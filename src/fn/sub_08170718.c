@@ -38,7 +38,7 @@ void SceneHud_LayoutActionGrid(struct SceneHudState *s)
         SceneHud_SetWidgetPalette(w, 0x373);
     }
     {
-        struct SceneInputWidget *w = (void *)((u8 *)s + 0x2620);
+        struct SceneInputWidget *w = &s->actionPanelWidgets[2];
         w->flags &= ~1;
         if (s->actionInput[0] & 0x40)
             SceneHud_SetWidgetPalette(w, 0x373);

@@ -92,7 +92,7 @@ u32 ScriptCombatActor_UpdateState(struct ScriptCombatActorState *p)
         p->ptr5c = gPaletteBankData + 0x36e0;
     }
     {
-        s16 *dp = (s16 *)((u8 *)p + 0x180);
+        s16 *dp = &p->damage;
         u16 d = *dp;
         if (*dp > 0 && *(s16 *)((u8 *)p + (0x180 + 6)) == 0) {
             u16 *hpp = &p->hp;

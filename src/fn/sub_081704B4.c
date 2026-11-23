@@ -19,7 +19,7 @@ void SceneHud_UpdateActionSwap(struct SceneHudState *p)
     u8 *cursor, *selection, *category;
     struct SceneInputWidget *widget;
     if (SceneInput_NavigateGridKeys(input, 240)) {
-        SceneHud_GetActionIconPosition((u8 *)p + 0x1620, p->actionCursor);
+        SceneHud_GetActionIconPosition(&p->categoryWidgets[5].position, p->actionCursor);
         SceneHud_ShowActionPreview(p);
     }
     MenuDisplay_UpdateActionPrompt(p, 4);
@@ -42,7 +42,7 @@ void SceneHud_UpdateActionSwap(struct SceneHudState *p)
         Hud_SetInteractionCallback(p, PauseMenu_OnSwapSelectionUpdate, 1);
         Hud_RestoreGridSelection(input);
         Hud_SetGridPosition(input, p->actionInput[1], p->actionInput[2]);
-        SceneHud_GetActionIconPosition((u8 *)p + 0x1620, p->actionCursor);
+        SceneHud_GetActionIconPosition(&p->categoryWidgets[5].position, p->actionCursor);
         widget = &p->categoryWidgets[6];
         widget->flags |= 1;
         SceneHud_ShowActionPreview(p);

@@ -92,7 +92,7 @@ void SceneHud_UpdateActionChoice(struct SceneHudState *p)
     u32 mode;
     u8 value;
     if (SceneInput_NavigateGridKeys(q, 0xf0)) {
-        SceneHud_SetActionCursorPosition((u8 *)p + 0x1620, p->actionCursor);
+        SceneHud_SetActionCursorPosition(&p->categoryWidgets[5].position, p->actionCursor);
         SceneHud_ShowSelectionDescription(p);
     }
     cursor = &p->actionCursor;
@@ -108,7 +108,7 @@ void SceneHud_UpdateActionChoice(struct SceneHudState *p)
         Sound_PlaySong(0xdd);
         Hud_SaveGridSelection(q);
         p->categoryWidgets[6].flags &= ~1;
-        SceneHud_SetActionCursorPosition((u8 *)p + 0x1680, p->actionSelection);
+        SceneHud_SetActionCursorPosition(&p->categoryWidgets[6].position, p->actionSelection);
         if (*cursor <= 7)
             SceneHud_ConfigureActionGrid(q, 0, 1);
         else
@@ -164,7 +164,7 @@ void SceneHud_UpdateActionTransferSelection(struct SceneHudState *p)
     u8 *selected;
     u32 value, mode;
     if (SceneInput_NavigateGridKeys(grid, 0xf0)) {
-        SceneHud_SetActionCursorPosition((u8 *)p + 0x1620, p->actionCursor);
+        SceneHud_SetActionCursorPosition(&p->categoryWidgets[5].position, p->actionCursor);
         SceneHud_ShowSelectionDescription(p);
     }
     selected = &p->actionCursor;
@@ -214,7 +214,7 @@ void SceneHud_UpdateActionTransferSelection(struct SceneHudState *p)
         p->categoryWidgets[6].flags |= 1;
         Hud_RestoreGridSelection(grid);
         Hud_SetGridPosition(grid, p->actionInput[1], p->actionInput[2]);
-        SceneHud_SetActionCursorPosition((u8 *)p + 0x1620, *selected);
+        SceneHud_SetActionCursorPosition(&p->categoryWidgets[5].position, *selected);
         Sound_PlaySong(0xde);
     }
 }

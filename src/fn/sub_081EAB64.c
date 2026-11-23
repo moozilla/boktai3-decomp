@@ -270,7 +270,7 @@ void Params3D0_UpdateDisplay(struct Display *p)
             p->idleTimer++;
             break;
         case 9:
-            Anim_LoadKeyframe((u8 *)p + 0x1B0, (u8 *)p + 0x4E0, (u16)(p->selection + 12), 0);
+            Anim_LoadKeyframe(&p->widgets[3], (u8 *)p + 0x4E0, (u16)(p->selection + 12), 0);
             FLAGS(0x1B8) &= ~1;
             {
                 s16 *destination = &p->widgets[3].x;
@@ -283,7 +283,7 @@ void Params3D0_UpdateDisplay(struct Display *p)
         case 10:
             Actor_UpdatePairedSpriteAnimation(p);
             if (p->stateTimer <= 4) {
-                Anim_LoadKeyframe((u8 *)p + 0x2C0, (u8 *)p + 0x4E0, 6, 0);
+                Anim_LoadKeyframe(&p->widgets[5], (u8 *)p + 0x4E0, 6, 0);
             }
             p->velocity -= 2;
             position = p->widgets[3].x + p->velocity;
@@ -293,14 +293,14 @@ void Params3D0_UpdateDisplay(struct Display *p)
                 p->widgets[2].x = y;
             }
             if ((s16)position <= 0) {
-                Anim_LoadKeyframe((u8 *)p + 0x128, (u8 *)p + 0x4E0, (u16)(p->selection + 12), 0);
+                Anim_LoadKeyframe(&p->widgets[2], (u8 *)p + 0x4E0, (u16)(p->selection + 12), 0);
                 p->widgets[2].x = 0;
                 FLAGS(0x1B8) |= 1;
                 p->state = 8;
             }
             break;
         case 11:
-            Anim_LoadKeyframe((u8 *)p + 0x1B0, (u8 *)p + 0x4E0, (u16)(p->selection + 12), 0);
+            Anim_LoadKeyframe(&p->widgets[3], (u8 *)p + 0x4E0, (u16)(p->selection + 12), 0);
             FLAGS(0x1B8) &= ~1;
             {
                 u16 *destination = (u16 *)&p->widgets[3].x;
@@ -316,7 +316,7 @@ void Params3D0_UpdateDisplay(struct Display *p)
         case 12:
             Actor_UpdatePairedSpriteAnimation(p);
             if (p->stateTimer <= 4) {
-                Anim_LoadKeyframe((u8 *)p + 0x238, (u8 *)p + 0x4E0, 10, 0);
+                Anim_LoadKeyframe(&p->widgets[4], (u8 *)p + 0x4E0, 10, 0);
             }
             p->velocity += 2;
             position = p->widgets[3].x + p->velocity;
@@ -326,7 +326,7 @@ void Params3D0_UpdateDisplay(struct Display *p)
                 p->widgets[2].x = y;
             }
             if ((s16)position >= 0) {
-                Anim_LoadKeyframe((u8 *)p + 0x128, (u8 *)p + 0x4E0, (u16)(p->selection + 12), 0);
+                Anim_LoadKeyframe(&p->widgets[2], (u8 *)p + 0x4E0, (u16)(p->selection + 12), 0);
                 p->widgets[2].x = 0;
                 FLAGS(0x1B8) |= 1;
                 p->state = 8;

@@ -47,7 +47,7 @@ void SceneHud_UpdateStatComparison(struct SceneHudState *p)
     MenuDisplay_UpdateActionPrompt(p, 3);
     input = p->actionInput;
     if (SceneInput_NavigateGridKeys(input, 240)) {
-        SceneHud_GetActionIconPosition((u8 *)p + 0x1620, p->actionCursor);
+        SceneHud_GetActionIconPosition(&p->categoryWidgets[5].position, p->actionCursor);
         PauseInventory_RefreshConsumableDescription(p);
         Hud_SaveGridSelection(input);
         for (i = 0; i < 3; i++) {
