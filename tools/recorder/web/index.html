@@ -38,6 +38,7 @@ th { text-align: left; color: var(--muted); font-weight: 500; border-bottom: 1px
 td { border-bottom: 1px solid var(--line); padding: 4px 6px; vertical-align: top; }
 td.place { font-family: var(--mono); color: var(--accent); cursor: pointer; overflow-wrap: anywhere; min-width: 12ch; }
 td.place:hover { text-decoration: underline; }
+td.place .prop { color: var(--ok); font-size: 12px; }
 td.src { font-family: var(--mono); font-size: 12px; color: var(--muted); }
 td.src code { color: var(--ink); }
 td.num { font-family: var(--mono); text-align: right; white-space: nowrap; }
@@ -146,7 +147,7 @@ function render() {
   const q = $('filter').value.toLowerCase();
   const shown = rows.filter((r) => !q || (r.place + ' ' + r.fn + ' ' + r.loc).toLowerCase().includes(q));
   $('rows').innerHTML = shown.slice(0, 400).map((r, i) => `
-    <tr><td class="place" data-i="${rows.indexOf(r)}">${esc(r.place)}</td>
+    <tr><td class="place" data-i="${rows.indexOf(r)}">${esc(r.place)}${r.proposal ? `<br><span class="prop" title="${esc(r.proposal.reasons.join('\n'))}">infer: ${esc(r.proposal.name)} (${r.proposal.confidence})</span>` : ''}</td>
       <td class="num" title="${hex(r.value, r.width)}">${r.value}</td>
       <td class="num">${r.count > 1 ? r.count : ''}</td>
       <td class="src">${esc(r.fn)} · ${esc(r.loc)}${r.text ? `<br><code>${esc(r.text)}</code>` : ''}</td></tr>`).join('')

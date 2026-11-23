@@ -8,6 +8,7 @@ JSON endpoints (all GET): /api/session, /api/screen?f=N (PNG), /api/writes?f=N,
 import contextlib
 import io
 import json
+import re
 import struct
 import zlib
 from collections import OrderedDict
@@ -56,6 +57,15 @@ class App:
             while len(self.maps) > 8:
                 self.maps.popitem(last=False)
         return om
+
+    def proposals(self):
+        if not hasattr(self, '_props'):
+            base = HERE.parents[1] / 'build/recorder/infer'
+            self._props = {}
+            for p in (base / 'evidence.json', base / 'all' / 'evidence.json'):   # the broader run wins
+                if p.exists():
+                    self._props.update(json.loads(p.read_text()))
+        return self._props
 
     def session_info(self):
         s = self.session
@@ -106,6 +116,14 @@ class App:
             g['width'] = w
             v = om.ram.read(g['addr'], w, signed)
             g['value'] = v if v is not None else g['last'] & ((1 << (8 * w)) - 1)   # IO: not in RAM snapshots
+        # name proposals from `infer` for placeholder fields (build/recorder/infer[/all]/evidence.json)
+        props = self.proposals()
+        for g in groups.values():
+            owner = re.split(r'[#(]', g['object'])[0]
+            key = owner + g['place'][len(g['object']):] if g['place'].startswith(g['object']) else None
+            ev = props.get(key) if key else None
+            if ev and ev.get('proposal'):
+                g['proposal'] = {'name': ev['proposal'], 'confidence': ev['confidence'], 'reasons': ev['reasons'][:3]}
         return {'frame': f, 'rows': int(sl.stop - sl.start), 'writes': list(groups.values()),
                 'keys': int(s.frames['keys'][f]), 'solar': int(s.frames['solar'][f])}
 
