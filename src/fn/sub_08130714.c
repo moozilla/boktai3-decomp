@@ -11,7 +11,7 @@ u8 SceneActorBehavior_AccelerateTowardDescriptor(void *, void *, u32, u32, s32);
 
 void SceneActorControl_UpdateTriggerApproach(struct ChaseActor *actor)
 {
-    u8 *group = (u8 *)&actor->group.common;
+    struct SceneActorChaseGroup *group = &actor->group;
     s32 speed;
     u16 *scale;
     if (SceneActorControl_TakeFlag(&actor->base.field2B1)) {
@@ -36,7 +36,7 @@ void SceneActorControl_UpdateTriggerApproach(struct ChaseActor *actor)
             Anim_SetDurationScale((u8 *)actor->base.drawable + 0x48, *scale);
         else
             Anim_SetFrameDurationScale((u8 *)actor->base.drawable + 0x20, *scale);
-        if (SceneActorBehavior_AccelerateTowardDescriptor(actor, *(void **)(group + 0x1fc), 32, 32,
+        if (SceneActorBehavior_AccelerateTowardDescriptor(actor, group->route, 32, 32,
                                                           speed)) {
             Trigger_ConsumePending((u8 *)actor + 0xc, 1);
             SceneActorTerrain_EnterState(actor, 2, 0, 2);
