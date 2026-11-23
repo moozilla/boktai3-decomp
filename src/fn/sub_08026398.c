@@ -36,10 +36,7 @@ void SceneActorAnimation_UpdateImpactRelease(struct StateActor *p)
         effect((u8 *)p, 2, 827, 6);
     }
     SceneGraphicsActor_ClearPendingDamage(actor);
-    {
-        u32 mask = 12;
-        p->actionFlags |= mask;
-    }
+    SceneActorState_SetFlags(p, 12);
     if (!p->actionReset(p) && (actor->animation.status & 2))
         p->actionFinished = 1;
 }

@@ -35,10 +35,7 @@ void SceneActorAnimation_UpdateImpactFinish(struct StateActor *p, int tick)
         Sound_PlaySongChecked(1334);
     }
     SceneGraphicsActor_ClearPendingDamage(actor);
-    {
-        u32 mask = 12;
-        p->actionFlags |= mask;
-    }
+    SceneActorState_SetFlags(p, 12);
     {
         u8 result = p->actionReset(p);
         if (!result && tick > 31) {

@@ -51,11 +51,10 @@ void SceneActorAnimation_UpdateLungeAttack(struct StateActor *p, int tick)
     decay(&actor->graphics.scaleMin);
     decay(&actor->graphics.scaleMax);
     if (!p->actionTryUpdate(p)) {
-        u32 mask = 64;
-        p->actionFlags |= mask;
+        SceneActorState_SetFlags(p, 64);
         if (!p->actionReset(p)) {
             if (tick <= 63) {
-                int rate = ((int)mask - tick) >> 3;
+                int rate = (64 - tick) >> 3;
                 struct ContactPosition *velocity = (struct ContactPosition *)(position + 20);
                 u32 angle = position[9];
                 int speed;

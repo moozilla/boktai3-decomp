@@ -1,5 +1,6 @@
 #include "global.h"
 #include "player.h"
+#include "player_slot_status.h"
 
 extern u32 gUnk_02000560;
 
@@ -234,8 +235,7 @@ void SceneActorAnimation_UpdatePlayerGrab(struct Sub0802592CActor *base, s32 par
                 actor->unk383 = 1;
         }
         if (actor->unk25D & 2) {
-            u32 mask = 4;
-            if ((gUnk_02000560 & mask) || actor->unk383 || param > 0x78)
+            if (PlayerSlot_ReadStatus(0, 4) || actor->unk383 || param > 0x78)
                 base->unkAF = 1;
         }
     }

@@ -64,9 +64,7 @@ void SceneActorAnimation_UpdateHomingLunge(struct StateActor *p, int tick)
     {
         struct ContactPosition *velocity = (struct ContactPosition *)(position + 20);
         u32 angle = position[9];
-        int speed;
-        speed = 40;
-        SceneActor_SetChargeOffset(angle, velocity, speed);
+        SceneActor_SetChargeOffset(angle, velocity, 40);
     }
     if (tick > 159) {
     finished:
