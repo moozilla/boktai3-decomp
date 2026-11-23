@@ -25,7 +25,7 @@ void ResourceHeader_Relocate(void *, void *);
 int Script_SeekToKeyword(int);
 void *Script_GetTextSourcePc(void);
 void *Script_GetKeywordValue(int, int);
-void WirelessPeerMenu_InitBackground(struct P *);
+void WirelessPeerMenu_InitBackground(struct P *, int);
 int WirelessPeerPanel_Init(struct P *, struct Panel *, int);
 int TextWindow_Create(int, int, int, int);
 void TextWindow_SetScript(int, void *);
@@ -54,7 +54,7 @@ int WirelessPeerPanel_Initialize(struct P *p)
     p->state = 0;
     p->entered = 1;
     p->timer = 0;
-    WirelessPeerMenu_InitBackground(p);
+    WirelessPeerMenu_InitBackground(p, 0);
     q = p->panels;
     i = 0;
     do {
