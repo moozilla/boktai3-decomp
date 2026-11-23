@@ -3,6 +3,8 @@
 #include "engine.h"
 #include "numeric_overlay.h"
 #include "ram.h"
+#include "render.h"
+#include "gba/io_reg.h"
 
 void StatusScreen_FadeAndExit(struct StatusScreen *p)
 {
@@ -42,18 +44,12 @@ void StatusScreen_FadeAndExit(struct StatusScreen *p)
 
 void StatusScreen_WaitForStart(struct StatusScreen *p)
 {
-    u32 mask = 256;
-    gDispCntShadow &= ~mask;
+    Bg_DisableDisplay(DISPCNT_BG0_ON);
     if (!StatusScreen_CheckConfirm(p)) {
         u16 old = p->delay--;
         if (old == 0) {
-            gDispCntShadow = mask | gDispCntShadow;
-            {
-                struct StatusScreen *target = gStatusScreen;
-                StatusScreenFn state = StatusScreen_Reveal;
-                target->state = state;
-                target->timer = 0;
-            }
+            Bg_EnableDisplay(DISPCNT_BG0_ON);
+            StatusScreen_SetState(gStatusScreen, StatusScreen_Reveal);
         }
     }
 }
@@ -210,14 +206,7 @@ int StatusScreen_Initialize(struct StatusScreen *p, u16 id)
     int i;
     u8 *map, *palette;
     gStatusScreen = p;
-    {
-        u16 *flags = &gDispCntShadow;
-        {
-            int mask = ~256;
-            mask &= *flags;
-            *flags = mask;
-        }
-    }
+    Bg_DisableDisplay(DISPCNT_BG0_ON);
     p->id = id;
     p->flags = Script_GetKeywordValue('f', 0);
     p->mapId = 0x5AF3;
@@ -258,13 +247,9 @@ int StatusScreen_Initialize(struct StatusScreen *p, u16 id)
     }
     p->source = (u16 *)(palette + 0x1B4);
     CpuFill32(0, p->buffer, 3 * 16 * sizeof(*p->buffer));
-    *(volatile u16 *)0x04000008 |= 0x40;
+    REG_BG0CNT |= BGCNT_MOSAIC;
     p->delay = Script_GetKeywordValue('w', 0);
-    {
-        register void (*state)(struct StatusScreen *) = StatusScreen_WaitForStart;
-        p->state = state;
-    }
-    p->timer = 0;
+    StatusScreen_SetState(p, StatusScreen_WaitForStart);
     p->start = 0;
     p->end = 16;
     p->blend = 0x1084;

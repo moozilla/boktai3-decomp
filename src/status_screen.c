@@ -181,11 +181,7 @@ int StatusScreen_CheckConfirm(struct StatusScreen *p)
 {
     if ((gPadState[1] & 8) || (gPadState[1] & 1)) {
         ScreenTransition_SendCommand(3, 4, 4, 4, 4, 65535, 0);
-        {
-            register void (*state)(struct StatusScreen *) = StatusScreen_FadeAndExit;
-            p->state = state;
-        }
-        p->timer = 0;
+        StatusScreen_SetState(p, StatusScreen_FadeAndExit);
         return 1;
     }
     return 0;
