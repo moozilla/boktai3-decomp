@@ -2,6 +2,7 @@
 #include "engine_globals.h"
 #include "ram.h"
 #include "contact_position.h"
+#include "vanargand_projectiles.h"
 
 struct FormationActor {
     u8 pad0[0x54];
@@ -23,18 +24,11 @@ void SceneSteeringActor_CreateBobbingActor(const struct ContactPosition *positio
                                            s32 b, s32 c, s32 d);
 extern const s16 gUnk_086149C4[];
 
-static inline s32 Scale(s32 value)
-{
-    if (value >= 0)
-        return value >> 12;
-    return -(-value >> 12);
-}
-
 static inline void GetOffset(struct ContactPosition *position, u32 angle, s32 distance, u32 mask)
 {
-    position->x = Scale(gUnk_086149C4[(angle + 64) & mask] * distance);
+    position->x = VanargandProjectile_Scale(gUnk_086149C4[(angle + 64) & mask] * distance);
     position->y = 0;
-    position->z = Scale(gUnk_086149C4[angle & mask] * distance);
+    position->z = VanargandProjectile_Scale(gUnk_086149C4[angle & mask] * distance);
 }
 
 static inline s32 FormationRandomValue(void)

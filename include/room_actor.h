@@ -57,7 +57,8 @@ struct RoomActor {
     void *object;
     void *drawable;
     u8 drawableKind;
-    u8 unknown9[0x37];
+    u8 unknown9[3];
+    u8 receiver[0x34]; /* 0x0C: a SceneMessageReceiver (include/scene_messages.h) */
     u8 movementProbe[0x10];
     struct SceneActorBody body;
     u8 category; /* enum MonsterCategory */

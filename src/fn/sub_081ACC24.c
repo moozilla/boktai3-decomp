@@ -6,10 +6,6 @@ void CpuSet(const void *, void *, u32);
 
 
 
-static inline void setFlags(struct VanargandPairAttack *p, u32 mask)
-{
-    p->flags |= mask;
-}
 static inline void setPosition(s16 *dst, s32 x, s32 y, s32 z)
 {
     s16 *first = dst;
@@ -64,7 +60,7 @@ s32 Vanargand_ApplyPendingDamage(struct VanargandPairAttack *p)
         }
         if (p->health <= 0) {
             p->health = 0;
-            setFlags(p, 2);
+            VanargandPairAttack_SetFlags(p, 2);
             return 1;
         }
         {
@@ -76,7 +72,7 @@ s32 Vanargand_ApplyPendingDamage(struct VanargandPairAttack *p)
                 s32 count = ScenePair_CountPositiveCounters(self->pair);
                 if (count == 0) {
                     mask = 1;
-                    setFlags(p, mask);
+                    VanargandPairAttack_SetFlags(p, mask);
                     *hitTotal = count;
                     return 1;
                 } else {
@@ -97,11 +93,11 @@ s32 Vanargand_ApplyPendingDamage(struct VanargandPairAttack *p)
                     self->part.position.z + 64);
         DamageNumberDisplay_ShowWithDefaultScale(&self->part.damageSource, partDamage, 0, pos, 1);
         if (p->health <= 0) {
-            setFlags(p, 2);
+            VanargandPairAttack_SetFlags(p, 2);
         } else if (self->part.flags & 4) {
             Vanargand_StartReaction(p, 20, Vanargand_UpdatePaletteLeap);
             mask = 0x10000;
-            setFlags(p, mask);
+            VanargandPairAttack_SetFlags(p, mask);
             return 1;
         }
     }

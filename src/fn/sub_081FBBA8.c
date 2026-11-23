@@ -84,7 +84,7 @@ s32 SceneParticles_SpawnAtPosition(struct ParticleConfig *config, struct Contact
             e->sprite.flags &= ~1;
             Sprite_LinkToList(&e->sprite, 0);
             {
-                u8 *kind = (u8 *)e + 0x33;
+                u8 *kind = &e->sprite.priority;
                 *kind = 2;
             }
         }

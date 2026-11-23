@@ -3,6 +3,7 @@
 #include "spark_particle.h"
 #include "engine.h"
 #include "ram.h"
+#include "monster_particle_random.h"
 
 extern const s16 gUnk_086149C4[];
 s32 Mod(s32, s32);
@@ -13,12 +14,6 @@ struct SparkParticleDrawView {
     struct SparkParticleSprite sprite;
     struct SparkParticleMotion motion;
 };
-
-static inline u32 SparkParticle_NextSample(const u16 *table)
-{
-    gRandomIndex = (gRandomIndex + 1) & 1023;
-    return table[gRandomIndex];
-}
 
 static inline s32 SparkParticle_Half(s32 value)
 {
@@ -98,14 +93,14 @@ s32 SparkParticle_Spawn(const struct ContactPosition *pos, u8 requestedCount,
                 if (spread->y == 0)
                     projected->sprite.position.y = pos->y;
                 else {
-                    s32 sample = SparkParticle_NextSample(setup.table);
+                    s32 sample = ParticleRandom_ReadDirectSample(setup.table);
                     s32 offset = Mod(sample, spread->y);
                     projected->sprite.position.y = offset - SparkParticle_Half(spread->y) + pos->y;
                 }
                 if (spread->z == 0)
                     projected->sprite.position.z = pos->z;
                 else {
-                    s32 sample = SparkParticle_NextSample(setup.table);
+                    s32 sample = ParticleRandom_ReadDirectSample(setup.table);
                     s32 offset = Mod(sample, spread->z);
                     projected->sprite.position.z = offset - SparkParticle_Half(spread->z) + pos->z;
                 }
@@ -122,10 +117,11 @@ s32 SparkParticle_Spawn(const struct ContactPosition *pos, u8 requestedCount,
             if (speed)
                 SparkParticle_SetVelocity(&motion->velocity, angle, speed);
             if (verticalRange == 0)
-                projected->motion.velocity.y = Mod(SparkParticle_NextSample(setup.table), 32);
+                projected->motion.velocity.y =
+                    Mod(ParticleRandom_ReadDirectSample(setup.table), 32);
             else
                 projected->motion.velocity.y =
-                    Mod(SparkParticle_NextSample(setup.table), verticalRange);
+                    Mod(ParticleRandom_ReadDirectSample(setup.table), verticalRange);
             switch (kind) {
                 case 0:
                     sequence = 15;

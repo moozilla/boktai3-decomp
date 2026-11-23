@@ -5,6 +5,7 @@
 #include "phase_object.h"
 #include "damage_number_display.h"
 #include "scene_hud_display.h"
+#include "scene_actor_init_primitives.h"
 
 s32 Callback_InvokeActor(void *, void *);
 
@@ -218,20 +219,13 @@ void Ivy_SetSegmentProperties(u8 *p, u32 b, s32 a)
 
 s32 Script_GetValue(void);
 
-static inline s32 ReadParameter(s32 fallback)
-{
-    if (Script_GetPc())
-        return Script_GetValue();
-    return fallback;
-}
-
 void ChildGroup_ReadScriptParameters(struct PhaseObject *p)
 {
     if (Script_SeekToKeyword('P')) {
-        p->launchInterval = ReadParameter(60);
-        p->memberCount = ReadParameter(2);
-        p->countdownLimit = ReadParameter(80);
-        p->countdownStep = ReadParameter(1);
+        p->launchInterval = MonsterInit_ReadWord(60);
+        p->memberCount = MonsterInit_ReadWord(2);
+        p->countdownLimit = MonsterInit_ReadWord(80);
+        p->countdownStep = MonsterInit_ReadWord(1);
     } else {
         p->launchInterval = 60;
         p->memberCount = 2;

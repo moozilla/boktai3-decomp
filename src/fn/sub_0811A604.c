@@ -1,11 +1,11 @@
 #include "global.h"
+#include "glove.h"
 void MotionActor_DispatchRequestedState(void *);
 void Glove_UpdatePostState(void *);
-void Callback_InvokeActor(void *, u32);
-u32 Glove_UpdateTask(u8 *p)
+u32 Glove_UpdateTask(struct Glove *p)
 {
     MotionActor_DispatchRequestedState(p);
-    Callback_InvokeActor(p, *(u32 *)(p + 0x86C));
+    Callback_InvokeActor(p, p->update);
     Glove_UpdatePostState(p);
     return 0;
 }

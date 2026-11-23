@@ -1,5 +1,6 @@
 #include "global.h"
 #include "contact_actor.h"
+#include "scene_actor_turn.h"
 struct Hresvelgr {
     u8 unknown0[0xBC];
     u32 contactMask, contactFlags;
@@ -21,10 +22,6 @@ struct Hresvelgr {
 void Collision_CalculateDamageResponse(void *, void *);
 void PlayerStats_AddContactHundredths(void *, void *, u32);
 s32 Math_Atan2(s32, s32);
-static inline u32 testFlags(u16 *flags, u32 mask)
-{
-    return *flags & mask;
-}
 static inline u32 testReaction(u32 *flags, u32 mask)
 {
     return *flags & mask;
@@ -44,7 +41,7 @@ void Hresvelgr_OnSecondaryContact(struct ContactCollider *a, struct ContactColli
             magnitude = -(-magnitude >> shift);
         actor->contactMagnitude = magnitude;
         actor->responseFlags = a->reactionFlags;
-        if (testFlags(&a->flags, 0x100))
+        if (SceneActorTurn_Flags(&a->flags, 0x100))
             actor->contactDirection = a->direction;
         else
             actor->contactDirection = Math_Atan2(b->x - a->x, b->z - a->z);

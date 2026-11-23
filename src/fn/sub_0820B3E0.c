@@ -4,6 +4,7 @@
 #include "engine.h"
 #include "ram.h"
 #include "engine_pause.h"
+#include "monster_particle_random.h"
 struct EffectVector {
     s32 x : 16;
     u32 y : 16;
@@ -68,11 +69,6 @@ void SceneHud_SetTimedState(void *, s32, s32, s32, u32, s32);
 void sub_08014634(s32, s32, void *, void *, void *, s32, s32);
 void Anim_RestartSequence(void *, void *, u32, u32, u32);
 void DragonPuppy_UpdateAttackWindup(void);
-static inline u32 RandomFrom(const u16 *table)
-{
-    gRandomIndex = (gRandomIndex + 1) & 0x3ff;
-    return table[gRandomIndex];
-}
 
 s32 DragonPuppy_UpdateCombat(u8 *p)
 {
@@ -125,12 +121,12 @@ s32 DragonPuppy_UpdateCombat(u8 *p)
             }
             velocity.x = -4;
             table = (const u16 *)0x0203B400;
-            velocity.y = RandomFrom(table) & 3;
+            velocity.y = ParticleRandom_ReadDirectSample(table) & 3;
             velocity.z = -4;
             size.x = 24;
-            size.y = (RandomFrom(table) & 3) + 1;
+            size.y = (ParticleRandom_ReadDirectSample(table) & 3) + 1;
             size.z = 24;
-            count = (RandomFrom(table) & 3) + 4;
+            count = (ParticleRandom_ReadDirectSample(table) & 3) + 4;
             sub_08014634(count, 0x16, &position, &velocity, &size, 15, 15);
             Anim_RestartSequence(((u8 *)&PUPPY_FIELD(animation)), PUPPY_FIELD(deathAnimation), 5,
                                  PUPPY_FIELD(deathVariant), 0);

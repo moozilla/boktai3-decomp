@@ -14,7 +14,7 @@ void SceneActorRegistry_RegisterCategoryReceiver(struct ChaseActor *actor)
     if (!paused &&
         (category == 4 || category == 5 || category == 7 || category == 6 || category == 8 ||
          category == 21 || category == 25 || category == 23 || category == 18)) {
-        SceneMessages_RegisterReceiver((u8 *)actor + 0xc, actor->base.body.id, 3);
+        SceneMessages_RegisterReceiver(actor->base.receiver, actor->base.body.id, 3);
         HalfwordFlags_Set(0x100, &actor->base.placementFlags);
     }
 }

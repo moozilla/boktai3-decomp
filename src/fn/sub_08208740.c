@@ -5,6 +5,7 @@
 #include "engine.h"
 #include "ram.h"
 #include "engine_pause.h"
+#include "monster_particle_random.h"
 extern u32 gUnk_02000560;
 s32 Mod(s32, s32);
 void Sound_PlaySong(u32);
@@ -15,11 +16,6 @@ void sub_08014634(s32, s32, void *, void *, void *, s32, s32);
 void sub_082086B8(void);
 void CannonTurret_FireAimedVolley(void);
 void Anim_SetDurationScale(void *, u16);
-static inline u32 RandomFrom(const u16 *table)
-{
-    gRandomIndex = (gRandomIndex + 1) & 0x3ff;
-    return table[gRandomIndex];
-}
 struct ColliderView {
     u8 pad[6];
     u16 flags;
@@ -208,12 +204,12 @@ s32 CannonTurret_UpdateCombat(struct CannonTurretCombat *p)
             }
             velocity.x = -4;
             table = gRandomTable;
-            velocity.y = RandomFrom(table) & 7;
+            velocity.y = ParticleRandom_ReadDirectSample(table) & 7;
             velocity.z = -4;
             size.x = 24;
-            size.y = (RandomFrom(table) & 7) + 3;
+            size.y = (ParticleRandom_ReadDirectSample(table) & 7) + 3;
             size.z = 24;
-            count = (RandomFrom(table) & 3) + 4;
+            count = (ParticleRandom_ReadDirectSample(table) & 3) + 4;
             sub_08014634(count, 2, &position, &velocity, &size, 15, 15);
             Anim_RestartSequence(&p->sequence, p->resource, 10, 0, 0);
             AnimData_SelectPaletteBank(p->graphics, 0x1bc);

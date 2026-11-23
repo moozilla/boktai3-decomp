@@ -2,6 +2,7 @@
 #include "player_cue_sequence.h"
 #include "ram.h"
 #include "engine_globals.h"
+#include "monster_particle_random.h"
 struct FanVec {
     s16 x, y, z, pad;
 };
@@ -76,11 +77,6 @@ void Anim_SetDurationScale(void *, u32);
 void AnimData_SelectPaletteBank(void *, s32);
 struct FanVec *Player_GetEffectivePosition(s32);
 
-static inline u32 RandomFrom(const u16 *table)
-{
-    gRandomIndex = (gRandomIndex + 1) & 0x3ff;
-    return table[gRandomIndex];
-}
 static inline s32 Fan_Cell(struct FanVec *v)
 {
     s32 x = (s16)v->x >> 8, z = (s16)v->z >> 8;
@@ -166,12 +162,12 @@ invoke:
             }
             velocity.a.lo = -4;
             table = (const u16 *)RANDOM_TABLE_ADDR;
-            velocity.a.hi = RandomFrom(table) & 7;
+            velocity.a.hi = ParticleRandom_ReadDirectSample(table) & 7;
             velocity.b.lo = -4;
             spread.a.lo = 24;
-            spread.a.hi = (RandomFrom(table) & 7) + 3;
+            spread.a.hi = (ParticleRandom_ReadDirectSample(table) & 7) + 3;
             spread.b.lo = 24;
-            sub_08014634((RandomFrom(table) & 3) + 4, 13, &center, &velocity, &spread, 15, 15);
+            sub_08014634((ParticleRandom_ReadDirectSample(table) & 3) + 4, 13, &center, &velocity, &spread, 15, 15);
             {
                 struct FanVec *v = &smoke;
                 *v = p->position;

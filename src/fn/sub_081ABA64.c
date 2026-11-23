@@ -403,12 +403,10 @@ void Vanargand_UpdateChargeSequence(struct VanargandBoss *arg0)
                     s32 y = arg0->position.y;
                     s32 z = arg0->position.z;
                     struct MotionTrack *track;
-                    s32 delta;
                     u32 mode;
                     track = &self->track;
-                    delta = -0x100;
-                    x += delta;
-                    z += delta;
+                    x += -0x100;
+                    z += -0x100;
                     mode = 4;
                     Vg_SetPosition(&org2, x, y, z);
                     MotionTrack_Initialize(track, &arg0->position,

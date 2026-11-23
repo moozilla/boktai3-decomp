@@ -1,6 +1,8 @@
 #include "positioned_effect.h"
 #include "scene_object.h"
 #include "input.h"
+#include "scene_actor_init_actor.h"
+#include "vanargand_parts.h"
 
 /* Empty callback registered by the adjacent effect constructors. */
 
@@ -145,20 +147,13 @@ void Vanargand_RunUnusedHook(void)
 {
 }
 
-static inline s32 SignedHalf(s32 value)
-{
-    if (value >= 0)
-        return value >> 1;
-    return -(-value >> 1);
-}
-
 static inline void Unproject(struct ContactPosition *out, s16 *in, s32 height)
 {
     s32 x = in[0];
     s32 y = in[1];
-    out->x = SignedHalf(((x + y) << 5) / 3 + height);
+    out->x = MonsterInit_Half(((x + y) << 5) / 3 + height);
     out->y = height;
-    out->z = SignedHalf(((y - x) << 5) / 3 + height);
+    out->z = MonsterInit_Half(((y - x) << 5) / 3 + height);
 }
 
 void Debug_TestIsometricProjection(void)
@@ -221,13 +216,6 @@ void ScreenPalette_ProjectPositionAt88(struct PositionedEffectCoordinates *obj)
     BgGfx_LoadTilemapAtPosition(2, d.x + 0x88, d.y + 0x6c);
 }
 
-static inline void SetVector(struct ContactPosition *v, s32 x, s32 y, s32 z)
-{
-    v->x = x;
-    v->y = y;
-    v->z = z;
-}
-
 static inline void AddVector(struct ContactPosition *p, struct ContactPosition *a,
                              struct ContactPosition *b)
 {
@@ -247,19 +235,11 @@ static inline void UpdateAnimation(struct PositionedEffectAnimation *a,
 void PositionedEffect_UpdateVectors(struct PositionedVectorEffect *p)
 {
     p->position = p->source;
-    SetVector(&p->shifted, p->source.x - 160, p->source.y, p->source.z - 160);
+    Vanargand_SetVector(&p->shifted, p->source.x - 160, p->source.y, p->source.z - 160);
     UpdateAnimation(&p->animation, p);
 }
 
 s32 __divsi3(s32, s32);
-
-static inline void SubVector(struct ContactPosition *v, struct ContactPosition *a,
-                             struct ContactPosition *b)
-{
-    v->x = a->x - b->x;
-    v->y = a->y - b->y;
-    v->z = a->z - b->z;
-}
 
 void PositionedEffect_InterpolateArcNodes(struct PositionedArc *effect)
 {
@@ -267,7 +247,7 @@ void PositionedEffect_InterpolateArcNodes(struct PositionedArc *effect)
     s32 i, dx, dy, dz, z, x;
     struct ContactSwarmSprite *node;
     struct ContactPosition *d;
-    SubVector(&diff, effect->end, effect->start);
+    Vanargand_Difference(&diff, effect->end, effect->start);
     i = 0;
     *(&d) = &diff;
     dx = d->x;
@@ -285,7 +265,7 @@ void PositionedEffect_InterpolateArcNodes(struct PositionedArc *effect)
         s32 oy = (dy * gUnk_086149C4[angle & 255]) >> 12;
         s32 pz = start->z;
         s32 oz = (z / 5);
-        SetVector(&node->position, px + ox, py + oy, pz + oz);
+        Vanargand_SetVector(&node->position, px + ox, py + oy, pz + oz);
         node->flags &= ~1;
         node++;
         z += dz;
@@ -296,8 +276,8 @@ void PositionedEffect_InterpolateArcNodes(struct PositionedArc *effect)
 void PositionedEffect_SetHalfScaleCoordinates(struct PositionedEffectCoordinates *out,
                                               struct ContactPosition *source)
 {
-    out->position.x = SignedHalf(source->x - 640) + 512;
-    out->position.z = SignedHalf(source->z - 640) + 512;
+    out->position.x = MonsterInit_Half(source->x - 640) + 512;
+    out->position.z = MonsterInit_Half(source->z - 640) + 512;
 }
 
 void PositionedEffect_UpdateOscillatingCoordinates(struct VanargandPairAttack *effect, s32 phase)
@@ -307,6 +287,6 @@ void PositionedEffect_UpdateOscillatingCoordinates(struct VanargandPairAttack *e
     coordinates->position.y = Scale(gUnk_086149C4[(effect->attackParameter5B8 * phase) & 255]
                                     << effect->attackParameter5BA) +
                               256;
-    SetVector(&coordinates->shifted, coordinates->position.x - 256, coordinates->position.y,
-              coordinates->position.z - 256);
+    Vanargand_SetVector(&coordinates->shifted, coordinates->position.x - 256,
+                        coordinates->position.y, coordinates->position.z - 256);
 }

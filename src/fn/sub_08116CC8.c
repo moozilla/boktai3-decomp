@@ -1,16 +1,16 @@
 #include "global.h"
-void Script_Call(u32, u32);
-void Glove_OnActionComplete(u8 *s)
+#include "glove.h"
+void Glove_OnActionComplete(struct Glove *s)
 {
-    u8 *p = s + 0x868;
+    u8 *p = &s->active;
     u16 *h;
     u16 m;
     if (*p != 0) {
         *p = 0;
-        Script_Call(*(u32 *)(s + 0x904), 0);
+        Script_Call(s->localScript, 0);
     }
     m = 1;
-    h = (u16 *)(s + 0x8f4);
+    h = &s->flags;
     *h = *h | m;
-    (*(u32 *)(s + 0x864))++;
+    s->timer++;
 }

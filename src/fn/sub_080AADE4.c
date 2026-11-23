@@ -4,8 +4,7 @@ void TentacleActor_ApplyPendingRadialVelocity(u8 *s)
 {
     u32 *state = (u32 *)(s + 0x8EC);
     u32 stored = *state;
-    u32 limit = 0x7FFFFFFF;
-    if (stored != limit) {
+    if (stored != 0x7FFFFFFF) {
         u8 *p = *((u8 **)(s + 0x8F0));
         s32 off;
         u8 *anglep;
@@ -16,7 +15,7 @@ void TentacleActor_ApplyPendingRadialVelocity(u8 *s)
         s32 value;
         s32 x;
         u32 zero;
-        *state = limit;
+        *state = 0x7FFFFFFF;
         off = 0x108;
         anglep = p + off;
         radiusp = (u16 *)(p + 0xDC);

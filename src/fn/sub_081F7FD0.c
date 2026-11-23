@@ -20,10 +20,6 @@ void Player_EndState25(void *);
 void SlotMotion_Initialize(void *);
 void Ratatosk_ConfigureParticle(void *, s32, s32, s32, s32, s32);
 void SceneParticles_SpawnAtPosition(void *, void *);
-static inline void setAnimation(struct Ratatosk *p, u32 animation)
-{
-    p->actionAnimation = animation;
-}
 static inline u32 randomB(void)
 {
     gRandomIndex = (gRandomIndex + 1) & 1023;
@@ -73,7 +69,7 @@ void Ratatosk_UpdatePlayerOrbitAttack(struct Ratatosk *p)
     } scratch;
     struct SceneVec offsetVector, deltaVector, positionVector;
     if (Ratatosk_ConsumeActionEntry(q)) {
-        setAnimation(q, 9);
+        Ratatosk_SetAnimation(q, 9);
         p->sequence = 0;
         p->repeat = 0;
         p->waitTimer = 0;
@@ -103,7 +99,7 @@ void Ratatosk_UpdatePlayerOrbitAttack(struct Ratatosk *p)
                         p->ended = 0;
                         Sound_PlaySong(0x569);
                     }
-                    setAnimation(q, 5);
+                    Ratatosk_SetAnimation(q, 5);
                 } else if ((++p->waitTimer) > 2) {
                     p->duration = 64;
                     p->sequenceDone = 1;
@@ -114,7 +110,7 @@ void Ratatosk_UpdatePlayerOrbitAttack(struct Ratatosk *p)
                     u32 address = index * sizeof(struct RatatoskOrbitPoint) + (u32)p;
                     address += (u32) & ((struct Ratatosk *)0)->points;
                     *destination = *(struct RatatoskOrbitPoint *)address;
-                    setAnimation(q, 4);
+                    Ratatosk_SetAnimation(q, 4);
                     p->sequence = 3;
                 }
             }
@@ -168,7 +164,7 @@ void Ratatosk_UpdatePlayerOrbitAttack(struct Ratatosk *p)
             }
         finish:
             if (q->actionFinished) {
-                setAnimation(q, 7);
+                Ratatosk_SetAnimation(q, 7);
                 p->waitTimer = 0;
                 p->sequence = 2;
             }
@@ -193,7 +189,7 @@ void Ratatosk_UpdatePlayerOrbitAttack(struct Ratatosk *p)
 
         case 3:
             if (q->actionFinished) {
-                setAnimation(q, 9);
+                Ratatosk_SetAnimation(q, 9);
                 p->sequence = 0;
                 p->repeat = 0;
             }

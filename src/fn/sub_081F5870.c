@@ -25,7 +25,7 @@ void SceneActor_BeginTimedAnimation(struct Ratatosk *p, s32 elapsed)
         if (p->locked) {
             setFacing(p, p->savedAngle);
         }
-        SceneActors_StartAnimation(p, (u8 *)p + 0x34c, (u8 *)p + 0x32c, 32, 0, 4);
+        SceneActors_StartAnimation(p, p->animationData, p->animation, 32, 0, 4);
         p->interval = 60;
     }
     {

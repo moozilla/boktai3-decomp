@@ -1,6 +1,7 @@
 #include "global.h"
 #include "engine.h"
 #include "ram.h"
+#include "task_manager.h"
 struct PackedVec {
     u32 x : 16;
     u32 y : 16;
@@ -97,10 +98,6 @@ void sub_081CC1B4(void);
 void StateActor_StartAnimStep(void);
 void StateActor_StartKind5Animation9AndAttach(void);
 void StateActor_StartAndMaybeFinishAnim(void);
-static inline void setHandler(void *fn, void **slot)
-{
-    *slot = fn;
-}
 /* Registry routine F9D7: commands the scene character named -n. For kind 29,
    -C sets its tag and sound choice (as in place_character) and resets its
    speed; -i restarts a behavior as in SceneCharacter_PlaceFromScript. Returns

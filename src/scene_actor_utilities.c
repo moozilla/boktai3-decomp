@@ -1,4 +1,5 @@
 #include "scene_actor_utilities.h"
+#include "scene_actor_placement.h"
 
 void SceneActorAnimation_InitEnemySequence(struct SceneActorSequenceDrawable *drawable, u16 b)
 {
@@ -156,11 +157,6 @@ s16 Math_GetVectorLength(s16 x, s16 y)
     return result;
 }
 
-static inline void ClearFlags16(u16 *f, u32 mask)
-{
-    *f &= mask;
-}
-
 void SceneActorRoute_ClampTargetToAnchor(struct ChaseActor *actor, struct ContactPosition *target)
 {
     struct SceneActorBody *body = &actor->base.body;
@@ -180,14 +176,14 @@ void SceneActorRoute_ClampTargetToAnchor(struct ChaseActor *actor, struct Contac
     mesh = actor->group.route;
     pos = &actor->base.body.position;
     if (!Nav_IsPositionInMesh(mesh, pos, target)) {
-        ClearFlags16(&actor->base.motionFlags, ~0x200);
+        SceneActorPlacement_ClearFlags(&actor->base.motionFlags, ~0x200);
     } else {
         r = Terrain_ApplyBlocked(mesh, pos, target);
         if (r != 0) {
             if (r != 2)
                 Memory_Clear(&actor->base.body.motion, 8);
         } else {
-            ClearFlags16(&actor->base.motionFlags, ~0x200);
+            SceneActorPlacement_ClearFlags(&actor->base.motionFlags, ~0x200);
         }
     }
 }

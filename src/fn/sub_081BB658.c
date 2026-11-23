@@ -43,7 +43,7 @@ void SolarBank_BeginAmountEntry(struct SolarBankPanel *panel)
     }
     zero = 0;
     AnimData_SelectPaletteBank(panel->indicators, 0x1AE);
-    AnimData_SelectPaletteBank((u8 *)panel + 0x6CC, 0x1B1);
+    AnimData_SelectPaletteBank(&panel->indicators[1], 0x1B1);
     FIELD(struct SolarBankDigit, 0x598).flags &= ~1;
     FIELD(struct SolarBankDigit, 0x5F8).flags &= ~1;
     MessageWindow_ShowMessage(2);

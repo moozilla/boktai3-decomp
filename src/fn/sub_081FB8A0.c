@@ -57,7 +57,7 @@ s32 Ratatosk_UpdateParticlePool(struct ParticlePool *aIn)
     i = 0;
     do {
         if (TestMask(1 << i, a)) {
-            struct ContactSwarmSprite *sprite = (struct ContactSwarmSprite *)((u8 *)e + 0x2c);
+            struct ContactSwarmSprite *sprite = &e->sprite;
             u8 *cfg = (u8 *)e + 0x14;
             if (sub_08249240(e, (void *)i, *(void **)(cfg + 0x10)) == 1) {
                 RatatoskParticle_Remove(a, e, i);

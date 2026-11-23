@@ -431,7 +431,7 @@ void Lun_TurnTowardSavedDirection(struct ChaseActor *actor)
 
 static inline u16 Flag(struct RoomActor *actor, u16 mask)
 {
-    u16 *p = (void *)((u8 *)actor + 0x2D6);
+    u16 *p = &actor->reactionFlags;
     return *p = mask | *p;
 }
 
@@ -932,7 +932,7 @@ void Lun_ChooseMovementDestination(struct ChaseActor *actor)
             endpoint->z -= position->z;
         }
 
-        *((u8 *)actor + 0x3CD) = Math_Atan2(target->x, endpoint->z);
+        actor->base.nextDirection = Math_Atan2(target->x, endpoint->z);
         ZeroFill8(state + 0x424);
     }
     actor->base.counter2AC++;
@@ -1737,7 +1737,7 @@ void Lun_ChooseDelayedDestination(struct ChaseActor *actor)
             endpoint->z -= position->z;
         }
 
-        *((u8 *)actor + 0x3CD) = Math_Atan2(target->x, endpoint->z);
+        actor->base.nextDirection = Math_Atan2(target->x, endpoint->z);
         ZeroFill8(state + 0x424);
     } else
         actor->base.counter2AC++;
@@ -1831,7 +1831,7 @@ u32 Lun_Destroy(struct ChaseActor *s)
     Heap_Free(p);
     m = 0x100;
     if (SceneActorChase_TestField(&s->base.placementFlags, m))
-        SceneMessages_UnregisterReceiver(&s->base.unknown9[3]);
+        SceneMessages_UnregisterReceiver(s->base.receiver);
     {
         u8 *r = s->base.shadow;
         if (*r == 1)

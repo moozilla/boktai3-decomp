@@ -10,9 +10,6 @@ static inline int choose(u32 mode, int normal, int alternate)
         result = alternate;
     return result;
 }
-typedef struct {
-    u32 a, b;
-} Point;
 void SceneActors_UpdateAnchoredReaction(struct StateActor *p)
 {
     struct StateActor *p2 = p;
@@ -24,7 +21,7 @@ void SceneActors_UpdateAnchoredReaction(struct StateActor *p)
         SceneActors_StartDirectionalAnimation(
             p, &((struct SceneGraphicsActor *)p)->animation,
             (int)&((struct SceneGraphicsActor *)p)->animationResource, sequence, 2, 1, 4);
-        *(Point *)((u8 *)p + 0xd0) = *(Point *)(position + 12);
+        p->targetPosition = *(struct StateActorPos *)(position + 12);
     }
     SceneGraphicsActor_ClearPendingDamage((struct SceneGraphicsActor *)p);
     SceneActorState_SetFlags(p2, 12);

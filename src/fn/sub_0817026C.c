@@ -24,7 +24,7 @@ void SceneHud_UpdateActionFeedback(struct SceneHudState *p)
         SceneHud_RefreshActionIcons(p);
         Hud_SetInteractionCallback(p, PauseMenu_OnItemUseSelectionUpdate, 1);
         Inventory_InitializeSelectionGrid(p->actionInput, 1, 0);
-        SceneHud_GetActionIconPosition((u8 *)p + 0x1620, p->actionCursor);
+        SceneHud_GetActionIconPosition(&p->categoryWidgets[5].position, p->actionCursor);
         SceneHud_ShowActionPreview(p);
         PauseMenu_ClearSpriteFlags(p, 5, 1);
         MenuDisplay_SetPaletteOverrides(p, 1, 0, 0, 0);

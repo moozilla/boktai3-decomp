@@ -13,11 +13,6 @@ s32 Mod(s32, s32);
 s32 Div(s32, s32);
 u8 *Path_GetPointData(u8 *);
 
-static inline s32 f0806D438_T12(s32 value)
-{
-    return value >= 0 ? value >> 12 : -((-value) >> 12);
-}
-
 struct WanderSource {
     u8 unknown0[0x30];
     struct ContactPosition position;
@@ -30,13 +25,6 @@ static inline struct ContactPosition *PrepareSourceDelta(void **source, struct C
     struct ContactPosition *target = &origin->position;
     Vanargand_Difference(out, &actor->sprite.position, target);
     return target;
-}
-
-static inline void f0806D438_Polar(struct ContactPosition *v, s32 angle, s32 radius)
-{
-    v->x = f0806D438_T12(gUnk_086149C4[(angle + 64) & 255] * radius);
-    v->y = 0;
-    v->z = f0806D438_T12(gUnk_086149C4[angle & 255] * radius);
 }
 
 static inline void f0806D438_Curve(struct ContactPosition *out, struct ContactPosition *start,
@@ -99,7 +87,7 @@ void RouteSpriteActor_PlanWanderPath(struct RouteSpriteActor *actor)
 
     angle = ParticleRandom_ReadSample(table) & 255;
     radius = ParticleRandom_ReadSample(table) & 255;
-    f0806D438_Polar(&polar, angle, radius - 0x80);
+    Vanargand_MakeRadialVector(&polar, angle, radius - 0x80);
     actor->elevatedPosition.x = actor->elevatedPosition.x + polar.x;
     actor->elevatedPosition.z = actor->elevatedPosition.z + polar.z;
 

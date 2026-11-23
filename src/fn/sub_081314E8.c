@@ -87,7 +87,7 @@ void SceneActorRoute_UpdateContactRecovery(struct ChaseActor *actor)
         struct ContactPosition **destination;
         SceneActorTerrain_EnterState(actor, 0, 0, 7);
         SceneActorChase_SetControl(actor, actor->base.onAlternateEntry, 1);
-        destination = (void *)((u8 *)group + 0x200);
+        destination = &group->destination;
         (*destination)->pad = 1;
         if (!TryRoute(actor, group->route, &actor->base.body.position, *destination, motionFlags,
                       0x200)) {

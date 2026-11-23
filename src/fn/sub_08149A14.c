@@ -58,9 +58,8 @@ void Player_UpdateRecoilMotion(struct Player *p)
             H(0x4C2) = 0;
         }
     }
-    Anim_SetSequence((void *)((u8 *)p + 0x3FC), *(void **)((u8 *)p + 0x410), 2, p->heading,
-                     p->side);
-    PlayerCue_StepSequence((void *)((u8 *)p + 0x14C), (void *)((u8 *)p + 0x3FC));
+    Anim_SetSequence(&p->cueCollider.sequence, *(void **)((u8 *)p + 0x410), 2, p->heading, p->side);
+    PlayerCue_StepSequence((void *)((u8 *)p + 0x14C), &p->cueCollider.sequence);
     {
         if (p->directionFrame) {
             if (p->terrainClampBlocked) {
@@ -68,7 +67,7 @@ void Player_UpdateRecoilMotion(struct Player *p)
                 if (H(0x45A) <= 5) {
                     if (!(H(0x45A) & 1)) {
                         Sound_PlaySong(0x191);
-                        RisingSprite_Spawn((u8 *)p + 0x30);
+                        RisingSprite_Spawn(&p->position);
                     }
                     H(0x45A)++;
                 }
@@ -77,7 +76,7 @@ void Player_UpdateRecoilMotion(struct Player *p)
                 if (H(0x45A) <= 5) {
                     if (!(H(0x45A) & 1)) {
                         Sound_PlaySong(0x191);
-                        SparkParticle_Spawn((u8 *)p + 0x30, 1, 0, 0, 0, 12, 2, 2);
+                        SparkParticle_Spawn(&p->position, 1, 0, 0, 0, 12, 2, 2);
                     }
                     H(0x45A)++;
                 }

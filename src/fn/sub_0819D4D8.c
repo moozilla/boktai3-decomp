@@ -5,10 +5,6 @@
 // confidence=low: requests movement around adjacent terrain overrides.
 
 
-static inline void Request(struct HresvelgrTravelActor *p, u32 kind)
-{
-    p->requestedAnimation = kind;
-}
 s32 Hresvelgr_HasAdjacentOverride(void *);
 void Hresvelgr_UpdateTerrainManeuver(struct HresvelgrTravelActor *p)
 {
@@ -19,7 +15,7 @@ void Hresvelgr_UpdateTerrainManeuver(struct HresvelgrTravelActor *p)
     switch (a->state) {
         case 0:
             if (!a->frame) {
-                Request(q, 24);
+                Hresvelgr_SetActionAnimation(q, 24);
                 a->frame++;
             } else if (q->finished) {
                 if (Hresvelgr_HasAdjacentOverride(q))
@@ -30,49 +26,49 @@ void Hresvelgr_UpdateTerrainManeuver(struct HresvelgrTravelActor *p)
             break;
         case 1:
             if (!a->frame) {
-                Request(q, 25);
+                Hresvelgr_SetActionAnimation(q, 25);
                 a->frame++;
             } else if (q->finished)
                 ActionState_SetState(a, 2);
             break;
         case 2:
             if (!a->frame) {
-                Request(q, 3);
+                Hresvelgr_SetActionAnimation(q, 3);
                 a->frame++;
             } else if (q->finished)
                 ActionState_AdvanceState(a);
             break;
         case 3:
             if (!a->frame) {
-                Request(q, 4);
+                Hresvelgr_SetActionAnimation(q, 4);
                 a->frame++;
             } else if (q->finished)
                 ActionState_SetState(a, 5);
             break;
         case 4:
             if (!a->frame) {
-                Request(q, 6);
+                Hresvelgr_SetActionAnimation(q, 6);
                 a->frame++;
             } else if (q->finished)
                 ActionState_SetState(a, 6);
             break;
         case 5:
             if (!a->frame) {
-                Request(q, 5);
+                Hresvelgr_SetActionAnimation(q, 5);
                 a->frame++;
             } else if (q->finished)
                 ActionState_SetState(a, 4);
             break;
         case 6:
             if (!a->frame) {
-                Request(q, 7);
+                Hresvelgr_SetActionAnimation(q, 7);
                 a->frame++;
             } else if (q->finished)
                 ActionState_SetState(a, 7);
             break;
         case 7:
             if (!a->frame) {
-                Request(q, 12);
+                Hresvelgr_SetActionAnimation(q, 12);
                 a->frame++;
             } else if (q->finished)
                 ActionState_SetState(a, 8);

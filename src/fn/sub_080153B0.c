@@ -70,7 +70,7 @@ int AnimatedParticleManager_Initialize(struct Manager *m)
         Sprite_InitUnlinked(o, r, 0);
         Anim_SetSequence(a, m->resources[0], 0, 0, clear);
         *((u8 *)o + 7) = 2;
-        *(struct Vec *)((u8 *)p + 88) = zero;
+        p->sprite.position = zero;
         a = (void *)((u8 *)a + 120);
         o = (void *)((u8 *)o + 120);
         r += 120;

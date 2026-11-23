@@ -430,7 +430,7 @@ static inline void ReportDrain(struct ChaseActor *victim)
 void Ivy_UpdateHold(struct ChaseActor *actor, s32 frame)
 {
     struct Ivy *context = actor->base.context;
-    void *group = (u8 *)actor + 0x3D4;
+    void *group = &actor->group;
     struct DisplaySequenceState *sequence = (void *)((u8 *)actor->base.drawable + 0x48);
     struct SceneActorBody *target;
     u8 quadrant, flip;
@@ -1083,7 +1083,7 @@ void Ivy_UpdateDefeat(struct ChaseActor *actor, s32 frame)
     COUNT(0x538);
     RecordKill(actor, categoryp);
     sub_08159164(actor->base.experience);
-    Player_RefreshLifeState(actor->base.hitAttributes, *((u8 *)actor + 0xA1));
+    Player_RefreshLifeState(actor->base.hitAttributes, actor->base.fieldA1);
     if (!SceneActorChase_Test(gEngineFlags, 0x4800) && !Flag(actor, 0x800, 0x2D0))
         SceneActorRecord_RecordPair(gScriptEntryProcedure, (u16)actor->base.body.id);
 }
@@ -1547,7 +1547,7 @@ s32 Ivy_FindAdjacentTarget(struct ChaseActor *actor, s32 mode)
                                         &other->base.body.position);
         distance = delta.x * delta.x + delta.z * delta.z;
         if (best > distance)
-            target = (void *)((u8 *)other + 0x50);
+            target = &other->base.body;
     }
     if (!target)
         return 0;
@@ -1663,7 +1663,7 @@ u32 Ivy_Destroy(struct ChaseActor *s)
     Heap_Free(p);
     m = 0x100;
     if (SceneActorPlacement_TestFlags(&s->base.placementFlags, m))
-        SceneMessages_UnregisterReceiver((u8 *)s + 0xc);
+        SceneMessages_UnregisterReceiver(s->base.receiver);
     {
         u8 *r = s->base.shadow;
         if (*r == 1)
@@ -1814,12 +1814,13 @@ static inline void IvyInit_InitializeBody(void *object, u32 *fill)
     }
 
     if (MonsterInit_TestMotionFlags(arg0, 0x200))
-        TargetRegistry_RegisterActor((u8 *)group + 0x30, body, SceneActorReaction_SetMotionMode);
+        TargetRegistry_RegisterActor(&group->common.placement, body,
+                                     SceneActorReaction_SetMotionMode);
     SceneBody_SetSprite(body, MonsterInit_GetDrawableKind(arg0) == 0 ? arg0->base.drawable : 0);
     if (MonsterInit_GetCategory(arg0) == 0x15)
-        SceneBody_SetMovementProbe(body, (u8 *)arg0 + 0x40, 0x3C, 0x3C);
+        SceneBody_SetMovementProbe(body, arg0->base.movementProbe, 0x3C, 0x3C);
     else
-        SceneBody_SetMovementProbe(body, (u8 *)arg0 + 0x40, 0x40, 0x40);
+        SceneBody_SetMovementProbe(body, arg0->base.movementProbe, 0x40, 0x40);
 
     group->common.bodyId = arg0->base.body.id;
     group->common.bodyPosition = &arg0->base.body.position;

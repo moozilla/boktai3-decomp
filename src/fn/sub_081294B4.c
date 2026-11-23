@@ -3,9 +3,7 @@
 #include "ram.h"
 #include "engine_globals.h"
 #include "engine_pause.h"
-struct Vec {
-    s16 x, y, z, pad;
-};
+#include "scene_indicator.h"
 struct Feather {
     u32 flags;
     u8 unknown4[3], priority;

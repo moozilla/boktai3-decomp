@@ -89,8 +89,7 @@ void Vanargand_UpdatePlayerDrain(struct VanargandPairAttack *p)
         struct Player *player = p->player;
         s32 start = self->drainStartFrame;
         s32 current = player->facingChangeEffects;
-        s32 bias = -256;
-        start += bias;
+        start += -256;
         if (((current - start) & 255) <= 19) {
             if (p->animationEvent) {
                 s32 amount;

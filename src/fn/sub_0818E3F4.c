@@ -80,8 +80,7 @@ static inline u8 reset(u8 *p)
     } *flag = (struct F *)(p + 0x119);
     u8 old = flag->flags;
     if (old & one) {
-        s32 mask = ~1;
-        s32 value = mask;
+        s32 value = ~1;
         value &= old;
         flag->flags = value;
         p[0x12e] = 0;

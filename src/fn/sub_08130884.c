@@ -8,7 +8,7 @@ void SceneActorControl_UpdateTriggerPhase(struct ChaseActor *actor)
     if (taken) {
         SceneActorTerrain_InstallControl(actor, actor->base.onEntry, 1);
     } else if (actor->base.stepDone) {
-        Trigger_ConsumePending((u8 *)actor + 0xc, 1);
+        Trigger_ConsumePending(actor->base.receiver, 1);
         SceneActorTerrain_InstallControl(actor, actor->base.onStanding, taken);
         SceneActorTerrain_EnterState(actor, 2, 0, 2);
     } else {

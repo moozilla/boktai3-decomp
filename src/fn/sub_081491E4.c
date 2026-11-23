@@ -40,7 +40,7 @@ void Player_UpdateRearSpiralCue(struct Player *p)
         pos.z += Scale12(gUnk_086149C4[angle] * 64);
         Player_PlayPositionEffect(p, &p->position, 1, 1, &pos, 0, 0x3A1);
     }
-    Anim_SetSequence(&((struct ReleaseAnimation *)p)->seq, *(const void **)((u8 *)p + 0x410), 0,
+    Anim_SetSequence(&((struct ReleaseAnimation *)p)->seq, p->cueCollider.sideResource, 0,
                      p->heading, p->side);
     PlayerCue_StepSequence(&((struct ReleaseAnimation *)p)->sprite,
                            &((struct ReleaseAnimation *)p)->seq);

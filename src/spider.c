@@ -644,7 +644,7 @@ void Spider_UpdateDefeat(struct ChaseActor *actor, s32 frame)
     } else if (SceneActorVisibility_IsHidden(actor)) {
         ActorShadow_Disable(((u8 *)actor) + 0x320);
     } else {
-        ActorShadow_Enable((u8 *)actor + 0x320);
+        ActorShadow_Enable(actor->base.shadow);
     }
 }
 
@@ -1224,7 +1224,7 @@ static inline u8 Route(struct ChaseActor *a, void *nav, void *pos, void *target)
     r = Terrain_ApplyBlocked(nav, pos, target);
     if (r) {
         if (r != 2)
-            Memory_Clear((u8 *)a + 0x64, 8);
+            Memory_Clear(&a->base.body.motion, 8);
         return 1;
     }
     Chase_ClearBits(&a->base.motionFlags, 0x200);
@@ -1657,7 +1657,7 @@ u8 SceneActorPlacement_BeginNearbyPlayerContact(struct ChaseActor *a)
     Spider_SelectRouteEntryAwayFromTarget(a);
     SceneActorMovement_ResolveRoutePosition(a);
     {
-        u16 *p = (void *)((u8 *)a + 0x414);
+        u16 *p = &a->group.common.gate.flags;
         u32 m = 4;
         u32 v = *p;
         m |= v;

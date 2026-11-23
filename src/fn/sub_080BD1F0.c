@@ -356,7 +356,7 @@ void Skeleton_UpdateDefeat(struct ChaseActor *actor)
             actor->base.reactionFlags = m | actor->base.reactionFlags;
         }
         ActorShadow_Disable(actor->base.shadow);
-        Trigger_ConsumePending((u8 *)actor + 0xC, 1);
+        Trigger_ConsumePending(actor->base.receiver, 1);
         return;
     }
 notHidden:

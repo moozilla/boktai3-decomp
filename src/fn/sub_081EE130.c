@@ -43,15 +43,13 @@ void SceneActors_UpdatePeriodicEffectAction(struct DepartureActor *arg, s32 tick
     struct DepartureActor *input = arg;
     s32 time = ticks;
     struct DepartureActor *p = input;
-    u32 one;
     {
         u32 random = RandomBits(0xFFFFFFFF);
-        s32 *destination = (s32 *)((u8 *)input + 0x288);
-        one = 1;
-        *destination = random & one;
+        s32 *destination = &input->jitter;
+        *destination = random & 1;
     }
     {
-        u8 *entry = (u8 *)input + 0xb1;
+        u8 *entry = &input->entered;
         if (*entry) {
             struct DepartureDrawable *foreground;
             u32 zero = 0;
@@ -59,11 +57,11 @@ void SceneActors_UpdatePeriodicEffectAction(struct DepartureActor *arg, s32 tick
             foreground = &input->foreground;
             W(0x298) = 0;
             W(0x290) = 0;
-            foreground->sequenceId = one;
+            foreground->sequenceId = 1;
             {
                 struct DisplaySequenceState *state = &foreground->sequence;
                 Anim_SetSequence(state, PTR(0x390), 1, 0, 0);
-                PlayerCue_StepSequenceEndedWithFirstFlipMask(&foreground->sprite, state, one);
+                PlayerCue_StepSequenceEndedWithFirstFlipMask(&foreground->sprite, state, 1);
             }
             W(0x598) = 0;
             W(0x398) = 0;
@@ -115,7 +113,7 @@ void SceneActors_UpdatePeriodicEffectAction(struct DepartureActor *arg, s32 tick
             Update(input, time);
             if (W(0x300)) {
                 p->foreground.sequence.flags &= ~4;
-                *((u8 *)input + 0xaf) = 1;
+                input->finished = 1;
             }
             break;
     }

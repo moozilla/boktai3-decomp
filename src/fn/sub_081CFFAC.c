@@ -21,12 +21,11 @@ s32 SceneNpc_OnStateChange(struct S *p)
     if ((u8)(p->b5 - 1) <= 0x21) {
         u32 t = gUnk_08612568[p->b5];
         u8 v = p->b5;
-        s32 z = 0;
         p->b6 = v;
         p->f2cc = t;
-        p->f10 = z;
+        p->f10 = 0;
         p->b9 = 1;
-        p->b18 = z;
+        p->b18 = 0;
         r = 1;
     } else {
         r = 0;

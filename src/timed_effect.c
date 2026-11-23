@@ -82,9 +82,9 @@ void TimedEffect_InitEntry(void *manager, struct TimedEffectInitView *entry, s32
     Sprite_InitUnlinked(entry->sprite, entry->graphics, 1);
     collider = entry->collider;
     if (entry->config.flags & 0x8000)
-        Collider_Init(collider, 0, 0x2101, 0, 16, (u8 *)entry + 0x40, (u8 *)entry + 0x48);
+        Collider_Init(collider, 0, 0x2101, 0, 16, &entry->config.bounds, &entry->config.offset);
     else
-        Collider_Init(collider, 0, 0x2101, 0, 1, (u8 *)entry + 0x40, (u8 *)entry + 0x48);
+        Collider_Init(collider, 0, 0x2101, 0, 1, &entry->config.bounds, &entry->config.offset);
     Collider_SetCallback(collider, TimedEffect_OnContact, entry);
     Collider_SetAttackProperties(collider, config->resourceId, config->cost, config->mode,
                                  config->contactFlags, config->option);

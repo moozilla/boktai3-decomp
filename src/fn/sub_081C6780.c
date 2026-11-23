@@ -60,11 +60,10 @@ void StateActor_ProcessDirectionMessages(struct StateActor *actor)
         s32 z = ((s32)ParticleRandom_ReadDirectSample(table) >> 4) & 1023;
         struct StateActorPos *target = &actor->target;
         {
-            u32 base = 1024;
             u32 height;
-            x += base;
+            x += 1024;
             height = 256;
-            z += base;
+            z += 1024;
             target->x = x;
             target->y = height;
             target->z = z;

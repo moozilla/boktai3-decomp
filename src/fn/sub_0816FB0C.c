@@ -68,7 +68,7 @@ void SceneHud_DispatchSelectedAction(struct SceneHudState *p)
             Hud_SetInteractionCallback(p, SceneHud_UpdateActionSelection, 1);
             q = p->actionInput;
             Inventory_InitializeSelectionGrid(q, 1, 0);
-            SceneHud_GetActionIconPosition((u8 *)p + 0x1620, p->actionCursor);
+            SceneHud_GetActionIconPosition(&p->categoryWidgets[5].position, p->actionCursor);
             SceneHud_ShowActionPreview(p);
             Hud_SaveGridSelection(q);
             InventoryPanel_ShowStatusIcons(p);
