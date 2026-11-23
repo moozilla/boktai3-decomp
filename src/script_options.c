@@ -1,10 +1,10 @@
 #include "script_options.h"
+#include "engine_pause.h"
 
 s32 StateFlags_TestIndexedFlag(s32 index)
 {
     if ((u32)index <= 11) {
-        u32 mask = 0x800;
-        if (((gEngineFlags | gScenePauseFlags) & mask) && index > 5)
+        if (Engine_PauseBits(0x800) && index > 5)
             goto enabled;
         if ((gGameState->counters628[3] >> index) & 1)
             goto enabled;
@@ -109,9 +109,8 @@ void StateFlags_SetCategoryBit(u32 category, u32 bit)
 
 void GameFlag_SetFromScript(void)
 {
-    s32 missing = -1;
-    s32 category = Script_GetKeywordValue(0x6b, missing);
-    s32 bit = Script_GetKeywordValue(0x69, missing);
+    s32 category = Script_GetKeywordValue('k', -1);
+    s32 bit = Script_GetKeywordValue('i', -1);
     if (category >= 0 && bit >= 0)
         StateFlags_SetCategoryBit(category, bit);
 }
