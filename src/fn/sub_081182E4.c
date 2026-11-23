@@ -5,6 +5,7 @@
 #include "engine_globals.h"
 #include "area_effect_link.h"
 #include "word_flags.h"
+#include "game_state_flags.h"
 
 // Clears action effects, emits defeat bursts, and selects the recovery callback.
 
@@ -175,12 +176,6 @@ static inline void Glove_RestorePartPalettes(const struct GloveModelSlotView *vi
         offset += sizeof(struct GloveModelPart);
         count--;
     } while (count >= 0);
-}
-static inline u8 IsRecoveryEnabled(u32 mask)
-{
-    if (gGameState->flags868 & mask)
-        return 1;
-    return 0;
 }
 void Glove_UpdateDefeatEffects(struct Glove *p)
 {
@@ -383,7 +378,8 @@ void Glove_UpdateDefeatEffects(struct Glove *p)
         void (*callback)(void *);
         u8 *active;
         u32 mask = 0x800;
-        if (((gEngineFlags | gScenePauseFlags) & mask) || (status = IsRecoveryEnabled(0x100))) {
+        if (((gEngineFlags | gScenePauseFlags) & mask) ||
+            (status = GameState_TestWorldFlags(0x100))) {
             callback = (void (*)(void *))sub_08117F6C;
             active = &p->active;
             status = 0;
