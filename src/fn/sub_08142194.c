@@ -62,7 +62,7 @@ void Player_PlayPositionEffect(void *, void *, u32, u32, void *, u32, u32);
 s32 SceneObjects_HasTypeTwoResource(s32);
 u8 *TerrainModifiers_FindCellOverride(s32, s32);
 s32 Player_IsWithinCoordinateBand(void *);
-s32 sub_08156DAC(void);
+s32 sub_08156DAC(void *);
 
 static inline int scale(int v)
 {
@@ -128,7 +128,7 @@ void Player_UpdateObjectPush(struct PlayerPushState *p)
     struct PackedVec a;
     struct PackedVec b;
     struct PackedVec c;
-    if (!sub_08156DAC()) {
+    if (!sub_08156DAC(p)) {
         ActorSequence_Begin(p, 0, 0);
         return;
     }
