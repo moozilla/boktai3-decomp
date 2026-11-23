@@ -46,7 +46,7 @@ struct SceneActorContactNode *SceneActorContacts_SelectForActor(struct ChaseActo
                 u32 *flags;
                 u32 clearMask;
                 u32 value;
-                flags = (u32 *)((u8 *)owner + 0x2D0);
+                flags = &owner->base.statusFlags;
                 clearMask = ~0x1000000;
                 value = *flags;
                 value &= clearMask;
