@@ -1695,22 +1695,11 @@ void Axe_BeginMoveToPosition(struct ChaseActor *actor, struct ContactPosition *t
     struct ContactPosition *delta;
     Axe_SetMovementEndpoints(actor, target);
     Axe_StepCurveMotion(actor);
-    {
-        u32 one = 1;
-        u8 *state = &actor->base.state2A8;
-        u32 zero = 0;
-        *state = zero;
-        {
-            actor->base.phase2A9 = zero;
-            actor->base.behavior2AA = one;
-            actor->base.counter2AC = zero;
-        }
-        actor->base.field2B1 = one;
-        delta = (struct ContactPosition *)(stack + 1);
-        Chase_Delta(delta, &actor->base.body.position, target);
-        actor->base.nextDirection = Math_Atan2(delta->x, delta->z);
-        Fill_BeginMoveToPosition(context->clearF14, stack, zero);
-    }
+    Chase_SetBehavior(actor, 1);
+    delta = (struct ContactPosition *)(stack + 1);
+    Chase_Delta(delta, &actor->base.body.position, target);
+    actor->base.nextDirection = Math_Atan2(delta->x, delta->z);
+    Fill_BeginMoveToPosition(context->clearF14, stack, 0);
 }
 
 struct B {
