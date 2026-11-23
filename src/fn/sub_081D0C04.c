@@ -116,7 +116,6 @@ void SceneNpc_CreateFromScript(void)
     void (*updateC)(void);
     struct PackedVec position;
     u32 zero;
-    s32 model;
     struct Rig *rig;
     struct Motion *motion;
     if (!manager) {
@@ -143,8 +142,7 @@ void SceneNpc_CreateFromScript(void)
     if (Actor_InitMotion(npc, name, &position, angle) < 0) {
         return;
     }
-    model = 0x97D3;
-    if (Actor_InitDrawable(npc, 1, model, 0xC6A0, zero = 0) < 0) {
+    if (Actor_InitDrawable(npc, 1, 0x97D3, 0xC6A0, zero = 0) < 0) {
         return;
     }
     motion = &npc->motion;
@@ -182,7 +180,7 @@ void SceneNpc_CreateFromScript(void)
     Task_SetManager(SceneNpc_OnStateUpdate, &npc->callbacks[2]);
     Task_SetManager(SceneNpc_OnStateEffectUpdate, &npc->callbacks[3]);
     Task_SetManager(SceneNpc_OnDestroy, &npc->callbacks[4]);
-    Actor_InitResources(manager, npc, model, 0);
+    Actor_InitResources(manager, npc, 0x97D3, 0);
     Actor_LinkToManager(manager, npc);
     Actor_InitBehaviorFromScript(manager, npc);
     rig = &npc->rig;

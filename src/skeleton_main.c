@@ -554,7 +554,6 @@ void SceneActorControl_BeginTimedBehavior56(struct ChaseActor *s,
         u8 code = 0x38;
         u32 zero;
         u8 one;
-        u8 zero8;
         u32 *flags;
         u8 *taken;
         u32 three;
@@ -565,7 +564,6 @@ void SceneActorControl_BeginTimedBehavior56(struct ChaseActor *s,
         s->base.stepDone = zero;
         s->base.controlKind = code;
         s->base.target = fn;
-        zero8 = 0;
         s->base.field2C8 = zero;
         flags = &s->base.pendingControlFlags;
         {
@@ -575,8 +573,8 @@ void SceneActorControl_BeginTimedBehavior56(struct ChaseActor *s,
         s->base.pendingControl = zero;
         three = 3;
         s->base.state2A8 = three;
-        s->base.phase2A9 = zero8;
-        s->base.behavior2AA = zero8;
+        s->base.phase2A9 = 0;
+        s->base.behavior2AA = 0;
         s->base.counter2AC = zero;
         s->base.field2B1 = one;
         {
@@ -910,7 +908,6 @@ u32 Skeleton_TryEnterIdleRange(struct ChaseActor *s)
         u8 code = 0x10;
         u32 zero;
         u8 one;
-        u8 zero8;
         u32 *flags;
         u8 *taken;
         u32 two;
@@ -921,7 +918,6 @@ u32 Skeleton_TryEnterIdleRange(struct ChaseActor *s)
         s->base.stepDone = zero;
         s->base.controlKind = code;
         s->base.target = fn;
-        zero8 = 0;
         s->base.field2C8 = zero;
         flags = &s->base.pendingControlFlags;
         {
@@ -930,9 +926,9 @@ u32 Skeleton_TryEnterIdleRange(struct ChaseActor *s)
         }
         s->base.pendingControl = zero;
         two = 2;
-        s->base.state2A8 = zero8;
+        s->base.state2A8 = 0;
         s->base.phase2A9 = two;
-        s->base.behavior2AA = zero8;
+        s->base.behavior2AA = 0;
         s->base.counter2AC = zero;
         s->base.field2B1 = one;
         return 1;
@@ -967,7 +963,6 @@ u8 SceneActorControl_TryBeginNearbyBehavior16(struct ChaseActor *s,
         u8 code = 0x10;
         u32 zero;
         u8 one;
-        u8 zero8;
         u32 *flags;
         u8 *taken;
         u32 two;
@@ -978,7 +973,6 @@ u8 SceneActorControl_TryBeginNearbyBehavior16(struct ChaseActor *s,
         s->base.stepDone = zero;
         s->base.controlKind = code;
         s->base.target = fn;
-        zero8 = 0;
         s->base.field2C8 = zero;
         flags = &s->base.pendingControlFlags;
         {
@@ -987,12 +981,12 @@ u8 SceneActorControl_TryBeginNearbyBehavior16(struct ChaseActor *s,
         }
         s->base.pendingControl = zero;
         two = 2;
-        s->base.state2A8 = zero8;
+        s->base.state2A8 = 0;
         s->base.phase2A9 = two;
-        s->base.behavior2AA = zero8;
+        s->base.behavior2AA = 0;
         s->base.counter2AC = zero;
         s->base.field2B1 = one;
-        context->attempts703 = zero8;
+        context->attempts703 = 0;
         return 1;
     }
     return 0;
@@ -2124,12 +2118,10 @@ void SceneActorScript_TriggerCallOnCount(struct ChaseActor *actor)
         *count += 1;
         limit = &context->callLimit6CE;
         if (*count >= *limit) {
-            u8 z;
             Script_Call(*script, zero);
-            z = 0;
             *script = 0;
-            *limit = z;
-            *count = z;
+            *limit = 0;
+            *count = 0;
         }
     }
 }
@@ -3553,12 +3545,10 @@ void SceneActorReaction_TickHiddenTimeout(struct ChaseActor *p, s32 elapsed)
     struct SceneActorScriptPropertiesView *state = p->base.context;
     u16 mode;
     if (SceneActorReaction_TakePrepared(p)) {
-        u32 mask;
         EffectCollision_Disable(&p->base.colliderB);
-        mask = 4;
         EffectCollision_Disable(&p->base.colliderA);
-        ((struct ContactCollider *)((u8 *)state + 0x624))->flags |= mask;
-        ((struct ContactCollider *)((u8 *)state + 0x678))->flags |= mask;
+        ((struct ContactCollider *)((u8 *)state + 0x624))->flags |= 4;
+        ((struct ContactCollider *)((u8 *)state + 0x678))->flags |= 4;
         SceneActorAnimation_SelectDirectionalEntry(&p->base, 0x11);
         ActorShadow_Disable(p->base.shadow);
     } else {

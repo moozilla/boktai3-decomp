@@ -2478,7 +2478,6 @@ void Mummy_UpdateAttackCollider(struct ChaseActor *actor)
     struct BoundsBits bounds;
 
     u32 flags;
-    u32 attackBit;
 
     if (SceneActor_ActionsBlocked(actor))
         return;
@@ -2490,8 +2489,7 @@ void Mummy_UpdateAttackCollider(struct ChaseActor *actor)
         if (mask & flags)
             return;
     }
-    attackBit = 16;
-    if (flags & attackBit) {
+    if (flags & 16) {
         struct ContactCollider *collider;
 
         bounds.x = 64;
@@ -2510,7 +2508,7 @@ void Mummy_UpdateAttackCollider(struct ChaseActor *actor)
         ((struct ContactPosition *)&bounds)->z = 32;
         collider = &actor->base.colliderB;
         collider->bounds = *(struct ContactPosition *)&bounds;
-        collider->contactFlags = attackBit;
+        collider->contactFlags = 16;
         collider->flags = 0x2201;
         ApplyAttack(actor, collider, 1, 0x20000);
     } else {
@@ -2520,7 +2518,7 @@ void Mummy_UpdateAttackCollider(struct ChaseActor *actor)
         ((struct ContactPosition *)&bounds)->z = 32;
         collider = &actor->base.colliderB;
         collider->bounds = *(struct ContactPosition *)&bounds;
-        collider->contactFlags = attackBit;
+        collider->contactFlags = 16;
         collider->flags = 0x2201;
         ApplyAttack(actor, collider, 0, 0);
     }

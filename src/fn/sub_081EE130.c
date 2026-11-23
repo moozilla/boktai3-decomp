@@ -43,12 +43,10 @@ void SceneActors_UpdatePeriodicEffectAction(struct DepartureActor *arg, s32 tick
     struct DepartureActor *input = arg;
     s32 time = ticks;
     struct DepartureActor *p = input;
-    u32 one;
     {
         u32 random = RandomBits(0xFFFFFFFF);
         s32 *destination = &input->jitter;
-        one = 1;
-        *destination = random & one;
+        *destination = random & 1;
     }
     {
         u8 *entry = &input->entered;
@@ -59,11 +57,11 @@ void SceneActors_UpdatePeriodicEffectAction(struct DepartureActor *arg, s32 tick
             foreground = &input->foreground;
             W(0x298) = 0;
             W(0x290) = 0;
-            foreground->sequenceId = one;
+            foreground->sequenceId = 1;
             {
                 struct DisplaySequenceState *state = &foreground->sequence;
                 Anim_SetSequence(state, PTR(0x390), 1, 0, 0);
-                PlayerCue_StepSequenceEndedWithFirstFlipMask(&foreground->sprite, state, one);
+                PlayerCue_StepSequenceEndedWithFirstFlipMask(&foreground->sprite, state, 1);
             }
             W(0x598) = 0;
             W(0x398) = 0;

@@ -231,13 +231,11 @@ void SceneNpc_DispatchCommands(struct SceneNpc *npc)
                     break;
 
                 case 8: {
-                    u8 directionMask;
                     npc->angle = (((u8 *)m)[8] + 5) << 5;
-                    directionMask = 3;
-                    npc->flags |= MaskedMessageFlags(((struct CmdFlags *)m)->flags, directionMask);
+                    npc->flags |= MaskedMessageFlags(((struct CmdFlags *)m)->flags, 3);
                     if (((u16 *)m)[2] & 1)
                         npc->flags |= 1;
-                    SetFlaggedFacing(npc, npc->angle, directionMask);
+                    SetFlaggedFacing(npc, npc->angle, 3);
                     SetNpcState(npc, 0x10);
                     npc->changed = 1;
                     break;
