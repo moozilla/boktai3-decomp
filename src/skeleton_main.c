@@ -127,13 +127,11 @@ void SceneActorControl_RestartBehavior57(struct ChaseActor *actor)
     if (actor->base.controlKind != 0x39)
         return;
     {
-        u32 offset = 0x130;
-        u32 *flags = (void *)((u8 *)actor + offset);
+        u32 *flags = (void *)((u8 *)actor + 0x130);
         *flags &= ~2;
     }
     {
-        u32 offset = 0x2CC;
-        u32 *flags = (void *)((u8 *)actor + offset);
+        u32 *flags = (void *)((u8 *)actor + 0x2CC);
         u32 mask = ~3;
         *flags &= mask;
     }
@@ -312,18 +310,16 @@ void Skeleton_BeginStationaryPursuit(struct ChaseActor *a)
 static inline u32 ReadFlags16(struct ChaseActor *actor, u32 inputMask)
 {
     u32 mask = inputMask;
-    u32 offset = 0x2D4;
     u16 *flags;
-    flags = (void *)((u8 *)actor + offset);
+    flags = (void *)((u8 *)actor + 0x2D4);
     return *flags & mask;
 }
 
 static inline u32 ReadFlags32(struct ChaseActor *actor, u32 inputMask)
 {
     u32 mask = inputMask;
-    u32 offset = 0x2D0;
     u32 *flags;
-    flags = (void *)((u8 *)actor + offset);
+    flags = (void *)((u8 *)actor + 0x2D0);
     return *flags & mask;
 }
 
@@ -369,17 +365,15 @@ void Skeleton_HandleVisibilityRequest(struct ChaseActor *input, const u16 *input
                 u32 hidden = SceneActorVisibility_IsHidden(actor);
                 if (hidden) {
                     {
-                        u32 offset = 0x748;
                         u16 *timer;
-                        timer = (void *)((u8 *)state + offset);
+                        timer = (void *)((u8 *)state + 0x748);
                         *timer = 0;
                     }
                     {
                         u32 mask = ~0x18000;
                         {
                             u32 old = *savedFlags & mask;
-                            u32 bits = 0x4000;
-                            *savedFlags = old | bits;
+                            *savedFlags = old | 0x4000;
                         }
                     }
                     Sound_PlaySong(0x21E);
@@ -400,17 +394,15 @@ void Skeleton_HandleVisibilityRequest(struct ChaseActor *input, const u16 *input
                     u32 hiddenZero = hidden;
                     {
                         u32 zero = hiddenZero;
-                        u32 offset = 0x748;
                         u16 *timer;
-                        timer = (void *)((u8 *)state + offset);
+                        timer = (void *)((u8 *)state + 0x748);
                         *timer = zero;
                     }
                     {
                         u32 mask = ~0x14000;
                         {
                             u32 old = *savedFlags & mask;
-                            u32 bits = 0x8000;
-                            *savedFlags = old | bits;
+                            *savedFlags = old | 0x8000;
                         }
                     }
                     Sound_PlaySong(0x21E);
@@ -435,8 +427,7 @@ static inline void Hide(struct ChaseActor *actor)
         tile->flags |= one;
     }
     {
-        u32 offset = 0x320;
-        ActorShadow_Disable((void *)((u8 *)actor + offset));
+        ActorShadow_Disable((void *)((u8 *)actor + 0x320));
     }
 }
 
@@ -457,8 +448,7 @@ static inline void Show(struct ChaseActor *actor)
         tile->flags &= mask;
     }
     {
-        u32 offset = 0x320;
-        ActorShadow_Enable((void *)((u8 *)actor + offset));
+        ActorShadow_Enable((void *)((u8 *)actor + 0x320));
     }
 }
 
@@ -483,9 +473,8 @@ void Skeleton_UpdateVisibilityFlicker(struct ChaseActor *actor)
         u32 counter;
         u32 value;
         {
-            u32 offset = 0x748;
             u16 *field;
-            field = (void *)((u8 *)state + offset);
+            field = (void *)((u8 *)state + 0x748);
             counter = (u32)*field << 16;
         }
         value = counter >> 16;
@@ -1432,9 +1421,8 @@ void Skeleton_RestorePursuitRoute(struct ChaseActor *actor)
     }
     destination->y = CellHeight(destination, CellIndex(destination));
     {
-        u32 routeMask = 0x200;
-        (*(struct ContactPosition **)((u8 *)group + routeMask))->pad = 0;
-        if (!Chase_RestorePursuitRoute(actor, group, routeMask))
+        (*(struct ContactPosition **)((u8 *)group + 0x200))->pad = 0;
+        if (!Chase_RestorePursuitRoute(actor, group, 0x200))
             Callback_InvokeActor(actor, group->failure);
     }
 }
@@ -2278,9 +2266,8 @@ s32 SceneActorReaction_TickHiddenResponse(struct ChaseActor *actor)
 {
     struct ChaseActor *saved = actor;
     u32 mask = 0x4000;
-    u32 offset = 0x2D4;
     u16 *field;
-    field = (void *)((u8 *)actor + offset);
+    field = (void *)((u8 *)actor + 0x2D4);
     if (*field & mask) {
         u32 mask = 0x10000;
         u32 *input;
@@ -3633,11 +3620,10 @@ void Skeleton_BeginKnockedFlight(struct ChaseActor *input)
     u32 origin;
     u8 taken = TakeFlag(&actor->base.field2B2);
     if (taken) {
-        u32 mask = 4;
-        SetColliderFlags((struct ContactCollider *)(context + 0x624), mask);
-        SetColliderFlags((struct ContactCollider *)(context + 0x678), mask);
-        SetColliderFlags(&actor->base.colliderA, mask);
-        ClearColliderFlags(&actor->base.colliderB, mask);
+        SetColliderFlags((struct ContactCollider *)(context + 0x624), 4);
+        SetColliderFlags((struct ContactCollider *)(context + 0x678), 4);
+        SetColliderFlags(&actor->base.colliderA, 4);
+        ClearColliderFlags(&actor->base.colliderB, 4);
         {
             u8 direction = actor->base.body.direction;
             s32 random;
@@ -4450,7 +4436,6 @@ void SceneActorReaction_SinkThenDefeat(struct ChaseActor *actor, s32 frame)
                 actor->base.body.position;
         if (frame > 8) {
             u32 zeroWord = 0;
-            u8 zeroByte = 0;
             {
                 s16 health = zeroWord;
                 actor->base.health = health;
@@ -4474,7 +4459,7 @@ void SceneActorReaction_SinkThenDefeat(struct ChaseActor *actor, s32 frame)
                 void *control = SceneActorReaction_BeginHiddenDefeat;
                 u32 kind = 23;
                 actor->base.field2B2 = 1;
-                actor->base.stepDone = zeroByte;
+                actor->base.stepDone = 0;
                 actor->base.controlKind = kind;
                 actor->base.target = control;
                 actor->base.field2C8 = zeroWord;
