@@ -480,7 +480,7 @@ class Slicer:
                     self.work.append((self.value, frame, inv, prev[0] if prev else dpos, fn, val.strip(), fn.by_label.get(lab), mask))
             return
         elif op == 'call':
-            self.add(frame, dpos, inv, fn, d, 'call')
+            self.add(frame, dpos, inv, fn, d, 'call', value=self.evaluate(frame, inv, dpos, fn, d.dest, d.block))
             child = self.child_for(ft, inv, dpos, d)
             if child is not None:
                 cinv, cfn = child
@@ -497,10 +497,138 @@ class Slicer:
             for n in operands(d.text, d.dest):
                 self.work.append((self.value, frame, inv, dpos, fn, n, d.block))
         else:
-            self.add(frame, dpos, inv, fn, d, 'compute')
+            self.add(frame, dpos, inv, fn, d, 'compute', value=self.evaluate(frame, inv, dpos, fn, d.dest, d.block))
             for n, m in demand(d.text, d.dest, mask):
                 self.work.append((self.value, frame, inv, dpos, fn, n, d.block, m))
         self.control(frame, inv, dpos, fn, d.block)
+
+    # ---- values of SSA expressions, from the trace ----
+    def evaluate(self, frame, inv, bpos, fn, name, use_block, depth=0):
+        """The runtime value of SSA NAME (None when it cannot be worked out from the trace)."""
+        if name is None or depth > 40:
+            return None
+        name = name.strip()
+        if re.fullmatch(r'-?\d+', name):
+            return int(name)
+        if name in ('true', 'false'):
+            return int(name == 'true')
+        if name == 'null':
+            return 0
+        if not name.startswith('%'):
+            return None
+        memo = self.__dict__.setdefault('_eval', {})
+        key = (frame, inv, bpos, name)
+        if key in memo:
+            return memo[key]
+        memo[key] = None
+        v = self._evaluate(frame, inv, bpos, fn, name, use_block, depth)
+        memo[key] = v
+        return v
+
+    def _evaluate(self, frame, inv, bpos, fn, name, use_block, depth):
+        ft = self.traces[frame]
+        params = [p[1] for p in fn.params]
+        if name in params:
+            ent = ft.enter.get(inv)
+            if not ent or ent[2] >= 0x80000000 or ent[2] not in ft.enter:
+                return None
+            parent = ent[2]
+            pblock = ft.block_at(parent, ent[0])
+            pfn = self.facts.function_of(ft.enter[parent][1])
+            blk = self.facts.site(pblock[1])
+            blk = pfn.blocks[0] if isinstance(blk, Function) else blk
+            for ci in blk.insts:
+                if re.search(r'@' + re.escape(fn.name) + r'\(', ci.text):
+                    child = self.child_for(ft, parent, pblock[0], ci)
+                    if child and child[0] == inv:
+                        args = call_operands(ci.text)
+                        k = params.index(name)
+                        return self.evaluate(frame, parent, pblock[0], pfn, args[k], blk, depth + 1) if k < len(args) else None
+            return None
+        d = fn.defs.get(name)
+        if d is None:
+            return None
+        if d.block is use_block:
+            dpos = bpos
+        else:
+            dpos = ft.last_instance(inv, d.block.site if d.block.index else fn.site, bpos, False)
+            if dpos is None:
+                return None
+        body = d.text.split(' = ', 1)[1]
+        ev = lambda n: self.evaluate(frame, inv, dpos, fn, n, d.block, depth + 1)  # noqa: E731
+        if d.site is not None:
+            p = ft.event_in(inv, d.site, dpos)
+            if p is None:
+                return None
+            k = int(ft.kind[p])
+            if k == K_LOAD:
+                return int(ft.rows['b'][p])
+            if k == K_WIDE:
+                return int(ft.rows['b'][p]) | int(ft.rows['c'][p]) << 32
+            return None
+        m = BINOP.match(body)
+        if m:
+            op, bits, a, b = m[1], int(m[2]), ev(m[3].strip()), ev(m[4].strip().rstrip(','))
+            if a is None or b is None:
+                return None
+            mask = (1 << bits) - 1
+            sa = a - (1 << bits) if a >> (bits - 1) & 1 else a
+            sb = b - (1 << bits) if b >> (bits - 1) & 1 else b
+            try:
+                r = {'add': a + b, 'sub': a - b, 'mul': a * b, 'and': a & b, 'or': a | b, 'xor': a ^ b,
+                     'shl': a << (b & 63), 'lshr': (a & mask) >> (b & 63), 'ashr': sa >> (b & 63),
+                     'udiv': (a & mask) // (b & mask) if b & mask else None,
+                     'sdiv': int(sa / sb) if sb else None, 'urem': (a & mask) % (b & mask) if b & mask else None,
+                     'srem': (abs(sa) % abs(sb)) * (1 if sa >= 0 else -1) if sb else None}[op]
+            except KeyError:
+                return None
+            return None if r is None else r & mask
+        m = CAST.match(body)
+        if m:
+            op, src, v, dst = m[1], int(m[2]), ev(m[3]), int(m[4])
+            if v is None:
+                return None
+            v &= (1 << src) - 1
+            if op == 'sext' and v >> (src - 1) & 1:
+                v -= 1 << src
+            return v & ((1 << dst) - 1)
+        m = re.match(r'icmp (\w+) (?:i\d+|ptr) ([^,]+), (\S+)', body)
+        if m:
+            a, b = ev(m[2].strip()), ev(m[3].strip())
+            if a is None or b is None:
+                return None
+            bits = int(re.search(r'icmp \w+ i(\d+)', body)[1]) if re.search(r'icmp \w+ i(\d+)', body) else 32
+            sa = a - (1 << bits) if a >> (bits - 1) & 1 else a
+            sb = b - (1 << bits) if b >> (bits - 1) & 1 else b
+            return int({'eq': a == b, 'ne': a != b, 'ugt': a > b, 'uge': a >= b, 'ult': a < b, 'ule': a <= b,
+                        'sgt': sa > sb, 'sge': sa >= sb, 'slt': sa < sb, 'sle': sa <= sb}.get(m[1], False))
+        m = SELECT.match(body)
+        if m:
+            c = ev(m[1].strip())
+            return None if c is None else ev(m[2].strip() if c else m[3].strip())
+        if body.startswith('phi'):
+            prev = ft.prev_block(inv, dpos)
+            pred = self.label_of(fn, prev[1]) if prev else None
+            for val, lab in re.findall(r'\[\s*([^,\]]+),\s*%([-\w.$]+)\s*\]', body):
+                if lab == pred:
+                    return self.evaluate(frame, inv, prev[0] if prev else dpos, fn, val.strip(), fn.by_label.get(lab), depth + 1)
+            return None
+        if body.startswith(('call', 'tail call')):
+            child = self.child_for(ft, inv, dpos, d)
+            if child is None:
+                return None
+            cinv, cfn = child
+            last = ft.block_at(cinv, ft.exit.get(cinv, len(ft.rows)))
+            if not last:
+                return None
+            blk = self.facts.site(last[1])
+            blk = blk if isinstance(blk, Block) else cfn.blocks[0]
+            m = re.match(r'\s*ret \S+ (.*)$', blk.insts[-1].text)
+            return self.evaluate(frame, cinv, last[0], cfn, m[1].split(',')[0].strip(), blk, depth + 1) if m else None
+        m = re.match(r'(?:freeze|bitcast|ptrtoint|inttoptr) \S+ (\S+)', body)
+        if m:
+            return ev(m[1])
+        return None
 
     def label_of(self, fn, site):
         if site == fn.site:
@@ -580,8 +708,9 @@ class Slicer:
             return
         b = fn.by_label[best[1]]
         term = b.insts[-1]
-        self.add(frame, best[0], inv, fn, term, 'decides')
         cond = branch_condition(term.text)
+        self.add(frame, best[0], inv, fn, term, 'decides',
+                 value=self.evaluate(frame, inv, best[0], fn, cond, b) if cond else None)
         d = fn.defs.get(cond) if cond else None
         if d is not None and re.search(r'icmp (?:eq|ne) ptr \S+, null', d.text):
             return   # a null check: where the pointer came from does not explain the value
@@ -759,13 +888,20 @@ def render(sl, describe=None):
                                'text': (text or '').strip(), 'loads': [], 'stores': [], 'roles': set(), 'inv': n.inv}
         g['pos'] = min(g['pos'], n.pos)
         g['roles'].add(n.role)
+        if n.role in ('compute', 'call'):
+            g.setdefault('computed', []).append((n.inst.index, n.value))
+        if n.role == 'decides' and n.value is not None:
+            g['taken'] = n.value
         if n.role == 'load':
             g['loads'].append((n.addr, n.width, n.value))
         elif n.role == 'store':
             g['stores'].append((n.addr, n.width, n.value))
     order = sorted(groups.values(), key=lambda g: (g['frame'], g['pos']), reverse=True)
     for g in order:
-        mark = ' (decides)' if g['roles'] == {'decides'} else ''
+        mark = ''
+        if g['roles'] == {'decides'}:
+            t = g.get('taken')
+            mark = ' (decides)' if t is None else f" (decides: {'true' if t == 1 else 'false' if t == 0 else f'case {t}'})"
         out.append(f"frame {g['frame']:6d}  {g['fn']}  {g['unit']}:{g['line']}{mark}")
         if g['text']:
             out.append(f"    {g['text']}")
@@ -774,6 +910,11 @@ def render(sl, describe=None):
             vals.append(f"{describe(a, w)} := {fmt(v, w)}")
         for a, w, v in g['loads']:
             vals.append(f"{describe(a, w)} = {fmt(v, w)}")
+        if g.get('computed') and not g['stores']:
+            # the line's result: its last computed value (highest instruction index)
+            idx, v = max(g['computed'], key=lambda x: x[0])
+            if v is not None:   # unknown when the last step is a call into code the trace does not see
+                vals.append(f'= {fmt(v, 4)}')
         if vals:
             out.append('      ' + '; '.join(dict.fromkeys(vals)))
     if sl.summaries:
