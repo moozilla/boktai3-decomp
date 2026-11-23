@@ -33,6 +33,12 @@ static inline u32 ContactCollider_TestFlags(const struct ContactCollider *collid
     return collider->flags & mask;
 }
 
+static inline u32 ContactCollider_TestReactionFlags(const struct ContactCollider *collider,
+                                                    u32 mask)
+{
+    return collider->reactionFlags & mask;
+}
+
 static inline void ContactCollider_SetReactionFlags(struct ContactCollider *collider, u32 mask)
 {
     collider->reactionFlags |= mask;
