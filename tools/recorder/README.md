@@ -45,8 +45,8 @@ Trace logs every event of the game-side units (and the hardware's RAM writes).
 **Sessions** (`runner.mjs`, `build/recorder/sessions/NAME/`): per frame keys, solar
 level and RAM hash; the write log (16-byte rows: frame, site, address | width, value);
 snapshots every 60 frames with the wasm call stack they were taken at; screens every
-30 frames; memory the script edited. About 2 MB per 10 s on the title screen, 55 MB in
-the field. `verify` applies the log to each snapshot and compares with the next.
+30 frames; memory the script edited. `record` then compacts the log to `writes.z`
+(columns, zlib): about 0.3 MB per 10 s on the title screen and 1.5 MB in the field. `verify` applies the log to each snapshot and compares with the next.
 
 **Replay** (`runner.mjs serve`, `emu.py`). A snapshot restores linear memory, not the
 wasm call stack (locals, return addresses), so it is restored only where the live

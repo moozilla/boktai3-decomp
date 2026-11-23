@@ -2,6 +2,8 @@
 
 frames.bin  32-byte rows: frame, keys, solar, flags, hash lo, hash hi, write rows, 0
 writes.bin  16-byte rows: frame, site, address | wcode << 28, value   (wcode: width 1 << wcode)
+writes.z    the same rows compacted (compact()): chunks of up to 1M rows, each
+            [rows u32, compressed length u32] + zlib(frame column, site, addrw, value)
 snap/       gzip: [count, stack pointer, (address, length) * count] then the bytes
 edits.json  [{frame, bytes: [[address, value], ...]}]: memory the script changed at the
             end of that frame, after the RAM hash was taken
@@ -9,6 +11,7 @@ edits.json  [{frame, bytes: [[address, value], ...]}]: memory the script changed
 import gzip
 import json
 import struct
+import zlib
 from pathlib import Path
 
 import numpy as np
@@ -96,7 +99,7 @@ class Session:
     @property
     def writes(self):
         if self._writes is None:
-            w = np.fromfile(self.path / 'writes.bin', WRITE)
+            w = read_writes(self.path)
             self._writes = w
             self.addr = (w['addrw'] & 0x0FFFFFFF).astype(np.uint32)
             self.width = (1 << ((w['addrw'] >> 28) & 3)).astype(np.uint32)
@@ -161,3 +164,47 @@ class Session:
                     log(f'frames {a}..{b}: {name} differs at {len(diff)} bytes, first {base + int(diff[0]):08X} '
                         f'(log {x[diff[0]]:02X}, snapshot {y[diff[0]]:02X})')
         return bad
+
+
+CHUNK = 1 << 20
+
+
+def read_writes(path):
+    path = Path(path)
+    if (path / 'writes.bin').exists():
+        return np.fromfile(path / 'writes.bin', WRITE)
+    parts = []
+    with open(path / 'writes.z', 'rb') as f:
+        while True:
+            head = f.read(8)
+            if len(head) < 8:
+                break
+            n, size = struct.unpack('<II', head)
+            cols = np.frombuffer(zlib.decompress(f.read(size)), np.uint32).reshape(4, n)
+            w = np.empty(n, WRITE)
+            for i, name in enumerate(WRITE.names):
+                w[name] = cols[i]
+            parts.append(w)
+    return np.concatenate(parts) if parts else np.empty(0, WRITE)
+
+
+def compact(path, log=print):
+    """writes.bin -> writes.z (column-chunked zlib, about a tenth of the size)."""
+    path = Path(path)
+    src = path / 'writes.bin'
+    if not src.exists():
+        return
+    w = np.memmap(src, WRITE, 'r')
+    tmp = path / 'writes.z.tmp'
+    with open(tmp, 'wb') as f:
+        for i in range(0, len(w), CHUNK):
+            c = w[i:i + CHUNK]
+            data = zlib.compress(b''.join(np.ascontiguousarray(c[name]).tobytes() for name in WRITE.names), 1)
+            f.write(struct.pack('<II', len(c), len(data)))
+            f.write(data)
+    n = len(w)
+    del w
+    before = src.stat().st_size
+    tmp.rename(path / 'writes.z')
+    src.unlink()
+    log(f'compacted {path.name}: {n} writes, {before >> 20} MB -> {(path / "writes.z").stat().st_size >> 20} MB')
