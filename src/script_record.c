@@ -1,4 +1,5 @@
 #include "script_record.h"
+#include "engine_pause.h"
 
 s32 ScriptRecord_FindModifierRecord(struct ModifierRecord *out, s32 id)
 {
@@ -183,65 +184,48 @@ s32 Modifier_AddKindThreeStat(struct StatModifier *modifier, s32 value)
     return AddModifierAmount(modifier, value);
 }
 
-s32 StatModifier_ScaleForGlobalMode(struct StatModifier *modifier_, s32 value)
+s32 StatModifier_ScaleForGlobalMode(struct StatModifier *modifier, s32 value)
 {
-    struct StatModifier *modifier = modifier_;
     s32 result;
-    s32 input = value;
-    if (modifier->state.enabled == 0)
-        return input;
-    {
-        u16 mask = 0x800;
-        if (!((gEngineFlags | gScenePauseFlags) & mask) || modifier->state.owner->mode == 1)
-            do {
-                return input;
-            } while (0);
-    }
-    result = Div(modifier->state.record.amount * input, 10);
+    if (!modifier->state.enabled)
+        return value;
+    if (!Engine_PauseBits(0x800))
+        return value;
+    if (modifier->state.owner->mode == 1)
+        return value;
+    result = Div(modifier->state.record.amount * value, 10);
     if (result < 0)
         result = 1;
     return result;
 }
 
-s32 StatModifier_AddForGlobalMode(struct StatModifier *arg, s32 value)
+s32 StatModifier_AddForGlobalMode(struct StatModifier *modifier, s32 value)
 {
-    struct StatModifier *modifier = arg;
     s32 result;
-    s32 input = value;
-    if (modifier->state.enabled == 0)
-        return input;
-    {
-        u16 mask = 0x800;
-        if (!((gEngineFlags | gScenePauseFlags) & mask) || modifier->state.owner->mode == 1)
-            do {
-                return input;
-            } while (0);
-    }
-    result = input + modifier->state.record.amount;
+    if (!modifier->state.enabled)
+        return value;
+    if (!Engine_PauseBits(0x800))
+        return value;
+    if (modifier->state.owner->mode == 1)
+        return value;
+    result = value + modifier->state.record.amount;
     if (result < 0)
         result = 1;
     return result;
 }
 
-s32 StatModifier_AddForOwnerMode(struct StatModifier *modifier_, s32 value_)
+s32 StatModifier_AddForOwnerMode(struct StatModifier *modifier, s32 value)
 {
-    struct StatModifier *modifier = modifier_;
-    s32 value = value_;
     s32 result;
-    if (modifier->state.enabled == 0)
-        result = value;
-    else {
-        u32 mask = 0x800;
-        if (!((gEngineFlags | gScenePauseFlags) & mask) || modifier->state.owner->mode == 0)
-            do {
-                result = value;
-            } while (0);
-        else {
-            result = value + modifier->state.record.amount;
-            if (result < 0)
-                result = 1;
-        }
-    }
+    if (!modifier->state.enabled)
+        return value;
+    if (!Engine_PauseBits(0x800))
+        return value;
+    if (modifier->state.owner->mode == 0)
+        return value;
+    result = value + modifier->state.record.amount;
+    if (result < 0)
+        result = 1;
     return result;
 }
 
@@ -473,18 +457,13 @@ void StatModifier_InitializeCallbacks(struct ScenePoolActor *p, struct StatModif
     s32 i;
     struct StatModifier *slots = p->modifiers;
     {
-        u32 zero = 0;
-        struct StatModifierState *record = &p->modifiers[0].state;
-        struct StatModifier *slot = slots;
-        s32 remaining = 23;
-        do {
-            slot->callback = (void *)zero;
-            record->enabled = zero;
-            record->owner = owner;
-            Memory_Clear(&record->record, sizeof(record->record));
-            record = (struct StatModifierState *)((u8 *)record + sizeof(*slot));
-            slot++;
-        } while (--remaining >= 0);
+        s32 slot;
+        for (slot = 0; slot < 24; slot++) {
+            slots[slot].callback = 0;
+            slots[slot].state.enabled = 0;
+            slots[slot].state.owner = owner;
+            Memory_Clear(&slots[slot].state.record, sizeof(slots[slot].state.record));
+        }
     }
     for (i = 0; i < sources->count; i++) {
         ScriptRecord_FindModifierRecord(&slots[i].state.record, (s8)sources->entries[i]);
