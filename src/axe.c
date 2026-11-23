@@ -3970,14 +3970,8 @@ s32 SceneActorControl_AdvanceReactionCount(struct ChaseActor *actor)
     if (!SceneActorTurn_Flags(flags, 0x8100)) {
         u32 blocked = WordFlags_Has(4, &context->flagsE4C);
         if (!blocked && context->reactionCount > 2) {
-            u32 phase = 2;
-            u32 behavior = 6;
-            actor->base.state2A8 = blocked;
-            actor->base.phase2A9 = phase;
-            actor->base.behavior2AA = behavior;
-            actor->base.counter2AC = blocked;
-            actor->base.field2B1 = 1;
-            context->reactionCount = blocked;
+            Chase_SetState(actor, 0, 2, 6);
+            context->reactionCount = 0;
             return 1;
         }
     }
