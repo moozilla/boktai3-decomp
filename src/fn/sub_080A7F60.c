@@ -3,6 +3,7 @@
 #include "global.h"
 #include "scene_actor_reaction.h"
 #include "scene_actor_terrain.h"
+#include "scene_actor_chase.h"
 
 extern const s16 gUnk_086149C4[];
 
@@ -27,14 +28,6 @@ static inline s32 Shift(s32 n, u32 bits)
     else
         r = -((-n) >> bits);
     return r;
-}
-
-static inline void Delta(struct ContactPosition *out, const struct ContactPosition *from,
-                         const struct ContactPosition *to)
-{
-    out->x = to->x - from->x;
-    out->y = to->y - from->y;
-    out->z = to->z - from->z;
 }
 
 struct SavedPair {
@@ -90,13 +83,13 @@ void TentacleBody_UpdateSpiral(struct ChaseActor *actor)
         Sound_PlaySong(0x3D7);
     ZeroFill8(&actor->base.secondaryMotion);
     if ((s32)actor->base.counter2AC > 115) {
-        s32 angle = *((u8 *)actor + 0xE9) - actor->base.body.direction;
+        s32 angle = actor->base.tracking.heading - actor->base.body.direction;
         if (angle > 128)
             angle -= 256;
         else if (angle < -128)
             angle += 256;
         if (Turned(angle)) {
-            actor->base.body.direction = *((u8 *)actor + 0xE9);
+            actor->base.body.direction = actor->base.tracking.heading;
             SceneActorChase_SetState(actor, 0, 0, 6);
             return;
         }

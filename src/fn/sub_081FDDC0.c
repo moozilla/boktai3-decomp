@@ -1,6 +1,7 @@
 #include "global.h"
 #include "engine.h"
 #include "ram.h"
+#include "vanargand_projectiles.h"
 struct OrbitEffectPosition {
     s16 x, y, z, pad;
 };
@@ -32,12 +33,6 @@ static inline s32 RandomValue(const u16 *table)
     return table[gRandomIndex];
 }
 extern const s16 gUnk_086149C4[];
-static inline s32 TrailComponent(s32 value)
-{
-    if (value >= 0)
-        return value >> 12;
-    return -(-value >> 12);
-}
 void OrbitEffect_SpawnOrbitTrail(struct OrbitEffect *p)
 {
     if (!(++p->trailTimer & 3)) {
@@ -58,10 +53,11 @@ void OrbitEffect_SpawnOrbitTrail(struct OrbitEffect *p)
         }
         {
             s32 delta;
-            delta = TrailComponent(gUnk_086149C4[(trail->angle + 64) & 255] * trail->radius);
+            delta =
+                VanargandProjectile_Scale(gUnk_086149C4[(trail->angle + 64) & 255] * trail->radius);
             trail->position.x = trail->target->x + delta;
             trail->position.y = trail->target->y;
-            delta = TrailComponent(gUnk_086149C4[trail->angle & 255] * trail->radius);
+            delta = VanargandProjectile_Scale(gUnk_086149C4[trail->angle & 255] * trail->radius);
             trail->position.z = trail->target->z + delta;
         }
         trail->active = 1;

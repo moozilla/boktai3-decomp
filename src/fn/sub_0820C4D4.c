@@ -13,12 +13,6 @@ static inline u32 Screamer_StepScreamLoop(struct ScreamerState *owner, u32 initi
                                                         initialBit);
 }
 
-// The recovery branch loads its duration mask through r3.
-static inline u32 Screamer_StepRecovery(struct ScreamerState *owner)
-{
-    return PlayerCue_StepSequenceEnded(&owner->sprite, &owner->sequence);
-}
-
 s32 Screamer_UpdateScream(struct ScreamerState *p)
 {
     s32 phase;
@@ -61,7 +55,7 @@ s32 Screamer_UpdateScream(struct ScreamerState *p)
             u32 playbackLimit;
             s16 *timer;
             s16 *limit;
-            playbackLimit = Screamer_StepRecovery(p);
+            playbackLimit = Screamer_StepAnimation(p);
             timer = &p->f1CA;
             limit = &p->f1CC;
             /* Keep the playback limit live through recovery-field address setup. */

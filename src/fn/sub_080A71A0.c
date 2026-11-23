@@ -2,6 +2,7 @@
 #include "scene_actor_chase_reaction.h"
 #include "scene_actor_reaction.h"
 #include "scene_actor_control_phase.h"
+#include "scene_actor_init_actor.h"
 
 struct TentacleTrailState {
     u8 unknown0[0x8EA];
@@ -29,16 +30,11 @@ static inline s32 Tentacle_ClampStep(s32 value, s16 limit)
     return value;
 }
 
-static inline void Tentacle_SetReactionFlags(struct ChaseActor *actor, u32 bits)
-{
-    actor->base.statusFlags |= bits;
-}
-
 static inline u8 Tentacle_ApproachReactionEnd(struct ChaseActor *actor)
 {
     s32 x, z;
     SceneActorChase_SetActorFlags(actor, 0x2000);
-    Tentacle_SetReactionFlags(actor, 0x10000);
+    MonsterInit_SetStatusFlags(actor, 0x10000);
     x = Tentacle_Shift(actor->base.reactionStart.x - actor->base.reactionEnd.x, 2);
     z = Tentacle_Shift(actor->base.reactionStart.z - actor->base.reactionEnd.z, 2);
     x = Tentacle_ClampStep(x, 200);

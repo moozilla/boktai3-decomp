@@ -102,7 +102,7 @@ void StateActor_StartKind5Animation6Then7(u32 ctx, struct StateActor *p)
     phase = p->phase;
     switch (phase) {
         case 0:
-            if (!DisplayAnimation_TestFinished((u8 *)p + 0xd4))
+            if (!DisplayAnimation_TestFinished(&p->targetPosition.z))
                 break;
             switch (p->kind) {
                 case 4:

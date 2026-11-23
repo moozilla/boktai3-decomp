@@ -1,4 +1,5 @@
 #include "actor_controller.h"
+#include "vanargand_parts.h"
 
 s32 DirectionalActor_TryBeginState(struct SceneCombatActor *actor, u32 state)
 {
@@ -119,20 +120,10 @@ u32 ActorController_SetBehaviorIfFinished(struct SceneCombatActor *actor, u32 be
     return 0;
 }
 
-static inline void ActorController_SubtractPositions(struct ContactPosition *out,
-                                                     struct ContactPosition *a,
-                                                     struct ContactPosition *b)
-{
-    out->x = a->x - b->x;
-    out->y = a->y - b->y;
-    out->z = a->z - b->z;
-}
-
 u32 ActorController_IsNearTarget(struct SceneCombatActor *actor)
 {
     struct ContactPosition delta;
-    ActorController_SubtractPositions(&delta, &actor->navigation.position,
-                                      &actor->navigation.referencePosition);
+    Vanargand_Difference(&delta, &actor->navigation.position, &actor->navigation.referencePosition);
     if (delta.x < 0)
         delta.x = -delta.x;
     if (delta.z < 0)

@@ -33,6 +33,6 @@ void StateActor_SpawnRadialEffect(struct StateActor *actor)
     v->z = Scale(gUnk_086149C4[heading] * speed);
     frames = (s32)ParticleRandom_ReadRelativeSample(sampleOrigin, (const u16 *)RANDOM_TABLE_ADDR);
     frames = ((frames >> 4) & 15) + 7;
-    SpriteEffectController_Create((u8 *)tag + 8, &velocity, 0x1C1E, 0xD43F, 0, 0, 17, 0, 2, 6, 0,
+    SpriteEffectController_Create(&tag->state, &velocity, 0x1C1E, 0xD43F, 0, 0, 17, 0, 2, 6, 0,
                                   frames, 0, 0, 0, 0, -4, -4);
 }

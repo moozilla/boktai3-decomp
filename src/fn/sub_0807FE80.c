@@ -23,7 +23,7 @@ void SceneActorReaction_RestoreAndClearRestart(struct ChaseActor *actor, s32 fra
             *field = one;
         }
         owner->base.stepDone = zero;
-        *((u8 *)owner + 0x2B5) = kind;
+        owner->base.controlKind = kind;
         owner->base.target = control;
         owner->base.field2C8 = zero;
         {
@@ -47,6 +47,6 @@ void SceneActorReaction_RestoreAndClearRestart(struct ChaseActor *actor, s32 fra
         }
         owner->base.counter2AC = zero;
         owner->base.field2B1 = one;
-        SceneActorReaction_ResetResponseState((u8 *)owner + 0x460, gUnk_0824E128, 0x8B);
+        SceneActorReaction_ResetResponseState(&owner->group.saved, gUnk_0824E128, 0x8B);
     }
 }

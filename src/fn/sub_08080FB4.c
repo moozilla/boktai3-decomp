@@ -3,6 +3,7 @@
 #include "script_utility.h"
 #include "runtime.h"
 #include "scene_actor_control_helpers.h"
+#include "scene_actor_terrain_reaction.h"
 void SceneActorAttachment_ReplaceResponseSlot(void *, u32, u32, u32);
 void SceneActorEffects_AdvanceSteps(void *, u32);
 void *Bestiary_GetEntryForActor(u32, u32);
@@ -41,14 +42,6 @@ static inline void SetControl(struct ChaseActor *actor)
         *field &= mask;
     }
     actor->base.pendingControl = 0;
-}
-static inline void SetAnimation(struct ChaseActor *actor, u8 state, u8 phase, u8 behavior)
-{
-    actor->base.state2A8 = state;
-    actor->base.phase2A9 = phase;
-    actor->base.behavior2AA = behavior;
-    actor->base.counter2AC = 0;
-    actor->base.field2B1 = 1;
 }
 void SceneActorReaction_BeginHiddenDefeat(struct ChaseActor *actor)
 {
@@ -111,11 +104,11 @@ void SceneActorReaction_BeginHiddenDefeat(struct ChaseActor *actor)
     }
     actor->base.attachmentTimer = 0;
     SetControl(actor);
-    SetAnimation(actor, 1, 0, 2);
+    SceneActorTerrain_EnterState(actor, 1, 0, 2);
     if ((!SceneActorControl_TestFlags(gEngineFlags, 0x4800)) && (!Flag(actor, 0x800, 0x2D0))) {
         SceneActorRecord_RecordPair(gScriptEntryProcedure, actor->base.body.id);
     }
-    ActorShadow_Disable((u8 *)actor + 0x320);
+    ActorShadow_Disable(actor->base.shadow);
     switch (actor->base.category) {
         case 4:
             Sound_PlaySong(212);

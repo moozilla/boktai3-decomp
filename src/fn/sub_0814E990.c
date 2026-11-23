@@ -1,6 +1,7 @@
 #include "player.h"
 #include "global.h"
 #include "contact_actor.h"
+#include "group_objects.h"
 // confidence=low: role inferred from callers and callback phases.
 // confidence=low: charge tiers and buffered input inferred from phase transitions.
 extern const s16 gUnk_086149C4[];
@@ -22,11 +23,6 @@ s32 Player_GetAttackEffectType(u32);
 #define HELD       (**(u16 **)(p + 0x348) & 2)
 #define PRESSED    ((*(u16 **)(p + 0x348))[1] & 2)
 #define ANIMATE(n) Player_SetAnimation(p, ActorVariant_GetTableValue(BYTE(0x418), n), 64, 1)
-
-static inline int scale(int n)
-{
-    return n >= 0 ? n >> 12 : -((-n) >> 12);
-}
 
 void Player_OnChargedAttackExit(void *);
 void Player_SetPendingCallback(void *, void (*)(void *));

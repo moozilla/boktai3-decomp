@@ -25,6 +25,8 @@
 #include "render.h"
 #include "scene_actor_init_group.h"
 #include "scene_actor_init_graphics.h"
+#include "scene_actor_terrain_reaction.h"
+#include "ghoul_disc.h"
 
 void Slime_ApplyBodyHit(struct ContactCollider *target, struct ContactCollider *info,
                         struct ChaseActor *actor)
@@ -584,15 +586,6 @@ void SceneActorPlacement_PlayCategoryEventSound(struct ChaseActor *);
 
 u8 Sprite_BlinkUntilExpired(void *, s32, s32, s32);
 
-static inline void Slime_SetReactionState(struct ChaseActor *actor, u8 state, u8 phase, u8 behavior)
-{
-    actor->base.state2A8 = state;
-    actor->base.phase2A9 = phase;
-    actor->base.behavior2AA = behavior;
-    actor->base.counter2AC = 0;
-    actor->base.field2B1 = 1;
-}
-
 void Slime_RunDefeatScript(struct ChaseActor *actor, s32 frame)
 {
     s32 values[8];
@@ -650,7 +643,7 @@ void Slime_RunDefeatScript(struct ChaseActor *actor, s32 frame)
             }
             actor->base.pendingControl = 0;
         }
-        Slime_SetReactionState(actor, 1, 0, 2);
+        SceneActorTerrain_EnterState(actor, 1, 0, 2);
     } else {
         if (SceneActorVisibility_IsHidden(actor))
             ActorShadow_Disable(actor->base.shadow);
@@ -863,24 +856,12 @@ s32 Slime_GetAnimationMovePulse(struct ChaseActor *actor)
 
 u8 SceneActorTerrain_CanTraverseCell(u32, u32, u32, u32);
 
-static inline s32 Slime_QuarterDirection(s32 heading)
-{
-    if (heading >= 0)
-        return heading >> 6;
-    return -(-heading >> 6);
-}
-
 static inline u16 Slime_RandomDirection(void)
 {
     u32 index = (gRandomIndex + 1) & 1023;
     gRandomIndex = index;
     index *= 2;
     return *(const u16 *)(RANDOM_TABLE_ADDR + index);
-}
-
-static inline s32 Slime_MapWidth(struct EngineMap **terrain)
-{
-    return ((struct SceneActorChaseTerrainGrid *)(*terrain)->cells)->width;
 }
 
 static inline s32 Slime_ForwardCell(struct ChaseActor *actor, s32 steps)
@@ -890,7 +871,7 @@ static inline s32 Slime_ForwardCell(struct ChaseActor *actor, s32 steps)
     struct EngineMap **cachedMapSlot = &gTerrainMap;
     u32 height = SceneActorChase_HeightAt(cell, position);
     u32 shape = SceneActorChase_CellProperties(cell)->attributes >> 4;
-    s32 direction = Slime_QuarterDirection(actor->base.body.direction + 32) & 3;
+    s32 direction = Ghoul_QuarterDirection(actor->base.body.direction + 32) & 3;
     s32 next;
     s32 i;
     struct EngineMap **completionMapSlot;
@@ -906,16 +887,16 @@ static inline s32 Slime_ForwardCell(struct ChaseActor *actor, s32 steps)
                 } while (++i < steps);
             return next - 1;
         case 1:
-            next = cell + Slime_MapWidth(cachedMapSlot);
+            next = cell + Ghoul_MapWidth(cachedMapSlot);
             i = 0;
             completionMapSlot = &gTerrainMap;
             if (i < steps)
                 do {
                     if (!SceneActorTerrain_CanTraverseCell(cell, next, height, shape))
                         goto south;
-                    next += Slime_MapWidth(cachedMapSlot);
+                    next += Ghoul_MapWidth(cachedMapSlot);
                 } while (++i < steps);
-            return next - Slime_MapWidth(completionMapSlot);
+            return next - Ghoul_MapWidth(completionMapSlot);
         case 2:
             next = cell - 1;
             i = 0;
@@ -927,23 +908,23 @@ static inline s32 Slime_ForwardCell(struct ChaseActor *actor, s32 steps)
                 } while (++i < steps);
             return next + 1;
         case 3:
-            next = cell - Slime_MapWidth(cachedMapSlot);
+            next = cell - Ghoul_MapWidth(cachedMapSlot);
             i = 0;
             completionMapSlot = &gTerrainMap;
             if (i < steps)
                 do {
                     if (!SceneActorTerrain_CanTraverseCell(cell, next, height, shape))
                         goto north;
-                    next -= Slime_MapWidth(cachedMapSlot);
+                    next -= Ghoul_MapWidth(cachedMapSlot);
                 } while (++i < steps);
-            return next + Slime_MapWidth(completionMapSlot);
+            return next + Ghoul_MapWidth(completionMapSlot);
         default:
             goto home;
     }
 south:
-    return next - Slime_MapWidth(cachedMapSlot);
+    return next - Ghoul_MapWidth(cachedMapSlot);
 north:
-    return next + Slime_MapWidth(cachedMapSlot);
+    return next + Ghoul_MapWidth(cachedMapSlot);
 home:
     return actor->base.terrainCell;
 }
@@ -1109,7 +1090,7 @@ void Slime_RunPendingActionScript(struct ChaseActor *actor)
             *p = flags;
         }
         SceneActorChase_SetControl(actor, SceneActorControl_OnIdle, 0x10);
-        Slime_SetReactionState(actor, 0, 0, 2);
+        SceneActorTerrain_EnterState(actor, 0, 0, 2);
         {
             u16 *p = &actor->base.reactionFlags;
             u32 mask = ~0x980;
@@ -1571,11 +1552,6 @@ static inline u32 Slime_MaskedDamage(struct ChaseActor *actor, u32 flags, u32 ma
     return actor->base.hitReactionFlags & flags & mask;
 }
 
-static inline u32 Slime_MaskedMotionBits(u16 *p, u32 mask)
-{
-    return *p & mask;
-}
-
 static inline u32 Slime_DamageFlags(u32 *flags)
 {
     return *flags;
@@ -1616,7 +1592,7 @@ u32 Slime_ResolveDamageReaction(struct ChaseActor *actor)
         Chase_SetCtl(actor, actor->base.onReaction, 0x12);
         Chase_SetState(actor, 3, 0, 0);
     } else {
-        if (Slime_MaskedMotionBits(motionFlags, 0x100))
+        if (SceneActorTurn_Flags(motionFlags, 0x100))
             return 0;
         if (actor->base.health < context->halfHealth || Slime_TestReactionFlag(context, 8)) {
             Chase_SetCtl(actor, SceneActorControl_OnIdle, 0x10);
@@ -1697,13 +1673,6 @@ void Collider_Remove(void *);
 
 void SceneActorRegistry_UnlinkActor(void *);
 
-static inline u8 Slime_TestDestroyFlags(u16 *a, u32 m)
-{
-    if (*a & m)
-        return 1;
-    return 0;
-}
-
 u32 Slime_Destroy(struct ChaseActor *actor)
 {
     u8 *p = actor->base.drawable;
@@ -1716,7 +1685,7 @@ u32 Slime_Destroy(struct ChaseActor *actor)
         Anim_Remove(&((struct SceneActorAnimationTileDrawable *)p)->tile);
     Heap_Free(p);
     m = 0x100;
-    if (Slime_TestDestroyFlags(&actor->base.placementFlags, m))
+    if (SceneActorChase_TestField(&actor->base.placementFlags, m))
         SceneMessages_UnregisterReceiver(&actor->base.unknown9[3]);
     {
         u8 *r = actor->base.shadow;

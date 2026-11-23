@@ -1,5 +1,6 @@
 #include "global.h"
 #include "scene_actor_reset.h"
+#include "movement_curve.h"
 extern const s16 gUnk_086149C4[];
 struct TentacleWaveSegment {
     u8 unknown0[0x1C];
@@ -39,46 +40,6 @@ static inline void Tentacle_MaskWaveFlags(u8 *flags, u32 mask)
     *flags = mask & *flags;
 }
 
-static inline s32 Tentacle_TruncateFixed10(s32 value)
-{
-    return value >= 0 ? value >> 10 : -((-value) >> 10);
-}
-static inline void Tentacle_SubtractPositions(struct ContactPosition *out,
-                                              struct ContactPosition *a, struct ContactPosition *b)
-{
-    out->x = b->x - a->x;
-    out->y = b->y - a->y;
-    out->z = b->z - a->z;
-}
-static inline void Tentacle_InterpolatePosition(struct ContactPosition *out,
-                                                struct ContactPosition *start,
-                                                struct ContactPosition *end, s32 initialScale,
-                                                s32 t, s32 finalScale, s32 speed)
-{
-    struct ContactPosition delta, tangent;
-    s32 square, cube, twiceCube, thriceSquare, sway, final;
-    s32 scaled, value;
-    Tentacle_SubtractPositions(&delta, start, end);
-    ZeroFill8(&tangent);
-    square = Tentacle_TruncateFixed10(t * t);
-    cube = Tentacle_TruncateFixed10(square * t);
-    twiceCube = cube * 2;
-    thriceSquare = square * 3;
-    sway = (cube - 2 * square + t) * speed;
-    final = (cube - square) * finalScale;
-    scaled = ((twiceCube - thriceSquare + 1) * tangent.x) * initialScale;
-    value = (thriceSquare - twiceCube) * delta.x;
-    value = scaled + value + sway + final;
-    out->x = start->x + Tentacle_TruncateFixed10(value);
-    scaled = ((twiceCube - thriceSquare + 1) * tangent.y) * initialScale;
-    value = (-twiceCube + thriceSquare) * delta.y;
-    value = scaled + value + sway + final;
-    out->y = start->y + Tentacle_TruncateFixed10(value);
-    scaled = ((twiceCube - thriceSquare + 1) * tangent.z) * initialScale;
-    value = (-twiceCube + thriceSquare) * delta.z;
-    value = scaled + value + sway + final;
-    out->z = start->z + Tentacle_TruncateFixed10(value);
-}
 void sub_080AA240(struct ChaseActor *actor)
 {
     struct TentacleWaveTrail *trail = actor->base.context;
@@ -99,8 +60,8 @@ void sub_080AA240(struct ChaseActor *actor)
     }
     previous = ((struct TentacleWaveDrawable *)actor->base.drawable)->position;
     for (i = 0; i < trail->count - 1; i += 2) {
-        Tentacle_InterpolatePosition(&output, &previous, &trail->segments[i + 1].position, 1, 512,
-                                     0, 0);
+        MovementCurve_InterpolatePosition(&output, &previous, &trail->segments[i + 1].position, 1,
+                                          512, 0, 0);
         trail->segments[i].position = output;
         previous = trail->segments[i + 1].position;
     }

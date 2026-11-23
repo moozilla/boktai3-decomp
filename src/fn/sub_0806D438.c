@@ -4,6 +4,8 @@
 #include "engine.h"
 #include "ram.h"
 #include "monster_particle_random.h"
+#include "movement_curve.h"
+#include "vanargand_parts.h"
 
 extern const s16 gUnk_086149C4[];
 extern void *gUnknown_02000580;
@@ -11,22 +13,9 @@ s32 Mod(s32, s32);
 s32 Div(s32, s32);
 u8 *Path_GetPointData(u8 *);
 
-static inline s32 f0806D438_T10(s32 value)
-{
-    return value >= 0 ? value >> 10 : -((-value) >> 10);
-}
-
 static inline s32 f0806D438_T12(s32 value)
 {
     return value >= 0 ? value >> 12 : -((-value) >> 12);
-}
-
-static inline void f0806D438_SubVec(struct ContactPosition *out, struct ContactPosition *a,
-                                    struct ContactPosition *b)
-{
-    out->x = a->x - b->x;
-    out->y = a->y - b->y;
-    out->z = a->z - b->z;
 }
 
 struct WanderSource {
@@ -39,7 +28,7 @@ static inline struct ContactPosition *PrepareSourceDelta(void **source, struct C
 {
     struct WanderSource *origin = *source;
     struct ContactPosition *target = &origin->position;
-    f0806D438_SubVec(out, &actor->sprite.position, target);
+    Vanargand_Difference(out, &actor->sprite.position, target);
     return target;
 }
 
@@ -57,10 +46,10 @@ static inline void f0806D438_Curve(struct ContactPosition *out, struct ContactPo
     struct ContactPosition acc;
     s32 q, p, twiceP, thriceQ, tangent, h11;
     s32 scaled, value;
-    f0806D438_SubVec(&offset, end, start);
+    Vanargand_Difference(&offset, end, start);
     ZeroFill8(&acc);
-    q = f0806D438_T10(t * t);
-    p = f0806D438_T10(q * t);
+    q = MovementCurve_TruncateFixed10(t * t);
+    p = MovementCurve_TruncateFixed10(q * t);
     twiceP = p * 2;
     thriceQ = q * 3;
     tangent = (p - 2 * q + t) * tz;
@@ -68,15 +57,15 @@ static inline void f0806D438_Curve(struct ContactPosition *out, struct ContactPo
     scaled = ((twiceP - thriceQ + 1) * acc.x) * tx;
     value = (thriceQ - twiceP) * offset.x;
     value = scaled + value + tangent + h11;
-    out->x = start->x + f0806D438_T10(value);
+    out->x = start->x + MovementCurve_TruncateFixed10(value);
     scaled = ((twiceP - thriceQ + 1) * acc.y) * tx;
     value = (-twiceP + thriceQ) * offset.y;
     value = scaled + value + tangent + h11;
-    out->y = start->y + f0806D438_T10(value);
+    out->y = start->y + MovementCurve_TruncateFixed10(value);
     scaled = ((twiceP - thriceQ + 1) * acc.z) * tx;
     value = (-twiceP + thriceQ) * offset.z;
     value = scaled + value + tangent + h11;
-    out->z = start->z + f0806D438_T10(value);
+    out->z = start->z + MovementCurve_TruncateFixed10(value);
 }
 
 void RouteSpriteActor_PlanWanderPath(struct RouteSpriteActor *actor)

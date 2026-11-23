@@ -371,19 +371,10 @@ void SceneActorControl_RestartOrAdvance(struct ChaseActor *actor)
         ++actor->base.counter2AC;
 }
 
-static inline u8 Ghoul_TakeStateEntry(u8 *field)
-{
-    if (*field) {
-        *field = 0;
-        return 1;
-    }
-    return 0;
-}
-
 void Ghoul_WaitForRouteResult(struct ChaseActor *actor)
 {
     u8 busy;
-    if (Ghoul_TakeStateEntry(&actor->base.field2B1)) {
+    if (SceneActorControl_TakeFlag(&actor->base.field2B1)) {
         void *control = actor->base.onEntry;
         SceneActorChase_SetControl(actor, control, 2);
     }

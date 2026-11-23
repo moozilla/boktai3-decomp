@@ -14,8 +14,8 @@ void SceneHud_RefreshEquippedActionIcons(struct SceneHudState *p)
         slot = 0;
     else
         slot = (s16)gGameState->unk50 - 8;
-    unlock = ((s16 *)((u8 *)gGameState + 0x78))[slot];
-    action = ((s16 *)((u8 *)gGameState + 0x90))[gGameState->actionAuxiliarySlot];
+    unlock = (&gGameState->inventory[8])[slot];
+    action = (&gGameState->slots88[4])[gGameState->actionAuxiliarySlot];
     if (unlock == -1 || action == -1) {
         {
             struct SceneInputWidget *a = &p->comparisonUnlockWidget;

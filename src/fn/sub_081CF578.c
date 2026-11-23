@@ -1,4 +1,5 @@
 #include "global.h"
+#include "scene_indicator.h"
 
 extern const s16 gUnk_086149C4[];
 s32 Actor_PlayAnimationEntry(void *, s32, s32, s32, s32);
@@ -6,9 +7,6 @@ static inline s32 trunc12(s32 x)
 {
     return x >= 0 ? x >> 12 : -((-x) >> 12);
 }
-struct Vec {
-    s16 x, y, z, pad;
-};
 struct DashNpc {
     u8 pad0[7];
     u8 done, changed, entered;

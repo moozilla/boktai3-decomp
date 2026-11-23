@@ -1,4 +1,5 @@
 #include "global.h"
+#include "scene_actor_init_actor.h"
 
 // confidence=low: slows the sword component and selects its return path when it stops.
 struct SwordReturn {
@@ -31,12 +32,6 @@ struct SwordReturn {
 };
 void Sword_UpdateHorizontalWaveReturn(void);
 void Sword_UpdateDepthWaveReturn(void);
-static inline s32 Half(s32 x)
-{
-    if (x >= 0)
-        return x >> 1;
-    return -(-x >> 1);
-}
 void Sword_DecelerateReturn(struct SwordReturn *input)
 {
     struct SwordReturn *p = input;
@@ -68,7 +63,7 @@ void Sword_DecelerateReturn(struct SwordReturn *input)
             else
                 p->callback = Sword_UpdateDepthWaveReturn;
         }
-        p->velocityX = Half(p->velocityX);
-        p->velocityZ = Half(p->velocityZ);
+        p->velocityX = MonsterInit_Half(p->velocityX);
+        p->velocityZ = MonsterInit_Half(p->velocityZ);
     }
 }

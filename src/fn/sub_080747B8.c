@@ -3,17 +3,12 @@
 #include "engine.h"
 #include "scene_actor_reset.h"
 #include "scene_actor_behavior.h"
+#include "scene_actor_init_actor.h"
 s32 Div(s32, s32);
 s32 Mod(s32, s32);
 static inline s32 motionSquared(struct ContactPosition *motion)
 {
     return motion->x * motion->x + motion->y * motion->y + motion->z * motion->z;
-}
-static inline s32 halve(s32 value)
-{
-    if (value >= 0)
-        return value >> 1;
-    return -(-value >> 1);
 }
 s32 SceneActorMovement_UpdateAirborne(struct ChaseActor *actor)
 {
@@ -61,8 +56,8 @@ s32 SceneActorMovement_UpdateAirborne(struct ChaseActor *actor)
         }
     } else {
         if (Mod(actor->base.frameCounter, 4) == 0) {
-            actor->base.secondaryMotion.x = halve(actor->base.secondaryMotion.x);
-            actor->base.secondaryMotion.z = halve(actor->base.secondaryMotion.z);
+            actor->base.secondaryMotion.x = MonsterInit_Half(actor->base.secondaryMotion.x);
+            actor->base.secondaryMotion.z = MonsterInit_Half(actor->base.secondaryMotion.z);
         }
         actor->base.body.motion.x += actor->base.secondaryMotion.x;
         actor->base.body.motion.z += actor->base.secondaryMotion.z;
@@ -110,8 +105,8 @@ done:;
                 category != 0xe && category != 0xc)
                 SceneParticleBurst_CreateWithPause(position, &actor->base.secondaryMotion, burst, 6,
                                                    2, 4);
-            if (*(void **)((u8 *)actor + 0x240))
-                Callback_InvokeActor(actor, *(void **)((u8 *)actor + 0x240));
+            if (actor->base.field240)
+                Callback_InvokeActor(actor, actor->base.field240);
             actor->base.heightOffset = 0;
         }
     }

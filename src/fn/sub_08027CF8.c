@@ -25,7 +25,7 @@ void SceneActors_UpdateHazardAttack(struct StateActor *p, int tick)
     }
     if (!p->actionTryUpdate(p) && !p->actionReset(p)) {
         if (tick == 16) {
-            AnimatedHazard_Create((u8 *)p + 0xd0, 1, 60);
+            AnimatedHazard_Create(&p->targetPosition, 1, 60);
             Sound_PlaySongChecked(849);
         }
         if (((struct SceneGraphicsActor *)p2)->animation.status & 2)

@@ -6,19 +6,12 @@
 #include "script_utility.h"
 #include "engine.h"
 #include "ram.h"
+#include "scene_actor_terrain_reaction.h"
 void *Bestiary_GetEntryForActor(u32, u32);
 void Bestiary_UnlockEntry(void *);
 void SceneActorBehavior_CallTerrainScript(struct RoomActor *);
 void SceneActorPlacement_PlayCategoryEventSound(struct ChaseActor *);
 u8 Sprite_BlinkUntilExpired(void *, s32, s32, s32);
-static inline void SetAnimation(struct ChaseActor *actor, u8 state, u8 phase, u8 behavior)
-{
-    actor->base.state2A8 = state;
-    actor->base.phase2A9 = phase;
-    actor->base.behavior2AA = behavior;
-    actor->base.counter2AC = 0;
-    actor->base.field2B1 = 1;
-}
 static inline void Select(struct RoomActor *actor, u32 selection, u32 variant, u32 flags)
 {
     u32 force;
@@ -97,7 +90,7 @@ void TentacleBody_UpdateDefeat(struct ChaseActor *actor, s32 frame)
         actor->base.restart = 0;
         SceneActorPlacement_PlayCategoryEventSound((void *)actor);
         {
-            struct ContactCollider *c = (void *)((u8 *)actor + 0x134);
+            struct ContactCollider *c = &actor->base.colliderA;
             c->flags |= 4;
         }
     }
@@ -138,6 +131,6 @@ void TentacleBody_UpdateDefeat(struct ChaseActor *actor, s32 frame)
     }
     actor->base.attachmentTimer = 0;
     SceneActorChase_SetControl(actor, SceneActorControl_OnIdle, 16);
-    SetAnimation(actor, 1, 0, 2);
-    ActorShadow_Disable((u8 *)actor + 0x320);
+    SceneActorTerrain_EnterState(actor, 1, 0, 2);
+    ActorShadow_Disable(actor->base.shadow);
 }

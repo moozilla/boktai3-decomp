@@ -37,7 +37,7 @@ s32 PaletteTransition_StartDisplay(struct PaletteTransition *p, int index)
     if (t == 0) {
         s32 x = e->offsetX;
         s32 y = e->offsetY;
-        u16 *origin = (u16 *)((u8 *)p + 0x9ec);
+        u16 *origin = p->origin;
         x += 0x40;
         y += 0x54;
         origin[0] = x;
@@ -46,16 +46,16 @@ s32 PaletteTransition_StartDisplay(struct PaletteTransition *p, int index)
         origin[3] = t;
     }
     if (e->kind == 2) {
-        if (DisplayAnimation_InitializeKeyframes(anim, e->id, 0x10, (u8 *)p + 0x9ec) < 0)
+        if (DisplayAnimation_InitializeKeyframes(anim, e->id, 0x10, p->origin) < 0)
             return -1;
     } else {
-        if (DisplayAnimation_InitializeSequence(anim, e->id, e->frames, 0x10, (u8 *)p + 0x9ec) < 0)
+        if (DisplayAnimation_InitializeSequence(anim, e->id, e->frames, 0x10, p->origin) < 0)
             return -1;
     }
     if (!(e->flags & 1))
         DisplayAnimation_SelectPaletteBank(anim, e->palette);
     DisplayAnimation_SetPriority(anim, 2);
     p->direction = e->direction;
-    Dir_Decompose(e->directionIndex, (u8 *)p + 0x9fe, (u8 *)p + 0x9ff, p->direction);
+    Dir_Decompose(e->directionIndex, &p->dirX, &p->dirY, p->direction);
     return 0;
 }

@@ -1,5 +1,6 @@
 #include "global.h"
 #include "scene_actor_reset.h"
+#include "scene_actor_chase_shared.h"
 s32 Div(s32, s32);
 s32 Mod(s32, s32);
 struct ActorTrail {
@@ -12,13 +13,9 @@ static inline u32 stateFlag(struct ChaseActor *p, u32 mask)
 {
     return p->base.motionFlags & mask;
 }
-static inline u32 actorFlag(struct ChaseActor *p, u32 mask)
-{
-    return p->base.statusFlags & mask;
-}
 static inline u8 unavailable(struct ChaseActor *p)
 {
-    if (p && (stateFlag(p, 0x40) || actorFlag(p, 0x20000) || p->base.health <= 0))
+    if (p && (stateFlag(p, 0x40) || SceneActorChase_StatusFlags(p, 0x20000) || p->base.health <= 0))
         return 1;
     return 0;
 }

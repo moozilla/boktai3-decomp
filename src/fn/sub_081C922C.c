@@ -185,7 +185,7 @@ void StateActor_StartKind9Or10Animation2(u32 ctx, struct StateActor *p)
     }
     if (p->phase != 0)
         return;
-    if (!DisplayAnimation_TestFinished((u8 *)p + 0xd4))
+    if (!DisplayAnimation_TestFinished(&p->targetPosition.z))
         return;
     Actor_PlayAnimationEntry(p, 0, 1, 0, 4);
     p->done = 1;

@@ -38,10 +38,6 @@ static inline u32 Ooze_StepInitialAnimation(struct DisplaySequenceSprite *sprite
     return PlayerCue_StepSequenceEnded(sprite, state);
 }
 
-static inline void CopyPosition(struct SceneVec *out, const struct SceneVec *in)
-{
-    *out = *in;
-}
 static inline void Ooze_OffsetBodyPosition(struct SceneVec *position, s32 facing)
 {
     if (!facing)
@@ -136,7 +132,7 @@ s32 Ooze_InitializeFromScript(struct OozeInit *p, void *parent)
     if (p->delayScript)
         Ooze_ReadScriptValueList(p);
     if (p->solid) {
-        CopyPosition(&position, (struct SceneVec *)((u8 *)p + 0x3c));
+        SceneVec_Copy(&position, (struct SceneVec *)((u8 *)p + 0x3c));
         if (p->variant == 1) {
             Ooze_OffsetBodyPosition(&position, p->facing);
         }

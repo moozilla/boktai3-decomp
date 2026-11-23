@@ -1,5 +1,7 @@
 #include "player_slot_status.h"
 #include "scene_actor_actions.h"
+#include "vanargand_parts.h"
+#include "ghoul_disc.h"
 
 struct ContactPosition *TetherActor_GetPosition(void);
 
@@ -358,27 +360,14 @@ s32 Math_Atan2(s32, s32);
 void Terrain_MoveFootprint(void *, struct ContactPosition *, struct ContactPosition *, u16, u16,
                            u8);
 
-static inline s32 SceneActor_ScaleTrig(s32 value)
-{
-    return value >= 0 ? value >> 12 : -(-value >> 12);
-}
-
 static inline void SceneActor_OffsetAlongHeading(const s16 *table, struct ContactPosition *v,
                                                  u32 angle, const s32 radius)
 {
     u32 heading = angle;
     s32 length = radius;
-    v->x = SceneActor_ScaleTrig(table[(heading + 64) & 255] * length);
+    v->x = SceneActor_ChargeComponent(table[(heading + 64) & 255] * length);
     v->y = 0;
-    v->z = SceneActor_ScaleTrig(table[heading & 255] * length);
-}
-
-static inline void Subtract(struct ContactPosition *out, struct ContactPosition *a,
-                            struct ContactPosition *b)
-{
-    out->x = a->x - b->x;
-    out->y = a->y - b->y;
-    out->z = a->z - b->z;
+    v->z = SceneActor_ChargeComponent(table[heading & 255] * length);
 }
 
 // confidence=low: emits toward flagged nearby actors using an outward radial offset.
@@ -413,7 +402,7 @@ void Actor_EmitTowardNearbyActors(struct SceneActorBody *emitter)
             if (distance <= 9999) {
                 SceneActor_OffsetAlongHeading(table, &offset, Math_Atan2(dx, dz), 100);
                 Add(&offset, position, &offset);
-                Subtract(&emitter->motion, &offset, &emitter->position);
+                Vanargand_Difference(&emitter->motion, &offset, &emitter->position);
                 if (emitter->movementProbe)
                     Terrain_MoveFootprint(emitter->movementProbe, &emitter->position,
                                           &emitter->motion, emitter->probeExtentX,
@@ -1219,13 +1208,6 @@ void Actor_OnPathFollowUpdate(void *unused, struct SceneActor *actor)
 
 extern u32 gUnk_02000560;
 
-static inline s32 SceneActor_Absolute(s32 x)
-{
-    if (x < 0)
-        return -x;
-    return x;
-}
-
 static inline u32 AttachmentFlag(void)
 {
     return PlayerSlot_ReadStatus(0, 4);
@@ -1309,9 +1291,8 @@ void Actor_UpdateTargetFacing(struct SceneActorManager *ctx, struct SceneActor *
         struct ContactPosition *target = ctx->target;
         s32 radius = actor->rateC;
         u8 SceneActor_IsNearTarget;
-        if (((SceneActor_Absolute(target->x - pos->x) < radius) &&
-             (SceneActor_Absolute(target->y - pos->y) <= 255)) &&
-            (SceneActor_Absolute(target->z - pos->z) < radius))
+        if (((Ghoul_Abs(target->x - pos->x) < radius) && (Ghoul_Abs(target->y - pos->y) <= 255)) &&
+            (Ghoul_Abs(target->z - pos->z) < radius))
             SceneActor_IsNearTarget = 1;
         else
             SceneActor_IsNearTarget = 0;
@@ -1322,7 +1303,7 @@ void Actor_UpdateTargetFacing(struct SceneActorManager *ctx, struct SceneActor *
             s32 oppositeFacing = (actor->body.direction) + 128;
             u8 opposite;
             opposite = facing - oppositeFacing;
-            if ((SceneActor_Absolute((s8)delta) <= 63) && (SceneActor_Absolute((s8)opposite) <= 31))
+            if ((Ghoul_Abs((s8)delta) <= 63) && (Ghoul_Abs((s8)opposite) <= 31))
                 SceneActor_SetFlags(actor, 0x800);
         }
     }

@@ -1,5 +1,6 @@
 #include "player.h"
 #include "contact_actor.h"
+#include "group_objects.h"
 
 // confidence=low: holding input charges recoil and release advances the tether attack.
 
@@ -12,11 +13,6 @@ void Player_SetTetherMode(u8 *, s32, s32);
 void Player_PlayLocalSong(s32 a, u32 b);
 s32 Player_UpdateFacingFromInputHistory(u8 *p);
 void sub_0823B308(u8 *p);
-
-static inline int scale(int n)
-{
-    return n >= 0 ? n >> 12 : -((-n) >> 12);
-}
 
 void Player_UpdateChargedTetherStrike(u8 *p)
 {

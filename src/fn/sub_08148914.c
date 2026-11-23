@@ -1,17 +1,12 @@
 #include "player_cue.h"
 #include "player.h"
 #include "player_cue_sequence.h"
+#include "vanargand_projectiles.h"
 u32 Player_ConsumeStateEntry(struct Player *);
 void ActorSequence_Begin(struct Player *, s32, s32);
 void Player_SetActionPhase(struct Player *, s32);
 void Sound_PlaySong(u32);
 extern const s16 gUnk_086149C4[];
-static inline s32 ScaleRecoil(s32 value)
-{
-    if (value >= 0)
-        return value >> 12;
-    return -(-value >> 12);
-}
 // confidence=low: applies a fading impulse opposite the stored facing, then chooses recovery.
 void Player_UpdateDecayingRecoil(struct Player *p)
 {
@@ -34,8 +29,9 @@ void Player_UpdateDecayingRecoil(struct Player *p)
     PlayerCue_StepSequence(&PlayerCue_Graphics(p)->sprite, &p->cueCollider.sequence);
     if (p->directionFrame) {
         u32 angle = ((p->facing + 5) & 7) << 5;
-        p->velocityX = -ScaleRecoil(gUnk_086149C4[(angle + 64) & 255] * p->directionFrame);
-        p->velocityZ = -ScaleRecoil(gUnk_086149C4[angle] * p->directionFrame);
+        p->velocityX =
+            -VanargandProjectile_Scale(gUnk_086149C4[(angle + 64) & 255] * p->directionFrame);
+        p->velocityZ = -VanargandProjectile_Scale(gUnk_086149C4[angle] * p->directionFrame);
         p->directionFrame = (p->directionFrame * 3) >> 2;
     } else {
         p->contactSpecial = 0;

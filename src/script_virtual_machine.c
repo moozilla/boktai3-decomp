@@ -823,7 +823,7 @@ void GameState_ResetActiveRegions(void)
 {
     u16 v = gGameState->unk744;
     Memory_Clear(gGameVariables, 0x400);
-    Memory_Clear((u8 *)gGameState + 0x30, 0x74A);
+    Memory_Clear(&gGameState->positionX, 0x74A);
     gGameState->unk744 = v;
     GameState_BackupActiveRegions();
 }

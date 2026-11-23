@@ -3,6 +3,7 @@
 #include "display_sprite_playback.h"
 #include "player_cue_sequence.h"
 #include "render.h"
+#include "scene_actor_part_burst.h"
 
 void ContactSequenceActor_SetFlags(struct ContactSequenceActor *actor, u32 flags)
 {
@@ -165,13 +166,6 @@ s32 TransientSpriteEffects_Spawn(u32, u32, const struct ContactPosition *,
    them, and reload takes each SImode use from sl afresh because find_equiv_reg rejects a
    copy made in another mode. */
 
-static inline u32 RandomValue(const u16 *table)
-{
-    u32 index = (gRandomIndex + 1) & 1023;
-    gRandomIndex = index;
-    return table[index];
-}
-
 static inline u32 RandomBits(const u16 *table, u16 mask)
 {
     u32 index = (gRandomIndex + 1) & 1023;
@@ -194,20 +188,20 @@ void ContactSequenceActor_UpdateDying(struct ContactSequenceOwner *parent,
 
     if (ContactSequenceActor_TakeEntryFlag(actor)) {
         table = (const u16 *)RANDOM_TABLE_ADDR;
-        scatter.bits.x = RandomValue(table) & 63;
+        scatter.bits.x = SceneActorEffects_NextSample(table) & 63;
         scatter.bits.y = RandomBits(table, 127);
-        scatter.bits.z = RandomValue(table) & 63;
+        scatter.bits.z = SceneActorEffects_NextSample(table) & 63;
         scatterPosition = &scatter.position;
         scatterPosition->x += actor->position.x;
         scatterPosition->y += (position = &actor->position)->y;
         scatterPosition->z += position->z;
         TransientSpriteEffects_Spawn(0, 0x1004, scatterPosition, 0, 256, 256);
         {
-            u32 sx = (u16)(RandomValue(table) & 63), sy, sz;
+            u32 sx = (u16)(SceneActorEffects_NextSample(table) & 63), sy, sz;
             scatterPosition->x = sx;
             sy = RandomBits(table, 127);
             scatterPosition->y = sy;
-            sz = (u16)(RandomValue(table) & 63);
+            sz = (u16)(SceneActorEffects_NextSample(table) & 63);
             sx += (u16)actor->position.x;
             scatterPosition->x = sx;
             sy += (u16)position->y;

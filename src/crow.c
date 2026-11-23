@@ -27,6 +27,8 @@
 #include "math_shift.h"
 #include "scene_actor_placement.h"
 #include "scene_actor_contact_response.h"
+#include "scene_actor_terrain_reaction.h"
+#include "scene_actor_chase.h"
 
 /* Records type-one contacts reported by the Crow attack collider. */
 
@@ -290,15 +292,6 @@ void SceneActorPlacement_PlayCategoryEventSound(struct ChaseActor *);
 
 u8 Sprite_BlinkUntilExpired(void *, s32, s32, s32);
 
-static inline void Crow_SetDefeatState(struct ChaseActor *actor, u8 state, u8 phase, u8 behavior)
-{
-    actor->base.state2A8 = state;
-    actor->base.phase2A9 = phase;
-    actor->base.behavior2AA = behavior;
-    actor->base.counter2AC = 0;
-    actor->base.field2B1 = 1;
-}
-
 void Crow_UpdateDefeat(struct ChaseActor *actor, s32 frame)
 {
     s32 values[8];
@@ -342,7 +335,7 @@ void Crow_UpdateDefeat(struct ChaseActor *actor, s32 frame)
         SceneActorBehavior_CallTerrainScript((void *)actor);
     actor->base.attachmentTimer = 0;
     SceneActorChase_SetControl(actor, SceneActorControl_OnIdle, 16);
-    Crow_SetDefeatState(actor, 1, 0, 2);
+    SceneActorTerrain_EnterState(actor, 1, 0, 2);
     ActorShadow_Disable(actor->base.shadow);
 }
 
@@ -467,15 +460,6 @@ static inline s32 Crow_HeadingMagnitude(s32 n)
     return n;
 }
 
-static inline void Crow_FindPositionDelta(struct ContactPosition *out,
-                                          const struct ContactPosition *from,
-                                          const struct ContactPosition *to)
-{
-    out->x = to->x - from->x;
-    out->y = to->y - from->y;
-    out->z = to->z - from->z;
-}
-
 static inline void Crow_MakeSteeringVelocity(struct ContactPosition *out, u32 angle, s32 speed)
 {
     out->x = Math_ShiftTowardZero(gUnk_086149C4[(angle + 64) & 255] * speed, 12);
@@ -488,15 +472,6 @@ static inline s32 Crow_ClampTurnSpeed(s32 n, s32 min, s32 *out)
     *out = n;
     n = n > 0 ? n : min;
     return n;
-}
-
-static inline void Crow_SetFlightState(struct ChaseActor *actor, u8 state, u8 phase, u8 behavior)
-{
-    actor->base.state2A8 = state;
-    actor->base.phase2A9 = phase;
-    actor->base.behavior2AA = behavior;
-    actor->base.counter2AC = 0;
-    actor->base.field2B1 = 1;
 }
 
 // confidence=low: distance and angle gates suggest approach and orbit flight steering.
@@ -516,7 +491,7 @@ void Crow_SteerAroundPlayer(struct ChaseActor *actor)
         SceneActorChase_SetControl(actor, actor->base.onEntry, 2);
     }
     if (state->approachTime < ((s32)actor->base.counter2AC)) {
-        Crow_FindPositionDelta(&delta, &actor->base.body.position, (void *)&gPlayers[0]->position);
+        Chase_Delta(&delta, &actor->base.body.position, (void *)&gPlayers[0]->position);
         t1 = delta.x;
         t2 = delta.z;
         angle = Math_Atan2(t1, t2);
@@ -526,7 +501,7 @@ void Crow_SteerAroundPlayer(struct ChaseActor *actor)
         if (turn <= 11) {
             state->approachTurns = 0;
             ((struct ActorSprite *)actor->base.drawable)->flags &= ~2;
-            Crow_SetFlightState(actor, 0, 2, 0);
+            SceneActorTerrain_EnterState(actor, 0, 2, 0);
             return;
         }
         step = Crow_ClampTurnSpeed(Math_ShiftTowardZero(turn, 2), 4, &step);
@@ -535,17 +510,17 @@ void Crow_SteerAroundPlayer(struct ChaseActor *actor)
         if (state->approachTurns > 20) {
             state->approachTurns = 0;
             state->turnDelay = 0;
-            Crow_SetFlightState(actor, 0, 0, 4);
+            SceneActorTerrain_EnterState(actor, 0, 0, 4);
             return;
         } else {
             state->approachTurns++;
             state->turnDelay = 0;
         }
     } else if (actor->base.tracking.distance <= 0x7CFF) {
-        Crow_SetFlightState(actor, 0, 0, 4);
+        SceneActorTerrain_EnterState(actor, 0, 0, 4);
         return;
     } else if (state->orbitRange > actor->base.tracking.distance) {
-        Crow_FindPositionDelta(&delta, (void *)&gPlayers[0]->position, &actor->base.body.position);
+        Chase_Delta(&delta, (void *)&gPlayers[0]->position, &actor->base.body.position);
         angle = Math_Atan2(delta.x, delta.z);
         turn = Crow_HeadingMagnitude(
             Crow_NormalizeHeading(((angle + 64) & 255) - actor->base.body.direction));
@@ -559,13 +534,13 @@ void Crow_SteerAroundPlayer(struct ChaseActor *actor)
             step = 2;
         goto clamp;
     } else {
-        Crow_FindPositionDelta(&delta, &actor->base.body.position, (void *)&gPlayers[0]->position);
+        Chase_Delta(&delta, &actor->base.body.position, (void *)&gPlayers[0]->position);
         angle = Math_Atan2(delta.x, delta.z);
         turn = Crow_NormalizeHeading(angle - actor->base.body.direction);
         if (turn < 0)
             turn = -turn;
         if (turn <= 31) {
-            Crow_SetFlightState(actor, 0, 0, 4);
+            SceneActorTerrain_EnterState(actor, 0, 0, 4);
             return;
         }
         step = Crow_ClampTurnSpeed(Math_ShiftTowardZero(turn, 3), 2, &step);
@@ -631,15 +606,6 @@ void Crow_UpdateWanderTimer(struct ChaseActor *actor)
     }
 }
 
-static inline u8 Crow_TakeReturnEntry(struct ChaseActor *actor)
-{
-    if (actor->base.field2B1) {
-        actor->base.field2B1 = 0;
-        return 1;
-    }
-    return 0;
-}
-
 static inline void Crow_SetReturnState(struct ChaseActor *actor, u32 phase, u32 behavior)
 {
     actor->base.state2A8 = 0;
@@ -651,7 +617,7 @@ static inline void Crow_SetReturnState(struct ChaseActor *actor, u32 phase, u32 
 
 void Crow_UpdateReturnAnimation(struct ChaseActor *actor)
 {
-    if (Crow_TakeReturnEntry(actor)) {
+    if (Chase_TakeArrived(actor)) {
         SceneActorChase_SetControl(actor, Crow_UpdateAnimationSequence, 0x23);
     }
     Callback_InvokeActor(actor, actor->base.contactQuery.opaque);
@@ -675,15 +641,15 @@ void Crow_ApproachPlayer(struct ChaseActor *actor)
     limit = actor->base.paletteOffset == 1 ? 0x18 : 0x28;
     if ((s32)actor->base.counter2AC > limit) {
         if (state->orbitRange > actor->base.tracking.distance) {
-            Crow_SetFlightState(actor, 0, 0, 1);
+            SceneActorTerrain_EnterState(actor, 0, 0, 1);
             return;
         }
         pp = &gPlayers;
-        Crow_FindPositionDelta(&delta, &actor->base.body.position,
+        Chase_Delta(&delta, &actor->base.body.position,
                                &((struct SceneActorChasePlayer *)*pp)->target.position);
         if (Crow_HeadingMagnitude(Crow_NormalizeHeading(Math_Atan2(delta.x, delta.z) -
                                                         actor->base.body.direction)) > 0x40) {
-            Crow_SetFlightState(actor, 0, 0, 1);
+            SceneActorTerrain_EnterState(actor, 0, 0, 1);
             return;
         }
     }
@@ -1174,29 +1140,11 @@ u32 Crow_UpdatePostAction(struct ChaseActor *actor)
     return 1;
 }
 
-static inline u8 Crow_TakeKnockbackEntry(struct ChaseActor *actor)
-{
-    if (actor->base.field2B1) {
-        actor->base.field2B1 = 0;
-        return 1;
-    }
-    return 0;
-}
-
-static inline void Crow_SetKnockbackState(struct ChaseActor *actor, u8 state, u8 phase, u8 behavior)
-{
-    actor->base.state2A8 = state;
-    actor->base.phase2A9 = phase;
-    actor->base.behavior2AA = behavior;
-    actor->base.counter2AC = 0;
-    actor->base.field2B1 = 1;
-}
-
 void Crow_UpdateKnockback(struct ChaseActor *actor)
 {
     struct Crow *state = actor->base.context;
     u32 mask = 0x42;
-    if (Crow_TakeKnockbackEntry(actor)) {
+    if (Chase_TakeArrived(actor)) {
         SceneActorChase_SetControl(actor, Crow_OnSpecialAnimation, 0x26);
         state->vectors[2].y = 30;
     }
@@ -1204,7 +1152,7 @@ void Crow_UpdateKnockback(struct ChaseActor *actor)
             ->flags &
         mask) {
         if ((s32)actor->base.counter2AC > 20) {
-            Crow_SetKnockbackState(actor, 0, 0, 4);
+            SceneActorTerrain_EnterState(actor, 0, 0, 4);
             return;
         }
     } else {
@@ -1227,7 +1175,7 @@ void Crow_UpdateKnockback(struct ChaseActor *actor)
             state->vectors[2].y = h;
         }
         if (state->vectors[2].y <= 0) {
-            Crow_SetKnockbackState(actor, 0, 2, 1);
+            SceneActorTerrain_EnterState(actor, 0, 2, 1);
             return;
         }
     }
@@ -1268,16 +1216,6 @@ static inline void Crow_SetAnimationSpeed(struct ChaseActor *actor)
             &((struct SceneActorAnimationTileDrawable *)actor->base.drawable)->tile, *scale);
 }
 
-static inline void Crow_SetResponseState(struct ChaseActor *actor, u32 state, u32 phase,
-                                         u32 behavior)
-{
-    actor->base.state2A8 = state;
-    actor->base.phase2A9 = phase;
-    actor->base.behavior2AA = behavior;
-    actor->base.counter2AC = 0;
-    actor->base.field2B1 = 1;
-}
-
 static inline u8 Crow_TestResponseFlags(struct Crow *body, u32 mask)
 {
     return Crow_TestFlagsValue(body->flags, mask);
@@ -1313,7 +1251,7 @@ void Crow_ApproachPlayerThenRecoil(struct ChaseActor *actor)
         *((struct CrowPackedPosition *)saved) =
             *(struct CrowPackedPosition *)&gPlayers[0]->position;
         ZeroFill8(&body->vectors[2]);
-        Crow_FindPositionDelta(&delta, &actor->base.body.position, saved);
+        Chase_Delta(&delta, &actor->base.body.position, saved);
         actor->base.body.direction = Math_Atan2(delta.x, delta.z);
         body->vectors[2].x = Math_ShiftTowardZero(
             gUnk_086149C4[(actor->base.body.direction + 64) & 255] * body->distance, 12);
@@ -1342,27 +1280,18 @@ void Crow_ApproachPlayerThenRecoil(struct ChaseActor *actor)
             Crow_TestResponseFlags(body, 2)) {
             Crow_MakeRecoilVelocity(&actor->base.secondaryMotion, actor->base.body.direction,
                                     body->distance * 2);
-            Crow_SetResponseState(actor, 0, 2, 2);
+            MonsterInit_SetState(actor, 0, 2, 2);
         } else {
             actor->base.counter2AC++;
         }
     }
 }
 
-static inline u8 Crow_TakeHeightReturnEntry(struct ChaseActor *actor)
-{
-    if (actor->base.field2B1) {
-        actor->base.field2B1 = 0;
-        return 1;
-    }
-    return 0;
-}
-
 void Crow_ReturnToGround(struct ChaseActor *actor)
 {
     s32 delta;
     u16 *height;
-    if (Crow_TakeHeightReturnEntry(actor)) {
+    if (Chase_TakeArrived(actor)) {
         SceneActorChase_SetControl(actor, actor->base.onAlternateEntry, 1);
         actor->base.body.direction += 0x80;
     }
@@ -1385,17 +1314,15 @@ void Crow_ReturnToGround(struct ChaseActor *actor)
             &((struct SceneActorAnimationTileDrawable *)actor->base.drawable)->tile, *height);
     {
         s32 y;
-        s32 offset;
         delta = actor->base.groundHeight;
         y = actor->base.body.position.y;
-        offset = -280;
-        y += offset;
+        y += -280;
         delta -= y;
     }
     if (delta < 0)
         delta = -delta;
     if ((delta <= 16) && (((s32)actor->base.counter2AC) > 80)) {
-        Crow_SetFlightState(actor, 0, 0, 1);
+        SceneActorTerrain_EnterState(actor, 0, 0, 1);
     } else {
         ++actor->base.counter2AC;
     }
@@ -1444,13 +1371,6 @@ void SceneBody_Unregister(void *);
 
 void SceneActorRegistry_UnlinkActor(void *);
 
-static inline u8 Crow_TestDestroyFlags(u16 *a, u32 m)
-{
-    if (*a & m)
-        return 1;
-    return 0;
-}
-
 u32 Crow_Destroy(struct ChaseActor *actor)
 {
     u8 *p = actor->base.drawable;
@@ -1463,7 +1383,7 @@ u32 Crow_Destroy(struct ChaseActor *actor)
         Anim_Remove(&((struct SceneActorAnimationTileDrawable *)p)->tile);
     Heap_Free(p);
     m = 0x100;
-    if (Crow_TestDestroyFlags(&actor->base.placementFlags, m))
+    if (SceneActorChase_TestField(&actor->base.placementFlags, m))
         SceneMessages_UnregisterReceiver(&actor->base.unknown9[3]);
     {
         u8 *r = actor->base.shadow;

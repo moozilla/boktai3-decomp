@@ -18,7 +18,7 @@ void Player_UpdateDefeatSequence(struct Player *p)
             Player_SetAnimationIndex(p, ActorVariant_GetTableValue(p->actionMode, 0x29), 0x40);
             F(u16, 0x4E8) = phase;
             F(u32, 0x40) = phase;
-            SelectionSlots_ClearValue((u8 *)p + 0x30, p->slot);
+            SelectionSlots_ClearValue(&p->position, p->slot);
             Player_PlayLocalSong(p->slot, 0x1AD);
             Player_SetTetherMode(p, 0x21, 1);
             break;

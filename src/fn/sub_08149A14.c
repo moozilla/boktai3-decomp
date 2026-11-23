@@ -1,6 +1,7 @@
 #include "contact_swarm.h"
 #include "player.h"
 #include "player_cue_sequence.h"
+#include "vanargand_projectiles.h"
 // confidence=low: provisional action interpretation from retained C and assembly.
 u32 Player_ConsumeStateEntry(struct Player *);
 void Player_UpdateFacingSide(struct Player *);
@@ -40,12 +41,6 @@ static inline void Approach2(struct Player *p)
         SH(0x3C) = z >> 3;
     else
         SH(0x3C) = -(-z >> 3);
-}
-static inline s32 Scale(s32 x)
-{
-    if (x >= 0)
-        return x >> 12;
-    return -(-x >> 12);
 }
 // confidence=low: moves toward a saved effect position or recoils while shake decays.
 void Player_UpdateRecoilMotion(struct Player *p)
@@ -91,8 +86,8 @@ void Player_UpdateRecoilMotion(struct Player *p)
                 H(0x45A)++;
             } else {
                 s32 angle = ((p->facing + 5) & 7) << 5;
-                SH(0x38) = -Scale(gUnk_086149C4[(angle + 64) & 255] * H(0x270));
-                SH(0x3C) = -Scale(gUnk_086149C4[angle] * H(0x270));
+                SH(0x38) = -VanargandProjectile_Scale(gUnk_086149C4[(angle + 64) & 255] * H(0x270));
+                SH(0x3C) = -VanargandProjectile_Scale(gUnk_086149C4[angle] * H(0x270));
             }
             Camera_RequestShake(H(0x270));
             H(0x270) = H(0x270) * 3 >> 2;

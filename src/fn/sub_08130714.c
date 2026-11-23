@@ -32,7 +32,7 @@ void SceneActorControl_UpdateTriggerApproach(struct ChaseActor *actor)
         SetControl(actor, actor->base.onAlternateEntry, 1);
     } else {
         SceneActorAnimation_SelectDirectionalEntry(actor, 1);
-        speed = Callback_InvokeActor(actor, *(void **)((u8 *)actor + 0x260));
+        speed = Callback_InvokeActor(actor, actor->base.animationQuery.opaque);
         {
             if (SceneActorBehavior_MotionBits(0xA02F, actor)) {
                 u16 *p = &actor->base.field2C2;

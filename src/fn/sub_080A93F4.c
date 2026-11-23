@@ -7,12 +7,6 @@ void *SceneActorProfiles_GetEntryAddress(u32, u32, s32);
 void TentacleBody_GetDirectionFrame(u16, s32 *, s32 *);
 void Anim_RestartSequence(void *, void *, u32, u8, u8);
 void Anim_SetDurationScale(void *, u32);
-static inline u8 TestMask(struct TentacleSegmentAnimation *p, u8 mask)
-{
-    if (mask & p->status)
-        return 1;
-    return 0;
-}
 static inline void Step(struct SceneActorControlMotionDrawable *drawable,
                         struct DisplaySequenceState *sequence)
 {
@@ -45,7 +39,7 @@ void TentacleBody_RestartSegmentAnimations(struct TentacleBodyAnimationView *bod
     actor = body;
     profile = SceneActorProfiles_GetEntryAddress(body->profileId, body->profileMode, 0);
     for (i = 0; i < body->segmentCount; i++) {
-        if (!TestMask(&body->segments[i].animation, 1)) {
+        if (!TentacleSegment_HasStatus(&body->segments[i].animation, 1)) {
             if (TentacleSegment_HasStatus(&body->segments[i].animation, 4))
                 Anim_RestartSequence(&body->segments[i].animation,
                                      body->segments[i].animation.script, 1, row, flags);

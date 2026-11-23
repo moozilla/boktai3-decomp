@@ -1,13 +1,10 @@
 #include "scene_departure_display.h"
 #include "background_controller.h"
 #include "ram.h"
+#include "native_effect.h"
 
 extern const u16 gUnk_086141BC[];
 s32 Player_GetHorizontalVelocity(s32);
-struct Camera {
-    u8 unknown0[0x44];
-    s32 x;
-};
 
 static inline void GetPlayerCoords(struct ScenePoolPlayer *p, struct ScenePoolVec32 *out)
 {

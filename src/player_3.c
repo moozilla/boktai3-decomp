@@ -3,6 +3,7 @@
 #include "ram.h"
 #include "scene_consumable_definition.h"
 #include "player_slot_status.h"
+#include "group_objects.h"
 
 /* Tentative role: select an effect flag from actor and global state. */
 
@@ -440,13 +441,6 @@ void Player_InitVisualState(struct Player *p)
 void EffectGroup_FadeFirstActive(void *);
 void EffectGroup_SpawnPart(void *, s32, struct SceneVec *, struct SceneVec *, struct SceneVec *,
                            s32, s32);
-static inline int EffectRandomWith(const u16 *table)
-{
-    u32 offset;
-    gRandomIndex = (gRandomIndex + 1) & 1023;
-    offset = gRandomIndex * 2;
-    return *(const u16 *)(offset + (u32)table);
-}
 
 void SceneActor_StartRandomizedEffect(struct Player *);
 
@@ -462,14 +456,14 @@ void SceneActor_StartRandomizedEffect(struct Player *p)
             Sound_PlaySong(0x134);
         else if (p->movementModifierKind == 3)
             Sound_PlaySong(0x134);
-        source = *(struct SceneVec **)((u8 *)p + 0x5C0);
+        source = p->visualPosition;
         position.x = source->x;
         position.y = source->y + 128;
         position.z = source->z;
         random = gRandomTable;
-        velocity.x = (EffectRandomWith(random) & 15) - 7;
-        velocity.y = (EffectRandomWith(random) & 31) - 16;
-        velocity.z = (EffectRandomWith(random) & 15) - 7;
+        velocity.x = (randomWith(random) & 15) - 7;
+        velocity.y = (randomWith(random) & 31) - 16;
+        velocity.z = (randomWith(random) & 15) - 7;
         scale.x = 5;
         scale.y = 10;
         scale.z = 5;
@@ -530,18 +524,18 @@ void Player_QueueStatusEffect(struct Player *p, s32 a)
 
     if (p->actionMode == 3) {
         const u16 *t = gRandomTable;
-        v.x = (EffectRandomWith(t) & 7) - 3;
-        v.y = (EffectRandomWith(t) & 7) - 5;
+        v.x = (randomWith(t) & 7) - 3;
+        v.y = (randomWith(t) & 7) - 5;
         v.z = 0;
     } else if (p->actionMode == 4) {
         const u16 *t = gRandomTable;
-        v.x = (EffectRandomWith(t) & 7) - 3;
-        v.y = (EffectRandomWith(t) & 7) - 3;
+        v.x = (randomWith(t) & 7) - 3;
+        v.y = (randomWith(t) & 7) - 3;
         v.z = 0;
     } else {
         const u16 *t = gRandomTable;
-        v.x = (EffectRandomWith(t) & 15) - 7;
-        v.y = -(EffectRandomWith(t) & 31);
+        v.x = (randomWith(t) & 15) - 7;
+        v.y = -(randomWith(t) & 31);
         v.z = 0;
     }
     if (EffectGroup_Spawn(&p->effectGroup, a, 0xE10, &v) >= 0) {
@@ -721,9 +715,9 @@ s32 Player_SelectTimedVisualMode(struct Player *p, s32 mode)
                 } else if (p->scriptStatus[0]) {
                     if (p->kind & 1) {
                         p->scriptStatus[0]--;
-                        if ((*p->inputKeys & 0xF0) || *((u8 *)p + 0x457) == 2)
-                            PaletteLevels_Configure(2, 1, 30, (u8 *)p + 0xAF4, (u8 *)p + 0xAF8,
-                                                    (u8 *)p + 0xAFC);
+                        if ((*p->inputKeys & 0xF0) || p->tetherMode == 2)
+                            PaletteLevels_Configure(2, 1, 30, p->effectModes, p->effectCounters,
+                                                    p->effectLimits);
                     }
                     mode = 2;
                     p->scriptFlashTimer = 64;
@@ -1476,7 +1470,7 @@ void Player_ConfigureActionCollider(struct Player *p)
 {
     struct SceneVec size, offset;
     s32 category;
-    void *collider = (u8 *)p + 0xB8C;
+    void *collider = &p->statModifierContext.attackCollider;
     if (p->actionMode != 6) {
         switch (p->statModifierContext.statBOverrideEnabled) {
             case 0:
@@ -1500,7 +1494,7 @@ void Player_ConfigureActionCollider(struct Player *p)
                 category = 16;
                 p->statModifierContext.actionTimer = 32;
                 p->statModifierContext.contactParameter = 20;
-                *((u8 *)p + 0x33E) = 0;
+                p->actionSelectionStamp = 0;
                 break;
             default:
                 return;

@@ -102,12 +102,6 @@ static inline void Phase(struct ChaseActor *a, u32 phase, u32 behavior, u32 coun
     a->base.counter2AC = counter;
     a->base.field2B1 = 1;
 }
-static inline s32 LocalPlayer(void)
-{
-    if (!gLinkSession)
-        return -1;
-    return gLinkSession->localPlayer;
-}
 static inline void Fill(u32 *zero, void *dst)
 {
     *zero = 0;

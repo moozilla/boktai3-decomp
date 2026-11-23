@@ -106,7 +106,7 @@ void StateActor_StartKind9Animation6Then5(u32 ctx, struct StateActor *p)
         goto end;
     if (phase != 0)
         goto end;
-    if (!DisplayAnimation_TestFinished((u8 *)p + 0xd4))
+    if (!DisplayAnimation_TestFinished(&p->targetPosition.z))
         goto end;
     switch (p->kind) {
         case 4:
@@ -195,7 +195,7 @@ void StateActor_StartKind9Animation6Then5(u32 ctx, struct StateActor *p)
     p->phase = 1;
     goto end;
 phase1:
-    if (!DisplayAnimation_TestFinished((u8 *)p + 0xd4))
+    if (!DisplayAnimation_TestFinished(&p->targetPosition.z))
         goto end;
     p->done = phase;
     p->phase = 2;

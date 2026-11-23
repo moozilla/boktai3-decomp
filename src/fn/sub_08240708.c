@@ -29,7 +29,7 @@ void sub_0823C280(struct Player *);
 void Player_UpdateRecoil(struct Player *p)
 {
     if (p->tetherMode != 0x1F) {
-        u8 *variant = (u8 *)p + 0x418;
+        u8 *variant = &p->actionMode;
         Player_SetAnimationIndex(p, ActorVariant_GetTableValue(*variant, 0x29), 0x40);
         p->interactionResetCounter = 0;
         if (*variant == 6)
@@ -76,8 +76,7 @@ void Player_UpdateRecoil(struct Player *p)
                 Player_PlayLocalSong(p->slot, 0xD1);
                 SelectionSlots_ClearValue(&p->position, p->slot);
             }
-            if (Player_SetAnimationIndex(p, ActorVariant_GetTableValue(*((u8 *)p + 0x418), 0x2E),
-                                         0x40))
+            if (Player_SetAnimationIndex(p, ActorVariant_GetTableValue(p->actionMode, 0x2E), 0x40))
                 Player_SetTetherMode(p, 0x1F, 2);
             break;
         case 2:

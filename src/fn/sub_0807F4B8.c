@@ -10,12 +10,6 @@ struct SceneActorBehaviorPlayerSlot {
     u8 unknown0[8];
     u8 slot;
 };
-static inline u8 Test(u32 value, u32 mask)
-{
-    if (value & mask)
-        return 1;
-    return 0;
-}
 static inline u16 *CounterAddress(u32 inputOffset)
 {
     u8 *base = (void *)gGameState;
@@ -52,7 +46,7 @@ void SceneActorTarget_ResetContactResponse(struct RoomActor *inputActor)
     {
         struct SceneActorChaseTracking *gate = &a->base.tracking;
         u32 mask = 8;
-        zero = Test(gate->flags, mask);
+        zero = SceneActorChase_Test(gate->flags, mask);
         if (zero)
             return;
     }
@@ -117,7 +111,7 @@ void SceneActorTarget_ResetContactResponse(struct RoomActor *inputActor)
     *((u8 *)group + 0x206) = 255;
     actor = (void *)a;
     SceneActorAttachment_ReplaceResponseSlot(actor, 0, 0, actor->category);
-    if (Test(gEngineFlags, 0x4800))
+    if (SceneActorChase_Test(gEngineFlags, 0x4800))
         return;
     {
         u32 mask = 0x8000;

@@ -97,14 +97,6 @@ static inline void SetControl(struct ChaseActor *actor, void *callback, u32 kind
     }
     actor->base.pendingControl = 0;
 }
-static inline void SetState(struct ChaseActor *actor, u32 state, u32 phase, u32 behavior)
-{
-    actor->base.state2A8 = state;
-    actor->base.phase2A9 = phase;
-    actor->base.behavior2AA = behavior;
-    actor->base.counter2AC = 0;
-    actor->base.field2B1 = 1;
-}
 static inline void SetResponse(struct RouteResponse *response, void *control, u32 state, u32 phase,
                                u32 behavior, s32 threshold)
 {
@@ -128,10 +120,10 @@ void SceneActorReaction_TryResumeRoute(struct ChaseActor *actor, s32 frame)
         SnapToRoute(group->destination, &group->route);
         if (!TryRoute(actor, group->context, &actor->base.body.position, group->destination)) {
             SetControl(actor, SceneActorControl_OnIdle, 0);
-            SetState(actor, 3, 0, 0);
+            MonsterInit_SetState(actor, 3, 0, 0);
         } else {
             group->destination->pad = 1;
-            SetState(actor, 3, 1, 0);
+            MonsterInit_SetState(actor, 3, 1, 0);
             SetControl(actor, SceneActorReaction_RestoreAfterDelay, 14);
             MonsterInit_SetBehaviorFlags(actor, 0x10);
             actor->base.field2C2 = 64;

@@ -76,7 +76,7 @@ s32 CannonEmitter_InitializeFromScript(struct CannonEmitter *p, void *parent)
     Anim_SetSequence(&p->sequence, p->resource, 6, 0, 0);
     PlayerCue_StepSequence((struct ContactSwarmSprite *)&p->sprite, &p->sequence);
     if (p->solid) {
-        SceneBody_Init(p->body, p->parent, (u8 *)p + 0x3c, 0, 4, p);
+        SceneBody_Init(p->body, p->parent, &p->sprite.position, 0, 4, p);
         SceneBody_SetSprite(p->body, &p->sprite);
         TerrainOverlay_QueueAddActor(p->body);
     }

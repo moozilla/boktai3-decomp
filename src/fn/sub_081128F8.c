@@ -2,6 +2,7 @@
 #include "player_cue_sequence.h"
 #include "actor_attachment_state.h"
 #include "background_controller.h"
+#include "native_effect.h"
 struct FixedPosition {
     s32 x, y, z;
 };
@@ -15,10 +16,6 @@ struct MarkerSlot {
 struct MarkerPool {
     u8 task[0x18];
     struct MarkerSlot slots[8];
-};
-struct Camera {
-    u8 unknown0[0x44];
-    s32 x;
 };
 s32 ActorMarkerPool_UpdateMarkers(struct MarkerPool *pool)
 {

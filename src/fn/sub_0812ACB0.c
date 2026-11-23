@@ -3,11 +3,9 @@
 #include "engine_globals.h"
 #include "ram.h"
 #include "player_cue_sequence.h"
+#include "scene_indicator.h"
 // confidence=low: steers and accelerates a linked effect toward a target until expiry.
 #define LinkedEffect_FollowTarget sub_0812ACB0
-struct Vec {
-    s16 x, y, z, pad;
-};
 struct Sprite {
     u32 flags;
     u8 visible, unknown5, palette, unknown7;

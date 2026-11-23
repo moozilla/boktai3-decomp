@@ -1,14 +1,9 @@
 #include "global.h"
+#include "scene_actor_init_actor.h"
 
 struct VanargandEffectVec {
     s16 x, y, z;
 };
-static inline s32 SignedHalf(s32 value)
-{
-    if (value >= 0)
-        return value >> 1;
-    return -(-value >> 1);
-}
 union PackedXY {
     u32 packed;
     s16 xy[3];
@@ -27,8 +22,8 @@ void Vanargand_ProjectEffectOffset(struct VanargandEffectVec *out, s16 x, s16 y,
     screenX = in.xy[0];
     screenY = coordinates[1];
     projected = (screenX + screenY) * 32 / 3 + height;
-    out->x = SignedHalf(projected);
+    out->x = MonsterInit_Half(projected);
     out->y = height;
     projected = (screenY - screenX) * 32 / 3 + height;
-    out->z = SignedHalf(projected);
+    out->z = MonsterInit_Half(projected);
 }

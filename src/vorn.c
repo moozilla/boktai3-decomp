@@ -109,20 +109,11 @@ struct TargetedAttackTarget {
     struct ContactPosition position;
 };
 
-static inline u8 TakeEntryFlag(struct ChaseActor *s)
-{
-    if (s->base.field2B2) {
-        s->base.field2B2 = 0;
-        return 1;
-    }
-    return 0;
-}
-
 void SceneActor_UpdateTargetedAttack(struct ChaseActor *s)
 {
     struct TargetedAttackContext *context = s->base.context;
     struct TargetedAttackSequence *sequence = (void *)((u8 *)s->base.drawable + 0x20);
-    if (TakeEntryFlag(s)) {
+    if (SceneActorReaction_TakePrepared(s)) {
         s->base.body.direction = (((s->base.tracking.heading + 0x20) & 0xFF) >> 6) << 6;
         SceneActorAnimation_SelectDirectionalEntry((void *)s, 5);
         context->target = ((struct TargetedAttackTarget *)s->base.tracking.target)->position;
@@ -184,7 +175,7 @@ struct DelayedAnimationContext {
 void SceneActor_UpdateDelayedAnimation(struct ChaseActor *s)
 {
     struct DelayedAnimationContext *context = s->base.context;
-    if (TakeEntryFlag(s))
+    if (SceneActorReaction_TakePrepared(s))
         SceneActorAnimation_SelectDirectionalEntry((void *)s, 0);
     if (context->delay) {
         if (--context->delay == 0) {
@@ -218,7 +209,7 @@ void Anim_SetFrameDurationScale(void *, u32);
 void Vorn_UpdateIdleFacing(struct ChaseActor *actor)
 {
     u8 *group = (u8 *)actor + 0x50;
-    void *route = (u8 *)actor + 0x448;
+    void *route = &actor->group.homeRoute;
     u16 *scale;
     if (SceneActorReaction_TakePrepared(actor)) {
         s32 direction;
@@ -228,9 +219,9 @@ void Vorn_UpdateIdleFacing(struct ChaseActor *actor)
         if (actor->base.behavior2AA != 20 && actor->base.behavior2AA != 6 &&
             actor->base.behavior2AA != 16 && !SceneActorContact_MotionFlags(actor, 0x4080)) {
             facing = (((u16)Route_GetCurrentPointFacing(route) + 0x70) >> 5) & 7;
-            *((u8 *)actor + 0x3CD) = facing;
+            actor->base.nextDirection = facing;
         } else
-            facing = *((u8 *)actor + 0x3CD);
+            facing = actor->base.nextDirection;
         if (direction == (facing >> 1)) {
             actor->base.stepDone = 1;
             SceneActorAnimation_SelectDirectionalEntry(actor, 0);
@@ -255,7 +246,7 @@ void Vorn_UpdateIdleFacing(struct ChaseActor *actor)
     else
         Anim_SetFrameDurationScale((u8 *)actor->base.drawable + 0x20, *scale);
     if (actor->base.restart) {
-        group[9] = (*((u8 *)actor + 0x3CD) + 5) << 5;
+        group[9] = (actor->base.nextDirection + 5) << 5;
         actor->base.stepDone = 1;
         {
             u32 facing = (actor->base.body.direction + 0x60) >> 6;
@@ -637,20 +628,11 @@ struct VornRouteGroup {
     void *failure;
 };
 
-static inline u8 TakePrepared(struct ChaseActor *actor)
-{
-    if (actor->base.field2B2) {
-        actor->base.field2B2 = 0;
-        return 1;
-    }
-    return 0;
-}
-
 void Vorn_ResumeRouteAfterDelay(struct ChaseActor *actor, s32 frame)
 {
     struct VornRouteGroup *group = (void *)&actor->group.common;
     u8 *context = actor->base.context;
-    if (TakePrepared(actor)) {
+    if (SceneActorReaction_TakePrepared(actor)) {
         DEBUG_PRINT();
     }
     {
@@ -816,15 +798,6 @@ static inline u8 Pending(u8 *context, u16 **out)
     return 0;
 }
 
-static inline void SetBehavior(struct ChaseActor *p, u32 b)
-{
-    p->base.state2A8 = 0;
-    p->base.phase2A9 = 0;
-    p->base.behavior2AA = b;
-    p->base.counter2AC = 0;
-    p->base.field2B1 = 1;
-}
-
 struct VornWaitTimer {
     u16 value : 16;
 };
@@ -849,7 +822,7 @@ void Vorn_UpdatePursuitWait(struct ChaseActor *input)
             Chase_SetState(a, 0, 0, 15);
         } else {
             struct VornWaitTimer *timer;
-            a->base.body.direction = *((u8 *)a + 0xE9);
+            a->base.body.direction = a->base.tracking.heading;
             SceneActorAnimation_SelectDirectionalEntry((void *)a, 0);
             timer = (void *)(context + 0x69C);
             ++timer->value;
@@ -1208,16 +1181,6 @@ static inline void Resume_SetControl(struct ChaseActor *actor, u32 kind, void *c
     actor->base.pendingControl = 0;
 }
 
-static inline void Resume_ResetAnimation(struct ChaseActor *actor, u32 state, u32 phase,
-                                         u32 behavior)
-{
-    actor->base.state2A8 = state;
-    actor->base.phase2A9 = phase;
-    actor->base.behavior2AA = behavior;
-    actor->base.counter2AC = 0;
-    actor->base.field2B1 = 1;
-}
-
 void SceneActorReaction_ResumeOrRunScript(struct ChaseActor *actor)
 {
     u8 *group = (u8 *)&actor->group.common;
@@ -1237,7 +1200,7 @@ void SceneActorReaction_ResumeOrRunScript(struct ChaseActor *actor)
                 u32 mask = 16;
                 actor->base.behaviorFlags |= mask;
             }
-            Resume_ResetAnimation(actor, 3, 1, 0);
+            MonsterInit_SetState(actor, 3, 1, 0);
             {
                 void *control = *(void **)(group + 0x210);
                 Resume_SetControl(actor, 15, control);
@@ -1364,8 +1327,7 @@ static inline s32 RandomByte(void)
     u32 offset;
     u32 *index = &gRandomIndex;
     u32 next = *index + 1;
-    u32 mask = 1023;
-    *index = next & mask;
+    *index = next & 1023;
     offset = *index * 2;
     return *(const u8 *)(offset + RANDOM_TABLE_ADDR);
 }

@@ -1,10 +1,5 @@
 #include "transient_sprite_effects.h"
-static inline s32 effectScale(s32 value)
-{
-    if (value >= 0)
-        return value >> 8;
-    return -((-value) >> 8);
-}
+#include "orbit_motion.h"
 s32 TransientSpriteEffects_Update(struct TransientSpriteEffects *pool)
 {
     s32 index = 0;
@@ -25,9 +20,9 @@ s32 TransientSpriteEffects_Update(struct TransientSpriteEffects *pool)
                 factor = slot->drag;
                 x *= factor;
                 drag = factor;
-                slot->velocity.x = effectScale(x);
-                slot->velocity.y = effectScale(slot->velocity.y * drag);
-                slot->velocity.z = effectScale(slot->velocity.z * drag);
+                slot->velocity.x = scale8(x);
+                slot->velocity.y = scale8(slot->velocity.y * drag);
+                slot->velocity.z = scale8(slot->velocity.z * drag);
             }
             {
                 sprite->position.vector.x += (u16)slot->velocity.x;

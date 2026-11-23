@@ -4,6 +4,7 @@
 #include "scene_actor_reset.h"
 #include "scene_actor_terrain.h"
 #include "scene_actor_animation.h"
+#include "scene_actor_chase.h"
 
 extern const s16 gUnk_086149C4[];
 s32 Callback_InvokeActor(void *, void *);
@@ -28,15 +29,6 @@ static inline s32 Tentacle_ShiftTowardZero(s32 n, u32 bits)
     else
         result = -((-n) >> bits);
     return result;
-}
-
-static inline void Tentacle_SubtractPositions(struct ContactPosition *out,
-                                              const struct ContactPosition *from,
-                                              const struct ContactPosition *to)
-{
-    out->x = to->x - from->x;
-    out->y = to->y - from->y;
-    out->z = to->z - from->z;
 }
 
 static inline void Tentacle_BeginForwardState(struct ChaseActor *a)
@@ -111,7 +103,7 @@ void TentacleBody_ReturnToCellCenter(struct ChaseActor *actor)
     Tentacle_AddPositions(&target, &actor->base.body.motion, &actor->base.body.position);
     index = SceneActorTerrain_GetCellIndex(&target);
     if ((body->returnCell) != index) {
-        Tentacle_SubtractPositions(&target, &target, &body->returnCenter);
+        Chase_Delta(&target, &target, &body->returnCenter);
         actor->base.body.motion.x += Div(target.x, 10);
         actor->base.body.motion.z += Div(target.z, 10);
     }

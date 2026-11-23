@@ -1,4 +1,5 @@
 #include "global.h"
+#include "orbit_motion.h"
 /* Math_BlendAngleWithTableFactor: Wraps the angle near its target then blends using the indexed table factor */
 #define Math_BlendAngleWithTableFactor sub_0819B244
 
@@ -13,13 +14,6 @@ static inline s32 AngleNear(s32 angle, s32 ref)
     return ref + d;
 }
 
-static inline s32 Shift8(s32 x)
-{
-    if (x >= 0)
-        return x >> 8;
-    return -((-x) >> 8);
-}
-
 s32 sub_0819B244(s32 angle, s32 target, s32 t)
 {
     s32 cur;
@@ -29,5 +23,5 @@ s32 sub_0819B244(s32 angle, s32 target, s32 t)
     cur = AngleNear(angle, target);
     if (t == 0)
         return target;
-    return (target - cur) * Shift8(t) + cur;
+    return (target - cur) * scale8(t) + cur;
 }

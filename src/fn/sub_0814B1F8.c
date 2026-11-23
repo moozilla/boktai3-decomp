@@ -160,12 +160,6 @@ static inline void PlayerMotion_AddPosition(struct SceneVec *out, const struct S
             animation->flags &= ~4;                                                                \
     }
 
-static inline u32 PlayerMotion_RandomFrom(const u16 *table)
-{
-    gRandomIndex = (gRandomIndex + 1) & 1023;
-    return table[gRandomIndex];
-}
-
 static inline u32 PlayerMotion_ReadRandomSample(void)
 {
     u32 index = (gRandomIndex + 1) & 1023;
@@ -288,9 +282,9 @@ void Player_UpdateTargetMotion(struct Player *p)
                 {
                     const u16 *earlyTable = (const u16 *)RANDOM_TABLE_ADDR;
                     struct ContactPosition *velocity;
-                    r0 = PlayerMotion_RandomFrom(earlyTable) & 0xFF;
+                    r0 = ParticleRandom_ReadDirectSample(earlyTable) & 0xFF;
                     {
-                        s32 raw = PlayerMotion_RandomFrom(earlyTable);
+                        s32 raw = ParticleRandom_ReadDirectSample(earlyTable);
                         raw &= 31;
                         velocity = &vel.value;
                         r1 = raw - 16;
@@ -375,9 +369,9 @@ void Player_UpdateTargetMotion(struct Player *p)
                 u32 sampleOrigin;
                 struct ContactPosition *velocity;
                 const u16 *earlyTable = (const u16 *)RANDOM_TABLE_ADDR;
-                r0 = PlayerMotion_RandomFrom(earlyTable) & 0xFF;
+                r0 = ParticleRandom_ReadDirectSample(earlyTable) & 0xFF;
                 {
-                    s32 raw = PlayerMotion_RandomFrom(earlyTable) & 0x1F;
+                    s32 raw = ParticleRandom_ReadDirectSample(earlyTable) & 0x1F;
                     velocity = &vel2.value;
                     r1 = raw - 16;
                 }

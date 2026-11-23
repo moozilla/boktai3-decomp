@@ -216,11 +216,9 @@ static inline u32 GridAttack_RandomValue(void)
 static inline void GridAttack_OffsetCoordinate(volatile s16 *coordinate, u32 random)
 {
     u16 value = *coordinate;
-    s32 upper = ~255;
-    u32 rounded = upper & value;
-    u32 mask = 63;
+    u32 rounded = ~255 & value;
     u8 center = 128;
-    *coordinate = (rounded + ((random & mask) + center)) - 32;
+    *coordinate = (rounded + ((random & 63) + center)) - 32;
 }
 void GridAttackActor_SpawnTargetedProjectile(struct GridAttackActor *actor,
                                              struct ContactPosition *point, int kind)

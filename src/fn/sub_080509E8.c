@@ -1,17 +1,7 @@
 #include "render.h"
 #include "orbit_background.h"
-static inline s32 scale(s32 value)
-{
-    if (value >= 0)
-        return value >> 12;
-    return -(-value >> 12);
-}
-static inline s32 absolute(s32 value)
-{
-    if (value < 0)
-        return -value;
-    return value;
-}
+#include "vanargand_projectiles.h"
+#include "ghoul_disc.h"
 void OrbitBackground_UpdatePosition(struct OrbitBackground *background)
 {
     s32 finalZ;
@@ -69,7 +59,7 @@ void OrbitBackground_UpdatePosition(struct OrbitBackground *background)
                 difference = (source - adjusted) & 255;
             }
             reverse = 128 - difference;
-            if (absolute(reverse) <= 16) {
+            if (Ghoul_Abs(reverse) <= 16) {
                 if (difference != 128) {
                     if (difference <= 127) {
                         step = (reverse >> 2) + 1;
@@ -108,7 +98,8 @@ void OrbitBackground_UpdatePosition(struct OrbitBackground *background)
                     s32 denominator;
                     background->target.x =
                         (u16)gPlayers[background->playerIndex]->position.x +
-                        scale(gUnk_086149C4[(background->angle + 64) & 255] * background->radius);
+                        VanargandProjectile_Scale(gUnk_086149C4[(background->angle + 64) & 255] *
+                                                  background->radius);
                     {
                         struct Player *player = gPlayers[background->playerIndex];
                         background->target.y = (((128 - player->visualSlowdownTimer) * 150) >> 7) +
@@ -116,7 +107,8 @@ void OrbitBackground_UpdatePosition(struct OrbitBackground *background)
                     }
                     background->target.z =
                         (u16)gPlayers[background->playerIndex]->position.z +
-                        scale(gUnk_086149C4[background->angle & 255] * background->radius);
+                        VanargandProjectile_Scale(gUnk_086149C4[background->angle & 255] *
+                                                  background->radius);
                     background->blendFrame--;
                     denominator = background->blendFrame + 1;
                     background->position.x =
@@ -132,7 +124,8 @@ void OrbitBackground_UpdatePosition(struct OrbitBackground *background)
                     background->blendFrame = 0;
                     background->position.x =
                         (u16)gPlayers[background->playerIndex]->position.x +
-                        scale(gUnk_086149C4[(background->angle + 64) & 255] * background->radius);
+                        VanargandProjectile_Scale(gUnk_086149C4[(background->angle + 64) & 255] *
+                                                  background->radius);
                     {
                         struct Player *player = gPlayers[background->playerIndex];
                         background->position.y =
@@ -140,7 +133,8 @@ void OrbitBackground_UpdatePosition(struct OrbitBackground *background)
                             (u16)player->position.y;
                     }
                     finalZ = (u16)gPlayers[background->playerIndex]->position.z +
-                             scale(gUnk_086149C4[background->angle & 255] * background->radius);
+                             VanargandProjectile_Scale(gUnk_086149C4[background->angle & 255] *
+                                                       background->radius);
                 }
             }
         }

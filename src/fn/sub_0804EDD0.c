@@ -1,10 +1,5 @@
 #include "area_effect_link.h"
-static inline s32 AreaEffect_GetLocalPlayer(void)
-{
-    if (!gLinkSession)
-        return -1;
-    return gLinkSession->localPlayer;
-}
+#include "scene_actor_damage_visibility.h"
 static inline u8 AreaEffect_GetLinkValue(s32 index)
 {
     if (!gLinkSession || index < 0)
@@ -14,7 +9,7 @@ static inline u8 AreaEffect_GetLinkValue(s32 index)
 void AreaEffect_UpdateLinkVisibility(struct AreaEffectManager *manager)
 {
     s32 i;
-    u32 value = AreaEffect_GetLinkValue(AreaEffect_GetLocalPlayer());
+    u32 value = AreaEffect_GetLinkValue(SceneActorDamage_LocalPlayer());
     if (value) {
         if (!manager->visible) {
             manager->visible = 1;

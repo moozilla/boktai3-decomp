@@ -7,6 +7,7 @@
 #include "scene_actor_contact_response.h"
 #include "word_flags.h"
 #include "scene_actor_chase_shared.h"
+#include "scene_actor_init_actor.h"
 void EffectGroup_Reset(void *);
 void SceneActorEffects_EmitRandomOffsets(void *, s32, u32, s32, s32, u32);
 static inline u8 Reaction_HasFlags(u32 bits)
@@ -17,11 +18,6 @@ static inline u8 Reaction_HasFlags(u32 bits)
     return flag;
 }
 
-/* Direction is stored in turns of 1/256 of a circle. */
-static inline u8 Reaction_GetDirection(struct ChaseActor *actor)
-{
-    return actor->base.body.direction;
-}
 static inline void Reaction_Palette(struct ChaseActor *actor, u32 bank)
 {
     if (!actor->base.drawableKind)
@@ -82,7 +78,7 @@ void SceneActorReaction_UpdateTimedBurst(struct ChaseActor *actor)
         u32 *word;
         u16 *motion;
         u32 bit;
-        actor->base.body.direction = (((Reaction_GetDirection(actor) + 32) >> 6) & 3) << 6;
+        actor->base.body.direction = (((MonsterInit_GetDirection(actor) + 32) >> 6) & 3) << 6;
         SceneActorAnimation_SelectDirectionalEntry((void *)actor, 3);
         actor->base.field2C2 = 64;
         reaction = (void *)&actor->base.tracking.target;
@@ -141,7 +137,7 @@ void SceneActorReaction_UpdateTimedBurst(struct ChaseActor *actor)
         Chase_SetState(actor, 3, 1, 0);
         Chase_SetCtl(actor, *(void **)(group + 0x210), 15);
         actor->base.reactionDirection =
-            (Reaction_ThirtySecond((Reaction_GetDirection(actor) + 128) & 255) + 7) & 7;
+            (Reaction_ThirtySecond((MonsterInit_GetDirection(actor) + 128) & 255) + 7) & 7;
     } else {
         actor->base.hitLockTimer--;
     }

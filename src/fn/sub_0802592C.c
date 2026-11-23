@@ -80,7 +80,7 @@ static inline void SceneTrail_CopySavedPosition(struct Sub0802592CActor *actor)
         u8 *positions = (u8 *)&actor->targetWords[1];
         pair = *(void **)(positions + offset);
     }
-    *(struct Sub0802592CPair *)((u8 *)actor + 0x9cc) = *(struct Sub0802592CPair *)pair;
+    actor->saved = *(struct Sub0802592CPair *)pair;
 }
 
 static inline s32 SceneTrail_WrappedDifference(s32 current, s32 previous)

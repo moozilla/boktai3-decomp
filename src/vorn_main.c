@@ -35,6 +35,8 @@
 #include "scene_actor_init_graphics.h"
 #include "scene_actor_turn.h"
 #include "scene_actor_chase_shared.h"
+#include "falling_objects.h"
+#include "ghoul_disc.h"
 
 extern const u8 gUnk_0824E218[];
 
@@ -186,7 +188,7 @@ void Vorn_UpdateDescriptorPursuit(struct ChaseActor *a)
         a->base.field2B1 = 0;
     }
     Callback_InvokeActor(a, a->base.contactQuery.opaque);
-    motion = Callback_InvokeActor(a, *(void **)((u8 *)a + 0x260));
+    motion = Callback_InvokeActor(a, a->base.animationQuery.opaque);
     {
         u16 *rate;
         a->base.field2C2 = 32;
@@ -1665,14 +1667,6 @@ u16 Vorn_GetAnimationEvent(u8 *p)
 
 /* Vorn_SelectRandomBehavior: Selects a different random eight-byte behavior entry and resets its cursor; behavior interpretation is tentative */
 
-static inline u32 Random(void)
-{
-    u32 offset;
-    gRandomIndex = (gRandomIndex + 1) & 1023;
-    offset = gRandomIndex * 2;
-    return *(u16 *)(offset + (u32)gRandomTable);
-}
-
 struct S080B1F48 {
     u8 pad0[2];
     u8 index;
@@ -1686,7 +1680,7 @@ void Vorn_SelectRandomBehavior(u8 *owner)
     struct S080B1F48 *p = (struct S080B1F48 *)(owner + 0x448);
     struct S080B1F48 *q = p;
     u8 n;
-    n = Mod(Random(), *p->data);
+    n = Mod(FallingObject_Random(), *p->data);
     if (n == p->index)
         n = Mod(n + 1, *p->data);
     q->index = n;
@@ -1994,11 +1988,6 @@ static inline s32 Vorn_RoundDirection(s32 n)
     return -((-n) >> 6);
 }
 
-static inline s32 Vorn_MapSlotWidth(struct EngineMap **slot)
-{
-    return ((struct SceneActorChaseTerrainGrid *)(*slot)->cells)->width;
-}
-
 static inline s32 Vorn_SweepEscapeCells(struct ChaseActor *actor, s32 range)
 {
     struct EngineMap **cachedMapSlot = &gTerrainMap;
@@ -2031,7 +2020,7 @@ static inline s32 Vorn_SweepEscapeCells(struct ChaseActor *actor, s32 range)
                         goto south;
                     next += SceneActorChase_MapWidth(*cachedMapSlot);
                 } while (++i < range);
-            return next - Vorn_MapSlotWidth(completionMapSlot);
+            return next - Ghoul_MapWidth(completionMapSlot);
         case 2:
             next = cell - 1;
             i = 0;
@@ -2052,18 +2041,18 @@ static inline s32 Vorn_SweepEscapeCells(struct ChaseActor *actor, s32 range)
                         goto north;
                     next -= SceneActorChase_MapWidth(*cachedMapSlot);
                 } while (++i < range);
-            return next + Vorn_MapSlotWidth(completionMapSlot);
+            return next + Ghoul_MapWidth(completionMapSlot);
         default:
             goto home;
     }
 east:
     return next - 1;
 south:
-    return next - Vorn_MapSlotWidth(cachedMapSlot);
+    return next - Ghoul_MapWidth(cachedMapSlot);
 west:
     return next + 1;
 north:
-    return next + Vorn_MapSlotWidth(cachedMapSlot);
+    return next + Ghoul_MapWidth(cachedMapSlot);
 home:
     return actor->base.terrainCell;
 }
