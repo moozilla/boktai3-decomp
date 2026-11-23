@@ -21,12 +21,7 @@ void AnimationActor_ProcessKeys(struct Ratatosk *p)
             *(struct ContactPosition
                   *)((Mod(*(const u16 *)(gRandomIndex * 2 + (u32)gRandomTable), 9) * 8 + (u32)q) +
                      0xccc);
-        {
-            u32 state = 2;
-            p->actionPhase = state;
-        }
-        p->actionTimer = 0;
-        p->actionEnter = 1;
+        Ratatosk_EnterPhase(p, 2);
     }
     if (p->actionFinished == 1 && q->actionState != 3)
         p->actionAnimation = 1;

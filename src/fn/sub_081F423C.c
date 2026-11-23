@@ -36,14 +36,9 @@ void ActorMotion_UpdateTimedPaletteAnimation(struct Ratatosk *p, s32 frame)
     PaletteEffect_RefreshPalette(q);
 updateFlags:
     if (p->actionPhase == 4) {
-        u32 v;
         Player_ClearFlag740();
-        {
-            u32 mask = 8;
-            v = mask | p->flags;
-        }
-        v |= 16;
-        p->flags = v;
+        Ratatosk_SetFlags(p, 8);
+        Ratatosk_SetFlags(p, 16);
     }
     {
         Ratatosk_SetFlags(p, 0x100000);

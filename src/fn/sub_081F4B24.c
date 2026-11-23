@@ -30,17 +30,11 @@ void Ratatosk_UpdateShrinkingAnimation(struct Ratatosk *p, s32 frame)
     p->spriteScaleY = p->fade;
     if (p->locked)
         p->anchor.y += 128;
-    {
-        u32 mask = 0x8000c;
-        p->flags = mask | p->flags;
-    }
+    Ratatosk_SetFlags(p, 0x8000c);
     SlotController_SetSlotFlag2(Ratatosk_GetSelectedPointIndex());
     if (frame > 299 || p->fade <= 1) {
         p->fade = 1;
-        {
-            u32 mask = 16;
-            p->flags = mask | p->flags;
-        }
+        Ratatosk_SetFlags(p, 16);
         p->actionFinished = 1;
     }
     Callback_InvokeActor(p, p->actionTryUpdate);

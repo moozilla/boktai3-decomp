@@ -6,21 +6,11 @@
 // Tentative family name: actor animation/state handlers; specific actor identity unknown.
 s32 Mod(s32, s32);
 u32 HomingProjectile_GetActiveCount(void);
-static inline u8 ConsumeActivation(struct Ratatosk *p)
-{
-    if (p->actionEnter) {
-        p->actionEnter = 0;
-        p->actionFinished = 0;
-        return 1;
-    }
-    return 0;
-}
 void AnimationActor_UpdateProjectileSequence(struct Ratatosk *p)
 {
     struct Ratatosk *q = p;
-    if (ConsumeActivation(q)) {
-        u32 animation = 6;
-        q->actionAnimation = animation;
+    if (Ratatosk_ConsumeActionEntry(q)) {
+        Ratatosk_SetAnimation(q, 6);
         p->sequence = 0;
     }
     {
@@ -29,8 +19,7 @@ void AnimationActor_UpdateProjectileSequence(struct Ratatosk *p)
             case 0:
                 if (q->actionFinished) {
                     if (p->healthPhase > 0) {
-                        u32 animation = 10;
-                        q->actionAnimation = animation;
+                        Ratatosk_SetAnimation(q, 10);
                         *sequence = 1;
                     } else
                         goto next;
@@ -40,10 +29,7 @@ void AnimationActor_UpdateProjectileSequence(struct Ratatosk *p)
                 if (q->actionFinished) {
                 next:
                     *sequence = 2;
-                    {
-                        u32 animation = 8;
-                        q->actionAnimation = animation;
-                    }
+                    Ratatosk_SetAnimation(q, 8);
                 }
                 break;
             case 2:

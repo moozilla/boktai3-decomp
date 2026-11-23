@@ -22,10 +22,7 @@ void sub_081F62A8(struct Ratatosk *p)
     } else {
         SceneActors_StartDirectionalAnimation(p, p->animationData, p->animation, 0, 1, 1, 1);
     }
-    {
-        u32 mask = 0xc;
-        p2->flags = p2->flags | mask;
-    }
+    Ratatosk_SetFlags(p2, 0xc);
     if ((u8)Callback_InvokeActor(p2, p2->actionReset) == 0) {
         s8 *sap = &p2->savedAngle;
         int d = (s8)(m->angle9 - *sap);

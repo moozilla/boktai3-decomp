@@ -5,15 +5,6 @@
 #include "ram.h"
 s32 Mod(s32, s32);
 u32 HomingProjectile_GetActiveCount(void);
-static inline u8 ConsumeActivation(struct Ratatosk *p)
-{
-    if (p->actionEnter) {
-        p->actionEnter = 0;
-        p->actionFinished = 0;
-        return 1;
-    }
-    return 0;
-}
 static inline u32 NextRandom(const u16 *table)
 {
     gRandomIndex = (gRandomIndex + 1) & 1023;
@@ -32,14 +23,12 @@ void Player_ClearFlag740(void);
 void Ratatosk_UpdateCloneAttack(struct Ratatosk *p)
 {
     struct Ratatosk *q = p;
-    if (ConsumeActivation(q) == 1) {
+    if (Ratatosk_ConsumeActionEntry(q) == 1) {
         if (p->healthPhase > 0) {
-            u32 animation = 10;
-            q->actionAnimation = animation;
+            Ratatosk_SetAnimation(q, 10);
             p->sequence = 0;
         } else {
-            u32 animation = 6;
-            q->actionAnimation = animation;
+            Ratatosk_SetAnimation(q, 6);
             p->sequence = 1;
         }
         p->sequence = 0;
@@ -51,19 +40,13 @@ void Ratatosk_UpdateCloneAttack(struct Ratatosk *p)
             case 0:
                 if (q->actionFinished) {
                     *sequence = 1;
-                    {
-                        u32 animation = 6;
-                        q->actionAnimation = animation;
-                    }
+                    Ratatosk_SetAnimation(q, 6);
                 }
                 break;
             case 1:
                 if (q->actionFinished) {
                     *sequence = 2;
-                    {
-                        u32 animation = 4;
-                        q->actionAnimation = animation;
-                    }
+                    Ratatosk_SetAnimation(q, 4);
                     p->cloneTimer = 0;
                 }
                 break;
@@ -71,10 +54,7 @@ void Ratatosk_UpdateCloneAttack(struct Ratatosk *p)
                 if (q->actionFinished) {
                     if (++p->repeat > 5) {
                         *sequence = 3;
-                        {
-                            u32 animation = 8;
-                            q->actionAnimation = animation;
-                        }
+                        Ratatosk_SetAnimation(q, 8);
                         p->duration = 128;
                         {
                             s32 x = 1060;
@@ -96,10 +76,7 @@ void Ratatosk_UpdateCloneAttack(struct Ratatosk *p)
                                                              8 +
                                                          (u32)p) +
                                                         0xccc);
-                        {
-                            u32 animation = 4;
-                            q->actionAnimation = animation;
-                        }
+                        Ratatosk_SetAnimation(q, 4);
                     }
                 }
                 break;
