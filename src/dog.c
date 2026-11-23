@@ -293,17 +293,6 @@ void SceneActor_RefreshLivingCountAndProfile(struct ChaseActor *actor)
     actor->base.profileId = SceneActorProfiles_FindOrAdd(category, count);
 }
 
-struct IvyContext {
-    u8 unknown0[0x62C];
-    u32 flags;
-    u8 unknown630[4];
-    u16 field634;
-};
-
-struct IvyPlacement {
-    u32 xy, z;
-};
-
 // confidence=low: clears action gates before resolving the route and stepping its drawable.
 
 void SceneActorMovement_ResolveRoutePosition(void *);
@@ -326,14 +315,9 @@ void Dog_ResetActionState(struct ChaseActor *actor)
     }
 }
 
-struct S {
-    u8 filler[0x2d0];
-    u32 flags;
-};
-
-void Dog_OnClearActivityFlag(struct S *s)
+void Dog_OnClearActivityFlag(struct ChaseActor *actor)
 {
-    u32 *p = &s->flags;
+    u32 *p = &actor->base.statusFlags;
     u32 m = ~2;
     *p = *p & m;
 }
@@ -3094,7 +3078,7 @@ void Dog_UpdateTargetGate(struct ChaseActor *p);
 
 s32 Dog_ChooseReactionBehavior(struct ChaseActor *a);
 
-void Dog_OnClearActivityFlag(struct S *s);
+void Dog_OnClearActivityFlag(struct ChaseActor *actor);
 
 void Dog_RestoreRoute(struct ChaseActor *actor);
 
