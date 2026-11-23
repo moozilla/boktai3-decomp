@@ -1,4 +1,5 @@
 #include "scene_actor_reset.h"
+#include "word_flags.h"
 #include "scene_actor_placement.h"
 s32 Callback_InvokeActor(void *, void *);
 void SceneActorAttachment_ReplaceResponseSlot(void *, u32, u32, u32);
@@ -41,11 +42,6 @@ static inline void SetState(struct ChaseActor *actor, u32 state, u32 phase, u32 
 
 #define GROUP_FIELD(g, off, T) (*(T *)((u8 *)(g) + (off)))
 
-static inline void ClearWordFlags(u32 *flags, u32 mask)
-{
-    *flags &= mask;
-}
-
 static inline u8 MoveTo(struct ChaseActor *actor, struct SceneActorRegistryControlGroup *group,
                         u32 blocked)
 {
@@ -70,8 +66,8 @@ void sub_08136F58(struct ChaseActor *actor)
     struct SceneActorRegistryControlGroup *group = &actor->group.common;
     if (ConsumeEntry(actor)) {
         SetControl(actor, actor->base.onStanding, 0);
-        ClearWordFlags(&actor->base.behaviorFlags, ~0x80);
-        ClearWordFlags(&actor->base.statusFlags, ~0x1000000);
+        WordFlags_Mask(&actor->base.behaviorFlags, ~0x80);
+        WordFlags_Mask(&actor->base.statusFlags, ~0x1000000);
         SceneActorPlacement_ClearFlags(&actor->base.motionFlags, ~0x200);
         actor->base.field2C2 = 0x40;
     }
@@ -97,7 +93,7 @@ void sub_08136F58(struct ChaseActor *actor)
                 struct SceneActorRegistryControl *control = &group->control;
                 u32 mask = 0x200000;
                 if (actor->base.behaviorFlags & mask) {
-                    ClearWordFlags(&actor->base.statusFlags, ~0x1000000);
+                    WordFlags_Mask(&actor->base.statusFlags, ~0x1000000);
                     {
                         u16 k1 = 0x200;
                         actor->base.motionFlags &= ~k1;

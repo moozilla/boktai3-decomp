@@ -41,6 +41,11 @@ static inline void WordFlags_And(u32 mask, u32 *flags)
     *flags = mask & *flags;
 }
 
+static inline void WordFlags_Mask(u32 *flags, u32 mask)
+{
+    *flags &= mask;
+}
+
 static inline void HalfwordFlags_Clear(u16 *flags, u32 mask)
 {
     u32 keep = ~mask;

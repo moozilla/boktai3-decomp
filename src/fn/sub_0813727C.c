@@ -1,4 +1,5 @@
 #include "global.h"
+#include "word_flags.h"
 #include "scene_actor_terrain.h"
 #include "scene_actor_reset.h"
 
@@ -69,11 +70,6 @@ static inline u32 CellIndex(struct ContactPosition *p)
     if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
         return 0;
     return gTerrainMap->rows[z] + x;
-}
-
-static inline void ClearWordFlags(u32 *flags, u32 mask)
-{
-    *flags &= mask;
 }
 
 struct FlagHalfword {
@@ -153,7 +149,7 @@ static inline void ResetControl(struct ChaseActor *actor, u32 enabled, u16 *flag
 {
     struct SceneActorRegistryControl *control = &actor->group.common.control;
     if (enabled) {
-        ClearWordFlags(&actor->base.statusFlags, ~0x1000000);
+        WordFlags_Mask(&actor->base.statusFlags, ~0x1000000);
         ClearHalfFlags(flags, ~0x200);
         control->mode = 0;
         control->counter = 0;
