@@ -13,7 +13,7 @@ const CELL = 256;
 
 exports.grid = () => {
   const map = $.gTerrainMap;
-  if (!map) return null;
+  if (!map || !map.cells) return null;
   const base = Number(map.cells.$addr ?? map.cells), w = g.u16(base + 4), h = g.u16(base + 6);
   const cells = [];
   for (let z = 0; z < h; z++) {
