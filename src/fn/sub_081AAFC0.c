@@ -42,9 +42,8 @@ void Vanargand_UpdateAnimationGate(struct Vanargand *p, s32 frame)
                 p->timer = phase;
                 {
                     u16 v = 4;
-                    u32 off = 0x5B8;
-                    *(u16 *)((u8 *)p + off) = v;
-                    *(u16 *)((u8 *)p + off + 2) = v;
+                    p->w5B8 = v;
+                    p->w5BA = v;
                 }
                 return;
             }

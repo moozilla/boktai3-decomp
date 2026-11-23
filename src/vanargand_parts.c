@@ -999,8 +999,7 @@ void Vanargand_UpdatePartFlashFade(struct VanargandAttackPair *boss, struct Pair
     u32 mask;
     u32 twelve = 12;
     p->actionFlags |= twelve;
-    mask = 0x80;
-    p->actionFlags |= mask;
+    p->actionFlags |= 0x80;
     if (p->entered) {
         p->entered = 0;
         CpuSet(p->palettes[0], p->graphics.palette, 0x04000008);
@@ -1016,7 +1015,7 @@ void Vanargand_UpdatePartFlashFade(struct VanargandAttackPair *boss, struct Pair
             case 0:
                 Palette_InterpolateBanks(p->graphics.palette, p->palettes[0], p->palettes[2], frame,
                                          7);
-                if (frame & mask) {
+                if (frame & 0x80) {
                     Vanargand_SetState(p, 1);
                     p->actionEntered = 1;
                 }
@@ -1154,9 +1153,8 @@ void Vanargand_UpdatePartLeap(struct VanargandAttackPair *boss, struct PairedSce
             }
             MotionTrack_Update(&p->motion);
             if (Vanargand_MotionEnded(p)) {
-                u32 next = 1;
-                Vanargand_SetState(p, next);
-                *enter = next;
+                Vanargand_SetState(p, 1);
+                *enter = 1;
             }
             break;
         }
@@ -1440,9 +1438,8 @@ void Vanargand_UpdatePartRevealFade(struct VanargandAttackPair *boss, struct Pai
         case 0:
             Palette_InterpolateBanks(p->graphics.palette, p->palettes[1], p->palettes[0], frame, 6);
             if (frame > 63) {
-                u32 next = 1;
-                Vanargand_SetState(p, next);
-                p->actionEntered = next;
+                Vanargand_SetState(p, 1);
+                p->actionEntered = 1;
             }
             break;
         case 1:
@@ -1582,7 +1579,6 @@ void *ScriptProc_Start(u16, u16);
 s32 Widget_InitLinked(void *, void *, u16, u32, u8, u8, u8, const void *);
 
 // confidence=low: initializes the controller resources and its two embedded halves.
-
 
 s32 Vanargand_InitializePartController(struct VanargandAttackPair *boss, void *origin,
                                        u16 (*palettes)[16], s32 mode)

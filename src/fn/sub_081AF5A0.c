@@ -14,9 +14,8 @@ void SceneAnimation_SelectSequence(struct SceneAnimation *p, u32 sequence, u32 f
 {
     if (sequence == 3) {
         u16 state = 7;
-        u16 inactive = 0;
         p->state = state;
-        p->active = inactive;
+        p->active = 0;
     } else {
         Anim_SetSequence(p->animation, p->data, (u16)sequence, 0, (u8)flags);
         p->active = 1;
