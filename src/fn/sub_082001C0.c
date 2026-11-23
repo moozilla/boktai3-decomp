@@ -11,12 +11,11 @@ void HomingProjectile_InitParams(struct HomingParams *p)
     p->speed = 5;
     p->variant = p->angle = 0;
     {
-        u32 c = 0x1e;
-        p->attack = c;
+        p->attack = 0x1e;
         p->element = 0xf;
-        p->attackFlags = c;
-        p->shotA = c;
-        p->shotB = c;
-        p->shotC = c;
+        p->attackFlags = 0x1e;
+        p->shotA = 0x1e;
+        p->shotB = 0x1e;
+        p->shotC = 0x1e;
     }
 }
