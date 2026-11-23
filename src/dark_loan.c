@@ -1,5 +1,6 @@
 #include "dark_loan_screen.h"
 #include "palette_pulse.h"
+#include "vanargand_parts.h"
 
 void MessageWindow_SetPalette(u32);
 
@@ -24,18 +25,6 @@ void StatGauge_Draw(s32, s32, s32, s32, s32, s32);
 void ScreenTransition_SendCommand(s32, s32, s32, s32, s32, s32, s32);
 
 void sub_082157EC(void);
-
-static inline void ShowWidget(struct SceneInputWidget *widget)
-{
-    widget->flags &= ~1;
-}
-
-static inline void Position_Set(struct ContactPosition *p, s32 x, s32 y, s32 z)
-{
-    p->x = x;
-    p->y = y;
-    p->z = z;
-}
 
 void DarkLoan_RelocateMapHeaderCopy(struct DarkLoanScreen *panel)
 {
@@ -278,11 +267,11 @@ void DarkLoan_BeginAdjustment(struct DarkLoanScreen *panel)
     DarkLoan_UpdateAdjustmentDigits(panel);
     panel->warningTimer = 0;
     panel->warningShowing = 0;
-    ShowWidget(&panel->widgets[DARK_LOAN_LABEL]);
+    SceneInputWidget_Show(&panel->widgets[DARK_LOAN_LABEL]);
     panel->sprite.flags &= ~1;
     AnimData_SelectPaletteBank(panel->animation, 0x1B4);
-    ShowWidget(&panel->widgets[DARK_LOAN_DECORATIONS]);
-    ShowWidget(&panel->widgets[21]);
+    SceneInputWidget_Show(&panel->widgets[DARK_LOAN_DECORATIONS]);
+    SceneInputWidget_Show(&panel->widgets[21]);
     MessageWindow_ShowMessage(4);
     panel->adjustmentState[1] = 0;
     panel->adjustmentState[2] = 0;
@@ -709,7 +698,7 @@ void DarkLoan_BuildDisplay(struct DarkLoanScreen *panel, s32 alternate)
         pos.x += 8;
     }
     Widget_InitLinked(&panel->widgets[DARK_LOAN_LABEL], primary, 0x22, flags, 0, 0, 0x3C, 0);
-    Position_Set(&pos, -0x85, -0x18, 0);
+    Vanargand_SetVector(&pos, -0x85, -0x18, 0);
     Widget_InitLinked(&panel->widgets[DARK_LOAN_DECORATIONS], secondary, 0x7E, flags, 0, 0, 0x3C,
                       &pos);
     Widget_InitLinked(&panel->widgets[21], secondary, 0x7F, flags, 0, 0, 0x3C, &pos);
