@@ -677,11 +677,9 @@ void SceneActorControl_CallContextScript(struct RoomActor *actor)
 
 u8 SceneActorTerrain_CanTraverseCell(u32, u32, u32, u32);
 
-static inline s8 TurnClockwise(void *object)
+static inline s8 TurnClockwise(struct Dog *context)
 {
-    struct Dog *context = object;
-    s16 offset = (u32) & ((struct Dog *)0)->turnClockwise;
-    return *((u8 *)context + offset);
+    return context->turnClockwise;
 }
 
 #define SetTurnClockwise(object_, value_)                                                          \
