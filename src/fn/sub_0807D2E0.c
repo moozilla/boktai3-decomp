@@ -9,6 +9,7 @@
 #include "scene_actor_damage_visibility.h"
 #include "runtime.h"
 #include "ram.h"
+#include "scene_actor_turn.h"
 
 void SceneActorRecord_RecordPair(u32, u32);
 void SceneActorAttachment_ReplaceResponseSlot(struct ChaseActor *, u32, u32, u32);
@@ -73,10 +74,6 @@ static inline void ResetEntry(struct ChaseActor *a, u32 ready)
 static inline void MaskContactFlags(u32 *dst, u32 mask)
 {
     *dst = mask & *dst;
-}
-static inline u32 ReadControlFlag(struct ChaseActor *a, u32 mask)
-{
-    return a->base.behaviorFlags & mask;
 }
 union HitSparkTable {
     const u16 *table;
@@ -158,7 +155,7 @@ void SceneActorReaction_ApplyHitResponse(void *victim, u32 mode, struct ContactP
             }
 
             control = &state->group.common.control;
-            if (ReadControlFlag(victim, 0x200000)) {
+            if (SceneActorTurn_ActorFlags(victim, 0x200000)) {
                 {
                     u32 *status = StatusFlags(victim);
                     u32 mask = ~0x1000000;
