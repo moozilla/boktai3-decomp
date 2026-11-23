@@ -1314,11 +1314,9 @@ void Crow_ReturnToGround(struct ChaseActor *actor)
             &((struct SceneActorAnimationTileDrawable *)actor->base.drawable)->tile, *height);
     {
         s32 y;
-        s32 offset;
         delta = actor->base.groundHeight;
         y = actor->base.body.position.y;
-        offset = -280;
-        y += offset;
+        y += -280;
         delta -= y;
     }
     if (delta < 0)
