@@ -329,6 +329,11 @@ exports.interact = function* (x, z, opts = {}) {
   const [tx, tz] = exports.cellOf(x, z), here = exports.cellOf(p.position.x, p.position.z);
   const goals = new Set();
   for (const [dx, dz] of [[0, 1], [1, 0], [-1, 0], [0, -1]]) { const c = grid.at(tx + dx, tz + dz); if (c && c.open) goals.add(`${tx + dx},${tz + dz}`); }
+  // across a counter: two cells away in a straight line, the cell between blocked
+  if (opts.across !== false) for (const [dx, dz] of [[0, 1], [1, 0], [-1, 0], [0, -1]]) {
+    const mid = grid.at(tx + dx, tz + dz), c = grid.at(tx + 2 * dx, tz + 2 * dz);
+    if (mid && !mid.open && c && c.open) goals.add(`${tx + 2 * dx},${tz + 2 * dz}`);
+  }
   const path = goals.has(here.join(',')) ? [here] : exports.findPath(grid, here, goals);
   if (!path) return { done: false, reason: 'no path' };
   const [sx, sz] = path[path.length - 1];
@@ -417,12 +422,14 @@ exports.hub = () => {
 
 exports.chooseHub = function* (index, opts = {}) {
   const start = g.frameNo, scene = exports.where().scene;
+  let presses = 0;
   for (let t = 0; t < (opts.frames ?? 1200); t++) {
     const h = exports.hub();
     if (!h || exports.where().scene !== scene) return { done: true, frames: g.frameNo - start };
     if (h.state !== 'Registry3F74_UpdateSelection' || !h.cursor) { yield 1; continue; }
     const c = h.cursor, e = c.entries[index], b = e.bounds;
     if (c.selectedIndex === index) {
+      if (++presses > 3) return { done: false, reason: 'entry does not open' };
       yield g.press('a', 2);
       yield g.press(0, 4);
       yield g.until(() => !exports.hub() || exports.hub().state !== 'Registry3F74_UpdateSelection', 120);
@@ -438,6 +445,8 @@ exports.chooseHub = function* (index, opts = {}) {
 
 // The story counter: r708[0x3c], r708 = gGameVariables (src/script_virtual_machine.c
 // Script_DecodeVariableValue).
+// San Miguel's facility flags r708[0x19a.0][i] (one bit each; proc 2566 needs ten of them).
+exports.facilities = () => { const b = g.u32(g.types.globals.gGameVariables.addr); if (!b) return []; const v = g.u16(b + 0x19a) | (g.u8(b + 0x19c) << 16); const out = []; for (let i = 0; i < 16; i++) if (v & (1 << i)) out.push(i); return out; };
 exports.story = () => { const b = g.u32(g.types.globals.gGameVariables.addr); return b ? g.u8(b + 0x3c) : null; };
 
 // Push planning: a breadth-first search over block states with the game's rules
