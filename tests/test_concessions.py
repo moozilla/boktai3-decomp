@@ -390,6 +390,15 @@ void clear(void) {
         self.assertEqual(warns("void f(u32 a) {\n    {\n        u32 bit = 8;\n        g(bit);\n    }\n    {\n        u32 bit;\n        bit = a;\n        g(bit);\n    }\n}\n"),
                          ["literal-local"])
 
+    def test_literal_local_holding_a_complemented_literal(self):
+        # `~8` is as much a literal as `8`: the local only parks the clearing mask
+        self.assertEqual(warns("void f(u32 *flags) {\n    u32 mask = ~8;\n    *flags &= mask;\n}\n"),
+                         ["literal-local"])
+        self.assertEqual(warns("void f(u32 *flags) {\n    u32 mask;\n    mask = ~0x20;\n    *flags &= mask;\n}\n"),
+                         ["literal-local"])
+        # a complement of a variable is not a literal
+        self.assertEqual(warns("void f(u32 *flags, u32 a) {\n    u32 mask = ~a;\n    *flags &= mask;\n}\n"), [])
+
     def test_register_storage_does_not_hide_constant_locals(self):
         source = ("void f(void) {\n    register u32 zero;\n    const register u32 mask = 4;\n"
                   "    register int index = 0;\n    while (index < 4)\n        g(index++);\n"

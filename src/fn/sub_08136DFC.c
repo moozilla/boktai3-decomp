@@ -1,11 +1,8 @@
+#include "scene_actor_chase_shared.h"
 #include "scene_actor_animation.h"
 #include "scene_input_widget.h"
 #include "global.h"
 #include "scene_actor_placement.h"
-static inline void ClearWord(u32 *p, u32 mask)
-{
-    *p &= mask;
-}
 static inline void ClearTile(struct SceneInputWidget *p, u32 mask)
 {
     p->flags &= mask;
@@ -30,7 +27,7 @@ void SceneActorPlacement_ShowActor(struct RoomActor *s)
             s->colliderA.responseValue = zero;
             if (s->drawableKind == 0) {
                 u32 *p = s->drawable;
-                ClearWord(p, ~1);
+                SceneActorChase_AndWordFlags(p, ~1);
             } else {
                 struct SceneInputWidget *p =
                     &((struct SceneActorAnimationTileDrawable *)s->drawable)->tile;

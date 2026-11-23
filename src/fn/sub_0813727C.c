@@ -1,14 +1,15 @@
+#include "scene_actor_control_begin.h"
+#include "terrain_sampling.h"
+#include "scene_actor_terrain_reaction.h"
 #include "global.h"
 #include "scene_actor_terrain.h"
 #include "scene_actor_reset.h"
+#include "scene_actor_chase_shared.h"
 
 #define gPlayerSlotFlags gUnk_02000560
 extern u32 gUnk_02000560;
 s32 Callback_InvokeActor(void *, void *);
-void SceneActorAnimation_SelectDirectionalEntry(void *, u32);
 void SceneActorAttachment_ReplaceResponseSlot(void *, u32, u32, u32);
-u32 Nav_IsPositionInMesh(void *, struct ContactPosition *, void *);
-s32 Terrain_ApplyBlocked(void *, struct ContactPosition *, void *);
 void SceneActorReaction_RestoreAfterDelay(void *);
 
 static inline u32 ActorFlag(struct ChaseActor *actor, u32 input, u32 offset)
@@ -39,42 +40,9 @@ static inline u32 TestSlot(s32 i)
     return flags[i] & mask;
 }
 
-static inline void SetState(struct ChaseActor *actor, u32 state, u32 phase, u32 behavior)
-{
-    actor->base.state2A8 = state;
-    actor->base.phase2A9 = phase;
-    actor->base.behavior2AA = behavior;
-    actor->base.counter2AC = 0;
-    actor->base.field2B1 = 1;
-}
 
-static inline void SetControl(struct ChaseActor *actor, void *callback, u32 kind)
-{
-    actor->base.field2B2 = 1;
-    actor->base.stepDone = 0;
-    actor->base.controlKind = kind;
-    actor->base.target = callback;
-    actor->base.field2C8 = 0;
-    {
-        u32 *field = &actor->base.pendingControlFlags;
-        u32 mask = ~1;
-        *field &= mask;
-    }
-    actor->base.pendingControl = 0;
-}
 
-static inline u32 CellIndex(struct ContactPosition *p)
-{
-    s32 x = p->x >> 8, z = p->z >> 8;
-    if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
-        return 0;
-    return gTerrainMap->rows[z] + x;
-}
 
-static inline void ClearWordFlags(u32 *flags, u32 mask)
-{
-    *flags &= mask;
-}
 
 struct FlagHalfword {
     s16 bits;
@@ -153,7 +121,7 @@ static inline void ResetControl(struct ChaseActor *actor, u32 enabled, u16 *flag
 {
     struct SceneActorRegistryControl *control = &actor->group.common.control;
     if (enabled) {
-        ClearWordFlags(&actor->base.statusFlags, ~0x1000000);
+        SceneActorChase_AndWordFlags(&actor->base.statusFlags, ~0x1000000);
         ClearHalfFlags(flags, ~0x200);
         control->mode = 0;
         control->counter = 0;
@@ -246,8 +214,8 @@ u32 sub_0813727C(struct ChaseActor *actor)
     actor->base.field2C2 = 0x40;
     SceneActorAnimation_SelectDirectionalEntry(actor, 0);
     actor->base.tracking.target = 0;
-    SetState(actor, 3, 1, 0);
-    SetControl(actor, SceneActorReaction_RestoreAfterDelay, 14);
+    SceneActorTerrain_EnterState(actor, 3, 1, 0);
+    SceneActorControl_Begin(actor, SceneActorReaction_RestoreAfterDelay, 14, 0);
     SetFlags(actor, 0x10);
     SaveControl(&group->saved, actor->base.onAlternateEntry, 7);
     ResetControl(actor, ActorFlags(actor, 0x200000), flagsp);
@@ -257,7 +225,7 @@ u32 sub_0813727C(struct ChaseActor *actor)
         struct RouteLink *link = &group->route;
         dest->x = link->point->x;
         dest->z = link->point->z;
-        dest->y = CellHeight(CellIndex(dest), dest);
+        dest->y = CellHeight(Terrain_GetCellIndex(dest), dest);
     }
     bit = 0x200;
     group->destination->pad = 1;

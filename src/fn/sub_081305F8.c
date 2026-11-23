@@ -1,14 +1,7 @@
+#include "scene_actor_control_phase.h"
 #include "global.h"
 #include "scene_actor_reaction.h"
 
-static inline u8 TakeFlag2B1(struct ChaseActor *actor)
-{
-    if (actor->base.field2B1) {
-        actor->base.field2B1 = 0;
-        return 1;
-    }
-    return 0;
-}
 
 static inline void SetControl(struct ChaseActor *actor, u32 kind, void *control)
 {
@@ -27,7 +20,7 @@ static inline void SetControl(struct ChaseActor *actor, u32 kind, void *control)
 
 void SceneActorControl_BeginIdleControl(struct ChaseActor *actor)
 {
-    if (TakeFlag2B1(actor)) {
+    if (SceneActorControl_TakeStateEntry(actor)) {
         void *target = SceneActorControl_OnIdle;
         SetControl(actor, 0x10, target);
     }

@@ -1,22 +1,16 @@
+#include "scene_actor_control_begin.h"
 #include "scene_actor_terrain_reaction.h"
 #include "global.h"
 #include "scene_actor_control_phase.h"
 #include "scene_actor_control_motion.h"
 #include "debug.h"
+#include "scene_actor_contact_response.h"
 u8 sub_0812F3CC(struct ChaseActor *);
 s32 NavMesh_ConsumeProbeEvent(void *);
 u8 SceneActorBehavior_AccelerateTowardDescriptor(void *, void *, u32, u32, u32);
 u8 SceneActorBehavior_RequestDescriptorTurn(void *, void *, u32, u32, u32);
 // confidence=low: selects control behavior after a route descriptor completes.
 
-static inline void State(struct ChaseActor *a, u32 state, u32 phase, u32 behavior, u32 zero)
-{
-    a->base.state2A8 = state;
-    a->base.phase2A9 = phase;
-    a->base.behavior2AA = behavior;
-    a->base.counter2AC = zero;
-    a->base.field2B1 = 1;
-}
 static inline u32 FlagsSave(struct ChaseActor *a, u32 mask, u16 **out)
 {
     u16 *flags = &a->base.motionFlags;
@@ -24,28 +18,10 @@ static inline u32 FlagsSave(struct ChaseActor *a, u32 mask, u16 **out)
     *out = flags;
     return value;
 }
-static inline u32 Flags(struct ChaseActor *a, u32 mask)
-{
-    return a->base.motionFlags & mask;
-}
-static inline void Control(struct ChaseActor *a, void *cb, u32 kind)
-{
-    a->base.field2B2 = 1;
-    a->base.stepDone = 0;
-    a->base.controlKind = kind;
-    a->base.target = cb;
-    a->base.field2C8 = 0;
-    {
-        u32 *flags = &a->base.pendingControlFlags;
-        s32 mask = ~1;
-        *flags &= mask;
-    }
-    a->base.pendingControl = 0;
-}
 void SceneActorMovement_ResolveRoutePosition(void *);
 void SceneActorRoute_UpdateRouteCompletion(struct ChaseActor *actor)
 {
-    u8 *group = (u8 *)&actor->group.common;
+    struct SceneActorChaseGroup *group = &actor->group;
     s32 speed, event;
     u16 *scale;
     u16 *motionFlags;
@@ -58,7 +34,7 @@ void SceneActorRoute_UpdateRouteCompletion(struct ChaseActor *actor)
     if ((u8)sub_0812F3CC(actor))
         return;
     SceneActorAnimation_SelectDirectionalEntry(actor, 1);
-    speed = Callback_InvokeActor(actor, *(void **)((u8 *)actor + 0x260));
+    speed = Callback_InvokeActor(actor, actor->base.animationQuery.opaque);
     if (FlagsSave(actor, 0xA02F, &motionFlags)) {
         u16 *p = &actor->base.field2C2;
         *p = 64;
@@ -75,26 +51,26 @@ void SceneActorRoute_UpdateRouteCompletion(struct ChaseActor *actor)
     else
         Anim_SetFrameDurationScale((u8 *)actor->base.drawable + 0x20, *scale);
     {
-        void **descriptor = (void **)(group + 0x1FC);
+        void **descriptor = &group->route;
         event = NavMesh_ConsumeProbeEvent(*descriptor);
         if (event) {
             if (SceneActorBehavior_RequestDescriptorTurn(actor, *descriptor, 32, 32, speed)) {
                 SceneActorTerrain_EnterState(actor, 0, 0, 6);
-                Control(actor, actor->base.onStanding, 0);
+                SceneActorTerrain_InstallControl(actor, actor->base.onStanding, 0);
             }
         } else if (SceneActorBehavior_AccelerateTowardDescriptor(actor, *descriptor, 32, 32,
                                                                  speed)) {
             struct ContactPosition **destination;
             u32 destinationOffset;
             u32 zero = event;
-            *(u16 *)(group + 0x54) = zero;
+            group->common.control.timer = zero;
             destinationOffset = 0x200;
-            destination = (void *)(group + destinationOffset);
+            destination = (void *)((u8 *)group + destinationOffset);
             if ((*destination)->pad != 0) {
-                u8 *control;
-                State(actor, 0, 0, 2, zero);
+                struct SceneActorRegistryControl *control;
+                SceneActorTerrain_EnterState(actor, 0, 0, 2);
                 SceneActorMovement_ResolveRoutePosition(actor);
-                control = group + 0x4C;
+                control = &group->common.control;
                 {
                     u32 mask = 0x200000;
                     if (actor->base.behaviorFlags & mask) {
@@ -104,9 +80,9 @@ void SceneActorRoute_UpdateRouteCompletion(struct ChaseActor *actor)
                             *flags &= mask;
                         }
                         *motionFlags &= ~destinationOffset;
-                        control[0xA] = 0;
-                        *(u32 *)(control + 0x18) = zero;
-                        *(u16 *)(control + 8) = zero;
+                        control->mode = 0;
+                        control->counter = zero;
+                        control->timer = zero;
                     }
                 }
                 {
@@ -117,9 +93,9 @@ void SceneActorRoute_UpdateRouteCompletion(struct ChaseActor *actor)
                 actor->base.field2C2 = 64;
                 Memory_Clear(*destination, 8);
             } else {
-                State(actor, 0, 0, 5, 0);
+                SceneActorTerrain_EnterState(actor, 0, 0, 5);
             }
-            Control(actor, actor->base.onStanding, 0);
+            SceneActorControl_Begin(actor, actor->base.onStanding, 0, 0);
             return;
         }
     }

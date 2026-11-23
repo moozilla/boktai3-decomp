@@ -1,4 +1,5 @@
 #include "global.h"
+#include "game_state_flags.h"
 #include "ram.h"
 #include "background_controller.h"
 #include "scene_object.h"
@@ -114,13 +115,6 @@ static inline u32 ActorParticles_NextRandom(void)
     return gUnk_086141BC[gEffectRandomTableIndex];
 }
 
-static inline u8 HasModifier(u32 mask)
-{
-    if (gGameState->flags868 & mask)
-        return 1;
-    return 0;
-}
-
 /* Tentative: emit paired particles when the actor reports an impact. */
 
 void ActorParticles_SpawnImpactBurst(void *actor)
@@ -130,7 +124,7 @@ void ActorParticles_SpawnImpactBurst(void *actor)
     u8 modifier;
     Sound_PlaySong(0x90);
     Memory_Clear(&offset, 8);
-    modifier = HasModifier(8);
+    modifier = GameState_TestWorldFlags(8);
     for (i = 0; i < 4; i++) {
         offset.x = (ActorParticles_NextRandom() & 31) - 7;
         velocity.x = (ActorParticles_NextRandom() & 3) - 2;

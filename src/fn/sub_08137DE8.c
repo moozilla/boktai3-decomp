@@ -1,17 +1,19 @@
 #include "global.h"
 #include "player.h"
-s32 SceneActorTarget_FindNearestEligiblePlayer(u8 *);
-void Callback_InvokeActor(u8 *, u32);
-s32 SceneActorTarget_TrySelectNearestParticipant(u8 *p)
+#include "scene_actor_terrain_reaction.h"
+s32 SceneActorTarget_FindNearestEligiblePlayer(void *);
+s32 Callback_InvokeActor(void *, void *);
+
+u8 SceneActorTarget_TrySelectNearestParticipant(struct ChaseActor *actor)
 {
-    s32 r = SceneActorTarget_FindNearestEligiblePlayer(p + 0x5c);
-    s32 ret;
-    if (r >= 0) {
-        *(u32 *)(p + 0xdc) = (u32)&gPlayers[r]->positionalEffectGroup;
-        ret = 1;
+    s32 player = SceneActorTarget_FindNearestEligiblePlayer(&actor->base.body.position);
+    u8 found;
+    if (player >= 0) {
+        actor->base.tracking.target = (void *)&gPlayers[player]->positionalEffectGroup;
+        found = 1;
     } else {
-        Callback_InvokeActor(p, *(u32 *)(p + 0x5f8));
-        ret = 0;
+        Callback_InvokeActor(actor, actor->group.fallback);
+        found = 0;
     }
-    return ret;
+    return found;
 }

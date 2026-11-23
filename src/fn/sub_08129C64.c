@@ -1,3 +1,4 @@
+#include "display_sequence_inline.h"
 #include "global.h"
 #include "engine_globals.h"
 #include "display_sequence.h"

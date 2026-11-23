@@ -1,4 +1,5 @@
 #include "scene_actor_terrain_reaction.h"
+#include "scene_actor_contact_response.h"
 #include "global.h"
 #include "scene_actor_control_phase.h"
 #include "scene_actor_control_motion.h"
@@ -16,10 +17,6 @@ static inline void State(struct ChaseActor *a, u32 state, u32 phase, u32 behavio
     a->base.counter2AC = zero;
     a->base.field2B1 = 1;
 }
-static inline u32 Flags(struct ChaseActor *a, u32 mask)
-{
-    return a->base.motionFlags & mask;
-}
 void SceneActorRoute_UpdateAdvancePhase(struct ChaseActor *actor)
 {
     struct SceneActorChaseGroup *group = &actor->group;
@@ -33,8 +30,8 @@ void SceneActorRoute_UpdateAdvancePhase(struct ChaseActor *actor)
     if ((u8)sub_0812F3CC(actor))
         return;
     SceneActorAnimation_SelectDirectionalEntry(actor, 1);
-    speed = Callback_InvokeActor(actor, *(void **)((u8 *)actor + 0x260));
-    if (Flags(actor, 0xA02F)) {
+    speed = Callback_InvokeActor(actor, actor->base.animationQuery.opaque);
+    if (SceneActorContact_MotionFlags(actor, 0xA02F)) {
         u16 *p = &actor->base.field2C2;
         *p = 64;
         scale = p;

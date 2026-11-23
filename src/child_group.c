@@ -442,6 +442,7 @@ void Ivy_WaitForSecondaryActionCompletion(struct PhaseObject *);
 
 s32 Div(s32, s32);
 
+// concession-ok(literal-param): truncating shift helper; the width written in place in its body gives the same code
 static inline s32 truncateShift(s32 value, s32 shift)
 {
     if (value >= 0)

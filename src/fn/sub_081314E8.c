@@ -1,29 +1,11 @@
+#include "scene_actor_contact_entry.h"
+#include "scene_actor_control_begin.h"
 #include "scene_actor_terrain_reaction.h"
 #include "scene_actor_chase_shared.h"
 #include "global.h"
 #include "scene_actor_control_phase.h"
 u8 sub_0812F3CC(struct ChaseActor *);
 // confidence=low: selects a route return phase from motion and route flags.
-static inline void BeginControl(struct ChaseActor *actor, void *control, u32 kind, u32 zero)
-{
-    u32 offset;
-    {
-        u8 *field = &actor->base.field2B2;
-        *field = 1;
-    }
-    offset = 0x2B0;
-    *((u8 *)actor + offset) = zero;
-    actor->base.controlKind = kind;
-    offset -= 0x94;
-    *(void **)((u8 *)actor + offset) = control;
-    actor->base.field2C8 = zero;
-    {
-        u32 *flags = &actor->base.pendingControlFlags;
-        s32 mask = ~1;
-        *flags &= mask;
-    }
-    actor->base.pendingControl = zero;
-}
 #include "scene_actor_chase.h"
 #include "scene_actor_attachment.h"
 static inline u32 FlagsSave(struct ChaseActor *a, u32 mask, u16 **out)
@@ -63,22 +45,7 @@ void SceneActorRoute_UpdateContactRecovery(struct ChaseActor *actor)
     u16 *motionFlags;
     if (SceneActorControl_TakeFlag(&actor->base.field2B1)) {
         SceneActorChase_SetControl(actor, actor->base.onStanding, 0);
-        {
-            u32 *flags = &actor->base.behaviorFlags;
-            u32 mask = ~0x80;
-            *flags &= mask;
-        }
-        {
-            u32 *flags = &actor->base.statusFlags;
-            u32 mask = ~0x1000000;
-            *flags &= mask;
-        }
-        {
-            u16 *flags = &actor->base.motionFlags;
-            u32 mask = ~0x200;
-            *flags &= mask;
-        }
-        actor->base.field2C2 = 64;
+        SceneActorContact_ResetEntry(actor);
     }
     if ((u8)Callback_InvokeActor(actor, actor->base.contactQuery.opaque))
         return;
@@ -90,7 +57,7 @@ void SceneActorRoute_UpdateContactRecovery(struct ChaseActor *actor)
         struct ChaseTarget **node = (struct ChaseTarget **)group->contactNode;
         SubtractContactNode(&delta, node, &actor->base.body.position);
         if (((u32)((delta.x * delta.x) + (delta.z * delta.z))) <= 0xFFFE) {
-            BeginControl(actor, group->contactArrivalControl, 0x19, result);
+            SceneActorControl_Begin(actor, group->contactArrivalControl, 0x19, result);
             SceneActorBehavior_WriteSelector(3, &actor->base.state2A8);
             {
                 typeof(actor->base.phase2A9) *q1 = &actor->base.phase2A9;
@@ -117,15 +84,13 @@ void SceneActorRoute_UpdateContactRecovery(struct ChaseActor *actor)
         }
     }
     if (((s32)actor->base.counter2AC) > 60) {
-        u32 destinationOffset;
         struct ContactPosition **destination;
         SceneActorTerrain_EnterState(actor, 0, 0, 7);
         SceneActorChase_SetControl(actor, actor->base.onAlternateEntry, 1);
-        destinationOffset = 0x200;
-        destination = (void *)((u8 *)group + destinationOffset);
+        destination = (void *)((u8 *)group + 0x200);
         (*destination)->pad = 1;
         if (!TryRoute(actor, group->route, &actor->base.body.position, *destination, motionFlags,
-                      destinationOffset)) {
+                      0x200)) {
             Callback_InvokeActor(actor, group->fallback);
             return;
         }

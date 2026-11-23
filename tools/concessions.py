@@ -147,9 +147,11 @@ _DECL_TYPE = (r"(?:(?:register|const)\s+){0,2}(?:unsigned\s+|signed\s+)?"
 _DECL_START = re.compile(r"(?m)^[ \t]+" + _DECL_TYPE + r"(?P<first>[A-Za-z_]\w*)(?=\s*[=,;\[])")
 _DECL_PUNCT = re.compile(r"[][(){},;]")
 _DECLARATOR = re.compile(r"\s*\*?\s*([A-Za-z_]\w*)\s*")
-_LITERAL_INIT = re.compile(r"=\s*" + _LITERAL + r"\s*")
-_LITERAL_ASSIGNMENT = re.compile(r"\s*=\s*" + _LITERAL + r"\s*;")
-_LITERAL_ASSIGNED = re.compile(r"\b([A-Za-z_]\w*)\s*=\s*" + _LITERAL + r"\s*[;)]")
+# what a literal local holds: a literal, also complemented (`u32 mask = ~8;` then `*flags &= mask;`)
+_LITERAL_VALUE = r"(?:~\s*)?" + _LITERAL
+_LITERAL_INIT = re.compile(r"=\s*" + _LITERAL_VALUE + r"\s*")
+_LITERAL_ASSIGNMENT = re.compile(r"\s*=\s*" + _LITERAL_VALUE + r"\s*;")
+_LITERAL_ASSIGNED = re.compile(r"\b([A-Za-z_]\w*)\s*=\s*" + _LITERAL_VALUE + r"\s*[;)]")
 _LOCAL_CHANGE = (r"\b{0}\s*(?:[-+*/|&^%]|<<|>>)?=(?!=)|\b{0}\s*(?:\+\+|--)|(?:\+\+|--)\s*{0}\b"
                  r"|(?:[(,=?:]|\breturn)\s*&\s*{0}\b")
 _MEMBER_ACCESS = re.compile(r"(?:->|\.)\s*[A-Za-z_]\w*")

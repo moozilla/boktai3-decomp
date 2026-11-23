@@ -1,3 +1,4 @@
+#include "scene_actor_availability.h"
 #include "global.h"
 #include "monster_particle_random.h"
 #include "scene_actor_chase_reaction.h"
@@ -9,10 +10,6 @@ s32 NavMesh_ConsumeProbeEvent(void *);
 u8 SceneActorBehavior_RequestDescriptorTurn(void *, void *, s32, s32, s32);
 u8 SceneActorBehavior_AccelerateTowardDescriptor(void *, void *, s32, s32, s32);
 u8 SceneActorRoute_TryRecoveryDetour(void *);
-static inline u32 ContactRoute_FieldBits(u32 mask, u16 *field)
-{
-    return *field & mask;
-}
 
 struct ContactRouteFlagOwner {
     u16 *field;
@@ -104,7 +101,7 @@ static inline void ContactRoute_BeginProbeTurn(void *object, u32 saved, u16 *mot
     struct SceneActorChaseGroup *group = object;
     struct ChaseActor *actor = object;
     group = (void *)((u8 *)group + (u32) & ((struct ChaseActor *)0)->group);
-    if (!ContactRoute_FieldBits(0x400, motionFlags) &&
+    if (!SceneActor_MaskedHalfword(0x400, motionFlags) &&
         !SceneActorChase_TestField((u16 *)&actor->group.common.gate.flags, 4)) {
         group->turn.direction =
             ContactRoute_RandomDirectionExcept(ContactRoute_CurrentDirection(actor), gRandomTable);
@@ -136,7 +133,6 @@ void SceneActorReaction_UpdateContactRoute(struct ChaseActor *actor)
     struct SceneActorChaseGroup *group = &actor->group;
     s32 speed, event;
     struct ContactRouteFlagOwner motionFlags;
-    u32 durationMask;
     if (SceneActorControl_TakeStateEntry(actor)) {
         DEBUG_PRINT();
     }
@@ -145,8 +141,7 @@ void SceneActorReaction_UpdateContactRoute(struct ChaseActor *actor)
     if (sub_0812F3CC(actor))
         return;
     speed = Callback_InvokeActor(actor, actor->base.animationQuery.opaque);
-    durationMask = 0xA02F;
-    ContactRoute_ApplyDuration(actor, durationMask, &motionFlags);
+    ContactRoute_ApplyDuration(actor, 0xA02F, &motionFlags);
     event = NavMesh_ConsumeProbeEvent(group->route);
     if (event) {
         if (SceneActorBehavior_RequestDescriptorTurn(actor, group->route, 32, 32, speed)) {
