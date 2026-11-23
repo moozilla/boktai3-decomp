@@ -66,8 +66,8 @@ struct Axe {
     u8 acceleration;
     u8 unknownEAF;
     u8 timerEB0;
-    u8 unknownEB1;
-    u8 parameterEB2;
+    u8 shakeFrames; /* frames of camera shake left (Axe_UpdateScreenShake) */
+    u8 parameterEB2; /* the shake strength */
     u8 unknownEB3;
     u16 lowHealthThreshold; /* the second attack threshold, below healthThreshold */
     s16 routeId;

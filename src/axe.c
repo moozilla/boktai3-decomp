@@ -2913,23 +2913,16 @@ void Axe_SpawnSparks(struct ChaseActor *actor, struct ContactPosition *origin, s
     }
 }
 
-struct S080FC3F8 {
-    u8 filler[0x2d4];
-    u16 h;
-    u8 filler2[0x3d0 - 0x2d6];
-    u8 *q;
-};
-
 void Camera_RequestShake(u8);
 
-void Axe_UpdateScreenShake(struct S080FC3F8 *s)
+void Axe_UpdateScreenShake(struct ChaseActor *actor)
 {
-    u8 *q = s->q;
+    struct Axe *q = actor->base.context;
     u32 m = 0x40;
-    if (!(s->h & m)) {
-        u8 *p = q + 0xeb1;
+    if (!(actor->base.motionFlags & m)) {
+        u8 *p = &q->shakeFrames;
         if (*p) {
-            Camera_RequestShake(q[0xeb2]);
+            Camera_RequestShake(q->parameterEB2);
             *p = *p - 1;
         }
     }
@@ -3469,7 +3462,7 @@ s32 Axe_PrepareUpdate(void *p)
     return 1;
 }
 
-void Axe_UpdateScreenShake(struct S080FC3F8 *s);
+void Axe_UpdateScreenShake(struct ChaseActor *actor);
 
 void Axe_TickAuxiliarySpriteTimers(struct ChaseActor *actor);
 
@@ -4195,17 +4188,12 @@ s32 Axe_OnUpdate(struct ChaseActor *p)
     return 1;
 }
 
-struct S080FE64C {
-    u8 filler[0xdc];
-    u8 *p;
-};
+void SceneActor_UpdateBehaviorCallbacks(struct ChaseActor *);
 
-void SceneActor_UpdateBehaviorCallbacks(struct S080FE64C *);
-
-s32 Axe_OnRender(struct S080FE64C *s)
+s32 Axe_OnRender(struct ChaseActor *actor)
 {
-    s->p = (*(u8 **)gPlayers) + 0x24;
-    SceneActor_UpdateBehaviorCallbacks(s);
+    actor->base.tracking.target = &((struct SceneActorChasePlayer *)gPlayers[0])->target;
+    SceneActor_UpdateBehaviorCallbacks(actor);
     return 0;
 }
 
@@ -4276,7 +4264,7 @@ void Axe_InitRoutePointHistory(struct ChaseActor *actor);
 
 void ActorCollision_InitThreeAuxiliaryAttacks(struct ChaseActor *actor);
 
-s32 Axe_OnRender(struct S080FE64C *s);
+s32 Axe_OnRender(struct ChaseActor *actor);
 
 s32 Axe_ReleaseResources(void *p);
 
