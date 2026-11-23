@@ -1015,56 +1015,18 @@ s32 Dog_ResolvePendingObject(struct ChaseActor *actor)
     s32 *pendingId = &owner->base.counter304;
     struct SceneActorChaseTracking *state;
     if (*pendingId > 0) {
-        struct Delta {
-            s16 x, y, z, pad;
-        } delta;
-        struct ContactPosition *target;
-        s32 x, z;
-        u32 cell;
+        struct ContactPosition delta;
         SceneActorTarget_ResetContactResponse((void *)owner);
         SceneActorChase_ClearFlagComponent((void *)&owner->group.common.gate.flags, 2);
         SceneActorChase_SetReactionFlags(owner, 0x80);
         state = &owner->base.tracking;
+        SceneActorContact_SetTrackingFlags((struct SceneActorContactTracking *)state, 0x10);
+        state->target = (void *)SceneActorContacts_FindObjectById(*pendingId);
+        SceneActorContact_SaveTargetCell(owner, Chase_CellAt(&state->target->position));
+        Chase_Delta(&delta, &owner->base.body.position, &state->target->position);
+        owner->base.body.direction = Math_Atan2(delta.x, delta.z);
         {
-            u32 mask = 0x10;
-            state->flags = (*(&mask)) | state->flags;
-        }
-        {
-            u8 *object = SceneActorContacts_FindObjectById(*pendingId);
-            state->target = (void *)object;
-            x = ((struct ContactPosition *)(object + 0xC))->x >> 8;
-            z = ((struct ContactPosition *)(object + 0xC))->z >> 8;
-        }
-        if ((((x < 0) || (z < 0)) || (((u32)x) >= gTerrainWidth)) || (((u32)z) >= gTerrainHeight)) {
-            cell = 0;
-        } else {
-            cell = gTerrainMap->rows[z] + x;
-        }
-        SceneActorContact_SaveTargetCell(owner, cell);
-        {
-            struct Delta *out = &delta;
-            struct ContactPosition *source = &owner->base.body.position;
-            target = &state->target->position;
-            {
-                u32 xDelta = (u16)target->x;
-                struct Delta *first;
-                xDelta -= (u16)source->x;
-                first = &delta;
-                first->x = xDelta;
-            }
-            out->y = (u16)target->y - (u16)source->y;
-            out->z = (u16)target->z - (u16)source->z;
-            {
-                struct Delta *first = &delta;
-                u32 direction;
-                u8 *field;
-                direction = Math_Atan2(first->x, out->z);
-                field = &owner->base.body.direction;
-                *field = direction;
-            }
-        }
-        {
-            u32 *flags = (u32 *)(*(u8 **)((u8 *)owner + 0x3D0) + 0x678);
+            u32 *flags = &((struct Dog *)owner->base.context)->flags;
             u32 mask = ~0xC;
             *flags &= mask;
         }
