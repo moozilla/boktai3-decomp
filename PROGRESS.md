@@ -19,17 +19,17 @@ Without concessions: **99.992%**. With concessions (register pins, asm barriers 
 | `once-loop` | 78 (+1 excused) |
 | `stmt-expr` | 1 |
 | `const-local` | 858 (+9 excused) |
-| `literal-local` | 2,842 |
+| `literal-local` | 2,829 |
 | `addr-deref` | 25 |
 | `subtract-negative` | 15 |
 | `duplicate-branches` | 25 (+1 excused) |
 | `placeholder-name` | 5 |
 | `volatile-view` | 2 |
 | `local-union` | 75 (+2 excused) |
-| `literal-param` | 772 (+1 excused) |
-| total | 4,730 |
+| `literal-param` | 751 (+1 excused) |
+| total | 4,696 |
 
-Source files with no warning: **4,463** of 6,041.
+Source files with no warning: **4,465** of 6,041.
 
 Nonmatching drafts (`#ifdef NONMATCHING`, not counted above): **0 functions**, 0.000% of code, mean fuzzy match 0.0%.
 
