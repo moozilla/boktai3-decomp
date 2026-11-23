@@ -1,4 +1,5 @@
 #include "scene_actor_reset.h"
+#include "scene_actor_placement.h"
 s32 Callback_InvokeActor(void *, void *);
 void SceneActorAttachment_ReplaceResponseSlot(void *, u32, u32, u32);
 void sub_08136F48(void *, struct SceneActorRegistryControl *);
@@ -45,11 +46,6 @@ static inline void ClearWordFlags(u32 *flags, u32 mask)
     *flags &= mask;
 }
 
-static inline void ClearHalfFlags(u16 *flags, u32 mask)
-{
-    *flags &= mask;
-}
-
 static inline u8 MoveTo(struct ChaseActor *actor, struct SceneActorRegistryControlGroup *group,
                         u32 blocked)
 {
@@ -76,7 +72,7 @@ void sub_08136F58(struct ChaseActor *actor)
         SetControl(actor, actor->base.onStanding, 0);
         ClearWordFlags(&actor->base.behaviorFlags, ~0x80);
         ClearWordFlags(&actor->base.statusFlags, ~0x1000000);
-        ClearHalfFlags(&actor->base.motionFlags, ~0x200);
+        SceneActorPlacement_ClearFlags(&actor->base.motionFlags, ~0x200);
         actor->base.field2C2 = 0x40;
     }
     if (((u8)Callback_InvokeActor(actor, actor->base.contactQuery.opaque)) == 0) {

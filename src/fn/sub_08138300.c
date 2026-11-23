@@ -27,8 +27,7 @@ s32 LinkSession_ReceiveSelectionByte(struct AreaEffectLinkState *session, u8 *de
         u32 count;
         {
             u32 index = player * 2;
-            u32 offset = 0x7C;
-            u8 *base = (u8 *)session + offset;
+            u8 *base = (u8 *)session + 0x7C;
             cursor = (void *)(base + index);
         }
         count = *cursor;
