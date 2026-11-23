@@ -11,6 +11,7 @@
 //     return g.$.gPlayers[0];
 //   });
 //   s.movie                                         // key mask of every frame played
+//   openSession({ movie })                          // start from a recorded movie (replayed by the first run)
 //
 // The PPU is off unless opts.render (or s.setRender(true) before a frame you want to
 // see): the game never reads the screen, and skipping it is most of a frame's cost.
@@ -47,7 +48,7 @@ export async function openSession(opts = {}) {
 
   let ex = null, memory = null, g = null, frameNo = 0, lastPixels = 0;
   let script = null, replay = null, stopped = null, pending = null;
-  const movie = [];      // movie[n] = keys returned for frame n
+  const movie = (opts.movie || []).slice();  // movie[n] = keys returned for frame n; opts.movie replays first
   const solarLog = [];   // [frame, value] changes
   const session = {};
 
