@@ -3,6 +3,7 @@
 #include "contact_swarm.h"
 #include "render.h"
 #include "display_sequence_inline.h"
+#include "player_slot_status.h"
 // confidence=low: action creates the spiral trail and advances its auxiliary sprite.
 u32 Player_ConsumeStateEntry(struct Player *);
 void Player_EmitQueuedEffects(struct Player *);
@@ -12,10 +13,6 @@ void SpiralTrail_CreateWithParticles(struct Player *, s32, s32, s32, s32);
 void Player_AddControlFlags(struct Player *, s32);
 s32 Player_SetAnimation(struct Player *, s32, s32, s32);
 void ActorSequence_Begin(struct Player *, s32, s32);
-static inline void addFlags(u32 *flags, u32 mask)
-{
-    *flags |= mask;
-}
 // confidence=low: provisional action interpretation from retained C and assembly.
 void Player_UpdateSpiralTrailAction(struct Player *p)
 {
@@ -29,7 +26,7 @@ void Player_UpdateSpiralTrailAction(struct Player *p)
         Sound_PlaySong(0x39A);
         SpiralTrail_CreateWithParticles(p, 1, 0, 32, 56);
     }
-    addFlags((u32 *)((u8 *)p + 0x20), 0x100000);
+    Player_SetStatusBits((u32 *)((u8 *)p + 0x20), 0x100000);
     if ((p->tetherFrame & 7) >= 7 - (p->tetherFrame >> 2)) {
         Player_AddControlFlags(p, 0x41);
         p->animation.position = *(struct ContactPosition *)&p->position;

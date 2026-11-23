@@ -1,4 +1,5 @@
 #include "global.h"
+#include "player_slot_status.h"
 
 // confidence=low: interpolates from the saved origin to a scripted endpoint.
 #define Player_UpdateInterpolatedMotion sub_08145254
@@ -12,10 +13,6 @@ void Player_AddControlFlags(void *, u32);
 s32 Div(s32, s32);
 s32 ActorVariant_GetTableValue(u32, u32);
 s32 Player_SetAnimation(void *, s32, s32, s32);
-static inline void OrFlags(u32 *p, u32 mask)
-{
-    *p |= mask;
-}
 static inline s32 Scale8(s32 value)
 {
     if (value >= 0)
@@ -42,7 +39,7 @@ void Player_UpdateInterpolatedMotion(u8 *p)
         *(struct MotionPosition *)(p + 0xA8C) = *(struct MotionPosition *)(p + 0x30);
     SetMotionSize(p);
     H(0xAD8) = 32;
-    OrFlags((u32 *)(p + 0x20), 0x1100);
+    Player_SetStatusBits((u32 *)(p + 0x20), 0x1100);
     Player_AddControlFlags(p, 8);
     {
         u16 *duration = (u16 *)(p + 0xA9C);

@@ -1,5 +1,6 @@
 #include "global.h"
 #include "player.h"
+#include "player_slot_status.h"
 u8 *Player_GetSpecialAttackDescriptor(s32 idx);
 s32 Player_GetAttackElementType(u32 x);
 void Projectile_InitializeParams(u8 *);
@@ -8,10 +9,6 @@ void Projectile_SetCollisionSize(u8 *, u16, u16, u16);
 void Projectile_SetTypeAndElement(u8 *, u32, u32);
 void Projectile_SetVariant(u8 *, u16);
 
-static inline u32 DisplayFlags(u32 *flags, u32 mask)
-{
-    return *flags & mask;
-}
 void Player_ConfigureActionSelectionDisplay(struct Player *p)
 {
     u32 selection;
@@ -23,7 +20,7 @@ void Player_ConfigureActionSelectionDisplay(struct Player *p)
         if (!p) {
             selection = 1;
         } else {
-            u32 flags = DisplayFlags(&p->statBonusFlags, 0x10000000);
+            u32 flags = Player_ReadStatusBits(&p->statBonusFlags, 0x10000000);
             selection = 7;
             if (flags)
                 goto selected;

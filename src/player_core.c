@@ -1,4 +1,5 @@
 #include "player_core.h"
+#include "player_slot_status.h"
 
 void ScreenMote_ResetManager(void)
 {
@@ -137,15 +138,7 @@ void Player_RunPendingCallback(struct Player *player)
     }
 }
 
-static inline u32 HasFlagBits(u32 *flags, u32 mask)
-{
-    return *flags & mask;
-}
 
-static inline void SetFlagBits(u32 *flags, u32 mask)
-{
-    *flags |= mask;
-}
 
 static inline struct GameState *EventCounterBase(u32 slot, struct GameState *state)
 {
@@ -159,9 +152,9 @@ void Player_ResetStatus(struct Player *player)
         *(s32 *)(u32)&EventCounterBase(player->timedEventSlot, gGameState)->counters628[0] = 0;
     if (*(s32 *)(u32)&EventCounterBase(player->timedEventSlot, gGameState)->counters628[0] == 0 &&
         AreaEffect_TestPlayerCoverage((u8 *)player))
-        SetFlagBits(&player->statusFlags, 0x10);
-    if (player && HasFlagBits(&player->statBonusFlags, 0x2000))
-        SetFlagBits(&player->statusFlags, 0x10000);
+        Player_SetStatusBits(&player->statusFlags, 0x10);
+    if (player && Player_ReadStatusBits(&player->statBonusFlags, 0x2000))
+        Player_SetStatusBits(&player->statusFlags, 0x10000);
     player->resetValue6F8 = 0;
     player->resetValue6FA = 0;
     player->resetValue6FC = 0;
@@ -269,7 +262,7 @@ s32 Player_IsActionBlocked(struct Player *player)
     s32 phase;
     if (((struct GameState *)(player->timedEventSlot * sizeof(s32) + (u32)gGameState))
                 ->counters628[0] > 0 ||
-        (player != 0 && HasFlagBits(&player->statBonusFlags, 0x4000) != 0) ||
+        (player != 0 && Player_ReadStatusBits(&player->statBonusFlags, 0x4000) != 0) ||
         ((phase = SunClock_GetPhase()), (u32)(phase - 4) <= 1 || phase == 0))
         return 1;
     return 0;
@@ -327,10 +320,6 @@ s32 Player_GetSelectedSlotActionScale(void)
     return scale;
 }
 
-static inline u32 ResponseFlags_Test(const u32 *flags, u32 mask)
-{
-    return *flags & mask;
-}
 
 static inline u32 ResponseActor_GetHalfFlag(struct Player *actor)
 {
@@ -338,19 +327,19 @@ static inline u32 ResponseActor_GetHalfFlag(struct Player *actor)
 
     if (!actor)
         return 0;
-    flags = ResponseFlags_Test(&actor->actionFlags, 0x1000);
+    flags = Player_ReadStatusBits(&actor->actionFlags, 0x1000);
     return flags & 0x1000;
 }
 
 s32 ActorResponse_Apply(struct Player *actor, s32 value)
 {
-    if (actor && ResponseFlags_Test(&actor->actionFlags, 0x1000)) {
-        if (ResponseFlags_Test(&actor->actionFlags, 0x800))
+    if (actor && Player_ReadStatusBits(&actor->actionFlags, 0x1000)) {
+        if (Player_ReadStatusBits(&actor->actionFlags, 0x800))
             return value;
     }
     if (ResponseActor_GetHalfFlag(actor))
         value -= Div(value, 2);
-    else if (actor && ResponseFlags_Test(&actor->actionFlags, 0x800))
+    else if (actor && Player_ReadStatusBits(&actor->actionFlags, 0x800))
         value <<= 1;
     return value;
 }

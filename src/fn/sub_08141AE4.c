@@ -1,15 +1,12 @@
 #include "global.h"
 #include "player.h"
+#include "player_slot_status.h"
 s32 Div(s32, s32);
-static inline u32 MaskFlags(u32 *flags, u32 mask)
-{
-    return *flags & mask;
-}
 static inline u8 HasFastMovement(struct Player *p)
 {
     u8 result;
     if (p) {
-        u32 flags = MaskFlags(&p->actionFlags, 0x40);
+        u32 flags = Player_ReadStatusBits(&p->actionFlags, 0x40);
         result = 1;
         if (flags)
             goto done;
@@ -31,7 +28,7 @@ s32 Player_GetMovementSpeed(struct Player *p)
     s32 speed;
     if (IsFastMovement(p))
         goto fast;
-    if (p && MaskFlags(&p->actionFlags, 0x40))
+    if (p && Player_ReadStatusBits(&p->actionFlags, 0x40))
         goto fast;
     speed = Div((100 - p->movementLoadPercent) * 12, 100);
     if (speed > 16) {
@@ -43,7 +40,7 @@ s32 Player_GetMovementSpeed(struct Player *p)
         speed -= 4;
     if (p->movementSpeedReduction)
         speed -= p->movementSpeedReduction;
-    if (p && MaskFlags(&p->actionFlags, 0x80))
+    if (p && Player_ReadStatusBits(&p->actionFlags, 0x80))
         speed -= 3;
     if (speed <= 1)
         return 2;

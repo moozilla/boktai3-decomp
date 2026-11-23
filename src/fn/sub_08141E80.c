@@ -4,6 +4,7 @@
 #define Player_SubtractStatB            Player_SubtractEnergy
 #include "global.h"
 #include "player.h"
+#include "player_slot_status.h"
 s32 Player_GetSmoothedDirection(struct Player *);
 s32 Player_GetMovementSpeed(struct Player *);
 s32 Player_GetMovementRateScale(s32);
@@ -15,27 +16,23 @@ s32 Player_SetAnimation(struct Player *, s32, s32, s32);
 void Player_IncreaseLifeTowardLimit(struct Player *, u32);
 void Player_AddEnergy(struct Player *, s32);
 void Player_SubtractEnergy(struct Player *, s32);
-static inline u32 MaskFlags(u32 *flags, u32 mask)
-{
-    return *flags & mask;
-}
 static inline u32 HasFlag0(struct Player *p)
 {
     if (!p)
         return 0;
-    return MaskFlags(&p->actionFlags, 0x100);
+    return Player_ReadStatusBits(&p->actionFlags, 0x100);
 }
 static inline u32 HasFlag1(struct Player *p)
 {
     if (!p)
         return 0;
-    return MaskFlags(&p->actionFlags, 0x200);
+    return Player_ReadStatusBits(&p->actionFlags, 0x200);
 }
 static inline u32 HasFlag2(struct Player *p)
 {
     if (!p)
         return 0;
-    return MaskFlags(&p->actionFlags, 0x400);
+    return Player_ReadStatusBits(&p->actionFlags, 0x400);
 }
 static inline u8 IsModeFive(struct Player *p)
 {

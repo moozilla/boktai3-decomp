@@ -1,4 +1,5 @@
 #include "global.h"
+#include "player_slot_status.h"
 #define B(n) (*(u8 *)(p + (n)))
 #define H(n) (*(u16 *)(p + (n)))
 #define W(n) (*(u32 *)(p + (n)))
@@ -12,10 +13,6 @@ s32 Player_CanRecoverResourceWhileUnflagged(void *);
 void Sound_PlaySong(u32);
 void Sound_StopSong(u32);
 void ConvergingEffects_EmitFarParticle(void *, void *);
-static inline void OrFlags(u32 *a, u32 mask)
-{
-    *a |= mask;
-}
 static inline void SetPulse(u8 *p, u32 value)
 {
     H(0xad8) = value;
@@ -73,7 +70,7 @@ void Player_UpdateUnflaggedResourceRecovery(u8 *p)
             goto pause;
         case 2: {
             u32 zero;
-            OrFlags((u32 *)(p + 0x20), 0xa0);
+            Player_SetStatusBits((u32 *)(p + 0x20), 0xa0);
             if (H(0x4f8) <= 4) {
                 if (++H(0x4f8) == 5) {
                     Sound_PlaySong(0x239);
@@ -116,7 +113,7 @@ void Player_UpdateUnflaggedResourceRecovery(u8 *p)
             Player_SetActionPhase(p, 3);
             break;
         case 3:
-            OrFlags((u32 *)(p + 0x20), 0x80);
+            Player_SetStatusBits((u32 *)(p + 0x20), 0x80);
             Player_SetAnimation(p, ActorVariant_GetTableValue(B(0x418), 10), 64, 1);
             H(0x6fc) = 30;
             if (!(*(*(u16 **)(p + 0x348)) & 1)) {

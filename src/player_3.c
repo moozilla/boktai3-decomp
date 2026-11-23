@@ -2,6 +2,7 @@
 #include "player_3.h"
 #include "ram.h"
 #include "scene_consumable_definition.h"
+#include "player_slot_status.h"
 
 /* Tentative role: select an effect flag from actor and global state. */
 
@@ -2089,10 +2090,6 @@ u32 ActorParameter_GetModeValue(s32 index)
         return gUnk_0861091C[index];
 }
 
-static inline u32 tst(u32 *a, u32 m)
-{
-    return *a & m;
-}
 
 u32 ActorParameter_GetModeValue(s32);
 
@@ -2104,7 +2101,7 @@ s32 Player_GetEnchantmentEnergyCost(struct Player *p)
         return 0;
     v = ActorParameter_GetModeValue((s8)p->thresholdMode);
     pct = 100;
-    if (p != 0 && tst(&p->actionFlags, 0x1000))
+    if (p != 0 && Player_ReadStatusBits(&p->actionFlags, 0x1000))
         pct = 50;
     if (pct <= 99)
         v = Div(v * pct, 100);

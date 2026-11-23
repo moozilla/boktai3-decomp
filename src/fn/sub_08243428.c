@@ -4,6 +4,7 @@
 #include "player.h"
 #include "scene_object.h"
 #include "player_cue.h"
+#include "player_slot_status.h"
 
 struct LinkRef {
     u8 unk0[0x18];
@@ -30,10 +31,6 @@ static inline u32 Busy(struct Player *p)
     return r;
 }
 
-static inline void FlagOr(u32 m, u32 *f)
-{
-    *f |= m;
-}
 
 static inline u32 FlagSet(u32 v, u32 m)
 {
@@ -83,7 +80,7 @@ s32 Player_ApplyTerrainDamage(struct Player *p)
     if (p->positionResetValue == 0 && p->movementModifierKind == 1 && p->movementModifierActive) {
         u16 *c;
         u16 n;
-        FlagOr(0x200, &p->statusFlags);
+        Player_SetStatusBits(&p->statusFlags, 0x200);
         c = &p->terrainDamageTimer;
         n = ++*c;
         if (n >= Div(0x3c, p->movementModifierActive)) {

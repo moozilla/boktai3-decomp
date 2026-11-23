@@ -3,14 +3,11 @@
 /* tentative: plays the action cue sound or positional effect chosen by mode and tether */
 
 #include "player.h"
+#include "player_slot_status.h"
 u32 Player_IsFlaggedWithoutGlobalModifiers(u32);
 void Player_PlayLocalSong(s32, u32);
 void Player_EmitPositionEffect(struct Player *s, const struct SceneVec *position, s32 height,
                                u32 variant, const void *effect, u32 flags, u32 song);
-static inline u32 MaskFlags(u32 *flags, u32 mask)
-{
-    return *flags & mask;
-}
 static inline u8 IsModeFive(struct Player *p)
 {
     u32 active = p->active;
@@ -25,7 +22,7 @@ void Player_PlayActionCueSound(struct Player *p, s32 quiet)
         return;
     if (p->animation.elapsed)
         return;
-    if (p && ((p->active && p->sceneMode == 0) || MaskFlags(&p->actionFlags, 4)))
+    if (p && ((p->active && p->sceneMode == 0) || Player_ReadStatusBits(&p->actionFlags, 4)))
         return;
     if (Player_IsFlaggedWithoutGlobalModifiers(p->movementStatus) && !(p && IsModeFive(p))) {
         if (p->animation.frameIndex == 0)

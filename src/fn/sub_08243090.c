@@ -2,6 +2,7 @@
 #include "engine.h"
 #include "player.h"
 #include "contact_actor.h"
+#include "player_slot_status.h"
 
 struct PlayerSelection;
 
@@ -19,10 +20,6 @@ struct Player *Player_FindMaskedSlot(const struct PlayerSelection *);
 void sub_08242FAC(struct Player *, u32);
 void sub_08243020(struct Player *, u32);
 
-static inline u32 Test(u32 m, u32 *pv)
-{
-    return *pv & m;
-}
 
 static inline u32 Test16(u32 m, u16 *pv)
 {
@@ -81,36 +78,36 @@ u32 Player_ApplyContact(struct Player *p, struct ContactCollider *source,
         }
         sub_08238580(p, source, target);
     }
-    if (Test(0x10, &source->reactionFlags))
+    if (Player_ReadStatusBits(&source->reactionFlags, 0x10))
         LinkSession_ClearFirstPlayerKind(&p->position, p->slot);
     if (InMode(p, 3)) {
         target->cost = 0;
         amount = 0;
-        if (Test(0x40000, &source->reactionFlags))
+        if (Player_ReadStatusBits(&source->reactionFlags, 0x40000))
             LinkPlayer_FlushPendingEffects(p);
         goto done;
     }
     if ((InMode(p, 5)) || p->tetherMode == 2 || p->actionMode == 4)
         shift++;
-    if (Test(4, &source->reactionFlags)) {
+    if (Player_ReadStatusBits(&source->reactionFlags, 4)) {
         if (!(target->costFlags & 2)) {
             if (p->contactSpecial == 0)
                 p->contactActionTag = 0x191;
             Player_QueueStatusEffect(p, 1);
         }
-    } else if (Test(8, &source->reactionFlags)) {
+    } else if (Player_ReadStatusBits(&source->reactionFlags, 8)) {
         if (!(target->costFlags & 2)) {
             if (p->contactSpecial == 0)
                 p->contactActionTag = 0x133;
             Player_QueueStatusEffect(p, 2);
         }
-    } else if (Test(0x40000, &source->reactionFlags))
+    } else if (Player_ReadStatusBits(&source->reactionFlags, 0x40000))
         LinkPlayer_FlushPendingEffects(p);
-    if (Test(0x8000, &source->reactionFlags))
+    if (Player_ReadStatusBits(&source->reactionFlags, 0x8000))
         sub_0813D834(p, 0, 0x708);
-    if (Test(0x100000, &source->reactionFlags))
+    if (Player_ReadStatusBits(&source->reactionFlags, 0x100000))
         sub_0813D834(p, 1, 0x384);
-    if (Test(0x20000, &source->reactionFlags)) {
+    if (Player_ReadStatusBits(&source->reactionFlags, 0x20000)) {
         struct ContactPosition a, b;
         s32 angle = ((p->facing + 5) & 7) << 5;
         s32 v;
@@ -125,9 +122,9 @@ u32 Player_ApplyContact(struct Player *p, struct ContactCollider *source,
     amount <<= shift;
     target->cost = 0;
     if (!(source->statRewardFlags & 0x10) && Test16(0xF, &source->contactFlags)) {
-        if (Test(0x20, &source->reactionFlags))
+        if (Player_ReadStatusBits(&source->reactionFlags, 0x20))
             sub_08242FAC(Player_FindMaskedSlot((const struct PlayerSelection *)source), amount);
-        if (Test(2, &source->reactionFlags))
+        if (Player_ReadStatusBits(&source->reactionFlags, 2))
             sub_08243020(Player_FindMaskedSlot((const struct PlayerSelection *)source), amount);
     }
     p->particleEmissionCount += amount;

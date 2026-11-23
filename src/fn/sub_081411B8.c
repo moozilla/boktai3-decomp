@@ -2,6 +2,7 @@
 #include "player.h"
 #include "directional_force.h"
 #include "ram.h"
+#include "player_slot_status.h"
 
 #define gSineTable gUnk_086149C4
 s32 Player_GetForceDirection(struct Player *);
@@ -12,10 +13,6 @@ static inline u32 Player_IsActiveInSceneFive(struct Player *p)
     if (p->active && p->sceneMode == 5)
         return 1;
     return 0;
-}
-static inline u32 Player_TestForceBlock(u32 *flags, u32 mask)
-{
-    return *flags & mask;
 }
 static inline s32 Player_ScaleForce(s32 value)
 {
@@ -31,7 +28,7 @@ void Player_ApplyDirectionalForce(struct Player *p)
         return;
     if (Player_IsActiveInSceneFive(p))
         return;
-    if (p && Player_TestForceBlock(&p->statBonusFlags, 0x80))
+    if (p && Player_ReadStatusBits(&p->statBonusFlags, 0x80))
         return;
     if (gPlayerBackgroundState < gPlayerDirectionLatch)
         return;
