@@ -144,10 +144,18 @@ const GOALS = {
         (dist.get(a.scene) ?? 1e9) - (dist.get(b.scene) ?? 1e9) || visited.has(a.scene) - visited.has(b.scene));
       event({ skill: 'room', ...L.where(), doors: doors.map((d) => `${d.box}->${d.scene}`) });
       let moved = false;
-      for (const d of doors) {
-        prev = here;
-        if (yield* throughDoor(g, L, d.box)) { moved = true; break; }
-        if (L.where().scene !== here) { moved = true; break; }
+      // a room can still be playing its arrival event (a dialogue that starts late, the
+      // map changing under the player): let it run and try the doors again
+      for (let round = 0; round < 4 && !moved; round++) {
+        if (round) {
+          event({ skill: 'wait', why: 'no door worked yet', round, ...L.where() });
+          yield* untilControl(g, L, () => true, 240, 6000);
+        }
+        for (const d of doors) {
+          prev = here;
+          if (yield* throughDoor(g, L, d.box)) { moved = true; break; }
+          if (L.where().scene !== here) { moved = true; break; }
+        }
       }
       if (!moved) { event({ skill: 'stop', why: 'no door worked', ...L.where() }); return rooms > 0; }
     }
