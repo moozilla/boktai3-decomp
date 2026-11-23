@@ -2177,16 +2177,7 @@ void SceneActorMotion_TestTargetTransition(struct ChaseActor *a)
                 u32 *flags = &context->flags;
                 s32 mask = -5;
                 *flags &= mask;
-                {
-                    u32 next = 17;
-                    u8 *state = &a->base.state2A8;
-                    u32 zero = 0;
-                    *state = zero;
-                    *((u8 *)a + 0x2A9) = zero;
-                    a->base.behavior2AA = next;
-                    a->base.counter2AC = zero;
-                    a->base.field2B1 = 1;
-                }
+                Chase_SetBehavior(a, 17);
             }
         }
     }
@@ -2208,17 +2199,6 @@ static inline u8 IsActive(u32 flags)
     return 0;
 }
 
-static inline void SetPhase(struct ChaseActor *a, u32 phase)
-{
-    u8 *state = &a->base.state2A8;
-    u32 zero = 0;
-    *state = zero;
-    a->base.phase2A9 = zero;
-    a->base.behavior2AA = phase;
-    a->base.counter2AC = zero;
-    a->base.field2B1 = 1;
-}
-
 void SceneActorMotion_UpdateTargetTransition(struct ChaseActor *a)
 {
     u32 *flags;
@@ -2230,7 +2210,7 @@ void SceneActorMotion_UpdateTargetTransition(struct ChaseActor *a)
         flags = address;
         if (IsActive(value)) {
             if (a->base.tracking.distance > c->timeLimit) {
-                SetPhase(a, 19);
+                Chase_SetBehavior(a, 19);
                 {
                     s32 angle = a->base.tracking.heading;
                     if (angle >= 0)
@@ -2244,9 +2224,9 @@ void SceneActorMotion_UpdateTargetTransition(struct ChaseActor *a)
                 *flags &= mask;
                 if (c->phase <= 3) {
                     if ((u8)Dog_SelectRetreatDirection(a, a->base.body.direction))
-                        SetPhase(a, 17);
+                        Chase_SetBehavior(a, 17);
                 } else {
-                    SetPhase(a, 19);
+                    Chase_SetBehavior(a, 19);
                     {
                         s32 angle = a->base.tracking.heading;
                         if (angle >= 0)
