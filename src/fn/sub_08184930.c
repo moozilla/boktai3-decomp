@@ -1,5 +1,5 @@
 #define gActorControllerDelayedTransitionAnimations gUnk_0824EEC0
-#include "scene_combat_actor.h"
+#include "scene_combat_colliders.h"
 
 extern u32 gActorControllerDelayedTransitionAnimations[];
 
