@@ -20,13 +20,8 @@ void PauseMenu_RefreshPriceDigits(struct SceneHudState *p)
     value = p->valueRate;
     if (value == 0) {
         data = &p->accountResource;
-        {
-            s32 zero = 0;
-            s32 *clear = &digits[3];
-            do {
-                *clear-- = zero;
-            } while ((s32)clear >= (s32)digits);
-        }
+        for (i = 0; i < 4; i++)
+            digits[i] = 0;
     } else {
         digits[0] = Div(value, 1000);
         value -= digits[0] * 1000;
@@ -44,13 +39,8 @@ void PauseMenu_RefreshPriceDigits(struct SceneHudState *p)
     WIDGET(p, 117).flags &= ~1;
     value = p->valueRate * p->selectedQuantity;
     if (value == 0) {
-        {
-            s32 zero = 0;
-            s32 *clear = &digits[3];
-            do {
-                *clear-- = zero;
-            } while ((s32)clear >= (s32)digits);
-        }
+        for (i = 0; i < 4; i++)
+            digits[i] = 0;
     } else {
         digits[0] = Div(value, 1000);
         value -= digits[0] * 1000;
