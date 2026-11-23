@@ -117,7 +117,7 @@ def main():
     # the hooks go in before inlining, so inlined copies keep them; stage 3 optimizes.
     flags = ['--target=wasm32', '-ffreestanding', '-std=gnu89', '-O2', '-Xclang', '-disable-llvm-passes',
              '-funsigned-char', '-fno-strict-aliasing',
-             '-fwrapv', '-fno-builtin', '-Wno-everything', '-Iport/include', '-Iport/core',
+             '-fwrapv', '-fno-builtin', '-Wno-everything', '-DUBFIX', '-Iport/include', '-Iport/core',
              '-Iport/game', '-Iport/hw', '-I' + str(headers), '-iquote', '.',
              '-include', 'port/core/compat.h']
     if args.trace:

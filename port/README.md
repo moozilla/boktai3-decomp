@@ -592,6 +592,27 @@ uses valid inactive sound state and leaves wireless uncreated; active audio/RFU
 callbacks are not covered. This focused resolver
 is a tested integration boundary, not the full game's callback registry.
 
+## Undefined behavior the GBA forgives (UBFIX)
+
+Some original code relies on what a register happens to hold: a call passing fewer
+arguments than the callee takes (the callee reads the caller's leftover r0-r3), or a
+non-void function that falls off the end while its caller tests the result (the caller
+reads whatever r0 held). On the GBA this works by accident; compiled for wasm the value is
+undefined. The source states the value instead, one call site at a time:
+
+* If writing the argument (or return) explicitly still matches (`tools/check.py`), the
+  original wrote it and the decompiled C had dropped it: the source just says it.
+* Otherwise the matching form stays, and the explicit form goes under pret's convention,
+  `#ifdef UBFIX` ... `#else` ... `#endif`, with a comment naming the inherited register
+  value. `port/build_game.py` compiles the game with `-DUBFIX`; the matching build never
+  defines it, and it is never used to steer matching.
+
+`build/port/game/padded_calls.txt` lists the short calls that remain (the ABI pass still
+pads them from the caller's registers or the last call's result as a fallback), and
+`unknown_registers.txt` the ones it cannot pad. Divergences the autopilot found this way:
+`LinkedWidgetSet_Init` fell off the end, so the floating-item effect manager was killed at
+creation on the port, which skipped random draws and desynced every later random number.
+
 ## Discarded return declarations
 
 `core/returns.py` records the actual integer return types of 25 frequently called
