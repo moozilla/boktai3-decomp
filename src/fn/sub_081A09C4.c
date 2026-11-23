@@ -1,7 +1,5 @@
 #include "hresvelgr_travel.h"
 
-void ActionState_Reset(struct BossActionState *);
-void ActionState_AdvanceState(struct BossActionState *);
 void Hresvelgr_SetAnimation(struct HresvelgrTravelActor *, void *, void *, u32, u32, u32);
 void Anim_SetFrameDurationScale(void *, u32);
 void OffsetActor_StepTowardTarget(struct HresvelgrTravelActor *);
@@ -9,11 +7,8 @@ void Sound_PlaySong(u32);
 /* Returns TRUE once the actor has reached the landing height. */
 static inline s32 Hresvelgr_Descend(struct HresvelgrTravelActor *actor)
 {
-    {
-        u32 mask = 0x200000;
-        actor->flags |= mask;
-        actor->flags |= 12;
-    }
+    Hresvelgr_SetFlags(actor, 0x200000);
+    actor->flags |= 12;
     if (actor->changed) {
         actor->changed = 0;
         Hresvelgr_RefreshTarget(actor);
