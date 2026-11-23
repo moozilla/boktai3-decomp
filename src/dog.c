@@ -1825,21 +1825,6 @@ static inline void Dog_ResetAnimation(struct ChaseActor *actor, u32 state, u32 p
     actor->base.field2B1 = 1;
 }
 
-static inline void Dog_SetControl(struct ChaseActor *actor, u32 kind, void *control)
-{
-    u32 *flags;
-    u32 mask;
-    actor->base.field2B2 = 1;
-    actor->base.stepDone = 0;
-    actor->base.controlKind = kind;
-    actor->base.target = control;
-    actor->base.field2C8 = 0;
-    flags = &actor->base.pendingControlFlags;
-    mask = ~1;
-    *flags &= mask;
-    actor->base.pendingControl = 0;
-}
-
 void Dog_UpdateTurnSequence(struct ChaseActor *actor, s32 frame)
 {
     struct SceneActorChaseGroup *group = &actor->group;
@@ -1855,7 +1840,7 @@ void Dog_UpdateTurnSequence(struct ChaseActor *actor, s32 frame)
             u32 encoded;
             Dog_ResetAnimation(actor, 3, 1);
             data = actor->base.onEntry;
-            Dog_SetControl(actor, 2, (void *)data);
+            SceneActorChase_SetControl(actor, (void *)data, 2);
             if (group->turn.turnsRemaining == 1) {
                 encoded = ((group->turn.savedDirection >> 5) + 3) & 7;
                 actor->base.nextDirection = encoded;
@@ -1895,7 +1880,7 @@ void Dog_UpdateTurnSequence(struct ChaseActor *actor, s32 frame)
             u32 kind = saved->kind;
             void *control = saved->control;
             u32 state, phase, behavior;
-            Dog_SetControl(actor, kind, control);
+            SceneActorChase_SetControl(actor, control, kind);
             state = saved->state;
             phase = saved->phase;
             behavior = saved->behavior;
