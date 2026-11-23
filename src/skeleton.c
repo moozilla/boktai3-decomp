@@ -582,8 +582,7 @@ s32 SceneActorTerrain_CompareNeighborHeight(s32 cell, s32 height, s32 direction)
     kind = *SceneActorTerrain_GetCell(cell) >> 4;
     {
         u32 flags = ((struct SceneActorChaseTerrainCell *)SceneActorTerrain_GetCell(cell))->flags;
-        u32 mask = 3;
-        if (flags & mask) {
+        if (flags & 3) {
             if (nextHeight >= height)
                 return 1;
             return 2;
