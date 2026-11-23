@@ -29,11 +29,11 @@
 #include "scene_actor_init_primitives.h"
 #include "scene_actor_init_graphics.h"
 
-void SceneActorBehavior_ApplyContactReaction(void);
+void SceneActorBehavior_ApplyContactReaction(void *, void *, void *);
 
-void Octopus_OnBodyContact(void)
+void Octopus_OnBodyContact(void *source, void *destination, void *actor)
 {
-    SceneActorBehavior_ApplyContactReaction();
+    SceneActorBehavior_ApplyContactReaction(source, destination, actor);
 }
 
 void Octopus_OnAttackContact(void)
@@ -1620,7 +1620,7 @@ void SceneActorCollision_InitBodyWithFlags(struct ChaseActor *, void *, void *, 
 void SceneActorCollision_InitAttack(struct ChaseActor *, void *, void *, void (*)(void), u32,
                                     void *);
 
-void Octopus_OnBodyContact(void);
+void Octopus_OnBodyContact(void *, void *, void *);
 
 void Octopus_OnAttackContact(void);
 
@@ -1903,11 +1903,11 @@ s32 Octopus_Update(struct SUpdate *s)
     return 1;
 }
 
-void SceneActor_UpdateActiveCallbacks(void);
+void SceneActor_UpdateActiveCallbacks(void *);
 
-s32 Octopus_UpdateInteraction(void)
+s32 Octopus_UpdateInteraction(void *actor)
 {
-    SceneActor_UpdateActiveCallbacks();
+    SceneActor_UpdateActiveCallbacks(actor);
     return 0;
 }
 
@@ -1991,7 +1991,7 @@ void Octopus_InitControlPresets(struct SInitControlPresets *s);
 
 void Octopus_BeginIdleAnimation(struct ChaseActor *actor);
 
-s32 Octopus_UpdateInteraction(void);
+s32 Octopus_UpdateInteraction(void *);
 
 u32 Octopus_Destroy(struct SDestroy *s);
 
