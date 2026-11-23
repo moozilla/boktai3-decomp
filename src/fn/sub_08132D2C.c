@@ -203,8 +203,8 @@ u32 SceneActorReaction_DefeatRecordStats(struct ChaseActor *actor)
             Player_RefreshLifeState(actor->base.hitAttributes, actor->base.fieldA1);
         }
     record:
-        if (!SceneActorChase_Test(Mask(flags2C0, 0x80), ~0) && !SceneActorChase_Test(gEngineFlags, 0x4800) &&
-            !Flag2D0(actor, 0x800))
+        if (!SceneActorChase_Test(Mask(flags2C0, 0x80), ~0) &&
+            !SceneActorChase_Test(gEngineFlags, 0x4800) && !Flag2D0(actor, 0x800))
             SceneActorRecord_RecordPair(gScriptEntryProcedure, actor->base.body.id);
         ((struct ContactCollider *)collider)->flags |= 4;
     done:

@@ -37,7 +37,8 @@ u8 SceneActorReaction_BeginTargetRecovery(struct ChaseActor *actor)
 {
     struct SceneActorChaseGroup *group = &actor->group;
     struct SceneActorReactionMotion *motion;
-    if (!ActorStatus_BehaviorFlags(actor, 0x400000) || !ActorStatus_BehaviorFlags(actor, 0x200000) ||
+    if (!ActorStatus_BehaviorFlags(actor, 0x400000) ||
+        !ActorStatus_BehaviorFlags(actor, 0x200000) ||
         !HasTargetFlag(&motion, MakeMotionPointer(actor), 1))
         return 0;
     SceneActorChase_SetActorFlags(actor, 0x100);

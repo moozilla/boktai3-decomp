@@ -15,7 +15,8 @@ s32 SceneActorTarget_CanReplaceByDistance(struct ChaseActor *actor,
     distance = delta.x * delta.x + delta.z * delta.z;
     if (!actor->base.tracking.target)
         return 1;
-    SceneActorTerrain_Subtract(&delta, &actor->base.tracking.target->position, &actor->base.body.position);
+    SceneActorTerrain_Subtract(&delta, &actor->base.tracking.target->position,
+                               &actor->base.body.position);
     if (delta.x * delta.x + delta.z * delta.z < distance)
         return 0;
     return 1;

@@ -6,7 +6,6 @@
 #include "scene_actor_terrain.h"
 #include "scene_actor_reset.h"
 
-
 static inline u32 TestSlot(s32 i)
 {
     u32 mask = 8;
@@ -50,7 +49,8 @@ static inline s32 FindNearestEligiblePlayer(struct ChaseActor *actor)
     return best;
 }
 
-static inline u8 MoveTo(struct ChaseActor *actor, struct SceneActorChaseGroup *group, struct Player **slot)
+static inline u8 MoveTo(struct ChaseActor *actor, struct SceneActorChaseGroup *group,
+                        struct Player **slot)
 {
     void *shape = group->route;
     struct ContactPosition *position = &actor->base.body.position;
