@@ -412,6 +412,10 @@ s32 SceneTransition_Initialize(struct SceneTransition *transition, void *scriptA
     }
     transition->target = RegistryF3E4_CreateHidden(2, 0);
     transition->particleFlags = 1;
+#ifdef UBFIX
+    // falls off the end; r0 still holds the RegistryF3E4_CreateHidden result (a heap pointer)
+    return (s32)transition->target;
+#endif
 }
 
 void *Task_Create(u32, u32);
