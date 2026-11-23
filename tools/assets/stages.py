@@ -201,7 +201,7 @@ class Walker:
         if pid in ENEMY_PROCS and spawner is None:
             spawner = dict(rec, families=[], name=None, path=None)
             o["enemies"].append(spawner)
-        elif not self.local(pid) and spawner is None:
+        elif not self.local(pid) and spawner is None and depth > 1:  # the scene's own calls are walked
             o["calls"].append(rec)
             return
         if depth > 8 or (pid, tuple(ops)) in self.visited:
@@ -361,6 +361,24 @@ def build(only=None):
         hps[h] = hpmod.decode(raw)
     names = dict(text.strings(rom))
     todo = [s["scene"] for s in sc if not only or s["scene"] in only]
+    if not only:
+        # every procedure whose first statement calls scene_start (proc_861) is a scene,
+        # including ones only reached by a transition without a box (2537 after the
+        # first dungeon, from a continue procedure)
+        known = set(todo)
+        for pid in range(1, 4096):
+            span = w.body(pid)
+            if pid in known or not span:
+                continue
+            # the call is the first statement, or the first one inside a leading `if`
+            b, p, end = w.b, span[0], min(span[1], span[0] + 48)
+            while p < end:
+                if b[p] >> 4 == 7:
+                    start, _ = gcx.length(b, p)
+                    if (b[start] | b[start + 1] << 8) == 861:
+                        todo.append(pid)
+                    break
+                p += 1
     out, seen = [], set(todo)
     while todo:  # door destinations that scenes.py does not list are scenes too
         s = resolve(w.scene(todo.pop(0)), hps, names)
