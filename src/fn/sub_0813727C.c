@@ -1,14 +1,12 @@
 #include "global.h"
 #include "scene_actor_terrain.h"
 #include "scene_actor_reset.h"
+#include "scene_actor_chase_shared.h"
 
 #define gPlayerSlotFlags gUnk_02000560
 extern u32 gUnk_02000560;
 s32 Callback_InvokeActor(void *, void *);
-void SceneActorAnimation_SelectDirectionalEntry(void *, u32);
 void SceneActorAttachment_ReplaceResponseSlot(void *, u32, u32, u32);
-u32 Nav_IsPositionInMesh(void *, struct ContactPosition *, void *);
-s32 Terrain_ApplyBlocked(void *, struct ContactPosition *, void *);
 void SceneActorReaction_RestoreAfterDelay(void *);
 
 static inline u32 ActorFlag(struct ChaseActor *actor, u32 input, u32 offset)
@@ -71,10 +69,6 @@ static inline u32 CellIndex(struct ContactPosition *p)
     return gTerrainMap->rows[z] + x;
 }
 
-static inline void ClearWordFlags(u32 *flags, u32 mask)
-{
-    *flags &= mask;
-}
 
 struct FlagHalfword {
     s16 bits;
@@ -153,7 +147,7 @@ static inline void ResetControl(struct ChaseActor *actor, u32 enabled, u16 *flag
 {
     struct SceneActorRegistryControl *control = &actor->group.common.control;
     if (enabled) {
-        ClearWordFlags(&actor->base.statusFlags, ~0x1000000);
+        SceneActorChase_AndWordFlags(&actor->base.statusFlags, ~0x1000000);
         ClearHalfFlags(flags, ~0x200);
         control->mode = 0;
         control->counter = 0;
