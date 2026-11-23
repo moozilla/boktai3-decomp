@@ -2587,71 +2587,26 @@ void Dog_UpdateArrivalAnimation(struct ChaseActor *a);
 
 void SceneActorBehavior_CallActionScript(u8 *);
 
-struct Sscripted {
-    u8 pad0[0x59];
-    u8 at59;
-    u8 pad1[0x98 - 0x5A];
-    u8 at98;
-    u8 pad2[0xE9 - 0x99];
-    u8 atE9;
-    u8 pad3[0x104 - 0xEA];
-    u32 at104;
-    u8 pad4[0x114 - 0x108];
-    u32 flags114;
-    u8 pad5[0x21C - 0x118];
-    void (*callback)(void);
-    u8 pad6[0x2AC - 0x220];
-    u32 counter;
-    u8 done;
-    u8 queued;
-    u8 taken;
-    u8 pad7[2];
-    u8 code;
-    u8 pad8[0x2C8 - 0x2B6];
-    u16 at2C8;
-    u8 pad9[0x2D4 - 0x2CA];
-    u16 flags2D4;
-    u8 pad10[0x414 - 0x2D6];
-    u16 flags414;
-    u16 at416;
-    u16 at418;
-};
-
-void Dog_UpdateScriptedAction(struct Sscripted *obj)
+void Dog_UpdateScriptedAction(struct ChaseActor *actor)
 {
-    if (SceneActorControl_TakeFlag(((u8 *)obj) + 0x2B1)) {
-        u16 *h;
-        u16 value;
-        s32 off;
-        SceneActorChase_SetControl(obj, Dog_UpdateArrivalAnimation, 10);
-        {
-            u32 byte = obj->atE9;
-            obj->at59 = byte;
-        }
-        SceneActorAttachment_ReplaceResponseSlot((u8 *)obj, 0, 0, obj->at98);
-        SceneActorBehavior_CallActionScript((u8 *)obj);
-        h = (u16 *)(((u8 *)obj) + 0x414);
-        {
-            u32 flag = 4;
-            flag |= *h;
-            *h = flag;
-        }
+    if (SceneActorControl_TakeFlag(&actor->base.field2B1)) {
+        SceneActorChase_SetControl(actor, Dog_UpdateArrivalAnimation, 10);
+        actor->base.body.direction = actor->base.tracking.heading;
+        SceneActorAttachment_ReplaceResponseSlot(actor, 0, 0, actor->base.category);
+        SceneActorBehavior_CallActionScript((u8 *)actor);
+        SceneActorChase_GroupSetFlags(&actor->group, 4);
         {
             u32 flag = 0x80;
-            u16 *flags = (u16 *)(((u8 *)obj) + 0x2D4);
+            u16 *flags = &actor->base.motionFlags;
             flag |= *flags;
             *flags = flag;
         }
-        off = 0x416;
-        value = *((u16 *)(((u8 *)obj) + off));
-        off += 2;
-        *((u16 *)(((u8 *)obj) - (-off))) = value;
+        actor->group.common.gate.counter = actor->group.common.gate.duration;
     }
-    if (obj->done) {
-        Dog_SelectTargetAction((u8 *)obj);
-    } else {
-        ++(*((u32 *)(((u8 *)obj) + 0x2AC)));
-    }
+    if (actor->base.stepDone)
+        Dog_SelectTargetAction(actor);
+    else
+        actor->base.counter2AC++;
 }
 
 /* Queue pursuit, a home route, or the short waiting response after the delay. */
