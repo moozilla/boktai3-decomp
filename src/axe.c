@@ -8,6 +8,7 @@
 #include "rotation_phase.h"
 #include "scene_actor_reset.h"
 #include "axe.h"
+#include "math_shift.h"
 #include "word_flags.h"
 #include "scene_actor_animation.h"
 #include "scene_actor_state.h"
@@ -729,21 +730,16 @@ static inline void Control(struct RoomActor *a, void *callback, u32 phase)
 
 // confidence=low: turns one octant toward the requested direction on animation ticks.
 
-static inline u32 Arg1(u32 k_, struct RoomActor *actor)
-{
-    return (*((u16 *)(((u8 *)actor) + 0x2D4))) & k_;
-}
-
 void Axe_UpdateTurnAnimation(struct RoomActor *actor, u32 events)
 {
-    u8 *direction = ((u8 *)actor) + 0x50;
+    u8 *direction = (u8 *)&actor->body;
     struct DisplaySequenceState *sequence;
     if (Take(&actor->field2B2)) {
         s32 current = ((actor->body.direction + 0x70) >> 5) & 7;
         s32 target = ((actor->nextDirection + 0x70) >> 5) & 7;
         if (current == target) {
             actor->body.direction = actor->nextDirection;
-            SceneActorChase_SetControl(actor, *((void **)(((u8 *)actor) + 0x22C)), 0);
+            SceneActorChase_SetControl(actor, actor->onStanding, 0);
             actor->stepDone = 1;
             return;
         }
@@ -751,12 +747,12 @@ void Axe_UpdateTurnAnimation(struct RoomActor *actor, u32 events)
         {
             s32 k1 = 4;
             if (((u8)((current - target) & 7)) <= k1) {
-                u32 *p = (u32 *)(((u8 *)actor) + 0x2CC);
+                u32 *p = &actor->behaviorFlags;
                 u32 mask = ~0x10000;
                 *p &= mask;
             } else {
                 u32 mask = 0x10000;
-                *((u32 *)(((u8 *)actor) + 0x2CC)) |= mask;
+                actor->behaviorFlags |= mask;
             }
         }
     }
@@ -790,7 +786,7 @@ void Axe_UpdateTurnAnimation(struct RoomActor *actor, u32 events)
         u32 variant;
         u32 flags;
         u32 selection;
-        SceneActorChase_SetControl(actor, *((void **)(((u8 *)actor) + 0x224)), 2);
+        SceneActorChase_SetControl(actor, actor->onEntry, 2);
         if (Flags_MaskedWord(0x10000, &actor->behaviorFlags))
             direction[9] += 32;
         else
@@ -896,14 +892,14 @@ void Axe_ConvergeRecoveryMotion(struct ChaseActor *actor)
     }
     {
         s32 current = actor->base.reactionStart.x;
-        s16 *field = (void *)((u8 *)actor + 0x318);
+        s16 *field = &actor->base.reactionEnd.x;
         s32 difference = current - *field;
         priorX = field;
         x = Quarter(difference);
     }
     {
         s32 current = actor->base.reactionStart.z;
-        s16 *field = (void *)((u8 *)actor + 0x31C);
+        s16 *field = &actor->base.reactionEnd.z;
         s32 difference = current - *field;
         priorZ = field;
         z = Quarter(difference);
@@ -1320,7 +1316,7 @@ void Axe_UpdateHealthPacedMotion(struct ChaseActor *actor)
     s32 speed;
     if (SceneActorControl_TakeFlag(&actor->base.field2B1))
         SetControl(actor, actor->base.onStanding, 0);
-    if ((u8)Callback_InvokeActor(actor, *(void **)((u8 *)actor + 0x270)) && Axe_PickAttack(actor))
+    if ((u8)Callback_InvokeActor(actor, actor->base.contactQuery.opaque) && Axe_PickAttack(actor))
         return;
     if (actor->base.health <= *(s32 *)(context + 0xE48)) {
         speed = 8;
