@@ -2,6 +2,8 @@
 #include "contact_collider.h"
 #include "ram.h"
 #include "engine_globals.h"
+#include "player_slot_status.h"
+#include "scene_pause.h"
 struct NidhoggrEffectVector {
     u16 x, y, z, pad;
 };
@@ -19,7 +21,6 @@ struct NidhoggrFallingEffect {
     u8 unknown180[4];
     u8 *boss;
 };
-extern u32 gUnk_02000560;
 extern const struct NidhoggrEffectPair gUnk_0824F244, gUnk_0824F25C, gUnk_0824F24C, gUnk_0824F254;
 struct NidhoggrFallingEffect *SceneEffectPool_AllocateSlot(void *);
 void SceneEffect_ResetState(void *);
@@ -37,10 +38,6 @@ void Collider_Refresh(void *);
 void Sound_PlaySongChecked(u32);
 void ScaledShadow_InitializeDefaultSmall(void *, void *);
 void ScaledShadow_Disable(void *);
-static inline u32 ReadBlockFlag(u32 mask)
-{
-    return gUnk_02000560 & mask;
-}
 // confidence=low: allocates a falling effect with attack/body colliders and an initially disabled shadow.
 #define Nidhoggr_CreateFallingAttackEffect sub_0818FA54
 void Nidhoggr_CreateFallingAttackEffect(u8 *owner, struct NidhoggrEffectVector *anchor,
@@ -50,12 +47,9 @@ void Nidhoggr_CreateFallingAttackEffect(u8 *owner, struct NidhoggrEffectVector *
     u8 *animation, *collider, *shadow;
     struct NidhoggrEffectVector *position;
     void (*callback)(void *);
-    u32 mask = 0x400;
-    u32 zero;
-    if ((gEngineFlags | gScenePauseFlags) & mask)
+    if (Scene_TestPauseFlags(0x400))
         return;
-    zero = ReadBlockFlag(4);
-    if (zero)
+    if (PlayerSlot_ReadStatus(0, 4))
         return;
     effect = SceneEffectPool_AllocateSlot(owner);
     if (!effect)
@@ -71,7 +65,7 @@ void Nidhoggr_CreateFallingAttackEffect(u8 *owner, struct NidhoggrEffectVector *
     AnimData_Load(animation, 0xc7ed);
     AnimData_SelectPaletteBank(animation, 0x1a6);
     Sprite_Init(effect->sprite, animation, 0);
-    Anim_RestartSequence((u8 *)effect + 0x50, *(void **)(owner + 0x53ac), 3, 0, zero);
+    Anim_RestartSequence((u8 *)effect + 0x50, *(void **)(owner + 0x53ac), 3, 0, 0);
     effect->anchor = anchor;
     effect->offset = *offset;
     position = &effect->position;
@@ -85,26 +79,22 @@ void Nidhoggr_CreateFallingAttackEffect(u8 *owner, struct NidhoggrEffectVector *
     *(struct NidhoggrEffectPair *)(collider + 0x14) = gUnk_0824F25C;
     {
         struct ContactCollider *attack = (void *)collider;
-        u32 collisionMask;
-        collisionMask = 4;
-        attack->flags |= collisionMask;
-        Collider_SetAttackProperties(collider, 0, 0, 0, zero, zero);
+        struct ContactCollider *body;
+        u32 attackFlag = 4;
+        attack->flags |= attackFlag;
+        Collider_SetAttackProperties(collider, 0, 0, 0, 0, 0);
         callback = Nidhoggr_OnEffectCollision;
         Collider_SetCallback(collider, callback, effect);
+        collider = (u8 *)effect + 0x120;
+        *(struct NidhoggrEffectPair *)(collider + 0x1c) = gUnk_0824F24C;
+        *(struct NidhoggrEffectPair *)(collider + 0x14) = gUnk_0824F254;
+        body = (void *)collider;
+        body->flags &= ~attackFlag;
         {
-            u32 bodyOffset = 0x120;
-            struct ContactCollider *body;
-            collider = (u8 *)effect + bodyOffset;
-            *(struct NidhoggrEffectPair *)(collider + 0x1c) = gUnk_0824F24C;
-            *(struct NidhoggrEffectPair *)(collider + 0x14) = gUnk_0824F254;
-            body = (void *)collider;
-            body->flags &= ~collisionMask;
-            {
-                u32 add = 0x1008;
-                body->flags |= add;
-            }
-            Collider_SetBodyProperties(collider, 1, bodyOffset, 16);
+            u32 bodyFlags = 0x1008;
+            body->flags |= bodyFlags;
         }
+        Collider_SetBodyProperties(collider, 1, 0x120, 16);
     }
     Collider_SetCallback(collider, callback, effect);
     Collider_Refresh(collider);
