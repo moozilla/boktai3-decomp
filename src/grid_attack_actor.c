@@ -54,7 +54,7 @@ void GridAttack_UpdateCollidersAndPalette(struct GridAttackActor *p);
 
 void SceneActors_Destroy(struct GridAttackActor *);
 
-struct GridAttackActor *SceneActors_GetBySlot(void);
+struct GridAttackActor *SceneActors_GetBySlot(u32);
 
 s32 GridAttackActor_Initialize(struct GridAttackActor *, u32);
 
@@ -1932,8 +1932,7 @@ s32 GridAttackActor_Initialize(struct GridAttackActor *p, u32 ctx)
 struct GridAttackActor *GridAttackActor_Create(u32 a)
 {
     struct GridAttackActor *p;
-    Script_GetKeywordValue(0x74, 3);
-    p = SceneActors_GetBySlot();
+    p = SceneActors_GetBySlot(Script_GetKeywordValue(0x74, 3));
     if (p != 0)
         return p;
     p = Task_Create(8, 0x924);
