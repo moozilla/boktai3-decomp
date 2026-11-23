@@ -669,9 +669,7 @@ void Bat_UpdateDefeat(struct ChaseActor *actor, s32 frame)
             Sound_PlaySong(0x12A);
         {
             struct SceneActorRegistryControl *control = &actor->group.common.control;
-            u32 *field = &actor->base.behaviorFlags;
-            u32 mask = ~0x141C0;
-            *field &= mask;
+            SceneActorChase_ClearWordFlags(&actor->base.behaviorFlags, 0x141C0);
             control->counter = 0;
             control->field14 = 0;
             control->timer = 0;
