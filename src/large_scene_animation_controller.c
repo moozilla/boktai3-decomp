@@ -1190,13 +1190,6 @@ void Nidhoggr_EmitSparks(u32 a)
 
 /* Collider-contact callback for Nidhoggr's grouped and independent body parts. */
 /* The two grouped-health pools and their damage stages are indexed together. */
-struct NidhoggrGroupHealth {
-    u8 unk_00[0x724F];
-    u8 state[2];
-    u8 unk_7251[0x728A - 0x7251];
-    s16 hp[2];
-};
-
 void Collision_CalculateDamageResponse(void *, void *);
 void PlayerStats_AddContactHundredths(void *, void *, s32);
 s32 sub_08249420(s32, s32);
@@ -1208,7 +1201,7 @@ void Sound_PlaySongChecked(u32);
 
 static inline u8 *GetGroupStages(struct Nidhoggr *p)
 {
-    return ((struct NidhoggrGroupHealth *)p)->state;
+    return &p->flags[3];
 }
 
 void Nidhoggr_ReceivePartContact(void *src, struct ContactCollider *c, struct Nidhoggr *input)
@@ -1224,31 +1217,31 @@ void Nidhoggr_ReceivePartContact(void *src, struct ContactCollider *c, struct Ni
     t = input;
     Collision_CalculateDamageResponse(src, c);
     dmg = c->cost;
-    PlayerStats_AddContactHundredths(src, c, (s16)t->optionS);
+    PlayerStats_AddContactHundredths(src, c, t->optionS);
     part = (u32)c - (u32)&t->colliders[0];
     part /= sizeof(t->colliders[0]);
     if (t->rowBlink[part] != 0)
         return;
     t->rowBlink[part] = ((struct ContactCollider *)src)->responseValue;
 
-    total = t->groupHpA + t->groupHpB;
+    total = t->groupHp[0] + t->groupHp[1];
     if ((u32)part <= 1) {
-        quarter = (s16)t->optionY >> 2;
-        half = (s16)t->optionY >> 1;
-        threeQuarters = ((s16)t->optionY * 3) >> 2;
+        quarter = t->optionY >> 2;
+        half = t->optionY >> 1;
+        threeQuarters = (t->optionY * 3) >> 2;
         slot = part;
-        if (((struct NidhoggrGroupHealth *)t)->hp[slot] <= 0)
+        if (t->groupHp[slot] <= 0)
             return;
         if (t->attackActive == 0) {
             Sound_PlaySongChecked(0x211);
             return;
         }
-        ((struct NidhoggrGroupHealth *)t)->hp[slot] -= dmg;
-        if (((struct NidhoggrGroupHealth *)t)->hp[slot] < 0) {
-            dmg += ((struct NidhoggrGroupHealth *)t)->hp[slot];
-            ((struct NidhoggrGroupHealth *)t)->hp[slot] = slotState;
+        t->groupHp[slot] -= dmg;
+        if (t->groupHp[slot] < 0) {
+            dmg += t->groupHp[slot];
+            t->groupHp[slot] = slotState;
         }
-        total = t->groupHpA + t->groupHpB;
+        total = t->groupHp[0] + t->groupHp[1];
         if (total <= 0 && t->mode != 6)
             Nidhoggr_SetBehavior(t, 12);
         t->life -= dmg;
@@ -1265,7 +1258,7 @@ void Nidhoggr_ReceivePartContact(void *src, struct ContactCollider *c, struct Ni
             DamageNumberDisplay_Show(c, dmg, 0, &c->position, &c->offset, 1);
             PaletteEffect_StartSpriteOverride(&t->rows[part], 8, 1);
         }
-        if (((struct NidhoggrGroupHealth *)t)->hp[slot] > 0) {
+        if (t->groupHp[slot] > 0) {
             if (slot)
                 t->flags[2] &= 0xF7;
             else
@@ -1284,22 +1277,22 @@ void Nidhoggr_ReceivePartContact(void *src, struct ContactCollider *c, struct Ni
             Sound_PlaySongChecked(0x1BB);
             Nidhoggr_CreateBurstEffects(&t->effectPool, &c->x);
         }
-        if (((struct NidhoggrGroupHealth *)t)->hp[slot] > threeQuarters) {
+        if (t->groupHp[slot] > threeQuarters) {
             if (GetGroupStages(t)[slot] != 0)
                 GetGroupStages(t)[slot] = 0;
             return;
         }
-        if (((struct NidhoggrGroupHealth *)t)->hp[slot] > half) {
+        if (t->groupHp[slot] > half) {
             if (GetGroupStages(t)[slot] != 1)
                 GetGroupStages(t)[slot] = 1;
             return;
         }
-        if (((struct NidhoggrGroupHealth *)t)->hp[slot] > quarter) {
+        if (t->groupHp[slot] > quarter) {
             if (GetGroupStages(t)[slot] != 2)
                 GetGroupStages(t)[slot] = 2;
             return;
         }
-        if (((struct NidhoggrGroupHealth *)t)->hp[slot] > 0) {
+        if (t->groupHp[slot] > 0) {
             if (GetGroupStages(t)[slot] != 3)
                 GetGroupStages(t)[slot] = 3;
             return;
@@ -1380,7 +1373,7 @@ void Nidhoggr_ReceivePartContact(void *src, struct ContactCollider *c, struct Ni
 
 /* Tentative: sibling of Nidhoggr_ReceivePartContact (also assigned via Nidhoggr_InitParts's literal pool, used
  * once rather than five times), taking the same (task, index, damage) shape and operating
- * on t->groupHpA/groupHpB (0x728A/0x728C) and t->maxHp-derived scaling from t->optionY
+ * on t->groupHp[0]/groupHp[1] (0x728A/0x728C) and t->maxHp-derived scaling from t->optionY
  * (0x726C). 964 bytes; not attempted byte-for-byte this pass. confidence=low. */
 
 /* Applies collider damage to Nidhoggr's two health groups or nine independent parts.
@@ -1407,18 +1400,18 @@ s32 Nidhoggr_ApplyPartDamage(struct ContactCollider *collider, s32 kind, s32 amo
         s32 quarter, half, threeQuarters;
         u8 *stage;
         u32 next;
-        quarter = (s16)p->optionY >> 2;
-        half = (s16)p->optionY >> 1;
-        threeQuarters = ((s16)p->optionY * 3) >> 2;
+        quarter = p->optionY >> 2;
+        half = p->optionY >> 1;
+        threeQuarters = (p->optionY * 3) >> 2;
         part = slot;
-        if (((struct NidhoggrGroupHealth *)p)->hp[slot] <= 0)
+        if (p->groupHp[slot] <= 0)
             return 0;
-        ((struct NidhoggrGroupHealth *)p)->hp[slot] -= damage;
-        if (((struct NidhoggrGroupHealth *)p)->hp[slot] < 0) {
-            damage += ((struct NidhoggrGroupHealth *)p)->hp[slot];
-            ((struct NidhoggrGroupHealth *)p)->hp[slot] = 0;
+        p->groupHp[slot] -= damage;
+        if (p->groupHp[slot] < 0) {
+            damage += p->groupHp[slot];
+            p->groupHp[slot] = 0;
         }
-        if (p->groupHpA <= 0 && p->groupHpB <= 0 && p->mode != 6)
+        if (p->groupHp[0] <= 0 && p->groupHp[1] <= 0 && p->mode != 6)
             Nidhoggr_SetBehavior(p, 12);
         p->life -= damage;
         if (p->life <= 0) {
@@ -1433,7 +1426,7 @@ s32 Nidhoggr_ApplyPartDamage(struct ContactCollider *collider, s32 kind, s32 amo
                                      1);
             PaletteEffect_StartSpriteOverride(&p->rows[slot], 8, 1);
         }
-        if (((struct NidhoggrGroupHealth *)p)->hp[part] > 0) {
+        if (p->groupHp[part] > 0) {
             if (part)
                 p->flags[2] &= ~8;
             else
@@ -1444,22 +1437,22 @@ s32 Nidhoggr_ApplyPartDamage(struct ContactCollider *collider, s32 kind, s32 amo
             else
                 p->flags[2] |= 4;
         }
-        if (((struct NidhoggrGroupHealth *)p)->hp[part] > threeQuarters) {
+        if (p->groupHp[part] > threeQuarters) {
             if (*(stage = GetGroupStages(p) + part) != 0) {
                 next = 0;
                 goto setStage;
             }
-        } else if (((struct NidhoggrGroupHealth *)p)->hp[part] > half) {
+        } else if (p->groupHp[part] > half) {
             if (*(stage = GetGroupStages(p) + part) != 1) {
                 next = 1;
                 goto setStage;
             }
-        } else if (((struct NidhoggrGroupHealth *)p)->hp[part] > quarter) {
+        } else if (p->groupHp[part] > quarter) {
             if (*(stage = GetGroupStages(p) + part) != 2) {
                 next = 2;
                 goto setStage;
             }
-        } else if (((struct NidhoggrGroupHealth *)p)->hp[part] > 0) {
+        } else if (p->groupHp[part] > 0) {
             if (*(stage = GetGroupStages(p) + part) != 3) {
                 next = 3;
                 goto setStage;
@@ -3135,7 +3128,7 @@ void Nidhoggr_UpdateTimedAttackSequence(struct Nidhoggr *t)
             break;
         case 6:
             if (gGameState->positionX > 0xeff) {
-                if ((t->groupHpA <= 0 && t->groupHpB <= 0) || t->life <= 0)
+                if ((t->groupHp[0] <= 0 && t->groupHp[1] <= 0) || t->life <= 0)
                     Nidhoggr_SetBehavior(t, 12);
                 else
                     Nidhoggr_SetBehavior(t, 10);
@@ -3760,8 +3753,8 @@ s32 Nidhoggr_Init(struct Nidhoggr *t, s32 unusedA, s32 unusedB)
     t->flags[6] = 0;
     t->flags[7] = 0;
     t->flags[8] = 0;
-    t->groupHpA = t->optionY;
-    t->groupHpB = t->optionY;
+    t->groupHp[0] = t->optionY;
+    t->groupHp[1] = t->optionY;
     Fill32(&t->cameraPos, &tmp, 8);
     Fill32(&t->cameraTarget, &tmp, 8);
     return 0;

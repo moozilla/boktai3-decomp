@@ -80,16 +80,15 @@ struct Nidhoggr {
     u8 unknown7268[0x7268 - 0x7268];
     u16 maxLife;     /* 0x7268: option -l, default 4000 */
     u16 maxHp;       /* 0x726A: option -g, default 100; per-part max hp */
-    u16 optionY;     /* 0x726C: option -Y, default 1000 */
+    s16 optionY;     /* 0x726C: option -Y, default 1000 */
     u16 attackPower; /* 0x726E: option -A, default 40; suspended object's collider power */
     u16 optionD;     /* 0x7270: option -D, default 20 */
     u16 optionE;     /* 0x7272: option -E, default 100 */
-    u16 optionS;     /* 0x7274: option -S, default 0 */
+    s16 optionS;     /* 0x7274: option -S, default 0 */
     s16 life;        /* 0x7276: boss total life (option -l, kept twice) */
     u8 unknown7278[0x7278 - 0x7278];
     s16 hp[9];    /* 0x7278: per-part current hp */
-    s16 groupHpA; /* 0x728A */
-    s16 groupHpB; /* 0x728C */
+    s16 groupHp[2]; /* 0x728A: the two body groups' hp, scaled from optionY */
     u8 unknown728E[0x7290 - 0x728E];
     struct SceneVec
         cameraPos; /* 0x7290: current camera position (ApproachCameraTarget eases toward cameraTarget) */
