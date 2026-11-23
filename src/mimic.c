@@ -828,12 +828,6 @@ static inline s32 motionSquared(struct ContactPosition *motion)
     return motion->x * motion->x + motion->y * motion->y + motion->z * motion->z;
 }
 
-static inline void clearFlag(u32 *flags)
-{
-    u32 mask = ~1;
-    *flags &= mask;
-}
-
 void SceneActor_PrepareStationaryReaction(struct ChaseActor *actor)
 {
     struct SceneActorReactionMotion *motion;
@@ -897,24 +891,13 @@ static inline void resetState(struct ChaseActor *actor, u8 behavior)
     actor->base.field2B1 = 1;
 }
 
-static inline void setControl(struct ChaseActor *actor, void *control, u8 kind)
-{
-    actor->base.field2B2 = 1;
-    actor->base.stepDone = 0;
-    actor->base.controlKind = kind;
-    actor->base.target = control;
-    actor->base.field2C8 = 0;
-    clearFlag(&actor->base.pendingControlFlags);
-    actor->base.pendingControl = 0;
-}
-
 void SceneActor_ResetCollisionReaction(struct ChaseActor *actor)
 {
     struct SceneActorReactionMotion *motion;
     struct SceneActorRegistryControl *control;
     u16 *flags;
     resetState(actor, 0x11);
-    setControl(actor, SceneActorControl_OnIdle, 0x10);
+    SceneActorChase_SetControl(actor, SceneActorControl_OnIdle, 0x10);
     motion = (void *)&actor->base.tracking.target;
     motion->fieldDC = 0;
     actor->base.field2C2 = 0x40;
