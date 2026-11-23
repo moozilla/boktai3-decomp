@@ -2,6 +2,7 @@
 #include "inventory_grid.h"
 #include "scene_hud_display.h"
 #include "sprite_drawable_api.h"
+#include "vanargand_parts.h"
 
 s32 PauseMenu_TickPaletteBlend(void *);
 
@@ -43,13 +44,6 @@ void PauseMenu_ApplyItemSlot(void *, u32);
 
 void Sound_PlaySong(u32);
 
-static inline void SetVector(struct ContactPosition *v, s32 x, s32 y, s32 z)
-{
-    v->x = x;
-    v->y = y;
-    v->z = z;
-}
-
 void InventoryGrid_BeginNumberPhase(struct SceneHudState *s)
 {
     struct ContactPosition vec;
@@ -58,7 +52,7 @@ void InventoryGrid_BeginNumberPhase(struct SceneHudState *s)
             s->motionWidgets[0].flags |= 1;
             PauseMenu_ApplyItemSlot(s, s->actionSelection);
             PauseMenu_StartPaletteTransition(s, 0x16E, PauseMenu_GetPlayerStatusValue(s), 16);
-            SetVector(&vec, 32, 48, 0);
+            Vanargand_SetVector(&vec, 32, 48, 0);
             InventoryGrid_ShowNumber(s, s->appliedStatB, &vec);
             Sound_PlaySong(0x10D);
             Hud_SetInteractionCallback(s, InventoryGrid_UpdateNumberPhase, 1);
@@ -161,7 +155,7 @@ void InventoryGrid_BeginNumberPhaseAlternate(struct SceneHudState *s)
             s->motionWidgets[0].flags |= 1;
             PauseMenu_ApplyItemSlot(s, s->actionSelection);
             PauseMenu_StartPaletteTransition(s, 0x16E, PauseMenu_GetPlayerStatusValue(s), 16);
-            SetVector(&vec, 32, 48, 0);
+            Vanargand_SetVector(&vec, 32, 48, 0);
             InventoryGrid_ShowNumber(s, s->appliedStatB, &vec);
             Sound_PlaySong(0x10D);
             Hud_SetInteractionCallback(s, InventoryGrid_FinishNumberPhase, 1);
