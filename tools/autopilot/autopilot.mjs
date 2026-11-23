@@ -1,0 +1,112 @@
+#!/usr/bin/env node
+// The Autopilot: plays Boktai 3 on the source port from typed game state.
+//
+//   node tools/autopilot/autopilot.mjs m1 [--save F] [--out DIR] [--shots]
+//
+// Runs headless in-process (port/agent/session.mjs) with the agent library plus
+// tools/autopilot/lib/*.js. Each milestone is a goal; the run writes the input
+// movie (movie.json: key mask per frame), the same inputs as a tools/emu/harness
+// script (harness.txt, for replay on the original ROM), and a log of what each
+// skill did (log.json). --shots writes a PNG at each event into DIR/shots/.
+//
+// Milestones:
+//   m1  power-on -> sensor, clock, region, title, new game, password prompt,
+//       name entry -> intro narration -> the first line of dialogue in the field.
+import fs from 'node:fs';
+import path from 'node:path';
+import { openSession, png } from '../../port/agent/session.mjs';
+
+const ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname), '../..');
+const args = process.argv.slice(2);
+const opt = (name, dflt) => { const i = args.indexOf(name); return i < 0 ? dflt : args[i + 1]; };
+const goal = args[0] || 'm1';
+const out = path.resolve(opt('--out', path.join(ROOT, 'build/autopilot', goal)));
+const shots = args.includes('--shots');
+fs.mkdirSync(out, { recursive: true });
+if (shots) fs.mkdirSync(path.join(out, 'shots'), { recursive: true });
+
+const s = await openSession({
+  save: opt('--save'), render: shots, print: () => {},
+  lib: [path.join(ROOT, 'port/agent/lib'), path.join(ROOT, 'tools/autopilot/lib')],
+});
+const log = [];
+const event = (what) => {
+  const e = { frame: s.frame, ...what };
+  log.push(e);
+  console.log(JSON.stringify(e));
+  if (shots) fs.writeFileSync(path.join(out, 'shots', `${String(s.frame).padStart(6, '0')}.png`), png(s.pixels()));
+};
+
+const BORING = /^(InterruptsAndVideo|TaskSystem|PositionQueue|SceneActor|SceneBody|SceneStimulus|SceneMessages|Solar_Update|DelayedScript|ColorFade|SceneLifecycle|ScrollingDialogue|TextWindowManager|MessageWindow_Update)/;
+const GOALS = {
+  // Power-on to the first message window line after name entry.
+  *m1(g, L) {
+    const msg = L.message();
+    let named = false, seen;
+    for (let idle = 0; g.frameNo < 20000;) {
+      const step = yield* L.menuStep({ password: 'no' });
+      if (step) {
+        event({ skill: 'menu', ...step, scene: L.where().scene });
+        if (step.menu === 'NameEntry_Update' && step.done) named = true;
+        idle = 0;
+        continue;
+      }
+      // The intro narration (scene 6551) uses the message window too; the opening
+      // dialogue is the first line once the field has a player.
+      const field = L.tasks().some((t) => !t.dead && t.update === 'Player_Update');
+      if (named && field && msg.open && msg.id !== undefined && msg.pages > 0) {
+        yield 30;  // let the window draw its first page
+        event({ skill: 'goal', reached: 'opening dialogue', string: msg.id, scene: L.where().scene,
+          anchor: { fn: g.addr('Text_LookupString') & ~1, r0: msg.id } });
+        return true;
+      }
+      if (msg.open && !field && msg.id !== seen) { seen = msg.id; event({ skill: 'narration', string: msg.id, scene: L.where().scene }); }
+      yield 1;
+      if (++idle % 600 === 0) event({ skill: 'wait', idle, scene: L.where().scene, tasks: [...new Set(L.tasks().filter((t) => !t.dead).map((t) => t.update))].filter((n) => !BORING.test(n)) });
+    }
+    return false;
+  },
+};
+
+if (!GOALS[goal]) { console.error(`unknown goal ${goal} (${Object.keys(GOALS).join(' ')})`); process.exit(2); }
+const t0 = performance.now();
+const ok = s.run((g) => GOALS[goal](g, g.lib));
+const secs = (performance.now() - t0) / 1000;
+
+const movie = s.movie.map((k) => k | 0);
+fs.writeFileSync(path.join(out, 'movie.json'), JSON.stringify({ goal, save: opt('--save') || null, frames: movie.length, movie }));
+fs.writeFileSync(path.join(out, 'harness.txt'), harnessScript(log, `autopilot ${goal}: ${ok ? 'reached' : 'NOT reached'}`));
+fs.writeFileSync(path.join(out, 'log.json'), JSON.stringify(log, null, 1));
+console.log(`${goal}: ${ok ? 'reached' : 'NOT reached'} at frame ${s.frame} (${secs.toFixed(1)} s) -> ${path.relative(ROOT, out)}`);
+process.exit(ok ? 0 : 1);
+
+// The run as a tools/emu/harness script for the original ROM. The port has no lag
+// frames, so frame numbers drift; each key waits until the menu's update function has
+// run (for that task, r0) as often as it had in the port (watchpc + waitpc MAX N), and
+// the goal string is checked the same way (waitpc reports a shortfall on a desync).
+// Needs the harness with counted waitpc (tools/emu/harness.c, `make -C tools/emu`).
+function harnessScript(events, title) {
+  const NAMES = { a: 'A', b: 'B', select: 'SELECT', start: 'START', right: 'RIGHT', left: 'LEFT', up: 'UP', down: 'DOWN', r: 'R', l: 'L' };
+  const hex = (a) => (a >>> 0).toString(16).toUpperCase();
+  const time = Math.floor(Date.parse('2025-11-13T12:00:00Z') / 1000);
+  const lines = [`# ${title}`, '# generated by tools/autopilot/autopilot.mjs (event-anchored; see harnessScript)',
+    'trace off', `rtc ${time}`, 'lux 232'];
+  for (const e of events) {
+    if (e.skill === 'menu' && e.keys.length) {
+      // r0 = the menu's task: the port's heap layout is the ROM's, so this also
+      // checks that the replay is in the same state.
+      lines.push(`# ${e.menu}`);
+      let done = 0;
+      for (const { key, calls } of e.keys) {
+        // wait until the update has run as often as it had in the port, then press
+        // (2 frames: hardware samples the pad once per frame at its own point, as the
+        // harness's tap does; a held key is still one new press)
+        lines.push(`watchpc ${hex(e.update)} ${e.task} ${e.task}`, `waitpc 30000 ${Math.max(1, calls - done)}`, `hold ${NAMES[key]} 2`);
+        done = calls;
+      }
+    } else if (e.skill === 'goal' && e.anchor) {
+      lines.push(`# goal: ${e.reached}`, `watchpc ${hex(e.anchor.fn)} ${e.anchor.r0} ${e.anchor.r0}`, 'waitpc 30000', 'wait 30', 'shot goal');
+    }
+  }
+  return lines.join('\n') + '\n';
+}
