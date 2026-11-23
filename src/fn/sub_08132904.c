@@ -1,6 +1,7 @@
 #include "scene_actor_terrain_reaction.h"
 #include "global.h"
 #include "scene_actor_damage_visibility.h"
+#include "scene_actor_damage_flash.h"
 #include "scene_actor_drawable_flags.h"
 #include "scene_actor_reaction.h"
 #include "scene_actor_palette.h"
@@ -114,16 +115,7 @@ u8 SceneActorReaction_ApplyLinkedAreaDamage(struct ChaseActor *actor)
         health = h;
         flags2D8 = f;
         if (!result) {
-            u16 bank = actor->base.paletteAlternateBank;
-            if (actor->base.drawableKind == 0)
-                AnimData_SelectPaletteBank(((u8 *)actor->base.drawable) + 0x2C, bank);
-            else
-                ((struct SceneActorPaletteTileView *)actor->base.drawable)->palette =
-                    (const u16 *)(gPaletteBankData + bank * 32);
-            {
-                u32 eight = 8;
-                actor->base.flashTimer = eight;
-            }
+            SceneActorDamage_Flash(actor);
             {
                 u32 bit = 0x8000;
                 *flags2CC |= bit;

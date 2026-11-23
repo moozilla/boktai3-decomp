@@ -1,6 +1,7 @@
 #include "scene_actor_chase_shared.h"
 #include "global.h"
 #include "scene_actor_damage_visibility.h"
+#include "scene_actor_damage_flash.h"
 #include "scene_actor_reset.h"
 #include "area_effect_link.h"
 #include "render.h"
@@ -296,16 +297,7 @@ u8 SceneActorReaction_ResolvePlacementDamage(struct ChaseActor *actor)
             flags2CC = &actor->base.behaviorFlags;
             collider = &actor->base.colliderA;
             if (mode) {
-                u16 bank = actor->base.paletteAlternateBank;
-                if (actor->base.drawableKind == 0)
-                    AnimData_SelectPaletteBank(((u8 *)actor->base.drawable) + 0x2C, bank);
-                else
-                    ((struct SceneActorRegistryTileDrawable *)actor->base.drawable)->palette =
-                        gPaletteBankData + (bank * 32);
-                {
-                    u32 eight = 8;
-                    actor->base.flashTimer = eight;
-                }
+                SceneActorDamage_Flash(actor);
                 {
                     u32 strong = mode & 4;
                     flags2CC = &actor->base.behaviorFlags;

@@ -5,6 +5,7 @@
 #include "area_effect_link.h"
 #include "render.h"
 #include "scene_actor_damage_visibility.h"
+#include "scene_actor_damage_flash.h"
 u8 SceneActorReaction_ApplyAreaDamage(void *);
 void SceneActor_ClearReactionFlags(void *);
 u8 SceneActorBehavior_DispatchFlaggedCategory(void *);
@@ -279,18 +280,7 @@ u8 SceneActorReaction_ResolveDamage(struct ChaseActor *actor)
         }
         flags2CC = &actor->base.behaviorFlags;
         if (mode) {
-            {
-                u16 bank = actor->base.paletteAlternateBank;
-                if (actor->base.drawableKind == 0)
-                    AnimData_SelectPaletteBank(((u8 *)actor->base.drawable) + 0x2C, bank);
-                else
-                    ((struct SceneActorPaletteTileView *)actor->base.drawable)->palette =
-                        (const u16 *)(gPaletteBankData + bank * 32);
-            }
-            {
-                u32 eight = 8;
-                actor->base.flashTimer = eight;
-            }
+            SceneActorDamage_Flash(actor);
             strong = mode & 4;
             flags2CC = &actor->base.behaviorFlags;
             if (strong && (actor->base.category == 0x19)) {
