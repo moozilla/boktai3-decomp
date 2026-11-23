@@ -6,6 +6,7 @@
 #include "player.h"
 #include "ram.h"
 #include "engine_pause_flags.h"
+#include "word_flags.h"
 void Hud_RegisterTimer(u16 *);
 void WirelessGameMenu_SetStatusPanelState(struct WirelessGameExchange *, int);
 void Sound_PlayTrackedSong(int);
@@ -18,10 +19,6 @@ void WirelessGame_AddWeightedScore(int, int);
 int WirelessExchange_SendPacket(struct WirelessGameExchange *, int, const u32 *, int);
 void Hud_ClearTimer(void);
 void Sound_PlaySong(int);
-static inline u32 test(u32 *flags, u32 mask)
-{
-    return *flags & mask;
-}
 void WirelessGameMenu_UpdateActiveRound(struct WirelessGameExchange *p)
 {
     u32 data;
@@ -111,7 +108,7 @@ void WirelessGameMenu_UpdateActiveRound(struct WirelessGameExchange *p)
         data |= packed << 16;
         WirelessExchange_SendPacket(p, 0, &data, 1);
     }
-    if (p->playerDefeated || p->opponentDefeated || test(&p->exchangeFlags, 128)) {
+    if (p->playerDefeated || p->opponentDefeated || WordFlags_Test(&p->exchangeFlags, WIRELESS_EXCHANGE_PEER_RESULT)) {
         Hud_ClearTimer();
         WirelessGameMenu_EnterState(p, WIRELESS_MENU_ROUND_RESULT_EXCHANGE);
         return;
