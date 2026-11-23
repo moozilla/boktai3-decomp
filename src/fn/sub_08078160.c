@@ -16,18 +16,18 @@ void SceneActorBehavior_CallTerrainScript(struct RoomActor *actor)
     {
         u32 mask = 0x80000;
         u32 *field;
-        field = (void *)((u32)actor + 0x2D0);
+        field = &actor->statusFlags;
         if (*field & mask)
             return;
     }
     {
-        u32 cell = *(u16 *)((u32)actor + 0x2F4);
+        u32 cell = actor->terrainCell;
         u32 flags = *(u16 *)(CellData(cell) + 2);
         if (flags & 0x43)
             return;
     }
     {
-        u16 *ground = (void *)((u32)actor + 0x2BE);
+        u16 *ground = &actor->groundHeight;
         if (*ground - actor->body.position.y > 256)
             return;
     }
