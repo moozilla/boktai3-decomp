@@ -77,13 +77,8 @@ void DarkLoan_UpdateBalanceDigits(struct DarkLoanScreen *panel)
     value = gGameState->menuRewardBalance + panel->adjustment * panel->rate;
     if (value == 0) {
         resource = &panel->secondaryResource;
-        {
-            s32 zero = 0;
-            s32 *clear = &digits[3];
-            do {
-                *clear-- = zero;
-            } while ((s32)clear >= (s32)digits);
-        }
+        for (i = 0; i < 4; i++)
+            digits[i] = 0;
     } else {
         digits[0] = Div(value, 1000);
         value -= digits[0] * 1000;
@@ -116,13 +111,8 @@ void DarkLoan_UpdateAdjustmentDigits(struct DarkLoanScreen *display)
     if (value == 0) {
         base = &display->widgets[DARK_LOAN_BACKGROUND].flags;
         data = &display->resource;
-        {
-            s32 zero = 0;
-            s32 *clear = &digits[3];
-            do {
-                *clear-- = zero;
-            } while ((s32)clear >= (s32)digits);
-        }
+        for (i = 0; i < 4; i++)
+            digits[i] = 0;
     } else {
         digits[0] = Div(value, 1000);
         value -= digits[0] * 1000;
@@ -146,13 +136,8 @@ void DarkLoan_UpdateAdjustmentDigits(struct DarkLoanScreen *display)
     display->widgets[DARK_LOAN_LOWER_RATE].flags &= ~1;
     value = display->adjustment * display->rate;
     if (value == 0) {
-        {
-            s32 zero = 0;
-            s32 *clear = &digits[3];
-            do {
-                *clear-- = zero;
-            } while ((s32)clear >= (s32)digits);
-        }
+        for (i = 0; i < 4; i++)
+            digits[i] = 0;
     } else {
         digits[0] = Div(value, 1000);
         value -= digits[0] * 1000;
