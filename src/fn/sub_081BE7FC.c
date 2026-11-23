@@ -30,9 +30,8 @@ void Storage_BeginItemSpecialMove(struct StoragePanel *panel)
     display->widgets[panel->selection + 8].flags |= 1;
     frames[0] = Selection_GetDisplayFrame(Inventory_GetItemId(panel->items[panel->selection]));
     {
-        u32 attribute = 0x373;
-        savedAttribute = attribute;
-        attributes[0] = attribute;
+        savedAttribute = 0x373;
+        attributes[0] = 0x373;
     }
     Storage_GetSlotPosition(starts, panel->selection);
     target = targets;
