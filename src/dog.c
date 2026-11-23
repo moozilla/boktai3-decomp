@@ -302,10 +302,10 @@ void Dog_ResetActionState(struct ChaseActor *actor)
     struct Dog *context = actor->base.context;
     context->flags = 0;
     context->actionTimer = 0;
-    context->destinationCell = 0xFFFF;
-    context->timer6A4 = 0;
-    context->state6A6 = 0;
-    context->emitted = 0;
+    context->stolenSlot = 0xFFFF;
+    context->stolenParameter = 0;
+    context->turnClockwise = 0;
+    context->retreatCount = 0;
     Memory_Clear(context->slots, 8);
     SceneActorMovement_ResolveRoutePosition(actor);
     SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0);
@@ -677,23 +677,17 @@ void SceneActorControl_CallContextScript(struct RoomActor *actor)
 
 u8 SceneActorTerrain_CanTraverseCell(u32, u32, u32, u32);
 
-struct DogRetreatContext {
-    u8 unknown0[0x6A6];
-    u8 turnClockwise;
-    u8 blockedRoutes;
-};
-
 static inline s8 TurnClockwise(void *object)
 {
-    struct DogRetreatContext *context = object;
-    s16 offset = (u32) & ((struct DogRetreatContext *)0)->turnClockwise;
+    struct Dog *context = object;
+    s16 offset = (u32) & ((struct Dog *)0)->turnClockwise;
     return *((u8 *)context + offset);
 }
 
 #define SetTurnClockwise(object_, value_)                                                          \
     do {                                                                                           \
-        struct DogRetreatContext *context_ = (object_);                                            \
-        s16 offset_ = (u32) & ((struct DogRetreatContext *)0)->turnClockwise;                      \
+        struct Dog *context_ = (object_);                                                          \
+        s16 offset_ = (u32) & ((struct Dog *)0)->turnClockwise;                                    \
         *((u8 *)context_ + offset_) = (value_);                                                    \
     } while (0)
 
@@ -756,7 +750,7 @@ static inline void Dog_CaptureRoutePosition(struct ContactPosition **out, struct
 
 static inline u32 SelectRetreat(struct ChaseActor *actor, u32 priorDirection, s32 steps)
 {
-    struct DogRetreatContext *context = actor->base.context;
+    struct Dog *context = actor->base.context;
     struct SceneActorChaseGroup *group = &actor->group;
     struct ContactPosition center;
     struct ContactPosition *routePosition;
@@ -857,7 +851,7 @@ selected: {
     SceneActorChase_CellCenter(chosen, &center);
     {
         if (TryRoute(actor, GroupRoute(group), routePosition, &center)) {
-            context->blockedRoutes++;
+            context->retreatCount++;
             return 1;
         }
         Callback_InvokeActor(actor, group->fallback);
@@ -948,9 +942,9 @@ void Dog_SelectRetreatOrChase(struct ChaseActor *a)
     struct Dog *context = a->base.context;
     struct SceneActorChaseGroup *group = &a->group;
     SceneActorReaction_ResetResponseState(&group->saved, gUnk_0824E2A8, 0x2AA);
-    if (context->emitted <= 3) {
+    if (context->retreatCount <= 3) {
         if (a->base.tracking.distance < context->lastCell || !Dog_IsActionTimerExpired(a)) {
-            if (context->emitted <= 3) {
+            if (context->retreatCount <= 3) {
                 u32 saved = a->base.body.direction;
                 a->base.body.direction = a->base.tracking.heading + 128;
                 if (Dog_SelectRetreatDirection(a, saved)) {
@@ -1008,12 +1002,6 @@ void Dog_TickCooldown(struct Dog *dog)
         *p = *p - 1;
 }
 
-struct DogItemContext {
-    u8 unknown0[0x6A0];
-    s16 slot, kind, parameter;
-    u8 turnClockwise, blockedRoutes, unknown6A8, healthPercent;
-};
-
 u8 InventorySlot_PickRandom(s16 *, s16 *, s16 *);
 
 s32 FloatingItemEffect_Spawn(s32, s32, s32, s32, void *, void *, s32, void *);
@@ -1055,7 +1043,7 @@ static inline void Dog_CopyContactCost(struct ContactCollider *collider, struct 
 
 void Dog_OnItemContact(void *unused, struct ContactCollider *contact, struct ChaseActor *actor)
 {
-    struct DogItemContext *context;
+    struct Dog *context;
     u32 palette;
     struct SceneActorEffectsOffset position;
     struct ContactPosition *actorPosition;
@@ -1066,24 +1054,26 @@ void Dog_OnItemContact(void *unused, struct ContactCollider *contact, struct Cha
         return;
     context = actor->base.context;
     palette = actor->base.paletteOffset;
-    if (context->slot >= 0)
+    if (context->stolenSlot >= 0)
         return;
     if (palette != 0 && palette != 2)
         return;
     position = *(struct SceneActorEffectsOffset *)&((struct SceneActorChasePlayer *)gPlayers[0])
                     ->target.position;
     position.y += 200;
-    if (!InventorySlot_PickRandom(&context->slot, &context->kind, &context->parameter))
+    if (!InventorySlot_PickRandom(&context->stolenSlot, &context->stolenKind,
+                                  &context->stolenParameter))
         return;
-    spawned = FloatingItemEffect_Spawn(0, context->kind, 3, 0, &position,
+    spawned = FloatingItemEffect_Spawn(0, context->stolenKind, 3, 0, &position,
                                        &actor->base.body.position, 24, actor);
     actorPosition = &actor->base.body.position;
     if (spawned < 0) {
-        SceneActorChase_SetFlagComponent((struct SceneActorChaseFlags16 *)&context->slot, 0xFFFF);
+        SceneActorChase_SetFlagComponent((struct SceneActorChaseFlags16 *)&context->stolenSlot,
+                                         0xFFFF);
         return;
     }
-    Inventory_ClearItemSlot(context->slot);
-    switch (context->kind) {
+    Inventory_ClearItemSlot(context->stolenSlot);
+    switch (context->stolenKind) {
         case 2:
         case 5:
         case 14:
@@ -1091,7 +1081,7 @@ void Dog_OnItemContact(void *unused, struct ContactCollider *contact, struct Cha
         default:
             return;
     }
-    responseValue = Div((u16)actor->base.defaultHealth * context->healthPercent, 100);
+    responseValue = Div((u16)actor->base.defaultHealth * context->itemDamagePercent, 100);
     {
         health = actor->base.health;
         if (health - responseValue <= 0)
@@ -1099,7 +1089,7 @@ void Dog_OnItemContact(void *unused, struct ContactCollider *contact, struct Cha
         else
             actor->base.reactionSoundVariant = responseValue;
     }
-    context->slot = -1;
+    context->stolenSlot = -1;
     actor->base.tracking.target = &((struct SceneActorChasePlayer *)gPlayers[0])->target;
     actor->base.hitOwners = 1;
     Dog_ClearResponseFlags(actor);
@@ -2529,7 +2519,7 @@ void Dog_UpdateLeapAttack(struct ChaseActor *a)
             u32 extra = a->base.attacks.parameter[1];
             Collider_SetAttackProperties(collider, damage, response, 0, power, extra);
         }
-        context->emitted = 0;
+        context->retreatCount = 0;
         context->nearTimer = context->nearDistance;
     }
     if (a->base.stepDone) {
@@ -2567,7 +2557,7 @@ void Dog_UpdateTrailAttack(struct ChaseActor *a)
             u32 extra = a->base.attacks.parameter[2];
             Collider_SetAttackProperties(collider, damage, response, 0, power, extra);
         }
-        context->emitted = 0;
+        context->retreatCount = 0;
     }
     if (a->base.stepDone) {
         context->farTimer = context->farDistance;
@@ -3103,7 +3093,7 @@ static inline void DogInit_Reset(void *object)
 {
     struct Dog *context = object;
     context->flags = 0;
-    context->state6A6 = 0;
+    context->turnClockwise = 0;
 }
 
 static inline void DogInit_EnableInitialFlags(struct ChaseActor *actor)
@@ -3164,11 +3154,11 @@ s32 Dog_Init(void *object)
         dog->actionDelay = (Script_GetPc() ? Script_GetValue() : 640);
         dog->alternateActionDelay = (Script_GetPc() ? Script_GetValue() : 640);
     }
-    dog->interval = Script_GetKeywordValue('d', 50);
-    if (!dog->interval)
-        dog->interval = 50;
-    dog->destinationCell = 0xFFFF;
-    dog->timer6A4 = 0;
+    dog->itemDamagePercent = Script_GetKeywordValue('d', 50);
+    if (!dog->itemDamagePercent)
+        dog->itemDamagePercent = 50;
+    dog->stolenSlot = 0xFFFF;
+    dog->stolenParameter = 0;
 
     MonsterInit_ReadPalette(actor, 0x273, 0x192);
     SceneActorCollision_InitGateColliders(actor);

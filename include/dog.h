@@ -19,10 +19,13 @@ struct Dog {
     u16 nearTimer;
     u16 farTimer;
     u16 nearDistance, farDistance;
-    u16 destinationCell;
-    u16 field6A2;
-    u16 timer6A4;
-    u8 state6A6, emitted, turnDelay, interval;
+    /* The item taken from the player's inventory on contact (InventorySlot_PickRandom);
+     * slot -1 when none. */
+    s16 stolenSlot, stolenKind, stolenParameter;
+    u8 turnClockwise; /* the retreat turns +64 (else -64) per blocked try */
+    u8 retreatCount;  /* retreats taken; past 3 the dog chases instead */
+    u8 turnDelay;
+    u8 itemDamagePercent; /* keyword 'd' (50): a healing item taken costs this share of health */
     u8 unknown6AA[2];
     struct ChaseRouteProbe routeProbe;
     struct ContactPosition destination;
