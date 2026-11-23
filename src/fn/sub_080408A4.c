@@ -6,11 +6,10 @@ s32 ModifierMenu_InitializeGraphics(struct ModifierMenu *menu)
 {
     struct ModifierGraphicsResource *resource;
     struct SceneVec origin;
-    u32 attribute;
     struct SceneVec *originPointer;
     struct ModifierDisplayObject *object;
     struct ModifierGraphicsResource *graphics;
-    s32 remaining;
+    s32 i;
     resource = ScriptProc_Start(0xcb05, 0x530d);
     menu->graphicsA = *resource;
     ResourceHeader_Relocate(&menu->graphicsA, resource);
@@ -20,12 +19,12 @@ s32 ModifierMenu_InitializeGraphics(struct ModifierMenu *menu)
     ZeroFill8(&origin);
     originPointer = &origin;
     object = menu->displays;
-    remaining = 17;
+    i = 17;
     do {
         Widget_InitLinked(object, &menu->graphicsB, 0, 0x11, 2, 0, 0x3c, originPointer);
-        remaining--;
+        i--;
         object++;
-    } while (remaining >= 0);
+    } while (i >= 0);
     object = &menu->displays[5];
     graphics = &menu->graphicsB;
     Anim_LoadKeyframe(object, graphics, 0x12, 0);
@@ -42,15 +41,11 @@ s32 ModifierMenu_InitializeGraphics(struct ModifierMenu *menu)
         Anim_LoadKeyframe(object, &menu->graphicsA, 0x7f, 0);
     object->y = 8;
     object = &menu->displays[14];
-    attribute = 0;
-    remaining = 3;
-    do {
+    for (i = 0; i <= 3; i++, object++) {
         Anim_LoadKeyframe(object, &menu->graphicsA, 0x50, 0);
         object->z = 50;
-        object->attribute1A = attribute;
-        remaining--;
-        object++;
-    } while (remaining >= 0);
+        object->attribute1A = 0;
+    }
     Palette_CopyBank(menu->palette, gPaletteBankData + 0x64e0);
     object = &menu->displays[1];
     object->tile = 0x9010;

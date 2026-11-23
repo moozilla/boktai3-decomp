@@ -131,23 +131,15 @@ void ControlPanel_ShowRewardBalanceDigits(struct ControlPanel *panel)
 void ControlPanel_ShowValueDisplay(struct ControlPanel *panel)
 {
     s32 i;
-    u32 m = ~1;
-    u32 *flags = &panel->widgets[0].flags;
-    for (i = 4; i >= 0; i--) {
-        *flags &= m;
-        flags = (void *)((u8 *)flags + sizeof(struct SceneInputWidget));
-    }
+    for (i = 0; i < 5; i++)
+        panel->widgets[i].flags &= ~1;
 }
 
 void ControlPanel_HideValueDisplay(struct ControlPanel *panel)
 {
     s32 i;
-    u32 m = 1;
-    u32 *flags = &panel->widgets[0].flags;
-    for (i = 4; i >= 0; i--) {
-        *flags |= m;
-        flags = (void *)((u8 *)flags + sizeof(struct SceneInputWidget));
-    }
+    for (i = 0; i < 5; i++)
+        panel->widgets[i].flags |= 1;
 }
 
 void ControlPanel_UpdateSustainedInputTimer(struct ControlPanel *panel)
@@ -174,11 +166,9 @@ void ControlPanel_ApplyMultiplierMode(struct ControlPanel *panel)
     s32 mode = panel->multiplier;
 
     if (mode == 1) {
-        u16 v = 0x30;
-        s32 i = 5;
-        do {
-            panel->markers[i].position.y = v;
-        } while (--i >= 0);
+        s32 i;
+        for (i = 0; i < 6; i++)
+            panel->markers[i].position.y = 0x30;
         panel->multiplierTimer = 4;
         return;
     }
@@ -240,12 +230,8 @@ void ControlPanel_TickMultiplierTimer(struct ControlPanel *panel)
 void ControlPanel_HideMultiplierSprites(struct ControlPanel *panel)
 {
     s32 i;
-    u32 m = 1;
-    struct ContactSwarmSprite *e = panel->markers;
-    for (i = 5; i >= 0; i--) {
-        e->flags |= m;
-        e++;
-    }
+    for (i = 0; i < 6; i++)
+        panel->markers[i].flags |= 1;
 }
 
 static inline void ControlPanel_SetSegmentFrame(struct ContactSwarmSprite *sprite, u16 frame)
@@ -259,16 +245,11 @@ void ControlPanel_UpdatePlayerSegments(struct ControlPanel *panel)
     s32 i;
     if (count > 7)
         count = 7;
-    i = 0;
-    if (i < count) {
-        u16 one = 1, two = 2;
-        do {
-            if (i <= 3)
-                ControlPanel_SetSegmentFrame(&panel->segments[i], one);
-            else
-                ControlPanel_SetSegmentFrame(&panel->segments[i], two);
-            i++;
-        } while (i < count);
+    for (i = 0; i < count; i++) {
+        if (i <= 3)
+            ControlPanel_SetSegmentFrame(&panel->segments[i], 1);
+        else
+            ControlPanel_SetSegmentFrame(&panel->segments[i], 2);
     }
     for (; i < 7; i++)
         ControlPanel_SetSegmentFrame(&panel->segments[i], 0);
@@ -277,23 +258,15 @@ void ControlPanel_UpdatePlayerSegments(struct ControlPanel *panel)
 void ControlPanel_ShowInputGauge(struct ControlPanel *panel)
 {
     s32 i;
-    u32 m = ~1;
-    struct ContactSwarmSprite *e = panel->segments;
-    for (i = 6; i >= 0; i--) {
-        e->flags &= m;
-        e++;
-    }
+    for (i = 0; i < 7; i++)
+        panel->segments[i].flags &= ~1;
 }
 
 void ControlPanel_HideInputGauge(struct ControlPanel *panel)
 {
     s32 i;
-    u32 m = 1;
-    struct ContactSwarmSprite *e = panel->segments;
-    for (i = 6; i >= 0; i--) {
-        e->flags |= m;
-        e++;
-    }
+    for (i = 0; i < 7; i++)
+        panel->segments[i].flags |= 1;
 }
 
 void ControlPanel_ShowInteractionDisplay(struct ControlPanel *panel)
@@ -536,37 +509,16 @@ u32 ControlPanel_OnTaskUpdate(struct ControlPanel *panel)
 s32 ControlPanel_Destroy(struct ControlPanel *panel)
 {
     s32 i;
-    struct SceneInputWidget *anim;
-    struct ContactSwarmSprite *segments;
-    struct ContactSwarmSprite *markers;
     Sprite_Remove(&panel->display[0].sprite);
     Sprite_Remove(&panel->display[1].sprite);
     Sprite_Remove(&panel->thirdSprite);
-    anim = panel->widgets;
-    i = 4;
-    do {
-        Anim_Remove(anim);
-        anim++;
-        i--;
-    } while (i >= 0);
-    segments = panel->segments;
-    i = 6;
-    do {
-        Sprite_Remove(segments);
-        segments++;
-        i--;
-    } while (i >= 0);
-    markers = panel->markers;
-    i = 5;
-    do {
-        Sprite_Remove(markers);
-        markers++;
-        i--;
-    } while (i >= 0);
-    {
-        u32 zero = 0;
-        gSegmentDisplay = zero;
-    }
+    for (i = 0; i < 5; i++)
+        Anim_Remove(&panel->widgets[i]);
+    for (i = 0; i < 7; i++)
+        Sprite_Remove(&panel->segments[i]);
+    for (i = 0; i < 6; i++)
+        Sprite_Remove(&panel->markers[i]);
+    gSegmentDisplay = 0;
     Sound_StopSong(0x23e);
     return 0;
 }
@@ -668,21 +620,19 @@ s32 ControlPanel_InitializeFromScript(struct ControlPanel *panel)
     else
         panel->start = value;
     {
-        s32 firstZero;
         anim = panel->display[0].graphics;
         AnimData_Load(anim, 0xC046);
         sprite = &panel->display[0].sprite;
         Sprite_Init(sprite, anim, 0);
-        firstZero = 0;
-        sprite->frame = firstZero;
+        sprite->frame = 0;
         panel->display[0].sprite.position.x = 0x380;
-        panel->display[0].sprite.position.y = firstZero;
+        panel->display[0].sprite.position.y = 0;
         panel->display[0].sprite.position.z = 0x52C;
         middleGraphics = panel->display[1].graphics;
         AnimData_Load(middleGraphics, 0xC046);
         middleSprite = &panel->display[1].sprite;
         Sprite_Init(middleSprite, middleGraphics, 0);
-        middleSprite->frame = firstZero;
+        middleSprite->frame = 0;
         panel->display[1].sprite.position = panel->display[0].sprite.position;
         panel->display[1].sprite.position.z += 0x300;
     }

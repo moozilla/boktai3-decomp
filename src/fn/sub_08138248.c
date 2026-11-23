@@ -9,9 +9,8 @@ u32 Registry1745_HasParticipantCount(u8 *p, s32 n)
 {
     s32 cnt = 0;
     s32 i = 0;
-    u32 k = 0xFFFF;
     do {
-        if (get(p, i) != k)
+        if (get(p, i) != 0xFFFF)
             cnt++;
         i++;
     } while (i <= 3);

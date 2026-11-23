@@ -258,7 +258,7 @@ static inline s32 GetPeer(void)
     return result;
 }
 
-static inline void SetUpdate(struct LinkPanel *panel, void (*update)(struct LinkPanel *), u8 state)
+static inline void SetUpdate(struct LinkPanel *panel, void (*update)(struct LinkPanel *), u32 state)
 {
     panel->update = update;
     panel->redraw = 1;
@@ -304,19 +304,16 @@ void LinkPanel_UpdateExitTransition(struct LinkPanel *panel)
 void LinkPanel_UpdateConnection(struct LinkPanel *panel)
 {
     s32 i;
-    struct LinkPanelStatus *s;
-    u32 zero;
     if (panel->redraw) {
         panel->message = 0xff;
         Bg_SetLayerMap(3, panel->backgroundResource, 2);
         BgGfx_LoadTilemapSimple(3, 0, 0, 0, 0);
         panel->timer = 0;
         panel->redraw = 0;
-        for (i = 0, zero = 0, s = &panel->entries[0].status; i <= 1;
-             s = (struct LinkPanelStatus *)((u8 *)s + sizeof(struct LinkPanelEntry)), i++) {
-            s->previousStatus = s->currentStatus;
-            s->currentStatus = zero;
-            s->animationTimer = zero;
+        for (i = 0; i < 2; i++) {
+            panel->entries[i].status.previousStatus = panel->entries[i].status.currentStatus;
+            panel->entries[i].status.currentStatus = 0;
+            panel->entries[i].status.animationTimer = 0;
             RegistryF246_ShowSlotDefaultFrame(panel, i);
         }
 
@@ -329,22 +326,14 @@ void LinkPanel_UpdateConnection(struct LinkPanel *panel)
     }
     panel->role = Serial_GetRole();
     panel->number = GetPeer();
-    {
-        u32 zero2;
-        struct LinkPanelStatus *slot;
-        s32 *role;
-        for (i = 0, zero2 = 0, role = &panel->role, slot = &panel->entries[0].status; i <= 1;
-             slot = (struct LinkPanelStatus *)((u8 *)slot + sizeof(struct LinkPanelEntry)), i++) {
-            slot->previousStatus = slot->currentStatus;
-            if (*role < 0)
-                slot->currentStatus = zero2;
-            else
-                slot->currentStatus = peerStatus(i);
-            if (slot->previousStatus != slot->currentStatus)
-                ((struct LinkPanel *)(i * sizeof(struct LinkPanelEntry) + (u32)panel))
-                    ->entries[0]
-                    .status.animationTimer = zero2;
-        }
+    for (i = 0; i <= 1; i++) {
+        panel->entries[i].status.previousStatus = panel->entries[i].status.currentStatus;
+        if (panel->role < 0)
+            panel->entries[i].status.currentStatus = 0;
+        else
+            panel->entries[i].status.currentStatus = peerStatus(i);
+        if (panel->entries[i].status.previousStatus != panel->entries[i].status.currentStatus)
+            panel->entries[i].status.animationTimer = 0;
     }
     LinkPanel_UpdateLastEntry(panel);
     LinkPanel_UpdateAnimations(panel);
@@ -408,15 +397,9 @@ s32 LinkPanel_InitFromScript(struct LinkPanel *panel)
     ModifierMenu_InitSelectionSnapshot(&panel->paletteCycle, panel->paletteResource);
     SlotMenu_CreateTextWindows(panel);
     LinkPanel_InitMessageDisplay(panel);
-    {
-        void (*update)(struct LinkPanel *) = LinkPanel_UpdateConnection;
-        u32 zero = 0;
-        panel->update = update;
-        panel->redraw = 1;
-        panel->state = zero;
-        if (Script_GetKeywordValue('f', 0))
-            ScreenTransition_SendCommand(2, 5, 4, 4, 4, 0xFFFF, zero);
-    }
+    SetUpdate(panel, LinkPanel_UpdateConnection, 0);
+    if (Script_GetKeywordValue('f', 0))
+        ScreenTransition_SendCommand(2, 5, 4, 4, 4, 0xFFFF, 0);
     gLinkPanel = (u32)panel;
     return 1;
 }

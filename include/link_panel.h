@@ -23,7 +23,8 @@ struct LinkPanel {
     struct SceneInputResource lastEntryResource, entryResource;
     u16 selected[7];
     s16 previous[7];
-    u8 unknown31C[8];
+    struct SceneInputResource *entrySource; /* 0x31C: the 0x1289 resource before relocation */
+    u8 unknown320[4];
     struct LinkPanelPaletteCycle paletteCycle;
     struct LinkPanelEntry entries[2];
     void (*update)(struct LinkPanel *);

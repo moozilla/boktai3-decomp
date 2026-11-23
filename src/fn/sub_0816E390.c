@@ -21,11 +21,9 @@ void SceneMenuPanel_FinishMotionDelay(struct SceneMenuPanel *panel)
 {
     if (SceneMenuPanel_UpdateMotion(panel, 0)) {
         if (++panel->delay > 7) {
-            u16 palette;
             panel->widgetFlags |= 1;
             PauseMenu_ApplyItemSlot(panel, panel->selection);
-            palette = 366;
-            SceneMenuPanel_StartPaletteTransition(panel, palette, PauseMenu_GetPlayerStatusValue(panel),
+            SceneMenuPanel_StartPaletteTransition(panel, 366, PauseMenu_GetPlayerStatusValue(panel),
                                                   16);
             Sound_PlaySong(269);
             SceneMenuPanel_SetCallback(panel, PauseMenu_OnItemUseDelayUpdate, 1);

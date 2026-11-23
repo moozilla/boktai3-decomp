@@ -1,4 +1,5 @@
 #include "global.h"
+#include "link_selection_mode.h"
 #include "area_effect_link.h"
 
 // foundry draft (worker best 96.4%); what differs is mostly register allocation and instruction order
@@ -18,12 +19,6 @@ static inline u16 GetSlot(struct AreaEffectLinkState *p, s32 i)
         return -1;
     return p->selection[i];
 }
-static inline u8 IsChoiceSlot(u32 value, u32 mask)
-{
-    if ((value & mask) == 0x2c00)
-        return 1;
-    return 0;
-}
 s32 LinkSelection_WaitForParticipantChoices(struct AreaEffectLinkState *p)
 {
     s32 count, selected, i, length;
@@ -39,19 +34,13 @@ s32 LinkSelection_WaitForParticipantChoices(struct AreaEffectLinkState *p)
     }
     count = 0;
     selected = 0;
-    i = 0;
-    length = p->participantCount;
-    if (i < length) {
-        u32 mask = 0x3c00;
-        do {
-            u16 slot = GetSlot(p, i);
-            if (IsChoiceSlot(slot, mask)) {
-                if (slot & 0x3f)
-                    selected++;
-                count++;
-            }
-            i++;
-        } while (i < length);
+    for (i = 0, length = p->participantCount; i < length; i++) {
+        u16 slot = GetSlot(p, i);
+        if (LinkSelection_IsChoice(slot, 0x3c00)) {
+            if (slot & 0x3f)
+                selected++;
+            count++;
+        }
     }
     if (count == length) {
         if (count == selected)

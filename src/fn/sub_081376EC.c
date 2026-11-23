@@ -82,7 +82,6 @@ u32 SceneActorTarget_ApproachNearestStimulus(struct ChaseActor *actor)
     u16 *timer;
     struct ContactPosition *dest;
     struct ContactPosition *target;
-    u32 bit;
     struct ContactPosition *position;
     s32 settle = 360;
 
@@ -156,10 +155,9 @@ u32 SceneActorTarget_ApproachNearestStimulus(struct ChaseActor *actor)
         dest->z = route->point->z;
         dest->y = CellHeight(Terrain_GetCellIndex(dest), dest);
     }
-    bit = 0x200;
-    GROUP_FIELD(group, bit, struct ContactPosition *)->y = actor->base.body.position.y;
-    GROUP_FIELD(group, bit, struct ContactPosition *)->pad = 0;
-    if (!MoveTo(actor, group, position, flagsp, bit)) {
+    GROUP_FIELD(group, 0x200, struct ContactPosition *)->y = actor->base.body.position.y;
+    GROUP_FIELD(group, 0x200, struct ContactPosition *)->pad = 0;
+    if (!MoveTo(actor, group, position, flagsp, 0x200)) {
         Callback_InvokeActor(actor, group->fallback);
     } else {
         {

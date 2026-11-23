@@ -27,8 +27,8 @@ void PauseInventory_RefreshConsumableDescription(u8 *p)
     }
     {
         u32 *q = (u32 *)(p + 0x2a48);
-        u32 v = *q, m = 1;
-        v |= m;
+        u32 v = *q;
+        v |= 1;
         *q = v;
         if (r < 0) {
             MessageWindow_Clear();

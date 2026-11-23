@@ -1,3 +1,4 @@
+#include "engine_pause.h"
 #include "global.h"
 #include "engine.h"
 #include "ram.h"
@@ -21,7 +22,6 @@ void sub_0810D760(struct RecordPanel *p)
 {
     s32 i, n;
     struct RecordPanel *q;
-    u32 mask;
     p->win[0] = TextWindow_Create(1, 3, 10, 2);
     p->win[1] = TextWindow_Create(13, 5, 16, 2);
     p->win[2] = TextWindow_Create(13, 7, 16, 2);
@@ -29,9 +29,8 @@ void sub_0810D760(struct RecordPanel *p)
     p->win[4] = TextWindow_Create(13, 11, 16, 2);
     p->win[5] = TextWindow_Create(13, 13, 16, 2);
     p->win[6] = TextWindow_Create(13, 15, 16, 2);
-    mask = 0x800;
     q = p;
-    if ((gEngineFlags | gScenePauseFlags) & mask) {
+    if (Engine_PauseBits(0x800)) {
         for (i = 0; i <= 5; i++) {
             TextWindow_SetScript(p->win[i + 1], p->script);
             n = p->page * 6 + i;

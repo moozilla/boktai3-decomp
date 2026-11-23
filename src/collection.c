@@ -54,14 +54,10 @@ u32 Collection_IsComplete(void)
 
 s32 Collection_UpdateEntryVisibility(struct CollectionMenu *menu)
 {
-    u32 hidden = 1;
-    struct ContactSwarmSprite *entry = menu->entries;
     s32 i;
 
-    for (i = 26; i >= 0; i--) {
-        entry->flags |= hidden;
-        entry++;
-    }
+    for (i = 0; i < 27; i++)
+        menu->entries[i].flags |= 1;
     for (i = menu->page * 10; i < menu->page * 10 + 10; i++) {
         if (Collection_IsEntryUnlocked(i))
             menu->entries[i].flags &= ~1;

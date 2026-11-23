@@ -16,7 +16,7 @@ static inline u8 testFlag(u32 mask, u32 *flags)
 void *Hud_Create(u32 a, u32 b)
 {
     void *p;
-    if (testFlag(0x80, (u32 *)((u8 *)gGameState + 0x868)))
+    if (testFlag(0x80, &gGameState->flags868))
         p = Hud_CreateAlternateLayout(a, b);
     else if (!(gEngineFlags & 0x800))
         p = Hud_CreateStandardLayout(a, b);

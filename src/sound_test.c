@@ -26,16 +26,11 @@ void SoundTest_CountEntries(struct SoundTest *p)
     p->thirdCategoryCount = CountSoundEntries(gUnk_08613BC4);
 }
 
-static inline void ShowWidget(struct SceneInputWidget *s)
-{
-    s->flags &= ~1;
-}
-
 // Show the selected category categoryLabel and its cursor.
 
 void SoundTest_ShowCategory(struct SoundTest *p)
 {
-    ShowWidget(&p->cursor);
+    SceneInputWidget_Show(&p->cursor);
     Anim_LoadKeyframe(&p->categoryLabel, &p->digitsResource, (u16)(p->selection + 47), 0);
     p->categoryLabel.flags &= ~1;
 }

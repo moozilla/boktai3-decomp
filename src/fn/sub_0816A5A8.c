@@ -10,9 +10,7 @@ s32 MessageWindow_ShowMessage(s32);
 void Hud_SetUpdateCallback(struct SceneHudState *, void (*)(struct SceneHudState *));
 void ScenePanel_BeginDetail(struct SceneHudState *p)
 {
-    u32 *a, *b;
     s32 i;
-    u16 zero;
     PauseMenu_HideAllSprites(p);
     Bg_SetLayerMap(0, p->accountLayerMap, 4);
     BgGfx_LoadTilemapSimple(0, 0, 0, 0, 0);
@@ -28,18 +26,13 @@ void ScenePanel_BeginDetail(struct SceneHudState *p)
     Anim_LoadKeyframe(&p->accountCursor, &p->accountResource, 0x12, 1);
     p->accountRateIcon.flags &= ~1;
     Anim_LoadKeyframe(&p->accountRateIcon, &p->accountResource, p->selectedQuantity + 9, 1);
-    b = &p->accountTotalDigits[0].flags;
-    a = &p->accountValueDigits[0].flags;
-    for (i = 3; i >= 0; i--) {
-        *a &= ~1;
-        *b &= ~1;
-        b += 24;
-        a += 24;
+    for (i = 0; i < 4; i++) {
+        p->accountValueDigits[i].flags &= ~1;
+        p->accountTotalDigits[i].flags &= ~1;
     }
-    zero = 0;
     PauseMenu_RefreshPriceDigits(p);
-    p->balanceLimitTimer = zero;
-    p->balanceLimitShown = zero;
+    p->balanceLimitTimer = 0;
+    p->balanceLimitShown = 0;
     p->quantityArrowTimer = 0;
     Anim_LoadKeyframe(&p->accountCursor, &p->accountResource, 0x12, 1);
     AnimData_SelectPaletteBank((u8 *)p + 0xC54, 0x1B4);

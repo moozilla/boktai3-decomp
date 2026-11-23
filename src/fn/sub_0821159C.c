@@ -15,17 +15,17 @@ void ScreenTransition_SendCommand(s32, s32, s32, s32, s32, s32, s32);
 void Sound_PlaySong(u32);
 s32 CollectionMenu_Init(u8 *s)
 {
-    u32 zero = 0, four;
+    u32 four;
     s16 *p;
     void *v;
-    *(u32 *)(s + 0x20) = zero;
-    *(u16 *)(s + 0xb80) = zero;
-    *(u16 *)(s + 0xb82) = zero;
+    *(u32 *)(s + 0x20) = 0;
+    *(u16 *)(s + 0xb80) = 0;
+    *(u16 *)(s + 0xb82) = 0;
     p = (s16 *)(s + 0xb8e);
     four = 4;
     *p = four;
-    *(u16 *)(s + 0xb8c) = zero;
-    *(u16 *)(s + 0xb88) = zero;
+    *(u16 *)(s + 0xb8c) = 0;
+    *(u16 *)(s + 0xb88) = 0;
     Collection_LoadPageBackground(s);
     CollectionMenu_InitGraphics(s);
     if (!Script_SeekToKeyword(0x6d))
@@ -51,7 +51,7 @@ success:
     ScrollingDialogue_RequestShow();
     ScrollingDialogue_ClearScript();
     Collection_UpdateSelectedEntryText(s);
-    ScreenTransition_SendCommand(0, *p, 4, 4, four, 0xffff, zero);
+    ScreenTransition_SendCommand(0, *p, 4, 4, four, 0xffff, 0);
     Sound_PlaySong(0x118);
     return 0;
 }

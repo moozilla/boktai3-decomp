@@ -26,19 +26,12 @@ void Hud_InitializeThreeIcons(struct Hud *hud)
 {
     struct HudIconOffset offset;
     s32 i;
-    s32 zero;
-    s32 j;
-    struct HudIcon *icon;
     offset.y = 8;
     offset.z = 0;
-    i = 0;
-    zero = 0;
-    icon = hud->icons;
-    j = 0;
-    for (; i < 3; icon++, j++, i++) {
+    for (i = 0; i < 3; i++) {
         offset.x = (i + 14) * 8;
-        Widget_InitLinked(icon, hud->resource, 0x29, 0x10031, zero, zero, 60, &offset);
-        icon->tile = zero;
-        hud->icons[j].tiles = gPaletteBankData + (icon->tile << 5);
+        Widget_InitLinked(&hud->icons[i], hud->resource, 0x29, 0x10031, 0, 0, 60, &offset);
+        hud->icons[i].tile = 0;
+        hud->icons[i].tiles = gPaletteBankData + (hud->icons[i].tile << 5);
     }
 }

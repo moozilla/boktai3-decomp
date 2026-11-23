@@ -7,6 +7,7 @@
 #include "monster_particle_random.h"
 #include "engine.h"
 #include "ram.h"
+#include "vanargand_projectiles.h"
 
 /* Tentative inventory display family, inferred from slot and item consumers. */
 
@@ -94,13 +95,9 @@ void InventoryPanel_SetEntryRow(struct MenuDisplay *, s32, s32, s32, s32, s32);
 
 static inline void HideSelected(struct InventoryPanel *p, s32 x, s32 y)
 {
-    u32 mask = 1;
-    struct InventoryPanelElement *e = p->selected;
-    s32 i = 2;
-    do {
-        e->flags |= mask;
-        e++;
-    } while (--i >= 0);
+    s32 i;
+    for (i = 0; i < 3; i++)
+        p->selected[i].flags |= 1;
     Hud_FillDigitCells(3, x, y, 0);
 }
 
@@ -349,13 +346,6 @@ extern const s16 gUnk_086149C4[];
 
 void *AnimData_FindEntry(s32);
 
-static inline s32 Scale(s32 value)
-{
-    if (value >= 0)
-        return value >> 12;
-    return -(-value >> 12);
-}
-
 static inline u32 Arg1(u32 k_, s32 angle)
 {
     return angle + k_;
@@ -390,8 +380,8 @@ void InventoryPanel_StartCallbackBurst(struct InventoryPanel *panel, s32 index, 
             Effect_SetPalette(sprite, 0);
             angle = ((i * 32) + (((s32)ParticleRandom_ReadSample(table) >> 3) & 0xf)) - 8;
             scale = (((s32)ParticleRandom_ReadDirectSample(table) >> 3) & 1) + 3;
-            entry->velocityX = Scale(gUnk_086149C4[Arg1(0x40, angle) & 0xff] * scale);
-            entry->velocityY = Scale(gUnk_086149C4[angle & 0xff] * scale) - 2;
+            entry->velocityX = VanargandProjectile_Scale(gUnk_086149C4[Arg1(0x40, angle) & 0xff] * scale);
+            entry->velocityY = VanargandProjectile_Scale(gUnk_086149C4[angle & 0xff] * scale) - 2;
             entry->sprite.position.x = entry->velocityX + x;
             entry->sprite.position.y = entry->velocityY + y;
             state->active = 1;
@@ -432,37 +422,20 @@ void PlayerPanel_RemoveEffects(struct InventoryPanel *panel)
 
 void InventoryPanel_InitCallbackGroups(struct InventoryPanel *panel)
 {
-    s32 i = 0;
-    do {
-        struct InventoryPanelCallbackGroup *group;
-        s32 frame;
-        s32 negative;
-        u32 zero;
-        s32 next;
-        struct InventoryPanelCallbackState *state;
-        struct InventoryPanelCallback *entry;
-        s32 j;
-        group = &panel->groups[i];
-        frame = 0x91;
+    s32 i, j;
+    for (i = 0; i <= 1; i++) {
+        struct InventoryPanelCallbackGroup *group = &panel->groups[i];
+        s32 frame = 0x91;
         if (i == 0)
             frame = 0x11;
         group->context = AnimData_FindEntry(0x1C1E);
         group->active = 0;
         group->initialized = 0;
-        next = i + 1;
-        negative = -4;
-        zero = 0;
-        state = &group->entries[0].state;
-        entry = group->entries;
-        j = 7;
-        do {
-            ParticleSprite_Initialize(&entry->sprite, group->context, frame);
-            Effect_SetOrigin(&entry->sprite, negative, negative);
-            entry->sprite.priority = zero;
-            state->active = zero;
-            state = (struct InventoryPanelCallbackState *)((u8 *)state + sizeof(*entry));
-            entry++;
-        } while (--j >= 0);
-        i = next;
-    } while (i <= 1);
+        for (j = 0; j < 8; j++) {
+            ParticleSprite_Initialize(&group->entries[j].sprite, group->context, frame);
+            Effect_SetOrigin(&group->entries[j].sprite, -4, -4);
+            group->entries[j].sprite.priority = 0;
+            group->entries[j].state.active = 0;
+        }
+    }
 }

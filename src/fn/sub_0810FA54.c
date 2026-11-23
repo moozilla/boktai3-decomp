@@ -15,21 +15,13 @@ void Widget_InitLinked(void *, void *, int, int, int, int, int, void *);
 void RecordList_InitializeSprites(struct RecordList *list)
 {
     s32 i;
-    struct RecordMenuSprite *sprite;
     void *proc;
     proc = ScriptProc_Start(0xcb05, 0x1289);
     list->spriteProc = proc;
     ResourceHeader_Relocate(list->resource, proc);
-    i = 0;
-    {
-        s32 zero = 0;
-        sprite = list->sprites;
-        for (; i < 18; i++) {
-            Widget_InitLinked(sprite, list->resource, list->spriteIds[i], 16, zero, zero, zero,
-                              (void *)zero);
-            list->states[i] = -1;
-            sprite++;
-        }
+    for (i = 0; i < 18; i++) {
+        Widget_InitLinked(&list->sprites[i], list->resource, list->spriteIds[i], 16, 0, 0, 0, 0);
+        list->states[i] = -1;
     }
 }
 void sub_0810FADC(struct RecordList *list)

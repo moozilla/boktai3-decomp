@@ -1,3 +1,4 @@
+#include "engine_pause.h"
 #include "modifier_list.h"
 #include "ram.h"
 void ModifierMenu_ValidateSavedSelection(struct ModifierMenu *);
@@ -15,13 +16,11 @@ void ScrollingDialogue_RequestShow(void);
 void ModifierMenu_InitSavedCursors(struct ModifierMenu *);
 s32 ModifierMenu_Initialize(struct ModifierMenu *menu)
 {
-    u32 mask;
     u32 flags;
     menu->unknown116 = 0;
     ModifierMenu_ValidateSavedSelection(menu);
     ModifierMenu_LoadSavedSelection(menu);
-    mask = 0x800;
-    flags = (gEngineFlags | gScenePauseFlags) & mask;
+    flags = Engine_PauseBits(0x800);
     /* The masked value is zero or 0x800: negation extracts its nonzero flag. */
     menu->specialHeader = Script_GetKeywordValue('E', (0 - flags) >> 31);
     menu->script = (void *)Script_GetKeywordValue('e', 0);
@@ -36,7 +35,7 @@ s32 ModifierMenu_Initialize(struct ModifierMenu *menu)
     ModifierMenu_StartBackgroundScript(menu);
     ModifierMenu_InitializeGraphics(menu);
     ModifierMenu_InitHeaderBackdrop(menu);
-    ModifierMenu_InitSelectionSnapshot((u8 *)menu + 0x3C, menu->tilemap);
+    ModifierMenu_InitSelectionSnapshot(&menu->paletteCycle, menu->tilemap);
     if (ModifierMenu_CreateTextWindows(menu) < 0)
         return -1;
     ScrollingDialogue_RequestShow();

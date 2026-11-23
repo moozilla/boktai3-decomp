@@ -43,7 +43,6 @@ static inline u32 TestSlot(s32 i)
 
 
 
-
 struct FlagHalfword {
     s16 bits;
 };
@@ -180,7 +179,6 @@ u32 sub_0813727C(struct ChaseActor *actor)
     u16 flags;
     u16 *flagsp;
     struct ContactPosition *dest;
-    u32 bit;
     if (IsUnavailable(actor))
         return 0;
     target = (void *)actor->base.tracking.target;
@@ -227,10 +225,9 @@ u32 sub_0813727C(struct ChaseActor *actor)
         dest->z = link->point->z;
         dest->y = CellHeight(Terrain_GetCellIndex(dest), dest);
     }
-    bit = 0x200;
     group->destination->pad = 1;
     if (!MoveTo(actor, group->shape, &actor->base.body.position, group->destination, &flagsp,
-                bit)) {
+                0x200)) {
         Callback_InvokeActor(actor, group->failureCallback);
     } else {
         u16 *resetFlags;

@@ -30,15 +30,10 @@ void TimeResult_BeginFadeOut(struct ChallengeTimeResult *result)
 
 void TimeResult_BeginDigitReveal(struct ChallengeTimeResult *result)
 {
-    void (*f)(struct ChallengeTimeResult *) = TimeResult_UpdateDigitReveal;
-    s32 m = ~1;
-    u32 *flags = &result->digits[0].flags;
     s32 i;
-    for (i = 5; i >= 0; i--) {
-        *flags &= m;
-        flags = (void *)((u8 *)flags + sizeof(struct SceneInputWidget));
-    }
-    TimeResult_SetState(result, f);
+    for (i = 0; i < 6; i++)
+        result->digits[i].flags &= ~1;
+    TimeResult_SetState(result, TimeResult_UpdateDigitReveal);
 }
 
 s32 TimeResult_HandleInput(struct ChallengeTimeResult *result)
@@ -246,27 +241,17 @@ void TimeResult_InitCategoryDisplay(struct ChallengeTimeResult *result)
 
 void TimeResult_InitAnimations(struct ChallengeTimeResult *result)
 {
-    u32 bank = 0xCB05, zero, duration;
-    struct SceneInputResource *resource = ScriptProc_Start(bank, 0x1289), *first;
-    struct SceneInputWidget *digit;
+    struct SceneInputResource *resource = ScriptProc_Start(0xCB05, 0x1289);
     s32 i;
     result->categoryGraphics = *resource;
-    first = &result->categoryGraphics;
-    ResourceHeader_Relocate(first, resource);
-    resource = ScriptProc_Start(bank, 0xE2AB);
+    ResourceHeader_Relocate(&result->categoryGraphics, resource);
+    resource = ScriptProc_Start(0xCB05, 0xE2AB);
     result->digitGraphics = *resource;
     ResourceHeader_Relocate(&result->digitGraphics, resource);
-    Widget_InitLinked(&result->category, first, 0, 0x10, 1, zero = 0, duration = 0x3C, 0);
-    Widget_InitLinked(&result->label, first, 0, 0x10, 2, zero, duration, zero);
-    {
-        u32 initialState = 0;
-        digit = &result->digits[0];
-        for (i = 5; i >= 0; i--) {
-            Widget_InitLinked(digit, &result->digitGraphics, 0, 0x31, 2, initialState, 0x3C,
-                              initialState);
-            digit++;
-        }
-    }
+    Widget_InitLinked(&result->category, &result->categoryGraphics, 0, 0x10, 1, 0, 0x3C, 0);
+    Widget_InitLinked(&result->label, &result->categoryGraphics, 0, 0x10, 2, 0, 0x3C, 0);
+    for (i = 0; i < 6; i++)
+        Widget_InitLinked(&result->digits[i], &result->digitGraphics, 0, 0x31, 2, 0, 0x3C, 0);
     TimeResult_InitCategoryDisplay(result);
     TimeResult_SetElapsedDigits(result);
     result->category.flags |= 1;
@@ -317,47 +302,11 @@ struct ChallengeTimeResult *TimeResult_Create(void)
     return p;
 }
 
-void Actor_UpdateStateTwo(u32 context, struct StateActor *actor)
-{
-    if (actor->enterCommand != 0) {
-        actor->enterCommand = 0;
-        actor->done = 0;
-        actor->nextState = 2;
-        Trigger_ConsumePending(actor->receiver, 1);
-    }
-}
+STATE_COMMAND_GO(Actor_UpdateStateTwo, 2)
 
-void Actor_UpdateStateThree(u32 context, struct StateActor *actor)
-{
-    if (actor->enterCommand != 0) {
-        actor->enterCommand = 0;
-        actor->done = 0;
-        actor->nextState = 3;
-    }
-    if (actor->done != 0) {
-        u32 ready = 1;
-        actor->state = ready;
-        actor->timer = 0;
-        actor->enterCommand = ready;
-        Trigger_ConsumePending(actor->receiver, 1);
-    }
-}
+STATE_COMMAND_RESTART(Actor_UpdateStateThree, 3)
 
-void Actor_UpdateStateFour(u32 context, struct StateActor *actor)
-{
-    if (actor->enterCommand != 0) {
-        actor->enterCommand = 0;
-        actor->done = 0;
-        actor->nextState = 4;
-    }
-    if (actor->done != 0) {
-        u32 ready = 1;
-        actor->state = ready;
-        actor->timer = 0;
-        actor->enterCommand = ready;
-        Trigger_ConsumePending(actor->receiver, 1);
-    }
-}
+STATE_COMMAND_RESTART(Actor_UpdateStateFour, 4)
 
 void Actor_DispatchPrimaryState(u32 context, struct StateActor *actor)
 {

@@ -44,19 +44,16 @@ void SceneInput_BuildActionGrid(struct SceneInputGridView *grid, u32 flags)
     if (flags & 0x20)
         *slot1 = 0x26;
     else {
-        u16 empty = 0xff;
-        *slot1 = empty;
+        *slot1 = 0xff;
     }
     if (flags & 0x40)
         *slot2 = 0x27;
     else {
-        u16 empty = 0xff;
-        *slot2 = empty;
+        *slot2 = 0xff;
     }
     if (flags & 0x80)
         *slot3 = 0x28;
     else {
-        u16 empty = 0xff;
-        *slot3 = empty;
+        *slot3 = 0xff;
     }
 }

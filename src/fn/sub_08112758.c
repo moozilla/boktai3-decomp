@@ -34,17 +34,16 @@ void StageResults_CreateTextWindows(void *);
 void StageResults_ShowSummaryText(void *);
 void sub_08112508(void *);
 void ScreenTransition_SendCommand(s32, s32, s32, s32, s32, s32, s32);
+static inline void SetUpdate(struct MessagePanel *panel, void (*update)(void *), u32 state)
+{
+    panel->callback = update;
+    panel->entering = 1;
+    panel->state = state;
+}
 s32 MessagePanel_ConfigureFromScript(struct MessagePanel *p)
 {
     s32 i;
     s32 value;
-    s32 found;
-    s32 zero;
-    void (**callback)(void *);
-    void (*nextCallback)(void *);
-    u8 *entering;
-    u8 *state;
-    struct MessagePanel *owner;
     if (Script_SeekToKeyword(0x6E)) {
         p->script = Script_GetPc();
         if (!p->script)
@@ -55,34 +54,18 @@ s32 MessagePanel_ConfigureFromScript(struct MessagePanel *p)
         if (!p->resource)
             return -1;
     }
-    found = Script_SeekToKeyword(0x62);
-    callback = &p->callback;
-    // Recover the panel that owns the callback slot.
-    owner = (struct MessagePanel *)((u8 *)callback - (u32) & ((struct MessagePanel *)0)->callback);
-    entering = &owner->entering;
-    state = &p->state;
-    if (found) {
+    if (Script_SeekToKeyword(0x62)) {
         s32 scriptPc = Script_GetValueSafe();
         if (!scriptPc) {
-            s32 *q;
-            s32 initial = 6000;
-            i = 11;
-            q = &p->parameters[11];
-            do {
-                *(q--) = initial;
-            } while ((--i) >= 0);
+            for (i = 0; i < 12; i++)
+                p->parameters[i] = 6000;
         } else {
             Script_SetPc(scriptPc);
-            i = 0;
-            goto read_parameter;
-        store_parameter:
-            p->parameters[i] = value;
-            i++;
-        read_parameter:
-            if (i <= 10) {
+            for (i = 0; i <= 10; i++) {
                 value = Script_GetValue();
-                if (value >= 0)
-                    goto store_parameter;
+                if (value < 0)
+                    break;
+                p->parameters[i] = value;
             }
         }
     }
@@ -99,12 +82,8 @@ s32 MessagePanel_ConfigureFromScript(struct MessagePanel *p)
     ModifierMenu_InitSelectionSnapshot(((u8 *)p) + 0x944, p->palette);
     StageResults_CreateTextWindows(p);
     StageResults_ShowSummaryText(p);
-    nextCallback = sub_08112508;
-    zero = 0;
-    *callback = nextCallback;
-    *entering = 1;
-    *state = zero;
+    SetUpdate(p, sub_08112508, 0);
     if (Script_GetKeywordValue(0x66, 0))
-        ScreenTransition_SendCommand(2, 5, 4, 4, 4, 0xFFFF, zero);
+        ScreenTransition_SendCommand(2, 5, 4, 4, 4, 0xFFFF, 0);
     return 1;
 }

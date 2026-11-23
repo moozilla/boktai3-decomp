@@ -187,12 +187,11 @@ s32 PauseMenu_TickPaletteBlend(struct SceneHudState *hud)
     s32 remainingFrames;
     u8 *framep;
     u8 *durp;
-    u32 channelShift = 5;
     u32 channelMask = 31;
     if (!hud->blendActive)
         return 1;
-    fromPalette = (u16 *)(((u8 *)gPaletteBankData) + (hud->blendSourceBank << channelShift));
-    toPalette = (u16 *)(((u8 *)gPaletteBankData) + (hud->blendTargetBank << channelShift));
+    fromPalette = (u16 *)(((u8 *)gPaletteBankData) + (hud->blendSourceBank << 5));
+    toPalette = (u16 *)(((u8 *)gPaletteBankData) + (hud->blendTargetBank << 5));
     framep = &hud->blendFrame;
     ++*framep;
     durp = &hud->blendDuration;
@@ -238,8 +237,7 @@ s32 PauseMenu_TickPaletteBlend(struct SceneHudState *hud)
                     red = Div((fromRed * remainingFrames) + (toRed * (*framep)), *durp);
                     green = Div((fromGreen * remainingFrames) + (toGreen * (*framep)), *durp);
                     blue = Div((fromBlue * remainingFrames) + (toBlue * (*framep)), *durp);
-                    hud->blendedPalette[colorIndex] =
-                        ((blue << 10) | (green << channelShift)) | red;
+                    hud->blendedPalette[colorIndex] = ((blue << 10) | (green << 5)) | red;
                 }
             }
             fromPalette++;

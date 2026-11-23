@@ -12,9 +12,8 @@ void Registry1745_InitParticipantOrder(u8 *p)
     }
     if (i <= 4) {
         u8 *r = q + 0x84;
-        u32 four = 4;
         do {
-            r[i] = four;
+            r[i] = 4;
             i++;
         } while (i <= 4);
     }
