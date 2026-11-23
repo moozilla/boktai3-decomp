@@ -1,3 +1,6 @@
+#include "scene_actor_turn.h"
+#include "terrain_sampling.h"
+#include "scene_actor_chase_shared.h"
 #include "global.h"
 #include "scene_actor_chase.h"
 #include "scene_actor_chase_reaction.h"
@@ -70,10 +73,6 @@ void Vorn_UpdateScriptedAction(struct ChaseActor *actor)
     }
 }
 
-static inline u32 Vorn_RouteFlags(struct ChaseActor *actor, u32 mask)
-{
-    return actor->base.behaviorFlags & mask;
-}
 
 /* Queue pursuit, a home route, or the short waiting response after the delay. */
 
@@ -95,7 +94,7 @@ void Vorn_QueueDelayedResponse(struct ChaseActor *actor)
     if (SceneActorChase_MotionFlags(actor, 0x80)) {
         SceneActorDelay_Prepare((void *)&group->saved, group->common.gate.control, 12, 30);
         SceneActorChase_Arrive(actor);
-    } else if (Vorn_RouteFlags(actor, 0x10)) {
+    } else if (SceneActorTurn_ActorFlags(actor, 0x10)) {
         SceneActorDelay_Prepare((void *)&group->saved, actor->base.onAlternateEntry, 7, 30);
         SceneActorChase_SnapToRoute(group->destination, &group->homeRoute);
         if (!SceneActorChase_TryRoute(actor, group->route, &actor->base.body.position,
@@ -725,12 +724,6 @@ static inline u8 IsUnavailable(void *input)
     return 0;
 }
 
-static inline u8 HasFlags(u16 *flags, u32 mask)
-{
-    if (*flags & mask)
-        return 1;
-    return 0;
-}
 
 static inline u32 MaskedFlags(struct ChaseActor *p, u32 mask)
 {
@@ -754,7 +747,7 @@ void SceneActorPhase_TryBeginSpecialMotion(struct ChaseActor *p)
     if (!IsUnavailable(base) && *(s16 *)(base + 0x682) == 1 && p->base.controlKind != 0x29 &&
         !MaskedFlags(p, 0xE3BF)) {
         u16 *flags;
-        if (!TestContext(base, 0xC, &flags) && HasFlags(flags, 2)) {
+        if (!TestContext(base, 0xC, &flags) && SceneActorChase_TestField(flags, 2)) {
             u32 state = 0x18;
             u8 *field = &p->base.state2A8;
             u32 zero = 0;
@@ -1315,12 +1308,6 @@ static inline void Chase_SetState_1(struct ChaseActor *actor, u32 s, u32 p)
     actor->base.field2B1 = 1;
 }
 
-static inline u8 Chase_Test_(const u16 *value, u32 mask)
-{
-    if (*value & mask)
-        return 1;
-    return 0;
-}
 
 inline static u32 Chase_Bits32_1(struct ChaseActor *actor_, u32 mask)
 {
@@ -1358,7 +1345,7 @@ void Vorn_TryUphillRoute(struct ChaseActor *actor)
     *((u16 *)(context + 0x6BC)) = *((u16 *)(context + 0x6BE));
     if (((s32)Vorn_GetRandomBits(255)) <= 189)
         return;
-    if (Chase_Test_(flags, 0x1D))
+    if (SceneActorChase_TestField(flags, 0x1D))
         return;
     point = (void *)(context + 0x6B0);
     SceneActor_SelectDistantRoutePoint(context, point, &actor->base.body.position, 0x400000);
@@ -1538,13 +1525,6 @@ void Vorn_SelectReactionControl(struct ChaseActor *a)
 
 // confidence=low: route role inferred from callers and terrain/path tests.
 
-static inline u32 CellIndex(struct ContactPosition *p)
-{
-    s32 x = p->x >> 8, z = p->z >> 8;
-    if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
-        return 0;
-    return gTerrainMap->rows[z] + x;
-}
 
 static inline u32 CellHeight(struct ContactPosition *position, u32 cell)
 {
@@ -1573,17 +1553,13 @@ done:
     return height;
 }
 
-static inline void ClearRouteBits(u16 *field, u32 bits)
-{
-    *field &= ~bits;
-}
 
 static inline u8 TryRoute(struct Vorn *actor, void *route, struct ContactPosition *position,
                           struct ContactPosition *target)
 {
     s32 result = Nav_IsPositionInMesh(route, position, target);
     if (!result) {
-        ClearRouteBits(&actor->chase.base.motionFlags, 0x200);
+        Chase_ClearBits(&actor->chase.base.motionFlags, 0x200);
         return 0;
     }
     result = Terrain_ApplyBlocked(route, position, target);
@@ -1592,16 +1568,10 @@ static inline u8 TryRoute(struct Vorn *actor, void *route, struct ContactPositio
             Memory_Clear(&actor->chase.base.body.motion, 8);
         return 1;
     }
-    ClearRouteBits(&actor->chase.base.motionFlags, 0x200);
+    Chase_ClearBits(&actor->chase.base.motionFlags, 0x200);
     return 0;
 }
 
-static inline u8 Test(u16 *p, u32 mask)
-{
-    if (*p & mask)
-        return 1;
-    return 0;
-}
 
 // confidence=low: routes toward the current target after a reaction.
 
@@ -1628,7 +1598,7 @@ void Vorn_BeginTargetPursuit(struct Vorn *actor)
         u16 *point;
     };
     struct RouteLink *point;
-    ClearRouteBits((void *)((u8 *)actor->chase.base.context + 0x6d4), 8);
+    Chase_ClearBits((void *)((u8 *)actor->chase.base.context + 0x6d4), 8);
     if (NeedsResponse(actor->chase.base.context)) {
         Vorn_BeginResponsePursuit(actor, 1, gUnk_0824E230, 0x29a);
         return;
@@ -1678,7 +1648,7 @@ void Vorn_BeginTargetPursuit(struct Vorn *actor)
     point = (struct RouteLink *)(group + 0x74);
     dest->x = point->point[0];
     dest->z = point->point[1];
-    dest->y = CellHeight(dest, CellIndex(dest));
+    dest->y = CellHeight(dest, Terrain_GetCellIndex(dest));
     (*(struct ContactPosition **)(group + 0x200))->pad = 0;
     if (!TryRoute(actor, *(void **)(group + 0x1fc), &actor->chase.base.body.position,
                   &actor->chase.base.tracking.target->position))
@@ -2431,7 +2401,7 @@ void SceneActor_TrySoloAction(struct Vorn *p)
     if (!q->field688)
         return;
     t1 = 4;
-    if (!Test(&q->flags6D4, t1))
+    if (!SceneActorChase_TestField(&q->flags6D4, t1))
         return;
     if (SceneActorRegistry_CountLivingByCategory(0x19) > 1)
         return;
@@ -2683,13 +2653,6 @@ void Vorn_TickSound(struct ChaseActor *actor)
     }
 }
 
-static inline u32 Vorn_CellIndex(struct ContactPosition *p)
-{
-    s32 x = p->x >> 8, z = p->z >> 8;
-    if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
-        return 0;
-    return gTerrainMap->rows[z] + x;
-}
 
 static inline u32 Vorn_CellHeight(struct ContactPosition *position, u32 cell)
 {
@@ -2718,10 +2681,6 @@ done:
     return height;
 }
 
-static inline void Vorn_ClearRouteBits(u16 *field, u32 bits)
-{
-    *field &= ~bits;
-}
 
 static inline void Vorn_SetControl(struct Vorn *actor, void *cb, u32 k)
 {
@@ -2782,7 +2741,7 @@ static inline void Vorn_SnapTarget(struct ContactPosition *out,
 {
     out->x = point->x;
     out->z = point->z;
-    out->y = Vorn_CellHeight(out, Vorn_CellIndex(out));
+    out->y = Vorn_CellHeight(out, Terrain_GetCellIndex(out));
 }
 
 static inline void Vorn_Resume(struct Vorn *input, struct SceneActorChaseGroup *group, u32 *flags)
@@ -2793,7 +2752,7 @@ static inline void Vorn_Resume(struct Vorn *input, struct SceneActorChaseGroup *
     actor->chase.base.field2C2 = 64;
     actor->chase.group.common.gate.flags = 0;
     actor->chase.group.common.gate.counter = 0;
-    Vorn_ClearRouteBits(&actor->chase.base.motionFlags, 0x380);
+    Chase_ClearBits(&actor->chase.base.motionFlags, 0x380);
     {
         struct SceneActorChaseTracking *motion = &actor->chase.base.tracking;
         u32 mask = ~0x18;
@@ -2803,7 +2762,7 @@ static inline void Vorn_Resume(struct Vorn *input, struct SceneActorChaseGroup *
         struct SceneActorRegistryControl *control = &actor->chase.group.common.control;
         if (Vorn_MaskLow(actor, 0x200000)) {
             SceneActorChase_ClearWordFlags(flags, 0x1000000);
-            Vorn_ClearRouteBits(&actor->chase.base.motionFlags, 0x200);
+            Chase_ClearBits(&actor->chase.base.motionFlags, 0x200);
             {
                 control->mode = 0;
                 control->counter = 0;
@@ -2811,7 +2770,7 @@ static inline void Vorn_Resume(struct Vorn *input, struct SceneActorChaseGroup *
             }
         }
     }
-    Vorn_ClearRouteBits(&actor->chase.base.motionFlags, 0x400);
+    Chase_ClearBits(&actor->chase.base.motionFlags, 0x400);
     actor->chase.group.turn.turnsRemaining = 255;
     SceneActorAttachment_ReplaceResponseSlot(actor, 0, 2, 0x19);
     SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0);
@@ -2841,7 +2800,7 @@ static inline void Vorn_Resume(struct Vorn *input, struct SceneActorChaseGroup *
         value |= mask;
         *field = value;
     }
-    Vorn_ClearRouteBits(&actor->chase.base.reactionFlags, 0x9c9);
+    Chase_ClearBits(&actor->chase.base.reactionFlags, 0x9c9);
     SceneBody_StartRoute(&actor->chase.base.body.id, &group->homeRoute, group->homeRoute.routeId,
                          group->homeRoute.parameterB, group->homeRoute.pointId);
     point = &group->homeRoute;
@@ -2882,12 +2841,12 @@ void Vorn_ResumeRouteAfterReaction(void *object)
     }
     if (Vorn_TestBody(body, 4)) {
         Vorn_Resume(actor, group, flags);
-        Vorn_ClearRouteBits(&((struct Vorn *)actor->chase.base.context)->flags6D4, 6);
+        Chase_ClearBits(&((struct Vorn *)actor->chase.base.context)->flags6D4, 6);
         SceneActorChase_ClearWordFlags(flags, 4);
         Vorn_SendMessage(&actor->chase);
     } else if (Vorn_TestBody(body, 16)) {
         Vorn_Resume(actor, group, flags);
-        Vorn_ClearRouteBits(&((struct Vorn *)actor->chase.base.context)->flags6D4, 0x70);
+        Chase_ClearBits(&((struct Vorn *)actor->chase.base.context)->flags6D4, 0x70);
         SceneActorChase_ClearWordFlags(flags, 4);
         Vorn_SendMessage(&actor->chase);
     }
@@ -2935,7 +2894,7 @@ u8 SceneActor_DispatchContextAction(struct Vorn *q, u32 reset)
         Vorn_BeginPursuitRoute(p, reset);
         return 1;
     }
-    if (Test(flags, 0x10)) {
+    if (SceneActorChase_TestField(flags, 0x10)) {
         if (reset == 1)
             q->field6D0 = 0;
         if (SceneActor_IsFacingNearbyTarget(p)) {
@@ -3285,14 +3244,6 @@ struct SRestoreControlAfterItemLaunch {
     u32 at3D4;
 };
 
-inline static u8 TakeFlag(u8 *p)
-{
-    if (*p) {
-        *p = 0;
-        return 1;
-    }
-    return 0;
-}
 
 s32 SceneActor_TryLaunchItem13(struct SceneActorItemLaunch *p);
 
@@ -3301,7 +3252,7 @@ s32 SceneActor_TryLaunchItem13(struct SceneActorItemLaunch *p);
 void Vorn_RestoreControlAfterItemLaunch(struct SRestoreControlAfterItemLaunch *s)
 {
     struct SRestoreControlAfterItemLaunch *context = s->other;
-    if (TakeFlag(&s->queued)) {
+    if (SceneActorControl_TakeFlag(&s->queued)) {
         void (*fn)(void);
         u32 zero;
         u8 one;
