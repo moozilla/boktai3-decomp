@@ -2,8 +2,7 @@
 void Hresvelgr_UpdateActionTwentyEightRequest(struct StateActor *p)
 {
     if (StateActor_ConsumeActionEntry(p)) {
-        u32 v = 0x1c;
-        p->actionAnimation = v;
+        SceneActorState_SetAnimation(p, 0x1c);
         Trigger_ConsumePending(p->receiver2, 1);
     }
     p->actionTimer++;

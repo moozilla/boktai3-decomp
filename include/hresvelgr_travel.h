@@ -76,6 +76,13 @@ static inline void Hresvelgr_SetFlags(struct HresvelgrTravelActor *actor, u32 fl
     actor->flags |= flags;
 }
 
+/* SceneActorState_SetAnimation on this type: requestedAnimation is the StateActor's
+ * actionAnimation (0xAA). */
+static inline void Hresvelgr_SetActionAnimation(struct HresvelgrTravelActor *actor, u32 animation)
+{
+    actor->requestedAnimation = animation;
+}
+
 static inline void Hresvelgr_EnterPhase(struct HresvelgrTravelActor *actor, u32 phase)
 {
     actor->phase = phase;
