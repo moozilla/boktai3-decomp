@@ -19,10 +19,9 @@ void SceneActorReaction_RestoreAfterDelay(struct ChaseActor *actor, s32 frame)
         owner->base.target = control;
         owner->base.field2C8 = zero;
         {
-            u32 offset = 0x114;
             u32 *field;
             u32 mask;
-            field = (void *)((u8 *)owner + offset);
+            field = (void *)((u8 *)owner + 0x114);
             mask = ~1;
             *field &= mask;
             {
