@@ -90,6 +90,29 @@ const GOALS = {
     return true;
   },
 
+  // Onward: M1, then repeatedly play to control and leave by a door, preferring
+  // scenes not visited yet (stages.json doors, else any box the live map has that a
+  // door record names). Logs each stop; --scenes N stops after N rooms.
+  *story(g, L) {
+    if (!from && !(yield* GOALS.m1(g, L))) return false;
+    const visited = new Set(), limit = +(opt('--scenes', 8));
+    for (let rooms = 0; rooms < limit; rooms++) {
+      const doorsHere = () => stageOf(L.where().scene).doors.filter((d) => L.boxes().some((b) => b.name === d.box));
+      if (!(yield* untilControl(g, L, () => doorsHere().length > 0, 120, g.frameNo + 30000))) { event({ skill: 'stop', why: 'no control with a door in 30000 frames', ...L.where() }); return rooms > 0; }
+      const here = L.where().scene;
+      visited.add(here);
+      const doors = doorsHere().sort((a, b) => visited.has(a.scene) - visited.has(b.scene));
+      event({ skill: 'room', ...L.where(), doors: doors.map((d) => `${d.box}->${d.scene}`) });
+      let moved = false;
+      for (const d of doors) {
+        if (yield* throughDoor(g, L, d.box)) { moved = true; break; }
+        if (L.where().scene !== here) { moved = true; break; }
+      }
+      if (!moved) { event({ skill: 'stop', why: 'no door worked', ...L.where() }); return rooms > 0; }
+    }
+    return true;
+  },
+
   // With --from: navigate to --box from where that run ended (a debugging aid).
   *nav(g, L) {
     yield 1;

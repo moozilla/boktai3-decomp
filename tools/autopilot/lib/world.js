@@ -46,6 +46,9 @@ exports.cellOf = (x, z) => [x >> 8, z >> 8];
 exports.findPath = (grid, start, goals, blocked = new Set()) => {
   const key = (x, z) => x + ',' + z;
   const open = (x, z) => { const c = grid.at(x, z); return c && c.open && !blocked.has(key(x, z)); };
+  // a step between cells: the same level, or through a slope at most one level apart
+  // (no drops: a pit can trap the player)
+  const step = (a, b) => a.level === b.level || ((a.slope || b.slope) && Math.abs(a.level - b.level) <= 1);
   const gx = [...goals].map((k) => k.split(',').map(Number));
   const hfn = (x, z) => Math.min(...gx.map(([a, b]) => Math.max(Math.abs(a - x), Math.abs(b - z))));
   const came = new Map(), cost = new Map([[key(...start), 0]]), frontier = [[hfn(...start), ...start]];
@@ -60,7 +63,9 @@ exports.findPath = (grid, start, goals, blocked = new Set()) => {
     for (const [dx, dz] of [[1, 0], [-1, 0], [0, 1], [0, -1], [1, 1], [1, -1], [-1, 1], [-1, -1]]) {
       const nx = x + dx, nz = z + dz;
       if (!open(nx, nz) && !goals.has(key(nx, nz))) continue;
-      if (dx && dz && !(open(x + dx, z) && open(x, z + dz))) continue;
+      const from = grid.at(x, z), to = grid.at(nx, nz);
+      if (to && to.open && !step(from, to)) continue;
+      if (dx && dz && !(open(x + dx, z) && open(x, z + dz) && step(from, grid.at(x + dx, z)) && step(from, grid.at(x, z + dz)))) continue;
       const nk = key(nx, nz), c = cost.get(k) + (dx && dz ? 1.414 : 1);
       if (c < (cost.get(nk) ?? Infinity)) { cost.set(nk, c); came.set(nk, k); frontier.push([c + hfn(nx, nz), nx, nz]); }
     }
