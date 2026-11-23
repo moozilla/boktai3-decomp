@@ -1,3 +1,4 @@
+#include "scene_actor_availability.h"
 #include "scene_actor_chase_shared.h"
 #include "global.h"
 #include "scene_actor_damage_visibility.h"
@@ -67,10 +68,6 @@ static inline u8 PlacementDamage_TestField(u32 mask, const u16 *field)
         return 1;
     return 0;
 }
-static inline u32 PlacementDamage_FieldBits(u32 mask, const u16 *field)
-{
-    return *field & mask;
-}
 
 // confidence=low: expanded scene-actor hit processing with route and collider cleanup.
 u8 SceneActorReaction_ApplyLinkedAreaDamage(void *);
@@ -115,10 +112,6 @@ static inline u8 HasPendingHitSave(struct ChaseActor *actor, u16 **out)
     return 1;
 }
 
-static inline u32 PlacementDamage_MotionBits(u32 mask, u16 *flags2D4)
-{
-    return (*flags2D4) & mask;
-}
 
 static inline void PlacementDamage_ReportHud(struct ChaseActor *actor, u32 id, s32 health,
                                              u32 maximum, u32 kind, u32 mode, u32 parameter,
@@ -142,7 +135,7 @@ static inline void PlacementDamage_UpdateCollider(struct ContactCollider *collid
     if (PlacementDamage_TestField(0x40, &actor->base.placementFlags))
         collider->flags &= ~0x100;
     else if ((actor->base.hitReactionFlags & 0x84000) ||
-             PlacementDamage_FieldBits(0x2016, flags2D4))
+             SceneActor_MaskedHalfword(0x2016, flags2D4))
         collider->flags &= ~0x100;
     else
         collider->flags |= 0x100;
@@ -224,7 +217,7 @@ u8 SceneActorReaction_ResolvePlacementDamage(struct ChaseActor *actor)
         flags2D8 = damageFlags;
         collider = &actor->base.colliderA;
         if (!blocked) {
-            if ((mode & 4) && (!PlacementDamage_MotionBits(4, flags2D4))) {
+            if ((mode & 4) && (!SceneActor_MaskedHalfword(4, flags2D4))) {
                 SceneActorBehavior_PlayReactionSound(actor);
                 *(u16 *)&actor->base.particleTimer = 12;
             }
