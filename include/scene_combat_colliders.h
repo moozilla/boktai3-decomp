@@ -3,6 +3,13 @@
 
 #include "scene_combat_actor.h"
 
+/* contact_collider.h has the setter; the combat actor's colliders also clear reaction flags. */
+static inline void ContactCollider_ClearReactionFlags(struct ContactCollider *collider, u32 bits)
+{
+    u32 mask = ~bits;
+    collider->reactionFlags &= mask;
+}
+
 static inline void ActorControllerMotion_ClearFlags(struct ActorControllerMotion *motion, u32 bits)
 {
     u32 mask = ~bits;
