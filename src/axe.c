@@ -2436,7 +2436,7 @@ struct TrailSprite {
     struct ContactPosition position;
 };
 
-struct AxeTrailSlot {
+struct AxeTrailSpriteSlot {
     struct TrailSprite sprite;
     u8 unknown24[0x24];
     struct DisplaySequenceState sequence;
@@ -2447,7 +2447,7 @@ struct AxeTrailSlot {
 
 struct AxeTrailContext {
     u8 unknown0[0x708];
-    struct AxeTrailSlot slots[4];
+    struct AxeTrailSpriteSlot slots[4];
     u8 unknown888[0x5BC];
     u16 nextSlot, interval;
     u8 unknownE48[0x8F];
@@ -2493,7 +2493,7 @@ void Axe_EmitMotionTrail(struct ChaseActor *actor)
             struct DisplaySequenceState *source = &drawable->sequence;
             u16 sequence = source->sequenceId;
             {
-                u32 offset = trail->nextSlot * sizeof(struct AxeTrailSlot);
+                u32 offset = trail->nextSlot * sizeof(struct AxeTrailSpriteSlot);
                 u8 *destination = context + (offset + 0x708);
                 u8 *sequenceState = destination + 0x48;
                 u32 sequenceOffset = 0x760;
@@ -2503,73 +2503,56 @@ void Axe_EmitMotionTrail(struct ChaseActor *actor)
             }
         }
     }
-    sprite = (void *)((trail->nextSlot * sizeof(struct AxeTrailSlot)) + (u32)context);
+    sprite = (void *)((trail->nextSlot * sizeof(struct AxeTrailSpriteSlot)) + (u32)context);
     sprite = (void *)((u8 *)sprite + 0x708);
     PlayerCue_StepSequence((void *)sprite, &trail->slots[trail->nextSlot].sequence);
     {
-        u32 offset = ((struct AxeTrailContext *)context)->nextSlot * sizeof(struct AxeTrailSlot);
+        u32 offset = ((struct AxeTrailContext *)context)->nextSlot * sizeof(struct AxeTrailSpriteSlot);
         u8 *slot = context + offset;
         *((struct ContactPosition *)(slot + 0x724)) = actor->base.body.position;
     }
     {
-        u32 offset = ((struct AxeTrailContext *)context)->nextSlot * sizeof(struct AxeTrailSlot);
+        u32 offset = ((struct AxeTrailContext *)context)->nextSlot * sizeof(struct AxeTrailSpriteSlot);
         u8 *slots = context + 0x708;
         *((u32 *)(slots + offset)) &= ~1;
-        slots += ((struct AxeTrailContext *)context)->nextSlot * sizeof(struct AxeTrailSlot);
+        slots += ((struct AxeTrailContext *)context)->nextSlot * sizeof(struct AxeTrailSpriteSlot);
         *((u32 *)slots) |= 2;
     }
     {
-        u32 offset = ((struct AxeTrailContext *)context)->nextSlot * sizeof(struct AxeTrailSlot);
+        u32 offset = ((struct AxeTrailContext *)context)->nextSlot * sizeof(struct AxeTrailSpriteSlot);
         u8 *slot = context + offset;
         *((u16 *)(slot + 0x764)) = 8;
     }
     sourceDrawable = actor->base.drawable;
     slotBase =
-        context + ((((struct AxeTrailContext *)context)->nextSlot) * sizeof(struct AxeTrailSlot));
+        context + ((((struct AxeTrailContext *)context)->nextSlot) * sizeof(struct AxeTrailSpriteSlot));
     CopyAngle(sourceDrawable, slotBase);
     scaleDrawable = actor->base.drawable;
     scaleSlotBase =
-        context + ((((struct AxeTrailContext *)context)->nextSlot) * sizeof(struct AxeTrailSlot));
+        context + ((((struct AxeTrailContext *)context)->nextSlot) * sizeof(struct AxeTrailSpriteSlot));
     CopyScaleX(scaleDrawable, scaleSlotBase);
     sourceDrawable = actor->base.drawable;
     slotBase =
-        context + ((((struct AxeTrailContext *)context)->nextSlot) * sizeof(struct AxeTrailSlot));
+        context + ((((struct AxeTrailContext *)context)->nextSlot) * sizeof(struct AxeTrailSpriteSlot));
     CopyScaleY(sourceDrawable, slotBase);
     if ((++(((struct AxeTrailContext *)context)->nextSlot)) > 3)
         ((struct AxeTrailContext *)context)->nextSlot = 0;
 }
 
-struct AxeTrailSlotEmitTrailSprite {
-    struct DisplaySequenceSprite sprite;
-    struct ContactSwarmGraphics graphics;
-    struct DisplaySequenceState sequence;
-    const void *resource;
-    u16 lifetime, unknown5E;
-};
-
-struct AxeTrailContextEmitTrailSprite {
-    u8 unknown0[0x708];
-    struct AxeTrailSlotEmitTrailSprite trail[4];
-    u8 unknown888[0xE44 - 0x888];
-    u16 nextTrail, spacing;
-    u8 unknownE48[0xED7 - 0xE48];
-    u8 variant;
-};
-
-static inline const void *Axe_TrailResource(struct AxeTrailContextEmitTrailSprite *context,
+static inline const void *Axe_TrailResource(struct Axe *context,
                                             u32 index)
 {
     return context->trail[index].resource;
 }
 
 static inline void Axe_CopyTrailScaleX(struct DisplaySequenceSprite *source,
-                                       struct AxeTrailContextEmitTrailSprite *row)
+                                       struct Axe *row)
 {
     row->trail[0].sprite.palette = source->palette;
 }
 
 static inline void Axe_CopyTrailScaleY(struct DisplaySequenceSprite *source,
-                                       struct AxeTrailContextEmitTrailSprite *row)
+                                       struct Axe *row)
 {
     row->trail[0].sprite.paletteVariant = source->paletteVariant;
 }
@@ -2648,26 +2631,26 @@ static inline u32 Axe_StepSequence(struct DisplaySequenceSprite *owner,
 void ActorPhase_EmitTrailSprite(struct ChaseActor *actor, const struct ContactPosition *position,
                                 u32 angle)
 {
-    struct AxeTrailContextEmitTrailSprite *context = actor->base.context;
+    struct Axe *context = actor->base.context;
     struct DisplaySequenceSprite *sprite;
     struct DisplaySequenceState *state;
     u32 spriteOffset;
     if (((struct DisplaySequenceSprite *)actor->base.drawable)->flags & 1)
         return;
     {
-        s32 zero = Mod(actor->base.frameCounter, context->spacing);
+        s32 zero = Mod(actor->base.frameCounter, context->trailSpacing);
         if (zero)
             return;
         {
             struct DisplaySequenceState *source =
                 &((struct SceneActorControlMotionDrawable *)actor->base.drawable)->sequence;
             u16 selection = source->sequenceId;
-            u32 indexOffset = context->nextTrail * sizeof(struct AxeTrailSlotEmitTrailSprite);
-            struct AxeTrailSlotEmitTrailSprite *slot;
+            u32 indexOffset = context->nextTrail * sizeof(struct AxeTrailSlot);
+            struct AxeTrailSlot *slot;
             struct DisplaySequenceState *destination;
             const void *resource;
-            spriteOffset = (u32) & ((struct AxeTrailContextEmitTrailSprite *)0)->trail[0];
-            slot = (struct AxeTrailSlotEmitTrailSprite *)((u8 *)context +
+            spriteOffset = (u32) & ((struct Axe *)0)->trail[0];
+            slot = (struct AxeTrailSlot *)((u8 *)context +
                                                           (indexOffset + spriteOffset));
             destination = &slot->sequence;
             resource = Axe_TrailResource(context, context->nextTrail);
@@ -2675,15 +2658,15 @@ void ActorPhase_EmitTrailSprite(struct ChaseActor *actor, const struct ContactPo
         }
     }
     sprite = (struct DisplaySequenceSprite *)(context->nextTrail *
-                                                  sizeof(struct AxeTrailSlotEmitTrailSprite) +
+                                                  sizeof(struct AxeTrailSlot) +
                                               (u32)context);
     sprite = (struct DisplaySequenceSprite *)((u8 *)sprite + spriteOffset);
     state = (struct DisplaySequenceState *)(context->nextTrail *
-                                                sizeof(struct AxeTrailSlotEmitTrailSprite) +
+                                                sizeof(struct AxeTrailSlot) +
                                             (u32)context);
     state = (struct DisplaySequenceState
                  *)((u8 *)state + (u32) &
-                    ((struct AxeTrailContextEmitTrailSprite *)0)->trail[0].sequence);
+                    ((struct Axe *)0)->trail[0].sequence);
     Axe_StepSequence(sprite, state);
     context->trail[context->nextTrail].sprite.position = *position;
     context->trail[context->nextTrail].sprite.flags &= ~1;
@@ -2692,16 +2675,16 @@ void ActorPhase_EmitTrailSprite(struct ChaseActor *actor, const struct ContactPo
     context->trail[context->nextTrail].sprite.attribute = angle;
     {
         struct DisplaySequenceSprite *source = actor->base.drawable;
-        struct AxeTrailContextEmitTrailSprite *row =
+        struct Axe *row =
             (void *)((u8 *)context +
-                     context->nextTrail * sizeof(struct AxeTrailSlotEmitTrailSprite));
+                     context->nextTrail * sizeof(struct AxeTrailSlot));
         Axe_CopyTrailScaleX(source, row);
     }
     {
         struct DisplaySequenceSprite *source = actor->base.drawable;
-        struct AxeTrailContextEmitTrailSprite *row =
+        struct Axe *row =
             (void *)((u8 *)context +
-                     context->nextTrail * sizeof(struct AxeTrailSlotEmitTrailSprite));
+                     context->nextTrail * sizeof(struct AxeTrailSlot));
         Axe_CopyTrailScaleY(source, row);
     }
     if (++context->nextTrail > 3)

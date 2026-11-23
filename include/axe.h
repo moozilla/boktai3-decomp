@@ -4,11 +4,22 @@
 #include "chase_actor.h"
 #include "sprite.h"
 #include "display_sequence.h"
+#include "contact_swarm.h"
+
+/* One of the four afterimage sprites the axe leaves along its path (struct Axe + 0x708). */
+struct AxeTrailSlot {
+    struct DisplaySequenceSprite sprite;
+    struct ContactSwarmGraphics graphics;
+    struct DisplaySequenceState sequence;
+    const void *resource;
+    u16 lifetime, unknown5E;
+};
 
 /* Axe's class fields past the chase actor (Axe_Create allocates 0xF24 bytes; provisional). */
 struct Axe {
     struct ChaseActor chase;
-    u8 unknown624[0x264];
+    u8 unknown624[0xE4];
+    struct AxeTrailSlot trail[4];
     struct ContactPosition position; /* Legacy name for the start of the black effect palette. */
     u8 unknown890[0x78];
     u16 originalEffectPalette[16];
@@ -40,7 +51,9 @@ struct Axe {
     u8 delay;
     u8 turnStep;
     u8 relocationDelay;
-    u8 unknownE41[7];
+    u8 unknownE41[3];
+    u16 nextTrail;   /* the trail slot the next afterimage uses */
+    u16 trailSpacing; /* frames between afterimages */
     s32 healthThreshold;
     u32 flagsE4C;
     u8 unknownE50[6];
