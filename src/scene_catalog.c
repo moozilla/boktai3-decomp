@@ -235,7 +235,6 @@ void MenuSelection_ProcessConfirmation(struct SceneHudState *s)
         MenuDisplay_SetPaletteOverrides(s, 1, 0, 0, 0);
     } else if (state == 1) {
         struct Player **p;
-        s32 neg;
         u32 count;
         Sound_PlaySong(0xDD);
         Presentation_CommitListValues(s);
@@ -245,12 +244,11 @@ void MenuSelection_ProcessConfirmation(struct SceneHudState *s)
         InventoryGrid_LayoutStatMarkers(s);
         Hud_DrawDefaultHealthMeter(s, 1, 8, 8);
         Hud_DrawDefaultEnergyMeter(s, 1, 8, 10, (*p)->currentStatB, (*p)->maximumStatB);
-        neg = -1;
-        PauseMenu_SetPairedIcons(s, 1, neg);
+        PauseMenu_SetPairedIcons(s, 1, -1);
         count = s->entryCount;
         if (count == 0) {
             s->categoryWidgets[5].flags |= state;
-            SceneCatalog_SetDescription(s, neg);
+            SceneCatalog_SetDescription(s, -1);
             Hud_SetInteractionCallback(s, InventoryGrid_UpdateModifierPreview, 0);
             MenuDisplay_SetPaletteOverrides(s, 0, 0, 0, count);
         } else {
@@ -337,7 +335,6 @@ void Hud_DrawStatusDayNightIndicators(struct SceneHudState *s)
 void Hud_InitStatusMenu(struct SceneHudState *s)
 {
     struct Player *p;
-    s32 neg;
     PauseMenu_CloseTextWindows(s);
     MessageWindow_Clear();
     ScrollingDialogue_ClearScript();
@@ -366,14 +363,13 @@ void Hud_InitStatusMenu(struct SceneHudState *s)
     InventoryPanel_ShowStatusIcons(s);
     SceneCatalog_ResetTextWindow(s);
     PauseMenu_SetPromptIconPositions(s, 0, 8);
-    neg = -1;
-    PauseMenu_SetPairedIcons(s, 1, neg);
+    PauseMenu_SetPairedIcons(s, 1, -1);
     InventoryPanel_UpdateSelectedUnlock(s, 20, 7, 0, 0);
     InventoryPanel_UpdateSelectedEquipment(s, 26, 7, 0, 0);
     if (!s->entryCount) {
         s->categoryWidgets[5].flags |= 1;
         s->allocationDescription = 0xFF;
-        SceneCatalog_SetDescription(s, neg);
+        SceneCatalog_SetDescription(s, -1);
         Hud_SetInteractionCallback(s, InventoryGrid_UpdateModifierPreview, 0);
         MenuDisplay_SetPaletteOverrides(s, 0, 0, 0, 0);
     } else {
