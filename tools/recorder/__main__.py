@@ -7,6 +7,9 @@
                                    every write to WHERE: frame, value, the C statement that wrote it
   who-wrote NAME WHERE FRAME       the last write to WHERE at or before FRAME
   at NAME ADDR [FRAME]             what typed object ADDR is at FRAME
+  why NAME WHERE FRAME [--nodes N] [--frames N]
+                                   dynamic backward slice: the C statements, with their runtime
+                                   values, that produced WHERE's value at the end of FRAME
 
 WHERE is an address (0x0300425C), a global with a field path (gGameState.timer,
 gTaskLists[3].head) or an object label at that frame (Player#3.hp). Sessions live in
@@ -234,6 +237,86 @@ def cmd_at(args):
     print(join(label, path), f'({types.name(leaf)})' if leaf is not None else '', f'object at 0x{base:08X}' if base else '')
 
 
+def cmd_why(args):
+    from slicer import Slicer, render
+    s, facts, types = open_session(args.name), Facts(), Types()
+    ram = s.ram_at(args.frame)
+    om = ObjectMap(types, ram)
+    place = resolve_place(args.where, types, lambda: om)
+    v = ram.read(place.addr, min(place.width, 8))
+    print(f'why {place} = {fmt_value(v, place.width, place.signed)} at the end of frame {args.frame}')
+    print()
+    sl = Slicer(s, facts, max_nodes=args.nodes, max_frames=args.frames,
+                log=(lambda m: print(m, file=sys.stderr)) if args.verbose else None)
+    try:
+        sl.why(place.addr, place.width, args.frame)
+    finally:
+        sl.close()
+
+    def describe(a, w):
+        if a is None:
+            return '?'
+        label, path, leaf, _ = om.at(a, w or 1)
+        return join(label, path)
+    print(render(sl, describe))
+    if args.check:
+        print()
+        check_slice(s, sl, place, args.frame, describe)
+
+
+def check_slice(s, sl, place, frame, describe):
+    """Perturb the slice's inputs and cross-frame links in a replay; does the target change?"""
+    from emu import Replay
+
+    def target(r):
+        return r.value(place.addr, min(place.width, 8))
+
+    print('check (replay with one cause perturbed; the target must change):')
+    with Replay(s.path) as r:
+        r.seek(frame)
+        base = target(r)
+        # host solar level behind sensor reads
+        solar_frames = [f for f, text, a in sl.terminals if 'solar level' in text]
+        if solar_frames:
+            f0 = min(solar_frames)
+            level = int(s.frames['solar'][max(f0 - 1, 0)])
+            other = 40 if level > 128 else 230
+            r.seek(max(f0 - 1, 0))
+            r.solar(other)
+            r.run(frame - max(f0 - 1, 0))
+            v = target(r)
+            r.solar(None)
+            print(f"  host solar level {level} -> {other} from frame {f0}: target {base} -> {v}  "
+                  + ('confirmed' if v != base else 'NOT confirmed'))
+        # stores in earlier frames whose value reaches the target through memory
+        seen, checked = set(), 0
+        for n in sorted(sl.nodes, key=lambda n: -n.frame):
+            if n.role != 'store' or n.frame >= frame or n.addr is None or n.value is None:
+                continue
+            key = (n.frame, n.addr)
+            if key in seen or checked >= 10:
+                continue
+            seen.add(key)
+            w = min(n.width or 4, 4)
+            r.seek(n.frame)
+            now = r.value(n.addr, w)
+            results = []
+            for flip in (1, 0x80 if w == 1 else 0x8000 if w == 2 else 0x80000000):
+                r.seek(n.frame)
+                r.poke(n.addr, w, now ^ flip)
+                r.run(frame - n.frame)
+                v = target(r)
+                results.append(v)
+                if v != base:
+                    break
+            ok = any(v != base for v in results)
+            checked += 1
+            print(f"  {describe(n.addr, w)} at the end of frame {n.frame} ({now} -> {now ^ flip}): target {base} -> {results[-1]}  "
+                  + ('confirmed' if ok else 'NOT confirmed (masked or overwritten)'))
+        same = sum(1 for n in sl.nodes if n.frame == frame)
+        print(f"  ({same} links inside frame {frame} are not checked: a replay can only be perturbed at frame boundaries)")
+
+
 def main(argv=None):
     ap = argparse.ArgumentParser(prog='python -m tools.recorder', description=__doc__,
                                  formatter_class=argparse.RawDescriptionHelpFormatter)
@@ -246,12 +329,16 @@ def main(argv=None):
     p.add_argument('--changes', action='store_true', help='only writes that changed the value')
     p = sub.add_parser('who-wrote'); p.add_argument('name'); p.add_argument('where'); p.add_argument('frame', type=int)
     p = sub.add_parser('at'); p.add_argument('name'); p.add_argument('addr'); p.add_argument('frame', type=int, nargs='?')
+    p = sub.add_parser('why'); p.add_argument('name'); p.add_argument('where'); p.add_argument('frame', type=int)
+    p.add_argument('--nodes', type=int, default=400); p.add_argument('--frames', type=int, default=24)
+    p.add_argument('-v', '--verbose', action='store_true')
+    p.add_argument('--check', action='store_true', help='validate the slice by perturbing its causes in a replay')
     args, extra = ap.parse_known_args(argv)
     if args.cmd == 'record':
         return cmd_record(args, extra)
     if extra:
         ap.error('unrecognized arguments: ' + ' '.join(extra))
-    return {'verify': cmd_verify, 'history': cmd_history, 'who-wrote': cmd_who_wrote, 'at': cmd_at}[args.cmd](args) or 0
+    return {'verify': cmd_verify, 'history': cmd_history, 'who-wrote': cmd_who_wrote, 'at': cmd_at, 'why': cmd_why}[args.cmd](args) or 0
 
 
 if __name__ == '__main__':

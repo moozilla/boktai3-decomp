@@ -403,6 +403,8 @@ async function serve(args) {
   const jump = (s) => {
     restore(machine, decodeSnapshot(fs.readFileSync(path.join(dir, 'snap', String(s).padStart(8, '0') + '.gz'))));
     current = s; restoredFrom = s;
+    setMode(machine, 0);   // the snapshot's own mode word is the recording's (REC)
+    drain(machine, () => {});
   };
   const read = lineReader();
   const reply = (o) => process.stdout.write(JSON.stringify(o) + '\n');
@@ -440,6 +442,7 @@ async function serve(args) {
   function status() { return { frame: current, perturbed, divergence }; }
   function go(left, answer, trace, target) {
     // run frames from the current boundary: left more boundaries after the next one
+    drain(machine, () => {});   // nothing from before this run belongs to its trace
     if (trace) {
       traceDir = path.resolve(trace);
       fs.mkdirSync(traceDir, { recursive: true });
