@@ -343,6 +343,35 @@ static inline void SceneActorChase_OrReactionFlags(struct ChaseActor *actor, u16
     actor->base.reactionFlags = mask | actor->base.reactionFlags;
 }
 
+static inline u8 SceneActorChase_HasPlacementFlags(struct ChaseActor *actor, u32 mask)
+{
+    if (actor->base.placementFlags & mask)
+        return 1;
+    return 0;
+}
+
+static inline void SceneActorChase_ClearBehaviorFlags(struct ChaseActor *actor, u32 bits)
+{
+    u32 mask = ~bits;
+    actor->base.behaviorFlags &= mask;
+}
+
+static inline void SceneActorChase_SetStatusFlags(struct ChaseActor *actor, u32 mask)
+{
+    actor->base.statusFlags = mask | actor->base.statusFlags;
+}
+
+static inline void SceneActorChase_ClearStatusFlags(struct ChaseActor *actor, u32 bits)
+{
+    u32 mask = ~bits;
+    actor->base.statusFlags &= mask;
+}
+
+static inline void SceneActorChase_AndMotionFlags(struct ChaseActor *actor, s32 mask)
+{
+    actor->base.motionFlags &= mask;
+}
+
 static inline void SceneActorChase_HalfwordFlagsSet(u16 *field, u32 bits)
 {
     u32 value = *field;
