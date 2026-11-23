@@ -330,25 +330,15 @@ void ChallengeMenu_InitializeKeyframes(struct ChallengeMenu *menu)
 {
     struct ChallengeMenuFrames frames = gUnk_0824F9F0;
     s32 i;
-    struct SceneInputResource *source = &menu->resources[1];
-    u32 *frame = frames.frames;
-    struct SceneInputWidget *animation = menu->widgets;
-    for (i = 0; i < 4; i++) {
-        Anim_LoadKeyframe(animation, &menu->resources[1], (u16)*frame++, 0);
-        animation++;
-    }
-    {
-        u16 *position = (u16 *)&menu->widgets[2].position.x;
-        u8 zero = 0;
-        u32 v;
-        *position = 0x92;
-        *(u16 *)&menu->widgets[2].position.y = v = 0xFFE8;
-        Anim_LoadKeyframe(&menu->widgets[0], source, (u16)(menu->group + 0x50), 0);
-        *(u16 *)&menu->widgets[1].paletteBank = v = 0xD008;
-        menu->widgets[1].palette = menu->palette;
-        CpuSet(gPaletteBankData + 0x64E0, menu->palette, 0x04000008);
-        menu->highlightPhase = zero;
-    }
+    for (i = 0; i < 4; i++)
+        Anim_LoadKeyframe(&menu->widgets[i], &menu->resources[1], (u16)frames.frames[i], 0);
+    menu->widgets[2].position.x = 0x92;
+    menu->widgets[2].position.y = -24;
+    Anim_LoadKeyframe(&menu->widgets[0], &menu->resources[1], (u16)(menu->group + 0x50), 0);
+    menu->widgets[1].paletteBank = 0xD008;
+    menu->widgets[1].palette = menu->palette;
+    CpuSet(gPaletteBankData + 0x64E0, menu->palette, 0x04000008);
+    menu->highlightPhase = 0;
 }
 
 void ChallengeMenu_InitAnimations(struct ChallengeMenu *menu)
