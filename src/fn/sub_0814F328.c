@@ -1,6 +1,7 @@
 #include "player.h"
 #include "global.h"
 #include "contact_actor.h"
+#include "group_objects.h"
 extern const s16 gUnk_086149C4[];
 void SceneParticleBurst_CreateWhilePaused(void *, void *, void *, u32, u32, u32);
 u32 Player_ConsumeStateEntry(void *);
@@ -18,11 +19,6 @@ s32 Player_GetAttackEffectType(u32);
 #define HELD       (p->inputKeys[0] & 2)
 #define PRESSED    (p->inputKeys[1] & 2)
 #define ANIMATE(n) Player_SetAnimation(p, ActorVariant_GetTableValue(p->actionMode, n), 64, 1)
-
-static inline int scale(int n)
-{
-    return n >= 0 ? n >> 12 : -((-n) >> 12);
-}
 
 static inline void FireCharge(struct Player *p)
 {

@@ -4,6 +4,7 @@
 #include "engine.h"
 #include "ram.h"
 #include "player.h"
+#include "state_actor_action_entry.h"
 
 int SceneActorGraphics_GetResourceId(struct StateActor *);
 
@@ -143,16 +144,6 @@ void Path_SnapToRandomFarPoint(void *, void *, u32, u32);
 struct SnapVector {
     u32 a, b;
 };
-
-static inline u8 TakeFlag(struct StateActor *p)
-{
-    if (p->actionEnter) {
-        p->actionEnter = 0;
-        p->actionFinished = 0;
-        return TRUE;
-    }
-    return FALSE;
-}
 
 static inline u8 chk_08023638(struct StateActor *p)
 {

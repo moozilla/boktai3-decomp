@@ -3,6 +3,7 @@
 #include "directional_force.h"
 #include "ram.h"
 #include "player_slot_status.h"
+#include "vanargand_projectiles.h"
 
 #define gSineTable gUnk_086149C4
 s32 Player_GetForceDirection(struct Player *);
@@ -13,12 +14,6 @@ static inline u32 Player_IsActiveInSceneFive(struct Player *p)
     if (p->active && p->sceneMode == 5)
         return 1;
     return 0;
-}
-static inline s32 Player_ScaleForce(s32 value)
-{
-    if (value >= 0)
-        return value >> 12;
-    return -(-value >> 12);
 }
 void Player_ApplyDirectionalForce(struct Player *p)
 {
@@ -40,11 +35,11 @@ void Player_ApplyDirectionalForce(struct Player *p)
     z = gSineTable[direction & 255];
     {
         s32 scaledX;
-        scaledX = Player_ScaleForce(x * gPlayerBackgroundState);
+        scaledX = VanargandProjectile_Scale(x * gPlayerBackgroundState);
         p->velocityX -= scaledX;
     }
     {
-        s32 scaledZ = Player_ScaleForce(z * gPlayerBackgroundState);
+        s32 scaledZ = VanargandProjectile_Scale(z * gPlayerBackgroundState);
         p->velocityZ -= scaledZ;
     }
 }

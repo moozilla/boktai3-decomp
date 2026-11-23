@@ -1,6 +1,7 @@
 #include "global.h"
 #include "player.h"
 #include "player_slot_status.h"
+#include "orbit_motion.h"
 
 // confidence=low: interpolates from the saved origin to a scripted endpoint.
 #define Player_UpdateInterpolatedMotion sub_08145254
@@ -9,15 +10,9 @@ void Player_AddControlFlags(void *, u32);
 s32 Div(s32, s32);
 s32 ActorVariant_GetTableValue(u32, u32);
 s32 Player_SetAnimation(void *, s32, s32, s32);
-static inline s32 Scale8(s32 value)
-{
-    if (value >= 0)
-        return value >> 8;
-    return -((-value) >> 8);
-}
 static inline s32 ScaleStep(s32 value)
 {
-    s32 result = Scale8(value);
+    s32 result = scale8(value);
     return result;
 }
 static inline void SetMotionSize(struct Player *p)
@@ -56,7 +51,7 @@ void Player_UpdateInterpolatedMotion(struct Player *p)
 
             dy = ScaleStep(dy * p->tetherFrame);
 
-            zstep = Scale8(dz * p->tetherFrame);
+            zstep = scale8(dz * p->tetherFrame);
             p->position.x = p->movementStart.x + dx;
             p->position.y = p->movementStart.y + dy;
             p->position.z = p->movementStart.z + zstep;
