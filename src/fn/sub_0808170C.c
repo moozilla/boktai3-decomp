@@ -5,6 +5,7 @@
 #include "scene_actor_displacement.h"
 #include "display_sequence.h"
 #include "scene_actor_turn.h"
+#include "scene_actor_chase_shared.h"
 
 void SceneActorAttachment_ReplaceResponseSlot(void *, u8, u8, u8);
 
@@ -22,10 +23,6 @@ static inline u8 Reaction_MotionStopped(s32 x, s32 z)
     return 0;
 }
 
-static inline u32 Recovery_StatusFlags(struct ChaseActor *actor, u32 mask)
-{
-    return actor->base.statusFlags & mask;
-}
 static inline void Recovery_ClearStatusFlags(struct ChaseActor *actor, u32 bits)
 {
     u32 mask = ~bits;
@@ -67,8 +64,8 @@ void SceneActorReaction_SettleDisplacement(struct ChaseActor *actor)
         struct SceneActorChaseFlags16 *motion;
         actor->base.body.direction = (((actor->base.body.direction + 32) >> 6) & 3) << 6;
         SceneActorAnimation_SelectDirectionalEntry((void *)actor, 6);
-        if (!Recovery_StatusFlags(actor, 2)) {
-            if (Recovery_StatusFlags(actor, 1)) {
+        if (!SceneActorChase_StatusFlags(actor, 2)) {
+            if (SceneActorChase_StatusFlags(actor, 1)) {
                 SceneActorAttachment_ReplaceResponseSlot(actor, 3, 2, category);
                 Recovery_ClearStatusFlags(actor, 1);
             } else

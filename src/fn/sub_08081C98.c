@@ -5,6 +5,8 @@
 #include "engine.h"
 #include "scene_actor_part_burst.h"
 #include "scene_actor_contact_response.h"
+#include "word_flags.h"
+#include "scene_actor_chase_shared.h"
 void EffectGroup_Reset(void *);
 void SceneActorEffects_EmitRandomOffsets(void *, s32, u32, s32, s32, u32);
 static inline u8 Reaction_HasFlags(u32 bits)
@@ -31,10 +33,6 @@ static inline void Reaction_SetWord(u32 *flags, u32 mask)
 {
     *flags = mask | *flags;
 }
-static inline void Reaction_ClearHalf(u16 *field, s32 mask)
-{
-    *field &= mask;
-}
 static inline void Reaction_ClearWord(u32 *field, s32 mask)
 {
     *field &= mask;
@@ -53,10 +51,6 @@ static inline void Reaction_ClearRoute(u32 *flags, struct SceneActorRegistryCont
 static inline void Reaction_ClearMotionBits(struct ChaseActor *actor, s32 mask)
 {
     actor->base.motionFlags &= mask;
-}
-static inline void Reaction_SetHalf(struct ChaseActor *actor, u16 mask)
-{
-    actor->base.reactionFlags = mask | actor->base.reactionFlags;
 }
 static inline void Reaction_SpawnPart(u8 *group)
 {
@@ -103,19 +97,19 @@ void SceneActorReaction_UpdateTimedBurst(struct ChaseActor *actor)
         actor->group.common.gate.flags = 0;
         actor->group.common.gate.counter = 0;
         motion = &actor->base.motionFlags;
-        Reaction_ClearHalf(motion, ~0x380);
+        HalfwordFlags_And(motion, ~0x380);
         Reaction_ClearMotion(reaction, ~0x18);
         control = &actor->group.common.control;
         bit = 0x200000;
         flags = &actor->base.behaviorFlags;
         if (Reaction_HasFlags(*flags & bit)) {
             Reaction_ClearWord(word, ~0x1000000);
-            Reaction_ClearHalf(motion, ~0x200);
+            HalfwordFlags_And(motion, ~0x200);
             control->mode = 0;
             control->counter = 0;
             control->timer = 0;
         }
-        Reaction_ClearHalf(motion, ~0x400);
+        HalfwordFlags_And(motion, ~0x400);
         actor->group.turn.turnsRemaining = -1;
         Reaction_ClearRoute(flags, (void *)(group + 0x4C));
         EffectGroup_Reset(group + 0xA8);
@@ -133,10 +127,10 @@ void SceneActorReaction_UpdateTimedBurst(struct ChaseActor *actor)
     duration = *(u16 *)(group + 0x1FA);
     if (duration * 2 == actor->base.hitLockTimer || duration == actor->base.hitLockTimer) {
         Reaction_SpawnPart(group);
-        Reaction_SetHalf(actor, 0x20);
+        SceneActorChase_OrReactionFlags(actor, 0x20);
     }
     if (actor->base.hitLockTimer <= 10)
-        Reaction_SetHalf(actor, 0x20);
+        SceneActorChase_OrReactionFlags(actor, 0x20);
     {
         u32 timer = 65;
         actor->base.paletteTimer = timer;

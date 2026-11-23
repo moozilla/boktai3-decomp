@@ -9,10 +9,6 @@ static inline void Reaction_ClearHalf(struct ChaseFlags40 *field, u32 bits)
     s32 mask = ~bits;
     field->bits &= mask;
 }
-static inline void Reaction_SetActorFlags(struct ChaseActor *actor, u32 mask)
-{
-    actor->base.behaviorFlags = mask | actor->base.behaviorFlags;
-}
 static inline void Reaction_Show(struct ChaseActor *actor)
 {
     if (!actor->base.drawableKind) {
@@ -89,7 +85,7 @@ void SceneActorReaction_UpdateContactRouteRecovery(struct ChaseActor *actor)
             Chase_SetState(actor, 3, 0, 0);
         } else {
             struct ContactPosition *destination;
-            Reaction_SetActorFlags(actor, 0x400000);
+            SceneActorChase_SetBehaviorFlags(actor, 0x400000);
             SceneActorChase_ClearWordFlags(motion, 4);
             ApplyColliderMask(&collider->flags, (u16)~4);
             destination = group->destination;
@@ -102,7 +98,7 @@ void SceneActorReaction_UpdateContactRouteRecovery(struct ChaseActor *actor)
                 group->destination->pad = 1;
                 Chase_SetState(actor, 3, 1, 0);
                 Chase_SetCtl(actor, SceneActorReaction_RestoreAfterDelay, 14);
-                Reaction_SetActorFlags(actor, 0x10);
+                SceneActorChase_SetBehaviorFlags(actor, 0x10);
                 actor->base.field2C2 = 0x40;
                 SceneActorDelay_Prepare((void *)&group->saved, actor->base.onAlternateEntry, 7, 30);
             }
