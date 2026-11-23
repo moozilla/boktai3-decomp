@@ -49,6 +49,13 @@ class Fold(unittest.TestCase):
                "#else\nINCLUDE_ASM(\"asm/nonmatching\", F);\n#endif\n"
         self.assertEqual(fl.candidates(text, "src/x.c"), [])
 
+    def test_a_fold_that_adds_a_raw_offset_is_refused(self):
+        news, text = fold("    u32 off = 0x8D0;\n    a = *(u16 *)((u8 *)flags + off);\n")
+        self.assertEqual(len(news), 1)
+        self.assertTrue(fl.adds_concession(text, news[0], "src/x.c"))
+        news, text = fold("    u32 mask = 0x40;\n    *flags |= mask;\n")
+        self.assertFalse(fl.adds_concession(text, news[0], "src/x.c"))
+
     def test_member_of_the_same_name_is_not_a_read(self):
         news, _ = fold("    u32 state = 3;\n    p->state = 1;\n    Call(state);\n", "struct S *p")
         self.assertEqual(news, ["void F(struct S *p)\n{\n    p->state = 1;\n    Call(3);\n}\n"])

@@ -19,7 +19,9 @@ The value must fit the local's type (`u8 x = 0x1FF` would change the value), exc
 or `~` literal of an unsigned local whose read is an operand of `&`, `|` or `^`, where the
 conversion is the same. Not folded: a read under `sizeof`, a negative literal after `+` or `-`
 (that is `subtract-negative`'s form), a local declared twice in the function, anything inside
-`#ifdef NONMATCHING` or a macro. Locals the linter excuses with `concession-ok` are left alone.
+`#ifdef NONMATCHING` or a macro, and a fold that gives the linter a new finding (`off = 0x8D0`
+read as `(u8 *)p + off` would become a raw-offset error). Locals the linter excuses with
+`concession-ok` are left alone.
 """
 from __future__ import annotations
 
@@ -136,6 +138,16 @@ def candidates(text, rel=None):
     return out
 
 
+def adds_concession(old, new, rel):
+    """Whether NEW has more unexcused linter findings of some kind than OLD (folding `off = 0x8D0`
+    into `(u8 *)p + off` makes a raw-offset error)."""
+    import collections
+
+    def count(text):
+        return collections.Counter(s.kind for s in concessions.sites(text, rel) if not s.excused)
+    return bool(count(new) - count(old))
+
+
 def process(rel, dry=False, log=print):
     unit = keepcheck.Unit(rel)
     applied = tried = 0
@@ -150,6 +162,10 @@ def process(rel, dry=False, log=print):
             if dry:
                 log(what)
                 failed.add(what)
+                continue
+            if adds_concession(unit.text, new, rel):
+                failed.add(what)
+                rows.append(f"{what}: not applied (it would add a linter finding)")
                 continue
             if unit.attempt(new):
                 applied += 1
