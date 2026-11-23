@@ -2577,9 +2577,8 @@ void ActorPhase_SelectDistantWaypoint(struct ChaseActor *actor, struct ContactPo
     Axe_RecordRoutePoint(actor, bestIndex);
     {
         struct RoutePointSelection *dst = &route;
-        u32 mode = 0;
         dst->index = bestIndex;
-        dst->mode = mode;
+        dst->mode = 0;
     }
     route.entry = (u16 *)Path_GetPointData(route.data);
     route.entry = (u16 *)(((u8 *)route.entry) + (route.index * 8));

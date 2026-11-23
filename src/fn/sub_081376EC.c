@@ -83,7 +83,6 @@ u32 SceneActorTarget_ApproachNearestStimulus(struct ChaseActor *actor)
     struct ContactPosition *dest;
     struct ContactPosition *target;
     struct ContactPosition *position;
-    s32 settle = 360;
 
     {
         u32 busy = SceneActorStimulus_CheckBusy(actor);
@@ -147,7 +146,7 @@ u32 SceneActorTarget_ApproachNearestStimulus(struct ChaseActor *actor)
         }
     }
     group->common.control.counter = bestTag;
-    group->common.control.field14 = settle;
+    group->common.control.field14 = 360;
     dest = group->destination;
     {
         struct SceneActorRegistryRoute *route = &group->homeRoute;

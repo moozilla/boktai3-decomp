@@ -597,8 +597,7 @@ static inline u8 TakeApproachEntry(struct ActorAnimController *p)
 static inline u32 frame_factor_v2(u16 v)
 {
     u32 value = v;
-    u32 mask = 15;
-    return mask & value;
+    return 15 & value;
 }
 
 void Sound_PlaySong(s32);

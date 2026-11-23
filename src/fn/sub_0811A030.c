@@ -83,9 +83,8 @@ void MotionActor_DispatchRequestedState(struct MotionActor *actor)
         state->mode = zero;
         state->pending = zero;
     } else {
-        u16 testMask = 2;
         u8 *flags;
-        if (TestStateFlags(state, testMask, &flags)) {
+        if (TestStateFlags(state, 2, &flags)) {
             s32 mask = ~2;
             u16 zero;
             mask &= *flags;
