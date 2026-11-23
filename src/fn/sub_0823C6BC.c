@@ -2,7 +2,7 @@
 
 s32 sub_0823C4B4(u8 *);
 s32 sub_0823C424(u8 *);
-s32 Player_GetMovementAnimationRate(void);
+s32 Player_GetMovementAnimationRate(s32);
 void Player_SetDirectionalVelocity_08238300(u8 *, s32);
 void Player_PlayActionCueSound(u8 *, u32);
 void sub_08238238(u8 *);
@@ -28,7 +28,7 @@ void sub_0823C6BC(u8 *p)
     p[0x3A4] = sub_0823C4B4(p);
     if (p[0x48C] == 0) {
         v = sub_0823C424(p);
-        Player_GetMovementAnimationRate();
+        Player_GetMovementAnimationRate(v);
         if (p != 0 && IsScaled(p) != 0)
             v = (p[0xC0] * v) >> 6;
         Player_SetDirectionalVelocity_08238300(p, v);
