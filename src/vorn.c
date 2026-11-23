@@ -209,7 +209,7 @@ void Anim_SetFrameDurationScale(void *, u32);
 void Vorn_UpdateIdleFacing(struct ChaseActor *actor)
 {
     u8 *group = (u8 *)actor + 0x50;
-    void *route = (u8 *)actor + 0x448;
+    void *route = &actor->group.homeRoute;
     u16 *scale;
     if (SceneActorReaction_TakePrepared(actor)) {
         s32 direction;
@@ -219,9 +219,9 @@ void Vorn_UpdateIdleFacing(struct ChaseActor *actor)
         if (actor->base.behavior2AA != 20 && actor->base.behavior2AA != 6 &&
             actor->base.behavior2AA != 16 && !SceneActorContact_MotionFlags(actor, 0x4080)) {
             facing = (((u16)Route_GetCurrentPointFacing(route) + 0x70) >> 5) & 7;
-            *((u8 *)actor + 0x3CD) = facing;
+            actor->base.nextDirection = facing;
         } else
-            facing = *((u8 *)actor + 0x3CD);
+            facing = actor->base.nextDirection;
         if (direction == (facing >> 1)) {
             actor->base.stepDone = 1;
             SceneActorAnimation_SelectDirectionalEntry(actor, 0);
@@ -246,7 +246,7 @@ void Vorn_UpdateIdleFacing(struct ChaseActor *actor)
     else
         Anim_SetFrameDurationScale((u8 *)actor->base.drawable + 0x20, *scale);
     if (actor->base.restart) {
-        group[9] = (*((u8 *)actor + 0x3CD) + 5) << 5;
+        group[9] = (actor->base.nextDirection + 5) << 5;
         actor->base.stepDone = 1;
         {
             u32 facing = (actor->base.body.direction + 0x60) >> 6;
@@ -822,7 +822,7 @@ void Vorn_UpdatePursuitWait(struct ChaseActor *input)
             Chase_SetState(a, 0, 0, 15);
         } else {
             struct VornWaitTimer *timer;
-            a->base.body.direction = *((u8 *)a + 0xE9);
+            a->base.body.direction = a->base.tracking.heading;
             SceneActorAnimation_SelectDirectionalEntry((void *)a, 0);
             timer = (void *)(context + 0x69C);
             ++timer->value;

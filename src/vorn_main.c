@@ -188,7 +188,7 @@ void Vorn_UpdateDescriptorPursuit(struct ChaseActor *a)
         a->base.field2B1 = 0;
     }
     Callback_InvokeActor(a, a->base.contactQuery.opaque);
-    motion = Callback_InvokeActor(a, *(void **)((u8 *)a + 0x260));
+    motion = Callback_InvokeActor(a, a->base.animationQuery.opaque);
     {
         u16 *rate;
         a->base.field2C2 = 32;
