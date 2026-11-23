@@ -12,6 +12,7 @@
 //   });
 //   s.movie                                         // key mask of every frame played
 //   openSession({ movie })                          // start from a recorded movie (replayed by the first run)
+//   openSession({ movie, onBoot: (g) => g.on(...) }) // hooks installed at boot see the replay too
 //
 // The PPU is off unless opts.render (or s.setRender(true) before a frame you want to
 // see): the game never reads the screen, and skipping it is most of a frame's cost.
@@ -102,6 +103,7 @@ export async function openSession(opts = {}) {
     g = createGame({ memory, exports: ex, types, print: out });
     g.loadLib(libSources);
     if (save) new Uint8Array(memory.buffer, ex.port_game_save_stage(), save.length).set(save);
+    if (opts.onBoot) opts.onBoot(g, session);  // hooks that also see the replayed movie
     return save ? save.length : 0;
   }
 

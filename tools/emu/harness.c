@@ -30,6 +30,8 @@
 //   watchpc ADDR LO HI  arm a latch: set when ADDR (hex) executes with r0 in
 //                       [LO, HI] (decimal), e.g. Text_LookupString of a string
 //   tick ADDR           the function holdt counts (hex), e.g. the game's input read
+//   tickdump NAME FROM:TO ADDR:LEN[,...]  append the regions to OUTDIR/NAME.bin at the
+//                       entry of each tick FROM..TO-1 (counted from "tick"; decimal)
 //   holdt KEYS N        hold keys (NONE for none) until ADDR has run N more times:
 //                       inputs keyed to game ticks, so lag frames do not shift them
 //   waitpc MAX [N]      run until the armed latch is set (N times, default 1; at most MAX frames;
@@ -284,11 +286,25 @@ static int until_hit;
 // holdt: calls of tick_pc so far
 static uint32_t tick_pc;
 static int tick_hits;
+// tickdump: absolute tick count since "tick", and regions dumped at the entry of
+// ticks [tickdump_from, tickdump_to) (appended to OUTDIR/NAME.bin, one record per tick)
+static long tick_total;
+static long tickdump_from = -1, tickdump_to = -1;
+static struct { uint32_t addr, len; } tickdump_r[4];
+static int tickdump_n;
+static FILE* tickdump_f;
+
+static void tickdump_hit(void) {
+	if (!tickdump_f || tick_total < tickdump_from || tick_total >= tickdump_to) return;
+	for (int r = 0; r < tickdump_n; ++r)
+		for (uint32_t i = 0; i < tickdump_r[r].len; ++i)
+			fputc(core->rawRead8(core, tickdump_r[r].addr + i, -1), tickdump_f);
+}
 
 static void run_frames(int n) {
 	for (int f = 0; f < n; ++f) {
 		for (int i = 0; i < nfreeze; ++i) poke(freezes[i].addr, freezes[i].size, freezes[i].val);
-		if (!tracing && !nprobes && !until_pc && !tick_pc && !draw_trace_active()) { core->runFrame(core); continue; }
+		if (!tracing && !nprobes && !until_pc && !tick_pc && !draw_trace_active() && !tickdump_f) { core->runFrame(core); continue; }
 		uint32_t frame = core->frameCounter(core);
 		while (core->frameCounter(core) == frame) {
 			// ARMRun processes events before executing an instruction. Drain
@@ -307,8 +323,11 @@ static void run_frames(int n) {
 			}
 			if (until_pc && pc == until_pc && (int32_t)cpu->gprs[0] >= until_lo && (int32_t)cpu->gprs[0] <= until_hi)
 				until_hit++;
-			if (tick_pc && pc == tick_pc)
+			if (tick_pc && pc == tick_pc) {
+				tickdump_hit();
 				tick_hits++;
+				tick_total++;
+			}
 			core->step(core);
 		}
 	}
@@ -462,7 +481,21 @@ int main(int argc, char** argv) {
 		if (sscanf(line, "%63s %255s %63s", cmd, a1, a2) < 1) continue;
 		if (!strcmp(cmd, "wait")) { core->setKeys(core, 0); run_frames(atoi(a1)); }
 		else if (!strcmp(cmd, "hold")) { core->setKeys(core, parse_keys(a1)); run_frames(atoi(a2)); core->setKeys(core, 0); }
-		else if (!strcmp(cmd, "tick")) { tick_pc = (uint32_t) strtoul(a1, NULL, 16); tick_hits = 0; }
+		else if (!strcmp(cmd, "tick")) { tick_pc = (uint32_t) strtoul(a1, NULL, 16); tick_hits = 0; tick_total = 0; }
+		else if (!strcmp(cmd, "tickdump")) {
+			// tickdump NAME FROM:TO ADDR:LEN[,ADDR:LEN...]  (ticks decimal, regions hex)
+			char path[1024], *rest = line;
+			snprintf(path, sizeof(path), "%s/%s.bin", outdir, a1);
+			if (tickdump_f) fclose(tickdump_f);
+			tickdump_f = fopen(path, "wb");
+			sscanf(a2, "%ld:%ld", &tickdump_from, &tickdump_to);
+			for (int k = 0; k < 3 && rest; ++k) { rest = strchr(rest, ' '); while (rest && *rest == ' ') ++rest; }
+			tickdump_n = 0;
+			for (char* t = rest ? strtok(rest, ", \n") : NULL; t && tickdump_n < 4; t = strtok(NULL, ", \n")) {
+				unsigned addr = 0, len = 0;
+				if (sscanf(t, "%x:%x", &addr, &len) == 2) { tickdump_r[tickdump_n].addr = addr; tickdump_r[tickdump_n].len = len; ++tickdump_n; }
+			}
+		}
 		else if (!strcmp(cmd, "holdt")) {
 			int want = atoi(a2), f = 0;
 			core->setKeys(core, strcmp(a1, "NONE") ? parse_keys(a1) : 0);
