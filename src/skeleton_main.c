@@ -4381,9 +4381,7 @@ static inline u8 ContextFlag(u8 *context)
 static inline void ClearRoute(struct ChaseActor *a, struct SceneActorRegistryControlGroup *group)
 {
     struct SceneActorRegistryControl *route = &group->control;
-    u32 *flags = &a->base.behaviorFlags;
-    u32 mask = ~0x141C0;
-    *flags &= mask;
+    SceneActorChase_ClearWordFlags(&a->base.behaviorFlags, 0x141C0);
     route->counter = 0;
     route->field14 = 0;
     route->timer = 0;
