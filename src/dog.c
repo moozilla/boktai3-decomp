@@ -3034,36 +3034,10 @@ void Dog_Create(void)
     }
 }
 
-static inline void clearFlag(u32 *flags)
-{
-    u32 mask = ~1;
-    *flags &= mask;
-}
-
 static inline void clearRouteFlag(u32 *flags)
 {
     u32 mask = ~0x1000000;
     *flags &= mask;
-}
-
-static inline void resetState(struct ChaseActor *actor, u8 behavior)
-{
-    actor->base.state2A8 = 0;
-    actor->base.phase2A9 = 0;
-    actor->base.behavior2AA = behavior;
-    actor->base.counter2AC = 0;
-    actor->base.field2B1 = 1;
-}
-
-static inline void setControl(struct ChaseActor *actor, void *control, u8 kind)
-{
-    actor->base.field2B2 = 1;
-    actor->base.stepDone = 0;
-    actor->base.controlKind = kind;
-    actor->base.target = control;
-    actor->base.field2C8 = 0;
-    clearFlag(&actor->base.pendingControlFlags);
-    actor->base.pendingControl = 0;
 }
 
 void Dog_ResetIdleControl(struct ChaseActor *actor)
@@ -3107,7 +3081,7 @@ void Dog_ResetIdleControl(struct ChaseActor *actor)
         actor->group.turn.turnsRemaining = 0xFF;
 
         motion->fieldDC = 0;
-        setControl(actor, actor->base.onStanding, 0);
+        SceneActorChase_SetControl(actor, actor->base.onStanding, 0);
     }
     Callback_InvokeActor(actor, actor->base.contactQuery.opaque);
 }
