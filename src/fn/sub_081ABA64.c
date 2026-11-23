@@ -210,7 +210,6 @@ static inline u32 Vg_081ABA64_StepFrame(struct VanargandSprite *owner)
 }
 
 // confidence=low: charged attack sequence with contact damage and a screen flash.
-#define Vanargand_UpdateChargeSequence sub_081ABA64
 void Vanargand_UpdateChargeSequence(struct VanargandBoss *arg0)
 {
     struct VanargandBoss *self = arg0;

@@ -132,6 +132,14 @@ static inline void Vanargand_EnterAction(struct VanargandPairAttack *owner, u32 
     owner->requestedAnimation = animation;
 }
 
+/* SceneActorState_EnterPhase on the body: move to action phase PHASE and re-enter it. */
+static inline void Vanargand_EnterActionPhase(struct VanargandPairAttack *owner, u32 phase)
+{
+    owner->actionPhase = phase;
+    owner->actionTimer = 0;
+    owner->entered = 1;
+}
+
 static inline struct VanargandAttackPair *Vanargand_GetAttackPair(struct VanargandPairAttack *owner)
 {
     return owner->pair;

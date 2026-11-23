@@ -2,7 +2,6 @@
 #include "player.h"
 
 /* Copy the selected player palette and complete the capture position request. */
-#define Vanargand_UpdateCaptureSetup sub_081A8E08
 void Vanargand_SetPendingCue(void *, u16);
 void SceneActors_StartUnmirroredAnimation(void *, void *, void *, s32, s32, s32);
 u32 Player_GetCollisionData(void);

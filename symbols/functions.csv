@@ -7470,7 +7470,10 @@ addr,name,mode,confidence,source,notes
 081A75C4,Vanargand_UpdateMode16,thumb,low,src-alias,Sets mode 16 on state entry and consumes the active trigger
 081A7614,Vanargand_UpdateMode13,thumb,low,src-alias,Sets mode 13 on state entry and consumes the active trigger
 081A7664,ScenePanel_RunSelectionScript,thumb,low,src-alias,
+081A76C8,Vanargand_BeginExitTransition,thumb,low,src-alias,
 081A770C,ScenePanel_UpdateTimedExit,thumb,low,src-alias,
+081A7760,Vanargand_UpdateIdleTransition,thumb,low,src-alias,
+081A77B0,Vanargand_UpdateActiveExitTransition,thumb,low,src-alias,
 081A780C,Vanargand_DispatchPrimaryState,thumb,low,src-alias,Invokes the state callback indexed by offset 0xAE from the first state table; primary designation is tentative
 081A7828,ScenePanel_DispatchTransitionCommands,thumb,low,src-alias,
 081A7A0C,ScenePanel_AdvancePairState,thumb,low,src-alias,
@@ -7511,7 +7514,10 @@ addr,name,mode,confidence,source,notes
 081A8C9C,Vanargand_RunModeCallback,thumb,low,src-alias,Clears byte A1 then dispatches the three-entry mode table using byte AC
 081A8CC0,ActorSoundPhase_StartFlaggedAnimation,thumb,low,src-alias,
 081A8D2C,Vanargand_UpdateMotionTrack,thumb,low,src-alias,
+081A8E08,Vanargand_UpdateCaptureSetup,thumb,low,src-alias,
 081A8F48,Vanargand_UpdatePlayerDrain,thumb,low,src-alias,
+081A9178,Vanargand_UpdateTargetDash,thumb,low,src-alias,
+081A93A0,Vanargand_UpdateMovingPairAttack,thumb,low,src-alias,
 081A95A8,Vanargand_UpdatePairedAttack,thumb,low,src-alias,
 081A96E0,Vanargand_UpdateSequencedPairAttack,thumb,low,src-alias,Tentatively runs five phases of paired-half commands 3/4/5/6 then marks the attack finished
 081A9910,Vanargand_UpdateSynchronizedPairAttack,thumb,low,src-alias,
@@ -7522,12 +7528,15 @@ addr,name,mode,confidence,source,notes
 081AA438,Vanargand_UpdateDescendTrack,thumb,low,src-alias,
 081AA5AC,Vanargand_UpdateMotionReturn,thumb,low,src-alias,
 081AA650,Vanargand_UpdateTimedAnimationAttack,thumb,low,src-alias,
+081AA788,Vanargand_UpdateSweepingProjectileAttack,thumb,low,src-alias,
 081AAE10,Vanargand_UpdateLeapTrack,thumb,low,src-alias,
 081AAFC0,Vanargand_UpdateAnimationGate,thumb,low,src-alias,
 081AB078,Vanargand_UpdatePaletteLeap,thumb,low,src-alias,
 081AB3DC,ActorSoundPhase_StartTimedAnimation,thumb,low,src-alias,
 081AB438,Vanargand_UpdateOffsetMotion,thumb,low,src-alias,
 081AB50C,Vanargand_RunDefeatSequence,thumb,low,src-alias,
+081AB904,Vanargand_UpdatePartDebugControls,thumb,low,src-alias,
+081ABA64,Vanargand_UpdateChargeSequence,thumb,low,src-alias,
 081AC954,Vanargand_OnPrimaryStopState,thumb,low,src-alias,State callback sets control flags and initializes animation 15 with zeroed motion fields
 081AC9A8,ActorSoundPhase_StartAnimation15,thumb,low,src-alias,
 081ACA10,ActorSoundPhase_StartAnimation4,thumb,low,src-alias,
@@ -7537,6 +7546,8 @@ addr,name,mode,confidence,source,notes
 081ACC24,Vanargand_ApplyPendingDamage,thumb,low,src-alias,
 081AD0D0,Vanargand_ApplyRequestedMode,thumb,low,src-alias,
 081AD3C0,Vanargand_UpdateStateCallback,thumb,low,src-alias,Clears the per-frame state marker and runs the actor callback unless globally suspended
+081AD3E8,Vanargand_UpdateAnimationAndTargets,thumb,low,src-alias,
+081AD564,Vanargand_UpdatePresentation,thumb,low,src-alias,
 081ADD0C,Vanargand_Update,thumb,low,src-alias,Task update callback advances boss logic and its counter when execution is enabled
 081ADD5C,Vanargand_DestroyAnimatedPart,thumb,low,src-alias,Removes a part animation and its sprite when present
 081ADD7C,Vanargand_DestroyPartSprites,thumb,low,src-alias,Removes active sprites from six consecutive part entries

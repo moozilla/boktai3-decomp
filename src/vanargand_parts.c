@@ -1583,7 +1583,6 @@ s32 Widget_InitLinked(void *, void *, u16, u32, u8, u8, u8, const void *);
 
 // confidence=low: initializes the controller resources and its two embedded halves.
 
-#define Vanargand_InitializePartController sub_081B5EA4
 
 s32 Vanargand_InitializePartController(struct VanargandAttackPair *boss, void *origin,
                                        u16 (*palettes)[16], s32 mode)
