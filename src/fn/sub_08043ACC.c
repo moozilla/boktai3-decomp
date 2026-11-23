@@ -33,10 +33,8 @@ u32 ContactActorPool_Update(struct ContactActorPool *poolInput)
             }
         }
         if (pool->fadeMode >= 0) {
-            u32 firstOffset = 0x5A60;
-            u32 secondOffset = 0x5AA0;
-            void *first = gPaletteBankData + firstOffset;
-            void *second = gPaletteBankData + secondOffset;
+            void *first = gPaletteBankData + 0x5A60;
+            void *second = gPaletteBankData + 0x5AA0;
             Palette_InterpolateBanks((u8 *)pool + 0x1700, first, second, pool->fadeLevel, 6);
         }
         if (pool->hideRequested) {

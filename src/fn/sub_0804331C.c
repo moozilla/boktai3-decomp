@@ -32,10 +32,9 @@ void ContactActor_UpdateRandomWalk(struct ContactActorPool *pool, struct Contact
     }
     if (pool->clearRequested) {
         u32 state = 6;
-        u32 frame = 0;
         slot->state = state;
         slot->enter = 1;
-        slot->stateFrame = frame;
+        slot->stateFrame = 0;
         return;
     }
     if (!slot->steeringTimer) {

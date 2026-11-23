@@ -29,10 +29,9 @@ void ContactActor_UpdateBurst(struct ContactActorPool *pool, struct ContactActor
     }
     if (pool->clearRequested) {
         u32 state = 6;
-        u32 zeroFrame = 0;
         slot->state = state;
         slot->enter = 1;
-        slot->stateFrame = zeroFrame;
+        slot->stateFrame = 0;
         return;
     }
     if (slot->stateFrame <= 15)

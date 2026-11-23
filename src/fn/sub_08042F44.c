@@ -78,26 +78,23 @@ void ContactActor_UpdateRoaming(struct ContactActorPool *pool, struct ContactAct
     if (pool->clearRequested) {
         {
             u32 state = 6;
-            u32 frame = 0;
             slot->state = state;
             slot->enter = 1;
-            slot->stateFrame = frame;
+            slot->stateFrame = 0;
         }
         return;
     }
     if (!slot->steeringTimer) {
-        u32 mask;
         s32 roll;
         work = (void *)gRandomTable;
-        mask = 255;
-        roll = nextSample((const u16 *)work) & mask;
+        roll = nextSample((const u16 *)work) & 255;
         if (roll <= 191) {
             if (slot->targetIndex >= 0) {
                 u32 scale = 256;
                 u32 angle = nextSample((const u16 *)work);
                 struct ContactPosition *write = &delta;
-                angle &= mask;
-                write->x = truncateShift12(gUnk_086149C4[(angle + 64) & mask] * scale);
+                angle &= 255;
+                write->x = truncateShift12(gUnk_086149C4[(angle + 64) & 255] * scale);
                 write->y = 0;
                 write->z = truncateShift12(gUnk_086149C4[angle] * scale);
                 addPosition(&slot->destination, pool->targets[slot->targetIndex], &delta);
