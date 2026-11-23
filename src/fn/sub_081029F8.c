@@ -39,10 +39,7 @@ void NamedObject_UpdatePlayerAttachment(struct NamedObject *object)
         NamedObject_ClearAttachmentFlag(manager->followName, 0);
         manager->followName = object->name;
         NamedObject_UpdatePlayerFollowFlags(object);
-        {
-            s16 mask = 8;
-            object->flags = mask | object->flags;
-        }
+        NamedObject_EnableFlags(8, object);
         {
             u32 f;
             u32 v;

@@ -26,10 +26,7 @@ void NamedObject_SnapTetherToPlatform(struct NamedObjectManager *manager,
             NamedObject_ClearAttachmentFlag(manager->tetherName, 1);
             manager->tetherName = object->name;
             TetherActor_AddStatusFlags(3, object->name);
-            {
-                s16 mask = 16;
-                object->flags = mask | object->flags;
-            }
+            NamedObject_EnableFlags(16, object);
         }
     }
 }

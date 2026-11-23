@@ -22,14 +22,6 @@ static inline void subtractVector(struct ContactPosition *d, struct ContactPosit
     d->y = a->y - b->y;
     d->z = a->z - b->z;
 }
-static inline void setFlag(s16 *flags, s32 mask)
-{
-    *flags = mask | *flags;
-}
-static inline void clearFlag(s16 *flags, s32 mask)
-{
-    *flags &= mask;
-}
 void NamedObject_UpdateTetherAttachment(struct NamedObject *object)
 {
     struct ContactPosition target, delta;
@@ -45,13 +37,10 @@ void NamedObject_UpdateTetherAttachment(struct NamedObject *object)
         NamedObject_ClearAttachmentFlag(manager->tetherName, 1);
         manager->tetherName = object->name;
         NamedObject_UpdateTetherFollowFlags(object);
-        {
-            s16 mask = 16;
-            object->flags = mask | object->flags;
-        }
+        NamedObject_EnableFlags(16, object);
     } else if (object->name == manager->tetherName) {
         manager->tetherName = 0;
         TetherActor_RemoveStatusFlags(7);
-        clearFlag(&object->flags, ~16);
+        NamedObject_DisableFlags(16, object);
     }
 }
