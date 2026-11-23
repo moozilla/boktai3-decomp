@@ -7,6 +7,6 @@ void SceneActors_UpdateTransitionToState16(struct SceneVolumeActor *actor)
         actor->state = state;
     }
     if (actor->pending)
-        Trigger_ConsumePending(actor->trigger, 1);
+        Trigger_ConsumePending(&actor->receiver, 1);
     actor->actionTimer++;
 }

@@ -1,14 +1,8 @@
-#include "global.h"
+#include "scene_volume.h"
 #include "render.h"
 // confidence=low: controls the actor palette fade and repeating pulse sequence
-struct PaletteActor {
-    u8 pad0[0x504];
-    u8 timer, pad505, mode, shift;
-    u8 pad508[0x6F8];
-    u16 palette[16];
-};
 void Palette_InterpolateBanks(u16 *, u16 *, u16 *, s32, s32);
-void SceneVolume_ResetPendingSequence(void *);
+void SceneVolume_ResetPendingSequence(struct SceneVolumeActor *);
 static inline s32 Fraction(s32 time, s32 end)
 {
     s32 value;
@@ -33,18 +27,19 @@ static inline void GetFadeBanks(u16 **from, u16 **to, u32 fromOffset, u32 toOffs
     *to = (u16 *)(banks + toOffset);
 }
 
-void BossSlot2_UpdateSequencePalette(struct PaletteActor *p)
+void BossSlot2_UpdateSequencePalette(struct SceneVolumeActor *p)
 {
-    switch (p->mode) {
+    switch (p->sequenceMode) {
         case 1: {
             u16 *from;
             u16 *to;
 
-            if ((s8)p->timer < 24) {
-                p->timer++;
+            if (p->sequenceTimer < 24) {
+                p->sequenceTimer++;
                 GetFadeBanks(&from, &to, 0x2E80, 0x680);
                 Palette_InterpolateBanks(p->palette, from, to,
-                                         Fraction((s8)p->timer, 1 << p->shift), p->shift);
+                                         Fraction(p->sequenceTimer, 1 << p->sequenceShift),
+                                         p->sequenceShift);
             } else {
                 SceneVolume_ResetPendingSequence(p);
             }
@@ -54,11 +49,12 @@ void BossSlot2_UpdateSequencePalette(struct PaletteActor *p)
             u16 *from;
             u16 *to;
 
-            if ((s8)p->timer < (1 << p->shift)) {
-                p->timer++;
+            if (p->sequenceTimer < (1 << p->sequenceShift)) {
+                p->sequenceTimer++;
                 GetFadeBanks(&from, &to, 0x680, 0x2DE0);
                 Palette_InterpolateBanks(p->palette, from, to,
-                                         Fraction((s8)p->timer, 1 << p->shift), p->shift);
+                                         Fraction(p->sequenceTimer, 1 << p->sequenceShift),
+                                         p->sequenceShift);
             } else {
                 SceneVolume_ResetPendingSequence(p);
             }
@@ -68,11 +64,12 @@ void BossSlot2_UpdateSequencePalette(struct PaletteActor *p)
             u16 *from;
             u16 *to;
 
-            if ((s8)p->timer < (1 << p->shift)) {
-                p->timer++;
+            if (p->sequenceTimer < (1 << p->sequenceShift)) {
+                p->sequenceTimer++;
                 GetFadeBanks(&from, &to, 0x2DE0, 0x680);
                 Palette_InterpolateBanks(p->palette, from, to,
-                                         Fraction((s8)p->timer, 1 << p->shift), p->shift);
+                                         Fraction(p->sequenceTimer, 1 << p->sequenceShift),
+                                         p->sequenceShift);
             } else {
                 SceneVolume_ResetPendingSequence(p);
             }
@@ -80,9 +77,9 @@ void BossSlot2_UpdateSequencePalette(struct PaletteActor *p)
         }
         case 4: {
             s32 half, time, shift;
-            p->timer = (p->timer + 1) & ((1 << p->shift) - 1);
-            time = (s8)p->timer;
-            shift = p->shift - 1;
+            p->sequenceTimer = (p->sequenceTimer + 1) & ((1 << p->sequenceShift) - 1);
+            time = p->sequenceTimer;
+            shift = p->sequenceShift - 1;
             half = 1 << shift;
             if (time < half) {
                 u16 *from, *to;

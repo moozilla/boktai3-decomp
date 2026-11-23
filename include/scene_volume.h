@@ -5,6 +5,7 @@
 #include "task4e01_projectile.h"
 #include "player.h"
 #include "contact_collider.h"
+#include "scene_panel.h"
 
 /* Shared attack, pursuit, impact, and landing state. Behavior names are tentative. */
 struct SceneVolumeActor {
@@ -32,7 +33,8 @@ struct SceneVolumeActor {
     void *positionSource;
     s8 alternateDirection;
     u8 pad115[3];
-    u8 trigger[0x60];
+    struct ScenePanelReceiver receiver;
+    u8 pad140[0x38];
     struct ContactCollider collider;
     u8 pad1CC[0xBC];
     u8 bounds[0x1C];
@@ -63,10 +65,12 @@ struct SceneVolumeActor {
     u8 pad4FA[2];
     s16 parameter;
     u8 pad4FE[6];
-    u8 sequenceState, pad505, pendingReset, pad507;
+    s8 sequenceTimer;
+    u8 pad505, sequenceMode, sequenceShift;
     u32 sequenceLength;
     u8 pad50C[0xF4];
-    u8 sequenceBuffer[0x620];
+    u8 sequenceBuffer[0x600];
+    u16 palette[16];
     u8 pathPosition[8];
     u8 padC28[0x38];
     u32 scripts[1]; /* indexed by decisionMode; extends past the shared layout */
