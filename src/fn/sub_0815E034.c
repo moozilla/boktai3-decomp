@@ -4,10 +4,6 @@
 void Collision_AccumulateNearbyResponse(void *, void *, s32);
 void PlayerCue_ApplyColliderScale(void *, void *);
 void Anim_ApplyDurationScales(void *, void *);
-static inline u32 AttackFlags(struct ContactCollider *a, u32 mask)
-{
-    return a->reactionFlags & mask;
-}
 
 /* Select the elemental response and scale damage by the matching player defense. */
 #define PlayerContact_ComputeCost sub_0815E034
@@ -20,7 +16,7 @@ void PlayerContact_ComputeCost(struct Player *player, struct ContactCollider *so
 
     if (target->cost)
         return;
-    if (AttackFlags(source, 0x1000))
+    if (ContactCollider_TestReactionFlags(source, 0x1000))
         damage = source->unknown3C;
     else
         damage = source->unknown3C - PLAYER_BODY_DEFENSE;
