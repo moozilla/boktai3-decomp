@@ -3,10 +3,7 @@
 #include "player.h"
 #include "engine.h"
 #include "ram.h"
-static inline u32 TestFlags(u32 mask)
-{
-    return (gEngineFlags | gScenePauseFlags) & mask;
-}
+#include "engine_pause.h"
 s32 SceneHud_CanOpenSecondarySelection(struct SceneHudState *p)
 {
     struct Player *owner = p->actionOwner;
@@ -26,7 +23,7 @@ s32 SceneHud_CanOpenSecondarySelection(struct SceneHudState *p)
         return 0;
     if (p->controlMode > 2)
         return 0;
-    if (TestFlags(0x201))
+    if (Engine_PauseBits(0x201))
         return 0;
     return 1;
 }

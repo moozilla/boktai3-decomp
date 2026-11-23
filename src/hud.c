@@ -1,6 +1,7 @@
 #include "hud.h"
 #include "sun_clock.h"
 #include "link_session_state.h"
+#include "engine_pause.h"
 
 extern u16 gUnk_03005178;
 
@@ -295,10 +296,6 @@ static inline u8 testFlag(u32 mask, u32 *flags)
     return FALSE;
 }
 
-static inline u32 LinkFlags(u32 mask)
-{
-    return (gEngineFlags | gScenePauseFlags) & mask;
-}
 
 static inline s32 TimedEventValue(u32 slot)
 {
@@ -366,7 +363,7 @@ void Hud_DrawWarningMeter(struct SceneHudState *hud, s32 mode, u32 x, u32 y)
         }
         if (gBgPaletteBank13Color10 != pulse)
             gBgPaletteBank13Color10 = pulse;
-        if (LinkFlags(0x800))
+        if (Engine_PauseBits(0x800))
             count = SlotCount(OwnerIndex());
         else
             count = gGameState->unk876;
