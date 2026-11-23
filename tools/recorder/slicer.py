@@ -302,6 +302,8 @@ class Slicer:
             if len(idx):
                 row = idx[-1] + sl.start
                 by_frame[int(s.writes['frame'][row])].append(b)
+            elif b < self.session.meta.get('heapBase', 0):
+                self.terminal(frame, f'port stack/data 0x{b:08X}, written before this frame\'s trace began', b)
             else:
                 self.terminal(frame, f'0x{b:08X} not written since the session began (power-on or save state)', b)
         for f, bs in by_frame.items():
@@ -347,9 +349,33 @@ class Slicer:
             self.add(frame, pos, inv, fn, x, 'store', value=value, addr=addr, width=width)
             bpos = ft.block_at(inv, pos)[0]
             val = store_value(x.text)
-            if val:
+            if val and not self.narrow_copy(frame, inv, bpos, fn, x, val, int(row['a']) & 0x0FFFFFFF if k != K_AGG else int(row['a']), addr, width):
                 self.work.append((self.value, frame, inv, bpos, fn, val, x.block))
         self.control(frame, inv, ft.block_at(inv, pos)[0], fn, x.block)
+
+    def narrow_copy(self, frame, inv, bpos, fn, store, val, start, addr, width):
+        """A store of a value loaded straight from memory (a struct or word copy): follow only
+        the source bytes that became the target bytes, not the whole loaded value."""
+        d = fn.defs.get(val)
+        if d is None or d.site is None or d.opcode != 'load':
+            return False
+        ft = self.traces[frame]
+        dpos = bpos if d.block is store.block else ft.last_instance(inv, d.block.site if d.block.index else fn.site, bpos, False)
+        p = ft.event_in(inv, d.site, dpos) if dpos is not None else None
+        if p is None:
+            return False
+        row = ft.rows[p]
+        k = int(ft.kind[p])
+        src = int(row['a']) & 0x0FFFFFFF if k in (K_LOAD, K_WIDE) else int(row['a'])
+        lw = (1 << ((int(row['a']) >> 28) & 3)) if k == K_LOAD else 8 if k == K_WIDE else int(row['b']) & 0x7FFFFFFF
+        off = addr - start
+        if off < 0 or off + width > lw:
+            return False
+        v = int(row['b']) if k == K_LOAD else None
+        self.add(frame, p, inv, fn, d, 'load', value=v, addr=src + off, width=width)
+        self.work.append((self.memory, frame, p, src + off, width, 'copy'))
+        self.control(frame, inv, dpos, fn, d.block)
+        return True
 
     def _game_side(self, fn):
         u = fn.unit.name
@@ -549,6 +575,9 @@ class Slicer:
         term = b.insts[-1]
         self.add(frame, best[0], inv, fn, term, 'decides')
         cond = branch_condition(term.text)
+        d = fn.defs.get(cond) if cond else None
+        if d is not None and re.search(r'icmp (?:eq|ne) ptr \S+, null', d.text):
+            return   # a null check: where the pointer came from does not explain the value
         if cond:
             self.work.append((self.value, frame, inv, best[0], fn, cond, b))
 

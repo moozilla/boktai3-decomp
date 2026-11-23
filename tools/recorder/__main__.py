@@ -49,11 +49,19 @@ def leaf_info(types, leaf):
     return min(size, 8) if d.get('k') in ('int', 'enum', 'ptr', 'float') else size, bool(d.get('signed'))
 
 
-def walk_path(types, t, rest):
-    """(offset, leaf type) of a C path like .a.b[3].c inside a T."""
-    off = 0
+def walk_path(types, t, rest, base=0, ram=None):
+    """(address, leaf type) of a C path like .a.b[3]->c from a T at BASE (RAM follows `->`)."""
+    off = base
     for m in re.finditer(r'\.(\w+)|\[(\d+)\]|->(\w+)', rest):
         d = types.resolve(t)
+        if m[3] is not None:
+            if not d or d.get('k') != 'ptr' or ram is None:
+                raise ValueError(f'{types.name(t)} is not a pointer')
+            p = ram.read(off, 4)
+            if not p:
+                raise ValueError(f'null pointer before ->{m[3]}')
+            off, t = p, d['to']
+            d = types.resolve(t)
         if m[2] is not None:
             if d.get('k') != 'array':
                 raise ValueError(f'{types.name(t)} is not an array')
@@ -85,15 +93,16 @@ def resolve_place(where, types, objmap_at):
     name, rest = m[1], m[2]
     if name in types.globals:
         g = types.globals[name]
-        off, leaf = walk_path(types, g['type'], rest)
+        om = objmap_at() if '->' in rest else None
+        addr, leaf = walk_path(types, g['type'], rest, g['addr'], om.ram if om else None)
         w, signed = leaf_info(types, leaf)
-        return Place(g['addr'] + off, w, where, leaf, signed)
+        return Place(addr, w, where, leaf, signed)
     om = objmap_at()
     for a, size, tname, label in om.objects:
         if label == name or label.split('(')[0] == name:
-            off, leaf = walk_path(types, tname, rest)
+            addr, leaf = walk_path(types, tname, rest, a, om.ram)
             w, signed = leaf_info(types, leaf)
-            return Place(a + off, w, where, leaf, signed)
+            return Place(addr, w, where, leaf, signed)
     raise SystemExit(f'cannot resolve {where!r}: not an address, a RAM global or an object label at that frame')
 
 
@@ -253,9 +262,13 @@ def cmd_why(args):
     finally:
         sl.close()
 
+    heap = s.meta.get('heapBase', 0)
+
     def describe(a, w):
         if a is None:
             return '?'
+        if a < heap:
+            return f'stack/port 0x{a:X}'
         label, path, leaf, _ = om.at(a, w or 1)
         return join(label, path)
     print(render(sl, describe))
@@ -293,6 +306,8 @@ def check_slice(s, sl, place, frame, describe):
         for n in sorted(sl.nodes, key=lambda n: -n.frame):
             if n.role != 'store' or n.frame >= frame or n.addr is None or n.value is None:
                 continue
+            if not (0x02000000 <= n.addr < 0x02040000 or 0x03000000 <= n.addr < 0x03008000):
+                continue   # the port's stack and data: not meaningful at a frame boundary
             key = (n.frame, n.addr)
             if key in seen or checked >= 10:
                 continue
@@ -313,6 +328,19 @@ def check_slice(s, sl, place, frame, describe):
             checked += 1
             print(f"  {describe(n.addr, w)} at the end of frame {n.frame} ({now} -> {now ^ flip}): target {base} -> {results[-1]}  "
                   + ('confirmed' if ok else 'NOT confirmed (masked or overwritten)'))
+        # runs (counters, positions): the value the run had at a frame boundary before the target
+        for a, site, count, first, last in {(x[0], x[1], x[2], x[3], x[4]) for x in sl.summaries}:
+            f = min(last, frame - 1)
+            if not (0x02000000 <= a < 0x02040000 or 0x03000000 <= a < 0x03008000) or f < 0:
+                continue
+            w = min(place.width, 4) if a == place.addr else 4
+            r.seek(f)
+            now = r.value(a, w)
+            r.poke(a, w, now ^ 1)
+            r.run(frame - f)
+            v = target(r)
+            print(f"  {describe(a, w)} (the run) at the end of frame {f} ({now} -> {now ^ 1}): target {base} -> {v}  "
+                  + ('confirmed' if v != base else 'NOT confirmed (masked or overwritten)'))
         same = sum(1 for n in sl.nodes if n.frame == frame)
         print(f"  ({same} links inside frame {frame} are not checked: a replay can only be perturbed at frame boundaries)")
 
