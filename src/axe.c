@@ -3706,23 +3706,14 @@ void SceneActorControl_EndExtendedPhase(struct ChaseActor *actor)
     if (SceneActorControl_TakeFlag(&actor->base.field2B1))
         context->lungeQueued = 1;
     if (actor->base.stepDone) {
-        u8 zero8;
         Axe_SetAuxiliarySpriteRenderState(actor, &context->position, 0x13C);
         actor->base.motionFlags = Mask16(&actor->base.motionFlags, ~0x100);
-        zero8 = 0;
         {
             u32 *flags = &context->flagsE4C;
             u32 mask = ~0x1000;
             *flags &= mask;
         }
-        {
-            u32 behavior = 3;
-            actor->base.state2A8 = zero8;
-            actor->base.phase2A9 = zero8;
-            actor->base.behavior2AA = behavior;
-            actor->base.counter2AC = 0;
-            actor->base.field2B1 = 1;
-        }
+        Chase_SetBehavior(actor, 3);
     } else {
         ++actor->base.counter2AC;
     }
@@ -3739,54 +3730,16 @@ struct SceneActorControl2AContext {
 
 static inline void Restart_UpdateControl2APhase(struct ChaseActor *actor)
 {
-    u8 zero8;
     actor->base.motionFlags = Mask16(&actor->base.motionFlags, ~0x100);
-    zero8 = 0;
-    {
-        void *callback = (void *)ActorPhase_UpdateSpriteCollapse;
-        u32 kind = 0x23;
-        u8 one;
-        u8 *taken = &actor->base.field2B2;
-        one = 1;
-        *taken = one;
-        actor->base.stepDone = zero8;
-        actor->base.controlKind = kind;
-        actor->base.target = callback;
-        actor->base.field2C8 = 0;
-        {
-            u32 *flags = &actor->base.pendingControlFlags;
-            u32 mask = ~1;
-            *flags &= mask;
-        }
-        actor->base.pendingControl = 0;
-        {
-            u32 behavior = 4;
-            actor->base.state2A8 = zero8;
-            actor->base.phase2A9 = zero8;
-            actor->base.behavior2AA = behavior;
-            actor->base.counter2AC = 0;
-            actor->base.field2B1 = one;
-        }
-    }
+    SceneActorChase_SetControl(actor, ActorPhase_UpdateSpriteCollapse, 0x23);
+    Chase_SetBehavior(actor, 4);
 }
 
 void SceneActorControl_UpdateControl2APhase(struct ChaseActor *actor)
 {
     struct SceneActorControl2AContext *context = actor->base.context;
     if (SceneActorControl_TakeFlag(&actor->base.field2B1)) {
-        void *callback = (void *)SceneActor_AdvanceOffsetApproach;
-        u32 kind = 0x2A;
-        actor->base.field2B2 = 1;
-        actor->base.stepDone = 0;
-        actor->base.controlKind = kind;
-        actor->base.target = callback;
-        actor->base.field2C8 = 0;
-        {
-            u32 *flags = &actor->base.pendingControlFlags;
-            u32 mask = ~1;
-            *flags &= mask;
-        }
-        actor->base.pendingControl = 0;
+        SceneActorChase_SetControl(actor, SceneActor_AdvanceOffsetApproach, 0x2A);
         Or16(0x100, &actor->base.motionFlags);
         context->fieldEBE = context->fieldEC6;
     }
