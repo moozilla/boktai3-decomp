@@ -17,7 +17,7 @@ void Player_InitializeActionContact(struct Player *p)
     p->statModifierContext.contactCounter = 0;
     Collider_SetAttackProperties(&p->statModifierContext.attackCollider, kind,
                                  p->statModifierContext.actionTimer, 1, flags, parameter);
-    p->statModifierContext.contactDirection = p->statModifierContext.contactHeading;
+    p->statModifierContext.attackCollider.direction = p->statModifierContext.contactHeading;
     p->statModifierContext.contactTimer = 0;
     p->contactCounted = 0;
 }

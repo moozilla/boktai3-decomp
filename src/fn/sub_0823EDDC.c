@@ -14,6 +14,6 @@ void sub_0823EDDC(struct Player *p)
     Collider_SetAttackProperties(&p->statModifierContext.attackCollider, resource,
                                  p->statModifierContext.actionTimer, 0x2000, 0,
                                  p->statModifierContext.contactParameter);
-    p->statModifierContext.contactDirection = p->statModifierContext.contactHeading;
+    p->statModifierContext.attackCollider.direction = p->statModifierContext.contactHeading;
     p->statModifierContext.contactTimer = 0;
 }

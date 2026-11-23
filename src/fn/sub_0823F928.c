@@ -148,7 +148,7 @@ void Player_UpdateChargedSpinAttack(struct Player *p)
             pos.y += 230;
             pos.z += scale(170 * gUnk_086149C4[angle]);
             Collider_SetPosition(&p->statModifierContext.attackCollider, &pos, 0);
-            p->statModifierContext.contactDirection = angle;
+            p->statModifierContext.attackCollider.direction = angle;
             Collider_Refresh(&p->statModifierContext.attackCollider);
             ((struct Player *)p)->facing =
                 ((0x10F - ((struct Player *)p)->statModifierContext.contactTimer) & 255) >> 5;

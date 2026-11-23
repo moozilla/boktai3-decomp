@@ -10,6 +10,7 @@
 #include "converging_effect_state.h"
 #include "task.h"
 #include "scene_input_widget.h"
+#include "contact_collider.h"
 
 /* Body colliders use a fixed defense in both setup and hit resolution. */
 #define PLAYER_BODY_DEFENSE 0
@@ -54,10 +55,8 @@ struct PlayerCollider {
 struct PlayerStatModifierContext {
     u8 unknown0[0x2C];
     u8 actionPalette[0x1C]; /* owner + 0xB70: palette-bank animation data for the action (tentative) */
-    struct PlayerCollider attackCollider; /* owner + 0xB8C: action contact collider */
-    u8 unknown88[2];
-    u8 contactDirection; /* owner + 0xBCE */
-    u8 unknown8B[0x19];
+    struct ContactCollider attackCollider; /* owner + 0xB8C: action contact collider */
+    u8 unknown9C[8];
     struct SceneVec contactOrigin;         /* owner + 0xBE8 */
     struct PlayerActionEntry *actionEntry; /* owner + 0xBF0: descriptor source */
     u8 actionKind;                         /* owner + 0xBF4 */

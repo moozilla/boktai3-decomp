@@ -24,6 +24,6 @@ void Player_StartContactAttack(struct Player *p)
         Player_ConsumeActionResource(p);
     }
     Collider_SetAttackProperties((u8 *)q + 0x48, power, q->actionTimer, 1, flags, param);
-    q->contactDirection = q->contactHeading;
+    q->attackCollider.direction = q->contactHeading;
     q->contactTimer = 0;
 }

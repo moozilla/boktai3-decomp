@@ -31,6 +31,6 @@ void sub_0823E704(struct Player *p)
     }
     Collider_SetAttackProperties(&q->attackCollider, resource, q->actionTimer, 4, flags,
                                  q->contactParameter);
-    q->contactDirection = q->contactHeading;
+    q->attackCollider.direction = q->contactHeading;
     q->contactTimer = 0;
 }
