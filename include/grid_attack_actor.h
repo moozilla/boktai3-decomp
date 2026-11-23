@@ -141,14 +141,36 @@ struct GridAttackActor {
     void *resource;                        /* 0x8C4 */
     struct ContactPosition shadowPosition; /* 0x8C8 */
     struct CameraTracking camera;
-    void *projectedDisplay;         /* 0x900 */
-    void *contactPool;              /* 0x904 */
-    void *orbitContact;             /* 0x908 */
-    void *contactBurst;             /* 0x90C */
-    s32 linkedActorId;              /* 0x910 */
+    void *projectedDisplay;          /* 0x900 */
+    void *contactPool;               /* 0x904 */
+    void *orbitContact;              /* 0x908 */
+    void *contactBurst;              /* 0x90C */
+    s32 linkedActorId;               /* 0x910 */
     struct SceneEventCommand packet; /* 0x914 */
     u8 unknown920[0x4];
 };
+
+/* The action flags at 0x9C, as the common scene actor controller keeps them. */
+static inline void GridAttack_AddFlags(struct GridAttackActor *p, u32 mask)
+{
+    p->flags |= mask;
+}
+
+static inline void GridAttack_ClearFlags(struct GridAttackActor *p, u32 mask)
+{
+    p->flags &= ~mask;
+}
+
+/* Request the action animation (0xAA) the recovery pipeline plays next. */
+static inline void GridAttack_RequestAnimation(struct GridAttackActor *p, u32 animation)
+{
+    p->requested = animation;
+}
+
+static inline u32 GridAttack_TestFlags(struct GridAttackActor *actor, u32 mask)
+{
+    return actor->flags & mask;
+}
 
 void GridAttackActor_RemoveSprite(struct GridAttackActor *p);
 

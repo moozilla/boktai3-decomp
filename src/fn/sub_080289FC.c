@@ -1,6 +1,8 @@
 #include "global.h"
 #include "render.h"
 #include "state_actor.h"
+#include "contact_collider.h"
+#include "camera_tracking.h"
 
 // confidence=low: per-frame scene actor update: applies queued health costs, drives the overlay and body
 // collider state from the action flags, runs two countdowns, picks the palette bank, steps the effect
@@ -16,7 +18,6 @@ s32 SceneActorGraphics_GetResourceId(void *);
 s32 SceneActorGraphics_GetDefaultResourceId(void *);
 void SceneActorGraphics_SelectResource(void *);
 void Palette_InterpolateBanks(void *, void *, void *, s32, s32);
-void CameraTracking_Update(void *);
 void SceneActors_SpawnAmbientParticlePair(void *);
 void SceneActors_StopBackgroundFlash(void *);
 
@@ -38,21 +39,10 @@ struct FrameBase {
     u8 padC4[0x20];
     u32 ticks;
 };
-struct FrameCollider {
-    u8 pad0[6];
-    u16 flags;
-    u8 pad8[0x3a];
-    u8 direction;
-    u8 pad43[0x11];
-};
 struct FrameAnimation {
     u8 pad0[8];
     u32 flags;
     u8 padC[0x14];
-};
-struct FrameCamera {
-    u8 pad0[0x20];
-    u32 flags;
 };
 /* The first byte is the signed interpolation amount when used in arithmetic. */
 struct FrameBlendState {
@@ -65,8 +55,8 @@ struct FrameBlendState {
 struct VampireFrame {
     struct FrameBase base;
     u8 padE8[0x90];
-    struct FrameCollider body;
-    struct FrameCollider overlay;
+    struct ContactCollider body;
+    struct ContactCollider overlay;
     u8 pad220[0x20];
     struct FrameAnimation animation;
     u8 position[8];
@@ -91,15 +81,8 @@ struct VampireFrame {
     u8 paletteNormal[0x200];
     u8 paletteSpecial[0x200];
     u8 pad9C4[0x1c];
-    struct FrameCamera camera;
+    struct CameraTracking camera;
 };
-
-#define Frame_SetColliderFlags(collider, mask) ((collider)->flags |= (mask))
-static inline void Frame_ClearColliderFlags(struct FrameCollider *collider, u32 mask)
-{
-    u32 keep = ~mask;
-    collider->flags = keep & collider->flags;
-}
 
 static inline void Frame_HideAnimation(struct FrameAnimation *animation)
 {
@@ -110,15 +93,6 @@ static inline void Frame_ClearAnimationFlags(struct FrameAnimation *animation, u
     u32 flags = animation->flags;
     flags &= ~mask;
     animation->flags = flags;
-}
-static inline void Frame_SetCameraFlags(struct FrameCamera *camera, u32 mask)
-{
-    camera->flags |= mask;
-}
-static inline void Frame_ClearCameraFlags(struct FrameCamera *camera, u32 mask)
-{
-    u32 keep = ~mask;
-    camera->flags &= keep;
 }
 
 static inline u8 Frame_ReadBlendAmount(struct FrameBlendState *blend)
@@ -131,7 +105,7 @@ void Vampire_UpdatePresentation(void *arg0)
     struct FrameBase *base = arg0;
     struct VampireFrame *p = arg0;
     struct FrameSprite *sprite = &base->sprite;
-    struct FrameCollider *collider;
+    struct ContactCollider *collider;
     s32 cost;
 
     SceneActorState_SetFlags((struct StateActor *)base, 0x20);
@@ -152,9 +126,9 @@ void Vampire_UpdatePresentation(void *arg0)
     }
     collider = &p->overlay;
     if (SceneActorState_TestFlags((struct StateActor *)base, 4)) {
-        Frame_SetColliderFlags(collider, 4);
+        ContactCollider_SetFlags(collider, 4);
     } else {
-        Frame_ClearColliderFlags(collider, 4);
+        ContactCollider_ClearFlags(collider, 4);
         Collider_SetPosition(collider, p->position, 0);
         collider->direction = sprite->direction;
     }
@@ -168,21 +142,21 @@ void Vampire_UpdatePresentation(void *arg0)
     if (SceneActorState_TestFlags((struct StateActor *)base, 0x10)) {
         Frame_HideAnimation(&p->animation);
         ScaledShadow_Disable(p->shadow);
-        Frame_ClearCameraFlags(&p->camera, 1);
-        Frame_ClearColliderFlags(&p->overlay, 8);
+        CameraTracking_ClearRequests(&p->camera, 1);
+        ContactCollider_ClearFlags(&p->overlay, 8);
     } else {
         Frame_ClearAnimationFlags(&p->animation, 1);
         if (base->ambientMode != 0) {
             ScaledShadow_Enable(p->shadow);
-            Frame_ClearCameraFlags(&p->camera, 1);
+            CameraTracking_ClearRequests(&p->camera, 1);
         } else {
             ScaledShadow_Enable(p->shadow);
-            Frame_SetCameraFlags(&p->camera, 1);
+            CameraTracking_SetRequests(&p->camera, 1);
         }
         if (SceneActorState_TestFlags((struct StateActor *)base, 0x20)) {
-            Frame_SetColliderFlags(&p->overlay, 8);
+            ContactCollider_SetFlags(&p->overlay, 8);
         } else {
-            Frame_ClearColliderFlags(&p->overlay, 8);
+            ContactCollider_ClearFlags(&p->overlay, 8);
         }
     }
     if (p->shakeAmplitude) {

@@ -88,15 +88,6 @@ void WirelessGame_AddItem(void *, s32);
 struct ContactVector {
     s16 x, y, z;
 };
-static inline u32 TestContactFlags(u32 *flags, u32 mask)
-{
-    return *flags & mask;
-}
-
-static inline u32 TestColliderFlags(const struct ContactCollider *collider, u32 mask)
-{
-    return collider->flags & mask;
-}
 
 void SceneActorGraphics_OnDamageContact(u8 *source, u8 *contact, u8 *p)
 {
@@ -127,7 +118,7 @@ void SceneActorGraphics_OnDamageContact(u8 *source, u8 *contact, u8 *p)
                                  &size, 1);
     }
     {
-        if (TestColliderFlags((struct ContactCollider *)source, 0x100)) {
+        if (ContactCollider_TestFlags((struct ContactCollider *)source, 0x100)) {
             u8 angle = ((struct ContactCollider *)source)->direction;
             ((struct SceneGraphicsActor *)p)->hitAngle = angle;
         } else
@@ -145,7 +136,7 @@ void SceneActorGraphics_OnDamageContact(u8 *source, u8 *contact, u8 *p)
     *((u16 *)(p + 0x34e)) = responseValue;
     PlayerStats_AddContactHundredths(source, contact, actor[0xe2]);
     if ((((struct SceneGraphicsActor *)p)->pendingDamage > 0) &&
-        TestContactFlags(&((struct ContactCollider *)source)->reactionFlags, 1))
+        ContactCollider_TestReactionFlags((struct ContactCollider *)source, 1))
         ((struct SceneGraphicsActor *)p)->damagePending = 1;
     if (!(gEngineFlags & 0x1000))
         return;
@@ -158,7 +149,7 @@ void SceneActorGraphics_OnDamageContact(u8 *source, u8 *contact, u8 *p)
     }
     if (((struct ContactCollider *)contact)->costFlags & 8)
         WirelessGame_AddItem(contact + 0xc, 0);
-    if (!TestContactFlags(&((struct ContactCollider *)source)->reactionFlags, 0x800000))
+    if (!ContactCollider_TestReactionFlags((struct ContactCollider *)source, 0x800000))
         return;
     {
         u8 *stats = (u8 *)gGameState;

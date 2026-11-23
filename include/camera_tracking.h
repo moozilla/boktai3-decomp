@@ -12,4 +12,15 @@ struct CameraTracking {
 
 void CameraTracking_Update(struct CameraTracking *tracking);
 
+/* Request bits an actor raises for the tracking update (bit 0: keep the actor in frame). */
+static inline void CameraTracking_SetRequests(struct CameraTracking *tracking, u32 mask)
+{
+    tracking->requests |= mask;
+}
+
+static inline void CameraTracking_ClearRequests(struct CameraTracking *tracking, u32 mask)
+{
+    tracking->requests &= ~mask;
+}
+
 #endif

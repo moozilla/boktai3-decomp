@@ -15,7 +15,7 @@ struct ContactCollider {
     u8 unknown2A[0xA];
     u32 statRewardFlags; /* 0x34: selects player hundredths gain on contact (tentative) */
     u32 reactionFlags;
-    u16 unknown3C, cost; /* 0x3C: base power, 0x3E: calculated damage */
+    u16 unknown3C, cost;   /* 0x3C: base power, 0x3E: calculated damage */
     u16 responseParameter; /* 0x40: copied to actor response state (tentative) */
     u8 direction;
     u8 costFlags;      /* 0x43: bit three latches quarter-cost adjustment */
@@ -27,5 +27,28 @@ struct ContactCollider {
     void (*callback)(struct ContactCollider *, struct ContactCollider *, void *);
     void *owner; /* 0x50: callback owner */
 };
+
+/* The collider's own flags (bit 2 disables it, bit 3 hides its contact, bit 8 carries a
+ * direction) and the reaction flags a hit passes to the struck actor. */
+static inline u32 ContactCollider_TestFlags(const struct ContactCollider *collider, u32 mask)
+{
+    return collider->flags & mask;
+}
+
+static inline void ContactCollider_SetFlags(struct ContactCollider *collider, u32 mask)
+{
+    collider->flags |= mask;
+}
+
+static inline void ContactCollider_ClearFlags(struct ContactCollider *collider, u32 mask)
+{
+    collider->flags &= ~mask;
+}
+
+static inline u32 ContactCollider_TestReactionFlags(const struct ContactCollider *collider,
+                                                    u32 mask)
+{
+    return collider->reactionFlags & mask;
+}
 
 #endif
