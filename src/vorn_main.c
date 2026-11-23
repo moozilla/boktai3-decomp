@@ -3170,9 +3170,7 @@ u8 Vorn_SelectHitRecovery(struct ChaseActor *actor)
         actor->base.counter2AC = blocked;
         actor->base.field2B1 = 1;
         {
-            u32 *flags = &actor->base.statusFlags;
-            u32 mask = ~0x1000000;
-            *flags &= mask;
+            SceneActorChase_ClearWordFlags(&actor->base.statusFlags, 0x1000000);
         }
         return 1;
     }
