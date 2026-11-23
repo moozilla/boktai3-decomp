@@ -1682,9 +1682,10 @@ void SceneActorAnimation_EmitDirectionalTrail(struct ChaseActor *a, s32 frame)
     if (SceneActorReaction_TakePrepared(a))
         SceneActorAnimation_SelectDirectionalEntry(&a->base, 17);
     {
-        struct DisplaySequenceState *sequence = (void *)((u8 *)a->base.drawable + 0x48);
+        struct DisplaySequenceState *sequence =
+            &((struct SceneActorAnimationSequenceDrawable *)a->base.drawable)->sequence;
         sequence->index = 0;
-        sequence = (void *)((u8 *)a->base.drawable + 0x48);
+        sequence = &((struct SceneActorAnimationSequenceDrawable *)a->base.drawable)->sequence;
         sequence->elapsed = 0;
     }
     if (Mod(frame, 4) == 0) {
@@ -2014,7 +2015,7 @@ void SceneActorControl_BeginHiddenDefeat(struct ChaseActor *actor)
             control->timer = 0;
         }
         {
-            u16 *colliderFlags = (u16 *)((u8 *)actor + 0x13A);
+            u16 *colliderFlags = &actor->base.colliderA.flags;
             u32 mask;
             u32 value = *colliderFlags;
             mask = 4;
@@ -2064,7 +2065,7 @@ void SceneActorControl_BeginHiddenDefeat(struct ChaseActor *actor)
                     SceneActorChase_SetState(actor, 1, 0, 2);
                 }
             }
-            ActorShadow_Disable((u8 *)actor + 0x320);
+            ActorShadow_Disable(&actor->base.shadow);
             ActorStatus_SetDrawableFlags(actor, 1);
         } else {
             SceneActorChase_SetControl(actor, SceneActorControl_CompleteBlinkOut, 0x27);
