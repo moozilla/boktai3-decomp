@@ -40,7 +40,8 @@ struct HresvelgrTravelActor {
     u8 pad1F4[0x248 - 0x1F4];
     u8 bodyCollider[0x2F0 - 0x248]; /* 0x248: set up by ColliderActor_InitBodyCollider. */
     struct BossActionState action, behavior; /* 0x2F0, 0x300 */
-    u8 pad310[8];
+    u16 reactionStage; /* 0x310: set 6 by ActorReaction_BeginCollisionPhase (tentative). */
+    u8 pad312[6];
     u16 recoveryFrames;
     u8 pad31A[2];
     s16 motionX, motionY, motionZ, motionW;
