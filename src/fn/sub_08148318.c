@@ -74,13 +74,8 @@ void Player_UpdateWaveringMovement(struct Player *p)
                 p->heading = (8 - direction) >> 1;
                 p->side = 1;
             } else {
-                {
-                    s32 folded = direction >> 1;
-                    u8 *heading = &p->heading;
-                    u8 side = 0;
-                    *heading = folded;
-                    p->side = side;
-                }
+                p->heading = direction >> 1;
+                p->side = 0;
             }
         }
     } else
