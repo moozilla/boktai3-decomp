@@ -39,6 +39,7 @@ const STAGES = (() => { try { return JSON.parse(fs.readFileSync(path.join(ROOT, 
 const stageOf = (scene) => STAGES.find((x) => x.scene === scene) || { items: [], doors: [], entrances: [] };
 const log = [];
 // scenes the run has been in (carried over from --from), for door choice
+const SEEN = new Map();  // person id -> rooms they were in
 const VISITS = new Map();  // room visits this run: least visited doors first
 const TRIED = new Set(from && from.tried ? from.tried : []);  // floor items already gone for
 const VISITED = new Set(from ? [...(from.visited || []), ...(from.rooms || []).map((r) => r.scene)] : []);
@@ -133,6 +134,9 @@ const GOALS = {
       // the characters the script placed (stages.json talk).
       if (!opt('--no-talk')) {
         const live = L.people();
+        // someone met in three or more rooms travels with the player (Otenko): talk once
+        for (const q of live) { const k = q.id.toString(16); SEEN.set(k, (SEEN.get(k) || new Set()).add(here)); }
+        const companion = (key) => (SEEN.get(key) || new Set()).size >= 3;
         const targets = live.length ? live.map((q) => ({ key: q.id.toString(16), x: q.x, z: q.z, addr: q.addr }))
           : (stageOf(here).talk || []).filter((t) => t.kind === 'character').map((t) => ({ key: String(t.id), x: t.x, z: t.z }));
         // twice each (a second talk can say more: San Miguel's flag r708[0x19c.4][6] is set
@@ -145,10 +149,10 @@ const GOALS = {
           const r = yield* L.interact(now ? now.x : t.x, now ? now.z : t.z, { avoid: stageOf(here).doors.map((d) => d.box), trace: (e) => event({ skill: 'nav', ...e }) });
           // a shop or service menu the talk opened: back out of it
           for (let i = 0; i < 8 && !$player(g); i++) { yield g.press('b', 2); yield g.press(0, 10); yield* L.clearInterruptions({}); }
-          event({ skill: 'talk', id: t.key, round, x: t.x, z: t.z, done: r.done, lines: (r.lines || []).slice(0, 6), story: L.story(), was: story0, facilities: L.facilities() });
+          event({ skill: 'talk', id: t.key, round, x: t.x, z: t.z, done: r.done, reason: r.reason, lines: (r.lines || []).slice(0, 6), story: L.story(), was: story0, facilities: L.facilities() });
           // whatever the talk started (a choice, a menu, an event) ends before the next one
           yield* untilControl(g, L, () => true, 30, 1200);
-          if (L.where().scene !== here || !r.done) break;
+          if (L.where().scene !== here || !r.done || companion(t.key)) break;
         }
       }
       // items: pick them up on the way (floor items, chests: a sword, fruit, potions)
