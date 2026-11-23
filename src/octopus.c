@@ -9,6 +9,7 @@
 #include "scene_actor_terrain.h"
 #include "player.h"
 #include "octopus.h"
+#include "word_flags.h"
 #include "gba/macro.h"
 #include "gba/syscall.h"
 #include "script_utility.h"
@@ -28,6 +29,7 @@
 #include "engine_globals.h"
 #include "scene_actor_init_primitives.h"
 #include "scene_actor_init_graphics.h"
+#include "scene_actor_init_actor.h"
 
 void SceneActorBehavior_ApplyContactReaction(void);
 
@@ -44,32 +46,18 @@ void Octopus_OnAttackContact(void)
 
 void SceneActorAnimation_SelectDirectionalFlags(struct RoomActor *, s32);
 
-static inline u8 TakeFlag(u8 *flag)
+void Ivy_UpdateActiveState_080E98B4(struct ChaseActor *actor)
 {
-    if (*flag) {
-        *flag = 0;
-        return TRUE;
-    }
-    return FALSE;
-}
-
-static inline void Clr(u16 *q, u32 m)
-{
-    *q = m & *q;
-}
-
-void Ivy_UpdateActiveState_080E98B4(u8 *p)
-{
-    if (TakeFlag(p + 0x2B2)) {
+    if (SceneActorControl_TakeFlag(&actor->base.field2B2)) {
         u16 *q;
-        q = (u16 *)(p + 0x13A);
+        q = &actor->base.colliderA.flags;
         *q = (*q & 0xFFFB) | 8;
-        Clr((u16 *)(p + 0x2C0), 0xFFFFF7FF);
+        HalfwordFlags_Clear(&actor->base.placementFlags, 0x800);
     }
-    SceneActorAnimation_SelectDirectionalFlags(p, 0xE);
+    SceneActorAnimation_SelectDirectionalFlags(actor, 0xE);
 }
 
-void Ivy_UpdateActiveState_080E98B4(u8 *p);
+void Ivy_UpdateActiveState_080E98B4(struct ChaseActor *actor);
 
 static inline void clearColliderFlag(u16 *flags)
 {
@@ -249,11 +237,6 @@ static inline void Octopus_EnableCollider(struct ContactCollider *collider)
     collider->flags &= 0xFFF7;
 }
 
-static inline void Octopus_SetContactFlag(struct ChaseActor *actor, u32 bits)
-{
-    actor->base.placementFlags = bits | actor->base.placementFlags;
-}
-
 static inline void Octopus_DisableContact(struct ChaseActor *actor)
 {
     actor->base.colliderA.flags &= 0xFFFB;
@@ -300,7 +283,7 @@ void Octopus_UpdateCaptureAttack(struct ChaseActor *actor)
 
     if (Octopus_ReadFrame(anim).index == 3 && anim->elapsed > limit) {
         Octopus_EnableCollider(&actor->base.colliderA);
-        Octopus_SetContactFlag(actor, 0x800);
+        MonsterInit_SetMotionFlags(actor, 0x800);
         if (SceneActorReaction_FindAdjacentTarget(actor, 0)) {
             SceneActorChase_SetControl(actor, Octopus_UpdateHold, 0x25);
             SceneActorChase_SetState(actor, 0, 2, 1);
@@ -328,7 +311,7 @@ void Octopus_UpdateCaptureAttack(struct ChaseActor *actor)
     } else {
         actor->base.colliderA.flags |= 4;
         actor->base.colliderA.flags &= 0xFFF7;
-        Octopus_SetContactFlag(actor, 0x800);
+        MonsterInit_SetMotionFlags(actor, 0x800);
     }
 
     if (actor->base.restart) {
@@ -380,13 +363,6 @@ struct OctopusDrawable {
     u8 unknown0[7];
     u8 mode : 8;
 };
-
-static inline u8 TestFlags(u32 value, u32 mask)
-{
-    if (value & mask)
-        return 1;
-    return 0;
-}
 
 static inline void CellCenter(struct SceneVec *out, u32 cell)
 {
@@ -476,7 +452,7 @@ static inline s32 HudMode(void)
 
 static inline u8 MayCount(struct ChaseActor *victim)
 {
-    if (TestFlags(gEngineFlags, 0x4800)) {
+    if (SceneActorChase_Test(gEngineFlags, 0x4800)) {
         u32 value = victim->base.hitOwners;
         if (!(value & 0x20) && value) {
             switch (HudMode()) {
@@ -984,11 +960,6 @@ static inline u32 Octopus_SpinSpeed(u32 value)
     return value | ~0x1F;
 }
 
-inline static u32 Octopus_MotionBits(u32 mask, u16 *flags)
-{
-    return (*flags) & mask;
-}
-
 struct OctopusDefeatMessage {
     u16 kind, value;
 };
@@ -1101,7 +1072,7 @@ void Octopus_UpdateDefeat(struct ChaseActor *actor, s32 frame)
                     Script_Call(script, &arguments);
                 }
             }
-            if ((!Octopus_MotionBits(0x4000, flags)) && (((u32)(actor->base.category - 11)) > 2))
+            if ((!HalfwordFlags_Test(0x4000, flags)) && (((u32)(actor->base.category - 11)) > 2))
                 Bestiary_UnlockEntry(
                     Bestiary_GetEntryForActor(actor->base.category, actor->base.paletteOffset));
             SceneActorChase_SetTypedControl(actor, (void *)SceneActorControl_OnIdle, 0x10);
@@ -1172,11 +1143,6 @@ static inline void State(struct ChaseActor *a, u8 state, u8 phase, u8 behavior)
     a->base.field2B1 = 1;
 }
 
-static inline void Or(u16 m, u16 *f)
-{
-    *f |= m;
-}
-
 // confidence=low: hides the actor and waits for an adjacent target; one starts the reaction
 
 // animation, otherwise after 60 frames it moves on to phase 2, behavior 5.
@@ -1190,7 +1156,7 @@ void SceneActorReaction_WaitHiddenForAdjacentTarget(struct ChaseActor *a)
             u16 v = 4 | c->flags;
             c->flags = v & 0xfff7;
         }
-        Or(0x800, &a->base.placementFlags);
+        HalfwordFlags_Set(0x800, &a->base.placementFlags);
         flag = 1;
         if (a->base.drawableKind == 0) {
             u32 *flags = a->base.drawable;
