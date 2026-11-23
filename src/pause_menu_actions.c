@@ -3,6 +3,7 @@
 #include "game_state.h"
 #include "scene_item_values.h"
 #include "scene_hud_display.h"
+#include "word_flags.h"
 
 void PauseMenu_RequestEffectMode(struct SceneHudState *p, u8 mode)
 {
@@ -175,10 +176,6 @@ void sub_08249244(void *, s32, s32, void *);
 
 void Inventory_ClearItemOverrideFlag(u32);
 
-static inline u32 Item_HasBonus(u32 *flags, u32 mask)
-{
-    return *flags & mask;
-}
 
 void PauseMenu_ApplyItemSlot(struct SceneHudState *p, u32 slot)
 {
@@ -191,7 +188,7 @@ void PauseMenu_ApplyItemSlot(struct SceneHudState *p, u32 slot)
             item == 25 || item == 2 || item == 23 || item == 24) {
             s16 *applied;
             s32 duration = 0x708;
-            if (p->actionOwner && Item_HasBonus(&p->actionOwner->statBonusFlags, 0x20000))
+            if (p->actionOwner && WordFlags_Test(&p->actionOwner->statBonusFlags, 0x20000))
                 duration <<= 1;
             sub_0813D834(p->actionOwner, 0, duration);
             applied = &p->appliedStatB;
@@ -200,7 +197,7 @@ void PauseMenu_ApplyItemSlot(struct SceneHudState *p, u32 slot)
         }
         if (item == 14) {
             s32 duration = 0x384;
-            if (p->actionOwner && Item_HasBonus(&p->actionOwner->statBonusFlags, 0x20000))
+            if (p->actionOwner && WordFlags_Test(&p->actionOwner->statBonusFlags, 0x20000))
                 duration <<= 1;
             sub_0813D834(p->actionOwner, 1, duration);
             p->appliedStatB = 0;
@@ -211,7 +208,7 @@ void PauseMenu_ApplyItemSlot(struct SceneHudState *p, u32 slot)
     b = gUnk_08E61280[item].effectValueB;
     if (p->actionOwner->actionMode == 6 && item == 13)
         a = -a;
-    if (p->actionOwner && Item_HasBonus(&p->actionOwner->statBonusFlags, 0x20000)) {
+    if (p->actionOwner && WordFlags_Test(&p->actionOwner->statBonusFlags, 0x20000)) {
         if (item == 1 || item == 13 || item == 2 || item == 14) {
             a <<= 1;
             b <<= 1;
