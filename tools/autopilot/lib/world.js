@@ -499,6 +499,10 @@ exports.menuSearch = function* (goal, opts = {}) {
   // remembered cursors of other grids are left out (they multiply states, not choices)
   const keyOf = () => { const m = exports.menuState(); return m ? [m.callback, m.page, ...m.grid.slice(0, 4), m.extra[1]].join(',') : ''; };
   yield g.press('start', 2); yield g.press(0, 60);
+  // the menu opens on the page it was left on: L/R to the page asked for (1 items, 3 Solar Gun)
+  for (let i = 0; i < 8 && opts.page !== undefined && exports.menuState() && exports.menuState().page !== opts.page; i++) {
+    yield g.press(exports.menuState().page > opts.page ? 'l' : 'r', 2); yield g.press(0, 40);
+  }
   let found = null, expanded = 0;
   const seen = new Set([keyOf()]), root = S.snapshot();
   // nodes are key paths replayed from the opened menu (a snapshot each would not fit)
