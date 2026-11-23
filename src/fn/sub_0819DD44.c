@@ -3,14 +3,6 @@
 #include "ram.h"
 
 
-static inline void Request(struct HresvelgrTravelActor *p, u32 kind)
-{
-    p->requestedAnimation = kind;
-}
-static inline u32 TestFlags(struct HresvelgrTravelActor *p, u32 mask)
-{
-    return p->flags & mask;
-}
 void Hresvelgr_UpdateAttackCycle(struct HresvelgrTravelActor *p)
 {
     struct HresvelgrTravelActor *q = p;
@@ -26,7 +18,7 @@ void Hresvelgr_UpdateAttackCycle(struct HresvelgrTravelActor *p)
     switch (a->state) {
         case 0:
             if (!a->frame) {
-                Request(q, 14);
+                Hresvelgr_SetActionAnimation(q, 14);
                 a->frame++;
             } else if (q->finished)
                 ActionState_SetState(a, 1);
@@ -39,11 +31,11 @@ void Hresvelgr_UpdateAttackCycle(struct HresvelgrTravelActor *p)
             *f = bits;
         }
             if (!a->frame) {
-                Request(q, 15);
+                Hresvelgr_SetActionAnimation(q, 15);
                 a->frame++;
             } else if (q->finished)
                 ActionState_AdvanceState(a);
-            if (TestFlags(q, 0x4000000))
+            if (Hresvelgr_TestFlags(q, 0x4000000))
                 ActionState_SetState(a, 3);
             break;
         case 2: {
@@ -55,37 +47,35 @@ void Hresvelgr_UpdateAttackCycle(struct HresvelgrTravelActor *p)
             *f = value;
         }
             if (!a->frame) {
-                Request(q, 3);
+                Hresvelgr_SetActionAnimation(q, 3);
                 a->frame++;
                 break;
             } else if (q->finished) {
                 ActionState_SetState(a, 4);
                 break;
             }
-            if (TestFlags(q, 0x4000000))
+            if (Hresvelgr_TestFlags(q, 0x4000000))
                 ActionState_SetState(a, 3);
             break;
         case 3:
             if (!a->frame) {
-                Request(q, 32);
+                Hresvelgr_SetActionAnimation(q, 32);
                 a->frame++;
             } else if (q->finished)
                 ActionState_SetState(a, 4);
             break;
         case 4:
             if (!a->frame) {
-                Request(q, 16);
+                Hresvelgr_SetActionAnimation(q, 16);
                 a->frame++;
                 gHresvelgrAttackCount++;
             } else {
-                u32 mask = 0x40000000;
-                u32 flags = q->flags;
-                if (flags & mask)
+                if (Hresvelgr_TestFlags(q, 0x40000000))
                     ActionState_SetState(a, 7);
-                else if ((s32)flags < 0)
+                else if ((s32)q->flags < 0)
                     ActionState_SetState(a, 6);
                 else if (q->finished) {
-                    if (flags & 0x20000000)
+                    if (Hresvelgr_TestFlags(q, 0x20000000))
                         ActionState_SetState(a, 5);
                     else
                         ActionState_SetState(a, 10);
@@ -94,7 +84,7 @@ void Hresvelgr_UpdateAttackCycle(struct HresvelgrTravelActor *p)
             break;
         case 5:
             if (!a->frame) {
-                Request(q, 17);
+                Hresvelgr_SetActionAnimation(q, 17);
                 a->frame++;
             } else if (q->finished)
                 ActionState_SetState(a, 9);
@@ -104,28 +94,28 @@ void Hresvelgr_UpdateAttackCycle(struct HresvelgrTravelActor *p)
             break;
         case 7:
             if (!a->frame) {
-                Request(q, 35);
+                Hresvelgr_SetActionAnimation(q, 35);
                 a->frame++;
             } else if (q->finished)
                 ActionState_SetState(a, 8);
             break;
         case 8:
             if (!a->frame) {
-                Request(q, 24);
+                Hresvelgr_SetActionAnimation(q, 24);
                 a->frame++;
             } else if (q->finished)
                 ActionState_SetState(a, 14);
             break;
         case 9:
             if (!a->frame) {
-                Request(q, 18);
+                Hresvelgr_SetActionAnimation(q, 18);
                 a->frame++;
             } else if (q->finished)
                 ActionState_SetState(a, 12);
             break;
         case 10:
             if (!a->frame) {
-                Request(q, 18);
+                Hresvelgr_SetActionAnimation(q, 18);
                 a->frame++;
             } else if (q->finished) {
                 if (gHresvelgrAttackCount <= 5)
@@ -136,21 +126,21 @@ void Hresvelgr_UpdateAttackCycle(struct HresvelgrTravelActor *p)
             break;
         case 11:
             if (!a->frame) {
-                Request(q, 20);
+                Hresvelgr_SetActionAnimation(q, 20);
                 a->frame++;
             } else if (q->finished)
                 ActionState_SetState(a, 4);
             break;
         case 12:
             if (!a->frame) {
-                Request(q, 19);
+                Hresvelgr_SetActionAnimation(q, 19);
                 a->frame++;
             } else if (q->finished)
                 ActionState_SetState(a, 13);
             break;
         case 13:
             if (!a->frame) {
-                Request(q, 1);
+                Hresvelgr_SetActionAnimation(q, 1);
                 a->frame++;
             }
             if (q->position.y <= 832)

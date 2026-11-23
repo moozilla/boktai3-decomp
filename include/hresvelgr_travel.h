@@ -12,7 +12,8 @@ struct HresvelgrTravelActor {
     struct SceneVec position, velocity;
     u8 pad64[0x90 - 0x64];
     u32 tick; /* 0x90: frames in the current behavior (read by the travel phases). */
-    u8 pad94[0x9A - 0x94];
+    s16 health; /* 0x94 */
+    u8 pad96[0x9A - 0x96];
     u8 vulnerable;
     u8 pad9B;
     u32 flags;
@@ -81,6 +82,11 @@ static inline u8 Hresvelgr_EnterVulnerableBehavior(struct HresvelgrTravelActor *
 {
     actor->vulnerable = 1;
     return Hresvelgr_ConsumeActionEntry(actor);
+}
+
+static inline u32 Hresvelgr_TestFlags(const struct HresvelgrTravelActor *actor, u32 mask)
+{
+    return actor->flags & mask;
 }
 
 static inline void Hresvelgr_SetFlags(struct HresvelgrTravelActor *actor, u32 flags)
