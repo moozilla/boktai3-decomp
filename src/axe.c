@@ -216,17 +216,7 @@ void Axe_UpdateReturningTrail(struct AxeActor *p, s32 frame)
         Velocity(&trail->velocity, trail->heading, 8);
         if (LengthSquared(&delta) <= 1023 || frame > 600) {
             trail->position = p->position;
-            {
-                void *callback = SceneActorControl_SettleRotation;
-                u32 phase = 0x29;
-                p->entered = 1;
-                p->state = 0;
-                p->phase = phase;
-                p->callback = callback;
-                p->timer = 0;
-                SceneActorChase_ClearWordFlags(&p->flags114, 1);
-                p->word104 = 0;
-            }
+            SceneActorChase_SetControl(p, SceneActorControl_SettleRotation, 0x29);
         }
     }
 }
@@ -447,19 +437,7 @@ void Axe_UpdateTargetWindup(struct ChaseActor *actor, s32 elapsed)
         else
             delay = state->delay;
         if (elapsed > delay) {
-            void *callback = Axe_UpdateTargetLunge;
-            u32 phase = 0x36;
-            actor->base.field2B2 = 1;
-            actor->base.stepDone = 0;
-            actor->base.controlKind = phase;
-            actor->base.target = callback;
-            actor->base.field2C8 = 0;
-            {
-                u32 *flags = &actor->base.pendingControlFlags;
-                u32 mask = ~1;
-                *flags &= mask;
-            }
-            actor->base.pendingControl = 0;
+            SceneActorChase_SetControl(actor, Axe_UpdateTargetLunge, 0x36);
         }
     } else {
         s32 step, turn;
