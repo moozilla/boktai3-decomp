@@ -295,20 +295,12 @@ void LinkRecordPanel_InitializePreviews(struct LinkRecordPanel *panel)
 
 void LinkRecordPanel_HideDisplay(struct LinkRecordPanel *owner)
 {
-    u32 flag = 1;
-    u32 *q = &owner->widgets[0].flags;
-    struct CharacterPreviewModel *r;
     s32 i;
 
-    for (i = 6; i >= 0; i--) {
-        *q |= flag;
-        q += sizeof(owner->widgets[0]) / sizeof(*q);
-    }
-    r = &owner->previews[0].model;
-    for (i = 1; i >= 0; i--) {
-        CharacterModel_SetAnimationFlags(r, 1);
-        r = (struct CharacterPreviewModel *)((u8 *)r + sizeof(owner->previews[0]));
-    }
+    for (i = 0; i < 7; i++)
+        owner->widgets[i].flags |= 1;
+    for (i = 0; i < 2; i++)
+        CharacterModel_SetAnimationFlags(&owner->previews[i].model, 1);
 }
 
 void LinkRecordPanel_RemoveWidgets(struct LinkRecordPanel *owner)
