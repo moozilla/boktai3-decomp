@@ -1509,8 +1509,7 @@ u8 Mummy_RequestStraightRoute(struct ChaseActor *actor);
 static inline void Mummy_ApplyDuration(struct ChaseActor *a)
 {
     u16 *scale;
-    u32 mask = 0xA02F;
-    if (a->base.motionFlags & mask) {
+    if (SceneActorContact_MotionFlags(a, 0xA02F)) {
         u16 *p = &a->base.field2C2;
         *p = 64;
         scale = p;
@@ -2227,8 +2226,7 @@ void SceneActor_EnterMotionPhase(struct ChaseActor *actor)
 
 void Mummy_OnMovementUpdate(struct ChaseActor *actor)
 {
-    u32 m = 0x100;
-    if (!(actor->base.motionFlags & m))
+    if (!(SceneActorContact_MotionFlags(actor, 0x100)))
         Mummy_RequestStraightRoute(actor);
 }
 
