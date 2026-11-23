@@ -432,7 +432,7 @@ void SceneActor_ConfigureSecondaryProfileEntry(struct ChaseActor *actor)
 
 struct P;
 
-void Dog_OnBodyCollision(struct P *p, s32 a, s32 b);
+void Dog_OnBodyCollision(struct ContactCollider *collider, s32 a, s32 b);
 
 void Dog_OnSensorContact(u8 *unused, u8 *obj, u8 *ctx);
 
@@ -1278,43 +1278,28 @@ void Dog_OnAttackContact(u8 *collider, u8 *other, struct ChaseActor *actor)
     }
 }
 
-struct P {
-    u8 f[6];
-    u16 flags;
-};
+void SceneActorReaction_HandleColliderContact(struct ContactCollider *, s32, s32);
 
-void SceneActorReaction_HandleColliderContact(struct P *, s32, s32);
-
-void Dog_OnBodyCollision(struct P *p, s32 a, s32 b)
+void Dog_OnBodyCollision(struct ContactCollider *collider, s32 a, s32 b)
 {
-    if (SceneActorTurn_Flags(&p->flags, 0x800) == 0)
-        SceneActorReaction_HandleColliderContact(p, a, b);
+    if (SceneActorTurn_Flags(&collider->flags, 0x800) == 0)
+        SceneActorReaction_HandleColliderContact(collider, a, b);
 }
 
 void SceneActorAnimation_SelectDirectionalEntry(struct RoomActor *, s32);
 
-struct SSelectAnimationOne {
-    u8 filler[0x2b2];
-    u8 f;
-};
-
-void Dog_SelectAnimationOne(struct SSelectAnimationOne *s)
+void Dog_SelectAnimationOne(struct ChaseActor *actor)
 {
-    if (s->f != 0)
-        s->f = 0;
-    SceneActorAnimation_SelectDirectionalEntry(s, 1);
+    if (actor->base.field2B2 != 0)
+        actor->base.field2B2 = 0;
+    SceneActorAnimation_SelectDirectionalEntry(&actor->base, 1);
 }
 
-struct SSelectAnimationZero {
-    u8 filler[0x2b2];
-    u8 f;
-};
-
-void Dog_SelectAnimationZero(struct SSelectAnimationZero *s)
+void Dog_SelectAnimationZero(struct ChaseActor *actor)
 {
-    if (s->f != 0)
-        s->f = 0;
-    SceneActorAnimation_SelectDirectionalEntry(s, 0);
+    if (actor->base.field2B2 != 0)
+        actor->base.field2B2 = 0;
+    SceneActorAnimation_SelectDirectionalEntry(&actor->base, 0);
 }
 
 u32 Route_GetCurrentPointFacing(void *);
@@ -3037,9 +3022,9 @@ void Dog_UpdateCardinalTurn(struct ChaseActor *actor);
 
 void Dog_UpdateContactRecovery(struct ChaseActor *actor);
 
-void Dog_SelectAnimationOne(struct SSelectAnimationOne *s);
+void Dog_SelectAnimationOne(struct ChaseActor *actor);
 
-void Dog_SelectAnimationZero(struct SSelectAnimationZero *s);
+void Dog_SelectAnimationZero(struct ChaseActor *actor);
 
 void SceneActorControl_BeginHiddenDefeat(struct ChaseActor *actor);
 
