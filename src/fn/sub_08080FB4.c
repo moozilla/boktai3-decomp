@@ -35,9 +35,8 @@ static inline void SetControl(struct ChaseActor *actor)
     actor->base.target = callback;
     {
         /* Preserve the short-lived halfword-clear address. */
-        u32 off = 0x2C8;
         {
-            u16 *field = (void *)((u8 *)actor + off);
+            u16 *field = (void *)((u8 *)actor + 0x2C8);
             *field = 0;
         }
     }
@@ -67,10 +66,9 @@ void SceneActorReaction_BeginHiddenDefeat(struct ChaseActor *actor)
     if (IsPrimary(actor)) {
         {
             struct SceneActorRegistryControl *control = &actor->group.common.control;
-            u32 fieldOffset = 0x2CC;
             u32 *field;
             u32 mask;
-            field = (void *)((u8 *)actor + fieldOffset);
+            field = (void *)((u8 *)actor + 0x2CC);
             mask = ~0x141C0;
             *field &= mask;
             control->counter = 0;

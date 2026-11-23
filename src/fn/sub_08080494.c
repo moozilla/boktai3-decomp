@@ -114,10 +114,8 @@ void SceneActorReaction_BeginDefeatBurst(struct ChaseActor *actor)
         {
             struct ContactCollider *collider;
 
-            u32 bit;
             collider = &actor->base.colliderA;
-            bit = 4;
-            collider->flags = bit | collider->flags;
+            collider->flags = 4 | collider->flags;
             {
                 u16 *field = &collider->responseValue;
                 *field = 0;
