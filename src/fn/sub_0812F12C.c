@@ -2,6 +2,8 @@
 #include "scene_actor_registry.h"
 #include "game_state.h"
 #include "ram.h"
+#include "scene_actor_availability.h"
+#include "scene_actor_behavior.h"
 extern u32 gUnk_02000560;
 void SceneActorPlacement_HideActor(struct ChaseActor *, s32);
 void SceneActorPlacement_ShowActor(struct ChaseActor *, s32);
@@ -17,46 +19,22 @@ static inline u8 sameRegion(u16 *region)
         return 1;
     return 0;
 }
-static inline u32 flags16(struct ChaseActor *p, u32 mask)
-{
-    return p->base.motionFlags & mask;
-}
-static inline u32 flags32(struct ChaseActor *p, u32 mask)
-{
-    return p->base.statusFlags & mask;
-}
-static inline u8 unavailable(struct ChaseActor *p)
-{
-    if (p) {
-        if (flags16(p, 0x40) || flags32(p, 0x20000) || p->base.health <= 0)
-            return 1;
-    }
-    return 0;
-}
-static inline u32 test(u32 mask, u32 flags)
-{
-    return mask & flags;
-}
 static inline void dispatch(void **callback, void *context)
 {
     Callback_InvokeActor(context, *callback);
 }
-static inline u32 engineFlags(u32 mask)
-{
-    return (gEngineFlags | gScenePauseFlags) & mask;
-}
 s32 SceneActor_UpdateActiveCallbacks(struct ChaseActor *p)
 {
-    if (engineFlags(0x400))
+    if (SceneActorBehavior_GlobalPauseBits(0x400))
         return 0;
-    if (test(4, gUnk_02000560))
+    if (SceneActorBehavior_OverrideBits(4, &gUnk_02000560))
         return 0;
-    if (!(test(2, p->base.behaviorFlags))) {
+    if (!SceneActorBehavior_OverrideBits(2, &p->base.behaviorFlags)) {
         if (!sameRegion(&p->base.regionId)) {
             SceneActorPlacement_HideActor(p, 0);
             return 0;
         }
-        if (!unavailable(p))
+        if (!SceneActor_ActionsBlocked(p))
             Callback_InvokeActor(p, p->base.onDamage);
         SceneActorPlacement_ConsumeCallbackFlag(p);
         SceneActorMovement_UpdateStatus(p);
