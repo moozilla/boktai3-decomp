@@ -5,10 +5,6 @@
 void *ScriptProc_Start(u16, u16);
 void Bg_SetupLayers(u32, u32, void *, u32, u32, u32, void *);
 void Bg_SetPriority(u32, u32);
-static inline void Bg_DisableDisplay(u32 layers)
-{
-    gDispCntShadow &= ~layers;
-}
 
 void OrbitBackground_LoadResource(struct OrbitBackground *p)
 {
