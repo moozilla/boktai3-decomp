@@ -10,10 +10,8 @@ void SceneActorRegistry_RestoreScriptActorFieldAA(void)
             actor->base.attachmentTimer = value;
             {
                 u32 mask = 2;
-                u32 offset;
                 u16 *field;
-                offset = 0x2d6;
-                field = (void *)((u8 *)actor + offset);
+                field = (void *)((u8 *)actor + 0x2d6);
                 mask |= *field;
                 *field = mask;
             }
