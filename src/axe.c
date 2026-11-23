@@ -1261,15 +1261,6 @@ struct AxeFlags16 {
     u16 bits : 16;
 };
 
-static inline void SetBehavior(struct ChaseActor *actor, u32 behavior)
-{
-    actor->base.state2A8 = 0;
-    actor->base.phase2A9 = 0;
-    actor->base.behavior2AA = behavior;
-    actor->base.counter2AC = 0;
-    actor->base.field2B1 = 1;
-}
-
 void Axe_UpdateCollapsePhase(struct ChaseActor *actor)
 {
     if (TakePending(actor)) {
@@ -1285,7 +1276,7 @@ void Axe_UpdateCollapsePhase(struct ChaseActor *actor)
         u32 mask = ~0x1800;
         flags->bits &= mask;
         SceneActorChase_SetControl(actor, actor->base.onStanding, 0);
-        SetBehavior(actor, 3);
+        Chase_SetBehavior(actor, 3);
     } else {
         actor->base.counter2AC++;
     }
@@ -3435,15 +3426,6 @@ s32 Axe_UpdateEffects(void *s)
 
 void Axe_UpdateFadeOut(struct ChaseActor *actor, s32 frame);
 
-static inline void SetPhase(struct ChaseActor *actor, u32 state, u32 phase, u32 behavior)
-{
-    actor->base.state2A8 = state;
-    actor->base.phase2A9 = phase;
-    actor->base.behavior2AA = behavior;
-    actor->base.counter2AC = 0;
-    actor->base.field2B1 = 1;
-}
-
 void Axe_UpdateFadeOutPhase(struct ChaseActor *actor)
 {
     struct Axe *group = actor->base.context;
@@ -3463,7 +3445,7 @@ void Axe_UpdateFadeOutPhase(struct ChaseActor *actor)
     Axe_EmitMotionTrail(actor);
     if (actor->base.stepDone) {
         SceneActorChase_SetControl(actor, ActorPhase_UpdateSpriteCollapse, 0x23);
-        SetPhase(actor, 0, 2, 1);
+        Chase_SetState(actor, 0, 2, 1);
     } else {
         actor->base.counter2AC++;
     }
@@ -3539,7 +3521,7 @@ void ActorGroup_BeginMotionPhase(struct ChaseActor *actor)
     }
     if (actor->base.stepDone) {
         SceneActorChase_SetControl(actor, ActorPhase_UpdateSpriteCollapse, 0x23);
-        SetPhase(actor, 0, 2, 3);
+        Chase_SetState(actor, 0, 2, 3);
     } else {
         actor->base.counter2AC++;
     }
@@ -3552,7 +3534,7 @@ void Axe_UpdateRecoverTimer(struct ChaseActor *actor)
     if (actor->base.stepDone) {
         u32 mask = 0x100;
         actor->base.motionFlags = actor->base.motionFlags & ~mask;
-        SetPhase(actor, 0, 0, 3);
+        Chase_SetState(actor, 0, 0, 3);
     } else
         actor->base.counter2AC++;
 }
@@ -3594,7 +3576,7 @@ void Axe_UpdateRecoverTimer2(struct ChaseActor *actor)
     if (actor->base.stepDone) {
         u32 mask = 0x100;
         actor->base.motionFlags = actor->base.motionFlags & ~mask;
-        SetPhase(actor, 0, 0, 3);
+        Chase_SetState(actor, 0, 0, 3);
     } else
         actor->base.counter2AC++;
 }
@@ -3635,7 +3617,7 @@ void ActorGroup_BeginExtendedMotion(struct ChaseActor *actor)
     }
     if (actor->base.stepDone) {
         SceneActorChase_SetControl(actor, ActorPhase_UpdateSpriteCollapse, 0x23);
-        SetPhase(actor, 0, 2, 7);
+        Chase_SetState(actor, 0, 2, 7);
     } else {
         actor->base.counter2AC++;
     }
