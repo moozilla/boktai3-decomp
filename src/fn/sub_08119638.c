@@ -7,12 +7,6 @@
 
 // confidence=low: animation 0x21 completes into Glove_UpdateStaggerRecoil.
 
-#define U8(p, o)  (*(u8 *)((u8 *)(p) + (o)))
-#define S8(p, o)  (*(s8 *)((u8 *)(p) + (o)))
-#define U16(p, o) (*(u16 *)((u8 *)(p) + (o)))
-#define S16(p, o) (*(s16 *)((u8 *)(p) + (o)))
-#define U32(p, o) (*(u32 *)((u8 *)(p) + (o)))
-#define S32(p, o) (*(s32 *)((u8 *)(p) + (o)))
 s32 Div(s32, s32);
 s32 Math_Atan2(s32, s32);
 void Terrain_ResolveActorMotion(struct GloveMotion *);
@@ -104,7 +98,7 @@ void Glove_UpdateStaggerReturn(struct Glove *p)
     }
 
     CharacterModel_UpdateAccessoryAnimations(&p->model);
-    ActorParticles_UpdateEmitter(self, &self->emitter, U32(self, 0x5C));
+    ActorParticles_UpdateEmitter(self, &self->emitter, self->style.initialWord);
     if (complete == 1) {
         Trigger_ConsumePending(&p->queue, 1);
         {
