@@ -206,6 +206,17 @@ const GOALS = {
   // With --from: nothing more (to verify, cover and save states for an earlier run).
   *replay(g) { yield 1; return true; },
 
+  // With --from: hold --keys (default none) for --frames frames, logging scene changes
+  // and life every 300 frames (to see what a section does on its own).
+  *hold(g, L) {
+    const keys = opt('--keys', '') || 0, n = +opt('--frames', 3000);
+    for (let i = 0; i < n; i += 300) {
+      yield g.press(keys, 300);
+      event({ skill: 'hold', keys, ...L.where(), story: L.story() });
+    }
+    return true;
+  },
+
   // With --from: navigate to --box from where that run ended (a debugging aid).
   *nav(g, L) {
     yield 1;
@@ -305,6 +316,13 @@ function* untilControl(g, L, ready = () => true, quiet = 120, limit = 60000) {
     // with B, or START (the bike parts menu closes on START when it was opened from a
     // story scene: ModifierMenu_HandleOverviewInput), now and then confirm with A
     stuck = field ? 0 : stuck + 1;
+    // riding the coffin bike (the Glove task; src/registry_actor_collision.c
+    // ActorMotion_ApplyInput: R accelerates, L boosts, up/down steer): ride on with R
+    if (!field && !msg.open && L.tasks().some((t) => !t.dead && t.update === 'Glove_UpdateTask')) {
+      if (stuck % 600 === 1) event({ skill: 'ride', ...L.where() });
+      yield g.press('r', 4);
+      continue;
+    }
     if (stuck && stuck % 180 === 0) {
       const key = ['b', 'start', 'b', 'start', 'a'][(stuck / 180) % 5];
       event({ skill: 'unstick', key, frames: stuck, tasks: [...new Set(L.tasks().filter((t) => !t.dead).map((t) => t.update))].filter((n) => !BORING.test(n)).slice(0, 8) });
