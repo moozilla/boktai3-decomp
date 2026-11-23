@@ -343,18 +343,11 @@ static inline void AddPosition(struct ContactPosition *out, const struct Contact
     out->z = b->z + a->z;
 }
 
-static inline s32 TruncateFixed(s32 value)
-{
-    if (value >= 0)
-        return value >> 12;
-    return -((-value) >> 12);
-}
-
 static inline void SetDirectionOffset(struct ContactPosition *position, u32 angle, s32 distance)
 {
-    position->x = TruncateFixed(gUnk_086149C4[(angle + 0x40) & 0xFF] * distance);
+    position->x = Math_ShiftTowardZero(gUnk_086149C4[(angle + 0x40) & 0xFF] * distance, 12);
     position->y = 0;
-    position->z = TruncateFixed(gUnk_086149C4[angle] * distance);
+    position->z = Math_ShiftTowardZero(gUnk_086149C4[angle] * distance, 12);
 }
 
 static inline u32 ReadPaletteOffset(u16 *offset)
@@ -701,13 +694,6 @@ static inline u32 CellShape(struct EngineMap **terrain, u32 cell)
     return *data >> 4;
 }
 
-static inline s32 FacingQuarter(s32 heading)
-{
-    if (heading >= 0)
-        return heading >> 6;
-    return -(-heading >> 6);
-}
-
 static inline s32 MapWidth(struct EngineMap **terrain)
 {
     return ((struct SceneActorChaseTerrainGrid *)(*terrain)->cells)->width;
@@ -762,7 +748,7 @@ static inline u32 SelectRetreat(struct ChaseActor *actor, u32 priorDirection, s3
             terrain = &gTerrainMap;
             height = SceneActorChase_HeightAt(cell, position);
             shape = CellShape(terrain, cell);
-            switch (FacingQuarter(actor->base.body.direction + 32) & 3) {
+            switch (Math_ShiftTowardZero(actor->base.body.direction + 32, 6) & 3) {
                 case 0:
                     next = cell + 1;
                     i = 0;
@@ -1113,13 +1099,6 @@ static inline u32 DogTrail_NextSample(const u16 *table)
     return table[gRandomIndex];
 }
 
-static inline s32 DogTrail_Truncate(s32 value)
-{
-    if (value >= 0)
-        return value >> 12;
-    return -((-value) >> 12);
-}
-
 void SceneActorAnimation_SpawnTrailAtPosition(void *position, u32 palette)
 {
     struct ContactPackedVector velocity;
@@ -1147,10 +1126,10 @@ void SceneActorAnimation_SpawnTrailAtPosition(void *position, u32 palette)
         s32 x, rawX;
         rawX = gUnk_086149C4[(heading + 64) & mask] * speed;
         sampleOrigin = randomOrigin;
-        x = DogTrail_Truncate(rawX);
+        x = Math_ShiftTowardZero(rawX, 12);
         planar->x = x;
         planar->y = 0;
-        planar->z = DogTrail_Truncate(gUnk_086149C4[heading] * speed);
+        planar->z = Math_ShiftTowardZero(gUnk_086149C4[heading] * speed, 12);
     }
     vertical = ParticleRandom_ReadRelativeSample(sampleOrigin, (const u16 *)RANDOM_TABLE_ADDR);
     vertical &= 63;
@@ -1305,13 +1284,6 @@ void Dog_SelectAnimationZero(struct ChaseActor *actor)
 u32 Route_GetCurrentPointFacing(void *);
 
 /* Half of a facing octant, rounded toward zero. */
-static inline s32 DogTurn_Half(s32 value)
-{
-    if (value >= 0)
-        return value >> 1;
-    return -((-value) >> 1);
-}
-
 void Dog_UpdateCardinalTurn(struct ChaseActor *actor)
 {
     struct SceneActorChaseGroup *group = &actor->group;
@@ -1333,7 +1305,7 @@ void Dog_UpdateCardinalTurn(struct ChaseActor *actor)
         } else {
             target = actor->base.nextDirection;
         }
-        if (direction == DogTurn_Half(target)) {
+        if (direction == Math_ShiftTowardZero(target, 1)) {
             actor->base.stepDone = 1;
             if (SceneActorTurn_Flags(motionFlags, 0x400)) {
                 SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0);
@@ -1854,25 +1826,11 @@ void Dog_UpdateLeapWindup(struct ChaseActor *actor)
 
 void Dog_UpdateAnimationSixteenReaction(struct ChaseActor *actor);
 
-static inline s32 Scale12(s32 n)
-{
-    if (n >= 0)
-        return n >> 12;
-    return -((-n) >> 12);
-}
-
-static inline s32 Half(s32 n)
-{
-    if (n >= 0)
-        return n >> 1;
-    return -((-n) >> 1);
-}
-
 static inline void Polar(struct ContactPosition *out, u32 angle, s32 speed)
 {
-    out->x = Scale12(gUnk_086149C4[(angle + 0x40) & 0xFF] * speed);
+    out->x = Math_ShiftTowardZero(gUnk_086149C4[(angle + 0x40) & 0xFF] * speed, 12);
     out->y = 0;
-    out->z = Scale12(gUnk_086149C4[angle & 0xFF] * speed);
+    out->z = Math_ShiftTowardZero(gUnk_086149C4[angle & 0xFF] * speed, 12);
 }
 
 void Dog_LeapTowardTarget(struct ChaseActor *actor)
@@ -1903,8 +1861,8 @@ void Dog_LeapTowardTarget(struct ChaseActor *actor)
     }
     Collider_Refresh(&context->collider);
     if (*(u8 *)actor->base.body.movementProbe & 1) {
-        actor->base.secondaryMotion.x = Half(actor->base.secondaryMotion.x);
-        actor->base.secondaryMotion.z = Half(actor->base.secondaryMotion.z);
+        actor->base.secondaryMotion.x = Math_ShiftTowardZero(actor->base.secondaryMotion.x, 1);
+        actor->base.secondaryMotion.z = Math_ShiftTowardZero(actor->base.secondaryMotion.z, 1);
     }
     SceneActorAnimation_SelectDirectionalEntry((void *)actor, 5);
     SceneActorChase_SetActorFlags(actor, 0x2000);
@@ -2287,13 +2245,6 @@ union DogReactionContext {
     struct Dog reaction;
 };
 
-static inline s32 Dog_HeadingOctant(s32 angle)
-{
-    if (angle >= 0)
-        return angle >> 5;
-    return -(-angle >> 5);
-}
-
 /* React to contact, pursue the target, or select a delayed cardinal turn. */
 
 s32 Dog_ChooseReactionBehavior(struct ChaseActor *a)
@@ -2342,7 +2293,7 @@ s32 Dog_ChooseReactionBehavior(struct ChaseActor *a)
         SceneActorChase_SetControl(a, SceneActorControl_OnIdle, 16);
         SceneActorChase_SetBehavior(a, 18);
         {
-            s32 angle = Dog_HeadingOctant((a->base.tracking.heading + 0xA0) & 255);
+            s32 angle = Math_ShiftTowardZero((a->base.tracking.heading + 0xA0) & 255, 5);
             a->base.nextDirection = (angle + 3) & 7;
         }
         {
