@@ -354,33 +354,13 @@ class Slicer:
             self.add(frame, pos, inv, fn, x, 'store', value=value, addr=addr, width=width)
             bpos = ft.block_at(inv, pos)[0]
             val = store_value(x.text)
-            if val and not self.narrow_copy(frame, inv, bpos, fn, x, val, int(row['a']) & 0x0FFFFFFF if k != K_AGG else int(row['a']), addr, width):
-                self.work.append((self.value, frame, inv, bpos, fn, val, x.block))
+            if val:
+                # only the bits of the stored value that became the target bytes matter
+                start = int(row['a']) & 0x0FFFFFFF if k != K_AGG else int(row['a'])
+                off = max(0, addr - start)
+                mask = ((1 << (8 * width)) - 1) << (8 * off)
+                self.work.append((self.value, frame, inv, bpos, fn, val, x.block, mask))
         self.control(frame, inv, ft.block_at(inv, pos)[0], fn, x.block)
-
-    def narrow_copy(self, frame, inv, bpos, fn, store, val, start, addr, width):
-        """A store of a value loaded straight from memory (a struct or word copy): follow only
-        the source bytes that became the target bytes, not the whole loaded value."""
-        d = fn.defs.get(val)
-        if d is None or d.site is None or d.opcode != 'load':
-            return False
-        ft = self.traces[frame]
-        dpos = bpos if d.block is store.block else ft.last_instance(inv, d.block.site if d.block.index else fn.site, bpos, False)
-        p = ft.event_in(inv, d.site, dpos) if dpos is not None else None
-        if p is None:
-            return False
-        row = ft.rows[p]
-        k = int(ft.kind[p])
-        src = int(row['a']) & 0x0FFFFFFF if k in (K_LOAD, K_WIDE) else int(row['a'])
-        lw = (1 << ((int(row['a']) >> 28) & 3)) if k == K_LOAD else 8 if k == K_WIDE else int(row['b']) & 0x7FFFFFFF
-        off = addr - start
-        if off < 0 or off + width > lw:
-            return False
-        v = int(row['b']) if k == K_LOAD else None
-        self.add(frame, p, inv, fn, d, 'load', value=v, addr=src + off, width=width)
-        self.work.append((self.memory, frame, p, src + off, width, 'copy'))
-        self.control(frame, inv, dpos, fn, d.block)
-        return True
 
     def _game_side(self, fn):
         u = fn.unit.name
@@ -432,17 +412,18 @@ class Slicer:
         self.terminal(frame, f'0x{addr:08X}: not written before the run (power-on or save state)', addr)
 
     # ---- values ----
-    def value(self, frame, inv, bpos, fn, name, use_block):
-        if not name.startswith('%'):
+    def value(self, frame, inv, bpos, fn, name, use_block, mask=None):
+        """Follow SSA value NAME; MASK is the bits of it that matter (None: all)."""
+        if not name.startswith('%') or mask == 0:
             return
-        key = ('v', frame, inv, bpos, name)
+        key = ('v', frame, inv, bpos, name, mask)
         if key in self.seen:
             return
         self.seen.add(key)
         ft = self.traces[frame]
         params = [p[1] for p in fn.params]
         if name in params:
-            self.param(frame, inv, fn, params.index(name))
+            self.param(frame, inv, fn, params.index(name), mask)
             return
         d = fn.defs.get(name)
         if d is None:
@@ -468,14 +449,17 @@ class Slicer:
                 addr, width, v = int(row['a']) & 0x0FFFFFFF, 8, int(row['b']) | int(row['c']) << 32
             else:
                 addr, width, v = int(row['a']), int(row['b']) & 0x7FFFFFFF, None
-            self.add(frame, p, inv, fn, d, 'load', value=v, addr=addr, width=width)
-            self.work.append((self.memory, frame, p, addr, width, 'load'))
+            runs = byte_runs(mask, width)
+            first = runs[0] if runs else (0, width)
+            self.add(frame, p, inv, fn, d, 'load', value=v, addr=addr + first[0], width=first[1])
+            for o, n in runs:
+                self.work.append((self.memory, frame, p, addr + o, n, 'load'))
         elif op == 'phi':
             prev = ft.prev_block(inv, dpos)
             pred = self.label_of(fn, prev[1]) if prev else None
             for val, lab in re.findall(r'\[\s*([^,\]]+),\s*%([-\w.$]+)\s*\]', d.text):
                 if lab == pred:
-                    self.work.append((self.value, frame, inv, prev[0] if prev else dpos, fn, val.strip(), fn.by_label.get(lab)))
+                    self.work.append((self.value, frame, inv, prev[0] if prev else dpos, fn, val.strip(), fn.by_label.get(lab), mask))
             return
         elif op == 'call':
             self.add(frame, dpos, inv, fn, d, 'call')
@@ -490,14 +474,14 @@ class Slicer:
                     ret = blk.insts[-1].text
                     m = re.match(r'\s*ret \S+ (.*)$', ret)
                     if m:
-                        self.work.append((self.value, frame, cinv, last[0], cfn, m[1].split(',')[0].strip(), blk))
+                        self.work.append((self.value, frame, cinv, last[0], cfn, m[1].split(',')[0].strip(), blk, mask))
                 return
             for n in operands(d.text, d.dest):
                 self.work.append((self.value, frame, inv, dpos, fn, n, d.block))
         else:
             self.add(frame, dpos, inv, fn, d, 'compute')
-            for n in operands(d.text, d.dest):
-                self.work.append((self.value, frame, inv, dpos, fn, n, d.block))
+            for n, m in demand(d.text, d.dest, mask):
+                self.work.append((self.value, frame, inv, dpos, fn, n, d.block, m))
         self.control(frame, inv, dpos, fn, d.block)
 
     def label_of(self, fn, site):
@@ -533,7 +517,7 @@ class Slicer:
                 return None
         return None
 
-    def param(self, frame, inv, fn, k):
+    def param(self, frame, inv, fn, k, mask=None):
         ft = self.traces[frame]
         ent = ft.enter.get(inv)
         if not ent:
@@ -554,7 +538,7 @@ class Slicer:
                     args = call_operands(ci.text)
                     if k < len(args):
                         self.add(frame, pblock[0], parent, pfn, ci, 'call')
-                        self.work.append((self.value, frame, parent, pblock[0], pfn, args[k], blk))
+                        self.work.append((self.value, frame, parent, pblock[0], pfn, args[k], blk, mask))
                     return
         self.terminal(frame, f'argument {k + 1} of {fn.name} (indirect call)', None)
 
@@ -601,6 +585,95 @@ def operands(text, dest):
     body = text.split(' = ', 1)[1] if dest and ' = ' in text else text
     body = LABEL.sub('', body)
     return [n for n in SSA.findall(body) if n != dest]
+
+
+def byte_runs(mask, width):
+    """Contiguous (offset, length) runs of the bytes of a WIDTH-byte value that MASK touches."""
+    if mask is None:
+        return [(0, width)]
+    runs, start = [], None
+    for i in range(width):
+        on = (mask >> (8 * i)) & 0xFF
+        if on and start is None:
+            start = i
+        if not on and start is not None:
+            runs.append((start, i - start))
+            start = None
+    if start is not None:
+        runs.append((start, width - start))
+    return runs
+
+
+BINOP = re.compile(r'(add|sub|mul|and|or|xor|shl|lshr|ashr|udiv|sdiv|urem|srem)\b(?:\s+(?:nuw|nsw|exact|disjoint))*'
+                   r'\s+i(\d+)\s+([^,]+),\s*(\S+)')
+CAST = re.compile(r'(zext|sext|trunc)\s+(?:nneg\s+)?i(\d+)\s+(\S+)\s+to\s+i(\d+)')
+SELECT = re.compile(r'select\s+(?:\w+\s+)*i1\s+([^,]+),\s*\S+\s+([^,]+),\s*\S+\s+(\S+)')
+
+
+def demand(text, dest, mask):
+    """[(operand, mask)]: which bits of each operand decide the MASK bits of DEST (demanded bits).
+    A None mask means all bits; operands whose mask becomes 0 are dropped."""
+    body = text.split(' = ', 1)[1] if dest and ' = ' in text else text
+
+    def full(bits):
+        return (1 << bits) - 1
+
+    def low(m, bits):
+        # carries move up: every bit at or below the highest demanded one
+        return full(bits) if m is None else full(min(bits, m.bit_length()))
+
+    out = None
+    m = BINOP.match(body)
+    if m:
+        op, bits, a, b = m[1], int(m[2]), m[3].strip(), m[4].strip().rstrip(',')
+        mk = full(bits) if mask is None else mask & full(bits)
+        const = lambda v: re.fullmatch(r'-?\d+', v) is not None
+        if op == 'and':
+            if const(b):
+                out = [(a, mk & (int(b) & full(bits)))]
+            elif const(a):
+                out = [(b, mk & (int(a) & full(bits)))]
+            else:
+                out = [(a, mk), (b, mk)]
+        elif op in ('or', 'xor'):
+            out = [(a, mk), (b, mk)]
+        elif op == 'shl':
+            out = [(a, mk >> int(b))] if const(b) else [(a, low(mk, bits)), (b, None)]
+        elif op in ('lshr', 'ashr'):
+            if const(b):
+                k = int(b)
+                am = (mk << k) & full(bits)
+                if op == 'ashr' and mk >> (bits - k):
+                    am |= 1 << (bits - 1)
+                out = [(a, am)]
+            else:
+                out = [(a, None), (b, None)]
+        elif op in ('add', 'sub', 'mul'):
+            lm = low(mk, bits)
+            out = [(a, lm), (b, lm)]
+        else:
+            out = [(a, None), (b, None)]
+    if out is None:
+        m = CAST.match(body)
+        if m:
+            op, src, v, dst = m[1], int(m[2]), m[3], int(m[4])
+            mk = full(dst) if mask is None else mask
+            if op == 'trunc':
+                out = [(v, mk & full(dst))]
+            elif op == 'zext':
+                out = [(v, mk & full(src))]
+            else:
+                sm = mk & full(src)
+                if mk >> src:
+                    sm |= 1 << (src - 1)
+                out = [(v, sm)]
+    if out is None:
+        m = SELECT.match(body)
+        if m:
+            out = [(m[1].strip(), None), (m[2].strip(), mask), (m[3].strip(), mask)]
+    if out is None:
+        return [(n, None) for n in operands(text, dest)]
+    return [(n, mk) for n, mk in out if n.startswith('%') and mk != 0]
 
 
 def store_value(text):
