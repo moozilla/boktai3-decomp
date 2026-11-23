@@ -2,20 +2,8 @@
 
 #include "engine.h"
 #include "scene_pool.h"
-struct GloveDraw {
-    u8 pad0[0x16];
-    s16 flags;
-};
-struct Glove {
-    u8 pad0[0x864];
-    u32 timer;
-    u8 active;
-    u8 pad869[3];
-    void (*update)(void);
-    u8 pad870[0x58];
-    struct GloveDraw draw;
-};
-void Glove_UpdateStopping(void);
+#include "glove.h"
+void Glove_UpdateStopping(struct Glove *);
 static inline void clearDrawFlags(struct GloveDraw *d, s32 mask)
 {
     d->flags &= mask;
@@ -28,7 +16,7 @@ void Glove_StopFromScript(void)
     s32 i = Script_GetKeywordValue('i', 0);
     glove = gParticipantActors[i];
     if (glove) {
-        void (*update)(void) = Glove_UpdateStopping;
+        void (*update)(void *) = (void (*)(void *))Glove_UpdateStopping;
         u8 *active = &glove->active;
         u32 zero = 0;
         *active = 1;
