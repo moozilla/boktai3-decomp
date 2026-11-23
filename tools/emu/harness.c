@@ -29,7 +29,7 @@
 //   probe NAME ADDR     log registers before executing ADDR (hex) to probes.tsv
 //   watchpc ADDR LO HI  arm a latch: set when ADDR (hex) executes with r0 in
 //                       [LO, HI] (decimal), e.g. Text_LookupString of a string
-//   waitpc MAX          run until the armed latch is set (at most MAX frames;
+//   waitpc MAX [N]      run until the armed latch is set (N times, default 1; at most MAX frames;
 //                       the rest of that frame runs too), then disarm it
 //   unprobe             remove all probes; probes also work with trace off
 //   (env BOKTAI3_SAV=file.sav loads a battery save first)
@@ -300,7 +300,7 @@ static void run_frames(int n) {
 				                    cpu->privilegeMode, note_probes(pc));
 			}
 			if (until_pc && pc == until_pc && (int32_t)cpu->gprs[0] >= until_lo && (int32_t)cpu->gprs[0] <= until_hi)
-				until_hit = 1;
+				until_hit++;
 			core->step(core);
 		}
 	}
@@ -513,9 +513,9 @@ int main(int argc, char** argv) {
 			until_pc = addr; until_lo = lo; until_hi = hi; until_hit = 0;
 		}
 		else if (!strcmp(cmd, "waitpc")) {
-			int f = 0, max = atoi(a1);
-			while (until_pc && !until_hit && f < max) { run_frames(1); ++f; }
-			if (!until_hit) fprintf(stderr, "waitpc %X: not reached in %d frames\n", until_pc, max);
+			int f = 0, max = atoi(a1), want = *a2 ? atoi(a2) : 1;
+			while (until_pc && until_hit < want && f < max) { run_frames(1); ++f; }
+			if (until_hit < want) fprintf(stderr, "waitpc %X: reached %d of %d times in %d frames\n", until_pc, until_hit, want, max);
 			until_pc = 0;
 		}
 		else if (!strcmp(cmd, "unprobe")) { nprobes = 0; probe_lo = UINT32_MAX; probe_hi = 0; }
