@@ -1,6 +1,7 @@
 #include "global.h"
 #include "engine.h"
 #include "ram.h"
+#include "state_actor_action_entry.h"
 // confidence=low: BossSlot2 per-frame update: animation, shake, cached target bearings.
 struct Vec {
     s16 x, y, z, pad;
@@ -50,11 +51,6 @@ void SceneActors_UpdateAnimation(void *, void *, void *);
 void SceneActors_UpdateTargetMetrics(void *);
 s32 Math_Atan2(s32, s32);
 
-static inline u32 TestFlags(struct BossSlot2Tick *p, u32 mask)
-{
-    return p->flags & mask;
-}
-
 void BossSlot2_UpdateFrame(struct BossSlot2Tick *p)
 {
     struct BossSlot2Tick *actor = p;
@@ -62,7 +58,7 @@ void BossSlot2_UpdateFrame(struct BossSlot2Tick *p)
     struct Sprite *sprite = &p->sprite;
     s32 i;
     sub_0817B2DC(actor);
-    if (TestFlags(actor, 0x80000))
+    if (SceneActorState_TestFlags((struct StateActor *)actor, 0x80000))
         actor->cell = 0;
     else if (!actor->cell) {
         CellObject_Init(actor->cellObject, (u8 *)actor + 0x54);
@@ -74,7 +70,7 @@ void BossSlot2_UpdateFrame(struct BossSlot2Tick *p)
     actor->renderPosition.x = sprite->position.x;
     actor->renderPosition.y = sprite->position.y;
     actor->renderPosition.z = sprite->position.z;
-    if (TestFlags(owner, 0x20000)) {
+    if (SceneActorState_TestFlags((struct StateActor *)owner, 0x20000)) {
         s32 product, x, z;
         product = gUnk_086149C4[(actor->shakeAngle + 64) & 255] * (actor->shakeAmp << 2);
         if (product >= 0)
