@@ -50,6 +50,18 @@ struct PooledActor {
     struct PooledActor *next, *previous;
 };
 
+/* Pooled actor flags: bit 0 removal requested, bit 1 drawable shown, bit 2 hit sensor active,
+ * bit 3 body collider active. */
+static inline void PooledActor_SetFlags(struct PooledActor *actor, u32 mask)
+{
+    actor->flags |= mask;
+}
+
+static inline u32 PooledActor_TestFlags(struct PooledActor *actor, u32 mask)
+{
+    return actor->flags & mask;
+}
+
 struct ActorPoolManager {
     struct Task task;
     struct SceneActorBody *targets[4];
