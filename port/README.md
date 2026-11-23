@@ -84,19 +84,16 @@ Every struct gets agbcc's 4-byte alignment and size rounding. A whole-program
 ABI pass (`port/core/abi.py`) rewrites calls to the defining signature, gives
 function values their GBA code addresses (so ROM function tables work as data)
 and routes indirect calls through `port_code_table`. Arguments the original
-passed in registers without declaring them are modeled (result of the previous
-call, or the caller's own registers). r0 follows branches: after `a && f()` the
-edge taken on true carries f's result (the region menu's `Script_ReadValue()`
-reads the pointer `Script_GetPc()` left in r0; `port/tests/abi_test.py`). Time advances cooperatively: at
+passed in leftover registers are stated in the source (see "Undefined behavior the GBA
+forgives" below); the build stops on any call still short. Time advances cooperatively: at
 `VBlankIntrWait`, and when the bus sees the same register polled three times
 (`port_bus_enable_spin`), the hardware model runs scanlines and raises
 interrupts; the frame is presented at line 160.
 
 What's left:
 
-* 15 register arguments the ABI pass could not determine
-  (`build/port/game/unknown_registers.txt`) and 111 padded calls
-  (`padded_calls.txt`): rarely run paths may read a wrong argument.
+* Non-void functions that fall off the end while a caller uses the result (about 50,
+  `-Wreturn-type`): the port reads an undefined value there. Fix them like short calls.
 * Timing is cooperative, not cycle-counted: the port has no lag frames, so it
   runs ahead of mGBA by frame number; compare screens, not frame counts.
 * The C MP2K sequencer (`port/game/m4a_seq.c`) stands in for `m4a_1.s`; it has
@@ -607,9 +604,9 @@ undefined. The source states the value instead, one call site at a time:
   value. `port/build_game.py` compiles the game with `-DUBFIX`; the matching build never
   defines it, and it is never used to steer matching.
 
-`build/port/game/padded_calls.txt` lists the short calls that remain (the ABI pass still
-pads them from the caller's registers or the last call's result as a fallback), and
-`unknown_registers.txt` the ones it cannot pad. Divergences the autopilot found this way:
+The ABI pass (`port/core/abi.py`) no longer guesses registers: `port/build_game.py`
+stops with the list of any call still passing fewer arguments than its callee takes
+(`build/port/game/padded_calls.txt`); fix each in the source as above. Divergences the autopilot found this way:
 `LinkedWidgetSet_Init` fell off the end, so the floating-item effect manager was killed at
 creation on the port, which skipped random draws and desynced every later random number.
 

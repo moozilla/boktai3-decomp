@@ -219,9 +219,8 @@ that is a scope gap: record it (below) so the tool gets better.
   #endif
   ```
   The matching build never defines `UBFIX`; the source port (`port/build_game.py`) does.
-  It is never a way to steer matching. `build/port/game/padded_calls.txt` lists the short
-  calls the port still pads by itself, `missing_returns.txt` the functions without a
-  return value.
+  It is never a way to steer matching. The port build stops on a short call it finds
+  (`build/port/game/padded_calls.txt`).
 * No data definitions in drafts (initialized globals, `static const` tables, string
   literals): reference the ROM labels that exist. agbcc is C89 (declarations first).
 * One translation unit per change; a unit is a contiguous run of functions in ROM order.

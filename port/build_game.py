@@ -207,18 +207,11 @@ def main():
         target = by_address.get(address & ~1)
         if target and fn != target and fn not in defs_global:
             aliases[fn] = target
-    # Pass 1 finds functions that read incoming registers; pass 2 makes their
-    # direct callers publish r0..r3 (see abi.rewrite_module).
-    readers = set()
-    for index, (name, game) in enumerate(units):
-        text = apply_aliases(texts[name], aliases) if aliases else texts[name]
-        readers |= abi.rewrite_module(text, defs_global, addresses, index, game, {})[4]
     synthetic = {}
     table = []  # (address, adapter symbol)
     rewritten = {}
     adapter_failures = []
     padded_report = []
-    unknown_report = []
     for index, (name, game) in enumerate(units):
         text = texts[name]
         if aliases:
@@ -228,12 +221,10 @@ def main():
                           lambda m: m[1] + '@' + fn + '.__replaced_by_port(', text, flags=re.M)
             if not re.search(r'^declare [^\n]*@' + re.escape(fn) + r'\(', text, re.M):
                 text += abi.render_declare(fn, defs_global[fn]) + '\n'
-        text, values, internals, padded, _, unknown = abi.rewrite_module(
-            text, defs_global, addresses, index, game, synthetic, readers)
+        text, values, internals, padded, _, _ = abi.rewrite_module(
+            text, defs_global, addresses, index, game, synthetic)
         for callee, given, wanted in padded:
             padded_report.append(f'{name}: {callee} called with {given} of {wanted} arguments')
-        for caller, slot in unknown:
-            unknown_report.append(f'{name}: {caller} passes an unknown r{slot}')
         extra = []
         defs, _decls, _ = abi.scan_module(text)
         for fn, sig in defs.items():
@@ -267,9 +258,10 @@ def main():
             text += abi.PORT_REGS_DECL + '\n'
         rewritten[name] = text
     (OUT / 'padded_calls.txt').write_text('\n'.join(padded_report) + '\n')
-    (OUT / 'unknown_registers.txt').write_text('\n'.join(unknown_report) + '\n')
-    print(f'register-passing calls: {len(padded_report)}, {len(readers)} functions read incoming '
-          f'registers, {len(unknown_report)} arguments unknown (unknown_registers.txt)')
+    if padded_report:
+        sys.exit('calls passing fewer arguments than the callee takes (they read leftover registers on '
+                 'the GBA; state the value in src/, plainly or under UBFIX, see port/README.md):\n  ' +
+                 '\n  '.join(padded_report))
     if adapter_failures:
         print('no adapter (aggregate signature):', ', '.join(sorted(adapter_failures)[:20]))
     table.sort()

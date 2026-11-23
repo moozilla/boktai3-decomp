@@ -321,15 +321,14 @@ PADDED = []  # (callee, given, wanted) for calls passing fewer arguments
 RESULT = []  # the discarded result adapt_direct just named, if any
 
 
-def adapt_direct(call, sig, fresh, fill=None, publish=False):
+def adapt_direct(call, sig, fresh):
     """Rewrite a direct call to the defining signature. Returns lines or None.
 
-    fill(i, type, out) supplies a missing argument (the register value an ARM
-    call would have passed); publish stores r0..r3 to port_regs first."""
+    A missing argument is zero (and the call is recorded in PADDED)."""
     have = [(t, v, at) for t, v, at in call['args']]
     same = (call['ret'] == sig.ret and len(have) == len(sig.params) and
             all(h[0] == p[0] for h, p in zip(have, sig.params)))
-    if sig.varargs or call['fnty'] or (same and not publish):
+    if sig.varargs or call['fnty'] or same:
         return None
     out = []
     args = []
@@ -346,18 +345,7 @@ def adapt_direct(call, sig, fresh, fill=None, publish=False):
                 continue
             args.append((pty, convert(v, t, pty, out, fresh, is_signed(at))))
         else:
-            v = fill(i, pty, out) if fill and pty in _SCALARS else None
-            args.append((pty, v if v is not None else zero(pty)))
-    if publish:
-        # The registers hold what the call site passed, including arguments
-        # beyond the definition's parameters (a (void) wrapper forwards them).
-        passed = args + [(t, v) for t, v, at in have[len(args):]]
-        slots = []
-        for t, v in passed:
-            if t in _SCALARS and t != 'void':
-                slots += to_slots(v, t, out, fresh, False)
-        for i, v in enumerate(slots[:4]):
-            out.append(f'store i32 {v}, ptr getelementptr (i8, ptr @port_regs, i32 {4 * i}), align 4')
+            args.append((pty, zero(pty)))
     ind = call['indent']
     lines = [ind + x for x in out]
     want = call['ret']
@@ -432,8 +420,7 @@ def adapt_indirect(call, fresh):
 def adapter(name, sig, symbol):
     """Canonical-signature thunk for a defined function."""
     fresh = Namer()
-    body = [f'store i32 %a{i}, ptr getelementptr (i8, ptr @port_regs, i32 {4 * i}), align 4'
-            for i in range(4)]
+    body = []
     params = [f'%a{i}' for i in range(CANON_SLOTS)]
     idx = 0
     args = []
@@ -497,40 +484,6 @@ def value_refs(text, names):
 
 
 PORT_REGS_DECL = '@port_regs = external global [4 x i32]'
-LABEL_RE = re.compile(r'^[-\w.$]+:')
-
-
-def inline_functions(text):
-    """Internal functions marked inline: still calls in unoptimized IR, but
-    inlined in the ROM, so they leave r0..r3 alone as far as callers see."""
-    groups = {m[1] for m in re.finditer(r'^attributes (#\d+) = \{[^}]*\b(?:inlinehint|alwaysinline)\b', text, re.M)}
-    return {m[1] for m in re.finditer(r'^define internal [^@]*@([-\w.$]+)\(.*\)[^{]*?(#\d+)', text, re.M)
-            if m[2] in groups}
-
-
-def _clobbers(callee):
-    return not (callee.startswith('@llvm.') or callee.startswith('@port_bus_'))
-
-
-PHI_I1_RE = re.compile(r'^\s+(%[-\w.$]+) = phi i1 (.*)$')
-PHI_IN_RE = re.compile(r'\[\s*([^,\]]+?)\s*,\s*(%[-\w.$]+)\s*\]')
-BR_I1_RE = re.compile(r'^\s+br i1 (%[-\w.$]+), label (%[-\w.$]+), label (%[-\w.$]+)')
-
-
-def _edge_end(state, pred, block):
-    """r0 on the edge pred -> block: the edge's own value when a branch on a
-    phi narrowed it, else whatever pred ended with ('unseen' if not yet)."""
-    if (pred, block) in state['edges']:
-        return state['edges'][(pred, block)]
-    return state['ends'].get(pred, 'unseen')
-
-
-def _common(values):
-    """The one r0 every edge agrees on, else None."""
-    values = list(values)
-    if values and all(v == values[0] for v in values) and values[0] != 'unseen':
-        return values[0]
-    return None
 
 
 def rewrite_module(text, defs_global, addresses, module_id, game, synthetic, readers=()):
@@ -539,20 +492,16 @@ def rewrite_module(text, defs_global, addresses, module_id, game, synthetic, rea
     defs_global: name -> Sig of external definitions in the whole program.
     addresses:   name -> code address word for functions with a GBA address.
     synthetic:   dict filled with (module_id, name) -> address for static code.
-    readers:     functions that read their incoming registers (see below).
 
     A call passing fewer arguments than the callee takes relied on ARM register
-    state. r0 right after another call is that call's result; before any call,
-    r0..r3 are still the caller's own incoming arguments. A function whose
-    incoming registers are read this way snapshots port_regs at entry; adapters
-    and direct callers of such functions publish r0..r3 there.
+    state. The source states those values (plainly, or under UBFIX: see
+    port/README.md); a call still short is padded with zeros and reported in
+    the PADDED list (port/build_game.py refuses to link the game then).
+    readers is accepted for compatibility and ignored.
     """
     fresh = Namer()
     PADDED.clear()
-    found_readers = set()
-    unknown = []
     defs, decls, internals = scan_module(text)
-    inline = inline_functions(text)
     funcs = set(defs) | set(decls) | set(internals)
     values = {}
     for name in (value_refs(text, funcs) if game else ()):
@@ -567,26 +516,6 @@ def rewrite_module(text, defs_global, addresses, module_id, game, synthetic, rea
             values[name] = addresses[name]
     out = []
     needed_decls = {}
-    state = {'params': [], 'name': None, 'calls': 0, 'last': None, 'snap': set(), 'define_at': 0,
-             'phis': {}, 'edges': {}, 'calls_at_label': 0, 'preds': [], 'label_at': 0}
-
-    def fill(i, pty, emit):
-        last = state['last']
-        if i == 0 and last and last[1] not in ('void',) and last[1] in _SCALARS:
-            return convert(last[0], last[1], pty, emit, fresh)
-        if state['calls'] == 0:
-            if i < len(state['params']):
-                t, v = state['params'][i]
-                if t in _SCALARS:
-                    return convert(v, t, pty, emit, fresh)
-            if i < 4:
-                state['snap'].add(i)
-                if state['name']:
-                    found_readers.add(state['name'])
-                return convert(f'%__abi.reg{i}', 'i32', pty, emit, fresh)
-        unknown.append((state['name'], i))
-        return None
-
     for line in text.splitlines():
         if line.startswith('declare '):
             parsed = parse_def(line)
@@ -594,54 +523,6 @@ def rewrite_module(text, defs_global, addresses, module_id, game, synthetic, rea
                 line = render_declare(parsed[1], defs_global[parsed[1]])
             out.append(line)
             continue
-        if line.startswith('define '):
-            parsed = parse_def(line)
-            names = re.findall(r'(%[-\w.$]+)(?=\s*[,)])', line[line.index('(', line.index('@')):])
-            state.update(name=parsed[1] if parsed else None, calls=0, last=None, snap=set(),
-                         define_at=len(out), block=f'%{len(names)}', ends={}, edges={}, phis={},
-                         calls_at_label=0,
-                         params=[(p[0], n) for p, n in zip(parsed[2].params, names)] if parsed else [])
-            out.append(line)
-            continue
-        if line == '}' and state['snap']:
-            loads = [f'  %__abi.reg{i} = load i32, ptr getelementptr (i8, ptr @port_regs, i32 {4 * i}), align 4'
-                     for i in sorted(state['snap'])]
-            out[state['define_at'] + 1:state['define_at'] + 1] = loads
-            state['snap'] = set()
-        if LABEL_RE.match(line):
-            # r0 survives branches: inherit the last call result when every
-            # (already seen) predecessor ended with the same one.
-            state['ends'][state['block']] = state['last']
-            state['block'] = '%' + line.split(':')[0]
-            pm = re.search(r'; preds = (.*)$', line)
-            preds = [p.strip() for p in pm[1].split(',')] if pm else []
-            state['last'] = _common(_edge_end(state, p, state['block']) for p in preds)
-            state['phis'] = {}
-            state['calls_at_label'] = state['calls']
-            state['preds'] = preds
-            state['label_at'] = len(out)
-        m = PHI_I1_RE.match(line)
-        if m:
-            state['phis'][m[1]] = PHI_IN_RE.findall(m[2])
-        m = BR_I1_RE.match(line)
-        if m and m[1] in state['phis'] and state['calls'] == state['calls_at_label']:
-            # `a && f()` ends in a phi of constant false (a failed) and f's
-            # result: the edge taken on true comes only from f's block, so r0
-            # there is f's result even though the merge block's r0 is mixed.
-            # The value is carried across the merge block by a phi of its own
-            # (poison from the edges that never take this branch).
-            incoming = state['phis'][m[1]]
-            for target, excluded in ((m[2], 'false'), (m[3], 'true')):
-                froms = [p for v, p in incoming if v.strip() != excluded]
-                if not froms or len(froms) == len(incoming):
-                    continue
-                value = _common(_edge_end(state, p, state['block']) for p in froms)
-                if value and value[1] not in ('void',) and value[1] in _SCALARS:
-                    name = fresh('r0.')
-                    arms = ', '.join(f'[ {value[0] if p in froms else "poison"}, {p} ]' for p in state['preds'])
-                    out.insert(state['label_at'] + 1, f'  {name} = phi {value[1]} {arms}')
-                    value = (name, value[1])
-                state['edges'][(state['block'], target)] = value
         if not line.startswith(' ') or ' call ' not in line:
             out.append(sub_values(line, values) if values else line)
             continue
@@ -655,7 +536,7 @@ def rewrite_module(text, defs_global, addresses, module_id, game, synthetic, rea
         if callee.startswith('@'):
             name = callee[1:]
             if name in defs_global and name not in internals:
-                lines = adapt_direct(call, defs_global[name], fresh, fill, publish=name in readers)
+                lines = adapt_direct(call, defs_global[name], fresh)
         elif game:
             lines = adapt_indirect(call, fresh)
             needed_decls['port_icall'] = ('declare i64 @port_icall(ptr, ' +
@@ -664,9 +545,6 @@ def rewrite_module(text, defs_global, addresses, module_id, game, synthetic, rea
             out.append(sub_values(line, values) if values else line)
         else:
             out += [sub_values(x, values) if values else x for x in lines]
-        if _clobbers(callee) and callee[1:] not in inline:
-            state['calls'] += 1
-            state['last'] = (call['dest'], call['ret']) if call['dest'] else (RESULT[0] if RESULT else None)
     result = '\n'.join(out) + '\n'
     if game:
         # Indirect calls can reach any function; drop optimizer guarantees.
@@ -676,7 +554,7 @@ def rewrite_module(text, defs_global, addresses, module_id, game, synthetic, rea
     for name, decl in needed_decls.items():
         if not re.search(r'^declare [^\n]*@' + re.escape(name) + r'\(', result, re.M):
             result += decl + '\n'
-    return result, values, internals, list(PADDED), found_readers, unknown
+    return result, values, internals, list(PADDED), set(), []
 
 
 def render_declare(name, sig):
