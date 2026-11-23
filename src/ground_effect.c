@@ -19,7 +19,6 @@ s32 GroundEffect_Link(struct SceneGroundManager *manager, struct SceneGroundEffe
 s32 GroundEffect_Unlink(struct SceneGroundManager *manager, struct SceneGroundEffect *effect)
 {
     struct SceneGroundEffect *prev = effect->prev, *next = effect->next;
-    s32 result;
     if (!effect->active)
         return -1;
     if (prev)
@@ -28,9 +27,8 @@ s32 GroundEffect_Unlink(struct SceneGroundManager *manager, struct SceneGroundEf
         manager->head = next;
     if (next)
         next->prev = prev;
-    result = 0;
-    effect->active = result;
-    return result;
+    effect->active = 0;
+    return 0;
 }
 
 void GroundEffect_EnableProjection(struct SceneGroundEffect *effect)
