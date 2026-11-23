@@ -38,14 +38,17 @@ struct GloveMotion {
     u8 pad6C[0x7E - 0x6C];
     u16 recoveryValue;
     struct GloveModel *parts; /* 0x80 */
-    u8 pad84[0xC0 - 0x84];
+    u8 pad84[0xB0 - 0x84];
+    u8 drain[0x10]; /* 0xB0: drain modifier state */
     s32 unkC0;
     u8 padC4[4];
     u32 secondaryBias; /* 0xC8 */
     u8 padCC[0x2B0 - 0xCC];
     u32 primaryCallback; /* 0x2B0 */
     u8 pad2B4, primaryKind;
-    u8 pad2B6[8];
+    u8 pad2B6[4];
+    u16 primaryValue; /* 0x2BA */
+    u8 pad2BC[2];
     u16 primaryCharge; /* 0x2BE */
     u8 pad2C0[0x305 - 0x2C0];
     u8 primarySpriteRefresh, primaryLatched;
@@ -57,7 +60,9 @@ struct GloveMotion {
     u32 secondaryCallback; /* 0x314 */
     u8 pad318;
     u8 actionKind;
-    u8 pad31A[0x324 - 0x31A];
+    u8 pad31A[4];
+    u16 fourthValue; /* 0x31E */
+    u8 pad320[4];
     u8 secondaryEnabled;
     s8 secondarySpriteSlot;
     u16 recoveryTimer, cooldown; /* 0x326 */
@@ -95,7 +100,8 @@ struct GloveMotion {
 struct GloveModelPart {
     u8 pad0[8];
     u32 flags;
-    u8 padC[0x48 - 0xC];
+    u8 padC[0x20 - 0xC];
+    u8 drainSource[0x48 - 0x20]; /* 0x20 (guess, confidence=low) */
     void *palette;
     u8 pad4C[0x60 - 0x4C];
 };
@@ -119,7 +125,8 @@ struct Glove {
     struct GloveMotion motion; /* 0x18 */
     struct GloveModel model;   /* 0x610 */
     s8 marker, markerSlot;     /* 0x860 */
-    u8 pad862[2];
+    u8 stylePlayer;            /* 0x862 */
+    u8 pad863;
     u32 timer;  /* 0x864 */
     u8 active;  /* 0x868 */
     u8 pad869[3];
