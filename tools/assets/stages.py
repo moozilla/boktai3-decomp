@@ -35,7 +35,8 @@ use library procedures, decoded here by argument position:
   talk      people and talk points: place_character (proc 8796; 1155, 1677 wrap it) and
             place_directional_controller (1030; 1771 disabled), id, x, z (San Miguel's
             facilities count who was talked to before the story goes on: proc 2566)
-  hittable  proc_1225/1226: a WoodenCrate-family object (a crate, or a lever switch
+  hittable  proc_1172/1173: a Breakable whose script runs when it breaks; and
+            proc_1225/1226: a WoodenCrate-family object (a crate, or a lever switch
             with crateflags 9/10) at (x + 128, z + 128); attacking it runs its script
             (2782: the lever that opens the shutter on CD23)
   enemy     spawner procedures 1490-1700 that create an actor family by
@@ -188,6 +189,11 @@ class Walker:
             # points (place_directional_controller 1030, disabled 1771): id, x, z, ...
             o["talk"].append(dict(rec, id=num(a(1)), x=num(a(2)), z=num(a(3)),
                                   kind="point" if pid in (1030, 1771) else "character", disabled=pid == 1771))
+            return
+        if pid in (1172, 1173) and len(ops) >= 7:
+            # a Breakable (proc_1173: Breakable(id, (x + 128, y, z + 128), script=arg4)): breaking
+            # it runs its script (2984: the shutter on CD23 opens)
+            o["hittables"].append(dict(rec, name=a(1), x=num(a(5)), z=num(a(7)), flags=9, script=num(a(4)), breakable=True))
             return
         if pid in (1225, 1226):
             # a hittable object (the WoodenCrate family: crates and lever switches):

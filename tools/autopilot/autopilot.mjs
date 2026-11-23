@@ -127,7 +127,7 @@ const GOALS = {
       // hittables with a script (lever switches): strike each once
       for (const h of (stageOf(here).hittables || []).filter((h) => h.flags === 9 && !TRIED.has(`${here}:hit:${h.name}`))) {
         TRIED.add(`${here}:hit:${h.name}`);
-        const r = yield* L.hitAt(h.x >> 8, h.z >> 8, { hits: 3, stopOnEvent: true, avoid: stageOf(here).doors.map((d) => d.box), trace: (e) => event({ skill: 'nav', ...e }) });
+        const r = yield* L.hitAt(h.x >> 8, h.z >> 8, { hits: h.breakable ? 12 : 3, stopOnEvent: true, avoid: stageOf(here).doors.map((d) => d.box), trace: (e) => event({ skill: 'nav', ...e }) });
         event({ skill: 'hit', name: h.name, x: h.x, z: h.z, ...r });
         if (L.where().scene !== here) break;
       }
