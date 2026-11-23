@@ -53,7 +53,6 @@ s32 ProjectedDisplay_InitializeEntries(struct ProjectedDisplay *display)
     struct SceneInputWidget *entry = display->entries;
     s32 index = 0;
     struct SceneInputResource *resource = &display->resource;
-    s32 result;
     do {
         if (Widget_InitLinked(entry, resource, 0, 16, 2, 0, 60, &display->screen) >= 0) {
             Anim_SetKeyframes(entry, resource, gUnk_08605960[index].frame, 1, 4);
@@ -64,8 +63,7 @@ s32 ProjectedDisplay_InitializeEntries(struct ProjectedDisplay *display)
             return -1;
         }
     } while (index <= 4);
-    result = 0;
-    return result;
+    return 0;
 }
 
 void ProjectedDisplay_RemoveEntries(struct ProjectedDisplay *display)
@@ -104,7 +102,6 @@ s32 ProjectedDisplay_Initialize(struct ProjectedDisplay *display,
                                 const struct ContactPosition *position)
 {
     struct SceneInputResource *resource;
-    s32 result;
     display->height = 0;
     display->world = *position;
     ProjectedDisplay_UpdateScreenPosition(display);
@@ -116,8 +113,7 @@ s32 ProjectedDisplay_Initialize(struct ProjectedDisplay *display,
     display->world = *position;
     display->raised = *position;
     ProjectedDisplay_InitializeEntries(display);
-    result = 0;
-    return result;
+    return 0;
 }
 
 struct ProjectedDisplay *ProjectedDisplay_Create(const struct ContactPosition *position)
