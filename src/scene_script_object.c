@@ -324,4 +324,9 @@ s32 SceneScriptObject_Initialize(struct SceneScriptObject *object, u32 caller)
     object->holdTimer = 0;
     object->finished = 0;
     object->counter = 0;
+#ifdef UBFIX
+    // falls off the end; r0 is left over from the last call (a ROM address on hardware,
+    // never negative), and its creator in orbit_motion.c only tests < 0
+    return 0;
+#endif
 }
