@@ -548,9 +548,9 @@ void Mimic_OnAttackContact(u8 *unused, struct ContactCollider *obj, struct Chase
     }
 }
 
-void Mimic_OnBodyContact(void *a, s32 b)
+void Mimic_OnBodyContact(void *a, s32 b, void *actor)
 {
-    SceneActorReaction_HandleColliderContact(a, b);
+    SceneActorReaction_HandleColliderContact(a, b, actor);
 }
 
 void Mimic_InitProfile(struct ChaseActor *actor)
