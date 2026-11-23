@@ -772,7 +772,6 @@ s32 NameEntry_Initialize(struct NameEntryTask *menu)
     }
     {
         u32 zero1;
-        u32 one1;
         void *bg;
         {
             u16 *h = &screen->verticalHistory;
@@ -782,8 +781,8 @@ s32 NameEntry_Initialize(struct NameEntryTask *menu)
         {
             s32 *a = &screen->verticalRepeat;
             s32 *b = &screen->horizontalRepeat;
-            *b = one1 = 1;
-            *a = one1;
+            *b = 1;
+            *a = 1;
         }
         screen->state = zero1;
         Bg_ClearTilemap(0);
@@ -795,7 +794,7 @@ s32 NameEntry_Initialize(struct NameEntryTask *menu)
         bg = ScriptProc_Start(0xC091, 0x3536);
         screen->bg = bg;
         value = zero1;
-        Bg_SetupLayers(2, 0, bg, 0, zero1, one1, &value);
+        Bg_SetupLayers(2, 0, bg, 0, zero1, 1, &value);
         BgGfx_LoadTilemapSimple(3, 0, 0, 0, zero1);
         CpuSet((u8 *)ScriptProc_Start(0x92B3, 0x204) + 0x14, gBgPaletteBuffer, 0x100);
         res = ScriptProc_Start(0xCB05, 0xE2AB);
