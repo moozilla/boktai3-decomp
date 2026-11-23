@@ -49,13 +49,12 @@ void Storage_BeginCategoryMode(struct SceneInventoryCategoryMenu *p, u32 mode)
         } else {
             Sound_PlaySong(0xDD);
             {
-                s32 descriptionMode = 4;
                 s32 none;
                 void *description = p->description;
                 void *panel = p;
 
                 none = new_var;
-                MenuPanel_ShowDescription(panel, descriptionMode, description, (void *)none);
+                MenuPanel_ShowDescription(panel, 4, description, (void *)none);
             }
             SceneInput_BeginChoice(&p->prompt, p->choiceResource, &p->choiceState, 1, 0);
             SceneInventory_ResetCategoryPalette(p, p->colors);
