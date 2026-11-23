@@ -13,6 +13,11 @@ static inline u32 Flags_MaskedWord(u32 mask, const u32 *flags)
     return *flags & mask;
 }
 
+static inline u32 HalfwordFlags_Test(u32 mask, const u16 *flags)
+{
+    return *flags & mask;
+}
+
 static inline void WordFlags_Set(u32 mask, u32 *flags)
 {
     *flags |= mask;
