@@ -806,13 +806,9 @@ void Axe_UpdateWaitingAnimation(struct RoomActor *actor, s32 frame)
 
 // confidence=low: converges saved motion, then enables the axe recovery behavior.
 
-struct S080FAE08;
+void Axe_ClearForcedMovement(struct ChaseActor *s);
 
-void Axe_ClearForcedMovement(struct S080FAE08 *s);
-
-struct S080FACFC;
-
-void Axe_ResetMovementFlags(struct S080FACFC *s);
+void Axe_ResetMovementFlags(struct ChaseActor *actor);
 
 static inline s32 Quarter(s32 v)
 {
@@ -1586,18 +1582,11 @@ u8 Axe_StepCurveMotion(struct ChaseActor *actor)
     return 0;
 }
 
-struct S080FAC14 {
-    u8 filler[0x98];
-    u8 a;
-    u8 filler2[0x308 - 0x99];
-    u32 b;
-};
-
 s32 SceneActorProfiles_FindOrAdd(u32, u32);
 
-void Axe_InitProfile(struct S080FAC14 *s)
+void Axe_InitProfile(struct ChaseActor *actor)
 {
-    s->b = SceneActorProfiles_FindOrAdd(s->a, 0);
+    actor->base.profileId = SceneActorProfiles_FindOrAdd(actor->base.category, 0);
 }
 
 #define gHoverAnimationData gUnk_0824E318
@@ -1636,32 +1625,18 @@ void SceneActorControl_InitializeHoverState(struct ChaseActor *actor)
     SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0);
 }
 
-struct Q {
-    u8 filler[0xe4c];
-    u32 f;
-};
-
-struct S080FACFC {
-    u8 filler0[0x13a];
-    u16 h;
-    u8 filler1[0x2d0 - 0x13c];
-    u32 f;
-    u8 filler2[0x3d0 - 0x2d4];
-    struct Q *q;
-};
-
-void Axe_ResetMovementFlags(struct S080FACFC *s)
+void Axe_ResetMovementFlags(struct ChaseActor *actor)
 {
-    struct Q *q = s->q;
+    struct Axe *context = actor->base.context;
     u32 m = 0x100000;
-    u32 *p = &s->f;
+    u32 *p = &actor->base.statusFlags;
     u32 *p2;
     u32 m2;
     *p = *p | m;
-    p2 = &q->f;
+    p2 = &context->flagsE4C;
     m2 = ~0x11;
     *p2 = *p2 & m2;
-    s->h &= ~4;
+    actor->base.colliderA.flags &= ~4;
 }
 
 void Axe_GetDirectionalFrame(u16 x, s32 *a, s32 *b)
@@ -1702,42 +1677,26 @@ void Axe_BeginMoveToPosition(struct ChaseActor *actor, struct ContactPosition *t
     Fill_BeginMoveToPosition(context->clearF14, stack, 0);
 }
 
-struct B {
-    u8 pad[0xf];
-    u8 b;
-};
-
-struct S080FAE08 {
-    u8 filler0[0xdc];
-    struct B bb;
-    u8 filler1[0x2d4 - 0xec];
-    u16 h;
-    u8 filler2[0x3d0 - 0x2d6];
-    struct Q *q;
-    u8 filler3[0x418 - 0x3d4];
-    u16 z;
-};
-
-void Axe_ClearForcedMovement(struct S080FAE08 *s)
+void Axe_ClearForcedMovement(struct ChaseActor *s)
 {
-    u16 *hp = &s->h;
+    u16 *hp = &s->base.motionFlags;
     u32 hm = 0xFFFFFEFF;
     u32 *p;
     u32 m;
-    struct B *t;
+    struct SceneActorChaseTracking *t;
     u32 bm;
     u16 zero;
     u16 hv;
     hv = *hp & hm;
     zero = 0;
     *hp = hv;
-    t = &s->bb;
+    t = &s->base.tracking;
     bm = ~8;
-    t->b = t->b & bm;
-    p = &s->q->f;
+    t->flags = t->flags & bm;
+    p = &((struct Axe *)s->base.context)->flagsE4C;
     m = ~0x10;
     *p = *p & m;
-    s->z = zero;
+    s->group.common.gate.counter = zero;
 }
 
 void Axe_SelectRandomRoutePoint(struct S080FA7D0 *s);
@@ -4406,7 +4365,7 @@ s32 Axe_ReleaseResources(void *p)
     return 0;
 }
 
-void Axe_InitProfile(struct S080FAC14 *s);
+void Axe_InitProfile(struct ChaseActor *actor);
 
 void Axe_InitAttackCooldowns(struct AxeCooldownActor *actor);
 
