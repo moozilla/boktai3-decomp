@@ -1,15 +1,11 @@
 #include "global.h"
+#include "contact_collider.h"
 
-struct ArmorPart {
-    u8 pad[0x38];
-    u32 flags;
-};
 struct ArmorActor {
     u8 pad0[0x190];
-    struct ArmorPart part0;
-    u8 pad1[0x1e4 - 0x1cc];
-    struct ArmorPart part1;
-    u8 pad2[0xb26 - 0x220];
+    struct ContactCollider part0;
+    struct ContactCollider part1;
+    u8 pad238[0xB26 - 0x238];
     s16 actionValue;
     u8 pad3[0xb32 - 0xb28];
     u16 flags;
@@ -26,11 +22,6 @@ struct ArmorActor {
     s16 initialActionValue;
 };
 void ActorController_SetBehavior(struct ArmorActor *, s32);
-
-static inline void setPartFlags(struct ArmorPart *p, u32 flags)
-{
-    p->flags |= flags;
-}
 
 void Armor_UpdateAccumulatedBehavior(struct ArmorActor *p, s32 amount, u32 flags)
 {
@@ -68,7 +59,7 @@ void Armor_UpdateAccumulatedBehavior(struct ArmorActor *p, s32 amount, u32 flags
         else
             scaled = -(-value >> 12);
         p->actionValue = scaled;
-        setPartFlags(&p->part1, 0x400008);
-        setPartFlags(&p->part0, 0x400008);
+        ContactCollider_SetReactionFlags(&p->part1, 0x400008);
+        ContactCollider_SetReactionFlags(&p->part0, 0x400008);
     }
 }
