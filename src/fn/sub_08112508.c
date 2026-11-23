@@ -30,8 +30,8 @@ s32 GameState_GetResultTimer(void);
 s32 GameState_GetResultIndex(void);
 s32 GameState_GetActionCount894(void);
 s32 Div(s32, s32);
-void SceneGauge_SelectThresholdFrame(struct StageResults *, s32);
-u8 StageResults_RecordStagePerformance(void);
+s32 SceneGauge_SelectThresholdFrame(struct StageResults *, s32);
+u8 StageResults_RecordStagePerformance(s32);
 void StageResults_ShowTimeDigits(struct StageResults *, s32, s32);
 void CharacterModel_UpdatePairedAnimations(void *, s32);
 void PaletteFade_CycleMenuColors(void *);
@@ -77,8 +77,7 @@ void sub_08112508(struct StageResults *p)
         CLAMP(actionScore, 20);
         total = timeScore + actionScore;
         CLAMP(total, 999);
-        SceneGauge_SelectThresholdFrame(p, total);
-        p->record = StageResults_RecordStagePerformance();
+        p->record = StageResults_RecordStagePerformance(SceneGauge_SelectThresholdFrame(p, total));
         {
             s32 sum = gGameState->clockDisplayValue + total;
             s16 *score;

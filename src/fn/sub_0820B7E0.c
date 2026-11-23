@@ -154,4 +154,9 @@ s32 DragonPuppy_InitializeFromScript(u8 *p, void *parent)
     }
     if (W(0x164))
         DragonPuppy_ReadAttackSchedule(p);
+#ifdef UBFIX
+    // falls off the end with r0 left over from its last statement; the creator only tests
+    // < 0, and this initializer has no failure path here
+    return 0;
+#endif
 }

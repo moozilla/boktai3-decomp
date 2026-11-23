@@ -142,4 +142,9 @@ s32 VulcanCannon_InitializeFromScript(struct VulcanCannon *p, void *owner)
     }
     if (p->delayScript)
         VulcanCannon_ReadScriptValueList(p, p->delayScript);
+#ifdef UBFIX
+    // falls off the end with r0 left over from its last statement; the creator only tests
+    // < 0, and this initializer has no failure path here
+    return 0;
+#endif
 }

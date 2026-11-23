@@ -27,6 +27,18 @@ use library procedures, decoded here by argument position:
             The item sits at (x + 128, z + 128), the centre of its cell.
             Category 0 items are named by strings 988 + item (回復薬, 大地の実,
             ...; 太陽の実 = 13); other categories are not mapped yet.
+  switch    proc_1087(track, box, flag, value, tile, priority, proc): a floor switch on an
+            HP box; stepping on it (the player or a pushed block) runs proc once, whose
+            items are listed with the condition `floor switch BOX` (2759: the sword chest)
+  hub       a town map (registry key 3F74): its entry scripts' transitions are doors
+            with "hub": entry index and no box (2553, San Miguel)
+  talk      people and talk points: place_character (proc 8796; 1155, 1677 wrap it) and
+            place_directional_controller (1030; 1771 disabled), id, x, z (San Miguel's
+            facilities count who was talked to before the story goes on: proc 2566)
+  hittable  proc_1172/1173: a Breakable whose script runs when it breaks; and
+            proc_1225/1226: a WoodenCrate-family object (a crate, or a lever switch
+            with crateflags 9/10) at (x + 128, z + 128); attacking it runs its script
+            (2782: the lever that opens the shutter on CD23)
   enemy     spawner procedures 1490-1700 that create an actor family by
             registry key (cmd 0xB745 KEY `N: name r: path ...`); the path is an
             index into the HP patrol paths (tentative)
@@ -138,7 +150,7 @@ class Walker:
     # ---- the walk ------------------------------------------------------------
     def scene(self, pid):
         self.out = {"scene": pid, "stage": None, "palette": None, "entrances": [], "doors": [], "items": [],
-                    "enemies": [], "calls": []}
+                    "enemies": [], "switches": [], "hittables": [], "talk": [], "calls": []}
         self.visited = set()
         self.call(pid, [], [], None, 0, None)
         return self.out
@@ -160,13 +172,43 @@ class Walker:
             return
         if pid in DOORS:
             bx, sc, en = DOORS[pid]
-            o["doors"].append(dict(rec, box=a(bx) if bx else trap, scene=num(a(sc)), entrance=num(a(en))))
+            door = dict(rec, box=a(bx) if bx else trap, scene=num(a(sc)), entrance=num(a(en)))
+            if getattr(self, "hub_index", None) is not None:
+                door["hub"] = self.hub_index
+                door["hubMenu"] = f"{self.hub_key:04X}"
+            o["doors"].append(door)
             return
         if pid in (1118, 1119):
             chest = pid == 1119 and num(a(6)) == 1
             flags, flag = (a(6), a(7)) if pid == 1118 else (a(8), a(9))
             o["items"].append(dict(rec, category=num(a(1)), item=num(a(2)), x=num(a(3)), z=num(a(4)),
                                    chest=chest, flags=flags, flag=num(flag)))
+            return
+        if pid in (8796, 1155, 1677, 1030, 1771) and len(ops) >= 3:
+            # people to talk to: place_character (8796; 1155 and 1677 wrap it) and talk
+            # points (place_directional_controller 1030, disabled 1771): id, x, z, ...
+            o["talk"].append(dict(rec, id=num(a(1)), x=num(a(2)), z=num(a(3)),
+                                  kind="point" if pid in (1030, 1771) else "character", disabled=pid == 1771))
+            return
+        if pid in (1172, 1173) and len(ops) >= 7:
+            # a Breakable (proc_1173: Breakable(id, (x + 128, y, z + 128), script=arg4)): breaking
+            # it runs its script (2984: the shutter on CD23 opens)
+            o["hittables"].append(dict(rec, name=a(1), x=num(a(5)), z=num(a(7)), flags=9, script=num(a(4)), breakable=True))
+            return
+        if pid in (1225, 1226):
+            # a hittable object (the WoodenCrate family: crates and lever switches):
+            # proc_1225(name, x, z, flags, sequence, script) wraps proc_1226(name, x, y, z,
+            # sequence, flags, palette, priority, script, ...); hitting it runs script
+            x, z, flags, script = (a(2), a(3), a(5), a(6)) if pid == 1225 else (a(2), a(4), a(6), a(9))
+            o["hittables"].append(dict(rec, name=a(1), x=num(x), z=num(z), flags=num(flags), script=num(script)))
+            return
+        if pid == 1087 and len(ops) >= 7:
+            # floor switch: proc_1087(track, box, flag, value, tile, priority, proc); a trap on
+            # the box (stepped on by anyone, the player or a block) runs proc once
+            o["switches"].append(dict(rec, box=a(2), flag=num(a(3)), run=num(a(7))))
+            target = num(a(7))
+            if target is not None:
+                self.call(target, [], conds + [f"floor switch {a(2)}"], a(2), depth + 1, spawner)
             return
         ent = self.entrance_proc(pid)
         if ent:
@@ -180,7 +222,7 @@ class Walker:
         if pid in ENEMY_PROCS and spawner is None:
             spawner = dict(rec, families=[], name=None, path=None)
             o["enemies"].append(spawner)
-        elif not self.local(pid) and spawner is None:
+        elif not self.local(pid) and spawner is None and depth > 1:  # the scene's own calls are walked
             o["calls"].append(rec)
             return
         if depth > 8 or (pid, tuple(ops)) in self.visited:
@@ -263,6 +305,19 @@ class Walker:
                     self.block(*blk, None, conds, box, depth, spawner)
             return
         key = num(ops[0]) if ops and (cid == 0xB745 or name == "chara") else None
+        if key is not None and len(dict((x, v) for x, v, _ in kw).get("p") or []) >= 5:
+            # (also RegistrySelection, San Miguel's gate 2569: 9 entries, f = enabled flags)
+            self.hub_key = key
+        if key is not None and getattr(self, 'hub_key', None) == key:
+            # a town map (Registry3F74, src/registry_choice_menu.c): keyword p lists the
+            # script each of its 11 cursor entries runs; their transitions are doors with
+            # hub = the entry index (no box)
+            k = dict((x, v) for x, v, _ in kw)
+            for i, v in enumerate(k.get("p") or []):
+                if num(v) is not None and not any(d.get("hub") == i for d in self.out["doors"]):
+                    self.hub_index = i
+                    self.call(num(v), [], conds, None, depth + 1, spawner)
+                    self.hub_index = None
         if spawner is not None and key in FAMILIES:
             if FAMILIES[key] not in spawner["families"]:
                 spawner["families"].append(FAMILIES[key])
@@ -296,8 +351,12 @@ def resolve(scene, hps, names):
             rec.setdefault("x", (bx["x0"] + bx["x1"]) // 2)
             rec.setdefault("z", (bx["z0"] + bx["z1"]) // 2)
             rec.setdefault("y", bx["y0"])
-    for e in scene["entrances"] + scene["doors"]:
+    for e in scene["entrances"] + scene["doors"] + scene["switches"]:
         box(e)
+    for h in scene["hittables"]:
+        if h["x"] is not None and h["z"] is not None:
+            h["x"] += 128
+            h["z"] += 128
     for it in scene["items"]:
         if it["category"] == 0 and it["item"] is not None:
             it["name"] = names.get(CONSUMABLE_NAMES + it["item"])
@@ -310,7 +369,7 @@ def resolve(scene, hps, names):
             en["route"] = [[q["x"], q["z"]] for q in hpd["paths"][p]]
             en["x"], en["z"] = en["route"][0]
     scene["enemies"] = [en for en in scene["enemies"] if en["families"]]
-    for rec in scene["entrances"] + scene["doors"] + scene["items"] + scene["enemies"]:
+    for rec in scene["entrances"] + scene["doors"] + scene["items"] + scene["enemies"] + scene["switches"] + scene["hittables"] + scene["talk"]:
         conds = []
         for c in rec["cond"]:
             for raw, nice in PRETTY:
@@ -336,6 +395,24 @@ def build(only=None):
         hps[h] = hpmod.decode(raw)
     names = dict(text.strings(rom))
     todo = [s["scene"] for s in sc if not only or s["scene"] in only]
+    if not only:
+        # every procedure whose first statement calls scene_start (proc_861) is a scene,
+        # including ones only reached by a transition without a box (2537 after the
+        # first dungeon, from a continue procedure)
+        known = set(todo)
+        for pid in range(1, 4096):
+            span = w.body(pid)
+            if pid in known or not span:
+                continue
+            # the call is the first statement, or the first one inside a leading `if`
+            b, p, end = w.b, span[0], min(span[1], span[0] + 48)
+            while p < end:
+                if b[p] >> 4 == 7:
+                    start, _ = gcx.length(b, p)
+                    if (b[start] | b[start + 1] << 8) == 861:
+                        todo.append(pid)
+                    break
+                p += 1
     out, seen = [], set(todo)
     while todo:  # door destinations that scenes.py does not list are scenes too
         s = resolve(w.scene(todo.pop(0)), hps, names)

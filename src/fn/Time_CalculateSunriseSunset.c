@@ -18,5 +18,5 @@ u32 Time_CalculateSunriseSunset(s32 a, s32 b, s32 c)
     da = a * 0.0000152587890625;
     db = b * 0.0000152587890625;
     Clock_UnpackDate(&year, &month, &day, gSunClock.date);
-    Time_CalculateSunriseSunsetCore(year, month, day, da, db, c);
+    return Time_CalculateSunriseSunsetCore(year, month, day, da, db, c);
 }

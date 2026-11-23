@@ -204,6 +204,23 @@ that is a scope gap: record it (below) so the tool gets better.
   ```
   `tools/check.py FILE --nonmatching --record` writes the `// fuzzy:` line;
   `scope.py land FUNC --nonmatching` does the same for a workspace.
+* Calls that rely on a leftover register (a call passing fewer arguments than the callee
+  takes, or a non-void function falling off the end while its caller uses the result):
+  first write the missing argument or return with the value the register holds there and
+  run `tools/check.py`; if it still matches, the original wrote it, so keep it as plain
+  source. If it does not match, the original really relied on it (undefined behavior that
+  happens to work on the GBA): keep the matching form and add the fix under pret's
+  convention, with a comment naming the register value the hardware inherits:
+  ```c
+  #ifdef UBFIX
+      Foo(p, angle); // r1 still holds angle here on hardware
+  #else
+      Foo(p);
+  #endif
+  ```
+  The matching build never defines `UBFIX`; the source port (`port/build_game.py`) does.
+  It is never a way to steer matching. The port build stops on a short call it finds
+  (`build/port/game/padded_calls.txt`).
 * No data definitions in drafts (initialized globals, `static const` tables, string
   literals): reference the ROM labels that exist. agbcc is C89 (declarations first).
 * One translation unit per change; a unit is a contiguous run of functions in ROM order.

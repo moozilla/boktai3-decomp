@@ -63,4 +63,9 @@ int CircleWindow_Initialize(struct Circle *p)
     }
     for (i = 0; i <= 1; i++)
         CircleWindow_GenerateScanlines(p, i);
+#ifdef UBFIX
+    // falls off the end with r0 left over from its last statement; the creator only tests
+    // < 0, and this initializer has no failure path here
+    return 0;
+#endif
 }

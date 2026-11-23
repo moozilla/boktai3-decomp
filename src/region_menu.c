@@ -207,6 +207,7 @@ s32 Script_GetValue(void);
 s32 Time_LoadRegionList(struct RegionMenu *menu)
 {
     s32 n, k, count, group;
+    u8 *pc;
     u32 zero;
     void *res;
     void *tiles;
@@ -239,9 +240,9 @@ s32 Time_LoadRegionList(struct RegionMenu *menu)
         }
         menu->pageFirst[group] = n;
         count = Script_GetValue();
-        for (k = 0; k < count && Script_GetPc(); n++, k++) {
+        for (k = 0; k < count && (pc = Script_GetPc()); n++, k++) {
             menu->entries[n].group = group;
-            menu->entries[n].name = Script_ReadValue();
+            menu->entries[n].name = Script_ReadValue(pc);
             menu->entries[n].longitude = Script_GetValue();
             menu->entries[n].latitude = Script_GetValue();
         }

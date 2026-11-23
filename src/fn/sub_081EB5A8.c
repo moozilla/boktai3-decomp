@@ -12,7 +12,7 @@ void TimeDisplay_InitAnimatedObjects(void *);
 void TimeDisplay_SetSelectionKeyframe(void *);
 void Actor_HideAuxiliarySprites(void *);
 void BgGfx_LoadTilemapAtPosition(s32, s32, s32);
-void Menu_StartFadeIn(void);
+void Menu_StartFadeIn(s32);
 
 s32 Params3D0_InitDisplay(u8 *p)
 {
@@ -47,7 +47,7 @@ s32 Params3D0_InitDisplay(u8 *p)
     *(s32 *)(p + 0x744) = 0;
     Sound_PlaySong(0xa4);
     *(s32 *)(p + 0x738) = gTimeDisplayParameters.fadeOut;
-    Menu_StartFadeIn();
+    Menu_StartFadeIn(gTimeDisplayParameters.fadeOut);
     CpuSet(gPaletteBankData + 0x6220, p + 0x500, 0x100);
     v = 0x7fff;
     i = 15;

@@ -89,7 +89,7 @@ void Armor_UpdateFacingAction9(u8 *p)
             angle = Math_Atan2((s16)v.x - *(s16 *)(p + 0x48), (s16)v.z - *(s16 *)(p + 0x4c));
             angle = (angle + 0x20) & 0xc0;
             if (p[0xb39] != angle)
-                ActorController_StartTurn(p);
+                ActorController_StartTurn(p, angle);
             else if (Armor_TryStartAction(p, 9))
                 *state = 1;
             break;
@@ -115,7 +115,7 @@ void Armor_UpdateFacingAction29(u8 *p)
             angle = Math_Atan2((s16)v.x - *(s16 *)(p + 0x48), (s16)v.z - *(s16 *)(p + 0x4c));
             angle = (angle + 0x20) & 0xc0;
             if (p[0xb39] != angle)
-                ActorController_StartTurn(p);
+                ActorController_StartTurn(p, angle);
             else if (Armor_TryStartAction(p, 29))
                 *state = 1;
             break;

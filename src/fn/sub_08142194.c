@@ -58,12 +58,12 @@ s32 Player_SetAnimation(void *, s32, s32, s32);
 void ActorSequence_Begin(void *, s32, s32);
 void Player_SetActionPhase(void *p, u8 v);
 u32 Player_IsStatusBit3ActionActive(u32 x);
-s32 ActorVariant_GetTableValue();
+s32 ActorVariant_GetTableValue(u32, s32);
 void Player_PlayPositionEffect(void *, void *, u32, u32, void *, u32, u32);
 s32 SceneObjects_HasTypeTwoResource(s32);
 u8 *TerrainModifiers_FindCellOverride(s32, s32);
 s32 Player_IsWithinCoordinateBand(void *);
-s32 sub_08156DAC(void);
+s32 sub_08156DAC(void *);
 
 static inline int scale(int v)
 {
@@ -125,7 +125,7 @@ void Player_UpdateObjectPush(struct PlayerPushState *p)
     struct PackedVec a;
     struct PackedVec b;
     struct PackedVec c;
-    if (!sub_08156DAC()) {
+    if (!sub_08156DAC(p)) {
         ActorSequence_Begin(p, 0, 0);
         return;
     }
@@ -214,7 +214,7 @@ void Player_UpdateObjectPush(struct PlayerPushState *p)
                                               4))) {
                                 int m;
                                 u16 q;
-                                animation = ActorVariant_GetTableValue(p->type);
+                                animation = ActorVariant_GetTableValue(p->type, 4);
                                 q = p->aa0;
                                 m = 0;
                                 if (q) {

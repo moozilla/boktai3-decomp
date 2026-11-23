@@ -45,7 +45,7 @@ struct Target {
     u32 damageType;
 };
 extern const struct Vec gUnk_0824FE8C;
-void Collision_CalculateDamageResponse(void *);
+void Collision_CalculateDamageResponse(void *, void *);
 void Sound_PlaySong(u32);
 void DamageNumberDisplay_Show(void *, s32, s32, void *, void *, s32);
 void SceneHud_SetTimedState(void *, s32, s32, s32, s32, s32);
@@ -60,7 +60,7 @@ void FanCannon_ApplyHitReaction(struct Source *sourceInput, struct Hit *input,
     struct Source *source = sourceInput;
     struct Hit *hit = input;
     struct Target *target = targetInput;
-    Collision_CalculateDamageResponse(source);
+    Collision_CalculateDamageResponse(source, hit);
     if (hit->blocked) {
         hit->damage = 0;
         hit->state = 0;

@@ -55,11 +55,13 @@ PORT_CODE = {
 RECORD_SKIP = {'tools/recorder/rec_rt.c', 'port/hw/psg.c', 'port/game/hooks.c', 'port/ppu/ppu.c', 'port/game/code_table'}
 EXPORTS = ['port_trace_map', 'port_memory_init', 'port_load_rom', 'port_game_run', 'port_game_set_solar',
            'port_game_set_time', 'port_frame_count', 'port_game_save_stage', 'port_game_save_dirty',
-           'port_game_save_data', 'port_game_save_size',
+           'port_game_save_data', 'port_game_save_size', 'port_video_set_enabled',
            # agent harness (port/agent/): hooks, calls into the game, C snippets
            'port_hook_state', 'port_hook_flags', 'port_hook_ring', 'port_icall', 'port_code_known',
            'port_bus_load_i8', 'port_bus_load_i16', 'port_bus_load_i32', 'port_bus_load_ptr',
-           'port_bus_store_i8', 'port_bus_store_i16', 'port_bus_store_i32', 'port_bus_store_ptr']
+           'port_bus_store_i8', 'port_bus_store_i16', 'port_bus_store_i32', 'port_bus_store_ptr',
+           # snapshots (port/agent/session.mjs): the live shadow stack and the data's end
+           '__stack_pointer', '__heap_base']
 
 
 def game_sources():
@@ -125,7 +127,7 @@ def main():
     # the hooks go in before inlining, so inlined copies keep them; stage 3 optimizes.
     flags = ['--target=wasm32', '-ffreestanding', '-std=gnu89', '-O2', '-Xclang', '-disable-llvm-passes',
              '-funsigned-char', '-fno-strict-aliasing',
-             '-fwrapv', '-fno-builtin', '-Wno-everything', '-Iport/include', '-Iport/core',
+             '-fwrapv', '-fno-builtin', '-Wno-everything', '-DUBFIX', '-Iport/include', '-Iport/core',
              '-Iport/game', '-Iport/hw', '-I' + str(headers), '-iquote', '.',
              '-include', 'port/core/compat.h']
     if args.trace:
@@ -217,18 +219,11 @@ def main():
         target = by_address.get(address & ~1)
         if target and fn != target and fn not in defs_global:
             aliases[fn] = target
-    # Pass 1 finds functions that read incoming registers; pass 2 makes their
-    # direct callers publish r0..r3 (see abi.rewrite_module).
-    readers = set()
-    for index, (name, game) in enumerate(units):
-        text = apply_aliases(texts[name], aliases) if aliases else texts[name]
-        readers |= abi.rewrite_module(text, defs_global, addresses, index, game, {})[4]
     synthetic = {}
     table = []  # (address, adapter symbol)
     rewritten = {}
     adapter_failures = []
     padded_report = []
-    unknown_report = []
     for index, (name, game) in enumerate(units):
         text = texts[name]
         if aliases:
@@ -238,12 +233,10 @@ def main():
                           lambda m: m[1] + '@' + fn + '.__replaced_by_port(', text, flags=re.M)
             if not re.search(r'^declare [^\n]*@' + re.escape(fn) + r'\(', text, re.M):
                 text += abi.render_declare(fn, defs_global[fn]) + '\n'
-        text, values, internals, padded, _, unknown = abi.rewrite_module(
-            text, defs_global, addresses, index, game, synthetic, readers)
+        text, values, internals, padded, _, _ = abi.rewrite_module(
+            text, defs_global, addresses, index, game, synthetic)
         for callee, given, wanted in padded:
             padded_report.append(f'{name}: {callee} called with {given} of {wanted} arguments')
-        for caller, slot in unknown:
-            unknown_report.append(f'{name}: {caller} passes an unknown r{slot}')
         extra = []
         defs, _decls, _ = abi.scan_module(text)
         for fn, sig in defs.items():
@@ -277,9 +270,10 @@ def main():
             text += abi.PORT_REGS_DECL + '\n'
         rewritten[name] = text
     (OUT / 'padded_calls.txt').write_text('\n'.join(padded_report) + '\n')
-    (OUT / 'unknown_registers.txt').write_text('\n'.join(unknown_report) + '\n')
-    print(f'register-passing calls: {len(padded_report)}, {len(readers)} functions read incoming '
-          f'registers, {len(unknown_report)} arguments unknown (unknown_registers.txt)')
+    if padded_report:
+        sys.exit('calls passing fewer arguments than the callee takes (they read leftover registers on '
+                 'the GBA; state the value in src/, plainly or under UBFIX, see port/README.md):\n  ' +
+                 '\n  '.join(padded_report))
     if adapter_failures:
         print('no adapter (aggregate signature):', ', '.join(sorted(adapter_failures)[:20]))
     table.sort()

@@ -167,11 +167,11 @@ void Lun_HandlePlayerContact(void *unused, struct ContactCollider *other, void *
     }
 }
 
-void SceneActorBehavior_ApplyContactReaction(void);
+void SceneActorBehavior_ApplyContactReaction(void *, void *, void *);
 
-void Lun_OnBodyContact(void)
+void Lun_OnBodyContact(void *source, void *destination, void *actor)
 {
-    SceneActorBehavior_ApplyContactReaction();
+    SceneActorBehavior_ApplyContactReaction(source, destination, actor);
 }
 
 struct ActorParticipantProgress {
@@ -1172,7 +1172,7 @@ void Lun_SelectRandomRouteEntry(struct S0809CB58 *p)
     q->entry = Path_GetPointData(q->data) + q->index * 8;
 }
 
-void Lun_OnBodyContact(void);
+void Lun_OnBodyContact(void *, void *, void *);
 
 void Lun_HandlePlayerContact(void *unused, struct ContactCollider *other, void *object);
 

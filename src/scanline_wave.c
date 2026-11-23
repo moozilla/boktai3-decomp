@@ -59,6 +59,11 @@ int ScanlineWave_Initialize(struct ScanlineWave *wave, int id)
         } while (j <= limit);
         i++;
     } while (i <= 0);
+#ifdef UBFIX
+    // falls off the end with r0 left over from its last statement; the creator only tests
+    // < 0, and this initializer has no failure path here
+    return 0;
+#endif
 }
 
 struct ScanlineWave *ScanlineWave_Create(int id)

@@ -8,7 +8,7 @@ struct TerrainHeader {
     u32 navMeshes;
 };
 void *ScriptProc_Start(u32, u16);
-struct TerrainHeader *sub_08225C08(void);
+struct TerrainHeader *sub_08225C08(void *);
 void Terrain_SetGrid(u32);
 void Terrain_SetBoxes(u32);
 void Terrain_SetPaths(u32);
@@ -18,9 +18,10 @@ void Terrain_SetNavMeshes(u32);
 s32 Terrain_LoadHP(u32 id)
 {
     struct TerrainHeader *src, h;
-    if (!ScriptProc_Start(0xAE6C, (u16)id))
+    void *resource = ScriptProc_Start(0xAE6C, (u16)id);
+    if (!resource)
         return -1;
-    src = sub_08225C08();
+    src = sub_08225C08(resource);
     h = *src;
     h.cells += (u32)src;
     h.boxes += (u32)src;

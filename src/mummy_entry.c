@@ -2403,7 +2403,7 @@ void SceneActorCollision_InitBody(u8 *, struct Z *, struct Z *, void (*)(void), 
 
 void SceneActorCollision_InitAttack(u8 *, struct Z *, struct Z *, void (*)(void), u32, u8 *);
 
-void Mummy_OnBodyCollision(void);
+void Mummy_OnBodyCollision(void *, void *, void *);
 
 void Mummy_OnAttackCollision(void);
 
@@ -3796,11 +3796,11 @@ s32 Mummy_OnUpdate(struct SOnUpdate *s)
     return 1;
 }
 
-void SceneActor_UpdateBehaviorCallbacks(void);
+void SceneActor_UpdateBehaviorCallbacks(void *);
 
-s32 Mummy_OnInteractionUpdate(void)
+s32 Mummy_OnInteractionUpdate(void *actor)
 {
-    SceneActor_UpdateBehaviorCallbacks();
+    SceneActor_UpdateBehaviorCallbacks(actor);
     return 0;
 }
 
@@ -3880,7 +3880,7 @@ u8 Mummy_SelectMovementResponse(struct ChaseActor *actor);
 
 void Mummy_OnClearActivityFlag(struct SOnClearActivityFlag *s);
 
-s32 Mummy_OnInteractionUpdate(void);
+s32 Mummy_OnInteractionUpdate(void *);
 
 s32 Mummy_OnReleaseResources(u8 *);
 

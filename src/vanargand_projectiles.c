@@ -26,7 +26,7 @@ void VanargandProjectile_OnContact(struct ContactCollider *actor, void *context,
                                    struct VanargandProjectile *reaction)
 {
     reaction->direction = actor->direction;
-    Collision_CalculateDamageResponse(actor);
+    Collision_CalculateDamageResponse(actor, context);
     {
         u32 one = 1;
         if (actor->statRewardFlags & one) {

@@ -135,7 +135,7 @@ void Ghost_BeginContactReaction(void *unused, struct ContactCollider *contact,
 
 /* SceneActorBehavior_OnContactForward: forwards the contact unless the actor is unavailable or flagged */
 
-void SceneActorBehavior_ApplyContactReaction(void *, void *);
+void SceneActorBehavior_ApplyContactReaction(void *, void *, struct ChaseActor *);
 
 void SceneActorBehavior_OnContactForward(u16 *source, void *destination, struct ChaseActor *actor)
 {
@@ -145,7 +145,7 @@ void SceneActorBehavior_OnContactForward(u16 *source, void *destination, struct 
         return;
     if (SceneActor_MaskedHalfword(0x800, &source[3]))
         return;
-    SceneActorBehavior_ApplyContactReaction(source, destination);
+    SceneActorBehavior_ApplyContactReaction(source, destination, actor);
 }
 
 extern const s16 gUnk_086149C4[];
