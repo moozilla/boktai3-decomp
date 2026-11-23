@@ -401,7 +401,6 @@ void DarkLoan_UpdateAdjustment(struct DarkLoanScreen *panel)
     u16 *balance, *limit;
     u32 group;
     s32 total;
-    u32 *p, *q;
     s32 i;
     Anim_Step(&panel->widgets[DARK_LOAN_BACKGROUND], &panel->resource);
     if (!panel->exitScript) {
@@ -482,18 +481,11 @@ void DarkLoan_UpdateAdjustment(struct DarkLoanScreen *panel)
             MessageWindow_ShowMessage(4);
             panel->warningShowing = 0;
         } else {
-            u32 mask;
             panel->widgets[DARK_LOAN_LOWER_RATE].flags |= 1;
-            mask = 1;
-            q = (u32 *)(&panel->widgets[DARK_LOAN_AMOUNT_DIGITS].flags);
-            p = (u32 *)(&panel->widgets[DARK_LOAN_ADJUSTMENT_DIGITS].flags);
-            i = 3;
-            do {
-                *p |= mask;
-                *q |= mask;
-                q = (void *)((u8 *)q + sizeof(struct SceneInputWidget));
-                p = (void *)((u8 *)p + sizeof(struct SceneInputWidget));
-            } while (--i >= 0);
+            for (i = 0; i < 4; i++) {
+                panel->widgets[DARK_LOAN_ADJUSTMENT_DIGITS + i].flags |= 1;
+                panel->widgets[DARK_LOAN_AMOUNT_DIGITS + i].flags |= 1;
+            }
             if (!panel->warningShowing) {
                 MessageWindow_ShowMessage(6);
                 panel->warningShowing = 1;
