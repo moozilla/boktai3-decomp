@@ -3457,11 +3457,11 @@ s32 Vorn_OnUpdate(struct SOnUpdate *s)
     return 1;
 }
 
-void SceneActor_UpdateBehaviorCallbacks(void);
+void SceneActor_UpdateBehaviorCallbacks(void *);
 
-u32 Vorn_OnRender(void)
+u32 Vorn_OnRender(void *actor)
 {
-    SceneActor_UpdateBehaviorCallbacks();
+    SceneActor_UpdateBehaviorCallbacks(actor);
     return 0;
 }
 
@@ -3656,7 +3656,7 @@ void Vorn_OnAnimationCleanup(void);
 
 void Vorn_BeginTargetPursuit(struct Vorn *actor);
 
-u32 Vorn_OnRender(void);
+u32 Vorn_OnRender(void *);
 
 u32 Vorn_OnDestroy(u8 *);
 
