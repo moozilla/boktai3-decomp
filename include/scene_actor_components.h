@@ -31,6 +31,12 @@ struct SceneActorBody {
     u8 unknown40[8];
 };
 
+/* Body flags (bit 2: the body follows its position target). */
+static inline void SceneActorBody_SetFlags(struct SceneActorBody *body, u32 mask)
+{
+    body->flags |= mask;
+}
+
 /* Script 'a' supplies four records in these parallel arrays. */
 struct SceneActorAttackParameters {
     u16 first[4];

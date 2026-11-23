@@ -85,10 +85,7 @@ int Actor_InitMotion(struct SceneActor *actor, int id, const struct ContactPosit
     body = &actor->body;
     SceneBody_Init(body, id, position, (u8)direction, 7, actor);
     result = SceneBody_SetPositionTarget(body, &actor->positionLink);
-    {
-        u32 mask = 4;
-        body->flags |= mask;
-    }
+    SceneActorBody_SetFlags(body, 4);
     return result;
 }
 
