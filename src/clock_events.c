@@ -80,23 +80,15 @@ u32 ClockEvents_Destroy(void)
 
 int ClockEvents_Initialize(struct ClockEvents *clock)
 {
-    u8 *armed;
+    int i;
     clock->hour = SunClock_GetBaseHour();
     clock->minute = SunClock_GetBaseMinute();
     clock->second = SunClock_GetSecond();
     clock->seconds = clock->hour * 3600 + clock->minute * 60 + clock->second;
     clock->window = Script_GetKeywordValue('d', 60);
     clock->procedure = Script_GetKeywordValue('p', 0);
-    {
-        int one = 1;
-        int count = 3;
-        armed = &clock->armed[3];
-        do {
-            *armed = one;
-            armed--;
-            count--;
-        } while (count >= 0);
-    }
+    for (i = 0; i < 4; i++)
+        clock->armed[i] = 1;
     clock->frame = 0;
     return 0;
 }
