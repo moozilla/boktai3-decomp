@@ -455,22 +455,20 @@ void Scene_PlayObjectBreakEffect(struct SceneObject *p)
     struct SceneExtent a;
     struct SceneExtent b;
     struct SceneExtent c;
-    u32 d;
     struct SceneVec *q;
     Sound_PlaySong(0x15B);
     q = &p->body.position;
-    d = 0x1e;
-    sub_08014CA4(3, 2, q, 0x3c, d, 0x10, 8, 8, 0, 0x100, 0x18, 0x10);
-    sub_08014CA4(8, 6, q, 0x3c, d, 0x16, 8, 8, 0, 0x100, 0x18, 0x10);
+    sub_08014CA4(3, 2, q, 0x3c, 0x1e, 0x10, 8, 8, 0, 0x100, 0x18, 0x10);
+    sub_08014CA4(8, 6, q, 0x3c, 0x1e, 0x16, 8, 8, 0, 0x100, 0x18, 0x10);
     a.x = p->body.position.x;
     a.y = p->body.position.y + 0x80;
     a.z = p->body.position.z;
     b.x = 0xFFF1;
     b.y = 8;
     b.z = 0xFFF1;
-    c.x = d;
+    c.x = 0x1e;
     c.y = 0x16;
-    c.z = d;
+    c.z = 0x1e;
     sub_08014634(8, 3, &a, &b, &c, 0x3c, 0x3c);
 }
 
@@ -479,21 +477,19 @@ void Scene_PlayObjectSplashEffect(struct SceneObject *p)
     struct SceneExtent a;
     struct SceneExtent b;
     struct SceneExtent c;
-    u32 d;
     struct SceneVec *q;
     Sound_PlaySong(0x135);
     q = &p->body.position;
-    d = 0x1e;
-    sub_08014CA4(4, 0, q, 0x3c, d, 0x14, 8, 8, 0, 0x100, 0x18, 0x10);
+    sub_08014CA4(4, 0, q, 0x3c, 0x1e, 0x14, 8, 8, 0, 0x100, 0x18, 0x10);
     a.x = p->body.position.x;
     a.y = p->body.position.y + 0x80;
     a.z = p->body.position.z;
     b.x = 0xFFF1;
     b.y = 8;
     b.z = 0xFFF1;
-    c.x = d;
+    c.x = 0x1e;
     c.y = 0x16;
-    c.z = d;
+    c.z = 0x1e;
     sub_08014634(8, 2, &a, &b, &c, 0x3c, 0x3c);
 }
 
@@ -555,7 +551,6 @@ void Scene_SpawnDirectionalDust(struct SceneObject *input)
     s32 i;
     const u16 *table;
     u32 *cursor;
-    u32 mask;
     size.x = 32;
     size.y = 0;
     size.z = 32;
@@ -563,7 +558,6 @@ void Scene_SpawnDirectionalDust(struct SceneObject *input)
     table = DUST_SAMPLE_ADDRESS(gRandomTable, 0);
     cursor = &gRandomIndex;
     i = 2;
-    mask = 1023;
     do {
         struct SceneObject *local = actor;
 
@@ -572,7 +566,7 @@ void Scene_SpawnDirectionalDust(struct SceneObject *input)
             case 0: {
                 u32 index;
                 const u16 *random;
-                index = (*cursor + 1) & mask;
+                index = (*cursor + 1) & 1023;
                 random = DUST_SAMPLE_ADDRESS(table, index);
                 {
                     u32 value = dustScatter((const u8 *)random, &particle->position.x);
@@ -580,7 +574,7 @@ void Scene_SpawnDirectionalDust(struct SceneObject *input)
                     point.words.xy = (point.words.xy & 0xFFFF0000) | low;
                 }
                 {
-                    u32 last = (index + 1) & mask;
+                    u32 last = (index + 1) & 1023;
                     const u16 *second;
                     *cursor = last;
                     second = DUST_SAMPLE_ADDRESS(table, last);
@@ -595,7 +589,7 @@ void Scene_SpawnDirectionalDust(struct SceneObject *input)
             case 1: {
                 u32 index;
                 const u16 *random;
-                index = (*cursor + 1) & mask;
+                index = (*cursor + 1) & 1023;
                 random = DUST_SAMPLE_ADDRESS(table, index);
                 {
                     u32 value = backEdge(*random, (u16)particle->position.x);
@@ -603,7 +597,7 @@ void Scene_SpawnDirectionalDust(struct SceneObject *input)
                     point.words.xy = (point.words.xy & 0xFFFF0000) | low;
                 }
                 {
-                    u32 last = (index + 1) & mask;
+                    u32 last = (index + 1) & 1023;
                     const u16 *second;
                     *cursor = last;
                     second = DUST_SAMPLE_ADDRESS(table, last);
@@ -618,7 +612,7 @@ void Scene_SpawnDirectionalDust(struct SceneObject *input)
             case 2: {
                 u32 index;
                 const u16 *random;
-                index = (*cursor + 1) & mask;
+                index = (*cursor + 1) & 1023;
                 random = DUST_SAMPLE_ADDRESS(table, index);
                 {
                     u32 value = dustScatter((const u8 *)random, &particle->position.x);
@@ -626,7 +620,7 @@ void Scene_SpawnDirectionalDust(struct SceneObject *input)
                     point.words.xy = (point.words.xy & 0xFFFF0000) | low;
                 }
                 {
-                    u32 last = (index + 1) & mask;
+                    u32 last = (index + 1) & 1023;
                     const u16 *second;
                     *cursor = last;
                     second = DUST_SAMPLE_ADDRESS(table, last);
@@ -641,7 +635,7 @@ void Scene_SpawnDirectionalDust(struct SceneObject *input)
             case 3: {
                 u32 index;
                 const u16 *random;
-                index = (*cursor + 1) & mask;
+                index = (*cursor + 1) & 1023;
                 random = DUST_SAMPLE_ADDRESS(table, index);
                 {
                     u32 value = frontEdge(*random, (u16)particle->position.x);
@@ -649,7 +643,7 @@ void Scene_SpawnDirectionalDust(struct SceneObject *input)
                     point.words.xy = (point.words.xy & 0xFFFF0000) | low;
                 }
                 {
-                    u32 last = (index + 1) & mask;
+                    u32 last = (index + 1) & 1023;
                     const u16 *second;
                     *cursor = last;
                     second = DUST_SAMPLE_ADDRESS(table, last);
@@ -1298,7 +1292,6 @@ s32 SceneObjects_CreateObject(u32 id, s32 type, u32 flags, struct SceneVec *posi
     struct SceneDraw *draw;
     struct SceneVec *pos;
     s32 x, z, index, height;
-    u32 clear;
     u8 *dynamic;
     struct SceneCell *cell;
     UpdateFn *slot;
@@ -1364,7 +1357,6 @@ s32 SceneObjects_CreateObject(u32 id, s32 type, u32 flags, struct SceneVec *posi
     if (height < 15)
         height++;
     initializeCell(&p->cellRef, index, height);
-    clear = 0;
     p->targetY = height << 8;
     size.x = 130;
     size.y = 128;
@@ -1385,11 +1377,11 @@ s32 SceneObjects_CreateObject(u32 id, s32 type, u32 flags, struct SceneVec *posi
     Collider_SetAttackPowerAndForce(&p->stepCollider, 1500, 50);
     setStepFlags(&p->stepCollider);
     p->health = health;
-    p->damageTimer = clear;
-    p->mode = clear;
-    p->animationTimer = clear;
-    p->phase = clear;
-    p->cooldown = clear;
+    p->damageTimer = 0;
+    p->mode = 0;
+    p->animationTimer = 0;
+    p->phase = 0;
+    p->cooldown = 0;
     p->unk23 = 4;
     gRandomIndex = (gRandomIndex + 1) & 1023;
     {
