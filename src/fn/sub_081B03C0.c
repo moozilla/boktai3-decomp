@@ -4,6 +4,7 @@
 #include "display_sequence_inline.h"
 #include "player.h"
 #include "motion_track.h"
+#include "vanargand_parts.h"
 // confidence=low: moves a paired half toward the player, then holds and releases the position request.
 void MotionTrack_Update(void *);
 void Player_BeginPositionRequest(void *, void *, s32, s32, s32, s32, s32, s32, s32);
@@ -106,10 +107,6 @@ static inline void copyPosition(struct MotionTrackVector *dst, struct MotionTrac
     dst->y = src->y - 128;
     dst->z = src->z;
 }
-static inline u8 trackFinished(struct PairedSceneHalf *half)
-{
-    return half->motion.active == 2;
-}
 void PairedSceneActor_UpdatePlayerCapture(struct VanargandAttackPair *owner,
                                           struct PairedSceneHalf *half)
 {
@@ -152,7 +149,7 @@ void PairedSceneActor_UpdatePlayerCapture(struct VanargandAttackPair *owner,
         advanceTrack:
             MotionTrack_Update(&half->motion);
 
-            if (trackFinished(half)) {
+            if (Vanargand_MotionEnded(half)) {
                 ChangeCapturePhase(half, 1, phaseEntered);
             }
             break;

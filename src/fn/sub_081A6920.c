@@ -2,6 +2,7 @@
 #include "render.h"
 #include "engine.h"
 #include "ram.h"
+#include "group_objects.h"
 #define gRandomTableIndex gRandomIndex
 
 struct ScreenPaletteTransition {
@@ -18,14 +19,6 @@ s32 ScalarApproach_StepSixteenth(s32, s32);
 s32 sub_08249350(s32, s32);
 void ScreenPalette_UpdateTransition(struct ScreenPaletteTransition *);
 void ScreenPalette_ProjectPosition(int, s16 *, int, int);
-
-static inline int nextRandom(void)
-{
-    u32 offset;
-    gRandomIndex = (gRandomIndex + 1) & 1023;
-    offset = gRandomIndex * 2;
-    return *(const u16 *)(offset + (u32)gRandomTable);
-}
 
 void ScreenPalette_UpdateState(struct ScreenPaletteTransition *s)
 {
@@ -65,7 +58,7 @@ void ScreenPalette_UpdateState(struct ScreenPaletteTransition *s)
     }
     ScreenPalette_UpdateTransition(s);
     if (s->state > 1) {
-        jitter = sub_08249350(nextRandom() >> 3, 3) - 1;
+        jitter = sub_08249350(randomValue() >> 3, 3) - 1;
     } else {
         jitter = 0;
     }

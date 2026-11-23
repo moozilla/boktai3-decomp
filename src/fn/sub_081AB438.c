@@ -1,8 +1,6 @@
 #include "global.h"
+#include "motion_track.h"
 
-struct MotionTrackVector {
-    s16 x, y, z, padding;
-};
 struct MotionTrack;
 struct Vanargand {
     u8 pad0[0x54];

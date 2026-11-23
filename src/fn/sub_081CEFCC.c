@@ -1,8 +1,7 @@
 #include "global.h"
+#include "ghoul_disc.h"
+#include "scene_indicator.h"
 
-struct Vec {
-    s16 x, y, z, pad;
-};
 struct Motion {
     u8 unk_00[9];
     u8 angle;
@@ -40,12 +39,6 @@ extern const s16 gUnk_086149C4[];
 s32 Math_Atan2(s32, s32);
 s32 Actor_PlayAnimationEntry(void *, s32, s32, s32, s32);
 s32 Callback_InvokeActor(void *, void *);
-static inline s32 Abs(s32 x)
-{
-    if (x < 0)
-        return -x;
-    return x;
-}
 static inline s32 Scale(s32 x)
 {
     if (x >= 0)
@@ -124,14 +117,14 @@ void SceneNpc_FollowSceneTarget(struct Context *ctx, struct SceneNpc *npc)
             Polar(&motion->velocity, motion->angle, 24);
         } else {
             Face(npc, angle);
-            if (Abs(motion->position.y - ctx->position->y) <= 255) {
+            if (Ghoul_Abs(motion->position.y - ctx->position->y) <= 255) {
                 struct Vec *destination = ctx->position;
                 s32 direction =
                     (s8)Math_Atan2(position->x - destination->x, position->z - destination->z);
                 s32 delta = targetAngle - direction;
                 s32 oppositeFacing = npc->motion.angle + 128;
                 u8 opposite = targetAngle - oppositeFacing;
-                if (Abs((s8)delta) <= 63 && Abs((s8)opposite) <= 31) {
+                if (Ghoul_Abs((s8)delta) <= 63 && Ghoul_Abs((s8)opposite) <= 31) {
                     s32 mask = 0x800;
                     npc->flags = mask | npc->flags;
                 }
