@@ -16,16 +16,14 @@ struct SceneEffectScheduleEntry *SceneEffectSchedule_FindById(u32 id)
     struct SceneEffectSchedule *manager = gSceneEffectSchedule;
     s32 index;
     u32 mask;
-    s32 bit;
     struct SceneEffectSchedule *cursor;
     if (!manager)
         return 0;
     index = 0;
     mask = manager->occupiedMask;
     cursor = manager;
-    bit = 1;
     for (; index < 12; index++) {
-        if (SceneEffectSchedule_TestOccupied(mask, bit, index)) {
+        if (SceneEffectSchedule_TestOccupied(mask, 1, index)) {
             u32 offset = index * sizeof(manager->entries[0]);
             if (cursor->entries[0].id == id)
                 return (void *)((u8 *)manager + (offset + sizeof(manager->task)));
