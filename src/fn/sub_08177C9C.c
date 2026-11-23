@@ -7,13 +7,8 @@ void SceneHud_ReadPageVisibility(struct SceneHudState *p)
         for (i = 0; i < 10; i++)
             p->pageEnabled[i] = Script_GetValue();
     } else {
-        u32 one = 1;
-        u8 *entry;
-        i = 9;
-        entry = &p->pageEnabled[9];
-        do {
-            *entry-- = one;
-        } while (--i >= 0);
+        for (i = 0; i < 10; i++)
+            p->pageEnabled[i] = 1;
     }
     if (!p->pageEnabled[p->mode]) {
         for (i = 0; i < 10; i++) {
