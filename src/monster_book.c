@@ -410,7 +410,7 @@ u32 MonsterBook_SetupPageBackgrounds(struct MonsterBook *book, u32 value)
     u32 color;
     u16 *dst;
     s32 i;
-    u32 zero, one;
+    u32 zero;
     struct BackgroundLayer *fields;
     mask |= *reg;
     *reg = mask;
@@ -431,13 +431,13 @@ u32 MonsterBook_SetupPageBackgrounds(struct MonsterBook *book, u32 value)
         dst--;
     }
     zero = 0;
-    Bg_SetupLayers(2, 0, book->backgroundResource, 0, zero, one = 1, &value);
+    Bg_SetupLayers(2, 0, book->backgroundResource, 0, zero, 1, &value);
     fields = &gBgRecords[3];
     fields->width = 0x10;
     fields->x = zero;
     fields->y = zero;
     Bg_SetPriority(3, 3);
-    sub_08215EB4(3, 4, 6, 8, 9, one, zero, 4);
+    sub_08215EB4(3, 4, 6, 8, 9, 1, zero, 4);
     return 0;
 }
 
