@@ -172,7 +172,8 @@ const GOALS = {
       const dist = routeDistances(+opt('--goal', -1));
       VISITS.set(here, (VISITS.get(here) || 0) + 1);
       const doors = doorsHere().sort((a, b) => (b.scene === toward) - (a.scene === toward) ||
-        (dist.get(a.scene) ?? 1e9) - (dist.get(b.scene) ?? 1e9) || (VISITS.get(a.scene) || 0) - (VISITS.get(b.scene) || 0));
+        (dist.get(a.scene) ?? 1e9) - (dist.get(b.scene) ?? 1e9) || visited.has(a.scene) - visited.has(b.scene) ||
+        (VISITS.get(a.scene) || 0) - (VISITS.get(b.scene) || 0));
       event({ skill: 'room', ...L.where(), doors: doors.map((d) => `${d.hub !== undefined ? 'hub' + d.hub : d.box}->${d.scene}`) });
       let moved = false;
       // a room can still be playing its arrival event (a dialogue that starts late, the
