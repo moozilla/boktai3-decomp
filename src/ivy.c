@@ -2395,49 +2395,6 @@ void Ivy_OnDestroy(void)
 
 #define ColorPulse_UpdateHitFlash Sword_UpdateBodyPaletteRestore
 
-struct ColorPulseContact {
-    u8 pad0[0xa];
-    u16 kind;
-    u8 padC[0x28];
-    u32 source, flags;
-    u8 pad3C[2];
-    u16 damage;
-    u8 pad40[3];
-    u8 effect;
-    u16 value;
-};
-
-struct ColorPulseApplyContact {
-    u8 pad0[0x64];
-    u16 velocityX;
-    u8 pad66[2];
-    u16 velocityZ;
-    u8 pad6A[0xa];
-    u16 impulseX;
-    u8 pad76[2];
-    u16 impulseZ;
-    u8 pad7A[0xa];
-    s16 hitValue;
-    u8 pad86[0xd];
-    u8 mode;
-    u8 pad94[8];
-    u16 colliderState;
-    u8 pad9E[0xb74 - 0x9e];
-    void *animation;
-    u8 padB78[0xcb4 - 0xb78];
-    u16 disabled;
-    u8 padCB6[0x12];
-    void (*callback)(void);
-    u8 padCCC[0x20];
-    void (*hitCallback)(void);
-    u8 padCF0[0x68];
-    u16 palette;
-    u8 padD5A[6];
-    u32 hitSource, hitFlags, hitKind;
-    u8 padD6C[0xc];
-    u16 damage, effect;
-};
-
 void Ivy_UpdateDefeatBurst(void);
 
 void Sword_UpdateBodyPaletteRestore(void);
@@ -2446,46 +2403,46 @@ void Collision_CalculateDamageResponse(void *, void *);
 
 void PlayerStats_AddContactHundredths(void *, void *, s32);
 
-void ColorPulse_ApplyContact(struct ColorPulseContact *a, struct ColorPulseContact *b,
-                             struct ColorPulseApplyContact *p)
+void ColorPulse_ApplyContact(struct ContactCollider *a, struct ContactCollider *b,
+                             struct PhaseObject *p)
 {
-    if (p->callback == Ivy_UpdateDefeatBurst)
+    if (p->update == (void *)Ivy_UpdateDefeatBurst)
         return;
-    if (p->disabled) {
-        if (p->effect) {
-            b->damage = 0;
-            b->effect = 0;
+    if (p->colliderB.responseValue) {
+        if (p->damageKind) {
+            b->cost = 0;
+            b->costFlags = 0;
         }
     } else {
         Collision_CalculateDamageResponse(a, b);
-        b->value = a->value;
-        if (!p->hitCallback) {
-            u32 damage = b->damage;
-            u32 flags = a->flags;
+        b->responseValue = a->responseValue;
+        if (!p->hitUpdate) {
+            u32 damage = b->cost;
+            u32 flags = a->reactionFlags;
             if (damage || (flags & 0x40)) {
-                u32 source = a->source;
-                p->hitSource = source;
-                p->hitFlags = flags;
-                p->hitKind = a->kind;
-                p->colliderState = 8;
-                p->hitCallback = Sword_UpdateBodyPaletteRestore;
-                AnimData_SelectPaletteBank(p->animation, p->palette);
-                PlayerStats_AddContactHundredths(a, b, p->hitValue);
+                u32 source = a->statRewardFlags;
+                p->hitResponseD60 = source;
+                p->hitResponseD64 = flags;
+                p->hitResponseD68 = a->contactFlags;
+                p->flashTimer = 8;
+                p->hitUpdate = (void *)Sword_UpdateBodyPaletteRestore;
+                AnimData_SelectPaletteBank(p->damageAnimation, p->damagePalette);
+                PlayerStats_AddContactHundredths(a, b, p->contactReward);
             }
         }
-        if (b->damage)
+        if (b->cost)
             Sound_PlaySong(318);
         else
             Sound_PlaySong(400);
         {
-            u16 *velocity = &p->velocityX;
-            if (p->mode == 1) {
-                p->impulseX = -*velocity * 4;
-                p->impulseZ = -p->velocityZ * 4;
+            u16 *velocity = (u16 *)&p->offsetX;
+            if (p->groupMode.mode == 1) {
+                p->driftX = -*velocity * 4;
+                p->driftZ = -(u16)p->offsetZ * 4;
             }
         }
-        p->damage = b->damage;
-        p->effect = b->effect;
+        p->damage = b->cost;
+        p->damageKind = b->costFlags;
     }
 }
 

@@ -41,7 +41,9 @@ struct PhaseObject {
     s16 driftX, unknown76, driftZ; /* added to the anchor approach, halved each frame */
     u8 unknown7A[4];
     s16 health;
-    u8 unknown80[0xD];
+    u8 unknown80[4];
+    s16 contactReward; /* passed to PlayerStats_AddContactHundredths on a hit */
+    u8 unknown86[7];
     struct PhaseObjectMode groupMode;
     u8 unknown94[8];
     u16 flashTimer;
@@ -83,7 +85,7 @@ struct PhaseObject {
     void (*scatterTransition)(struct PhaseObject *);
     void (*launchUpdate)(struct PhaseObject *);
     void (*attackUpdate)(struct PhaseObject *);
-    u8 unknownCEC[4];
+    void (*hitUpdate)(struct PhaseObject *); /* the hit flash, set on a damaging contact */
     void (*phaseUpdate)(struct PhaseObject *);
     s32 scatterDelay;
     u32 bobbingTimer;
