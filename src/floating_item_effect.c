@@ -159,17 +159,15 @@ void FloatingEffect_RiseAndSettle(struct LinkedWidgetSet *manager, struct Floati
     if ((effect->mode == 3) && (effect->timer > 3)) {
         const u16 *table = gRandomTable;
         u32 *seed = &gRandomIndex;
-        u32 mask;
         u16 index = *seed + 1;
-        mask = 0x3FF;
-        index &= mask;
+        index &= 0x3FF;
         *seed = index;
         {
             u32 bits = FloatingEffect_RandomAt(table, index);
             s32 x = (u16)effect->sprite.position.x - 1;
             effect->sprite.position.x = x + (bits & 3);
         }
-        index = (index + 1) & mask;
+        index = (index + 1) & 0x3FF;
         *seed = index;
         {
             u32 bits = FloatingEffect_RandomAt(table, index);
