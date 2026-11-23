@@ -23,6 +23,7 @@ s32 Math_Atan2(s32, s32);
 
 s32 Callback_InvokeActor(void *, void *);
 
+// concession-ok(literal-param): one truncating shift used with widths 3, 4 and 12; the width written in place gives the same code
 static inline s32 Shift(s32 n, u32 bits)
 {
     if (n >= 0)
@@ -37,18 +38,19 @@ static inline u32 WanderRand(void)
     return *(const u16 *)((index << 1) + (u32)gRandomTable);
 }
 
-struct SavedMotion {
-    u8 pad[12];
+/* The block at 0x3F0 of the control context; the position curve writes its position at 0x3FC. */
+struct StoredCurve {
+    u8 unknown0[0xC];
     struct ContactPosition position;
 };
 
-static inline u8 ApproachStoredPoint(struct ChaseActor *actor, struct SavedMotion *saved,
+static inline u8 ApproachStoredPoint(struct ChaseActor *actor, struct StoredCurve *curve,
                                      s32 inSpeed)
 {
     struct SceneActorBody *motion = &actor->base.body;
     s32 speed = inSpeed;
-    s16 dx = saved->position.x - (u16)motion->position.x;
-    s16 dz = saved->position.z - (u16)motion->position.z;
+    s16 dx = curve->position.x - (u16)motion->position.x;
+    s16 dz = curve->position.z - (u16)motion->position.z;
     if ((dx < 0 ? -dx : dx) <= 32 && (dz < 0 ? -dz : dz) <= 32)
         return 1;
     if (dx || dz) {
@@ -59,19 +61,36 @@ static inline u8 ApproachStoredPoint(struct ChaseActor *actor, struct SavedMotio
     return 0;
 }
 
+static inline u8 MotionState_TestFlags(struct SceneActorControlMotionState *state, u32 mask)
+{
+    if (state->flags3D4 & mask)
+        return 1;
+    return 0;
+}
+
+static inline void MotionState_SetFlags(struct SceneActorControlMotionState *state, u32 mask)
+{
+    state->flags3D4 |= mask;
+}
+
+static inline void MotionState_ClearFlags(struct SceneActorControlMotionState *state, u32 mask)
+{
+    state->flags3D4 &= ~mask;
+}
+
 // confidence=low: homes on a stored point, then picks a new point around the player.
 
 void SceneActorControl_WanderAroundPlayer(struct ChaseActor *actor)
 {
-    u8 *body = actor->base.context;
+    struct SceneActorControlMotionState *body = actor->base.context;
     if (SceneActorControl_TakeStateEntry(actor)) {
-        u8 *context = actor->base.context;
+        struct SceneActorControlMotionState *context = actor->base.context;
         SceneActorTerrain_InstallControl(actor, actor->base.onAlternateEntry, 1);
-        ZeroFill8(context + 0x42C);
-        context[0x3E3] = 1;
+        ZeroFill8(&context->vectors[2]);
+        context->swayStep = 1;
     }
     SceneActorControl_TickSway(actor);
-    if (ApproachStoredPoint(actor, (void *)(body + 0x3F0),
+    if (ApproachStoredPoint(actor, (struct StoredCurve *)body->unknown3F0,
                             Callback_InvokeActor(actor, actor->base.animationQuery.opaque))) {
         if ((u8)SceneActorControl_AdvancePositionCurve(actor)) {
             struct ContactPosition target;
@@ -81,12 +100,7 @@ void SceneActorControl_WanderAroundPlayer(struct ChaseActor *actor)
             target.x += Shift(gUnk_086149C4[angle], 4);
             target.z += Shift(gUnk_086149C4[(angle + 64) & 255], 4);
             SceneActorControl_StartPositionCurve(actor, &target);
-            {
-                u32 *flags =
-                    &((struct SceneActorControlMotionState *)actor->base.context)->flags3D4;
-                u32 mask = ~8;
-                *flags &= mask;
-            }
+            MotionState_ClearFlags(actor->base.context, 8);
         }
     } else {
         actor->base.counter2AC++;
@@ -113,24 +127,6 @@ static inline u32 MotionRand(void)
     return *(const u16 *)((index << 1) + RANDOM_TABLE_ADDR);
 }
 
-struct StoredMotionState {
-    u8 unknown0[0x3D4];
-    u32 flags;
-    u8 unknown3D8[0xB];
-    u8 mode;
-    u8 unknown3E4[4];
-    u16 timer;
-    u8 unknown3EA[6];
-    struct SavedMotion saved;
-    u8 unknown404[0x28];
-    struct ContactPosition scratch;
-};
-
-static inline void EnableMotionFlags(u32 mask, struct StoredMotionState *state)
-{
-    state->flags |= mask;
-}
-
 struct PlayerPositionView {
     u8 unknown0[0x30];
     struct ContactPosition position;
@@ -140,12 +136,12 @@ struct PlayerPositionView {
 
 void SceneActorControl_UpdateStoredMotion(struct ChaseActor *actor)
 {
-    struct StoredMotionState *body = actor->base.context;
+    struct SceneActorControlMotionState *body = actor->base.context;
     if (SceneActorControl_TakeStateEntry(actor)) {
         SceneActorTerrain_InstallControl(actor, (void *)SceneActorControl_UpdateTimedFacing, 0x24);
-        ZeroFill8(&body->scratch);
-        body->mode = 1;
-        body->timer = 0;
+        ZeroFill8(&body->vectors[2]);
+        body->swayStep = 1;
+        body->waitTimer = 0;
         {
             u32 angle;
             struct ContactPosition target;
@@ -155,25 +151,21 @@ void SceneActorControl_UpdateStoredMotion(struct ChaseActor *actor)
             target.z += Shift(gUnk_086149C4[(angle + 64) & 255], 3);
             SceneActorControl_InitPositionCurveEndpoints(actor, &target);
             SceneActorControl_AdvancePositionCurve(actor);
-            {
-                u32 *flags = &body->flags;
-                u32 mask = ~8;
-                *flags &= mask;
-            }
+            MotionState_ClearFlags(body, 8);
         }
     }
-    if (body->timer != 0) {
-        u32 timer = body->timer;
+    if (body->waitTimer != 0) {
+        u32 timer = body->waitTimer;
         timer--;
-        body->timer = timer;
+        body->waitTimer = timer;
         if ((timer << 16) == 0) {
             SceneActorControl_StartPositionCurve(
                 actor, &((struct PlayerPositionView *)gPlayers[0])->position);
-            EnableMotionFlags(8, body);
+            MotionState_SetFlags(body, 8);
         }
     } else {
         SceneActorControl_TickSway(actor);
-        if (ApproachStoredPoint(actor, &body->saved,
+        if (ApproachStoredPoint(actor, (struct StoredCurve *)body->unknown3F0,
                                 Callback_InvokeActor(actor, actor->base.animationQuery.opaque))) {
             if ((u8)SceneActorControl_AdvancePositionCurve(actor)) {
                 struct ContactPosition target;
@@ -189,7 +181,7 @@ void SceneActorControl_UpdateStoredMotion(struct ChaseActor *actor)
         if (actor->base.tracking.distance > 0xFDE8) {
             SceneActorControl_ResetCollisionPhase(actor);
             actor->base.body.direction = actor->base.tracking.heading;
-            body->timer = 0x1E;
+            body->waitTimer = 0x1E;
             return;
         }
     }
@@ -218,15 +210,9 @@ void SceneActorControl_TickVisibility(struct ChaseActor *actor)
     u32 unavailable = SceneActor_ActionsBlocked((void *)actor);
     if (unavailable)
         return;
-    {
-        u32 mask;
-        u32 active;
-        state = SceneActorControl_GetMotionState(actor);
-        mask = 0x60;
-        active = SceneActorControl_TestFlags(state->flags3D4, mask);
-        if (!active)
-            return;
-    }
+    state = SceneActorControl_GetMotionState(actor);
+    if (!MotionState_TestFlags(state, 0x60))
+        return;
     {
         u32 counter;
         u32 value;
@@ -249,30 +235,14 @@ void SceneActorControl_TickVisibility(struct ChaseActor *actor)
                 ActorStatus_SetDrawableFlags(actor, 1);
                 ActorShadow_Disable(actor->base.shadow);
             }
+        } else if (MotionState_TestFlags(state, 0x20)) {
+            ActorStatus_ClearDrawableFlags(actor, 1);
+            MotionState_ClearFlags(state, 0x20);
+            ActorShadow_Enable(actor->base.shadow);
         } else {
-            u32 mask = 0x20;
-            u32 *inputFlags;
-            u32 *flags;
-            u32 active;
-            inputFlags = &state->flags3D4;
-            active = *inputFlags & mask;
-            flags = inputFlags;
-            active = SceneActorControl_TestFlags(active, ~0);
-            if (active) {
-                ActorStatus_ClearDrawableFlags(actor, 1);
-                {
-                    u32 mask = ~0x20;
-                    *flags &= mask;
-                }
-                ActorShadow_Enable(actor->base.shadow);
-            } else {
-                ActorStatus_SetDrawableFlags(actor, 1);
-                {
-                    u32 mask = ~0x40;
-                    *flags &= mask;
-                }
-                ActorShadow_Disable(actor->base.shadow);
-            }
+            ActorStatus_SetDrawableFlags(actor, 1);
+            MotionState_ClearFlags(state, 0x40);
+            ActorShadow_Disable(actor->base.shadow);
         }
     }
     {
@@ -288,11 +258,7 @@ void SceneActorControl_StartStoredCurve(struct ChaseActor *actor)
     position = actor->base.previousPosition;
     SceneActorControl_StartPositionCurve(actor, &position);
     SceneActorTerrain_EnterState(actor, 2, 0, 3);
-    {
-        u32 *flags = &SceneActorControl_GetMotionState(actor)->flags3D4;
-        u32 mask = ~8;
-        *flags &= mask;
-    }
+    MotionState_ClearFlags(SceneActorControl_GetMotionState(actor), 8);
     actor->base.field2B1 = 0;
 }
 
@@ -397,34 +363,24 @@ struct WanderTriggerView {
     u8 trigger[1];
 };
 
-struct WanderMotionState {
-    u8 unknown0[0x3E0];
-    u16 timer;
-    u8 unknown3E2, mode;
-    u8 unknown3E4[0xC];
-    struct SavedMotion saved;
-    u8 unknown404[0x28];
-    struct ContactPosition scratch;
-};
-
 // confidence=low: homes on a stored point, then consumes a pending trigger and restarts.
 
 void SceneActorControl_UpdateWanderTarget(struct ChaseActor *actor)
 {
-    struct WanderMotionState *body = actor->base.context;
+    struct SceneActorControlMotionState *body = actor->base.context;
     if (SceneActorControl_TakeStateEntry(actor)) {
-        struct WanderMotionState *context = actor->base.context;
-        context->timer = 0;
-        context->mode = 1;
+        struct SceneActorControlMotionState *context = actor->base.context;
+        context->field3E0 = 0;
+        context->swayStep = 1;
         SceneActorControl_StartStoredCurve(actor);
         SceneActorTerrain_InstallControl(actor, actor->base.onAlternateEntry, 1);
-        ZeroFill8(&context->scratch);
+        ZeroFill8(&context->vectors[2]);
         SceneActorPlacement_SetFlags(0x800, &actor->base);
     }
     SceneActorControl_TickSway(actor);
     {
         s32 speed = Callback_InvokeActor(actor, actor->base.animationQuery.opaque);
-        if (ApproachStoredPoint(actor, &body->saved, speed)) {
+        if (ApproachStoredPoint(actor, (struct StoredCurve *)body->unknown3F0, speed)) {
             if ((u8)SceneActorControl_AdvancePositionCurve(actor)) {
                 Trigger_ConsumePending(((struct WanderTriggerView *)actor)->trigger, 1);
                 SceneActorTerrain_EnterState(actor, 2, 0, 2);

@@ -15,7 +15,7 @@ struct SceneActorControlMotionState {
     s8 swayStep;
     s16 sway;
     u8 elapsed, startTick;
-    u8 unknown3E8[2];
+    u16 waitTimer; /* confidence=low: frames before stored motion restarts */
     u16 previousGround;
     u8 randomMotionAngle, randomDelay3ED;
     u16 visibilityFrame;
