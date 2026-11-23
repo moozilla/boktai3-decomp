@@ -6,6 +6,7 @@
 #include "scene_actor_turn.h"
 #include "scene_actor_status.h"
 #include "scene_actor_chase_shared.h"
+#include "word_flags.h"
 void SceneActorMovement_UpdateAirborne(struct SceneActorMotionView *);
 void SceneActorMovement_UpdateHeight(struct ChaseActor *);
 void Obj_StepPosition(void *);
@@ -22,12 +23,6 @@ static inline void SceneActorMotion_SetFlags(struct ChaseActor *actor, u32 bits)
     u16 *field = &actor->base.motionFlags;
     value |= *field;
     *field = value;
-}
-
-static inline void SceneActorMotion_ClearPending(u16 *flags, u32 bits)
-{
-    u32 keep = ~bits;
-    *flags = keep & *flags;
 }
 
 static inline u32 SceneActorMotion_StepSequence(struct SceneActorMotionSequence *drawable,
@@ -189,7 +184,7 @@ s32 SceneActorMovement_UpdateAnimationAndTerrain(struct ChaseActor *object)
         }
     }
 done:
-    SceneActorMotion_ClearPending(flags, 0x2000);
+    HalfwordFlags_Clear(flags, 0x2000);
     actor->base.frameCounter++;
     actor->base.previousPosition = actor->base.body.position;
     return 1;
