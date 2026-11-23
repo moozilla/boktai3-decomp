@@ -1,15 +1,10 @@
 #include "global.h"
+#include "contact_collider.h"
 #include "ram.h"
-
-struct Sub {
-    u8 pad[0x38];
-    u32 flags;
-    u8 pad2[0x54 - 0x3c];
-};
 
 struct Obj {
     u8 pad0[0x190];
-    struct Sub sub[2];
+    struct ContactCollider sub[2];
     u8 pad1[0xB1C - 0x238];
     u16 hB1C;
     u8 pad2[0xB26 - 0xB1E];
@@ -33,9 +28,9 @@ extern u16 gUnk_086141BC[];
 extern void Armor_UpdateContactBoost(struct Obj *, s32, u32);
 extern void Armor_UpdateAccumulatedBehavior(struct Obj *, s32, u32);
 
-static inline void clearFlags(struct Sub *p, u32 mask)
+static inline void clearFlags(struct ContactCollider *p, u32 mask)
 {
-    p->flags &= ~mask;
+    p->reactionFlags &= ~mask;
 }
 
 void Armor_UpdateBehaviorAfterContact(struct Obj *p, s32 delta, u32 flags, s32 flag)
