@@ -2356,16 +2356,11 @@ waiting:
     actor->base.counter2AC++;
 }
 
-extern const u8 gUnk_08606204[];
+extern void *gUnk_08606204[];
 
-struct SSetPrimaryBehaviorPreset {
-    u8 filler[648];
-    const u8 *p;
-};
-
-void Dog_SetPrimaryBehaviorPreset(struct SSetPrimaryBehaviorPreset *s)
+void Dog_SetPrimaryBehaviorPreset(struct ChaseActor *actor)
 {
-    s->p = gUnk_08606204;
+    actor->base.alternateBehaviorCallbacks = gUnk_08606204;
 }
 
 void SceneActor_ConfigureSecondaryProfileEntry(struct ChaseActor *actor);
@@ -2467,16 +2462,11 @@ void Dog_UpdateTrailAttack(struct ChaseActor *a)
         a->base.counter2AC++;
 }
 
-extern const u8 gUnk_0860620C[];
+extern void *gUnk_0860620C[];
 
-struct SSetSecondaryBehaviorPreset {
-    u8 filler[652];
-    const u8 *p;
-};
-
-void Dog_SetSecondaryBehaviorPreset(struct SSetSecondaryBehaviorPreset *s)
+void Dog_SetSecondaryBehaviorPreset(struct ChaseActor *actor)
 {
-    s->p = gUnk_0860620C;
+    actor->base.behaviorCallbacks = gUnk_0860620C;
 }
 
 // confidence=low: tracks player zero and switches from the chase animation to a bite in range.
@@ -2972,9 +2962,9 @@ void Dog_UpdateTurnSequence(struct ChaseActor *actor, s32 frame);
 
 void Dog_SetControlPreset(struct Sapproach *s);
 
-void Dog_SetPrimaryBehaviorPreset(struct SSetPrimaryBehaviorPreset *s);
+void Dog_SetPrimaryBehaviorPreset(struct ChaseActor *actor);
 
-void Dog_SetSecondaryBehaviorPreset(struct SSetSecondaryBehaviorPreset *s);
+void Dog_SetSecondaryBehaviorPreset(struct ChaseActor *actor);
 
 s32 Dog_OnAuxiliaryUpdate(void);
 
