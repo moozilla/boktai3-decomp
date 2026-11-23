@@ -15,10 +15,6 @@ void sub_08014634(s32, s32, void *, void *, void *, s32, s32);
 void sub_082086B8(void);
 void CannonTurret_FireAimedVolley(void);
 void Anim_SetDurationScale(void *, u16);
-static inline void CopyPosition(struct SceneVec *out, const struct SceneVec *in)
-{
-    *out = *in;
-}
 static inline u32 RandomFrom(const u16 *table)
 {
     gRandomIndex = (gRandomIndex + 1) & 0x3ff;
@@ -205,7 +201,7 @@ s32 CannonTurret_UpdateCombat(struct CannonTurretCombat *p)
             s32 count;
             p->defeated = 1;
             CannonTurret_ClearBlink(&p->invulnerability);
-            CopyPosition(&position, &p->sprite.coordinates.position);
+            SceneVec_Copy(&position, &p->sprite.coordinates.position);
             {
                 struct SceneVec *v = &position;
                 v->y += 200;
