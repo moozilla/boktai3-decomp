@@ -170,6 +170,21 @@ def open_session(name):
 def cmd_record(args, extra):
     out = SESSIONS / args.name if '/' not in args.name else Path(args.name)
     r = subprocess.run(['node', str(HERE / 'runner.mjs'), 'record', str(out), *extra], cwd=ROOT)
+    if r.returncode == 0 and (out / 'meta.json').exists():
+        meta = json.loads((out / 'meta.json').read_text())
+        end = meta.get('movieEnd')
+        if end:
+            # the movie's own end state (tools/autopilot `end`): scene and player position
+            s, types = Session(out), Types()
+            ram = s.ram_at(len(s) - 1, after_edits=True)
+            gs = ram.read(types.globals['gGameState']['addr'], 4) if 'gGameState' in types.globals else ram.read(0x02000710, 4)
+            pl = ram.read(types.globals['gPlayers']['addr'], 4)
+            got = {'scene': ram.read(gs + 0x5A4, 2) if gs else None}
+            if pl:
+                got.update(zip('xyz', (ram.read(pl + 0x30 + 2 * i, 2, True) for i in range(3))))
+            same = all(got.get(k) == v for k, v in end.items() if k in got)
+            print(f"movie end {end}: recorded {got} -> {'identical' if same else 'DIFFERENT (the build or start state differs)'}")
+            return 0 if same else 2
     return r.returncode
 
 

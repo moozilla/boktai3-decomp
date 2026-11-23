@@ -108,6 +108,7 @@ class Field:
         self.sources = Counter()        # ('var', name) / ('field', name) / ('param', fn, name)
         self.cowrites = Counter()
         self.last = {}
+        self.changes = set()            # (session, frame) where an instance's value changed
 
     @property
     def key(self):
@@ -117,6 +118,8 @@ class Field:
         self.values[v] += 1
         self.frames_written.add(frame)
         prev = self.last.get(inst)
+        if prev is not None and prev != v:
+            self.changes.add((inst[0], frame))
         if prev is not None:
             d = v - prev
             self.deltas['same' if d == 0 else '+1' if d == 1 else '-1' if d == -1 else '+' if d > 0 else '-'] += 1
@@ -133,6 +136,8 @@ class Inferer:
         self.trace_frames = trace_frames
         self.log = log
         self.fn_addr = {v & ~1: k for k, v in self.types.functions.items()}
+        self.named_changes = defaultdict(set)
+        self.named_last = {}
         self.site_text = {}
 
     def field(self, key, size, kind):
@@ -214,8 +219,16 @@ class Inferer:
                     if ra + rw <= a or ra >= a + sz:
                         continue
                     if not ph:
-                        if len(named_by_site[int(sites[j])]) < 12:
-                            named_by_site[int(sites[j])].add(owner + path)
+                        fk = self.fn_of_site(int(sites[j]))
+                        if len(named_by_site[fk]) < 60:
+                            named_by_site[fk].add(owner + path)
+                        if ra <= a and ra + rw >= a + sz:
+                            nv = (int(vals[j]) >> (8 * (a - ra))) & ((1 << (8 * sz)) - 1)
+                            ik = (s.name, a)
+                            pv = self.named_last.get(ik)
+                            if pv is not None and pv != nv:
+                                self.named_changes[owner + path].add((s.name, int(frames[j])))
+                            self.named_last[ik] = nv
                         continue
                     fld = self.field(ph, sz, k)
                     fld.sessions.add(s.name)
@@ -225,8 +238,8 @@ class Inferer:
                         v = (int(vals[j]) >> (8 * (a - ra))) & ((1 << (8 * sz)) - 1)
                         fld.add_value((s.name, base), v, int(frames[j]))
             for fld in self.fields.values():
-                for site in fld.writers:
-                    for n in named_by_site.get(site, ()):
+                for fk in {self.fn_of_site(site) for site in fld.writers}:
+                    for n in named_by_site.get(fk, ()):
                         fld.cowrites[n] += 1
 
     # reads and forward flow, from a few traced frames
@@ -581,6 +594,28 @@ class Inferer:
         conf = min(conf, 1.0)
         return name, round(conf, 2), reasons, pat, info
 
+    def fn_of_site(self, site):
+        c = self.__dict__.setdefault('_fn_site', {})
+        if site not in c:
+            fn = self.facts.function_of(site)
+            c[site] = fn.name if fn else None
+        return c[site]
+
+    def covary(self, fld, top=3):
+        """Named fields whose value changes in the same frames (Jaccard >= 0.5), among those its
+        writers also write."""
+        if len(fld.changes) < 5:
+            return []
+        out = []
+        for name in list(fld.cowrites)[:120]:
+            other = self.named_changes.get(name)
+            if not other or len(other) < 5:
+                continue
+            j = len(fld.changes & other) / len(fld.changes | other)
+            if j >= 0.5:
+                out.append((name, round(j, 2)))
+        return sorted(out, key=lambda x: -x[1])[:top]
+
     def embeddings(self, min_agree=3):
         """Structs that another struct embeds without declaring it: for each owner, the member
         names other code uses for its placeholder bytes (aliases) are matched against every
@@ -699,7 +734,10 @@ class Inferer:
                   'writers': self.describe_sites(fld.writers, 4), 'readers': self.describe_sites(fld.readers, 4),
                   'flows': [list(map(str, k)) + [c] for k, c in fld.flows.most_common(6)],
                   'sources': [list(map(str, k)) + [c] for k, c in fld.sources.most_common(6)],
-                  'cowrites': [k for k, _ in fld.cowrites.most_common(6)], 'sessions': sorted(fld.sessions)}
+                  'cowrites': [k for k, _ in fld.cowrites.most_common(6)], 'sessions': sorted(fld.sessions),
+                  'covaries': self.covary(fld), 'changes': len(fld.changes)}
+            for nm, j in ev['covaries']:
+                ev['reasons'].append(f'changes in the same frames as {nm} (Jaccard {j})')
             evidence[key] = ev
             rows.append(ev)
         rows = self.merge_ranges(rows)
