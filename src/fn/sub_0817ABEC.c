@@ -1,14 +1,12 @@
 #include "global.h"
 #include "engine_globals.h"
 #include "ram.h"
+#include "contact_position.h"
 /* SceneActors_SpawnDestructionParticles_0817ABEC: same as SceneActors_SpawnDestructionParticles but spawns the sparks on the object itself (provisional name) */
-struct Packed {
-    s32 x : 16, y : 16, z : 16, pad : 16;
-};
 void SparkParticle_Spawn(void *, int, void *, int, int, int, int, int);
 void SceneActors_SpawnDestructionParticles_0817ABEC(u8 *p)
 {
-    struct Packed size;
+    struct ContactPosition size;
     int angle;
     int speed;
     int count;
