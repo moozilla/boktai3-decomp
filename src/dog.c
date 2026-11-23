@@ -176,17 +176,18 @@ static inline u8 Dog_HasAwarenessFlag(struct Dog *context, u32 mask)
     return 0;
 }
 
-static inline void Response(struct ChaseActor *actor, u8 *nav, u32 behavior, u32 response)
+static inline void Response(struct ChaseActor *actor, struct SceneActorChaseGroup *group,
+                            u32 behavior, u32 response)
 {
     Chase_SetState(actor, 0, 2, behavior);
     Chase_SetCtl(actor, (void *)SceneActorControl_OnIdle, 0x10);
-    SceneActorReaction_ResetResponseState(nav + 0x8C, gUnk_0824E2A8, response);
+    SceneActorReaction_ResetResponseState(&group->saved, gUnk_0824E2A8, response);
 }
 
 void Dog_SelectTargetAction(struct ChaseActor *actor)
 {
     struct Dog *context = actor->base.context;
-    u8 *nav = (u8 *)&actor->group.common;
+    struct SceneActorChaseGroup *nav = &actor->group;
     if (SceneActorContact_MotionFlags(actor, 0x100))
         return;
     if (actor->base.tracking.distance < actor->base.tracking.range) {
@@ -261,7 +262,7 @@ static inline void SetTurn(struct ChaseActor *a, u32 value)
 {
     u32 bits = 7;
     bits &= value;
-    ((u8 *)a)[0x3CD] = bits;
+    a->base.nextDirection = bits;
 }
 
 u8 Dog_RequestHeadingTurn(struct ChaseActor *a, s32 heading)
