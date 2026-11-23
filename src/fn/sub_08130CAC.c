@@ -30,7 +30,7 @@ void SceneActorRoute_UpdateAdvancePhase(struct ChaseActor *actor)
     if ((u8)sub_0812F3CC(actor))
         return;
     SceneActorAnimation_SelectDirectionalEntry(actor, 1);
-    speed = Callback_InvokeActor(actor, *(void **)((u8 *)actor + 0x260));
+    speed = Callback_InvokeActor(actor, actor->base.animationQuery.opaque);
     if (SceneActorContact_MotionFlags(actor, 0xA02F)) {
         u16 *p = &actor->base.field2C2;
         *p = 64;
