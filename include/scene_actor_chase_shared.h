@@ -322,6 +322,12 @@ static inline void SceneActorChase_OrHalfFlags(u16 *flags, u32 input)
     *flags |= mask;
 }
 
+/* The u16 mask (loaded before the field's address) matters to agbcc. */
+static inline void SceneActorChase_SetMotionFlags(struct ChaseActor *actor, u16 mask)
+{
+    actor->base.motionFlags = mask | actor->base.motionFlags;
+}
+
 static inline void SceneActorChase_HalfwordFlagsSet(u16 *field, u32 bits)
 {
     u32 value = *field;
