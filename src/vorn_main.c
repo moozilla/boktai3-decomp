@@ -416,8 +416,7 @@ void Vorn_UpdateRouteApproach(struct ChaseActor *actor)
     SceneActorAnimation_SelectDirectionalEntry(actor, 1);
     speed = Callback_InvokeActor(actor, FIELD(actor, 0x260, void *));
     {
-        u32 mask = 0xa02f;
-        if (actor->base.motionFlags & mask) {
+        if (SceneActorContact_MotionFlags(actor, 0xa02f)) {
             u16 *p = &actor->base.field2C2;
             *p = 64;
             scale = p;
@@ -553,8 +552,7 @@ void SceneActorControl_UpdateProbeApproach_080B04F4(struct ChaseActor *actor)
     speed = Callback_InvokeActor(*(&actor), *((void **)(((u8 *)actor) + 0x260)));
     actor->base.field2C2 = 0x20;
     {
-        u32 mask = 0xA02F;
-        if (actor->base.motionFlags & mask) {
+        if (SceneActorContact_MotionFlags(actor, 0xA02F)) {
             u16 *p = &actor->base.field2C2;
             *p = 0x40;
             scale = p;
@@ -1034,12 +1032,10 @@ struct SceneActorForwardCollider {
 static inline u8 unavailable(struct ChaseActor *p)
 {
     if (p) {
-        u32 mask = 0x40;
-        if (p->base.motionFlags & mask)
+        if (SceneActorContact_MotionFlags(p, 0x40))
             return 1;
         {
-            u32 mask = 0x20000;
-            if (p->base.statusFlags & mask)
+            if (SceneActorChase_StatusFlags(p, 0x20000))
                 return 1;
         }
         if (p->base.health <= 0)
@@ -1098,8 +1094,7 @@ static inline u8 active(struct SceneActorRandomReaction *p)
 
 static inline u32 blocked(struct ChaseActor *p)
 {
-    u32 mask = 0xe33f;
-    return p->base.motionFlags & mask;
+    return SceneActorContact_MotionFlags(p, 0xe33f);
 }
 
 void SceneActor_TickRandomReaction(struct ChaseActor *p)
