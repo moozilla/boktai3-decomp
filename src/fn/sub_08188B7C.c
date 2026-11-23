@@ -1,6 +1,7 @@
 #include "global.h"
 #include "contact_collider.h"
 #include "game_state.h"
+#include "scene_combat_colliders.h"
 
 struct ArmorChargeActor {
     u8 pad0[0x18];
@@ -42,12 +43,6 @@ void ActorController_SetBehavior(void *, s32);
 void ActorController_SetBehaviorIfFinished(void *, s32);
 s32 Math_Atan2(s32, s32);
 
-static inline void Armor_ClearPart(struct ContactCollider *part, u32 bits)
-{
-    u32 mask = ~bits;
-    part->reactionFlags &= mask;
-}
-
 /* Prepare a charge and clear the body and attack-part flags. */
 static inline void Armor_BeginCharge(struct ArmorChargeActor *p)
 {
@@ -58,8 +53,8 @@ static inline void Armor_BeginCharge(struct ArmorChargeActor *p)
     damage = p->field112E;
     p->savedB28 = damage;
     p->damage274 = damage;
-    Armor_ClearPart(&p->attack, 0x200004);
-    Armor_ClearPart(&p->body, 0x200004);
+    ContactCollider_ClearReactionFlags(&p->attack, 0x200004);
+    ContactCollider_ClearReactionFlags(&p->body, 0x200004);
 }
 
 /* Select a close strike or a more distant aligned attack. */
