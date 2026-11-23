@@ -80,11 +80,9 @@ void Player_ApplyControlPresentation(u8 *p)
     if (B(0x53D)) {
         s32 jitter;
         u32 random;
-        u32 mask;
         gRandomIndex = (gRandomIndex + 1) & 1023;
         random = *(const u16 *)((gRandomIndex << 1) + (u32)gRandomTable);
-        mask = 15;
-        jitter = (random & mask) - 7;
+        jitter = (random & 15) - 7;
         H(0xAC) += jitter;
         H(0xB0) -= jitter;
         B(0x53D)--;

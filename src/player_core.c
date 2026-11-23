@@ -386,7 +386,6 @@ void Player_RecalculateDerivedStats(struct Player *player)
         s32 remainder, quotient, value;
         u16 *dest;
         const struct GameState *statCursor;
-        u16 cap;
         if (level > 99)
             level = 99;
         remainder = level - 1;
@@ -396,7 +395,6 @@ void Player_RecalculateDerivedStats(struct Player *player)
         value = quotient + 10;
         dest = player->derivedStats;
         statCursor = gGameState;
-        cap = 120;
         for (i = 0; i < 3; i++) {
             *dest = statCursor->statBonuses[0] + value;
             if (remainder > 0) {
@@ -404,7 +402,7 @@ void Player_RecalculateDerivedStats(struct Player *player)
                 remainder--;
             }
             if (*dest > 120)
-                *dest = cap;
+                *dest = 120;
             dest++;
             statCursor = (void *)((const u8 *)statCursor + sizeof(statCursor->statBonuses[0]));
         }

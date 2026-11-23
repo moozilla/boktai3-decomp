@@ -56,7 +56,6 @@ void Player_UpdateConvergingChargeAction(struct Player *p)
             }
             break;
         case 2: {
-            u8 z;
             Player_AddStatusFlags(p, 0xA0);
             if (p->chargeCounter <= 4) {
                 p->chargeCounter++;
@@ -72,17 +71,16 @@ void Player_UpdateConvergingChargeAction(struct Player *p)
                 p->actionEighteenDuration = p->tetherFrame;
             else
                 p->actionEighteenDuration = 0x40 - p->tetherFrame;
-            z = 0;
             p->tetherFrame++;
             if (p->tetherFrame > 0x40)
                 p->tetherFrame = 0;
             if (!(p->inputKeys[0] & 1)) {
                 Player_StopLocalSong(p->slot, 0x239);
-                p->chargeSoundActive = z;
+                p->chargeSoundActive = 0;
                 Player_SetTetherMode(p, 7, 4);
             } else if (!Player_IsUnflaggedBelowResourceLimit(p)) {
                 Player_StopLocalSong(p->slot, 0x239);
-                p->chargeSoundActive = z;
+                p->chargeSoundActive = 0;
                 Player_SetTetherMode(p, 7, 3);
             }
             break;
