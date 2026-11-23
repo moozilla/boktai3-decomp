@@ -21,19 +21,13 @@ void Widget_InitLinked(void *, void *, int, int, int, int, int, void *);
 void MessagePanel_InitSprites(struct MessagePanel *p)
 {
     s32 i;
-    s32 zero;
-    u8 *sprite;
     p->proc = ScriptProc_Start(0xCB05, 0x1289);
     ResourceHeader_Relocate(p->resources, p->proc);
-    i = 0;
-    zero = 0;
-    sprite = (u8 *)p->sprites;
-    for (; i < 23; i++) {
-        Widget_InitLinked(sprite, p->resources, p->spriteIds[i], 0x10, 1, zero, zero, (void *)zero);
+    for (i = 0; i < 23; i++) {
+        Widget_InitLinked(&p->sprites[i], p->resources, p->spriteIds[i], 0x10, 1, 0, 0, 0);
         p->selections[i] = 0xFFFF;
         if (i == 5)
-            p->sprites[5].visible = zero;
-        sprite += 0x60;
+            p->sprites[5].visible = 0;
     }
     p->sprites[7].flags |= 1;
 }
