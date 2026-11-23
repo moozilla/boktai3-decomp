@@ -1,42 +1,21 @@
 #include "global.h"
+#include "ratatosk.h"
 
 void Trigger_ConsumePending(void *, u32);
 
-struct S {
-    u8 pad[0xAA];
-    u8 st;
-    u8 pad2[4];
-    u8 f1;
-    u8 f2;
-    u8 pad3[0xC4 - 0xB1];
-    u32 cnt;
-    u8 pad4[0xE94 - 0xC8];
-    s16 h;
-};
-
-static inline u8 TakeFlag(struct S *p)
-{
-    if (p->f2) {
-        p->f2 = 0;
-        p->f1 = 0;
-        return TRUE;
-    }
-    return FALSE;
-}
-
-void SceneActor_UpdateState24AndConditionalReturnCommand(struct S *p)
+void SceneActor_UpdateState24AndConditionalReturnCommand(struct Ratatosk *p)
 {
     u8 *q = (u8 *)p;
-    if (TakeFlag(p)) {
+    if (Ratatosk_ConsumeActionEntry(p)) {
         u32 v = 0x18;
-        p->st = v;
+        p->actionAnimation = v;
     }
-    if (p->f1) {
+    if (p->actionFinished) {
         if (*(s16 *)(q + 0xE94) == 0) {
             u32 w = 1;
-            p->st = w;
+            p->actionAnimation = w;
         }
         Trigger_ConsumePending((u8 *)p + 0x118, 1);
     } else
-        p->cnt++;
+        p->actionTimer++;
 }

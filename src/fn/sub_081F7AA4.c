@@ -1,51 +1,33 @@
 #include "global.h"
+#include "ratatosk.h"
 #include "engine.h"
 #include "input.h"
 #include "ram.h"
 // Tentative family name: actor animation/state handlers; specific actor identity unknown.
-struct AnimationPosition {
-    u32 packedXY, packedZ;
-};
-struct AnimationActor {
-    u8 pad0[0xaa];
-    u8 animation, mode, padAC[2], state, inputMode, active;
-    u8 padB1[0xc4 - 0xb1];
-    u32 timer;
-    u8 padC8[0x17c - 0xc8];
-    u32 animationTimer;
-    u8 pad180[0x49c - 0x180];
-    s32 animationIndex;
-    u8 pad4A0[0xccc - 0x4a0];
-    struct AnimationPosition positions[9];
-    u8 padD14[0xe5c - 0xd14];
-    struct AnimationPosition position;
-    u8 padE64[8];
-    u16 duration;
-};
 s32 Mod(s32, s32);
-void AnimationActor_ProcessKeys(struct AnimationActor *p)
+void AnimationActor_ProcessKeys(struct Ratatosk *p)
 {
-    struct AnimationActor *q = p;
+    struct Ratatosk *q = p;
     if (gPadState[1] & 0x100) {
         if (++p->animationIndex > 36)
             p->animationIndex = 0;
-        p->animationTimer = 0;
-        p->animation = p->animationIndex;
+        p->actionCounter = 0;
+        p->actionAnimation = p->animationIndex;
     }
     if (gPadState[1] & 0x200) {
         q->duration = 128;
         gRandomIndex = (gRandomIndex + 1) & 1023;
-        q->position =
-            *(struct AnimationPosition
+        q->destination =
+            *(struct ContactPosition
                   *)((Mod(*(const u16 *)(gRandomIndex * 2 + (u32)gRandomTable), 9) * 8 + (u32)q) +
                      0xccc);
         {
             u32 state = 2;
-            p->state = state;
+            p->actionPhase = state;
         }
-        p->timer = 0;
-        p->active = 1;
+        p->actionTimer = 0;
+        p->actionEnter = 1;
     }
-    if (p->inputMode == 1 && q->mode != 3)
-        p->animation = 1;
+    if (p->actionFinished == 1 && q->actionState != 3)
+        p->actionAnimation = 1;
 }

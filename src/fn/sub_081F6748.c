@@ -1,15 +1,10 @@
 #include "global.h"
+#include "ratatosk.h"
 
 #define gSceneAngleSineTable gUnk_086149C4
 typedef struct ProjectilePosition {
     s16 x, y, z, pad;
 } ProjectilePosition;
-typedef struct SpreadProjectileActor {
-    u8 pad0[0xa8];
-    u8 facing;
-    u8 padA9[0xe67];
-    ProjectilePosition target;
-} SpreadProjectileActor;
 extern s16 gUnk_086149C4[];
 s32 Math_Atan2(s32, s32);
 void Projectile_SetBehaviorMode(u8 *, u16);
@@ -30,8 +25,8 @@ static inline void sum(ProjectilePosition *dst, ProjectilePosition *a, Projectil
     dst->y = b->y + a->y;
     dst->z = b->z + a->z;
 }
-void SceneActors_FireTrackingProjectileSpread(SpreadProjectileActor *p,
-                                              ProjectilePosition *position, u32 parameter)
+void SceneActors_FireTrackingProjectileSpread(struct Ratatosk *p, ProjectilePosition *position,
+                                              u32 parameter)
 {
     u8 projectile[0x58];
     ProjectilePosition delta;
@@ -45,7 +40,7 @@ void SceneActors_FireTrackingProjectileSpread(SpreadProjectileActor *p,
     ProjectilePosition *velocity;
     ProjectilePosition *target;
     ProjectilePosition *spawnPtr;
-    target = &p->target;
+    target = &p->shotTarget;
     angle = (u8)Math_Atan2(target->x - position->x, target->z - position->z);
     step = 16;
     rawFacing = ((u32)p->facing << 30) + 0xc0000000;
@@ -68,7 +63,7 @@ void SceneActors_FireTrackingProjectileSpread(SpreadProjectileActor *p,
         Projectile_SetLaunchParameters(projectile, 0, parameter, angle, 24);
         Projectile_SetSpriteParameters(projectile, 0x8e5a, 0, 498);
         Projectile_SetScriptProcedure(projectile, 0x4363, 0);
-        Projectile_SetTrackingTarget(projectile, (u32)&p->target);
+        Projectile_SetTrackingTarget(projectile, (u32)&p->shotTarget);
         Projectile_SetBehaviorMode(projectile, 1);
         Projectile_SpawnAtPosition(projectile, spawnPtr);
         angle = (u8)(angle + step);

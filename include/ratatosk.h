@@ -5,7 +5,7 @@
 #include "camera_tracking.h"
 #include "contact_collider.h"
 #include "contact_position.h"
-#include "scaled_shadow_types.h"
+#include "scene_actor_components.h"
 
 /* The Ratatosk boss body (0xF30 bytes, Ratatosk_InitializeFromScript). Its first 0x178
  * bytes are the StateActor head (names as in include/state_actor.h); past that it has its
@@ -29,16 +29,12 @@ struct RatatoskMotion {
     u8 unknown28[8];
 };
 
+struct Player;
+
 struct Ratatosk {
     u8 unknown0[0x48];
-    u32 bodyId, bodyFlags;
-    u8 bodyMode;
-    u8 angle; /* 0x51: body direction; RATATOSK_SET_FACING derives facing and facing8. */
-    u8 unknown52[2];
-    struct ContactPosition position; /* 0x54 */
-    struct ContactPosition motion;   /* 0x5C */
-    u8 unknown64[0x90 - 0x64];
-    u32 callbackFrame; /* 0x90 */
+    struct SceneActorBody body; /* 0x48: direction (0x51) gives facing and facing8. */
+    u32 callbackFrame;          /* 0x90 */
     s16 health, maxHealth;
     u8 unknown98[2];
     u8 vulnerable; /* 0x9A */
@@ -72,8 +68,8 @@ struct Ratatosk {
     void (*actionCallback)(void);
     void *actionTryUpdate; /* 0x104: called through Callback_InvokeActor. */
     void *actionReset;     /* 0x108 */
-    const void *target;
-    const void *targetPositionPointer;
+    struct Player *player; /* 0x10C: the target player. */
+    const struct ContactPosition *playerPosition;
     s8 savedAngle; /* 0x114 */
     u8 unknown115[3];
     u8 receiver2[0x10]; /* 0x118: StateActor receiver2. */
@@ -89,7 +85,9 @@ struct Ratatosk {
     u8 animation[0x20];                      /* 0x32C */
     u8 animationData[0x20];                  /* 0x34C */
     struct ContactPosition anchor;           /* 0x36C: collider and shadow position. */
-    u8 unknown374[0x394 - 0x374];
+    u8 unknown374[0x380 - 0x374];
+    u8 spriteScaleX, spriteScaleY; /* 0x380: shrink and fade-out scale. */
+    u8 unknown382[0x394 - 0x382];
     void *palette; /* 0x394: the active palette bank. */
     u8 unknown398[0x3AC - 0x398];
     struct RatatoskMotion motionPath;
@@ -114,7 +112,7 @@ struct Ratatosk {
     u8 unknownCB8[4];
     u32 unknownCBC, unknownCC0; /* cleared every frame by the collider update. */
     u8 unknownCC4[4];
-    s32 cloneTimer; /* 0xCC8 */
+    s32 cloneTimer;                   /* 0xCC8 */
     struct ContactPosition points[9]; /* 0xCCC: path points from script keyword 'm'. */
     u8 unknownD14[4];
     struct RatatoskSlot orbPoints[9]; /* 0xD18 */
@@ -122,14 +120,14 @@ struct Ratatosk {
     u8 unknownE38[0xE4C - 0xE38];
     s16 selectedPoint, selectedTarget; /* 0xE4C */
     s16 distance;
-    u16 scaleX, scaleZ; /* 0xE52: cleared by the directional animation update. */
-    u8 unknownE56[2];
-    u16 scaleStep;
-    u16 repeat; /* 0xE5A */
+    s16 scaleX, scaleZ; /* 0xE52: sprite scale, cleared by the directional animation update. */
+    s16 scaleSpeed;
+    s16 scaleMode;                      /* 0xE58: 0 normal, 1 stretched (960 by 1440). */
+    u16 repeat;                         /* 0xE5A */
     struct ContactPosition destination; /* 0xE5C */
     struct ContactPosition center;      /* 0xE64 */
     u16 duration;                       /* 0xE6C */
-    u16 frameDamage;                    /* 0xE6E: cleared every frame by the collider update. */
+    s16 frameDamage;                    /* 0xE6E: cleared every frame by the collider update. */
     u8 motionFlag;
     u8 unknownE71;
     u8 targetAngle; /* 0xE72 */
@@ -142,9 +140,9 @@ struct Ratatosk {
     s16 transferDelay; /* 0xE7E: sun-orb player transfer countdown. */
     s16 interruptLock;
     s16 transferArmed;
-    u16 timer; /* 0xE84 */
+    s16 timer;    /* 0xE84 */
     s16 orbTimer; /* 0xE86 */
-    s16 hasOrb; /* 0xE88 */
+    s16 hasOrb;   /* 0xE88 */
     s16 previousAngle;
     s16 ended;
     s16 pattern;
@@ -169,7 +167,7 @@ struct Ratatosk {
     s16 cloneCount;
     s16 waitTimer; /* 0xEDE */
     s16 particleTimer;
-    s16 orbReady; /* 0xEE2 */
+    s16 orbReady;      /* 0xEE2 */
     s16 paletteToggle; /* 0xEE4 */
     s16 angleLimit;
     u32 savedPhase, savedTime, savedState, savedSequence; /* 0xEE8 */
@@ -181,8 +179,8 @@ struct Ratatosk {
     u32 incomingDamage;
     s16 contactValue; /* 0xF0C */
     s16 orbParameter;
-    struct ContactPosition anchorOffset; /* 0xF10 */
-    void *homingProjectiles;             /* 0xF18 */
+    struct ContactPosition shotTarget; /* 0xF10: point tracked by the homing shots. */
+    void *homingProjectiles;           /* 0xF18 */
     void *playerClones;
     void *particles;
     void *animatedParticles;
@@ -202,6 +200,24 @@ static inline u8 Ratatosk_ConsumeActionEntry(struct Ratatosk *actor)
         return TRUE;
     }
     return FALSE;
+}
+
+/* SceneActors_SetFacing on this type: the body direction and the four- and eight-way
+ * facings derived from it. */
+static inline void Ratatosk_SetFacing(struct Ratatosk *actor, int angle)
+{
+    struct Ratatosk *self = actor;
+    s32 shifted;
+    u32 direction;
+    self->body.direction = angle;
+    shifted = (self->body.direction + 0x60) >> 6;
+    direction = 3;
+    direction &= shifted;
+    self->facing = direction;
+    shifted = (self->body.direction + 0x70) >> 5;
+    direction = 7;
+    direction &= shifted;
+    self->facing8 = direction;
 }
 
 static inline void Ratatosk_SetAnimation(struct Ratatosk *actor, u32 animation)

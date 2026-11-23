@@ -1,36 +1,11 @@
 #include "global.h"
+#include "ratatosk.h"
 #include "engine.h"
 #include "player.h"
 #include "ram.h"
 
 struct RatatoskOrbitPoint {
     u32 xy, z;
-};
-struct RatatoskOrbitActor {
-    u8 pad0[0x54];
-    struct SceneVec position;
-    u8 pad5c[0x34];
-    u32 timer;
-    u8 pad94[0x16];
-    u8 animation, padAB[4], ready, active;
-    u8 padB1[0x1b];
-    u8 angle;
-    u8 padCD[0xb3];
-    s32 sequence, complete;
-    u8 pad188[0xb44];
-    struct RatatoskOrbitPoint points[9];
-    u8 padD14[0x146];
-    u16 repeat;
-    struct SceneVec destination, center;
-    u16 duration;
-    u8 padE6e[6];
-    s16 hitTimer;
-    u8 padE76[0x14];
-    s16 previousAngle, ended;
-    u8 padE8e[0x50];
-    s16 waitTimer, particleTimer;
-    u8 padEe2[4];
-    s16 angleLimit;
 };
 extern const s16 gUnk_086149C4[];
 struct SceneVec *Player_GetEffectivePosition(s32);
@@ -45,18 +20,9 @@ void Player_EndState25(void *);
 void SlotMotion_Initialize(void *);
 void Ratatosk_ConfigureParticle(void *, s32, s32, s32, s32, s32);
 void SceneParticles_SpawnAtPosition(void *, void *);
-static inline void setAnimation(struct RatatoskOrbitActor *p, u32 animation)
+static inline void setAnimation(struct Ratatosk *p, u32 animation)
 {
-    p->animation = animation;
-}
-static inline u8 consume(struct RatatoskOrbitActor *p)
-{
-    if (p->active) {
-        p->active = 0;
-        p->ready = 0;
-        return 1;
-    }
-    return 0;
+    p->actionAnimation = animation;
 }
 static inline u32 randomB(void)
 {
@@ -98,15 +64,15 @@ inline static void sum_081F7FD0(struct SceneVec *d, struct SceneVec *a, struct S
     d->z = b->z + a->z;
 }
 
-void Ratatosk_UpdatePlayerOrbitAttack(struct RatatoskOrbitActor *p)
+void Ratatosk_UpdatePlayerOrbitAttack(struct Ratatosk *p)
 {
-    struct RatatoskOrbitActor *q = p;
+    struct Ratatosk *q = p;
     struct {
         u32 zero;
         u32 config[6];
     } scratch;
     struct SceneVec offsetVector, deltaVector, positionVector;
-    if (consume(q)) {
+    if (Ratatosk_ConsumeActionEntry(q)) {
         setAnimation(q, 9);
         p->sequence = 0;
         p->repeat = 0;
@@ -116,16 +82,16 @@ void Ratatosk_UpdatePlayerOrbitAttack(struct RatatoskOrbitActor *p)
     }
     switch (p->sequence) {
         case 0:
-            if (q->ready) {
+            if (q->actionFinished) {
                 if (p->hitTimer > 0) {
                     struct SceneVec *playerPosition;
                     struct Player *player;
                     p->sequence = 1;
                     playerPosition = Player_GetEffectivePosition(0);
-                    difference(&p->center, playerPosition, &q->position);
-                    p->center.x = q->position.x + Div(p->center.x, 2);
-                    p->center.y = q->position.y;
-                    p->center.z = q->position.z + Div(p->center.z, 2);
+                    difference(&p->center, playerPosition, &q->body.position);
+                    p->center.x = q->body.position.x + Div(p->center.x, 2);
+                    p->center.y = q->body.position.y;
+                    p->center.z = q->body.position.z + Div(p->center.z, 2);
                     p->duration = 128;
                     polar(&offsetVector, ((((((u8)randomB()) + 0x60) >> 6) & 3) * 64) + 64, 512);
                     sum_081F7FD0(&p->destination, &offsetVector, &p->center);
@@ -140,13 +106,13 @@ void Ratatosk_UpdatePlayerOrbitAttack(struct RatatoskOrbitActor *p)
                     setAnimation(q, 5);
                 } else if ((++p->waitTimer) > 2) {
                     p->duration = 64;
-                    p->complete = 1;
+                    p->sequenceDone = 1;
                 } else {
                     s32 index = Mod(randomB(), 9);
                     struct RatatoskOrbitPoint *destination =
                         (struct RatatoskOrbitPoint *)&p->destination;
                     u32 address = index * sizeof(struct RatatoskOrbitPoint) + (u32)p;
-                    address += (u32) & ((struct RatatoskOrbitActor *)0)->points;
+                    address += (u32) & ((struct Ratatosk *)0)->points;
                     *destination = *(struct RatatoskOrbitPoint *)address;
                     setAnimation(q, 4);
                     p->sequence = 3;
@@ -177,11 +143,11 @@ void Ratatosk_UpdatePlayerOrbitAttack(struct RatatoskOrbitActor *p)
                         p->particleTimer = 10;
                 }
                 if (p->particleTimer > 0) {
-                    s32 step = Mod(q->timer, 32);
+                    s32 step = Mod(q->callbackFrame, 32);
                     struct SceneVec *delta;
                     struct SceneVec *position;
                     struct SceneVec *effectivePosition;
-                    difference(&deltaVector, &q->position, Player_GetEffectivePosition(0));
+                    difference(&deltaVector, &q->body.position, Player_GetEffectivePosition(0));
                     delta = &deltaVector;
                     if (!step) {
                         ClearVector(delta, &scratch.zero);
@@ -201,7 +167,7 @@ void Ratatosk_UpdatePlayerOrbitAttack(struct RatatoskOrbitActor *p)
                 }
             }
         finish:
-            if (q->ready) {
+            if (q->actionFinished) {
                 setAnimation(q, 7);
                 p->waitTimer = 0;
                 p->sequence = 2;
@@ -214,19 +180,19 @@ void Ratatosk_UpdatePlayerOrbitAttack(struct RatatoskOrbitActor *p)
             if ((p->waitTimer == 13) && (!p->ended)) {
                 struct Player *player = gPlayers[0];
                 if (flag(player, 0x40000) != 1)
-                    Player_ApplyInterpolatedMovement(player, &p->center, 30, q->angle, 0, 42, 30,
-                                                     0);
+                    Player_ApplyInterpolatedMovement(player, &p->center, 30, q->requestedAngle, 0,
+                                                     42, 30, 0);
                 Sound_StopSong(0x569);
             }
-            if (q->ready) {
+            if (q->actionFinished) {
                 p->duration = 64;
-                p->complete = 1;
+                p->sequenceDone = 1;
             }
             p->waitTimer++;
             break;
 
         case 3:
-            if (q->ready) {
+            if (q->actionFinished) {
                 setAnimation(q, 9);
                 p->sequence = 0;
                 p->repeat = 0;

@@ -62,7 +62,7 @@ void Ratatosk_UpdateSunOrbPlacement(struct Ratatosk *p)
         switch (*sequence) {
             case 0:
                 if (q->actionFinished) {
-                    if (Ratatosk_IsPositionOutsideArena(&q->position)) {
+                    if (Ratatosk_IsPositionOutsideArena(&q->body.position)) {
                         Ratatosk_EnterPhase(q, 11);
                     } else {
                         Ratatosk_SetAnimation(q, 11);
@@ -96,7 +96,8 @@ void Ratatosk_UpdateSunOrbPlacement(struct Ratatosk *p)
                         SunOrb_SetMotionParams(&config, 360, 4, 0, 2);
                         ((u16 *)&config)[11] = p->orbParameter;
                         {
-                            s32 slot = SunOrb_CreateAtPosition(&config, &p->orbPoints[point].position);
+                            s32 slot =
+                                SunOrb_CreateAtPosition(&config, &p->orbPoints[point].position);
                             if (slot >= 0) {
                                 p->orbPoints[point].active = 1;
                                 p->targets[slot].active = 1;

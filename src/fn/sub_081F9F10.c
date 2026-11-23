@@ -1,32 +1,8 @@
 #include "global.h"
+#include "ratatosk.h"
+#include "player.h"
 struct PackedVec {
     s32 x : 16, y : 16, z : 16, pad : 16;
-};
-struct Sprite {
-    u8 pad[9];
-    u8 direction;
-};
-struct Ratatosk {
-    u8 pad0[0x48];
-    struct Sprite sprite;
-    u8 pad54[0x3c];
-    u32 timer;
-    u8 pad94[0x8];
-    u32 flags;
-    u8 padA0[2];
-    u8 mode;
-    u8 padA3;
-    u32 modeTime;
-    u8 padA8[3];
-    u8 animation, state, nextState, changed, padAF, active, reset;
-    u8 padB2[0x12];
-    u32 ticks;
-    u8 padC8[0x38];
-    void (*callback)(void);
-    u8 pad104[8];
-    u8 *player;
-    u8 unk110[0xE72 - 0x110];
-    u8 reactionDirection;
 };
 void DamageNumberDisplay_Show(void *, s32, s32, void *, void *, s32);
 void Ratatosk_BeginDirectionalReaction(void);
@@ -34,24 +10,24 @@ void Ratatosk_UpdateDirectionalRecovery(void);
 void Ratatosk_UpdateDefeatSequence(void);
 static inline void setState(struct Ratatosk *p, u32 state, u32 next, u32 changed)
 {
-    p->state = state;
-    p->nextState = next;
-    p->changed = changed;
-    p->ticks = 0;
-    p->active = 1;
+    p->actionMode = state;
+    p->actionIndex = next;
+    p->actionPhase = changed;
+    p->actionTimer = 0;
+    p->actionEnter = 1;
 }
 static inline void setCallback(struct Ratatosk *p, void (*callback)(void), u32 animation)
 {
-    p->animation = animation;
-    p->callback = callback;
-    p->timer = 0;
-    p->reset = 1;
-    p->mode = 0;
-    p->modeTime = 0;
+    p->actionState = animation;
+    p->actionCallback = callback;
+    p->callbackFrame = 0;
+    p->actionChanged = 1;
+    p->reactionPhase = 0;
+    p->reactionTimer = 0;
 }
 s32 Ratatosk_ApplyDamageReaction(struct Ratatosk *p, s32 kind, s32 damage)
 {
-    struct Sprite *sprite = &p->sprite;
+    struct SceneActorBody *body = &p->body;
     struct PackedVec size;
     switch (kind) {
         case 0:
@@ -68,13 +44,13 @@ s32 Ratatosk_ApplyDamageReaction(struct Ratatosk *p, s32 kind, s32 damage)
             setState(p, 1, 0, 3);
             setCallback(p, Ratatosk_UpdateDirectionalRecovery, 17);
             {
-                u32 direction = sprite->direction;
-                p->reactionDirection = direction;
+                u32 direction = body->direction;
+                p->targetAngle = direction;
             }
             break;
         case 1: {
-            u32 direction = p->player[0x2d];
-            u8 *dest = &p->reactionDirection;
+            u32 direction = (u8)p->player->unk2D;
+            u8 *dest = &p->targetAngle;
             u32 zero = 0;
             *dest = direction;
             {
