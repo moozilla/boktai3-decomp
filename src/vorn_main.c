@@ -3465,11 +3465,11 @@ u32 Vorn_OnRender(void *actor)
     return 0;
 }
 
-void SceneActorEffects_ReleaseResources(void);
+void SceneActorEffects_ReleaseResources(void *);
 
-u32 Vorn_OnDestroy(u8 *unused)
+u32 Vorn_OnDestroy(u8 *actor)
 {
-    SceneActorEffects_ReleaseResources();
+    SceneActorEffects_ReleaseResources(actor);
     return 0;
 }
 
