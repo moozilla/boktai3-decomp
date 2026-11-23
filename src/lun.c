@@ -418,9 +418,8 @@ void Lun_TurnTowardSavedDirection(struct ChaseActor *actor)
     }
     sequence = &((struct SceneActorAnimationSequenceDrawable *)actor->base.drawable)->sequence;
     {
-        u32 mask = 0xA02F;
         u16 *scale;
-        if (actor->base.motionFlags & mask) {
+        if (SceneActorContact_MotionFlags(actor, 0xA02F)) {
             actor->base.field2C2 = 64;
             scale = &actor->base.field2C2;
         } else {
