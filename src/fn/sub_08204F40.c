@@ -7,6 +7,7 @@
 #include "player_cue_sequence.h"
 #include "engine_pause.h"
 #include "word_flags.h"
+#include "monster_particle_random.h"
 extern u32 gUnk_02000560;
 s32 Callback_InvokeActor(void *, void *);
 void Collider_SetPosition(void *, void *, u32);
@@ -31,11 +32,6 @@ struct EffectPair {
 struct EffectVector {
     struct EffectPair a, b;
 };
-static inline u32 RandomFrom(const u16 *table)
-{
-    gRandomIndex = (gRandomIndex + 1) & 0x3ff;
-    return table[gRandomIndex];
-}
 s32 EnemyD459_Update(u8 *p)
 {
     struct ColliderView *collider;
@@ -79,12 +75,13 @@ s32 EnemyD459_Update(u8 *p)
             }
             velocity.a.lo = -4;
             table = (const u16 *)RANDOM_TABLE_ADDR;
-            velocity.a.hi = RandomFrom(table) & 7;
+            velocity.a.hi = ParticleRandom_ReadDirectSample(table) & 7;
             velocity.b.lo = -4;
             spread.a.lo = 24;
-            spread.a.hi = (RandomFrom(table) & 7) + 3;
+            spread.a.hi = (ParticleRandom_ReadDirectSample(table) & 7) + 3;
             spread.b.lo = 24;
-            sub_08014634((RandomFrom(table) & 3) + 4, 13, &center, &velocity, &spread, 15, 15);
+            sub_08014634((ParticleRandom_ReadDirectSample(table) & 3) + 4, 13, &center, &velocity,
+                         &spread, 15, 15);
             Anim_RestartSequence(p + 0x10c, *(void **)(p + 0x158), 4, 0, 0);
             *position = U(0x1c) + 0x40;
             {

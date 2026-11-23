@@ -1588,11 +1588,6 @@ void CameraFollow_Initialize(void *, void *, void *, u32);
 void *ContactSequencePool_Create(s32, u32, s32, u32, u32);
 void *OrbitContactActor_Create(const struct ContactPosition *, u32);
 
-static inline void GridAttack_SetCameraLimits(struct CameraTracking *camera, s32 min, s32 max)
-{
-    camera->minimum = min;
-    camera->maximum = max;
-}
 s32 GridAttackActor_Initialize(struct GridAttackActor *p, u32 ctx)
 {
     struct GridAttackActor *actor = p;
@@ -1793,7 +1788,7 @@ s32 GridAttackActor_Initialize(struct GridAttackActor *p, u32 ctx)
 
     p->shadowPosition = p->drawable.position;
     CameraFollow_Initialize(&p->camera, positions[0], &p->shadowPosition, 1);
-    GridAttack_SetCameraLimits(&p->camera, 0, 0x8C);
+    CameraTracking_SetRange(&p->camera, 0, 0x8C);
 
     SceneActors_SetDamageCallback(actor, &p->damageCollider, (void *)GridAttackActor_OnDamage, 0);
     if (Script_GetKeywordValue(0x43, 1) != 0)

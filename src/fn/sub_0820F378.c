@@ -9,6 +9,7 @@
 #include "ram.h"
 #include "engine_pause.h"
 #include "word_flags.h"
+#include "monster_particle_random.h"
 // confidence=low: handles collision damage, defeat effects, palette flashing and animation.
 extern u32 gUnk_02000560;
 s32 Callback_InvokeActor(void *, void *);
@@ -26,14 +27,9 @@ struct OrangeSpineEffectPair {
 struct OrangeSpineEffectVector {
     struct OrangeSpineEffectPair a, b;
 };
-static inline u32 OrangeSpine_RandomSample(const u16 *table)
-{
-    gRandomIndex = (gRandomIndex + 1) & 0x3ff;
-    return table[gRandomIndex];
-}
 static inline u16 OrangeSpine_RandomBurstCount(const u16 *table)
 {
-    return (OrangeSpine_RandomSample(table) & 3) + 4;
+    return (ParticleRandom_ReadDirectSample(table) & 3) + 4;
 }
 static inline u32 OrangeSpine_StepSequence(struct DisplaySequenceSprite *owner,
                                            struct DisplaySequenceState *state)
@@ -151,10 +147,10 @@ s32 OrangeSpine_UpdateDamageState(struct OrangeSpineActor *p)
             }
             velocity.a.lo = -4;
             table = gRandomTable;
-            velocity.a.hi = OrangeSpine_RandomSample(table) & 7;
+            velocity.a.hi = ParticleRandom_ReadDirectSample(table) & 7;
             velocity.b.lo = -4;
             spread.a.lo = 24;
-            spread.a.hi = (OrangeSpine_RandomSample(table) & 7) + 3;
+            spread.a.hi = (ParticleRandom_ReadDirectSample(table) & 7) + 3;
             spread.b.lo = 24;
             sub_08014634(OrangeSpine_RandomBurstCount(table), 13, &center, &velocity, &spread, 15,
                          15);

@@ -6,10 +6,6 @@ struct CameraPackedPosition {
 u16 Sqrt(u32);
 s32 Div(s32, s32);
 void Camera_SetPosition(struct CameraPackedPosition *);
-static inline u32 Test(u32 *flags, u32 mask)
-{
-    return *flags & mask;
-}
 void CameraTracking_UpdatePosition(struct CameraTracking *tracking)
 {
     struct CameraPosition *first = tracking->first;
@@ -35,7 +31,7 @@ void CameraTracking_UpdatePosition(struct CameraTracking *tracking)
         tracking->scale = tracking->maximum;
     factor = Vanargand_TruncateShift(tracking->scale * tracking->blend, 7);
     position.x = first->x + Vanargand_TruncateShift((second->x - first->x) * factor, 8);
-    if (Test(&tracking->flags, 1))
+    if (Vanargand_MaskedFlags(&tracking->flags, 1))
         position.y = first->y + 150;
     else
         position.y = first->y + Vanargand_TruncateShift((second->y - first->y) * factor, 8);
