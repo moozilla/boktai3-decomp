@@ -8,7 +8,7 @@ static inline s16 IsUnavailable(struct ChaseActor *input, u32 disabledInput, u32
         u32 mask;
         u16 *first;
         u32 value;
-        first = (void *)((u8 *)actor + 0x2d4);
+        first = &actor->base.motionFlags;
         value = *first;
         mask = disabled;
         value &= mask;
@@ -16,7 +16,7 @@ static inline s16 IsUnavailable(struct ChaseActor *input, u32 disabledInput, u32
             goto one;
         {
             u32 *second;
-            second = (void *)((u8 *)actor + 0x2d0);
+            second = &actor->base.statusFlags;
             value = *second;
             mask = excluded;
             value &= mask;
