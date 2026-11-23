@@ -362,6 +362,11 @@ void clear(void) {
     def test_literal_local_is_never_changed(self):
         self.assertEqual(warns("void f(u32 a) {\n    u32 mask = 0x17;\n    if (mask & a)\n        g();\n}\n"),
                          ["literal-local"])
+        # a complemented literal is one too, initialized or assigned on its own line
+        for body in ("    u32 mask = ~1;\n", "    u32 mask = ~0x141C0u;\n", "    u32 mask;\n    mask = ~ 8;\n"):
+            with self.subTest(body=body):
+                self.assertEqual(warns("void f(u32 *a) {\n" + body + "    *a &= mask;\n}\n"), ["literal-local"])
+        self.assertEqual(warns("void f(u32 *a, u32 b) {\n    u32 mask = ~b;\n    *a &= mask;\n}\n"), [])
         # a counter, an accumulator, something passed by address, and a later scope's own variable
         for body in ("    int i = 0;\n    while (i < 4)\n        g(i++);\n",
                      "    u32 sum = 0;\n    sum += a;\n    g(sum);\n",

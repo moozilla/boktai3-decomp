@@ -53,8 +53,10 @@ its spelling, so each one is a question, not a verdict:
   assignment in a one-pass loop before returning the assigned temporary.
 * `const-local`: a local named for a number (`zero`, `one`, `two`, `zeroX`, `four`, ...), which
   only holds that constant, alone or in a grouped declaration (`u32 kind, zero;`), with or
-  without `register`. A `goto` label, a `return` operand or a struct member is not one.
-* `literal-local`: any other local that is initialized to a literal and never changed
+  without `register`, or a parameter of a `static inline` named that way
+  (`Restore(struct A *a, u32 kind, u32 zero)`). A `goto` label, a `return` operand or a struct
+  member is not one.
+* `literal-local`: any other local that is initialized to a literal (`0x17`, `-1`, `~8`) and never changed
   (`u32 mask = 0x17;` then `if (mask & flags)`), in any declarator of a declaration
   (`int i = 0, limit = 8;`). Also a local whose first use is a separate literal assignment in the
   declaration's own block (`u32 mask; ... mask = 0x17;`, reported at the assignment), and a local
@@ -136,7 +138,8 @@ _REGEX = {
 # a local named for a number: zero, one, zeroX, two_, four2 (not zeroed, oneshot, tenth)
 _NUMBER_NAME = (r"(?:zero|one|two|three|four|five|six|seven|eight|nine|ten|sixteen|minusOne|negOne|allOnes)"
                 r"(?:[A-Z_0-9]\w*)?")
-_LITERAL = r"-?(?:0[xX][0-9A-Fa-f]+|\d+)[uUlL]*"
+_LITERAL_DIGITS = r"(?:0[xX][0-9A-Fa-f]+|\d+)[uUlL]*"
+_LITERAL = r"(?:-|~\s*)?" + _LITERAL_DIGITS  # `~0x141C0` is as much a literal as `-1`
 _DECL_TYPE = (r"(?:(?:register|const)\s+){0,2}(?:unsigned\s+|signed\s+)?"
               r"(?!v[us]\d|volatile\b|goto\b|return\b|static\b|else\b|case\b|register\b|const\b)\w+\s+\*?")
 # A local declaration: its first declarator follows the type; _local_declarations walks the rest.
@@ -553,7 +556,7 @@ _OPERATOR_AFTER = re.compile(_OPERATOR)
 _BITWISE = ("&", "|", "^", "~", "<<", ">>")
 _BITWISE_STORE = ("&=", "|=", "^=", "<<=", ">>=")
 # a call argument that is a constant: literals and ALL_CAPS names, joined by constant operators
-_CONSTANT_ARG = re.compile(r"(?:\s|[-+~*()|&^]|<<|>>|(?<![\w.])(?:" + _LITERAL.removeprefix("-?")
+_CONSTANT_ARG = re.compile(r"(?:\s|[-+~*()|&^]|<<|>>|(?<![\w.])(?:" + _LITERAL_DIGITS
                            + r"|[A-Z][A-Z0-9_]*)(?![\w.]))+")
 _DECLARED_ARG = re.compile(r"\s*(?:void|(?:const\s+|struct\s+|union\s+|enum\s+)*[A-Za-z_]\w*[\s*]+\**\s*[A-Za-z_]\w*)\s*")
 _INCLUDE = re.compile(r'(?m)^[ \t]*#[ \t]*include[ \t]+"([^"\n]+)"')
