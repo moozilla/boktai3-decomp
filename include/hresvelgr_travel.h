@@ -22,9 +22,12 @@ struct HresvelgrTravelActor {
     u8 facing4, facing8, requestedAnimation, currentAnimation;
     u8 actionMode, actionIndex, actionPhase, finished;
     u8 actionEnter, changed, pulse;
-    u8 padB3[0xCC - 0xB3];
+    u8 padB3[0xC4 - 0xB3];
+    u32 actionTimer; /* 0xC4: StateActor actionTimer. */
+    u8 padC8[0xCC - 0xC8];
     u8 targetHeading;
-    u8 padCD[0x104 - 0xCD];
+    u8 padCD[0x100 - 0xCD];
+    void *actionCallback; /* 0x100: StateActor actionCallback. */
     void *callback;
     u8 pad108[4];
     struct Player *player;
@@ -60,15 +63,21 @@ struct HresvelgrTravelActor {
     u16 flashPalette[7][16]; /* 0x704: initialized to RGB555 gray. */
 };
 
-static inline u8 Hresvelgr_EnterVulnerableBehavior(struct HresvelgrTravelActor *actor)
+/* StateActor_ConsumeActionEntry on this type. */
+static inline u8 Hresvelgr_ConsumeActionEntry(struct HresvelgrTravelActor *actor)
 {
-    actor->vulnerable = 1;
     if (actor->actionEnter) {
         actor->actionEnter = 0;
         actor->finished = 0;
         return TRUE;
     }
     return FALSE;
+}
+
+static inline u8 Hresvelgr_EnterVulnerableBehavior(struct HresvelgrTravelActor *actor)
+{
+    actor->vulnerable = 1;
+    return Hresvelgr_ConsumeActionEntry(actor);
 }
 
 static inline void Hresvelgr_SetFlags(struct HresvelgrTravelActor *actor, u32 flags)
@@ -81,6 +90,17 @@ static inline void Hresvelgr_SetFlags(struct HresvelgrTravelActor *actor, u32 fl
 static inline void Hresvelgr_SetActionAnimation(struct HresvelgrTravelActor *actor, u32 animation)
 {
     actor->requestedAnimation = animation;
+}
+
+/* SceneActorState_StartAction on this type. */
+static inline void Hresvelgr_StartAction(struct HresvelgrTravelActor *actor, u32 mode, u32 index,
+                                         u32 phase)
+{
+    actor->actionMode = mode;
+    actor->actionIndex = index;
+    actor->actionPhase = phase;
+    actor->actionTimer = 0;
+    actor->actionEnter = 1;
 }
 
 static inline void Hresvelgr_EnterPhase(struct HresvelgrTravelActor *actor, u32 phase)
