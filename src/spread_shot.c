@@ -6,6 +6,7 @@
 #include "sprite_notice.h"
 #include "scene_actor_reset.h"
 #include "ram.h"
+#include "vanargand_parts.h"
 
 /* Bounce-shot terrain probe: may the shot enter the next cell, else slide it along a wall or up
  * a slope toward the player. The match depends on GCSE's expression hash table size (insns at
@@ -188,14 +189,6 @@ static inline u8 Seek(struct ContactPosition *position, s32 cell, s32 target)
     return 0;
 }
 
-static inline void Delta(struct ContactPosition *out, struct ContactPosition *a,
-                         struct ContactPosition *b)
-{
-    out->x = a->x - b->x;
-    out->y = a->y - b->y;
-    out->z = a->z - b->z;
-}
-
 u8 SpreadShot_ResolveTerrain(struct SpreadShot *shot, s32 angle, u32 next)
 {
     struct ContactPosition *position;
@@ -255,7 +248,7 @@ u8 SpreadShot_ResolveTerrain(struct SpreadShot *shot, s32 angle, u32 next)
             if (!player)
                 preferred = 0;
             else {
-                Delta(&delta, (struct ContactPosition *)&player->position, position);
+                Vanargand_Difference(&delta, (struct ContactPosition *)&player->position, position);
                 preferred = ((Math_Atan2(delta.x, delta.z) + 0x20) & 0xFF) >> 6;
             }
             Memory_Clear(found, 4);
