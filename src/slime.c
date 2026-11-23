@@ -1,3 +1,4 @@
+#include "scene_actor_displacement.h"
 #include "scene_actor_chase.h"
 #include "tentacle_spread.h"
 #include "slime.h"
@@ -75,13 +76,6 @@ static inline void Slime_AddPositions(struct ContactPosition *out, struct Contac
     out->z = b->z + a->z;
 }
 
-static inline void Slime_SubtractMotion(struct ContactPosition *out, struct ContactPosition *a,
-                                        struct ContactPosition *b)
-{
-    out->x = a->x - b->x;
-    out->y = a->y - b->y;
-    out->z = a->z - b->z;
-}
 
 static inline s32 Slime_QuarterDirectionForContact(s32 angle)
 {
@@ -106,9 +100,9 @@ void Slime_ResolveBodyContact(struct ContactCollider *contact, void *other,
 
     if (contactFlags) {
         Slime_AddPositions(&next, &actor->base.body.position, &actor->base.body.motion);
-        Slime_SubtractMotion(&displacement, (void *)&contact->x, &next);
+        SceneActorTerrain_Subtract(&displacement, (void *)&contact->x, &next);
         SceneActorTerrain_GetCenter(actor->base.terrainCell, &center);
-        Slime_SubtractMotion(&fromContact, &center, (void *)&contact->x);
+        SceneActorTerrain_Subtract(&fromContact, &center, (void *)&contact->x);
         angle = Slime_QuarterDirectionForContact(Math_Atan2(fromContact.x, fromContact.z) + 32);
         switch (angle) {
             case 0:
@@ -371,10 +365,6 @@ void Slime_OnUnusedControlEvent(void)
 
 // confidence=low: motion converges to saved displacement before choosing idle or the next Slime control.
 
-static inline s32 Slime_QuarterMotion(s32 v)
-{
-    return v >= 0 ? v >> 2 : -(-v >> 2);
-}
 
 static inline s32 Slime_ClampMotion(s32 v)
 {
@@ -424,8 +414,8 @@ void Slime_ConvergeReactionMotion(struct ChaseActor *actor)
     u32 *actorFlags;
     u32 *t;
     if (Slime_TakePrepared(actor)) {
-        actor->base.secondaryMotion.x = Slime_QuarterMotion(actor->base.secondaryMotion.x);
-        actor->base.secondaryMotion.z = Slime_QuarterMotion(actor->base.secondaryMotion.z);
+        actor->base.secondaryMotion.x = SceneActorDisplacement_Quarter(actor->base.secondaryMotion.x);
+        actor->base.secondaryMotion.z = SceneActorDisplacement_Quarter(actor->base.secondaryMotion.z);
         SceneActorAnimation_SelectProfileEntry((void *)actor, 3);
         {
             u16 *flags = &actor->base.motionFlags;
@@ -442,14 +432,14 @@ void Slime_ConvergeReactionMotion(struct ChaseActor *actor)
         s32 difference = current - *field;
         actorFlags = t;
         priorX = field;
-        x = Slime_QuarterMotion(difference);
+        x = SceneActorDisplacement_Quarter(difference);
     }
     {
         s32 current = actor->base.reactionStart.z;
         s16 *field = &actor->base.reactionEnd.z;
         s32 difference = current - *field;
         priorZ = field;
-        z = Slime_QuarterMotion(difference);
+        z = SceneActorDisplacement_Quarter(difference);
     }
     x = Slime_ClampMotion(x);
     z = Slime_ClampMotion(z);
@@ -1238,13 +1228,6 @@ static inline void Slime_TargetBurstPolarMotion(struct ContactPosition *v, s32 a
     v->z = Slime_TargetBurstFixed12(gUnk_086149C4[angle & 255] * radius);
 }
 
-static inline void Slime_TargetBurstDelta(struct ContactPosition *v, struct ContactPosition *from,
-                                          struct ContactPosition *to)
-{
-    v->x = to->x - from->x;
-    v->y = to->y - from->y;
-    v->z = to->z - from->z;
-}
 
 static inline u16 *Slime_TargetBurstPalette(struct ChaseActor *actor)
 {
@@ -1280,7 +1263,7 @@ void Slime_EmitTargetedReactionBurst(struct ChaseActor *input)
     s32 angle;
     u32 variant = Slime_GetRandomVariantFlags(actor);
     s16 jitter = Slime_TargetBurstRandom() & 15;
-    Slime_TargetBurstDelta(&velocity, &actor->base.body.position,
+    Chase_Delta(&velocity, &actor->base.body.position,
                            &actor->base.tracking.target->position);
     angle = Math_Atan2(velocity.x, velocity.z);
     Slime_TargetBurstPolarMotion(&velocity, angle + jitter, (Slime_TargetBurstRandom() & 7) + 6);
@@ -1385,13 +1368,6 @@ static inline void Slime_SetPolarMotion(struct ContactPosition *v, s32 angle, s3
     v->z = Slime_TruncateFixed12(gUnk_086149C4[angle & 255] * radius);
 }
 
-static inline void Slime_SubtractPositions(struct ContactPosition *v, struct ContactPosition *from,
-                                           struct ContactPosition *to)
-{
-    v->x = to->x - from->x;
-    v->y = to->y - from->y;
-    v->z = to->z - from->z;
-}
 
 static inline u16 *Slime_PaletteBase(struct ChaseActor *actor)
 {
@@ -1437,7 +1413,7 @@ void Slime_EmitScatteredReactionBurst(struct ChaseActor *input)
     s32 angle;
     u32 variant = Slime_GetRandomVariantFlags(actor);
     s32 jitter = Slime_RandomSample() & 15;
-    Slime_SubtractPositions(&velocity, &actor->base.body.position,
+    Chase_Delta(&velocity, &actor->base.body.position,
                             &actor->base.tracking.target->position);
     angle = Slime_RandomSample() & 255;
     Slime_SetPolarMotion(&velocity, angle + jitter, (Slime_RandomSample() & 7) + 12);
