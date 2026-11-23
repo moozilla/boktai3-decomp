@@ -1,5 +1,6 @@
 #include "pooled_motion.h"
 #include "scene_actor_components.h"
+#include "word_flags.h"
 
 void MotionPool_FinishOnResourceContact(void *a, void *b, struct MotionPoolSlot *slot)
 {
@@ -344,8 +345,7 @@ s32 MotionPool_UpdateUntilDeadline(struct MotionPoolSlot *slot, s32 index)
     struct MotionPoolParams *params = &slot->params;
     MotionPool_AdjustHeading(slot);
     {
-        u32 flag = 2;
-        slot->flags |= flag;
+        WordFlags_Set(2, &slot->flags);
     }
     if (slot->frame >= params->endFrame)
         return 1;
