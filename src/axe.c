@@ -2162,13 +2162,6 @@ struct AxeFlashDrawable {
     struct DisplayTrackGraphics graphics;
 };
 
-static inline u8 TestFlag(const u32 *flags, u32 mask)
-{
-    if (*flags & mask)
-        return 1;
-    return 0;
-}
-
 /* Fade the attack palette, then restore the actor palette when the level reaches zero. */
 
 void Axe_UpdateAttackFlashFade(struct ChaseActor *actor)
@@ -2216,7 +2209,7 @@ void Axe_UpdateAttackFlashFade(struct ChaseActor *actor)
         state->reset = 0;
     }
     {
-        if (TestFlag(flags, 0x180)) {
+        if (WordFlags_Has(0x180, flags)) {
             ((struct AxeFlashDrawable *)actor->base.drawable)->graphics.defaultPalette = 0x13F;
             ((struct AxeFlashDrawable *)actor->base.drawable)->graphics.palette = state->palette;
             switch (state->level) {
@@ -2234,7 +2227,7 @@ void Axe_UpdateAttackFlashFade(struct ChaseActor *actor)
                     break;
             }
             if (++state->timer > 9) {
-                if (!TestFlag(flags, 0x80)) {
+                if (!WordFlags_Has(0x80, flags)) {
                     if (--state->level <= 0) {
                         void *drawable =
                             &((struct AxeFlashDrawable *)actor->base.drawable)->graphics;
