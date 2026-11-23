@@ -50,7 +50,7 @@ void SceneHud_UpdateTimedMessage(struct SceneHudState *p)
         MessageWindow_SetBounds(0, 16, 30, 2);
         SceneHud_RefreshActionIcons(p);
         Hud_SetInteractionCallback(p, SceneHud_UpdateActionSelection, 1);
-        q = (u8 *)p + 0x4384;
+        q = p->actionInput;
         Inventory_InitializeSelectionGrid(q, 1, 0);
         SceneHud_GetActionIconPosition((u8 *)p + 0x1620, ((u8 *)p)[0x4387]);
         SceneHud_ShowActionPreview(p);

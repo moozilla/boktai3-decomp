@@ -40,19 +40,16 @@ void SceneHud_FinishActionSlide(struct SceneHudState *s)
         SceneHud_RefreshActionIcons(s);
         Hud_SetInteractionCallback(s, PauseMenu_OnSwapSelectionUpdate, 1);
         {
-            u32 o1 = 0x4384;
             u8 *b;
             u8 *in;
             u8 *pp;
-            in = (u8 *)s + o1;
+            in = (u8 *)s + 0x4384;
             Inventory_InitializeSelectionGrid(in, 1, 0);
             {
-                u32 o3 = 0x1620;
-                pp = (u8 *)s + o3;
+                pp = (u8 *)s + 0x1620;
             }
             {
-                u32 o2 = 0x4387;
-                b = (u8 *)s + o2;
+                b = (u8 *)s + 0x4387;
             }
             SceneHud_GetActionIconPosition(pp, *b);
         }
