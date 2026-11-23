@@ -3,6 +3,7 @@
 #include "player.h"
 #include "contact_actor.h"
 #include "player_slot_status.h"
+#include "scene_vec_polar.h"
 
 struct PlayerSelection;
 
@@ -20,11 +21,6 @@ struct Player *Player_FindMaskedSlot(const struct PlayerSelection *);
 void sub_08242FAC(struct Player *, u32);
 void sub_08243020(struct Player *, u32);
 
-static inline u32 Test16(u32 m, u16 *pv)
-{
-    return *pv & m;
-}
-
 static inline u32 InMode(struct Player *p, u32 mode)
 {
     u32 r;
@@ -38,13 +34,6 @@ static inline u32 InMode(struct Player *p, u32 mode)
             r = 1;
     }
     return r;
-}
-
-static inline s32 TruncShift(s32 value, s32 shift)
-{
-    if (value >= 0)
-        return value >> shift;
-    return -(-value >> shift);
 }
 
 u32 Player_ApplyContact(struct Player *p, struct ContactCollider *source,
@@ -111,16 +100,16 @@ u32 Player_ApplyContact(struct Player *p, struct ContactCollider *source,
         s32 angle = ((p->facing + 5) & 7) << 5;
         s32 v;
         v = gUnk_086149C4[(angle + 64) & 255] * 80;
-        a.x = TruncShift(v, 12);
+        a.x = SceneVec_TruncateComponent(v);
         a.y = 200;
         v = gUnk_086149C4[angle] * 80;
-        a.z = TruncShift(v, 12);
+        a.z = SceneVec_TruncateComponent(v);
         SceneParticle_CreateDefaultPriority((struct ContactPosition *)&p->position, &a, 0, 0, 1);
     }
     amount = target->cost;
     amount <<= shift;
     target->cost = 0;
-    if (!(source->statRewardFlags & 0x10) && Test16(0xF, &source->contactFlags)) {
+    if (!(source->statRewardFlags & 0x10) && ContactCollider_TestContactFlags(source, 0xF)) {
         if (Player_ReadStatusBits(&source->reactionFlags, 0x20))
             sub_08242FAC(Player_FindMaskedSlot((const struct PlayerSelection *)source), amount);
         if (Player_ReadStatusBits(&source->reactionFlags, 2))
