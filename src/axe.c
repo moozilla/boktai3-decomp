@@ -734,11 +734,6 @@ static inline u32 Arg1(u32 k_, struct RoomActor *actor)
     return (*((u16 *)(((u8 *)actor) + 0x2D4))) & k_;
 }
 
-static inline u32 Arg2(u32 k_, struct RoomActor *actor)
-{
-    return (*((u32 *)(((u8 *)actor) + 0x2CC))) & k_;
-}
-
 void Axe_UpdateTurnAnimation(struct RoomActor *actor, u32 events)
 {
     u8 *direction = ((u8 *)actor) + 0x50;
@@ -796,7 +791,7 @@ void Axe_UpdateTurnAnimation(struct RoomActor *actor, u32 events)
         u32 flags;
         u32 selection;
         SceneActorChase_SetControl(actor, *((void **)(((u8 *)actor) + 0x224)), 2);
-        if (Arg2(0x10000, actor))
+        if (Flags_MaskedWord(0x10000, &actor->behaviorFlags))
             direction[9] += 32;
         else
             direction[9] -= 32;
@@ -809,7 +804,7 @@ void Axe_UpdateTurnAnimation(struct RoomActor *actor, u32 events)
 
 static inline u16 Flag(struct RoomActor *actor, u16 mask)
 {
-    u16 *p = (void *)((u8 *)actor + 0x2D6);
+    u16 *p = &actor->reactionFlags;
     return *p = mask | *p;
 }
 
