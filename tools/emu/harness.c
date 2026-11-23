@@ -418,6 +418,10 @@ static void loadstate(const char* rel) {
 int main(int argc, char** argv) {
 	if (argc != 4) { fprintf(stderr, "usage: %s ROM SCRIPT OUTDIR\n", argv[0]); return 1; }
 	outdir = argv[3];
+	// mGBA's cartridge RTC converts the clock with localtime_r: pin the zone so
+	// "rtc SECONDS" (and BOKTAI3_RTC) mean UTC on every host, as the port's clock does
+	setenv("TZ", "UTC", 1);
+	tzset();
 	mLogSetDefaultLogger(&quiet);
 	core = mCoreFind(argv[1]);
 	if (!core || !core->init(core)) { fprintf(stderr, "core init failed\n"); return 1; }
