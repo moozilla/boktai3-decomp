@@ -8,6 +8,7 @@
 #include "rotation_phase.h"
 #include "scene_actor_reset.h"
 #include "axe.h"
+#include "word_flags.h"
 #include "scene_actor_animation.h"
 #include "scene_actor_state.h"
 #include "scene_actor_behavior.h"
@@ -34,6 +35,7 @@
 #include "scene_actor_init_primitives.h"
 #include "scene_actor_init_graphics.h"
 #include "scene_actor_init_body.h"
+#include "scene_actor_turn.h"
 
 struct AxeTrailSprite {
     u32 flags;
@@ -174,11 +176,6 @@ static inline s32 Absolute(s32 value)
     return value;
 }
 
-static inline void ClearFlags(u32 *p, u32 mask)
-{
-    *p &= ~mask;
-}
-
 void Axe_UpdateReturningTrail(struct AxeActor *p, s32 frame)
 {
     struct AxeTrail *trail = p->trail;
@@ -235,7 +232,7 @@ void Axe_UpdateReturningTrail(struct AxeActor *p, s32 frame)
                 p->phase = phase;
                 p->callback = callback;
                 p->timer = 0;
-                ClearFlags(&p->flags114, 1);
+                SceneActorChase_ClearWordFlags(&p->flags114, 1);
                 p->word104 = 0;
             }
         }
@@ -501,11 +498,6 @@ static inline s32 Axe_ShiftSigned(s32 v)
     return v >= 0 ? v >> 6 : -(-v >> 6);
 }
 
-static inline u32 Axe_TestFlags(u32 k_, u32 *flags)
-{
-    return (*flags) & k_;
-}
-
 struct AxeLungePlayer {
     u8 unknown0[0x30];
     struct ContactPosition position;
@@ -586,7 +578,7 @@ void Axe_UpdateTargetLunge(struct ChaseActor *a, s32 frame)
         else
             state->angularSpeed = 0;
     }
-    if (Axe_TestFlags(0x10, flags)) {
+    if (Flags_MaskedWord(0x10, flags)) {
         state->queued = 1;
         RotationPhase_Change(a, SceneActorControl_FinishRotation, 0x33);
         {
@@ -877,11 +869,6 @@ static inline void SetFlags(struct ChaseActor *a, u32 m)
     a->base.motionFlags = v;
 }
 
-static inline void SetForced(struct ChaseActor *a, u32 m)
-{
-    a->base.statusFlags = m | a->base.statusFlags;
-}
-
 static inline void SetContext(u8 *p, u32 m)
 {
     *(u32 *)(p + 0xE4C) = m | *(u32 *)(p + 0xE4C);
@@ -948,7 +935,7 @@ void Axe_ConvergeRecoveryMotion(struct ChaseActor *actor)
             s32 m = ~0x80;
             *f &= m;
         }
-        SetForced(actor, 0x100000);
+        SceneActorChase_SetStatusFlags(actor, 0x100000);
         Axe_ResetMovementFlags(actor);
         SetContext(context, 0x10);
         RestoreHistory(actor, actor->group.common.gate.duration);
@@ -965,11 +952,6 @@ void Axe_UpdateAttackColliderPositions(struct S080FC7F4 *s);
 struct S080FC844;
 
 void Axe_ReleaseAuxiliarySprite(struct S080FC844 *s);
-
-static inline void OrStatus(u16 status, u16 *flags)
-{
-    *flags |= status;
-}
 
 static inline u8 HasAuxiliary(const u8 *state)
 {
@@ -1016,7 +998,7 @@ void Axe_UpdateDamageSpin(struct ChaseActor *actor, s32 frame)
     }
     if (*(u16 *)(context + 0xED4)) {
         --*(u16 *)(context + 0xED4);
-        OrStatus(0x20, &actor->base.reactionFlags);
+        HalfwordFlags_Set(0x20, &actor->base.reactionFlags);
     }
     if (context[0xA3C]) {
         u32 previous = context[0xA34];
@@ -2419,18 +2401,6 @@ struct S080FB938;
 
 void Axe_SetAuxiliarySpriteResource(struct S080FB938 *s, u32 x);
 
-static inline u32 Axe_ReadMaskedFlags(u32 mask, const u32 *field)
-{
-    return *field & mask;
-}
-
-static inline u8 Axe_TestFlags_UpdatePaletteTransition(u32 value, u32 mask)
-{
-    if (value & mask)
-        return 1;
-    return 0;
-}
-
 static inline s32 Axe_ChannelValue(s32 value)
 {
     return value >= 0 ? value >> 8 : -(-value >> 8);
@@ -2476,11 +2446,11 @@ u32 Axe_UpdatePaletteTransition(struct ChaseActor *actor)
     if (SceneActorPlacement_IsUnavailable((void *)actor))
         return 0;
     context = actor->base.context;
-    if (!Axe_TestFlags_UpdatePaletteTransition(Axe_ReadMaskedFlags(2, &context->flags), ~0))
+    if (!SceneActorChase_Test(Flags_MaskedWord(2, &context->flags), ~0))
         return 0;
     p = &context->transition;
     if (!p->remaining) {
-        if (!Axe_ReadMaskedFlags(0x02008000, &actor->base.behaviorFlags))
+        if (!Flags_MaskedWord(0x02008000, &actor->base.behaviorFlags))
             Axe_BindPalette(actor, p);
         return 1;
     }
@@ -3679,7 +3649,7 @@ void Axe_FireAttack(struct ChaseActor *actor)
         Axe_ApplyAttack(&context->attackColliders[0], actor, 2);
         Axe_ApplyAttack(&context->attackColliders[1], actor, 2);
     } else {
-        u32 value = Axe_ReadMaskedFlags(0x800, &context->flags);
+        u32 value = Flags_MaskedWord(0x800, &context->flags);
         selection.flags = &context->flags;
         if (Axe_TestMaskedFlags(value)) {
             s32 power = actor->base.attacks.first[2] * 2;
@@ -3916,11 +3886,6 @@ static inline void Or16(u32 m, u16 *p)
     *p = m | *p;
 }
 
-static inline void Or32(u32 m, u32 *p)
-{
-    *p |= m;
-}
-
 static inline void Restart(struct ChaseActor *actor)
 {
     void *callback = (void *)ActorPhase_UpdateSpriteCollapse;
@@ -3960,7 +3925,7 @@ void SceneActorControl_UpdateControl35Phase(struct ChaseActor *actor)
     if (SceneActorControl_TakeFlag(&actor->base.field2B1)) {
         SceneActorChase_SetControl(actor, Axe_UpdateTargetWindup, 0x35);
         Or16(0x100, &actor->base.motionFlags);
-        Or32(0x800, &context->flagsE4C);
+        WordFlags_Set(0x800, &context->flagsE4C);
         context->fieldEBA = context->fieldEC2;
         Or16(0x1000, &actor->base.placementFlags);
     }
@@ -4441,18 +4406,6 @@ struct SceneActorReactionCountContext {
     u16 fieldED4;
 };
 
-static inline u8 TestFlag_AdvanceReactionCount(u32 mask, u32 *flags)
-{
-    if (*flags & mask)
-        return 1;
-    return 0;
-}
-
-static inline u32 MaskFlags(u16 *p, u32 mask)
-{
-    return *p & mask;
-}
-
 s32 SceneActorControl_AdvanceReactionCount(struct ChaseActor *actor)
 {
     struct SceneActorReactionCountContext *context = actor->base.context;
@@ -4469,8 +4422,8 @@ s32 SceneActorControl_AdvanceReactionCount(struct ChaseActor *actor)
         context->fieldED4 = 8;
     if (context->reactionCount <= 2)
         ++context->reactionCount;
-    if (!MaskFlags(flags, 0x8100)) {
-        u32 blocked = TestFlag_AdvanceReactionCount(4, &context->flagsE4C);
+    if (!SceneActorTurn_Flags(flags, 0x8100)) {
+        u32 blocked = WordFlags_Has(4, &context->flagsE4C);
         if (!blocked && context->reactionCount > 2) {
             u32 phase = 2;
             u32 behavior = 6;
