@@ -220,7 +220,8 @@ class Slicer:
         self.terminals = []
         self.summaries = []
         self.seen = set()
-        self.expanded_sites = set()     # store sites already followed
+        self.expanded_sites = set()     # (store site, address) already followed
+        self.site_count = defaultdict(int)
         self.cycles = []                # (frame, site, addr): a statement met again, not followed
         self.log = log or (lambda *a: None)
         self.truncated = False
@@ -329,13 +330,14 @@ class Slicer:
         # each statement is followed once per slice: a run of the same store to the same
         # address (a counter) is counted through the write log and the slice continues
         # at the store that started the run; any other repeat is an earlier cycle
-        if site in self.expanded_sites:
+        if (site, addr) in self.expanded_sites or self.site_count[site] >= 4:
             if self.prev_store_site(frame, pos, addr) == site:
                 self.collapse(frame, pos, addr, width, site)
             else:
                 self.cycles.append((frame, site, addr))
             return
-        self.expanded_sites.add(site)
+        self.expanded_sites.add((site, addr))
+        self.site_count[site] += 1
         if k == K_CPY:
             node = self.add(frame, pos, inv, fn, x, 'copy', note=f'copy of {int(row["c"])} bytes')
             src = int(row['b']) + (addr - int(row['a']))

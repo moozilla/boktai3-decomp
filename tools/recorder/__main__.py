@@ -81,6 +81,13 @@ def walk_path(types, t, rest, base=0, ram=None):
 
 
 def resolve_place(where, types, objmap_at):
+    try:
+        return _resolve_place(where, types, objmap_at)
+    except ValueError as e:
+        raise SystemExit(f'cannot resolve {where!r}: {e}')
+
+
+def _resolve_place(where, types, objmap_at):
     m = re.fullmatch(r'(0x[0-9A-Fa-f]+|\d+)(?::(\d+))?', where)
     if m:
         addr = int(m[1], 0)

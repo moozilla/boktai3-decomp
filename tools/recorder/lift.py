@@ -246,6 +246,9 @@ class ObjectMap:
                 for i in range(n):
                     yield from self._pointers_uncached(d['of'], f'{prefix}[{i}]', base + i * es)
 
+    def _raw(self, t):
+        return _is_raw(self.t, t)
+
     def at(self, addr, width=1):
         """(label, field path, leaf type, object base) for ADDR."""
         best = None
@@ -258,6 +261,8 @@ class ObjectMap:
                 best = self.objects[j]
             j -= 1
         st = self.t.static_at(addr)
+        if st and best is not None and self._raw(st[2]):
+            st = None   # raw storage (a byte array) that a typed pointer gives a type
         if st and (best is None or st[0] >= best[0]):
             a, name, t = st
             p, leaf, _ = self.t.path(t, addr - a, width)
@@ -267,6 +272,14 @@ class ObjectMap:
             p, leaf, _ = self.t.path(tname, addr - a, width)
             return label, p, leaf, a
         return region_name(addr), '', None, None
+
+
+def _is_raw(types, t):
+    d = types.resolve(t)
+    if not d or d.get('k') != 'array':
+        return False
+    e = types.resolve(d['of'])
+    return bool(e) and e.get('k') == 'int' and e.get('size') == 1
 
 
 def join(label, path):
