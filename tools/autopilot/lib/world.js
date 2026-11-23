@@ -226,6 +226,7 @@ exports.navigate = function* (target, opts = {}) {
   for (const b of exports.boxes()) if ((opts.avoid || []).includes(b.name) && b.name !== String(target).toUpperCase())
     for (let cz = b.z0 >> 8; cz <= (b.z1 - 1) >> 8; cz++) for (let cx = b.x0 >> 8; cx <= (b.x1 - 1) >> 8; cx++) avoid.add(`${cx},${cz}`);
   let plans = 0, pushes = 0;
+  const tried = new Set();  // blocks a break attempt failed on
   exports.message();  // installs the message window hooks before anything opens
   const done = (reached, reason, extra) => ({ reached, reason, scene: exports.where().scene, frames: g.frameNo - start, plans, ...extra });
   while (g.frameNo - start < budget) {
@@ -264,6 +265,24 @@ exports.navigate = function* (target, opts = {}) {
         const r = yield* exports.push(plan[0], opts);
         if (opts.trace) opts.trace({ push: plan[0], ...r });
         if (r.done) { blocked.clear(); continue; }
+      }
+    }
+    if (!path && !opts.noBreak) {
+      // breakable blocks (wooden crates, health > 0) in the way: plan as if they were
+      // gone, then break the first one on the route with the weapon
+      const crates = exports.blocks().filter((b) => b.health > 0 && !tried.has(b.slot));
+      const open = { ...grid, cells: grid.cells.slice(), at: null };
+      for (const b of crates) { const c = grid.at(b.x, b.z); if (c) open.cells[c.index] = { ...c, level: b.top - 1, open: true }; }
+      open.at = (x, z) => (x < 0 || z < 0 || x >= grid.w || z >= grid.h ? null : open.cells[z * grid.w + x]);
+      const route = exports.findPath(open, here, goals, new Set([...blocked, ...avoid]));
+      const first = route && route.map(([x, z]) => crates.find((b) => b.x === x && b.z === z)).find(Boolean);
+      if (opts.trace) opts.trace({ breakPlan: first ? [first.x, first.z] : null });
+      if (first) {
+        tried.add(first.slot);
+        const r = yield* exports.breakBlock(first, opts);
+        if (opts.trace) opts.trace({ broke: [first.x, first.z], ...r });
+        if (r.done) { blocked.clear(); tried.delete(first.slot); }
+        continue;
       }
     }
     if (!path) return done(false, 'no path');
@@ -345,6 +364,34 @@ exports.collect = function* (x, z, opts = {}) {
   }
   const after = exports.bags();
   return { done: JSON.stringify(after) !== before, lines: i.lines, reason: i.reason, bags: after };
+};
+
+// Break a block (a wooden crate: SceneObject with health) with the weapon: stand on a
+// neighboring cell at its floor level, face it and attack (B) until it is gone.
+exports.breakBlock = function* (block, opts = {}) {
+  const grid = exports.grid(), p = $.gPlayers[0];
+  const goals = new Set();
+  for (const [dx, dz] of DIRS) {
+    const c = grid.at(block.x - dx, block.z - dz);
+    if (c && c.open && c.level === block.top - 1) goals.add(`${block.x - dx},${block.z - dz}`);
+  }
+  const here = exports.cellOf(p.position.x, p.position.z);
+  const path = goals.has(here.join(',')) ? [here] : exports.findPath(grid, here, goals);
+  if (!path) return { done: false, reason: 'no cell next to it' };
+  const [sx, sz] = path[path.length - 1];
+  const r = yield* exports.navigate([sx * 256 + 128, sz * 256 + 128], { ...opts, noBreak: true, frames: 1800 });
+  if (!r.reached) return { done: false, reason: 'could not get next to it: ' + r.reason };
+  const key = exports.DIR_KEYS[DIRS.findIndex(([dx, dz]) => sx + dx === block.x && sz + dz === block.z)];
+  const alive = () => exports.blocks().some((b) => b.slot === block.slot && b.health > 0);
+  let hits = 0;
+  for (let t = 0; t < 40 && alive(); t++) {
+    yield g.press(key, 4);  // face it
+    yield g.press(key + '+b', 2);
+    yield g.press(0, 16);
+    hits++;
+    yield* exports.clearInterruptions(opts);
+  }
+  return { done: !alive(), hits, health: (exports.blocks().find((b) => b.slot === block.slot) || {}).health };
 };
 
 // Push planning: a breadth-first search over block states with the game's rules
