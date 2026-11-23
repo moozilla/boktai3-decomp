@@ -8,7 +8,7 @@ void PositionedEffect_OnAttackContact(void)
 {
 }
 
-void Collision_CalculateDamageResponse(void *);
+void Collision_CalculateDamageResponse(void *, void *);
 
 void PlayerStats_AddContactHundredths(void *, void *, u32);
 
@@ -17,7 +17,7 @@ void PositionedEffect_ReceiveContact(struct ContactCollider *source,
                                      struct VanargandPairAttack *actor)
 {
     u32 flags;
-    Collision_CalculateDamageResponse(source);
+    Collision_CalculateDamageResponse(source, contact);
     actor->damage = contact->cost;
     flags = source->reactionFlags;
     actor->hitFlags = flags;
