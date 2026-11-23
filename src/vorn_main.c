@@ -618,27 +618,11 @@ void SceneActorControl_UpdateProbeApproach_080B04F4(struct ChaseActor *actor)
 
 /* Tentative phase-control interpretation; names have low confidence. */
 
-static inline void SelectControl(struct ChaseActor *p, void *control, u32 kind)
-{
-    p->base.field2B2 = 1;
-    p->base.stepDone = 0;
-    p->base.controlKind = kind;
-    p->base.target = control;
-    p->base.field2C8 = 0;
-    {
-        u32 *flags = &p->base.pendingControlFlags;
-        s32 mask = -2;
-        *flags &= mask;
-    }
-    p->base.pendingControl = 0;
-}
 
 void SceneActorPhase_UpdateConditionalMotion(struct ChaseActor *p)
 {
     if (SceneActorControl_TakeFlag(&p->base.field2B1)) {
-        void *control = p->base.onEntry;
-        u32 kind = 2;
-        SelectControl(p, control, kind);
+        Chase_SetCtl(p, p->base.onEntry, 2);
     }
     if (SceneActor_IsFacingNearbyTarget(p)) {
         if ((u8)Callback_InvokeActor(p, p->base.contactQuery.opaque))
@@ -653,7 +637,7 @@ void SceneActorPhase_UpdateConditionalMotion(struct ChaseActor *p)
         p->base.behavior2AA = phase;
         p->base.counter2AC = 0;
         p->base.field2B1 = 1;
-        SelectControl(p, p->base.onStanding, 0);
+        Chase_SetCtl(p, p->base.onStanding, 0);
     } else
         ++p->base.counter2AC;
 }
@@ -668,9 +652,7 @@ static inline u8 PhaseComplete(struct ChaseActor *p)
 void SceneActorPhase_BeginTimedMotion(struct ChaseActor *p)
 {
     if (SceneActorControl_TakeFlag(&p->base.field2B1)) {
-        void *control = p->base.onEntry;
-        u32 kind = 2;
-        SelectControl(p, control, kind);
+        Chase_SetCtl(p, p->base.onEntry, 2);
     }
     if (SceneActor_IsFacingNearbyTarget(p)) {
         if ((u8)Callback_InvokeActor(p, p->base.contactQuery.opaque))
