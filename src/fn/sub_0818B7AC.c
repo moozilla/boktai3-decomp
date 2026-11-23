@@ -1,16 +1,5 @@
 #include "global.h"
-struct ArmorContactCollider {
-    u8 pad0[6];
-    u16 flags;
-    u16 pad8, contactId;
-    s32 position[3];
-    u8 pad18[0x34 - 0x18];
-    u32 category, properties;
-    u16 pad3C, damage;
-    u8 pad40[2];
-    u8 direction, effect;
-    u16 cooldown;
-};
+#include "contact_collider.h"
 struct ArmorContactOwner {
     u8 pad0[0xB18];
     u32 actorId;
@@ -29,8 +18,7 @@ struct ArmorContactOwner {
     u8 padB54[0x1120 - 0xB54];
     u8 state;
 };
-void Collision_CalculateDamageResponse(struct ArmorContactCollider *,
-                                       struct ArmorContactCollider *);
+void Collision_CalculateDamageResponse(struct ContactCollider *, struct ContactCollider *);
 void PlayerStats_AddContactHundredths(void *, void *, s32);
 void ActorController_SetBehavior(void *, s32);
 void ActorPalette_Reset(void *);
@@ -47,13 +35,7 @@ struct ContactScriptArgs {
 };
 void Script_Call(u32, void *);
 
-static inline u32 properties(struct ArmorContactCollider *p, u32 mask)
-{
-    return p->properties & mask;
-}
-
-void Armor_ReceiveColliderContact(struct ArmorContactCollider *attack,
-                                  struct ArmorContactCollider *contact,
+void Armor_ReceiveColliderContact(struct ContactCollider *attack, struct ContactCollider *contact,
                                   struct ArmorContactOwner *input)
 {
     struct ContactScriptArgs args;
@@ -72,11 +54,11 @@ void Armor_ReceiveColliderContact(struct ArmorContactCollider *attack,
         return;
     if (p->contactCooldown > 0)
         return;
-    p->contactCooldown = attack->cooldown;
+    p->contactCooldown = attack->responseValue;
     Collision_CalculateDamageResponse(attack, contact);
     PlayerStats_AddContactHundredths(attack, contact, p->contactHundredths);
     critical = 0;
-    damage = originalDamage = contact->damage;
+    damage = originalDamage = contact->cost;
     knockback = 30;
     if (attack->flags & 0x100) {
         direction = attack->direction;
@@ -88,10 +70,10 @@ void Armor_ReceiveColliderContact(struct ArmorContactCollider *attack,
         direction = (p->direction + 0xA0) & 0xC0;
     }
     if (p->flags & 2) {
-        if (contact->effect & 8) {
+        if (contact->costFlags & 8) {
             ActorController_SetBehavior(p, 16);
             ActorPalette_Reset(p);
-            if (contact->effect & 4)
+            if (contact->costFlags & 4)
                 ActorMarker_EmitRingEffects(p);
             sound = 1;
         } else {
@@ -107,17 +89,17 @@ void Armor_ReceiveColliderContact(struct ArmorContactCollider *attack,
                 sound = 2;
             }
             if (!broken) {
-                savedProperties = contact->properties;
-                savedCategory = contact->category;
+                savedProperties = contact->reactionFlags;
+                savedCategory = contact->statRewardFlags;
                 switch (p->type) {
                     case 3:
                     case 4:
-                        contact->properties = 0x1F;
-                        contact->category = 0x20;
+                        contact->reactionFlags = 0x1F;
+                        contact->statRewardFlags = 0x20;
                         Collision_CalculateDamageResponse(attack, contact);
-                        if (properties(attack, 0x10))
+                        if (ContactCollider_TestReactionFlags(attack, 0x10))
                             damage = -damage;
-                        else if (properties(attack, 0x20))
+                        else if (ContactCollider_TestReactionFlags(attack, 0x20))
                             ActorMarker_EmitRingEffects(p);
                         else {
                             knockback >>= 2;
@@ -125,14 +107,14 @@ void Armor_ReceiveColliderContact(struct ArmorContactCollider *attack,
                         }
                         break;
                     case 5:
-                        contact->properties = 0x2F;
-                        contact->category = 0x10;
+                        contact->reactionFlags = 0x2F;
+                        contact->statRewardFlags = 0x10;
                         Collision_CalculateDamageResponse(attack, contact);
-                        contact->properties = savedProperties;
-                        contact->category = savedCategory;
-                        if (properties(attack, 0x20))
+                        contact->reactionFlags = savedProperties;
+                        contact->statRewardFlags = savedCategory;
+                        if (ContactCollider_TestReactionFlags(attack, 0x20))
                             damage = -damage;
-                        else if (properties(attack, 0x10))
+                        else if (ContactCollider_TestReactionFlags(attack, 0x10))
                             ActorMarker_EmitRingEffects(p);
                         else {
                             knockback >>= 2;
@@ -141,12 +123,12 @@ void Armor_ReceiveColliderContact(struct ArmorContactCollider *attack,
                         break;
                     case 7:
                     case 13:
-                        contact->properties = 0x3B;
-                        contact->category = 4;
+                        contact->reactionFlags = 0x3B;
+                        contact->statRewardFlags = 4;
                         Collision_CalculateDamageResponse(attack, contact);
-                        if (properties(attack, 8))
+                        if (ContactCollider_TestReactionFlags(attack, 8))
                             damage = -damage;
-                        else if (properties(attack, 4))
+                        else if (ContactCollider_TestReactionFlags(attack, 4))
                             ActorMarker_EmitRingEffects(p);
                         else {
                             knockback >>= 2;
@@ -155,12 +137,12 @@ void Armor_ReceiveColliderContact(struct ArmorContactCollider *attack,
                         break;
                     case 9:
                     case 15:
-                        contact->properties = 0x37;
-                        contact->category = 8;
+                        contact->reactionFlags = 0x37;
+                        contact->statRewardFlags = 8;
                         Collision_CalculateDamageResponse(attack, contact);
-                        if (properties(attack, 4))
+                        if (ContactCollider_TestReactionFlags(attack, 4))
                             damage = -damage;
-                        else if (properties(attack, 8))
+                        else if (ContactCollider_TestReactionFlags(attack, 8))
                             ActorMarker_EmitRingEffects(p);
                         else {
                             knockback >>= 2;
@@ -168,12 +150,12 @@ void Armor_ReceiveColliderContact(struct ArmorContactCollider *attack,
                         }
                         break;
                     case 10:
-                        contact->properties = 0x3E;
-                        contact->category = 1;
+                        contact->reactionFlags = 0x3E;
+                        contact->statRewardFlags = 1;
                         Collision_CalculateDamageResponse(attack, contact);
-                        if (properties(attack, 2))
+                        if (ContactCollider_TestReactionFlags(attack, 2))
                             damage = -damage;
-                        else if (properties(attack, 1))
+                        else if (ContactCollider_TestReactionFlags(attack, 1))
                             ActorMarker_EmitRingEffects(p);
                         else {
                             knockback >>= 2;
@@ -181,12 +163,12 @@ void Armor_ReceiveColliderContact(struct ArmorContactCollider *attack,
                         }
                         break;
                     case 11:
-                        contact->properties = 0x3D;
-                        contact->category = 2;
+                        contact->reactionFlags = 0x3D;
+                        contact->statRewardFlags = 2;
                         Collision_CalculateDamageResponse(attack, contact);
-                        if (properties(attack, 1))
+                        if (ContactCollider_TestReactionFlags(attack, 1))
                             damage = -damage;
-                        else if (!(properties(attack, 2))) {
+                        else if (!(ContactCollider_TestReactionFlags(attack, 2))) {
                             knockback >>= 2;
                             damage >>= 1;
                         } else
@@ -197,19 +179,19 @@ void Armor_ReceiveColliderContact(struct ArmorContactCollider *attack,
                         damage >>= 1;
                         break;
                 }
-                contact->properties = savedProperties;
-                contact->category = savedCategory;
+                contact->reactionFlags = savedProperties;
+                contact->statRewardFlags = savedCategory;
             }
         }
     } else {
-        if (contact->effect & 8) {
+        if (contact->costFlags & 8) {
             critical = 1;
             sound = 1;
         } else {
             knockback >>= 1;
             sound = 0;
         }
-        if (contact->effect & 4)
+        if (contact->costFlags & 4)
             ActorMarker_EmitRingEffects(p);
         if ((u8)(p->type - 2) <= 1 && p->state == 16) {
             knockback = 0;
@@ -221,7 +203,7 @@ void Armor_ReceiveColliderContact(struct ArmorContactCollider *attack,
             ActorPalette_Reset(p);
         }
     }
-    if (!(properties(attack, 0x40))) {
+    if (!(ContactCollider_TestReactionFlags(attack, 0x40))) {
         if (damage <= 0)
             damage = 1;
     }
@@ -242,16 +224,14 @@ void Armor_ReceiveColliderContact(struct ArmorContactCollider *attack,
             broken = 1;
             sound = 3;
         }
-        Armor_UpdateBehaviorAfterContact(p, originalDamage, attack->properties, broken);
+        Armor_UpdateBehaviorAfterContact(p, originalDamage, attack->reactionFlags, broken);
     }
     SceneHud_SetTimedState(p->actorId, p->health, p->maxHealth, 5, critical, -1);
     if (damage < 0) {
-        DamageNumberDisplay_Show(contact, -damage, 1, &contact->position[0], &contact->position[2],
-                                 1);
+        DamageNumberDisplay_Show(contact, -damage, 1, &contact->position, &contact->offset, 1);
     } else {
-        DamageNumberDisplay_Show(contact, damage, 0, &contact->position[0], &contact->position[2],
-                                 1);
-        p->lastContactId = attack->contactId;
+        DamageNumberDisplay_Show(contact, damage, 0, &contact->position, &contact->offset, 1);
+        p->lastContactId = attack->contactFlags;
     }
     switch (sound) {
         case 0:
