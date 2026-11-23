@@ -637,8 +637,7 @@ void SceneActorPhase_UpdateConditionalMotion(struct ChaseActor *p)
 {
     if (SceneActorControl_TakeFlag(&p->base.field2B1)) {
         void *control = p->base.onEntry;
-        u32 kind = 2;
-        SelectControl(p, control, kind);
+        SelectControl(p, control, 2);
     }
     if (SceneActor_IsFacingNearbyTarget(p)) {
         if ((u8)Callback_InvokeActor(p, p->base.contactQuery.opaque))
@@ -669,8 +668,7 @@ void SceneActorPhase_BeginTimedMotion(struct ChaseActor *p)
 {
     if (SceneActorControl_TakeFlag(&p->base.field2B1)) {
         void *control = p->base.onEntry;
-        u32 kind = 2;
-        SelectControl(p, control, kind);
+        SelectControl(p, control, 2);
     }
     if (SceneActor_IsFacingNearbyTarget(p)) {
         if ((u8)Callback_InvokeActor(p, p->base.contactQuery.opaque))
@@ -928,8 +926,7 @@ void SceneActor_CallContextScriptB(struct RoomActor *actor)
     struct SceneActorScriptContext *context;
     {
         u32 mask = 0x80000;
-        u32 offset = 0x2D0;
-        u32 *field = (void *)((u32)actor + offset);
+        u32 *field = (void *)((u32)actor + 0x2D0);
         if (*field & mask)
             return;
     }
