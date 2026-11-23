@@ -115,23 +115,13 @@ void GameOver_UpdateOpening(struct GameOver *panel)
         panel->extentX += 5;
         panel->extentY -= 5;
         if (panel->extentX > 127) {
-            struct GameOverSprite *sprite;
             s32 i;
             panel->extentX = 1;
             panel->extentY = 1;
-            {
-                u32 mask = 1;
-                sprite = panel->sprites;
-                for (i = 7; i >= 0; i--) {
-                    sprite->flags |= mask;
-                    sprite++;
-                }
-            }
-            {
-                u32 zero = 0;
-                panel->animationState = 7;
-                panel->timer = zero;
-            }
+            for (i = 0; i < 8; i++)
+                panel->sprites[i].flags |= 1;
+            panel->animationState = 7;
+            panel->timer = 0;
         }
     }
 }
@@ -274,13 +264,9 @@ void GameOver_FinishDelay(struct GameOver *panel)
         void *a = SpriteOam_QueueFlaggedProjectedSprites;
         void *b = Sprite_RenderFlipAwareList;
         void *c = sub_08219674;
-        u32 mask = ~1;
-        struct GameOverSprite *entry = panel->sprites;
-        int i = 7;
-        do {
-            entry->flags &= mask;
-            entry++;
-        } while (--i >= 0);
+        int i;
+        for (i = 0; i < 8; i++)
+            panel->sprites[i].flags &= ~1;
         Video_SetRenderCallbacks(0, a, b, c);
         panel->closeState = 2;
     }
@@ -318,29 +304,21 @@ void GameOver_UpdateCostSelection(struct GameOver *panel)
         Sound_PlaySong(222);
     }
     if (decision == 0) {
-        u32 mask;
         panel->overlay.flags |= 1;
-        mask = 1;
         MessageWindow_Clear();
         Hud_SetMode(7);
         Player_AdvanceTetherPhase(gPlayers[0]);
         Sound_FadeOutChannel10(2);
-        panel->timer = decision;
-        panel->choice = mask;
+        panel->timer = 0;
+        panel->choice = 1;
         panel->animationState = 6;
         panel->closeState = 4;
     } else if (decision == 1) {
-        struct GameOverSprite *sprite;
         s32 i;
-        u32 mask;
         Sound_FadeOutChannel10(2);
         panel->overlay.flags |= decision;
-        mask = 1;
-        sprite = panel->sprites;
-        for (i = 7; i >= 0; i--) {
-            sprite->flags |= mask;
-            sprite++;
-        }
+        for (i = 0; i < 8; i++)
+            panel->sprites[i].flags |= 1;
         MessageWindow_Clear();
         Hud_SetMode(7);
         if (panel->procedure) {
