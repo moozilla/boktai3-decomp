@@ -2,6 +2,8 @@
 #include "vulcan_cannon_worker.h"
 #include "ram.h"
 #include "contact_collider.h"
+#include "engine_pause.h"
+#include "word_flags.h"
 extern u32 gUnk_02000560;
 void VulcanCannon_UpdateTargeting(void);
 void VulcanCannon_UpdateDefeatEffects(void);
@@ -23,14 +25,6 @@ struct CannonCollider {
     u8 pad[6];
     u16 flags;
 };
-static inline u32 TestPair(u32 mask, u32 *a, u32 *b)
-{
-    return (*a | *b) & mask;
-}
-static inline u32 TestFlag(u32 mask, u32 *p)
-{
-    return *p & mask;
-}
 static inline s32 CannonRandom(const u16 *table)
 {
     gRandomIndex = (gRandomIndex + 1) & 1023;
@@ -39,7 +33,7 @@ static inline s32 CannonRandom(const u16 *table)
 s32 VulcanCannon_UpdateDamageState(struct VulcanCannon *p)
 {
     struct CannonCollider *collider;
-    if (TestPair(0x400, &gEngineFlags, &gScenePauseFlags) || TestFlag(4, &gUnk_02000560))
+    if (Engine_PauseBits(0x400) || Flags_MaskedWord(4, &gUnk_02000560))
         return 0;
     p->previousVisible = p->targetVisible;
     Callback_InvokeActor(p, p->state);
