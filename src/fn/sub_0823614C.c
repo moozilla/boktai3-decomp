@@ -44,22 +44,20 @@ void RadialBurstEffect_EmitOrbitParticle(u8 *owner, struct Unk0823614CPosition *
         const u16 *table;
         u32 *seed;
         unsigned short i;
-        u32 mask;
 
         p->active = 1;
         p->origin = origin;
         table = gRandomTable;
         seed = &gRandomIndex;
         i = *seed + 1;
-        mask = 1023;
-        i &= mask;
+        i &= 1023;
         {
             u32 r = table[i];
             p->radius = (r & 0x7F) + 0x180;
         }
-        i = (i + 1) & mask;
+        i = (i + 1) & 1023;
         p->angle = table[i];
-        i = (i + 1) & mask;
+        i = (i + 1) & 1023;
         *seed = i;
         {
             u32 r = table[i];
