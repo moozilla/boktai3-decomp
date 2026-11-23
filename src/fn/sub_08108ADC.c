@@ -17,19 +17,14 @@ struct SlotMonitor {
 s32 SlotMonitor_CheckTimeout(struct SlotMonitor *obj)
 {
     s32 count, i;
-    u16 *slot;
     if (obj->flags & 1) {
         if (obj->mode > 0) {
             u16 *timer;
-            u16 invalid;
             count = 0;
             timer = &obj->activeTimer;
-            invalid = 0xffff;
-            slot = obj->slots;
-            for (i = 3; i >= 0; i--) {
-                if (*slot != invalid)
+            for (i = 0; i < 4; i++) {
+                if (obj->slots[i] != 0xffff)
                     count++;
-                slot++;
             }
             if (count != 2) {
                 if (*timer > 90)
