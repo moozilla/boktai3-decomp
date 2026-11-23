@@ -203,6 +203,18 @@ static inline void SceneActorState_EnterReactionPhase(struct StateActor *actor, 
     actor->reactionTimer = 0;
 }
 
+/* Enter an action state: install its per-frame callback, restart the callback's frame count, mark
+ * the change for the callback's first frame and restart the reaction substate. */
+static inline void SceneActorState_EnterAction(struct StateActor *actor,
+                                               void (*callback)(void *, int), u32 state)
+{
+    actor->actionState = state;
+    actor->actionCallback = callback;
+    actor->callbackFrame = 0;
+    actor->actionChanged = 1;
+    SceneActorState_EnterReactionPhase(actor, 0);
+}
+
 u32 Trigger_ConsumePending(void *receiver, u32 count);
 
 /* On entry select the next state, then consume a message once done. */

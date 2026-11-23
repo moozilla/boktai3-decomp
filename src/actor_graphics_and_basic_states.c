@@ -646,19 +646,10 @@ struct ReactionActor {
     u8 padC8[0x38];
     void (*callback)(void *);
 };
-void SceneActors_UpdateShrinkingReaction(void *);
-void SceneActors_UpdateKnockbackReaction(void *);
-void sub_08027214(void *);
+void SceneActors_UpdateShrinkingReaction(void *, int);
+void SceneActors_UpdateKnockbackReaction(void *, int);
+void sub_08027214(void *, int);
 void WirelessGame_AddItem(void *, s32);
-
-static inline void reactionState(struct ReactionActor *p, void (*fn)(void *), int id)
-{
-    p->state = id;
-    p->callback = fn;
-    p->timer = 0;
-    p->changed = 1;
-    SceneActorState_EnterReactionPhase((struct StateActor *)p, 0);
-}
 
 // confidence=low: damage handler: 0 shows the damage number and starts the shrinking reaction
 // (wireless games may award an item when hit from the front), 2 starts a knockback, 1 a death.
@@ -687,7 +678,8 @@ s32 sub_08022B18(struct ReactionActor *p, s32 kind, s32 damage)
                     SceneActors_StopBackgroundFlash((struct StateActor *)actor);
             }
             SceneActorState_StartAction((struct StateActor *)p, 1, 0, 0);
-            reactionState(p, SceneActors_UpdateShrinkingReaction, 0x16);
+            SceneActorState_EnterAction((struct StateActor *)p, SceneActors_UpdateShrinkingReaction,
+                                        0x16);
             if (gEngineFlags & 0x1000) {
                 u8 *position = sprite + 0xc;
                 if (WirelessGame_TryAddCyclingItem(position)) {
@@ -704,7 +696,8 @@ s32 sub_08022B18(struct ReactionActor *p, s32 kind, s32 damage)
         }
         case 2:
             SceneActorState_StartAction((struct StateActor *)p, 1, 0, 1);
-            reactionState(p, SceneActors_UpdateKnockbackReaction, 0x17);
+            SceneActorState_EnterAction((struct StateActor *)p, SceneActors_UpdateKnockbackReaction,
+                                        0x17);
             {
                 u8 v = sprite[9] + 0x80;
                 ((struct SceneGraphicsActor *)p)->hitAngle = v;
@@ -719,7 +712,7 @@ s32 sub_08022B18(struct ReactionActor *p, s32 kind, s32 damage)
                 SceneActorState_SetFlags((struct StateActor *)p, 2);
             }
             SceneActorState_StartAction((struct StateActor *)p, 1, 0, 3);
-            reactionState(p, sub_08027214, 0x19);
+            SceneActorState_EnterAction((struct StateActor *)p, sub_08027214, 0x19);
             break;
         }
     }
@@ -1353,7 +1346,7 @@ int SceneActorState_TryStartDeathOrFlaggedAction(struct StateActor *p)
 {
     if (p->health <= 0 && p->vulnerable) {
         SceneActorState_SetFlags(p, 2);
-        reactionState((struct ReactionActor *)p, sub_08027214, 25);
+        SceneActorState_EnterAction(p, sub_08027214, 25);
     }
     p->vulnerable = 0;
     if (SceneActorState_TestFlags(p, 2)) {
