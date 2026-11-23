@@ -52,11 +52,13 @@ PORT_CODE = {
 }
 EXPORTS = ['port_trace_map', 'port_memory_init', 'port_load_rom', 'port_game_run', 'port_game_set_solar',
            'port_game_set_time', 'port_frame_count', 'port_game_save_stage', 'port_game_save_dirty',
-           'port_game_save_data', 'port_game_save_size',
+           'port_game_save_data', 'port_game_save_size', 'port_video_set_enabled',
            # agent harness (port/agent/): hooks, calls into the game, C snippets
            'port_hook_state', 'port_hook_flags', 'port_hook_ring', 'port_icall', 'port_code_known',
            'port_bus_load_i8', 'port_bus_load_i16', 'port_bus_load_i32', 'port_bus_load_ptr',
-           'port_bus_store_i8', 'port_bus_store_i16', 'port_bus_store_i32', 'port_bus_store_ptr']
+           'port_bus_store_i8', 'port_bus_store_i16', 'port_bus_store_i32', 'port_bus_store_ptr',
+           # snapshots (port/agent/session.mjs): the live shadow stack and the data's end
+           '__stack_pointer', '__heap_base']
 
 
 def game_sources():

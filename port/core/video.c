@@ -5,9 +5,11 @@
 static Ppu ppu;
 static PpuMemory memory;
 static uint16_t framebuffer[PPU_WIDTH * PPU_HEIGHT];
+static int render_enabled = 1;
 static void render(void *context, unsigned line)
 {
     (void)context;
+    if (!render_enabled) return;
     if (line == 0) ppu_begin_frame(&ppu, &memory);
     ppu_render_scanline(&ppu, &memory, line, framebuffer + line * PPU_WIDTH);
 }
@@ -27,6 +29,9 @@ int port_video_init(void)
     return 0;
 }
 const uint16_t *port_video_framebuffer(void) { return framebuffer; }
+/* Headless hosts that never look at the screen skip the PPU (most of a frame's
+ * cost); the game never reads the framebuffer, so its state is unchanged. */
+void port_video_set_enabled(int enabled) { render_enabled = enabled != 0; }
 
 /* Replay a captured line through the same C renderer. The caller supplies
  * hardware banks at their normal addresses and the captured affine latches. */
