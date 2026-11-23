@@ -33,7 +33,7 @@ s32 Inventory_AddEquipmentFromRecord(const void *record)
     q = (s16 *)((u8 *)q + 0x68);
     i = 7;
     do {
-        if (*(s16 *)((u8 *)q + 0) > m1)
+        if (*q > m1)
             count++;
         q++;
         i--;
