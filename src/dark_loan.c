@@ -173,14 +173,9 @@ void DarkLoan_DrawPreview(struct DarkLoanScreen *panel)
 
 void DarkLoan_HideSprites(struct DarkLoanScreen *panel)
 {
-    u32 one = 1;
-    u32 *flags = &panel->widgets[DARK_LOAN_BACKGROUND].flags;
-    s32 i = 0x15;
-    do {
-        *flags |= one;
-        flags = (void *)((u8 *)flags + sizeof(struct SceneInputWidget));
-        i--;
-    } while (i >= 0);
+    s32 i;
+    for (i = 0; i < 22; i++)
+        panel->widgets[i].flags |= 1;
     panel->sprite.flags |= 1;
 }
 
