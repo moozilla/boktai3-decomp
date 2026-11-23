@@ -208,23 +208,16 @@ void LinkRecordPanel_InitializeEntryValues(struct LinkRecordPanel *owner)
 
 void LinkRecordPanel_InitializeWidgets(struct LinkRecordPanel *owner)
 {
-    struct SceneInputWidget *sprite;
     int i;
     void *script;
-    int zero;
     script = ScriptProc_Start(0xCB05, 0x1289);
     owner->widgetScript = script;
     ResourceHeader_Relocate(&owner->widgetResource, script);
-    i = 0;
-    zero = 0;
-    sprite = owner->widgets;
-    do {
-        Widget_InitLinked(sprite, &owner->widgetResource, owner->entryValues[i], 0x10, zero, zero,
-                          zero, (void *)zero);
+    for (i = 0; i < 7; i++) {
+        Widget_InitLinked(&owner->widgets[i], &owner->widgetResource, owner->entryValues[i], 0x10, 0, 0,
+                          0, 0);
         owner->previousValues[i] = 0xFFFF;
-        sprite++;
-        i++;
-    } while (i < 7);
+    }
 }
 
 void LinkRecordPanel_PositionWidgets(struct LinkRecordPanel *owner)
