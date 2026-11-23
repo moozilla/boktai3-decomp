@@ -75,7 +75,7 @@ void Collider_SetBodyProperties(void *, s32, s32, s32);
 void Sprite_InitUnlinked(void *, void *, s32);
 void Sprite_LinkToList(void *, s32);
 void PlayerStats_AddContactHundredths(void *, void *, u32);
-void Collision_CalculateDamageResponse(void *);
+void Collision_CalculateDamageResponse(void *, void *);
 struct ContactPosition *SceneActors_GetAvailablePosition(void);
 void Vec16_Lerp(void *, void *, void *, int, int);
 
