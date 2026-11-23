@@ -144,11 +144,11 @@ const GOALS = {
         const tkey = (t) => `${here}:talk:${t.key}:${L.story()}`;
         for (const t0 of targets.filter((t) => !TRIED.has(tkey(t)))) for (let round = 0; round < 2; round++) {
           const t = t0;
-          if (round === 0) TRIED.add(tkey(t));
           const story0 = L.story(), now = t.addr ? L.people().find((q) => q.addr === t.addr) : null;
           const r = yield* L.interact(now ? now.x : t.x, now ? now.z : t.z, { avoid: stageOf(here).doors.map((d) => d.box), trace: (e) => event({ skill: 'nav', ...e }) });
           // a shop or service menu the talk opened: back out of it
           for (let i = 0; i < 8 && !$player(g); i++) { yield g.press('b', 2); yield g.press(0, 10); yield* L.clearInterruptions({}); }
+          if (round === 0 && r.done) TRIED.add(tkey(t));  // a failed talk is tried again on the next visit
           event({ skill: 'talk', id: t.key, round, x: t.x, z: t.z, done: r.done, reason: r.reason, lines: (r.lines || []).slice(0, 6), story: L.story(), was: story0, facilities: L.facilities() });
           // whatever the talk started (a choice, a menu, an event) ends before the next one
           yield* untilControl(g, L, () => true, 30, 1200);
