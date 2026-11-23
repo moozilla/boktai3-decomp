@@ -599,14 +599,12 @@ void Spider_UpdateDefeat(struct ChaseActor *actor, s32 frame)
             index *= 2;
             {
                 const u16 *table = (const u16 *)0x0203B400;
-                u32 off;
                 {
                     const u16 *entry = (void *)(index + (u32)table);
                     value = *entry;
                 }
-                off = 0x2BA;
                 {
-                    u8 *field = (u8 *)actor + off;
+                    u8 *field = (u8 *)actor + 0x2BA;
                     *field = value;
                 }
             }
