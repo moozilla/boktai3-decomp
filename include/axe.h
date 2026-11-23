@@ -53,11 +53,14 @@ struct Axe {
     u8 timerEB0;
     u8 unknownEB1;
     u8 parameterEB2;
-    u8 unknownEB3[7];
-    u16 fieldEBA;
-    u8 unknownEBC[6];
-    u16 fieldEC2;
-    u8 unknownEC4[0xC];
+    u8 unknownEB3;
+    u16 lowHealthThreshold; /* the second attack threshold, below healthThreshold */
+    s16 routeId;
+    u16 attackCooldowns[4]; /* counted down each frame (Axe_TickCooldowns) */
+    u16 attackDelays[4];    /* what a cooldown restarts from */
+    u8 recentRoutePoints[3];
+    u8 recentRoutePointIndex;
+    u8 unknownECC[4];
     u8 active;
     u8 lungeQueued;
     u8 sparkStep;

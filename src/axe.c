@@ -1842,19 +1842,9 @@ void Axe_InitAttackCooldowns(struct AxeCooldownActor *actor)
     state->healthThreshold = health - quarter;
 }
 
-struct QTickCooldowns {
-    u8 filler[0xeb8];
-    u16 v[4];
-};
-
-struct S080FB050 {
-    u8 filler[0x3d0];
-    struct QTickCooldowns *q;
-};
-
-void Axe_TickCooldowns(struct S080FB050 *s)
+void Axe_TickCooldowns(struct ChaseActor *actor)
 {
-    u16 *p = s->q->v;
+    u16 *p = ((struct Axe *)actor->base.context)->attackCooldowns;
     s32 i = 3;
     do {
         if (*p)
@@ -1919,63 +1909,30 @@ u8 Axe_PickAttack(void *actorIn)
     return 0;
 }
 
-struct QInitRoutePointHistory {
-    u8 filler[0xec8];
-    u8 v[3];
-    u8 w;
-};
-
-struct S080FB1DC {
-    u8 filler[0x3d0];
-    struct QInitRoutePointHistory *q;
-};
-
-void Axe_InitRoutePointHistory(struct S080FB1DC *s)
+void Axe_InitRoutePointHistory(struct ChaseActor *actor)
 {
-    struct QInitRoutePointHistory *q = s->q;
+    struct Axe *q = actor->base.context;
     s32 i;
     for (i = 0; i < 3; i++)
-        q->v[i] |= 0xff;
-    q->w = 0;
+        q->recentRoutePoints[i] |= 0xff;
+    q->recentRoutePointIndex = 0;
 }
 
-struct QRecordRoutePoint {
-    u8 filler[0xec8];
-    u8 v[3];
-    u8 idx;
-};
-
-struct S080FB214 {
-    u8 filler[0x3d0];
-    struct QRecordRoutePoint *q;
-};
-
-void Axe_RecordRoutePoint(struct S080FB214 *s, u32 x)
+void Axe_RecordRoutePoint(struct ChaseActor *actor, u32 x)
 {
-    struct QRecordRoutePoint *q = s->q;
-    q->v[q->idx] = x;
-    q->idx++;
-    if (q->idx > 2)
-        q->idx = 0;
+    struct Axe *q = actor->base.context;
+    q->recentRoutePoints[q->recentRoutePointIndex] = x;
+    q->recentRoutePointIndex++;
+    if (q->recentRoutePointIndex > 2)
+        q->recentRoutePointIndex = 0;
 }
 
-struct QIsRoutePointRecent {
-    u8 filler[0xec8];
-    s8 v[3];
-};
-
-struct S080FB248 {
-    u8 filler[0x3d0];
-    struct QIsRoutePointRecent *q;
-};
-
-u8 Axe_IsRoutePointRecent(struct ChaseActor *sIn, s32 x)
+u8 Axe_IsRoutePointRecent(struct ChaseActor *actor, s32 x)
 {
-    struct S080FB248 *s = (struct S080FB248 *)sIn;
-    struct QIsRoutePointRecent *q = s->q;
+    struct Axe *q = actor->base.context;
     s32 i;
     for (i = 0; i < 3; i++) {
-        if (q->v[i] == x)
+        if ((s8)q->recentRoutePoints[i] == x)
             return 1;
     }
     return 0;
@@ -2856,7 +2813,7 @@ struct RouteSelectionPosition {
 
 extern u32 gRandomTableIndex;
 
-void Axe_RecordRoutePoint(struct S080FB214 *s, u32 x);
+void Axe_RecordRoutePoint(struct ChaseActor *actor, u32 x);
 
 u8 Axe_IsRoutePointRecent(struct ChaseActor *, s32);
 
@@ -2892,7 +2849,7 @@ void ActorPhase_SelectDistantWaypoint(struct ChaseActor *actor, struct ContactPo
     unsigned long long wide;
     u16 *entry;
     s32 bestIndex;
-    Route_Start((void *)(&route), *((s16 *)(((u8 *)actor->base.context) + 0xeb6)), 0, 0);
+    Route_Start((void *)(&route), ((struct Axe *)actor->base.context)->routeId, 0, 0);
     bestDistance = 0;
     bestIndex = -1;
     for (i = 0; i < (*route.data); i++) {
@@ -3618,7 +3575,7 @@ u32 Axe_UpdatePaletteTransition(struct ChaseActor *actor);
 
 void Axe_UpdateBodyColliders(struct AxeCollisionActor *actor);
 
-void Axe_TickCooldowns(struct S080FB050 *s);
+void Axe_TickCooldowns(struct ChaseActor *actor);
 
 void Axe_FireAttack(struct ChaseActor *actor);
 
@@ -3804,7 +3761,7 @@ void SceneActorControl_UpdateControl35Phase(struct ChaseActor *actor)
         SceneActorChase_SetControl(actor, Axe_UpdateTargetWindup, 0x35);
         Or16(0x100, &actor->base.motionFlags);
         WordFlags_Set(0x800, &context->flagsE4C);
-        context->fieldEBA = context->fieldEC2;
+        context->attackCooldowns[1] = context->attackDelays[1];
         Or16(0x1000, &actor->base.placementFlags);
     }
     if (actor->base.stepDone) {
@@ -4413,7 +4370,7 @@ void Axe_InitEventCallbacks(struct ChaseActor *p);
 
 void SpriteGroup_InitAnimatedSprites(struct ChaseActor *owner);
 
-void Axe_InitRoutePointHistory(struct S080FB1DC *s);
+void Axe_InitRoutePointHistory(struct ChaseActor *actor);
 
 void ActorCollision_InitThreeAuxiliaryAttacks(struct ChaseActor *actor);
 
