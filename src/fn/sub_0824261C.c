@@ -92,7 +92,7 @@ void Player_UpdateLinkKind(struct Player *p)
             sub_0823B728(p, idx);
             Callback_InvokeActor(p, (void *)gUnk_08E87A10[idx]);
             if (p->movementVelocityLocked)
-                *(struct SceneVec *)&p->velocityX = *(struct SceneVec *)((u8 *)p + 0x490);
+                *(struct SceneVec *)&p->velocityX = p->lockedVelocity;
             sub_082424D0(p);
             if (p->cameraOffsetActive != 0)
                 sub_0823B7A4(p);
