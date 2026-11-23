@@ -86,7 +86,8 @@ struct VanargandPairAttack {
     s16 repeats;
     u8 pad5B6[2];
     u16 attackParameter5B8, attackParameter5BA;
-    u8 pad5BC[0x5C2 - 0x5BC];
+    u8 pad5BC[0x5C0 - 0x5BC];
+    u16 attackPhase; /* 0x5C0: cleared by the mode 25 transition (tentative). */
     s16 mode;
     u8 unknown5C4[4];
     struct ContactCollider attackCollider, radialColliders[2];
@@ -98,7 +99,7 @@ struct VanargandPairAttack {
     u32 variant;
     u32 stageQueued[3]; /* 0xF28: per stage (indexed by transition), tested by the queued action state. */
     s32 transition;
-    u8 unknownF38[4];
+    s32 attachment; /* 0xF38: passed to sub_08159164 on entering state 21. */
     u16 flash;
     u8 unknownF3E[6];
     void *afterimages;

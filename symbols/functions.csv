@@ -7506,6 +7506,8 @@ addr,name,mode,confidence,source,notes
 081A8938,Vanargand_UpdateQueuedActionTransition,thumb,low,src-alias,
 081A8A0C,Vanargand_UpdateMode23Transition,thumb,low,src-alias,
 081A8A74,Vanargand_UpdateMode20,thumb,low,src-alias,
+081A8AE4,Vanargand_UpdateMode24Transition,thumb,low,src-alias,
+081A8B28,Vanargand_UpdateMode25Transition,thumb,low,src-alias,
 081A8BA4,ActorSoundPhase_EnterPhase21,thumb,low,src-alias,
 081A8C00,Vanargand_DispatchSecondaryState,thumb,low,src-alias,Invokes the state callback indexed by offset 0xAE from the second state table; secondary designation is tentative
 081A8C1C,Vanargand_RunSecondaryPhaseCallback,thumb,low,src-alias,Dispatches the secondary phase table using state byte AE; phase identity is tentative
@@ -7549,6 +7551,7 @@ addr,name,mode,confidence,source,notes
 081AD3C0,Vanargand_UpdateStateCallback,thumb,low,src-alias,Clears the per-frame state marker and runs the actor callback unless globally suspended
 081AD3E8,Vanargand_UpdateAnimationAndTargets,thumb,low,src-alias,
 081AD564,Vanargand_UpdatePresentation,thumb,low,src-alias,
+081ADBB8,Vanargand_CycleDebugAnimation,thumb,low,src-alias,Debug: on pad bit 4 steps the requested animation through 1-31
 081ADD0C,Vanargand_Update,thumb,low,src-alias,Task update callback advances boss logic and its counter when execution is enabled
 081ADD5C,Vanargand_DestroyAnimatedPart,thumb,low,src-alias,Removes a part animation and its sprite when present
 081ADD7C,Vanargand_DestroyPartSprites,thumb,low,src-alias,Removes active sprites from six consecutive part entries
