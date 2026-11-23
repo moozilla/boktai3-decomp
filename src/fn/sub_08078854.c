@@ -51,9 +51,7 @@ void SceneActorBehavior_ApplyContactReaction(struct SceneActorBehaviorContactVie
     destination->parameter44 = source->parameter44;
     {
         u32 mode = destination->mode;
-        u32 offset;
-        offset = 0x2E6;
-        *(u16 *)((u32)actor + offset) = mode;
+        *(u16 *)((u32)actor + 0x2E6) = mode;
     }
     if ((u32)(actor->category - 18) <= 2 || actor->category == 23) {
         destination->power = source->power;
@@ -71,11 +69,9 @@ void SceneActorBehavior_ApplyContactReaction(struct SceneActorBehaviorContactVie
     {
         u32 parameter = source->parameter34;
         u32 reaction = source->reactionFlags;
-        u32 offset = 0x2D8;
-        *(u32 *)((u32)actor + offset) = parameter;
+        *(u32 *)((u32)actor + 0x2D8) = parameter;
         {
-            u32 offset = 0x2DC;
-            *(u32 *)((u32)actor + offset) = reaction;
+            *(u32 *)((u32)actor + 0x2DC) = reaction;
         }
     }
     {
@@ -91,9 +87,8 @@ void SceneActorBehavior_ApplyContactReaction(struct SceneActorBehaviorContactVie
     PlayerStats_AddContactHundredths(source, destination, actor->contactReward);
     {
         u32 mask = 0x2000;
-        u32 offset = 0x2CC;
         u32 *field;
-        field = (void *)((u32)actor + offset);
+        field = (void *)((u32)actor + 0x2CC);
         *field |= mask;
     }
 }
