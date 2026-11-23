@@ -271,6 +271,9 @@ class Slicer:
                 note = f': host solar level {int(self.session.frames["solar"][prev])}'
             self.terminal(frame, f'{hw_name(addr)} 0x{addr:08X}{note}', addr)
             return
+        if frame <= 0:
+            self.terminal(0, f'0x{addr:08X} set during boot (frame 0 cannot be re-traced)', addr)
+            return
         ft = self.trace(frame)
         if ft is None:
             self.terminal(frame, f'0x{addr:08X} (frame {frame} not traced: budget)', addr)

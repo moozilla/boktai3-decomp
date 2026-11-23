@@ -7,7 +7,8 @@
                                    every write to WHERE: frame, value, the C statement that wrote it
   who-wrote NAME WHERE FRAME       the last write to WHERE at or before FRAME
   at NAME ADDR [FRAME]             what typed object ADDR is at FRAME
-  why NAME WHERE FRAME [--nodes N] [--frames N]
+  serve NAME [--port 8765]         the Recorder page: screens timeline, typed writes, history, why
+  why NAME WHERE FRAME [--nodes N] [--frames N] [--check]
                                    dynamic backward slice: the C statements, with their runtime
                                    values, that produced WHERE's value at the end of FRAME
 
@@ -364,6 +365,7 @@ def main(argv=None):
     p.add_argument('--changes', action='store_true', help='only writes that changed the value')
     p = sub.add_parser('who-wrote'); p.add_argument('name'); p.add_argument('where'); p.add_argument('frame', type=int)
     p = sub.add_parser('at'); p.add_argument('name'); p.add_argument('addr'); p.add_argument('frame', type=int, nargs='?')
+    p = sub.add_parser('serve'); p.add_argument('name'); p.add_argument('--port', type=int, default=8765)
     p = sub.add_parser('why'); p.add_argument('name'); p.add_argument('where'); p.add_argument('frame', type=int)
     p.add_argument('--nodes', type=int, default=400); p.add_argument('--frames', type=int, default=24)
     p.add_argument('-v', '--verbose', action='store_true')
@@ -371,6 +373,9 @@ def main(argv=None):
     args, extra = ap.parse_known_args(argv)
     if args.cmd == 'record':
         return cmd_record(args, extra)
+    if args.cmd == 'serve':
+        from server import serve
+        return serve(args.name, args.port)
     if extra:
         ap.error('unrecognized arguments: ' + ' '.join(extra))
     return {'verify': cmd_verify, 'history': cmd_history, 'who-wrote': cmd_who_wrote, 'at': cmd_at, 'why': cmd_why}[args.cmd](args) or 0
