@@ -4,6 +4,7 @@
 #include "scene_actor_reaction.h"
 #include "scene_actor_displacement.h"
 #include "display_sequence.h"
+#include "scene_actor_turn.h"
 
 void SceneActorAttachment_ReplaceResponseSlot(void *, u8, u8, u8);
 
@@ -24,10 +25,6 @@ static inline u8 Reaction_MotionStopped(s32 x, s32 z)
 static inline u32 Recovery_StatusFlags(struct ChaseActor *actor, u32 mask)
 {
     return actor->base.statusFlags & mask;
-}
-static inline u32 Recovery_ActorFlags(struct ChaseActor *actor, u32 mask)
-{
-    return actor->base.behaviorFlags & mask;
 }
 static inline void Recovery_ClearStatusFlags(struct ChaseActor *actor, u32 bits)
 {
@@ -119,7 +116,7 @@ void SceneActorReaction_SettleDisplacement(struct ChaseActor *actor)
             SceneActorChase_ClearFlagComponent(motion, 0x380);
             Recovery_ClearTrackingFlags(&actor->base.tracking, 0x18);
             control = &actor->group.common.control;
-            if (Recovery_ActorFlags(actor, 0x200000)) {
+            if (SceneActorTurn_ActorFlags(actor, 0x200000)) {
                 Recovery_ClearStatusFlags(actor, 0x1000000);
                 SceneActorChase_ClearFlagComponent(motion, 0x200);
                 control->mode = 0;

@@ -1,5 +1,7 @@
 #include "global.h"
 #include "scene_actor_reaction.h"
+#include "scene_actor_init_actor.h"
+#include "scene_actor_chase_shared.h"
 void SceneActorAttachment_ReplaceResponseSlot(void *, u32, u32, u32);
 struct RouteResponseGroup {
     u8 unknown0[0x74];
@@ -64,20 +66,12 @@ static inline void SnapToRoute(struct ContactPosition *position, struct RoutePoi
     position->z = route->point[1];
     position->y = TerrainHeight(position);
 }
-static inline void ClearBits(u16 *flags, u32 bits)
-{
-    *flags &= ~bits;
-}
-static inline void SetActorBits(struct ChaseActor *actor, u32 bits)
-{
-    actor->base.behaviorFlags |= bits;
-}
 static inline u8 TryRoute(struct ChaseActor *actor, void *context, struct ContactPosition *source,
                           struct ContactPosition *destination)
 {
     s32 result;
     if (!Nav_IsPositionInMesh(context, source, destination)) {
-        ClearBits(&actor->base.motionFlags, 0x200);
+        SceneActorChase_ClearBits(&actor->base.motionFlags, 0x200);
         return 0;
     }
     result = Terrain_ApplyBlocked(context, source, destination);
@@ -86,7 +80,7 @@ static inline u8 TryRoute(struct ChaseActor *actor, void *context, struct Contac
             Memory_Clear(&actor->base.body.motion, 8);
         return 1;
     }
-    ClearBits(&actor->base.motionFlags, 0x200);
+    SceneActorChase_ClearBits(&actor->base.motionFlags, 0x200);
     return 0;
 }
 static inline void SetControl(struct ChaseActor *actor, void *callback, u32 kind)
@@ -139,7 +133,7 @@ void SceneActorReaction_TryResumeRoute(struct ChaseActor *actor, s32 frame)
             group->destination->pad = 1;
             SetState(actor, 3, 1, 0);
             SetControl(actor, SceneActorReaction_RestoreAfterDelay, 14);
-            SetActorBits(actor, 0x10);
+            MonsterInit_SetBehaviorFlags(actor, 0x10);
             actor->base.field2C2 = 64;
             SetResponse(&group->response, actor->base.onAlternateEntry, 0, 0, 7, 60);
         }

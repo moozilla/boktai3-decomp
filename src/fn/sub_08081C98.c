@@ -4,6 +4,7 @@
 #include "scene_actor_reaction.h"
 #include "engine.h"
 #include "scene_actor_part_burst.h"
+#include "scene_actor_contact_response.h"
 void EffectGroup_Reset(void *);
 void SceneActorEffects_EmitRandomOffsets(void *, s32, u32, s32, s32, u32);
 static inline u8 Reaction_HasFlags(u32 bits)
@@ -48,10 +49,6 @@ static inline void Reaction_ClearRoute(u32 *flags, struct SceneActorRegistryCont
     control->counter = 0;
     control->field14 = 0;
     control->timer = 0;
-}
-static inline u32 Reaction_Motion(struct ChaseActor *actor, u32 mask)
-{
-    return actor->base.motionFlags & mask;
 }
 static inline void Reaction_ClearMotionBits(struct ChaseActor *actor, s32 mask)
 {
@@ -148,7 +145,7 @@ void SceneActorReaction_UpdateTimedBurst(struct ChaseActor *actor)
         struct ContactCollider *collider = &actor->base.colliderA;
         u32 mask = 0x100;
         collider->flags = mask | collider->flags;
-        if (Reaction_HasFlags(Reaction_Motion(actor, 0x2000)))
+        if (Reaction_HasFlags(SceneActorContact_MotionFlags(actor, 0x2000)))
             SceneActorEffects_SpawnContactParts((void *)actor);
         Reaction_ClearMotionBits(actor, ~0x2000);
         Chase_SetState(actor, 3, 1, 0);

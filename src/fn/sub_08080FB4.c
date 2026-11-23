@@ -2,6 +2,7 @@
 #include "scene_actor_reaction.h"
 #include "script_utility.h"
 #include "runtime.h"
+#include "scene_actor_control_helpers.h"
 void SceneActorAttachment_ReplaceResponseSlot(void *, u32, u32, u32);
 void SceneActorEffects_AdvanceSteps(void *, u32);
 void *Bestiary_GetEntryForActor(u32, u32);
@@ -10,12 +11,6 @@ void SceneActorRecord_RecordPair(u16, u16);
 static inline u8 IsPrimary(struct ChaseActor *actor)
 {
     if (actor->base.object == (void *)1)
-        return 1;
-    return 0;
-}
-static inline u8 Test(u32 value, u32 mask)
-{
-    if (value & mask)
         return 1;
     return 0;
 }
@@ -117,7 +112,7 @@ void SceneActorReaction_BeginHiddenDefeat(struct ChaseActor *actor)
     actor->base.attachmentTimer = 0;
     SetControl(actor);
     SetAnimation(actor, 1, 0, 2);
-    if ((!Test(gEngineFlags, 0x4800)) && (!Flag(actor, 0x800, 0x2D0))) {
+    if ((!SceneActorControl_TestFlags(gEngineFlags, 0x4800)) && (!Flag(actor, 0x800, 0x2D0))) {
         SceneActorRecord_RecordPair(gScriptEntryProcedure, actor->base.body.id);
     }
     ActorShadow_Disable((u8 *)actor + 0x320);
