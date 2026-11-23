@@ -53,14 +53,12 @@ void ScanlinePresentation_UpdateFadeIn(struct ScanlinePresentation *s)
 
 void ScanlinePresentation_UpdateFadeOut(struct ScanlinePresentation *s)
 {
-    u32 k;
     if (s->mode == 0)
         gBgFadeLevel = Div(s->phase << 6, s->duration);
     s->phase--;
-    k = 0;
     if (s->phase < 0) {
-        s->phase = k;
-        s->fade = (void *)k;
+        s->phase = 0;
+        s->fade = (void *)0;
         if (s->script != 0)
             Script_Call(s->script, 0);
         Task_Kill(s);
