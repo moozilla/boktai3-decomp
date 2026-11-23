@@ -39,9 +39,9 @@ void NamedObject_UpdateContactTrigger(struct NamedObject *o)
             if (o->timer >= o->limit && NamedObject_IsPlayerWithinContactBounds(o)) {
                 o->state = 2;
                 if (NamedObjectFlags_Has(2, &o->flags))
-                    NamedObjectFlags_Remove(2, &o->flags);
+                    NamedObject_DisableFlags(2, o);
                 else
-                    NamedObjectFlags_Add(2, &o->flags);
+                    NamedObject_EnableFlags(2, o);
                 o->timer = 0;
                 o->stage = 1;
                 m = gNamedActorManager;
@@ -57,7 +57,7 @@ void NamedObject_UpdateContactTrigger(struct NamedObject *o)
                 return;
             }
             if (o->timer > o->limit - 10)
-                NamedObjectFlags_Add(0x20, &o->flags);
+                NamedObject_EnableFlags(0x20, o);
         }
         found = NamedObject_FindNearPosition(((u8 **)gPlayers)[0] + 0x30);
         if (found) {

@@ -19,7 +19,8 @@ void NamedObject_TryCapturePlayer(struct NamedObject *o)
     s32 i;
     i = 0;
     do {
-        if (gPlayers[i] && Player_TestAttachmentFlags(gPlayers[i], 1) && NamedObjectFlags_Has(8, &o->flags)) {
+        if (gPlayers[i] && Player_TestAttachmentFlags(gPlayers[i], 1) &&
+            NamedObjectFlags_Has(8, &o->flags)) {
             s32 x = gPlayers[i]->position.x >> 8;
             s32 z = gPlayers[i]->position.z >> 8;
             s32 cell;
@@ -38,12 +39,13 @@ void NamedObject_TryCapturePlayer(struct NamedObject *o)
                 attr = *(u16 *)(data + 2);
                 if (attr & 0x80) {
                     struct SceneVec delta;
-                    Difference(&delta, (struct SceneVec *)&o->body.position.x, &gPlayers[i]->position);
+                    Difference(&delta, (struct SceneVec *)&o->body.position.x,
+                               &gPlayers[i]->position);
                     if (delta.x > gUnk_086064B4.x || delta.x < -gUnk_086064B4.x ||
                         delta.y > gUnk_086064B4.y || delta.y < -gUnk_086064B4.y ||
                         delta.z > gUnk_086064B4.z || delta.z < -gUnk_086064B4.z) {
                         Player_SetPendingObject(gPlayers[i], &o->body.position.x);
-                        NamedObjectFlags_Add(0x100, &o->flags);
+                        NamedObject_EnableFlags(0x100, o);
                     }
                 }
             }

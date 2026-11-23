@@ -59,6 +59,6 @@ void NamedObject_ClampTetherToPlatform(struct NamedObject *o)
         tether.y = o->body.position.y;
         tether.z = o->body.position.z + delta.z;
         TetherActor_SetPosition(&tether);
-        NamedObjectFlags_Add(0x200, &o->flags);
+        NamedObject_EnableFlags(0x200, o);
     }
 }

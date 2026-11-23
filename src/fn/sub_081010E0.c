@@ -50,7 +50,7 @@ void NamedObject_UpdateVerticalTravel(struct NamedObject *object)
             delta = (*(struct LiftPlayer **)gPlayers)->position;
             ((struct ContactPosition *)&delta)->y = object->body.position.y;
             Player_SetPositionAndSave((*(struct LiftPlayer **)gPlayers), &delta);
-            NamedObjectFlags_Add(0x100, &object->flags);
+            NamedObject_EnableFlags(0x100, object);
             object->motion.y = 0;
         }
         object->state = 4;
@@ -66,7 +66,7 @@ void NamedObject_UpdateVerticalTravel(struct NamedObject *object)
             delta = (*(struct LiftPlayer **)gPlayers)->position;
             ((struct ContactPosition *)&delta)->y = object->body.position.y;
             Player_SetPositionAndSave((*(struct LiftPlayer **)gPlayers), &delta);
-            NamedObjectFlags_Add(0x100, &object->flags);
+            NamedObject_EnableFlags(0x100, object);
             object->motion.y = 0;
         }
         object->state = 4;

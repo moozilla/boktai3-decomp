@@ -30,6 +30,6 @@ void NamedObject_ApplyVerticalImpulseAndJitter(struct NamedObject *object)
             object->sprite.position.z += Mod(gRandomTable[gRandomIndex], 12) - 6;
         }
     clear:
-        NamedObjectFlags_Remove(0x20, &object->flags);
+        NamedObject_DisableFlags(0x20, object);
     }
 }

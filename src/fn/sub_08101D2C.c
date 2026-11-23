@@ -29,7 +29,7 @@ void NamedObject_UpdateTerrainRegistration(struct NamedObject *object)
     if ((u16)(object->state - 3) > 1) {
         if (NamedObjectFlags_Has(1, &object->flags)) {
             TerrainModifiers_UnregisterCell(object->registration);
-            NamedObjectFlags_Remove(1, &object->flags);
+            NamedObject_DisableFlags(1, object);
         }
     } else {
         if (NamedObjectFlags_Has(1, &object->flags))
