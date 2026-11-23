@@ -1406,35 +1406,9 @@ struct S {
 
 void Vorn_BeginAction16(struct S *s)
 {
-    void (*fn)(void) = SceneActorControl_OnIdle;
-    u8 code = 0x10;
-    u32 zero;
-    u8 one;
-    u8 zero8;
-    u32 *flags;
-    u8 *taken;
-    u32 two;
-    taken = &s->taken;
-    zero = 0;
-    one = 1;
-    *taken = one;
-    s->done = zero;
-    s->code = code;
-    s->callback = fn;
-    zero8 = 0;
-    s->timer = zero;
-    flags = &s->flags114;
-    {
-        u32 mask = -2;
-        *flags &= mask;
-    }
-    s->at104 = zero;
-    two = 2;
-    s->a = zero8;
-    s->b = two;
-    s->c = zero8;
-    s->count = zero;
-    s->queued = one;
+    struct ChaseActor *actor = (void *)s;
+    Chase_SetCtl(actor, SceneActorControl_OnIdle, 0x10);
+    Chase_SetState(actor, 0, 2, 0);
 }
 
 void Vorn_BeginAction16(struct S *s);
@@ -3253,39 +3227,11 @@ void Vorn_RestoreControlAfterItemLaunch(struct SRestoreControlAfterItemLaunch *s
 {
     struct SRestoreControlAfterItemLaunch *context = s->other;
     if (SceneActorControl_TakeFlag(&s->queued)) {
-        void (*fn)(void);
-        u32 zero;
-        u8 one;
-        u8 zero8;
-        u32 *flags;
-        u32 two;
         SceneActor_TryLaunchItem13(context);
         ((struct Vorn *)context)->response = 0xFFFF;
         Trigger_ConsumePending(((u8 *)s) + 0xC, 1);
-        fn = s->next;
-        zero = 0;
-        {
-            u8 *taken = &s->taken;
-            one = 1;
-            *taken = one;
-        }
-        s->done = zero;
-        s->code = zero;
-        s->callback = fn;
-        zero8 = 0;
-        s->timer = zero;
-        flags = &s->flags114;
-        {
-            s32 mask = -2;
-            *flags &= mask;
-        }
-        s->at104 = zero;
-        two = 2;
-        s->a = two;
-        s->b = zero8;
-        s->c = two;
-        s->count = zero;
-        s->queued = one;
+        Chase_SetCtl((struct ChaseActor *)s, s->next, 0);
+        Chase_SetState((struct ChaseActor *)s, 2, 0, 2);
     } else {
         ++s->count;
     }
