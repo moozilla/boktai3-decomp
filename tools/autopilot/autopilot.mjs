@@ -39,6 +39,7 @@ const STAGES = (() => { try { return JSON.parse(fs.readFileSync(path.join(ROOT, 
 const stageOf = (scene) => STAGES.find((x) => x.scene === scene) || { items: [], doors: [], entrances: [] };
 const log = [];
 // scenes the run has been in (carried over from --from), for door choice
+const UNREACHABLE = new Set(from && from.unreachable ? from.unreachable : []);  // 'scene:box' doors no route reached
 const SEEN = new Map();  // person id -> rooms they were in
 const VISITS = new Map();  // room visits this run: least visited doors first
 const TRIED = new Set(from && from.tried ? from.tried : []);  // floor items already gone for
@@ -169,7 +170,9 @@ const GOALS = {
       // --toward SCENE: a door there first; --goal SCENE: the door on the shortest route
       // over the door graph (stages.json); then unvisited scenes
       const toward = rooms === 0 ? +opt('--toward', -1) : -1;
-      const dist = routeDistances(+opt('--goal', -1));
+      // with no --goal: explore, the door on the shortest route (over doors not known to
+      // be unreachable) to the nearest scene not visited yet
+      const dist = +opt('--goal', -1) >= 0 ? routeDistances(+opt('--goal', -1)) : exploreDistances(here, visited);
       VISITS.set(here, (VISITS.get(here) || 0) + 1);
       const doors = doorsHere().sort((a, b) => (b.scene === toward) - (a.scene === toward) ||
         (dist.get(a.scene) ?? 1e9) - (dist.get(b.scene) ?? 1e9) || visited.has(a.scene) - visited.has(b.scene) ||
@@ -195,6 +198,7 @@ const GOALS = {
             continue;
           }
           if (yield* throughDoor(g, L, d.box)) { moved = true; break; }
+          if (L.where().scene === here) UNREACHABLE.add(`${here}:${d.box}`);
           if (L.where().scene !== here) { moved = true; break; }
         }
       }
@@ -242,6 +246,26 @@ const GOALS = {
     return true;
   },
 };
+
+// Exploration distances: breadth first from HERE over stages.json doors (skipping doors a
+// run found unreachable from their side) to the nearest unvisited scene; each door's
+// destination gets the number of doors from it to that frontier.
+function exploreDistances(here, visited) {
+  const out = new Map(), adj = new Map();
+  for (const st of STAGES) adj.set(st.scene, st.doors.filter((d) => !UNREACHABLE.has(`${st.scene}:${d.box}`)).map((d) => d.scene));
+  const toFrontier = new Map();  // scene -> doors to the nearest unvisited scene
+  const frontier = STAGES.map((st) => st.scene).filter((sc) => !visited.has(sc));
+  // reverse breadth first from all unvisited scenes
+  let level = frontier.slice();
+  for (const sc of level) toFrontier.set(sc, 0);
+  while (level.length) {
+    const next = [];
+    for (const [from, tos] of adj) if (!toFrontier.has(from) && tos.some((t) => level.includes(t))) { toFrontier.set(from, 1 + Math.min(...tos.filter((t) => level.includes(t)).map((t) => toFrontier.get(t)))); next.push(from); }
+    level = next;
+  }
+  for (const [sc, d] of toFrontier) out.set(sc, d);
+  return out;
+}
 
 // Door-graph distances to GOAL (breadth first over stages.json doors, walked backwards):
 // scene -> number of doors to the goal. Empty without a goal.
@@ -360,7 +384,7 @@ const reads = readFrames.map((n) => movie[n]);
 // a savestate on the ROM at each room the run entered: the input read index there
 const allEvents = [...(from && from.rooms ? from.rooms : []), ...log.filter((e) => e.skill === 'room' || e.skill === 'goal').map((e) => ({ frame: e.frame, scene: e.scene }))];
 const saves = allEvents.map((e) => ({ at: readFrames.filter((n) => n < e.frame).length, name: `scene_${e.scene}_f${e.frame}` }));
-fs.writeFileSync(path.join(out, 'movie.json'), JSON.stringify({ goal, save: opt('--save') || (from && from.save) || null, frames: movie.length, end, visited: [...VISITED], tried: [...TRIED], rooms: allEvents, readFrames, movie }));
+fs.writeFileSync(path.join(out, 'movie.json'), JSON.stringify({ goal, save: opt('--save') || (from && from.save) || null, frames: movie.length, end, visited: [...VISITED], tried: [...TRIED], unreachable: [...UNREACHABLE], rooms: allEvents, readFrames, movie }));
 fs.writeFileSync(path.join(out, 'harness.txt'), harnessScript(reads, saves, `autopilot ${goal}: ${ok ? 'reached' : 'NOT reached'}; port end ${JSON.stringify(end)}`));
 fs.writeFileSync(path.join(out, 'log.json'), JSON.stringify(log, null, 1));
 console.log(`${goal}: ${ok ? 'reached' : 'NOT reached'} at frame ${s.frame} (${secs.toFixed(1)} s), end ${JSON.stringify(end)} -> ${path.relative(ROOT, out)}`);
