@@ -1,8 +1,9 @@
 #include "global.h"
-void SceneActorControl_AdvancePhase(u8 *p)
+#include "scene_actor_terrain_reaction.h"
+
+void SceneActorControl_AdvancePhase(struct ChaseActor *actor)
 {
-    u8 *q = p + 0x2b1;
-    if (*q != 0)
-        *q = 0;
-    *(s32 *)(p + 0x2ac) += 1;
+    if (actor->base.field2B1)
+        actor->base.field2B1 = 0;
+    actor->base.counter2AC++;
 }
