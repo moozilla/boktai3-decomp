@@ -1,3 +1,4 @@
+#include "engine_pause.h"
 #include "modifier_list.h"
 #include "ram.h"
 #include "area_effect_link.h"
@@ -19,12 +20,10 @@ void ModifierMenu_InitializePreview(struct ModifierMenu *menu)
     u8 *resource;
     u8 *model;
     u32 flags;
-    u32 mask;
     origin.x = 48;
     origin.y = 80;
     origin.z = 0;
-    mask = 0x800;
-    flags = (gEngineFlags | gScenePauseFlags) & mask;
+    flags = Engine_PauseBits(0x800);
     if (flags) {
         menu->previewActorId = ModifierMenu_GetPreviewActorId(gLinkSession);
     } else {
