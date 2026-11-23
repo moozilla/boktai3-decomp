@@ -1,10 +1,7 @@
 #include "wireless_trade_menu.h"
 #include "global.h"
+#include "word_flags.h"
 int WirelessExchange_SendPacket(struct WirelessGameExchange *, int, const u32 *, int);
-static inline u32 test(u32 *flags, u32 mask)
-{
-    return *flags & mask;
-}
 void WirelessGameMenu_UpdateReadyExchange(struct WirelessGameExchange *p)
 {
     u32 data;
@@ -20,7 +17,7 @@ void WirelessGameMenu_UpdateReadyExchange(struct WirelessGameExchange *p)
         WirelessExchange_SendPacket(p, 3, &retry, 1);
         p->selectionReady = 0;
     }
-    if (test(&p->exchangeFlags, 0x30) == 0x30) {
+    if (WordFlags_Test(&p->exchangeFlags, WIRELESS_EXCHANGE_READY) == WIRELESS_EXCHANGE_READY) {
         p->exchangeFlags &= ~WIRELESS_EXCHANGE_READY;
         WirelessGameMenu_EnterState(p, WIRELESS_MENU_ROUND_PREPARATION);
     } else
