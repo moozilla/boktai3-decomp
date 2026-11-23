@@ -3079,16 +3079,6 @@ void Axe_RemoveSecondaryColliders(struct ChaseActor *actor)
     } while (--i >= 0);
 }
 
-static inline void SetCollider(struct ContactCollider *collider, u32 mask)
-{
-    collider->flags |= mask;
-}
-
-static inline void ClearCollider(struct ContactCollider *collider, u32 mask)
-{
-    collider->flags &= ~mask;
-}
-
 static inline s32 Scale_UpdateBodyColliders(s32 value)
 {
     s32 result;
@@ -3116,19 +3106,19 @@ void Axe_UpdateBodyColliders(struct ChaseActor *actor)
     for (index = 0; index < 3; index++) {
         if (WordFlags_Has(0x40, &context->flagsE4C) ||
             SceneActorChase_HasPlacementFlags(actor, 0x800)) {
-            SetCollider(attack, 4);
-            SetCollider(&actor->base.colliderA, 4);
+            ContactCollider_SetFlags(attack, 4);
+            ContactCollider_SetFlags(&actor->base.colliderA, 4);
             for (i = 0; i < 2; i++) {
-                SetCollider(&context->extraBody[i], 4);
-                SetCollider(&context->extraAttack[i], 4);
+                ContactCollider_SetFlags(&context->extraBody[i], 4);
+                ContactCollider_SetFlags(&context->extraAttack[i], 4);
             }
             break;
         }
-        ClearCollider(attack, 4);
-        ClearCollider(&actor->base.colliderA, 4);
+        ContactCollider_ClearFlags(attack, 4);
+        ContactCollider_ClearFlags(&actor->base.colliderA, 4);
         for (i = 0; i < 2; i++) {
-            ClearCollider(&context->extraBody[i], 4);
-            ClearCollider(&context->extraAttack[i], 4);
+            ContactCollider_ClearFlags(&context->extraBody[i], 4);
+            ContactCollider_ClearFlags(&context->extraAttack[i], 4);
         }
         MonsterInit_ClearPosition(&buf.zero, &offset);
         position = actor->base.body.position;
