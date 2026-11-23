@@ -286,15 +286,15 @@ void ScenePool_UpdateOccupiedActor(u8 *pool, u8 *slot, u8 *item, u32 index)
     }
     {
         Character_GetHeightAdjustedPosition(actor, (s16 *)&pos);
-        SpatialIndex_SetPosition((u8 *)actor + 0x56C, pos.x, pos.y, pos.z);
+        SpatialIndex_SetPosition(&actor->motionFlags, pos.x, pos.y, pos.z);
         h = *ph;
         heading = (s16)h;
         if (heading < 0) {
-            SpatialIndex_SetPosition((u8 *)actor + 0x52C, pos.x, pos.y, pos.z);
+            SpatialIndex_SetPosition(actor->contactIndex, pos.x, pos.y, pos.z);
         } else {
             struct SceneVec off;
             SceneVec_SetPolarXZ(&off, (s16)*ph, 20);
-            SpatialIndex_SetPosition((u8 *)actor + 0x52C, pos.x + off.x, pos.y, pos.z + off.z);
+            SpatialIndex_SetPosition(actor->contactIndex, pos.x + off.x, pos.y, pos.z + off.z);
         }
     }
     ScenePool_UpdateProximityCollider(slot);
@@ -342,7 +342,7 @@ void ScenePool_UpdateOccupiedActor(u8 *pool, u8 *slot, u8 *item, u32 index)
         if (((u8 *)actor)[0x57A])
             FIELD(item, 0x60, u32) += FIELD(actor, 0x578, u16);
         ActorStats_ApplyPendingDamage(actor);
-        ActorParticles_UpdateEmitter(actor, (u8 *)actor + 0x44, FIELD(actor, 0x5C, u32));
+        ActorParticles_UpdateEmitter(actor, actor->colorEffect, FIELD(actor, 0x5C, u32));
     }
     PalFade_Update(actor);
     if (TestFlags(flags, 2)) {
@@ -375,7 +375,7 @@ void ScenePool_UpdateOccupiedActor(u8 *pool, u8 *slot, u8 *item, u32 index)
         }
     }
     ScenePool_ResetProximityContact(slot);
-    Character_UpdateTimedEffect((u8 *)actor + 0x68);
+    Character_UpdateTimedEffect(actor->preview);
     if (!(TestFlags(flags, 0x20)) && (actor->flags40 & 4))
         ActorParticles_SpawnImpactBurst(actor);
     FIELD(item, 0x14, struct Vec16) = FIELD(actor, 0x10, struct Vec16);

@@ -73,7 +73,7 @@ void Vanargand_UpdateAnimationAndTargets(struct VanargandTargets *p)
         u32 offset;
         s16 z = sprite->position.z;
         {
-            s16 *out = (s16 *)((u8 *)actor + 0x210);
+            s16 *out = &actor->renderPosition.z;
             *out = z;
         }
     }

@@ -254,7 +254,7 @@ static inline void ActorStatus_ReactionFlags(void *object)
         SceneActorChase_ClearWordFlags(&((struct ChaseActor *)object)->base.behaviorFlags, 0x2000);
     } else if (ActorStatus_IsDown(object)) {
         ActorStatus_ReleaseContact(object);
-        ActorStatus_ResetInteractionAt(actor, (void *)((u8 *)group + 0x4C));
+        ActorStatus_ResetInteractionAt(actor, &group->common.control);
         actor->base.motionFlags = 0x40;
         actor->base.field2E6 = 0;
         SceneActorChase_ClearBits(&actor->base.reactionFlags, 0x980);
@@ -288,20 +288,20 @@ static inline void ActorStatus_ReactionFlags(void *object)
             ActorStatus_SetPendingBits(actor, 0x400);
             SceneActorChase_ClearBits(&actor->base.reactionFlags, 0x980);
         } else if (ActorStatus_MotionFlags(actor, 0x10)) {
-            ActorStatus_ResetRouteAt(actor, (void *)((u8 *)group + 0x4C));
+            ActorStatus_ResetRouteAt(actor, &group->common.control);
             ActorStatus_ResetReaction(object);
             ActorStatus_ClearMotionFlags(actor, 0x2500);
             (*(s16 *)&actor->base.attachmentTimer) = 0;
             actor->base.field2C2 = Div(0x40, 6);
             ActorStatus_ReleaseContact(object);
-            ActorStatus_ResetInteractionAt(actor, (void *)((u8 *)group + 0x4C));
+            ActorStatus_ResetInteractionAt(actor, &group->common.control);
             ActorStatus_ClearMotionFlags(actor, 0x400);
             group->turn.turnsRemaining |= -1;
             ActorStatus_SetPendingBits(actor, 0x400);
             SceneActorChase_ClearBits(&actor->base.reactionFlags, 0x980);
         } else if (ActorStatus_MotionFlags(actor, 8)) {
-            ActorStatus_ResetRouteAt(actor, (void *)((u8 *)group + 0x4C));
-            ActorStatus_ResetInteractionAt(actor, (void *)((u8 *)group + 0x4C));
+            ActorStatus_ResetRouteAt(actor, &group->common.control);
+            ActorStatus_ResetInteractionAt(actor, &group->common.control);
             ActorStatus_ClearMotionFlags(actor, 0x2500);
             ActorStatus_SetPendingBits(actor, 0x400);
             SceneActorChase_ClearBits(&actor->base.reactionFlags, 0x980);
@@ -315,7 +315,7 @@ static inline void ActorStatus_ReactionFlags(void *object)
                 SceneActorChase_ClearWordFlags(&actor->base.behaviorFlags, 0x80);
             SceneActorChase_ClearWordFlags(&actor->base.statusFlags, 0x100004);
             ActorStatus_ReleaseContact(object);
-            ActorStatus_ResetInteractionAt(actor, (void *)((u8 *)group + 0x4C));
+            ActorStatus_ResetInteractionAt(actor, &group->common.control);
             ActorStatus_ClearMotionFlags(actor, 0x400);
             group->turn.turnsRemaining = 0xFF;
             ActorStatus_SetPendingBits(actor, 0x400);

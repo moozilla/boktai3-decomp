@@ -2788,7 +2788,7 @@ void Actor_InitPaletteEffectPose(struct ActorAnimController *p)
     if (take(p)) {
         p->state = 12;
         Anim_SetSequence(&p->anim, p->arg, 12, 0, 0);
-        AnimData_SelectPaletteBank((u8 *)p + 0xe08, 346);
+        AnimData_SelectPaletteBank(p->effect, 346);
         o = &p->obj;
         a = &p->anim;
         entry = a->data + a->frame;
@@ -2849,7 +2849,7 @@ void Actor_InitPaletteEffectPose(struct ActorAnimController *p)
                 a->rate = 1;
         } else
             done = 0;
-        *((u8 *)p + 0xde3) = 3;
+        p->obj.priority = 3;
         p->obj.flags &= ~1;
     }
 }
@@ -2872,7 +2872,7 @@ void Actor_UpdateBlinkBurstDisappearance(struct ActorAnimController *p)
     if (take(p)) {
         p->state = 13;
         Anim_SetSequence(&p->anim, p->arg, 13, 0, 0);
-        AnimData_SelectPaletteBank((u8 *)p + 0xe08, 346);
+        AnimData_SelectPaletteBank(p->effect, 346);
         o = &p->obj;
         a = &p->anim;
         entry = a->data + a->frame;
@@ -2944,18 +2944,18 @@ void Actor_UpdateBlinkBurstDisappearance(struct ActorAnimController *p)
             p->obj.flags |= 1;
         if (--(*(u16 *)&p->blinkInterval) == 0) {
             s32 duration = 10;
-            AnimatedParticles_EmitBurst((u8 *)p + 0xdf8, 1, 512, 48, 8, 8, 8, 4);
-            AnimatedParticles_EmitBurst((u8 *)p + 0xdf8, 1, 512, 48, 8, 8, 8, 4);
-            AnimatedParticles_EmitBurst((u8 *)p + 0xdf8, 1, 512, 48, 8, 8, 8, 4);
-            AnimatedParticles_EmitBurst((u8 *)p + 0xdf8, 1, 512, 48, 8, 8, 8, 4);
-            sub_080148CC(1, 3, (u8 *)p + 0xdf8, 32, 60, duration, 3, duration, 5, 60, duration);
-            sub_080148CC(1, 3, (u8 *)p + 0xdf8, 64, 60, duration, 3, duration, 5, 60, duration);
-            sub_080148CC(1, 3, (u8 *)p + 0xdf8, 96, 60, duration, 3, duration, 5, 60, duration);
-            sub_080148CC(1, 3, (u8 *)p + 0xdf8, 128, 60, duration, 3, duration, 5, 60, duration);
-            sub_080148CC(1, 3, (u8 *)p + 0xdf8, 160, 60, duration, 3, duration, 5, 60, duration);
-            sub_080148CC(1, 3, (u8 *)p + 0xdf8, 192, 60, duration, 3, duration, 5, 60, duration);
-            sub_080148CC(1, 3, (u8 *)p + 0xdf8, 224, 60, duration, 3, duration, 5, 60, duration);
-            sub_080148CC(1, 3, (u8 *)p + 0xdf8, 256, 60, duration, 3, duration, 5, 60, duration);
+            AnimatedParticles_EmitBurst(&p->obj.x, 1, 512, 48, 8, 8, 8, 4);
+            AnimatedParticles_EmitBurst(&p->obj.x, 1, 512, 48, 8, 8, 8, 4);
+            AnimatedParticles_EmitBurst(&p->obj.x, 1, 512, 48, 8, 8, 8, 4);
+            AnimatedParticles_EmitBurst(&p->obj.x, 1, 512, 48, 8, 8, 8, 4);
+            sub_080148CC(1, 3, &p->obj.x, 32, 60, duration, 3, duration, 5, 60, duration);
+            sub_080148CC(1, 3, &p->obj.x, 64, 60, duration, 3, duration, 5, 60, duration);
+            sub_080148CC(1, 3, &p->obj.x, 96, 60, duration, 3, duration, 5, 60, duration);
+            sub_080148CC(1, 3, &p->obj.x, 128, 60, duration, 3, duration, 5, 60, duration);
+            sub_080148CC(1, 3, &p->obj.x, 160, 60, duration, 3, duration, 5, 60, duration);
+            sub_080148CC(1, 3, &p->obj.x, 192, 60, duration, 3, duration, 5, 60, duration);
+            sub_080148CC(1, 3, &p->obj.x, 224, 60, duration, 3, duration, 5, 60, duration);
+            sub_080148CC(1, 3, &p->obj.x, 256, 60, duration, 3, duration, 5, 60, duration);
             ActorShadow_Disable(p->p2);
             p->obj.flags |= 1;
             Actor_SetState(p, 1, 2);

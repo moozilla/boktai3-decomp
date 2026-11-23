@@ -51,7 +51,7 @@ void PaletteTransition_Restart(struct PaletteTransition *p)
     if (t == 0) {
         s32 x = e->offsetX;
         s32 y = e->offsetY;
-        u16 *origin = (u16 *)((u8 *)p + 0x9ec);
+        u16 *origin = p->origin;
         x += 0x40;
         y += 0x54;
         origin[k2] = x;
