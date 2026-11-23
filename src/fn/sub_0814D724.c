@@ -15,7 +15,7 @@ void Player_InitializeActionContact(struct Player *p)
     p->statModifierContext.contactExtentA = 8;
     p->statModifierContext.contactExtentB = 8;
     p->statModifierContext.contactCounter = 0;
-    Collider_SetAttackProperties(&p->statModifierContext.drain, kind,
+    Collider_SetAttackProperties(&p->statModifierContext.attackCollider, kind,
                                  p->statModifierContext.actionTimer, 1, flags, parameter);
     p->statModifierContext.contactDirection = p->statModifierContext.contactHeading;
     p->statModifierContext.contactTimer = 0;

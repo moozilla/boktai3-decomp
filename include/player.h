@@ -44,13 +44,17 @@ struct PlayerActionEntry {
     u8 kind, unknown1;
     u16 remainingCharge;
 };
-struct PlayerActionDrainContext {
-    u8 unknown0[0x3E];
-    u16 pendingCost;
+struct PlayerCollider {
+    u8 unknown0[6];
+    u16 flags;
+    u8 unknown8[0x36];
+    u16 cost; /* 0x3E: contact cost, cleared when restoring a linked player */
 };
+
 struct PlayerStatModifierContext {
-    u8 unknown0[0x48];
-    struct PlayerActionDrainContext drain;
+    u8 unknown0[0x2C];
+    u8 actionPalette[0x1C]; /* owner + 0xB70: palette-bank animation data for the action (tentative) */
+    struct PlayerCollider attackCollider; /* owner + 0xB8C: action contact collider */
     u8 unknown88[2];
     u8 contactDirection; /* owner + 0xBCE */
     u8 unknown8B[0x19];
@@ -85,13 +89,6 @@ struct PlayerStatModifierContext {
 
 struct PlayerColliderVector {
     u32 x : 16, y : 16, z : 16;
-};
-
-struct PlayerCollider {
-    u8 unknown0[6];
-    u16 flags;
-    u8 unknown8[0x36];
-    u16 cost; /* 0x3E: contact cost, cleared when restoring a linked player */
 };
 
 struct PlayerCueCollider {

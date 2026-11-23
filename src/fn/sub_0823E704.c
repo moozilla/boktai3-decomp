@@ -29,7 +29,7 @@ void sub_0823E704(struct Player *p)
         flags |= 1 << q->savedActionIndex;
         Player_ConsumeActionResource(p);
     }
-    Collider_SetAttackProperties(&q->drain, resource, q->actionTimer, 4, flags,
+    Collider_SetAttackProperties(&q->attackCollider, resource, q->actionTimer, 4, flags,
                                  q->contactParameter);
     q->contactDirection = q->contactHeading;
     q->contactTimer = 0;

@@ -1644,8 +1644,8 @@ void Player_ConsumeActionCharge(struct Player *p)
 
     if (p->actionMode != 6) {
         {
-            struct PlayerActionDrainContext *drain = &p->statModifierContext.drain;
-            cost = drain->pendingCost;
+            struct PlayerCollider *drain = &p->statModifierContext.attackCollider;
+            cost = drain->cost;
         }
         if (cost > 0) {
             if (!p->statModifierContext.statBOverrideEnabled) {
@@ -1674,8 +1674,8 @@ void Player_ConsumeActionCharge(struct Player *p)
                 }
             }
         clear: {
-            struct PlayerActionDrainContext *drain = &p->statModifierContext.drain;
-            drain->pendingCost = 0;
+            struct PlayerCollider *drain = &p->statModifierContext.attackCollider;
+            drain->cost = 0;
         }
         }
     }
