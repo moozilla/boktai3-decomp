@@ -949,7 +949,8 @@ void Player_UpdateFourPhaseAction(struct Player *player)
             }
             result = Player_SetAnimation(
                 player, ActorVariant_GetTableValue(player->actionMode, 0x17), speed, 1);
-            if (player->actionMode == 1 && player->animation.frameIndex == 2 && !player->animation.elapsed)
+            if (player->actionMode == 1 && player->animation.frameIndex == 2 &&
+                !player->animation.elapsed)
                 DirectionalSpriteEffect_LaunchFromFacing(player, player->facing, &player->position);
             if (result)
                 ActorSequence_Begin(player, 3, 3);
@@ -1850,7 +1851,8 @@ void PlayerCue_UpdateSpiralMotion(struct Player *player)
     Player_SetAnimation(player, 0x9A, 64, 1);
     {
         player->animation.paletteBank = 0x16F;
-        player->animation.palette = (u16 *)(gPaletteBankData + (player->animation.paletteBank << 5));
+        player->animation.palette =
+            (u16 *)(gPaletteBankData + (player->animation.paletteBank << 5));
     }
     Anim_SetSequence(&player->cueCollider.sequence, (void *)player->cueCollider.setupResource, 0,
                      player->heading, player->side);
@@ -2221,8 +2223,7 @@ void PlayerCue_UpdateSpiralRecovery(struct Player *player)
     }
     if ((player->tetherFrame & 7) >= 7 - (player->tetherFrame >> 2)) {
         Player_AddControlFlags(player, 0x41);
-        player->animation.position =
-            (*(struct ContactPosition *)&player->position);
+        player->animation.position = (*(struct ContactPosition *)&player->position);
     }
     Player_SetAnimation(player, 0x9A, 0x40, 1);
     {
@@ -2890,8 +2891,7 @@ void PlayerCue_UpdateTargetDash(struct Player *player)
         gUnk_02000524 = 0;
         (*(struct ContactPosition *)&player->movementStart) =
             (*(struct ContactPosition *)&player->position);
-        player->secondaryAnimation.position =
-            player->animation.position;
+        player->secondaryAnimation.position = player->animation.position;
         ClearAnimationFlags(&player->secondaryAnimation, 1);
         Player_SetPendingCallback(player, Player_OnTargetMotionExit);
         Player_EmitQueuedEffects(player);
@@ -2911,9 +2911,8 @@ void PlayerCue_UpdateTargetDash(struct Player *player)
             if (frame == 0) {
                 Player_SetFacingFromAngle(
                     player,
-                    Math_Atan2(
-                        player->cueDestination.x - player->secondaryAnimation.position.x,
-                        player->cueDestination.z - player->secondaryAnimation.position.z));
+                    Math_Atan2(player->cueDestination.x - player->secondaryAnimation.position.x,
+                               player->cueDestination.z - player->secondaryAnimation.position.z));
                 TargetDash_StartAnimation(player, anim, data, 0x1A1, 0x1A6, 1);
             }
             Anim_Step(anim, data);
@@ -2928,8 +2927,7 @@ void PlayerCue_UpdateTargetDash(struct Player *player)
             deltaX = player->cueDestination.x - player->secondaryAnimation.position.x;
             deltaZ = player->cueDestination.z - player->secondaryAnimation.position.z;
             angle = Math_Atan2(deltaX, deltaZ);
-            ParticlePool_EmitTriple(player->unkA88[0],
-                                    &player->secondaryAnimation.position,
+            ParticlePool_EmitTriple(player->unkA88[0], &player->secondaryAnimation.position,
                                     (angle + 0x80) & 0xFF, 0);
             frame = player->tetherFrame;
             anim = &player->secondaryAnimation;
@@ -2961,8 +2959,7 @@ void PlayerCue_UpdateTargetDash(struct Player *player)
                         player->secondaryAnimation.position.y = player->cueDestination.y;
                 } else {
                     player->secondaryAnimation.position.y += 0x50;
-                    if (player->secondaryAnimation.position.y >
-                        player->cueDestination.y + 1000)
+                    if (player->secondaryAnimation.position.y > player->cueDestination.y + 1000)
                         player->secondaryAnimation.position.y = player->cueDestination.y + 1000;
                 }
                 facingQuadrant = ((angle + 0x60) & 0xFF) >> 6;
@@ -2979,8 +2976,7 @@ void PlayerCue_UpdateTargetDash(struct Player *player)
             }
             if (player->inputKeys[1] & 2)
                 gUnk_02000524 = 1;
-            PlayerCue_InitAttackCollider(
-                player, &player->secondaryAnimation.position, 1, 0x20);
+            PlayerCue_InitAttackCollider(player, &player->secondaryAnimation.position, 1, 0x20);
             break;
         }
         case 2: {

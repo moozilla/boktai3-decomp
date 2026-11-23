@@ -59,7 +59,7 @@ struct PlayerGrabGrabContext {
     u16 duration, returnSpeed;
     u8 heading;
 };
-#define PlayerGrab_Context(p)   ((struct PlayerGrabGrabContext *)(p))
+#define PlayerGrab_Context(p) ((struct PlayerGrabGrabContext *)(p))
 
 struct PlayerGrabCoordinates {
     u8 unknown0[0x10C];
@@ -347,8 +347,7 @@ void Player_UpdateGrabMotion(struct Player *p)
                 vec.x = PlayerGrab_Fx12(PlayerGrab_Sin(base + 0x40) * 64);
                 vec.y = 0xE6;
                 vec.z = PlayerGrab_Fx12(PlayerGrab_Sin(base) * 64);
-                SceneParticle_CreateDefaultPriority(&p->secondaryAnimation.position, &vec, 0, 0,
-                                                    1);
+                SceneParticle_CreateDefaultPriority(&p->secondaryAnimation.position, &vec, 0, 0, 1);
                 {
                     u32 link = gEngineFlags & 0x1000;
                     damage = amount;

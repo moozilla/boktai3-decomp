@@ -169,7 +169,8 @@ void Player_UpdateTerrainSidestep(struct Player *player)
                 }
             }
             Player_SetAnimationIndex(p, anim, 0x40);
-            if (p->animationIndex == 24 && p->animation.frameIndex == 0 && p->animation.elapsed == 1)
+            if (p->animationIndex == 24 && p->animation.frameIndex == 0 &&
+                p->animation.elapsed == 1)
                 Player_PlayLocalSong(p->slot, 0xDB);
             break;
         case 2:

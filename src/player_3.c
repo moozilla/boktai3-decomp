@@ -6,7 +6,6 @@
 
 /* Tentative role: select an effect flag from actor and global state. */
 
-
 s32 Player_GetVisualEffectFlags(struct Player *s)
 {
     s32 result = 0;
@@ -609,7 +608,6 @@ s32 SceneActor_SelectEffectDisplayMode(struct Player *p, s32 mode)
     return mode;
 }
 
-
 void Player_EmitQueuedEffects(struct Player *);
 s32 Mod(s32, s32);
 static inline int Player_NextStatusRandom(void)
@@ -1089,7 +1087,8 @@ s32 Player_ModifyValueByEquipmentLevel(struct PlayerModifierInput *p, s32 n)
     return n - b * a;
 }
 
-static inline u32 PlayerModifier_TestTargetFlags(const struct PlayerModifierTarget *target, u32 mask)
+static inline u32 PlayerModifier_TestTargetFlags(const struct PlayerModifierTarget *target,
+                                                 u32 mask)
 {
     return target->flags & mask;
 }
@@ -2089,7 +2088,6 @@ u32 ActorParameter_GetModeValue(s32 index)
     else
         return gUnk_0861091C[index];
 }
-
 
 u32 ActorParameter_GetModeValue(s32);
 

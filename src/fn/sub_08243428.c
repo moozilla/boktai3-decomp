@@ -31,7 +31,6 @@ static inline u32 Busy(struct Player *p)
     return r;
 }
 
-
 static inline u32 FlagSet(u32 v, u32 m)
 {
     return v & m;

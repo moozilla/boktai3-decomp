@@ -138,8 +138,6 @@ void Player_RunPendingCallback(struct Player *player)
     }
 }
 
-
-
 static inline struct GameState *EventCounterBase(u32 slot, struct GameState *state)
 {
     return (void *)((slot * sizeof(state->counters628[0])) + (u32)state);
@@ -319,7 +317,6 @@ s32 Player_GetSelectedSlotActionScale(void)
     }
     return scale;
 }
-
 
 static inline u32 ResponseActor_GetHalfFlag(struct Player *actor)
 {

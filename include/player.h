@@ -178,10 +178,10 @@ struct Player {
     u32 visualState;
     struct SceneInputWidget *activeAnimation;
     u8 unk58[0x6C - 0x58];
-    u8 animationData[0x20];           /* 0x6C: keyframe resource */
+    u8 animationData[0x20];                     /* 0x6C: keyframe resource */
     struct SceneInputWidget animation;          /* 0x8C: body sprite and its keyframe playback */
     struct SceneInputWidget secondaryAnimation; /* 0xEC: alternate keyframe channel */
-    u32 secondaryDrawFlags; /* 0x14C: bit zero follows reset flag one */
+    u32 secondaryDrawFlags;                     /* 0x14C: bit zero follows reset flag one */
     u8 unk150[3];
     u8 secondaryPriority;
     u8 secondaryScaleX, secondaryScaleY; /* cue drawable scale channels */
@@ -232,11 +232,11 @@ struct Player {
     const struct PlayerActionConfig *actionConfig; /* 0x344 */
     const u16 *inputKeys;     /* 0x348: directional key bits consumed by Player_GetInputDirection */
     u16 directionHistory[10]; /* 0x34C: signed samples; 0xFFFF means absent (read through s16) */
-    u16 basePalette[16]; /* 0x360: actor palette before blending */
-    u16 workPalette[16]; /* 0x380: blended palette bound to the active drawable */
-    u16 animationIndex; /* 0x3A0: selected base keyframe index */
-    u8 heading, side;   /* 0x3A2: folded direction and side */
-    u8 facing;          /* (guess) direction index */
+    u16 basePalette[16];      /* 0x360: actor palette before blending */
+    u16 workPalette[16];      /* 0x380: blended palette bound to the active drawable */
+    u16 animationIndex;       /* 0x3A0: selected base keyframe index */
+    u8 heading, side;         /* 0x3A2: folded direction and side */
+    u8 facing;                /* (guess) direction index */
     u8 unk3A5[2];
     u8 cueColliderPhase;                  /* 0x3A7: collider setup phase (tentative) */
     struct PlayerCueCollider cueCollider; /* 0x3A8 */
@@ -269,9 +269,10 @@ struct Player {
     u8 unk461[3];
     u8 actionLatch464, actionLatch465;
     u8 colliderHeightOffset; /* 0x466: added to the spiral collider Y position. */
-    u8 colliderHeightTarget, colliderHeightRetargetTimer; /* 0x467: hover target and frames until resampling */
+    u8 colliderHeightTarget,
+        colliderHeightRetargetTimer; /* 0x467: hover target and frames until resampling */
     u8 directionHold; /* 0x469: frames before the wavering walk picks a new direction (tentative) */
-    u8 footstepSide; /* 0x46A: alternates the walking effect and sound */
+    u8 footstepSide;  /* 0x46A: alternates the walking effect and sound */
     u8 movementMode46B;
     u8 unk46C[6];
     u8 timedEventSlot; /* 0x472: index into GameState counters620/counters628 */
@@ -389,12 +390,12 @@ struct Player {
     struct PlayerEffectSprite visualEffects778[1];
     struct PlayerPairedEffectTail visualEffects7A0[1];
     struct PlayerOrbitingSpriteState visualEffects7D0[1];
-    struct DirectionalSpriteEffect directionalEffect[1];      /* 0x7FC */
-    void *directionalEffectCallback; /* 0x864 */
+    struct DirectionalSpriteEffect directionalEffect[1]; /* 0x7FC */
+    void *directionalEffectCallback;                     /* 0x864 */
     u8 unk868[0x140];
     struct ConvergingEffectState convergingEffects; /* 0x9A8 */
-    struct SceneVec actionOrigin; /* 0xA80: offset copy of position (tentative) */
-    u32 unkA88[1];                /* cue particle pool handle; array keeps existing storage users */
+    struct SceneVec actionOrigin;                   /* 0xA80: offset copy of position (tentative) */
+    u32 unkA88[1]; /* cue particle pool handle; array keeps existing storage users */
     struct SceneVec movementStart, movementDestination; /* 0xA8C, 0xA94 */
     u16 movementDuration;                               /* 0xA9C */
     u16 cueSpeed;                                       /* 0xA9E */
@@ -417,7 +418,7 @@ struct Player {
     u8 unkAE6[2];
     struct SceneVec movementRequestTarget; /* 0xAE8 */
     u8 unkAF0;
-    u8 actionRequestState; /* 0xAF1 */
+    u8 actionRequestState;   /* 0xAF1 */
     u16 visualSlowdownTimer; /* 0xAF2: also lowers the orbiting background (OrbitBackground) */
     u8 effectModes[4], effectCounters[4]; /* 0xAF4: per-channel effect reset state */
     u16 effectLimits[4];
