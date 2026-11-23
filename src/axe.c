@@ -3737,19 +3737,7 @@ void Axe_FollowDeceleratingRoute(struct ChaseActor *actor)
     if (SceneActorControl_TakeFlag(&actor->base.field2B1)) {
         u32 origin, savedOrigin;
         u32 angle;
-        void *callback = actor->base.onAlternateEntry;
-        u32 one = 1;
-        actor->base.field2B2 = one;
-        actor->base.stepDone = 0;
-        actor->base.controlKind = 1;
-        actor->base.target = callback;
-        actor->base.field2C8 = 0;
-        {
-            u32 *flags = &actor->base.pendingControlFlags;
-            u32 mask = ~1;
-            *flags &= mask;
-        }
-        actor->base.pendingControl = 0;
+        SceneActorChase_SetControl(actor, actor->base.onAlternateEntry, 1);
         route->index = 0;
         target = (*(struct AxePlayer **)gPlayers)->position;
         origin = (u32)gRandomTable + (PARTICLE_RANDOM_SAMPLE_ORIGIN - RANDOM_TABLE_ADDR);
@@ -3810,19 +3798,7 @@ void Axe_FollowAcceleratingRoute(struct ChaseActor *actor)
     if (SceneActorControl_TakeFlag(&actor->base.field2B1)) {
         u32 origin, savedOrigin;
         u32 angle;
-        void *callback = actor->base.onAlternateEntry;
-        u32 one = 1;
-        actor->base.field2B2 = one;
-        actor->base.stepDone = 0;
-        actor->base.controlKind = 1;
-        actor->base.target = callback;
-        actor->base.field2C8 = 0;
-        {
-            u32 *flags = &actor->base.pendingControlFlags;
-            u32 mask = ~1;
-            *flags &= mask;
-        }
-        actor->base.pendingControl = 0;
+        SceneActorChase_SetControl(actor, actor->base.onAlternateEntry, 1);
         route->index = 0;
         target = (*(struct AxePlayer **)gPlayers)->position;
         origin = (u32)gRandomTable + (PARTICLE_RANDOM_SAMPLE_ORIGIN - RANDOM_TABLE_ADDR);
