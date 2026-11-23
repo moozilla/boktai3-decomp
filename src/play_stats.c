@@ -64,12 +64,8 @@ void PlayStats_RemoveAnimations(struct PlayStatsScreen *screen)
 void PlayStats_HideEntryAnimations(struct PlayStatsScreen *screen)
 {
     s32 i;
-    u32 m = 1;
-    u32 *flags = &screen->entries[0].flags;
-    for (i = 7; i >= 0; i--) {
-        *flags |= m;
-        flags = (void *)((u8 *)flags + sizeof(struct SceneInputWidget));
-    }
+    for (i = 0; i < 8; i++)
+        screen->entries[i].flags |= 1;
 }
 
 void PlayStats_DrawLabels(struct PlayStatsScreen *screen)
