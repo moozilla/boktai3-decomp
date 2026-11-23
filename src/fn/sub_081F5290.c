@@ -28,15 +28,6 @@ static inline void polar(struct ContactPosition *v, s32 angle, s32 radius)
 
 void Ratatosk_UpdateDirectionalAnimation(void);
 void Ratatosk_UpdateDefeatSequence(void);
-static inline void setState(struct Ratatosk *p, void (*update)(void), u8 state)
-{
-    p->actionState = state;
-    p->actionCallback = update;
-    p->callbackFrame = 0;
-    p->actionChanged = 1;
-    p->reactionPhase = 0;
-    p->reactionTimer = 0;
-}
 // confidence=low: recovers from knockback, choosing defeat when health is depleted.
 #define Ratatosk_UpdateKnockbackRecovery sub_081F5290
 void Ratatosk_UpdateKnockbackRecovery(struct Ratatosk *p, s32 tick)
@@ -94,9 +85,9 @@ void Ratatosk_UpdateKnockbackRecovery(struct Ratatosk *p, s32 tick)
         *scaleZ = 0;
         p2->scaleMode = 0;
         if (p->health <= 0 && !p->locked) {
-            setState(p, Ratatosk_UpdateDefeatSequence, 15);
+            Ratatosk_StartReaction(p, Ratatosk_UpdateDefeatSequence, 15);
         } else {
-            setState(p, Ratatosk_UpdateDirectionalAnimation, 1);
+            Ratatosk_StartReaction(p, Ratatosk_UpdateDirectionalAnimation, 1);
             p->actionFinished = 1;
         }
     } else {
