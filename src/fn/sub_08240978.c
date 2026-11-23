@@ -45,7 +45,7 @@ void Player_UpdateFlinch(struct Player *p)
             p->heading = p->facing >> 1;
             p->side = 0;
         }
-        if (*((u8 *)p + 0x418) == 6)
+        if (p->actionMode == 6)
             Player_PlayLocalSong(p->slot, 0x2EB);
         else
             Player_PlayLocalSong(p->slot, 0xE7);
@@ -54,7 +54,7 @@ void Player_UpdateFlinch(struct Player *p)
     }
     switch (p->tetherPhase) {
         case 0:
-            Player_SetAnimationIndex(p, ActorVariant_GetTableValue(*((u8 *)p + 0x418), 0x29), 0x40);
+            Player_SetAnimationIndex(p, ActorVariant_GetTableValue(p->actionMode, 0x29), 0x40);
             if (++p->tetherFrame > 3) {
                 Player_SetTetherMode(p, 0x20, 1);
                 p->terrainRecoveryCounter = 300;
@@ -65,7 +65,7 @@ void Player_UpdateFlinch(struct Player *p)
             struct StackPoint pos;
             s32 x, z;
             u32 cell;
-            Player_SetAnimationIndex(p, ActorVariant_GetTableValue(*((u8 *)p + 0x418), 0x2B), 0x40);
+            Player_SetAnimationIndex(p, ActorVariant_GetTableValue(p->actionMode, 0x2B), 0x40);
             a = ((p->facing + 5) & 7) << 5;
             p->velocityX = -Truncate12(gUnk_086149C4[(a + 0x40) & 0xFF] * p->directionFrame);
             p->velocityZ = -Truncate12(gUnk_086149C4[a] * p->directionFrame);
@@ -115,7 +115,7 @@ void Player_UpdateFlinch(struct Player *p)
                 p->velocityX = 0;
                 p->velocityZ = 0;
             }
-            if (Player_SetAnimationIndex(p, ActorVariant_GetTableValue(*((u8 *)p + 0x418), 0x2C),
+            if (Player_SetAnimationIndex(p, ActorVariant_GetTableValue(p->actionMode, 0x2C),
                                          0x40)) {
                 p->directionFrame = 0;
                 Player_SetTetherMode(p, 0x20, 3);

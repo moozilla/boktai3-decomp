@@ -49,7 +49,7 @@ static inline u32 groundHeight(struct FloorPoint *position)
 
 s32 Player_TryStepForward(struct Player *p)
 {
-    u32 zero = *((u8 *)p + 0x4E3);
+    u32 zero = p->gateCount;
     if (zero != 0)
         return 1;
     {

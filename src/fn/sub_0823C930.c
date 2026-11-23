@@ -87,7 +87,7 @@ void Player_UpdateTerrainSidestep(struct Player *player)
         Player_SetTetherMode(p, 4, 2);
     switch (p->tetherPhase) {
         case 0:
-            SetFlags((u32 *)((u8 *)p + 0x20), 4);
+            SetFlags(&p->statusFlags, 4);
             anim = ActorVariant_GetTableValue(p->actionMode, 2);
             if (p->animationIndex != anim) {
                 Player_PlayLocalSong(p->slot, 0xD0);
@@ -113,7 +113,7 @@ void Player_UpdateTerrainSidestep(struct Player *player)
                 Player_SetTetherMode(p, 4, 1);
             break;
         case 1:
-            SetFlags((u32 *)((u8 *)p + 0x20), 8);
+            SetFlags(&p->statusFlags, 8);
             p->actionFourEnabled = 1;
             direction = (s16)p->directionHistory[0];
             a = (p->coordinateAxis + 7) & 7;
@@ -174,7 +174,7 @@ void Player_UpdateTerrainSidestep(struct Player *player)
                 Player_PlayLocalSong(p->slot, 0xDB);
             break;
         case 2:
-            SetFlags((u32 *)((u8 *)p + 0x20), 8);
+            SetFlags(&p->statusFlags, 8);
             if (Player_SetAnimationIndex(p, ActorVariant_GetTableValue(p->actionMode, 5), 0x40)) {
                 effect = *(struct PackedVec *)((u8 *)p + 0x30);
                 if (p->coordinateAxis == 1) {
@@ -202,7 +202,7 @@ void Player_UpdateTerrainSidestep(struct Player *player)
                         u32 angle;
                         u8 *heading;
                         s32 sample, product;
-                        heading = (u8 *)p + 0x4a5;
+                        heading = &p->coordinateAxis;
                         angle = (*heading + 1) & 7;
                         sample = base[((angle << 5) + 64) & 255];
                         product = sample * 50;
@@ -213,14 +213,14 @@ void Player_UpdateTerrainSidestep(struct Player *player)
                         u32 angle;
                         u8 *heading;
                         s32 sample, product;
-                        heading = (u8 *)p + 0x4a5;
+                        heading = &p->coordinateAxis;
                         angle = (*heading + 1) & 7;
                         sample = trig[angle << 5];
                         product = sample * 50;
                         probe.z -= Scale(product);
                     }
                 }
-                Player_EmitPositionEffect(p, (u8 *)p + 0x30, 256, 1, &effect, 0, 236);
+                Player_EmitPositionEffect(p, &p->position, 256, 1, &effect, 0, 236);
                 Player_SetTetherMode(p, 4, 1);
             }
             break;
