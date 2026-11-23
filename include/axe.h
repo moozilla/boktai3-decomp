@@ -64,11 +64,11 @@ struct Axe {
     u8 unknownE58[0x50];
     u16 curveTime; /* 0..1024 along the movement curve, +128 per step */
     u8 hoverPhase; /* index into the sine table for the hover bob, +2 per frame */
-    u8 unknownEAB;
+    u8 hoverEnabled;
     s16 curve;
     u8 acceleration;
     u8 unknownEAF;
-    u8 timerEB0;
+    u8 reactionCount; /* hits taken in a row; past 2 the axe answers (capped at 3) */
     u8 shakeFrames; /* frames of camera shake left (Axe_UpdateScreenShake) */
     u8 parameterEB2; /* the shake strength */
     u8 unknownEB3;

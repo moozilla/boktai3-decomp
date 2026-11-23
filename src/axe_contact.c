@@ -85,7 +85,7 @@ void Axe_OnBodyContact(struct SceneActorBehaviorContactView *source,
         actor->base.field2E6 = destination->mode;
         actor->base.colliderA.responseValue = Axe_ContactResponse(destination);
     }
-    if ((context->flagsCAB & 2) && context->timerEB0 > 2) {
+    if ((context->flagsCAB & 2) && context->reactionCount > 2) {
         s32 i;
         u32 stride = sizeof(struct ContactCollider);
         i = 0;
@@ -102,7 +102,7 @@ void Axe_OnBodyContact(struct SceneActorBehaviorContactView *source,
             ++i;
         } while (Axe_ContactIndex(i) <= 2);
         SceneActorChase_SetControl(actor, (void *)ActorPhase_UpdateReverseFlicker, 0x2F);
-        context->timerEB0 = 0;
+        context->reactionCount = 0;
     }
 }
 
@@ -354,7 +354,7 @@ void Axe_UpdateOrbitAttack(struct ChaseActor *p, s32 frame)
         Axe_ScaleTowardZero(gUnk_086149C4[(data->angle + 128) & 255] * data->radius, 12);
     if (frame < 60) {
         data->speed += 2;
-        data->timerEB0 = 0;
+        data->reactionCount = 0;
     } else if (frame < 180) {
         if (Mod(frame, 4) == 0) {
             if (Axe_RandomByte() <= 19) {
@@ -367,7 +367,7 @@ void Axe_UpdateOrbitAttack(struct ChaseActor *p, s32 frame)
         }
         Axe_Difference(&delta, &data->center, (void *)&gPlayers[0]->position);
         data->heading = Math_Atan2(delta.x, delta.z);
-        data->timerEB0 = 0;
+        data->reactionCount = 0;
     } else {
         if (!(data->flagsCAB & 4)) {
             if (data->radius < 512) {

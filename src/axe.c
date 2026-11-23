@@ -1497,31 +1497,20 @@ extern const u8 gUnk_0824E318[];
 
 void SceneActorReaction_ResetResponseState(void *, const void *, u32);
 
-struct HoverControlContext {
-    u8 unknown0[0xE4C];
-    u32 savedFlags;
-    u8 unknownE50[0x58];
-    u16 timer;
-    u8 angle, enabled;
-    u16 counter;
-    u8 unknownEAE[0x56];
-    struct ContactPosition vectorF04, vectorF0C, vectorF14, savedPosition;
-};
-
 void SceneActorControl_InitializeHoverState(struct ChaseActor *actor)
 {
-    struct HoverControlContext *context = actor->base.context;
+    struct Axe *context = actor->base.context;
     // concession-ok(const-local): The CpuSet position clears use the same fixed source word.
     u32 zero;
-    context->timer = 0;
-    context->angle = 0;
-    context->enabled = 1;
-    context->counter = 0;
-    context->savedFlags = actor->base.saved.privateFlags;
-    context->savedPosition = *(struct ContactPosition *)&gPlayers[0]->position;
-    MonsterInit_ClearPosition(&zero, &context->vectorF04);
-    MonsterInit_ClearPosition(&zero, &context->vectorF0C);
-    MonsterInit_ClearPosition(&zero, &context->vectorF14);
+    context->curveTime = 0;
+    context->hoverPhase = 0;
+    context->hoverEnabled = 1;
+    context->curve = 0;
+    context->flagsE4C = actor->base.saved.privateFlags;
+    context->target = *(struct ContactPosition *)&gPlayers[0]->position;
+    MonsterInit_ClearPosition(&zero, &context->curveStart);
+    MonsterInit_ClearPosition(&zero, &context->curveEnd);
+    MonsterInit_ClearPosition(&zero, (struct ContactPosition *)context->clearF14);
     Memory_Clear(actor->group.destination, 8);
     SceneActorReaction_ResetResponseState(&actor->group.saved.control, gHoverAnimationData, 0xD4);
     SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0);
@@ -3000,14 +2989,9 @@ void Axe_SetAuxiliarySpriteParameters(struct S080FC8B0 *s, u32 a, u32 b)
     *(u32 *)(q + 0xa70) = a;
 }
 
-struct AuxiliaryAttackGroup {
-    u8 unknown0[0x928];
-    struct ContactCollider colliders[3];
-};
-
 void ActorCollision_InitThreeAuxiliaryAttacks(struct ChaseActor *actor)
 {
-    struct AuxiliaryAttackGroup *group = actor->base.context;
+    struct Axe *group = actor->base.context;
     struct ContactPackedVector size, offset;
     s32 i;
     size.x = 24;
@@ -3017,7 +3001,7 @@ void ActorCollision_InitThreeAuxiliaryAttacks(struct ChaseActor *actor)
     offset.y = 0;
     offset.z = 0;
     for (i = 0; i < 3; i++) {
-        struct ContactCollider *collider = &group->colliders[i];
+        struct ContactCollider *collider = &group->auxiliaryAttack[i];
         Collider_Init(collider, actor->base.body.id, 0x2401, 0, 16, &size, &offset);
         Collider_SetAttackProperties(collider, SceneActorCollision_ReadAttackField3C(actor, 3),
                                      SceneActorCollision_ReadAttackField40(actor, 3), 0,
@@ -3524,13 +3508,6 @@ void SceneActorControl_EndExtendedPhase(struct ChaseActor *actor)
 
 void SceneActor_AdvanceOffsetApproach(void);
 
-struct SceneActorControl2AContext {
-    u8 unknown0[0xEBE];
-    u16 fieldEBE;
-    u8 unknownEC0[6];
-    u16 fieldEC6;
-};
-
 static inline void Restart_UpdateControl2APhase(struct ChaseActor *actor)
 {
     actor->base.motionFlags = Mask16(&actor->base.motionFlags, ~0x100);
@@ -3540,11 +3517,11 @@ static inline void Restart_UpdateControl2APhase(struct ChaseActor *actor)
 
 void SceneActorControl_UpdateControl2APhase(struct ChaseActor *actor)
 {
-    struct SceneActorControl2AContext *context = actor->base.context;
+    struct Axe *context = actor->base.context;
     if (SceneActorControl_TakeFlag(&actor->base.field2B1)) {
         SceneActorChase_SetControl(actor, SceneActor_AdvanceOffsetApproach, 0x2A);
         Or16(0x100, &actor->base.motionFlags);
-        context->fieldEBE = context->fieldEC6;
+        context->attackCooldowns[3] = context->attackDelays[3];
     }
     if (actor->base.stepDone) {
         Restart_UpdateControl2APhase(actor);
@@ -3817,18 +3794,9 @@ void Axe_InitEventCallbacks(struct ChaseActor *p)
     p->base.alternateBehaviorCallbacks = gUnk_08606494;
 }
 
-struct SceneActorReactionCountContext {
-    u8 unknown0[0xE4C];
-    u32 flagsE4C;
-    u8 unknownE50[0x60];
-    u8 reactionCount;
-    u8 unknownEB1[0x23];
-    u16 fieldED4;
-};
-
 s32 SceneActorControl_AdvanceReactionCount(struct ChaseActor *actor)
 {
-    struct SceneActorReactionCountContext *context = actor->base.context;
+    struct Axe *context = actor->base.context;
     u16 *flags;
     u32 mask;
     if (actor->base.reactionSoundVariant == 0)
@@ -3839,7 +3807,7 @@ s32 SceneActorControl_AdvanceReactionCount(struct ChaseActor *actor)
     mask = ~0x20;
     *flags = mask & *flags;
     if (*flags & 0x8000)
-        context->fieldED4 = 8;
+        context->reactionHoldTimer = 8;
     if (context->reactionCount <= 2)
         ++context->reactionCount;
     if (!SceneActorTurn_Flags(flags, 0x8100)) {
