@@ -261,6 +261,24 @@ class Slicer:
             self.truncated = True
         return self
 
+    def why_store(self, frame, site, addr, nth):
+        """Slice back from the NTH store by SITE to ADDR in FRAME (a write-log row)."""
+        ft = self.trace(frame)
+        hits = [int(p) for p in ft.st_pos if int(ft.rows['site'][p]) == site and ft.st_start[np.searchsorted(ft.st_pos, p)] == addr]
+        if nth >= len(hits):
+            raise ValueError(f'store {site:#x} to {addr:#x} ran {len(hits)} times in frame {frame}, not {nth + 1}')
+        pos = hits[nth]
+        width = int(ft.st_end[np.searchsorted(ft.st_pos, pos)] - addr)
+        self.target = (addr, width, frame)
+        self.work = []
+        self.store(frame, pos, addr, width)
+        while self.work and len(self.nodes) < self.max_nodes:
+            item = self.work.pop()
+            item[0](*item[1:])
+        if self.work:
+            self.truncated = True
+        return self
+
     # ---- memory ----
     def memory(self, frame, pos, addr, width, why):
         if 0x08000000 <= addr < 0x0E000000 or (0x04000000 <= addr < 0x04000400 and not self._logged_io(addr)):

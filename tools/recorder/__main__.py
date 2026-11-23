@@ -7,6 +7,7 @@
                                    every write to WHERE: frame, value, the C statement that wrote it
   who-wrote NAME WHERE FRAME       the last write to WHERE at or before FRAME
   at NAME ADDR [FRAME]             what typed object ADDR is at FRAME
+  diff RUN_A RUN_B [--both]        first typed divergence of two sessions of one movie, and its slice
   serve NAME [--port 8765]         the Recorder page: screens timeline, typed writes, history, why
   why NAME WHERE FRAME [--nodes N] [--frames N] [--check]
                                    dynamic backward slice: the C statements, with their runtime
@@ -278,6 +279,93 @@ def cmd_why(args):
         check_slice(s, sl, place, args.frame, describe)
 
 
+def cmd_diff(args):
+    """First typed divergence between two sessions of the same movie, and its slice in each."""
+    from slicer import Slicer, render
+    from session import KEYS
+    a, b = open_session(args.a), open_session(args.b)
+    facts, types = Facts(), Types()
+    n = min(len(a), len(b))
+    fa, fb = a.frames[:n], b.frames[:n]
+    print(f'diff {a.name} ({len(a)} frames) vs {b.name} ({len(b)} frames)')
+    if a.meta.get('wasmSize') != b.meta.get('wasmSize'):
+        print(f"  builds differ: wasm {a.meta.get('wasmSize')} vs {b.meta.get('wasmSize')} bytes")
+    for k in ('save', 'time', 'script'):
+        if a.meta.get(k) != b.meta.get(k):
+            print(f'  {k} differs: {a.meta.get(k)!r} vs {b.meta.get(k)!r}')
+    inputs = np.nonzero((fa['keys'] != fb['keys']) | (fa['solar'] != fb['solar']))[0]
+    if len(inputs):
+        f = int(inputs[0])
+        print(f"  inputs first differ for frame {f + 1}: keys {fa['keys'][f]:#x} vs {fb['keys'][f]:#x}, "
+              f"solar level {fa['solar'][f]} vs {fb['solar'][f]} ({len(inputs)} frames differ in all)")
+    hashes = np.nonzero((fa['lo'] != fb['lo']) | (fa['hi'] != fb['hi']))[0]
+    if not len(hashes):
+        print(f'  RAM identical for all {n} common frames')
+        return 0
+    F = int(hashes[0])
+    print(f'  RAM first differs at the end of frame {F}')
+    # the write streams of frame F, aligned row by row
+    a.writes, b.writes
+    sa, sb = a.writes_in(F, F), b.writes_in(F, F)
+    ra = np.stack([a.writes['site'][sa], a.addr[sa], a.writes['value'][sa]], 1)
+    rb = np.stack([b.writes['site'][sb], b.addr[sb], b.writes['value'][sb]], 1)
+    m = min(len(ra), len(rb))
+    neq = np.nonzero((ra[:m] != rb[:m]).any(1))[0]
+    i = int(neq[0]) if len(neq) else m
+    na = Namer(a, facts, types, F)
+    nb = Namer(b, facts, types, F)
+    if i < m or len(ra) != len(rb):
+        print(f'  write {i} of frame {F} is the first that differs ({len(ra)} vs {len(rb)} writes):')
+        for name, rows, sess, nm in (('A', ra, a, na), ('B', rb, b, nb)):
+            if i < len(rows):
+                site, addr, val = (int(x) for x in rows[i])
+                fn, loc, text, lv = statement(facts, site)
+                print(f'    {name}: {nm.describe(addr, 1)} := {val}   {fn}  {loc}' + (f'   `{text}`' if text else ''))
+            else:
+                print(f'    {name}: (no more writes)')
+        same_site = i < m and ra[i][0] == rb[i][0] and ra[i][1] == rb[i][1]
+        print('    -> ' + ('same statement, different value: the data diverged'
+                           if same_site else 'different statements: control flow diverged'))
+    # typed fields that differ at the end of frame F
+    ram_a, ram_b = na.ram, nb.ram
+    diffs = []
+    for mem_a, mem_b, base in ((ram_a.ewram, ram_b.ewram, 0x02000000), (ram_a.iwram, ram_b.iwram, 0x03000000)):
+        for off in np.nonzero(mem_a != mem_b)[0][:4000]:
+            diffs.append(base + int(off))
+    fields = {}
+    for addr in diffs:
+        label, path, _, _ = nb.at(addr, 1)
+        fields.setdefault(join(label, path), []).append(addr)
+    print(f'  {len(diffs)} bytes in {len(fields)} fields differ at the end of frame {F}:')
+    for k, (fld, addrs) in enumerate(fields.items()):
+        if k >= args.fields:
+            print(f'    ... ({len(fields) - args.fields} more)')
+            break
+        w = min(len(addrs), 4)
+        print(f'    {fld}: {ram_a.read(addrs[0], w)} vs {ram_b.read(addrs[0], w)}')
+    # slice the first divergent write in both runs
+    if i < m or len(ra) != len(rb):
+        for name, rows, sess, nm, sidx in (('B', rb, b, nb, sb), ('A', ra, a, na, sa)):
+            if i >= len(rows):
+                continue
+            site, addr, val = (int(x) for x in rows[i])
+            nth = int(np.count_nonzero((rows[:i, 0] == site) & (rows[:i, 1] == addr)))
+            sl = Slicer(sess, facts, max_nodes=args.nodes)
+            try:
+                sl.why_store(F, site, addr, nth)
+                print()
+                print(f'why, in {name} ({sess.name}): {nm.describe(addr, 1)} := {val} in frame {F}')
+                print(render(sl, lambda x, w, nm=nm: nm.describe(x, w or 1)))
+            except ValueError as e:
+                print(f'  ({name}: {e})')
+            finally:
+                sl.close()
+            if not args.both:
+                break
+    na.close(); nb.close()
+    return 0
+
+
 def check_slice(s, sl, place, frame, describe):
     """Perturb the slice's inputs and cross-frame links in a replay; does the target change?"""
     from emu import Replay
@@ -392,6 +480,9 @@ def main(argv=None):
     p.add_argument('--changes', action='store_true', help='only writes that changed the value')
     p = sub.add_parser('who-wrote'); p.add_argument('name'); p.add_argument('where'); p.add_argument('frame', type=int)
     p = sub.add_parser('at'); p.add_argument('name'); p.add_argument('addr'); p.add_argument('frame', type=int, nargs='?')
+    p = sub.add_parser('diff'); p.add_argument('a'); p.add_argument('b')
+    p.add_argument('--fields', type=int, default=20); p.add_argument('--nodes', type=int, default=200)
+    p.add_argument('--both', action='store_true', help='slice the divergent write in both runs')
     p = sub.add_parser('serve'); p.add_argument('name'); p.add_argument('--port', type=int, default=8765)
     p = sub.add_parser('why'); p.add_argument('name'); p.add_argument('where'); p.add_argument('frame', type=int)
     p.add_argument('--nodes', type=int, default=400); p.add_argument('--frames', type=int, default=24)
@@ -405,7 +496,7 @@ def main(argv=None):
         return serve(args.name, args.port)
     if extra:
         ap.error('unrecognized arguments: ' + ' '.join(extra))
-    return {'verify': cmd_verify, 'history': cmd_history, 'who-wrote': cmd_who_wrote, 'at': cmd_at, 'why': cmd_why}[args.cmd](args) or 0
+    return {'verify': cmd_verify, 'history': cmd_history, 'who-wrote': cmd_who_wrote, 'at': cmd_at, 'why': cmd_why, 'diff': cmd_diff}[args.cmd](args) or 0
 
 
 if __name__ == '__main__':
