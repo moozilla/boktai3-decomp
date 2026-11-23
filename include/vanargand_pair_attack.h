@@ -98,7 +98,8 @@ struct VanargandPairAttack {
     u8 fadeB[0xD18 - 0xB18];
     u8 fadeC[0xF24 - 0xD18];
     u32 variant;
-    u32 stageQueued[3]; /* 0xF28: per stage (indexed by transition), tested by the queued action state. */
+    u32 stageQueued
+        [3]; /* 0xF28: per stage (indexed by transition), tested by the queued action state. */
     s32 transition;
     s32 attachment; /* 0xF38: passed to sub_08159164 on entering state 21. */
     u16 flash;
@@ -176,10 +177,10 @@ static inline u32 Vanargand_HalfState(const struct VanargandAttackPair *pair, u3
 
 void Vanargand_ResetPaletteTransition(struct VanargandPairAttack *);
 
-/* Leaving reaction state 3 (the flash): restore the stage palette for the variant and stop
- * the action sequence. */
-static inline void Vanargand_RestoreStagePalette(struct VanargandPairAttack *p, 
-                                                struct VanargandPairAttack *self)
+/* Load the stage palette for the variant (also the leap's opening) and reset the palette
+ * transition. */
+static inline void Vanargand_LoadStagePalette(struct VanargandPairAttack *p,
+                                              struct VanargandPairAttack *self)
 {
     s32 kind = 0x6F;
     if (!p->variant)
@@ -205,12 +206,20 @@ static inline void Vanargand_RestoreStagePalette(struct VanargandPairAttack *p,
             break;
     }
     Vanargand_ResetPaletteTransition(self);
+}
+
+/* Leaving reaction state 3 (the flash): restore the stage palette and stop the action
+ * sequence. */
+static inline void Vanargand_RestoreStagePalette(struct VanargandPairAttack *p,
+                                                 struct VanargandPairAttack *self)
+{
+    Vanargand_LoadStagePalette(p, self);
     Vanargand_StopActionSequence(&self->actionSequence);
 }
 
 /* SceneActorState_StartReaction on the body, restoring the palette when it leaves state 3. */
 static inline void Vanargand_StartReaction(struct VanargandPairAttack *p, s32 state,
-                               void (*callback)(void *, s32))
+                                           void (*callback)(void *, s32))
 {
     struct VanargandPairAttack *self = p;
     // Keep the transition owner distinct from the callback installation owner.
