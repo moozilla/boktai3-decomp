@@ -1,5 +1,6 @@
 #include "global.h"
 #include "render.h"
+#include "state_actor.h"
 
 // confidence=low: per-frame scene actor update: applies queued health costs, drives the overlay and body
 // collider state from the action flags, runs two countdowns, picks the palette bank, steps the effect
@@ -93,14 +94,6 @@ struct VampireFrame {
     struct FrameCamera camera;
 };
 
-static inline void Frame_AddFlags(struct FrameBase *p, u32 mask)
-{
-    p->flags |= mask;
-}
-static inline u32 Frame_TestFlags(struct FrameBase *p, u32 mask)
-{
-    return p->flags & mask;
-}
 #define Frame_SetColliderFlags(collider, mask) ((collider)->flags |= (mask))
 static inline void Frame_ClearColliderFlags(struct FrameCollider *collider, u32 mask)
 {
@@ -141,7 +134,7 @@ void Vampire_UpdatePresentation(void *arg0)
     struct FrameCollider *collider;
     s32 cost;
 
-    Frame_AddFlags(base, 0x20);
+    SceneActorState_SetFlags((struct StateActor *)base, 0x20);
     cost = p->queuedHeal;
     if (cost != 0) {
         SceneActors_SetHealth(base, base->health + cost);
@@ -154,11 +147,11 @@ void Vampire_UpdatePresentation(void *arg0)
     }
     SceneActors_UpdateEffects(base);
     if (p->effectTimer != 0) {
-        Frame_AddFlags(base, 4);
+        SceneActorState_SetFlags((struct StateActor *)base, 4);
         p->effectTimer--;
     }
     collider = &p->overlay;
-    if (Frame_TestFlags(base, 4)) {
+    if (SceneActorState_TestFlags((struct StateActor *)base, 4)) {
         Frame_SetColliderFlags(collider, 4);
     } else {
         Frame_ClearColliderFlags(collider, 4);
@@ -166,13 +159,13 @@ void Vampire_UpdatePresentation(void *arg0)
         collider->direction = sprite->direction;
     }
     collider = &p->body;
-    if (!Frame_TestFlags(base, 8)) {
+    if (!SceneActorState_TestFlags((struct StateActor *)base, 8)) {
         Collider_SetPosition(collider, p->position, 0);
         collider->direction = sprite->direction;
         SceneActorGraphics_UpdateVariant(p);
         Collider_Refresh(collider);
     }
-    if (Frame_TestFlags(base, 0x10)) {
+    if (SceneActorState_TestFlags((struct StateActor *)base, 0x10)) {
         Frame_HideAnimation(&p->animation);
         ScaledShadow_Disable(p->shadow);
         Frame_ClearCameraFlags(&p->camera, 1);
@@ -186,7 +179,7 @@ void Vampire_UpdatePresentation(void *arg0)
             ScaledShadow_Enable(p->shadow);
             Frame_SetCameraFlags(&p->camera, 1);
         }
-        if (Frame_TestFlags(base, 0x20)) {
+        if (SceneActorState_TestFlags((struct StateActor *)base, 0x20)) {
             Frame_SetColliderFlags(&p->overlay, 8);
         } else {
             Frame_ClearColliderFlags(&p->overlay, 8);
@@ -194,7 +187,7 @@ void Vampire_UpdatePresentation(void *arg0)
     }
     if (p->shakeAmplitude) {
         p->shakeAmplitude--;
-        Frame_AddFlags(base, 0x20000);
+        SceneActorState_SetFlags((struct StateActor *)base, 0x20000);
     }
     if ((s16)p->flashTimer > 0) {
         p->flashTimer--;

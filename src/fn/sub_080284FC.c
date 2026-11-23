@@ -61,27 +61,8 @@ struct Packed {
 void DamageNumberDisplay_Show(void *, int, int, void *, void *, int);
 void SceneActors_SpawnDestructionParticles(void *);
 int SceneActorGraphics_GetEffectState(void *);
-void Vampire_UpdateSwayReaction(void *);
-void sub_08027214(void *);
-
-static inline void Vampire_SetState(struct VampireDamage *p, void (*fn)(void *), int id)
-{
-    p->state = id;
-    p->callback = fn;
-    p->timer = 0;
-    p->changed = 1;
-    SceneActorState_EnterReactionPhase((struct StateActor *)p, 0);
-}
-
-static inline void Vampire_SetReactionState(struct VampireDamage *p, void (*fn)(void *), u8 id)
-{
-    Vampire_SetState(p, fn, id);
-}
-
-static inline void Vampire_AddFlags(u32 *flags, u32 mask)
-{
-    *flags |= mask;
-}
+void Vampire_UpdateSwayReaction(void *, int);
+void sub_08027214(void *, int);
 
 /* Health is stored in the signed halfword domain. */
 static inline s16 Vampire_GetHealthFloor(void)
@@ -98,7 +79,6 @@ int Vampire_ApplyPendingDamage(struct VampireDamage *p)
     int damage;
     int trigger;
     int flaggedBit;
-    u32 *flags;
     u8 *hit;
     s16 *hp;
     struct Packed size;
@@ -125,14 +105,9 @@ int Vampire_ApplyPendingDamage(struct VampireDamage *p)
         if (damage < 0)
             damage = 0;
     }
-    {
-        u32 mask = 0x100000;
-        u32 *fp = &base->flags;
-        u32 test = (*fp) & mask;
-        flags = fp;
-        if ((test && (p->forcedHit == 0)) && (damage > 0))
-            p->hitCount++;
-    }
+    if (SceneActorState_TestFlags((struct StateActor *)base, 0x100000) && p->forcedHit == 0 &&
+        damage > 0)
+        p->hitCount++;
     if (p->effectCooldown == 0) {
         if ((p->effectState == 0) && SceneActorGraphics_GetEffectState(p)) {
             SceneActors_SpawnDestructionParticles(p);
@@ -173,21 +148,21 @@ int Vampire_ApplyPendingDamage(struct VampireDamage *p)
         if ((*hp) <= 0) {
             s16 health = Vampire_GetHealthFloor();
             *hp = health;
-            Vampire_AddFlags(flags, 2);
-            Vampire_SetState(base, sub_08027214, 25);
+            SceneActorState_SetFlags((struct StateActor *)base, 2);
+            SceneActorState_EnterAction((struct StateActor *)base, sub_08027214, 25);
             return 1;
         }
         if (p->forcedHit == 0) {
             if (special) {
-                Vampire_AddFlags(flags, 0x80000);
+                SceneActorState_SetFlags((struct StateActor *)base, 0x80000);
             }
             Sound_PlaySongChecked(0x13e);
         }
         if (p->kind == 3)
             trigger = flaggedBit;
         if (trigger) {
-            Vampire_AddFlags(flags, 1);
-            Vampire_SetReactionState(base, Vampire_UpdateSwayReaction, 24);
+            SceneActorState_SetFlags((struct StateActor *)base, 1);
+            SceneActorState_EnterAction((struct StateActor *)base, Vampire_UpdateSwayReaction, 24);
             return 1;
         }
         p->shakeAmplitude = 8;

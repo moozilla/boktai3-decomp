@@ -1,5 +1,6 @@
 #include "global.h"
 #include "engine.h"
+#include "state_actor.h"
 // confidence=low: Vampire per-frame update: animation, scale wobble, shake, cached target bearings.
 struct Vec {
     s16 x, y, z, pad;
@@ -42,11 +43,6 @@ void SceneActorGraphics_OscillateScale(void *);
 void SceneActors_UpdateTargetMetrics(void *);
 s32 Math_Atan2(s32, s32);
 
-static inline u32 TestFlags(struct VampireTick *p, u32 mask)
-{
-    return p->flags & mask;
-}
-
 void Vampire_UpdateFrame(struct VampireTick *p)
 {
     struct VampireTick *actor = p;
@@ -64,7 +60,7 @@ void Vampire_UpdateFrame(struct VampireTick *p)
     actor->renderPosition.y = sprite->position.y;
     actor->renderPosition.x = sprite->position.x;
     actor->renderPosition.z = sprite->position.z;
-    if (TestFlags(owner, 0x20000)) {
+    if (SceneActorState_TestFlags((struct StateActor *)owner, 0x20000)) {
         s32 product, x, z;
         product = gUnk_086149C4[(actor->shakeAngle + 64) & 255] * (actor->shakeAmp << 2);
         if (product >= 0)
