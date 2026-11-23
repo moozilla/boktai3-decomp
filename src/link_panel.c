@@ -220,7 +220,7 @@ void LinkPanel_UpdateStatusMessage(struct LinkPanel *panel)
 
 void RegistryF246_HideAnimations(struct LinkPanel *);
 
-void RegistryF246_RemoveAnimations(void);
+void RegistryF246_RemoveAnimations(void *);
 
 void Registry1745_NotifyMenuClosed(void);
 
@@ -377,9 +377,9 @@ s32 LinkPanel_Update(struct LinkPanel *panel)
     return 1;
 }
 
-s32 LinkPanel_Destroy(void)
+s32 LinkPanel_Destroy(void *panel)
 {
-    RegistryF246_RemoveAnimations();
+    RegistryF246_RemoveAnimations(panel);
     gLinkPanel = 0;
     return 1;
 }
