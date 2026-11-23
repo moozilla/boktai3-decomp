@@ -806,23 +806,19 @@ s32 NameEntry_Initialize(struct NameEntryTask *menu)
             Widget_InitLinked(nameWidget, nameResource, 0x3D, 0x10, zero1, zero1, zero1, NULL);
     }
     {
-        u32 zero2;
-        u32 one2;
         keyGraphics = screen->widgets[1].resource;
         ResourceHeader_Relocate(keyGraphics, res);
-        zero2 = 0;
-        Widget_InitLinked(keyWidget, keyGraphics, 0x16, 0x10, zero2, zero2, zero2, NULL);
+        Widget_InitLinked(keyWidget, keyGraphics, 0x16, 0x10, 0, 0, 0, NULL);
         keyGraphics = screen->widgets[3].resource;
         ResourceHeader_Relocate(keyGraphics, res);
-        Widget_InitLinked(&screen->widgets[3], keyGraphics, 0x18, 0x10, zero2, zero2, zero2, NULL);
+        Widget_InitLinked(&screen->widgets[3], keyGraphics, 0x18, 0x10, 0, 0, 0, NULL);
         keyGraphics = screen->widgets[2].resource;
         ResourceHeader_Relocate(keyGraphics, res);
-        Widget_InitLinked(&screen->widgets[2], keyGraphics, 0x17, 0x10, zero2, zero2, zero2, NULL);
+        Widget_InitLinked(&screen->widgets[2], keyGraphics, 0x17, 0x10, 0, 0, 0, NULL);
         {
             u32 *f = &screen->widgets[2].flags;
             u32 v = *f;
-            one2 = 1;
-            *f = v | one2;
+            *f = v | 1;
         }
 
         {
@@ -852,14 +848,12 @@ s32 NameEntry_Initialize(struct NameEntryTask *menu)
         res = ScriptProc_Start(0xCB05, 0x530D);
         cursorGraphics = screen->widgets[4].resource;
         ResourceHeader_Relocate(cursorGraphics, res);
-        Widget_InitLinked(&screen->widgets[4], cursorGraphics, 0x8C, 0x10, one2, zero2, zero2,
-                          NULL);
+        Widget_InitLinked(&screen->widgets[4], cursorGraphics, 0x8C, 0x10, 1, 0, 0, NULL);
         cursorGraphics = screen->widgets[5].resource;
         ResourceHeader_Relocate(cursorGraphics, res);
-        Widget_InitLinked(&screen->widgets[5], cursorGraphics, 0x8D, 0x10, zero2, zero2, zero2,
-                          NULL);
+        Widget_InitLinked(&screen->widgets[5], cursorGraphics, 0x8D, 0x10, 0, 0, 0, NULL);
         screen->widgets[4].flags &= ~1;
-        screen->widgets[5].flags |= one2;
+        screen->widgets[5].flags |= 1;
         {
             u16 **save = &screen->savedCursorPalette;
             u16 **ptr = &screen->widgets[5].palette;
