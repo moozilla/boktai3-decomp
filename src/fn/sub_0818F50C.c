@@ -21,7 +21,7 @@ void EffectPool_CreateTimedEffect(u8 *p, struct EffectPosition *q)
 {
     struct EffectPoolSlot *o = EffectPool_AllocateSlot(p);
     if (o != 0) {
-        u8 *r = (u8 *)o + 8;
+        u8 *r = o->g;
         void (*a)(void);
         void (*b)(void);
         AnimData_Load(r, 0xC7ED);

@@ -22,7 +22,7 @@ void StatusPanel_BeginRefresh(void)
     if (p) {
         struct PanelRefresh *refresh;
         SelectionPanel_ClearTileColumns();
-        refresh = (struct PanelRefresh *)((u8 *)p + 0xA9C);
+        refresh = &p->refresh;
         refresh->flags |= 1;
         SceneHud_ApplySecondarySelection(p);
         PauseMenu_ApplySelectedEquipment(p);

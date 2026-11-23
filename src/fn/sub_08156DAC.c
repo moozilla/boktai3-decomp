@@ -52,7 +52,7 @@ static inline u32 groundHeight(struct FloorPoint *position)
 #define Player_CheckFacingTerrainClearance sub_08156DAC
 s32 Player_CheckFacingTerrainClearance(struct Player *p)
 {
-    u32 zero = *((u8 *)p + 0x4E3);
+    u32 zero = p->gateCount;
     if (zero != 0)
         return 1;
     {
