@@ -28,7 +28,8 @@ def prepare_source(path, target):
     if path.name == 'ghost.c':
         # Called before its prototype; agbcc accepts the implicit int, clang does not.
         text = 'void Anim_SetDurationScale(void *, unsigned int);\n' + text
-    if path.name == 'golem_2.c':
+    if path.name == 'golem_2.c' and not re.search(
+            r'SceneActorAnimation_SelectDirectionalEntry\(struct RoomActor', (ROOT_SRC.parent / 'include/scene_actor_animation.h').read_text()):
         text = ('struct SceneActorAnimationView;\n'
                 'void SceneActorAnimation_SelectDirectionalEntry(struct SceneActorAnimationView *, int);\n' + text)
     if path.name == 'sub_08224980.c':
@@ -53,6 +54,8 @@ def prepare_source(path, target):
         # ARM APCS doubles put the high word first. wasm/host IEEE doubles do not.
         text = text.replace('  {\n    halffractype tmp = dst.words[0];\n    dst.words[0] = dst.words[1];\n    dst.words[1] = tmp;\n  }', '')
         text = text.replace('  FLO_union_type swapped;\n  swapped.words[0] = src->words[1];\n  swapped.words[1] = src->words[0];\n  src = &swapped;', '')
+    if path.is_relative_to(ROOT_SRC):
+        text = hoist_prototypes(text)
     if target == 'host':
         text = host_layout(text)
     elif path.is_relative_to(ROOT_SRC):
@@ -83,6 +86,36 @@ def prepare_headers(root, output, target):
         destination.parent.mkdir(parents=True, exist_ok=True)
         if not destination.exists() or destination.read_text() != text:
             destination.write_text(text)
+
+
+_PROTO = re.compile(r'^(?!static\b|typedef\b|extern\b|return\b)[A-Za-z_][\w \t*]*?\b([A-Za-z_]\w*)\s*\(([^;{}()]*)\)\s*;[ \t]*$', re.M)
+
+
+def hoist_prototypes(text):
+    """agbcc accepts a call before the function's file-scope prototype (an
+    implicit int declaration that the prototype later refines); clang rejects
+    the conflict. Repeat each such prototype after the last top-level #include,
+    unless it names a struct this file defines (its tag is not in scope there)."""
+    includes = list(re.finditer(r'^#include[^\n]*\n', text, re.M))
+    if not includes:
+        return text
+    head_end = includes[-1].end()
+    code = re.sub(r'/\*.*?\*/|//[^\n]*', lambda m: ' ' * len(m[0]), text, flags=re.S)
+    local_tags = set(re.findall(r'\b(?:struct|union)\s+(\w+)\s*\{', code))
+    hoisted = []
+    for m in _PROTO.finditer(code):
+        if m.start() < head_end:
+            continue
+        name = m[1]
+        if set(re.findall(r'\b(?:struct|union)\s+(\w+)', m[2])) & local_tags:
+            continue
+        first = re.search(r'\b' + re.escape(name) + r'\s*\(', code[head_end:m.start()])
+        proto = text[m.start():m.end()].strip()
+        if first and proto not in hoisted:
+            hoisted.append(proto)
+    if not hoisted:
+        return text
+    return text[:head_end] + '\n'.join(hoisted) + '\n' + text[head_end:]
 
 
 _RECORD = re.compile(r'\b(struct|union)(\s+__attribute__\s*\(\([^)]*\)\))?(\s+\w+)?\s*\{')
