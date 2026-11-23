@@ -36,7 +36,7 @@ s32 ModifierMenu_Initialize(struct ModifierMenu *menu)
     ModifierMenu_StartBackgroundScript(menu);
     ModifierMenu_InitializeGraphics(menu);
     ModifierMenu_InitHeaderBackdrop(menu);
-    ModifierMenu_InitSelectionSnapshot((u8 *)menu + 0x3C, menu->tilemap);
+    ModifierMenu_InitSelectionSnapshot(&menu->paletteCycle, menu->tilemap);
     if (ModifierMenu_CreateTextWindows(menu) < 0)
         return -1;
     ScrollingDialogue_RequestShow();
