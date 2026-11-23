@@ -1370,10 +1370,10 @@ void Axe_UpdateCollapsePhase(struct ChaseActor *actor)
 
 void SceneActorControl_UpdatePausePhase(struct ChaseActor *actor)
 {
-    u8 *control = actor->base.context;
+    struct Axe *control = actor->base.context;
     if (SceneActorControl_TakeFlag(&actor->base.field2B1)) {
         SceneActorChase_SetControl(actor, actor->base.onStanding, 0);
-        control[0xEAA] = 0;
+        control->hoverPhase = 0;
     }
     {
         s32 *c = (s32 *)(((u8 *)(*(&actor))) + 0x2AC);
@@ -1400,15 +1400,15 @@ void Axe_InitMotionTable(struct ChaseActor *actor)
 
 void SceneActorControl_UpdateHoverHeight(struct ChaseActor *actor)
 {
-    u8 *context = actor->base.context;
+    struct Axe *context = actor->base.context;
     if (!(SceneActorChase_QueryMotionFlags(actor, 0x8000))) {
-        s32 height = Scale(gHoverSineTable[context[0xEAA]] << 5);
+        s32 height = Scale(gHoverSineTable[context->hoverPhase] << 5);
         struct Player *player = gPlayers[0];
         u32 y = height + 220;
         y += (u16)player->position.y;
         actor->base.body.position.y = y;
-        *(u16 *)(context + 0xA56) = y;
-        context[0xEAA] += 2;
+        context->auxiliarySprite.position.y = y;
+        context->hoverPhase += 2;
     }
 }
 
@@ -1515,29 +1515,13 @@ struct P {
     u32 a, b;
 };
 
-struct S080FAA20 {
-    u8 filler0[0x5c];
-    struct P p;
-    u8 filler1[0xf4 * 4 - 0x64];
-    u8 *q;
-};
-
-void Axe_SetMovementEndpoints(struct S080FAA20 *s, struct P *d)
+void Axe_SetMovementEndpoints(struct ChaseActor *actor, struct ContactPosition *end)
 {
-    u8 *q = s->q;
-    *(struct P *)(q + 0xf04) = s->p;
-    *(struct P *)(q + 0xf0c) = *d;
-    *(u16 *)(q + 0xea8) = 0;
+    struct Axe *context = actor->base.context;
+    context->curveStart = actor->base.body.position;
+    context->curveEnd = *end;
+    context->curveTime = 0;
 }
-
-struct AxeCurveContext {
-    u8 unknown0[0xEA8];
-    u16 time;
-    u8 unknownEAA[2];
-    s16 curve;
-    u8 unknownEAE[0xF04 - 0xEAE];
-    struct ContactPosition start, end;
-};
 
 struct AxeMoveNode {
     u8 unknown0[12];
@@ -1588,17 +1572,17 @@ static inline void Interpolate(struct ContactPosition *out, struct ContactPositi
 
 u8 Axe_StepCurveMotion(struct ChaseActor *actor)
 {
-    struct AxeCurveContext *ctx = actor->base.context;
+    struct Axe *ctx = actor->base.context;
     struct ContactPosition start, end;
-    start = ctx->start;
+    start = ctx->curveStart;
     start.y = 0;
-    end = ctx->end;
+    end = ctx->curveEnd;
     end.y = 0;
-    Interpolate(&((struct AxeMoveNode *)actor->group.route)->position, &start, &end, 1, ctx->time,
-                0, ctx->curve);
-    if (ctx->time > 1023)
+    Interpolate(&((struct AxeMoveNode *)actor->group.route)->position, &start, &end, 1,
+                ctx->curveTime, 0, ctx->curve);
+    if (ctx->curveTime > 1023)
         return 1;
-    ctx->time += 128;
+    ctx->curveTime += 128;
     return 0;
 }
 
@@ -1694,7 +1678,7 @@ void Axe_GetDirectionalFrame(u16 x, s32 *a, s32 *b)
     *b = r;
 }
 
-void Axe_SetMovementEndpoints(struct S080FAA20 *s, struct P *d);
+void Axe_SetMovementEndpoints(struct ChaseActor *actor, struct ContactPosition *end);
 
 u8 Axe_StepCurveMotion(struct ChaseActor *actor);
 

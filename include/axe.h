@@ -43,7 +43,11 @@ struct Axe {
     u32 flagsE4C;
     u8 unknownE50[6];
     u16 distance;
-    u8 unknownE58[0x56];
+    u8 unknownE58[0x50];
+    u16 curveTime; /* 0..1024 along the movement curve, +128 per step */
+    u8 hoverPhase; /* index into the sine table for the hover bob, +2 per frame */
+    u8 unknownEAB;
+    s16 curve;
     u8 acceleration;
     u8 unknownEAF;
     u8 timerEB0;
@@ -60,7 +64,8 @@ struct Axe {
     u8 savedAngle;
     u8 unknownED4[3];
     u8 variant;
-    u8 unknownED8[0x3C];
+    u8 unknownED8[0x2C];
+    struct ContactPosition curveStart, curveEnd; /* the movement curve's endpoints */
     u32 clearF14[2];
     struct ContactPosition target;
 };
