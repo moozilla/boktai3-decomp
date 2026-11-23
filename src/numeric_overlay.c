@@ -82,12 +82,10 @@ void sub_0800F4EC(struct NumericOverlay *unused)
 void NumericOverlay_RefreshDisplay(struct NumericOverlay *s)
 {
     s32 a, b, c;
-    u32 z;
     Clock_UnpackDate(&a, &b, &c, SunClock_GetPackedDate());
-    z = 0;
     s->dirty = 0xf;
     sub_0800F4EC(s);
-    s->dirty = z;
+    s->dirty = 0;
 }
 
 u32 NumericOverlay_Update(struct NumericOverlay *p)
