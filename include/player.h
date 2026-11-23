@@ -56,7 +56,7 @@ struct PlayerStatModifierContext {
     u8 unknown0[0x2C];
     u8 actionPalette[0x1C]; /* owner + 0xB70: palette-bank animation data for the action (tentative) */
     struct ContactCollider attackCollider; /* owner + 0xB8C: action contact collider */
-    u8 unknown9C[8];
+    struct SceneVec contactDestination;   /* owner + 0xBE0: moving point of the attack motion */
     struct SceneVec contactOrigin;         /* owner + 0xBE8 */
     struct PlayerActionEntry *actionEntry; /* owner + 0xBF0: descriptor source */
     u8 actionKind;                         /* owner + 0xBF4 */
@@ -65,12 +65,14 @@ struct PlayerStatModifierContext {
     u8 unknownB3;
     u16 actionDuration, actionPhase, actionTimer; /* owner + 0xBF8 */
     u16 contactParameter;                         /* owner + 0xBFE */
-    u16 contactExtentA;                           /* owner + 0xC00 */
+    /* Attack motion (tentative): wait windupFrames, move for swingFrames at motionSpeed
+       (angle step per frame), then hold the collider for holdFrames; contactTimer counts. */
+    u16 motionSpeed; /* owner + 0xC00 */
     u8 unknownBE[2];
-    u16 contactExtentB;  /* owner + 0xC04 */
-    u16 contactExtentC;  /* owner + 0xC06: third sweep extent, paired with contactExtentB */
-    u16 contactCounter;  /* owner + 0xC08 */
-    u16 contactTimer;    /* owner + 0xC0A */
+    u16 swingFrames;    /* owner + 0xC04 */
+    u16 holdFrames;     /* owner + 0xC06 */
+    u16 windupFrames;   /* owner + 0xC08 */
+    u16 contactTimer;   /* owner + 0xC0A */
     u8 contactHeading;   /* owner + 0xC0C */
     s8 savedActionIndex; /* owner + 0xC0D: snapshot from Player_GetActionIndex (tentative) */
     u8 unknownCA;

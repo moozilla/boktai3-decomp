@@ -16,9 +16,9 @@ void Player_StartContactAttack(struct Player *p)
     power = Player_GetConfiguredActionPower(p);
     flags = Player_CollectCallbackFlags(p);
     param = q->contactParameter;
-    q->contactExtentA = 8;
-    q->contactExtentB = 8;
-    q->contactCounter = 4;
+    q->motionSpeed = 8;
+    q->swingFrames = 8;
+    q->windupFrames = 4;
     if (q->savedActionIndex >= 0) {
         flags |= 1U << q->savedActionIndex;
         Player_ConsumeActionResource(p);

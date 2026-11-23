@@ -50,7 +50,7 @@ void Player_UpdateThrowAction(struct Player *p)
                 p->tetherPhase = 0;
             } else {
                 p->tetherFrame++;
-                if (p->tetherFrame >= p->statModifierContext.contactCounter) {
+                if (p->tetherFrame >= p->statModifierContext.windupFrames) {
                     *((u8 *)p + 0xBF6) = 0;
                     Player_SetTetherMode(p, 0, 0);
                 }

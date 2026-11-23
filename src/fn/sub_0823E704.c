@@ -14,16 +14,16 @@ void sub_0823E704(struct Player *p)
     resource = Player_GetConfiguredActionPower(p);
     flags = Player_CollectCallbackFlags(p);
     if (p->actionMode == 1) {
-        q->contactExtentA = 29;
-        q->contactCounter = 7;
-        q->contactExtentB = 4;
-        q->contactExtentC = 6;
+        q->motionSpeed = 29;
+        q->windupFrames = 7;
+        q->swingFrames = 4;
+        q->holdFrames = 6;
         flags |= 0x40000;
     } else {
-        q->contactExtentA = 19;
-        q->contactCounter = 11;
-        q->contactExtentB = 6;
-        q->contactExtentC = 9;
+        q->motionSpeed = 19;
+        q->windupFrames = 11;
+        q->swingFrames = 6;
+        q->holdFrames = 9;
     }
     if (q->savedActionIndex >= 0) {
         flags |= 1 << q->savedActionIndex;
