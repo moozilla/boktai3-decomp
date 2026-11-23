@@ -1,6 +1,7 @@
 #include "global.h"
 #include "player.h"
 #include "ram.h"
+#include "named_object_flags.h"
 struct NamedObjectVector {
     s16 x, y, z, pad;
 };
@@ -42,10 +43,6 @@ static inline void addVector(struct NamedObjectVector *d, struct SceneVec *a, st
 #define IN_BOUNDS(b)                                                                               \
     (delta.x <= (b).x && delta.x >= -(b).x && delta.y <= (b).y && delta.y >= -(b).y &&             \
      delta.z <= (b).z && delta.z >= -(b).z)
-static inline void clearFlag16(s32 mask, s16 *flags)
-{
-    *flags &= ~mask;
-}
 void NamedObject_UpdatePlayerAttachment(struct NamedObject *object)
 {
     struct NamedObjectVector target, delta;
@@ -89,7 +86,7 @@ void NamedObject_UpdatePlayerAttachment(struct NamedObject *object)
             manager->playerName = 0;
             gPlayers[0]->followTarget = &gPlayers[0]->movementContactFlags;
             Player_ClearAttachmentFlags(gPlayers[0], 5);
-            clearFlag16(8, &object->flags);
+            NamedObjectFlags_Remove(8, &object->flags);
             ((u8 *)gPlayers[0])[0x701] &= 0xFE;
         }
     }

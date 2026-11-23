@@ -1,6 +1,7 @@
 #include "named_object.h"
 #include "player.h"
 #include "engine.h"
+#include "named_object_flags.h"
 extern const struct SceneVec gUnk_086064B4;
 static inline void Difference(struct SceneVec *d, const struct SceneVec *b,
                               const struct SceneVec *a)
@@ -13,22 +14,12 @@ s32 Player_TestAttachmentFlags(struct Player *, u32);
 void Player_SetPendingObject(struct Player *, void *);
 u8 NamedObject_IsMapCellOccupied(s32);
 u8 *TerrainModifiers_FindCellOverride(s32, s32);
-static inline u8 HasFlag(u32 mask, s16 *flags)
-{
-    if ((u16)*flags & mask)
-        return TRUE;
-    return FALSE;
-}
-static inline void SetFlag2(u16 mask, u16 *flags)
-{
-    *flags = mask | *flags;
-}
 void NamedObject_TryCapturePlayer(struct NamedObject *o)
 {
     s32 i;
     i = 0;
     do {
-        if (gPlayers[i] && Player_TestAttachmentFlags(gPlayers[i], 1) && HasFlag(8, &o->flags)) {
+        if (gPlayers[i] && Player_TestAttachmentFlags(gPlayers[i], 1) && NamedObjectFlags_Has(8, &o->flags)) {
             s32 x = gPlayers[i]->position.x >> 8;
             s32 z = gPlayers[i]->position.z >> 8;
             s32 cell;
@@ -52,7 +43,7 @@ void NamedObject_TryCapturePlayer(struct NamedObject *o)
                         delta.y > gUnk_086064B4.y || delta.y < -gUnk_086064B4.y ||
                         delta.z > gUnk_086064B4.z || delta.z < -gUnk_086064B4.z) {
                         Player_SetPendingObject(gPlayers[i], &o->body.position.x);
-                        SetFlag2(0x100, (u16 *)&o->flags);
+                        NamedObjectFlags_Add(0x100, &o->flags);
                     }
                 }
             }

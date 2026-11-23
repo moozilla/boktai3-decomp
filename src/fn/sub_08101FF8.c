@@ -1,6 +1,7 @@
 #include "named_object.h"
 #include "player.h"
 #include "engine.h"
+#include "named_object_flags.h"
 extern const struct SceneVec gUnk_086064B4;
 extern const struct SceneVec gUnk_086064BC;
 s32 Player_TestAttachmentFlags(struct Player *, u32);
@@ -13,12 +14,6 @@ static inline void Difference(struct SceneVec *d, const struct SceneVec *b,
     d->y = a->y - b->y;
     d->z = a->z - b->z;
 }
-static inline u8 HasFlag(u32 mask, s16 *flags)
-{
-    if ((u16)*flags & mask)
-        return TRUE;
-    return FALSE;
-}
 void NamedObject_UpdateEntryTrigger(struct NamedObject *o)
 {
     s32 i;
@@ -28,7 +23,7 @@ void NamedObject_UpdateEntryTrigger(struct NamedObject *o)
             if (!Player_TestAttachmentFlags(gPlayers[i], 1) &&
                 !Player_TestAttachmentFlags(gPlayers[i], 2))
                 return;
-            if (HasFlag(8, &o->flags)) {
+            if (NamedObjectFlags_Has(8, &o->flags)) {
                 s32 x = gPlayers[i]->position.x >> 8;
                 s32 z = gPlayers[i]->position.z >> 8;
                 s32 cell;

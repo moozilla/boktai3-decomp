@@ -1,19 +1,6 @@
 #include "named_object.h"
 #include "player.h"
-static inline u8 HasFlag(u32 mask, s16 *flags)
-{
-    if ((u16)*flags & mask)
-        return TRUE;
-    return FALSE;
-}
-static inline void ClearFlag(s32 mask, s16 *flags)
-{
-    *flags &= ~mask;
-}
-static inline void SetFlag2(u16 mask, u16 *flags)
-{
-    *flags = mask | *flags;
-}
+#include "named_object_flags.h"
 static inline s32 Load(s16 *p)
 {
     return *p;
@@ -28,10 +15,10 @@ void NamedObject_UpdateContactTrigger(struct NamedObject *o)
     u32 *np, name;
     if (o->stage) {
         manager = gNamedActorManager;
-        if (HasFlag(0x2000, &o->flags) || o->name == manager->followName) {
+        if (NamedObjectFlags_Has(0x2000, &o->flags) || o->name == manager->followName) {
             if (o->script) {
                 if (o->kind == 2) {
-                    if (HasFlag(2, &o->flags))
+                    if (NamedObjectFlags_Has(2, &o->flags))
                         values[0] = 2;
                     else
                         values[0] = 1;
@@ -51,10 +38,10 @@ void NamedObject_UpdateContactTrigger(struct NamedObject *o)
         if (o->field_E0 & 1) {
             if (o->timer >= o->limit && NamedObject_IsPlayerWithinContactBounds(o)) {
                 o->state = 2;
-                if (HasFlag(2, &o->flags))
-                    ClearFlag(2, &o->flags);
+                if (NamedObjectFlags_Has(2, &o->flags))
+                    NamedObjectFlags_Remove(2, &o->flags);
                 else
-                    SetFlag2(2, (u16 *)&o->flags);
+                    NamedObjectFlags_Add(2, &o->flags);
                 o->timer = 0;
                 o->stage = 1;
                 m = gNamedActorManager;
@@ -70,12 +57,12 @@ void NamedObject_UpdateContactTrigger(struct NamedObject *o)
                 return;
             }
             if (o->timer > o->limit - 10)
-                SetFlag2(0x20, (u16 *)&o->flags);
+                NamedObjectFlags_Add(0x20, &o->flags);
         }
         found = NamedObject_FindNearPosition(((u8 **)gPlayers)[0] + 0x30);
         if (found) {
             if (found->name == o->name) {
-                if (!HasFlag(0x1000, &o->flags) && o->timer == 0) {
+                if (!NamedObjectFlags_Has(0x1000, &o->flags) && o->timer == 0) {
                     o->offsetC2 = -0x20;
                     Sound_PlaySong(0x222);
                 }

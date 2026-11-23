@@ -19,4 +19,22 @@ static inline void NamedObjectFlags_Clear(struct NamedObjectFlags *field, s32 bi
 {
     field->value &= ~bits;
 }
+/* Mask-first accessors on the raw halfword, as every routine of the family
+ * (contact triggers, lifts, followers, routes) calls them. */
+static inline u8 NamedObjectFlags_Has(u32 mask, s16 *flags)
+{
+    if ((u16)*flags & mask)
+        return TRUE;
+    return FALSE;
+}
+
+static inline void NamedObjectFlags_Add(u16 mask, s16 *flags)
+{
+    *flags = mask | *flags;
+}
+
+static inline void NamedObjectFlags_Remove(s32 mask, s16 *flags)
+{
+    *flags &= ~mask;
+}
 #endif
