@@ -166,8 +166,6 @@ void Dog_RestoreRoute(struct ChaseActor *actor)
 
 // confidence=low: chooses response 0x75/0x82/0x87 from target range, heading, and action timers.
 
-#define FIELD(p, n, T) (*(T *)((u8 *)(p) + (n)))
-
 extern const u8 gUnk_0824E2A8[];
 
 static inline u8 Dog_HasAwarenessFlag(struct Dog *context, u32 mask)
@@ -204,9 +202,10 @@ void Dog_SelectTargetAction(struct ChaseActor *actor)
         angle =
             RotationPhase_HeadingDistance(Math_Atan2(delta.x, delta.z), actor->base.body.direction);
         if (angle <= 23) {
-            u32 mode = FIELD(actor, 0x1E6, u16);
+            u32 mode = actor->base.paletteOffset;
             if (mode == 0 || mode == 2) {
-                if (actor->base.tracking.distance < context->speed && !context->nearTimer) {
+                if (actor->base.tracking.distance < context->nearRangeSquared &&
+                    !context->nearTimer) {
                     Response(actor, nav, 0, 0x75);
                     return;
                 }
@@ -215,11 +214,12 @@ void Dog_SelectTargetAction(struct ChaseActor *actor)
                     return;
                 goto move;
             } else {
-                if (actor->base.tracking.distance < context->speed && !context->nearTimer) {
+                if (actor->base.tracking.distance < context->nearRangeSquared &&
+                    !context->nearTimer) {
                     Response(actor, nav, 0, 0x82);
                     return;
                 }
-                if (actor->base.tracking.distance < context->alternateSpeed && angle <= 5 &&
+                if (actor->base.tracking.distance < context->farRangeSquared && angle <= 5 &&
                     !context->farTimer) {
                     Response(actor, nav, 1, 0x87);
                     return;
@@ -922,7 +922,8 @@ void Dog_SelectRetreatOrChase(struct ChaseActor *a)
     struct SceneActorChaseGroup *group = &a->group;
     SceneActorReaction_ResetResponseState(&group->saved, gUnk_0824E2A8, 0x2AA);
     if (context->retreatCount <= 3) {
-        if (a->base.tracking.distance < context->lastCell || !Dog_IsActionTimerExpired(a)) {
+        if (a->base.tracking.distance < context->retreatRangeSquared ||
+            !Dog_IsActionTimerExpired(a)) {
             if (context->retreatCount <= 3) {
                 u32 saved = a->base.body.direction;
                 a->base.body.direction = a->base.tracking.heading + 128;
@@ -933,7 +934,7 @@ void Dog_SelectRetreatOrChase(struct ChaseActor *a)
                 return;
             }
         }
-        if (a->base.tracking.distance > context->currentSpeed) {
+        if (a->base.tracking.distance > context->chaseRangeSquared) {
             struct ChaseTarget *target;
             if (a->base.controlKind == 0x1A)
                 return;
@@ -2018,58 +2019,25 @@ void SceneActorMotion_TestTargetTransition(struct ChaseActor *a)
     }
 }
 
-struct SceneActorTargetMotionContext {
-    u8 unknown0[0x678];
-    u32 flags;
-    u8 unknown67C[0x10];
-    u32 timeLimit;
-    u8 unknown690[0x17];
-    u8 phase;
-};
-
-static inline u8 IsActive(u32 flags)
-{
-    if (flags)
-        return 1;
-    return 0;
-}
-
 void SceneActorMotion_UpdateTargetTransition(struct ChaseActor *a)
 {
     u32 *flags;
-    struct SceneActorTargetMotionContext *c = a->base.context;
+    struct Dog *c = a->base.context;
     if (!SceneActorReaction_TakePrepared(a)) {
-        u32 four = 4;
-        u32 *address = &c->flags;
-        u32 value = *address & four;
-        flags = address;
-        if (IsActive(value)) {
-            if (a->base.tracking.distance > c->timeLimit) {
+        if (TestContext(c, 4, &flags)) {
+            if (a->base.tracking.distance > c->chaseRangeSquared) {
                 Chase_SetBehavior(a, 19);
-                {
-                    s32 angle = a->base.tracking.heading;
-                    if (angle >= 0)
-                        angle >>= 5;
-                    else
-                        angle = -(-angle >> 5);
-                    a->base.nextDirection = (angle + 3) & 7;
-                }
+                a->base.nextDirection = (Math_ShiftTowardZero(a->base.tracking.heading, 5) + 3) & 7;
             } else {
                 s32 mask = -5;
                 *flags &= mask;
-                if (c->phase <= 3) {
+                if (c->retreatCount <= 3) {
                     if ((u8)Dog_SelectRetreatDirection(a, a->base.body.direction))
                         Chase_SetBehavior(a, 17);
                 } else {
                     Chase_SetBehavior(a, 19);
-                    {
-                        s32 angle = a->base.tracking.heading;
-                        if (angle >= 0)
-                            angle >>= 5;
-                        else
-                            angle = -(-angle >> 5);
-                        a->base.nextDirection = (angle + 3) & 7;
-                    }
+                    a->base.nextDirection =
+                        (Math_ShiftTowardZero(a->base.tracking.heading, 5) + 3) & 7;
                 }
             }
         } else
@@ -3138,17 +3106,17 @@ s32 Dog_Init(void *object)
         struct Dog *context = DogInit_Context(actor);
         u32 *speed;
         if (MonsterInit_GetPaletteOffset(actor) == 0 || MonsterInit_GetPaletteOffset(actor) == 2) {
-            speed = &context->speed;
+            speed = &context->nearRangeSquared;
             *speed = 0x40000;
-            context->lastCell = 0xFFFF;
-            context->currentSpeed = *speed;
+            context->retreatRangeSquared = 0xFFFF;
+            context->chaseRangeSquared = *speed;
         } else {
-            u32 *primary = &context->speed;
+            u32 *primary = &context->nearRangeSquared;
             *primary = 0x40000;
             speed = primary;
-            context->alternateSpeed = 0x38400;
-            context->lastCell = 0xFFFF;
-            context->currentSpeed = *speed;
+            context->farRangeSquared = 0x38400;
+            context->retreatRangeSquared = 0xFFFF;
+            context->chaseRangeSquared = *speed;
         }
     }
     SceneActorBehavior_InstallCallbackTables(actor);
