@@ -310,10 +310,7 @@ u8 SceneActorReaction_ResolvePlacementDamage(struct ChaseActor *actor)
                         }
                     }
                 }
-                {
-                    u32 bit = 0x8000;
-                    *flags2CC |= bit;
-                }
+                SceneActorDamage_MarkFlashing(flags2CC);
                 {
                     union {
                         struct {

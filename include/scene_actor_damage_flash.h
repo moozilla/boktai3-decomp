@@ -20,4 +20,11 @@ static inline void SceneActorDamage_Flash(struct ChaseActor *actor)
     }
 }
 
+/* Behavior flag 0x8000 marks the actor as flashing from a hit. */
+static inline void SceneActorDamage_MarkFlashing(u32 *behaviorFlags)
+{
+    u32 bit = 0x8000;
+    *behaviorFlags |= bit;
+}
+
 #endif

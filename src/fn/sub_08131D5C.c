@@ -101,10 +101,7 @@ u8 SceneActorReaction_ApplyAreaDamage(struct ChaseActor *actor)
         flags2D8 = f;
         if (!result) {
             SceneActorDamage_Flash(actor);
-            {
-                u32 bit = 0x8000;
-                *flags2CC |= bit;
-            }
+            SceneActorDamage_MarkFlashing(flags2CC);
             if (SceneActorDamage_ShouldShow(actor)) {
                 struct ContactPosition offset;
                 s32 h = *health;

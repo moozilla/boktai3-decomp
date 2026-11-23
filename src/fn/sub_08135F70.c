@@ -293,10 +293,7 @@ u8 SceneActorReaction_ResolveDamage(struct ChaseActor *actor)
                     actor->base.paletteTimer = v;
                 }
             }
-            {
-                u32 bit = 0x8000;
-                *flags2CC |= bit;
-            }
+            SceneActorDamage_MarkFlashing(flags2CC);
             {
                 union {
                     u32 raw;
