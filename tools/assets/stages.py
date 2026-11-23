@@ -27,6 +27,9 @@ use library procedures, decoded here by argument position:
             The item sits at (x + 128, z + 128), the centre of its cell.
             Category 0 items are named by strings 988 + item (回復薬, 大地の実,
             ...; 太陽の実 = 13); other categories are not mapped yet.
+  switch    proc_1087(track, box, flag, value, tile, priority, proc): a floor switch on an
+            HP box; stepping on it (the player or a pushed block) runs proc once, whose
+            items are listed with the condition `floor switch BOX` (2759: the sword chest)
   enemy     spawner procedures 1490-1700 that create an actor family by
             registry key (cmd 0xB745 KEY `N: name r: path ...`); the path is an
             index into the HP patrol paths (tentative)
@@ -138,7 +141,7 @@ class Walker:
     # ---- the walk ------------------------------------------------------------
     def scene(self, pid):
         self.out = {"scene": pid, "stage": None, "palette": None, "entrances": [], "doors": [], "items": [],
-                    "enemies": [], "calls": []}
+                    "enemies": [], "switches": [], "calls": []}
         self.visited = set()
         self.call(pid, [], [], None, 0, None)
         return self.out
@@ -167,6 +170,14 @@ class Walker:
             flags, flag = (a(6), a(7)) if pid == 1118 else (a(8), a(9))
             o["items"].append(dict(rec, category=num(a(1)), item=num(a(2)), x=num(a(3)), z=num(a(4)),
                                    chest=chest, flags=flags, flag=num(flag)))
+            return
+        if pid == 1087 and len(ops) >= 7:
+            # floor switch: proc_1087(track, box, flag, value, tile, priority, proc); a trap on
+            # the box (stepped on by anyone, the player or a block) runs proc once
+            o["switches"].append(dict(rec, box=a(2), flag=num(a(3)), run=num(a(7))))
+            target = num(a(7))
+            if target is not None:
+                self.call(target, [], conds + [f"floor switch {a(2)}"], a(2), depth + 1, spawner)
             return
         ent = self.entrance_proc(pid)
         if ent:
@@ -296,7 +307,7 @@ def resolve(scene, hps, names):
             rec.setdefault("x", (bx["x0"] + bx["x1"]) // 2)
             rec.setdefault("z", (bx["z0"] + bx["z1"]) // 2)
             rec.setdefault("y", bx["y0"])
-    for e in scene["entrances"] + scene["doors"]:
+    for e in scene["entrances"] + scene["doors"] + scene["switches"]:
         box(e)
     for it in scene["items"]:
         if it["category"] == 0 and it["item"] is not None:
@@ -310,7 +321,7 @@ def resolve(scene, hps, names):
             en["route"] = [[q["x"], q["z"]] for q in hpd["paths"][p]]
             en["x"], en["z"] = en["route"][0]
     scene["enemies"] = [en for en in scene["enemies"] if en["families"]]
-    for rec in scene["entrances"] + scene["doors"] + scene["items"] + scene["enemies"]:
+    for rec in scene["entrances"] + scene["doors"] + scene["items"] + scene["enemies"] + scene["switches"]:
         conds = []
         for c in rec["cond"]:
             for raw, nice in PRETTY:
