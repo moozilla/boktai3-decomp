@@ -70,8 +70,10 @@ export async function openSession(opts = {}) {
         if (!script.done) keys = g.frame(n);
         if (script.done) { stopped = script; throw new Stop(); }
       }
-      movie.length = n + 1;
-      movie[n] = keys;
+      // frameNo, not n: a restore inside this call moved the game back to snap.frame,
+      // and these keys are what that frame runs with
+      movie.length = frameNo + 1;
+      movie[frameNo] = keys;
       return keys;
     },
     audio() {},
