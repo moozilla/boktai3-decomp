@@ -65,7 +65,7 @@ exports.cellOf = (x, z) => [x >> 8, z >> 8];
 // A* over open cells (8 neighbors; a diagonal needs both sides open). goals: a set
 // of "x,z" keys. blocked: extra "x,z" keys learned from failed moves. Returns
 // [[x, z], ...] from start to a goal, or null.
-exports.findPath = (grid, start, goals, blocked = new Set()) => {
+exports.findPath = (grid, start, goals, blocked = new Set(), loose = false) => {
   const key = (x, z) => x + ',' + z;
   const open = (x, z) => { const c = grid.at(x, z); return c && c.open && !blocked.has(key(x, z)); };
   // a step between cells: the same level, or through a slope at most one level apart
@@ -87,7 +87,10 @@ exports.findPath = (grid, start, goals, blocked = new Set()) => {
       if (!open(nx, nz) && !goals.has(key(nx, nz))) continue;
       const from = grid.at(x, z), to = grid.at(nx, nz);
       if (to && to.open && !step(from, to)) continue;
-      if (dx && dz && !(open(x + dx, z) && open(x, z + dz) && step(from, grid.at(x + dx, z)) && step(from, grid.at(x, z + dz)))) continue;
+      // a diagonal needs both sides open; loose: one side is enough (squeezing past a
+      // person or a piece of furniture that blocks the other)
+      const side = (cx, cz) => open(cx, cz) && step(from, grid.at(cx, cz));
+      if (dx && dz && !(loose ? side(x + dx, z) || side(x, z + dz) : side(x + dx, z) && side(x, z + dz))) continue;
       const nk = key(nx, nz), c = cost.get(k) + (dx && dz ? 1.414 : 1);
       if (c < (cost.get(nk) ?? Infinity)) { cost.set(nk, c); came.set(nk, k); frontier.push([c + hfn(nx, nz), nx, nz]); }
     }
@@ -255,7 +258,8 @@ exports.navigate = function* (target, opts = {}) {
     // the same lines again: a scripted gate turned the player back
     if (opts.seen && [...opts.seen.values()].some((n) => n >= 2)) return done(false, 'gated', { lines: [...opts.seen.keys()] });
     const here = exports.cellOf(p.position.x, p.position.z);
-    const path = goals.has(here.join(',')) ? [here] : exports.findPath(grid, here, goals, new Set([...blocked, ...avoid]));
+    let path = goals.has(here.join(',')) ? [here] : exports.findPath(grid, here, goals, new Set([...blocked, ...avoid]));
+    if (!path && blocked.size) path = exports.findPath(grid, here, goals, new Set([...blocked, ...avoid]), true);
     plans++;
     if (opts.trace) opts.trace({ plan: plans, here, path: path && simplify(path), blocked: [...blocked], x: p.position.x, z: p.position.z });
     if (!path && !opts.noPush) {
