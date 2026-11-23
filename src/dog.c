@@ -107,16 +107,6 @@ static inline void Or16(u16 *p, u32 mask)
     *p = value;
 }
 
-static inline u32 Test16(u16 *p, u32 mask)
-{
-    return *p & mask;
-}
-
-static inline void And32(u32 *p, u32 mask)
-{
-    *p &= mask;
-}
-
 static inline void OrMotion(struct SceneActorReactionMotion *p, u32 mask)
 {
     u32 v = mask;
@@ -146,7 +136,7 @@ void Dog_UpdateTargetGate(struct ChaseActor *p)
         v |= *f;
         *f = v;
         p->group.common.gate.counter = p->group.common.gate.duration;
-        if (Test16(f, 0x100) || !Dog_IsActionTimerExpired(p)) {
+        if (SceneActorTurn_Flags(f, 0x100) || !Dog_IsActionTimerExpired(p)) {
             if (!ContextBlocked(context))
                 Dog_SelectRetreatOrChase(p);
             return;
@@ -154,7 +144,7 @@ void Dog_UpdateTargetGate(struct ChaseActor *p)
             Dog_SelectTargetAction(p);
         }
     } else {
-        And32(&context->flags, ~12);
+        SceneActorChase_AndWordFlags(&context->flags, ~12);
         SceneActorChase_SetPhase(p, 1, 0);
         SceneActorChase_SetControl(p, SceneActorControl_OnIdle, 0x10);
     }
@@ -218,11 +208,6 @@ static inline u8 Dog_HasAwarenessFlag(struct Dog *context, u32 mask)
     return 0;
 }
 
-static inline u32 ActorFlag(struct ChaseActor *actor, u32 mask)
-{
-    return actor->base.motionFlags & mask;
-}
-
 static inline void Response(struct ChaseActor *actor, u8 *nav, u32 behavior, u32 response)
 {
     Chase_SetState(actor, 0, 2, behavior);
@@ -234,7 +219,7 @@ void Dog_SelectTargetAction(struct ChaseActor *actor)
 {
     struct Dog *context = actor->base.context;
     u8 *nav = (u8 *)&actor->group.common;
-    if (ActorFlag(actor, 0x100))
+    if (SceneActorContact_MotionFlags(actor, 0x100))
         return;
     if (actor->base.tracking.distance < actor->base.tracking.range) {
         struct ContactPosition delta;
@@ -396,11 +381,6 @@ static inline u32 NextRandomSample(const u16 *table)
     return table[gRandomIndex];
 }
 
-static inline u16 TestAnimationFlags(struct ChaseActor *actor, u16 mask)
-{
-    return actor->base.motionFlags & mask;
-}
-
 static inline void AddPosition(struct ContactPosition *out, const struct ContactPosition *a,
                                const struct ContactPosition *b)
 {
@@ -446,7 +426,7 @@ u16 Dog_UpdateItemDrop(struct ChaseActor *actor)
     struct ContactPosition velocity;
 
     if (sequence->elapsed == 0) {
-        alternate = TestAnimationFlags(actor, 0x80) != 0;
+        alternate = SceneActorChase_QueryMotionFlags(actor, 0x80) != 0;
         SetStatusFlags(actor, 0x10000);
         palette = ReadPaletteOffset(&actor->base.paletteOffset);
         paletteOffset = &actor->base.paletteOffset;
@@ -1473,14 +1453,9 @@ struct P {
 
 void SceneActorReaction_HandleColliderContact(struct P *, s32, s32);
 
-static inline u32 tst(u16 *a, u32 m)
-{
-    return *a & m;
-}
-
 void Dog_OnBodyCollision(struct P *p, s32 a, s32 b)
 {
-    if (tst(&p->flags, 0x800) == 0)
+    if (SceneActorTurn_Flags(&p->flags, 0x800) == 0)
         SceneActorReaction_HandleColliderContact(p, a, b);
 }
 
@@ -1685,20 +1660,6 @@ void Dog_UpdateDefeatFinish(struct ChaseActor *actor, s32 frame)
 
 // confidence=low: animation 11 is the route-arrival reaction selected by Dog_ResumeRoute.
 
-static inline u8 TakeEntry(struct ChaseActor *a)
-{
-    if (a->base.field2B2) {
-        a->base.field2B2 = 0;
-        return 1;
-    }
-    return 0;
-}
-
-static inline u32 Test_UpdateArrivalAnimation(u16 *p, u32 mask)
-{
-    return *p & mask;
-}
-
 void Dog_UpdateArrivalAnimation(struct ChaseActor *a)
 {
     u16 saved;
@@ -1706,7 +1667,7 @@ void Dog_UpdateArrivalAnimation(struct ChaseActor *a)
     u16 *scale;
     u16 *originalScale;
     unsigned long long originalOffset;
-    if (TakeEntry(a)) {
+    if (SceneActorReaction_TakePrepared(a)) {
         SceneActorAnimation_SelectDirectionalEntry(a, 11);
         a->base.restart = 0;
     }
@@ -1716,12 +1677,12 @@ void Dog_UpdateArrivalAnimation(struct ChaseActor *a)
     {
         u32 mask = 0x80;
         flags = &a->base.motionFlags;
-        if (Test_UpdateArrivalAnimation(flags, mask)) {
+        if (SceneActorTurn_Flags(flags, mask)) {
             *originalScale = Div(0x40, 3);
         }
     }
 
-    if (Test_UpdateArrivalAnimation(flags, 0xA02F)) {
+    if (SceneActorTurn_Flags(flags, 0xA02F)) {
         u16 *p = &a->base.field2C2;
         *p = 0x40;
         scale = p;
@@ -1751,7 +1712,7 @@ void Dog_ResumeAfterReaction(struct ChaseActor *a)
 {
     struct SceneActorChaseGroup *group;
     u16 flags;
-    if (TakeEntry(a)) {
+    if (SceneActorReaction_TakePrepared(a)) {
         SceneActorAnimation_SelectDirectionalEntry(a, 11);
         a->base.restart = 0;
     }
@@ -2728,11 +2689,6 @@ void Dog_UpdateScriptedAction(struct Sscripted *obj)
     }
 }
 
-static inline u32 Dog_RouteFlags(struct ChaseActor *actor, u32 mask)
-{
-    return actor->base.behaviorFlags & mask;
-}
-
 /* Queue pursuit, a home route, or the short waiting response after the delay. */
 
 void Dog_UpdateDelayedPursuit(struct ChaseActor *actor)
@@ -2752,7 +2708,7 @@ void Dog_UpdateDelayedPursuit(struct ChaseActor *actor)
     if (SceneActorChase_MotionFlags(actor, 0x80)) {
         SceneActorDelay_Prepare((void *)&group->saved, group->common.gate.control, 12, 30);
         SceneActorChase_Arrive(actor);
-    } else if (Dog_RouteFlags(actor, 0x10)) {
+    } else if (SceneActorTurn_ActorFlags(actor, 0x10)) {
         SceneActorDelay_Prepare((void *)&group->saved, actor->base.onAlternateEntry, 7, 30);
         SceneActorChase_SnapToRoute(group->destination, &group->homeRoute);
         if (!SceneActorChase_TryRoute(actor, group->route, &actor->base.body.position,
@@ -2808,21 +2764,16 @@ s32 Dog_FinishFrame(void *p)
 
 void Dog_UpdateLeapWindup(struct ChaseActor *actor);
 
-static inline void Dog_MaskAttackFlags(u32 *field, u32 mask)
-{
-    *field &= mask;
-}
-
 static inline void Dog_ClearAttackFlags(struct Dog *ctx, u32 bits)
 {
-    Dog_MaskAttackFlags(&ctx->flags, ~bits);
+    SceneActorChase_AndWordFlags(&ctx->flags, ~bits);
 }
 
 void Dog_UpdateLeapAttack(struct ChaseActor *a)
 {
     struct Dog *context = a->base.context;
     if (SceneActorControl_TakeStateEntry(a)) {
-        And32(&context->flags, ~8);
+        SceneActorChase_AndWordFlags(&context->flags, ~8);
         SceneActorReaction_EnableMotionFlags(0x100, &a->base.motionFlags);
         SceneActorChase_SetControl(a, Dog_UpdateLeapWindup, 34);
         Dog_ClearAttackFlags(a->base.context, 2);
@@ -2860,7 +2811,7 @@ void Dog_UpdateTrailAttack(struct ChaseActor *a)
 {
     struct Dog *context = a->base.context;
     if (SceneActorControl_TakeStateEntry(a)) {
-        And32(&context->flags, ~8);
+        SceneActorChase_AndWordFlags(&context->flags, ~8);
         SceneActorReaction_EnableMotionFlags(0x100, &a->base.motionFlags);
         SceneActorChase_SetControl(a, SceneActorAnimation_EmitDirectionalTrail, 37);
         Dog_SetContextFlags(a->base.context, 2);
@@ -2912,14 +2863,6 @@ static inline u16 LoadMotionFlags(struct ChaseActor *actor, u32 mask)
     return value & mask;
 }
 
-static inline void Delta_scripted(struct ContactPosition *out, const struct ContactPosition *from,
-                                  const struct ContactPosition *to)
-{
-    out->x = to->x - from->x;
-    out->y = to->y - from->y;
-    out->z = to->z - from->z;
-}
-
 void Dog_ChasePlayer(struct ChaseActor *actor)
 {
     u8 *context = actor->base.context;
@@ -2934,8 +2877,8 @@ void Dog_ChasePlayer(struct ChaseActor *actor)
     {
         struct DisplaySequenceState *anim;
         s32 distance;
-        Delta_scripted(&target, &actor->base.body.position,
-                       (struct ContactPosition *)((u8 *)gPlayers[0] + 0x30));
+        Chase_Delta(&target, &actor->base.body.position,
+                    (struct ContactPosition *)((u8 *)gPlayers[0] + 0x30));
         distance = target.x * target.x + target.z * target.z;
         anim = &((struct SceneActorAnimationSequenceDrawable *)actor->base.drawable)->sequence;
         if ((anim->index == 6 || anim->index == 0xC || anim->index == 0x13 ||
@@ -3617,11 +3560,6 @@ static inline void setControl(struct ChaseActor *actor, void *control, u8 kind)
     actor->base.pendingControl = 0;
 }
 
-static inline u32 testFlags(struct ChaseActor *actor, u32 mask)
-{
-    return actor->base.behaviorFlags & mask;
-}
-
 void Dog_ResetIdleControl(struct ChaseActor *actor)
 {
     if (Chase_TakeArrived(actor)) {
@@ -3644,7 +3582,7 @@ void Dog_ResetIdleControl(struct ChaseActor *actor)
             motion->flags = mask;
         }
         control = &actor->group.common.control;
-        if (testFlags(actor, 0x200000)) {
+        if (SceneActorTurn_ActorFlags(actor, 0x200000)) {
             clearRouteFlag(&actor->base.statusFlags);
             {
                 u32 mask = ~0x200;
