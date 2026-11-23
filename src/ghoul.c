@@ -1079,7 +1079,7 @@ void Ghoul_UpdateSpecialActionControl(struct ChaseActor *actor)
     if (SceneActorControl_TakeStateEntry(actor))
         SceneActorChase_SetControl(actor, Ghoul_UpdateDiscThrow, 35);
     if (actor->base.stepDone) {
-        Trigger_ConsumePending(&actor->base.unknown9[3], 1);
+        Trigger_ConsumePending(actor->base.receiver, 1);
         SceneActorChase_SetControl(actor, actor->base.onStanding, 0);
         SceneActorChase_SetState(actor, 2, 0, 2);
     } else {
@@ -1092,7 +1092,7 @@ void Ghoul_UpdateAnimationElevenControl(struct ChaseActor *actor)
     if (SceneActorControl_TakeStateEntry(actor))
         SceneActorChase_SetControl(actor, SceneActorReaction_PlayAnimationBUntilComplete, 10);
     if (actor->base.stepDone) {
-        Trigger_ConsumePending(&actor->base.unknown9[3], 1);
+        Trigger_ConsumePending(actor->base.receiver, 1);
         SceneActorChase_SetControl(actor, actor->base.onStanding, 0);
         SceneActorChase_SetState(actor, 2, 0, 2);
     } else {
@@ -1105,7 +1105,7 @@ void Ghoul_UpdateAttackControl(struct ChaseActor *actor)
     if (SceneActorControl_TakeStateEntry(actor))
         SceneActorChase_SetControl(actor, Ghoul_UpdateDisplacementRecovery, 18);
     if (actor->base.stepDone) {
-        Trigger_ConsumePending(&actor->base.unknown9[3], 1);
+        Trigger_ConsumePending(actor->base.receiver, 1);
         SceneActorChase_SetControl(actor, actor->base.onStanding, 0);
         SceneActorChase_SetState(actor, 2, 0, 2);
     } else {

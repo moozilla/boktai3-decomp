@@ -1384,7 +1384,7 @@ u32 Crow_Destroy(struct ChaseActor *actor)
     Heap_Free(p);
     m = 0x100;
     if (SceneActorChase_TestField(&actor->base.placementFlags, m))
-        SceneMessages_UnregisterReceiver(&actor->base.unknown9[3]);
+        SceneMessages_UnregisterReceiver(actor->base.receiver);
     {
         u8 *r = actor->base.shadow;
         if (*r == 1)

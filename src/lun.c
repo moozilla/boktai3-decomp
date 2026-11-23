@@ -1831,7 +1831,7 @@ u32 Lun_Destroy(struct ChaseActor *s)
     Heap_Free(p);
     m = 0x100;
     if (SceneActorChase_TestField(&s->base.placementFlags, m))
-        SceneMessages_UnregisterReceiver(&s->base.unknown9[3]);
+        SceneMessages_UnregisterReceiver(s->base.receiver);
     {
         u8 *r = s->base.shadow;
         if (*r == 1)

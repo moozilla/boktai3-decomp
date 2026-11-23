@@ -1369,7 +1369,7 @@ void Golem_UpdateSlideImpact(struct ChaseActor *actor, u32 frame)
         spread.z = 32;
         SceneParticleBurst_CreateWithPause(&body->position, &velocity, &spread, 1, 3, 4);
     }
-    if (actor->base.unknown9[0x40 - 9] & 1) {
+    if (actor->base.movementProbe[0] & 1) {
         struct SceneExtent velocity, spread;
         u32 count;
         u32 randomOrigin;
