@@ -3283,7 +3283,6 @@ void Nidhoggr_UpdateLeftwardRetreat(struct Nidhoggr *t)
     switch (t->state) {
         case 0: {
             s32 i;
-            s32 value;
             u16 x;
             struct SceneVec *base;
 
@@ -3296,7 +3295,6 @@ void Nidhoggr_UpdateLeftwardRetreat(struct Nidhoggr *t)
 
             x = t->pos.x - 0x800;
             base = &t->basePos;
-            value = 0;
             base->x = x;
             t->basePos.y = t->pos.y;
             t->basePos.z = t->pos.z;
@@ -3304,7 +3302,7 @@ void Nidhoggr_UpdateLeftwardRetreat(struct Nidhoggr *t)
             t->posOffsetXVelocity = -0xe00;
             t->swayXVelocity = -0x88;
             t->state++;
-            t->timer = value;
+            t->timer = 0;
             break;
         }
         case 1:
