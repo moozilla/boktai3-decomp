@@ -33,6 +33,8 @@
 #include "scene_actor_init_group.h"
 #include "scene_actor_init_dispatch.h"
 #include "scene_actor_init_graphics.h"
+#include "scene_actor_turn.h"
+#include "scene_actor_chase_shared.h"
 
 extern const u8 gUnk_0824E218[];
 
@@ -72,7 +74,6 @@ void Vorn_UpdateScriptedAction(struct ChaseActor *actor)
         actor->base.counter2AC++;
     }
 }
-
 
 /* Queue pursuit, a home route, or the short waiting response after the delay. */
 
@@ -175,11 +176,6 @@ u8 SceneActorBehavior_AccelerateTowardDescriptor(void *, void *, u32, u32, s32);
 
 u8 SceneActorBehavior_RequestDescriptorTurn(void *, void *, u32, u32, s32);
 
-static inline u32 TestFlags(struct ChaseActor *a, u32 mask)
-{
-    return a->base.motionFlags & mask;
-}
-
 void Vorn_UpdateDescriptorPursuit(struct ChaseActor *a)
 {
     u8 *group = (u8 *)&a->group.common;
@@ -198,7 +194,7 @@ void Vorn_UpdateDescriptorPursuit(struct ChaseActor *a)
             struct ChaseActor *held = a;
             a = held;
         }
-        if (TestFlags(a, 0xA02F)) {
+        if (SceneActorContact_MotionFlags(a, 0xA02F)) {
             u16 *p = &a->base.field2C2;
             *p = 64;
             rate = p;
@@ -375,8 +371,6 @@ void Anim_SetFrameDurationScale(void *, u32);
 
 #define FIELD(p, off, T) (*(T *)((u8 *)(p) + (off)))
 
-
-
 void SceneActorReaction_BeginSideStep(void);
 
 void Vorn_UpdateRouteApproach(struct ChaseActor *actor)
@@ -394,8 +388,7 @@ void Vorn_UpdateRouteApproach(struct ChaseActor *actor)
     SceneActorAnimation_SelectDirectionalEntry(actor, 1);
     speed = Callback_InvokeActor(actor, FIELD(actor, 0x260, void *));
     {
-        u32 mask = 0xa02f;
-        if (actor->base.motionFlags & mask) {
+        if (SceneActorContact_MotionFlags(actor, 0xa02f)) {
             u16 *p = &actor->base.field2C2;
             *p = 64;
             scale = p;
@@ -429,7 +422,6 @@ void Vorn_UpdateRouteApproach(struct ChaseActor *actor)
     }
     actor->base.counter2AC++;
 }
-
 
 static inline void SetControlWords(struct ChaseActor *actor, void *control, u32 kind)
 {
@@ -523,8 +515,7 @@ void SceneActorControl_UpdateProbeApproach_080B04F4(struct ChaseActor *actor)
     speed = Callback_InvokeActor(*(&actor), *((void **)(((u8 *)actor) + 0x260)));
     actor->base.field2C2 = 0x20;
     {
-        u32 mask = 0xA02F;
-        if (actor->base.motionFlags & mask) {
+        if (SceneActorContact_MotionFlags(actor, 0xA02F)) {
             u16 *p = &actor->base.field2C2;
             *p = 0x40;
             scale = p;
@@ -564,7 +555,6 @@ void SceneActorControl_UpdateProbeApproach_080B04F4(struct ChaseActor *actor)
 }
 
 /* Tentative phase-control interpretation; names have low confidence. */
-
 
 void SceneActorPhase_UpdateConditionalMotion(struct ChaseActor *p)
 {
@@ -724,12 +714,6 @@ static inline u8 IsUnavailable(void *input)
     return 0;
 }
 
-
-static inline u32 MaskedFlags(struct ChaseActor *p, u32 mask)
-{
-    return p->base.motionFlags & mask;
-}
-
 static inline u8 TestContext(u8 *base, u32 mask, u16 **out)
 {
     u16 *field = (u16 *)(base + 0x6D4);
@@ -745,7 +729,7 @@ void SceneActorPhase_TryBeginSpecialMotion(struct ChaseActor *p)
     u8 *base = (u8 *)p;
 
     if (!IsUnavailable(base) && *(s16 *)(base + 0x682) == 1 && p->base.controlKind != 0x29 &&
-        !MaskedFlags(p, 0xE3BF)) {
+        !SceneActorContact_MotionFlags(p, 0xE3BF)) {
         u16 *flags;
         if (!TestContext(base, 0xC, &flags) && SceneActorChase_TestField(flags, 2)) {
             Chase_SetBehavior(p, 0x18);
@@ -972,12 +956,10 @@ struct SceneActorForwardCollider {
 static inline u8 unavailable(struct ChaseActor *p)
 {
     if (p) {
-        u32 mask = 0x40;
-        if (p->base.motionFlags & mask)
+        if (SceneActorContact_MotionFlags(p, 0x40))
             return 1;
         {
-            u32 mask = 0x20000;
-            if (p->base.statusFlags & mask)
+            if (SceneActorChase_StatusFlags(p, 0x20000))
                 return 1;
         }
         if (p->base.health <= 0)
@@ -1036,8 +1018,7 @@ static inline u8 active(struct SceneActorRandomReaction *p)
 
 static inline u32 blocked(struct ChaseActor *p)
 {
-    u32 mask = 0xe33f;
-    return p->base.motionFlags & mask;
+    return SceneActorContact_MotionFlags(p, 0xe33f);
 }
 
 void SceneActor_TickRandomReaction(struct ChaseActor *p)
@@ -1237,16 +1218,6 @@ void SceneActor_SelectDistantRoutePoint(struct SceneActorRouteSelection *p,
 
 u8 Vorn_SelectUphillTurn(void *, void *);
 
-static inline u32 MotionFlags(struct ChaseActor *a, u32 mask)
-{
-    return a->base.motionFlags & mask;
-}
-
-static inline u32 StatusFlags(struct ChaseActor *a, u32 mask)
-{
-    return a->base.statusFlags & mask;
-}
-
 static inline u8 ContextFlags(u8 *p, u32 mask, u16 **out)
 {
     u16 *field = (void *)(p + 0x6D4);
@@ -1259,7 +1230,7 @@ static inline u8 ContextFlags(u8 *p, u32 mask, u16 **out)
 
 static inline u8 Unavailable(struct ChaseActor *a)
 {
-    if (a && (MotionFlags(a, 64) || StatusFlags(a, 0x20000) || a->base.health <= 0))
+    if (a && (SceneActorContact_MotionFlags(a, 64) || SceneActorChase_StatusFlags(a, 0x20000) || a->base.health <= 0))
         return 1;
     return 0;
 }
@@ -1274,7 +1245,6 @@ static inline void Chase_SetState_1(struct ChaseActor *actor, u32 s, u32 p)
     actor->base.counter2AC = 0;
     actor->base.field2B1 = 1;
 }
-
 
 inline static u32 Chase_Bits32_1(struct ChaseActor *actor_, u32 mask)
 {
@@ -1297,7 +1267,7 @@ void Vorn_TryUphillRoute(struct ChaseActor *actor)
     struct ContactPosition *point;
     if (Unavailable(actor))
         return;
-    if (MotionFlags(actor, 0xE3BF))
+    if (SceneActorContact_MotionFlags(actor, 0xE3BF))
         return;
     if (Chase_Bits32_1(actor, 16))
         return;
@@ -1466,7 +1436,6 @@ void Vorn_SelectReactionControl(struct ChaseActor *a)
 
 // confidence=low: route role inferred from callers and terrain/path tests.
 
-
 static inline u32 CellHeight(struct ContactPosition *position, u32 cell)
 {
     u32 shape, height;
@@ -1494,7 +1463,6 @@ done:
     return height;
 }
 
-
 static inline u8 TryRoute(struct Vorn *actor, void *route, struct ContactPosition *position,
                           struct ContactPosition *target)
 {
@@ -1512,7 +1480,6 @@ static inline u8 TryRoute(struct Vorn *actor, void *route, struct ContactPositio
     Chase_ClearBits(&actor->chase.base.motionFlags, 0x200);
     return 0;
 }
-
 
 // confidence=low: routes toward the current target after a reaction.
 
@@ -1544,13 +1511,13 @@ void Vorn_BeginTargetPursuit(struct Vorn *actor)
         Vorn_BeginResponsePursuit(actor, 1, gUnk_0824E230, 0x29a);
         return;
     }
-    if (MotionFlags(&actor->chase, 0x100))
+    if (SceneActorContact_MotionFlags(&actor->chase, 0x100))
         return;
     group = (u8 *)&actor->chase.group.common;
     if (TestContext_BeginTargetPursuit(actor->chase.base.context, 0x1d)) {
         actor->chase.base.field2C2 = 32;
         if (TestContext_BeginTargetPursuit(actor->chase.base.context, 4) &&
-            MotionFlags(&actor->chase, 0x80)) {
+            SceneActorContact_MotionFlags(&actor->chase, 0x80)) {
             actor->chase.group.common.gate.counter += 300;
             if (actor->chase.group.common.gate.counter > actor->chase.group.common.gate.duration)
                 actor->chase.group.common.gate.counter = actor->chase.group.common.gate.duration;
@@ -2315,7 +2282,6 @@ static inline s32 RandomByte(void)
     return *(const u8 *)(gRandomTable + gRandomIndex);
 }
 
-
 inline static s32 RandomByte_TrySoloAction(void)
 {
     gRandomIndex = (gRandomIndex + 1) & 0x3FF;
@@ -2573,7 +2539,6 @@ void Vorn_TickSound(struct ChaseActor *actor)
     }
 }
 
-
 static inline u32 Vorn_CellHeight(struct ContactPosition *position, u32 cell)
 {
     u32 shape, height;
@@ -2600,8 +2565,6 @@ slopeX:
 done:
     return height;
 }
-
-
 
 /* Restores the saved route after a context response; interpretation is tentative. */
 
@@ -2937,9 +2900,7 @@ u8 Vorn_SelectHitRecovery(struct ChaseActor *actor)
         Chase_SetCtl(actor, actor->base.onReaction, 0x12);
         Chase_SetState(actor, 3, 0, 0);
         {
-            u32 *flags = &actor->base.statusFlags;
-            u32 mask = ~0x1000000;
-            *flags &= mask;
+            SceneActorChase_ClearWordFlags(&actor->base.statusFlags, 0x1000000);
         }
         return 1;
     }
@@ -3126,7 +3087,6 @@ struct SRestoreControlAfterItemLaunch {
     struct SRestoreControlAfterItemLaunch *other;
     u32 at3D4;
 };
-
 
 s32 SceneActor_TryLaunchItem13(struct SceneActorItemLaunch *p);
 

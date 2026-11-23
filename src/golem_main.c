@@ -23,6 +23,8 @@
 #include "golem_charge.h"
 #include "monster_particle_random.h"
 #include "scene_actor_delayed_response.h"
+#include "scene_actor_init_actor.h"
+#include "scene_actor_chase_shared.h"
 
 void Golem_CenterPositionInCell(void *ptr)
 {
@@ -121,11 +123,6 @@ void Golem_ResetIdleControl(struct ChaseActor *actor);
 
 void SceneActorControl_OnIdle(u8 *);
 
-static inline u32 TestFlags(u16 *flags, u32 mask)
-{
-    return *flags & mask;
-}
-
 void SceneActorControl_RefreshMotionRoute(struct ChaseActor *actor)
 {
     u32 active = SceneActorChase_TrackingFlags(&actor->base.tracking, 8);
@@ -145,7 +142,7 @@ void SceneActorControl_RefreshMotionRoute(struct ChaseActor *actor)
             *flags = mask;
         }
         actor->group.common.gate.counter = actor->group.common.gate.duration;
-        if (TestFlags(&actor->base.motionFlags, 256))
+        if (SceneActorTurn_Flags(&actor->base.motionFlags, 256))
             return;
         Golem_ResetIdleControl(actor);
     } else {
@@ -172,11 +169,11 @@ void Golem_RestoreRoute(struct ChaseActor *actor)
         return;
     Chase_SetState(actor, 3, 1, 0);
     Chase_SetCtl(actor, (void *)SceneActorReaction_RestoreAfterDelay, 0xE);
-    if (TestFlags(flags, 0x80)) {
+    if (SceneActorTurn_Flags(flags, 0x80)) {
         actor->base.field2C2 = 0x20;
         SceneActorChase_GroupSetFlags(&actor->group, 4);
         SceneActorDelay_Prepare((void *)&actor->group.saved, *(void **)(group + 0x48), 0xC, 0x1E);
-        if (TestFlags(flags, 0x80)) {
+        if (SceneActorTurn_Flags(flags, 0x80)) {
             u16 *time = &actor->group.common.gate.counter;
             *time += 0x12C;
             if (*time > actor->group.common.gate.duration)
@@ -443,11 +440,6 @@ struct Seq {
     u16 hE;
 };
 
-static inline void Golem_SetStatusFlags(struct ChaseActor *actor, u32 mask)
-{
-    actor->base.statusFlags |= mask;
-}
-
 extern u16 gUnk_08606120[];
 
 u16 Skeleton_LookupAnimationEntry(struct ChaseActor *actor)
@@ -457,7 +449,7 @@ u16 Skeleton_LookupAnimationEntry(struct ChaseActor *actor)
     struct DisplaySequenceState *wrapped = sequence;
 
     if (sequence->elapsed == 0) {
-        Golem_SetStatusFlags(actor, 0x10000);
+        MonsterInit_SetStatusFlags(actor, 0x10000);
         if (sequence->index <= 7)
             return gUnk_08606120[sequence->index];
         if ((u16)(sequence->index - 8) <= 7)
@@ -1365,11 +1357,6 @@ static inline s32 GolemSlide_Quarter(s16 value)
     return -((-value) >> 2);
 }
 
-static inline void GolemSlide_SetMotionFlags(struct ChaseActor *actor, u16 mask)
-{
-    actor->base.motionFlags = mask | actor->base.motionFlags;
-}
-
 static inline void GolemSlide_ClearColliderFlags(struct ContactCollider *collider, u16 bits)
 {
     u32 mask = ~bits;
@@ -1390,7 +1377,7 @@ void Golem_UpdateSlideImpact(struct ChaseActor *actor, u32 frame)
         SceneActorPlacement_PlayVariantEventSound((void *)actor, 4);
     SceneActorAnimation_SelectDirectionalEntry((void *)actor, 15);
     SceneActorChase_SetReactionFlags(actor, 0x20);
-    GolemSlide_SetMotionFlags(actor, 0x100);
+    SceneActorChase_SetMotionFlags(actor, 0x100);
     SceneActorChase_SetActorFlags(actor, 0x2000);
     actor->base.body.motion.x +=
         (context->speed * gUnk_086149C4[(body->direction + 64) & 255]) >> 16;
@@ -1427,7 +1414,7 @@ void Golem_UpdateSlideImpact(struct ChaseActor *actor, u32 frame)
             actor->base.stepDone = 1;
         } else {
             GolemSlide_SetDelay(actor, 180);
-            Golem_SetStatusFlags(actor, 1);
+            MonsterInit_SetStatusFlags(actor, 1);
             SceneActorChase_SetState(actor, 3, 0, 0);
             SceneActorChase_SetControl(actor, group->contactControl, 7);
             GolemSlide_ClearColliderFlags(&actor->base.colliderA, 0x100);
@@ -2045,7 +2032,7 @@ static inline u8 Golem_Drift(struct ChaseActor *actor)
         mask &= ~0x100;
         *flags = mask;
     }
-    Golem_SetStatusFlags(actor, 0x10000);
+    MonsterInit_SetStatusFlags(actor, 0x10000);
     dx = Golem_ReadDisplacementAxis(Golem_ReadDesiredX(actor), &actor->base.reactionEnd.x, &x);
     dz = Golem_ReadDisplacementAxis(Golem_ReadDesiredZ(actor), &actor->base.reactionEnd.z, &z);
     dx = Golem_ClampAxis(dx, 200);

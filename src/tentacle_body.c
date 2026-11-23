@@ -1,6 +1,7 @@
 #include "tentacle_body.h"
 
 #include "scene_actor_init_actor.h"
+#include "word_flags.h"
 
 void TentacleBody_OnAttackCollision(u8 *unused, struct ContactCollider *collider,
                                     struct ChaseActor *actor)
@@ -71,24 +72,14 @@ void TentacleBody_UpdateInactiveState(void)
 
 /* TentacleBody_UpdateTimedAction: Starts animation 7 and advances action flags at frame 40 and after frame 120 */
 
-static inline void TentacleBody_ClearActionFlags(u16 *f, s32 m)
-{
-    *f &= m;
-}
-
-static inline void TentacleBody_SetActionFlags(u16 m, u16 *f)
-{
-    *f |= m;
-}
-
 void TentacleBody_UpdateTimedAction(struct ChaseActor *actor, s32 frame)
 {
     if (TentacleSpread_Take(&actor->base.field2B2)) {
         SceneActorAnimation_SelectDirectionalEntry(actor, 7);
-        TentacleBody_ClearActionFlags(&actor->base.motionFlags, ~1);
+        HalfwordFlags_And(&actor->base.motionFlags, ~1);
     }
     if (frame == 40)
-        TentacleBody_SetActionFlags(16, &actor->base.reactionFlags);
+        HalfwordFlags_Set(16, &actor->base.reactionFlags);
     if (actor->base.restart && frame > 120)
         actor->base.stepDone = 1;
 }

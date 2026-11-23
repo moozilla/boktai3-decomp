@@ -305,6 +305,18 @@ class Warnings(unittest.TestCase):
             with self.subTest(decl=decl):
                 self.assertEqual(warns("void f(void) {\n    " + decl + "\n    g();\n}\n"), [])
 
+    def test_const_local_number_named_inline_parameter(self):
+        text = ("static inline void Restore(struct A *a, void *control, u32 kind,\n                           u32 zero)\n"
+                "{\n    a->done = zero;\n    a->kind = kind;\n}\n")
+        site, = [s for s in c.sites(text) if s.kind == "const-local"]
+        self.assertEqual(site.line, 2)
+        self.assertEqual(warns(text.replace("u32 zero", "const u16 two").replace("= zero", "= two")), ["const-local"])
+        # an ordinary function's parameter, a pointer, and a name that only starts with a number word
+        for header in ("void Restore(struct A *a, u32 zero)", "static inline void Restore(u32 *zero)",
+                       "static inline void Restore(u32 oneshot)"):
+            with self.subTest(header=header):
+                self.assertEqual(warns(header + "\n{\n    g();\n}\n"), [])
+
     def test_grouped_literal_initializers(self):
         body = """void draw(void) {
     u32 redBlue = 0x7c1f, product = 0xf83e0;
@@ -362,6 +374,11 @@ void clear(void) {
     def test_literal_local_is_never_changed(self):
         self.assertEqual(warns("void f(u32 a) {\n    u32 mask = 0x17;\n    if (mask & a)\n        g();\n}\n"),
                          ["literal-local"])
+        # a complemented literal is one too, initialized or assigned on its own line
+        for body in ("    u32 mask = ~1;\n", "    u32 mask = ~0x141C0u;\n", "    u32 mask;\n    mask = ~ 8;\n"):
+            with self.subTest(body=body):
+                self.assertEqual(warns("void f(u32 *a) {\n" + body + "    *a &= mask;\n}\n"), ["literal-local"])
+        self.assertEqual(warns("void f(u32 *a, u32 b) {\n    u32 mask = ~b;\n    *a &= mask;\n}\n"), [])
         # a counter, an accumulator, something passed by address, and a later scope's own variable
         for body in ("    int i = 0;\n    while (i < 4)\n        g(i++);\n",
                      "    u32 sum = 0;\n    sum += a;\n    g(sum);\n",
@@ -594,11 +611,11 @@ void f(struct P *p) {
         self.assertEqual(self.found({"include/word_flags.h": self.HEADER,
                                      "src/a.c": "static inline u32 WordFlags_Test(const u32 *flags, u32 mask);\n"}), {})
 
-    def test_a_longer_body_is_quiet(self):
+    def test_a_longer_body_that_calls_something_is_quiet(self):
         longer = """static inline u32 Test(struct P *p, u32 mask)
 {
     u32 *flags = &p->flags;
-    u32 value = *flags;
+    u32 value = Read(flags);
     return value & mask;
 }
 void f(struct P *p) {
@@ -606,8 +623,32 @@ void f(struct P *p) {
 }
 """
         self.assertEqual(self.found({"src/a.c": longer}), {})
-        self.assertEqual(self.found({"src/a.c": longer.replace("    u32 value = *flags;\n", "").replace("value", "*flags")}),
+        self.assertEqual(self.found({"src/a.c": longer.replace("    u32 value = Read(flags);\n", "").replace("value", "*flags")}),
                          {"src/a.c": [(1, "literal-param")]})
+
+    def test_a_longer_body_that_only_moves_bits_counts(self):
+        # out-parameter mask helpers: the field's address goes back to the caller beside the bits
+        out = """static inline u16 ReadFlags(struct P *p, u16 mask, u16 **field)
+{
+    u16 *flags = &p->flags;
+    u16 value = *flags & mask;
+    *field = flags;
+    return value;
+}
+static inline u8 HasFlags(struct P *p, u32 mask)
+{
+    u8 found = 0;
+    if (p->flags & mask)
+        found = 1;
+    return found;
+}
+void f(struct P *p) {
+    u16 *field;
+    ReadFlags(p, 8, &field);
+    HasFlags(p, 0x40);
+}
+"""
+        self.assertEqual(self.found({"src/a.c": out}), {"src/a.c": [(1, "literal-param"), (8, "literal-param")]})
 
     def test_other_uses_of_the_parameter_are_quiet(self):
         for body in ("return *flags + mask;", "return flags[mask];", "return *flags == mask;",

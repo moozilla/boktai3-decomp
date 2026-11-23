@@ -24,6 +24,9 @@
 #include "scene_actor_init_group.h"
 #include "scene_actor_init_graphics.h"
 #include "scene_actor_init_dispatch.h"
+#include "math_shift.h"
+#include "scene_actor_placement.h"
+#include "scene_actor_contact_response.h"
 
 /* Records type-one contacts reported by the Crow attack collider. */
 
@@ -263,9 +266,7 @@ void Crow_RecoverFromDisplacement(struct ChaseActor *actor, s32 elapsed)
             ((struct CrowSignedFlags *)field)->bits &= mask;
         }
         {
-            u32 *flags = &actor->base.behaviorFlags;
-            u32 mask = ~0x80;
-            *flags &= mask;
+            SceneActorChase_ClearWordFlags(&actor->base.behaviorFlags, 0x80);
         }
         state->bobPhase = 0;
         Crow_DisableAttackCollision(actor);
@@ -466,13 +467,6 @@ static inline s32 Crow_HeadingMagnitude(s32 n)
     return n;
 }
 
-static inline s32 Crow_TruncateShift(s32 n, u32 bits)
-{
-    if (n >= 0)
-        return n >> bits;
-    return -((-n) >> bits);
-}
-
 static inline void Crow_FindPositionDelta(struct ContactPosition *out,
                                           const struct ContactPosition *from,
                                           const struct ContactPosition *to)
@@ -484,9 +478,9 @@ static inline void Crow_FindPositionDelta(struct ContactPosition *out,
 
 static inline void Crow_MakeSteeringVelocity(struct ContactPosition *out, u32 angle, s32 speed)
 {
-    out->x = Crow_TruncateShift(gUnk_086149C4[(angle + 64) & 255] * speed, 12);
+    out->x = Math_ShiftTowardZero(gUnk_086149C4[(angle + 64) & 255] * speed, 12);
     out->y = 0;
-    out->z = Crow_TruncateShift(gUnk_086149C4[angle & 255] * speed, 12);
+    out->z = Math_ShiftTowardZero(gUnk_086149C4[angle & 255] * speed, 12);
 }
 
 static inline s32 Crow_ClampTurnSpeed(s32 n, s32 min, s32 *out)
@@ -535,7 +529,7 @@ void Crow_SteerAroundPlayer(struct ChaseActor *actor)
             Crow_SetFlightState(actor, 0, 2, 0);
             return;
         }
-        step = Crow_ClampTurnSpeed(Crow_TruncateShift(turn, 2), 4, &step);
+        step = Crow_ClampTurnSpeed(Math_ShiftTowardZero(turn, 2), 4, &step);
         if (step > 8)
             step = 8;
         if (state->approachTurns > 20) {
@@ -574,7 +568,7 @@ void Crow_SteerAroundPlayer(struct ChaseActor *actor)
             Crow_SetFlightState(actor, 0, 0, 4);
             return;
         }
-        step = Crow_ClampTurnSpeed(Crow_TruncateShift(turn, 3), 2, &step);
+        step = Crow_ClampTurnSpeed(Math_ShiftTowardZero(turn, 3), 2, &step);
     clamp:
         if (step > 6)
             step = 6;
@@ -614,13 +608,6 @@ static inline u32 Crow_NextWanderRandom(void)
     }
 }
 
-static inline u8 Crow_TestFlags(u32 mask, u32 flags)
-{
-    if (flags & mask)
-        return 1;
-    return 0;
-}
-
 void Crow_UpdateWanderTimer(struct ChaseActor *actor)
 {
     struct Crow *context = actor->base.context;
@@ -631,7 +618,7 @@ void Crow_UpdateWanderTimer(struct ChaseActor *actor)
         context->wanderTicks = (0x7F & value) + 0x14;
     }
     {
-        if (!Crow_TestFlags(4, context->flags)) {
+        if (!SceneActorPlacement_TestValue(4, context->flags)) {
             u8 result = Callback_InvokeActor(actor, actor->base.contactQuery.opaque);
             if (!result) {
                 if ((s32)actor->base.counter2AC > context->wanderTicks && actor->base.restart) {
@@ -1258,18 +1245,11 @@ static inline u8 Crow_TestFlagsValue(u32 v, u32 m)
     return 0;
 }
 
-static inline s32 Crow_ShiftMotion(s32 n, u32 bits)
-{
-    if (n >= 0)
-        return n >> bits;
-    return -((-n) >> bits);
-}
-
 static inline void Crow_MakeRecoilVelocity(struct ContactPosition *out, u32 angle, s32 speed)
 {
-    out->x = Crow_ShiftMotion(gUnk_086149C4[(angle + 64) & 255] * speed, 12);
+    out->x = Math_ShiftTowardZero(gUnk_086149C4[(angle + 64) & 255] * speed, 12);
     out->y = 0;
-    out->z = Crow_ShiftMotion(gUnk_086149C4[angle & 255] * speed, 12);
+    out->z = Math_ShiftTowardZero(gUnk_086149C4[angle & 255] * speed, 12);
 }
 
 void Anim_SetDurationScale(void *, u32);
@@ -1316,8 +1296,8 @@ static inline u8 Crow_ApproachSavedPosition(struct ChaseActor *actor,
     if (dx || dz) {
         motion->direction = Math_Atan2(dx, dz);
         *(u16 *)&motion->motion.x +=
-            Crow_ShiftMotion(gUnk_086149C4[(motion->direction + 64) & 255] * speed, 12);
-        *(u16 *)&motion->motion.z += Crow_ShiftMotion(gUnk_086149C4[motion->direction] * speed, 12);
+            Math_ShiftTowardZero(gUnk_086149C4[(motion->direction + 64) & 255] * speed, 12);
+        *(u16 *)&motion->motion.z += Math_ShiftTowardZero(gUnk_086149C4[motion->direction] * speed, 12);
     }
     return 0;
 }
@@ -1335,10 +1315,10 @@ void Crow_ApproachPlayerThenRecoil(struct ChaseActor *actor)
         ZeroFill8(&body->vectors[2]);
         Crow_FindPositionDelta(&delta, &actor->base.body.position, saved);
         actor->base.body.direction = Math_Atan2(delta.x, delta.z);
-        body->vectors[2].x = Crow_ShiftMotion(
+        body->vectors[2].x = Math_ShiftTowardZero(
             gUnk_086149C4[(actor->base.body.direction + 64) & 255] * body->distance, 12);
         body->vectors[2].z =
-            Crow_ShiftMotion(gUnk_086149C4[actor->base.body.direction] * body->distance, 12);
+            Math_ShiftTowardZero(gUnk_086149C4[actor->base.body.direction] * body->distance, 12);
         body->vectors[2].y = 0;
         if (body->vectors[2].x)
             body->vectors[2].x = Div(delta.x, body->vectors[2].x);
@@ -1356,7 +1336,7 @@ void Crow_ApproachPlayerThenRecoil(struct ChaseActor *actor)
         Crow_SetAnimationSpeed(actor);
         *(s16 *)&actor->base.heightOffset += body->vectors[2].y;
         if (!Mod(actor->base.counter2AC, 6))
-            body->vectors[2].y = Crow_ShiftMotion(body->vectors[2].y, 1);
+            body->vectors[2].y = Math_ShiftTowardZero(body->vectors[2].y, 1);
         if (Crow_ApproachSavedPosition(actor, &body->curveSubject, &actor->base.body,
                                        body->distance) ||
             Crow_TestResponseFlags(body, 2)) {
@@ -1378,11 +1358,6 @@ static inline u8 Crow_TakeHeightReturnEntry(struct ChaseActor *actor)
     return 0;
 }
 
-static inline u32 Crow_ReadHeightReturnFlags(struct ChaseActor *actor, u32 mask)
-{
-    return actor->base.motionFlags & mask;
-}
-
 void Crow_ReturnToGround(struct ChaseActor *actor)
 {
     s32 delta;
@@ -1392,7 +1367,7 @@ void Crow_ReturnToGround(struct ChaseActor *actor)
         actor->base.body.direction += 0x80;
     }
     Callback_InvokeActor(actor, actor->base.contactQuery.opaque);
-    if (Crow_ReadHeightReturnFlags(actor, 0xA02F)) {
+    if (SceneActorContact_MotionFlags(actor, 0xA02F)) {
         actor->base.field2C2 = 0x40;
         height = &actor->base.field2C2;
     } else {

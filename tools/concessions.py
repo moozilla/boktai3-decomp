@@ -53,8 +53,10 @@ its spelling, so each one is a question, not a verdict:
   assignment in a one-pass loop before returning the assigned temporary.
 * `const-local`: a local named for a number (`zero`, `one`, `two`, `zeroX`, `four`, ...), which
   only holds that constant, alone or in a grouped declaration (`u32 kind, zero;`), with or
-  without `register`. A `goto` label, a `return` operand or a struct member is not one.
-* `literal-local`: any other local that is initialized to a literal and never changed
+  without `register`, or a parameter of a `static inline` named that way
+  (`Restore(struct A *a, u32 kind, u32 zero)`). A `goto` label, a `return` operand or a struct
+  member is not one.
+* `literal-local`: any other local that is initialized to a literal (`0x17`, `-1`, `~8`) and never changed
   (`u32 mask = 0x17;` then `if (mask & flags)`), in any declarator of a declaration
   (`int i = 0, limit = 8;`). Also a local whose first use is a separate literal assignment in the
   declaration's own block (`u32 mask; ... mask = 0x17;`, reported at the assignment), and a local
@@ -72,7 +74,8 @@ its spelling, so each one is a question, not a verdict:
   covers objects and `&x` casts). A global an interrupt writes is volatile in its header instead.
 * `local-union`: a union defined inside a function (not a union member of a file-scope struct).
   Two views of one value are ordinary C; two unrelated values sharing storage are not.
-* `literal-param`: a `static inline` of at most two statements with an integer parameter that
+* `literal-param`: a `static inline` of at most two statements, or of any length when it calls
+  nothing (`u32 v = *p & mask; *out = p; return v;`), with an integer parameter that
   is only an operand of bitwise operations (`&`, `|`, `^`, `~`, shifts and their compound
   assignments, as in `*flags & mask` or `*flags |= mask`) and that gets a literal or an ALL_CAPS
   constant at every call in the tree (`WordFlags_Test(&p->flags, 1)`). To the compiler the
@@ -136,7 +139,8 @@ _REGEX = {
 # a local named for a number: zero, one, zeroX, two_, four2 (not zeroed, oneshot, tenth)
 _NUMBER_NAME = (r"(?:zero|one|two|three|four|five|six|seven|eight|nine|ten|sixteen|minusOne|negOne|allOnes)"
                 r"(?:[A-Z_0-9]\w*)?")
-_LITERAL = r"-?(?:0[xX][0-9A-Fa-f]+|\d+)[uUlL]*"
+_LITERAL_DIGITS = r"(?:0[xX][0-9A-Fa-f]+|\d+)[uUlL]*"
+_LITERAL = r"(?:-|~\s*)?" + _LITERAL_DIGITS  # `~0x141C0` is as much a literal as `-1`
 _DECL_TYPE = (r"(?:(?:register|const)\s+){0,2}(?:unsigned\s+|signed\s+)?"
               r"(?!v[us]\d|volatile\b|goto\b|return\b|static\b|else\b|case\b|register\b|const\b)\w+\s+\*?")
 # A local declaration: its first declarator follows the type; _local_declarations walks the rest.
@@ -443,6 +447,12 @@ def _warn_sites(code: str):
         if re.fullmatch(r"[\s()+\-*/%&|^~<>=!;]+", operators):
             yield m.start("updates") + len(updates) - len(updates.lstrip()), "dead-local-update"
     yield from _constant_locals(code)
+    for m in _INLINE_DEF.finditer(code):  # `u32 zero` as an inline's parameter is the same local
+        params_start = m.start("params")
+        for param in re.finditer(r"[^,]+", m["params"]):
+            scalar = _SCALAR_PARAM.fullmatch(param[0])
+            if scalar and re.fullmatch(_NUMBER_NAME, scalar[1]):
+                yield params_start + param.start() + scalar.start(1), "const-local"
     for offset in _duplicate_branches(code, source):
         yield offset, "duplicate-branches"
     for m in _ONCE_END.finditer(code):
@@ -553,7 +563,7 @@ _OPERATOR_AFTER = re.compile(_OPERATOR)
 _BITWISE = ("&", "|", "^", "~", "<<", ">>")
 _BITWISE_STORE = ("&=", "|=", "^=", "<<=", ">>=")
 # a call argument that is a constant: literals and ALL_CAPS names, joined by constant operators
-_CONSTANT_ARG = re.compile(r"(?:\s|[-+~*()|&^]|<<|>>|(?<![\w.])(?:" + _LITERAL.removeprefix("-?")
+_CONSTANT_ARG = re.compile(r"(?:\s|[-+~*()|&^]|<<|>>|(?<![\w.])(?:" + _LITERAL_DIGITS
                            + r"|[A-Z][A-Z0-9_]*)(?![\w.]))+")
 _DECLARED_ARG = re.compile(r"\s*(?:void|(?:const\s+|struct\s+|union\s+|enum\s+)*[A-Za-z_]\w*[\s*]+\**\s*[A-Za-z_]\w*)\s*")
 _INCLUDE = re.compile(r'(?m)^[ \t]*#[ \t]*include[ \t]+"([^"\n]+)"')
@@ -602,8 +612,8 @@ def _inline_definitions(code: str):
         stop = _scope_end(code, m.end())
         body = _SCALAR_CAST.sub("", _QUOTED.sub(_blank, code[m.end():stop]))
         body = _MEMBER_ACCESS.sub(lambda access: "@" * len(access[0]), body)  # p->mask is not the parameter mask
-        if body.count(";") > 2:
-            continue
+        if body.count(";") > 2 and any(word not in _NOT_CALLS for word in _CALLED.findall(body)):
+            continue  # a longer helper that does more than move bits (it calls something)
         params = {}
         for index, param in enumerate(m["params"].split(",")):
             scalar = _SCALAR_PARAM.fullmatch(param)
@@ -637,6 +647,7 @@ def _arguments(code: str, start: int):
 
 
 _CALLED = re.compile(r"\b([A-Za-z_]\w*)\s*\(")
+_NOT_CALLS = frozenset(("if", "while", "for", "switch", "return", "sizeof"))
 
 
 def _file_calls(text: str, names, called=None):
