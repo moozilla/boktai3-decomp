@@ -226,8 +226,7 @@ void RegistrySelection_BlendTimedPalettes(struct RegistrySelectionMenu *menu)
     u8 *base = menu->palettes;
     u8 *extra;
     u32 flags = menu->availableEntries;
-    u32 mask = 0x80;
-    if (flags & mask)
+    if (flags & 0x80)
         extra = base + 0x120;
     else
         extra = 0;
