@@ -90,11 +90,6 @@ void InventoryGrid_UpdateModifierPreview(struct SceneHudState *p)
     p->comparisonIndicators[1].flags |= 1;
 }
 
-static inline void SceneCatalog_ShowWidget(struct SceneInputWidget *widget)
-{
-    widget->flags &= ~1;
-}
-
 void Presentation_UpdateAllocationSelection(struct SceneHudState *menu)
 {
     s32 inputState;
@@ -207,7 +202,7 @@ void Presentation_UpdateAllocationSelection(struct SceneHudState *menu)
     refreshDisplay:
         menu->comparisonIndicators[0].flags &= ~1;
         if (menu->comparisonModifier) {
-            SceneCatalog_ShowWidget(&menu->comparisonIndicators[1]);
+            SceneInputWidget_Show(&menu->comparisonIndicators[1]);
             menu->comparisonIndicators[1].position.x = 0;
             menu->comparisonIndicators[1].position.y = 8;
             PauseMenu_HidePromptIcons(menu);
