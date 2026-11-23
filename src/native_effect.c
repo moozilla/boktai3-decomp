@@ -674,8 +674,7 @@ void NativeEffect_UpdateTurningTrail(struct ScenePoolSlot *);
 
 static inline u32 NativeEffect_GroupId(u32 frame, s32 group)
 {
-    u32 mask = 255;
-    return (group & mask) | ((frame & mask) << 8);
+    return (group & 255) | ((frame & 255) << 8);
 }
 
 static inline s32 NativeEffect_ThresholdDamage(struct NativeEffectProfile *profile)
