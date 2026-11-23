@@ -7,10 +7,6 @@ void PauseMenu_RemoveHeaderAnimation(struct SceneHudState *);
 void PlayerPanel_RemoveEffects(struct SceneHudState *);
 void Hud_RemoveMenuGraphics(struct SceneHudState *);
 void PauseMenu_RemoveEquipmentSlotAnimations(struct SceneHudState *);
-static inline u32 TestFlags(u32 *flags, u32 mask)
-{
-    return *flags & mask;
-}
 static inline u8 OwnerWidgetsEnabled(u32 mask)
 {
     if ((gGameState->flags868 & mask))
