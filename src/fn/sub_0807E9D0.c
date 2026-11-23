@@ -5,6 +5,7 @@
 #include "game_state.h"
 #include "scene_actor_chase_types.h"
 #include "player.h"
+#include "scene_actor_turn.h"
 s32 Math_Atan2(s32, s32);
 s32 Div(s32, s32);
 void Collision_CalculateElementalResponse(void *, void *);
@@ -32,10 +33,6 @@ static inline u32 ReadReactionFlags(u32 inputMask, struct SceneActorBehaviorCont
 {
     u32 mask = inputMask;
     return source->reactionFlags & mask;
-}
-static inline u32 TestMotion(u16 *flags, u32 mask)
-{
-    return *flags & mask;
 }
 static inline void AimAtContactTarget(struct ChaseActor *actor)
 {
@@ -184,7 +181,7 @@ void SceneActorReaction_HandleColliderContact(struct SceneActorBehaviorContactVi
                 if (!(mask & source->parameter34))
                     return;
             }
-            if (TestMotion(motion, 0xA007))
+            if (SceneActorTurn_Flags(motion, 0xA007))
                 return;
             if (actor->group.contactCooldown)
                 return;
@@ -210,7 +207,7 @@ void SceneActorReaction_HandleColliderContact(struct SceneActorBehaviorContactVi
                 destination->remaining = 0;
                 SetContactResult(actor, 0);
                 SelectContactTarget(source, actor);
-                if (TestMotion(motion, 0x80))
+                if (SceneActorTurn_Flags(motion, 0x80))
                     ExtendContactTimer(actor);
                 actor->base.field2E6 = 1;
                 return;
@@ -219,7 +216,7 @@ void SceneActorReaction_HandleColliderContact(struct SceneActorBehaviorContactVi
                 SetContactResult(actor, attack);
                 SelectContactTarget(source, actor);
             }
-            if (TestMotion(motion, 0x80))
+            if (SceneActorTurn_Flags(motion, 0x80))
                 ExtendContactTimer(actor);
             actor->base.field2E6 = 1;
             return;
@@ -239,7 +236,7 @@ void SceneActorReaction_HandleColliderContact(struct SceneActorBehaviorContactVi
             power = 0;
         destination->power = power;
     }
-    if (TestMotion(motion, 6)) {
+    if (SceneActorTurn_Flags(motion, 6)) {
         destination->remaining <<= 1;
         power = destination->power;
         power = power >= 0 ? power >> 1 : -(-power >> 1);
@@ -248,7 +245,7 @@ void SceneActorReaction_HandleColliderContact(struct SceneActorBehaviorContactVi
     SceneActor_SetContactReactionDirection(actor, source, destination);
     SelectContactTarget(source, actor);
     if (actor->base.field2E6 || ReadReactionFlags(0x40, source)) {
-        if (TestMotion(motion, 0x80))
+        if (SceneActorTurn_Flags(motion, 0x80))
             ExtendContactTimer(actor);
     }
     {
@@ -259,7 +256,7 @@ void SceneActorReaction_HandleColliderContact(struct SceneActorBehaviorContactVi
             actor->base.field2E6 = 1;
         }
     }
-    if (TestMotion(motion, 0x2000))
+    if (SceneActorTurn_Flags(motion, 0x2000))
         SpawnContactParts((void *)actor);
     actor->base.reactionSoundVariant = destination->remaining;
     PlayerStats_AddContactHundredths(source, destination, actor->base.contactReward);
