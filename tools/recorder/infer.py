@@ -162,6 +162,19 @@ class Inferer:
         rows.sort(key=lambda r: (r[0], r[1]))
         return rows
 
+    def alloc_markers(self, s):
+        """Write sites of the allocator's once-per-allocation `block->unused = 0` (heap.py)."""
+        if getattr(self, '_markers', None) is None:
+            from heap import ALLOCATORS
+            sites = set()
+            for site in np.unique(s.writes['site']):
+                fn = self.facts.function_of(int(site))
+                x = self.facts.site(int(site))
+                if fn is not None and fn.name in ALLOCATORS and isinstance(x, Inst) and 'store i32 0' in x.text:
+                    sites.add(int(site))
+            self._markers = sites
+        return self._markers
+
     def run(self):
         for s in self.sessions:
             self.log(f'{s.name}: {len(s)} frames')
@@ -174,11 +187,15 @@ class Inferer:
         snaps = s.snapshots
         for wi, f0 in enumerate(snaps):
             f1 = snaps[wi + 1] - 1 if wi + 1 < len(snaps) else len(s) - 1
-            ram = s.ram_snapshot(f0)
-            iv = self.intervals(ram)
             sl = s.writes_in(f0 + 1, f1) if f1 > f0 else slice(0, 0)
             if sl.stop <= sl.start:
                 continue
+            # heap blocks the allocator handed out again inside this window: their objects at
+            # the snapshot are stale for part of it, so they are left out of this window
+            marks = np.isin(s.writes['site'][sl], list(self.alloc_markers(s)))
+            realloc = {int(a) - 12 for a in s.addr[sl][marks]}
+            ram = s.ram_snapshot(f0)
+            iv = [r for r in self.intervals(ram) if r[6] - 16 not in realloc]
             addr = s.addr[sl].astype(np.int64)
             order = np.argsort(addr, kind='stable')
             sa = addr[order]
@@ -391,7 +408,7 @@ class Inferer:
         for sites, role in ((fld.writers, 'w'), (fld.readers, 'r')):
             for site in sites:
                 x = self.facts.site(site)
-                if not isinstance(x, Inst):
+                if not isinstance(x, Inst) or not x.fn.unit.name.startswith('src/'):
                     continue
                 text = self.line_text(x) or ''
                 m = re.match(r'^(.*?)\s*=\s*(.*?);?\s*$', text)
@@ -408,6 +425,38 @@ class Inferer:
                     name = re.fullmatch(r'(?:\w+\s+)?\*?([A-Za-z_]\w*)', lhs.strip())[1]
                     if name not in VAGUE and not is_placeholder(name) and re.fullmatch(member + r'(\[\w+\])?', rhs.split('->')[-1].split('.')[-1].strip().rstrip(';')):
                         votes[name] += 1
+        return votes
+
+    def alias_evidence(self, fld):
+        """Member names other code uses for the same bytes: the member accessed at each game-side
+        writer's and reader's source column (`anim->sequenceId = sequence;` -> sequenceId)."""
+        from facts import lvalue_text
+        own = re.sub(r'\[\d+\]', '', fld.path.split('.')[-1])
+        votes = Counter()
+        for sites, role in ((fld.writers, 'w'), (fld.readers, 'r')):
+            for site in sites:
+                x = self.facts.site(site)
+                if not isinstance(x, Inst) or not x.fn.unit.name.startswith('src/'):
+                    continue
+                text = self.line_text(x)
+                if not text:
+                    continue
+                if role == 'w':
+                    unit, line, raw = self.facts.source(x)
+                    lv = lvalue_text(raw, x.col) if raw and x.col else None
+                    m = re.search(r'(?:->|\.)\s*([A-Za-z_]\w*)\s*(?:\[[^\]]*\])?\s*$', lv or '')
+                    name = m[1] if m else None
+                else:
+                    unit, line, raw = self.facts.source(x)
+                    name = None
+                    if raw and x.col:
+                        # the access expression that starts at the load's column: `anim->durationScale`
+                        m = re.match(r'[A-Za-z_]\w*(?:\s*(?:->|\.)\s*[A-Za-z_]\w*(?:\[[^\]]*\])?)+', raw[x.col - 1:])
+                        if m:
+                            name = re.findall(r'(?:->|\.)\s*([A-Za-z_]\w*)', m[0])[-1]
+                if name and name != own and not is_placeholder(name) and name not in VAGUE and len(name) > 2 \
+                        and not re.match(r'^(?:value|word|byte|half|data|field|entry|elem|arg|param|var|item|slot|reg|tmp)_?\d+$', name):
+                    votes[name] += 1
         return votes
 
     # ---- proposals ----
@@ -488,6 +537,10 @@ class Inferer:
                 if tail and not is_placeholder(tail):
                     votes[tail] += 2 + bonus(c)
                     reasons.append(f'loaded from {rest[0]} (x{c})')
+        for nm, c in self.alias_evidence(fld).items():
+            votes[nm] += 4 + (1 if c >= 2 else 0)   # a name another author already gave these bytes
+            fld.sources[('alias', nm)] += c
+            reasons.append(f'other code names these bytes `{nm}` ({c} statement(s))')
         for nm, c in self.text_evidence(fld).items():
             if re.match(r'g[A-Z]', nm):
                 nm = nm[1].lower() + nm[2:]
@@ -519,7 +572,7 @@ class Inferer:
         # confidence: independent signals that agree with the name, how often they were seen,
         # how many sessions; a single observation stays below 0.5
         support = [(k, c) for (k, *rest), c in list(fld.flows.items()) + list(fld.sources.items())
-                   if k in ('param', 'var', 'field', 'text') and name.lower() in ' '.join(map(str, rest)).lower()]
+                   if k in ('param', 'var', 'field', 'text', 'alias') and name.lower() in ' '.join(map(str, rest)).lower()]
         seen = sum(c for _, c in support)
         conf = 0.2 * min(len(support), 3) + 0.3 * agree + 0.1 * min(seen, 3) / 3 + (0.15 if len(fld.sessions) > 1 else 0) \
             + (0.1 if pat in ('timer', 'counter', 'flag', 'callback') else 0)
@@ -527,6 +580,36 @@ class Inferer:
             conf = min(conf, 0.45)
         conf = min(conf, 1.0)
         return name, round(conf, 2), reasons, pat, info
+
+    @staticmethod
+    def merge_ranges(rows):
+        """Consecutive elements of one placeholder array with the same proposal become one row
+        (`unknown24[0..3] -> previous`: a pointer inside a byte array)."""
+        out, groups = [], defaultdict(list)
+        for r in rows:
+            m = re.match(r'^(.*)\[(\d+)\]$', r['field'])
+            if m and r['proposal']:
+                groups[(r['owner'], m[1])].append((int(m[2]), r))
+            else:
+                out.append(r)
+        for (owner, base), items in groups.items():
+            items.sort(key=lambda x: x[0])
+            run = [items[0]]
+            for i, r in items[1:] + [(None, None)]:
+                if r is not None and i == run[-1][0] + 1 and r['proposal'] == run[-1][1]['proposal']:
+                    run.append((i, r))
+                    continue
+                if len(run) == 1:
+                    out.append(run[0][1])
+                else:
+                    first = dict(run[0][1])
+                    first['field'] = f'{base}[{run[0][0]}..{run[-1][0]}]'
+                    first['size'] = sum(x[1]['size'] for x in run)
+                    first['confidence'] = max(x[1]['confidence'] for x in run)
+                    first['reasons'] = run[0][1]['reasons'] + [f'{len(run)} consecutive elements agree']
+                    out.append(first)
+                run = [(i, r)] if r is not None else []
+        return out
 
     def describe_sites(self, sites, n=3):
         out = []
@@ -552,6 +635,7 @@ class Inferer:
                   'cowrites': [k for k, _ in fld.cowrites.most_common(6)], 'sessions': sorted(fld.sessions)}
             evidence[key] = ev
             rows.append(ev)
+        rows = self.merge_ranges(rows)
         rows.sort(key=lambda r: (-(r['confidence'] or 0), r['owner'], r['field']))
         with open(out / 'proposals.tsv', 'w') as f:
             f.write('owner\tfield\tsize\tproposal\tconfidence\tpattern\twriters\treaders\treasons\n')
@@ -568,6 +652,6 @@ class Inferer:
             if not r['proposal']:
                 continue
             ev = '; '.join(r['reasons'][:3]) + ('<br>writers: ' + '; '.join(r['writers'][:2]) if r['writers'] else '')
-            md.append(f"| `{r['owner']}.{r['field']}` | `{r['proposal']}` | {r['confidence']} | {r['pattern'] or ''} | {ev.replace('|', '/')} |")
+            md.append(f"| `{r['owner']}{'.' + r['field'] if r['field'] else ''}` | `{r['proposal']}` | {r['confidence']} | {r['pattern'] or ''} | {ev.replace('|', '/')} |")
         (out / 'proposals.md').write_text('\n'.join(md) + '\n')
         return rows

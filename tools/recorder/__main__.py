@@ -379,7 +379,7 @@ def cmd_infer(args):
     named = [r for r in rows if r['proposal']]
     print(f'{len(rows)} placeholder fields observed, {len(named)} with proposals -> {args.out or OUT}')
     for r in named[:args.show]:
-        print(f"  {r['owner']}.{r['field']} -> {r['proposal']}  ({r['confidence']}, {r['pattern']})")
+        print(f"  {r['owner']}{'.' + r['field'] if r['field'] else ''} -> {r['proposal']}  ({r['confidence']}, {r['pattern']})")
         for why in r['reasons'][:4]:
             print(f'      {why}')
     return 0
