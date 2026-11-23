@@ -242,11 +242,11 @@ void SceneHud_FinishActionTransfer(struct SceneHudState *p)
         MenuDisplay_InterpolateActivePairPositions(p, n);
     } else {
         u32 *q = &p->motionWidgets[0].flags;
-        u32 v = *q, m = 1;
-        *q = v | m;
-        p->motionWidgets[1].flags |= m;
-        p->transferWidgets[0].flags |= m;
-        p->transferWidgets[1].flags |= m;
+        u32 v = *q;
+        *q = v | 1;
+        p->motionWidgets[1].flags |= 1;
+        p->transferWidgets[0].flags |= 1;
+        p->transferWidgets[1].flags |= 1;
         if (p->actionInput[1] <= 1)
             sub_0822EB14(p->actionSelection, p->actionCursor);
         else

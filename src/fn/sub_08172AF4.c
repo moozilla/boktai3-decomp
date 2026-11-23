@@ -18,7 +18,7 @@ void SceneHud_RefreshEquippedActionIcons(u8 *);
 void PauseInventory_ReturnToEquipmentSelection(u8 *s)
 {
     u8 *p, *q;
-    u32 zero, result;
+    u32 result;
     PauseMenu_RefreshFruitAndUnlockIcons(s);
     p = s + 0x4384;
     Hud_RestoreSecondaryGridSelection(p);
@@ -49,8 +49,8 @@ void PauseInventory_ReturnToEquipmentSelection(u8 *s)
     }
     MessageWindow_Clear();
     ScrollingDialogue_RequestHide();
-    MenuDisplay_SetPaletteOverrides(s, 0, 1, 0, zero = 0);
-    result = InventoryPanel_UpdateSelectedUnlock(s, 0, 0, 1, zero);
-    InventoryPanel_SetEntryRow(s, 3, 14, result, zero, 0x47);
+    MenuDisplay_SetPaletteOverrides(s, 0, 1, 0, 0);
+    result = InventoryPanel_UpdateSelectedUnlock(s, 0, 0, 1, 0);
+    InventoryPanel_SetEntryRow(s, 3, 14, result, 0, 0x47);
     SceneHud_RefreshEquippedActionIcons(s);
 }

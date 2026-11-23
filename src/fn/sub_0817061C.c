@@ -27,9 +27,9 @@ void SceneHud_FinishActionSlide(struct SceneHudState *s)
         SceneHud_BlendPosition(&s->motionWidgets[1].position, &s->actionTargets[1], n);
     } else {
         u32 *q = &s->motionWidgets[0].flags;
-        u32 v = *q, m = 1;
-        *q = v | m;
-        s->motionWidgets[1].flags |= m;
+        u32 v = *q;
+        *q = v | 1;
+        s->motionWidgets[1].flags |= 1;
         {
             u32 sel = s->actionSelection;
             unsigned long long off = 0x4387;
