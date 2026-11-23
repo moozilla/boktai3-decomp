@@ -14,7 +14,11 @@ $P -m tools.recorder verify field                          # write log complete?
 $P -m tools.recorder history field 'gPlayers[0]->position.x' --changes
 $P -m tools.recorder who-wrote field gSolarMeasurement 470
 $P -m tools.recorder why t1 gSolarMeasurement 470 --check
-$P -m tools.recorder serve field                           # the Recorder page, :8765
+$P -m tools.recorder serve field                           # the Recorder page, :8765 (also /recorder in the Studio)
+$P -m tools.recorder record ap --movie ../cl-side-almanac/build/autopilot/m1/movie.json   # an autopilot run
+$P -m tools.recorder diff t1 t1dim --both                  # first typed divergence + its slice in each run
+$P -m tools.recorder infer cp0046 field ap                 # name proposals for placeholder fields
+$P -m tools.recorder export field                          # history.duckdb (typed_writes view)
 ```
 
 Scripts are the agent's JavaScript dialect (`port/agent/README.md`: `yield N`,
@@ -74,10 +78,39 @@ sensor read, a bit of each earlier-frame store in the slice, and the value of ea
 collapsed run at the frame boundary before the target. Links inside the target frame
 cannot be perturbed (replays change state only at frame boundaries).
 
+**Masks.** Value requests carry the bits that matter: shifts, ands with constants, truncs and
+packing ors narrow them, add/sub/mul keep the low bits, loads follow only demanded bytes. A
+field packed with its neighbor into one integer no longer pulls the neighbor in.
+
+**Heap names** (`heap.py`). An address inside a heap block is named by its allocation: the
+allocator writes `block->unused = 0` once per allocation, the write log dates it, that frame is
+re-traced for the caller chain, and the type comes from the update function the code gives the
+task (Task_SetCallbacks) or a same-prefix callee's first parameter:
+`heap(by Hud_CreateStandardLayout via Task_Create @1742, 19872 B)+0xA40`.
+
+**In-frame checks.** `rec_rt.c` can xor the bytes stored by the Nth execution of a store site
+(`perturb`); `--check` replays the target frame once per in-frame store of the slice.
+
+**diff.** First frame whose RAM hash differs, the first differing write of that frame (same
+statement with another value, or another statement), the typed fields that differ, and the
+slice of that write in each run.
+
+**infer** (`infer.py`). For placeholder fields (`unk34`, `field_10`, `f5A4`, `unknown0`,
+`gUnk_...`): writers and readers as C statements, values and their pattern, forward flow of each
+read (named field, named parameter, branch, return), the C variable a stored value came from,
+and the member names other code uses for the same bytes at that exact source column. Proposals
+in `build/recorder/infer/proposals.{tsv,md}`, evidence in `evidence.json`, and `layout.md`:
+structs embedded without being declared (alias names matching another struct's members at one
+base offset). It never edits include/ or symbols/.
+
+**Movies.** `record --movie` replays an autopilot movie.json (tools/autopilot,
+port/agent/session.mjs: movie[n] = keys returned for frame n).
+
 ## Limits
 
-* Byte-precise, not bit-precise: when `opt` packs two fields into one integer (a
-  `{x, y}` pair stored as an i32), asking about one field also pulls in the other.
+* Memory is tracked per byte (registers per bit): a store of a packed integer is one write.
+* In-frame perturbation changes the stored memory; a value the same function keeps in a
+  register after storing it is not changed.
 * The trace starts at a frame boundary: values held in wasm locals of functions
   already running (the main loop) and port stack slots written before it are inputs.
 * A snapshot's call stack must match the live one; long sessions whose main loop
