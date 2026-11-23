@@ -122,7 +122,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [docs/FOUNDRY.md](../docs/FOUNDRY.md) | The foundry: asm to a committed match, measured as a funnel | #matching #tooling | 12 |
 | [docs/GAME_LAYOUT.md](../docs/GAME_LAYOUT.md) | Boktai 3 game layout: from ROM to gameplay | *#assets* | 34 |
 | [docs/GHOUL_CONTACT_RESPONSE.md](../docs/GHOUL_CONTACT_RESPONSE.md) | Ghoul contact response: 0808B3EC | #matching #ghoul #scene-actor #regalloc #0808B3EC | 3 |
-| [docs/HANDOFF.md](../docs/HANDOFF.md) | Handoff: current state and how to continue | #process | 13 |
+| [docs/HANDOFF.md](../docs/HANDOFF.md) | Handoff: current state and how to continue | #process | 14 |
 | [docs/HIT_SWITCH.md](../docs/HIT_SWITCH.md) | Hit-counted switch pool (tentative identity) |  | 5 |
 | [docs/KNIDL_PROCESS_REVIEW_2026-10-09.md](../docs/KNIDL_PROCESS_REVIEW_2026-10-09.md) | KNIDL workflow review and implications for Boktai 3 | *#process* | 13 |
 | [docs/LAYOUTS.md](../docs/LAYOUTS.md) | RAM object layouts merged across files | #tooling #matching | 12 |
@@ -215,7 +215,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [docs/STACKED_ACTOR.md](../docs/STACKED_ACTOR.md) | Stacked display actor (tentative identity) | *#actors #particles #assets* | 5 |
 | [docs/TERRAIN_EDGE_MARKER.md](../docs/TERRAIN_EDGE_MARKER.md) | Terrain edge marker manager (tentative identity) | *#scripts* | 4 |
 | [docs/UNIT_WORKER.md](../docs/UNIT_WORKER.md) | Subsystem unit worker | *#text* | 5 |
-| [docs/WORKER.md](../docs/WORKER.md) | Worker playbook: matching with scope | #matching #process | 16 |
+| [docs/WORKER.md](../docs/WORKER.md) | Worker playbook: matching with scope | #matching #process | 18 |
 | [docs/tasks/m4a.md](../docs/tasks/m4a.md) | Task: lift the MP2K (m4a) sound library from pokeemerald | *#sound #library* | 3 |
 | [docs/tasks/relatives.md](../docs/tasks/relatives.md) | Unmatched functions with matched relatives | *#tooling* | 35 |
 | [docs/tasks/script_targets.md](../docs/tasks/script_targets.md) | Decomp targets: the code the scripts call | *#scripts #assets #tooling* | 2 |
@@ -238,10 +238,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [docs/history/2026-11-15.md](../docs/history/2026-11-15.md) | 2026-11-15 |  | 11 |
 | [docs/history/2026-11-16.md](../docs/history/2026-11-16.md) | 2026-11-16 | #cleanup #compiler #concessions #depin #matching #object-model #round13 #round14 #tooling | 18 |
 | [docs/history/2026-11-17.md](../docs/history/2026-11-17.md) | 2026-11-17 | #compiler #depin #matching #phase3 #round13 #round15 #structs | 3 |
-| [docs/history/2026-11-20.md](../docs/history/2026-11-20.md) | 2026-11-20 | #compiler #matching #monsters #phase3 | 0 |
-| [docs/history/2026-11-20.md](../docs/history/2026-11-20.md) | November 20 | #actors #matching #tooling #wireless | 0 |
-| [docs/history/2026-11-20.md](../docs/history/2026-11-20.md) | 2026-11-20 | #matching #phase3 #scene-actors | 0 |
-| [docs/history/2026-11-20.md](../docs/history/2026-11-20.md) | 2026-11-20 | #actors #matching #scene #tooling | 0 |
+| [docs/history/2026-11-20.md](../docs/history/2026-11-20.md) | 2026-11-20 | #actors #compiler #matching #monsters #phase3 #scene #scene-actors #tooling #wireless | 2 |
 | [docs/history/HANDOFF_2026-10-23.md](../docs/history/HANDOFF_2026-10-23.md) | Handoff: current state and how to continue | #process | 14 |
 | [docs/history/MANAGER_HANDOFF_2026-10-19.md](../docs/history/MANAGER_HANDOFF_2026-10-19.md) | Manager handoff (2026-10-19) | #process #tooling | 6 |
 | [docs/history/README.md](../docs/history/README.md) | Handoff history |  | 17 |
@@ -273,6 +270,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [notes/breakable-prop_2026-10-14.md](../notes/breakable-prop_2026-10-14.md) | Breakable prop, 080515C0–08051A3C | *#particles* | 2 |
 | [notes/cell-gates_2026-10-14.md](../notes/cell-gates_2026-10-14.md) | Cell-based traversal gates and the preceding script entry | *#scripts* | 4 |
 | [notes/cgb.md](../notes/cgb.md) | CgbSound (0x08230AC8) | *#sound* | 3 |
+| [notes/claude-warning-run_2026-11-22.md](../notes/claude-warning-run_2026-11-22.md) | Claude warning run, 2026-11-22 to 23 | #process #phase3 | 6 |
 | [notes/cloud-08084F44.md](../notes/cloud-08084F44.md) | Cloud task 08084F44 (Bat, unassigned functions) | #matching #cloud | 1 |
 | [notes/cloud-080B7C10.md](../notes/cloud-080B7C10.md) | Cloud task 080B7C10 (Skeleton states) |  | 1 |
 | [notes/cloud-080BFCC4.md](../notes/cloud-080BFCC4.md) | Cloud task 080BFCC4 | *#actors* | 1 |
@@ -365,6 +363,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [notes/grid_attack_animation_and_targets.md](../notes/grid_attack_animation_and_targets.md) | Grid attack animation and targets | #matching #bosses | 1 |
 | [notes/grid_attack_colliders_and_palette.md](../notes/grid_attack_colliders_and_palette.md) | Grid attack colliders and palette | #matching #bosses | 0 |
 | [notes/grid_attack_initialize.md](../notes/grid_attack_initialize.md) | Grid attack initialization | #matching #bosses | 1 |
+| [notes/hard-sites_2026-11-23.md](../notes/hard-sites_2026-11-23.md) | Hard sites, 2026-11-23 | #matching #compiler #phase3 #linter | 8 |
 | [notes/initializer-actor-embedding_2026-10-30.md](../notes/initializer-actor-embedding_2026-10-30.md) | Initializer actor containment | #matching #monster #structs | 1 |
 | [notes/interaction-marker_2026-10-14.md](../notes/interaction-marker_2026-10-14.md) | Interaction marker, 080537D0–08053D8C |  | 3 |
 | [notes/ivy-matching.md](../notes/ivy-matching.md) | Ivy (080ED914..080F0B8C): matching notes | #matching | 2 |
