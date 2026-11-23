@@ -52,8 +52,7 @@ playback:
 static inline u32 TerrainBlockingFlags(s32 cell)
 {
     u16 flags = ((u16 *)SceneActorTerrain_GetCell(cell))[1];
-    u32 mask = 3;
-    return flags & mask;
+    return flags & 3;
 }
 static inline s32 SumVelocity(const struct ContactPosition *velocity)
 {
@@ -68,10 +67,7 @@ void BouncingObject_TickActive(struct BouncingPool *pool, struct BouncingObject 
     u16 currentCell;
     s32 currentGround;
     struct ContactPosition rel;
-    union {
-        struct ContactPackedVector packed;
-        struct ContactPosition position;
-    } candidate;
+    struct ContactPosition candidate;
     struct ContactPosition *pos;
     struct ContactPosition *velocity;
     s32 cell, ground, nextGround, speed, dist2;
@@ -125,11 +121,11 @@ void BouncingObject_TickActive(struct BouncingPool *pool, struct BouncingObject 
             }
             pos->y = currentGround;
         }
-        candidate.packed.x = pos->x + velocity->x;
-        candidate.packed.y = pos->y + velocity->y;
-        candidate.packed.z = pos->z + velocity->z;
-        cell = SceneActorTerrain_GetCellIndex(&candidate.position);
-        nextGround = SceneActorTerrain_GetHeight(cell, &candidate.position);
+        candidate.x = pos->x + velocity->x;
+        candidate.y = pos->y + velocity->y;
+        candidate.z = pos->z + velocity->z;
+        cell = SceneActorTerrain_GetCellIndex(&candidate);
+        nextGround = SceneActorTerrain_GetHeight(cell, &candidate);
         cellFlags = ((u16 *)SceneActorTerrain_GetCell(cell))[1];
         if (currentCell != cell) {
             if (currentGround < nextGround || TerrainBlockingFlags(cell) != 0) {
@@ -138,7 +134,7 @@ void BouncingObject_TickActive(struct BouncingPool *pool, struct BouncingObject 
                 Sound_PlaySong(0x166);
             }
         }
-        if ((nextGround <= 0 || (cellFlags & 0x40)) && candidate.position.y <= nextGround) {
+        if ((nextGround <= 0 || (cellFlags & 0x40)) && candidate.y <= nextGround) {
             BouncingObject_ReleaseSlot(obj);
         } else {
             pos->x += velocity->x;
