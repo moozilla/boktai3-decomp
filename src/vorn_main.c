@@ -389,14 +389,6 @@ static inline void ResetState(struct ChaseActor *actor, u32 state, u32 phase, u3
     }
 }
 
-static inline void SetMotion(struct ChaseActor *actor, void *cb, u32 kind)
-{
-    actor->base.pendingControl = (u32)cb;
-    actor->base.pendingControlData = 0;
-    actor->base.pendingControlRelease = 0;
-    actor->base.pendingControlKind = kind;
-    actor->base.pendingControlFlags = 1;
-}
 
 void SceneActorReaction_BeginSideStep(void);
 
@@ -438,7 +430,7 @@ void Vorn_UpdateRouteApproach(struct ChaseActor *actor)
                                                           32, speed)) {
             Chase_SetBehavior(actor, 18);
             Chase_SetCtl(actor, actor->base.onStanding, 0);
-            SetMotion(actor, SceneActorReaction_BeginSideStep, 38);
+            MonsterInit_SetMotionControl(actor, SceneActorReaction_BeginSideStep, 38);
             actor->base.field2C2 = 64;
             *(u16 *)(group + 0x54) = 0;
             return;
@@ -2080,7 +2072,7 @@ u8 Vorn_BeginPursuitRoute(struct Vorn *actor, u32 reset)
     }
     Chase_SetBehavior(&actor->chase, 15);
     Chase_SetCtl(&actor->chase, actor->chase.base.onStanding, 0);
-    SetMotion(&actor->chase, Vorn_UpdatePursuitDistance, 37);
+    MonsterInit_SetMotionControl(&actor->chase, Vorn_UpdatePursuitDistance, 37);
     {
         u16 bit = 4;
         u16 *field = &actor->chase.group.common.gate.flags;
