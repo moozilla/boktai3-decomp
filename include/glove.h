@@ -43,14 +43,14 @@ struct GloveMotion {
     u32 pendingDamage; /* 0x68 */
     u8 pad6C[0x7E - 0x6C];
     u16 recoveryValue;
-    struct GloveModel *parts; /* 0x80 */
+    void *parts; /* 0x80: the glove's model, read through a slot view */
     u8 pad84[0xB0 - 0x84];
     u8 drain[0x10]; /* 0xB0: drain modifier state */
     s32 unkC0;
     u8 padC4[4];
     u32 secondaryBias; /* 0xC8 */
     u8 padCC[0x2B0 - 0xCC];
-    u32 primaryCallback; /* 0x2B0 */
+    void *primaryCallback; /* 0x2B0 */
     u8 pad2B4, primaryKind;
     u8 pad2B6[4];
     u16 primaryValue; /* 0x2BA */
@@ -63,7 +63,7 @@ struct GloveMotion {
     u8 pad30A[4];
     u16 primaryKeyframes; /* 0x30E */
     u8 pad310[4];
-    u32 secondaryCallback; /* 0x314 */
+    void *secondaryCallback; /* 0x314 */
     u8 pad318;
     u8 actionKind;
     u8 pad31A[4];
