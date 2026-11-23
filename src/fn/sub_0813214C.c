@@ -8,12 +8,6 @@
 #include "runtime.h"
 /* Clears hit timers; at zero health hands control to the defeat target and records the defeat. */
 void SceneActorRecord_RecordPair(u16, u16);
-static inline u8 Test(u32 value, u32 mask)
-{
-    if (value & mask)
-        return 1;
-    return 0;
-}
 static inline u32 Flag2D0(struct ChaseActor *actor, u32 maskInput)
 {
     u32 mask = maskInput;
@@ -106,7 +100,7 @@ void SceneActorReaction_ApplyStaggerDamage(struct ChaseActor *actor)
         }
         SceneActorTerrain_EnterState(actor, 3, 0, 0);
         actor->base.hitOwners = 32;
-        if (!Test(gEngineFlags, 0x4800) && !Flag2D0(actor, 0x800))
+        if (!SceneActorDamage_TestFlags(gEngineFlags, 0x4800) && !Flag2D0(actor, 0x800))
             SceneActorRecord_RecordPair(gScriptEntryProcedure, actor->base.body.id);
     } else {
         SetHit(0x20, (void *)&actor->base.motionFlags);
