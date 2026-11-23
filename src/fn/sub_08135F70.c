@@ -4,6 +4,7 @@
 #include "scene_actor_palette.h"
 #include "area_effect_link.h"
 #include "render.h"
+#include "scene_actor_damage_visibility.h"
 u8 SceneActorReaction_ApplyAreaDamage(void *);
 void SceneActor_ClearReactionFlags(void *);
 u8 SceneActorBehavior_DispatchFlaggedCategory(void *);
@@ -16,54 +17,10 @@ void CpuSet(const void *, void *, u32);
 void DamageNumberDisplay_Show(void *, s32, u32, void *, void *, u32);
 void AnimData_SelectPaletteBank(void *, s32);
 
-static inline u8 Test(u32 value, u32 mask)
-{
-    if (value & mask)
-        return 1;
-    return 0;
-}
 static inline u8 HasPendingHit(struct ChaseActor *actor)
 {
     if (actor->base.field2E6 == 0)
         return 0;
-    return 1;
-}
-static inline s32 LocalPlayer(void)
-{
-    if (!gLinkSession)
-        return -1;
-    return gLinkSession->localPlayer;
-}
-static inline u16 OwnershipFlagBits(u32 value, u32 mask)
-{
-    return value & mask;
-}
-static inline u8 ShouldShowDamage(struct ChaseActor *actor)
-{
-    if (Test(gEngineFlags, 0x4800)) {
-        u32 *owner = &actor->base.hitOwners;
-        u32 mask = *owner;
-        if (!OwnershipFlagBits(mask, 0x20) && mask) {
-            switch (LocalPlayer()) {
-                case 0:
-                    if (*owner != 1)
-                        return 0;
-                    break;
-                case 1:
-                    if (*owner != 2)
-                        return 0;
-                    break;
-                case 2:
-                    if (*owner != 4)
-                        return 0;
-                    break;
-                case 3:
-                    if (*owner != 8)
-                        return 0;
-                    break;
-            }
-        }
-    }
     return 1;
 }
 static inline u8 IsDown(struct ChaseActor *actor, u16 flags)
@@ -357,7 +314,7 @@ u8 SceneActorReaction_ResolveDamage(struct ChaseActor *actor)
                         s32 value : 16;
                     } part;
                 } decision;
-                decision.raw = ShouldShowDamage(actor);
+                decision.raw = SceneActorDamage_ShouldShow(actor);
                 if (decision.part.value) {
                     struct ContactPosition offset;
                     s32 h = *savedHealth;
