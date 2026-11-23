@@ -146,6 +146,8 @@ const GOALS = {
           // a shop or service menu the talk opened: back out of it
           for (let i = 0; i < 8 && !$player(g); i++) { yield g.press('b', 2); yield g.press(0, 10); yield* L.clearInterruptions({}); }
           event({ skill: 'talk', id: t.key, round, x: t.x, z: t.z, done: r.done, lines: (r.lines || []).slice(0, 6), story: L.story(), was: story0, facilities: L.facilities() });
+          // whatever the talk started (a choice, a menu, an event) ends before the next one
+          yield* untilControl(g, L, () => true, 30, 1200);
           if (L.where().scene !== here || !r.done) break;
         }
       }
