@@ -1,4 +1,5 @@
 #include "scene_actor_terrain_reaction.h"
+#include "scene_actor_contact_response.h"
 #include "global.h"
 #include "scene_actor_control_phase.h"
 #define FIELD(p, n, t) (*(t *)((u8 *)(p) + (n)))
@@ -38,10 +39,6 @@ static inline void *SavedControl(u8 *group)
     void **field = (void *)(group + 0x214);
     return *field;
 }
-static inline u32 MotionFlags(struct ChaseActor *a, u32 mask)
-{
-    return a->base.motionFlags & mask;
-}
 void SceneActorRoute_UpdateReturnEntry(struct ChaseActor *actor)
 {
     u8 *group = (u8 *)&actor->group.common;
@@ -56,7 +53,7 @@ void SceneActorRoute_UpdateReturnEntry(struct ChaseActor *actor)
     {
         u8 *finished = &actor->base.stepDone;
         if (*finished) {
-            u16 flags = MotionFlags(actor, 0x10);
+            u16 flags = SceneActorContact_MotionFlags(actor, 0x10);
             if (flags) {
                 State(actor, 8, result);
                 BeginControl(actor, SavedControl(group), 0x13, result);
