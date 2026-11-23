@@ -32,7 +32,8 @@ from session import Session
 
 ROOT = Path(__file__).resolve().parents[2]
 OUT = ROOT / 'build/recorder/infer'
-PLACEHOLDER = re.compile(r'^(?:unk|unknown|field_?|f|pad|filler|u)_?[0-9A-Fa-f]+[a-z]?$|^unk[_A-Z0-9]\w*$|^unknown\w*$')
+PLACEHOLDER = re.compile(r'^(?:unk|unknown|field_?|pad|filler)_?[0-9A-Fa-f]+[a-z]?$|^[fu]_?(?=[0-9A-Fa-f]*\d)[0-9A-Fa-f]+$'
+                         r'|^unk[_A-Z0-9]\w*$|^unknown\w*$')
 GLOBAL_PLACEHOLDER = re.compile(r'^g?Unk_?[0-9A-Fa-f]+|^gUnk\w*')
 VAGUE = {'v', 'val', 'value', 'x', 'y', 'z', 'i', 'j', 'k', 'n', 'p', 'q', 'r', 's', 't', 'a', 'b', 'c', 'd', 'e', 'w',
          'tmp', 'temp', 'ret', 'result', 'arg', 'obj', 'self', 'this', 'ptr', 'data', 'base', 'off', 'idx', 'out', 'in',
@@ -137,7 +138,7 @@ class Inferer:
     def field(self, key, size, kind):
         f = self.fields.get(key)
         if f is None:
-            owner, _, path = key.partition('.')
+            owner, dot, path = key.partition('.')
             f = self.fields[key] = Field(owner, '.' + path if path else '', size, kind)
         return f
 
@@ -150,7 +151,7 @@ class Inferer:
         for a, size, name, t in self.types.static:
             if GLOBAL_PLACEHOLDER.match(name):
                 for off, sz, path, decl, k in self.leaves.of(t) or [(0, min(size, 4), '', None, 'int')]:
-                    rows.append((a + off, sz, name, path, name + path, k, a))
+                    rows.append((a + off, sz, name, path, (name + path) if path else name, k, a))
             else:
                 for off, sz, path, decl, k in self.leaves.of(t):
                     rows.append((a + off, sz, name, path, decl, k, a))
@@ -464,24 +465,28 @@ class Inferer:
         reasons = []
         votes = Counter()
         # strongest: named parameters it is passed as, variables it is stored from
+        def tail_of(name):
+            t = re.sub(r'\[\d+\]$', '', re.split(r'\.|->', name)[-1])
+            return t[1].lower() + t[2:] if re.match(r'g[A-Z]', t) else t
+
+        bonus = lambda c: 1 if c >= 10 else 0  # noqa: E731  repeated, consistent observations
         for (kind, *rest), c in fld.flows.items():
             if kind == 'param':
-                votes[rest[1]] += 3
+                votes[rest[1]] += 3 + bonus(c)
                 reasons.append(f'passed as `{rest[1]}` to {rest[0]} (x{c})')
             elif kind == 'field':
-                tail = re.split(r'[.\->]+', rest[0])[-1]
-                tail = re.sub(r'\[\d+\]$', '', tail)
+                tail = tail_of(rest[0])
                 if tail and not is_placeholder(tail):
-                    votes[tail] += 1
+                    votes[tail] += 2 + bonus(c)
                     reasons.append(f'copied into {rest[0]} (x{c})')
         for (kind, *rest), c in fld.sources.items():
             if kind == 'var':
-                votes[rest[0]] += 3
+                votes[rest[0]] += 3 + bonus(c)
                 reasons.append(f'stored from C variable `{rest[0]}` (x{c})')
             elif kind == 'field':
-                tail = re.sub(r'\[\d+\]$', '', re.split(r'[.\->]+', rest[0])[-1])
+                tail = tail_of(rest[0])
                 if tail and not is_placeholder(tail):
-                    votes[tail] += 2
+                    votes[tail] += 2 + bonus(c)
                     reasons.append(f'loaded from {rest[0]} (x{c})')
         for nm, c in self.text_evidence(fld).items():
             if re.match(r'g[A-Z]', nm):

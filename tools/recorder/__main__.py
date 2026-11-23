@@ -11,6 +11,7 @@
   infer SESSION... [--trace-frames N]
                                    evidence and name proposals for placeholder fields
                                    (build/recorder/infer/: proposals.tsv, proposals.md, evidence.json)
+  export NAME [--db F] [--sqlite]  typed history to DuckDB (history.duckdb, typed_writes view) or SQLite
   serve NAME [--port 8765]         the Recorder page: screens timeline, typed writes, history, why
   why NAME WHERE FRAME [--nodes N] [--frames N] [--check]
                                    dynamic backward slice: the C statements, with their runtime
@@ -384,6 +385,12 @@ def cmd_infer(args):
     return 0
 
 
+def cmd_export(args):
+    from export import export
+    export(open_session(args.name), args.db, args.sqlite, log=lambda m: print(m, file=sys.stderr))
+    return 0
+
+
 def check_slice(s, sl, place, frame, describe):
     """Perturb the slice's inputs and cross-frame links in a replay; does the target change?"""
     from emu import Replay
@@ -503,6 +510,7 @@ def main(argv=None):
     p.add_argument('--both', action='store_true', help='slice the divergent write in both runs')
     p = sub.add_parser('infer'); p.add_argument('names', nargs='+')
     p.add_argument('--trace-frames', type=int, default=6); p.add_argument('--out'); p.add_argument('--show', type=int, default=20)
+    p = sub.add_parser('export'); p.add_argument('name'); p.add_argument('--db'); p.add_argument('--sqlite', action='store_true')
     p = sub.add_parser('serve'); p.add_argument('name'); p.add_argument('--port', type=int, default=8765)
     p = sub.add_parser('why'); p.add_argument('name'); p.add_argument('where'); p.add_argument('frame', type=int)
     p.add_argument('--nodes', type=int, default=400); p.add_argument('--frames', type=int, default=24)
@@ -516,7 +524,7 @@ def main(argv=None):
         return serve(args.name, args.port)
     if extra:
         ap.error('unrecognized arguments: ' + ' '.join(extra))
-    return {'verify': cmd_verify, 'history': cmd_history, 'who-wrote': cmd_who_wrote, 'at': cmd_at, 'why': cmd_why, 'diff': cmd_diff, 'infer': cmd_infer}[args.cmd](args) or 0
+    return {'verify': cmd_verify, 'history': cmd_history, 'who-wrote': cmd_who_wrote, 'at': cmd_at, 'why': cmd_why, 'diff': cmd_diff, 'infer': cmd_infer, 'export': cmd_export}[args.cmd](args) or 0
 
 
 if __name__ == '__main__':
