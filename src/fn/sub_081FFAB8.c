@@ -113,8 +113,7 @@ s32 HomingProjectile_UpdateManager(struct HomingManager *m)
                             value = src->flags;
                         }
                         {
-                            u32 mask = 8;
-                            value |= mask;
+                            value |= 8;
                         }
                         {
                             struct HomingSprite *dst = sprite;
