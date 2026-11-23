@@ -12,8 +12,7 @@ s32 Presentation_Destroy(u8 *p)
         s32 mask = -3;
         mask &= value;
         {
-            s32 mask2 = -4;
-            mask &= mask2;
+            mask &= ~3;
             gDispCntShadow = mask;
         }
     }
