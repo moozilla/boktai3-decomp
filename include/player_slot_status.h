@@ -13,4 +13,9 @@ static inline u32 Player_ReadStatusBits(const u32 *flags, u32 mask)
     return *flags & mask;
 }
 
+static inline void Player_SetStatusBits(u32 *flags, u32 mask)
+{
+    *flags |= mask;
+}
+
 #endif
