@@ -3,7 +3,6 @@
 #include "engine.h"
 #include "ram.h"
 
-#define W(o) (*(u32 *)((u8 *)p2 + (o)))
 void Bestiary_UnlockEntry(s32);
 extern const struct ContactPosition gUnk_0824FDF0;
 struct ContactPosition *Ratatosk_GetRandomMovementPoint(void *);
@@ -22,19 +21,6 @@ static inline u32 randomB(void)
 {
     gRandomIndex = (gRandomIndex + 1) & 1023;
     return ((const u16 *)RANDOM_TABLE_ADDR)[gRandomIndex];
-}
-static inline void setState(struct Ratatosk *p, void (*update)(void), u8 state)
-{
-    p->actionState = state;
-    p->actionCallback = update;
-    p->callbackFrame = 0;
-    p->actionChanged = 1;
-    p->reactionPhase = 0;
-    p->reactionTimer = 0;
-}
-static inline u32 testFlags(struct Ratatosk *p, u32 mask)
-{
-    return p->flags & mask;
 }
 // confidence=low: consumes queued damage and transitions to recoil or defeat.
 #define Ratatosk_ApplyQueuedDamage sub_081F6428
@@ -64,7 +50,7 @@ s32 Ratatosk_ApplyQueuedDamage(struct Ratatosk *p)
         p2->savedState = 2;
     }
     if (damage > 0) {
-        if (testFlags(p, 16) || p2->interruptLock > 0) {
+        if (Ratatosk_TestFlags(p, 16) || p2->interruptLock > 0) {
             react = 1;
             if (!Player_IsSlotInActionTwelveOrThirtyEight(0))
                 damage *= 3;
@@ -137,14 +123,12 @@ s32 Ratatosk_ApplyQueuedDamage(struct Ratatosk *p)
             } while (--i >= 0);
         }
         if (react) {
-            u32 one;
             p2->savedPhase = p2->actionCounter;
             p2->savedTime = p->callbackFrame;
             p2->savedState = p->actionPhase;
-            p2->savedSequence = W(0x180);
-            one = 1;
-            p->flags |= one;
-            setState(p, sub_081F5290, 18);
+            p2->savedSequence = p2->sequence;
+            Ratatosk_SetFlags(p, 1);
+            Ratatosk_StartReaction(p, sub_081F5290, 18);
             return 1;
         }
         Sound_PlaySongChecked(318);

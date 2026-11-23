@@ -235,6 +235,18 @@ static inline void Ratatosk_SetFlags(struct Ratatosk *actor, u32 flags)
     actor->flags |= flags;
 }
 
+/* SceneActorState_StartReaction on this type: hand the body to reaction callback UPDATE as
+ * reaction state STATE. */
+static inline void Ratatosk_StartReaction(struct Ratatosk *actor, void (*update)(void), u8 state)
+{
+    actor->actionState = state;
+    actor->actionCallback = update;
+    actor->callbackFrame = 0;
+    actor->actionChanged = 1;
+    actor->reactionPhase = 0;
+    actor->reactionTimer = 0;
+}
+
 static inline void Ratatosk_EnterPhase(struct Ratatosk *actor, u32 phase)
 {
     actor->actionPhase = phase;
