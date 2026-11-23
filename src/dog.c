@@ -608,18 +608,6 @@ void Dog_UpdateCollisionBounds(struct ChaseActor *a)
     }
 }
 
-struct T {
-    u8 filler[0x698];
-    u16 h698;
-    u8 f2[0x69a - 0x69a];
-    u16 h69a;
-};
-
-struct SUpdateActionTimers {
-    u8 filler[0x3d0];
-    struct T *t;
-};
-
 void Dog_UpdateActionTimers(struct ChaseActor *actor)
 {
     struct Dog *context = actor->base.context;
@@ -630,16 +618,6 @@ void Dog_UpdateActionTimers(struct ChaseActor *actor)
     if (*p != 0)
         *p = *p - 1;
 }
-
-struct TUpdateActionCooldown {
-    u8 filler[0x696];
-    u16 h;
-};
-
-struct SUpdateActionCooldown {
-    u8 filler[0x3d0];
-    struct TUpdateActionCooldown *t;
-};
 
 void Dog_UpdateActionCooldown(struct ChaseActor *actor)
 {
@@ -940,24 +918,16 @@ u8 Dog_SelectRetreatDirection(struct ChaseActor *actor, u32 priorDirection)
     return SelectRetreat(actor, priorDirection, 1);
 }
 
-struct SIsActionTimerExpired {
-    u8 filler[0x1e6];
-    u16 st;
-    u8 f2[0x3d0 - 0x1e8];
-    struct T *t;
-};
-
-u8 Dog_IsActionTimerExpired(struct ChaseActor *sIn)
+u8 Dog_IsActionTimerExpired(struct ChaseActor *actor)
 {
-    struct SIsActionTimerExpired *s = (struct SIsActionTimerExpired *)sIn;
-    struct T *t = s->t;
+    struct Dog *context = actor->base.context;
     u16 v;
-    if (s->st == 0 || s->st == 2)
-        v = t->h698;
+    if (actor->base.paletteOffset == 0 || actor->base.paletteOffset == 2)
+        v = context->nearTimer;
     else {
-        if (t->h698 == 0)
+        if (context->nearTimer == 0)
             return 1;
-        v = t->h69a;
+        v = context->farTimer;
     }
     if (v != 0)
         return 0;
@@ -1079,14 +1049,9 @@ void Dog_SelectRetreatOrChase(struct ChaseActor *a)
     Chase_SetCtl(a, SceneActorMotion_TestTargetTransition, 0x2B);
 }
 
-struct STickCooldown {
-    u8 filler[0x6a8];
-    u8 b;
-};
-
-void Dog_TickCooldown(struct STickCooldown *s)
+void Dog_TickCooldown(struct Dog *dog)
 {
-    u8 *p = &s->b;
+    u8 *p = &dog->turnDelay;
     if (*p != 0)
         *p = *p - 1;
 }
@@ -2578,7 +2543,7 @@ s32 Dog_PrepareFrame(void *p)
 
 void Dog_UpdateCollisionBounds(struct ChaseActor *a);
 
-void Dog_TickCooldown(struct STickCooldown *s);
+void Dog_TickCooldown(struct Dog *dog);
 
 s32 Dog_FinishFrame(void *p)
 {
