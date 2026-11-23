@@ -95,6 +95,7 @@ class App:
                 g = groups[key] = {'place': name, 'addr': a, 'width': w, 'fn': fn, 'loc': loc, 'text': text, 'count': 0,
                                    'object': label}
             g['count'] += 1
+            g['last'] = (int(s.writes['value'][i]) >> (8 * max(0, g['addr'] - a))) & 0xFFFFFFFF
             if len(groups) > 600:
                 break
         # each field's value at the end of the frame, at the field's own width
@@ -103,7 +104,8 @@ class App:
             w, signed = cli.leaf_info(self.types, leaf) if leaf is not None else (min(g['width'], 4), False)
             w = min(w, 4)
             g['width'] = w
-            g['value'] = om.ram.read(g['addr'], w, signed) if om.ram.read(g['addr'], w) is not None else None
+            v = om.ram.read(g['addr'], w, signed)
+            g['value'] = v if v is not None else g['last'] & ((1 << (8 * w)) - 1)   # IO: not in RAM snapshots
         return {'frame': f, 'rows': int(sl.stop - sl.start), 'writes': list(groups.values()),
                 'keys': int(s.frames['keys'][f]), 'solar': int(s.frames['solar'][f])}
 
@@ -131,15 +133,69 @@ def run_cli(argv):
     return out.getvalue()
 
 
+SESSIONS = HERE.parents[1] / 'build/recorder/sessions'
+_apps = {}
+
+
+def sessions():
+    """Recorded sessions, newest first."""
+    out = [p for p in SESSIONS.glob('*') if (p / 'meta.json').exists()] if SESSIONS.exists() else []
+    return sorted(out, key=lambda p: -(p / 'meta.json').stat().st_mtime)
+
+
+def app_for(name=None):
+    if not name:
+        found = sessions()
+        if not found:
+            raise FileNotFoundError('no recorded sessions in build/recorder/sessions')
+        name = found[0].name
+    app = _apps.get(name)
+    if app is None:
+        app = _apps[name] = App(name)
+    return app
+
+
+def page():
+    return (HERE / 'web' / 'index.html').read_bytes()
+
+
+def api(sub, q, app=None):
+    """(code, body, content type) for the Recorder API path SUB (after the API prefix)."""
+    try:
+        if sub == '/sessions':
+            return 200, [{'name': p.name, 'frames': json.loads((p / 'meta.json').read_text()).get('frames')} for p in sessions()], None
+        app = app or app_for(q.get('session'))
+        if sub == '/session':
+            return 200, app.session_info(), None
+        if sub == '/screen':
+            data = app.screen(int(q.get('f', 0)))
+            return (200, data, 'image/png') if data else (404, {'error': 'no screens'}, None)
+        if sub == '/writes':
+            return 200, app.frame_writes(int(q['f'])), None
+        if sub == '/history':
+            argv = ['history', str(app.session.path), q['where'], '--changes', '--limit', q.get('limit', '200')]
+            if 'from' in q:
+                argv += ['--from', q['from']]
+            if 'to' in q:
+                argv += ['--to', q['to']]
+            return 200, {'text': run_cli(argv)}, None
+        if sub == '/why':
+            argv = ['why', str(app.session.path), q['where'], q['frame']] + (['--check'] if q.get('check') else [])
+            return 200, {'text': run_cli(argv)}, None
+        return 404, {'error': 'not found'}, None
+    except Exception as e:  # reported to the page
+        return 500, {'error': f'{type(e).__name__}: {e}'}, None
+
+
 def serve(name, port=8765):
-    app = App(name)
-    page = (HERE / 'web' / 'index.html').read_bytes()
+    app = app_for(name)
 
     class Handler(BaseHTTPRequestHandler):
         def log_message(self, *a):
             pass
 
-        def send(self, body, kind='application/json', code=200):
+        def send(self, body, kind=None, code=200):
+            kind = kind or 'application/json'
             if isinstance(body, (dict, list)):
                 body = json.dumps(body).encode()
             elif isinstance(body, str):
@@ -153,29 +209,12 @@ def serve(name, port=8765):
         def do_GET(self):
             u = urlparse(self.path)
             q = {k: v[0] for k, v in parse_qs(u.query).items()}
-            try:
-                if u.path == '/':
-                    return self.send(page, 'text/html; charset=utf-8')
-                if u.path == '/api/session':
-                    return self.send(app.session_info())
-                if u.path == '/api/screen':
-                    data = app.screen(int(q.get('f', 0)))
-                    return self.send(data, 'image/png') if data else self.send({'error': 'no screens'}, code=404)
-                if u.path == '/api/writes':
-                    return self.send(app.frame_writes(int(q['f'])))
-                if u.path == '/api/history':
-                    argv = ['history', str(app.session.path), q['where'], '--changes', '--limit', q.get('limit', '200')]
-                    if 'from' in q:
-                        argv += ['--from', q['from']]
-                    if 'to' in q:
-                        argv += ['--to', q['to']]
-                    return self.send({'text': run_cli(argv)})
-                if u.path == '/api/why':
-                    argv = ['why', str(app.session.path), q['where'], q['frame']] + (['--check'] if q.get('check') else [])
-                    return self.send({'text': run_cli(argv)})
-                self.send({'error': 'not found'}, code=404)
-            except Exception as e:  # report to the page
-                self.send({'error': f'{type(e).__name__}: {e}'}, code=500)
+            if u.path == '/':
+                return self.send(page(), 'text/html; charset=utf-8')
+            if u.path.startswith('/api/'):
+                code, body, kind = api(u.path[4:], q, None if q.get('session') else app)
+                return self.send(body, kind, code)
+            self.send({'error': 'not found'}, code=404)
 
     srv = ThreadingHTTPServer(('127.0.0.1', port), Handler)
     print(f'Recorder: http://127.0.0.1:{port}/  ({app.session.name}, {len(app.session)} frames)')

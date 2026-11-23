@@ -29,7 +29,7 @@ main { display: grid; grid-template-columns: minmax(260px, 500px) 1fr; gap: 16px
 .timeline canvas { width: 100%; height: 100%; display: block; }
 .controls { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
 .controls input[type=number] { width: 90px; }
-button, input { font: inherit; color: inherit; background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 4px 8px; }
+button, input, select { font: inherit; color: inherit; background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 4px 8px; }
 button:hover { border-color: var(--accent); }
 .facts { color: var(--muted); font-size: 13px; margin-top: 6px; }
 .filter { width: 100%; margin-bottom: 8px; }
@@ -55,6 +55,7 @@ pre { font-family: var(--mono); font-size: 12px; white-space: pre-wrap; word-bre
 <header>
   <h1>Flight Recorder</h1>
   <span class="meta" id="meta">loading…</span>
+  <select id="sessions" aria-label="Session" hidden></select>
 </header>
 <main>
   <section class="panel">
@@ -86,6 +87,10 @@ pre { font-family: var(--mono); font-size: 12px; white-space: pre-wrap; word-bre
 </main>
 <script>
 const $ = (id) => document.getElementById(id);
+// standalone (tools.recorder serve) or inside the Studio (/recorder, API under /api/recorder)
+const API = location.pathname.startsWith('/recorder') ? '/api/recorder' : '/api';
+const SESSION = new URLSearchParams(location.search).get('session');
+const withSession = (path) => SESSION ? path + (path.includes('?') ? '&' : '?') + 'session=' + encodeURIComponent(SESSION) : path;
 const KEYS = ['A', 'B', 'Sel', 'Start', '→', '←', '↑', '↓', 'R', 'L'];
 let info = null, frame = 0, rows = [], selected = null, timer = null;
 
@@ -94,7 +99,7 @@ const hex = (v, w) => '0x' + (v >>> 0).toString(16).toUpperCase().padStart(2 * M
 const esc = (s) => String(s ?? '').replace(/[&<>]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]));
 
 async function api(path) {
-  const r = await fetch(path);
+  const r = await fetch(withSession(path.replace(/^\/api/, API)));
   const j = r.headers.get('content-type')?.includes('json') ? await r.json() : null;
   if (!r.ok) throw new Error(j?.error || r.statusText);
   return j;
@@ -120,7 +125,7 @@ function drawTimeline() {
 async function go(f) {
   frame = Math.max(0, Math.min(info.frames - 1, f | 0));
   $('frame').value = frame;
-  $('screen').src = `/api/screen?f=${frame}`;
+  $('screen').src = withSession(`${API}/screen?f=${frame}`);
   $('pos').textContent = `of ${info.frames - 1}`;
   drawTimeline();
   clearTimeout(timer);
@@ -185,7 +190,17 @@ addEventListener('keydown', (e) => {
 addEventListener('resize', () => info && drawTimeline());
 
 (async () => {
+  try {
+    const list = await api('/api/sessions');
+    if (list.length > 1) {
+      const sel = $('sessions');
+      sel.innerHTML = list.map((x) => `<option value="${esc(x.name)}">${esc(x.name)} · ${x.frames ?? '?'} frames</option>`).join('');
+      sel.hidden = false;
+      sel.onchange = () => { const u = new URL(location.href); u.searchParams.set('session', sel.value); location.href = u; };
+    }
+  } catch (e) { /* the list is optional */ }
   info = await api('/api/session');
+  if (!$('sessions').hidden) $('sessions').value = info.name;
   const m = info.meta;
   $('meta').textContent = `${info.name} · ${info.frames} frames · ${m.save ? 'save ' + m.save : 'power-on'} · solar ${m.solar}`;
   go(info.frames - 1);
