@@ -25,6 +25,7 @@ struct ContactPosition *TetherActor_GetPosition(void);
 #include "scene_actor_charge_offset.h"
 
 #include "display_keyframe.h"
+#include "scene_actor_chase_shared.h"
 
 u8 *TerrainModifiers_FindCellOverride(int, int);
 
@@ -425,11 +426,6 @@ void Actor_EmitTowardNearbyActors(struct SceneActorBody *emitter)
 
 s32 Scene_CanOpenMenu(void);
 
-static inline u32 Flag(u32 *p, u32 mask)
-{
-    return *p & mask;
-}
-
 static inline s32 PlayerKind(void)
 {
     return gPlayers[0]->tetherMode;
@@ -448,7 +444,7 @@ static inline s32 TargetAllowsInteraction(struct Player *p)
 {
     if ((u8)(p->actionMode - 3) <= 2)
         return 0;
-    if (Flag(&p->statusFlags, 0x100000))
+    if (SceneActorChase_Bits32(&p->statusFlags, 0x100000))
         return 0;
     if (p->active && (u16)(p->sceneMode - 5) <= 1)
         return 0;
