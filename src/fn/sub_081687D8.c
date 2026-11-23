@@ -19,7 +19,7 @@ void SceneHud_UpdateTertiaryWidgets(struct SceneHudState *p)
     }
     i = 0;
     selection = &p->tertiarySelection;
-    w = (struct SceneInputWidget *)((u8 *)p + 0xF70);
+    w = p->tertiaryWidgets;
     for (; i <= 2; w++, i++) {
         struct SceneHudState *entry = (struct SceneHudState *)((u8 *)p + *selection * 4);
         PauseMenu_LoadStatusIconFrame(p, w, entry->tertiaryOptions[0].icon);
