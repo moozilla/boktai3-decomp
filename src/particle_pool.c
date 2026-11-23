@@ -102,11 +102,6 @@ static inline s32 TruncatePoolOffset(s32 value)
     return value >= 0 ? value >> 12 : -(-value >> 12);
 }
 
-static inline u16 ReadParticleSample(const u16 *table, const u32 *index)
-{
-    return table[*index];
-}
-
 void ParticlePool_SpawnJitteredParticle(struct ParticlePool *inPool, struct SceneVec *position,
                                         s32 angle, u32 kind)
 {
@@ -149,7 +144,7 @@ void ParticlePool_SpawnJitteredParticle(struct ParticlePool *inPool, struct Scen
             index = (index + 1) & mask;
             *randomIndex = index;
             {
-                u32 random = ReadParticleSample(table, &index);
+                u32 random = ParticleRandom_ReadCursor(table, &index);
                 s32 z = (u16)p->tail.position.signedAxis.z;
                 z -= 63;
                 random &= range;
@@ -254,8 +249,7 @@ static inline u32 RandomByte(void)
     u32 offset;
     u32 *index = &gRandomIndex;
     u32 next = *index + 1;
-    u32 mask = 1023;
-    *index = next & mask;
+    *index = next & 1023;
     offset = *index * 2;
     return *(const u8 *)(offset + RANDOM_TABLE_ADDR);
 }

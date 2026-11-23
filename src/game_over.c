@@ -3,6 +3,7 @@
 #include "player.h"
 #include "message_window.h"
 #include "runtime.h"
+#include "scene_actor_chase_shared.h"
 
 void Sound_StopAllTrackedSongs(void);
 
@@ -40,11 +41,6 @@ static inline s32 AddScaledLetterSpacing(s32 spread, struct GameOver *panel)
 {
     s32 scale = panel->extentX;
     return spread + (scale >> 2);
-}
-
-static inline void andm(u32 *flags, u32 mask)
-{
-    *flags &= mask;
 }
 
 void GameOver_InitExpansion(struct GameOver *panel)
@@ -175,7 +171,7 @@ void GameOver_UpdateLetterTransforms(struct GameOver *panel)
 
 void GameOver_StopPresentation(void)
 {
-    andm(&gEngineFlags, ~0x400);
+    SceneActorChase_AndWordFlags(&gEngineFlags, ~0x400);
     Sound_StopSong(2);
     SceneLifecycle_RequestRestart(0);
 }
@@ -378,7 +374,7 @@ void GameOver_UpdateExit(struct GameOver *panel)
 {
     GameOver_UpdateLetterAnimation(panel);
     if (panel->animationState == 8) {
-        andm(&gEngineFlags, ~0x400);
+        SceneActorChase_AndWordFlags(&gEngineFlags, ~0x400);
         gPlayTimeCounterEnabled = 0;
         SceneLifecycle_RequestRestart(panel->choice);
         Task_Kill(panel);
