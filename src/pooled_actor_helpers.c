@@ -72,8 +72,7 @@ void Actor_ClearPendingHit(struct PooledActor *actor)
 void Actor_InitHitSensor(struct PooledActor *actor, void *a, void *b, void *fn)
 {
     struct ContactCollider *q = &actor->hitSensor;
-    u32 flags = 0x2001;
-    Collider_Init(q, 0, flags, 0, 16, a, b);
+    Collider_Init(q, 0, 0x2001, 0, 16, a, b);
     Collider_SetPosition(q, &actor->body.position, 0);
     Collider_SetCallback(q, fn, actor);
     Collider_SetAttackProperties(q, actor->attackProperty0, actor->attackProperty1,
@@ -88,8 +87,7 @@ void Actor_InitHitSensor(struct PooledActor *actor, void *a, void *b, void *fn)
 void Actor_InitBodyCollider(struct PooledActor *actor, void *a, void *b, void *fn)
 {
     struct ContactCollider *q = &actor->bodyCollider;
-    u32 flags = 0x4001;
-    Collider_Init(q, 0, flags, 0, 16, a, b);
+    Collider_Init(q, 0, 0x4001, 0, 16, a, b);
     Collider_SetPosition(q, &actor->body.position, 0);
     Collider_SetCallback(q, fn, actor);
     Collider_SetBodyProperties(q, actor->bodyProperty, actor->bodyProperty1, actor->bodyProperty2);
