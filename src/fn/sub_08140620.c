@@ -46,6 +46,6 @@ void Player_ClampAlternateTerrainPosition(struct Player *p)
     else if (p->position.z > maxZ)
         p->position.z = maxZ;
     p->colliderPosition = p->position;
-    p->previousPosition = p->position;
+    p->animation.position = *(struct ContactPosition *)&p->position;
     p->actionPhase488 = 1;
 }

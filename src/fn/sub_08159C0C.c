@@ -9,7 +9,7 @@ static inline u32 requestBlocked(u32 *flags, u32 mask)
 {
     return *flags & mask;
 }
-static inline void enableAnimation(struct PlayerAnimation *a)
+static inline void enableAnimation(struct SceneInputWidget *a)
 {
     a->flags &= ~1;
 }

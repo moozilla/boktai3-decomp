@@ -111,7 +111,7 @@ void Player_UpdateTetherMovement(struct Player *p)
             angle = ((p->facing + 1) & 7) << 5;
             cosine = gUnk_086149C4[(angle + 64) & 255];
             sine = gUnk_086149C4[angle & 255];
-            if (p->actionCueFlags & 3) {
+            if (p->animation.frameIndex & 3) {
                 p->velocityX = -scale12(cosine * speed);
                 p->velocityZ = -scale12(sine * speed);
                 if (p->velocityScaleAxis == 1) {
@@ -128,35 +128,35 @@ void Player_UpdateTetherMovement(struct Player *p)
             }
         }
     }
-    if (moving && (s16)p->directionHistory[1] >= 0 && !(p->actionCueFlags & 3) &&
-        !p->actionCueCounter) {
+    if (moving && (s16)p->directionHistory[1] >= 0 && !(p->animation.frameIndex & 3) &&
+        !p->animation.elapsed) {
         if (p && ((p->active && p->sceneMode == 0) || flags(&p->actionFlags, 4)))
             goto animate;
         if (FlagMovement(PlayerRef_FromPlayer(p))) {
-            if (!p->actionCueFlags)
+            if (!p->animation.frameIndex)
                 Player_PlayPositionEffect(p, &p->position, 1, 1, &p->position, 0, 0x5AE);
             else
                 Player_PlayPositionEffect(p, &p->position, 1, 1, &p->position, 0, 0x5AD);
         } else if (RepeatedEffect_RequestNearby(&p->position)) {
-            if (!p->actionCueFlags)
+            if (!p->animation.frameIndex)
                 Player_PlayPositionEffect(p, &p->position, 1, 1, &p->position, 0, 0x163);
             else
                 Player_PlayPositionEffect(p, &p->position, 1, 1, &p->position, 0, 0x162);
         } else if (Player_IsNormalActionAllowed(
                        ((struct PlayerMovementCueFields *)p)->normalAction) &&
                    !(p && modeFive(p))) {
-            if (!p->actionCueFlags)
+            if (!p->animation.frameIndex)
                 Player_PlayPositionEffect(p, &p->position, 1, 1, &p->position, 0, 0x194);
             else
                 Player_PlayPositionEffect(p, &p->position, 1, 1, &p->position, 0, 0x193);
         } else {
             if (p->tetherStatusFlags || !p->velocityScaleAxis) {
-                if (!p->actionCueFlags)
+                if (!p->animation.frameIndex)
                     Sound_PlaySong(0xCA);
                 else
                     Sound_PlaySong(0xC9);
             } else {
-                if (!p->actionCueFlags)
+                if (!p->animation.frameIndex)
                     Sound_PlaySong(0x28E);
                 else
                     Sound_PlaySong(0x28D);

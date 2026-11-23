@@ -32,11 +32,11 @@ void Player_UpdateSpiralTrailAction(struct Player *p)
     addFlags((u32 *)((u8 *)p + 0x20), 0x100000);
     if ((p->tetherFrame & 7) >= 7 - (p->tetherFrame >> 2)) {
         Player_AddControlFlags(p, 0x41);
-        p->previousPosition = p->position;
+        p->animation.position = *(struct ContactPosition *)&p->position;
     }
     Player_SetAnimation(p, 0x9A, 64, 1);
-    p->spriteResource = 0x16F;
-    p->actionVariantResource = (u32)(gPaletteBankData + p->spriteResource * 32);
+    p->animation.paletteBank = 0x16F;
+    p->animation.palette = (u16 *)(gPaletteBankData + p->animation.paletteBank * 32);
     state = (void *)((u8 *)p + 0x3FC);
     Anim_SetSequence(state, *(void **)((u8 *)p + 0x410), 0, p->heading, p->side);
     sprite = (void *)((u8 *)p + 0x14C);

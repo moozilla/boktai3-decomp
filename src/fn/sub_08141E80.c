@@ -53,7 +53,7 @@ void Player_UpdateMovement(struct Player *p)
         s32 speed = Player_GetMovementSpeed(p);
         Player_GetMovementRateScale(speed);
         if (p && IsModeFive(p))
-            speed = (p->movementSpeedScale * speed) >> 6;
+            speed = (p->animation.scaleX * speed) >> 6;
         Player_SetDirectionalVelocity(p, speed);
     }
     Player_EmitMovementEffects(p, 0);

@@ -21,7 +21,7 @@ void Player_UpdateTimedCuePhase(struct Player *p)
                 Player_SetActionPhase(p, 1);
             break;
         case 1:
-            if (!(p->actionCueFlags & 3) && !p->actionCueCounter)
+            if (!(p->animation.frameIndex & 3) && !p->animation.elapsed)
                 Sound_PlaySong(0xD1);
             if (Player_SetAnimation(p, ActorVariant_GetTableValue(p->actionMode, 0x2E), 0x40, 1))
                 Player_SetActionPhase(p, 2);

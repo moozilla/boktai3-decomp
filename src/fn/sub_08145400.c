@@ -16,7 +16,7 @@ static inline void SetStatusFlags(struct Player *p, u32 mask)
 }
 void Player_UpdateScaleTransition(struct Player *p)
 {
-    struct PlayerAnimation *animation;
+    struct SceneInputWidget *animation;
     if (Player_ConsumeStateEntry(p))
         Player_SetPendingCallback(p, Player_OnFadeMotionExit);
     animation = &p->animation;
@@ -29,8 +29,8 @@ void Player_UpdateScaleTransition(struct Player *p)
             u16 frame = p->tetherFrame;
             if (frame <= 63) {
                 s32 scale = 64 - frame;
-                p->movementSpeedScale = scale;
-                p->secondarySpeedScale = scale;
+                p->animation.scaleX = scale;
+                p->animation.scaleY = scale;
                 p->tetherFrame++;
             } else
                 Player_SetActionPhase(p, 1);
@@ -44,8 +44,8 @@ void Player_UpdateScaleTransition(struct Player *p)
                 s32 n = p->tetherFrame + 1;
                 long long scale = n;
                 if ((p->tetherFrame = n) <= 63) {
-                    p->movementSpeedScale = scale;
-                    p->secondarySpeedScale = scale;
+                    p->animation.scaleX = scale;
+                    p->animation.scaleY = scale;
                 } else {
                     animation->flags &= ~2;
                     ActorSequence_Begin(p, 0, 0);

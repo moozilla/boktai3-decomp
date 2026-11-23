@@ -21,14 +21,14 @@ static inline u8 IsModeFive(struct Player *p)
 }
 void Player_PlayActionCueSound(struct Player *p, s32 quiet)
 {
-    if (p->actionCueFlags & 3)
+    if (p->animation.frameIndex & 3)
         return;
-    if (p->actionCueCounter)
+    if (p->animation.elapsed)
         return;
     if (p && ((p->active && p->sceneMode == 0) || MaskFlags(&p->actionFlags, 4)))
         return;
     if (Player_IsFlaggedWithoutGlobalModifiers(p->movementStatus) && !(p && IsModeFive(p))) {
-        if (p->actionCueFlags == 0)
+        if (p->animation.frameIndex == 0)
             Player_EmitPositionEffect(p, &p->position, 1, 1, &p->position, 0, 0x194);
         else
             Player_EmitPositionEffect(p, &p->position, 1, 1, &p->position, 0, 0x193);
@@ -37,17 +37,17 @@ void Player_PlayActionCueSound(struct Player *p, s32 quiet)
     if (quiet)
         return;
     if (p && IsModeFive(p)) {
-        if (p->actionCueFlags == 0)
+        if (p->animation.frameIndex == 0)
             Player_PlayLocalSong(p->slot, 0xC8);
         else
             Player_PlayLocalSong(p->slot, 0xC7);
     } else if (p->tetherStatusFlags || !p->velocityScaleAxis) {
-        if (p->actionCueFlags == 0)
+        if (p->animation.frameIndex == 0)
             Player_PlayLocalSong(p->slot, 0xCA);
         else
             Player_PlayLocalSong(p->slot, 0xC9);
     } else {
-        if (p->actionCueFlags == 0)
+        if (p->animation.frameIndex == 0)
             Player_PlayLocalSong(p->slot, 0x28E);
         else
             Player_PlayLocalSong(p->slot, 0x28D);

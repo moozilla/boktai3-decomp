@@ -18,7 +18,7 @@ s32 Player_BeginPositionRequest(struct Player *p, struct SceneVec *position,
     if (p->tetherMode != 0x18)
         PlayerAction_BeginMode24(p);
     p->position = *position;
-    p->previousPosition = p->position;
+    p->animation.position = *(struct ContactPosition *)&p->position;
     if (immediate) {
         p->animation.flags |= 1;
         p->movementRequestAnimated = 0;

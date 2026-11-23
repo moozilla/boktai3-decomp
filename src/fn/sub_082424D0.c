@@ -42,6 +42,6 @@ void sub_082424D0(struct Player *p)
     else
         ActorShadow_Enable(p->shadow);
     p->position.y += p->actionCountdown;
-    p->previousPosition = p->position;
-    p->previousPosition.y += p->terrainRecoveryCounter;
+    p->animation.position = *(struct ContactPosition *)&p->position;
+    p->animation.position.y += p->terrainRecoveryCounter;
 }

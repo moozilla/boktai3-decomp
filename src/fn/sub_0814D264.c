@@ -69,7 +69,7 @@ void Player_UpdateAttackColliderMotion(struct Player *p, s32 forced)
             PlayerAttackEffect_SetEmissionState(1);
             q->speed = Div(512, ((struct AttackMotionPlayerFields *)p)->animationDuration);
             q->phase1 = 8;
-            if (((u16)(p->actionCueFlags - 1)) > 1) {
+            if (((u16)(p->animation.frameIndex - 1)) > 1) {
                 ((struct AttackMotionPlayerFields *)p)->previousAnimation = -1;
                 return;
             }
@@ -99,11 +99,11 @@ void Player_UpdateAttackColliderMotion(struct Player *p, s32 forced)
             s32 radius;
             PlayerAttackEffect_SetEmissionState(2);
             q->speed = Div(1216, ((struct AttackMotionPlayerFields *)p)->animationDuration);
-            if (p->actionCueFlags <= 1) {
+            if (p->animation.frameIndex <= 1) {
                 ((struct AttackMotionPlayerFields *)p)->previousAnimation = -1;
                 return;
             }
-            if (p->actionCueFlags > 3)
+            if (p->animation.frameIndex > 3)
                 break;
             if (((struct AttackMotionPlayerFields *)p)->previousAnimation != 0x81)
                 Sound_PlaySong(0x386);

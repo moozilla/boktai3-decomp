@@ -50,19 +50,6 @@ u32 Sqrt(u32);
 s32 Div(s32, s32);
 s32 Player_ScaleLevelValue(s32, s32);
 
-struct PlayerGrabSecondary {
-    u8 unknown0[0xEC];
-    struct PlayerAnimation animation;
-    u16 elapsed;
-    u8 unknownE[6];
-    u16 frame;
-    u8 unknown16[10];
-    struct SceneVec position;
-    u8 unknown28[18];
-    u16 spriteResource;
-    u8 unknown3C[12];
-    u32 variantResource;
-};
 struct PlayerGrabGrabContext {
     u8 unknown0[0xA88];
     void *particlePool;
@@ -70,7 +57,6 @@ struct PlayerGrabGrabContext {
     u16 duration, returnSpeed;
     u8 heading;
 };
-#define PlayerGrab_Secondary(p) ((struct PlayerGrabSecondary *)(p))
 #define PlayerGrab_Context(p)   ((struct PlayerGrabGrabContext *)(p))
 
 struct PlayerGrabCoordinates {
@@ -146,7 +132,7 @@ static inline s32 PlayerGrab_Hit(struct PlayerGrabTarget *t, s32 a, s32 b)
 }
 static inline void PlayerGrab_CopyPosition(struct Player *p)
 {
-    PlayerGrab_Secondary(p)->position = p->position;
+    p->secondaryAnimation.position = *(struct ContactPosition *)&p->position;
 }
 
 static inline void PlayerGrab_Polar(struct PlayerGrabPos *vec, u32 angle, s32 radius)
@@ -163,7 +149,7 @@ static inline struct PlayerGrabPos *PlayerGrab_TargetPosition(struct PlayerGrabT
     else
         return &target->body->pos;
 }
-static inline void PlayerGrab_ClearAnimation(struct PlayerAnimation *animation)
+static inline void PlayerGrab_ClearAnimation(struct SceneInputWidget *animation)
 {
     animation->flags &= ~1;
 }
@@ -199,12 +185,12 @@ void Player_UpdateGrabMotion(struct Player *p)
         p->actionEighteenDuration = 0x20;
         Sound_PlaySong(0x39E);
         PlayerGrab_ClearAnimation(&p->secondaryAnimation);
-        PlayerGrab_Secondary(p)->position = p->previousPosition;
+        p->secondaryAnimation.position = p->animation.position;
         {
-            u16 resource = p->spriteResource;
-            PlayerGrab_Secondary(p)->spriteResource = resource;
+            u16 resource = p->animation.paletteBank;
+            p->secondaryAnimation.paletteBank = resource;
         }
-        PlayerGrab_Secondary(p)->variantResource = p->actionVariantResource;
+        p->secondaryAnimation.palette = p->animation.palette;
         p->movementStart = p->position;
         Player_SetPendingCallback(p, Player_OnGrabMotionExit);
         if (PlayerGrab_Context(p)->particlePool == 0)
@@ -318,7 +304,7 @@ void Player_UpdateGrabMotion(struct Player *p)
                     Player_SetActionPhase(p, 6);
             }
             ParticlePool_EmitTriple((void *)PlayerGrab_Context(p)->particlePool,
-                                    &PlayerGrab_Secondary(p)->position, (angle + 0x80) & 0xFF, 1);
+                                    &p->secondaryAnimation.position, (angle + 0x80) & 0xFF, 1);
             return;
         }
         case 2: {
@@ -342,7 +328,7 @@ void Player_UpdateGrabMotion(struct Player *p)
                     gUnk_02000530 = 1;
             }
             r = PlayerAnimation_SelectSecondaryKeyframes(p, 0xF0, 0x40);
-            if (PlayerGrab_Secondary(p)->frame == 5 && PlayerGrab_Secondary(p)->elapsed == 0) {
+            if (p->secondaryAnimation.frameIndex == 5 && p->secondaryAnimation.elapsed == 0) {
                 s32 amount;
                 s32 base;
                 s32 hitResult;
@@ -367,7 +353,7 @@ void Player_UpdateGrabMotion(struct Player *p)
                 vec.x = PlayerGrab_Fx12(PlayerGrab_Sin(base + 0x40) * 64);
                 vec.y = 0xE6;
                 vec.z = PlayerGrab_Fx12(PlayerGrab_Sin(base) * 64);
-                SceneParticle_CreateDefaultPriority(&PlayerGrab_Secondary(p)->position, &vec, 0, 0,
+                SceneParticle_CreateDefaultPriority(&p->secondaryAnimation.position, &vec, 0, 0,
                                                     1);
                 {
                     u32 link = gEngineFlags & 0x1000;
@@ -382,7 +368,7 @@ void Player_UpdateGrabMotion(struct Player *p)
                 }
                 if (damage > 0)
                     DamageNumberDisplay_Show(&p->collider, damage, 1,
-                                             &PlayerGrab_Secondary(p)->position,
+                                             &p->secondaryAnimation.position,
                                              &p->movementRequestTarget, 0);
                 gUnk_02000510++;
                 return;
@@ -432,7 +418,7 @@ void Player_UpdateGrabMotion(struct Player *p)
             PlayerGrab_Coordinates(p)->x += PlayerGrab_PlanarVelocity(p)->x;
             PlayerGrab_Coordinates(p)->z += PlayerGrab_PlanarVelocity(p)->z;
             ParticlePool_EmitTriple((void *)PlayerGrab_Context(p)->particlePool,
-                                    &PlayerGrab_Secondary(p)->position,
+                                    &p->secondaryAnimation.position,
                                     (PlayerGrab_Context(p)->heading + 0xA0) & 0xFF, 1);
             {
                 u8 heading = PlayerGrab_Context(p)->heading;
@@ -445,7 +431,7 @@ void Player_UpdateGrabMotion(struct Player *p)
             if ((p->tetherFrame & 3) == 0)
                 TemporaryAnimationPool_CreateEntry(&p->secondaryAnimation, 0x10, 0x200,
                                                    p->menuStatusValues[0], 0);
-            PlayerCue_InitAttackCollider(p, &PlayerGrab_Secondary(p)->position, 2, 0x20);
+            PlayerCue_InitAttackCollider(p, &p->secondaryAnimation.position, 2, 0x20);
             p->tetherFrame++;
             if (p->tetherFrame > 0x23)
                 Player_SetActionPhase(p, 4);

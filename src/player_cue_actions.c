@@ -262,7 +262,7 @@ void Player_AdvanceScriptDestination(struct Player *player)
     s32 speed = 12;
     Player_GetMovementRateScale(12);
     if (player && IsMovementSlowed(player))
-        speed = (speed * player->movementSpeedScale) >> 6;
+        speed = (speed * player->animation.scaleX) >> 6;
     if (((deltaX * deltaX) + (dz * dz)) <= (speed * speed)) {
         player->position.x = player->cueDestination.x;
         player->position.z = player->cueDestination.z;
@@ -307,20 +307,20 @@ void Player_AdvanceScriptDestination(struct Player *player)
             player->heading = player->facing;
             player->side = 0;
         }
-        if ((!((player->actionCueFlags) & 3)) && (!(player->actionCueCounter))) {
+        if ((!((player->animation.frameIndex) & 3)) && (!(player->animation.elapsed))) {
             if ((!((player && (player->active)) && (!(player->sceneMode)))) &&
                 (!(player && ((u8)ReadFlagBits(&player->actionFlags, 4))))) {
                 if (PlayerCue_ResolveReference(player) && IsMovementSlowed(player)) {
-                    if (!(player->actionCueFlags))
+                    if (!(player->animation.frameIndex))
                         Sound_PlaySong(0xC8);
                     else
                         Sound_PlaySong(0xC7);
                 } else if ((player->tetherStatusFlags) || (!player->velocityScaleAxis)) {
-                    if (!(player->actionCueFlags))
+                    if (!(player->animation.frameIndex))
                         Sound_PlaySong(0xCA);
                     else
                         Sound_PlaySong(0xC9);
-                } else if (!(player->actionCueFlags))
+                } else if (!(player->animation.frameIndex))
                     Sound_PlaySong(0x28E);
                 else
                     Sound_PlaySong(0x28D);
@@ -408,7 +408,7 @@ void PlayerCue_UpdateMoveDestination(struct Player *player)
         angle = (((player->facing) + 1) & 7) << 5;
         x = gUnk_086149C4[(angle + 64) & 255];
         z = gUnk_086149C4[angle & 255];
-        if ((player->actionCueFlags) & 3) {
+        if ((player->animation.frameIndex) & 3) {
             if (distance <= 64) {
                 player->position.x = player->cueDestination.x;
                 player->position.z = player->cueDestination.z;
@@ -514,9 +514,9 @@ void PlayerCue_UpdateScaleTransition(struct Player *player)
             player->resetValue6FC = 30;
             player->animation.flags |= 2;
             t = &player->tetherFrame;
-            player->movementSpeedScale = 64 - ((u8)*t << 2);
+            player->animation.scaleX = 64 - ((u8)*t << 2);
             if (*t > 8) {
-                player->secondarySpeedScale = *t << 3;
+                player->animation.scaleY = *t << 3;
                 {
                     s32 frame = *t - 8;
                     SetCueVerticalScale(player, ((frame << 2) + frame) << 2);
@@ -543,8 +543,8 @@ void PlayerCue_UpdateScaleTransition(struct Player *player)
             Player_SetAnimation(player, ActorVariant_GetTableValue(player->actionMode, 0), 64, 1);
             Player_AddControlFlags(player, 4);
             player->animation.flags |= 2;
-            player->movementSpeedScale = 4;
-            player->secondarySpeedScale = 120;
+            player->animation.scaleX = 4;
+            player->animation.scaleY = 120;
             SetCueVerticalScale(player, (8 - player->tetherFrame) * 200 + 160);
             if (++player->tetherFrame > 7)
                 ActorSequence_Begin(player, 7, 5);
@@ -552,12 +552,12 @@ void PlayerCue_UpdateScaleTransition(struct Player *player)
         case 5:
             Player_SetAnimation(player, ActorVariant_GetTableValue(player->actionMode, 0), 64, 1);
             player->animation.flags |= 2;
-            player->movementSpeedScale = 64 - ((15 - (u8)player->tetherFrame) << 2);
+            player->animation.scaleX = 64 - ((15 - (u8)player->tetherFrame) << 2);
             if (player->tetherFrame <= 7) {
-                player->secondarySpeedScale = (15 - player->tetherFrame) << 3;
+                player->animation.scaleY = (15 - player->tetherFrame) << 3;
                 SetCueVerticalScale(player, (8 - player->tetherFrame) * 20);
             } else {
-                player->secondarySpeedScale = 64;
+                player->animation.scaleY = 64;
                 SetCueVerticalScale(player, 0);
                 Player_AddControlFlags(player, 4);
             }
@@ -579,9 +579,9 @@ void PlayerCue_UpdateScaleTransition(struct Player *player)
             Player_SetAnimation(player, ActorVariant_GetTableValue(player->actionMode, 0), 64, 1);
             player->animation.flags |= 2;
             t = &player->tetherFrame;
-            player->movementSpeedScale = 64 - ((u8)*t << 2);
+            player->animation.scaleX = 64 - ((u8)*t << 2);
             if (*t > 8) {
-                player->secondarySpeedScale = *t << 3;
+                player->animation.scaleY = *t << 3;
                 {
                     s32 frame = *t - 8;
                     SetCueVerticalScale(player, ((frame << 2) + frame) << 2);
@@ -690,7 +690,7 @@ void PlayerCue_UpdateDeparture(struct Player *player)
             Player_AddControlFlags(player, 4);
             if (++player->tetherFrame > 5) {
                 player->terrainRecoveryCounter = 0;
-                player->unkA2[4] = 1;
+                player->animation.attribute1A = 1;
                 Sound_PlaySong(0x1AE);
                 ActorSequence_Begin(player, 0x1B, 2);
             }
@@ -905,7 +905,7 @@ void PlayerCue_UpdateRecoilRecovery(struct Player *player)
                 ActorSequence_Begin(player, 0x1D, 1);
             break;
         case 1:
-            if (player->actionCueFlags == 3 && player->actionCueCounter == 0)
+            if (player->animation.frameIndex == 3 && player->animation.elapsed == 0)
                 Sound_PlaySong(0xD1);
             if (Player_SetAnimation(player, ActorVariant_GetTableValue(player->actionMode, 0x2E),
                                     0x40, 1)) {
@@ -948,7 +948,7 @@ void Player_UpdateFourPhaseAction(struct Player *player)
             }
             result = Player_SetAnimation(
                 player, ActorVariant_GetTableValue(player->actionMode, 0x17), speed, 1);
-            if (player->actionMode == 1 && player->actionCueFlags == 2 && !player->actionCueCounter)
+            if (player->actionMode == 1 && player->animation.frameIndex == 2 && !player->animation.elapsed)
                 DirectionalSpriteEffect_LaunchFromFacing(player, player->facing, &player->position);
             if (result)
                 ActorSequence_Begin(player, 3, 3);
@@ -1837,7 +1837,7 @@ void PlayerCue_UpdateSpiralMotion(struct Player *player)
         }
     } else {
         Player_AddControlFlags(player, 0x41);
-        player->previousPosition = player->position;
+        player->animation.position = *(struct ContactPosition *)&player->position;
         if (player->facing > 4) {
             player->heading = 8 - player->facing;
             player->side = 1;
@@ -1848,8 +1848,8 @@ void PlayerCue_UpdateSpiralMotion(struct Player *player)
     }
     Player_SetAnimation(player, 0x9A, 64, 1);
     {
-        player->spriteResource = 0x16F;
-        player->actionVariantResource = (u32)(gPaletteBankData + (player->spriteResource << 5));
+        player->animation.paletteBank = 0x16F;
+        player->animation.palette = (u16 *)(gPaletteBankData + (player->animation.paletteBank << 5));
     }
     Anim_SetSequence(&player->cueCollider.sequence, (void *)player->cueCollider.setupResource, 0,
                      player->heading, player->side);
@@ -2220,16 +2220,16 @@ void PlayerCue_UpdateSpiralRecovery(struct Player *player)
     }
     if ((player->tetherFrame & 7) >= 7 - (player->tetherFrame >> 2)) {
         Player_AddControlFlags(player, 0x41);
-        (*(struct ContactPosition *)&player->previousPosition) =
+        player->animation.position =
             (*(struct ContactPosition *)&player->position);
     }
     Player_SetAnimation(player, 0x9A, 0x40, 1);
     {
-        u16 *target = &player->spriteResource;
+        u16 *target = &player->animation.paletteBank;
         u32 resource;
         resource = 0x16F;
         *target = resource;
-        player->actionVariantResource = (u32)(gPaletteBankData + (resource << 5));
+        player->animation.palette = (u16 *)(gPaletteBankData + (resource << 5));
     }
     {
         struct DisplaySequenceState *seq;
@@ -2391,26 +2391,26 @@ void Player_UpdateStateMotionCue(struct Player *player)
     if (!(player->tetherFrame)) {
         Sound_PlaySong(490);
         if (player->scriptStatus[0])
-            player->spriteResource = 45;
+            player->animation.paletteBank = 45;
         else if (*(gGameState->counters628 + player->timedEventSlot) > 0)
-            player->spriteResource = 46;
+            player->animation.paletteBank = 46;
         else if (GetStatBonusFlags(player, 0x10000000))
-            player->spriteResource = 0x179;
+            player->animation.paletteBank = 0x179;
         else if (HasHighStatBonusFlag(player))
-            player->spriteResource = 0x175;
+            player->animation.paletteBank = 0x175;
         else if (GetActionFlags(player, 1))
-            player->spriteResource = 0x177;
+            player->animation.paletteBank = 0x177;
         else if (GetStatBonusFlags(player, 0x40000000))
-            player->spriteResource = 0x178;
+            player->animation.paletteBank = 0x178;
         else if (GetStatBonusFlags(player, 0x20000000))
-            player->spriteResource = 0x176;
+            player->animation.paletteBank = 0x176;
         else
-            player->spriteResource = 51;
+            player->animation.paletteBank = 51;
     }
     Player_AddControlFlags(player, 64);
     Player_SetAnimation(player, 154, 64, 1);
-    player->previousPosition = player->position;
-    player->actionVariantResource = (u32)(gPaletteBankData + ((player->spriteResource) * 32));
+    player->animation.position = *(struct ContactPosition *)&player->position;
+    player->animation.palette = (u16 *)(gPaletteBankData + ((player->animation.paletteBank) * 32));
     if ((player->tetherFrame) <= 9) {
         struct DisplaySequenceState *s = &player->cueCollider.sequence;
         struct ContactSwarmSprite *draw;
@@ -2779,7 +2779,7 @@ void PlayerCue_UpdateStandDiagonalB(struct Player *player)
 
 extern u32 gUnk_0200051C, gUnk_02000524;
 
-static inline void ClearAnimationFlags(struct PlayerAnimation *animation, u32 mask)
+static inline void ClearAnimationFlags(struct SceneInputWidget *animation, u32 mask)
 {
     u32 flags = animation->flags;
     flags &= ~mask;
@@ -2803,7 +2803,7 @@ static inline void TargetDash_SetKeyframes(u32 index, void *anim, void *data, u3
     Anim_SetKeyframes(anim, data, selection.sequence, mode, flags);
 }
 
-static inline void TargetDash_StartAnimation(struct Player *player, struct PlayerAnimation *anim,
+static inline void TargetDash_StartAnimation(struct Player *player, struct SceneInputWidget *anim,
                                              void *data, u32 a, u32 b, u32 mode)
 {
     if (player->heading == 0)
@@ -2882,7 +2882,7 @@ static inline void TargetDash_EmitRelativeTargetSpark(struct Player *player)
 
 void PlayerCue_UpdateTargetDash(struct Player *player)
 {
-    struct PlayerAnimation *anim;
+    struct SceneInputWidget *anim;
     void *data;
     u32 animationFrame;
 
@@ -2894,15 +2894,15 @@ void PlayerCue_UpdateTargetDash(struct Player *player)
         gUnk_02000524 = 0;
         (*(struct ContactPosition *)&player->movementStart) =
             (*(struct ContactPosition *)&player->position);
-        (*(struct ContactPosition *)&player->alternatePosition) =
-            (*(struct ContactPosition *)&player->previousPosition);
+        player->secondaryAnimation.position =
+            player->animation.position;
         ClearAnimationFlags(&player->secondaryAnimation, 1);
         Player_SetPendingCallback(player, Player_OnTargetMotionExit);
         Player_EmitQueuedEffects(player);
         Player_NotifyActionCategories(player);
     }
-    player->secondarySpriteResource = player->spriteResource;
-    player->secondaryVariantResource = player->actionVariantResource;
+    player->secondaryAnimation.paletteBank = player->animation.paletteBank;
+    player->secondaryAnimation.palette = player->animation.palette;
     Player_AddControlFlags(player, 9);
     player->statusFlags = ClearStatusFlags(&player->statusFlags, 0x4000) | 0x60000;
 
@@ -2916,8 +2916,8 @@ void PlayerCue_UpdateTargetDash(struct Player *player)
                 Player_SetFacingFromAngle(
                     player,
                     Math_Atan2(
-                        player->cueDestination.x - (*(s16 *)(u32)&player->alternatePosition[0]),
-                        player->cueDestination.z - (*(s16 *)(u32)&player->alternatePosition[2])));
+                        player->cueDestination.x - player->secondaryAnimation.position.x,
+                        player->cueDestination.z - player->secondaryAnimation.position.z));
                 TargetDash_StartAnimation(player, anim, data, 0x1A1, 0x1A6, 1);
             }
             Anim_Step(anim, data);
@@ -2929,11 +2929,11 @@ void PlayerCue_UpdateTargetDash(struct Player *player)
         case 1: {
             s32 deltaX, deltaZ, angle, facingQuadrant;
             u32 frame;
-            deltaX = player->cueDestination.x - (*(s16 *)(u32)&player->alternatePosition[0]);
-            deltaZ = player->cueDestination.z - (*(s16 *)(u32)&player->alternatePosition[2]);
+            deltaX = player->cueDestination.x - player->secondaryAnimation.position.x;
+            deltaZ = player->cueDestination.z - player->secondaryAnimation.position.z;
             angle = Math_Atan2(deltaX, deltaZ);
             ParticlePool_EmitTriple(player->unkA88[0],
-                                    (struct ContactPosition *)&player->alternatePosition,
+                                    &player->secondaryAnimation.position,
                                     (angle + 0x80) & 0xFF, 0);
             frame = player->tetherFrame;
             anim = &player->secondaryAnimation;
@@ -2946,28 +2946,28 @@ void PlayerCue_UpdateTargetDash(struct Player *player)
             Anim_Step(anim, data);
             if (deltaX * deltaX + deltaZ * deltaZ < player->cueSpeed * player->cueSpeed) {
                 player->facing = (((((angle + 0x20) & 0xFF) >> 6) << 1) + 3) & 7;
-                player->alternatePosition[1] = player->cueDestination.y;
+                player->secondaryAnimation.position.y = player->cueDestination.y;
                 Player_SetFacingFromAngle(player, angle);
                 Player_SetActionPhase(player, 2);
                 TargetDash_EmitTargetSpark(player);
             } else {
-                (*(s16 *)(u32)&player->alternatePosition[0]) +=
+                player->secondaryAnimation.position.x +=
                     TruncateQ12(gUnk_086149C4[(angle + 0x40) & 0xFF] * player->cueSpeed);
                 {
                     u32 speed = player->cueSpeed;
-                    (*(s16 *)(u32)&player->alternatePosition[2]) +=
+                    player->secondaryAnimation.position.z +=
                         TruncateQ12(gUnk_086149C4[angle & 0xFF] * speed);
                 }
                 player->facing = (((((angle + 0x20) & 0xFF) >> 6) << 1) + 3) & 7;
                 if (Div(player->movementDuration, 2) < (s32)player->tetherFrame) {
-                    (*(s16 *)(u32)&player->alternatePosition[1]) -= 0x50;
-                    if ((*(s16 *)(u32)&player->alternatePosition[1]) < player->cueDestination.y)
-                        player->alternatePosition[1] = player->cueDestination.y;
+                    player->secondaryAnimation.position.y -= 0x50;
+                    if (player->secondaryAnimation.position.y < player->cueDestination.y)
+                        player->secondaryAnimation.position.y = player->cueDestination.y;
                 } else {
-                    (*(s16 *)(u32)&player->alternatePosition[1]) += 0x50;
-                    if ((*(s16 *)(u32)&player->alternatePosition[1]) >
+                    player->secondaryAnimation.position.y += 0x50;
+                    if (player->secondaryAnimation.position.y >
                         player->cueDestination.y + 1000)
-                        player->alternatePosition[1] = player->cueDestination.y + 1000;
+                        player->secondaryAnimation.position.y = player->cueDestination.y + 1000;
                 }
                 facingQuadrant = ((angle + 0x60) & 0xFF) >> 6;
                 if (facingQuadrant > 1) {
@@ -2984,28 +2984,28 @@ void PlayerCue_UpdateTargetDash(struct Player *player)
             if (player->inputKeys[1] & 2)
                 gUnk_02000524 = 1;
             PlayerCue_InitAttackCollider(
-                player, (struct ContactPosition *)&player->alternatePosition, 1, 0x20);
+                player, &player->secondaryAnimation.position, 1, 0x20);
             break;
         }
         case 2: {
             s32 deltaX, deltaZ, angle;
             if (player->tetherFrame == 0) {
                 Sound_PlaySong(0x4FB);
-                deltaX = player->cueDestination.x - (*(s16 *)(u32)&player->alternatePosition[0]);
-                deltaZ = player->cueDestination.z - (*(s16 *)(u32)&player->alternatePosition[2]);
+                deltaX = player->cueDestination.x - player->secondaryAnimation.position.x;
+                deltaZ = player->cueDestination.z - player->secondaryAnimation.position.z;
                 if (deltaX * deltaX + deltaZ * deltaZ > 0x9C4) {
                     angle = Math_Atan2(deltaX, deltaZ);
                     Player_SetFacingFromAngle(player, angle);
-                    player->alternatePosition[0] =
+                    player->secondaryAnimation.position.x =
                         player->cueDestination.x +
                         TruncateQ12(gUnk_086149C4[(angle + 0x40) & 0xFF] * 0x32);
-                    player->alternatePosition[2] =
+                    player->secondaryAnimation.position.z =
                         player->cueDestination.z + TruncateQ12(gUnk_086149C4[angle & 0xFF] * 0x32);
                 }
                 gUnk_0200051C = 0;
             }
             if (player->tetherFrame == 5) {
-                struct PlayerAnimation *animation;
+                struct SceneInputWidget *animation;
                 if (player->heading == 0) {
                     animation = &player->secondaryAnimation;
                     Anim_SetKeyframes(animation, player->animationData, 0x1A3, 2, 0);
@@ -3031,17 +3031,17 @@ void PlayerCue_UpdateTargetDash(struct Player *player)
         }
         case 3: {
             s32 deltaX, deltaZ, angle;
-            deltaX = player->position.x - (*(s16 *)(u32)&player->alternatePosition[0]);
-            deltaZ = player->position.z - (*(s16 *)(u32)&player->alternatePosition[2]);
+            deltaX = player->position.x - player->secondaryAnimation.position.x;
+            deltaZ = player->position.z - player->secondaryAnimation.position.z;
             angle = Math_Atan2(deltaX, deltaZ);
             if (deltaX * deltaX + deltaZ * deltaZ <= 0xE0F) {
-                (*(struct ContactPosition *)&player->alternatePosition) =
+                player->secondaryAnimation.position =
                     (*(struct ContactPosition *)&player->position);
                 Player_SetActionPhase(player, 4);
             } else {
-                (*(s16 *)(u32)&player->alternatePosition[0]) +=
+                player->secondaryAnimation.position.x +=
                     TruncateQ12(gUnk_086149C4[(angle + 0x40) & 0xFF] * 0x32);
-                (*(s16 *)(u32)&player->alternatePosition[2]) +=
+                player->secondaryAnimation.position.z +=
                     TruncateQ12(gUnk_086149C4[angle & 0xFF] * 0x32);
                 player->tetherFrame++;
                 if (player->tetherFrame > 0x59)

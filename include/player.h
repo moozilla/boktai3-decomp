@@ -9,6 +9,7 @@
 #include "directional_sprite_state.h"
 #include "converging_effect_state.h"
 #include "task.h"
+#include "scene_input_widget.h"
 
 /* Body colliders use a fixed defense in both setup and hit resolution. */
 #define PLAYER_BODY_DEFENSE 0
@@ -105,11 +106,6 @@ struct PlayerCueCollider {
     const void *setupResource, *sideResource, *alternateResource;
 };
 
-struct PlayerAnimation {
-    u8 unknown0[8];
-    u32 flags;
-};
-
 struct PlayerVisualObject {
     u8 unknown0[6];
     u16 resource;
@@ -180,31 +176,11 @@ struct Player {
         *followTarget; /* 0x40: active movement source, reset to the player's own contact object. */
     u8 unk44[0x50 - 0x44];
     u32 visualState;
-    struct PlayerAnimation *activeAnimation;
+    struct SceneInputWidget *activeAnimation;
     u8 unk58[0x6C - 0x58];
     u8 animationData[0x20];           /* 0x6C: keyframe resource */
-    struct PlayerAnimation animation; /* 0x8C */
-    u16 actionCueCounter;             /* 0x98: zero gates phase-one sound in 08146478 (tentative) */
-    u8 unk9A[6];
-    u16 actionCueFlags; /* 0xA0: low two bits gate phase-one sound (tentative) */
-    u8 unkA2[0xA];
-    struct SceneVec previousPosition; /* 0xAC: synchronized after terrain clamp */
-    u8 unkB4[0xC];
-    u8 movementSpeedScale;  /* 0xC0: mode-five speed scale, units of 1/64 */
-    u8 secondarySpeedScale; /* 0xC1: paired with movementSpeedScale by 08145400 (tentative) */
-    u8 unkC2[4];
-    u16 spriteResource; /* 0xC6 */
-    u8 unkC8[0xC];
-    u32 actionVariantResource; /* 0xD4: forwarded to variant display */
-    u8 unkD8[0x14];
-    struct PlayerAnimation secondaryAnimation; /* 0xEC: alternate keyframe channel */
-    u8 unkF8[0x14];
-    u16 alternatePosition[3]; /* 0x10C */
-    u8 unk112[0x14];
-    u16 secondarySpriteResource;
-    u8 unk128[0xC];
-    u32 secondaryVariantResource;
-    u8 unk138[0x14];
+    struct SceneInputWidget animation;          /* 0x8C: body sprite and its keyframe playback */
+    struct SceneInputWidget secondaryAnimation; /* 0xEC: alternate keyframe channel */
     u32 secondaryDrawFlags; /* 0x14C: bit zero follows reset flag one */
     u8 unk150[3];
     u8 secondaryPriority;

@@ -35,7 +35,7 @@ void Player_UpdateThrowAction(struct Player *p)
                 *((u8 *)p + 0xBF6) = 1;
             Player_SetAnimationIndex(p, ActorVariant_GetTableValue(p->actionMode, 0x17), 0x40);
             {
-                if (p->actionMode == 1 && p->actionCueFlags == 2 && p->actionCueCounter == 0)
+                if (p->actionMode == 1 && p->animation.frameIndex == 2 && p->animation.elapsed == 0)
                     Player_StartDirectionalEffect(p, p->facing, &p->position);
             }
             if (Player_UpdateSweepAction(p))
