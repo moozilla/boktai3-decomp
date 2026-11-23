@@ -136,7 +136,6 @@ void SceneActorReaction_UpdateContactRoute(struct ChaseActor *actor)
     struct SceneActorChaseGroup *group = &actor->group;
     s32 speed, event;
     struct ContactRouteFlagOwner motionFlags;
-    u32 durationMask;
     if (SceneActorControl_TakeStateEntry(actor)) {
         DEBUG_PRINT();
     }
@@ -145,8 +144,7 @@ void SceneActorReaction_UpdateContactRoute(struct ChaseActor *actor)
     if (sub_0812F3CC(actor))
         return;
     speed = Callback_InvokeActor(actor, actor->base.animationQuery.opaque);
-    durationMask = 0xA02F;
-    ContactRoute_ApplyDuration(actor, durationMask, &motionFlags);
+    ContactRoute_ApplyDuration(actor, 0xA02F, &motionFlags);
     event = NavMesh_ConsumeProbeEvent(group->route);
     if (event) {
         if (SceneActorBehavior_RequestDescriptorTurn(actor, group->route, 32, 32, speed)) {

@@ -117,15 +117,13 @@ void SceneActorRoute_UpdateContactRecovery(struct ChaseActor *actor)
         }
     }
     if (((s32)actor->base.counter2AC) > 60) {
-        u32 destinationOffset;
         struct ContactPosition **destination;
         SceneActorTerrain_EnterState(actor, 0, 0, 7);
         SceneActorChase_SetControl(actor, actor->base.onAlternateEntry, 1);
-        destinationOffset = 0x200;
-        destination = (void *)((u8 *)group + destinationOffset);
+        destination = (void *)((u8 *)group + 0x200);
         (*destination)->pad = 1;
         if (!TryRoute(actor, group->route, &actor->base.body.position, *destination, motionFlags,
-                      destinationOffset)) {
+                      0x200)) {
             Callback_InvokeActor(actor, group->fallback);
             return;
         }
