@@ -425,9 +425,11 @@ void SceneActor_ConfigureSecondaryProfileEntry(struct ChaseActor *actor)
 
 void Dog_OnBodyCollision(struct ContactCollider *collider, s32 a, s32 b);
 
-void Dog_OnSensorContact(u8 *unused, u8 *obj, u8 *ctx);
+void Dog_OnSensorContact(struct ContactCollider *unused, struct ContactCollider *other,
+                         struct ChaseActor *actor);
 
-void Dog_OnAttackContact(u8 *collider, u8 *other, struct ChaseActor *actor);
+void Dog_OnAttackContact(struct ContactCollider *collider, struct ContactCollider *other,
+                         struct ChaseActor *actor);
 
 void SceneActorCollision_InitBody(struct ChaseActor *, void *, void *, void *, void *);
 
@@ -1134,89 +1136,29 @@ void SceneActorAnimation_SpawnTrailAtPosition(void *position, u32 palette)
         SceneMovingParticle_CreateWithOptions(position, result, 60, 4, 3);
 }
 
-inline static u8 blocked2048(u8 *c)
-{
-    u32 mask;
-    u32 *p;
-    u32 off;
-    if (!c)
-        goto zero;
-    mask = 0x40;
-    off = 0xB5;
-    off <<= 2;
-    p = (u32 *)(c + off);
-    if ((*((u16 *)p)) & mask)
-        goto one;
-    mask = 0x80;
-    mask <<= 10;
-    off -= 4;
-    p = (u32 *)(c + off);
-    if ((*p) & mask)
-        goto one;
-    if ((*((s16 *)(c + 0x9C))) > 0)
-        goto zero;
-one:
-    return 1;
-zero:
-    return 0;
-}
-
-void Dog_OnSensorContact(u8 *unused, u8 *obj, u8 *ctx)
+void Dog_OnSensorContact(struct ContactCollider *unused, struct ContactCollider *other,
+                         struct ChaseActor *actor)
 {
     int mask;
     u32 *flags;
-    if ((blocked2048(ctx) == 0) && ((*((u16 *)(obj + 0xA))) & 0xF)) {
-        *((u32 *)(ctx + 0x304)) = *((u16 *)(obj + 4));
-        flags = (u32 *)(ctx + 0x2D0);
+    if ((ActorStatus_IsDown(actor) == 0) && (other->contactFlags & 0xF)) {
+        actor->base.counter304 = other->collisionId;
+        flags = &actor->base.statusFlags;
         mask = 0xFEFFFFFF;
         *flags &= mask;
     }
 }
 
-inline static u8 blockedFirst(u8 *c)
-{
-    u32 mask;
-    u32 *p;
-    u32 off;
-    if (!c)
-        goto zero;
-    mask = 0x40;
-    off = 0xB5;
-    off <<= 2;
-    p = (u32 *)(c + off);
-    if ((*((u16 *)p)) & mask)
-        goto one;
-    mask = 0x80;
-    mask <<= 10;
-    off -= 4;
-    p = (u32 *)(c + off);
-    if ((*p) & mask)
-        goto one;
-    if ((*((s16 *)(c + 0x9C))) > 0)
-        goto zero;
-one:
-    return 1;
-zero:
-    return 0;
-}
-
-static inline void Delta(struct ContactPosition *out, struct ContactPosition *to,
-                         struct ContactPosition *from)
-{
-    out->x = to->x - from->x;
-    out->y = to->y - from->y;
-    out->z = to->z - from->z;
-}
-
-void Dog_OnAttackContact(u8 *collider, u8 *other, struct ChaseActor *actor)
+void Dog_OnAttackContact(struct ContactCollider *collider, struct ContactCollider *other,
+                         struct ChaseActor *actor)
 {
     union SceneActorRegistryPackedPosition position;
     struct ContactPosition delta;
     s32 direction;
     struct ChaseActor *facingActor = actor;
-    if (blockedFirst((u8 *)actor))
+    if (ActorStatus_IsDown(actor))
         return;
-    position.position = *(struct ContactPosition *)(collider + 0x24);
+    position.position = *(struct ContactPosition *)&collider->x;
     direction = ((facingActor->base.body.direction + 0x20) & 0xFF) >> 6;
     switch (direction) {
         case 0:
@@ -1232,17 +1174,12 @@ void Dog_OnAttackContact(u8 *collider, u8 *other, struct ChaseActor *actor)
             position.packed.z += 0x100;
             break;
     }
-    {
-        struct ContactPosition *out = &delta;
-        struct ContactPosition *from = &position.position;
-        struct ContactPosition *to = (struct ContactPosition *)(other + 0x24);
-        Delta(out, to, from);
-    }
-    collider[0x42] = Math_Atan2(delta.x, delta.z);
-    if (!blocked2048((u8 *)actor) && (*(u16 *)(other + 0xA) & 0xF)) {
+    Chase_Delta(&delta, &position.position, (struct ContactPosition *)&other->x);
+    collider->direction = Math_Atan2(delta.x, delta.z);
+    if (!ActorStatus_IsDown(actor) && (other->contactFlags & 0xF)) {
         u32 *flags;
         s32 mask;
-        actor->base.counter304 = *(u16 *)(other + 4);
+        actor->base.counter304 = other->collisionId;
         flags = &actor->base.statusFlags;
         mask = 0xFEFFFFFF;
         *flags &= mask;
