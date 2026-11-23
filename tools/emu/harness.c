@@ -29,6 +29,9 @@
 //   probe NAME ADDR     log registers before executing ADDR (hex) to probes.tsv
 //   watchpc ADDR LO HI  arm a latch: set when ADDR (hex) executes with r0 in
 //                       [LO, HI] (decimal), e.g. Text_LookupString of a string
+//   tick ADDR           the function holdt counts (hex), e.g. the game's input read
+//   holdt KEYS N        hold keys (NONE for none) until ADDR has run N more times:
+//                       inputs keyed to game ticks, so lag frames do not shift them
 //   waitpc MAX [N]      run until the armed latch is set (N times, default 1; at most MAX frames;
 //                       the rest of that frame runs too), then disarm it
 //   unprobe             remove all probes; probes also work with trace off
@@ -278,11 +281,14 @@ static void poke(uint32_t addr, uint32_t size, uint32_t val) {
 static uint32_t until_pc;
 static int32_t until_lo, until_hi;
 static int until_hit;
+// holdt: calls of tick_pc so far
+static uint32_t tick_pc;
+static int tick_hits;
 
 static void run_frames(int n) {
 	for (int f = 0; f < n; ++f) {
 		for (int i = 0; i < nfreeze; ++i) poke(freezes[i].addr, freezes[i].size, freezes[i].val);
-		if (!tracing && !nprobes && !until_pc && !draw_trace_active()) { core->runFrame(core); continue; }
+		if (!tracing && !nprobes && !until_pc && !tick_pc && !draw_trace_active()) { core->runFrame(core); continue; }
 		uint32_t frame = core->frameCounter(core);
 		while (core->frameCounter(core) == frame) {
 			// ARMRun processes events before executing an instruction. Drain
@@ -301,6 +307,8 @@ static void run_frames(int n) {
 			}
 			if (until_pc && pc == until_pc && (int32_t)cpu->gprs[0] >= until_lo && (int32_t)cpu->gprs[0] <= until_hi)
 				until_hit++;
+			if (tick_pc && pc == tick_pc)
+				tick_hits++;
 			core->step(core);
 		}
 	}
@@ -454,6 +462,14 @@ int main(int argc, char** argv) {
 		if (sscanf(line, "%63s %255s %63s", cmd, a1, a2) < 1) continue;
 		if (!strcmp(cmd, "wait")) { core->setKeys(core, 0); run_frames(atoi(a1)); }
 		else if (!strcmp(cmd, "hold")) { core->setKeys(core, parse_keys(a1)); run_frames(atoi(a2)); core->setKeys(core, 0); }
+		else if (!strcmp(cmd, "tick")) { tick_pc = (uint32_t) strtoul(a1, NULL, 16); tick_hits = 0; }
+		else if (!strcmp(cmd, "holdt")) {
+			int want = atoi(a2), f = 0;
+			core->setKeys(core, strcmp(a1, "NONE") ? parse_keys(a1) : 0);
+			tick_hits = 0;
+			while (tick_pc && tick_hits < want && f < want * 60 + 600) { run_frames(1); ++f; }
+			if (tick_hits < want) fprintf(stderr, "holdt: %d of %d ticks\n", tick_hits, want);
+		}
 		else if (!strcmp(cmd, "tap")) { core->setKeys(core, parse_keys(a1)); run_frames(2); core->setKeys(core, 0); run_frames(8); }
 		else if (!strcmp(cmd, "shot")) shot(a1);
 		else if (!strcmp(cmd, "save")) savestate(a1, 0);
