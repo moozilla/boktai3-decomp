@@ -1,4 +1,5 @@
 #include "mimic.h"
+#include "math_shift.h"
 #include "scene_actor_visibility.h"
 #include "scene_actor_turn.h"
 #include "scene_actor_terrain.h"
@@ -183,18 +184,11 @@ static inline void CellCenter(struct ContactPosition *out, u32 cell)
     out->z = (z << 8) + 0x80;
 }
 
-static inline s32 Scale12(s32 n)
-{
-    if (n >= 0)
-        return n >> 12;
-    return -((-n) >> 12);
-}
-
 static inline void Polar(struct ContactPosition *out, u32 angle, s32 speed)
 {
-    out->x = Scale12(gUnk_086149C4[(angle + 0x40) & 0xFF] * speed);
+    out->x = Math_ShiftTowardZero(gUnk_086149C4[(angle + 0x40) & 0xFF] * speed, 12);
     out->y = 0;
-    out->z = Scale12(gUnk_086149C4[angle & 0xFF] * speed);
+    out->z = Math_ShiftTowardZero(gUnk_086149C4[angle & 0xFF] * speed, 12);
 }
 
 static inline void RouteDelta(struct ContactPosition *out, struct ContactPosition *from,
