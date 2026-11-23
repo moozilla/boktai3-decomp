@@ -57,16 +57,14 @@ void sub_08108C94(struct SlotMonitor *obj)
     }
     if (obj->result >= 0) {
         u16 *base;
-        s32 none;
         obj->ticks++;
         base = obj->peers;
-        none = 0xFFFF;
         for (i = 0; i < 4; i++) {
             u16 peer[1];
             u16 v;
             peer[0] = base[i];
             v = peer[0];
-            if (v != none) {
+            if (v != 0xFFFF) {
                 if ((u8)first) {
                     if (v == (0x1BC0 | obj->config)) {
                         matches++;
