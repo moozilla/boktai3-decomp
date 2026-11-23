@@ -270,7 +270,7 @@ struct Player {
     u8 actionLatch464, actionLatch465;
     u8 colliderHeightOffset; /* 0x466: added to the spiral collider Y position. */
     u8 colliderHeightTarget, colliderHeightRetargetTimer; /* 0x467: hover target and frames until resampling */
-    u8 unk469;
+    u8 directionHold; /* 0x469: frames before the wavering walk picks a new direction (tentative) */
     u8 footstepSide; /* 0x46A: alternates the walking effect and sound */
     u8 movementMode46B;
     u8 unk46C[6];
