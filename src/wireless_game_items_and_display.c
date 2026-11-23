@@ -1169,16 +1169,10 @@ void WirelessGameDisplay_UpdateHidden(struct WirelessGameDisplay *p)
     if (p->entered) {
         struct WirelessGameDrawing *q;
         int i;
-        u32 mask;
         p->entered = 0;
         q = p->drawings;
-        mask = 1;
-        i = 3;
-        do {
-            q->flags |= mask;
-            i--;
-            q++;
-        } while (i >= 0);
+        for (i = 0; i < 4; i++, q++)
+            q->flags |= 1;
     }
     if (p->finished)
         p->finished = 0;
