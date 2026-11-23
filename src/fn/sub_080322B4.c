@@ -1,16 +1,9 @@
 #include "global.h"
-#include "game_state.h"
-static inline u8 TextState_HasPlayerFlag(u32 mask)
-{
-
-    if (mask & gGameState->flags868)
-        return 1;
-    return 0;
-}
+#include "game_state_flags.h"
 
 int TextState_GetPlayerSpeakerLabel(void)
 {
-    if (TextState_HasPlayerFlag(128))
+    if (GameState_TestWorldFlags(128))
         return 28;
     switch (gGameState->form) {
         case 0:

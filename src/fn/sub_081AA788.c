@@ -193,7 +193,6 @@ static inline void SpawnFreeProjectile(struct Vanargand *owner, struct ContactPo
     index = sub_08249350(r >> 3, 6);
     VanargandProjectile_Create(owner->sprite, position, target, spread, sideOffset, index);
 }
-#define Vanargand_UpdateSweepingProjectileAttack sub_081AA788
 void Vanargand_UpdateSweepingProjectileAttack(struct Vanargand *p)
 {
     struct Vanargand *self = p;

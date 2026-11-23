@@ -8,12 +8,12 @@
         __typeof__(actor_) facingActor = (actor_);                                                 \
         s32 shifted;                                                                               \
         u32 value;                                                                                 \
-        facingActor->angle = (heading_);                                                           \
-        shifted = (facingActor->angle + 0x60) >> 6;                                                \
+        facingActor->body.direction = (heading_);                                                  \
+        shifted = (facingActor->body.direction + 0x60) >> 6;                                       \
         value = 3;                                                                                 \
         value &= shifted;                                                                          \
         facingActor->facing = value;                                                               \
-        shifted = (facingActor->angle + 0x70) >> 5;                                                \
+        shifted = (facingActor->body.direction + 0x70) >> 5;                                       \
         value = 7;                                                                                 \
         value &= shifted;                                                                          \
         facingActor->facing8 = value;                                                              \

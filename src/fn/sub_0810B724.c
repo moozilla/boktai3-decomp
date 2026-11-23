@@ -4,6 +4,7 @@
 #include "ram.h"
 #include "runtime.h"
 #include "area_effect_link.h"
+#include "engine_pause_flags.h"
 
 struct Reg1745Run {
     u8 pad0[0x1c];
@@ -35,14 +36,6 @@ void Registry1745_BeginShutdown(void *, void (*)(void));
 void ScriptPanel_OpenTextWindow(void);
 void System_ShutdownAndSoftReset(void);
 
-static inline void FlagSet(u32 m)
-{
-    gEnginePauseFlags |= m;
-}
-static inline void FlagClear(u32 m)
-{
-    gEnginePauseFlags &= ~m;
-}
 
 static inline u8 Registry1745_FinishIfRequested(struct Reg1745Run *p)
 {
@@ -96,7 +89,7 @@ u32 Registry1745_RunSession(struct Reg1745Run *p)
             gLinkSessionStep = 6;
             if (q->field48 == -3) {
                 if (st != 0xb)
-                    FlagSet(1);
+                    Engine_SetPauseFlags(1);
                 gLinkSessionStep = 8;
                 if (q->field1F <= 0xfe) {
                     q->field1F++;
@@ -106,7 +99,7 @@ u32 Registry1745_RunSession(struct Reg1745Run *p)
                 gLinkSessionStep = 9;
                 return 0;
             }
-            FlagClear(1);
+            Engine_ClearPauseFlags(1);
             q->field1F = 0;
             gLinkSessionStep = 10;
         }

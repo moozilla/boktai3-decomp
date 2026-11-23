@@ -1,7 +1,6 @@
 #include "global.h"
 #include "render.h"
-#define Hud_SetPhase        Hud_SetUpdateCallback
-#define gDisplayUpdateFlags gEnginePauseFlags
+#include "engine_pause_flags.h"
 struct HudManager {
     u8 pad0[0xA12];
     u16 savedControl;
@@ -11,17 +10,13 @@ struct HudManager {
 s32 SceneHud_CanOpenFromStart(struct HudManager *);
 void Hud_SetUpdateCallback(struct HudManager *, void (*)(void));
 void SceneDialog_UpdateEntryFade(void);
-static inline void SetFlags(u32 mask)
-{
-    gEnginePauseFlags |= mask;
-}
 s32 Hud_BeginSavedBlend(struct HudManager *p)
 {
     s32 result;
     if (!SceneHud_CanOpenFromStart(p)) {
         result = 0;
     } else {
-        SetFlags(4);
+        Engine_SetPauseFlags(4);
         p->savedControl = gFadeMultiplier;
         p->savedBlend[0] = gBgFadeColor;
         p->savedBlend[1] = gBgFadeBankMask;

@@ -1,50 +1,10 @@
 #include "global.h"
+#include "ratatosk.h"
 #include "engine.h"
 #include "input.h"
 #include "ram.h"
-struct RatatoskPosition {
-    u32 packedXY, packedZ;
-};
-struct Ratatosk {
-    u8 pad0[0x54];
-    s16 x, y, z;
-    u8 pad5A[0xaa - 0x5a];
-    u8 animation, mode, padAC[2], state, inputMode, active;
-    u8 padB1[0xc4 - 0xb1];
-    u32 timer;
-    u8 padC8[0x17c - 0xc8];
-    u32 animationTimer;
-    s32 sequence;
-    u32 animationFlag;
-    u8 pad188[0x49c - 0x188];
-    s32 animationIndex;
-    u8 pad4A0[0xcc8 - 0x4a0];
-    s32 cloneTimer;
-    struct RatatoskPosition positions[9];
-    u8 padD14[0xe5a - 0xd14];
-    u16 repeatCount;
-    struct RatatoskPosition position;
-    u8 padE64[8];
-    u16 duration;
-    s16 cloneReady;
-    u8 padE70[0xe7c - 0xe70];
-    u16 recovery;
-    u8 padE7E[0xe96 - 0xe7e];
-    s16 pendingCount;
-    u8 padE98[0xef8 - 0xe98];
-    u16 spawnClone;
-};
 s32 Mod(s32, s32);
 u32 HomingProjectile_GetActiveCount(void);
-static inline u8 ConsumeActivation(struct Ratatosk *p)
-{
-    if (p->active) {
-        p->active = 0;
-        p->inputMode = 0;
-        return 1;
-    }
-    return 0;
-}
 static inline u32 NextRandom(const u16 *table)
 {
     gRandomIndex = (gRandomIndex + 1) & 1023;
@@ -63,85 +23,71 @@ void Player_ClearFlag740(void);
 void Ratatosk_UpdateCloneAttack(struct Ratatosk *p)
 {
     struct Ratatosk *q = p;
-    if (ConsumeActivation(q) == 1) {
-        if (p->pendingCount > 0) {
-            u32 animation = 10;
-            q->animation = animation;
+    if (Ratatosk_ConsumeActionEntry(q) == 1) {
+        if (p->healthPhase > 0) {
+            Ratatosk_SetAnimation(q, 10);
             p->sequence = 0;
         } else {
-            u32 animation = 6;
-            q->animation = animation;
+            Ratatosk_SetAnimation(q, 6);
             p->sequence = 1;
         }
         p->sequence = 0;
-        p->repeatCount = 0;
+        p->repeat = 0;
     }
     {
         s32 *sequence = &p->sequence;
         switch (*sequence) {
             case 0:
-                if (q->inputMode) {
+                if (q->actionFinished) {
                     *sequence = 1;
-                    {
-                        u32 animation = 6;
-                        q->animation = animation;
-                    }
+                    Ratatosk_SetAnimation(q, 6);
                 }
                 break;
             case 1:
-                if (q->inputMode) {
+                if (q->actionFinished) {
                     *sequence = 2;
-                    {
-                        u32 animation = 4;
-                        q->animation = animation;
-                    }
+                    Ratatosk_SetAnimation(q, 4);
                     p->cloneTimer = 0;
                 }
                 break;
             case 2:
-                if (q->inputMode) {
-                    if (++p->repeatCount > 5) {
+                if (q->actionFinished) {
+                    if (++p->repeat > 5) {
                         *sequence = 3;
-                        {
-                            u32 animation = 8;
-                            q->animation = animation;
-                        }
+                        Ratatosk_SetAnimation(q, 8);
                         p->duration = 128;
                         {
                             s32 x = 1060;
                             x += RandomModulo(2230);
-                            p->x = x;
+                            p->body.position.x = x;
                         }
                         {
                             s32 z = 1320;
                             z += RandomModulo(1710);
-                            p->z = z;
+                            p->body.position.z = z;
                         }
                     } else {
                         p->duration = 32;
                         gRandomIndex = (gRandomIndex + 1) & 1023;
-                        p->position =
-                            *(struct RatatoskPosition *)((Mod(*(const u16 *)(gRandomIndex * 2 +
-                                                                             (u32)gRandomTable),
-                                                              9) *
-                                                              8 +
-                                                          (u32)p) +
-                                                         0xccc);
-                        {
-                            u32 animation = 4;
-                            q->animation = animation;
-                        }
+                        p->destination =
+                            *(struct ContactPosition *)((Mod(*(const u16 *)(gRandomIndex * 2 +
+                                                                            (u32)gRandomTable),
+                                                             9) *
+                                                             8 +
+                                                         (u32)p) +
+                                                        0xccc);
+                        Ratatosk_SetAnimation(q, 4);
                     }
                 }
                 break;
             case 3:
-                if (p->cloneReady > 0) {
-                    p->spawnClone = 1;
+                if (p->frameDamage > 0) {
+                    p->pendingAttack = 1;
                     PlayerClone_BeginActiveReactions();
                 }
                 if (PlayerClone_GetActiveCount() == 0) {
-                    p->animationFlag = 1;
-                    p->recovery = 60;
+                    p->sequenceDone = 1;
+                    p->flashTimer = 60;
                     Player_SetFlag740();
                 } else {
                     Player_ClearFlag740();

@@ -1,11 +1,6 @@
 #include "status_screen.h"
 #include "render.h"
 
-static inline void StatusScreen_SetState(struct StatusScreen *p, StatusScreenFn state)
-{
-    p->state = state;
-    p->timer = 0;
-}
 
 void StatusScreen_BeginClose(struct StatusScreen *p)
 {

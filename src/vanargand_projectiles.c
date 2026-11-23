@@ -617,17 +617,9 @@ void VanargandAfterimagePool_ActivateSlot(struct VanargandAfterimage *afterimage
     afterimage->sprite.position = *position;
 }
 
-static inline void CpuSetC(void *dst, u32 control, const void *src)
-{
-    CpuSet(src, dst, control);
-}
-
 void VanargandAfterimagePool_InitializeSlot(void *pool, struct VanargandAfterimage *slot, s32 index)
 {
-    u32 zero;
     struct ContactSwarmSprite *sprite;
-    void *position;
-    const void *source;
     slot->lifetime = 0;
     AnimData_Load(&slot->graphics, 0x8202);
     AnimData_SelectPaletteBank(&slot->graphics, 0x6f);
@@ -636,10 +628,7 @@ void VanargandAfterimagePool_InitializeSlot(void *pool, struct VanargandAfterima
     Sprite_Init(sprite, &slot->graphics, 1);
     sprite->frame = 8;
     sprite->priority = 1;
-    position = &slot->sprite.position;
-    zero = 0;
-    source = (const void *)&zero;
-    CpuSetC(position, 0x05000002, source);
+    ZeroFill8(&slot->sprite.position);
 }
 
 void VanargandAfterimagePool_ReleaseSlot(struct VanargandAfterimagePool *pool,

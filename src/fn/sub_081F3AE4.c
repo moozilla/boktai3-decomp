@@ -1,28 +1,6 @@
 #include "global.h"
-#include "ratatosk_facing.h"
+#include "ratatosk.h"
 #include "render.h"
-typedef struct ActorAnimation {
-    u8 pad0[0x51];
-    u8 angle;
-    u8 pad52[0x4a];
-    u32 flags;
-    u8 padA0[8];
-    u8 facing, facing8;
-    u8 padAA[4];
-    u8 state, finished, enter, changed;
-    u8 padB2[2];
-    u8 padB4[0x18];
-    u8 requestedAngle;
-    u8 padCD[0x37];
-    void *callback;
-    u8 pad108[0x224];
-    u8 animation[0x20];
-    u8 animationData[0x60];
-    u8 polar[0xab0];
-    u8 target[0x10];
-    u16 count;
-} ActorAnimation;
-
 void SceneActors_StartEightDirectionAnimation(void *, void *, void *, int, int, int, int);
 void SceneActors_StartDirectionalAnimation(void *, void *, void *, int, int, int, int);
 void PolarInterpolation_SetCurrentFromPoint(void *, void *);
@@ -32,54 +10,29 @@ void Sound_PlaySong(int);
 int ActorResource_GetFixedId(void *);
 int Callback_InvokeActor(void *, void *);
 void TemporaryAnimationPool_CreateEntry(void *, int, int, int, void *);
-void SceneActorAnimation_UpdateDiveApproach(ActorAnimation *p, int tick)
+void SceneActorAnimation_UpdateDiveApproach(struct Ratatosk *p, int tick)
 {
-    ActorAnimation *p2 = p;
-    u8 *position = (u8 *)p + 0x48;
-    RATATOSK_SET_FACING(p, p->requestedAngle);
-    {
-        u32 mask = 8;
-        p->flags = p->flags | mask;
-    }
-    if (p->changed) {
-        p->changed = 0;
+    struct Ratatosk *p2 = p;
+    struct SceneActorBody *body = &p->body;
+    Ratatosk_SetFacing(p, p->requestedAngle);
+    Ratatosk_SetFlags(p, 8);
+    if (p->actionChanged) {
+        p->actionChanged = 0;
+        SceneActors_StartDirectionalAnimation(p, p->animationData, p->animation, 0x14, 1, 4, 4);
+        PolarInterpolation_SetCurrentFromPoint(&p->motionPath, &p->body.position);
         {
-            int off = 0x34c;
-            u8 *data;
-            u8 *anim;
-            data = (u8 *)p + off;
-            anim = p->animation;
-            SceneActors_StartDirectionalAnimation(p, data, anim, 0x14, 1, 4, 4);
-        }
-        PolarInterpolation_SetCurrentFromPoint(p->polar, (u8 *)p + 0x54);
-        {
-            int off2 = 0xe5c;
-            u8 *dst;
-            u16 *count;
-            dst = (u8 *)p + off2;
-            {
-                int off3 = 0xe6c;
-                count = (u16 *)((u8 *)p + off3);
-            }
-            sub_082222BC(p->polar, dst, *count);
-            if (p->state != 5) {
-                if (*count <= 64)
+            sub_082222BC(&p->motionPath, &p->destination, p->duration);
+            if (p->actionPhase != 5) {
+                if (p->duration <= 64)
                     Sound_PlaySong(0x567);
                 else
                     Sound_PlaySong(0x56c);
             }
         }
     } else {
-        {
-            int off = 0x34c;
-            u8 *data;
-            u8 *anim;
-            data = (u8 *)p + off;
-            anim = p->animation;
-            SceneActors_StartDirectionalAnimation(p, data, anim, 0x14, 1, 4, 1);
-        }
+        SceneActors_StartDirectionalAnimation(p, p->animationData, p->animation, 0x14, 1, 4, 1);
     }
-    if (!(u8)Callback_InvokeActor(p, p->callback)) {
+    if (!(u8)Callback_InvokeActor(p, p->actionTryUpdate)) {
         if (!(tick & 3)) {
             int id = ActorResource_GetFixedId(p2);
             {
@@ -87,15 +40,11 @@ void SceneActorAnimation_UpdateDiveApproach(ActorAnimation *p, int tick)
                 TemporaryAnimationPool_CreateEntry(p2->animationData, 8, 0x200, 0xe011, data);
             }
         }
-        if (p2->count == 0x20) {
-            u32 mask = 0x40000;
-            p->flags = p->flags | mask;
-        }
-        if (p2->count <= 0x40) {
-            u32 mask = 0x40;
-            p->flags = p->flags | mask;
-        }
-        if (Interp_Step(p2->polar, position + 12))
-            p->finished = 1;
+        if (p2->duration == 0x20)
+            Ratatosk_SetFlags(p, 0x40000);
+        if (p2->duration <= 0x40)
+            Ratatosk_SetFlags(p, 0x40);
+        if (Interp_Step(&p2->motionPath, &body->position))
+            p->actionFinished = 1;
     }
 }

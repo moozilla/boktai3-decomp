@@ -1,29 +1,17 @@
 #include "global.h"
-struct Animation {
-    u8 pad[12];
-    u16 timer;
-    u8 flag;
-};
-struct P {
-    u8 pad[0x85c];
-    int countdown;
-    struct Animation animation;
-};
-int ScenePool_UpdateProximityCooldown(struct P *p)
+#include "scene_pool.h"
+
+int ScenePool_UpdateProximityCooldown(struct ScenePoolActor *p)
 {
-    int alias;
-    struct Animation *animation = &p->animation;
-    alias = 0;
-    if (p->countdown > alias) {
-        u32 zero;
-        p->countdown--;
-        zero = alias;
-        animation->timer = alias;
-        animation->flag = zero;
-        return alias;
+    struct SpatialEntry *collider = &p->proximityCollider;
+
+    if (p->proximityCooldown > 0) {
+        p->proximityCooldown--;
+        collider->kind = 0;
+        collider->hit = 0;
+        return 0;
     }
-    if (animation->timer) {
+    if (collider->kind)
         return 1;
-    }
-    return alias;
+    return 0;
 }

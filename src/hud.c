@@ -1,6 +1,8 @@
 #include "hud.h"
 #include "sun_clock.h"
 #include "link_session_state.h"
+#include "engine_pause.h"
+#include "word_flags.h"
 
 extern u16 gUnk_03005178;
 
@@ -283,10 +285,6 @@ static inline u8 SlotCount(s32 slot)
     return gLinkSession->playerValues[slot];
 }
 
-static inline u32 testFlags(const u32 *flags, u32 mask)
-{
-    return *flags & mask;
-}
 
 static inline u8 testFlag(u32 mask, u32 *flags)
 {
@@ -295,10 +293,6 @@ static inline u8 testFlag(u32 mask, u32 *flags)
     return FALSE;
 }
 
-static inline u32 LinkFlags(u32 mask)
-{
-    return (gEngineFlags | gScenePauseFlags) & mask;
-}
 
 static inline s32 TimedEventValue(u32 slot)
 {
@@ -347,7 +341,7 @@ void Hud_DrawWarningMeter(struct SceneHudState *hud, s32 mode, u32 x, u32 y)
         if (mode == 1)
             pulse = 0x29F;
         else if (testFlag(0x80, &gGameState->flags868) || hud->controlMode == 8 ||
-                 testFlags(&hud->actionOwner->statusFlags, 0x10)) {
+                 WordFlags_Test(&hud->actionOwner->statusFlags, 0x10)) {
             u32 frame = hud->meterPulseFrame;
             pulse = 0x29F;
             if (frame > 0x24) {
@@ -366,7 +360,7 @@ void Hud_DrawWarningMeter(struct SceneHudState *hud, s32 mode, u32 x, u32 y)
         }
         if (gBgPaletteBank13Color10 != pulse)
             gBgPaletteBank13Color10 = pulse;
-        if (LinkFlags(0x800))
+        if (Engine_PauseBits(0x800))
             count = SlotCount(OwnerIndex());
         else
             count = gGameState->unk876;

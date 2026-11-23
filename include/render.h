@@ -146,6 +146,11 @@ static inline void Bg_EnableDisplay(s32 mask)
 {
     gDispCntShadow |= mask;
 }
+
+static inline void Bg_DisableDisplay(s32 mask)
+{
+    gDispCntShadow &= ~mask;
+}
 /* 0x03004BE0 */
 extern u16 gBgTileUploadParamA[]; /* per-layer tile-upload parameter (4) */
 /* 0x03004BEC */

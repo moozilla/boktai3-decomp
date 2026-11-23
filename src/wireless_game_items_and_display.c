@@ -26,55 +26,43 @@ int WirelessGame_TryAddCyclingItem(void *owner)
 {
     struct WirelessGameExchange *p = WirelessExchange_Get();
     int index;
-    u8 *choice, *counts;
+    u8 *counts;
+
     if (!p)
-        goto unavailable;
-    {
-        if (!++p->counter) {
-            int mask = 255;
-            p->counter |= mask;
-        }
-        if (p->counter != 1) {
-        unavailable:
-            return 0;
-        }
-        {
-            {
-                u8 *field = &p->choice;
-                int value;
-                value = *field;
-                choice = field;
-                switch (value) {
-                    case 8:
-                        index = 3;
-                        break;
-                    case 7:
-                        index = 1;
-                        break;
-                    case 6:
-                    default:
-                        index = 2;
-                        break;
-                }
-            }
-            counts = p->local.counts;
-            if (counts[index] <= 4) {
-                int total = 0, i = 0;
-                do {
-                    total += counts[i];
-                } while (++i <= 3);
-                if (total <= 9) {
-                    WirelessGameItems_QueueLocalItem(owner, index, 1);
-                    counts[index]++;
-                    WirelessGame_AddWeightedScore(2, 1);
-                    Sound_PlaySong(885);
-                    if (++*choice > 8)
-                        *choice = 6;
-                }
-            }
-            return 1;
+        return 0;
+    p->counter++;
+    if (!p->counter)
+        p->counter = 0xFF;
+    if (p->counter != 1)
+        return 0;
+    switch (p->choice) {
+        case 8:
+            index = 3;
+            break;
+        case 7:
+            index = 1;
+            break;
+        case 6:
+        default:
+            index = 2;
+            break;
+    }
+    counts = p->local.counts;
+    if (counts[index] <= 4) {
+        int total = 0, i = 0;
+        do {
+            total += counts[i];
+        } while (++i <= 3);
+        if (total <= 9) {
+            WirelessGameItems_QueueLocalItem(owner, index, 1);
+            counts[index]++;
+            WirelessGame_AddWeightedScore(2, 1);
+            Sound_PlaySong(885);
+            if (++p->choice > 8)
+                p->choice = 6;
         }
     }
+    return 1;
 }
 
 void WirelessGame_NotifyPlayerDefeated(void)
@@ -1181,16 +1169,10 @@ void WirelessGameDisplay_UpdateHidden(struct WirelessGameDisplay *p)
     if (p->entered) {
         struct WirelessGameDrawing *q;
         int i;
-        u32 mask;
         p->entered = 0;
         q = p->drawings;
-        mask = 1;
-        i = 3;
-        do {
-            q->flags |= mask;
-            i--;
-            q++;
-        } while (i >= 0);
+        for (i = 0; i < 4; i++, q++)
+            q->flags |= 1;
     }
     if (p->finished)
         p->finished = 0;

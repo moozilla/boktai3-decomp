@@ -2,7 +2,6 @@
 #include "paired_scene_actor.h"
 
 // confidence=low: coordinates paired animations with an offset motion track.
-#define Vanargand_UpdateMovingPairAttack sub_081A93A0
 struct MovingPairActor {
     u8 pad0[0x54];
     struct MotionTrackVector position;

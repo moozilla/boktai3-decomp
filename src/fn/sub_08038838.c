@@ -1,5 +1,6 @@
 #include "wireless_trade_menu.h"
 #include "global.h"
+#include "word_flags.h"
 
 void WirelessGame_AddWeightedScore(int, int);
 int WirelessExchange_SendPacket(struct WirelessGameExchange *, int, const u32 *, int);
@@ -9,10 +10,6 @@ void WirelessGameMenu_ConsumeSelectedEquipment(struct WirelessGameExchange *);
 void WirelessExchange_ApplyReceivedCounts(struct WirelessGameExchange *);
 void WirelessGameMenu_SignalStatusPanel(struct WirelessGameExchange *);
 
-static inline u32 test(u32 *flags, u32 mask)
-{
-    return *flags & mask;
-}
 
 void WirelessGameMenu_UpdateSelectionExchange(struct WirelessGameExchange *p)
 {
@@ -68,7 +65,7 @@ void WirelessGameMenu_UpdateSelectionExchange(struct WirelessGameExchange *p)
         WirelessGameMenu_ConsumeSelectedItem(p);
         WirelessGameMenu_ConsumeSelectedEquipment(p);
     }
-    if (test(&p->exchangeFlags, 12) == 12) {
+    if (WordFlags_Test(&p->exchangeFlags, WIRELESS_EXCHANGE_SELECTION) == WIRELESS_EXCHANGE_SELECTION) {
         WirelessExchange_ApplyReceivedCounts(p);
         {
             u32 mask = ~12;

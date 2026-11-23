@@ -1,54 +1,24 @@
 #include "global.h"
-struct ColliderActorVector {
-    s16 x, y, z, pad;
-};
-struct ColliderActor {
-    u8 pad0[0x51];
-    u8 heading;
-    u8 pad52[2];
-    struct ColliderActorVector position;
-    u8 pad5C[0xa8 - 0x5c];
-    u8 facing4, facing8;
-    u8 padAA[0x32b - 0xaa];
-    u8 direction;
-    u8 pad32C[0x38a - 0x32c];
-    u16 travelTime;
-    u8 pad38C[0x39c - 0x38c];
-    struct ColliderActorVector target;
-};
+#include "hresvelgr_travel.h"
+#include "scene_facing.h"
 u16 Sqrt(u32);
 s32 __divsi3(s32, s32);
-static inline void SetTravelTime(struct ColliderActor *actor, u32 time)
+static inline void SetTravelTime(struct HresvelgrTravelActor *actor, u32 time)
 {
-    actor->travelTime = time;
+    actor->travel = time;
     if ((u16)time <= 1)
-        actor->travelTime = 2;
+        actor->travel = 2;
 }
-s32 ColliderActor_SetTargetPosition(struct ColliderActor *actor, struct ColliderActorVector *target)
+s32 ColliderActor_SetTargetPosition(struct HresvelgrTravelActor *actor, struct SceneVec *target)
 {
-    struct ColliderActorVector delta;
-    struct ColliderActorVector *out;
-    struct ColliderActorVector *position;
+    struct SceneVec delta;
+    struct SceneVec *out;
+    struct SceneVec *position;
     s32 distance, result;
     actor->target = *target;
-    {
-        u32 heading = actor->direction << 6;
-        u32 flag = 128;
-        u8 *dest = &actor->heading;
-        *dest = heading | flag;
-    }
-    {
-        s32 value = (actor->heading + 96) >> 6;
-        u32 mask = 3;
-        mask &= value;
-        actor->facing4 = mask;
-    }
-    {
-        s32 value = (actor->heading + 112) >> 5;
-        u32 mask = 7;
-        mask &= value;
-        actor->facing8 = mask;
-    }
+    actor->facing = (actor->side << 6) | 0x80u;
+    actor->facing4 = SceneFacing_FourWay(actor->facing);
+    actor->facing8 = SceneFacing_EightWay(actor->facing);
     out = &delta;
     position = &actor->position;
     delta.x = target->x - position->x;

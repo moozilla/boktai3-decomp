@@ -1,10 +1,7 @@
-#include "global.h"
+#include "boss_action_state.h"
 
-void sub_0819AEB0(u8 *p)
+void ActionState_AdvanceStep(struct BossActionState *p)
 {
-    u32 z;
-    u8 v = p[2] + 1;
-    z = 0;
-    p[2] = v;
-    *(u32 *)(p + 0xc) = z;
+    p->step++;
+    p->stepFrame = 0;
 }

@@ -11,14 +11,8 @@ struct Player {
     u8 pad[0x9c];
     struct Blob blob;
 };
-struct Item {
-    u8 pad[0x25];
-    u8 kind;
-    u8 pad2[0x13];
-    u8 flag;
-};
 void ActorStats_ConfigureScaledParameters(void *, int, int, int, int, int, int);
-void ScenePool_InitActorBounds(struct P *p, struct Item *item)
+void ScenePool_InitActorBounds(struct P *p, struct ScenePoolEntry *item)
 {
     struct Player *player = (*(struct Player **)gParticipantActors);
     int okay = 0;
@@ -27,7 +21,8 @@ void ScenePool_InitActorBounds(struct P *p, struct Item *item)
     if (player) {
         switch (item->kind) {
             case 0:
-                if (!item->flag) {
+                // concession-ok(duplicate-branches): the ROM keeps the mode test and both identical arms, so the original wrote separate per-mode values that happen to be equal
+                if (!item->mode) {
                     okay = 1;
                     z = 1024;
                     x = z;
@@ -38,7 +33,8 @@ void ScenePool_InitActorBounds(struct P *p, struct Item *item)
                 }
                 break;
             case 1:
-                if (!item->flag) {
+                // concession-ok(duplicate-branches): the ROM keeps the mode test and both identical arms, so the original wrote separate per-mode values that happen to be equal
+                if (!item->mode) {
                     okay = 1;
                     z = 1024;
                     x = z;

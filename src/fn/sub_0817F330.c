@@ -1,67 +1,53 @@
-#include "global.h"
-typedef struct A {
-    u8 pad0[0x51];
-    u8 angle;
-    u8 pad52[0x4a];
-    u32 flags;
-    u8 padA0[8];
-    u8 facing, facing8;
-    u8 padAA[5];
-    u8 finished;
-    u8 enter;
-    u8 changed;
-    u8 pad[0x114 - 0xB2];
-    s8 savedAngle;
-    u8 pad115[0x2AC - 0x115];
-    u8 animationState[0x20];
-    u8 animation[1];
-} A;
+#include "scene_volume.h"
+#include "scene_actor_components.h"
 
-static inline void setFacing(A *p, int angle)
+static inline void SetDirection(struct SceneVolumeActor *actor, int angle)
 {
-    p->angle = angle;
+    actor->direction = angle;
     {
-        int shifted = (p->angle + 0x60) >> 6;
-        u32 value = 3;
-        value &= shifted;
-        p->facing = value;
+        s32 d = (actor->direction + 0x60) >> 6;
+        u32 mask = 3;
+        mask &= d;
+        actor->direction4 = mask;
     }
     {
-        int shifted = (p->angle + 0x70) >> 5;
-        u32 value = 7;
-        value &= shifted;
-        p->facing8 = value;
+        s32 d = (actor->direction + 0x70) >> 5;
+        u32 mask = 7;
+        mask &= d;
+        actor->direction8 = mask;
     }
 }
+
 void SceneActors_StartEightDirectionAnimation(void *, void *, void *, int, int, int, int);
-void sub_0817F330(A *p)
+
+// confidence=low: turns toward the saved direction 8 steps a frame, finishing within 8.
+void sub_0817F330(struct SceneVolumeActor *p)
 {
-    A *p2 = p;
-    u8 *position = (u8 *)p + 0x48;
-    if (p->changed) {
-        p->changed = 0;
-        SceneActors_StartEightDirectionAnimation(p, p->animation, p->animationState, 0xF4, 1, 1, 4);
+    struct SceneVolumeActor *actor = p;
+    struct SceneActorBody *body = (struct SceneActorBody *)((u8 *)p + 0x48);
+    if (p->restart) {
+        p->restart = 0;
+        SceneActors_StartEightDirectionAnimation(p, &p->animation, p->animationState, 0xF4, 1, 1,
+                                                 4);
     } else {
-        SceneActors_StartEightDirectionAnimation(p, p->animation, p->animationState, 0xF4, 1, 1, 1);
+        SceneActors_StartEightDirectionAnimation(p, &p->animation, p->animationState, 0xF4, 1, 1,
+                                                 1);
     }
+    SceneVolume_SetFlags(actor, 0x400004);
     {
-        u32 mask = 0x400004;
-        p2->flags |= mask;
-    }
-    {
-        int delta = (s8)(position[9] - (u8)p2->savedAngle), distance = delta;
+        int delta = (s8)(body->direction - (u8)actor->alternateDirection), distance = delta;
         if (distance < 0)
             distance = -distance;
         if (distance <= 7) {
-            setFacing(p2, p2->savedAngle);
-            p2->finished = 1;
+            SetDirection(actor, actor->alternateDirection);
+            actor->pending = 1;
         } else {
             int angle;
             if (delta < 0)
-                angle = position[9] + 8;
+                angle = body->direction + 8;
             else
-                angle = position[9] - 8;
-            setFacing(p2, angle);
+                angle = body->direction - 8;
+            SetDirection(actor, angle);
         }
     }
 }

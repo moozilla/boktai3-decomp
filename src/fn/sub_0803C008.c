@@ -1,45 +1,20 @@
 #include "global.h"
-struct P {
-    u8 pad[0x24];
-    u32 mask[8];
-};
-struct Slot {
-    u8 pad[0x56c];
-    u32 flags;
-    u8 pad2[0x2e0];
-    u8 selector;
-    u8 pad3[3];
-    s32 id;
-};
-struct Item {
-    u8 pad[0x10];
-    u32 id;
-};
+#include "scene_pool.h"
+
 int Mod(int, int);
 void CharacterModel_SetAnimationFlags(void *, int);
 void ActorMarkerPool_HideMarker(int);
 void CallbackList_ResetDispatch(void *);
-void ScenePool_ReleaseActorSlot(struct P *input, struct Slot *slotInput, struct Item *item)
+void ScenePool_ReleaseActorSlot(struct ScenePoolManager *p, struct ScenePoolActor *slot,
+                                struct ScenePoolEntry *entry)
 {
-    struct P *p = input;
-    struct Slot *slot = slotInput;
-    u32 id = item->id;
+    u32 id = entry->index;
     int shift = Mod(id, 32);
-    u32 index = (id >> 5) * 4;
-    u32 *mask;
-    mask = p->mask;
-    mask = (u32 *)((u8 *)mask + index);
-    *mask &= ~(1 << shift);
-    CharacterModel_SetAnimationFlags((u8 *)slot + 0x600, 1);
-    ActorMarkerPool_HideMarker((s8)slot->selector);
-    {
-        u32 *flags = (u32 *)((u8 *)slot + 0x56c);
-        *flags |= 1;
-    }
+
+    p->seenIds[id >> 5] &= ~(1 << shift);
+    CharacterModel_SetAnimationFlags(slot->model, 1);
+    ActorMarkerPool_HideMarker(slot->marker);
+    slot->motionFlags |= 1;
     CallbackList_ResetDispatch(slot);
-    {
-        u32 offset = 0x854;
-        slot = (struct Slot *)((u8 *)slot + offset);
-        *(s32 *)slot = -1;
-    }
+    slot->entryIndex = -1;
 }

@@ -10,6 +10,12 @@ struct CameraTracking {
     s32 active, blend, followMode;
 };
 
+static inline void CameraTracking_SetRange(struct CameraTracking *tracking, s32 minimum, s32 maximum)
+{
+    tracking->minimum = minimum;
+    tracking->maximum = maximum;
+}
+
 void CameraTracking_Update(struct CameraTracking *tracking);
 
 /* Request bits an actor raises for the tracking update (bit 0: keep the actor in frame). */

@@ -1,5 +1,6 @@
 #include "global.h"
 #include "player.h"
+#include "word_flags.h"
 struct ItemAgingDefinition {
     u8 unknown0[4];
     u16 agingLimit; /* aging state reaches agingLimit * 32 before the item changes */
@@ -15,10 +16,6 @@ void Inventory_SetItemPackedState(u32, u32);
 void Inventory_ClearItemSlot(u32);
 s32 Inventory_GetItemOverrideFlag(u32);
 void Inventory_SetItemOverrideFlag(u32);
-static inline u32 Flags_Test(u32 *flags, u32 mask)
-{
-    return *flags & mask;
-}
 void sub_0822D2E0(s32 amount)
 {
     s32 i;
@@ -27,7 +24,7 @@ void sub_0822D2E0(s32 amount)
         s32 value;
         if (id < 0 || gUnk_08E61280[id].agingLimit == 0)
             continue;
-        if ((*(u8 **)gPlayers) && Flags_Test((u32 *)((*(u8 **)gPlayers) + 0x444), 0x100000))
+        if ((*(u8 **)gPlayers) && WordFlags_Test((u32 *)((*(u8 **)gPlayers) + 0x444), 0x100000))
             amount *= 2;
         value = Inventory_GetItemStateValue(i) + amount;
         if (value > 0x7FFF)

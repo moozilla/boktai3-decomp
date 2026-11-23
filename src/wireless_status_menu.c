@@ -1,5 +1,6 @@
 #include "wireless_status_menu.h"
 #include "input.h"
+#include "engine_pause_flags.h"
 
 struct WirelessStatusMenu *WirelessStatusMenu_Get(void)
 {
@@ -52,14 +53,10 @@ void WirelessStatusMenu_UpdateIdleState(struct WirelessStatusMenu *menu)
     menu->timer++;
 }
 
-static inline void WirelessStatusMenu_AddPauseFlags(u32 mask)
-{
-    gEnginePauseFlags |= mask;
-}
 
 void WirelessStatusMenu_UpdateDisconnectState(struct WirelessStatusMenu *menu)
 {
-    WirelessStatusMenu_AddPauseFlags(4);
+    Engine_SetPauseFlags(4);
     if (menu->entered) {
         menu->entered = 0;
         Wireless_RequestDisconnectMode();
@@ -80,9 +77,16 @@ void WirelessStatusMenu_UpdateDisconnectState(struct WirelessStatusMenu *menu)
     menu->timer++;
 }
 
+static inline void WirelessStatusMenu_SetState(struct WirelessStatusMenu *menu, u8 state)
+{
+    menu->state = state;
+    menu->entered = 1;
+    menu->timer = 0;
+}
+
 void WirelessStatusMenu_UpdateDismissibleMessageState(struct WirelessStatusMenu *menu)
 {
-    WirelessStatusMenu_AddPauseFlags(4);
+    Engine_SetPauseFlags(4);
     if (menu->entered) {
         menu->entered = 0;
         Sound_FadeOutChannel10(1);
@@ -99,12 +103,7 @@ void WirelessStatusMenu_UpdateDismissibleMessageState(struct WirelessStatusMenu 
         Sound_PlaySong(402);
     }
     if (menu->timer > 59 && (gPadState[1] & 11)) {
-        {
-            int state = 3;
-            menu->state = state;
-            menu->entered = 1;
-            menu->timer = 0;
-        }
+        WirelessStatusMenu_SetState(menu, 3);
     } else
         menu->timer++;
 }
@@ -131,15 +130,10 @@ int WirelessStatusMenu_Update(struct WirelessStatusMenu *menu)
     int previous = menu->state;
     if (!previous) {
         int state = Wireless_GetStatus();
-        if (state == 1) {
-            menu->state = state;
-            menu->entered = state;
-            menu->timer = previous;
-        } else if (state == 2) {
-            menu->state = state;
-            menu->entered = 1;
-            menu->timer = previous;
-        }
+        if (state == 1)
+            WirelessStatusMenu_SetState(menu, 1);
+        else if (state == 2)
+            WirelessStatusMenu_SetState(menu, 2);
     }
     Callback_InvokeActor(menu, gUnk_08605770[menu->state]);
     return 0;
@@ -178,9 +172,7 @@ int WirelessStatusMenu_InitFromScript(struct WirelessStatusMenu *menu)
     }
     menu->completionProcedure = Script_GetKeywordValue('r', 0);
     menu->window = -1;
-    menu->state = 0;
-    menu->entered = 1;
-    menu->timer = 0;
+    WirelessStatusMenu_SetState(menu, 0);
     return 0;
 }
 

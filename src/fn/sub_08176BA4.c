@@ -1,5 +1,6 @@
 #include "global.h"
 #include "render.h"
+#include "engine_pause_flags.h"
 void Hud_InitSelectionBounds(u32, u32);
 void Hud_UpdateEquipmentPrompt(void *);
 void Hud_SetUpdateCallback(void *, void (*)(void *));
@@ -18,10 +19,6 @@ struct PackedVec {
     s32 pad : 16;
 };
 void EffectManager_SpawnParticles(u32, u32, u32, struct PackedVec *, struct PackedVec *, u32, u32);
-static inline void clearFlags(u32 *p, u32 mask)
-{
-    *p &= mask;
-}
 void SceneHud_FinishPageExit(u8 *p)
 {
     u32 zero;
@@ -51,7 +48,7 @@ void SceneHud_FinishPageExit(u8 *p)
             gBgFadeBankMask = *(u16 *)(p + 0x43e2);
             gObjFadeColor = *(u16 *)(p + 0x43e4);
             gObjFadeFlags = *(u16 *)(p + 0x43e6);
-            clearFlags(&gEnginePauseFlags, ~4);
+            Engine_ClearPauseFlags(4);
             Sound_ResumePersistentSongs();
             if (p[0x487c]) {
                 HealthBurstEffect_Create(*(void **)(p + 0xa40), p[0x487d]);

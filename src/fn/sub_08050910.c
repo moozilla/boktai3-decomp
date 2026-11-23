@@ -12,10 +12,6 @@ static inline u8 LinkSession_SelectedStatus(void)
         return 0;
     return gLinkSession->status[selected];
 }
-static inline void Bg_DisableDisplay(s32 mask)
-{
-    gDispCntShadow &= ~mask;
-}
 static inline bool32 isSpecial(void)
 {
     if (gPlayerActionPending == 1)

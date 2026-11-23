@@ -1,7 +1,6 @@
 #include "global.h"
 
 // confidence=low: starts a target-directed motion track and emits afterimages.
-#define Vanargand_UpdateTargetDash sub_081A9178
 struct Vector {
     s16 x, y, z, pad;
 };

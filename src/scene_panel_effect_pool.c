@@ -1,4 +1,6 @@
 #include "scene_panel_effect_pool.h"
+#include "player_slot_status.h"
+#include "scene_pause.h"
 
 void sub_0818ECFC(struct ScenePanelEffectPool *);
 
@@ -28,7 +30,6 @@ void ScaledShadow_InitializeDefaultSmall(void *, void *);
 
 void ScaledShadow_Disable(void *);
 
-extern u32 gUnk_02000560;
 
 extern const u16 gUnk_086141BC[];
 
@@ -54,10 +55,6 @@ static inline void AddPosition(struct ContactPosition *out, struct ContactPositi
     out->z += position->z;
 }
 
-static inline u32 ReadBlockFlag(u32 mask)
-{
-    return gUnk_02000560 & mask;
-}
 
 u32 ScenePanelEffect_UpdateTask(struct ScenePanelEffect *effect)
 {
@@ -191,12 +188,9 @@ void Nidhoggr_CreateOwnedSeekingEffect(struct ScenePanelEffect *owner,
     u8 *animation, *collider, *shadow;
     struct ContactPosition *position;
     void (*callback)(void *);
-    u32 mask = 0x400;
-    u32 zero;
-    if ((gEngineFlags | gScenePauseFlags) & mask)
+    if (Scene_TestPauseFlags(0x400))
         return;
-    zero = ReadBlockFlag(4);
-    if (zero)
+    if (PlayerSlot_ReadStatus(0, 4))
         return;
     effect = SceneEffectPool_AllocateSlot(&owner->pool);
     if (!effect)
@@ -212,7 +206,7 @@ void Nidhoggr_CreateOwnedSeekingEffect(struct ScenePanelEffect *owner,
     AnimData_Load(animation, 0xc7ed);
     AnimData_SelectPaletteBank(animation, 0x1a6);
     Sprite_Init(&effect->sprite, animation, 0);
-    Anim_RestartSequence(&effect->sequence, owner->pool.sequenceResource, 0, 0, zero);
+    Anim_RestartSequence(&effect->sequence, owner->pool.sequenceResource, 0, 0, 0);
     position = &effect->sprite.position;
     position->x = anchor->x + offset->x;
     position->y = anchor->y + offset->y;
@@ -224,25 +218,23 @@ void Nidhoggr_CreateOwnedSeekingEffect(struct ScenePanelEffect *owner,
     ((struct ContactCollider *)collider)->offset = gUnk_0824F2DC;
     {
         struct ContactCollider *attack = (void *)collider;
-        u32 collisionMask;
-        collisionMask = 4;
-        attack->flags |= collisionMask;
-        Collider_SetAttackProperties(collider, 0, 0, 0, zero, zero);
+        u32 attackFlag = 4;
+        attack->flags |= attackFlag;
+        Collider_SetAttackProperties(collider, 0, 0, 0, 0, 0);
         callback = Nidhoggr_OnEffectCollision;
         Collider_SetCallback(collider, callback, effect);
         {
-            u32 bodyOffset = 0x120;
             struct ContactCollider *body;
             collider = (u8 *)&effect->bodyCollider;
             ((struct ContactCollider *)collider)->bounds = gUnk_0824F2CC;
             ((struct ContactCollider *)collider)->offset = gUnk_0824F2DC;
             body = (void *)collider;
-            body->flags &= ~collisionMask;
+            body->flags &= ~attackFlag;
             {
-                u32 add = 0x1008;
-                body->flags |= add;
+                u32 bodyFlags = 0x1008;
+                body->flags |= bodyFlags;
             }
-            Collider_SetBodyProperties(collider, 1, bodyOffset, 16);
+            Collider_SetBodyProperties(collider, 1, 0x120, 16);
         }
     }
     Collider_SetCallback(collider, ScenePanelEffect_OnContact, effect);

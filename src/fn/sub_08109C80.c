@@ -3,6 +3,7 @@
 #include "render.h"
 #include "ram.h"
 #include "runtime.h"
+#include "engine_pause_flags.h"
 struct ScriptPanel {
     u8 unk0[0x30];
     u32 counter;
@@ -37,10 +38,7 @@ s32 ScriptPanel_OpenTextWindow(struct ScriptPanel *p)
 {
     if (Registry1745_ConsumeStateEntry(p)) {
         gLinkMenuActive = 0;
-        {
-            u32 mask = 4;
-            gEnginePauseFlags |= mask;
-        }
+        Engine_SetPauseFlags(4);
         p->windowReady = 0;
         p->hudReady = 0;
         p->scale = 0x4000;

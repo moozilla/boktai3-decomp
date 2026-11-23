@@ -5,10 +5,7 @@ void ActionState_AdvanceState(struct BossActionState *);
 void Hresvelgr_PlayDelayedReposition(struct HresvelgrTravelActor *p)
 {
     struct BossActionState *action = &p->action;
-    {
-        u32 mask = 0x1c;
-        p->flags |= mask;
-    }
+    Hresvelgr_SetFlags(p, 0x1c);
     if (p->changed) {
         p->changed = 0;
         ActionState_Reset(action);

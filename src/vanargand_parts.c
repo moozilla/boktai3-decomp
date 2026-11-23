@@ -15,8 +15,7 @@ extern const s16 gUnk_086149C4[];
 void Vanargand_UpdatePartTracking(struct VanargandAttackPair *boss, struct PairedSceneHalf *p)
 {
     struct ContactPosition delta;
-    u32 mask = 8;
-    p->actionFlags |= mask;
+    Vanargand_SetFlags(p, 8);
     if (p->entered) {
         p->entered = 0;
         p->actionCounters[0] = 0;
@@ -58,8 +57,7 @@ void Vanargand_UpdatePartPairedStrike(struct VanargandAttackPair *boss, struct P
                                       u32 tick)
 {
     u8 *enter;
-    u32 mask = 0x20;
-    p->actionFlags |= mask;
+    Vanargand_SetFlags(p, 0x20);
     if (p->entered) {
         p->entered = 0;
         Vanargand_Difference(&p->targetPosition, Player_GetEffectivePosition(0), p->origin);
@@ -232,8 +230,7 @@ void Vanargand_UpdatePartRetreat(struct VanargandAttackPair *boss, struct Paired
     u8 *enter;
     u32 state;
     struct ContactPosition delta;
-    u32 mask = 0x20;
-    p->actionFlags |= mask;
+    Vanargand_SetFlags(p, 0x20);
     if (p->entered) {
         p->entered = 0;
         if (p->mode == 0)
@@ -288,8 +285,7 @@ void Vanargand_UpdatePartGroundStrike(struct VanargandAttackPair *boss, struct P
 {
     u8 *enter;
     register u32 entering;
-    u32 mask = 0x20;
-    p->actionFlags |= mask;
+    Vanargand_SetFlags(p, 0x20);
     if (p->entered) {
         p->entered = 0;
         p->actionCounters[0] = 0;
@@ -441,8 +437,7 @@ void Vanargand_UpdatePartOffsetStrike(struct VanargandAttackPair *boss, struct P
 {
     u8 *enter;
     u32 entering;
-    u32 mask = 0x20;
-    p->actionFlags |= mask;
+    Vanargand_SetFlags(p, 0x20);
     if (p->entered) {
         p->entered = 0;
         p->actionCounters[0] = 0;
@@ -549,8 +544,7 @@ void Vanargand_UpdatePartSweepingStrike(struct VanargandAttackPair *boss, struct
 {
     u8 *enter;
     u32 entering;
-    u32 mask = 0x20;
-    p->actionFlags |= mask;
+    Vanargand_SetFlags(p, 0x20);
     if (p->entered) {
         p->entered = 0;
         p->actionCounters[0] = 0;
@@ -697,8 +691,7 @@ void Vanargand_UpdatePartLunge(void *unused, struct PairedSceneHalf *p)
 {
     u8 *enter;
     u32 entering;
-    u32 mask = 0x20;
-    p->actionFlags |= mask;
+    Vanargand_SetFlags(p, 0x20);
     if (p->entered) {
         p->entered = 0;
         p->actionCounters[0] = 0;
@@ -786,8 +779,7 @@ void ActorStatus_Deactivate(void *, void *);
 
 void Vanargand_ReleaseRadialEffects(struct VanargandAttackPair *boss, struct PairedSceneHalf *p)
 {
-    u32 mask = 12;
-    p->actionFlags |= mask;
+    Vanargand_SetFlags(p, 12);
     if (p->entered) {
         struct ContactPosition velocity;
         struct ContactPosition position;
@@ -898,8 +890,7 @@ void Vanargand_UpdatePartImpact(struct VanargandAttackPair *boss, struct PairedS
     u8 *enter;
     u32 entering;
     u32 savedFrame = frame;
-    u32 mask = 0x20;
-    p->actionFlags |= mask;
+    Vanargand_SetFlags(p, 0x20);
     if (p->entered) {
         p->entered = 0;
         p->actionCounters[0] = 0;
@@ -989,8 +980,7 @@ void OrbitingParticles_Create(void *, int, int, int, int);
 
 void SceneParticleEmitter_EmitPeriodically(void *unused, struct PairedSceneHalf *p, u32 frame)
 {
-    u32 mask = 12;
-    p->actionFlags |= mask;
+    Vanargand_SetFlags(p, 12);
     if ((frame & 31) == 0) {
         if (p->mode == 0)
             OrbitingParticles_Create(&p->sprite.position, 256, 32, 16, 2);
@@ -1009,8 +999,7 @@ void Vanargand_UpdatePartFlashFade(struct VanargandAttackPair *boss, struct Pair
     u32 mask;
     u32 twelve = 12;
     p->actionFlags |= twelve;
-    mask = 0x80;
-    p->actionFlags |= mask;
+    p->actionFlags |= 0x80;
     if (p->entered) {
         p->entered = 0;
         CpuSet(p->palettes[0], p->graphics.palette, 0x04000008);
@@ -1026,7 +1015,7 @@ void Vanargand_UpdatePartFlashFade(struct VanargandAttackPair *boss, struct Pair
             case 0:
                 Palette_InterpolateBanks(p->graphics.palette, p->palettes[0], p->palettes[2], frame,
                                          7);
-                if (frame & mask) {
+                if (frame & 0x80) {
                     Vanargand_SetState(p, 1);
                     p->actionEntered = 1;
                 }
@@ -1049,8 +1038,7 @@ void Vanargand_UpdatePartFlashFade(struct VanargandAttackPair *boss, struct Pair
 
 void Vanargand_UpdatePartSidestep(struct VanargandAttackPair *bossArg, struct PairedSceneHalf *p)
 {
-    u32 mask = 12;
-    p->actionFlags |= mask;
+    Vanargand_SetFlags(p, 12);
     if (p->entered) {
         p->entered = 0;
         {
@@ -1138,8 +1126,7 @@ void Vanargand_UpdatePartRecovery(struct VanargandAttackPair *boss, struct Paire
 void Vanargand_UpdatePartLeap(struct VanargandAttackPair *boss, struct PairedSceneHalf *p)
 {
     u8 *enter;
-    u32 mask = 12;
-    p->actionFlags |= mask;
+    Vanargand_SetFlags(p, 12);
     if (p->entered) {
         p->entered = 0;
         {
@@ -1166,9 +1153,8 @@ void Vanargand_UpdatePartLeap(struct VanargandAttackPair *boss, struct PairedSce
             }
             MotionTrack_Update(&p->motion);
             if (Vanargand_MotionEnded(p)) {
-                u32 next = 1;
-                Vanargand_SetState(p, next);
-                *enter = next;
+                Vanargand_SetState(p, 1);
+                *enter = 1;
             }
             break;
         }
@@ -1204,8 +1190,7 @@ void Vanargand_UpdatePartVerticalOscillation(u8 *unused, struct PairedSceneHalf 
 {
     struct ContactPosition lowerTarget, upperTarget;
     u8 *enter;
-    u32 mask = 0x20;
-    p->actionFlags |= mask;
+    Vanargand_SetFlags(p, 0x20);
     if (p->entered) {
         p->entered = 0;
         p->actionCounters[0] = 0;
@@ -1275,8 +1260,7 @@ void Vanargand_UpdatePartVerticalOscillation(u8 *unused, struct PairedSceneHalf 
 void Vanargand_UpdatePartBobbing(struct VanargandAttackPair *boss, struct PairedSceneHalf *p,
                                  s32 frame)
 {
-    u32 mask = 0x20;
-    p->actionFlags |= mask;
+    Vanargand_SetFlags(p, 0x20);
     if (p->entered) {
         p->entered = 0;
         {
@@ -1310,8 +1294,7 @@ void Vanargand_UpdatePartRadialTravel(struct VanargandAttackPair *boss, struct P
         finished = &p->finished;
         *finished = 1;
     } else {
-        u32 mask = 12;
-        p->actionFlags |= mask;
+        Vanargand_SetFlags(p, 12);
     }
 }
 
@@ -1433,8 +1416,7 @@ void Vanargand_UpdatePartEmergence(struct VanargandAttackPair *boss, struct Pair
 void Vanargand_UpdatePartRevealFade(struct VanargandAttackPair *boss, struct PairedSceneHalf *p,
                                     s32 frame)
 {
-    u32 mask = 12;
-    p->actionFlags |= mask;
+    Vanargand_SetFlags(p, 12);
     if (p->entered) {
         p->entered = 0;
         Vanargand_PolarVector(&p->offset, (s16)p->heading, (s16)p->scale);
@@ -1456,9 +1438,8 @@ void Vanargand_UpdatePartRevealFade(struct VanargandAttackPair *boss, struct Pai
         case 0:
             Palette_InterpolateBanks(p->graphics.palette, p->palettes[1], p->palettes[0], frame, 6);
             if (frame > 63) {
-                u32 next = 1;
-                Vanargand_SetState(p, next);
-                p->actionEntered = next;
+                Vanargand_SetState(p, 1);
+                p->actionEntered = 1;
             }
             break;
         case 1:
@@ -1598,8 +1579,6 @@ void *ScriptProc_Start(u16, u16);
 s32 Widget_InitLinked(void *, void *, u16, u32, u8, u8, u8, const void *);
 
 // confidence=low: initializes the controller resources and its two embedded halves.
-
-#define Vanargand_InitializePartController sub_081B5EA4
 
 s32 Vanargand_InitializePartController(struct VanargandAttackPair *boss, void *origin,
                                        u16 (*palettes)[16], s32 mode)

@@ -1,28 +1,6 @@
 #include "global.h"
-#include "ratatosk_facing.h"
+#include "ratatosk.h"
 #include "render.h"
-typedef struct ActorAnimation {
-    u8 pad0[0x51];
-    u8 angle;
-    u8 pad52[0x4a];
-    u32 flags;
-    u8 padA0[8];
-    u8 facing, facing8;
-    u8 padAA[4];
-    u8 state, finished, enter, changed;
-    u8 padB2[2];
-    u8 padB4[0x18];
-    u8 requestedAngle;
-    u8 padCD[0x37];
-    void *callback;
-    u8 pad108[0x224];
-    u8 animation[0x20];
-    u8 animationData[0x60];
-    u8 polar[0xab0];
-    u8 target[0x10];
-    u16 count;
-} ActorAnimation;
-
 void SceneActors_StartEightDirectionAnimation(void *, void *, void *, int, int, int, int);
 void SceneActors_StartDirectionalAnimation(void *, void *, void *, int, int, int, int);
 void PolarInterpolation_SetCurrentFromPoint(void *, void *);
@@ -32,48 +10,26 @@ void Sound_PlaySong(int);
 int ActorResource_GetFixedId(void *);
 int Callback_InvokeActor(void *, void *);
 void TemporaryAnimationPool_CreateEntry(void *, int, int, int, void *);
-void SceneActorAnimation_UpdateSwoopApproach(ActorAnimation *p, int tick)
+void SceneActorAnimation_UpdateSwoopApproach(struct Ratatosk *p, int tick)
 {
-    ActorAnimation *p2 = p;
-    u8 *position = (u8 *)p + 0x48;
-    RATATOSK_SET_FACING(p, p->requestedAngle);
-    if (p->changed) {
-        p->changed = 0;
+    struct Ratatosk *p2 = p;
+    struct SceneActorBody *body = &p->body;
+    Ratatosk_SetFacing(p, p->requestedAngle);
+    if (p->actionChanged) {
+        p->actionChanged = 0;
+        SceneActors_StartEightDirectionAnimation(p, p->animationData, p->animation, 2, 1, 1, 4);
+        PolarInterpolation_SetCurrentFromPoint(&p->motionPath, &p->body.position);
         {
-            int off = 0x34c;
-            u8 *data;
-            u8 *anim;
-            data = (u8 *)p + off;
-            anim = p->animation;
-            SceneActors_StartEightDirectionAnimation(p, data, anim, 2, 1, 1, 4);
-        }
-        PolarInterpolation_SetCurrentFromPoint(p->polar, (u8 *)p + 0x54);
-        {
-            int off2 = 0xe5c;
-            u8 *dst;
-            u16 *count;
-            dst = (u8 *)p + off2;
-            {
-                int off3 = 0xe6c;
-                count = (u16 *)((u8 *)p + off3);
-            }
-            sub_082222BC(p->polar, dst, *count);
-            if (*count <= 64)
+            sub_082222BC(&p->motionPath, &p->destination, p->duration);
+            if (p->duration <= 64)
                 Sound_PlaySong(0x567);
             else
                 Sound_PlaySong(0x56c);
         }
     } else {
-        {
-            int off = 0x34c;
-            u8 *data;
-            u8 *anim;
-            data = (u8 *)p + off;
-            anim = p->animation;
-            SceneActors_StartEightDirectionAnimation(p, data, anim, 2, 1, 1, 1);
-        }
+        SceneActors_StartEightDirectionAnimation(p, p->animationData, p->animation, 2, 1, 1, 1);
     }
-    if (!(u8)Callback_InvokeActor(p, p->callback)) {
+    if (!(u8)Callback_InvokeActor(p, p->actionTryUpdate)) {
         if (!(tick & 3)) {
             int id = ActorResource_GetFixedId(p2);
             {
@@ -81,19 +37,15 @@ void SceneActorAnimation_UpdateSwoopApproach(ActorAnimation *p, int tick)
                 TemporaryAnimationPool_CreateEntry(p2->animationData, 8, 0x200, 0xe011, data);
             }
         }
-        if (p2->count <= 0x20) {
-            u32 mask = 0x40000;
-            u32 v = p->flags;
-            v = v | mask;
-            v = v | 8;
-            v = v | 4;
-            p->flags = v;
+        if (p2->duration <= 0x20) {
+            Ratatosk_SetFlags(p, 0x40000);
+            Ratatosk_SetFlags(p, 8);
+            Ratatosk_SetFlags(p, 4);
         }
-        if (p2->count > 0x3f && p->state != 8 && p->state != 4) {
-            u32 mask = 0x40;
-            p->flags = p->flags | mask;
+        if (p2->duration > 0x3f && p->actionPhase != 8 && p->actionPhase != 4) {
+            Ratatosk_SetFlags(p, 0x40);
         }
-        if (Interp_Step(p2->polar, position + 12))
-            p->finished = 1;
+        if (Interp_Step(&p2->motionPath, &body->position))
+            p->actionFinished = 1;
     }
 }

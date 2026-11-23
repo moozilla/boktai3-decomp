@@ -1,43 +1,37 @@
 #include "global.h"
-struct OffsetActor {
-    u8 unknown[0x300];
-};
-void ActionState_Reset(u8 *);
-void ActionState_SetState(u8 *, u32);
+#include "hresvelgr_travel.h"
+
 void Hresvelgr_SetAnimation(void *, void *, void *, u32, u32, u32);
-void Actor_SetHeadingVelocity(struct OffsetActor *, u32);
-static inline u8 OutsideBoundary(struct OffsetActor *actor)
+void Actor_SetHeadingVelocity(struct HresvelgrTravelActor *, u32);
+
+static inline u8 OutsideBoundary(struct HresvelgrTravelActor *actor)
 {
-    u8 *p = (u8 *)actor;
     u8 outside = 0;
-    if (*(s16 *)(p + 0x54) > 0x2000 || *(s16 *)(p + 0x58) > 0x2000)
+    if (actor->position.x > 0x2000 || actor->position.z > 0x2000)
         outside = 1;
     return outside;
 }
-void OffsetActor_PlayBoundarySequence(struct OffsetActor *actor)
+
+void OffsetActor_PlayBoundarySequence(struct HresvelgrTravelActor *actor)
 {
-    u8 *p = (u8 *)actor;
-    u8 *state = p + 0x2f0;
-    if (p[0xb1]) {
-        p[0xb1] = 0;
+    struct BossActionState *state = &actor->action;
+    if (actor->changed) {
+        actor->changed = 0;
         ActionState_Reset(state);
     }
-    {
-        u32 mask = 0x20000;
-        *(u32 *)(p + 0x9c) |= mask;
-    }
-    switch (*state) {
+    Hresvelgr_SetFlags(actor, 0x20000);
+    switch (state->state) {
         case 0:
-            if (*(u32 *)(state + 4) == 0) {
-                Hresvelgr_SetAnimation(p, p + 0x194, p + 0x174, 2, 1, 0);
-                *(u32 *)(state + 4) = 1;
+            if (state->frame == 0) {
+                Hresvelgr_SetAnimation(actor, &actor->animation, &actor->animationData, 2, 1, 0);
+                state->frame = 1;
             }
             Actor_SetHeadingVelocity(actor, 0x20);
             if (OutsideBoundary(actor))
                 ActionState_SetState(state, 1);
             break;
         case 1:
-            p[0xaf] = 1;
+            actor->finished = 1;
             break;
     }
 }

@@ -1,4 +1,5 @@
 #include "global.h"
+#include "ratatosk.h"
 #include "sun_orb_effect.h"
 struct RatatoskOrbTarget {
     u32 active;

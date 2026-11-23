@@ -73,11 +73,11 @@ static inline u8 PairedSceneHalf_IsAlive(const struct PairedSceneHalf *half)
 s32 PairedSceneActor_ApplyToActiveHalf(struct VanargandAttackPair *, u32 value);
 s32 PairedSceneActor_ApplyToSelectedHalves(struct VanargandAttackPair *, u32 mask, u32 value);
 u32 PairedSceneActor_AreSelectedHalvesFinished(struct VanargandAttackPair *);
-u32 ScenePair_CountPositiveCounters(struct VanargandAttackPair *);
+s32 ScenePair_CountPositiveCounters(struct VanargandAttackPair *);
 void PairedSceneActor_UpdateHalfPresentation(struct VanargandAttackPair *, struct PairedSceneHalf *);
 void Vanargand_ResetState(struct PairedSceneHalf *, s32);
 void PairedSceneActor_InitializeHalf(struct PairedSceneHalf *, void *, s32);
-s32 sub_081B5EA4(struct VanargandAttackPair *, void *origin, u16 (*palettes)[16], s32 mode);
+s32 Vanargand_InitializePartController(struct VanargandAttackPair *, void *origin, u16 (*palettes)[16], s32 mode);
 
 typedef char PairedSceneHalfSizeCheck[sizeof(struct PairedSceneHalf) == 0x21c ? 1 : -1];
 typedef char VanargandAttackPairSizeCheck[sizeof(struct VanargandAttackPair) == 0x5b8 ? 1 : -1];

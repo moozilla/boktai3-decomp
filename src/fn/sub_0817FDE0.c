@@ -3,6 +3,7 @@
 #include "render.h"
 #include "ram.h"
 #include "player.h"
+#include "camera_tracking.h"
 
 struct FDE0Header {
     u32 w[8];
@@ -54,11 +55,6 @@ struct BossWidget {
     u8 shadowPart[0x28];
     u8 *tileData;
     u8 pad4C[0x14];
-};
-struct CameraSetup {
-    u8 pad0[0x10];
-    u32 timer;
-    u32 distance;
 };
 struct BossInit {
     u8 pad0[0x48];
@@ -137,10 +133,8 @@ struct BossInit {
     u8 tiles2[0x200];
     u8 tiles3[0x20];
     u8 padC20[0x10];
-    struct CameraSetup camera;
-    u8 padC48[0x18];
-    u32 firstSummon;
-    u32 secondSummon;
+    struct CameraTracking camera;
+    u32 summons[2];
 };
 
 static inline void SetDamageCallback(struct BossInit *p, void *callback)
@@ -288,25 +282,15 @@ s32 sub_0817FDE0(struct BossInit *boss, u32 arg1)
 
     if (Script_SeekToKeyword(0x65)) {
         u32 *p;
-        u32 clear;
         cameraTarget = &actor->targets[1];
         volumePosition = actor->body.position;
-        p = &boss->firstSummon;
-        i = 1;
-        do {
-            *p++ = Script_GetValue();
-        } while (--i >= 0);
+        for (i = 0; i < 2; i++)
+            boss->summons[i] = Script_GetValue();
     } else {
-        u32 *p;
-        u32 clear;
         cameraTarget = &actor->targets[1];
         volumePosition = actor->body.position;
-        clear = 0;
-        i = 1;
-        p = &boss->secondSummon;
-        do {
-            *p-- = clear;
-        } while (--i >= 0);
+        for (i = 0; i < 2; i++)
+            boss->summons[i] = 0;
     }
 
     if (Script_SeekToKeyword(0x63)) {
@@ -374,12 +358,7 @@ s32 sub_0817FDE0(struct BossInit *boss, u32 arg1)
     boss->effectCount = 5;
     boss->effectEnabled = 1;
     CameraFollow_Initialize(&boss->camera, *cameraTarget, (u8 *)boss + 0x2EC, 1);
-    {
-        struct CameraSetup *camera = &boss->camera;
-        u32 distance = 0x8C;
-        camera->timer = zero;
-        camera->distance = distance;
-    }
+    CameraTracking_SetRange(&boss->camera, zero, 0x8C);
     SceneActors_SetDamageCallback((u8 *)actor, boss->attackCollider, ActorPosition_BeginReaction, boss->damage);
     ProximityVolume_TranslateBounds(boss->bounds, volumePosition);
     Task4E01_Destroy();

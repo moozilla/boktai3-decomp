@@ -1,15 +1,10 @@
 #include "global.h"
+#include "ratatosk.h"
 struct Vec {
     s16 x, y, z, pad;
 };
 struct PackedVec {
     s32 x : 16, y : 16, z : 16, pad : 16;
-};
-struct Actor {
-    u8 pad0[0xa8];
-    u8 facing;
-    u8 padA9[0xf10 - 0xa9];
-    u8 target[1];
 };
 void Projectile_InitParameters(void *);
 void Projectile_SetLaunchParameters(void *, u16, u32, u8, u32);
@@ -27,12 +22,12 @@ static inline void sum(struct Vec *d, struct Vec *a, struct Vec *b)
     d->z = b->z + a->z;
 }
 // confidence=low: fires a tracking projectile at a facing-dependent offset.
-void Ratatosk_FireTrackingShot(struct Actor *p, struct Vec *position, u32 parameter)
+void Ratatosk_FireTrackingShot(struct Ratatosk *p, struct Vec *position, u32 parameter)
 {
     u8 params[0x58];
     struct PackedVec offset;
     struct Vec spawn;
-    struct Actor *p2 = p;
+    struct Ratatosk *p2 = p;
     s8 k2 = 5;
     s32 direction = 0;
     switch (p2->facing) {
@@ -47,10 +42,10 @@ void Ratatosk_FireTrackingShot(struct Actor *p, struct Vec *position, u32 parame
     }
     Projectile_InitParameters(params);
     Projectile_SetLaunchParameters(params, 0, parameter, (direction + k2) << 5, 24);
-    Projectile_SetHomingParameters(params, 300, p->target, 1);
+    Projectile_SetHomingParameters(params, 300, &p->shotTarget, 1);
     Projectile_SetSpriteParameters(params, 0x8e5a, 0, 499);
     Projectile_SetScriptProcedure(params, 0x4363, 3);
-    Projectile_SetTrackingTarget(params, p->target);
+    Projectile_SetTrackingTarget(params, &p->shotTarget);
     Projectile_SetBehaviorMode(params, 0);
     switch (p2->facing) {
         case 0:

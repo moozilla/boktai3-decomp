@@ -5,7 +5,9 @@
 #include "damage_number_source.h"
 
 struct VanargandDamagePart {
-    u8 unknown0[0x1C];
+    u8 unknown0[0x10];
+    u16 state; /* 0x10: set 7 when the leap ends (tentative). */
+    u8 unknown12[0x1C - 0x12];
     struct ContactPosition position;
     u8 unknown24[0xA8 - 0x24];
     struct DamageNumberSource damageSource;

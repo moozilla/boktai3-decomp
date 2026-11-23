@@ -1,37 +1,14 @@
 #include "global.h"
+#include "state_actor_action_entry.h"
 
-void Trigger_ConsumePending(void *, u32);
-
-struct S {
-    u8 pad[0xAA];
-    u8 st;
-    u8 pad2[4];
-    u8 f1;
-    u8 f2;
-    u8 pad3[0xC4 - 0xB1];
-    u32 cnt;
-};
-
-static inline u8 TakeFlag(struct S *p)
+void SceneActor_UpdateState14AndReturnCommand(struct StateActor *p)
 {
-    if (p->f2) {
-        p->f2 = 0;
-        p->f1 = 0;
-        return TRUE;
+    if (StateActor_ConsumeActionEntry(p)) {
+        SceneActorState_SetAnimation(p, 0xe);
     }
-    return FALSE;
-}
-
-void SceneActor_UpdateState14AndReturnCommand(struct S *p)
-{
-    if (TakeFlag(p)) {
-        u32 v = 0xe;
-        p->st = v;
-    }
-    if (p->f1) {
-        u32 w = 1;
-        p->st = w;
-        Trigger_ConsumePending((u8 *)p + 0x118, 1);
+    if (p->actionFinished) {
+        SceneActorState_SetAnimation(p, 1);
+        Trigger_ConsumePending(p->receiver2, 1);
     } else
-        p->cnt++;
+        p->actionTimer++;
 }

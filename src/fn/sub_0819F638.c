@@ -26,10 +26,7 @@ void Hresvelgr_UpdateRandomVolleyPhase(struct HresvelgrTravelActor *actor, s32 f
         Sound_PlaySong(0x4D2);
         actor->phaseFrame = 0;
     }
-    {
-        u32 mask = 0x600000;
-        actor->flags |= mask;
-    }
+    Hresvelgr_SetFlags(actor, 0x600000);
     if (frame == 16)
         Sound_PlaySong(0x3E2);
     if (frame > 15) {

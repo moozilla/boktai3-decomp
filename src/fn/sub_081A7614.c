@@ -1,33 +1,11 @@
-#include "global.h"
-struct S {
-    u8 f0[0xAA];
-    u8 st;
-    u8 g[4];
-    u8 af;
-    u8 b0;
-    u8 f2[0x118 - 0xB1];
-    u8 d[1];
-};
-void Vanargand_StopActionSequence(void *);
-void Trigger_ConsumePending(void *, s32);
-static inline u8 chk(struct S *p)
+#include "vanargand_pair_attack.h"
+
+u32 Trigger_ConsumePending(void *, u32);
+
+void Vanargand_UpdateMode13(struct VanargandPairAttack *p)
 {
-    u8 *q = &p->b0;
-    if (*q != 0) {
-        *q = 0;
-        *(q - 1) = 0;
-        return TRUE;
-    }
-    return FALSE;
-}
-void Vanargand_UpdateMode13(struct S *p)
-{
-    u8 *q;
-    if (chk(p) == 1) {
-        u32 v = 0xd;
-        Vanargand_StopActionSequence((u8 *)p + 0x21C);
-        p->st = v;
-    }
-    if (p->af != 0)
-        Trigger_ConsumePending((u8 *)p + 0x118, 1);
+    if (Vanargand_ConsumeActionEntry(p) == 1)
+        Vanargand_EnterAction(p, 0xd);
+    if (p->finished)
+        Trigger_ConsumePending(p->trigger, 1);
 }
