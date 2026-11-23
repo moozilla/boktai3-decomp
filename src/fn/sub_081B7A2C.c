@@ -2,6 +2,7 @@
 #include "engine.h"
 #include "player.h"
 #include "proximity_emitter.h"
+#include "scene_actor_terrain.h"
 
 // foundry draft (worker best 99.1%); what differs is mostly register allocation and instruction order
 #define GrowthHazard_EmitRevealEffects GrowthHazard_PlayImpactEffect
@@ -26,21 +27,12 @@ u32 TetherActor_RequestKindNineAction(u32, u32);
 /* Facing away from a flipped marker. */
 #define GROWTH_HAZARD_FACING(flags) (((flags) & 4) ? 0 : 0x40)
 
-static inline s32 GrowthHazard_GetCell(const struct ContactPosition *position)
-{
-    s32 x = position->x >> 8;
-    s32 z = position->z >> 8;
-    if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
-        return 0;
-    return gTerrainMap->rows[z] + x;
-}
-
 void GrowthHazard_RevealWhenCellVacant(struct AnimatedMarker *marker)
 {
     u32 occupied = 0;
     u32 direction;
     struct Player *player = gPlayers[0];
-    s32 tetherCell = GrowthHazard_GetCell(TetherActor_GetPosition());
+    s32 tetherCell = SceneActorTerrain_GetCellIndex(TetherActor_GetPosition());
     struct GrowthHazardCollider *collider = &marker->collider;
     collider->flags |= 4;
     if (player->recoveryTerrainCell == marker->terrainCell) {

@@ -1,9 +1,7 @@
 #include "global.h"
+#include "sun_orb_effect.h"
 struct OrbitEffectWords {
     u32 a, b;
-};
-struct OrbitEffectPosition {
-    s16 x, y, z, pad;
 };
 struct OrbitEffectOwner {
     u8 unknown0[0x1a8];

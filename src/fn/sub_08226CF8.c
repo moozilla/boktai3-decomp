@@ -3,10 +3,8 @@
 #include "game_state.h"
 #include "engine.h"
 #include "player.h"
+#include "scene_indicator.h"
 
-struct Vec {
-    s16 x, y, z, pad;
-};
 struct PackedVec {
     s32 x : 16, y : 16, z : 16, pad : 16;
 };

@@ -1,4 +1,5 @@
 #include "camera_tracking.h"
+#include "vanargand_parts.h"
 struct CameraPackedPosition {
     s32 x : 16, y : 16, z : 16, pad : 16;
 };
@@ -8,10 +9,6 @@ void Camera_SetPosition(struct CameraPackedPosition *);
 static inline u32 Test(u32 *flags, u32 mask)
 {
     return *flags & mask;
-}
-static inline s32 Scale(s32 v, u32 shift)
-{
-    return v >= 0 ? v >> shift : -((-v) >> shift);
 }
 void CameraTracking_UpdatePosition(struct CameraTracking *tracking)
 {
@@ -36,12 +33,12 @@ void CameraTracking_UpdatePosition(struct CameraTracking *tracking)
         tracking->scale = tracking->minimum;
     if (tracking->scale > tracking->maximum)
         tracking->scale = tracking->maximum;
-    factor = Scale(tracking->scale * tracking->blend, 7);
-    position.x = first->x + Scale((second->x - first->x) * factor, 8);
+    factor = Vanargand_TruncateShift(tracking->scale * tracking->blend, 7);
+    position.x = first->x + Vanargand_TruncateShift((second->x - first->x) * factor, 8);
     if (Test(&tracking->flags, 1))
         position.y = first->y + 150;
     else
-        position.y = first->y + Scale((second->y - first->y) * factor, 8);
-    position.z = first->z + Scale((second->z - first->z) * factor, 8);
+        position.y = first->y + Vanargand_TruncateShift((second->y - first->y) * factor, 8);
+    position.z = first->z + Vanargand_TruncateShift((second->z - first->z) * factor, 8);
     Camera_SetPosition(&position);
 }

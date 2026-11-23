@@ -1,4 +1,5 @@
 #include "global.h"
+#include "group_objects.h"
 
 struct E {
     u32 flags;
@@ -25,11 +26,6 @@ s32 Div(s32, s32);
 void SolarBomb_SetState(struct S *, void (*)(struct S *));
 void sub_08233CAC(struct S *);
 void SpriteDrawable_SelectTileFrame(void *, u32, u32);
-
-static inline int scale(int n)
-{
-    return n >= 0 ? n >> 12 : -((-n) >> 12);
-}
 
 void sub_08233B78(struct S *p)
 {
