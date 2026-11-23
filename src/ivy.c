@@ -36,6 +36,7 @@
 #include "scene_actor_init_graphics.h"
 #include "scene_actor_init_actor.h"
 #include "scene_actor_placement.h"
+#include "movement_curve.h"
 
 void SceneActorBehavior_ApplyContactReaction(void *, void *, void *);
 
@@ -327,15 +328,6 @@ static inline void ResetState(struct ChaseActor *actor, u32 s)
     actor->base.field2B1 = 1;
 }
 
-static inline void SetState(struct ChaseActor *actor, u32 s, u32 p, u32 b)
-{
-    actor->base.state2A8 = s;
-    actor->base.phase2A9 = p;
-    actor->base.behavior2AA = b;
-    actor->base.counter2AC = 0;
-    actor->base.field2B1 = 1;
-}
-
 static inline void Facing(struct ChaseActor *actor, u8 *quadrant, u8 *flip)
 {
     s32 side = ((actor->base.body.direction + 0x60) >> 6) & 3;
@@ -409,11 +401,6 @@ static inline u8 MayCount(struct ChaseActor *victim)
     return 1;
 }
 
-static inline void ClearVector(void *dest)
-{
-    CpuFill32(0, dest, 8);
-}
-
 static inline void ReportDrain(struct ChaseActor *victim)
 {
     struct ContactPackedVector range;
@@ -423,7 +410,7 @@ static inline void ReportDrain(struct ChaseActor *victim)
         s32 kind = (s16)victim->base.hudKind;
         s32 parameter = (s16)victim->base.hudLabel;
         SceneHud_SetTimedState(victim->base.body.id, health, max, kind, 0, parameter);
-        ClearVector(&range);
+        ZeroFill8(&range);
         if (victim->base.reactionSoundVariant || !(victim->base.hitAttributes & 0x20000))
             DamageNumberDisplay_Show(&victim->base.colliderA, victim->base.reactionSoundVariant, 0,
                                      &victim->base.body.position, &range, 1);
@@ -523,7 +510,7 @@ void Ivy_UpdateHold(struct ChaseActor *actor, s32 frame)
                 Player_ApplyPositionRequest(player, (struct SceneVec *)&position, 0x40, quadrant,
                                             0x3C, 0, 0, 0);
                 ClearHeld(context);
-                SetState(actor, 0, 0, 2);
+                MonsterInit_SetState(actor, 0, 0, 2);
                 SceneActorChase_SetControl(actor, (void *)Ivy_UpdateActiveState, 0x22);
                 return;
             }
@@ -1528,14 +1515,6 @@ void *SceneActor_FindNearbyPlayerTarget(struct ChaseActor *actor);
 
 struct ChaseActor *SceneActorRegistry_FindNearestCategoryActor(const struct ContactPosition *);
 
-static inline void Delta(struct ContactPosition *out, const struct ContactPosition *from,
-                         const struct ContactPosition *to)
-{
-    out->x = to->x - from->x;
-    out->y = to->y - from->y;
-    out->z = to->z - from->z;
-}
-
 /* Row stride of the current terrain map, in cells. */
 
 #define MAP_WIDTH (*(s16 *)(gTerrainMap->cells + 4))
@@ -1568,7 +1547,7 @@ s32 Ivy_FindAdjacentTarget(struct ChaseActor *actor, s32 mode)
     u32 cell;
     if (target && actor->base.body.position.y == target->position.y) {
         s32 distance;
-        Delta(&delta, &actor->base.body.position, &target->position);
+        MovementCurve_SubtractPositions(&delta, &actor->base.body.position, &target->position);
         distance = delta.x * delta.x + delta.z * delta.z;
         if (best > distance)
             best = distance;
@@ -1578,7 +1557,8 @@ s32 Ivy_FindAdjacentTarget(struct ChaseActor *actor, s32 mode)
     other = SceneActorRegistry_FindNearestCategoryActor(&actor->base.body.position);
     if (other && actor->base.body.position.y == other->base.body.position.y) {
         s32 distance;
-        Delta(&delta, &actor->base.body.position, &other->base.body.position);
+        MovementCurve_SubtractPositions(&delta, &actor->base.body.position,
+                                        &other->base.body.position);
         distance = delta.x * delta.x + delta.z * delta.z;
         if (best > distance)
             target = (void *)((u8 *)other + 0x50);
