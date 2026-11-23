@@ -1700,9 +1700,7 @@ static inline void Show(struct ChaseActor *input)
     {
         u32 *flags = actor->base.drawable;
         u32 value = *flags;
-        u32 mask;
-        mask = ~1;
-        *flags = value & mask;
+        *flags = value & ~1;
     }
     {
 
