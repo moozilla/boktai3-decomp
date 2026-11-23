@@ -20,15 +20,7 @@ void ActorController_UpdateLayeredEnd(struct SceneCombatActor *actor)
             *f = two;
         }
         four = 4;
-        ((struct ContactCollider *)(p + 0x238))->flags &= ~four;
-        ((struct ContactCollider *)(p + 0x1e4))->flags &= ~four;
-        ((struct ContactCollider *)(p + 0x28c))->flags &= ~four;
-        ((struct ContactCollider *)(p + 0x190))->flags |= four;
-        {
-            struct ActorControllerMotion *render = (void *)(p + 0x180);
-            u32 one = 1;
-            render->flags &= ~one;
-        }
+        SceneCombatActor_SelectFirstCollider((struct SceneCombatActor *)p);
         *(u16 *)(s - 14) &= ~0x20;
     }
 }
