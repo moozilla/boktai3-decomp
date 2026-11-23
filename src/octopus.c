@@ -357,23 +357,6 @@ static inline void CellCenter(struct SceneVec *out, u32 cell)
     out->z = (z << 8) + 0x80;
 }
 
-static inline void SetCtl(struct ChaseActor *actor, void *cb, u32 k)
-{
-    void *callback = cb;
-    u32 kind = k;
-    actor->base.field2B2 = 1;
-    actor->base.stepDone = 0;
-    actor->base.controlKind = kind;
-    actor->base.target = callback;
-    actor->base.field2C8 = 0;
-    {
-        u32 *field = &actor->base.pendingControlFlags;
-        u32 mask = ~1;
-        *field &= mask;
-    }
-    actor->base.pendingControl = 0;
-}
-
 static inline void ResetState(struct ChaseActor *actor, u32 s)
 {
     actor->base.state2A8 = s;
@@ -547,7 +530,7 @@ void Octopus_UpdateHold(struct ChaseActor *actor, s32 frame)
                 Player_ApplyPositionRequest(player, (struct SceneVec *)&position, 0x40, quadrant,
                                             0x3C, 0, 0, 0);
                 SetState(actor, 0, 0, 0);
-                SetCtl(actor, (void *)SceneActorControl_OnIdle, 0x10);
+                SceneActorChase_SetControl(actor, (void *)SceneActorControl_OnIdle, 0x10);
                 return;
             }
             {
@@ -1072,21 +1055,6 @@ s32 Octopus_UpdateBodyColliderPosition(struct ChaseActor *actor)
 
 void SceneActor_BeginReactionAnimation(struct ChaseActor *actor);
 
-static inline void SetControl_WaitHiddenForAdjacentTarget(struct ChaseActor *a, void *cb, u32 k)
-{
-    a->base.field2B2 = 1;
-    a->base.stepDone = 0;
-    a->base.controlKind = k;
-    a->base.target = cb;
-    a->base.field2C8 = 0;
-    {
-        u32 *p = &a->base.pendingControlFlags;
-        u32 mask = ~1;
-        *p &= mask;
-    }
-    a->base.pendingControl = 0;
-}
-
 static inline void State(struct ChaseActor *a, u8 state, u8 phase, u8 behavior)
 {
     a->base.state2A8 = state;
@@ -1126,28 +1094,13 @@ void SceneActorReaction_WaitHiddenForAdjacentTarget(struct ChaseActor *a)
             a->base.counter2AC++;
     } else {
         State(a, 0, 0, 2);
-        SetControl_WaitHiddenForAdjacentTarget(a, (void *)SceneActor_BeginReactionAnimation, 41);
+        SceneActorChase_SetControl(a, (void *)SceneActor_BeginReactionAnimation, 41);
     }
 }
 
 void SceneActorControl_OnIdle(u8 *);
 
 void Octopus_UpdateCaptureAttack(struct ChaseActor *actor);
-
-static inline void SetControl_ReacquireAdjacentTarget(struct ChaseActor *a, void *cb, u32 k)
-{
-    a->base.field2B2 = 1;
-    a->base.stepDone = 0;
-    a->base.controlKind = k;
-    a->base.target = cb;
-    a->base.field2C8 = 0;
-    {
-        u32 *p = &a->base.pendingControlFlags;
-        u32 mask = ~1;
-        *p &= mask;
-    }
-    a->base.pendingControl = 0;
-}
 
 static inline void State_ReacquireAdjacentTarget(struct ChaseActor *a, u32 state)
 {
@@ -1172,7 +1125,7 @@ static inline void IdleState(struct ChaseActor *a)
 void SceneActorReaction_ReacquireAdjacentTarget(struct ChaseActor *a)
 {
     if (SceneActorControl_TakeFlag(&a->base.field2B1)) {
-        SetControl_ReacquireAdjacentTarget(a, (void *)SceneActor_BeginReactionAnimation, 41);
+        SceneActorChase_SetControl(a, (void *)SceneActor_BeginReactionAnimation, 41);
         a->base.restart = 0;
     }
     if (a->base.restart || a->base.controlKind == 34) {
@@ -1187,11 +1140,11 @@ void SceneActorReaction_ReacquireAdjacentTarget(struct ChaseActor *a)
                 p[2] &= mask;
             }
             State_ReacquireAdjacentTarget(a, 3);
-            SetControl_ReacquireAdjacentTarget(a, (void *)Octopus_UpdateCaptureAttack, 3);
+            SceneActorChase_SetControl(a, (void *)Octopus_UpdateCaptureAttack, 3);
         }
         if (a->base.controlKind == 34 && (s32)a->base.counter2AC > 180) {
             IdleState(a);
-            SetControl_ReacquireAdjacentTarget(a, (void *)SceneActorControl_OnIdle, 16);
+            SceneActorChase_SetControl(a, (void *)SceneActorControl_OnIdle, 16);
             return;
         }
     }
