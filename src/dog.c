@@ -1609,20 +1609,11 @@ void SceneActorAttachment_ReplaceResponseSlot(void *, u32, u32, u32);
 
 void Dog_UpdateDefeatFinish(struct ChaseActor *actor, s32 frame);
 
-inline static u8 TakeFlag(u8 *flag)
-{
-    if (*flag) {
-        *flag = 0;
-        return 1;
-    }
-    return 0;
-}
-
 void Dog_UpdateDefeatDelay(struct ChaseActor *actor, s32 frame)
 {
     struct SceneActorChaseGroup *group = &actor->group;
     u32 mask;
-    if (TakeFlag(&actor->base.field2B2)) {
+    if (SceneActorControl_TakeFlag(&actor->base.field2B2)) {
         u32 test;
         u16 *flags;
         u32 value;
@@ -1967,19 +1958,10 @@ void SceneActorAnimation_SpawnTrailAtPosition(void *, u32);
 
 void SceneActorAnimation_RefreshTimedAttackCollider(struct ChaseActor *a, u32 frame);
 
-static inline u8 TakePrepared(struct ChaseActor *a)
-{
-    if (a->base.field2B2) {
-        a->base.field2B2 = 0;
-        return 1;
-    }
-    return 0;
-}
-
 void SceneActorAnimation_EmitDirectionalTrail(struct ChaseActor *a, s32 frame)
 {
     union SceneActorRegistryPackedPosition p;
-    if (TakePrepared(a))
+    if (SceneActorReaction_TakePrepared(a))
         SceneActorAnimation_SelectDirectionalEntry(&a->base, 17);
     {
         struct DisplaySequenceState *sequence = (void *)((u8 *)a->base.drawable + 0x48);
@@ -2021,7 +2003,7 @@ void FeatherEffectPool_CreateDirectional(struct ContactPosition *, u32, u32, u32
 void SceneActorAnimation_RefreshTimedAttackCollider(struct ChaseActor *a, u32 frame)
 {
     struct SceneActorTimedAttackContext *context = a->base.context;
-    if (TakePrepared(a)) {
+    if (SceneActorReaction_TakePrepared(a)) {
         u32 variant, palette;
         SceneActorAnimation_SelectDirectionalEntry(&a->base, 17);
         palette = a->base.paletteOffset;
@@ -2040,19 +2022,10 @@ void SceneActorAnimation_RefreshTimedAttackCollider(struct ChaseActor *a, u32 fr
 
 void Dog_LeapTowardTarget(struct ChaseActor *actor);
 
-static inline u8 TakePending(u8 *flag)
-{
-    if (*flag) {
-        *flag = 0;
-        return 1;
-    }
-    return 0;
-}
-
 void Dog_UpdateLeapWindup(struct ChaseActor *actor)
 {
     u8 *context = actor->base.context;
-    if (TakePending(&actor->base.field2B2)) {
+    if (SceneActorControl_TakeFlag(&actor->base.field2B2)) {
         SceneActorAnimation_SelectDirectionalEntry(actor, 0xF);
         *(struct ContactPosition *)(context + 0x6D8) = actor->base.tracking.target->position;
     }
@@ -2085,23 +2058,15 @@ static inline void Polar(struct ContactPosition *out, u32 angle, s32 speed)
     out->z = Scale12(gUnk_086149C4[angle & 0xFF] * speed);
 }
 
-static inline void Delta_reaction(struct ContactPosition *out, const struct ContactPosition *from,
-                                  const struct ContactPosition *to)
-{
-    out->x = to->x - from->x;
-    out->y = to->y - from->y;
-    out->z = to->z - from->z;
-}
-
 void Dog_LeapTowardTarget(struct ChaseActor *actor)
 {
     u8 *context = actor->base.context;
     struct ContactPosition velocity;
-    if (TakeFlag(&actor->base.field2B2)) {
+    if (SceneActorControl_TakeFlag(&actor->base.field2B2)) {
         s32 angle, facing, turn;
         context = actor->base.context;
-        Delta_reaction(&velocity, &actor->base.body.position,
-                       (struct ContactPosition *)(context + 0x6D8));
+        Chase_Delta(&velocity, &actor->base.body.position,
+                    (struct ContactPosition *)(context + 0x6D8));
         angle = Math_Atan2(velocity.x, velocity.z);
         facing = ((actor->base.body.direction + 0x20) & 0xFF) >> 6 << 6;
         turn = angle - facing;
@@ -2137,7 +2102,7 @@ void Dog_LeapTowardTarget(struct ChaseActor *actor)
 
 void Dog_UpdateAnimationSixteenReaction(u8 *p)
 {
-    if (TakeFlag(p + 0x2B2))
+    if (SceneActorControl_TakeFlag(p + 0x2B2))
         SceneActorAnimation_SelectDirectionalEntry(p, 0x10);
     if (*(u8 *)(p + 0x2B3))
         *(u8 *)(p + 0x2B0) = 1;
@@ -2145,7 +2110,7 @@ void Dog_UpdateAnimationSixteenReaction(u8 *p)
 
 void Dog_UpdateAnimationFourteenReaction(u8 *p)
 {
-    if (TakeFlag(p + 0x2B2))
+    if (SceneActorControl_TakeFlag(p + 0x2B2))
         SceneActorAnimation_SelectDirectionalEntry(p, 0xE);
     if (*(u8 *)(p + 0x2B3))
         *(u8 *)(p + 0x2B0) = 1;
@@ -2266,7 +2231,7 @@ s32 Terrain_ApplyBlocked(void *, struct ContactPosition *, struct ContactPositio
 void SceneActorMotion_TestTargetTransition(struct ChaseActor *a)
 {
     struct Dog *context = a->base.context;
-    if (!TakePrepared(a)) {
+    if (!SceneActorReaction_TakePrepared(a)) {
         SceneActorAnimation_SelectDirectionalEntry(&a->base, 11);
         if ((u8)Dog_IsActionTimerExpired(a)) {
             struct SceneActorChaseGroup *group = &a->group;
@@ -2324,7 +2289,7 @@ void SceneActorMotion_UpdateTargetTransition(struct ChaseActor *a)
 {
     u32 *flags;
     struct SceneActorTargetMotionContext *c = a->base.context;
-    if (!TakePrepared(a)) {
+    if (!SceneActorReaction_TakePrepared(a)) {
         u32 four = 4;
         u32 *address = &c->flags;
         u32 value = *address & four;
@@ -2654,7 +2619,7 @@ struct Sscripted {
 
 void Dog_UpdateScriptedAction(struct Sscripted *obj)
 {
-    if (TakeFlag(((u8 *)obj) + 0x2B1)) {
+    if (SceneActorControl_TakeFlag(((u8 *)obj) + 0x2B1)) {
         u16 *h;
         u16 value;
         s32 off;
