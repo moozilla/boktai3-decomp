@@ -1,6 +1,7 @@
 #include "scene_actor_state.h"
 #include "scene_actor_registry.h"
 #include "player.h"
+#include "scene_actor_status.h"
 u8 *TerrainModifiers_FindCellOverride(s32, s32);
 static inline u32 TerrainHeight(struct ChaseActor *actor, u32 index)
 {
@@ -32,12 +33,6 @@ static inline u8 IsPlayerRelativeCategory(u32 c)
         return 1;
     return 0;
 }
-static inline u8 HasSceneFlag(struct ChaseActor *actor, u32 mask)
-{
-    if (actor->base.placementFlags & mask)
-        return 1;
-    return 0;
-}
 void SceneActorMovement_UpdateHeight(struct ChaseActor *actor)
 {
     u32 category = actor->base.category;
@@ -59,7 +54,7 @@ void SceneActorMovement_UpdateHeight(struct ChaseActor *actor)
             actor->base.groundHeight = height;
         }
     }
-    if (!HasSceneFlag(actor, 0x20)) {
+    if (!ActorStatus_BodyFlags(actor, 0x20)) {
         u16 height = actor->base.groundHeight;
         actor->base.body.position.y = height;
         actor->base.body.position.y = height + actor->base.heightOffset;

@@ -2,6 +2,7 @@
 #include "scene_particle_burst_api.h"
 #include "engine.h"
 #include "scene_actor_reset.h"
+#include "scene_actor_behavior.h"
 s32 Div(s32, s32);
 s32 Mod(s32, s32);
 static inline s32 motionSquared(struct ContactPosition *motion)
@@ -13,10 +14,6 @@ static inline s32 halve(s32 value)
     if (value >= 0)
         return value >> 1;
     return -(-value >> 1);
-}
-static inline void orFlags(u32 *flags, u32 mask)
-{
-    *flags |= mask;
 }
 s32 SceneActorMovement_UpdateAirborne(struct ChaseActor *actor)
 {
@@ -122,7 +119,7 @@ done:;
         *(s16 *)&actor->base.heightOffset == 0) {
         actor->base.heightOffset = 0;
         ZeroFill8(&actor->base.secondaryMotion);
-        orFlags(flags, 0x10);
+        SceneActorBehavior_SetWordFlags(flags, 0x10);
         return 1;
     }
     return 0;
