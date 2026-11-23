@@ -17,8 +17,9 @@ their own definition of a struct a header already has. A *twin* is exact:
 A helper with several shared twins is applied only when one of them has the private copy's own
 name or is the only one the unit already sees through its includes; otherwise it is reported
 as ambiguous. A twin whose shared name has no Object_ prefix (`scale`, `add`) is reported, not
-applied, in place of a private name that has one. The private definition goes with the comment
-lines directly above it.
+applied, in place of a private name that has one. A private helper's definition goes with the
+comment lines directly above it (its description; a `confidence=` note stays); a struct's
+comments stay.
 
 For each twin the private definition goes, its uses are renamed to the shared name (the helper's
 calls, `struct Old` or the typedef name), the header is included when the unit does not already
@@ -206,10 +207,12 @@ def add_include(text, header):
     return text[:at] + line + text[at:]
 
 
-def cut(text, start, end):
-    """TEXT without [START, END) and the comment lines directly above it, leaving one blank line."""
+def cut(text, start, end, comment=True):
+    """TEXT without [START, END), leaving one blank line. COMMENT: also the comment lines directly
+    above it (a helper's description), except a `confidence=` note, which names a function."""
     lines_above = text[:start].splitlines(keepends=True)
-    while lines_above and re.match(r"\s*(//|/\*.*\*/\s*$)", lines_above[-1]):
+    while comment and lines_above and re.match(r"\s*(//|/\*.*\*/\s*$)", lines_above[-1]) \
+            and "confidence=" not in lines_above[-1]:
         lines_above.pop()
     head = "".join(lines_above)
     tail = text[end:]
@@ -254,7 +257,7 @@ def plan(text, idx, drafts):
 
 
 def replace(text, kind, priv, shared):
-    new = cut(text, priv.start, priv.end)
+    new = cut(text, priv.start, priv.end, comment=kind == "helper")
     if priv.name != shared.name:
         if kind == "helper" or priv.typedef:
             new = rename(new, priv.name, shared.name)

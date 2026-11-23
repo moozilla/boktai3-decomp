@@ -121,6 +121,14 @@ class Twins(unittest.TestCase):
         self.assertNotIn("tests the mask", new)
         self.assertIn("Flags_Test(4, &a->flags)", new)
 
+    def test_struct_comment_and_confidence_notes_stay(self):
+        text = "// confidence=low: the update\nstatic inline u8 H(u8 x)\n{\n    return x;\n}\n"
+        h = it.helpers(text)[0]
+        self.assertTrue(it.cut(text, h.start, h.end).startswith("// confidence=low"))
+        text = "// about the file\nstruct Vec {\n    s16 x;\n};\n"
+        r = it.records(text)[0]
+        self.assertEqual(it.cut(text, r.start, r.end, comment=False), "// about the file\n")
+
     def test_record_rename_touches_only_the_tag(self):
         text = "struct Old {\n    s32 a;\n};\nstruct Old *p; int Old;\n"
         priv = it.records(text)[0]
