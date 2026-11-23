@@ -57,7 +57,8 @@ struct PhaseObject {
     s32 orbitAngles[4];
     s8 turnSpeed;
     u8 targetAngle;
-    u8 unknown4B2[2];
+    u8 orbitAngle; /* the member colliders orbit at this angle (28 - rotation) */
+    u8 unknown4B3;
     u16 turnFrames;
     u8 unknown4B6[2];
     s32 countdown;
