@@ -22,7 +22,7 @@ void sub_081BE730(struct StoragePanel *panel)
     struct SceneInputPosition starts[2], targets[2];
     u32 enabled[2], frames[2], attributes[2];
     struct StorageFlagsView *display = (void *)panel;
-    u32 base, attribute;
+    u32 base;
     enabled[0] = 1;
     display->widgets[panel->selection + 8].flags |= 1;
     {
@@ -30,13 +30,12 @@ void sub_081BE730(struct StoragePanel *panel)
         base = 0x121;
         frames[0] = id + base;
     }
-    attribute = 0x373;
-    attributes[0] = attribute;
+    attributes[0] = 0x373;
     Storage_GetSlotPosition(starts, panel->selection);
     Storage_GetSlotPosition(targets, 32);
     enabled[1] = 0;
     frames[1] = base;
-    attributes[1] = attribute;
+    attributes[1] = 0x373;
     starts[1].x = 0;
     starts[1].y = 0;
     starts[1].z = 0;
