@@ -96,11 +96,8 @@ void RecordMenu_DrawRecords(struct RecordMenu *menu)
     TimerDisplay_DrawRecord((struct TimerRecords *)rec, 5, 0x11, menu->selection, 0);
     TimerDisplay_DrawRecord((struct TimerRecords *)rec, 0x17, 0x11, menu->selection, 1);
     cell = (u16 *)Video_GetWrappedBackgroundMapEntry(3, 0, 0x10);
-    {
-        u16 one = 1;
-        for (i = 0x1d; i >= 0; i--)
-            *cell++ = one;
-    }
+    for (i = 0; i < 30; i++)
+        *cell++ = 1;
     if (rec->ticksA == rec->ticksB) {
         gGameState->draws++;
         menu->spriteIds[4] = 0x37;
