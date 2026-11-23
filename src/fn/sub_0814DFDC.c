@@ -10,7 +10,7 @@ u8 *Player_GetSpecialAttackDescriptor(s32);
 s32 Player_IsStatBBelow(struct Player *, s32);
 void Player_ConfigureActionSelectionDisplay(struct Player *);
 void PlayerContact_GetOffsetPosition(s32, struct SceneVec *);
-s32 Task4E01_GetKind7Value(void);
+s32 Task4E01_GetKind7Value(s32);
 u32 Player_GetAttackAttributeFlags(u32);
 void Projectile_SetDamageParams(void *, s32, u32, s32, s32, s32);
 s32 Projectile_CreateForOwner(void *, struct SceneVec *, s32);
@@ -73,7 +73,7 @@ s32 Player_SpawnSelectedAttackProjectile(struct Player *p)
                 if (p->statModifierContext.attachedEntry < 0)
                     cost = 0;
                 else {
-                    s32 count = Task4E01_GetKind7Value();
+                    s32 count = Task4E01_GetKind7Value(p->statModifierContext.attachedEntry);
                     if (count > 0) {
                         s32 prior = cost - 1;
                         cost = prior + count;

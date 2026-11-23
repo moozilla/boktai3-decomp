@@ -3,6 +3,7 @@
 #include "ram.h"
 #include "display_sequence_inline.h"
 #include "projectile_pool.h"
+#include "engine_pause.h"
 struct ProjectilePlaybackConfig {
     u16 baseY;
     s16 spriteFlag;
@@ -52,8 +53,7 @@ s32 ProjectilePool_Update(struct TimedProjectilePool *pool)
     struct ProjectileSlot *cursor, *base;
     s32 i;
     {
-        u32 mask = 0x400;
-        if ((gEngineFlags | gScenePauseFlags) & mask)
+        if (Engine_PauseBits(0x400))
             return 0;
     }
     {

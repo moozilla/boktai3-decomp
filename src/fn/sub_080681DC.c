@@ -2,8 +2,7 @@
 #include "ram.h"
 static inline u8 IsUsed(u32 *used, u32 index)
 {
-    u32 one = 1;
-    if (*used & (one << index))
+    if (*used & (1 << index))
         return 1;
     return 0;
 }

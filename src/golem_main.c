@@ -491,7 +491,7 @@ void SceneActorCollision_InitBody(u8 *, struct Z *, struct Z *, void (*)(void), 
 
 void SceneActorCollision_InitAttack(u8 *, struct Z *, struct Z *, void (*)(void), u32, u8 *);
 
-void Golem_OnBodyCollision(void);
+void Golem_OnBodyCollision(void *, void *, void *);
 
 void Golem_OnAttackCollision(struct ContactCollider *self, struct ContactCollider *other,
                              struct ChaseActor *a);
@@ -709,11 +709,11 @@ void Golem_OnAttackCollision(struct ContactCollider *self, struct ContactCollide
         RecordContact(a, other);
 }
 
-void SceneActorReaction_HandleColliderContact(void);
+void SceneActorReaction_HandleColliderContact(void *, void *, void *);
 
-void Golem_OnBodyCollision(void)
+void Golem_OnBodyCollision(void *source, void *destination, void *actor)
 {
-    SceneActorReaction_HandleColliderContact();
+    SceneActorReaction_HandleColliderContact(source, destination, actor);
 }
 
 void SceneActorAnimation_SelectDirectionalEntry(struct RoomActor *, s32);

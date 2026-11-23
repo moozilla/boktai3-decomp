@@ -48,7 +48,7 @@ void LinkPanel_RunCompletionScript(struct LinkPanel *panel);
 void LinkPanel_UpdateExitTransition(struct LinkPanel *panel);
 void LinkPanel_UpdateConnection(struct LinkPanel *panel);
 s32 LinkPanel_Update(struct LinkPanel *panel);
-s32 LinkPanel_Destroy(void);
+s32 LinkPanel_Destroy(void *panel);
 s32 LinkPanel_InitFromScript(struct LinkPanel *panel);
 struct LinkPanel *LinkPanel_Create(void);
 #endif

@@ -3,25 +3,8 @@
 #include "global.h"
 #include "engine.h"
 #include "ram.h"
-struct NamedObjectPosition {
-    u32 xy, zp;
-};
-struct NamedObject {
-    u8 pad0[0x1C];
-    struct NamedObjectPosition spritePosition;
-    u8 pad24[0x92];
-    s16 state;
-    u8 padB8[0x2C];
-    void *callbackE4, *callbackE8, *callbackEC;
-    u8 padF0[0x1C];
-    struct NamedObjectPosition position;
-    u8 pad114[0x88];
-};
-struct NamedObjectManager {
-    u8 pad0[0x1C];
-    struct NamedObject objects[12];
-    u32 activeMask;
-};
+#include "engine_pause.h"
+#include "named_object.h"
 extern s32 gUnk_02000560;
 extern void *gUnk_086064CC[];
 void NamedObject_RegisterFollowCells(struct NamedObject *);
@@ -42,14 +25,12 @@ static inline u32 testMask(void)
 }
 u32 NamedObject_UpdatePool(struct NamedObjectManager *manager)
 {
-    struct NamedObject *objects = manager->objects;
+    struct NamedObject *objects = manager->slots;
     s32 i;
-    if (!manager->activeMask)
+    if (!manager->used)
         return 0;
     {
-        u32 mask = 0x400;
-        s32 mask2 = 4;
-        if ((mask & (gEngineFlags | gScenePauseFlags)) || testMask()) {
+        if (Engine_PauseBits(0x400) || testMask()) {
             Sound_StopSong(0x158);
             Sound_StopSong(0x261);
             Sound_StopSong(0x289);
@@ -60,19 +41,19 @@ u32 NamedObject_UpdatePool(struct NamedObjectManager *manager)
     }
     if (!(gEnginePauseFlags & 8)) {
         for (i = 0; i < 12; i++) {
-            u32 *active = &manager->activeMask;
+            u32 *active = &manager->used;
             if (isActive(*active, 1 << i)) {
                 struct NamedObject *object = (struct NamedObject *)(i * 0x19C + (u32)objects);
                 if (object->state != 6) {
-                    Callback_InvokeActor(object, object->callbackE4);
+                    Callback_InvokeActor(object, object->handlers[0]);
                     Callback_InvokeActor(object, gUnk_086064CC[object->state]);
-                    Callback_InvokeActor(object, object->callbackE8);
-                    Callback_InvokeActor(object, object->callbackEC);
+                    Callback_InvokeActor(object, object->handlers[1]);
+                    Callback_InvokeActor(object, object->handlers[2]);
                     NamedObject_RegisterFollowCells(object);
                     NamedObject_UpdateFollowers(object);
                     sub_0810103C(object);
-                    object->spritePosition = object->position;
-                    *(u16 *)&object->spritePosition -= 0x100;
+                    object->sprite.position = object->body.position;
+                    object->sprite.position.x -= 0x100;
                     NamedObject_ApplyVerticalImpulseAndJitter(object);
                 }
             }

@@ -137,4 +137,9 @@ s32 PoisonHand_InitializeFromScript(u8 *p, void *parent)
         SceneBody_SetSprite(body, p + 0x24);
         TerrainOverlay_QueueAddActor(body);
     }
+#ifdef UBFIX
+    // falls off the end with r0 left over from its last statement; the creator only tests
+    // < 0, and this initializer has no failure path here
+    return 0;
+#endif
 }

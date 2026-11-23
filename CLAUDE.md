@@ -30,6 +30,12 @@ write `~`). The hooks in `.githooks` run `tools/pii_check.py`.
   Nonmatching C goes on `main` only inside `#ifdef NONMATCHING` with an
   `INCLUDE_ASM` `#else` branch (see `docs/WORKER.md`). The default build never
   compiles it; it is reported as a fuzzy score, never as exact progress.
+* Undefined behavior that works on the GBA by accident (a call missing an argument
+  that inherits a register, a function that falls off the end and returns a leftover):
+  write the value explicitly first; if the unit still matches, that is a decomp
+  correction. If not, keep the matching form and put the fix under `#ifdef UBFIX` /
+  `#else` / `#endif` with a comment naming the inherited value. The matching build
+  never defines `UBFIX`, the port does; `UBFIX` is never used to steer matching.
 * No selector macros (a `#define` a file sets before including a shared header
   to change the header's code). Use real struct fields and types from `include/`.
 * One translation unit per change/PR. A unit is a `src/*.c` file covering a

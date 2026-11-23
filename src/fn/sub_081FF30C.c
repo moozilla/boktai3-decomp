@@ -11,12 +11,10 @@ struct S {
 };
 void SpriteParticle_InitParams(struct S *p)
 {
-    u32 z;
     Memory_Clear(p, 0x34);
     SpriteParticle_SetMotionParams(p, 0, 0x78, 0, 5);
     SpriteParticle_SetSpriteResource(p, 0x848F, 0, -1);
     SpriteParticle_SetUpdateCallback(p, SpriteParticle_OnDefaultUpdate);
-    z = 0;
-    p->w2c = z;
-    p->h30 = z;
+    p->w2c = 0;
+    p->h30 = 0;
 }

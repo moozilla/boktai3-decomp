@@ -2,24 +2,7 @@
 #include "player.h"
 #include "terrain_cell_probe.h"
 #include "ram.h"
-struct NamedObject {
-    u8 pad0[0xB6];
-    u16 state;
-    u16 flags;
-    u8 padBA[0xDC - 0xBA];
-    u32 name;
-    u8 padE0[0xF3 - 0xE0];
-    u8 kind;
-    u8 padF4[0x10C - 0xF4];
-    struct Pos16 position;
-    u8 pad114[0x158 - 0x114];
-    u8 registration[4][0x10];
-    u8 registered[4];
-};
-struct NamedObjectManager {
-    u8 pad0[0x1370];
-    u32 followName;
-};
+#include "named_object.h"
 void ActorGroup_ReleaseMember(struct NamedObject *);
 void TerrainModifiers_RegisterCell(void *, s32, s32, s32, s32, s32);
 s32 Div(s32, s32);
@@ -84,15 +67,15 @@ void NamedObject_RegisterFollowCells(struct NamedObject *objectArg)
         if (TestV(v, ~0))
             return;
     }
-    base = GetCell(&object->position);
+    base = GetCell(&object->body.position);
     cell = base + 1;
     i = 0;
-    registration = object->registration[0];
+    registration = object->cellRegistrations[0];
     for (; i < 4; i++) {
         if (HasBits((u16 *)(cellProps(cell) + 2))) {
-            TerrainModifiers_RegisterCell(registration, cell, 0, (s16)object->position.y >> 8, 0xFF,
-                                          5);
-            object->registered[i] = 1;
+            TerrainModifiers_RegisterCell(registration, cell, 0, (s16)object->body.position.y >> 8,
+                                          0xFF, 5);
+            object->cellRegistered[i] = 1;
             w = &where;
             col = Mod(cell, *(s16 *)(gTerrainMap->cells + 4));
             row = Div(cell, *(s16 *)(gTerrainMap->cells + 4));

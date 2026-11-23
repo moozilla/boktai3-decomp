@@ -4,12 +4,12 @@ struct Unk08127EFC {
     u32 unk0;
 };
 
-struct Unk08127EFC *DirectionalProjectile_AllocateSlot(void);
+struct Unk08127EFC *DirectionalProjectile_AllocateSlot(void *);
 
 // &p->unk0 == p, but agbcc keeps the null test for the address expression
-u32 *DirectionalProjectile_AllocateSprite(void)
+u32 *DirectionalProjectile_AllocateSprite(void *pool)
 {
-    struct Unk08127EFC *p = DirectionalProjectile_AllocateSlot();
+    struct Unk08127EFC *p = DirectionalProjectile_AllocateSlot(pool);
     if (!p)
         return NULL;
     return &p->unk0;

@@ -168,4 +168,9 @@ s32 PinkSpine_InitFromScript(struct PinkSpineState *p, void *resource)
     }
     p->f136 = 1;
     /* This initializer has no explicit return-value assignment in the ROM. */
+#ifdef UBFIX
+    // falls off the end with r0 left over from its last statement; the creator only tests
+    // < 0, and this initializer has no failure path here
+    return 0;
+#endif
 }

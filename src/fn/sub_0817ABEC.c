@@ -1,20 +1,17 @@
 #include "global.h"
 #include "engine_globals.h"
 #include "ram.h"
+#include "contact_position.h"
 /* SceneActors_SpawnDestructionParticles_0817ABEC: same as SceneActors_SpawnDestructionParticles but spawns the sparks on the object itself (provisional name) */
-struct Packed {
-    s32 x : 16, y : 16, z : 16, pad : 16;
-};
 void SparkParticle_Spawn(void *, int, void *, int, int, int, int, int);
 void SceneActors_SpawnDestructionParticles_0817ABEC(u8 *p)
 {
-    struct Packed size;
+    struct ContactPosition size;
     int angle;
     int speed;
     int count;
     u16 *table;
     u32 *indexPtr;
-    u32 mask;
     u32 smallMask;
     u32 *alias;
     u32 index;
@@ -25,26 +22,25 @@ void SceneActors_SpawnDestructionParticles_0817ABEC(u8 *p)
     indexPtr = &gRandomIndex;
     index = *indexPtr;
     index++;
-    mask = 1023;
-    index &= mask;
+    index &= 1023;
     angle = (u8)table[index];
-    index = (index + 1) & mask;
+    index = (index + 1) & 1023;
     count = table[index];
     smallMask = 3;
     count = (count & smallMask) + 2;
-    index = (index + 1) & mask;
+    index = (index + 1) & 1023;
     *indexPtr = index;
     alias = &index;
     speed = (table[*alias] & smallMask) + 20;
     SparkParticle_Spawn(p, 3, &size, angle, count, speed, 2, 2);
     {
         u32 *ptr = indexPtr;
-        index = ((*ptr) + 1) & mask;
+        index = ((*ptr) + 1) & 1023;
     }
     angle = (u8)table[*alias];
-    index = (index + 1) & mask;
+    index = (index + 1) & 1023;
     count = (table[index] & smallMask) + 2;
-    index = (index + 1) & mask;
+    index = (index + 1) & 1023;
     *indexPtr = index;
     speed = (table[*alias] & smallMask) + 20;
     SparkParticle_Spawn(p, 3, &size, angle, count, speed, 2, 2);

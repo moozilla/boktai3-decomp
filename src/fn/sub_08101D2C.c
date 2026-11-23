@@ -1,19 +1,10 @@
 #include "global.h"
 #include "named_object.h"
 #include "player.h"
+#include "named_object_flags.h"
 
 void TerrainModifiers_UnregisterCell(void *);
 void TerrainModifiers_RegisterCell(void *, u32, u32, u32, u32, u32);
-static inline u8 HasFlag(s32 mask, s16 *flags)
-{
-    if ((u16)*flags & mask)
-        return TRUE;
-    return FALSE;
-}
-static inline void ClearFlag(s32 mask, s16 *flags)
-{
-    *flags &= ~mask;
-}
 static inline void SetFlag(u16 *flags, u32 mask)
 {
     u32 m = mask;
@@ -36,12 +27,12 @@ void NamedObject_UpdateTerrainRegistration(struct NamedObject *object)
     struct EngineMap *map;
     s32 cell;
     if ((u16)(object->state - 3) > 1) {
-        if (HasFlag(1, &object->flags)) {
+        if (NamedObjectFlags_Has(1, &object->flags)) {
             TerrainModifiers_UnregisterCell(object->registration);
-            ClearFlag(1, &object->flags);
+            NamedObject_DisableFlags(1, object);
         }
     } else {
-        if (HasFlag(1, &object->flags))
+        if (NamedObjectFlags_Has(1, &object->flags))
             return;
         map = gTerrainMap;
         if (!map)

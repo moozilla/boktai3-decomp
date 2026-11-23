@@ -206,4 +206,9 @@ s32 Screamer_InitFromScript(struct ScreamerState *p, void *resource)
         p->f1FC = p->f1DA * p->f1DA;
     else
         p->f1FC = p->f1DA;
+#ifdef UBFIX
+    // falls off the end with r0 left over from its last statement; the creator only tests
+    // < 0, and this initializer has no failure path here
+    return 0;
+#endif
 }

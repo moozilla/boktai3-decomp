@@ -84,8 +84,7 @@ static inline s32 random(void)
     const u16 *table = gRandomTable;
     u32 *indexPtr = &gRandomIndex;
     u32 index = *indexPtr + 1;
-    u32 mask = 1023;
-    index &= mask;
+    index &= 1023;
     *indexPtr = index;
     return table[index];
 }
@@ -290,7 +289,6 @@ s32 SparkleEmitter_Initialize(struct SparkleEmitter *p, void *script)
     void *animation;
     struct SparkleParticle *sprite;
     s32 i;
-    u32 one;
 
     p->script = script;
     animation = p->animation;
@@ -298,13 +296,12 @@ s32 SparkleEmitter_Initialize(struct SparkleEmitter *p, void *script)
     AnimData_SelectPaletteBank(animation, 0x255);
     sprite = p->particles;
     i = 0;
-    one = 1;
     do {
         u32 flags;
         Sprite_Init(sprite, p->animation, 0);
-        flags = sprite->sprite.flags | one;
+        flags = sprite->sprite.flags | 1;
         sprite->sprite.flags = flags;
-        if (i & one)
+        if (i & 1)
             flags |= 0x200;
         else
             flags |= 0x400;

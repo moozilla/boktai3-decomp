@@ -7,8 +7,8 @@ void WirelessGameMenu_SetStatusPanelState(struct WirelessGameExchange *, int);
 void WirelessGameMenu_SignalStatusPanel(struct WirelessGameExchange *);
 void Player_EnterStateTen(void);
 void Player_EnterStateEleven(void);
-void WirelessGame_GetSelectedEquipmentEffect(int);
-void Player_SetTransitionMode(void);
+s32 WirelessGame_GetSelectedEquipmentEffect(int);
+void Player_SetTransitionMode(s32);
 void WirelessGameMenu_UpdateRoundPreparation(struct WirelessGameExchange *p)
 {
     if (p->entered) {
@@ -51,8 +51,8 @@ void WirelessGameMenu_UpdateRoundPreparation(struct WirelessGameExchange *p)
                 }
                 break;
         }
-        WirelessGame_GetSelectedEquipmentEffect(*(gGameState->slots88 + gGameState->selected));
-        Player_SetTransitionMode();
+        Player_SetTransitionMode(
+            WirelessGame_GetSelectedEquipmentEffect(*(gGameState->slots88 + gGameState->selected)));
     } else
         p->timer++;
 }

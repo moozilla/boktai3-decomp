@@ -78,7 +78,7 @@ void SceneCharacter_RegisterMessageReceiver(struct SceneNpc *, s32);
 void Actor_InitResources(void *, struct SceneNpc *, s32, s32);
 void Actor_LinkToManager(void *, struct SceneNpc *);
 void Actor_InitBehaviorFromScript(void *, struct SceneNpc *);
-void DisplayAnimation_SetFlags(void *);
+void DisplayAnimation_SetFlags(void *, u32);
 void Actor_DisableShadow(struct SceneNpc *);
 u8 SceneCharacter_GetPathNodeState(struct SceneNpc *);
 u32 ParticlePool_Create(void);
@@ -168,7 +168,7 @@ s32 SceneCharacter_CommandFromScript(void)
             npc->field10 = 0;
             npc->field9 = 1;
             npc->field18 = 0;
-            DisplayAnimation_SetFlags(&npc->animMode);
+            DisplayAnimation_SetFlags(&npc->animMode, 1);
             Actor_DisableShadow(npc);
             break;
         case 2: {

@@ -202,11 +202,10 @@ struct FrostEmitter *FrostEmitter_CreateTask(void)
 struct FrostEmitter *FrostEmitter_Create(void)
 {
     struct FrostEmitter *emitter = FrostEmitter_CreateTask();
-    u32 z = 0;
-    emitter->source = z;
-    emitter->emitting = z;
-    emitter->runtime.update = z;
-    emitter->runtime.age = z;
+    emitter->source = 0;
+    emitter->emitting = 0;
+    emitter->runtime.update = 0;
+    emitter->runtime.age = 0;
     return emitter;
 }
 

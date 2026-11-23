@@ -276,6 +276,11 @@ s32 Breakable_InitManager(struct PooledInteractableManager *manager)
     slot = manager->slots;
     for (i = 0; (u32)i < manager->count; i++, slot++)
         Breakable_InitSlot(manager, slot);
+#ifdef UBFIX
+    // falls off the end with r0 left over from its last statement; the creator only tests
+    // < 0, and this initializer has no failure path here
+    return 0;
+#endif
 }
 
 void *Breakable_GetOrCreateManager(void)

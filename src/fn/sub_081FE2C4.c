@@ -1,8 +1,10 @@
 #include "global.h"
 #include "engine.h"
 #include "ram.h"
+#include "word_flags.h"
 
 #include "sun_orb_effect.h"
+#include "engine_pause.h"
 
 extern u32 gUnk_02000560;
 extern const s16 gUnk_086149C4[];
@@ -37,10 +39,6 @@ static inline void AddPosition(struct OrbitEffectPosition *out, struct OrbitEffe
     out->y += in->y;
     out->z += in->z;
 }
-static inline u32 TestFlags(u32 *flags, u32 mask)
-{
-    return *flags & mask;
-}
 static inline s32 ReadScale(struct OrbitEffect *effect)
 {
     if (effect->scale >= 0)
@@ -58,8 +56,7 @@ s32 OrbitEffect_UpdateManager(struct OrbitEffectManager *manager)
             struct OrbitEffectSprite *sprite = &effect->sprite;
             struct OrbitEffectParams *params = &effect->params;
             struct ContactCollider *collider;
-            u32 mask = 0x400;
-            if ((gEngineFlags | gScenePauseFlags) & mask)
+            if (Engine_PauseBits(0x400))
                 continue;
             {
                 u32 pause = 4;
@@ -74,7 +71,7 @@ s32 OrbitEffect_UpdateManager(struct OrbitEffectManager *manager)
                 Polar(&effect->velocity, params);
                 ClearFlags(&effect->flags, ~1);
             }
-            if (effect->params.targetSource && !TestFlags(&effect->flags, 2)) {
+            if (effect->params.targetSource && !WordFlags_Test(&effect->flags, 2)) {
                 AddPosition(&sprite->position, &effect->velocity);
                 if (effect->params.homing == 0) {
                     if (sprite->position.x > 0xCDA)

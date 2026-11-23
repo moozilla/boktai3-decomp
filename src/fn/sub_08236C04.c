@@ -42,25 +42,23 @@ void ParticleBurst_EmitOrbitParticle(u8 *owner, struct Unk08236C04Position *orig
         const u16 *table;
         u32 *seed;
         unsigned short i;
-        u32 mask;
         struct Unk08236C04Particle *sprite;
 
         p->active = 1;
         table = gRandomTable;
         seed = &gRandomIndex;
         i = *seed + 1;
-        mask = 1023;
-        i &= mask;
+        i &= 1023;
         {
             u32 r = table[i];
             p->speed = (r & 15) + 0x10;
         }
-        i = (i + 1) & mask;
+        i = (i + 1) & 1023;
         {
             u32 r = table[i];
             p->radius = (r & 15) + 0x40;
         }
-        i = (i + 1) & mask;
+        i = (i + 1) & 1023;
         *seed = i;
         p->angle = table[i];
         p->life = 8;

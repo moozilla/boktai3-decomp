@@ -1817,11 +1817,11 @@ u32 Spider_OnUpdate(u8 *p)
     return 1;
 }
 
-void SceneActor_UpdateBehaviorCallbacks(void);
+void SceneActor_UpdateBehaviorCallbacks(void *);
 
-u32 Spider_OnSecondaryUpdate(void)
+u32 Spider_OnSecondaryUpdate(void *actor)
 {
-    SceneActor_UpdateBehaviorCallbacks();
+    SceneActor_UpdateBehaviorCallbacks(actor);
     return 0;
 }
 
@@ -1931,7 +1931,7 @@ void Spider_UpdateDefeat(struct ChaseActor *actor, s32 frame);
 
 void SceneActorReaction_BeginTargetRecovery(void);
 
-u32 Spider_OnSecondaryUpdate(void);
+u32 Spider_OnSecondaryUpdate(void *);
 
 s32 Spider_Destroy(u8 *p);
 

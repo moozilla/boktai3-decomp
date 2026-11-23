@@ -8,7 +8,7 @@ struct LinkRef {
     s16 bit;
 };
 extern struct LinkRef *gLinkSession;
-void LinkPlayer_ReadSlotFromScript(void);
+void LinkPlayer_ReadSlotFromScript(void *);
 void sub_0823ADB4(struct Player *);
 void KeyframeActor_InitBodyFromScript(struct Player *, void *);
 void Player_InitBodyCollider(struct Player *);
@@ -24,7 +24,7 @@ static inline s32 LocalPlayer(void)
 }
 s32 Player_OnCreate(struct Player *p, void *script)
 {
-    LinkPlayer_ReadSlotFromScript();
+    LinkPlayer_ReadSlotFromScript(p);
     sub_0823ADB4(p);
     KeyframeActor_InitBodyFromScript(p, script);
     Player_InitBodyCollider(p);

@@ -1,6 +1,7 @@
 #include "global.h"
 #include "engine.h"
 #include "ram.h"
+#include "engine_pause.h"
 void Player_GetWorldPosition(u32, s32 *);
 static inline s32 absolute(s32 x)
 {
@@ -12,8 +13,7 @@ u32 SpriteDrop_IsNearPlayer(u8 *s)
 {
     s32 v[4];
     s32 i;
-    u32 mask = 0x800;
-    if ((gEngineFlags | gScenePauseFlags) & mask) {
+    if (Engine_PauseBits(0x800)) {
         i = 0;
         s += 0x9C;
         do {

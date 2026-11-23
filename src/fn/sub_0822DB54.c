@@ -18,7 +18,7 @@ struct RecordEntry {
 };
 extern const struct Record gUnk_08E6092C[];
 s32 Inventory_AddEquipmentFromRecord(struct Record *record);
-struct RecordEntry *Inventory_GetEquipmentEntry(void);
+struct RecordEntry *Inventory_GetEquipmentEntry(s32);
 /* Script: copies record -w of 08E6092C into a new entry (Inventory_GetEquipmentEntry):
    with -s the a/b lists too, -H (0-2) picks one of three values, -d
    (default 1000). Returns 1, or 0 on failure. */
@@ -26,13 +26,13 @@ s32 RecordEntry_AddFromScript(void)
 {
     struct Record record;
     struct RecordEntry *entry;
-    s32 h, i;
+    s32 h, i, slot;
     if (!Script_SeekToKeyword('w'))
         return 0;
     record = gUnk_08E6092C[Script_GetValue()];
-    if (Inventory_AddEquipmentFromRecord(&record) < 0)
+    if ((slot = Inventory_AddEquipmentFromRecord(&record)) < 0)
         return 0;
-    entry = Inventory_GetEquipmentEntry();
+    entry = Inventory_GetEquipmentEntry(slot);
     if (!entry)
         return 0;
     if (Script_GetKeywordValue('s', 0)) {

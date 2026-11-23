@@ -1,6 +1,7 @@
 #include "named_object.h"
 #include "player.h"
 #include "engine.h"
+#include "named_object_flags.h"
 extern const struct SceneVec gUnk_086064B4;
 s32 TetherActor_TestStatusFlags(u32);
 void TetherActor_CopyPosition(struct SceneVec *);
@@ -25,16 +26,6 @@ static inline void Difference(struct SceneVec *d, const struct SceneVec *b,
     d->y = a->y - b->y;
     d->z = a->z - b->z;
 }
-static inline u8 HasFlag(u32 mask, s16 *flags)
-{
-    if ((u16)*flags & mask)
-        return TRUE;
-    return FALSE;
-}
-static inline void SetFlag2(u16 mask, u16 *flags)
-{
-    *flags = mask | *flags;
-}
 void NamedObject_ClampTetherToPlatform(struct NamedObject *o)
 {
     struct SceneVec tether;
@@ -42,7 +33,7 @@ void NamedObject_ClampTetherToPlatform(struct NamedObject *o)
     s32 x, z, cell;
     if (!TetherActor_TestStatusFlags(1))
         return;
-    if (!HasFlag(0x10, &o->flags))
+    if (!NamedObjectFlags_Has(0x10, &o->flags))
         return;
     TetherActor_CopyPosition(&tether);
     x = tether.x >> 8;
@@ -68,6 +59,6 @@ void NamedObject_ClampTetherToPlatform(struct NamedObject *o)
         tether.y = o->body.position.y;
         tether.z = o->body.position.z + delta.z;
         TetherActor_SetPosition(&tether);
-        SetFlag2(0x200, (u16 *)&o->flags);
+        NamedObject_EnableFlags(0x200, o);
     }
 }

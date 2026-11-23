@@ -12,7 +12,7 @@ struct H {
 void Sprite_Remove(void *);
 void HomingProjectile_ReleaseSlot(struct A *a, u8 *b, u32 n)
 {
-    u32 m, t;
+    u32 t;
     u32 *q;
     struct H *s;
     a->cnt--;
@@ -20,8 +20,7 @@ void HomingProjectile_ReleaseSlot(struct A *a, u8 *b, u32 n)
     s->h = 4 | s->h;
     q = (u32 *)(b + 0x10c);
     t = *q;
-    m = 1;
-    *q = t | m;
+    *q = t | 1;
     Sprite_Remove(q);
-    a->w18 &= ~(m << n);
+    a->w18 &= ~(1 << n);
 }

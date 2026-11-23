@@ -1,0 +1,211 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Flight Recorder</title>
+<style>
+:root {
+  --bg: #f6f5f1; --panel: #ffffff; --ink: #1d1d1b; --muted: #6b6a64; --line: #e2e0d8;
+  --accent: #2f6fb0; --accent-soft: #e4eef8; --warn: #a3581c; --ok: #2e7d4f; --bad: #b23a3a;
+  --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #161614; --panel: #1f1f1c; --ink: #ecebe6; --muted: #9a9890; --line: #33322e;
+    --accent: #7ab0e6; --accent-soft: #24313e; --warn: #e0a066; --ok: #6cc391; --bad: #e57d7d;
+  }
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 14px/1.45 system-ui, sans-serif; }
+header { display: flex; gap: 16px; align-items: baseline; padding: 12px 16px; border-bottom: 1px solid var(--line); flex-wrap: wrap; }
+header h1 { font-size: 16px; margin: 0; }
+header .meta { color: var(--muted); font-size: 13px; }
+main { display: grid; grid-template-columns: minmax(260px, 500px) 1fr; gap: 16px; padding: 16px; }
+@media (max-width: 860px) { main { grid-template-columns: 1fr; } }
+.panel { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 12px; min-width: 0; }
+.screen { width: 100%; image-rendering: pixelated; border-radius: 4px; background: #000; aspect-ratio: 3 / 2; display: block; }
+.timeline { position: relative; height: 56px; margin: 10px 0 4px; cursor: pointer; }
+.timeline canvas { width: 100%; height: 100%; display: block; }
+.controls { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.controls input[type=number] { width: 90px; }
+button, input, select { font: inherit; color: inherit; background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 4px 8px; }
+button:hover { border-color: var(--accent); }
+.facts { color: var(--muted); font-size: 13px; margin-top: 6px; }
+.filter { width: 100%; margin-bottom: 8px; }
+table { width: 100%; border-collapse: collapse; font-size: 13px; }
+th { text-align: left; color: var(--muted); font-weight: 500; border-bottom: 1px solid var(--line); padding: 4px 6px; position: sticky; top: 0; background: var(--panel); }
+td { border-bottom: 1px solid var(--line); padding: 4px 6px; vertical-align: top; }
+td.place { font-family: var(--mono); color: var(--accent); cursor: pointer; overflow-wrap: anywhere; min-width: 12ch; }
+td.place:hover { text-decoration: underline; }
+td.place .prop { color: var(--ok); font-size: 12px; }
+td.src { font-family: var(--mono); font-size: 12px; color: var(--muted); }
+td.src code { color: var(--ink); }
+td.num { font-family: var(--mono); text-align: right; white-space: nowrap; }
+.scroll { max-height: 52vh; overflow: auto; }
+pre { font-family: var(--mono); font-size: 12px; white-space: pre-wrap; word-break: break-word; margin: 0; }
+.detail { margin-top: 16px; }
+.detail h2 { font-size: 14px; margin: 0 0 8px; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.detail h2 code { color: var(--accent); }
+.tabs button.on { background: var(--accent-soft); border-color: var(--accent); }
+.hint { color: var(--muted); }
+.ok { color: var(--ok); } .bad { color: var(--bad); }
+</style>
+</head>
+<body>
+<header>
+  <h1>Flight Recorder</h1>
+  <span class="meta" id="meta">loading…</span>
+  <select id="sessions" aria-label="Session" hidden></select>
+</header>
+<main>
+  <section class="panel">
+    <img class="screen" id="screen" alt="Game screen at the selected frame">
+    <div class="timeline" id="timeline" title="Writes per frame; click to jump"><canvas id="tl"></canvas></div>
+    <div class="controls">
+      <button id="prev" title="Previous frame (←)">◀</button>
+      <input type="number" id="frame" min="0" value="0" aria-label="Frame">
+      <button id="next" title="Next frame (→)">▶</button>
+      <span class="hint" id="pos"></span>
+    </div>
+    <div class="facts" id="facts"></div>
+  </section>
+  <section class="panel">
+    <input class="filter" id="filter" placeholder="Filter writes by field, function or file (e.g. Player, gSolar, sprite.c)">
+    <div class="scroll">
+      <table>
+        <thead><tr><th>Field</th><th class="num">Value</th><th class="num">×</th><th>Written by</th></tr></thead>
+        <tbody id="rows"></tbody>
+      </table>
+    </div>
+    <div class="detail" id="detail" hidden>
+      <h2><code id="dplace"></code>
+        <span class="tabs"><button id="thist" class="on">History</button> <button id="twhy">Why</button> <button id="tcheck" title="Slice, then perturb its causes in a replay">Why + check</button></span>
+      </h2>
+      <pre id="dtext"></pre>
+    </div>
+  </section>
+</main>
+<script>
+const $ = (id) => document.getElementById(id);
+// standalone (tools.recorder serve) or inside the Studio (/recorder, API under /api/recorder)
+const API = location.pathname.startsWith('/recorder') ? '/api/recorder' : '/api';
+const SESSION = new URLSearchParams(location.search).get('session');
+const withSession = (path) => SESSION ? path + (path.includes('?') ? '&' : '?') + 'session=' + encodeURIComponent(SESSION) : path;
+const KEYS = ['A', 'B', 'Sel', 'Start', '→', '←', '↑', '↓', 'R', 'L'];
+let info = null, frame = 0, rows = [], selected = null, timer = null;
+
+const keyNames = (m) => KEYS.filter((_, i) => m >> i & 1).join('+') || '–';
+const hex = (v, w) => '0x' + (v >>> 0).toString(16).toUpperCase().padStart(2 * Math.min(w || 4, 4), '0');
+const esc = (s) => String(s ?? '').replace(/[&<>]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]));
+
+async function api(path) {
+  const r = await fetch(withSession(path.replace(/^\/api/, API)));
+  const j = r.headers.get('content-type')?.includes('json') ? await r.json() : null;
+  if (!r.ok) throw new Error(j?.error || r.statusText);
+  return j;
+}
+
+function drawTimeline() {
+  const c = $('tl'), w = c.clientWidth, h = c.clientHeight, dpr = devicePixelRatio || 1;
+  c.width = w * dpr; c.height = h * dpr;
+  const g = c.getContext('2d'); g.scale(dpr, dpr);
+  const css = getComputedStyle(document.documentElement);
+  const n = info.frames, max = Math.max(...info.writes, 1);
+  g.fillStyle = css.getPropertyValue('--line');
+  for (let x = 0; x < w; x++) {
+    const a = Math.floor(x / w * n), b = Math.max(a + 1, Math.floor((x + 1) / w * n));
+    let m = 0; for (let f = a; f < b; f++) m = Math.max(m, info.writes[f] || 0);
+    const bh = Math.max(1, Math.sqrt(m / max) * (h - 8));
+    g.fillRect(x, h - bh, 1, bh);
+  }
+  g.fillStyle = css.getPropertyValue('--accent');
+  g.fillRect(Math.round(frame / n * w) - 1, 0, 2, h);
+}
+
+async function go(f) {
+  frame = Math.max(0, Math.min(info.frames - 1, f | 0));
+  $('frame').value = frame;
+  $('screen').src = withSession(`${API}/screen?f=${frame}`);
+  $('pos').textContent = `of ${info.frames - 1}`;
+  drawTimeline();
+  clearTimeout(timer);
+  timer = setTimeout(load, 120);
+}
+
+async function load() {
+  const f = frame;
+  $('rows').innerHTML = '<tr><td colspan="4" class="hint">loading…</td></tr>';
+  const d = await api(`/api/writes?f=${f}`);
+  if (f !== frame) return;
+  rows = d.writes;
+  $('facts').textContent = `frame ${f}: ${d.rows} write rows · keys ${keyNames(d.keys)} · solar level ${d.solar}`;
+  render();
+}
+
+function render() {
+  const q = $('filter').value.toLowerCase();
+  const shown = rows.filter((r) => !q || (r.place + ' ' + r.fn + ' ' + r.loc).toLowerCase().includes(q));
+  $('rows').innerHTML = shown.slice(0, 400).map((r, i) => `
+    <tr><td class="place" data-i="${rows.indexOf(r)}">${esc(r.place)}${r.proposal ? `<br><span class="prop" title="${esc(r.proposal.reasons.join('\n'))}">infer: ${esc(r.proposal.name)} (${r.proposal.confidence})</span>` : ''}</td>
+      <td class="num" title="${hex(r.value, r.width)}">${r.value}</td>
+      <td class="num">${r.count > 1 ? r.count : ''}</td>
+      <td class="src">${esc(r.fn)} · ${esc(r.loc)}${r.text ? `<br><code>${esc(r.text)}</code>` : ''}</td></tr>`).join('')
+    || '<tr><td colspan="4" class="hint">no writes to game memory in this frame</td></tr>';
+}
+
+async function detail(mode) {
+  if (!selected) return;
+  ['thist', 'twhy', 'tcheck'].forEach((id) => $(id).classList.toggle('on', id === { hist: 'thist', why: 'twhy', check: 'tcheck' }[mode]));
+  $('detail').hidden = false;
+  $('dplace').textContent = `${selected.place} @ frame ${selected.frame}`;
+  $('dtext').textContent = mode === 'hist' ? 'reading the write log…' : 'tracing frames and slicing… (a few seconds; with check, replays too)';
+  const where = encodeURIComponent('0x' + selected.addr.toString(16) + ':' + selected.width);
+  try {
+    const d = mode === 'hist'
+      ? await api(`/api/history?where=${where}&to=${selected.frame}&from=${Math.max(0, selected.frame - 600)}`)
+      : await api(`/api/why?where=${where}&frame=${selected.frame}${mode === 'check' ? '&check=1' : ''}`);
+    $('dtext').innerHTML = esc(d.text).replace(/\bconfirmed\b/g, '<span class="ok">confirmed</span>').replace(/NOT confirmed/g, '<span class="bad">NOT confirmed</span>');
+  } catch (e) { $('dtext').textContent = 'error: ' + e.message; }
+}
+
+$('rows').addEventListener('click', (e) => {
+  const td = e.target.closest('td.place'); if (!td) return;
+  const r = rows[+td.dataset.i];
+  selected = { ...r, frame };
+  detail('hist');
+});
+$('thist').onclick = () => detail('hist');
+$('twhy').onclick = () => detail('why');
+$('tcheck').onclick = () => detail('check');
+$('filter').oninput = render;
+$('prev').onclick = () => go(frame - 1);
+$('next').onclick = () => go(frame + 1);
+$('frame').onchange = () => go(+$('frame').value);
+$('timeline').onclick = (e) => { const r = e.currentTarget.getBoundingClientRect(); go((e.clientX - r.left) / r.width * info.frames); };
+addEventListener('keydown', (e) => {
+  if (e.target.tagName === 'INPUT') return;
+  if (e.key === 'ArrowLeft') go(frame - (e.shiftKey ? 30 : 1));
+  if (e.key === 'ArrowRight') go(frame + (e.shiftKey ? 30 : 1));
+});
+addEventListener('resize', () => info && drawTimeline());
+
+(async () => {
+  try {
+    const list = await api('/api/sessions');
+    if (list.length > 1) {
+      const sel = $('sessions');
+      sel.innerHTML = list.map((x) => `<option value="${esc(x.name)}">${esc(x.name)} · ${x.frames ?? '?'} frames</option>`).join('');
+      sel.hidden = false;
+      sel.onchange = () => { const u = new URL(location.href); u.searchParams.set('session', sel.value); location.href = u; };
+    }
+  } catch (e) { /* the list is optional */ }
+  info = await api('/api/session');
+  if (!$('sessions').hidden) $('sessions').value = info.name;
+  const m = info.meta;
+  $('meta').textContent = `${info.name} · ${info.frames} frames · ${m.save ? 'save ' + m.save : 'power-on'} · solar ${m.solar}`;
+  go(info.frames - 1);
+})().catch((e) => { $('meta').textContent = 'error: ' + e.message; });
+</script>
+</body>
+</html>

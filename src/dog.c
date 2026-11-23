@@ -3500,11 +3500,11 @@ s32 Dog_Update(struct SUpdate *s)
     return 1;
 }
 
-void SceneActor_UpdateBehaviorCallbacks(void);
+void SceneActor_UpdateBehaviorCallbacks(void *);
 
-s32 Dog_OnAuxiliaryUpdate(void)
+s32 Dog_OnAuxiliaryUpdate(void *actor)
 {
-    SceneActor_UpdateBehaviorCallbacks();
+    SceneActor_UpdateBehaviorCallbacks(actor);
     return 0;
 }
 
@@ -3592,7 +3592,7 @@ void Dog_SetPrimaryBehaviorPreset(struct SSetPrimaryBehaviorPreset *s);
 
 void Dog_SetSecondaryBehaviorPreset(struct SSetSecondaryBehaviorPreset *s);
 
-s32 Dog_OnAuxiliaryUpdate(void);
+s32 Dog_OnAuxiliaryUpdate(void *);
 
 s32 Dog_ReleaseResources(u8 *p);
 

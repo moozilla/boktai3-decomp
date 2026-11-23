@@ -13,11 +13,9 @@ void PaletteTransition_Restart(struct S *);
 
 void SceneDisplay_SwitchToAlternateDescriptor(struct S *p)
 {
-    u32 z;
     BestiaryDisplay_SetEntry(p, SceneDisplay_GetAlternateDescriptor(p));
-    z = 0;
-    p->f18 = z;
-    p->f20 = z;
-    p->b24 = z;
+    p->f18 = 0;
+    p->f20 = 0;
+    p->b24 = 0;
     PaletteTransition_Restart(p);
 }

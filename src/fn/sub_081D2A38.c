@@ -77,7 +77,7 @@ void SceneMessages_RegisterReceiver(void *, s32, s32);
 void Actor_InitResources(void *, struct SceneNpc *, s32, s32);
 void Actor_LinkToManager(void *, struct SceneNpc *);
 void Actor_InitBehaviorFromScript(void *, struct SceneNpc *);
-void DisplayAnimation_SetFlags(void *);
+void DisplayAnimation_SetFlags(void *, u32);
 void Actor_DisableShadow(struct SceneNpc *);
 s32 Actor_SetMirroredFourWayAnimation(struct SceneNpc *, s32, s32, s32, s32, s32);
 u32 ParticlePool_Create(void);
@@ -229,7 +229,7 @@ void TaggedSceneNpc_Create(u32 tag)
             npc->field10 = 0;
             npc->field9 = 1;
             npc->field18 = 0;
-            DisplayAnimation_SetFlags(npc->blockD4);
+            DisplayAnimation_SetFlags(npc->blockD4, 1);
             Actor_DisableShadow(npc);
             break;
         case 2: {

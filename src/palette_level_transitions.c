@@ -80,6 +80,11 @@ s32 PaletteLevels_Initialize(struct PaletteLevels *s, u16 unused)
         s->current[i] = 0;
         s->target[i] = 0;
     }
+#ifdef UBFIX
+    // falls off the end with r0 left over from its last statement; the creator only tests
+    // < 0, and this initializer has no failure path here
+    return 0;
+#endif
 }
 
 struct PaletteLevels *PaletteLevels_Create(u32 a, u32 unused)

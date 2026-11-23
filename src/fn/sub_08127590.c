@@ -4,6 +4,7 @@
 #include "engine_globals.h"
 #include "display_sequence_inline.h"
 #include "monster_particle_random.h"
+#include "engine_pause.h"
 // confidence=low: creates a pooled projectile with optional spin and collider.
 #define SpriteProjectile_Create sub_08127590
 void *SpriteProjectile_EnsurePool(void);
@@ -15,10 +16,6 @@ void Sprite_Init(void *, void *, s32);
 void Anim_SetSequence(void *, void *, u16, u8, u8);
 void AnimData_SelectPaletteBank(const void *, s32);
 void sub_081274F4(void *, s32, s32, s32, s32);
-static inline u32 Busy(u32 mask)
-{
-    return (gEngineFlags | gScenePauseFlags) & mask;
-}
 static inline u32 TestFlags(u32 mask, u32 *value)
 {
     return *value & mask;
@@ -126,7 +123,7 @@ struct Projectile *SpriteProjectile_Create(struct ContactPosition *position,
         if (!pool)
             return 0;
     }
-    if (Busy(0x400))
+    if (Engine_PauseBits(0x400))
         return 0;
     if (TestFlags(4, &gUnk_02000560))
         return 0;

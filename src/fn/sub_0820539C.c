@@ -314,4 +314,9 @@ s32 EnemyD459_InitializeFromScript(struct EnemyD459Actor *p, void *parent)
     if (p->scriptList)
         EnemyD459_ReadScriptValueList(p);
     /* The initializer has no explicit return assignment on this path. */
+#ifdef UBFIX
+    // falls off the end with r0 left over from its last statement; the creator only tests
+    // < 0, and this initializer has no failure path here
+    return 0;
+#endif
 }

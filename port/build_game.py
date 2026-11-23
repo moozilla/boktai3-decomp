@@ -50,13 +50,18 @@ PORT_CODE = {
     'ply_lfodl': 0x0822F7D1, 'ply_modt': 0x0822F7DD, 'ply_tune': 0x0822F7F5,
     'ply_port': 0x0822F809,
 }
+# Units the recorder build leaves alone: its own runtime, the agent hooks (their ring
+# is not game memory), the picture processor (reads game memory, writes only its own).
+RECORD_SKIP = {'tools/recorder/rec_rt.c', 'port/hw/psg.c', 'port/game/hooks.c', 'port/ppu/ppu.c', 'port/game/code_table'}
 EXPORTS = ['port_trace_map', 'port_memory_init', 'port_load_rom', 'port_game_run', 'port_game_set_solar',
            'port_game_set_time', 'port_frame_count', 'port_game_save_stage', 'port_game_save_dirty',
-           'port_game_save_data', 'port_game_save_size',
+           'port_game_save_data', 'port_game_save_size', 'port_video_set_enabled',
            # agent harness (port/agent/): hooks, calls into the game, C snippets
            'port_hook_state', 'port_hook_flags', 'port_hook_ring', 'port_icall', 'port_code_known',
            'port_bus_load_i8', 'port_bus_load_i16', 'port_bus_load_i32', 'port_bus_load_ptr',
-           'port_bus_store_i8', 'port_bus_store_i16', 'port_bus_store_i32', 'port_bus_store_ptr']
+           'port_bus_store_i8', 'port_bus_store_i16', 'port_bus_store_i32', 'port_bus_store_ptr',
+           # snapshots (port/agent/session.mjs): the live shadow stack and the data's end
+           '__stack_pointer', '__heap_base']
 
 
 def game_sources():
@@ -97,6 +102,9 @@ def main():
     ap.add_argument('--force', action='store_true')
     ap.add_argument('--trace', action='store_true',
                     help='record each GBA function\'s first call (build/port/game-trace/)')
+    ap.add_argument('--record', action='store_true',
+                    help='flight recorder build: -g, every memory access and block instrumented '
+                         '(tools/recorder/, build/port/game-rec/)')
     ap.add_argument('--watch', metavar='FUNC[,FUNC]',
                     help='log these functions\' first three arguments at every entry (build/port/game-watch/)')
     args = ap.parse_args()
@@ -106,6 +114,10 @@ def main():
         OUT = ROOT / 'build/port/game-trace'
     elif args.watch:
         OUT = ROOT / 'build/port/game-watch'
+    elif args.record:
+        OUT = ROOT / 'build/port/game-rec'
+        PORT_UNITS['tools/recorder/rec_rt.c'] = False
+        EXPORTS.extend(['rec_state', 'rec_static_units', '__heap_base', '__data_end'])
     if not (ROOT / 'build/boktai3.elf').exists():
         sys.exit('build/boktai3.elf is missing: run make (or tools/worktree.sh --here) first')
     OUT.mkdir(parents=True, exist_ok=True)
@@ -115,11 +127,13 @@ def main():
     # the hooks go in before inlining, so inlined copies keep them; stage 3 optimizes.
     flags = ['--target=wasm32', '-ffreestanding', '-std=gnu89', '-O2', '-Xclang', '-disable-llvm-passes',
              '-funsigned-char', '-fno-strict-aliasing',
-             '-fwrapv', '-fno-builtin', '-Wno-everything', '-Iport/include', '-Iport/core',
+             '-fwrapv', '-fno-builtin', '-Wno-everything', '-DUBFIX', '-Iport/include', '-Iport/core',
              '-Iport/game', '-Iport/hw', '-I' + str(headers), '-iquote', '.',
              '-include', 'port/core/compat.h']
     if args.trace:
         flags.append('-fno-inline')
+    if args.record:
+        flags.append('-g')
     hasher = hashlib.sha256()
     for directory in (ROOT / 'include', ROOT / 'port'):
         for p in sorted(directory.rglob('*.h')):
@@ -205,18 +219,11 @@ def main():
         target = by_address.get(address & ~1)
         if target and fn != target and fn not in defs_global:
             aliases[fn] = target
-    # Pass 1 finds functions that read incoming registers; pass 2 makes their
-    # direct callers publish r0..r3 (see abi.rewrite_module).
-    readers = set()
-    for index, (name, game) in enumerate(units):
-        text = apply_aliases(texts[name], aliases) if aliases else texts[name]
-        readers |= abi.rewrite_module(text, defs_global, addresses, index, game, {})[4]
     synthetic = {}
     table = []  # (address, adapter symbol)
     rewritten = {}
     adapter_failures = []
     padded_report = []
-    unknown_report = []
     for index, (name, game) in enumerate(units):
         text = texts[name]
         if aliases:
@@ -226,12 +233,10 @@ def main():
                           lambda m: m[1] + '@' + fn + '.__replaced_by_port(', text, flags=re.M)
             if not re.search(r'^declare [^\n]*@' + re.escape(fn) + r'\(', text, re.M):
                 text += abi.render_declare(fn, defs_global[fn]) + '\n'
-        text, values, internals, padded, _, unknown = abi.rewrite_module(
-            text, defs_global, addresses, index, game, synthetic, readers)
+        text, values, internals, padded, _, _ = abi.rewrite_module(
+            text, defs_global, addresses, index, game, synthetic)
         for callee, given, wanted in padded:
             padded_report.append(f'{name}: {callee} called with {given} of {wanted} arguments')
-        for caller, slot in unknown:
-            unknown_report.append(f'{name}: {caller} passes an unknown r{slot}')
         extra = []
         defs, _decls, _ = abi.scan_module(text)
         for fn, sig in defs.items():
@@ -265,9 +270,10 @@ def main():
             text += abi.PORT_REGS_DECL + '\n'
         rewritten[name] = text
     (OUT / 'padded_calls.txt').write_text('\n'.join(padded_report) + '\n')
-    (OUT / 'unknown_registers.txt').write_text('\n'.join(unknown_report) + '\n')
-    print(f'register-passing calls: {len(padded_report)}, {len(readers)} functions read incoming '
-          f'registers, {len(unknown_report)} arguments unknown (unknown_registers.txt)')
+    if padded_report:
+        sys.exit('calls passing fewer arguments than the callee takes (they read leftover registers on '
+                 'the GBA; state the value in src/, plainly or under UBFIX, see port/README.md):\n  ' +
+                 '\n  '.join(padded_report))
     if adapter_failures:
         print('no adapter (aggregate signature):', ', '.join(sorted(adapter_failures)[:20]))
     table.sort()
@@ -281,8 +287,20 @@ def main():
           f'{sum(len(v) for v in replaced.values())} game functions replaced by port code, '
           f'{time.monotonic() - t0:.0f}s', flush=True)
 
+    order = list(rewritten)
+    if args.record:
+        sys.path.insert(0, str(ROOT / 'tools/recorder'))
+        import instrument
+        (OUT / 'rec').mkdir(parents=True, exist_ok=True)
+        (OUT / 'rec' / 'units.json').write_text(json.dumps(order))
+        record_key = (ROOT / 'tools/recorder/instrument.py').read_bytes()
+
     def stage3(name):
         text = rewritten[name]
+        if args.record:
+            text = record_unit(name, text)
+            if text is None:
+                return name, 'instrumentation failed (see ' + str(OUT / 'rec') + ')'
         ll = OUT / 'abi' / (name + '.ll')
         obj = ll.with_suffix('.o')
         key = hashlib.sha256(text.encode()).hexdigest()
@@ -297,6 +315,31 @@ def main():
             return name, r.stderr[-3000:]
         stamp.write_text(key)
         return name, None
+
+    def record_unit(name, text):
+        # Recorder build: SSA-promote locals, then instrument (tools/recorder/instrument.py).
+        # Only the facts are kept beside stage 3's own copy of the IR (disk space).
+        if name in RECORD_SKIP or 'define ' not in text:
+            return text
+        base = OUT / 'rec' / name
+        key = hashlib.sha256(text.encode() + record_key).hexdigest()
+        facts, stamp = base.with_suffix('.facts.json'), base.with_suffix('.rec.key')
+        cached = OUT / 'abi' / (name + '.ll')
+        if not args.force and cached.exists() and facts.exists() and stamp.exists() and stamp.read_text() == key:
+            return cached.read_text()
+        base.parent.mkdir(parents=True, exist_ok=True)
+        src, promoted = base.with_suffix('.abi.ll'), base.with_suffix('.sroa.ll')
+        src.write_text(text)
+        r = run([str(LLVM / 'opt'), '-passes=sroa', '-S', str(src), '-o', str(promoted)])
+        src.unlink()
+        if r.returncode:
+            base.with_suffix('.err').write_text(r.stderr)
+            return None
+        out, info = instrument.instrument(promoted.read_text(), order.index(name), name)
+        promoted.unlink()
+        instrument.write_facts(facts, info)
+        stamp.write_text(key)
+        return out
 
     t0 = time.monotonic()
     failures = []
@@ -378,7 +421,8 @@ def add_hooks(text, addresses, owner, unit):
         elif current is not None:
             m = re.match(r'\s+ret (void|\S+) ?(.*)$', line)
             if m:
-                value = '0' if m[1] == 'void' else as_i32(m[1], m[2].strip())
+                # a -g build attaches metadata (", !dbg !N") after the value
+                value = '0' if m[1] == 'void' else as_i32(m[1], re.sub(r',\s*!.*$', '', m[2]).strip())
                 out.append(f'  call void @port_hook_exit(i32 {current}, i32 {value})')
         out.append(line)
     return ('\n'.join(out) + '\ndeclare void @port_hook_enter(i32, i32, i32, i32, i32)\n'

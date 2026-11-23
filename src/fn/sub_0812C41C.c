@@ -17,24 +17,22 @@ void FragmentEffect_SpawnRandomParticle(struct ContactPosition *position)
     struct ContactPosition velocity;
     struct ContactPosition *planar;
     u32 randomOrigin;
-    u32 mask, sampleOrigin;
+    u32 sampleOrigin;
     s32 heading;
     s32 speed, vertical;
 
     /* The recovered bank origin cancels when converting a sample address to its table offset. */
     randomOrigin = (u32)&gHeapHead + RESOURCE_REGISTRY_ENTRIES_ADDR;
-    mask = 255;
-    heading = ParticleRandom_ReadDirectSample(gRandomTable) & mask;
+    heading = ParticleRandom_ReadDirectSample(gRandomTable) & 255;
     {
         s32 raw = ParticleRandom_ReadDirectSample(gRandomTable);
-        s32 speedMask = 31;
-        raw &= speedMask;
+        raw &= 31;
         planar = &velocity;
         speed = raw - 16;
     }
     {
         s32 x, zero, rawX;
-        rawX = gUnk_086149C4[(heading + 64) & mask] * speed;
+        rawX = gUnk_086149C4[(heading + 64) & 255] * speed;
         sampleOrigin = randomOrigin;
         x = Truncate(rawX);
         zero = 0;

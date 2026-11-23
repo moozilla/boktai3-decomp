@@ -33,18 +33,16 @@ void SceneTransition_SpawnParticleBurst(s32 x, s32 y, s32 flags)
         const u16 *table;
         u32 *seed;
         u16 index;
-        u32 mask;
         s32 angle, random;
         struct ContactPosition *pos;
         table = gRandomTable;
         seed = &gRandomIndex;
         index = *seed + 1;
-        mask = 0x3FF;
-        index &= mask;
+        index &= 0x3FF;
         angle = table[index];
         angle >>= 4;
         angle &= 0xF;
-        index = (index + 1) & mask;
+        index = (index + 1) & 0x3FF;
         *seed = index;
         random = table[index];
         random >>= 4;
@@ -71,7 +69,6 @@ void SceneTransition_SpawnFlyingParticle(s32 x, s32 y, u32 flags)
     const u16 *table;
     u32 *seed;
     u16 index;
-    u32 mask;
     s32 angle, random;
     u32 attribute;
     pos->x = x;
@@ -80,12 +77,11 @@ void SceneTransition_SpawnFlyingParticle(s32 x, s32 y, u32 flags)
     table = gRandomTable;
     seed = &gRandomIndex;
     index = *seed + 1;
-    mask = 0x3FF;
-    index &= mask;
+    index &= 0x3FF;
     angle = table[index];
     angle >>= 4;
     angle = angle & 0x1F;
-    index = (index + 1) & mask;
+    index = (index + 1) & 0x3FF;
     *seed = index;
     random = table[index];
     random >>= 4;
@@ -268,21 +264,19 @@ void SceneTransition_UpdateShakingBackground(struct SceneTransition *transition)
     u16 *table;
     u32 *seed;
     u16 index;
-    u32 mask;
     s32 timer, range, random;
     Registry6A37_UpdateBackgroundScroll(transition);
     table = gRandomTable;
     seed = &gRandomIndex;
     index = *seed + 1;
-    mask = 0x3FF;
-    index &= mask;
+    index &= 0x3FF;
     *seed = index;
     random = table[index];
     random >>= 4;
     timer = transition->timer;
     range = (timer >> 4) + 3;
     transition->scroll.x = sub_08249350(random, range) + 0x15E;
-    index = (index + 1) & mask;
+    index = (index + 1) & 0x3FF;
     *seed = index;
     random = table[index];
     random >>= 4;
@@ -387,7 +381,7 @@ void SceneTransition_LoadBackground(struct SceneTransition *screen)
     CpuSet(palette->colors, gBgPaletteBuffer, 0x04000080);
 }
 
-void *RegistryF3E4_CreateHidden(s32);
+void *RegistryF3E4_CreateHidden(s32, s32);
 
 // confidence=low: sets up the layers, reads keyword 'e' as the script, starts the fade-in and
 
@@ -410,8 +404,12 @@ s32 SceneTransition_Initialize(struct SceneTransition *transition, void *scriptA
         transition->motion.mode = 0;
         transition->motion.timer = 0;
     }
-    transition->target = RegistryF3E4_CreateHidden(2);
+    transition->target = RegistryF3E4_CreateHidden(2, 0);
     transition->particleFlags = 1;
+#ifdef UBFIX
+    // falls off the end; r0 still holds the RegistryF3E4_CreateHidden result (a heap pointer)
+    return (s32)transition->target;
+#endif
 }
 
 void *Task_Create(u32, u32);

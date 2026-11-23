@@ -455,6 +455,9 @@ class Handler(http.server.BaseHTTPRequestHandler):
         import forge
         if forge.route(self, "GET"):
             return
+        import recorder_route
+        if recorder_route.route(self, "GET"):
+            return
         if self.path in ("/", "/index.html", "/text"):
             self.send(200, open(os.path.join(HERE, "index.html"), "rb").read(), "text/html; charset=utf-8")
         elif self.path == "/api/strings":

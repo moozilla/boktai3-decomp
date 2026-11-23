@@ -3,6 +3,7 @@
 #include "global.h"
 #include "engine.h"
 #include "scene_vec.h"
+#include "contact_collider.h"
 #include "scene_input_widget.h"
 #include "scene_event_dispatch.h"
 
@@ -15,16 +16,12 @@
  * (confidence=low); several short byte/word fields, and most of the suspended-object
  * and terrain-cell sub-regions, are still guesses. */
 
-struct NidhoggrCollider {
-    u8 unknown0[6];
-    u16 flags; /* 0x06: bit 2 disables the part's collider */
-    u8 unknown8[0x54 - 8];
-};
-
+/* A part's registration with the scene target registry. */
 struct NidhoggrPartExtra {
-    u32 unknown0;
+    void *collider;
     u32 flags; /* 0x04: bit 0 set when the part is hidden */
-    u8 unknown8[0x10 - 8];
+    void *callback;
+    void *next;
 };
 
 struct NidhoggrTerrainCell {
@@ -48,19 +45,18 @@ struct Nidhoggr {
     u8 unknown541A[0x541C - 0x541A];
     struct SceneInputResource animHdr;                /* 0x541C: shared keyframe/resource header for all part rows */
     struct SceneInputWidget rows[26]; /* 0x543C: one per body segment */
-    struct NidhoggrCollider
-        altColliders[26]; /* 0x5DFC: a second collider per part; [0] is refreshed
-                                                * each frame in Update while flags[0] counts down */
-    u8 unknown6684[0x66D8 - 0x6684];
-    struct NidhoggrCollider colliders[26];  /* 0x66D8 */
+    struct ContactCollider timedCollider;       /* 0x5DFC: refreshed each frame in Update while
+                                                 * flags[0] counts down */
+    struct ContactCollider attackColliders[26]; /* 0x5E50: one per part */
+    struct ContactCollider colliders[26];  /* 0x66D8 */
     struct NidhoggrPartExtra partExtra[26]; /* 0x6F60 */
     struct NidhoggrTerrainCell
         terrainCells[2];      /* 0x7100: registered via TerrainModifiers_RegisterCell */
     u8 suspendedAnim[0x1C];   /* 0x7120: suspended-object sprite animation data */
     u8 suspendedSprite[0x1C]; /* 0x713C */
-    s16 suspendedPosX, suspendedPosY, suspendedPosZ, suspendedPosW; /* 0x7158 */
+    struct ContactPosition suspendedPos; /* 0x7158 */
     u8 unknown7160[0x7168 - 0x7160];
-    u8 suspendedCollider[0x54]; /* 0x7168 */
+    struct ContactCollider suspendedCollider; /* 0x7168 */
     u8 suspendedState;          /* 0x71BC: descent/retraction/shake sub-state */
     u8 terrainCellsRegistered;  /* 0x71BD */
     u8 attackActive;            /* 0x71BE: timed-attack collider active latch */
@@ -85,16 +81,15 @@ struct Nidhoggr {
     u8 unknown7268[0x7268 - 0x7268];
     u16 maxLife;     /* 0x7268: option -l, default 4000 */
     u16 maxHp;       /* 0x726A: option -g, default 100; per-part max hp */
-    u16 optionY;     /* 0x726C: option -Y, default 1000 */
+    s16 optionY;     /* 0x726C: option -Y, default 1000 */
     u16 attackPower; /* 0x726E: option -A, default 40; suspended object's collider power */
     u16 optionD;     /* 0x7270: option -D, default 20 */
     u16 optionE;     /* 0x7272: option -E, default 100 */
-    u16 optionS;     /* 0x7274: option -S, default 0 */
+    s16 optionS;     /* 0x7274: option -S, default 0 */
     s16 life;        /* 0x7276: boss total life (option -l, kept twice) */
     u8 unknown7278[0x7278 - 0x7278];
     s16 hp[9];    /* 0x7278: per-part current hp */
-    s16 groupHpA; /* 0x728A */
-    s16 groupHpB; /* 0x728C */
+    s16 groupHp[2]; /* 0x728A: the two body groups' hp, scaled from optionY */
     u8 unknown728E[0x7290 - 0x728E];
     struct SceneVec
         cameraPos; /* 0x7290: current camera position (ApproachCameraTarget eases toward cameraTarget) */
@@ -110,8 +105,19 @@ struct Nidhoggr {
     s32 swayXVelocity;      /* 0x72B8 */
     s32 posOffsetZVelocity; /* 0x72BC */
     u32 script;             /* 0x72C0: option -e; a script key to call when a cutscene departs */
-    u8 unknown72C4[0x72FC - 0x72C4];
+    u8 paletteTransition[0x38]; /* 0x72C4 */
 };
+
+/* Bit 2 of a part collider's flags disables it. */
+static inline void Nidhoggr_DisablePartCollider(struct ContactCollider *collider)
+{
+    collider->flags |= 4;
+}
+
+static inline void Nidhoggr_SetPartExtraFlags(struct NidhoggrPartExtra *extra, u32 mask)
+{
+    extra->flags |= mask;
+}
 
 /* Defined outside this unit's range; callers disagree on its exact signature. */
 s32 Nidhoggr_ChangeCompletedPartState(void *, s32, s32);

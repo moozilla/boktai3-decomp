@@ -4,6 +4,7 @@
 #include "engine.h"
 #include "ram.h"
 #include "homing_projectile.h"
+#include "engine_pause.h"
 struct HomingManager {
     u8 task[0x18];
     u32 activeMask;
@@ -15,10 +16,6 @@ extern u32 gUnk_02000560;
 extern const s16 gUnk_086149C4[];
 void HomingProjectile_ReleaseSlot(struct HomingManager *, struct HomingSlot *, s32);
 
-static inline u32 TestPause(u32 mask)
-{
-    return (gEngineFlags | gScenePauseFlags) & mask;
-}
 static inline s32 Scale(s32 x)
 {
     return x >= 0 ? x >> 12 : -((-x) >> 12);
@@ -59,7 +56,7 @@ s32 HomingProjectile_UpdateManager(struct HomingManager *m)
             struct HomingParams *params = &p->params;
             struct ContactPosition *velocity;
             struct ContactPosition *position;
-            if (TestPause(0x400))
+            if (Engine_PauseBits(0x400))
                 continue;
             if (gUnk_02000560 & flagMask)
                 continue;
@@ -113,8 +110,7 @@ s32 HomingProjectile_UpdateManager(struct HomingManager *m)
                             value = src->flags;
                         }
                         {
-                            u32 mask = 8;
-                            value |= mask;
+                            value |= 8;
                         }
                         {
                             struct HomingSprite *dst = sprite;

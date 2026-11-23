@@ -1822,11 +1822,11 @@ s32 Ivy_Update(struct SUpdate *s)
     return 1;
 }
 
-void SceneActor_UpdateActiveCallbacks(void);
+void SceneActor_UpdateActiveCallbacks(void *);
 
-s32 Ivy_UpdateInteraction(void)
+s32 Ivy_UpdateInteraction(void *actor)
 {
-    SceneActor_UpdateActiveCallbacks();
+    SceneActor_UpdateActiveCallbacks(actor);
     return 0;
 }
 
@@ -1910,7 +1910,7 @@ void Ivy_InitControlPresets(struct SInitControlPresets *s);
 
 void SceneActor_BeginReaction22(struct ChaseActor *actor);
 
-s32 Ivy_UpdateInteraction(void);
+s32 Ivy_UpdateInteraction(void *);
 
 u32 Ivy_Destroy(struct SDestroy *s);
 

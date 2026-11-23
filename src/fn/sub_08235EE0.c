@@ -44,25 +44,23 @@ void CallbackGroup_EmitAtPosition(u8 *owner, struct SpPosition *origin)
         const u16 *table;
         u32 *seed;
         u32 i;
-        u32 mask;
         struct SpParticle *sprite;
 
         p->active = 1;
         table = gRandomTable;
         seed = &gRandomIndex;
         *(&i) = (*seed) + 1;
-        mask = 1023;
-        i &= mask;
+        i &= 1023;
         {
             u32 r = table[i];
             p->speed = (r & 15) + 0x10;
         }
-        i = (i + 1) & mask;
+        i = (i + 1) & 1023;
         {
             u32 r = table[i];
             p->radius = (r & 15) + 0x40;
         }
-        i = (i + 1) & mask;
+        i = (i + 1) & 1023;
         *seed = i;
         p->angle = table[i];
         p->life = 8;

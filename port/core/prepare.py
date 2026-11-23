@@ -28,9 +28,6 @@ def prepare_source(path, target):
     if path.name == 'ghost.c':
         # Called before its prototype; agbcc accepts the implicit int, clang does not.
         text = 'void Anim_SetDurationScale(void *, unsigned int);\n' + text
-    if path.name == 'golem_2.c':
-        text = ('struct SceneActorAnimationView;\n'
-                'void SceneActorAnimation_SelectDirectionalEntry(struct SceneActorAnimationView *, int);\n' + text)
     if path.name == 'sub_08224980.c':
         # The portable SDK call-via bridge returns a word; this caller ignores it.
         text = text.replace('void sub_08249240(', 'int sub_08249240(')
@@ -53,11 +50,47 @@ def prepare_source(path, target):
         # ARM APCS doubles put the high word first. wasm/host IEEE doubles do not.
         text = text.replace('  {\n    halffractype tmp = dst.words[0];\n    dst.words[0] = dst.words[1];\n    dst.words[1] = tmp;\n  }', '')
         text = text.replace('  FLO_union_type swapped;\n  swapped.words[0] = src->words[1];\n  swapped.words[1] = src->words[0];\n  src = &swapped;', '')
+    if path.is_relative_to(ROOT_SRC):
+        text = hoist_prototypes(text)
     if target == 'host':
         text = host_layout(text)
     elif path.is_relative_to(ROOT_SRC):
         text = agbcc_records(text)
     return text
+
+
+PROTOTYPE = re.compile(r'^(?!static\b|typedef\b|return\b|extern\s+"C")([A-Za-z_][\w \t\*]*?\b(\w+)\s*\(([^;{}()]|\([^;{}()]*\))*\)\s*;)[ \t]*$', re.M)
+
+
+def hoist_prototypes(text):
+    """Copy a file-scope function prototype above the first use that precedes it.
+
+    agbcc takes a call before the prototype as an implicit declaration and then
+    accepts the prototype; clang rejects the prototype as conflicting. The copy
+    goes after the last #include, with forward declarations of the struct tags
+    it names so they are not scoped to the prototype."""
+    includes = list(re.finditer(r'^#include .*$', text, re.M))
+    if not includes:
+        return text
+    top = includes[-1].end()
+    moved, declared = [], set()
+    protos = [m for m in PROTOTYPE.finditer(text) if m.start() >= top]
+    spans = [(m.start(), m.end()) for m in protos]
+    for m in protos:
+        name = m[2]
+        if name in declared:
+            continue
+        declared.add(name)
+        for use in re.finditer(r'\b%s\s*\(' % re.escape(name), text[top:m.start()]):
+            at = top + use.start()
+            if not any(a <= at < b for a, b in spans):
+                moved.append(m[1])
+                break
+    if not moved:
+        return text
+    tags = sorted({t for p in moved for t in re.findall(r'\b((?:struct|union) \w+)', p)})
+    block = ''.join(t + ';\n' for t in tags) + '\n'.join(moved) + '\n'
+    return text[:top] + '\n' + block + text[top:]
 
 
 def prepare_headers(root, output, target):

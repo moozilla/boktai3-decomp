@@ -119,10 +119,7 @@ void SceneVolume_UpdateRepeatedShot(struct SceneVolumeActor *actor)
         SceneActors_StartEightDirectionAnimation(actor, &volume->animation, volume->animationState,
                                                  0x134, 1, 1, 1);
         volume->impactCount = 0;
-        {
-            u32 mask = 0x400004;
-            actor->flags |= mask;
-        }
+        SceneVolume_SetFlags(actor, 0x400004);
     }
     switch (actor->phase) {
         case 0:
@@ -132,8 +129,8 @@ void SceneVolume_UpdateRepeatedShot(struct SceneVolumeActor *actor)
             SceneActors_StartEightDirectionAnimation(actor, &volume->animation,
                                                      volume->animationState, 0x134, 1, 1, 1);
             if (actor->finished) {
-                u32 one = 1, zero = 0;
-                actor->phase = one;
+                u32 zero = 0;
+                actor->phase = 1;
                 actor->timer = zero;
             }
             break;
@@ -184,10 +181,8 @@ void SceneVolume_UpdateRepeatedShot(struct SceneVolumeActor *actor)
     }
     if ((u8)Callback_InvokeActor(actor, actor->callback))
         volume->impactCount = 0;
-    else {
-        u32 mask = 0x40;
-        actor->flags |= mask;
-    }
+    else
+        SceneVolume_SetFlags(actor, 0x40);
 }
 
 // confidence=low: pursues a destination while spawning a rotating effect
@@ -204,10 +199,7 @@ void SceneVolume_UpdatePursuitSpin(struct SceneVolumeActor *actor, s32 elapsed)
             ProximityVolume_TranslateBounds(actor->bounds, actor->position);
         else if (actor->movementMode == 1)
             ProximityVolume_TranslateBounds(actor->bounds, actor->position);
-        {
-            u32 mask = 0x400004;
-            actor->flags |= mask;
-        }
+        SceneVolume_SetFlags(actor, 0x400004);
         volume->impactCount = 0;
         Sound_PlaySong(0x2E9);
     }
@@ -221,10 +213,8 @@ void SceneVolume_UpdatePursuitSpin(struct SceneVolumeActor *actor, s32 elapsed)
             volume->movementMode = result;
     }
     switch (actor->phase) {
-        case 0: {
-            u32 mask = 0x400000;
-            actor->flags |= mask;
-        }
+        case 0:
+            SceneVolume_SetFlags(actor, 0x400000);
             if (actor->timer == 0)
                 SceneActors_StartEightDirectionAnimation(actor, &volume->animation,
                                                          volume->animationState, 0x134, 1, 1, 4);
@@ -233,10 +223,8 @@ void SceneVolume_UpdatePursuitSpin(struct SceneVolumeActor *actor, s32 elapsed)
                 actor->timer = 0;
             }
             break;
-        case 1: {
-            u32 mask = 0x100000;
-            actor->flags |= mask;
-        }
+        case 1:
+            SceneVolume_SetFlags(actor, 0x100000);
             if (SpriteComponent_GetCollisionStatus(volume->effect) && !volume->impactCount) {
                 volume->impactCount++;
                 Sound_PlaySong(0x2E7);
@@ -249,8 +237,8 @@ void SceneVolume_UpdatePursuitSpin(struct SceneVolumeActor *actor, s32 elapsed)
                 b.x = 0x20;
                 b.y = 0;
                 b.z = 0x20;
-                SceneParticleBurst_CreateWithPause(
-                    (const struct ContactPosition *)actor->position, &a, &b, 1, 2, 4);
+                SceneParticleBurst_CreateWithPause((const struct ContactPosition *)actor->position,
+                                                   &a, &b, 1, 2, 4);
             }
             if (volume->movementMode == 1 || volume->movementMode == 3) {
                 int speed = 5;
@@ -275,10 +263,8 @@ void SceneVolume_UpdatePursuitSpin(struct SceneVolumeActor *actor, s32 elapsed)
                 actor->phase = 2;
                 actor->timer = 0;
             }
-            if (elapsed <= 31) {
-                u32 mask = 0x400000;
-                actor->flags |= mask;
-            }
+            if (elapsed <= 31)
+                SceneVolume_SetFlags(actor, 0x400000);
             break;
         case 2:
             volume->impactCount = 0;
@@ -288,10 +274,7 @@ void SceneVolume_UpdatePursuitSpin(struct SceneVolumeActor *actor, s32 elapsed)
                                                      volume->animationState, 0x134, 1, 1, 4);
             break;
     }
-    {
-        u32 mask = 0x40;
-        actor->flags |= mask;
-    }
+    SceneVolume_SetFlags(actor, 0x40);
     Callback_InvokeActor(actor, actor->callback);
 }
 
@@ -317,10 +300,7 @@ void SceneVolume_UpdateImpactSlide(struct SceneVolumeActor *actor)
         SceneActors_SetParticleControlMode(actor, 30);
         Sound_PlaySong(0x50D);
     }
-    {
-        u32 mask = 0x400004;
-        actor->flags |= mask;
-    }
+    SceneVolume_SetFlags(actor, 0x400004);
     if (!(u8)Callback_InvokeActor(actor, actor->callback)) {
         switch (actor->phase) {
             case 0:
@@ -370,10 +350,8 @@ static inline void UpdateSequence(struct SceneVolumeActor *actor, u32 complete)
             actor->pending = 1;
             actor->phase = 1;
             actor->timer = complete;
-        } else if (actor->timer <= 7) {
-            u32 flags = 4;
-            actor->flags |= flags;
-        }
+        } else if (actor->timer <= 7)
+            SceneVolume_SetFlags(actor, 4);
     }
 }
 
@@ -387,10 +365,7 @@ void ActorEffect_UpdateTimedSequence(struct SceneVolumeActor *actor)
         Sound_PlaySong(0x13C);
         SceneActors_ConfigureEffect(actor, 5, 0xB4, 0xB4);
     }
-    {
-        u32 flags = 0x400040;
-        actor->flags |= flags;
-    }
+    SceneVolume_SetFlags(actor, 0x400040);
     if ((u8)Callback_InvokeActor(actor, actor->callback) == 0)
         UpdateSequence(actor, actor->phase);
 }
@@ -461,10 +436,7 @@ void SceneVolume_UpdateKnockbackLanding(struct SceneVolumeActor *actor, s32 elap
         actor->timer = 0;
         volume->height = 300;
     }
-    {
-        u32 mask = 0x400004;
-        actor->flags |= mask;
-    }
+    SceneVolume_SetFlags(actor, 0x400004);
     switch (actor->phase) {
         case 0:
             if (elapsed > 3) {
@@ -514,8 +486,5 @@ void SceneVolume_UpdateKnockbackLanding(struct SceneVolumeActor *actor, s32 elap
         case 4:
             return;
     }
-    {
-        u32 mask = 1;
-        actor->flags |= mask;
-    }
+    SceneVolume_SetFlags(actor, 1);
 }

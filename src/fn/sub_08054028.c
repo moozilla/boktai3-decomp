@@ -13,8 +13,6 @@ s32 SavedPositionMarker_InitializeFromScript(struct SavedPositionMarker *marker,
     struct ContactSwarmGraphics *secondaryGraphics;
     struct ContactSwarmGraphics *graphics;
     struct ContactPosition *position;
-    u32 resourceId;
-    u32 priority;
     s32 i;
     u16 *argument;
     {
@@ -105,19 +103,17 @@ s32 SavedPositionMarker_InitializeFromScript(struct SavedPositionMarker *marker,
         u32 tile = 0x167;
         *paletteBase = tile;
     }
-    resourceId = 0xA152;
-    AnimData_Load(graphics, resourceId);
+    AnimData_Load(graphics, 0xA152);
     Sprite_Init(primary, graphics, 0);
     AnimData_SelectPaletteBank(graphics, *paletteBase);
     marker->primary.sprite.flags |= 0x200;
-    priority = 3;
-    *primaryPriority = priority;
+    *primaryPriority = 3;
     marker->primary.sprite.position = marker->position;
-    AnimData_Load(secondaryGraphics, resourceId);
+    AnimData_Load(secondaryGraphics, 0xA152);
     Sprite_Init(secondary, secondaryGraphics, 0);
     AnimData_SelectPaletteBank(secondaryGraphics, *paletteBase);
     marker->secondary.sprite.flags |= 0x400;
-    *secondaryPriority = priority;
+    *secondaryPriority = 3;
     *secondaryPosition = marker->position;
     SavedPositionMarker_SetState(marker, SavedPositionMarker_TickIdle);
     return 0;

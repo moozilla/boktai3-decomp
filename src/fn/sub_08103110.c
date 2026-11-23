@@ -20,16 +20,6 @@ static inline void SelectObjectPalette(struct NamedObject *object, s32 index)
 {
     AnimData_SelectPaletteBank(object->anim, index);
 }
-static inline void SetObjectFlags(u32 mask, s16 *flags)
-{
-    u16 bits = mask;
-    bits |= *flags;
-    *flags = bits;
-}
-static inline void ClearObjectFlags(u32 mask, s16 *flags)
-{
-    *flags = ~mask & (u16)*flags;
-}
 static inline s32 optionalValue(void)
 {
     if (Script_GetPc())
@@ -74,7 +64,7 @@ void NamedObject_CreateFromScript(void)
     }
     e->kind = Script_GetKeywordValue('k', 0);
     if (Script_GetKeywordValue('O', 0))
-        SetObjectFlags(0x2000, &e->flags);
+        NamedObject_EnableFlags(0x2000, e);
     if (Script_SeekToKeyword('Y')) {
         s32 height;
         readOptional(&e->lowerHeight);
@@ -83,10 +73,10 @@ void NamedObject_CreateFromScript(void)
         if (e->kind == 2) {
             if (height == e->lowerHeight) {
                 view.sprite->position.y = height;
-                ClearObjectFlags(2, &e->flags);
+                NamedObject_DisableFlags(2, e);
             } else if (height == e->upperHeight) {
                 view.sprite->position.y = height;
-                SetObjectFlags(2, &e->flags);
+                NamedObject_EnableFlags(2, e);
             }
         } else
             view.sprite->position.y = e->lowerHeight;
@@ -200,12 +190,12 @@ void NamedObject_CreateFromScript(void)
         s32 enabled = Script_GetKeywordValue('d', 0);
         view.route = route;
         if (enabled)
-            SetObjectFlags(0x80, &e->flags);
+            NamedObject_EnableFlags(0x80, e);
     }
     if (Script_GetKeywordValue('F', 0))
-        SetObjectFlags(0x1000, &e->flags);
+        NamedObject_EnableFlags(0x1000, e);
     e->stage = 0;
-    e->offsetC2 = 0;
+    e->verticalImpulse = 0;
     do {
         follow = Script_GetKeywordValue('f', 0);
     } while (0);
@@ -223,7 +213,7 @@ void NamedObject_CreateFromScript(void)
         NamedObject_ClearAttachmentFlag(manager->followName, 0);
         manager->followName = e->name;
         Player_AddAttachmentFlags(gPlayers[0], 1, e->name);
-        SetObjectFlags(8, &e->flags);
+        NamedObject_EnableFlags(8, e);
         gPlayers[0]->shadow[1] |= 1;
         cell = SceneActorTerrain_GetCellIndex(&e->body.position);
         TerrainModifiers_RegisterCell(e->registration, cell, 0, e->body.position.y >> 8, 0xFF, 4);

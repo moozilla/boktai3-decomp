@@ -28,7 +28,6 @@ int ScanlineWave_Initialize(struct ScanlineWave *wave, int id)
     int limit;
     int wrap;
     const s16 *table;
-    int mask;
     gScanlineWave = (u32)wave;
     wave->id = id;
     wave->target = Script_GetKeywordValue('t', 0);
@@ -51,16 +50,20 @@ int ScanlineWave_Initialize(struct ScanlineWave *wave, int id)
     limit = 287;
     wrap = 127;
     table = gUnk_086149C4;
-    mask = 255;
     do {
         j = 0;
         do {
-            int v = (table[(j & wrap) & mask] * amplitude) >> 12;
+            int v = (table[(j & wrap) & 255] * amplitude) >> 12;
             wave->samples[i][j] = v;
             j++;
         } while (j <= limit);
         i++;
     } while (i <= 0);
+#ifdef UBFIX
+    // falls off the end with r0 left over from its last statement; the creator only tests
+    // < 0, and this initializer has no failure path here
+    return 0;
+#endif
 }
 
 struct ScanlineWave *ScanlineWave_Create(int id)

@@ -3,6 +3,7 @@
 #include "player.h"
 #include "game_state.h"
 #include "ram.h"
+#include "engine_pause.h"
 
 static inline u8 SceneEffectSchedule_TestOccupied(u32 mask, s32 bit, s32 index)
 {
@@ -16,16 +17,14 @@ struct SceneEffectScheduleEntry *SceneEffectSchedule_FindById(u32 id)
     struct SceneEffectSchedule *manager = gSceneEffectSchedule;
     s32 index;
     u32 mask;
-    s32 bit;
     struct SceneEffectSchedule *cursor;
     if (!manager)
         return 0;
     index = 0;
     mask = manager->occupiedMask;
     cursor = manager;
-    bit = 1;
     for (; index < 12; index++) {
-        if (SceneEffectSchedule_TestOccupied(mask, bit, index)) {
+        if (SceneEffectSchedule_TestOccupied(mask, 1, index)) {
             u32 offset = index * sizeof(manager->entries[0]);
             if (cursor->entries[0].id == id)
                 return (void *)((u8 *)manager + (offset + sizeof(manager->task)));
@@ -72,8 +71,7 @@ s32 SceneEffectSchedule_Tick(struct SceneEffectSchedule *manager)
     if (!manager->occupiedMask)
         return 0;
     {
-        u32 mask = 0x400;
-        if ((gEngineFlags | gScenePauseFlags) & mask)
+        if (Engine_PauseBits(0x400))
             return 0;
     }
     {
@@ -143,8 +141,7 @@ void SceneEffectSchedule_AddFromScript(void)
     struct SceneEffectScheduleEntry *entry;
     s32 time, delay;
     {
-        u32 mask = 0x400;
-        if ((gEngineFlags | gScenePauseFlags) & mask)
+        if (Engine_PauseBits(0x400))
             return;
     }
     if (!gSceneEffectSchedule)

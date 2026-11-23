@@ -110,4 +110,9 @@ s32 DirectionalForce_InitializeFromScript(struct DirectionalForce *force, u32 id
             break;
     }
     gDirectionalForce = force;
+#ifdef UBFIX
+    // falls off the end with r0 left over from its last statement; the creator only tests
+    // < 0, and this initializer has no failure path here
+    return 0;
+#endif
 }

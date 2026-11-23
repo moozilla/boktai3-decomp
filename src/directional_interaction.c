@@ -115,16 +115,11 @@ void LevelController_Update(struct DirectionalManager *manager, struct Direction
     }
 }
 
-static inline u32 Directional_ReadPlayerStatus(const u32 *status, u32 mask)
-{
-    return *status & mask;
-}
-
 s32 Actor_CanInteractWithController(struct DirectionalManager *manager,
                                     struct DirectionalController *p)
 {
     struct Player *actor = manager->actor;
-    if (Directional_ReadPlayerStatus(&actor->statusFlags, 0x186c))
+    if (Player_ReadStatusBits(&actor->statusFlags, 0x186c))
         return 0;
     if (!(actor->statusFlags & 0x100000) && manager->selected < 0)
         return 1;

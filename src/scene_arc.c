@@ -291,9 +291,8 @@ struct SceneArcSlot *SceneArc_FindFreeSlot(struct SceneArcManager *manager, s32 
 {
     struct SceneArcSlot *slot = manager->slots;
     s32 index = 0;
-    u32 one = 1, mask = manager->activeMask;
     do {
-        if ((one << index) & mask) {
+        if (manager->activeMask & (1 << index)) {
             index++;
             slot++;
         } else {
@@ -303,6 +302,7 @@ struct SceneArcSlot *SceneArc_FindFreeSlot(struct SceneArcManager *manager, s32 
     } while (index <= 7);
     return 0;
 }
+
 
 struct SceneArcManager *ResourceRegistry_GetResource(u32);
 
