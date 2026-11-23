@@ -52,7 +52,7 @@ PORT_CODE = {
 }
 # Units the recorder build leaves alone: its own runtime, the agent hooks (their ring
 # is not game memory), the picture processor (reads game memory, writes only its own).
-RECORD_SKIP = {'tools/recorder/rec_rt.c', 'port/game/hooks.c', 'port/ppu/ppu.c', 'port/game/code_table'}
+RECORD_SKIP = {'tools/recorder/rec_rt.c', 'port/hw/psg.c', 'port/game/hooks.c', 'port/ppu/ppu.c', 'port/game/code_table'}
 EXPORTS = ['port_trace_map', 'port_memory_init', 'port_load_rom', 'port_game_run', 'port_game_set_solar',
            'port_game_set_time', 'port_frame_count', 'port_game_save_stage', 'port_game_save_dirty',
            'port_game_save_data', 'port_game_save_size',
@@ -115,7 +115,7 @@ def main():
     elif args.record:
         OUT = ROOT / 'build/port/game-rec'
         PORT_UNITS['tools/recorder/rec_rt.c'] = False
-        EXPORTS.extend(['rec_state', '__heap_base', '__data_end'])
+        EXPORTS.extend(['rec_state', 'rec_static_units', '__heap_base', '__data_end'])
     if not (ROOT / 'build/boktai3.elf').exists():
         sys.exit('build/boktai3.elf is missing: run make (or tools/worktree.sh --here) first')
     OUT.mkdir(parents=True, exist_ok=True)

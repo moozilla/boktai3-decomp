@@ -179,6 +179,10 @@ async function boot({ save, time, solar, onFrame, onFlush }) {
   machine.heapBase = ex.__heap_base.value;
   machine.stackPointer = () => (ex.__stack_pointer ? ex.__stack_pointer.value : 0);
   machine.rec = ex.rec_state();
+  // static-data writes are logged for every unit except the emulated hardware (rec_rt.c)
+  const units = JSON.parse(fs.readFileSync(path.join(path.dirname(WASM), 'rec/units.json'), 'utf8'));
+  const bits = new Uint8Array(memory.buffer, ex.rec_static_units(), 1024);
+  units.forEach((u, i) => { if (!/^port\/(hw|core)\//.test(u)) bits[i >> 3] |= 1 << (i & 7); });
   return machine;
 }
 

@@ -42,13 +42,22 @@ struct RecState *rec_state(void) { return &state; }
  * level): logged too, so a slice can cross frames through it. The stack is not. */
 extern unsigned char __global_base, __heap_base;
 
-static int watched(uint32_t address, uint32_t length)
+/* Game-side units (bit per unit index; the host sets it: everything but the
+ * emulated hardware). Only their writes to IO and to the module's static data are
+ * logged: the hardware's own (HBlank DMA, DISPSTAT, audio and timing state) follow
+ * from logged RAM and would dominate the log. RAM writes are always logged. */
+static uint8_t static_units[8192 / 8];
+
+uint8_t *rec_static_units(void) { return static_units; }
+
+static int watched_site(uint32_t site, uint32_t address, uint32_t length)
 {
-    uint32_t end = address + (length ? length : 1);
-    if (address < (uint32_t)(uintptr_t)&__heap_base && end > (uint32_t)(uintptr_t)&__global_base) return 1;
+    uint32_t end = address + (length ? length : 1), unit = (site >> 16) & 0x1FFFu;
+    if (address < (uint32_t)(uintptr_t)&__heap_base && end > (uint32_t)(uintptr_t)&__global_base)
+        return static_units[unit >> 3] >> (unit & 7) & 1;
     if (address < 0x02040000u && end > 0x02000000u) return 1;
     if (address < 0x03008000u && end > 0x03000000u) return 1;
-    if (address < 0x04000400u && end > 0x04000000u) return 1;
+    if (address < 0x04000400u && end > 0x04000000u) return static_units[unit >> 3] >> (unit & 7) & 1;
     return 0;
 }
 
@@ -93,7 +102,7 @@ void __rec_st(uint32_t site, void *address, uint32_t value, uint32_t wcode)
 {
     uint32_t *e;
     if (!state.mode) return;
-    if (!(state.mode & MODE_TRACE) && !watched((uint32_t)(uintptr_t)address, 1u << wcode)) return;
+    if (!(state.mode & MODE_TRACE) && !watched_site(site, (uint32_t)(uintptr_t)address, 1u << wcode)) return;
     if ((e = reserve(3))) { e[0] = site; e[1] = (uint32_t)(uintptr_t)address | wcode << 28; e[2] = value; }
 }
 
@@ -108,7 +117,7 @@ void __rec_st64(uint32_t site, void *address, uint64_t value)
 {
     uint32_t *e;
     if (!state.mode) return;
-    if (!(state.mode & MODE_TRACE) && !watched((uint32_t)(uintptr_t)address, 8)) return;
+    if (!(state.mode & MODE_TRACE) && !watched_site(site, (uint32_t)(uintptr_t)address, 8)) return;
     if ((e = reserve(4))) {
         e[0] = site; e[1] = (uint32_t)(uintptr_t)address | 3u << 28 | 1u << 31;
         e[2] = (uint32_t)value; e[3] = (uint32_t)(value >> 32);
@@ -126,7 +135,7 @@ void __rec_cpy(uint32_t site, void *dst, const void *src, uint32_t length)
 {
     uint32_t *e;
     if (!state.mode) return;
-    if (!(state.mode & MODE_TRACE) && !watched((uint32_t)(uintptr_t)dst, length)) return;
+    if (!(state.mode & MODE_TRACE) && !watched_site(site, (uint32_t)(uintptr_t)dst, length)) return;
     if (length > 0x100000u) length = 0x100000u;
     if ((e = reserve(4u + (length + 3u) / 4u))) {
         e[0] = site; e[1] = (uint32_t)(uintptr_t)dst; e[2] = (uint32_t)(uintptr_t)src; e[3] = length;
@@ -138,7 +147,7 @@ void __rec_set(uint32_t site, void *dst, uint32_t byte, uint32_t length)
 {
     uint32_t *e;
     if (!state.mode) return;
-    if (!(state.mode & MODE_TRACE) && !watched((uint32_t)(uintptr_t)dst, length)) return;
+    if (!(state.mode & MODE_TRACE) && !watched_site(site, (uint32_t)(uintptr_t)dst, length)) return;
     if ((e = reserve(4))) { e[0] = site; e[1] = (uint32_t)(uintptr_t)dst; e[2] = byte & 0xffu; e[3] = length; }
 }
 
@@ -162,6 +171,6 @@ void __rec_agg(uint32_t site, void *address, uint32_t size)
 void __rec_aggst(uint32_t site, void *address, uint32_t size)
 {
     if (!state.mode) return;
-    if (!(state.mode & MODE_TRACE) && !watched((uint32_t)(uintptr_t)address, size)) return;
+    if (!(state.mode & MODE_TRACE) && !watched_site(site, (uint32_t)(uintptr_t)address, size)) return;
     aggregate(site, address, size, 1);
 }
