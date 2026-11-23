@@ -18,12 +18,11 @@ static inline void clearDrawFlags(struct ScenePoolPlayerDraw *d, s16 mask)
 void Glove_StopWithMessage(struct ScenePoolPlayer *glove)
 {
     struct Packet *packet = &gMessagePacket;
-    u32 zero = 0;
     u32 one;
-    packet->zero = zero;
-    packet->reserved = zero;
+    packet->zero = 0;
+    packet->reserved = 0;
     packet->command = 0x41;
-    packet->count = zero;
+    packet->count = 0;
     packet->kind = 4;
     packet->id = 0x7c56;
     SceneMessages_Send(&gMessagePacket);
@@ -38,6 +37,6 @@ void Glove_StopWithMessage(struct ScenePoolPlayer *glove)
         u8 *active = &glove->gloveActive;
         *active = one;
         glove->gloveUpdate = update;
-        glove->gloveTimer = zero;
+        glove->gloveTimer = 0;
     }
 }

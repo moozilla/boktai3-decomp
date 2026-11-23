@@ -402,7 +402,6 @@ void ContactImpactEffect_UpdateShakingPosition(struct ContactImpactEffect *effec
     const u16 *table;
     u32 *seed;
     u16 index;
-    u32 mask;
     s32 random;
     Project((u16 *)&effect->sprite.position.x, (struct ContactPosition *)&effect->world.x);
     timer = &effect->timer;
@@ -412,12 +411,11 @@ void ContactImpactEffect_UpdateShakingPosition(struct ContactImpactEffect *effec
     table = gRandomTable;
     seed = &gRandomIndex;
     index = *seed + 1;
-    mask = 0x3FF;
-    index &= mask;
+    index &= 0x3FF;
     *seed = index;
     random = table[index];
     ApplyOffset((u16 *)&effect->sprite.position.x, random, range);
-    index = (index + 1) & mask;
+    index = (index + 1) & 0x3FF;
     *seed = index;
     random = table[index];
     ApplyOffset((u16 *)&effect->sprite.position.y, random, range);

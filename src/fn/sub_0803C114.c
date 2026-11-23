@@ -156,7 +156,6 @@ void ScenePool_UpdateOccupiedActor(u8 *pool, u8 *slot, u8 *item, u32 index)
     s32 *pprevX, *ox, *i1, *i2;
     u16 *ph;
     struct ShortVector pos;
-    u32 one;
     u32 fieldOffset;
     s8 *earlyFrames;
     s32 *earlyForward;
@@ -186,8 +185,7 @@ void ScenePool_UpdateOccupiedActor(u8 *pool, u8 *slot, u8 *item, u32 index)
         view->lateralSpeed = 0;
     {
         u32 controls = view->flags40;
-        one = 1;
-        if (controls & one)
+        if (controls & 1)
             view->verticalSpeed = 0;
     }
     {
@@ -217,7 +215,7 @@ void ScenePool_UpdateOccupiedActor(u8 *pool, u8 *slot, u8 *item, u32 index)
             ScenePool_ClampMotionSpeeds(actor);
     }
     actor->lateralSpeed = Div(actor->lateralSpeed * 90, 100);
-    if (TestFlags(flags, one)) {
+    if (TestFlags(flags, 1)) {
         ((struct WirelessSceneActor *)slot)->forwardSpeed = 0;
         ((struct WirelessSceneActor *)slot)->lateralSpeed = 0;
         ((struct WirelessSceneActor *)slot)->forwardBias = 0;

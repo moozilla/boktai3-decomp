@@ -24,10 +24,9 @@ static inline void Glove_BeginStopping(union GloveAnimationKey *animation, struc
                                        u8 *entry)
 {
     u16 elapsedReset[] = {0};
-    u8 entryClear = 0;
     animation->half[0] = 0x88;
     p->motion.animation.half[1] = elapsedReset[0];
-    *entry = entryClear;
+    *entry = 0;
 }
 static inline s32 Glove_ReadHeightLimit(const s32 *limit)
 {

@@ -10,7 +10,6 @@ void ModifierMenu_DrawPendingChoice(struct ModifierMenu *menu)
 {
     struct ModifierSelection *current = &menu->current;
     struct ModifierDisplayObject *object;
-    u32 mask;
     s32 i;
     s32 mode;
     s32 end;
@@ -21,13 +20,12 @@ void ModifierMenu_DrawPendingChoice(struct ModifierMenu *menu)
     object->y = menu->choice.cursor.index << 4;
     object = &menu->displays[13];
     object->flags |= 1;
-    mask = ~1;
     object = &menu->displays[5];
-    object->flags = mask & object->flags;
+    object->flags = ~1 & object->flags;
     object = &menu->displays[6];
-    object->flags = mask & object->flags;
+    object->flags = ~1 & object->flags;
     object = &menu->displays[7];
-    object->flags = mask & object->flags;
+    object->flags = ~1 & object->flags;
     for (i = 9; i < 13; i++)
         menu->displays[i].flags |= 1;
     for (i = 14; i < 18; i++)

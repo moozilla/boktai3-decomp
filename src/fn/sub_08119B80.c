@@ -55,8 +55,7 @@ s32 Glove_DispatchCommands(struct Glove *p)
     p->offsetY = -24;
     {
         struct GloveAttachment *desc = &p->attachmentDesc;
-        u32 bit = 4;
-        desc->flags |= bit;
+        desc->flags |= 4;
     }
     {
         struct GlovePosition *pos = &p->screenPosition;
