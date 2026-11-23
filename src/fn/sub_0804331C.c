@@ -31,10 +31,7 @@ void ContactActor_UpdateRandomWalk(struct ContactActorPool *pool, struct Contact
         }
     }
     if (pool->clearRequested) {
-        u32 state = 6;
-        slot->state = state;
-        slot->enter = 1;
-        slot->stateFrame = 0;
+        ContactActor_EnterState(slot, 6);
         return;
     }
     if (!slot->steeringTimer) {
@@ -62,9 +59,7 @@ void ContactActor_UpdateRandomWalk(struct ContactActorPool *pool, struct Contact
     }
     ContactActor_SetDirectionalSequence(pool, slot, 0);
     if (slot->stateFrame > 31) {
-        slot->state = 2;
-        slot->enter = 1;
-        slot->stateFrame = 0;
+        ContactActor_EnterState(slot, 2);
     } else {
         if (slot->retargetTimer && !--slot->retargetTimer) {
             u32 mode = pool->mode;

@@ -1,4 +1,3 @@
-// fuzzy: 73.7%
 #include "contact_actor.h"
 void ContactActor_SetDirectionalSequence(struct ContactActorPool *, struct ContactActor *, u32);
 static inline s32 truncateShift12(s32 value)
@@ -35,6 +34,12 @@ static inline s32 distanceSq(const struct ContactPosition *a, const struct Conta
     s32 dz = a->z - b->z;
     return dx * dx + dz * dz;
 }
+static inline void polarOffset(struct ContactPosition *write, u32 angle, u32 radius)
+{
+    write->x = truncateShift12(gUnk_086149C4[(angle + 64) & 255] * radius);
+    write->y = 0;
+    write->z = truncateShift12(gUnk_086149C4[angle] * radius);
+}
 static inline void addPosition(struct ContactPosition *out, const struct ContactPosition *base,
                                const struct ContactPosition *delta)
 {
@@ -50,14 +55,7 @@ void ContactActor_UpdateRoaming(struct ContactActorPool *pool, struct ContactAct
     if (slot->enter) {
         slot->enter = 0;
         if (slot->targetIndex >= 0) {
-            u32 scale = 256;
-            u32 angle = nextRandom();
-            u32 mask = 255;
-            struct ContactPosition *write = &delta;
-            angle &= mask;
-            write->x = truncateShift12(gUnk_086149C4[(angle + 64) & mask] * scale);
-            write->y = 0;
-            write->z = truncateShift12(gUnk_086149C4[angle] * scale);
+            polarOffset(&delta, nextRandom() & 255, 256);
             addPosition(&slot->destination, pool->targets[slot->targetIndex], &delta);
         }
         slot->direction = headingTo(&slot->destination, &slot->position);
@@ -76,12 +74,7 @@ void ContactActor_UpdateRoaming(struct ContactActorPool *pool, struct ContactAct
         }
     }
     if (pool->clearRequested) {
-        {
-            u32 state = 6;
-            slot->state = state;
-            slot->enter = 1;
-            slot->stateFrame = 0;
-        }
+        ContactActor_EnterState(slot, 6);
         return;
     }
     if (!slot->steeringTimer) {
@@ -90,13 +83,7 @@ void ContactActor_UpdateRoaming(struct ContactActorPool *pool, struct ContactAct
         roll = nextSample((const u16 *)work) & 255;
         if (roll <= 191) {
             if (slot->targetIndex >= 0) {
-                u32 scale = 256;
-                u32 angle = nextSample((const u16 *)work);
-                struct ContactPosition *write = &delta;
-                angle &= 255;
-                write->x = truncateShift12(gUnk_086149C4[(angle + 64) & 255] * scale);
-                write->y = 0;
-                write->z = truncateShift12(gUnk_086149C4[angle] * scale);
+                polarOffset(&delta, nextSample((const u16 *)work) & 255, 256);
                 addPosition(&slot->destination, pool->targets[slot->targetIndex], &delta);
             }
             slot->direction = headingTo(&slot->destination, &slot->position);
@@ -125,9 +112,7 @@ void ContactActor_UpdateRoaming(struct ContactActorPool *pool, struct ContactAct
     Collider_SetPosition(&slot->healthCollider, &slot->position, 0);
     ContactActor_SetDirectionalSequence(pool, slot, 0);
     if (distanceSq(&slot->destination, &slot->position) <= 16383) {
-        slot->state = 2;
-        slot->enter = 1;
-        slot->stateFrame = 0;
+        ContactActor_EnterState(slot, 2);
     } else {
         if (slot->retargetTimer) {
             u32 timer = slot->retargetTimer - 1;
