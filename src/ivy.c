@@ -984,11 +984,6 @@ static inline u16 Rand(void)
     return *(const u16 *)(index + RANDOM_TABLE_ADDR);
 }
 
-struct DefeatContext {
-    u8 unknown0[0x638];
-    u16 script;
-};
-
 void Ivy_UpdateDefeat(struct ChaseActor *actor, s32 frame)
 {
     struct {
@@ -1424,17 +1419,6 @@ void Ivy_InitProfileId(struct ChaseActor *actor)
     actor->base.profileId = SceneActorProfiles_FindOrAdd(actor->base.category, 0);
 }
 
-struct IvyContext {
-    u8 unknown0[0x62C];
-    u32 flags;
-    u8 unknown630[4];
-    u16 field634;
-};
-
-struct IvyPlacement {
-    u32 xy, z;
-};
-
 /* Ivy drawable reset (tentative): clears the context's capture flags, moves the actor by 0x20
  * on x and z, copies the position to the drawable, selects directional entry 0 and steps the
  * display sequence. */
@@ -1442,18 +1426,17 @@ struct IvyPlacement {
 void Ivy_TickDrawable(struct ChaseActor *actor)
 {
     {
-        struct IvyContext *context = actor->base.context;
-        context->flags = 0;
-        context->field634 = 0;
+        struct Ivy *context = actor->base.context;
+        context->captureFlags = 0;
+        context->targetMissFrames = 0;
     }
     actor->base.body.position.x += 0x20;
     actor->base.body.position.z += 0x20;
     if (!actor->base.drawableKind)
-        *(struct IvyPlacement *)((u8 *)actor->base.drawable + 0x1C) =
-            *(struct IvyPlacement *)&actor->base.body.position;
+        ((struct DisplaySequenceSprite *)actor->base.drawable)->position =
+            actor->base.body.position;
     else
-        *(struct IvyPlacement *)((u8 *)actor->base.drawable + 0x40) =
-            *(struct IvyPlacement *)&actor->base.body.position;
+        *(struct ContactPosition *)((u8 *)actor->base.drawable + 0x40) = actor->base.body.position;
     SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0);
     {
         struct SceneActorControlMotionDrawable *drawable = actor->base.drawable;
