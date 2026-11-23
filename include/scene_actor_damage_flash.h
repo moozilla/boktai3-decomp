@@ -28,6 +28,19 @@ static inline void SceneActorDamage_MarkFlashing(u32 *behaviorFlags)
     *behaviorFlags |= bit;
 }
 
+/* A strong hit on a category-0x19 actor also starts its 0x41-frame palette cycle. */
+static inline void SceneActorDamage_StartStrongPalette(struct ChaseActor *actor, u32 *behaviorFlags)
+{
+    {
+        u32 bit = 0x2000000;
+        *behaviorFlags |= bit;
+    }
+    {
+        u32 duration = 0x41;
+        actor->base.paletteTimer = duration;
+    }
+}
+
 /* Ending a hit clears the reaction bits 0x980. */
 static inline void SceneActorDamage_ClearHitReaction(struct ChaseActor *actor)
 {

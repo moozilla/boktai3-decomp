@@ -229,12 +229,7 @@ u8 SceneActorReaction_ResolvePlacementDamage(struct ChaseActor *actor)
                     u32 strong = mode & 4;
                     flags2CC = &actor->base.behaviorFlags;
                     if (strong && (actor->base.category == 0x19)) {
-                        u32 bit = 0x2000000;
-                        *flags2CC |= bit;
-                        {
-                            u32 duration = 0x41;
-                            actor->base.paletteTimer = duration;
-                        }
+                        SceneActorDamage_StartStrongPalette(actor, flags2CC);
                     }
                 }
                 SceneActorDamage_MarkFlashing(flags2CC);
