@@ -338,8 +338,7 @@ s32 GameStart_Init(struct GameStart *p)
         *targetY = k1;
     }
     {
-        u32 group = 0xcb05;
-        res = ScriptProc_Start(group, 0x530d);
+        res = ScriptProc_Start(0xcb05, 0x530d);
     }
     ResourceHeader_Relocate((u8 *)&p->titleResource, res);
     Widget_InitLinked((u8 *)&p->title, (u8 *)&p->titleResource, 0x8a, 0x10, 0, 0, 0, 0);
