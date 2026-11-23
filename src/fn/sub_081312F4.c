@@ -2,22 +2,15 @@
 #include "scene_actor_contact_response.h"
 #include "global.h"
 #include "scene_actor_control_phase.h"
-#define FIELD(p, n, t) (*(t *)((u8 *)(p) + (n)))
 u8 sub_0812F3CC(struct ChaseActor *);
 // confidence=low: selects a route return phase from motion and route flags.
 
 static inline void BeginControl(struct ChaseActor *actor, void *control, u32 kind, u32 zero)
 {
-    u32 offset;
-    {
-        u8 *field = &actor->base.field2B2;
-        *field = 1;
-    }
-    offset = 0x2B0;
-    *((u8 *)actor + offset) = zero;
+    actor->base.field2B2 = 1;
+    actor->base.stepDone = zero;
     actor->base.controlKind = kind;
-    offset -= 0x94;
-    *(void **)((u8 *)actor + offset) = control;
+    actor->base.target = control;
     actor->base.field2C8 = zero;
     {
         u32 *flags = &actor->base.pendingControlFlags;
@@ -25,14 +18,6 @@ static inline void BeginControl(struct ChaseActor *actor, void *control, u32 kin
         *flags &= mask;
     }
     actor->base.pendingControl = zero;
-}
-static inline void State(struct ChaseActor *a, u32 behavior, u32 zero)
-{
-    a->base.state2A8 = zero;
-    a->base.phase2A9 = zero;
-    a->base.behavior2AA = behavior;
-    a->base.counter2AC = zero;
-    a->base.field2B1 = 1;
 }
 static inline void *SavedControl(u8 *group)
 {
@@ -55,14 +40,14 @@ void SceneActorRoute_UpdateReturnEntry(struct ChaseActor *actor)
         if (*finished) {
             u16 flags = SceneActorContact_MotionFlags(actor, 0x10);
             if (flags) {
-                State(actor, 8, result);
+                SceneActorTerrain_EnterState(actor, 0, 0, 8);
                 BeginControl(actor, SavedControl(group), 0x13, result);
             } else {
                 u32 bits = actor->base.behaviorFlags & 0x10;
                 if (bits)
-                    State(actor, 7, flags);
+                    SceneActorTerrain_EnterState(actor, 0, 0, 7);
                 else
-                    State(actor, 2, bits);
+                    SceneActorTerrain_EnterState(actor, 0, 0, 2);
                 SceneActorTerrain_InstallControl(actor, actor->base.onAlternateEntry, 1);
             }
         } else
