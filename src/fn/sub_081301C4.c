@@ -1,31 +1,10 @@
+#include "scene_actor_terrain_reaction.h"
 #include "scene_actor_behavior.h"
 #include "global.h"
 #include "scene_actor_chase.h"
 #include "scene_actor_straight_route.h"
 #include "scene_actor_attachment.h"
 
-static inline void SetState(struct ChaseActor *actor, u8 s, u8 p, u8 b)
-{
-    actor->base.state2A8 = s;
-    actor->base.phase2A9 = p;
-    actor->base.behavior2AA = b;
-    actor->base.counter2AC = 0;
-    actor->base.field2B1 = 1;
-}
-static inline void SetControl(struct ChaseActor *actor, void *cb, u8 kind)
-{
-    actor->base.field2B2 = 1;
-    actor->base.stepDone = 0;
-    actor->base.controlKind = kind;
-    actor->base.target = cb;
-    actor->base.field2C8 = 0;
-    {
-        u32 *flags = &actor->base.pendingControlFlags;
-        u32 mask = ~1;
-        *flags &= mask;
-    }
-    actor->base.pendingControl = 0;
-}
 // confidence=low: timed movement recovery restores a route and saves a delayed control.
 u8 sub_0812F3CC(struct ChaseActor *);
 void SceneActorAttachment_ReplaceResponseSlot(void *, u32, u32, u32);
@@ -68,8 +47,8 @@ void SceneActorReaction_UpdateRouteRecovery(struct ChaseActor *actor)
             *flags &= mask;
         }
         SceneActorAttachment_ReplaceResponseSlot(actor, 0, 2, actor->base.category);
-        SetState(actor, 3, 1, 0);
-        SetControl(actor, SceneActorReaction_RestoreAfterDelay, 14);
+        SceneActorTerrain_EnterState(actor, 3, 1, 0);
+        SceneActorTerrain_InstallControl(actor, SceneActorReaction_RestoreAfterDelay, 14);
         SceneActorBehavior_SetWordFlags(&actor->base.behaviorFlags, 0x10);
         {
             struct ContactPosition *p = &target;

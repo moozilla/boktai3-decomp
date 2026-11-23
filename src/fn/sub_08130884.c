@@ -1,3 +1,4 @@
+#include "scene_actor_terrain_reaction.h"
 #include "scene_actor_control_phase.h"
 u32 Trigger_ConsumePending(void *, u32);
 static inline void SetControl(struct ChaseActor *actor, void *callback, u32 kind)
@@ -14,14 +15,6 @@ static inline void SetControl(struct ChaseActor *actor, void *callback, u32 kind
     }
     actor->base.pendingControl = 0;
 }
-static inline void SetState(struct ChaseActor *actor, u8 state, u8 phase, u8 behavior)
-{
-    actor->base.state2A8 = state;
-    actor->base.phase2A9 = phase;
-    actor->base.behavior2AA = behavior;
-    actor->base.counter2AC = 0;
-    actor->base.field2B1 = 1;
-}
 
 void SceneActorControl_UpdateTriggerPhase(struct ChaseActor *actor)
 {
@@ -31,7 +24,7 @@ void SceneActorControl_UpdateTriggerPhase(struct ChaseActor *actor)
     } else if (actor->base.stepDone) {
         Trigger_ConsumePending((u8 *)actor + 0xc, 1);
         SetControl(actor, actor->base.onStanding, taken);
-        SetState(actor, 2, 0, 2);
+        SceneActorTerrain_EnterState(actor, 2, 0, 2);
     } else {
         actor->base.counter2AC++;
     }

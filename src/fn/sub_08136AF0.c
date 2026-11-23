@@ -1,3 +1,4 @@
+#include "scene_actor_chase_shared.h"
 #include "scene_actor_terrain_reaction.h"
 #include "global.h"
 #include "scene_actor_placement.h"
@@ -5,10 +6,6 @@
 static inline void SetFlags(struct RoomActor *s, u16 mask)
 {
     s->motionFlags = mask | s->motionFlags;
-}
-static inline void ClearFlags32(u32 *p, u32 mask)
-{
-    *p &= mask;
 }
 static inline u32 MaskFlags(u16 *p, u32 mask)
 {
@@ -55,7 +52,7 @@ s32 SceneActorPlacement_PlayResponseAndResetState(struct RoomActor *s)
         SceneActorTerrain_InstallControl((struct ChaseActor *)s, s->onReaction, 0x12);
         SceneActorTerrain_EnterState((struct ChaseActor *)s, 3, 0, 0);
         SceneActorPlacement_ClearFlags(&s->reactionFlags, 0xFFFFF636);
-        ClearFlags32(&s->statusFlags, 0xFEFFFFFF);
+        SceneActorChase_AndWordFlags(&s->statusFlags, 0xFEFFFFFF);
     }
     return 1;
 }
