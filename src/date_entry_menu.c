@@ -7,13 +7,9 @@
 
 void DateMenu_HideAnimations(struct DateMenu *p)
 {
-    u32 one = 1;
-    u32 *entry = &p->digits[0].flags;
-    s32 i = 11;
-    do {
-        *entry |= one;
-        entry += sizeof(struct SceneInputWidget) / sizeof(*entry);
-    } while (--i >= 0);
+    s32 i;
+    for (i = 0; i < 12; i++)
+        p->digits[i].flags |= 1;
     p->widgets[3].flags |= 1;
     p->widgets[2].flags |= 1;
     p->widgets[1].flags |= 1;
