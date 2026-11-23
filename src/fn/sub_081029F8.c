@@ -29,9 +29,9 @@ void NamedObject_UpdatePlayerAttachment(struct NamedObject *object)
     struct ContactPosition target, delta;
     struct NamedObjectManager *manager;
     struct Player *player = gPlayers[0];
-    target.x = player->position.x + object->offset.x;
-    target.y = player->position.y + object->offset.y;
-    target.z = player->position.z + object->offset.z;
+    target.x = player->position.x + object->motion.x;
+    target.y = player->position.y + object->motion.y;
+    target.z = player->position.z + object->motion.z;
     subtractVector(&delta, &target, &object->body.position);
     manager = gNamedActorManager;
     if (delta.x <= gUnk_086064B4.x && delta.x >= -gUnk_086064B4.x && delta.y <= gUnk_086064B4.y &&

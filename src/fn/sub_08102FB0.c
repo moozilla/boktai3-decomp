@@ -19,9 +19,9 @@ void NamedObject_MoveAttachedTether(struct NamedObject *object)
         TetherActor_CopyPosition(&target);
         subtractVector(&delta, &target, &object->body.position);
         if (!NamedObjectFlags_Has(0x200, &object->flags)) {
-            target.x = target.x + object->offset.x;
-            target.y += object->offset.y;
-            target.z = target.z + object->offset.z;
+            target.x = target.x + object->motion.x;
+            target.y += object->motion.y;
+            target.z = target.z + object->motion.z;
             TetherActor_SetPosition(&target);
         }
         {

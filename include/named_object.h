@@ -19,7 +19,7 @@ struct NamedObject {
     struct ContactSwarmSprite sprite;
     u8 anim[0x1C];
     struct DisplaySequenceState sequence;
-    struct ContactPosition offset;
+    struct ContactPosition motion; /* this frame's movement, carried to attached actors */
     u8 unknown60[0x54];
     s16 index;
     s16 state;
@@ -27,7 +27,7 @@ struct NamedObject {
     u8 stage, unknownBB;
     s16 timer;
     u16 speed, limit;
-    s16 offsetC2;
+    s16 verticalImpulse;
     u32 enterScript, script, exitScript;
     u16 row;
     u8 unknownD2[2];

@@ -35,9 +35,9 @@ void NamedObject_UpdateTetherAttachment(struct NamedObject *object)
     struct ContactPosition target, delta;
     struct NamedObjectManager *manager;
     TetherActor_CopyPosition(&target);
-    target.x = target.x + object->offset.x;
-    target.y += object->offset.y;
-    target.z = target.z + object->offset.z;
+    target.x = target.x + object->motion.x;
+    target.y += object->motion.y;
+    target.z = target.z + object->motion.z;
     subtractVector(&delta, &target, &object->body.position);
     manager = gNamedActorManager;
     if (delta.x <= gUnk_086064B4.x && delta.x >= -gUnk_086064B4.x && delta.y <= gUnk_086064B4.y &&

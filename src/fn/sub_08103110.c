@@ -205,7 +205,7 @@ void NamedObject_CreateFromScript(void)
     if (Script_GetKeywordValue('F', 0))
         SetObjectFlags(0x1000, &e->flags);
     e->stage = 0;
-    e->offsetC2 = 0;
+    e->verticalImpulse = 0;
     do {
         follow = Script_GetKeywordValue('f', 0);
     } while (0);

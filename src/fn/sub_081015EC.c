@@ -63,7 +63,7 @@ void NamedObject_UpdateContactTrigger(struct NamedObject *o)
         if (found) {
             if (found->name == o->name) {
                 if (!NamedObjectFlags_Has(0x1000, &o->flags) && o->timer == 0) {
-                    o->offsetC2 = -0x20;
+                    o->verticalImpulse = -0x20;
                     Sound_PlaySong(0x222);
                 }
                 if (o->timer <= 0x7CFF)
@@ -71,7 +71,7 @@ void NamedObject_UpdateContactTrigger(struct NamedObject *o)
             }
         } else {
             o->timer = 0;
-            o->offsetC2 = 0;
+            o->verticalImpulse = 0;
         }
     }
 }
