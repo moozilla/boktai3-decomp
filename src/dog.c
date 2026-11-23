@@ -423,8 +423,6 @@ void SceneActor_ConfigureSecondaryProfileEntry(struct ChaseActor *actor)
     }
 }
 
-struct P;
-
 void Dog_OnBodyCollision(struct ContactCollider *collider, s32 a, s32 b);
 
 void Dog_OnSensorContact(u8 *unused, u8 *obj, u8 *ctx);
@@ -442,7 +440,7 @@ void SceneActorCollision_InitGateColliders(struct ChaseActor *actor)
 {
     struct ContactPackedVector bodySize, bodyOffset, attackSize, attackOffset, externalSize,
         externalOffset;
-    u8 *context = actor->base.context;
+    struct Dog *context = actor->base.context;
     bodySize.x = 0x40;
     bodySize.y = 0x80;
     bodySize.z = 0x40;
@@ -464,12 +462,11 @@ void SceneActorCollision_InitGateColliders(struct ChaseActor *actor)
     externalOffset.x = 0;
     externalOffset.y = 0x80;
     externalOffset.z = 0;
-    SceneActorCollision_InitExternalAttack(actor, (struct ContactCollider *)(context + 0x624),
-                                           &externalSize, &externalOffset, Dog_OnAttackContact, 1,
-                                           actor);
+    SceneActorCollision_InitExternalAttack(actor, &context->collider, &externalSize,
+                                           &externalOffset, Dog_OnAttackContact, 1, actor);
     {
         u32 mask = 0x100;
-        struct ContactCollider *collider = (struct ContactCollider *)(context + 0x624);
+        struct ContactCollider *collider = &context->collider;
         mask |= collider->flags;
         collider->flags = mask;
     }
