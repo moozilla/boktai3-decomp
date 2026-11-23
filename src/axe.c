@@ -1688,32 +1688,28 @@ static inline void Fill_BeginMoveToPosition(void *dst, u32 *tmp, u32 v)
     CpuSet(tmp, dst, 0x05000002);
 }
 
-void Axe_BeginMoveToPosition(u8 *s, s16 *v)
+void Axe_BeginMoveToPosition(struct ChaseActor *actor, struct ContactPosition *target)
 {
-    u8 *p = *(u8 **)(s + 0x3d0);
+    struct Axe *context = actor->base.context;
     u32 stack[3];
-    s16 *a;
-    s16 *b;
-    Axe_SetMovementEndpoints(s, v);
-    Axe_StepCurveMotion(s);
+    struct ContactPosition *delta;
+    Axe_SetMovementEndpoints(actor, target);
+    Axe_StepCurveMotion(actor);
     {
         u32 one = 1;
-        u8 *q = s + 0x2a8;
+        u8 *state = &actor->base.state2A8;
         u32 zero = 0;
-        *q = zero;
+        *state = zero;
         {
-            s[0x2a9] = zero;
-            s[0x2aa] = one;
-            *(u32 *)(s + 0x2a9 + 3) = zero;
+            actor->base.phase2A9 = zero;
+            actor->base.behavior2AA = one;
+            actor->base.counter2AC = zero;
         }
-        s[0x2b1] = one;
-        b = (s16 *)(stack + 1);
-        a = (s16 *)(s + 0x5c);
-        b[0] = v[0] - a[0];
-        b[1] = v[1] - a[1];
-        b[2] = v[2] - a[2];
-        s[0x3cd] = Math_Atan2(b[0], b[2]);
-        Fill_BeginMoveToPosition(p + 0xf14, stack, zero);
+        actor->base.field2B1 = one;
+        delta = (struct ContactPosition *)(stack + 1);
+        Chase_Delta(delta, &actor->base.body.position, target);
+        actor->base.nextDirection = Math_Atan2(delta->x, delta->z);
+        Fill_BeginMoveToPosition(context->clearF14, stack, zero);
     }
 }
 
@@ -1757,7 +1753,7 @@ void Axe_ClearForcedMovement(struct S080FAE08 *s)
 
 void Axe_SelectRandomRoutePoint(struct S080FA7D0 *s);
 
-void Axe_BeginMoveToPosition(u8 *s, s16 *v);
+void Axe_BeginMoveToPosition(struct ChaseActor *actor, struct ContactPosition *target);
 
 struct AxeVec {
     s16 x, y, z;
