@@ -1,4 +1,5 @@
 #include "global.h"
+#include "math_shift.h"
 #include "scene_actor_visibility.h"
 #include "scene_actor_status.h"
 #include "scene_actor_availability.h"
@@ -550,16 +551,6 @@ static inline u8 TestContext(struct Dog *context, u32 mask, u32 **out)
     return 0;
 }
 
-static inline s32 Scale(s32 value)
-{
-    return value >= 0 ? value >> 12 : -(-value >> 12);
-}
-
-static inline s32 Direction(s32 value)
-{
-    return value >= 0 ? value >> 6 : -(-value >> 6);
-}
-
 void Dog_UpdateCollisionBounds(struct ChaseActor *a)
 {
     union SceneActorRegistryPackedPosition position;
@@ -571,20 +562,20 @@ void Dog_UpdateCollisionBounds(struct ChaseActor *a)
     if (SceneActor_ActionsBlocked(a))
         return;
     position.position = a->base.body.position;
-    heading = Direction((a->base.body.direction + 32) & 255) << 6;
+    heading = Math_ShiftTowardZero((a->base.body.direction + 32) & 255, 6) << 6;
     {
         if (TestContext(context, 2, &flags)) {
-            position.packed.x += Scale(gUnk_086149C4[(heading + 64) & 255] << 9);
-            position.packed.z += Scale(gUnk_086149C4[heading & 255] << 9);
+            position.packed.x += Math_ShiftTowardZero(gUnk_086149C4[(heading + 64) & 255] << 9, 12);
+            position.packed.z += Math_ShiftTowardZero(gUnk_086149C4[heading & 255] << 9, 12);
         } else {
-            position.packed.x += Scale(gUnk_086149C4[(heading + 64) & 255] << 7);
-            position.packed.z += Scale(gUnk_086149C4[heading & 255] << 7);
+            position.packed.x += Math_ShiftTowardZero(gUnk_086149C4[(heading + 64) & 255] << 7, 12);
+            position.packed.z += Math_ShiftTowardZero(gUnk_086149C4[heading & 255] << 7, 12);
         }
     }
     Collider_SetPosition(&context->collider, &position, 0);
     context->collider.direction = heading;
     position.position = a->base.body.position;
-    switch (Direction(heading)) {
+    switch (Math_ShiftTowardZero(heading, 6)) {
         case 0:
         case 2:
             if (Test(flags, 2)) {
