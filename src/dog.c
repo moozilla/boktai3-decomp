@@ -859,12 +859,6 @@ u8 Dog_IsActionTimerExpired(struct ChaseActor *actor)
     return 1;
 }
 
-struct SceneActorTargetLink {
-    u8 *target;
-    u8 unknownE0[0xB];
-    u8 flags;
-};
-
 void SceneActorTarget_ResetContactResponse(struct RoomActor *);
 
 static inline u8 BoolOf(u32 v)
@@ -1783,16 +1777,11 @@ void SceneActorAnimation_EmitDirectionalTrail(struct ChaseActor *a, s32 frame)
     }
 }
 
-struct SceneActorTimedAttackContext {
-    u8 unknown0[0x624];
-    struct ContactCollider collider;
-};
-
 void FeatherEffectPool_CreateDirectional(struct ContactPosition *, u32, u32, u32);
 
 void SceneActorAnimation_RefreshTimedAttackCollider(struct ChaseActor *a, u32 frame)
 {
-    struct SceneActorTimedAttackContext *context = a->base.context;
+    struct Dog *context = a->base.context;
     if (SceneActorReaction_TakePrepared(a)) {
         u32 variant, palette;
         SceneActorAnimation_SelectDirectionalEntry(&a->base, 17);
