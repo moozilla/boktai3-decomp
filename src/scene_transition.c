@@ -387,7 +387,7 @@ void SceneTransition_LoadBackground(struct SceneTransition *screen)
     CpuSet(palette->colors, gBgPaletteBuffer, 0x04000080);
 }
 
-void *RegistryF3E4_CreateHidden(s32);
+void *RegistryF3E4_CreateHidden(s32, s32);
 
 // confidence=low: sets up the layers, reads keyword 'e' as the script, starts the fade-in and
 
@@ -410,7 +410,7 @@ s32 SceneTransition_Initialize(struct SceneTransition *transition, void *scriptA
         transition->motion.mode = 0;
         transition->motion.timer = 0;
     }
-    transition->target = RegistryF3E4_CreateHidden(2);
+    transition->target = RegistryF3E4_CreateHidden(2, 0);
     transition->particleFlags = 1;
 }
 
