@@ -1389,16 +1389,11 @@ void SceneActorControl_UpdatePausePhase(struct ChaseActor *actor)
     }
 }
 
-struct S080FA744 {
-    u8 filler[0x284];
-    const u8 *p;
-};
+extern void *gUnk_08606444[];
 
-extern const u8 gUnk_08606444[];
-
-void Axe_InitMotionTable(struct S080FA744 *s)
+void Axe_InitMotionTable(struct ChaseActor *actor)
 {
-    s->p = gUnk_08606444;
+    actor->base.callbacks284 = gUnk_08606444;
 }
 
 #define gHoverSineTable gUnk_086149C4
@@ -1784,17 +1779,6 @@ struct AxeVec {
     s16 x, y, z;
 };
 
-struct AxeRoutePoint {
-    s16 x, z;
-};
-
-struct AxeGroup {
-    u8 unknown0[0x44];
-    u16 field44;
-    u8 unknown46[0x36];
-    struct AxeRoutePoint *point;
-};
-
 static inline u32 CellIndex(struct AxeVec *p)
 {
     s32 x = p->x >> 8, z = p->z >> 8;
@@ -1854,25 +1838,25 @@ static inline u8 HasMark(struct Axe *context)
 void Axe_UpdateRouteWander(struct ChaseActor *actor)
 {
     struct Axe *context = actor->base.context;
-    struct AxeGroup *group = (void *)&actor->group.common;
+    struct SceneActorChaseGroup *group = &actor->group;
     struct AxeVec targetStorage;
     struct AxeVec *target;
-    struct AxeRoutePoint *point;
+    struct SceneActorChaseRoutePoint *point;
     if (IsDown(actor))
         return;
     if (Flag_UpdateRouteWander(actor, 0x100, 0x2D4))
         return;
     if (!HasMark(context)) {
-        group->field44 = 0;
+        group->common.gate.counter = 0;
         return;
     }
-    if (group->field44 != 0) {
-        group->field44--;
+    if (group->common.gate.counter != 0) {
+        group->common.gate.counter--;
         return;
     }
     Axe_SelectRandomRoutePoint(actor);
     target = &targetStorage;
-    point = group->point;
+    point = group->homeRoute.point;
     targetStorage.x = point->x;
     target->z = point->z;
     target->y = CellHeight(target, CellIndex(&targetStorage));
@@ -4290,11 +4274,6 @@ void Axe_UpdatePlayerDestinationPhase(struct ChaseActor *actor)
 
 // confidence=low: after the wait, selects a route point and starts the stored movement spline.
 
-struct AxeLink {
-    u8 unknown0[8];
-    struct AxeRoutePoint *point;
-};
-
 static inline u32 CellIndex_UpdateRouteDestinationPhase(s32 x, s32 z)
 {
     if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
@@ -4318,8 +4297,8 @@ void Axe_UpdateRouteDestinationPhase(struct ChaseActor *actor)
     struct AxeVec targetStorage;
     struct AxeVec *target;
     struct AxeVec *copy;
-    struct AxeRoutePoint *point;
-    struct AxeLink *link;
+    struct SceneActorChaseRoutePoint *point;
+    struct SceneActorRegistryRoute *link;
     s16 deltaX;
     s16 deltaZ;
     if (actor->base.field2B1)
@@ -4329,7 +4308,7 @@ void Axe_UpdateRouteDestinationPhase(struct ChaseActor *actor)
     if (((s32)actor->base.counter2AC) > 60) {
         Axe_SelectRandomRoutePoint(actor);
         target = &targetStorage;
-        link = (struct AxeLink *)(((u8 *)actor) + 0x448);
+        link = &actor->group.homeRoute;
         point = link->point;
         target->x = point->x;
         target->z = point->z;
@@ -4350,7 +4329,7 @@ void Axe_UpdateRouteDestinationPhase(struct ChaseActor *actor)
         }
         deltaZ = copy->z;
         deltaX = target->x;
-        *(((u8 *)actor) + 0x3cd) = Math_Atan2(deltaX, deltaZ);
+        actor->base.nextDirection = Math_Atan2(deltaX, deltaZ);
         ZeroFill8(context->clearF14);
     } else
         actor->base.counter2AC++;
@@ -4498,7 +4477,7 @@ void Axe_UpdateDamageSpin(struct ChaseActor *actor, s32 frame);
 
 void SceneActorBehavior_InitializeShadow(void *);
 
-void Axe_InitMotionTable(struct S080FA744 *s);
+void Axe_InitMotionTable(struct ChaseActor *actor);
 
 void Axe_InitActionCallbacks(struct ChaseActor *actor);
 
