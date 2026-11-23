@@ -3,6 +3,7 @@
 #include "global.h"
 #include "scene_actor_reaction.h"
 #include "scene_actor_terrain.h"
+#include "scene_actor_chase.h"
 
 extern const s16 gUnk_086149C4[];
 
@@ -27,14 +28,6 @@ static inline s32 Shift(s32 n, u32 bits)
     else
         r = -((-n) >> bits);
     return r;
-}
-
-static inline void Delta(struct ContactPosition *out, const struct ContactPosition *from,
-                         const struct ContactPosition *to)
-{
-    out->x = to->x - from->x;
-    out->y = to->y - from->y;
-    out->z = to->z - from->z;
 }
 
 struct SavedPair {
