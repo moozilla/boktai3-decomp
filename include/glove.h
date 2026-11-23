@@ -3,6 +3,7 @@
 #include "global.h"
 #include "scene_pool.h"
 #include "scene_actor_style.h"
+#include "spatial_entry.h"
 
 /* The Glove controller (0811697C-0811A9xx): the player's glove actor, a 0x958-byte
  * object whose movement body sits at +0x18 and whose sprite model follows it.
@@ -64,8 +65,8 @@ struct GloveMotion {
     u8 pad32C[0x524 - 0x32C];
     union GloveAnimationKey animation; /* 0x524 */
     u8 pad528[4];
-    u8 contactIndex[0x40]; /* 0x52C */
-    u32 motionFlags;       /* 0x56C */
+    struct SpatialEntry contact; /* 0x52C */
+    u32 motionFlags;             /* 0x56C */
     u8 pad570[10];
     u8 damageTimer; /* 0x57A */
     u8 pad57B[0x59E - 0x57B];

@@ -112,7 +112,7 @@ void Glove_UpdatePostState(struct Glove *p)
         heading = Glove_SignedHeading(self->angle);
         motion = &self->motionFlags;
         if (heading < 0) {
-            SpatialIndex_SetPosition(self->contactIndex, pos.x, pos.y, pos.z);
+            SpatialIndex_SetPosition(&self->contact, pos.x, pos.y, pos.z);
         } else {
             struct Vec16 off;
             struct Vec16 *o = &off;
@@ -121,14 +121,14 @@ void Glove_UpdatePostState(struct Glove *p)
             o->x = VanargandProjectile_Scale(gUnk_086149C4[(angle + 64) & 255] * radius);
             o->y = 0;
             o->z = VanargandProjectile_Scale(gUnk_086149C4[angle & 255] * radius);
-            SpatialIndex_SetPosition(self->contactIndex, pos.x + off.x, pos.y, pos.z + off.z);
+            SpatialIndex_SetPosition(&self->contact, pos.x + off.x, pos.y, pos.z + off.z);
         }
         if (self->spatialTimer) {
             (self->spatialTimer)--;
             *motion |= 1;
         } else
             *motion &= ~1;
-        SpatialIndex_InsertEntry(self->contactIndex);
+        SpatialIndex_InsertEntry(&self->contact);
     }
     {
         Glove_UpdateLocalPresentation(p);
