@@ -25,7 +25,11 @@ s32 ColliderActor_SetTargetPosition(HresvelgrActor *, HresvelgrPosition *);
 void Hresvelgr_SetAnimation(HresvelgrActor *, void *, void *, u32, u32, u32);
 void Sound_PlaySong(u32);
 int Hresvelgr_UpdateTravel(HresvelgrActor *);
+#ifdef UBFIX
+int Path_SnapToNearestPoint(HresvelgrPosition *, HresvelgrPosition *, int, int);
+#else
 int Path_SnapToNearestPoint(HresvelgrPosition *, HresvelgrPosition *, int);
+#endif
 void Hresvelgr_PlayNearestPointTravel(HresvelgrActor *body)
 {
     HresvelgrActor *actor = body;
@@ -37,7 +41,12 @@ void Hresvelgr_PlayNearestPointTravel(HresvelgrActor *body)
     if (body->changed) {
         body->changed = 0;
         Hresvelgr_GetTravelTarget(body, &target);
+#ifdef UBFIX
+        // r3 is left over from Hresvelgr_GetTravelTarget; Path_SnapToNearestPoint never reads it
+        if (Path_SnapToNearestPoint(&nearest, &target, 0, 0) < 0) {
+#else
         if (Path_SnapToNearestPoint(&nearest, &target, 0) < 0) {
+#endif
             body->finished = 1;
             return;
         }
