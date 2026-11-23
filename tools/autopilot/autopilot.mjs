@@ -103,7 +103,8 @@ const GOALS = {
     const visited = VISITED, limit = +(opt('--scenes', 8));
     let prev;
     for (let rooms = 0; rooms < limit; rooms++) {
-      const doorsHere = () => (L.hub() ? stageOf(L.where().scene).doors.filter((d) => d.hub !== undefined)
+      const doorsHere = () => (L.hub() ? stageOf(L.where().scene).doors.filter((d) => d.hub !== undefined && (!d.hubMenu || d.hubMenu === L.hub().kind))
+          .filter((d, i, all) => all.findIndex((e) => e.hub === d.hub) === i)  // one per entry (its conditional destinations)
         : stageOf(L.where().scene).doors.filter((d) => L.boxes().some((b) => b.name === d.box)));
       if (!(yield* untilControl(g, L, () => doorsHere().length > 0, 120, 30000))) { event({ skill: 'stop', why: 'no control with a door in 30000 frames', ...L.where() }); return rooms > 0; }
       // enemies in the room: fight them first (the "defeat all" rooms lock the doors)

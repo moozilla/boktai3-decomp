@@ -440,11 +440,17 @@ exports.breakBlock = function* (block, opts = {}) {
 // moved freely with the D-pad over 11 entries; A on an entry runs its script (stages.json
 // doors with "hub": index). hub() is the live menu or null.
 exports.hub = () => {
-  const t = exports.tasks().find((x) => !x.dead && x.update === 'Registry3F74_OnUpdate');
+  // a town map (Registry3F74, 11 entries) or San Miguel's gate (RegistrySelection,
+  // src/registry_selection_menu.c, 9 entries with enabled flags)
+  const t = exports.tasks().find((x) => !x.dead && (x.update === 'Registry3F74_OnUpdate' || x.update === 'RegistrySelection_OnUpdate'));
   if (!t) return null;
-  const menu = g.at(Number(t.task), 'struct RegistryChoiceMenu');
-  const cursor = menu.cursor ? g.at(Number(menu.cursor.$addr ?? menu.cursor), 'struct MenuCursor') : null;
-  return { menu, cursor, state: menu.update ? g.name(menu.update) : '-' };
+  const sel = t.update === 'RegistrySelection_OnUpdate';
+  const menu = g.at(Number(t.task), sel ? 'struct RegistrySelectionMenu' : 'struct RegistryChoiceMenu');
+  const ptr = sel ? menu.selectionCursor : menu.cursor;
+  const cursor = ptr ? g.at(Number(ptr.$addr ?? ptr), 'struct MenuCursor') : null;
+  // ready: the cursor reads input (src/menu_cursor.c MenuCursor_UpdateInput)
+  const ready = !!cursor && !!cursor.callback && g.name(cursor.callback) === 'MenuCursor_UpdateInput';
+  return { menu, cursor, kind: sel ? '2388' : '3F74', ready, state: ready ? 'Registry3F74_UpdateSelection' : (menu.update ? g.name(menu.update) : '-') };
 };
 
 exports.chooseHub = function* (index, opts = {}) {
