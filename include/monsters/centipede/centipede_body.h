@@ -19,7 +19,7 @@ struct TentacleBody {
     u8 blockedFrameCount;
     u16 returnCell;
     u16 routeHistory[6];
-    u8 unknown888[0x48];
+    struct SceneActorBody markedSegmentBody;
     u16 attackFlags;
     u8 unknown8D2[2];
     s8 oscillationDirection;
