@@ -874,3 +874,35 @@ node gives six differing instructions on each side and two moved branch
 targets in each registration. A plain member store, an explicit next
 slot, and a reacquired head slot give the same score. The previous
 inline search form without result reuse remains a holdout.
+
+## 2026-11-26: Registry task lifecycle and remaining table decisions
+
+`TargetRegistry_Init` (0815F77C) clears the two fields of the native
+`MotionTargets` and publishes it. The definition accepts the two
+additional arguments already passed by its creator. The creator
+(0815F790) uses the same initializer declaration and derives the task
+allocation from the native type. The stock units match 20 and 80
+bytes with no lint findings. The two insertions still use the
+existing volatile declarations.
+
+The saved-pointer FragmentGroup draft puts `samples` (pseudo 54) in
+r6 ahead of the group cursor (pseudo 383). The saved table pointer
+(pseudo 55) is unallocated. Lowering priority 54 by 254 makes the
+cursor allocate before `samples` and recovers the four ROM and five
+draft rows of the previous frame-data reuse draft. This leaves both
+the early initial load and the extra loop reload. Suppressing the
+saved pointer's equivalence or raising its priority worsens the
+instruction shape.
+
+Removing the origin term from `ContactActor_UpdateRetreat` (0804373C)
+reproduces 776 bytes against the 788-byte ROM function. Replacing its
+early numeric table with `gRandomTable` expands the differences in
+both the original and zero-free drafts. The 788-byte stock unit has
+one proved-zero finding at the origin term. The direct displacement
+trial is in `build/matchsearch/ContactActor_UpdateRetreat`.
+
+Factoring the boundary barrage X offset or both offsets makes the
+scatter code farther from the ROM. Keeping a GameState byte address
+in an integer local before casting it back also changes 15 rows on
+each side. Neither improves on the existing exact diagnostics. SpriteTrail
+and Wireless rechecked at 304 and 684 bytes.
