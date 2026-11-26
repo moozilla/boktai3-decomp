@@ -594,18 +594,22 @@ class SharedLayouts:
 def warning_counts(paths, compiler, jobs):
     from statement_macros import single_use_names
 
+    texts = {rel: (ROOT / rel).read_text(errors="replace") for rel in sorted(paths)}
+    if not texts:
+        return {}
     once = frozenset(single_use_names(ROOT))
-    params = concessions.literal_params(ROOT)
+    params = {rel: concessions.literal_param_sites(rel, text, ROOT)
+              for rel, text in texts.items() if concessions.literal_param_definitions(rel, text)}
 
     def count(rel):
-        text = (ROOT / rel).read_text(errors="replace")
+        text = texts[rel]
         sites = concessions.sites(text, rel, single_use=once) + params.get(rel, [])
         if compiler:
             sites += concessions.compiler_sites(rel, text)
         return rel, len(concessions.warnings(sites))
 
     with ThreadPoolExecutor(jobs) as pool:
-        return dict(pool.map(count, sorted(paths)))
+        return dict(pool.map(count, texts))
 
 
 def make_catalog(scans, *, jobs=2, compiler=True, rom=True):

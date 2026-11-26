@@ -157,6 +157,36 @@ void F(struct Owner *p, int n) {
                                  "| `0x2` |  |  |  |",
                                  "| `0x4` |  |  | u8 × 1, s16 × 1 |"])
 
+    def test_warning_counts_honor_literal_param_exceptions(self):
+        helper = """static inline u32 TestFlags(u32 *flags, u32 mask)
+{
+    return *flags & mask;
+}
+void Test(u32 *flags)
+{
+    TestFlags(flags, 1);
+}
+"""
+        allow = "// concession-ok(literal-param): the SDK header documents this accessor by name\n"
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            (root / "src").mkdir()
+            (root / "src/a.c").write_text(allow + helper)
+            (root / "src/b.c").write_text(helper)
+            with patch.object(families, "ROOT", root):
+                self.assertEqual(families.warning_counts(["src/a.c", "src/b.c"], False, 1),
+                                 {"src/a.c": 0, "src/b.c": 1})
+
+    def test_warning_counts_skip_the_call_index_without_eligible_definitions(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            (root / "src").mkdir()
+            (root / "src/a.c").write_text("void Test(void) {}\n")
+            with patch.object(families, "ROOT", root), \
+                    patch.object(families.concessions, "literal_params") as params:
+                self.assertEqual(families.warning_counts(["src/a.c"], False, 1), {"src/a.c": 0})
+                params.assert_not_called()
+
 
 @unittest.skipUnless(Path(lm.AGBCC).is_file(), "agbcc required for layout probes")
 class CompilerTests(unittest.TestCase):

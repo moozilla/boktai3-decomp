@@ -102,3 +102,9 @@ Grouping ROM load counts by field offset reduced median Markdown rendering time 
 0.1899 to 0.0388 seconds for the top fifty and from 0.5069 to 0.2485 seconds for all 394
 families. These are five alternating runs on the same loaded catalog. Both rendered reports
 were byte-for-byte identical to the previous renderer.
+
+Family ranking now uses the linter's unexcused `literal-param` sites. The warning pass builds
+the tree-wide call index only when a selected unit defines an eligible inline helper. Counting
+warnings for the two SceneDistance units fell from 64.66 to 38.11 seconds with compiler
+diagnostics disabled, and both runs returned the same counts. The whole-tree refresh
+reproduced all 394 family scores.
