@@ -74,18 +74,12 @@ its spelling, so each one is a question, not a verdict:
   covers objects and `&x` casts). A global an interrupt writes is volatile in its header instead.
 * `local-union`: a union defined inside a function (not a union member of a file-scope struct).
   Two views of one value are ordinary C; two unrelated values sharing storage are not.
-* `literal-param`: a `static inline` of at most two statements, or of any length when it calls
-  nothing (`u32 v = *p & mask; *out = p; return v;`), with an integer parameter that
-  is only an operand of bitwise operations (`&`, `|`, `^`, `~`, shifts and their compound
-  assignments, as in `*flags & mask` or `*flags |= mask`) and that gets a literal or an ALL_CAPS
-  constant at every call in the tree (`WordFlags_Test(&p->flags, 1)`). To the compiler the
-  parameter is a local initialized to the literal, so this is `literal-local` moved into a
-  helper, and as weak: a real accessor of the original's looks the same. Reported at the
-  definition with the number of calls; a helper nobody calls, one that gets a variable
-  somewhere, and a setter that only stores the parameter (`p->state = state`) are not
-  reported. It needs every call, so it comes from a pass over src and include
-  (`literal_params`, `literal_param_sites`), not from `sites`; the linter, tools/progress.py
-  and land's added-warnings check all run it.
+* `literal-param`: one constant argument at a call to a small inline bit operation, including
+  calls to helpers that also receive runtime masks. Macro arguments bound to mask temporaries
+  are charged likewise. Expression-only flag macros do not bind the mask. See notes/flag-accessors_2026-11-25.md
+  for the measured exception for the combined pause operation. Parked constants are charged
+  by source uses (at least one per binding). The steering-debt subtotal sums both spellings.
+  literal_params() retains the legacy definition inventory for historical comparisons.
 
 Warnings don't lower a score. The order of work is errors to zero, then warnings to zero, adding
 none. A warning is silenced the way a linter's is, by a `concession-ok(kind): reason` comment, and
@@ -98,6 +92,8 @@ from __future__ import annotations
 import os
 import re
 from dataclasses import dataclass, field
+from functools import lru_cache
+from pathlib import Path
 
 from source_layout import is_upstream
 
@@ -145,14 +141,9 @@ _LITERAL = r"(?:-|~\s*)?" + _LITERAL_DIGITS  # `~0x141C0` is as much a literal a
 _DECL_TYPE = (r"(?:(?:register|const)\s+){0,2}(?:unsigned\s+|signed\s+)?"
               r"(?!v[us]\d|volatile\b|goto\b|return\b|static\b|else\b|case\b|register\b|const\b)\w+\s+\*?")
 # A local declaration: its first declarator follows the type; _local_declarations walks the rest.
-_DECL_START = re.compile(r"(?m)^[ \t]+" + _DECL_TYPE + r"(?P<first>[A-Za-z_]\w*)(?=\s*[=,;\[])")
+_DECL_START = re.compile(r"(?m)(?:^[ \t]+|(?<=[{;])[ \t]*)" + _DECL_TYPE + r"(?P<first>[A-Za-z_]\w*)(?=\s*[=,;\[])")
 _DECL_PUNCT = re.compile(r"[][(){},;]")
 _DECLARATOR = re.compile(r"\s*\*?\s*([A-Za-z_]\w*)\s*")
-# what a literal local holds: a literal, also complemented (`u32 mask = ~8;` then `*flags &= mask;`)
-_LITERAL_VALUE = r"(?:~\s*)?" + _LITERAL
-_LITERAL_INIT = re.compile(r"=\s*" + _LITERAL_VALUE + r"\s*")
-_LITERAL_ASSIGNMENT = re.compile(r"\s*=\s*" + _LITERAL_VALUE + r"\s*;")
-_LITERAL_ASSIGNED = re.compile(r"\b([A-Za-z_]\w*)\s*=\s*" + _LITERAL_VALUE + r"\s*[;)]")
 _LOCAL_CHANGE = (r"\b{0}\s*(?:[-+*/|&^%]|<<|>>)?=(?!=)|\b{0}\s*(?:\+\+|--)|(?:\+\+|--)\s*{0}\b"
                  r"|(?:[(,=?:]|\breturn)\s*&\s*{0}\b")
 _MEMBER_ACCESS = re.compile(r"(?:->|\.)\s*[A-Za-z_]\w*")
@@ -214,6 +205,7 @@ class Site:
     line: int  # 1-based, in the text scanned
     kind: str
     excused: bool = False
+    weight: int = field(default=1, compare=False, kw_only=True)
     note: str = field(default="", compare=False)  # detail for the report ("12 call sites, ...")
 
 
@@ -336,7 +328,8 @@ def _local_declarations(code: str):
                 if not item:
                     break
                 init = None if item.end() == token.start() else \
-                    bool(_LITERAL_INIT.fullmatch(code, item.end(), token.start()))
+                    (code[item.end():token.start()].lstrip().startswith("=") and
+                     _is_constant_arg(code[item.end():token.start()].lstrip()[1:]))
                 found.append((item[1], item.start(1), token.end(), init))
                 if char == ";":
                     yield found
@@ -344,7 +337,7 @@ def _local_declarations(code: str):
                 start = token.end()
 
 
-def _constant_locals(code: str):
+def _constant_locals(code: str, weights):
     """(offset, kind) for const-local and literal-local in CODE (macros and strings blanked)."""
     # A write to actor->state or sprite.state cannot modify a local named state.
     masked = _MEMBER_ACCESS.sub(lambda m: "@" * len(m[0]), code)
@@ -352,18 +345,23 @@ def _constant_locals(code: str):
     bindings: dict[str, list[int]] = {}
     for name, pos, _, _ in declarators:
         bindings.setdefault(name, []).append(pos)
-    assigned = {m[1] for m in _LITERAL_ASSIGNED.finditer(masked)}
+    assigned = {m[1] for m in re.finditer(r"\b(\w+)\s*=(?!=)", masked)}
     records = None
+    recovered = _fixed_accessor_masks(code)
     for name, pos, end, init in declarators:
+        if pos in recovered:
+            continue
         if init is False:
             continue
-        if re.fullmatch(_NUMBER_NAME, name):
+        numbered = bool(re.fullmatch(_NUMBER_NAME, name))
+        if numbered:
             if records is None:
                 records = list(_record_bodies(code))
-            if not any(start <= pos < stop for start, stop in records):
-                yield pos, "const-local"
-            continue
+            if any(start <= pos < stop for start, stop in records):
+                continue
         if init is None and name not in assigned:
+            if numbered:
+                yield pos, "const-local"
             continue
         # The rest of the declaration's block, less the blocks of inner locals of the same name:
         # a write before an inner binding or after its block still changes this one.
@@ -377,23 +375,32 @@ def _constant_locals(code: str):
         if init is None:
             first = re.search(rf"\b{n}\b", body)
             if not first:
+                if numbered:
+                    yield pos, "const-local"
                 continue
             before = body[:first.start()].rstrip()
-            assignment = _LITERAL_ASSIGNMENT.match(body, first.end())
+            assignment = re.compile(r"\s*=([^;{}]+);").match(body, first.end())
             # Only a statement of the declaration's own block counts as its first assignment: a
             # nested, conditional or labeled write, or one a goto can skip, depends on control flow.
-            if assignment and before.count("{") == before.count("}") and before[-1:] in ("", ";", "}") \
+            if assignment and _is_constant_arg(assignment[1]) and before.count("{") == before.count("}") and before[-1:] in ("", ";", "}") \
                     and not re.search(r"\bgoto\b", before):
-                pos = end + first.start()
+                if not numbered:
+                    pos = end + first.start()
                 body = body[assignment.end():]
             else:
                 # `sample & (mask = 0x7f)` where mask is never read: the local only carries the literal
                 inside = re.search(rf"\(\s*({n})\s*=\s*{_LITERAL}\s*\)", body)
-                if inside and len(re.findall(rf"\b{n}\b", body)) == 1:
+                if numbered:
+                    yield pos, "const-local"
+                elif inside and len(re.findall(rf"\b{n}\b", body)) == 1:
                     yield end + inside.start(1), "literal-local"
                 continue
-        if not re.search(_LOCAL_CHANGE.format(n), body):
-            yield pos, "literal-local"
+        if re.search(_LOCAL_CHANGE.format(n), body):
+            if numbered:
+                yield pos, "const-local"
+        else:
+            weights[pos] = max(1, len(re.findall(rf"\b{n}\b", body)))
+            yield pos, "const-local" if numbered else "literal-local"
 
 
 def _statements(source: str, start: int, end: int) -> str:
@@ -429,7 +436,7 @@ def _duplicate_branches(code: str, source: str):
             yield match.start()
 
 
-def _warn_sites(code: str):
+def _warn_sites(code: str, weights):
     """(offset, kind) for the warning kinds in CODE (comments already blanked)."""
     for macro in _MACRO_DEF.finditer(code):
         if _WRAPPED_EXPR_MACRO.fullmatch(macro.group(0).replace("\\\n", " ")):
@@ -449,7 +456,7 @@ def _warn_sites(code: str):
         operators = re.sub(rf"(?<!\w)(?:{name}|{_LITERAL})(?!\w)", "", updates)
         if re.fullmatch(r"[\s()+\-*/%&|^~<>=!;]+", operators):
             yield m.start("updates") + len(updates) - len(updates.lstrip()), "dead-local-update"
-    yield from _constant_locals(code)
+    yield from _constant_locals(code, weights)
     for m in _INLINE_DEF.finditer(code):  # `u32 zero` as an inline's parameter is the same local
         params_start = m.start("params")
         for param in re.finditer(r"[^,]+", m["params"]):
@@ -481,10 +488,12 @@ def sites(text: str, path=None, *, single_use=frozenset(), kinds=SCORED + WARN +
     found: list[Site] = []
     volatile_spans = []
 
+    weights = {}
+
     def add(pos, kind):
         line = _line(code, pos)
         excused = kind in EXCUSABLE + WARN and (library or kind in ok.get(line, {}))
-        found.append(Site(line, kind, excused))
+        found.append(Site(line, kind, excused, weight=weights.get(pos, 1)))
 
     for m in _ASM_EMPTY.finditer(code):
         kind = asm_kind(m.group("rest"))
@@ -502,10 +511,16 @@ def sites(text: str, path=None, *, single_use=frozenset(), kinds=SCORED + WARN +
                 add(pos, "volatile")
     if any(k in kinds for k in WARN) and not library:
         seen = set()
-        for pos, kind in _warn_sites(code):
+        for pos, kind in _warn_sites(code, weights):
             if kind in kinds and (_line(code, pos), kind) not in seen:
                 seen.add((_line(code, pos), kind))
                 add(pos, kind)
+            elif kind in kinds and kind in ("const-local", "literal-local"):
+                # Multiple bindings on one declaration line share its diagnostic.
+                for i, site in enumerate(found):
+                    if site.kind == kind and site.line == _line(code, pos):
+                        found[i] = Site(site.line, kind, site.excused, weight=site.weight + weights.get(pos, 1))
+                        break
     if "single-use-macro" in kinds and single_use:
         rx = re.compile(r"\b(" + "|".join(map(re.escape, sorted(single_use))) + r")\s*\(")
         for m in rx.finditer(code):
@@ -532,7 +547,7 @@ def cflags(text: str, path=None) -> Site | None:
     return Site(line, "cflags", is_library(path) or "cflags" in allows(text).get(line, {}))
 
 
-def compiler_sites(path, text=None) -> list[Site]:
+def compiler_sites(path, text=None, *, events=None) -> list[Site]:
     """The dead-code and proved-zero sites on PATH's own lines (a unit under src/), from the
     instrumented compiler. Empty for headers and when the compiler isn't built.
 
@@ -546,7 +561,9 @@ def compiler_sites(path, text=None) -> list[Site]:
     if text is None:
         text = open(os.path.join(deadcode.ROOT, rel), errors="replace").read()
     ok = allows(text)
-    seen = {(line, kind) for kind, file, line, _, _ in deadcode.unit(rel) if file == rel}
+    if events is None:
+        events = deadcode.unit(rel)
+    seen = {(line, kind) for kind, file, line, _, _ in events if file == rel}
     code = strip(text)
     for guard in _NARROW_NEGATIVE_ASSIGNMENT.finditer(code):
         seen.add((_line(code, guard.start("assignment")), "dead-code"))
@@ -800,6 +817,175 @@ def literal_param_sites(path, text=None, root=None, *, candidate=False) -> list[
     return [Site(s.line, s.kind, s.kind in ok.get(s.line, {}), s.note) for s in found]
 
 
+STAGED = ("literal-local", "const-local", "literal-param")
+
+
+@lru_cache(maxsize=4096)
+def _header_facts(path, mtime, size):
+    return _argument_facts(path.read_text(errors="replace"))
+
+
+def _recovered_operand(owners, body, operand):
+    """Recognize reviewed operations by implementation and owning type, independent of name."""
+    expr = f"(gEngineFlags|gScenePauseFlags)&{operand}"
+    if not owners and body == f"return{expr};":
+        return True
+    if len(owners) != 1:
+        return False
+    owner = re.fullmatch(r"(?:const\s+)?struct\s+SceneActorChaseTracking\s*\*\s*(\w+)", owners[0])
+    if not owner:
+        return False
+    field = f"{owner[1]}->flags"
+    return body in {f"return{field}&{operand};", f"if({field}&{operand})return1;return0;",
+                    f"{field}|={operand};", f"{field}&=~{operand};"}
+
+
+_FIXED_MASK = re.compile(r"\s*(?:const\s+)?(?:" + _SCALAR_TYPE + r")\s+(?P<name>\w+)"
+                         r"\s*(?:;\s*(?P=name)\s*)?=\s*(?P<value>[^;{}]+);")
+
+
+def _fixed_accessor_masks(code):
+    """Bindings in fixed-mask specializations of the reviewed operand operations."""
+    found = set()
+    if "gScenePauseFlags" not in code and "SceneActorChaseTracking" not in code:
+        return found
+    for fn in _INLINE_DEF.finditer(code):
+        init = _FIXED_MASK.match(code, fn.end())
+        if not init or not _is_constant_arg(init["value"]):
+            continue
+        body = re.sub(r"\s+", "", code[init.end():_scope_end(code, fn.end())])
+        owners = [p.strip() for p in fn["params"].split(",") if p.strip() not in ("", "void")]
+        if _recovered_operand(owners, body, init["name"]):
+            found.add(init.start("name"))
+    return found
+
+
+_FUNCTION_DEFINE = re.compile(r"\s*#\s*define\s+(\w+)\(([^()]*)\)\s*(.*)", re.S)
+_MASK_TEMP = re.compile(r"\b(?:const\s+)?(?:" + _SCALAR_TYPE + ")" +
+                        r"\s+(\w+)\s*=\s*\(*\s*(\w+)\s*\)*\s*;")
+
+
+def _staged_macros(code):
+    """A function macro only stages an argument if its expansion binds the mask."""
+    for m in _MACRO_DEF.finditer(code):
+        macro = _FUNCTION_DEFINE.fullmatch(m[0].replace("\\\n", " "))
+        if not macro:
+            continue
+        formals = [p.strip() for p in macro[2].split(",")]
+        body = _MEMBER_ACCESS.sub("@", macro[3])
+        params = {}
+        for tmp in _MASK_TEMP.finditer(body):
+            local, actual = tmp.groups()
+            if actual not in formals:
+                continue
+            uses = list(re.finditer(rf"\b{local}\b", body[tmp.end():]))
+            if uses and all(_operand_use(body, tmp.end() + u.start(), tmp.end() + u.end()) for u in uses):
+                params[formals.index(actual)] = actual
+        if params:
+            yield macro[1], m.start(), params
+
+
+def _argument_facts(text):
+    code = strip(text)
+    ok = allows(text)
+    definitions = {}
+    candidates = {offset: params for _, offset, params in _inline_definitions(code)}
+    for m in _INLINE_DEF.finditer(code):
+        params = candidates.get(m.start("name"), {})
+        line = _line(code, m.start("name"))
+        body = re.sub(r"\s+", "", code[m.end():_scope_end(code, m.end())])
+        formals = [p.strip() for p in m["params"].split(",")]
+        unresolved = {i: param for i, param in params.items()
+                      if not _recovered_operand(formals[:i] + formals[i + 1:], body, param)}
+        definitions[m["name"]] = unresolved, "literal-param" in ok.get(line, {})
+    for name, pos, params in _staged_macros(code):
+        definitions[name] = params, "literal-param" in ok.get(_line(code, pos), {})
+    return definitions, _INCLUDE.findall(code)
+
+
+_BODY_START = re.compile(r"\s*\{")
+
+
+def literal_argument_sites(path, text, root=None, *, headers=None):
+    """Charge each constant at its caller, including mixed dynamic/constant APIs.
+    Resolve private definitions before included ones. A candidate only requires
+    this unit and its transitive headers, independent of all other callers.
+    """
+    if not path or is_library(path):
+        return []
+    root = Path(root or Path(__file__).resolve().parent.parent)
+    local, includes = _argument_facts(text)
+    definitions = {}
+    seen = {root / path}
+
+    # Bulk reports see one source snapshot. Land uses a fresh include lookup
+    # so a newly created, changed or shadowing header is visible immediately.
+    if headers is None:
+        headers = {}
+
+    def visit(parent, names):
+        for name in names:
+            key = parent, name
+            if key not in headers:
+                target = parent / name
+                if not target.is_file():
+                    target = root / "include" / name
+                if target.is_file():
+                    st = target.stat()
+                    headers[key] = target, _header_facts(target, st.st_mtime_ns, st.st_size)
+                else:
+                    headers[key] = None
+            entry = headers[key]
+            if entry is None:
+                continue
+            target, (defs, nested) = entry
+            if target in seen:
+                continue
+            seen.add(target)
+            visit(target.parent, nested)
+            definitions.update(defs)
+
+    visit((root / path).parent, includes)
+    definitions.update(local)
+    code = _QUOTED.sub(_blank, strip(text))
+    ok = allows(text)
+    out = []
+    for call in _CALLED.finditer(code):
+        name = call[1]
+        if name not in definitions:
+            continue
+        params, excused = definitions[name]
+        start = code.rfind("\n", 0, call.start()) + 1
+        if re.fullmatch(r"\s*#\s*define\s+", code[start:call.start()]):
+            continue
+        if not params:
+            continue
+        args, end = _arguments(code, call.end())
+        if args is None or _BODY_START.match(code, end):
+            continue
+        line = _line(code, call.start())
+        for index, param in params.items():
+            if index < len(args) and _is_constant_arg(args[index]):
+                out.append(Site(line, "literal-param", excused or "literal-param" in ok.get(line, {}),
+                                f"{name} argument {param}"))
+    return out
+
+
+def _is_constant_arg(arg):
+    arg = _SCALAR_CAST.sub("", arg)
+    return bool(re.search(r"\w", arg) and _CONSTANT_ARG.fullmatch(arg))
+
+
+def _annotation_sites(rel, text, params):
+    if params is not None and "literal-param" in text and "concession-ok" in text:
+        # A definition-level justification describes the helper contract even
+        # when a different caller starts passing a runtime mask.
+        code = strip(text)
+        return params + [Site(_line(code, offset), "literal-param", True)
+                         for _, offset, _ in (*_inline_definitions(code), *_staged_macros(code))]
+    return params
+
+
 def warnings(found) -> list[Site]:
     """The unexcused warning sites."""
     return [s for s in found if s.kind in WARN and not s.excused]
@@ -829,6 +1015,8 @@ def lint(text: str, path=None, *, single_use=frozenset(), compiler=None, tree=No
     a missing reason, or a comment with nothing to excuse. COMPILER and TREE are the file's
     compiler_sites and literal_param_sites; without them a comment for one of those kinds is
     not checked for something to excuse."""
+    if not _ALLOW.search(text):
+        return []
     problems = []
     used: dict[int, set[str]] = {}
     for s in sites(text, path, single_use=single_use, kinds=EXCUSABLE + WARN):
@@ -876,34 +1064,43 @@ def main(argv=None) -> int:
     ap.add_argument("--errors-only", action="store_true")
     ap.add_argument("--kind", action="append", help="only these kinds")
     ap.add_argument("--summary", action="store_true", help="totals per kind only")
+    ap.add_argument("--jobs", type=int, default=2, help="parallel compiler checks (default 2)")
     ap.add_argument("--no-compiler", action="store_true", help="skip dead-code and proved-zero (no compiles)")
     args = ap.parse_args(argv)
     from statement_macros import single_use_names
-    once = frozenset(single_use_names(root))
+    once = None if args.kind and "single-use-macro" not in args.kind else single_use_names(root)
     files = []
     for p in args.paths or [root / "src", root / "include"]:
         p = Path(p)
         files += sorted([*p.rglob("*.c"), *p.rglob("*.h")]) if p.is_dir() else [p]
+    paths = {}
+    for path in files:
+        absolute = path.resolve()
+        paths[path] = absolute.relative_to(root) if absolute.is_relative_to(root) else absolute
+    events = {}
     import deadcode
     use_compiler = not args.no_compiler
     if use_compiler and not deadcode.available():
         sys.exit("dead-code and proved-zero need scope's compiler: sh tools/scope/build_agbcc.sh (or pass --no-compiler)")
     if use_compiler:  # compile in parallel up front; the loop below reads the cache
         from concurrent.futures import ThreadPoolExecutor
-        units = [str(f.resolve().relative_to(root)) for f in files
-                 if f.suffix == ".c" and f.resolve().is_relative_to(root) and not is_library(f.resolve().relative_to(root))]
-        with ThreadPoolExecutor(8) as pool:
-            list(pool.map(deadcode.unit, units))
+        units = [str(rel) for f, rel in paths.items()
+                 if f.suffix == ".c" and not rel.is_absolute() and not is_library(rel)]
+        with ThreadPoolExecutor(args.jobs) as pool:
+            events = dict(zip(units, pool.map(deadcode.unit, units)))
     use_tree = not args.errors_only and (not args.kind or any(k in TREE for k in args.kind))
+    headers = {}
     totals: dict[str, int] = {}
     for f in files:
         text = f.read_text(errors="replace")
-        rel = f.resolve().relative_to(root) if f.resolve().is_relative_to(root) else f
+        rel = paths[f]
+        if once is None and "single-use-macro" in text and "concession-ok" in text:
+            once = single_use_names(root)
         lines = text.splitlines()
-        found = sites(text, rel, single_use=once)
+        found = sites(text, rel, single_use=once or frozenset())
         flags = cflags(text, rel)
-        compiled = compiler_sites(rel, text) if use_compiler else None
-        params = literal_param_sites(rel, text, root) if use_tree else None
+        compiled = compiler_sites(rel, text, events=events.get(str(rel), ())) if use_compiler else None
+        params = literal_argument_sites(rel, text, root, headers=headers) if use_tree else None
         for s in sorted(found + (compiled or []) + (params or []), key=lambda s: (s.line, s.kind)) \
                 + ([flags] if flags else []):
             if s.excused or s.kind in TRACKED or (args.kind and s.kind not in args.kind):
@@ -911,12 +1108,13 @@ def main(argv=None) -> int:
             level = "warning" if s.kind in WARN else "error"
             if level == "warning" and args.errors_only:
                 continue
-            totals[s.kind] = totals.get(s.kind, 0) + 1
+            totals[s.kind] = totals.get(s.kind, 0) + s.weight
             if not args.summary:
                 print(f"{rel}:{s.line}: {level} [{s.kind}] "
                       f"{lines[s.line - 1].strip()[:100] if 0 < s.line <= len(lines) else ''}"
-                      + (f"  ({s.note})" if s.note else ""))
-        for problem in lint(text, rel, single_use=once, compiler=compiled if f.suffix == ".c" else None, tree=params):
+                      + (f"  ({s.note})" if s.note else "")
+                      + (f"  ({s.weight} uses)" if s.weight > 1 else ""))
+        for problem in lint(text, rel, single_use=once or frozenset(), compiler=compiled if f.suffix == ".c" else None, tree=_annotation_sites(rel, text, params)):
             totals["bad-ignore"] = totals.get("bad-ignore", 0) + 1
             if not args.summary:
                 print(f"{problem.split(': ', 1)[0]}: error [bad-ignore] {problem.split(': ', 1)[1]}")
@@ -925,6 +1123,8 @@ def main(argv=None) -> int:
     for k in [*SCORED, "bad-ignore", *WARN]:
         if k in totals:
             print(f"{'warning' if k in WARN else 'error':8} {k:18} {totals[k]:6,}", file=sys.stderr)
+    if not args.errors_only and not args.kind:
+        print(f"steering debt: {sum(totals.get(k, 0) for k in STAGED):,} constant uses", file=sys.stderr)
     print(f"{errors:,} errors, {warns:,} warnings in {len(files):,} files", file=sys.stderr)
     return 1 if errors else 0
 
