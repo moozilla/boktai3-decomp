@@ -1,3 +1,4 @@
+#include "scene/actor/scene_actor_behavior.h"
 #include "scene/actor/scene_event_dispatch.h"
 #include "scene/motion/scene_actor_terrain_reaction.h"
 #include "scene/motion/scene_actor_chase_reaction.h"
@@ -12,29 +13,6 @@ struct ActorCommand {
         } attachment;
     } data;
 };
-struct CommandRoute {
-    u8 unknown0[0xC];
-    struct CommandPositionRoute {
-        s16 x, y, z, pad;
-    } current;
-    u8 unknown14[8];
-    struct CommandPositionRoute destination;
-};
-struct CommandAttachmentValues {
-    s32 initial : 16;
-    s32 value : 16;
-};
-struct SceneActorCommandFields {
-    u8 unknown0[0xC];
-    struct SceneEventReceiver receiver;
-    u8 unknown34[0xA8 - 0x34];
-    struct CommandAttachmentValues attachmentValues;
-    u8 unknownAC[0x2FC - 0xAC];
-    struct ContactPosition destination;
-    u8 unknown304[0x3CD - 0x304];
-    u8 desiredDirection;
-};
-#define CommandFields(actor) ((struct SceneActorCommandFields *)(actor))
 void SceneActorControl_OnIdle(void);
 u32 Trigger_ConsumePending(void *, u32);
 void SceneActorRegistry_SendToActorId(u8, void *, u16);
@@ -87,7 +65,7 @@ s32 SceneActorReaction_DispatchPendingCommands(struct ChaseActor *input)
     else
         group = 0;
     attachment = 0;
-    receiver = &CommandFields(actor)->receiver;
+    receiver = (struct SceneEventReceiver *)actor->base.receiver;
     category = actor->base.category;
     i = 0;
     if (i < receiver->count[gSceneEventDispatchState->phase]) {
@@ -97,16 +75,16 @@ s32 SceneActorReaction_DispatchPendingCommands(struct ChaseActor *input)
             switch (command->command) {
                 case 0:
                     if (category == 18) {
-                        CommandFields(actor)->destination.x = command->data.args[0];
-                        CommandFields(actor)->destination.y = command->data.args[1];
-                        CommandFields(actor)->destination.z = command->data.args[2];
+                        actor->base.previousPosition.x = command->data.args[0];
+                        actor->base.previousPosition.y = command->data.args[1];
+                        actor->base.previousPosition.z = command->data.args[2];
                         SetBehaviorAndIdle(actor, 2, 3);
                     } else {
-                        ((struct CommandRoute *)group->route)->destination.x =
+                        ((struct SceneActorBehaviorDestination *)group->route)->destination.x =
                             command->data.args[0];
-                        ((struct CommandRoute *)group->route)->destination.y =
+                        ((struct SceneActorBehaviorDestination *)group->route)->destination.y =
                             command->data.args[1];
-                        ((struct CommandRoute *)group->route)->destination.z =
+                        ((struct SceneActorBehaviorDestination *)group->route)->destination.z =
                             command->data.args[2];
                         if (command->data.args[3])
                             Command_SetMotionFlag(
@@ -114,8 +92,8 @@ s32 SceneActorReaction_DispatchPendingCommands(struct ChaseActor *input)
                         else
                             SceneActorChase_ClearFlagComponent(
                                 (struct SceneActorChaseFlags16 *)&actor->base.motionFlags, 0x200);
-                        ((struct CommandRoute *)group->route)->current =
-                            ((struct CommandRoute *)group->route)->destination;
+                        ((struct SceneActorBehaviorDestination *)group->route)->position =
+                            ((struct SceneActorBehaviorDestination *)group->route)->destination;
                         SetBehaviorAndIdle(actor, 2, 3);
                     }
                     break;
@@ -132,16 +110,16 @@ s32 SceneActorReaction_DispatchPendingCommands(struct ChaseActor *input)
                         delta = -delta;
                     if (category == 23) {
                         if (delta) {
-                            CommandFields(actor)->desiredDirection =
+                            actor->base.nextDirection =
                                 ((u8)command->data.args[0] + 5 & 7) << 5;
                             SetBehaviorAndIdle(actor, 2, 4);
                         } else
-                            Trigger_ConsumePending(&CommandFields(actor)->receiver, 1);
+                            Trigger_ConsumePending(((struct SceneEventReceiver *)actor->base.receiver), 1);
                     } else if (delta > 1) {
-                        CommandFields(actor)->desiredDirection = command->data.args[0];
+                        actor->base.nextDirection = command->data.args[0];
                         SetBehaviorAndIdle(actor, 2, 4);
                     } else
-                        Trigger_ConsumePending(&CommandFields(actor)->receiver, 1);
+                        Trigger_ConsumePending(((struct SceneEventReceiver *)actor->base.receiver), 1);
                     break;
                 }
                 case 2:
@@ -206,10 +184,10 @@ s32 SceneActorReaction_DispatchPendingCommands(struct ChaseActor *input)
                             s16 *value;
                             s16 *initial;
                             s32 initialValue;
-                            CommandFields(actor)->attachmentValues.value =
+                            actor->base.attachmentTimer =
                                 command->data.attachment.value;
                             value = (s16 *)&actor->base.attachmentTimer;
-                            CommandFields(actor)->attachmentValues.initial =
+                            actor->base.attachmentRestart =
                                 command->data.attachment.initial;
                             initial = &actor->base.attachmentRestart;
                             SceneActorAttachment_SelectOffsets(category, 1, &workspace.offset.y,
@@ -226,10 +204,10 @@ s32 SceneActorReaction_DispatchPendingCommands(struct ChaseActor *input)
                             s16 *initial;
                             s32 initialValue;
                             s32 count;
-                            CommandFields(actor)->attachmentValues.value =
+                            actor->base.attachmentTimer =
                                 command->data.attachment.value;
                             value = (s16 *)&actor->base.attachmentTimer;
-                            CommandFields(actor)->attachmentValues.initial =
+                            actor->base.attachmentRestart =
                                 command->data.attachment.initial;
                             initial = &actor->base.attachmentRestart;
                             count = command->data.attachment.count;
@@ -268,7 +246,7 @@ s32 SceneActorReaction_DispatchPendingCommands(struct ChaseActor *input)
                             break;
                         }
                     }
-                    Trigger_ConsumePending(&CommandFields(actor)->receiver, 1);
+                    Trigger_ConsumePending(((struct SceneEventReceiver *)actor->base.receiver), 1);
                     break;
             }
             SceneMessages_SetPendingTrigger(receiver, (struct SceneEventCommand *)command);
