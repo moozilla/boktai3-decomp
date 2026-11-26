@@ -239,6 +239,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [docs/history/2026-11-16.md](../docs/history/2026-11-16.md) | 2026-11-16 | #cleanup #compiler #concessions #depin #matching #object-model #round13 #round14 #tooling | 18 |
 | [docs/history/2026-11-17.md](../docs/history/2026-11-17.md) | 2026-11-17 | #compiler #depin #matching #phase3 #round13 #round15 #structs | 3 |
 | [docs/history/2026-11-20.md](../docs/history/2026-11-20.md) | 2026-11-20 | #actors #compiler #matching #monsters #phase3 #scene #scene-actors #tooling #wireless | 2 |
+| [docs/history/2026-11-25.md](../docs/history/2026-11-25.md) | 2026-11-25 | #hardware #menu #tooling | 0 |
 | [docs/history/HANDOFF_2026-10-23.md](../docs/history/HANDOFF_2026-10-23.md) | Handoff: current state and how to continue | #process | 14 |
 | [docs/history/MANAGER_HANDOFF_2026-10-19.md](../docs/history/MANAGER_HANDOFF_2026-10-19.md) | Manager handoff (2026-10-19) | #process #tooling | 6 |
 | [docs/history/README.md](../docs/history/README.md) | Handoff history |  | 17 |
@@ -262,6 +263,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [notes/area-effect-link_2026-10-14.md](../notes/area-effect-link_2026-10-14.md) | Link variant of area effects (Sol, 2026-10-14) |  | 2 |
 | [notes/area-effect_2026-10-14.md](../notes/area-effect_2026-10-14.md) | Rectangular area effect manager (Sol, 2026-10-14) | *#tooling* | 4 |
 | [notes/arm-08000430.md](../notes/arm-08000430.md) | sub_08000430: unpinned exact match, and how it works | #matching #compiler #register-pinning #arm | 6 |
+| [notes/autopilot-port-stress_2026-11-25.md](../notes/autopilot-port-stress_2026-11-25.md) | Autopilot port stress run, 2026-11-25 | #hardware #tooling #menu #scene | 2 |
 | [notes/axe-trail-playback.md](../notes/axe-trail-playback.md) | Axe trail playback | #monsters #matching | 0 |
 | [notes/background-palette-fade_2026-11-01.md](../notes/background-palette-fade_2026-11-01.md) | Background palette fade | *#assets* | 0 |
 | [notes/bee-cleanup_2026-11-13.md](../notes/bee-cleanup_2026-11-13.md) | Bee cleanup draft | #monsters #cleanup #bee #volatile | 2 |
@@ -363,7 +365,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [notes/grid_attack_animation_and_targets.md](../notes/grid_attack_animation_and_targets.md) | Grid attack animation and targets | #matching #bosses | 1 |
 | [notes/grid_attack_colliders_and_palette.md](../notes/grid_attack_colliders_and_palette.md) | Grid attack colliders and palette | #matching #bosses | 0 |
 | [notes/grid_attack_initialize.md](../notes/grid_attack_initialize.md) | Grid attack initialization | #matching #bosses | 1 |
-| [notes/hard-sites_2026-11-23.md](../notes/hard-sites_2026-11-23.md) | Hard sites, 2026-11-23 | #matching #compiler #phase3 #linter | 8 |
+| [notes/hard-sites_2026-11-23.md](../notes/hard-sites_2026-11-23.md) | Hard sites, 2026-11-23 | #matching #compiler #phase3 #linter | 11 |
 | [notes/initializer-actor-embedding_2026-10-30.md](../notes/initializer-actor-embedding_2026-10-30.md) | Initializer actor containment | #matching #monster #structs | 1 |
 | [notes/interaction-marker_2026-10-14.md](../notes/interaction-marker_2026-10-14.md) | Interaction marker, 080537D0–08053D8C |  | 3 |
 | [notes/ivy-matching.md](../notes/ivy-matching.md) | Ivy (080ED914..080F0B8C): matching notes | #matching | 2 |
