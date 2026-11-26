@@ -61,8 +61,9 @@ def resolve(query, entries):
     prefix = path.as_posix()
     units = set(source.by_file) | {p.as_posix() for file in source.by_file for p in Path(file).parents}
     if prefix not in units:
-        suffixes = ("/" + query, "/" + query + ".c")
-        matches = {unit for unit in units if unit.endswith(suffixes)}
+        matches = {unit for unit in units if unit.endswith("/" + query)}
+        if not matches:
+            matches = {unit for unit in units if unit.endswith("/" + query + ".c")}
         if len(matches) > 1:
             raise ValueError(f"ambiguous unit {query}: {', '.join(sorted(matches))}")
         if matches:
