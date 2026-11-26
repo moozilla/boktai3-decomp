@@ -1,8 +1,8 @@
-#include "engine/shared/global.h"
+#include "effects/sprite_trail/sprite_trail.h"
 
-void Vector3_CopyComponents(u8 *d, u8 *s)
+void Vector3_CopyComponents(struct TrailVector *destination, struct TrailVector *source)
 {
-    *(u32 *)(d + 0) = *(u32 *)(s + 0);
-    *(u32 *)(d + 4) = *(u32 *)(s + 4);
-    *(u32 *)(d + 8) = *(u32 *)(s + 8);
+    destination->x = source->x;
+    destination->y = source->y;
+    destination->z = source->z;
 }
