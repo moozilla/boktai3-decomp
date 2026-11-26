@@ -106,13 +106,12 @@ static inline void Polar(struct ContactPosition *v, s32 angle, s32 radius)
         else if (flags & 0x400)                                                                    \
             ((struct EnemyDefeatStatistics *)gGameState)->reactionCounts[3] =                      \
                 Clamp(((struct EnemyDefeatStatistics *)gGameState)->reactionCounts[3] + 1);        \
-        else if (flags &= 0x800)                                                                   \
+        else if (flags & 0x800)                                                                   \
             ((struct EnemyDefeatStatistics *)gGameState)->reactionCounts[4] =                      \
                 Clamp(((struct EnemyDefeatStatistics *)gGameState)->reactionCounts[4] + 1);        \
     }
-static inline void RecordKill(struct ChaseActor *actor, u8 *category)
+static inline void RecordKill(struct ContactCollider *collider, u8 *category)
 {
-    struct ContactCollider *collider = &actor->base.colliderA;
     switch (*category) {
         case 4: {
             u32 flags = collider->reactionFlags;
@@ -228,6 +227,25 @@ static inline void RecordKill(struct ChaseActor *actor, u8 *category)
     }
 }
 
+static inline void Skeleton_RunDefeatScript(struct ChaseActor *actor, s32 *values)
+{
+    u16 script = (u16)actor->base.script1F8;
+    if (script) {
+        struct ScriptUtilityArguments arguments;
+        values[0] = actor->base.body.position.x;
+        values[1] = actor->base.body.position.y;
+        values[2] = actor->base.body.position.z;
+        values[3] = actor->base.parameters1FC[0];
+        values[4] = actor->base.parameters1FC[1];
+        values[5] = actor->base.parameters1FC[2];
+        values[6] = actor->base.hitOwners;
+        values[7] = actor->base.body.id;
+        arguments.count = 8;
+        arguments.values = values;
+        Script_Call(script, &arguments);
+    }
+}
+
 void Skeleton_UpdateDefeat(struct ChaseActor *actor)
 {
     s32 values[8];
@@ -295,21 +313,7 @@ void Skeleton_UpdateDefeat(struct ChaseActor *actor)
             goto notHidden;
     }
     {
-        u16 script = (u16)actor->base.script1F8;
-        if (script) {
-            struct ScriptUtilityArguments arguments;
-            values[0] = actor->base.body.position.x;
-            values[1] = actor->base.body.position.y;
-            values[2] = actor->base.body.position.z;
-            values[3] = actor->base.parameters1FC[0];
-            values[4] = actor->base.parameters1FC[1];
-            values[5] = actor->base.parameters1FC[2];
-            values[6] = actor->base.hitOwners;
-            values[7] = actor->base.body.id;
-            arguments.count = 8;
-            arguments.values = values;
-            Script_Call(script, &arguments);
-        }
+        Skeleton_RunDefeatScript(actor, values);
         {
             u32 t = *response.flags & mask;
             categoryp = &actor->base.category;
@@ -388,21 +392,7 @@ notHidden:
             }
         }
         if (state.context->revivalDelay > 19999) {
-            u16 script = (u16)actor->base.script1F8;
-            if (script) {
-                struct ScriptUtilityArguments arguments;
-                values[0] = actor->base.body.position.x;
-                values[1] = actor->base.body.position.y;
-                values[2] = actor->base.body.position.z;
-                values[3] = actor->base.parameters1FC[0];
-                values[4] = actor->base.parameters1FC[1];
-                values[5] = actor->base.parameters1FC[2];
-                values[6] = actor->base.hitOwners;
-                values[7] = actor->base.body.id;
-                arguments.count = 8;
-                arguments.values = values;
-                Script_Call(script, &arguments);
-            }
+            Skeleton_RunDefeatScript(actor, values);
             if (!Masked16(response.flags, 0x4000) && (u32)(actor->base.category - 11) > 2)
                 Bestiary_UnlockEntry(
                     Bestiary_GetEntryForActor(actor->base.category, actor->base.paletteOffset));
@@ -434,21 +424,7 @@ notHidden:
         }
         SceneActorBehavior_CallTerrainScript(actor);
         {
-            u16 script = (u16)actor->base.script1F8;
-            if (script) {
-                struct ScriptUtilityArguments arguments;
-                values[0] = actor->base.body.position.x;
-                values[1] = actor->base.body.position.y;
-                values[2] = actor->base.body.position.z;
-                values[3] = actor->base.parameters1FC[0];
-                values[4] = actor->base.parameters1FC[1];
-                values[5] = actor->base.parameters1FC[2];
-                values[6] = actor->base.hitOwners;
-                values[7] = actor->base.body.id;
-                arguments.count = 8;
-                arguments.values = values;
-                Script_Call(script, &arguments);
-            }
+            Skeleton_RunDefeatScript(actor, values);
         }
         if (!Masked16(response.flags, 0x4000) && (u32)(*categoryp - 11) > 2)
             Bestiary_UnlockEntry(Bestiary_GetEntryForActor(*categoryp, actor->base.paletteOffset));
@@ -456,7 +432,7 @@ notHidden:
         Player_RefreshLifeState(actor->base.hitAttributes, actor->base.fieldA1);
         Count(&((struct EnemyDefeatStatistics *)gGameState)->lifetimeTotal);
         Count(&((struct EnemyDefeatStatistics *)gGameState)->total);
-        RecordKill(actor, categoryp);
+        RecordKill(&actor->base.colliderA, categoryp);
         {
             struct ContactPosition range;
             u8 category;
