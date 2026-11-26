@@ -10,17 +10,6 @@ static inline u8 IsControlled(struct ChaseActor *a)
     return 0;
 }
 
-static inline void ClearRoute(struct ChaseActor *a)
-{
-    struct SceneActorRegistryControl *route = &a->group.common.control;
-    u32 *flags = &a->base.behaviorFlags;
-    u32 mask = ~0x141C0;
-    *flags &= mask;
-    route->counter = 0;
-    route->field14 = 0;
-    route->timer = 0;
-}
-
 static inline void Show(struct ChaseActor *a)
 {
     if (!a->base.drawableKind) {
@@ -40,7 +29,7 @@ void SceneActorReaction_SinkAndRemove(struct ChaseActor *actor, s32 frame)
         struct ContactCollider *collider = &actor->base.colliderA;
         u32 category = actor->base.category;
         if (IsControlled(actor))
-            ClearRoute(actor);
+            SceneActorReaction_ResetRouteControl(actor, &actor->group.common.control);
         SceneActorAnimation_SelectDirectionalEntry((void *)actor, 3);
         if (category != 2 && category != 22) {
             SceneActorAttachment_ReplaceResponseSlot(actor, 0, 1, (u8)category);
@@ -67,10 +56,10 @@ void SceneActorReaction_SinkAndRemove(struct ChaseActor *actor, s32 frame)
     if (frame > 6) {
         actor->base.body.position.y -= (u32)(frame - 6) * 30;
         if (!actor->base.drawableKind)
-            *(struct ContactPosition *)((u8 *)actor->base.drawable + 0x1C) =
+            ((struct SceneActorAnimationSequenceDrawable *)actor->base.drawable)->sprite.position =
                 actor->base.body.position;
         else
-            *(struct ContactPosition *)((u8 *)actor->base.drawable + 0x40) =
+            ((struct SceneActorAnimationTileDrawable *)actor->base.drawable)->tile.position =
                 actor->base.body.position;
         if (frame > 8) {
             u16 zeroWord = 0;
