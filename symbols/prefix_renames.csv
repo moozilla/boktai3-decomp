@@ -23,7 +23,7 @@ Pool184_,LootDepositPool_,src/field/actor_group,"F1F9 ID 5639 uses a slot in thi
 CallbackPool_,LootDepositHit_,src/other/callback_pool,"0029→3905, F1F9 slot 0200FC30 passed to CallbackPool_ApplyDamage."
 BreakableProp_,QuestBarrier_,src/field/breakable_props,"0029→3931, 3DB0 ID E912 shatters and triggers the named Trinity sequence."
 RegionActor_,IceBoulder_,src/field/proximity_actor,"0029→3955, 377D at (896, y, 896) draws the blue 863A ice boulder."
-SceneObjects_,PuzzleBlocks_,src/field/scene_objects,"0029→3955, E02A IDs 0EEC and 0EED are puzzle obstacles using sprite 9D41. Scope this prefix to the E02A unit."
+SceneObjects_,PuzzleBlocks_,src/field/scene_objects,0029→3955. D9AE initializes the E02A stone-block task. The 9D41 pair and removal are tied to each original slot by renderer submissions. The same prefix in the separate door pool is outside scope.
 SceneObject_,SlidingDoor_,src/actors/scene_object_controller,"0054→5297 D4E3 slot with opening/closing states, sprites 7ACD and 7AD3."
 SceneScriptObject_,DungeonScenery_,src/field/scene_script_object,0029→3905 with 3D91/B07C. Sword strike runs the flash and burst paths.
 SceneNpc_,Otenko_,src/actors/scene_npc,0000/2201 visible field companion. BB34 at 2544 loads Otenko sprite 97D3. Scope to this unit.
@@ -47,7 +47,6 @@ Breakable_,LightFixture_,src/field/pooled_interactables,"0038→4479. Original 2
 ActorMarker_,BikeChargeMarker_,src/effects/particle_burst_effect/following_sprite_effect.c,0008→6274. Glove’s reserved compact slot becomes visible in the original B-hold charge loop; renderer records drawable 0200F4E8.
 Player_UpdateLink,LinkPlayer_Update,0824261C / 082438F4,Controlled 3955 alternate Django runs both entry points on the task returned by the original constructor. The ordinary Player task keeps its existing update name.
 sub_08243B0C,LinkPlayer_Create,08243B0C,Original constructor creates the 0xCAC task. The 3955 controlled run shows a second blue Django and traces the task owner into LinkPlayer update.
-SceneObjects_,PuzzleBlocks_,src/field/scene_objects,0029→3955. D9AE initializes the E02A stone-block task. The 9D41 pair and removal are tied to each original slot by renderer submissions. The same prefix in the separate door pool is outside scope.
 MovingGlyph_,CutsceneShot_,src/effects/particle_burst/moving_glyph.c,PlayerCue_Shoot loads 210E and the original task moves the shot across the 6201 screen. The 2961 stock run hits the same unit.
 SpriteParticle_,VanargandMotes_,src/effects/sprite_particle,The live Vanargand presentation callback uses the original 081FF09C pool in the controlled 6323 burst. Scope to 081FED9C–081FF38C.
 ParticleEffect_,PlayerActionFlash_,src/effects/particle_effect,"Original Player motion 9 runs the gold flash, orbit effect and terminal update at 6201."
