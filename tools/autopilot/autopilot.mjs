@@ -184,6 +184,7 @@ const GOALS = {
         }
       }
       // Both HP traps and live pressure plates can run scripts on contact.
+      let timedSwitch = false;
       const switches = (stageOf(here).switches || []).concat(L.floorSwitches().filter((sw) => !sw.pressed));
       for (const sw of switches) {
         const key = `${here}:switch:${sw.box ?? sw.name}`;
@@ -196,12 +197,14 @@ const GOALS = {
         const clear = () => !g.fn.ScriptUtility_IsControlFlagSet();
         const completed = delayed ? (yield* untilControl(g, L, () => delayed() && clear(), 24, 900)) :
           pressed ? pressed() || L.where().scene !== here : r.reached;
+        timedSwitch ||= Boolean(delayed && completed);
         if (!pressed || completed) TRIED.add(key);
         if (pressed && completed && !delayed) yield* untilControl(g, L, clear, 24, 900);
         else yield* L.clearInterruptions({});
         event({ skill: 'switch', box: sw.box, name: sw.name, reached: completed, reason: r.reason });
         if (L.where().scene !== here) break;
       }
+      if (L.where().scene !== here) { rooms--; continue; }
       // hittables with a script (lever switches): strike each once
       for (const h of (stageOf(here).hittables || []).filter((h) => h.flags === 9 && !TRIED.has(`${here}:${h.breakable ? 'break' : 'hit'}:${h.name}`))) {
         if (h.breakable) {
@@ -244,7 +247,9 @@ const GOALS = {
       // people: talk to each once (towns count who was heard before the story goes on).
       // The live actors (world.js people(): SceneActorManager) where they stand now, else
       // the characters the script placed (stages.json talk).
-      if (!opt('--no-talk')) {
+      // A scripted opening can reset at room exit. Cross it before detouring
+      // to a character or pickup near another door.
+      if (!timedSwitch && !opt('--no-talk')) {
         const live = L.people();
         // someone met in three or more rooms travels with the player (Otenko): talk once
         for (const q of live) { const k = q.id.toString(16); SEEN.set(k, (SEEN.get(k) || new Set()).add(here)); }
@@ -275,7 +280,7 @@ const GOALS = {
       // A key detour has a specific pickup. Other items can wait until the
       // detour ends, since the approach can consume life or change floors.
       if (keyGoal && L.hasItem(keyGoal.item)) keyGoal = undefined;
-      const pickups = stageOf(here).items.filter((it) => !keyGoal || (it.category === 0 && it.item === keyGoal.item));
+      const pickups = timedSwitch ? [] : stageOf(here).items.filter((it) => !keyGoal || (it.category === 0 && it.item === keyGoal.item));
       for (const it of pickups.filter((it) => !TRIED.has(`${here}:${it.x},${it.z}`))) {
         if (bossActive()) break;
         TRIED.add(`${here}:${it.x},${it.z}`);
