@@ -1,54 +1,9 @@
-#include "global.h"
+#include "engine/video/anim_sprite.h"
+#include "bosses/ratatosk/ratatosk.h"
 #include "engine/video/render.h"
 struct HalfBits {
     s32 bits : 16;
 };
-struct Vec {
-    s16 x, y, z, pad;
-};
-struct Collider {
-    u8 pad[6];
-    s16 flags;
-};
-struct Sprite {
-    u8 pad[9];
-    u8 direction;
-};
-struct Anim {
-    u8 pad[8];
-    u32 flags;
-};
-struct Camera {
-    u8 pad[0x20];
-    u32 flags;
-};
-struct Boss {
-    u8 pad[0x34c];
-    struct Anim animation;
-    u8 pad358[0x84];
-    struct Camera camera;
-    u8 pad400[0xa7c];
-    s16 flashTimer;
-    u8 padE7E[0x56];
-    u16 invulnerability;
-};
-struct Actor {
-    u8 pad[0x9c];
-    u32 flags;
-    u8 padA0[9];
-    u8 facing;
-    u8 padAA[9];
-    u8 mode;
-    u8 padB4[8];
-    u32 forceX, forceZ;
-    u8 padC4[0x20];
-    u32 frame;
-};
-#define H(o) (*(s16 *)(p + (o)))
-#define U(o) (*(u16 *)(p + (o)))
-#define B(o) (*(u8 *)(p + (o)))
-#define S(o) (*(s8 *)(p + (o)))
-#define W(o) (*(u32 *)(p + (o)))
 extern const s16 gUnk_086149C4[];
 extern u32 gUnk_02000560;
 void Collider_SetPosition(void *, void *, u32);
@@ -60,133 +15,120 @@ void AnimData_SelectPaletteBank(void *, s32);
 s32 Ratatosk_GetDefaultPaletteIndex(void *);
 void Palette_InterpolateBanks(void *, void *, void *, s32, s32);
 void PaletteEffect_RefreshPalette(void *);
-void CameraTracking_Update(void *);
 static inline s32 scale(s32 v)
 {
     return v >= 0 ? v >> 12 : -((-v) >> 12);
 }
-static inline void polar(struct Vec *v, s32 angle, s32 radius)
+static inline void polar(struct ContactPosition *v, s32 angle, s32 radius)
 {
     v->x = scale(gUnk_086149C4[(angle + 64) & 255] * radius);
     v->y = 0;
     v->z = scale(gUnk_086149C4[angle & 255] * radius);
 }
-static inline void setFlags(struct Actor *a, u32 mask)
+static inline void setFlags(struct Ratatosk *a, u32 mask)
 {
     a->flags |= mask;
 }
-static inline void clearFlags(struct Actor *a, u32 mask)
+static inline void clearFlags(struct Ratatosk *a, u32 mask)
 {
     a->flags &= ~mask;
 }
-static inline void clearColliderFlags(struct Collider *c, s32 mask)
+static inline void clearColliderFlags(struct ContactCollider *c, s32 mask)
 {
-    c->flags &= ~mask;
+    c->flags = (s16)c->flags & ~mask;
 }
-static inline void setAnimFlags(struct Anim *a, u32 mask)
+static inline void setCameraFlags(struct CameraTracking *a, u32 mask)
 {
-    a->flags |= mask;
+    a->requests |= mask;
 }
-static inline void clearAnimFlags(struct Anim *a, u32 mask)
+static inline void clearCameraFlags(struct CameraTracking *a, u32 mask)
 {
-    a->flags &= ~mask;
-}
-static inline void setCameraFlags(struct Camera *a, u32 mask)
-{
-    a->flags |= mask;
-}
-static inline void clearCameraFlags(struct Camera *a, u32 mask)
-{
-    a->flags &= ~mask;
+    a->requests &= ~mask;
 }
 static inline u32 globalFlags(u32 mask)
 {
     return gUnk_02000560 & mask;
 }
-static inline void hide(struct Anim *a)
+static inline void hide(struct AnimSprite *a)
 {
     a->flags |= 1;
 }
-static inline void show(struct Anim *a)
+static inline void show(struct AnimSprite *a)
 {
     a->flags &= ~1;
 }
-static inline void fade(struct Anim *a)
+static inline void fade(struct AnimSprite *a)
 {
     a->flags |= 0x200;
 }
-static inline void unfade(struct Anim *a)
+static inline void unfade(struct AnimSprite *a)
 {
     a->flags &= ~0x200;
 }
-static inline u16 readHalf(u16 *p)
-{
-    return *p;
-}
-static inline u32 flags(struct Actor *a, u32 mask)
+static inline u32 flags(struct Ratatosk *a, u32 mask)
 {
     return a->flags & mask;
 }
-void Ratatosk_UpdateCollidersAndPalette(u8 *p)
+void Ratatosk_UpdateCollidersAndPalette(struct Ratatosk *p)
 {
-    struct Actor *actor = (struct Actor *)p;
-    struct Sprite *sprite = (struct Sprite *)(p + 0x48);
-    struct Collider *collider;
-    struct Vec pos;
+    struct Ratatosk *actor = p;
+    struct SceneActorBody *sprite = &p->body;
+    struct ContactCollider *collider;
+    struct ContactPosition pos;
     s32 base, bank, value;
     u8 *palette;
     s32 zero;
-    if (((struct Boss *)p)->invulnerability) {
+    if (p->invulnerability) {
         setFlags(actor, 4);
-        ((struct Boss *)p)->invulnerability--;
+        p->invulnerability--;
     }
-    if (H(0xed6) > 0)
+    if (p->damageTimer > 0)
         setFlags(actor, 4);
-    if (!B(0xb3)) {
-        collider = (struct Collider *)(p + 0x188);
+    if (!p->locked) {
+        collider = &p->hurtCollider;
         if (flags(actor, 4))
             collider->flags |= 4;
         else {
             clearColliderFlags(collider, 4);
-            Collider_SetPosition(collider, p + 0x36c, 0);
+            Collider_SetPosition(collider, &p->anchor, 0);
             {
                 u32 direction = sprite->direction;
-                B(0x1ca) = direction;
+                p->hurtCollider.direction = direction;
             }
         }
-        collider = (struct Collider *)(p + 0x2d8);
+        collider = &p->wideBodyCollider;
         if (flags(actor, 0x800000)) {
             clearColliderFlags(collider, 4);
-            Collider_SetPosition(collider, p + 0x36c, 0);
+            Collider_SetPosition(collider, &p->anchor, 0);
             {
                 u32 direction = sprite->direction;
-                B(0x31a) = direction;
+                p->wideBodyCollider.direction = direction;
             }
         } else
             collider->flags |= 4;
-        collider = (struct Collider *)(p + 0x284);
+        collider = &p->outerCollider;
         if (flags(actor, 0x800000)) {
-            Collider_SetPosition(collider, p + 0x36c, 0);
+            Collider_SetPosition(collider, &p->anchor, 0);
             {
                 u32 direction = sprite->direction;
-                B(0x2c6) = direction;
+                p->outerCollider.direction = direction;
             }
             Collider_Refresh(collider);
         }
-        collider = (struct Collider *)(p + 0x1dc);
+        collider = &p->bodyCollider;
         if (!flags(actor, 8)) {
-            Collider_SetPosition(collider, p + 0x36c, 0);
+            Collider_SetPosition(collider, &p->anchor, 0);
             {
                 u32 direction = sprite->direction;
-                B(0x21e) = direction;
+                p->bodyCollider.direction = direction;
             }
             Collider_Refresh(collider);
         }
-        collider = (struct Collider *)(p + 0x230);
+        collider = &p->frontCollider;
         if (flags(actor, 0x20000)) {
-            polar(&pos, (u8)((actor->facing + 5) << 5), 512);
+            polar(&pos, (u8)((actor->facing8 + 5) << 5), 512);
             {
-                struct Vec *v = &pos, *b = (struct Vec *)(p + 0x36c);
+                struct ContactPosition *v = &pos, *b = &p->anchor;
                 v->x = v->x + b->x;
                 v->y = v->y + b->y;
                 v->z = v->z + b->z;
@@ -194,137 +136,137 @@ void Ratatosk_UpdateCollidersAndPalette(u8 *p)
             Collider_SetPosition(collider, &pos, 0);
             {
                 u32 direction = sprite->direction;
-                *((u8 *)collider + 0x42) = direction;
+                collider->direction = direction;
             }
             Collider_Refresh(collider);
             clearFlags(actor, 0x20000);
         }
     } else {
-        collider = (struct Collider *)(p + 0x188);
+        collider = &p->hurtCollider;
         collider->flags |= 4;
     }
     if (flags(actor, 16)) {
-        if (!actor->mode)
-            clearCameraFlags(&((struct Boss *)p)->camera, 1);
-        hide(&((struct Boss *)p)->animation);
-        ScaledShadow_Disable(p + 0x40c);
+        if (!actor->locked)
+            clearCameraFlags(&p->camera, 1);
+        hide((struct AnimSprite *)p->animationData);
+        ScaledShadow_Disable(p->shadow);
     } else {
-        show(&((struct Boss *)p)->animation);
+        show((struct AnimSprite *)p->animationData);
         if (flags(actor, 0x40000)) {
-            if (!actor->mode)
-                clearCameraFlags(&((struct Boss *)p)->camera, 1);
-            fade(&((struct Boss *)p)->animation);
+            if (!actor->locked)
+                clearCameraFlags(&p->camera, 1);
+            fade((struct AnimSprite *)p->animationData);
         } else {
-            if (!actor->mode) {
-                setCameraFlags(&((struct Boss *)p)->camera, 1);
+            if (!actor->locked) {
+                setCameraFlags(&p->camera, 1);
                 Camera_FollowPlayerWithoutCompletion(30);
             }
-            unfade(&((struct Boss *)p)->animation);
+            unfade((struct AnimSprite *)p->animationData);
         }
-        ScaledShadow_Enable(p + 0x40c);
+        ScaledShadow_Enable(p->shadow);
         setFlags(actor, 32);
     }
     if (!globalFlags(1)) {
-        if (!actor->mode)
-            clearCameraFlags(&((struct Boss *)p)->camera, 1);
+        if (!actor->locked)
+            clearCameraFlags(&p->camera, 1);
     }
-    if (!actor->mode && flags(actor, 0x1000000))
-        clearCameraFlags(&((struct Boss *)p)->camera, 1);
-    if (((struct Boss *)p)->flashTimer > 0) {
-        fade(&((struct Boss *)p)->animation);
-        ((struct Boss *)p)->flashTimer--;
+    if (!actor->locked && flags(actor, 0x1000000))
+        clearCameraFlags(&p->camera, 1);
+    if (p->flashTimer > 0) {
+        fade((struct AnimSprite *)p->animationData);
+        p->flashTimer--;
     }
     if (flags(actor, 0x2000000))
-        ScaledShadow_Disable(p + 0x40c);
+        ScaledShadow_Disable(p->shadow);
     if (flags(actor, 32))
-        ((struct HalfBits *)(p + 0x18e))->bits |= 8;
+        ((struct HalfBits *)&p->hurtCollider.flags)->bits |= 8;
     else
-        U(0x18e) &= ~8;
-    if (U(0x1cc)) {
-        U(0x1cc)--;
-        if ((U(0x1cc) >> 2) & 1)
-            hide(&((struct Boss *)p)->animation);
+        p->hurtCollider.flags &= ~8;
+    if (p->hurtCollider.responseValue) {
+        p->hurtCollider.responseValue--;
+        if ((p->hurtCollider.responseValue >> 2) & 1)
+            hide((struct AnimSprite *)p->animationData);
         else
-            show(&((struct Boss *)p)->animation);
+            show((struct AnimSprite *)p->animationData);
     }
-    if (H(0xed6) > 0) {
-        AnimData_SelectPaletteBank(p + 0x478, 402);
-        *(u8 **)(p + 0x394) = p + 0x8b8;
-        H(0xed6)--;
+    if (p->damageTimer > 0) {
+        AnimData_SelectPaletteBank(p->paletteAnimation, 402);
+        p->palette = p->paletteAlternate;
+        p->damageTimer--;
     } else {
-        AnimData_SelectPaletteBank(p + 0x478, 498);
+        AnimData_SelectPaletteBank(p->paletteAnimation, 498);
         {
-            u8 **dest = (u8 **)(p + 0x394);
-            palette = p + 0x4b8;
+            void **dest = &p->palette;
+            palette = p->paletteBase;
             *dest = palette;
         }
         zero = 0;
         base = Ratatosk_GetDefaultPaletteIndex(p);
-        bank = W(0x4b0);
-        if (B(0x4ae) == 1) {
-            if (S(0x4ac) < (1 << B(0x4af))) {
-                B(0x4ac)++;
+        bank = p->blendBank;
+        if (p->blendMode == 1) {
+            if (p->blendStep < (1 << p->blendShift)) {
+                p->blendStep++;
                 Palette_InterpolateBanks(palette, gPaletteBankData + base * 32,
-                                         gPaletteBankData + bank * 32, S(0x4ac), B(0x4af));
+                                         gPaletteBankData + bank * 32, p->blendStep, p->blendShift);
             }
-        } else if (B(0x4ae) == 2) {
-            if (S(0x4ac) > 0) {
-                B(0x4ac)--;
+        } else if (p->blendMode == 2) {
+            if (p->blendStep > 0) {
+                p->blendStep--;
                 Palette_InterpolateBanks(palette, gPaletteBankData + base * 32,
-                                         gPaletteBankData + bank * 32, S(0x4ac), B(0x4af));
+                                         gPaletteBankData + bank * 32, p->blendStep, p->blendShift);
             } else
                 PaletteEffect_RefreshPalette(p);
-        } else if (B(0x4ae) == 3) {
+        } else if (p->blendMode == 3) {
             Palette_InterpolateBanks(palette, gPaletteBankData + base * 32,
-                                     gPaletteBankData + bank * 32, S(0x4ac), B(0x4af));
-            if (!B(0x4ad)) {
-                B(0x4ac)++;
-                if (S(0x4ac) > 31) {
-                    B(0x4ac) = 32;
-                    B(0x4ad) = 1;
+                                     gPaletteBankData + bank * 32, p->blendStep, p->blendShift);
+            if (!p->blendReturning) {
+                p->blendStep++;
+                if (p->blendStep > 31) {
+                    p->blendStep = 32;
+                    p->blendReturning = 1;
                 }
             } else {
-                B(0x4ac)--;
-                if (S(0x4ac) <= 0) {
-                    B(0x4ac) = zero;
-                    B(0x4ad) = zero;
+                p->blendStep--;
+                if (p->blendStep <= 0) {
+                    p->blendStep = zero;
+                    p->blendReturning = zero;
                 }
             }
-        } else if (B(0x4ae) == 4) {
-            Palette_InterpolateBanks(palette, gPaletteBankData + base * 32, p + 0x6b8, S(0x4ac),
-                                     B(0x4af));
-            if (!B(0x4ad)) {
-                B(0x4ac)++;
-                if (S(0x4ac) > 31) {
-                    B(0x4ac) = 32;
-                    B(0x4ad) = 1;
+        } else if (p->blendMode == 4) {
+            Palette_InterpolateBanks(palette, gPaletteBankData + base * 32, p->paletteNormal, p->blendStep,
+                                     p->blendShift);
+            if (!p->blendReturning) {
+                p->blendStep++;
+                if (p->blendStep > 31) {
+                    p->blendStep = 32;
+                    p->blendReturning = 1;
                 }
             } else {
-                B(0x4ac)--;
-                if (S(0x4ac) <= 0) {
-                    B(0x4ac) = zero;
-                    B(0x4ad) = zero;
+                p->blendStep--;
+                if (p->blendStep <= 0) {
+                    p->blendStep = zero;
+                    p->blendReturning = zero;
                 }
             }
         }
     }
-    if (H(0xe74) > 0)
-        H(0xe74)--;
-    if (H(0xe78) > 0) {
-        if (H(0xe78) == 1)
-            H(0xe7a) = 0;
-        H(0xe78)--;
+    if (p->hitTimer > 0)
+        p->hitTimer--;
+    if (p->damageWindow > 0) {
+        if (p->damageWindow == 1)
+            p->repeatHits = 0;
+        p->damageWindow--;
     }
     {
-        s16 *dest = (s16 *)(p + 0xe6e);
+        s16 *dest = &p->frameDamage;
         u32 zero = 0;
         *dest = zero;
-        actor->frame++;
-        actor->forceX = zero;
-        actor->forceZ = zero;
-        W(0xcbc) = zero;
-        W(0xcc0) = zero;
+        actor->presentationFrames++;
+        actor->contactAttack = zero;
+        actor->contactFlags = zero;
+        p->unknownCBC = zero;
+        p->unknownCC0 = zero;
     }
-    if (!actor->mode)
-        CameraTracking_Update(p + 0x3dc);
+    if (!actor->locked)
+        CameraTracking_Update(&p->camera);
 }
