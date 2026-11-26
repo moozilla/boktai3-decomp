@@ -369,3 +369,9 @@ ProximityActor_NextSpawnSample,LootDepositFeedback_NextSpawnSample,helper,,Inlin
 MotionEntry_AddVelocity,HresvelgrMotion_AddVelocity,helper,,Inline helper used by this owner,src/bosses/hresvelgr/
 RegistrySelectionMenu,WorldMapMenu,struct,,San Miguel world map destination chooser,src/ui/world_map.c
 RegistrySelectionMenu,WorldMapMenu,struct,,San Miguel world map destination chooser,include/ui/world_map.h
+EffectEmitter,StrikeCrystal,identifier,,Reviewed in-game owner,src/objects/strike_crystal.c
+EffectEmitter,StrikeCrystal,identifier,,Reviewed in-game owner,include/objects/strike_crystal.h
+FrostEmitter,SabataFrost,identifier,,Reviewed in-game owner,src/effects/particles/sabata_frost.c
+FrostEmitterStatus,SabataFrostStatus,identifier,,Reviewed in-game owner,src/effects/particles/sabata_frost.c
+FrostEmitter,SabataFrost,identifier,,Reviewed in-game owner,include/effects/particles/sabata_frost.h
+FrostEmitterStatus,SabataFrostStatus,identifier,,Reviewed in-game owner,include/effects/particles/sabata_frost.h

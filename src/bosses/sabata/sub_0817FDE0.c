@@ -25,7 +25,7 @@ void Anim_SelectPaletteBank(void *, s32);
 void SceneActors_StartUnmirroredAnimation(u8 *, void *, void *, s32, s32, s32);
 void SpriteComponent_Init(void *);
 void SpriteComponent_ConfigureCollider(void *, s32, s32, s32);
-void *FrostEmitter_Create(void);
+void *SabataFrost_Create(void);
 void ActorAnimation_UpdateDirectional(void);
 void Sabata_ApplyPendingDamage(void);
 void Sabata_InitStateDispatch(void);
@@ -255,7 +255,7 @@ s32 sub_0817FDE0(struct BossInit *boss, u32 arg1)
     SceneActors_StartUnmirroredAnimation((u8 *)actor, &boss->widget, &boss->resource, 0xF4, 1, 0);
     SpriteComponent_Init(boss->sprite);
     SpriteComponent_ConfigureCollider(boss->sprite, boss->colliderRadius, 0x40, 0x1E);
-    boss->frostEmitter = FrostEmitter_Create();
+    boss->frostEmitter = SabataFrost_Create();
 
     actor->mode = 0;
     actor->action = 0;

@@ -179,3 +179,5 @@ BreakableProp_,QuestBarrier_,,Observed identity of the defining unit (Pass 4),in
 BouncingObject_,BouncingBomb_,,Observed identity of the defining unit (Pass 4),include/objects/bouncing_bombs/
 PlayerBarrier_,PileTrap_,,Observed identity of the defining unit (Pass 4),include/player/pile_trap/
 TentacleSpread_,CentipedeSpread_,,Observed identity of the defining unit (Pass 4),include/monsters/centipede/
+EffectEmitter_,StrikeCrystal_,,Confirmed in-game owner,src/objects/strike_crystal.c
+FrostEmitter_,SabataFrost_,,Confirmed in-game owner,src/effects/particles/sabata_frost.c

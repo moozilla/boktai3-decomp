@@ -1,4 +1,4 @@
-#include "effects/particles/frost_emitter.h"
+#include "effects/particles/sabata_frost.h"
 #include "npc/otenko/scene_npc_transition_palette.h"
 #include "engine/math/monster_particle_random.h"
 #include "player/cutscene/player_cue_sequence.h"
@@ -36,9 +36,9 @@ static inline s32 Scale(s32 n)
     return n >= 0 ? n >> 12 : -(-n >> 12);
 }
 
-void FrostEmitter_SpawnParticle(struct FrostEmitter *input)
+void SabataFrost_SpawnParticle(struct SabataFrost *input)
 {
-    struct FrostEmitter *emitter = input;
+    struct SabataFrost *emitter = input;
     struct FrostParticle *slot = 0;
     s32 i;
     for (i = 0; i < 12; i++) {
@@ -57,7 +57,7 @@ void FrostEmitter_SpawnParticle(struct FrostEmitter *input)
         s32 mask;
         s32 sample;
         struct ContactPosition *velocity;
-        struct FrostEmitter *animationOwner;
+        struct SabataFrost *animationOwner;
         slot->sprite.position = *emitter->source;
         PARTICLE_RANDOM_CAPTURE_ORIGIN(sampleOrigin);
         table = gRandomTable;
@@ -94,7 +94,7 @@ static inline void FrostParticle_AddVelocity(struct ContactPosition *out, struct
     out->z = out->z + v->z;
 }
 
-void FrostEmitter_UpdateParticle(struct FrostParticle *input)
+void SabataFrost_UpdateParticle(struct FrostParticle *input)
 {
     struct FrostParticle *particle = input;
     FrostParticle_AddVelocity(&particle->sprite.position, &particle->velocity);
@@ -103,13 +103,13 @@ void FrostEmitter_UpdateParticle(struct FrostParticle *input)
         particle->sprite.flags |= 1;
 }
 
-void FrostEmitter_Step(struct FrostEmitter *emitter)
+void SabataFrost_Step(struct SabataFrost *emitter)
 {
     s32 idle = 0;
     s32 i;
     for (i = 0; i < 12; i++) {
         if (emitter->particles[i].lifetime != 0)
-            FrostEmitter_UpdateParticle(&emitter->particles[i]);
+            SabataFrost_UpdateParticle(&emitter->particles[i]);
         else
             idle++;
     }
@@ -119,17 +119,17 @@ void FrostEmitter_Step(struct FrostEmitter *emitter)
             emitter->runtime.age = 0;
         }
     } else if ((emitter->runtime.age & 3) == 0)
-        FrostEmitter_SpawnParticle(emitter);
+        SabataFrost_SpawnParticle(emitter);
     emitter->runtime.age++;
 }
 
-void FrostEmitter_Update(struct FrostEmitter *emitter)
+void SabataFrost_Update(struct SabataFrost *emitter)
 {
     if (emitter->runtime.update)
         Callback_InvokeActor(emitter, emitter->runtime.update);
 }
 
-void FrostEmitter_Destroy(struct FrostEmitter *emitter)
+void SabataFrost_Destroy(struct SabataFrost *emitter)
 {
     struct FrostParticle *particle = emitter->particles;
     s32 i;
@@ -139,14 +139,14 @@ void FrostEmitter_Destroy(struct FrostEmitter *emitter)
     }
 }
 
-s32 FrostEmitter_Initialize(struct FrostEmitter *emitter)
+s32 SabataFrost_Initialize(struct SabataFrost *emitter)
 {
     void *graphics = &emitter->graphics;
     void *spriteGraphics;
     struct FrostParticle *slot;
     u16 *lifetime;
-    struct FrostEmitterStatus *state;
-    void (**update)(struct FrostEmitter *);
+    struct SabataFrostStatus *state;
+    void (**update)(struct SabataFrost *);
     u32 *age;
     u32 zero;
     u32 one;
@@ -186,12 +186,12 @@ s32 FrostEmitter_Initialize(struct FrostEmitter *emitter)
     return zero;
 }
 
-struct FrostEmitter *FrostEmitter_CreateTask(void)
+struct SabataFrost *SabataFrost_CreateTask(void)
 {
-    struct FrostEmitter *r = Task_Create(8, 0x3a8);
+    struct SabataFrost *r = Task_Create(8, 0x3a8);
     if (r != 0) {
-        Task_SetCallbacks(r, FrostEmitter_Update, FrostEmitter_Destroy);
-        if (FrostEmitter_Initialize(r) < 0) {
+        Task_SetCallbacks(r, SabataFrost_Update, SabataFrost_Destroy);
+        if (SabataFrost_Initialize(r) < 0) {
             Task_Kill(r);
             return 0;
         }
@@ -199,9 +199,9 @@ struct FrostEmitter *FrostEmitter_CreateTask(void)
     return r;
 }
 
-struct FrostEmitter *FrostEmitter_Create(void)
+struct SabataFrost *SabataFrost_Create(void)
 {
-    struct FrostEmitter *emitter = FrostEmitter_CreateTask();
+    struct SabataFrost *emitter = SabataFrost_CreateTask();
     emitter->source = 0;
     emitter->emitting = 0;
     emitter->runtime.update = 0;
@@ -209,19 +209,19 @@ struct FrostEmitter *FrostEmitter_Create(void)
     return emitter;
 }
 
-void FrostEmitter_StartEmission(struct FrostEmitter *emitter, struct ContactPosition *source)
+void SabataFrost_StartEmission(struct SabataFrost *emitter, struct ContactPosition *source)
 {
     if (emitter) {
-        void (*f)(struct FrostEmitter *);
+        void (*f)(struct SabataFrost *);
         emitter->source = source;
         emitter->emitting = 1;
-        f = FrostEmitter_Step;
+        f = SabataFrost_Step;
         emitter->runtime.update = f;
         emitter->runtime.age = 0;
     }
 }
 
-void FrostEmitter_StopEmission(struct FrostEmitter *emitter)
+void SabataFrost_StopEmission(struct SabataFrost *emitter)
 {
     if (emitter)
         emitter->emitting = 0;

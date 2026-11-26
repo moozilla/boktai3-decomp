@@ -17,7 +17,7 @@ void NavMesh_UpdateProbe(void *, void *);
 u32 ProximityVolume_ContainsPlayer(struct ProximityVolume *);
 s32 Math_Atan2(s32, s32);
 void AnimatedHazard_CreateProximity(void *, s32, s32, s32);
-void FrostEmitter_StopEmission(void *);
+void SabataFrost_StopEmission(void *);
 static inline s32 scaleOffset(s32 value)
 {
     if (value >= 0)
@@ -47,6 +47,6 @@ void ProximityVolume_Update(struct ProximityVolume *p)
             p->active = 0;
         }
     } else {
-        FrostEmitter_StopEmission(p->emitter);
+        SabataFrost_StopEmission(p->emitter);
     }
 }

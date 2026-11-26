@@ -430,7 +430,7 @@ key,callback,name
 933C,0815CBF9,ScriptActor_MoveToFromScript
 9519,080114CD,Password_Create
 9531,08006D45,ChoiceMenu_CreateFromScript
-95A8,0800C7AD,EffectEmitter_Create
+95A8,0800C7AD,StrikeCrystal_Create
 95F8,0800F80D,NumericOverlay_Create
 96CD,081DBB0D,Options_Create
 9700,0806F769,SceneEffectSchedule_RemoveFromScript

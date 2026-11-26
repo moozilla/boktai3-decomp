@@ -1,4 +1,4 @@
-#define PositionReference_SetSource FrostEmitter_StartEmission
+#define PositionReference_SetSource SabataFrost_StartEmission
 #include "global.h"
 #include "scene/collision/contact_actor.h"
 struct ProximityVolume {
@@ -9,12 +9,12 @@ struct ProximityVolume {
     u16 latch;
 };
 void ProximityVolume_TranslateBounds(void *, struct ContactPosition *);
-void FrostEmitter_StartEmission(void *, struct ContactPosition *);
+void SabataFrost_StartEmission(void *, struct ContactPosition *);
 void ProximityVolume_SetPosition(struct ProximityVolume *volume, struct ContactPosition *position)
 {
     struct ContactPosition *stored = &volume->position;
     *stored = *position;
     volume->latch = 1;
     ProximityVolume_TranslateBounds(volume->bounds, stored);
-    FrostEmitter_StartEmission(volume->reference, stored);
+    SabataFrost_StartEmission(volume->reference, stored);
 }
