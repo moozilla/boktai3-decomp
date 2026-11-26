@@ -1,0 +1,16 @@
+old_prefix,new_prefix,units,evidence
+ScenePanel,PileDriver,src/menus/scene_panel_control_and_lifecycle / src/menus/scene_panel_presentation / src/menus/scene_panel_sprite_rig / src/menus/scene_panel_subjects,CBB0 apparatus and purification run in 6201 and 6195. See the four Pile Driver identity rows.
+SingletonSlot7_,VanargandChase_,src/actors/actor_display / src/actors/singleton_slot_7 / src/effects/sprite_trail,"Stock 0072, 0076 and 0084 capture the visible Vanargand chase head at 6323."
+BossSlot2_,Sabata_,src/actors/scene_event_actor / src/bosses/boss_slot_2,The named White Forest encounter runs in 4233 and the rematch in 6415.
+EnemyD459_,AxeArmor_,src/monsters/enemy_d459,D459 runs on screen at 2993. Book #9867 names it Armor and #2538 identifies its axe shockwave.
+EnemyF426_,Statue_,src/monsters/enemy_f426,F426 runs on screen at 3182 and maps to the Statue entry at #9866.
+RegistryA8CB_,SabataRider_,src/actors/registry_a8_cb,Ending proc 6316 creates the purple bike rider. The 6323 replay names him Sabata.
+Glove_,CoffinBike_,src/monsters/glove,E881 update draws the ride in 6274 and both players in a Back Street Bike Battle.
+GridAttackActor_,NidhoggrInteriorActor_,src/actors/grid_attack_actor,Named Nidhoggr dialogue and grid attack execution in 4915.
+GridAttack_,NidhoggrInterior_,src/actors/grid_attack_actor,Named Nidhoggr dialogue and grid attack execution in 4915.
+GrowthHazard_,SolarRoot_,src/monsters/growth_hazard,Earth shots make the 1FBA plants in 3588 grow into the platforms named in text #1817.
+CannonBattery_,DeckCannonBattery_,src/monsters/cannon_battery,Deck guns in 4906 and 4859. The same 55E9 pool creates and updates them.
+CannonEmitter_,PollenFlower_,src/monsters/cannon_emitter,98CB plants in 3504 and 5181 apply the two pollen effects named in the Book.
+TentacleEnemy_,Centipede_,src/monsters/tentacle_actor,"Live 0AC7 actor in 4076 has category 9, which maps to Centipede #9851."
+TentacleActor_,CentipedeActor_,src/monsters/tentacle_actor,The 0AC7 component update runs around the visible Centipede in 4076.
+TentacleBody_,CentipedeBody_,src/monsters/tentacle_actor / src/monsters/tentacle_body,Windup and spread callbacks run while the 0AC7 Centipede attacks in 4076.

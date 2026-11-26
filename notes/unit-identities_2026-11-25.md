@@ -8,6 +8,11 @@ The layout changes are in `build/layout/corrections.csv`. Paths under
 `build/identify/` refer to local replay outputs. The original ROM and the
 translation's checkpoint bank are read-only inputs.
 
+The coordinator's batch inputs are `build/layout/corrections.csv` and
+`build/layout/prefix_renames.csv`. Their checked-in copies live under
+`symbols/`. Apply a prefix only within its listed source units. Several
+legacy prefixes also occur in unrelated parts of the ROM.
+
 ## Reproduce the capture
 
 Run at the decomp root. The translation is two levels up in a nested worker
