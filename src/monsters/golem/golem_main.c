@@ -27,14 +27,11 @@
 #include "scene/actor/scene_actor_init_actor.h"
 #include "scene/motion/scene_actor_chase_shared.h"
 
-void Golem_CenterPositionInCell(void *ptr)
+void Golem_CenterPositionInCell(struct ContactPosition *position)
 {
-    u16 *p = ptr;
-    long long mask = 0xFFFFFF00;
-
-    *p = (*p & mask) + 0x80;
-    p[1] = (mask & p[1]) + 0x80;
-    p[2] = (mask & p[2]) + 0x80;
+    position->x = (position->x & ~0xFF) + 0x80;
+    position->y = (position->y & ~0xFF) + 0x80;
+    position->z = (position->z & ~0xFF) + 0x80;
 }
 
 // Golem settle step, called with the actor context.
@@ -42,15 +39,6 @@ void Golem_CenterPositionInCell(void *ptr)
 struct Unk080C47DCObject {
     u8 unknown0[0x1C];
     struct ContactPosition position;
-};
-
-struct Unk080C47DCBody {
-    u8 unknown0[0xC];
-    struct ContactPosition position;
-};
-
-struct Unk080C47DCDelta {
-    s16 x, y, z, pad;
 };
 
 struct Unk080C47DCLink {
@@ -67,18 +55,19 @@ static inline u32 Cell(s32 x, s32 z)
     return gTerrainMap->rows[z] + x;
 }
 
-s32 Golem_AlignChargeTarget(u8 *actor)
+s32 Golem_AlignChargeTarget(void *context)
 {
+    u8 *actor = context;
     u8 *owner = actor;
     struct Unk080C47DCLink *link = (struct Unk080C47DCLink *)(actor + 0x3D4);
-    struct Unk080C47DCBody *body = (struct Unk080C47DCBody *)(actor + 0x50);
+    struct SceneActorBody *body = &((struct Golem *)actor)->chase.base.body;
     struct Unk080C47DCObject **target = (struct Unk080C47DCObject **)(actor + 0x5D0);
-    s32 found = Terrain_ApplyBlocked(*target, actor + 0x5C, actor + 0x69C);
+    s32 found = Terrain_ApplyBlocked(*target, &body->position, &((struct Golem *)actor)->target69C);
     if (found != 0) {
         s32 dx = (*target)->position.x - body->position.x;
         s32 dz = (*target)->position.z - body->position.z;
         u8 *direction;
-        struct Unk080C47DCDelta delta;
+        struct ContactPosition delta;
         struct Unk080C47DCObject **goalTarget;
         if (Cell((*target)->position.x >> 8, (*target)->position.z >> 8) !=
             Cell(body->position.x >> 8, body->position.z >> 8)) {
@@ -94,17 +83,17 @@ s32 Golem_AlignChargeTarget(u8 *actor)
         dz = (*goalTarget)->position.z - body->position.z;
         {
             u8 angle = Math_Atan2(dx, dz);
-            direction = actor + 0x68E;
+            direction = &((struct Golem *)actor)->direction68E;
             *direction = angle;
         }
         *direction = ((((*direction) + 0x20) & 0xFF) >> 6) << 6;
         {
-            struct Unk080C47DCDelta *out = &delta;
+            struct ContactPosition *out = &delta;
             struct ContactPosition *from = (struct ContactPosition *)(owner + 0x5C);
             struct ContactPosition *goal = &(*goalTarget)->position;
             s32 quadrant;
             {
-                struct Unk080C47DCDelta *first = &delta;
+                struct ContactPosition *first = &delta;
                 first->x = ((u16)goal->x) - ((u16)from->x);
             }
             out->y = ((u16)goal->y) - ((u16)from->y);
@@ -115,7 +104,7 @@ s32 Golem_AlignChargeTarget(u8 *actor)
                 Memory_Clear(owner + 0x64, 8);
         }
     } else {
-        *((u16 *)(actor + 0x680)) = found;
+        ((struct Golem *)actor)->routeDelay = found;
     }
     return 1;
 }
@@ -163,7 +152,7 @@ void SceneActorControl_RefreshMotionRoute(struct ChaseActor *actor)
 
 void Golem_RestoreRoute(struct ChaseActor *actor)
 {
-    u8 *group = (u8 *)&actor->group.common;
+    struct SceneActorChaseGroup *group = &actor->group;
     void *flags;
 
     if (SceneActorContact_QueryMotionField(actor, 0x100, &flags))
@@ -173,7 +162,7 @@ void Golem_RestoreRoute(struct ChaseActor *actor)
     if (SceneActorTurn_Flags(flags, 0x80)) {
         actor->base.field2C2 = 0x20;
         SceneActorChase_GroupSetFlags(&actor->group, 4);
-        SceneActorDelay_Prepare((void *)&actor->group.saved, *(void **)(group + 0x48), 0xC, 0x1E);
+        SceneActorDelay_Prepare((void *)&actor->group.saved, group->common.gate.control, 0xC, 0x1E);
         if (SceneActorTurn_Flags(flags, 0x80)) {
             u16 *time = &actor->group.common.gate.counter;
             *time += 0x12C;
@@ -185,16 +174,14 @@ void Golem_RestoreRoute(struct ChaseActor *actor)
         actor->base.field2C2 = 0x20;
         SceneActorDelay_Prepare((void *)&actor->group.saved, actor->base.onAlternateEntry, 7, 0x3C);
     }
-    Chase_SnapToRoute(*(struct ContactPosition **)(group + 0x200), group + 0x74);
-    (*(struct ContactPosition **)(group + 0x200))->pad = 0;
-    if (!Chase_TryRoute(actor, *(void **)(group + 0x1FC), &actor->base.body.position,
+    SceneActorChase_SnapToRoute(group->destination, &group->homeRoute);
+    group->destination->pad = 0;
+    if (!Chase_TryRoute(actor, group->route, &actor->base.body.position,
                         &actor->base.tracking.target->position))
-        Callback_InvokeActor(actor, *(void **)(group + 0x224));
+        Callback_InvokeActor(actor, group->fallback);
 }
 
 s32 Nav_IsPositionInMesh(void *, struct ContactPosition *, struct ContactPosition *);
-
-void Golem_CenterPositionInCell(void *ptr);
 
 void SceneActorRoute_CommitReachableDestination(struct ChaseActor *actor)
 {
@@ -295,9 +282,9 @@ void Golem_ResetIdleControl(struct ChaseActor *actor)
 
 s32 SceneActorProfiles_FindOrAdd(u32, u32);
 
-void Golem_InitAnimationProfile(u8 *p)
+void Golem_InitAnimationProfile(struct RoomActor *actor)
 {
-    *(u32 *)(p + 0x308) = SceneActorProfiles_FindOrAdd(3, 0);
+    actor->profileId = SceneActorProfiles_FindOrAdd(3, 0);
 }
 
 void Memory_Clear(void *, int);
@@ -1120,8 +1107,6 @@ void Golem_UpdateChargeStop(struct ChaseActor *actor)
         actor->base.stepDone = 1;
     }
 }
-
-s32 Golem_AlignChargeTarget(u8 *actor);
 
 /* Decelerate, approach the current cell center, then restore route motion. */
 
