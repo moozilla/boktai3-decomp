@@ -14,6 +14,7 @@ struct AxeTrailSlot {
     const void *resource;
     u16 lifetime, unknown5E;
 };
+typedef char AxeTrailSlotSize[(sizeof(struct AxeTrailSlot) == 0x60) ? 1 : -1];
 
 /* Axe's class fields past the chase actor (Axe_Create allocates 0xF24 bytes; provisional). */
 struct Axe {
@@ -61,7 +62,8 @@ struct Axe {
     u32 flagsE4C;
     u8 unknownE50[6];
     u16 distance;
-    u8 unknownE58[0x50];
+    u16 groundHeight;
+    u8 unknownE5A[0x4E];
     u16 curveTime; /* 0..1024 along the movement curve, +128 per step */
     u8 hoverPhase; /* index into the sine table for the hover bob, +2 per frame */
     u8 hoverEnabled;
@@ -86,10 +88,12 @@ struct Axe {
     u16 reactionHoldTimer; /* while set, reactionFlags 0x20 is held (Axe_UpdateDamageSpin) */
     u8 damageSpinStarted;
     u8 variant;
-    u8 unknownED8[0x2C];
+    struct ChaseRouteProbe routeProbe;
+    struct ContactPosition destination;
     struct ContactPosition curveStart, curveEnd; /* the movement curve's endpoints */
     u32 clearF14[2];
     struct ContactPosition target;
 };
+typedef char AxeSize[(sizeof(struct Axe) == 0xF24) ? 1 : -1];
 
 #endif // GUARD_AXE_H
