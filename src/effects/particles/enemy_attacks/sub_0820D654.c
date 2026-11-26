@@ -1,4 +1,4 @@
-#include "monsters/enemy_particle.h"
+#include "effects/particles/enemy_particle.h"
 struct EnemyParticle *EnemyAttackParticle_FindFreeSlot(struct EnemyParticlePool *a, s32 *out)
 {
     struct EnemyParticle *e = a->slots;

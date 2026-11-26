@@ -1,4 +1,4 @@
-#include "monsters/enemy_particle.h"
+#include "effects/particles/enemy_particle.h"
 #include "player/cutscene/player_cue_sequence.h"
 #include "monsters/poison_hand.h"
 #include "engine/video/display_sequence_inline.h"

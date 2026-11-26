@@ -1,6 +1,6 @@
 #include "engine/math/math_shift.h"
 #include "engine/engine_pause.h"
-#include "monsters/enemy_particle.h"
+#include "effects/particles/enemy_particle.h"
 #include "engine/engine.h"
 #include "engine/ram.h"
 #include "engine/video/display_sequence_sprite.h"

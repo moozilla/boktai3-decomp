@@ -1,4 +1,4 @@
-#include "monsters/enemy_particle.h"
+#include "effects/particles/enemy_particle.h"
 void EnemyAttackParticle_ReleaseSlot(struct EnemyParticlePool *a, struct EnemyParticle *b, u32 n)
 {
     b->sprite.flags |= 1;

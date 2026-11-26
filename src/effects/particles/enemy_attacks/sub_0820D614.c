@@ -1,4 +1,4 @@
-#include "monsters/enemy_particle.h"
+#include "effects/particles/enemy_particle.h"
 s32 EnemyAttackParticle_InitPool(void *);
 void EnemyAttackParticle_UpdatePool(void *);
 void EnemyAttackParticle_DestroyPool(void *);
