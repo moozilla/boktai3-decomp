@@ -38,8 +38,11 @@ struct Skeleton {
     s32 healthThreshold;
     struct ChaseRouteProbe routeProbe;
     struct ContactPosition destination;
-    u8 unknown748[4];
+    u16 visibilityFrame; /* Frames elapsed in the visibility flicker transition. */
+    u8 unknown74A[2];
 };
+
+typedef char SkeletonSize[(sizeof(struct Skeleton) == 0x74C) ? 1 : -1];
 
 void SceneActorScript_TriggerCallOnCount(struct ChaseActor *actor);
 u8 SceneActorReaction_IsRangeReady(struct ChaseActor *actor);

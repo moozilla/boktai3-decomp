@@ -232,7 +232,7 @@ void Skeleton_HandleVisibilityRequest(struct ChaseActor *input, const u16 *input
 {
     struct ChaseActor *actor = input;
     const u16 *request = inputRequest;
-    struct SceneActorControlMotionState *state = SceneActorControl_GetMotionState(actor);
+    struct Skeleton *state = actor->base.context;
     u32 unavailable = SceneActor_ActionsBlocked(actor);
     if (unavailable)
         return;
@@ -250,7 +250,7 @@ void Skeleton_HandleVisibilityRequest(struct ChaseActor *input, const u16 *input
             u32 *flags;
             u32 active;
             u32 *savedFlags;
-            flags = (u32 *)((u8 *)state + 0x6DC);
+            flags = &state->actionFlags;
             active = *flags & mask;
             savedFlags = flags;
             active = SceneActorControl_TestFlags(active, ~0);
@@ -259,7 +259,7 @@ void Skeleton_HandleVisibilityRequest(struct ChaseActor *input, const u16 *input
                 if (hidden) {
                     {
                         u16 *timer;
-                        timer = (void *)((u8 *)state + 0x748);
+                        timer = &state->visibilityFrame;
                         *timer = 0;
                     }
                     {
@@ -277,7 +277,7 @@ void Skeleton_HandleVisibilityRequest(struct ChaseActor *input, const u16 *input
             u32 *flags;
             u32 active;
             u32 *savedFlags;
-            flags = (u32 *)((u8 *)state + 0x6DC);
+            flags = &state->actionFlags;
             active = *flags & mask;
             savedFlags = flags;
             active = SceneActorControl_TestFlags(active, ~0);
@@ -288,7 +288,7 @@ void Skeleton_HandleVisibilityRequest(struct ChaseActor *input, const u16 *input
                     {
                         u32 zero = hiddenZero;
                         u16 *timer;
-                        timer = (void *)((u8 *)state + 0x748);
+                        timer = &state->visibilityFrame;
                         *timer = zero;
                     }
                     {
@@ -347,18 +347,16 @@ static inline void Show(struct ChaseActor *actor)
 
 void Skeleton_UpdateVisibilityFlicker(struct ChaseActor *actor)
 {
-    struct SceneActorControlMotionState *state;
+    struct Skeleton *state;
     u32 unavailable = SceneActor_ActionsBlocked(actor);
     if (unavailable)
         return;
     {
-        u32 offset = 0x3D0;
-        u32 mask;
+            u32 mask;
         u32 active;
-        state = *(void **)((u8 *)actor + offset);
+        state = actor->base.context;
         mask = 0xC000;
-        offset = 0x6DC;
-        active = SceneActorControl_TestFlags(*(u32 *)((u8 *)state + offset), mask);
+        active = SceneActorControl_TestFlags(state->actionFlags, mask);
         if (!active)
             return;
     }
@@ -367,7 +365,7 @@ void Skeleton_UpdateVisibilityFlicker(struct ChaseActor *actor)
         u32 value;
         {
             u16 *field;
-            field = (void *)((u8 *)state + 0x748);
+            field = &state->visibilityFrame;
             counter = (u32)*field << 16;
         }
         value = counter >> 16;
@@ -386,7 +384,7 @@ void Skeleton_UpdateVisibilityFlicker(struct ChaseActor *actor)
             u32 *inputFlags;
             u32 *flags;
             u32 active;
-            inputFlags = (u32 *)((u8 *)state + 0x6DC);
+            inputFlags = &state->actionFlags;
             active = *inputFlags & mask;
             flags = inputFlags;
             active = SceneActorControl_TestFlags(active, ~0);
@@ -433,7 +431,7 @@ void Skeleton_UpdateVisibilityFlicker(struct ChaseActor *actor)
         }
     }
     {
-        u16 *counter = (void *)((u8 *)state + 0x748);
+        u16 *counter = &state->visibilityFrame;
         (*counter)++;
     }
 }
