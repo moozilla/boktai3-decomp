@@ -10,9 +10,9 @@
 
 void SceneActorAttachment_ReplaceResponseSlot(void *, u32, u32, u32);
 void SceneActorEffects_AdvanceSteps(void *, u32);
-void SceneActor_CallContextScriptB(void *);
-void Vorn_SendMessage(void *);
-void SceneActorPlacement_PlayCategoryEventSound(void *);
+void SceneActor_CallContextScriptB(struct RoomActor *actor);
+void Vorn_SendMessage(struct ChaseActor *actor);
+void SceneActorPlacement_PlayCategoryEventSound(struct ChaseActor *actor);
 
 static inline u8 Vorn_RandomSparkCount(const u16 *table, u32 *cursor)
 {
@@ -90,7 +90,7 @@ void Vorn_UpdateDefeat(struct ChaseActor *actor)
     actor->base.stepDone = 1;
     if (!SceneActorTurn_ActorFlags(actor, 0x400)) {
         u8 category;
-        SceneActor_CallContextScriptB(actor);
+        SceneActor_CallContextScriptB(&actor->base);
         {
             union VornSpreadVector *spread;
             const struct ContactPosition *origin;
