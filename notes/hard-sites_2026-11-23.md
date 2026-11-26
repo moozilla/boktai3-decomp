@@ -172,3 +172,32 @@ The persistent search is in `build/matchsearch/SpriteTrail_UpdatePositions`.
 The landed unit passes the stock check at 304 bytes and has zero linter
 reports. This removes one volatile error. The precedent for the registry is
 a reassignment that survives through the alias pass and gets deleted later.
+
+## 2026-11-25: first registry insertion recovered
+
+`TargetRegistry_RegisterActor` (0815F6A8) matches at 72 bytes using the
+existing motion-target and registry types. A shared insertion operation
+checks the head before scanning the rest of the list. Empty and singleton
+lists join at a short-list link step. Longer lists go through the scan and
+link before joining the same head update.
+
+Explicit next-slot locals, two-set pointer reassignments, one-node array
+views and an intrusive-link aggregate still removed the second singleton
+load. The base test and scalar classification described above explain why
+changing just one side was insufficient. `AGBCC_NOSTRICT=1` alone also
+left the baseline at 4 ROM / 4 draft instructions off. In the baseline,
+`why 87` traced the destination-address change to the first CSE pass.
+
+Duplicating the link step for the empty and nonempty branches restored both
+loads but left the initial empty-list branch landing on the store, four
+bytes later than in the ROM. `why 91` showed that CSE followed the empty
+edge and replaced that branch's loaded head with the register it had just
+tested. `CSE_NOFOLLOW=2` matched that draft. Peeling the first node gives
+the short-list block multiple predecessors. Both link steps then retain
+the loads through CSE, and jump cleanup merges the corresponding machine
+instructions. The shared head update retains its separate load.
+
+The finished unit and all five header dependents match. The volatile error
+is gone. The existing flag-mask argument still produces one literal-param
+warning. The persistent search is in
+`build/matchsearch/TargetRegistry_RegisterActor`.
