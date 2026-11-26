@@ -1,9 +1,6 @@
+#include "scene/motion/scene_actor_chase_shared.h"
 #include "scene/actor/scene_actor_behavior.h"
 void SceneActorAttachment_ReplaceResponseSlot(struct RoomActor *, u32, u32, u32);
-struct SceneActorBehaviorPlayerSlot {
-    u8 unknown0[8];
-    u8 slot;
-};
 static inline u8 Test(u32 value, u32 mask)
 {
     if (value & mask)
@@ -32,8 +29,7 @@ void SceneActorBehavior_RecordDefeat(struct RoomActor *inputActor)
     u32 slot;
     {
         struct SceneActorChaseTracking *gate = &inputActor->tracking;
-        u32 mask = 8;
-        if (Test(gate->flags, mask))
+        if (SceneActorChase_TrackingFlags(gate, 8))
             return;
     }
     {
@@ -58,7 +54,7 @@ void SceneActorBehavior_RecordDefeat(struct RoomActor *inputActor)
         if (actor->statusFlags & mask)
             return;
     }
-    slot = ((struct SceneActorBehaviorPlayerSlot *)actor->tracking.target)->slot;
+    slot = actor->tracking.target->playerIndex;
     {
         u16 *counter;
         u32 value;
