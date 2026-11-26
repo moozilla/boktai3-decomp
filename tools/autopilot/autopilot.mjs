@@ -2,7 +2,7 @@
 // The Autopilot: plays Boktai 3 on the source port from typed game state.
 //
 //   node tools/autopilot/autopilot.mjs m1 [--save F] [--out DIR] [--shots]
-//   node tools/autopilot/autopilot.mjs story [--from MOVIE] [--until-scene SCENE] [--verify]
+//   node tools/autopilot/autopilot.mjs story [--from MOVIE|--save SAV] [--until-scene SCENE] [--verify]
 //
 // Runs headless in-process (port/agent/session.mjs) with the agent library plus
 // tools/autopilot/lib/*.js. Each milestone is a goal; the run writes the input
@@ -130,7 +130,10 @@ const GOALS = {
   // scenes not visited yet (stages.json doors, else any box the live map has that a
   // door record names). Logs each stop; --scenes N stops after N rooms.
   *story(g, L) {
-    if (!from && !(yield* GOALS.m1(g, L))) return false;
+    if (!from) {
+      if (battery) yield* L.continueSave();
+      else if (!(yield* GOALS.m1(g, L))) return false;
+    }
     const visited = VISITED, limit = +(opt('--scenes', 8));
     const destination = +opt('--until-scene', -1), routeGoal = +opt('--goal', destination);
     let prev, keyGoal;
@@ -449,13 +452,14 @@ function* throughDoor(g, L, box) {
   return false;
 }
 
-// End a run at a stable point (the player still for 30 frames, at most 600), so a
-// replay compares positions rather than a frame inside a walk.
+// End a run after 30 still frames (at most 600), including elevation and scene
+// changes so the final comparison is outside a fall or entrance animation.
 function* settle(g) {
   let last = '', still = 0;
   for (let i = 0; i < 600 && still < 30; i++) {
     yield 1;
-    const p = g.$.gPlayers[0], k = p ? `${p.position.x},${p.position.z}` : '-';
+    const p = g.$.gPlayers[0];
+    const k = p ? `${g.lib.where().scene}:${p.position.x},${p.position.y},${p.position.z}` : '-';
     still = k === last ? still + 1 : 0;
     last = k;
   }
