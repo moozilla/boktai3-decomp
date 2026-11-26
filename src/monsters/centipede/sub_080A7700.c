@@ -1,4 +1,5 @@
 #include "scene/motion/scene_actor_chase_reaction.h"
+#include "monsters/scene_route_sample.h"
 #include "global.h"
 #include "scene/actor/scene_actor_reaction.h"
 #include "scene/motion/scene_actor_terrain.h"
@@ -19,12 +20,6 @@ static inline u8 Take(u8 *p)
     return 0;
 }
 
-static inline s32 Shift(s32 n, u32 bits)
-{
-    if (n >= 0)
-        return n >> bits;
-    return -((-n) >> bits);
-}
 
 static inline void Control(struct ChaseActor *a, void *cb, u32 kind)
 {
@@ -76,15 +71,16 @@ void sub_080A9DB0(void *, s32, s32);
 void Centipede_UpdateOscillation(void *, s32, s32);
 static inline u8 Approach(struct ChaseActor *actor, struct SavedMotion *saved, s32 speed)
 {
-    u8 *motion = (u8 *)actor + 0x50;
-    s16 dx = saved->position.x - *(u16 *)(motion + 12);
-    s16 dz = saved->position.z - *(u16 *)(motion + 16);
+    struct SceneActorBody *body = &actor->base.body;
+    s16 dx = saved->position.x - body->position.x;
+    s16 dz = saved->position.z - body->position.z;
     if ((dx < 0 ? -dx : dx) <= 32 && (dz < 0 ? -dz : dz) <= 32)
         return 1;
     if (dx || dz) {
-        motion[9] = Math_Atan2(dx, dz);
-        *(u16 *)(motion + 20) += Shift(gUnk_086149C4[(motion[9] + 64) & 255] * speed, 12);
-        *(u16 *)(motion + 24) += Shift(gUnk_086149C4[motion[9]] * speed, 12);
+        body->direction = Math_Atan2(dx, dz);
+        body->motion.x +=
+            SceneRoute_ScaleComponent(gUnk_086149C4[(body->direction + 64) & 255] * speed);
+        body->motion.z += SceneRoute_ScaleComponent(gUnk_086149C4[body->direction] * speed);
     }
     return 0;
 }
@@ -92,9 +88,9 @@ static inline void Scale(struct ChaseActor *actor)
 {
     u16 *scale = SceneActorChase_PrepareAnimationScale(actor, 0xA02F);
     if (actor->base.drawableKind == 0)
-        Anim_SetDurationScale((u8 *)actor->base.drawable + 0x48, *scale);
+        Anim_SetDurationScale(&((struct SceneActorAnimationSequenceDrawable *)actor->base.drawable)->sequence, *scale);
     else
-        Anim_SetFrameDurationScale((u8 *)actor->base.drawable + 0x20, *scale);
+        Anim_SetFrameDurationScale(&((struct SceneActorAnimationTileDrawable *)actor->base.drawable)->tile, *scale);
 }
 // confidence=low: approaches a saved waypoint and requests a turn when the target heading differs.
 void CentipedeBody_ApproachWaypoint(struct ChaseActor *actor)
@@ -109,7 +105,7 @@ void CentipedeBody_ApproachWaypoint(struct ChaseActor *actor)
         *flag = one;
         *(u16 *)(body + 0x8D8) = zero;
         {
-            void *cb = *(void **)((u8 *)actor + 0x228);
+            void *cb = actor->base.onAlternateEntry;
             actor->base.field2B2 = one;
             actor->base.stepDone = 0;
             actor->base.controlKind = one;
