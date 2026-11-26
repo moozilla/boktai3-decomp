@@ -416,6 +416,41 @@ draws the green spiral around Django. Both weapon probes stay idle. See
 `probes.tsv`. The sunlight dependency and visual are verified in this
 controlled run. The normal input trigger remains open.
 
+### Pile Trap placement and activation
+
+Tags: Pile Trap, Solar Pile, Player, quick change, sprites
+
+The Coffin Shopkeeper's original proc 2446 uses text #4166 to name
+the special action Pile Trap. Text #4173 gives SELECT+L to select it.
+#4175 gives L to place it, and #4177 gives A to release the Solar
+Pile. The stock 0037 battery has all four special-action slots,
+including request kind 3. The earlier 0032 sample lacked that slot.
+
+Warp 0037 to 6201, entrance 7, story 58, and follow
+`resume4-pile-trap-effect/commands.txt`. After the warp, the replay
+uses directional and equipment inputs. The Quick Change commit at
+frame 2470 sets request kind 3. At 2488 L starts motion 19 through
+`Player_UpdateActionEffectSequence`. At 2508 it calls
+`PlayerBarrier_TryPlace` on the task at 0200D2A4. At 2537 A starts
+motion 20 and runs 08144AAC, which calls `PlayerBarrier_TryActivate`
+on the same task.
+
+The task initializes DC7A and A680 at frame 1470. The gold ring uses
+drawable 0200D398. At frame 2546 the renderer submits the Solar Pile
+column from 0200D3C4 alongside the ring. See `before.png`, `placed.png`,
+and `release02.png` in the replay directory. This identifies the
+runtime purpose of the old player barrier unit and the two motion
+files. Use `player/pile_trap` and scope the `PileTrap_` prefix to
+the former `player_barrier` directory. The sampled inputs reach
+motions 19 and 20. The controlled motion 9, 16, and 17 handlers
+receive zero hits.
+
+```sh
+run=build/identify/replays/resume4-pile-trap-effect
+runner=build/identify/pass3/link_harness
+BOKTAI3_SAV="$run/start.sav" nice -n 19 "$runner" baserom.gba "$run/commands.txt" "$run"
+```
+
 ### Plasma Cannon contact and the timed reaction
 
 Load 0060 with `scene=5875 entrance=7 story=166`. The cannon's native update

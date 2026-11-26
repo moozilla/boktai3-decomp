@@ -55,3 +55,4 @@ sub_08243B0C,LinkPlayer_Create,08243B0C,Original constructor creates the 0xCAC t
 MovingGlyph_,CutsceneShot_,src/effects/particle_burst/moving_glyph.c,PlayerCue_Shoot loads 210E and the original task moves the shot across the 6201 screen. The 2961 stock run hits the same unit.
 SpriteParticle_,VanargandMotes_,src/effects/sprite_particle,The live Vanargand presentation callback uses the original 081FF09C pool in the controlled 6323 burst. Scope to 081FED9C–081FF38C.
 ParticleEffect_,PlayerActionFlash_,src/effects/particle_effect,"Original Player motion 9 runs the gold flash, orbit effect and terminal update at 6201."
+PlayerBarrier_,PileTrap_,src/player/player_barrier,Proc 2446 text #4166 and the 0037 outdoor replay tie request kind 3 and the normal L/A motions to the DC7A/A680 Pile Trap task.
