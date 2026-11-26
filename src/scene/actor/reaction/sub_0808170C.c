@@ -29,15 +29,6 @@ static inline void Recovery_ClearTrackingFlags(struct SceneActorChaseTracking *t
     tracking->flags &= mask;
 }
 
-static inline void Recovery_ClearRoute(struct ChaseActor *actor,
-                                       struct SceneActorRegistryControl *control)
-{
-    SceneActorChase_ClearActorFlags(actor, 0x141C0);
-    control->counter = 0;
-    control->field14 = 0;
-    control->timer = 0;
-}
-
 static inline u8 Recovery_ActorCollisionFlags(struct ChaseActor *actor, u32 bits)
 {
     return SceneActorChase_TestField(&actor->base.placementFlags, bits);
@@ -118,7 +109,7 @@ void SceneActorReaction_SettleDisplacement(struct ChaseActor *actor)
         actor->base.field2C2 = 64;
         Recovery_ClearTrackingFlags(&actor->base.tracking, 0x18);
         SceneActorChase_ClearStatusFlags(actor, 0x1000000);
-        Recovery_ClearRoute(actor, &group->common.control);
+        SceneActorReaction_ResetRouteControl(actor, &group->common.control);
     }
     if (!actor->base.drawableKind) {
         struct DisplaySequenceState *status = &((struct SceneActorAnimationSequenceDrawable *)actor->base.drawable)->sequence;
