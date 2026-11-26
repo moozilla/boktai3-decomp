@@ -1039,3 +1039,30 @@ The compact display slot was reserved during Glove initialization.
 The file also contains a following ability effect, called from
 `ActorAction_TrySpawn`, which uses its own 409C pool. The shipped
 configuration selecting primary kind two remains unobserved.
+
+### Nidhoggr burst release and Coffin Bike palette recovery
+
+Tags: Nidhoggr, Coffin Bike, palette, 4147, contact burst
+
+Load `bank/0046/checkpoint.ss` at 4915. The
+`resume-grid-contact-inspect` snapshot has a live GridAttack actor at
+0200DE24 and ContactBurst at 0200F3C4. In the matched release run
+`resume-grid-scatter-release`, write 255 to its contact count limit
+at 0200DFCA for three frames. The original grid actor calls
+`ContactBurst_SetEnabled` with zero at frame 1930. The attached
+task then calls `DirectionalParticle_Spawn` eight times with the
+4147 sprite. The renderer submissions for the resulting slots appear
+at frame 1933 in the same screenshot. The comparison run
+`resume-grid-scatter-control` keeps the original threshold and
+shows the intact contact burst.
+
+Load 0008's 6274 Coffin Bike snapshot and compare the
+`resume-bike-fade-{control,recovery}` runs. In recovery, enable the
+secondary path, set action kind one and stage a one-frame recovery
+timer. `Glove_UpdateStopping` invokes `PalFade_Start` on its live
+motion at frame 1898 with palette rows 0378 and 0379. Compare
+`initial.png` and `fading.png` for the gradual restoration.
+The matched screenshots differ only around the bike and rider.
+The early and middle OBJ palette dumps differ in the banks used
+by those draws. At `finished.png` both the palette and the
+screenshot match the no-fade run exactly.

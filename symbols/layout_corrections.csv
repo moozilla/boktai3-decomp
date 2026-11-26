@@ -15,14 +15,14 @@ src/actors/singleton_slot_7,src/bosses/vanargand,"GCL 6325 calls 6314, which cre
 src/actors/tagged_scene_npc,src/npc/kuro,"D774→E00E with name ID 51E2. Procs 2235/2266 connect that actor to text #3515, Kuro."
 src/effects/animated_particles,src/effects/particles/impact_bursts,3DB0’s shatter dust and the Vanargand burst use the same animated manager.
 src/effects/debris_particles,src/objects/bat_curtain,0014→6401 5734 Count rematch. A staged hit on the live curtain calls 08012B34 and draws DA6D debris while the curtain flashes.
-src/effects/directional_particles,src/effects/particles/impact_fragments,Stage original 4147 scattering sprites and trace ContactBurst_Update ownership. Place with the other impact fragments.
+src/effects/directional_particles,src/effects/particles/impact_fragments,0046→4915. Nidhoggr’s native ContactBurst release creates eight 4147 fragments. Keep its two files with the other impact fragment primitives.
 src/effects/effect_emitter,src/objects/strike_crystal.c,Green 066A strike crystal drawn by original 95A8 and proc 1179. The same crystal actor runs in Pirate Island.
 src/effects/effect_part,src/effects/actor_attachments,"Live attack effects attach to the Player through 0E10, with the shared manager in other actor encounters."
 src/effects/fading_particle_groups,src/objects/hazards/falling_object_effects,Original FallingObject burst calls this group; recorded standalone red-orange flame motes in 3955. Keep with falling hazards.
 src/effects/five_slot_burst_emitter,src/effects/particles/spark_explosions,"Original registry 1488 through proc 1043. Native emitter draws sparks, then smoke."
 src/effects/fragment_groups,src/effects/particles/impact_fragments,Staged type 0 uses 84EE and creates a radial spread of white-blue fragments. The implementation accepts several debris sprite types.
 src/effects/frost_emitter,src/effects/particles/sabata_frost.c,EC71 boss creates the emitter. Controlled start during White Forest fight draws 4384 frost. The source also contains one Otenko script mode entry.
-src/effects/pal_fade/actor_palette_fade.c,src/effects/palette/actor_palette_fade.c,PalFade_Update runs while riding the Coffin Bike. Adjacent challenge records belong in game state.
+src/effects/pal_fade/actor_palette_fade.c,src/effects/palette/actor_palette_fade.c,0008→6274. The live Coffin Bike recovery branch starts the fade of rows 0378 and 0379 and its actor colors visibly recover.
 src/effects/particle_burst,src/effects/particles/action_trails,Player action 13 uses the orbiting trail. The moving glyph file handles a separate effect and can be routed separately.
 src/effects/particle_burst/moving_glyph.c,src/effects/particles/moving_glyph.c,MovingGlyph code runs in the Count-area control independently of Player action trail particles.
 src/effects/particle_burst_effect/following_sprite_effect.c,src/effects/sprites/bike_charge_and_following_effects.c,0008→6274. Controlled Coffin Bike mode 2 B hold gathers motes then shows the rider’s compact 409C marker. A separate 409C following ability pool shares this file.
