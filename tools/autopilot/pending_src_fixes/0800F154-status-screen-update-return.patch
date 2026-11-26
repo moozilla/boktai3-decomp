@@ -1,0 +1,16 @@
+0800F154 status-screen-update-return
+
+BgGfx_LoadTilemapSimple exits through r0 and the caller preserves its return address.
+
+The explicit form changed the ROM bytes. The guarded form passed the unit ROM check.
+
+--- a/src/status_screen_fade.c
++++ b/src/status_screen_fade.c
+@@ -190,4 +190,7 @@
+     StatusScreen_RefreshDirtyDisplays(p);
+     BgGfx_LoadTilemapSimple(0, 0, 0, 0, 0);
++#ifdef UBFIX
++    return 0x0800F1B5; // preserve the inherited GBA return value
++#endif
+ }
+ 

@@ -28,6 +28,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import * as zlibModule from 'node:zlib';
 import { createGame, keyMask } from './gameapi.mjs';
+import { runGame } from '../web/run-game.mjs';
 
 const ROOT = fileURLToPath(new URL('../..', import.meta.url));
 const REGIONS = [[0x02000000, 0x40000], [0x03000000, 0x8000], [0x04000000, 0x400], [0x05000000, 0x400],
@@ -147,7 +148,7 @@ export async function openSession(opts = {}) {
       movie.length = 0;
       script = null;
       pending = gen;
-      try { ex.port_game_run(saveSize); } catch (e) { if (!(e instanceof Stop)) throw e; }
+      try { runGame(ex, saveSize); } catch (e) { if (!(e instanceof Stop)) throw e; }
       const t = stopped;
       script = null;
       pending = null;

@@ -1,0 +1,16 @@
+08162598 attack-effect-destroy-return
+
+Sprite_Remove returns through r0. The loop counter and teardown stores leave
+the return address of that final removal in r0.
+
+The explicit form changed the ROM bytes. The guarded form passed the unit ROM check.
+
+--- a/src/fn/sub_08162598.c
++++ b/src/fn/sub_08162598.c
+@@ -16,3 +16,6 @@
+     z = 0;
+     gPlayerAttackEffect = z;
++#ifdef UBFIX
++    return 0x081625A7; // preserve the inherited GBA return value
++#endif
+ }

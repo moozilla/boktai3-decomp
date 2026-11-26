@@ -14,7 +14,7 @@ PY      := python3
 ROM     := build/boktai3.gba
 SHA1    := 2651c5e6875ac60abff734510d152166d211c87c
 
-.PHONY: all compare setup disasm clean shifttest format format-check mod english port-demo
+.PHONY: all compare setup disasm clean shifttest format format-check mod english port-demo port-verify
 # Default: split asm around src/, compile with agbcc, link, verify SHA-1
 all: gen/code_sym.s gen/data.s
 	$(PY) tools/build.py
@@ -78,5 +78,8 @@ format-check:
 	@$(PY) tools/source_layout.py --format-files | xargs $(CLANG_FORMAT) --dry-run --Werror
 
 # Play the source port in a browser (builds build/port/game/game.wasm; see port/README.md).
+port-verify:
+	$(or $(wildcard build/venv/bin/python),$(PY)) port/tests/verify.py
+
 port-demo:
 	python3 port/serve.py

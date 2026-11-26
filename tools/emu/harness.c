@@ -30,7 +30,11 @@
 //   watchpc ADDR LO HI  arm a latch: set when ADDR (hex) executes with r0 in
 //                       [LO, HI] (decimal), e.g. Text_LookupString of a string
 //   tick ADDR           the function holdt counts (hex), e.g. the game's input read
-//   tickdump NAME FROM:TO ADDR:LEN[,...]  append the regions to OUTDIR/NAME.bin at the
+//   fasttick ADDR       count at a Thumb literal load at entry or immediately after PUSH.
+//                       Samples can differ from tick in the stack written by PUSH.
+//   tickdump NAME FROM:TO ADDR:LEN[,ADDR+OFFSET:LEN,...]  append the regions to OUTDIR/NAME.bin at the
+//                       entry to each selected tick. ADDR+OFFSET follows a RAM pointer.
+//                       "keyinput" reads the current KEYINPUT halfword through the bus.
 //                       entry of each tick FROM..TO-1 (counted from "tick"; decimal)
 //   holdt KEYS N        hold keys (NONE for none) until ADDR has run N more times:
 //                       inputs keyed to game ticks, so lag frames do not shift them
@@ -204,7 +208,17 @@ static inline void note_word(uint32_t addr, int nwords) {
 	for (int i = 0; i < nwords && w + i < ROM_SIZE / 4; ++i)
 		if (!rom_word32[w + i]) rom_word32[w + i] = pc;
 }
-static uint32_t h_load32(struct ARMCore* c, uint32_t a, int* cc) { note_read(a & ~3u, 4); note_word(a & ~3u, 1); return orig.load32(c, a, cc); }
+static uint32_t fast_tick_pc, fast_tick_address;
+static int fast_tick_running;
+static void count_tick(void);
+
+static uint32_t h_load32(struct ARMCore* c, uint32_t a, int* cc) {
+	if (fast_tick_running && a == fast_tick_address && cur_pc() == fast_tick_pc)
+		count_tick();
+	note_read(a & ~3u, 4);
+	note_word(a & ~3u, 1);
+	return orig.load32(c, a, cc);
+}
 static uint32_t h_load16(struct ARMCore* c, uint32_t a, int* cc) { note_read(a & ~1u, 2); return orig.load16(c, a, cc); }
 static uint32_t h_load8(struct ARMCore* c, uint32_t a, int* cc) { note_read(a, 1); return orig.load8(c, a, cc); }
 static uint32_t h_loadMultiple(struct ARMCore* c, uint32_t base, int mask, enum LSMDirection dir, int* cc) {
@@ -290,21 +304,66 @@ static int tick_hits;
 // ticks [tickdump_from, tickdump_to) (appended to OUTDIR/NAME.bin, one record per tick)
 static long tick_total;
 static long tickdump_from = -1, tickdump_to = -1;
-static struct { uint32_t addr, len; } tickdump_r[4];
+static struct { uint32_t addr, offset, len; int indirect, keyinput; } tickdump_r[32];
 static int tickdump_n;
 static FILE* tickdump_f;
 
+static int tickdump_ram(uint32_t addr, uint32_t len) {
+	return (addr >= 0x02000000 && addr < 0x02040000 && len <= 0x02040000 - addr) ||
+	       (addr >= 0x03000000 && addr < 0x03008000 && len <= 0x03008000 - addr);
+}
+
 static void tickdump_hit(void) {
 	if (!tickdump_f || tick_total < tickdump_from || tick_total >= tickdump_to) return;
-	for (int r = 0; r < tickdump_n; ++r)
-		for (uint32_t i = 0; i < tickdump_r[r].len; ++i)
-			fputc(core->rawRead8(core, tickdump_r[r].addr + i, -1), tickdump_f);
+	for (int r = 0; r < tickdump_n; ++r) {
+		if (tickdump_r[r].keyinput) {
+			// The raw I/O image is updated by a keypad read and may hold the previous keys.
+			uint16_t keys = core->busRead16(core, 0x04000130);
+			fputc(keys & 0xff, tickdump_f);
+			fputc(keys >> 8, tickdump_f);
+			continue;
+		}
+		uint32_t addr = tickdump_r[r].addr, len = tickdump_r[r].len;
+		int readable = 1;
+		if (tickdump_r[r].indirect) {
+			uint32_t ptr = core->rawRead32(core, addr, -1);
+			addr = ptr + tickdump_r[r].offset;
+			readable = tickdump_ram(ptr, 1) && addr >= ptr && tickdump_ram(addr, len);
+		}
+		for (uint32_t i = 0; i < len; ++i)
+			fputc(readable ? core->rawRead8(core, addr + i, -1) : 0, tickdump_f);
+	}
+}
+
+static void count_tick(void) {
+	tickdump_hit();
+	tick_hits++;
+	tick_total++;
+}
+
+static int set_fast_tick(uint32_t entry) {
+	uint32_t pc = entry;
+	uint16_t opcode = core->rawRead16(core, pc, -1);
+	if ((opcode & 0xfe00) == 0xb400) {
+		pc += 2;
+		opcode = core->rawRead16(core, pc, -1);
+	}
+	if ((opcode & 0xf800) != 0x4800) return 0;
+	fast_tick_pc = pc;
+	fast_tick_address = ((pc + 4) & ~3u) + (opcode & 0xff) * 4;
+	return 1;
 }
 
 static void run_frames(int n) {
 	for (int f = 0; f < n; ++f) {
 		for (int i = 0; i < nfreeze; ++i) poke(freezes[i].addr, freezes[i].size, freezes[i].val);
-		if (!tracing && !nprobes && !until_pc && !tick_pc && !draw_trace_active() && !tickdump_f) { core->runFrame(core); continue; }
+		if (!tracing && !nprobes && !until_pc && !draw_trace_active() &&
+		    (!tick_pc || fast_tick_pc)) {
+			fast_tick_running = fast_tick_pc != 0;
+			core->runFrame(core);
+			fast_tick_running = 0;
+			continue;
+		}
 		uint32_t frame = core->frameCounter(core);
 		while (core->frameCounter(core) == frame) {
 			// ARMRun processes events before executing an instruction. Drain
@@ -323,11 +382,7 @@ static void run_frames(int n) {
 			}
 			if (until_pc && pc == until_pc && (int32_t)cpu->gprs[0] >= until_lo && (int32_t)cpu->gprs[0] <= until_hi)
 				until_hit++;
-			if (tick_pc && pc == tick_pc) {
-				tickdump_hit();
-				tick_hits++;
-				tick_total++;
-			}
+			if (tick_pc && pc == tick_pc) count_tick();
 			core->step(core);
 		}
 	}
@@ -427,8 +482,10 @@ int main(int argc, char** argv) {
 	if (!core || !core->init(core)) { fprintf(stderr, "core init failed\n"); return 1; }
 	mCoreInitConfig(core, NULL);
 	core->desiredVideoDimensions(core, &W, &H);
-	fb = calloc(W * H, sizeof(color_t));
-	core->setVideoBuffer(core, fb, W);
+	if (!getenv("BOKTAI3_HEADLESS")) {
+		fb = calloc(W * H, sizeof(color_t));
+		core->setVideoBuffer(core, fb, W);
+	}
 	if (!mCoreLoadFile(core, argv[1])) { fprintf(stderr, "load failed\n"); return 1; }
 	core->setPeripheral(core, mPERIPH_GBA_LUMINANCE, &luxsrc);
 	// Optional battery save: BOKTAI3_SAV=path (copied, never modified)
@@ -485,20 +542,54 @@ int main(int argc, char** argv) {
 		if (sscanf(line, "%63s %255s %63s", cmd, a1, a2) < 1) continue;
 		if (!strcmp(cmd, "wait")) { core->setKeys(core, 0); run_frames(atoi(a1)); }
 		else if (!strcmp(cmd, "hold")) { core->setKeys(core, parse_keys(a1)); run_frames(atoi(a2)); core->setKeys(core, 0); }
-		else if (!strcmp(cmd, "tick")) { tick_pc = (uint32_t) strtoul(a1, NULL, 16); tick_hits = 0; tick_total = 0; }
+		else if (!strcmp(cmd, "tick") || !strcmp(cmd, "fasttick")) {
+			tick_pc = (uint32_t)strtoul(a1, NULL, 16);
+			fast_tick_pc = 0;
+			tick_hits = 0;
+			tick_total = 0;
+			if (cmd[0] == 'f' && !set_fast_tick(tick_pc)) {
+				fprintf(stderr, "fasttick needs a Thumb literal load at entry or after PUSH\n");
+				return 1;
+			}
+		}
 		else if (!strcmp(cmd, "tickdump")) {
-			// tickdump NAME FROM:TO ADDR:LEN[,ADDR:LEN...]  (ticks decimal, regions hex)
+			// Ticks are decimal. Addresses, offsets and lengths are hex.
 			char path[1024], *rest = line;
 			snprintf(path, sizeof(path), "%s/%s.bin", outdir, a1);
 			if (tickdump_f) fclose(tickdump_f);
 			tickdump_f = fopen(path, "wb");
-			sscanf(a2, "%ld:%ld", &tickdump_from, &tickdump_to);
-			for (int k = 0; k < 3 && rest; ++k) { rest = strchr(rest, ' '); while (rest && *rest == ' ') ++rest; }
-			tickdump_n = 0;
-			for (char* t = rest ? strtok(rest, ", \n") : NULL; t && tickdump_n < 4; t = strtok(NULL, ", \n")) {
-				unsigned addr = 0, len = 0;
-				if (sscanf(t, "%x:%x", &addr, &len) == 2) { tickdump_r[tickdump_n].addr = addr; tickdump_r[tickdump_n].len = len; ++tickdump_n; }
+			if (!tickdump_f) { perror(path); return 1; }
+			if (sscanf(a2, "%ld:%ld", &tickdump_from, &tickdump_to) != 2 ||
+			    tickdump_from < 0 || tickdump_to <= tickdump_from) {
+				fprintf(stderr, "invalid tickdump range: %s\n", a2);
+				return 1;
 			}
+			strtok(rest, " \t\r\n");
+			strtok(NULL, " \t\r\n");
+			strtok(NULL, " \t\r\n");
+			tickdump_n = 0;
+			for (char* t = strtok(NULL, ", \t\r\n"); t; t = strtok(NULL, ", \t\r\n")) {
+				unsigned addr = 0, offset = 0, len = 2;
+				int indirect = 0, end = 0;
+				int keyinput = !strcmp(t, "keyinput");
+				if (keyinput) {
+					end = sizeof("keyinput") - 1;
+				} else {
+					indirect = sscanf(t, "%x+%x:%x%n", &addr, &offset, &len, &end) == 3;
+					if (!indirect && sscanf(t, "%x:%x%n", &addr, &len, &end) != 2) end = 0;
+				}
+				if (!end || t[end] || !len || tickdump_n == 32 ||
+				    (indirect && ((addr & 3) || !tickdump_ram(addr, 4)))) {
+					fprintf(stderr, "invalid tickdump region: %s\n", t);
+					return 1;
+				}
+				tickdump_r[tickdump_n].addr = addr;
+				tickdump_r[tickdump_n].offset = offset;
+				tickdump_r[tickdump_n].len = len;
+				tickdump_r[tickdump_n].keyinput = keyinput;
+				tickdump_r[tickdump_n++].indirect = indirect;
+			}
+			if (!tickdump_n) { fprintf(stderr, "tickdump needs at least one region\n"); return 1; }
 		}
 		else if (!strcmp(cmd, "holdt")) {
 			int want = atoi(a2), f = 0;
@@ -508,7 +599,10 @@ int main(int argc, char** argv) {
 			if (tick_hits < want) fprintf(stderr, "holdt: %d of %d ticks\n", tick_hits, want);
 		}
 		else if (!strcmp(cmd, "tap")) { core->setKeys(core, parse_keys(a1)); run_frames(2); core->setKeys(core, 0); run_frames(8); }
-		else if (!strcmp(cmd, "shot")) shot(a1);
+		else if (!strcmp(cmd, "shot")) {
+			if (!fb) { fprintf(stderr, "shot needs a video buffer\n"); return 1; }
+			shot(a1);
+		}
 		else if (!strcmp(cmd, "save")) savestate(a1, 0);
 		else if (!strcmp(cmd, "load")) savestate(a1, 1);
 		else if (!strcmp(cmd, "loadstate")) loadstate(a1);
@@ -589,6 +683,11 @@ int main(int argc, char** argv) {
 	stop_recording();
 #endif
 	if (probe_file && fclose(probe_file)) { perror("probes.tsv"); return 1; }
+	if (tickdump_f && fclose(tickdump_f)) { perror("tickdump"); return 1; }
+	if (getenv("BOKTAI3_NO_COVERAGE")) {
+		core->deinit(core);
+		return 0;
+	}
 #ifdef STUDIO_EXPERIMENTS
 	if (getenv("BOKTAI3_OBSERVATIONS_ONLY")) {
 		core->deinit(core);

@@ -16,11 +16,18 @@ void port_set_hooks(const struct PortPlatformHooks *hooks)
     }
 }
 
+/* A BIOS reset abandons the active call stack but the display keeps scanning. */
+void port_timing_unwind(void)
+{
+    dispatch_depth = 0;
+    running = 0;
+}
+
 void port_timing_reset(void)
 {
     current_line = 0;
     frames = 0;
-    dispatch_depth = 0;
+    port_timing_unwind();
     REG16(6) = 0;
     REG16(4) &= (uint16_t)~7u;
 }

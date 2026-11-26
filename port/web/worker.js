@@ -12,6 +12,8 @@
 //   3 solar level 0 (sun) .. 255 (dark)    4 sleep slot (always 0)
 //   5 keys pressed since the last frame (a tap shorter than a frame still counts)
 // Audio ring (`audio`): Int32 [write, read, rate], then Float32 stereo data.
+import { runGame } from './run-game.mjs';
+
 const FRAME_MS = 1000 / (16777216 / 280896);
 let ex, memory, control, audioHead, audioData, audioFrames;
 let started = 0, solar = -1, lastSave = 0;
@@ -109,7 +111,7 @@ onmessage = async (event) => {
     setClock();
     started = performance.now();
     postMessage({ type: 'started' });
-    const result = ex.port_game_run(saveSize);
+    const result = runGame(ex, saveSize);
     postMessage({ type: 'fatal', text: `port_game_run returned ${result}` });
   } catch (e) {
     postMessage({ type: 'fatal', text: String(e && e.stack || e) });

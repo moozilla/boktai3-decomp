@@ -1,0 +1,30 @@
+0800F1BC status-screen-destroy-return
+
+A ROM probe at 0800F1D2 shows CpuSet sets r0 to one word past
+its stack fill source. The subsequent stores preserve that address
+through 0800F1FC. The UBFIX branch returns the corresponding local
+address in the port address space.
+
+The explicit form changed the ROM bytes. The guarded form passed the unit ROM check.
+
+--- a/src/status_screen_fade.c
++++ b/src/status_screen_fade.c
+@@ -194,5 +194,10 @@
+ int StatusScreen_Destroy(struct StatusScreen *p)
+ {
++#ifdef UBFIX
++    u32 fill = 0;
++    CpuSet(&fill, p->rows, CPU_SET_SRC_FIXED | CPU_SET_32BIT | 0x91);
++#else
+     CpuFill32(0, p->rows, 0x91 * sizeof(u32));
++#endif
+     gScanlineDmaSource = p->rows[p->active];
+     gScanlineDmaTarget = (void *)0x0400004C;
+@@ -200,4 +205,7 @@
+     gScanlineDmaMode = 0;
+     gStatusScreen = 0;
++#ifdef UBFIX
++    return (int)(&fill + 1); // r0 contains the one-past fill address
++#endif
+ }
+ 

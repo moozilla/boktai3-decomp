@@ -12,6 +12,7 @@ GBA forgives"): an explicit return when that still matches, else UBFIX.
 Callers reached through function pointers (task callbacks, script commands, whose
 result stops a script when it is 1) are not found by the caller scan.
 """
+import argparse
 import concurrent.futures as cf
 import os
 import re
@@ -45,9 +46,14 @@ def scan(path):
 
 
 def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('-j', '--jobs', type=int, default=2)
+    args = parser.parse_args()
+    if args.jobs < 1:
+        parser.error('--jobs must be positive')
     files = sorted((GAME / 'prepared/src').rglob('*.c'))
     found = []
-    with cf.ThreadPoolExecutor(8) as ex:
+    with cf.ThreadPoolExecutor(args.jobs) as ex:
         for r in ex.map(scan, files):
             found += r
     sources = {p: p.read_text() for p in (ROOT / 'src').rglob('*.c')}
@@ -55,7 +61,10 @@ def main():
     for f, name, kind in found:
         uses = []
         if name:
-            pat = re.compile(r'([=!<>(,&|?:]|return)\s*(\([^()]*\)\s*)?\b' + re.escape(name) + r'\s*\(')
+            # A colon followed by a newline usually ends a label or case.
+            # Calls after those labels are standalone statements.
+            pat = re.compile(r'(?:[=!<>(,&|?]\s*|\breturn\s+|:[ \t]*)'
+                             r'(\([^()]*\)\s*)?\b' + re.escape(name) + r'\s*\(')
             for p, text in sources.items():
                 if name not in text:
                     continue

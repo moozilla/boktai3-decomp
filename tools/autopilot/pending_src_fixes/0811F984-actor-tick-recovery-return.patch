@@ -1,0 +1,37 @@
+0811F984 actor-tick-recovery-return
+
+The routine preserves the incoming stats pointer except on the fade path.
+PalFade_Start returns through r0, leaving 0811F9E5.
+
+The explicit form changed the ROM bytes. The guarded form passed the unit ROM check.
+
+--- a/src/actor_ability.c
++++ b/src/actor_ability.c
+@@ -267,4 +267,7 @@
+ s32 ActorAction_TickRecovery(struct ActorStats *stats, void *context)
+ {
++#ifdef UBFIX
++    s32 result = (s32)stats;
++#endif
+     if (stats->ability.kind == 1 && stats->ability.cooldown) {
+         stats->ability.cooldown--;
+@@ -272,9 +275,19 @@
+         stats->damageTimer = 0;
+         stats->pendingDamage = 0;
++#ifdef UBFIX
++        if (!stats->ability.cooldown) {
++            PalFade_Start(stats, (s32)context, stats->recoveryValue, 0, 0, 16, 1, 1);
++            result = 0x0811F9E5;
++        }
++#else
+         if (!stats->ability.cooldown)
+             PalFade_Start(stats, (s32)context, stats->recoveryValue, 0, 0, 16, 1, 1);
++#endif
+     }
+     if (stats->ability.remaining)
+         stats->ability.remaining--;
++#ifdef UBFIX
++    return result; // hardware r0 is the stats pointer or the fade return address
++#endif
+ }
+ 

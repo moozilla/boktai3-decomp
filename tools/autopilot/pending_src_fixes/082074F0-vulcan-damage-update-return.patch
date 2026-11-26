@@ -1,0 +1,45 @@
+082074F0 vulcan-damage-update-return
+
+The final palette call returns through r0. Response flags and timer
+stores use other registers and preserve that Thumb return address.
+
+The explicit form changed the ROM bytes. The guarded form passed the unit ROM check.
+
+--- a/src/fn/sub_082074F0.c
++++ b/src/fn/sub_082074F0.c
+@@ -34,4 +34,7 @@
+ {
+     struct CannonCollider *collider;
++#ifdef UBFIX
++    s32 result;
++#endif
+     if (Engine_PauseBits(0x400) || Flags_MaskedWord(4, &gUnk_02000560))
+         return 0;
+@@ -135,4 +138,14 @@
+         Sound_PlaySong(0x1b1);
+     }
++#ifdef UBFIX
++    if (p->flash > 0 && !p->dead) {
++        AnimData_SelectPaletteBank(&p->graphics, 0x192);
++        p->flash--;
++        result = 0x08207985;
++    } else {
++        AnimData_SelectPaletteBank(&p->graphics, 0x1be);
++        result = 0x0820799F;
++    }
++#else
+     if (p->flash > 0 && !p->dead) {
+         AnimData_SelectPaletteBank(&p->graphics, 0x192);
+@@ -140,4 +153,5 @@
+     } else
+         AnimData_SelectPaletteBank(&p->graphics, 0x1be);
++#endif
+     if (((struct ContactCollider *)p->collider)->responseValue) {
+         u16 n = --((struct ContactCollider *)p->collider)->responseValue;
+@@ -150,3 +164,6 @@
+     if (p->aimTimer > 0)
+         p->aimTimer--;
++#ifdef UBFIX
++    return result; // r0 preserves the last call result
++#endif
+ }

@@ -1,0 +1,45 @@
+0802D9F8 actor-movement-update-return
+
+DisplayAnimation_UpdatePlayback returns its result in r0. Timer and flag
+stores preserve it. The attachment call overrides r0 with its Thumb
+return address on the path that clears the flashing effect.
+
+The explicit form changed the ROM bytes. The guarded form passed the unit ROM check.
+
+--- a/src/scene_actor_animation.c
++++ b/src/scene_actor_animation.c
+@@ -46,4 +46,7 @@
+     struct SceneActorBody *body = &actor->body;
+     void *drawable = &actor->drawable.common.kind;
++#ifdef UBFIX
++    int result;
++#endif
+     Obj_StepPosition(body);
+     {
+@@ -73,5 +76,9 @@
+     }
+     DisplayAnimation_SetPosition(drawable, (struct DisplayPosition *)&body->position);
++#ifdef UBFIX
++    result = DisplayAnimation_UpdatePlayback(drawable);
++#else
+     DisplayAnimation_UpdatePlayback(drawable);
++#endif
+     if (actor->timer > 0) {
+         actor->timer--;
+@@ -83,7 +90,13 @@
+                 Actor_SetAttachmentEffect(actor, 8, 180, 180);
+                 actor->flashing = 0;
+-            }
+-        }
+-    }
++#ifdef UBFIX
++                result = 0x0802DB09;
++#endif
++            }
++        }
++    }
++#ifdef UBFIX
++    return result;
++#endif
+ }
+ 

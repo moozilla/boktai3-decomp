@@ -1,0 +1,17 @@
+082010EC player-clone-pool
+
+The failed Task_Create branch exits with its null result still in r0.
+Ratatosk checks this result before continuing boss initialization.
+
+The explicit form changed the ROM bytes. The guarded form passed the unit ROM check.
+
+--- a/src/player_clone.c
++++ b/src/player_clone.c
+@@ -742,4 +742,7 @@
+         return p;
+     }
++#ifdef UBFIX
++    return p; // r0 is zero when Task_Create fails
++#endif
+ }
+ 

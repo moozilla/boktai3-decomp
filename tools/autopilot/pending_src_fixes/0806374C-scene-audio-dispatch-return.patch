@@ -1,0 +1,48 @@
+0806374C scene-audio-dispatch-return
+
+The empty queue preserves owner in r0. Pending commands first call
+SceneMessages_SetPendingTrigger. Known kinds then invoke their handler,
+whose epilogue returns through r0. The loop preserves the final value.
+
+The explicit form changed the ROM bytes. The guarded form passed the unit ROM check.
+
+--- a/src/scene_audio_events.c
++++ b/src/scene_audio_events.c
+@@ -91,11 +91,28 @@
+ {
+     struct SceneEventReceiver *receiver = &owner->messages.queue;
++#ifdef UBFIX
++    static const s32 handlerLinks[] = {
++        0x080637D3, 0x080637DF, 0x080637EB, 0x080637F7, 0x08063803,
++        0x0806380F, 0x0806381B, 0x08063827, 0x08063833, 0x0806383F,
++    };
++    s32 result = (s32)owner;
++#endif
+     s32 index = 0;
+     while (index < SceneAudioEvent_GetPendingCount(receiver)) {
+         struct SceneEventDispatchState *state = gSceneEventDispatchState;
+         struct SceneEventCommand *command;
++#ifdef UBFIX
++        u32 kind;
++        command = receiver->pending[state->phase][index];
++        result = SceneMessages_SetPendingTrigger(receiver, command);
++        kind = (u32)command->kind;
++        if (kind < (sizeof(handlerLinks) / sizeof(handlerLinks[0])))
++            result = handlerLinks[kind];
++        switch (kind) {
++#else
+         command = receiver->pending[state->phase][index];
+         SceneMessages_SetPendingTrigger(receiver, command);
+         switch ((u32)command->kind) {
++#endif
+             case 0:
+                 SceneAudioEvent_PlaySong(owner, receiver, command);
+@@ -131,5 +148,7 @@
+         index++;
+     }
+-    /* The task driver discards the original incidental return register. */
++#ifdef UBFIX
++    return result;
++#endif
+ }
+ 

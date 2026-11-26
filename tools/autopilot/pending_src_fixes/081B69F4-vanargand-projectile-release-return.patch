@@ -1,0 +1,16 @@
+081B69F4 vanargand-projectile-release-return
+
+The final Sprite_Remove exits through r0. The following flag updates preserve r0.
+
+The explicit form changed the ROM bytes. The guarded form passed the unit ROM check.
+
+--- a/src/vanargand_projectiles.c
++++ b/src/vanargand_projectiles.c
+@@ -118,4 +118,7 @@
+     EffectCollision_Disable(&effect->healthCollider);
+     owner->activeMask &= ~(1 << index);
++#ifdef UBFIX
++    return 0x081B6A0F; // preserve the inherited GBA return value
++#endif
+ }
+ 

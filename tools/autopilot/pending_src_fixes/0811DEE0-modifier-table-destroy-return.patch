@@ -1,0 +1,23 @@
+0811DEE0 modifier-table-destroy-return
+
+The task scheduler supplies the retiring table owner in r0. The
+table is created only when gScriptRecordTable is null, and its
+initializer publishes that same owner. ROM probes on checkpoint
+0028 show the destroy argument equals the published table pointer.
+
+The explicit form changed the ROM bytes. The guarded form passed the unit ROM check.
+
+--- a/src/script_options.c
++++ b/src/script_options.c
+@@ -174,5 +174,11 @@
+ u32 Modifier_OnTableTaskDestroy(void)
+ {
++#ifdef UBFIX
++    u32 owner = (u32)gScriptRecordTable;
++#endif
+     gScriptRecordTable = 0;
++#ifdef UBFIX
++    return owner;
++#endif
+ }
+ 

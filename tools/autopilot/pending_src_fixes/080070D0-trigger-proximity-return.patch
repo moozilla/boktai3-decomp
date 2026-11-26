@@ -1,0 +1,51 @@
+080070D0 trigger-proximity-return
+
+The incoming manager stays in r0 when no actor reaches the box. A
+blocked proximity check leaves zero or the Sound_PlaySongChecked
+link. On interaction the final Trigger_RunScript call supplies r0.
+
+The explicit form changed the ROM bytes. The guarded form passed the unit ROM check.
+
+--- a/src/item_container.c
++++ b/src/item_container.c
+@@ -229,4 +229,7 @@
+     struct SceneVec pos;
+     s32 armed, i;
++#ifdef UBFIX
++    s32 result = (s32)manager;
++#endif
+     {
+         s16 *out = box;
+@@ -264,8 +267,14 @@
+         pos.y += 128;
+         if (!(gEngineFlags & 2048) && !sub_0822D490(p->id, p->kind)) {
++#ifdef UBFIX
++            result = 0;
++#endif
+             if (p->armed && !p->cooldown) {
+                 if (p->id <= 5) {
+                     FloatingItemEffect_Spawn(p->id, p->kind, 1, i, &pos, &pos, 24, p);
+                     Sound_PlaySongChecked(272);
++#ifdef UBFIX
++                    result = 0x0800724F;
++#endif
+                 }
+                 p->cooldown = 36;
+@@ -286,5 +295,9 @@
+                 else
+                     event = sub_0822D490(p->id, p->kind) == 1;
++#ifdef UBFIX
++                result = Trigger_RunScript(p, *(u16 *)&p->script, event);
++#else
+                 Trigger_RunScript(p, *(u16 *)&p->script, event);
++#endif
+             }
+             p->flags |= 1;
+@@ -294,4 +307,7 @@
+     }
+     p->armed = armed;
++#ifdef UBFIX
++    return result; // final hardware result
++#endif
+ }
+ 

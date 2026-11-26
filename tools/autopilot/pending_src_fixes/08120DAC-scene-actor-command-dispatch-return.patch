@@ -1,0 +1,30 @@
+08120DAC scene-actor-command-dispatch-return
+
+The no-message path preserves p in r0 after the attachment position stores.
+Otherwise the final SceneMessages_SetPendingTrigger provides the result.
+
+The explicit form changed the ROM bytes. The guarded form passed the unit ROM check.
+
+--- a/src/fn/sub_08120DAC.c
++++ b/src/fn/sub_08120DAC.c
+@@ -48,4 +48,7 @@
+     s32 i;
+     struct RegistryActorCommand *cmd;
++#ifdef UBFIX
++    s32 result = (s32)p;
++#endif
+ 
+     if (!RegistryActor_TestMotionFlags(REGISTRY_ACTOR_MOTION_COMMANDS, m))
+@@ -108,5 +111,12 @@
+                     break;
+             }
++#ifdef UBFIX
++            result = SceneMessages_SetPendingTrigger(queue, (struct SceneEventCommand *)cmd);
++#else
+             SceneMessages_SetPendingTrigger(queue, (struct SceneEventCommand *)cmd);
++#endif
+         } while (++i < queue->count[gSceneEventDispatchState->phase]);
++#ifdef UBFIX
++    return result; // r0 retains the final message result or actor pointer
++#endif
+ }

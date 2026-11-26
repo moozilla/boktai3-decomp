@@ -1,0 +1,17 @@
+081806C4 scene-motion-return
+
+SceneMotion_InitState stores the result of FrostEmitter_Create via r1 and
+returns it unchanged in r0. ProximityVolume_InitializeCallbacks forwards it.
+
+The explicit form changed the ROM bytes. The guarded form passed the unit ROM check.
+
+--- a/src/fn/sub_081806C4.c
++++ b/src/fn/sub_081806C4.c
+@@ -23,4 +23,6 @@
+     motion->task = task;
+     motion->active = 0;
+-    /* Original ABI leaves the task result in r0; callers ignore it. */
++#ifdef UBFIX
++    return task; // r0 still holds the FrostEmitter_Create result
++#endif
+ }

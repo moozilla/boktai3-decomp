@@ -1,0 +1,38 @@
+0821FD3C proximity-translate-bounds-return
+
+The nested loops preserve r0 unless a region test runs. The return is
+the last test result, or the incoming out pointer when there were no tests.
+
+The explicit form changed the ROM bytes. The guarded form passed the unit ROM check.
+
+--- a/src/nav_mesh.c
++++ b/src/nav_mesh.c
+@@ -623,4 +623,7 @@
+     struct NavHdr *hdr = ((struct World *)gTerrainMap)->nav;
+     s32 i, j;
++#ifdef UBFIX
++    u32 result = (u32)out;
++#endif
+ 
+     out->region = 0xff;
+@@ -632,6 +635,12 @@
+         u8 *region = (u8 *)e + e->regionOffset;
+         for (j = 0; j < e->count; j++) {
++#ifdef UBFIX
++            result = NavMesh_IsPointInsideRegion((struct NavMeshRegion *)region,
++                                                 (struct ContactPosition *)pos, j);
++            if (result) {
++#else
+             if (NavMesh_IsPointInsideRegion((struct NavMeshRegion *)region,
+                                             (struct ContactPosition *)pos, j)) {
++#endif
+                 out->region = i;
+                 out->index = j;
+@@ -643,3 +652,6 @@
+     out->pos2 = *pos;
+     out->pos1 = *pos;
+-}
++#ifdef UBFIX
++    return result; // r0 holds the last region test result or the output pointer
++#endif
++}

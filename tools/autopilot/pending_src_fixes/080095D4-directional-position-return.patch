@@ -1,0 +1,16 @@
+080095D4 directional-position-return
+
+All position loads and stores use r1 through r4. The incoming manager pointer remains in r0.
+
+The explicit form changed the ROM bytes. The guarded form passed the unit ROM check.
+
+--- a/src/directional_interaction.c
++++ b/src/directional_interaction.c
+@@ -86,4 +86,7 @@
+     q->position.z += 0x3c;
+     q->position.y += 0x14;
++#ifdef UBFIX
++    return (u32)manager; // preserve the inherited GBA return value
++#endif
+ }
+ 
