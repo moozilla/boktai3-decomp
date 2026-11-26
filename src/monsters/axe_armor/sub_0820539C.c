@@ -1,57 +1,8 @@
-#include "global.h"
+#include "monsters/axe_armor/axe_armor.h"
 #include "engine/math/scene_vec.h"
 #include "engine/video/display_animation.h"
 #include "engine/video/display_sequence_inline.h"
 #include "engine/engine_globals.h"
-union EnemyD459Sprite {
-    struct DisplaySequenceSprite display;
-    struct {
-        u8 unknown0[0x1C];
-        struct SceneVec position;
-    } coordinates;
-};
-struct EnemyD459Actor {
-    u8 unknown0[0x18];
-    s32 timer;
-    struct SceneVec initialPosition;
-    union EnemyD459Sprite sprite;
-    u8 graphics[0x18];
-    u8 unknown68[0x58];
-    u8 body[0x48];
-    void *update;
-    struct DisplaySequenceState sequence;
-    u8 unknown11C[0x4];
-    s16 attackA;
-    s16 attackB;
-    s16 attackC;
-    s16 health;
-    u8 unknown128[0x6];
-    s16 dead;
-    u8 unknown130[0x2];
-    s8 facing;
-    u8 unknown133[0x1];
-    s16 interval;
-    s16 attackD;
-    s16 maxHealth;
-    s16 rangeA;
-    s16 rangeB;
-    s16 hudStyle;
-    s16 bodyEnabled;
-    s16 hudTime;
-    s16 initialDead;
-    u8 unknown146[0x2];
-    s16 unknown148;
-    s16 unknown14A;
-    u32 scriptList;
-    u32 valueD;
-    u32 terrainEnabled;
-    void *resource;
-    void *parent;
-    u8 terrain[0x10];
-    u32 valueG0;
-    u32 valueG1;
-    u32 valueG2;
-};
 struct PHTerrain {
     u8 pad[0x24];
     u16 rows[1];
@@ -68,10 +19,10 @@ s32 Script_GetValue(void);
 s32 Script_GetValueSafe(void);
 void Sprite_Init(void *, void *, s32);
 void AnimData_SelectPaletteBank(void *, s32);
-void AxeArmor_InitCollider(u8 *);
-void AxeArmor_ReadScriptValueList(u8 *);
-s32 AxeArmor_UpdateAttackTiming(void);
-s32 AxeArmor_UpdateDeath(u8 *);
+void AxeArmor_InitCollider(struct AxeArmor *);
+void AxeArmor_ReadScriptValueList(struct AxeArmor *);
+s32 AxeArmor_UpdateAttackTiming(struct AxeArmor *);
+s32 AxeArmor_UpdateDeath(struct AxeArmor *);
 void TerrainModifiers_RegisterCell(void *, s32, s32, s32, s32, s32);
 void SceneBody_Init(void *, void *, void *, u32, u32, void *);
 void SceneBody_SetSprite(void *, void *);
@@ -87,7 +38,7 @@ static inline void EnemyD459_GetFlags(u32 **out, struct DisplaySequenceSprite *s
 {
     *out = &sprite->flags;
 }
-static inline u32 EnemyD459_StepSequence(u32 *flipFlags, struct EnemyD459Actor *actor,
+static inline u32 EnemyD459_StepSequence(u32 *flipFlags, struct AxeArmor *actor,
                                          struct DisplaySequenceSprite *owner,
                                          struct DisplaySequenceState *state)
 {
@@ -107,9 +58,9 @@ static inline u32 EnemyD459_StepSequence(u32 *flipFlags, struct EnemyD459Actor *
         bit = 1;
         first = (u8)(control.raw & bit);
         if (first != (((*command & 0x30) >> 4) & bit))
-            actor->sprite.display.flags |= 4;
+            actor->sprite.flags |= 4;
         else
-            actor->sprite.display.flags &= ~4;
+            actor->sprite.flags &= ~4;
     }
     {
         union DisplaySequenceControl control;
@@ -164,7 +115,7 @@ inline static u32 Arg1(u32 k_, u8 *p)
     return p + k_;
 }
 
-s32 AxeArmor_InitializeFromScript(struct EnemyD459Actor *p, void *parent)
+s32 AxeArmor_InitializeFromScript(struct AxeArmor *p, void *parent)
 {
     struct SpawnOffsets offsets = gUnk_0824FE5C;
     void *resource;
@@ -215,7 +166,7 @@ s32 AxeArmor_InitializeFromScript(struct EnemyD459Actor *p, void *parent)
     } else
         p->facing = 1;
     if (Script_SeekToKeyword('r'))
-        p->scriptList = Script_GetValueSafe();
+        p->attackSchedule = (void *)Script_GetValueSafe();
     if (Script_SeekToKeyword('S'))
         p->bodyEnabled = Script_GetValue();
     if (Script_SeekToKeyword('z')) {
@@ -247,7 +198,7 @@ s32 AxeArmor_InitializeFromScript(struct EnemyD459Actor *p, void *parent)
         p->hudTime = 0;
     p->parent = parent;
     {
-        u8 *graphics = &p->graphics;
+        struct ContactSwarmGraphics *graphics = &p->graphics;
         void *earlySprite;
         s16 *x;
         s16 *z;
@@ -255,11 +206,11 @@ s32 AxeArmor_InitializeFromScript(struct EnemyD459Actor *p, void *parent)
         AnimData_Load(graphics, 0x7e82);
         earlySprite = &p->sprite;
         Sprite_Init(earlySprite, graphics, 1);
-        x = &(p->sprite.coordinates.position.x);
-        p->sprite.coordinates.position = p->initialPosition;
+        x = &(p->sprite.position.x);
+        p->sprite.position = p->initialPosition;
         h = &(p->facing);
         *x += offsets.e[*h].x << 2;
-        z = &(p->sprite.coordinates.position.z);
+        z = &(p->sprite.position.z);
         *z += offsets.e[*h].z << 2;
         {
             s32 facing = *h;
@@ -302,16 +253,16 @@ s32 AxeArmor_InitializeFromScript(struct EnemyD459Actor *p, void *parent)
         AxeArmor_InitCollider(p);
     if (p->terrainEnabled && p->initialDead == 0) {
         s32 cell = EnemyD459_CellIndex((struct SceneVec *)position);
-        TerrainModifiers_RegisterCell(&p->terrain, cell, 0, (p->sprite.coordinates.position.y) >> 8,
+        TerrainModifiers_RegisterCell(&p->terrain, cell, 0, (p->sprite.position.y) >> 8,
                                       0, 1);
     }
     if (p->bodyEnabled) {
-        u8 *body = &p->body;
+        struct SceneActorBody *body = &p->body;
         SceneBody_Init(body, p->parent, position, 0, 4, p);
         SceneBody_SetSprite(body, sprite);
         TerrainOverlay_QueueAddActor(body);
     }
-    if (p->scriptList)
+    if (p->attackSchedule)
         AxeArmor_ReadScriptValueList(p);
     /* The initializer has no explicit return assignment on this path. */
 #ifdef UBFIX
