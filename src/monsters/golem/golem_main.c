@@ -1,4 +1,5 @@
 #include "global.h"
+#include "scene/motion/scene_actor_availability.h"
 #include "effects/particles/scene_particle_burst_api.h"
 #include "engine/engine.h"
 #include "scene/collision/contact_actor.h"
@@ -299,61 +300,40 @@ void Golem_InitAnimationProfile(u8 *p)
     *(u32 *)(p + 0x308) = SceneActorProfiles_FindOrAdd(3, 0);
 }
 
-struct GolemCombatResetContext {
-    u8 pad0[0x624];
-    u8 b624;
-    u8 pad625[3];
-    u32 w628;
-    u8 pad62c[0x50];
-    u32 w67c;
-    u16 h680, h682, h684, h686, h688, h68a;
-    u8 b68c, b68d, b68e, b68f, b690, b691;
-    u8 pad692[2];
-    u8 a694[8];
-    u8 a69c[8];
-    u8 a6a4[8];
-    u16 h6ac, h6ae;
-};
-
-struct GolemResetActor {
-    u8 pad0[4];
-    void *spr;
-};
-
 void Memory_Clear(void *, int);
 
 void SceneActorMovement_ResolveRoutePosition(void *);
 
 // confidence=low: resets golem combat counters and restarts the idle animation.
 
-void Golem_ResetCombatState(u8 *p)
+void Golem_ResetCombatState(struct ChaseActor *actor)
 {
-    struct GolemCombatResetContext *in = *(struct GolemCombatResetContext **)(p + 0x3d0);
-    in->b624 = 0;
-    in->w628 = 0;
-    in->w67c = 0;
-    in->h682 = 0;
-    in->h680 = 0;
-    in->h684 = 0;
-    in->h686 = 0;
-    in->h688 = 0;
-    in->h68a = 0;
-    in->b68c = 0;
-    in->b68d = 0;
-    in->b68e = 0;
-    in->b68f = 0;
-    in->b690 = 0;
-    in->b691 = 0;
-    Memory_Clear(in->a694, 8);
-    Memory_Clear(in->a69c, 8);
-    Memory_Clear(in->a6a4, 8);
-    Memory_Clear((u8 *)in + 0x674, 8);
-    in->h6ac = 0;
-    in->h6ae = 0;
-    SceneActorMovement_ResolveRoutePosition(p);
-    SceneActorAnimation_SelectDirectionalEntry((void *)p, 0);
+    struct Golem *in = actor->base.context;
+    in->responseCount = 0;
+    in->flags628 = 0;
+    in->field67C = 0;
+    in->pushSpeed = 0;
+    in->routeDelay = 0;
+    in->field684 = 0;
+    in->counter686 = 0;
+    in->charge688 = 0;
+    in->field68A = 0;
+    in->field68C = 0;
+    in->field68D = 0;
+    in->direction68E = 0;
+    in->unknown68F = 0;
+    in->savedDirection690 = 0;
+    in->direction691 = 0;
+    Memory_Clear(&in->home694, sizeof(in->home694));
+    Memory_Clear(&in->target69C, sizeof(in->target69C));
+    Memory_Clear(in->unknown6A4, sizeof(in->unknown6A4));
+    Memory_Clear(in->unknown674, sizeof(in->unknown674));
+    in->shakeStrength = 0;
+    in->shakeTimer = 0;
+    SceneActorMovement_ResolveRoutePosition(actor);
+    SceneActorAnimation_SelectDirectionalEntry(&actor->base, 0);
     {
-        struct SceneActorControlMotionDrawable *drawable = ((struct GolemResetActor *)p)->spr;
+        struct SceneActorControlMotionDrawable *drawable = actor->base.drawable;
         DisplaySequence_StepState(drawable, &drawable->sequence);
     }
 }
@@ -363,16 +343,11 @@ void Golem_ClearControlFlag(struct ChaseActor *actor)
     SceneActorChase_ClearWordFlags(&actor->base.statusFlags, 2);
 }
 
-struct ActorMotion {
-    u8 pad0[0x682];
-    s16 speed;
-};
-
 u8 *TerrainModifiers_FindCellOverride(s32, s32);
 
 void SceneActor_AccelerateForTerrain(struct ChaseActor *actor)
 {
-    struct ActorMotion *motion = actor->base.context;
+    struct Golem *motion = actor->base.context;
     u16 type = actor->base.terrainCell;
     u8 *entry = TerrainModifiers_FindCellOverride(type, 1);
     s32 maximum, acceleration;
@@ -415,10 +390,10 @@ void SceneActor_AccelerateForTerrain(struct ChaseActor *actor)
                 break;
         }
     }
-    if (motion->speed < maximum)
-        motion->speed += acceleration;
+    if (motion->pushSpeed < maximum)
+        motion->pushSpeed += acceleration;
     else
-        motion->speed = maximum;
+        motion->pushSpeed = maximum;
 }
 
 s32 Callback_InvokeActor(void *, void *);
@@ -524,12 +499,6 @@ static inline u32 Flag(struct ChaseActor *a, u32 m, u32 off)
     return off == 0x2D4 ? *(u16 *)((u8 *)a + off) & m : *(u32 *)((u8 *)a + off) & m;
 }
 
-static inline u8 Unavailable(struct ChaseActor *a)
-{
-    if (a && (Flag(a, 0x40, 0x2D4) || Flag(a, 0x20000, 0x2D0) || a->base.health <= 0))
-        return 1;
-    return 0;
-}
 
 static inline void Golem_MarkContactPlacement(struct SceneActorChasePlacement *placement, u32 flags)
 {
@@ -540,7 +509,7 @@ void Golem_UpdateAttackProperties(struct ChaseActor *a)
 {
     struct GolemChargeContext *state = a->base.context;
     struct SceneActorRegistryControlGroup *group = &a->group.common;
-    if (Unavailable(a))
+    if (SceneActor_ActionsBlocked(a))
         return;
     if (SceneActorChase_QueryMotionFlags(a, 0xA027))
         return;
@@ -605,7 +574,7 @@ s32 Math_Atan2(s32, s32);
 
 static inline void RecordContact(struct ChaseActor *a, struct ContactCollider *other)
 {
-    if (!Unavailable(a) && (other->contactFlags & 15)) {
+    if (!SceneActor_ActionsBlocked(a) && (other->contactFlags & 15)) {
         a->base.counter304 = other->collisionId;
         SceneActorChase_ClearWordFlags(&a->base.statusFlags, ROOM_ACTOR_STATUS_INTERACTING);
     }
@@ -653,7 +622,7 @@ void Golem_OnAttackCollision(struct ContactCollider *self, struct ContactCollide
     struct Golem *state = a->base.context;
     struct ContactPosition origin;
     struct ContactPosition delta;
-    if (Unavailable(a))
+    if (SceneActor_ActionsBlocked(a))
         return;
     origin = *(struct ContactPosition *)&self->x;
     switch ((s32)((base->base.body.direction + 0x20) & 255) >> 6) {
@@ -897,7 +866,7 @@ void Golem_UpdateRevivalReturn(struct ChaseActor *actor, s32 arg, u32 unused)
 
 void ActorShadow_Enable(void *);
 
-void Golem_ResetCombatState(u8 *p);
+void Golem_ResetCombatState(struct ChaseActor *actor);
 
 void SceneActorPalette_ClearCompletedTransitions(void);
 
@@ -923,7 +892,7 @@ void Golem_UpdateRevival(struct ChaseActor *actor)
     if (!Golem_RevivalAnimationFinished(actor))
         return;
     {
-        Golem_ResetCombatState((u8 *)actor);
+        Golem_ResetCombatState(actor);
         actor->base.behaviorFlags = actor->base.saved.behaviorFlags;
         actor->base.statusFlags = actor->base.saved.statusFlags;
         actor->base.body.direction = actor->base.saved.direction;
@@ -1031,30 +1000,20 @@ struct RoomActor;
 
 void SceneActorPlacement_PlayVariantEventSound(struct RoomActor *, u32);
 
-struct GolemWaitContext {
-    u8 unknown[0x628];
-    u32 flags;
-};
-
-static inline u8 TestBody(struct GolemWaitContext *body, u32 mask)
-{
-    return Test(body->flags, mask);
-}
-
 static inline u32 Random(void)
 {
     gRandomIndex = (gRandomIndex + 1) & 1023;
     return ((u16 *)RANDOM_TABLE_ADDR)[gRandomIndex];
 }
 
-static inline s32 WaitTime(struct GolemWaitContext *context, u32 mask, s32 shift, s32 base)
+static inline s32 WaitTime(struct Golem *context, u32 mask, s32 shift, s32 base)
 {
     u32 bits = mask;
     u32 *flags;
     u8 tested;
     u32 masked;
     u32 *clear;
-    flags = &context->flags;
+    flags = &context->flags628;
     masked = *flags & bits;
     clear = flags;
     tested = Test(masked, ~0);
@@ -1069,9 +1028,9 @@ static inline s32 WaitTime(struct GolemWaitContext *context, u32 mask, s32 shift
 
 void Golem_UpdateChargeBuildup(struct ChaseActor *actor, s32 frame)
 {
-    u8 *body = actor->base.context;
+    struct Golem *body = actor->base.context;
     if (SceneActorControl_TakeFlag(&actor->base.field2B2)) {
-        struct GolemWaitContext *context = actor->base.context;
+        struct Golem *context = actor->base.context;
         s32 duration;
         switch (actor->base.paletteOffset) {
             case 1:
@@ -1086,7 +1045,7 @@ void Golem_UpdateChargeBuildup(struct ChaseActor *actor, s32 frame)
                 duration = 0;
                 break;
         }
-        *(u16 *)(body + 0x68A) = duration;
+        body->field68A = duration;
     }
     {
         u8 directionVariant, mirror;
@@ -1094,11 +1053,11 @@ void Golem_UpdateChargeBuildup(struct ChaseActor *actor, s32 frame)
         Golem_SelectAnimation(actor, 8, directionVariant, Golem_MirrorFlags(mirror));
     }
     Golem_SetMotionFlags(actor, 0x100);
-    if (*(s16 *)(body + 0x682) <= 0x17F)
-        *(s16 *)(body + 0x682) += 16;
-    actor->base.field2C2 = 0x40 >> (*(s16 *)(body + 0x682) >> 7);
+    if (body->pushSpeed <= 0x17F)
+        body->pushSpeed += 16;
+    actor->base.field2C2 = 0x40 >> (body->pushSpeed >> 7);
     Golem_ApplyDuration(actor);
-    if (frame > *(u16 *)(body + 0x68A)) {
+    if (frame > body->field68A) {
         actor->base.stepDone = 1;
         SceneActorPlacement_PlayVariantEventSound((void *)actor, 4);
     }
@@ -1110,7 +1069,7 @@ void Golem_UpdateChargeBuildup(struct ChaseActor *actor, s32 frame)
 
 void Golem_UpdateRouteMotion(struct ChaseActor *actor, u32 frame)
 {
-    u8 *body = actor->base.context;
+    struct GolemChargeContext *body = actor->base.context;
     struct SceneActorBody *motion = &actor->base.body;
     if (SceneActorControl_TakeFlag(&actor->base.field2B2))
         actor->base.restart = 0;
@@ -1120,7 +1079,7 @@ void Golem_UpdateRouteMotion(struct ChaseActor *actor, u32 frame)
         Golem_GetDirectionVariant(actor, &directionVariant, &mirror);
         Golem_SelectAnimation(actor, 8, directionVariant, Golem_MirrorFlags(mirror));
     }
-    actor->base.field2C2 = 0x40 >> (*(s16 *)(body + 0x682) >> 7);
+    actor->base.field2C2 = 0x40 >> (body->charge.speed >> 7);
     Golem_ApplyDuration(actor);
     if (!(frame & 3)) {
         struct ContactPosition velocity, size;
@@ -1317,16 +1276,6 @@ u32 ActorMode_SelectOddStateVariant(struct ChaseActor *);
 void sub_08014634(u32, u32, struct SceneExtent *, struct SceneExtent *, struct SceneExtent *, u32,
                   u32);
 
-struct GolemSlideContext {
-    u8 unknown0[0x634];
-    u16 recovery;
-    u8 unknown636[0x4A];
-    u16 state;
-    s16 speed;
-    u8 unknown684[0x28];
-    u16 impactDelay, colliderDelay;
-};
-
 static inline s32 GolemSlide_Quarter(s16 value)
 {
     if (value >= 0)
@@ -1347,7 +1296,7 @@ static inline void GolemSlide_SetDelay(struct ChaseActor *actor, u16 delay)
 
 void Golem_UpdateSlideImpact(struct ChaseActor *actor, u32 frame)
 {
-    struct GolemSlideContext *context = actor->base.context;
+    struct Golem *context = actor->base.context;
     struct SceneActorChaseGroup *group = &actor->group;
     struct SceneActorBody *body = &actor->base.body;
     if (SceneActorReaction_TakePrepared(actor))
@@ -1357,8 +1306,8 @@ void Golem_UpdateSlideImpact(struct ChaseActor *actor, u32 frame)
     SceneActorChase_SetMotionFlags(actor, 0x100);
     SceneActorChase_SetActorFlags(actor, 0x2000);
     actor->base.body.motion.x +=
-        (context->speed * gUnk_086149C4[(body->direction + 64) & 255]) >> 16;
-    actor->base.body.motion.z += (context->speed * gUnk_086149C4[body->direction]) >> 16;
+        (context->pushSpeed * gUnk_086149C4[(body->direction + 64) & 255]) >> 16;
+    actor->base.body.motion.z += (context->pushSpeed * gUnk_086149C4[body->direction]) >> 16;
     if ((frame & 3) == 0) {
         struct ContactPosition velocity, spread;
         velocity.x = -body->motion.x;
@@ -1373,8 +1322,8 @@ void Golem_UpdateSlideImpact(struct ChaseActor *actor, u32 frame)
         struct SceneExtent velocity, spread;
         u32 count;
         u32 randomOrigin;
-        context->impactDelay = 30;
-        context->colliderDelay = 20;
+        context->shakeStrength = 30;
+        context->shakeTimer = 20;
         velocity.x = GolemSlide_Quarter(body->motion.z);
         /* The recovered origin cancels when a later sample address becomes a table offset. */
         PARTICLE_RANDOM_CAPTURE_ORIGIN(randomOrigin);
@@ -1387,7 +1336,7 @@ void Golem_UpdateSlideImpact(struct ChaseActor *actor, u32 frame)
         sub_08014634(count, ActorMode_SelectOddStateVariant(actor), (void *)&body->position,
                      &velocity, &spread, 45, 31);
         SceneActorPlacement_PlayVariantEventSound((void *)actor, 5);
-        if (context->recovery) {
+        if (context->pendingEvent) {
             actor->base.stepDone = 1;
         } else {
             GolemSlide_SetDelay(actor, 180);
@@ -2027,7 +1976,7 @@ void Golem_ResumeBehaviorAfterDisplacement(struct ChaseActor *actor)
         return;
     }
     if (SceneActorChase_MotionFlags(actor, 0x80)) {
-        SceneActorChase_SetActorFlags(actor, 0x80);
+        actor->base.behaviorFlags |= 0x80;
         SceneActorChase_SetFlagComponent((struct SceneActorChaseFlags16 *)&group->common.gate.flags,
                                          4);
         SceneActorChase_TrackPlayer(actor);
