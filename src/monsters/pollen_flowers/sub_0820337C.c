@@ -1,33 +1,14 @@
-#include "global.h"
+#include "monsters/pollen_flower.h"
 #include "player/cutscene/player_cue_sequence.h"
 #include "engine/video/display_animation.h"
 #include "engine/math/scene_vec.h"
 
-struct CannonPaletteColor {
-    u16 value;
-} __attribute__((packed, aligned(2)));
 
-struct CannonEmitter {
-    u8 pad0[0x18];
-    struct SceneVec initialPosition;
-    struct DisplaySequenceSprite sprite;
-    u8 animationData[0x1c];
-    u8 body[0x48];
-    struct CannonPaletteColor flashPalette[16];
-    void (*state)(void);
-    struct DisplaySequenceState sequence;
-    s32 rangeSquared;
-    s16 effectX, effectY, effectZ, solid;
-    s16 timer, flashTimer, variant, spread;
-    void *parent;
-    u8 padFC[4];
-    void *resource;
-};
 void SceneBody_Init(void *, void *, void *, u32, u32, void *);
 void SceneBody_SetSprite(void *, void *);
 s32 TerrainOverlay_QueueAddActor(void *);
 void ProximitySequence_TestPlayerDistance(void);
-s32 PollenFlower_InitializeFromScript(struct CannonEmitter *p, void *parent)
+s32 PollenFlower_InitializeFromScript(struct PollenFlower *p, void *parent)
 {
     if (Script_SeekToKeyword('p')) {
         p->initialPosition.x = Script_GetValue();
@@ -57,10 +38,10 @@ s32 PollenFlower_InitializeFromScript(struct CannonEmitter *p, void *parent)
     if (Script_SeekToKeyword('S'))
         p->solid = Script_GetValue();
     p->parent = parent;
-    AnimData_Load(p->animationData, 0x7e7d);
-    Sprite_Init(&p->sprite, p->animationData, 1);
-    *(struct SceneVec *)((u8 *)p + 0x3c) = p->initialPosition;
-    AnimData_SelectPaletteBank(p->animationData, p->variant + 0x1ba);
+    AnimData_Load(&p->graphics, 0x7e7d);
+    Sprite_Init(&p->sprite, &p->graphics, 1);
+    p->sprite.position = p->initialPosition;
+    AnimData_SelectPaletteBank(&p->graphics, p->variant + 0x1ba);
     {
         s32 i = 15;
         struct CannonPaletteColor *palette;

@@ -24,29 +24,36 @@ struct OrangeSpineActor {
     u8 unknownC0[0x108 - 0xc0];
     void *update;
     struct DisplaySequenceState sequence;
-    u8 unknown11C[0xA];
+    u8 unknown11C[4];
+    s16 projectileHitX, projectileHitY, projectileHitZ;
     s16 health;
     s16 damage;
     s16 hitReaction;
-    u8 unknown12C[0x2];
+    u16 recoveryTimer;
     s16 defeated;
     s16 flashTimer;
     u8 facing;
-    u8 unknown133[0x5];
+    u8 unknown133;
+    u16 recoveryDelay;
+    s16 unknown136;
     s16 maxHealth;
-    u8 unknown13A[2];
+    s16 projectileSpeed;
     u16 bodyReactionFlags;
     u16 sparkMask;
     s16 hudStyle;
-    u8 unknown142[0x6];
+    s16 showTerrainBody, unknown144, unknown146;
     s16 hudTime;
-    u8 unknown14A[0x2];
+    s16 defeatDelay;
     void *hud;
     u32 reactionFlags;
     u32 pendingReaction;
-    u8 unknown158[0x18];
+    u32 unknown158, unknown15C, unknown160, unknown164, unknown168;
+    u32 registerTerrain;
     void *resource;
+    u8 terrainRegistration[0x24];
 };
+
+typedef char OrangeSpineActorSizeCheck[sizeof(struct OrangeSpineActor) == 0x198 ? 1 : -1];
 
 void PlasmaCannon_ApplyHitReaction(struct ContactCollider *source, struct ContactCollider *hit,
                                   struct OrangeSpineActor *actor);

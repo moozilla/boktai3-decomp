@@ -1,30 +1,9 @@
-#include "global.h"
+#include "monsters/ooze.h"
 
 #include "engine/video/display_animation.h"
 #include "engine/math/scene_vec.h"
 #include "player/cutscene/player_cue_sequence.h"
 
-struct OozeInit {
-    u8 pad0[0x18];
-    struct SceneVec initialPosition;
-    struct DisplaySequenceSprite sprite;
-    u8 animationData[0x1c];
-    u8 collider[0x54];
-    u8 body[0x48];
-    void (*state)(void);
-    struct DisplaySequenceState sequence;
-    s16 extentX, extentY, extentZ, timer;
-    s16 interval, variant;
-    u8 pad124[0x14];
-    s16 repeatAttack, repeatLimit, repeatCount, attackDelay, phase, unknown142;
-    s16 facing;
-    u16 idleSequence, startSequence, holdSequence, endSequence;
-    s16 solid;
-    void *parent;
-    u8 pad154[4];
-    void *resource;
-    void *delayScript;
-};
 void SceneBody_Init(void *, void *, void *, u32, u32, void *);
 void SceneBody_SetSprite(void *, void *);
 s32 TerrainOverlay_QueueAddActor(void *);
@@ -35,7 +14,7 @@ void Ooze_UpdateAttackDelay(void);
 static inline u32 Ooze_StepInitialAnimation(struct DisplaySequenceSprite *sprite,
                                             struct DisplaySequenceState *state)
 {
-    return PlayerCue_StepSequenceEnded(sprite, state);
+    return PlayerCue_StepSequenceEnded((void *)sprite, state);
 }
 
 static inline void Ooze_OffsetBodyPosition(struct SceneVec *position, s32 facing)
@@ -45,7 +24,7 @@ static inline void Ooze_OffsetBodyPosition(struct SceneVec *position, s32 facing
     else
         position->z += 128;
 }
-s32 Ooze_InitializeFromScript(struct OozeInit *p, void *parent)
+s32 Ooze_InitializeFromScript(struct Ooze *p, void *parent)
 {
     struct SceneVec position;
     if (Script_SeekToKeyword('p')) {
@@ -110,10 +89,10 @@ s32 Ooze_InitializeFromScript(struct OozeInit *p, void *parent)
     if (Script_SeekToKeyword('S'))
         p->solid = Script_GetValue();
     p->parent = parent;
-    AnimData_Load(p->animationData, 0x7e7d);
-    Sprite_Init(&p->sprite, p->animationData, 0x201);
-    *(struct SceneVec *)((u8 *)p + 0x3c) = p->initialPosition;
-    AnimData_SelectPaletteBank(p->animationData, 0x1c3);
+    AnimData_Load(&p->graphics, 0x7e7d);
+    Sprite_Init(&p->sprite, &p->graphics, 0x201);
+    p->sprite.position = p->initialPosition;
+    AnimData_SelectPaletteBank(&p->graphics, 0x1c3);
     p->resource = ScriptProc_Start(0x922e, 0x5184);
     Anim_SetSequence(&p->sequence, p->resource, 0x22, (u8)p->facing, 8);
     Ooze_StepInitialAnimation(&p->sprite, &p->sequence);
@@ -132,7 +111,7 @@ s32 Ooze_InitializeFromScript(struct OozeInit *p, void *parent)
     if (p->delayScript)
         Ooze_ReadScriptValueList(p);
     if (p->solid) {
-        SceneVec_Copy(&position, (struct SceneVec *)((u8 *)p + 0x3c));
+        SceneVec_Copy(&position, (struct SceneVec *)&p->sprite.position);
         if (p->variant == 1) {
             Ooze_OffsetBodyPosition(&position, p->facing);
         }

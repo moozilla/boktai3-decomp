@@ -1,50 +1,31 @@
-#include "global.h"
+#include "monsters/popbud/popbud_playback.h"
 /* Names and field interpretations are tentative. */
-struct EmitterPosition {
-    s16 x, y, z, pad;
-};
-struct ProximityProjectileEmitter {
-    u8 pad0[0x40];
-    struct EmitterPosition position;
-    u8 pad48[0xC0];
-    u32 (*update)(struct ProximityProjectileEmitter *);
-    u8 animation[0x10];
-    s32 triggerDistanceSquared;
-    s32 closeDistanceSquared;
-    u8 pad124[6];
-    u16 timer;
-    u8 pad12C[4];
-    u16 closeRange;
-    u8 pad132[0x2A];
-    void *animationResource;
-};
-struct EmitterPosition *Player_GetEffectivePosition(s32);
+struct ContactPosition *Player_GetEffectivePosition(s32);
 void Anim_RestartSequence(void *, void *, u32, u32, u32);
 void Sound_PlaySong(u32);
-u32 ProjectileEmitter_UpdateAttack(struct ProximityProjectileEmitter *);
-void Anim_SetDurationScale(void *, u32);
-u32 ProjectileEmitter_WaitForPlayerApproach(struct ProximityProjectileEmitter *);
-u32 ProjectileEmitter_UpdateAttack(struct ProximityProjectileEmitter *p)
+u32 ProjectileEmitter_UpdateAttack(struct PinkSpineState *);
+u32 ProjectileEmitter_WaitForPlayerApproach(struct PinkSpineState *);
+u32 ProjectileEmitter_UpdateAttack(struct PinkSpineState *p)
 {
-    struct EmitterPosition *pos = Player_GetEffectivePosition(0);
-    struct EmitterPosition *origin = &p->position;
+    struct ContactPosition *pos = Player_GetEffectivePosition(0);
+    struct ContactPosition *origin = &p->sprite.position;
     s32 x = pos->x - origin->x;
     s32 z = pos->z - origin->z;
     s32 xx = x * x, zz = z * z;
     s32 distance = xx + zz;
     s32 remaining, span;
-    if (distance < p->closeDistanceSquared)
-        p->closeRange = 1;
-    remaining = p->triggerDistanceSquared - distance;
-    span = p->triggerDistanceSquared - p->closeDistanceSquared;
+    if (distance < p->farRadiusSquared)
+        p->f130 = 1;
+    remaining = p->nearRadiusSquared - distance;
+    span = p->nearRadiusSquared - p->farRadiusSquared;
     if (remaining > (span * 9) / 16)
-        Anim_SetDurationScale(p->animation, 0x20);
+        Anim_SetDurationScale(&p->sequence, 0x20);
     else if (remaining < (span * 3) / 4)
-        Anim_SetDurationScale(p->animation, 0x80);
+        Anim_SetDurationScale(&p->sequence, 0x80);
     else
-        Anim_SetDurationScale(p->animation, 0x40);
-    if (distance > p->triggerDistanceSquared) {
-        Anim_RestartSequence(p->animation, p->animationResource, 11, 0, 0);
+        Anim_SetDurationScale(&p->sequence, 0x40);
+    if (distance > p->nearRadiusSquared) {
+        Anim_RestartSequence(&p->sequence, p->f15C, 11, 0, 0);
         p->update = ProjectileEmitter_WaitForPlayerApproach;
     }
     return 0;

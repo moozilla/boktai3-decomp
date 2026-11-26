@@ -4,6 +4,7 @@
 #include "engine/video/display_animation.h"
 #include "engine/video/display_sequence_sprite.h"
 #include "engine/task.h"
+#include "scene/collision/contact_collider.h"
 /* Layout observed in initialization, state callbacks and collision consumers. */
 struct VulcanCannon {
     struct Task task;
@@ -12,7 +13,7 @@ struct VulcanCannon {
     struct ContactPosition initialPosition;
     struct DisplaySequenceSprite display;
     struct SpriteRenderResource graphics;
-    u8 collider[0x54];
+    struct ContactCollider collider;
     void (*state)(void);
     struct DisplaySequenceState sequence;
     s32 range;
@@ -31,6 +32,8 @@ struct VulcanCannon {
     u8 terrain[0x10];
     s16 delayCount, delayIndex, delays[8];
 };
+typedef char VulcanCannonSizeCheck[sizeof(struct VulcanCannon) == 0x1A8 ? 1 : -1];
+
 static inline u32 VulcanCannon_StepAnimation(struct VulcanCannon *owner)
 {
     return DisplaySequence_StepSprite(&owner->display, &owner->sequence);

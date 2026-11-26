@@ -1,22 +1,5 @@
-#include "global.h"
+#include "monsters/muspell_head.h"
 #include "objects/hazards/animated_hazard.h"
-struct ScriptCombatActor {
-    u8 pad0[0x40];
-    struct SceneVec position;
-    u8 pad48[0x15c - 0x48];
-    u32 (*update)(void *);
-    u8 animation[0x170 - 0x160];
-    s32 attackDistance;
-    u8 pad174[0x184 - 0x174];
-    u16 timer;
-    u8 pad186[8];
-    u16 duration;
-    s16 enabled;
-    u8 pad192[4];
-    u16 phase;
-    u8 pad198[0x1cc - 0x198];
-    void *sequence;
-};
 u32 MuspellHead_UpdateProjectileAttack(void *);
 void Anim_RestartSequence(void *, void *, u32, u32, u32);
 void Sound_PlaySong(u32);
@@ -50,27 +33,27 @@ static inline s32 distanceSquared(struct SceneVec *a, struct SceneVec *b)
     s32 z = a->z - b->z;
     return x * x + z * z;
 }
-u32 MuspellHead_TryProjectileAttack(struct ScriptCombatActor *p)
+u32 MuspellHead_TryProjectileAttack(struct MuspellHead *p)
 {
     struct SceneVec delta;
     struct CannonSample sample;
     s32 i;
     if (p->enabled) {
-        if (distanceSquared(Player_GetEffectivePosition(0), &p->position) < p->attackDistance) {
-            subtract(&delta, Player_GetEffectivePosition(0), &p->position);
+        if (distanceSquared(Player_GetEffectivePosition(0), (struct SceneVec *)&p->sprite.position) < p->attackDistance) {
+            subtract(&delta, Player_GetEffectivePosition(0), (struct SceneVec *)&p->sprite.position);
             for (i = 1; i <= 4; i++) {
                 s32 index;
                 u8 *cell;
-                sample.x = p->position.x + Div(delta.x * i, 4);
-                sample.y = p->position.y + Div(delta.y * i, 4);
-                sample.z = p->position.z + Div(delta.z * i, 4);
+                sample.x = p->sprite.position.x + Div(delta.x * i, 4);
+                sample.y = p->sprite.position.y + Div(delta.y * i, 4);
+                sample.z = p->sprite.position.z + Div(delta.z * i, 4);
                 index = cellIndex((struct SceneVec *)&sample);
                 cell = cellData(index);
-                if (((cell[0] & 15u) << 8) > p->position.y + 128)
+                if (((cell[0] & 15u) << 8) > p->sprite.position.y + 128)
                     break;
                 if (i == 4) {
-                    p->update = MuspellHead_UpdateProjectileAttack;
-                    Anim_RestartSequence(p->animation, p->sequence, 1, 0, 0);
+                    p->action = (void (*)(void))MuspellHead_UpdateProjectileAttack;
+                    Anim_RestartSequence(&p->playback, p->sequence, 1, 0, 0);
                     p->timer = p->duration;
                     p->phase = 0;
                     Sound_PlaySong(0x51f);

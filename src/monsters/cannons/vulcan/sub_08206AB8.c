@@ -1,11 +1,5 @@
-#include "global.h"
+#include "monsters/cannons/vulcan_cannon_worker.h"
 #include "objects/hazards/animated_hazard.h"
-struct VulcanCannon {
-    u8 pad0[0x88];
-    struct SceneVec position;
-    u8 pad90[0x8c];
-    s32 targetDistance;
-};
 struct CannonSample {
     s32 x : 16, y : 16, z : 16, pad : 16;
 };
@@ -34,18 +28,18 @@ s32 VulcanCannon_HasClearShot(struct VulcanCannon *p)
 {
     struct SceneVec delta;
     struct CannonSample sample;
-    s32 count = Div(p->targetDistance, 256);
+    s32 count = Div(p->range, 256);
     s32 i;
-    subtract(&delta, Player_GetEffectivePosition(0), &p->position);
+    subtract(&delta, Player_GetEffectivePosition(0), (struct SceneVec *)&p->display.position);
     for (i = 1; i < count; i++) {
         s32 index;
         u8 *cell;
-        sample.x = p->position.x + Div(delta.x * i, count);
-        sample.y = p->position.y + 128;
-        sample.z = p->position.z + Div(delta.z * i, count);
+        sample.x = p->display.position.x + Div(delta.x * i, count);
+        sample.y = p->display.position.y + 128;
+        sample.z = p->display.position.z + Div(delta.z * i, count);
         index = cellIndex((struct SceneVec *)&sample);
         cell = cellData(index);
-        if (((cell[0] & 15u) << 8) > p->position.y + 128)
+        if (((cell[0] & 15u) << 8) > p->display.position.y + 128)
             return 0;
     }
     return 1;

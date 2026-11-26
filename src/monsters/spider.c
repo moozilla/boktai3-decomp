@@ -8,6 +8,7 @@
 #include "scene/actor/scene_actor_behavior.h"
 #include "scene/actor/scene_actor_reaction.h"
 #include "scene/motion/scene_actor_turn.h"
+#include "scene/motion/scene_actor_route.h"
 #include "engine/video/display_sequence.h"
 #include "scene/actor/scene_actor_reset.h"
 #include "engine/engine.h"
@@ -252,27 +253,10 @@ void ScaledShadow_Destroy(void *);
 
 void SceneActorReaction_RestoreAlternateAfterDelay(void);
 
-struct SpiderRecoveryContext {
-    u8 pad[0x62C];
-    u16 flags;
-};
-
-struct SpiderHalfFlags {
-    s16 bits : 16;
-};
-
-
-static inline void ClearHidden(struct SpiderHalfFlags *p, u32 mask)
+static inline void ClearHidden(struct SceneActorReactionMotionFlags *p, u32 mask)
 {
     p->bits &= mask;
 }
-
-struct RecoveryPacket {
-    u8 pad[8];
-    u8 state, phase, behavior, gap;
-    u32 delay;
-    void *callback;
-};
 
 static inline void ClearCollider(struct ContactCollider *c)
 {
@@ -280,25 +264,14 @@ static inline void ClearCollider(struct ContactCollider *c)
     c->flags &= mask;
 }
 
-static inline void ClearContext(struct SpiderRecoveryContext *c, u32 mask)
+static inline void ClearContext(struct Spider *c, u32 mask)
 {
-    c->flags &= mask;
+    c->flags62C &= mask;
 }
-
-static inline void SaveRecovery(struct RecoveryPacket *p, void *callback, u8 behavior, u32 delay)
-{
-    p->delay = delay;
-    p->callback = callback;
-    p->state = 0;
-    p->phase = 0;
-    p->behavior = behavior;
-}
-
-
 
 void Spider_UpdateHiddenRecovery(struct ChaseActor *a)
 {
-    struct SpiderRecoveryContext *ctx = a->base.context;
+    struct Spider *ctx = a->base.context;
     if (SceneActorControl_TakeFlag(&a->base.field2B2)) {
         SceneActorAnimation_SelectDirectionalEntry(a, 0);
         ScaledShadow_Enable((u8 *)a + 0x360);
@@ -327,17 +300,7 @@ void Spider_UpdateHiddenRecovery(struct ChaseActor *a)
 
 // confidence=low: selects delayed route recovery or alternate recovery after the context delay.
 
-struct SpiderFlagWord {
-    s16 bits : 16;
-};
-
-struct SpiderRouteRecoveryContext {
-    u8 pad[0x62A];
-    s16 delay;
-    struct SpiderFlagWord flags;
-};
-
-static inline void ClearContext_SelectRecoveryRoute(struct SpiderFlagWord *p, u32 mask)
+static inline void ClearContext_SelectRecoveryRoute(struct SceneActorReactionMotionFlags *p, u32 mask)
 {
     p->bits &= mask;
 }
@@ -357,27 +320,27 @@ static inline s32 Random(void)
 
 void Spider_SelectRecoveryRoute(struct ChaseActor *a, s32 frame)
 {
-    struct SpiderRouteRecoveryContext *ctx = a->base.context;
-    u8 *actor = (u8 *)a + 0x50;
-    u8 *group;
+    struct Spider *ctx = a->base.context;
+    struct SceneActorBody *actor = &a->base.body;
+    struct SceneActorChaseGroup *group;
     SceneActorControl_TakeFlag(&a->base.field2B2);
     SceneActorAnimation_SelectDirectionalEntry(a, 14);
-    if (frame <= ctx->delay)
+    if (frame <= ctx->recoveryDelay)
         return;
-    group = (u8 *)&a->group.common;
-    ClearContext_SelectRecoveryRoute(&ctx->flags, ~4);
+    group = &a->group;
+    ClearContext_SelectRecoveryRoute((struct SceneActorReactionMotionFlags *)&ctx->flags62C, ~4);
     if (a->base.paletteOffset == 0 && SceneActorControl_CreateFromPosition(actor) >= 0) {
-        SaveRecovery((void *)&a->group.saved.control, a->base.onAlternateEntry, 7, 60);
+        SceneActorDelay_Prepare((void *)&group->saved, a->base.onAlternateEntry, 7, 60);
         Chase_SetCtl(a, SceneActorReaction_RestoreAlternateAfterDelay, 14);
         Chase_SetState(a, 3, 1, 0);
     } else {
         u32 choice = (Random() >> 3) & 3;
         if (choice == 0) {
-            SaveRecovery((void *)(group + 0x8C), a->base.onAlternateEntry, 7, 60);
+            SceneActorDelay_Prepare((void *)&group->saved, a->base.onAlternateEntry, 7, 60);
             Chase_SetCtl(a, SceneActorReaction_RestoreAlternateAfterDelay, 14);
             Chase_SetState(a, 3, 1, 0);
         } else {
-            SaveRecovery((void *)(group + 0x8C), a->base.onStanding, 5, 60);
+            SceneActorDelay_Prepare((void *)&group->saved, a->base.onStanding, 5, 60);
             Chase_SetCtl(a, SceneActorReaction_RestoreAlternateAfterDelay, 14);
             Chase_SetState(a, 3, 1, 0);
         }
@@ -408,9 +371,9 @@ void SceneActorMovement_ResolveRoutePosition(void *);
 
 void Spider_UpdateContactWindup(struct ChaseActor *a, s32 n)
 {
-    u8 *anim = (u8 *)a->base.drawable + 0x48;
-    u8 *nav = (u8 *)a + 0x3D4;
-    u8 *c = (u8 *)SceneActorControl_GetState(a);
+    struct DisplaySequenceState *anim = &((struct SceneActorControlMotionDrawable *)a->base.drawable)->sequence;
+    struct SceneActorRegistryControlGroup *nav = &a->group.common;
+    struct Spider *c = a->base.context;
     struct SceneActorBody *transform = &a->base.body;
     if (SceneActorControl_TakeFlag(&a->base.field2B2)) {
         SceneActorReaction_EnableMotionFlags(0x100, &a->base.motionFlags);
@@ -420,12 +383,12 @@ void Spider_UpdateContactWindup(struct ChaseActor *a, s32 n)
             u32 m = ~0x4000;
             *p &= m;
         }
-        F(c, 0x624, void *) = a->base.tracking.target;
+        c->windupTarget = a->base.tracking.target;
     }
-    if (F(anim, 8, u16) == 3 && F(anim, 0xE, u16) == 0) {
+    if (anim->index == 3 && anim->elapsed == 0) {
         void *v;
         Sound_PlaySong(0x114);
-        v = F(c, 0x624, void *);
+        v = c->windupTarget;
         if (v)
             SceneColliderEffect_SpawnAimedSprite(transform, v, a->base.attacks.first[1],
                                                  a->base.attacks.second[1],
@@ -437,8 +400,8 @@ void Spider_UpdateContactWindup(struct ChaseActor *a, s32 n)
             u32 mask = ~0x100;
             p->bits &= mask;
         }
-        Chase_SetBehavior(a, 12);
-        Chase_SetCtl(a, F(nav, 0x48, void *), 26);
+        SceneActorChase_SetBehavior(a, 12);
+        Chase_SetCtl(a, nav->gate.control, 26);
         Spider_SelectRouteEntryAwayFromTarget(a);
         SceneActorMovement_ResolveRoutePosition(a);
         SceneActorChase_SetFlagComponent((void *)&a->group.common.gate.flags, 4);
@@ -470,7 +433,7 @@ void SceneActorReaction_ResumeEntryTarget(struct ChaseActor *actor)
 // confidence=low: eases landing displacement, then restores route pursuit.
 
 
-static inline void Spider_ClearContextFlags(struct SpiderFlagWord *p, u32 mask)
+static inline void Spider_ClearContextFlags(struct SceneActorReactionMotionFlags *p, u32 mask)
 {
     p->bits &= mask;
 }
@@ -543,7 +506,7 @@ void Spider_UpdateLandingMotion(struct ChaseActor *a, s32 frame)
         &((struct SceneActorAnimationSequenceDrawable *)a->base.drawable)->sequence;
     u32 *flags;
     if (SceneActorControl_TakeFlag(&a->base.field2B2)) {
-        Spider_ClearContextFlags(&((struct SpiderRecoveryContext *)a->base.context)->flags, ~6);
+        Spider_ClearContextFlags((struct SceneActorReactionMotionFlags *)&((struct Spider *)a->base.context)->flags62C, ~6);
         SceneActorAnimation_SelectDirectionalEntry(a, 3);
         Spider_AddMotionFlags(a, 0x20);
     }
@@ -691,31 +654,11 @@ u8 SceneActorBehavior_RequestDescriptorTurn(void *, void *, u32, u32, s32);
 
 u8 SceneActorBehavior_AccelerateTowardDescriptor(void *, void *, u32, u32, s32);
 
-#define FIELD(p, off, T) (*(T *)((u8 *)(p) + (off)))
-
-static inline void Control_ApproachRouteProbe(struct ChaseActor *a, void *target)
-{
-    u32 off = 0x2B2;
-    FIELD(a, off, u8) = 1;
-    off -= 2;
-    FIELD(a, off, u8) = 0;
-    off += 5;
-    FIELD(a, off, u8) = 1;
-    a->base.target = target;
-    a->base.field2C8 = 0;
-    {
-        u32 *p = &a->base.pendingControlFlags;
-        s32 m = ~1;
-        *p &= m;
-    }
-    a->base.pendingControl = 0;
-}
-
 // confidence=low: advances Spider toward its route probe and resumes route control on arrival
 
 void Spider_ApproachRouteProbe(struct ChaseActor *actor)
 {
-    u8 *nav = (u8 *)actor + 0x3D4;
+    struct SceneActorChaseGroup *group = &actor->group;
     s32 speed;
     u16 *scale;
     if (actor->base.field2B1)
@@ -726,17 +669,17 @@ void Spider_ApproachRouteProbe(struct ChaseActor *actor)
         Anim_SetDurationScale((u8 *)actor->base.drawable + 0x48, *scale);
     else
         Anim_SetFrameDurationScale((u8 *)actor->base.drawable + 0x20, *scale);
-    if (NavMesh_ConsumeProbeEvent(FIELD(nav, 0x1FC, void *))) {
-        if (SceneActorBehavior_RequestDescriptorTurn(actor, FIELD(nav, 0x1FC, void *), 32, 32,
+    if (NavMesh_ConsumeProbeEvent(group->route)) {
+        if (SceneActorBehavior_RequestDescriptorTurn(actor, group->route, 32, 32,
                                                      speed)) {
             Chase_SetBehavior(actor, 13);
             return;
         }
     }
-    if (SceneActorBehavior_AccelerateTowardDescriptor(actor, FIELD(nav, 0x1FC, void *), 32, 32,
+    if (SceneActorBehavior_AccelerateTowardDescriptor(actor, group->route, 32, 32,
                                                       speed)) {
         Chase_SetBehavior(actor, 12);
-        Control_ApproachRouteProbe(actor, FIELD(nav, 0x48, void *));
+        SceneActorChase_SetControl(actor, group->common.gate.control, 1);
         Spider_SelectRouteEntryAwayFromTarget(actor);
         SceneActorMovement_ResolveRoutePosition(actor);
     } else {
@@ -751,25 +694,14 @@ void Spider_ApproachRouteProbe(struct ChaseActor *actor)
 
 void Spider_UpdateWanderGoal(struct ChaseActor *input);
 
-struct SpiderProbeFlags {
-    s16 bits : 16;
-};
-
-struct SpiderProbeContext {
-    u8 pad[0x628];
-    s16 timer;
-    s16 delay;
-    struct SpiderProbeFlags flags;
-};
-
-static inline u8 HasFlag(struct SpiderProbeContext *c, u32 mask)
+static inline u8 HasFlag(struct Spider *c, u32 mask)
 {
-    if (*(u16 *)&c->flags & mask)
+    if (c->flags62C & mask)
         return 1;
     return 0;
 }
 
-static inline void ClearFlag(struct SpiderProbeFlags *p, u32 mask)
+static inline void ClearFlag(struct SceneActorReactionMotionFlags *p, u32 mask)
 {
     p->bits &= mask;
 }
@@ -784,15 +716,10 @@ static inline u32 GetFlags(struct ChaseActor *a, u32 mask, u32 **out)
     return v;
 }
 
-struct SpiderGroupView {
-    u8 pad[0x1FC];
-    void *mesh;
-};
-
 void Spider_UpdateProbeNavigation(struct ChaseActor *actor)
 {
-    struct SpiderProbeContext *ctx = actor->base.context;
-    struct SpiderGroupView *group = (void *)&actor->group.common;
+    struct Spider *ctx = actor->base.context;
+    struct SceneActorChaseGroup *group = &actor->group;
     s32 speed;
     u32 *flags;
     u16 *scale;
@@ -809,24 +736,24 @@ void Spider_UpdateProbeNavigation(struct ChaseActor *actor)
         Anim_SetFrameDurationScale((u8 *)actor->base.drawable + 0x20, *scale);
     if (!GetFlags(actor, 0x4000, &flags) && !HasFlag(actor->base.context, 4))
         Spider_UpdateWanderGoal(actor);
-    probe = NavMesh_ConsumeProbeEvent(group->mesh);
+    probe = NavMesh_ConsumeProbeEvent(group->route);
     if (!probe) {
-        void *descriptor = group->mesh;
+        void *descriptor = group->route;
         if (SceneActorBehavior_AccelerateTowardDescriptor(actor, descriptor, 32, 32, speed)) {
             Chase_SetBehavior(actor, 5);
             {
                 u32 mask = ~0x4000;
                 *flags &= mask;
             }
-            ClearFlag(&((struct SpiderProbeContext *)actor->base.context)->flags, ~2);
+            ClearFlag((struct SceneActorReactionMotionFlags *)&((struct Spider *)actor->base.context)->flags62C, ~2);
             return;
         }
     } else {
-        void *descriptor = group->mesh;
+        void *descriptor = group->route;
         if (SceneActorBehavior_RequestDescriptorTurn(actor, descriptor, 32, 32, speed))
             Chase_SetBehavior(actor, 6);
     }
-    if (!SceneActorChase_Bits32(flags, 0x4000) && ctx->timer > 0) {
+    if (!SceneActorChase_Bits32(flags, 0x4000) && ctx->wanderTimer > 0) {
         *flags |= 0x2000;
     }
     actor->base.counter2AC++;
@@ -866,11 +793,11 @@ void SceneActorControl_UpdateRouteResponse(struct ChaseActor *s)
     if (entered) {
         SceneActorChase_SetControl(s, s->base.onEntry, 2);
     } else if (Peek(s)) {
-        u8 *group = (u8 *)s + 0x3D4;
+        struct SceneActorChaseGroup *group = &s->group;
         void *fn;
         u32 kind;
         SceneActorChase_SetState(s, 0, 0, 12);
-        fn = *(void **)(group + 0x48);
+        fn = group->common.gate.control;
         kind = 26;
         s->base.field2B2 = 1;
         s->base.stepDone = entered;
@@ -890,9 +817,7 @@ void SceneActorControl_UpdateRouteResponse(struct ChaseActor *s)
 
 // confidence=low: spider action tick; restores entry state, picks a route or delayed recovery each frame.
 
-struct S080A48E0;
-
-void Spider_SelectRandomEntry(struct S080A48E0 *p);
+void Spider_SelectRandomEntry(struct SceneActorRouteCursor *p);
 
 s32 SceneActorPlacement_TriggerTetherAction(struct ChaseActor *a);
 
@@ -915,7 +840,7 @@ void Spider_UpdateIdleWander(struct ChaseActor *a)
         if (SceneActorChase_Test(ctx->flags62C, four)) {
             if ((u8)SceneActor_IsWithinTetherRange(a, 0x40, 0x40)) {
                 a->base.field2C2 = 0x40;
-                Spider_SelectRandomEntry(group + 0x74);
+                Spider_SelectRandomEntry((void *)(group + 0x74));
                 SceneActorMovement_ResolveRoutePosition(a);
                 ctx->recoveryDelay = 0;
                 Chase_SetState(a, 0, 0, 15);
@@ -924,7 +849,7 @@ void Spider_UpdateIdleWander(struct ChaseActor *a)
                 SceneActorPlacement_TriggerTetherAction(a);
             }
         } else if ((s32)a->base.counter2AC > 60) {
-            Spider_SelectRandomEntry(group + 0x74);
+            Spider_SelectRandomEntry((void *)(group + 0x74));
             SceneActorMovement_ResolveRoutePosition(a);
             if (a->base.paletteOffset == 0) {
                 if ((ParticleRandom_ReadDirectSample(gRandomTable) & 3) != 0) {
@@ -1017,17 +942,12 @@ void Spider_InitColliders(u8 *p)
 
 /* SceneActorRoute_ResetStep: tentative */
 
-struct SpiderResetContext {
-    u8 unknown0[0x628];
-    u16 field628, field62A, field62C;
-};
-
 void SceneActorRoute_ResetStep(struct ChaseActor *actor)
 {
-    struct SpiderResetContext *context = actor->base.context;
-    context->field628 = 0;
-    context->field62A = 0;
-    context->field62C = 0;
+    struct Spider *context = actor->base.context;
+    context->wanderTimer = 0;
+    context->recoveryDelay = 0;
+    context->flags62C = 0;
     SceneActorMovement_ResolveRoutePosition(actor);
     SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0);
     {
@@ -1051,18 +971,6 @@ s32 Terrain_ApplyBlocked(void *, struct ContactPosition *, struct ContactPositio
 
 s32 Div(s32, s32);
 
-struct PursuitContext {
-    u8 pad[0x628];
-    s16 timer, delay;
-    u16 flags;
-};
-
-struct SpiderPursuitGroup {
-    u8 unknown0[0x1FC];
-    void *mesh;
-    struct ContactPosition *point;
-};
-
 static inline u8 Blocked(struct ChaseActor *a)
 {
     if (a) {
@@ -1078,17 +986,17 @@ static inline u8 Blocked(struct ChaseActor *a)
     return 0;
 }
 
-static inline u8 HasFlag_BeginPlayerPursuit(struct PursuitContext *c, u32 mask)
+static inline u8 HasFlag_BeginPlayerPursuit(struct Spider *c, u32 mask)
 {
-    if (c->flags & mask)
+    if (c->flags62C & mask)
         return 1;
     return 0;
 }
 
 void Spider_BeginPlayerPursuit(struct ChaseActor *a)
 {
-    struct PursuitContext *ctx;
-    u8 *group;
+    struct Spider *ctx;
+    struct SceneActorChaseGroup *group;
     u8 ready;
     void **mesh;
     struct ContactPosition **point;
@@ -1098,21 +1006,21 @@ void Spider_BeginPlayerPursuit(struct ChaseActor *a)
     u32 motionMask;
     if (Blocked(a))
         return;
-    if (!(*(u8 **)gPlayers))
+    if (!gPlayers[0])
         return;
     ctx = a->base.context;
-    group = (u8 *)(&a->group.common);
+    group = &a->group;
     ready = HasFlag_BeginPlayerPursuit(ctx, 1);
     if (ready)
         return;
-    mesh = &((struct SpiderPursuitGroup *)group)->mesh;
-    if (!Nav_IsPositionInMesh(*mesh, &a->base.body.position, (*(u8 **)gPlayers) + 0x30))
+    mesh = &group->route;
+    if (!Nav_IsPositionInMesh(*mesh, &a->base.body.position, (struct ContactPosition *)&gPlayers[0]->position))
         return;
     motionMask = 0x200;
-    point = &((struct SpiderPursuitGroup *)group)->point;
+    point = &group->destination;
     *(*point) = a->base.body.position;
     (*point)->pad = ready;
-    a->base.tracking.target = (u32)((*(u8 **)gPlayers) + 0x24);
+    a->base.tracking.target = &((struct SceneActorChasePlayer *)gPlayers[0])->target;
     Chase_SetState(a, 0, 0, 7);
     Chase_SetCtl(a, a->base.onAlternateEntry, 1);
     terrain = *mesh;
@@ -1130,8 +1038,8 @@ void Spider_BeginPlayerPursuit(struct ChaseActor *a)
     }
     SceneActorChase_SetBehaviorFlags(a, 0x4010);
     a->base.field2C2 = Div(64, 3);
-    ctx->flags |= 2;
-    ctx->timer = 0;
+    ctx->flags62C |= 2;
+    ctx->wanderTimer = 0;
 }
 
 void Spider_ClearGroupFlag(u8 *s)
@@ -1178,30 +1086,6 @@ s32 SceneActor_IsWithinTetherRange(struct ChaseActor *actor, s32 xRange, s32 zRa
     }
 }
 
-static inline void Control_TriggerTetherAction(struct ChaseActor *a, void *c, u32 k, u32 z)
-{
-    a->base.field2B2 = 1;
-    a->base.stepDone = 0;
-    a->base.controlKind = k;
-    a->base.target = c;
-    a->base.field2C8 = z;
-    {
-        u32 *p = &a->base.pendingControlFlags;
-        u32 m = ~1;
-        *p &= m;
-    }
-    a->base.pendingControl = z;
-}
-
-static inline void State_TriggerTetherAction(struct ChaseActor *a, u32 k, u32 z)
-{
-    a->base.state2A8 = z;
-    a->base.phase2A9 = z;
-    a->base.behavior2AA = k;
-    a->base.counter2AC = z;
-    a->base.field2B1 = 1;
-}
-
 static inline u8 Disabled(struct ChaseActor *a)
 {
     if (a) {
@@ -1233,7 +1117,7 @@ static inline u8 Route(struct ChaseActor *a, void *nav, void *pos, void *target)
 
 s32 SceneActorPlacement_TriggerTetherAction(struct ChaseActor *a)
 {
-    u8 *c = (void *)SceneActorControl_GetState(a);
+    struct Spider *c = a->base.context;
     u8 *nav = (u8 *)a + 0x3d4;
     struct ContactPosition *target;
     if (Disabled(a))
@@ -1244,13 +1128,10 @@ s32 SceneActorPlacement_TriggerTetherAction(struct ChaseActor *a)
     if (!Route(a, F(nav, 0x1fc, void *), &a->base.body.position, target))
         return 0;
     {
-        struct Flags {
-            s16 bits : 16;
-        };
-        struct Flags *p = (void *)(c + 0x62C);
+        struct SceneActorReactionMotionFlags *p = (void *)&c->flags62C;
         p->bits |= 4;
-        Control_TriggerTetherAction(a, F(a, 0x228, void *), 1, 0);
-        State_TriggerTetherAction(a, 7, 0);
+        SceneActorChase_SetControl(a, a->base.onAlternateEntry, 1);
+        SceneActorChase_SetBehavior(a, 7);
     }
     a->base.field2C2 = 16;
     return 1;
@@ -1291,9 +1172,9 @@ void SceneActorPlacement_UpdateTetherTimer(struct ChaseActor *p)
     }
 }
 
-static inline u8 SaveControlFlags(u8 *c, u16 **out, u32 m)
+static inline u8 SaveControlFlags(struct Spider *c, u16 **out, u32 m)
 {
-    u16 *p = (void *)(c + 0x62c);
+    u16 *p = &c->flags62C;
     u16 value = *p;
     value &= m;
     *out = p;
@@ -1323,7 +1204,7 @@ static inline u8 Disabled_UpdateMovementSlowdown(struct ChaseActor *a)
 
 void SceneActorPlacement_UpdateMovementSlowdown(struct ChaseActor *a)
 {
-    u8 *c = (void *)SceneActorControl_GetState(a);
+    struct Spider *c = a->base.context;
     u16 *flags;
     if (Disabled_UpdateMovementSlowdown(a))
         return;
@@ -1332,7 +1213,7 @@ void SceneActorPlacement_UpdateMovementSlowdown(struct ChaseActor *a)
             if (!SceneActorChase_TestField(flags, 8)) {
                 SceneActorMovement_ResolveRoutePosition(a);
                 Chase_SetBehavior(a, 7);
-                Chase_SetCtl(a, F(a, 0x228, void *), 1);
+                Chase_SetCtl(a, a->base.onAlternateEntry, 1);
                 {
                     u32 v = *flags;
                     u32 m = 8;
@@ -1438,10 +1319,7 @@ void Spider_UpdateWanderGoal(struct ChaseActor *input)
         }
     } else if (ctx->wanderTimer > 0) {
     decrement: {
-        s16 *timer = &ctx->wanderTimer;
-        u16 value = *timer;
-        --value;
-        *timer = value;
+        ctx->wanderTimer--;
     }
     }
 }
@@ -1626,7 +1504,7 @@ static inline u32 SaveFlags(struct ChaseActor *a, u16 **out, u32 m)
 u8 SceneActorPlacement_BeginNearbyPlayerContact(struct ChaseActor *a)
 {
     u8 *c = (void *)SceneActorControl_GetState(a);
-    u8 *nav = (u8 *)a + 0x3d4;
+    struct SceneActorChaseGroup *group = &a->group;
     u8 *transform = (u8 *)a + 0x50;
     u8 *player;
     u16 *flags;
@@ -1653,7 +1531,7 @@ u8 SceneActorPlacement_BeginNearbyPlayerContact(struct ChaseActor *a)
         return 0;
     a->base.tracking.target = (u32)(((u8 **)gPlayers)[0] + 0x24);
     Chase_SetBehavior(a, 12);
-    Chase_SetCtl(a, F(nav, 0x48, void *), 26);
+    Chase_SetCtl(a, group->common.gate.control, 26);
     Spider_SelectRouteEntryAwayFromTarget(a);
     SceneActorMovement_ResolveRoutePosition(a);
     {
@@ -1700,7 +1578,7 @@ void Spider_SelectRouteEntryAwayFromTarget(struct ChaseActor *actor)
     u8 *group = (u8 *)(&actor->group.common);
     struct RouteCursor *route = (struct RouteCursor *)(group + 0x74);
     u8 selected = 0;
-    struct ChaseTarget *t;
+    struct SceneActorChaseTarget *t;
     struct ContactPosition dir;
     struct ContactPosition delta;
     u8 angle;
@@ -1708,7 +1586,7 @@ void Spider_SelectRouteEntryAwayFromTarget(struct ChaseActor *actor)
     s32 i;
     u8 found;
 
-    t = *((struct ChaseTarget **)(((u8 *)actor) + 0xDC));
+    t = actor->base.tracking.target;
     angle = Math_Atan2(t->position.x - actor->base.body.position.x,
                        t->position.z - actor->base.body.position.z);
     dir.x = (gUnk_086149C4[(angle + 64) & 255] * 10) >> 12;
@@ -1730,7 +1608,7 @@ void Spider_SelectRouteEntryAwayFromTarget(struct ChaseActor *actor)
     }
 
     if (!found) {
-        Spider_SelectRandomEntry(group + 0x74);
+        Spider_SelectRandomEntry((void *)(group + 0x74));
     } else {
         route->index = selected;
         route->unk3 = 0;
@@ -1740,24 +1618,17 @@ void Spider_SelectRouteEntryAwayFromTarget(struct ChaseActor *actor)
 
 s32 Mod(s32, s32);
 
-struct S080A48E0 {
-    u8 pad0[2];
-    u8 index;
-    u8 unk3;
-    u8 *data;
-    u8 *entry;
-};
-
-void Spider_SelectRandomEntry(struct S080A48E0 *p)
+void Spider_SelectRandomEntry(struct SceneActorRouteCursor *p)
 {
-    struct S080A48E0 *q = p;
+    struct SceneActorRouteCursor *q = p;
     u8 n;
-    n = Mod(Random(), *p->data);
-    if (n == p->index)
-        n = Mod(n + 1, *p->data);
-    q->index = n;
-    q->unk3 = 0;
-    q->entry = Path_GetPointData(q->data) + q->index * 8;
+    n = Mod(Random(), p->definition->pointCount);
+    if (n == p->pointIndex)
+        n = Mod(n + 1, p->definition->pointCount);
+    q->pointIndex = n;
+    q->unknown3 = 0;
+    q->point = (void *)(Path_GetPointData((void *)q->definition) +
+                       q->pointIndex * sizeof(*q->point));
 }
 
 extern const u16 gUnk_08605F30[];
@@ -1884,13 +1755,6 @@ void SceneActorTerrain_ReadScriptParameters(void *);
 
 u8 SceneActorRegistry_LinkActor(void *);
 
-struct SpiderDeferredControl {
-    u8 unknown0[8];
-    u8 state, phase, mode, unknownB;
-    u32 counter;
-    void *callback;
-};
-
 void Spider_InitProfile(u8 *p);
 
 u32 Spider_OnUpdate(u8 *p);
@@ -1956,16 +1820,6 @@ static inline void Spider_SetFlags(struct Spider *actor, u32 mask)
     actor->flags62C |= mask;
 }
 
-static inline void Spider_InitializeDeferred(struct SpiderDeferredControl *control, void *callback,
-                                             u32 mode, u32 timer)
-{
-    control->counter = timer;
-    control->callback = callback;
-    control->state = 0;
-    control->phase = 0;
-    control->mode = mode;
-}
-
 static inline void Spider_InstallContact(struct ChaseActor *actor,
                                          struct SceneActorChaseGroup *group)
 {
@@ -1984,7 +1838,7 @@ s32 Spider_Init(void *object)
     struct Spider *arg0 = object;
     struct ChaseActor *actor = object;
     struct SceneActorChaseGroup *group = &arg0->chase.group;
-    u32 zero;
+    u32 zero; // concession-ok(const-local): CpuSet reads this source word for a fixed position fill.
     struct ContactPosition tmp;
     u32 flag;
     s32 extra;
@@ -2065,7 +1919,7 @@ s32 Spider_Init(void *object)
         Spider_SetFlags(arg0, 1);
     } else {
         MonsterInit_SetControl(actor, SceneActorReaction_RestoreAlternateAfterDelay, 0xE);
-        Spider_InitializeDeferred((void *)&group->saved, actor->base.onAlternateEntry, 7, 0x3C);
+        SceneActorDelay_Prepare((void *)&group->saved, actor->base.onAlternateEntry, 7, 0x3C);
     }
     arg0->timer62E = 0x12C;
     MonsterInit_SaveControl(MonsterInit_SavedControlOf(actor), actor);
@@ -2079,9 +1933,9 @@ s32 Spider_Init(void *);
 
 void Spider_Create(void)
 {
-    void *m = Heap_Alloc(0x65c);
+    void *m = Heap_Alloc(sizeof(struct Spider));
     if (m != 0) {
-        Memory_Clear(m, 0x65c);
+        Memory_Clear(m, sizeof(struct Spider));
         if (Spider_Init(m) < 0) {
             Spider_Destroy(m);
             Heap_Free(m);

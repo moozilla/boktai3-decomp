@@ -1,3 +1,5 @@
+#include "scene/motion/scene_actor_terrain_reaction.h"
+#include "scene/collision/contact_actor.h"
 #include "monsters/ghoul.h"
 #include "scene/motion/scene_actor_turn.h"
 #include "scene/actor/scene_actor_init_actor.h"
@@ -287,15 +289,6 @@ u8 SceneActorBehavior_RequestDescriptorTurn(void *, void *, u32, u32, s32);
 
 u8 SceneActorBehavior_AccelerateTowardDescriptor(void *, void *, u32, u32, s32);
 
-static inline void Ghoul_EnterRouteBehavior(struct ChaseActor *actor, u32 behavior)
-{
-    actor->base.state2A8 = 0;
-    actor->base.phase2A9 = 0;
-    actor->base.behavior2AA = behavior;
-    actor->base.counter2AC = 0;
-    actor->base.field2B1 = 1;
-}
-
 static inline void Ghoul_ClearPendingRoute(u16 *flags)
 {
     u32 mask = ~1;
@@ -335,7 +328,7 @@ void Ghoul_UpdateProbeApproach(struct ChaseActor *actor)
     event = NavMesh_ConsumeProbeEvent(group->route);
     if (event) {
         if (SceneActorBehavior_RequestDescriptorTurn(actor, group->route, 0x20, 0x20, speed)) {
-            Ghoul_EnterRouteBehavior(actor, 16);
+            SceneActorTerrain_EnterState(actor, 0, 0, 16);
         }
     } else if (SceneActorBehavior_AccelerateTowardDescriptor(actor, group->route, 0x20, 0x20,
                                                              speed)) {
@@ -366,7 +359,7 @@ void SceneActorControl_RestartOrAdvance(struct ChaseActor *actor)
         }
     }
     if (actor->base.stepDone)
-        Ghoul_EnterRouteBehavior(actor, 15);
+        SceneActorTerrain_EnterState(actor, 0, 0, 15);
     else
         ++actor->base.counter2AC;
 }
@@ -447,25 +440,9 @@ void Ghoul_EnterIdleControl(struct ChaseActor *actor)
 
 /* Refresh the chase gate from the actor's tracking flags. */
 
-static inline void Ghoul_RestoreIdleController(struct ChaseActor *actor, void *control, u32 kind,
-                                               u32 zero)
-{
-    actor->base.field2B2 = 1;
-    actor->base.stepDone = zero;
-    actor->base.controlKind = kind;
-    actor->base.target = control;
-    actor->base.field2C8 = zero;
-    {
-        u32 *flags = &actor->base.pendingControlFlags;
-        u32 mask = ~1;
-        *flags &= mask;
-    }
-    actor->base.pendingControl = zero;
-}
-
 void Ghoul_RefreshMotionRoute(struct ChaseActor *actor)
 {
-    u32 active = MonsterInit_TestTargetingFlags(&actor->base.tracking, 8);
+    u32 active = SceneActorChase_TrackingFlags(&actor->base.tracking, 8);
     if (active) {
         {
             u16 *flags = &actor->group.common.gate.flags;
@@ -487,7 +464,7 @@ void Ghoul_RefreshMotionRoute(struct ChaseActor *actor)
         Ghoul_EnterIdleControl(actor);
     } else {
         SceneActorChase_SetPhase(actor, 1, 0);
-        Ghoul_RestoreIdleController(actor, (void *)SceneActorControl_OnIdle, 16, active);
+        SceneActorChase_SetControl(actor, SceneActorControl_OnIdle, 16);
     }
     {
         struct SceneActorReactionMotion *motion = (void *)&actor->base.tracking.target;
@@ -568,20 +545,20 @@ void Ghoul_ResumeContactRoute(struct ChaseActor *actor)
     return;
 }
 
-void SceneActorCollision_InitBody(void *, struct GhoulCollisionVector *,
-                                  struct GhoulCollisionVector *, void *, void *);
+void SceneActorCollision_InitBody(void *, struct ContactPackedVector *,
+                                  struct ContactPackedVector *, void *, void *);
 
-void SceneActorCollision_InitAttack(void *, struct GhoulCollisionVector *,
-                                    struct GhoulCollisionVector *, void *, u32, void *);
+void SceneActorCollision_InitAttack(void *, struct ContactPackedVector *,
+                                    struct ContactPackedVector *, void *, u32, void *);
 
 void Ghoul_InitCollision(struct ChaseActor *actor)
 {
-    struct GhoulCollisionVector bounds, offset;
-    bounds.xy.first = 0x40;
-    bounds.xy.second = 0x80;
-    bounds.zw.first = 0x40;
-    *(u32 *)&offset.xy = 0x800000;
-    *(u32 *)&offset.zw &= 0xFFFF0000;
+    struct ContactPackedVector bounds, offset;
+    bounds.x = 0x40;
+    bounds.y = 0x80;
+    bounds.z = 0x40;
+    *(u32 *)&offset = 0x800000;
+    ((u32 *)&offset)[1] &= 0xFFFF0000;
     SceneActorCollision_InitBody(actor, &bounds, &offset, Ghoul_OnBodyCollision, actor);
     ((struct ContactPosition *)&bounds)->x = 0x40;
     ((struct ContactPosition *)&bounds)->y = 0x64;
@@ -828,7 +805,7 @@ void Ghoul_BeginAlternateRoute(struct ChaseActor *actor)
     Ghoul_SetDiscFlags(context, 1);
     Ghoul_ClearDiscFlags(context, 2);
     MonsterInit_SetStatusFlags(actor, 4);
-    Ghoul_EnterRouteBehavior(actor, 15);
+    SceneActorTerrain_EnterState(actor, 0, 0, 15);
     Ghoul_StartAlternateRoute(&actor->base.body, &actor->group.homeRoute, &actor->group);
     Ghoul_SelectRetreatRoutePoint(actor);
     Ghoul_ClearDiscFlags(context, 2);
@@ -980,16 +957,6 @@ static inline u8 Ghoul_ActionsUnavailable(struct ChaseActor *actor)
     return 0;
 }
 
-static inline void Ghoul_PrepareRouteDelay(struct SceneActorDelayedResponse *packet, void *control,
-                                           u32 behavior, u32 delay)
-{
-    packet->delay = delay;
-    packet->control = control;
-    packet->state = 0;
-    packet->phase = 0;
-    packet->behavior = behavior;
-}
-
 static inline u8 Ghoul_TestPendingRoute(struct Ghoul *context, u32 mask, u16 **pending)
 {
     u16 *pointer = &context->discFlags;
@@ -1000,31 +967,22 @@ static inline u8 Ghoul_TestPendingRoute(struct Ghoul *context, u32 mask, u16 **p
     return 0;
 }
 
-static inline u32 Ghoul_ReadRouteMotionFlags(struct ChaseActor *actor, u32 mask, u16 **out)
-{
-    *out = &actor->base.motionFlags;
-    return **out & mask;
-}
-
 s32 Ghoul_ResumePendingRoute(struct ChaseActor *actor)
 {
     struct Ghoul *context = actor->base.context;
     struct SceneActorChaseGroup *group = &actor->group;
     void **routeSlot;
-    u16 *flags;
     u16 *pending;
-    u16 *timer;
     struct ChaseRouteProbe *route;
     void *body;
     if (Ghoul_ActionsUnavailable(actor))
         return 1;
     if (!Ghoul_TestPendingRoute(context, 1, &pending))
         return 1;
-    if (Ghoul_ReadRouteMotionFlags(actor, 0xA107, &flags))
+    if (SceneActorChase_QueryMotionFlags(actor, 0xA107))
         return 1;
-    timer = &context->routeDelay;
-    if (*timer)
-        (*timer)--;
+    if (context->routeDelay)
+        context->routeDelay--;
     else {
         {
             u32 *p = &actor->base.statusFlags;
@@ -1036,7 +994,7 @@ s32 Ghoul_ResumePendingRoute(struct ChaseActor *actor)
         route = *routeSlot;
         SceneActor_SetPositionXZ(body, route->destination.x, route->destination.z);
         SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0);
-        Ghoul_PrepareRouteDelay((void *)&group->saved, group->common.gate.control, 12, 30);
+        SceneActorDelay_Prepare((void *)&group->saved, group->common.gate.control, 12, 30);
         SceneActorChase_SetControl(actor, SceneActorReaction_RestoreAfterDelay, 14);
         SceneActorChase_SetState(actor, 3, 1, 0);
         SceneBody_StartRoute(body, &group->homeRoute, group->homeRoute.routeId,
@@ -1045,20 +1003,7 @@ s32 Ghoul_ResumePendingRoute(struct ChaseActor *actor)
             void *route = *routeSlot;
             struct ContactPosition *position = &actor->base.body.position;
             struct ContactPosition *target = Ghoul_InitialDiscTarget(context);
-            s32 result = Nav_IsPositionInMesh(route, position, target);
-            if (!result) {
-                u32 mask = ~0x200;
-                *flags = mask & (*flags);
-            } else {
-                result = Terrain_ApplyBlocked(route, position, target);
-                if (result) {
-                    if (result != 2)
-                        Memory_Clear(&actor->base.body.motion, 8);
-                } else {
-                    u32 mask = ~0x200;
-                    *flags = mask & (*flags);
-                }
-            }
+            SceneActorChase_TryRoute(actor, route, position, target);
         }
         {
             u32 mask = ~1;
@@ -1260,7 +1205,7 @@ s32 Ghoul_Init(void *object)
         Bat_UpdateDefeat, SceneActorReaction_OnEnemyDefault, SceneActorTarget_UpdateTrackedContact,
         SceneActorTarget_ResolvePendingObject, SceneActorReaction_ResolvePlacementDamage,
         SceneActorPlacement_ResetStateThree);
-    MonsterInit_InitializeGroupWithBounds(group, rootActor->routeBounds, &rootActor->routePosition,
+    MonsterInit_InitializeGroupWithBounds(group, &rootActor->routeBounds, &rootActor->routePosition,
                                           Ghoul_UpdateDyingState, Bat_ResumeSavedTarget,
                                           SceneActorReaction_BeginTargetRecovery,
                                           Bat_UpdateAnimationRequest, 1, body);

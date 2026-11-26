@@ -70,4 +70,6 @@ struct ScreamerState {
     u32 f21C;
 };
 
+typedef char ScreamerStateSizeCheck[sizeof(struct ScreamerState) == 0x220 ? 1 : -1];
+
 #endif

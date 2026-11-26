@@ -1,16 +1,14 @@
-#include "global.h"
-void *Task_Create(u32, u32);
-void Task_SetCallbacks(void *, void *, void *);
+#include "monsters/cannons/wind_cannon.h"
 s32 WindCannonManager_Init(void *);
-void Task_Kill(void *);
-void WindCannonManager_Update(void);
-void WindCannonManager_Destroy(void);
+u32 WindCannonManager_Update(struct FanCannonManager *);
+u32 WindCannonManager_Destroy(struct FanCannonManager *);
 
 void *WindCannonManager_Create(void)
 {
-    void *p = Task_Create(8, 0xc1c);
+    void *p = Task_Create(8, sizeof(struct FanCannonManager));
     if (p) {
-        Task_SetCallbacks(p, WindCannonManager_Update, WindCannonManager_Destroy);
+        Task_SetCallbacks(p, (void (*)(void *))WindCannonManager_Update,
+                          (void (*)(void *))WindCannonManager_Destroy);
         if (WindCannonManager_Init(p) < 0) {
             Task_Kill(p);
             return 0;

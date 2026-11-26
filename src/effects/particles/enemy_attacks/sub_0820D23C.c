@@ -1,15 +1,9 @@
-#include "global.h"
-struct S {
-    u32 w0;
-    u32 w4;
-    u8 a[0x22];
-    u16 h2a;
-};
-u32 EnemyAttackParticle_UpdateLifetime(struct S *p)
+#include "monsters/enemy_particle.h"
+u32 EnemyAttackParticle_UpdateLifetime(struct EnemyParticle *p)
 {
     u32 m = 2;
-    p->w4 |= m;
-    if (p->w0 > p->h2a)
+    p->flags |= m;
+    if (p->timer > p->params.lifetime)
         return 1;
     return 0;
 }
