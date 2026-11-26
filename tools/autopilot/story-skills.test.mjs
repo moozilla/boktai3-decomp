@@ -81,6 +81,51 @@ test('doors to the same scene prefer the arrival nearer a forward exit', () => {
   assert.equal(distance(9), Infinity);
 });
 
+test('live pressure plates use the center of the occupied square', () => {
+  const manager = 0x02010000, slot = manager + 0x18;
+  const words = { 0x020001a8: manager, [manager + 0x498]: 1,
+    [slot + 0x48]: 0x5fc0, [slot + 0x4c]: 3145, [slot + 0x50]: 3146, [slot + 0x54]: 31 };
+  const positions = { [slot + 0x1c]: 1536, [slot + 0x1e]: 256, [slot + 0x20]: 1536 };
+  const g = { types: { globals: { gFloorSwitchManager: { addr: 0x020001a8 } } },
+    u32: (address) => words[address] ?? 0, s16: (address) => positions[address] ?? 0, u16: () => 2 };
+  const game = { gGameState: { region: 31 } };
+  const { floorSwitches } = skill('floor-switches', g, game);
+  assert.deepEqual(floorSwitches(), [{ addr: slot, name: 0x5fc0, x: 1664, y: 256, z: 1664, release: true, pressed: true }]);
+  game.gGameState.region = 32;
+  assert.deepEqual(floorSwitches(), []);
+});
+
+test('a delayed floor switch retreats on its first occupied tick', () => {
+  const plate = { addr: 0x02010018, x: 128, y: 256, z: 128, release: true };
+  const cells = [{ x: 0, z: 0, open: true, level: 1 }, { x: 0, z: 1, open: true, level: 1 }];
+  const task = { task: 4, update: 'DelayedScript_Update' };
+  let pressed = false, scheduled = false;
+  const lib = skill('floor-switches', { press: (key) => key }, {}, {
+    where: () => ({ x: 128, y: 256, z: 384, scene: 2 }),
+    grid: () => ({ at: (x, z) => x === 0 ? cells[z] : undefined }),
+    cellOf: (x, z) => [x >> 8, z >> 8],
+    findPath: () => [[0, 1]],
+    navigate: function* (target) {
+      assert.deepEqual(target, [128, 384]);
+      return { reached: true };
+    },
+    tasks: () => scheduled ? [task] : [],
+    session: { snapshot: () => null, restore: () => {} },
+    DIR_KEYS: ['up+right', 'down+right', 'down+left', 'up+left'],
+  });
+  lib.floorSwitches = () => [{ ...plate, pressed }];
+  const trial = lib.tapFloorSwitch(plate, {});
+  assert.equal(trial.next().value, 'up+right');
+  pressed = scheduled = true;
+  assert.equal(trial.next().value, 'down+left');
+  pressed = false;
+  const result = trial.next();
+  assert.equal(result.done, true);
+  assert.equal(result.value(), false);
+  scheduled = false;
+  assert.equal(result.value(), true);
+});
+
 test('the vampire model uses signed health and the source sunlight flag', () => {
   const addr = 0x02010000;
   const values = { [addr + 0x94]: 310, [addr + 0x9c]: 0x10, [addr + 0x3ac]: 1, [addr + 0x54]: 400 };

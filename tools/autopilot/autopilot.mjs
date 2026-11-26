@@ -183,13 +183,23 @@ const GOALS = {
           event({ skill: 'heal', from: life0, to: life(), ...r });
         }
       }
-      // floor switches (stages.json: a trap on an HP box that runs a script once, e.g. a
-      // chest appears): step on each once
-      for (const sw of (stageOf(here).switches || []).filter((sw) => !TRIED.has(`${here}:switch:${sw.box}`))) {
-        TRIED.add(`${here}:switch:${sw.box}`);
-        const r = yield* L.navigate([sw.x, sw.z], { avoid: stageOf(here).doors.map((d) => d.box), trace: (e) => event({ skill: 'nav', ...e }) });
-        yield* L.clearInterruptions({});
-        event({ skill: 'switch', box: sw.box, reached: r.reached, reason: r.reason });
+      // Both HP traps and live pressure plates can run scripts on contact.
+      const switches = (stageOf(here).switches || []).concat(L.floorSwitches().filter((sw) => !sw.pressed));
+      for (const sw of switches) {
+        const key = `${here}:switch:${sw.box ?? sw.name}`;
+        if (TRIED.has(key)) continue;
+        const pressed = sw.addr ? () => L.floorSwitches().some((plate) => plate.addr === sw.addr && plate.pressed) : undefined;
+        const opts = { avoid: stageOf(here).doors.map((d) => d.box) };
+        const delayed = yield* L.tapFloorSwitch(sw, opts);
+        const r = delayed ? { reason: 'released before delayed script' } :
+          yield* L.navigate([sw.x, sw.z], { ...opts, stopIf: pressed, trace: (e) => event({ skill: 'nav', ...e }) });
+        const clear = () => !g.fn.ScriptUtility_IsControlFlagSet();
+        const completed = delayed ? (yield* untilControl(g, L, () => delayed() && clear(), 24, 900)) :
+          pressed ? pressed() || L.where().scene !== here : r.reached;
+        if (!pressed || completed) TRIED.add(key);
+        if (pressed && completed && !delayed) yield* untilControl(g, L, clear, 24, 900);
+        else yield* L.clearInterruptions({});
+        event({ skill: 'switch', box: sw.box, name: sw.name, reached: completed, reason: r.reason });
         if (L.where().scene !== here) break;
       }
       // hittables with a script (lever switches): strike each once
