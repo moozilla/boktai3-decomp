@@ -1,6 +1,7 @@
 #include "engine/script_virtual_machine/script_virtual_machine.h"
 #include "engine/shared/ram.h"
 #include "engine/shared/runtime.h"
+#include "gba/io_reg.h"
 
 s32 Script_FindResourceKey(u32 key, u16 *tbl, s32 x, s32 lo, s32 hi)
 {
@@ -803,7 +804,7 @@ void Script_ResetLocalVariables(void)
 
 void GameState_SelectRamBase(void)
 {
-    u32 timer = *(vu16 *)0x0400010C;
+    u32 timer = *(vu16 *)REG_ADDR_TM3CNT_L;
     u8 *base = (u8 *)((u32)gGameStateStorage & ~(timer >> 16));
     base += (timer & 127) * 8;
     gGameState = (struct GameState *)base;
