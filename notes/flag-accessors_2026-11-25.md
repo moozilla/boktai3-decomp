@@ -62,6 +62,8 @@ The pinned compiler source under `build/tools/agbcc/gcc/` explains the distincti
   10 ahead of UID 12 from initial RTL onward. Raising the mask pseudo's allocation
   priority with `AGBCC_PRI=24:+20000` leaves exactly the same one-instruction order
   hunk. The physical ROM then uses the same 1 for a write to a different field.
+  Stock check.py reports MATCH on all 44 bytes with the existing accessor, with a
+  single-use local in its place, and with a mask-temporary macro in its place.
 
 ## Which sites the ROM supports
 
@@ -117,7 +119,10 @@ globals and multiple masks. The ordinary combined-expression branch builds 0x400
 after both loads and the OR. Passing 0x400 into the inline builds it before either
 load. Homing effect (0800A900 and 0800A90A) reuses a combined value in consecutive
 tests, explaining how orders can differ within a single computation. By contrast the
-single engine word is overwhelmingly word-first. Preserve the combined semantic
+single engine word is overwhelmingly word-first. Trigger_UpdateProximity contains a
+  within-function control at 0800729C and 080072AC. Both tests in item_container.c
+  spell `gEngineFlags & 2048` directly. The first is word-first and the second
+  mask-first because both use the definition at 0800729A. Preserve the combined semantic
 operation with high confidence, its original inline-versus-macro spelling with lower
 confidence. A generic single-word exception would cover fundamentally different sites.
 
@@ -166,7 +171,9 @@ and [Emerald input macros](https://github.com/pret/pokeemerald/blob/master/inclu
 
 The old inventory counted a definition once and required every call to pass a constant.
 It counted the definition zero times as soon as any caller supplied a runtime mask.
-The revised warning is at each caller and each operand. A local read twice is charged
+The revised warning is at each caller and each operand. An expression macro expands
+directly. A function macro that first assigns its mask argument to a scalar temporary
+and uses that temporary for bit operations also incurs caller debt. A local read twice is charged
 twice, including when its two uses are on one source line. A grouped declaration retains
 one printable diagnostic with the combined weight. Number-named bindings are included
 in the subtotal so renaming a parked literal to `one` cannot help. A declaration with
@@ -186,6 +193,19 @@ The branch test on an unsigned-char bit-field at bit 2 is a particularly good ne
 control. Its LDRB, MOV 4, AND, CMP 0 and branch are the same pattern as the plain-byte
 branch. Even bit-field inference needs the container width, neighboring members and
 other operations for support.
+
+At the worker baseline 9a0f205da the old linter printed 3 errors and 3,607 warnings.
+On the same game source the revised accounting yields 3 errors and 7,280 weighted
+warnings. Steering debt is 7,042 uses, comprising 2,972 literal-local, 1,199
+const-local and 2,871 unresolved constant arguments. These are source-level
+review counts. Previously the corresponding categories were 2,133 lines, 708 lines and
+528 definitions. The increase measures a change of units and coverage on identical game source.
+
+The whole-tree, single-job summary covered 6,628 files. The final macro extension
+was checked incrementally against that run by inspecting all 208 files defining function
+macros and recounting all six files mentioning the three eligible macros.
+It adds 4 constant arguments. Filtered checks reuse header facts and can skip the
+unrelated whole-tree statement-macro inventory.
 
 For a compact expansion-order replay, save the following as build/flag_forms.c:
 
