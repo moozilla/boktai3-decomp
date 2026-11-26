@@ -463,8 +463,8 @@ void SceneActorControl_WaitForRouteResult(struct ChaseActor *actor)
 
 void SceneActorControl_UpdateProbeApproach_080B04F4(struct ChaseActor *actor)
 {
-    u8 *nav = (u8 *)actor + 0x3D4;
-    u8 *control = (u8 *)SceneActorControl_GetState(actor);
+    struct SceneActorChaseGroup *nav = &actor->group;
+    struct Vorn *control = actor->base.context;
     s32 speed;
     u32 event;
     u16 *scale;
@@ -473,7 +473,7 @@ void SceneActorControl_UpdateProbeApproach_080B04F4(struct ChaseActor *actor)
         Chase_SetCtl(actor, SceneActorPhase_SelectLinkedAnimation, 0x27);
         {
             u32 bit = 0x20;
-            u16 *flags = (u16 *)(control + 0x6D4);
+            u16 *flags = &control->flags6D4;
             bit |= *flags;
             *flags = bit;
         }
@@ -502,24 +502,27 @@ void SceneActorControl_UpdateProbeApproach_080B04F4(struct ChaseActor *actor)
             }
         }
     }
-    if (actor->base.drawableKind == 0)
-        Anim_SetDurationScale((u8 *)actor->base.drawable + 0x48, *scale);
-    else
-        Anim_SetFrameDurationScale((u8 *)actor->base.drawable + 0x20, *scale);
-    event = NavMesh_ConsumeProbeEvent(FIELD(nav, 0x1FC, void *));
+    if (actor->base.drawableKind == 0) {
+        struct SceneActorAnimationSequenceDrawable *drawable = actor->base.drawable;
+        Anim_SetDurationScale(&drawable->sequence, *scale);
+    } else {
+        struct SceneActorAnimationTileDrawable *drawable = actor->base.drawable;
+        Anim_SetFrameDurationScale(&drawable->tile, *scale);
+    }
+    event = NavMesh_ConsumeProbeEvent(nav->route);
     if (event) {
-        if (SceneActorBehavior_RequestDescriptorTurn(actor, FIELD(nav, 0x1FC, void *), 0x20, 0x20,
+        if (SceneActorBehavior_RequestDescriptorTurn(actor, nav->route, 0x20, 0x20,
                                                      speed)) {
             Chase_SetBehavior(actor, 22);
             Chase_SetCtl(actor, actor->base.onStanding, 0);
             return;
         }
-    } else if (SceneActorBehavior_AccelerateTowardDescriptor(actor, FIELD(nav, 0x1FC, void *), 0x20,
+    } else if (SceneActorBehavior_AccelerateTowardDescriptor(actor, nav->route, 0x20,
                                                              0x20, speed)) {
         Chase_SetState(actor, 3, 1, 0);
         {
             u32 bit = 0x40;
-            u16 *flags = (u16 *)(control + 0x6D4);
+            u16 *flags = &control->flags6D4;
             bit |= *flags;
             *flags = bit;
         }
@@ -3076,7 +3079,7 @@ void Vorn_UpdateStaggerRecovery(void *);
 
 void Vorn_UpdateDefeat(void *);
 
-void Vorn_UpdateHiddenRecovery(void *);
+void Vorn_UpdateHiddenRecovery(struct ChaseActor *actor, s32 frame);
 
 void SceneActorTarget_ResolvePendingObject(void);
 
@@ -3197,7 +3200,8 @@ s32 Vorn_Init(void *object)
     SceneActor_InitContextColliders(actor);
     MonsterInit_InstallSequenceCallbacks(
         actor, Vorn_OnUpdate, Vorn_GetAnimationEvent, Vorn_UpdateIdleFacing, Vorn_ResetStateEntry,
-        Vorn_BeginIdle, Vorn_UpdateHiddenRecovery, Vorn_UpdateStaggerRecovery, Vorn_UpdateDefeat,
+        Vorn_BeginIdle, (SceneActorAction)Vorn_UpdateHiddenRecovery, Vorn_UpdateStaggerRecovery,
+        Vorn_UpdateDefeat,
         SceneActorReaction_OnEnemyDefault, Vorn_UpdateContactResponse,
         SceneActorTarget_ResolvePendingObject, SceneActorReaction_ResolvePlacementDamage,
         SceneActorPlacement_ResetStateThree);
