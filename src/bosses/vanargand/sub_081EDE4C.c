@@ -18,7 +18,6 @@ void ActorDisplay_UpdateAccentSprite(void *);
 void SceneActors_EmitPeriodicParticles(void *, s32);
 void SceneActors_UpdateIdleDisplay(void *);
 // confidence=low: departs past the left edge, then schedules destruction.
-#define SceneActors_UpdatePastEdgeDeparture sub_081EDE4C
 /* Tentative fields of the actor's departure display state. */
 struct DepartureActor {
     u8 unknown0[0x90];

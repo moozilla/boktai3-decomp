@@ -5,7 +5,6 @@
 #include "engine/video/sprite_drawable_api.h"
 #include "scene/terrain/terrain_collision.h"
 // confidence=low: creates weather particles with two terrain-adjusted endpoints.
-#define Weather_SpawnTerrainParticles sub_080177AC
 u32 Weather_TestFlags(u32, u32);
 u8 *TerrainModifiers_FindCellOverride(s32, s32);
 s32 Mod(s32, s32);

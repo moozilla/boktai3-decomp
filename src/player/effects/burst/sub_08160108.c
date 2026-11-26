@@ -49,7 +49,6 @@ static inline s32 Truncate(s32 value)
     return -((-value) >> 12);
 }
 // confidence=low: initializes sixteen radial particles around the attached player.
-#define PlayerBurst_InitializeParticles sub_08160108
 void PlayerBurst_InitializeParticles(struct PlayerBurstTask *p)
 {
     s32 i;

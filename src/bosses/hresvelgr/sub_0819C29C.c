@@ -2,7 +2,7 @@
 
 void DamageNumberDisplay_Show(void *, int, int, void *, void *, int);
 void ActorReaction_BeginCollisionPhase(void *);
-void sub_081A1D18(void *);
+void Hresvelgr_UpdateFlaggedMotionBurst(void *);
 void sub_081A14FC(void *);
 
 int Hresvelgr_BeginDamageReaction(struct HresvelgrTravelActor *p, int kind, int damage)
@@ -22,7 +22,7 @@ int Hresvelgr_BeginDamageReaction(struct HresvelgrTravelActor *p, int kind, int 
             break;
         case 2:
             Hresvelgr_StartAction(p, 1, 0, 4);
-            Hresvelgr_StartReaction(p, sub_081A1D18, 0x25);
+            Hresvelgr_StartReaction(p, Hresvelgr_UpdateFlaggedMotionBurst, 0x25);
             break;
         case 1:
             Hresvelgr_StartAction(p, 1, 0, 5);

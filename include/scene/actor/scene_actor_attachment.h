@@ -7,10 +7,10 @@ void SceneActorEffect_PlayCategorySoundIfEnabled(u32 gate, u32 event, u32 catego
 void SceneActorAttachment_SelectCategory4Offsets(u8 kind, s32 *yOffset, s32 *zOffset);
 void SceneActorAttachment_SelectCategory1Offsets(u8 kind, s32 *yOffset, s32 *zOffset);
 void SceneActorAttachment_SelectCommonOffsets(u8 kind, s32 *yOffset, s32 *zOffset);
-void sub_0807C468(u8 kind, s32 *yOffset, s32 *zOffset);
+void SceneActorAttachment_SelectAlternateCommonOffsets(u8 kind, s32 *yOffset, s32 *zOffset);
 void SceneActorAttachment_SelectCategory3Offsets(u8 kind, s32 *yOffset, s32 *zOffset);
 void SceneActorAttachment_SelectCategory25Offsets(u8 kind, s32 *yOffset, s32 *zOffset);
-void sub_0807C53C(u8 kind, s32 *yOffset, s32 *zOffset);
+void SceneActorAttachment_SelectAlternateCategory21Offsets(u8 kind, s32 *yOffset, s32 *zOffset);
 void SceneActorAttachment_SelectCategory21Offsets(u8 kind, s32 *yOffset, s32 *zOffset);
 void SceneActorAttachment_SelectCategory10Offsets(u8 kind, s32 *yOffset, s32 *zOffset);
 void SceneActorAttachment_SelectCategory23Offsets(u8 kind, s32 *yOffset, s32 *zOffset);

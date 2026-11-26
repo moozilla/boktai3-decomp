@@ -4,7 +4,7 @@
 #include "global.h"
 #include "scene/actor/scene_actor_control_phase.h"
 s32 SceneActorRoute_GetStepDuration(void *);
-u8 sub_0812F3CC(void *);
+u8 SceneActorReaction_BeginContactResponse(void *);
 void SceneActorRoute_AdvanceActorPoint(void *, void *);
 void SceneActorRoute_UpdateWaitPhase(struct ChaseActor *actor)
 {
@@ -13,7 +13,7 @@ void SceneActorRoute_UpdateWaitPhase(struct ChaseActor *actor)
         SceneActorChase_SetControl(actor, actor->base.onStanding, 0);
     }
     if (!(u8)Callback_InvokeActor(actor, actor->base.contactQuery.opaque)) {
-        if (!sub_0812F3CC(actor)) {
+        if (!SceneActorReaction_BeginContactResponse(actor)) {
             u32 kind = route->point->attributes >> 4;
             if (kind == 1) {
                 actor->base.state2A8 = 0;

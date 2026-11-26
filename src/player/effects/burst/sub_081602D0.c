@@ -11,7 +11,7 @@ struct PlayerStatEffect {
 };
 void PlayerTransition_LoadAnimation(struct PlayerStatEffect *);
 void PlayerTransition_InitCollider(struct PlayerStatEffect *);
-void sub_08160108(struct PlayerStatEffect *);
+void PlayerBurst_InitializeParticles(struct PlayerStatEffect *);
 void PlayerOrbitEffect_UpdateIntro(struct PlayerStatEffect *);
 void PlayerBurst_SetStateCallback(struct PlayerStatEffect *, void (*)(struct PlayerStatEffect *));
 s32 Div(s32, s32);
@@ -20,7 +20,7 @@ s32 PlayerStatEffect_Initialize(struct PlayerStatEffect *p, struct Player *playe
     p->player = player;
     PlayerTransition_LoadAnimation(p);
     PlayerTransition_InitCollider(p);
-    sub_08160108(p);
+    PlayerBurst_InitializeParticles(p);
     PlayerBurst_SetStateCallback(p, PlayerOrbitEffect_UpdateIntro);
     gEngineFlags |= 1;
     p->targetStat = p->player->currentStatA >> 1;

@@ -3,7 +3,6 @@
 #include "engine/ram.h"
 #include "system/game_state/game_state_flags.h"
 // confidence=low: spawns pooled particles with optional velocity ranges and position jitter.
-#define SceneParticleBurst_CreateWithRanges sub_08067E3C
 struct SceneParticleBurstPool *SceneParticleBurst_EnsureSingleton(u32, u32);
 struct SceneParticleBurstSlot *SceneParticleBurst_AllocateSlot(struct SceneParticleBurstPool *);
 s32 Mod(s32, s32);

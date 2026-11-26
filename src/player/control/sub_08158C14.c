@@ -13,7 +13,6 @@ static inline void Player_ClearRegisteredSlots(void)
     }
 }
 
-#define Player_ResetLinkState sub_08158C14
 void Player_ResetLinkState(void)
 {
     s32 i;

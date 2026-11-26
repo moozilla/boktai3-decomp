@@ -1,12 +1,11 @@
 #include "global.h"
 #include "engine/word_flags.h"
 /* SceneActorControl_UpdateTimedResponseAnimation: Selects heading-dependent animation 11 and sets response flags at the 30 and 60 tick thresholds; response interpretation is provisional. */
-#define SceneActorControl_UpdateTimedResponseAnimation sub_08082D20
 
 void SceneActorControl_GetDirectionalVariant(u32, s32 *, s32 *);
 void SceneActorAnimation_SelectExplicitVariant(u8 *, u32, s32, s32);
 
-void sub_08082D20(u8 *p, s32 time)
+void SceneActorControl_UpdateTimedResponseAnimation(u8 *p, s32 time)
 {
     s32 a, b;
     if (p[0x2b2])

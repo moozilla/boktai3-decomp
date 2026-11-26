@@ -1,6 +1,3 @@
-#define Anim_FindGlyphEntryById     sub_082196FC
-#define Anim_RemoveAllInCurrentList sub_082195F8
-#define Blend_Disable               sub_082195AC
 #include "engine/video/anim_sprite_glyph.h"
 #include "engine/video/render.h"
 #include "engine/video/display_resource.h"

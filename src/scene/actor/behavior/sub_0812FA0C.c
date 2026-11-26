@@ -128,7 +128,7 @@ void SceneActorReaction_UpdateRouteReturn(struct ChaseActor *actor)
     }
     if ((u8)Callback_InvokeActor(actor, actor->base.contactQuery.opaque))
         return;
-    if ((u8)sub_0812F3CC(actor))
+    if ((u8)SceneActorReaction_BeginContactResponse(actor))
         return;
     if ((s32)actor->base.counter2AC <= 60)
         goto waiting;

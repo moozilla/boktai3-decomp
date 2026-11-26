@@ -15,7 +15,6 @@ void Collision_CalculateDamageResponse(void *, void *);
 void PlayerStats_AddContactHundredths(void *, void *, s32);
 void DamageNumberDisplay_Show(void *, s32, s32, void *, void *, s32);
 // confidence=low: collision response queues Ratatosk damage and tracks repeated hits.
-#define Ratatosk_OnDamageCollision sub_081F9BEC
 void Ratatosk_OnDamageCollision(u8 *hit, u8 *response, struct Ratatosk *owner)
 {
     struct Ratatosk *p2 = owner;

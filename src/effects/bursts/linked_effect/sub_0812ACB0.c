@@ -5,7 +5,6 @@
 #include "player/cutscene/player_cue_sequence.h"
 #include "ui/hud/scene_indicator.h"
 // confidence=low: steers and accelerates a linked effect toward a target until expiry.
-#define LinkedEffect_FollowTarget sub_0812ACB0
 struct Sprite {
     u32 flags;
     u8 visible, unknown5, palette, unknown7;

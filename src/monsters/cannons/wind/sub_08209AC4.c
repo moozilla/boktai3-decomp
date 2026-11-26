@@ -70,7 +70,7 @@ void DamageNumberDisplay_Show(void *, s32, s32, void *, void *, s32);
 void SceneHud_SetTimedState(void *, s32, s32, s32, s32, s32);
 void TerrainModifiers_UnregisterCell(void *);
 void TerrainModifiers_RegisterCell(void *, s32, s32, s32, s32, s32);
-void sub_08014634(s32, s32, void *, void *, void *, s32, s32);
+void ImpactParticleGroup_SpawnBouncing(s32, s32, void *, void *, void *, s32, s32);
 void Explosion_CreateAt(void *, s32, s32, s32, s32, s32, s32, s32);
 void Anim_RestartSequence(void *, void *, u32, u32, u32);
 void Anim_SetDurationScale(void *, u32);
@@ -167,7 +167,7 @@ invoke:
             spread.a.lo = 24;
             spread.a.hi = (ParticleRandom_ReadDirectSample(table) & 7) + 3;
             spread.b.lo = 24;
-            sub_08014634((ParticleRandom_ReadDirectSample(table) & 3) + 4, 13, &center, &velocity, &spread, 15, 15);
+            ImpactParticleGroup_SpawnBouncing((ParticleRandom_ReadDirectSample(table) & 3) + 4, 13, &center, &velocity, &spread, 15, 15);
             {
                 struct FanVec *v = &smoke;
                 *v = p->position;

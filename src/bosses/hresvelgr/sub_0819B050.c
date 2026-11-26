@@ -1,6 +1,5 @@
 #include "global.h"
 /* Math_ApproachAngleByHalf: Approaches the target along the shortest angular difference by half and snaps within one unit */
-#define Math_ApproachAngleByHalf sub_0819B050
 
 static inline s32 AngleNear(s32 angle, s32 ref)
 {
@@ -26,7 +25,7 @@ static inline s32 Approach(s32 cur, s32 target)
     return cur + Shift(d);
 }
 
-s32 sub_0819B050(s32 angle, s32 target)
+s32 Math_ApproachAngleByHalf(s32 angle, s32 target)
 {
     return Approach(AngleNear(angle, target), target);
 }

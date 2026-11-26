@@ -60,7 +60,7 @@ key,callback,name
 1744,080F1BD5,Ivy_Create
 1745,0810B915,LinkSession_Create
 180B,08226C45,Camera_SetBoundsFromScript
-1833,0822906D,sub_0822906C
+1833,0822906D,Clock_RunReservedHook
 184B,08226B51,Camera_SetCenteredBoundsFromScript
 184D,081EA71D,TutorialOtenko_RequestControllerRemoval
 1870,0822B341,Sound_StartSongDirectFromScript
@@ -90,7 +90,7 @@ key,callback,name
 2207,0810026D,WoodenCrate_StartBreakFromScript
 225B,081E4741,TutorialOtenko_BeginAnimationPhaseFour
 233F,0815AD25,Player_EnableStatGaugeFromScript
-2354,08228235,sub_08228234
+2354,08228235,SaveData_GetCounterA
 2388,081BA5D1,WorldMap_Create
 23F4,0806F2CD,SceneState_ResetRuntimeFields
 24E1,08197891,Nidhoggr_CreateCutscene
@@ -124,7 +124,7 @@ key,callback,name
 2D87,0802D571,Actor_CreateControllerFromScript
 2E1C,080091C9,LightFixture_ScriptCreate
 2F01,08229045,SunClock_GetLightPhaseFromScript
-2F51,08229071,sub_08229070
+2F51,08229071,SunClock_RunReservedHook
 2FA0,081780D5,Hud_SetLayoutFromScript
 2FA5,08107EBD,FloorTrap_CreateFromScript
 2FE4,08225439,Script_GetSavedVariable
@@ -165,7 +165,7 @@ key,callback,name
 3A5D,0822CFB5,Inventory_RemoveItemFromScript
 3A89,08018665,PaletteBlend_AddFromScript
 3C47,08228F9D,SunClock_GetSunriseSpanFromScript
-3C48,08227F4D,sub_08227F4C
+3C48,08227F4D,SaveData_GetSaveRequest
 3C8D,0822BFC9,SavedVariables_RunFromScript
 3C9F,0810E8D1,SelectionPanel_Create
 3D0C,0804231D,SceneActorRegistry_IgnoreEntry3D0C
@@ -181,10 +181,10 @@ key,callback,name
 3E17,081E49C1,TutorialOtenko_BeginAnimationPhaseEight
 3E1F,08006185,TerrainModifiers_DestroyFromScript
 3E91,08103C55,ActorGroup_RemoveFromScript
-3E93,08227F59,sub_08227F58
+3E93,08227F59,SaveData_GetUnusedStatus
 3EA2,0822B169,Sound_FadeInChannel12FromScript
 3ED0,0822B299,Sound_SetPlayer10VolumeFromScript
-3F3B,08228241,sub_08228240
+3F3B,08228241,SaveData_GetCounterB
 3F74,081BAC75,TownMap_Create
 3F99,080ED2F1,Octopus_Create
 4043,0822E905,GameState_AddUnlockFromScript
@@ -218,9 +218,9 @@ key,callback,name
 4A25,081EB7DD,CutsceneDisplay_CreateDisplay
 4A8D,0815AA39,ScriptActor_TestCounter628FromScript
 4AE5,080033FD,Palette_GetOrCreate
-4B39,0822C18D,sub_0822C18C
+4B39,0822C18D,Solar_DisableControlFlag
 4B41,08227B81,Terrain_GetCellWordFromScript
-4B57,0822C181,sub_0822C180
+4B57,0822C181,Solar_EnableControlFlag
 4C4D,0815D591,ScriptActor_ResetActionStateFromScript
 4CBB,0822B1C1,Sound_PauseChannel12FromScript
 4CCD,08227ECD,SaveData_WritePlayTimeToScript
@@ -231,7 +231,7 @@ key,callback,name
 4D88,0822D5D1,Inventory_CanReceiveItemFromScript
 4DDF,081D73F1,TextSequence_CreateFromScript
 4E22,08070A91,SceneActorRegistry_SetMovementModesFromScript
-4E30,08228E95,sub_08228E94
+4E30,08228E95,SunClock_GetAuxiliaryState
 4E69,08020C85,SceneMessages_Create
 4EBF,081D10D9,Otenko_SetBehaviorTwoFromScript
 4EC9,081803D9,Sabata_AdvanceStepFromScript
@@ -259,7 +259,7 @@ key,callback,name
 5856,081F2035,VanargandHead_Create
 585F,08178545,Hud_StartMessageDisplayTimer
 58D7,0815CF25,ScriptActor_FaceFromScript
-5933,082290E9,sub_082290E8
+5933,082290E9,SunClock_GetMoonPhaseIndex
 5941,0815F791,TargetRegistry_Create
 5986,0815A535,PlayerCue_IsStateFour
 5A36,0801E999,SlidingDoors_ScriptLower
@@ -401,7 +401,7 @@ key,callback,name
 893C,08042159,ModifierMenu_CreateTask
 8944,0803D61D,ScenePool_CreateEntryFromScript
 8954,0806F219,SceneState_IncrementCounters
-898D,0815AAB9,sub_0815AAB8
+898D,0815AAB9,ScriptActor_ResetCountersFromScript
 89C6,0815A9D9,ScriptActor_ClearSlotFromScript
 8AAB,081EA731,TutorialOtenko_EnsureController
 8AF6,08055B09,ScriptKeyframe_CreateManagerFromScript
@@ -421,7 +421,7 @@ key,callback,name
 9079,081C2F8D,CutsceneSparkle_StopEmitting
 90B4,08008989,TriggerManager_DestroyAllOfTypeFromScript
 9129,08057649,CountdownTimer_AddFromScript
-9146,08229075,sub_08229074
+9146,08229075,SunClock_RunReservedMoonHook
 917F,0802C621,NidhoggrDuel_Create
 9284,08037D81,WirelessPeerPanel_Create
 92BE,08056EE5,ShakeIconDisplay_CreateFromScript
@@ -454,7 +454,7 @@ key,callback,name
 9C3F,08055769,ScriptKeyframe_ShowFromScript
 9CC2,0820A421,WindCannonManager_Create
 9DFE,081D2D35,SceneNpc_SetSpecialModeFromScript
-9E8B,081BB38D,sub_081BB38C
+9E8B,081BB38D,SolarBank_GetBalance
 9E8D,080A2011,Crow_Create
 9F1B,0811BCA9,GameState_ResetActionCounts
 9FB7,0816CD6D,Inventory_SetUsePermissionFlagsFromScript
@@ -496,8 +496,8 @@ AD03,080C44AD,Skeleton_Create
 ADB6,0822BA59,SceneStimulus_RemoveExclusionRegionsFromScript
 ADD2,08031185,MessageWindow_SetAutoAdvanceFromScript
 AE3A,08103C1D,MovingPlatformActor_SetModeFromScript
-AE4E,08227F3D,sub_08227F3C
-AE71,080697C9,sub_080697C8
+AE4E,08227F3D,SaveData_RequestSave
+AE71,080697C9,BouncingBomb_SpawnFromScript
 AEB2,0806F955,SceneRangeWatch_CreateFromScript
 AF10,08211805,ForgingBook_IsComplete
 AF33,08039491,WirelessTradeMenu_Create
@@ -515,7 +515,7 @@ B1F3,080199C5,TileAnimation_Stop
 B3D1,081C27ED,DarkGenerator_CreateFromScript
 B3D7,08072265,SceneActorScript_SetControlBytesFromScript
 B426,0800E08D,ScanlinePresentation_Create
-B45F,082281F1,sub_082281F0
+B45F,082281F1,SaveData_GetPoints
 B47E,08054C99,DisplayTrack_SetPriorityFromScript
 B4B4,08001D09,Background_CreateFromScript
 B50D,081E5561,TutorialOtenko_GetFacingDirection
@@ -660,7 +660,7 @@ E9D3,081BD815,DarkLoan_Create
 E9E2,0815AAFD,ScriptActor_SetField4A2FromScript
 EA00,0815A73D,ScriptActor_ApplyItemFromScript
 EA96,0815D155,ScriptActor_StartMotion7Variant3FromScript
-EAAC,08224F99,sub_08224F98
+EAAC,08224F99,SceneLifecycle_DisablePlayTimeCounter
 EAAF,0801EB09,SlidingDoors_ScriptReadPosition
 EAB4,0805592D,ScriptKeyframe_AddFromScript
 EB42,0804E535,AreaEffect_EnableEntryFromScript
@@ -668,7 +668,7 @@ EBF1,082117E5,ForgingBook_HasDiscoveredAllItems
 EBFF,08055741,ScriptKeyframe_HideFromScript
 EC1F,0821B029,Script_DiscardValueIfZero
 EC2A,08071D9D,SceneActorRegistry_CreateManager
-EC5B,08224F8D,sub_08224F8C
+EC5B,08224F8D,SceneLifecycle_EnablePlayTimeCounter
 EC71,08180381,Sabata_CreateFromScript
 ED1F,08055709,ScriptKeyframe_SetMirrorFromScript
 ED2E,082281CD,SaveData_IsHeaderValid

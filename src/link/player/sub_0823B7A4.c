@@ -22,7 +22,6 @@ static inline s32 ControllerId(void)
     return *(s16 *)(((u8 *)gLinkSession) + 0x18);
 }
 // confidence=low: smooths the camera anchor toward actor position and motion offset.
-#define Player_SmoothCameraAnchor sub_0823B7A4
 void Player_SmoothCameraAnchor(struct Q *p)
 {
     s32 other;

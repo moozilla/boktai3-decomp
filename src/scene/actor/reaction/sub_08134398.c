@@ -8,7 +8,7 @@ void SceneActorRecord_RecordPair(u16, u16);
 void SceneActorContacts_ReleaseNode(void *);
 void Player_NotifyFirstSelectedSlot(u32, u32);
 void Player_RefreshLifeState(u32, u32);
-void sub_08159164(u32);
+void Player_AddExperience(u32);
 #define STATS   ((u8 *)gGameState)
 #define H(p, n) (*(s16 *)((p) + (n)))
 struct GroupLink {
@@ -189,7 +189,7 @@ u32 SceneActorReaction_RecordDefeat(struct ChaseActor *actor)
                     }
                 }
             }
-            sub_08159164(actor->base.experience);
+            Player_AddExperience(actor->base.experience);
             Player_RefreshLifeState(actor->base.hitAttributes, actor->base.fieldA1);
         }
     record:

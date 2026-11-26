@@ -39,7 +39,7 @@ void Player_AddControlFlags(struct Player *, u32);
 void Player_SetActionPhase(struct Player *, u8);
 s32 ActorVariant_GetTableValue(u32, u32);
 s32 PlayerAnimation_SelectSecondaryKeyframes(struct Player *, s32, s32);
-struct PlayerGrabTarget *sub_0814C248(struct Player *);
+struct PlayerGrabTarget *Player_FindNearestVisibleTarget(struct Player *);
 s32 Math_Atan2(s32, s32);
 s32 sub_08249244(void *, s32, s32, u32);
 void Player_UpdateFacingSide(struct Player *);
@@ -154,7 +154,6 @@ static inline struct PlayerGrabPos *PlayerGrab_TargetPosition(struct PlayerGrabT
 }
 
 // confidence=low: Player grab/throw action update; entry setup, then an 8-phase switch (reach, pull, throw, release, ...).
-#define Player_UpdateGrabMotion sub_0814C3A4
 void Player_UpdateGrabMotion(struct Player *p)
 {
     if (Player_ConsumeStateEntry(p)) {
@@ -200,7 +199,7 @@ void Player_UpdateGrabMotion(struct Player *p)
             else
                 PlayerAnimation_SelectSecondaryKeyframes(p, 0xE9, 0x40);
             PlayerGrab_CopyPosition(p);
-            (*(struct PlayerGrabTarget **)&gPlayerPendingActor) = sub_0814C248(p);
+            (*(struct PlayerGrabTarget **)&gPlayerPendingActor) = Player_FindNearestVisibleTarget(p);
             if ((*(struct PlayerGrabTarget **)&gPlayerPendingActor) == 0) {
                 Player_AddStatusFlags(p, 0x4000);
             } else {
@@ -210,7 +209,7 @@ void Player_UpdateGrabMotion(struct Player *p)
             p->tetherFrame++;
             if (p->tetherFrame <= 0x1D)
                 return;
-            (*(struct PlayerGrabTarget **)&gPlayerPendingActor) = sub_0814C248(p);
+            (*(struct PlayerGrabTarget **)&gPlayerPendingActor) = Player_FindNearestVisibleTarget(p);
             if ((*(struct PlayerGrabTarget **)&gPlayerPendingActor))
                 return;
             Player_SetActionPhase(p, 5);

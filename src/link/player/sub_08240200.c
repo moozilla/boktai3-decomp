@@ -10,7 +10,7 @@ u32 Player_SetAnimationIndex(void *, u32, u32);
 void Player_PlayLocalSong(u32, u32);
 void Player_SetTetherMode(void *, u32, u32);
 void Player_SetSecondaryActionFlags(void *, u32);
-void sub_0823C280(void *);
+void Player_RestoreLinkedActionState(void *);
 void SelectionSlots_ClearValue(void *, u32);
 u8 *TerrainModifiers_FindCellOverride(s32, s32);
 u32 Player_IsFlaggedWithGlobalModifier10(u32);
@@ -29,7 +29,7 @@ static inline void reverseMotion(struct Player *p, u16 *magnitude)
 
 void RecoilPuff_Spawn(void *);
 void Camera_RequestShake(u32);
-void sub_08238238(void *);
+void Player_UpdateActionFacingSide(void *);
 static inline s32 scale3(s32 v)
 {
     if (v >= 0)
@@ -79,7 +79,7 @@ void Player_UpdateTetherRecoil(struct Player *p)
                 Player_SetTetherMode(p, 0x16, 0);
             else if (Player_SetAnimationIndex(p, ActorVariant_GetTableValue(p->actionMode, 0x2A),
                                               0x40)) {
-                sub_08238238(p);
+                Player_UpdateActionFacingSide(p);
                 Player_SetTetherMode(p, 0, 0);
             }
         }

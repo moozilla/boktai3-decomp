@@ -5,7 +5,6 @@
 #include "effects/particles/particle_group.h"
 #include "effects/shadows/terrain_shadow.h"
 // confidence=low: integrates group particles and bounces them against terrain.
-#define ImpactParticleGroup_UpdateBouncing sub_0801404C
 extern u32 gUnk_08604B90[];
 void Effect_Remove(void *);
 static inline u32 CoordinateBits(const s16 *coordinate)

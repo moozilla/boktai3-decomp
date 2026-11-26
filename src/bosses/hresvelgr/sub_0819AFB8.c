@@ -1,6 +1,5 @@
 #include "global.h"
 /* Math_ClampAngleAroundReference: Wraps a 256-unit angle near the reference then clamps its deviation */
-#define Math_ClampAngleAroundReference sub_0819AFB8
 
 static inline s32 AngleNear(s32 angle, s32 ref)
 {
@@ -23,7 +22,7 @@ static inline s32 ClampAround(s32 v, s32 center, s32 range)
     return v;
 }
 
-s32 sub_0819AFB8(s32 angle, s32 ref, s32 range)
+s32 Math_ClampAngleAroundReference(s32 angle, s32 ref, s32 range)
 {
     return ClampAround(AngleNear(angle, ref), ref, range);
 }

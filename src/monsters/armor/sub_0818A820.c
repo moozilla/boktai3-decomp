@@ -54,7 +54,7 @@ void Armor_DispatchTypeUpdate(void *);
 void Armor_DispatchBehaviorUpdate(void *);
 void ActorController_UpdateAnimation(void *);
 void SceneBody_ClearMovementProbe(struct SceneActorBody *);
-u32 sub_0821C254(void *, const struct ContactPosition *, struct ContactPosition *, u32);
+u32 Terrain_AdjustBlockedMovement(void *, const struct ContactPosition *, struct ContactPosition *, u32);
 void Obj_StepPosition(struct SceneActorBody *);
 void Armor_StartAccentPaletteFade(void *);
 void SceneEffectPool_Update(void *, const struct ContactPosition *);
@@ -113,7 +113,7 @@ static inline void Armor_ResolveMotion(void *probe, struct ContactPosition *posi
     candidate.packed.y = position->y + motion->y;
     candidate.packed.z = position->z + motion->z;
     candidate.packed.padding = 16;
-    if (sub_0821C254(probe, position, &candidate.position, actor->body.mode)) {
+    if (Terrain_AdjustBlockedMovement(probe, position, &candidate.position, actor->body.mode)) {
         SceneActorTerrain_Subtract(motion, &candidate.position, position);
     }
 }

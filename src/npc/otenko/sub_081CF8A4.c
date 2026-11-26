@@ -32,7 +32,7 @@ void Palette_InterpolateBanks(void *, void *, void *, u32, u32);
 s32 DisplayAnimation_TestFinished(void *);
 u32 PlayerParticleCloud_Create(void *, u32);
 s32 PlayerParticleCloud_RequestStop(void);
-s32 sub_081D3620(void);
+s32 PlayerParticleCloud_ScatterAnchors(void);
 void Actor_OnHiddenIdleUpdate(void);
 
 void Otenko_UpdateParticleDisappearance(void *ctx, struct SceneNpc *npc, s32 tick)
@@ -74,7 +74,7 @@ void Otenko_UpdateParticleDisappearance(void *ctx, struct SceneNpc *npc, s32 tic
             u32 mask = 0x100;
             npc->displayFlags |= mask;
         }
-            sub_081D3620();
+            PlayerParticleCloud_ScatterAnchors();
             npc->stateFrame = 0;
             npc->phase++;
             break;

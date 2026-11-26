@@ -22,7 +22,7 @@ void Collider_SetPosition(void *, void *, u32);
 void Collider_Refresh(void *);
 
 void Player_SetDirectionalVelocity_08238300(void *, u32);
-void sub_08238238(void *);
+void Player_UpdateActionFacingSide(void *);
 void DirectionalEffect_PlaceSprite(void *, u32, void *);
 static inline s32 scale(s32 v)
 {
@@ -152,7 +152,7 @@ void Player_UpdateChargedSpinAttack(struct Player *p)
             Collider_Refresh(&p->statModifierContext.attackCollider);
             ((struct Player *)p)->facing =
                 ((0x10F - ((struct Player *)p)->statModifierContext.contactTimer) & 255) >> 5;
-            sub_08238238(p);
+            Player_UpdateActionFacingSide(p);
             Player_SetAnimationIndex(p, ActorVariant_GetTableValue(p->actionMode, 0x25), 0x40);
             if (!(p->tetherFrame & 15))
                 Player_PlayLocalSong(p->slot, 0x204);

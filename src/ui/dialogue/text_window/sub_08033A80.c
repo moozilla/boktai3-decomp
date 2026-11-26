@@ -1,10 +1,9 @@
 #include "global.h"
 /* TextWindow_GetBounds: Returns the embedded text bounds as left top width and height */
-#define TextWindow_GetBounds sub_08033A80
 
 u8 *TextWindow_Find(u32);
 
-s32 sub_08033A80(u32 id, u32 *out)
+s32 TextWindow_GetBounds(u32 id, u32 *out)
 {
     u8 *w = TextWindow_Find(id);
     u8 *q;

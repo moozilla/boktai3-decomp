@@ -6,7 +6,7 @@ void Player_SetSecondaryActionFlags(struct Player *, u32);
 s32 ActorVariant_GetTableValue(u32, s32);
 void Player_SetAnimationIndex(struct Player *, s32, s32);
 void SelectionSlots_ClearValue(void *, u32);
-void sub_0823C280(struct Player *);
+void Player_RestoreLinkedActionState(struct Player *);
 #define F(T, off) (*(T *)((u8 *)p + (off)))
 void Player_UpdateDefeatSequence(struct Player *p)
 {
@@ -45,7 +45,7 @@ void Player_UpdateDefeatSequence(struct Player *p)
             Player_SetSecondaryActionFlags(p, 1);
             p->tetherFrame++;
             if (p->tetherFrame > 0x3B)
-                sub_0823C280(p);
+                Player_RestoreLinkedActionState(p);
             break;
     }
 }

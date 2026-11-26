@@ -2,7 +2,6 @@
 #include "scene/actor/scene_actor_control_phase.h"
 #include "engine/math/movement_curve.h"
 // confidence=low: animate contact release, then resume the saved actor callback.
-#define SceneActorControl_UpdateContactRelease sub_0807FCA8
 s32 Math_Atan2(s32, s32);
 void SceneActorEffect_PlayCategorySound(u32, u32, u32);
 void TetherActor_StartInteractionEffect(void);

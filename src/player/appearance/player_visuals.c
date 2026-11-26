@@ -221,7 +221,6 @@ void Player_UpdateVisualPalette(struct Player *p, u32 requestedMode)
 }
 
 // confidence=low: alternate overlay ramp, pulse and fade modes.
-#define Player_UpdateAlternateVisualPalette sub_0813CE20
 
 void Player_UpdateAlternateVisualPalette(struct Player *p, u32 requestedMode)
 {
@@ -849,7 +848,7 @@ s32 SceneActor_SelectEffectDisplayMode(struct Player *, s32);
 
 s32 Player_SelectFlashingVisualMode(struct Player *, s32);
 
-void sub_0813CE20(struct Player *, u32);
+void Player_UpdateAlternateVisualPalette(struct Player *, u32);
 
 void sub_0813B950(void *);
 
@@ -870,7 +869,7 @@ void SceneActor_UpdateVisualEffects(struct Player *p)
     mode = SceneActor_SelectEffectDisplayMode(p, mode);
     mode = Player_SelectFlashingVisualMode(p, mode);
     if (p->kind == 2 && p->tetherMode != 10 && p->tetherMode != 11)
-        sub_0813CE20(p, mode);
+        Player_UpdateAlternateVisualPalette(p, mode);
     else
         Player_UpdateVisualPalette(p, mode);
     sub_0813B950(p);
@@ -921,7 +920,6 @@ void Player_DestroyEffects(struct Player *p)
 
 /* Player_GetEffectIntensity: Returns the global signed value also used to pace inward particle emission; intensity interpretation tentative */
 
-#define Player_GetEffectIntensity sub_0813E0F0
 
 /* Tentative names for the per-channel effect reset state. */
 struct PlayerEffectResetState {
@@ -1001,14 +999,13 @@ void Player_InitEffects(struct Player *p)
     p->movementAnimationState = 255;
 }
 
-s16 sub_0813E0F0(void)
+s16 Player_GetEffectIntensity(void)
 {
     return gGameState->unk876;
 }
 
 s32 Div(s32, s32);
 
-#define Player_GetStateModifierBonus sub_0813E108
 s32 Player_GetStateModifierBonus(struct Player *p)
 {
     s32 i;
@@ -1022,7 +1019,6 @@ s32 Player_GetStateModifierBonus(struct Player *p)
         return 10;
     return 0;
 }
-#define Player_GetBlockedActionBonus sub_0813E160
 s32 Player_IsActionBlocked(struct Player *);
 s32 Player_GetBlockedActionBonus(struct Player *p)
 {
@@ -1032,22 +1028,18 @@ s32 Player_GetBlockedActionBonus(struct Player *p)
 zero:
     return 0;
 }
-#define Player_GetStatAModifierBonus sub_0813E174
 s32 Player_GetStatAModifierBonus(struct Player *p)
 {
     return p->derivedStats[0] >> 3;
 }
-#define Player_GetStatBModifierBonus sub_0813E184
 s32 Player_GetStatBModifierBonus(struct Player *p)
 {
     return p->derivedStats[1] >> 3;
 }
-#define Player_GetEnergyRatioModifier sub_0813E194
 s32 Player_GetEnergyRatioModifier(struct Player *p)
 {
     return Div(p->currentStatB * 10, p->maximumStatB);
 }
-#define Player_GetLifeRatioModifier sub_0813E1B8
 s32 Player_GetLifeRatioModifier(void)
 {
     return Div(gGameState->life * 10, gGameState->lifeMax);
@@ -1087,7 +1079,6 @@ static inline u32 PlayerModifier_TestTargetFlags(const struct PlayerModifierTarg
     return target->flags & mask;
 }
 
-#define Player_GetScaledTargetFlagBonus sub_0813E284
 static inline s32 LimitTargetBonus(s32 value)
 {
     if (value > 10)
@@ -1542,7 +1533,7 @@ void Player_ConfigureActionCollider(struct Player *);
 
 void Player_UpdateAttachedAttackCharge(void);
 
-void sub_0814D9C4(void);
+void Player_UpdateWeaponCueCombo(void);
 
 void ActorSequence_Begin(struct Player *, s32, s32);
 
@@ -1570,7 +1561,7 @@ void Player_BeginDescriptorAction(struct Player *p, u32 entry)
     if (p->statModifierContext.actionKind == 0x30)
         p->actionCallback = Player_UpdateAttachedAttackCharge;
     else
-        p->actionCallback = sub_0814D9C4;
+        p->actionCallback = Player_UpdateWeaponCueCombo;
     p->actionResetCounter = 0;
     Player_ConfigureActionCollider(p);
     if (p->tetherMode == 3)
@@ -1584,9 +1575,9 @@ void Player_BeginDescriptorAction(struct Player *p, u32 entry)
 
 extern const struct PlayerIndexedAction gUnk_08E60F4C[];
 
-void sub_0814A9D4(void);
+void Player_UpdateSelectedSpinAttack(void);
 
-void sub_0814EEE0(void);
+void Player_UpdateSustainedSpinAttack(void);
 
 void Player_UpdateAttachedChargeTiers(void);
 
@@ -1610,9 +1601,9 @@ void Player_BeginIndexedAction(struct Player *p, s32 action)
     p->statModifierContext.actionDuration = descriptor->duration;
     p->statModifierContext.statBOverrideEnabled = 4;
     if (p->actionMode == 6)
-        p->actionCallback = sub_0814A9D4;
+        p->actionCallback = Player_UpdateSelectedSpinAttack;
     else if (p->statModifierContext.actionKind == 11)
-        p->actionCallback = sub_0814EEE0;
+        p->actionCallback = Player_UpdateSustainedSpinAttack;
     else if (p->statModifierContext.actionKind == 8)
         p->actionCallback = Player_UpdateAttachedChargeTiers;
     else
@@ -2114,7 +2105,6 @@ s32 Player_CanAffordEnchantment(struct Player *p)
     return 0;
 }
 
-#define Player_SpendEnchantmentEnergy sub_0813F828
 void Player_SpendEnchantmentEnergy(struct Player *p)
 {
     s32 cost = Player_GetEnchantmentEnergyCost(p);

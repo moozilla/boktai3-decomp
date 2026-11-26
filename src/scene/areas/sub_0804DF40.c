@@ -2,9 +2,8 @@
 #include "global.h"
 #include "scene/areas/area_effect.h"
 /* AreaEffect_ResetSingleton: Clears the global area effect manager pointer. */
-#define AreaEffect_ResetSingleton sub_0804DF40
 
-void sub_0804DF40(void)
+void AreaEffect_ResetSingleton(void)
 {
     gAreaEffectManager = 0;
 }

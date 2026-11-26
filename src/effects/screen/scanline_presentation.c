@@ -133,7 +133,7 @@ int ScanlinePresentation_Update(struct ScanlinePresentation *p)
     return 0;
 }
 
-void sub_082194D4(void *);
+void ScanlineEffect_StopTransfer(void *);
 
 void Mosaic_ResetParameters(void);
 
@@ -141,7 +141,7 @@ int ScanlinePresentation_Destroy(struct ScanlinePresentation *p)
 {
     int i;
     struct ScanlineLayer *layer;
-    sub_082194D4(p);
+    ScanlineEffect_StopTransfer(p);
     Mosaic_ResetParameters();
     Anim_Remove(&p->layers[0]);
     Anim_Remove(&p->layers[1]);

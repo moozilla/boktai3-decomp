@@ -1,6 +1,5 @@
 #include "scene/actor/actor_attachment_manager.h"
 /* ActorAttachment_ReleaseAll: Releases occupied attachment slots and removes their sprites or parts without identity filtering */
-#define ActorAttachment_ReleaseAll sub_08066CB8
 void Effect_Remove(void *);
 static inline u8 Occupied(u32 *mask, s32 i)
 {

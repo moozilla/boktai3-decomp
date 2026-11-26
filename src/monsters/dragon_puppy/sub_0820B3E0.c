@@ -66,7 +66,7 @@ void Sound_PlaySong(u32);
 void Collider_SetPosition(void *, void *, u32);
 void DamageNumberDisplay_Show(void *, s32, u32, void *, void *, u32);
 void SceneHud_SetTimedState(void *, s32, s32, s32, u32, s32);
-void sub_08014634(s32, s32, void *, void *, void *, s32, s32);
+void ImpactParticleGroup_SpawnBouncing(s32, s32, void *, void *, void *, s32, s32);
 void Anim_RestartSequence(void *, void *, u32, u32, u32);
 void DragonPuppy_UpdateAttackWindup(void);
 
@@ -127,7 +127,7 @@ s32 DragonPuppy_UpdateCombat(u8 *p)
             size.y = (ParticleRandom_ReadDirectSample(table) & 3) + 1;
             size.z = 24;
             count = (ParticleRandom_ReadDirectSample(table) & 3) + 4;
-            sub_08014634(count, 0x16, &position, &velocity, &size, 15, 15);
+            ImpactParticleGroup_SpawnBouncing(count, 0x16, &position, &velocity, &size, 15, 15);
             Anim_RestartSequence(((u8 *)&PUPPY_FIELD(animation)), PUPPY_FIELD(deathAnimation), 5,
                                  PUPPY_FIELD(deathVariant), 0);
             AnimData_SelectPaletteBank(((u8 *)&PUPPY_FIELD(palette)), 0x1b9);

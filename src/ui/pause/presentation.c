@@ -291,7 +291,7 @@ void PauseMenu_SetSpritePalette(struct AnimSprite *, u16);
 
 void InventoryGrid_GetSlotPosition(void *, s32);
 
-s32 sub_0822D730(s32);
+s32 Inventory_GetEquipmentValueStub(s32);
 
 /* Tentative: refresh equipment icons, with a fixed icon in alternate action mode. */
 
@@ -356,7 +356,7 @@ void SceneHud_ConfigureEquipmentTransfer(struct SceneHudState *owner, s32 index,
 u32 SceneHud_GetEquipmentActionFlags(void *unused, s32 slot)
 {
     u32 flags = 0;
-    s32 category = sub_0822D730(slot);
+    s32 category = Inventory_GetEquipmentValueStub(slot);
     s32 id;
     u32 available;
     u32 offset;

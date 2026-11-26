@@ -55,5 +55,5 @@ void ScrollingDialogue_ClearScript(void);
 s32 ScrollingDialogue_SetScript(const u8 *);
 void Bg_SetPriority(u32, u32);
 void Bg_SetupLayers(u32, u32, void *, u32, u32, u32, u32 *);
-void sub_08215EB4(s32, s32, s32, s32, s32, s32, s32, s32);
+void Bg_FillTilemapRectangle(s32, s32, s32, s32, s32, s32, s32, s32);
 #endif

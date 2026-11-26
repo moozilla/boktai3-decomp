@@ -542,7 +542,7 @@ extern u32 gUnk_02000560;
 
 extern const u8 gUnk_0824F004[];
 
-void sub_08159164(s32);
+void Player_AddExperience(s32);
 
 void Bestiary_UnlockEntry(u32);
 
@@ -566,7 +566,7 @@ void Armor_FinalizeDefeat(struct ArmorDefeatActor *p)
     if (!((gEngineFlags | gScenePauseFlags) & mask) && !Armor_TestDefeatBlocked()) {
         s32 v;
         u32 script;
-        sub_08159164(p->rewardId);
+        Player_AddExperience(p->rewardId);
         H(gGameState, 0x87c) = H(gGameState, 0x87c) < 9999 ? H(gGameState, 0x87c) + 1 : 9999;
         H(gGameState, 0x538) = H(gGameState, 0x538) < 9999 ? H(gGameState, 0x538) + 1 : 9999;
         H(gGameState, 0x57e) = H(gGameState, 0x57e) < 9999 ? H(gGameState, 0x57e) + 1 : 9999;

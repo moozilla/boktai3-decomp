@@ -2,9 +2,6 @@
 /* Derived from pret/agbcc da598c1d918402c42c0c0d7128ba14567f3175e9,
  * libgcc/fp-bit-base.c (dp configuration). See docs/LIBGCC.md.
  * Original FSF license and linking exceptions are retained below. */
-#define __cmpdf2 sub_08249F7C
-#define __make_dp sub_0824A288
-#define __truncdfsf2 sub_0824A2B0
 // COMPILER: old_agbcc
 // CFLAGS: -O2
 /* This is a software floating point library which can be used instead of

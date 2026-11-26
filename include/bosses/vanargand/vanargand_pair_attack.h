@@ -101,7 +101,7 @@ struct VanargandPairAttack {
     u32 stageQueued
         [3]; /* 0xF28: per stage (indexed by transition), tested by the queued action state. */
     s32 transition;
-    s32 attachment; /* 0xF38: passed to sub_08159164 on entering state 21. */
+    s32 attachment; /* 0xF38: passed to Player_AddExperience on entering state 21. */
     u16 flash;
     u8 unknownF3E[6];
     void *afterimages;

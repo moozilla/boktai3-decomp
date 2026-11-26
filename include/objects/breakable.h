@@ -71,7 +71,7 @@ struct PooledPackedArgs {
 void AnimSprite_InitCleared(void *, void *, s32, s32, s32, s32, s32, void *);
 void Anim_SelectPaletteBank(void *, u32);
 void Anim_LinkToList(void *, u32);
-u32 sub_0821E67C(void *, void *, void *, void *, u32, u32, u32);
+u32 Route_GetMovementTowardCurrentPoint(void *, void *, void *, void *, u32, u32, u32);
 void Route_AdvancePoint(void *);
 u16 Route_GetCurrentPointNodeId(void *);
 u8 Route_Start(struct PooledRoute *, s32, s32, s32);

@@ -3,7 +3,6 @@
 #include "engine/resource_registry.h"
 
 // confidence=low: emits sixteen motion entries around the actor's facing direction.
-#define Hresvelgr_EmitFacingMotionBurst sub_0819BB18
 union BurstWord {
     u32 value;
     u16 halves[2];

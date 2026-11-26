@@ -77,7 +77,6 @@ static inline s32 Remove(struct TrapProbe *p, s32 count, const u32 *serial, s32 
     return 0;
 }
 // confidence=low: reconciles a probe's ten tracked trap serials and dispatches enter/stay/leave events.
-#define Trap_UpdateProbeContacts sub_0821DE30
 inline static s32 Append_0821DE30(u32 *serials, s32 count, const u32 *serial, s32 *index)
 {
     s32 i;

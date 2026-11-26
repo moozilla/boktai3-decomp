@@ -1,10 +1,9 @@
 #include "global.h"
 #include "engine/ram.h"
 /* Wireless_CopyReceivedNiPacket: Copies the twelve-byte NI receive buffer into the caller destination */
-#define Wireless_CopyReceivedNiPacket sub_08036BAC
 
 
-s32 sub_08036BAC(void *dst)
+s32 Wireless_CopyReceivedNiPacket(void *dst)
 {
     if (((u8 *)gWirelessController) == NULL)
         return -1;

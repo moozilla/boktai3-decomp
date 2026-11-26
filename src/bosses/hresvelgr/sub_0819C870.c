@@ -3,7 +3,6 @@
 #include "engine/ram.h"
 
 // confidence=low: projects a sine-scaled speed opposite the actor side.
-#define Hresvelgr_SetSineScaledVelocity sub_0819C870
 struct BurstVector {
     s16 x, y, z, pad;
 };

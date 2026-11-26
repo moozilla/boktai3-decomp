@@ -1,7 +1,5 @@
 #include "engine/math/scalar_approach.h"
-/* ScalarApproach_StepAngleSixteenthArray: Updates signed halfword angles toward corresponding targets using wrapped sixteenth steps */
-#define ScalarApproach_StepAngleSixteenthArray sub_08221EE0
-#define ScalarApproach_SixteenthAngleArray     sub_08221EE0
+/* ScalarApproach_SixteenthAngleArray: Updates signed halfword angles toward corresponding targets using wrapped sixteenth steps */
 void ScalarApproach_SixteenthAngleArray(s16 *values, const s16 *targets, s32 count)
 {
     s32 remaining = count;

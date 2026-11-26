@@ -1,7 +1,5 @@
 #include "engine/math/scalar_approach.h"
-/* ScalarApproach_StepQuarterArrayWithSnap: Steps signed halfword elements one quarter toward targets and snaps when the step magnitude is below the threshold */
-#define ScalarApproach_StepQuarterArrayWithSnap sub_08222094
-#define ScalarApproach_Snap4Array               sub_08222094
+/* ScalarApproach_Snap4Array: Steps signed halfword elements one quarter toward targets and snaps when the step magnitude is below the threshold */
 void ScalarApproach_Snap4Array(s16 *values, const s16 *targets, s32 threshold, s32 count)
 {
     s32 initialLimit = threshold;

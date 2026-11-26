@@ -19,7 +19,6 @@ static inline void facing(struct StateActor *npc, short angle)
 void Kuro_PlayTaggedAnimation(void *, s32, s32, s32, s32);
 s32 DisplayAnimation_TestFinished(void *);
 // confidence=low: faces away, then plays tagged animations 2, a 30-frame hold, 4 and 0.
-#define Kuro_UpdateAnimationSequence sub_081D2160
 void Kuro_UpdateAnimationSequence(void *context, struct StateActor *p)
 {
     struct StateActorTag *tag = &p->tag;

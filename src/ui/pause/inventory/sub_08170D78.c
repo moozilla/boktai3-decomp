@@ -1,7 +1,6 @@
 #include "ui/pause/scene_hud_display.h"
 #include "system/game_state/game_state.h"
 // confidence=low: refreshes inventory icons and equipped-slot markers.
-#define PauseInventory_RefreshConsumableIcons sub_08170D78
 struct PauseInventory {
     struct SceneHudState hud;
     u8 equippedConsumableSlots[4];

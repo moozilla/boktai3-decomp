@@ -28,7 +28,6 @@ static inline void SceneActorReaction_SetControl(struct ChaseActor *a, void *p, 
     a->base.pendingControl = zero;
 }
 // confidence=low: begins a contact reaction after filtering actor and contact flags.
-#define SceneActorReaction_BeginContactResponse sub_0812F3CC
 u8 SceneActorReaction_BeginContactResponse(struct ChaseActor *a)
 {
     struct SceneActorChaseGroup *group = &a->group;

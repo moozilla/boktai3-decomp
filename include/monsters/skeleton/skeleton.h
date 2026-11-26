@@ -43,7 +43,7 @@ struct Skeleton {
 
 void SceneActorScript_TriggerCallOnCount(struct ChaseActor *actor);
 u8 SceneActorReaction_IsRangeReady(struct ChaseActor *actor);
-u8 sub_0812F3CC(struct ChaseActor *);
+u8 SceneActorReaction_BeginContactResponse(struct ChaseActor *);
 void Skeleton_UpdateTargetTransition(struct ChaseActor *a);
 void Anim_SetDurationScale(void *, u32);
 void Anim_SetFrameDurationScale(void *, u32);

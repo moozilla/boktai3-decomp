@@ -18,7 +18,6 @@ static inline u8 IsActive(u32 *mask, s32 slot)
         return TRUE;
     return FALSE;
 }
-#define SpritePool4_UpdateActive sub_08128A00
 s32 SpritePool4_UpdateActive(struct SpritePool4 *pool)
 {
     s32 i = 0;

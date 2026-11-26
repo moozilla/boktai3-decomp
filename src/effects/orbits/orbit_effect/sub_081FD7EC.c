@@ -27,7 +27,7 @@ void Projectile_SetSpriteParameters(void *, u32, u32, u32);
 void Projectile_SetCollisionParameters(void *, s32, u32, s32, s32, s32);
 void Projectile_SetBehaviorMode(void *, u16);
 void Projectile_SpawnAtPosition(void *, void *);
-void sub_08127590(void *, void *, u32, u32, s32, s32, s32, s32, s32, s32, s32, s32, s32, s32, s32);
+void SpriteProjectile_Create(void *, void *, u32, u32, s32, s32, s32, s32, s32, s32, s32, s32, s32, s32, s32);
 void Sound_PlaySong(u32);
 
 s32 OrbitEffect_FireVolley(struct OrbitEffect *p, s32 slot)
@@ -119,7 +119,7 @@ s32 OrbitEffect_FireVolley(struct OrbitEffect *p, s32 slot)
                 pos = *(struct OrbitPacked *)&p->sprite.position;
                 pos.y += 0x40;
                 vel.y = 0x36;
-                sub_08127590(&pos, &vel, 0xB07C, 0x99CB, gUnk_08613F88[r], 0x1e, 2, 0,
+                SpriteProjectile_Create(&pos, &vel, 0xB07C, 0x99CB, gUnk_08613F88[r], 0x1e, 2, 0,
                              gUnk_08613F98[r] + 0x26b, 0, 0, p->params.collisionX,
                              p->params.collisionY, 0, 0);
                 if (p->volley.count == 5)

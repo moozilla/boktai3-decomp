@@ -3,7 +3,7 @@
 
 // confidence=low: prioritizes defeat, recovery, and interrupted charge reactions.
 void sub_081A14FC(void *);
-void sub_081A0FF0(void *);
+void Hresvelgr_UpdateOscillatingMotionBurst(void *);
 void Hresvelgr_UpdateTimedPose(void *);
 void Hresvelgr_UpdateMotionPhase(void *);
 
@@ -23,7 +23,7 @@ s32 Hresvelgr_TryStartReaction(struct HresvelgrTravelActor *p)
     if (p->flags & 1) {
         q->savedPhase = p->actionPhase;
         Hresvelgr_StartAction(p, 1, 0, 0);
-        Hresvelgr_StartReaction(p, sub_081A0FF0, 34);
+        Hresvelgr_StartReaction(p, Hresvelgr_UpdateOscillatingMotionBurst, 34);
         return 1;
     }
     if (p->flags & 0x10000000) {

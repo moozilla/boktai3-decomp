@@ -85,7 +85,7 @@ extern const s16 gUnk_086149C4[];
 
 void TargetMotion_UpdateFlashingExit(void);
 
-void sub_08159164(u32);
+void Player_AddExperience(u32);
 
 void Player_RefreshLifeState(void *, s32);
 
@@ -178,7 +178,7 @@ void Ivy_UpdateDefeatBurst(struct IvyBurstPrefix *actor)
         actor->burstIndex = 0;
         actor->flash = 0;
         actor->bursts = 30;
-        sub_08159164(actor->lifeValue);
+        Player_AddExperience(actor->lifeValue);
         Player_RefreshLifeState(actor->lifeState, actor->lifeParameter);
         actor->done = 1;
     }

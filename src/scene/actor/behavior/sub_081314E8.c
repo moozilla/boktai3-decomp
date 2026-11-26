@@ -4,7 +4,7 @@
 #include "scene/motion/scene_actor_chase_shared.h"
 #include "global.h"
 #include "scene/actor/scene_actor_control_phase.h"
-u8 sub_0812F3CC(struct ChaseActor *);
+u8 SceneActorReaction_BeginContactResponse(struct ChaseActor *);
 // confidence=low: selects a route return phase from motion and route flags.
 #include "scene/motion/scene_actor_chase.h"
 #include "scene/actor/scene_actor_attachment.h"
@@ -49,7 +49,7 @@ void SceneActorRoute_UpdateContactRecovery(struct ChaseActor *actor)
     }
     if ((u8)Callback_InvokeActor(actor, actor->base.contactQuery.opaque))
         return;
-    result = sub_0812F3CC(actor);
+    result = SceneActorReaction_BeginContactResponse(actor);
     if (result)
         return;
     if (FlagsSave(actor, 0x1000, &motionFlags)) {

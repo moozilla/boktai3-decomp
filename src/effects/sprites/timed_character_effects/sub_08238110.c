@@ -15,7 +15,6 @@ struct MovingParticle {
     u16 direction, phase;
 };
 // confidence=low: heading-based velocity and impact variant initialize the moving particle task.
-#define PlayerOrbitEffect_InitMovingParticle sub_08238110
 s32 PlayerOrbitEffect_InitMovingParticle(struct MovingParticle *p, void *position, u32 angle,
                                          s32 speed, s32 spriteType, s32 spriteVariant, s32 c, s32 d,
                                          s32 e, u32 f)

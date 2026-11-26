@@ -61,7 +61,6 @@ static inline void AddPosition(struct NidhoggrEffectVector *out,
     out->z += position->z;
 }
 // Tentative: an owned Nidhoggr effect that seeks the player before impact.
-#define Nidhoggr_UpdateSeekingAttackEffect sub_0818FEE4
 void Nidhoggr_UpdateSeekingAttackEffect(struct NidhoggrAnimatedSlot *owner)
 {
     struct EffectDelta delta;

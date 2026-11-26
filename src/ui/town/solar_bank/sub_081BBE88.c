@@ -32,7 +32,6 @@ static inline void SolarBank_SetRate(s16 *rate, s32 level)
     *rate = 0x41 + level;
 }
 
-#define SolarBank_InitWidgets sub_081BBE88
 void SolarBank_InitWidgets(struct SolarBankDisplay *p)
 {
     struct AnimSpritePlayback labelPlayback;

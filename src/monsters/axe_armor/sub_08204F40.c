@@ -14,7 +14,7 @@ void Collider_SetPosition(void *, void *, u32);
 void DamageNumberDisplay_Show(void *, s32, s32, void *, void *, s32);
 void SceneHud_SetTimedState(void *, s32, s32, s32, s32, s32);
 void TerrainModifiers_UnregisterCell(void *);
-void sub_08014634(s32, s32, void *, void *, void *, s32, s32);
+void ImpactParticleGroup_SpawnBouncing(s32, s32, void *, void *, void *, s32, s32);
 void Anim_RestartSequence(void *, void *, u32, u32, u32);
 void AnimData_SelectPaletteBank(void *, s32);
 s32 AxeArmor_UpdateDeath(u8 *);
@@ -80,7 +80,7 @@ s32 AxeArmor_Update(u8 *p)
             spread.a.lo = 24;
             spread.a.hi = (ParticleRandom_ReadDirectSample(table) & 7) + 3;
             spread.b.lo = 24;
-            sub_08014634((ParticleRandom_ReadDirectSample(table) & 3) + 4, 13, &center, &velocity,
+            ImpactParticleGroup_SpawnBouncing((ParticleRandom_ReadDirectSample(table) & 3) + 4, 13, &center, &velocity,
                          &spread, 15, 15);
             Anim_RestartSequence(p + 0x10c, *(void **)(p + 0x158), 4, 0, 0);
             *position = U(0x1c) + 0x40;

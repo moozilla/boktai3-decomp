@@ -10,7 +10,7 @@ struct Message {
 extern u8 *gGameState;
 void Script_Call(u32, struct Message *);
 void Bestiary_UnlockEntry(s32);
-void sub_08159164(s32);
+void Player_AddExperience(s32);
 #define H(p, n) (*(s16 *)((p) + (n)))
 #define W(p, n) (*(u32 *)((p) + (n)))
 static inline s32 clamp(s32 v)
@@ -42,7 +42,7 @@ void Popbud_RecordDefeat(u8 *p)
     }
     Bestiary_UnlockEntry(2);
     if (W(p, 0x144) & 1) {
-        sub_08159164(H(p, 0x13C));
+        Player_AddExperience(H(p, 0x13C));
         H(gGameState, 0x87C) = H(gGameState, 0x87C) < 9999 ? H(gGameState, 0x87C) + 1 : 9999;
         H(gGameState, 0x538) = H(gGameState, 0x538) < 9999 ? H(gGameState, 0x538) + 1 : 9999;
         H(gGameState, 0x56E) = H(gGameState, 0x56E) < 9999 ? H(gGameState, 0x56E) + 1 : 9999;

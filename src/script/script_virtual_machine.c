@@ -448,18 +448,16 @@ s32 Script_GetValue(void)
 
 /* Script_GetVector32: Reads a three component thirty two bit vector from the current script PC */
 
-#define Script_GetVector32 sub_0821AB50
 
-s32 sub_0821AB50(void *p)
+s32 Script_GetVector32(void *p)
 {
     return Script_ReadVector32(Script_GetPc(), p);
 }
 
 /* Script_GetVector: Decodes three operands at the current script cursor into a signed 16-bit vector */
 
-#define Script_GetVector sub_0821AB64
 
-s32 sub_0821AB64(void *p)
+s32 Script_GetVector(void *p)
 {
     return Script_ReadVector16(Script_GetPc(), p);
 }
@@ -478,9 +476,8 @@ u32 Script_GetValueSafe(void)
 
 /* Script_GetStringRef: Parses a string reference at the current script cursor and advances it */
 
-#define Script_GetStringRef sub_0821AB98
 
-s32 sub_0821AB98(void)
+s32 Script_GetStringRef(void)
 {
     return Script_ParseStringRef(Script_GetPc());
 }
@@ -674,22 +671,20 @@ s32 Script_LoadScript(u8 *p)
 
 /* Script_GetSectionThreeData: Returns data after the fourth resolved section pointer's header with section purpose tentative */
 
-#define Script_GetSectionThreeData sub_0821AED0
 
-u8 *sub_0821AED0(void)
+u8 *Script_GetSectionThreeData(void)
 {
     return gScriptSectionBases[3] + 4;
 }
 
 /* Script_SaveContext: Copies the loaded script context and section pointers into caller storage */
 
-#define Script_SaveContext sub_0821AEDC
 
 struct Block0821AEDC {
     u32 w[4];
 };
 
-void sub_0821AEDC(struct Block0821AEDC *dst)
+void Script_SaveContext(struct Block0821AEDC *dst)
 {
     dst[0] = *(struct Block0821AEDC *)&gScriptProcedureTable;
     dst[1] = *(struct Block0821AEDC *)&gScriptSectionBases;
@@ -697,13 +692,12 @@ void sub_0821AEDC(struct Block0821AEDC *dst)
 
 /* Script_RestoreContext: Restores the loaded script context and section pointers from caller storage */
 
-#define Script_RestoreContext sub_0821AF04
 
 struct Block0821AF04 {
     u32 w[4];
 };
 
-void sub_0821AF04(struct Block0821AF04 *src)
+void Script_RestoreContext(struct Block0821AF04 *src)
 {
     gScriptProcedureTable = *(struct ScriptProcedureTable *)&src[0];
     *(struct Block0821AF04 *)gScriptSectionBases = src[1];

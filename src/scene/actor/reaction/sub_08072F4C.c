@@ -13,8 +13,8 @@ u8 SceneActorContacts_TestPlayerCondition(struct SceneActorContactSample *, u32,
 u32 SceneActorTerrain_IsFacingPosition(struct SceneActorTerrainView *,
                                        const struct ContactPosition *);
 u32 TetherActor_CopySampledPosition(struct ContactPosition *);
-s32 sub_08076CDC(struct ChaseActor *, struct ContactPosition *, struct ContactPosition *);
-s32 sub_0821D4F0(struct ContactPosition *, struct ContactPosition *, s32, s32);
+s32 SceneActorTerrain_CheckHeightTransition(struct ChaseActor *, struct ContactPosition *, struct ContactPosition *);
+s32 Terrain_IsSegmentBelowHeightLimit(struct ContactPosition *, struct ContactPosition *, s32, s32);
 s32 Nav_IsPositionInMesh(void *, struct ContactPosition *, struct ContactPosition *);
 void *memcpy(void *, const void *, unsigned long);
 extern u32 gUnk_02000560[];
@@ -130,7 +130,7 @@ plain:
 gate:
     if (dist > limit)
         return 0;
-    transition = sub_08076CDC(self, &self->base.body.position, &sample->position);
+    transition = SceneActorTerrain_CheckHeightTransition(self, &self->base.body.position, &sample->position);
     if (transition < 0)
         return 0;
     cell = SceneActorTerrain_GetCellIndex(&sample->position);
@@ -146,9 +146,9 @@ gate:
     }
     if (transition != 2) {
         if (SceneActorChase_TrackingFlags(TrackingOf(self), 0x20)) {
-            if (!(u8)sub_0821D4F0(&self->base.tracking.destination, &sample->position, 10, 0x100))
+            if (!(u8)Terrain_IsSegmentBelowHeightLimit(&self->base.tracking.destination, &sample->position, 10, 0x100))
                 return 0;
-        } else if (!(u8)sub_0821D4F0(&self->base.body.position, &sample->position, 10, 0x100))
+        } else if (!(u8)Terrain_IsSegmentBelowHeightLimit(&self->base.body.position, &sample->position, 10, 0x100))
             return 0;
     }
     if (dist < *bestDistance) {

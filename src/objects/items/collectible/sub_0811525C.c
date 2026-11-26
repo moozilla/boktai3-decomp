@@ -2,9 +2,8 @@
 #include "global.h"
 #include "engine/ram.h"
 /* EffectPool_ClearManager: Clears the singleton effect manager pointer */
-#define EffectPool_ClearManager sub_0811525C
 
-void sub_0811525C(void)
+void EffectPool_ClearManager(void)
 {
     gParticleManager = 0;
 }

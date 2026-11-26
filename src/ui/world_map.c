@@ -2,7 +2,7 @@
 
 void Palette_InterpolateBanks(void *, void *, void *, int, int);
 
-void sub_082157EC(void);
+void Bg_ResetDisplay(void);
 
 void Hud_SetMode(s32);
 
@@ -310,7 +310,7 @@ void WorldMap_InitializeBackground(struct RegistrySelectionMenu *menu)
     u16 *display = &gDispCntShadow;
     s32 clearMask = ~0xf00;
     *display = clearMask & *display;
-    sub_082157EC();
+    Bg_ResetDisplay();
     Hud_SetMode(7);
     {
         u32 enabledLayers = 0xd00;

@@ -130,7 +130,6 @@ void Hresvelgr_EmitFacingMotion(struct ActorReaction *input)
             4,
         32);
 }
-#define Hresvelgr_SetPartApproachMotion sub_0819BE28
 /* Tentative: choose an offset from one part, then set a normalized movement vector. */
 void Hresvelgr_SetPartApproachMotion(struct ActorReaction *actor, s32 radius, s32 speed, u32 part)
 {

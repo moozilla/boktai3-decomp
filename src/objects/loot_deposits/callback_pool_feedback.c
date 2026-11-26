@@ -77,7 +77,7 @@ void CallbackPool_ApplyDamage(struct ContactCollider *source, struct ContactColl
     }
 }
 
-void sub_08014634(u32, u32, struct SceneExtent *, struct SceneExtent *, struct SceneExtent *, u32,
+void ImpactParticleGroup_SpawnBouncing(u32, u32, struct SceneExtent *, struct SceneExtent *, struct SceneExtent *, u32,
                   u32);
 
 static inline s32 NextRandom(void)
@@ -99,7 +99,7 @@ void CallbackPool_SpawnHitParticles(struct CallbackPoolEntry *entry)
     spread.x = (NextRandom() & 3U) + 15U;
     spread.y = (NextRandom() & 7U) + 15U;
     spread.z = (NextRandom() & 3U) + 15U;
-    sub_08014634((NextRandom() & 3) + 2, 17, (struct SceneExtent *)&entry->sprite.position,
+    ImpactParticleGroup_SpawnBouncing((NextRandom() & 3) + 2, 17, (struct SceneExtent *)&entry->sprite.position,
                  velocity, &spread, 12, 15);
 }
 
@@ -128,7 +128,7 @@ void sub_08105194(struct CallbackPoolEntry *entry, u32 a, u32 b, u32 c)
 
 extern const s16 gUnk_086149C4[];
 
-void sub_08127590(void *, void *, u32, u32, s32, s32, s32, s32, s32, s32, s32, s32, s32, s32, s32);
+void SpriteProjectile_Create(void *, void *, u32, u32, s32, s32, s32, s32, s32, s32, s32, s32, s32, s32, s32);
 
 static inline s32 Scale(s32 x)
 {
@@ -165,19 +165,19 @@ void LootDeposit_EmitRemovalDebris(struct CallbackPoolEntry *entry)
         Polar(direction, selected, 10);
     }
     v.y = 64;
-    sub_08127590(&entry->sprite.position, &v, 0x9385, 0x74C9, 1, 30, 2, 0, 490, 0, 0, 0, 0, 0, 0);
+    SpriteProjectile_Create(&entry->sprite.position, &v, 0x9385, 0x74C9, 1, 30, 2, 0, 490, 0, 0, 0, 0, 0, 0);
     Polar(Rand() & 255, &v, 10);
     v.y = 34;
-    sub_08127590(&entry->sprite.position, &v, 0x9385, 0x74C9, 1, 30, 2, 0, 490, 0, 0, 0, 0, 0, 0);
+    SpriteProjectile_Create(&entry->sprite.position, &v, 0x9385, 0x74C9, 1, 30, 2, 0, 490, 0, 0, 0, 0, 0, 0);
     Polar(Rand() & 255, &v, 10);
     v.y = 34;
-    sub_08127590(&entry->sprite.position, &v, 0x9385, 0x74C9, 1, 30, 2, 0, 490, 0, 1, 0, 0, 0, 0);
+    SpriteProjectile_Create(&entry->sprite.position, &v, 0x9385, 0x74C9, 1, 30, 2, 0, 490, 0, 1, 0, 0, 0, 0);
     Polar(Rand() & 255, &v, 10);
     v.y = 34;
-    sub_08127590(&entry->sprite.position, &v, 0x9385, 0x74C9, 1, 30, 2, 0, 490, 1, 0, 0, 0, 0, 0);
+    SpriteProjectile_Create(&entry->sprite.position, &v, 0x9385, 0x74C9, 1, 30, 2, 0, 490, 1, 0, 0, 0, 0, 0);
     Polar(Rand() & 255, &v, 10);
     v.y = 34;
-    sub_08127590(&entry->sprite.position, &v, 0x9385, 0x74C9, 1, 30, 2, 0, 490, 2, 0, 0, 0, 0, 0);
+    SpriteProjectile_Create(&entry->sprite.position, &v, 0x9385, 0x74C9, 1, 30, 2, 0, 490, 2, 0, 0, 0, 0, 0);
     CallbackPool_SpawnHitParticles(entry);
 }
 

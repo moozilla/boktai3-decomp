@@ -2,7 +2,6 @@
 #include "scene/collision/contact_actor.h"
 #include "engine/video/display_sprite_playback.h"
 // confidence=low: advances falling motion entries and releases them at ground or expiry.
-#define MotionEntry_UpdateFalling sub_081A4420
 struct MotionEntry {
     struct ContactSwarmSprite sprite;
     struct DisplaySequenceState sequence;
@@ -19,7 +18,7 @@ static inline void MotionEntry_AddVelocity(struct ContactPosition *out, struct C
     out->y = out->y + v->y;
     out->z = out->z + v->z;
 }
-void MotionEntry_UpdateFalling(struct MotionEntry *input)
+void MotionEntry_UpdateFalling_081A4420(struct MotionEntry *input)
 {
     struct MotionEntry *p = input;
     MotionEntry_AddVelocity(&p->sprite.position, &p->velocity);

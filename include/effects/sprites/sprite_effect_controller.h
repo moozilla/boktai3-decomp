@@ -63,6 +63,6 @@ struct SpriteEffectController *
 SpriteEffectController_AllocateSlot(struct SpriteEffectControllerPool *);
 void SpriteEffectController_TickAnimation(struct SpriteEffectControllerPool *,
                                           struct SpriteEffectController *);
-void sub_0806AB1C(struct SpriteEffectControllerPool *, struct SpriteEffectController *);
-void sub_0806AF74(struct SpriteEffectControllerPool *, struct SpriteEffectController *);
+void SpriteEffectController_UpdateBouncing(struct SpriteEffectControllerPool *, struct SpriteEffectController *);
+void SpriteEffectController_UpdateTileBounce(struct SpriteEffectControllerPool *, struct SpriteEffectController *);
 #endif

@@ -192,7 +192,6 @@ void PaletteLevels_Reset(void)
 }
 
 /* This range's trailing reset belongs to the next subsystem's manager. */
-#define FloatingEffectManager_ClearActive sub_08016890
 void FloatingEffectManager_ClearActive(void)
 {
     gLinkedWidgetSet = 0;

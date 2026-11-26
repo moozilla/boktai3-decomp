@@ -25,7 +25,7 @@ void StatGauge_Draw(s32, s32, s32, s32, s32, s32);
 
 void ScreenTransition_SendCommand(s32, s32, s32, s32, s32, s32, s32);
 
-void sub_082157EC(void);
+void Bg_ResetDisplay(void);
 
 void DarkLoan_RelocateMapHeaderCopy(struct DarkLoanScreen *panel)
 {
@@ -541,7 +541,7 @@ void DarkLoan_CloseAfterDelay(struct DarkLoanScreen *panel)
         } else {
             Script_Call(panel->exitScript, 0);
             Task_Kill(panel);
-            sub_082157EC();
+            Bg_ResetDisplay();
             Bg_DisableDisplay(DISPCNT_BG0_ON);
         }
     }

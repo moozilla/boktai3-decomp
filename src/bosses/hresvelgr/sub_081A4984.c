@@ -24,7 +24,7 @@ void Anim_SetKeyframes(void *, void *, u32, u32, u32);
 void ScaledShadow_Initialize(void *, void *, s32, s32, s32, s32, s32, s32, s32, s32, s32);
 void ScaledShadow_SetGraphic(void *, s32, s32);
 u32 Hresvelgr_SetFallingAttackState(struct HresvelgrProjectile *, void *);
-void sub_081A4BF8(void);
+void Hresvelgr_UpdateFallingProjectile(void);
 static inline void clear(void *dest)
 {
     u32 zero = 0;
@@ -56,5 +56,5 @@ u32 Hresvelgr_InitializeProjectile(struct ProjectilePosition *position, u32 noSh
         ScaledShadow_SetGraphic(shadow, 0x1c1b, 7);
         p->flags &= ~1;
     }
-    return Hresvelgr_SetFallingAttackState(p, sub_081A4BF8);
+    return Hresvelgr_SetFallingAttackState(p, Hresvelgr_UpdateFallingProjectile);
 }

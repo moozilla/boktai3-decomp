@@ -8,7 +8,7 @@ struct Weather {
 };
 extern int (*const gUnk_08604C80[])(struct Weather *);
 extern u8 *gGameState;
-void sub_08017510(void *);
+void Weather_UpdateTilemapScroll(void *);
 void WeatherParticles_Update(void *);
 int Weather_Update(struct Weather *p)
 {
@@ -16,7 +16,7 @@ int Weather_Update(struct Weather *p)
     if (f)
         f(p);
     if (p->state > 1)
-        sub_08017510(p);
+        Weather_UpdateTilemapScroll(p);
     if (p->state == 3) {
         *(s16 *)(gGameState + 0x87a) = 32767;
         gStormActive = 1;

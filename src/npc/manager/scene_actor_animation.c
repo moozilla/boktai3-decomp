@@ -99,7 +99,7 @@ void Actor_NoopRender(void)
 {
 }
 
-void sub_0821DE30(void *);
+void Trap_UpdateProbeContacts(void *);
 
 int DisplayAnimation_SetFlags(void *, int);
 
@@ -108,7 +108,7 @@ int Actor_UpdateVisibilityAndShadow(void *unused, struct SceneActor *actor)
     int result;
     actor->positionLink.id = actor->body.id;
     actor->positionLink.position = &actor->body.position;
-    sub_0821DE30(&actor->positionLink.id);
+    Trap_UpdateProbeContacts(&actor->positionLink.id);
     if (SceneActor_TestFlags(actor, 0x100)) {
         DisplayAnimation_SetFlags(&actor->drawable.common.kind, 1);
         result = Actor_DisableShadow(actor);
@@ -1150,7 +1150,7 @@ void Actor_OnConfiguredAnimationUpdate(void *unused, struct SceneActor *actor)
 
 struct SceneActor;
 
-u32 sub_0821E67C(void *, void *, void *, void *, u32, u32, u32);
+u32 Route_GetMovementTowardCurrentPoint(void *, void *, void *, void *, u32, u32, u32);
 
 void Actor_OnPathFollowUpdate(void *unused, struct SceneActor *actor)
 {
@@ -1184,13 +1184,13 @@ void Actor_OnPathFollowUpdate(void *unused, struct SceneActor *actor)
                         v = (u16)actor->radiusA >> 1;
                     else
                         v = (u16)actor->radiusA;
-                    actor->routeStepFinished = sub_0821E67C(ctx, &path->position, &path->motion,
+                    actor->routeStepFinished = Route_GetMovementTowardCurrentPoint(ctx, &path->position, &path->motion,
                                                             &path->direction, v, v, v);
                 }
             } else {
                 u32 v = (u16)actor->radiusA;
                 actor->routeStepFinished =
-                    sub_0821E67C(ctx, pos, &actor->body.motion, &actor->body.direction, v, v, v);
+                    Route_GetMovementTowardCurrentPoint(ctx, pos, &actor->body.motion, &actor->body.direction, v, v, v);
             }
         }
         if (actor->routeStepFinished) {

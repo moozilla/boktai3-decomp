@@ -1,6 +1,5 @@
 #include "objects/bouncing_bombs/bouncing_object.h"
 /* BouncingBomb_IsActive: Returns true for a nonnull object with a nonnegative slot index and nonzero timer whose state is not 2 */
-#define BouncingBomb_IsActive sub_08069788
 u32 BouncingBomb_IsActive(struct BouncingObject *input)
 {
     struct BouncingObject *object = input;

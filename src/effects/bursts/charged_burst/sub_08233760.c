@@ -17,7 +17,7 @@ struct ChargedBurst {
 };
 void sub_0823350C(struct ChargedBurst *);
 s32 Collider_Refresh(void *);
-void sub_08014634(u32, u32, void *, void *, void *, u32, u32);
+void ImpactParticleGroup_SpawnBouncing(u32, u32, void *, void *, void *, u32, u32);
 
 static inline u32 TerrainHeight(struct ContactPosition *position)
 {
@@ -70,7 +70,7 @@ void ChargedBurst_EmitTerminalDebris(struct ChargedBurst *object)
             extent.x = 5;
             extent.y = 10;
             extent.z = 5;
-            sub_08014634(4, 2, object->unknown8C, &velocity, &extent, 60, 60);
+            ImpactParticleGroup_SpawnBouncing(4, 2, object->unknown8C, &velocity, &extent, 60, 60);
         }
         Task_Kill(object);
     }

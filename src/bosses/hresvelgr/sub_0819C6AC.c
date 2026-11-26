@@ -3,7 +3,6 @@
 #include "engine/ram.h"
 
 // confidence=low: stores a randomized elevated travel point in the actor.
-#define Hresvelgr_SetRandomTravelTarget sub_0819C6AC
 struct BurstVector {
     s16 x, y, z, pad;
 };

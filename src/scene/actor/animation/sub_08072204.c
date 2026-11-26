@@ -1,6 +1,5 @@
 #include "scene/actor/scene_actor_palette.h"
 /* SceneActorPalette_BindActiveTransition: Binds the active category transition colors and actor palette offset to the actor drawable without advancing the transition */
-#define SceneActorPalette_BindActiveTransition sub_08072204
 void SceneActorPalette_BindActiveTransition(struct ChaseActor *actor)
 {
     struct SceneActorPaletteManagerView *manager = (void *)gSceneActorRegistryManager;

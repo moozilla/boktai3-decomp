@@ -32,7 +32,6 @@ void Ratatosk_ConfigureParticle(void *, s32, s32, s32, s32, s32);
 void SceneParticles_SpawnAtPosition(void *, struct ContactPosition *);
 s32 Callback_InvokeActor(void *, void *);
 // confidence=low: emits particles around the anchor during a timed pose.
-#define Ratatosk_UpdateOrbitingParticlePose sub_081F55B0
 void Ratatosk_UpdateOrbitingParticlePose(struct Ratatosk *p)
 {
     u8 params[0x18];

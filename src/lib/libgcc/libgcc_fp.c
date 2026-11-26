@@ -2,21 +2,6 @@
 /* Derived from pret/agbcc da598c1d918402c42c0c0d7128ba14567f3175e9,
  * libgcc/fp-bit-base.c (fp configuration). See docs/LIBGCC.md.
  * Original FSF license and linking exceptions are retained below. */
-#define __addsf3 sub_0824A5A4
-#define __subsf3 sub_0824A5D0
-#define __mulsf3 sub_0824A604
-#define __divsf3 sub_0824A768
-#define __cmpsf2 sub_0824A938
-#define __eqsf2 sub_0824A960
-#define __nesf2 sub_0824A9A8
-#define __gtsf2 sub_0824A9F0
-#define __gesf2 sub_0824AA38
-#define __ltsf2 sub_0824AA80
-#define __lesf2 sub_0824AAC8
-#define __floatsisf sub_0824AB10
-#define __fixsfsi sub_0824AB70
-#define __negsf2 sub_0824ABD8
-#define __extendsfdf2 sub_0824AC14
 // COMPILER: old_agbcc
 // CFLAGS: -O2
 /* This is a software floating point library which can be used instead of
@@ -768,12 +753,12 @@ __make_fp(fp_class_type class,
   in.fraction.ll = frac;
   return __pack_f (&in);
 }
-extern DFtype sub_0824A288 (fp_class_type, unsigned int, int, UDItype frac);
+extern DFtype __make_dp (fp_class_type, unsigned int, int, UDItype frac);
 DFtype
 __extendsfdf2 (SFtype arg_a)
 {
   fp_number_type in;
   __unpack_f ((FLO_union_type *) & arg_a, &in);
-  return sub_0824A288 (in.class, in.sign, in.normal_exp,
+  return __make_dp (in.class, in.sign, in.normal_exp,
       ((UDItype) in.fraction.ll) << (52+8-(23+7)));
 }

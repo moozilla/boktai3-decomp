@@ -1,7 +1,6 @@
 #include "scene/motion/scene_steering_actor.h"
 #include "player/player.h"
-/* SceneSteeringActor_CreateFixedOriginTravelActor: Creates a travel actor at fixed coordinates aimed toward the primary player */
-#define SceneSteeringActor_CreateFixedOriginTravelActor sub_0806CF4C
+/* SceneSteeringActor_CreateFixedTravelActor: Creates a travel actor at fixed coordinates aimed toward the primary player */
 struct SceneSteeringPlayerView {
     u8 unknown0[0x30];
     struct ContactPosition position;
@@ -9,7 +8,6 @@ struct SceneSteeringPlayerView {
 void SceneSteeringActor_CreateTravelActor(const struct ContactPosition *,
                                           const struct ContactPosition *, s32, s32, s32, s32, s32,
                                           s32, s32, s32, s32, s32, s32);
-#define SceneSteeringActor_CreateFixedTravelActor sub_0806CF4C
 void SceneSteeringActor_CreateFixedTravelActor(void)
 {
     union {

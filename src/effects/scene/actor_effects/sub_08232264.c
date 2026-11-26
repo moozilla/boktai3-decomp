@@ -28,7 +28,7 @@ void ParticleSprite_Initialize(void *, void *, u32);
 void Effect_SetOrigin(void *, s32, s32);
 void Anim_SetSequence(void *, void *, u32, u32, u32);
 s32 ActiveList_PrependNode(struct EffectManager *, struct EffectGroup *);
-void sub_08231444(struct EffectGroup *);
+void SceneActorEffects_OnInactiveSlot(struct EffectGroup *);
 // confidence=low: sets up an effect group of four particles for an owner and adds it to the
 // scene actor effect manager, creating the manager if needed.
 s32 sub_08232264(struct EffectGroup *group, void *owner, s32 mode, s32 kind, s32 variant)
@@ -48,7 +48,7 @@ s32 sub_08232264(struct EffectGroup *group, void *owner, s32 mode, s32 kind, s32
     group->mode = mode;
     group->kind = kind;
     group->variant = variant;
-    group->update = sub_08231444;
+    group->update = SceneActorEffects_OnInactiveSlot;
     for (i = 0; i < 4; i++) {
         entry = &group->entries[i];
         entry->state = 0;

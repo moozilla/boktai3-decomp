@@ -2,9 +2,7 @@
 #include "effects/orbits/homing_effect.h"
 #include "engine/video/display_sequence_inline.h"
 /* EffectManager_ClearGlobal: sets the global EffectManager pointer to 0; matches an existing vetted proposal and the body's single store */
-#define EffectManager_ClearGlobal sub_0800A800
 
-#define EffectManager_ClearGlobal sub_0800A800
 static inline void EffectManager_SetGlobal(struct EffectManager *manager)
 {
     gEffectManager = manager;

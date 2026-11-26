@@ -3,7 +3,6 @@
 #include "engine/ram.h"
 
 // confidence=low: projects a cosine-scaled speed opposite the actor side.
-#define Hresvelgr_SetCosineScaledVelocity sub_0819C8F8
 struct BurstVector {
     s16 x, y, z, pad;
 };

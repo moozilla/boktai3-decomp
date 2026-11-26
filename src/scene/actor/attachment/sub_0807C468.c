@@ -1,7 +1,5 @@
 #include "scene/actor/scene_actor_attachment.h"
 /* SceneActorAttachment_SelectAlternateCommonOffsets: Selects attachment Y/Z offsets by kind; alternate common selector uses Z offset 390 for kind 3 */
-#define SceneActorAttachment_SelectAlternateCommonOffsets sub_0807C468
-#define SceneActorAttachment_SelectAlternateCommonOffsets sub_0807C468
 
 void SceneActorAttachment_SelectAlternateCommonOffsets(u8 kind, s32 *yOffset, s32 *zOffset)
 {
