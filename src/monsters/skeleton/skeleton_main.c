@@ -1242,44 +1242,28 @@ mode_flags:
     }
 }
 
-struct Parent {
-    u8 pad0[0x6e0];
-    s32 a, value, b;
-    u8 pad6EC[0x1c];
-    s32 c, copy;
-};
-
-struct Obj {
-    u8 pad0[0x98];
-    u8 state;
-    u8 pad99[0x5b];
-    s32 value;
-    u8 padF8[0x2d8];
-    struct Parent *parent;
-};
-
 void Skeleton_InitVariantMotion(void *pIn)
 {
-    struct Obj *p = (struct Obj *)pIn;
-    struct Parent *owner = p->parent;
-    switch (p->state) {
+    struct ChaseActor *actor = pIn;
+    struct Skeleton *owner = actor->base.context;
+    switch (actor->base.category) {
         case 5:
-            owner->a = 80000;
-            owner->c = 80000;
-            owner->copy = p->value;
+            owner->distanceThresholds[0] = 80000;
+            owner->nearDistance = 80000;
+            owner->farDistance = actor->base.tracking.range;
             break;
         case 6:
-            owner->a = 102400;
-            owner->value = p->value;
-            owner->b = 85535;
-            owner->c = 85535;
-            owner->copy = owner->value;
+            owner->distanceThresholds[0] = 102400;
+            owner->distanceThresholds[1] = actor->base.tracking.range;
+            owner->distanceThresholds[2] = 85535;
+            owner->nearDistance = 85535;
+            owner->farDistance = owner->distanceThresholds[1];
             break;
         case 7:
-            owner->a = 102400;
-            owner->value = p->value;
-            owner->c = Div(p->value * 6, 10);
-            owner->copy = owner->value;
+            owner->distanceThresholds[0] = 102400;
+            owner->distanceThresholds[1] = actor->base.tracking.range;
+            owner->nearDistance = Div((s32)actor->base.tracking.range * 6, 10);
+            owner->farDistance = owner->distanceThresholds[1];
             break;
     }
 }
@@ -1628,12 +1612,6 @@ u32 Skeleton_TrySelectRetreatCell(struct ChaseActor *actor, u32 priorDirection)
 
 // confidence=low: resolves the pending contact object and clears Skeleton context state bits.
 
-struct SceneActorTargetLink {
-    u8 *target;
-    u8 unknownE0[0xB];
-    u8 flags;
-};
-
 void SceneActorTarget_ResetContactResponse(struct RoomActor *);
 
 static inline u8 BoolOf(u32 v)
@@ -1646,7 +1624,7 @@ static inline u8 BoolOf(u32 v)
 s32 SceneActorTarget_ResolvePendingObjectSkeleton(struct ChaseActor *actor)
 {
     struct ChaseActor *owner = actor;
-    struct SceneActorTargetLink *state;
+    struct SceneActorChaseTracking *state;
     s32 *pendingId = &owner->base.counter304;
     if (*pendingId > 0) {
         struct Delta {
@@ -1670,16 +1648,16 @@ s32 SceneActorTarget_ResolvePendingObjectSkeleton(struct ChaseActor *actor)
             mask |= *flags;
             *flags = mask;
         }
-        state = (void *)((u8 *)owner + 0xDC);
+        state = &owner->base.tracking;
         {
             u32 mask = 0x10;
             state->flags = (*(&mask)) | state->flags;
         }
         {
-            u8 *object = SceneActorContacts_FindObjectById(*pendingId);
+            struct SceneActorChaseTarget *object = SceneActorContacts_FindObjectById(*pendingId);
             state->target = object;
-            x = ((struct ContactPosition *)(object + 0xC))->x >> 8;
-            z = ((struct ContactPosition *)(object + 0xC))->z >> 8;
+            x = object->position.x >> 8;
+            z = object->position.z >> 8;
         }
         if ((((x < 0) || (z < 0)) || (((u32)x) >= gTerrainWidth)) || (((u32)z) >= gTerrainHeight)) {
             cell = 0;
@@ -1690,7 +1668,7 @@ s32 SceneActorTarget_ResolvePendingObjectSkeleton(struct ChaseActor *actor)
         {
             struct Delta *out = &delta;
             struct ContactPosition *source = &owner->base.body.position;
-            target = (void *)(state->target + 0xC);
+            target = &state->target->position;
             {
                 u32 xDelta = (u16)target->x;
                 struct Delta *first;
@@ -1710,13 +1688,14 @@ s32 SceneActorTarget_ResolvePendingObjectSkeleton(struct ChaseActor *actor)
             }
         }
         {
-            u32 *sf = (u32 *)(*(u8 **)((u8 *)owner + 0x3D0) + 0x6DC);
+            struct Skeleton *context = owner->base.context;
+            u32 *sf = &context->actionFlags;
             u32 mask = 0xFFFFFCFF;
             *sf &= mask;
         }
         return 1;
     } else {
-        struct SceneActorTargetLink *link = (void *)&owner->base.tracking;
+        struct SceneActorChaseTracking *link = &owner->base.tracking;
         u32 mask = 2;
         u32 pending = link->flags & mask;
         state = link;
@@ -1866,20 +1845,15 @@ void SceneActorScript_ReadCallScriptConfig(struct ChaseActor *actor)
 void SceneActorScript_TriggerCallOnCount(struct ChaseActor *actor)
 {
     s32 zero = 0;
-    struct SceneActorScriptPropertiesView *context = actor->base.context;
-    u16 *script = &context->scriptId6CC;
-    u8 *count;
-    u8 *limit;
+    struct Skeleton *context = actor->base.context;
+    u16 *script = &context->callScriptId;
 
     if (*script != 0) {
-        count = &context->callCount6CF;
-        *count += 1;
-        limit = &context->callLimit6CE;
-        if (*count >= *limit) {
+        if (++context->callCount >= context->callLimit) {
             Script_Call(*script, zero);
             *script = 0;
-            *limit = 0;
-            *count = 0;
+            context->callLimit = 0;
+            context->callCount = 0;
         }
     }
 }
