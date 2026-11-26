@@ -303,3 +303,22 @@ All seven edited units matched their full ROM extents. Scoped lint reported
 zero errors. The direct Vorn tracking clear still folds the component offset
 and moves the mask below the byte load. Mummy's direct tracking clear uses
 an immediate byte where the ROM forms a full-width complemented mask.
+
+## Initialization and combat follow-up
+
+| Class | Report lines before and after | Steering uses before and after |
+|---|---:|---:|
+| Skeleton | 240 → 238 | 296 → 295 |
+| Vorn | 217 → 213 | 225 → 222 |
+| Mummy | 169 → 169 | 171 → 171 |
+
+All three classes size their drawable allocations from the matching
+types. Skeleton and Vorn share the probe animation duration update
+with direct callback arguments. Vorn uses the common pending-control
+installation in route recovery and uses native collider positions and
+palette fields. Mummy uses its native tracking component and the
+actual room actor and route start signatures.
+
+All five edited units matched their full ROM extents, and the scoped
+linter reported zero errors. Direct bone burst, sprite priority, and
+burn overlay candidates still changed the generated instructions.
