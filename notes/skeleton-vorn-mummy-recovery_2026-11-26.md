@@ -77,3 +77,49 @@ appearance on the right of a binary operator. The scanner now parses
 all twelve candidates and reports 39 embedded-type observations in the
 final source. The focused type-family suite passes 25 tests, including
 the compound-expression regression.
+
+## Resumed pass
+
+- Skeleton's idle, approach, target, and sink paths use the shared control
+  and state transitions. The near and far distance checks and drawable
+  writes use the class fields. The 31,956-byte unit matches. Testing
+  native spark positions with earlier random-table assignments still
+  left the stack-slot mismatch in Skeleton_UpdateDefeat (080BD1F0).
+  The direct-index neighbor loop (080B713C) kept the extent and changed
+  33 bytes, with the actor and mask lifetimes still unresolved.
+- Vorn's saved-target callback uses the shared chase group and player
+  tracking. The defeat spread is a typed position in the same packed
+  storage. Vorn's main unit reads the native class timers and uses the
+  shared phase transition. Vorn_UpdateDefeat (080AEE08) still differs
+  in 17 bytes with the proved-zero spread adjustment removed.
+  In Vorn_UpdateActionCompletion the flat tracking read changed three
+  instructions by folding the group address at actor + 0xDC into the
+  byte read at actor + 0xEB.
+- Mummy_UpdateDying (080D203C) uses the prepared latch, named motion
+  field, and display sequence type. With those edits in place, the
+  signed timer read through the chase group also matches. Mummy's
+  hidden recovery uses a literal default mirror value. Revival
+  (080D1EA0) uses the shared health and collider reset. Burn damage
+  (080D812C) uses the defeat callback and shares the two-drawable
+  palette and flash timer update. The contact callback writes its
+  response bit directly, and the route replay uses the typed body.
+  The shared burn death-state reset expands its zero argument before
+  the state field address. The ROM loads zero after forming that
+  address and before storing the state byte. In Mummy_OnAttackCollision
+  (080D0C30), CSE reuses the direct response address for both accesses,
+  putting it in r7. The ROM uses r0 for the read and r1 for the store.
+  SceneActor_EnterMotionPhase (080D7438) keeps the tracking base at
+  actor + 0xDC for its final flag write. The direct access folds it with
+  the byte offset and loads the flag before building the mask.
+
+| Class | Linter report lines after the resumed pass | Steering uses after the resumed pass |
+|---|---:|---:|
+| Skeleton | 251 | 310 |
+| Vorn | 226 | 236 |
+| Mummy | 174 | 176 |
+
+The resumed pass removed 23 report lines and 37 steering uses. Across
+both passes, the three directories went from 743 to 651 report lines
+(12.4% lower) and from 844 to 722 steering uses (14.5% lower).
+The seven units touched on resumption matched their recorded extents.
+The scoped linter reported zero errors.
