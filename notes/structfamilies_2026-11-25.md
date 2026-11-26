@@ -39,7 +39,7 @@ before and after.
 
 The full report at `build/structfamilies/REPORT.md` ranks the top fifty of 394 families and
 records 1,818 embedded-type findings.
-For `struct Player` it confirms `struct SceneInputWidget` at 0x8C and 0xEC from 12 and four
+For `struct Player` it confirms `struct AnimSprite` at 0x8C and 0xEC from 12 and four
 call sites respectively. Some units use syntax the source parser cannot resolve. The catalog
 keeps those diagnostics, along with any layouts obtainable from declarations alone.
 
@@ -79,7 +79,7 @@ scoped linter. The generated scratch header is
 reordered the fields of an included type while preserving the outer header text and size.
 The merger asked for a rescan before proposing source changes.
 
-The scratch trial adopted `struct TerrainTrap` from `include/engine_map.h` in three units
+The scratch trial adopted `struct TerrainTrap` from `include/objects/warp_circle/engine_map.h` in three units
 (0821E040, 0821E190, 08225624). All three matched. The scoped linter reported two warnings
 and zero errors before and after.
 
@@ -88,13 +88,13 @@ and zero errors before and after.
 The argument prefilter reduced scan inputs from 4,554 to 3,584. A two-header test uses one
 compiler probe on the first pass and zero new probes on the cached pass. Compatible headers can
 share a probe and incompatible groups fall back to smaller groups or individual headers.
-On `src/grid_attack_actor.c`, three direct Clang preprocessing invocations took 5.304 seconds
+On `src/bosses/nidhoggr/grid_attack_actor.c`, three direct Clang preprocessing invocations took 5.304 seconds
 versus 10.161 through `cc`, with identical output. The final whole-tree refresh with cached
 probes took 1 minute 42 seconds at two jobs. The nested-evidence refresh took 3 minutes
 1 second and ranked the newly discovered families as well.
 
 A focused two-unit SceneDistance scan took 55.59 seconds with all 444 shared headers in scope
-and 30.75 seconds with `--shared-header include/scene_vec.h`. Both runs found the same two
+and 30.75 seconds with `--shared-header include/engine/math/scene_vec.h`. Both runs found the same two
 private family IDs. The focused report records the selected header because it limits which
 shared layouts and embedded-type findings can appear.
 

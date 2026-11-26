@@ -194,7 +194,7 @@ Status transition calls `Hud_InitStatusMenu` (0817565C),
 (08174F48). The Status shot is `build/identify/replays/pause-tabs/page05.png`.
 The four equipment and valuables pages call the 0816B3C0–0816B66C navigation
 routines, including `SceneInput_NavigateGridKeys`. Move the catalog to
-`src/ui/pause/status_options.c` and the broader sequence unit to
+`src/ui/pause/status/status_options.c` and the broader sequence unit to
 `src/ui/pause/menu_sequences`. The Dark Card runs the first half of the
 same unit at 0816AE38–0816B390. Grid navigation begins at 0816B3C0.
 

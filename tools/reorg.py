@@ -24,6 +24,9 @@ SYMBOL = re.compile(r"\b[A-Za-z_][A-Za-z_0-9]*\b")
 FILE_SUFFIX = re.compile(r"\.(?:c|h|s|inc|py|ts|md)\b")
 
 
+# Layout audit records: their old paths are the record, so replay leaves them alone.
+LAYOUT_RECORDS = (Path("symbols/identity_corrections.csv"), Path("symbols/prefix_renames.csv"))
+
 def tracked_paths():
     out = subprocess.check_output(["git", "ls-files", "--cached", "--others", "--exclude-standard", "-z"], cwd=ROOT)
     return {Path(path) for path in out.decode().split("\0") if path}
@@ -281,7 +284,7 @@ def rewrite_moves(recorded, moves, apply, *, input_table=None):
     paths = set(moves)
     for path in tracked_paths():
         if (path.parts[0] not in ("src", "include", "tests", "build") and path.suffix in TEXT_SUFFIXES
-                and path not in (SOURCE_DIRS, SOURCE_FILES, HEADER_DIRS)
+                and path not in (SOURCE_DIRS, SOURCE_FILES, HEADER_DIRS, *LAYOUT_RECORDS)
                 and path not in (Path("PROGRESS.md"), Path("docs/SOURCE_LAYOUT_DECISIONS.md"))
                 and path.parts[:2] != ("docs", "history")):
             paths.add(path)
