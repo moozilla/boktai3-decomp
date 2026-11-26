@@ -228,6 +228,13 @@ static inline void ActorStatus_SetRecoveryDuration(struct ChaseActor *actor, u32
     actor->base.field2C2 = Div(0x40, 3);
 }
 
+static inline void ActorStatus_QueueRecovery(struct ChaseActor *actor)
+{
+    ActorStatus_ClearMotionFlags(actor, 0x2500);
+    ActorStatus_SetPendingBits(actor, 0x400);
+    SceneActorChase_ClearBits(&actor->base.reactionFlags, 0x980);
+}
+
 static inline void ActorStatus_ReactionFlags(void *object)
 {
     struct ChaseActor *actor = object;
@@ -264,13 +271,9 @@ static inline void ActorStatus_ReactionFlags(void *object)
         } else if (ActorStatus_MotionFlags(actor, 2)) {
             ActorStatus_ResetReaction(object);
             ActorStatus_ClearTrackingFlags((void *)&actor->base.tracking.target, 8);
-            ActorStatus_ClearMotionFlags(actor, 0x2500);
-            ActorStatus_SetPendingBits(actor, 0x400);
-            SceneActorChase_ClearBits(&actor->base.reactionFlags, 0x980);
+            ActorStatus_QueueRecovery(actor);
         } else if (ActorStatus_MotionFlags(actor, 0x8000)) {
-            ActorStatus_ClearMotionFlags(actor, 0x2500);
-            ActorStatus_SetPendingBits(actor, 0x400);
-            SceneActorChase_ClearBits(&actor->base.reactionFlags, 0x980);
+            ActorStatus_QueueRecovery(actor);
         } else if (ActorStatus_MotionFlags(actor, 0x10)) {
             ActorStatus_ResetRouteAt(actor, &group->common.control);
             ActorStatus_ResetReaction(object);
@@ -286,9 +289,7 @@ static inline void ActorStatus_ReactionFlags(void *object)
         } else if (ActorStatus_MotionFlags(actor, 8)) {
             ActorStatus_ResetRouteAt(actor, &group->common.control);
             ActorStatus_ResetInteractionAt(actor, &group->common.control);
-            ActorStatus_ClearMotionFlags(actor, 0x2500);
-            ActorStatus_SetPendingBits(actor, 0x400);
-            SceneActorChase_ClearBits(&actor->base.reactionFlags, 0x980);
+            ActorStatus_QueueRecovery(actor);
         }
 
         if (ActorStatus_MotionFlags(actor, 0x803E)) {
