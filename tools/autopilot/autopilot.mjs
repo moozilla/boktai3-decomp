@@ -19,7 +19,7 @@ import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { openSession, png } from '../../port/agent/session.mjs';
 import { tickAt } from './movie-index.mjs';
-import { distanceFromEntrance } from './route-entrances.mjs';
+import { distanceFromEntrance, routeDistances } from './route-entrances.mjs';
 
 const ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname), '../..');
 const args = process.argv.slice(2);
@@ -69,6 +69,7 @@ const stageOf = (scene) => stageIndex.get(scene) || emptyStage;
 const log = [];
 // scenes the run has been in (carried over from --from), for door choice
 const UNREACHABLE = new Set(from && from.unreachable ? from.unreachable : []);  // 'scene:box' doors no route reached
+const distancesTo = (scene, locked) => routeDistances(STAGES, scene, UNREACHABLE, locked);
 const SEEN = new Map();  // person id -> rooms they were in
 const VISITS = new Map();  // room visits this run: least visited doors first
 const TRIED = new Set(from && from.tried ? from.tried : []);  // floor items already gone for
@@ -303,8 +304,8 @@ const GOALS = {
       const toward = rooms === 0 ? +opt('--toward', -1) : -1;
       // with no --goal: explore, the door on the shortest route (over doors not known to
       // be unreachable) to the nearest scene not visited yet
-      const dist = keyGoal ? routeDistances(keyGoal.scene, keyGoal.blocked)
-        : routeGoal >= 0 ? routeDistances(routeGoal) : exploreDistances(here, visited);
+      const dist = keyGoal ? distancesTo(keyGoal.scene, keyGoal.blocked)
+        : routeGoal >= 0 ? distancesTo(routeGoal) : exploreDistances(here, visited);
       VISITS.set(here, (VISITS.get(here) || 0) + 1);
       const distanceFromDoor = (d) => distanceFromEntrance(d, stageOf, dist);
       const doors = doorsHere().sort((a, b) => (b.scene === toward) - (a.scene === toward) ||
@@ -315,7 +316,7 @@ const GOALS = {
         const blocked = `${here}:${lock.box}`;
         const keyRoutes = STAGES.filter((st) => st.scene !== here && !failedKeyRooms.has(`${lock.item}:${st.scene}`) &&
             st.items.some((it) => it.category === 0 && it.item === lock.item))
-          .map((st) => ({ scene: st.scene, dist: routeDistances(st.scene, blocked) }))
+          .map((st) => ({ scene: st.scene, dist: distancesTo(st.scene, blocked) }))
           .filter((r) => r.dist.has(here)).sort((a, b) => a.dist.get(here) - b.dist.get(here));
         if (keyRoutes.length) {
           const route = keyRoutes[0];
@@ -346,8 +347,9 @@ const GOALS = {
             if (L.where().scene !== here) { moved = true; break; }
             continue;
           }
-          if (yield* throughDoor(g, L, d.box)) { moved = true; break; }
-          if (L.where().scene === here) UNREACHABLE.add(`${here}:${d.box}`);
+          const edge = `${here}:${d.box}`;
+          if (yield* throughDoor(g, L, d.box)) { UNREACHABLE.delete(edge); moved = true; break; }
+          if (L.where().scene === here) UNREACHABLE.add(edge);
           if (L.where().scene !== here) { moved = true; break; }
         }
       }
@@ -415,21 +417,6 @@ function exploreDistances(here, visited) {
   }
   for (const [sc, d] of toFrontier) out.set(sc, d);
   return out;
-}
-
-// Door-graph distances to GOAL (breadth first over stages.json doors, walked backwards):
-// scene -> number of doors to the goal. Empty without a goal.
-function routeDistances(goal, blocked) {
-  const d = new Map();
-  if (goal < 0) return d;
-  d.set(goal, 0);
-  for (let frontier = [goal]; frontier.length;) {
-    const next = [];
-    for (const st of STAGES) for (const door of st.doors)
-      if (`${st.scene}:${door.box}` !== blocked && frontier.includes(door.scene) && !d.has(st.scene)) { d.set(st.scene, d.get(door.scene) + 1); next.push(st.scene); }
-    frontier = next;
-  }
-  return d;
 }
 
 // Through door box BOX: navigate; when a scripted gate turns the player back, open

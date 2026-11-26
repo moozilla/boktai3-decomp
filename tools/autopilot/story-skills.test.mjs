@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import test from 'node:test';
-import { distanceFromEntrance } from './route-entrances.mjs';
+import { distanceFromEntrance, routeDistances } from './route-entrances.mjs';
 
 function skill(file, g, game = {}, exports = {}) {
   const source = fs.readFileSync(new URL(`lib/${file}.js`, import.meta.url), 'utf8');
@@ -79,6 +79,22 @@ test('doors to the same scene prefer the arrival nearer a forward exit', () => {
   assert.equal(distance(7), 3840);
   assert.equal(distance(8), 256);
   assert.equal(distance(9), Infinity);
+});
+
+test('goal routing avoids a failed shortcut and learns the longer path', () => {
+  const stage = (scene, ...doors) => ({ scene, doors: doors.map(([box, to]) => ({ box, scene: to })) });
+  const stages = [
+    stage(1, ['A', 2], ['B', 3]), stage(2, ['C', 5], ['D', 1]),
+    stage(3, ['E', 4]), stage(4, ['F', 5]),
+  ];
+  const failed = new Set();
+  const pristine = routeDistances(stages, 5, failed);
+  assert.equal(pristine.get(1), 2);
+  failed.add('2:C');
+  const reroute = routeDistances(stages, 5, failed);
+  assert.equal(reroute.get(1), 3);
+  assert.equal(reroute.get(2), 4);
+  assert.equal(routeDistances(stages, 5, failed, '4:F').has(1), false);
 });
 
 test('live pressure plates use the center of the occupied square', () => {
