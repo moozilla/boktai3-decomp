@@ -144,6 +144,18 @@ void F(struct Owner *p, int n) {
         with self.assertRaisesRegex(ValueError, "shared header not found"):
             families.shared_scan_inputs(headers, [Path("include/missing.h")])
 
+    def test_report_groups_load_widths_and_signedness_at_each_offset(self):
+        family = {"id": "Test", "files": 0, "size": 8, "records": [], "warnings": 0,
+                  "score": 0, "shared": [], "evidence": [],
+                  "rows": [{"offset": n, "votes": [], "conflicts": []} for n in (0, 2, 4)],
+                  "loads": [(4, 2, True, "F", 0x8000000), (0, 4, None, "F", 0x8000002),
+                            (4, 1, False, "F", 0x8000004), (0, 4, None, "F", 0x8000006),
+                            (0, 4, False, "G", 0x8000008)]}
+        table = [line for line in families.family_lines(family) if line.startswith("| `0x")]
+        self.assertEqual(table, ["| `0x0` |  |  | word32 × 2, u32 × 1 |",
+                                 "| `0x2` |  |  |  |",
+                                 "| `0x4` |  |  | u8 × 1, s16 × 1 |"])
+
 
 @unittest.skipUnless(Path(lm.AGBCC).is_file(), "agbcc required for layout probes")
 class CompilerTests(unittest.TestCase):

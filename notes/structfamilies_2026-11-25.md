@@ -87,3 +87,8 @@ A focused two-unit SceneDistance scan took 55.59 seconds with all 444 shared hea
 and 30.75 seconds with `--shared-header include/scene_vec.h`. Both runs found the same two
 private family IDs. The focused report records the selected header because it limits which
 shared layouts and embedded-type findings can appear.
+
+Grouping ROM load counts by field offset reduced median Markdown rendering time from
+0.1899 to 0.0388 seconds for the top fifty and from 0.5069 to 0.2485 seconds for all 394
+families. These are five alternating runs on the same loaded catalog. Both rendered reports
+were byte-for-byte identical to the previous renderer.

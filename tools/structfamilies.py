@@ -666,7 +666,9 @@ def family_lines(family):
     rows.extend(f"- {relation} `{key}` ({proof}, {count} agreeing fields)"
                 for key, relation, proof, count in f["shared"])
     rows.extend(f"- {kind} · {where}" for kind, where in f["evidence"])
-    loads = Counter((o, w, s) for o, w, s, _, _ in f["loads"])
+    loads = defaultdict(Counter)
+    for off, width, signed, _, _ in f["loads"]:
+        loads[off][width, signed] += 1
     rows.extend(["", "| Offset | Candidate name and type (copies) | Conflicts | ROM loads |",
                  "|---:|---|---|---|"])
     for row in f["rows"]:
@@ -676,9 +678,12 @@ def family_lines(family):
         if row.get("member_votes"):
             members = ", ".join(f"`{n}` `{t}` ({v})" for n, t, v in row["member_votes"]).replace("|", r"\|")
             conflicts += f" ({members})"
-        observations = ", ".join(f"{'word' if s is None else 's' if s else 'u'}{w * 8} × {count}"
-                                 for (o, w, s), count in sorted(loads.items()) if o == off)
-        rows.append(f"| `{off:#x}` | {votes} | {conflicts} | {observations} |")
+        counts = loads.get(off, {})
+        observations = []
+        for width, signed in sorted(counts, key=lambda k: (k[0], -1 if k[1] is None else k[1])):
+            prefix = "word" if signed is None else "s" if signed else "u"
+            observations.append(f"{prefix}{width * 8} × {counts[width, signed]}")
+        rows.append(f"| `{off:#x}` | {votes} | {conflicts} | {', '.join(observations)} |")
     return rows + [""]
 
 

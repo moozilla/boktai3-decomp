@@ -644,7 +644,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [notes/stage-icon-display_2026-10-14.md](../notes/stage-icon-display_2026-10-14.md) | Staged keyframe icon display |  | 3 |
 | [notes/staged-effect_2026-10-14.md](../notes/staged-effect_2026-10-14.md) | Contiguous staged effect subsection (Sol, 2026-10-14) | *#tooling* | 4 |
 | [notes/storage-equipment-slots-round9.md](../notes/storage-equipment-slots-round9.md) | Storage_RefreshEquipmentSlots |  | 1 |
-| [notes/structfamilies_2026-11-25.md](../notes/structfamilies_2026-11-25.md) | Private record recovery, 2026-11-25 | #tooling #matching #process | 5 |
+| [notes/structfamilies_2026-11-25.md](../notes/structfamilies_2026-11-25.md) | Private record recovery, 2026-11-25 | #tooling #matching #process | 6 |
 | [notes/sub_082392E8.md](../notes/sub_082392E8.md) | sub_082392E8.md | *#particles* | 1 |
 | [notes/subsystem-run_2026-10-25.md](../notes/subsystem-run_2026-10-25.md) | Subsystem scope run, 2026-10-25/26 | #process #tooling #matching | 4 |
 | [notes/subsystem-run_2026-10-27.md](../notes/subsystem-run_2026-10-27.md) | Subsystem scope run, 2026-10-27 | #process #tooling #matching #ram | 1 |
