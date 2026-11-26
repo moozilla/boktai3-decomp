@@ -3,7 +3,7 @@
 #include "engine/ram.h"
 #include "engine/engine_globals.h"
 #include "player/player_slot_status.h"
-#include "bosses/nidhoggr/scene_pause.h"
+#include "engine/engine_pause.h"
 struct NidhoggrEffectVector {
     u16 x, y, z, pad;
 };
@@ -48,7 +48,7 @@ void Nidhoggr_CreateSeekingAttackEffect(u8 *owner, struct NidhoggrEffectVector *
     u8 *animation, *collider, *shadow;
     struct NidhoggrEffectVector *position;
     void (*callback)(void *);
-    if (Scene_TestPauseFlags(0x400))
+    if (Engine_PauseBits(0x400))
         return;
     if (PlayerSlot_ReadStatus(0, 4))
         return;
