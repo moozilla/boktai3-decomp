@@ -1,4 +1,5 @@
 #include "global.h"
+#include "monsters/armor/armor_part_queue.h"
 #include "system/game_state/game_state.h"
 #include "engine/engine.h"
 #include "engine/ram.h"
@@ -20,7 +21,7 @@ struct ArmorDecisionActor {
     u8 unknownB3A[2];
     u8 behavior, phase;
     u8 unknownB3E[0xB58 - 0xB3E];
-    u8 sequence[0x1120 - 0xB58];
+    struct ArmorLaunchGroup sequence;
     u8 decision, fastMode;
     u16 attackCooldown, secondaryCooldown, collisionCooldown, modeTimer;
 };
@@ -111,7 +112,7 @@ void Armor_UpdateModeAttackDecision(struct ArmorDecisionActor *p)
                         ActorController_SetBehavior(p, 32);
                     p->decision = 1;
                     p->attackCooldown = 180;
-                } else if (Armor_IsSequenceIncomplete(p->sequence))
+                } else if (Armor_IsSequenceIncomplete(&p->sequence))
                     ActorController_SetBehavior(p, 8);
                 else if (p->fastMode)
                     ActorController_SetBehavior(p, 33);
