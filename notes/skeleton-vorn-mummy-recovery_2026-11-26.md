@@ -155,3 +155,37 @@ All six units edited in this pass match their recorded ROM extents.
 Both dependents of the Vorn header also match. The scoped linter
 reports zero errors. Across all three passes, report lines fell from
 743 to 647 and steering uses from 844 to 717.
+
+## Visibility and route follow-up
+
+| Class | Report lines before and after | Steering uses before and after |
+|---|---:|---:|
+| Skeleton | 251 → 244 | 310 → 300 |
+| Vorn | 226 → 221 | 235 → 229 |
+| Mummy | 170 → 170 | 172 → 172 |
+
+- Skeleton's visibility flicker and hidden-state tick use the shared
+  two-layout drawable operations. The return-to-entry callback
+  (080BBBC0) uses the typed probe destination and shared state
+  transitions. The approach callback reads the class distance bands
+  and the chase fallback. Skeleton_UpdateDefeat (080BD1F0) indexes
+  the random samples directly. Removing the remaining false paths
+  still changes the spark-position spill and late table allocation.
+- Vorn_UpdateHiddenRecovery (080AD1C0) takes the native actor and frame
+  and uses the shared drawable and control transitions. The snapshot
+  restore shares the revival health operation. The probe approach
+  (080B04F4) uses the real chase route, Vorn class flags, and animation
+  components. The direct animation callback expression still changes
+  the rate-selection allocation and reload order. Direct sample
+  indexing in Vorn_UpdateDefeat (080AEE08) also changes the spark
+  registers.
+- Mummy_UpdatePlayerRoute (080D3D60) uses the turn state, saved control,
+  tracked target, and route fields. The shared saved-control helper
+  changes a spill from sp+0x14 to sp+0x38 in this caller. The volley
+  (080D62CC) reads class parameters and passes native positions using
+  the projectile's declared interface. The particle pattern
+  (080DA810) updates the same position type directly.
+
+All five edited units matched their recorded extents. The scoped
+linter reported zero errors. The pass removed 12 report lines and
+16 steering uses. The original 844 steering uses are now 701.

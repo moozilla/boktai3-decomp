@@ -636,7 +636,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [notes/singleton-slot7-recovery_2026-11-01.md](../notes/singleton-slot7-recovery_2026-11-01.md) | Slot-seven presentation | *#assets* | 1 |
 | [notes/skeleton-cleanup_2026-11-13.md](../notes/skeleton-cleanup_2026-11-13.md) | Skeleton unit cleanup |  | 2 |
 | [notes/skeleton-knocked-flight-round9.md](../notes/skeleton-knocked-flight-round9.md) | Skeleton_BeginKnockedFlight |  | 0 |
-| [notes/skeleton-vorn-mummy-recovery_2026-11-26.md](../notes/skeleton-vorn-mummy-recovery_2026-11-26.md) | Skeleton, Vorn, and Mummy class recovery | #matching #types #phase3 #compiler | 8 |
+| [notes/skeleton-vorn-mummy-recovery_2026-11-26.md](../notes/skeleton-vorn-mummy-recovery_2026-11-26.md) | Skeleton, Vorn, and Mummy class recovery | #matching #types #phase3 #compiler | 10 |
 | [notes/sol-family-push-2.md](../notes/sol-family-push-2.md) | Sol family push 2 |  | 3 |
 | [notes/sol-family-push-3.md](../notes/sol-family-push-3.md) | Sol family push 3 |  | 8 |
 | [notes/sol-family-push-4.md](../notes/sol-family-push-4.md) | Sol family push 4 |  | 2 |
