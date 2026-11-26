@@ -435,14 +435,7 @@ void SceneActorReaction_ResumeSavedTarget(struct ChaseActor *actor, s32 frame)
             SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0);
             target = actor->base.onAlternateEntry;
             SceneActorChase_SetControl(actor, target, 1);
-            {
-                u32 behavior = 7;
-                actor->base.state2A8 = 0;
-                actor->base.phase2A9 = 0;
-                actor->base.behavior2AA = behavior;
-                actor->base.counter2AC = 0;
-                actor->base.field2B1 = 1;
-            }
+            Chase_SetBehavior(actor, 7);
             {
                 u32 mask = 16;
                 actor->base.behaviorFlags |= mask;
@@ -458,9 +451,9 @@ u8 SceneActor_DispatchContextAction(void *, u32);
 // confidence=low: after the action delay, restores a reaction or reroutes toward the player.
 
 
-static inline u8 ContextFlags(u8 *context, u32 mask)
+static inline u8 ContextFlags(struct Vorn *context, u32 mask)
 {
-    if (*(u16 *)(context + 0x6D4) & mask)
+    if (context->flags6D4 & mask)
         return 1;
     return 0;
 }
@@ -470,20 +463,10 @@ static inline u16 ReactionFlagMask(u16 flag)
     return flag;
 }
 
-struct VornRouteGroup {
-    u8 pad[0x1FC];
-    void *mesh;
-    struct ContactPosition *destination;
-    u8 pad204[4];
-    void *control;
-    u8 pad20C[0x18];
-    void *failure;
-};
-
 void Vorn_ResumeRouteAfterDelay(struct ChaseActor *actor, s32 frame)
 {
-    struct VornRouteGroup *group = (void *)&actor->group.common;
-    u8 *context = actor->base.context;
+    struct SceneActorChaseGroup *group = &actor->group;
+    struct Vorn *context = actor->base.context;
     if (SceneActorReaction_TakePrepared(actor)) {
         DEBUG_PRINT();
     }
@@ -497,22 +480,22 @@ void Vorn_ResumeRouteAfterDelay(struct ChaseActor *actor, s32 frame)
     if (SceneActorContact_MotionFlags(actor, 2)) {
         u32 mask;
         Chase_SetState(actor, 3, 0, 0);
-        Chase_SetCtl(actor, group->control, 7);
+        Chase_SetCtl(actor, group->contactControl, 7);
         mask = ~0x983;
         actor->base.reactionFlags = mask & actor->base.reactionFlags;
     } else if (ContextFlags(context, 0x1D))
         SceneActor_DispatchContextAction(context, 1);
     else {
-        actor->base.tracking.target = (u32)gPlayers[0] + 0x24;
+        SceneActorChase_TrackPlayer(actor);
         {
             u32 mask = 16;
             actor->base.behaviorFlags |= mask;
         }
         group->destination->pad = 0;
         if (!Skeleton_RerouteToTarget(actor) &&
-            !Chase_TryRoute(actor, group->mesh, &actor->base.body.position,
+            !Chase_TryRoute(actor, group->route, &actor->base.body.position,
                             &actor->base.tracking.target->position)) {
-            Callback_InvokeActor(actor, group->failure);
+            Callback_InvokeActor(actor, group->fallback);
             return;
         }
         Chase_SetCtl(actor, actor->base.onAlternateEntry, 1);
