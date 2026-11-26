@@ -222,7 +222,7 @@ const GOALS = {
         }
       }
       // Both HP traps and live pressure plates can run scripts on contact.
-      let prioritizeExit = Boolean(landingDetour) || L.coffinAvailable();
+      let prioritizeExit = Boolean(landingDetour) || L.coffinAvailable() || L.movingFloors().length > 0;
       for (const puzzle of PLATE_PUZZLES[here] || []) {
         if (!L.conditionsAllow(puzzle.cond)) continue;
         const solved = yield* L.solvePlatePuzzle(puzzle, { avoid: stageOf(here).doors.map((d) => d.box),
@@ -521,6 +521,11 @@ function* throughDoor(g, L, box, { stopIf, alternateLanding } = {}) {
   }
   let fights = 0;
   for (let attempt = 0; attempt < 6; attempt++) {
+    const floor = yield* L.approachMovingFloor(box, { avoid });
+    if (floor?.name !== undefined) {
+      const { gaps, ...trip } = floor;
+      event({ skill: 'moving-floor', box, ...trip });
+    }
     const initial = new Set(L.fightTargets().map((t) => t.addr));
     const life = () => g.$.gPlayers[0]?.currentStatA ?? 0;
     const lifeBefore = life();
@@ -530,7 +535,7 @@ function* throughDoor(g, L, box, { stopIf, alternateLanding } = {}) {
       return targets.some((t) => t.boss || t.barrier || !initial.has(t.addr)) ||
         (targets.length && lifeBefore - life() >= lossBudget);
     };
-    const r = yield* L.navigate(box, { avoid, stopIf: interrupted, trace: (e) => event({ skill: 'nav', ...e }) });
+    const r = yield* L.navigate(box, { avoid, avoidCells: floor?.gaps, stopIf: interrupted, trace: (e) => event({ skill: 'nav', ...e }) });
     event({ skill: 'navigate', box, ...r, from: scene });
     if (r.reached) return true;
     if (alternateLanding && r.reason === 'no path') return false;

@@ -238,7 +238,7 @@ exports.clearInterruptions = function* (opts = {}) {
 exports.navigate = function* (target, opts = {}) {
   const start = g.frameNo, scene0 = exports.where().scene, blocked = new Set(), budget = opts.frames ?? 3600;
   // never walk through another door's box on the way (opts.avoid: box names)
-  const avoid = new Set();
+  const avoid = new Set(opts.avoidCells);
   for (const b of exports.boxes()) if ((opts.avoid || []).includes(b.name) && b.name !== String(target).toUpperCase())
     for (let cz = b.z0 >> 8; cz <= (b.z1 - 1) >> 8; cz++) for (let cx = b.x0 >> 8; cx <= (b.x1 - 1) >> 8; cx++) avoid.add(`${cx},${cz}`);
   let plans = 0, pushes = 0;

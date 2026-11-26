@@ -97,6 +97,17 @@ test('an exhausted terrain search rolls back a lethal final trial', () => {
   assert.equal(player.currentStatA, 240);
 });
 
+test('a moving floor links reachable solid landings across authored gap cells', () => {
+  const lib = skill('moving-floors', {}, {}, skill('world', {}));
+  const cells = Array.from({ length: 5 }, (_, x) => ({ x, z: 0, open: true, level: 3 }));
+  const grid = { at: (x, z) => z === 0 ? cells[x] : undefined };
+  const goals = new Set(['4,0']), gaps = new Set(['1,0', '2,0']);
+  const board = { x: 384, z: 128 }, arrival = { x: 640, z: 128 }, floor = {};
+  assert.equal(lib.findPath(grid, [0, 0], goals, gaps), null);
+  assert.deepEqual(lib.planMovingFloor(grid, [0, 0], goals, gaps, [{ floor, points: [arrival, board], y: 768 }]),
+    { floor, launch: cells[0], board, arrival, leave: cells[3], cost: 3 });
+});
+
 test('a lock tracks its saved bit across the script bank bytes', () => {
   let value = 0;
   const g = {
