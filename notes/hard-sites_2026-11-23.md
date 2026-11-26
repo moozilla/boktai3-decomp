@@ -201,3 +201,10 @@ The finished unit and all five header dependents match. The volatile error
 is gone. The existing flag-mask argument still produces one literal-param
 warning. The persistent search is in
 `build/matchsearch/TargetRegistry_RegisterActor`.
+
+The same insertion helper also matches `TargetRegistry_RegisterSceneActor`
+(0815F6F0) at 72 bytes. It uses the native collider member and sets the
+collider flag only on insertion. Its existing literal-param warning
+remains and the last volatile error is gone. The context after the shared
+header change is preserved in
+`build/matchsearch/TargetRegistry_RegisterSceneActor-shared`.
