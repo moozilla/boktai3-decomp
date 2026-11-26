@@ -12,7 +12,7 @@ struct NamedObjectTrail {
     u8 pad10A[2];
     struct ContactPosition position;
 };
-void SpriteParticle_CreateDefaultVariant4384(void *, s32, s32, s32, s32, s32, s32, s32, s32, s32,
+void TrapSpellParticles_CreateDefaultBurst(void *, s32, s32, s32, s32, s32, s32, s32, s32, s32,
                                              s32, s32);
 void SpriteParticle_ForwardCreate(void *, s32, s32, s32, s32, s32, s32, s32, s32, s32, s32, s32,
                                   s32, s32, s32, s32, s32, s32);
@@ -82,14 +82,14 @@ void MovingPlatform_EmitMovementTrail(struct NamedObjectTrail *object)
                 position.x = object->position.x + offsets[0].x;
                 position.y = object->position.y + offsets[0].y;
                 position.z = object->position.z + offsets[0].z;
-                SpriteParticle_CreateDefaultVariant4384(&position, 22, 8, width, 4, 24, direction,
+                TrapSpellParticles_CreateDefaultBurst(&position, 22, 8, width, 4, 24, direction,
                                                         height, depth, 3, 2, 512);
                 object->alternate = 1;
             } else {
                 position.x = object->position.x + offsets[1].x;
                 position.y = object->position.y + offsets[1].y;
                 position.z = object->position.z + offsets[1].z;
-                SpriteParticle_CreateDefaultVariant4384(&position, 22, 8, width, 4, 24, direction,
+                TrapSpellParticles_CreateDefaultBurst(&position, 22, 8, width, 4, 24, direction,
                                                         height, depth, 3, 2, 512);
                 object->alternate = 0;
             }

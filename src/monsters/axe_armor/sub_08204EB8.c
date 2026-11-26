@@ -10,7 +10,7 @@ struct R {
     u8 a;
     u8 b;
 } __attribute__((packed));
-void SpriteParticle_CreateDefaultVariant4384(void *, s32, s32, s32, s32, s32, s32, s32, s32, s32,
+void TrapSpellParticles_CreateDefaultBurst(void *, s32, s32, s32, s32, s32, s32, s32, s32, s32,
                                              s32, s32);
 void AxeArmor_RecordDefeat(void *);
 s32 AxeArmor_UpdateDeath(u8 *p)
@@ -24,7 +24,7 @@ s32 AxeArmor_UpdateDeath(u8 *p)
             q->y += 200;
             gRandomIndex = (gRandomIndex + 1) & 0x3ff;
             r = (*(&((struct R *)gRandomTable)[gRandomIndex])).a;
-            SpriteParticle_CreateDefaultVariant4384(&v, 128, 32, 12, 12, 24, r, 32, 32, 1, 1, 512);
+            TrapSpellParticles_CreateDefaultBurst(&v, 128, 32, 12, 12, 24, r, 32, 32, 1, 1, 512);
         }
         if ((*((s32 *)(p + 0x18))) == 12) {
             AxeArmor_RecordDefeat(p);

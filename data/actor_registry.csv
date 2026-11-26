@@ -26,12 +26,12 @@ key,callback,name
 0AD8,08004195,CentipedeOverlay_Create
 0B49,080537B5,WarpCircle_RequestRetraction
 0B50,0804D5CD,TetherActor_CreateFromScript
-0BCE,08103EBD,MovingPlatformActor_ClearFlag1000FromScript
+0BCE,08103EBD,MovingPlatformActor_ClearScriptLatch
 0BFD,0816B8D9,GameState_ClearAreaFlagFromScript
 0BFE,081EC169,ModeMenu_Create
 0C1B,0816B885,GameState_SetAreaFlagFromScript
 0CD4,08227A11,Terrain_GetFloorHeightFromScript
-0E15,0815A839,ScriptActor_GetField534FromScript
+0E15,0815A839,ScriptActor_GetActiveSceneMode
 0E37,08031D41,MessageWindow_Create
 0E76,080048F5,PuzzleBlock_DestroyObjectsByScriptId
 0EE4,08108245,Tile_SetEnabledFromScript
@@ -47,7 +47,7 @@ key,callback,name
 1488,08069DB9,SparkExplosion_CreateFromScript
 1500,08227D41,Background_SetVisibilityFlagFromScript
 1595,081DCD91,RegionMenuParams_SetFromScript
-15B3,08056D25,ScriptUtility_SetFlag800
+15B3,08056D25,ScriptUtility_SetPauseLatch
 15DE,081E1AB5,GameStart_Create
 15ED,08103DCD,MovingPlatformActor_SetSpeedFromScript
 1606,0822E925,GameState_ResetUnlocksFromScript
@@ -98,7 +98,7 @@ key,callback,name
 2571,08072831,SceneActorScript_SetManagerModeFromScript
 2572,0822E3F1,GameState_CountCollectedConsumableTypes
 2575,0803103D,MessageWindow_SetStringArgumentFromScript
-2593,0815D0ED,ScriptActor_StartMotionB774FromScript
+2593,0815D0ED,ScriptActor_BeginOddDirectionMotion
 2687,081DE5A5,NameEntry_Create
 2734,081E2899,TimedPresentation_Create
 2740,08009D41,InteractionPrompt_ScriptRelease
@@ -115,7 +115,7 @@ key,callback,name
 29EE,0816B92D,MapScreen_SuppressSpecialMarkers
 29F1,0805C615,PileDriver_BeginArrivalRamp
 2B8C,0800D00D,FallingObject_CreateFromScript
-2BDE,0815A715,Player_SetField434FromScript
+2BDE,0815A715,Player_SetStatScaleFromScript
 2C04,0820A541,WindCannonSlot_ResetFromScript
 2C8A,081E07D9,PasswordDisplay_Create
 2D2B,08009181,LightFixture_GetOrCreateManager
@@ -160,7 +160,7 @@ key,callback,name
 377D,08106871,IceBoulder_CreateFromScript
 382F,08199411,SceneEffectQueue_Create
 3960,08110A41,SaveMenu_CreateFromScript
-39C6,08056D39,ScriptUtility_WriteFlag800ToReference
+39C6,08056D39,ScriptUtility_WritePauseLatchToReference
 3A31,081DC691,ScreenMessage_Create
 3A5D,0822CFB5,Inventory_RemoveItemFromScript
 3A89,08018665,PaletteBlend_AddFromScript
@@ -216,7 +216,7 @@ key,callback,name
 4A0A,08210A61,Collection_UnlockEntryFromScript
 4A16,080510D5,DirectionalForce_StopFromScript
 4A25,081EB7DD,TitleDisplay_Create
-4A8D,0815AA39,ScriptActor_TestCounter628FromScript
+4A8D,0815AA39,ScriptActor_TestTimedEventCounter
 4AE5,080033FD,Palette_GetOrCreate
 4B39,0822C18D,Solar_DisableControlFlag
 4B41,08227B81,Terrain_GetCellWordFromScript
@@ -275,7 +275,7 @@ key,callback,name
 5E6E,0811DB6D,GameState_ClearChallengeCompletionFlags
 5F5F,08056BC9,ScriptUtility_GetKeys
 5F70,0815CBC1,ScriptActor_StandDiagonalBFromScript
-5FDA,0815A86D,ScriptActor_ClearField534FromScript
+5FDA,0815A86D,ScriptActor_ClearSceneModeAndActivity
 6057,08056CF9,ScriptUtility_ClearControlFlagFromScript
 60FB,08070A41,SceneActorRegistry_SetScriptActorMovementMode
 60FD,0822ECA9,SolarFruit_AddFromScript
@@ -541,7 +541,7 @@ BD3D,081C6B85,StoryCharacter_CreateFromScript
 BEC2,082259A1,SceneBody_ReadPositionFromScript
 BEF5,080E986D,Mimic_Create
 C015,08036D81,WirelessText_InitCharacterTableFromScript
-C036,0811D235,GameState_SetRuntimeFlag100
+C036,0811D235,GameState_RequestPaletteRefresh
 C077,081A3271,Hresvelgr_Create
 C0B0,082275D9,Camera_Create
 C12A,080704ED,SceneActorRegistry_DefeatActorsFromScript
@@ -598,7 +598,7 @@ D40E,0815D2DD,ScriptActor_AimFromScript
 D459,08205901,AxeArmor_Create
 D4E3,0801E3E5,SlidingDoors_ScriptAppend
 D53D,080371E1,WirelessStatusMenu_Create
-D562,08042319,SceneActorRegistry_IgnoreEntryD562
+D562,08042319,SceneActorRegistry_IgnoreScriptEntry
 D6F7,0801E821,SlidingDoors_ScriptDeactivate
 D774,081D2D1D,Kuro_CreateTagZeroFromScript
 D7F4,08054CC1,DisplayTrack_SetPaletteTrackFromScript
@@ -610,7 +610,7 @@ D935,08036911,Wireless_CreateController
 D968,08028EC1,Count_QueueDefaultCommand
 D972,08029799,Count_Create
 D9AE,08005779,PuzzleBlock_CreateTask
-D9B7,0815AA7D,ScriptActor_ClearCounter628FromScript
+D9B7,0815AA7D,ScriptActor_ClearTimedEventCounter
 D9D3,0801959D,PaletteFrames_Create
 DA0B,0801B455,SelectionMenu_Create
 DA0E,08206471,Ooze_Create

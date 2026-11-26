@@ -1,11 +1,11 @@
 #include "global.h"
 #include "engine/ram.h"
 #include "link/serial/serial.h"
-void Serial_ResetMultiplayer_082230AC(void);
+void Serial_ReinitializeMultiplayerLines(void);
 void SerialLink_ResetMultiplayer(void)
 {
     s32 i, j;
-    Serial_ResetMultiplayer_082230AC();
+    Serial_ReinitializeMultiplayerLines();
     gSerialReceivePending = 0;
     gSerialActiveSendWord = 0x4000;
     gSerialQueuedSendWord = 0x4000;

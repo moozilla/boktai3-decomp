@@ -1,6 +1,6 @@
 #define Player_TestTerrainRecoveryEnabled Player_IsFlaggedWithGlobalModifier10
 #include "global.h"
-/* Player_ClampPositionToStoredTerrainCell_0823B938: same code as Player_ClampPositionToStoredTerrainCell at another address (ported by relatives.py; provisional name) */
+/* LinkPlayer_ClampToRecoveryTerrainCell: same code as Player_ClampPositionToStoredTerrainCell at another address (ported by relatives.py; provisional name) */
 #include "player/player.h"
 #include "engine/engine.h"
 u8 *TerrainModifiers_FindCellOverride(s32, s32);
@@ -8,7 +8,7 @@ u32 Player_IsFlaggedWithGlobalModifier10(u32);
 u32 MovingPlatform_FindNearPosition(struct SceneVec *);
 s32 Mod(s32, s32);
 s32 Div(s32, s32);
-void Player_ClampPositionToStoredTerrainCell_0823B938(struct Player *p)
+void LinkPlayer_ClampToRecoveryTerrainCell(struct Player *p)
 {
     s32 x = p->position.x >> 8;
     s32 z = p->position.z >> 8;

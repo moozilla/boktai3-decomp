@@ -3,7 +3,7 @@
 s32 Player_GetLinkedSmoothedDirection(u8 *);
 s32 Player_ComputeLinkedActionDelay(u8 *);
 s32 Player_GetMovementAnimationRate(s32);
-void Player_SetDirectionalVelocity_08238300(u8 *, s32);
+void LinkPlayer_SetScaledDirectionalVelocity(u8 *, s32);
 void Player_PlayActionCueSound(u8 *, u32);
 void Player_UpdateActionFacingSide(u8 *);
 s32 ActorVariant_GetTableValue(u32, s32);
@@ -31,7 +31,7 @@ void sub_0823C6BC(u8 *p)
         Player_GetMovementAnimationRate(v);
         if (p != 0 && IsScaled(p) != 0)
             v = (p[0xC0] * v) >> 6;
-        Player_SetDirectionalVelocity_08238300(p, v);
+        LinkPlayer_SetScaledDirectionalVelocity(p, v);
     }
     Player_PlayActionCueSound(p, 0);
     Player_UpdateActionFacingSide(p);

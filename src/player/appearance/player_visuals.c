@@ -1186,7 +1186,7 @@ s32 Player_OnWeaponHitApplyEarth(struct Player *p)
     return 32;
 }
 
-s32 Player_OnWeaponHitRollEffect1000(void)
+s32 Player_RollWeaponHitElementEffect(void)
 {
     s32 r;
 
@@ -1200,7 +1200,7 @@ s32 Player_OnWeaponHitRollEffect1000(void)
     return r;
 }
 
-s32 Player_OnWeaponHitRollEffect40000Low(void)
+s32 Player_RollFirstWeaponHitStatusLow(void)
 {
     s32 r;
 
@@ -1214,7 +1214,7 @@ s32 Player_OnWeaponHitRollEffect40000Low(void)
     return r;
 }
 
-s32 Player_OnWeaponHitRollEffect40000High(void)
+s32 Player_RollFirstWeaponHitStatusHigh(void)
 {
     s32 r;
 
@@ -1228,7 +1228,7 @@ s32 Player_OnWeaponHitRollEffect40000High(void)
     return r;
 }
 
-s32 Player_OnWeaponHitRollEffect80000Low(void)
+s32 Player_RollSecondWeaponHitStatusLow(void)
 {
     s32 r;
 
@@ -1242,7 +1242,7 @@ s32 Player_OnWeaponHitRollEffect80000Low(void)
     return r;
 }
 
-s32 Player_OnWeaponHitRollEffect80000High(void)
+s32 Player_RollSecondWeaponHitStatusHigh(void)
 {
     s32 r;
 
@@ -1399,22 +1399,22 @@ void Player_BuildActionModifiers(struct Player *p, struct PlayerStatModifierCont
                 break;
             case 9:
                 if (p)
-                    p->flagCallbacks[i] = Player_OnWeaponHitRollEffect40000Low;
+                    p->flagCallbacks[i] = Player_RollFirstWeaponHitStatusLow;
                 context->savedActionIndex = 12;
                 break;
             case 10:
                 if (p)
-                    p->flagCallbacks[i] = Player_OnWeaponHitRollEffect40000High;
+                    p->flagCallbacks[i] = Player_RollFirstWeaponHitStatusHigh;
                 context->savedActionIndex = 12;
                 break;
             case 11:
                 if (p)
-                    p->flagCallbacks[i] = Player_OnWeaponHitRollEffect80000Low;
+                    p->flagCallbacks[i] = Player_RollSecondWeaponHitStatusLow;
                 context->savedActionIndex = 11;
                 break;
             case 12:
                 if (p)
-                    p->flagCallbacks[i] = Player_OnWeaponHitRollEffect80000High;
+                    p->flagCallbacks[i] = Player_RollSecondWeaponHitStatusHigh;
                 context->savedActionIndex = 11;
                 break;
             case 13:

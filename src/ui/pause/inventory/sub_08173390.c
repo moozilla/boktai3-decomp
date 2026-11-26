@@ -7,7 +7,7 @@ void PauseMenu_ClearSpriteFlags(void *, int, int);
 void PauseMenu_ShowPromptSprite(void *, int, int);
 void PauseInventory_EnterEquipmentSelection(void *);
 void Hud_DrawHeaderCounter(void);
-void SceneHud_LayoutActionGrid_08172950(void *);
+void PauseMenu_LayoutCategoryWidgets(void *);
 void SceneHud_RefreshEquippedActionIcons(void *);
 void PauseMenu_SetPromptIconPositions(void *, int, int);
 void MenuDisplay_UpdateActionPrompt(void *, int);
@@ -28,7 +28,7 @@ void PauseInventory_InitEquipmentSelectionPage(u8 *p)
     PauseMenu_LoadSpriteKeyframe(p, 8, 0x71);
     PauseInventory_EnterEquipmentSelection(p);
     Hud_DrawHeaderCounter();
-    SceneHud_LayoutActionGrid_08172950(p);
+    PauseMenu_LayoutCategoryWidgets(p);
     SceneHud_RefreshEquippedActionIcons(p);
     PauseMenu_SetPromptIconPositions(p, 0, 0);
     {

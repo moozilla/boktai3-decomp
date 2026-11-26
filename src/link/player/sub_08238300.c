@@ -2,10 +2,10 @@
 #include "monsters/ghoul_disc.h"
 #define gDirectionSine gUnk_086149C4
 #include "global.h"
-/* Player_SetDirectionalVelocity_08238300: same code as Player_SetDirectionalVelocity at another address (ported by relatives.py; provisional name) */
+/* LinkPlayer_SetScaledDirectionalVelocity: same code as Player_SetDirectionalVelocity at another address (ported by relatives.py; provisional name) */
 #include "player/player.h"
 extern const s16 gUnk_086149C4[];
-void Player_SetDirectionalVelocity_08238300(struct Player *p, s32 speed)
+void LinkPlayer_SetScaledDirectionalVelocity(struct Player *p, s32 speed)
 {
     s32 angle = ((p->facing + 5) & 7) << 5;
     p->velocityX = VanargandProjectile_Scale(gUnk_086149C4[(angle + 64) & 255] * speed);

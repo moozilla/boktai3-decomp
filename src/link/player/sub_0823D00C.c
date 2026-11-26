@@ -2,7 +2,7 @@
 #include "player/player.h"
 
 /* Tentative: position offset used as the player's action origin. */
-void Player_SetActionOrigin_0823D00C(struct Player *p)
+void LinkPlayer_SetFacingActionOrigin(struct Player *p)
 {
     p->actionOrigin = p->position;
     if (p->facing == 4) {

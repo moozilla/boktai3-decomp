@@ -10,16 +10,16 @@ struct T {
     u32 a;
     u32 b;
 };
-void GameState_AddActionCount892(u32);
+void GameState_AddPickupRewardCount(u32);
 void Collectible_ApplyPickupReward(struct S *s, struct T *t)
 {
     if (Engine_PauseBits(0x800) == 0 && t->b == 1) {
         switch (s->st) {
             case 0:
-                GameState_AddActionCount892(1);
+                GameState_AddPickupRewardCount(1);
                 break;
             case 1:
-                GameState_AddActionCount892(2);
+                GameState_AddPickupRewardCount(2);
                 break;
         }
     }

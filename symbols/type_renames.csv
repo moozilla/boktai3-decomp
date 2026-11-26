@@ -387,3 +387,4 @@ StackedActorPosition,WarpCirclePosition,identifier,,Reviewed in-game owner,inclu
 StackedActorSprite,WarpCircleSprite,identifier,,Reviewed in-game owner,include/objects/warp_circle/warp_circle.h
 StackedActor,WarpCircle,identifier,,Reviewed in-game owner,symbols/ram.csv
 gStackedActor,gWarpCircle,identifier,,Reviewed in-game owner,all
+SetState_UpdateEntryRecoveryPhase_080E55AC,Dog_QueueEntryRecoveryState,identifier,,Reviewed in-game owner,src/monsters/dog.c

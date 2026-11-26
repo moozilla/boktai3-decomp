@@ -1,6 +1,6 @@
 #include "global.h"
 void Callback_InvokeActor(void *, void *);
-void Armor_UpdatePartColliders_080F2260(void *);
+void Ivy_UpdatePartColliders(void *);
 static inline u32 Flags(u8 *p, u32 mask)
 {
     u32 m = mask;
@@ -17,7 +17,7 @@ void Sword_UpdateComponentControl(u8 *p)
         callback = *(void **)(p + 0x164);
         if (callback)
             Callback_InvokeActor(p, callback);
-        Armor_UpdatePartColliders_080F2260(p);
+        Ivy_UpdatePartColliders(p);
         callback = *(void **)(p + 0x168);
         if (callback)
             Callback_InvokeActor(p, callback);

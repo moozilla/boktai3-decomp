@@ -6,7 +6,7 @@ struct ParticleBurstSprite {
     u8 active;
     u8 frame;
 };
-void RadialBurstEffect_BlendSpritePalette_08236E4C(struct ParticleBurstSprite *);
+void RadialBurstEffect_BlendPaletteTowardWhite(struct ParticleBurstSprite *);
 void SpiralTrail_RewindFrame(struct ParticleBurstSprite *p)
 {
     if (p->frame <= 5)
@@ -18,6 +18,6 @@ void SpiralTrail_RewindFrame(struct ParticleBurstSprite *p)
         p->active = 0;
     } else {
         p->frame--;
-        RadialBurstEffect_BlendSpritePalette_08236E4C(p);
+        RadialBurstEffect_BlendPaletteTowardWhite(p);
     }
 }

@@ -1,7 +1,7 @@
 #include "global.h"
-/* SceneInput_BuildActionGrid_08173508: SceneInput_BuildActionGrid with other constants (ported by relatives.py, fixed by hand; provisional name) */
+/* PauseInventory_InitializeActionCells: SceneInput_BuildActionGrid with other constants (ported by relatives.py, fixed by hand; provisional name) */
 #include "ui/widgets/scene_input_navigation.h"
-void SceneInput_BuildActionGrid_08173508(struct SceneInputGridView *grid, u32 flags)
+void PauseInventory_InitializeActionCells(struct SceneInputGridView *grid, u32 flags)
 {
     s32 row, col;
     u8 *cells;

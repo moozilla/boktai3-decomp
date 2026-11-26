@@ -6,7 +6,7 @@ struct S {
     u8 idx;
 };
 void Callback_InvokeActor(void *, u32);
-void SceneActorState_DispatchTable294State(struct S *p)
+void SceneActorState_InvokeBehaviorCallback(struct S *p)
 {
     u32 i = p->idx;
     Callback_InvokeActor(p, p->tbl[i]);

@@ -2,9 +2,9 @@
 #include "engine/engine_globals.h"
 #include "engine/ram.h"
 #include "scene/collision/contact_position.h"
-/* SceneActors_SpawnDestructionParticles_0817ABEC: same as SceneActors_SpawnDestructionParticles but spawns the sparks on the object itself (provisional name) */
+/* Sabata_SpawnDestructionParticles: same as SceneActors_SpawnDestructionParticles but spawns the sparks on the object itself (provisional name) */
 void SparkParticle_Spawn(void *, int, void *, int, int, int, int, int);
-void SceneActors_SpawnDestructionParticles_0817ABEC(u8 *p)
+void Sabata_SpawnDestructionParticles(u8 *p)
 {
     struct ContactPosition size;
     int angle;

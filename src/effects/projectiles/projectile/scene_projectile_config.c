@@ -154,7 +154,7 @@ void Projectile_InitParameters(struct SceneProjectileParams *params)
     Projectile_SetLaunchParameters(params, 0, 0x3C, 0, 0);
     Projectile_SetCollisionParameters(params, 0, 0, 0xA, 0x14, 0x14);
     Projectile_SetCollisionExtents(params, 0x10, 0x80, 0x10);
-    Projectile_SetCollisionOffset_081FD49C(params, 0, 0, 0);
+    ProjectileConfig_SetLaunchOffset(params, 0, 0, 0);
     Projectile_SetSpriteParameters(params, 0x848F, 0, -1);
     Projectile_SetBehaviorCallback(params, SceneProjectile_UpdatePulse);
     params->script = 0;
@@ -206,7 +206,7 @@ void Projectile_SetCollisionExtents(struct SceneProjectileParams *params, u16 x,
     params->bounds.z = z;
 }
 
-void Projectile_SetCollisionOffset_081FD49C(struct SceneProjectileParams *params, u16 x, u16 y,
+void ProjectileConfig_SetLaunchOffset(struct SceneProjectileParams *params, u16 x, u16 y,
                                             u16 z)
 {
     params->offset.x = x;

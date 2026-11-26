@@ -363,7 +363,7 @@ void ScriptActor_StartMotion29BFromScript(void)
     }
 }
 
-void ScriptActor_StartMotionB774FromScript(void)
+void ScriptActor_BeginOddDirectionMotion(void)
 {
     s32 index = Script_GetActorIndex();
     struct Player *player = gPlayers[index];

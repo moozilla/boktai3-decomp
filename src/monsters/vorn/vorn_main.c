@@ -477,7 +477,7 @@ void SceneActorControl_WaitForRouteResult(struct ChaseActor *actor)
     }
 }
 
-/* SceneActorControl_UpdateProbeApproach_080B04F4: SceneActorControl_UpdateProbeApproach (SceneActorControl_UpdateProbeApproach) with control SceneActorPhase_SelectLinkedAnimation and halfword flags at +0x6D4 (provisional name) */
+/* Vorn_UpdateProbeApproach: SceneActorControl_UpdateProbeApproach (SceneActorControl_UpdateProbeApproach) with control SceneActorPhase_SelectLinkedAnimation and halfword flags at +0x6D4 (provisional name) */
 
 static inline void SetState_UpdateProbeApproach_080B04F4(struct ChaseActor *actor)
 {
@@ -489,7 +489,7 @@ static inline void SetState_UpdateProbeApproach_080B04F4(struct ChaseActor *acto
     actor->base.field2B1 = 1;
 }
 
-void SceneActorControl_UpdateProbeApproach_080B04F4(struct ChaseActor *actor)
+void Vorn_UpdateProbeApproach(struct ChaseActor *actor)
 {
     u8 *nav = (u8 *)actor + 0x3D4;
     u8 *control = (u8 *)SceneActorControl_GetState(actor);
@@ -1802,7 +1802,7 @@ void Vorn_SelectRouteAwayFromTarget(struct ChaseActor *actor)
     }
 }
 
-void Vorn_ParseField624(struct ChaseActor *actor)
+void Vorn_ReadPairedScriptParameters(struct ChaseActor *actor)
 {
     struct Vorn *ctx = (struct Vorn *)actor->base.context;
 
@@ -2313,7 +2313,7 @@ void SceneActor_TrySoloAction(struct Vorn *p)
     }
 }
 
-void Vorn_ParseField688(struct Vorn *ctx)
+void Vorn_ReadHiddenStartOptions(struct Vorn *ctx)
 {
     if (Script_SeekToKeyword(0x73) != 0) {
         s32 val1;
@@ -3359,7 +3359,7 @@ static inline void VornInit_InstallCompletionCallbacks(struct ChaseActor *arg0)
     arg0->base.destroy = (SceneActorResultCallback)Vorn_OnDestroy;
 }
 
-void Vorn_ParseField624(struct ChaseActor *actor);
+void Vorn_ReadPairedScriptParameters(struct ChaseActor *actor);
 
 void Vorn_InitScriptCallback(struct Vorn *p);
 
@@ -3373,7 +3373,7 @@ void Vorn_ResetRecoveryMode(u8 *p);
 
 void Vorn_InitMotionLimits(struct PInitMotionLimits *p);
 
-void Vorn_ParseField688(struct Vorn *ctx);
+void Vorn_ReadHiddenStartOptions(struct Vorn *ctx);
 
 void Vorn_InitAttackActionTable(u8 *p);
 
@@ -3408,14 +3408,14 @@ s32 Vorn_Init(void *object)
     SceneActorRegistry_SetObjectContext(actor, actor, 1, 1);
     MonsterInit_SetCategory(actor, MONSTER_CATEGORY_VORN);
     Vorn_InitActorProfile(actor);
-    Vorn_ParseField624(actor);
+    Vorn_ReadPairedScriptParameters(actor);
     Vorn_InitScriptCallback(actor);
     Vorn_InitActionCooldown(actor);
     Vorn_InitTimedAction(actor);
     Vorn_ParseField69A(actor);
     Vorn_ResetRecoveryMode(actor);
     Vorn_InitMotionLimits(actor);
-    Vorn_ParseField688(actor);
+    Vorn_ReadHiddenStartOptions(actor);
     if (MonsterInit_GetDrawableKind(actor) == 0) {
         u8 *heap;
         actor->base.drawable = Heap_Alloc(0x5C);

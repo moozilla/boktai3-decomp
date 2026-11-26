@@ -11,7 +11,7 @@ u16 *SceneHud_GetMapCell(u32 layerIndex, u32 x, u32 y)
     return (u16 *)(base + ((x & 31) << 1) + ((y & 31) << 6));
 }
 
-void SceneHud_FillTile001(u32 x, u32 y, s32 count)
+void SceneHud_FillDigitBacking(u32 x, u32 y, s32 count)
 {
     u16 *cell = SceneHud_GetMapCell(0, x, y);
     if (count > 0) {
@@ -22,7 +22,7 @@ void SceneHud_FillTile001(u32 x, u32 y, s32 count)
     }
 }
 
-void SceneHud_FillTile020(u32 x, u32 y, s32 count)
+void SceneHud_FillEmptyDigitRow(u32 x, u32 y, s32 count)
 {
     u16 *cell = SceneHud_GetMapCell(0, x, y);
     s32 remaining;

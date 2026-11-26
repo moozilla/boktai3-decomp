@@ -650,7 +650,7 @@ void GameState_EnableAlternateHud(void)
     GameState_SetWorldFlags(0x80);
 }
 
-void GameState_SetRuntimeFlag100(void)
+void GameState_RequestPaletteRefresh(void)
 {
     GameState_SetWorldFlags(0x100);
 }

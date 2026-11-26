@@ -1751,9 +1751,9 @@ void SceneActor_WaitForControlCompletion(struct ChaseActor *actor)
     }
 }
 
-/* SceneActorControl_UpdatePersistentPhase_080D622C: SceneActorControl_UpdatePersistentPhase variant: control Mummy_UpdatePlayerRoute kind 39, no shadow toggle, update callback via Callback_InvokeActor (provisional name) */
+/* Mummy_UpdatePlayerRouteTransition: SceneActorControl_UpdatePersistentPhase variant: control Mummy_UpdatePlayerRoute kind 39, no shadow toggle, update callback via Callback_InvokeActor (provisional name) */
 
-void SceneActorControl_UpdatePersistentPhase_080D622C(struct ChaseActor *actor)
+void Mummy_UpdatePlayerRouteTransition(struct ChaseActor *actor)
 {
     if (SceneActorControl_TakeFlag(&actor->base.field2B1)) {
         SceneActorChase_SetControl(actor, Mummy_UpdatePlayerRoute, 39);

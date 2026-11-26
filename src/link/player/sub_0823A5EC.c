@@ -17,8 +17,8 @@ void Player_OnWeaponHitApplyFlame(void);
 void Player_OnWeaponHitApplyFrost(void);
 void Player_OnWeaponHitApplyCloud(void);
 void Player_OnWeaponHitApplyEarth(void);
-void Player_OnWeaponHitRollEffect1000(void);
-void Player_OnWeaponHitRollEffect80000Low(void);
+void Player_RollWeaponHitElementEffect(void);
+void Player_RollSecondWeaponHitStatusLow(void);
 void Player_RollModifierBonus(void);
 void ActorEffect_TestStatusFlags(void);
 void Player_GetTargetFlag7Bonus(void);
@@ -83,10 +83,10 @@ void sub_0823A5EC(struct P0823A5EC *p, struct HitSource *src)
                 p->hitHandlers[i] = Player_OnWeaponHitApplyEarth;
                 break;
             case 42:
-                p->hitHandlers[i] = Player_OnWeaponHitRollEffect1000;
+                p->hitHandlers[i] = Player_RollWeaponHitElementEffect;
                 break;
             case 11:
-                p->hitHandlers[i] = Player_OnWeaponHitRollEffect80000Low;
+                p->hitHandlers[i] = Player_RollSecondWeaponHitStatusLow;
                 break;
             case 44:
                 if (p)

@@ -14,7 +14,7 @@ struct OrangeSpine {
     u8 unk48[0x14a - 0x48];
     s16 defeatDelay;
 };
-void SpriteParticle_CreateDefaultVariant4384(void *, u32, u32, u32, u32, u32, u32, u32, u32, u32,
+void TrapSpellParticles_CreateDefaultBurst(void *, u32, u32, u32, u32, u32, u32, u32, u32, u32,
                                              u32, u32);
 void PlasmaCannon_RecordDefeat(void *);
 u32 PlasmaCannon_UpdateDefeatEffect(struct OrangeSpine *p)
@@ -28,7 +28,7 @@ u32 PlasmaCannon_UpdateDefeatEffect(struct OrangeSpine *p)
             pos->y += 128;
             gEffectRandomIndex = (gEffectRandomIndex + 1) & 0x3ff;
             random = *(u8 *)&gRandomTable[gEffectRandomIndex];
-            SpriteParticle_CreateDefaultVariant4384(&position, 128, 32, 12, 12, 24, random, 32, 32,
+            TrapSpellParticles_CreateDefaultBurst(&position, 128, 32, 12, 12, 24, random, 32, 32,
                                                     1, 2, 512);
         }
         if (p->state == 1)

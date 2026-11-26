@@ -291,7 +291,7 @@ void FloorTrap_TickIdle(struct TileTrigger *trigger)
     }
 }
 
-void SpriteParticle_CreateDefaultVariant4384(void *, s32, s32, s32, s32, s32, s32, s32, s32, s32,
+void TrapSpellParticles_CreateDefaultBurst(void *, s32, s32, s32, s32, s32, s32, s32, s32, s32,
                                              s32, s32);
 
 static inline u32 NextRandom(void)
@@ -314,30 +314,30 @@ void FloorTrap_EmitParticles(struct TileTrigger *trigger)
             position = trigger->position;
             position.x = position.x + 92 - (NextRandom() & 63);
             position.z = position.z + 92 - (NextRandom() & 63);
-            SpriteParticle_CreateDefaultVariant4384(&position, 8, 8, 4, 4, 0, 0, 32, 64, one, one,
+            TrapSpellParticles_CreateDefaultBurst(&position, 8, 8, 4, 4, 0, 0, 32, 64, one, one,
                                                     512);
             position = trigger->position;
             position.x = position.x - 92 - (NextRandom() & 63);
             position.z = position.z - 92 - (NextRandom() & 63);
-            SpriteParticle_CreateDefaultVariant4384(&position, 8, 8, 4, 4, 0, 0, 32, 64, one, one,
+            TrapSpellParticles_CreateDefaultBurst(&position, 8, 8, 4, 4, 0, 0, 32, 64, one, one,
                                                     512);
             position = trigger->position;
             position.x = position.x - 92 - (NextRandom() & 63);
             position.z = position.z + 92 - (NextRandom() & 63);
-            SpriteParticle_CreateDefaultVariant4384(&position, 8, 8, 4, 4, 0, 0, 32, 64, one, one,
+            TrapSpellParticles_CreateDefaultBurst(&position, 8, 8, 4, 4, 0, 0, 32, 64, one, one,
                                                     512);
             position = trigger->position;
             position.x = position.x + 92 - (NextRandom() & 63);
             position.z = position.z - 92 - (NextRandom() & 63);
-            SpriteParticle_CreateDefaultVariant4384(&position, 8, 8, 4, 2, 0, 0, 32, 64, one, one,
+            TrapSpellParticles_CreateDefaultBurst(&position, 8, 8, 4, 2, 0, 0, 32, 64, one, one,
                                                     512);
             position = trigger->position;
             position.x = position.x - 92 - (NextRandom() & 63);
-            SpriteParticle_CreateDefaultVariant4384(&position, 8, 8, 4, 2, 0, 0, 32, 64, one, one,
+            TrapSpellParticles_CreateDefaultBurst(&position, 8, 8, 4, 2, 0, 0, 32, 64, one, one,
                                                     512);
             position = trigger->position;
             position.x = position.x + 92 - (NextRandom() & 63);
-            SpriteParticle_CreateDefaultVariant4384(&position, 8, 8, 4, 4, 0, 0, 32, 64, one, one,
+            TrapSpellParticles_CreateDefaultBurst(&position, 8, 8, 4, 4, 0, 0, 32, 64, one, one,
                                                     512);
             break;
     }

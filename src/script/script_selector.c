@@ -93,7 +93,7 @@ void SceneActorRegistry_IgnoreEntry1B77(void)
 {
 }
 
-void SceneActorRegistry_IgnoreEntryD562(void)
+void SceneActorRegistry_IgnoreScriptEntry(void)
 {
 }
 

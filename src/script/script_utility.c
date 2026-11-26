@@ -163,9 +163,9 @@ u32 ScriptUtility_IsControlFlagSet(void)
     return FALSE;
 }
 
-/* ScriptUtility_SetFlag800: Sets bit 0x800 in the shared control flags and preserves the incoming return value; pairs with ScriptUtility_WriteFlag800ToReference. */
+/* ScriptUtility_SetPauseLatch: Sets bit 0x800 in the shared control flags and preserves the incoming return value; pairs with ScriptUtility_WritePauseLatchToReference. */
 
-u32 ScriptUtility_SetFlag800(u32 result)
+u32 ScriptUtility_SetPauseLatch(u32 result)
 {
     u32 *flags;
     do {
@@ -179,7 +179,7 @@ u32 ScriptUtility_SetFlag800(u32 result)
     return result;
 }
 
-void ScriptUtility_WriteFlag800ToReference(void)
+void ScriptUtility_WritePauseLatchToReference(void)
 {
     struct ScriptUtilityReference reference;
     Script_ReadReference(&reference);

@@ -21,7 +21,7 @@ void Collider_SetAttackProperties(void *, u32, u32, u32, u32, u32);
 void Collider_SetPosition(void *, void *, u32);
 void Collider_Refresh(void *);
 
-void Player_SetDirectionalVelocity_08238300(void *, u32);
+void LinkPlayer_SetScaledDirectionalVelocity(void *, u32);
 void Player_UpdateActionFacingSide(void *);
 void DirectionalEffect_PlaceSprite(void *, u32, void *);
 static inline s32 scale(s32 v)
@@ -125,7 +125,7 @@ void Player_UpdateChargedSpinAttack(struct Player *p)
             s32 angle;
             p->cameraInputProcessed = 0;
             if (Player_UpdateFacingFromInputHistory(p)) {
-                Player_SetDirectionalVelocity_08238300(p, 6);
+                LinkPlayer_SetScaledDirectionalVelocity(p, 6);
             }
             if (!((p->tetherFrame) & 3)) {
                 offset.x = 0;

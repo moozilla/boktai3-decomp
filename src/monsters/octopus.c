@@ -45,11 +45,11 @@ void Octopus_OnAttackContact(void)
 {
 }
 
-/* Ivy_UpdateActiveState_080E98B4: same as Ivy_UpdateActiveState without setting the owner's byte +7 (provisional name) */
+/* Octopus_UpdateActiveCollider: same as Ivy_UpdateActiveState without setting the owner's byte +7 (provisional name) */
 
 void SceneActorAnimation_SelectDirectionalFlags(struct RoomActor *, s32);
 
-void Ivy_UpdateActiveState_080E98B4(struct ChaseActor *actor)
+void Octopus_UpdateActiveCollider(struct ChaseActor *actor)
 {
     if (SceneActorControl_TakeFlag(&actor->base.field2B2)) {
         u16 *q;
@@ -60,7 +60,7 @@ void Ivy_UpdateActiveState_080E98B4(struct ChaseActor *actor)
     SceneActorAnimation_SelectDirectionalFlags(actor, 0xE);
 }
 
-void Ivy_UpdateActiveState_080E98B4(struct ChaseActor *actor);
+void Octopus_UpdateActiveCollider(struct ChaseActor *actor);
 
 static inline void clearColliderFlag(u16 *flags)
 {
@@ -83,7 +83,7 @@ void SceneActor_BeginReactionAnimation(struct ChaseActor *actor)
         Sound_PlaySong(0x2A0);
     }
     if (actor->base.restart) {
-        SceneActorChase_SetControl(actor, Ivy_UpdateActiveState_080E98B4, 0x22);
+        SceneActorChase_SetControl(actor, Octopus_UpdateActiveCollider, 0x22);
     }
 }
 
@@ -306,7 +306,7 @@ void SceneActorReaction_PlayEntry17(struct ChaseActor *actor)
         SceneActorAnimation_SelectDirectionalEntry((void *)actor, 17);
     }
     if (actor->base.restart) {
-        SceneActorChase_SetControl(actor, Ivy_UpdateActiveState_080E98B4, 34);
+        SceneActorChase_SetControl(actor, Octopus_UpdateActiveCollider, 34);
         SceneActorChase_SetBehavior(actor, 3);
     }
 }
@@ -1338,11 +1338,11 @@ void Octopus_InitControlPresets(struct ChaseActor *actor)
     actor->base.callbacks294 = gUnk_0860634C;
 }
 
-/* SceneActorControl_BeginSoundTransition_080EBC38: SceneActorControl_BeginSoundTransition with other constants (ported by relatives.py + repair.py; provisional name) */
+/* Octopus_PlayReactionAndBeginTransition: SceneActorControl_BeginSoundTransition with other constants (ported by relatives.py + repair.py; provisional name) */
 
 void Octopus_UpdateStagger(struct ChaseActor *, s32);
 
-s32 SceneActorControl_BeginSoundTransition_080EBC38(struct ChaseActor *actor)
+s32 Octopus_PlayReactionAndBeginTransition(struct ChaseActor *actor)
 {
     u16 *flags;
     u16 suppressed;
@@ -1380,13 +1380,13 @@ void Octopus_InitProfileId(struct ChaseActor *actor)
     actor->base.profileId = SceneActorProfiles_FindOrAdd(actor->base.category, 0);
 }
 
-/* SceneActorControl_UpdateMotionPhase_080EBD0C: same code as SceneActorControl_UpdateMotionPhase at another address (ported by relatives.py; provisional name) */
+/* Octopus_UpdateCaptureMotion: same code as SceneActorControl_UpdateMotionPhase at another address (ported by relatives.py; provisional name) */
 
 /* Ivy drawable reset (tentative): clears the context's capture flags, moves the actor by 0x20
  * on x and z, copies the position to the drawable, selects directional entry 0 and steps the
  * display sequence. */
 
-void SceneActorControl_UpdateMotionPhase_080EBD0C(struct ChaseActor *actor)
+void Octopus_UpdateCaptureMotion(struct ChaseActor *actor)
 {
     {
         struct Octopus *context = actor->base.context;
@@ -1735,9 +1735,9 @@ s32 Octopus_Update(struct ChaseActor *actor);
 
 void Octopus_UpdateDefeat(struct ChaseActor *actor, s32 frame);
 
-s32 SceneActorControl_BeginSoundTransition_080EBC38(struct ChaseActor *actor);
+s32 Octopus_PlayReactionAndBeginTransition(struct ChaseActor *actor);
 
-void SceneActorControl_UpdateMotionPhase_080EBD0C(struct ChaseActor *actor);
+void Octopus_UpdateCaptureMotion(struct ChaseActor *actor);
 
 void SceneActorCollision_InitCompactBody(struct ChaseActor *actor);
 
@@ -1896,7 +1896,7 @@ static inline void OctopusInit_InstallCompletionCallbacks(struct ChaseActor *arg
 
 static inline void OctopusInit_InstallRoutes(struct ChaseActor *actor)
 {
-    actor->base.routeReset = SceneActorControl_UpdateMotionPhase_080EBD0C;
+    actor->base.routeReset = Octopus_UpdateCaptureMotion;
     MonsterInit_WriteDataPointer(&actor->base.commandTable.opaque, gUnk_0860635C);
 }
 
@@ -1952,7 +1952,7 @@ s32 Octopus_Init(void *object)
     MonsterInit_InstallSequenceCallbacks(actor, Octopus_Update, 0, 0, 0, 0, 0, 0,
                                          Octopus_UpdateDefeat, SceneActorReaction_OnEnemyDefault, 0,
                                          0, SceneActorReaction_ResolvePlacementDamage,
-                                         SceneActorControl_BeginSoundTransition_080EBC38);
+                                         Octopus_PlayReactionAndBeginTransition);
     MonsterInit_InitializeGroup(group, 0, 0, 0, 0, 0, 0, 1);
     OctopusInit_InstallRoutes(actor);
     MonsterInit_SetBehaviorFlags(actor, 0x200);

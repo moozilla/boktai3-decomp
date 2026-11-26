@@ -1,7 +1,7 @@
 #include "effects/particles/burst_emitter.h"
 #include "engine/math/monster_particle_random.h"
 void BurstSpark_Create(const struct ContactPosition *, s32, s32, s32, s32, s32, u32);
-void SpriteParticle_CreateVariant4384(const struct ContactPosition *, s32, s32, s32, s32, s32, s32,
+void TrapSpellParticles_CreateBurst(const struct ContactPosition *, s32, s32, s32, s32, s32, s32,
                                       s32, s32, s32, s32, s32, s32);
 void SparkExplosion_EmitFrame(struct BurstEmitter *emitter)
 {
@@ -78,7 +78,7 @@ void SparkExplosion_EmitFrame(struct BurstEmitter *emitter)
             if (!emitter->context) {
                 u32 kind = 2;
                 for (index = 0; index <= 7; index++)
-                    SpriteParticle_CreateVariant4384(&emitter->position, 8, 16, 4, 12, 18,
+                    TrapSpellParticles_CreateBurst(&emitter->position, 8, 16, 4, 12, 18,
                                                      index << 5, 8, 64, 1, kind, 512, 8);
             }
             break;

@@ -22,7 +22,7 @@ struct PRecover {
 };
 s32 Player_GetLinkedSmoothedDirection(struct PRecover *);
 s32 Player_GetAdjustedMovementInterval(struct PRecover *);
-void Player_SetDirectionalVelocity_08238300(struct PRecover *, s32);
+void LinkPlayer_SetScaledDirectionalVelocity(struct PRecover *, s32);
 void Player_UpdateActionFacingSide(struct PRecover *);
 void Player_PlayLocalSong(u32, s32);
 void Player_SetTetherMode(struct PRecover *, s32, s32);
@@ -34,7 +34,7 @@ void Player_BeginWalk(struct PRecover *p)
     }
     p->flags20 &= ~1;
     p->dir = Player_GetLinkedSmoothedDirection(p);
-    Player_SetDirectionalVelocity_08238300(p, Player_GetAdjustedMovementInterval(p));
+    LinkPlayer_SetScaledDirectionalVelocity(p, Player_GetAdjustedMovementInterval(p));
     Player_UpdateActionFacingSide(p);
     Anim_SetSequence(&p->seq, p->resource, 1, p->facing, p->flip);
     PlayerCue_StepSequence(&p->sprite, &p->seq);

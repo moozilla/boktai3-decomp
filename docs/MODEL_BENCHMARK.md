@@ -35,7 +35,7 @@ the per-line report from `tools/explain.py` (with idioms from
 | sub_0816AC64 | 80 | MATCH@5 | no (94 B) | no (94 B) | MATCH@6 |
 | SavedVariables_RunFromScript | 27 | no (51 B) | MATCH@10 | no (48 B) | MATCH@6 |
 | Route_Start | 39 | no (4 B) | no (8 B) | MATCH@6 | MATCH@7 |
-| ScriptActor_GetField534FromScript | 23 | no (26 B) | no (26 B) | no (20 B) | MATCH@7 |
+| ScriptActor_GetActiveSceneMode | 23 | no (26 B) | no (26 B) | no (20 B) | MATCH@7 |
 | StageIconDisplay_SelectUpdate | 15 | no (2 B) | no (6 B) | MATCH@5 | MATCH@6 |
 | sub_08126000 | 52 | no (4 B) | no (89 B) | no (7 B) | no (89 B) |
 | sub_08229440 | 16 | no (16 B) | no (29 B) | MATCH@7 | MATCH@7 |
@@ -109,7 +109,7 @@ averaged 2.2 KB (max 4.0 KB).
 One commit per function on the tools branch, checked with one combined ROM
 build: sub_0821FE40 (Collider_Refresh), sub_08125B68 (pinned), sub_0816AC64,
 sub_0822BFC8 (SavedVariables_RunFromScript), sub_0821E5C4 (Route_Start, pinned),
-sub_0815A838 (ScriptActor_GetField534FromScript), sub_08229440 (pinned),
+sub_0815A838 (ScriptActor_GetActiveSceneMode), sub_08229440 (pinned),
 sub_082285C4 (pinned), sub_08234770, sub_0823652C, sub_0822B968 and
 sub_08239CDC. Each takes the cleanest matching run, preferring plain C, with
 pins reduced by `tools/depin.py`.
