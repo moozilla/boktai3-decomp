@@ -18,16 +18,26 @@ class PlateWalker(Walker):
         self.scene(scene)
         puzzles = []
         for callback, plates in self.groups.items():
-            if len(plates) < 2 or len({flag for _, flag in plates.values()}) != 1:
+            if len(plates) < 2:
                 continue
-            # The shared press/release procedures (1085/1086) set and clear
-            # the indexed r708 bit. A conjunctive callback needs all of them.
+            # A conjunctive callback needs every indexed r708 bit. If the
+            # placement calls start with a literal, take the saved bit from
+            # the callback's own guard.
             tests = {f"(r708[0x133.0]:t4(48,{i}) == 1)" for i in plates}
-            if any(line.startswith("if ") and "||" not in line and all(t in line for t in tests)
-                   for _, line in self.text(callback)):
-                flag = next(iter(plates.values()))[1]
-                if re.fullmatch(r"r708\[0x[0-9a-f]+\.\d+\]:t4", flag):
-                    puzzles.append({"plates": [name for name, _ in plates.values()], "cond": [f"({flag} == 0)"]})
+            lines = [line for _, line in self.text(callback)]
+            guards = [line for line in lines
+                      if line.startswith("if ") and "||" not in line and all(t in line for t in tests)]
+            if not guards:
+                continue
+            bit = r"r708\[0x[0-9a-f]+\.\d+\]:t4"
+            flags = {flag for _, flag in plates.values() if re.fullmatch(bit, flag)}
+            if not flags:
+                flags = {match for line in guards for match in re.findall(rf"({bit}) == 0", line)
+                         if f"{match} = 1" in lines}
+            if len(flags) != 1:
+                continue
+            flag, = flags
+            puzzles.append({"plates": [name for name, _ in plates.values()], "cond": [f"({flag} == 0)"]})
         return puzzles
 
     def call(self, pid, ops, conds, trap, depth, spawner):
@@ -48,7 +58,7 @@ def main():
     puzzles = {row["scene"]: found for row in stages if (found := walker.puzzles(row["scene"]))}
     args.out.parent.mkdir(parents=True, exist_ok=True)
     args.out.write_text(json.dumps(puzzles, indent=2) + "\n")
-    print(f"{sum(map(len, puzzles.values()))} simultaneous plate puzzles in {len(puzzles)} scenes")
+    print(f"{sum(map(len, puzzles.values()))} plate puzzles in {len(puzzles)} scenes")
 
 
 if __name__ == "__main__":

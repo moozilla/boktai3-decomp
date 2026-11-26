@@ -44,8 +44,9 @@ const venvPython = path.join(ROOT, 'build/venv/bin/python');
 const python = fs.existsSync(venvPython) ? venvPython : 'python3';
 function stageData(file, generator, args, fallback) {
   file = path.join(ROOT, file);
-  if (goal === 'story' && !fs.existsSync(file)) {
-    const result = spawnSync(python, [path.join(ROOT, generator), ...args], { cwd: ROOT, encoding: 'utf8' });
+  const script = path.join(ROOT, generator);
+  if (goal === 'story' && (!fs.existsSync(file) || fs.statSync(file).mtimeMs < fs.statSync(script).mtimeMs)) {
+    const result = spawnSync(python, [script, ...args], { cwd: ROOT, encoding: 'utf8' });
     if (result.error || result.status !== 0) throw new Error(`Could not generate ${file}: ${result.error || result.stderr}`);
   }
   return fs.existsSync(file) ? JSON.parse(fs.readFileSync(file, 'utf8')) : fallback;
@@ -231,17 +232,22 @@ const GOALS = {
       let prioritizeExit = Boolean(landingDetour) || L.coffinAvailable() || L.movingFloors().length > 0;
       const arrivals = arrivalForGoal();
       if (arrivals && doorsHere().some((door) => door.scene === routeGoal && arrivals.has(door.entrance))) prioritizeExit = true;
+      const completedPlates = new Set();
       for (const puzzle of PLATE_PUZZLES[here] || []) {
-        if (!L.conditionsAllow(puzzle.cond)) continue;
+        if (!L.conditionsAllow(puzzle.cond)) {
+          for (const name of puzzle.plates) completedPlates.add(name);
+          continue;
+        }
         const solved = yield* L.solvePlatePuzzle(puzzle, { avoid: stageOf(here).doors.map((d) => d.box),
           trace: (e) => event({ skill: 'nav', ...e }) });
         event({ skill: 'plate-puzzle', ...solved, scene: here });
         if (solved.done) {
           prioritizeExit = true;
+          for (const name of puzzle.plates) completedPlates.add(name);
           yield* untilControl(g, L, () => !g.fn.ScriptUtility_IsControlFlagSet(), 30, 1800);
         }
       }
-      const switches = (stageOf(here).switches || []).concat(L.floorSwitches().filter((sw) => !sw.pressed));
+      const switches = (stageOf(here).switches || []).concat(L.floorSwitches().filter((sw) => !sw.pressed && !completedPlates.has(sw.name)));
       for (const sw of switches) {
         const key = `${here}:switch:${sw.box ?? sw.name}`;
         if (TRIED.has(key)) continue;
