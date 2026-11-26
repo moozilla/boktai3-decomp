@@ -59,16 +59,6 @@ static inline u32 Lun_ReadContextFlags(struct ChaseActor *actor, u8 mask)
     return context->flags3D4 & mask ? 1 : 0;
 }
 
-static inline u8 Lun_IsUnavailable(struct ChaseActor *actor)
-{
-    if (actor) {
-        if (SceneActorContact_MotionFlags(actor, 0x40) || SceneActorChase_StatusFlags(actor, 0x20000) ||
-            actor->base.health <= 0)
-            return 1;
-    }
-    return 0;
-}
-
 static inline u8 Lun_IsPlayerFast(void)
 {
     u32 state = gPlayerPassageState;
@@ -129,7 +119,7 @@ void Lun_HandlePlayerContact(void *unused, struct ContactCollider *other, void *
         return;
     }
     actor = object;
-    if (Lun_IsUnavailable(actor))
+    if (SceneActor_ActionsBlocked(actor))
         return;
     distance = actor->base.body.position.y - gPlayers[0]->position.y;
     {
@@ -454,31 +444,6 @@ void Lun_BeginMoveToPosition(struct ChaseActor *actor, struct ContactPosition *t
 
 void Lun_UpdateWaitingAnimation(struct RoomActor *actor, s32 frame);
 
-static inline void SetControl(struct ChaseActor *a, void *callback, u32 kind, u32 zero, u8 zero8)
-{
-    a->base.field2B2 = 1;
-    a->base.stepDone = zero8;
-    a->base.controlKind = kind;
-    a->base.target = callback;
-    a->base.field2C8 = zero;
-    {
-        u32 *flags = &a->base.pendingControlFlags;
-        u32 mask = ~1;
-        *flags &= mask;
-    }
-    a->base.pendingControl = zero;
-}
-
-static inline void SetState(struct ChaseActor *a, u32 phase, u32 zero, u8 zero8)
-{
-    u32 one = 1;
-    a->base.state2A8 = zero8;
-    a->base.phase2A9 = phase;
-    a->base.behavior2AA = one;
-    a->base.counter2AC = zero;
-    a->base.field2B1 = one;
-}
-
 void Lun_ResumeAfterLiftPenalty(struct ChaseActor *input, s32 elapsed)
 {
     s32 frame = elapsed;
@@ -507,11 +472,11 @@ void Lun_ResumeAfterLiftPenalty(struct ChaseActor *input, s32 elapsed)
             *p = flags;
             ctx->routeDelay = ctx->field442;
             Lun_BeginMoveToPosition(input, &gPlayers[0]->position);
-            SetState(input, 2, 0, zero8);
+            SceneActorChase_SetPhase(input, 2, 1);
         } else {
             u32 zero = delay;
-            SetControl(input, Lun_UpdateWaitingAnimation, 10, zero, zero8);
-            SetState(input, 1, zero, zero8);
+            SceneActorChase_SetControl(input, Lun_UpdateWaitingAnimation, 10);
+            SceneActorChase_SetPhase(input, 1, 1);
             input->base.body.direction = input->base.tracking.heading;
             input->base.field2C2 = 64;
         }
@@ -841,16 +806,6 @@ void Lun_FollowRoute(struct ChaseActor *actor)
 
 // confidence=low: decays saved horizontal route motion before returning to pursuit or rest.
 
-static inline void SetState_DecayRouteMotion(struct ChaseActor *a, u32 phase, u32 behavior,
-                                             u32 zero)
-{
-    a->base.state2A8 = 0;
-    a->base.phase2A9 = phase;
-    a->base.behavior2AA = behavior;
-    a->base.counter2AC = zero;
-    a->base.field2B1 = 1;
-}
-
 void Lun_DecayRouteMotion(struct ChaseActor *a)
 {
     struct Lun *ctx = a->base.context;
@@ -865,9 +820,9 @@ void Lun_DecayRouteMotion(struct ChaseActor *a)
     if (a->base.stepDone) {
         u16 flags = SceneActorChase_QueryMotionFlagComponent(a, 0x100);
         if (flags)
-            SetState_DecayRouteMotion(a, 2, 1, 0);
+            SceneActorChase_SetPhase(a, 2, 1);
         else
-            SetState_DecayRouteMotion(a, 0, 2, flags);
+            SceneActorChase_SetBehavior(a, 2);
     } else
         a->base.counter2AC++;
 }
@@ -1457,7 +1412,7 @@ u32 Lun_OnTargetCheck(struct ChaseActor *actor)
 {
     struct SceneActorChaseTracking *p;
     s32 distance;
-    if (!MonsterInit_TestTargetingFlags(&actor->base.tracking, 2))
+    if (!SceneActorChase_TrackingFlags(&actor->base.tracking, 2))
         goto zero;
     p = &actor->base.tracking;
     {
@@ -1508,30 +1463,9 @@ void Lun_EnterIdleOrCopyCell(struct ChaseActor *s)
         u16 v = g->field442;
         g->routeDelay = v;
     } else {
-        void (*fn)(void) = SceneActorControl_OnIdle;
-        u8 code = 0x10;
-        u8 one;
-        u32 *flags;
-        u8 *taken;
         struct SceneActorChaseTracking *tracking;
-        taken = &s->base.field2B2;
-        one = 1;
-        *taken = one;
-        s->base.stepDone = zero;
-        s->base.controlKind = code;
-        s->base.target = fn;
-        s->base.field2C8 = zero;
-        flags = &s->base.pendingControlFlags;
-        {
-            u32 clear = -2;
-            *flags &= clear;
-        }
-        s->base.pendingControl = zero;
-        s->base.state2A8 = 0;
-        s->base.phase2A9 = one;
-        s->base.behavior2AA = 0;
-        s->base.counter2AC = zero;
-        s->base.field2B1 = one;
+        SceneActorChase_SetControl(s, SceneActorControl_OnIdle, 0x10);
+        SceneActorChase_SetPhase(s, 1, 0);
         tracking = &s->base.tracking;
         {
             u32 bit = 8;
@@ -1550,13 +1484,14 @@ static inline u8 LiftFlag(struct SceneActorControlMotionState *state)
 void SceneActorControl_ConsumeLiftFlagPenalty(struct ChaseActor *input)
 {
     struct ChaseActor *actor = input;
-    if (!LiftFlag((void *)SceneActorControl_GetMotionState(actor)))
+    struct Lun *state = actor->base.context;
+    if (!LiftFlag((void *)state))
         return;
     if (actor->base.paletteOffset == 0) {
         gPlayers[0]->movementSpeedReduction--;
     }
     {
-        u32 *flags = &SceneActorControl_GetMotionState(actor)->flags3D4;
+        u32 *flags = &((struct Lun *)actor->base.context)->flags3D4;
         u32 clearMask = ~2;
         *flags &= clearMask;
     }
@@ -1611,16 +1546,6 @@ void Lun_RenewPlayerRoute(struct ChaseActor *actor)
 
 void ActorBehavior_TickParticipantProgress(struct ChaseActor *a);
 
-static inline void SetState_FollowParticipantDisplacement(struct ChaseActor *a, u32 phase,
-                                                          u32 behavior, u32 zero)
-{
-    a->base.state2A8 = 0;
-    a->base.phase2A9 = phase;
-    a->base.behavior2AA = behavior;
-    a->base.counter2AC = zero;
-    a->base.field2B1 = 1;
-}
-
 void Lun_FollowParticipantDisplacement(struct ChaseActor *a)
 {
     struct Lun *ctx = a->base.context;
@@ -1635,7 +1560,7 @@ void Lun_FollowParticipantDisplacement(struct ChaseActor *a)
     a->base.body.motion.z += delta.z;
     ctx->curveStart = *(struct ContactPosition *)&gPlayers[0]->position;
     if (a->base.stepDone) {
-        SetState_FollowParticipantDisplacement(a, 0, 3, 0);
+        SceneActorChase_SetBehavior(a, 3);
         SceneActorChase_SetControl(a, SceneActorControl_OnIdle, 0x10);
     } else {
         a->base.counter2AC++;
