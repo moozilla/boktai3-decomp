@@ -1,4 +1,5 @@
 #include "global.h"
+#include "scene/motion/scene_actor_availability.h"
 #include "scene/actor/scene_actor_reset.h"
 #include "monsters/mummy/mummy.h"
 #include "npc/manager/scene_actor_animation.h"
@@ -10,19 +11,6 @@
 #include "scene/motion/scene_actor_chase_shared.h"
 
 /* Records attack contacts and queues a timed reaction (tentative). */
-
-static inline u32 Mummy_Flag(u8 *a, u32 m, u32 off)
-{
-    return off == 0x2D4 ? *(u16 *)(a + off) & m : *(u32 *)(a + off) & m;
-}
-
-static inline u8 Mummy_IsAttackBlocked(u8 *c)
-{
-    if (c && (Mummy_Flag(c, 0x40, 0x2D4) || Mummy_Flag(c, 0x20000, 0x2D0) ||
-              ((struct ChaseActor *)c)->base.health <= 0))
-        return 1;
-    return 0;
-}
 
 void *SceneActorContacts_FindObjectById(u16);
 
@@ -49,7 +37,7 @@ void Mummy_OnAttackCollision(u8 *unused, struct ContactCollider *obj, u8 *input)
     u16 contactFlags;
     u32 rawKind;
     u32 kindIndex;
-    if (Mummy_IsAttackBlocked(input))
+    if (SceneActor_ActionsBlocked((struct ChaseActor *)input))
         return;
     rawKind = obj->contactFlags;
     kindIndex = (u16)(rawKind - 1);
@@ -63,7 +51,8 @@ void Mummy_OnAttackCollision(u8 *unused, struct ContactCollider *obj, u8 *input)
             u32 mask = ~0x800;
             *flags &= mask;
         }
-        if ((!Mummy_IsAttackBlocked(input)) && ((obj->contactFlags) & 15)) {
+        if ((!SceneActor_ActionsBlocked((struct ChaseActor *)input)) &&
+            ((obj->contactFlags) & 15)) {
             ((struct ChaseActor *)input)->base.counter304 = obj->collisionId;
             SceneActorChase_ClearWordFlags(&((struct ChaseActor *)input)->base.statusFlags,
                                            ROOM_ACTOR_STATUS_INTERACTING);
@@ -92,7 +81,7 @@ void Mummy_OnAttackCollision(u8 *unused, struct ContactCollider *obj, u8 *input)
             base->base.colliderA.responseValue = 30;
             base->base.field2E6 = 4;
         }
-    } else if ((!Mummy_IsAttackBlocked(input)) && (contactFlags & 15)) {
+    } else if ((!SceneActor_ActionsBlocked((struct ChaseActor *)input)) && (contactFlags & 15)) {
         ((struct ChaseActor *)input)->base.counter304 = obj->collisionId;
         SceneActorChase_ClearWordFlags(&((struct ChaseActor *)input)->base.statusFlags,
                                        ROOM_ACTOR_STATUS_INTERACTING);
@@ -105,13 +94,6 @@ void Mummy_OnBodyCollision(void *source, void *destination, void *actor)
 {
     SceneActorReaction_HandleColliderContact(source, destination, actor);
 }
-
-struct SceneActorCheckpointSequence {
-    u8 unknown0[8];
-    u16 frame;
-    u8 unknownA[4];
-    u16 timer;
-};
 
 void Mummy_FireAcceleratingVolley(struct ChaseActor *);
 
@@ -127,15 +109,16 @@ static inline u8 TakeFlag(u8 *flag)
 void SceneActor_UpdateAnimationCheckpoint(struct ChaseActor *actor)
 {
     struct Mummy *state = actor->base.context;
-    struct SceneActorCheckpointSequence *sequence = (void *)((u8 *)actor->base.drawable + 0x48);
+    struct SceneActorControlMotionDrawable *drawable = actor->base.drawable;
+    struct DisplaySequenceState *sequence = &drawable->sequence;
     if (TakeFlag(&actor->base.field2B2)) {
         u32 mask;
         SceneActorAnimation_SelectDirectionalEntry((void *)actor, 5);
         mask = 0x100;
         actor->base.motionFlags |= mask;
     }
-    if (sequence->frame > 2) {
-        if (sequence->frame == 4 && sequence->timer == 0)
+    if (sequence->index > 2) {
+        if (sequence->index == 4 && sequence->elapsed == 0)
             Mummy_FireAcceleratingVolley(actor);
     }
     if (actor->base.restart) {
@@ -186,23 +169,18 @@ void SceneActorAttachment_ReplaceResponseSlot(void *, u32, u32, u32);
 
 void SceneActorAnimation_SelectDirectionalEntry(struct RoomActor *, s32);
 
-void Mummy_UpdateWalking(u8 *p)
+void Mummy_UpdateWalking(struct ChaseActor *actor)
 {
-    if (TakeFlag(p + 0x2B2))
-        SceneActorAttachment_ReplaceResponseSlot(p, 0, 0x7F, 0);
-    SceneActorAnimation_SelectDirectionalEntry(p, 1);
+    if (SceneActorReaction_TakePrepared(actor))
+        SceneActorAttachment_ReplaceResponseSlot(actor, 0, 0x7F, 0);
+    SceneActorAnimation_SelectDirectionalEntry(&actor->base, 1);
 }
 
-struct S {
-    u8 filler[0x2b2];
-    u8 f;
-};
-
-void Mummy_UpdateIdle(struct S *s)
+void Mummy_UpdateIdle(struct ChaseActor *actor)
 {
-    if (s->f != 0)
-        s->f = 0;
-    SceneActorAnimation_SelectDirectionalEntry(s, 0);
+    if (actor->base.field2B2 != 0)
+        actor->base.field2B2 = 0;
+    SceneActorAnimation_SelectDirectionalEntry(&actor->base, 0);
 }
 
 u32 Route_GetCurrentPointFacing(void *);
