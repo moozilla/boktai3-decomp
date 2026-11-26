@@ -587,3 +587,61 @@ Splitting the wave samples, keeping a single typed base in the helper,
 and changing the heading width or cursor all worsen the stock match.
 The original units retain their reported constructs. See
 `build/hard-sites/impact-scatter/` and `build/matchsearch/sub_0817AEC8`.
+
+## 2026-11-26: SpriteTrail history extent and signed wrap
+
+The matching camera source now uses the native history array's last
+index for the backward cursor and the forward ring update. With the
+array-size enumeration in the forward comparison, agbcc initially
+emits BLS where the ROM has BLE. Casting the limit to s32 preserves
+the original signed comparison and matches all 304 bytes. The scoped
+lint reports zero concessions. Starting from the last history pointer
+and subtracting the reverse distance changes the address calculation,
+so the previously matching initial offset remains.
+
+## 2026-11-26: Skeleton defeat origin and late table
+
+Removing the two dead exits and the zero sound term from
+Skeleton_UpdateDefeat still emits 7,924 bytes, with 28 changed ROM
+instructions and 28 changed draft instructions. Removing only one
+exit or only the sound term performs worse. Reusing one named random
+table in both bursts also increases the mismatch.
+
+UID 1095 takes PRE's pseudo 3858 for the body-position pointer.
+The draft puts it in sl, while the ROM spills it to stack+0x98.
+The first real ROM use of sl after its save is the late random-table
+load. Suppressing allocation of 3858 alone spills it into stack+0x94
+and moves the category pointer into sl. Suppressing both sends the
+early wrap mask to sl. Suppressing those three pseudos sends the
+spark-count mask there instead. The earlier exact allocation probe
+has no verified equivalent in this checkout. Direct origins,
+shared burst code and narrower locations for the wrap mask miss
+under stock agbcc. See `build/hard-sites/skeleton-defeat/`.
+
+Suppressing allocation of the two pointers and all five named
+constants recovers the stack addresses and leaves 14 ROM / 14
+draft instructions. The late table is still in r6, so the missing
+sl save and late register move account for the remaining shape
+differences. Explicitly forcing sl changes the allocation earlier
+in the function and gives a larger miss. The original unit still
+passes the stock 7,924-byte check with its two dead-code and one
+proved-zero reports.
+
+## 2026-11-26: Shared byte draw and native region alternatives
+
+Using the existing shared draw only for the byte sample in
+FragmentGroup changes the stock miss from 98 ROM / 96 draft to
+70 ROM / 68 draft instructions. The table still has REG_EQUIV.
+Suppressing that note recovers the 704-byte length and leaves 30/30
+instruction differences, so the plain inline is still the better
+diagnostic basis. A sampler descriptor for SpiralBurst, using the
+table and mask as two fields passed by value or address, also misses.
+
+Splitting the Hresvelgr action pointer by case or using the actor
+member at each call changes more than the two mask instructions.
+Typed GameState RAM-region members and publishing the active region
+before deriving its neighbors fail to recover the operand order.
+Plain register declarations on the registry candidates preserve the
+same allocation. XOR comparisons for Wireless flip flags miss while
+the original dead-guard cleanup remains exact. The corresponding
+trial folders are under `build/hard-sites/`.
