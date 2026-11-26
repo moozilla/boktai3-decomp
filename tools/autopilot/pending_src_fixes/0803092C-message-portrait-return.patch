@@ -1,0 +1,36 @@
+0803092C message-portrait-return
+
+The hidden speaker path updates portrait flags via r1 to r3 and
+keeps window in r0. The other path leaves the result of the call
+to Anim_SetSequence at 08030A68 in r0 through playback and flag updates.
+
+The explicit form changed the ROM bytes. The guarded form passed the unit ROM check.
+
+--- a/src/message_window.c
++++ b/src/message_window.c
+@@ -42,4 +42,7 @@
+ {
+     struct MessagePlaybackState *state = &window->state;
++#ifdef UBFIX
++    int result = (int)window;
++#endif
+     if (state->speaker == -1) {
+         window->portrait.flags |= 1;
+@@ -93,5 +96,9 @@
+         }
+         initial = &window->portraitSequence;
++#ifdef UBFIX
++        result = Anim_SetSequence(initial, window->portraitResource, (u16)state->speaker, 0, 0);
++#else
+         Anim_SetSequence(initial, window->portraitResource, (u16)state->speaker, 0, 0);
++#endif
+         r = &window->portrait;
+         f = initial;
+@@ -129,4 +136,7 @@
+     }
+     window->previousSpeaker = (u8)state->speaker;
++#ifdef UBFIX
++    return result; // r0 preserves the incoming window or sequence result
++#endif
+ }
+ 
