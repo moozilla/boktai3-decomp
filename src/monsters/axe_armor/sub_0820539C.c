@@ -3,10 +3,6 @@
 #include "engine/video/display_animation.h"
 #include "engine/video/display_sequence_inline.h"
 #include "engine/engine_globals.h"
-struct PHTerrain {
-    u8 pad[0x24];
-    u16 rows[1];
-};
 struct SpawnOffset {
     s32 x, z;
 };
@@ -32,7 +28,7 @@ static inline s32 EnemyD459_CellIndex(struct SceneVec *v)
     s32 x = (s16)v->x >> 8, z = (s16)v->z >> 8;
     if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
         return 0;
-    return ((struct PHTerrain *)gTerrainMap)->rows[z] + x;
+    return gTerrainMap->rows[z] + x;
 }
 static inline void EnemyD459_GetFlags(u32 **out, struct DisplaySequenceSprite *sprite)
 {
@@ -44,12 +40,7 @@ static inline u32 EnemyD459_StepSequence(u32 *flipFlags, struct AxeArmor *actor,
 {
     const u16 *command;
     u32 ended;
-    {
-        u32 offset = DisplaySequence_GetIndex(state) << 1;
-        const u16 *table;
-        table = state->commands;
-        command = (const u16 *)((u32)table + offset);
-    }
+    command = &state->commands[state->index];
     owner->frame = *command >> 6;
     {
         union DisplaySequenceControl control;
@@ -233,12 +224,8 @@ s32 AxeArmor_InitializeFromScript(struct AxeArmor *p, void *parent)
         Anim_SetSequence(&p->sequence, resource, 2, (u8)(p->facing), dead);
     } else {
         *((void **)(&p->update)) = AxeArmor_UpdateDeath;
-        {
-            s16 *d = &(p->dead);
-            s32 zero = 0;
-            *d = 1;
-            Anim_SetSequence(&p->sequence, *slot, 4, 0, zero);
-        }
+        p->dead = 1;
+        Anim_SetSequence(&p->sequence, *slot, 4, 0, 0);
         *position = (p->initialPosition.x) + 0x40;
         *zp = (p->initialPosition.z) + 0x40;
         *position -= 0x60;
