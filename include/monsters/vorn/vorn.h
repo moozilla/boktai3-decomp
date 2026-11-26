@@ -31,13 +31,11 @@ struct Vorn {
     u16 farTimer;
     u16 pursuitCooldown;
     u8 unknown6AE[2];
-    u16 turnX;
-    u8 unknown6B2[2];
-    u16 turnZ;
-    u8 unknown6B6[3];
+    struct ContactPosition uphillPosition;
+    s8 uphillRouteId;
     u8 axis;
     u16 sideStepDuration;
-    u8 unknown6BC[4];
+    u16 uphillProbeDelay, uphillProbePeriod;
     u8 foreignPosition;
     u8 field6C1;
     u8 unknown6C2[2];
@@ -57,5 +55,7 @@ struct Vorn {
     struct ChaseRouteProbe routeProbe;
     struct ContactPosition destination;
 };
+
+typedef char VornSize[(sizeof(struct Vorn) == 0x720) ? 1 : -1];
 
 #endif // GUARD_VORN_H
