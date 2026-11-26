@@ -1,24 +1,4 @@
-#include "global.h"
-struct S {
-    u8 f0[1];
-    u8 b1;
-    u8 f2[5];
-    u8 b7;
-    u8 b8;
-    u8 b9;
-    u8 f3[4];
-    u16 h0e;
-    u32 w10;
-    u8 f5[4];
-    u8 b18;
-    u8 f6[0x56 - 0x19];
-    s16 h56;
-    u8 f8[0x6a - 0x58];
-    s16 h6a;
-    u8 f9[0xd4 - 0x6c];
-    u8 d4[1];
-};
-void Actor_PlayAnimationEntry(void *, u32, u32, u32, u32);
+#include "npc/manager/scene_actor_lifecycle.h"
 void DisplayAnimation_SetFlags(void *, u32);
 void DisplayAnimation_ClearFlags(void *, u32);
 s32 DisplayAnimation_SetPalette(void *, u32, u32, u32);
@@ -39,19 +19,19 @@ static inline s32 Interpolate(s32 start, s32 end, s32 tick, s32 duration)
         delta = -(-delta >> 8);
     return start + delta;
 }
-void StoryCharacter_RunPaletteFlashSequence(u32 a, struct S *p, s32 a2)
+void StoryCharacter_RunPaletteFlashSequence(u32 a, struct SceneActor *p, s32 a2)
 {
     s32 *base20 = (s32 *)((u8 *)p + 0x20);
     {
         u16 mask = 0x400;
-        p->h0e |= mask;
+        p->flags |= mask;
     }
-    if (p->b9 != 0) {
+    if (p->animationEntered != 0) {
         u32 animId;
-        p->b9 = 0;
-        p->b7 = 0;
-        DisplayAnimation_SetFlags(p->d4, 2);
-        switch (p->b1) {
+        p->animationEntered = 0;
+        p->finished = 0;
+        DisplayAnimation_SetFlags(&p->drawable.common, 2);
+        switch (p->variant) {
             case 4:
             case 5:
             case 6:
@@ -86,12 +66,12 @@ void StoryCharacter_RunPaletteFlashSequence(u32 a, struct S *p, s32 a2)
                 break;
         }
         Actor_PlayAnimationEntry(p, animId, 1, 1, 4);
-        p->b18 = 0;
-        p->w10 = 0;
+        p->animationPhase = 0;
+        p->stateFrame = 0;
         a2 = 0;
         Sound_PlaySong(0x577);
     }
-    switch (p->b18) {
+    switch (p->animationPhase) {
         case 0: {
             s32 color;
             s32 base;
@@ -100,27 +80,27 @@ void StoryCharacter_RunPaletteFlashSequence(u32 a, struct S *p, s32 a2)
             if (a2 > 0x77)
                 goto finalize;
             color = Interpolate(0x40, 0, a2, 0x78);
-            DisplayAnimation_SetPalette(p->d4, color, color, 0);
-            base = p->h56;
+            DisplayAnimation_SetPalette(&p->drawable.common, color, color, 0);
+            base = p->target.y;
             hi = base + 0x40;
             r2 = Interpolate(base, hi, a2, 0x78);
-            p->h6a = r2;
+            p->body.position.y = r2;
             break;
         finalize:
-            DisplayAnimation_SetPalette(p->d4, 0x40, 0x40, 0);
-            DisplayAnimation_ClearFlags(p->d4, 2);
+            DisplayAnimation_SetPalette(&p->drawable.common, 0x40, 0x40, 0);
+            DisplayAnimation_ClearFlags(&p->drawable.common, 2);
             sub_081FED40(base20[1]);
-            p->b18++;
+            p->animationPhase++;
             {
                 u16 mask = 0x100;
-                p->h0e |= mask;
+                p->flags |= mask;
             }
             break;
         }
         case 1: {
             u16 mask = 0x100;
-            p->h0e |= mask;
-            p->b7 = 1;
+            p->flags |= mask;
+            p->finished = 1;
             break;
         }
     }
