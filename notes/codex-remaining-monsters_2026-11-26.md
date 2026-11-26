@@ -207,3 +207,21 @@ scan tests its occupied bit directly.
 
 All eleven changed units matched. These objects cleared one diagnostic
 line and three weighted constant uses.
+
+## Native defeat script arguments
+
+Plasma Cannon, Statue, Dragon Puppy, and Screamer now read their defeat
+script values through the recovered actor fields. Their callbacks fill the
+existing `ScriptUtilityArguments` record and write the five reaction
+counters through the game-state array. Plasma's typed total and lifetime
+counters still change branch layout. The prior signed offset accesses
+remain for those totals.
+
+The four hit-spark bursts use counted loops. Plasma and Dragon Puppy
+decrement their native recovery counters. Dragon Puppy uses the shared
+position record in its windup. Statue copies the native position and
+reads the low random-sample byte. Screamer counts defeat particles and
+writes their position offsets directly.
+
+All thirteen changed units matched with the stock compiler. The printed
+warning and weighted-use totals are unchanged.
