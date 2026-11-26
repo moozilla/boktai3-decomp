@@ -1,41 +1,16 @@
-#include "global.h"
-
-struct SceneNpcPoint {
-    u16 x, y;
-};
-
-struct SceneNpcBob {
-    u8 pad[9];
-    u8 counter;
-    s16 offset;
-};
-
-struct SceneNpcBobActor {
-    u8 pad0[5];
-    u8 field5;
-    u8 pad6[8];
-    u16 flags;
-    u8 pad10[0x20 - 0x10];
-    struct SceneNpcBob bob;
-    u8 pad2C[0x6A - 0x2C];
-    u16 targetY;
-    u8 pad6C[0x130 - 0x6C];
-    u16 phase;
-    u8 pad132[0x160 - 0x132];
-    struct SceneNpcPoint *displayPosition;
-};
+#include "npc/otenko/otenko_actor.h"
 
 struct SceneNpcBobContext {
     u8 pad[0x434];
-    struct SceneNpcPoint *targetPosition;
+    const struct ContactPosition *targetPosition;
 };
 
 void Otenko_DispatchCommands(void *);
 int Actor_UpdateMovementAnimationAndEffects(void *, void *);
 
-int sub_081D0864(struct SceneNpcBobContext *ctx, struct SceneNpcBobActor *npc)
+int sub_081D0864(struct SceneNpcBobContext *ctx, struct OtenkoActor *npc)
 {
-    struct SceneNpcBob *bob = &npc->bob;
+    struct OtenkoEffectState *effect = &npc->effect;
     u32 m2, t;
     union {
         u32 flags;
@@ -43,40 +18,40 @@ int sub_081D0864(struct SceneNpcBobContext *ctx, struct SceneNpcBobActor *npc)
     } work;
     Otenko_DispatchCommands(npc);
     m2 = 2;
-    if (m2 & npc->flags) {
-        struct SceneNpcPoint *p = ctx->targetPosition;
+    if (m2 & npc->displayFlags) {
+        const struct ContactPosition *p = ctx->targetPosition;
         if (p) {
             u32 m = 0x400;
-            npc->flags |= m;
-            npc->targetY = p->y;
+            npc->displayFlags |= m;
+            npc->body.position.y = p->y;
         }
     }
     Actor_UpdateMovementAnimationAndEffects(ctx, npc);
     {
         u32 m8 = 8;
-        if (!(m8 & npc->flags))
-            npc->displayPosition->y += 0xA0;
+        if (!(m8 & npc->displayFlags))
+            ((struct ContactPosition *)npc->display.position)->y += 0xA0;
     }
     {
         work.flags = 1;
-        if (!(work.flags & npc->flags)) {
-            work.counter = bob->counter;
+        if (!(work.flags & npc->displayFlags)) {
+            work.counter = effect->bobCounter;
             t = 3;
             if (!(t & work.counter)) {
-                t &= npc->phase;
+                t &= npc->display.resource.sequence.playback.index;
                 if (t == 0 || t == 3)
-                    bob->offset -= 8;
+                    effect->bobOffset -= 8;
                 else
-                    bob->offset += 8;
-                if (bob->offset > 0x40)
-                    bob->offset = 0x40;
-                else if (bob->offset < -0x40)
-                    bob->offset = -0x40;
+                    effect->bobOffset += 8;
+                if (effect->bobOffset > 0x40)
+                    effect->bobOffset = 0x40;
+                else if (effect->bobOffset < -0x40)
+                    effect->bobOffset = -0x40;
             }
-            bob->counter++;
-            npc->displayPosition->y += bob->offset;
+            effect->bobCounter++;
+            ((struct ContactPosition *)npc->display.position)->y += effect->bobOffset;
         }
     }
-    npc->field5 = 0;
+    npc->nextState = 0;
     return 0;
 }
