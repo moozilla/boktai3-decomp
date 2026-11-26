@@ -1,12 +1,11 @@
-#include "global.h"
+#include "monsters/centipede/centipede_body.h"
 extern const s16 gUnk_086149C4[];
-void Centipede_ApplyPendingRadialVelocity(u8 *s)
+void Centipede_ApplyPendingRadialVelocity(struct TentacleBody *body)
 {
-    u32 *state = (u32 *)(s + 0x8EC);
+    s32 *state = &body->pendingImpulse;
     u32 stored = *state;
     if (stored != 0x7FFFFFFF) {
-        u8 *p = *((u8 **)(s + 0x8F0));
-        s32 off;
+        struct TentacleAnimationSegment *segment = body->impulseSegment;
         u8 *anglep;
         u16 *radiusp;
         s16 *v;
@@ -16,11 +15,9 @@ void Centipede_ApplyPendingRadialVelocity(u8 *s)
         s32 x;
         u32 zero;
         *state = 0x7FFFFFFF;
-        off = 0x108;
-        anglep = p + off;
-        radiusp = (u16 *)(p + 0xDC);
-        off += 0x14;
-        v = (s16 *)(p - (-off));
+        anglep = &segment->impulseHeading;
+        radiusp = &segment->bodyCollider.responseParameter;
+        v = &segment->offset.x;
         angle = *anglep;
         radius = *radiusp;
         value = gUnk_086149C4[(angle + 0x40) & 0xFF] * radius;
