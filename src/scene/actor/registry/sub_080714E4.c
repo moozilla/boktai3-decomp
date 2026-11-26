@@ -1,3 +1,6 @@
+#include "npc/manager/scene_actor_animation.h"
+#include "scene/actor/scene_actor_status.h"
+#include "scene/motion/scene_actor_terrain.h"
 #include "scene/actor/scene_actor_reset.h"
 static inline void SceneActorRegistry_ResetRouteState(struct ChaseActor *actor)
 {
@@ -8,11 +11,10 @@ static inline void SceneActorRegistry_ResetRouteState(struct ChaseActor *actor)
     struct ContactPosition *position;
     struct SceneActorRegistryControl *control;
     u32 *flags, *renderFlags;
-    s32 x, z, height, slope;
+    s32 x, z;
     s32 cell;
     u32 category;
     s32 computedCell;
-    u8 *data;
     route->currentPoint = route->pointId;
     category = actor->base.category;
     if (category - 18 > 1 && category != 9 && category != 22) {
@@ -41,23 +43,7 @@ static inline void SceneActorRegistry_ResetRouteState(struct ChaseActor *actor)
         cell = *address;
     }
     position = cachedPosition;
-    data = TerrainModifiers_FindCellOverride(cell, 1);
-    if (data)
-        data += 4;
-    else {
-        data = gTerrainMap->cells + 12 + cell * 4;
-    }
-    slope = *data >> 4;
-    height = (*data & 15) << 8;
-    switch (slope) {
-        case 1:
-            height -= (u8)position->z;
-            break;
-        case 2:
-            height -= (u8)position->x;
-            break;
-    }
-    actor->base.body.position.y = height;
+    actor->base.body.position.y = SceneActorTerrain_GetHeight(cell, position);
     if (!actor->base.drawableKind)
         ((struct SceneActorRegistrySequenceDrawable *)actor->base.drawable)->position =
             actor->base.body.position;
@@ -88,24 +74,8 @@ static inline void SceneActorRegistry_ResetRouteState(struct ChaseActor *actor)
             selected = *address & mask;
             flags = address;
             renderFlags = &actor->base.statusFlags;
-            if (selected) {
-                u32 clearMask = ~0x1000000;
-                u32 value;
-                u16 *shortFlags;
-                u32 offset;
-                u32 mask0;
-                value = *renderFlags;
-                value &= clearMask;
-                *renderFlags = value;
-                offset = 0x2D4;
-                shortFlags = &actor->base.motionFlags;
-                mask0 = 0xFFFFFDFF;
-                mask0 &= *shortFlags;
-                *shortFlags = mask0;
-                control->mode = 0;
-                control->counter = zero;
-                control->timer = zero;
-            }
+            if (selected)
+                ActorStatus_ClearInteraction(actor, control);
         }
     }
     {
@@ -130,33 +100,24 @@ static inline void SceneActorRegistry_ResetRouteState(struct ChaseActor *actor)
         mask = 0xFFFFBE3F;
         *renderFlags &= mask;
     }
-    {
-        u32 offset = 0x188;
-        Collider_SetPosition(&actor->base.colliderB, cachedPosition, 0);
-    }
+    Collider_SetPosition(&actor->base.colliderB, cachedPosition, 0);
     Collider_SetPosition(collider, cachedPosition, 0);
     {
-        u32 offset;
-        u16 *address;
         struct ContactCollider *lowCollider = collider;
         u32 savedFlags = lowCollider->flags;
         u32 value;
         value = 0xFFFB;
         value &= savedFlags;
         collider->flags = value;
-        offset = 0x1EA;
-        address = &actor->base.paletteTimer;
-        *address = 0;
-        offset -= 2;
-        address = &actor->base.flashTimer;
-        *address = 0;
+        actor->base.paletteTimer = 0;
+        actor->base.flashTimer = 0;
     }
     {
         u32 mode = 2;
         if (!actor->base.drawableKind)
-            ((u8 *)actor->base.drawable)[7] = mode;
+            ((struct SceneActorAnimationSequenceDrawable *)actor->base.drawable)->sprite.priority = mode;
         else
-            ((u8 *)actor->base.drawable)[0x3A] = mode;
+            ((struct SceneActorAnimationTileDrawable *)actor->base.drawable)->tile.attribute1A = mode;
     }
     collider->responseValue = 0;
 }
