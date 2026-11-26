@@ -19,12 +19,16 @@ void SceneActorAttachment_ReplaceResponseSlot(void *, u32, u32, u32);
 void SceneActorEffects_AdvanceSteps(void *, u32);
 s32 Bestiary_GetEntryForActor(u32, s32);
 void Bestiary_UnlockEntry(u32);
-void SceneActorBehavior_CallTerrainScript(void *);
-void SceneActorPlacement_PlayCategoryEventSound(void *);
-void sub_08127590(void *, void *, u32, u32, u32, u32, u32, u32, u32, u32, u32, u32, u32, u32, u32);
+void SceneActorBehavior_CallTerrainScript(struct RoomActor *actor);
+void SceneActorPlacement_PlayCategoryEventSound(struct ChaseActor *actor);
+struct Projectile;
+struct Projectile *sub_08127590(struct ContactPosition *position, struct ContactPosition *velocity,
+                                u32 resource, u32 script, u32 sequence, u32 lifetime, u32 flags,
+                                u32 colliderFlags, s32 palette, u32 flip, u32 speed,
+                                s32 colliderKind, s32 sizeX, s32 sizeY, s32 sizeZ);
 void sub_08159164(u32);
 void Player_RefreshLifeState(u32, u32);
-void Skeleton_InitializeCategoryProfile(void *);
+void Skeleton_InitializeCategoryProfile(struct ChaseActor *actor);
 void Skeleton_InitVariantMotion(void *);
 void SceneActorRecord_RecordPair(u32, u32);
 
@@ -416,7 +420,7 @@ void Skeleton_UpdateDefeat(struct ChaseActor *actor)
             if (b)
                 *categoryp = 7;
         }
-        SceneActorBehavior_CallTerrainScript(actor);
+        SceneActorBehavior_CallTerrainScript(&actor->base);
         {
             Skeleton_RunDefeatScript(actor);
         }
