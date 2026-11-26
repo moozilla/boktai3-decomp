@@ -1,4 +1,5 @@
 #include "monsters/centipede/centipede_body.h"
+#include "monsters/scene_route_sample.h"
 extern const s16 gUnk_086149C4[];
 void Centipede_ApplyPendingRadialVelocity(struct TentacleBody *body)
 {
@@ -21,20 +22,12 @@ void Centipede_ApplyPendingRadialVelocity(struct TentacleBody *body)
         angle = *anglep;
         radius = *radiusp;
         value = gUnk_086149C4[(angle + 0x40) & 0xFF] * radius;
-        if (value >= 0) {
-            x = value >> 12;
-        } else {
-            x = -((-value) >> 12);
-        }
+        x = SceneRoute_ScaleComponent(value);
         zero = 0;
         v[0] = x;
         v[1] = zero;
         value = gUnk_086149C4[angle] * radius;
-        if (value >= 0) {
-            value >>= 12;
-        } else {
-            value = -((-value) >> 12);
-        }
+        value = SceneRoute_ScaleComponent(value);
         v[2] = value;
     }
 }
