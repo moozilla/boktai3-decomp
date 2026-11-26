@@ -6,7 +6,8 @@ struct H {
 struct Z {
     struct H a, b;
 };
-void AxeArmor_ApplyHitReaction(void);
+void AxeArmor_ApplyHitReaction(struct ContactCollider *, struct ContactCollider *,
+                               struct AxeArmor *);
 void Collider_SetBodyProperties(void *, u32, u32, u32);
 void AxeArmor_InitCollider(struct AxeArmor *p)
 {
