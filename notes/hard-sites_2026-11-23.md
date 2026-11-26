@@ -223,3 +223,43 @@ allowing the reassigned node and the entry to share their physical home.
 The persistent registry stores are in `build/matchsearch/`. Review drafts
 and the stock-verified typed fallback are in
 `build/hard-sites/registry/review/`.
+
+## 2026-11-25: Fragment radial sampler copy
+
+`FragmentGroup_SpawnRadial` (08014CA4) has a plain-loop rewrite using the
+native arrays and separate halfword and byte draws. The byte helper
+returns `s32`, reproducing the signed branch that an unsigned return with
+an outer cast missed. The scratch unit `plain-byte-helper.c` has zero
+warnings and is exact under diagnostic `AGBCC_NOEQUIV=122`. The table
+priority rises from 1988 to 3976 under that check.
+
+Reusing an earlier animation lookup's pointer as the random table
+produces a real nonconstant first set. The later set keeps REG_EQUAL
+instead of becoming REG_EQUIV. In `adjust-array-addr-animation-temp.c`
+the instruction shape is exact with 20 register differences. Lowering
+the pointer's priority restores all but the two register operands of the
+animation lookup: the earlier pointer really needs r0, whereas the
+sampler needs r7. The ROM has no r7 use in the intervening body before the
+table load.
+
+A separate source pointer and sample pointer gives the latter a plain
+copy without the constant note. `locate-entry-after-rng.c` gets the
+register homes and frame right but emits the table literal before the
+outer loop. A source copy in the particle body, `copy-in-loop.c`, is
+hoisted to the right preheader. GCSE copy propagation then replaces
+the sampler's first draw with the original source pointer (UID 278
+under scope), leaving only 14 references and a priority of 2441 for the
+sample copy. A private `cprop_insn` control limited to that copy
+destination, `AGBCC_NOCPROP_REG=55`, together with
+`AGBCC_NOREG=39` to rematerialize the source, matches all 704 bytes.
+Either control alone leaves a miss. That establishes a second route
+which needs both the five sample uses and reload-time rematerialization.
+The surviving near-match places the literal too early. The guarded
+do-loop form also needs six independent PRE replacements suppressed.
+
+Cursor advances, typed byte and halfword views, sampler structures passed by
+value and by pointer, and inlining the entire fill with a table argument
+were tried. The nearest source remains in `build/hard-sites/fragment/`
+with the graph in `build/matchsearch/FragmentGroup_SpawnRadial`. The
+private diagnostic compiler is under `build/hard-sites/diagnostic-agbcc/`.
+The checked-in matching unit retains its three proved-zero sites.
