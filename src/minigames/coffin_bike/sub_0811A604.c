@@ -2,7 +2,7 @@
 #include "minigames/coffin_bike/coffin_bike.h"
 void MotionActor_DispatchRequestedState(void *);
 void CoffinBike_UpdatePostState(void *);
-u32 CoffinBike_UpdateTask(struct Glove *p)
+u32 CoffinBike_UpdateTask(struct CoffinBike *p)
 {
     MotionActor_DispatchRequestedState(p);
     Callback_InvokeActor(p, p->update);

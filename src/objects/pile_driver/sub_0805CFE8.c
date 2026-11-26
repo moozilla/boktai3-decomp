@@ -1,5 +1,5 @@
-#include "objects/pile_driver/scene_panel_subject_playback.h"
-void PileDriverSubject_TickActivating(struct ScenePanelSubject *owner)
+#include "objects/pile_driver/pile_driver_subject_playback.h"
+void PileDriverSubject_TickActivating(struct PileDriverSubject *owner)
 {
     union {
         u32 first;
@@ -30,7 +30,7 @@ void PileDriverSubject_TickActivating(struct ScenePanelSubject *owner)
         work.resource = owner->sequenceResource;
         Anim_SetSequence(sequence, work.resource, 2, owner->sequenceRow, owner->sequenceVariant);
     }
-    if (ScenePanelSubject_StepPlayback(owner)) {
+    if (PileDriverSubject_StepPlayback(owner)) {
         owner->changed = 1;
         PileDriverSubject_SetState((void *)owner, 4);
     }

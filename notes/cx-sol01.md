@@ -36,7 +36,7 @@ The wrap-up marker appeared during integration; no further function attempts wer
 - 08143604 matched without hints: separate parameter setter controls the 366 constant lifetime; depin removes every hint.
 - 08143B54 drafted 90.8% (from 89.0%): inline actor-cell calculation preserves the direct field loads and an explicit saved x coordinate. A memory barrier retains the later z reload. Two structural and 39 total instruction differences remain; fixed-register experiments did not help.
 - 08143ED0 drafted 99.9% (from 93.9%): safe flag helpers and byte-valued mode/global predicates recover the tail. One null-branch target remains, as in 08141C40. Explicit bypass variants regress.
-- 08144AAC matched without hints, tentative Player_UpdateBarrierRecovery: ported the resource-recovery sibling and retained the positive-input early break in phase two to reproduce its branch trampoline.
+- 08144AAC matched without hints, tentative PileTrap_UpdateSolarPileRecovery: ported the resource-recovery sibling and retained the positive-input early break in phase two to reproduce its branch trampoline.
 - 08145254 matched without hints, tentative Player_UpdateInterpolatedMotion: duration and elapsed pointer locals plus a retained duration value reproduce the deltas and divisions. A nested rounding helper returns through a separate local. Depin removes every hint; broad coordinate pins had regressed.
 - 081462DC matched without hints, tentative Player_UpdateTimedScreenTransition: six animation/transition phases; declaring the flag pointer before the zero local fixes the last ordering difference.
 - 08147FB8 matched (register-pinned): explicit resource load, timer address and final latch addresses repair the tail. Depin reduces hints from 29 to 17.

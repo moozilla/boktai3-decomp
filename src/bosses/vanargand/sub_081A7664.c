@@ -14,7 +14,7 @@ struct ScenePanelSelection {
     s32 selection;
 };
 void Script_Call(u32, void *);
-static inline u8 ScenePanel_ConsumePending(struct ScenePanelInput *panel)
+static inline u8 VanargandPair_ConsumePending(struct ScenePanelInput *panel)
 {
     if (panel->pending != 0) {
         panel->pending = 0;
@@ -26,7 +26,7 @@ static inline u8 ScenePanel_ConsumePending(struct ScenePanelInput *panel)
 void VanargandPair_RunSelectionScript(struct ScenePanelSelection *panel)
 {
     struct ScenePanelInput *input = (struct ScenePanelInput *)panel;
-    if (ScenePanel_ConsumePending(input)) {
+    if (VanargandPair_ConsumePending(input)) {
         u8 timer = 30;
         input->timer = timer;
     }

@@ -31,7 +31,6 @@ static inline s32 Tentacle_HalfTowardZero(s32 v)
 {
     return v >= 0 ? v >> 1 : -((-v) >> 1);
 }
-#define TentacleActor_UpdateSegmentImpulses sub_080AAA90
 static inline u8 Tentacle_TestSegmentFlags(struct TentacleImpulseSegment *p, u8 mask)
 {
     if (p->flags & mask)
@@ -39,7 +38,7 @@ static inline u8 Tentacle_TestSegmentFlags(struct TentacleImpulseSegment *p, u8 
     return 0;
 }
 
-void TentacleActor_UpdateSegmentImpulses(struct ChaseActor *p)
+void Centipede_UpdateSegmentImpulses(struct ChaseActor *p)
 {
     struct TentacleImpulseTrail *g;
     s32 i;

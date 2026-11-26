@@ -19,7 +19,7 @@ struct ResultMenu {
 };
 int Script_SeekToKeyword(int);
 void *Script_GetTextSourcePc(void);
-void Widget_InitLinked(void *, void *, int, int, int, int, int, void *);
+void AnimSprite_InitLinked(void *, void *, int, int, int, int, int, void *);
 void Anim_RestartSequence(void *, void *, int, int, int);
 void *WirelessExchange_GetPeerEntry(int);
 int WirelessResultPanel_Init(struct ResultMenu *arg)
@@ -73,16 +73,16 @@ initialize:
     ResourceHeader_Relocate(secondary, res);
     {
         struct AnimSprite *draw = p->draws;
-        Widget_InitLinked(draw, secondary, 30, 0x2011, 0, 0, 60, 0);
+        AnimSprite_InitLinked(draw, secondary, 30, 0x2011, 0, 0, 60, 0);
         draw = p->draws + 1;
-        Widget_InitLinked(draw, secondary, 2, 0x2011, 0, 0, 60, 0);
+        AnimSprite_InitLinked(draw, secondary, 2, 0x2011, 0, 0, 60, 0);
         draw = p->draws + 2;
         glyph = &p->glyph;
         savedSprite = &p->sprite;
         {
             int i;
             for (i = 0; i < 20; i++, draw++)
-                Widget_InitLinked(draw, primary, 51, 0x2011, 0, 0, 60, NULL);
+                AnimSprite_InitLinked(draw, primary, 51, 0x2011, 0, 0, 60, NULL);
         }
     }
     resource = ScriptProc_Start(0x922E, 0x4BBF);

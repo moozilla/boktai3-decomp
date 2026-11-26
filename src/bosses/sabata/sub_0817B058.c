@@ -1,6 +1,6 @@
-#include "bosses/sabata/scene_volume.h"
+#include "bosses/sabata/sabata_attack_state.h"
 
-s32 SabataVolume_ConsumePendingEvent(struct SceneVolumeActor *volume)
+s32 Sabata_TakeReachedTarget(struct SabataAttackActor *volume)
 {
     s32 result;
     if (volume->reached != 1) {

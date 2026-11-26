@@ -110,7 +110,7 @@ struct LargeFragmentSlot *SceneSlot_Allocate(struct LargeFragmentSlotPool *pool)
 
 extern const s16 gUnk_086149C4[];
 
-void SceneMovingParticle_Create(struct ContactPosition *, struct ContactPosition *, s32, s32);
+void DebrisMote_Create(struct ContactPosition *, struct ContactPosition *, s32, s32);
 
 static inline s32 Truncate(s32 v)
 {
@@ -151,7 +151,7 @@ void SceneSlot_EmitPulse(struct ContactPosition *position)
     vertical &= 15;
     vertical += 30;
     velocity.y = vertical;
-    SceneMovingParticle_Create(position, &velocity, 30, 3);
+    DebrisMote_Create(position, &velocity, 30, 3);
 }
 
 void SpriteEffectController_Create(void *, const void *, s32, u32, u32, u32, u32, u32, u32, u32,

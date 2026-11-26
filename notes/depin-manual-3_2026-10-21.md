@@ -40,7 +40,7 @@ Near misses (instruction diff counts are for the fully unpinned code):
 * sub_08126000 / ParticleEffectPool_Update (1 diff each): `(*(&off))` on the first 0x69C use removes 9 of 10 diffs; the second use must be `ldr r0,=0x69C` again but CSE reuses the register (`adds r0,r2,#0`).
 * ScenePool_SelectRepeatOrExit: the two identical tails are merged (cross-jumped) without the asm; wrapper in one branch and plain call in the other gives 2 diffs (argument order).
 * StagedEffect_ShakeAndReveal / PlayShakeSequence: the random-read part is fixed with the BlendAndShake technique; the remaining pin is `state` (needs r1 while nextFrame keeps r0).
-* SceneObject_UpdateRaising: barriers keep two RMWs separate; no plain form.
+* SlidingDoor_UpdateRaising: barriers keep two RMWs separate; no plain form.
 * SceneEffect_InitParticleRing: `z = 0` set in the loop must not be hoisted but must stay in r0 after the loop; a dead pre-loop set did not help here.
 * Untouched beyond the first permuter pass (scores > 200): the remaining 5+ hint functions (SceneActorRegistry_SetMovementModesFromScript, Shop_BuildConsumableCatalog, SceneActorControl_ConsumePendingEntry, ActorAttachment_ReleasePartsResource, Shop_ClassifyConsumableMove / EquipmentMove, SpriteEffectController_QueueColliders, SceneCommands_FadePalette, ResultGame_UpdatePlayerMarker, StageIconDisplay_TickShake, ScenePool_SelectDirectionOrRepeat, SceneActorControl_TickJitter, SceneActorPlacement_ConsumeCallbackFlag, sub_081C4708, RecordList_InitializeSprites, Nidhoggr_UpdateDistanceLimitedEffect (constant 0x180 derived from 0x182 via `subs r3,#2` unless r3 is clobbered), StatusPanel_DrawDecimalValue (mask must be a copy of the const in r1)).
 

@@ -1,10 +1,9 @@
 #include "global.h"
-/* Vampire_GetBarrierCount: Getter for the same offset-0x384 counter that Count_DecrementBarrierCount decrements */
-#define Vampire_GetBarrierCount sub_08028DFC
+/* Count_GetBarrierCount: Getter for the same offset-0x384 counter that Count_DecrementBarrierCount decrements */
 
 u8 *SceneActors_GetBySlot(u32);
 
-u8 sub_08028DFC(void)
+u8 Count_GetBarrierCount(void)
 {
     u8 *p = SceneActors_GetBySlot(0);
     u8 r;

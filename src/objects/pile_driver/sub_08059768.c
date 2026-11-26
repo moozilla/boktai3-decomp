@@ -6,7 +6,7 @@ static inline s32 randomValue(void)
     offset = gRandomIndex * 2;
     return *(const u16 *)(offset + (u32)gRandomTable);
 }
-s32 PileDriverRig_SelectActiveSubject(struct ScenePanelRig *rig)
+s32 PileDriverRig_SelectActiveSubject(struct PileDriverRig *rig)
 {
     struct SceneRigParentView *parent = (void *)rig->parent;
     s32 count = PileDriverRig_GetActiveCount(rig);

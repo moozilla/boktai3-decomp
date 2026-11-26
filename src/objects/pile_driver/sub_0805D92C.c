@@ -1,6 +1,6 @@
-#include "objects/pile_driver/scene_panel_subject_tail.h"
-#include "objects/pile_driver/scene_panel_subject_playback.h"
-s32 PileDriverSubject_Initialize(struct ScenePanelSubject *subject,
+#include "objects/pile_driver/pile_driver_subject_tail.h"
+#include "objects/pile_driver/pile_driver_subject_playback.h"
+s32 PileDriverSubject_Initialize(struct PileDriverSubject *subject,
                                  const struct ContactPosition *home, u32 row, u32 variant,
                                  u32 initialState, u32 kind, u32 contactLimit, u32 colliderSetting,
                                  u32 appearDelay)
@@ -32,7 +32,7 @@ s32 PileDriverSubject_Initialize(struct ScenePanelSubject *subject,
             subject->paletteBank = 0x24C;
             Anim_SetSequence(&subject->sequence, subject->sequenceResource, 1, subject->sequenceRow,
                              subject->sequenceVariant);
-            ScenePanelSubject_StepPlayback(subject);
+            PileDriverSubject_StepPlayback(subject);
             Collider_Refresh(&subject->collider);
             break;
         case 4: {
@@ -42,7 +42,7 @@ s32 PileDriverSubject_Initialize(struct ScenePanelSubject *subject,
             subject->paletteBank = 0x24D;
             Anim_SetSequence(&subject->sequence, subject->sequenceResource, 3, subject->sequenceRow,
                              subject->sequenceVariant);
-            ScenePanelSubject_StepPlayback(subject);
+            PileDriverSubject_StepPlayback(subject);
             Collider_Refresh(&subject->collider);
             break;
     }

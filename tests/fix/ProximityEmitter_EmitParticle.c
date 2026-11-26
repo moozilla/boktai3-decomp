@@ -1,7 +1,7 @@
 // Regression: split cursor increment and masking before local allocation.
 // MATCHING_CONCESSION: register-pinning
 #include "engine/shared/proximity_emitter.h"
-void ProximityEmitter_EmitParticle(struct ProximityEmitter *emitter, void *resource)
+void TetherRing_EmitParticle(struct ProximityEmitter *emitter, void *resource)
 {
     u8 *next = &emitter->nextParticle;
     struct ProximityEmitterParticle *particle = &emitter->particles[*next];

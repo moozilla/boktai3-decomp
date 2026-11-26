@@ -24,7 +24,7 @@ and deletions differently from its register-aware instruction pairing.
 | Unit | Ordinary removal | Best or most informative natural trial | Remaining decision |
 | --- | --- | --- | --- |
 | `sub_08014CA4` / FragmentGroup_SpawnRadial | 106 / 106 | Global table sampler: 75 / 75 | PRE hoists two group-array bases; constant equivalence lowers table priority. |
-| `sub_080154EC` / AnimatedParticles_Create | 5 / 1 | Correct external prototype produces the same result | Jump2 merges two sequence-setting call tails which the ROM keeps separate. |
+| `sub_080154EC` / ImpactBurst_Create | 5 / 1 | Correct external prototype produces the same result | Jump2 merges two sequence-setting call tails which the ROM keeps separate. |
 | `sub_08016118` / FadingParticleGroup_Update | 43 / 43 | Removing the additional impossible lifetime guard: 48 / 46 | The clean expression reuses the earlier vertical-velocity load; pointer allocation also changes. |
 | `sub_0804373C` / ContactActor_UpdateRetreat | 13 / 8 | Removing the associated origin, union and once-loops: 85 / 86 | A high-register spill choice and the dead symbolic-origin lifetime. |
 | `sub_0805B0F0` / PileDriver_InitRig | 12 / 12 | Typed samples, indices, mask and lookup helper all preserve that result | Constant-equivalent table loses r4 to mask. |

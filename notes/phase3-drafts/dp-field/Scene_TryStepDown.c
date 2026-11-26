@@ -1,4 +1,4 @@
-s32 Scene_TryStepDown(struct SceneObject *actor, s32 index, s32 direction)
+s32 PuzzleBlock_TryStepDown(struct SceneObject *actor, s32 index, s32 direction)
 {
     struct SceneCell *reference = &actor->cellRef.cell;
     s32 savedIndex, neighbor;
@@ -74,7 +74,7 @@ s32 Scene_TryStepDown(struct SceneObject *actor, s32 index, s32 direction)
                         d;
                     });
                     {
-                        register void (*callback)(struct SceneObject *) = Scene_UpdateObjectStep;
+                        register void (*callback)(struct SceneObject *) = PuzzleBlock_UpdateObjectStep;
                         actor->update = callback;
                     }
                     actor->timer = 0;
@@ -112,7 +112,7 @@ s32 Scene_TryStepDown(struct SceneObject *actor, s32 index, s32 direction)
                         d;
                     });
                     {
-                        register void (*callback)(struct SceneObject *) = Scene_UpdateObjectStep;
+                        register void (*callback)(struct SceneObject *) = PuzzleBlock_UpdateObjectStep;
                         actor->update = callback;
                     }
                     actor->timer = 0;

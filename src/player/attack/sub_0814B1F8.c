@@ -66,7 +66,7 @@ s32 Math_Atan2(s32, s32);
 void Anim_SetKeyframes(void *, void *, u16, u16, u16);
 s32 Anim_Step(void *, void *);
 void ParticlePool_EmitTriple(void *, void *, s32, s32);
-u32 SceneMovingParticle_Create(void *, void *, s32, s32);
+u32 DebrisMote_Create(void *, void *, s32, s32);
 void PlayerCue_InitAttackCollider(void *, void *, s32, s32);
 s32 Div(s32, s32);
 void *TemporaryAnimationPool_CreateEntry(void *, u32, u32, s32, const void *);
@@ -303,7 +303,7 @@ void Player_UpdateTargetMotion(struct Player *p)
                 {
                     particlePosition.value = *(struct ContactPosition *)TGT_POS();
                     particlePosition.value.y += 30;
-                    SceneMovingParticle_Create(&particlePosition.value, &vel.value, 60, 1);
+                    DebrisMote_Create(&particlePosition.value, &vel.value, 60, 1);
                 }
             } else {
                 p->secondaryAnimation.position.x +=
@@ -390,7 +390,7 @@ void Player_UpdateTargetMotion(struct Player *p)
                 {
                     particlePosition2.value = *(struct ContactPosition *)TGT_POS();
                     particlePosition2.value.y += 30;
-                    SceneMovingParticle_Create(&particlePosition2.value, &vel2.value, 60, 1);
+                    DebrisMote_Create(&particlePosition2.value, &vel2.value, 60, 1);
                 }
             }
             p->tetherFrame++;

@@ -14,7 +14,7 @@ void SceneInput_InitGlyphPair(struct SceneInputPair *pair)
     }
     for (i = 0; i < 2; i++) {
         widget = &pair->widgets[i];
-        Widget_InitLinked(widget, pair, 0x7F, 0x31, 0, 0, 60, &position);
+        AnimSprite_InitLinked(widget, pair, 0x7F, 0x31, 0, 0, 60, &position);
         position.y += 8;
     }
 }

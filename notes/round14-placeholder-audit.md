@@ -103,7 +103,7 @@ diagnostic knobs were used only to identify mechanisms.
 | `SceneActorPlacement_PlayResponseAndResetState` (`08136AF0`) | `u8 new_var` | Test the mask result without a narrowing assignment. | 2 / 2; 348 bytes |
 | `Hresvelgr_UpdateRandomAnimation` (`081A117C`) | `struct ActorReaction **new_var3` | Access the existing actor pointer directly. | 10 / 10; 200 bytes |
 | `Storage_BeginCategoryMode` (`081BF440`) | `int new_var = -1` | Pass the sentinel directly in the description call. | 2 / 2; 220 bytes |
-| `TaggedSceneNpc_UpdateJumpToTarget` (`081D1E78`) | `struct Tagged *new_var` | Use the existing case-local tagged-state pointer. | 7 / 7; 420 bytes |
+| `Kuro_UpdateJumpToTarget` (`081D1E78`) | `struct Tagged *new_var` | Use the existing case-local tagged-state pointer. | 7 / 7; 420 bytes |
 | `ProjectileTask_SpawnTrailSprite` (`081D76F4`) | `unsigned char new_var` | Mask the computed heading directly in the accepted real-field implementation. | 1 / 1; 384 bytes |
 | `SceneActor_FindNearbyActivePlayer` (`src/monsters/mimic.c`, `080E7F54`) | `s16 new_var` | Square `delta->z` directly. | 7 / 7; 160-byte function |
 

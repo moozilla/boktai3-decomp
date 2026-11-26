@@ -397,14 +397,14 @@ void PlayStats_InitializeWidgets(struct PlayStatsScreen *screen)
 
     for (i = 0; i <= 7; i++) {
         dims.x = data[i];
-        Widget_InitLinked(&screen->entries[i], &screen->resources[0], 0, 0x30, 0, 0, 0x3c, &dims);
+        AnimSprite_InitLinked(&screen->entries[i], &screen->resources[0], 0, 0x30, 0, 0, 0x3c, &dims);
         AnimSprite_Hide(&screen->entries[i]);
     }
 
-    Widget_InitLinked(&screen->entries[8], &screen->resources[0], 0x3c, 0x30, 0, 0, 0x3c, NULL);
+    AnimSprite_InitLinked(&screen->entries[8], &screen->resources[0], 0x3c, 0x30, 0, 0, 0x3c, NULL);
 
     widget = &screen->entries[9];
-    Widget_InitLinked(widget, &screen->resources[1], 0x80, 0x30, 0, 0, 0x3c, NULL);
+    AnimSprite_InitLinked(widget, &screen->resources[1], 0x80, 0x30, 0, 0, 0x3c, NULL);
     widget->flags |= 1;
 }
 

@@ -18,6 +18,7 @@ import argparse
 import csv
 import glob
 import os
+from pathlib import Path
 import re
 import sys
 
@@ -43,18 +44,49 @@ def func_labels():
     return {label: mode for mode, label in found}
 
 
+def selected_aliases(path):
+    selections = {}
+    with path.open(newline="") as stream:
+        for row in csv.DictReader(stream):
+            addr, name = row["addr"].upper(), row["alias"]
+            label = f"sub_{addr}"
+            if not re.fullmatch(r"[0-9A-F]{8}", addr) or not name.isidentifier() or label in selections:
+                sys.exit(f"{path}: invalid or repeated alias selection at {addr}")
+            selections[label] = name
+    return selections
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--dry-run", action="store_true")
+    ap.add_argument("--only-table", type=Path, help="promote the selected addr,alias rows")
     args = ap.parse_args()
 
-    rows = list(csv.DictReader(open(CSV)))
+    with open(CSV, newline="") as stream:
+        reader = csv.DictReader(stream)
+        rows = list(reader)
+        fields = reader.fieldnames
+    for row in rows:
+        if extra := row.pop(None, ()):
+            # Older rows may have an unquoted comma in the final notes column.
+            row[fields[-1]] = ",".join((row[fields[-1]], *extra))
     by_addr = {r["addr"].upper(): r["name"] for r in rows}
     names = set(by_addr.values())
     labels = func_labels()
+    selected = selected_aliases(args.only_table) if args.only_table else None
     alias = {}  # sub_X -> Name
+    alternatives = {}
     for path in sources():
-        for name, label, _ in ALIAS.findall(open(path).read()):
+        with open(path) as stream:
+            definitions = ALIAS.findall(stream.read())
+        for name, label, _ in definitions:
+            if selected is not None:
+                if label not in selected or label[4:] in by_addr:
+                    continue
+                if name != selected[label]:
+                    if alternatives.setdefault(name, label) != label:
+                        sys.exit(f"{name} aliases multiple selected addresses")
+                    continue
             if label not in labels:
                 # already named (gen/ labels it by name) or a hidden boundary: never rewrite
                 # the alias to `#define Alias ExistingName`, report the disagreement instead
@@ -77,22 +109,33 @@ def main():
     if errors:
         sys.exit("\n".join(errors))
 
+    if selected is not None:
+        for label, name in selected.items():
+            if label not in alias and label[4:] not in by_addr:
+                print(f"skip {label}: {name} has no promotable source alias", file=sys.stderr)
     new = {label: name for label, name in alias.items() if label[4:] not in by_addr}
     # Workers based on an older checkout can still call a previously promoted
     # sub_ label. Normalize those references as well as this batch's aliases.
-    renames = {"sub_" + addr: name for addr, name in by_addr.items()}
+    renames = {"sub_" + addr: name for addr, name in by_addr.items()} if selected is None else {}
     renames.update(alias)
     print(f"{len(alias)} aliases, {len(new)} new names for functions.csv")
-    if args.dry_run:
+    if args.dry_run or (selected is not None and not alias):
         return
 
-    ref = re.compile(r"\bsub_[0-9A-F]{8}\b")
+    rewrites = {name: alias[label] for name, label in alternatives.items() if label in alias}
+    for name in rewrites:
+        if name in names or name in alias.values():
+            sys.exit(f"{name} is both an alternate alias and a function name")
+    rewrites.update(renames)
+    pattern = (r"sub_[0-9A-F]{8}" if selected is None else "(?:" + "|".join(map(re.escape, rewrites)) + ")")
+    ref = re.compile(r"\b" + pattern + r"\b(?!\.[ch]\b)")
     changed = 0
     for path in sources():
         text = open(path).read()
         out = ALIAS.sub(lambda m: ((m.group(3) or "").strip() + "\n").lstrip("\n")
-                        if renames.get(m.group(2)) == m.group(1) else m.group(0), text)
-        out = ref.sub(lambda m: renames.get(m.group(0), m.group(0)), out)
+                        if ((selected is not None and m.group(2) in alias)
+                            or renames.get(m.group(2)) == m.group(1)) else m.group(0), text)
+        out = ref.sub(lambda m: rewrites.get(m.group(0), m.group(0)), out)
         if out != text:
             open(path, "w").write(out)
             changed += 1
@@ -102,12 +145,12 @@ def main():
     ld = os.path.join(ROOT, "symbols", "ram.ld")
     text = open(ld).read()
     out = re.sub(r"^(\w+) = (sub_[0-9A-F]{8});\n",
-                 lambda m: "" if renames.get(m.group(2)) == m.group(1) else m.group(0), text, flags=re.M)
-    out = ref.sub(lambda m: renames.get(m.group(0), m.group(0)), out)
+                 lambda m: "" if rewrites.get(m.group(2)) == rewrites.get(m.group(1), m.group(1))
+                 else m.group(0), text, flags=re.M)
+    out = ref.sub(lambda m: rewrites.get(m.group(0), m.group(0)), out)
     if out != text:
         open(ld, "w").write(out)
 
-    fields = list(rows[0].keys())
     for label, name in new.items():
         rows.append({"addr": label[4:], "name": name, "mode": "arm" if labels[label] == "arm" else "thumb",
                      "confidence": "low", "source": "src-alias", "notes": ""})

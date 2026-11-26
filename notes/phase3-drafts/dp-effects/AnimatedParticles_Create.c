@@ -48,7 +48,7 @@ struct Config {
         verticalDecayRange, horizontalStart, horizontalStartRange, horizontalDecay,
         horizontalDecayRange;
 };
-struct Manager *AnimatedParticleManager_Create(int, int);
+struct Manager *ImpactBurstManager_Create(int, int);
 int Mod(int, int);
 void AnimData_SelectPaletteBank(void *, int);
 int AnimatedParticle_PriorityFromFlags(int);
@@ -74,14 +74,14 @@ static inline u32 frame_factor(u16 v)
 {
     return DisplaySequence_MaskCommand(v, 15);
 }
-int AnimatedParticles_Create(int count, struct Vec *pos, struct Config *c)
+int ImpactBurst_Create(int count, struct Vec *pos, struct Config *c)
 {
     int i, emitted;
     u16 *table;
     u32 *index;
     if ((*(struct Manager **)&gAnimatedParticleManager))
         goto start;
-    if (AnimatedParticleManager_Create(0, 0))
+    if (ImpactBurstManager_Create(0, 0))
         goto start;
     goto failure;
 success:

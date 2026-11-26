@@ -47,7 +47,7 @@ static inline u8 HasBits(u16 *p)
         return 0;
     return 1;
 }
-void NamedObject_RegisterFollowCells(struct NamedObject *objectArg)
+void MovingPlatform_RegisterFollowCells(struct NamedObject *objectArg)
 {
     register struct NamedObject *object = objectArg;
     struct NamedObjectManager *manager = gNamedActorManager;

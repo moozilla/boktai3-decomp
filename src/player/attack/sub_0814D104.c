@@ -1,6 +1,6 @@
 #include "global.h"
 #include "player/player.h"
-#include "objects/scene_objects/scene_object.h"
+#include "objects/scene_object.h"
 #include "system/game_state/game_state.h"
 s32 Div(s32, s32);
 u32 SunClock_GetPhase(void);

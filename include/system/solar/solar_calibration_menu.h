@@ -45,7 +45,7 @@ struct SolarCalibrationMenu *SolarCalibration_Create(void);
 void Menu_EraseRect(s32 a, s32 b, s32 c, s32 d);
 void Menu_DrawText(s32 left, s32 row, const u8 *s);
 void Menu_DrawStringRef(s32 column, s32 row, const void *source, s32 index);
-void Menu_SetTextRect(struct AnimSprite *widget, const struct ContactPosition *position);
+void Menu_SetTextRect(struct AnimSprite *animSprite, const struct ContactPosition *position);
 void Menu_SetBackgroundMap(void *p, u32 b);
 void Menu_StartFadeIn(u32 a);
 void Menu_StartFadeOut(u32 a);

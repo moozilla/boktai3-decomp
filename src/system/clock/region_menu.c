@@ -194,7 +194,7 @@ void BgGfx_LoadTilemapSimple(u32, u32, u32, u32, u32);
 
 void Bg_SetupLayers(u32, u32, void *, u32, u32, u32, u32 *);
 
-void Widget_InitLinked(void *, void *, u32, u32, u32, u32, u32, u32);
+void AnimSprite_InitLinked(void *, void *, u32, u32, u32, u32, u32, u32);
 
 void Menu_StartFadeIn(u32);
 
@@ -250,15 +250,15 @@ s32 Time_LoadRegionList(struct RegionMenu *menu)
     menu->page = menu->entries[menu->selected].group;
     res = ScriptProc_Start(0xCB05, 0xE2AB);
     ResourceHeader_Relocate(menu->anims[0].resource, res);
-    Widget_InitLinked(&menu->anims[0], menu->anims[0].resource, 0x35, 0x10, 0, 0, 0, 0);
+    AnimSprite_InitLinked(&menu->anims[0], menu->anims[0].resource, 0x35, 0x10, 0, 0, 0, 0);
     ResourceHeader_Relocate(menu->anims[1].resource, res);
-    Widget_InitLinked(&menu->anims[1], menu->anims[1].resource, (u16)(menu->page + 0x18), 0x10, 0,
+    AnimSprite_InitLinked(&menu->anims[1], menu->anims[1].resource, (u16)(menu->page + 0x18), 0x10, 0,
                       0, 0, 0);
     res = ScriptProc_Start(0xCB05, 0x530D);
     ResourceHeader_Relocate(menu->anims[2].resource, res);
-    Widget_InitLinked(&menu->anims[2], menu->anims[2].resource, 0x8a, 0x10, 0, 0, 0, 0);
+    AnimSprite_InitLinked(&menu->anims[2], menu->anims[2].resource, 0x8a, 0x10, 0, 0, 0, 0);
     ResourceHeader_Relocate(menu->anims[3].resource, res);
-    Widget_InitLinked(&menu->anims[3], menu->anims[3].resource, 0x48, 0x10, 0, 0, 0, 0);
+    AnimSprite_InitLinked(&menu->anims[3], menu->anims[3].resource, 0x48, 0x10, 0, 0, 0, 0);
     menu->anims[3].flags |= 1;
     Time_ShowRegionMenu(menu);
     {

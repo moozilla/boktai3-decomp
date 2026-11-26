@@ -1,4 +1,4 @@
-void Scene_SpawnDirectionalDust(struct SceneObject *actor)
+void PuzzleBlock_SpawnDirectionalDust(struct SceneObject *actor)
 {
     struct SceneExtent size;
     struct SceneExtent point;

@@ -1,5 +1,5 @@
 #include "objects/pile_driver/pile_driver_rig.h"
-void PileDriverRig_TickHideBurst(struct ScenePanelRig *rig)
+void PileDriverRig_TickHideBurst(struct PileDriverRig *rig)
 {
     struct ContactPackedVector extent;
     u16 *counter;

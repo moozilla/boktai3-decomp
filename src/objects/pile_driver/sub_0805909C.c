@@ -1,7 +1,7 @@
 #include "objects/pile_driver/pile_driver_schedule.h"
-void PileDriver_TickHazardSpawner(struct ScenePanel *input)
+void PileDriver_TickHazardSpawner(struct PileDriver *input)
 {
-    struct ScenePanelScheduleView *panel = (void *)input;
+    struct PileDriverScheduleView *panel = (void *)input;
     if (++panel->frame >= panel->interval) {
         struct ContactPackedVector position;
         position.x = gGameState->positionX;

@@ -673,16 +673,16 @@ s32 PasswordMenu_Initialize(struct PasswordMenu *s)
     resource = ScriptProc_Start(0xCB05, 0xE2AB);
     firstResource = &s->widgets[0].resource;
     ResourceHeader_Relocate(firstResource, resource);
-    Widget_InitLinked(&s->widgets[0].sprite, firstResource, 0x39, 0x10, zero, zero, zero, zero);
+    AnimSprite_InitLinked(&s->widgets[0].sprite, firstResource, 0x39, 0x10, zero, zero, zero, zero);
     secondResource = (u8 *)&s->widgets[1].resource;
     ResourceHeader_Relocate(secondResource, resource);
-    Widget_InitLinked(&s->widgets[1].sprite, secondResource, 0x16, 0x10, zero, zero, zero, zero);
+    AnimSprite_InitLinked(&s->widgets[1].sprite, secondResource, 0x16, 0x10, zero, zero, zero, zero);
     graphics = &s->widgets[2].resource;
     ResourceHeader_Relocate(graphics, resource);
-    Widget_InitLinked(&s->widgets[2].sprite, graphics, 0x18, 0x10, zero, zero, zero, zero);
+    AnimSprite_InitLinked(&s->widgets[2].sprite, graphics, 0x18, 0x10, zero, zero, zero, zero);
     graphics = &s->widgets[3].resource;
     ResourceHeader_Relocate(graphics, resource);
-    Widget_InitLinked(&s->widgets[3].sprite, graphics, 0x32, 0x10, zero, zero, zero, zero);
+    AnimSprite_InitLinked(&s->widgets[3].sprite, graphics, 0x32, 0x10, zero, zero, zero, zero);
     {
         u32 *save = (u32 *)(&s->savedKeyPalette);
         u32 old;
@@ -707,11 +707,11 @@ s32 PasswordMenu_Initialize(struct PasswordMenu *s)
     graphics = (u8 *)s + offA;
     ResourceHeader_Relocate(graphics, resource);
     offB = (u32) & ((struct PasswordMenu *)0)->widgets[4].sprite;
-    Widget_InitLinked((u8 *)s + offB, graphics, 0x8C, 0x10, one, zero, zero, zero);
+    AnimSprite_InitLinked((u8 *)s + offB, graphics, 0x8C, 0x10, one, zero, zero, zero);
     offB = (u32) & ((struct PasswordMenu *)0)->widgets[5].resource;
     graphics = (u8 *)s + offB;
     ResourceHeader_Relocate(graphics, resource);
-    Widget_InitLinked(&s->widgets[5].sprite, graphics, 0x8D, 0x10, zero, zero, zero, zero);
+    AnimSprite_InitLinked(&s->widgets[5].sprite, graphics, 0x8D, 0x10, zero, zero, zero, zero);
     *(u32 *)(&s->widgets[4].sprite.flags) &= ~1;
     *(u32 *)(&s->widgets[5].sprite.flags) |= one;
     {
@@ -859,7 +859,7 @@ s32 PasswordDisplay_Initialize(struct PasswordDisplay *p)
     CpuSet(((struct PasswordMenuPalette *)ScriptProc_Start(0x92b3, 0x204))->colors,
            gBgPaletteBuffer, 0x100);
     ResourceHeader_Relocate(&p->resource, ScriptProc_Start(0xcb05, 0xe2ab));
-    Widget_InitLinked(&p->widget, &p->resource, 0x39, 0x10, 0, 0, 0, 0);
+    AnimSprite_InitLinked(&p->widget, &p->resource, 0x39, 0x10, 0, 0, 0, 0);
 
     w = &p->windows[0];
     if ((*w = TextWindow_Create(2, 5, 28, 2)) < 0)

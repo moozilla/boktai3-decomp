@@ -2,7 +2,7 @@
 #include "engine/engine.h"
 #include "system/game_state/game_state_flags.h"
 #include "player/player.h"
-#include "objects/scene_objects/scene_object.h"
+#include "objects/scene_object.h"
 #include "player/cues/player_cue.h"
 #include "player/player_slot_status.h"
 

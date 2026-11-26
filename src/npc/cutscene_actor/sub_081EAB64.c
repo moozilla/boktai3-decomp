@@ -35,8 +35,8 @@ void ScreenTransition_SendCommand(s32, s32, s32, s32, s32, s32, s32);
 void Palette_InterpolateBanks(void *, void *, void *, s32, s32);
 s32 Mod(s32, s32);
 void TimeDisplay_SetSelectionKeyframe(void *);
-void Actor_HideAuxiliarySprites(void *);
-void Actor_UpdatePairedSpriteAnimation(void *);
+void TutorialOtenko_HideAuxiliarySprites(void *);
+void TutorialOtenko_UpdatePairedSpriteAnimation(void *);
 void Anim_LoadKeyframe(void *, void *, u16, s32);
 void TimeDisplay_HideAnimatedObjects(void *);
 void Script_Call(void *, void *);
@@ -214,7 +214,7 @@ void CutsceneDisplay_UpdateDisplay(struct Display *p)
                 p->state = 8;
                 p->widgets[2].flags &= ~1;
                 TimeDisplay_SetSelectionKeyframe(p);
-                Actor_HideAuxiliarySprites(p);
+                TutorialOtenko_HideAuxiliarySprites(p);
             } else if (Mod(p->stateTimer, 4) == 0) {
                 if (p->widgets[2].flags & 1)
                     p->widgets[2].flags &= ~1;
@@ -267,7 +267,7 @@ void CutsceneDisplay_UpdateDisplay(struct Display *p)
                     break;
                 }
             }
-            Actor_UpdatePairedSpriteAnimation(p);
+            TutorialOtenko_UpdatePairedSpriteAnimation(p);
             p->idleTimer++;
             break;
         case 9:
@@ -282,7 +282,7 @@ void CutsceneDisplay_UpdateDisplay(struct Display *p)
             p->state = 10;
             break;
         case 10:
-            Actor_UpdatePairedSpriteAnimation(p);
+            TutorialOtenko_UpdatePairedSpriteAnimation(p);
             if (p->stateTimer <= 4) {
                 Anim_LoadKeyframe(&p->widgets[5], p->keyframes, 6, 0);
             }
@@ -315,7 +315,7 @@ void CutsceneDisplay_UpdateDisplay(struct Display *p)
             p->state = 12;
             break;
         case 12:
-            Actor_UpdatePairedSpriteAnimation(p);
+            TutorialOtenko_UpdatePairedSpriteAnimation(p);
             if (p->stateTimer <= 4) {
                 Anim_LoadKeyframe(&p->widgets[4], p->keyframes, 10, 0);
             }

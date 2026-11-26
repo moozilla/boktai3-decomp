@@ -1,11 +1,11 @@
 Background_LoadMapsFromScript	as is	8	solved in compiler; C search at 8 bytes	8	53	
 ChoiceMenu_CreateFromScript	as is	51	partial in compiler (37 left); C search at ? bytes	?	81	
-DirectionalController_CheckRemaining	as is	None	no solution; too far for C search		1	
+InteractionPrompt_CheckRemaining	as is	None	no solution; too far for C search		1	
 CircleWindow_GenerateScanlines	as is	9	partial in compiler (4 left); C search at 9 bytes	9	140	
 ResultGame_UpdatePlayerMarker	as is	23	partial in compiler (12 left); C search at 2 bytes	2	240	
-SceneObjects_ScriptRaise	as is	24	partial in compiler (20 left); C search at 23 bytes	23	124	
-SceneObject_BeginLowering	as is	10	partial in compiler (8 left); C search at 7 bytes	7	42	
-SceneObject_UpdateLowered	as is	7	TRANSLATED	0	19	wip/deep/out0/SceneObject_UpdateLowered/match-as_is.c
+SlidingDoors_ScriptRaise	as is	24	partial in compiler (20 left); C search at 23 bytes	23	124	
+SlidingDoor_BeginLowering	as is	10	partial in compiler (8 left); C search at 7 bytes	7	42	
+SlidingDoor_UpdateLowered	as is	7	TRANSLATED	0	19	wip/deep/out0/SlidingDoor_UpdateLowered/match-as_is.c
 SceneActors_SpawnAmbientParticlePair	as is	61	partial in compiler (29 left); C search at 3 bytes	3	189	
 SceneActorAnimation_UpdateChargeShotRelease	as is	38	partial in compiler (29 left); C search at 38 bytes	38	100	
 SceneActors_UpdateDirectionalTurn	as is	28	partial in compiler (19 left); C search at 28 bytes	28	293	
@@ -43,7 +43,7 @@ ActorAttachment_UpdateValueFrame	as is	48	partial in compiler (7 left); C search
 SceneActorControl_TickJitter	as is	33	partial in compiler (31 left); C search at 31 bytes	31	80	
 SceneActorControl_TryActivateNearby	as is	30	partial in compiler (21 left); C search at 26 bytes	26	319	
 SceneParticle_UpdateSlot	as is	63	partial in compiler (62 left); C search at 53 bytes	53	183	
-BurstEmitter_EmitFrame	as is	38	partial in compiler (26 left); C search at ? bytes	?	130	
+SparkExplosion_EmitFrame	as is	38	partial in compiler (26 left); C search at ? bytes	?	130	
 SpriteEffectController_UpdatePool	as is	12	solved in compiler; C search at 12 bytes	12	118	
 SceneSteeringActor_DestroyPool	as is	19	partial in compiler (18 left); C search at 18 bytes	18	161	
 RouteSpriteActor_Create	as is	48	partial in compiler (39 left); C search at 35 bytes	35	296	
@@ -67,19 +67,19 @@ SceneActorControl_RestartPositionCurve	as is	37	partial in compiler (25 left); C
 SceneActorControl_ConsumePendingEntry	as is	44	partial in compiler (38 left); C search at 14 bytes	14	223	
 AnimatedTile_CreateFromScript	as is	25	partial in compiler (16 left); C search at 4 bytes	4	388	
 SceneActors_EmitRandomBursts	as is	61	partial in compiler (29 left); C search at 3 bytes	3	200	
-Actor_TryInteraction	as is	49	partial in compiler (29 left); C search at 45 bytes	45	167	
-Actor_OnInteractionChildRelease	as is	10	partial in compiler (5 left); C search at 5 bytes	5	26	
-Actor_UpdateProjectedEntryAnimation	as is	27	partial in compiler (26 left); C search at 23 bytes	23	349	
-Actor_UpdateShadowedRestAnimation	as is	44	partial in compiler (37 left); C search at 41 bytes	41	194	
-Actor_MoveAlongCurveToRest	as is	54	partial in compiler (49 left); C search at 42 bytes	42	257	
-Actor_UpdateBlinkBurstDisappearance	as is	51	partial in compiler (44 left); C search at ? bytes	?	1996	
+TutorialOtenko_TryInteraction	as is	49	partial in compiler (29 left); C search at 45 bytes	45	167	
+TutorialOtenko_OnInteractionChildRelease	as is	10	partial in compiler (5 left); C search at 5 bytes	5	26	
+TutorialOtenko_UpdateProjectedEntryAnimation	as is	27	partial in compiler (26 left); C search at 23 bytes	23	349	
+TutorialOtenko_UpdateShadowedRestAnimation	as is	44	partial in compiler (37 left); C search at 41 bytes	41	194	
+TutorialOtenko_MoveAlongCurveToRest	as is	54	partial in compiler (49 left); C search at 42 bytes	42	257	
+TutorialOtenko_UpdateBlinkBurstDisappearance	as is	51	partial in compiler (44 left); C search at ? bytes	?	1996	
 Route_Start	as is	24	partial in compiler (14 left); C search at 6 bytes	6	113	
 sub_0822216C	as is	10	partial in compiler (2 left); C search at 2 bytes	2	48	
 GridAttackActor_UpdateElevatedGridAttack	as is	49	partial in compiler (36 left); C search at 49 bytes	49	241	
 EffectParticle_UpdateHomingWide	as is	36	partial in compiler (23 left); C search at 36 bytes	36	284	
 EffectParticle_UpdateFinish	as is	15	partial in compiler (13 left); C search at 7 bytes	7	236	
 OrbitingParticles_Update	as is	41	partial in compiler (31 left); C search at ? bytes	?	55	
-Scene_StopSelectedObject	as is	10	solved in compiler; C search at 6 bytes	6	157	
+PuzzleBlock_StopSelectedObject	as is	10	solved in compiler; C search at 6 bytes	6	157	
 Presentation_SetItemGraphic	as is	10	partial in compiler (9 left); C search at 9 bytes	9	35	
 StatusScreen_WaitForStart	as is	12	partial in compiler (9 left); C search at 9 bytes	9	27	
 TetherActor_BlendPalette	as is	6	solved in compiler; C search at 2 bytes	2	54	
@@ -91,12 +91,12 @@ WirelessGameItems_UpdateOutgoingItem	as is	30	partial in compiler (25 left); C s
 WirelessGameItems_QueueIncomingItem	as is	55	partial in compiler (25 left); C search at 37 bytes	37	292	
 Background_Initialize	as is	26	partial in compiler (6 left); C search at 22 bytes	22	553	
 ChoiceMenu_HandleInput	as is	29	partial in compiler (17 left); C search at ? bytes	?	65	
-CollisionController_UpdateIdleAnimation	as is	13	partial in compiler (8 left); C search at 13 bytes	13	505	
-AnimatedParticleManager_Update	as is	64	partial in compiler (18 left); C search at 8 bytes	8	629	
+StrikeTrap_UpdateIdleAnimation	as is	13	partial in compiler (8 left); C search at 13 bytes	13	505	
+ImpactBurstManager_Update	as is	64	partial in compiler (18 left); C search at 8 bytes	8	629	
 SpritePool_AdvanceAnimation	as is	37	partial in compiler (29 left); C search at 24 bytes	24	273	
 ResultTutorial_AnimateLevel	as is	59	partial in compiler (26 left); C search at 9 bytes	9	73	
-SceneObjects_ScriptLower	as is	26	partial in compiler (16 left); C search at 6 bytes	6	187	
-SceneObject_UpdateRaised	as is	8	solved in compiler; C search at 4 bytes	4	96	
+SlidingDoors_ScriptLower	as is	26	partial in compiler (16 left); C search at 6 bytes	6	187	
+SlidingDoor_UpdateRaised	as is	8	solved in compiler; C search at 4 bytes	4	96	
 SceneCommands_FadePalette	as is	25	partial in compiler (10 left); C search at 10 bytes	10	81	
 SceneActorAnimation_TransitionVariant	as is	3	solved in compiler; C search at 3 bytes	3	199	
 SceneActorAnimation_UpdateFlashAlternatingRepeat	as is	28	partial in compiler (1 left); C search at 7 bytes	7	436	
@@ -134,7 +134,7 @@ ActorAttachment_TickAscendingSprite	as is	50	partial in compiler (43 left); C se
 ActorAttachment_TickManager	as is	18	partial in compiler (13 left); C search at 18 bytes	18	30	
 SceneActorControl_TickActive	as is	48	partial in compiler (38 left); C search at 28 bytes	28	335	
 SceneParticleBurst_UpdateSlot	as is	46	partial in compiler (42 left); C search at 42 bytes	42	294	
-BouncingObject_Allocate	as is	28	partial in compiler (17 left); C search at 3 bytes	3	54	
+BouncingBomb_Allocate	as is	28	partial in compiler (17 left); C search at 3 bytes	3	54	
 SpriteEffectController_TickAnimation	as is	21	partial in compiler (9 left); C search at 21 bytes	21	272	
 SceneSteeringActor_DestroySlot	as is	26	partial in compiler (16 left); C search at 5 bytes	5	212	
 RouteSpriteActor_FinishAnimation	as is	2	solved in compiler; C search at 2 bytes	2	166	
@@ -159,19 +159,19 @@ SceneActorControl_TickVisibility	as is	35	partial in compiler (24 left); C searc
 sub_08091E58	as is	15	partial in compiler (9 left); C search at 15 bytes	15	76	
 ConvergingEffects_EmitNearParticle	as is	19	partial in compiler (17 left); C search at 2 bytes	2	148	
 SceneCharacter_PlaceFromScript	as is	7	TRANSLATED	0	16	wip/deep/out1/SceneCharacter_PlaceFromScript/match-as_is.c
-Actor_SelectNearestInteraction	as is	40	partial in compiler (8 left); C search at 32 bytes	32	284	
-Actor_UpdateCompactEntryAnimation	as is	48	partial in compiler (40 left); C search at 45 bytes	45	252	
-Actor_UpdateSilentProjectedEntryAnimation	as is	27	partial in compiler (26 left); C search at 23 bytes	23	335	
-Actor_UpdateLargeRestAnimation	as is	43	partial in compiler (36 left); C search at 40 bytes	40	184	
-Actor_UpdateNotifyingAnimation	as is	22	partial in compiler (16 left); C search at 17 bytes	17	166	
-Actor_UpdateFinishingAnimation	as is	60	partial in compiler (53 left); C search at 55 bytes	55	149	
+TutorialOtenko_SelectNearestInteraction	as is	40	partial in compiler (8 left); C search at 32 bytes	32	284	
+TutorialOtenko_UpdateCompactEntryAnimation	as is	48	partial in compiler (40 left); C search at 45 bytes	45	252	
+TutorialOtenko_UpdateSilentProjectedEntryAnimation	as is	27	partial in compiler (26 left); C search at 23 bytes	23	335	
+TutorialOtenko_UpdateLargeRestAnimation	as is	43	partial in compiler (36 left); C search at 40 bytes	40	184	
+TutorialOtenko_UpdateNotifyingAnimation	as is	22	partial in compiler (16 left); C search at 17 bytes	17	166	
+TutorialOtenko_UpdateFinishingAnimation	as is	60	partial in compiler (53 left); C search at 55 bytes	55	149	
 sub_08221D40	as is	10	partial in compiler (2 left); C search at 10 bytes	10	31	
 GridAttackActor_EmitSpriteParticles	as is	63	partial in compiler (31 left); C search at 3 bytes	3	321	
 EffectManager_UpdateAll	as is	9	partial in compiler (4 left); C search at 9 bytes	9	137	
 EffectParticle_UpdateHoming	as is	32	partial in compiler (18 left); C search at 26 bytes	26	367	
 Trigger_RunScript	as is	24	partial in compiler (18 left); C search at ? bytes	?	24	
-Breakable_InitSlot	as is	38	partial in compiler (28 left); C search at 18 bytes	18	213	
-SceneObjects_CreateObject	as is	9	partial in compiler (6 left); C search at ? bytes	?	56	
+LightFixture_InitSlot	as is	38	partial in compiler (28 left); C search at 18 bytes	18	213	
+PuzzleBlock_CreateObject	as is	9	partial in compiler (6 left); C search at ? bytes	?	56	
 SelectionMenu_Choose	as is	61	partial in compiler (59 left); C search at 36 bytes	36	357	
 TerrainOverlay_Initialize	as is	22	partial in compiler (13 left); C search at ? bytes	?	3	
 TetherActor_StartInteractionEffect	as is	33	partial in compiler (17 left); C search at 13 bytes	13	129	

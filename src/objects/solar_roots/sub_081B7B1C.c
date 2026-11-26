@@ -12,16 +12,16 @@ struct GrowthHazardManager {
 extern const u32 gUnk_08612154[];
 void Sound_PlaySong(u32);
 
-static inline u16 GrowthHazard_ReadColor(const u16 *color)
+static inline u16 SolarRoot_ReadColor(const u16 *color)
 {
     return *color;
 }
-static inline u32 GrowthHazard_ReadBank(const u32 *bank)
+static inline u32 SolarRoot_ReadBank(const u32 *bank)
 {
     return *bank;
 }
 
-static inline u32 GrowthHazard_MaskChannel(u32 value, const u32 *mask)
+static inline u32 SolarRoot_MaskChannel(u32 value, const u32 *mask)
 {
     return value & *mask;
 }
@@ -47,20 +47,20 @@ void SolarRoot_UpdateSharedFlash(struct GrowthHazardManager *manager)
                 CpuSet(gPaletteBankData + 0x1AA0, manager->palette[channel], 0x04000008);
             else if (manager->flash[channel] > 15) {
                 const u32 *banks = gUnk_08612154;
-                CpuSet(gPaletteBankData + GrowthHazard_ReadBank(banks + channel) * 32,
+                CpuSet(gPaletteBankData + SolarRoot_ReadBank(banks + channel) * 32,
                        manager->palette[channel], 0x04000008);
             } else {
                 s32 flash = manager->flash[channel];
                 s32 inverse = 16 - flash;
                 const u32 *banks = gUnk_08612154;
-                u16 *from = (u16 *)(gPaletteBankData + GrowthHazard_ReadBank(banks + channel) * 32);
+                u16 *from = (u16 *)(gPaletteBankData + SolarRoot_ReadBank(banks + channel) * 32);
                 u16 *to = (u16 *)(gPaletteBankData + 0x1AA0);
                 s32 colorIndex;
                 u32 channelMask;
                 colorIndex = 0;
                 channelMask = 31;
                 do {
-                    u32 fromColor = GrowthHazard_ReadColor(from);
+                    u32 fromColor = SolarRoot_ReadColor(from);
                     s32 fromRed = 31;
                     s32 fromGreen;
                     u32 toColor;
@@ -70,17 +70,17 @@ void SolarRoot_UpdateSharedFlash(struct GrowthHazardManager *manager)
                     fromRed &= fromColor;
                     fromColor <<= 16;
                     fromGreen = fromColor >> 21;
-                    fromGreen = GrowthHazard_MaskChannel(fromGreen, &channelMask);
+                    fromGreen = SolarRoot_MaskChannel(fromGreen, &channelMask);
                     fromColor >>= 26;
-                    fromColor = GrowthHazard_MaskChannel(fromColor, &channelMask);
-                    toColor = GrowthHazard_ReadColor(to);
+                    fromColor = SolarRoot_MaskChannel(fromColor, &channelMask);
+                    toColor = SolarRoot_ReadColor(to);
                     toRed = 31;
                     toRed &= toColor;
                     toColor <<= 16;
                     toGreen = toColor >> 21;
-                    toGreen = GrowthHazard_MaskChannel(toGreen, &channelMask);
+                    toGreen = SolarRoot_MaskChannel(toGreen, &channelMask);
                     toColor >>= 26;
-                    toColor = GrowthHazard_MaskChannel(toColor, &channelMask);
+                    toColor = SolarRoot_MaskChannel(toColor, &channelMask);
                     red = (fromRed * flash + toRed * inverse) >> 4;
                     green = (fromGreen * flash + toGreen * inverse) >> 4;
                     blue = ((s32)fromColor * flash + (s32)toColor * inverse) >> 4;

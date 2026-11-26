@@ -3,7 +3,7 @@
 #include "engine/engine.h"
 #include "engine/ram.h"
 #include "player/target_registry/target_registry.h"
-#include "objects/scene_objects/scene_object.h"
+#include "objects/scene_object.h"
 #include "scene/collision/contact_collider.h"
 #include "engine/video/render.h"
 

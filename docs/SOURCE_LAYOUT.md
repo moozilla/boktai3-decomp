@@ -50,6 +50,8 @@ list the evidence and the names still awaiting confirmation.
   (`PileDriver_`, `VanargandHead_`, `Sabata_`, `Shop_`), never a registry key,
   slot or address. One-function files are named after their function
   (`Hresvelgr_Create.c`); an unnamed function keeps `sub_XXXXXXXX.c`.
+  If the symbol ends in a disambiguating address, preserve that suffix in
+  the filename too.
 * Headers sit beside their object under the mirrored path in `include/`, at
   most two directories deep (`#include "monsters/ghoul.h"`,
   `#include "objects/pile_driver/pile_driver_rig.h"`); a three-level source
@@ -98,6 +100,10 @@ list the evidence and the names still awaiting confirmation.
 | Warp Circle, Solar Stand, deck cannons, wooden crate, switches, Bat Curtain | `src/objects/<name>/` |
 | Treasure chests and dropped items | `src/objects/items/` |
 | Townspeople, story characters, cutscene actors | `src/npc/` |
+| Otenko field dialogue, Kuro, and Otenko's tutorial | `src/npc/otenko/`, `src/npc/kuro/`, `src/ui/title/tutorial_otenko.c` |
+| Route platforms, passage barriers, and breakable loot deposits | `src/objects/moving_platforms/`, `src/objects/passage_barriers/`, `src/objects/loot_deposits/` |
+| Puzzle blocks, sliding doors, lanterns, ice boulders, and quest barriers | `src/objects/puzzle_blocks.c`, `src/objects/sliding_doors/`, `src/objects/light_fixtures.c`, `src/objects/ice_boulders.c`, `src/objects/quest_barriers/` |
+| Floor traps, strike traps, Pile Traps, and bouncing bombs | `src/objects/floor_traps.c`, `src/objects/strike_traps.c`, `src/player/pile_trap/`, `src/objects/bouncing_bombs/` |
 | Timed sprites created by story characters | `src/effects/sprites/timed_character_effects/` |
 | The solar sensor, solar level, calibration | `src/system/solar/` |
 | Clock, sunrise and sunset, region setting | `src/system/clock/` (RTC driver `src/lib/rtc/`) |
@@ -168,22 +174,35 @@ unique owner reports which table to update.
 
 ### Replay on a worker branch
 
-1. Bring `tools/reorg.py`, `tools/source_layout.py`, and the three placement
-   tables from `main` onto the worker branch.
+1. Bring `tools/reorg.py`, `tools/source_layout.py`, `tools/promote_names.py`,
+   and the placement and rename tables listed below from `main` onto the
+   worker branch.
 2. Run `python3 tools/reorg.py` from the repository root. The preview should
    succeed, and every destination should use the current top-level layout.
 3. Run `python3 tools/reorg.py --apply`, then `python3 tools/reorg.py --check`.
-4. Commit the replay and merge `main` with a high rename limit, for example
+4. Run `make disasm`, then `python3 tools/promote_names.py --only-table
+   symbols/function_aliases.csv` to promote the selected address aliases.
+5. Run `python3 tools/reorg.py --function-renames symbols/function_renames.csv
+   --skip-diverged --apply`. Review every reported skip. The address table
+   accepts the reviewed earlier spellings and reports a branch's own name.
+6. Run `python3 tools/reorg.py --function-prefixes symbols/prefix_renames.csv
+   --apply`. The prefix rules follow defining files, including branch-added
+   functions and file-local helpers in the recorded directories.
+7. Run `python3 tools/reorg.py --type-renames symbols/type_renames.csv --apply`.
+8. Repeat each reorg command with `--check` in place of `--apply` and build
+   the stock ROM. Review the exact-table skips before committing.
+9. Commit the replay and merge `main` with a high rename limit, for example
    `git -c merge.renameLimit=20000 merge main`.
 
-### Reviewed symbol and Player tables
+### Reviewed tables
 
-Preview an exact symbol table with `tools/reorg.py --function-renames CSV`.
-The table gives `addr`, `old_name`, and `new_name`. The tool checks the name
-at each address, then rewrites all symbol references together. A prefix table
-uses `--function-prefixes CSV` with `old_prefix`, `new_prefix`, and an
-optional defining file or directory in `scope`. Use the exact table when
-the reviewed scopes refer to a layout you have yet to apply.
+The exact function table gives `addr`, `old_name`, `new_name`, and optional
+`prior_names` separated by `|`. The tool checks each address, then rewrites
+the accepted references together. The prefix table gives `old_prefix`,
+`new_prefix`, and a defining file, directory, or `all` in `scope`. The
+longest matching prefix lets a helper keep a distinct name within a family.
+A type row can limit the rewrite to one `scope` when different owners use
+the same tag. Preview any operation by omitting `--apply` and `--check`.
 
 `tools/reorg.py --player-moves CSV` previews a Player routing table with
 `file`, `new_path` (a directory), and an optional `note`. It preserves each
@@ -191,14 +210,6 @@ source basename and records the previous path in the placement tables for
 replay. Run the regular directory replay before applying a Player table to
 an older worker branch.
 
-Use `--apply` after reviewing a table's preview. These operations are separate
-from the filename pass. Run the stock ROM build after any applied symbol table.
-
-For worker replay, use `tools/reorg.py --function-renames
-symbols/function_renames.csv --apply` after replaying the placement tables.
-The symbol pass preserves source basenames, the reviewed input table, and
-history entries. `--check` with the same table verifies the rename replay.
-
-Replay the sprite types with `tools/reorg.py --type-renames
-symbols/type_renames.csv --apply`. The placement table routes the owning
-header to `include/engine/video/anim_sprite.h`.
+Symbol replay preserves source basenames and history entries. Header names
+are recorded in the placement table, including `anim_sprite.h` and
+`anim_sprite_glyph.h` under `include/engine/video/`.

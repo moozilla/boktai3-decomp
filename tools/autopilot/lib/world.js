@@ -29,8 +29,8 @@ exports.grid = () => {
   return { w, h, cells, at: (x, z) => (x < 0 || z < 0 || x >= w || z >= h ? null : cells[z * w + x]) };
 };
 
-// Scene objects (src/objects/scene_objects/scene_object.c, gSceneObjectManager->objects): blocks and
-// crates. An idle one (kind 0) can be pushed (SceneObjects_TryPushNeighbor) from a
+// Scene objects (src/objects/puzzle_blocks.c, gSceneObjectManager->objects): blocks and
+// crates. An idle one (kind 0) can be pushed (PuzzleBlock_TryPushNeighbor) from a
 // cell one level below its top; type 1 movable block, 5 limited pushes.
 exports.blocks = () => {
   const mgr = $.gSceneObjectManager;
@@ -537,8 +537,8 @@ exports.menuSearch = function* (goal, opts = {}) {
   return { done: !!found, keys: found ? found.join(' ') : null, states: seen.size, expanded, frames: g.frameNo - start, closed: !exports.menuState() || exports.menuState().callback === fieldCb };
 };
 
-// Live Breakables (src/objects/breakable.c: gPooledInteractableManager slots): script id
-// and state (1 unlit / 2 lit for a candlestick; Breakable_OnHit moves them on).
+// Live Breakables (src/objects/light_fixtures.c: gPooledInteractableManager slots): script id
+// and state (1 unlit / 2 lit for a candlestick; LightFixture_OnHit moves them on).
 exports.breakables = () => {
   const m = $.gPooledInteractableManager;
   if (!m || !m.slots) return [];
@@ -619,7 +619,7 @@ exports.people = () => {
 };
 
 // Push planning: a breadth-first search over block states with the game's rules
-// (SceneObjects_TryPushNeighbor + Scene_TryStepDown). Heights include the blocks
+// (PuzzleBlock_TryPushNeighbor + PuzzleBlock_TryStepDown). Heights include the blocks
 // (a block raises its cell to its top). A push from P into direction d moves the
 // block at B = P + d when level(P) + 1 == top, the cell T = B + d is flat, not
 // flagged 8, and lower than the top: one level lower -> the block slides onto T;

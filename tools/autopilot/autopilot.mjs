@@ -36,7 +36,7 @@ const s = await openSession({
 });
 // Script-derived stage data (doors, entrances, items, enemies): tools/assets/stages.py json.
 const STAGES = (() => { try { return JSON.parse(fs.readFileSync(path.join(ROOT, 'build/assets/stages.json'), 'utf8')); } catch { return []; } })();
-// What carries which reaction flag (tools/autopilot/breakers.py: Breakable_OnHit, the gun's
+// What carries which reaction flag (tools/autopilot/breakers.py: LightFixture_OnHit, the gun's
 // lens table, weapon modifiers, read from the source and the ROM's weapon records).
 const BREAKERS = (() => {
   const f = path.join(ROOT, 'build/autopilot/breakers.json');

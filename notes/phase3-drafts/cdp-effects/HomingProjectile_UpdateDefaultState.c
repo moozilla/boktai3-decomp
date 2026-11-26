@@ -11,7 +11,7 @@ struct ContactPosition *Player_GetEffectivePosition(s32);
 s32 Math_Atan2(s32, s32);
 u32 Anim_SetSequence(struct DisplaySequenceState *, u8 *, u16, u8, u8);
 void SunDiscPool_SpawnDisc(void *, void *, s32, s32, s32, s32, u32, s32, s32);
-void BouncingObject_Spawn(void *, void *, void *, s32, s32, s32, s32);
+void BouncingBomb_Spawn(void *, void *, void *, s32, s32, s32, s32);
 u16 Sqrt(u32);
 s32 Div(s32, s32);
 s32 Sprite_BlinkUntilExpired(u32 *, s32, s32, s32);
@@ -173,7 +173,7 @@ s32 HomingProjectile_UpdateDefaultState(struct HomingSlot *p, s32 slot)
                         d->y = Div(d->y * speed, length);
                         d->z = Div(d->z * speed, length);
                     }
-                    BouncingObject_Spawn(f, d, t, p->params.shotA, p->params.shotB, 0x50, elapsed);
+                    BouncingBomb_Spawn(f, d, t, p->params.shotA, p->params.shotB, 0x50, elapsed);
                 }
             }
             sequence = (params->variant == 0) ? (7) : (0);

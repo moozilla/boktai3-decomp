@@ -327,9 +327,9 @@ s32 GameStart_Init(struct GameStart *p)
     res = ScriptProc_Start(0xcb05, 0xe2ab);
     ResourceHeader_Relocate((u8 *)&p->backgroundResource, res);
     p->itemResource = p->backgroundResource;
-    Widget_InitLinked((u8 *)&p->background, (u8 *)&p->backgroundResource, 0x36, 0x10, 0, 0, 0, 0);
+    AnimSprite_InitLinked((u8 *)&p->background, (u8 *)&p->backgroundResource, 0x36, 0x10, 0, 0, 0, 0);
     ResourceHeader_Relocate((u8 *)&p->decorationResource, res);
-    Widget_InitLinked((u8 *)&p->decoration, (u8 *)&p->decorationResource, 0x28, 0x10, 0, 0, 0, 0);
+    AnimSprite_InitLinked((u8 *)&p->decoration, (u8 *)&p->decorationResource, 0x28, 0x10, 0, 0, 0, 0);
     p->decoration.flags |= 1;
     p->decoration.position.x = 0;
     {
@@ -341,7 +341,7 @@ s32 GameStart_Init(struct GameStart *p)
         res = ScriptProc_Start(0xcb05, 0x530d);
     }
     ResourceHeader_Relocate((u8 *)&p->titleResource, res);
-    Widget_InitLinked((u8 *)&p->title, (u8 *)&p->titleResource, 0x8a, 0x10, 0, 0, 0, 0);
+    AnimSprite_InitLinked((u8 *)&p->title, (u8 *)&p->titleResource, 0x8a, 0x10, 0, 0, 0, 0);
     p->title.position.x = 0;
     {
         s16 *targetY = &p->title.position.y;
@@ -358,7 +358,7 @@ s32 GameStart_Init(struct GameStart *p)
     pos.x = 0xa8;
     pos.y = 0x28;
     for (i = 0; i <= 4; i++) {
-        Widget_InitLinked((u8 *)&p->timeDigits[i], (u8 *)&p->itemResource, (i == 2) ? (0x14) : (0),
+        AnimSprite_InitLinked((u8 *)&p->timeDigits[i], (u8 *)&p->itemResource, (i == 2) ? (0x14) : (0),
                           0x30, 1, 0, 0x3c, &pos);
         p->timeDigits[i].position.x += i * 8;
         p->timeDigits[i].flags |= 1;
@@ -367,7 +367,7 @@ s32 GameStart_Init(struct GameStart *p)
     pos.x = 0xc0;
     pos.y = 0x38;
     for (i = 0; i <= 1; i++) {
-        Widget_InitLinked((u8 *)&p->levelDigits[i], (u8 *)&p->itemResource, 0, 0x30, 1, 0, 0x3c,
+        AnimSprite_InitLinked((u8 *)&p->levelDigits[i], (u8 *)&p->itemResource, 0, 0x30, 1, 0, 0x3c,
                           &pos);
         p->levelDigits[i].position.x += i * 8;
         p->levelDigits[i].flags |= 1;

@@ -48,25 +48,25 @@ static inline u8 Recoil_TestDamageFlags(u32 mask, struct ActorStats *obj, u8 **o
     return FALSE;
 }
 
-static inline bool32 ActorRecoil_IsDamageCategory(s32 kind, s32 want)
+static inline bool32 CoffinBike_IsDamageCategory(s32 kind, s32 want)
 {
     if (kind == want)
         return TRUE;
     return FALSE;
 }
 
-static inline s32 ActorRecoil_ScaleVelocity(s32 value)
+static inline s32 CoffinBike_ScaleVelocity(s32 value)
 {
     if (value >= 0)
         return value >> 12;
     return -((-value) >> 12);
 }
 
-static inline void ActorRecoil_SetPolarVelocity(struct ContactPosition *v, s32 angle, s32 speed)
+static inline void CoffinBike_SetPolarVelocity(struct ContactPosition *v, s32 angle, s32 speed)
 {
-    v->x = ActorRecoil_ScaleVelocity(gUnk_086149C4[(angle + 64) & 255] * speed);
+    v->x = CoffinBike_ScaleVelocity(gUnk_086149C4[(angle + 64) & 255] * speed);
     v->y = 0;
-    v->z = ActorRecoil_ScaleVelocity(gUnk_086149C4[angle & 255] * speed);
+    v->z = CoffinBike_ScaleVelocity(gUnk_086149C4[angle & 255] * speed);
 }
 
 void SceneMotion_PlayKindSound(struct SpatialEntry *);
@@ -97,8 +97,8 @@ void CoffinBike_ReceiveBodyContact(void *owner, struct SpatialEntry *other)
         obj->damageTimer = 0;
         goto sound;
     }
-    if (ActorRecoil_IsDamageCategory(msg->category, 4) ||
-        ActorRecoil_IsDamageCategory(msg->category, 3)) {
+    if (CoffinBike_IsDamageCategory(msg->category, 4) ||
+        CoffinBike_IsDamageCategory(msg->category, 3)) {
         obj->damageTimer = 0;
         goto sound;
     }
@@ -116,7 +116,7 @@ void CoffinBike_ReceiveBodyContact(void *owner, struct SpatialEntry *other)
     positions.diff.z = positions.self.z - positions.target.z;
     angle = Math_Atan2(positions.diff.x, positions.diff.z);
     angle = (angle >> 5) << 5;
-    ActorRecoil_SetPolarVelocity(&vel, angle, msg->parameter);
+    CoffinBike_SetPolarVelocity(&vel, angle, msg->parameter);
     durationScale = obj->secondaryConfig[0] >> 1;
     obj->knockback.forward = vel.x << 10;
     obj->knockback.lateral = vel.z << 10;
@@ -131,8 +131,8 @@ void CoffinBike_ReceiveBodyContact(void *owner, struct SpatialEntry *other)
     }
 sound:
     SceneMotion_PlayKindSound(msg);
-    if (ActorRecoil_IsDamageCategory(msg->category, 4) ||
-        ActorRecoil_IsDamageCategory(msg->category, 3)) {
+    if (CoffinBike_IsDamageCategory(msg->category, 4) ||
+        CoffinBike_IsDamageCategory(msg->category, 3)) {
         obj->increment = ModifierStats_ApplyKind15((struct ScenePoolActor *)obj, msg->kind);
         obj->mode = msg->category;
         obj->pending = 1;
@@ -149,7 +149,7 @@ static inline u8 Recoil_IsIgnored(s32 type)
     return r;
 }
 
-static inline struct ActorStats *ActorRecoil_GetStats(void *owner)
+static inline struct ActorStats *CoffinBike_GetStats(void *owner)
 {
     return owner;
 }
@@ -164,11 +164,11 @@ void CoffinBike_ApplyDirectionalImpulse(void *owner, struct SpatialEntry *msg)
         return;
     if (Recoil_IsIgnored(msg->category))
         return;
-    a = ActorRecoil_GetStats(owner)->contactPosition.x +
-        ActorRecoil_GetStats(owner)->contactOffset.x;
+    a = CoffinBike_GetStats(owner)->contactPosition.x +
+        CoffinBike_GetStats(owner)->contactOffset.x;
     dst.x = a;
-    b = ActorRecoil_GetStats(owner)->contactPosition.z +
-        ActorRecoil_GetStats(owner)->contactOffset.z;
+    b = CoffinBike_GetStats(owner)->contactPosition.z +
+        CoffinBike_GetStats(owner)->contactOffset.z;
     dst.z = b;
     c = msg->position.x + msg->offset.x;
     src.x = c;
@@ -178,16 +178,16 @@ void CoffinBike_ApplyDirectionalImpulse(void *owner, struct SpatialEntry *msg)
     diff.z = b - d;
     angle = Math_Atan2(a - c, b - d);
     angle = (angle >> 5) << 5;
-    ActorRecoil_SetPolarVelocity(&vel, angle, 8);
-    ActorRecoil_GetStats(owner)->knockback.forward = vel.x << 10;
-    ActorRecoil_GetStats(owner)->knockback.lateral = vel.z << 10;
+    CoffinBike_SetPolarVelocity(&vel, angle, 8);
+    CoffinBike_GetStats(owner)->knockback.forward = vel.x << 10;
+    CoffinBike_GetStats(owner)->knockback.lateral = vel.z << 10;
     if ((u32)(angle - 10) > 0xEC) {
-        ActorRecoil_GetStats(owner)->motion.forward += 0x3000;
-        ActorRecoil_GetStats(owner)->knockbackTimer = 10;
+        CoffinBike_GetStats(owner)->motion.forward += 0x3000;
+        CoffinBike_GetStats(owner)->knockbackTimer = 10;
     } else {
-        ActorRecoil_GetStats(owner)->motion.forward -= 0x2000;
-        ActorRecoil_GetStats(owner)->boost = 0;
-        ActorRecoil_GetStats(owner)->knockbackTimer = 15;
+        CoffinBike_GetStats(owner)->motion.forward -= 0x2000;
+        CoffinBike_GetStats(owner)->boost = 0;
+        CoffinBike_GetStats(owner)->knockbackTimer = 15;
     }
 }
 

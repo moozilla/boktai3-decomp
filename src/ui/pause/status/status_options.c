@@ -55,7 +55,7 @@ void Hud_DrawCounter50C(u32, u32);
 void Presentation_SetAmountGlyphRows(void *);
 void GameState_BackupRegionRange(void *, u32);
 
-static inline void SceneCatalog_QueueDescription(struct SceneHudState *state, u32 message)
+static inline void StatusOptions_QueueDescription(struct SceneHudState *state, u32 message)
 {
     state->allocationDescription = message;
 }
@@ -128,7 +128,7 @@ void Presentation_UpdateAllocationSelection(struct SceneHudState *menu)
         }
         Presentation_UpdateListCursor(menu);
         Sound_PlaySong(0xdc);
-        SceneCatalog_QueueDescription(menu, menu->rowIndex + 20);
+        StatusOptions_QueueDescription(menu, menu->rowIndex + 20);
     } else if (key & 0x80) {
         if (menu->rowIndex > 1) {
             menu->rowIndex = 0;
@@ -137,7 +137,7 @@ void Presentation_UpdateAllocationSelection(struct SceneHudState *menu)
         }
         Presentation_UpdateListCursor(menu);
         Sound_PlaySong(0xdc);
-        SceneCatalog_QueueDescription(menu, menu->rowIndex + 20);
+        StatusOptions_QueueDescription(menu, menu->rowIndex + 20);
     } else if (key & 0x20) {
         u32 offset = menu->rowIndex << 1;
         u8 *base;

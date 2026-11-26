@@ -94,7 +94,7 @@ s32 ProximityIcon_InitFromScript(struct ProximityIcon *icon)
     position.x = offset.x + icon->origin.x;
     position.y = offset.y + icon->origin.y;
     position.z = offset.z + icon->origin.z;
-    Widget_InitLinked(&icon->animation, &resource, (u16)frame, 0, (u8)priority, 0, 60, &position);
+    AnimSprite_InitLinked(&icon->animation, &resource, (u16)frame, 0, (u8)priority, 0, 60, &position);
     if (gEngineFlags & 0x200)
         icon->animation.flags |= 1;
     else if (ProximityIcon_IsPlayerNearby(icon))

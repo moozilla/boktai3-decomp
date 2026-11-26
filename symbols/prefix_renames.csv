@@ -1,0 +1,180 @@
+old_prefix,new_prefix,count,evidence,scope
+ScenePanel_,PileDriver_,99,CBB0 パイルドライバー creates ScenePanel; identity worker: Pile Driver apparatus and purification (6182/6183),src/objects/pile_driver/
+ScenePanelRig_,PileDriverRig_,33,sprite rig of the Pile Driver,src/objects/pile_driver/
+ScenePanelSubject_,PileDriverSubject_,17,"the captive in the Pile Driver (the Count, Sabata)",src/objects/pile_driver/
+ScenePanelSubject_,ShipWheel_,1,ScenePanelSubject_SlideOpen is the ship wheel's first function,src/objects/ship_wheel.c
+ScenePanel_,VanargandPair_,14,"pair-state helpers inside Vanargand's block 081A6FF4-081A8774, not Pile Driver code",src/bosses/vanargand/
+ScenePanel_,StatusPanel_,2,pause Status page functions,src/ui/pause/status/
+ScenePanel_,MenuPrompt_,2,pause menu prompt unit,src/ui/pause/menu_prompt.c
+ScenePanel_,MenuSequence_,2,Dark Card Replay/loan sequences (identity worker),src/ui/pause/menu_sequences/
+ScenePanel_,PauseDisplay_,1,pause display layer,src/ui/pause/display/
+ScenePanelEffect_,NidhoggrEffect_,6,six-function effect pool inside Nidhoggr's block 0818EBF4,src/bosses/nidhoggr/
+SceneInventory_,Shop_,97,the shop screen: SceneInventory_CreatePresentation0..4 are its five shops; 0 is 武器屋 (Weapon Shop),src/ui/town/shop/
+SceneInventory_,Storage_,11,Storage (倉庫) category browsing,src/ui/town/storage/
+SceneInventory_,PauseDisplay_,1,item condition frame of the pause display,src/ui/pause/display/
+SceneInventory_,Vorn_,1,one helper inside vorn_main.c,src/monsters/vorn/
+SingletonSlot7_,VanargandHead_,40,identity worker: Vanargand's layered head in the 6323 bike chase and ending; distinct from Vanargand_ (arena body),src/bosses/vanargand/
+Slot7_,VanargandHead_,1,same object,src/bosses/vanargand/
+BossSlot2_,Sabata_,19,"identity worker: Sabata, White Forest 4233 and rematch 6415 (GCL EC71)",src/bosses/sabata/
+SceneEventActor_,Sabata_,7,Sabata block,src/bosses/sabata/
+SceneEventActor_SetDirection,Sabata_SetReactionDirection,,Separate reaction direction helper from the boss heading helper,src/bosses/sabata/scene_event_actor.c
+ActorImpact_,SabataImpact_,7,Sabata block,src/bosses/sabata/
+ActorPosition_,SabataPosition_,5,Sabata block,src/bosses/sabata/
+ActorState_,SabataState_,8,Sabata block,src/bosses/sabata/
+ActorState_,HresvelgrState_,3,three hold/restart states inside Hresvelgr,src/bosses/hresvelgr/
+ActorDecision_,Sabata_,9,Sabata block,src/bosses/sabata/
+SceneVolume_,Sabata_,12,Sabata block,src/bosses/sabata/
+EnemyD459_,AxeArmor_,11,Book #29 and text #2538: observed axe shockwave,src/monsters/axe_armor/
+SceneSequence_,AxeArmor_,1,Book #29 and text #2538: observed axe shockwave,src/monsters/axe_armor/
+EnemyF426_,Statue_,10,"Book #28 STATUE (石像), key F426",src/monsters/statue/
+StateActor_,StoryCharacter_,51,the body of SceneCharacter (96-state table); named for its directory until the identity worker names the characters,src/npc/story_character/
+RegistryA8CB_,SabataRider_,13,proc 6316: Sabata on his purple bike in the ending chase,src/npc/sabata_rider/
+Registry3F74_,TownMap_,18,"GCL 2554, San Miguel town map",all
+RegistrySelection_,WorldMap_,26,"GCL 2570, nine world destinations",src/ui/world_map.c
+Registry6A37_,MagicCannonDeparture_,12,"proc 4928, the Magic Cannon space-flight backdrop",src/effects/screen/
+Registry1745_,LinkSession_,25,Registry1745_Create is the link session controller,all
+RegistryF246_,LinkPanelSlots_,6,key F246 = LinkPanel_Create; these six draw its seven slot animations (LinkPanel_Close already exists),all
+Registry33FF_,LinkLobbyPanel_,3,key 33FF = LinkLobbyPanel_Create,all
+Registry3C9F_,RecordPanel_,2,first two functions of the record panel unit,all
+RegistryC5BD_,LinkPanel_,1,SetTimeFromScript inside the link panel block,all
+Registry1022_,LinkPanel_,1,GetValueFromScript inside the link panel block,all
+Registry1909_,SceneMessageSprite_,11,key 1909 = SceneMessageSprite_Create,all
+RegistryC281_,MoveSequence_,10,scripted four-stage actor movement sequence with fades (in ship_wheel.c); needs-evidence for the scene,all
+RegistryF3E4_,PopInSprite_,12,singleton sprite that scales 38->64 to appear and back to hide; needs-evidence for the scene,all
+RegistryE7BC_,ScriptObjectPool_,10,twelve pooled objects whose completion runs their script procedure,all
+Registry3C8D_,SavedVariables_,3,captures and restores up to 512 script variables around a state reset,all
+Task4E01_,ProjectileTask_,31,projectile task with trails and impacts (key 4E01),all
+Pool184_,LootDepositPool_,6,F1F9 breakable deposits in scene 3905,src/objects/loot_deposits/
+Pool1B4_,IceBoulderPool_,2,377D blue ice boulders in scene 3955,src/objects/ice_boulders.c
+Pool128_,IceBoulderPool_,3,377D blue ice boulders in scene 3955,src/objects/ice_boulders.c
+Pool1B8_,FloorTrapPool_,9,2FA5 contact traps in scene 3161,src/objects/floor_traps.c
+Pool1BC_,AnimatedTilePool_,2,pool of the animated tile,all
+Slot600_,WindCannonSlot_,3,Wind Cannon slots (activate/deactivate from script),all
+Params3D0_,CutsceneDisplay_,5,display parameters of the cutscene actor,all
+ScreenParams310_,RegionMenuParams_,1,parameters of the region menu,all
+ScreenParams328_,NameEntryParams_,1,parameters of Name Entry,all
+SceneActor14_,SpriteEffectSet_,7,shared animation set of actor category 14 sprite effects,all
+SceneEffect863A_,SpriteEffectSet_,1,loads the set's resource 863A,all
+SpritePool10_,SpriteProjectilePool_,1,pool of the sprite projectile,all
+SpritePool12_,TimedSpritePool_,1,pool of the timed sprite,all
+Armor6_,Armor_,2,two Armor destroy callbacks,all
+Glove_,CoffinBike_,24,"identity worker: E881, the Coffin Bike (Vector Coffin) ride",all
+ActorRecoil_,CoffinBike_,5,Coffin Bike impact and recoil,src/minigames/coffin_bike/
+TentacleActor_,Centipede_,34,"identity worker: 0AC7 Centipede, Book #13",all
+TentacleEnemy_,Centipede_,2,Centipede constructor,all
+TentacleBody_,CentipedeBody_,31,Centipede body and attacks,src/monsters/centipede/
+TentacleBody_,Skeleton_,1,one helper inside skeleton_main.c,src/monsters/skeleton/
+Centipede_,CentipedeOverlay_,1,Centipede_Create of key 0AD8 lives in the terrain overlay; frees the name for the Book Centipede,src/scene/terrain/
+PinkSpine_,Popbud_,6,"Book #2 POPBUD, key F639",all
+OrangeSpine_,PlasmaCannon_,11,"Book #36 PLASMA CANNON, key 01A2",all
+CannonTurret_,GarmrStatue_,8,"Book #30 GARMR STATUE, key 4CD8",all
+FanCannon_,WindCannon_,9,Book #34 WIND CANNON (扇風砲),all
+FanCannonManager_,WindCannonManager_,8,"扇風砲マネージャ, key 9CC2",all
+CannonEmitter_,PollenFlower_,4,"key 98CB, Poisoner and Perplexer",all
+CannonBattery_,DeckCannon_,17,"key 55E9, Pirate Island deck cannons",all
+GrowthHazard_,SolarRoot_,16,"key 1FBA, Solar Roots",all
+ScriptCombatActor_,MuspellHead_,8,"Book #31 MUSPELL HEAD, key 5153",all
+Vampire_,Count_,11,"identity worker: the Count, Lifeless Town vampire (D972 ヴァンパイア creates him)",all
+ContactSwarm_,CountBats_,16,identity worker: the Count's attacking bat swarm,all
+GridAttackActor_,NidhoggrDuel_,25,identity worker: Nidhoggr's interior personal-form fight (key 917F),all
+GridAttack_,NidhoggrDuel_,44,same object,all
+ContactSequenceActor_,NidhoggrDuelMinion_,14,contacts spawned by the duel,all
+ContactSequencePool_,NidhoggrDuelMinionPool_,8,their pool,all
+OrbitContactActor_,NidhoggrDuelOrb_,8,rotating contact of the duel,all
+ContactBurst_,NidhoggrDuelBurst_,9,contact burst of the duel,all
+ControlPanel_,DarkGenerator_,35,identity worker: Dark Loans forced work at the Dark Generator (key B3D1),all
+GroupObjects_,BatFlock_,4,E534 bat flock (medium),all
+BoardPiece_,BatFlockBat_,13,one bat of the flock,all
+BoardPieces_,BatFlockBats_,5,the flock's bats,all
+SceneCatalog_,StatusOptions_,8,identity worker: pause Status option descriptions,all
+SceneSequence_,MenuSequence_,7,Dark Card Replay/loan sequences,src/ui/pause/menu_sequences/
+SceneNpc_,Otenko_,,Observed identity of the defining unit (Pass 4),src/npc/otenko/
+TaggedSceneNpc_,Kuro_,,Observed identity of the defining unit (Pass 4),src/npc/kuro/
+SceneNpc_,Kuro_,,Observed identity of the defining unit (Pass 4),src/npc/kuro/
+Actor_,TutorialOtenko_,,Observed identity of the defining unit (Pass 4),src/ui/title/tutorial_otenko.c
+ActorPalette_,TutorialOtenkoPalette_,,Observed identity of the defining unit (Pass 4),src/ui/title/tutorial_otenko.c
+SceneObject_,SlidingDoor_,,Observed identity of the defining unit (Pass 4),src/objects/sliding_doors/
+SceneObjects_,SlidingDoors_,,Observed identity of the defining unit (Pass 4),src/objects/sliding_doors/
+SceneObjects_,PuzzleBlock_,,Observed identity of the defining unit (Pass 4),src/objects/puzzle_blocks.c
+Scene_,PuzzleBlock_,,Observed identity of the defining unit (Pass 4),src/objects/puzzle_blocks.c
+ActorGroup_,LootDeposit_,,Observed identity of the defining unit (Pass 4),src/objects/loot_deposits/
+ActorGroupPool_,LootDepositPool_,,Observed identity of the defining unit (Pass 4),src/objects/loot_deposits/
+NamedObject_,MovingPlatform_,,Observed identity of the defining unit (Pass 4),src/objects/moving_platforms/
+NamedActor_,MovingPlatformActor_,,Observed identity of the defining unit (Pass 4),src/objects/moving_platforms/
+CellGate_,PassageBarrier_,,Observed identity of the defining unit (Pass 4),src/objects/passage_barriers/
+BreakableProp_,QuestBarrier_,,Observed identity of the defining unit (Pass 4),src/objects/quest_barriers/
+BouncingObject_,BouncingBomb_,,Observed identity of the defining unit (Pass 4),src/objects/bouncing_bombs/
+ProximityActor_,IceBoulder_,,Observed identity of the defining unit (Pass 4),src/objects/ice_boulders.c
+ProximityActorPool_,IceBoulderPool_,,Observed identity of the defining unit (Pass 4),src/objects/ice_boulders.c
+RegionActor_,IceBoulder_,,Observed identity of the defining unit (Pass 4),src/objects/ice_boulders.c
+RegionActor_HasBehavior,RegionActor_HasBehavior,,Inline accessor retains the name of its RegionActor type,src/objects/ice_boulders.c
+RegionActorPool_,IceBoulderPool_,,Observed identity of the defining unit (Pass 4),src/objects/ice_boulders.c
+CollisionController_,StrikeTrap_,,Observed identity of the defining unit (Pass 4),src/objects/strike_traps.c
+DirectionalController_,InteractionPrompt_,,Observed identity of the defining unit (Pass 4),src/objects/interaction_prompts.c
+TileTrigger_,FloorTrap_,,Observed identity of the defining unit (Pass 4),src/objects/floor_traps.c
+TileTriggerPool_,FloorTrapPool_,,Observed identity of the defining unit (Pass 4),src/objects/floor_traps.c
+Breakable_,LightFixture_,,Observed identity of the defining unit (Pass 4),src/objects/light_fixtures.c
+SceneScriptObject_,DungeonScenery_,,Observed identity of the defining unit (Pass 4),src/objects/dungeon_prop/scenery.c
+SceneScriptTask_,DungeonScenery_,,Observed identity of the defining unit (Pass 4),src/objects/dungeon_prop/scenery.c
+OrbitMotion_,SceneryMotion_,,Observed identity of the defining unit (Pass 4),src/objects/dungeon_prop/scenery_motion.c
+SceneMover_,SceneryMotion_,,Observed identity of the defining unit (Pass 4),src/objects/dungeon_prop/scenery_motion.c
+ProximityEmitter_,TetherRing_,,Observed identity of the defining unit (Pass 4),src/effects/particles/tether_rings/
+EnemyParticle_,EnemyAttackParticle_,,Observed identity of the defining unit (Pass 4),src/effects/particles/enemy_attacks/
+NativeEffect_,ProjectileEffect_,,Observed identity of the defining unit (Pass 4),src/effects/sprites/projectile_effects.c
+NativeParticle_,ProjectileMote_,,Observed identity of the defining unit (Pass 4),src/effects/particles/projectile_motes.c
+NativeEffect_,ProjectileMote_,,Observed identity of the defining unit (Pass 4),src/effects/particles/projectile_motes.c
+SceneMovingParticle_,DebrisMote_,,Observed identity of the defining unit (Pass 4),src/effects/particles/debris_motes.c
+SceneTerrainProbe_,DebrisMote_,,Observed identity of the defining unit (Pass 4),src/effects/particles/debris_motes.c
+SceneTerrainProbe_,SpreadShot_,,Observed identity of the defining unit (Pass 4),src/effects/particles/spread_shot.c
+AnimatedParticles_,ImpactBurst_,,Observed identity of the defining unit (Pass 4),src/effects/particles/impact_bursts/
+AnimatedParticleManager_,ImpactBurstManager_,,Observed identity of the defining unit (Pass 4),src/effects/particles/impact_bursts/
+DirectionalParticle_,ImpactFragment_,,Observed identity of the defining unit (Pass 4),src/effects/particles/impact_fragments/
+FragmentManager_,ImpactFragmentManager_,,Observed identity of the defining unit (Pass 4),src/effects/particles/impact_fragments/
+FragmentGroup_,ImpactFragmentGroup_,,Observed identity of the defining unit (Pass 4),src/effects/particles/impact_fragments/
+ParticleManager_,ImpactParticleManager_,,Observed identity of the defining unit (Pass 4),src/effects/particles/impact_fragments/
+ParticleGroup_,ImpactParticleGroup_,,Observed identity of the defining unit (Pass 4),src/effects/particles/impact_fragments/
+BurstEmitter_,SparkExplosion_,,Observed identity of the defining unit (Pass 4),src/effects/particles/spark_explosions/
+SparkleEmitter_,CutsceneSparkle_,,Observed identity of the defining unit (Pass 4),src/effects/particles/cutscene_sparkles.c
+SceneParticle_,LinearMote_,,Observed identity of the defining unit (Pass 4),src/effects/particles/linear_motes.c
+ParticleBurstEffect_,AbilityScatter_,,Observed identity of the defining unit (Pass 4),src/effects/sprites/ability_scatter.c
+ParticleEmitter_,BallisticTrail_,,Observed identity of the defining unit (Pass 4),src/effects/sprites/ballistic_trail.c
+ParticleBurst_,SpiralTrail_,,Observed identity of the defining unit (Pass 4),src/player/effects/spiral_trail/
+RisingPuffPool_,RecoilPuffPool_,,Observed identity of the defining unit (Pass 4),src/player/effects/recoil_puffs/
+RisingSprite_,RecoilPuff_,,Observed identity of the defining unit (Pass 4),src/player/effects/recoil_puffs/
+ParticleEffect_,ActionFlash_,,Observed identity of the defining unit (Pass 4),src/player/effects/action_flash/
+ActorBurst_,ActionFlashBurst_,,Observed identity of the defining unit (Pass 4),src/player/effects/action_flash/
+PlayerBarrier_,PileTrap_,,Observed identity of the defining unit (Pass 4),src/player/pile_trap/
+TentacleSpread_,CentipedeSpread_,,Observed identity of the defining unit (Pass 4),src/monsters/centipede/
+TentacleSpread_,CentipedeSpread_,,Observed identity of the defining unit (Pass 4),src/monsters/slime.c
+TentacleSpread_,CentipedeSpread_,,Observed identity of the defining unit (Pass 4),include/monsters/centipede_spread.h
+ScenePanel_,PileDriver_,,CBB0 パイルドライバー creates ScenePanel; identity worker: Pile Driver apparatus and purification (6182/6183),include/objects/pile_driver/
+ScenePanelRig_,PileDriverRig_,,sprite rig of the Pile Driver,include/objects/pile_driver/
+ScenePanelSubject_,PileDriverSubject_,,"the captive in the Pile Driver (the Count, Sabata)",include/objects/pile_driver/
+ScenePanel_,VanargandPair_,,"pair-state helpers inside Vanargand's block 081A6FF4-081A8774, not Pile Driver code",include/bosses/vanargand/
+ScenePanelEffect_,NidhoggrEffect_,,six-function effect pool inside Nidhoggr's block 0818EBF4,include/bosses/nidhoggr/
+SingletonSlot7_,VanargandHead_,,identity worker: Vanargand's layered head in the 6323 bike chase and ending; distinct from Vanargand_ (arena body),include/bosses/vanargand/
+Slot7_,VanargandHead_,,same object,include/bosses/vanargand/
+BossSlot2_,Sabata_,,"identity worker: Sabata, White Forest 4233 and rematch 6415 (GCL EC71)",include/bosses/sabata/
+SceneEventActor_,Sabata_,,Sabata block,include/bosses/sabata/
+ActorImpact_,SabataImpact_,,Sabata block,include/bosses/sabata/
+ActorPosition_,SabataPosition_,,Sabata block,include/bosses/sabata/
+ActorState_,SabataState_,,Sabata block,include/bosses/sabata/
+ActorDecision_,Sabata_,,Sabata block,include/bosses/sabata/
+SceneVolume_,Sabata_,,Sabata block,include/bosses/sabata/
+Pool184_,LootDepositPool_,,F1F9 breakable deposits in scene 3905,include/objects/loot_deposits/
+ActorRecoil_,CoffinBike_,,Coffin Bike impact and recoil,include/minigames/coffin_bike/
+TentacleBody_,CentipedeBody_,,Centipede body and attacks,include/monsters/centipede/
+SceneNpc_,Otenko_,,Observed identity of the defining unit (Pass 4),include/npc/otenko/
+TaggedSceneNpc_,Kuro_,,Observed identity of the defining unit (Pass 4),include/npc/kuro/
+SceneNpc_,Kuro_,,Observed identity of the defining unit (Pass 4),include/npc/kuro/
+SceneObject_,SlidingDoor_,,Observed identity of the defining unit (Pass 4),include/objects/sliding_doors/
+SceneObjects_,SlidingDoors_,,Observed identity of the defining unit (Pass 4),include/objects/sliding_doors/
+ActorGroup_,LootDeposit_,,Observed identity of the defining unit (Pass 4),include/objects/loot_deposits/
+ActorGroupPool_,LootDepositPool_,,Observed identity of the defining unit (Pass 4),include/objects/loot_deposits/
+NamedObject_,MovingPlatform_,,Observed identity of the defining unit (Pass 4),include/objects/moving_platforms/
+NamedActor_,MovingPlatformActor_,,Observed identity of the defining unit (Pass 4),include/objects/moving_platforms/
+CellGate_,PassageBarrier_,,Observed identity of the defining unit (Pass 4),include/objects/passage_barriers/
+BreakableProp_,QuestBarrier_,,Observed identity of the defining unit (Pass 4),include/objects/quest_barriers/
+BouncingObject_,BouncingBomb_,,Observed identity of the defining unit (Pass 4),include/objects/bouncing_bombs/
+PlayerBarrier_,PileTrap_,,Observed identity of the defining unit (Pass 4),include/player/pile_trap/
+TentacleSpread_,CentipedeSpread_,,Observed identity of the defining unit (Pass 4),include/monsters/centipede/

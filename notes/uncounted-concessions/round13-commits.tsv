@@ -17,7 +17,7 @@ dd59d2993	Remove Spider wander goal register concessions
 c0dfd00a2	Remove defeat-state statement-macro concessions
 db6be2d3a	Remove target registry ID register pin
 bb5f8abbf	Match TentacleActor_UpdateRetraction without an operand barrier
-92173a644	Match AnimatedParticles_Create without operand barriers
+92173a644	Match ImpactBurst_Create without operand barriers
 26ad07ea2	Remove motion-burst operand barriers with staged invariant values
 66361917e	Remove boundary barrage mask operand concession
 556da172a	Remove fading particle update pin and memory barrier

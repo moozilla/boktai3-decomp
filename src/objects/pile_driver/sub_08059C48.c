@@ -4,7 +4,7 @@ static inline s32 quarter(s32 value)
 {
     return value >= 0 ? value >> 2 : -((-value) >> 2);
 }
-void PileDriverRig_TickHoverSelection(struct ScenePanelRig *rig)
+void PileDriverRig_TickHoverSelection(struct PileDriverRig *rig)
 {
     s32 sample;
     u32 origin;

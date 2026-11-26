@@ -1,11 +1,11 @@
 #include "objects/pile_driver/pile_driver_rig.h"
 #include "objects/pile_driver/pile_driver_rig.h"
-static inline s32 ScenePanelRig_NextRandom(void)
+static inline s32 PileDriverRig_NextRandom(void)
 {
     gRandomIndex = (gRandomIndex + 1) & 1023;
     return ((const u16 *)RANDOM_TABLE_ADDR)[gRandomIndex];
 }
-void PileDriverRig_TickResourceDrain(struct ScenePanelRig *rig)
+void PileDriverRig_TickResourceDrain(struct PileDriverRig *rig)
 {
     struct SceneRigParentView *parent = (void *)rig->parent;
     s32 count = PileDriverRig_GetActiveCount(rig), mode = PileDriverRig_GetParentMode(rig);
@@ -13,12 +13,12 @@ void PileDriverRig_TickResourceDrain(struct ScenePanelRig *rig)
         s32 rate = 0, drain = 0;
         if (rig->state == 2) {
             rate = count * mode * 4;
-            if (((ScenePanelRig_NextRandom() >> 3) & 1) == 0) {
+            if (((PileDriverRig_NextRandom() >> 3) & 1) == 0) {
                 SparkParticle_Spawn(&rig->position, 1, rig->payloadA, 0, 0, 0, 2, 1);
             }
         } else if ((u16)(rig->state - 3) <= 2 || rig->state == 7) {
             rate = count * mode;
-            if (((ScenePanelRig_NextRandom() >> 3) & 7) == 0) {
+            if (((PileDriverRig_NextRandom() >> 3) & 7) == 0) {
                 SparkParticle_Spawn(&rig->origin, 1, rig->payloadB, 0, 0, 0, 2, 1);
             }
         }

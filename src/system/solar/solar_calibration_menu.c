@@ -142,13 +142,13 @@ s32 SolarCalibration_Initialize(struct SolarCalibrationMenu *s)
     resource = ScriptProc_Start(0xCB05, 0xE2AB);
     obj = &s->widgets[0].graphics;
     ResourceHeader_Relocate(obj, resource);
-    Widget_InitLinked(&s->widgets[0].sprite, obj, 0x38, 0x10, zero, zero, zero, zero);
+    AnimSprite_InitLinked(&s->widgets[0].sprite, obj, 0x38, 0x10, zero, zero, zero, zero);
     obj2 = &s->widgets[1].graphics;
     ResourceHeader_Relocate(obj2, resource);
-    Widget_InitLinked(&s->widgets[1].sprite, obj2, 0x29, 0x10, zero, zero, zero, zero);
+    AnimSprite_InitLinked(&s->widgets[1].sprite, obj2, 0x29, 0x10, zero, zero, zero, zero);
     obj3 = &s->widgets[2].graphics;
     ResourceHeader_Relocate(obj3, resource);
-    Widget_InitLinked(&s->widgets[2].sprite, obj3, 0x2A, 0x10, zero, zero, zero, zero);
+    AnimSprite_InitLinked(&s->widgets[2].sprite, obj3, 0x2A, 0x10, zero, zero, zero, zero);
     s->widgets[1].sprite.flags &= ~1;
     s->widgets[2].sprite.flags |= one;
     MessageWindow_SetPalette(0xC486);
@@ -270,12 +270,12 @@ void Menu_DrawStringRef(s32 column, s32 row, const void *source, s32 index)
     Menu_DrawText(column, row, Text_LookupString(Script_ParseStringRef(source) + index));
 }
 
-void Menu_SetTextRect(struct AnimSprite *widget, const struct ContactPosition *position)
+void Menu_SetTextRect(struct AnimSprite *animSprite, const struct ContactPosition *position)
 {
-    widget->position.x = position->x;
-    widget->position.y = position->y;
-    widget->position.z = position->z;
-    widget->position.pad = position->pad;
+    animSprite->position.x = position->x;
+    animSprite->position.y = position->y;
+    animSprite->position.z = position->z;
+    animSprite->position.pad = position->pad;
 }
 
 void Menu_SetBackgroundMap(void *p, u32 b)

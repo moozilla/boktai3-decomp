@@ -23,7 +23,7 @@ Range boundaries include a few singleton resets belonging to the following owner
 
 ## Compiler decisions
 
-- FragmentManager_Initialize (080150D0): typed array indexing initially recomputed the enabled-byte address. `scope probe` with `AGBCC_GIV=54` matched, establishing strength reduction as the difference. A backwards byte cursor, initialized after the active/next stores, gives the original code with ordinary C.
+- ImpactFragmentManager_Initialize (080150D0): typed array indexing initially recomputed the enabled-byte address. `scope probe` with `AGBCC_GIV=54` matched, establishing strength reduction as the difference. A backwards byte cursor, initialized after the active/next stores, gives the original code with ordinary C.
 - FloatingEffect_RiseAndSettle (08016AA0): the closest structured conditional inverted one branch. Preserve the explicit terminal control flow for now. Three separate projection copies were successfully consolidated into a common scalar helper and a common vector helper.
 - BlendTransition_InitializeFromScript (08018E00): converting the pointer read loop to `do/while` hoisted its end address and changed allocation. `hoist` identifies UID 78; `AGBCC_NOMOVE=78` confirms a diagnostic match. The landed source retains the pointer loop, without a knob or concession.
 
@@ -93,13 +93,13 @@ The continuation completed the previously inspected spread-shot item as two cont
 
 Tags: #matching #particles #scene #structs #compiler
 
-At the next continuation request, completed 08125B64–08126140 as `src/effects/particles/scene_moving_particle.c` (13 former files, 1500 bytes). The shared MovingParticlePool now uses Task and the complete particle record, including the common sprite, velocity, animation counters and lifetime. All functions match, as does the other header consumer at 0812D8EC. The allocator originally used a volatile mask pointer even though this range was in the concession-free queue. A direct indexed loop using the shared occupancy helper matches and removes that access. Pointer-cursor variations had retained or reordered loads; no concession is needed. This completes the assigned forward queue before 08126650; four earlier typed-cleanup blockers remain for another pass.
+At the next continuation request, completed 08125B64–08126140 as `src/effects/particles/debris_motes.c` (13 former files, 1500 bytes). The shared MovingParticlePool now uses Task and the complete particle record, including the common sprite, velocity, animation counters and lifetime. All functions match, as does the other header consumer at 0812D8EC. The allocator originally used a volatile mask pointer even though this range was in the concession-free queue. A direct indexed loop using the shared occupancy helper matches and removes that access. Pointer-cursor variations had retained or reordered loads; no concession is needed. This completes the assigned forward queue before 08126650; four earlier typed-cleanup blockers remain for another pass.
 
 ## Scheduling-manager revisit
 
 Tags: #matching #scene #structs #compiler
 
-Resolved 0806F3A8–0806F7B0 and consolidated nine files into `src/effects/scene/scene_effect_schedule.c` (1032 bytes MATCH). The lookup walks a typed pool cursor and reads `cursor->entries[0].id` directly; materializing a separate entry pointer changes allocation, while direct access preserves the original setup and loop. Dynamic strides derive from the entry size, and Task replaces the raw task prefix. Script creation shares the complete schedule entry and the previously recovered scheduled effect. The signed slot-sentinel check remains. The changed header has no other consumer. Four additional pointer/array forms for CellGate_ClampPlayerEdge still remove its required player-pointer reload; its original matching source is restored.
+Resolved 0806F3A8–0806F7B0 and consolidated nine files into `src/effects/scene/scene_effect_schedule.c` (1032 bytes MATCH). The lookup walks a typed pool cursor and reads `cursor->entries[0].id` directly; materializing a separate entry pointer changes allocation, while direct access preserves the original setup and loop. Dynamic strides derive from the entry size, and Task replaces the raw task prefix. Script creation shares the complete schedule entry and the previously recovered scheduled effect. The signed slot-sentinel check remains. The changed header has no other consumer. Four additional pointer/array forms for PassageBarrier_ClampPlayerEdge still remove its required player-pointer reload; its original matching source is restored.
 
 ## Palette-fade revisit
 

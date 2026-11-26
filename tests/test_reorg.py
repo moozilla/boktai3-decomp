@@ -121,6 +121,48 @@ class ReorgTests(unittest.TestCase):
             self.assertEqual(reorg.function_renames(table, prefixes=True, apply=True), 0)
             self.assertIn("void Npc_Two(void) { Player_One(); }", (root / "src/npc/two.c").read_text())
 
+    def test_exact_replay_accepts_prior_names_and_reports_branch_names(self):
+        table_path = "symbols/function_renames.csv"
+        files = {
+            "symbols/functions.csv": "addr,name\n08001000,Interim_Run\n08001020,Branch_Run\n",
+            "src/engine/run.c": "void Interim_Run(void) { Branch_Run(); }\n",
+            table_path: "addr,old_name,new_name,prior_names\n"
+            "08001000,Old_Run,Final_Run,Interim_Run\n"
+            "08001020,Other_Run,Reviewed_Run,\n",
+        }
+        with fixture(files) as root, contextlib.redirect_stderr(io.StringIO()) as messages:
+            table = root / table_path
+            with self.assertRaisesRegex(ValueError, "08001020.*Branch_Run"):
+                reorg.function_renames(table, apply=True)
+            self.assertEqual(reorg.function_renames(table, apply=True, skip_diverged=True), 2)
+            self.assertIn("skip", messages.getvalue())
+            self.assertIn("08001020 is 'Branch_Run'", messages.getvalue())
+            self.assertIn("void Final_Run(void) { Branch_Run(); }", (root / "src/engine/run.c").read_text())
+            self.assertEqual(reorg.function_renames(table, skip_diverged=True), 0)
+
+    def test_scoped_helpers_and_types_do_not_change_another_owner(self):
+        player, npc = "src/player/local.c", "src/npc/local.c"
+        body = ("struct SharedSprite;\nstatic void Shared_Helper(struct SharedSprite *it) {}\n"
+                "static void Shared_Step(void) {}\n")
+        files = {
+            player: body,
+            npc: body,
+            "symbols/functions.csv": "addr,name\n",
+            "symbols/prefix_renames.csv": "old_prefix,new_prefix,scope\nShared_,Player_,src/player/\n"
+            "Shared_Helper,Player_HandleSprite,src/player/local.c\n",
+            "symbols/type_renames.csv": "old_name,new_name,scope\nSharedSprite,PlayerSprite,src/player/\n",
+        }
+        with fixture(files) as root:
+            prefixes = root / "symbols/prefix_renames.csv"
+            types = root / "symbols/type_renames.csv"
+            self.assertEqual(reorg.function_renames(prefixes, prefixes=True, apply=True), 1)
+            self.assertEqual(reorg.type_renames(types, apply=True), 1)
+            self.assertEqual(reorg.function_renames(prefixes, prefixes=True), 0)
+            self.assertEqual(reorg.type_renames(types), 0)
+            self.assertEqual((root / npc).read_text(), body)
+            self.assertIn("Player_HandleSprite(struct PlayerSprite *it)", (root / player).read_text())
+            self.assertIn("Player_Step(void)", (root / player).read_text())
+
     def test_type_renames_keep_related_identifiers_and_the_input_table_intact(self):
         path = "include/engine/video/sprite.h"
         table_path = "symbols/type_renames.csv"

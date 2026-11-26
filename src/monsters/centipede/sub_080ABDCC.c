@@ -41,7 +41,7 @@ void CentipedeBody_ResetDirectionalPose(void *);
 void CentipedeBody_ConvergeReactionMotion(void *);
 void CentipedeBody_UpdateDefeat(void *);
 void CentipedeBody_UpdateHiddenTransition(void *);
-void sub_080ABB18(void *);
+void Centipede_RecoverFromSegmentLoss(void *);
 void ActorTrail_ResetAtSavedPosition(void *);
 void SceneActor_ResetQueuedState(void *);
 s32 SceneActor_TryRequestFacingReaction(void *);
@@ -211,7 +211,7 @@ s32 Centipede_Init(void *object)
         res = ScriptProc_Start(0xCB05, 0xD636);
         *(struct DisplayResourceHeader *)heap = *(struct DisplayResourceHeader *)res;
         ResourceHeader_Relocate(heap, res);
-        Widget_InitLinked(heap + 0x20, heap, 0, 0, 2, 2, 0x3C, &tmp);
+        AnimSprite_InitLinked(heap + 0x20, heap, 0, 0, 2, 2, 0x3C, &tmp);
         actor->base.animationIndex = 0xFF;
     }
     MonsterInit_InitializeBody(actor, &zero);
@@ -247,7 +247,7 @@ s32 Centipede_Init(void *object)
         CentipedeBody_OnIdleState, CentipedeBody_UpdateAttackWindup,
         CentipedeBody_ResetDirectionalPose, CentipedeBody_UpdateHiddenTransition,
         CentipedeBody_ConvergeReactionMotion, CentipedeBody_UpdateDefeat,
-        SceneActorReaction_OnEnemyDefault, 0, SceneActorReaction_ResolveDamage, sub_080ABB18);
+        SceneActorReaction_OnEnemyDefault, 0, SceneActorReaction_ResolveDamage, Centipede_RecoverFromSegmentLoss);
     Tentacle_InstallRoutes(actor);
     Tentacle_EnableInitialFlags(actor);
     SceneActorBehavior_InitializeShadow(actor);

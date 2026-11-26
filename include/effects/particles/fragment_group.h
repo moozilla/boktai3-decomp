@@ -1,7 +1,7 @@
 #ifndef GUARD_FRAGMENT_GROUP_H
 #define GUARD_FRAGMENT_GROUP_H
 #include "engine/video/display_animation.h"
-#include "objects/scene_objects/scene_object.h"
+#include "objects/scene_object.h"
 
 /* Four groups of six ballistic fragments; resources and motion come from the spawner. */
 struct FragmentGroup {
@@ -17,10 +17,10 @@ struct FragmentManager {
     u32 frame, unknown1C;
     struct FragmentGroup groups[4];
 };
-void FragmentGroup_Update(struct FragmentManager *, struct FragmentGroup *);
-u32 FragmentManager_Update(struct FragmentManager *);
-u32 FragmentManager_Destroy(struct FragmentManager *);
-s32 FragmentManager_Initialize(struct FragmentManager *, void *);
-struct FragmentManager *FragmentManager_Create(void *, u32);
+void ImpactFragmentGroup_Update(struct FragmentManager *, struct FragmentGroup *);
+u32 ImpactFragmentManager_Update(struct FragmentManager *);
+u32 ImpactFragmentManager_Destroy(struct FragmentManager *);
+s32 ImpactFragmentManager_Initialize(struct FragmentManager *, void *);
+struct FragmentManager *ImpactFragmentManager_Create(void *, u32);
 void AnimatedParticleManager_ClearSingleton(void);
 #endif

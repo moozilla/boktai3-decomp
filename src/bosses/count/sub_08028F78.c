@@ -15,7 +15,7 @@ u32 Script_GetPc(void);
 void SceneActors_Register(void *, u32);
 void SceneActors_Initialize(void *, u32, u32, void *, u32);
 void SceneBody_SetPositionOffset(void *, const void *);
-void Widget_InitLinked(void *, void *, u32, u32, u32, u32, s32, const void *);
+void AnimSprite_InitLinked(void *, void *, u32, u32, u32, u32, s32, const void *);
 void SceneActors_StartUnmirroredAnimation(void *, void *, void *, s32, s32, s32);
 void SceneActors_SetHealthLimits(void *, u32, u32, u32);
 void SceneActorGraphics_InitializeBody(void *);
@@ -293,7 +293,7 @@ int sub_08028F78(struct VampireInit *s, u32 id)
 
     SceneActors_Initialize(base, id, actorType, &pos, facing);
     SceneBody_SetPositionOffset(base->sprite, gUnk_0824DC78);
-    Widget_InitLinked(s->base.animation, &s->base.resource, 0, 0, 2, 0, 60, &pos);
+    AnimSprite_InitLinked(s->base.animation, &s->base.resource, 0, 0, 2, 0, 60, &pos);
 
     SceneActors_StartUnmirroredAnimation(base, s->base.animation, &s->base.resource, 5, 1, 0);
 

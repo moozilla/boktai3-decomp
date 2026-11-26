@@ -1,7 +1,7 @@
 #include "objects/pile_driver/pile_driver_schedule.h"
-void PileDriver_TickAngleBurst(struct ScenePanel *input)
+void PileDriver_TickAngleBurst(struct PileDriver *input)
 {
-    struct ScenePanelScheduleView *panel = (void *)input;
+    struct PileDriverScheduleView *panel = (void *)input;
     if (panel->frame < panel->interval) {
         if (++panel->frame >= panel->interval) {
             u32 angle = Math_Atan2(gGameState->positionX - panel->origin.x,

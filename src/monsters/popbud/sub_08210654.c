@@ -7,11 +7,11 @@ s32 Popbud_InitCollider(struct PinkSpineState *);
 void SceneBody_Init(void *, void *, void *, u32, u32, void *);
 void SceneBody_SetSprite(void *, void *);
 void TerrainOverlay_QueueAddActor(void *);
-static inline void PinkSpine_GetSpriteFlags(u32 **out, struct DisplaySequenceSprite *sprite)
+static inline void Popbud_GetSpriteFlags(u32 **out, struct DisplaySequenceSprite *sprite)
 {
     *out = &sprite->flags;
 }
-static inline u32 PinkSpine_StepSequence(u32 *flipFlags, struct PinkSpineState *actor,
+static inline u32 Popbud_StepSequence(u32 *flipFlags, struct PinkSpineState *actor,
                                          struct DisplaySequenceSprite *owner,
                                          struct DisplaySequenceState *state)
 {
@@ -156,8 +156,8 @@ s32 Popbud_InitFromScript(struct PinkSpineState *p, void *resource)
     {
 
         u32 *flipFlags;
-        PinkSpine_GetSpriteFlags(&flipFlags, sprite);
-        PinkSpine_StepSequence(flipFlags, p, sprite, &p->sequence);
+        Popbud_GetSpriteFlags(&flipFlags, sprite);
+        Popbud_StepSequence(flipFlags, p, sprite, &p->sequence);
     }
     if (!p->f13A)
         Popbud_InitCollider(p);

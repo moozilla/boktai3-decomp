@@ -26,7 +26,7 @@ def prepare_source(path, target):
         text = text.replace(before, 'void port_hw_publish_io(Hw *hw, unsigned offset, unsigned size)')
     # The compatibility macro erases matching hints. Keep MMIO volatile intact.
     text = re.sub(r'\basm\s+(?:volatile|__volatile__)\s*\(', 'asm(', text)
-    if path.name == 'actor_animation_controller.c':
+    if path.name == 'tutorial_otenko.c':
         text = 'void *ScriptProc_Start(unsigned int, unsigned int);\n' + text
     if path.name == 'script_virtual_machine.c':
         # ScriptProc_Start's result stays in r0 as Script_LoadScript's argument.
