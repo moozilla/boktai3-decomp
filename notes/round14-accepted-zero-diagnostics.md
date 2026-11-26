@@ -12,9 +12,9 @@ later rejects. Narrow volatile loads provided three concrete counterexamples:
 
 | Source | Operation | Why the report was false |
 |---|---|---|
-| `src/fn/sub_082227D8.c:14` | Serial control register masked with `0x40` | The selected hardware bit can be set. |
-| `src/fn/sub_08248778.c:78,96` | EEPROM input masked with `1` | The sampled input bit can be either value. |
-| `src/fn/sub_08249184.c:17` | RTC input masked with `2`, then shifted right once | This extracts a real input bit. |
+| `src/link/serial/sub_082227D8.c:14` | Serial control register masked with `0x40` | The selected hardware bit can be set. |
+| `src/lib/eeprom/sub_08248778.c:78,96` | EEPROM input masked with `1` | The sampled input bit can be either value. |
+| `src/lib/rtc/sub_08249184.c:17` | RTC input masked with `2`, then shifted right once | This extracts a real input bit. |
 
 In each case the diagnostic observed an intermediate zero in a proposed
 narrow-load transformation. The transformation was rejected; the source
@@ -42,14 +42,14 @@ not nine source cleanups. No new compiler sites appear.
 
 The removed sites are:
 
-- `src/fn/sub_08034310.c:47`
-- `src/fn/sub_0810048C.c:32`
-- `src/fn/sub_081A2858.c:137`
-- `src/fn/sub_082227D8.c:14`
-- `src/fn/sub_08248778.c:78,96`
-- `src/fn/sub_08249184.c:17`
-- `src/ivy.c:1197`
-- `src/vorn_main.c:2680`
+- `src/link/wireless_connection_controller/sub_08034310.c:47`
+- `src/field/floor_switch/sub_0810048C.c:32`
+- `src/bosses/hresvelgr/sub_081A2858.c:137`
+- `src/link/serial/sub_082227D8.c:14`
+- `src/lib/eeprom/sub_08248778.c:78,96`
+- `src/lib/rtc/sub_08249184.c:17`
+- `src/monsters/ivy/ivy.c:1197`
+- `src/monsters/vorn/vorn_main.c:2680`
 
 All 32 concession tests pass. Added regressions cover all three hardware
 counterexamples and two genuinely zero expressions involving volatile reads;

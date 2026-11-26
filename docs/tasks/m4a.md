@@ -8,7 +8,7 @@ as C in [pokeemerald](https://github.com/pret/pokeemerald) `src/m4a.c`
 
 ## Goal
 
-`src/lib/m4a.c`: one translation unit covering the contiguous run of m4a.c
+`src/lib/m4a/m4a.c`: one translation unit covering the contiguous run of m4a.c
 functions in the ROM, from `MidiKeyToFreq` (`0822FDB4`) to the last m4a.c
 function before unrelated code (around `ply_xswee` `08231420` and the few
 after it: ply_xwait, ply_xcmd_0D, DummyFunc if present). For every function in
@@ -26,7 +26,7 @@ mapping in `symbols/proposed/m4a.csv`.
 
 * Headers: copy what's needed from pokeemerald `include/gba/` into
   `include/gba/` with a header comment crediting pret (see THIRD_PARTY.md).
-  Make `include/global.h` compatible (it already defines u8/u16/...; avoid
+  Make `include/engine/shared/global.h` compatible (it already defines u8/u16/...; avoid
   duplicate typedefs, e.g. include `gba/types.h` from global.h instead).
 * m4a.c references RAM globals (`gSoundInfo`, `gMPlayJumpTable`, `gCgbChans`,
   `gMPlayMemAccArea`, ...) and ROM tables (`gCgbScaleTable`, `gNoiseTable`,
@@ -47,7 +47,7 @@ mapping in `symbols/proposed/m4a.csv`.
 
 ## Done when
 
-`python3 tools/build.py` prints OK with `src/lib/m4a.c` in place, the unit
+`python3 tools/build.py` prints OK with `src/lib/m4a/m4a.c` in place, the unit
 contains as many real C functions as possible, and the work is committed in
 your worktree. Report which functions are C, which are INCLUDE_ASM, and the
 RAM/ROM symbol mapping you derived.

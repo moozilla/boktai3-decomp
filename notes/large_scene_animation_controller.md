@@ -5,7 +5,7 @@ segment dragon boss task (`Task_Create(8, 0x72FC)`). It continues the earlier
 "Nidhoggr (auto, tentative)" subsystem at 0818ECAC-0818F678 (a different unit); that
 earlier range was not touched here.
 
-Unit: `src/large_scene_animation_controller.c`, header `include/large_scene_animation_controller.h`
+Unit: `src/effects/large_scene_animation_controller/large_scene_animation_controller.c`, header `include/effects/large_scene_animation_controller/large_scene_animation_controller.h`
 (`struct Nidhoggr`, 0x72FC bytes). 130 functions in ROM order, 120 matching (praise be),
 10 left as `INCLUDE_ASM` (see below).
 

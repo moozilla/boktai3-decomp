@@ -99,8 +99,8 @@ Reset, the ARM crt0, the IWRAM helpers, `AgbMain` and the first frame. The
 | Range | Subsystem (from progress_subsystems.csv) | C location | What it does |
 |---|---|---|---|
 | `08000000`–`08000350` | GBA header and crt0 | - | Cartridge header, SDK crt0 (stacks, IntrMain install). Handwritten assembly; reported as intentional assembly. |
-| `08000350`–`0800145C` | IWRAM ARM code | `src/iwram_code.c` | Six ARM C functions copied to IWRAM 0x03000000 by AgbMain (palette bank cache, sprite/blit helpers). |
-| `0800145C`–`080015AC` | Game entry point | `src/fn/AgbMain.c` | `AgbMain`: hardware and subsystem startup, then the endless `TaskSystem_RunFrame` loop. See ENTRY_AND_MENUS.md. |
+| `08000350`–`0800145C` | IWRAM ARM code | `src/engine/iwram_arm_code/iwram_code.c` | Six ARM C functions copied to IWRAM 0x03000000 by AgbMain (palette bank cache, sprite/blit helpers). |
+| `0800145C`–`080015AC` | Game entry point | `src/engine/game_entry_point/AgbMain.c` | `AgbMain`: hardware and subsystem startup, then the endless `TaskSystem_RunFrame` loop. See ENTRY_AND_MENUS.md. |
 
 [ENTRY_AND_MENUS.md](ENTRY_AND_MENUS.md) describes the entry point and the
 start of the menus. The solar and RTC initialization are in section 11.
@@ -154,16 +154,16 @@ first ([ENGINE.md](ENGINE.md), sections 4 and 9).
 
 | Range | Subsystem (from progress_subsystems.csv) | C location | What it does |
 |---|---|---|---|
-| `08003B44`–`080041CC` | Terrain overlays (tentative) | `src/terrain_overlay.c` | Overlays that track actors and draw terrain edges, with queued commands. |
-| `080041CC`–`08005E10` | Scene objects (tentative) | `src/scene_object.c` | Scene blocks: push, step, fall, flash, disappear. Created from script with keywords (`0x74` manager, `0x1A8` objects). |
-| `08005E10`–`08006374` | Terrain modifiers (tentative) | `src/terrain_modifier.c` | Registers and changes terrain cells at runtime, including the script change commands. |
-| `08006F00`–`08008A70` | Items and containers (tentative) | `src/item_container.c` | Dropped items (fall, land, bob, pick up) and treasure containers (open, locked). Singleton `TriggerManager`. |
-| `08008A70`–`08009500` | Pooled interactables (tentative) | `src/pooled_interactable.c` | Fixed-pool breakable props with a five-state machine, placed and activated from script (`0xEC`-byte slots). |
-| `08009500`–`08009E30` | Directional interaction controllers (tentative) | `src/directional_interaction.c` | Interaction prompts gated by actor distance, facing and input. |
-| `08009E30`–`0800A800` | Collision controllers (tentative) | `src/collision_controller.c` | Pool of 16 hit-detecting props with idle and hit animation and an effect burst. |
-| `0800CBA0`–`0800D874` | Falling objects (tentative) | `src/falling_objects.c` | Objects that fall onto the terrain, with allocation, update and cleanup. |
-| `0800F9C4`–`080111EC` | Group objects (tentative) | `src/group_objects.c` | Manager for sixteen objects with animation and movement; several movement callbacks are unmatched. |
-| `08011884`–`08012040` | Scene indicators (tentative) | `src/scene_indicator.c` | Scene indicators: lifecycle, timing, visibility, terrain placement, script pause and resume. |
+| `08003B44`–`080041CC` | Terrain overlays (tentative) | `src/field/terrain_overlays/terrain_overlay.c` | Overlays that track actors and draw terrain edges, with queued commands. |
+| `080041CC`–`08005E10` | Scene objects (tentative) | `src/field/scene_objects/scene_object.c` | Scene blocks: push, step, fall, flash, disappear. Created from script with keywords (`0x74` manager, `0x1A8` objects). |
+| `08005E10`–`08006374` | Terrain modifiers (tentative) | `src/field/terrain_modifiers/terrain_modifier.c` | Registers and changes terrain cells at runtime, including the script change commands. |
+| `08006F00`–`08008A70` | Items and containers (tentative) | `src/field/items_and_containers/item_container.c` | Dropped items (fall, land, bob, pick up) and treasure containers (open, locked). Singleton `TriggerManager`. |
+| `08008A70`–`08009500` | Pooled interactables (tentative) | `src/field/pooled_interactables/pooled_interactable.c` | Fixed-pool breakable props with a five-state machine, placed and activated from script (`0xEC`-byte slots). |
+| `08009500`–`08009E30` | Directional interaction controllers (tentative) | `src/field/directional_interaction_controllers/directional_interaction.c` | Interaction prompts gated by actor distance, facing and input. |
+| `08009E30`–`0800A800` | Collision controllers (tentative) | `src/field/collision_controllers/collision_controller.c` | Pool of 16 hit-detecting props with idle and hit animation and an effect burst. |
+| `0800CBA0`–`0800D874` | Falling objects (tentative) | `src/field/falling_objects/falling_objects.c` | Objects that fall onto the terrain, with allocation, update and cleanup. |
+| `0800F9C4`–`080111EC` | Group objects (tentative) | `src/field/group_objects/group_objects.c` | Manager for sixteen objects with animation and movement; several movement callbacks are unmatched. |
+| `08011884`–`08012040` | Scene indicators (tentative) | `src/menus/scene_indicators/scene_indicator.c` | Scene indicators: lifecycle, timing, visibility, terrain placement, script pause and resume. |
 | `08012D08`–`080133CC` | Breakable barriers | `src/fn/` (13 files) | Breakable barriers: manager and callbacks (tentative grouping). |
 | `0801E000`–`08020964` | Scene object controller (tentative) | `src/fn/` (37 files) | Scene object controller: shared object slots (140 bytes), script handlers and callbacks. |
 | `08020964`–`08020F6C` | Scene message controller | `src/fn/` (24 files) | Scene message controller: receiver registration, double-buffered dispatch and the scene-script lifecycle. |
@@ -192,7 +192,7 @@ descriptive, not confirmed roles.
 | `0802D5B4`–`0802D9F8` | Scene actor resources and lifecycle (tentative) | `src/fn/` (19 files) | Scene actor resources and lifecycle: resource lookup, registry, allocation, motion registration and destruction. |
 | `0802D9F8`–`08030710` | Scene actor animation and scripted actions (tentative) | `src/fn/` (35 files) | Scene actor animation and scripted actions: terrain height, path nodes, status effects, directional animation, proximity and phase actions. |
 | `08030710`–`080308BC` | Scene actor manager | `src/fn/` (4 files) | Scene actor manager: update, destruction, initialization and task creation. |
-| `0803CDF0`–`0803EE58` | Scene pooled motion and actor controls (tentative) | `src/fn/`, `include/scene_pool.h` | Four actor slots and configurable pooled state entries; target x/z metrics, speed/lateral controls and a twelve-state callback table (ten callbacks exact). Incomplete; gameplay identity unconfirmed. |
+| `0803CDF0`–`0803EE58` | Scene pooled motion and actor controls (tentative) | `src/fn/`, `include/engine/shared/scene_pool.h` | Four actor slots and configurable pooled state entries; target x/z metrics, speed/lateral controls and a twelve-state callback table (ten callbacks exact). Incomplete; gameplay identity unconfirmed. |
 | `0818D754`–`0818DC50` | Spinning approach motion (tentative) | `src/fn/` (3 files) | Two-stage spinning approach movement (four callbacks); see MOTION_0818.md. Not tied to a visible object yet. |
 | `081E34D0`–`081EAB64` | Actor animation controller (tentative) | `src/fn/` (91 files) | Actor animation controller: shared actor layout, child effects, state transitions, palette fades and interaction selection (ANIMATION_081E.md). |
 
@@ -212,12 +212,12 @@ selection grids, the password screen and the sound test.
 
 | Range | Subsystem (from progress_subsystems.csv) | C location | What it does |
 |---|---|---|---|
-| `08006374`–`08006F00` | Choice menu | `src/choice_menu.c` | Script-driven choice list: input, text markup, layout and dispatch of the chosen callback. |
-| `0800E3E0`–`0800F4C4` | Status screen (tentative) | `src/status_screen.c, status_screen_fade.c, status_screen_phases.c` | Status screen: numeric display, palette fades and the scanline transition chain. Split in three files for compiler flags. |
-| `0800F4C4`–`0800F850` | Numeric overlay (tentative) | `src/numeric_overlay.c` | Counter display, a sibling of the status screen with the same background and palette load but no fades. |
-| `0800F850`–`0800F9C4` | Result prompt | `src/result_prompt.c` | Input prompt with callbacks and lifecycle. |
-| `080111EC`–`0801150C` | Message menu | `src/message_menu.c` | Message box: background text windows, transition, update and cleanup. |
-| `0801150C`–`08011884` | Password decoding | `src/password.c` | Password text filtering, decoding and validation. |
+| `08006374`–`08006F00` | Choice menu | `src/menus/choice_menu/choice_menu.c` | Script-driven choice list: input, text markup, layout and dispatch of the chosen callback. |
+| `0800E3E0`–`0800F4C4` | Status screen (tentative) | `src/menus/status_screen/status_screen.c, status_screen_fade.c, status_screen_phases.c` | Status screen: numeric display, palette fades and the scanline transition chain. Split in three files for compiler flags. |
+| `0800F4C4`–`0800F850` | Numeric overlay (tentative) | `src/menus/numeric_overlay/numeric_overlay.c` | Counter display, a sibling of the status screen with the same background and palette load but no fades. |
+| `0800F850`–`0800F9C4` | Result prompt | `src/menus/result_prompt/result_prompt.c` | Input prompt with callbacks and lifecycle. |
+| `080111EC`–`0801150C` | Message menu | `src/menus/message_menu/message_menu.c` | Message box: background text windows, transition, update and cleanup. |
+| `0801150C`–`08011884` | Password decoding | `src/menus/password_decoding/password.c` | Password text filtering, decoding and validation. |
 | `08019E58`–`0801B49C` | Selection menu (tentative) | `src/fn/` (45 files) | Selection menu for actors and items: display, cursors, availability, confirmation and script initialization. |
 | `080308BC`–`0803198C` | Dialogue controls and animation (tentative) | `src/fn/` (35 files) | Dialogue controls: text lookup, choice parsing, window rectangles, palette, scrolling, timing, fast text, graphics cleanup. |
 | `0803198C`–`08031E54` | Dialogue task setup (tentative) | `src/fn/` (7 files) | Dialogue task setup: allocator, callbacks, singleton and rectangle and VM accessors. |
@@ -247,14 +247,14 @@ sprite and tile animation, and the timed presentations that run them.
 
 | Range | Subsystem (from progress_subsystems.csv) | C location | What it does |
 |---|---|---|---|
-| `080015AC`–`08002AA8` | Background controllers | `src/background_controller.c` | Background layers: static and scrolling families with map loading, camera follow, blend and an eight-command queue. |
-| `08002AA8`–`080036F8` | Palette controllers | `src/palette_controller.c` | Palette blending, brightness scaling, oscillation, script-driven transitions and hardware palette upload. |
-| `080036F8`–`08003B44` | Color and fade controller | `src/color_fade_controller.c` | Two-channel colour-blend fade with an eight-entry command queue (fade in, fade out, hold). |
-| `0800A800`–`0800C49C` | Homing and orbiting effects (tentative) | `src/homing_effect.c` | Six particle effects (four sprites each) that drift, orbit and home in on the player; `EffectManager`. |
-| `0800C49C`–`0800C7F4` | Effect emitter (tentative) | `src/effect_emitter.c` | Emitter task that spawns effects; allocation, initialization, update and cleanup. |
-| `0800C7F4`–`0800CBA0` | Damage controller | `src/damage_controller.c` | Hit and death handling for an actor; runs its hit and death scripts with `Script_Call`. |
-| `0800D874`–`0800E0CC` | Scanline presentation (tentative) | `src/scanline_presentation.c` | Per-scanline animation layers (six display layers) and their lifecycle. |
-| `0800E0CC`–`0800E3E0` | Palette sets | `src/palette_set.c` | Palette sets: allocation, initialization, blending and upload. |
+| `080015AC`–`08002AA8` | Background controllers | `src/effects/background_controllers/background_controller.c` | Background layers: static and scrolling families with map loading, camera follow, blend and an eight-command queue. |
+| `08002AA8`–`080036F8` | Palette controllers | `src/effects/palette_controllers/palette_controller.c` | Palette blending, brightness scaling, oscillation, script-driven transitions and hardware palette upload. |
+| `080036F8`–`08003B44` | Color and fade controller | `src/effects/color_and_fade_controller/color_fade_controller.c` | Two-channel colour-blend fade with an eight-entry command queue (fade in, fade out, hold). |
+| `0800A800`–`0800C49C` | Homing and orbiting effects (tentative) | `src/effects/homing_and_orbiting_effects/homing_effect.c` | Six particle effects (four sprites each) that drift, orbit and home in on the player; `EffectManager`. |
+| `0800C49C`–`0800C7F4` | Effect emitter (tentative) | `src/effects/effect_emitter/effect_emitter.c` | Emitter task that spawns effects; allocation, initialization, update and cleanup. |
+| `0800C7F4`–`0800CBA0` | Damage controller | `src/field/damage_controller/damage_controller.c` | Hit and death handling for an actor; runs its hit and death scripts with `Script_Call`. |
+| `0800D874`–`0800E0CC` | Scanline presentation (tentative) | `src/effects/scanline_presentation/scanline_presentation.c` | Per-scanline animation layers (six display layers) and their lifecycle. |
+| `0800E0CC`–`0800E3E0` | Palette sets | `src/effects/palette_sets/palette_set.c` | Palette sets: allocation, initialization, blending and upload. |
 | `08012AD0`–`08012D08` | Debris particles | `src/fn/` (1 file) | Debris particles: manager callbacks (tentative grouping). |
 | `080133CC`–`080136B4` | Terrain shadows | `src/fn/` (12 files) | Terrain shadows: shadows that follow the terrain height. |
 | `080136B4`–`08013C14` | Scaled shadows | `src/fn/` (17 files) | Scaled shadows: shadows scaled to the object's height. |
@@ -279,9 +279,9 @@ sprite and tile animation, and the timed presentations that run them.
 | `081E2898`–`081E34D0` | Scripted presentation | `src/fn/` (12 files) | Scripted presentation: allocation through global callback cleanup. |
 
 Shared controllers and their layouts are in
-[`include/background_controller.h`](../include/background_controller.h),
-[`include/palette_controller.h`](../include/palette_controller.h) and
-[`include/color_fade_controller.h`](../include/color_fade_controller.h).
+[`include/effects/background_controllers/background_controller.h`](../include/effects/background_controllers/background_controller.h),
+[`include/effects/palette_controllers/palette_controller.h`](../include/effects/palette_controllers/palette_controller.h) and
+[`include/effects/color_and_fade_controller/color_fade_controller.h`](../include/effects/color_and_fade_controller/color_fade_controller.h).
 [BACKGROUND_CONTROLLERS.md](BACKGROUND_CONTROLLERS.md) covers the background
 families. The engine's palette and tile services are in
 [ENGINE.md](ENGINE.md), section 10.
@@ -350,12 +350,12 @@ linked notes.
 
 | Range | Library | C location | Notes |
 |---|---|---|---|
-| `0822F1B4`–`08231448` | MP2K (`m4a`) sound driver | `src/lib/m4a.c` (57 of 58 functions) | [THIRD_PARTY.md](../THIRD_PARTY.md); `symbols/proposed/m4a.csv`; the mixer `SoundMainRAM` at `0822F248` runs from IWRAM |
+| `0822F1B4`–`08231448` | MP2K (`m4a`) sound driver | `src/lib/m4a/m4a.c` (57 of 58 functions) | [THIRD_PARTY.md](../THIRD_PARTY.md); `symbols/proposed/m4a.csv`; the mixer `SoundMainRAM` at `0822F248` runs from IWRAM |
 | `08243EFC`–`08248590` | RFU SDK 1024 (STWI transport, serial interrupt, link API, identification) | `src/lib/librfu_*.c` (145 functions) | [RFU.md](RFU.md) |
 | `08248590`–`082485EC` | `libagbsyscall` BIOS wrappers | `symbols/functions.csv` | standard syscalls such as `CpuSet` and `VBlankIntrWait` |
-| `082485EC`–`08248970` | EEPROM SDK V124 | `src/fn/sub_082485EC.c`, `sub_08248634.c` to `sub_08248930.c` | [EEPROM.md](EEPROM.md) |
+| `082485EC`–`08248970` | EEPROM SDK V124 | `src/lib/eeprom/sub_082485EC.c`, `sub_08248634.c` to `sub_08248930.c` | [EEPROM.md](EEPROM.md) |
 | `08248970`–`08249238` | SIIRTC | `symbols/proposed/rtc.csv` | [RTC.md](RTC.md) |
-| `08249238`–`0824ACFC` | libgcc runtime (`_call_via_rX`, division, floating point) | `src/lib/libgcc_fp.c`, `libgcc_dp.c` | [LIBGCC.md](LIBGCC.md) |
+| `08249238`–`0824ACFC` | libgcc runtime (`_call_via_rX`, division, floating point) | `src/lib/libgcc/libgcc_fp.c`, `libgcc_dp.c` | [LIBGCC.md](LIBGCC.md) |
 | `0824ACFC`–`0824DA3C` | libm (Sun fdlibm) | `src/lib/libm_*.c` | [LIBM.md](LIBM.md) |
 | `0824DA3C`–`0824DAFA` | libc (`memcpy`, `memset`) | `src/lib/libc_*.c` | [LIBM.md](LIBM.md) |
 
@@ -388,7 +388,7 @@ came from.
 ## 14. Unknown and not yet mapped
 
 The leading 0803CDF0–0803EE58 stretch now has a tentative pooled motion/actor
-controller group and shared types in `include/scene_pool.h`; ten additional
+controller group and shared types in `include/engine/shared/scene_pool.h`; ten additional
 functions match. Its gameplay identity and remaining state callbacks are still
 unresolved. See [scene-pool notes](../notes/scene-pool_2026-10-13.md).
 

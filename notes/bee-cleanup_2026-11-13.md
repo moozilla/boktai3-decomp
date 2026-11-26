@@ -2,7 +2,7 @@
 
 Tags: #monsters #cleanup #bee #volatile
 
-The completed 08091E54–08095574 unit now lives in `src/bee.c`, with its shared types in `include/bee.h`. All 45 input functions and eight reference-only rename consumers match; the merged unit matches all 14112 bytes. Four anonymous routines now have provisional Bee names. The old source-only draft patch has been removed because the completed source supersedes it.
+The completed 08091E54–08095574 unit now lives in `src/monsters/bee/bee.c`, with its shared types in `include/monsters/bee/bee.h`. All 45 input functions and eight reference-only rename consumers match; the merged unit matches all 14112 bytes. Four anonymous routines now have provisional Bee names. The old source-only draft patch has been removed because the completed source supersedes it.
 
 The recovered 0x490-byte Bee context contains flags at 3D4, initial height/previous ground at 3D8/3DA, behavior cooldown and saved facing at 3DC/3DF, nine points at 3E0, waypoint and cooldown bytes at 428–42B, duration at 42C, curve time/phase/type at 430–437, remaining duration at 43A, anchor ID/speed/pointer at 43C/43E/440, a saved motion subject at 444 with curve output at 450, endpoints at 470/478, motion at 480 and original position at 488. Existing engine component types preserve the layout. These field interpretations remain provisional.
 

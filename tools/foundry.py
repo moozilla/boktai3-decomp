@@ -21,7 +21,7 @@ Stages, and where each function's state lives (build/foundry/FUNC/):
               symbols in place of the C's
   3. regs     when the remaining difference is registers only, tools/rasolve.py
               and tools/translate.py (tools/autosolve.py)
-  4. commit   a MATCH goes to src/fn/FUNC.c through the usual batch PR
+  4. commit   a MATCH goes to the source treeFUNC.c through the usual batch PR
 
 Distances are aligned halfwords (rasolve.distance); "shape" is the same with
 registers and immediates abstracted, i.e. what a C change has to fix.
@@ -29,6 +29,7 @@ registers and immediates abstracted, i.e. what a C change has to fix.
 import argparse
 import difflib
 import glob
+from source_layout import manifest, new_source
 import json
 import os
 import random
@@ -203,11 +204,10 @@ def context(func):
     if hi:
         import collections
         inc = collections.Counter()
-        for q in glob.glob(os.path.join(ROOT, "src", "fn", "sub_*.c")):
-            a = int(os.path.basename(q)[4:12], 16)
-            if lo <= a < hi:
-                inc.update(re.findall(r'#include "([^"]+\.h)"', open(q, errors="replace").read()))
-        inc.pop("global.h", None)
+        for path, addresses in manifest().by_file.items():
+            if any(lo <= a < hi for a in addresses):
+                inc.update(re.findall(r'#include "([^"]+\.h)"', open(path, errors="replace").read()))
+        inc.pop("engine/shared/global.h", None)
         pack += [f"## Subsystem: {sname} ({lo:08X}-{hi:08X})", "",
                  "Headers its matched functions include (shared types live here; extend them):", ""]
         pack += [f"* include/{h} (used by {n} matched functions)" for h, n in inc.most_common(6)] or ["* (none yet)"]
@@ -227,7 +227,7 @@ matched relatives (start from a relative's C when one covers most of the functio
 Read docs/AGBCC_TIPS.md, including "Wrong values in the right shape"
 bullet for compiler idioms.
 
-Write your C to wip/{run}/{func}.c: `#include "global.h"`, local declarations, then the one
+Write your C to wip/{run}/{func}.c: `#include "engine/shared/global.h"`, local declarations, then the one
 function {func} (keep the sub_ name). Use the names the context pack shows: the linker
 does not resolve sub_XXXXXXXX for a function that has a real name, or D_XXXXXXXX labels. No data definitions, no string literals, no register
 pins (`register ... asm("rN")`), no asm() statements.
@@ -522,7 +522,7 @@ For EACH function FUNC:
      existing offset. After editing a header run
        build/venv/bin/python tools/foundry.py hdrcheck include/HEADER.h
      which re-checks every matched file that includes it; undo the edit if anything breaks.
-     Don't edit include/global.h or headers outside this subsystem. If the object has no
+     Don't edit include/engine/shared/global.h or headers outside this subsystem. If the object has no
      header yet, define its struct locally, named after the object (not `struct S1`).
 3. Write build/foundry/FUNC/result.txt with these lines:
      RESULT FUNC MATCH checks=K            (or: RESULT FUNC fuzzy N% checks=K)
@@ -718,8 +718,10 @@ def committable():
                   if os.path.exists(os.path.join(OUT, func, "checks.tsv")) else None}
         if not st["stage"].startswith("matched") or "disagrees" in st["stage"]:
             continue
-        if os.path.exists(os.path.join(ROOT, "src", "fn", func + ".c")):
-            continue
+        if (file := manifest().single_file(func)) and "#ifdef NONMATCHING" not in open(file).read():
+            from split import c_functions
+            if c_functions(file, with_asm=False):
+                continue
         src = os.path.join(WIP, func + ".c") if st["stage"] == "matched by worker" else os.path.join(OUT, func, "candidate.c")
         out.append((func, src, st["stage"], st.get("checks")))
     return sorted(out)
@@ -828,12 +830,13 @@ def integrate(dry=False, limit=10 ** 9):
             else:
                 open(unit, "w").write(old)
         if not placed:
-            placed = os.path.join(ROOT, "src", "fn", func + ".c")
+            placed = os.path.join(ROOT, new_source(int(func[4:], 16), func))
             if not dry:
+                os.makedirs(os.path.dirname(placed), exist_ok=True)
                 open(placed, "w").write(text)
                 if not drop_conflicting_decls(placed):
                     os.remove(placed)
-                    print(f"{func}: no longer matches as src/fn; skipped")
+                    print(f"{func}: no longer matches on its own; skipped")
                     continue
         addr = func[4:]
         fam = r.get("FAMILY", "")

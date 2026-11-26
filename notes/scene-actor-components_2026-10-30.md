@@ -2,9 +2,9 @@
 
 Tags: #ram #structs #monster #matching
 
-The actor record in `include/scene_actor_reset.h` now embeds the shared body,
+The actor record in `include/engine/shared/scene_actor_reset.h` now embeds the shared body,
 attack arrays, targeting state, and saved control state declared in
-`include/scene_actor_components.h`. Existing consumers use those members directly.
+`include/engine/shared/scene_actor_components.h`. Existing consumers use those members directly.
 This replaces misleading flat aliases such as `defaultFlags2CC` at offset `0x118`
 with `saved.behaviorFlags`; it does not add a second actor prefix.
 

@@ -30,7 +30,7 @@ No handwritten instruction bodies were used.
 
 ## Transient effects
 
-`include/transient_sprite_effects.h` describes a **0x598 list-10 singleton**
+`include/effects/transient_sprite_effects/transient_sprite_effects.h` describes a **0x598 list-10 singleton**
 at gUnk_020000A0. Sixteen **0x58 slots** start at 0x18. Each slot has active and
 option bytes, age, damping delay and multiplier, a velocity vector, graphics
 at 0x10 and sprite at 0x2C. A union exposes both packed initialization fields
@@ -71,7 +71,7 @@ New full extents: 08047338 = 184; 080473F0 = 52; 08047424 = 124;
 
 ## BG1 flash and scrolling
 
-`include/background_flash.h` recovers a **0x48 list-9 task**. Its overall frame
+`include/effects/bg1_flash_and_scrolling_controller/background_flash.h` recovers a **0x48 list-9 task**. Its overall frame
 counter is at 0x18, state/entry/page at 0x1C/0x1D/0x1E, effect sources at
 0x20/0x24, state frame at 0x28, current/target speeds at 0x2C/0x30, retarget
 countdown at 0x34, and two x/y scroll-offset pairs at 0x38/0x40. The family name

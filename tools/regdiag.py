@@ -33,6 +33,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import build  # noqa: E402
 import check  # noqa: E402
 from romlib import ROOT, load_rom, off  # noqa: E402
+from source_layout import resolve
 
 REG = re.compile(r"\b(r\d+|sb|sl|fp|ip|sp|lr|pc)\b")
 ALIAS = {"sb": "r9", "sl": "r10", "fp": "r11", "ip": "r12"}
@@ -373,7 +374,10 @@ def main():
     ap.add_argument("--lines", action="store_true",
                     help="print only the source lines that need changes (for permute.py --focus)")
     a = ap.parse_args()
-    src = a.src if os.path.exists(a.src) else os.path.join(ROOT, "src/fn", a.src + ".c")
+    try:
+        src = resolve(a.src)
+    except ValueError as error:
+        sys.exit(str(error))
     an = analyze(src, a.func, a.nonmatching)
     if a.lines:
         print(" ".join(str(x) for x in sorted(an.focus_lines())))

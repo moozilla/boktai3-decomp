@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """Fold a unit's private view of a class into the class struct.
 
-  fold_views.py include/vorn.h Vorn src/fn/sub_080AD40C.c:SceneActorReactionContext ...
-  fold_views.py include/vorn.h Vorn --candidates      list the views in units of Vorn_ functions
+  fold_views.py include/monsters/vorn/vorn.h Vorn src/fn/sub_080AD40C.c:SceneActorReactionContext ...
+  fold_views.py include/monsters/vorn/vorn.h Vorn --candidates      list the views in units of Vorn_ functions
 
 Drafts often declare their own copy of a monster struct: `u8 unknown0[0x6D4]; u16 flags;`.
 For each UNIT:VIEW this places every named member of the view at its offset in the class
@@ -287,9 +287,9 @@ def edit_unit(text, view, tag, header):
     body = struct_body(text, view)
     text = text[:body.start()] + text[body.end():].lstrip("\n") if body else text
     text = re.sub(r"\bstruct %s\b" % re.escape(view), f"struct {tag}", text)
-    inc = f'#include "{os.path.basename(header)}"'
+    inc = f'#include "{os.path.relpath(header, 'include')}"'
     if inc not in text:
-        text = re.sub(r'^(#include "global.h"\n)', r"\1" + inc + "\n", text, count=1, flags=re.M)
+        text = re.sub(r'^(#include "engine/shared/global.h"\n)', r"\1" + inc + "\n", text, count=1, flags=re.M)
         if inc not in text:
             text = inc + "\n" + text
     return text

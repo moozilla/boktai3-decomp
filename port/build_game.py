@@ -22,6 +22,8 @@ import time
 ROOT = Path(__file__).resolve().parents[1]
 LLVM = Path('/opt/homebrew/opt/llvm/bin')
 sys.path.insert(0, str(ROOT / 'port/core'))
+sys.path.insert(0, str(ROOT / 'tools'))
+from source_layout import source_paths
 from prepare import prepare_headers, prepare_source  # noqa: E402
 from addresses import read_addresses, bind_ir  # noqa: E402
 from mmio import instrument_mmio  # noqa: E402
@@ -65,8 +67,8 @@ EXPORTS = ['port_trace_map', 'port_memory_init', 'port_load_rom', 'port_game_run
 
 
 def game_sources():
-    return (sorted(ROOT.glob('src/*.c')) + sorted(ROOT.glob('src/fn/*.c')) +
-            sorted(ROOT.glob('src/lib/*.c')))
+    return source_paths(ROOT)
+
 
 
 def code_addresses():

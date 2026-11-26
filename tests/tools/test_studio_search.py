@@ -17,7 +17,7 @@ ATLAS = {
     'actor:F5EB': {'id': 'actor:F5EB', 'kind': 'actor', 'key': 'F5EB', 'title': 'Django', 'fname': 'Player_Create', 'path': 'Objects'},
 }
 CODE = {'categories': [{'name': 'Monsters', 'units': [{'name': 'Ghoul', 'functions': [
-    ['Ghoul_Create', '0808E1D4', 100, 100, [], 'src/ghoul.c'], ['sub_0808E300', '0808E300', 20, 100, [], None]]}]}],
+    ['Ghoul_Create', '0808E1D4', 100, 100, [], 'src/monsters/ghoul/ghoul.c'], ['sub_0808E300', '0808E300', 20, 100, [], None]]}]}],
     'ram': [{'name': 'gGhoulCount', 'addr': '02001000', 'size': 4}]}
 
 

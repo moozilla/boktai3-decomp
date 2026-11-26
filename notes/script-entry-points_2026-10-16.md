@@ -35,7 +35,7 @@ The two hidden functions were counted as part of the entry point before them
 ## Not matched yet
 
 * 08225624, the `trap` command (`Trap_CreateFromScript`): guarded draft at 93.5%
-  in `src/fn/sub_08225624.c`. Everything matches except the two loops that clear
+  in `src/engine/script/sub_08225624.c`. Everything matches except the two loops that clear
   the four-entry `-w` and `-s` lists. The original runs a pointer from
   `&list[3]` down and compares it with the list base (`cmp r0, r2; bge`), no
   counter, no entry check. Tried: index loops (`for`, `do`, count up/down,
@@ -256,7 +256,7 @@ Guarded drafts (no exact gain): FloorSwitch_Create (0810067C), 0810858C
 `SceneEffectSchedule_AddFromScript`, 081C4080 `RegistryF3E4_Create`, 08111A48
 `PaletteFade_StartFromScript` and 08103110 `NamedObject_CreateFromScript`
 (registry A4FC, 66%; it inlines the packed-command sprite stepper of
-`include/actor_attachment_sprite_playback.h`). FloorSwitch_Create stays near
+`include/actors/actor_attachment_manager/actor_attachment_sprite_playback.h`). FloorSwitch_Create stays near
 70% after about an hour of permuter time: the "pressed" block is placed
 differently and the scratch registers in its hoisted-address region differ.
 

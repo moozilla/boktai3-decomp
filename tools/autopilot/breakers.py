@@ -7,11 +7,11 @@ An attack's collider carries reaction flags (ContactCollider.reactionFlags, +0x3
 target's hit callback tests them. This collects, from the decomp's own C and the ROM's
 weapon table, which flags each source of attack carries:
 
-* targets: Breakable_OnHit (src/pooled_interactable.c): the flag each slot state needs
+* targets: Breakable_OnHit (src/field/pooled_interactables/pooled_interactable.c): the flag each slot state needs
   (state 1 -> 4: a candlestick is lit; state 2 -> 8: put out) and the state it moves to.
-* lens: Player_GetAttackAttributeFlags (src/fn/sub_0814DD3C.c): the gun's flags per lens
+* lens: Player_GetAttackAttributeFlags (src/player/sub_0814DD3C.c): the gun's flags per lens
   mode; the lens id in the bag (GameState+0x828) is the mode, its name is string 970 + id.
-* weapon modifiers: Player_BuildActionModifiers (src/player_3.c): modifier kind -> the
+* weapon modifiers: Player_BuildActionModifiers (src/player/player_3.c): modifier kind -> the
   Player_OnWeaponHitApply* callback -> the flags it returns.
 * weapons: the ROM's weapon records (gUnk_08E6092C, 32 bytes each, modifier kinds at
   +12 and +16); a sword's name is string 817 + id.
@@ -27,8 +27,12 @@ import sys
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 
+sys.path.insert(0, os.path.join(ROOT, "tools"))
+from source_layout import resolve
+
+
 def src(path):
-    with open(os.path.join(ROOT, path)) as f:
+    with open(os.path.join(ROOT, resolve(path))) as f:
         return f.read()
 
 
@@ -44,7 +48,7 @@ def body(text, name):
 
 
 def targets():
-    b = body(src("src/pooled_interactable.c"), "Breakable_OnHit")
+    b = body(src("src/field/pooled_interactables/pooled_interactable.c"), "Breakable_OnHit")
     out = {}
     for m in re.finditer(r"state == (\d+)\)\s*\{\s*if \(SceneCollider_ReadReactionFlags\(other, (\w+)\)\)\s*"
                          r"Breakable_EnterState\(\w+, (\d+)\)", b):
@@ -80,8 +84,8 @@ def text(i):
 
 def main():
     out_path = sys.argv[1] if len(sys.argv) > 1 else os.path.join(ROOT, "build/autopilot/breakers.json")
-    lens = switch_cases(body(src("src/fn/sub_0814DD3C.c"), "Player_GetAttackAttributeFlags").split("else", 1)[1])
-    p3 = src("src/player_3.c")
+    lens = switch_cases(body(src("Player_GetAttackAttributeFlags"), "Player_GetAttackAttributeFlags").split("else", 1)[1])
+    p3 = src("src/player/player_3.c")
     returns = {m.group(1): int(m.group(2), 0) for m in re.finditer(
         r"s32 (Player_OnWeaponHitApply\w+)\(struct Player \*p\)\s*\{[^}]*return (\w+);", p3)}
     mods = {}

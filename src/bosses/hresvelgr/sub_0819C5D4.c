@@ -1,0 +1,53 @@
+#include "engine/shared/global.h"
+#include "engine/shared/engine.h"
+#include "engine/shared/ram.h"
+#include "engine/shared/monster_particle_random.h"
+
+struct BurstVector {
+    s16 x, y, z, pad;
+};
+struct BurstActor {
+    u8 unknown0[0x51];
+    u8 direction;
+    u8 unknown52[2];
+    struct BurstVector position;
+    u8 unknown5C[0x110 - 0x5C];
+    struct BurstVector *target;
+    u8 unknown114[0x32B - 0x114];
+    u8 side;
+};
+extern const s16 gUnk_086149C4[];
+void MotionEntry_CreateWithDelta(void *, void *, s32, s32);
+static inline s32 scale(s32 n)
+{
+    return n >= 0 ? n >> 12 : -((-n) >> 12);
+}
+static inline void polar(struct BurstVector *v, s32 angle, s32 radius)
+{
+    v->x = scale(gUnk_086149C4[(angle + 64) & 255] * radius);
+    v->y = 0;
+    v->z = scale(gUnk_086149C4[angle & 255] * radius);
+}
+static inline void add(struct BurstVector *d, struct BurstVector *a, struct BurstVector *b)
+{
+    d->x = b->x + a->x;
+    d->y = b->y + a->y;
+    d->z = b->z + a->z;
+}
+
+void Hresvelgr_GetTravelTarget(struct BurstActor *object, struct BurstVector *out)
+{
+    struct BurstActor *actor = object;
+    if (out) {
+        const u16 *table = gRandomTable;
+        s32 radius = ((s32)ParticleRandom_ReadSample(table) >> 3) % 512 + 256;
+        s32 sample = ParticleRandom_ReadDirectSample(table);
+        s32 base = actor->side << 6;
+        s32 offset = (sample >> 3) % 32 + 112;
+        s32 angle = base + offset;
+        angle &= 255;
+        polar(out, angle, radius);
+        add(out, actor->target, out);
+        out->y = 832;
+    }
+}

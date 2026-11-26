@@ -11,9 +11,9 @@ that intermediate to the enclosing source statement.
 
 | Source at baseline `c940902f6` | Reported operations | Nonzero source case |
 | --- | --- | --- |
-| `src/fn/sub_0819FC34.c:131`, `Hresvelgr_UpdateTurningCharge` | `ashiftrt`, `lshiftrt` | Sample 8 gives remainder 1 and turn +16. |
-| `src/fn/sub_081A9DDC.c:47`, `Vanargand_UpdateAlternatingPairAttack` | `ashiftrt`, `lshiftrt` | Sample 8 selects half 1. |
-| `src/vorn_main.c:2117`, `Vorn_BeginPursuitRoute` | `and` | Initial flags 0 become 4, then remain 4. |
+| `src/bosses/hresvelgr/sub_0819FC34.c:131`, `Hresvelgr_UpdateTurningCharge` | `ashiftrt`, `lshiftrt` | Sample 8 gives remainder 1 and turn +16. |
+| `src/bosses/vanargand/sub_081A9DDC.c:47`, `Vanargand_UpdateAlternatingPairAttack` | `ashiftrt`, `lshiftrt` | Sample 8 selects half 1. |
+| `src/monsters/vorn/vorn_main.c:2117`, `Vorn_BeginPursuitRoute` | `and` | Initial flags 0 become 4, then remain 4. |
 
 These are **three warning sites and five raw diagnostic records**. They
 share a loss of operation provenance. Two distinct lowering paths generate

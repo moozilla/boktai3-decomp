@@ -1,0 +1,133 @@
+#include "engine/shared/scene_actor_chase_reaction.h"
+#include "engine/shared/global.h"
+#include "actors/scene_actor_reaction/scene_actor_reaction.h"
+#include "engine/shared/scene_actor_terrain.h"
+#include "engine/shared/scene_actor_chase.h"
+
+extern const s16 gUnk_086149C4[];
+
+s32 Math_Atan2(s32, s32);
+s32 Div(s32, s32);
+void CpuSet(const void *, void *, u32);
+
+static inline u8 Take(u8 *p)
+{
+    if (*p) {
+        *p = 0;
+        return 1;
+    }
+    return 0;
+}
+
+static inline s32 Shift(s32 n, u32 bits)
+{
+    if (n >= 0)
+        return n >> bits;
+    return -((-n) >> bits);
+}
+
+static inline void State0(struct ChaseActor *a)
+{
+    a->base.state2A8 = 0;
+    a->base.phase2A9 = 0;
+    a->base.behavior2AA = 0;
+    a->base.counter2AC = 0;
+    a->base.field2B1 = 1;
+}
+
+static inline void State2(struct ChaseActor *a)
+{
+    u32 behavior = 2;
+    a->base.state2A8 = 0;
+    a->base.phase2A9 = 0;
+    a->base.behavior2AA = behavior;
+    a->base.counter2AC = 0;
+    a->base.field2B1 = 1;
+}
+
+struct SavedPair {
+    u32 x, z;
+};
+struct SavedMotion {
+    u8 pad[12];
+    struct ContactPosition position;
+};
+
+void TentacleActor_ResetOscillation(void *);
+s32 Callback_InvokeActor(void *, void *);
+void Anim_SetDurationScale(void *, u32);
+void Anim_SetFrameDurationScale(void *, u32);
+void TentacleActor_SelectWanderRoute(void *);
+void TentacleActor_AdvanceMotionPhase(void *, s32);
+void sub_080A9DB0(void *, s32, s32);
+void TentacleActor_UpdateOscillation(void *, s32, s32);
+static inline u8 Approach(struct ChaseActor *actor, struct SavedMotion *saved, s32 speed)
+{
+    u8 *motion = (u8 *)actor + 0x50;
+    s16 dx = saved->position.x - *(u16 *)(motion + 12);
+    s16 dz = saved->position.z - *(u16 *)(motion + 16);
+    if ((dx < 0 ? -dx : dx) <= 32 && (dz < 0 ? -dz : dz) <= 32)
+        return 1;
+    if (dx || dz) {
+        motion[9] = Math_Atan2(dx, dz);
+        *(u16 *)(motion + 20) += Shift(gUnk_086149C4[(motion[9] + 64) & 255] * speed, 12);
+        *(u16 *)(motion + 24) += Shift(gUnk_086149C4[motion[9]] * speed, 12);
+    }
+    return 0;
+}
+static inline void Scale(struct ChaseActor *actor)
+{
+    u16 *scale = SceneActorChase_PrepareAnimationScale(actor, 0xA02F);
+    if (actor->base.drawableKind == 0)
+        Anim_SetDurationScale((u8 *)actor->base.drawable + 0x48, *scale);
+    else
+        Anim_SetFrameDurationScale((u8 *)actor->base.drawable + 0x20, *scale);
+}
+// confidence=low: pursues saved waypoints with an 800-frame transition.
+void TentacleBody_UpdatePursuit(struct ChaseActor *actor)
+{
+    u8 *body = actor->base.context;
+    s32 speed;
+    u32 o;
+    struct ContactPosition delta;
+    typeof(o) t1;
+    if (Take(&actor->base.field2B1)) {
+        SceneActorChase_SetControl(actor, actor->base.onAlternateEntry, 1);
+        TentacleActor_ResetOscillation(actor);
+        {
+            u32 direction = (((*(((u8 *)actor) + 0xE9)) + 32) & 255) >> 6;
+            body[0x8E9] = direction;
+        }
+        body[0x8E8] = 0;
+        TentacleActor_SelectWanderRoute(actor);
+    }
+    o = (t1 = 0x270);
+    if ((u8)Callback_InvokeActor(actor, *((void **)(((u8 *)actor) + o)))) {
+        State0(actor);
+        return;
+    }
+    if ((*((s16 *)(body + 0x8D6))) <= 0)
+        *((s16 *)(body + 0x8D6)) = 1;
+    speed = Callback_InvokeActor(actor, *((void **)(((u8 *)actor) + 0x260)));
+    Scale(actor);
+    if (Approach(actor, (void *)(body + 0x8F8), speed)) {
+        TentacleActor_SelectWanderRoute(actor);
+        Chase_Delta(&delta, &actor->base.body.position, (void *)(body + 0x904));
+        *(((u8 *)actor) + 0x3CD) = Math_Atan2(delta.x, delta.z);
+    }
+    TentacleActor_AdvanceMotionPhase(actor, speed);
+    {
+        u16 *p = (void *)(body + 0x8E4);
+        if (*p) {
+            sub_080A9DB0(actor, 18, 0x1000);
+            --(*p);
+        } else
+            sub_080A9DB0(actor, 20, 0x6400);
+    }
+    TentacleActor_UpdateOscillation(actor, 120, 10);
+    if (((s32)actor->base.counter2AC) > 800) {
+        TentacleActor_SelectWanderRoute(actor);
+        State2(actor);
+    } else
+        actor->base.counter2AC++;
+}

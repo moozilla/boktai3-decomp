@@ -235,7 +235,7 @@ The studio's Maps view renders every stage and map this way
 `tools/assets/hp.py list | show HASH | json [HASH...]` decodes all 528
 entries. `Terrain_LoadHP(hp)` (`08225C48`) finds the resource and hands the four offsets of
 its header (`"HP\0\0"`, then `u32` offsets from `HP`) to the terrain map
-`gUnk_030052F4` (`struct EngineMap`, include/engine.h):
+`gUnk_030052F4` (`struct EngineMap`, include/engine/shared/engine.h):
 
 | Offset | Section | Loader | `EngineMap` field |
 |---|---|---|---|

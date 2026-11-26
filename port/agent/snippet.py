@@ -58,7 +58,7 @@ def symbols():
 
 
 def wrap(code, includes=()):
-    head = '#include "global.h"\n#include "agent.h"\n'
+    head = '#include "engine/shared/global.h"\n#include "agent.h"\n'
     head += ''.join(f'#include "{h}"\n' for h in includes)
     if re.search(r'\bsnippet_main\s*\(', code):
         return head + code + '\n'

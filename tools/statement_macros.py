@@ -14,10 +14,12 @@ import os
 import re
 from pathlib import Path
 
+from source_layout import is_upstream
+
 ROOT = Path(__file__).resolve().parents[1]
 ROOTS = ("src", "include")
 # library and SDK sources are the original authors' code: their macros are never knobs
-LIBRARY = ("src/lib", "include/gba")
+
 
 _COMMENTS = re.compile(r'"(?:\\.|[^"\\\n])*"|/\*.*?\*/|//[^\n]*', re.S)
 _DEFINE = re.compile(r'^[ \t]*#[ \t]*define[ \t]+(\w+)\(((?:[^\n]*\\\n)*[^\n]*)', re.M)
@@ -53,8 +55,6 @@ def _sources(root: Path, exclude: Path | None):
     for sub in ROOTS:
         for directory, _, files in os.walk(root / sub):
             folder = os.path.realpath(directory)
-            library = Path(directory).relative_to(root).as_posix() + "/"
-            count_defs = not any(library.startswith(lib + "/") for lib in LIBRARY)
             for name in sorted(files):
                 if not name.endswith((".c", ".h")):
                     continue
@@ -62,7 +62,7 @@ def _sources(root: Path, exclude: Path | None):
                 if skip and (path == skip or os.path.islink(path) and os.path.realpath(path) == skip):
                     continue
                 stat = os.stat(path)
-                yield path, stat.st_mtime_ns, stat.st_ctime_ns, stat.st_size, count_defs
+                yield path, stat.st_mtime_ns, stat.st_ctime_ns, stat.st_size, not is_upstream(path)
 
 
 @functools.lru_cache(maxsize=2)

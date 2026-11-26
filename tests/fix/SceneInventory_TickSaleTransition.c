@@ -1,7 +1,7 @@
 // draft with the funds update stored through the field in each case. The ROM loads gGameState
 // again for the clamp, so the original stored through a pointer (sp_store_via_ptr, README fact 60)
-#include "scene_inventory_tail.h"
-#include "scene_item_values.h"
+#include "menus/inventory_transactions_and_catalogs/scene_inventory_tail.h"
+#include "engine/shared/scene_item_values.h"
 struct SceneInventorySaleView {
     u8 unknown0[0x1AF0];
     struct SceneInputPair pair;

@@ -1,18 +1,19 @@
 #!/usr/bin/env python3
 """List (and check) every source unit that includes a header, directly or through others.
 
-  header_dependents.py include/player.h ...            list the dependent src/ units
-  header_dependents.py include/player.h --check [-j N] run tools/check.py on each; exit 1 on a mismatch
+  header_dependents.py include/engine/shared/player.h ...            list the dependent src/ units
+  header_dependents.py include/engine/shared/player.h --check [-j N] run tools/check.py on each; exit 1 on a mismatch
   header_dependents.py --since REV --check             the headers changed since REV (git diff)
 
 A header change that is meant to change no bytes (a field renamed, a byte array
 given its real struct type) must leave every dependent unit byte-identical. The
-include graph comes from `#include "..."` lines in src/ and include/, matched by
-file name, the way the build's -I include resolves them.
+include graph comes from `#include "..."` lines in src/ and include/, resolved as
+paths using the same quote search order as the build.
 """
 import argparse
 import concurrent.futures
 import os
+from pathlib import Path
 import re
 import subprocess
 import sys
@@ -22,31 +23,34 @@ INCLUDE = re.compile(r'^\s*#\s*include\s+"([^"]+)"', re.M)
 
 
 def tree():
-    files = {}
-    for top in ("src", "include"):
-        for d, _, names in os.walk(os.path.join(ROOT, top)):
-            for n in names:
-                if n.endswith((".c", ".h")):
-                    p = os.path.join(d, n)
-                    with open(p, encoding="utf-8", errors="replace") as f:
-                        files[os.path.relpath(p, ROOT)] = {os.path.basename(x) for x in INCLUDE.findall(f.read())}
-    return files
+    root = Path(ROOT)
+    paths = {p.relative_to(root) for top in ("src", "include")
+             for p in (root / top).rglob("*") if p.suffix in (".c", ".h")}
+
+    def resolve(path, name):
+        for candidate in (path.parent / name, Path(name), Path("include") / name):
+            candidate = Path(os.path.normpath(candidate))
+            if candidate in paths:
+                return candidate.as_posix()
+
+    return {p.as_posix(): {resolved for name in INCLUDE.findall((root / p).read_text(errors="replace"))
+                           if (resolved := resolve(p, name))}
+            for p in paths}
 
 
 def dependents(headers, files=None):
     """Sorted src/ .c files that include any of headers, transitively."""
-    files = files or tree()
-    closure = {os.path.basename(h) for h in headers}
+    files = tree() if files is None else files
+    closure = {os.path.relpath(h, ROOT) if os.path.isabs(h) else os.path.normpath(h) for h in headers}
     grew = True
     while grew:
         grew = False
         for p, inc in files.items():
-            b = os.path.basename(p)
-            if p.endswith(".h") and b not in closure and inc & closure:
-                closure.add(b)
+            if p.endswith(".h") and p not in closure and inc & closure:
+                closure.add(p)
                 grew = True
     return sorted(p for p, inc in files.items()
-                  if p.endswith(".c") and p.startswith("src" + os.sep) and inc & closure)
+                  if p.endswith(".c") and p.startswith("src/") and inc & closure)
 
 
 def check(path):

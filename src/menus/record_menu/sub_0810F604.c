@@ -1,0 +1,20 @@
+#include "engine/shared/global.h"
+s32 Registry1745_GetSessionState(void *);
+void ScrollingDialogue_HideImmediately(void);
+void Task_Kill(void *);
+void Callback_InvokeActor(void *, u32);
+struct S {
+    u8 filler[0x14D8];
+    u32 f;
+};
+s32 LinkLobbyPanel_OnTaskUpdate(struct S *s)
+{
+    if (Registry1745_GetSessionState(s) == 0) {
+        ScrollingDialogue_HideImmediately();
+        Task_Kill(s);
+        return -1;
+    }
+    if (s->f != 0)
+        Callback_InvokeActor(s, s->f);
+    return 1;
+}

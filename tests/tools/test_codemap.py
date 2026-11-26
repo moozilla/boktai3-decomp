@@ -48,11 +48,11 @@ class XrefTests(unittest.TestCase):
 
 class IndexTests(unittest.TestCase):
     def setUp(self):
-        tree = {'version': 1, 'files': ['src/foo.c'], 'categories': [
+        tree = {'version': 2, 'files': ['src/foo.c', 'src/engine/foo/foo_on_done.c'], 'categories': [
             {'name': 'Engine core', 'units': [{'name': 'Foo', 'functions': [
                 ['Foo_Update', '08001000', 32, 100, 0, 0],
                 ['Foo_Helper', '08001020', 32, 80.0, 1, 0],
-                ['Foo_OnDone', '08001040', 4, 100, 0, -1]]}]}]}
+                ['Foo_OnDone', '08001040', 4, 100, 0, 1]]}]}]}
         report = {'measures': {'total_code': '68', 'complete_code': '36', 'complete_code_percent': 52.9,
                                'total_functions': 3},
                   'categories': [{'name': 'Engine core', 'measures': {'total_code': '68'}}]}
@@ -76,7 +76,7 @@ class IndexTests(unittest.TestCase):
         ix = json.loads(json.dumps(codemap.build()))
         self.assertEqual(ix['missing'], [])
         self.assertEqual(ix['functions']['08001020']['kinds'], ['pin'])
-        self.assertEqual(ix['functions']['08001040']['file'], 'src/fn/sub_08001040.c')
+        self.assertEqual(ix['functions']['08001040']['file'], 'src/engine/foo/foo_on_done.c')
         self.assertEqual(ix['calls'], {'08001000': ['08001020']})
         self.assertEqual(sorted(ix['ptr_users']['08001040']), ['08001000', '08001020'])
         self.assertEqual(ix['ram_users']['gPause'], ['08001000'])

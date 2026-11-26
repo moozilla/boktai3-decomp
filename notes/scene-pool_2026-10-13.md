@@ -8,7 +8,7 @@ concession. `tools/depin.py --write` removed all unnecessary hints first.
 
 ## Observed ownership and fields
 
-`include/scene_pool.h` describes a manager allocated by 0803D5A8 (task list 8,
+`include/engine/shared/scene_pool.h` describes a manager allocated by 0803D5A8 (task list 8,
 size 0x2360). Its initializer 0803D514 allocates a configurable number of
 0x17c entries, default 0x60, and initializes four inline 0x8b0 actor slots.
 The manager is stored at gUnk_02000108. These are static source/assembly

@@ -1,0 +1,79 @@
+#include "engine/shared/scene_actor_registry.h"
+#include "engine/shared/scene_actor_control.h"
+#include "actors/actor_attachment_manager/actor_attachment_manager.h"
+#include "engine/shared/scene_particle_burst.h"
+struct SceneActorControlManager *SceneActorControl_EnsureSingleton(void);
+struct ActorAttachmentManagerView *ActorAttachment_CreateManager(void);
+struct SceneParticleBurstPool *SceneParticleBurst_EnsureSingleton(u32, u32);
+struct Task *SceneColliderEffect_EnsurePool(void);
+struct Task *SceneActor14_EnsureSingleton(void);
+static inline u8 HasFlag(struct SceneActorRegistryManager *manager, u32 mask)
+{
+    if (manager->flags & mask)
+        return 1;
+    return 0;
+}
+void SceneActorRegistry_EnsureActorSubsystems(struct SceneActorRegistryManager *manager,
+                                              struct ChaseActor *actor)
+{
+    u32 category = actor->base.category;
+    if (category == 2) {
+        if (!HasFlag(manager, 8)) {
+            struct Task *task = (void *)SceneActorControl_EnsureSingleton();
+            manager->controlTask = task;
+            if (!task)
+                return;
+            {
+                u32 mask = 8;
+                u32 flags;
+                flags = manager->flags;
+                flags |= mask;
+                manager->flags = flags;
+            }
+            manager->controlTaskId = task->id;
+        }
+        if (actor->base.paletteOffset == 1 && !HasFlag(manager, 0x10)) {
+            struct Task *task = SceneColliderEffect_EnsurePool();
+            manager->variantTask = task;
+            if (!task)
+                return;
+            {
+                u32 mask = 0x10;
+                u32 flags;
+                flags = manager->flags;
+                flags |= mask;
+                manager->flags = flags;
+            }
+            manager->variantTaskId = task->id;
+        }
+    } else if (!HasFlag(manager, 0x20)) {
+        struct Task *task = (void *)ActorAttachment_CreateManager();
+        manager->attachmentTask = task;
+        if (!task)
+            return;
+        {
+            u32 mask = 0x20;
+            u32 flags;
+            flags = manager->flags;
+            flags |= mask;
+            manager->flags = flags;
+        }
+        manager->attachmentTaskId = task->id;
+    }
+    if (category == 3)
+        SceneParticleBurst_EnsureSingleton(0, 0);
+    if (category == 14 && !HasFlag(manager, 0x1000)) {
+        struct Task *task = SceneActor14_EnsureSingleton();
+        manager->category14Task = task;
+        if (!task)
+            return;
+        {
+            u32 mask = 0x1000;
+            u32 flags;
+            flags = manager->flags;
+            flags |= mask;
+            manager->flags = flags;
+        }
+        manager->category14TaskId = task->id;
+    }
+}

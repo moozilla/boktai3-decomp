@@ -13,7 +13,7 @@ and 1,236 bytes with minimized register-allocation concessions. Every promoted
 function passed its entire independently reviewed extent. Fourteen affected TUs
 retain empty operand barriers or local register constraints; none contains
 instruction bodies or an explicit r7 binding. The shared
-`include/scalar_approach.h` contains ordinary C only. The four existing scalar
+`include/engine/shared/scalar_approach.h` contains ordinary C only. The four existing scalar
 seeds at `21774`, `21798`, `217CC` and `21800` now use the same explicit wrapping helpers;
 their original full 36/52/52/52-byte extents stay exact without extra credit.
 

@@ -1,5 +1,5 @@
-#include "global.h"
-#include "scene_actor_reaction.h"
+#include "engine/shared/global.h"
+#include "actors/scene_actor_reaction/scene_actor_reaction.h"
 
 void Octopus_ReturnToRoutePoint(void);
 void SceneActorReaction_RestoreAlternateAfterDelay(void);

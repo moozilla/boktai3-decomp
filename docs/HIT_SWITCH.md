@@ -5,7 +5,7 @@
 provisional descriptive name. These are static contracts, without execution
 coverage or proof of a particular in-game switch identity.
 
-The common layout is in `include/hit_switch.h`. The manager stores count at
+The common layout is in `include/field/hit_switch/hit_switch.h`. The manager stores count at
 `0x18`, pending-hit latch at `0x19`, flash counter at `0x1B`, and sixteen RGB15
 colors at `0x1C`. Each entry has a sprite at zero, graphics at `0x2C`, collider
 at `0x48`, body at `0x9C`, world position at `0xE4`, kind at `0xEC`, optional-body

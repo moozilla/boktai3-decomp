@@ -191,7 +191,7 @@ def compile_header(header, names, work):
     src = work / (header.stem + '.c')
     obj = work / (header.stem + '.o')
     for _ in range(3):
-        text = '#include "global.h"\n#include "%s"\n' % header.name
+        text = '#include "engine/shared/global.h"\n#include "%s"\n' % header.relative_to(ROOT / 'include').as_posix()
         text += ''.join(f'__typeof__({n}) *__agent_var_{n};\n' for n in names)
         src.write_text(text)
         r = subprocess.run([CC, *FLAGS, '-c', str(src), '-o', str(obj)], cwd=ROOT, text=True, capture_output=True)
@@ -211,7 +211,7 @@ def first_params(code, types):
     """{function: 'struct X'} for functions whose first parameter is a struct
     pointer of a known type; a definition in src/ wins over a prototype."""
     out = {}
-    files = sorted(ROOT.glob('src/**/*.c')) + sorted((ROOT / 'include').glob('*.h'))
+    files = sorted(ROOT.glob('src/**/*.c')) + sorted((ROOT / 'include').rglob('*.h'))
     for path in files:
         text = path.read_text(errors='replace')
         if 'struct' not in text:
@@ -225,7 +225,7 @@ def first_params(code, types):
 
 def build(force=False):
     include = GAME / 'include'
-    headers = sorted(include.glob('*.h'))
+    headers = sorted(h for h in include.rglob('*.h') if 'gba' not in h.relative_to(include).parts)
     syms = symbols()
     data = syms['data']
     sources = sorted(ROOT.glob('src/**/*.c'))

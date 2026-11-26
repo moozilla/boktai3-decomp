@@ -39,7 +39,7 @@ code progress. Current aggregate totals are in [PROGRESS.md](../PROGRESS.md).
 | Combined ROM and RAM-literal build | Pass |
 | Complete unittest discovery after review fixes | 196 tests pass |
 
-The function is in [src/golem_2.c](../src/golem_2.c). Its provisional descriptive
+The function is in [src/monsters/golem/golem_2.c](../src/monsters/golem/golem_2.c). Its provisional descriptive
 name is recorded in `symbols/functions.csv`; the two callback references in
 `src/fn/sub_080CFC14.c` were renamed with scope. Other functions retain their
 existing implementation and concession status. The translation unit's existing

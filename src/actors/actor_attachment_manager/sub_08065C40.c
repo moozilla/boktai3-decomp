@@ -1,0 +1,16 @@
+#include "engine/shared/global.h"
+
+struct Unk08065BEC {
+    u32 unk0;
+};
+
+struct Unk08065BEC *ActorAttachment_AllocateSlot(void *);
+
+// &p->unk0 == p, but agbcc keeps the null test for the address expression
+u32 *ActorAttachment_AllocateSlotHeader(void *manager)
+{
+    struct Unk08065BEC *p = ActorAttachment_AllocateSlot(manager);
+    if (!p)
+        return NULL;
+    return &p->unk0;
+}

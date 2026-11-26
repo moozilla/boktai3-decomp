@@ -3,7 +3,7 @@
 Tags: #matching #ratatosk #compiler #cse #reload #defaults
 
 **Exact match in ordinary C.** `Ratatosk_InitializeFromScript`, 2428 bytes,
-compiles byte-identically (`tools/check.py src/fn/sub_081FAE0C.c`: MATCH, 0
+compiles byte-identically (`tools/check.py src/bosses/ratatosk/sub_081FAE0C.c`: MATCH, 0
 differing bytes). It has no register pins, barriers, inline assembly or compiler
 overrides. Commit `c73f7b151` on `codex/opus-ratatosk-defeat`. The starting
 points were the unit's plain draft (84.4%) and GPT-6's round 8 witness (93.5%,

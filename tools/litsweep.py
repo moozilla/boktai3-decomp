@@ -10,7 +10,7 @@ one is to read a RAM global through its literal address (REGALLOC.md,
 sampling: each reference (and with --pairs, each pair) is replaced by
 `(*(T *)0x0203B400)` and scored with the permuter's scorer. Prints the
 variants that improve, best first; a score of 0 is an exact match. Write the
-literal through a named macro in include/global.h before committing
+literal through a named macro in include/engine/shared/global.h before committing
 (tools/check_ram_literals.py ties it to the symbol).
 
 FILE.c holds one ROM function (tools/isolate.py). Uses the decomp-permuter

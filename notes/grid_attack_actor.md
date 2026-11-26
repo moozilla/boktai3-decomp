@@ -4,7 +4,7 @@ Tags: #grid-attack-actor #unit #matching #080297E8 #0802C678
 
 Range: `080297E8–0802C678` (end exclusive). Subsystem interpretation is tentative.
 
-Consolidated all 63 existing matching files into `src/grid_attack_actor.c`, in
+Consolidated all 63 existing matching files into `src/actors/grid_attack_actor/grid_attack_actor.c`, in
 ROM order, with the six existing unmatched functions in their original positions.
 No new function gaps or inventory entries. No commits or shared-doc edits.
 `merge_unit.py --write` performed the merge; its `git rm` removal step was replaced
@@ -13,7 +13,7 @@ Git metadata. The tool itself was not changed.
 
 ## Layout
 
-`include/grid_attack_actor.h` defines the shared 0x924-byte actor, its transform,
+`include/actors/grid_attack_actor/grid_attack_actor.h` defines the shared 0x924-byte actor, its transform,
 word-copy position, packed vector, outgoing message packet, animation resource
 header, and drawable. It reuses `ContactCollider`, `SceneEventReceiver`,
 `DisplaySequenceState`, and `SceneVec` from existing headers; engine declarations

@@ -1,4 +1,4 @@
-// FadingParticleGroup_Update (src/fn/sub_08016118.c) without its memory barrier: 43 ROM / 43 draft.
+// FadingParticleGroup_Update (src/effects/fading_particle_groups/sub_08016118.c) without its memory barrier: 43 ROM / 43 draft.
 #include "global.h"
 #include "ram.h"
 #include "display_sequence_inline.h"

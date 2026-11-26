@@ -2,7 +2,7 @@
 
 Tags: Skeleton, 080C12FC, 080C2BE0, 080C3260, 080C44E4, phase4
 
-Consolidated 13 files from 080C12FC through 080C47B8 into `src/skeleton.c`.
+Consolidated 13 files from 080C12FC through 080C47B8 into `src/monsters/skeleton/skeleton.c`.
 The formatted unit matches all 13500 bytes with the stock compiler.
 
 The complete 0x74C allocation now has the shared actor/group prefix, two contact

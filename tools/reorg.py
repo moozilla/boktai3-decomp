@@ -1,0 +1,164 @@
+#!/usr/bin/env python3
+"""Plan or apply the source tree migration. Run from the repository root."""
+import argparse
+from collections import Counter, defaultdict
+import os
+from pathlib import Path
+import re
+import subprocess
+
+from source_layout import directory_for, header_paths, is_upstream, new_filename, scan, source_paths, symbol_names
+
+ROOT = Path(__file__).resolve().parents[1]
+INCLUDE = re.compile(r'^([ \t]*#[ \t]*include[ \t]+")([^"\n]+)(")', re.M)
+PATH = re.compile(r'(?<![\w/])((?:\.\./)*)(?P<path>(?:src|include)/[\w./-]+\.[ch])(?![\w.-])')
+UNIT_HEADER = {
+    "global.h": "engine/shared",
+    "debug.h": "engine/shared",
+    "rfu_compat.h": "lib/rfu",
+    "libm_compat.h": "lib/libm",
+    "m4a.h": "lib/m4a",
+}
+
+
+def plan_sources(rename):
+    manifest = scan(ROOT)
+    names = symbol_names(ROOT)
+    files = source_paths(ROOT)
+    moves = {}
+    for path in files:
+        old = path.relative_to(ROOT)
+        addresses = manifest.by_file.get(old.as_posix(), [])
+        if not addresses:
+            raise ValueError(f"{old}: no external function with a known ROM address")
+        directory = directory_for(min(addresses), ROOT)
+        filename = old.name
+        if rename and len(addresses) == 1 and not is_upstream(old):
+            address = addresses[0]
+            filename = new_filename(names.get(address, f"sub_{address:08X}"), address)
+        moves[old] = Path("src") / directory / filename
+    return moves
+
+
+def plan_headers(sources):
+    paths = header_paths(ROOT)
+    headers = {p.name: p.relative_to(ROOT) for p in paths}
+    if len(headers) != len(paths):
+        raise ValueError("header basenames must be unique for the flat-tree migration")
+
+    by_stem = defaultdict(set)
+    uses = defaultdict(Counter)
+    for old, new in sources.items():
+        directory = new.parent.relative_to("src")
+        by_stem[old.stem].add(directory)
+        for _, name, _ in INCLUDE.findall((ROOT / old).read_text()):
+            uses[Path(name).name][directory] += 1
+    for path in paths:
+        old = path.relative_to(ROOT)
+        if len(old.parts) > 2:
+            directory = old.parent.relative_to("include")
+            for _, name, _ in INCLUDE.findall(path.read_text()):
+                uses[Path(name).name][directory] += 1
+
+    moves = {}
+    for name, old in headers.items():
+        if len(old.parts) > 2:  # Includes already organized, including SDK headers.
+            moves[old] = old
+            continue
+        same = by_stem[old.stem]
+        if name in UNIT_HEADER:
+            directory = UNIT_HEADER[name]
+        elif len(same) == 1:
+            directory = next(iter(same))
+        elif Path("engine", old.stem) in uses[name]:
+            directory = Path("engine", old.stem)
+        elif len(uses[name]) == 1:
+            directory = next(iter(uses[name]))
+        else:
+            # A narrow hero/actor header often has more than one consumer. Use
+            # a unit whose complete name prefixes the header when available.
+            candidates = {d for d in uses[name] if d.name != d.parts[0] and
+                          (old.stem == d.name or old.stem.startswith(d.name + "_"))}
+            directory = max(candidates, key=lambda d: (len(d.name), str(d))) if candidates else "engine/shared"
+        moves[old] = Path("include") / directory / name
+    return moves
+
+
+def transform(path, raw, moves, includes):
+    if path.parts[0] in ("src", "include", "port", "tools", "tests") and path.suffix in (".c", ".h"):
+        raw = INCLUDE.sub(lambda m: m[1] + includes.get(m[2], m[2]) + m[3], raw)
+
+    def reference(match):
+        old = Path(match["path"])
+        target = moves.get(old, old)
+        if match[1]:
+            old_relative = Path(os.path.normpath(path.parent / match[0]))
+            if old_relative == old:
+                return os.path.relpath(target, path.parent)
+        return match[1] + target.as_posix()
+
+    return PATH.sub(reference, raw)
+
+
+def migrate(rename=False, apply=False):
+    sources = plan_sources(rename)
+    headers = plan_headers(sources)
+    moves = sources | headers
+    occupied = {}
+    for old, new in moves.items():
+        previous = occupied.setdefault(new, old)
+        if previous != old:
+            raise ValueError(f"{previous} and {old} both map to {new}")
+    includes = {old.relative_to("include").as_posix(): new.relative_to("include").as_posix()
+                for old, new in headers.items()}
+
+    # Include migration also applies to files already in their final directories.
+    tracked = subprocess.check_output(["git", "ls-files", "-z"], cwd=ROOT).decode().split("\0")
+    paths = set(moves)
+    for value in filter(None, tracked):
+        path = Path(value)
+        if (path.parts[0] not in ("src", "include") and
+                path.suffix in (".c", ".h", ".csv", ".ld", ".md", ".py", ".js", ".mjs", ".html", ".sh", ".ts", ".yml")):
+            # Progress snapshots are regenerated by the integration, and historic
+            # reports describe the source tree at their corresponding revisions.
+            if path.name != "PROGRESS.md" and path.parts[:2] != ("docs", "history"):
+                paths.add(path)
+    changed = []
+    for old in sorted(paths):
+        if not (ROOT / old).is_file():
+            continue
+        raw = (ROOT / old).read_bytes().decode("utf-8", errors="surrogateescape")
+        new = moves.get(old, old)
+        updated = transform(old, raw, moves, includes)
+        if new != old:
+            print(f"{old} -> {new}")
+        elif updated != raw:
+            print(f"rewrite {old}")
+        if new != old or updated != raw:
+            changed.append((old, new, updated if updated != raw else None))
+
+    if apply:
+        for old, new, updated in changed:
+            if new != old:
+                (ROOT / new).parent.mkdir(parents=True, exist_ok=True)
+                (ROOT / old).rename(ROOT / new)
+            if updated is not None:
+                (ROOT / new).write_bytes(updated.encode("utf-8", errors="surrogateescape"))
+        for top in ("src", "include"):
+            for parent, _, _ in os.walk(ROOT / top, topdown=False):
+                path = Path(parent)
+                if path != ROOT / top and not any(path.iterdir()):
+                    path.rmdir()
+    return len(changed)
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--apply", action="store_true", help="perform the printed plan")
+    parser.add_argument("--rename", action="store_true", help="also name one-function files from the symbol map")
+    args = parser.parse_args()
+    print(f"{migrate(args.rename, args.apply)} paths {'updated' if args.apply else 'to update'}")
+
+
+if __name__ == "__main__":
+    main()

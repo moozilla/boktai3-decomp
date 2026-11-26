@@ -11,6 +11,7 @@ import hashlib
 import json
 import os
 from pathlib import Path
+from source_layout import report_path
 import re
 import struct
 import subprocess
@@ -65,7 +66,7 @@ def _index(stamp):
         for unit in category['units']:
             for row in unit['functions']:
                 name, addr, size, _, _, file = row[:6]
-                file = f'src/fn/sub_{addr}.c' if file == -1 else tree['files'][file] if file >= 0 else None
+                file = report_path(tree, addr, file, ROOT)
                 if file and (ROOT / file).is_file():
                     result[addr] = dict(name=name, addr=addr, size=size, file=file,
                                         defined=row[6] if len(row) > 6 else name,

@@ -2,8 +2,8 @@
 goes into the source tree, and how a name change reaches every place that spells it.
 
 A function with no C is in one of two states (scope.py todo counts them):
-  in a unit   an INCLUDE_ASM line inside a src/*.c unit: its C replaces that line in that file
-  plain       an inventory function with no C anywhere: a new src/fn/sub_ADDR.c
+  in a unit   an INCLUDE_ASM line inside a C unit: its C replaces that line in that file
+  plain       an inventory function with no C anywhere: a new single-function file
 """
 import glob
 import os
@@ -53,7 +53,11 @@ def where(root, name, addr, index=None):
     defined = defining_unit(root, names)
     if defined:
         return "unit", defined, None
-    path = f"src/fn/sub_{addr:08X}.c"
+    tools = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    if tools not in sys.path:
+        sys.path.insert(0, tools)
+    from source_layout import new_source
+    path = new_source(addr, name, root)
     return "plain", path, None
 
 

@@ -36,7 +36,7 @@
   scope.py twins [N] [all]      drafts (all: also no C) by their closest matched relative: twins first
   scope.py new FUNC             open FUNC: a draft in build/scope/work/ (its unit with a stub, or a twin's C)
   scope.py land FUNC [D.c] [--name NEW] [--note T] [--rom] [--nonmatching] [--allow-pins]   put a matching draft into
-                                src/ (unit merge, or a new src/fn file and the hidden boundary), check the
+                                src/ (unit merge, or a new single-function file and the hidden boundary), check the
                                 file, name it; --nonmatching: an unfinished draft under #ifdef NONMATCHING;
                                 --allow-pins: land a match that adds pins or barriers (refused without it)
   scope.py rename FUNC NEW [--note T]   functions.csv and every C spelling of the old name or sub_ label
@@ -152,6 +152,7 @@ sys.path.insert(0, TOOLS)
 import build  # noqa: E402
 import check  # noqa: E402
 from romlib import ROOT, load_rom, off, rom_data_ranges  # noqa: E402
+from source_layout import resolve
 
 INSTR = os.environ.get("SCOPE_AGBCC") or os.path.join(ROOT, "build", "scope", "agbcc", "gcc", "agbcc")  # tools/scope/build_agbcc.sh; SCOPE_AGBCC: an experimental build
 PASSES = ["rtl", "jump", "cse", "addressof", "gcse", "loop", "cse2", "flow", "combine", "regmove",
@@ -3029,7 +3030,7 @@ def shared_statement_macros(want_index=False, limit=3, root=None):
         srcs = {}
         for f in glob.glob(os.path.join(base, "src", "**", "*.c"), recursive=True):
             srcs[f] = open(f, errors="replace").read()
-        for h in sorted(glob.glob(os.path.join(base, "include", "*.h"))):
+        for h in sorted(glob.glob(os.path.join(base, "include", "**", "*.h"), recursive=True)):
             text = open(h, errors="replace").read()
             for m in re.finditer(r"#define\s+(\w+)\([^)]*\)\s*\\\n\s*do\s*\{(.*?)\}\s*while\s*\(\s*0\s*\)",
                                  text, re.S):
@@ -5387,7 +5388,7 @@ def explain_regmove(wd, uid, gone, new, nm, at):
               " if, or give the result its own variable that is read before the operation. For a"
               " byte read and masked (`u8` flags), read it into a byte union and narrow the and:"
               " `control.raw = a->flags; first = (u8)(control.raw & bit);` (DisplaySequence_ApplyFrame,"
-              " include/display_sequence_inline.h; it matched AnimatedTile_TickAlternateAnimation where"
+              " include/engine/shared/display_sequence_inline.h; it matched AnimatedTile_TickAlternateAnimation where"
               " `u8 left`/`u8 input` did not). For a u16/u8 field masked by a constant, write the and"
               " on the read itself, `(*field & K)`, not through u32 variables: the constant then sits in"
               " an HImode pseudo read through a subreg, which regmove does not tie, and cse does not move a"
@@ -6197,9 +6198,10 @@ def cmd_why(src, func, uid, env, via=None):
 def cmd_fastcheck(n):
     """Both of scope's object paths (the fork server, and the one-shot compile placed in Python) must give
     the bytes ld and objcopy give: check N units (drafts first)."""
-    import glob
     import random
-    srcs = sorted(glob.glob(os.path.join(ROOT, "src", "fn", "*.c")) + glob.glob(os.path.join(ROOT, "src", "*.c")))
+    from source_layout import is_upstream, source_paths
+
+    srcs = [p for p in source_paths() if not is_upstream(p)]
     drafts = [p for p in srcs if "#ifdef NONMATCHING" in open(p).read()]
     random.seed(1)
     pick = random.sample(drafts, min(n, len(drafts)))
@@ -7959,7 +7961,7 @@ def cmd_new(target):
             head, where_ = tree_prototype(name)
             if where_:
                 seed += f" with the signature {where_} declares"
-            out = (f'#include "global.h"\n\n// scope: write {name} here (`scope.py rom {name}`)\n'
+            out = (f'#include "engine/shared/global.h"\n\n// scope: write {name} here (`scope.py rom {name}`)\n'
                    f"{head or f'void {name}(void)'}\n{{\n}}\n")
     g = ghidra_c(addr)
     if g:  # a reading aid inside the stub: Ghidra's types and control flow, never matching C
@@ -7979,7 +7981,7 @@ def cmd_new(target):
 
 
 def cmd_land(target, draft=None, new_name=None, rom=False, note=None, nonmatching=False, allow_pins=False):
-    """Put a matching draft into the source tree: merged into its unit, or a new src/fn file (a hidden
+    """Put a matching draft into the source tree: merged into its unit, or a new single-function file (a hidden
     function also gets its replacement end). Then the concession marker, clang-format, a check of
     every C function in the landed file, and optionally the name and a whole-ROM build.
     NONMATCHING: a draft that does not match yet goes in as `#ifdef NONMATCHING` C with its fuzzy
@@ -8039,7 +8041,7 @@ def cmd_land(target, draft=None, new_name=None, rom=False, note=None, nonmatchin
             import split
             alone = split.c_functions(path) == [name] and split.c_functions(os.path.abspath(draft)) == [name]
             if alone and land.context_key(rest) != land.context_key(now):
-                # a unit that holds FUNC alone (a src/fn file): no neighbor can be undone, so a depin
+                # a unit that holds FUNC alone (a single-function file): no neighbor can be undone, so a depin
                 # draft that also rewrote the file's helpers, types or marker lands whole
                 print(f"{name}: {dest} holds {name} alone; the draft replaces the whole file")
             elif land.context_key(rest) != land.context_key(now):
@@ -8142,6 +8144,7 @@ def land_write(name, addr, kind, dest, path, text, info, nonmatching, funcs, siz
                new_name, note, rom, wdraft, base, draft):
     import land
     import progress
+    os.makedirs(os.path.dirname(path), exist_ok=True)
     open(path, "w").write(text)
     fmt = os.path.join(ROOT, "build", "venv", "bin", "clang-format")
     subprocess.run([fmt if os.path.exists(fmt) else "clang-format", "-i", path], cwd=ROOT, check=True)
@@ -8686,10 +8689,10 @@ def main():
             cli_error("insn UID FUNC", "no previous function in this SCOPE_RUN")
         cmd_insn(int(args[1]), func)
         return 0
-    src = args[0]
-    if not src.endswith(".c"):
-        src = os.path.join("src", "fn", src + ".c")
-    src = os.path.relpath(os.path.join(ROOT, src) if not os.path.isabs(src) else src, ROOT)
+    try:
+        src = resolve(args[0])
+    except ValueError as error:
+        sys.exit(str(error))
     if not os.path.isfile(os.path.join(ROOT, src)):
         sys.exit(f"{src}: source file not found (run scope.py --help for commands)")
     refresh_workspace(src)

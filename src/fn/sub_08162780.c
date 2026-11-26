@@ -1,9 +1,0 @@
-#include "global.h"
-#include "game_state.h"
-void PlayerBarrier_DecrementDuration(void)
-{
-    if (gGameState->unk77C <= 1)
-        gGameState->unk77C = 0;
-    else
-        gGameState->unk77C--;
-}

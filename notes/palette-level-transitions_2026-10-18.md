@@ -2,8 +2,8 @@
 
 Tags: #palette #mosaic #unit-consolidation
 
-Consolidated 080164B8–0801689C into `src/palette_level_transitions.c` in ROM
-order. `include/palette_level_transitions.h` defines the shared 0x34-byte
+Consolidated 080164B8–0801689C into `src/effects/palette_level_transitions/palette_level_transitions.c` in ROM
+order. `include/effects/palette_level_transitions/palette_level_transitions.h` defines the shared 0x34-byte
 `PaletteLevels` task: task header at +0x00, state and target selectors at +0x18,
 active-channel mask at +0x1B, four timers at +0x1C, periods at +0x24, signed
 current sizes at +0x2C and signed targets at +0x30. All nine prior C functions

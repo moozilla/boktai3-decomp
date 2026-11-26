@@ -393,7 +393,7 @@ function categoryPage(name) {
       <td class="r">${kb(u.size)}</td><td>${bar(u.clean, u.size)}</td><td class="r">${u.cat === ASM_CAT ? '<span class="muted">assembly</span>' : u.ndraft + u.ncx ? `<span style="color:var(--warn)">${u.ndraft + u.ncx} left</span>` : '<span style="color:var(--ok)">✓</span>'}</td>
       <td class="muted mono" style="font-size:11.5px">${esc(fileSummary(u))}</td></tr>`).join('')}</table></div>`;
 }
-const fileSummary = u => { const fs = [...u.files], one = fs.filter(f => !f.startsWith('src/fn/')); return one.length ? one.join(', ') + (fs.length > one.length ? ` + ${fs.length - one.length} in src/fn` : '') : fs.length ? `${fs.length} files in src/fn` : ''; };
+const fileSummary = u => { const fs = [...u.files]; return fs.length > 3 ? `${fs.length} files` : fs.join(', '); };
 // a strip of the functions, each as wide as its bytes, colored by status
 function strip(fns, sel) {
   const total = fns.reduce((s, f) => s + f.size, 0) || 1;

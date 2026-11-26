@@ -4,13 +4,13 @@
 
 65 → 1 warning, 0 errors. All three translation units match the ROM.
 
-- `src/golem_main.c`: 36 → 0. Shared chase control, route, and gate operations.
+- `src/monsters/golem/golem_main.c`: 36 → 0. Shared chase control, route, and gate operations.
   Contact uses one native position. Revival restores the typed actor snapshot.
   Charge recovery, recoil, and slide use the shared body and charge fields.
-- `src/golem_2.c`: 12 → 0. 080C9C04 uses an ordinary route block. The shared
+- `src/monsters/golem/golem_2.c`: 12 → 0. 080C9C04 uses an ordinary route block. The shared
   gate, fallback, and control operations restore the PRE stack-slot order.
   The context countdown and camera shake fields replace the private record.
-- `src/golem_main_2.c`: 17 → 1. Shared charge, player, and phase operations.
+- `src/monsters/golem/golem_main_2.c`: 17 → 1. Shared charge, player, and phase operations.
   080CFC14 has the only `concession-ok`. Both 8-byte CpuSet calls use control
   0x05000002 and the same source word at sp+0x10.
 - Open, 080CE188 `Golem_ResumeRouteAfterControl`: the 0x200 local supplies one
@@ -37,12 +37,12 @@ six expansions and direct table, with the full 1,256-byte function exact.
 87 warnings at intake, with two more exposed by linter coverage fixes.
 26 warnings remain and all three translation units match, with zero errors.
 
-- `src/mummy.c` 4 → 0. Uses the shared display sequence and typed player
+- `src/monsters/mummy/mummy.c` 4 → 0. Uses the shared display sequence and typed player
   and Mummy contact fields.
-- `src/fn/sub_080D1784.c` 2 → 0 under the improved linter. At 080D1784 the
+- `src/monsters/mummy/sub_080D1784.c` 2 → 0 under the improved linter. At 080D1784 the
   shared route check and terrain snap restore PRE stack ordering after the
   discarded arithmetic and signed offset mask are removed.
-- `src/mummy_entry.c` 83 → 26 under the improved linter. Named range,
+- `src/monsters/mummy/mummy_entry.c` 83 → 26 under the improved linter. Named range,
   drawable, route, snapshot and interaction fields. Shared control and
   phase cover idle and pursuit. 080D211C is named `Mummy_UpdateDeath`.
   080DA5C8 matches with native fields and an ordinary tracking flag
@@ -59,7 +59,7 @@ six expansions and direct table, with the full 1,256-byte function exact.
   reaction and context masks change load order or narrow operations.
   Burn palette and flash stores also change their allocation. Exact
   sources retain these locals. See `build/cx/work/mummy-final-warn.log`.
-- `include/mummy.h` now names the 0x6EA countdown `interactionFrames`.
+- `include/monsters/mummy/mummy.h` now names the 0x6EA countdown `interactionFrames`.
   Both dependent units still match.
 - Tools. 0042 flags arithmetic in a block whose only updated scalar
   is discarded. 0052 detects number-named locals inside grouped scalar
@@ -94,7 +94,7 @@ with zero errors and the full translation unit exact.
   drawable operations replace duplicated state writes. The ordinary cell
   coordinate operation replaces both statement expressions. Three address
   indirections are gone. The typed trail vector uses a direct zero store.
-- `include/dog.h` names the 0x696 action cooldown beside the near and far
+- `include/monsters/dog/dog.h` names the 0x696 action cooldown beside the near and far
   attack timers. Its dependent unit matches.
 - `concession-ok` at 080E5744. Both `CpuSet` calls pass sp+0x10 and
   0x05000002. The `Memory_Clear` candidate changes the call and block.
@@ -147,10 +147,10 @@ with zero errors and the full translation unit exact.
 
 39 → 18 warnings, zero errors, both translation units exact.
 
-- `src/ivy.c` 36 → 15. Shared state changes recover the hold, release and
+- `src/monsters/ivy/ivy.c` 36 → 15. Shared state changes recover the hold, release and
   collision controls. The hide paths use the same drawable operations
   as Golem. The animation transition and defeat script use typed fields.
-- `src/ivy_child.c` 3 → 3. The dispatch callback reads the existing child
+- `src/monsters/ivy/ivy_child.c` 3 → 3. The dispatch callback reads the existing child
   phase record. Direct flag tests and the standard random sampler still
   change the burst prologue and neutral-phase writes.
 - `concession-ok` at 080EE1B0 and 080F0C20. Defeat passes sp+0x2C as the
@@ -163,7 +163,7 @@ with zero errors and the full translation unit exact.
   The remaining literal and zero locals affect flag-load and state-store
   order. See `build/cx/work/ivy-ready-warn.log`.
 - The existing drawable flag family moved into
-  `include/scene_actor_drawable_flags.h`. All eight existing dependents
+  `include/engine/shared/scene_actor_drawable_flags.h`. All eight existing dependents
   passed and the same operation removed one more warning in Mummy and
   two in Octopus on revisiting those units.
 
@@ -193,7 +193,7 @@ during the phase routines, so the Axe review is partial.
   stores its index as a scalar. Shared chase control and motion queries
   cover the turn, pause, pursuit and several attack phases. The existing
   drawable operation clears damage-spin visibility flags.
-- `include/axe.h` names the lunge entry latch and spark cycle at ED1 and
+- `include/monsters/axe/axe.h` names the lunge entry latch and spark cycle at ED1 and
   ED2. Both dependents passed. Defeat and trail sparks use the same
   named cycle. Reused the existing fixed-source position clear.
 - Six `concession-ok` entries record ROM fixed-source fills with
@@ -216,7 +216,7 @@ through Sword and Axe was partially reviewed. Across those eight units
 the intake count was 438, with three further warnings exposed by the
 linter fixes. The checkpoint count is 173 and zero errors. All source and
 header changes through 0068 have runner acknowledgments. Resume Axe at
-`SceneActorControl_UpdateControl2APhase`, then `src/axe_contact.c`. The
+`SceneActorControl_UpdateControl2APhase`, then `src/monsters/axe/axe_contact.c`. The
 fifteen units from Glove through Orange spine remain unreviewed.
 
 Final verification passed for all 23 translation units in the reviewed

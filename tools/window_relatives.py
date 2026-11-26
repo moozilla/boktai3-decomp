@@ -18,6 +18,7 @@ import re
 import sys
 
 from romlib import ROOT, ROM_BASE, load_rom
+from source_layout import report_path
 
 
 def opcode(h):
@@ -46,7 +47,7 @@ class Function:
     address: int
     end: int
     name: str
-    file: str
+    file: str | None
     clean: bool
 
 
@@ -56,7 +57,7 @@ def read_functions(report):
         for unit in category["units"]:
             for name, address, size, score, pinned, file_index, *_ in unit["functions"]:
                 start = int(address, 16)
-                file = report["files"][file_index] if file_index >= 0 else f"src/fn/sub_{address}.c"
+                file = report_path(report, address, file_index)
                 funcs.append(Function(start, start + size, name, file, score == 100 and not pinned))
     return sorted(funcs, key=lambda f: f.address)
 

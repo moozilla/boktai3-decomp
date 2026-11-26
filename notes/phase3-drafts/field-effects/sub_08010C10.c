@@ -1,4 +1,4 @@
-// Pin-free draft of sub_08010C10 (src/group_objects.c): 2 ROM / 2 draft; AGBCC_SPILL=0:1 matches.
+// Pin-free draft of sub_08010C10 (src/field/group_objects/group_objects.c): 2 ROM / 2 draft; AGBCC_SPILL=0:1 matches.
 void sub_08010C10(struct GroupObjects *m, struct GroupPiece *p, int index)
 {
     struct GroupVec delta;

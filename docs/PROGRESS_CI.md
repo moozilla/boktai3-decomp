@@ -181,7 +181,7 @@ no other in-place `swi` outside the syscall library and the m4a mixer.
 The ARM code after crt0 (`08000350-0800145C`, copied to IWRAM `03000000` by `AgbMain`)
 is *not* assembly: it is six agbcc ARM C functions (APCS frames, the same compiler as
 the RFU serial interrupt), now disassembled as functions in the `Engine core/IWRAM ARM
-code` unit and matched with `// COMPILER: agbcc_arm` (`src/iwram_code.c`).
+code` unit and matched with `// COMPILER: agbcc_arm` (`src/engine/iwram_arm_code/iwram_code.c`).
 
 ## Integration references
 

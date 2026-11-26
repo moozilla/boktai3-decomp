@@ -11,7 +11,7 @@ The downloaded archive has SHA-256
 `e52667ed78595dd1919f4a303f8b658b1d57b926e085e8021851b279143cf3ef`.
 Sources are `newlib/libm/math/` except `s_scalbn.c`, `s_copysign.c` and
 `s_matherr.c`, which are in `newlib/libm/common/`. The original Sun permission
-notice is preserved in every adapted file and in `include/libm_compat.h`.
+notice is preserved in every adapted file and in `include/lib/libm/libm_compat.h`.
 These files retain that license rather than becoming project-authored MIT code.
 
 | Start | Source function | Compiled bytes, including alignment |

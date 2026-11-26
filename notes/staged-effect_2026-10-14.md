@@ -11,7 +11,7 @@ specific visual/gameplay identity is tentative, so names use `StagedEffect`.
 
 ## Recovered contract
 
-`include/staged_effect.h` describes the observed 0x190-byte task allocation.
+`include/effects/staged_sprite_effect/staged_effect.h` describes the observed 0x190-byte task allocation.
 The effect owns five 0x2C-byte display sprites at 0x74. Each sprite has flags at
 0, render mode at 7, X/Y scale bytes at 8/9, priority at 0x10 and XYZ halfwords
 at 0x1C/0x1E/0x20. The parent task has script-presence/state/palette/scale

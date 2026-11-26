@@ -1,0 +1,30 @@
+#ifndef GUARD_SCENE_EFFECT_SCHEDULE_H
+#define GUARD_SCENE_EFFECT_SCHEDULE_H
+#include "engine/shared/engine.h"
+#include "engine/shared/contact_actor.h"
+#include "engine/shared/ram.h"
+#include "effects/scene_scheduled_effect/scene_scheduled_effect.h"
+struct SceneEffectScheduleEntry {
+    struct ContactPosition position, offset;
+    s16 randomValue, scaleValue;
+    u16 id, flags;
+    u8 kind, style;
+    s16 index;
+    struct SceneScheduledEffect *effect;
+};
+struct SceneEffectSchedule {
+    struct Task task;
+    struct SceneEffectScheduleEntry entries[12];
+    u32 occupiedMask;
+};
+/* 0x0200019C */
+extern struct SceneEffectSchedule *gSceneEffectSchedule;
+extern u32 gUnk_02000560;
+struct SceneEffectScheduleEntry *SceneEffectSchedule_Allocate(struct SceneEffectSchedule *);
+s32 SceneEffectSchedule_Tick(struct SceneEffectSchedule *);
+void SceneEffectSchedule_Destroy(void *);
+s32 SceneEffectSchedule_Initialize(struct SceneEffectSchedule *, u32);
+struct SceneEffectSchedule *SceneEffectSchedule_Create(u32);
+struct SceneScheduledEffect *SceneScheduledEffect_Create(const struct ContactPosition *, u32, s32,
+                                                         u32, u32, s32, s32, s32, s32, s32, u32);
+#endif

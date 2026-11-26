@@ -1,6 +1,6 @@
 // A small MP2K ("Sappy"/m4a) player for the Studio: plays a song from the ROM
 // bytes /api/sound/song/N serves (tools/studio/sound.py), following the driver
-// in src/lib/m4a.c (pokeemerald's m4a.c): the sequencer runs per frame
+// in src/lib/m4a/m4a.c (pokeemerald's m4a.c): the sequencer runs per frame
 // (tempo accumulator, 150 per tick), notes go to DirectSound channels with
 // the m4a ADSR envelope, or to CGB square/wave/noise channels.
 //

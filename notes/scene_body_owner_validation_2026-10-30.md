@@ -4,8 +4,8 @@ Tags: #matching #compiler #structs #ram
 
 The shared `SceneActorBody` record is now used by the engine operations that
 initialize it, attach a drawable, and install its movement probe. The API is
-in `include/scene_body_api.h`. The canonical record remains in
-`include/scene_actor_components.h`; existing used members retain their names,
+in `include/engine/scene_body/scene_body_api.h`. The canonical record remains in
+`include/engine/shared/scene_actor_components.h`; existing used members retain their names,
 offsets, and types. The record remains 0x48 bytes, with the actor's next field
 at +0x98 when the body begins at +0x50.
 
