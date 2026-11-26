@@ -226,10 +226,11 @@ static inline void RecordKill(struct ContactCollider *collider, u8 *category)
     }
 }
 
-static inline void Skeleton_RunDefeatScript(struct ChaseActor *actor, s32 *values)
+static inline void Skeleton_RunDefeatScript(struct ChaseActor *actor)
 {
     u16 script = (u16)actor->base.script1F8;
     if (script) {
+        s32 values[8];
         struct ScriptUtilityArguments arguments;
         values[0] = actor->base.body.position.x;
         values[1] = actor->base.body.position.y;
@@ -247,7 +248,6 @@ static inline void Skeleton_RunDefeatScript(struct ChaseActor *actor, s32 *value
 
 void Skeleton_UpdateDefeat(struct ChaseActor *actor)
 {
-    s32 values[8];
     /* Allocation-only: reuse disjoint pointer and spark-priority lifetimes. */
     union {
         struct Skeleton *context;
@@ -308,7 +308,7 @@ void Skeleton_UpdateDefeat(struct ChaseActor *actor)
     test = actor->base.motionFlags & mask;
     response.flags = &actor->base.motionFlags;
     if (test) {
-        Skeleton_RunDefeatScript(actor, values);
+        Skeleton_RunDefeatScript(actor);
         {
             u32 t = *response.flags & mask;
             categoryp = &actor->base.category;
@@ -386,7 +386,7 @@ void Skeleton_UpdateDefeat(struct ChaseActor *actor)
             }
         }
         if (state.context->revivalDelay > 19999) {
-            Skeleton_RunDefeatScript(actor, values);
+            Skeleton_RunDefeatScript(actor);
             if (!Masked16(response.flags, 0x4000) && (u32)(actor->base.category - 11) > 2)
                 Bestiary_UnlockEntry(
                     Bestiary_GetEntryForActor(actor->base.category, actor->base.paletteOffset));
@@ -418,7 +418,7 @@ void Skeleton_UpdateDefeat(struct ChaseActor *actor)
         }
         SceneActorBehavior_CallTerrainScript(actor);
         {
-            Skeleton_RunDefeatScript(actor, values);
+            Skeleton_RunDefeatScript(actor);
         }
         if (!Masked16(response.flags, 0x4000) && (u32)(*categoryp - 11) > 2)
             Bestiary_UnlockEntry(Bestiary_GetEntryForActor(*categoryp, actor->base.paletteOffset));
