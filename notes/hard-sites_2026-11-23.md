@@ -263,3 +263,86 @@ were tried. The nearest source remains in `build/hard-sites/fragment/`
 with the graph in `build/matchsearch/FragmentGroup_SpawnRadial`. The
 private diagnostic compiler is under `build/hard-sites/diagnostic-agbcc/`.
 The checked-in matching unit retains its three proved-zero sites.
+
+## 2026-11-25: SpiralBurst table and mask copies
+
+`SpiralBurst_InitParticles` (08234540) with a direct symbolic table
+assignment emits 416 bytes. It retains the table's preheader copy but
+allocates it in sb and puts the wrap mask in r6. Suppressing table
+equivalence raises the table's priority from 1107 to 2214 without
+changing the allocation. In this checkout the first and loop wrap-mask
+pseudos still take r6. Forcing the table to r6 restores 428 bytes and
+leaves seven substitutions. The independent structural difference is
+the wrap-mask copy: the ROM saves it in sb during the phase draw, and
+the draft copies it into sb immediately before the body. That also
+changes the first mask reload and the counter initialization registers.
+Raising table priority by 3600 alone gives 15 register substitutions
+with exact instruction shape.
+
+Separate typed table views, a cursor advanced for the first draw,
+actual array indexing, an inline phase helper, the existing shared
+random sample operations, and wrap-by-table-count forms were tried.
+The main-tree source retains the existing zero term. See
+`build/matchsearch/SpiralBurst_InitParticles` and
+`build/hard-sites/spiral/`.
+
+## 2026-11-25: Hresvelgr mask reload
+
+The clean `Hresvelgr_UpdateBoundaryBarrage` draft (081A0BC8) remains
+732 bytes with two differing instructions. Source line 75's 0x3FF
+mask is pseudo 219. `why 476` shows it allocated to r5 and then
+evicted into sl by reload. `AGBCC_FORCE=219:12` matches. The 0x2F0
+action offset in sl is live in the other switch cases, so it does
+not interfere with the mask in case 1.
+
+Changing the draw to use the native index, a wrap by table length,
+an explicit cursor argument, a direct table reference, or separate
+advance and wrap expressions leaves the same two differences.
+Readdressing the action in either boundary arm or using a signed
+halfword scatter helper changes additional instructions. Combining
+both boundary tests under a shared action advance has the original
+two differences. The source frontier and trials are in
+`build/matchsearch/Hresvelgr_UpdateBoundaryBarrage` and
+`build/hard-sites/barrage/`.
+
+## 2026-11-25: GameState late subtraction fold
+
+In `GameState_SelectRamBase` (0821B084), a signed byte displacement
+assigned the negated timer offset, followed by subtracting it from
+the storage pointer, matches all 88 bytes. It stays MINUS with a
+separate NEG through cse2. Combine makes the PLUS after CSE would
+have reversed the operands. Moving the negation before multiplying
+by eight misses. The same exact form works with the named timer
+register. End-relative and midpoint-relative indexing trials did
+not match.
+
+The negation and subtraction cancel and there is no separate use
+for the negative displacement. The exact trial is retained as
+compiler evidence, and the source job remains open for a natural
+storage operation producing the late add. See
+`build/hard-sites/game-state/trial-signed-subtraction-scaled.c`.
+
+## 2026-11-25: WirelessResultPanel failure returns recovered
+
+Removing the two dead resource guards in `WirelessResultPanel_Init`
+(0803B40C) initially gave 680 bytes. The missing instructions were
+`adds r0, r2, #0` before each 32-byte resource copy. Both moves still
+exist in greg with the ROM registers. Post-reload CSE deletes each as
+redundant, since the script call returned the same pointer in r0. It
+forgets that equality at a code label.
+
+Separate `return -1` statements for the two real resource failures
+preserve the copy labels through reload. With the old text-entry shape,
+jump2 then chooses the last failure as the common tail. On that draft,
+`AGBCC_NOCROSS=52` matches 684 bytes by leaving the earliest failure
+available as a target.
+
+The original shape is reproduced in ordinary C by nesting the text
+lookup under the successful keyword search and returning separately
+when either fails. The trace shows the text-null and primary failures
+merge into the secondary failure, then that tail merges into the
+earliest return. The shared script package ID is named and used directly
+in both resource calls. The full unit matches at 684 bytes and the two
+dead-code reports disappear. The scratch trials and graph are in
+`build/hard-sites/wireless/` and
+`build/matchsearch/WirelessResultPanel_Init`.
