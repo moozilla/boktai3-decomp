@@ -26,8 +26,12 @@ The matrix reached 81 functions from the initial 226-warning missing-return
 scan. The pending overlay directory now supplies a checked source patch
 for every reached function. Applying the overlays brought the Clang scan to
 139 fallthrough warnings, with zero from the reached set. The combined build
-passed the short suite and six focused 2,800-frame reruns. StatusScreen_Destroy at 0800F1BC preserves the
-address one word past its BIOS fill source in the port address space.
+passed the short suite and the full 249-movie matrix with 1,257,166 matching
+ticks. Each movie on the combined build produced the same emulator script as
+the ABI-fixed build and matched the original ROM samples byte for byte. The
+sweep reached no additional fallthroughs.
+StatusScreen_Destroy at 0800F1BC preserves the address one word past its BIOS
+fill source in the port address space.
 Modifier_OnTableTaskDestroy at 0811DEE0 preserves the retiring owner through
 the matching published table pointer, confirmed by a ROM probe.
 The pending patches can be applied to generated copies before the port's
