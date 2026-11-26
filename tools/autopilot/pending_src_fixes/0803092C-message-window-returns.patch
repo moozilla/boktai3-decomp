@@ -1,0 +1,39 @@
+0803092C message-window-returns
+
+MessageWindow_SetDisplayMode forces speaker -1. That path of
+MessageWindow_UpdateSpeakerPortrait leaves r0 at the window pointer.
+TextWindow_BlankRect returns via r0 to 08030C2C in MessageWindow_Clear,
+leaving the Thumb return address 08030C2D. Clear does not overwrite r0.
+MessageWindow_SetAutoAdvance leaves the incoming mode in r0 when a window exists.
+
+The explicit form changed the ROM bytes. The guarded form passed the unit ROM check.
+
+--- a/src/message_window.c
++++ b/src/message_window.c
+@@ -155,5 +155,10 @@
+         }
+     }
++#ifdef UBFIX
++    MessageWindow_UpdateSpeakerPortrait(window);
++    return (int)window; // r0 retains window on the speaker -1 path
++#else
+     return MessageWindow_UpdateSpeakerPortrait(window);
++#endif
+ }
+ 
+@@ -182,4 +187,7 @@
+     window->portrait.flags |= 1;
+     window->queuedMessage = 65535;
++#ifdef UBFIX
++    return 0x08030C2D; // r0 retains the Thumb return address from TextWindow_BlankRect
++#endif
+ }
+ 
+@@ -449,4 +457,7 @@
+     window->autoAdvanceCounter = 0;
+     window->skipFlags = flags;
++#ifdef UBFIX
++    return mode; // r0 retains the input mode
++#endif
+ }
+ 

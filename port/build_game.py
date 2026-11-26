@@ -70,6 +70,21 @@ def game_sources():
             sorted(ROOT.glob('src/lib/*.c')))
 
 
+def source_patches(directory, units):
+    """Read one-source unified diffs supplied for the generated port build."""
+    result = {}
+    for patch in sorted(directory.glob('*.patch')):
+        data = patch.read_bytes()
+        old = re.findall(rb'^--- a/(\S+)$', data, re.M)
+        new = re.findall(rb'^\+\+\+ b/(\S+)$', data, re.M)
+        if len(old) != 1 or old != new or old[0].decode() not in units:
+            raise ValueError(f'{patch}: expected a patch to one existing game source')
+        result.setdefault(old[0].decode(), []).append(data)
+    if not result:
+        raise ValueError(f'{directory}: no source patches found')
+    return result
+
+
 def code_addresses():
     """Function name -> the code word the ROM build uses (Thumb bit set)."""
     out = subprocess.run(['arm-none-eabi-readelf', '-sW', str(ROOT / 'build/boktai3.elf')],
@@ -108,6 +123,8 @@ def main():
                          '(tools/recorder/, build/port/game-rec/)')
     ap.add_argument('--watch', metavar='FUNC[,FUNC]',
                     help='log these functions\' first three arguments at every entry (build/port/game-watch/)')
+    ap.add_argument('--source-patches', type=Path, metavar='DIR',
+                    help='apply temporary unified diffs to generated game sources only')
     args = ap.parse_args()
     os.chdir(ROOT)
     global OUT
@@ -147,6 +164,7 @@ def main():
     context = hasher.digest()
 
     units = [(str(p.relative_to(ROOT)), True) for p in game_sources()]
+    overlays = source_patches(args.source_patches, {name for name, _ in units}) if args.source_patches else {}
     doubles = {int(m, 16) for p in game_sources()
                for m in re.findall(r'extern const double gUnk_([0-9A-F]{8})\[\]', p.read_text())}
     listed = {int(m, 16) for m in re.findall(r'\{0x([0-9A-F]{8}), \d+\}', (ROOT / 'port/game/game.c').read_text())}
@@ -160,13 +178,20 @@ def main():
         src = ROOT / name
         ll = OUT / 'ir' / (name + '.ll')
         stamp = ll.with_suffix('.key')
-        key = hashlib.sha256(context + src.read_bytes()).hexdigest()
+        patches = overlays.get(name, [])
+        key = hashlib.sha256(context + src.read_bytes() + b''.join(patches)).hexdigest()
         if not args.force and ll.exists() and stamp.exists() and stamp.read_text() == key:
             return name, None
         ll.parent.mkdir(parents=True, exist_ok=True)
         prepared = OUT / 'prepared' / name
         prepared.parent.mkdir(parents=True, exist_ok=True)
         prepared.write_text('#line 1 "' + name + '"\n' + prepare_source(src, 'wasm32'))
+        for patch in patches:
+            result = subprocess.run(['patch', '-s', '-t', '-N', '-F', '0', '-o', '-', str(prepared)],
+                                    input=patch, capture_output=True)
+            if result.returncode:
+                raise RuntimeError(f'{name}: generated source patch failed\n{result.stderr.decode()}')
+            prepared.write_bytes(result.stdout)
         r = run([args.cc, *flags, '-S', '-emit-llvm', str(prepared), '-o', str(ll)])
         if r.returncode:
             return name, r.stderr[-2000:]

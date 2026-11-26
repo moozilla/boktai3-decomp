@@ -589,6 +589,26 @@ uses valid inactive sound state and leaves wireless uncreated; active audio/RFU
 callbacks are not covered. This focused resolver
 is a tested integration boundary, not the full game's callback registry.
 
+## Checkpoint replays against the ROM
+
+```sh
+make -f tools/emu/Makefile build/emu/harness
+build/venv/bin/python port/agent/gametypes.py
+build/venv/bin/python port/tests/verify.py --bank build/saves
+```
+
+Build the full-game wasm and generate the checkpoint bank first. The short
+suite replays field and menu input in each area, including a swords-page
+navigation case and a soft reset followed by Continue. It compares live state
+at input ticks, which keeps the movies aligned when the ROM has lag frames.
+The first difference names the scene, position, player stats, HUD state,
+previous input or random index that changed.
+
+`--all --resume` runs seedable field and menu fuzzing from the entire bank.
+Use `--case CHECKPOINT` to rerun a specific save and `--seed N` to change the
+inputs. Movies, action logs and ROM samples are under `build/autopilot/`.
+`tools/autopilot/tickdiff.mjs DIR FROM TO` compares RAM around a failing tick.
+
 ## Undefined behavior the GBA forgives (UBFIX)
 
 Some original code relies on what a register happens to hold: a call passing fewer
@@ -609,6 +629,10 @@ stops with the list of any call still passing fewer arguments than its callee ta
 (`build/port/game/padded_calls.txt`); fix each in the source as above. Divergences the autopilot found this way:
 `LinkedWidgetSet_Init` fell off the end, so the floating-item effect manager was killed at
 creation on the port, which skipped random draws and desynced every later random number.
+
+`port/build_game.py --source-patches tools/autopilot/pending_src_fixes` applies
+pending one-unit source repairs to the generated port copies. The patches give
+the original instruction evidence and their ROM unit-check result.
 
 ## Discarded return declarations
 
