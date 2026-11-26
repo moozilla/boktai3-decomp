@@ -38,7 +38,7 @@ struct SabataActorState {
     struct ContactPosition *selectedPoint;
     s8 alternateDirection;
     u8 unknown115[0x150 - 0x115];
-    s16 controlPhaseTimer;
+    s16 effectDuration;
     u8 unknown152[0x178 - 0x152];
     struct ContactCollider attackCollider, bodyCollider, proximityCollider;
     u8 unknown274[0x288 - 0x274];
@@ -54,7 +54,7 @@ struct SabataActorState {
     u16 lastDamage;
     u32 hitAttributes;
     u8 slowDown, direction, hitParameter, impactCount;
-    u8 unknown474[3];
+    u8 recentHitCount, hitSequence, unknown476;
     u8 transitionBlocked;
     struct ContactPosition savedPosition;
     struct ContactPosition nearbyPosition;
@@ -64,7 +64,7 @@ struct SabataActorState {
     u8 request, requestedVariant, requestMode, requestPhase;
     s16 paletteRestoreTimer;
     u16 contactHoldoff;
-    u8 unknown4F0[2];
+    u16 hitstun;
     s16 floorHeight;
     s16 attackFlags;
     u8 unknown4F6[6];

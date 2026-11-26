@@ -37,10 +37,10 @@ void Sabata_UpdatePresentation(struct SabataActorState *p)
     SceneActors_UpdateEffects(p);
     SceneActors_UpdateConvergingParticles(p);
     if (p->controlPhase == 10) {
-        if (q->controlPhaseTimer > 0)
-            q->controlPhaseTimer--;
+        if (q->effectDuration > 0)
+            q->effectDuration--;
     } else
-        q->controlPhaseTimer = 0;
+        q->effectDuration = 0;
     {
         struct SabataActorState *a = q;
         u32 v = a->contactHoldoff;
