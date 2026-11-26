@@ -1,12 +1,13 @@
+#include "scene/terrain/terrain_collision.h"
 #include "scene/actor/scene_actor_behavior.h"
 u8 *TerrainModifiers_FindCellOverride(u32, u32);
 #include "script/script_utility.h"
-static inline u8 *CellData(u32 cell)
+static inline struct TerrainCell *CellData(u32 cell)
 {
-    u8 *override = TerrainModifiers_FindCellOverride(cell, 1);
+    struct TerrainCellOverride *override = (void *)TerrainModifiers_FindCellOverride(cell, 1);
     if (override)
-        return override + 4;
-    return gTerrainMap->cells + (cell * 4 + 12);
+        return &override->cell;
+    return &((struct TerrainGrid *)gTerrainMap->cells)->cells[cell];
 }
 void SceneActorBehavior_CallTerrainScript(struct RoomActor *actor)
 {
@@ -22,7 +23,7 @@ void SceneActorBehavior_CallTerrainScript(struct RoomActor *actor)
     }
     {
         u32 cell = actor->terrainCell;
-        u32 flags = *(u16 *)(CellData(cell) + 2);
+        u32 flags = CellData(cell)->flags;
         if (flags & 0x43)
             return;
     }
