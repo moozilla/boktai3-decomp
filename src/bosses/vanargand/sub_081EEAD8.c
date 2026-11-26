@@ -4,8 +4,8 @@
 
 extern u16 gUnk_03005040[4][16];
 extern const u16 gUnk_086141BC[];
-void sub_08113398(struct ContactPackedVector *, struct ContactPackedVector *, u32, u32, s32, s32,
-                  s32, s32, s32, s32, s32, s32, s32, s32);
+void SceneDebris_Create(struct ContactPackedVector *, struct ContactPackedVector *, u32, u32, s32,
+                        s32, s32, s32, s32, s32, s32, s32, s32, s32);
 
 static inline u32 RandomValue(void)
 {
@@ -87,8 +87,8 @@ void VanargandHead_UpdatePaletteDispersal(struct DepartureActor *input)
                 velocity.x = (RandomValue() & 3) - 1;
                 velocity.y = -(RandomValue() & 1);
                 velocity.z = 0;
-                sub_08113398(&position, &velocity, actor->effectResource, actor->effectGraphics, 5,
-                             0, 0, 0, 2, 42, 0, 512, 1, 0);
+                SceneDebris_Create(&position, &velocity, actor->effectResource,
+                                   actor->effectGraphics, 5, 0, 0, 0, 2, 42, 0, 512, 1, 0);
                 actor->emitted++;
             }
             if (actor->emitted > 23)

@@ -1,5 +1,5 @@
 #include "global.h"
-/* SceneActor_UpdateDirectionalTrigger_081F7C08: same as SceneActor_UpdateDirectionalTrigger but sets the owner's +0x184 flag instead of consuming a trigger (provisional name) */
+/* Ratatosk_UpdateDirectionalTrigger: same as SceneActor_UpdateDirectionalTrigger but sets the owner's +0x184 flag instead of consuming a trigger (provisional name) */
 
 u32 Trigger_ConsumePending(void *latch, u32 expected);
 
@@ -40,7 +40,7 @@ static inline u8 SelectState(s32 value)
     return value;
 }
 
-void SceneActor_UpdateDirectionalTrigger_081F7C08(struct SceneDirectionalActor *p)
+void Ratatosk_UpdateDirectionalTrigger(struct SceneDirectionalActor *p)
 {
     u8 *q = (u8 *)p;
     p->direction = p->requestedDirection;

@@ -17,7 +17,7 @@ void sub_0823B728(u8 *, s32);
 void Callback_InvokeActor(u8 *, void *);
 void Player_SynchronizeColliderState(u8 *);
 void Player_SmoothCameraAnchor(u8 *);
-void Player_ClampPositionToStoredTerrainCell_0823B938(u8 *);
+void LinkPlayer_ClampToRecoveryTerrainCell(u8 *);
 void Player_UpdateModifier08Drift(u8 *);
 void Player_SetSecondaryActionFlags(u8 *, s32);
 
@@ -50,7 +50,7 @@ void Player_UpdateActionPhase(u8 *p)
             Player_SynchronizeColliderState(p);
             if (*(s16 *)(p + 0x4b6) != 0)
                 Player_SmoothCameraAnchor(p);
-            Player_ClampPositionToStoredTerrainCell_0823B938(p);
+            LinkPlayer_ClampToRecoveryTerrainCell(p);
             Player_UpdateModifier08Drift(p);
             break;
         }

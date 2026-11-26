@@ -1,7 +1,7 @@
-#include "objects/warp_circle/stacked_actor.h"
-void StackedActor_WaitForRetraction(struct StackedActor *p)
+#include "objects/warp_circle/warp_circle.h"
+void WarpCircle_WaitForRetraction(struct WarpCircle *p)
 {
     p->frame++;
     if (p->frame > 0xf)
-        StackedActor_SetUpdate(p, StackedActor_FinishPlayerInteraction);
+        WarpCircle_SetUpdate(p, WarpCircle_FinishPlayerInteraction);
 }

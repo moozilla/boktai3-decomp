@@ -1,7 +1,7 @@
 #include "global.h"
-/* Player_ClampCameraOffsets_0823B3C4: same code as Player_ClampCameraOffsets at another address (ported by relatives.py; provisional name) */
+/* LinkPlayer_ClampCameraOffsets: same code as Player_ClampCameraOffsets at another address (ported by relatives.py; provisional name) */
 #include "player/player.h"
-void Player_ClampCameraOffsets_0823B3C4(struct Player *p)
+void LinkPlayer_ClampCameraOffsets(struct Player *p)
 {
     s32 correction = p->cameraOffsetY >> 1;
     s32 a = p->cameraOffsetX - correction;

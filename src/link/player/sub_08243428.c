@@ -34,7 +34,7 @@ static inline u32 Busy(struct Player *p)
 u8 *TerrainModifiers_FindCellOverride(s32, s32);
 s32 Div(s32, s32);
 void Player_SetTetherMode(struct Player *, s32, s32);
-s32 Player_BeginTerrainRecovery_0823BA78(struct Player *);
+s32 LinkPlayer_BeginTerrainRecovery(struct Player *);
 s32 DamageNumberDisplay_Show(void *, u32, u32, void *, void *, u32);
 void SceneHud_SetTimedState(u32, s32, s32, u32, u32, s32);
 
@@ -70,7 +70,7 @@ s32 Player_ApplyTerrainDamage(struct Player *p)
             flash = 1;
     }
     if (p->terrainClampApplied)
-        p->particleEmissionCount += Player_BeginTerrainRecovery_0823BA78(p);
+        p->particleEmissionCount += LinkPlayer_BeginTerrainRecovery(p);
     if (p->positionResetValue == 0 && p->movementModifierKind == 1 && p->movementModifierActive) {
         u16 *c;
         u16 n;

@@ -1,5 +1,5 @@
-#ifndef GUARD_CONTROL_PANEL_H
-#define GUARD_CONTROL_PANEL_H
+#ifndef GUARD_MINIGAMES_DARK_GENERATOR_H
+#define GUARD_MINIGAMES_DARK_GENERATOR_H
 #include "ui/widgets/scene_input.h"
 #include "effects/projectiles/contact_swarm_sprite.h"
 #include "player/player.h"

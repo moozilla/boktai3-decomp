@@ -4,7 +4,7 @@
 s32 Mod(s32, s32);
 s32 Div(s32, s32);
 s32 Math_Atan2(s32, s32);
-s32 Player_BeginTerrainRecovery_081408AC(struct Player *p)
+s32 Player_BeginTerrainCellRecovery(struct Player *p)
 {
     s32 x, z, angle, tx, tz;
     u32 direction;

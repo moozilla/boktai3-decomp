@@ -28,7 +28,7 @@ s32 TextWindow_Refresh(s32 id, s32 index);
 void TextWindow_StartPlayback(s32);
 s32 GameState_GetResultTimer(void);
 s32 GameState_GetResultIndex(void);
-s32 GameState_GetActionCount894(void);
+s32 GameState_GetBikeRecoveryCount(void);
 s32 Div(s32, s32);
 s32 SceneGauge_SelectThresholdFrame(struct StageResults *, s32);
 u8 StageResults_RecordStagePerformance(s32);
@@ -72,7 +72,7 @@ void sub_08112508(struct StageResults *p)
         TextWindow_StartPlayback(p->windows[1]);
         elapsed = GameState_GetResultTimer();
         timeScore = Div(p->times[GameState_GetResultIndex()] - elapsed, 60) + 25;
-        actionScore = Div(20, GameState_GetActionCount894() + 1);
+        actionScore = Div(20, GameState_GetBikeRecoveryCount() + 1);
         CLAMP(timeScore, 80);
         CLAMP(actionScore, 20);
         total = timeScore + actionScore;

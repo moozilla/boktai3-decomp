@@ -1,5 +1,5 @@
-#ifndef GUARD_SCENE_INPUT_WIDGET_H
-#define GUARD_SCENE_INPUT_WIDGET_H
+#ifndef GUARD_ENGINE_VIDEO_ANIM_SPRITE_H
+#define GUARD_ENGINE_VIDEO_ANIM_SPRITE_H
 
 #include "scene/collision/contact_position.h"
 

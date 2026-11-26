@@ -7,8 +7,8 @@ Reviewed range: **0805DD18–0805DE3C**, five functions, 292 bytes. Two new func
 | Address | Name | Bytes | Contract |
 |---|---|---:|---|
 | 0805DD18 | SceneHud_GetMapCell | 32 | Return map[layer] + wrappedX +32*wrappedY. Caller supplies a valid layer index and map. |
-| 0805DD38 | SceneHud_FillTile001 | 48 | Fill a positive-length run on layer0 with F001. A nonpositive count writes nothing. |
-| 0805DD68 | SceneHud_FillTile020 | 48 | Same run behavior with F020. |
+| 0805DD38 | SceneHud_FillDigitBacking | 48 | Fill a positive-length run on layer0 with F001. A nonpositive count writes nothing. |
+| 0805DD68 | SceneHud_FillEmptyDigitRow | 48 | Same run behavior with F020. |
 | 0805DD98 | SceneHud_DrawDecimal | 80 | Repeatedly divide by the caller's positive place divisor, emit the quotient as a glyph, retain the remainder, then divide the place by10. Glyph base is `(style<<4)+21`; each glyph narrows to16 bits before OR withF000. Writes no cells for a nonpositive initial divisor. |
 | 0805DDE8 | SceneHud_DrawCenteredMeter | 84 | At layer0 cell(5,2), write eight cells from selected/unselected template rows. Select a centered interval of caller-supplied length, using the centering table0824DEB8. Valid table indices correspond to lengths1–8. |
 

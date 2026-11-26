@@ -23,7 +23,7 @@ s32 CharacterModel_GetPrimaryPaletteIndex(void *);
 void ChargeMarker_TickHold(void *, void *, u32);
 void CoffinBike_UpdateStopping(struct CoffinBike *);
 
-void GameState_AddActionCount894(s32);
+void GameState_AddBikeRecoveryCount(s32);
 void CharacterModel_ClearAnimationFlags(void *, s32);
 void CharacterModel_SetAnimationFlags(void *, s32);
 void ActorMarkerPool_ShowMarker(s32);
@@ -53,7 +53,7 @@ void CoffinBike_UpdateRecoveryFlash(struct CoffinBike *p)
     s32 *vy, *py, *pvz, *bias;
     if (p->active) {
         if (!Engine_PauseBits(0x800))
-            GameState_AddActionCount894(1);
+            GameState_AddBikeRecoveryCount(1);
         CharacterModel_ClearAnimationFlags(&p->model, 1);
         p->active = 0;
         p->blinkTimer = 3;

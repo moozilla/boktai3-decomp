@@ -1,4 +1,4 @@
-#define SceneMotion_CreateTask FrostEmitter_Create
+#define SceneMotion_CreateTask SabataFrost_Create
 #include "global.h"
 struct SceneMotion {
     u8 unknown00[8];
@@ -7,7 +7,7 @@ struct SceneMotion {
     u8 unknown14[0x24];
     s16 active;
 };
-void *FrostEmitter_Create(void);
+void *SabataFrost_Create(void);
 static inline void ClearPosition(void *destination, u32 *source)
 {
     *source = 0;
@@ -19,7 +19,7 @@ void *SceneMotion_InitState(struct SceneMotion *motion)
     u32 zero;
     void *task;
     ClearPosition(position, &zero);
-    task = FrostEmitter_Create();
+    task = SabataFrost_Create();
     motion->task = task;
     motion->active = 0;
     /* Original ABI leaves the task result in r0; callers ignore it. */

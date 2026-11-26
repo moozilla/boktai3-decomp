@@ -1,7 +1,7 @@
 #include "global.h"
-/* Player_BeginTerrainRecovery_0823BA78: same code as Player_BeginTerrainRecovery at another address (ported by relatives.py; provisional name) */
+/* LinkPlayer_BeginTerrainRecovery: same code as Player_BeginTerrainRecovery at another address (ported by relatives.py; provisional name) */
 #include "player/core/player_core.h"
-s32 Player_BeginTerrainRecovery_0823BA78(struct Player *p)
+s32 LinkPlayer_BeginTerrainRecovery(struct Player *p)
 {
     u32 direction;
     u16 angle;

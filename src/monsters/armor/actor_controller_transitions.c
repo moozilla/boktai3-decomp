@@ -54,7 +54,7 @@ void ActorController_UpdateResetMotion(struct SceneCombatActor *actor)
     ActorController_UpdateResetMotionTransition(actor, 0);
 }
 
-void ActorController_UpdateResetMotionSpeed120(struct SceneCombatActor *actor)
+void ActorController_UpdateFastMotionReset(struct SceneCombatActor *actor)
 {
     ActorController_UpdateResetMotionTransition(actor, 1);
 }

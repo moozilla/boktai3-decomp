@@ -5,7 +5,7 @@ s32 ActorVariant_GetTableValue(u32, s32);
 s32 Player_SetAnimationIndex(struct Player *, s32, s32);
 void Player_SetTetherMode(struct Player *, s32, s32);
 s32 Player_IsFlaggedBelowResourceLimit(struct Player *);
-void Player_SetActionOrigin_0823D00C(struct Player *);
+void LinkPlayer_SetFacingActionOrigin(struct Player *);
 void Player_PlayLocalSong(s32, u32);
 void Player_StopLocalSong(s32, u32);
 void sub_082392E8(struct Player *, void *);
@@ -32,7 +32,7 @@ void Player_UpdateChargeAction(struct Player *p)
                     p->heading = 0;
                     p->side = 0;
                 }
-                Player_SetActionOrigin_0823D00C(p);
+                LinkPlayer_SetFacingActionOrigin(p);
                 p->tetherFrame++;
             }
             p->resetValue6FC = 15;
@@ -68,7 +68,7 @@ void Player_UpdateChargeAction(struct Player *p)
             }
             Player_SetAnimationIndex(p, ActorVariant_GetTableValue(p->actionMode, 9), 0x40);
             p->resetValue6FC = 30;
-            Player_SetActionOrigin_0823D00C(p);
+            LinkPlayer_SetFacingActionOrigin(p);
             sub_082392E8(p, &p->actionOrigin);
             if (!(p->inputKeys[0] & 1)) {
                 Player_StopLocalSong(p->slot, 0xD8);

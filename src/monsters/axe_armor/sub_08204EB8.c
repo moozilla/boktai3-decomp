@@ -1,7 +1,7 @@
 #include "monsters/axe_armor/axe_armor.h"
 #include "engine/engine_globals.h"
 #include "engine/ram.h"
-void SpriteParticle_CreateDefaultVariant4384(void *, s32, s32, s32, s32, s32, s32, s32, s32, s32,
+void TrapSpellParticles_CreateDefaultBurst(void *, s32, s32, s32, s32, s32, s32, s32, s32, s32,
                                              s32, s32);
 void AxeArmor_RecordDefeat(struct AxeArmor *);
 s32 AxeArmor_UpdateDeath(struct AxeArmor *p)
@@ -15,7 +15,7 @@ s32 AxeArmor_UpdateDeath(struct AxeArmor *p)
             q->y += 200;
             gRandomIndex = (gRandomIndex + 1) & 0x3ff;
             r = *(const u8 *)&gRandomTable[gRandomIndex];
-            SpriteParticle_CreateDefaultVariant4384(&v, 128, 32, 12, 12, 24, r, 32, 32, 1, 1, 512);
+            TrapSpellParticles_CreateDefaultBurst(&v, 128, 32, 12, 12, 24, r, 32, 32, 1, 1, 512);
         }
         if (p->timer == 12) {
             AxeArmor_RecordDefeat(p);

@@ -1,4 +1,4 @@
-# Scene panel initialization and script controls
+# Pile Driver initialization and script controls
 
 The reviewed range `0805C310–0805C680` contains eight functions following the
 sprite/configuration cohort and preceding the command-sequence runner. It uses
@@ -46,7 +46,7 @@ The separate null-tether and other-tether branches are preserved.
 at `0x1338`, reloading the panel global between writes. `0805C640` and
 `0805C660` respectively set and clear gate byte `0xC12`. These guarded controls
 couple to the state-seven ramp and state-eight transition gate documented in
-`SCENE_PANEL_INTERACTION.md`. Their return ABI is void.
+`PILE_DRIVER_INTERACTION.md`. Their return ABI is void.
 
 All eight full reviewed extents are exact. Three new functions add 696 bytes,
 all ordinary C, or 0.0288 percentage points. Five already-C functions contribute

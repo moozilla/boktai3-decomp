@@ -1,5 +1,5 @@
-#ifndef GUARD_REGISTRY_E7BC_H
-#define GUARD_REGISTRY_E7BC_H
+#ifndef GUARD_SCENE_COLLISION_COLLISION_MANAGER_H
+#define GUARD_SCENE_COLLISION_COLLISION_MANAGER_H
 
 #include "scene/collision/spatial_index.h"
 
@@ -45,14 +45,14 @@ void ScriptObjectPool_CreateFromScript(void);
 void ScriptObjectPool_ResetManager(void);
 void GameState_SetResultIndex(s32);
 void GameState_SetResultTimer(s32);
-void GameState_SetActionCount892(s32);
-void GameState_SetActionCount894(s32);
+void GameState_SetPickupRewardCount(s32);
+void GameState_SetBikeRecoveryCount(s32);
 s16 GameState_GetResultIndex(void);
 s32 GameState_GetResultTimer(void);
-s16 GameState_GetActionCount892(void);
-s16 GameState_GetActionCount894(void);
-void GameState_AddActionCount892(s32);
-void GameState_AddActionCount894(s32);
+s16 GameState_GetPickupRewardCount(void);
+s16 GameState_GetBikeRecoveryCount(void);
+void GameState_AddPickupRewardCount(s32);
+void GameState_AddBikeRecoveryCount(s32);
 void GameState_ResetActionCounts(void);
 s32 SceneTilemap_GetLayoutLength(void);
 

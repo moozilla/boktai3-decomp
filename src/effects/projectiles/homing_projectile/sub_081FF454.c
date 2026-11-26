@@ -4,7 +4,7 @@
 struct LocalVec {
     s16 x, y, z;
 } __attribute__((aligned(4)));
-void SpriteParticle_CreateDefaultVariant4384(void *, u32, u32, u32, u32, u32, u32, u32, u32, u32,
+void TrapSpellParticles_CreateDefaultBurst(void *, u32, u32, u32, u32, u32, u32, u32, u32, u32,
                                              u32, u32);
 struct ContactPosition *Player_GetEffectivePosition(s32);
 s32 Math_Atan2(s32, s32);
@@ -29,7 +29,7 @@ static inline void SpawnTrail(struct HomingSlot *p)
     gRandomIndex = (gRandomIndex + 1) & 0x3ff;
     seed = gRandomIndex;
     t = *((u8 *)(RANDOM_TABLE_ADDR + sizeof(*gRandomTable) * seed));
-    SpriteParticle_CreateDefaultVariant4384(&p->origin, 0x28, 0x20, 0xc, 4, 0x18, t, 0x20, 0x20, 3,
+    TrapSpellParticles_CreateDefaultBurst(&p->origin, 0x28, 0x20, 0xc, 4, 0x18, t, 0x20, 0x20, 3,
                                             2, 0x200);
 }
 

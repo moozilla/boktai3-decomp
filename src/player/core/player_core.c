@@ -279,7 +279,7 @@ void Player_CallEventScript(struct Player *player, u32 value)
 /* Player_AddEventFlags: or bits into the player event flags.
  * Address spelling retained for callers outside this unit. */
 
-void sub_0813B3AC(struct Player *player, u32 bits)
+void Player_AddEventFlags(struct Player *player, u32 bits)
 {
     player->eventFlags = bits | player->eventFlags;
 }
@@ -292,7 +292,7 @@ u16 Player_GetEventFlags(struct Player *player, u16 mask)
 /* Player_CallCompletionScript: call the configured completion procedure when present.
  * Address spelling retained for callers outside this unit. */
 
-void sub_0813B3CC(struct Player *player)
+void Player_CallCompletionScript(struct Player *player)
 {
     if (player->completionProcedure != 0)
         Script_Call(player->completionProcedure, 0);
@@ -561,7 +561,7 @@ void SceneActor_SpawnModeParticles(struct Player *player)
 /* Player_UpdateTimedEffect: advance and hide the short timed player effect.
  * Address spelling retained for callers outside this unit. */
 
-void sub_0813B950(struct Player *player)
+void Player_UpdateTimedEffect(struct Player *player)
 {
     if (player->visualEffects748[0].active) {
         if (++player->visualEffects748[0].ticks > 5) {
@@ -664,7 +664,7 @@ inline static struct SceneVec *SetEffectOffset(struct SceneVec *v, s32 x, s32 y,
 /* Player_UpdateDirectionalEffectPair: project and position the two direction-dependent player effects.
  * Address spelling retained for callers outside this unit. */
 
-void sub_0813BAD8(struct Player *player)
+void Player_UpdateDirectionalEffectPair(struct Player *player)
 {
     struct SceneVec offsets[2];
     struct ContactPackedVector position;

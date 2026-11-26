@@ -1,7 +1,7 @@
-#include "objects/warp_circle/stacked_actor.h"
-void StackedActor_WaitForScriptParticles(struct StackedActor *p)
+#include "objects/warp_circle/warp_circle.h"
+void WarpCircle_WaitForScriptParticles(struct WarpCircle *p)
 {
     p->frame++;
     if (p->frame > 0xf)
-        StackedActor_SetUpdate(p, StackedActor_EmitScriptParticles);
+        WarpCircle_SetUpdate(p, WarpCircle_EmitScriptParticles);
 }

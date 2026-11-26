@@ -39,7 +39,7 @@ u32 ForgingBook_RefreshEntryDescription(struct ForgingBook *);
 void ScreenTransition_SendCommand(s32, s32, s32, s32, s32, s32, s32);
 void Sound_PlaySong(u32);
 
-s32 ForgingBook_InitializeFromScript_08213B64(struct ForgingBook *book, u32 arg)
+s32 ForgingBook_InitializePageFromScript(struct ForgingBook *book, u32 arg)
 {
     book->state = 0;
     book->page = 0;

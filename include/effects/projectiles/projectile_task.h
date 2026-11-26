@@ -1,5 +1,5 @@
-#ifndef GUARD_TASK4E01_PROJECTILE_H
-#define GUARD_TASK4E01_PROJECTILE_H
+#ifndef GUARD_EFFECTS_PROJECTILES_PROJECTILE_TASK_H
+#define GUARD_EFFECTS_PROJECTILES_PROJECTILE_TASK_H
 #include "player/cutscene/player_cue_sequence.h"
 struct Task4E01Params {
     u16 flags, lifetime, tracking;

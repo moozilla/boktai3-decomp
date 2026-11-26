@@ -1,4 +1,4 @@
-# ScenePanel message and display helpers
+# PileDriver message and display helpers
 
 Reviewed range: **0805C680–0805C8D8**, nine functions, 600 bytes. Two newly recovered functions add **304 exact bytes (+0.0126 percentage points)**; seven existing C functions account for 296 bytes and receive typed contracts/names. Every full reviewed extent matches without register pins or empty asm. C754 is an existing hidden 12-byte leaf already represented separately; it earns no new credit. C8D8 begins the next driver and is excluded.
 

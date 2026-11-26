@@ -1397,7 +1397,7 @@ void SceneActorCollision_InitBodyWithFlags(struct ChaseActor *, void *, void *, 
 void SceneActorCollision_InitAttack(struct ChaseActor *, void *, void *, void (*)(void), u32,
                                     struct ChaseActor *);
 
-void SceneActor_InitCollision5005(struct ChaseActor *actor)
+void Ivy_InitializeContactColliders(struct ChaseActor *actor)
 {
     union SceneActorRegistryPackedPosition bodySize, bodyOffset, attackSize, attackOffset;
     bodySize.packed.x = 0x40;
@@ -1669,7 +1669,7 @@ s32 SceneActorControl_BeginSoundTransition(struct ChaseActor *actor);
 
 void Ivy_TickDrawable(struct ChaseActor *actor);
 
-void SceneActor_InitCollision5005(struct ChaseActor *actor);
+void Ivy_InitializeContactColliders(struct ChaseActor *actor);
 
 void Ivy_InitControlPresets(struct ChaseActor *actor);
 
@@ -1880,7 +1880,7 @@ s32 Ivy_Init(void *object)
     actor->base.body.position.z += 0x20;
     MonsterInit_DrawablePosition(actor);
     MonsterInit_ReadPalette(actor, 0x12A, 0x192);
-    SceneActor_InitCollision5005(actor);
+    Ivy_InitializeContactColliders(actor);
     MonsterInit_InstallOpaqueContactCallbacks(
         actor, Ivy_Update, 0, 0, 0, 0, 0, 0, Ivy_UpdateDefeat, SceneActorReaction_OnEnemyDefault, 0,
         0, SceneActorReaction_ResolvePlacementDamage, SceneActorControl_BeginSoundTransition);
@@ -2163,7 +2163,7 @@ void Armor_UpdateOrbitingColliders(struct PhaseObject *actor)
     }
 }
 
-/* Armor_UpdatePartColliders_080F2260: same as Armor_UpdatePartColliders but the scene comes from the owner at +0x160 (provisional name) */
+/* Ivy_UpdatePartColliders: same as Armor_UpdatePartColliders but the scene comes from the owner at +0x160 (provisional name) */
 
 struct ArmorVector {
     s32 x : 16;
@@ -2190,7 +2190,7 @@ struct ArmorSceneUpdatePartColliders_080F2260 {
     s16 height;
 };
 
-void Armor_UpdatePartColliders_080F2260(struct ArmorPart *p)
+void Ivy_UpdatePartColliders(struct ArmorPart *p)
 {
     struct ArmorVector position;
     struct ArmorVector delta;

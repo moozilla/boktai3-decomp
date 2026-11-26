@@ -7,7 +7,7 @@ u8 *TerrainModifiers_FindCellOverride(s32, s32);
 void ActorSequence_Begin(struct Player *, s32, s32);
 s32 Player_BeginTerrainRecovery(struct Player *);
 s32 Player_BeginTerrainFacingAction(struct Player *);
-s32 Player_BeginTerrainRecovery_081408AC(struct Player *);
+s32 Player_BeginTerrainCellRecovery(struct Player *);
 void DamageNumberDisplay_Show(void *, s32, s32, void *, void *, s32);
 s32 Inventory_HasItem(s32);
 void Inventory_RemoveItem(s32);
@@ -67,7 +67,7 @@ s32 PlayerContact_ApplyTerrainDamage(struct Player *p)
     } else if (p->actionPhase488)
         p->particleEmissionCount += Player_BeginTerrainFacingAction(p);
     else if (p->terrainRecoveryPhase)
-        p->particleEmissionCount += Player_BeginTerrainRecovery_081408AC(p);
+        p->particleEmissionCount += Player_BeginTerrainCellRecovery(p);
     if (!p->positionResetValue) {
         if (p->movementModifierKind == 1 && p->movementModifierActive) {
             Player_AddStatusFlags(p, 0x200);

@@ -1,8 +1,8 @@
-#include "objects/effect_emitter.h"
+#include "objects/strike_crystal.h"
 #include "engine/word_flags.h"
 
-void EffectEmitter_ReceiveHit(struct ContactCollider *attack, struct ContactCollider *unused,
-                              struct EffectEmitter *object)
+void StrikeCrystal_ReceiveHit(struct ContactCollider *attack, struct ContactCollider *unused,
+                              struct StrikeCrystal *object)
 {
     s32 damage = attack->cost;
     struct EmitterVec position;
@@ -36,7 +36,7 @@ static inline void setFrame(struct EmitterSprite *sprite, u16 frame)
 {
     sprite->frame = frame;
 }
-s32 EffectEmitter_Update(struct EffectEmitter *object)
+s32 StrikeCrystal_Update(struct StrikeCrystal *object)
 {
     s32 visible = isVisible(object->scene);
     if (!visible) {
@@ -80,7 +80,7 @@ s32 EffectEmitter_Update(struct EffectEmitter *object)
     return 0;
 }
 
-u32 EffectEmitter_Destroy(struct EffectEmitter *object)
+u32 StrikeCrystal_Destroy(struct StrikeCrystal *object)
 {
     Collider_Remove(&object->collider);
     Sprite_Remove(&object->sprite);
@@ -88,7 +88,7 @@ u32 EffectEmitter_Destroy(struct EffectEmitter *object)
     return 0;
 }
 
-s32 EffectEmitter_Initialize(struct EffectEmitter *object, u32 id, u32 unused)
+s32 StrikeCrystal_Initialize(struct StrikeCrystal *object, u32 id, u32 unused)
 {
     struct SceneExtent position, size, offset;
     struct SceneCollider *collision;
@@ -124,7 +124,7 @@ s32 EffectEmitter_Initialize(struct EffectEmitter *object, u32 id, u32 unused)
     offset.z = 0;
     collision = &object->collider;
     Collider_Init(collision, 0, 0x4001, 0, 16, &size, &offset);
-    Collider_SetCallback(collision, EffectEmitter_ReceiveHit, object);
+    Collider_SetCallback(collision, StrikeCrystal_ReceiveHit, object);
     Collider_SetPosition(collision, (struct SceneVec *)&position, 0);
     Collider_Refresh(collision);
     resource = &object->resource;
@@ -138,12 +138,12 @@ s32 EffectEmitter_Initialize(struct EffectEmitter *object, u32 id, u32 unused)
     return 0;
 }
 
-void *EffectEmitter_Create(u32 a, u32 b)
+void *StrikeCrystal_Create(u32 a, u32 b)
 {
     void *p = Task_Create(8, 0x118);
     if (p) {
-        Task_SetCallbacks(p, EffectEmitter_Update, EffectEmitter_Destroy);
-        if (EffectEmitter_Initialize(p, a, b) < 0) {
+        Task_SetCallbacks(p, StrikeCrystal_Update, StrikeCrystal_Destroy);
+        if (StrikeCrystal_Initialize(p, a, b) < 0) {
             Task_Kill(p);
             return 0;
         }

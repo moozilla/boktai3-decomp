@@ -1,4 +1,4 @@
-#include "objects/warp_circle/stacked_actor.h"
+#include "objects/warp_circle/warp_circle.h"
 #include "engine/engine_globals.h"
 #include "player/player.h"
 struct ActorMapView {

@@ -287,7 +287,7 @@ void GameState_SetResultTimer(s32 value)
     (*(s32 *)(u32)&gGameState->unk88C) = clamped;
 }
 
-void GameState_SetActionCount892(s32 value)
+void GameState_SetPickupRewardCount(s32 value)
 {
     s32 clamped;
     (*(s16 *)(u32)&gGameState->unk892) = value;
@@ -299,7 +299,7 @@ void GameState_SetActionCount892(s32 value)
     (*(s16 *)(u32)&gGameState->unk892) = clamped;
 }
 
-void GameState_SetActionCount894(s32 value)
+void GameState_SetBikeRecoveryCount(s32 value)
 {
     s32 clamped;
     (*(s16 *)(u32)&gGameState->unk894) = value;
@@ -333,7 +333,7 @@ s32 GameState_GetResultTimer(void)
     return (*(s32 *)(u32)&gGameState->unk88C);
 }
 
-s16 GameState_GetActionCount892(void)
+s16 GameState_GetPickupRewardCount(void)
 {
     s32 clamped = (*(s16 *)(u32)&gGameState->unk892);
     if (clamped > 999)
@@ -344,7 +344,7 @@ s16 GameState_GetActionCount892(void)
     return (*(s16 *)(u32)&gGameState->unk892);
 }
 
-s16 GameState_GetActionCount894(void)
+s16 GameState_GetBikeRecoveryCount(void)
 {
     s32 clamped = (*(s16 *)(u32)&gGameState->unk894);
     if (clamped > 0x3E7)
@@ -355,7 +355,7 @@ s16 GameState_GetActionCount894(void)
     return (*(s16 *)(u32)&gGameState->unk894);
 }
 
-void GameState_AddActionCount892(s32 value)
+void GameState_AddPickupRewardCount(s32 value)
 {
     s32 clamped = (*(s16 *)(u32)&gGameState->unk892) + value;
     if (clamped > 0x3E7)
@@ -365,7 +365,7 @@ void GameState_AddActionCount892(s32 value)
     (*(s16 *)(u32)&gGameState->unk892) = clamped;
 }
 
-void GameState_AddActionCount894(s32 value)
+void GameState_AddBikeRecoveryCount(s32 value)
 {
     s32 clamped = (*(s16 *)(u32)&gGameState->unk894) + value;
     if (clamped > 0x3E7)
@@ -377,6 +377,6 @@ void GameState_AddActionCount894(s32 value)
 
 void GameState_ResetActionCounts(void)
 {
-    GameState_SetActionCount892(0);
-    GameState_SetActionCount894(0);
+    GameState_SetPickupRewardCount(0);
+    GameState_SetBikeRecoveryCount(0);
 }

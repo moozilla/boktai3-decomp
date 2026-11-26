@@ -23,7 +23,7 @@ void CoffinBike_SetAnimationKeyframes(struct CoffinBike *, s32);
 void CoffinBike_UpdateMotion(struct CoffinBike *);
 
 void ActorParticles_UpdateEmitter(void *, void *, u32);
-void GameState_AddActionCount894(s32);
+void GameState_AddBikeRecoveryCount(s32);
 void CharacterModel_ClearAnimationFlags(void *, u32);
 void CharacterModel_SetAnimationFlags(void *, u32);
 void ActorMarkerPool_ShowMarker(s32);

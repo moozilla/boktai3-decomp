@@ -1,5 +1,5 @@
-#include "objects/warp_circle/stacked_actor.h"
-void StackedActor_LowerLift(struct StackedActor *actor)
+#include "objects/warp_circle/warp_circle.h"
+void WarpCircle_LowerLift(struct WarpCircle *actor)
 {
     u8 *lift = &actor->lift;
     u32 value = *lift;
@@ -13,6 +13,6 @@ void StackedActor_LowerLift(struct StackedActor *actor)
         actor->sprite.flags &= ~0x200;
         actor->sprite.renderMode = 3;
         actor->shadow.flags |= 1;
-        StackedActor_SetUpdate(actor, StackedActor_ExtendSegments);
+        WarpCircle_SetUpdate(actor, WarpCircle_ExtendSegments);
     }
 }

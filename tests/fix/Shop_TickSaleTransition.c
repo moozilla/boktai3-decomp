@@ -1,8 +1,8 @@
 // draft with the funds update stored through the field in each case. The ROM loads gGameState
 // again for the clamp, so the original stored through a pointer (sp_store_via_ptr, README fact 60)
-#include "menus/inventory_transactions_and_catalogs/scene_inventory_tail.h"
-#include "engine/shared/scene_item_values.h"
-struct SceneInventorySaleView {
+#include "ui/town/shop_tail.h"
+#include "ui/town/shop_item_values.h"
+struct ShopSaleView {
     u8 unknown0[0x1AF0];
     struct SceneInputPair pair;
 };
@@ -13,11 +13,11 @@ s32 SceneItemValue_CalculateConsumable(u32);
 void Inventory_RemoveEquipmentEntry(u32);
 void Inventory_ClearItemSlot(u32);
 void GameState_ClearConsumableSlot(u32);
-s32 Shop_TickSaleFeedback(struct SceneInventoryTail *);
-s32 Shop_TickSaleTransition(struct SceneInventoryTail *p)
+s32 Shop_TickSaleFeedback(struct ShopTail *);
+s32 Shop_TickSaleTransition(struct ShopTail *p)
 {
     SceneInputPanel_ResetHighlights(&p->display, &p->highlight);
-    if (SceneInput_TickPairTransition(&((struct SceneInventorySaleView *)p)->pair)) {
+    if (SceneInput_TickPairTransition(&((struct ShopSaleView *)p)->pair)) {
         u32 selection = p->grid.savedSelection;
         s32 category = p->category;
         s32 value;
@@ -55,7 +55,7 @@ s32 Shop_TickSaleTransition(struct SceneInventoryTail *p)
         }
         p->sold = 1;
         Shop_SetControllerCallback(
-            p, (SceneInventoryCallback)Shop_TickSaleFeedback);
+            p, (ShopCallback)Shop_TickSaleFeedback);
     }
     return 0;
 }

@@ -27,7 +27,7 @@ struct Obj {
     u8 enabled;
 };
 
-void Player_ClampCameraOffsets_0823B3C4(struct Obj *);
+void LinkPlayer_ClampCameraOffsets(struct Obj *);
 
 static inline s32 scale(s32 v)
 {
@@ -46,13 +46,13 @@ void ActorMotion_ApplyHeadingDrift(struct Obj *p)
         p->offY = 0;
         p->offZ = 0;
         p->init = 1;
-        Player_ClampCameraOffsets_0823B3C4(p);
+        LinkPlayer_ClampCameraOffsets(p);
     }
     if (p->heading != -1) {
         u32 a = ((p->heading + 1) & 7) * 32;
         p->offX -= scale(gUnk_086149C4[(a + 64) & 255] * 30);
         p->offZ -= scale(gUnk_086149C4[a] * 30);
-        Player_ClampCameraOffsets_0823B3C4(p);
+        LinkPlayer_ClampCameraOffsets(p);
     }
     if ((p->offX != 0 || p->offZ != 0) && p->enabled) {
         s32 angle = ((u16)Math_Atan2(p->offX, p->offZ) + 0x70) >> 5;

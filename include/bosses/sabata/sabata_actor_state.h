@@ -1,5 +1,5 @@
-#ifndef FOUNDRY_ACTOR_STATE_H
-#define FOUNDRY_ACTOR_STATE_H
+#ifndef GUARD_BOSSES_SABATA_SABATA_ACTOR_STATE_H
+#define GUARD_BOSSES_SABATA_SABATA_ACTOR_STATE_H
 #include "scene/actor/scene_actor_components.h"
 #include "bosses/sabata/converging_particles.h"
 struct SabataActorAnimationResource {

@@ -1,4 +1,4 @@
-# Scene panel rig setup
+# Pile Driver rig setup
 
 The reviewed setup cohort is `0805AD18–0805B28C`. It operates on the same
 15-sprite rig as the preceding state handlers: one main sprite, eight primary

@@ -16,7 +16,7 @@ void StatModifier_InitializeCallbacks(void *, void *);
 void Actor_RecomputeScriptedValue(void *);
 void ActorStats_ConfigureScaledParameters(void *, s32, s32, s32, s32, s32, s32);
 void ActorAction_InitializeMode(void *, void *, s32);
-s32 sub_0811EAB8(void *, s32);
+s32 ModifierStats_ApplyKind3(void *, s32);
 void Character_OnActionSoundCue(void);
 void ActorEffect_EmitOffsetPair(void *, void *, void *, void (*)(void), s32);
 void Modifier_InitDrainState(void *, void *, u16, u8);
@@ -86,12 +86,12 @@ void CoffinBike_InitializeStyleModifiers(struct CoffinBike *p)
     Actor_RecomputeScriptedValue(self);
     ActorStats_ConfigureScaledParameters(self, 0x1000, 0x3000, -0x2000, 0x2000, 0, 0x1000);
     ActorAction_InitializeMode(self, p, 0);
-    self->primaryValue = sub_0811EAB8(self, self->primaryValue);
+    self->primaryValue = ModifierStats_ApplyKind3(self, self->primaryValue);
     if (self->primaryKind == 5)
         ActorEffect_EmitOffsetPair(self, &p->model, &self->primaryCallback,
                                    Character_OnActionSoundCue, p->participant + 1);
     Modifier_InitDrainState(self->drain, p->model.parts[0].drainSource, 120, 1);
     Modifier_InitFourthSourceEffect(self, p);
-    self->fourthValue = sub_0811EAB8(self, self->fourthValue);
+    self->fourthValue = ModifierStats_ApplyKind3(self, self->fourthValue);
     Character_SetLowResourceColorEffect(&self->emitter, &self->style);
 }

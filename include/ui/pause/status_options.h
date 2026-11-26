@@ -1,5 +1,5 @@
-#ifndef GUARD_SCENE_CATALOG_H
-#define GUARD_SCENE_CATALOG_H
+#ifndef GUARD_UI_PAUSE_STATUS_OPTIONS_H
+#define GUARD_UI_PAUSE_STATUS_OPTIONS_H
 #include "ui/pause/scene_hud_display.h"
 #include "player/player.h"
 

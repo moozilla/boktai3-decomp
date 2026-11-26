@@ -86,11 +86,11 @@ Matched here means without concessions, as on decomp.dev.
 |---|---:|---:|---|
 | **Gameplay** | 6104/6104 | 100.0% | `████████████████████` |
 | &nbsp;&nbsp;Player | 736/736 | 100.0% | `████████████████████` |
-| &nbsp;&nbsp;Monsters | 1551/1551 | 100.0% | `████████████████████` |
+| &nbsp;&nbsp;Monsters | 1501/1501 | 100.0% | `████████████████████` |
 | &nbsp;&nbsp;Bosses | 717/717 | 100.0% | `████████████████████` |
 | &nbsp;&nbsp;Field objects and hazards | 1046/1046 | 100.0% | `████████████████████` |
 | &nbsp;&nbsp;Scene actors and NPCs | 1982/1982 | 100.0% | `████████████████████` |
-| &nbsp;&nbsp;Minigames | 72/72 | 100.0% | `████████████████████` |
+| &nbsp;&nbsp;Minigames | 122/122 | 100.0% | `████████████████████` |
 | **Presentation and UI** | 3574/3574 | 100.0% | `████████████████████` |
 | &nbsp;&nbsp;Effects and presentation | 1558/1558 | 100.0% | `████████████████████` |
 | &nbsp;&nbsp;Menus, HUD and dialogue | 2016/2016 | 100.0% | `████████████████████` |
@@ -122,7 +122,7 @@ Matched here means without concessions, as on decomp.dev.
 
 </details>
 
-<details><summary><b>Monsters</b>: 1551/1551 functions, 100.0% of bytes</summary>
+<details><summary><b>Monsters</b>: 1501/1501 functions, 100.0% of bytes</summary>
 
 | Family / unit | Functions | Bytes matched | |
 |---|---:|---:|---|
@@ -141,7 +141,6 @@ Matched here means without concessions, as on decomp.dev.
 | Ghoul | 46/46 | 100.0% | `████████████████████` |
 | Ivy | 72/72 | 100.0% | `████████████████████` |
 | Ghost | 63/63 | 100.0% | `████████████████████` |
-| Glove | 50/50 | 100.0% | `████████████████████` |
 | Lun | 50/50 | 100.0% | `████████████████████` |
 | Slime | 48/48 | 100.0% | `████████████████████` |
 | Spider | 45/45 | 100.0% | `████████████████████` |
@@ -159,16 +158,15 @@ Matched here means without concessions, as on decomp.dev.
 | &nbsp;&nbsp;Fan cannon | 13/13 | 100.0% | `████████████████████` |
 | &nbsp;&nbsp;Fan cannon manager | 10/10 | 100.0% | `████████████████████` |
 | Vulcan cannon | 14/14 | 100.0% | `████████████████████` |
-| **Enemy** | 29/29 | 100.0% | `████████████████████` |
-| &nbsp;&nbsp;Enemy F426 | 12/12 | 100.0% | `████████████████████` |
-| &nbsp;&nbsp;Enemy particle | 17/17 | 100.0% | `████████████████████` |
 | Screamer | 11/11 | 100.0% | `████████████████████` |
 | Poison hand | 10/10 | 100.0% | `████████████████████` |
 | Dragon puppy | 12/12 | 100.0% | `████████████████████` |
 | Orange spine | 11/11 | 100.0% | `████████████████████` |
+| Statue | 12/12 | 100.0% | `████████████████████` |
 | Pink spine | 11/11 | 100.0% | `████████████████████` |
 | Growth hazard | 24/24 | 100.0% | `████████████████████` |
 | Ooze | 10/10 | 100.0% | `████████████████████` |
+| Enemy particle | 17/17 | 100.0% | `████████████████████` |
 
 </details>
 
@@ -355,10 +353,11 @@ Matched here means without concessions, as on decomp.dev.
 
 </details>
 
-<details><summary><b>Minigames</b>: 72/72 functions, 100.0% of bytes</summary>
+<details><summary><b>Minigames</b>: 122/122 functions, 100.0% of bytes</summary>
 
 | Family / unit | Functions | Bytes matched | |
 |---|---:|---:|---|
+| Coffin Bike | 50/50 | 100.0% | `████████████████████` |
 | Transformation and result game (tentative) | 42/42 | 100.0% | `████████████████████` |
 | Result game tutorial (tentative) | 30/30 | 100.0% | `████████████████████` |
 

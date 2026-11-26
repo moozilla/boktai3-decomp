@@ -1,5 +1,5 @@
-#include "objects/warp_circle/stacked_actor.h"
-s32 StackedActor_IsPlayerNearby(struct StackedActor *o)
+#include "objects/warp_circle/warp_circle.h"
+s32 WarpCircle_IsPlayerNearby(struct WarpCircle *o)
 {
     struct GameState *g = gGameState;
     s32 dx = g->positionX - o->world.x;

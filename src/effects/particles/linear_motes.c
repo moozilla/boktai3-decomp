@@ -48,7 +48,7 @@ void ScriptedColliderPool_RunIdleHook(void)
 {
 }
 
-struct SceneParticle *SceneMovingParticle_AllocateEntry_0812D670(struct SceneParticlePool *pool)
+struct SceneParticle *SceneMovingParticle_AllocateEntry(struct SceneParticlePool *pool)
 {
     s32 i;
     for (i = 0; i < 26; i++) {
@@ -135,13 +135,13 @@ struct SceneParticle *LinearMote_CreateWithMode(struct SceneParticleVector *posi
     return LinearMote_Create(position, velocity, lifetime, kind, mode);
 }
 
-#define LinearMote_Allocate   SceneMovingParticle_AllocateEntry_0812D670
+#define LinearMote_Allocate   SceneMovingParticle_AllocateEntry
 
 #define LinearMote_CreatePool ParticleEffectPool_GetOrCreate
 
 struct SceneParticlePool *ParticleEffectPool_GetOrCreate(void);
 
-struct SceneParticle *SceneMovingParticle_AllocateEntry_0812D670(struct SceneParticlePool *);
+struct SceneParticle *SceneMovingParticle_AllocateEntry(struct SceneParticlePool *);
 
 void ParticleSprite_Initialize(struct SceneParticle *, void *, u32);
 
@@ -163,7 +163,7 @@ struct SceneParticle *LinearMote_Create(struct SceneParticleVector *position,
         if (!pool)
             return 0;
     }
-    p = SceneMovingParticle_AllocateEntry_0812D670(pool);
+    p = SceneMovingParticle_AllocateEntry(pool);
     if (!p)
         return 0;
     p->state = 1;

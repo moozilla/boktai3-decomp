@@ -41,8 +41,8 @@ void SpriteComponent_Resume(void *);
 void SpriteComponent_Suspend(void *);
 void ProximityVolume_DispatchUpdate(void *);
 s32 SabataPosition_SaveSelectedPoint(void *);
-void FrostEmitter_StartEmission(void *, void *);
-void FrostEmitter_StopEmission(void *);
+void SabataFrost_StartEmission(void *, void *);
+void SabataFrost_StopEmission(void *);
 void ActorShadow_Disable(void *);
 void ActorShadow_Enable(void *);
 void Camera_RequestShake(s32);
@@ -104,9 +104,9 @@ void Sabata_UpdatePresentation(u8 *p)
     ProximityVolume_DispatchUpdate(q + 0x428);
     B(0x477) = SabataPosition_SaveSelectedPoint(q);
     if (WordFlags_Test(flags, 0x200000))
-        FrostEmitter_StartEmission(*(void **)(q + 0x41c), p + 0x54);
+        SabataFrost_StartEmission(*(void **)(q + 0x41c), p + 0x54);
     else
-        FrostEmitter_StopEmission(*(void **)(q + 0x41c));
+        SabataFrost_StopEmission(*(void **)(q + 0x41c));
     if (WordFlags_Test(flags, 0x10)) {
         hide((struct Anim *)(q + 0x2cc));
         ActorShadow_Disable(&((struct A *)q)->shadow);

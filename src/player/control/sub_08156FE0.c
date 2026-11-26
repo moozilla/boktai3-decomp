@@ -11,7 +11,7 @@ struct PlayerPendingNotification {
 void ActorSequence_Begin(struct Player *, s32, s32);
 void Player_BeginDirectionSequence(struct Player *, u32);
 void Player_StopMovementEffects(struct Player *);
-void Player_SubtractGauge430(struct Player *, s32);
+void Player_SubtractActionGauge(struct Player *, s32);
 void sub_08249244(void *, s32, s32, void *);
 s32 Player_TestTetherActionInput(struct Player *);
 void Sound_PlaySong(u32);
@@ -20,7 +20,7 @@ s32 PileTrap_IsActive(void *);
 void PileTrap_Hide(void *);
 s32 Player_SelectRequestedActionMode(struct Player *);
 s32 Player_GetEventFlags(struct Player *, u32);
-void sub_0813B3CC(struct Player *);
+void Player_CallCompletionScript(struct Player *);
 s32 Player_TestNearbyInteraction(struct Player *);
 static inline u32 HasActionFlag(struct Player *p, u32 mask)
 {
@@ -97,9 +97,9 @@ s32 Player_SelectActionSequence(struct Player *p)
         }
         if ((HasActionFlag(p, 0x8000) && p->actionMode == 1) ||
             (HasActionFlag(p, 0x10000) && p->actionMode == 2))
-            Player_SubtractGauge430(p, 3);
+            Player_SubtractActionGauge(p, 3);
         else
-            Player_SubtractGauge430(p, 4);
+            Player_SubtractActionGauge(p, 4);
     } else {
         if (p->statGaugeFull == 1)
             p->statusValue = 4000;
@@ -198,7 +198,7 @@ s32 Player_SelectActionSequence(struct Player *p)
                         goto primary;
                 cancel:
                     ActorSequence_Begin(p, 0, 0);
-                    sub_0813B3CC(p);
+                    Player_CallCompletionScript(p);
                     goto end;
                 }
                 goto normalAttack;

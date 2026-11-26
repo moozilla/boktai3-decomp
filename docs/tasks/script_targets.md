@@ -18,7 +18,7 @@ handlers; their callees are found through `bl` calls and Thumb function pointers
 | 4 | `08111A48` | 380 | `PaletteFade_StartFromScript` | registry 734C |  |
 | 4 | `0815A680` | 116 | `ScriptActor_TestFlagFromScript` | registry 440F |  |
 | 3 | `08104350` | 1016 | `sub_08104350` | registry F1F9 |  |
-| 3 | `0815A838` | 52 | `ScriptActor_GetField534FromScript` | registry 0E15 |  |
+| 3 | `0815A838` | 52 | `ScriptActor_GetActiveSceneMode` | registry 0E15 |  |
 | 2 | `0810067C` | 700 | `FloorSwitch_Create` | registry AB8E |  |
 | 2 | `08103B94` | 136 | `MovingPlatformActor_SetMoveModeFromScript` | registry 7E33 |  |
 | 2 | `081803D8` | 176 | `Sabata_AdvanceStepFromScript` | registry 4EC9 |  |

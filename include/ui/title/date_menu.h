@@ -1,5 +1,5 @@
-#ifndef GUARD_DATE_ENTRY_MENU_H
-#define GUARD_DATE_ENTRY_MENU_H
+#ifndef GUARD_UI_TITLE_DATE_MENU_H
+#define GUARD_UI_TITLE_DATE_MENU_H
 
 #include "engine/video/anim_sprite.h"
 #include "ui/title/text_entry_widget.h"

@@ -1,7 +1,7 @@
 #include "monsters/statue.h"
 #include "engine/engine_globals.h"
 #include "engine/ram.h"
-void SpriteParticle_CreateDefaultVariant4384(void *, s32, s32, s32, s32, s32, s32, s32, s32, s32,
+void TrapSpellParticles_CreateDefaultBurst(void *, s32, s32, s32, s32, s32, s32, s32, s32, s32,
                                              s32, s32);
 void Statue_RecordDefeat(void *);
 s32 Statue_UpdateDeath(struct Statue *p)
@@ -15,7 +15,7 @@ s32 Statue_UpdateDeath(struct Statue *p)
             q->y += 200;
             gRandomIndex = (gRandomIndex + 1) & 0x3ff;
             r = *(const u8 *)&gRandomTable[gRandomIndex];
-            SpriteParticle_CreateDefaultVariant4384(&v, 128, 32, 12, 12, 24, r, 32, 32, 1, 1, 512);
+            TrapSpellParticles_CreateDefaultBurst(&v, 128, 32, 12, 12, 24, r, 32, 32, 1, 1, 512);
         }
         if ((p->timer) == 12) {
             Statue_RecordDefeat(p);

@@ -1,6 +1,6 @@
-#include "objects/warp_circle/stacked_actor.h"
+#include "objects/warp_circle/warp_circle.h"
 void *AnimData_FindEntry(u32);
-void SpriteDrawable_SelectTileFrame(struct StackedActorParticle *, void *, u32);
+void SpriteDrawable_SelectTileFrame(struct WarpCircleParticle *, void *, u32);
 static inline s32 damp(s32 v)
 {
     s32 scaled = v * 15;
@@ -8,7 +8,7 @@ static inline s32 damp(s32 v)
         return scaled >> 4;
     return -((-scaled) >> 4);
 }
-void StackedActor_TickParticle(struct StackedActorParticle *particle)
+void WarpCircle_TickParticle(struct WarpCircleParticle *particle)
 {
     particle->life--;
     if (particle->life == 0) {

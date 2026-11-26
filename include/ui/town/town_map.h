@@ -1,5 +1,5 @@
-#ifndef GUARD_REGISTRY_CHOICE_MENU_H
-#define GUARD_REGISTRY_CHOICE_MENU_H
+#ifndef GUARD_UI_TOWN_TOWN_MAP_H
+#define GUARD_UI_TOWN_TOWN_MAP_H
 #include "ui/widgets/menu_cursor.h"
 
 /* Registry script 3F74: eleven choices, with a separate script for choice one. */

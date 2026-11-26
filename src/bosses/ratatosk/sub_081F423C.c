@@ -4,7 +4,7 @@
 void SceneActors_StartDirectionalAnimation(void *, void *, void *, int, int, int, int);
 s32 Callback_InvokeActor(void *, void *);
 void PaletteEffect_RefreshPalette(void *);
-void Player_ClearFlag740(void);
+void Player_ClearScriptToggle(void);
 static inline void palette(struct Ratatosk *p, u32 duration, u8 rate, u8 mode, u32 zero)
 {
     p->blendBank = duration;
@@ -36,7 +36,7 @@ void ActorMotion_UpdateTimedPaletteAnimation(struct Ratatosk *p, s32 frame)
     PaletteEffect_RefreshPalette(q);
 updateFlags:
     if (p->actionPhase == 4) {
-        Player_ClearFlag740();
+        Player_ClearScriptToggle();
         Ratatosk_SetFlags(p, 8);
         Ratatosk_SetFlags(p, 16);
     }

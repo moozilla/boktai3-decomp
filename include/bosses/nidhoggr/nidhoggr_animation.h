@@ -1,5 +1,5 @@
-#ifndef GUARD_LARGE_SCENE_ANIMATION_CONTROLLER_H
-#define GUARD_LARGE_SCENE_ANIMATION_CONTROLLER_H
+#ifndef GUARD_BOSSES_NIDHOGGR_NIDHOGGR_ANIMATION_H
+#define GUARD_BOSSES_NIDHOGGR_NIDHOGGR_ANIMATION_H
 #include "global.h"
 #include "engine/engine.h"
 #include "engine/math/scene_vec.h"

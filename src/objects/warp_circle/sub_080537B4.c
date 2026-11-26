@@ -1,6 +1,6 @@
-#include "objects/warp_circle/stacked_actor.h"
-void StackedActor_RequestRetraction(void)
+#include "objects/warp_circle/warp_circle.h"
+void WarpCircle_RequestRetraction(void)
 {
-    if (gStackedActor)
-        StackedActor_SetUpdate(gStackedActor, StackedActor_RetractToIdle);
+    if (gWarpCircle)
+        WarpCircle_SetUpdate(gWarpCircle, WarpCircle_RetractToIdle);
 }

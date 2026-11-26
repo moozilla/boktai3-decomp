@@ -12,7 +12,7 @@ static inline void SetPosition(struct SceneVec *position, s16 x, s16 y, s16 z)
     position->z = z;
     position->pad = 0;
 }
-void SceneHud_LayoutActionGrid_08172950(struct SceneHudState *p)
+void PauseMenu_LayoutCategoryWidgets(struct SceneHudState *p)
 {
     struct SceneVec position;
     s32 i;

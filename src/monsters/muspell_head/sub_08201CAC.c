@@ -6,7 +6,7 @@ struct V {
     u16 b;
     u32 c;
 };
-void SpriteParticle_CreateDefaultVariant4384(void *, u32, u32, u32, u32, u32, u32, u32, u32, u32,
+void TrapSpellParticles_CreateDefaultBurst(void *, u32, u32, u32, u32, u32, u32, u32, u32, u32,
                                              u32, u32);
 void MuspellHead_RecordDefeat(void *);
 u32 MuspellHead_UpdateDefeatEffect(struct MuspellHead *p)
@@ -21,7 +21,7 @@ u32 MuspellHead_UpdateDefeatEffect(struct MuspellHead *p)
             gRandomIndex = (gRandomIndex + 1) & 0x3ff;
             idx = gRandomIndex;
             t = *(u8 *)&gRandomTable[idx];
-            SpriteParticle_CreateDefaultVariant4384(&v, 0x80, 0x20, 0xc, 0xc, 0x18, t, 0x20, 0x20,
+            TrapSpellParticles_CreateDefaultBurst(&v, 0x80, 0x20, 0xc, 0xc, 0x18, t, 0x20, 0x20,
                                                     1, 2, 0x200);
         }
         if (p->age == 1)

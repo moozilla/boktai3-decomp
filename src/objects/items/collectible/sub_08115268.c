@@ -16,8 +16,8 @@ struct ParticleEmitter {
     u8 variant;
 };
 extern const u16 gUnk_086141BC[];
-void sub_08113398(s16 *, struct ParticleOffset *, u32, u32, u32, u32, u32, u32, u32, u32, u32, u32,
-                  u32, u32);
+void SceneDebris_Create(s16 *, struct ParticleOffset *, u32, u32, u32, u32, u32, u32, u32, u32, u32,
+                        u32, u32, u32);
 static inline u32 ParticleRandom(void)
 {
     gEffectRandomTableIndex = (gEffectRandomTableIndex + 1) & 1023;
@@ -57,7 +57,7 @@ void ActorParticles_SpawnAlternatingBurst(struct ParticleEmitter *p)
             size = 1024;
             flip = 0;
         }
-        sub_08113398(p->position, &offset, 0xae8e, 0x87e6, count, 0, mode, flip, 260, 40, 1, size,
-                     1, 4);
+        SceneDebris_Create(p->position, &offset, 0xae8e, 0x87e6, count, 0, mode, flip, 260, 40, 1,
+                           size, 1, 4);
     }
 }

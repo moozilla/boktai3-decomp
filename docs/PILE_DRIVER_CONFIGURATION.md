@@ -1,8 +1,8 @@
-# Scene panel script configuration and subject creation
+# Pile Driver script configuration and subject creation
 
 The reviewed span `0805BCEC–0805C310` contains seven exact functions, five
 new (1,472 bytes, +0.0609 percentage points) and two existing (100 bytes).
-The partial `ScenePanelConfigView` records fields observed in these consumers;
+The partial `PileDriverConfigView` records fields observed in these consumers;
 it does not establish the complete allocation or identify a particular scene.
 
 `BCEC` initializes the main palette sprite unless byte C0F suppresses it.

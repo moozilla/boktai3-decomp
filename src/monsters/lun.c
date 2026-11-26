@@ -971,7 +971,7 @@ void Lun_InitMotionPreset(u8 *p)
     *(u8 **)(p + 0x284) = gUnk_08605E34;
 }
 
-/* SceneActor_BeginLinkedIdleReaction_0809C834: SceneActor_BeginLinkedIdleReaction variant with other offsets/flags and without the collider flag clear (provisional name) */
+/* Lun_BeginLinkedIdleReaction: SceneActor_BeginLinkedIdleReaction variant with other offsets/flags and without the collider flag clear (provisional name) */
 
 static inline u8 LinkedFlag(struct Lun *p)
 {
@@ -981,7 +981,7 @@ static inline u8 LinkedFlag(struct Lun *p)
     return 0;
 }
 
-void SceneActor_BeginLinkedIdleReaction_0809C834(struct ChaseActor *s)
+void Lun_BeginLinkedIdleReaction(struct ChaseActor *s)
 {
     if (!SceneActor_ActionsBlocked(s) && LinkedFlag(s->base.context)) {
         SceneActorTerrain_EnterState(s, 0, 0, 3);

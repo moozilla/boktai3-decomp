@@ -44,28 +44,28 @@ void SceneInputPanel_ShowItemComparison(struct AnimSprite *primary,
     }
     if (primaryValue > 0 || candidate) {
         s32 offset;
-        SceneHud_FillTile001(primary->position.x >> 3, primary->position.y >> 3, 3);
+        SceneHud_FillDigitBacking(primary->position.x >> 3, primary->position.y >> 3, 3);
         offset = comparison * 10;
         for (i = 0; i < 3; i++) {
             primary[i].flags &= ~1;
             Anim_LoadKeyframe(&primary[i], resource, (u16)(digits[i] + offset), 1);
         }
     } else {
-        SceneHud_FillTile020(primary->position.x >> 3, primary->position.y >> 3, 3);
+        SceneHud_FillEmptyDigitRow(primary->position.x >> 3, primary->position.y >> 3, 3);
         for (i = 0; i < 3; i++)
             primary[i].flags |= 1;
     }
     SceneInputPanel_SplitThreeDigits(secondaryValue, digits);
     if (secondaryValue > 0 && !candidate) {
         s32 offset;
-        SceneHud_FillTile001(secondary->position.x >> 3, secondary->position.y >> 3, 3);
+        SceneHud_FillDigitBacking(secondary->position.x >> 3, secondary->position.y >> 3, 3);
         offset = 0;
         for (i = 0; i < 3; i++) {
             secondary[i].flags &= ~1;
             Anim_LoadKeyframe(&secondary[i], resource, (u16)(digits[i] + offset), 1);
         }
     } else {
-        SceneHud_FillTile020(secondary->position.x >> 3, secondary->position.y >> 3, 3);
+        SceneHud_FillEmptyDigitRow(secondary->position.x >> 3, secondary->position.y >> 3, 3);
         for (i = 0; i < 3; i++)
             secondary[i].flags |= 1;
     }

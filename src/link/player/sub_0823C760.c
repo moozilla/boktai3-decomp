@@ -6,7 +6,7 @@ s32 LinkPlayer_HasSlotValueAtLeast(u8 *, s32);
 void Player_PlayLocalSong(s32, u32);
 void Player_SetTetherMode(u8 *, s32, s32);
 s32 Div(s32, s32);
-void Player_SetDirectionalVelocity_08238300(u8 *, s32);
+void LinkPlayer_SetScaledDirectionalVelocity(u8 *, s32);
 void Player_PlayActionCueSound(u8 *, u32);
 void Player_UpdateActionFacingSide(u8 *);
 s32 ActorVariant_GetTableValue(u32, s32);
@@ -57,7 +57,7 @@ void sub_0823C760(u8 *p)
             }
             if (*(s16 *)(p + 0x34C) != -1 && *(s16 *)(p + 0x4B6) == 0)
                 p[0x3A4] = Player_GetLinkedSmoothedDirection(p);
-            Player_SetDirectionalVelocity_08238300(p, p[0x4F0]);
+            LinkPlayer_SetScaledDirectionalVelocity(p, p[0x4F0]);
             Player_PlayActionCueSound(p, 1);
             Player_UpdateActionFacingSide(p);
             Player_SetAnimationIndex(p, ActorVariant_GetTableValue(p[0x418], 1), 0x20);

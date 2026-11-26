@@ -248,7 +248,7 @@ static void channel_volume(struct SoundChannel *chan, struct MusicPlayerTrack *t
 }
 
 /* 0xCF TIE and 0xD0..0xFF notes: n = command - 0xCF. */
-void m4a_Unk_0822FB18(u32 n, struct MusicPlayerInfo *player, struct MusicPlayerTrack *track)
+void m4a_TriggerTrackNote(u32 n, struct MusicPlayerInfo *player, struct MusicPlayerTrack *track)
 {
     struct SoundInfo *sound = SOUND_INFO;
     struct ToneData *tone = &track->tone;

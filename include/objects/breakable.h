@@ -1,5 +1,5 @@
-#ifndef POOLED_INTERACTABLE_H
-#define POOLED_INTERACTABLE_H
+#ifndef GUARD_OBJECTS_BREAKABLE_H
+#define GUARD_OBJECTS_BREAKABLE_H
 #include "engine/video/anim_sprite.h"
 #include "objects/scene_object.h"
 #include "engine/task.h"

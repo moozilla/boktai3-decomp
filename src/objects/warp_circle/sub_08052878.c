@@ -1,5 +1,5 @@
-#include "objects/warp_circle/stacked_actor.h"
-void StackedActor_EmitFallingParticles(struct StackedActor *actor)
+#include "objects/warp_circle/warp_circle.h"
+void WarpCircle_EmitFallingParticles(struct WarpCircle *actor)
 {
     u32 next_2;
     u32 frame = actor->frame;
@@ -8,7 +8,7 @@ void StackedActor_EmitFallingParticles(struct StackedActor *actor)
         u32 mask = 3;
         mask &= frame;
         if (!mask) {
-            StackedActor_InitFallingParticle(&actor->particles[shifted >> 18], &actor->world);
+            WarpCircle_InitFallingParticle(&actor->particles[shifted >> 18], &actor->world);
         }
     }
     {
@@ -16,7 +16,7 @@ void StackedActor_EmitFallingParticles(struct StackedActor *actor)
         actor->frame = next;
         next_2 = (u16)next;
         if (next_2 == 64) {
-            StackedActor_SetUpdate(actor, StackedActor_RetractToIdle);
+            WarpCircle_SetUpdate(actor, WarpCircle_RetractToIdle);
         }
     }
 }

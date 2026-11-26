@@ -1,5 +1,5 @@
-#ifndef GUARD_PINK_SPINE_PLAYBACK_H
-#define GUARD_PINK_SPINE_PLAYBACK_H
+#ifndef GUARD_MONSTERS_POPBUD_POPBUD_PLAYBACK_H
+#define GUARD_MONSTERS_POPBUD_POPBUD_PLAYBACK_H
 #include "engine/video/display_animation.h"
 #include "scene/collision/contact_collider.h"
 #include "player/cutscene/player_cue_sequence.h"

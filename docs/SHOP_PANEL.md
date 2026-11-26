@@ -1,4 +1,4 @@
-# Scene inventory panel: values, descriptions and grids
+# Shop panel: values, descriptions and grids
 
 Static evidence covers `0805F7E0–0806055C`, alongside the input-panel
 initializer and comparison helpers in [SCENE_INPUT_PANEL.md](SCENE_INPUT_PANEL.md).
@@ -7,7 +7,7 @@ coverage have not been established.
 
 ## Layout and ownership
 
-`SceneInventoryPanel` embeds the input display prefix through `0x14E8`, then five
+`ShopPanel` embeds the input display prefix through `0x14E8`, then five
 groups of three comparison widgets with stride `0x120`. Text pointers appear at
 `1A8C` (equipment), `1A94` (items), and `1A98` (consumables). Page is at `1AB0`,
 the signed catalog view begins at `1AB3`, and selection is at `1BE7`.

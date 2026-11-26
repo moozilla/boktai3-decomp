@@ -18,7 +18,7 @@ void SceneHud_DrawClock(int);
 void SceneHud_DrawNumericStatus(int);
 void Text_DrawNumber(int, int, int, int, int, int, int);
 void SceneInputPanel_GetEquippedValues(int *, int *, int, int);
-void SceneHud_FillTile020(int, int, int);
+void SceneHud_FillEmptyDigitRow(int, int, int);
 int Player_GetCurrentAttribute(int);
 int GameState_IsConsumableSlotEquipped(int);
 void MessageWindow_SetDisplayMode(int);
@@ -590,12 +590,12 @@ void SelectionMenu_DrawStatistics(struct SelectionMenu *p)
     if (b > 0) {
         Text_DrawNumber(0, 9, 10, b, 33, 3, 15);
     } else {
-        SceneHud_FillTile020(9, 10, 3);
+        SceneHud_FillEmptyDigitRow(9, 10, 3);
     }
     if (a > 0) {
         Text_DrawNumber(0, 9, 11, a, 33, 3, 15);
     } else {
-        SceneHud_FillTile020(9, 11, 3);
+        SceneHud_FillEmptyDigitRow(9, 11, 3);
     }
     Text_DrawNumber(0, 11, 12, Player_GetCurrentAttribute(0), 33, 3, 15);
     Text_DrawNumber(0, 11, 13, Player_GetCurrentAttribute(1), 33, 3, 15);

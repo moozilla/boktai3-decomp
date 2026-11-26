@@ -150,7 +150,7 @@ void Player_InitField42C(void)
         player->statHundredths = 1000;
 }
 
-void Player_SetField434FromScript(void)
+void Player_SetStatScaleFromScript(void)
 {
     struct Player *player = gPlayers[0];
     if (player)
@@ -191,7 +191,7 @@ void ScriptActor_ApplyItemFromScript(void)
     }
 }
 
-s32 ScriptActor_GetField534FromScript(void)
+s32 ScriptActor_GetActiveSceneMode(void)
 {
     struct Player *actor;
     struct Player *player;
@@ -205,7 +205,7 @@ s32 ScriptActor_GetField534FromScript(void)
     return actor->sceneMode;
 }
 
-void ScriptActor_ClearField534FromScript(void)
+void ScriptActor_ClearSceneModeAndActivity(void)
 {
     struct Player *player;
     s32 index = Script_GetActorIndex();
@@ -223,7 +223,7 @@ void ScriptActor_SetActionFlagsFromScript(void)
     struct Player *actor = gPlayers[index];
     struct Player *player = actor;
     if (actor != NULL && Script_SeekToKeyword('f')) {
-        sub_0813B3AC(actor, Script_GetValue());
+        Player_AddEventFlags(actor, Script_GetValue());
         if (Player_GetEventFlags(actor, 0x3ffe))
             actor->actionEnabled = Player_IsEnchantmentAvailable(actor, (s8)actor->thresholdMode);
         if (Script_SeekToKeyword('p'))
@@ -294,7 +294,7 @@ void ScriptActor_ClearSlotsFromScript(void)
     }
 }
 
-u32 ScriptActor_TestCounter628FromScript(void)
+u32 ScriptActor_TestTimedEventCounter(void)
 {
     struct Player *player;
     s32 actorIndex = Script_GetActorIndex();
@@ -310,7 +310,7 @@ positiveCounter:
     return 1;
 }
 
-void ScriptActor_ClearCounter628FromScript(void)
+void ScriptActor_ClearTimedEventCounter(void)
 {
     struct Player *player;
     s32 actorIndex = Script_GetActorIndex();

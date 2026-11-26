@@ -25,8 +25,8 @@ struct NidhoggrEffect {
     s16 ground;
     u8 *boss;
 };
-void Nidhoggr_CreatePalette426Effect(void *, void *);
-void Nidhoggr_CreatePalette424Effect(void *, void *);
+void Nidhoggr_CreateFallingAttackTrail(void *, void *);
+void Nidhoggr_CreateFallingAttackGroundBurst(void *, void *);
 void Nidhoggr_CreateTimedPositionEffect(void *, void *);
 void EffectPool_CreateTimedEffect(void *, void *);
 void Anim_RestartSequence(void *, void *, u32, u32, u32);
@@ -50,7 +50,7 @@ void Nidhoggr_UpdateFallingAttackEffect(struct NidhoggrEffect *p)
     PlayerCue_StepSequence((struct ContactSwarmSprite *)&p->sprite, &p->sequence);
     age = &p->age;
     if (!((*age) & 3))
-        Nidhoggr_CreatePalette426Effect(p->boss + 0x54, &p->sprite.position);
+        Nidhoggr_CreateFallingAttackTrail(p->boss + 0x54, &p->sprite.position);
     state = &p->state;
     switch (*state) {
         case 0:
@@ -140,7 +140,7 @@ void Nidhoggr_UpdateFallingAttackEffect(struct NidhoggrEffect *p)
                 v.z = p->sprite.position.z;
                 if (p->ground <= 0) {
                     v.y -= 0x100;
-                    Nidhoggr_CreatePalette424Effect(boss + 0x54, &v);
+                    Nidhoggr_CreateFallingAttackGroundBurst(boss + 0x54, &v);
                 } else {
                     v.y -= 0x80;
                     Nidhoggr_CreateTimedPositionEffect(&v, boss);

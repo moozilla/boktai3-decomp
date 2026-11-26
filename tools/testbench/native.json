@@ -4,7 +4,7 @@
     "name": "Scene Particle",
     "aliases": ["LinearMote_Create"],
     "role": "spawn",
-    "allocation": "SceneMovingParticle_AllocateEntry_0812D670",
+    "allocation": "SceneMovingParticle_AllocateEntry",
     "callback": "LinearMote_Create",
     "address": "0812D7D0",
     "init": "LinearMote_Create",

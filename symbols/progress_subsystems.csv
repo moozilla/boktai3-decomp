@@ -116,7 +116,7 @@ Orbit background controller,08050820,080510B8,,,notes/orbit-background_2026-10-1
 Directional force controller,080510B8,080515C0,,,notes/directional-force_2026-10-14.md; threshold state and scripted force task
 Breakable props (tentative),080515C0,08051A3C,,,notes/breakable-prop_2026-10-14.md; contact transition and prop lifecycle
 Proximity particle emitter,08051A3C,08052130,,,notes/proximity-emitter_2026-10-14.md; particle slots and proximity owner
-Stacked actor (tentative),08052130,080537D0,,,include/objects/warp_circle/stacked_actor.h; StackedActor state callbacks and shared task ownership
+Stacked actor (tentative),08052130,080537D0,,,include/objects/warp_circle/warp_circle.h; StackedActor state callbacks and shared task ownership
 Interaction marker,080537D0,08053D8C,,,notes/interaction-marker_2026-10-14.md; proximity marker state and lifecycle
 Saved-position marker,08053D8C,08054294,,,notes/saved-position-marker_2026-10-14.md; stored-position predicate and marker lifecycle
 Hit switch (tentative),08054294,08054B80,,,include/objects/hit_switch.h; HitSwitch state callbacks contact and lifecycle
@@ -129,19 +129,19 @@ Shaking icon display,08056D70,08056F20,,,notes/shake-icon-display_2026-10-14.md;
 Level advance display (tentative),08056F20,0805751C,,,include/ui/hud/level_advance_display.h; threshold display and script completion
 Countdown timer,0805751C,08057678,,,notes/countdown-timer_2026-10-14.md; timer lifecycle and controls
 Proximity icon,08057678,08057960,,,notes/proximity-icon_2026-10-14.md; proximity and icon lifecycle
-Scene panel presentation (tentative),08057960,08059428,,,docs/SCENE_PANEL_EFFECTS.md; notes/scene-panel-states_2026-10-14.md; notes/scene-panel-background_2026-10-14.md; notes/scene-panel-schedule_2026-10-14.md
-Scene panel sprite rig,08059428,0805B28C,,,notes/scene-panel-rig_2026-10-14.md; notes/scene-panel-rig-states_2026-10-14.md; docs/SCENE_PANEL_RIG_SETUP.md; fifteen shared rig sprites
-Scene panel control and lifecycle,0805B28C,0805CB88,,,docs/SCENE_PANEL_INTERACTION.md; docs/SCENE_PANEL_CONFIGURATION.md; docs/SCENE_PANEL_ORCHESTRATION.md; docs/SCENE_PANEL_COMMANDS.md; docs/SCENE_PANEL_LIFECYCLE.md; parent creator endsCB88
-Scene panel subjects,0805CB88,0805DD18,,,docs/SCENE_PANEL_SUBJECT.md; docs/SCENE_PANEL_SUBJECT_STATES.md; docs/SCENE_PANEL_SUBJECT_TAIL.md; docs/SCENE_PANEL_SUBJECT_INITIALIZER.md; subject states and creator
+Scene panel presentation (tentative),08057960,08059428,,,docs/PILE_DRIVER_EFFECTS.md; notes/scene-panel-states_2026-10-14.md; notes/scene-panel-background_2026-10-14.md; notes/scene-panel-schedule_2026-10-14.md
+Scene panel sprite rig,08059428,0805B28C,,,notes/scene-panel-rig_2026-10-14.md; notes/scene-panel-rig-states_2026-10-14.md; docs/PILE_DRIVER_RIG_SETUP.md; fifteen shared rig sprites
+Scene panel control and lifecycle,0805B28C,0805CB88,,,docs/PILE_DRIVER_INTERACTION.md; docs/PILE_DRIVER_CONFIGURATION.md; docs/PILE_DRIVER_ORCHESTRATION.md; docs/PILE_DRIVER_COMMANDS.md; docs/PILE_DRIVER_LIFECYCLE.md; parent creator endsCB88
+Scene panel subjects,0805CB88,0805DD18,,,docs/PILE_DRIVER_SUBJECT.md; docs/PILE_DRIVER_SUBJECT_STATES.md; docs/PILE_DRIVER_SUBJECT_TAIL.md; docs/PILE_DRIVER_SUBJECT_INITIALIZER.md; subject states and creator
 HUD tilemaps and clock digits,0805DD18,0805E190,,,docs/SCENE_HUD_MAP.md; docs/SCENE_HUD_DISPLAY.md
 Input marker widgets,0805E190,0805E484,,,docs/SCENE_INPUT.md; shared marker pairs and input rendering
 Input grid and navigation,0805E484,0805EA58,,,docs/SCENE_INPUT_GRID.md; docs/SCENE_INPUT_NAVIGATION.md; same grid storage and saved cursor
-Inventory values and display,0805EA58,0806055C,,,docs/SCENE_INPUT_PANEL.md; docs/SCENE_INVENTORY_PANEL.md; docs/SCENE_INVENTORY_ACTIONS.md; shared comparison and catalog owner
-Inventory action transitions,0806055C,08061C3C,,,docs/SCENE_INVENTORY_ACTIONS.md; docs/SCENE_INVENTORY_CONTROL.md; docs/SCENE_INVENTORY_STATES.md
-Inventory transactions and catalogs,08061C3C,08063634,,,docs/SCENE_INVENTORY_TAIL.md; docs/SCENE_INVENTORY_LIFECYCLE.md; shared inventory task completion and catalog builders
-Scene audio events,08063634,080638BC,,,docs/SCENE_INVENTORY_LIFECYCLE.md; event-to-song command dispatcher
-Roaming objects (tentative),080638BC,080645D4,,,docs/SCENE_INVENTORY_LIFECYCLE.md; paired task layouts and parallel wander flash impulse states
-Actor attachment manager,080645D4,08066F90,,,docs/ACTOR_ATTACHMENT.md; docs/ACTOR_ATTACHMENT_MANAGER.md; docs/SCENE_INVENTORY_LIFECYCLE.md; eight attachment slots and geometry helpers
+Inventory values and display,0805EA58,0806055C,,,docs/SCENE_INPUT_PANEL.md; docs/SHOP_PANEL.md; docs/SHOP_ACTIONS.md; shared comparison and catalog owner
+Inventory action transitions,0806055C,08061C3C,,,docs/SHOP_ACTIONS.md; docs/SHOP_CONTROL.md; docs/SHOP_STATES.md
+Inventory transactions and catalogs,08061C3C,08063634,,,docs/SHOP_TAIL.md; docs/SHOP_LIFECYCLE.md; shared inventory task completion and catalog builders
+Scene audio events,08063634,080638BC,,,docs/SHOP_LIFECYCLE.md; event-to-song command dispatcher
+Roaming objects (tentative),080638BC,080645D4,,,docs/SHOP_LIFECYCLE.md; paired task layouts and parallel wander flash impulse states
+Actor attachment manager,080645D4,08066F90,,,docs/ACTOR_ATTACHMENT.md; docs/ACTOR_ATTACHMENT_MANAGER.md; docs/SHOP_LIFECYCLE.md; eight attachment slots and geometry helpers
 Scene actor slot controller,08066F90,08067C10,,,docs/SCENE_ACTOR_CONTROL_PARTICLES.md; eight-slot controller at02000128 including hidden constructor and request loop
 Scene particle pools,08067C10,080688D0,,,docs/SCENE_ACTOR_CONTROL_PARTICLES.md; include/effects/particles/scene_particle_pool.h; separate burst and anchored particle records
 Bouncing object pool (tentative),080688D0,08069964,,,docs/BOUNCING_OBJECTS.md; shared physics pool contact state and active query
@@ -236,7 +236,7 @@ Native particle,08114CB0,0811525C,,,auto: 8 of 11 functions named NativeParticle
 Collectible,0811525C,08115D4C,,,auto: 9 of 14 functions named Collectible_*
 Sprite drop,08115D4C,08116280,,,auto: 5 of 10 functions named SpriteDrop_*
 Actor recoil,08116280,08116870,,,auto: 5 of 6 functions named ActorRecoil_*
-Glove,08116870,0811B048,,,auto: 24 of 50 functions named Glove_*
+Coffin Bike,08116870,0811B048,minigames,,auto: 24 of 50 functions named CoffinBike_*
 Spatial index,0811B048,0811B498,,,auto: 5 of 13 functions named SpatialIndex_*
 Registry E7BC,0811B498,0811BCBC,,,auto: 10 of 28 functions named RegistryE7BC_*; also GameState_*
 Actor particles,0811BCBC,0811C5F8,,,auto: 4 of 9 functions named ActorParticles_*
@@ -335,7 +335,7 @@ Actor controller,08182F60,081854DC,,,auto: 44 of 49 functions named ActorControl
 Armor,081854DC,0818D754,,,auto: 94 of 102 functions named Armor_*
 Spinning approach motion (tentative),0818D754,0818DC50,,symbols/proposed/subsystems.csv,docs/MOTION_0818.md contiguous four-callback movement chain
 Armor,0818DC50,0818EBF4,,,auto: 16 of 21 functions named Armor_*
-Nidhoggr,0818EBF4,08190C98,,,auto: 21 of 39 functions named Nidhoggr_*; also ScenePanelEffect_*
+Nidhoggr,0818EBF4,08190C98,,,auto: 21 of 39 functions named Nidhoggr_*; also NidhoggrEffect_*
 Large scene animation controller (tentative),08190C98,0819792C,,,docs/REPORT_SUBSYSTEMS.md; reviewed controller portion with sixteen keyframes543C; task creators19783C and197890 allocate72FC bytes
 Buffered animation task (tentative),0819792C,08197DD0,,,docs/REPORT_SUBSYSTEMS.md; independent graphics-buffer owner allocated count*32+0x28 with sprite and animation initialization
 Time palette transitions (tentative),08197DD0,08197EC4,,symbols/proposed/report-subsystems.csv,docs/REPORT_SUBSYSTEMS.md; three phase-selected palette sources and64-tick transition through08221110
@@ -403,7 +403,7 @@ Actor animation controller (tentative),081E34D0,081EB81C,,symbols/proposed/entry
 Mode menu,081EB81C,081EC380,,,auto: 7 of 12 functions named ModeMenu_*; also ResultScreen_*
 Actor display,081EC380,081EEE30,,,auto: 4 of 30 functions named ActorDisplay_*; also SceneActors_*
 Vanargand head,081EEE30,081F2190,,,"Vanargand head runtime, animation states and transitions"
-Sprite trail,081F2190,081F2CD4,,,auto: 7 of 25 functions named SpriteTrail_*; also SingletonSlot7_*
+Sprite trail,081F2190,081F2CD4,,,auto: 7 of 25 functions named SpriteTrail_*; also VanargandHead_*
 Ratatosk,081F2CD4,081FC66C,,,auto: 85 of 172 functions named Ratatosk_*
 Scene projectile,081FC66C,081FCFE8,,,auto: 12 of 13 functions named SceneProjectile_*
 Projectile,081FCFE8,081FD53C,,,auto: 15 of 15 functions named Projectile_*
@@ -415,7 +415,7 @@ Player clone,08200224,08201388,,,auto: 20 of 20 functions named PlayerClone_*
 Script combat actor,08201388,0820264C,,,auto: 8 of 11 functions named ScriptCombatActor_*
 Projectile pool,0820264C,08203200,,,auto: 6 of 25 functions named ProjectilePool_*; also ProjectileConfig_* ProximitySequence_*
 Cannon emitter,08203200,08203660,,,auto: 4 of 5 functions named CannonEmitter_*
-Enemy F426,08203660,08204748,,,auto: 10 of 12 functions named EnemyF426_*
+Statue,08203660,08204748,monsters,,auto: 10 of 12 functions named Statue_*
 Axe Armor,08204748,08205944,monsters,,auto: 12 of 12 functions named AxeArmor_*
 Ooze,08205944,082064B4,,,auto: 8 of 10 functions named Ooze_*
 Vulcan cannon,082064B4,08207FAC,,,auto: 14 of 14 functions named VulcanCannon_*

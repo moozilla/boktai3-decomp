@@ -1,8 +1,8 @@
-#include "objects/warp_circle/stacked_actor.h"
+#include "objects/warp_circle/warp_circle.h"
 void Sound_PlaySong(u32);
 void AnimData_SelectPaletteBank(void *, u32);
 void Trigger_ConsumePending(void *, u32);
-void StackedActor_RaiseLift(struct StackedActor *actor)
+void WarpCircle_RaiseLift(struct WarpCircle *actor)
 {
     u16 *frame = &actor->frame;
     if (!*frame) {
@@ -28,7 +28,7 @@ void StackedActor_RaiseLift(struct StackedActor *actor)
     else
         AnimData_SelectPaletteBank(actor->graphics, actor->paletteBase);
     if (actor->lift > 23) {
-        StackedActor_SetUpdate(actor, StackedActor_HoldLift);
+        WarpCircle_SetUpdate(actor, WarpCircle_HoldLift);
         Trigger_ConsumePending(actor->trigger, 1);
     }
 }
