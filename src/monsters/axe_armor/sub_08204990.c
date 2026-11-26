@@ -1,10 +1,7 @@
 #include "monsters/axe_armor/axe_armor.h"
 #include "engine/math/hit_spark_random.h"
 #include "engine/engine.h"
-struct Vec {
-    u16 x, y, z, pad;
-};
-extern const struct Vec gUnk_0824FE54;
+extern const struct ContactPosition gUnk_0824FE54;
 void Collision_CalculateDamageResponse(void *, void *);
 void Sound_PlaySong(u32);
 void DamageNumberDisplay_Show(void *, s32, s32, void *, void *, s32);
@@ -16,7 +13,7 @@ void AxeArmor_ApplyHitReaction(struct ContactCollider *sourceInput, struct Conta
 {
     struct {
         struct ContactPosition position;
-        struct Vec velocity;
+        struct ContactPosition velocity;
     } frame;
     struct ContactCollider *source = sourceInput;
     struct ContactCollider *hit = input;
@@ -36,7 +33,8 @@ void AxeArmor_ApplyHitReaction(struct ContactCollider *sourceInput, struct Conta
             target->collider.responseValue = 0x26;
             target->flashTimer = 8;
             Sound_PlaySong(0x211);
-            DamageNumberDisplay_Show(&target->collider, target->pendingDamage, 0, &target->collider.position,
+            DamageNumberDisplay_Show(&target->collider, target->pendingDamage, 0,
+                                     &target->collider.position,
                                      &target->collider.offset, 1);
             hud = target->parent;
             health = target->health;
@@ -53,13 +51,11 @@ void AxeArmor_ApplyHitReaction(struct ContactCollider *sourceInput, struct Conta
     sparks:
         if (source->reactionFlags & (u16)target->rangeB) {
             s32 i;
-            struct Vec *vel = &frame.velocity;
+            struct ContactPosition *vel = &frame.velocity;
             struct ContactPosition *pos = &frame.position;
             u32 *index = &gRandomIndex;
             u32 limit = 0x3ff;
-            u32 mask = 0x7f;
-            i = 2;
-            do {
+            for (i = 0; i < 3; i++) {
                 u32 random;
                 u32 value;
                 u32 sample;
@@ -70,7 +66,7 @@ void AxeArmor_ApplyHitReaction(struct ContactCollider *sourceInput, struct Conta
                 random = HitSpark_NextIndex(*index, limit);
                 sample = HitSpark_Sample(value, random);
                 x = (u16)pos->x - 0x40;
-                sample &= mask;
+                sample &= 0x7F;
                 x += sample;
                 pos->x = x;
                 random = HitSpark_NextIndex(random, limit);
@@ -80,14 +76,13 @@ void AxeArmor_ApplyHitReaction(struct ContactCollider *sourceInput, struct Conta
                 {
                     u32 last = HitSpark_Sample(value, random);
                     x = (u16)pos->z - 0x40;
-                    last &= mask;
+                    last &= 0x7F;
                     x += last;
                     pos->z = x;
                 }
                 value = 0;
                 SparkParticle_Spawn(&frame.position, 1, vel, value, 3, 8, 2, 2);
-                i--;
-            } while (i >= 0);
+            }
         }
     }
 }
