@@ -1,0 +1,25 @@
+081CDE14 scene-character-palette-fade-return
+
+The four interpolation calls return via r0. The other modes leave the first
+argument in r0 and the final counter update uses r1.
+
+The explicit form changed the ROM bytes. The guarded form passed the unit ROM check.
+
+--- a/src/fn/sub_081CDE14.c
++++ b/src/fn/sub_081CDE14.c
+@@ -16,4 +16,7 @@
+     SceneCharacterPaletteFade *fade = (SceneCharacterPaletteFade *)(b + 0x20);
+     s32 counter = fade->counter;
++#ifdef UBFIX
++    const s16 mode = fade->mode;
++#endif
+ 
+     if (fade->mode == 1) {
+@@ -53,3 +56,7 @@
+ 
+     fade->counter++;
++#ifdef UBFIX
++    return mode == 1 ? 0x081CDE4D : mode == 2 ? 0x081CDE7D :
++           mode == 3 ? (counter <= 63 ? 0x081CDEBD : 0x081CDEE7) : (s32)a; // r0 is the final interpolation link or incoming argument
++#endif
+ }
