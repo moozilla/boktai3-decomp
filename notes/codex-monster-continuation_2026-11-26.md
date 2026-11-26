@@ -126,3 +126,26 @@ The per-object comparison gives 644 diagnostic rows and 702 steering
 uses in each scan. All six scans report zero errors.
 
 All seven changed source units match their recorded ROM extents.
+
+## Fifth pass
+
+Both Armor wave returns combine the timer decrement and expiration test.
+The direct completion stores grow each routine from 220 to 228 bytes.
+Centipede's update dispatch reads the actor's callback table and state
+index. Its radial impulse reads and clears the named pending field.
+
+Golem's directional entry reads the index and elapsed fields from the
+drawable's shared display sequence. Dog_Init derives its sequence and
+tile allocation and clear sizes from their established types.
+
+Axe_EmitMotionTrail uses the drawable's flags and the trail slot's
+sequence field. AxeArmor_InitializeFromScript keeps the display
+sprite type through setup. Its death-particle position and byte-cast
+random sample trials still change the generated instructions. The
+cast moves the table base load before the index shift.
+
+The six scoped reports contain 644 diagnostic rows and 702 steering
+uses before and after the pass. They report zero errors and no added
+diagnostics.
+
+All eight changed source units match their recorded ROM extents.
