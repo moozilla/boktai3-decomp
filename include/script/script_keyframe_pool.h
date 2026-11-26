@@ -33,5 +33,5 @@ void ScriptKeyframe_SetPriorityFromScript(void);
 void ScriptKeyframe_SetTargetFromScript(void);
 void ScriptKeyframe_AddFromScript(void);
 struct ScriptKeyframeManager *ScriptKeyframe_CreateManagerFromScript(u32, u32);
-void Widget_InitLinked(void *, void *, u32, u32, u32, u32, s32, const void *);
+void AnimSprite_InitLinked(void *, void *, u32, u32, u32, u32, s32, const void *);
 #endif

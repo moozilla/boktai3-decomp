@@ -1,7 +1,7 @@
-s32 DirectionalController_CheckRemaining(struct DirectionalManager *manager,
+s32 InteractionPrompt_CheckRemaining(struct DirectionalManager *manager,
                                          struct DirectionalController *p)
 {
-    DirectionalController_ConsumeEntered(p);
+    InteractionPrompt_ConsumeEntered(p);
     if (manager->actor) {
         u32 mask = 6;
         u32 flags;
@@ -36,6 +36,6 @@ s32 DirectionalController_CheckRemaining(struct DirectionalManager *manager,
         }
     }
 done:
-    DirectionalController_SetState(p, 0);
+    InteractionPrompt_SetState(p, 0);
     return 0;
 }

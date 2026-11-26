@@ -1,5 +1,5 @@
 #include "engine/video/render.h"
-#include "objects/pile_driver/scene_panel_overlay.h"
+#include "objects/pile_driver/pile_driver_overlay.h"
 
 static inline s32 scaleSceneOverlay(s32 value)
 {
@@ -42,7 +42,7 @@ static inline void projectSceneOverlay(struct ContactPosition *out,
             result = -((-value) >> 1);                                                             \
         result;                                                                                    \
     })
-void PileDriver_DrawOverlay(struct ScenePanel *panel, s32 tileX, s32 tileY, s32 screenX,
+void PileDriver_DrawOverlay(struct PileDriver *panel, s32 tileX, s32 tileY, s32 screenX,
                             s32 screenY)
 {
     struct SceneOverlayResource resource;

@@ -1,4 +1,4 @@
-#include "bosses/sabata/scene_volume.h"
+#include "bosses/sabata/sabata_attack_state.h"
 #include "effects/particles/scene_particle_burst_api.h"
 
 void Projectile_InitializeParams(struct Task4E01Params *);
@@ -33,15 +33,15 @@ static inline void SetProjectileOrigin(s16 *pos, s32 x, s32 y, s32 z)
     pos[3] = zero;
 }
 
-static inline u8 ProjectileDirection(struct SceneVolumeActor *actor)
+static inline u8 ProjectileDirection(struct SabataAttackActor *actor)
 {
     s32 direction = actor->direction8;
     return ((direction + 5) & 7) << 5;
 }
 
-void ActorEffect_InitializeOffset(struct SceneVolumeActor *actor)
+void ActorEffect_InitializeOffset(struct SabataAttackActor *actor)
 {
-    struct SceneVolumeActor *volume = actor;
+    struct SabataAttackActor *volume = actor;
     struct ContactPosition pos;
     s32 x;
     s32 z;
@@ -76,7 +76,7 @@ void ProximityVolume_TranslateBounds(void *, void *);
 
 s32 SabataPosition_TestPath(void *, void *);
 
-s32 SabataVolume_TestPlayerPosition(void *);
+s32 Sabata_TestPlayerInAttackArea(void *);
 
 s32 SpriteComponent_GetCollisionStatus(void *);
 
@@ -84,7 +84,7 @@ int Math_Atan2(int, int);
 
 void ActorEffect_SpawnAtAngle(void *, void *, int);
 
-static inline void SetDirection(struct SceneVolumeActor *actor, int angle)
+static inline void SetDirection(struct SabataAttackActor *actor, int angle)
 {
     actor->direction = angle;
     {
@@ -107,9 +107,9 @@ s32 SabataImpact_TestForwardPoint(void *);
 
 // confidence=low: alternates aim and projectile states, capped at three impacts
 
-void SabataVolume_UpdateRepeatedShot(struct SceneVolumeActor *actor)
+void Sabata_UpdateRepeatedShot(struct SabataAttackActor *actor)
 {
-    struct SceneVolumeActor *volume = actor;
+    struct SabataAttackActor *volume = actor;
     if (actor->restart) {
         actor->restart = 0;
         if (actor->special)
@@ -119,7 +119,7 @@ void SabataVolume_UpdateRepeatedShot(struct SceneVolumeActor *actor)
         SceneActors_StartEightDirectionAnimation(actor, &volume->animation, volume->animationState,
                                                  0x134, 1, 1, 1);
         volume->impactCount = 0;
-        SceneVolume_SetFlags(actor, 0x400004);
+        Sabata_SetFlags(actor, 0x400004);
     }
     switch (actor->phase) {
         case 0:
@@ -181,14 +181,14 @@ void SabataVolume_UpdateRepeatedShot(struct SceneVolumeActor *actor)
     if ((u8)Callback_InvokeActor(actor, actor->callback))
         volume->impactCount = 0;
     else
-        SceneVolume_SetFlags(actor, 0x40);
+        Sabata_SetFlags(actor, 0x40);
 }
 
 // confidence=low: pursues a destination while spawning a rotating effect
 
-void SabataVolume_UpdatePursuitSpin(struct SceneVolumeActor *actor, s32 elapsed)
+void Sabata_UpdatePursuitSpin(struct SabataAttackActor *actor, s32 elapsed)
 {
-    struct SceneVolumeActor *volume = actor;
+    struct SabataAttackActor *volume = actor;
     if (actor->restart) {
         actor->restart = 0;
         SetDirection(actor, actor->requestedDirection);
@@ -198,7 +198,7 @@ void SabataVolume_UpdatePursuitSpin(struct SceneVolumeActor *actor, s32 elapsed)
             ProximityVolume_TranslateBounds(actor->bounds, actor->position);
         else if (actor->movementMode == 1)
             ProximityVolume_TranslateBounds(actor->bounds, actor->position);
-        SceneVolume_SetFlags(actor, 0x400004);
+        Sabata_SetFlags(actor, 0x400004);
         volume->impactCount = 0;
         Sound_PlaySong(0x2E9);
     }
@@ -207,13 +207,13 @@ void SabataVolume_UpdatePursuitSpin(struct SceneVolumeActor *actor, s32 elapsed)
         if (!result)
             volume->movementMode = result;
     } else if (volume->movementMode == 1) {
-        int result = SabataVolume_TestPlayerPosition(volume);
+        int result = Sabata_TestPlayerInAttackArea(volume);
         if (!result)
             volume->movementMode = result;
     }
     switch (actor->phase) {
         case 0:
-            SceneVolume_SetFlags(actor, 0x400000);
+            Sabata_SetFlags(actor, 0x400000);
             if (actor->timer == 0)
                 SceneActors_StartEightDirectionAnimation(actor, &volume->animation,
                                                          volume->animationState, 0x134, 1, 1, 4);
@@ -223,7 +223,7 @@ void SabataVolume_UpdatePursuitSpin(struct SceneVolumeActor *actor, s32 elapsed)
             }
             break;
         case 1:
-            SceneVolume_SetFlags(actor, 0x100000);
+            Sabata_SetFlags(actor, 0x100000);
             if (SpriteComponent_GetCollisionStatus(volume->effect) && !volume->impactCount) {
                 volume->impactCount++;
                 Sound_PlaySong(0x2E7);
@@ -263,7 +263,7 @@ void SabataVolume_UpdatePursuitSpin(struct SceneVolumeActor *actor, s32 elapsed)
                 actor->timer = 0;
             }
             if (elapsed <= 31)
-                SceneVolume_SetFlags(actor, 0x400000);
+                Sabata_SetFlags(actor, 0x400000);
             break;
         case 2:
             volume->impactCount = 0;
@@ -273,21 +273,21 @@ void SabataVolume_UpdatePursuitSpin(struct SceneVolumeActor *actor, s32 elapsed)
                                                      volume->animationState, 0x134, 1, 1, 4);
             break;
     }
-    SceneVolume_SetFlags(actor, 0x40);
+    Sabata_SetFlags(actor, 0x40);
     Callback_InvokeActor(actor, actor->callback);
 }
 
 void sub_0817AEC8(void *, int);
 
-void SabataVolume_ConfigureAttackCollider(void *, int, int, int);
+void Sabata_ConfigureAttackCollider(void *, int, int, int);
 
 void SceneActors_SetParticleControlMode(void *, int);
 
 // confidence=low: decays impact speed, then plays a recovery animation
 
-void SabataVolume_UpdateImpactSlide(struct SceneVolumeActor *actor)
+void Sabata_UpdateImpactSlide(struct SabataAttackActor *actor)
 {
-    struct SceneVolumeActor *volume = actor;
+    struct SabataAttackActor *volume = actor;
     if (actor->restart) {
         actor->restart = 0;
         SceneActors_StartDirectionalAnimation(actor, &actor->animation, actor->animationState,
@@ -295,11 +295,11 @@ void SabataVolume_UpdateImpactSlide(struct SceneVolumeActor *actor)
         actor->phase = 0;
         actor->timer = 0;
         sub_0817AEC8(actor, actor->impactDirection);
-        SabataVolume_ConfigureAttackCollider(actor, 128, ((u8)actor->target->unk2D + 128) & 255, 16);
+        Sabata_ConfigureAttackCollider(actor, 128, ((u8)actor->target->unk2D + 128) & 255, 16);
         SceneActors_SetParticleControlMode(actor, 30);
         Sound_PlaySong(0x50D);
     }
-    SceneVolume_SetFlags(actor, 0x400004);
+    Sabata_SetFlags(actor, 0x400004);
     if (!(u8)Callback_InvokeActor(actor, actor->callback)) {
         switch (actor->phase) {
             case 0:
@@ -331,14 +331,14 @@ void SabataVolume_UpdateImpactSlide(struct SceneVolumeActor *actor)
 
 void SceneActors_ConfigureEffect(void *, unsigned, int, int);
 
-static inline void StartTimedAnimation(struct SceneVolumeActor *actor, u8 *animation, u8 *state,
+static inline void StartTimedAnimation(struct SabataAttackActor *actor, u8 *animation, u8 *state,
                                        s32 sequence)
 {
     u16 id = sequence;
     SceneActors_StartEightDirectionAnimation(actor, animation, state, id, 3, 1, 4);
 }
 
-static inline void UpdateSequence(struct SceneVolumeActor *actor, u32 complete)
+static inline void UpdateSequence(struct SabataAttackActor *actor, u32 complete)
 {
     if (complete == 0) {
         if (actor->timer == 0) {
@@ -350,11 +350,11 @@ static inline void UpdateSequence(struct SceneVolumeActor *actor, u32 complete)
             actor->phase = 1;
             actor->timer = complete;
         } else if (actor->timer <= 7)
-            SceneVolume_SetFlags(actor, 4);
+            Sabata_SetFlags(actor, 4);
     }
 }
 
-void ActorEffect_UpdateTimedSequence(struct SceneVolumeActor *actor)
+void ActorEffect_UpdateTimedSequence(struct SabataAttackActor *actor)
 {
     if (actor->restart) {
         actor->restart = 0;
@@ -364,7 +364,7 @@ void ActorEffect_UpdateTimedSequence(struct SceneVolumeActor *actor)
         Sound_PlaySong(0x13C);
         SceneActors_ConfigureEffect(actor, 5, 0xB4, 0xB4);
     }
-    SceneVolume_SetFlags(actor, 0x400040);
+    Sabata_SetFlags(actor, 0x400040);
     if ((u8)Callback_InvokeActor(actor, actor->callback) == 0)
         UpdateSequence(actor, actor->phase);
 }
@@ -418,9 +418,9 @@ static inline void SetVelocity(s16 *velocity, u32 angle, s32 speed)
 
 // confidence=low: decays impact velocity and height before landing animations
 
-void SabataVolume_UpdateKnockbackLanding(struct SceneVolumeActor *actor, s32 elapsed)
+void Sabata_UpdateKnockbackLanding(struct SabataAttackActor *actor, s32 elapsed)
 {
-    struct SceneVolumeActor *volume = actor;
+    struct SabataAttackActor *volume = actor;
     if (actor->restart) {
         actor->restart = 0;
         SetDirection(actor, actor->impactDirection + 128);
@@ -435,7 +435,7 @@ void SabataVolume_UpdateKnockbackLanding(struct SceneVolumeActor *actor, s32 ela
         actor->timer = 0;
         volume->height = 300;
     }
-    SceneVolume_SetFlags(actor, 0x400004);
+    Sabata_SetFlags(actor, 0x400004);
     switch (actor->phase) {
         case 0:
             if (elapsed > 3) {
@@ -485,5 +485,5 @@ void SabataVolume_UpdateKnockbackLanding(struct SceneVolumeActor *actor, s32 ela
         case 4:
             return;
     }
-    SceneVolume_SetFlags(actor, 1);
+    Sabata_SetFlags(actor, 1);
 }

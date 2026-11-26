@@ -6,13 +6,13 @@
 // confidence=low: inferred from segment state and collider updates.
 
 void Centipede_SelectWanderRoute(void *);
-void sub_080A9DB0(void *, s32, s32);
+void Centipede_UpdateSegmentPositions(void *, s32, s32);
 void Centipede_UpdateOscillation(void *, s32, s32);
 static inline void Advance(void *p, s32 x, s32 z)
 {
 
     u16 k[] = {0x6400};
-    sub_080A9DB0(p, 4, k[0]);
+    Centipede_UpdateSegmentPositions(p, 4, k[0]);
 }
 union RetractionActorHandle {
     struct ChaseActor *ptr;

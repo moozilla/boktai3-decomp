@@ -14,7 +14,6 @@ struct Group {
 void Sound_PlaySong(u32);
 u8 ActorTrail_RemoveLastSegment(void *);
 // confidence=low: removes excess segments after damage and restores idle control.
-#define TentacleActor_RecoverFromSegmentLoss sub_080ABB18
 static inline void ClearHalf(u16 *p, u32 mask)
 {
     *p = mask & *p;
@@ -34,7 +33,7 @@ static inline void ClearMotionFlags(struct ChaseActor *actor, u32 mask)
 // gcse's PRE computes the field addresses of the idle-control stores above the trail loop
 // (its stack slots follow the hash-table order of a 65-bucket table), and cse2 turns the
 // motion-flags address into a copy of the one the head computed through MotionFlags.
-u32 TentacleActor_RecoverFromSegmentLoss(struct ChaseActor *p)
+u32 Centipede_RecoverFromSegmentLoss(struct ChaseActor *p)
 {
     struct Group *g = p->base.context;
     s32 count;

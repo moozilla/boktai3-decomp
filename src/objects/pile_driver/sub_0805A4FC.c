@@ -1,10 +1,10 @@
 #include "objects/pile_driver/pile_driver_rig.h"
-static inline s32 ScenePanelRig_ContactDepth(const struct ScenePanelRig *rig)
+static inline s32 PileDriverRig_ContactDepth(const struct PileDriverRig *rig)
 {
     return rig->position.z - rig->origin.z - 64;
 }
 
-void PileDriverRig_CheckContactTransition(struct ScenePanelRig *rig)
+void PileDriverRig_CheckContactTransition(struct PileDriverRig *rig)
 {
     u32 state = rig->state;
     if (state == 9 || state == 0 || state == 1 || state == 6)
@@ -20,7 +20,7 @@ void PileDriverRig_CheckContactTransition(struct ScenePanelRig *rig)
             s32 dx = rig->position.x;
             s32 dz;
             dx -= rig->origin.x;
-            dz = ScenePanelRig_ContactDepth(rig);
+            dz = PileDriverRig_ContactDepth(rig);
             dx -= 64;
             if (dx < 0)
                 dx = -dx;

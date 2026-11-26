@@ -126,10 +126,10 @@ void PauseMenu_ClearTileRect(s32 x, s32 y, s32 width, s32 height)
     }
 }
 
-void PauseMenu_SetSpritePalette(struct AnimSprite *widget, u32 bank)
+void PauseMenu_SetSpritePalette(struct AnimSprite *animSprite, u32 bank)
 {
-    widget->paletteBank = bank;
-    widget->palette = (u16 *)((u8 *)gPaletteBankData + (widget->paletteBank << 5));
+    animSprite->paletteBank = bank;
+    animSprite->palette = (u16 *)((u8 *)gPaletteBankData + (animSprite->paletteBank << 5));
 }
 
 void PauseMenu_SmoothPoint(s16 *position, s16 *target, s32 weight)
@@ -390,45 +390,45 @@ void PauseMenu_ShowPromptSprite(struct SceneHudState *hud, s16 x, s16 y)
     PlayerCue_StepSequence(&hud->promptSprite, &hud->promptSequence);
 }
 
-void PauseMenu_LoadCategoryIconFrame(struct SceneHudState *hud, struct AnimSprite *widget,
+void PauseMenu_LoadCategoryIconFrame(struct SceneHudState *hud, struct AnimSprite *animSprite,
                                      s32 icon)
 {
-    Anim_LoadKeyframe(widget, hud->motionResource, (u16)(icon + 0xf0), 0);
+    Anim_LoadKeyframe(animSprite, hud->motionResource, (u16)(icon + 0xf0), 0);
 }
 
-void PauseMenu_LoadEquipmentIconFrame(struct SceneHudState *hud, struct AnimSprite *widget,
+void PauseMenu_LoadEquipmentIconFrame(struct SceneHudState *hud, struct AnimSprite *animSprite,
                                       s32 icon)
 {
-    Anim_LoadKeyframe(widget, hud->motionResource, (u16)(icon + 0xd9), 0);
+    Anim_LoadKeyframe(animSprite, hud->motionResource, (u16)(icon + 0xd9), 0);
 }
 
-void PauseMenu_LoadAttributeIconFrame(struct SceneHudState *hud, struct AnimSprite *widget,
+void PauseMenu_LoadAttributeIconFrame(struct SceneHudState *hud, struct AnimSprite *animSprite,
                                       s32 icon)
 {
     if (icon <= 5)
-        Anim_LoadKeyframe(widget, hud->motionResource, (u16)(icon + 0x184), 1);
+        Anim_LoadKeyframe(animSprite, hud->motionResource, (u16)(icon + 0x184), 1);
     else
-        Anim_LoadKeyframe(widget, hud->motionResource, (u16)(icon + 0x19c), 1);
+        Anim_LoadKeyframe(animSprite, hud->motionResource, (u16)(icon + 0x19c), 1);
 }
 
-void PauseMenu_LoadStatusIconFrame(struct SceneHudState *hud, struct AnimSprite *widget,
+void PauseMenu_LoadStatusIconFrame(struct SceneHudState *hud, struct AnimSprite *animSprite,
                                    s32 icon)
 {
-    Anim_LoadKeyframe(widget, hud->motionResource, (u16)(icon + 0xe7), 0);
+    Anim_LoadKeyframe(animSprite, hud->motionResource, (u16)(icon + 0xe7), 0);
 }
 
-void PauseMenu_LoadEmptySlotFrame(struct SceneHudState *hud, struct AnimSprite *widget)
+void PauseMenu_LoadEmptySlotFrame(struct SceneHudState *hud, struct AnimSprite *animSprite)
 {
-    Anim_LoadKeyframe(widget, hud->motionResource, 0xc9, 1);
+    Anim_LoadKeyframe(animSprite, hud->motionResource, 0xc9, 1);
 }
 
-void PauseMenu_LoadFixedIconKeyframe(struct SceneHudState *hud, struct AnimSprite *widget)
+void PauseMenu_LoadFixedIconKeyframe(struct SceneHudState *hud, struct AnimSprite *animSprite)
 {
-    Anim_LoadKeyframe(widget, hud->motionResource, 0xc8, 1);
+    Anim_LoadKeyframe(animSprite, hud->motionResource, 0xc8, 1);
 }
 
-void PauseMenu_LoadIndexedIconKeyframe(struct SceneHudState *hud, struct AnimSprite *widget,
+void PauseMenu_LoadIndexedIconKeyframe(struct SceneHudState *hud, struct AnimSprite *animSprite,
                                        s32 icon)
 {
-    Anim_LoadKeyframe(widget, hud->widgetResource, (u16)(icon + 0x90), 0);
+    Anim_LoadKeyframe(animSprite, hud->widgetResource, (u16)(icon + 0x90), 0);
 }

@@ -254,7 +254,7 @@ BOOKKEEPING = {"begin_event", "end_event", "nop", "run_continue_proc", "restore_
 
 
 def snake(name):
-    """GameState_SetAreaFlag -> game_state_set_area_flag; SceneObjects_ScriptActivate ->
+    """GameState_SetAreaFlag -> game_state_set_area_flag; SlidingDoors_ScriptActivate ->
     scene_objects_activate; snake_case names stay."""
     name = re.sub(r"_Script(?=[A-Z])", "_", name)
     return re.sub(r"(?<=[a-z0-9])(?=[A-Z])", "_", name).lower().replace("__", "_")

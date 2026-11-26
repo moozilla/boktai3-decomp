@@ -19,7 +19,7 @@ void ResourceStation_InitializeDigits(struct ResourceStation *station)
         cursor += sizeof(struct AnimSpriteResource);
         remaining = 3;
         do {
-            Widget_InitLinked(cursor, graphics, 0x1e, 0x31, 1, 0, 0x3c, &position);
+            AnimSprite_InitLinked(cursor, graphics, 0x1e, 0x31, 1, 0, 0x3c, &position);
             cursor += sizeof(struct AnimSprite);
             remaining--;
         } while (remaining >= 0);

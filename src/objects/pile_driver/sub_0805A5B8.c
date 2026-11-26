@@ -7,7 +7,7 @@ static inline s32 absolute(s32 v)
 {
     return v < 0 ? -v : v;
 }
-void PileDriverRig_TickPrimarySprites(struct ScenePanelRig *rig, u32 palette)
+void PileDriverRig_TickPrimarySprites(struct PileDriverRig *rig, u32 palette)
 {
     s32 i;
     for (i = 0; i < 8; i++) {
@@ -28,7 +28,7 @@ void PileDriverRig_TickPrimarySprites(struct ScenePanelRig *rig, u32 palette)
             sprite->phase = (sprite->phase + 1) & 255;
         else
             sprite->phase = (sprite->phase + 255) & 255;
-        ScenePanelRig_StepSprite(sprite);
+        PileDriverRig_StepSprite(sprite);
         AnimData_SelectPaletteBank(sprite->graphics, palette);
     }
 }

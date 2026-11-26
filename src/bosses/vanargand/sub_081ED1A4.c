@@ -1,7 +1,7 @@
 #include "bosses/vanargand/scene_departure_display.h"
 #include "effects/screen/background_controller.h"
 #include "engine/ram.h"
-#include "effects/particles/native_effect.h"
+#include "effects/sprites/native_effect.h"
 
 extern const u16 gUnk_086141BC[];
 s32 Player_GetHorizontalVelocity(s32);

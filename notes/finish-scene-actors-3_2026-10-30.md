@@ -26,7 +26,7 @@ Branch: `codex/finish-scene-actors-3`, based on `a8c44f25d`. Work stopped at the
 | 081363F4 | 1,492 | MATCH — `SceneActorReaction_ResolvePlacementDamage` | Separate status/motion owners, packed flags snapshot, fully initialized signed mask carrier, late priority decision, real HUD/collider helper boundaries and full-width final field query. |
 | 0815AC04 | 240 | MATCH — `ScriptActor_TestFacingPointFromScript` | Reset the consumed actor cursor after dx/dz so CSE retains the independent player alias; dead-set elimination removes the reset. |
 | 08181514 | 288 | Guarded ordinary draft 90.1% — `ActorMarker_LaunchFragments` | Original scalar source remains the best readable ordinary draft: 284 bytes, 11/9, shape 8. Complete compiler proof and a 288-byte pinned near-match are retained separately. |
-| 081B8E44 | 272 | MATCH — `OrbitMotion_UpdateCrossedSines` | Late `(s16)screenX` in the final Z projection lengthens the second coordinate's pre-combine life to equal the first; combine removes the redundant conversion. |
+| 081B8E44 | 272 | MATCH — `SceneryMotion_UpdateCrossedSines` | Late `(s16)screenX` in the final Z projection lengthens the second coordinate's pre-combine life to equal the first; combine removes the redundant conversion. |
 
 The 0812E118 row already includes its hidden neighbor; do not count that 288-byte body twice. Descriptive names remain tentative. Every exact replacement was checked independently over its full reviewed extent.
 

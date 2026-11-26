@@ -317,7 +317,7 @@ s32 LinkedWidgetSet_Init(struct LinkedWidgetSet *manager)
         effect->state = FLOATING_EFFECT_WAIT_AFTER_BOB;
         effect->kind = 0;
         effect->timer = 0;
-        result = Widget_InitLinked(&effect->sprite, &manager->resource, 0, 0x11, 1, 0, 0x3C, &zero);
+        result = AnimSprite_InitLinked(&effect->sprite, &manager->resource, 0, 0x11, 1, 0, 0x3C, &zero);
     }
     return result;
 }

@@ -1,10 +1,9 @@
 // COMPILER: old_agbcc
 #include "global.h"
 #include "engine/ram.h"
-/* RegistryF246_ResetInstance: Clears the singleton pointer */
-#define RegistryF246_ResetInstance sub_0810CB7C
+/* LinkPanelSlots_ResetInstance: Clears the singleton pointer */
 
-void sub_0810CB7C(void)
+void LinkPanelSlots_ResetInstance(void)
 {
     gLinkPanel = 0;
 }

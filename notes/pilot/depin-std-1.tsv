@@ -1,4 +1,4 @@
-08008AF4	Breakable_InitSlot	clean	25	Its only concession was the shared ZeroFill8 helper's vu32 zero; excused it in include/global.h with concession-ok(volatile) citing the SDK CPU_FILL macro's identical volatile temp (a plain u32 mismatches), which also clears every other ZeroFill8 caller.
+08008AF4	LightFixture_InitSlot	clean	25	Its only concession was the shared ZeroFill8 helper's vu32 zero; excused it in include/global.h with concession-ok(volatile) citing the SDK CPU_FILL macro's identical volatile temp (a plain u32 mismatches), which also clears every other ZeroFill8 caller.
 08018F38	CircleWindow_GenerateScanlines	holdout	45	The ROM keeps a dead radius-y set (its use vanished after flow, README facts 57/94); identical-arm and loop-biv rewrites got to 7/5 differing but none reproduced it.
 0801A6D0	sub_0801A6D0	clean	1	Cleared by the ZeroFill8 concession-ok(volatile) in include/global.h (its only concession); unit still matches.
 08043FB0	ContactSwarm_InitializeSlot	clean	1	Cleared by the ZeroFill8 concession-ok(volatile) in include/global.h (its only concession); unit still matches.

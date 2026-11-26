@@ -1,6 +1,6 @@
 #include "scene/motion/scene_actor_displacement.h"
 #include "scene/motion/scene_actor_chase.h"
-#include "monsters/tentacle_spread.h"
+#include "monsters/centipede_spread.h"
 #include "monsters/slime.h"
 #include "scene/motion/scene_actor_turn.h"
 #include "scene/actor/scene_actor_visibility.h"
@@ -714,8 +714,8 @@ static inline u8 Slime_ApproachWanderTarget(struct ChaseActor *actor,
     if (dx || dz) {
         motion->direction = Math_Atan2(dx, dz);
         motion->motion.x +=
-            TentacleSpread_Shift(gUnk_086149C4[(motion->direction + 64) & 255] * speed, 12);
-        motion->motion.z += TentacleSpread_Shift(gUnk_086149C4[motion->direction] * speed, 12);
+            CentipedeSpread_Shift(gUnk_086149C4[(motion->direction + 64) & 255] * speed, 12);
+        motion->motion.z += CentipedeSpread_Shift(gUnk_086149C4[motion->direction] * speed, 12);
     }
     return 0;
 }
@@ -1896,7 +1896,7 @@ s32 Slime_Init(void *object)
         res = ScriptProc_Start(0xCB05, 0xB96C);
         *(struct DisplayResourceHeader *)heap = *(struct DisplayResourceHeader *)res;
         ResourceHeader_Relocate(heap, res);
-        Widget_InitLinked((void *)&((struct SceneActorAnimationTileDrawable *)heap)->tile, heap, 0,
+        AnimSprite_InitLinked((void *)&((struct SceneActorAnimationTileDrawable *)heap)->tile, heap, 0,
                           0, 2, 2, 0x3C, &tmp);
         actor->base.animationIndex = 0xFF;
     }

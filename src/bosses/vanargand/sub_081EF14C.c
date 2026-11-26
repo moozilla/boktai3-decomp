@@ -2,10 +2,10 @@
 
 void SceneActors_UpdateIdleDisplay(void);
 
-void SceneActors_EnterIdleState(struct Slot7Transition *actor)
+void SceneActors_EnterIdleState(struct VanargandHeadTransition *actor)
 {
-    if (Slot7_TakeActionEntry(actor) == TRUE) {
-        Slot7_TransitionTo(actor, SceneActors_UpdateIdleDisplay);
+    if (VanargandHead_TakeActionEntry(actor) == TRUE) {
+        VanargandHead_TransitionTo(actor, SceneActors_UpdateIdleDisplay);
     }
     actor->actionTimer++;
 }

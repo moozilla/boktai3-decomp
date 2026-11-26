@@ -13,7 +13,7 @@ They now have no errors or warnings, with compiler diagnostics enabled.
 - `sub_080148CC` needs no volatility on either its particle flags or the flag
   helper. Removing both qualifiers preserves the exact function.
 - The effect pool uses an ordinary occupancy word. Its allocator has the same
-  instruction sequence as `SceneMovingParticle_AllocateEntry`; that sibling's
+  instruction sequence as `DebrisMote_AllocateEntry`; that sibling's
   ordinary indexed loop replaces the volatile pointer, constant temporary, and
   address-dereference expression. All 16 functions in the unit still match.
 - `SceneMenu_WaitForConfirmation` uses an ordinary bounded `for` loop and passes

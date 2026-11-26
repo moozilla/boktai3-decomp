@@ -6,7 +6,7 @@ Branch cloud/depin-manual-4b. List: wip/depin_list4.tsv (40 functions). Method: 
 
 * sub_0808E780: depin.py alone (the `+r` barrier on q was unneeded).
 * Wireless_OnChildTransferEvent (0803614C): by hand. `*slots |= (u8)gUnk_03005390.code;` directly (no pinned r1 temp); drop the pinned `key` copy and use the u8 parameter `command` for the late 0xF2/0xFF compares.
-* BouncingObject_UpdatePool (08069510): permuter. Reuse the `offset` local as the return value: `offset = 0;` after computing guard, `return offset;`.
+* BouncingBomb_UpdatePool (08069510): permuter. Reuse the `offset` local as the return value: `offset = 0;` after computing guard, `return offset;`.
 * SceneHud_AnimateActionResult (0816F340): permuter. `short index;` and the mode constant 1 via `u16 k2 = 1; mode = k2;`.
 * ActorAttachment_UpdateValueFrame (08065904): permuter. `s16 new_var; new_var = *value; current = new_var;`.
 * Shop_BeginConsumableRemoveMove / SpecialMove (0806097C, 08060B94): permuter. `start[1].x` through the local pointer but `starts[1].y/.z` through the array.

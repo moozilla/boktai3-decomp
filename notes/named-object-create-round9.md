@@ -1,4 +1,4 @@
-# NamedObject_CreateFromScript
+# MovingPlatform_CreateFromScript
 
 All 1,856 bytes match with stock agbcc. The final player and tether flag writes
 use a halfword mask and the named object's flags field. This gives both writes

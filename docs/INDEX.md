@@ -252,13 +252,13 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [gcl/examples/scale_quiz.md](../gcl/examples/scale_quiz.md) | Worked example: the Blackbeard Brothers' scale quiz | *#scripts #assets #tooling* | 10 |
 | [gcl/examples/sealed_prison.md](../gcl/examples/sealed_prison.md) | Worked example: the Sealed Prison, the first dungeon | *#scripts #assets #tooling* | 6 |
 | [notes/actor-contact-target-draft.md](../notes/actor-contact-target-draft.md) | Contact target and damage update | #scene-actors #matching | 1 |
-| [notes/actor-controller-init-round9.md](../notes/actor-controller-init-round9.md) | Actor_InitializeController | *#assets* | 0 |
+| [notes/actor-controller-init-round9.md](../notes/actor-controller-init-round9.md) | TutorialOtenko_InitializeController | *#assets* | 0 |
 | [notes/actor-damage-particle-bursts.md](../notes/actor-damage-particle-bursts.md) | Hit reaction particle bursts | #scene-actors #matching | 1 |
 | [notes/actor-glyph-trail_2026-11-01.md](../notes/actor-glyph-trail_2026-11-01.md) | Actor glyph trail | *#actors* | 0 |
-| [notes/actor-interaction-child-recovery.md](../notes/actor-interaction-child-recovery.md) | Actor_ConfigureInteractionChildFromScript | *#scripts #assets* | 1 |
+| [notes/actor-interaction-child-recovery.md](../notes/actor-interaction-child-recovery.md) | TutorialOtenko_ConfigureInteractionChildFromScript | *#scripts #assets* | 1 |
 | [notes/actor-marker-launch-fragments_2026-11-01.md](../notes/actor-marker-launch-fragments_2026-11-01.md) | ActorMarker_LaunchFragments (08181514) | #matching #actor-marker #compiler | 1 |
-| [notes/actor-move-toward-target-round9.md](../notes/actor-move-toward-target-round9.md) | Actor_MoveTowardTarget | *#animation #assets* | 0 |
-| [notes/actor-region-children-round9.md](../notes/actor-region-children-round9.md) | Actor_UpdateRegionChildren | *#assets* | 0 |
+| [notes/actor-move-toward-target-round9.md](../notes/actor-move-toward-target-round9.md) | TutorialOtenko_MoveTowardTarget | *#animation #assets* | 0 |
+| [notes/actor-region-children-round9.md](../notes/actor-region-children-round9.md) | TutorialOtenko_UpdateRegionChildren | *#assets* | 0 |
 | [notes/actor_animation_controller.md](../notes/actor_animation_controller.md) | Actor animation controller (081E34D0-081EAB64) | *#actors #animation #assets #tooling* | 8 |
 | [notes/actor_graphics_and_basic_states.md](../notes/actor_graphics_and_basic_states.md) | Actor graphics and basic states (08021EA8-08024F2C) | #actors #animation | 8 |
 | [notes/animation-contact-burst_2026-10-14.md](../notes/animation-contact-burst_2026-10-14.md) | Temporary animations and contact-burst effect, October 14 | *#particles #animation* | 7 |
@@ -271,7 +271,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [notes/background-palette-fade_2026-11-01.md](../notes/background-palette-fade_2026-11-01.md) | Background palette fade | *#assets* | 0 |
 | [notes/bee-cleanup_2026-11-13.md](../notes/bee-cleanup_2026-11-13.md) | Bee cleanup draft | #monsters #cleanup #bee #volatile | 2 |
 | [notes/bk.md](../notes/bk.md) | bk notes (backlog retry, 45 matches) |  | 5 |
-| [notes/bouncing-object-active-round9.md](../notes/bouncing-object-active-round9.md) | BouncingObject_TickActive | #matching #round9b #bouncing-object | 1 |
+| [notes/bouncing-object-active-round9.md](../notes/bouncing-object-active-round9.md) | BouncingBomb_TickActive | #matching #round9b #bouncing-object | 1 |
 | [notes/breakable-prop_2026-10-14.md](../notes/breakable-prop_2026-10-14.md) | Breakable prop, 080515C0–08051A3C | *#particles* | 2 |
 | [notes/cell-gates_2026-10-14.md](../notes/cell-gates_2026-10-14.md) | Cell-based traversal gates and the preceding script entry | *#scripts* | 4 |
 | [notes/cgb.md](../notes/cgb.md) | CgbSound (0x08230AC8) | *#sound* | 3 |
@@ -404,9 +404,9 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [notes/monster_init_shared_groups_2026-10-30.md](../notes/monster_init_shared_groups_2026-10-30.md) | Shared monster initialization groups | *#actors* | 4 |
 | [notes/monsters-units_2026-11-13.md](../notes/monsters-units_2026-11-13.md) | Monsters unit cleanup | #monsters #cleanup #ghoul #slime | 4 |
 | [notes/monsters2-source-recovery_2026-11-20.md](../notes/monsters2-source-recovery_2026-11-20.md) | Golem through Axe source recovery | #monsters #matching #compiler #phase3 #structs | 1 |
-| [notes/named-actor-move-mode-round9.md](../notes/named-actor-move-mode-round9.md) | NamedActor_SetMoveModeFromScript | #matching #round9b #named-object | 0 |
-| [notes/named-object-create-round9.md](../notes/named-object-create-round9.md) | NamedObject_CreateFromScript | #matching #round9b #named-object | 1 |
-| [notes/native-effect-profile-round9.md](../notes/native-effect-profile-round9.md) | NativeEffect_CreateFromProfile |  | 1 |
+| [notes/named-actor-move-mode-round9.md](../notes/named-actor-move-mode-round9.md) | MovingPlatformActor_SetMoveModeFromScript | #matching #round9b #named-object | 0 |
+| [notes/named-object-create-round9.md](../notes/named-object-create-round9.md) | MovingPlatform_CreateFromScript | #matching #round9b #named-object | 1 |
+| [notes/native-effect-profile-round9.md](../notes/native-effect-profile-round9.md) | ProjectileEffect_CreateFromProfile |  | 1 |
 | [notes/nav-mesh-route-round9.md](../notes/nav-mesh-route-round9.md) | NavMesh_FindRoute |  | 1 |
 | [notes/nidhoggr-init-parts-match.md](../notes/nidhoggr-init-parts-match.md) | Nidhoggr_InitParts (081940F8) | #matching #nidhoggr #cse #reload | 1 |
 | [notes/nidhoggr-restored-collider-ranges.md](../notes/nidhoggr-restored-collider-ranges.md) | Nidhoggr restored collider ranges | #matching #nidhoggr #register-allocation | 1 |
@@ -452,7 +452,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [notes/push20-low.md](../notes/push20-low.md) | Push20 low range |  | 14 |
 | [notes/push20-mid.md](../notes/push20-mid.md) | Push20 mid-range worker | *#text* | 10 |
 | [notes/push20-root.md](../notes/push20-root.md) | Push toward 20%: parent matches |  | 8 |
-| [notes/region-actor-behavior-round9.md](../notes/region-actor-behavior-round9.md) | RegionActor_UpdateBehaviorAnimation | *#animation #assets* | 0 |
+| [notes/region-actor-behavior-round9.md](../notes/region-actor-behavior-round9.md) | IceBoulder_UpdateBehaviorAnimation | *#animation #assets* | 0 |
 | [notes/registry-callback-updater_2026-11-01.md](../notes/registry-callback-updater_2026-11-01.md) | SceneActorRegistry_UpdateActors | *#particles* | 2 |
 | [notes/registry-particle-burst.md](../notes/registry-particle-burst.md) | Registry update and contact particles | #scene-actors #matching | 0 |
 | [notes/registry_terrain_reactions.md](../notes/registry_terrain_reactions.md) | Registered actor terrain reactions | #matching #scene-actors | 0 |
@@ -664,7 +664,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [notes/tether-roaming-states_2026-10-14.md](../notes/tether-roaming-states_2026-10-14.md) | Tether roaming, recovery and lifecycle states | *#actors #tether* | 6 |
 | [notes/tether-world-states_2026-10-14.md](../notes/tether-world-states_2026-10-14.md) | Tether world position, player boundary and state callbacks | *#actors #tether* | 6 |
 | [notes/tether_actor.md](../notes/tether_actor.md) | Tether actor unit consolidation | #tether-actor #unit #matching #types | 5 |
-| [notes/tile-trigger-press-round9.md](../notes/tile-trigger-press-round9.md) | TileTrigger_StepPress | *#assets* | 1 |
+| [notes/tile-trigger-press-round9.md](../notes/tile-trigger-press-round9.md) | FloorTrap_StepPress | *#assets* | 1 |
 | [notes/tilemap-stream-columns-round9.md](../notes/tilemap-stream-columns-round9.md) | TilemapPanel_StreamColumns |  | 0 |
 | [notes/uncounted-concessions_2026-11-16.md](../notes/uncounted-concessions_2026-11-16.md) | Steering C the concession scanner does not count (first sweep) | #concessions #phase3 #phase4 #tooling | 4 |
 | [notes/unit-context-sensitivity_2026-11-16.md](../notes/unit-context-sensitivity_2026-11-16.md) | Functions that match alone but not inside a unit | #units #selector-macros #scene-actors | 7 |

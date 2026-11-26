@@ -14,7 +14,7 @@ exports.movingFloors = () => {
   return floors;
 };
 
-// NamedObject_RegisterFollowCells temporarily gives these cells a floor.
+// MovingPlatform_RegisterFollowCells temporarily gives these cells a floor.
 // Check the authored cells so a moving platform does not look like a bridge.
 function floorGaps(grid) {
   const cells = $.gTerrainMap.cells;

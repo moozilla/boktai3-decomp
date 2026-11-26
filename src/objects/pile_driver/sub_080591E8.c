@@ -1,7 +1,7 @@
 #include "objects/pile_driver/pile_driver_schedule.h"
-void PileDriver_TickHandlePosition(struct ScenePanel *input)
+void PileDriver_TickHandlePosition(struct PileDriver *input)
 {
-    struct ScenePanelScheduleView *panel = (void *)input;
+    struct PileDriverScheduleView *panel = (void *)input;
     if (++panel->frame >= panel->interval) {
         Math_Atan2(gGameState->positionX - panel->origin.x,
                    gGameState->positionZ - panel->origin.z);

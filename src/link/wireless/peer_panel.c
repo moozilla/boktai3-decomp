@@ -109,7 +109,7 @@ int WirelessPeerPanel_Init(struct WirelessPeerMenu *owner, struct WirelessPeerPa
     {
         int i;
         for (i = 0; i < 5; i++)
-            Widget_InitLinked(&panelState->digits[i], &owner->digitResource, 0, 17, 1, 0, 60, NULL);
+            AnimSprite_InitLinked(&panelState->digits[i], &owner->digitResource, 0, 17, 1, 0, 60, NULL);
     }
     panelState->active = 0;
     panelState->name[0] = 0;

@@ -1,7 +1,7 @@
 #include "global.h"
 #include "minigames/coffin_bike/coffin_bike.h"
-void CoffinBike_UpdateStopping(struct Glove *);
-void CoffinBike_BeginStopping(struct Glove *s)
+void CoffinBike_UpdateStopping(struct CoffinBike *);
+void CoffinBike_BeginStopping(struct CoffinBike *s)
 {
     void (*f)(void *) = (void (*)(void *))CoffinBike_UpdateStopping;
     u8 *p = &s->active;

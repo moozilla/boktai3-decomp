@@ -1,4 +1,4 @@
-# NamedActor_SetMoveModeFromScript
+# MovingPlatformActor_SetMoveModeFromScript
 
 All 136 bytes match. The two flags are updated through the shared halfword
 helpers. In mode four, the separate clear and set collapse to one store, while

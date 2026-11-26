@@ -40,7 +40,7 @@ static inline int CellIndex(struct ContactPosition *p)
         return 0xffff;
     return gTerrainMap->rows[z] + x;
 }
-struct Manager *ParticleManager_Create(void *, u32);
+struct Manager *ImpactParticleManager_Create(void *, u32);
 s32 Mod(s32, s32);
 void sub_08217E40(void *, s32);
 struct SpawnArgs {
@@ -84,7 +84,7 @@ static inline s32 SpawnInline(s32 count, s32 options, const struct ContactPositi
     u8 *resource;
     u16 *randomTable;
     if (!m) {
-        m = ParticleManager_Create(0, 0);
+        m = ImpactParticleManager_Create(0, 0);
         if (!m)
             return -1;
     }

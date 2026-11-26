@@ -43,14 +43,14 @@ Coordinates wrap through sixteen-bit storage; padding is preserved.
 - **08048CB0 point:** clones the caller's packed position, then applies RNG
   offsets **x/z [-15,+16]**, **y [-79,-16]**. Its second parameter is a
   **particle-configuration pointer**, forwarded to
-  **`AnimatedParticles_Create(1, &position, config)`**. It creates one
+  **`ImpactBurst_Create(1, &position, config)`**. It creates one
   animated particle; the factory may consume further RNG samples according
   to that configuration. The original signed y is retained in the cached
   xy word while x/z jitter wraps through halfword storage.
 
 The fast checker initially accepted the old numeric name `sub_080154EC` by
 address, while full linking requires the existing canonical name
-`AnimatedParticles_Create`. Full-build review exposed this and also clarified
+`ImpactBurst_Create`. Full-build review exposed this and also clarified
 the configuration-pointer contract. Both are corrected and revalidated.
 
 ## Palette and glow

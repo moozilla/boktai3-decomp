@@ -30,7 +30,7 @@ void SceneInputPanel_InitWidgets(struct SceneInputPanel *owner, s32 mode)
         initialPosition = &position;
         {
             register u32 zero = 0;
-            Widget_InitLinked(&panel->indicator, &panel->widgetResource, gUnk_0824DEEA[mode], 0x30,
+            AnimSprite_InitLinked(&panel->indicator, &panel->widgetResource, gUnk_0824DEEA[mode], 0x30,
                               zero, zero, 60, initialPosition);
         }
     }
@@ -150,11 +150,11 @@ void SceneInputPanel_InitWidgets(struct SceneInputPanel *owner, s32 mode)
         {
             struct AnimSprite *modeWidget = &panel->mode;
             widgets = &panel->widgetResource;
-            Widget_InitLinked(modeWidget, widgets, gUnk_0824DEF4[mode], 0x30, 0, 0, 60, &position);
+            AnimSprite_InitLinked(modeWidget, widgets, gUnk_0824DEF4[mode], 0x30, 0, 0, 60, &position);
         }
-        Widget_InitLinked(&panel->valueA, widgets, 0x41, 0x31, 0, 0, 60, &position);
+        AnimSprite_InitLinked(&panel->valueA, widgets, 0x41, 0x31, 0, 0, 60, &position);
         position.x = 8;
-        Widget_InitLinked(&panel->valueB, widgets, 0x42, 0x31, 0, 0, 60, &position);
+        AnimSprite_InitLinked(&panel->valueB, widgets, 0x42, 0x31, 0, 0, 60, &position);
         {
             u32 cachedMode;
             struct AnimSpriteResource *lateResource;
@@ -172,56 +172,56 @@ void SceneInputPanel_InitWidgets(struct SceneInputPanel *owner, s32 mode)
             for (i = 0; i <= 15; i++) {
                 position.x = (i & 3) * 24 + 112;
                 position.y = (i >> 2) * 24 + 32;
-                Widget_InitLinked(&panel->primary[i], grid, 0x151, 0x31, 0, 0, 60, &position);
+                AnimSprite_InitLinked(&panel->primary[i], grid, 0x151, 0x31, 0, 0, 60, &position);
             }
             for (i = 0; i <= 7; i++) {
                 position.x = (i & 3) * 24 + 8;
                 position.y = (i >> 2) * 24 + 32;
-                Widget_InitLinked(&panel->secondary[i], grid, 0x151, 0x31, 0, 0, 60, &position);
+                AnimSprite_InitLinked(&panel->secondary[i], grid, 0x151, 0x31, 0, 0, 60, &position);
             }
             position.x = 0;
             position.y = 128;
-            Widget_InitLinked(&panel->banner, grid, 0x189, 0x31, 0, 0, 60, &position);
+            AnimSprite_InitLinked(&panel->banner, grid, 0x189, 0x31, 0, 0, 60, &position);
             position.x = 216;
             position.y = 56;
-            Widget_InitLinked(&panel->buttons[1], grid, 0x192, 0x30, 0, 0, 60, &position);
+            AnimSprite_InitLinked(&panel->buttons[1], grid, 0x192, 0x30, 0, 0, 60, &position);
             position.x = 216;
             position.y = 80;
-            Widget_InitLinked(&panel->buttons[2], grid, 0x191, 0x30, 0, 0, 60, &position);
+            AnimSprite_InitLinked(&panel->buttons[2], grid, 0x191, 0x30, 0, 0, 60, &position);
             position.x = 216;
             position.y = 32;
-            Widget_InitLinked(&panel->buttons[0], grid, 0x18F, 0x30, 0, 0, 60, &position);
+            AnimSprite_InitLinked(&panel->buttons[0], grid, 0x18F, 0x30, 0, 0, 60, &position);
             position.x = 216;
             position.y = 104;
-            Widget_InitLinked(&panel->buttons[3], grid, 0x190, 0x30, 0, 0, 60, &position);
-            Widget_InitLinked(&panel->category, lateResource, 0x4E, 0x31, 0, 0, 60, &position);
+            AnimSprite_InitLinked(&panel->buttons[3], grid, 0x190, 0x30, 0, 0, 60, &position);
+            AnimSprite_InitLinked(&panel->category, lateResource, 0x4E, 0x31, 0, 0, 60, &position);
             position.x = 112;
             position.y = 32;
-            Widget_InitLinked(&panel->compareA, lateResource, 0x4D, 0x31, 0, 0, 60, &position);
+            AnimSprite_InitLinked(&panel->compareA, lateResource, 0x4D, 0x31, 0, 0, 60, &position);
             position.x = 216;
             position.y = 32;
-            Widget_InitLinked(&panel->modeCursor, lateResource, 0x4D, 0x30, 0, 0, 60, &position);
+            AnimSprite_InitLinked(&panel->modeCursor, lateResource, 0x4D, 0x30, 0, 0, 60, &position);
             position.x = 0;
             position.y = 0;
-            Widget_InitLinked(&panel->heading, lateResource,
+            AnimSprite_InitLinked(&panel->heading, lateResource,
                               *(const u16 *)((const u8 *)gUnk_0824DEE0 + cachedMode), 0x30, 0, 0,
                               60, &position);
             position.x = 8;
             position.y = 0;
-            Widget_InitLinked(&panel->valueLabel, lateResource, 0x40, 0x30, 0, 0, 60, &position);
+            AnimSprite_InitLinked(&panel->valueLabel, lateResource, 0x40, 0x30, 0, 0, 60, &position);
             position.x = 0;
             position.y = 0;
-            Widget_InitLinked(&panel->glyph, lateResource, 0x67, 0x30, 0, 0, 60, &position);
+            AnimSprite_InitLinked(&panel->glyph, lateResource, 0x67, 0x30, 0, 0, 60, &position);
             position.x = 56;
             position.y = 0;
-            Widget_InitLinked(&panel->meterGlyph, lateResource, 0x68, 0x30, 0, 0, 60, &position);
+            AnimSprite_InitLinked(&panel->meterGlyph, lateResource, 0x68, 0x30, 0, 0, 60, &position);
             {
                 u32 cachedPriority;
                 {
                     u32 zero = 0;
                     struct AnimSprite *widget = panel->digits;
                     for (i = 7; i >= 0; i--) {
-                        Widget_InitLinked(widget, lateResource, 0x50, 0x30, zero, zero, ({
+                        AnimSprite_InitLinked(widget, lateResource, 0x50, 0x30, zero, zero, ({
                                               register u32 priority = 60;
                                               cachedPriority = priority;
                                               priority;
@@ -234,7 +234,7 @@ void SceneInputPanel_InitWidgets(struct SceneInputPanel *owner, s32 mode)
                     }
                 }
                 {
-                    Widget_InitLinked(({
+                    AnimSprite_InitLinked(({
                                           register u32 offset =
                                               (u32) & ((struct SceneInputPanel *)0)->numericLabel;
                                           (void *)((u32)panel + offset);
@@ -269,7 +269,7 @@ void SceneInputPanel_InitWidgets(struct SceneInputPanel *owner, s32 mode)
                     }
                     zero = 0;
                     for (i = 3; i >= 0; i--) {
-                        Widget_InitLinked(widget, lateResource, 0xAA, 0x31, zero, zero, ({
+                        AnimSprite_InitLinked(widget, lateResource, 0xAA, 0x31, zero, zero, ({
                                               register u32 priority = 60;
                                               cachedPriority = priority;
                                               priority;
@@ -288,7 +288,7 @@ void SceneInputPanel_InitWidgets(struct SceneInputPanel *owner, s32 mode)
                     position.x = 0;
                     out = &position;
                     out->y = 0;
-                    Widget_InitLinked(({
+                    AnimSprite_InitLinked(({
                                           u32 offset =
                                               (u32) & ((struct SceneInputPanel *)0)->prompt;
                                           (void *)((u32)panel + offset);

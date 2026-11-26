@@ -5,7 +5,7 @@ void Tentacle_FireSecondaryAttack(u8 *);
 void ActorTrail_UpdateTimedScale(u8 *);
 void SpritePool_FlagEntries(u8 *);
 void Centipede_ShiftSegmentTrail(u8 *);
-void sub_080AAA90(u8 *);
+void Centipede_UpdateSegmentImpulses(u8 *);
 void Centipede_AlignSegmentsToTerrain(u8 *);
 void Centipede_ResolveBlockedMovement(u8 *);
 
@@ -17,7 +17,7 @@ s32 Centipede_UpdateComponents(u8 *p)
     ActorTrail_UpdateTimedScale(p);
     SpritePool_FlagEntries(p);
     Centipede_ShiftSegmentTrail(p);
-    sub_080AAA90(p);
+    Centipede_UpdateSegmentImpulses(p);
     Centipede_AlignSegmentsToTerrain(p);
     Centipede_ResolveBlockedMovement(p);
     timer = (s16 *)(p + 0x8d6);

@@ -39,6 +39,6 @@ struct ContactPosition *Player_GetEffectivePosition(s32);
 void Collider_SetAttackPowerAndForce(void *, s32, s32);
 void Collider_SetAttackProperties(void *, s32, s32, s32, s32, s32);
 u8 *TerrainModifiers_FindCellOverride(s32, s32);
-void AnimatedParticles_EmitOffset(void *, s32, s32, s32, s32, s32, s32, s32);
+void ImpactBurst_EmitOffset(void *, s32, s32, s32, s32, s32, s32, s32);
 
 #endif

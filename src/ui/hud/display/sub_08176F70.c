@@ -3,7 +3,7 @@
 #include "engine/video/display_sequence.h"
 
 void CpuSet(const void *src, void *dst, u32 control);
-s32 Widget_InitLinked(void *, void *, u16, u32, u32, u32, u32, const void *);
+s32 AnimSprite_InitLinked(void *, void *, u16, u32, u32, u32, u32, const void *);
 s32 Anim_LoadKeyframe(void *, void *, u16, u8);
 void Anim_SetKeyframes(void *, void *, u16, u16, u16);
 u32 Anim_SetSequence(void *, void *, u16, u8, u8);
@@ -13,7 +13,7 @@ void Sprite_Init(void *, void *, u32);
 void AnimData_SelectPaletteBank(void *, s32);
 
 #define WI(w, par, id, type, a, b, pos)                                                            \
-    Widget_InitLinked((w), (par), (id), (type), (a), (b), 60, (pos))
+    AnimSprite_InitLinked((w), (par), (id), (type), (a), (b), 60, (pos))
 
 struct HudAnimation {
     u8 *cmds;
@@ -149,7 +149,7 @@ struct HudLayout {
 static inline s32 HudLayout_InitWidget(struct HudLayout *p, s32 index, void *par, u32 id, u32 type,
                                        u32 a, u32 b, const void *pos)
 {
-    return Widget_InitLinked(&p->widgets[index], par, id, type, a, b, 60, pos);
+    return AnimSprite_InitLinked(&p->widgets[index], par, id, type, a, b, 60, pos);
 }
 
 static inline void ClearPosition(u32 value, struct HudPosition *position)
@@ -332,8 +332,8 @@ void sub_08176F70(struct HudLayout *p)
     {
         struct HudWidget *unlock = &p->compareUnlock;
         w = p->comparisonResource;
-        Widget_InitLinked(unlock, w, 2, 0x91, 0, 0, 0, 0);
+        AnimSprite_InitLinked(unlock, w, 2, 0x91, 0, 0, 0, 0);
     }
-    Widget_InitLinked(&p->compareAction, w, 0, 0x91, 0, 0, 0, 0);
+    AnimSprite_InitLinked(&p->compareAction, w, 0, 0x91, 0, 0, 0, 0);
     CpuSet(gPaletteBankData + 0x7540, p->palette, 0x04000008);
 }

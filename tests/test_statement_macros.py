@@ -137,5 +137,6 @@ class RepoMacros(unittest.TestCase):
                                            ROOT / "src/fn/zz_none.c", ROOT)
         self.assertEqual(got, ["ZZ_W"])
 
+
 if __name__ == "__main__":
     unittest.main()

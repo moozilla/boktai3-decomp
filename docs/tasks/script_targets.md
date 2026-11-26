@@ -14,13 +14,13 @@ handlers; their callees are found through `bl` calls and Thumb function pointers
 
 | Uses | Address | Bytes | Function | Script name | GCL name |
 |---:|---|---:|---|---|---|
-| 5 | `08103110` | 1856 | `NamedObject_CreateFromScript` | registry A4FC |  |
+| 5 | `08103110` | 1856 | `MovingPlatform_CreateFromScript` | registry A4FC |  |
 | 4 | `08111A48` | 380 | `PaletteFade_StartFromScript` | registry 734C |  |
 | 4 | `0815A680` | 116 | `ScriptActor_TestFlagFromScript` | registry 440F |  |
 | 3 | `08104350` | 1016 | `sub_08104350` | registry F1F9 |  |
 | 3 | `0815A838` | 52 | `ScriptActor_GetField534FromScript` | registry 0E15 |  |
 | 2 | `0810067C` | 700 | `FloorSwitch_Create` | registry AB8E |  |
-| 2 | `08103B94` | 136 | `NamedActor_SetMoveModeFromScript` | registry 7E33 |  |
+| 2 | `08103B94` | 136 | `MovingPlatformActor_SetMoveModeFromScript` | registry 7E33 |  |
 | 2 | `081803D8` | 176 | `Sabata_AdvanceStepFromScript` | registry 4EC9 |  |
 | 2 | `0820A5CC` | 1392 | `sub_0820A5CC` | registry 056E |  |
 | 1 | `0806F5C0` | 412 | `SceneEffectSchedule_AddFromScript` | registry FD6B |  |
@@ -43,5 +43,5 @@ handlers; their callees are found through `bl` calls and Thumb function pointers
 | 2 | `082215E4` | 276 | `Math_Atan2` |
 | 2 | `0821E5C4` | 84 | `Route_Start` |
 | 2 | `082161B4` | 736 | `Bg_SetupLayers` |
-| 2 | `081D2A38` | 740 | `TaggedSceneNpc_Create` |
+| 2 | `081D2A38` | 740 | `Kuro_Create` |
 | 2 | `0824923C` | 4 | `_call_via_r1` |

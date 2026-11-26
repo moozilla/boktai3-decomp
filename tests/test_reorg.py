@@ -82,6 +82,29 @@ class ReorgTests(unittest.TestCase):
             reorg.header_destination(Path("include/shared.h"), {}, set(),
                                      {"shared": {Path("include/scene"), Path("include/ui")}}, {})
 
+    def test_replays_legacy_links_after_a_source_basename_changes(self):
+        legacy = "src/fn/sub_08001000.c"
+        earlier = "src/scene/actor/sub_08001000.c"
+        active = "src/scene/actor/Actor_Move.c"
+        guide = "docs/example.md"
+        files = {
+            "symbols/functions.csv": "addr,name\n08001000,Actor_Move\n",
+            "symbols/source_dirs.csv": "current_path,new_path,note\n"
+            "src/actors/mover,src/scene/actor,fixture\n",
+            "symbols/source_files.csv": "original_path,current_path,rule,filename,start,end\n"
+            f"{legacy},src/actors/mover/sub_08001000.c,src/actors/mover,sub_08001000.c,08001000,08001020\n",
+            "symbols/header_dirs.csv": "current_path,new_path,note\n",
+            active: "void Actor_Move(void) {}\n",
+            guide: f"[Flat](../{legacy}) and [Nested](../{earlier}).\n",
+        }
+        with fixture(files) as root:
+            self.assertEqual(reorg.migrate(), 1)
+            self.assertEqual((root / guide).read_text(), files[guide])
+            self.assertEqual(reorg.migrate(apply=True), 1)
+            self.assertEqual((root / guide).read_text(), f"[Flat](../{active}) and [Nested](../{active}).\n")
+            self.assertEqual((root / active).read_text(), files[active])
+            self.assertEqual(reorg.migrate(), 0)
+
     def test_address_renames_are_simultaneous_and_keep_source_basenames(self):
         files = {
             "symbols/functions.csv": "addr,name\n08001000,Old_Thing\n08001020,New_Thing\n",
@@ -120,6 +143,67 @@ class ReorgTests(unittest.TestCase):
             self.assertEqual(reorg.function_renames(table, prefixes=True, apply=True), 3)
             self.assertEqual(reorg.function_renames(table, prefixes=True, apply=True), 0)
             self.assertIn("void Npc_Two(void) { Player_One(); }", (root / "src/npc/two.c").read_text())
+
+    def test_exact_replay_accepts_prior_names_and_reports_branch_names(self):
+        table_path = "symbols/function_renames.csv"
+        files = {
+            "symbols/functions.csv": "addr,name\n08001000,Interim_Run\n08001020,Branch_Run\n",
+            "src/engine/run.c": "void Interim_Run(void) { Branch_Run(); }\n",
+            table_path: "addr,old_name,new_name,prior_names\n"
+            "08001000,Old_Run,Final_Run,Interim_Run\n"
+            "08001020,Other_Run,Reviewed_Run,\n",
+        }
+        with fixture(files) as root, contextlib.redirect_stderr(io.StringIO()) as messages:
+            table = root / table_path
+            with self.assertRaisesRegex(ValueError, "08001020.*Branch_Run"):
+                reorg.function_renames(table, apply=True)
+            self.assertEqual(reorg.function_renames(table, apply=True, skip_diverged=True), 2)
+            self.assertIn("skip", messages.getvalue())
+            self.assertIn("08001020 is 'Branch_Run'", messages.getvalue())
+            self.assertIn("void Final_Run(void) { Branch_Run(); }", (root / "src/engine/run.c").read_text())
+            self.assertEqual(reorg.function_renames(table, skip_diverged=True), 0)
+
+    def test_scoped_helpers_and_types_do_not_change_another_owner(self):
+        player, npc = "src/player/local.c", "src/npc/local.c"
+        body = ("struct SharedSprite;\nstatic void Shared_Helper(struct SharedSprite *it) {}\n"
+                "static void Shared_Step(void) {}\n")
+        files = {
+            player: body,
+            npc: body,
+            "symbols/functions.csv": "addr,name\n",
+            "symbols/prefix_renames.csv": "old_prefix,new_prefix,scope\nShared_,Player_,src/player/\n"
+            "Shared_Helper,Player_HandleSprite,src/player/local.c\n",
+            "symbols/type_renames.csv": "old_name,new_name,scope\nSharedSprite,PlayerSprite,src/player/\n",
+        }
+        with fixture(files) as root:
+            prefixes = root / "symbols/prefix_renames.csv"
+            types = root / "symbols/type_renames.csv"
+            self.assertEqual(reorg.function_renames(prefixes, prefixes=True, apply=True), 1)
+            self.assertEqual(reorg.type_renames(types, apply=True), 1)
+            self.assertEqual(reorg.function_renames(prefixes, prefixes=True), 0)
+            self.assertEqual(reorg.type_renames(types), 0)
+            self.assertEqual((root / npc).read_text(), body)
+            self.assertIn("Player_HandleSprite(struct PlayerSprite *it)", (root / player).read_text())
+            self.assertIn("Player_Step(void)", (root / player).read_text())
+
+    def test_prefix_replay_reports_collisions_and_leaves_audit_records(self):
+        path = "src/engine/probe.c"
+        audit = ["symbols/identities.csv", "symbols/identity_corrections.csv", "notes/identities.md"]
+        files = {
+            "symbols/functions.csv": "addr,name\n08001000,Old_Move\n08001020,New_Move\n08001040,Old_Step\n",
+            path: "struct OldBody;\nvoid Old_Move(void) {}\nvoid Old_Step(void) { Old_Move(); }\n",
+            "symbols/prefix_renames.csv": "old_prefix,new_prefix,scope\nOld_,New_,src/engine/\n",
+            **{name: "Old_Step\n" for name in audit},
+        }
+        with fixture(files) as root, contextlib.redirect_stderr(io.StringIO()) as messages:
+            table = root / "symbols/prefix_renames.csv"
+            self.assertEqual(reorg.function_renames(table, prefixes=True, apply=True,
+                                                   skip_collisions=True, warn_types=True), 2)
+            self.assertIn("Old_Move -> New_Move would collide", messages.getvalue())
+            self.assertIn("check legacy type OldBody", messages.getvalue())
+            self.assertIn("void New_Step(void) { Old_Move(); }", (root / path).read_text())
+            for name in audit:
+                self.assertEqual((root / name).read_text(), files[name])
 
     def test_type_renames_keep_related_identifiers_and_the_input_table_intact(self):
         path = "include/engine/video/sprite.h"

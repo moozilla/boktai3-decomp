@@ -1,4 +1,4 @@
-void Actor_UpdateFinishingAnimation(struct ActorAnimController *p)
+void TutorialOtenko_UpdateFinishingAnimation(struct ActorAnimController *p)
 {
     struct ActorSprite *o;
     struct ActorAnim *a;
@@ -79,7 +79,7 @@ void Actor_UpdateFinishingAnimation(struct ActorAnimController *p)
         Actor_SetState(p, 1, 2);
         {
             u32 active = 4;
-            register void (*fn)(void *, void *) = Actor_OnInteractionChildUpdate;
+            register void (*fn)(void *, void *) = TutorialOtenko_OnInteractionChildUpdate;
             u8 reset = 1;
             struct ActorChildCallbackView *child =
                 (struct ActorChildCallbackView *)&p->children[0].fn; 

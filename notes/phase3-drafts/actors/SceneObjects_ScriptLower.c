@@ -1,12 +1,12 @@
-#include "objects/scene_objects/scene_object_slot.h"
-void SceneObject_UpdateLowered(void);
-int SceneObjects_ScriptLower(void)
+#include "objects/scene_object_slot.h"
+void SlidingDoor_UpdateLowered(void);
+int SlidingDoors_ScriptLower(void)
 {
     u8 *p = ResourceRegistry_GetResource(0x85e6);
     int found;
     int i;
     int id;
-    void (*fn)(void) = SceneObject_UpdateLowered;
+    void (*fn)(void) = SlidingDoor_UpdateLowered;
     if (!p)
         return -1;
     found = 0;

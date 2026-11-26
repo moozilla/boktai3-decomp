@@ -15,7 +15,7 @@ struct Hud {
     u8 transition[0x61];
     u8 transitionState;
 };
-void Widget_InitLinked(void *, void *, int, int, int, int, int, void *);
+void AnimSprite_InitLinked(void *, void *, int, int, int, int, int, void *);
 void Hud_InitializePanelTransition(struct Hud *hud)
 {
     struct HudTransitionOffset offset;
@@ -23,12 +23,12 @@ void Hud_InitializePanelTransition(struct Hud *hud)
         offset.x = 0;
         offset.y = 0;
         offset.z = 0;
-        Widget_InitLinked(hud->transition, hud->alternate, 0x1c, 0x10031, 0, 0, 60, &offset);
+        AnimSprite_InitLinked(hud->transition, hud->alternate, 0x1c, 0x10031, 0, 0, 60, &offset);
     } else {
         offset.x = 8;
         offset.y = 32;
         offset.z = 0;
-        Widget_InitLinked(hud->transition, hud->primary, 0x68, 0x10031, 0, 0, 60, &offset);
+        AnimSprite_InitLinked(hud->transition, hud->primary, 0x68, 0x10031, 0, 0, 60, &offset);
         hud->transitionState = 0;
     }
 }

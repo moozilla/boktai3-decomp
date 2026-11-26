@@ -124,10 +124,10 @@ s32 ScreenMessage_Initialize(struct ScreenMessage *s)
         resource = ScriptProc_Start(0xCB05, 0x530D);
         obj = &s->choices[0].graphics;
         ResourceHeader_Relocate(obj, resource);
-        Widget_InitLinked(&s->choices[0].sprite, obj, 0x4B, 0x10, 0, 0, 0, 0);
+        AnimSprite_InitLinked(&s->choices[0].sprite, obj, 0x4B, 0x10, 0, 0, 0, 0);
         obj2 = &s->choices[1].graphics;
         ResourceHeader_Relocate(obj2, resource);
-        Widget_InitLinked(&s->choices[1].sprite, obj2, 0x4C, 0x10, 0, 0, 0, 0);
+        AnimSprite_InitLinked(&s->choices[1].sprite, obj2, 0x4C, 0x10, 0, 0, 0, 0);
         x = 0xFFF8;
         *(u16 *)&s->choices[0].sprite.position.x = x;
         *(u16 *)&s->choices[0].sprite.position.y = y = 0xFFC0;

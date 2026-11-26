@@ -1,4 +1,4 @@
-#define SceneSequence_SetPhase Hud_SetUpdateCallback
+#define MenuSequence_SetPhase Hud_SetUpdateCallback
 #include "global.h"
 struct SceneSequence {
     u8 unknown0[0xC4];

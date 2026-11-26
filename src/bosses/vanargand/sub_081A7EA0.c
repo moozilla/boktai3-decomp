@@ -13,7 +13,7 @@ struct ScenePanelPairReaction {
 };
 s32 ScenePair_CountPositiveCounters(void *);
 u32 Vanargand_IsEitherComponentFlag40Set(void *);
-static inline void ScenePanel_RequestReaction(struct ScenePanelPairReaction *panel, u32 mode,
+static inline void VanargandPair_RequestReaction(struct ScenePanelPairReaction *panel, u32 mode,
                                               u32 substate, u32 transition)
 {
     panel->mode = mode;
@@ -26,27 +26,27 @@ s32 VanargandPair_RequestPairReaction(struct ScenePanelPairReaction *panel)
 {
     u32 two = 2;
     if (panel->flags & two) {
-        ScenePanel_RequestReaction(panel, 1, 0, 6);
+        VanargandPair_RequestReaction(panel, 1, 0, 6);
         return 1;
     }
     if (panel->flags & 0x10000) {
-        ScenePanel_RequestReaction(panel, 1, 0, 3);
+        VanargandPair_RequestReaction(panel, 1, 0, 3);
         return 1;
     }
     if (panel->flags & 1) {
         if (ScenePair_CountPositiveCounters(panel->pair) == 0)
-            ScenePanel_RequestReaction(panel, 1, 0, 1);
+            VanargandPair_RequestReaction(panel, 1, 0, 1);
         else
-            ScenePanel_RequestReaction(panel, 1, 0, 0);
+            VanargandPair_RequestReaction(panel, 1, 0, 0);
         return 1;
     }
     if (Vanargand_IsEitherComponentFlag40Set(panel->pair)) {
-        ScenePanel_RequestReaction(panel, 0, 0, two);
+        VanargandPair_RequestReaction(panel, 0, 0, two);
         return 1;
     }
     if (ScenePair_CountPositiveCounters(panel->pair) == 0 && panel->pairMode != 1 &&
         panel->transition != 11 && panel->transition != 14 && panel->transition != 1) {
-        ScenePanel_RequestReaction(panel, 0, 0, 11);
+        VanargandPair_RequestReaction(panel, 0, 0, 11);
         return 1;
     }
     return 0;

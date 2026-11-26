@@ -59,7 +59,7 @@ void *Script_GetTextSourcePc(void);
 s32 MessageWindow_LoadPalette(void *, s32);
 void MessageWindow_ApplyPalette(void *);
 void Anim_SetKeyframes(void *, void *, u32, u32, u32);
-void Widget_InitLinked(void *, void *, u32, u32, u32, u32, s32, const void *);
+void AnimSprite_InitLinked(void *, void *, u32, u32, u32, u32, s32, const void *);
 
 // confidence=low: opens a message window from script keywords (bounds, palette, text source, value list) and starts its script, sprite and animation setup.
 int sub_0803198C(void *arg0, void *arg1)
@@ -136,7 +136,7 @@ int sub_0803198C(void *arg0, void *arg1)
     bufferMask = 0xFFFF0000;
     buf[0] = 0;
     buf[1] &= bufferMask;
-    Widget_InitLinked(p->widget, p->hdr, 0x3D, 0x3071, 0, 1, 0x3C, buf);
+    AnimSprite_InitLinked(p->widget, p->hdr, 0x3D, 0x3071, 0, 1, 0x3C, buf);
     Anim_SetKeyframes(p->widget, p->hdr, 0, 1, 0);
     AnimData_Load(p->animData, 0x593A);
     p->proc2C8 = ScriptProc_Start(0x922E, 0x4BBF);

@@ -15,7 +15,8 @@ inputs.
 
 The coordinator's batch inputs were `build/layout/corrections.csv` and
 `build/layout/prefix_renames.csv`. Their checked-in copies are
-`symbols/identity_corrections.csv` and `symbols/prefix_renames.csv`. Apply a prefix only within its listed source units. Several
+`symbols/identity_corrections.csv` and `symbols/identity_prefix_evidence.csv`
+(the applied, re-scoped table is `symbols/prefix_renames.csv`). Apply a prefix only within its listed source units. Several
 legacy prefixes also occur in unrelated parts of the ROM.
 
 ## Reproduce the capture

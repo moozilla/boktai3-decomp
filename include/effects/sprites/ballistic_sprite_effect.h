@@ -1,6 +1,6 @@
 #ifndef GUARD_BALLISTIC_SPRITE_EFFECT_H
 #define GUARD_BALLISTIC_SPRITE_EFFECT_H
-#include "effects/particles/particle_emitter.h"
+#include "effects/sprites/particle_emitter.h"
 #include "engine/task.h"
 
 struct BallisticSpriteEffectManager {

@@ -27,7 +27,7 @@ static inline void reverseMotion(struct Player *p, u16 *magnitude)
     p->velocityZ = -scale(gUnk_086149C4[angle] * p->directionFrame);
 }
 
-void RisingSprite_Spawn(void *);
+void RecoilPuff_Spawn(void *);
 void Camera_RequestShake(u32);
 void sub_08238238(void *);
 static inline s32 scale3(s32 v)
@@ -64,7 +64,7 @@ void Player_UpdateTetherRecoil(struct Player *p)
                 if (p->tetherFrame <= 5) {
                     if (!(p->tetherFrame & 1)) {
                         Player_PlayLocalSong(p->slot, 0x191);
-                        RisingSprite_Spawn(&p->position);
+                        RecoilPuff_Spawn(&p->position);
                     }
                     ++p->tetherFrame;
                 }

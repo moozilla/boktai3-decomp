@@ -5,12 +5,12 @@
 // (README fact 37), which keeps the 31 masks spilled as in the ROM. In the sprite loop the target
 // and destination are indexed, so loop.c creates their pointers after the hoisted masks and both
 // outrank them.
-void PileDriver_UpdateTimePalette(struct ScenePanelEffectsView *panel)
+void PileDriver_UpdateTimePalette(struct PileDriverEffectsView *panel)
 {
     u32 phase = SunClock_GetPhase();
     if (panel->timePhase != phase) {
         panel->timePhase = phase;
-        PileDriver_SelectTimePalette((struct ScenePanel *)panel, panel->timePhase);
+        PileDriver_SelectTimePalette((struct PileDriver *)panel, panel->timePhase);
     }
     if (panel->paletteBlendActive) {
         panel->channelsDirty = 1;
@@ -30,11 +30,11 @@ void PileDriver_UpdateTimePalette(struct ScenePanelEffectsView *panel)
             }
             panel->paletteBlendActive = 0;
             {
-                struct ScenePanelMainSprite *sprite = &panel->mainSprite;
+                struct PileDriverMainSprite *sprite = &panel->mainSprite;
                 if (PileDriver_IsSpriteVisible(sprite)) {
                     sprite->paletteFrame = PileDriver_AdvancePaletteFrame(sprite);
                     {
-                        struct ScenePanelGraphics *graphics = &sprite->graphics;
+                        struct PileDriverGraphics *graphics = &sprite->graphics;
                         u32 bank;
                         u32 paletteFrame;
                         bank = panel->targetPalette * 4;
@@ -106,13 +106,13 @@ void PileDriver_UpdateTimePalette(struct ScenePanelEffectsView *panel)
             }
         }
     } else {
-        struct ScenePanelMainSprite *sprite = &panel->mainSprite;
+        struct PileDriverMainSprite *sprite = &panel->mainSprite;
         if (PileDriver_IsSpriteVisible(sprite)) {
             s32 frame = PileDriver_AdvancePaletteFrame(sprite);
             if (frame != sprite->paletteFrame) {
                 sprite->paletteFrame = frame;
                 {
-                    struct ScenePanelGraphics *graphics = &sprite->graphics;
+                    struct PileDriverGraphics *graphics = &sprite->graphics;
                     u32 bank;
                     u32 paletteFrame;
                     bank = panel->targetPalette * 4;

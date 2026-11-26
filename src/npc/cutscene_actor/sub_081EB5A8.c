@@ -10,7 +10,7 @@ struct Params3D0Gfx {
 void TimeDisplay_InitBackgrounds(void *);
 void TimeDisplay_InitAnimatedObjects(void *);
 void TimeDisplay_SetSelectionKeyframe(void *);
-void Actor_HideAuxiliarySprites(void *);
+void TutorialOtenko_HideAuxiliarySprites(void *);
 void BgGfx_LoadTilemapAtPosition(s32, s32, s32);
 void Menu_StartFadeIn(s32);
 
@@ -34,7 +34,7 @@ s32 CutsceneDisplay_InitDisplay(u8 *p)
         BgGfx_LoadTilemapAtPosition(2, 0, 0);
         *(s32 *)(p + 0x72c) = *(s32 *)(p + 0x74c) = 8;
         TimeDisplay_SetSelectionKeyframe(p);
-        Actor_HideAuxiliarySprites(p);
+        TutorialOtenko_HideAuxiliarySprites(p);
     } else {
         *(s32 *)(p + 0x724) = 0;
         *(s32 *)(p + 0x72c) = *(s32 *)(p + 0x74c) = 0;

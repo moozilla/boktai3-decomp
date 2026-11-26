@@ -26,7 +26,7 @@ optional resource ID, never a host pointer. The creator forwards a third
 initializer argument that is unused in the recovered body.
 
 Particles copy the complete source position packet, jitter X/Z by[-150,149],
-add[0,299] to Y, and call AnimatedParticles_Create(1,...). RNG order is XYZ per
+add[0,299] to Y, and call ImpactBurst_Create(1,...). RNG order is XYZ per
 particle. Their40-byte configuration leaves halfword4 untouched, matching the
 original; the particle consumer154EC does not read it. Whole-word masked
 position updates preserve copied padding. No uninitalized packet is read by

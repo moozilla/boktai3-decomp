@@ -1,4 +1,4 @@
-# Actor_InitializeController
+# TutorialOtenko_InitializeController
 
 All 576 bytes of the initializer match. Each of the sixteen child sprites
 receives its index, the idle callback and its initial control bits. Grouping the

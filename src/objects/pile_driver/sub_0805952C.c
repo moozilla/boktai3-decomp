@@ -1,5 +1,5 @@
 #include "objects/pile_driver/pile_driver_rig.h"
-void PileDriverRig_HideSprites(struct ScenePanelRig *rig)
+void PileDriverRig_HideSprites(struct PileDriverRig *rig)
 {
     struct SceneRigSprite *sprite;
     s32 i;

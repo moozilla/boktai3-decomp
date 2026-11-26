@@ -1,9 +1,9 @@
 #include "engine/video/palette_resource.h"
 #include "objects/pile_driver/pile_driver_effects.h"
 #include "gba/syscall.h"
-void PileDriver_InitTimePalette(struct ScenePanel *input)
+void PileDriver_InitTimePalette(struct PileDriver *input)
 {
-    struct ScenePanelEffectsView *panel = (void *)input;
+    struct PileDriverEffectsView *panel = (void *)input;
     u32 resourceIds[3];
     s32 i;
     const u16 *colors;
@@ -22,7 +22,7 @@ void PileDriver_InitTimePalette(struct ScenePanel *input)
         panel->paletteSources[i] = resource->banks[0];
     }
     panel->timePhase = SunClock_GetPhase();
-    PileDriver_SelectTimePalette((struct ScenePanel *)panel, panel->timePhase);
+    PileDriver_SelectTimePalette((struct PileDriver *)panel, panel->timePhase);
     panel->paletteBlendActive = 0;
     panel->paletteBlendFrame = 0;
     colors = panel->paletteSources[panel->targetPalette];
@@ -44,11 +44,11 @@ void PileDriver_InitTimePalette(struct ScenePanel *input)
         } while (--i >= 0);
     }
     {
-        struct ScenePanelMainSprite *sprite = &panel->mainSprite;
+        struct PileDriverMainSprite *sprite = &panel->mainSprite;
         if (PileDriver_IsSpriteVisible(sprite)) {
             sprite->paletteFrame = PileDriver_AdvancePaletteFrame(sprite);
             {
-                struct ScenePanelGraphics *graphics = &sprite->graphics;
+                struct PileDriverGraphics *graphics = &sprite->graphics;
                 u32 bank;
                 u32 paletteFrame;
                 bank = panel->targetPalette * 4;

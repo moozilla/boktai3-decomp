@@ -27,7 +27,7 @@ struct PEntry {
 extern u32 gUnk_08604B90[];
 u8 *TerrainModifiers_FindCellOverride(s32, s32);
 
-void ParticleGroup_UpdateFrozen(struct PManager *m, struct PGroup *g)
+void ImpactParticleGroup_UpdateFrozen(struct PManager *m, struct PGroup *g)
 {
     u8 *p;
     u32 base;

@@ -24,7 +24,7 @@ exports.grid = () => {
       const over = g.fn.TerrainModifiers_FindCellOverride(row + x, 1);
       const original = base + 12 + 4 * (row + x);
       const a = over ? over + 4 : original, hb = g.u8(a), flags = g.u16(a + 2);
-      // CellGate_UpdatePassageBarrier hides an authored gap with 0x82a while
+      // PassageBarrier_UpdatePassageBarrier hides an authored gap with 0x82a while
       // waiting for the player to enter the cell. That override adds no floor.
       const gatedGap = flags === 0x82a && (g.u16(original + 2) & 0x40) !== 0;
       cells.push({ x, z, index: row + x, level: hb & 15, slope: hb >> 4 !== 0, kind: hb >> 4, flags, gatedGap, open: !(flags & 1) });
@@ -33,8 +33,8 @@ exports.grid = () => {
   return { w, h, cells, at: (x, z) => (x < 0 || z < 0 || x >= w || z >= h ? null : cells[z * w + x]) };
 };
 
-// Scene objects (src/objects/scene_objects/scene_object.c, gSceneObjectManager->objects): blocks and
-// crates. An idle one (kind 0) can be pushed (SceneObjects_TryPushNeighbor) from a
+// Scene objects (src/objects/puzzle_blocks.c, gSceneObjectManager->objects): blocks and
+// crates. An idle one (kind 0) can be pushed (PuzzleBlock_TryPushNeighbor) from a
 // cell one level below its top; type 1 movable block, 5 limited pushes.
 exports.blocks = () => {
   const mgr = $.gSceneObjectManager;
@@ -557,8 +557,8 @@ exports.menuSearch = function* (goal, opts = {}) {
   return { done: !!found, keys: found ? found.join(' ') : null, states: seen.size, expanded, frames: g.frameNo - start, closed: !exports.menuState() || exports.menuState().callback === fieldCb };
 };
 
-// Live Breakables (src/objects/breakable.c: gPooledInteractableManager slots): script id
-// and state (1 unlit / 2 lit for a candlestick; Breakable_OnHit moves them on).
+// Live Breakables (src/objects/light_fixtures.c: gPooledInteractableManager slots): script id
+// and state (1 unlit / 2 lit for a candlestick; LightFixture_OnHit moves them on).
 exports.breakables = () => {
   const m = $.gPooledInteractableManager;
   if (!m || !m.slots) return [];
@@ -639,7 +639,7 @@ exports.people = () => {
 };
 
 // Push planning: a breadth-first search over block states with the game's rules
-// (SceneObjects_TryPushNeighbor + Scene_TryStepDown). Heights include the blocks
+// (PuzzleBlock_TryPushNeighbor + PuzzleBlock_TryStepDown). Heights include the blocks
 // (a block raises its cell to its top). A push from P into direction d moves the
 // block at B = P + d when level(P) + 1 == top, the cell T = B + d is flat, not
 // flagged 8, and lower than the top: one level lower -> the block slides onto T;
@@ -691,7 +691,7 @@ exports.planPushes = (grid, start, goals, blocks, maxStates = 20000, opts = {}) 
         const lvl = st.lvl.slice(), nb = st.blocks.map((x) => ({ ...x }));
         lvl[b.c] = top - 1;
         lvl[T] += 1;
-        // Scene_UpdateFallingObject leaves an unbroken block on the lower
+        // PuzzleBlock_UpdateFallingObject leaves an unbroken block on the lower
         // floor, where its body continues to occupy a pressure plate.
         if (lvl[T] === top || (opts.occupy && b.survivesFall)) { nb[bi].c = T; nb[bi].pushes--; }
         else nb.splice(bi, 1);

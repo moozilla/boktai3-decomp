@@ -12,15 +12,15 @@
 
 s32 Div(s32, s32);
 s32 Math_Atan2(s32, s32);
-void Terrain_ResolveActorMotion(struct GloveMotion *);
-void PalFade_Update(struct GloveMotion *);
-void Actor_UpdateShadowSpriteParts(struct GloveMotion *, void *);
-void ActorParticles_SpawnImpactBurst(struct GloveMotion *);
+void Terrain_ResolveActorMotion(struct CoffinBikeMotion *);
+void PalFade_Update(struct CoffinBikeMotion *);
+void Actor_UpdateShadowSpriteParts(struct CoffinBikeMotion *, void *);
+void ActorParticles_SpawnImpactBurst(struct CoffinBikeMotion *);
 void CharacterModel_UpdateAccessoryAnimations(void *);
-void ScenePool_ClampMotionSpeeds(struct GloveMotion *);
-void Actor_ClampMovementSpeed(struct GloveMotion *);
-void CoffinBike_SetAnimationKeyframes(struct Glove *, s32);
-void CoffinBike_UpdateMotion(struct Glove *);
+void ScenePool_ClampMotionSpeeds(struct CoffinBikeMotion *);
+void Actor_ClampMovementSpeed(struct CoffinBikeMotion *);
+void CoffinBike_SetAnimationKeyframes(struct CoffinBike *, s32);
+void CoffinBike_UpdateMotion(struct CoffinBike *);
 
 void ActorParticles_UpdateEmitter(void *, void *, u32);
 void GameState_AddActionCount894(s32);
@@ -28,10 +28,10 @@ void CharacterModel_ClearAnimationFlags(void *, u32);
 void CharacterModel_SetAnimationFlags(void *, u32);
 void ActorMarkerPool_ShowMarker(s32);
 void Character_SetLowResourceColorEffect(void *, void *);
-void CoffinBike_UpdateStopping(struct Glove *);
-void ActorParticles_SpawnSideBurst(struct GloveMotion *);
-u8 LinkParticipant_IsLocallySelected(struct Glove *);
-void CallbackList_ResetDispatch(struct GloveMotion *);
+void CoffinBike_UpdateStopping(struct CoffinBike *);
+void ActorParticles_SpawnSideBurst(struct CoffinBikeMotion *);
+u8 LinkParticipant_IsLocallySelected(struct CoffinBike *);
+void CallbackList_ResetDispatch(struct CoffinBikeMotion *);
 void ActorMarker_HideSlot(s32);
 void ActorMarkerPool_HideMarker(s32);
 void SpritePair_ReleaseSlot(s32, s32);
@@ -40,34 +40,34 @@ void CharacterModel_LoadSecondaryPalette(void *, s32);
 void sub_0810BB4C(void *, s32);
 void sub_0810BB90(void *, s32);
 s32 Mod(s32, s32);
-void ActorParticles_EmitOffsetBurst(struct GloveMotion *);
-void sub_08117F6C(struct Glove *);
-void CoffinBike_OnActionComplete(struct Glove *);
-struct GloveModelSlotView {
+void ActorParticles_EmitOffsetBurst(struct CoffinBikeMotion *);
+void CoffinBike_UpdateRecoveryFlash(struct CoffinBike *);
+void CoffinBike_OnActionComplete(struct CoffinBike *);
+struct CoffinBikeModelSlotView {
     void **slot;
 };
-static inline void Glove_RestorePartPalettes(const struct GloveModelSlotView *view)
+static inline void CoffinBike_RestorePartPalettes(const struct CoffinBikeModelSlotView *view)
 {
     void **sprites = view->slot;
-    u32 paletteOffset = (u32)((struct GloveModel *)0)->palette;
+    u32 paletteOffset = (u32)((struct CoffinBikeModel *)0)->palette;
     u32 offset = 0;
     s32 count = 4;
     do {
-        struct GloveModel *base = *sprites;
+        struct CoffinBikeModel *base = *sprites;
         u8 *destination = (u8 *)&base->parts[0].palette;
         destination += offset;
         *(void **)destination = (u8 *)base + paletteOffset;
-        offset += sizeof(struct GloveModelPart);
+        offset += sizeof(struct CoffinBikeModelPart);
         count--;
     } while (count >= 0);
 }
-void CoffinBike_UpdateDefeatEffects(struct Glove *p)
+void CoffinBike_UpdateDefeatEffects(struct CoffinBike *p)
 {
-    struct GloveMotion *self = &p->motion;
+    struct CoffinBikeMotion *self = &p->motion;
     s32 h;
     s32 dx, dz;
     u32 a, status;
-    struct GloveMotion *actionSelf;
+    struct CoffinBikeMotion *actionSelf;
     s32 *bias;
     u32 *motionBias;
     u16 *flags;
@@ -77,7 +77,7 @@ void CoffinBike_UpdateDefeatEffects(struct Glove *p)
     void **sprites;
     s32 *vy, *py, *pvz;
     if (p->active) {
-        struct GloveMotion *entrySelf;
+        struct CoffinBikeMotion *entrySelf;
         s32 count;
         u32 *animation;
         u32 hidden;
@@ -108,7 +108,7 @@ void CoffinBike_UpdateDefeatEffects(struct Glove *p)
         count = 4;
         do {
             *animation |= hidden;
-            animation += sizeof(struct GloveModelPart) / sizeof(*animation);
+            animation += sizeof(struct CoffinBikeModelPart) / sizeof(*animation);
             count--;
         } while (count >= 0);
         ActorMarkerPool_HideMarker(p->marker);
@@ -144,8 +144,8 @@ void CoffinBike_UpdateDefeatEffects(struct Glove *p)
         *cooldown = 0;
         HalfwordFlags_And(flags, ~2);
         {
-            struct GloveModelSlotView view = {sprites};
-            Glove_RestorePartPalettes(&view);
+            struct CoffinBikeModelSlotView view = {sprites};
+            CoffinBike_RestorePartPalettes(&view);
         }
         CharacterModel_LoadPrimaryPalette(&p->model);
         CharacterModel_LoadSecondaryPalette(&p->model, *style);
@@ -264,7 +264,7 @@ void CoffinBike_UpdateDefeatEffects(struct Glove *p)
         u32 mask = 0x800;
         if (((gEngineFlags | gScenePauseFlags) & mask) ||
             (status = GameState_TestWorldFlags(0x100))) {
-            callback = (void (*)(void *))sub_08117F6C;
+            callback = (void (*)(void *))CoffinBike_UpdateRecoveryFlash;
             active = &p->active;
             status = 0;
         } else {

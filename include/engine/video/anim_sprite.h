@@ -7,7 +7,7 @@ struct AnimSpritePlayback {
     u8 priority, mode;
 };
 
-struct WidgetGlyphEntry;
+struct AnimSpriteGlyph;
 struct AnimationKeyframe {
     u16 key, duration;
 };
@@ -19,7 +19,7 @@ struct AnimationKeyframeSequence {
 struct AnimSpriteResource {
     u16 paletteIndex, glyphCount, sequenceCount, unknown6;
     u32 unknown8;
-    struct WidgetGlyphEntry *glyphs;
+    struct AnimSpriteGlyph *glyphs;
     struct AnimationKeyframeSequence *sequences;
     u8 *tileBase;
     u8 *frameData;
@@ -52,14 +52,14 @@ struct AnimSprite {
 };
 
 /* flags bit 0 hides the widget's sprite. */
-static inline void AnimSprite_Hide(struct AnimSprite *widget)
+static inline void AnimSprite_Hide(struct AnimSprite *animSprite)
 {
-    widget->flags |= 1;
+    animSprite->flags |= 1;
 }
 
-static inline void AnimSprite_Show(struct AnimSprite *widget)
+static inline void AnimSprite_Show(struct AnimSprite *animSprite)
 {
-    widget->flags &= ~1;
+    animSprite->flags &= ~1;
 }
 
 #endif

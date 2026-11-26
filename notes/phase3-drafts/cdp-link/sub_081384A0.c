@@ -46,8 +46,8 @@ void LinkSession_UpdateParticipantScores(struct SessionScores *session)
 }
 s32 Div(s32, s32);
 extern const s8 gUnk_086108C8[];
-#define Registry1745_UpdateRankingAwards sub_081384A0
-void Registry1745_UpdateRankingAwards(struct SessionScores *session)
+#define LinkSession_UpdateRankingAwards sub_081384A0
+void LinkSession_UpdateRankingAwards(struct SessionScores *session)
 {
     s32 order[4], values[4], groupSizes[4], ranks[4];
     s32 i, j, group;

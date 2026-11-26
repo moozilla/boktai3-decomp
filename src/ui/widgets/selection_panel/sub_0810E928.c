@@ -1,13 +1,12 @@
 #include "global.h"
 #include "engine/engine.h"
 #include "engine/ram.h"
-/* Registry3C9F_Destroy: Hides menu display objects and clears backgrounds before killing the singleton task */
-#define Registry3C9F_Destroy sub_0810E928
+/* RecordPanel_Destroy: Hides menu display objects and clears backgrounds before killing the singleton task */
 
 void SelectionPanel_HideDisplayObjects(void *);
 void ScrollingDialogue_ClearScript(void);
 
-void sub_0810E928(void)
+void RecordPanel_Destroy(void)
 {
     if (gConfirmPanel) {
         SelectionPanel_HideDisplayObjects(gConfirmPanel);

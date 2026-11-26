@@ -11,7 +11,7 @@ struct ContactPosition *Player_GetEffectivePosition(u32);
 void MotionTrack_Update(void *);
 void OrbitMotion_BeginDistanceWave(void *, const void *, const void *, s32, s32);
 void Vanargand_EmitPartTrail(void *);
-void AnimatedParticles_EmitBurst(void *, s32, s32, s32, s32, s32, s32, s32);
+void ImpactBurst_EmitBurst(void *, s32, s32, s32, s32, s32, s32, s32);
 void ActorStatus_Deactivate(void *, void *);
 void Palette_InterpolateBanks(void *, const void *, const void *, s32, s32);
 void OrbitingParticles_Create(void *, int, int, int, int);

@@ -5,7 +5,7 @@ struct Digit {
     u8 rest[0x5c];
 };
 s32 Div(s32, s32);
-s32 Anim_SelectWidgetGlyph(void *, void *, u32);
+s32 AnimSprite_SelectGlyph(void *, void *, u32);
 static inline u32 *FLP(struct Digit *p, s32 n)
 {
     u32 o = n * 0x60;
@@ -68,7 +68,7 @@ void StageResults_ShowTimeDigits(u8 *s, s32 mode, s32 time)
                 } else {
                     FL(fb, idx) &= ~1;
                 }
-                Anim_SelectWidgetGlyph(s + 0x24 + *(&idx) * 0x60, s + 0x8c4, (u16)glyph);
+                AnimSprite_SelectGlyph(s + 0x24 + *(&idx) * 0x60, s + 0x8c4, (u16)glyph);
                 divisor = Div(divisor, 10);
             } while (++j < 3);
         } while (++outer < 2);
@@ -93,7 +93,7 @@ void StageResults_ShowTimeDigits(u8 *s, s32 mode, s32 time)
                 FL(fb, idx) &= ~1;
                 seen = 1;
             }
-            Anim_SelectWidgetGlyph(s + 0x24 + idx * 0x60, s + 0x8c4, (u16)glyph);
+            AnimSprite_SelectGlyph(s + 0x24 + idx * 0x60, s + 0x8c4, (u16)glyph);
             divisor = Div(divisor, 10);
         }
     }
