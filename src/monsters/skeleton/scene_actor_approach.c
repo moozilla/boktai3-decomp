@@ -1,16 +1,10 @@
 #include "global.h"
+#include "monsters/skeleton/skeleton.h"
 #include "player/player.h"
 #include "scene/actor/scene_actor_reaction.h"
 #include "scene/actor/scene_actor_control_phase.h"
 #include "scene/motion/scene_actor_chase_reaction.h"
 #include "scene/motion/scene_actor_terrain.h"
-
-struct SceneActorApproachCategoryContext {
-    u8 unknown0[0x6F0];
-    u16 timer;
-    u8 unknown6F2[6];
-    u16 duration;
-};
 
 void SceneActorReaction_TickQueuedContact(void);
 
@@ -22,7 +16,7 @@ void Skeleton_SelectDistanceReaction(struct ChaseActor *);
 
 void SceneActorApproach_RunCategoryAction(struct ChaseActor *actor)
 {
-    struct SceneActorApproachCategoryContext *context = actor->base.context;
+    struct Skeleton *context = actor->base.context;
     if (SceneActorControl_TakeStateEntry(actor)) {
         SceneActorReaction_EnableMotionFlags(0x100, &actor->base.motionFlags);
         {
@@ -32,7 +26,7 @@ void SceneActorApproach_RunCategoryAction(struct ChaseActor *actor)
                 SceneActorChase_SetControl(actor, SceneActorReaction_TickContactAnimation, 3);
         }
         Vorn_SpawnHazard(actor, 1);
-        context->timer = context->duration;
+        context->pursuitTimer = context->parameters6F8[0];
     }
     if (actor->base.stepDone) {
         SceneActorPlacement_ClearFlags(&actor->base.motionFlags, ~0x100);
@@ -41,22 +35,15 @@ void SceneActorApproach_RunCategoryAction(struct ChaseActor *actor)
         actor->base.counter2AC++;
 }
 
-struct SceneActorApproachTimedContext {
-    u8 unknown0[0x6F2];
-    u16 timer;
-    u8 unknown6F4[6];
-    u16 duration;
-};
-
 void Skeleton_UpdateAttackWindup(void);
 
 void SceneActorApproach_RunTimedAction(struct ChaseActor *actor)
 {
-    struct SceneActorApproachTimedContext *context = actor->base.context;
+    struct Skeleton *context = actor->base.context;
     if (SceneActorControl_TakeStateEntry(actor)) {
         SceneActorReaction_EnableMotionFlags(0x100, &actor->base.motionFlags);
         SceneActorChase_SetControl(actor, Skeleton_UpdateAttackWindup, 0x27);
-        context->timer = context->duration;
+        context->timer6F2 = context->parameters6F8[1];
         Vorn_SpawnHazard(actor, 2);
     }
     if (actor->base.stepDone) {
@@ -66,22 +53,15 @@ void SceneActorApproach_RunTimedAction(struct ChaseActor *actor)
         actor->base.counter2AC++;
 }
 
-struct SceneActorApproachAlternateContext {
-    u8 unknown0[0x6F4];
-    u16 timer;
-    u8 unknown6F6[6];
-    u16 duration;
-};
-
 void SceneActorReaction_TickMultiHitAnimation(void);
 
 void SceneActorApproach_RunAlternateTimedAction(struct ChaseActor *actor)
 {
-    struct SceneActorApproachAlternateContext *context = actor->base.context;
+    struct Skeleton *context = actor->base.context;
     if (SceneActorControl_TakeStateEntry(actor)) {
         SceneActorReaction_EnableMotionFlags(0x100, &actor->base.motionFlags);
         SceneActorChase_SetControl(actor, SceneActorReaction_TickMultiHitAnimation, 0x2B);
-        context->timer = context->duration;
+        context->timer6F4 = context->parameters6F8[2];
         Vorn_SpawnHazard(actor, 3);
     }
     if (actor->base.stepDone) {
@@ -121,7 +101,7 @@ void SceneActorApproach_CaptureTargetAndRunAction(struct ChaseActor *actor)
         actor->base.counter2AC++;
 }
 
-void Skeleton_UpdateScriptWaitState(void);
+void Skeleton_UpdateScriptWaitState(u8 *);
 
 s32 Callback_InvokeActor(void *, void *);
 
@@ -133,13 +113,6 @@ void Anim_SetFrameDurationScale(void *, u32);
 
 struct SkeletonApproachProbe {
     u8 flags;
-};
-
-struct SkeletonChaseBody {
-    u8 unknown0[0x6DC];
-    u32 flags;
-    u8 unknown6E0[0x28];
-    u32 minimumDistance, maximumDistance;
 };
 
 static inline s32 Skeleton_ScaleApproachMotion(s32 n)
@@ -255,7 +228,7 @@ static inline void Skeleton_UpdateApproachAnimation(struct ChaseActor *actor)
 }
 
 static inline void Skeleton_ApplyApproachMotion(struct ChaseActor *actor,
-                                                struct SkeletonChaseBody *body, u32 angle,
+                                                struct Skeleton *body, u32 angle,
                                                 s32 speed)
 {
     Skeleton_UpdateApproachAnimation(actor);
@@ -266,8 +239,8 @@ static inline void Skeleton_ApplyApproachMotion(struct ChaseActor *actor,
         u32 mask = 0x2000;
         actor->base.behaviorFlags |= mask;
     }
-    if (actor->base.tracking.distance > body->minimumDistance &&
-        actor->base.tracking.distance < body->maximumDistance) {
+    if (actor->base.tracking.distance > body->nearDistance &&
+        actor->base.tracking.distance < body->farDistance) {
         u16 mask = 0x80;
         actor->base.reactionFlags = mask | actor->base.reactionFlags;
     } else
@@ -276,7 +249,7 @@ static inline void Skeleton_ApplyApproachMotion(struct ChaseActor *actor,
 
 void Skeleton_UpdateTargetApproach(struct ChaseActor *actor)
 {
-    struct SkeletonChaseBody *body = actor->base.context;
+    struct Skeleton *body = actor->base.context;
     struct SceneActorChaseGroup *group = &actor->group;
     if (SceneActorControl_TakeStateEntry(actor)) {
         void *target = Skeleton_UpdateScriptWaitState;
@@ -287,9 +260,9 @@ void Skeleton_UpdateTargetApproach(struct ChaseActor *actor)
         SceneActorChase_SetControl(actor, group->common.gate.control, 0x1A);
         Skeleton_ApproachTargetCell(actor);
         {
-            struct SkeletonChaseBody *b = actor->base.context;
+            struct Skeleton *b = actor->base.context;
             u32 mask = 0x80;
-            b->flags |= mask;
+            b->actionFlags |= mask;
         }
     } else {
         struct ContactPosition diff;
@@ -302,10 +275,10 @@ void Skeleton_UpdateTargetApproach(struct ChaseActor *actor)
             SceneActorTerrain_Subtract(out, to, from);
         }
         angle = Math_Atan2(diff.x, diff.z);
-        if (actor->base.tracking.distance < body->minimumDistance) {
+        if (actor->base.tracking.distance < body->nearDistance) {
             angle = (angle + 0x80) & 0xFF;
             actor->base.field2C2 = 0x20;
-        } else if (actor->base.tracking.distance > body->maximumDistance) {
+        } else if (actor->base.tracking.distance > body->farDistance) {
             actor->base.field2C2 = 0x20;
             actor->base.body.direction = angle;
         }
@@ -317,7 +290,8 @@ void Skeleton_UpdateTargetApproach(struct ChaseActor *actor)
 
 extern const u32 gUnk_086060A0[];
 
-void Skeleton_SetReactionControlTable(u8 *p)
+void Skeleton_SetReactionControlTable(void *object)
 {
-    *(const u32 **)(p + 0x28c) = gUnk_086060A0;
+    struct ChaseActor *actor = object;
+    actor->base.behaviorCallbacks = (void **)gUnk_086060A0;
 }
