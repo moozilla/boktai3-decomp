@@ -736,9 +736,7 @@ static inline void Lun_UpdateRouteAnimationScale(struct ChaseActor *actor)
 
 void Lun_UpdateSway(struct ChaseActor *actor);
 
-struct S0809CB58;
-
-void Lun_SelectRandomRouteEntry(struct S0809CB58 *p);
+void Lun_SelectRandomRouteEntry(struct SceneActorRouteCursor *p);
 
 u8 Lun_StepCurveMotion(struct ChaseActor *actor);
 
@@ -777,7 +775,7 @@ void Lun_FollowRoute(struct ChaseActor *actor)
         u32 kind;
         u16 attr;
         Polar((void *)(&body->routeMotion), actor->base.body.direction, speed);
-        route = (void *)(&body->route);
+        route = &body->route.cursor;
         Lun_SelectRandomRouteEntry(route);
         p = &target;
         p->x = route->point->x;
@@ -827,35 +825,29 @@ void Lun_DecayRouteMotion(struct ChaseActor *a)
         a->base.counter2AC++;
 }
 
-struct LunRouteEntry {
-    u8 unknown0[4];
-    u8 *data;
-    u16 *point;
-};
-
 void Lun_SetMovementEndpoints(struct ChaseActor *, struct ContactPosition *);
 
 void Lun_ChooseMovementDestination(struct ChaseActor *actor)
 {
-    u8 *state = actor->base.context;
+    struct Lun *state = actor->base.context;
     struct ContactPosition destination;
     struct ContactPosition *target, *endpoint;
 
     if (SceneActorControl_TakeFlag(&actor->base.field2B1)) {
         SceneActorChase_SetControl(actor, actor->base.onStanding, 0);
-        state[0x3E2] = 0;
+        state->hoverPhase = 0;
     }
     if ((u8)Callback_InvokeActor(actor, actor->base.contactQuery.opaque))
         return;
     if ((s16)actor->base.heightOffset > 239 && (s32)actor->base.counter2AC > 60) {
-        struct LunRouteEntry *route;
+        struct SceneActorRouteCursor *route;
 
         actor->base.heightOffset = 240;
-        route = (struct LunRouteEntry *)(state + 0x42C);
+        route = &state->route.cursor;
         Lun_SelectRandomRouteEntry(route);
         target = &destination;
-        target->x = route->point[0];
-        target->z = route->point[1];
+        target->x = route->point->x;
+        target->z = route->point->z;
         {
             s32 cellX = target->x >> 8, cellZ = target->z >> 8;
             endpoint = target;
@@ -874,7 +866,7 @@ void Lun_ChooseMovementDestination(struct ChaseActor *actor)
         }
 
         actor->base.nextDirection = Math_Atan2(target->x, endpoint->z);
-        ZeroFill8(state + 0x424);
+        ZeroFill8(&state->routeMotion);
     }
     actor->base.counter2AC++;
 }
@@ -1093,24 +1085,17 @@ void Lun_UpdateSway(struct ChaseActor *actor)
 
 u8 *Path_GetPointData(u8 *);
 
-struct S0809CB58 {
-    u8 pad0[2];
-    u8 index;
-    u8 unk3;
-    u8 *data;
-    u8 *entry;
-};
-
-void Lun_SelectRandomRouteEntry(struct S0809CB58 *p)
+void Lun_SelectRandomRouteEntry(struct SceneActorRouteCursor *p)
 {
-    struct S0809CB58 *q = p;
+    struct SceneActorRouteCursor *q = p;
     u8 n;
-    n = Mod(Random(), *p->data);
-    if (n == p->index)
-        n = Mod(n + 1, *p->data);
-    q->index = n;
-    q->unk3 = 0;
-    q->entry = Path_GetPointData(q->data) + q->index * 8;
+    n = Mod(Random(), p->definition->pointCount);
+    if (n == p->pointIndex)
+        n = Mod(n + 1, p->definition->pointCount);
+    q->pointIndex = n;
+    q->unknown3 = 0;
+    q->point = (void *)(Path_GetPointData((void *)q->definition) +
+                       q->pointIndex * sizeof(*q->point));
 }
 
 void Lun_OnBodyContact(void *, void *, void *);
@@ -1323,7 +1308,7 @@ void RouteActor_UpdateRandomDestination(struct ChaseActor *actor)
     } else {
         struct ContactPosition target;
         struct ContactPosition *p;
-        struct SceneActorRouteCursor *route = (struct SceneActorRouteCursor *)&state->route;
+        struct SceneActorRouteCursor *route = &state->route.cursor;
         s32 cell;
         u16 attr;
         u32 kind;
@@ -1596,7 +1581,7 @@ void RouteActor_UpdatePlayerDestinationPhase(struct ChaseActor *actor)
 
 void Lun_ChooseDelayedDestination(struct ChaseActor *actor)
 {
-    u8 *state = actor->base.context;
+    struct Lun *state = actor->base.context;
     struct ContactPosition destination;
     struct ContactPosition *target, *endpoint;
 
@@ -1605,13 +1590,13 @@ void Lun_ChooseDelayedDestination(struct ChaseActor *actor)
     if ((u8)Callback_InvokeActor(actor, actor->base.contactQuery.opaque))
         return;
     if ((s32)actor->base.counter2AC > 60) {
-        struct LunRouteEntry *route;
+        struct SceneActorRouteCursor *route;
 
-        route = (struct LunRouteEntry *)(state + 0x42C);
+        route = &state->route.cursor;
         Lun_SelectRandomRouteEntry(route);
         target = &destination;
-        target->x = route->point[0];
-        target->z = route->point[1];
+        target->x = route->point->x;
+        target->z = route->point->z;
         {
             s32 cellX = target->x >> 8, cellZ = target->z >> 8;
             endpoint = target;
@@ -1630,7 +1615,7 @@ void Lun_ChooseDelayedDestination(struct ChaseActor *actor)
         }
 
         actor->base.nextDirection = Math_Atan2(target->x, endpoint->z);
-        ZeroFill8(state + 0x424);
+        ZeroFill8(&state->routeMotion);
     } else
         actor->base.counter2AC++;
 }
@@ -1980,8 +1965,8 @@ static inline u32 Lun_ReadRoute(struct ChaseActor *actor, struct Lun *lun,
         route->parameterB = 0;
         route->pointId = 0;
         route->currentPoint = 0;
-        lun->route.branches[MonsterInit_RouteActiveBranch(route)] = 0;
-        lun->route.branches[MonsterInit_RouteAlternateBranch(route)] = 0;
+        lun->route.registry.branches[MonsterInit_RouteActiveBranch(route)] = 0;
+        lun->route.registry.branches[MonsterInit_RouteAlternateBranch(route)] = 0;
     }
     return 0;
 }
@@ -2037,7 +2022,7 @@ s32 Lun_Init(void *object)
     }
     MonsterInit_InitializeBody(actor);
     {
-        struct SceneActorRegistryRoute *route = &lun->route;
+        struct SceneActorRegistryRoute *route = &lun->route.registry;
         if (Lun_ReadRoute(actor, lun, route)) {
             MonsterInit_SnapToRoute(&actor->base.body.position, route);
             MonsterInit_DrawablePosition(actor);
