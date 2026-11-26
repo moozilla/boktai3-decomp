@@ -741,9 +741,9 @@ exports.fightTargets = () => {
     ignored = new Set();
   }
   // The scene heap can give a later enemy the same address.
-  const bosses = exports.vampireTargets();
-  const reg = bosses.concat(exports.enemies().filter((e) => e.alive && !ignored.has(e.addr) &&
-    !bosses.some((boss) => boss.addr === e.addr)));
+  const scripted = exports.barrierTargets().concat(exports.vampireTargets());
+  const reg = scripted.concat(exports.enemies().filter((e) => e.alive && !ignored.has(e.addr) &&
+    !scripted.some((actor) => actor.addr === e.addr)));
   const owners = new Set(reg.map((e) => e.addr));
   for (const t of exports.targets()) {
     if (t.alive && t.health !== null && !owners.has(t.addr) && !ignored.has(t.addr)) {
@@ -760,7 +760,7 @@ exports.fight = function* (opts = {}) {
   const progress = new Map(), living = exports.fightTargets, triedOtherWeapon = new Set();
   const initialGun = exports.weapon().gun;
   const initialLight = S.solar;
-  const hpSum = () => living().reduce((s, e) => s + Math.max(0, e.health), 0);
+  const hpSum = () => living().reduce((s, e) => s + Math.max(0, e.health) * (e.barrier ? 20 : 1), 0);
   const toward = (e) => {
     const dx = e.x - p.position.x, dz = e.z - p.position.z;
     const sx = Math.abs(dx) > 40 ? Math.sign(dx) : 0, sz = Math.abs(dz) > 40 ? Math.sign(dz) : 0;
@@ -771,7 +771,7 @@ exports.fight = function* (opts = {}) {
   while (exports.where().scene === scene && p && life() > 0 && living().length && g.frameNo - start < (opts.frames ?? 6000)) {
     if (yield* exports.clearInterruptions(opts)) continue;
     const distance = (e) => Math.hypot(e.x - p.position.x, e.z - p.position.z);
-    const target = living().sort((a, b) => distance(a) - distance(b))[0];
+    const target = living().sort((a, b) => Number(Boolean(b.barrier)) - Number(Boolean(a.barrier)) || distance(a) - distance(b))[0];
     const tk = toward(target);
     const weapon = exports.weapon();
     const frame = exports.gunFrame();
@@ -809,7 +809,7 @@ exports.fight = function* (opts = {}) {
       yield g.press(0, opts.look ?? (target.boss ? 60 : weapon.gun ? 40 : 20));
       if (exports.where().scene !== scene) continue;
       const dealt = hp0 - hpSum(), lost = life0 - life();
-      const e = living()[0], dist = e ? Math.hypot(e.x - p.position.x, e.z - p.position.z) : 0;
+      const e = living().find((actor) => actor.addr === target.addr), dist = e ? distance(e) : 0;
       const spent = Math.max(0, weapon.energy - exports.weapon().energy);
       const score = dealt - (opts.lifeCost ?? 3) * lost - spent / 8 - dist / 400 - (life() > 0 ? 0 : 10000);
       if (!best || score > best.score) best = { score, t, mid };
@@ -818,7 +818,7 @@ exports.fight = function* (opts = {}) {
     S.restore(best.mid);
     steps++;
     // Some targets are scripted actors or invulnerable during this encounter.
-    if (!target.boss && steps - pr.since > 40) { ignored.add(target.addr); if (opts.trace) opts.trace({ ignore: target.addr, category: target.category }); }
+    if (!target.boss && !target.barrier && steps - pr.since > 40) { ignored.add(target.addr); if (opts.trace) opts.trace({ ignore: target.addr, category: target.category }); }
     if (opts.trace && steps % 10 === 0) opts.trace({ fight: steps, hp: hpSum(), life: life(), enemies: living().length });
   }
   S.setSolar(initialLight);

@@ -62,13 +62,29 @@ test('the vampire model uses signed health and the source sunlight flag', () => 
   const values = { [addr + 0x94]: 310, [addr + 0x9c]: 0x10, [addr + 0x3ac]: 1, [addr + 0x54]: 400 };
   const lists = Array.from({ length: 9 }, () => ({ head: null }));
   lists[8].head = { $addr: addr, flags: 0, update: 0x08028f25, next: null };
-  const g = { addr: () => 0x08028f25, u32: (a) => values[a] ?? 0, s16: (a) => values[a] ?? 0 };
+  const g = { addr: () => 0x08028f25, u32: (a) => values[a] ?? 0, s16: (a) => values[a] ?? 0, u8: (a) => values[a] ?? 0 };
   const { vampireTargets, combatWait } = skill('combatants', g, { gTaskLists: lists });
   const [vampire] = vampireTargets();
   assert.equal(vampire.health, 310);
   assert.equal(vampire.x, 400);
   assert.equal(vampire.solarWeak, true);
   assert.equal(combatWait(vampire), 24);
+  values[addr + 0x384] = 1;
+  assert.equal(vampireTargets()[0].solarWeak, false);
   values[addr + 0x9c] |= 2;
   assert.deepEqual(vampireTargets(), []);
+});
+
+test('curtain segments are targets only while standing and have hit cooldowns', () => {
+  const lists = Array.from({ length: 9 }, () => ({ head: null }));
+  lists[8].head = { $addr: 0x02010000, flags: 0, update: 0x0801324d, next: null };
+  const position = { x: 300, y: 512, z: 500 };
+  const barrier = { $addr: 0x02010050, state: 1, health: 2, flash: 6, sprite: { position } };
+  const g = { addr: () => 0x0801324d, at: () => ({ count: 2, barriers: [barrier, { state: 2 }] }) };
+  const { barrierTargets, combatWait } = skill('combatants', g, { gTaskLists: lists });
+  const [target] = barrierTargets();
+  assert.equal(barrierTargets().length, 1);
+  assert.equal(target.health, 2);
+  assert.equal(target.y, 512);
+  assert.equal(combatWait(target), 6);
 });
