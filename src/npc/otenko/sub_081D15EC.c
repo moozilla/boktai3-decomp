@@ -1,8 +1,5 @@
-#include "global.h"
+#include "npc/otenko/scene_npc_transition.h"
 
-struct Pair {
-    u32 a, b;
-};
 void AnimData_Load(void *, s32);
 void Sprite_Init(void *, void *, s32);
 void *AnimData_FindEntry(s32);
@@ -10,36 +7,35 @@ void ParticleSprite_Initialize(void *, void *, s32);
 void Effect_SetOrigin(void *, s32, s32);
 void SpriteDrawable_SelectTileFrame(void *, void *, s32);
 void Effect_SetPalette(void *, s32);
-s32 SceneEffect_InitParticleRing(u8 *p, struct Pair *src)
+s32 SceneEffect_InitParticleRing(struct TransitionEffect *effect,
+                                 const struct ContactPosition *origin)
 {
-    u8 *anim;
-    u8 *particle;
+    struct SceneAnimation *anim;
+    struct TransitionParticle *particle;
     s32 i, neg;
-    u32 z;
-    *(struct Pair *)(p + 0x60) = *src;
-    *(u32 *)(p + 0x68) = 0;
-    anim = p + 0x44;
+    effect->origin = *origin;
+    effect->frame = 0;
+    anim = &effect->animation;
     AnimData_Load(anim, 0x3641);
-    Sprite_Init(p + 0x18, anim, 2);
-    *(struct Pair *)(p + 0x34) = *src;
-    p[0x20] = 0x40;
-    p[0x21] = 0x40;
-    p[0x1f] = 3;
-    *(void **)(p + 0x78) = AnimData_FindEntry(0x1C1E);
+    Sprite_Init(&effect->sprite, anim, 2);
+    effect->sprite.position = *origin;
+    effect->sprite.palette = 0x40;
+    effect->sprite.paletteVariant = 0x40;
+    effect->sprite.priority = 3;
+    effect->graphics = AnimData_FindEntry(0x1C1E);
     neg = -4;
-    particle = anim + 0x38;
+    particle = effect->particles;
     i = 7;
     do {
-        ParticleSprite_Initialize(particle, *(void **)(p + 0x78), 1);
+        ParticleSprite_Initialize(particle, effect->graphics, 1);
         Effect_SetOrigin(particle, neg, neg);
-        SpriteDrawable_SelectTileFrame(particle, *(void **)(p + 0x78), 2);
+        SpriteDrawable_SelectTileFrame(particle, effect->graphics, 2);
         Effect_SetPalette(particle, 1);
-        *(&z) = 0;
-        *(u16 *)(particle + 0x28) = z;
-        particle += 0x30;
+        particle->motion.active = 0;
+        particle++;
     } while (--i >= 0);
-    *(u32 *)(p + 0x6c) = z;
-    *(u32 *)(p + 0x70) = z;
-    *(u32 *)(p + 0x74) = 1;
+    effect->state = 0;
+    effect->stateFrame = 0;
+    effect->enter = 1;
     return 0;
 }
