@@ -1,6 +1,7 @@
 #include "scene/motion/scene_actor_chase_reaction.h"
 #include "monsters/scene_route_sample.h"
 #include "global.h"
+#include "monsters/centipede/centipede_body.h"
 #include "scene/actor/scene_actor_reaction.h"
 #include "scene/motion/scene_actor_terrain.h"
 #include "scene/motion/scene_actor_chase.h"
@@ -20,20 +21,6 @@ static inline u8 Take(u8 *p)
     return 0;
 }
 
-
-static inline void Control(struct ChaseActor *a, void *cb, u32 kind)
-{
-    a->base.field2B2 = 1;
-    a->base.stepDone = 0;
-    a->base.controlKind = kind;
-    a->base.target = cb;
-    a->base.field2C8 = 0;
-    {
-        u32 *flags = &a->base.pendingControlFlags;
-        *flags &= ~1;
-    }
-    a->base.pendingControl = 0;
-}
 static inline void State7(struct ChaseActor *a)
 {
     u32 behavior = 7;
@@ -53,9 +40,6 @@ static inline void State1(struct ChaseActor *a)
     a->base.field2B1 = 1;
 }
 
-struct SavedPair {
-    u32 x, z;
-};
 struct SavedMotion {
     u8 pad[12];
     struct ContactPosition position;
@@ -95,29 +79,13 @@ static inline void Scale(struct ChaseActor *actor)
 // confidence=low: approaches a saved waypoint and requests a turn when the target heading differs.
 void CentipedeBody_ApproachWaypoint(struct ChaseActor *actor)
 {
-    u8 *body = actor->base.context;
+    struct TentacleBody *body = actor->base.context;
     s32 speed;
     struct ContactPosition delta;
     if (Take(&actor->base.field2B1)) {
-        u8 *flag = body + 0x8D4;
-        u32 zero = 0;
-        u32 one = 1;
-        *flag = one;
-        *(u16 *)(body + 0x8D8) = zero;
-        {
-            void *cb = actor->base.onAlternateEntry;
-            actor->base.field2B2 = one;
-            actor->base.stepDone = 0;
-            actor->base.controlKind = one;
-            actor->base.target = cb;
-            actor->base.field2C8 = zero;
-            {
-                u32 *flags = &actor->base.pendingControlFlags;
-                u32 mask = ~1;
-                *flags &= mask;
-            }
-            actor->base.pendingControl = zero;
-        }
+        body->oscillationDirection = 1;
+        body->oscillationPhase = 0;
+        SceneActorChase_SetControl(actor, actor->base.onAlternateEntry, 1);
         Centipede_ResetOscillation(actor);
     }
     if ((u8)Callback_InvokeActor(actor, actor->base.contactQuery.opaque)) {
@@ -126,10 +94,10 @@ void CentipedeBody_ApproachWaypoint(struct ChaseActor *actor)
     }
     speed = Callback_InvokeActor(actor, actor->base.animationQuery.opaque);
     Scale(actor);
-    if (Approach(actor, (void *)(body + 0x8F8), speed)) {
+    if (Approach(actor, (void *)((u8 *)body + 0x8F8), speed)) {
         s32 angle;
         Centipede_SelectWanderRoute(actor);
-        Chase_Delta(&delta, &actor->base.body.position, (void *)(body + 0x904));
+        Chase_Delta(&delta, &actor->base.body.position, &body->waypoint);
         actor->base.nextDirection = Math_Atan2(delta.x, delta.z);
         angle = actor->base.nextDirection - actor->base.body.direction;
         if (angle > 128)
@@ -145,7 +113,7 @@ void CentipedeBody_ApproachWaypoint(struct ChaseActor *actor)
     }
     Centipede_AdvanceMotionPhase(actor, speed);
     {
-        u16 *p = (void *)(body + 0x8E4);
+        u16 *p = &body->routeMotionTimer;
         if (*p) {
             sub_080A9DB0(actor, 18, 0x1000);
             --*p;
