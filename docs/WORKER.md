@@ -232,6 +232,20 @@ that is a scope gap: record it (below) so the tool gets better.
 
 ## Linter warnings
 
+Read the [flag-order survey](../notes/flag-accessors_2026-11-25.md) before moving a mask.
+A Thumb mask load preceding the field load also comes from a local or a macro temporary.
+Check the owning type, field, operation and independent callers. Compare plain C in the
+same unit. Recover a repeated domain operation once on its owner. Keep an unresolved
+local visible when the only evidence is instruction order. A fixed object whose address
+is consumed, such as a CpuSet fill source, can carry an evidence-backed annotation.
+
+Use the steering-debt subtotal to compare patches. It charges a parked constant by uses
+and charges unresolved bit-operation arguments at each call, even when another caller
+passes a runtime value. A transfer warning from land asks for source evidence. The
+combined pause query and reviewed typed tracking operations are documented exceptions.
+A fixed-mask inline that binds a constant and performs exactly one such operation
+gets the same treatment as its parameterized form.
+
 `python3 tools/concessions.py [FILE...]` reports errors (pins, barriers and the other scored
 kinds) and warnings (C a person plausibly would not write; the kinds are in its docstring).
 Errors stay at zero. Warnings go down, and a change adds none: `scope.py land` prints the
@@ -281,8 +295,7 @@ to clean, before reading warnings by hand, in this order:
   place (`u32 mask = 0x40; f & mask` becomes `f & 0x40`). A local read more than once is left
   for you.
 
-Moving a parked constant into a helper's argument instead is steering under another name; no
-tool does it and neither should you.
+Use the field and call-site evidence above when considering an accessor.
 
 ## Recording what you learned
 

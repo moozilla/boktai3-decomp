@@ -840,6 +840,7 @@ def concession_counts(source_root):
     once = frozenset(single_use_names(Path(ROOT)))
     counts = {}
     import deadcode
+    headers = {}
     compiled = deadcode.available()
     if compiled:
         deadcode.tree()  # compile every unit in parallel; compiler_sites below reads the cache
@@ -855,10 +856,10 @@ def concession_counts(source_root):
         found += [concessions.Site(0, "alias", ok) for ok in concessions.aliases(text, rel).values()]
         if compiled and path.suffix == ".c":
             found += concessions.compiler_sites(rel, path.read_text())
-        found += concessions.literal_param_sites(rel, path.read_text())  # the tree pass; not in sites()
+        found += concessions.literal_argument_sites(rel, text, headers=headers)  # the tree pass; not in sites()
         for s in found:
             n, ok = counts.get(s.kind, (0, 0))
-            counts[s.kind] = (n + (not s.excused), ok + s.excused)
+            counts[s.kind] = (n + (0 if s.excused else s.weight), ok + (s.weight if s.excused else 0))
         if path.suffix == ".c":
             n, ok = counts.get("_units", (0, 0))  # (units with an unexcused warning, units without)
             dirty = any(s.kind in concessions.WARN and not s.excused for s in found)
@@ -877,6 +878,8 @@ def concession_lines_md(counts):
             "| Warnings (`python3 tools/concessions.py`; not scored) | |", "|---|---:|",
             *[f"| `{k}` | {cell(k)} |" for k in concessions.WARN if k in counts],
             f"| total | {sum(counts.get(k, (0, 0))[0] for k in concessions.WARN):,} |", "",
+            f"Steering debt (parked constant uses and unresolved inline constant arguments): "
+            f"**{sum(counts.get(k, (0, 0))[0] for k in concessions.STAGED):,}**.", "",
             f"Source files with no warning: **{counts.get('_units', (0, 0))[1]:,}** of "
             f"{sum(counts.get('_units', (0, 0))):,}.", ""]
 
