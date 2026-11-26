@@ -404,6 +404,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [notes/monsters2-source-recovery_2026-11-20.md](../notes/monsters2-source-recovery_2026-11-20.md) | Golem through Axe source recovery | #monsters #matching #compiler #phase3 #structs | 1 |
 | [notes/named-actor-move-mode-round9.md](../notes/named-actor-move-mode-round9.md) | MovingPlatformActor_SetMoveModeFromScript | #matching #round9b #named-object | 0 |
 | [notes/named-object-create-round9.md](../notes/named-object-create-round9.md) | MovingPlatform_CreateFromScript | #matching #round9b #named-object | 1 |
+| [notes/naming-debt_2026-11-26.md](../notes/naming-debt_2026-11-26.md) | Source naming debt before the filename pass | *#scripts #inventory* | 10 |
 | [notes/native-effect-profile-round9.md](../notes/native-effect-profile-round9.md) | ProjectileEffect_CreateFromProfile |  | 1 |
 | [notes/nav-mesh-route-round9.md](../notes/nav-mesh-route-round9.md) | NavMesh_FindRoute |  | 1 |
 | [notes/nidhoggr-init-parts-match.md](../notes/nidhoggr-init-parts-match.md) | Nidhoggr_InitParts (081940F8) | #matching #nidhoggr #cse #reload | 1 |
