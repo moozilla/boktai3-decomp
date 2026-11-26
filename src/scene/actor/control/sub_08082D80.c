@@ -1,3 +1,4 @@
+#include "scene/motion/scene_actor_terrain_reaction.h"
 #include "scene/actor/scene_actor_control_helpers.h"
 #include "scene/actor/scene_actor_control_phase.h"
 #include "player/player.h"
@@ -26,12 +27,7 @@ static inline void OrTrackingFlags(struct SceneActorChaseTracking *tracking, u32
     mask |= tracking->flags;
     tracking->flags = mask;
 }
-static inline void SelectState(struct ChaseActor *actor, u8 state, u8 phase, u8 behavior)
-{
-    actor->base.state2A8 = state;
-    actor->base.phase2A9 = phase;
-    actor->base.behavior2AA = behavior;
-}
+
 void SceneActorControl_ConvergeSavedMotion(struct ChaseActor *actor)
 {
     struct SceneActorControlMotionState *state = SceneActorControl_GetMotionState(actor);
@@ -90,17 +86,13 @@ void SceneActorControl_ConvergeSavedMotion(struct ChaseActor *actor)
         tracked = SceneActorChase_TrackingFlags(tracking, 8);
         if (tracked) {
             SceneActorReaction_EnableMotionFlags(0x100, flags);
-            SceneActorControl_StartPositionCurve(actor, &gPlayers[0]->position);
-            SelectState(actor, 0, 2, 0);
-            actor->base.counter2AC = 0;
-            actor->base.field2B1 = 1;
+            SceneActorControl_StartPositionCurve(actor, (const struct ContactPosition *)&gPlayers[0]->position);
+            SceneActorTerrain_EnterState(actor, 0, 2, 0);
             SceneActorControl_ResetCollisionPhase(actor);
         } else {
             OrTrackingFlags(tracking, 8);
             SceneActorReaction_EnableMotionFlags(0x100, flags);
-            SelectState(actor, 0, 0, 3);
-            actor->base.counter2AC = 0;
-            actor->base.field2B1 = 1;
+            SceneActorTerrain_EnterState(actor, 0, 0, 3);
             SceneActorControl_ResetCollisionPhase(actor);
         }
     }
