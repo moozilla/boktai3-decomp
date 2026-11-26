@@ -1,3 +1,4 @@
+#include "scene/collision/scene_actor_delayed_response.h"
 #include "scene/actor/scene_actor_status.h"
 #include "scene/actor/scene_actor_placement.h"
 
@@ -28,23 +29,6 @@ typedef char Check_interactionCallback
 typedef char
     Check_responseCallback[(u32) & ((struct ChaseActor *)0)->group.responseCallback == 0x61C ? 1
                                                                                              : -1];
-struct UpdateRestorationCommand {
-    u8 unknown0[8];
-    u8 state, phase, behavior, unknownB;
-    u32 delay;
-    void *control;
-};
-static inline void ActorStatus_StoreRestoration(struct UpdateRestorationCommand *command,
-                                                void *control, u32 state, u32 phase, u32 behavior,
-                                                u32 delay)
-{
-    command->delay = delay;
-    command->control = control;
-    command->state = state;
-    command->phase = phase;
-    command->behavior = behavior;
-}
-
 void SceneActorRecord_RecordPair(u32, u32);
 void SceneActorAttachment_ReplaceResponseSlot(void *, s32, s32, s32);
 s32 Callback_InvokeActor(void *, void *);
@@ -383,16 +367,14 @@ static inline void ActorStatus_RecoverAndRelease(void *object)
         } else if ((cat = ((struct ChaseActor *)object)->base.category) != 2 && cat != 0x19 &&
                    !(ActorStatus_MotionFlags(object, 0x100))) {
             u8 *grp;
-            u8 *r5;
+            struct ContactPosition *position;
 
             ActorStatus_ResetReaction(object);
             SceneActorAttachment_ReplaceResponseSlot(object, 0, 2, cat);
             SceneActorAnimation_SelectDirectionalEntry(object, 0);
             SceneActorChase_SetControl(object, (void *)SceneActorReaction_RestoreAfterDelay, 0xE);
             SceneActorChase_SetState(object, 3, 1, 0);
-            ActorStatus_StoreRestoration(
-                (void *)&((struct ChaseActor *)object)->group.saved.control,
-                ((struct ChaseActor *)object)->base.onAlternateEntry, 0, 0, 7, 60);
+            SceneActorDelay_Prepare((void *)&actor->group.saved, actor->base.onAlternateEntry, 7, 60);
             ActorStatus_SetWord(&((struct ChaseActor *)object)->base.behaviorFlags, 0x10);
             SceneActorPlacement_ClearFlags(&((struct ChaseActor *)object)->base.reactionFlags,
                                            (u32)(s16)0xF636);
@@ -402,8 +384,8 @@ static inline void ActorStatus_RecoverAndRelease(void *object)
 
             group->destination->pad = 1;
             grp = group->route;
-            r5 = (u8 *)actor + 0x5C;
-            res = ActorStatus_TryRecoveryRoute(object, grp, (void *)r5, &targetPosition);
+            position = &actor->base.body.position;
+            res = ActorStatus_TryRecoveryRoute(object, grp, position, &targetPosition);
             if (!res)
                 Callback_InvokeActor(actor, group->fallback);
         }
