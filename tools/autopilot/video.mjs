@@ -84,6 +84,7 @@ const describe = (e) => {
     case 'hit': return `hit ${e.with ? `with ${e.with}` : 'it'}: ${e.lit ? 'lit' : e.done ? 'done' : `${e.hits} hits, no effect`}`;
     case 'collect': return e.done ? 'picked up an item' : null;
     case 'heal': return `heal: life ${e.from} > ${e.to}`;
+    case 'ride': return e.key ? `bike ${e.key}: track ${e.x}, lane ${e.lane}, life ${e.life}` : 'ride the coffin bike';
     case 'talk': return 'talk';
     case 'fight':
       if (e.threshold !== undefined) return `sunlight: threshold ${e.threshold}, guard ${e.guard}`;
