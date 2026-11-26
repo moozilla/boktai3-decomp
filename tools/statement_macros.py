@@ -10,9 +10,13 @@ it as one.
 from __future__ import annotations
 
 import functools
+import hashlib
+import json
 import os
 import re
+from contextlib import suppress
 from pathlib import Path
+from tempfile import NamedTemporaryFile
 
 from source_layout import is_upstream
 
@@ -43,7 +47,7 @@ def scan(text: str) -> tuple[set[str], dict[str, int]]:
 
 
 @functools.lru_cache(maxsize=16384)
-def _scan_file(path: str, mtime_ns: int, ctime_ns: int, size: int):
+def _scan_file(path: str, inode: int, mtime_ns: int, ctime_ns: int, size: int):
     defs, uses = scan(Path(path).read_text(errors="replace"))
     return frozenset(defs), tuple(uses.items())
 
@@ -62,15 +66,15 @@ def _sources(root: Path, exclude: Path | None):
                 if skip and (path == skip or os.path.islink(path) and os.path.realpath(path) == skip):
                     continue
                 stat = os.stat(path)
-                yield path, stat.st_mtime_ns, stat.st_ctime_ns, stat.st_size, not is_upstream(path)
+                yield path, stat.st_ino, stat.st_mtime_ns, stat.st_ctime_ns, stat.st_size, not is_upstream(path)
 
 
 @functools.lru_cache(maxsize=2)
 def _counts(sources):
     defs: set[str] = set()
     uses: dict[str, int] = {}
-    for path, mtime_ns, ctime_ns, size, count_defs in sources:
-        defined, calls = _scan_file(path, mtime_ns, ctime_ns, size)
+    for path, inode, mtime_ns, ctime_ns, size, count_defs in sources:
+        defined, calls = _scan_file(path, inode, mtime_ns, ctime_ns, size)
         if count_defs:
             defs.update(defined)
         for name, count in calls:
@@ -86,8 +90,40 @@ def corpus(root: Path = ROOT, exclude: Path | None = None) -> tuple[set[str], di
 
 def single_use_names(root: Path = ROOT) -> frozenset[str]:
     """Statement macros used at exactly one site across the current tree."""
-    defs, uses = corpus(Path(root))
-    return frozenset(name for name in defs if uses.get(name, 0) == 1)
+    root = Path(root)
+    sources = tuple(_sources(root, None))
+    cache = root / "build" / "statement-macros.json"
+    cache_enabled = cache.parent.is_dir()
+    if cache_enabled:
+        fingerprint = hashlib.sha256(Path(__file__).read_bytes())
+        for source in sources:
+            fingerprint.update(repr(source).encode())
+        key = fingerprint.hexdigest()
+        try:
+            saved = json.loads(cache.read_text())
+            names = saved["names"]
+            if saved["fingerprint"] == key and isinstance(names, list) and all(isinstance(n, str) for n in names):
+                return frozenset(names)
+        except (OSError, ValueError, KeyError, TypeError):
+            pass
+
+    defs, uses = _counts(sources)
+    names = frozenset(name for name in defs if uses.get(name, 0) == 1)
+    if cache_enabled:
+        temporary = None
+        try:
+            with NamedTemporaryFile("w", dir=cache.parent, delete=False) as stream:
+                temporary = Path(stream.name)
+                json.dump({"fingerprint": key, "names": sorted(names)}, stream)
+            temporary.replace(cache)
+            temporary = None
+        except OSError:
+            pass
+        finally:
+            if temporary is not None:
+                with suppress(OSError):
+                    temporary.unlink()
+    return names
 
 
 def single_use_in(text: str, exclude: Path | None = None, root: Path = ROOT) -> list[str]:
