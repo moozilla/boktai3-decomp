@@ -1,4 +1,4 @@
-#include "global.h"
+#include "bosses/count/count.h"
 #include "engine/video/render.h"
 #include "npc/story_character/state_actor.h"
 #include "scene/collision/contact_collider.h"
@@ -21,90 +21,16 @@ void Palette_InterpolateBanks(void *, void *, void *, s32, s32);
 void SceneActors_SpawnAmbientParticlePair(void *);
 void SceneActors_StopBackgroundFlash(void *);
 
-struct FrameSprite {
-    u8 pad0[9];
-    u8 direction;
-    u8 padA[0x42];
-};
-struct FrameBase {
-    u8 pad0[0x48];
-    struct FrameSprite sprite;
-    s16 health;
-    u8 pad96[6];
-    u32 flags;
-    u8 padA0[0x13];
-    u8 ambientMode;
-    u8 padB4[8];
-    u32 requestX, requestZ;
-    u8 padC4[0x20];
-    u32 ticks;
-};
-struct FrameAnimation {
-    u8 pad0[8];
-    u32 flags;
-    u8 padC[0x14];
-};
-/* The first byte is the signed interpolation amount when used in arithmetic. */
-struct FrameBlendState {
-    u32 amount : 8;
-    u32 descending : 8;
-    u32 mode : 8;
-    u32 shift : 8;
-    s32 resource;
-};
-struct CountFrame {
-    struct FrameBase base;
-    u8 padE8[0x90];
-    struct ContactCollider body;
-    struct ContactCollider overlay;
-    u8 pad220[0x20];
-    struct FrameAnimation animation;
-    u8 position[8];
-    u8 pad268[0x20];
-    void *palette;
-    u8 pad28C[0x14];
-    u8 shadow[0xac];
-    u16 flashTimer;
-    u16 effectTimer;
-    u8 pad350[0x3c];
-    struct FrameBlendState blend;
-    u8 pad394[5];
-    u8 shakeAmplitude;
-    u8 pad39A[2];
-    s32 queuedHeal;
-    s32 queuedDamage;
-    u8 pad3A4[0x14];
-    u8 ambientParticles;
-    u8 pad3B9[7];
-    s32 flashFrames;
-    u8 paletteDefault[0x200];
-    u8 paletteNormal[0x200];
-    u8 paletteSpecial[0x200];
-    u8 pad9C4[0x1c];
-    struct CameraTracking camera;
-};
-
-static inline void Frame_HideAnimation(struct FrameAnimation *animation)
-{
-    animation->flags |= 1;
-}
-static inline void Frame_ClearAnimationFlags(struct FrameAnimation *animation, u32 mask)
-{
-    u32 flags = animation->flags;
-    flags &= ~mask;
-    animation->flags = flags;
-}
-
-static inline u8 Frame_ReadBlendAmount(struct FrameBlendState *blend)
+static inline u8 CountPaletteBlend_ReadAmount(struct CountPaletteBlend *blend)
 {
     return blend->amount;
 }
 
 void Count_UpdatePresentation(void *arg0)
 {
-    struct FrameBase *base = arg0;
-    struct CountFrame *p = arg0;
-    struct FrameSprite *sprite = &base->sprite;
+    struct Count *base = arg0;
+    struct Count *p = arg0;
+    struct SceneActorBody *sprite = &base->body;
     struct ContactCollider *collider;
     s32 cost;
 
@@ -120,32 +46,32 @@ void Count_UpdatePresentation(void *arg0)
         p->queuedDamage = 0;
     }
     SceneActors_UpdateEffects(base);
-    if (p->effectTimer != 0) {
+    if (p->invulnerabilityTimer != 0) {
         SceneActorState_SetFlags((struct StateActor *)base, 4);
-        p->effectTimer--;
+        p->invulnerabilityTimer--;
     }
-    collider = &p->overlay;
+    collider = &p->overlayCollider;
     if (SceneActorState_TestFlags((struct StateActor *)base, 4)) {
         ContactCollider_SetFlags(collider, 4);
     } else {
         ContactCollider_ClearFlags(collider, 4);
-        Collider_SetPosition(collider, p->position, 0);
+        Collider_SetPosition(collider, &p->animation.position, 0);
         collider->direction = sprite->direction;
     }
-    collider = &p->body;
+    collider = &p->bodyCollider;
     if (!SceneActorState_TestFlags((struct StateActor *)base, 8)) {
-        Collider_SetPosition(collider, p->position, 0);
+        Collider_SetPosition(collider, &p->animation.position, 0);
         collider->direction = sprite->direction;
         SceneActorGraphics_UpdateVariant(p);
         Collider_Refresh(collider);
     }
     if (SceneActorState_TestFlags((struct StateActor *)base, 0x10)) {
-        Frame_HideAnimation(&p->animation);
+        AnimSprite_Hide(&p->animation);
         ScaledShadow_Disable(p->shadow);
         CameraTracking_ClearRequests(&p->camera, 1);
-        ContactCollider_ClearFlags(&p->overlay, 8);
+        ContactCollider_ClearFlags(&p->overlayCollider, 8);
     } else {
-        Frame_ClearAnimationFlags(&p->animation, 1);
+        AnimSprite_Show(&p->animation);
         if (base->ambientMode != 0) {
             ScaledShadow_Enable(p->shadow);
             CameraTracking_ClearRequests(&p->camera, 1);
@@ -154,25 +80,25 @@ void Count_UpdatePresentation(void *arg0)
             CameraTracking_SetRequests(&p->camera, 1);
         }
         if (SceneActorState_TestFlags((struct StateActor *)base, 0x20)) {
-            ContactCollider_SetFlags(&p->overlay, 8);
+            ContactCollider_SetFlags(&p->overlayCollider, 8);
         } else {
-            ContactCollider_ClearFlags(&p->overlay, 8);
+            ContactCollider_ClearFlags(&p->overlayCollider, 8);
         }
     }
     if (p->shakeAmplitude) {
         p->shakeAmplitude--;
         SceneActorState_SetFlags((struct StateActor *)base, 0x20000);
     }
-    if ((s16)p->flashTimer > 0) {
-        p->flashTimer--;
-        if (p->flashTimer == 0) {
+    if ((s16)p->paletteRestoreTimer > 0) {
+        p->paletteRestoreTimer--;
+        if (p->paletteRestoreTimer == 0) {
             s32 res = SceneActorGraphics_GetResourceId(p);
             if (res == 0) {
-                p->palette = p->paletteNormal;
+                p->animation.palette = p->paletteNormal;
             } else if (res == 1) {
-                p->palette = p->paletteSpecial;
+                p->animation.palette = p->paletteSpecial;
             } else {
-                p->palette = p->paletteDefault;
+                p->animation.palette = p->paletteDefault;
             }
         }
     } else {
@@ -192,9 +118,9 @@ void Count_UpdatePresentation(void *arg0)
                 b = gPaletteBankData + (res << 5);
                 dst = p->paletteDefault;
                 Palette_InterpolateBanks(
-                    dst, a, b, (s8)Frame_ReadBlendAmount((struct FrameBlendState *)amountByte),
+                    dst, a, b, (s8)CountPaletteBlend_ReadAmount((struct CountPaletteBlend *)amountByte),
                     p->blend.shift);
-                p->palette = dst;
+                p->animation.palette = dst;
             }
         } else if (p->blend.mode == 2) {
             void *dst;
@@ -207,9 +133,9 @@ void Count_UpdatePresentation(void *arg0)
                 b = gPaletteBankData + (res << 5);
                 dst = p->paletteDefault;
                 Palette_InterpolateBanks(
-                    dst, a, b, (s8)Frame_ReadBlendAmount((struct FrameBlendState *)amountByte),
+                    dst, a, b, (s8)CountPaletteBlend_ReadAmount((struct CountPaletteBlend *)amountByte),
                     p->blend.shift);
-                p->palette = dst;
+                p->animation.palette = dst;
             } else {
                 SceneActorGraphics_SelectResource(p);
             }
@@ -221,7 +147,7 @@ void Count_UpdatePresentation(void *arg0)
             dst = p->paletteDefault;
             amountByte = (u8 *)&p->blend;
             Palette_InterpolateBanks(dst, a, b, (s8)*amountByte, p->blend.shift);
-            p->palette = dst;
+            p->animation.palette = dst;
             if (p->blend.descending == 0) {
                 *amountByte += 1;
                 if ((s8)*amountByte > 0x1f) {
@@ -239,14 +165,14 @@ void Count_UpdatePresentation(void *arg0)
     }
     if (base->ambientMode == 0)
         CameraTracking_Update(&p->camera);
-    if (base->ambientMode != 0 && p->ambientParticles && (base->ticks & 0xf) == 0)
+    if (base->ambientMode != 0 && p->ambientParticles && (base->effectTimer & 0xf) == 0)
         SceneActors_SpawnAmbientParticlePair(p);
-    if (p->flashFrames > 0) {
-        p->flashFrames--;
-        if (p->flashFrames == 0)
+    if (p->backgroundFlashTimer > 0) {
+        p->backgroundFlashTimer--;
+        if (p->backgroundFlashTimer == 0)
             SceneActors_StopBackgroundFlash(p);
     }
-    base->requestX = 0;
-    base->requestZ = 0;
-    base->ticks++;
+    base->contactAttack = 0;
+    base->contactFlags = 0;
+    base->effectTimer++;
 }
