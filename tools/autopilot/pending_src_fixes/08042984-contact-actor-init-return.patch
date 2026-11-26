@@ -1,0 +1,16 @@
+08042984 contact-actor-init-return
+
+The final Collider_SetAttackProperties returns through r0.
+
+The explicit form changed the ROM bytes. The guarded form passed the unit ROM check.
+
+--- a/src/contact_actor_display.c
++++ b/src/contact_actor_display.c
+@@ -162,4 +162,7 @@
+     Collider_SetCallback(collider, ContactActor_ApplyResourceContact, slot);
+     Collider_SetAttackProperties(collider, pool->resourceColliderId, 30, 0x208000, 0x20000, 30);
++#ifdef UBFIX
++    return 0x08042AD1; // preserve the inherited GBA return value
++#endif
+ }
+ 
