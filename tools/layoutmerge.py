@@ -76,7 +76,8 @@ except ImportError:  # the project venv has it
     sys.exit("layoutmerge.py needs pycparser (build/venv)")
 
 AGBCC = os.environ.get("AGBCC", os.path.join(ROOT, "build", "tools", "agbcc", "agbcc"))
-CPP = ["cc", "-E"] if sys.platform == "darwin" else ["cpp"]
+CLANG = "/Library/Developer/CommandLineTools/usr/bin/clang"
+CPP = [CLANG if os.path.exists(CLANG) else "cc", "-E"] if sys.platform == "darwin" else ["cpp"]
 ELF = os.path.join(ROOT, "build", "boktai3.elf")
 OUT = os.path.join(ROOT, "build", "layouts")
 with open(os.path.abspath(__file__), "rb") as _f:
@@ -96,8 +97,9 @@ def is_ram(v):
 
 # ---------------------------------------------------------------- C side
 
-def preprocess(path):
-    r = subprocess.run(CPP + ["-nostdinc", "-undef", "-DNONMATCHING", "-I", "include", "-iquote", ".", path],
+def preprocess(path, *, nonmatching=True):
+    defines = ["-DNONMATCHING"] if nonmatching else []
+    r = subprocess.run(CPP + ["-nostdinc", "-undef"] + defines + ["-I", "include", "-iquote", ".", path],
                        cwd=ROOT, capture_output=True, text=True)
     return r.stdout if r.returncode == 0 else None
 
@@ -589,6 +591,12 @@ def _scan_tu(path, text, names):
         for k in ("count", "sizeof"):
             if k in d:  # sizeof of an incomplete array: 0 or refused
                 d[k] = vals[d[k]] or None
+    finish_layouts(structs, vals, bitfields, bfbytes)
+    return {"decls": out_decls, "structs": structs, "accesses": accesses}
+
+
+def finish_layouts(structs, vals, bitfields, bfbytes):
+    """Replace probe indexes with agbcc's offsets, sizes and bit positions."""
     for st in structs.values():
         st["size"] = vals[st["size"]]
         for c in st["containers"]:
@@ -611,7 +619,62 @@ def _scan_tu(path, text, names):
         lo, hi = bits[0], bits[-1] + 1
         lf["off"], lf["size"] = lo // 8, (hi + 7) // 8 - lo // 8
         lf["bitpos"], lf["bits"] = lo, hi - lo
-    return {"decls": out_decls, "structs": structs, "accesses": accesses}
+
+
+def probe_records(body, tu, records):
+    """Probe named aggregate definitions directly, without synthetic RAM globals.
+
+    RECORDS maps an arbitrary key to (C spelling, definition). Keep direct
+    members as well as flattened leaves so a consumer can preserve or rebuild
+    enclosing arrays and structs. Neither list guesses offsets or alignment.
+    """
+    probes, structs, bitfields = [], {}, []
+    for key, (spell, definition) in records.items():
+        root = f"(({spell} *)0)->"
+        st = {"spell": spell, "kind": kind_of(definition), "size": len(probes), "align": len(probes) + 1,
+              "leaves": [], "containers": [], "members": []}
+        probes.extend((f"sizeof({spell})", f"__alignof__({spell})"))
+        flatten(tu, root, definition, [], probes, st["leaves"], st["containers"], [], frozenset())
+        for i, lf in enumerate(st["leaves"]):
+            if "bf" in lf:
+                bitfields.append((key, i, spell, lf["bf"]))
+        for d in definition.decls:
+            if d.name is None:
+                st["members"].append({"name": None})
+                continue
+            t = tu.resolve(d.type)
+            array = isinstance(t, c_ast.ArrayDecl)
+            elem = t.type if array else d.type
+            width, signed, base = tu.scalar(elem)
+            aggregate = tu.aggregate(elem)
+            m = {"name": d.name, "ctype": spell_type(d.type), "decl": GEN.visit(d), "array": array,
+                 "bits": d.bitsize is not None, "width": width, "signed": signed,
+                 "base": "aggregate" if aggregate else base}
+            if not m["bits"]:
+                expr = root + d.name
+                for field, probe in (("off", f"(unsigned)&{expr}"), ("size", f"sizeof({expr})"),
+                                     ("align", f"__alignof__({expr})")):
+                    m[field] = len(probes)
+                    probes.append(probe)
+                if array:
+                    m["esize"] = len(probes)
+                    probes.append(f"sizeof({expr}[0])")
+            st["members"].append(m)
+        structs[key] = st
+    if not structs:
+        return structs
+    vals, bfbytes = run_probe(body, probes, [(spell, p) for _, _, spell, p in bitfields])
+    finish_layouts(structs, vals, bitfields, bfbytes)
+    for st in structs.values():
+        st["align"] = vals[st["align"]]
+        for m in st["members"]:
+            for k in ("off", "size", "align", "esize"):
+                if k in m:
+                    m[k] = vals[m[k]]
+            if m.get("bits"):
+                lf = next((l for l in st["leaves"] if l["name"] == m["name"]), {})
+                m.update({k: lf.get(k) for k in ("off", "size", "bitpos")})
+    return {key: st for key, st in structs.items() if st["size"] and st["align"]}
 
 
 PROBE_WORD = re.compile(r"^\s*\.(word|4byte|long|short|2byte|hword|byte|space)\s+(.*)$")
