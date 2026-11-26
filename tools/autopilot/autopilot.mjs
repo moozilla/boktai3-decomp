@@ -2,7 +2,7 @@
 // The Autopilot: plays Boktai 3 on the source port from typed game state.
 //
 //   node tools/autopilot/autopilot.mjs m1 [--save F] [--out DIR] [--shots]
-//   node tools/autopilot/autopilot.mjs story [--from MOVIE|--save SAV] [--until-scene SCENE] [--verify]
+//   node tools/autopilot/autopilot.mjs story [--from MOVIE|--save SAV] [--until-scene SCENE|--until-story N] [--verify]
 //
 // Runs headless in-process (port/agent/session.mjs) with the agent library plus
 // tools/autopilot/lib/*.js. Each milestone is a goal; the run writes the input
@@ -51,6 +51,7 @@ function stageData(file, generator, args, fallback) {
 }
 const STAGES = stageData('build/assets/stages.json', 'tools/assets/stages.py', ['json'], []);
 const LOCKS = stageData('build/autopilot/locks.json', 'tools/autopilot/locks.py', [], {});
+const ESCORT_TARGETS = stageData('build/autopilot/escort-targets.json', 'tools/autopilot/escort-targets.py', [], {});
 // What carries which reaction flag (tools/autopilot/breakers.py: Breakable_OnHit, the gun's
 // lens table, weapon modifiers, read from the source and the ROM's weapon records).
 const BREAKERS = (() => {
@@ -140,6 +141,9 @@ const GOALS = {
     }
     const visited = VISITED, limit = +(opt('--scenes', 8));
     const destination = +opt('--until-scene', -1), routeGoal = +opt('--goal', destination);
+    const storyGoal = +opt('--until-story', -1), endpoint = destination >= 0 || storyGoal >= 0;
+    const reachedScene = () => destination >= 0 && L.where().scene === destination;
+    const reached = () => reachedScene() || (storyGoal >= 0 && L.story() >= storyGoal);
     let prev, keyGoal;
     const failedKeyRooms = new Set();
     const bossActive = () => L.fightTargets().some((target) => target.boss || target.barrier);
@@ -154,11 +158,11 @@ const GOALS = {
         const portals = doors.filter((d) => boxes.has(d.box));
         return resolve ? L.doorBranches(portals, (d) => d.box) : portals;
       };
-      const ready = () => L.where().scene === destination || doorsHere(false).length > 0 || L.fightTargets().length > 0;
-      if (!(yield* untilControl(g, L, ready, 120, 30000))) { event({ skill: 'stop', why: 'no control with a door or enemy in 30000 frames', ...L.where() }); return destination < 0 && rooms > 0; }
+      const ready = () => reached() || doorsHere(false).length > 0 || L.fightTargets().length > 0;
+      if (!(yield* untilControl(g, L, ready, 120, 30000))) { event({ skill: 'stop', why: 'no control with a door or enemy in 30000 frames', ...L.where() }); return !endpoint && rooms > 0; }
       event({ skill: 'entry', ...L.where(), story: L.story() });
-      if (L.where().scene === destination) {
-        event({ skill: 'goal', reached: `scene ${destination}`, ...L.where(), story: L.story() });
+      if (reached()) {
+        event({ skill: 'goal', reached: reachedScene() ? `scene ${destination}` : `story ${storyGoal}`, ...L.where(), story: L.story() });
         return true;
       }
       // Boss fights can advance the scene themselves. Rooms with exits can
@@ -167,9 +171,16 @@ const GOALS = {
       if (targets.some((t) => t.boss || t.barrier) || (targets.length && !doorsHere(false).length)) {
         const f = yield* L.fight({ trace: (e) => event({ skill: 'fight', ...e }) });
         event({ skill: 'fought', ...f, scene: L.where().scene });
-        if (!(yield* untilControl(g, L, ready, 60, 30000))) { event({ skill: 'stop', why: 'no control after the fight', ...L.where() }); return destination < 0 && rooms > 0; }
+        if (!(yield* untilControl(g, L, ready, 60, 30000))) { event({ skill: 'stop', why: 'no control after the fight', ...L.where() }); return !endpoint && rooms > 0; }
       }
       const here = L.where().scene;
+      if (L.coffinAvailable()) {
+        const before = L.story(), advanced = () => L.story() > before;
+        for (const { box, cond } of ESCORT_TARGETS[here] || []) {
+          if (L.conditionsAllow(cond) && L.boxes().some((b) => b.name === box) && (yield* throughDoor(g, L, box, advanced))) break;
+        }
+        if (L.where().scene !== here || advanced()) continue;
+      }
       // healing: below a third of the life bar with something in the item bag, find the
       // use of an item in the pause menu that raises life (menuSearch; once per room)
       {
@@ -362,9 +373,9 @@ const GOALS = {
           if (L.where().scene !== here) { moved = true; break; }
         }
       }
-      if (!moved) { event({ skill: 'stop', why: 'no door worked', ...L.where() }); return destination < 0 && rooms > 0; }
+      if (!moved) { event({ skill: 'stop', why: 'no door worked', ...L.where() }); return !endpoint && rooms > 0; }
     }
-    return destination < 0;
+    return !endpoint || reached();
   },
 
   // With --from: nothing more (to verify, cover and save states for an earlier run).
@@ -430,7 +441,7 @@ function exploreDistances(here, visited) {
 
 // Through door box BOX: navigate; when a scripted gate turns the player back, open
 // the room's chests and items (the usual ask), then try again.
-function* throughDoor(g, L, box) {
+function* throughDoor(g, L, box, stopIf) {
   const scene = L.where().scene, tried = new Set();
   const avoid = stageOf(scene).doors.map((d) => d.box).filter((b) => b !== box);
   if (L.coffinAvailable()) {
@@ -440,9 +451,9 @@ function* throughDoor(g, L, box) {
       if (L.where().scene !== scene) return true;
       if (!L.coffinAvailable() || !g.$.gPlayers[0]) break;
       const life = L.where().life;
-      const r = yield* L.carryCoffin(box, { avoid, trace: (e) => event({ skill: 'nav', ...e }) });
+      const r = yield* L.carryCoffin(box, { avoid, stopIf, trace: (e) => event({ skill: 'nav', ...e }) });
       event({ skill: 'coffin', box, ...L.where(), ...r });
-      if (r.reached || L.where().scene !== scene) return true;
+      if (r.reached || L.where().scene !== scene || stopIf?.()) return true;
       if (r.reason !== 'lost grip') break;
       if (!foughtPatrol && L.where().life < life && L.fightTargets().length) {
         foughtPatrol = true;

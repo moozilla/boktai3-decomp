@@ -17,11 +17,13 @@ test('conditional branches prefer known script flags with a physical-door fallba
     s16: (addr) => addr === 0x0201003c ? 42 : 0,
     u8: (addr) => addr === 0x0201006e ? 8 : 0,
   };
-  const { doorBranches } = skill('conditions', g);
+  const { doorBranches, conditionsAllow } = skill('conditions', g);
   const first = { box: 'CD24', scene: 3022, cond: ['not ((progress >= 40) && ({ proc_1200 } == 1))'] };
   const second = { box: 'CD24', scene: 3028, cond: ['((progress >= 40) && (r708[0x6e.2]:t4(4,1) == 1))'] };
   const absent = { box: 'CD23', scene: 3011, cond: ['(progress < 41)'] };
   assert.deepEqual(doorBranches([first, second, absent], (door) => door.box), [second, absent]);
+  assert.equal(conditionsAllow(['(r708[0x3c]:t1 < 59)']), true);
+  assert.equal(conditionsAllow(['(r708[0x3c]:t1 >= 59)']), false);
 });
 
 test('gun tactics use the equipped frame cost, including the free lens', () => {

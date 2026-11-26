@@ -94,6 +94,8 @@ function condition(input) {
   }
 }
 
+exports.conditionsAllow = (conditions) => conditions.every((input) => condition(input) !== false);
+
 // Keep physical doors even if all extracted branches are false at the current
 // tick. The scripts may have created their traps under earlier conditions.
 exports.doorBranches = (doors, key) => {
