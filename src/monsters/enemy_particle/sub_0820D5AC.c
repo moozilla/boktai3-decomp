@@ -1,21 +1,12 @@
-#include "global.h"
+#include "monsters/enemy_particle.h"
 #include "engine/ram.h"
-struct E {
-    u8 p[0xB0];
-};
-struct A {
-    u8 p0[0x18];
-    u32 w18;
-    u8 p1[0x1C - 0x1c];
-    struct E e[24];
-};
-void EnemyParticle_ReleaseSlot(struct A *, struct E *, s32);
-u32 EnemyParticle_DestroyPool(struct A *a)
+void EnemyParticle_ReleaseSlot(struct EnemyParticlePool *, struct EnemyParticle *, s32);
+u32 EnemyParticle_DestroyPool(struct EnemyParticlePool *a)
 {
-    struct E *e = a->e;
+    struct EnemyParticle *e = a->slots;
     s32 i = 0;
     do {
-        if (a->w18 & (1 << i))
+        if (a->mask & (1 << i))
             EnemyParticle_ReleaseSlot(a, e, i);
         i++;
         e++;
