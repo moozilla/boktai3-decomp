@@ -249,3 +249,21 @@ lines and two steering uses, bringing the original 844 uses to 699.
 All five edited units and six header dependents matched. The scoped
 linter reported zero errors. The pass removed four report lines and
 four steering uses, bringing the original 844 uses to 695.
+
+## Shared route cursor and scripted recovery
+
+Skeleton's random behavior and three Vorn route selectors use
+`SceneActorRouteCursor` for the entry and chase group. Skeleton uses
+a direct return in the contact-forwarding guard and owns the defeat
+script arguments in their script helper. Vorn reads the animation
+event from the sprite tile and room actor's status.
+
+Mummy reads the recovery sequence through its drawable and copies the
+scripted heading and gate duration between their class fields. For the
+remaining gate OR at 080D4980, agbcc expands `ldrh` ahead of `movs #4`.
+The ROM materializes the flag value first. The difference is already
+present in the first RTL dump and persists through every pass.
+
+All four edited units matched their full ROM extents. The scoped
+linter totals held at 629 report lines and 695 steering uses, with
+zero errors.
