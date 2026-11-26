@@ -31,7 +31,7 @@ src/effects/particle_effect,src/effects/particles/action_flashes,Staged Player a
 src/effects/particle_emitter,src/effects/sprites/ballistic_trail.c,Original 081394B4 initializes the 409C launch. Flight ends in 8639 scatter effects from this unit.
 src/effects/particle_groups,src/effects/particles/impact_fragments,Staged bouncing chunks at 3955 and active during timed attack at 6165. Shared debris motion and fragment constructor; merge src/effects/fragment_groups.
 src/effects/registry_6_a37,src/effects/screen/magic_cannon_departure.c,Warp to 4924 at entrance 57. Proc 4928 hides the ship sprites and creates 6A37 before the space flight. The scrolling sky is visible during its update.
-src/effects/scene_particle,src/effects/particles/contact_particles.c,Native mode 1 uses the separate moving contact pool at 0812D7D0.
+src/effects/scene_particle,src/effects/particles/linear_motes.c,Controlled 0812D7A8 spawns the visible 1C1E mote. Its motion is separate from the gravity and terrain behavior in SceneMovingParticle.
 src/effects/scene_particle_pools,src/effects/particles/hit_effects,"Shared actor hit bursts at Centipede 4076 and Black Knight 6265, distinct from the anchored attachment group."
 src/effects/scripted_particle,src/effects/particles/trap_and_spell_effects,A945 floor traps call this 4384 puff and marker family. Ratatosk also uses the shared drifting-sprite branch.
 src/effects/sparkle_emitter,src/effects/particles/cutscene_sparkles.c,3D64 in Trinity release proc 3845. Green CC88 sparkles observed during the isolated script replay.
@@ -85,7 +85,7 @@ src/monsters/tentacle_actor,src/monsters/centipede,"Proc 4075 calls 1574 and 157
 src/monsters/tentacle_body,src/monsters/centipede,"Proc 4075 calls 1574 and 1576 to create 0AC7. The visible category-9 actor maps to Monster Book entry 13, text #9851, Centipede. The replay executes its constructor, component update and the shared body windup and spread callbacks."
 src/other/callback_pool,src/objects/loot_deposits,0029→3905. CallbackPool_ApplyDamage receives the F1F9 slot and creates its visible impact particles. Merge src/field/actor_group.
 src/other/registry_selection,src/ui/world_map.c,GCL 2570 creates key 2388 for the nine world destinations. WORLD is visible in the stock save. Confirm selects San Miguel in this replay.
-src/other/scene_terrain_probe/scene_moving_particle.c,src/effects/particles/debris_motes.c,Original moving-sprite updater and many Player and fragment callers. Leave the type 2 spread projectile separately routed.
+src/other/scene_terrain_probe/scene_moving_particle.c,src/effects/particles/debris_motes.c,Controlled 08125EC4 draws a 1C1E mote and applies gravity and terrain bounces. Keep the separate spread projectile in its own file.
 src/other/scene_terrain_probe/spread_shot.c,src/effects/particles/spread_shot.c,The original type 2 shot and its spread bursts execute in the staged 3955 comparison.
 src/player/sub_08143604.c,src/player/special_actions,"Special motion effect callbacks, dispatched separately from mode 3 gun/melee. Controlled motion IDs 9, 16, and 17 reached three callbacks. 0814692C is the alternate table’s equivalent mode 9."
 src/player/sub_08144408.c,src/player/special_actions,"Special motion effect callbacks, dispatched separately from mode 3 gun/melee. Controlled motion IDs 9, 16, and 17 reached three callbacks. 0814692C is the alternate table’s equivalent mode 9."

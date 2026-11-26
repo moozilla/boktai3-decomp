@@ -988,3 +988,32 @@ for the flying pieces. Compare `before.png`, `debris.png` and
 `scatter.png`. At frame 1851, the renderer ties the curtain pieces
 to 0200DD88 and the debris pieces to 02011C78, 02011D28 and 02011DD8.
 The staged hit proves the ownership in its retail arena.
+
+### Linear and gravity-driven mote isolation
+
+Tags: particles, 1C1E, hardware OBJ, renderer, gravity
+
+Load the 0029 snapshot at 3955 for each run. The
+`resume-pixel-{control,contact,impact}/commands.txt` files use the
+same initial state, camera and frame timing. In the two spawn runs,
+invoke 0812D7A8 or 08125EC4 with the same position, velocity,
+lifetime and frame kind. In the control, advance the same frames.
+Both spawners use graphics 1C1E, so the same artwork cannot establish
+which pool drew the screen pixels.
+
+At frame 1869, compare the OAM attribute triples as multisets.
+Both spawn runs add a single OBJ at index 3. Match its nontransparent
+texture pixels against the screenshot with
+`studio.experiments.obj_pixels.matching_objects` using the OAM,
+OBJ VRAM, palette and DISPCNT dumps. The linear spawn changes 30
+pixels in the rectangle bounded by (135, 87) and (141, 94),
+with maximum coordinates excluded. The gravity-driven spawn
+changes the same shape three pixels lower. Original probes show
+the two separate motion callbacks on those frames.
+
+Repeat each spawn run with `hideobj 3 1869` before running the
+target frame. The observer hides the slot for scanline rendering
+and restores the original hardware state. The resulting
+`resume-pixel-*-hide/frame2.png` matches the no-spawn control exactly.
+The controlled render establishes the effect identity. A shipped
+trigger for the linear mote constructor remains open.
