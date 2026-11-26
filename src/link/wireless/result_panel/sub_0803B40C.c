@@ -22,12 +22,13 @@ void *Script_GetTextSourcePc(void);
 void Widget_InitLinked(void *, void *, int, int, int, int, int, void *);
 void Anim_RestartSequence(void *, void *, int, int, int);
 void *WirelessExchange_GetPeerEntry(int);
+enum { WIRELESS_RESULT_SCRIPT_PACK = 0xCB05 };
+
 int WirelessResultPanel_Init(struct ResultMenu *arg)
 {
     struct ResultMenu *p = arg;
     struct AnimSpriteResource *res;
     struct AnimSpriteResource *first;
-    int pack;
     struct AnimSpriteResource *primary;
     struct AnimSpriteResource *secondary;
     void *resource;
@@ -37,37 +38,22 @@ int WirelessResultPanel_Init(struct ResultMenu *arg)
     struct DisplaySequenceSprite *savedSprite;
     gResultMenu = p;
     if (Script_SeekToKeyword(115)) {
-        void *value = Script_GetTextSourcePc();
-        void **slot = &p->resource;
-        *slot = value;
-        if (value)
-            goto initialize;
+        p->resource = Script_GetTextSourcePc();
+        if (!p->resource)
+            return -1;
+    } else {
+        return -1;
     }
-failed:
-    return -1;
-initialize:
-    pack = 0xCB05;
-    res = ScriptProc_Start(pack, 0x530D);
+    res = ScriptProc_Start(WIRELESS_RESULT_SCRIPT_PACK, 0x530D);
     if (!res)
-        goto failed;
-    /* Both bounded resource guards remain unresolved allocation-only forms. */
-    {
-        u32 raw = (u8)(u32)res;
-        if ((s32)raw < 0)
-            res = 0;
-    }
+        return -1;
     p->primary = *res;
     first = &p->primary;
     ResourceHeader_Relocate(first, res);
-    res = ScriptProc_Start(pack, 0x7C8B);
+    res = ScriptProc_Start(WIRELESS_RESULT_SCRIPT_PACK, 0x7C8B);
     primary = first;
     if (!res)
-        goto failed;
-    {
-        u32 raw = (u8)(u32)res;
-        if ((s32)raw < 0)
-            res = 0;
-    }
+        return -1;
     p->secondary = *res;
     secondary = &p->secondary;
     ResourceHeader_Relocate(secondary, res);
@@ -94,7 +80,6 @@ initialize:
     {
         struct DisplaySequenceState *state = &animation;
         const u16 *command;
-        u32 ended;
         command = state->commands + state->index;
         sprite->frame = *command >> 6;
         {
@@ -127,28 +112,22 @@ initialize:
                         state->elapsed = state->duration;
                     else
                         state->index = state->frameCount - 1;
-                    ended = 1;
                 } else {
                     state->index--;
-                    ended = 0;
                 }
             } else if (++state->index >= state->frameCount) {
                 if ((u8)(state->flags & 8)) {
                     state->elapsed = state->duration;
                     state->index = state->frameCount - 1;
-                    ended = 1;
                 } else {
                     state->index = 0;
-                    ended = 1;
                 }
-            } else
-                ended = 0;
+            }
             command = state->commands + state->index;
             DisplaySequence_UpdateWeight(state, command);
             if (!state->duration)
                 state->duration = 1;
-        } else
-            ended = 0;
+        }
     }
     p->sprite.priority = 0;
     Memory_Copy(p->left, WirelessExchange_GetPeerEntry(0), sizeof(p->left));

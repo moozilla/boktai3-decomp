@@ -1,6 +1,7 @@
 #include "effects/bursts/spiral_burst.h"
 
 #include "engine/math/monster_particle_random.h"
+#include "engine/math/scene_vec_polar.h"
 void SpiralBurst_InitParticles(struct SpiralBurst *burst)
 {
     const u16 *table;
@@ -37,12 +38,12 @@ void SpiralBurst_InitParticles(struct SpiralBurst *burst)
             wave.table = gUnk_086149C4;
             wave.sample = wave.table[((frame->motion.angle + 64) & 255)];
             frame->motion.position.x =
-                burst->origin.x + SpiralBurst_ScaleOffset(radius * wave.sample);
+                burst->origin.x + SceneVec_TruncateComponent(radius * wave.sample);
         }
         frame->motion.position.y = burst->origin.y;
         frame->motion.position.z =
             burst->origin.z +
-            SpiralBurst_ScaleOffset(frame->motion.radius * gUnk_086149C4[frame->motion.angle]);
+            SceneVec_TruncateComponent(frame->motion.radius * gUnk_086149C4[frame->motion.angle]);
         sprite->priority = 2;
         frame->depthOffset = -20;
         {

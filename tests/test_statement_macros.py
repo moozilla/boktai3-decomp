@@ -3,6 +3,7 @@ from pathlib import Path
 import sys
 import tempfile
 import unittest
+from unittest.mock import patch
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "tools"))
@@ -56,10 +57,56 @@ class StatementMacros(unittest.TestCase):
         path.unlink()
         self.assertIn("BUMP", sm.single_use_names(self.root))
 
+    def test_disk_counts_reload_and_follow_same_size_edits(self):
+        build = self.root / "build"
+        build.mkdir()
+        path = self.root / "src/fn/extra.c"
+        path.write_text("void t(void) { CALL(x); }")
+        self.assertIn("BUMP", sm.single_use_names(self.root))
+        with patch.object(sm, "_counts", side_effect=AssertionError("unexpected rescan")):
+            self.assertIn("BUMP", sm.single_use_names(self.root))
+
+        path.write_text("void t(void) { BUMP(x); }")
+        self.assertNotIn("BUMP", sm.single_use_names(self.root))
+        path.unlink()
+        self.assertIn("BUMP", sm.single_use_names(self.root))
+
+    def test_corrupt_disk_counts_are_rebuilt(self):
+        build = self.root / "build"
+        build.mkdir()
+        cache = build / "statement-macros.json"
+        cache.write_text("{")
+        self.assertIn("BUMP", sm.single_use_names(self.root))
+        with patch.object(sm, "_counts", side_effect=AssertionError("unexpected rescan")):
+            self.assertIn("BUMP", sm.single_use_names(self.root))
+
     def test_draft_replacing_its_own_file(self):
         path = self.root / "src/fn/once.c"
         self.assertEqual(sm.single_use_in(ONCE, exclude=path, root=self.root), ["BUMP"])
         self.assertEqual(sm.single_use_in('void c(void) { DELTAS(x, y); }\n', root=self.root), [])
+
+    def test_disk_counts_subtract_the_replaced_file_only(self):
+        (self.root / "build").mkdir()
+        duplicate = self.root / "src/fn/a.c"
+        duplicate.write_text(SHARED_DEF + "void a(void) { DELTAS(x, y); }")
+        (self.root / "src/fn/b.c").unlink()
+        self.assertIn("DELTAS", sm.single_use_names(self.root))
+
+        with patch.object(sm, "_counts", side_effect=AssertionError("unexpected rescan")):
+            self.assertEqual(sm.single_use_in("void a(void) { DELTAS(x, y); }", duplicate, self.root),
+                             ["DELTAS"])
+            once = self.root / "src/fn/once.c"
+            self.assertEqual(sm.single_use_in("void a(void) { BUMP(x); }", once, self.root), [])
+
+    def test_disk_counts_exclude_symlinks_to_the_replaced_file(self):
+        (self.root / "build").mkdir()
+        path = self.root / "src/fn/once.c"
+        (self.root / "src/fn/alias.c").symlink_to(path)
+        self.assertNotIn("BUMP", sm.single_use_names(self.root))
+        with patch.object(sm, "_counts", side_effect=AssertionError("unexpected rescan")):
+            self.assertEqual(sm.single_use_in(ONCE, path, self.root), ["BUMP"])
+        path.unlink()
+        self.assertEqual(sm.single_use_in(ONCE, path, self.root), ["BUMP"])
 
     def test_only_do_while_macros_are_statement_macros(self):
         defs, _ = sm.scan("#define SQ(x) ((x) * (x))\n#define LOOP() do { } while (0)\n")
@@ -69,6 +116,11 @@ class StatementMacros(unittest.TestCase):
         got = sm.single_use_in(ONCE + "void g(u8 *c) { BUMP(c); }\n", root=self.root,
                                exclude=self.root / "src/fn/once.c")
         self.assertEqual(got, [])
+
+    def test_progress_marks_its_users(self):
+        import progress
+        with patch.object(progress, "ROOT", self.root):
+            self.assertIn("single-use-macro", progress.hint_kinds("void f(void) { BUMP(x); }"))
 
 
 class RepoMacros(unittest.TestCase):
@@ -84,12 +136,6 @@ class RepoMacros(unittest.TestCase):
         got = evaluator._single_use_macros("#define ZZ_W(c) do { (c)++; } while (0)\nvoid z(int c) { ZZ_W(c); }\n",
                                            ROOT / "src/fn/zz_none.c", ROOT)
         self.assertEqual(got, ["ZZ_W"])
-
-    def test_progress_marks_its_users(self):
-        import progress
-        self.assertIn("single-use-macro", progress.hint_kinds("void f(void) { %s(x); }" % sorted(
-            __import__("statement_macros").single_use_names())[0]))
-
 
 if __name__ == "__main__":
     unittest.main()

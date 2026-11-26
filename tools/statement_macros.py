@@ -10,9 +10,14 @@ it as one.
 from __future__ import annotations
 
 import functools
+import hashlib
+import json
 import os
 import re
+import stat
+from contextlib import suppress
 from pathlib import Path
+from tempfile import NamedTemporaryFile
 
 from source_layout import is_upstream
 
@@ -43,15 +48,14 @@ def scan(text: str) -> tuple[set[str], dict[str, int]]:
 
 
 @functools.lru_cache(maxsize=16384)
-def _scan_file(path: str, mtime_ns: int, ctime_ns: int, size: int):
+def _scan_file(path: str, inode: int, mtime_ns: int, ctime_ns: int, size: int):
     defs, uses = scan(Path(path).read_text(errors="replace"))
     return frozenset(defs), tuple(uses.items())
 
 
-def _sources(root: Path, exclude: Path | None):
+def _sources(root: Path, skip: str | None = None):
     """File identities for the live tree. A long-running search can see additions and edits."""
     root = root.resolve()
-    skip = os.fspath(Path(exclude).resolve()) if exclude else None
     for sub in ROOTS:
         for directory, _, files in os.walk(root / sub):
             folder = os.path.realpath(directory)
@@ -59,34 +63,110 @@ def _sources(root: Path, exclude: Path | None):
                 if not name.endswith((".c", ".h")):
                     continue
                 path = os.path.join(folder, name)
-                if skip and (path == skip or os.path.islink(path) and os.path.realpath(path) == skip):
+                if path == skip:
                     continue
-                stat = os.stat(path)
-                yield path, stat.st_mtime_ns, stat.st_ctime_ns, stat.st_size, not is_upstream(path)
+                info = os.lstat(path)
+                target = path
+                if stat.S_ISLNK(info.st_mode):
+                    target = os.path.realpath(path)
+                    if target == skip:
+                        continue
+                    info = os.stat(path)
+                identity = path, info.st_ino, info.st_mtime_ns, info.st_ctime_ns, info.st_size
+                yield identity, target, not is_upstream(path)
 
 
 @functools.lru_cache(maxsize=2)
 def _counts(sources):
-    defs: set[str] = set()
+    defs: dict[str, int] = {}
     uses: dict[str, int] = {}
-    for path, mtime_ns, ctime_ns, size, count_defs in sources:
-        defined, calls = _scan_file(path, mtime_ns, ctime_ns, size)
+    for identity, _, count_defs in sources:
+        defined, calls = _scan_file(*identity)
         if count_defs:
-            defs.update(defined)
+            for name in defined:
+                defs[name] = defs.get(name, 0) + 1
         for name, count in calls:
             uses[name] = uses.get(name, 0) + count
     return defs, uses
 
 
+def _census(root, sources):
+    cache = root / "build" / "statement-macros.json"
+    cache_enabled = cache.parent.is_dir()
+    if cache_enabled:
+        fingerprint = hashlib.sha256(Path(__file__).read_bytes())
+        for source in sources:
+            fingerprint.update(repr(source).encode())
+        key = fingerprint.hexdigest()
+        try:
+            saved = json.loads(cache.read_text())
+            defs, uses = saved["definitions"], saved["uses"]
+            if saved["fingerprint"] == key and all(
+                isinstance(counts, dict) and all(type(n) is int and n > 0 for n in counts.values())
+                for counts in (defs, uses)
+            ):
+                return defs, uses
+        except (OSError, ValueError, KeyError, TypeError):
+            pass
+
+    defs, uses = _counts(sources)
+    if cache_enabled:
+        temporary = None
+        try:
+            with NamedTemporaryFile("w", dir=cache.parent, delete=False) as stream:
+                temporary = Path(stream.name)
+                json.dump({"fingerprint": key, "definitions": defs, "uses": uses}, stream)
+            temporary.replace(cache)
+            temporary = None
+        except OSError:
+            pass
+        finally:
+            if temporary is not None:
+                with suppress(OSError):
+                    temporary.unlink()
+    return defs, uses
+
+
 def corpus(root: Path = ROOT, exclude: Path | None = None) -> tuple[set[str], dict[str, int]]:
     """Statement macros defined and all call-like uses across ROOT's src/ and include/."""
-    defs, uses = _counts(tuple(_sources(Path(root), exclude)))
-    return defs.copy(), uses.copy()
+    root = Path(root)
+    skip = os.fspath(Path(exclude).resolve()) if exclude else None
+    try:
+        sources = tuple(_sources(root))
+        defs, uses = _census(root, sources)
+        if skip is not None:
+            defs, uses = _except_source(defs, uses, sources, skip)
+            return set(defs), uses
+    except (OSError, KeyError):
+        if skip is None:
+            raise
+        # A missing edit target or a file changed after inventorying the tree.
+        defs, uses = _counts(tuple(_sources(root, skip)))
+    return set(defs), uses.copy()
+
+
+def _except_source(defs, uses, sources, skip):
+    """Subtract the live contributions of the file the candidate replaces."""
+    defs, uses = defs.copy(), uses.copy()
+    for identity, target, count_defs in sources:
+        if target != skip:
+            continue
+        defined, calls = _scan_file(*identity)
+        if count_defs:
+            for name in defined:
+                defs[name] -= 1
+                if not defs[name]:
+                    del defs[name]
+        for name, count in calls:
+            uses[name] -= count
+            if not uses[name]:
+                del uses[name]
+    return defs, uses
 
 
 def single_use_names(root: Path = ROOT) -> frozenset[str]:
     """Statement macros used at exactly one site across the current tree."""
-    defs, uses = corpus(Path(root))
+    defs, uses = corpus(root)
     return frozenset(name for name in defs if uses.get(name, 0) == 1)
 
 

@@ -1,11 +1,8 @@
 #include "bosses/vanargand/sprite_trail.h"
 
-struct Camera {
-    u8 unk_00[0x44];
-    s32 x;
-};
-/* Read the camera pointer separately for each projected position. */
-extern struct Camera *gSceneCamera;
+#include "effects/screen/background_controller.h"
+#include "ui/tilemap_panel.h"
+
 void Vector3_CopyComponents(struct TrailVector *, struct TrailVector *);
 
 void SpriteTrail_UpdatePositions(struct SpriteTrail *p)
@@ -14,14 +11,15 @@ void SpriteTrail_UpdatePositions(struct SpriteTrail *p)
     struct DisplaySequenceSprite *tail = p->tail;
     struct DisplaySequenceSprite *next;
     struct TrailVector *position;
+    enum { LAST_HISTORY_INDEX = sizeof(p->history) / sizeof(p->history[0]) - 1 };
     s32 index, i;
     u32 *flags = &p->frame;
     u32 *savedFlags;
     /* Record and project a new leading position on even frames. */
     if (!(*flags & 1)) {
         struct TrailVector *position = &p->position;
-        struct ContactPosition *out = &p->head[0].position;
-        out->x = (p->position.x >> 12) - gSceneCamera->x;
+        struct ContactPosition *out = &head->position;
+        out->x = (p->position.x >> 12) - ((struct TilemapPanel *)gSceneCamera)->scroll.x;
         {
             s32 y = position->y;
             s32 z = position->z;
@@ -31,7 +29,7 @@ void SpriteTrail_UpdatePositions(struct SpriteTrail *p)
     }
     index = p->historyIndex - 1;
     if (index < 0)
-        index = 3;
+        index = LAST_HISTORY_INDEX;
     next = head;
     next++;
     savedFlags = flags;
@@ -41,9 +39,9 @@ void SpriteTrail_UpdatePositions(struct SpriteTrail *p)
             index * sizeof(struct TrailVector) + (u32) & ((struct SpriteTrail *)0)->history;
         position = (struct TrailVector *)(offset + (u32)p);
     }
-    for (; i >= 0;) {
+    for (; i >= 0; i--, next++) {
         struct ContactPosition *out = &next->position;
-        next->position.x = (position->x >> 12) - gSceneCamera->x;
+        out->x = (position->x >> 12) - ((struct TilemapPanel *)gSceneCamera)->scroll.x;
         {
             s32 y = position->y;
             s32 z = position->z;
@@ -53,21 +51,19 @@ void SpriteTrail_UpdatePositions(struct SpriteTrail *p)
         position--;
         index--;
         if (index < 0) {
-            position = &p->history[3];
-            index = 3;
+            position = &p->history[LAST_HISTORY_INDEX];
+            index = LAST_HISTORY_INDEX;
         }
         tail->position.x = (next->position.x + head->position.x) >> 1;
         tail->position.y = (next->position.y + head->position.y) >> 1;
         tail->position.z = (next->position.z + head->position.z) >> 1;
         head++;
         tail++;
-        i--;
-        next++;
     }
     if (!(*savedFlags & 1)) {
         Vector3_CopyComponents(&p->history[p->historyIndex], &p->position);
         p->historyIndex++;
-        if (p->historyIndex > 3)
+        if (p->historyIndex > (s32)LAST_HISTORY_INDEX)
             p->historyIndex = 0;
     }
 }
