@@ -295,6 +295,47 @@ dispatcher implements only 0, 1, 2 and 11. This narrows the missing
 placement to a dynamic route outside the built-in cutscene packets, if
 any exists. The name records the observed effect and its registered key.
 
+### E534 through the scene-message controller
+
+Tags: bat flock, E534, scene messages, renderer
+
+Load the 0016 outdoor 6201 state from the straight-advance test.
+The scene already has a director at 02001E24, and the probe call
+to its constructor returns zero. Stage the registered E534
+constructor with receiver ID F104. It returns task
+02010064 and registers kind 10. The baseline frame with the task
+installed still has a clear field.
+
+Replay `resume5-flock-packets/commands.txt` from its retained
+`start.ss`. Each staged packet starts at 0203DD70. It gives kind
+10 and ID F104 to the original `SceneMessages_Send` 08020DD0.
+The director finds that receiver and the task dispatches each
+packet in its normal update. The debugger calls the enqueue
+entry and lets the scheduler call the launch and movement code.
+
+| Command | Executing code | Screenshot |
+|---|---|---|
+| 0 | `BoardPieces_StartStraightAdvance` and `BoardPiece_AdvanceStraight` | `straight.png` |
+| 1 | `BoardPieces_StartLaunch`, `BoardPiece_Launch`, and `BoardPiece_Wander` | `launch.png` |
+| 2 | `BoardPieces_StartActorChase` and `BoardPiece_ChasePlayer` target the live F5EB Django body | `chase48.png` |
+| 11 | `BoardPieces_StartConvergence` and `BoardPiece_ConvergeOnTarget` gather the bats toward (2176, 512, 1024) | `converge08.png` |
+
+```sh
+runner=build/identify/pass3/link_harness
+run=build/identify/replays/resume5-flock-registry
+nice -n 19 "$runner" baserom.gba "$run/commands.txt" "$run"
+run=build/identify/replays/resume5-flock-packets
+nice -n 19 "$runner" baserom.gba "$run/commands.txt" "$run"
+```
+
+Receiver, command and dispatch PCs are in `probes.tsv`. The imagery
+and underlying animation source are the same DA6D and 5BB7 pair
+used by the F8BE Bat enemy. E534 is the independent scene-message
+flock task with sixteen animated pieces. Use `BatFlock_` for its
+manager and command handlers and `BatFlockPiece_` for its piece
+updates. The constructed packets establish behavior. The retail
+producer remains open.
+
 ## Coffin Bike and Sabata’s scripted rider
 
 Warp 0008 to `scene=6274 entrance=130 story=31` and continue. Proc 6275 calls

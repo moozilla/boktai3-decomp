@@ -56,3 +56,6 @@ MovingGlyph_,CutsceneShot_,src/effects/particle_burst/moving_glyph.c,PlayerCue_S
 SpriteParticle_,VanargandMotes_,src/effects/sprite_particle,The live Vanargand presentation callback uses the original 081FF09C pool in the controlled 6323 burst. Scope to 081FED9C–081FF38C.
 ParticleEffect_,PlayerActionFlash_,src/effects/particle_effect,"Original Player motion 9 runs the gold flash, orbit effect and terminal update at 6201."
 PlayerBarrier_,PileTrap_,src/player/player_barrier,Proc 2446 text #4166 and the 0037 outdoor replay tie request kind 3 and the normal L/A motions to the DC7A/A680 Pile Trap task.
+GroupObjects_,BatFlock_,src/field/group_objects,E534 creates a kind 10 bat receiver. The 0016→6201 staged scene messages operate its sixteen live DA6D bats.
+BoardPieces_,BatFlock_,src/field/group_objects,"Packets 0, 1, 2 and 11 run the four bat flock command handlers in the normal scheduler."
+BoardPiece_,BatFlockPiece_,src/field/group_objects,The E534 piece updates move the visible DA6D bats in the staged 6201 replay.
