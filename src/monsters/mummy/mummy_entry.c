@@ -17,6 +17,7 @@
 #include "scene/actor/scene_actor_control_phase.h"
 #include "debug.h"
 #include "monsters/mummy/mummy.h"
+#include "monsters/skeleton/enemy_defeat_statistics.h"
 #include "scene/motion/scene_actor_turn.h"
 #include "scene/actor/scene_actor_reset.h"
 #include "scene/motion/scene_actor_chase_direct_arrival.h"
@@ -214,17 +215,7 @@ void Mummy_UpdateRevival(void *object)
     s32 n;
     if (SceneActorReaction_TakePrepared(actor)) {
         ActorShadow_Enable(actor->base.shadow);
-        if (!actor->base.drawableKind) {
-            struct SceneActorRegistrySequenceDrawable *drawable = actor->base.drawable;
-            u32 *flags = &drawable->flags;
-            u32 mask = ~1;
-            *flags = mask & *flags;
-        } else {
-            struct SceneActorAnimationTileDrawable *drawable = actor->base.drawable;
-            struct AnimSprite *tile = &drawable->tile;
-            u32 mask = ~1;
-            tile->flags = mask & tile->flags;
-        }
+        ActorStatus_ClearDrawableFlags(actor, 1);
         SceneActorReaction_BeginRevival(&actor->base, 1);
     }
     if (!peek_flag(actor))
@@ -771,12 +762,6 @@ static inline u32 Mummy_DisplayFlags(struct ChaseActor *actor, u32 maskInput)
     return actor->base.statusFlags & mask;
 }
 
-static inline void HideTile(struct AnimSprite *tile)
-{
-    u32 mask = ~1;
-    tile->flags = mask & tile->flags;
-}
-
 static inline u32 Random4(void)
 {
     u32 index = (gRandomIndex + 1) & 1023;
@@ -806,14 +791,8 @@ void Mummy_UpdateDefeat(struct ChaseActor *actor, s32 frame)
     struct ContactCollider *collider;
     if (SceneActorReaction_TakePrepared((void *)actor)) {
         struct SceneActorChaseGroup *group = &actor->group;
-        if (!Mummy_DisplayFlags(actor, 0x20000)) {
-            if (!actor->base.drawableKind) {
-                u32 *flags = actor->base.drawable;
-                s32 mask = ~1;
-                *flags = mask & (*flags);
-            } else
-                HideTile(&((struct SceneActorAnimationTileDrawable *)actor->base.drawable)->tile);
-        }
+        if (!Mummy_DisplayFlags(actor, 0x20000))
+            ActorStatus_ClearDrawableFlags(actor, 1);
         {
             struct SceneActorRegistryControl *control = &group->common.control;
             SceneActorChase_ClearWordFlags(&actor->base.behaviorFlags, 0x141C0);
@@ -1849,33 +1828,6 @@ u8 SceneActorTerrain_CanTraverseCell(s32, s32, s32, u32);
 
 s32 Math_Atan2(s32, s32);
 
-struct Unk080D6DF8Goal {
-    u8 unknown0[6];
-    u16 cell;
-};
-
-struct Unk080D6DF8Target {
-    u8 unknown0[0xC];
-    struct ContactPosition position;
-    u8 unknown14[8];
-    struct Unk080D6DF8Goal *goal;
-};
-
-struct Unk080D6DF8Actor {
-    u8 unknown0[0x59];
-    u8 direction;
-    u8 unknown5A[2];
-    struct ContactPosition position;
-    u8 unknown64[0x78];
-    struct Unk080D6DF8Target *target;
-    u8 unknownE0[0x214];
-    u16 terrainCell;
-};
-
-struct Unk080D6DF8Delta {
-    s16 x, y, z;
-};
-
 static inline u8 CanReach(s32 cell, s32 goal, s32 y, u32 kind, s32 total)
 {
     s32 i, col;
@@ -1907,36 +1859,36 @@ static inline u8 CanReach(s32 cell, s32 goal, s32 y, u32 kind, s32 total)
     return 0;
 }
 
-static inline u8 FindPath_FaceAndCheckStraightPath(struct Unk080D6DF8Actor *actor, s32 goal)
+static inline u8 FindPath_FaceAndCheckStraightPath(struct ChaseActor *actor, s32 goal)
 {
-    s32 cell = actor->terrainCell;
-    s32 y = actor->position.y;
+    s32 cell = actor->base.terrainCell;
+    s32 y = actor->base.body.position.y;
     u32 kind = *SceneActorTerrain_GetCell(cell) >> 4;
     s32 total = SceneActorTerrain_Width() * SceneActorTerrain_Height();
     return CanReach(cell, goal, y, kind, total);
 }
 
-u8 SceneActorPath_FaceAndCheckStraightPath(struct Unk080D6DF8Actor *actor)
+u8 SceneActorPath_FaceAndCheckStraightPath(struct ChaseActor *actor)
 {
-    struct Unk080D6DF8Target *target = actor->target;
-    s32 goal = target->goal->cell;
-    u8 saved = actor->direction;
-    struct Unk080D6DF8Delta delta;
+    struct SceneActorContactTarget *target = (void *)actor->base.tracking.target;
+    s32 goal = target->cell->index;
+    u8 saved = actor->base.body.direction;
+    struct ContactPosition delta;
     u8 result;
 
     {
-        struct Unk080D6DF8Delta *d = &delta;
-        struct ContactPosition *from = &actor->position;
-        struct ContactPosition *to = &target->position;
+        struct ContactPosition *d = &delta;
+        struct ContactPosition *from = &actor->base.body.position;
+        struct ContactPosition *to = &target->target.position;
         d->x = to->x - from->x;
         d->y = to->y - from->y;
         d->z = to->z - from->z;
     }
-    actor->direction = Math_Atan2(delta.x, delta.z);
-    if (goal == actor->terrainCell)
+    actor->base.body.direction = Math_Atan2(delta.x, delta.z);
+    if (goal == actor->base.terrainCell)
         result = 1;
     else if (!FindPath_FaceAndCheckStraightPath(actor, goal)) {
-        actor->direction = saved;
+        actor->base.body.direction = saved;
         result = 0;
     } else
         result = 1;
@@ -2218,18 +2170,11 @@ restore:
     return 0;
 }
 
-struct H {
-    u32 lo : 16;
-    u32 hi : 16;
-};
+void SceneActorCollision_InitBody(u8 *, struct ContactPosition *, struct ContactPosition *,
+                                  void (*)(void), u8 *);
 
-struct Z {
-    struct H a, b;
-};
-
-void SceneActorCollision_InitBody(u8 *, struct Z *, struct Z *, void (*)(void), u8 *);
-
-void SceneActorCollision_InitAttack(u8 *, struct Z *, struct Z *, void (*)(void), u32, u8 *);
+void SceneActorCollision_InitAttack(u8 *, struct ContactPosition *, struct ContactPosition *,
+                                    void (*)(void), u32, u8 *);
 
 void Mummy_OnBodyCollision(void *, void *, void *);
 
@@ -2237,31 +2182,28 @@ void Mummy_OnAttackCollision(void);
 
 void Mummy_InitCollision(u8 *p)
 {
-    struct Z s1, s2, s3, s4;
-    s1.a.lo = 0x20;
-    s1.a.hi = 0x80;
-    s1.b.lo = 0x20;
-    *(u32 *)&s2.a = 0x800000;
-    *(u32 *)&s2.b &= 0xFFFF0000;
-    SceneActorCollision_InitBody(p, &s1, &s2, Mummy_OnBodyCollision, p);
-    s3.a.lo = 0x20;
-    s3.a.hi = 0x64;
-    s3.b.lo = 0x20;
-    *(u32 *)&s4.a = 0x800000;
-    *(u32 *)&s4.b &= 0xFFFF0000;
-    SceneActorCollision_InitAttack(p, &s3, &s4, Mummy_OnAttackCollision, 0, p);
+    struct ContactPosition bodySize, bodyOffset, attackSize, attackOffset;
+    bodySize.x = 0x20;
+    bodySize.y = 0x80;
+    bodySize.z = 0x20;
+    bodyOffset.x = 0;
+    bodyOffset.y = 0x80;
+    bodyOffset.z = 0;
+    SceneActorCollision_InitBody(p, &bodySize, &bodyOffset, Mummy_OnBodyCollision, p);
+    attackSize.x = 0x20;
+    attackSize.y = 0x64;
+    attackSize.z = 0x20;
+    attackOffset.x = 0;
+    attackOffset.y = 0x80;
+    attackOffset.z = 0;
+    SceneActorCollision_InitAttack(p, &attackSize, &attackOffset, Mummy_OnAttackCollision, 0, p);
 }
 
 s32 SceneActorProfiles_FindOrAdd(u32, u32);
 
-struct SInitProfile {
-    u8 filler[0x308];
-    s32 v;
-};
-
-void Mummy_InitProfile(struct SInitProfile *s)
+void Mummy_InitProfile(struct ChaseActor *actor)
 {
-    s->v = SceneActorProfiles_FindOrAdd(1, 0);
+    actor->base.profileId = SceneActorProfiles_FindOrAdd(1, 0);
 }
 
 // confidence=low: selects attack bounds and properties from mummy movement flags.
@@ -2390,14 +2332,7 @@ struct BurnState {
     u16 count, active, timer;
 };
 
-#define STATS ((u8 *)gGameState)
-
-#define H(p, n) (*(s16 *)((p) + (n)))
-
-struct GroupLink {
-    u32 unknown0;
-    u32 flags;
-};
+#define STATS ((struct EnemyDefeatStatistics *)gGameState)
 
 static inline s32 clamp(s32 v)
 {
@@ -2410,27 +2345,27 @@ static inline s32 clamp(s32 v)
 
 /* Saturating defeat counters in the game-state block. */
 
-#define STAT_INC(n) Count(&H(STATS, n))
+#define STAT_INC(n) Count(&STATS->n)
 
-#define STAT_ADD(n) H(STATS, n) = clamp(H(STATS, n) + 1)
+#define STAT_ADD(n) STATS->n = clamp(STATS->n + 1)
 
 #define KILL_KIND(flags)                                                                           \
     {                                                                                              \
         if ((flags) & 0x80)                                                                        \
-            STAT_ADD(0x58A);                                                                       \
+            STAT_ADD(reactionCounts[0]);                                                                       \
         else if ((flags) & 0x100)                                                                  \
-            STAT_ADD(0x58C);                                                                       \
+            STAT_ADD(reactionCounts[1]);                                                                       \
         else if ((flags) & 0x200)                                                                  \
-            STAT_ADD(0x58E);                                                                       \
+            STAT_ADD(reactionCounts[2]);                                                                       \
         else if ((flags) & 0x400)                                                                  \
-            STAT_ADD(0x590);                                                                       \
-        else if ((flags) &= 0x800)                                                                 \
-            STAT_ADD(0x592);                                                                       \
+            STAT_ADD(reactionCounts[3]);                                                                       \
+        else if ((flags) & 0x800)                                                                 \
+            STAT_ADD(reactionCounts[4]);                                                                       \
     }
 
 #define CASE_BODY(n)                                                                               \
     {                                                                                              \
-        u32 flags = *(u32 *)(hit + 0x38);                                                          \
+        u32 flags = hit->reactionFlags;                                                          \
         STAT_INC(n);                                                                               \
         KILL_KIND(flags);                                                                          \
     }
@@ -2521,7 +2456,7 @@ void Mummy_UpdateBurnDamage(struct ChaseActor *actor)
     u16 *flags2C0;
     u8 *category;
     u8 *collider;
-    u8 *hit;
+    struct ContactCollider *hit;
     u32 kind;
     s32 i;
     u32 *damageFlags;
@@ -2642,69 +2577,69 @@ void Mummy_UpdateBurnDamage(struct ChaseActor *actor)
     }
     {
         if (kind != 5 && kind != 7 && kind != 6) {
-            STAT_INC(0x87C);
-            STAT_INC(0x538);
-            hit = (u8 *)&actor->base.colliderA;
+            STAT_INC(lifetimeTotal);
+            STAT_INC(total);
+            hit = &actor->base.colliderA;
             {
                 u32 index = *category - 1; /* category 1..25 */
-                collider = hit;
+                collider = (u8 *)hit;
                 switch (index) {
                     case 3:
-                        CASE_BODY(0X53A);
+                        CASE_BODY(category4);
                         break;
                     case 0:
-                        CASE_BODY(0X53C);
+                        CASE_BODY(category1);
                         break;
                     case 1:
-                        CASE_BODY(0X53E);
+                        CASE_BODY(category2);
                         break;
                     case 2:
-                        CASE_BODY(0X540);
+                        CASE_BODY(category3);
                         break;
                     case 13:
-                        CASE_BODY(0X54C);
+                        CASE_BODY(category14);
                         break;
                     case 23:
-                        CASE_BODY(0X55C);
+                        CASE_BODY(category24);
                         break;
                     case 9:
-                        CASE_BODY(0X546);
+                        CASE_BODY(category10);
                         break;
                     case 4:
                     case 5:
                     case 6:
-                        CASE_BODY(0X542);
+                        CASE_BODY(category5To7);
                         break;
                     case 20:
-                        CASE_BODY(0X554);
+                        CASE_BODY(category21);
                         break;
                     case 17:
-                        CASE_BODY(0X550);
+                        CASE_BODY(category18);
                         break;
                     case 18:
-                        CASE_BODY(0X552);
+                        CASE_BODY(category19);
                         break;
                     case 16:
-                        CASE_BODY(0X54E);
+                        CASE_BODY(category17);
                         break;
                     case 21:
-                        CASE_BODY(0X556);
+                        CASE_BODY(category22);
                         break;
                     case 19:
-                        CASE_BODY(0X558);
+                        CASE_BODY(category20);
                         break;
                     case 8:
-                        CASE_BODY(0X544);
+                        CASE_BODY(category9);
                         break;
                     case 22:
-                        CASE_BODY(0X55A);
+                        CASE_BODY(category23);
                         break;
                     case 11:
                     case 12:
-                        CASE_BODY(0X54A);
+                        CASE_BODY(category12And13);
                         break;
                     case 24:
-                        CASE_BODY(0X560);
+                        CASE_BODY(category25);
                         break;
                 }
             }
@@ -2870,27 +2805,21 @@ s32 SceneActor_StartAdjacentCellRoute(struct Mummy *actor);
 u8 BouncingObject_RefreshNearbyHeading(struct ChaseActor *arg)
 {
     struct ChaseActor *actor = arg;
-    struct Mummy **slot = (void *)&actor->base.context;
-    struct Mummy *context = *slot;
-    u16 *counter;
-    u32 v;
-    u32 saved;
-    counter = &context->flags6D4;
-    v = *counter;
-    saved = (unsigned short)v;
-    if (saved) {
-        *counter = v - 1;
+    struct Mummy *context = actor->base.context;
+    if (context->flags6D4) {
+        context->flags6D4--;
         return 0;
     }
     if (BouncingObject_GetNearbyHeading(&actor->base.body.position) < 0) {
-        u16 *flags = &(*slot)->flags6F2;
+        struct Mummy *control = actor->base.context;
+        u16 *flags = &control->flags6F2;
         u32 mask = ~0x400;
         *flags &= mask;
-        *counter = saved;
+        context->flags6D4 = 0;
         return 0;
     }
     {
-        struct Mummy *control = *slot;
+        struct Mummy *control = actor->base.context;
         u32 mask = 0x400;
         u16 *flags = &control->flags6F2;
         *flags = mask | *flags;
@@ -2898,18 +2827,6 @@ u8 BouncingObject_RefreshNearbyHeading(struct ChaseActor *arg)
     SceneActor_StartAdjacentCellRoute(actor);
     return 1;
 }
-
-u8 SceneActorPath_FaceAndCheckStraightPath(struct Unk080D6DF8Actor *actor);
-
-struct SceneActorTrackingTarget {
-    u8 unknown0[12];
-    struct ContactPosition position;
-};
-
-struct SceneActorTrackingParent {
-    u8 unknown0[0x6F2];
-    u16 flags;
-};
 
 static inline u8 IsPlayerTracked(struct ChaseActor *actor)
 {
@@ -2927,7 +2844,7 @@ u8 SceneActor_TryTrackNearbyPlayer(struct ChaseActor *actor, struct ContactPosit
     struct ContactPosition *deltaPointer;
     struct ContactPosition *position;
     u32 distance;
-    struct SceneActorReactionMotion *motion;
+    struct SceneActorChaseTracking *tracking;
     if (playerId != gTrackedPlayerId[0])
         goto fail;
     {
@@ -2956,14 +2873,14 @@ u8 SceneActor_TryTrackNearbyPlayer(struct ChaseActor *actor, struct ContactPosit
         mask |= value;
         *flags = mask;
     }
-    motion = (void *)&actor->base.tracking.target;
-    motion->fieldDC = (u32)((u8 *)gPlayers[0] + 0x24);
+    tracking = &actor->base.tracking;
+    tracking->target = &((struct SceneActorChasePlayer *)gPlayers[0])->target;
     if (IsPlayerTracked(actor))
-        motion->fieldDC = (u32)((u8 *)gPlayers[0] + 0x24);
-    else if (!motion->fieldDC)
+        tracking->target = &((struct SceneActorChasePlayer *)gPlayers[0])->target;
+    else if (!tracking->target)
         goto ready;
     {
-        struct SceneActorTrackingTarget *target = (void *)motion->fieldDC;
+        struct SceneActorChaseTarget *target = tracking->target;
         s32 dx = target->position.x - position->x;
         s32 dz = target->position.z - actor->base.body.position.z;
         actor->base.tracking.heading = Math_Atan2(dx, dz);
@@ -3577,7 +3494,7 @@ static inline void MummyInit_ResetFlags(void *object)
     actor->flags6F2 = 0;
 }
 
-void Mummy_InitProfile(struct SInitProfile *s);
+void Mummy_InitProfile(struct ChaseActor *actor);
 
 void Mummy_InitCollision(u8 *p);
 
@@ -3661,7 +3578,7 @@ s32 Mummy_Init(void *object)
     MummyInit_ResetFlags(arg0);
     SceneActorRegistry_SetObjectContext(actor, actor, 0, 1);
     MonsterInit_SetCategory(actor, MONSTER_CATEGORY_MUMMY);
-    Mummy_InitProfile(actor);
+    Mummy_InitProfile(&actor->chase);
     if (MonsterInit_GetDrawableKind(&actor->chase) == 0) {
         u8 *heap;
         actor->chase.base.drawable = Heap_Alloc(0x5C);
