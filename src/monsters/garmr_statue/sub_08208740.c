@@ -63,10 +63,7 @@ s32 GarmrStatue_UpdateCombat(struct GarmrStatue *p)
             p->defeated = 1;
             p->collider.responseValue = 0;
             SceneVec_Copy(&position, &p->sprite.coordinates.position);
-            {
-                struct SceneVec *v = &position;
-                v->y += 200;
-            }
+            position.y += 200;
             velocity.x = -4;
             table = gRandomTable;
             velocity.y = ParticleRandom_ReadDirectSample(table) & 7;
