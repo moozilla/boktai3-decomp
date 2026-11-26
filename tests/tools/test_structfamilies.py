@@ -10,6 +10,7 @@ ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "tools"))
 
 import keepcheck
+import deadcode
 import layoutmerge as lm
 import struct_evidence as evidence
 import structfamilies as families
@@ -205,6 +206,13 @@ int X(struct R *r, struct Q *q) { return r->old + q->old; }
 
 
 class GateTests(unittest.TestCase):
+    @unittest.skipUnless(sys.platform == "darwin" and Path(deadcode.CLANG).is_file(), "macOS clang required")
+    def test_direct_preprocessor_preserves_diagnostic_input(self):
+        source = "#define OFFSET 4\nint field = OFFSET;\n"
+        args = ["-nostdinc", "-undef", "-x", "c", "-"]
+        expected = subprocess.check_output(["cc", "-E", *args], input=source, text=True)
+        self.assertEqual(subprocess.check_output([*deadcode.CPP, *args], input=source, text=True), expected)
+
     def test_check_surfaces_the_compiler_failure(self):
         error = "stdin:18: structure has no member named `flags'"
         process = subprocess.CompletedProcess([], 1, "", error + "\nCalledProcessError\n")
