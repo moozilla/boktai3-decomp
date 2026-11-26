@@ -87,12 +87,8 @@ void TentacleActor_UpdateSegmentPositions(struct Actor *p, s32 divisor, s32 thre
                     *(s16 *)(address + FIELD_OFFSET(struct Group, segments[0].position)) +=
                         quotient;
                 }
-                *((s16 *)((((u8 *)g) + (i * (s32)sizeof(struct Segment))) +
-                          FIELD_OFFSET(struct Group, segments[0].position.y))) +=
-                    Div(delta.y, divisor);
-                *((s16 *)((((u8 *)g) + (i * (s32)sizeof(struct Segment))) +
-                          FIELD_OFFSET(struct Group, segments[0].position.z))) +=
-                    Div(delta.z, divisor);
+                g->segments[i].position.y += Div(delta.y, divisor);
+                g->segments[i].position.z += Div(delta.z, divisor);
             }
         }
     }
