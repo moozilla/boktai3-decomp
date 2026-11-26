@@ -113,9 +113,7 @@ void ActorPhase_EmitTrailSprite(struct ChaseActor *, struct ContactPosition *, u
 
 void Axe_UpdateTrailColliders(struct ChaseActor *);
 
-struct PhaseActor;
-
-void ActorPhase_UpdateTimedFlicker(struct PhaseActor *s, s32 frame);
+void ActorPhase_UpdateTimedFlicker(struct ChaseActor *s, s32 frame);
 
 s32 Div(s32, s32);
 
@@ -145,30 +143,9 @@ void SceneActor_AdvanceOffsetApproach(struct ChaseActor *p)
     }
 }
 
-#define ActorPhase_SetAnimation Axe_SetAuxiliarySpriteParameters
+void Axe_InitAttackTrail(struct ChaseActor *);
 
-struct PhaseActor {
-    u8 pad0[0x104];
-    u32 f104;
-    u8 pad108[0xc];
-    u32 flags114;
-    u8 pad118[0x104];
-    void (*phase)(void);
-    u8 pad220[0x90];
-    u8 phaseState;
-    u8 pad2b1;
-    u8 entered;
-    u8 pad2b3[2];
-    u8 phaseId;
-    u8 pad2b6[0x12];
-    u16 timer;
-    u8 pad2ca[0x106];
-    u8 *data;
-};
-
-void Axe_InitAttackTrail(struct PhaseActor *);
-
-void Axe_CopyAuxiliaryVector(struct PhaseActor *, void *);
+void Axe_CopyAuxiliaryVector(struct ChaseActor *, const struct ContactPosition *);
 
 void ActorShadow_Enable(void *);
 
@@ -176,40 +153,31 @@ void Sound_PlaySong(u32);
 
 u8 ActorPhase_UpdateFlicker(u32 *, s32, s32, s32);
 
-void Axe_SetAuxiliarySpriteParameters(struct PhaseActor *, void *, u32);
+void Axe_SetAuxiliarySpriteParameters(void *, const u16 *, u32);
 
 void Axe_UpdateOrbitAttack(struct ChaseActor *p, s32 frame);
 
-static inline u8 consumeEntry(struct PhaseActor *s)
+void ActorPhase_UpdateTimedFlicker(struct ChaseActor *s, s32 frame)
 {
-    if (s->entered) {
-        s->entered = 0;
-        return 1;
-    }
-    return 0;
-}
-
-void ActorPhase_UpdateTimedFlicker(struct PhaseActor *s, s32 frame)
-{
-    u8 *data = s->data;
+    struct Axe *axe = s->base.context;
     u32 flags;
-    if (consumeEntry(s)) {
+    if (SceneActorReaction_TakePrepared(s)) {
         Axe_InitAttackTrail(s);
-        Axe_CopyAuxiliaryVector(s, data + 0xc88);
-        *(u16 *)(data + 0x90a) = 0;
-        *(u32 *)(data + 0xa38) &= ~1;
-        ActorShadow_Enable(data + 0xcac);
-        Axe_SetAuxiliarySpriteParameters(s, data + 0x888, 0x13c);
+        Axe_CopyAuxiliaryVector(s, &axe->origin);
+        axe->originalEffectPalette[1] = 0;
+        axe->auxiliarySprite.flags &= ~1;
+        ActorShadow_Enable(axe->auxiliaryShadow);
+        Axe_SetAuxiliarySpriteParameters(s, axe->blackPalette, 0x13c);
         Sound_PlaySong(0x16f);
     }
     if (ActorPhase_UpdateFlicker(&flags, frame, 10, 30)) {
         SceneActorChase_SetControl(s, Axe_UpdateOrbitAttack, 0x2c);
-        Axe_SetAuxiliarySpriteParameters(s, data + 0x908, 0x13f);
+        Axe_SetAuxiliarySpriteParameters(s, axe->originalEffectPalette, 0x13f);
         Sound_PlaySong(0x16d);
     } else if (flags & 1) {
-        Axe_SetAuxiliarySpriteParameters(s, data + 0x888, 0x13c);
+        Axe_SetAuxiliarySpriteParameters(s, axe->blackPalette, 0x13c);
     } else {
-        Axe_SetAuxiliarySpriteParameters(s, data + 0x908, 0x13f);
+        Axe_SetAuxiliarySpriteParameters(s, axe->originalEffectPalette, 0x13f);
     }
 }
 
