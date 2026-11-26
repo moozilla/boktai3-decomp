@@ -1,0 +1,23 @@
+0819CA38 hresvelgr-refresh-target-return
+
+The final division leaves the full quotient in r0. The routine writes its low
+halfword to travel via r2.
+
+The explicit form changed the ROM bytes. The guarded form passed the unit ROM check.
+
+--- a/src/fn/sub_0819CA38.c
++++ b/src/fn/sub_0819CA38.c
+@@ -44,5 +44,13 @@
+     obj->facing8 = SceneFacing_EightWay(obj->facing);
+     Subtract(&v, &obj->position);
++#ifdef UBFIX
++    {
++        s32 travel = Sqrt(v.x * v.x + v.z * v.z) * 0x274 / 0x6400;
++        p->travel = travel;
++        return travel;
++    }
++#else
+     p->travel = Sqrt(v.x * v.x + v.z * v.z) * 0x274 / 0x6400;
++#endif
+     /* The four travel-state calls discard the return register. */
+ }
