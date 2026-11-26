@@ -267,3 +267,18 @@ present in the first RTL dump and persists through every pass.
 All four edited units matched their full ROM extents. The scoped
 linter totals held at 629 report lines and 695 steering uses, with
 zero errors.
+
+## Native animation, terrain, and pursuit fields
+
+- Skeleton's tile parameter lookup reads `AnimSprite.elapsed` and
+  `frameIndex`. The armed and default paths still use the separate
+  tile bases that match the ROM. The terrain search takes a chase
+  actor and uses the narrower terrain view at its query.
+- Vorn uses its native retry state, home route, destination, and
+  pursuit timers. The animation reset steps the typed sprite tile
+  and resource. The shared retreat RNG changes table addressing and
+  register allocation in that caller.
+- Mummy passes the embedded room actor to the action script. Direct
+  scripted gate and motion writes still each differ by one instruction.
+
+All three edited units matched their full ROM extents.
