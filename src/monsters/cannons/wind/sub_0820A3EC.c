@@ -1,18 +1,10 @@
-#include "global.h"
-struct E {
-    u8 p[0x180];
-};
-struct A {
-    u8 p0[0x18];
-    u32 w18;
-    struct E e[8];
-};
-struct E *WindCannonManager_FindFreeSlot(struct A *a, s32 *out)
+#include "monsters/cannons/wind_cannon.h"
+struct FanCannon *WindCannonManager_FindFreeSlot(struct FanCannonManager *a, s32 *out)
 {
-    struct E *e = a->e;
+    struct FanCannon *e = a->slots;
     s32 i = 0;
     u32 m = 1;
-    u32 w = a->w18;
+    u32 w = a->occupiedSlots;
     do {
         if ((m << i & w) != 0) {
             i++;
