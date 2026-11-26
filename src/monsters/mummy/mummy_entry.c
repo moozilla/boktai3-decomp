@@ -1216,7 +1216,7 @@ s32 Mummy_UpdateSpecialFlags(void *actor)
     return 1;
 }
 
-void SceneActorBehavior_CallActionScript(u8 *);
+void SceneActorBehavior_CallActionScript(struct RoomActor *actor);
 
 void Mummy_EnterIdleControl(struct ChaseActor *actor);
 
@@ -1227,7 +1227,7 @@ void Mummy_UpdateScriptedAction(struct ChaseActor *obj)
         SceneActorChase_SetControl(obj, SceneActorAnimation_UpdateDirectionalEntry, 10);
         obj->base.body.direction = obj->base.tracking.heading;
         SceneActorAttachment_ReplaceResponseSlot(obj, 0, 0, obj->base.category);
-        SceneActorBehavior_CallActionScript((u8 *)obj);
+        SceneActorBehavior_CallActionScript(&obj->base);
         h = (u16 *)&obj->group.common.gate.flags;
         {
             u32 flag = 4;
