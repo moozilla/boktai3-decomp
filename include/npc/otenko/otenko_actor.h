@@ -58,7 +58,8 @@ struct OtenkoActor {
     struct ContactPosition savedPosition;
     u8 unknown244[0x88];
     void (*stateCallback)(void);
-    void *callbacks[6];
+    void *callbacks[5];
+    s32 (*animationCallback)(struct OtenkoActor *);
     u8 unknown2E8[8];
     struct OtenkoProjection projection;
     u8 unknown32C[0x18];
