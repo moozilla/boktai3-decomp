@@ -1,3 +1,5 @@
+#include "scene/collision/scene_actor_damage_visibility.h"
+#include "scene/actor/scene_actor_record.h"
 #include "scene/actor/scene_actor_drawable_flags.h"
 #include "scene/motion/scene_actor_terrain_reaction.h"
 #include "global.h"
@@ -6,12 +8,6 @@
 #include "scene/motion/scene_actor_chase_shared.h"
 #include "scene/actor/scene_actor_damage_flash.h"
 /* Clears hit timers; at zero health hands control to the defeat target and records the defeat. */
-void SceneActorRecord_RecordPair(u16, u16);
-static inline u32 Flag2D0(struct ChaseActor *actor, u32 maskInput)
-{
-    u32 mask = maskInput;
-    return actor->base.statusFlags & mask;
-}
 void SceneActorReaction_EndHitCheckDefeat(struct ChaseActor *actor)
 {
     {
@@ -37,8 +33,7 @@ void SceneActorReaction_EndHitCheckDefeat(struct ChaseActor *actor)
     }
     SceneActorTerrain_EnterState(actor, 3, 0, 0);
     actor->base.hitOwners = 32;
-    if (!SceneActorChase_Test(gEngineFlags, 0x4800) && !Flag2D0(actor, 0x800))
-        SceneActorRecord_RecordPair(gScriptEntryProcedure, actor->base.body.id);
+    SceneActorRecord_RecordDefeat(actor);
     {
         u32 mask = 0x2000;
         actor->base.behaviorFlags |= mask;
