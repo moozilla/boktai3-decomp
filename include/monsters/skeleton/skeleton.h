@@ -31,7 +31,7 @@ struct Skeleton {
     u8 unknown700[2];
     u8 parameter702;
     u8 attempts; /* distance reactions tried since the last reset */
-    u8 unknown704[2];
+    u16 actionCooldown; /* Frames until the next timed turn or action. */
     u16 parameter706;
     u32 nearDistance, farDistance; /* target distance bands for the reaction choice */
     u8 unknown710[8];

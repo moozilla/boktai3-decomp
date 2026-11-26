@@ -9,7 +9,6 @@
 #include "player/player.h"
 #include "scene/actor/scene_actor_visibility.h"
 #include "scene/actor/scene_actor_control_helpers.h"
-#include "monsters/vorn/vorn.h"
 #include "monsters/skeleton/scene_actor_timed_behavior.h"
 #include "scene/actor/scene_actor_registry.h"
 #include "objects/hazards/animated_hazard.h"
@@ -436,23 +435,18 @@ void Skeleton_UpdateVisibilityFlicker(struct ChaseActor *actor)
     }
 }
 
-struct SceneActorBehaviorTimer {
-    u8 unknown0[0x704];
-    u16 timer;
-};
-
 void Skeleton_UpdateHopToOpenCell(struct ChaseActor *actor);
 
 void SceneActorControl_BeginTimedBehavior56(struct ChaseActor *s,
-                                            struct SceneActorBehaviorTimer *other)
+                                            struct Skeleton *other)
 {
     switch (s->base.category) {
         case MONSTER_CATEGORY_SKELETON_GUARD:
-            other->timer = 60;
+            other->actionCooldown = 60;
             break;
         case MONSTER_CATEGORY_SKELETON:
         case MONSTER_CATEGORY_SKELETON_ARMED:
-            other->timer = 120;
+            other->actionCooldown = 120;
             break;
         default:
             return;
@@ -470,19 +464,18 @@ void SceneActorControl_BeginTimedBehavior56(struct ChaseActor *s,
 
 
 
-u8 SceneActorControl_CanTurnTowardTarget(struct ChaseActor *sIn)
+u8 SceneActorControl_CanTurnTowardTarget(struct ChaseActor *s)
 {
-    struct Vorn *s = (struct Vorn *)sIn;
-    struct SceneActorTimedBehaviorContext *context = s->chase.base.context;
+    struct Skeleton *context = s->base.context;
     s32 x, y, z, angle;
-    if (!s->chase.base.tracking.target)
+    if (!s->base.tracking.target)
         return 0;
-    if (context->timer704)
+    if (context->actionCooldown)
         return 0;
-    if (!SceneActorChase_TrackingFlags(&s->chase.base.tracking, 0x10))
+    if (!SceneActorChase_TrackingFlags(&s->base.tracking, 0x10))
         return 0;
     {
-        struct ContactPosition *v = &s->chase.base.secondaryMotion;
+        struct ContactPosition *v = &s->base.secondaryMotion;
         s32 sum;
         x = v->x;
         sum = x * x;
@@ -492,10 +485,10 @@ u8 SceneActorControl_CanTurnTowardTarget(struct ChaseActor *sIn)
         if (sum + x * x != 0)
             return 0;
     }
-    if (s->chase.base.tracking.distance > 0x24000)
+    if (s->base.tracking.distance > 0x24000)
         return 0;
-    angle = ((struct SceneActorFacingTarget *)s->chase.base.tracking.target)->heading -
-            s->chase.base.body.direction;
+    angle = ((struct SceneActorFacingTarget *)s->base.tracking.target)->heading -
+            s->base.body.direction;
     if (angle > 128)
         angle -= 256;
     else if (angle < -128)
@@ -503,17 +496,16 @@ u8 SceneActorControl_CanTurnTowardTarget(struct ChaseActor *sIn)
     x = angle;
     if (x < 0)
         x = -x;
-    if (x > 63 && !context->field6D0)
+    if (x > 63 && !context->collisionDelay)
         return 1;
     return 0;
 }
 
-void Skeleton_UpdateActionCooldown(u8 *p)
+void Skeleton_UpdateActionCooldown(struct ChaseActor *actor)
 {
-    u8 *q = *(u8 **)(p + 0x3d0);
-    u16 *h = (u16 *)(q + 0x704);
-    if (*h != 0)
-        *h -= 1;
+    struct Skeleton *context = actor->base.context;
+    if (context->actionCooldown)
+        --context->actionCooldown;
 }
 
 // confidence=low: restores the common Skeleton route and reaction state after snapshot recovery
@@ -647,24 +639,15 @@ void SceneActorControl_InitBehaviorColliders(struct ChaseActor *actor)
                                            &extraOffset, Skeleton_OnContactEvent, 1, actor);
 }
 
-struct VornActorExtra {
-    u8 unknown0[0xB4];
-    u16 arrB4[4];
-    u16 arrBC[4];
-    u16 arrC4[4];
-    u32 arrCC[4];
-};
-
 void Vorn_SpawnHazard(struct ChaseActor *actor, s32 index)
 {
-    struct Vorn *ctx = (struct Vorn *)actor->base.context;
-    struct VornActorExtra *extra = (struct VornActorExtra *)actor;
-    u16 b4 = extra->arrB4[index];
-    u16 bc = extra->arrBC[index];
-    u32 cc = extra->arrCC[index];
-    u16 c4 = extra->arrC4[index];
+    struct Skeleton *context = actor->base.context;
+    u16 b4 = actor->base.attacks.first[index];
+    u16 bc = actor->base.attacks.second[index];
+    u32 cc = actor->base.attacks.flags[index];
+    u16 c4 = actor->base.attacks.parameter[index];
 
-    Collider_SetAttackProperties((u8 *)ctx + 0x678, b4, bc, 0, cc, c4);
+    Collider_SetAttackProperties(&context->attackCollider, b4, bc, 0, cc, c4);
 }
 
 #define gSineTable gUnk_086149C4
@@ -809,16 +792,16 @@ u8 SceneActorReaction_IsRangeReady(struct ChaseActor *);
 
 void Skeleton_SelectDistanceReaction(struct Skeleton *actor);
 
-static inline u8 IsFlag512Set(struct SceneActorTimedBehaviorContext *context)
+static inline u8 IsFlag512Set(struct Skeleton *context)
 {
     u32 mask = 0x200;
-    if (context->flags6DC & mask)
+    if (context->actionFlags & mask)
         return 1;
     return 0;
 }
 
 u8 SceneActorControl_TryBeginNearbyBehavior16(struct ChaseActor *s,
-                                              struct SceneActorTimedBehaviorContext *context,
+                                              struct Skeleton *context,
                                               s32 angle)
 {
     if (!SceneActorReaction_IsRangeReady(s)) {
@@ -827,7 +810,7 @@ u8 SceneActorControl_TryBeginNearbyBehavior16(struct ChaseActor *s,
         Skeleton_SelectDistanceReaction(s);
         return 1;
     }
-    if (angle <= 24 && s->base.tracking.distance < context->nearRange6E0) {
+    if (angle <= 24 && s->base.tracking.distance < context->distanceThresholds[0]) {
         void (*fn)(void) = SceneActorControl_OnIdle;
         u8 code = 0x10;
         u32 zero;
@@ -855,7 +838,7 @@ u8 SceneActorControl_TryBeginNearbyBehavior16(struct ChaseActor *s,
         s->base.behavior2AA = 0;
         s->base.counter2AC = zero;
         s->base.field2B1 = one;
-        context->attempts703 = 0;
+        context->attempts = 0;
         return 1;
     }
     return 0;
@@ -960,7 +943,7 @@ u8 Skeleton_TryBeginArmedAttack(struct ChaseActor *actor, struct Skeleton *conte
 s32 Math_Atan2(s32, s32);
 
 u8 SceneActorControl_TryBeginNearbyBehavior16(struct ChaseActor *,
-                                              struct SceneActorTimedBehaviorContext *, s32);
+                                              struct Skeleton *, s32);
 
 u8 Skeleton_TryBeginGuardedAttack(struct ChaseActor *, struct Skeleton *, s32);
 
@@ -977,7 +960,7 @@ struct SceneActorTargetPosition {
 
 void SceneActorControl_SelectBehaviorByTargetAngle(struct ChaseActor *s)
 {
-    struct SceneActorTimedBehaviorContext *context;
+    struct Skeleton *context;
     struct SceneActorTargetDelta delta;
     s32 angle;
 
@@ -2085,14 +2068,14 @@ struct SkeletonActionFlagsActor {
 
 void Skeleton_UpdateFacingColliders(struct ChaseActor *p);
 
-void Skeleton_UpdateActionCooldown(u8 *p);
+void Skeleton_UpdateActionCooldown(struct ChaseActor *);
 
 s32 Skeleton_UpdateActionFlags(struct SkeletonActionFlagsActor *p)
 {
     u32 m;
     u16 *q;
     Skeleton_UpdateFacingColliders(p);
-    Skeleton_UpdateActionCooldown(p);
+    Skeleton_UpdateActionCooldown((struct ChaseActor *)p);
     m = 0x200;
     q = &p->fl;
     if ((*q & m) == 0) {
@@ -2238,7 +2221,7 @@ void SceneActor_TryForward(void *a, void *b, struct ChaseActor *actor)
 /* Tentative reaction name, based on the observed fields and calls. */
 
 void SceneActorControl_BeginTimedBehavior56(struct ChaseActor *s,
-                                            struct SceneActorBehaviorTimer *other);
+                                            struct Skeleton *other);
 
 u8 SceneActorControl_CanTurnTowardTarget(struct ChaseActor *);
 
@@ -2259,7 +2242,7 @@ void SceneActorReaction_TryStartContact(u8 *source, u16 *contact, struct ChaseAc
         return;
     if (!SceneActorControl_CanTurnTowardTarget(actor))
         return;
-    SceneActorControl_BeginTimedBehavior56(actor, state);
+    SceneActorControl_BeginTimedBehavior56(actor, (struct Skeleton *)state);
     state->active6D0 = 20;
     actor->base.reactionDirection = actor->base.tracking.heading + 0x80;
 }
@@ -2312,10 +2295,10 @@ static inline void Skeleton_EnableMotionFlags(struct ChaseActor *actor, u16 bits
                                      bits);
 }
 
-static inline void Skeleton_SetContextFlags(struct SceneActorTimedBehaviorContext *context,
+static inline void Skeleton_SetContextFlags(struct Skeleton *context,
                                             u32 bits)
 {
-    context->flags6DC |= bits;
+    context->actionFlags |= bits;
 }
 
 static inline u32 Skeleton_MovementFlags(struct ChaseActor *actor, u32 mask)
@@ -2412,7 +2395,7 @@ void Skeleton_UpdateHopToOpenCell(struct ChaseActor *actor)
         s32 direction =
             SceneActorTerrain_FindOpenNeighborDirection(actor, actor->base.reactionDirection);
         if (direction < 0) {
-            struct SceneActorTimedBehaviorContext *context;
+            struct Skeleton *context;
             SceneActorAnimation_SelectDirectionalEntry(&actor->base, 15);
             SceneActorChase_SetFlagComponent(Skeleton_GateFlags(actor), 4);
             Skeleton_EnableMotionFlags(actor, 0x80);
