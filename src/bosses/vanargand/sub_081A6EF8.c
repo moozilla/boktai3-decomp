@@ -1,20 +1,16 @@
-#include "global.h"
+#include "bosses/vanargand/vanargand_damage_part.h"
+
 void Collision_CalculateDamageResponse(void *, void *);
 void PlayerStats_AddContactHundredths(void *, void *, u32);
-struct Dest {
-    u8 pad[0x124];
-    u32 a;
-    u16 b;
-    u8 pad2[4];
-    u16 c;
-};
-void Vanargand_OnPartContact(u8 *a, u8 *b, struct Dest *c)
+
+void Vanargand_OnPartContact(struct ContactCollider *source, struct ContactCollider *receiver,
+                            struct VanargandDamagePart *part)
 {
-    u32 v;
-    Collision_CalculateDamageResponse(a, b);
-    c->b = *(u16 *)(b + 0x3e);
-    v = *(u32 *)(a + 0x38);
-    c->a = v;
-    c->c = *(u16 *)(a + 0x44);
-    PlayerStats_AddContactHundredths(a, b, 10);
+    u32 flags;
+    Collision_CalculateDamageResponse(source, receiver);
+    part->pendingDamage = receiver->cost;
+    flags = source->reactionFlags;
+    part->pendingFlags = flags;
+    part->contactCooldown = source->responseValue;
+    PlayerStats_AddContactHundredths(source, receiver, 10);
 }
