@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Check one C file against the ROM without a full build, and show a diff.
 
-  check.py FILE.c [--quiet]
+  check.py FILE.c [--quiet | --match-only]
   check.py sub_08033568              (resolve a ROM address or function name)
 
 Compiles the file exactly as build.py does, links it alone at the address of
@@ -261,6 +261,8 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("src")
     ap.add_argument("--quiet", action="store_true")
+    ap.add_argument("--match-only", action="store_true",
+                    help="compare bytes and print the verdict without disassembly or scoring")
     ap.add_argument("--full", action="store_true", help="show all decoded rows")
     ap.add_argument("--context", type=int, default=3)
     ap.add_argument("--json", action="store_true", help="machine-readable comparison")
@@ -277,6 +279,8 @@ def main():
         build.DEFINES.append("-DNONMATCHING")
     if a.context < 0 or (a.target_size is not None and a.target_size <= 0):
         ap.error("context must be nonnegative and target size must be positive")
+    if a.match_only and (a.full or a.json or a.keep or a.nonmatching or a.record):
+        ap.error("--match-only cannot be used with full, JSON, kept, or nonmatching reports")
     try:
         src = resolve(a.src)
     except ValueError as error:
@@ -302,6 +306,11 @@ def linked_bytes(src, work, *, syms=None, ram=None):
         return obj, addr, defined, stream.read()
 
 
+def print_verdict(defined, addr, size, matched):
+    names = ", ".join(defined)
+    print(f"{names}: {'MATCH' if matched else 'MISMATCH'} ({size} bytes at 0x{addr:08X})")
+
+
 def run(a, src, work):
     obj, addr, defined, mine = linked_bytes(src, work)
     rom = load_rom(verify=False)
@@ -311,6 +320,10 @@ def run(a, src, work):
     if off(addr) < 0 or off(addr) + extent > len(rom):
         sys.exit("target extent outside ROM")
     orig = rom[off(addr):off(addr) + extent]
+    if a.match_only:
+        ok = orig == mine
+        print_verdict(defined, addr, len(mine), ok)
+        sys.exit(0 if ok else 1)
     arm = os.path.basename(build.compiler_for(src)) == "agbcc_arm"
     result = comparison(orig, mine, addr, arm=arm, target_size=a.target_size)
     result.update(functions=defined, artifacts=work, fuzzy_match_percent=fuzzy_percent(result))
@@ -338,8 +351,7 @@ def run(a, src, work):
         hint = f"tools/anchordiff.py {work}" if a.keep else "rerun with --keep for tools/anchordiff.py"
         print(f"realigned: {result['anchordiff']['total']} differing insns, "
               f"{result['anchordiff']['structural']} ignoring registers ({hint})")
-    names = ", ".join(defined)
-    print(f"{names}: {'MATCH' if ok else 'MISMATCH'} ({len(mine)} bytes at 0x{addr:08X})")
+    print_verdict(defined, addr, len(mine), ok)
     sys.exit(0 if ok else 1)
 
 
