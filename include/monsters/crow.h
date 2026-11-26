@@ -48,19 +48,6 @@ struct Crow {
     struct ContactPosition storedPosition;
 };
 
-struct CrowPackedPosition {
-    u32 xy, z;
-};
-
-struct CrowColliderHalfwords {
-    u32 lo : 16;
-    u32 hi : 16;
-};
-
-struct CrowColliderVector {
-    struct CrowColliderHalfwords a, b;
-};
-
 struct CrowSignedFlags {
     s32 bits : 16;
 };
