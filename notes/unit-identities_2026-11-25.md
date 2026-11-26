@@ -1258,3 +1258,37 @@ Tags: player spiral trail, recoil puff, scripted shot, Vanargand, coffin ring, W
 
 The new effects tapes are in `build/identify/pass3/replay_effects.py`.
 They preserve the original ROM and stage only the specified entry state.
+
+## Coffin Bike charge and repair through normal inputs
+
+Tags: Coffin Bike, Blaster, Repair, 409C, palette, 6274
+
+Use checkpoint 0037 and warp to 6274 entrance 130, story 31, preserving its
+equipment. The saved front index at GameState+07A0 is 2, the Blaster whose
+text #2321 describes holding B for a piercing shot. The special at +07A6
+is 0, Repair (text #2326 and #2332). No live gear, timer, energy, or HP edits
+are needed.
+
+```sh
+build/venv/bin/python build/identify/resume2/bike.py 0037 repair
+```
+
+The first replay uses 67 frames of B hold. Original initialization calls
+`ScriptRecord_FindExtendedModifier` with front 2 at frame 1470. Watch
+`SpriteParticle_SpawnSingleFrameBatch` every 12 frames, then
+`ActorMarker_ShowSlot` for slot zero at 1896. The renderer submits drawable
+0200F4E8 at screen (90, 76). Release at frame 1903 to run
+`ActorEmitter_TryEmitLow`. See `resume2-bike-0037/charge.png` and
+`flight.png` for the marker and launched shot. The comparison from saved
+front 1 in 0018 runs no charge handler or reveal with the same inputs.
+
+The second replay uses the original bike impact tape. The collision drops
+the HUD from 390 to 250 HP. Hold A after the recorded damage. At frame
+2470 the Repair callback `ActorAbility_UpdateRecovery` calls
+`PalFade_Start` targeting the 0386 recovery palette. The rider and bike
+turn green and HP climbs. At 2550, now at full HP, the original stopping
+update invokes the fade with rows 0378 and 0379. The HUD shows 390 and
+the bike returns to its base colors. Compare
+`resume2-bike-repair/{recover-before,recover-active,recovered,restored}.png`.
+This verifies the same restoration branch as the earlier timer-staged
+experiment, now reached by ordinary inputs.
