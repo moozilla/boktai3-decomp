@@ -34,7 +34,7 @@ struct Skeleton {
     u16 actionCooldown; /* Frames until the next timed turn or action. */
     u16 parameter706;
     u32 nearDistance, farDistance; /* target distance bands for the reaction choice */
-    u8 unknown710[8];
+    struct ContactPosition capturedTargetPosition;
     s32 healthThreshold;
     struct ChaseRouteProbe routeProbe;
     struct ContactPosition destination;

@@ -73,25 +73,16 @@ void SceneActorApproach_RunAlternateTimedAction(struct ChaseActor *actor)
 
 // foundry draft (worker best 94.9%); what differs is mostly register allocation and instruction order
 
-struct SceneActorApproachCaptureContext {
-    u8 unknown0[0x6F2];
-    u16 timer;
-    u8 unknown6F4[6];
-    u16 duration;
-    u8 unknown6FC[0x14];
-    struct ContactPosition destination;
-};
-
 void Skeleton_BeginHomingBurst(void);
 
 void SceneActorApproach_CaptureTargetAndRunAction(struct ChaseActor *actor)
 {
-    struct SceneActorApproachCaptureContext *context = actor->base.context;
+    struct Skeleton *context = actor->base.context;
     if (SceneActorControl_TakeStateEntry(actor)) {
         SceneActorReaction_EnableMotionFlags(0x100, &actor->base.motionFlags);
         SceneActorChase_SetControl(actor, Skeleton_BeginHomingBurst, 0x2C);
-        context->destination = actor->base.tracking.target->position;
-        context->timer = context->duration;
+        context->capturedTargetPosition = actor->base.tracking.target->position;
+        context->timer6F2 = context->parameters6F8[1];
         Vorn_SpawnHazard(actor, 2);
     }
     if (actor->base.stepDone) {
