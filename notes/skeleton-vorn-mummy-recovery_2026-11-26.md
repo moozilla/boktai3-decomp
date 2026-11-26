@@ -342,3 +342,7 @@ The statement-macro census now reuses scans for unchanged sources.
 Its repository-sized benchmark with one file to rescan took 4.5 seconds,
 compared with 89.8 seconds for the old full rescan. The counts agreed,
 and all 13 focused tests passed.
+
+The final Skeleton change uses `ContactPosition` for the four collider
+shapes and their offsets. The full 31,956-byte unit matched with direct
+X, Y and Z assignments.
