@@ -542,12 +542,7 @@ void SceneActorPhase_UpdateConditionalMotion(struct ChaseActor *p)
             return;
     }
     if (p->base.stepDone) {
-        u32 phase = 0x15;
-        p->base.state2A8 = 0;
-        p->base.phase2A9 = 0;
-        p->base.behavior2AA = phase;
-        p->base.counter2AC = 0;
-        p->base.field2B1 = 1;
+        Chase_SetBehavior(p, 0x15);
         Chase_SetCtl(p, p->base.onStanding, 0);
     } else
         ++p->base.counter2AC;
@@ -585,8 +580,8 @@ void SceneActorPhase_BeginTimedMotion(struct ChaseActor *p)
             void *control = p->base.onStanding;
             u32 *flags;
             p->base.field2B2 = one;
-            *(u8 *)((u32)p + 0x2B0) = zero;
-            *(u8 *)((u32)p + 0x2B5) = zero;
+            p->base.stepDone = zero;
+            p->base.controlKind = zero;
             p->base.target = control;
             p->base.field2C8 = zero;
             flags = &p->base.pendingControlFlags;
@@ -612,8 +607,7 @@ void SceneActorPhase_BeginTimedMotion(struct ChaseActor *p)
 
 void Vorn_UpdateActionCompletion(u8 *p)
 {
-    if (p[0x2b1])
-        p[0x2b1] = 0;
+    SceneActorControl_TakeStateEntry((struct ChaseActor *)p);
     if (p[0x2b0]) {
         struct {
             u8 pad[0xf];
@@ -623,7 +617,7 @@ void Vorn_UpdateActionCompletion(u8 *p)
         sprite->flags |= m;
         Vorn_SelectRecoveryAction(p, gUnk_0824E224, 0x19b);
     } else
-        (*(u32 *)(p + 0x2ac))++;
+        ++((struct ChaseActor *)p)->base.counter2AC;
 }
 
 extern const u32 gUnk_08605F9C[];
@@ -2462,14 +2456,7 @@ static inline void Vorn_Resume(struct Vorn *input, struct SceneActorChaseGroup *
     SceneActorAttachment_ReplaceResponseSlot(actor, 0, 2, 0x19);
     SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0);
     Chase_SetCtl(&actor->chase, SceneActorReaction_RestoreAfterDelay, 14);
-    {
-        u8 k1 = 3;
-        actor->chase.base.state2A8 = k1;
-    }
-    actor->chase.base.phase2A9 = 1;
-    actor->chase.base.behavior2AA = 0;
-    actor->chase.base.counter2AC = 0;
-    actor->chase.base.field2B1 = 1;
+    SceneActorChase_SetState(&actor->chase, 3, 1, 0);
     {
         struct SceneActorDelayedResponse *command = (void *)&group->saved;
         u32 target = (u32)actor->chase.base.onAlternateEntry;
@@ -2775,12 +2762,12 @@ s32 Vorn_UpdateBehavior(void *p)
 
 void Vorn_UpdateRecoveryCooldown(struct ChaseActor *p);
 
-u32 Vorn_UpdateActionTimers(u8 *p)
+u32 Vorn_UpdateActionTimers(struct Vorn *vorn)
 {
-    u8 *q = p;
+    struct ChaseActor *actor = &vorn->chase;
     u16 *r;
-    Vorn_UpdateRecoveryCooldown((struct ChaseActor *)p);
-    switch (p[0x2B5]) {
+    Vorn_UpdateRecoveryCooldown(actor);
+    switch (actor->base.controlKind) {
         case 12:
         case 13:
         case 34:
@@ -2789,17 +2776,17 @@ u32 Vorn_UpdateActionTimers(u8 *p)
         case 41:
         case 42: {
             u32 m = 4;
-            u32 *x = (u32 *)(q + 0x2D0);
+            u32 *x = &actor->base.statusFlags;
             *x = *x | m;
         } break;
     }
-    r = (u16 *)(p + 0x69E);
+    r = &vorn->field69E;
     if (*r != 0)
         *r = *r - 1;
-    r = (u16 *)(p + 0x6AC);
+    r = &vorn->pursuitCooldown;
     if (*r != 0)
         *r = *r - 1;
-    r = (u16 *)(p + 0x6D0);
+    r = &vorn->field6D0;
     if (*r != 0)
         *r = *r - 1;
     return 1;
@@ -2889,7 +2876,7 @@ void Vorn_InitActionTable(u8 *p)
 
 s32 Vorn_UpdateBehavior(void *);
 
-u32 Vorn_UpdateActionTimers(u8 *);
+u32 Vorn_UpdateActionTimers(struct Vorn *);
 
 void SceneActorControl_DispatchControl(void *);
 
@@ -2907,7 +2894,7 @@ s32 Vorn_OnUpdate(struct ChaseActor *s)
         }
         SceneActorControl_DispatchControl(s);
     }
-    Vorn_UpdateActionTimers((u8 *)s);
+    Vorn_UpdateActionTimers((struct Vorn *)s);
     return 1;
 }
 
