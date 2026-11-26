@@ -5,7 +5,7 @@
 #include "engine/scene_body/scene_body_api.h"
 #include "engine/shared/scene_facing.h"
 #include "effects/shared_display_animation_wrapper/display_animation.h"
-#include "player/player.h"
+#include "engine/shared/player.h"
 #include "engine/shared/scene_actor_components.h"
 #include "engine/shared/contact_collider.h"
 

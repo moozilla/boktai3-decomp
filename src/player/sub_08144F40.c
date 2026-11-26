@@ -1,5 +1,5 @@
 #include "engine/shared/global.h"
-#include "player/player.h"
+#include "engine/shared/player.h"
 // confidence=low: departure variant with a camera lift and scale descent, sibling of PlayerCue_UpdateDeparture.
 void Player_AddControlFlags(void *, u32);
 void Camera_SnapToWithoutCompletion(struct SceneVec *);

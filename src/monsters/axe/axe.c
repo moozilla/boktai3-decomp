@@ -3,7 +3,7 @@
 #include "engine/shared/global.h"
 #include "engine/shared/scene_actor_drawable_flags.h"
 #include "engine/shared/scene_actor_chase_shared.h"
-#include "player/player.h"
+#include "engine/shared/player.h"
 #include "engine/shared/scene_actor_control_phase.h"
 #include "engine/shared/rotation_phase.h"
 #include "engine/shared/scene_actor_reset.h"

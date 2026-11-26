@@ -3,7 +3,7 @@
 #include "engine/shared/scene_actor_terrain.h"
 #include "monsters/golem/golem.h"
 #include "engine/shared/scene_actor_chase_reaction.h"
-#include "player/player.h"
+#include "engine/shared/player.h"
 #include "engine/shared/scene_actor_control_phase.h"
 #include "engine/shared/scene_actor_delayed_response.h"
 #include "engine/shared/scene_actor_reset.h"

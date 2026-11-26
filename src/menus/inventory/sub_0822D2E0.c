@@ -1,5 +1,5 @@
 #include "engine/shared/global.h"
-#include "player/player.h"
+#include "engine/shared/player.h"
 #include "engine/shared/word_flags.h"
 struct ItemAgingDefinition {
     u8 unknown0[4];

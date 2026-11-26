@@ -97,10 +97,10 @@ def lookup(addr):
         for r in csv.DictReader(f):
             if int(r["addr"], 16) == a:
                 name = r["name"]
-    from source_layout import locate
-
-    entry = locate(a)
-    state = f"in C: {entry[0]}" if entry else "no C definition"
+    src = glob.glob(os.path.join(ROOT, "src", "**", "*.c"), recursive=True)
+    hit = [s for s in src if re.search(rf"\b(sub_)?{a:08X}\b|\b{re.escape(name or 'sub_%08X' % a)}\b",
+                                       open(s, errors="replace").read())]
+    state = "in C: " + ", ".join(os.path.relpath(s, ROOT) for s in hit[:3]) if hit else "no C file mentions it"
     print(f"{a:08X}  {name or f'sub_{a:08X} (unnamed)'}  ({state})")
     for f in files():
         i = info(f)

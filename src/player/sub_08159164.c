@@ -1,5 +1,5 @@
 #include "engine/shared/global.h"
-#include "player/player.h"
+#include "engine/shared/player.h"
 #include "system/game_state/game_state.h"
 s32 Div(s32, s32);
 static inline u32 Bonus(struct Player *p, u32 mask)

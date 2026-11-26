@@ -1,7 +1,7 @@
 #include "engine/shared/engine_pause.h"
 #include "menus/game_over/game_over.h"
 #include "engine/shared/palette_pulse.h"
-#include "player/player.h"
+#include "engine/shared/player.h"
 #include "menus/dialogue_controls_and_animation/message_window.h"
 #include "engine/shared/runtime.h"
 #include "engine/shared/scene_actor_chase_shared.h"

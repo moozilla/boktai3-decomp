@@ -3,7 +3,7 @@
 #include "system/game_state/game_state.h"
 #include "engine/shared/engine_globals.h"
 #include "engine/shared/task.h"
-#include "player/player.h"
+#include "engine/shared/player.h"
 /* Tentative identity: scripted rectangular areas with optional display sprites. */
 struct AreaEffectEntry {
     struct SceneVec position;

@@ -1,5 +1,5 @@
 #include "engine/shared/global.h"
-#include "player/player.h"
+#include "engine/shared/player.h"
 #include "monsters/axe/axe.h"
 #include "actors/actor_phase/directional_sprite_state.h"
 #include "engine/shared/engine.h"

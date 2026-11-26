@@ -1011,7 +1011,7 @@ def scan_all(globals_, jobs):
     os.makedirs(stubdir, exist_ok=True)
     for h in headers():
         p = os.path.join(stubdir, os.path.basename(h)[:-2] + ".c")
-        txt = f'#include "engine/shared/global.h"\n#include "{os.path.relpath(h, "include")}"\n'
+        txt = f'#include "engine/shared/global.h"\n#include "{os.path.relpath(h, 'include')}"\n'
         if not os.path.exists(p) or open(p).read() != txt:
             open(p, "w").write(txt)
         stubs.append(os.path.relpath(p, ROOT))

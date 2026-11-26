@@ -8018,9 +8018,6 @@ def cmd_land(target, draft=None, new_name=None, rom=False, note=None, nonmatchin
         nonmatching = False
         print(f"{name}: the draft matches; landing it as exact C")
     kind, dest, asm_name = land.where(ROOT, name, addr)
-    if kind == "plain" and new_name:
-        from source_layout import new_source
-        dest = new_source(addr, new_name)
     if new_name:  # a name that cannot be applied fails before anything is written
         try:
             land.rename(ROOT, addr, name, new_name, dry=True)

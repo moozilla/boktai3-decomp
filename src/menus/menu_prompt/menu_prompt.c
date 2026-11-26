@@ -1,7 +1,7 @@
 #include "engine/shared/global.h"
 #include "menus/menu_prompt/menu_prompt.h"
 #include "system/game_state/game_state.h"
-#include "player/player.h"
+#include "engine/shared/player.h"
 #include "menus/dark_loan/dark_loan_screen.h"
 #include "engine/shared/input.h"
 #include "engine/shared/render.h"

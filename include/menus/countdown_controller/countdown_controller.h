@@ -2,7 +2,7 @@
 #define GUARD_COUNTDOWN_CONTROLLER_H
 
 #include "engine/shared/engine.h"
-#include "player/player.h"
+#include "engine/shared/player.h"
 
 struct CountdownTask {
     struct Task task;

@@ -339,7 +339,7 @@ Nidhoggr,0818EBF4,08190C98,,,auto: 21 of 39 functions named Nidhoggr_*; also Sce
 Large scene animation controller (tentative),08190C98,0819792C,,,docs/REPORT_SUBSYSTEMS.md; reviewed controller portion with sixteen keyframes543C; task creators19783C and197890 allocate72FC bytes
 Buffered animation task (tentative),0819792C,08197DD0,,,docs/REPORT_SUBSYSTEMS.md; independent graphics-buffer owner allocated count*32+0x28 with sprite and animation initialization
 Time palette transitions (tentative),08197DD0,08197EC4,,symbols/proposed/report-subsystems.csv,docs/REPORT_SUBSYSTEMS.md; three phase-selected palette sources and64-tick transition through08221110
-Scripted key trigger,08197EC4,0819804C,,,src/engine/scripted_key_trigger/key_trigger_update.c; KeyTrigger_Update Init Create and task key-mask/message consumers
+Scripted key trigger,08197EC4,0819804C,,,src/engine/scripted_key_trigger/sub_08197EC4.c; KeyTrigger_Update Init Create and task key-mask/message consumers
 Scene effect,0819804C,08199094,,,auto: 12 of 17 functions named SceneEffect_*; also ShadowActor_*
 Scene effect queue,08199094,08199AEC,,,auto: 8 of 10 functions named SceneEffectQueue_*
 Cannon battery,08199AEC,0819A698,,,auto: 17 of 28 functions named CannonBattery_*; also PaletteCycleBackground_* ScriptValues_*

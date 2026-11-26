@@ -1,5 +1,5 @@
 #include "engine/shared/scene_steering_actor.h"
-#include "player/player.h"
+#include "engine/shared/player.h"
 /* SceneSteeringActor_CreateFixedOriginTravelActor: Creates a travel actor at fixed coordinates aimed toward the primary player */
 #define SceneSteeringActor_CreateFixedOriginTravelActor sub_0806CF4C
 struct SceneSteeringPlayerView {

@@ -1,7 +1,7 @@
 #ifndef GUARD_NAMED_ACTOR_COMMANDS_H
 #define GUARD_NAMED_ACTOR_COMMANDS_H
 #include "field/named_object/named_object.h"
-#include "player/player.h"
+#include "engine/shared/player.h"
 #include "field/terrain_shadows/terrain_shadow.h"
 #include "engine/shared/scene_actor_terrain.h"
 struct NamedObject *NamedObject_FindByName(s32);

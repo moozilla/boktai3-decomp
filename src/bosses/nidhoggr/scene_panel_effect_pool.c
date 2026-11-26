@@ -1,5 +1,5 @@
 #include "bosses/nidhoggr/scene_panel_effect_pool.h"
-#include "player/player_slot_status.h"
+#include "engine/shared/player_slot_status.h"
 #include "bosses/nidhoggr/scene_pause.h"
 
 void sub_0818ECFC(struct ScenePanelEffectPool *);

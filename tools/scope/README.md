@@ -406,7 +406,8 @@ ported here deliberately. Incremental rebuild after editing one file:
 ### The workspace: new, land, rename
 
 `new FUNC` finds where FUNC's C will live: an `INCLUDE_ASM` line in a unit,
-or nowhere yet (a new single-function file in the subsystem directory). It writes `build/scope/work/FUNC.c`: the whole unit with
+or nowhere yet (a new
+`src/fn/sub_ADDR.c`). It writes `build/scope/work/FUNC.c`: the whole unit with
 FUNC's `INCLUDE_ASM` replaced by a stub (signature from the first
 declaration in the unit or its headers), plus `FUNC.base.c`, the unit as it
 was. Outside a unit, the draft is a like twin's file (coverage >= 0.5) with
@@ -2291,7 +2292,7 @@ which is exactly `10:1`. Not tested.
   explicit `enter` pointer comes first. Dropping the pointer loses r8 reuse
   entirely (fact 2). Open: what C makes `&p->enter` shared yet copied after
   the gcse insertion.
-* **Vanargand_UpdateRepeatedPairAttack** (src/bosses/vanargand/vanargand_update_repeated_pair_attack.c, 1 insn). ROM
+* **Vanargand_UpdateRepeatedPairAttack** (src/bosses/vanargand/sub_081AA178.c, 1 insn). ROM
   stores `phase` (r5) to `p->timer` in case 0 (line 76); the draft stores the
   call result (r7). `CSE_KEEP=24` (keep `phase` canonical) matches exactly, so
   this is cse canonicity (facts 4, 6, 7). Chain in the draft: at the switch

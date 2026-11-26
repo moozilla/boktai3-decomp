@@ -1,7 +1,7 @@
 #ifndef GUARD_SCENE_CATALOG_H
 #define GUARD_SCENE_CATALOG_H
 #include "menus/scene_hud/scene_hud_display.h"
-#include "player/player.h"
+#include "engine/shared/player.h"
 
 void SceneCatalog_SetDescription(struct SceneHudState *s, s32 selection);
 void InventoryGrid_UpdateModifierPreview(struct SceneHudState *p);

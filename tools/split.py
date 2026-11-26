@@ -118,11 +118,7 @@ def split_nonmatching(raw):
 def nonmatching_functions(path):
     """[(name, fuzzy percent or None)] for each NONMATCHING draft in a unit."""
     with open(path) as source:
-        return draft_functions(source.read())
-
-
-def draft_functions(text):
-    _, drafts = split_nonmatching(text)
+        _, drafts = split_nonmatching(source.read())
     found = []
     for draft, fallback in drafts:
         m = FUZZY.search(draft)
@@ -131,15 +127,12 @@ def draft_functions(text):
     return found
 
 
-def c_functions(path, with_asm=True, *, resolve_aliases=True):
+def c_functions(path, with_asm=True):
     """Functions a C unit covers, in file order: C definitions plus
     INCLUDE_ASM(dir, name) placeholders (unless with_asm=False).
     NONMATCHING drafts are skipped; their INCLUDE_ASM fallbacks count."""
     with open(path) as source:
-        return source_functions(source.read(), with_asm, resolve_aliases=resolve_aliases)
-
-
-def source_functions(raw, with_asm=True, *, resolve_aliases=True):
+        raw = source.read()
     raw, _ = split_nonmatching(raw)
     src = raw
     # "#define Name sub_XXXXXXXX" aliases a known name to its address label
@@ -170,7 +163,7 @@ def source_functions(raw, with_asm=True, *, resolve_aliases=True):
     if with_asm:
         for m in INCLUDE_ASM.finditer(src):
             found.append((m.start(), m.group(1)))
-    return [alias.get(n, n) if resolve_aliases else n for _, n in sorted(found)]
+    return [alias.get(n, n) for _, n in sorted(found)]
 
 
 def write_nonmatching(code, funcs):

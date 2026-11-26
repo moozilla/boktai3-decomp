@@ -2,7 +2,7 @@
 #define GUARD_SCENE_ACTOR_LIFECYCLE_H
 
 #include "engine/shared/engine.h"
-#include "player/player.h"
+#include "engine/shared/player.h"
 #include "engine/shared/scene_actor_components.h"
 #include "engine/scene_body/scene_body_api.h"
 #include "engine/shared/display_animation_api.h"

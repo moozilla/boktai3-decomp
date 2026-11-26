@@ -8,7 +8,7 @@
   relatives.py --port [--min 0.9] [--keep]
                                        write each strong relative's C as a candidate for the
                                        unmatched function (wip/relatives/), check it, and with
-                                       --keep copy MATCHes to the source tree (as clones.py does)
+                                       --keep copy MATCHes to src/fn/ (as clones.py does)
 
 clones.py ports C between functions whose instructions are identical once
 symbols are abstracted. Most unmatched functions have no clone, but many share

@@ -1,5 +1,5 @@
 #include "engine/shared/global.h"
-#include "player/player.h"
+#include "engine/shared/player.h"
 #include "system/game_state/game_state.h"
 #include "engine/shared/scene_item_values.h"
 #include "menus/scene_hud/scene_hud_display.h"

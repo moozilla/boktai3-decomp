@@ -2,7 +2,7 @@
 #include "engine/shared/render.h"
 #include "system/game_state/game_state.h"
 #include "engine/shared/engine.h"
-#include "player/player.h"
+#include "engine/shared/player.h"
 #include "menus/scene_indicators/scene_indicator.h"
 
 struct PackedVec {

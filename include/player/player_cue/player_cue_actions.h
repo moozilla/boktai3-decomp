@@ -1,6 +1,6 @@
 #ifndef GUARD_PLAYER_CUE_ACTIONS_H
 #define GUARD_PLAYER_CUE_ACTIONS_H
-#include "player/player.h"
+#include "engine/shared/player.h"
 #include "engine/shared/contact_swarm.h"
 #include "engine/shared/display_sequence.h"
 #include "engine/script_utility_references/script_utility.h"

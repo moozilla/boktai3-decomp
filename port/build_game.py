@@ -24,7 +24,7 @@ LLVM = Path('/opt/homebrew/opt/llvm/bin')
 sys.path.insert(0, str(ROOT / 'port/core'))
 sys.path.insert(0, str(ROOT / 'tools'))
 from source_layout import source_paths
-from prepare import compatibility_sources, prepare_headers, prepare_source  # noqa: E402
+from prepare import prepare_headers, prepare_source  # noqa: E402
 from addresses import read_addresses, bind_ir  # noqa: E402
 from mmio import instrument_mmio  # noqa: E402
 from link_slice import find_linker  # noqa: E402
@@ -125,7 +125,6 @@ def main():
     OUT.mkdir(parents=True, exist_ok=True)
     headers = OUT / 'include'
     prepare_headers(ROOT, headers, 'wasm32')
-    compatibility_sources()
     # Stage 1 emits unoptimized IR (-disable-llvm-passes keeps -O2's attributes):
     # the hooks go in before inlining, so inlined copies keep them; stage 3 optimizes.
     flags = ['--target=wasm32', '-ffreestanding', '-std=gnu89', '-O2', '-Xclang', '-disable-llvm-passes',
@@ -148,9 +147,8 @@ def main():
     hasher.update(subprocess.check_output([args.cc, '--version']) + repr(flags).encode())
     context = hasher.digest()
 
-    sources = game_sources()
-    units = [(str(p.relative_to(ROOT)), True) for p in sources]
-    doubles = {int(m, 16) for p in sources
+    units = [(str(p.relative_to(ROOT)), True) for p in game_sources()]
+    doubles = {int(m, 16) for p in game_sources()
                for m in re.findall(r'extern const double gUnk_([0-9A-F]{8})\[\]', p.read_text())}
     listed = {int(m, 16) for m in re.findall(r'\{0x([0-9A-F]{8}), \d+\}', (ROOT / 'port/game/game.c').read_text())}
     if doubles != listed:

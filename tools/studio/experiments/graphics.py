@@ -32,7 +32,7 @@ def layout(stamps):
         raise RuntimeError("The IWRAM sprite declaration changed")
     measures = ["(unsigned)&((struct IwObj *)0)->tiles", f"sizeof({PLAYER_ROOT})"]
     measures.extend(f"(unsigned)&((struct Player *)0)->{member}" for member in PLAYER_MEMBERS)
-    text = '#include "engine/shared/global.h"\n#include "player/player.h"\n' + private[0]
+    text = '#include "engine/shared/global.h"\n#include "engine/shared/player.h"\n' + private[0]
     text += "\nconst unsigned experiment_layout[] = {" + ",\n".join(measures) + "};\n"
     offsets = fields.compile_layout(text, "sprite renderer")
     if len(offsets) != len(measures) or offsets[1] % 4:
@@ -43,7 +43,7 @@ def layout(stamps):
 
 
 def measured_layout():
-    paths = (IW_SOURCE, fields.ROOT / "include/player/player.h", fields.ROOT / "symbols/ram.csv")
+    paths = (IW_SOURCE, fields.ROOT / "include/engine/shared/player.h", fields.ROOT / "symbols/ram.csv")
     return layout(tuple(path.stat().st_mtime_ns for path in paths))
 
 
@@ -151,7 +151,7 @@ def owner(drawable, players, member_offsets, result, snap):
             watched = [{**row, "path": field["path"]} for field, row in zip(result["fields"], snap["fields"])
                        if field["path"].startswith(root)]
             return {"type": "struct Player", "address": f"{address:08X}", "slot": slot,
-                    "member": root + member, "header": "include/player/player.h", "fields": watched}
+                    "member": root + member, "header": "include/engine/shared/player.h", "fields": watched}
     return None
 
 

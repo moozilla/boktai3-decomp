@@ -1,6 +1,6 @@
 #include "engine/shared/global.h"
-#include "player/player.h"
-#include "player/player_slot_status.h"
+#include "engine/shared/player.h"
+#include "engine/shared/player_slot_status.h"
 
 s32 Div(s32, s32);
 

@@ -3,7 +3,7 @@
 
 #include "engine/shared/contact_collider.h"
 #include "engine/shared/engine.h"
-#include "player/player.h"
+#include "engine/shared/player.h"
 #include "engine/interrupts_and_video/sprite.h"
 
 struct Vec {

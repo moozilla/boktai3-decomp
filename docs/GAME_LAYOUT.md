@@ -100,7 +100,7 @@ Reset, the ARM crt0, the IWRAM helpers, `AgbMain` and the first frame. The
 |---|---|---|---|
 | `08000000`–`08000350` | GBA header and crt0 | - | Cartridge header, SDK crt0 (stacks, IntrMain install). Handwritten assembly; reported as intentional assembly. |
 | `08000350`–`0800145C` | IWRAM ARM code | `src/engine/iwram_arm_code/iwram_code.c` | Six ARM C functions copied to IWRAM 0x03000000 by AgbMain (palette bank cache, sprite/blit helpers). |
-| `0800145C`–`080015AC` | Game entry point | `src/engine/game_entry_point/agb_main.c` | `AgbMain`: hardware and subsystem startup, then the endless `TaskSystem_RunFrame` loop. See ENTRY_AND_MENUS.md. |
+| `0800145C`–`080015AC` | Game entry point | `src/engine/game_entry_point/AgbMain.c` | `AgbMain`: hardware and subsystem startup, then the endless `TaskSystem_RunFrame` loop. See ENTRY_AND_MENUS.md. |
 
 [ENTRY_AND_MENUS.md](ENTRY_AND_MENUS.md) describes the entry point and the
 start of the menus. The solar and RTC initialization are in section 11.
@@ -353,7 +353,7 @@ linked notes.
 | `0822F1B4`–`08231448` | MP2K (`m4a`) sound driver | `src/lib/m4a/m4a.c` (57 of 58 functions) | [THIRD_PARTY.md](../THIRD_PARTY.md); `symbols/proposed/m4a.csv`; the mixer `SoundMainRAM` at `0822F248` runs from IWRAM |
 | `08243EFC`–`08248590` | RFU SDK 1024 (STWI transport, serial interrupt, link API, identification) | `src/lib/librfu_*.c` (145 functions) | [RFU.md](RFU.md) |
 | `08248590`–`082485EC` | `libagbsyscall` BIOS wrappers | `symbols/functions.csv` | standard syscalls such as `CpuSet` and `VBlankIntrWait` |
-| `082485EC`–`08248970` | EEPROM SDK V124 | `src/lib/eeprom/eeprom_set_capacity.c`, `sub_08248634.c` to `sub_08248930.c` | [EEPROM.md](EEPROM.md) |
+| `082485EC`–`08248970` | EEPROM SDK V124 | `src/lib/eeprom/sub_082485EC.c`, `sub_08248634.c` to `sub_08248930.c` | [EEPROM.md](EEPROM.md) |
 | `08248970`–`08249238` | SIIRTC | `symbols/proposed/rtc.csv` | [RTC.md](RTC.md) |
 | `08249238`–`0824ACFC` | libgcc runtime (`_call_via_rX`, division, floating point) | `src/lib/libgcc/libgcc_fp.c`, `libgcc_dp.c` | [LIBGCC.md](LIBGCC.md) |
 | `0824ACFC`–`0824DA3C` | libm (Sun fdlibm) | `src/lib/libm_*.c` | [LIBM.md](LIBM.md) |

@@ -1,6 +1,6 @@
 #include "engine/shared/global.h"
 #include "engine/shared/ram.h"
-#include "player/player.h"
+#include "engine/shared/player.h"
 
 static inline void Player_ClearRegisteredSlots(void)
 {

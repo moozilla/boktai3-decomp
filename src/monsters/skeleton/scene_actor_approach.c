@@ -1,5 +1,5 @@
 #include "engine/shared/global.h"
-#include "player/player.h"
+#include "engine/shared/player.h"
 #include "actors/scene_actor_reaction/scene_actor_reaction.h"
 #include "engine/shared/scene_actor_control_phase.h"
 #include "engine/shared/scene_actor_chase_reaction.h"

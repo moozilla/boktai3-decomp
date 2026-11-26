@@ -64,7 +64,7 @@ the most readable summary of each subsystem.
 
 ## 2. Boot and the frame loop
 
-Entry point: `AgbMain` in [`src/engine/game_entry_point/agb_main.c`](../src/engine/game_entry_point/agb_main.c) (ROM
+Entry point: `AgbMain` in [`src/engine/game_entry_point/AgbMain.c`](../src/engine/game_entry_point/AgbMain.c) (ROM
 `0800145C`, [ENTRY_AND_MENUS.md](ENTRY_AND_MENUS.md)). The ARM crt0 at `080000C0`
 jumps to it; six ARM C functions (agbcc ARM mode, `src/engine/iwram_arm_code/iwram_code.c`) run from IWRAM
 at `03000000` (ROM `08000350`).
@@ -517,7 +517,7 @@ known offset and not proven. Use the header as the authoritative list.
 
 ### `struct Player`
 
-[`include/player/player.h`](../include/player/player.h). `gUnk_02000580[4]` holds four
+[`include/engine/shared/player.h`](../include/engine/shared/player.h). `gUnk_02000580[4]` holds four
 pointers to player-like objects. Slot 0 is the local player. The other slots
 are used by the multiplayer code *(guess)*. Known fields: `statusFlags`
 (`+0x20`, bit `0x100000` = cannot interact, *guess*), `position` (`+0x30`,
@@ -745,7 +745,7 @@ The SDK routines `EEPROMRead` (`082486B4`), `EEPROMWrite` (`08248778`),
 (`08248634`) are matched EEPROM_V124 code.
 
 The game's save writer is `sub_0822EE68` (a non-matching draft, in
-`src/system/save/save_write_block.c` under `#ifdef NONMATCHING`). Its layout, from the code:
+`src/system/save/sub_0822EE68.c` under `#ifdef NONMATCHING`). Its layout, from the code:
 
 * The data is split into **8-byte blocks**, starting at a block index. All blocks are
   written with `sub_08248764`, then all are compared with `sub_082488D8`. A
@@ -828,7 +828,7 @@ These show up across units. Learn them once and the code reads quickly.
 ### Reading order for a mod
 
 1. [GAME_LAYOUT.md](GAME_LAYOUT.md) for the map of subsystems.
-2. `include/engine/shared/engine.h` for the shared API, then `include/system/game_state/game_state.h` and `include/player/player.h`.
+2. `include/engine/shared/engine.h` for the shared API, then `include/system/game_state/game_state.h` and `include/engine/shared/player.h`.
 3. One example object end to end: `src/field/items_and_containers/item_container.c` (triggers) or
    `src/field/scene_objects/scene_object.c` (blocks). Start at its `*_CreateFromScript`.
 4. [SCRIPT_TRACING.md](SCRIPT_TRACING.md) to see what a script command does at runtime.

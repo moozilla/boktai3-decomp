@@ -2,7 +2,7 @@
 #define GUARD_PLAYER_SAVED_POSITION_H
 
 #include "system/game_state/game_state.h"
-#include "player/player.h"
+#include "engine/shared/player.h"
 
 static inline void Player_SavePositionAndFacing(struct Player *p)
 {

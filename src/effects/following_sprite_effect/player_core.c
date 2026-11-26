@@ -1,5 +1,5 @@
 #include "effects/following_sprite_effect/player_core.h"
-#include "player/player_slot_status.h"
+#include "engine/shared/player_slot_status.h"
 #include "monsters/ghoul/ghoul_disc.h"
 
 void ScreenMote_ResetManager(void)

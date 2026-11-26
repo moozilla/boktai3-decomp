@@ -1,7 +1,7 @@
 #ifndef GUARD_PLAYER_SCRIPT_H
 #define GUARD_PLAYER_SCRIPT_H
 #include "engine/shared/engine.h"
-#include "player/player.h"
+#include "engine/shared/player.h"
 struct PlayerScriptItem {
     u16 unknown0, actionKind, unknown4, valueA, valueB;
     u8 unknownA[6];

@@ -5,7 +5,7 @@
 #include "monsters/skeleton/skeleton.h"
 #include "actors/scene_actor_reaction/scene_actor_reaction.h"
 #include "engine/shared/scene_actor_terrain.h"
-#include "player/player.h"
+#include "engine/shared/player.h"
 #include "engine/shared/scene_actor_visibility.h"
 #include "engine/shared/scene_actor_control_helpers.h"
 #include "monsters/vorn/vorn.h"

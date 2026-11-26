@@ -287,9 +287,9 @@ def edit_unit(text, view, tag, header):
     body = struct_body(text, view)
     text = text[:body.start()] + text[body.end():].lstrip("\n") if body else text
     text = re.sub(r"\bstruct %s\b" % re.escape(view), f"struct {tag}", text)
-    inc = f'#include "{os.path.relpath(header, "include")}"'
+    inc = f'#include "{os.path.relpath(header, 'include')}"'
     if inc not in text:
-        text = re.sub(r'^(#include "(?:engine/shared/)?global\.h"\n)', r"\1" + inc + "\n", text, count=1, flags=re.M)
+        text = re.sub(r'^(#include "engine/shared/global.h"\n)', r"\1" + inc + "\n", text, count=1, flags=re.M)
         if inc not in text:
             text = inc + "\n" + text
     return text

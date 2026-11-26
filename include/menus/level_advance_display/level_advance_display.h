@@ -3,7 +3,7 @@
 #include "engine/shared/engine.h"
 #include "engine/shared/scene_vec.h"
 #include "engine/shared/sprite_drawable_api.h"
-#include "player/player.h"
+#include "engine/shared/player.h"
 union LevelAdvancePosition {
     struct SceneVec world;
     u32 words[2];

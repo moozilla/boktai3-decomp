@@ -6,7 +6,7 @@
 #include "engine/shared/contact_collider.h"
 #include "engine/shared/display_sequence.h"
 #include "engine/shared/scaled_shadow_types.h"
-#include "player/player.h"
+#include "engine/shared/player.h"
 struct CallbackPoolEntry {
     struct ContactSwarmSprite sprite;
     struct DisplaySequenceState sequence;

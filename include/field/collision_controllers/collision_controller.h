@@ -2,7 +2,7 @@
 #define COLLISION_CONTROLLER_H
 #include "engine/shared/global.h"
 #include "field/scene_objects/scene_object.h"
-#include "player/player.h"
+#include "engine/shared/player.h"
 #include "engine/shared/ram.h"
 #include "engine/shared/task.h"
 #include "engine/shared/display_sequence.h"

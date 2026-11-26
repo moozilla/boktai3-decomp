@@ -1,6 +1,6 @@
 #include "engine/shared/global.h"
 #include "engine/shared/ram.h"
-#include "player/player.h"
+#include "engine/shared/player.h"
 struct NamedObject {
     u8 pad0[0xB6];
     u16 state;

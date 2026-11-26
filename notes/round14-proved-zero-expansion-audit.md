@@ -11,8 +11,8 @@ that intermediate to the enclosing source statement.
 
 | Source at baseline `c940902f6` | Reported operations | Nonzero source case |
 | --- | --- | --- |
-| `src/bosses/hresvelgr/hresvelgr_update_turning_charge.c:131`, `Hresvelgr_UpdateTurningCharge` | `ashiftrt`, `lshiftrt` | Sample 8 gives remainder 1 and turn +16. |
-| `src/bosses/vanargand/vanargand_update_alternating_pair_attack.c:47`, `Vanargand_UpdateAlternatingPairAttack` | `ashiftrt`, `lshiftrt` | Sample 8 selects half 1. |
+| `src/bosses/hresvelgr/sub_0819FC34.c:131`, `Hresvelgr_UpdateTurningCharge` | `ashiftrt`, `lshiftrt` | Sample 8 gives remainder 1 and turn +16. |
+| `src/bosses/vanargand/sub_081A9DDC.c:47`, `Vanargand_UpdateAlternatingPairAttack` | `ashiftrt`, `lshiftrt` | Sample 8 selects half 1. |
 | `src/monsters/vorn/vorn_main.c:2117`, `Vorn_BeginPursuitRoute` | `and` | Initial flags 0 become 4, then remain 4. |
 
 These are **three warning sites and five raw diagnostic records**. They

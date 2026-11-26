@@ -1,5 +1,5 @@
 #include "engine/shared/global.h"
-#include "player/player.h"
+#include "engine/shared/player.h"
 struct LinkSide {
     u8 pad0[0x18];
     s16 side;

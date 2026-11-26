@@ -1,5 +1,5 @@
 #include "field/directional_interaction_controllers/directional_interaction.h"
-#include "player/player_slot_status.h"
+#include "engine/shared/player_slot_status.h"
 
 /* Sets the controller's state and flags it as newly entered. */
 u32 DirectionalController_SetState(struct DirectionalController *p, u32 state)

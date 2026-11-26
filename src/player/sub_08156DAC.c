@@ -1,6 +1,6 @@
 #include "engine/shared/global.h"
 #include "engine/shared/engine.h"
-#include "player/player.h"
+#include "engine/shared/player.h"
 u8 *TerrainModifiers_FindCellOverride(s32, s32);
 void Player_UpdateFacingSide(struct Player *);
 void ActorSequence_Begin(void *, s32, s32);

@@ -1,7 +1,7 @@
 #include "engine/shared/global.h"
 #include "engine/shared/ram.h"
 #include "engine/shared/engine_globals.h"
-#include "player/player.h"
+#include "engine/shared/player.h"
 // fix.py best (sweep after the inlined-insn fix)
 #include "player/player_particle_cloud/player_particle_cloud.h"
 

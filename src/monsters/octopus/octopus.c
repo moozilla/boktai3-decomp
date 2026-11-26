@@ -7,7 +7,7 @@
 #include "engine/shared/display_sequence_inline.h"
 #include "engine/shared/scene_actor_chase_reaction.h"
 #include "engine/shared/scene_actor_terrain.h"
-#include "player/player.h"
+#include "engine/shared/player.h"
 #include "monsters/octopus/octopus.h"
 #include "engine/shared/word_flags.h"
 #include "gba/macro.h"

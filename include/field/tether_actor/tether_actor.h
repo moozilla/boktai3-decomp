@@ -2,7 +2,7 @@
 #define GUARD_TETHER_ACTOR_H
 #include "engine/shared/contact_swarm.h"
 #include "engine/shared/engine.h"
-#include "player/player.h"
+#include "engine/shared/player.h"
 #include "engine/sprite_oam/sprite_oam.h"
 #include "engine/shared/terrain_collision.h"
 /* Tentative identity: world actor with seven visible player-tether segments. */

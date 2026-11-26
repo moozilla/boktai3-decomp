@@ -32,7 +32,7 @@
 
 #include "engine/shared/scene_actor_displacement.h"
 
-#include "player/player.h"
+#include "engine/shared/player.h"
 
 #include "engine/script_utility_references/script_utility.h"
 #include "engine/shared/chase_actor.h"

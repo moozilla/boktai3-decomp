@@ -1,7 +1,7 @@
 #include "engine/shared/global.h"
 #include "engine/shared/ram.h"
 #include "engine/shared/engine_globals.h"
-#include "player/player.h"
+#include "engine/shared/player.h"
 #include "menus/scene_hud/scene_hud_display.h"
 extern u8 gUnk_08E60F0C[];
 void Inventory_InitEquipmentEntryFromDescriptor(u8 *, u8 *);

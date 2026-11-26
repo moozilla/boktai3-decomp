@@ -21,7 +21,7 @@
 #include "engine/shared/scene_actor_chase_direct_arrival.h"
 #include "engine/shared/scene_actor_cardinal_path.h"
 #include "engine/shared/scene_actor_terrain.h"
-#include "player/player.h"
+#include "engine/shared/player.h"
 #include "engine/shared/scene_actor_straight_route.h"
 #include "engine/shared/scene_actor_contacts.h"
 #include "engine/shared/scene_actor_chase_shared.h"

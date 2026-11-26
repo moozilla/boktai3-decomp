@@ -667,7 +667,7 @@ remain tentative where the precise gameplay role is uncertain.
   improve the score. Needs the original spilled motion pointer, transient r3
   destination and flags2CC lifetime around the terrain call.
 - **080AEE08 drafted 83.4%**, `Vorn_UpdateDefeat`, in
-  `src/monsters/vorn/vorn_update_defeat.c`. Reused Bat_UpdateDefeat's verified spark/script/event
+  `src/monsters/vorn/sub_080AEE08.c`. Reused Bat_UpdateDefeat's verified spark/script/event
   pattern; Vorn adds Vorn_SendMessage, calls 080B0D28 before the burst, and
   always transitions to idle control/state 1/behavior 2 after its completion
   latch. Entry releases attachments, advances effects, clears route counters,
@@ -2642,7 +2642,7 @@ NONMATCHING drafts earn no exact coverage. No network operations or full builds.
 All six functions have descriptive file-local address aliases.
 
 - **08119B80 — matched, Glove_DispatchCommands.** Reviewed extent 880 bytes;
-  `tools/check.py src/monsters/glove/glove_dispatch_commands.c --target-size 880` reports zero differing
+  `tools/check.py src/monsters/glove/sub_08119B80.c --target-size 880` reports zero differing
   bytes. Glove command queue +870, recoil-motion parameters +8C8, attachment
   descriptor +91C, screen position +928 and attachment handle +964. Queue kinds
   2/6 populate recoil parameters and select 08119378/08119638; kinds 5/0/1 select

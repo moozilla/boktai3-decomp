@@ -1,5 +1,5 @@
 #include "engine/shared/global.h"
-#include "player/player.h"
+#include "engine/shared/player.h"
 struct TriggerOpener;
 s32 Trigger_TryOpenNearby(struct TriggerOpener *);
 u32 Player_GetTetherMode(struct Player *);

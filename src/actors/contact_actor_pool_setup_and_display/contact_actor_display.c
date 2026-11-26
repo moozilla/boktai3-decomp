@@ -1,6 +1,6 @@
 #include "engine/shared/scene_graphics_actor.h"
 #include "engine/shared/contact_actor.h"
-#include "player/player.h"
+#include "engine/shared/player.h"
 #include "engine/shared/contact_swarm.h"
 #include "engine/shared/display_sprite_playback.h"
 

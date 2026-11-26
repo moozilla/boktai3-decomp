@@ -3,7 +3,7 @@
 #include "engine/shared/scene_input.h"
 #include "engine/shared/display_resource.h"
 #include "actors/task_4_e01/contact_swarm_sprite.h"
-#include "player/player.h"
+#include "engine/shared/player.h"
 
 enum DarkLoanWidgetIndex {
     DARK_LOAN_BACKGROUND = 0,

@@ -881,24 +881,24 @@ def main(argv=None) -> int:
     from statement_macros import single_use_names
     once = frozenset(single_use_names(root))
     files = []
-    requested = [Path(path).resolve() for path in args.paths] or [root / "src", root / "include"]
-    for p in requested:
+    for p in args.paths or [root / "src", root / "include"]:
+        p = Path(p)
         files += sorted([*p.rglob("*.c"), *p.rglob("*.h")]) if p.is_dir() else [p]
-    entries = [(f, f.relative_to(root) if f.is_relative_to(root) else f) for f in files]
     import deadcode
     use_compiler = not args.no_compiler
     if use_compiler and not deadcode.available():
         sys.exit("dead-code and proved-zero need scope's compiler: sh tools/scope/build_agbcc.sh (or pass --no-compiler)")
     if use_compiler:  # compile in parallel up front; the loop below reads the cache
         from concurrent.futures import ThreadPoolExecutor
-        units = [str(rel) for f, rel in entries
-                 if f.suffix == ".c" and not rel.is_absolute() and not is_library(rel)]
+        units = [str(f.resolve().relative_to(root)) for f in files
+                 if f.suffix == ".c" and f.resolve().is_relative_to(root) and not is_library(f.resolve().relative_to(root))]
         with ThreadPoolExecutor(8) as pool:
             list(pool.map(deadcode.unit, units))
     use_tree = not args.errors_only and (not args.kind or any(k in TREE for k in args.kind))
     totals: dict[str, int] = {}
-    for f, rel in entries:
+    for f in files:
         text = f.read_text(errors="replace")
+        rel = f.resolve().relative_to(root) if f.resolve().is_relative_to(root) else f
         lines = text.splitlines()
         found = sites(text, rel, single_use=once)
         flags = cflags(text, rel)

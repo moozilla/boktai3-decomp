@@ -3,7 +3,7 @@
 Tags: #matching #scene-actors #damage #compiler #reload #jump2 #cross-jump
 
 **Exact match in ordinary C.** `SceneActorReaction_ResolveDamage`, 1156 bytes,
-compiles byte-identically (`tools/check.py src/actors/scene_actor_reaction/scene_actor_reaction_resolve_damage.c`: MATCH, 0
+compiles byte-identically (`tools/check.py src/actors/scene_actor_reaction/sub_08135F70.c`: MATCH, 0
 differing bytes). It has no register pins, barriers, inline assembly or compiler
 overrides. Commit `7174089b8` on `codex/opus-ratatosk-defeat`. The unit's
 guarded draft was at 96.4%. GPT-6's round 8 frontier

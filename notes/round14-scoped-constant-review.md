@@ -15,24 +15,24 @@ those units passed independent stock checks with the original complete extents.
 
 | Unit | Locals removed | Integration commit |
 |---|---:|---|
-| `src/link/wireless_connection_controller/wireless_handle_send_error.c` | 1 | `600782650` |
-| `src/link/wireless_trade_and_selection_menu/wireless_game_menu_update_round_handshake.c` | 1 | `edf27dbda` |
-| `src/link/wireless_trade_and_selection_menu/wireless_game_menu_update_ready_exchange.c` | 1 | `bdfcdbbc8` |
-| `src/actors/scene_pooled_motion_and_actor_controls/scene_pool_state_emit_bursts.c` | 2 | `9610d6c9f` |
-| `src/actors/scene_pooled_motion_and_actor_controls/scene_pool_state_depart_forward.c` | 1 | `8e4bd9025` |
-| `src/field/proximity_particle_emitter/proximity_emitter_emit_particle.c` | 2 | `48b466289` |
-| `src/menus/scene_panel_sprite_rig/scene_panel_rig_init_primary_sprites.c` | 2 | `b967776fb` |
-| `src/actors/scene_actor_registry_manager/scene_actor_registry_reset_route_and_colliders.c` | 1 | `c0e5a4f91` |
-| `src/actors/scene_actor_reaction_callbacks/scene_actor_reaction_begin_faded_state.c` | 1 | `098c7c036` |
-| `src/player/player_update_flagged_resource_recovery.c` | 1 | `e0f2d1b01` |
-| `src/player/player_update_unflagged_resource_recovery.c` | 1 | `e077ab8b9` |
-| `src/player/player_update_target_motion.c` | 1 | `e7fe304db` |
-| `src/bosses/hresvelgr/hresvelgr_begin_damage_reaction.c` | 2 | `638f4df4d` |
-| `src/bosses/vanargand/vanargand_update_sequenced_pair_attack.c` | 3 | `82d1bb19b` |
-| `src/bosses/vanargand/vanargand_update_synchronized_pair_attack.c` | 4 | `b5059a10e` |
-| `src/bosses/vanargand/vanargand_update_alternating_pair_attack.c` | 2 | `fd86aef06` |
-| `src/bosses/vanargand/vanargand_update_charged_pair_attack.c` | 4 | `4cfa9f021` |
-| `src/actors/singleton_slot_7/singleton_slot7_update_ending_scene.c` | 4 | `eb78da36e` |
+| `src/link/wireless_connection_controller/sub_08035288.c` | 1 | `600782650` |
+| `src/link/wireless_trade_and_selection_menu/sub_080386C8.c` | 1 | `edf27dbda` |
+| `src/link/wireless_trade_and_selection_menu/sub_08038928.c` | 1 | `bdfcdbbc8` |
+| `src/actors/scene_pooled_motion_and_actor_controls/sub_0803E998.c` | 2 | `9610d6c9f` |
+| `src/actors/scene_pooled_motion_and_actor_controls/sub_0803ED84.c` | 1 | `8e4bd9025` |
+| `src/field/proximity_particle_emitter/sub_08051A8C.c` | 2 | `48b466289` |
+| `src/menus/scene_panel_sprite_rig/sub_0805AE58.c` | 2 | `b967776fb` |
+| `src/actors/scene_actor_registry_manager/sub_080714E4.c` | 1 | `c0e5a4f91` |
+| `src/actors/scene_actor_reaction_callbacks/sub_08080868.c` | 1 | `098c7c036` |
+| `src/player/sub_08142CC0.c` | 1 | `e0f2d1b01` |
+| `src/player/sub_08142FC4.c` | 1 | `e077ab8b9` |
+| `src/player/sub_0814B1F8.c` | 1 | `e7fe304db` |
+| `src/bosses/hresvelgr/sub_0819C29C.c` | 2 | `638f4df4d` |
+| `src/bosses/vanargand/sub_081A96E0.c` | 3 | `82d1bb19b` |
+| `src/bosses/vanargand/sub_081A9910.c` | 4 | `b5059a10e` |
+| `src/bosses/vanargand/sub_081A9DDC.c` | 2 | `fd86aef06` |
+| `src/bosses/vanargand/sub_081A9F88.c` | 4 | `4cfa9f021` |
+| `src/actors/singleton_slot_7/sub_081EF914.c` | 4 | `eb78da36e` |
 
 ## Source and diagnostic checks
 

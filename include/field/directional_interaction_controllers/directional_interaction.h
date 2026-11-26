@@ -3,7 +3,7 @@
 #include "engine/shared/global.h"
 #include "engine/shared/directional_script_args.h"
 #include "system/game_state/game_state.h"
-#include "player/player.h"
+#include "engine/shared/player.h"
 #include "engine/shared/input.h"
 #include "engine/interrupts_and_video/sprite.h"
 #include "engine/shared/task.h"

@@ -1,5 +1,5 @@
 #include "engine/shared/global.h"
-#include "player/player.h"
+#include "engine/shared/player.h"
 #include "engine/shared/engine.h"
 #include "engine/shared/ram.h"
 #include "player/target_registry/target_registry.h"

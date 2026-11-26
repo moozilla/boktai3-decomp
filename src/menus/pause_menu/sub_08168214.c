@@ -1,7 +1,7 @@
 #include "engine/shared/global.h"
 // fix.py best (sweep after the inlined-insn fix)
 #include "menus/scene_hud/scene_hud_display.h"
-#include "player/player.h"
+#include "engine/shared/player.h"
 #include "engine/shared/engine.h"
 
 void PauseMenu_LoadAttributeIconFrame(void *, void *, s32);

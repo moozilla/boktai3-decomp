@@ -3,12 +3,12 @@
 Tags: #loop-reduction #goto #reload-rotation #inventory #spilled-locals #giv #incremented-index #live-length
 
 **PopulateItemGrid (0805FF38) matches with no pins** (commit 3f28b7dd2,
-`src/menus/inventory_values_and_display/scene_inventory_populate_item_grid.c`). **PopulateEquipmentGrid (0805FD20) matches with no
-pins and real loops** (commit 40eb582e0, `src/menus/inventory_values_and_display/scene_inventory_populate_equipment_grid.c`): the flags
+`src/menus/inventory_values_and_display/sub_0805FF38.c`). **PopulateEquipmentGrid (0805FD20) matches with no
+pins and real loops** (commit 40eb582e0, `src/menus/inventory_values_and_display/sub_0805FD20.c`): the flags
 are indexed with a variable that the column loop increments, so the outer loop
 cannot reduce the per-row flag offset (equipment section below).
 **PopulateConsumableGrid (080600DC) matches with no pins** (commit 8a8f207ee,
-`src/menus/inventory_values_and_display/scene_inventory_populate_consumable_grid.c`): real loops with `flagIndex = slot + 5`, and two
+`src/menus/inventory_values_and_display/sub_080600DC.c`): real loops with `flagIndex = slot + 5`, and two
 no-op `(s16)` narrowings of `kind` that lengthen flow's live ranges in the
 column loop (consumable section below).
 
@@ -88,7 +88,7 @@ the row on every row. As C this is `entry = (void *)((rowSlot + 5) * 0x60 +
 
 ## Consumable grid (080600DC): matched pin-free with real loops and two no-op s16 narrowings
 
-**Matches with no pins** (commit 8a8f207ee, `src/menus/inventory_values_and_display/scene_inventory_populate_consumable_grid.c`). The register pins, the
+**Matches with no pins** (commit 8a8f207ee, `src/menus/inventory_values_and_display/sub_080600DC.c`). The register pins, the
 asm barriers and the concession marker are gone. What it needed:
 
 * Real `for` loops in the first section (`for (; row <= 3; row++)` around `for (column = 0;

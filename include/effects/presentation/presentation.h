@@ -3,7 +3,7 @@
 #include "menus/scene_hud/scene_hud_display.h"
 #include "engine/shared/scene_input_compare.h"
 #include "engine/shared/scene_value_equipment.h"
-#include "player/player.h"
+#include "engine/shared/player.h"
 struct TextLabelStyle {
     u8 index, unknown1[0xb], specialC, unknownD[3], special10, unknown11[3], suffixKind;
 };

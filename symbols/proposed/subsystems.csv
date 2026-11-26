@@ -218,22 +218,22 @@ addr,name,confidence,evidence
 08013D3C,ShadowRegistry_Create,medium,Tentative descriptive name from exact C in src/fn/sub_08013D3C.c
 08013DC0,ShadowRegistry_CreateFromScript,medium,Tentative descriptive name from exact C in src/fn/sub_08013DC0.c
 08013E34,ShadowRegistry_Remove,medium,Tentative descriptive name from exact C in src/fn/sub_08013E34.c
-08013F98,ParticleGroup_Update,medium,Tentative descriptive name from exact C in src/effects/particle_groups/particle_group_update.c
-08014498,ParticleManager_Update,medium,Tentative descriptive name from exact C in src/effects/particle_groups/particle_manager_update.c
-08014568,ParticleManager_Initialize,medium,Tentative descriptive name from exact C in src/effects/particle_groups/particle_manager_initialize.c
+08013F98,ParticleGroup_Update,medium,Tentative descriptive name from exact C in src/effects/particle_groups/sub_08013F98.c
+08014498,ParticleManager_Update,medium,Tentative descriptive name from exact C in src/effects/particle_groups/sub_08014498.c
+08014568,ParticleManager_Initialize,medium,Tentative descriptive name from exact C in src/effects/particle_groups/sub_08014568.c
 08014F64,FragmentGroup_Update,medium,Tentative descriptive name from exact C in src/fn/sub_08014F64.c
 080150D0,FragmentManager_Initialize,medium,Tentative descriptive name from exact C in src/fn/sub_080150D0.c
-08015160,AnimatedParticleManager_Update,medium,Tentative descriptive name from exact C in src/effects/animated_particles/animated_particle_manager_update.c
-080153B0,AnimatedParticleManager_Initialize,medium,Tentative descriptive name from exact C in src/effects/animated_particles/animated_particle_manager_initialize.c
-080154D0,AnimatedParticle_PriorityFromFlags,medium,Tentative descriptive name from exact C in src/effects/animated_particles/animated_particle_priority_from_flags.c
-080154EC,AnimatedParticles_Create,medium,Tentative descriptive name from exact C in src/effects/animated_particles/animated_particles_create.c
-08015984,AnimatedParticles_EmitRing,medium,Tentative descriptive name from exact C in src/effects/animated_particles/animated_particles_emit_ring.c
+08015160,AnimatedParticleManager_Update,medium,Tentative descriptive name from exact C in src/effects/animated_particles/sub_08015160.c
+080153B0,AnimatedParticleManager_Initialize,medium,Tentative descriptive name from exact C in src/effects/animated_particles/sub_080153B0.c
+080154D0,AnimatedParticle_PriorityFromFlags,medium,Tentative descriptive name from exact C in src/effects/animated_particles/sub_080154D0.c
+080154EC,AnimatedParticles_Create,medium,Tentative descriptive name from exact C in src/effects/animated_particles/sub_080154EC.c
+08015984,AnimatedParticles_EmitRing,medium,Tentative descriptive name from exact C in src/effects/animated_particles/sub_08015984.c
 08015B1C,AnimatedParticles_EmitFan,medium,Tentative descriptive name from exact C in src/effects/animated_particles/sub_08015B1C.c
-08015BD4,AnimatedParticles_EmitDirectional,medium,Tentative descriptive name from exact C in src/effects/animated_particles/animated_particles_emit_directional.c
-08015C30,AnimatedParticles_EmitBurst,medium,Tentative descriptive name from exact C in src/effects/animated_particles/animated_particles_emit_burst.c
+08015BD4,AnimatedParticles_EmitDirectional,medium,Tentative descriptive name from exact C in src/effects/animated_particles/sub_08015BD4.c
+08015C30,AnimatedParticles_EmitBurst,medium,Tentative descriptive name from exact C in src/effects/animated_particles/sub_08015C30.c
 08015C90,AnimatedParticles_EmitAngledBurst,medium,Tentative descriptive name from exact C in src/effects/animated_particles/sub_08015C90.c
-08015CF0,AnimatedParticles_EmitOffset,medium,Tentative descriptive name from exact C in src/effects/animated_particles/animated_particles_emit_offset.c
-08015DE0,AnimatedParticles_CreateFromScript,medium,Tentative descriptive name from exact C in src/effects/animated_particles/animated_particles_create_from_script.c
+08015CF0,AnimatedParticles_EmitOffset,medium,Tentative descriptive name from exact C in src/effects/animated_particles/sub_08015CF0.c
+08015DE0,AnimatedParticles_CreateFromScript,medium,Tentative descriptive name from exact C in src/effects/animated_particles/sub_08015DE0.c
 08016118,FadingParticleGroup_Update,low,Tentative effect/palette interpretation from matched state updates and manager layout
 080163C8,FadingParticleManager_Initialize,low,Tentative effect/palette interpretation from matched state updates and manager layout
 080164B8,PaletteLevels_Increase,low,Tentative effect/palette interpretation from matched state updates and manager layout
@@ -362,38 +362,38 @@ addr,name,confidence,evidence
 0801DD40,ResultTutorial_UpdateSequence,tentative,Exact C; result-game and tutorial state transitions and demonstration sequence
 0801DEBC,ResultTutorial_ReadScript,tentative,Exact C; result-game and tutorial state transitions and demonstration sequence
 0801DEF4,ResultTutorial_Initialize,tentative,Exact C; result-game and tutorial state transitions and demonstration sequence
-0801E000,SceneObject_UpdatePoseA,low,Tentative scene-object controller role; exact C in src/actors/scene_object_controller/scene_object_update_pose_a.c
-0801E090,SceneObject_UpdatePoseB,low,Tentative scene-object controller role; exact C in src/actors/scene_object_controller/scene_object_update_pose_b.c
-0801E0F4,SceneObject_UpdatePoseC,low,Tentative scene-object controller role; exact C in src/actors/scene_object_controller/scene_object_update_pose_c.c
-0801E184,SceneObjects_Append,low,Tentative scene-object controller role; exact C in src/actors/scene_object_controller/scene_objects_append.c
-0801E344,SceneObjects_HasPrimaryId,low,Tentative scene-object controller role; exact C in src/actors/scene_object_controller/scene_objects_has_primary_id.c
-0801E374,SceneObjects_HasSecondaryId,low,Tentative scene-object controller role; exact C in src/actors/scene_object_controller/scene_objects_has_secondary_id.c
-0801E3A4,SceneObject_CheckActorCompatibility,low,Tentative scene-object controller role; exact C in src/actors/scene_object_controller/scene_object_check_actor_compatibility.c
-0801E3E4,SceneObjects_ScriptAppend,low,Tentative scene-object controller role; exact C in src/actors/scene_object_controller/scene_objects_script_append.c
-0801E530,SceneObjects_BeginActivation,low,Tentative scene-object controller role; exact C in src/actors/scene_object_controller/scene_objects_begin_activation.c
-0801E5B8,SceneObjects_BeginDeactivation,low,Tentative scene-object controller role; exact C in src/actors/scene_object_controller/scene_objects_begin_deactivation.c
-0801E630,SceneObjects_SetActive,low,Tentative scene-object controller role; exact C in src/actors/scene_object_controller/scene_objects_set_active.c
-0801E698,SceneObjects_SetInactive,low,Tentative scene-object controller role; exact C in src/actors/scene_object_controller/scene_objects_set_inactive.c
-0801E700,SceneObjects_Lock,low,Tentative scene-object controller role; exact C in src/actors/scene_object_controller/scene_objects_lock.c
-0801E740,SceneObjects_Unlock,low,Tentative scene-object controller role; exact C in src/actors/scene_object_controller/scene_objects_unlock.c
-0801E784,SceneObjects_ScriptActivate,low,Tentative scene-object controller role; exact C in src/actors/scene_object_controller/scene_objects_script_activate.c
-0801E820,SceneObjects_ScriptDeactivate,low,Tentative scene-object controller role; exact C in src/actors/scene_object_controller/scene_objects_script_deactivate.c
-0801E8B8,SceneObjects_ScriptRaise,low,Tentative scene-object controller role; exact C in src/actors/scene_object_controller/scene_objects_script_raise.c
-0801E998,SceneObjects_ScriptLower,low,Tentative scene-object controller role; exact C in src/actors/scene_object_controller/scene_objects_script_lower.c
-0801EA70,SceneObjects_ScriptPromote,low,Tentative scene-object controller role; exact C in src/actors/scene_object_controller/scene_objects_script_promote.c
-0801EB08,SceneObjects_ScriptReadPosition,low,Tentative scene-object controller role; exact C in src/actors/scene_object_controller/scene_objects_script_read_position.c
-0801EBBC,SceneObjects_ScriptSetSelection,low,Tentative scene-object controller role; exact C in src/actors/scene_object_controller/scene_objects_script_set_selection.c
-0801EBE4,SceneObjects_ClearSelection,low,Tentative scene-object controller role; exact C in src/actors/scene_object_controller/scene_objects_clear_selection.c
-0801EC00,SceneObjects_HasTypeTwoResource,low,Tentative scene-object controller role; exact C in src/actors/scene_object_controller/scene_objects_has_type_two_resource.c
-0801EF60,SceneObject_AnimateInactive,low,Tentative scene-object controller role; exact C in src/actors/scene_object_controller/scene_object_animate_inactive.c
-0801EFDC,SceneObject_AnimateActive,low,Tentative scene-object controller role; exact C in src/actors/scene_object_controller/scene_object_animate_active.c
-0801F3A0,SceneObject_BeginRaising,low,Tentative scene-object controller role; exact C in src/actors/scene_object_controller/scene_object_begin_raising.c
-0801F3CC,SceneObject_BeginLowering,low,Tentative scene-object controller role; exact C in src/actors/scene_object_controller/scene_object_begin_lowering.c
-0801F430,SceneObject_UpdateRaising,low,Tentative scene-object controller role; exact C in src/actors/scene_object_controller/scene_object_update_raising.c
-0801F4C4,SceneObject_UpdateLowering,low,Tentative scene-object controller role; exact C in src/actors/scene_object_controller/scene_object_update_lowering.c
-0801F580,SceneObject_UpdateRaised,low,Tentative scene-object controller role; exact C in src/actors/scene_object_controller/scene_object_update_raised.c
-0801F5B8,SceneObject_UpdateLowered,low,Tentative scene-object controller role; exact C in src/actors/scene_object_controller/scene_object_update_lowered.c
-080203D4,SceneObjects_Destroy,low,Tentative lifecycle or scene-message role; exact C in src/actors/scene_object_controller/scene_objects_destroy.c
+0801E000,SceneObject_UpdatePoseA,low,Tentative scene-object controller role; exact C in src/actors/scene_object_controller/sub_0801E000.c
+0801E090,SceneObject_UpdatePoseB,low,Tentative scene-object controller role; exact C in src/actors/scene_object_controller/sub_0801E090.c
+0801E0F4,SceneObject_UpdatePoseC,low,Tentative scene-object controller role; exact C in src/actors/scene_object_controller/sub_0801E0F4.c
+0801E184,SceneObjects_Append,low,Tentative scene-object controller role; exact C in src/actors/scene_object_controller/sub_0801E184.c
+0801E344,SceneObjects_HasPrimaryId,low,Tentative scene-object controller role; exact C in src/actors/scene_object_controller/sub_0801E344.c
+0801E374,SceneObjects_HasSecondaryId,low,Tentative scene-object controller role; exact C in src/actors/scene_object_controller/sub_0801E374.c
+0801E3A4,SceneObject_CheckActorCompatibility,low,Tentative scene-object controller role; exact C in src/actors/scene_object_controller/sub_0801E3A4.c
+0801E3E4,SceneObjects_ScriptAppend,low,Tentative scene-object controller role; exact C in src/actors/scene_object_controller/sub_0801E3E4.c
+0801E530,SceneObjects_BeginActivation,low,Tentative scene-object controller role; exact C in src/actors/scene_object_controller/sub_0801E530.c
+0801E5B8,SceneObjects_BeginDeactivation,low,Tentative scene-object controller role; exact C in src/actors/scene_object_controller/sub_0801E5B8.c
+0801E630,SceneObjects_SetActive,low,Tentative scene-object controller role; exact C in src/actors/scene_object_controller/sub_0801E630.c
+0801E698,SceneObjects_SetInactive,low,Tentative scene-object controller role; exact C in src/actors/scene_object_controller/sub_0801E698.c
+0801E700,SceneObjects_Lock,low,Tentative scene-object controller role; exact C in src/actors/scene_object_controller/sub_0801E700.c
+0801E740,SceneObjects_Unlock,low,Tentative scene-object controller role; exact C in src/actors/scene_object_controller/sub_0801E740.c
+0801E784,SceneObjects_ScriptActivate,low,Tentative scene-object controller role; exact C in src/actors/scene_object_controller/sub_0801E784.c
+0801E820,SceneObjects_ScriptDeactivate,low,Tentative scene-object controller role; exact C in src/actors/scene_object_controller/sub_0801E820.c
+0801E8B8,SceneObjects_ScriptRaise,low,Tentative scene-object controller role; exact C in src/actors/scene_object_controller/sub_0801E8B8.c
+0801E998,SceneObjects_ScriptLower,low,Tentative scene-object controller role; exact C in src/actors/scene_object_controller/sub_0801E998.c
+0801EA70,SceneObjects_ScriptPromote,low,Tentative scene-object controller role; exact C in src/actors/scene_object_controller/sub_0801EA70.c
+0801EB08,SceneObjects_ScriptReadPosition,low,Tentative scene-object controller role; exact C in src/actors/scene_object_controller/sub_0801EB08.c
+0801EBBC,SceneObjects_ScriptSetSelection,low,Tentative scene-object controller role; exact C in src/actors/scene_object_controller/sub_0801EBBC.c
+0801EBE4,SceneObjects_ClearSelection,low,Tentative scene-object controller role; exact C in src/actors/scene_object_controller/sub_0801EBE4.c
+0801EC00,SceneObjects_HasTypeTwoResource,low,Tentative scene-object controller role; exact C in src/actors/scene_object_controller/sub_0801EC00.c
+0801EF60,SceneObject_AnimateInactive,low,Tentative scene-object controller role; exact C in src/actors/scene_object_controller/sub_0801EF60.c
+0801EFDC,SceneObject_AnimateActive,low,Tentative scene-object controller role; exact C in src/actors/scene_object_controller/sub_0801EFDC.c
+0801F3A0,SceneObject_BeginRaising,low,Tentative scene-object controller role; exact C in src/actors/scene_object_controller/sub_0801F3A0.c
+0801F3CC,SceneObject_BeginLowering,low,Tentative scene-object controller role; exact C in src/actors/scene_object_controller/sub_0801F3CC.c
+0801F430,SceneObject_UpdateRaising,low,Tentative scene-object controller role; exact C in src/actors/scene_object_controller/sub_0801F430.c
+0801F4C4,SceneObject_UpdateLowering,low,Tentative scene-object controller role; exact C in src/actors/scene_object_controller/sub_0801F4C4.c
+0801F580,SceneObject_UpdateRaised,low,Tentative scene-object controller role; exact C in src/actors/scene_object_controller/sub_0801F580.c
+0801F5B8,SceneObject_UpdateLowered,low,Tentative scene-object controller role; exact C in src/actors/scene_object_controller/sub_0801F5B8.c
+080203D4,SceneObjects_Destroy,low,Tentative lifecycle or scene-message role; exact C in src/actors/scene_object_controller/sub_080203D4.c
 080209D0,SceneMessages_Enqueue,low,Tentative lifecycle or scene-message role; exact C in src/fn/sub_080209D0.c
 08020A14,SceneMessages_SwapBuffers,low,Tentative lifecycle or scene-message role; exact C in src/fn/sub_08020A14.c
 08020A60,SceneMessages_RunScript,low,Tentative descriptive role from exact C in src/fn/sub_08020A60.c
@@ -457,45 +457,45 @@ addr,name,confidence,evidence
 08024B60,SceneActorState_WaitForFlagClear,low,Tentative role from matched actor layout and control flow in src/fn/sub_08024B60.c
 08024CE0,SceneActorAnimation_StartDirectional,low,Tentative role from matched actor layout and control flow in src/fn/sub_08024CE0.c
 08024E18,SceneActorAnimation_StartEightDirection,low,Tentative role from matched actor layout and control flow in src/fn/sub_08024E18.c
-08024F2C,SceneActorAnimation_TransitionVariant,medium,Tentative descriptive role from exact C control flow; src/actors/actor_animation_and_action_controllers/scene_actor_animation_transition_variant.c
-080251C4,SceneActorAnimation_FollowMotionPath,medium,Tentative descriptive role from exact C control flow; src/actors/actor_animation_and_action_controllers/scene_actor_animation_update_charge_approach.c
-0802533C,SceneActorAnimation_Recoil,medium,Tentative descriptive role from exact C control flow; src/actors/actor_animation_and_action_controllers/scene_actor_animation_update_lunge_attack.c
-08025550,SceneActorAnimation_ApproachTarget,medium,Tentative descriptive role from exact C control flow; src/actors/actor_animation_and_action_controllers/scene_actor_animation_update_homing_lunge.c
-08025714,SceneActorAnimation_Decelerate,medium,Tentative descriptive role from exact C control flow; src/actors/actor_animation_and_action_controllers/scene_actor_animation_update_recoil_slide.c
-080257D0,SceneActorAnimation_RecoverMovement,medium,Tentative descriptive role from exact C control flow; src/actors/actor_animation_and_action_controllers/scene_actor_animation_update_charge_slide.c
-08025CD4,SceneActorAnimation_WaitForCompletion,medium,Tentative descriptive role from exact C control flow; src/actors/actor_animation_and_action_controllers/scene_actor_animation_update_swing_light.c
-08025D60,SceneActorAnimation_WaitForAlternateCompletion,medium,Tentative descriptive role from exact C control flow; src/actors/actor_animation_and_action_controllers/scene_actor_animation_update_swing_heavy.c
-08025DEC,SceneActor_FireRandomizedProjectile,low,Tentative descriptive role from exact C control flow; src/actors/actor_animation_and_action_controllers/scene_actor_animation_update_charge_shot_release.c
-08026248,SceneActorAnimation_TimedEffectReset,medium,Tentative descriptive role from exact C control flow; src/actors/actor_animation_and_action_controllers/scene_actor_animation_update_impact_finish.c
-0802634C,SceneActorAnimation_LockedReset,medium,Tentative descriptive role from exact C control flow; src/actors/actor_animation_and_action_controllers/scene_actor_animation_reset_action_state.c
-08026398,SceneActorAnimation_AlternateEffectReset,medium,Tentative descriptive role from exact C control flow; src/actors/actor_animation_and_action_controllers/scene_actor_animation_update_impact_release.c
-08026488,SceneActorAnimation_TimedAction,medium,Tentative descriptive role from exact C control flow; src/actors/actor_animation_and_action_controllers/scene_actor_animation_update_flash_windup.c
-0802667C,SceneActorAnimation_HoldFrame,medium,Tentative descriptive role from exact C control flow; src/actors/actor_animation_and_action_controllers/scene_actor_animation_update_flash_pulse.c
-08026780,SceneActorAnimation_ReleaseHeldFrame,medium,Tentative descriptive role from exact C control flow; src/actors/actor_animation_and_action_controllers/scene_actor_animation_update_flash_alternating.c
-08026908,SceneActorAnimation_ReleaseSavedAction,medium,Tentative descriptive role from exact C control flow; src/actors/actor_animation_and_action_controllers/scene_actor_animation_update_flash_alternating_repeat.c
-08026AA4,SceneActor_PeriodicProjectileBurst,low,Tentative descriptive role from exact C control flow; src/actors/actor_projectile_and_reaction_controllers/scene_actors_update_route_projectile_attack.c
-08026C38,SceneActor_FireDirectedProjectile,low,Tentative descriptive role from exact C control flow; src/actors/actor_projectile_and_reaction_controllers/scene_actors_update_travel_projectile_attack.c
-08026DE0,SceneActor_DecayScale,low,Tentative descriptive role from exact C control flow; src/actors/actor_projectile_and_reaction_controllers/scene_actors_update_shrinking_reaction.c
-08026EB4,SceneActor_DecayScaleAndMove,low,Tentative descriptive role from exact C control flow; src/actors/actor_projectile_and_reaction_controllers/scene_actors_update_knockback_reaction.c
-080277B8,SceneActor_ResetWhenBlocked,low,Tentative descriptive role from exact C control flow; src/actors/actor_projectile_and_reaction_controllers/scene_actors_update_stationary_reaction.c
-08027824,SceneActor_TurnFourDirections,low,Tentative descriptive role from exact C control flow; src/actors/actor_projectile_and_reaction_controllers/scene_actors_update_directional_turn.c
-0802797C,SceneActor_TurnEightDirections,low,Tentative descriptive role from exact C control flow; src/actors/actor_projectile_and_reaction_controllers/scene_actors_update_eight_direction_turn.c
-08027AD4,SceneActor_ContractAnchoredShake,low,Tentative descriptive role from exact C control flow; src/actors/actor_projectile_and_reaction_controllers/scene_actors_update_contracting_shake.c
-08027BF0,SceneActor_ExpandAnchoredShake,low,Tentative descriptive role from exact C control flow; src/actors/actor_projectile_and_reaction_controllers/scene_actors_update_expanding_shake.c
-08027CF8,SceneActor_TimedCommandAnimation,low,Tentative descriptive role from exact C control flow; src/actors/actor_projectile_and_reaction_controllers/scene_actors_update_hazard_attack.c
-08027DAC,SceneActor_HoldSavedFacing,low,Tentative descriptive role from exact C control flow; src/actors/actor_projectile_and_reaction_controllers/scene_actors_update_rest_pose.c
-08027E44,SceneActor_CompleteTriggeredAnimation,low,Tentative descriptive role from exact C control flow; src/actors/actor_projectile_and_reaction_controllers/scene_actors_update_release_pose.c
-08027F08,SceneActor_HoldAlternateSavedFacing,low,Tentative descriptive role from exact C control flow; src/actors/actor_projectile_and_reaction_controllers/scene_actors_update_special_pose.c
-08027FA0,SceneActor_AnchorAnimation,low,Tentative descriptive role from exact C control flow; src/actors/actor_projectile_and_reaction_controllers/scene_actors_update_anchored_reaction.c
-08028040,SceneActor_HoldUnmirroredAnimation,low,Tentative descriptive role from exact C control flow; src/actors/actor_projectile_and_reaction_controllers/scene_actors_update_unmirrored_reaction.c
-080280CC,SceneActor_RepeatDirectedProjectiles,low,Tentative descriptive role from exact C control flow; src/actors/actor_projectile_and_reaction_controllers/scene_actors_update_swarm_attack.c
-080282BC,SceneActor_TimedAnchoredReaction,low,Tentative descriptive role from exact C control flow; src/actors/actor_projectile_and_reaction_controllers/scene_actors_update_blink_reaction.c
-08028414,SceneActor_EmitDestructionParticles,low,Tentative descriptive role from exact C control flow; src/actors/actor_projectile_and_reaction_controllers/scene_actors_spawn_destruction_particles.c
-08028E18,SceneActor_DispatchCompanionCommand,low,Tentative actor/grid-effect role from exact C control flow; src/actors/actor_damage_and_lifecycle/vampire_trigger_background_flash.c
-08028E6C,SceneActor_QueueCompanionCommand,low,Tentative actor/grid-effect role from exact C control flow; src/actors/actor_damage_and_lifecycle/vampire_try_queue_command.c
-08028EC0,SceneActor_QueueDefaultCompanionCommand,low,Tentative actor/grid-effect role from exact C control flow; src/actors/actor_damage_and_lifecycle/vampire_queue_default_command.c
-08028F48,SceneActor_DestroyController,low,Tentative actor/grid-effect role from exact C control flow; src/actors/actor_damage_and_lifecycle/vampire_destroy.c
-08029798,SceneActor_CreateController,low,Tentative actor/grid-effect role from exact C control flow; src/actors/actor_damage_and_lifecycle/vampire_create.c
+08024F2C,SceneActorAnimation_TransitionVariant,medium,Tentative descriptive role from exact C control flow; src/actors/actor_animation_and_action_controllers/sub_08024F2C.c
+080251C4,SceneActorAnimation_FollowMotionPath,medium,Tentative descriptive role from exact C control flow; src/actors/actor_animation_and_action_controllers/sub_080251C4.c
+0802533C,SceneActorAnimation_Recoil,medium,Tentative descriptive role from exact C control flow; src/actors/actor_animation_and_action_controllers/sub_0802533C.c
+08025550,SceneActorAnimation_ApproachTarget,medium,Tentative descriptive role from exact C control flow; src/actors/actor_animation_and_action_controllers/sub_08025550.c
+08025714,SceneActorAnimation_Decelerate,medium,Tentative descriptive role from exact C control flow; src/actors/actor_animation_and_action_controllers/sub_08025714.c
+080257D0,SceneActorAnimation_RecoverMovement,medium,Tentative descriptive role from exact C control flow; src/actors/actor_animation_and_action_controllers/sub_080257D0.c
+08025CD4,SceneActorAnimation_WaitForCompletion,medium,Tentative descriptive role from exact C control flow; src/actors/actor_animation_and_action_controllers/sub_08025CD4.c
+08025D60,SceneActorAnimation_WaitForAlternateCompletion,medium,Tentative descriptive role from exact C control flow; src/actors/actor_animation_and_action_controllers/sub_08025D60.c
+08025DEC,SceneActor_FireRandomizedProjectile,low,Tentative descriptive role from exact C control flow; src/actors/actor_animation_and_action_controllers/sub_08025DEC.c
+08026248,SceneActorAnimation_TimedEffectReset,medium,Tentative descriptive role from exact C control flow; src/actors/actor_animation_and_action_controllers/sub_08026248.c
+0802634C,SceneActorAnimation_LockedReset,medium,Tentative descriptive role from exact C control flow; src/actors/actor_animation_and_action_controllers/sub_0802634C.c
+08026398,SceneActorAnimation_AlternateEffectReset,medium,Tentative descriptive role from exact C control flow; src/actors/actor_animation_and_action_controllers/sub_08026398.c
+08026488,SceneActorAnimation_TimedAction,medium,Tentative descriptive role from exact C control flow; src/actors/actor_animation_and_action_controllers/sub_08026488.c
+0802667C,SceneActorAnimation_HoldFrame,medium,Tentative descriptive role from exact C control flow; src/actors/actor_animation_and_action_controllers/sub_0802667C.c
+08026780,SceneActorAnimation_ReleaseHeldFrame,medium,Tentative descriptive role from exact C control flow; src/actors/actor_animation_and_action_controllers/sub_08026780.c
+08026908,SceneActorAnimation_ReleaseSavedAction,medium,Tentative descriptive role from exact C control flow; src/actors/actor_animation_and_action_controllers/sub_08026908.c
+08026AA4,SceneActor_PeriodicProjectileBurst,low,Tentative descriptive role from exact C control flow; src/actors/actor_projectile_and_reaction_controllers/sub_08026AA4.c
+08026C38,SceneActor_FireDirectedProjectile,low,Tentative descriptive role from exact C control flow; src/actors/actor_projectile_and_reaction_controllers/sub_08026C38.c
+08026DE0,SceneActor_DecayScale,low,Tentative descriptive role from exact C control flow; src/actors/actor_projectile_and_reaction_controllers/sub_08026DE0.c
+08026EB4,SceneActor_DecayScaleAndMove,low,Tentative descriptive role from exact C control flow; src/actors/actor_projectile_and_reaction_controllers/sub_08026EB4.c
+080277B8,SceneActor_ResetWhenBlocked,low,Tentative descriptive role from exact C control flow; src/actors/actor_projectile_and_reaction_controllers/sub_080277B8.c
+08027824,SceneActor_TurnFourDirections,low,Tentative descriptive role from exact C control flow; src/actors/actor_projectile_and_reaction_controllers/sub_08027824.c
+0802797C,SceneActor_TurnEightDirections,low,Tentative descriptive role from exact C control flow; src/actors/actor_projectile_and_reaction_controllers/sub_0802797C.c
+08027AD4,SceneActor_ContractAnchoredShake,low,Tentative descriptive role from exact C control flow; src/actors/actor_projectile_and_reaction_controllers/sub_08027AD4.c
+08027BF0,SceneActor_ExpandAnchoredShake,low,Tentative descriptive role from exact C control flow; src/actors/actor_projectile_and_reaction_controllers/sub_08027BF0.c
+08027CF8,SceneActor_TimedCommandAnimation,low,Tentative descriptive role from exact C control flow; src/actors/actor_projectile_and_reaction_controllers/sub_08027CF8.c
+08027DAC,SceneActor_HoldSavedFacing,low,Tentative descriptive role from exact C control flow; src/actors/actor_projectile_and_reaction_controllers/sub_08027DAC.c
+08027E44,SceneActor_CompleteTriggeredAnimation,low,Tentative descriptive role from exact C control flow; src/actors/actor_projectile_and_reaction_controllers/sub_08027E44.c
+08027F08,SceneActor_HoldAlternateSavedFacing,low,Tentative descriptive role from exact C control flow; src/actors/actor_projectile_and_reaction_controllers/sub_08027F08.c
+08027FA0,SceneActor_AnchorAnimation,low,Tentative descriptive role from exact C control flow; src/actors/actor_projectile_and_reaction_controllers/sub_08027FA0.c
+08028040,SceneActor_HoldUnmirroredAnimation,low,Tentative descriptive role from exact C control flow; src/actors/actor_projectile_and_reaction_controllers/sub_08028040.c
+080280CC,SceneActor_RepeatDirectedProjectiles,low,Tentative descriptive role from exact C control flow; src/actors/actor_projectile_and_reaction_controllers/sub_080280CC.c
+080282BC,SceneActor_TimedAnchoredReaction,low,Tentative descriptive role from exact C control flow; src/actors/actor_projectile_and_reaction_controllers/sub_080282BC.c
+08028414,SceneActor_EmitDestructionParticles,low,Tentative descriptive role from exact C control flow; src/actors/actor_projectile_and_reaction_controllers/sub_08028414.c
+08028E18,SceneActor_DispatchCompanionCommand,low,Tentative actor/grid-effect role from exact C control flow; src/actors/actor_damage_and_lifecycle/sub_08028E18.c
+08028E6C,SceneActor_QueueCompanionCommand,low,Tentative actor/grid-effect role from exact C control flow; src/actors/actor_damage_and_lifecycle/sub_08028E6C.c
+08028EC0,SceneActor_QueueDefaultCompanionCommand,low,Tentative actor/grid-effect role from exact C control flow; src/actors/actor_damage_and_lifecycle/sub_08028EC0.c
+08028F48,SceneActor_DestroyController,low,Tentative actor/grid-effect role from exact C control flow; src/actors/actor_damage_and_lifecycle/sub_08028F48.c
+08029798,SceneActor_CreateController,low,Tentative actor/grid-effect role from exact C control flow; src/actors/actor_damage_and_lifecycle/sub_08029798.c
 080297FC,GridActor_SetAnimation,low,Tentative actor/grid-effect role from exact C control flow; src/fn/sub_080297FC.c
 08029908,GridActor_InitializeBodyCollider,low,Tentative actor/grid-effect role from exact C control flow; src/fn/sub_08029908.c
 080299B4,GridActor_InitializeAttackCollider,low,Tentative actor/grid-effect role from exact C control flow; src/fn/sub_080299B4.c
@@ -596,10 +596,10 @@ addr,name,confidence,evidence
 080304F8,SceneActor_StateTargetWaitA,medium,Tentative descriptive role from exact C and contiguous callers; src/fn/sub_080304F8.c
 080305AC,SceneActor_StatePhaseWindowWait,medium,Tentative descriptive role from exact C and contiguous callers; src/fn/sub_080305AC.c
 08030658,SceneActor_StateTargetWaitB,medium,Tentative descriptive role from exact C and contiguous callers; src/fn/sub_08030658.c
-08030710,SceneActorManager_Update,medium,Tentative descriptive role from exact C and contiguous callers; src/actors/scene_actor_manager/scene_actor_manager_update.c
-080307D8,SceneActorManager_Destroy,medium,Tentative descriptive role from exact C and contiguous callers; src/actors/scene_actor_manager/scene_actor_manager_destroy.c
-08030818,SceneActorManager_Initialize,medium,Tentative descriptive role from exact C and contiguous callers; src/actors/scene_actor_manager/scene_actor_manager_init.c
-08030864,SceneActorManager_Create,medium,Tentative descriptive role from exact C and contiguous callers; src/actors/scene_actor_manager/scene_actor_manager_create.c
+08030710,SceneActorManager_Update,medium,Tentative descriptive role from exact C and contiguous callers; src/actors/scene_actor_manager/sub_08030710.c
+080307D8,SceneActorManager_Destroy,medium,Tentative descriptive role from exact C and contiguous callers; src/actors/scene_actor_manager/sub_080307D8.c
+08030818,SceneActorManager_Initialize,medium,Tentative descriptive role from exact C and contiguous callers; src/actors/scene_actor_manager/sub_08030818.c
+08030864,SceneActorManager_Create,medium,Tentative descriptive role from exact C and contiguous callers; src/actors/scene_actor_manager/sub_08030864.c
 080308D0,Dialogue_LoadPaletteResource,medium,Tentative descriptive role from exact C and contiguous callers; src/fn/sub_080308D0.c
 0803092C,Dialogue_AdvanceAnimation,medium,Tentative descriptive role from exact C and contiguous callers; src/fn/sub_0803092C.c
 08030B78,Dialogue_SetDisplayMode,medium,Tentative descriptive role from exact C and contiguous callers; src/fn/sub_08030B78.c

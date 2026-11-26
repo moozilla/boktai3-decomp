@@ -1,31 +1,21 @@
 """Small, audited source adaptations for clang, confined to generated build files."""
 import re
 import sys
-from functools import lru_cache
 from pathlib import Path
 from returns import repair_returns, verify_returns
 
 ROOT = Path(__file__).resolve().parents[2]
 ROOT_SRC = ROOT / 'src'
 sys.path.insert(0, str(ROOT / 'tools'))
-from source_layout import locate, resolve
+from source_layout import resolve
 
 
 def source_units(root, *functions):
     return list(dict.fromkeys(resolve(function, root) for function in functions))
 
 
-# Some hand-recovered units need a small, verified clang compatibility rewrite.
-# Use their ROM entry addresses so the rewrite follows a move or consolidation.
-@lru_cache(maxsize=1)
-def compatibility_sources():
-    addresses = ('08224980', '08228C40', '082290F4', '08229380', '082486B4')
-    return {address: ROOT / entry[0] for address in addresses if (entry := locate(address, ROOT))}
-
-
 def prepare_source(path, target):
     text = repair_returns(path.read_text())
-    compat = compatibility_sources() if path.is_relative_to(ROOT_SRC) else {}
     text = text.replace('asm("swi 0x2A")', 'port_system_call(0x2a)')
     if path.name == 'devices.c' and path.parent.name == 'hw':
         # Leave callers at the public boundary so core can observe every IO
@@ -46,21 +36,21 @@ def prepare_source(path, target):
     if path.name == 'ghost.c':
         # Called before its prototype; agbcc accepts the implicit int, clang does not.
         text = 'void Anim_SetDurationScale(void *, unsigned int);\n' + text
-    if path == compat.get('08224980'):
+    if path.name == 'sub_08224980.c':
         # The portable SDK call-via bridge returns a word; this caller ignores it.
         text = text.replace('void sub_08249240(', 'int sub_08249240(')
-    if path == compat.get('08228C40'):
+    if path.name == 'sub_08228C40.c':
         # The GBA call carries the incoming date in r0/r1/r2 unchanged.
         # wasm needs explicit arguments; see the original 08228C40 prologue.
         text = text.replace('u32 Clock_PackDate(void);', 'u32 Clock_PackDate(s32, s32, s32);')
         text = text.replace('Clock_PackDate();', 'Clock_PackDate(a, b, c);')
-    if path in (compat.get('082290F4'), compat.get('08229380')):
+    if path.name in ('sub_082290F4.c', 'sub_08229380.c'):
         # These callers discard the result, but wasm still checks the type.
         text = text.replace('void SunClock_SetDateTime(', 's32 SunClock_SetDateTime(')
     if path.name == 'sub_08213D10.c':
         # The dispatcher copy is data; a wasm function pointer is not ROM bytes.
         text = text.replace('(u32)IntrMain', '(u32)0x080001f0')
-    if path == compat.get('082486B4'):
+    if path.name == 'sub_082486B4.c':
         text = text.replace('(u8 *)ptr += (gEEPROMConfig->address_width << 1) + 1;',
                             'ptr = (u16 *)((u8 *)ptr + (gEEPROMConfig->address_width << 1) + 1);')
         text = text.replace('((u8 *)ptr)++;', 'ptr = (u16 *)((u8 *)ptr + 1);')

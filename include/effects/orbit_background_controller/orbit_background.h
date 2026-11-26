@@ -5,7 +5,7 @@
 #include "engine/shared/render.h"
 #include "engine/shared/ram.h"
 #include "engine/shared/task.h"
-#include "player/player.h"
+#include "engine/shared/player.h"
 /* Tentative identity: BG1 image positioned from an orbit around the selected player. */
 struct OrbitBackground {
     struct Task task;

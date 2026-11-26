@@ -95,12 +95,12 @@ includes a changed header was checked with `tools/check.py` through the new
 
 ## Item 4: Nidhoggr
 
-* `src/effects/large_scene_animation_controller/nidhoggr_hide_part_with_explosion.c` (Nidhoggr_HidePartWithExplosion) uses the header's struct.
+* `src/effects/large_scene_animation_controller/sub_08191508.c` (Nidhoggr_HidePartWithExplosion) uses the header's struct.
   `NidhoggrCollider` gains `flags` at +6 (bit 2 disables the collider) and
   `NidhoggrPartExtra` gains `flags` at +4 (bit 0 hides the part). The local `parts` were
   `rows` (flags at row+8), `partPhases` is `rowInitFlag` and `partCompleted` is
   `rowDoneFlag`.
-* Also folded in: `struct BossParts` in `src/effects/large_scene_animation_controller/nidhoggr_change_completed_part_state.c`
+* Also folded in: `struct BossParts` in `src/effects/large_scene_animation_controller/sub_08190C98.c`
   (Nidhoggr_ChangeCompletedPartState). Its `state[26]` at 0x71C2 is the header's new
   `partState` (it keys the part animation callback table in Nidhoggr_UpdatePartSequences).
 * The unit's three index-scaled address computations stay as they were; each one

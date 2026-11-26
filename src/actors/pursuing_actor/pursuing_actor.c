@@ -1,5 +1,5 @@
 #include "actors/pursuing_actor/pursuing_actor.h"
-#include "player/player.h"
+#include "engine/shared/player.h"
 
 void TwinSpriteEffect_InitGraphics(struct PursuingActor *effect)
 {

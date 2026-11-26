@@ -3,7 +3,7 @@
 
   sdkcmp.py SDK_CC1 OUT.json [LIMIT]
 
-Compiles each game C file under src/ (and the NONMATCHING branch where present) with the
+Compiles each src/*.c and src/fn/*.c (and the NONMATCHING branch where present) with the
 pinned agbcc and with SDK_CC1 (invoked as: cc1 -quiet FLAGS in.i -o out.s), assembles both
 and compares the .text bytes. Values per unit and branch: same, diff, stockfail, sdkfail,
 asmfail (usually a missing INCLUDE_ASM stub) or skip (units with a COMPILER override).

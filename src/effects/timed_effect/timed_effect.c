@@ -1,5 +1,5 @@
 #include "effects/timed_effect/timed_effect.h"
-#include "player/player.h"
+#include "engine/shared/player.h"
 #include "engine/shared/engine.h"
 #include "engine/shared/scene_actor_terrain.h"
 

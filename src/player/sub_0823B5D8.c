@@ -1,4 +1,4 @@
-#include "player/player.h"
+#include "engine/shared/player.h"
 extern const s16 gUnk_086149C4[];
 
 static inline s32 scale(s32 v)

@@ -1,5 +1,5 @@
 #include "engine/shared/global.h"
-#include "player/player.h"
+#include "engine/shared/player.h"
 #include "engine/shared/contact_actor.h"
 
 static inline u32 flagBits(u32 *flags, u32 mask)

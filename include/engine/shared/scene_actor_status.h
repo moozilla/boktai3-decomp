@@ -2,7 +2,7 @@
 #define GUARD_SCENE_ACTOR_STATUS_H
 #include "engine/shared/scene_actor_chase_reaction.h"
 #include "engine/shared/scene_actor_drawable_flags.h"
-#include "player/player.h"
+#include "engine/shared/player.h"
 #include "engine/shared/global.h"
 #include "engine/shared/render.h"
 #include "engine/shared/ram.h"

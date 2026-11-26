@@ -15,7 +15,7 @@
 #include "actors/scene_actor_behavior/scene_actor_behavior.h"
 #include "engine/shared/scene_actor_registry.h"
 #include "engine/script_utility_references/script_utility.h"
-#include "player/player.h"
+#include "engine/shared/player.h"
 #include "engine/shared/ram.h"
 #include "engine/shared/route_sprite_actor.h"
 #include "engine/shared/scene_actor_route.h"

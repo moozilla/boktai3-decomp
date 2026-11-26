@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Decompilation progress: functions/bytes under src/ vs all code.
+"""Decompilation progress: functions/bytes in src/*.c vs all code.
 
   progress.py            human-readable summary
   progress.py --json F   objdiff v2 report for decomp.dev

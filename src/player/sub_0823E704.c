@@ -1,5 +1,5 @@
 #include "engine/shared/global.h"
-#include "player/player.h"
+#include "engine/shared/player.h"
 u32 Player_GetConfiguredActionPower(struct Player *);
 u32 Player_CollectCallbackFlags(struct Player *);
 void Player_ConsumeActionResource(struct Player *);

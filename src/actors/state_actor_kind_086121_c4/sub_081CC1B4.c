@@ -1,6 +1,6 @@
 #include "engine/shared/global.h"
 #include "engine/shared/scene_facing.h"
-#include "player/player.h"
+#include "engine/shared/player.h"
 #include "engine/shared/engine.h"
 #include "engine/shared/state_actor.h"
 

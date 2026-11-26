@@ -1,7 +1,7 @@
 #ifndef GUARD_HUD_STAT_DISPLAY_H
 #define GUARD_HUD_STAT_DISPLAY_H
 #include "menus/scene_hud/scene_hud_display.h"
-#include "player/player.h"
+#include "engine/shared/player.h"
 void Hud_SetUpdateCallback(struct SceneHudState *p, u32 w);
 void Hud_SetInteractionCallback(struct SceneHudState *p, u32 w, u32 c);
 void Hud_SetupBackgroundLayer(s32 unused, void *map, s32 offset, s32 format, const void *palette);

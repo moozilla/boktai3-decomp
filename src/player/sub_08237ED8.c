@@ -1,6 +1,6 @@
-#include "player/player_status_flags.h"
+#include "engine/shared/player_status_flags.h"
 #include "engine/shared/global.h"
-#include "player/player.h"
+#include "engine/shared/player.h"
 void Task_Kill(void *);
 void Collider_SetPosition(void *, void *, u32);
 void Collider_Refresh(void *);

@@ -8,7 +8,7 @@
 #include "engine/shared/scene_actor_terrain.h"
 #include "engine/shared/scene_actor_status.h"
 #include "engine/shared/scene_actor_adjacent_cell.h"
-#include "player/player.h"
+#include "engine/shared/player.h"
 #include "engine/shared/scene_actor_restoration.h"
 #include "engine/shared/scene_actor_control_motion.h"
 #include "engine/shared/scene_actor_contact_response.h"

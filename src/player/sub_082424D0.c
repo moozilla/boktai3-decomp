@@ -1,5 +1,5 @@
 #include "engine/shared/global.h"
-#include "player/player.h"
+#include "engine/shared/player.h"
 u32 Player_GetSecondaryActionFlags(struct Player *, u16);
 void CellObject_Init(void *, void *);
 void Obj_StepPosition(void *);

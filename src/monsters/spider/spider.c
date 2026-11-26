@@ -21,7 +21,7 @@
 #include "engine/shared/scene_actor_control_motion.h"
 #include "actors/scene_actor_animation_and_scripted_actions/scene_actor_animation.h"
 #include "engine/shared/display_sequence_inline.h"
-#include "player/player.h"
+#include "engine/shared/player.h"
 #include "engine/shared/proximity_emitter.h"
 #include "monsters/spider/spider.h"
 #include "engine/shared/engine_globals.h"

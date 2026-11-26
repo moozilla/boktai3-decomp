@@ -8,7 +8,7 @@ Scope: Player, Player burst, Player attack effect and Player clone report units.
 
 ## Existing shared ownership
 
-- `include/player/player.h` is the canonical Player and PlayerStatModifierContext owner. It already holds action request/config/entry/drain records, collider and cue-collider views, animation/visual object records, and gPlayers. It is substantially more informative than most local padded Player views.
+- `include/engine/shared/player.h` is the canonical Player and PlayerStatModifierContext owner. It already holds action request/config/entry/drain records, collider and cue-collider views, animation/visual object records, and gPlayers. It is substantially more informative than most local padded Player views.
 - `include/player/player_3.h` owns modifier callback input/target records only; these are distinct callback arguments, not additional Player prefixes. `notes/player_3.md` records the prior unit merge and field choices, although its matching-state narrative is historical.
 - `include/engine/shared/contact_collider.h` owns the generic0x54 contact collider; `include/engine/shared/scene_vec.h` owns signed padded8-byte SceneVec. `include/engine/shared/display_sequence.h`, `display_keyframe.h`, `display_animation.h` and `contact_swarm.h` provide existing graphics/sequence records used by the attack particle allocator.
 - `include/engine/shared/monster_particle_random.h` already provides shared random cursor/sample operations. It should be reviewed as prior art before adding a Player-specific random-helper family, while preserving the successful matching form's source/lifetime boundaries.

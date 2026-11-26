@@ -3,7 +3,7 @@
 #include "engine/shared/scene_actor_visibility.h"
 #include "engine/shared/scene_actor_status.h"
 #include "engine/shared/scene_actor_availability.h"
-#include "player/player.h"
+#include "engine/shared/player.h"
 #include "monsters/dog/dog.h"
 #include "engine/shared/scene_actor_reset.h"
 #include "engine/shared/scene_actor_chase.h"

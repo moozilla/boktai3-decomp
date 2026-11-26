@@ -1,6 +1,6 @@
 #include "engine/shared/global.h"
 #include "engine/shared/scene_vec.h"
-#include "player/player.h"
+#include "engine/shared/player.h"
 struct Owner {
     u8 pad[0x30];
     struct SceneVec position;
