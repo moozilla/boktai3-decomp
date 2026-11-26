@@ -173,7 +173,7 @@ The landed unit passes the stock check at 304 bytes and has zero linter
 reports. This removes one volatile error. The precedent for the registry is
 a reassignment that survives through the alias pass and gets deleted later.
 
-## 2026-11-25: first registry insertion recovered
+## 2026-11-25: registry control-flow experiment and native types
 
 `TargetRegistry_RegisterActor` (0815F6A8) matches at 72 bytes using the
 existing motion-target and registry types. A shared insertion operation
@@ -197,14 +197,29 @@ the short-list block multiple predecessors. Both link steps then retain
 the loads through CSE, and jump cleanup merges the corresponding machine
 instructions. The shared head update retains its separate load.
 
-The finished unit and all five header dependents match. The volatile error
-is gone. The existing flag-mask argument still produces one literal-param
-warning. The persistent search is in
-`build/matchsearch/TargetRegistry_RegisterActor`.
+The short-list rewrite matched both functions but was declined in review.
+It duplicates the link step and peels the scan to arrange CSE predecessors.
+The final source retains the existing volatile pointer and uses the native
+types and a single search loop. Both functions remain exact at 72 bytes.
 
-The same insertion helper also matches `TargetRegistry_RegisterSceneActor`
-(0815F6F0) at 72 bytes. It uses the native collider member and sets the
-collider flag only on insertion. Its existing literal-param warning
-remains and the last volatile error is gone. The context after the shared
-header change is preserved in
-`build/matchsearch/TargetRegistry_RegisterSceneActor-shared`.
+The review tried pointer-to-pointer traversal, tail insertion, a reassigned
+node, a reused link slot, and insertion inlines accepting the registry or
+its slot. Tail insertion changes the operation: the ROM prepends the entry.
+Most prepend variants still fold the two singleton reads into one.
+
+Reusing a `MotionTarget **` to read the head, then assigning it
+`&entry->next` before the search, keeps both singleton loads. The address
+survives to the final store, where the ROM uses the immediate field offset.
+The reassigned-node frontier
+`build/hard-sites/registry/review/actor-reuse-node-slot.c` also keeps both
+loads and folds the address into the store. It still has a separate
+`adds r1, r3, #0` before the scan and uses r1 for the next-field store.
+Using that node for all later operations changes register allocation and
+still does not match. When the link slot is assigned immediately before
+the store, CSE can fold it back into the incoming pointer before the alias
+test. The remaining C question is how to lose the inherited base while
+allowing the reassigned node and the entry to share their physical home.
+
+The persistent registry stores are in `build/matchsearch/`. Review drafts
+and the stock-verified typed fallback are in
+`build/hard-sites/registry/review/`.
