@@ -41,7 +41,7 @@ DWARFDUMP = str(LLVM / 'llvm-dwarfdump') if (LLVM / 'llvm-dwarfdump').exists() e
 FLAGS = ['--target=wasm32', '-ffreestanding', '-std=gnu89', '-funsigned-char', '-fno-builtin',
          '-Wno-everything', '-Iport/include', '-Iport/core', '-I' + str(GAME / 'include'),
          '-iquote', '.', '-include', 'port/core/compat.h', '-g', '-fno-eliminate-unused-debug-types']
-VERSION = '3:'  # bump when the output format changes
+VERSION = '4:'  # bump when the output format changes
 EXTERN = re.compile(r'^\s*extern\b([^;(]*?)\b([A-Za-z_]\w*)\s*(?:\[[^\]]*\]\s*)*;', re.M)
 ENTRY = re.compile(r'^0x([0-9a-f]+):( +)(DW_TAG_\w+|NULL)')
 ATTR = re.compile(r'^\s+DW_AT_(\w+)\t\((.*)\)$')
@@ -188,10 +188,12 @@ class Folder:
 
 
 def compile_header(header, names, work):
-    src = work / (header.stem + '.c')
-    obj = work / (header.stem + '.o')
+    rel = header.relative_to(GAME / 'include')
+    src = (work / rel).with_suffix('.c')
+    obj = src.with_suffix('.o')
+    src.parent.mkdir(parents=True, exist_ok=True)
     for _ in range(3):
-        text = '#include "engine/shared/global.h"\n#include "%s"\n' % header.relative_to(ROOT / 'include').as_posix()
+        text = '#include "engine/shared/global.h"\n#include "%s"\n' % rel.as_posix()
         text += ''.join(f'__typeof__({n}) *__agent_var_{n};\n' for n in names)
         src.write_text(text)
         r = subprocess.run([CC, *FLAGS, '-c', str(src), '-o', str(obj)], cwd=ROOT, text=True, capture_output=True)
@@ -223,13 +225,13 @@ def first_params(code, types):
     return out
 
 
-def build(force=False):
+def build(force=False, jobs=None):
     include = GAME / 'include'
     headers = sorted(h for h in include.rglob('*.h') if 'gba' not in h.relative_to(include).parts)
     syms = symbols()
     data = syms['data']
     sources = sorted(ROOT.glob('src/**/*.c'))
-    stamp = VERSION + hashlib.sha256(''.join(f'{h.name}:{h.stat().st_mtime_ns};' for h in headers + sources).encode()
+    stamp = VERSION + hashlib.sha256(''.join(f'{h.relative_to(ROOT)}:{h.stat().st_mtime_ns};' for h in headers + sources).encode()
                            + syms['stamp'].encode()).hexdigest()[:16]
     out = OUT / 'types.json'
     if out.exists() and not force:
@@ -247,22 +249,22 @@ def build(force=False):
         for row in csv.DictReader(f):
             if row['header'].startswith('include/'):
                 owner[row['name']] = row['header'][len('include/'):]
-    plan = {h.name: [] for h in headers}
-    texts = {h.name: h.read_text(errors='replace') for h in headers}
-    for h in headers:
-        for n in header_globals(texts[h.name], data):
-            owner.setdefault(n, h.name)
+    plan = {h.relative_to(include).as_posix(): [] for h in headers}
+    for rel in plan:
+        for n in header_globals((include / rel).read_text(errors='replace'), data):
+            if owner.get(n) not in plan:
+                owner[n] = rel
     for n, h in owner.items():
         if h in plan and n in data:
             plan[h].append(n)
     folder = Folder()
     globals_ = {}
-    with ThreadPoolExecutor(os.cpu_count() or 4) as pool:
-        results = list(pool.map(lambda h: (h, *compile_header(h, sorted(set(plan[h.name])), work)), headers))
+    with ThreadPoolExecutor(jobs or os.cpu_count() or 4) as pool:
+        results = list(pool.map(lambda h: (h, *compile_header(h, sorted(plan[h.relative_to(include).as_posix()]), work)), headers))
     failed = []
     for h, obj, names in results:
         if obj is None:
-            failed.append(h.name)
+            failed.append(h.relative_to(include).as_posix())
             continue
         entries = dwarf_entries(obj)
         for off, e in entries.items():
@@ -286,7 +288,15 @@ def build(force=False):
 
 
 if __name__ == '__main__':
-    path = build(force='--force' in sys.argv)
+    import argparse
+
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--force', action='store_true')
+    parser.add_argument('-j', '--jobs', type=int)
+    args = parser.parse_args()
+    if args.jobs is not None and args.jobs < 1:
+        parser.error('--jobs must be positive')
+    path = build(force=args.force, jobs=args.jobs)
     d = json.loads(path.read_text())
     print(f"{path}: {len(d['types'])} types, {len(d['globals'])} typed globals, "
           f"{len(d['functions'])} functions ({len(d['params'])} with a struct parameter), "
