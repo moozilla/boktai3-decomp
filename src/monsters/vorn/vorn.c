@@ -1,4 +1,5 @@
 #include "global.h"
+#include "scene/motion/scene_actor_availability.h"
 #include "scene/actor/scene_actor_reset.h"
 #include "npc/manager/scene_actor_animation.h"
 #include "scene/actor/scene_actor_reaction.h"
@@ -17,40 +18,13 @@
 #include "scene/motion/scene_actor_turn.h"
 #include "scene/actor/scene_actor_init_actor.h"
 
-inline static u8 blocked2048(u8 *c)
-{
-    u32 mask;
-    u32 *p;
-    u32 off;
-    if (!c)
-        goto zero;
-    mask = 0x40;
-    off = 0xB5;
-    off <<= 2;
-    p = (u32 *)(c + off);
-    if ((*((u16 *)p)) & mask)
-        goto one;
-    mask = 0x80;
-    mask <<= 10;
-    off -= 4;
-    p = (u32 *)(c + off);
-    if ((*p) & mask)
-        goto one;
-    if ((*((s16 *)(c + 0x9C))) > 0)
-        goto zero;
-one:
-    return 1;
-zero:
-    return 0;
-}
-
-void Vorn_OnContactEvent(u8 *unused, u8 *obj, u8 *ctx)
+void Vorn_OnContactEvent(u8 *unused, struct ContactCollider *collider, struct ChaseActor *ctx)
 {
     int mask;
     u32 *flags;
-    if ((blocked2048(ctx) == 0) && ((*((u16 *)(obj + 0xA))) & 0xF)) {
-        *((u32 *)(ctx + 0x304)) = *((u16 *)(obj + 4));
-        flags = (u32 *)(ctx + 0x2D0);
+    if ((SceneActor_ActionsBlocked(ctx) == 0) && (collider->contactFlags & 0xF)) {
+        ctx->base.counter304 = collider->collisionId;
+        flags = &ctx->base.statusFlags;
         mask = 0xFEFFFFFF;
         *flags &= mask;
     }
@@ -74,20 +48,15 @@ void Vorn_OnScriptActionRequest(u32 a, u32 b, u8 *p)
     }
 }
 
-struct P {
-    u8 f[0x2dc];
-    u32 flags;
-};
+void SceneActorReaction_HandleColliderContact(s32, s32, struct ChaseActor *);
 
-void SceneActorReaction_HandleColliderContact(s32, s32, struct P *);
-
-void Vorn_OnCollisionResponse(s32 a, s32 b, struct P *p)
+void Vorn_OnCollisionResponse(s32 a, s32 b, struct ChaseActor *p)
 {
     u32 f;
     SceneActorReaction_HandleColliderContact(a, b, p);
-    f = p->flags;
+    f = p->base.hitReactionFlags;
     if (f & 0x20)
-        p->flags = f | 0x80000;
+        p->base.hitReactionFlags = f | 0x80000;
 }
 
 void SceneActor_UpdateForwardCollider(struct ChaseActor *);
@@ -115,13 +84,6 @@ void SceneActorAnimation_SelectDirectionalEntry(struct RoomActor *, s32);
 
 void SceneActor_RunPositionScript(void *);
 
-struct VornAnimation {
-    u8 unknown0[0xC];
-    u16 frame;
-    u8 unknownE[6];
-    u16 state;
-};
-
 static inline u8 TakeFlag(u8 *flag)
 {
     if (*flag) {
@@ -131,17 +93,18 @@ static inline u8 TakeFlag(u8 *flag)
     return FALSE;
 }
 
-void Vorn_UpdateScriptedAnimation(u8 *p)
+void Vorn_UpdateScriptedAnimation(struct ChaseActor *p)
 {
-    if (TakeFlag(p + 0x2B2))
-        SceneActorAnimation_SelectDirectionalEntry(p, 0xF);
+    if (TakeFlag(&p->base.field2B2))
+        SceneActorAnimation_SelectDirectionalEntry(&p->base, 0xF);
     {
-        struct VornAnimation *anim = (struct VornAnimation *)(*(u8 **)(p + 4) + 0x20);
-        if (anim->state == 3 && anim->frame == 0)
-            SceneActor_RunPositionScript(*(void **)(p + 0x3D0));
+        struct SceneActorAnimationTileDrawable *drawable = p->base.drawable;
+        struct AnimSprite *anim = &drawable->tile;
+        if (anim->frameIndex == 3 && anim->elapsed == 0)
+            SceneActor_RunPositionScript(p->base.context);
     }
-    if (*(u8 *)(p + 0x2B3))
-        *(u8 *)(p + 0x2B0) = 1;
+    if (p->base.restart)
+        p->base.stepDone = 1;
 }
 
 void Vorn_ResetStateEntry(u8 *p)
@@ -289,9 +252,7 @@ void SceneActorReaction_UpdateFacingAttack(struct ChaseActor *actor, s32 frame)
 
 extern void ActorShadow_Disable(void *);
 
-struct Obj;
-
-void Vorn_RestoreSavedState(struct Obj *s);
+void Vorn_RestoreSavedState(struct ChaseActor *s);
 
 static inline u8 take6030(u8 *s)
 {
@@ -353,89 +314,16 @@ void Vorn_UpdateHiddenRecovery(u8 *s, s32 arg, u32 unused)
 /* Observed in this callback: owner flags at +0 and inner +0x20/+8.
  * The snapshot fields below are copied and reset at the listed offsets. */
 
-typedef struct Inner {
-    u8 pad0[8];
-    u32 unk8;
-} Inner;
-
-typedef struct Owner {
-    u32 unk0;
-    u8 pad4[0x1c];
-    Inner inner;
-} Owner;
-
-typedef struct Obj {
-    u8 pad0[0x4];
-    Owner *unk4;
-    u8 unk8;
-    u8 pad9[0x50];
-    u8 unk59;
-    u8 pad5A[0x42];
-    u16 unk9C;
-    u8 pad9E[0x12];
-    s16 unkB0;
-    u8 padB2[0x2A];
-    u32 unkDC;
-    u8 padE0[0x38];
-    u32 unk118;
-    u32 unk11C;
-    u8 unk120;
-    u8 unk121;
-    u8 unk122;
-    u8 unk123;
-    u32 unk124;
-    u8 unk128;
-    u8 pad129[0x3];
-    u16 unk12C;
-    u16 unk12E;
-    u8 pad130[0x48];
-    u16 unk178;
-    u8 pad17A[0xA2];
-    u32 unk21C;
-    u8 pad220[0x88];
-    u8 unk2A8;
-    u8 unk2A9;
-    u8 unk2AA;
-    u8 pad2AB[0x5];
-    u8 unk2B0;
-    u8 unk2B1;
-    u8 unk2B2;
-    u8 unk2B3;
-    u8 pad2B4[0x1];
-    u8 unk2B5;
-    u8 unk2B6;
-    u8 pad2B7[0x9];
-    u16 unk2C0;
-    u16 unk2C2;
-    u8 pad2C4[0x8];
-    u32 unk2CC;
-    u32 unk2D0;
-    u16 unk2D4;
-    u16 unk2D6;
-    u32 unk2D8;
-    u32 unk2DC;
-    u32 unk2E0;
-    u8 pad2E4[0x2];
-    u16 unk2E6;
-    u8 pad2E8[0x2];
-    u16 unk2EA;
-    u8 pad2EC[0x18];
-    u32 unk304;
-    u8 pad308[0x18];
-    u8 unk320[0xac];
-    u8 unk3CC;
-} Obj;
-
 void ActorShadow_Enable(void *);
 
-void SceneActor_ResetContextAnimation(Obj *);
+void SceneActor_ResetContextAnimation(struct Vorn *);
 
 void SceneActorPalette_ClearCompletedTransitions(void);
 
-static inline u8 take_flag(Obj *s)
+static inline u8 take_flag(struct ChaseActor *s)
 {
-    if (s->unk2B2) {
-        s->unk2B2 = 0;
+    if (s->base.field2B2) {
+        s->base.field2B2 = 0;
         return 1;
     }
     return 0;
@@ -443,64 +331,65 @@ static inline u8 take_flag(Obj *s)
 
 /* Keep this byte predicate local; its address is not retained by the body. */
 
-static inline u8 peek_flag(Obj *s)
+static inline u8 peek_flag(struct ChaseActor *s)
 {
-    return s->unk2B3;
+    return s->base.restart;
 }
 
-void Vorn_RestoreSavedState(Obj *s)
+void Vorn_RestoreSavedState(struct ChaseActor *s)
 {
     s32 n;
     if (take_flag(s)) {
-        ActorShadow_Enable(s->unk320);
-        if (!s->unk8) {
-            u32 *q = &s->unk4->unk0;
+        ActorShadow_Enable(s->base.shadow);
+        if (!s->base.drawableKind) {
+            u32 *q = &((struct SceneActorRegistrySequenceDrawable *)s->base.drawable)->flags;
             u32 mask = ~1;
             *q = mask & *q;
         } else {
-            Inner *q = &s->unk4->inner;
+            struct SceneActorAnimationTileDrawable *drawable = s->base.drawable;
+            struct AnimSprite *q = &drawable->tile;
             u32 mask = ~1;
-            q->unk8 = mask & q->unk8;
+            q->flags = mask & q->flags;
         }
         {
             u16 one = 1;
-            s->unk9C = one;
+            s->base.health = one;
         }
-        s->unk178 = 60;
+        s->base.colliderA.responseValue = 60;
     }
     if (!peek_flag(s))
         return;
     {
-        SceneActor_ResetContextAnimation(s);
-        s->unk2CC = s->unk118;
-        s->unk2D0 = s->unk11C;
-        s->unk59 = s->unk120;
-        s->unk2A8 = s->unk121;
-        s->unk2A9 = s->unk122;
-        s->unk2AA = s->unk123;
-        s->unk21C = s->unk124;
-        s->unk2B5 = s->unk128;
-        s->unk2C0 = s->unk12E;
-        s->unk2EA = s->unk12C;
-        n = s->unkB0;
+        SceneActor_ResetContextAnimation((struct Vorn *)s);
+        s->base.behaviorFlags = s->base.saved.behaviorFlags;
+        s->base.statusFlags = s->base.saved.statusFlags;
+        s->base.body.direction = s->base.saved.direction;
+        s->base.state2A8 = s->base.saved.state;
+        s->base.phase2A9 = s->base.saved.phase;
+        s->base.behavior2AA = s->base.saved.behavior;
+        s->base.target = (void *)s->base.saved.control;
+        s->base.controlKind = s->base.saved.kind;
+        s->base.placementFlags = s->base.saved.motionFlags;
+        s->base.heightOffset = s->base.saved.heightOffset;
+        n = s->base.defaultHealth;
         if (n <= 0)
             n = 0;
-        s->unk9C = n;
-        s->unk2D6 = 0;
-        s->unk2D4 = 0;
-        s->unk2B0 = 0;
-        s->unk2B1 = 1;
-        s->unk2B2 = 1;
-        s->unk2B3 = 0;
-        s->unk304 = 0;
-        s->unk2B6 = 0;
-        s->unk2C2 = 64;
-        s->unk2D8 = 0;
-        s->unk2DC = 0;
-        s->unk2E0 = 0;
-        s->unk2E6 = 0;
-        s->unk3CC = 0;
-        s->unkDC = 0;
+        s->base.health = n;
+        s->base.reactionFlags = 0;
+        s->base.motionFlags = 0;
+        s->base.stepDone = 0;
+        s->base.field2B1 = 1;
+        s->base.field2B2 = 1;
+        s->base.restart = 0;
+        s->base.counter304 = 0;
+        s->base.reactionDirection = 0;
+        s->base.field2C2 = 64;
+        s->base.hitAttributes = 0;
+        s->base.hitReactionFlags = 0;
+        s->base.hitOwners = 0;
+        s->base.field2E6 = 0;
+        s->base.field3CC = 0;
+        s->base.tracking.target = 0;
         SceneActorPalette_ClearCompletedTransitions();
     }
 }
@@ -519,21 +408,6 @@ struct SceneActorReactionRoutePoint {
 
 void SceneActor_SetPositionXZ(void *, s32, s32);
 
-
-static inline void Reaction_SetControl(struct ChaseActor *actor, u32 kind, void *control)
-{
-    actor->base.field2B2 = 1;
-    actor->base.stepDone = 0;
-    actor->base.controlKind = kind;
-    actor->base.target = control;
-    actor->base.field2C8 = 0;
-    {
-        u32 *flags = &actor->base.pendingControlFlags;
-        s32 mask = ~1;
-        *flags &= mask;
-    }
-    actor->base.pendingControl = 0;
-}
 
 void SceneActorReaction_ResumeSavedTarget(struct ChaseActor *actor, s32 frame)
 {
@@ -560,7 +434,7 @@ void SceneActorReaction_ResumeSavedTarget(struct ChaseActor *actor, s32 frame)
                 (*(struct SceneActorReactionRoutePoint **)((u8 *)group + 0x1FC))->z);
             SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0);
             target = actor->base.onAlternateEntry;
-            Reaction_SetControl(actor, 1, target);
+            SceneActorChase_SetControl(actor, target, 1);
             {
                 u32 behavior = 7;
                 actor->base.state2A8 = 0;
@@ -672,8 +546,6 @@ static inline u8 Vorn_ContextFlags(struct SceneActorAnimationLink *context, u32 
         return 1;
     return 0;
 }
-
-
 
 void Vorn_UpdateStaggerRecovery(struct ChaseActor *actor, s32 frame)
 {
@@ -996,8 +868,6 @@ static inline s32 Vorn_DivideDirection(s32 n)
 }
 
 
-
-
 static inline void Vorn_ClearTrackingFlags(struct SceneActorChaseTracking *tracking, u32 bits)
 {
     u32 mask = ~bits;
@@ -1144,21 +1014,6 @@ void Vorn_UpdateKnockbackRecovery(struct ChaseActor *actor)
     }
 }
 
-static inline void Resume_SetControl(struct ChaseActor *actor, u32 kind, void *control)
-{
-    actor->base.field2B2 = 1;
-    actor->base.stepDone = 0;
-    actor->base.controlKind = kind;
-    actor->base.target = control;
-    actor->base.field2C8 = 0;
-    {
-        u32 *flags = &actor->base.pendingControlFlags;
-        s32 mask = ~1;
-        *flags &= mask;
-    }
-    actor->base.pendingControl = 0;
-}
-
 void SceneActorReaction_ResumeOrRunScript(struct ChaseActor *actor)
 {
     u8 *group = (u8 *)&actor->group.common;
@@ -1181,7 +1036,7 @@ void SceneActorReaction_ResumeOrRunScript(struct ChaseActor *actor)
             MonsterInit_SetState(actor, 3, 1, 0);
             {
                 void *control = *(void **)(group + 0x210);
-                Resume_SetControl(actor, 15, control);
+                SceneActorChase_SetControl(actor, control, 15);
             }
         }
     }
