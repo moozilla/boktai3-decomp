@@ -1,0 +1,27 @@
+08180678 sprite-resume-return
+
+r0 preserves the input pointer on the already-active path. Otherwise
+Sound_PlaySong returns through r0, leaving 0818068D.
+
+The explicit form changed the ROM bytes. The guarded form passed the unit ROM check.
+
+--- a/src/fn/sub_08180678.c
++++ b/src/fn/sub_08180678.c
+@@ -8,7 +8,17 @@
+ u32 SpriteComponent_Resume(struct SpriteComponent *component)
+ {
++#ifdef UBFIX
++    u32 result = (u32)component;
++    if (component->flags & 1) {
++        Sound_PlaySong(0x202);
++        result = 0x0818068D;
++    }
++    component->flags &= ~1;
++    return result;
++#else
+     if (component->flags & 1)
+         Sound_PlaySong(0x202);
+     component->flags &= ~1;
+     /* Callers must ignore the unspecified ABI result. */
++#endif
+ }
