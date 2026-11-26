@@ -25,7 +25,7 @@ src/effects/frost_emitter,src/effects/particles/sabata_frost.c,EC71 boss creates
 src/effects/pal_fade/actor_palette_fade.c,src/effects/palette/actor_palette_fade.c,PalFade_Update runs while riding the Coffin Bike. Adjacent challenge records belong in game state.
 src/effects/particle_burst,src/effects/particles/action_trails,Player action 13 uses the orbiting trail. The moving glyph file handles a separate effect and can be routed separately.
 src/effects/particle_burst/moving_glyph.c,src/effects/particles/moving_glyph.c,MovingGlyph code runs in the Count-area control independently of Player action trail particles.
-src/effects/particle_burst_effect/following_sprite_effect.c,src/effects/sprites/actor_appearance_effects.c,The 6323 chase updates the SpritePair manager. Character model appearance reserves slots from this task.
+src/effects/particle_burst_effect/following_sprite_effect.c,src/effects/sprites/bike_charge_and_following_effects.c,0008→6274. Controlled Coffin Bike mode 2 B hold gathers motes then shows the rider’s compact 409C marker. A separate 409C following ability pool shares this file.
 src/effects/particle_burst_effect/particle_burst_effect.c,src/effects/sprites/ability_scatter.c,Original ability dispatcher uses the 08139E24 slot to drop a sprite and scatter it. The rotating appearance helper has a separate file.
 src/effects/particle_effect,src/effects/particles/action_flashes,Staged Player action 9 at 6201 draws attached gold flash and sparks.
 src/effects/particle_emitter,src/effects/sprites/ballistic_trail.c,Original 081394B4 initializes the 409C launch. Flight ends in 8639 scatter effects from this unit.

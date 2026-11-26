@@ -1017,3 +1017,25 @@ and restores the original hardware state. The resulting
 `resume-pixel-*-hide/frame2.png` matches the no-spawn control exactly.
 The controlled render establishes the effect identity. A shipped
 trigger for the linear mote constructor remains open.
+
+### Coffin Bike charge sprites
+
+Tags: Coffin Bike, charge, sprite attribution, 409C, 1C1E
+
+Load `targets/bike-lifeless/baseline.ss` from 0008 at 6274.
+The unmodified B-hold replay runs `SpritePair_UpdateAnimation`
+but the bike's primary kind is zero. The chase control at 6323
+uses kind four. In `resume-bike-charge-render`, write kind two
+to Glove motion at 0200EE01 and hold the original B input. The
+existing charge value exceeds the threshold. The original
+`ChargeMarker_TickHold` invokes the 1C1E mote spawner every
+12 frames and the motes approach the rider.
+
+After 60 held frames, `ActorMarker_ShowSlot` reveals slot zero.
+`sprite-sources.tsv` attributes the bright 409C charge marker
+near (90, 76) to 0200F4E8 from the first frame of the reveal.
+Compare `before.png`, `gathering.png`, and `charged.png`.
+The compact display slot was reserved during Glove initialization.
+The file also contains a following ability effect, called from
+`ActorAction_TrySpawn`, which uses its own 409C pool. The shipped
+configuration selecting primary kind two remains unobserved.
