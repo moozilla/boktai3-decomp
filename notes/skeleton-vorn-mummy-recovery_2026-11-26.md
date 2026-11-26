@@ -123,3 +123,35 @@ both passes, the three directories went from 743 to 651 report lines
 (12.4% lower) and from 844 to 722 steering uses (14.5% lower).
 The seven units touched on resumption matched their recorded extents.
 The scoped linter reported zero errors.
+
+## Further pass
+
+| Class | Report lines before and after | Steering uses before and after |
+|---|---:|---:|
+| Skeleton | 251 → 251 | 310 → 310 |
+| Vorn | 226 → 226 | 236 → 235 |
+| Mummy | 174 → 170 | 176 → 172 |
+
+- Skeleton's route reset, pending contact, script counter, and range
+  initializer use their native class fields. Skeleton_UpdateDefeat
+  (080BD1F0) shares its three script payloads and passes the native
+  collider to the kill counters. The spill still differs when the
+  unreachable exits are removed. The ordinary tracking OR loads the
+  byte before building the mask. The ROM performs those steps in the
+  reverse order.
+- Vorn_UpdateActionCompletion now takes the native chase actor and
+  uses its tracking byte. With that signature the direct OR is one
+  load-order difference from the ROM. The class uses native action
+  table fields, a 120-frame pursuit wait timer, the sprite elapsed
+  time, and the shared drawable hide in Vorn_UpdateDefeat.
+- Mummy's straight-path check (080D6DF8), nearby target tracking,
+  collider bounds, and profile use the shared layouts. Burn damage
+  (080D812C) counts defeat reactions through EnemyDefeatStatistics.
+  The revival and defeat callbacks share the drawable show operation.
+  Testing the dying status as a literal (080D203C) changes reload
+  registers for the prepared latch and signed chase-group timer.
+
+All six units edited in this pass match their recorded ROM extents.
+Both dependents of the Vorn header also match. The scoped linter
+reports zero errors. Across all three passes, report lines fell from
+743 to 647 and steering uses from 844 to 717.

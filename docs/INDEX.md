@@ -242,7 +242,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [docs/history/2026-11-17.md](../docs/history/2026-11-17.md) | 2026-11-17 | #compiler #depin #matching #phase3 #round13 #round15 #structs | 3 |
 | [docs/history/2026-11-20.md](../docs/history/2026-11-20.md) | 2026-11-20 | #actors #compiler #matching #monsters #phase3 #scene #scene-actors #tooling #wireless | 2 |
 | [docs/history/2026-11-25.md](../docs/history/2026-11-25.md) | Work log, 2026-11-25 | #actors #assets #compiler #hardware #matching #menu #phase3 #process #scene #tooling | 5 |
-| [docs/history/2026-11-26.md](../docs/history/2026-11-26.md) | Work log, 2026-11-26 | #actors #autopilot #compiler #matching #menu #phase3 #port #scripts #tooling #tools #types #verification | 9 |
+| [docs/history/2026-11-26.md](../docs/history/2026-11-26.md) | Work log, 2026-11-26 | #actors #autopilot #compiler #matching #menu #phase3 #port #scripts #tooling #tools #types #verification | 10 |
 | [docs/history/HANDOFF_2026-10-23.md](../docs/history/HANDOFF_2026-10-23.md) | Handoff: current state and how to continue | #process | 14 |
 | [docs/history/MANAGER_HANDOFF_2026-10-19.md](../docs/history/MANAGER_HANDOFF_2026-10-19.md) | Manager handoff (2026-10-19) | #process #tooling | 6 |
 | [docs/history/README.md](../docs/history/README.md) | Handoff history |  | 17 |
@@ -636,7 +636,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [notes/singleton-slot7-recovery_2026-11-01.md](../notes/singleton-slot7-recovery_2026-11-01.md) | Slot-seven presentation | *#assets* | 1 |
 | [notes/skeleton-cleanup_2026-11-13.md](../notes/skeleton-cleanup_2026-11-13.md) | Skeleton unit cleanup |  | 2 |
 | [notes/skeleton-knocked-flight-round9.md](../notes/skeleton-knocked-flight-round9.md) | Skeleton_BeginKnockedFlight |  | 0 |
-| [notes/skeleton-vorn-mummy-recovery_2026-11-26.md](../notes/skeleton-vorn-mummy-recovery_2026-11-26.md) | Skeleton, Vorn, and Mummy class recovery | #matching #types #phase3 #compiler | 7 |
+| [notes/skeleton-vorn-mummy-recovery_2026-11-26.md](../notes/skeleton-vorn-mummy-recovery_2026-11-26.md) | Skeleton, Vorn, and Mummy class recovery | #matching #types #phase3 #compiler | 8 |
 | [notes/sol-family-push-2.md](../notes/sol-family-push-2.md) | Sol family push 2 |  | 3 |
 | [notes/sol-family-push-3.md](../notes/sol-family-push-3.md) | Sol family push 3 |  | 8 |
 | [notes/sol-family-push-4.md](../notes/sol-family-push-4.md) | Sol family push 4 |  | 2 |
