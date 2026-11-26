@@ -92,36 +92,20 @@ void Vorn_OnCollisionResponse(s32 a, s32 b, struct P *p)
 
 void SceneActor_UpdateForwardCollider(struct ChaseActor *);
 
-struct TargetedAttackContext {
-    u8 unknown0[0x628];
-    struct ContactCollider collider;
-    u8 unknown67C[0x6D8 - 0x67C];
-    struct ContactPosition target;
-};
-
-struct TargetedAttackSequence {
-    u8 unknown0[0x14];
-    u16 frame;
-};
-
-struct TargetedAttackTarget {
-    u8 unknown0[0xC];
-    struct ContactPosition position;
-};
-
 void SceneActor_UpdateTargetedAttack(struct ChaseActor *s)
 {
-    struct TargetedAttackContext *context = s->base.context;
-    struct TargetedAttackSequence *sequence = (void *)((u8 *)s->base.drawable + 0x20);
+    struct Vorn *context = s->base.context;
+    struct SceneActorAnimationTileDrawable *drawable = s->base.drawable;
+    struct AnimSprite *tile = &drawable->tile;
     if (SceneActorReaction_TakePrepared(s)) {
         s->base.body.direction = (((s->base.tracking.heading + 0x20) & 0xFF) >> 6) << 6;
         SceneActorAnimation_SelectDirectionalEntry((void *)s, 5);
-        context->target = ((struct TargetedAttackTarget *)s->base.tracking.target)->position;
+        context->vector6D8 = s->base.tracking.target->position;
         Sound_PlaySong(0x1D0);
     }
-    if ((u16)(sequence->frame - 3) <= 1) {
+    if ((u16)(tile->frameIndex - 3) <= 1) {
         SceneActor_UpdateForwardCollider(s);
-        Collider_Refresh(&context->collider);
+        Collider_Refresh(&context->attackCollider);
     }
     if (s->base.restart)
         s->base.stepDone = 1;
@@ -166,20 +150,14 @@ void Vorn_ResetStateEntry(u8 *p)
         p[0x2b2] = 0;
 }
 
-struct DelayedAnimationContext {
-    u8 unknown0[0x694];
-    u16 flags;
-    u8 unknown696, delay;
-};
-
 void SceneActor_UpdateDelayedAnimation(struct ChaseActor *s)
 {
-    struct DelayedAnimationContext *context = s->base.context;
+    struct Vorn *context = s->base.context;
     if (SceneActorReaction_TakePrepared(s))
         SceneActorAnimation_SelectDirectionalEntry((void *)s, 0);
-    if (context->delay) {
-        if (--context->delay == 0) {
-            if (!(context->flags & 1))
+    if (context->delayedAnimationTimer) {
+        if (--context->delayedAnimationTimer == 0) {
+            if (!(context->delayedAnimationFlags & 1))
                 SceneActorAnimation_SelectDirectionalEntry((void *)s, 14);
             else
                 SceneActorAnimation_SelectDirectionalEntryFlags((void *)s, 14, 4);
