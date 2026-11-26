@@ -60,7 +60,7 @@ void SceneActorBehavior_RecordDefeat(struct RoomActor *inputActor)
         u32 value;
         u32 result;
         if (slot == 0) {
-            IncrementFirst(CounterAddress(0x884));
+            IncrementFirst(&gGameState->actorDefeatsByPlayer[0]);
             counter = CounterAddress(0x530);
             value = *counter;
             if (*(s16 *)counter > 9998)
@@ -69,7 +69,7 @@ void SceneActorBehavior_RecordDefeat(struct RoomActor *inputActor)
             *counter = result;
             return;
         } else if (slot == 1) {
-            counter = CounterAddress(0x886);
+            counter = &gGameState->actorDefeatsByPlayer[1];
             value = *counter;
             if (*(s16 *)counter > 9998)
                 goto capped;
@@ -77,7 +77,7 @@ void SceneActorBehavior_RecordDefeat(struct RoomActor *inputActor)
             *counter = result;
             return;
         } else if (slot == 2) {
-            counter = CounterAddress(0x888);
+            counter = &gGameState->actorDefeatsByPlayer[2];
             value = *counter;
             if (*(s16 *)counter > 9998)
                 goto capped;
@@ -85,7 +85,7 @@ void SceneActorBehavior_RecordDefeat(struct RoomActor *inputActor)
             *counter = result;
             return;
         } else if (slot == 3) {
-            counter = CounterAddress(0x88A);
+            counter = &gGameState->actorDefeatsByPlayer[3];
             value = *counter;
             if (*(s16 *)counter > 9998)
                 goto capped;
