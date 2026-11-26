@@ -29,9 +29,6 @@ struct SceneActorBehaviorDestination {
     struct ContactPosition destination;
 };
 
-/* Keep the spelling still used by the Skeleton unit. */
-#define SceneActorBehavior_GlobalPauseBits Engine_PauseBits
-
 static inline u32 SceneActorBehavior_OverrideBits(u32 mask, const u32 *flags)
 {
     return *flags & mask;
