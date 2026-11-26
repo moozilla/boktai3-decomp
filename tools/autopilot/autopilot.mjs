@@ -19,7 +19,7 @@ import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { openSession, png } from '../../port/agent/session.mjs';
 import { tickAt } from './movie-index.mjs';
-import { distanceFromEntrance, routeDistances } from './route-entrances.mjs';
+import { distanceFromEntrance, routeDistances, storyEntrances } from './route-entrances.mjs';
 import { landingReturn } from './higher-landings.mjs';
 
 const ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname), '../..');
@@ -72,7 +72,7 @@ const stageOf = (scene) => stageIndex.get(scene) || emptyStage;
 const log = [];
 // scenes the run has been in (carried over from --from), for door choice
 const UNREACHABLE = new Set(from && from.unreachable ? from.unreachable : []);  // 'scene:box' doors no route reached
-const distancesTo = (scene, locked) => routeDistances(STAGES, scene, UNREACHABLE, locked);
+const distancesTo = (scene, locked, entrances) => routeDistances(STAGES, scene, UNREACHABLE, locked, entrances);
 const SEEN = new Map();  // person id -> rooms they were in
 const VISITS = new Map();  // room visits this run: least visited doors first
 const TRIED = new Set(from && from.tried ? from.tried : []);  // floor items already gone for
@@ -151,6 +151,8 @@ const GOALS = {
     const storyGoal = +opt('--until-story', -1), endpoint = destination >= 0 || storyGoal >= 0;
     const reachedScene = () => destination >= 0 && L.where().scene === destination;
     const reached = () => reachedScene() || (storyGoal >= 0 && L.story() >= storyGoal);
+    const arrivalForGoal = () => routeGoal >= 0 && storyGoal > L.story() ?
+      storyEntrances(stageOf(routeGoal), storyGoal, L.conditionsAllow) : undefined;
     if (from?.landingDetour?.goal === routeGoal) landingDetour = from.landingDetour;
     let prev, keyGoal;
     const failedKeyRooms = new Set();
@@ -183,6 +185,10 @@ const GOALS = {
         if (reached()) { rooms--; continue; }
       }
       const here = L.where().scene;
+      if (landingDetour?.via === here && stageOf(landingDetour.room).doors.some((d) => d.box === landingDetour.box && d.scene === here)) {
+        event({ skill: 'landing-bypass', scene: here, from: landingDetour.room, box: landingDetour.box });
+        landingDetour = undefined;
+      }
       if (landingDetour?.room === here && (landingDetour.descending ? L.where().y <= landingDetour.height : L.where().y >= landingDetour.height)) {
         UNREACHABLE.delete(`${here}:${landingDetour.box}`);
         landingDetour = undefined;
@@ -223,6 +229,8 @@ const GOALS = {
       }
       // Both HP traps and live pressure plates can run scripts on contact.
       let prioritizeExit = Boolean(landingDetour) || L.coffinAvailable() || L.movingFloors().length > 0;
+      const arrivals = arrivalForGoal();
+      if (arrivals && doorsHere().some((door) => door.scene === routeGoal && arrivals.has(door.entrance))) prioritizeExit = true;
       for (const puzzle of PLATE_PUZZLES[here] || []) {
         if (!L.conditionsAllow(puzzle.cond)) continue;
         const solved = yield* L.solvePlatePuzzle(puzzle, { avoid: stageOf(here).doors.map((d) => d.box),
@@ -362,13 +370,19 @@ const GOALS = {
       const toward = rooms === 0 ? +opt('--toward', -1) : -1;
       // with no --goal: explore, the door on the shortest route (over doors not known to
       // be unreachable) to the nearest scene not visited yet
-      const dist = keyGoal ? distancesTo(keyGoal.scene, keyGoal.blocked)
-        : routeGoal >= 0 ? distancesTo(landingDetour?.via ?? routeGoal) : exploreDistances(here, visited);
+      let arrival = !keyGoal && !landingDetour ? arrivalForGoal() : undefined;
+      let dist = keyGoal ? distancesTo(keyGoal.scene, keyGoal.blocked)
+        : routeGoal >= 0 ? distancesTo(landingDetour?.via ?? routeGoal, undefined, arrival) : exploreDistances(here, visited);
+      if (arrival && !dist.has(here)) {
+        arrival = undefined;
+        dist = distancesTo(routeGoal);
+      }
       VISITS.set(here, (VISITS.get(here) || 0) + 1);
       const distanceFromDoor = (d) => distanceFromEntrance(d, stageOf, dist);
+      const hops = (d) => d.scene === routeGoal && arrival?.has(d.entrance) ? 0 : dist.get(d.scene) ?? 1e9;
       const returnDoor = (d) => landingDetour?.via === here && d.box === landingDetour.returnBox && d.entrance === landingDetour.entrance;
       const doors = doorsHere().sort((a, b) => returnDoor(b) - returnDoor(a) || (b.scene === toward) - (a.scene === toward) ||
-        (dist.get(a.scene) ?? 1e9) - (dist.get(b.scene) ?? 1e9) || visited.has(a.scene) - visited.has(b.scene) ||
+        hops(a) - hops(b) || visited.has(a.scene) - visited.has(b.scene) ||
         (VISITS.get(a.scene) || 0) - (VISITS.get(b.scene) || 0) || distanceFromDoor(a) - distanceFromDoor(b));
       const lock = doors.length && L.closedLock(LOCKS[here] || [], doors[0].box);
       if (!keyGoal && lock && !L.hasItem(lock.item)) {

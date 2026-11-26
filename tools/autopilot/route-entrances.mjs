@@ -13,18 +13,29 @@ export function distanceFromEntrance(door, stageOf, distances) {
   return distance;
 }
 
+// Some story scenes run the advancing script only from a special entrance.
+export function storyEntrances(stage, milestone, conditionsAllow) {
+  const threshold = `progress<${milestone}`;
+  const matches = stage.entrances.filter((entry) => entry.cond.some((cond) => cond.replace(/[()\s]/g, '') === threshold) &&
+    conditionsAllow(entry.cond));
+  return matches.length ? new Set(matches.map((entry) => entry.id)) : undefined;
+}
+
 // Traverse incoming doors once to measure walking hops to a goal. Ignore
 // failed approaches and a locked door being bypassed on a key detour.
-export function routeDistances(stages, goal, failed, locked) {
+export function routeDistances(stages, goal, failed, locked, entrances) {
   if (goal < 0) return new Map();
+  // An ordinary arrival can still be on the route to the scripted arrival.
+  const terminal = entrances ? Symbol('scripted arrival') : goal;
   const incoming = new Map();
   for (const stage of stages) for (const door of stage.doors) {
     const edge = `${stage.scene}:${door.box}`;
     if (edge === locked || failed.has(edge)) continue;
-    if (!incoming.has(door.scene)) incoming.set(door.scene, []);
-    incoming.get(door.scene).push(stage.scene);
+    const to = door.scene === goal && entrances?.has(door.entrance) ? terminal : door.scene;
+    if (!incoming.has(to)) incoming.set(to, []);
+    incoming.get(to).push(stage.scene);
   }
-  const distances = new Map([[goal, 0]]), pending = [goal];
+  const distances = new Map([[terminal, 0]]), pending = [terminal];
   for (const room of pending) {
     const hops = distances.get(room) + 1;
     for (const from of incoming.get(room) ?? []) {
@@ -33,5 +44,6 @@ export function routeDistances(stages, goal, failed, locked) {
       pending.push(from);
     }
   }
+  if (entrances) distances.delete(terminal);
   return distances;
 }

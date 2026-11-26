@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import { landingReturn } from './higher-landings.mjs';
 import fs from 'node:fs';
 import test from 'node:test';
-import { distanceFromEntrance, routeDistances } from './route-entrances.mjs';
+import { distanceFromEntrance, routeDistances, storyEntrances } from './route-entrances.mjs';
 
 function skill(file, g, game = {}, exports = {}) {
   const source = fs.readFileSync(new URL(`lib/${file}.js`, import.meta.url), 'utf8');
@@ -226,6 +226,21 @@ test('goal routing avoids a failed shortcut and learns the longer path', () => {
   assert.equal(reroute.get(1), 3);
   assert.equal(reroute.get(2), 4);
   assert.equal(routeDistances(stages, 5, failed, '4:F').has(1), false);
+});
+
+test('a story goal routes through the active scripted entrance', () => {
+  const target = { scene: 4, doors: [], entrances: [{ id: 7, cond: [] }, { id: 27, cond: ['(progress < 79)'] }] };
+  const stages = [target, { scene: 1, doors: [{ box: 'A', scene: 4, entrance: 7 }, { box: 'B', scene: 2 }] },
+    { scene: 2, doors: [{ box: 'C', scene: 4, entrance: 27 }] }];
+  assert.equal(routeDistances(stages, 4, new Set()).get(1), 1);
+  const allowed = storyEntrances(target, 79, () => true);
+  assert.deepEqual([...allowed], [27]);
+  assert.equal(routeDistances(stages, 4, new Set(), undefined, allowed).get(1), 2);
+  assert.equal(storyEntrances(target, 79, () => false), undefined);
+  target.doors.push({ box: 'D', scene: 2 });
+  const transit = routeDistances(stages, 4, new Set(['1:B']), undefined, allowed);
+  assert.equal(transit.get(4), 2);
+  assert.equal(transit.get(1), 3);
 });
 
 test('live pressure plates use the center of the occupied square', () => {
