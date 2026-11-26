@@ -17,8 +17,8 @@
  * The burst arguments live in function-scope variables and are rematerialized at each call. */
 void SceneActorAttachment_ReplaceResponseSlot(void *, u32, u32, u32);
 void SceneActorEffects_AdvanceSteps(void *, u32);
-void *Bestiary_GetEntryForActor(u32, u32);
-void Bestiary_UnlockEntry(void *);
+s32 Bestiary_GetEntryForActor(u32, s32);
+void Bestiary_UnlockEntry(u32);
 void SceneActorBehavior_CallTerrainScript(void *);
 void SceneActorPlacement_PlayCategoryEventSound(void *);
 void sub_08127590(void *, void *, u32, u32, u32, u32, u32, u32, u32, u32, u32, u32, u32, u32, u32);
@@ -254,7 +254,7 @@ void Skeleton_UpdateDefeat(struct ChaseActor *actor)
         s32 one;
     } state = {actor->base.context};
     struct SceneActorRegistryControlGroup *group = &actor->group.common;
-    u32 mask;
+    u32 mask, test;
     u32 wrap = 1023;
     u32 bits = 3;
     s32 count = 4;
@@ -305,13 +305,9 @@ void Skeleton_UpdateDefeat(struct ChaseActor *actor)
     actor->base.attachmentTimer = 0;
     actor->base.colliderA.responseValue = 0;
     mask = 0x4000;
-    {
-        u32 test = actor->base.motionFlags & mask;
-        response.flags = &actor->base.motionFlags;
-        if (!test)
-            goto notHidden;
-    }
-    {
+    test = actor->base.motionFlags & mask;
+    response.flags = &actor->base.motionFlags;
+    if (test) {
         Skeleton_RunDefeatScript(actor, values);
         {
             u32 t = *response.flags & mask;
@@ -362,7 +358,6 @@ void Skeleton_UpdateDefeat(struct ChaseActor *actor)
         Trigger_ConsumePending(actor->base.receiver, 1);
         return;
     }
-notHidden:
     if (actor->base.hitReactionFlags & 0x7F) {
         u32 hit = actor->base.hitAttributes & 0x100017;
         ctxFlags = &state.context->actionFlags;
