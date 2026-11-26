@@ -61,7 +61,7 @@ s32 VulcanCannon_UpdateDamageState(struct VulcanCannon *p)
                 TerrainModifiers_UnregisterCell(p->terrain);
             VulcanCannon_GetEffectPosition(&center, p);
             velocity.x = -4;
-            table = (const u16 *)RANDOM_TABLE_ADDR;
+            table = gRandomTable;
             velocity.y = (CannonRandom(table) & 7);
             velocity.z = -4;
             spread.x = 24;
@@ -87,10 +87,7 @@ s32 VulcanCannon_UpdateDamageState(struct VulcanCannon *p)
                 u32 facing;
                 seq = &p->sequence;
                 res = p->resource;
-                {
-                    const u8 *direction = (const u8 *)&p->facing;
-                    facing = *direction;
-                }
+                facing = (u8)p->facing;
                 Anim_RestartSequence(seq, res, 0x13, facing, 0);
             }
             AnimData_SelectPaletteBank(&p->graphics, 0x1be);
