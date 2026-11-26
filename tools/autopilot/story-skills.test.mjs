@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { higherReturn } from './higher-landings.mjs';
 import fs from 'node:fs';
 import test from 'node:test';
 import { distanceFromEntrance, routeDistances } from './route-entrances.mjs';
@@ -99,6 +100,17 @@ test('doors to the same scene prefer the arrival nearer a forward exit', () => {
   assert.equal(distance(7), 3840);
   assert.equal(distance(8), 256);
   assert.equal(distance(9), Infinity);
+});
+
+test('a failed high door can be retried from a higher entrance reached through another room', () => {
+  const highDoor = { box: 'CD25', y: 1024, scene: 4 };
+  const room = { scene: 1, doors: [{ box: 'CD22', y: 512 }, { box: 'CD24', y: 768 }, highDoor],
+    entrances: [{ id: 7, box: 'CD22' }, { id: 9, box: 'CD24' }, { id: 10, box: 'CD25' }] };
+  const stages = [room, { scene: 2, doors: [{ box: 'CD22', scene: 1, entrance: 7 }] },
+    { scene: 3, doors: [{ box: 'CD23', scene: 1, entrance: 9 }] },
+    { scene: 4, doors: [{ box: 'CD22', scene: 1, entrance: 10 }] }];
+  assert.deepEqual(higherReturn(stages, room, highDoor, 512, (scene) => new Map([[1, scene]])),
+    { room: 1, box: 'CD25', via: 3, returnBox: 'CD23', entrance: 9, height: 768, distance: 3 });
 });
 
 test('goal routing avoids a failed shortcut and learns the longer path', () => {

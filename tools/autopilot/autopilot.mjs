@@ -20,6 +20,7 @@ import { spawnSync } from 'node:child_process';
 import { openSession, png } from '../../port/agent/session.mjs';
 import { tickAt } from './movie-index.mjs';
 import { distanceFromEntrance, routeDistances } from './route-entrances.mjs';
+import { higherReturn } from './higher-landings.mjs';
 
 const ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname), '../..');
 const args = process.argv.slice(2);
@@ -149,7 +150,7 @@ const GOALS = {
     const storyGoal = +opt('--until-story', -1), endpoint = destination >= 0 || storyGoal >= 0;
     const reachedScene = () => destination >= 0 && L.where().scene === destination;
     const reached = () => reachedScene() || (storyGoal >= 0 && L.story() >= storyGoal);
-    let prev, keyGoal;
+    let prev, keyGoal, landingDetour;
     const failedKeyRooms = new Set();
     const bossActive = () => L.fightTargets().some((target) => target.boss || target.barrier);
     for (let rooms = 0; rooms < limit; rooms++) {
@@ -180,6 +181,10 @@ const GOALS = {
         if (reached()) { rooms--; continue; }
       }
       const here = L.where().scene;
+      if (landingDetour?.room === here && L.where().y >= landingDetour.height) {
+        UNREACHABLE.delete(`${here}:${landingDetour.box}`);
+        landingDetour = undefined;
+      }
       if (L.purificationBattle()) {
         const result = yield* L.fightPurification({ trace: (e) => event({ skill: 'drive', ...e }) });
         event({ skill: 'drive-result', ...result, scene: L.where().scene, story: L.story() });
@@ -196,7 +201,7 @@ const GOALS = {
       if (L.coffinAvailable()) {
         const before = L.story(), advanced = () => L.story() > before;
         for (const { box, cond } of ESCORT_TARGETS[here] || []) {
-          if (L.conditionsAllow(cond) && L.boxes().some((b) => b.name === box) && (yield* throughDoor(g, L, box, advanced))) break;
+          if (L.conditionsAllow(cond) && L.boxes().some((b) => b.name === box) && (yield* throughDoor(g, L, box, { stopIf: advanced }))) break;
         }
         if (L.where().scene !== here || advanced()) continue;
       }
@@ -215,7 +220,7 @@ const GOALS = {
         }
       }
       // Both HP traps and live pressure plates can run scripts on contact.
-      let prioritizeExit = L.coffinAvailable();
+      let prioritizeExit = Boolean(landingDetour) || L.coffinAvailable();
       for (const puzzle of PLATE_PUZZLES[here] || []) {
         if (!L.conditionsAllow(puzzle.cond)) continue;
         const solved = yield* L.solvePlatePuzzle(puzzle, { avoid: stageOf(here).doors.map((d) => d.box),
@@ -356,10 +361,11 @@ const GOALS = {
       // with no --goal: explore, the door on the shortest route (over doors not known to
       // be unreachable) to the nearest scene not visited yet
       const dist = keyGoal ? distancesTo(keyGoal.scene, keyGoal.blocked)
-        : routeGoal >= 0 ? distancesTo(routeGoal) : exploreDistances(here, visited);
+        : routeGoal >= 0 ? distancesTo(landingDetour?.via ?? routeGoal) : exploreDistances(here, visited);
       VISITS.set(here, (VISITS.get(here) || 0) + 1);
       const distanceFromDoor = (d) => distanceFromEntrance(d, stageOf, dist);
-      const doors = doorsHere().sort((a, b) => (b.scene === toward) - (a.scene === toward) ||
+      const returnDoor = (d) => landingDetour?.via === here && d.box === landingDetour.returnBox && d.entrance === landingDetour.entrance;
+      const doors = doorsHere().sort((a, b) => returnDoor(b) - returnDoor(a) || (b.scene === toward) - (a.scene === toward) ||
         (dist.get(a.scene) ?? 1e9) - (dist.get(b.scene) ?? 1e9) || visited.has(a.scene) - visited.has(b.scene) ||
         (VISITS.get(a.scene) || 0) - (VISITS.get(b.scene) || 0) || distanceFromDoor(a) - distanceFromDoor(b));
       const lock = doors.length && L.closedLock(LOCKS[here] || [], doors[0].box);
@@ -399,9 +405,16 @@ const GOALS = {
             continue;
           }
           const edge = `${here}:${d.box}`;
-          if (yield* throughDoor(g, L, d.box)) { UNREACHABLE.delete(edge); moved = true; break; }
+          const floor = L.where().y;
+          const alternate = !keyGoal && !landingDetour && routeGoal >= 0 && d.y > floor &&
+            higherReturn(STAGES, stageOf(here), d, floor, (scene) => distancesTo(scene, edge));
+          if (yield* throughDoor(g, L, d.box, { alternateLanding: Boolean(alternate) })) { UNREACHABLE.delete(edge); moved = true; break; }
           if (L.where().scene === here) UNREACHABLE.add(edge);
           if (L.where().scene !== here) { moved = true; break; }
+          if (alternate) {
+            landingDetour = alternate;
+            event({ skill: 'landing', ...alternate });
+          }
         }
       }
       if (!moved) { event({ skill: 'stop', why: 'no door worked', ...L.where() }); return !endpoint && rooms > 0; }
@@ -472,7 +485,7 @@ function exploreDistances(here, visited) {
 
 // Through door box BOX: navigate; when a scripted gate turns the player back, open
 // the room's chests and items (the usual ask), then try again.
-function* throughDoor(g, L, box, stopIf) {
+function* throughDoor(g, L, box, { stopIf, alternateLanding } = {}) {
   const scene = L.where().scene, tried = new Set();
   const avoid = stageOf(scene).doors.map((d) => d.box).filter((b) => b !== box);
   const landing = yield* L.approachLift(box, { avoid, trace: (e) => event({ skill: 'nav', ...e }) });
@@ -518,6 +531,7 @@ function* throughDoor(g, L, box, stopIf) {
     const r = yield* L.navigate(box, { avoid, stopIf: interrupted, trace: (e) => event({ skill: 'nav', ...e }) });
     event({ skill: 'navigate', box, ...r, from: scene });
     if (r.reached) return true;
+    if (alternateLanding && r.reason === 'no path') return false;
     if (L.fightTargets().length && fights < 5 && (!lock || L.hasItem(lock.item))) {
       fights++;
       const f = yield* L.fight({ trace: (e) => event({ skill: 'fight', ...e }) });

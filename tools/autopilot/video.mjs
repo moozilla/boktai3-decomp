@@ -88,6 +88,7 @@ const describe = (e) => {
     case 'talk': return 'talk';
     case 'plate-puzzle': return e.done ? `held all plates with ${e.moves} pushes` : null;
     case 'lift': return e.reached ? `reached lift landing at height ${e.height}` : `approach lift at height ${e.height}`;
+    case 'landing': return `return via scene ${e.via} at height ${e.height}`;
     case 'fight':
       if (e.threshold !== undefined) return `sunlight: threshold ${e.threshold}, guard ${e.guard}`;
       if (e.equip) return e.equip.gun ? 'equip the solar gun' : 'equip a sword';
