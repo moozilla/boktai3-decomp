@@ -322,3 +322,23 @@ actual room actor and route start signatures.
 All five edited units matched their full ROM extents, and the scoped
 linter reported zero errors. Direct bone burst, sprite priority, and
 burn overlay candidates still changed the generated instructions.
+
+## Combat animation and delayed controls
+
+| Class | Report lines before and after | Steering uses before and after |
+|---|---:|---:|
+| Skeleton | 238 → 228 | 295 → 281 |
+| Vorn | 213 → 211 | 222 → 220 |
+| Mummy | 169 → 169 | 171 → 171 |
+
+Skeleton reads combat tile frames and attack collider fields by name
+and shares the contact control transitions. Vorn uses the common
+delayed response and contact animation and reads the typed route
+branches. Mummy shares cardinal direction and reads its dying and
+saved-target animation through the native types.
+
+All four edited units matched. Scoped lint reported zero errors.
+The statement-macro census now reuses scans for unchanged sources.
+Its repository-sized benchmark with one file to rescan took 4.5 seconds,
+compared with 89.8 seconds for the old full rescan. The counts agreed,
+and all 13 focused tests passed.
