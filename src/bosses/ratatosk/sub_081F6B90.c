@@ -1,11 +1,8 @@
-#include "global.h"
+#include "scene/collision/contact_position.h"
 #include "engine/video/render.h"
 
 struct Vec {
     s16 x, y, z, pad;
-};
-struct PackedVec {
-    s32 x : 16, y : 16, z : 16, pad : 16;
 };
 struct MessageEntry {
     u16 id;
@@ -111,10 +108,7 @@ void Ratatosk_DispatchSceneCommands(u8 *p)
 {
     struct Actor *q = (void *)p;
     struct MessageEntry *entry = (void *)(p + 0x118);
-    union {
-        struct Vec vec;
-        struct PackedVec packed;
-    } position;
+    struct ContactPosition position;
     s32 i = 0;
     if (i < entry->count[gSceneEventDispatchState[0x24]])
         do {
@@ -248,16 +242,16 @@ void Ratatosk_DispatchSceneCommands(u8 *p)
                     setState(q, 2, 0, 19);
                     break;
                 case 47:
-                    position.packed.x = q->position.x;
-                    position.packed.y = q->position.y;
-                    position.packed.z = q->position.z;
+                    position.x = q->position.x;
+                    position.y = q->position.y;
+                    position.z = q->position.z;
                     Ratatosk_FireTrackingShot(p, &position, message[4]);
                     Trigger_ConsumePending(&q->entry, 1);
                     break;
                 case 48:
-                    position.vec.x = q->position.x;
-                    position.vec.y = q->position.y;
-                    position.vec.z = q->position.z;
+                    position.x = q->position.x;
+                    position.y = q->position.y;
+                    position.z = q->position.z;
                     SceneActors_FireTrackingProjectileSpread(p, &position, message[4]);
                     Trigger_ConsumePending(&q->entry, 1);
                     break;
