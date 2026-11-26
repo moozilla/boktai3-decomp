@@ -1,21 +1,10 @@
-#include "global.h"
+#include "effects/projectiles/timed_effect_manager.h"
 
 
 extern const s16 gUnk_086149C4[];
 
 struct TrailPosition {
     u16 x, y, z, unk_06;
-};
-struct TrailEntry {
-    u32 flags;
-    u8 unk_04[0x14];
-    struct TrailPosition position;
-    u8 unk_20[8];
-    u8 active;
-    s8 angleOffset;
-    u16 radius;
-    u16 timer;
-    u8 unk_2E[2];
 };
 /* A position-first view of an entry, retaining the sprite array stride. */
 struct TrailMotion {
@@ -26,16 +15,6 @@ struct TrailMotion {
     u16 radius;
     u16 timer;
     u8 unk_16[0x1A];
-};
-struct TrailGroup {
-    u8 unk_00[0x48];
-    struct TrailEntry entries[4];
-};
-struct TrailSource {
-    u8 unk_00[0x1E];
-    s8 direction;
-    u8 unk_1F[0xA8 - 0x1F];
-    struct TrailPosition position;
 };
 struct PositionWords {
     u32 a, b;
@@ -48,7 +27,7 @@ static inline s32 Truncate(s32 product)
 }
 
 // Tentative: shrink the four radial trail sprites, hiding each after its fifteenth tick.
-void ProjectileTask_UpdateTrailSprites(struct TrailGroup *group, struct TrailSource *source)
+void ProjectileTask_UpdateTrailSprites(struct TimedEffectManager *manager, struct Task4E01Projectile *source)
 {
     s32 direction;
     u8 facing;
@@ -57,21 +36,21 @@ void ProjectileTask_UpdateTrailSprites(struct TrailGroup *group, struct TrailSou
     struct TrailMotion *motion;
     s32 angleMask;
     u16 *age;
-    direction = (facing = ((u16)source->direction + 0x70) >> 5) & 7;
+    direction = (facing = ((u16)source->params.direction + 0x70) >> 5) & 7;
     direction = ((direction + 5) & 7) << 5;
     angleMask = 255;
     byteOffset = 0;
-    motion = (struct TrailMotion *)&group->entries[0].position;
+    motion = (struct TrailMotion *)&manager->effects[0].sprite.position;
     age = &motion->timer;
     remaining = 3;
     do {
         if (motion->active) {
             if (++motion->timer > 14) {
-                struct TrailEntry *sprite;
+                struct TimedEffectTrail *sprite;
                 motion->active = 0;
-                sprite = group->entries;
-                sprite = (struct TrailEntry *)((u8 *)sprite + byteOffset);
-                sprite->flags |= 1;
+                sprite = manager->effects;
+                sprite = (struct TimedEffectTrail *)((u8 *)sprite + byteOffset);
+                sprite->sprite.flags |= 1;
             } else {
                 s32 radius;
                 s32 angle;
@@ -80,15 +59,15 @@ void ProjectileTask_UpdateTrailSprites(struct TrailGroup *group, struct TrailSou
                 radius = (motion->radius * (16 - *age)) >> 3;
                 offset = motion->angleOffset + 256;
                 angle = (direction + offset) & angleMask;
-                out = (struct PositionWords *)&group->entries[0].position;
+                out = (struct PositionWords *)&manager->effects[0].sprite.position;
                 out = (struct PositionWords *)((u8 *)out + byteOffset);
-                *out = *(struct PositionWords *)&source->position;
+                *out = *(struct PositionWords *)&source->sprite.position;
                 motion->position.x += Truncate(gUnk_086149C4[(angle + 64) & angleMask] * radius);
                 motion->position.z += Truncate(gUnk_086149C4[angle & angleMask] * radius);
             }
         }
-        byteOffset += sizeof(struct TrailEntry);
+        byteOffset += sizeof(struct TimedEffectTrail);
         motion++;
-        age += sizeof(struct TrailEntry) / sizeof(u16);
+        age += sizeof(struct TimedEffectTrail) / sizeof(u16);
     } while (--remaining >= 0);
 }
