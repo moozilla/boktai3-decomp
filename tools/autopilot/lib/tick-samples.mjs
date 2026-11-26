@@ -1,6 +1,6 @@
 // KEYINPUT stores the ten controller bits active-low in little-endian I/O.
-export function readPressedKeys(memory) {
-  return ~memory.getUint16(0x04000130, true) & 0x03ff;
+export function readPressedKeys(memory, offset = 0x04000130) {
+  return ~memory.getUint16(offset, true) & 0x03ff;
 }
 
 // Align snapshots at input polls and report the earliest differing sample.

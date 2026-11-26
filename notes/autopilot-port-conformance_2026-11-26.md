@@ -88,3 +88,10 @@ Recorded fixtures check it against their fixed tick masks, and seeded runs
 check it against the host masks sent to the ROM. All 13 recordings passed
 in 102.6 seconds using the existing ROM samples. The shifted input still
 failed at tick 1690, and checkpoint 0065 seed 1 matched all 4,850 ticks.
+
+`tickdiff.mjs` now reports actual KEYINPUT masks on both sides, including
+ticks within its RAM noise window. The harness reads the ROM register
+through the bus because mGBA refreshes its cached I/O value on a keypad
+read. The shifted Sealed Prison replay is reported at tick 1690 with
+zero differing RAM bytes. The kept RAM dumps match those from the earlier
+diagnostic byte for byte.

@@ -17,6 +17,7 @@ test('KEYINPUT decodes active-low button bits and ignores the unused bits', () =
   });
   assert.equal(read(0x03ff), 0);
   assert.equal(read(0xfdf6), 0x0209);
+  assert.equal(readPressedKeys(new DataView(Uint8Array.of(0, 0xef, 0x03).buffer), 1), 0x10);
 });
 
 test('a shifted controller read fails even with matching RAM and tick counts', () => {

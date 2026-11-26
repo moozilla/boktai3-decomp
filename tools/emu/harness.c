@@ -34,6 +34,7 @@
 //                       Samples can differ from tick in the stack written by PUSH.
 //   tickdump NAME FROM:TO ADDR:LEN[,ADDR+OFFSET:LEN,...]  append the regions to OUTDIR/NAME.bin at the
 //                       entry to each selected tick. ADDR+OFFSET follows a RAM pointer.
+//                       "keyinput" reads the current KEYINPUT halfword through the bus.
 //                       entry of each tick FROM..TO-1 (counted from "tick"; decimal)
 //   holdt KEYS N        hold keys (NONE for none) until ADDR has run N more times:
 //                       inputs keyed to game ticks, so lag frames do not shift them
@@ -303,7 +304,7 @@ static int tick_hits;
 // ticks [tickdump_from, tickdump_to) (appended to OUTDIR/NAME.bin, one record per tick)
 static long tick_total;
 static long tickdump_from = -1, tickdump_to = -1;
-static struct { uint32_t addr, offset, len; int indirect; } tickdump_r[32];
+static struct { uint32_t addr, offset, len; int indirect, keyinput; } tickdump_r[32];
 static int tickdump_n;
 static FILE* tickdump_f;
 
@@ -315,6 +316,13 @@ static int tickdump_ram(uint32_t addr, uint32_t len) {
 static void tickdump_hit(void) {
 	if (!tickdump_f || tick_total < tickdump_from || tick_total >= tickdump_to) return;
 	for (int r = 0; r < tickdump_n; ++r) {
+		if (tickdump_r[r].keyinput) {
+			// The raw I/O image is updated by a keypad read and may hold the previous keys.
+			uint16_t keys = core->busRead16(core, 0x04000130);
+			fputc(keys & 0xff, tickdump_f);
+			fputc(keys >> 8, tickdump_f);
+			continue;
+		}
 		uint32_t addr = tickdump_r[r].addr, len = tickdump_r[r].len;
 		int readable = 1;
 		if (tickdump_r[r].indirect) {
@@ -561,10 +569,15 @@ int main(int argc, char** argv) {
 			strtok(NULL, " \t\r\n");
 			tickdump_n = 0;
 			for (char* t = strtok(NULL, ", \t\r\n"); t; t = strtok(NULL, ", \t\r\n")) {
-				unsigned addr, offset = 0, len;
-				int end = 0;
-				int indirect = sscanf(t, "%x+%x:%x%n", &addr, &offset, &len, &end) == 3;
-				if (!indirect && sscanf(t, "%x:%x%n", &addr, &len, &end) != 2) end = 0;
+				unsigned addr = 0, offset = 0, len = 2;
+				int indirect = 0, end = 0;
+				int keyinput = !strcmp(t, "keyinput");
+				if (keyinput) {
+					end = sizeof("keyinput") - 1;
+				} else {
+					indirect = sscanf(t, "%x+%x:%x%n", &addr, &offset, &len, &end) == 3;
+					if (!indirect && sscanf(t, "%x:%x%n", &addr, &len, &end) != 2) end = 0;
+				}
 				if (!end || t[end] || !len || tickdump_n == 32 ||
 				    (indirect && ((addr & 3) || !tickdump_ram(addr, 4)))) {
 					fprintf(stderr, "invalid tickdump region: %s\n", t);
@@ -573,6 +586,7 @@ int main(int argc, char** argv) {
 				tickdump_r[tickdump_n].addr = addr;
 				tickdump_r[tickdump_n].offset = offset;
 				tickdump_r[tickdump_n].len = len;
+				tickdump_r[tickdump_n].keyinput = keyinput;
 				tickdump_r[tickdump_n++].indirect = indirect;
 			}
 			if (!tickdump_n) { fprintf(stderr, "tickdump needs at least one region\n"); return 1; }

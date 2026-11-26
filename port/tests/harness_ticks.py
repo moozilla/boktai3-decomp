@@ -7,6 +7,7 @@ import time
 
 ROOT = Path(__file__).resolve().parents[2]
 OUT = ROOT / 'build/emu/tick-test'
+RECORD_BYTES = 12
 
 
 def run(command, headless=False):
@@ -18,7 +19,7 @@ def run(command, headless=False):
 rtc 1763035200
 lux 232
 {command} 08219B24
-tickdump samples 0:24 2000710+5a4:4,3005260:6
+tickdump samples 0:24 2000710+5a4:4,3005260:6,keyinput
 holdt NONE 12
 holdt RIGHT 2
 holdt NONE 10
@@ -34,8 +35,11 @@ holdt NONE 10
     assert 'holdt:' not in result.stderr, result.stderr
     assert not (directory / 'total.exec').exists()
     data = (directory / 'samples.bin').read_bytes()
-    assert len(data) == 240, result.stderr
-    print(f'{name}: {time.monotonic() - start:.2f}s for {len(data) // 10} ticks', flush=True)
+    assert len(data) == 24 * RECORD_BYTES, result.stderr
+    keys = [int.from_bytes(data[i + 10:i + 12], 'little')
+            for i in range(0, len(data), RECORD_BYTES)]
+    assert keys == [0x03ff] * 12 + [0x03ef] * 2 + [0x03ff] * 10, keys
+    print(f'{name}: {time.monotonic() - start:.2f}s for {len(keys)} ticks', flush=True)
     return data
 
 
@@ -44,5 +48,5 @@ if __name__ == '__main__':
     fast = run('fasttick')
     headless = run('fasttick', headless=True)
     assert fast == slow == headless, 'Input tick observations differ'
-    assert any(fast[(i * 10) + 4] & 0x10 for i in range(12, 16)), 'Right press was not observed'
+    assert any(fast[(i * RECORD_BYTES) + 4] & 0x10 for i in range(12, 16)), 'Right press was not observed'
     print('MATCH')

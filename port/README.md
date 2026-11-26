@@ -622,7 +622,8 @@ still match, including the wasm, ROM, saves and verifier files. It reruns failur
 and older results that lack this record. Use a fresh `--out-root` to keep results
 from multiple builds. Results, movies and action logs are under
 `build/autopilot/`. Run `node tools/autopilot/tickdiff.mjs DIR FROM TO` to compare
-RAM around a failing tick.
+RAM and the sampled controller masks around a failing tick. The RAM noise window
+does not suppress controller mismatches.
 
 To rerun the port against previously captured ROM ticks, pass the earlier output
 root to `--rom-reference` and select a separate `--out-root`. The verifier hashes
