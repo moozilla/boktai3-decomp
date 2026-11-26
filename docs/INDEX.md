@@ -627,6 +627,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [notes/scene-pool-states_2026-10-13.md](../notes/scene-pool-states_2026-10-13.md) | Scene pool state family: second contiguous batch | *#scene* | 6 |
 | [notes/scene-pool_2026-10-13.md](../notes/scene-pool_2026-10-13.md) | Scene pool and actor controls, 0803CDF0–0803EE58 | *#actors #scene #tooling* | 5 |
 | [notes/scene-reaction-cleanup_2026-11-26.md](../notes/scene-reaction-cleanup_2026-11-26.md) | Scene actor reaction cleanup | #matching #types #phase3 #scene | 3 |
+| [notes/scene-shared-reaction-route-reset_2026-11-26.md](../notes/scene-shared-reaction-route-reset_2026-11-26.md) | Shared scene reaction route reset | #matching #types #phase3 #scene | 1 |
 | [notes/scene-terrain-steering-return-cleanup_2026-11-26.md](../notes/scene-terrain-steering-return-cleanup_2026-11-26.md) | Terrain traps, steering, and attachment return | #matching #types #phase3 #scene #terrain | 2 |
 | [notes/scene_actor_animation_route_walk.md](../notes/scene_actor_animation_route_walk.md) | Scene actor route walk | #matching #scene-actors | 0 |
 | [notes/scene_actor_contact_candidates.md](../notes/scene_actor_contact_candidates.md) | Scene actor contact candidates | #matching #scene-actors | 1 |
