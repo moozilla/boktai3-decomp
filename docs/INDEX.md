@@ -242,7 +242,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [docs/history/2026-11-17.md](../docs/history/2026-11-17.md) | 2026-11-17 | #compiler #depin #matching #phase3 #round13 #round15 #structs | 3 |
 | [docs/history/2026-11-20.md](../docs/history/2026-11-20.md) | 2026-11-20 | #actors #compiler #matching #monsters #phase3 #scene #scene-actors #tooling #wireless | 2 |
 | [docs/history/2026-11-25.md](../docs/history/2026-11-25.md) | Work log, 2026-11-25 | #actors #assets #compiler #hardware #matching #menu #phase3 #process #scene #tooling | 5 |
-| [docs/history/2026-11-26.md](../docs/history/2026-11-26.md) | Work log, 2026-11-26 | #actors #autopilot #compiler #matching #menu #phase3 #port #scene #scripts #tooling #tools #types #verification | 9 |
+| [docs/history/2026-11-26.md](../docs/history/2026-11-26.md) | Work log, 2026-11-26 | #actors #autopilot #compiler #matching #menu #phase3 #port #scene #scripts #tooling #tools #types #verification | 10 |
 | [docs/history/HANDOFF_2026-10-23.md](../docs/history/HANDOFF_2026-10-23.md) | Handoff: current state and how to continue | #process | 14 |
 | [docs/history/MANAGER_HANDOFF_2026-10-19.md](../docs/history/MANAGER_HANDOFF_2026-10-19.md) | Manager handoff (2026-10-19) | #process #tooling | 6 |
 | [docs/history/README.md](../docs/history/README.md) | Handoff history |  | 17 |
@@ -594,6 +594,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [notes/s5.md](../notes/s5.md) | s5 notes | *#assets* | 13 |
 | [notes/saved-position-marker_2026-10-14.md](../notes/saved-position-marker_2026-10-14.md) | Saved-position marker, 08053D8C–08054294 |  | 2 |
 | [notes/scene-actor-apply-hit-response.md](../notes/scene-actor-apply-hit-response.md) | SceneActorReaction_ApplyHitResponse | *#actors #particles* | 1 |
+| [notes/scene-actor-behavior-cleanup_2026-11-26.md](../notes/scene-actor-behavior-cleanup_2026-11-26.md) | Scene actor behavior cleanup | #matching #types #phase3 #scene | 3 |
 | [notes/scene-actor-cleanup_2026-11-13.md](../notes/scene-actor-cleanup_2026-11-13.md) | Scene actor cleanup, 2026-11-13 | #actors #scene #matching | 7 |
 | [notes/scene-actor-collider-contact_2026-11-01.md](../notes/scene-actor-collider-contact_2026-11-01.md) | scene-actor-collider-contact_2026-11-01.md | *#actors #scene* | 1 |
 | [notes/scene-actor-components_2026-10-30.md](../notes/scene-actor-components_2026-10-30.md) | Canonical scene actor components | #ram #structs #monster #matching | 6 |
