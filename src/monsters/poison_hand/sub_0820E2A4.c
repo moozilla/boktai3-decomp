@@ -67,8 +67,7 @@ s32 PoisonHand_Update(struct PoisonHand *p)
                 s32 i;
                 p->defeated = 1;
                 p->collider.responseValue = 0;
-                i = 0;
-                for (; i <= 7; i++) {
+                for (i = 0; i < 8; i++) {
                     dataOwner = gUnk_0203B000;
                     randomTable = (const u16 *)dataOwner + 512;
                     {
