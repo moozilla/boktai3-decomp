@@ -346,7 +346,10 @@ def _constant_locals(code: str, weights):
         bindings.setdefault(name, []).append(pos)
     assigned = {m[1] for m in re.finditer(r"\b(\w+)\s*=(?!=)", masked)}
     records = None
+    recovered = _fixed_accessor_masks(code)
     for name, pos, end, init in declarators:
+        if pos in recovered:
+            continue
         if init is False:
             continue
         numbered = bool(re.fullmatch(_NUMBER_NAME, name))
@@ -821,21 +824,39 @@ def _header_facts(path, mtime, size):
     return _argument_facts(path.read_text(errors="replace"))
 
 
-def _recovered_operand(params, body, operand):
+def _recovered_operand(owners, body, operand):
     """Recognize reviewed operations by implementation and owning type, independent of name."""
-    formals = [p.strip() for p in params.split(",")]
     expr = f"(gEngineFlags|gScenePauseFlags)&{operand}"
-    if len(formals) == 1 and body == f"return{expr};":
+    if not owners and body == f"return{expr};":
         return True
-    if len(formals) != 2:
+    if len(owners) != 1:
         return False
-    owner = next((m[1] for p in formals if (m := re.fullmatch(
-        r"(?:const\s+)?struct\s+SceneActorChaseTracking\s*\*\s*(\w+)", p))), None)
+    owner = re.fullmatch(r"(?:const\s+)?struct\s+SceneActorChaseTracking\s*\*\s*(\w+)", owners[0])
     if not owner:
         return False
-    field = f"{owner}->flags"
+    field = f"{owner[1]}->flags"
     return body in {f"return{field}&{operand};", f"if({field}&{operand})return1;return0;",
                     f"{field}|={operand};", f"{field}&=~{operand};"}
+
+
+_FIXED_MASK = re.compile(r"\s*(?:const\s+)?(?:" + _SCALAR_TYPE + r")\s+(?P<name>\w+)"
+                         r"\s*(?:;\s*(?P=name)\s*)?=\s*(?P<value>[^;{}]+);")
+
+
+def _fixed_accessor_masks(code):
+    """Bindings in fixed-mask specializations of the reviewed operand operations."""
+    found = set()
+    if "gScenePauseFlags" not in code and "SceneActorChaseTracking" not in code:
+        return found
+    for fn in _INLINE_DEF.finditer(code):
+        init = _FIXED_MASK.match(code, fn.end())
+        if not init or not _is_constant_arg(init["value"]):
+            continue
+        body = re.sub(r"\s+", "", code[init.end():_scope_end(code, fn.end())])
+        owners = [p.strip() for p in fn["params"].split(",") if p.strip() not in ("", "void")]
+        if _recovered_operand(owners, body, init["name"]):
+            found.add(init.start("name"))
+    return found
 
 
 _FUNCTION_DEFINE = re.compile(r"\s*#\s*define\s+(\w+)\(([^()]*)\)\s*(.*)", re.S)
@@ -872,9 +893,10 @@ def _argument_facts(text):
         params = candidates.get(m.start("name"), {})
         line = _line(code, m.start("name"))
         body = re.sub(r"\s+", "", code[m.end():_scope_end(code, m.end())])
-        recovered = any(_recovered_operand(m["params"], body, param)
-                        for param in params.values())
-        definitions[m["name"]] = ({} if recovered else params, "literal-param" in ok.get(line, {}))
+        formals = [p.strip() for p in m["params"].split(",")]
+        unresolved = {i: param for i, param in params.items()
+                      if not _recovered_operand(formals[:i] + formals[i + 1:], body, param)}
+        definitions[m["name"]] = unresolved, "literal-param" in ok.get(line, {})
     for name, pos, params in _staged_macros(code):
         definitions[name] = params, "literal-param" in ok.get(_line(code, pos), {})
     return definitions, _INCLUDE.findall(code)

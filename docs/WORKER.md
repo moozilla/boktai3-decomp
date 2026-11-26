@@ -241,6 +241,8 @@ Use the steering-debt subtotal to compare patches. It charges a parked constant 
 and charges unresolved bit-operation arguments at each call, even when another caller
 passes a runtime value. A transfer warning from land asks for source evidence. The
 combined pause query and reviewed typed tracking operations are documented exceptions.
+A fixed-mask inline that binds a constant and performs exactly one such operation
+gets the same treatment as its parameterized form.
 
 `python3 tools/concessions.py [FILE...]` reports errors (pins, barriers and the other scored
 kinds) and warnings (C a person plausibly would not write; the kinds are in its docstring).

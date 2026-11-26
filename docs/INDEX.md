@@ -345,7 +345,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [notes/finish-player-cue_2026-10-30.md](../notes/finish-player-cue_2026-10-30.md) | Player cue worker batch — 2026-10-30 | #matching #player #cue #compiler | 11 |
 | [notes/finish-player_2026-10-30.md](../notes/finish-player_2026-10-30.md) | Finish-player worker batch | #matching #player #compiler #structs #cleanup #data #studio | 12 |
 | [notes/finish-scene-actors-3_2026-10-30.md](../notes/finish-scene-actors-3_2026-10-30.md) | Finish scene actors, part 3 | #matching #scene-actors #compiler #scope-gap #register-pinning #structs #data #studio | 13 |
-| [notes/flag-accessors_2026-11-25.md](../notes/flag-accessors_2026-11-25.md) | Where Boktai 3 puts the mask in a flag operation | #compiler #phase3 #tooling | 16 |
+| [notes/flag-accessors_2026-11-25.md](../notes/flag-accessors_2026-11-25.md) | Where Boktai 3 puts the mask in a flag operation | #compiler #phase3 #tooling | 17 |
 | [notes/foundry-actor-route-behavior_2026-10-18.md](../notes/foundry-actor-route-behavior_2026-10-18.md) | Actor route and behavior foundry pass | #matching #foundry #scene-actor #route | 2 |
 | [notes/foundry-actor-stats-style_2026-10-18.md](../notes/foundry-actor-stats-style_2026-10-18.md) | Actor stats, preview palette and style foundry pass | #matching #foundry #actor-stats #scene-actor | 2 |
 | [notes/foundry-display-resources_2026-10-18.md](../notes/foundry-display-resources_2026-10-18.md) | Foundry display resource functions, 2026-10-18 | #matching #assets | 2 |

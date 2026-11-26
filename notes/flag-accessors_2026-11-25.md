@@ -126,6 +126,15 @@ single engine word is overwhelmingly word-first. Trigger_UpdateProximity contain
 operation with high confidence, its original inline-versus-macro spelling with lower
 confidence. A generic single-word exception would cover fundamentally different sites.
 
+Holding the mask constant strengthens the pause comparison. For 0x800 the combined
+test is mask-first at 42 of 43 sites across 28 units. The single-word test is
+word-first at 49 of 50 sites across 32 units. Weather_ActiveStorm supplies a
+within-function control for 0x400. At 08017D16 the engine-word load precedes the
+mask. At 08017DD8 the mask precedes both loads of the combined test. The matched
+Weather_IsInterrupted helper binds 1024 to a local. Giving it an integer mask
+parameter and passing 1024 from the caller matches all 496 bytes. Both spellings
+therefore carry the same evidence for the pause operation.
+
 There is direct ABI evidence for both styles of interface. ContactSequenceActor_SetFlags
 and ClearFlags (08045D18, 08045D20) operate on an actor. RegistryE7BC_SetFlags and
 ClearFlags (0811B774, 0811B77C) operate on a pointer. Weather_TestFlags at 08017468
@@ -195,8 +204,8 @@ branch. Even bit-field inference needs the container width, neighboring members 
 other operations for support.
 
 At the worker baseline 9a0f205da the old linter printed 3 errors and 3,607 warnings.
-On the same game source the revised accounting yields 3 errors and 7,280 weighted
-warnings. Steering debt is 7,042 uses, comprising 2,972 literal-local, 1,199
+On the same game source the revised accounting yields 3 errors and 7,275 weighted
+warnings. Steering debt is 7,037 uses, comprising 2,967 literal-local, 1,199
 const-local and 2,871 unresolved constant arguments. These are source-level
 review counts. Previously the corresponding categories were 2,133 lines, 708 lines and
 528 definitions. The increase measures a change of units and coverage on identical game source.
@@ -204,7 +213,11 @@ review counts. Previously the corresponding categories were 2,133 lines, 708 lin
 The whole-tree, single-job summary covered 6,628 files. The final macro extension
 was checked incrementally against that run by inspecting all 208 files defining function
 macros and recounting all six files mentioning the three eligible macros.
-It adds 4 constant arguments. Filtered checks reuse header facts and can skip the
+It adds four constant arguments. Applying the same rule to a fixed-mask inline
+specialization removes five literal-local charges. A scan of all 69 files mentioning
+either owning type or global found those five affected units. The exception requires
+one constant binding followed by the exact reviewed operation on that binding.
+Additional statements or uses still receive ordinary review. Filtered checks reuse header facts and can skip the
 unrelated whole-tree statement-macro inventory.
 
 For a compact expansion-order replay, save the following as build/flag_forms.c:

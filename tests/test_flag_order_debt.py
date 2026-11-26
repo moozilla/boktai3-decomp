@@ -112,3 +112,14 @@ class FlagDebt(unittest.TestCase):
             self.assertEqual(c.main(["--no-compiler", "--summary", str(source)]), 0)
         self.assertIn("steering debt: 3 constant uses", output.getvalue())
         self.assertIn("0 errors, 3 warnings in 1 files", output.getvalue())
+
+    def test_fixed_mask_specializations_use_the_same_evidence(self):
+        pause = ("static inline int Stop(void) { int mask = 1024; "
+                 "return (gEngineFlags | gScenePauseFlags) & mask; }")
+        self.assertEqual(self.debt(pause), 0)
+        self.assertEqual(self.debt(pause.replace("mask = ", "mask; mask = ")), 0)
+        self.assertEqual(self.debt(pause.replace("gScenePauseFlags", "gOther")), 1)
+        self.assertGreater(self.debt(pause.replace("return ", "Log(mask); return ")), 0)
+        flag = "static inline void Set(struct SceneActorChaseTracking *t) { int m = 8; t->flags |= m; }"
+        self.assertEqual(self.debt(flag), 0)
+        self.assertEqual(self.debt(flag.replace("SceneActorChaseTracking", "Actor")), 1)
