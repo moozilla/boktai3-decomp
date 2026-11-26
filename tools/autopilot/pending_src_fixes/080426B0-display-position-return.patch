@@ -1,0 +1,17 @@
+080426B0 display-position-return
+
+After the success branch, the position copy uses r1 through r3 and leaves the display pointer in r0.
+
+The explicit form changed the ROM bytes. The guarded form passed the unit ROM check.
+
+--- a/src/display_animation.c
++++ b/src/display_animation.c
+@@ -165,5 +165,7 @@
+         return -1;
+     *display->position = *position;
+-    /* No return on success: the ROM leaves the incoming display pointer in r0. */
++#ifdef UBFIX
++    return (s32)display; // r0 retains the incoming display pointer
++#endif
+ }
+ 
