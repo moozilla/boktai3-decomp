@@ -1686,17 +1686,12 @@ void SceneLink_RemoveNode(void *);
 
 void Nidhoggr_DestroyParts(struct Nidhoggr *p)
 {
-    s32 i = 0;
-    u8 *a = (u8 *)p->partExtra;
-    u8 *b = (u8 *)p->rows;
-    do {
-        Anim_Remove(b);
+    s32 i;
+    for (i = 0; i < 26; i++) {
+        Anim_Remove(&p->rows[i]);
         Collider_Remove(&p->colliders[i]);
-        SceneLink_RemoveNode(a);
-        a += 0x10;
-        b += 0x60;
-        i++;
-    } while (i <= 0x19);
+        SceneLink_RemoveNode(&p->partExtra[i]);
+    }
 }
 
 extern const struct ContactPosition gUnk_0824F4E4;
@@ -2627,17 +2622,11 @@ void Nidhoggr_InitFirstPhaseParts(struct Nidhoggr *t)
 
 void Nidhoggr_ResetAllPartHealth(struct Nidhoggr *p)
 {
-    s32 i = 0;
-    u8 *a = (u8 *)&p->maxHp;
-    u32 z = 0;
-    u8 *b = p->dead;
-    u16 *d = (u16 *)p->hp;
-    do {
-        *d = *(u16 *)a;
-        b[i] = z;
-        d++;
-        i++;
-    } while (i <= 8);
+    s32 i;
+    for (i = 0; i < 9; i++) {
+        p->hp[i] = p->maxHp;
+        p->dead[i] = 0;
+    }
 }
 
 void Nidhoggr_ClearTargetValues(struct Nidhoggr *p)
