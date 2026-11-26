@@ -17,6 +17,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { openSession, png } from '../../port/agent/session.mjs';
+import { tickAt } from './movie-index.mjs';
 
 const ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname), '../..');
 const args = process.argv.slice(2);
@@ -29,18 +30,30 @@ if (shots) fs.mkdirSync(path.join(out, 'shots'), { recursive: true });
 
 // --from DIR/movie.json: start where an earlier run ended (its movie is replayed).
 const from = opt('--from') ? JSON.parse(fs.readFileSync(opt('--from'), 'utf8')) : null;
+const battery = opt('--save') || from?.save || null;
 const s = await openSession({
   movie: from ? from.movie : undefined, solarLog: from ? from.solar : undefined,
-  save: opt('--save') || (from && from.save) || undefined, render: shots, print: () => {},
+  save: battery || undefined, render: shots, print: () => {},
   lib: [path.join(ROOT, 'port/agent/lib'), path.join(ROOT, 'tools/autopilot/lib')],
+  onBoot: (g) => g.lib.message(),
 });
-// Script-derived stage data (doors, entrances, items, enemies): tools/assets/stages.py json.
-const STAGES = (() => { try { return JSON.parse(fs.readFileSync(path.join(ROOT, 'build/assets/stages.json'), 'utf8')); } catch { return []; } })();
+const venvPython = path.join(ROOT, 'build/venv/bin/python');
+const python = fs.existsSync(venvPython) ? venvPython : 'python3';
+function stageData(file, generator, args, fallback) {
+  file = path.join(ROOT, file);
+  if (goal === 'story' && !fs.existsSync(file)) {
+    const result = spawnSync(python, [path.join(ROOT, generator), ...args], { cwd: ROOT, encoding: 'utf8' });
+    if (result.error || result.status !== 0) throw new Error(`Could not generate ${file}: ${result.error || result.stderr}`);
+  }
+  return fs.existsSync(file) ? JSON.parse(fs.readFileSync(file, 'utf8')) : fallback;
+}
+const STAGES = stageData('build/assets/stages.json', 'tools/assets/stages.py', ['json'], []);
+const LOCKS = stageData('build/autopilot/locks.json', 'tools/autopilot/locks.py', [], {});
 // What carries which reaction flag (tools/autopilot/breakers.py: Breakable_OnHit, the gun's
 // lens table, weapon modifiers, read from the source and the ROM's weapon records).
 const BREAKERS = (() => {
   const f = path.join(ROOT, 'build/autopilot/breakers.json');
-  if (!fs.existsSync(f)) spawnSync('python3', [path.join(ROOT, 'tools/autopilot/breakers.py'), f]);
+  if (!fs.existsSync(f)) spawnSync(python, [path.join(ROOT, 'tools/autopilot/breakers.py'), f]);
   try { return JSON.parse(fs.readFileSync(f, 'utf8')); } catch { return { targets: { Breakable: {} }, lens: [], weapons: [] }; }
 })();
 // means(flag, bags): the lenses and swords that carry the flag, owned first
@@ -48,7 +61,9 @@ const means = (flag, bags) => [
   ...BREAKERS.lens.filter((l) => l.flags & flag).map((l) => ({ kind: 'lens', id: l.id, name: l.name, owned: bags.lenses.includes(l.id) })),
   ...BREAKERS.weapons.filter((w) => w.flags & flag).map((w) => ({ kind: 'sword', id: w.id, name: w.name, owned: bags.swords.includes(w.id) })),
 ].sort((a, b) => b.owned - a.owned);
-const stageOf = (scene) => STAGES.find((x) => x.scene === scene) || { items: [], doors: [], entrances: [] };
+const stageIndex = new Map(STAGES.map((stage) => [stage.scene, stage]));
+const emptyStage = { items: [], doors: [], entrances: [] };
+const stageOf = (scene) => stageIndex.get(scene) || emptyStage;
 const log = [];
 // scenes the run has been in (carried over from --from), for door choice
 const UNREACHABLE = new Set(from && from.unreachable ? from.unreachable : []);  // 'scene:box' doors no route reached
@@ -60,6 +75,8 @@ const event = (what) => {
   const e = { frame: s.frame, ...what };
   log.push(e);
   console.log(JSON.stringify(e));
+  if (e.skill === 'entry' || e.skill === 'room' || e.skill === 'goal')
+    writeMovie('checkpoint.json', { scene: e.scene, x: e.x, y: e.y, z: e.z });
   if (shots) fs.writeFileSync(path.join(out, 'shots', `${String(s.frame).padStart(6, '0')}.png`), png(s.pixels()));
 };
 
@@ -114,17 +131,27 @@ const GOALS = {
   *story(g, L) {
     if (!from && !(yield* GOALS.m1(g, L))) return false;
     const visited = VISITED, limit = +(opt('--scenes', 8));
-    let prev;
+    let prev, keyGoal;
+    const failedKeyRooms = new Set();
     for (let rooms = 0; rooms < limit; rooms++) {
-      const doorsHere = () => (L.hub() ? stageOf(L.where().scene).doors.filter((d) => d.hub !== undefined && (!d.hubMenu || d.hubMenu === L.hub().kind))
-          .filter((d, i, all) => all.findIndex((e) => e.hub === d.hub) === i)  // one per entry (its conditional destinations)
-        : stageOf(L.where().scene).doors.filter((d) => L.boxes().some((b) => b.name === d.box)));
-      if (!(yield* untilControl(g, L, () => doorsHere().length > 0, 120, 30000))) { event({ skill: 'stop', why: 'no control with a door in 30000 frames', ...L.where() }); return rooms > 0; }
+      const doorsHere = (resolve = true) => {
+        const doors = stageOf(L.where().scene).doors, hub = L.hub();
+        if (hub) {
+          const entries = doors.filter((d) => d.hub !== undefined && (!d.hubMenu || d.hubMenu === hub.kind));
+          return resolve ? L.doorBranches(entries, (d) => d.hub) : entries;
+        }
+        const boxes = new Set(L.boxes().map((b) => b.name));
+        const portals = doors.filter((d) => boxes.has(d.box));
+        return resolve ? L.doorBranches(portals, (d) => d.box) : portals;
+      };
+      const ready = () => doorsHere(false).length > 0 || L.fightTargets().length > 0;
+      if (!(yield* untilControl(g, L, ready, 120, 30000))) { event({ skill: 'stop', why: 'no control with a door or enemy in 30000 frames', ...L.where() }); return rooms > 0; }
+      event({ skill: 'entry', ...L.where(), story: L.story() });
       // enemies in the room: fight them first (the "defeat all" rooms lock the doors)
-      if (L.enemies().some((e) => e.alive && !(L.fightIgnored && L.fightIgnored.has(e.addr)))) {
+      if (L.fightTargets().length) {
         const f = yield* L.fight({ trace: (e) => event({ skill: 'fight', ...e }) });
         event({ skill: 'fought', ...f, scene: L.where().scene });
-        if (!(yield* untilControl(g, L, () => doorsHere().length > 0, 60, 30000))) { event({ skill: 'stop', why: 'no control after the fight', ...L.where() }); return rooms > 0; }
+        if (!(yield* untilControl(g, L, ready, 60, 30000))) { event({ skill: 'stop', why: 'no control after the fight', ...L.where() }); return rooms > 0; }
       }
       const here = L.where().scene;
       // healing: below a third of the life bar with something in the item bag, find the
@@ -132,10 +159,10 @@ const GOALS = {
       {
         const p = $player(g) && g.$.gPlayers[0], life = () => g.$.gPlayers[0] ? g.$.gPlayers[0].currentStatA : 0;
         if (p && p.maximumStatA && p.currentStatA * 3 < p.maximumStatA && L.bags().items.length) {
-          const life0 = p.currentStatA, items0 = JSON.stringify(L.bags().items);
-          // items page only (L/R over the other pages crashed the port); the life bar fills
-          // over many frames, so a used item is judged by the bag changing as well
-          const r = yield* L.menuSearch(() => life() > life0 || JSON.stringify(L.bags().items) !== items0,
+          const life0 = p.currentStatA;
+          // Judge the actual life gain so the search keeps solar fruit and
+          // passes over items with unrelated effects.
+          const r = yield* L.menuSearch(() => life() > life0,
             { max: 300, page: 1, keys: ['down', 'right', 'up', 'left', 'a', 'b'], settle: 90 });
           if (r.done) yield g.press(0, 120);
           event({ skill: 'heal', from: life0, to: life(), ...r });
@@ -168,6 +195,8 @@ const GOALS = {
             event({ skill: 'menu', goal: `lens ${way.name}`, ...m });
             qc = yield* L.quickChange({ gun: true, lens: way.id });
           }
+          const frame = yield* L.equipBestFrame();
+          if (frame) event({ skill: 'equip', ...frame });
           const ch = yield* L.chargeEnergy(6);
           event({ skill: 'equip', ...way, quickChange: qc, charge: ch });
           const changed = () => { const b = L.breakables().find((x) => x.id === live.id); return !b || b.state !== live.state; };
@@ -204,6 +233,11 @@ const GOALS = {
           const t = t0;
           const story0 = L.story(), now = t.addr ? L.people().find((q) => q.addr === t.addr) : null;
           const r = yield* L.interact(now ? now.x : t.x, now ? now.z : t.z, { avoid: stageOf(here).doors.map((d) => d.box), trace: (e) => event({ skill: 'nav', ...e }) });
+          if (L.shopState()) {
+            const purchase = yield* L.buyHealing();
+            event({ skill: 'shop', scene: here, ...purchase });
+            yield* L.leaveShop();
+          }
           // a shop or service menu the talk opened: back out of it
           for (let i = 0; i < 8 && !$player(g); i++) { yield g.press('b', 2); yield g.press(0, 10); yield* L.clearInterruptions({}); }
           if (round === 0 && r.done) TRIED.add(tkey(t));  // a failed talk is tried again on the next visit
@@ -224,16 +258,37 @@ const GOALS = {
       if (L.where().scene !== here) { rooms--; continue; }
       visited.add(here);
       if (prev !== undefined) visited.add(prev);
+      if (keyGoal && L.bags().items.includes(keyGoal.item)) keyGoal = undefined;
+      if (keyGoal && here === keyGoal.scene) {
+        failedKeyRooms.add(`${keyGoal.item}:${here}`);
+        keyGoal = undefined;
+      }
       // --toward SCENE: a door there first; --goal SCENE: the door on the shortest route
       // over the door graph (stages.json); then unvisited scenes
       const toward = rooms === 0 ? +opt('--toward', -1) : -1;
       // with no --goal: explore, the door on the shortest route (over doors not known to
       // be unreachable) to the nearest scene not visited yet
-      const dist = +opt('--goal', -1) >= 0 ? routeDistances(+opt('--goal', -1)) : exploreDistances(here, visited);
+      const dist = keyGoal ? routeDistances(keyGoal.scene, keyGoal.blocked)
+        : +opt('--goal', -1) >= 0 ? routeDistances(+opt('--goal', -1)) : exploreDistances(here, visited);
       VISITS.set(here, (VISITS.get(here) || 0) + 1);
       const doors = doorsHere().sort((a, b) => (b.scene === toward) - (a.scene === toward) ||
         (dist.get(a.scene) ?? 1e9) - (dist.get(b.scene) ?? 1e9) || visited.has(a.scene) - visited.has(b.scene) ||
         (VISITS.get(a.scene) || 0) - (VISITS.get(b.scene) || 0));
+      const lock = doors.length && L.closedLock(LOCKS[here] || [], doors[0].box);
+      if (!keyGoal && lock && !L.bags().items.includes(lock.item)) {
+        const blocked = `${here}:${lock.box}`;
+        const keyRoutes = STAGES.filter((st) => st.scene !== here && !failedKeyRooms.has(`${lock.item}:${st.scene}`) &&
+            st.items.some((it) => it.category === 0 && it.item === lock.item))
+          .map((st) => ({ scene: st.scene, dist: routeDistances(st.scene, blocked) }))
+          .filter((r) => r.dist.has(here)).sort((a, b) => a.dist.get(here) - b.dist.get(here));
+        if (keyRoutes.length) {
+          const route = keyRoutes[0];
+          keyGoal = { item: lock.item, scene: route.scene, blocked };
+          doors.sort((a, b) => (a.box === lock.box) - (b.box === lock.box) ||
+            (route.dist.get(a.scene) ?? Infinity) - (route.dist.get(b.scene) ?? Infinity));
+          event({ skill: 'key', scene: here, box: lock.box, item: lock.item, toward: route.scene });
+        }
+      }
       event({ skill: 'room', ...L.where(), doors: doors.map((d) => `${d.hub !== undefined ? 'hub' + d.hub : d.box}->${d.scene}`) });
       let moved = false;
       // a room can still be playing its arrival event (a dialogue that starts late, the
@@ -327,14 +382,14 @@ function exploreDistances(here, visited) {
 
 // Door-graph distances to GOAL (breadth first over stages.json doors, walked backwards):
 // scene -> number of doors to the goal. Empty without a goal.
-function routeDistances(goal) {
+function routeDistances(goal, blocked) {
   const d = new Map();
   if (goal < 0) return d;
   d.set(goal, 0);
   for (let frontier = [goal]; frontier.length;) {
     const next = [];
     for (const st of STAGES) for (const door of st.doors)
-      if (frontier.includes(door.scene) && !d.has(st.scene)) { d.set(st.scene, d.get(door.scene) + 1); next.push(st.scene); }
+      if (`${st.scene}:${door.box}` !== blocked && frontier.includes(door.scene) && !d.has(st.scene)) { d.set(st.scene, d.get(door.scene) + 1); next.push(st.scene); }
     frontier = next;
   }
   return d;
@@ -344,11 +399,20 @@ function routeDistances(goal) {
 // the room's chests and items (the usual ask), then try again.
 function* throughDoor(g, L, box) {
   const scene = L.where().scene, tried = new Set();
+  const avoid = stageOf(scene).doors.map((d) => d.box).filter((b) => b !== box);
+  const lock = L.closedLock(LOCKS[scene] || [], box);
+  if (lock && L.bags().items.includes(lock.item)) {
+    const door = stageOf(scene).doors.find((d) => d.box === box);
+    if (door?.x !== undefined && door.z !== undefined) {
+      const r = yield* L.interact(door.x, door.z, { avoid });
+      event({ skill: 'unlock', scene, box, item: lock.item, ...r });
+      if (L.where().scene !== scene) return true;
+    }
+  }
   let fights = 0;
   for (let attempt = 0; attempt < 6; attempt++) {
-    const avoid = stageOf(scene).doors.map((d) => d.box).filter((b) => b !== box);
     // enemies that appear on the way (a scripted ambush, a boss after its banner): fight
-    const foes = () => L.enemies().concat(L.targets().filter((t) => t.health !== null)).some((e) => e.alive && !(L.fightIgnored && L.fightIgnored.has(e.addr)));
+    const foes = () => L.fightTargets().length > 0;
     const r = yield* L.navigate(box, { avoid, stopIf: foes, trace: (e) => event({ skill: 'nav', ...e }) });
     event({ skill: 'navigate', box, ...r, from: scene });
     if (r.reached) return true;
@@ -419,15 +483,19 @@ if (!GOALS[goal]) { console.error(`unknown goal ${goal} (${Object.keys(GOALS).jo
 const t0 = performance.now();
 // The keys each input read saw (Input_UpdatePadStates runs once per game tick; the
 // port has no lag frames, the hardware does, so replays key inputs to these reads).
-// readAt[n]: frame n ran an input read (truncated with the movie on a restore).
-const readAt = [];
-if (from && from.readFrames) for (const n of from.readFrames) readAt[n] = 1;
+let readFrames = from?.readFrames?.slice() ?? [];
+let rooms = from?.rooms?.slice() ?? [];
 const snapshot = s.snapshot, restore = s.restore;
-s.snapshot = () => ({ ...snapshot(), readAt: readAt.slice() });
-s.restore = (snap) => { restore(snap); readAt.length = 0; for (let i = 0; i < snap.movie; i++) readAt[i] = snap.readAt[i]; };
+s.snapshot = () => ({ ...snapshot(), readFrames: readFrames.slice(), rooms: rooms.slice() });
+s.restore = (snap) => { restore(snap); readFrames = snap.readFrames.slice(); rooms = snap.rooms.slice(); };
 const ok = s.run(function* (g) {
   g.lib.session = s;
-  g.on('Input_UpdatePadStates', () => { readAt[s.frame] = 1; });
+  const gameState = g.types.globals.gGameState.addr;
+  g.on('Input_UpdatePadStates', () => {
+    if (readFrames.at(-1) !== s.frame) readFrames.push(s.frame);
+    const state = g.u32(gameState), scene = state ? g.u32(state + 0x5a4) : 0;
+    if (scene && rooms.at(-1)?.scene !== scene) rooms.push({ frame: s.frame, scene });
+  });
   // --life N: set the player's life to N before the goal (a port-only test aid, e.g. of
   // healing; such a run cannot be verified on the ROM)
   if (opt('--life') && g.$.gPlayers[0]) g.$.gPlayers[0].currentStatA = +opt('--life');
@@ -438,18 +506,16 @@ const ok = s.run(function* (g) {
 const secs = (performance.now() - t0) / 1000;
 const end = s.run(function* (g) {
   const w = g.lib.where();
-  return { scene: w.scene, x: w.x, y: w.y, z: w.z, ...(s.solarLog.length ? { solar: g.lib.solarStatus() } : {}) };
+  return { scene: w.scene, story: g.lib.story(), x: w.x, y: w.y, z: w.z,
+    ...(s.solarLog.length ? { solar: g.lib.solarStatus() } : {}) };
 });
 
 const movie = s.movie.map((k) => k | 0);
-const readFrames = [];
-for (let n = 0; n < movie.length; n++) if (readAt[n]) readFrames.push(n);
+readFrames = readFrames.filter((n) => n < movie.length);
+rooms = rooms.filter((entry) => entry.frame < movie.length);
 const reads = readFrames.map((n) => movie[n]);
-function readFramesOf() { return readFrames; }
-// a savestate on the ROM at each room the run entered: the input read index there
-const allEvents = [...(from && from.rooms ? from.rooms : []), ...log.filter((e) => e.skill === 'room' || e.skill === 'goal').map((e) => ({ frame: e.frame, scene: e.scene }))];
-const saves = allEvents.map((e) => ({ at: readFrames.filter((n) => n < e.frame).length, name: `scene_${e.scene}_f${e.frame}` }));
-fs.writeFileSync(path.join(out, 'movie.json'), JSON.stringify({ goal, save: opt('--save') || (from && from.save) || null, frames: movie.length, end, visited: [...VISITED], tried: [...TRIED], unreachable: [...UNREACHABLE], rooms: allEvents, solar: s.solarLog, readFrames, movie }));
+const saves = rooms.map(({ frame, scene }) => ({ at: tickAt(readFrames, frame), name: `scene_${scene}_f${frame}` }));
+writeMovie('movie.json', end);
 fs.writeFileSync(path.join(out, 'harness.txt'), harnessScript(reads, saves, `autopilot ${goal}: ${ok ? 'reached' : 'NOT reached'}; port end ${JSON.stringify(end)}`));
 fs.writeFileSync(path.join(out, 'log.json'), JSON.stringify(log, null, 1));
 console.log(`${goal}: ${ok ? 'reached' : 'NOT reached'} at frame ${s.frame} (${secs.toFixed(1)} s), end ${JSON.stringify(end)} -> ${path.relative(ROOT, out)}`);
@@ -457,6 +523,20 @@ let verified = true;
 if (args.includes('--verify') && opt('--life')) console.log('--verify skipped: --life changed the port\'s memory');
 else if (args.includes('--verify')) verified = verify(end);
 process.exit(ok && verified ? 0 : 1);
+
+// Refresh the resume point at each room before trying its exits. If the
+// port traps while testing a later step, this still contains accepted input.
+function writeMovie(file, end) {
+  const frames = s.movie.length;
+  const movie = {
+    goal, save: battery, frames, end, visited: [...VISITED], tried: [...TRIED], unreachable: [...UNREACHABLE],
+    rooms: rooms.filter((entry) => entry.frame < frames), solar: s.solarLog,
+    readFrames: readFrames.slice(0, tickAt(readFrames, frames)), movie: s.movie,
+  };
+  const dst = path.join(out, file);
+  fs.writeFileSync(dst + '.tmp', JSON.stringify(movie));
+  fs.renameSync(dst + '.tmp', dst);
+}
 
 // The run as a tools/emu/harness script for the original ROM: `holdt KEYS N` holds
 // keys for N calls of Input_UpdatePadStates (tick), so the ROM sees the same keys
@@ -470,9 +550,10 @@ function harnessScript(reads, saves, title) {
   const lines = [`# ${title}`, '# generated by tools/autopilot/autopilot.mjs (inputs keyed to game ticks)',
     args.includes('--coverage') ? 'trace on' : 'trace off', `rtc ${time}`, 'lux 232', `tick ${tick.toString(16).toUpperCase()}`];
   // sensor changes (session solar log, by frame) as `lux` lines before the first tick at or after them
-  const lux = s.solarLog.map(([f, v]) => ({ at: readFramesOf().filter((n) => n < f).length, lux: v }));
+  const lux = s.solarLog.map(([f, v]) => ({ at: tickAt(readFrames, f), lux: v }));
   const marks = [...saves, ...lux].sort((a, b) => a.at - b.at);
-  for (let i = 0, m = 0; i < reads.length;) {
+  let m = 0;
+  for (let i = 0; i < reads.length;) {
     while (m < marks.length && marks[m].at <= i) { const k = marks[m++]; lines.push(k.lux !== undefined ? `lux ${k.lux}` : `save ${k.name}`); }
     let j = i;
     const stop = m < marks.length ? marks[m].at : Infinity;
@@ -481,6 +562,7 @@ function harnessScript(reads, saves, title) {
     lines.push(`holdt ${keys} ${j - i}`);
     i = j;
   }
+  for (; m < marks.length; m++) { const k = marks[m]; lines.push(k.lux !== undefined ? `lux ${k.lux}` : `save ${k.name}`); }
   lines.push('holdt NONE 1', 'dump ewram 02000000:40000', 'dump iwram 03000000:8000', 'shot end');
   return lines.join('\n') + '\n';
 }
@@ -491,20 +573,27 @@ function verify(end) {
   const dir = path.join(out, 'rom');
   fs.mkdirSync(dir, { recursive: true });
   const harness = path.join(ROOT, 'tools/emu/harness');
-  const r = spawnSync(harness, [path.join(ROOT, 'baserom.gba'), path.join(out, 'harness.txt'), dir], { encoding: 'utf8', maxBuffer: 1 << 26 });
+  const env = { ...process.env };
+  delete env.BOKTAI3_SAV;
+  if (battery) env.BOKTAI3_SAV = path.resolve(battery);
+  const r = spawnSync(harness, [path.join(ROOT, 'baserom.gba'), path.join(out, 'harness.txt'), dir], { env, encoding: 'utf8', maxBuffer: 1 << 26 });
+  if (r.error || r.status !== 0) throw new Error(`ROM harness failed: ${r.error || r.stderr || r.signal || r.status}`);
   const warn = (r.stderr || '').split('\n').filter((l) => /ticks$|not reached|times in|error/i.test(l));
   const ew = fs.readFileSync(path.join(dir, 'ewram.bin')), iw = fs.readFileSync(path.join(dir, 'iwram.bin'));
   const rd = (addr, n) => { const b = addr >= 0x03000000 ? iw : ew, o = addr - (addr >= 0x03000000 ? 0x03000000 : 0x02000000); return n === 2 ? b.readInt16LE(o) : b.readUInt32LE(o); };
-  const gs = rd(0x02000710, 4), scene = rd(gs + 0x5a4, 4);
+  const gs = rd(0x02000710, 4), scene = gs ? rd(gs + 0x5a4, 4) : undefined;
   const players = s.types.globals.gPlayers.addr, p = rd(players, 4);
   const pos = p ? { x: rd(p + 0x30, 2), y: rd(p + 0x32, 2), z: rd(p + 0x34, 2) } : {};
-  const rom = { scene, ...pos };
+  const vars = rd(s.types.globals.gGameVariables.addr, 4);
+  const rom = { scene, story: vars ? rd(vars + 0x3c, 2) : null, ...pos };
   if (end.solar) rom.solar = { measurement: rd(s.types.globals.gSolarMeasurement.addr, 4) | 0,
     intensity: gs ? rd(gs + 0x874, 2) : 0, level: gs ? rd(gs + 0x876, 2) : 0 };
-  const same = rom.scene === end.scene && rom.x === end.x && rom.z === end.z &&
+  const same = !warn.some((line) => line.startsWith('holdt:')) &&
+    rom.scene === end.scene && rom.story === end.story &&
+    rom.x === end.x && rom.y === end.y && rom.z === end.z &&
     (!end.solar || (rom.solar.intensity === end.solar.intensity && rom.solar.level === end.solar.level));
   console.log(`verify on ROM: ${same ? 'MATCH' : 'DIFFER'} rom ${JSON.stringify(rom)} port ${JSON.stringify(end)}${warn.length ? ' ' + warn.join('; ') : ''}`);
-  if (args.includes('--coverage')) coverage(path.join(dir, 'total.exec'));
+  if (same && args.includes('--coverage')) coverage(path.join(dir, 'total.exec'));
   for (const f of fs.readdirSync(dir)) if (/^total\./.test(f)) fs.rmSync(path.join(dir, f));
   return same;
 }

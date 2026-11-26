@@ -207,6 +207,13 @@ exports.clearInterruptions = function* (opts = {}) {
   let any = false;
   opts.seen = opts.seen || new Map();
   for (let i = 0; i < 20; i++) {
+    if (exports.gameOverActive?.() && exports.activeMenu()?.name === 'GameOver_OnUpdate') {
+      const step = yield* exports.menuStep(opts.policy || {});
+      if (opts.trace) opts.trace({ menu: step.menu, keys: step.keys });
+      any = true;
+      if (!step.done) break;
+      continue;
+    }
     const m = exports.message();
     if (m.open) {
       const id = m.id;
@@ -239,6 +246,7 @@ exports.navigate = function* (target, opts = {}) {
   const done = (reached, reason, extra) => ({ reached, reason, scene: exports.where().scene, frames: g.frameNo - start, plans, ...extra });
   while (g.frameNo - start < budget) {
     if (exports.where().scene !== scene0) return done(true, 'scene changed');
+    if (opts.stopIf?.()) return done(false, 'stopped');
     const grid = exports.grid(), p = $.gPlayers[0];
     if (!grid || !p) { yield 1; continue; }
     let goals = new Set(), aim;
@@ -323,13 +331,14 @@ exports.navigate = function* (target, opts = {}) {
     }
     if (interrupted) continue;
     // at the goal: push into the box's middle (a door triggers on contact)
+    if (opts.stopIf?.()) return done(false, 'stopped');
     const here2 = exports.cellOf(p.position.x, p.position.z);
     if (goals.has(here2.join(','))) {
       const r = yield* exports.walkTo(aim[0], aim[1], { tolerance: 8, patience: 120 });
       if (exports.where().scene !== scene0) return done(true, 'scene changed');
       if (yield* exports.clearInterruptions(opts)) continue;
       if (typeof target !== 'string' && r.reached) return done(true, 'arrived');
-      yield g.until(() => exports.where().scene !== scene0 || exports.message().open, opts.eventWait ?? 600);
+      yield g.until(() => exports.where().scene !== scene0 || exports.message().open || opts.stopIf?.(), opts.eventWait ?? 600);
       if (exports.where().scene !== scene0) return done(true, 'scene changed');
       if (yield* exports.clearInterruptions(opts)) continue;
       if (++pushes > 3) return done(false, 'at the box, no transition');
@@ -447,7 +456,9 @@ exports.weapon = () => {
   const gs = g.u32(g.types.globals.gGameState.addr), s16 = (o) => g.u16(gs + o) << 16 >> 16;
   const slot = s16(0x50), aux = s16(0x54), li = s16(0x90 + aux * 2);
   const p = $.gPlayers[0];
-  return { slot, gun: slot > 7, lens: li >= 0 ? s16(0x828 + li * 2) : -1, energy: p ? p.currentStatB : 0, energyMax: p ? p.maximumStatB : 0 };
+  const frameSlot = slot >= 8 && slot < 16 ? s16(0x68 + slot * 2) : -1;
+  const frame = frameSlot >= 0 && frameSlot < 16 ? s16(0x4c0 + frameSlot * 2) - 1 : -1;
+  return { slot, gun: slot > 7, frame, lens: li >= 0 ? s16(0x828 + li * 2) : -1, energy: p ? p.currentStatB : 0, energyMax: p ? p.maximumStatB : 0 };
 };
 
 // Quick Change (Otenko 8759/8893: hold SELECT and press R to swap the sword and the gun,
@@ -588,7 +599,7 @@ exports.chooseHub = function* (index, opts = {}) {
 // Script_DecodeVariableValue).
 // San Miguel's facility flags r708[0x19a.0][i] (one bit each; proc 2566 needs ten of them).
 exports.facilities = () => { const b = g.u32(g.types.globals.gGameVariables.addr); if (!b) return []; const v = g.u16(b + 0x19a) | (g.u8(b + 0x19c) << 16); const out = []; for (let i = 0; i < 16; i++) if (v & (1 << i)) out.push(i); return out; };
-exports.story = () => { const b = g.u32(g.types.globals.gGameVariables.addr); return b ? g.u8(b + 0x3c) : null; };
+exports.story = () => { const b = g.u32(g.types.globals.gGameVariables.addr); return b ? g.s16(b + 0x3c) : null; };
 
 // People in a town (src/scene_actor_lifecycle.c SceneActorManager: head, then each
 // actor's previous; body.id is the character's id as place_character gives it).
@@ -687,7 +698,7 @@ exports.enemies = () => {
     if (!actor) break;
     const a = g.at(actor, 'struct RoomActor');
     const pos = a.body.position;
-    out.push({ addr: actor, category: a.category, health: a.health, alive: a.health > 0 && !(a.statusFlags & 0x20000),
+    out.push({ addr: actor, category: a.category, health: a.health, alive: a.health > 0 && !(a.statusFlags & 0x20000), hitLock: a.hitLockTimer,
       x: pos.x, y: pos.y, z: pos.z, state: a.state2A8, view: a });
     node = g.u32(node);
   }
@@ -722,31 +733,72 @@ exports.targets = () => {
   return out;
 };
 
+let ignoredScene, ignored;
+exports.fightTargets = () => {
+  const scene = exports.where().scene;
+  if (scene !== ignoredScene) {
+    ignoredScene = scene;
+    ignored = new Set();
+  }
+  // The scene heap can give a later enemy the same address.
+  const bosses = exports.vampireTargets();
+  const reg = bosses.concat(exports.enemies().filter((e) => e.alive && !ignored.has(e.addr) &&
+    !bosses.some((boss) => boss.addr === e.addr)));
+  const owners = new Set(reg.map((e) => e.addr));
+  for (const t of exports.targets()) {
+    if (t.alive && t.health !== null && !owners.has(t.addr) && !ignored.has(t.addr)) {
+      reg.push(t);
+      owners.add(t.addr);
+    }
+  }
+  return reg;
+};
+
 exports.fight = function* (opts = {}) {
   const S = exports.session, p = $.gPlayers[0], start = g.frameNo, scene = exports.where().scene;
   const DIRS8 = ['up', 'down', 'left', 'right', 'up+left', 'up+right', 'down+left', 'down+right'];
-  // a target that takes no damage for 40 steps is not a fight (a scripted thief,
-  // an invulnerable actor): leave it alone
-  const ignored = exports.fightIgnored || (exports.fightIgnored = new Set()), progress = new Map();
-  // registry enemies, plus lock-on targets outside the registry (bosses, armors)
-  const living = () => {
-    const reg = exports.enemies().filter((e) => e.alive && !ignored.has(e.addr));
-    const more = exports.targets().filter((t) => t.alive && t.health !== null && !reg.some((e) => e.addr === t.addr) && !ignored.has(t.addr));
-    return reg.concat(more);
-  };
+  const progress = new Map(), living = exports.fightTargets, triedOtherWeapon = new Set();
+  const initialGun = exports.weapon().gun;
+  const initialLight = S.solar;
   const hpSum = () => living().reduce((s, e) => s + Math.max(0, e.health), 0);
   const toward = (e) => {
     const dx = e.x - p.position.x, dz = e.z - p.position.z;
     const sx = Math.abs(dx) > 40 ? Math.sign(dx) : 0, sz = Math.abs(dz) > 40 ? Math.sign(dz) : 0;
     return KEY8[`${sx},${sz}`];
   };
-  const life = () => exports.where().life ?? 0;
+  const life = () => $.gPlayers[0]?.currentStatA ?? 0;
   let steps = 0;
-  while (living().length && g.frameNo - start < (opts.frames ?? 6000) && exports.where().scene === scene) {
+  while (exports.where().scene === scene && p && life() > 0 && living().length && g.frameNo - start < (opts.frames ?? 6000)) {
     if (yield* exports.clearInterruptions(opts)) continue;
-    const target = living().sort((a, b) => Math.hypot(a.x - p.position.x, a.z - p.position.z) - Math.hypot(b.x - p.position.x, b.z - p.position.z))[0];
+    const distance = (e) => Math.hypot(e.x - p.position.x, e.z - p.position.z);
+    const target = living().sort((a, b) => distance(a) - distance(b))[0];
     const tk = toward(target);
-    const tactics = [...DIRS8.map((k) => [[k, 12]]), [['b', 2], [0, 10]], ...(tk ? [[[tk, 6], ['b', 2], [0, 4]]] : [])];
+    const weapon = exports.weapon();
+    const frame = exports.gunFrame();
+    if (target.solarWeak && S.solar > 64) {
+      S.setSolar(64);
+      if (opts.trace) opts.trace({ boss: target.boss, threshold: 64 });
+    }
+    const pr = progress.get(target.addr) || { hp: target.health, since: steps };
+    if (target.health < pr.hp) { pr.hp = target.health; pr.since = steps; }
+    progress.set(target.addr, pr);
+    if (frame && weapon.energy < frame.cost && distance(target) > 512 && !pr.triedCharge) {
+      pr.triedCharge = true;
+      const charge = yield* exports.chargeEnergy(frame.cost, { stopIf: () => living().some((e) => distance(e) < 512) });
+      if (charge.done) continue;
+    }
+    if (!triedOtherWeapon.has(target.addr) && exports.bags().frames.length &&
+        ((frame && weapon.energy < frame.cost) || steps - pr.since >= 8)) {
+      triedOtherWeapon.add(target.addr);
+      const equip = yield* exports.quickChange({ gun: !weapon.gun });
+      if (opts.trace) opts.trace({ equip, target: target.addr });
+      if (equip.done) continue;
+    }
+    const tactics = DIRS8.map((k) => [[k, 12]]);
+    if (weapon.gun) tactics.push(...exports.gunTactics(tk));
+    else tactics.push([['b', 2], [0, 10]], ...(tk ? [[[tk, 6], ['b', 2], [0, 4]]] : []));
+    const wait = exports.combatWait(target);
+    if (target.boss || wait) tactics.push([[0, wait || 18]]);
     const root = S.snapshot(), hp0 = hpSum(), life0 = life();
     let best = null;
     for (const t of tactics) {
@@ -754,21 +806,23 @@ exports.fight = function* (opts = {}) {
       for (const [k, n] of t) yield g.press(k, n);
       if (exports.where().scene !== scene) continue;  // walked out through a door
       const mid = S.snapshot();
-      yield g.press(0, opts.look ?? 20);
+      yield g.press(0, opts.look ?? (target.boss ? 60 : weapon.gun ? 40 : 20));
       if (exports.where().scene !== scene) continue;
       const dealt = hp0 - hpSum(), lost = life0 - life();
       const e = living()[0], dist = e ? Math.hypot(e.x - p.position.x, e.z - p.position.z) : 0;
-      const score = dealt - (opts.lifeCost ?? 3) * lost - dist / 400;
+      const spent = Math.max(0, weapon.energy - exports.weapon().energy);
+      const score = dealt - (opts.lifeCost ?? 3) * lost - spent / 8 - dist / 400 - (life() > 0 ? 0 : 10000);
       if (!best || score > best.score) best = { score, t, mid };
     }
     if (!best) { S.restore(root); break; }
     S.restore(best.mid);
     steps++;
-    const pr = progress.get(target.addr) || { hp: target.health, since: steps };
-    if (target.health < pr.hp) { pr.hp = target.health; pr.since = steps; }
-    progress.set(target.addr, pr);
-    if (steps - pr.since > 40) { ignored.add(target.addr); if (opts.trace) opts.trace({ ignore: target.addr, category: target.category }); }
+    // Some targets are scripted actors or invulnerable during this encounter.
+    if (!target.boss && steps - pr.since > 40) { ignored.add(target.addr); if (opts.trace) opts.trace({ ignore: target.addr, category: target.category }); }
     if (opts.trace && steps % 10 === 0) opts.trace({ fight: steps, hp: hpSum(), life: life(), enemies: living().length });
   }
-  return { won: !living().length, life: life(), frames: g.frameNo - start, steps };
+  S.setSolar(initialLight);
+  if (exports.where().scene === scene && life() > 0 && exports.weapon().gun !== initialGun)
+    yield* exports.quickChange({ gun: initialGun });
+  return { won: exports.where().scene === scene && life() > 0 && !living().length, life: life(), frames: g.frameNo - start, steps };
 };
