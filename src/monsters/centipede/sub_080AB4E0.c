@@ -3,12 +3,8 @@
 void Centipede_ResetRouteHistory(struct RoomActor *actor)
 {
     struct TentacleBody *body = actor->context;
-    u16 *cell = &actor->terrainCell;
-    u16 *dst = body->routeHistory;
-    s32 i = 5;
-    do {
-        *dst++ = *cell;
-        i--;
-    } while (i >= 0);
+    s32 i;
+    for (i = 0; i < 6; i++)
+        body->routeHistory[i] = actor->terrainCell;
     body->routeHistoryIndex = 0;
 }
