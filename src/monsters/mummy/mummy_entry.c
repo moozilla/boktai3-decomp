@@ -1,4 +1,5 @@
 #include "global.h"
+#include "scene/actor/scene_actor_damage_flash.h"
 #include "scene/actor/scene_actor_drawable_flags.h"
 #include "scene/actor/scene_actor_reaction.h"
 #include "scene/motion/scene_actor_availability.h"
@@ -273,9 +274,8 @@ void Mummy_UpdateDying(struct ChaseActor *actor, s32 frame)
 {
     struct SceneActorControlMotionDrawable *drawable = actor->base.drawable;
     struct DisplaySequenceState *sequence = &drawable->sequence;
-    u8 *part = (u8 *)&actor->group;
+    struct SceneActorChaseGroup *group = &actor->group;
     u32 mask;
-    s32 off;
     if (SceneActorReaction_TakePrepared(actor)) {
         u32 test;
         u16 *flags;
@@ -294,9 +294,7 @@ void Mummy_UpdateDying(struct ChaseActor *actor, s32 frame)
     if (Mod(frame, 60) == 0) {
         SceneActorAttachment_ReplaceResponseSlot(actor, 2, 0, actor->base.category);
     }
-    off = 0xF9;
-    off <<= 1;
-    if ((*((s16 *)(part + off))) <= 0) {
+    if ((s16)group->field5C6 <= 0) {
         mask = 0x80;
         mask <<= 5;
         if (!(actor->base.statusFlags & mask)) {
@@ -2590,20 +2588,7 @@ void Mummy_UpdateBurnDamage(struct ChaseActor *actor)
             collider = (u8 *)initial;
             damageFlags = flags;
             if (!masked) {
-                u16 bank = actor->base.paletteAlternateBank;
-                {
-                    struct ChaseActor *p = actor;
-                    if (p->base.drawableKind == 0)
-                        AnimData_SelectPaletteBank((u8 *)p->base.drawable + 0x2C, bank);
-                    else {
-                        struct ChaseActor *q = actor;
-                        *(u8 **)((u8 *)q->base.drawable + 0x68) = gPaletteBankData + bank * 32;
-                    }
-                }
-                {
-                    u32 n = 8;
-                    actor->base.flashTimer = n;
-                }
+                SceneActorDamage_Flash(actor);
                 SceneActorChase_SetActorFlags(actor, 0x8000);
                 if (ShouldShowDamage(actor)) {
                     // concession-ok(const-local): CpuSet reads this fixed word twice to clear the damage buffer.
