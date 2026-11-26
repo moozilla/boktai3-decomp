@@ -16,14 +16,14 @@ void SceneActorMovement_ResolveRoutePosition(struct ChaseActor *actor)
     struct ContactPosition target;
     struct ChaseActor *owner = actor;
     struct ChaseActor *base = owner;
-    u8 *control = (u8 *)owner + 0x3D4;
+    struct SceneActorChaseGroup *group = &owner->group;
     void *context;
     {
         struct ContactPosition *p = &target;
-        struct SceneActorRouteCursor *route = (void *)((u8 *)owner + 0x448);
+        struct SceneActorRegistryRoute *route = &owner->group.homeRoute;
         s32 cell;
         {
-            struct SceneActorRoutePoint *point = route->point;
+            struct SceneActorChaseRoutePoint *point = route->point;
             p->x = point->x;
             p->z = point->z;
         }
@@ -31,7 +31,7 @@ void SceneActorMovement_ResolveRoutePosition(struct ChaseActor *actor)
         p->y = SceneActorTerrain_GetHeight(cell, p);
     }
     target.y = base->base.body.position.y;
-    context = *(void **)(control + 0x1FC);
+    context = group->route;
     if (!Nav_IsPositionInMesh(context, &base->base.body.position, &target))
         goto failed;
     {
