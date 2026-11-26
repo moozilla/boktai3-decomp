@@ -1,4 +1,5 @@
 #include "monsters/centipede/centipede_body.h"
+#include "engine/video/sprite.h"
 #include "scene/motion/scene_actor_availability.h"
 
 s32 Mod(s32, s32);
@@ -14,13 +15,15 @@ void Centipede_ShiftSegmentTrail(struct ChaseActor *actor)
 {
     struct TentacleBody *g;
     struct ContactPosition carry;
+    struct DisplaySequenceSprite *sprite;
     s32 i;
     if (SceneActor_ActionsBlocked(actor))
         return;
     g = actor->base.context;
     if (Mod(actor->base.frameCounter, g->unknown874))
         return;
-    carry = *(struct ContactPosition *)((u8 *)actor->base.drawable + 0x1c);
+    sprite = actor->base.drawable;
+    carry = sprite->position;
     for (i = 0; i < g->segmentCount; i++) {
         if (TestMask(&g->segments[i], 2) && !TestMask(&g->segments[i], 1)) {
             struct ContactPosition t = g->segments[i].position;
