@@ -335,7 +335,7 @@ exports.navigate = function* (target, opts = {}) {
     if (opts.stopIf?.()) return done(false, 'stopped');
     const here2 = exports.cellOf(p.position.x, p.position.z);
     if (goals.has(here2.join(','))) {
-      const r = yield* exports.walkTo(aim[0], aim[1], { tolerance: 8, patience: 120 });
+      const r = yield* exports.walkTo(aim[0], aim[1], { tolerance: opts.tolerance ?? 8, patience: 120 });
       if (exports.where().scene !== scene0) return done(true, 'scene changed');
       if (yield* exports.clearInterruptions(opts)) continue;
       if (typeof target !== 'string' && r.reached) return done(true, 'arrived');

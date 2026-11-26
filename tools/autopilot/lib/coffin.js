@@ -36,7 +36,7 @@ exports.carryCoffin = function* (door, opts) {
   g.keys = keys | g.keyMask('a');
   try {
     const route = yield* exports.navigate(door, { ...opts,
-      stopIf: () => lostGrip() || opts.stopIf?.(),
+      stopIf: () => lostGrip() || Boolean(opts.stopIf?.()),
       beforeText: () => { reading = true; g.keys = keys; } });
     if (!route.reached && lostGrip()) return { grabbed: true, ...route, reason: 'lost grip' };
     return { grabbed: true, ...route };

@@ -248,6 +248,46 @@ test('coffin navigation holds A until the exit text opens', () => {
   assert.equal(g.keys, 0);
 });
 
+test('purification brings the trailing coffin across the live panel center', () => {
+  let story = 59;
+  const panel = { initialMode: 0, effectState: 0, subjectCount: 0, subjects: [], center: { x: 100, z: 100 } };
+  const game = { gScenePanel: panel, gTetherActor: { position: { x: 100, z: 0 } },
+    gPlayers: [{ position: { x: 100, z: 90 } }] };
+  const lib = skill('purification', { fn: { ScriptUtility_IsControlFlagSet: () => false } }, game, {
+    where: () => ({ scene: 1 }), story: () => story, coffinAvailable: () => true,
+    carryCoffin: function* (target, opts) {
+      assert.deepEqual(target, [100, 190]);
+      assert.equal(opts.stopIf(), false);
+      panel.effectState = 1;
+      assert.equal(opts.stopIf(), true);
+      story++;
+      return { grabbed: true, reached: false, reason: 'stopped' };
+    },
+  });
+  assert.equal(lib.purificationPanel(), true);
+  assert.deepEqual(lib.preparePurification().next(), { done: true, value: { done: true } });
+});
+
+test('Battle Drive waits while the rig is trapped above the coffin', () => {
+  let scene = 1, threshold;
+  const g = { frameNo: 0, fn: { ScriptUtility_IsControlFlagSet: () => false },
+    press: (key, frames) => ({ key, frames }) };
+  const game = { gScenePanel: { initialMode: 1, effectState: 10, rig: { state: 2 } },
+    gGameState: { unk618: 100 }, gPlayers: [{ currentStatA: 80 }] };
+  const lib = skill('purification-battle', g, game, {
+    session: { setSolar: (value) => { threshold = value; } },
+    where: () => ({ scene }), story: () => 59,
+    clearInterruptions: function* () { return false; },
+  });
+  assert.equal(lib.purificationBattle(), true);
+  const fight = lib.fightPurification();
+  assert.deepEqual(fight.next().value, { key: 0, frames: 30 });
+  assert.equal(threshold, 64);
+  game.gGameState.unk618 = 0;
+  scene = 2;
+  assert.deepEqual(fight.next(), { done: true, value: { done: true, steps: 0, darkness: 0, life: 80 } });
+});
+
 test('armor targets model damage to the guard and the contact cooldown', () => {
   const fields = { 0xb1c: 240, 0xb20: 65, 0xb2c: 9, 0xb32: 2 };
   const read = (addr) => fields[addr - 0x02010000] ?? 0;

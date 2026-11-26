@@ -83,6 +83,8 @@ const event = (what) => {
     writeMovie('checkpoint.json', { scene: e.scene, x: e.x, y: e.y, z: e.z });
   if (e.skill === 'fight' && (e.dialogue !== undefined || e.trance || e.fight !== undefined))
     writeMovie('checkpoint.json', s.g.lib.where());
+  if ((e.skill === 'purification' && e.phase !== undefined) || (e.skill === 'drive' && e.steps !== undefined))
+    writeMovie('checkpoint.json', s.g.lib.where());
   if (shots) fs.writeFileSync(path.join(out, 'shots', `${String(s.frame).padStart(6, '0')}.png`), png(s.pixels()));
 };
 
@@ -158,7 +160,7 @@ const GOALS = {
         const portals = doors.filter((d) => boxes.has(d.box));
         return resolve ? L.doorBranches(portals, (d) => d.box) : portals;
       };
-      const ready = () => reached() || doorsHere(false).length > 0 || L.fightTargets().length > 0;
+      const ready = () => reached() || L.purificationPanel() || L.purificationBattle() || doorsHere(false).length > 0 || L.fightTargets().length > 0;
       if (!(yield* untilControl(g, L, ready, 120, 30000))) { event({ skill: 'stop', why: 'no control with a door or enemy in 30000 frames', ...L.where() }); return !endpoint && rooms > 0; }
       event({ skill: 'entry', ...L.where(), story: L.story() });
       if (reached()) {
@@ -174,6 +176,19 @@ const GOALS = {
         if (!(yield* untilControl(g, L, ready, 60, 30000))) { event({ skill: 'stop', why: 'no control after the fight', ...L.where() }); return !endpoint && rooms > 0; }
       }
       const here = L.where().scene;
+      if (L.purificationBattle()) {
+        const result = yield* L.fightPurification({ trace: (e) => event({ skill: 'drive', ...e }) });
+        event({ skill: 'drive-result', ...result, scene: L.where().scene, story: L.story() });
+        if (result.done) continue;
+        return false;
+      }
+      if (L.purificationPanel()) {
+        const result = yield* L.preparePurification({ avoid: stageOf(here).doors.map((d) => d.box),
+          trace: (e) => event({ skill: 'purification', ...e }) });
+        event({ skill: 'purification-result', ...result, scene: L.where().scene, story: L.story() });
+        if (result.done) continue;
+        return false;
+      }
       if (L.coffinAvailable()) {
         const before = L.story(), advanced = () => L.story() > before;
         for (const { box, cond } of ESCORT_TARGETS[here] || []) {
