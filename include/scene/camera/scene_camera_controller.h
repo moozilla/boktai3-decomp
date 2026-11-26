@@ -3,13 +3,14 @@
 
 #include "engine/task.h"
 #include "engine/video/render.h"
+#include "script/demo_manager.h"
 
 /* Task allocated at 082275D8. Both position paths share the scene offsets. */
 struct SceneCameraController {
     struct Task task;
     u32 id;
     u16 moving, completionMode;
-    u8 receiver[0x34];
+    struct SceneMessageReceiver receiver;
     u16 secondaryMode, secondaryTimer;
     struct CameraPosition saved, target;
     u16 positionMode, positionTimer;

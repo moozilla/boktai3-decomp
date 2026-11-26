@@ -9,8 +9,6 @@ struct Vec {
     s16 x, y, z;
 };
 
-int SceneMessages_RegisterReceiver(u8 *p, int id, int kind);
-
 static inline int project(int input)
 {
     int v = input * 3;
@@ -57,7 +55,7 @@ s32 Camera_Initialize(struct SceneCameraController *c, u32 id)
     c->rate = 0;
     updateScroll();
     if (!(gEngineFlags & 0x800))
-        SceneMessages_RegisterReceiver(c->receiver, c->id, 6);
+        SceneMessages_RegisterReceiver(&c->receiver, c->id, 6);
     gActiveCamera = (void *)c;
     return 0;
 }
