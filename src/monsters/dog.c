@@ -2828,8 +2828,8 @@ s32 Dog_Init(void *object)
     SceneActor_RefreshLivingCountAndProfile(actor);
     if (MonsterInit_GetDrawableKind(actor) == 0) {
         u8 *heap;
-        actor->base.drawable = Heap_Alloc(0x5C);
-        Memory_Clear(actor->base.drawable, 0x5C);
+        actor->base.drawable = Heap_Alloc(sizeof(struct SceneActorAnimationSequenceDrawable));
+        Memory_Clear(actor->base.drawable, sizeof(struct SceneActorAnimationSequenceDrawable));
         heap = MonsterInit_Drawable(actor);
         MonsterInit_InitializeSprite(heap, 0xD635, 0xF6E7);
         if (MonsterInit_GetCategory(actor) == 0x11 || MonsterInit_GetCategory(actor) == 0x17)
@@ -2837,8 +2837,8 @@ s32 Dog_Init(void *object)
         actor->base.body.direction = 0;
     } else {
         u8 *heap;
-        actor->base.drawable = Heap_Alloc(0x80);
-        Memory_Clear(actor->base.drawable, 0x80);
+        actor->base.drawable = Heap_Alloc(sizeof(struct SceneActorAnimationTileDrawable));
+        Memory_Clear(actor->base.drawable, sizeof(struct SceneActorAnimationTileDrawable));
         heap = MonsterInit_Drawable(actor);
         MonsterInit_ClearPosition(&zero, &tmp);
         MonsterInit_InitializeWidget(heap, 0xCB05, 0xD635, &tmp);
