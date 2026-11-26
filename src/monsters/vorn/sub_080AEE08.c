@@ -13,14 +13,6 @@ void SceneActor_CallContextScriptB(void *);
 void Vorn_SendMessage(void *);
 void SceneActorPlacement_PlayCategoryEventSound(void *);
 
-static inline u16 Vorn_GetDefeatScript(struct ChaseActor *actor)
-{
-    return actor->base.script1F8;
-}
-static inline s32 Vorn_GetScriptParameter(struct ChaseActor *actor, u32 index)
-{
-    return actor->base.parameters1FC[index];
-}
 static inline u8 Vorn_RandomSparkCount(const u16 *table, u32 *cursor)
 {
     u32 index = (*cursor + 1) & 1023;
@@ -137,14 +129,14 @@ void Vorn_UpdateDefeat(struct ChaseActor *actor)
             category == 0x18 || category == 0x19)
             Sound_PlaySong(0xE5);
     }
-    script = Vorn_GetDefeatScript(actor);
+    script = actor->base.script1F8;
     if (script) {
         values[0] = actor->base.body.position.x;
         values[1] = actor->base.body.position.y;
         values[2] = actor->base.body.position.z;
-        values[3] = Vorn_GetScriptParameter(actor, 0);
-        values[4] = Vorn_GetScriptParameter(actor, 1);
-        values[5] = Vorn_GetScriptParameter(actor, 2);
+        values[3] = actor->base.parameters1FC[0];
+        values[4] = actor->base.parameters1FC[1];
+        values[5] = actor->base.parameters1FC[2];
         values[6] = actor->base.hitOwners;
         values[7] = actor->base.body.id;
         arguments.count = 8;
@@ -159,7 +151,7 @@ void Vorn_UpdateDefeat(struct ChaseActor *actor)
     {
         u32 mask = 1;
         if (!actor->base.drawableKind)
-            *((u32 *)actor->base.drawable) |= mask;
+            ((struct SceneActorRegistrySequenceDrawable *)actor->base.drawable)->flags |= mask;
         else
             Vorn_SetTileFlags(
                 &((struct SceneActorAnimationTileDrawable *)actor->base.drawable)->tile, mask);
