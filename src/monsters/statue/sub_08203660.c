@@ -2,7 +2,7 @@
 #include "monsters/statue.h"
 #include "global.h"
 void Bestiary_UnlockEntry(s32);
-void sub_08159164(s32);
+void Player_AddExperience(s32);
 #define H(p, n) (*(s16 *)((u8 *)(p) + (n)))
 static inline s32 clamp(s32 v)
 {
@@ -33,7 +33,7 @@ void Statue_RecordDefeat(struct Statue *p)
     Bestiary_UnlockEntry(28);
     if (p->hitFlags & 1) {
         u16 flags;
-        sub_08159164(p->unknown158);
+        Player_AddExperience(p->unknown158);
         H(gGameState, 0x87C) = H(gGameState, 0x87C) < 9999 ? H(gGameState, 0x87C) + 1 : 9999;
         H(gGameState, 0x538) = H(gGameState, 0x538) < 9999 ? H(gGameState, 0x538) + 1 : 9999;
         flags = p->bodyReactionFlags;

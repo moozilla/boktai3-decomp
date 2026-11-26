@@ -20,7 +20,7 @@ void AreaEffect_AccumulatePlayerResource(struct AreaEffectManager *manager, s32 
     struct Player *player;
     if (gEngineFlags & 0x100) {
         object->idleFrame = 0;
-    } else if ((*(u16 *)gPadState)) {
+    } else if (gPadState[0]) {
         object->idleFrame = 0;
     } else if (object->idleFrame <= 899) {
         object->idleFrame++;

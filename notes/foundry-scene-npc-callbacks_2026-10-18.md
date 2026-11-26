@@ -30,7 +30,7 @@ blend count is decremented by 081D25AC. Existing fields retain their offsets.
 The final header check passed for the existing matched consumer.
 
 081D1908 interpolates 5-bit RGB palette channels; the provisional alias is
-SceneNpc_BlendPalette. 081D2118 feeds it alternating 60-frame ramps.
+Kuro_BlendPalette. 081D2118 feeds it alternating 60-frame ramps.
 The state callback table at 0861265C is provisionally gSceneNpcStateCallbacks.
 Names remain low confidence; animation and projection ownership come from
 known callees, while state/command meanings follow the existing StateActor view.

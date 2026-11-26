@@ -5,13 +5,13 @@ struct EquipmentDescriptor {
     u8 modifierA, unknownD[3], modifierB, unknown11[3], modifierC, unknown15[11];
 };
 void Inventory_GetEquipmentDescriptor(s32, void *);
-void Shop_PrepareEquipmentDescriptor(struct SceneInventoryPanel *,
+void Shop_PrepareEquipmentDescriptor(struct ShopPanel *,
                                                struct EquipmentDescriptor *);
 void Presentation_ApplyGraphicData(void *, void *);
 void Presentation_ApplyGraphicSettings(void *, const void *);
 void Presentation_ApplyPackedGraphicData(const void *, const void *);
 u32 Presentation_SelectGraphicResource(void *);
-void sub_0805F904(struct SceneInventoryPanel *panel)
+void sub_0805F904(struct ShopPanel *panel)
 {
     struct EquipmentDescriptor descriptor;
     struct SceneValueEquipment fallback;

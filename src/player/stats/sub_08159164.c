@@ -29,7 +29,6 @@ static inline u32 Both(struct Player *p)
     return 1;
 }
 // confidence=low: enemy and script rewards add capped experience with opposing player bonuses.
-#define Player_AddExperience sub_08159164
 void Player_AddExperience(s32 input)
 {
     s32 amount = input;

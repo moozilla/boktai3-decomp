@@ -31,13 +31,9 @@ int ActorPool_UnlinkObject(struct ActorPoolManager *manager, struct PooledActor 
 void ActorPool_RefreshTargets(struct ActorPoolManager *manager)
 {
     int i;
-    struct SceneActorBody **out = manager->targets;
-    struct Player **src = gPlayers;
     for (i = 0; i < 4; i++) {
-        struct Player *player = *src;
-        *out = player ? (struct SceneActorBody *)&player->positionalEffectGroup : 0;
-        out++;
-        src++;
+        struct Player *player = gPlayers[i];
+        manager->targets[i] = player ? (struct SceneActorBody *)&player->positionalEffectGroup : 0;
     }
 }
 

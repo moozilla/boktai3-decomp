@@ -9,6 +9,27 @@ import layoutmerge as lm
 from pycparser import c_ast, c_parser
 
 
+class EvidenceParser(c_parser.CParser):
+    """Parse GNU statement expressions wherever a primary expression can appear."""
+
+    def _parse_assignment_expression(self):
+        # pycparser recognizes a statement expression here and returns early,
+        # leaving following operators such as << unconsumed.
+        expr = self._parse_conditional_expression()
+        if self._is_assignment_op():
+            op = self._advance().value
+            return c_ast.Assignment(op, expr, self._parse_assignment_expression(), expr.coord)
+        return expr
+
+    def _parse_primary_expression(self):
+        if self._peek_type() == "LPAREN" and self._peek_type(2) == "LBRACE":
+            self._advance()
+            expr = self._parse_compound_statement()
+            self._expect("RPAREN")
+            return expr
+        return super()._parse_primary_expression()
+
+
 def record_key(node, spell=None):
     if not node.coord:
         return None
@@ -231,12 +252,12 @@ def parse(text, path, *, declarations_only=False):
     body = lm.strip_bodies(text)
     error = None
     try:
-        ast = c_parser.CParser().parse(lm.pycparser_text(lm.strip_gnu(body if declarations_only else text)), path)
+        ast = EvidenceParser().parse(lm.pycparser_text(lm.strip_gnu(body if declarations_only else text)), path)
     except c_parser.ParseError as exc:
         if declarations_only:
             raise
         error = str(exc)
-        ast = c_parser.CParser().parse(lm.pycparser_text(lm.strip_gnu(body)), path)
+        ast = EvidenceParser().parse(lm.pycparser_text(lm.strip_gnu(body)), path)
     # Prevent local tags from replacing the file-scope definitions in layoutmerge.TU.
     ext = [node.decl if isinstance(node, c_ast.FuncDef) else node for node in ast.ext]
     tu = lm.TU(c_ast.FileAST(ext))

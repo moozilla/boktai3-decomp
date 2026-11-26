@@ -20,7 +20,7 @@
 
 #include "scene/motion/scene_actor_route.h"
 
-#include "npc/cutscene_actor/actor_animation_controller.h"
+#include "ui/title/actor_animation_controller.h"
 
 #include "engine/video/display_sequence.h"
 

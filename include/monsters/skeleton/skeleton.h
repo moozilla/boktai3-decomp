@@ -3,7 +3,7 @@
 #include "scene/motion/scene_actor_chase_reaction.h"
 #include "scene/actor/scene_actor_control_phase.h"
 #include "scene/motion/scene_actor_terrain.h"
-#include "npc/cutscene_actor/actor_animation_controller.h"
+#include "ui/title/actor_animation_controller.h"
 #include "monsters/scene_actor_init_primitives.h"
 #include "monsters/scene_actor_init_group.h"
 #include "scene/actor/scene_actor_init_dispatch.h"
@@ -31,19 +31,22 @@ struct Skeleton {
     u8 unknown700[2];
     u8 parameter702;
     u8 attempts; /* distance reactions tried since the last reset */
-    u8 unknown704[2];
+    u16 actionCooldown; /* Frames until the next timed turn or action. */
     u16 parameter706;
     u32 nearDistance, farDistance; /* target distance bands for the reaction choice */
-    u8 unknown710[8];
+    struct ContactPosition capturedTargetPosition;
     s32 healthThreshold;
     struct ChaseRouteProbe routeProbe;
     struct ContactPosition destination;
-    u8 unknown748[4];
+    u16 visibilityFrame; /* Frames elapsed in the visibility flicker transition. */
+    u8 unknown74A[2];
 };
+
+typedef char SkeletonSize[(sizeof(struct Skeleton) == 0x74C) ? 1 : -1];
 
 void SceneActorScript_TriggerCallOnCount(struct ChaseActor *actor);
 u8 SceneActorReaction_IsRangeReady(struct ChaseActor *actor);
-u8 sub_0812F3CC(struct ChaseActor *);
+u8 SceneActorReaction_BeginContactResponse(struct ChaseActor *);
 void Skeleton_UpdateTargetTransition(struct ChaseActor *a);
 void Anim_SetDurationScale(void *, u32);
 void Anim_SetFrameDurationScale(void *, u32);
@@ -54,8 +57,7 @@ void SceneActorApproach_UpdateRange(struct ChaseActor *actor);
 extern const u32 gUnk_086060B4[];
 s32 SceneActorReaction_TickHiddenResponse(struct ChaseActor *actor);
 void SceneActorControl_DispatchControl(void *);
-struct SkeletonActionFlagsActor;
-s32 Skeleton_UpdateActionFlags(struct SkeletonActionFlagsActor *p);
+s32 Skeleton_UpdateActionFlags(struct Skeleton *p);
 extern u32 gUnk_02000560;
 void SceneActorPlacement_ConsumeShakeFlags(struct ChaseActor *);
 void SceneActorTarget_OnBindingChanged(struct ChaseActor *);

@@ -239,7 +239,7 @@ void *ActorAttachment_UpdateFromDescriptor(void *, void *, u32, u32, u32, u32, u
 
 void SceneParticleBurst_CreateWhilePaused(void *, void *, void *, u32, u32, u32);
 
-s32 AnimatedParticles_Create(s32, void *, const void *);
+s32 ImpactBurst_Create(s32, void *, const void *);
 
 s32 DisplayAnimation_SelectPaletteBank(struct DisplayAnimation *, u32);
 
@@ -295,7 +295,7 @@ s32 Div(s32, s32);
 
 void Obj_StepPosition(void *);
 
-u32 NamedObject_FindNearPosition(struct ContactPosition *);
+u32 MovingPlatform_FindNearPosition(struct ContactPosition *);
 
 void NavMesh_UpdateProbe(void *, void *);
 
@@ -766,7 +766,7 @@ void TetherActor_EmitPointEffect(const struct ContactPackedVector *source, const
         position.z = z + (sample & 31);
     }
     position.y = position.y - 16 - (ParticleRandom_ReadDirectSample(table) & 63);
-    AnimatedParticles_Create(1, &position, config);
+    ImpactBurst_Create(1, &position, config);
 }
 
 void TetherActor_UpdateGlow(struct TetherActor *actor)
@@ -2913,7 +2913,7 @@ u32 TetherActor_TestStepPosition(struct ContactPosition *origin, struct ContactP
         difference = -difference;
     if (difference > 50)
         return 0;
-    if (NamedObject_FindNearPosition(candidate))
+    if (MovingPlatform_FindNearPosition(candidate))
         return 0;
     return 1;
 }

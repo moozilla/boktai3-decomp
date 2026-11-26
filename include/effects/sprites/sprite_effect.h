@@ -64,7 +64,7 @@ void Collider_SetAttackProperties(void *, s32, s32, s32, s32, s32);
 void Shadow_Destroy(void *);
 void Shadow_Initialize(void *, void *, u32);
 u8 *TerrainModifiers_FindCellOverride(s32, s32);
-void sub_08014634(u32, u32, void *, void *, void *, u32, u32);
+void ImpactParticleGroup_SpawnBouncing(u32, u32, void *, void *, void *, u32, u32);
 s32 Mod(s32, s32);
 s32 Div(s32, s32);
 void TerrainOverlay_QueueRemoveActor(void *);

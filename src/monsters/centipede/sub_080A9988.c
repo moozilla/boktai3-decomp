@@ -1,80 +1,33 @@
-#include "monsters/centipede/centipede_segment_animation.h"
-#include "global.h"
+#include "monsters/centipede/centipede_body.h"
+#include "engine/video/sprite.h"
+#include "scene/motion/scene_actor_availability.h"
 
-struct Pos080A9988 {
-    u32 v[2];
-};
-struct Entry080A9988 {
-    u8 pad0[0x1c];
-    struct Pos080A9988 pos;
-    u8 pad24[0x105 - 0x24];
-    u8 flags;
-    u8 pad106[0x114 - 0x106];
-    struct Pos080A9988 prev;
-    u8 pad11C[0x128 - 0x11C];
-};
-struct Group080A9988 {
-    u8 pad0[0x3d4];
-    struct Entry080A9988 entries[4];
-};
-struct Body080A9988 {
-    u8 pad0[4];
-    u8 *obj;
-    u8 pad8[0x2ca - 8];
-    u16 f2CA;
-    u8 pad2CC[0x3d0 - 0x2cc];
-    struct Group080A9988 *g;
-};
 s32 Mod(s32, s32);
 
-inline static u8 blocked(u8 *c)
+inline static u8 TestMask(struct TentacleAnimationSegment *e, char mask)
 {
-    u32 mask;
-    u32 *p;
-    u32 off;
-    if (!c)
-        goto zero;
-    mask = 0x40;
-    off = 0xB5;
-    off <<= 2;
-    p = (u32 *)(c + off);
-    if ((*((u16 *)p)) & mask)
-        goto one;
-    mask = 0x80;
-    mask <<= 10;
-    off -= 4;
-    p = (u32 *)(c + off);
-    if ((*p) & mask)
-        goto one;
-    if ((*((s16 *)(c + 0x9C))) > 0)
-        goto zero;
-one:
-    return 1;
-zero:
-    return 0;
-}
-inline static u8 TestMask(struct Entry080A9988 *e, char mask)
-{
-    if (e->flags & mask)
+    if (e->animation.status & mask)
         return 1;
     return 0;
 }
 
-void Centipede_ShiftSegmentTrail(struct Body080A9988 *p)
+void Centipede_ShiftSegmentTrail(struct ChaseActor *actor)
 {
-    struct Group080A9988 *g;
-    struct Pos080A9988 carry;
+    struct TentacleBody *g;
+    struct ContactPosition carry;
+    struct DisplaySequenceSprite *sprite;
     s32 i;
-    if (blocked((u8 *)p))
+    if (SceneActor_ActionsBlocked(actor))
         return;
-    g = p->g;
-    if (Mod(p->f2CA, *((u8 *)g + 0x874)))
+    g = actor->base.context;
+    if (Mod(actor->base.frameCounter, g->unknown874))
         return;
-    carry = *(struct Pos080A9988 *)(p->obj + 0x1c);
-    for (i = 0; i < ((struct TentacleBodyAnimationView *)g)->segmentCount; i++) {
-        if (TestMask(&g->entries[i], 2) && !TestMask(&g->entries[i], 1)) {
-            struct Pos080A9988 t = g->entries[i].pos;
-            g->entries[i].prev = carry;
+    sprite = actor->base.drawable;
+    carry = sprite->position;
+    for (i = 0; i < g->segmentCount; i++) {
+        if (TestMask(&g->segments[i], 2) && !TestMask(&g->segments[i], 1)) {
+            struct ContactPosition t = g->segments[i].position;
+            g->segments[i].targetPosition = carry;
             carry = t;
         }
     }

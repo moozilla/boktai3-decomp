@@ -3,7 +3,7 @@
 #include "scene/motion/scene_actor_terrain_reaction.h"
 #include "global.h"
 
-u8 sub_0812F3CC(struct ChaseActor *);
+u8 SceneActorReaction_BeginContactResponse(struct ChaseActor *);
 void SceneActorControl_UpdateEntryTransition(struct ChaseActor *actor)
 {
     u8 result;
@@ -12,7 +12,7 @@ void SceneActorControl_UpdateEntryTransition(struct ChaseActor *actor)
         SceneActorTerrain_InstallControl(actor, actor->base.onEntry, 2);
     }
     if (!(u8)Callback_InvokeActor(actor, actor->base.contactQuery.opaque)) {
-        result = sub_0812F3CC(actor);
+        result = SceneActorReaction_BeginContactResponse(actor);
         if (!result) {
             if (actor->base.stepDone) {
                 SceneActorAnimation_SelectDirectionalEntry(actor, 0);

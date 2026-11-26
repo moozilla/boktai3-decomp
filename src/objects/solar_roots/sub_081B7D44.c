@@ -21,7 +21,6 @@ void SceneBody_Unregister(void *);
 void Sprite_Remove(void *);
 void Collider_Remove(void *);
 void TerrainModifiers_UnregisterCell(void *);
-#define GrowthManager_Destroy sub_081B7D44
 s32 GrowthManager_Destroy(struct GrowthManager *manager)
 {
     s32 i;

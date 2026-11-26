@@ -42,7 +42,7 @@ void SceneActors_RunSecondEventScript(void *, void *);
 void Anim_SetFrameDurationScale(void *, u16);
 void Anim_SetKeyframes(void *, void *, u32, u32, u32);
 void GameState_SetEventFlag(u32);
-void AnimatedParticles_EmitBurst(void *, u32, u32, u32, u32, u32, u32, u32);
+void ImpactBurst_EmitBurst(void *, u32, u32, u32, u32, u32, u32, u32);
 void MotionEntry_CreateWithDelta(void *, void *, s32, u32);
 s32 sub_08249420(u32, u32);
 s32 sub_08249498(u32, u32);
@@ -210,7 +210,7 @@ void sub_081A14FC(struct Hresvelgr *saved, u32 tick)
                     SetVector(&position, (RandomValue(table.samples) >> 3) % 1024 - 512, 0,
                               -((RandomValue(table.samples) >> 3) % 256));
                     AddVector(&position, &position, &saved->position);
-                    AnimatedParticles_EmitBurst(&position, 7, 0, 64, 4, 4, 4, 4);
+                    ImpactBurst_EmitBurst(&position, 7, 0, 64, 4, 4, 4, 4);
                 }
                 if (action->frame == 1)
                     SceneActors_StartUnmirroredAnimation(saved, actor->animation,
@@ -227,7 +227,7 @@ void sub_081A14FC(struct Hresvelgr *saved, u32 tick)
             saved->velocity = actor->delta;
             actor->delta.y--;
             if (!(tick & 7) && action->frame == 1)
-                AnimatedParticles_EmitBurst(&saved->position, 2, 0, 64, 8, 8, 4, 4);
+                ImpactBurst_EmitBurst(&saved->position, 2, 0, 64, 8, 8, 4, 4);
             break;
         }
         case 3:

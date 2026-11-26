@@ -50,9 +50,7 @@ struct AxeTrailSprite {
 
 void Axe_EmitMotionTrail(struct ChaseActor *actor);
 
-struct AxeActor;
-
-void Axe_UpdateReturningTrail(struct AxeActor *p, s32 frame);
+void Axe_UpdateReturningTrail(struct ChaseActor *p, s32 frame);
 
 void Axe_UpdateTrailFadeIn(struct ChaseActor *actor, s32 frame)
 {
@@ -75,42 +73,11 @@ void Axe_UpdateTrailFadeIn(struct ChaseActor *actor, s32 frame)
 
 // confidence=low: axe attack behavior inferred from orbit and trail state updates.
 
-// Two instructions differ: the global address load is scheduled after the stack-vector address.
-
 // confidence=low: sends the axe trail toward the player, then returns it to the actor.
-
-struct AxeTrail {
-    u8 unknown0[0xA24];
-    struct ContactPosition position, velocity;
-    u8 angle, heading, spinRate;
-    u8 unknownA37[0x405];
-    u8 angleDecay, speed;
-};
-
-struct AxeActor {
-    u8 unknown0[4];
-    u8 *sprite;
-    u8 unknown8[0x54];
-    struct ContactPosition position;
-    u8 unknown64[0x85];
-    u8 facing;
-    u8 unknownEA[0x1A];
-    u32 word104;
-    u8 unknown108[0xC];
-    u32 flags114;
-    u8 unknown118[0x104];
-    void *callback;
-    u8 unknown220[0x90];
-    u8 state, unknown2B1, entered, unknown2B3[2], phase;
-    u8 unknown2B6[0x12];
-    u16 timer;
-    u8 unknown2CA[0x106];
-    struct AxeTrail *trail;
-};
 
 extern const s16 gUnk_086149C4[];
 
-void Axe_UpdateTrailColliders(u8 *actor);
+void Axe_UpdateTrailColliders(struct ChaseActor *actor);
 
 void ActorPhase_EmitTrailSprite(struct ChaseActor *actor, const struct ContactPosition *position,
                                 u32 angle);
@@ -164,54 +131,49 @@ static inline s32 Absolute(s32 value)
     return value;
 }
 
-void Axe_UpdateReturningTrail(struct AxeActor *p, s32 frame)
+void Axe_UpdateReturningTrail(struct ChaseActor *p, s32 frame)
 {
-    struct AxeTrail *trail = p->trail;
+    struct Axe *trail = p->base.context;
     u32 previous;
-    if (SceneActorControl_TakeFlag(&p->entered)) {
-        *(u32 *)p->sprite |= 2;
-        Velocity(&trail->velocity, p->facing, 12);
-        trail->heading = p->facing;
-        trail->position = p->position;
-        trail->angle = p->sprite[6];
-        trail->spinRate = 1;
+    if (SceneActorControl_TakeFlag(&p->base.field2B2)) {
+        ((struct RotatingDrawable *)p->base.drawable)->flags |= 2;
+        Velocity(&trail->trailVelocity, p->base.tracking.heading, 12);
+        trail->trailHeading = p->base.tracking.heading;
+        trail->trailPosition = p->base.body.position;
+        trail->trailAngle = ((struct RotatingDrawable *)p->base.drawable)->angle;
+        trail->trailSpinRate = 1;
     }
-    previous = p->sprite[6];
-    p->sprite[6] = previous - trail->spinRate;
-    if ((frame & 1) && trail->spinRate <= 11)
-        trail->spinRate++;
+    previous = ((struct RotatingDrawable *)p->base.drawable)->angle;
+    ((struct RotatingDrawable *)p->base.drawable)->angle = previous - trail->trailSpinRate;
+    if ((frame & 1) && trail->trailSpinRate <= 11)
+        trail->trailSpinRate++;
     Axe_UpdateTrailColliders(p);
-    if ((s32)previous < p->sprite[6])
+    if ((s32)previous < ((struct RotatingDrawable *)p->base.drawable)->angle)
         Sound_PlaySong(0x169);
     if (frame <= 119) {
         struct ContactPosition delta;
         s32 difference;
-        ActorPhase_EmitTrailSprite(p, &trail->position, trail->angle);
-        Advance(&trail->position, &trail->velocity);
-        trail->angle -= trail->angleDecay;
-        {
-            u8 **gp = &gPlayers;
-            struct ContactPosition *d;
-            d = &delta;
-            Vanargand_Difference(d, (void *)(*gp + 0x30), &trail->position);
-        }
-        difference = AngleDifference(Math_Atan2(delta.x, delta.z), trail->heading);
+        ActorPhase_EmitTrailSprite(p, &trail->trailPosition, trail->trailAngle);
+        Advance(&trail->trailPosition, &trail->trailVelocity);
+        trail->trailAngle -= trail->trailAngleDecay;
+        Vanargand_Difference(&delta, (void *)&gPlayers[0]->position, &trail->trailPosition);
+        difference = AngleDifference(Math_Atan2(delta.x, delta.z), trail->trailHeading);
         if (Absolute(difference) > 32)
-            trail->heading += 4;
-        Velocity(&trail->velocity, trail->heading, trail->speed);
+            trail->trailHeading += 4;
+        Velocity(&trail->trailVelocity, trail->trailHeading, trail->returningTrailSpeed);
     } else {
         struct ContactPosition delta;
         s32 difference;
-        ActorPhase_EmitTrailSprite(p, &trail->position, trail->angle);
-        Advance(&trail->position, &trail->velocity);
-        trail->angle -= 6;
-        Vanargand_Difference(&delta, &p->position, &trail->position);
-        difference = AngleDifference(Math_Atan2(delta.x, delta.z), trail->heading);
+        ActorPhase_EmitTrailSprite(p, &trail->trailPosition, trail->trailAngle);
+        Advance(&trail->trailPosition, &trail->trailVelocity);
+        trail->trailAngle -= 6;
+        Vanargand_Difference(&delta, &p->base.body.position, &trail->trailPosition);
+        difference = AngleDifference(Math_Atan2(delta.x, delta.z), trail->trailHeading);
         if (Absolute(difference) > 12)
-            trail->heading += 6;
-        Velocity(&trail->velocity, trail->heading, 8);
+            trail->trailHeading += 6;
+        Velocity(&trail->trailVelocity, trail->trailHeading, 8);
         if (LengthSquared(&delta) <= 1023 || frame > 600) {
-            trail->position = p->position;
+            trail->trailPosition = p->base.body.position;
             SceneActorChase_SetControl(p, SceneActorControl_SettleRotation, 0x29);
         }
     }
@@ -469,25 +431,9 @@ static inline void Axe_DeltaFromPlayer(u8 **player, struct ContactPosition *v,
     v->z = a->z - b->z;
 }
 
-struct AxeLungeState {
-    u8 unknown0[0x8A8];
-    u8 auxiliary[0xE48 - 0x8A8];
-    s32 healthThreshold;
-    u32 flags;
-    u8 unknownE50[0xEAE - 0xE50];
-    u8 angularSpeed;
-    u8 unknownEAF[3];
-    u8 trailDuration;
-    u8 delay;
-    u8 unknownEB4[0xED1 - 0xEB4];
-    u8 queued;
-    u8 unknownED2;
-    u8 angle;
-};
-
 void Axe_UpdateTargetLunge(struct ChaseActor *a, s32 frame)
 {
-    struct AxeLungeState *state = a->base.context;
+    struct Axe *state = a->base.context;
     struct RotatingDrawable *sprite = a->base.drawable;
     u8 entered = SceneActorControl_TakeFlag(&a->base.field2B2);
     s32 angle;
@@ -495,7 +441,7 @@ void Axe_UpdateTargetLunge(struct ChaseActor *a, s32 frame)
     if (entered) {
         struct ContactPosition delta;
         sprite->flags |= 2;
-        state->angularSpeed = 2;
+        state->acceleration = 2;
         Axe_DeltaFromPlayer(&gPlayers, &delta, &a->base.body.position);
         if (a->base.health <= (state->healthThreshold)) {
             a->base.secondaryMotion.x = Div(delta.x, 44);
@@ -506,43 +452,43 @@ void Axe_UpdateTargetLunge(struct ChaseActor *a, s32 frame)
             a->base.secondaryMotion.y = 64;
             a->base.secondaryMotion.z = Axe_ShiftSigned(delta.z);
         }
-        state->delay = 0;
+        state->unknownEB3 = 0;
         {
             u32 *entryFlags = &a->base.statusFlags;
             u32 mask = ~0x100000;
             *entryFlags &= mask;
-            Axe_SetAuxiliarySpriteRenderState(a, state->auxiliary, 0x13D);
+            Axe_SetAuxiliarySpriteRenderState(a, state->redPalette, 0x13D);
             Sound_PlaySong(0x1E5);
             flags = entryFlags;
         }
     }
     a->base.body.position.y += a->base.heightOffset;
-    if (NormalizeAngle(32 - state->angle) < 0)
-        sprite->angle += state->angularSpeed;
+    if (NormalizeAngle(32 - state->savedAngle) < 0)
+        sprite->angle += state->acceleration;
     else
-        sprite->angle -= state->angularSpeed;
+        sprite->angle -= state->acceleration;
     angle = NormalizeAngle(sprite->angle);
     Axe_EmitMotionTrail(a);
     if (frame <= 27) {
         if (!Mod(frame, 10))
-            state->angularSpeed += 4;
+            state->acceleration += 4;
     } else {
         s32 magnitude = angle;
         if (magnitude < 0)
             magnitude = -magnitude;
         if (magnitude <= 95)
-            state->angularSpeed = 8;
+            state->acceleration = 8;
         else
-            state->angularSpeed = 0;
+            state->acceleration = 0;
     }
     if (Flags_MaskedWord(0x10, flags)) {
-        state->queued = 1;
+        state->lungeQueued = 1;
         RotationPhase_Change(a, SceneActorControl_FinishRotation, 0x33);
         {
             u16 k1 = 0x800;
-            state->flags &= ~k1;
+            state->flagsE4C &= ~k1;
         }
-        state->trailDuration = 64;
+        state->parameterEB2 = 64;
         Axe_SpawnHeadingBurst(a, 14);
     }
 }
@@ -1633,13 +1579,12 @@ void Axe_InitAttackCooldowns(struct ChaseActor *actor)
 
 void Axe_TickCooldowns(struct ChaseActor *actor)
 {
-    u16 *p = ((struct Axe *)actor->base.context)->attackCooldowns;
-    s32 i = 3;
-    do {
-        if (*p)
-            (*p)--;
-        p++;
-    } while (--i >= 0);
+    struct Axe *axe = actor->base.context;
+    s32 i;
+    for (i = 0; i < 4; i++) {
+        if (axe->attackCooldowns[i])
+            axe->attackCooldowns[i]--;
+    }
 }
 
 u8 Axe_PickAttack(void *actorIn)
@@ -2112,26 +2057,19 @@ loop: {
 void Axe_SetAuxiliarySpriteResource(struct ChaseActor *actor, const void *palette)
 {
     struct Axe *q = actor->base.context;
-    s32 i = 3;
-    const void **p = &q->trail[3].graphics.paletteData;
-    do {
-        *p = palette;
-        p = (const void **)((u8 *)p - sizeof(struct AxeTrailSlot));
-    } while (--i >= 0);
+    s32 i;
+    for (i = 3; i >= 0; i--)
+        q->trail[i].graphics.paletteData = palette;
 }
 
 void Axe_SetAuxiliarySpriteRenderState(struct ChaseActor *actor, const void *palette, u32 index)
 {
     struct Axe *q = actor->base.context;
-    const void **a = &q->trail[0].graphics.paletteData;
-    u16 *b = &q->trail[0].graphics.paletteIndex;
-    s32 i = 3;
-    do {
-        *b = index;
-        *a = palette;
-        a = (const void **)((u8 *)a + sizeof(struct AxeTrailSlot));
-        b = (u16 *)((u8 *)b + sizeof(struct AxeTrailSlot));
-    } while (--i >= 0);
+    s32 i;
+    for (i = 0; i < 4; i++) {
+        q->trail[i].graphics.paletteIndex = index;
+        q->trail[i].graphics.paletteData = palette;
+    }
 }
 
 struct AnimatedSpriteAnimation {
@@ -2145,103 +2083,55 @@ struct AnimatedSpriteAnimation {
     u8 unknown32[2];
 };
 
-struct AnimatedSpriteRecord {
-    u32 flags;
-    u8 unknown4[0x28];
-    struct AnimatedSpriteAnimation animation;
-};
-
-struct AnimatedSpriteGroup {
-    u8 unknown0[0x708];
-    struct AnimatedSpriteRecord sprites[4];
-    u8 unknown888[0x5bc];
-    u16 state;
-    u16 phase;
-};
-
-struct AnimatedSpriteView {
-    u32 flags;
-    u8 unknown4[0x2e];
-    u16 priority;
-    u8 unknown34[0x2c];
-};
-
 void SpriteGroup_InitAnimatedSprites(struct ChaseActor *owner)
 {
-    struct AnimatedSpriteGroup *group = owner->base.context;
+    struct Axe *group = owner->base.context;
     u16 zero = 0;
-    struct AnimatedSpriteAnimation *animation = &group->sprites[0].animation;
-    struct AnimatedSpriteView *sprite = (void *)group->sprites;
+    struct AnimatedSpriteAnimation *animation = (void *)&group->trail[0].graphics;
+    struct AxeTrailSlot *slot = group->trail;
     s32 offset = 0;
     s32 i = 3;
     do {
-        void **sharedField;
-        void **resourceField;
+        const void **sharedField;
+        const void **resourceField;
         void *resource;
         AnimData_Load(animation, 0x5291);
-        Sprite_Init(sprite, animation, 0);
-        sprite->priority = 0x13c;
-        sharedField = &group->sprites[0].animation.shared;
+        Sprite_Init(&slot->sprite, animation, 0);
+        slot->graphics.paletteIndex = 0x13c;
+        sharedField = &group->trail[0].graphics.paletteData;
         sharedField = (void *)((u8 *)sharedField + offset);
-        *sharedField = group->unknown888;
+        *sharedField = group->blackPalette;
         resource = ScriptProc_Start(0x922e, 0x3f72);
-        resourceField = &group->sprites[0].animation.resource;
-        *(void **)((u8 *)resourceField + offset) = resource;
-        sprite->flags = 0x201;
+        resourceField = &group->trail[0].resource;
+        *(const void **)((u8 *)resourceField + offset) = resource;
+        slot->sprite.flags = 0x201;
         animation->frame = zero;
         animation++;
         animation = (void *)((u8 *)animation + 0x2c);
-        sprite++;
-        offset += sizeof(struct AnimatedSpriteRecord);
+        slot++;
+        offset += sizeof(struct AxeTrailSlot);
     } while (--i >= 0);
     {
         u16 state = 0;
-        group->state = state;
+        group->nextTrail = state;
     }
-    group->phase = 2;
+    group->trailSpacing = 2;
 }
 
-struct TrailSprite {
-    u32 flags;
-    u8 unknown4[2], angle, unknown7, scaleX, scaleY;
-    u8 unknownA[6];
-    u16 frame;
-    u8 unknown12[0xA];
-    struct ContactPosition position;
-};
-
-struct AxeTrailSpriteSlot {
-    struct TrailSprite sprite;
-    u8 unknown24[0x24];
-    struct DisplaySequenceState sequence;
-    void *commands;
-    u16 remaining;
-    u8 unknown5E[2];
-};
-
-struct AxeTrailContext {
-    u8 unknown0[0x708];
-    struct AxeTrailSpriteSlot slots[4];
-    u8 unknown888[0x5BC];
-    u16 nextSlot, interval;
-    u8 unknownE48[0x8F];
-    u8 speed;
-};
-
-static inline void CopyAngle(struct TrailSprite *src, u8 *dest)
+static inline void CopyAngle(struct DirectionalSprite *src, u8 *dest)
 {
     u8 angle = src->angle;
     *(u8 *)(dest + 0x70E) = angle;
 }
 
-static inline void CopyScaleX(struct TrailSprite *src, u8 *dest)
+static inline void CopyScaleX(struct DirectionalSprite *src, u8 *dest)
 {
     u8 scaleX;
     scaleX = src->scaleX;
     *((u8 *)(dest + 0x710)) = scaleX;
 }
 
-static inline void CopyScaleY(struct TrailSprite *src, u8 *dest)
+static inline void CopyScaleY(struct DirectionalSprite *src, u8 *dest)
 {
     u8 scaleY = src->scaleY;
     *(u8 *)(dest + 0x711) = scaleY;
@@ -2249,17 +2139,17 @@ static inline void CopyScaleY(struct TrailSprite *src, u8 *dest)
 
 void Axe_EmitMotionTrail(struct ChaseActor *actor)
 {
-    struct AxeTrailContext *trail = actor->base.context;
+    struct Axe *trail = actor->base.context;
     u8 *context = (void *)trail;
-    struct TrailSprite *sprite;
+    struct DisplaySequenceSprite *sprite;
     void *sourceDrawable;
     u8 *slotBase;
     void *scaleDrawable;
     u8 *scaleSlotBase;
-    if ((*((u32 *)actor->base.drawable)) & 1)
+    if (((struct SceneActorControlMotionDrawable *)actor->base.drawable)->flags & 1)
         return;
     {
-        s32 zero = Mod(actor->base.frameCounter, trail->interval);
+        s32 zero = Mod(actor->base.frameCounter, trail->trailSpacing);
         if (zero)
             return;
         {
@@ -2267,53 +2157,50 @@ void Axe_EmitMotionTrail(struct ChaseActor *actor)
             struct DisplaySequenceState *source = &drawable->sequence;
             u16 sequence = source->sequenceId;
             {
-                u32 offset = trail->nextSlot * sizeof(struct AxeTrailSpriteSlot);
-                u8 *destination = context + (offset + 0x708);
-                u8 *sequenceState = destination + 0x48;
-                u32 sequenceOffset = 0x760;
-                void *commands = *(void **)(context + sequenceOffset + offset);
-                u8 speed = trail->speed;
-                Anim_SetSequence((void *)sequenceState, commands, sequence, speed, zero);
+                struct DisplaySequenceState *state = &trail->trail[trail->nextTrail].sequence;
+                const void *commands = trail->trail[trail->nextTrail].resource;
+                u8 speed = trail->variant;
+                Anim_SetSequence(state, (void *)commands, sequence, speed, zero);
             }
         }
     }
-    sprite = (void *)((trail->nextSlot * sizeof(struct AxeTrailSpriteSlot)) + (u32)context);
+    sprite = (void *)((trail->nextTrail * sizeof(struct AxeTrailSlot)) + (u32)context);
     sprite = (void *)((u8 *)sprite + 0x708);
-    PlayerCue_StepSequence((void *)sprite, &trail->slots[trail->nextSlot].sequence);
+    PlayerCue_StepSequence((void *)sprite, &trail->trail[trail->nextTrail].sequence);
     {
         u32 offset =
-            ((struct AxeTrailContext *)context)->nextSlot * sizeof(struct AxeTrailSpriteSlot);
+            ((struct Axe *)context)->nextTrail * sizeof(struct AxeTrailSlot);
         u8 *slot = context + offset;
         *((struct ContactPosition *)(slot + 0x724)) = actor->base.body.position;
     }
     {
         u32 offset =
-            ((struct AxeTrailContext *)context)->nextSlot * sizeof(struct AxeTrailSpriteSlot);
+            ((struct Axe *)context)->nextTrail * sizeof(struct AxeTrailSlot);
         u8 *slots = context + 0x708;
         *((u32 *)(slots + offset)) &= ~1;
-        slots += ((struct AxeTrailContext *)context)->nextSlot * sizeof(struct AxeTrailSpriteSlot);
+        slots += ((struct Axe *)context)->nextTrail * sizeof(struct AxeTrailSlot);
         *((u32 *)slots) |= 2;
     }
     {
         u32 offset =
-            ((struct AxeTrailContext *)context)->nextSlot * sizeof(struct AxeTrailSpriteSlot);
+            ((struct Axe *)context)->nextTrail * sizeof(struct AxeTrailSlot);
         u8 *slot = context + offset;
         *((u16 *)(slot + 0x764)) = 8;
     }
     sourceDrawable = actor->base.drawable;
-    slotBase = context + ((((struct AxeTrailContext *)context)->nextSlot) *
-                          sizeof(struct AxeTrailSpriteSlot));
+    slotBase = context + ((((struct Axe *)context)->nextTrail) *
+                          sizeof(struct AxeTrailSlot));
     CopyAngle(sourceDrawable, slotBase);
     scaleDrawable = actor->base.drawable;
-    scaleSlotBase = context + ((((struct AxeTrailContext *)context)->nextSlot) *
-                               sizeof(struct AxeTrailSpriteSlot));
+    scaleSlotBase = context + ((((struct Axe *)context)->nextTrail) *
+                               sizeof(struct AxeTrailSlot));
     CopyScaleX(scaleDrawable, scaleSlotBase);
     sourceDrawable = actor->base.drawable;
-    slotBase = context + ((((struct AxeTrailContext *)context)->nextSlot) *
-                          sizeof(struct AxeTrailSpriteSlot));
+    slotBase = context + ((((struct Axe *)context)->nextTrail) *
+                          sizeof(struct AxeTrailSlot));
     CopyScaleY(sourceDrawable, slotBase);
-    if ((++(((struct AxeTrailContext *)context)->nextSlot)) > 3)
-        ((struct AxeTrailContext *)context)->nextSlot = 0;
+    if ((++(((struct Axe *)context)->nextTrail)) > 3)
+        ((struct Axe *)context)->nextTrail = 0;
 }
 
 static inline const void *Axe_TrailResource(struct Axe *context, u32 index)
@@ -2487,13 +2374,12 @@ void Sprite_Remove(void *);
 
 void Axe_RemoveAuxiliarySprites(struct ChaseActor *actor)
 {
-    struct AxeTrailSlot *p = ((struct Axe *)actor->base.context)->trail;
-    s32 i = 3;
-    do {
-        if (p->sprite.unknown4[0])
-            Sprite_Remove(&p->sprite);
-        p++;
-    } while (--i >= 0);
+    struct Axe *axe = actor->base.context;
+    s32 i;
+    for (i = 0; i < 4; i++) {
+        if (axe->trail[i].sprite.unknown4[0])
+            Sprite_Remove(&axe->trail[i].sprite);
+    }
 }
 
 // Remaining: route index byte uses r3 instead of r2.
@@ -2863,12 +2749,9 @@ void Axe_ReleaseAuxiliarySprite(struct ChaseActor *actor)
 {
     struct Axe *q = actor->base.context;
     if (q->auxiliarySprite.unknown4[0]) {
-        struct ContactCollider *p = q->body;
-        s32 i = 2;
-        do {
-            Collider_Remove(p);
-            p++;
-        } while (--i >= 0);
+        s32 i;
+        for (i = 0; i < 3; i++)
+            Collider_Remove(&q->body[i]);
         Shadow_Destroy(q->auxiliaryShadow);
         Sprite_Remove(&q->auxiliarySprite);
     }
@@ -2880,16 +2763,12 @@ void Axe_CopyAuxiliaryVector(struct ChaseActor *s, const struct ContactPosition 
     trail->auxiliarySprite.position = *src;
 }
 
-struct S080FC8B0 {
-    u8 filler[0x3d0];
-    u8 *q;
-};
-
-void Axe_SetAuxiliarySpriteParameters(struct S080FC8B0 *s, u32 a, u32 b)
+void Axe_SetAuxiliarySpriteParameters(void *object, const u16 *palette, u32 index)
 {
-    u8 *q = s->q;
-    *(u16 *)(q + 0xa6a) = b;
-    *(u32 *)(q + 0xa70) = a;
+    struct ChaseActor *actor = object;
+    struct Axe *axe = actor->base.context;
+    axe->auxiliaryGraphics.paletteKey = index;
+    axe->auxiliaryGraphics.palette = (void *)palette;
 }
 
 void ActorCollision_InitThreeAuxiliaryAttacks(struct ChaseActor *actor)
@@ -2925,28 +2804,24 @@ static inline s32 Scale_UpdateTrailColliders(s32 x)
     return result;
 }
 
-void Axe_UpdateTrailColliders(u8 *actor)
+void Axe_UpdateTrailColliders(struct ChaseActor *actor)
 {
-    u8 *ctx = *(u8 **)(actor + 0x3d0);
-    u8 *entry;
+    struct Axe *ctx = actor->base.context;
+    struct AxeTrailSlot *entry;
     u32 idx;
     s32 i;
-    struct {
-        u32 zero;
-        u32 values[0];
-    } buf;
+    u32 fill;
     struct ContactPosition offset;
     struct ContactPosition position;
     s32 x, z;
-    u16 *ip = (u16 *)(ctx + 0xe44);
-    if (*ip == 0)
+    if (ctx->nextTrail == 0)
         idx = 3;
     else
-        idx = *ip - 1;
-    entry = ctx + (idx * 0x60 + 0x708);
+        idx = ctx->nextTrail - 1;
+    entry = &ctx->trail[idx];
     for (i = 0; i < 3; i++) {
-        MonsterInit_ClearPosition(&buf.zero, &offset);
-        position = *(struct ContactPosition *)(ctx + 0xa24);
+        MonsterInit_ClearPosition(&fill, &offset);
+        position = ctx->trailPosition;
         switch (i) {
             case 0:
                 offset.x = -120;
@@ -2961,25 +2836,23 @@ void Axe_UpdateTrailColliders(u8 *actor)
                 offset.z = 60;
                 break;
         }
-        x = Scale_UpdateTrailColliders(offset.x * gUnk_086149C4[(entry[6] + 64) & 255]);
-        z = Scale_UpdateTrailColliders(offset.z * gUnk_086149C4[entry[6]]);
+        x = Scale_UpdateTrailColliders(offset.x * gUnk_086149C4[(entry->sprite.attribute + 64) & 255]);
+        z = Scale_UpdateTrailColliders(offset.z * gUnk_086149C4[entry->sprite.attribute]);
         position.x = x + z + position.x;
-        x = Scale_UpdateTrailColliders(-(offset.x * gUnk_086149C4[entry[6]]));
-        z = Scale_UpdateTrailColliders(offset.z * gUnk_086149C4[(entry[6] + 64) & 255]);
+        x = Scale_UpdateTrailColliders(-(offset.x * gUnk_086149C4[entry->sprite.attribute]));
+        z = Scale_UpdateTrailColliders(offset.z * gUnk_086149C4[(entry->sprite.attribute + 64) & 255]);
         position.z = x + z + position.z;
-        Collider_SetPosition(ctx + 0x928 + i * 0x54, &position, 0);
-        Collider_Refresh(ctx + 0x928 + i * 0x54);
+        Collider_SetPosition(&ctx->auxiliaryAttack[i], &position, 0);
+        Collider_Refresh(&ctx->auxiliaryAttack[i]);
     }
 }
 
 void Axe_RemoveSecondaryColliders(struct ChaseActor *actor)
 {
-    struct ContactCollider *p = ((struct Axe *)actor->base.context)->extraBody;
-    s32 i = 1;
-    do {
-        Collider_Remove(p);
-        p++;
-    } while (--i >= 0);
+    struct Axe *axe = actor->base.context;
+    s32 i;
+    for (i = 0; i < 2; i++)
+        Collider_Remove(&axe->extraBody[i]);
 }
 
 static inline s32 Scale_UpdateBodyColliders(s32 value)
@@ -3133,11 +3006,6 @@ void Axe_FireAttack(struct ChaseActor *actor)
     }
 }
 
-struct ActorGroupOptions {
-    u8 unknown0[0xe3c];
-    u8 option0, option1, option2, option3, option4, option5;
-};
-
 static inline s32 ReadOption(s32 defaultValue)
 {
     s32 value;
@@ -3150,14 +3018,14 @@ static inline s32 ReadOption(s32 defaultValue)
 
 void ActorGroup_ReadScriptOptions(struct ChaseActor *actor)
 {
-    struct ActorGroupOptions *group = actor->base.context;
+    struct Axe *axe = actor->base.context;
     if (Script_SeekToKeyword('O')) {
-        group->option0 = ReadOption(6);
-        group->option1 = ReadOption(12);
-        group->option2 = ReadOption(60);
-        group->option3 = ReadOption(3);
-        group->option4 = ReadOption(60);
-        group->option5 = ReadOption(30);
+        axe->trailAngleDecay = ReadOption(6);
+        axe->returningTrailSpeed = ReadOption(12);
+        axe->delay = ReadOption(60);
+        axe->turnStep = ReadOption(3);
+        axe->relocationDelay = ReadOption(60);
+        axe->unknownE41[0] = ReadOption(30);
     }
 }
 
@@ -3844,21 +3712,6 @@ s32 Anim_Step(void *, void *);
 
 u8 SceneActorRegistry_LinkActor(void *);
 
-struct AxeActorInit {
-    struct ChaseActor base;
-    u8 unknown624[0x824];
-    s32 halfHealthE48;
-    u32 savedFlagsE4C;
-    u8 unknownE50[8];
-    u16 groundHeightE58;
-    u8 unknownE5A[0x5C];
-    u16 fieldEB6;
-    u8 unknownEB8[0x1F];
-    u8 variantED7;
-    u8 unknownED8[0x44];
-    struct SceneVec playerPositionF1C;
-};
-
 static inline void AxeInit_InstallPrimary(struct ChaseActor *arg0, void *cb0, s32 (*cb1)(void),
                                           void *cb2, void *cb3, void *cb4, void *hidden, void *cb5,
                                           void *cb6, void *defaultReaction, s32 (*cb270)(void *),
@@ -3907,7 +3760,7 @@ static inline u8 AxeInit_BoundedVariant(s32 variant)
 
 static inline void AxeInit_SetVariant(struct ChaseActor *actor, u8 variant)
 {
-    ((struct AxeActorInit *)actor)->variantED7 = variant;
+    ((struct Axe *)actor)->variant = variant;
 }
 
 static inline void AxeInit_InitializePaletteRange(struct ChaseActor *actor, u32 alternate,
@@ -3919,20 +3772,20 @@ static inline void AxeInit_InitializePaletteRange(struct ChaseActor *actor, u32 
 
 s32 Axe_Init(void *object)
 {
-    struct AxeActorInit *arg0 = object;
-    struct ChaseActor *actor = &arg0->base;
-    struct SceneActorChaseGroup *group = &arg0->base.group;
+    struct Axe *arg0 = object;
+    struct ChaseActor *actor = &arg0->chase;
+    struct SceneActorChaseGroup *group = &arg0->chase.group;
     // concession-ok(const-local): The CpuSet position clears use the same fixed source word.
     u32 zero;
     struct ContactPosition tmp;
     u32 flag;
     s32 variant;
 
-    arg0->savedFlagsE4C = 0;
+    arg0->flagsE4C = 0;
     SceneActorRegistry_SetObjectContext(actor, actor, 0, 1);
-    ((struct AxeActorInit *)actor)->variantED7 = Script_GetKeywordValue('t', 0);
-    variant = AxeInit_BoundedVariant(((struct AxeActorInit *)actor)->variantED7);
-    AxeInit_SetVariant(&arg0->base, variant);
+    ((struct Axe *)actor)->variant = Script_GetKeywordValue('t', 0);
+    variant = AxeInit_BoundedVariant(((struct Axe *)actor)->variant);
+    AxeInit_SetVariant(&arg0->chase, variant);
     if (variant == 0)
         MonsterInit_SetCategory(actor, MONSTER_CATEGORY_AXE);
     else
@@ -3956,8 +3809,8 @@ s32 Axe_Init(void *object)
         MonsterInit_InitializeWidget(heap, 0xCB05, 0x5291, &tmp);
         actor->base.animationIndex = 0xFF;
     }
-    MonsterInit_InitializePursuitBody(&arg0->base, &zero);
-    arg0->halfHealthE48 = MonsterInit_GetHealth(actor) >> 1;
+    MonsterInit_InitializePursuitBody(&arg0->chase, &zero);
+    arg0->healthThreshold = MonsterInit_GetHealth(actor) >> 1;
     Axe_InitAttackCooldowns(actor);
     if (Script_SeekToKeyword('p')) {
         u32 height;
@@ -3968,13 +3821,13 @@ s32 Axe_Init(void *object)
         height = MonsterInit_TerrainHeight(MonsterInit_GetTerrainCell(actor),
                                            &actor->base.body.position);
         actor->base.groundHeight = height;
-        arg0->groundHeightE58 = height;
+        arg0->groundHeight = height;
     } else {
-        arg0->groundHeightE58 = actor->base.groundHeight;
+        arg0->groundHeight = actor->base.groundHeight;
     }
-    arg0->fieldEB6 = Script_GetKeywordValue('w', -1);
+    arg0->routeId = Script_GetKeywordValue('w', -1);
     ActorGroup_ReadScriptOptions(actor);
-    arg0->playerPositionF1C = gPlayers[0]->position;
+    arg0->target = *(const struct ContactPosition *)&gPlayers[0]->position;
     MonsterInit_ReadPalette(actor, 0x2BD, 0x192);
     AxeInit_InitializePaletteRange(actor, 0, 2);
     Axe_InitEffectPalettes(actor);
@@ -3986,7 +3839,7 @@ s32 Axe_Init(void *object)
         SceneActorReaction_OnEnemyDefault, SceneActorControl_CanAdvanceHover,
         SceneActorTarget_ResolvePendingObject, SceneActorReaction_ResolvePlacementDamage,
         SceneActorControl_AdvanceReactionCount);
-    MonsterInit_InitializeGroup(group, (u8 *)arg0 + 0xED8, (u8 *)arg0 + 0xEFC, 0, 0, 0, 0, 1);
+    MonsterInit_InitializeGroup(group, &arg0->routeProbe, &arg0->destination, 0, 0, 0, 0, 1);
     AxeInit_InstallRoutes(actor);
     group->responseCallback = 0;
     group->routeRestoreCallback = 0;
@@ -4027,7 +3880,7 @@ s32 Axe_Init(void *object)
     Axe_InitRoutePointHistory(actor);
     ActorCollision_InitThreeAuxiliaryAttacks(actor);
     MonsterInit_SaveControl(MonsterInit_SavedControlOf(actor), actor);
-    actor->base.saved.privateFlags = arg0->savedFlagsE4C;
+    actor->base.saved.privateFlags = arg0->flagsE4C;
     AxeInit_InstallCompletionCallbacks(actor);
     if (!SceneActorRegistry_LinkActor(actor))
         return -1;
@@ -4040,12 +3893,12 @@ void Heap_Free(void *);
 
 void Axe_Create(void)
 {
-    u8 *p = Heap_Alloc(0xf24);
-    if (p != 0) {
-        Memory_Clear(p, 0xf24);
-        if (Axe_Init(p) < 0) {
-            Axe_ReleaseResources(p);
-            Heap_Free(p);
+    struct Axe *axe = Heap_Alloc(sizeof(*axe));
+    if (axe != NULL) {
+        Memory_Clear(axe, sizeof(*axe));
+        if (Axe_Init(axe) < 0) {
+            Axe_ReleaseResources(axe);
+            Heap_Free(axe);
         }
     }
 }

@@ -6,11 +6,11 @@ Background_QueueCommand	as is	2	not allocation; C search at 2 bytes	2	21
 BreakableBarrier_Update	as is	None	no solution; too far for C search		0	
 ChoiceMenu_ParseTag	as is	88	too far; skipped		0	
 ChoiceMenu_CreateFromScript	as is	51	partial in compiler (37 left); C search at ? bytes	?	97	
-CollisionController_UpdateHitAnimation	as is	10	not allocation; C search at 10 bytes	10	78	
-CollisionController_InitManager	as is	1	TRANSLATED	0	18	wip/farm/out/s0/CollisionController_InitManager/match-as_is.c
-DirectionalController_ScriptCreate	as is	9	TRANSLATED	0	35	wip/farm/out/s0/DirectionalController_ScriptCreate/match-as_is.c
-AnimatedParticleManager_Update	as is	64	partial in compiler (18 left); C search at 8 bytes	8	188	
-AnimatedParticles_Create	as is	48	not allocation; C search at 48 bytes	48	230	
+StrikeTrap_UpdateHitAnimation	as is	10	not allocation; C search at 10 bytes	10	78	
+StrikeTrap_InitManager	as is	1	TRANSLATED	0	18	wip/farm/out/s0/StrikeTrap_InitManager/match-as_is.c
+InteractionPrompt_ScriptCreate	as is	9	TRANSLATED	0	35	wip/farm/out/s0/InteractionPrompt_ScriptCreate/match-as_is.c
+ImpactBurstManager_Update	as is	64	partial in compiler (18 left); C search at 8 bytes	8	188	
+ImpactBurst_Create	as is	48	not allocation; C search at 48 bytes	48	230	
 OrbitingParticles_Update	as is	41	partial in compiler (31 left); C search at 31 bytes	31	136	
 ClockEvents_Update	as is	20	TRANSLATED	0	11	wip/farm/out/s0/ClockEvents_Update/match-as_is.c
 Presentation_SetItemGraphic	as is	10	partial in compiler (9 left); C search at 9 bytes	9	16	
@@ -18,11 +18,11 @@ SelectionMenu_Choose	as is	61	partial in compiler (59 left); C search at 41 byte
 SelectionMenu_Initialize	as is	26	not allocation; C search at 26 bytes	26	28	
 ResultGame_UpdatePlayerMarker	as is	23	partial in compiler (12 left); C search at 2 bytes	2	35	
 ResultTutorial_AnimateLevel	as is	59	partial in compiler (26 left); C search at 9 bytes	9	63	
-SceneObjects_ScriptAppend	as is	2	not allocation; C search at 2 bytes	2	38	
-SceneObjects_ScriptLower	as is	26	partial in compiler (16 left); C search at 14 bytes	14	121	
-SceneObject_AnimateActive	as is	5	not allocation; C search at 5 bytes	5	17	
-SceneObject_UpdateRaising	as is	8	not allocation; C search at 6 bytes	6	30	
-SceneObject_UpdateRaised	as is	8	solved in compiler; C search at 4 bytes	4	41	
+SlidingDoors_ScriptAppend	as is	2	not allocation; C search at 2 bytes	2	38	
+SlidingDoors_ScriptLower	as is	26	partial in compiler (16 left); C search at 14 bytes	14	121	
+SlidingDoor_AnimateActive	as is	5	not allocation; C search at 5 bytes	5	17	
+SlidingDoor_UpdateRaising	as is	8	not allocation; C search at 6 bytes	6	30	
+SlidingDoor_UpdateRaised	as is	8	solved in compiler; C search at 4 bytes	4	41	
 SceneCommands_FadePalette	as is	25	partial in compiler (10 left); C search at 10 bytes	10	71	
 SceneActors_Initialize	as is	10	not allocation; C search at 10 bytes	10	31	
 SceneActors_RunFirstEventScript	as is	2	not allocation; C search at 2 bytes	2	18	
@@ -95,7 +95,7 @@ DamageNumberDisplay_UpdateLeaving	as is	None	no solution; too far for C search		
 TransientSpriteEffects_Initialize	as is	None	no solution; too far for C search		1	
 BackgroundFlash_UpdateAppearing	as is	20	TRANSLATED	0	8	wip/farm/out/s0/BackgroundFlash_UpdateAppearing/match-as_is.c
 TemporaryAnimationPool_Initialize	as is	24	not allocation; C search at ? bytes	?	4	
-DirectionalParticle_Update	as is	None	no solution; too far for C search		0	
+ImpactFragment_Update	as is	None	no solution; too far for C search		0	
 ContactBurst_Update	as is	None	no solution; too far for C search		0	
 TetherActor_EmitDirectionalEffect	as is	None	no solution; too far for C search		0	
 TetherActor_UpdateGlow	as is	None	no solution; too far for C search		0	
@@ -123,13 +123,13 @@ AreaEffect_UpdateActionParticles	as is	None	no solution; too far for C search		0
 AreaEffect_UpdateLinkPlayerResources	as is	None	no solution; too far for C search		0	
 ResourceStation_CheckInteraction	as is	None	no solution; too far for C search		0	
 RepeatedEffect_TickUpperTransition	as is	None	no solution; too far for C search		0	
-CellGate_InitializeFromScript	as is	None	no solution; too far for C search		0	
+PassageBarrier_InitializeFromScript	as is	None	no solution; too far for C search		0	
 OrbitBackground_UpdatePosition	as is	None	no solution; too far for C search		0	
 DirectionalForce_Tick	as is	None	no solution; too far for C search		0	
-BreakableProp_EmitBreakParticles	as is	None	no solution; too far for C search		0	
-ProximityEmitter_TickParticle	as is	None	no solution; too far for C search		0	
-ProximityEmitter_TickActive	as is	None	no solution; too far for C search		0	
-ProximityEmitter_InitializeParticles	as is	None	no solution; too far for C search		0	
+QuestBarrier_EmitBreakParticles	as is	None	no solution; too far for C search		0	
+TetherRing_TickParticle	as is	None	no solution; too far for C search		0	
+TetherRing_TickActive	as is	None	no solution; too far for C search		0	
+TetherRing_InitializeParticles	as is	None	no solution; too far for C search		0	
 StackedActor_InitRisingParticle	as is	None	no solution; too far for C search		0	
 StackedActor_UpdateSegments	as is	None	no solution; too far for C search		0	
 StackedActor_EmitScriptParticles	as is	None	no solution; too far for C search		0	
@@ -190,9 +190,9 @@ SceneActorControl_CreateFromPosition	as is	94	too far; skipped		0
 SceneParticleBurst_UpdateSlot	as is	46	partial in compiler (42 left); C search at 42 bytes	42	149	
 SceneParticleBurst_Update	as is	26	TRANSLATED	0	17	wip/farm/out/s0/SceneParticleBurst_Update/match-as_is.c
 SceneParticle_AllocateSlot	as is	23	TRANSLATED	0	21	wip/farm/out/s0/SceneParticle_AllocateSlot/match-as_is.c
-BouncingObject_HandleTimerContact	as is	10	TRANSLATED	0	11	wip/farm/out/s0/BouncingObject_HandleTimerContact/match-as_is.c
-BouncingObject_UpdatePool	as is	20	not allocation; C search at 20 bytes	20	13	
-BurstEmitter_EmitFrame	as is	38	partial in compiler (26 left); C search at ? bytes	?	311	
+BouncingBomb_HandleTimerContact	as is	10	TRANSLATED	0	11	wip/farm/out/s0/BouncingBomb_HandleTimerContact/match-as_is.c
+BouncingBomb_UpdatePool	as is	20	not allocation; C search at 20 bytes	20	13	
+SparkExplosion_EmitFrame	as is	38	partial in compiler (26 left); C search at ? bytes	?	311	
 SparkParticle_UpdatePool	as is	88	too far; skipped		0	
 SpriteEffectController_QueueColliders	as is	27	not allocation; C search at 23 bytes	23	38	
 SpriteEffectController_TickAnimation	as is	21	partial in compiler (9 left); C search at 21 bytes	21	159	
@@ -253,24 +253,24 @@ FragmentEffect_SpawnRandomParticle	as is	67	too far; skipped		0
 ConvergingEffects_EmitNearParticle	as is	19	partial in compiler (17 left); C search at 2 bytes	2	51	
 SceneActors_SpawnConvergingParticle	as is	17	TRANSLATED	0	28	wip/farm/out/s0/SceneActors_SpawnConvergingParticle/match-as_is.c
 SceneCharacter_PlaceFromScript	as is	8	partial in compiler (1 left); C search at 1 bytes	1	88	
-ActorPalette_UpdateReverseFade	as is	9	not allocation; C search at 7 bytes	7	27	
-Actor_SelectNearestInteraction	as is	40	partial in compiler (8 left); C search at 32 bytes	32	140	
-Actor_BeginScriptedAnimationPhaseNine	as is	10	not allocation; C search at 7 bytes	7	14	
-Actor_BeginScriptedCurve	as is	12	not allocation; C search at 7 bytes	7	14	
-Actor_BeginPositionedEffect	as is	12	not allocation; C search at 7 bytes	7	14	
-Actor_OnInteractionChildRelease	as is	10	partial in compiler (5 left); C search at 5 bytes	5	15	
-Actor_UpdateAppearanceAnimation	as is	21	not allocation; C search at 21 bytes	21	50	
-Actor_UpdateProjectedEntryAnimation	as is	27	partial in compiler (26 left); C search at 23 bytes	23	135	
-Actor_UpdateShadowedRestAnimation	as is	44	partial in compiler (37 left); C search at 41 bytes	41	127	
-Actor_HideAndResetChildren	as is	28	not allocation; C search at 22 bytes	22	28	
-Actor_MoveAlongScriptedCurve	as is	74	too far; skipped		0	
-Actor_UpdateReverseFadeAnimation	as is	17	not allocation; C search at 17 bytes	17	43	
-Actor_InitPaletteEffectPose	as is	17	not allocation; C search at 17 bytes	17	36	
-Actor_UpdateRotatingAnimation2	as is	20	not allocation; C search at 14 bytes	14	58	
-Actor_UpdateRotatingAnimation4	as is	20	not allocation; C search at 14 bytes	14	54	
-Actor_UpdateRotatingAnimation6	as is	17	not allocation; C search at 17 bytes	17	40	
-Actor_UpdateRotatingAnimation8	as is	20	not allocation; C search at 14 bytes	14	45	
-Actor_UpdateFinishingAnimation	as is	60	partial in compiler (53 left); C search at 55 bytes	55	86	
+TutorialOtenkoPalette_UpdateReverseFade	as is	9	not allocation; C search at 7 bytes	7	27	
+TutorialOtenko_SelectNearestInteraction	as is	40	partial in compiler (8 left); C search at 32 bytes	32	140	
+TutorialOtenko_BeginScriptedAnimationPhaseNine	as is	10	not allocation; C search at 7 bytes	7	14	
+TutorialOtenko_BeginScriptedCurve	as is	12	not allocation; C search at 7 bytes	7	14	
+TutorialOtenko_BeginPositionedEffect	as is	12	not allocation; C search at 7 bytes	7	14	
+TutorialOtenko_OnInteractionChildRelease	as is	10	partial in compiler (5 left); C search at 5 bytes	5	15	
+TutorialOtenko_UpdateAppearanceAnimation	as is	21	not allocation; C search at 21 bytes	21	50	
+TutorialOtenko_UpdateProjectedEntryAnimation	as is	27	partial in compiler (26 left); C search at 23 bytes	23	135	
+TutorialOtenko_UpdateShadowedRestAnimation	as is	44	partial in compiler (37 left); C search at 41 bytes	41	127	
+TutorialOtenko_HideAndResetChildren	as is	28	not allocation; C search at 22 bytes	22	28	
+TutorialOtenko_MoveAlongScriptedCurve	as is	74	too far; skipped		0	
+TutorialOtenko_UpdateReverseFadeAnimation	as is	17	not allocation; C search at 17 bytes	17	43	
+TutorialOtenko_InitPaletteEffectPose	as is	17	not allocation; C search at 17 bytes	17	36	
+TutorialOtenko_UpdateRotatingAnimation2	as is	20	not allocation; C search at 14 bytes	14	58	
+TutorialOtenko_UpdateRotatingAnimation4	as is	20	not allocation; C search at 14 bytes	14	54	
+TutorialOtenko_UpdateRotatingAnimation6	as is	17	not allocation; C search at 17 bytes	17	40	
+TutorialOtenko_UpdateRotatingAnimation8	as is	20	not allocation; C search at 14 bytes	14	45	
+TutorialOtenko_UpdateFinishingAnimation	as is	60	partial in compiler (53 left); C search at 55 bytes	55	86	
 GameState_SelectRamBase	as is	1	not allocation; C search at 1 bytes	1	11	
 sub_08221B9C	as is	3	not allocation; C search at 3 bytes	3	11	
 sub_08221C34	as is	3	not allocation; C search at 3 bytes	3	10	
@@ -289,11 +289,11 @@ TriggerManager_Initialize	as is	8	TRANSLATED	0	9	wip/farm/out/s0/TriggerManager_
 Palette_BlendRange	as is	22	TRANSLATED	0	45	wip/farm/out/s0/Palette_BlendRange/match-as_is.c
 Palette_InitializeFromScript	as is	25	TRANSLATED	0	17	wip/farm/out/s0/Palette_InitializeFromScript/match-as_is.c
 Text_CopyWithoutTags	as is	6	TRANSLATED	0	9	wip/farm/out/s0/Text_CopyWithoutTags/match-as_is.c
-Breakable_ScriptCreate	as is	67	too far; skipped		0	
+LightFixture_ScriptCreate	as is	67	too far; skipped		0	
 SceneIndicator_CreateFromScript	as is	110	too far; skipped		0	
-Scene_ApplyTerrainInteraction	as is	18	not allocation; C search at ? bytes	?	4	
-Scene_SpawnDirectionalDust	as is	110	too far; skipped		0	
-SceneObjects_CreateObject	as is	9	partial in compiler (6 left); C search at ? bytes	?	50	
+PuzzleBlock_ApplyTerrainInteraction	as is	18	not allocation; C search at ? bytes	?	4	
+PuzzleBlock_SpawnDirectionalDust	as is	110	too far; skipped		0	
+PuzzleBlock_CreateObject	as is	9	partial in compiler (6 left); C search at ? bytes	?	50	
 NumericDisplay_DrawPair	as is	8	TRANSLATED	0	404	wip/farm/out/s0/NumericDisplay_DrawPair/match-as_is.c
 StatusScreen_FadeAndExit	as is	23	TRANSLATED	0	29	wip/farm/out/s0/StatusScreen_FadeAndExit/match-as_is.c
 StatusScreen_FadeInPalette	as is	7	TRANSLATED	0	11	wip/farm/out/s0/StatusScreen_FadeInPalette/match-as_is.c
@@ -307,9 +307,9 @@ Background_LoadMapsFromScript	as is	8	solved in compiler; C search at 8 bytes	8	
 BreakableBarrier_SetPosition	as is	21	not allocation; C search at 19 bytes	19	30	
 ChoiceMenu_HandleInput	as is	29	partial in compiler (17 left); C search at ? bytes	?	106	
 ChoiceMenu_LayoutText	as is	5	not allocation; C search at ? bytes	?	73	
-CollisionController_UpdateIdleAnimation	as is	13	partial in compiler (8 left); C search at 13 bytes	13	263	
-CollisionController_UpdateAll	as is	80	too far; skipped		0	
-DirectionalController_CheckRemaining	as is	63	partial in compiler (33 left); C search at ? bytes	?	59	
+StrikeTrap_UpdateIdleAnimation	as is	13	partial in compiler (8 left); C search at 13 bytes	13	263	
+StrikeTrap_UpdateAll	as is	80	too far; skipped		0	
+InteractionPrompt_CheckRemaining	as is	63	partial in compiler (33 left); C search at ? bytes	?	59	
 FallingObjectManager_Update	as is	95	too far; skipped		0	
 AnimatedParticle_PriorityFromFlags	as is	7	TRANSLATED	0	14	wip/farm/out/s1/AnimatedParticle_PriorityFromFlags/match-as_is.c
 FadingParticleGroup_Update	as is	83	too far; skipped		0	
@@ -319,12 +319,12 @@ SelectionMenu_DrawStatistics	as is	2	not allocation; C search at 2 bytes	2	27
 SelectionMenu_ReviewChoice	as is	4	not allocation; C search at 2 bytes	2	20	
 ResultMenu_CreateGraphics	as is	2	TRANSLATED	0	7	wip/farm/out/s1/ResultMenu_CreateGraphics/match-as_is.c
 ResultGame_TimedPress	as is	27	TRANSLATED	0	7	wip/farm/out/s1/ResultGame_TimedPress/match-as_is.c
-SceneObjects_Append	as is	67	too far; skipped		0	
-SceneObjects_ScriptRaise	as is	24	partial in compiler (20 left); C search at 23 bytes	23	86	
-SceneObject_AnimateInactive	as is	5	not allocation; C search at 5 bytes	5	19	
-SceneObject_BeginLowering	as is	10	partial in compiler (8 left); C search at 7 bytes	7	27	
-SceneObject_UpdateLowering	as is	36	TRANSLATED	0	132	wip/farm/out/s1/SceneObject_UpdateLowering/match-as_is.c
-SceneObject_UpdateLowered	as is	7	solved in compiler; C search at 4 bytes	4	26	
+SlidingDoors_Append	as is	67	too far; skipped		0	
+SlidingDoors_ScriptRaise	as is	24	partial in compiler (20 left); C search at 23 bytes	23	86	
+SlidingDoor_AnimateInactive	as is	5	not allocation; C search at 5 bytes	5	19	
+SlidingDoor_BeginLowering	as is	10	partial in compiler (8 left); C search at 7 bytes	7	27	
+SlidingDoor_UpdateLowering	as is	36	TRANSLATED	0	132	wip/farm/out/s1/SlidingDoor_UpdateLowering/match-as_is.c
+SlidingDoor_UpdateLowered	as is	7	solved in compiler; C search at 4 bytes	4	26	
 SceneActors_FindAvailable	as is	10	TRANSLATED	0	19	wip/farm/out/s1/SceneActors_FindAvailable/match-as_is.c
 SceneActors_UpdateEffects	as is	10	not allocation; C search at 6 bytes	6	35	
 SceneActors_RunSecondEventScript	as is	2	not allocation; C search at 2 bytes	2	18	
@@ -428,10 +428,10 @@ RepeatedEffect_TickNeutral	as is	17	not allocation; C search at 6 bytes	6	34
 OrbitBackground_UpdateVisibility	as is	54	partial in compiler (39 left); C search at 7 bytes	7	34	
 OrbitBackground_CreateFromScript	as is	19	TRANSLATED	0	5	wip/farm/out/s1/OrbitBackground_CreateFromScript/match-as_is.c
 DirectionalForce_InitializeFromScript	as is	81	too far; skipped		0	
-BreakableProp_InitializeFromScript	as is	2	not allocation; C search at 2 bytes	2	31	
-ProximityEmitter_EmitParticle	as is	86	too far; skipped		0	
-ProximityEmitter_TickRise	as is	7	not allocation; C search at 4 bytes	4	10	
-ProximityEmitter_InitializeFromScript	as is	100	too far; skipped		0	
+QuestBarrier_InitializeFromScript	as is	2	not allocation; C search at 2 bytes	2	31	
+TetherRing_EmitParticle	as is	86	too far; skipped		0	
+TetherRing_TickRise	as is	7	not allocation; C search at 4 bytes	4	10	
+TetherRing_InitializeFromScript	as is	100	too far; skipped		0	
 StackedActor_InitFallingParticle	as is	60	partial in compiler (55 left); C search at 6 bytes	6	131	
 StackedActor_EmitFallingParticles	as is	8	TRANSLATED	0	7	wip/farm/out/s1/StackedActor_EmitFallingParticles/match-as_is.c
 StackedActor_EmitRisingParticles	as is	8	TRANSLATED	0	7	wip/farm/out/s1/StackedActor_EmitRisingParticles/match-as_is.c
@@ -492,9 +492,9 @@ sub_08067990	as is	128	too far; skipped		0
 SceneParticleBurst_AllocateSlot	as is	25	TRANSLATED	0	29	wip/farm/out/s1/SceneParticleBurst_AllocateSlot/match-as_is.c
 SceneParticle_UpdateSlot	as is	63	partial in compiler (62 left); C search at 53 bytes	53	72	
 SceneParticlePool_Update	as is	17	not allocation; C search at 10 bytes	10	11	
-BouncingObject_Allocate	as is	28	partial in compiler (17 left); C search at 3 bytes	3	29	
+BouncingBomb_Allocate	as is	28	partial in compiler (17 left); C search at 3 bytes	3	29	
 sub_08069788	as is	14	not allocation; C search at 14 bytes	14	14	
-BurstEmitter_AllocateSlot	as is	19	TRANSLATED	0	12	wip/farm/out/s1/BurstEmitter_AllocateSlot/match-as_is.c
+SparkExplosion_AllocateSlot	as is	19	TRANSLATED	0	12	wip/farm/out/s1/SparkExplosion_AllocateSlot/match-as_is.c
 sub_0806A420	as is	78	too far; skipped		0	
 SpriteEffectController_RefreshCollider	as is	2	TRANSLATED	0	5	wip/farm/out/s1/SpriteEffectController_RefreshCollider/match-as_is.c
 SpriteEffectController_FadeAndDestroy	as is	423	too far; skipped		0	
@@ -550,28 +550,28 @@ SceneActorControl_SetCollisionResponse	as is	21	TRANSLATED	0	18	wip/farm/out/s1/
 SceneActorControl_StartStoredCurve	as is	32	not allocation; C search at 8 bytes	8	19	
 SceneActorControl_ConsumePendingEntry	as is	44	partial in compiler (38 left); C search at 26 bytes	26	43	
 Dog_UpdateTurnSequence	as is	153	too far; skipped		0	
-SceneMovingParticle_AllocateEntry	as is	4	TRANSLATED	0	5	wip/farm/out/s1/SceneMovingParticle_AllocateEntry/match-as_is.c
+DebrisMote_AllocateEntry	as is	4	TRANSLATED	0	5	wip/farm/out/s1/DebrisMote_AllocateEntry/match-as_is.c
 sub_0812CF9C	as is	None	no solution; too far for C search		1	
 ConvergingEffects_EmitFarParticle	as is	17	TRANSLATED	0	27	wip/farm/out/s1/ConvergingEffects_EmitFarParticle/match-as_is.c
 SceneActors_EmitRandomBursts	as is	61	partial in compiler (29 left); C search at 6 bytes	6	68	
 Presentation_UpdateDropShakeBlink	as is	77	too far; skipped		0	
-Actor_TryInteraction	as is	49	partial in compiler (29 left); C search at 45 bytes	45	93	
-Actor_UpdateIdlePhaseRestoration	as is	15	not allocation; C search at 15 bytes	15	15	
-Actor_BeginCurveToPosition	as is	9	not allocation; C search at 7 bytes	7	23	
-Actor_SetFacingAndIdle	as is	20	not allocation; C search at 11 bytes	11	24	
-Actor_OnInteractionChildDelay	as is	16	not allocation; C search at 16 bytes	16	18	
-Actor_UpdateRotatingAnimation	as is	20	not allocation; C search at 14 bytes	14	49	
-Actor_UpdateCompactEntryAnimation	as is	48	partial in compiler (40 left); C search at 45 bytes	45	112	
-Actor_UpdateSilentProjectedEntryAnimation	as is	27	partial in compiler (26 left); C search at 23 bytes	23	126	
-Actor_UpdateLargeRestAnimation	as is	43	partial in compiler (36 left); C search at 40 bytes	40	98	
-Actor_MoveAlongCurveToRest	as is	54	partial in compiler (49 left); C search at 48 bytes	48	124	
-Actor_UpdateFadeAnimation	as is	17	not allocation; C search at 17 bytes	17	32	
-Actor_UpdateNotifyingAnimation	as is	22	partial in compiler (16 left); C search at 17 bytes	17	89	
-Actor_UpdateBlinkBurstDisappearance	as is	51	partial in compiler (44 left); C search at ? bytes	?	813	
-Actor_UpdateRotatingAnimation3	as is	20	not allocation; C search at 14 bytes	14	43	
-Actor_UpdateRotatingAnimation5	as is	20	not allocation; C search at 14 bytes	14	43	
-Actor_UpdateRotatingAnimation7	as is	20	not allocation; C search at 14 bytes	14	41	
-Actor_UpdateRotatingAnimation9	as is	20	not allocation; C search at 14 bytes	14	42	
+TutorialOtenko_TryInteraction	as is	49	partial in compiler (29 left); C search at 45 bytes	45	93	
+TutorialOtenko_UpdateIdlePhaseRestoration	as is	15	not allocation; C search at 15 bytes	15	15	
+TutorialOtenko_BeginCurveToPosition	as is	9	not allocation; C search at 7 bytes	7	23	
+TutorialOtenko_SetFacingAndIdle	as is	20	not allocation; C search at 11 bytes	11	24	
+TutorialOtenko_OnInteractionChildDelay	as is	16	not allocation; C search at 16 bytes	16	18	
+TutorialOtenko_UpdateRotatingAnimation	as is	20	not allocation; C search at 14 bytes	14	49	
+TutorialOtenko_UpdateCompactEntryAnimation	as is	48	partial in compiler (40 left); C search at 45 bytes	45	112	
+TutorialOtenko_UpdateSilentProjectedEntryAnimation	as is	27	partial in compiler (26 left); C search at 23 bytes	23	126	
+TutorialOtenko_UpdateLargeRestAnimation	as is	43	partial in compiler (36 left); C search at 40 bytes	40	98	
+TutorialOtenko_MoveAlongCurveToRest	as is	54	partial in compiler (49 left); C search at 48 bytes	48	124	
+TutorialOtenko_UpdateFadeAnimation	as is	17	not allocation; C search at 17 bytes	17	32	
+TutorialOtenko_UpdateNotifyingAnimation	as is	22	partial in compiler (16 left); C search at 17 bytes	17	89	
+TutorialOtenko_UpdateBlinkBurstDisappearance	as is	51	partial in compiler (44 left); C search at ? bytes	?	813	
+TutorialOtenko_UpdateRotatingAnimation3	as is	20	not allocation; C search at 14 bytes	14	43	
+TutorialOtenko_UpdateRotatingAnimation5	as is	20	not allocation; C search at 14 bytes	14	43	
+TutorialOtenko_UpdateRotatingAnimation7	as is	20	not allocation; C search at 14 bytes	14	41	
+TutorialOtenko_UpdateRotatingAnimation9	as is	20	not allocation; C search at 14 bytes	14	42	
 sub_081E99EC	as is	17	not allocation; C search at 17 bytes	17	33	
 Route_Start	as is	24	partial in compiler (14 left); C search at 6 bytes	6	35	
 sub_08221BE8	as is	3	not allocation; C search at 3 bytes	3	10	
@@ -590,12 +590,12 @@ TriggerManager_Update	as is	97	too far; skipped		0
 Trigger_CreateContainer	as is	21	not allocation; C search at ? bytes	?	10	
 Palette_BlendVariants	as is	20	TRANSLATED	0	16	wip/farm/out/s1/Palette_BlendVariants/match-as_is.c
 Palette_SetBrightnessFromScript	as is	22	TRANSLATED	0	10	wip/farm/out/s1/Palette_SetBrightnessFromScript/match-as_is.c
-Breakable_InitSlot	as is	38	partial in compiler (28 left); C search at 22 bytes	22	56	
+LightFixture_InitSlot	as is	38	partial in compiler (28 left); C search at 22 bytes	22	56	
 SceneIndicators_Initialize	as is	27	not allocation; C search at 27 bytes	27	30	
-Scene_SpawnEdgeParticles	as is	95	too far; skipped		0	
-Scene_StopSelectedObject	as is	10	solved in compiler; C search at 6 bytes	6	35	
-Scene_TryStepDown	as is	86	too far; skipped		0	
-SceneObjects_CreateFromScript	as is	114	too far; skipped		0	
+PuzzleBlock_SpawnEdgeParticles	as is	95	too far; skipped		0	
+PuzzleBlock_StopSelectedObject	as is	10	solved in compiler; C search at 6 bytes	6	35	
+PuzzleBlock_TryStepDown	as is	86	too far; skipped		0	
+PuzzleBlock_CreateFromScript	as is	114	too far; skipped		0	
 NumericDisplay_DrawStatusValues	as is	8	TRANSLATED	0	12	wip/farm/out/s1/NumericDisplay_DrawStatusValues/match-as_is.c
 StatusScreen_WaitForStart	as is	12	partial in compiler (9 left); C search at 9 bytes	9	11	
 StatusScreen_FadeOutPalette	as is	9	not allocation; C search at 5 bytes	5	25	

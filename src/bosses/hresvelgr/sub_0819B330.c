@@ -1,6 +1,5 @@
 #include "global.h"
 /* Math_ApproachShortArrayByEighth: Updates each signed halfword toward its target by one eighth with a minimum unit step */
-#define Math_ApproachShortArrayByEighth sub_0819B330
 
 static inline s32 Shift(s32 x)
 {
@@ -19,7 +18,7 @@ static inline s32 Approach(s32 cur, s32 target)
     return cur + Shift(d);
 }
 
-void sub_0819B330(s16 *cur, s16 *target, s32 count)
+void Math_ApproachShortArrayByEighth(s16 *cur, s16 *target, s32 count)
 {
     while (--count >= 0) {
         *cur = Approach(*cur, *target);

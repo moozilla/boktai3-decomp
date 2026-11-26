@@ -17,7 +17,7 @@ Step 1 (`tools/depin.py --write` over all 60) auto-dropped hints in 9 files (com
 * SceneActorTerrain_FindOpenNeighborDirection (080B713C): one `do { mask = 3; } while (0);` around the loop-invariant constant raises it above the actor pointer (mask r7, actor r8), replacing the `+r` barrier.
 * SceneActorContacts_SetDistanceGate (08072E50): the `input*` copies of the parameters were the problem (they moved metric/threshold to r6/r7); use the parameters directly, then one `do { gate->enabled = result; } while (0);` makes gate outrank actor.
 * ContactActor_SetDirectionalSequence (08042B84) / CountBats_SetDirectionalSequence (08044174): pins on base/actor were only compensating for copies of the parameters; using `pool`/`slot` directly yields r6/r5 with no hints at all.
-* DirectionalParticle_Update (08047DBC): the per-axis `movement`/`current` temporaries (pinned r0/r4) replaced by `position->x = (u16)position->x + (u16)motion->velocity.x;`. Operand order of the `+` decides which load is emitted first and thus the register.
+* ImpactFragment_Update (08047DBC): the per-axis `movement`/`current` temporaries (pinned r0/r4) replaced by `position->x = (u16)position->x + (u16)motion->velocity.x;`. Operand order of the `+` decides which load is emitted first and thus the register.
 * WirelessResultPanel_Create (0803B6B8): early return `p = GetInstance(); if (p) return p;` instead of `result`/`p` copy pair + use-barrier.
 
 * SceneActorContacts_CanSelectNode (08072BC4): found by decomp-permuter; `u32 flags = node->flags; int mask = 2; mask = flags & mask; if (mask || ...)` (the mask test through a reused int temp) gives the pinned register roles.
@@ -33,7 +33,7 @@ See the end of the file (appended when the run ends).
 * SceneStatusIndicator_Allocate: `u32 bit = one; (*(&bit)) <<= index;` (kept the pre-existing volatile pointer).
 * SelectionSlots_ClearValue: `u32 m; do { m = 0xFF; } while (0);` plus `u32 cur = (u8)*slot; *slot = cur | m;`.
 * DisplayAnimation_SetPosition (permuter): early `return -1`, no return on success path (r0 left as incoming value).
-* ProximityEmitter_TickParticle (permuter): int temp reused for `previous + 1` and later the constant 2.
+* TetherRing_TickParticle (permuter): int temp reused for `previous + 1` and later the constant 2.
 * SceneActorRegistry_FindAvailableAfterId (permuter): `(u8 *)actor - (-offset)` with `u32 offset = 0x2cc`.
 * Player_UpdateResetBlink (permuter): second pointer temp `q = p` used inside the `mode != 0x1E` branch.
 

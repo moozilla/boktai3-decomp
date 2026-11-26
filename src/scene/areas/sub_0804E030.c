@@ -13,12 +13,7 @@ struct O {
     u8 f[0x26];
     u8 n;
 };
-struct P {
-    s16 x;
-    s16 pad;
-    s16 y;
-};
-s32 AreaEffect_FindContainingEntry(struct P *p)
+s32 AreaEffect_FindContainingEntry(struct SceneVec *p)
 {
     struct O *o = gAreaEffectManager;
     s32 i;
@@ -38,7 +33,7 @@ go:
         if (e->on != 0) {
             s32 x = p->x;
             if (x >= e->x0) {
-                s32 y = p->y;
+                s32 y = p->z;
                 if (y >= e->y0) {
                     if (x <= e->x1) {
                         if (y <= e->y1)

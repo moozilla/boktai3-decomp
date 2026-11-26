@@ -27,7 +27,6 @@ static inline s32 IsFixedDelay(struct Player *p)
 }
 
 // confidence=low: flags and active modifiers choose and shorten the linked action delay.
-#define Player_ComputeLinkedActionDelay sub_0823C424
 s32 Player_ComputeLinkedActionDelay(struct Player *p)
 {
     s32 n;

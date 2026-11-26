@@ -1,32 +1,32 @@
-#ifndef GUARD_GLOVE_H
-#define GUARD_GLOVE_H
+#ifndef GUARD_COFFIN_BIKE_H
+#define GUARD_COFFIN_BIKE_H
 #include "global.h"
 #include "link/wireless/scene_pool.h"
 #include "scene/actor/scene_actor_style.h"
 #include "scene/collision/spatial_entry.h"
 
-/* The Glove controller (0811697C-0811A9xx): the player's glove actor, a 0x968-byte
+/* The CoffinBike controller (0811697C-0811A9xx): the player's glove actor, a 0x968-byte
  * object whose movement body sits at +0x18 and whose sprite model follows it.
  * Merged from the per-unit declarations of the units that drive it. Names are
  * tentative (confidence=low) unless a sibling confirms them. */
 
-struct GloveModel;
-struct Glove;
+struct CoffinBikeModel;
+struct CoffinBike;
 
 /* The animation key at +0x524, read as a word and as its two halves. */
-union GloveAnimationKey {
+union CoffinBikeAnimationKey {
     u32 word;
     u16 half[2];
 };
 
 /* The particle emitter request at motion+0x44: a recoil command sets the kind
  * and type and raises `enter`; the low-resource color effect reads it too. */
-struct GloveEmitter {
+struct CoffinBikeEmitter {
     u8 kind, unknown1, type, enter;
 };
 
-/* The movement body, 0x5F8 bytes at Glove+0x18. */
-struct GloveMotion {
+/* The movement body, 0x5F8 bytes at CoffinBike+0x18. */
+struct CoffinBikeMotion {
     u8 pad0[4];
     u32 unk4;
     u32 unk8;
@@ -37,7 +37,7 @@ struct GloveMotion {
     s32 unk38;
     s32 unk3C;
     u32 flags40;
-    struct GloveEmitter emitter; /* 0x44 */
+    struct CoffinBikeEmitter emitter; /* 0x44 */
     struct SceneActorStyle style; /* 0x48 */
     u8 pad64[4];
     u32 pendingDamage; /* 0x68 */
@@ -74,7 +74,7 @@ struct GloveMotion {
     u16 recoveryTimer, cooldown; /* 0x326 */
     u8 secondaryRelease, secondaryLatched;
     u8 pad32C[0x524 - 0x32C];
-    union GloveAnimationKey animation; /* 0x524 */
+    union CoffinBikeAnimationKey animation; /* 0x524 */
     u8 pad528[4];
     struct SpatialEntry contact; /* 0x52C */
     u32 motionFlags;             /* 0x56C */
@@ -100,10 +100,10 @@ struct GloveMotion {
     u8 pad5EF;
     u16 angle; /* 0x5F0 */
     u8 pad5F2[2];
-    struct Glove *owner; /* 0x5F4 */
+    struct CoffinBike *owner; /* 0x5F4 */
 };
 
-struct GloveModelPart {
+struct CoffinBikeModelPart {
     u8 pad0[8];
     u32 flags;
     u8 padC[0x20 - 0xC];
@@ -112,30 +112,30 @@ struct GloveModelPart {
     u8 pad4C[0x60 - 0x4C];
 };
 
-/* The sprite model, 0x250 bytes at Glove+0x610: five parts, then the primary
+/* The sprite model, 0x250 bytes at CoffinBike+0x610: five parts, then the primary
  * animation and the palette. */
-struct GloveModel {
-    struct GloveModelPart parts[5];
+struct CoffinBikeModel {
+    struct CoffinBikeModelPart parts[5];
     u8 primaryAnimation[0x30];
     u8 palette[0x40];
 };
 
 /* A queued scene command for the glove (kind in `type`). */
-struct GloveCommand {
+struct CoffinBikeCommand {
     u8 unknown0[6], type, unknown7;
     s16 x, y;
     u16 c, d, e, f;
 };
 
-/* The command queue at Glove+0x870, double-buffered by the dispatch bank. */
-struct GloveQueue {
+/* The command queue at CoffinBike+0x870, double-buffered by the dispatch bank. */
+struct CoffinBikeQueue {
     u8 unknown0[6], count[2];
-    struct GloveCommand *commands[2][4];
+    struct CoffinBikeCommand *commands[2][4];
 };
 
-/* The recoil record at Glove+0x8C8 (bit 0 of flags: the glove is active). A
+/* The recoil record at CoffinBike+0x8C8 (bit 0 of flags: the glove is active). A
  * recoil command writes its target here. confidence=low */
-struct GloveDraw {
+struct CoffinBikeDraw {
     s32 x, y, z;
     u8 unknownC[4];
     u8 b, d, a, c;
@@ -143,19 +143,19 @@ struct GloveDraw {
     u16 flags;
 };
 
-/* The attachment descriptor at Glove+0x91C; its resource is the participant index. */
-struct GloveAttachment {
+/* The attachment descriptor at CoffinBike+0x91C; its resource is the participant index. */
+struct CoffinBikeAttachment {
     u32 resource, flags, unknown8;
 };
 
-struct GlovePosition {
+struct CoffinBikePosition {
     s16 x, y, z;
 };
 
-struct Glove {
+struct CoffinBike {
     u8 pad0[0x18];
-    struct GloveMotion motion; /* 0x18 */
-    struct GloveModel model;   /* 0x610 */
+    struct CoffinBikeMotion motion; /* 0x18 */
+    struct CoffinBikeModel model;   /* 0x610 */
     s8 marker, markerSlot;     /* 0x860 */
     u8 stylePlayer;            /* 0x862 */
     u8 pad863;
@@ -163,11 +163,11 @@ struct Glove {
     u8 active;  /* 0x868 */
     u8 pad869[3];
     void (*update)(void *); /* 0x86C */
-    struct GloveQueue queue; /* 0x870 */
+    struct CoffinBikeQueue queue; /* 0x870 */
     u8 pad898[0x8A4 - 0x898];
     struct ScenePoolVec32 origin, scroll; /* 0x8A4 */
     u16 *input;                           /* 0x8C4 */
-    struct GloveDraw draw;                /* 0x8C8 */
+    struct CoffinBikeDraw draw;                /* 0x8C8 */
     u8 pad8E0[4];
     u32 previousInput; /* 0x8E4 */
     s32 height;        /* 0x8E8 */
@@ -181,16 +181,16 @@ struct Glove {
     s32 launchSpeed; /* 0x914 */
     u8 launchPhase;  /* 0x918 */
     u8 pad919[3];
-    struct GloveAttachment attachmentDesc; /* 0x91C */
-    struct GlovePosition screenPosition;   /* 0x928 */
+    struct CoffinBikeAttachment attachmentDesc; /* 0x91C */
+    struct CoffinBikePosition screenPosition;   /* 0x928 */
     u8 pad930[0x950 - 0x930];
     s16 offsetX, offsetY; /* 0x950 */
     u8 pad954[0x964 - 0x954];
     void *attachment; /* 0x964 */
 };
 
-typedef char GloveMotionSizeCheck[sizeof(struct GloveMotion) == 0x5F8 ? 1 : -1];
-typedef char GloveModelSizeCheck[sizeof(struct GloveModel) == 0x250 ? 1 : -1];
-typedef char GloveSizeCheck[sizeof(struct Glove) == 0x968 ? 1 : -1];
+typedef char CoffinBikeMotionSizeCheck[sizeof(struct CoffinBikeMotion) == 0x5F8 ? 1 : -1];
+typedef char CoffinBikeModelSizeCheck[sizeof(struct CoffinBikeModel) == 0x250 ? 1 : -1];
+typedef char CoffinBikeSizeCheck[sizeof(struct CoffinBike) == 0x968 ? 1 : -1];
 
 #endif

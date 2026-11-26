@@ -27,7 +27,7 @@ static inline u32 Step(struct ContactSwarmSprite *sp, struct DisplaySequenceStat
 
 u32 Player_ConsumeStateEntry(struct PlayerCue *);
 void Player_SetSecondaryActionFlags(struct PlayerCue *, u32);
-void sub_08238238(struct PlayerCue *);
+void Player_UpdateActionFacingSide(struct PlayerCue *);
 void Player_SetTetherMode(struct PlayerCue *, s32, s32);
 void Player_PlayLocalSong(s32, u32);
 // confidence=low: decays the stored recovery amount before playing the finishing pose.
@@ -58,7 +58,7 @@ void PlayerCue_UpdatePoseRecovery(struct PlayerCue *p)
         case 1:
             Anim_SetSequence(&p->sequence, p->resource, 3, p->heading, p->side);
             if (Step(&p->sprite, &p->sequence, phase, 2)) {
-                sub_08238238(p);
+                Player_UpdateActionFacingSide(p);
                 Player_SetTetherMode(p, 0, 0);
             }
             break;

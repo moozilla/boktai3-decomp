@@ -1,5 +1,6 @@
 #include "scene/actor/actor_utilities.h"
 #include "scene/actor/scene_actor_placement.h"
+#include "scene/motion/scene_actor_chase_reaction.h"
 
 void SceneActorAnimation_InitEnemySequence(struct SceneActorSequenceDrawable *drawable, u16 b)
 {
@@ -165,7 +166,6 @@ void SceneActorRoute_ClampTargetToAnchor(struct ChaseActor *actor, struct Contac
     s32 len = (s16)Math_GetVectorLength((s16)dx, (s16)dz);
     void *mesh;
     struct ContactPosition *pos;
-    s32 r;
     dx = target->x - body->position.x;
     dz = target->z - body->position.z;
     if (len <= (s16)Math_GetVectorLength((s16)dx, (s16)dz)) {
@@ -175,17 +175,7 @@ void SceneActorRoute_ClampTargetToAnchor(struct ChaseActor *actor, struct Contac
     }
     mesh = actor->group.route;
     pos = &actor->base.body.position;
-    if (!Nav_IsPositionInMesh(mesh, pos, target)) {
-        SceneActorPlacement_ClearFlags(&actor->base.motionFlags, ~0x200);
-    } else {
-        r = Terrain_ApplyBlocked(mesh, pos, target);
-        if (r != 0) {
-            if (r != 2)
-                Memory_Clear(&actor->base.body.motion, 8);
-        } else {
-            SceneActorPlacement_ClearFlags(&actor->base.motionFlags, ~0x200);
-        }
-    }
+    SceneActorChase_TryRoute(actor, mesh, pos, target);
 }
 
 static inline s32 FacingDelta(s16 target, u16 current)
@@ -304,7 +294,7 @@ static inline s32 CellAt(struct ContactPosition *position)
 u8 SceneActorTerrain_IsBelowForwardFloor(struct SceneActorBody *body)
 {
     struct ContactPackedVector offset;
-    struct ContactPackedVector point;
+    struct ContactPosition point;
     s32 cell;
     s32 height;
     if (body->motion.x != 0) {
@@ -328,7 +318,7 @@ u8 SceneActorTerrain_IsBelowForwardFloor(struct SceneActorBody *body)
     point.x = body->position.x + body->motion.x + offset.x;
     point.y = body->position.y + body->motion.y;
     point.z = body->position.z + body->motion.z + offset.z;
-    cell = CellAt((struct ContactPosition *)&point);
+    cell = CellAt(&point);
     height = (CellProperties(cell)->height & 15) << 8;
     if (body->position.y < height)
         return 1;
@@ -382,7 +372,7 @@ void ActorParticles_SpawnDirectionalBurst(struct ChaseActor *actor, s32 amount)
         spread.y = (ActorParticles_NextRandom() & 7) + 3;
         spread.z = (ActorParticles_NextRandom() & 7) + 3;
         count = (ActorParticles_NextRandom() & 1) + 2;
-        sub_08014634(count, ActorMode_SelectOddStateVariant(actor),
+        ImpactParticleGroup_SpawnBouncing(count, ActorMode_SelectOddStateVariant(actor),
                      (struct SceneExtent *)&actor->base.body.position, &velocity, &spread, 45, 31);
     }
 }
@@ -414,7 +404,7 @@ void ActorParticles_SpawnBurst(struct ChaseActor *actor)
     spread.y = (ParticleRandom_ReadRelativeSample(sampleOrigin, gRandomTable) & 7) + 15;
     spread.z = (ParticleRandom_ReadRelativeSample(sampleOrigin, gRandomTable) & 3) + 15;
     count = (ParticleRandom_ReadRelativeSample(sampleOrigin, gRandomTable) & 3) + 4;
-    sub_08014634(count, ActorMode_SelectOddStateVariant(actor),
+    ImpactParticleGroup_SpawnBouncing(count, ActorMode_SelectOddStateVariant(actor),
                  (struct SceneExtent *)&actor->base.body.position, &velocity, &spread, 45, 31);
 }
 
@@ -446,6 +436,6 @@ void ActorParticles_SpawnWideBurst(struct ChaseActor *actor)
     spread.y = (ActorParticles_NextRandom() & 7) + 3;
     spread.z = 24;
     count = (ActorParticles_NextRandom() & 3) + 4;
-    sub_08014634(count, ActorMode_SelectOddStateVariant(actor),
+    ImpactParticleGroup_SpawnBouncing(count, ActorMode_SelectOddStateVariant(actor),
                  (struct SceneExtent *)&actor->base.body.position, &velocity, &spread, 60, 63);
 }

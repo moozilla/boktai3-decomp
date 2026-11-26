@@ -15,7 +15,7 @@ settings changed. The parent integration task owns the full-ROM build gate.
 | Unit | Const-local before → after | Stock bytes | Commit |
 | --- | ---: | ---: | --- |
 | `src/npc/manager/scene_actor_animation.c` | 41 → 13 | 11,544 | `0c162ae12` |
-| `src/npc/cutscene_actor/actor_animation_controller.c` | 36 → 31 | 30,356 | `7474978c5` |
+| `src/ui/title/tutorial_otenko.c` | 36 → 31 | 30,356 | `7474978c5` |
 | `src/bosses/count/actor_graphics_and_basic_states.c` | 16 → 10 | 12,420 | `0f429931e` |
 | `src/monsters/armor/actor_controller_transitions.c` | 13 → 6 | 3,404 | `88e29c2bf` |
 | `src/bosses/sabata/scene_event_actor.c` | 14 → 2 | 4,024 | `0bb3db59d` |
@@ -49,7 +49,7 @@ result, not a claim that every changed byte belongs to that function.
 
 The main residual in actor_animation_controller is a repeated u8-one flag update.
 Replacing the temporary by a literal moves the constant load after the flag
-address/load. Actor_BeginFadeAnimation isolates this as three reordered
+address/load. TutorialOtenko_BeginFadeAnimation isolates this as three reordered
 instructions. Constant-first OR, an explicit u8 operand and an explicit u8 result
 all produce the same mismatch. Those declarations were retained; no helper was
 invented merely to hide or rename them.

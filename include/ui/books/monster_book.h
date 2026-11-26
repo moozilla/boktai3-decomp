@@ -39,7 +39,7 @@ struct MonsterBookPalette {
 void Bg_SetupLayers(u32, u32, void *, u32, u32, u32, u32 *);
 void Bg_SetPriority(u32, u32);
 void BgGfx_LoadTilemapAtPosition(u32, u32, u32);
-void sub_08215EB4(u32, u32, u32, u32, u32, u32, u32, u32);
+void Bg_FillTilemapRectangle(u32, u32, u32, u32, u32, u32, u32, u32);
 void ScrollingDialogue_ClearScript(void);
 void ScrollingDialogue_HideImmediately(void);
 void ScrollingDialogue_RequestShow(void);

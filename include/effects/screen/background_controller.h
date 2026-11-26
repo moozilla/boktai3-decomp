@@ -125,7 +125,7 @@ struct ScrollingBackgroundConfig {
 /* Per-layer state in the hardware scroll registers (48-byte stride). */
 /* gBgRecords[bg], 0x30 bytes per background. x/y are the layer's full
  * scroll in map pixels (for the stage, BG2: 0x03004CB0/CB2); Bg_UpdateScrollShadow masks
- * them to 8 bits into gBgScrollShadow (BG0-3 HOFS/VOFS), which sub_08213FD8 copies
+ * them to 8 bits into gBgScrollShadow (BG0-3 HOFS/VOFS), which InterruptsAndVideo_OnVBlank copies
  * to REG_BG0HOFS.. in VBlank. World position -> BG2 map pixel: docs/ASSETS.md. */
 
 /* Dimensions record found through a resource reference (x/y at 8/10). */
@@ -168,7 +168,7 @@ void Bg_SetPriority(u32, s32);
 void Bg_SetupLayer(u32, u32, void *, s32, s32, s32, s32, void *);
 void Bg_SetupLayers(s32, s32, void *, s16, s16, s32, s32 *);
 void Bg_SetLayerMap(u32, void *, s32);
-void sub_08215D40(u16, void *, s32, u16 *, u16);
+void Bg_UploadTileEntries(u16, void *, s32, u16 *, u16);
 void *Video_GetBackgroundMap(u32);
 s32 Div(s32, s32);
 s32 Mod(s32, s32);

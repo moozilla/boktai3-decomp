@@ -376,7 +376,7 @@ void SceneTransition_LoadBackground(struct SceneTransition *screen)
         tile = 0xD759;
         firstTile = tiles->size;
     }
-    sub_08215D40(2, resource, 1, &tile, firstTile);
+    Bg_UploadTileEntries(2, resource, 1, &tile, firstTile);
     palette = SceneTransition_StartSunScript();
     CpuSet(palette->colors, gBgPaletteBuffer, 0x04000080);
 }

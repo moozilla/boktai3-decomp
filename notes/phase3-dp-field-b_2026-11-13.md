@@ -10,11 +10,11 @@ build was run; combined integration validation remains with the coordinator.
 
 Concession-free functions:
 
-- BreakableProp_EmitBreakParticles (080515DC): union random-table initializer
+- QuestBarrier_EmitBreakParticles (080515DC): union random-table initializer
   prevents loop hoisting; separate shifts preserve coordinate allocation.
-- ProximityEmitter_EmitParticle (08051A8C): split cursor updates and halfword
+- TetherRing_EmitParticle (08051A8C): split cursor updates and halfword
   field masks preserve the required register lifetimes and reload copy.
-- ProximityEmitter_TickActive (08051BD8) and ProximityEmitter_TickRise
+- TetherRing_TickActive (08051BD8) and TetherRing_TickRise
   (08051CB4): direct field preincrements preserve the cadence mask copies.
 - StackedActor_InitRisingParticle (080521DC): halfword-returning raised-height
   helper preserves constant/load order.
@@ -24,7 +24,7 @@ Concession-free functions:
   world-height pointer recover allocation and reload order.
 - WoodenCrate_CreateFromScript (080FF87C): shared DisplaySequence_StepSprite
   replaces the pinned local step while retaining a separate sprite pointer.
-- ActorGroup_CreateFromScript (08104350): command loads repeated in both
+- LootDeposit_CreateFromScript (08104350): command loads repeated in both
   animation direction arms, a mask after the join, and a do loop recover allocation.
 - Collectible_StartDeath (081153B4): shared sprite playback and byte-valued
   sequence arguments preserve the call argument setup order.
@@ -33,7 +33,7 @@ Concession-free functions:
 
 Matching partials:
 
-- ProximityEmitter_InitializeFromScript (08051EA8): eight pins and four
+- TetherRing_InitializeFromScript (08051EA8): eight pins and four
   barriers removed; two terrain pointers remain.
 - InteractionMarker_InitializeFromScript (08053AEC): nine pins and two
   barriers removed; two terrain pointers remain.
@@ -46,7 +46,7 @@ Matching partials:
 
 Twelve remaining holdouts, including those five partials, have drafts under
 `notes/phase3-drafts/dp-field-b/` and evidence under the dp-field-b heading in
-`notes/phase3-holdouts.md`. NamedObject_RegisterFollowCells (08101B1C),
+`notes/phase3-holdouts.md`. MovingPlatform_RegisterFollowCells (08101B1C),
 Collectible_UpdateEntry (08115674), and sub_0817AEC8 have exact diagnostic
 matches from allocation-priority changes. Their ordinary-C lifetime forms
 remain unresolved. The last emitter's union table initializer already prevents

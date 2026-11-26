@@ -42,7 +42,7 @@ s32 ScrollingDialogue_SetScript(const u8 *);
 void ScrollingDialogue_RequestShow(void);
 void ScrollingDialogue_HideImmediately(void);
 void BgGfx_LoadTilemapAtPosition(u32, u32, u32);
-void sub_082157EC(void);
+void Bg_ResetDisplay(void);
 void Hud_SetMode(s32);
 void Bg_SetupLayers(s32, s32, void *, s32, s32, s32, s32 *);
 u16 *Video_GetWrappedBackgroundMapEntry(s32, s32, s32);

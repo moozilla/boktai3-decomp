@@ -12,7 +12,7 @@ struct PaletteTransition {
     u16 black[16];
 };
 void PaletteTransition_StartDisplay(struct PaletteTransition *, u32);
-void sub_081D409C(struct PaletteTransition *, u32);
+void PaletteTransition_LoadSource(struct PaletteTransition *, u32);
 void PaletteTransition_ResetBuffers(struct PaletteTransition *p)
 {
     u16 *source;
@@ -21,7 +21,7 @@ void PaletteTransition_ResetBuffers(struct PaletteTransition *p)
     PaletteTransition_StartDisplay(p, p->parameter);
     if (p->mode == 2) {
         source = p->source;
-        sub_081D409C(p, p->parameter);
+        PaletteTransition_LoadSource(p, p->parameter);
         CpuSet(source, p->destination, 0x04000080);
         value = 0x7fff;
         for (i = 15; i >= 0; i--)

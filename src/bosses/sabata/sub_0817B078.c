@@ -1,6 +1,6 @@
-#include "bosses/sabata/scene_volume.h"
+#include "bosses/sabata/sabata_attack_state.h"
 
-void SabataVolume_ResetPendingSequence(struct SceneVolumeActor *volume)
+void Sabata_ResetAttackSequence(struct SabataAttackActor *volume)
 {
     if (volume->sequenceMode) {
         volume->sequenceTimer = 0;

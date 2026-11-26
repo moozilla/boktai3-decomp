@@ -1,16 +1,16 @@
-#include "global.h"
 #include "scene/collision/scene_stimulus.h"
+
 void SceneStimulus_ClearExclusionRegions(void)
 {
-    u8 *p = (u8 *)gSceneStimulusState;
-    if (p != 0) {
-        s32 lo = (s32)(p + 0x98);
-        u32 *q;
-        u32 z = 0;
-        q = (u32 *)(p + 0xd4);
+    struct SceneStimulusState *state = gSceneStimulusState;
+    if (state) {
+        s32 first = (s32)&state->ids[0];
+        s32 cursor;
+        s32 zero = 0;
+        cursor = (s32)&state->ids[15];
         do {
-            *q = z;
-            q--;
-        } while ((s32)q >= lo);
+            *(s32 *)cursor = zero;
+            cursor -= sizeof(state->ids[0]);
+        } while (cursor >= first);
     }
 }

@@ -1,5 +1,5 @@
 #include "ui/town/shop_states.h"
-void Shop_BeginSaleConfirmation(struct SceneInventoryControlView *panel)
+void Shop_BeginSaleConfirmation(struct ShopControlView *panel)
 {
     SceneInput_SaveSelection(&panel->grid);
     panel->interactionFlags = 0x14;
@@ -20,7 +20,7 @@ void Shop_BeginSaleConfirmation(struct SceneInventoryControlView *panel)
             s32 item;
             address <<= 1;
             address += (u32)game;
-            item = ((struct SceneInventoryConsumableSlot *)address)->id;
+            item = ((struct ShopConsumableSlot *)address)->id;
             SceneInputPanel_ShowDescription(panel, 1, message, item);
             break;
         }
@@ -29,5 +29,5 @@ void Shop_BeginSaleConfirmation(struct SceneInventoryControlView *panel)
     SceneInput_BeginChoice(&panel->display.prompt, &panel->display.widgetResource,
                            &panel->choiceValue, 0, &panel->choiceBlink);
     Shop_SetControllerCallback(
-        panel, (SceneInventoryCallback)Shop_TickSaleConfirmation);
+        panel, (ShopCallback)Shop_TickSaleConfirmation);
 }

@@ -1,0 +1,61 @@
+old_prefix,new_prefix,units,evidence
+ScenePanel,PileDriver,src/menus/scene_panel_control_and_lifecycle / src/menus/scene_panel_presentation / src/menus/scene_panel_sprite_rig / src/menus/scene_panel_subjects,CBB0 apparatus and purification run in 6201 and 6195. See the four Pile Driver identity rows.
+SingletonSlot7_,VanargandChase_,src/actors/actor_display / src/actors/singleton_slot_7 / src/effects/sprite_trail,"Stock 0072, 0076 and 0084 capture the visible Vanargand chase head at 6323."
+BossSlot2_,Sabata_,src/actors/scene_event_actor / src/bosses/boss_slot_2,The named White Forest encounter runs in 4233 and the rematch in 6415.
+EnemyD459_,AxeArmor_,src/monsters/enemy_d459,D459 runs on screen at 2993. Book #9867 names it Armor and #2538 identifies its axe shockwave.
+EnemyF426_,Statue_,src/monsters/enemy_f426,F426 runs on screen at 3182 and maps to the Statue entry at #9866.
+RegistryA8CB_,SabataRider_,src/actors/registry_a8_cb,Ending proc 6316 creates the purple bike rider. The 6323 replay names him Sabata.
+Glove_,CoffinBike_,src/monsters/glove,E881 update draws the ride in 6274 and both players in a Back Street Bike Battle.
+GridAttackActor_,NidhoggrInteriorActor_,src/actors/grid_attack_actor,Named Nidhoggr dialogue and grid attack execution in 4915.
+GridAttack_,NidhoggrInterior_,src/actors/grid_attack_actor,Named Nidhoggr dialogue and grid attack execution in 4915.
+GrowthHazard_,SolarRoot_,src/monsters/growth_hazard,Earth shots make the 1FBA plants in 3588 grow into the platforms named in text #1817.
+CannonBattery_,DeckCannonBattery_,src/monsters/cannon_battery,Deck guns in 4906 and 4859. The same 55E9 pool creates and updates them.
+CannonEmitter_,PollenFlower_,src/monsters/cannon_emitter,98CB plants in 3504 and 5181 apply the two pollen effects named in the Book.
+TentacleEnemy_,Centipede_,src/monsters/tentacle_actor,"Live 0AC7 actor in 4076 has category 9, which maps to Centipede #9851."
+TentacleActor_,CentipedeActor_,src/monsters/tentacle_actor,The 0AC7 component update runs around the visible Centipede in 4076.
+TentacleBody_,CentipedeBody_,src/monsters/tentacle_actor / src/monsters/tentacle_body,Windup and spread callbacks run while the 0AC7 Centipede attacks in 4076.
+BouncingObject_,BouncingBomb_,src/field/bouncing_object_pool,Nidhoggr’s grid attack calls the bomb pool at frame 1921. Dark spheres bounce across active floor tiles and the pool’s removal callback triggers the explosions. The same pool is reached from Mummy and Ratatosk projectile code.
+SceneInventory_CreatePresentation0,Shop_OpenWeaponShop,src/menus/inventory_transactions_and_catalogs/sub_0806347C.c,0007→1929. Key 744F opens the visible Weapon Shop catalog.
+SceneInventory_CreatePresentation1,Shop_OpenItemShop,src/menus/inventory_transactions_and_catalogs/sub_080634D4.c,0007→1996. Key 3019 opens the visible Item Shop catalog.
+SceneInventory_CreatePresentation2,Shop_OpenAccessoryShop,src/menus/inventory_transactions_and_catalogs/sub_0806352C.c,0007→2053. Key 7300 opens the visible Accessory Shop catalog.
+SceneInventory_CreatePresentation3,Shop_OpenTravelingMerchant,src/menus/inventory_transactions_and_catalogs/sub_08063584.c,0032→4217 (staged proc 1811). Key 3050 opens the visible Unnamed traveling merchant catalog.
+SceneInventory_CreatePresentation4,Shop_OpenGariGariStall,src/menus/inventory_transactions_and_catalogs/sub_080635DC.c,0032→4217 (staged proc 1811). Key 661E opens the visible GariGari-kun’s ice candy stall catalog.
+SceneInventory_,Shop_,src/menus/inventory_action_transitions / src/menus/inventory_transactions_and_catalogs / src/menus/inventory_values_and_display,"The five shop presentations are witnessed at 1929, 1996, 2053 and controlled proc 1811. Apply the five more specific constructor proposals first. Scope the general rule to the three shop units."
+NamedObject_,MovingPlatform_,src/field/named_object,"0042→4808, A4FC ID 085F, B019 moving platform. Scoped to the route-platform unit."
+CellGate_,PassageBarrier_,src/field/cell_traversal_gates,"0042→4755, GCL 71BA. CellGate_TestPassage then TerrainModifiers_UnregisterCell on approach."
+ActorGroup_,LootDeposit_,src/field/actor_group,"0029→3905, F1F9 ID 5639; slot breaks and calls item-drop proc 1133."
+Pool184_,LootDepositPool_,src/field/actor_group,"F1F9 ID 5639 uses a slot in this pool, observed in 3905."
+CallbackPool_,LootDepositHit_,src/other/callback_pool,"0029→3905, F1F9 slot 0200FC30 passed to CallbackPool_ApplyDamage."
+BreakableProp_,QuestBarrier_,src/field/breakable_props,"0029→3931, 3DB0 ID E912 shatters and triggers the named Trinity sequence."
+RegionActor_,IceBoulder_,src/field/proximity_actor,"0029→3955, 377D at (896, y, 896) draws the blue 863A ice boulder."
+SceneObjects_,PuzzleBlocks_,src/field/scene_objects,0029→3955. D9AE initializes the E02A stone-block task. The 9D41 pair and removal are tied to each original slot by renderer submissions. The same prefix in the separate door pool is outside scope.
+SceneObject_,SlidingDoor_,src/actors/scene_object_controller,"0054→5297 D4E3 slot with opening/closing states, sprites 7ACD and 7AD3."
+SceneScriptObject_,DungeonScenery_,src/field/scene_script_object,0029→3905 with 3D91/B07C. Sword strike runs the flash and burst paths.
+SceneNpc_,Otenko_,src/actors/scene_npc,0000/2201 visible field companion. BB34 at 2544 loads Otenko sprite 97D3. Scope to this unit.
+Actor_BeginAnimationPhase,OtenkoTutorial_BeginAnimationPhase,src/actors/actor_animation_controller/actor_animation_controller.c,GCL 1481→1474→1482 uses 8AAB to create and 5B01 to configure the Otenko tutorial actor. The staged screen and trace reach 081EA1C0 and its phase routines.
+StateActor_,StoryCharacter_,src/actors/state_actor_kind_086121_c4,"The 51 scoped functions animate Trinity (kinds 27 and 28 at 3931 and 4915) and share the story dispatch family used for Sabata’s projection (kind 29, 6587)."
+SceneCatalog_,PauseStatus_,"src/menus/scene_catalog, addresses 08174F14–08175854","0032→4217, Status tab. Scope to SetDescription, GetLevelScaledValue, SetSelection, ResetTextWindow and SelectDescription. The three settings functions are outside this scope."
+BurstEmitter_,SparkExplosion_,src/effects/five_slot_burst_emitter,Staged GCL 1043→1488/8639 shows a spark blast and smoke tail.
+SparkleEmitter_,CutsceneSparkles_,src/effects/sparkle_emitter,"Trinity release proc 3845 uses 3D64, instance A3E7 and CC88 green sparkle."
+EffectEmitter_,StrikeCrystal_,src/effects/effect_emitter,Proc 1179→95A8 loads 066A. A floating green crystal appears in the original renderer.
+TaggedSceneNpc_,Kuro_,src/actors/tagged_scene_npc,"D774 loads E00E, actor ID 51E2. Procs 2235/2266 and text #3515 tie this actor to Kuro."
+TileTrigger_,FloorTrap_,src/field/tile_trigger,"0013→3161, original 2FA5 slots are floor traps. The staged contact branch plays the press and particle callbacks."
+FrostEmitter_,SabataFrost_,src/effects/frost_emitter,0033/4233. EC71 attaches its 4384 cloud emitter. Staged constructor and draw confirm the effect in the battle.
+CollisionController_,StrikeTrap_,src/field/collision_controllers,0866 ID E811. Original collision callback and delayed spark blast verified in 3955.
+DirectionalController_,InteractionPrompt_,src/field/directional_interaction_controllers,0029→3955. A at 883A/E6CC selects the slot and opens the Fireball hint #1690 through the original input handler.
+ProximityEmitter_,TetherRing_,src/field/proximity_particle_emitter,F156 / 0BA8. Stock 0024 Ancient Tree checkpoint at 3472 renders and emits from the coffin ring. Proc 3475 invokes 851→852.
+Params3D0_,TitleDisplay_,src/actors/actor_animation_controller/sub_081EAB64.c / sub_081EB598.c / sub_081EB5A8.c / sub_081EB724.c / sub_081EB7DC.c,0000 cold boot dispatches 3578 + 4A25 FBD8; the phoenix title emblem animates under these callbacks.
+SceneObjects_Script,SlidingDoors_Script,src/actors/scene_object_controller,"0054/5297 6D69 and D4E3 update the separate sliding-door task, sprites 7ACD and 7AD3."
+SceneProcSprites_,BallisticSprite_,src/effects/ballistic_sprite_effect,"Controlled original 081394B4 uses 409C launch, flight and the scatter trail."
+ParticleEmitter_,BallisticTrail_,src/effects/particle_emitter,Controlled original 081394B4 reaches ParticleEmitter_UpdateFlight and the 8639 scatter trail.
+Breakable_,LightFixture_,src/field/pooled_interactables,"0038→4479. Original 2E1C slot B8CC draws F099 and its hit response calls 4478, lighting the room."
+ActorMarker_,BikeChargeMarker_,src/effects/particle_burst_effect/following_sprite_effect.c,0037→6274 with the saved piercing Blaster. Ordinary B hold reveals drawable 0200F4E8 at frame 1896. The release runs the original piercing-shot emitter.
+Player_UpdateLink,LinkPlayer_Update,0824261C / 082438F4,Controlled 3955 alternate Django runs both entry points on the task returned by the original constructor. The ordinary Player task keeps its existing update name.
+sub_08243B0C,LinkPlayer_Create,08243B0C,Original constructor creates the 0xCAC task. The 3955 controlled run shows a second blue Django and traces the task owner into LinkPlayer update.
+MovingGlyph_,CutsceneShot_,src/effects/particle_burst/moving_glyph.c,PlayerCue_Shoot loads 210E and the original task moves the shot across the 6201 screen. The 2961 stock run hits the same unit.
+SpriteParticle_,VanargandMotes_,src/effects/sprite_particle,The live Vanargand presentation callback uses the original 081FF09C pool in the controlled 6323 burst. Scope to 081FED9C–081FF38C.
+ParticleEffect_,PlayerActionFlash_,src/effects/particle_effect,"Original Player motion 9 runs the gold flash, orbit effect and terminal update at 6201."
+PlayerBarrier_,PileTrap_,src/player/player_barrier,Proc 2446 text #4166 and the 0037 outdoor replay tie request kind 3 and the normal L/A motions to the DC7A/A680 Pile Trap task.
+GroupObjects_,BatFlock_,src/field/group_objects,E534 creates a kind 10 bat receiver. The 0016→6201 staged scene messages operate its sixteen live DA6D bats.
+BoardPieces_,BatFlock_,src/field/group_objects,"Packets 0, 1, 2 and 11 run the four bat flock command handlers in the normal scheduler."
+BoardPiece_,BatFlockPiece_,src/field/group_objects,The E534 piece updates move the visible DA6D bats in the staged 6201 replay.

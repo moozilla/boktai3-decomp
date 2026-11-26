@@ -1,12 +1,12 @@
 #include "global.h"
-struct SceneInventoryCategoryMenu {
+struct StorageCategoryMenu {
     u8 unknown0[0xF3A];
     s16 introY;
     u8 unknownF3C[0x812];
     u16 introFrame;
 };
-void Storage_BeginCategoryBrowse(struct SceneInventoryCategoryMenu *);
-void Storage_UpdateBrowseIntro(struct SceneInventoryCategoryMenu *p)
+void Storage_BeginCategoryBrowse(struct StorageCategoryMenu *);
+void Storage_UpdateBrowseIntro(struct StorageCategoryMenu *p)
 {
     p->introFrame++;
     if (p->introFrame <= 11) {

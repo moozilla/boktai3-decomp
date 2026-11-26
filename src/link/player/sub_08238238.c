@@ -1,7 +1,6 @@
 #include "global.h"
 
 // confidence=low: alternate action handlers use this copy of the facing-fold helper.
-#define Player_UpdateActionFacingSide sub_08238238
 
 struct FacingState {
     u8 pad[0x3A2];

@@ -18,7 +18,7 @@ void DamageNumberDisplay_Show(void *, s32, s32, void *, void *, s32);
 void SceneHud_SetTimedState(void *, s32, s32, s32, s32, s32);
 void TerrainModifiers_UnregisterCell(void *);
 void TerrainModifiers_RegisterCell(void *, s32, s32, s32, s32, s32);
-void sub_08014634(s32, s32, void *, void *, void *, s32, s32);
+void ImpactParticleGroup_SpawnBouncing(s32, s32, void *, void *, void *, s32, s32);
 void Explosion_CreateAt(void *, s32, s32, s32, s32, s32, s32, s32);
 void Anim_RestartSequence(void *, void *, u32, u32, u32);
 void AnimData_SelectPaletteBank(void *, s32);
@@ -85,8 +85,8 @@ invoke:
         p->f158 = p->f15c;
         Sound_PlaySong(0x13e);
         if (p->damage > 0) {
-            DamageNumberDisplay_Show(collider, p->damage, 0, &p->collider.position, &p->collider.offset,
-                                     1);
+            DamageNumberDisplay_Show(collider, p->damage, 0, &p->collider.position,
+                                     &p->collider.offset, 1);
             SceneHud_SetTimedState((void *)p->name, p->health, p->maximumHealth, p->hudA,
                                    p->collider.costFlags == 4, p->hudTime);
         }
@@ -100,7 +100,8 @@ invoke:
                 s32 cell;
                 TerrainModifiers_UnregisterCell(p->terrainCell);
                 cell = Fan_Cell(&p->sprite.position);
-                TerrainModifiers_RegisterCell(p->terrainCell, cell, 0, p->sprite.position.y >> 8, 0, 1);
+                TerrainModifiers_RegisterCell(p->terrainCell, cell, 0, p->sprite.position.y >> 8, 0,
+                                              1);
             }
             {
                 struct ContactPosition *v = &center;
@@ -114,7 +115,8 @@ invoke:
             spread.x = 24;
             spread.y = (ParticleRandom_ReadDirectSample(table) & 7) + 3;
             spread.z = 24;
-            sub_08014634((ParticleRandom_ReadDirectSample(table) & 3) + 4, 13, &center, &velocity, &spread, 15, 15);
+            ImpactParticleGroup_SpawnBouncing((ParticleRandom_ReadDirectSample(table) & 3) + 4, 13,
+                                              &center, &velocity, &spread, 15, 15);
             {
                 struct ContactPosition *v = &smoke;
                 *v = p->sprite.position;
@@ -203,8 +205,7 @@ tail:
     }
     {
         u32 *sprite = &p->sprite.flags;
-        PlayerCue_StepSequence((struct ContactSwarmSprite *)sprite,
-                               &p->sequence);
+        PlayerCue_StepSequence((struct ContactSwarmSprite *)sprite, &p->sequence);
     }
     p->age++;
 }

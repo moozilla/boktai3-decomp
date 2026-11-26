@@ -107,7 +107,6 @@ static inline void Palette_SelectResource(u8 *p, u32 id)
     }
 }
 // confidence=low: dispatches queued scene-message commands to Ratatosk states and effects.
-#define Ratatosk_DispatchSceneCommands sub_081F6B90
 void Ratatosk_DispatchSceneCommands(u8 *p)
 {
     struct Actor *q = (void *)p;

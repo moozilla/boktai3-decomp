@@ -93,7 +93,7 @@ are low confidence unless the handler is named; the rest print as
 | 2 | player characters (`F5EB` the player, `2B06` actor_name_of 102) | sub_0815D688 | PlayerCue_Dispatch (52 cases) | 29 | all handlers matched and named (table below) |
 | 3 | registry actors | SceneActorRegistry_RegisterCategoryReceiver, Armor_Create | | 6 | |
 | 4 | scene actors (Vanargand, Ratatosk...) | SceneActors_Initialize | SceneActors_DispatchCommands (67 cases, inline; NONMATCHING draft) | 43 | most set state 2 with a sub-state (0-8, 10-14, 18-24, 66); 2 place(x, y, z), 9 effect, 15/16 graphics variant, 25 flash; 26-65 do nothing here |
-| 5 | NPCs (`place_character`) | SceneNpc_CreateFromScript, TaggedSceneNpc_Create | SceneNpc_DispatchCommands (68 cases; NONMATCHING draft) | 62 | the player's shapes: 1 stand, 3 face, 4 walk_to (speed 10), 5 run_to (speed 20), 25 pose, 26 pose_end, 64 place(x, y, z); 13-16 swap the palette; most others set state 0 with a sub-state |
+| 5 | NPCs (`place_character`) | Otenko_CreateFromScript, Kuro_Create | Otenko_DispatchCommands (68 cases; NONMATCHING draft) | 62 | the player's shapes: 1 stand, 3 face, 4 walk_to (speed 10), 5 run_to (speed 20), 25 pose, 26 pose_end, 64 place(x, y, z); 13-16 swap the palette; most others set state 0 with a sub-state |
 | 6 | camera `FF40` | Camera_Initialize | Camera_DispatchCommands | 4 | all matched: 0 reset, 1 snap_to(x, y, z), 2 pan_to(x, y, z, frames), 3 `sub_08226474`(frames), 4 sway(a, b, mode) (guess), 5 follow_player(frames) |
 | 7 | screen `730A` | sub_08021394 | SceneCommands_Dispatch | 8 | all matched: 0 particles_at, 1 particles_stop, 2 particles_on, 3 fade(out, speed, r, g, b, bg, obj, other, 0), 4 fade_palette, 5 blend_palette, 6 quake(strength, frames), 7 quake_stop, 8 flash, 9 done |
 | 8 | audio `D3A9` | SceneAudioEvent_Register | SceneAudioEvent_DispatchPending | 9 | all (named handlers): 0 play_sound, 2 start_bgm, 4 fade_out_bgm, 6/9 channel 12 |
@@ -151,7 +151,7 @@ the handler returns 0; 51 neither).
 `python3 tools/assets/cutscenes.py --targets` lists each kind's registration,
 dispatcher and handlers with their status. The player, camera and screen
 receivers are matched. The scene-actor (`SceneActors_DispatchCommands`,
-1,644 bytes) and NPC (`SceneNpc_DispatchCommands`, 1,552) dispatchers are
+1,644 bytes) and NPC (`Otenko_DispatchCommands`, 1,552) dispatchers are
 NONMATCHING drafts (81% and 71%): the scene actor's graphics-variant
 branches and the NPC facing math still allocate registers differently. Open:
 Vanargand (`7C56`) is sent scene-actor commands 51–62, which this dispatcher

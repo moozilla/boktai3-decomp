@@ -21,11 +21,11 @@ struct MapMenu {
     u16 originX, originY, map, x, y, otherMap, otherX, otherY;
 };
 s32 Anim_LoadKeyframe(void *, void *, u32, u32);
-void sub_0816BC54(struct MapMenu *);
+void MapMenu_RefreshNavigationArrows(struct MapMenu *);
 u32 MapScreen_GetPositionMarkerKeyframe(struct MapMenu *);
 void MapMenu_ResetMarkers(struct MapMenu *s)
 {
-    sub_0816BC54(s);
+    MapMenu_RefreshNavigationArrows(s);
     if (s->adjacent != -1) {
         Anim_LoadKeyframe(&s->arrow, s->arrowData, 0x72, 1);
         s->arrow.flags &= ~1;

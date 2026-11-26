@@ -4,8 +4,8 @@ BgGfx_LoadTilemapSimple exits through r0 and the caller preserves its return add
 
 The explicit form changed the ROM bytes. The guarded form passed the unit ROM check.
 
---- a/src/status_screen_fade.c
-+++ b/src/status_screen_fade.c
+--- a/src/ui/status_screen/status_screen_fade.c
++++ b/src/ui/status_screen/status_screen_fade.c
 @@ -190,4 +190,7 @@
      StatusScreen_RefreshDirtyDisplays(p);
      BgGfx_LoadTilemapSimple(0, 0, 0, 0, 0);

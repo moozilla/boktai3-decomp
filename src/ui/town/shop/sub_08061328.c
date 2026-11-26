@@ -1,5 +1,5 @@
 #include "ui/town/shop_control.h"
-void Shop_UpdateActionPrompt(struct SceneInventoryControlView *panel)
+void Shop_UpdateActionPrompt(struct ShopControlView *panel)
 {
     switch (panel->mode) {
         case 4:

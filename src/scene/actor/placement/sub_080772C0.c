@@ -1,28 +1,8 @@
+#include "scene/actor/scene_actor_reaction.h"
+#include "scene/motion/scene_actor_terrain_reaction.h"
 #include "scene/actor/scene_actor_reset.h"
 #include "scene/actor/scene_actor_init_actor.h"
 #include "scene/motion/scene_actor_chase_shared.h"
-struct MotionFlags {
-    s16 bits : 16;
-};
-static inline void EnableMotionFlags(u32 mask, u16 *field)
-{
-    struct MotionFlags *flags = (void *)field;
-    flags->bits |= mask;
-}
-static inline void SetControl(struct ChaseActor *actor, void *control, u32 kind)
-{
-    actor->base.field2B2 = 1;
-    actor->base.stepDone = 0;
-    actor->base.controlKind = kind;
-    actor->base.target = control;
-    actor->base.field2C8 = 0;
-    {
-        u32 *flags = &actor->base.pendingControlFlags;
-        u32 mask = ~1;
-        *flags &= mask;
-    }
-    actor->base.pendingControl = 0;
-}
 static inline u8 IsDown(struct ChaseActor *actor, u16 *motion)
 {
     if (!actor)
@@ -45,7 +25,7 @@ void SceneActorPlacement_ResetActorState(struct ChaseActor *actor, const u16 *ar
     u16 prior = mask & *flags;
     if (prior)
         return;
-    EnableMotionFlags(mask, flags);
+    SceneActorReaction_EnableMotionFlags(mask, flags);
     switch (*argument) {
         case 0: {
             u32 bit = 1;
@@ -55,7 +35,7 @@ void SceneActorPlacement_ResetActorState(struct ChaseActor *actor, const u16 *ar
             SceneActorChase_ClearWordFlags(&actor->base.behaviorFlags, 3);
             SceneActorRegistry_ResetRouteAndColliders((void *)actor);
             MonsterInit_SetState(actor, 3, 0, 0);
-            SetControl(actor, actor->base.onHidden, 12);
+            SceneActorTerrain_InstallControl(actor, actor->base.onHidden, 12);
             break;
         case 1:
             if (IsDown(actor, flags))
@@ -63,7 +43,7 @@ void SceneActorPlacement_ResetActorState(struct ChaseActor *actor, const u16 *ar
             SceneActorChase_ClearWordFlags(&actor->base.behaviorFlags, 3);
             SceneActorRegistry_ResetRoute((void *)actor);
             MonsterInit_SetState(actor, 3, 0, 0);
-            SetControl(actor, actor->base.onHidden, 12);
+            SceneActorTerrain_InstallControl(actor, actor->base.onHidden, 12);
             break;
         default: {
             u32 bit = 1;

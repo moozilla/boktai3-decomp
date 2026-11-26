@@ -47,7 +47,7 @@ s32 Popbud_UpdateDamageAnimation(struct PinkSpineState *p)
         p->f12C--;
     } else
         AnimData_SelectPaletteBank(p->graphics, 0x1BD);
-    if (PinkSpine_StepAnimation(p) && p->update == ProjectileEmitter_UpdateAttack)
+    if (Popbud_StepAnimation(p) && p->update == ProjectileEmitter_UpdateAttack)
         Sound_PlaySong(0x521);
     p->age++;
 }

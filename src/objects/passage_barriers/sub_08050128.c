@@ -1,0 +1,14 @@
+#include "objects/passage_barriers/cell_gate.h"
+s32 PassageBarrier_TestPlayerCell(struct CellGate *gate)
+{
+    s32 x = gPlayers[0]->position.x >> 8;
+    s32 z = gPlayers[0]->position.z >> 8;
+    u32 cell;
+    if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
+        cell = 0;
+    else
+        cell = gTerrainMap->rows[z] + x;
+    if (cell == gate->cell)
+        return 1;
+    return 0;
+}

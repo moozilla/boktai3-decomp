@@ -1,6 +1,5 @@
 #include "global.h"
 // confidence=low: tests the perpendicular cell coordinate against the terrain sidestep margin.
-#define Player_IsWithinSidestepCellMargin sub_0823C8FC
 s32 Player_IsWithinSidestepCellMargin(u8 *p)
 {
     u32 direction = p[0x4A5];

@@ -2,7 +2,7 @@
 #include "monsters/dragon_puppy.h"
 #include "global.h"
 void Bestiary_UnlockEntry(s32);
-void sub_08159164(s32);
+void Player_AddExperience(s32);
 #define H(p, n) (*(s16 *)((u8 *)(p) + (n)))
 static inline s32 clamp(s32 v)
 {
@@ -33,7 +33,7 @@ void DragonPuppy_HandleDefeat(struct DragonPuppy *p)
     Bestiary_UnlockEntry(3);
     if (p->stateWord & 1) {
         u16 flags;
-        sub_08159164(p->unknown144);
+        Player_AddExperience(p->unknown144);
         H(gGameState, 0x87C) = H(gGameState, 0x87C) < 9999 ? H(gGameState, 0x87C) + 1 : 9999;
         H(gGameState, 0x538) = H(gGameState, 0x538) < 9999 ? H(gGameState, 0x538) + 1 : 9999;
         flags = p->bodyReactionFlags;

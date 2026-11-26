@@ -2,7 +2,7 @@
 #include "bosses/hresvelgr/hresvelgr_travel.h"
 
 // confidence=low: enters animation 38 and notifies the linked actor once.
-void sub_08159164(void *);
+void Player_AddExperience(void *);
 
 void Hresvelgr_BeginLinkedAnimation(struct HresvelgrTravelActor *arg)
 {
@@ -11,7 +11,7 @@ void Hresvelgr_BeginLinkedAnimation(struct HresvelgrTravelActor *arg)
     if (Hresvelgr_ConsumeActionEntry(p)) {
         if (p->currentAnimation != 38)
             Hresvelgr_SetActionAnimation(p, 38);
-        sub_08159164(base->linked);
+        Player_AddExperience(base->linked);
     }
     p->actionTimer++;
 }

@@ -4,9 +4,9 @@
 // confidence=low: initializes a half's sprite, origin, collision, target registration and shadow.
 void AnimData_Load(void *, u32);
 void Sprite_Init(void *, void *, u32);
-void ActorStatus_InitializeCollider(void *, s32, s32, s32);
-void ActorStatus_InitializeBodyCollider(void *);
-s32 ActorStatus_BeginTimedState(struct ActorStatusOwner *, s32, s32);
+void VanargandCombat_InitializeCollider(void *, s32, s32, s32);
+void VanargandCombat_InitializeBodyCollider(void *);
+s32 VanargandCombat_BeginTimedState(struct ActorStatusOwner *, s32, s32);
 s32 TargetRegistry_RegisterSceneActor(struct PairedHalfTarget *, struct ContactCollider *,
                                       s32 (*)(struct ActorStatusOwner *, s32, s32));
 void ScaledShadow_Initialize(void *, void *, s32, s32, s32, s32, s32, s32, s32, s32, s32);
@@ -55,8 +55,8 @@ void PairedSceneActor_InitializeHalf(struct PairedSceneHalf *half, void *origin,
         one = 1;
         *active = one;
     }
-    ActorStatus_InitializeCollider(half, 30, 128, 60);
-    ActorStatus_InitializeBodyCollider(half);
+    VanargandCombat_InitializeCollider(half, 30, 128, 60);
+    VanargandCombat_InitializeBodyCollider(half);
     {
         u16 *field188 = &half->field188;
         *field188 = zero;
@@ -71,7 +71,7 @@ void PairedSceneActor_InitializeHalf(struct PairedSceneHalf *half, void *origin,
         track->cursor = zero;
     }
     TargetRegistry_RegisterSceneActor(&half->target, &half->damageCollider,
-                                      ActorStatus_BeginTimedState);
+                                      VanargandCombat_BeginTimedState);
     shadow = half->shadow;
     ScaledShadow_Initialize(shadow, &half->sprite.position, 128, 128, 128, 128, scale, one, 6, zero,
                             zero);

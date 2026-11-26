@@ -29,7 +29,7 @@ static inline void add(struct MotionVector *out, struct MotionVector *a, struct 
     out->y = b->y + a->y;
     out->z = b->z + a->z;
 }
-void MotionEntry_UpdatePosition(struct MotionEntry *entry)
+void HresvelgrMotion_UpdatePosition(struct MotionEntry *entry)
 {
     struct MotionVector offset;
     s32 angle = (entry->frame * entry->angularStep) & 255;

@@ -14,7 +14,7 @@ struct IbSprite {
     u8 pad12[10];
     struct ContactPosition position;
 };
-s32 Widget_InitLinked(u8 *, void *, u16, u32, u8, u8, u8, const struct ContactPosition *);
+s32 AnimSprite_InitLinked(u8 *, void *, u16, u32, u8, u8, u8, const struct ContactPosition *);
 s32 ForgingBook_IsCategoryComplete(void *, s32);
 s32 Mod(s32, s32);
 void *ActorDebris_Create(void *, void *, void *);
@@ -31,29 +31,29 @@ u32 ForgingBook_InitSprites(u8 *p)
     res = ScriptProc_Start(0xcb05, 0xe2ab);
     *((struct AnimSpriteResource *)(p + 0x24)) = *res;
     ResourceHeader_Relocate(p + 0x24, res);
-    Widget_InitLinked(p + 0x64, p + 0x24, 0x49, 0x10, 0, 0, 0, 0);
-    Widget_InitLinked(p + 0x124, p + 0x24, 0x3e, 0x10, 0, 0, 0, 0);
+    AnimSprite_InitLinked(p + 0x64, p + 0x24, 0x49, 0x10, 0, 0, 0, 0);
+    AnimSprite_InitLinked(p + 0x124, p + 0x24, 0x3e, 0x10, 0, 0, 0, 0);
     if (!ForgingBook_IsCategoryComplete(p, *((s16 *)(p + 0xb60))))
         *((u32 *)(p + 0x12c)) |= 1;
     pos.x = 0xb8;
     pos.y = 0x68;
     pos.z = 0;
     for (i = 0; i < 4; i++) {
-        Widget_InitLinked((u8 *)((struct AnimSprite *)(p + 0x1e4) + i), p + 0x24, 0, 0x10, 0,
+        AnimSprite_InitLinked((u8 *)((struct AnimSprite *)(p + 0x1e4) + i), p + 0x24, 0, 0x10, 0,
                           0, 0, &pos);
         pos.x += 8;
         if (i == 1)
             pos.x += 8;
     }
 
-    Widget_InitLinked(p + 0x184, p + 0x24, 0x4c, 0x10, 0, 0, 0, 0);
+    AnimSprite_InitLinked(p + 0x184, p + 0x24, 0x4c, 0x10, 0, 0, 0, 0);
     res = ScriptProc_Start(0xcb05, 0x530d);
     *((struct AnimSpriteResource *)(p + 0x44)) = *res;
     ResourceHeader_Relocate(p + 0x44, res);
     pos.x = 0x58;
     pos.y = 0x18;
     pos.z = 0;
-    Widget_InitLinked(p + 0xc4, p + 0x44, 0x4d, 0x10, 0, 0, 0, &pos);
+    AnimSprite_InitLinked(p + 0xc4, p + 0x44, 0x4d, 0x10, 0, 0, 0, &pos);
     res = ScriptProc_Start(0xcb05, 0x5d04);
     *((struct AnimSpriteResource *)(p + 0x388)) = *res;
     ResourceHeader_Relocate(p + 0x388, res);
@@ -63,7 +63,7 @@ u32 ForgingBook_InitSprites(u8 *p)
         struct AnimSprite *cells = (void *)(p + 0x3a8);
         for (i = 0; i < 18; i++) {
             struct ContactPosition *cellPosition = &cells[i].position;
-            Widget_InitLinked((u8 *)&cells[i], p + 0x388, (u16)(0xf0 + i), 0x10, 0, 0, 0, 0);
+            AnimSprite_InitLinked((u8 *)&cells[i], p + 0x388, (u16)(0xf0 + i), 0x10, 0, 0, 0, 0);
             cellPosition->x = pos.x;
             cellPosition->y = pos.y;
             cellPosition->z = 0;
@@ -85,7 +85,7 @@ u32 ForgingBook_InitSprites(u8 *p)
         struct AnimSpriteResource *objectRes = ScriptProc_Start(0xcb05, 0xde23);
         ResourceHeader_Relocate(p + 0xa68, objectRes);
     }
-    Widget_InitLinked(p + 0xa88, p + 0xa68, 0, 0, 0, 1, 0, 0);
+    AnimSprite_InitLinked(p + 0xa88, p + 0xa68, 0, 0, 0, 1, 0, 0);
     *((u32 *)(p + 0xa90)) &= ~1;
     *((u8 *)(p + 0xaa2)) = 2;
     {

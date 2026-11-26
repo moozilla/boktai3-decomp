@@ -8,9 +8,9 @@ static inline s32 randomGlobal(void)
     offset = gRandomIndex * 2;
     return *(const u16 *)(offset + (u32)gRandomTable);
 }
-void PileDriverRig_RandomizeMovement(struct ScenePanelRig *input)
+void PileDriverRig_RandomizeMovement(struct PileDriverRig *input)
 {
-    struct ScenePanelRig *rig = input;
+    struct PileDriverRig *rig = input;
     s32 angle, difference;
     const u16 *table;
     u32 *seed;

@@ -4,8 +4,8 @@ The out-of-range mode branch returns with menu in r0
 
 The explicit form changed the ROM bytes. The guarded form passed the unit ROM check.
 
---- a/src/fn/sub_08040A74.c
-+++ b/src/fn/sub_08040A74.c
+--- a/src/ui/modifier_menu/sub_08040A74.c
++++ b/src/ui/modifier_menu/sub_08040A74.c
 @@ -10,3 +10,6 @@
              return menu->choice.cursor.category + 27;
      }

@@ -11,13 +11,13 @@ struct VanargandAnimatedPart {
     u16 animation;
 };
 void Vanargand_UpdatePartCollision(void *boss, void *part);
-void sub_081A7204(void *part);
+void Vanargand_ApplyPartDamage(void *part);
 void SceneAnimation_SelectSequence(void *, s32, s32, s32);
 void Vanargand_UpdatePartAnimation(void *boss, struct VanargandAnimatedPart *part)
 {
     if (!(part->sprite.flags & 1)) {
         part->flags = 0;
-        sub_081A7204(part);
+        Vanargand_ApplyPartDamage(part);
         if (part->animation) {
             if (DisplaySequence_StepSprite(&part->sprite, &part->sequence)) {
                 part->animation = 0;

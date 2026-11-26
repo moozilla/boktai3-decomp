@@ -8,7 +8,7 @@ void MotionTrack_Update(void *);
 
 void Vanargand_EmitPartTrail(void *);
 
-void AnimatedParticles_EmitBurst(void *, s32, s32, s32, s32, s32, s32, s32);
+void ImpactBurst_EmitBurst(void *, s32, s32, s32, s32, s32, s32, s32);
 
 extern const s16 gUnk_086149C4[];
 
@@ -131,7 +131,7 @@ void Vanargand_UpdatePartPairedStrike(struct VanargandAttackPair *boss, struct P
                     MotionTrack_Initialize(&p->motion, &p->offset, &delta, 0, 2);
                     Sound_PlaySong(0x1ba);
                     Vanargand_AddVector(&position, &p->targetPosition, p->origin);
-                    AnimatedParticles_EmitBurst(&position, (s16)p->fieldB0, 0, 64, 4, 4, 4, 4);
+                    ImpactBurst_EmitBurst(&position, (s16)p->fieldB0, 0, 64, 4, 4, 4, 4);
                     Vanargand_SetState(p, 6);
                     p->actionEntered = 1;
                     p->finished = 1;
@@ -140,7 +140,7 @@ void Vanargand_UpdatePartPairedStrike(struct VanargandAttackPair *boss, struct P
                     {
                         struct ContactPosition *position = &p->sprite.position;
                         s16 heading = (s16)p->fieldB0;
-                        AnimatedParticles_EmitBurst(position, heading, 0, 64, 4, 4, 4, 4);
+                        ImpactBurst_EmitBurst(position, heading, 0, 64, 4, 4, 4, 4);
                     }
                     Vanargand_SetState(p, 6);
                     p->actionEntered = 1;
@@ -164,7 +164,7 @@ void Vanargand_UpdatePartPairedStrike(struct VanargandAttackPair *boss, struct P
             if ((p->actionCounters[1] <= 44) && (!(p->actionCounters[1] & 15))) {
                 struct ContactPosition position;
                 Vanargand_AddVector(&position, &p->targetPosition, p->origin);
-                AnimatedParticles_EmitBurst(&position, (s16)p->fieldB0, 0, 64, 4, 4, 4, 4);
+                ImpactBurst_EmitBurst(&position, (s16)p->fieldB0, 0, 64, 4, 4, 4, 4);
             }
             if ((++p->actionCounters[1]) > 90) {
                 Vanargand_SetState(p, 4);
@@ -217,7 +217,7 @@ void SceneBurstActor_UpdateTimedBurst(void *unused, struct PairedSceneHalf *acto
         out->x = offset->x + base->x;
         out->y = offset->y + base->y;
         out->z = offset->z + base->z;
-        AnimatedParticles_EmitBurst(out, (s16)actor->fieldB0, 0, 0x40, 4, 4, 4, 4);
+        ImpactBurst_EmitBurst(out, (s16)actor->fieldB0, 0, 0x40, 4, 4, 4, 4);
     }
     if (++actor->actionCounters[1] > 0x5A)
         actor->finished = 1;
@@ -364,7 +364,7 @@ void Vanargand_UpdatePartGroundStrike(struct VanargandAttackPair *boss, struct P
             MotionTrack_Update(&p->motion);
             if (Vanargand_MotionEnded(p)) {
                 Sound_PlaySong(0x1ba);
-                AnimatedParticles_EmitBurst(&p->sprite.position, (s16)p->fieldB0, 0, 64, 4, 4, 4,
+                ImpactBurst_EmitBurst(&p->sprite.position, (s16)p->fieldB0, 0, 64, 4, 4, 4,
                                             4);
                 Vanargand_SetState(p, 4);
                 p->actionEntered = 1;
@@ -393,7 +393,7 @@ void Vanargand_UpdatePartGroundStrike(struct VanargandAttackPair *boss, struct P
                 p->shake = 8;
             }
             if (!(p->actionCounters[1] & 15) && p->actionCounters[1] <= 44)
-                AnimatedParticles_EmitBurst(&p->sprite.position, (s16)p->fieldB0, 0, 64, 4, 4, 4,
+                ImpactBurst_EmitBurst(&p->sprite.position, (s16)p->fieldB0, 0, 64, 4, 4, 4,
                                             4);
             {
                 u32 mask = 128;
@@ -503,7 +503,7 @@ void Vanargand_UpdatePartOffsetStrike(struct VanargandAttackPair *boss, struct P
                 Vanargand_EmitPartTrail(p);
             if (Vanargand_MotionEnded(p)) {
                 Sound_PlaySong(0x3d9);
-                AnimatedParticles_EmitBurst(&p->sprite.position, (s16)p->fieldB0, 0, 64, 4, 4, 4,
+                ImpactBurst_EmitBurst(&p->sprite.position, (s16)p->fieldB0, 0, 64, 4, 4, 4,
                                             4);
                 Vanargand_SetState(p, 3);
                 *enter = 1;
@@ -628,7 +628,7 @@ void Vanargand_UpdatePartSweepingStrike(struct VanargandAttackPair *boss, struct
             MotionTrack_Update(&p->motion);
             if (Vanargand_MotionEnded(p)) {
                 Sound_PlaySong(0x3d9);
-                AnimatedParticles_EmitBurst(&p->sprite.position, (s16)p->fieldB0, 0, 64, 4, 4, 4,
+                ImpactBurst_EmitBurst(&p->sprite.position, (s16)p->fieldB0, 0, 64, 4, 4, 4,
                                             4);
                 Vanargand_SetState(p, 4);
                 p->actionEntered = 1;
@@ -775,7 +775,7 @@ void Vanargand_UpdatePartLunge(void *unused, struct PairedSceneHalf *p)
 
 void CpuSet(const void *, void *, u32);
 
-void ActorStatus_Deactivate(void *, void *);
+void VanargandCombat_Deactivate(void *, void *);
 
 void Vanargand_ReleaseRadialEffects(struct VanargandAttackPair *boss, struct PairedSceneHalf *p)
 {
@@ -816,7 +816,7 @@ void Vanargand_ReleaseRadialEffects(struct VanargandAttackPair *boss, struct Pai
 
         case 1:
             p->finished = 1;
-            ActorStatus_Deactivate(boss, p);
+            VanargandCombat_Deactivate(boss, p);
             break;
     }
 }
@@ -877,7 +877,7 @@ void Vanargand_EmitRadialPartEffects(struct VanargandAttackPair *boss, struct Pa
 
         case 2:
             p->finished = 1;
-            ActorStatus_Deactivate(boss, p);
+            VanargandCombat_Deactivate(boss, p);
             break;
     }
 }
@@ -957,12 +957,12 @@ void Vanargand_UpdatePartImpact(struct VanargandAttackPair *boss, struct PairedS
                     struct ContactPosition point;
                     Sound_PlaySong(0x1ba);
                     Vanargand_AddPosition(&point, &p->targetPosition, p->origin);
-                    AnimatedParticles_EmitBurst(&point, (s16)p->fieldB0, 0, 64, 4, 4, 4, 4);
+                    ImpactBurst_EmitBurst(&point, (s16)p->fieldB0, 0, 64, 4, 4, 4, 4);
                     p->shake = 15;
                     Vanargand_FinishImpact(p, enter);
                 } else {
                     Sound_PlaySong(0x3d9);
-                    AnimatedParticles_EmitBurst(&p->sprite.position, (s16)p->fieldB0, 0, 64, 4, 4,
+                    ImpactBurst_EmitBurst(&p->sprite.position, (s16)p->fieldB0, 0, 64, 4, 4,
                                                 4, 4);
                     Vanargand_FinishImpact(p, enter);
                 }
@@ -1322,11 +1322,11 @@ void Vanargand_UpdatePartEmergence(struct VanargandAttackPair *boss, struct Pair
             p->actionEntered = 1;
             return;
         }
-        boss->widget.flags &= ~1;
+        boss->animSprite.flags &= ~1;
         if (p->mode == 0)
-            boss->widget.flags |= 4;
+            boss->animSprite.flags |= 4;
         else
-            boss->widget.flags &= ~4;
+            boss->animSprite.flags &= ~4;
         {
             void *data = boss->effectResource;
             u32 zero = 0;
@@ -1348,7 +1348,7 @@ void Vanargand_UpdatePartEmergence(struct VanargandAttackPair *boss, struct Pair
         case 0:
             entering = p->actionEntered;
             enter = &p->actionEntered;
-            animation = &boss->widget;
+            animation = &boss->animSprite;
             keyframes = &boss->resource;
             if (entering) {
                 p->actionEntered = 0;
@@ -1365,7 +1365,7 @@ void Vanargand_UpdatePartEmergence(struct VanargandAttackPair *boss, struct Pair
         case 1:
             entering = p->actionEntered;
             enter = &p->actionEntered;
-            animation = &boss->widget;
+            animation = &boss->animSprite;
             keyframes = &boss->resource;
             if (entering) {
                 p->actionEntered = 0;
@@ -1374,7 +1374,7 @@ void Vanargand_UpdatePartEmergence(struct VanargandAttackPair *boss, struct Pair
             if (Anim_Step(animation, keyframes)) {
                 Vanargand_SetState(p, 2);
                 *enter = 1;
-                boss->widget.flags |= 1;
+                boss->animSprite.flags |= 1;
             }
             p->sprite.position = *((struct ContactPosition *)p->origin);
             break;
@@ -1408,7 +1408,7 @@ void Vanargand_UpdatePartEmergence(struct VanargandAttackPair *boss, struct Pair
     Vanargand_Project(&projected, p->origin);
     projected.x = (projected.x - gCameraOrigin[0]) + 120;
     projected.y = (projected.y - gCameraOrigin[1]) + 92;
-    boss->widget.position = projected;
+    boss->animSprite.position = projected;
 }
 
 // confidence=low: moves to the radial target and fades from the alternate palette.
@@ -1479,7 +1479,7 @@ void Vanargand_UpdatePartFadeOut(struct VanargandAttackPair *boss, struct Paired
                     u8 *ptr = &p->finished;
                     *ptr = 1;
                 }
-                ActorStatus_Deactivate(boss, p);
+                VanargandCombat_Deactivate(boss, p);
             } break;
         }
     }
@@ -1546,7 +1546,7 @@ void Vanargand_DestroyPartController(struct VanargandAttackPair *controller)
     struct ContactCollider *collider;
     struct ContactSwarmSprite *sprite;
     s32 i;
-    Anim_Remove(&controller->widget);
+    Anim_Remove(&controller->animSprite);
     node = &controller->halves[0].target;
     shadow = controller->halves[0].shadow;
     collider = &controller->halves[0].damageCollider;
@@ -1576,7 +1576,7 @@ void Vanargand_DestroyPartController(struct VanargandAttackPair *controller)
 
 void *ScriptProc_Start(u16, u16);
 
-s32 Widget_InitLinked(void *, void *, u16, u32, u8, u8, u8, const void *);
+s32 AnimSprite_InitLinked(void *, void *, u16, u32, u8, u8, u8, const void *);
 
 // confidence=low: initializes the controller resources and its two embedded halves.
 
@@ -1590,8 +1590,8 @@ s32 Vanargand_InitializePartController(struct VanargandAttackPair *boss, void *o
     void *data = ScriptProc_Start(0xcb05, 0xb3de);
     resource = &boss->resource;
     ResourceHeader_Relocate(resource, data);
-    animation = &boss->widget;
-    Widget_InitLinked(animation, resource, 0, 16, 3, 1, 60, 0);
+    animation = &boss->animSprite;
+    AnimSprite_InitLinked(animation, resource, 0, 16, 3, 1, 60, 0);
     Anim_SetKeyframes(animation, resource, 0, 1, 0);
     if (!palettes)
         source = gPaletteBankData + 0xe00;
@@ -1603,7 +1603,7 @@ s32 Vanargand_InitializePartController(struct VanargandAttackPair *boss, void *o
     CpuSet(source, boss->palettes[4], 0x04000008);
     source = gPaletteBankData + 0x1060;
     CpuSet(source, boss->palettes[5], 0x04000010);
-    boss->widget.flags |= 1;
+    boss->animSprite.flags |= 1;
     boss->effectResource = ScriptProc_Start(0x922e, 0x572b);
     for (i = 0; i < 2; i++) {
         struct PairedSceneHalf *part = &boss->halves[i];

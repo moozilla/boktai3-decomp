@@ -2,7 +2,6 @@
 #include "player/player.h"
 
 // confidence=low: table-driven weapon cue and combo phases drive the attack collider.
-#define Player_UpdateWeaponCueCombo sub_0814D9C4
 struct PlayerActionCueInfo {
     u8 unknown0[0x15];
     u8 cueIndex;
@@ -30,7 +29,7 @@ void Player_InitializeActionContact(void *);
 s32 Player_UpdateStatThreshold(void *);
 s32 Player_IsActionCueReady(void *);
 s32 Player_HasWeaponComboEntry(void *);
-void sub_0814D264(void *, s32);
+void Player_UpdateAttackColliderMotion(void *, s32);
 void ActorSequence_Begin(void *, u32, u32);
 static inline void InvalidatePreviousAnimation(struct Player *p)
 {
@@ -113,7 +112,7 @@ void Player_UpdateWeaponCueCombo(struct Player *p)
                 } else
                     Player_SetActionPhase(p, 4);
             }
-            sub_0814D264(p, forced);
+            Player_UpdateAttackColliderMotion(p, forced);
             break;
         }
 

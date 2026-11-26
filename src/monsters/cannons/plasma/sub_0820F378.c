@@ -16,17 +16,17 @@
 s32 Callback_InvokeActor(void *, void *);
 void Collider_SetPosition(void *, void *, u32);
 void TerrainModifiers_UnregisterCell(void *);
-void sub_08014634(s32, s32, void *, void *, void *, s32, s32);
+void ImpactParticleGroup_SpawnBouncing(s32, s32, void *, void *, void *, s32, s32);
 void Anim_RestartSequence(void *, void *, u32, u32, u32);
 void AnimData_SelectPaletteBank(void *, s32);
 void PlasmaCannon_UpdateDefeatEffect(u8 *);
 void Explosion_CreateAt(void *, s32, s32, s32, s32, s32, s32, s32);
-static inline u16 OrangeSpine_RandomBurstCount(const u16 *table)
+static inline u16 PlasmaCannon_RandomBurstCount(const u16 *table)
 {
     return (ParticleRandom_ReadDirectSample(table) & 3) + 4;
 }
-static inline u32 OrangeSpine_StepSequence(struct DisplaySequenceSprite *owner,
-                                           struct DisplaySequenceState *state)
+static inline u32 PlasmaCannon_StepSequence(struct DisplaySequenceSprite *owner,
+                                            struct DisplaySequenceState *state)
 {
     const u16 *command;
     u32 ended;
@@ -119,8 +119,8 @@ s32 PlasmaCannon_UpdateDamageState(struct OrangeSpineActor *p)
             spread.x = 24;
             spread.y = (ParticleRandom_ReadDirectSample(table) & 7) + 3;
             spread.z = 24;
-            sub_08014634(OrangeSpine_RandomBurstCount(table), 13, &center, &velocity, &spread, 15,
-                         15);
+            ImpactParticleGroup_SpawnBouncing(PlasmaCannon_RandomBurstCount(table), 13, &center,
+                                              &velocity, &spread, 15, 15);
             {
                 struct SceneVec *smokePosition = &smoke;
                 *smokePosition = p->sprite.coordinates.position;
@@ -161,6 +161,6 @@ s32 PlasmaCannon_UpdateDamageState(struct OrangeSpineActor *p)
         else
             p->sprite.display.flags &= ~1;
     }
-    OrangeSpine_StepSequence(&p->sprite.display, &p->sequence);
+    PlasmaCannon_StepSequence(&p->sprite.display, &p->sequence);
     p->age++;
 }

@@ -3,7 +3,7 @@
 #include "engine/engine.h"
 #include "scene/collision/contact_collider.h"
 #include "engine/video/sprite.h"
-#include "objects/scene_objects/scene_object.h"
+#include "objects/scene_object.h"
 #include "engine/video/render.h"
 
 // Tentative: a task owning up to four wall segments (script 'p' positions, 'd' directions) that

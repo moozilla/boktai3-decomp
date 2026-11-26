@@ -8,7 +8,6 @@ struct ScreenLayerPair {
     u8 unknown30C[0x2E2];
     s16 layer;
 };
-#define ScreenLayers_ShowPair sub_081EC628
 void ScreenLayers_ShowPair(struct ScreenLayerPair *screen)
 {
     screen->firstFlags &= ~1;

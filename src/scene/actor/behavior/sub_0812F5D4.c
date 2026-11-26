@@ -5,7 +5,7 @@
 #include "scene/actor/scene_actor_control_phase.h"
 #include "scene/motion/scene_actor_turn.h"
 #include "debug.h"
-u8 sub_0812F3CC(struct ChaseActor *);
+u8 SceneActorReaction_BeginContactResponse(struct ChaseActor *);
 s32 NavMesh_ConsumeProbeEvent(void *);
 u8 SceneActorBehavior_RequestDescriptorTurn(void *, void *, s32, s32, s32);
 u8 SceneActorBehavior_AccelerateTowardDescriptor(void *, void *, s32, s32, s32);
@@ -138,7 +138,7 @@ void SceneActorReaction_UpdateContactRoute(struct ChaseActor *actor)
     }
     if ((u8)Callback_InvokeActor(actor, actor->base.contactQuery.opaque))
         return;
-    if (sub_0812F3CC(actor))
+    if (SceneActorReaction_BeginContactResponse(actor))
         return;
     speed = Callback_InvokeActor(actor, actor->base.animationQuery.opaque);
     ContactRoute_ApplyDuration(actor, 0xA02F, &motionFlags);

@@ -34,7 +34,7 @@ struct Unk082315A8Graphics {
     void *animation;
 };
 extern const u16 gUnk_08E879A0[];
-void sub_08231444(void);
+void SceneActorEffects_OnInactiveSlot(void);
 void EffectGroup_Reset(void *);
 void Anim_SetSequence(void *, void *, u32, u32, u32);
 void sub_08231EF8(void);
@@ -73,7 +73,7 @@ s32 EffectGroup_Spawn(struct Unk082315A8Group *group, u32 kind, u32 parameter,
         group->kind = kind;
         switch (group->kind) {
             case 0:
-                group->callback = sub_08231444;
+                group->callback = SceneActorEffects_OnInactiveSlot;
                 break;
             case 1:
                 group->callback = sub_08231EF8;

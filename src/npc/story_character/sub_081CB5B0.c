@@ -32,7 +32,7 @@ void Palette_InterpolateBanks(void *, void *, void *, u32, u32);
 s32 DisplayAnimation_TestFinished(void *);
 u32 PlayerParticleCloud_Create(void *, u32);
 s32 PlayerParticleCloud_RequestStop(void);
-s32 sub_081D3620(void);
+s32 PlayerParticleCloud_ScatterAnchors(void);
 void Actor_OnHiddenIdleUpdate(void);
 
 void sub_081CB5B0(void *ctx, struct SceneNpc *npc, s32 tick)
@@ -57,7 +57,7 @@ void sub_081CB5B0(void *ctx, struct SceneNpc *npc, s32 tick)
                 npc->stateFrame = 0;
                 npc->phase++;
                 PlayerParticleCloud_Create(&npc->position, 1);
-                sub_081D3620();
+                PlayerParticleCloud_ScatterAnchors();
                 Sound_PlaySong(0x5B5);
             }
             break;

@@ -1,7 +1,5 @@
 #include "engine/math/scalar_approach.h"
-/* ScalarApproach_StepAngleQuarterArray: Updates signed halfword angles toward corresponding targets using wrapped quarter steps */
-#define ScalarApproach_StepAngleQuarterArray sub_08221E00
-#define ScalarApproach_QuarterAngleArray     sub_08221E00
+/* ScalarApproach_QuarterAngleArray: Updates signed halfword angles toward corresponding targets using wrapped quarter steps */
 void ScalarApproach_QuarterAngleArray(s16 *values, const s16 *targets, s32 count)
 {
     s32 remaining = count;

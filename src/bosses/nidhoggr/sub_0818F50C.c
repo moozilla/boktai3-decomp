@@ -15,7 +15,7 @@ void AnimData_Load(void *, s32);
 void AnimData_SelectPaletteBank(void *, s32);
 void Sprite_Init(void *, void *, s32);
 void Anim_RestartSequence(void *, s32, s32, s32, s32);
-void sub_0818F0FC(void);
+void NidhoggrEffect_TickSpriteLifetime(void);
 void Nidhoggr_DestroySpriteEffect(void);
 void EffectPool_CreateTimedEffect(u8 *p, struct EffectPosition *q)
 {
@@ -29,7 +29,7 @@ void EffectPool_CreateTimedEffect(u8 *p, struct EffectPosition *q)
         Sprite_Init((u8 *)o + 0x24, r, 0);
         Anim_RestartSequence((u8 *)o + 0x50, *(s32 *)(p + 0x53AC), 6, 0, 0);
         o->v = *q;
-        a = sub_0818F0FC;
+        a = NidhoggrEffect_TickSpriteLifetime;
         b = Nidhoggr_DestroySpriteEffect;
         o->f0 = a;
         o->f1 = b;

@@ -1,25 +1,18 @@
+#include "scene/camera/scene_camera_controller.h"
 #include "global.h"
 #include "engine/ram.h"
-struct S {
-    u8 pad[0x1c];
-    u16 f1c;
-    u16 f1e;
-    u8 pad2[0x68 - 0x20];
-    u16 f68;
-    u16 f6a;
-};
-void Camera_NotifyMoveComplete(struct S *);
+void Camera_NotifyMoveComplete(struct SceneCameraController *);
 void Camera_ReturnToDefault(s32 n)
 {
-    struct S *p = gActiveCamera;
+    struct SceneCameraController *p = (void *)gActiveCamera;
     if (p) {
-        p->f1c = 1;
+        p->moving = 1;
         if (n <= 1) {
-            p->f68 = 0;
+            p->positionMode = 0;
             Camera_NotifyMoveComplete(p);
         } else {
-            p->f6a = n;
-            p->f68 = 5;
+            p->positionTimer = n;
+            p->positionMode = 5;
         }
     }
 }

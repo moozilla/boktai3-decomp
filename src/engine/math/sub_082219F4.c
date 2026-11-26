@@ -1,7 +1,5 @@
 #include "engine/math/scalar_approach.h"
-/* ScalarApproach_StepAngleSixteenth: Approaches the target along the wrapped angle difference by one sixteenth with a minimum unit step */
-#define ScalarApproach_StepAngleSixteenth sub_082219F4
-#define ScalarApproach_SixteenthAngle     sub_082219F4
+/* ScalarApproach_SixteenthAngle: Approaches the target along the wrapped angle difference by one sixteenth with a minimum unit step */
 s32 ScalarApproach_SixteenthAngle(s32 current, s32 target)
 {
     s16 angle = ((u32)current - (u32)target) & 255;

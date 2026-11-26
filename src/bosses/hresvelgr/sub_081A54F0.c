@@ -1,5 +1,5 @@
 #include "global.h"
-void Debug_NudgeScreenPositionWithB(s16 *);
+void HresvelgrDebug_NudgeScreenPositionWithB(s16 *);
 s32 __divsi3(s32, s32);
 static inline s32 shift(s32 x, s32 n)
 {
@@ -28,7 +28,7 @@ void Debug_NudgeWorldPositionWithB(s16 *p)
     q[1] = a - b1;
     q[2] = a + b1;
     q2 = v;
-    Debug_NudgeScreenPositionWithB(v);
+    HresvelgrDebug_NudgeScreenPositionWithB(v);
     a2 = v[0];
     b = q2[1];
     c = __divsi3((a2 + b) << 5, 3) + y;

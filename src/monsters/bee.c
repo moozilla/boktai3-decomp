@@ -1559,8 +1559,8 @@ s32 Bee_Init(void *object)
         res = ScriptProc_Start(0xCB05, 0x9506);
         *(struct DisplayResourceHeader *)heap = *(struct DisplayResourceHeader *)res;
         ResourceHeader_Relocate(heap, res);
-        Widget_InitLinked((void *)&((struct SceneActorAnimationTileDrawable *)heap)->tile, heap, 0,
-                          0, 2, 2, 0x3C, &tmp);
+        AnimSprite_InitLinked((void *)&((struct SceneActorAnimationTileDrawable *)heap)->tile, heap,
+                              0, 0, 2, 2, 0x3C, &tmp);
         actor->base.animationIndex = 0xFF;
     }
     MonsterInit_InitializeBody(actor);

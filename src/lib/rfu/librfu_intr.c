@@ -1,13 +1,6 @@
 /* RFU_V1024 interrupt source from pinned pret/pokeemerald; docs/RFU.md. */
 // COMPILER: agbcc_arm
 // CFLAGS: -O2 -mthumb-interwork
-#define IntrSIO32 sub_08244A38
-#define sio32intr_clock_master sub_08244A9C
-#define sio32intr_clock_slave sub_08244D2C
-#define handshake_wait sub_08245138
-#define STWI_set_timer_in_RAM sub_082451A0
-#define STWI_stop_timer_in_RAM sub_082452B0
-#define STWI_init_slave sub_08245300
 #define Callback_Dummy_M sub_0824538C
 #define Callback_Dummy_S sub_08245390
 #define Callback_Dummy_ID sub_08245394

@@ -1,8 +1,8 @@
 #include "global.h"
 #include "engine/engine.h"
 #include "npc/story_character/state_actor.h"
-// confidence=low: Vampire pending-damage handler: applies queued damage, flash/shake, death and stagger transitions.
-struct VampireDamage {
+// confidence=low: Count pending-damage handler: applies queued damage, flash/shake, death and stagger transitions.
+struct CountDamage {
     u8 pad0[0x48];
     u8 sprite[0x14];
     u8 pad5C[0x34];
@@ -51,7 +51,7 @@ struct VampireDamage {
     u8 specialEffect[1];
 };
 
-struct VampireDamageGameState {
+struct CountDamageGameState {
     u8 pad0[0x876];
     s16 damageLevel;
 };
@@ -65,15 +65,15 @@ void Count_UpdateSwayReaction(void *, int);
 void sub_08027214(void *, int);
 
 /* Health is stored in the signed halfword domain. */
-static inline s16 Vampire_GetHealthFloor(void)
+static inline s16 Count_GetHealthFloor(void)
 {
     return 0;
 }
 
-int Count_ApplyPendingDamage(struct VampireDamage *p)
+int Count_ApplyPendingDamage(struct CountDamage *p)
 {
     int special;
-    struct VampireDamage *base = p;
+    struct CountDamage *base = p;
     u8 *sprite = p->sprite;
     void *collider = p->collider;
     int damage;
@@ -99,7 +99,7 @@ int Count_ApplyPendingDamage(struct VampireDamage *p)
     flaggedBit = p->contactFlags >> 3;
     flaggedBit &= 1;
     if (((p->damageFlags & 1) && (p->damageGuard == 0)) &&
-        (((struct VampireDamageGameState *)gGameState)->damageLevel > 0)) {
+        (((struct CountDamageGameState *)gGameState)->damageLevel > 0)) {
         *hit = 1;
         damage = p->health - (p->maxHealth / 2);
         if (damage < 0)
@@ -111,7 +111,7 @@ int Count_ApplyPendingDamage(struct VampireDamage *p)
     if (p->effectCooldown == 0) {
         if ((p->effectState == 0) && SceneActorGraphics_GetEffectState(p)) {
             SceneActors_SpawnDestructionParticles(p);
-            damage = ((struct VampireDamageGameState *)gGameState)->damageLevel * 5;
+            damage = ((struct CountDamageGameState *)gGameState)->damageLevel * 5;
             Sound_PlaySongChecked(0x12a);
             p->effectCooldown = 60;
         }
@@ -146,7 +146,7 @@ int Count_ApplyPendingDamage(struct VampireDamage *p)
         size.z = 16;
         DamageNumberDisplay_Show(collider, damage, 0, sprite + 0xc, &size, 1);
         if ((*hp) <= 0) {
-            s16 health = Vampire_GetHealthFloor();
+            s16 health = Count_GetHealthFloor();
             *hp = health;
             SceneActorState_SetFlags((struct StateActor *)base, 2);
             SceneActorState_EnterAction((struct StateActor *)base, sub_08027214, 25);

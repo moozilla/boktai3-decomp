@@ -14,9 +14,13 @@ struct ArmorLaunchPart {
     u8 flags;
     u8 unk_11A[4];
     u8 active, action;
-    u8 unk_120[0x134 - 0x120];
+    u8 unk_120[0x12E - 0x120];
+    u8 motionPhase;
+    u8 unk_12F[0x134 - 0x12F];
     struct ArmorLaunchPosition target;
-    u8 unk_13C[0x1E4 - 0x13C];
+    u8 unk_13C[0x1D0 - 0x13C];
+    void (*update)(struct ArmorLaunchPart *);
+    u8 unk_1D4[0x1E4 - 0x1D4];
 };
 struct ArmorLaunchState {
     u8 flags, unk_01[4], active, action;
@@ -32,6 +36,8 @@ struct ArmorLaunchGroup {
     u8 unk_5B4[0x5C3 - 0x5B4];
     u8 count, activeCount;
 };
+typedef char ArmorLaunchPartSize[(sizeof(struct ArmorLaunchPart) == 0x1E4) ? 1 : -1];
+typedef char ArmorLaunchGroupSize[(sizeof(struct ArmorLaunchGroup) == 0x5C8) ? 1 : -1];
 
 /* Activate a part, signal its next action, and count it in the group. */
 #define ARMOR_QUEUE_PART_ACTION(state_, next_, active_, bit_, count_) \

@@ -209,8 +209,8 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [docs/SHARED_MONSTER_REACTIONS.md](../docs/SHARED_MONSTER_REACTIONS.md) | Shared monster pursuit and contact operations | #matching #scene-actor #golem #skeleton #ghoul #mummy #regalloc #080C9C04 #080C12FC #0808B3EC #080DA97C #080D2584 #08078EE8 | 9 |
 | [docs/SHIFTABILITY.md](../docs/SHIFTABILITY.md) | Shiftable data: how it was proven | #tooling #assets | 1 |
 | [docs/SOLAR_SENSOR.md](../docs/SOLAR_SENSOR.md) | Cartridge solar sensor: code and runtime evidence | *#hardware* | 5 |
-| [docs/SOURCE_LAYOUT.md](../docs/SOURCE_LAYOUT.md) | Source layout | #tooling #process | 13 |
-| [docs/SOURCE_LAYOUT_DECISIONS.md](../docs/SOURCE_LAYOUT_DECISIONS.md) | Source layout pass 3: decisions | #tooling #process | 13 |
+| [docs/SOURCE_LAYOUT.md](../docs/SOURCE_LAYOUT.md) | Source layout | #tooling #process | 15 |
+| [docs/SOURCE_LAYOUT_DECISIONS.md](../docs/SOURCE_LAYOUT_DECISIONS.md) | Source layout pass 3: decisions | #tooling #process | 14 |
 | [docs/SPARK_PARTICLE.md](../docs/SPARK_PARTICLE.md) | Moving tile particles (tentative identity) | *#particles #assets* | 3 |
 | [docs/SPRITE_EFFECT_CONTROLLER.md](../docs/SPRITE_EFFECT_CONTROLLER.md) | Sprite effect controllers (tentative) | *#assets* | 2 |
 | [docs/SPRITE_EFFECT_STEERING_ACTORS.md](../docs/SPRITE_EFFECT_STEERING_ACTORS.md) | Sprite/effect controllers and steering actors (0806B2C4–0806CA3C) | *#actors #assets* | 13 |
@@ -242,7 +242,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [docs/history/2026-11-17.md](../docs/history/2026-11-17.md) | 2026-11-17 | #compiler #depin #matching #phase3 #round13 #round15 #structs | 3 |
 | [docs/history/2026-11-20.md](../docs/history/2026-11-20.md) | 2026-11-20 | #actors #compiler #matching #monsters #phase3 #scene #scene-actors #tooling #wireless | 2 |
 | [docs/history/2026-11-25.md](../docs/history/2026-11-25.md) | Work log, 2026-11-25 | #actors #assets #compiler #hardware #matching #menu #phase3 #process #scene #tooling | 5 |
-| [docs/history/2026-11-26.md](../docs/history/2026-11-26.md) | Work log, 2026-11-26 | #actors #autopilot #compiler #matching #menu #monster #phase3 #port #scripts #tooling #tools #types #verification | 13 |
+| [docs/history/2026-11-26.md](../docs/history/2026-11-26.md) | Work log, 2026-11-26 | #actors #autopilot #camera #compiler #matching #menu #monster #monsters #phase3 #port #scene #scripts #terrain #tooling #tools #types #verification | 18 |
 | [docs/history/HANDOFF_2026-10-23.md](../docs/history/HANDOFF_2026-10-23.md) | Handoff: current state and how to continue | #process | 14 |
 | [docs/history/MANAGER_HANDOFF_2026-10-19.md](../docs/history/MANAGER_HANDOFF_2026-10-19.md) | Manager handoff (2026-10-19) | #process #tooling | 6 |
 | [docs/history/README.md](../docs/history/README.md) | Handoff history |  | 17 |
@@ -253,13 +253,13 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [gcl/examples/scale_quiz.md](../gcl/examples/scale_quiz.md) | Worked example: the Blackbeard Brothers' scale quiz | *#scripts #assets #tooling* | 10 |
 | [gcl/examples/sealed_prison.md](../gcl/examples/sealed_prison.md) | Worked example: the Sealed Prison, the first dungeon | *#scripts #assets #tooling* | 6 |
 | [notes/actor-contact-target-draft.md](../notes/actor-contact-target-draft.md) | Contact target and damage update | #scene-actors #matching | 1 |
-| [notes/actor-controller-init-round9.md](../notes/actor-controller-init-round9.md) | Actor_InitializeController | *#assets* | 0 |
+| [notes/actor-controller-init-round9.md](../notes/actor-controller-init-round9.md) | TutorialOtenko_InitializeController | *#assets* | 0 |
 | [notes/actor-damage-particle-bursts.md](../notes/actor-damage-particle-bursts.md) | Hit reaction particle bursts | #scene-actors #matching | 1 |
 | [notes/actor-glyph-trail_2026-11-01.md](../notes/actor-glyph-trail_2026-11-01.md) | Actor glyph trail | *#actors* | 0 |
-| [notes/actor-interaction-child-recovery.md](../notes/actor-interaction-child-recovery.md) | Actor_ConfigureInteractionChildFromScript | *#scripts #assets* | 1 |
+| [notes/actor-interaction-child-recovery.md](../notes/actor-interaction-child-recovery.md) | TutorialOtenko_ConfigureInteractionChildFromScript | *#scripts #assets* | 1 |
 | [notes/actor-marker-launch-fragments_2026-11-01.md](../notes/actor-marker-launch-fragments_2026-11-01.md) | ActorMarker_LaunchFragments (08181514) | #matching #actor-marker #compiler | 1 |
-| [notes/actor-move-toward-target-round9.md](../notes/actor-move-toward-target-round9.md) | Actor_MoveTowardTarget | *#animation #assets* | 0 |
-| [notes/actor-region-children-round9.md](../notes/actor-region-children-round9.md) | Actor_UpdateRegionChildren | *#assets* | 0 |
+| [notes/actor-move-toward-target-round9.md](../notes/actor-move-toward-target-round9.md) | TutorialOtenko_MoveTowardTarget | *#animation #assets* | 0 |
+| [notes/actor-region-children-round9.md](../notes/actor-region-children-round9.md) | TutorialOtenko_UpdateRegionChildren | *#assets* | 0 |
 | [notes/actor_animation_controller.md](../notes/actor_animation_controller.md) | Actor animation controller (081E34D0-081EAB64) | *#actors #animation #assets #tooling* | 8 |
 | [notes/actor_graphics_and_basic_states.md](../notes/actor_graphics_and_basic_states.md) | Actor graphics and basic states (08021EA8-08024F2C) | #actors #animation | 8 |
 | [notes/animation-contact-burst_2026-10-14.md](../notes/animation-contact-burst_2026-10-14.md) | Temporary animations and contact-burst effect, October 14 | *#particles #animation* | 7 |
@@ -272,7 +272,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [notes/background-palette-fade_2026-11-01.md](../notes/background-palette-fade_2026-11-01.md) | Background palette fade | *#assets* | 0 |
 | [notes/bee-cleanup_2026-11-13.md](../notes/bee-cleanup_2026-11-13.md) | Bee cleanup draft | #monsters #cleanup #bee #volatile | 2 |
 | [notes/bk.md](../notes/bk.md) | bk notes (backlog retry, 45 matches) |  | 5 |
-| [notes/bouncing-object-active-round9.md](../notes/bouncing-object-active-round9.md) | BouncingObject_TickActive | #matching #round9b #bouncing-object | 1 |
+| [notes/bouncing-object-active-round9.md](../notes/bouncing-object-active-round9.md) | BouncingBomb_TickActive | #matching #round9b #bouncing-object | 1 |
 | [notes/breakable-prop_2026-10-14.md](../notes/breakable-prop_2026-10-14.md) | Breakable prop, 080515C0–08051A3C | *#particles* | 2 |
 | [notes/cell-gates_2026-10-14.md](../notes/cell-gates_2026-10-14.md) | Cell-based traversal gates and the preceding script entry | *#scripts* | 4 |
 | [notes/cgb.md](../notes/cgb.md) | CgbSound (0x08230AC8) | *#sound* | 3 |
@@ -291,10 +291,13 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [notes/cloud-081AA438.md](../notes/cloud-081AA438.md) | Cloud task 081AA438 (Vanargand phase scripts) | *#scripts* | 3 |
 | [notes/cloud-08228DB8.md](../notes/cloud-08228DB8.md) | Cloud task 08228DB8: SunClock_GetPhase (and Camera_SetPosition) |  | 3 |
 | [notes/cloud-08231A0C.md](../notes/cloud-08231A0C.md) | Cloud task 08231A0C | *#animation #assets* | 1 |
+| [notes/codex-centipede-armor-cleanup_2026-11-26.md](../notes/codex-centipede-armor-cleanup_2026-11-26.md) | Centipede and Armor actor cleanup | #monsters #types #phase3 #matching | 3 |
 | [notes/codex-high.md](../notes/codex-high.md) | Codex high: task 0808AF38 | #matching #ghoul #slime #register-pinning | 244 |
 | [notes/codex-low.md](../notes/codex-low.md) | Task 080D812C — 2026-10-20 | #matching #dog | 376 |
 | [notes/codex-medium.md](../notes/codex-medium.md) | Codex medium worker: task 080D6FDC | #matching #scene-actor #terrain #mummy #dog | 476 |
-| [notes/codex-remaining-monsters_2026-11-26.md](../notes/codex-remaining-monsters_2026-11-26.md) | Remaining monster state and type recovery | #monster #types #matching #phase3 | 13 |
+| [notes/codex-monster-continuation_2026-11-26.md](../notes/codex-monster-continuation_2026-11-26.md) | Monster route, control, and sprite follow-up | #monsters #types #phase3 #matching | 7 |
+| [notes/codex-monster-layout-cleanup_2026-11-26.md](../notes/codex-monster-layout-cleanup_2026-11-26.md) | Golem, Dog, Axe and Axe Armor layouts | #monsters #types #phase3 #matching | 3 |
+| [notes/codex-remaining-monsters_2026-11-26.md](../notes/codex-remaining-monsters_2026-11-26.md) | Remaining monster state and type recovery | #monster #types #matching #phase3 | 9 |
 | [notes/collision-process-pairs-round9.md](../notes/collision-process-pairs-round9.md) | Collision_ProcessPairs |  | 0 |
 | [notes/compiler-debugger-2026-10-23.md](../notes/compiler-debugger-2026-10-23.md) | Compiler debugger: first session (2026-10-23) | #matching #tooling #regalloc | 12 |
 | [notes/contact-actor-pool_2026-10-14.md](../notes/contact-actor-pool_2026-10-14.md) | Contact actor pool setup and display (tentative) | *#actors* | 7 |
@@ -406,9 +409,9 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [notes/monster_init_shared_groups_2026-10-30.md](../notes/monster_init_shared_groups_2026-10-30.md) | Shared monster initialization groups | *#actors* | 4 |
 | [notes/monsters-units_2026-11-13.md](../notes/monsters-units_2026-11-13.md) | Monsters unit cleanup | #monsters #cleanup #ghoul #slime | 4 |
 | [notes/monsters2-source-recovery_2026-11-20.md](../notes/monsters2-source-recovery_2026-11-20.md) | Golem through Axe source recovery | #monsters #matching #compiler #phase3 #structs | 1 |
-| [notes/named-actor-move-mode-round9.md](../notes/named-actor-move-mode-round9.md) | NamedActor_SetMoveModeFromScript | #matching #round9b #named-object | 0 |
-| [notes/named-object-create-round9.md](../notes/named-object-create-round9.md) | NamedObject_CreateFromScript | #matching #round9b #named-object | 1 |
-| [notes/native-effect-profile-round9.md](../notes/native-effect-profile-round9.md) | NativeEffect_CreateFromProfile |  | 1 |
+| [notes/named-actor-move-mode-round9.md](../notes/named-actor-move-mode-round9.md) | MovingPlatformActor_SetMoveModeFromScript | #matching #round9b #named-object | 0 |
+| [notes/named-object-create-round9.md](../notes/named-object-create-round9.md) | MovingPlatform_CreateFromScript | #matching #round9b #named-object | 1 |
+| [notes/native-effect-profile-round9.md](../notes/native-effect-profile-round9.md) | ProjectileEffect_CreateFromProfile |  | 1 |
 | [notes/nav-mesh-route-round9.md](../notes/nav-mesh-route-round9.md) | NavMesh_FindRoute |  | 1 |
 | [notes/nidhoggr-init-parts-match.md](../notes/nidhoggr-init-parts-match.md) | Nidhoggr_InitParts (081940F8) | #matching #nidhoggr #cse #reload | 1 |
 | [notes/nidhoggr-restored-collider-ranges.md](../notes/nidhoggr-restored-collider-ranges.md) | Nidhoggr restored collider ranges | #matching #nidhoggr #register-allocation | 1 |
@@ -454,7 +457,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [notes/push20-low.md](../notes/push20-low.md) | Push20 low range |  | 14 |
 | [notes/push20-mid.md](../notes/push20-mid.md) | Push20 mid-range worker | *#text* | 10 |
 | [notes/push20-root.md](../notes/push20-root.md) | Push toward 20%: parent matches |  | 8 |
-| [notes/region-actor-behavior-round9.md](../notes/region-actor-behavior-round9.md) | RegionActor_UpdateBehaviorAnimation | *#animation #assets* | 0 |
+| [notes/region-actor-behavior-round9.md](../notes/region-actor-behavior-round9.md) | IceBoulder_UpdateBehaviorAnimation | *#animation #assets* | 0 |
 | [notes/registry-callback-updater_2026-11-01.md](../notes/registry-callback-updater_2026-11-01.md) | SceneActorRegistry_UpdateActors | *#particles* | 2 |
 | [notes/registry-particle-burst.md](../notes/registry-particle-burst.md) | Registry update and contact particles | #scene-actors #matching | 0 |
 | [notes/registry_terrain_reactions.md](../notes/registry_terrain_reactions.md) | Registered actor terrain reactions | #matching #scene-actors | 0 |
@@ -595,22 +598,29 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [notes/s5.md](../notes/s5.md) | s5 notes | *#assets* | 13 |
 | [notes/saved-position-marker_2026-10-14.md](../notes/saved-position-marker_2026-10-14.md) | Saved-position marker, 08053D8C–08054294 |  | 2 |
 | [notes/scene-actor-apply-hit-response.md](../notes/scene-actor-apply-hit-response.md) | SceneActorReaction_ApplyHitResponse | *#actors #particles* | 1 |
+| [notes/scene-actor-behavior-cleanup_2026-11-26.md](../notes/scene-actor-behavior-cleanup_2026-11-26.md) | Scene actor behavior cleanup | #matching #types #phase3 #scene | 3 |
 | [notes/scene-actor-cleanup_2026-11-13.md](../notes/scene-actor-cleanup_2026-11-13.md) | Scene actor cleanup, 2026-11-13 | #actors #scene #matching | 7 |
 | [notes/scene-actor-collider-contact_2026-11-01.md](../notes/scene-actor-collider-contact_2026-11-01.md) | scene-actor-collider-contact_2026-11-01.md | *#actors #scene* | 1 |
 | [notes/scene-actor-components_2026-10-30.md](../notes/scene-actor-components_2026-10-30.md) | Canonical scene actor components | #ram #structs #monster #matching | 6 |
 | [notes/scene-actor-contact-route-probe.md](../notes/scene-actor-contact-route-probe.md) | Contact route probe | #scene-actors #matching | 0 |
+| [notes/scene-actor-control-cleanup_2026-11-26.md](../notes/scene-actor-control-cleanup_2026-11-26.md) | Scene actor control cleanup | #matching #types #phase3 #scene | 2 |
 | [notes/scene-actor-defeat-burst_2026-11-01.md](../notes/scene-actor-defeat-burst_2026-11-01.md) | Defeat burst at 08080494 | #scene-actors #matching #compiler | 1 |
 | [notes/scene-actor-evaluate-candidate.md](../notes/scene-actor-evaluate-candidate.md) | SceneActorContacts_EvaluateCandidate |  | 1 |
 | [notes/scene-actor-groups_2026-10-30.md](../notes/scene-actor-groups_2026-10-30.md) | Canonical scene actor groups and routes | #structs #ram #monster #matching | 4 |
+| [notes/scene-actor-placement-cleanup_2026-11-26.md](../notes/scene-actor-placement-cleanup_2026-11-26.md) | Scene actor placement cleanup | #matching #types #phase3 #scene | 2 |
 | [notes/scene-actor-position-curve.md](../notes/scene-actor-position-curve.md) | Scene actor position curve | #scene-actors #matching | 0 |
 | [notes/scene-actor-pursuit-recovery.md](../notes/scene-actor-pursuit-recovery.md) | Pursuit after contact release | #scene-actors #matching | 0 |
 | [notes/scene-actor-recovery-route.md](../notes/scene-actor-recovery-route.md) | SceneActorRoute_TryRecoveryDetour | *#actors* | 1 |
+| [notes/scene-actor-registry-cleanup_2026-11-26.md](../notes/scene-actor-registry-cleanup_2026-11-26.md) | Scene actor registry cleanup | #matching #types #phase3 #scene | 2 |
 | [notes/scene-actor-retreat-route.md](../notes/scene-actor-retreat-route.md) | Scene actor retreat route | #scene-actors #terrain #matching | 0 |
 | [notes/scene-actor-timed-burst_2026-11-01.md](../notes/scene-actor-timed-burst_2026-11-01.md) | Timed reaction burst | #scene-actor #matching #compiler | 1 |
 | [notes/scene-actor-twenty_2026-10-12.md](../notes/scene-actor-twenty_2026-10-12.md) | Scene actors and dialogue: reaching 20% | *#actors #scene* | 3 |
 | [notes/scene-actor-warning-cleanup_2026-11-20.md](../notes/scene-actor-warning-cleanup_2026-11-20.md) | Scene actor warning cleanup checkpoint | #scene-actors #phase3 #matching #0801E000 #080297E8 | 1 |
 | [notes/scene-actors-second-half_2026-11-20.md](../notes/scene-actors-second-half_2026-11-20.md) | Scene actors and NPCs, second half | #scene #actors #matching #tooling | 2 |
 | [notes/scene-arc-effects_2026-10-13.md](../notes/scene-arc-effects_2026-10-13.md) | Scene arc slots and projected ground effects (tentative) | *#scene* | 4 |
+| [notes/scene-area-collision-camera-cleanup_2026-11-26.md](../notes/scene-area-collision-camera-cleanup_2026-11-26.md) | Scene area, collision, lifecycle, and camera cleanup | #matching #types #phase3 #scene #camera | 3 |
+| [notes/scene-attachment-palette-pool-cleanup_2026-11-26.md](../notes/scene-attachment-palette-pool-cleanup_2026-11-26.md) | Scene attachment, palette, and pool cleanup | #matching #types #phase3 #scene | 2 |
+| [notes/scene-camera-receiver-and-reaction-owner_2026-11-26.md](../notes/scene-camera-receiver-and-reaction-owner_2026-11-26.md) | Scene camera receiver and registered reaction owner | #matching #types #phase3 #scene #camera | 2 |
 | [notes/scene-contact-pool-start_2026-11-01.md](../notes/scene-contact-pool-start_2026-11-01.md) | scene-contact-pool-start_2026-11-01.md | *#scene #assets* | 0 |
 | [notes/scene-departure-display_2026-11-01.md](../notes/scene-departure-display_2026-11-01.md) | Scene departure display | *#scene* | 1 |
 | [notes/scene-panel-background_2026-10-14.md](../notes/scene-panel-background_2026-10-14.md) | Scene panel background effects and overlay setup | *#scene #panel* | 2 |
@@ -621,6 +631,9 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [notes/scene-pool-manager_2026-11-01.md](../notes/scene-pool-manager_2026-11-01.md) | scene-pool-manager_2026-11-01.md | *#scene* | 0 |
 | [notes/scene-pool-states_2026-10-13.md](../notes/scene-pool-states_2026-10-13.md) | Scene pool state family: second contiguous batch | *#scene* | 6 |
 | [notes/scene-pool_2026-10-13.md](../notes/scene-pool_2026-10-13.md) | Scene pool and actor controls, 0803CDF0–0803EE58 | *#actors #scene #tooling* | 5 |
+| [notes/scene-reaction-cleanup_2026-11-26.md](../notes/scene-reaction-cleanup_2026-11-26.md) | Scene actor reaction cleanup | #matching #types #phase3 #scene | 3 |
+| [notes/scene-shared-reaction-route-reset_2026-11-26.md](../notes/scene-shared-reaction-route-reset_2026-11-26.md) | Shared scene reaction route reset | #matching #types #phase3 #scene | 1 |
+| [notes/scene-terrain-steering-return-cleanup_2026-11-26.md](../notes/scene-terrain-steering-return-cleanup_2026-11-26.md) | Terrain traps, steering, and attachment return | #matching #types #phase3 #scene #terrain | 2 |
 | [notes/scene_actor_animation_route_walk.md](../notes/scene_actor_animation_route_walk.md) | Scene actor route walk | #matching #scene-actors | 0 |
 | [notes/scene_actor_contact_candidates.md](../notes/scene_actor_contact_candidates.md) | Scene actor contact candidates | #matching #scene-actors | 1 |
 | [notes/scene_body_owner_validation_2026-10-30.md](../notes/scene_body_owner_validation_2026-10-30.md) | SceneBody owner validation | #matching #compiler #structs #ram | 4 |
@@ -637,6 +650,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [notes/singleton-slot7-recovery_2026-11-01.md](../notes/singleton-slot7-recovery_2026-11-01.md) | Slot-seven presentation | *#assets* | 1 |
 | [notes/skeleton-cleanup_2026-11-13.md](../notes/skeleton-cleanup_2026-11-13.md) | Skeleton unit cleanup |  | 2 |
 | [notes/skeleton-knocked-flight-round9.md](../notes/skeleton-knocked-flight-round9.md) | Skeleton_BeginKnockedFlight |  | 0 |
+| [notes/skeleton-vorn-mummy-recovery_2026-11-26.md](../notes/skeleton-vorn-mummy-recovery_2026-11-26.md) | Skeleton, Vorn, and Mummy class recovery | #matching #types #phase3 #compiler | 15 |
 | [notes/sol-family-push-2.md](../notes/sol-family-push-2.md) | Sol family push 2 |  | 3 |
 | [notes/sol-family-push-3.md](../notes/sol-family-push-3.md) | Sol family push 3 |  | 8 |
 | [notes/sol-family-push-4.md](../notes/sol-family-push-4.md) | Sol family push 4 |  | 2 |
@@ -666,7 +680,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [notes/tether-roaming-states_2026-10-14.md](../notes/tether-roaming-states_2026-10-14.md) | Tether roaming, recovery and lifecycle states | *#actors #tether* | 6 |
 | [notes/tether-world-states_2026-10-14.md](../notes/tether-world-states_2026-10-14.md) | Tether world position, player boundary and state callbacks | *#actors #tether* | 6 |
 | [notes/tether_actor.md](../notes/tether_actor.md) | Tether actor unit consolidation | #tether-actor #unit #matching #types | 5 |
-| [notes/tile-trigger-press-round9.md](../notes/tile-trigger-press-round9.md) | TileTrigger_StepPress | *#assets* | 1 |
+| [notes/tile-trigger-press-round9.md](../notes/tile-trigger-press-round9.md) | FloorTrap_StepPress | *#assets* | 1 |
 | [notes/tilemap-stream-columns-round9.md](../notes/tilemap-stream-columns-round9.md) | TilemapPanel_StreamColumns |  | 0 |
 | [notes/uncounted-concessions_2026-11-16.md](../notes/uncounted-concessions_2026-11-16.md) | Steering C the concession scanner does not count (first sweep) | #concessions #phase3 #phase4 #tooling | 4 |
 | [notes/unit-context-sensitivity_2026-11-16.md](../notes/unit-context-sensitivity_2026-11-16.md) | Functions that match alone but not inside a unit | #units #selector-macros #scene-actors | 7 |

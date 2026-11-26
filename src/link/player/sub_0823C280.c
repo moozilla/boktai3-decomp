@@ -3,12 +3,11 @@
 extern const u8 gUnk_08E6290C[];
 void Player_InitializeActionState(void *, const void *);
 void CellObject_Init(void *, void *);
-void sub_08238238(void *);
+void Player_UpdateActionFacingSide(void *);
 u32 ActorVariant_GetTableValue(u32, u32);
 void Player_SetAnimationIndex(void *, u32, u32);
 void Player_SetTetherMode(void *, u32, u32);
 // confidence=low: restores saved position and resource values while resetting the linked action state.
-#define Player_RestoreLinkedActionState sub_0823C280
 void Player_RestoreLinkedActionState(struct Player *p)
 {
     void *cell;
@@ -28,7 +27,7 @@ void Player_RestoreLinkedActionState(struct Player *p)
     p->terrainRecoveryCounter = 0;
     p->linkPositionRestored = 1;
     p->facing = p->savedLinkFacing;
-    sub_08238238(p);
+    Player_UpdateActionFacingSide(p);
     Player_SetAnimationIndex(p, ActorVariant_GetTableValue(p->actionMode, 0), 64);
     Player_SetTetherMode(p, 0, 0);
 }

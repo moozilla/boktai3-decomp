@@ -5,8 +5,8 @@ When i is absent and the old range is nonpositive r0 remains zero.
 
 The explicit form changed the ROM bytes. The guarded form passed the unit ROM check.
 
---- a/src/fn/sub_080183A8.c
-+++ b/src/fn/sub_080183A8.c
+--- a/src/effects/weather/sub_080183A8.c
++++ b/src/effects/weather/sub_080183A8.c
 @@ -26,3 +26,6 @@
      gWeatherCooldownBase = base;
      gWeatherCooldownRange = spread;

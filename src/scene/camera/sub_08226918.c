@@ -1,6 +1,6 @@
-#include "global.h"
+#include "scene/camera/scene_camera_controller.h"
 
-void Camera_SetMessageCompletionMode(u8 *p)
+void Camera_SetMessageCompletionMode(struct SceneCameraController *camera)
 {
-    *(u16 *)(p + 0x1e) = 2;
+    camera->completionMode = 2;
 }

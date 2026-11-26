@@ -6,7 +6,7 @@
 struct PackedVec {
     u32 x : 16, y : 16, z : 16, pad : 16;
 };
-u8 *BouncingObject_Spawn(struct PackedVec *, struct PackedVec *, struct PackedVec *, s32, s32, s32,
+u8 *BouncingBomb_Spawn(struct PackedVec *, struct PackedVec *, struct PackedVec *, s32, s32, s32,
                          s32);
 static inline s32 optionalValue(void)
 {
@@ -68,7 +68,7 @@ void BouncingObject_SpawnFromScript(void)
             BouncingObject_ClearVector(dest, source);
         }
     }
-    object = BouncingObject_Spawn(&pos, &vel, out, a, b, l, n);
+    object = BouncingBomb_Spawn(&pos, &vel, out, a, b, l, n);
     if (object) {
         u16 *flags = (u16 *)(object + 0x134);
         u32 value = *flags;

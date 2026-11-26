@@ -1,11 +1,11 @@
 #include "ui/town/shop_actions.h"
 #include "system/game_state/game_state.h"
-struct SceneInventoryOwnedConsumables {
+struct ShopOwnedConsumables {
     u8 unknown0[0x160];
     s16 id;
 };
 s32 Shop_FindConsumableAssignment(u32);
-void Shop_BeginConsumableSwapPair(struct SceneInventoryActionView *panel)
+void Shop_BeginConsumableSwapPair(struct ShopActionView *panel)
 {
     struct SceneInputPosition starts[2], targets[2];
     u32 enabled[2], frames[2], attributes[2];
@@ -25,16 +25,16 @@ void Shop_BeginConsumableSwapPair(struct SceneInventoryActionView *panel)
             slot = panel->savedSelection;
         else
             slot = panel->selection;
-        ((struct SceneInventoryActionFlagsView *)panel)->widgets[slot + 5].flags |= 1;
+        ((struct ShopActionFlagsView *)panel)->widgets[slot + 5].flags |= 1;
         assigned = Shop_FindConsumableAssignment(slot);
         if (assigned >= 0)
-            ((struct SceneInventoryActionFlagsView *)panel)->widgets[assigned + 0x29].flags |= 1;
+            ((struct ShopActionFlagsView *)panel)->widgets[assigned + 0x29].flags |= 1;
         {
             u32 address = slot;
             struct GameState *game = gGameState;
             address <<= 1;
             address += (u32)game;
-            id = ((struct SceneInventoryOwnedConsumables *)address)->id;
+            id = ((struct ShopOwnedConsumables *)address)->id;
         }
         if (id >= 0) {
             enabled[i] = 1;
@@ -48,7 +48,7 @@ void Shop_BeginConsumableSwapPair(struct SceneInventoryActionView *panel)
     }
     for (i = 0; i < 2; i++)
         targetBase[i] = starts[1 - i];
-    SceneInput_BeginPairTransition(&((struct SceneInventoryTransitionView *)panel)->pair,
+    SceneInput_BeginPairTransition(&((struct ShopTransitionView *)panel)->pair,
                                    enabledBase, starts, targetBase, frameBase, attributeBase, 12);
     Sound_PlaySong(0x38A);
 }

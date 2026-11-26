@@ -49,7 +49,6 @@ static inline u32 groundHeight(struct FloorPoint *position)
 
 // confidence=low: compares nearby terrain height and input heading before reversing facing;
 // Player_TryStepForward (sub_08242120) with a facing update and sequence restart at the end.
-#define Player_CheckFacingTerrainClearance sub_08156DAC
 s32 Player_CheckFacingTerrainClearance(struct Player *p)
 {
     u32 zero = p->gateCount;

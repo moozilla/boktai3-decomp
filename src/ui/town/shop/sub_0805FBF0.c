@@ -1,5 +1,5 @@
 #include "ui/town/shop_panel.h"
-void Shop_ShowConsumableDescription(struct SceneInventoryPanel *panel)
+void Shop_ShowConsumableDescription(struct ShopPanel *panel)
 {
     s32 item;
     if (panel->selection <= 15) {

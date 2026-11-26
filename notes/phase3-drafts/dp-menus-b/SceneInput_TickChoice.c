@@ -33,9 +33,9 @@ s32 SceneInput_TickChoice(struct AnimSprite *widget, void *resource, u8 *selecti
         value = 1 - *selection;
         *selection = value;
         if ((u8)value)
-            Anim_SelectWidgetGlyph(widget, resource, 0x4B);
+            AnimSprite_SelectGlyph(widget, resource, 0x4B);
         else
-            Anim_SelectWidgetGlyph(widget, resource, 0x4C);
+            AnimSprite_SelectGlyph(widget, resource, 0x4C);
     }
     if (blink)
         Palette_UpdateHighlightPulse(widget->palette + 12, blink);

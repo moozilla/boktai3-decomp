@@ -15,7 +15,7 @@
 
 #include "scene/actor/scene_actor_placement.h"
 
-#include "npc/cutscene_actor/actor_animation_controller.h"
+#include "ui/title/actor_animation_controller.h"
 
 #include "scene/actor/scene_actor_init_dispatch.h"
 

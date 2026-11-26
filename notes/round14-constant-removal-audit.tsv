@@ -16,7 +16,7 @@ src/animated_hazard.c	AnimatedHazard_Initialize	zero	34	open
 src/animated_hazard.c	AnimatedHazard_Create	zero	442	open	
 src/animated_hazard.c	AnimatedHazard_CreateProximity	zero	495	open	
 src/animated_tile.c	Pool1BC_FindByName	one	45	open	
-src/animation_widget.c	Anim_SelectWidgetGlyph	zero	96	removed	193f4797790fd6d2e81d113af26d3ea8d150ca0e
+src/animation_widget.c	AnimSprite_SelectGlyph	zero	96	removed	193f4797790fd6d2e81d113af26d3ea8d150ca0e
 src/armor_motion.c	Armor_EnterFacingAnimation	one	165	open	
 src/armor_motion.c	Armor_UpdateRunMotion	zero	357	open	
 src/armor_motion.c	Armor_UpdatePositiveTurn	one	580	open	
@@ -79,17 +79,17 @@ src/fn/sub_080177AC.c	Weather_SpawnTerrainParticles	one	120	open
 src/fn/sub_0801C24C.c	sub_0801C24C	zero	67	removed	08ca647c56b0a25e84137c2654a509c09bc2237d
 src/fn/sub_0801C69C.c	ResultGame_SetUpdateCallback	zero	6	open	
 src/fn/sub_0801CAF0.c	ResultGame_ScorePress	zero	21	open	
-src/fn/sub_0801E630.c	SceneObjects_SetActive	one	8	open	
-src/fn/sub_0801E630.c	SceneObjects_SetActive	zero	9	open	
-src/fn/sub_0801E698.c	SceneObjects_SetInactive	zero	9	open	
-src/fn/sub_0801E700.c	SceneObjects_Lock	one	7	removed	0e042da8f5c65787e64f3527791a21d6ec505c78
-src/fn/sub_0801E998.c	SceneObjects_ScriptLower	one	29	open	
-src/fn/sub_0801E998.c	SceneObjects_ScriptLower	zero	31	removed	669aaedcbc83382b74f9957198852c71c0739223
-src/fn/sub_0801EA70.c	SceneObjects_ScriptPromote	zero	19	open	
-src/fn/sub_0801EC4C.c	SceneObject_InitPlacement	zero	44	open	
-src/fn/sub_0801EFDC.c	SceneObject_AnimateActive	one	17	open	
-src/fn/sub_0801F5EC.c	SceneObject_InitSlotPlacement	zero	44	open	
-src/fn/sub_0802048C.c	SceneObjects_Init	zero	11	open	
+src/fn/sub_0801E630.c	SlidingDoors_SetActive	one	8	open	
+src/fn/sub_0801E630.c	SlidingDoors_SetActive	zero	9	open	
+src/fn/sub_0801E698.c	SlidingDoors_SetInactive	zero	9	open	
+src/fn/sub_0801E700.c	SlidingDoors_Lock	one	7	removed	0e042da8f5c65787e64f3527791a21d6ec505c78
+src/fn/sub_0801E998.c	SlidingDoors_ScriptLower	one	29	open	
+src/fn/sub_0801E998.c	SlidingDoors_ScriptLower	zero	31	removed	669aaedcbc83382b74f9957198852c71c0739223
+src/fn/sub_0801EA70.c	SlidingDoors_ScriptPromote	zero	19	open	
+src/fn/sub_0801EC4C.c	SlidingDoor_InitPlacement	zero	44	open	
+src/fn/sub_0801EFDC.c	SlidingDoor_AnimateActive	one	17	open	
+src/fn/sub_0801F5EC.c	SlidingDoor_InitSlotPlacement	zero	44	open	
+src/fn/sub_0802048C.c	SlidingDoors_Init	zero	11	open	
 src/fn/sub_0802533C.c	SceneActorAnimation_UpdateLungeAttack	zero	113	open	
 src/fn/sub_08025550.c	SceneActorAnimation_UpdateHomingLunge	zero	117	open	
 src/fn/sub_08025714.c	SceneActorAnimation_UpdateRecoilSlide	zero	82	open	
@@ -165,13 +165,13 @@ src/fn/sub_0804413C.c	ContactSwarm_HideSlot	one	4	removed	725a18fbd7ab46441d49d4
 src/fn/sub_08044290.c	ContactSwarm_UpdateTracking	zero	72	removed	784d9b2d0dc555ee958be325b3c88cc54a9262a3
 src/fn/sub_08044594.c	ContactSwarm_Update	zero	94	open	
 src/fn/sub_08044854.c	ContactSwarm_ActivateChargeSlot	one	18	open	
-src/fn/sub_08044934.c	ContactSwarm_SpawnPairedAdvance	zero	77	open	
+src/fn/sub_08044934.c	CountBats_SpawnPairedAdvance	zero	77	open	
 src/fn/sub_08044AD4.c	ContactSwarm_SpawnPairedAdvanceCount	zero	77	open	
 src/fn/sub_0804F384.c	ResourceStation_ReadDisplayCommands	one	16	removed	08a54b84feba4e34e867fc72cf86bfc93df7e45b
 src/fn/sub_0804F384.c	ResourceStation_ReadDisplayCommands	zero	17	removed	08a54b84feba4e34e867fc72cf86bfc93df7e45b
-src/fn/sub_08051CB4.c	ProximityEmitter_TickRise	zero	18	removed	29776d2b1a02f6fe226957cb0047cbae67dea168
-src/fn/sub_08051E10.c	ProximityEmitter_InitializeParticles	zero	45	open	
-src/fn/sub_08051EA8.c	ProximityEmitter_InitializeFromScript	zero	10	removed	19b487080fd63930843ce292055e33ad94c887c9
+src/fn/sub_08051CB4.c	TetherRing_TickRise	zero	18	removed	29776d2b1a02f6fe226957cb0047cbae67dea168
+src/fn/sub_08051E10.c	TetherRing_InitializeParticles	zero	45	open	
+src/fn/sub_08051EA8.c	TetherRing_InitializeFromScript	zero	10	removed	19b487080fd63930843ce292055e33ad94c887c9
 src/fn/sub_080521DC.c	StackedActor_InitRisingParticle	zero	16	removed	aa3aad8f2d855c569d5409b103acc4e0b0e79dc3
 src/fn/sub_0805228C.c	StackedActor_InitFallingParticle	zero	11	removed	0bb56d78829fdc348399aab98927544d46def4f0
 src/fn/sub_08053AEC.c	InteractionMarker_InitializeFromScript	zero	98	open	
@@ -190,9 +190,9 @@ src/fn/sub_080659C4.c	ActorAttachment_TickValueFrame	one	15	open
 src/fn/sub_08066278.c	ActorAttachment_SetupPart	one	23	open	
 src/fn/sub_080681DC.c	SceneParticleBurst_Destroy	zero	20	open	
 src/fn/sub_080687EC.c	SceneParticlePool_Destroy	zero	24	open	
-src/fn/sub_080692C8.c	BouncingObject_Spawn	one	14	open	
-src/fn/sub_08069964.c	BurstEmitter_EmitFrame	one	18	removed	1fad2efbd27b92761578d4c3b4466b668115b55c
-src/fn/sub_08069DB8.c	BurstEmitter_CreateFromScript	zero	49	open	
+src/fn/sub_080692C8.c	BouncingBomb_Spawn	one	14	open	
+src/fn/sub_08069964.c	SparkExplosion_EmitFrame	one	18	removed	1fad2efbd27b92761578d4c3b4466b668115b55c
+src/fn/sub_08069DB8.c	SparkExplosion_CreateFromScript	zero	49	open	
 src/fn/sub_0806A138.c	SparkParticle_DestroyPool	zero	12	open	
 src/fn/sub_0806B96C.c	SpriteEffectController_DestroyPool	zero	47	open	
 src/fn/sub_0806CCC8.c	sub_0806CCC8	one	17	removed	d35dab9a131038a47df4187cac7ed5a1c49cac65
@@ -264,9 +264,9 @@ src/fn/sub_080F645C.c	Sword_UpdateDamage	zero	38	open
 src/fn/sub_080FF820.c	WoodenCrate_FindByName	one	16	open	
 src/fn/sub_081004F8.c	FloorSwitch_Release	one	34	open	
 src/fn/sub_081004F8.c	FloorSwitch_Release	zero	35	open	
-src/fn/sub_08101E20.c	NamedObject_IsMapCellOccupied	one	15	removed	333c8351a0b191e18ca4518c3b6254f76abfb31e
-src/fn/sub_08104350.c	ActorGroup_CreateFromScript	zero	168	open	
-src/fn/sub_08104350.c	ActorGroup_CreateFromScript	one	169	open	
+src/fn/sub_08101E20.c	MovingPlatform_IsMapCellOccupied	one	15	removed	333c8351a0b191e18ca4518c3b6254f76abfb31e
+src/fn/sub_08104350.c	LootDeposit_CreateFromScript	zero	168	open	
+src/fn/sub_08104350.c	LootDeposit_CreateFromScript	one	169	open	
 src/fn/sub_08109D94.c	ScriptPanel_ConfirmSelection	zero	24	open	
 src/fn/sub_08109DF8.c	ScriptPanel_Retry	zero	30	open	
 src/fn/sub_08109E98.c	ScriptPanel_WaitForSelectionData	zero	29	open	
@@ -330,7 +330,7 @@ src/fn/sub_08136C80.c	SceneActorPlacement_HideActor	one	35	open
 src/fn/sub_08136F48.c	sub_08136F48	zero	16	removed	0ee4cb57c92bc8ef5d60ab15443798c586c7a7b4
 src/fn/sub_08137180.c	sub_08137180	zero	30	open	
 src/fn/sub_0813FC38.c	Player_InitActionMode	zero	85	open	
-src/fn/sub_08144AAC.c	Player_UpdateBarrierRecovery	zero	44	removed	be36302e9b540c63d72ee865ac80d085cbe2868d
+src/fn/sub_08144AAC.c	PileTrap_UpdateSolarPileRecovery	zero	44	removed	be36302e9b540c63d72ee865ac80d085cbe2868d
 src/fn/sub_081462DC.c	Player_UpdateTimedScreenTransition	zero	20	open	
 src/fn/sub_08146EAC.c	Player_UpdateAlternateFormCue	one	153	open	
 src/fn/sub_0814A7D8.c	Player_CalculateTotalAttackPower	zero	24	open	
@@ -470,29 +470,29 @@ src/fn/sub_081CD484.c	setInitialFacing	zero	100	open
 src/fn/sub_081CDE14.c	SceneCharacter_UpdatePaletteFade	zero	15	open	
 src/fn/sub_081CE1BC.c	SceneCharacter_PlaceFromScript	one	238	open	
 src/fn/sub_081CE6DC.c	SceneCharacter_CommandFromScript	one	145	open	
-src/fn/sub_081CF518.c	SceneNpc_UpdateBlinkWithCallback	zero	18	removed	12000e79c5245693897f162e5e8d8fe1443e8d1e
+src/fn/sub_081CF518.c	Otenko_UpdateBlinkWithCallback	zero	18	removed	12000e79c5245693897f162e5e8d8fe1443e8d1e
 src/fn/sub_081CF62C.c	polar	zero	33	removed	be7d05068b9de1489a13ec64d7b6197f86efa1f1
-src/fn/sub_081CF62C.c	SceneNpc_UpdateDescendingDash	zero	42	removed	be7d05068b9de1489a13ec64d7b6197f86efa1f1
-src/fn/sub_081CF84C.c	SceneNpc_PlayAnimation12	zero	9	removed	0a652876fc70a1dc49cf150adda58adf019ff816
-src/fn/sub_081CF8A4.c	SceneNpc_UpdateParticleDisappearance	zero	41	removed	bde66d060c61fd204742b9e0e1aa02b9a04e8108
-src/fn/sub_081CF9E8.c	SceneNpc_UpdateRisingToTerrain	zero	19	removed	f27e4dfbe36299a414e3663d3a5f45586cd94418
+src/fn/sub_081CF62C.c	Otenko_UpdateDescendingDash	zero	42	removed	be7d05068b9de1489a13ec64d7b6197f86efa1f1
+src/fn/sub_081CF84C.c	Otenko_PlayAnimation12	zero	9	removed	0a652876fc70a1dc49cf150adda58adf019ff816
+src/fn/sub_081CF8A4.c	Otenko_UpdateParticleDisappearance	zero	41	removed	bde66d060c61fd204742b9e0e1aa02b9a04e8108
+src/fn/sub_081CF9E8.c	Otenko_UpdateRisingToTerrain	zero	19	removed	f27e4dfbe36299a414e3663d3a5f45586cd94418
 src/fn/sub_081CFB04.c	sub_081CFB04	zero	20	removed	12bc8dc34f314488520575f766b47236d77b97a1
 src/fn/sub_081CFB54.c	SceneNpc_UpdateTurnInPlace	zero	36	removed	853bbcffb0a9a7c2a0f70c8a61a34b841ba438c2
-src/fn/sub_081CFDA4.c	SceneNpc_UpdateProjectedMove	zero	99	removed	fe57f70cbb555842202acdaffb32bce0b9836947
-src/fn/sub_081D0928.c	SceneNpc_OnStateEffectUpdate	zero	66	open	
-src/fn/sub_081D0C04.c	SceneNpc_CreateFromScript	one	196	open	
-src/fn/sub_081D1404.c	SceneNpc_UpdateTransitionEffect	zero	33	removed	5bd0d6ba86cbf45dba3e3a8e9234ba5e9fb6f6a3
+src/fn/sub_081CFDA4.c	Otenko_UpdateProjectedMove	zero	99	removed	fe57f70cbb555842202acdaffb32bce0b9836947
+src/fn/sub_081D0928.c	Otenko_OnStateEffectUpdate	zero	66	open	
+src/fn/sub_081D0C04.c	Otenko_CreateFromScript	one	196	open	
+src/fn/sub_081D1404.c	Otenko_UpdateTransitionEffect	zero	33	removed	5bd0d6ba86cbf45dba3e3a8e9234ba5e9fb6f6a3
 src/fn/sub_081D1A8C.c	sub_081D1A8C	zero	83	removed	844a13816b6d1e3de5d9d7bf26601593dd0d780a
-src/fn/sub_081D1BA8.c	SceneNpc_TurnTowardAngle	zero	32	removed	c1b7dd4e7501339b74e75af45de8bbf8cb1c3bcb
+src/fn/sub_081D1BA8.c	Kuro_TurnTowardAngle	zero	32	removed	c1b7dd4e7501339b74e75af45de8bbf8cb1c3bcb
 src/fn/sub_081D1C38.c	sub_081D1C38	zero	84	removed	eb74b7fedc0d5c532251fc55a52ace83285a502d
-src/fn/sub_081D1DF8.c	TaggedSceneNpc_UpdateState17AnimationA	zero	12	open	
-src/fn/sub_081D201C.c	TaggedSceneNpc_UpdateArcMove	zero	55	removed	874f0f9a710011201acc969b4bc0f0d46516f6b8
-src/fn/sub_081D201C.c	TaggedSceneNpc_UpdateArcMove	one	76	open	
-src/fn/sub_081D227C.c	TaggedSceneNpc_UpdateState17AnimationB	zero	13	open	
-src/fn/sub_081D2544.c	SceneNpc_EnterRequestedState	zero	12	removed	f27d847474bf9e9a828ab4101d1aa958b759a147
-src/fn/sub_081D2544.c	SceneNpc_EnterRequestedState	one	13	removed	f27d847474bf9e9a828ab4101d1aa958b759a147
-src/fn/sub_081D2A38.c	TaggedSceneNpc_Create	zero	134	open	
-src/fn/sub_081D2A38.c	TaggedSceneNpc_Create	one	206	open	
+src/fn/sub_081D1DF8.c	Kuro_UpdateState17AnimationA	zero	12	open	
+src/fn/sub_081D201C.c	Kuro_UpdateArcMove	zero	55	removed	874f0f9a710011201acc969b4bc0f0d46516f6b8
+src/fn/sub_081D201C.c	Kuro_UpdateArcMove	one	76	open	
+src/fn/sub_081D227C.c	Kuro_UpdateState17AnimationB	zero	13	open	
+src/fn/sub_081D2544.c	Kuro_EnterRequestedState	zero	12	removed	f27d847474bf9e9a828ab4101d1aa958b759a147
+src/fn/sub_081D2544.c	Kuro_EnterRequestedState	one	13	removed	f27d847474bf9e9a828ab4101d1aa958b759a147
+src/fn/sub_081D2A38.c	Kuro_Create	zero	134	open	
+src/fn/sub_081D2A38.c	Kuro_Create	one	206	open	
 src/fn/sub_081D31EC.c	sub_081D31EC	zero	95	removed	c012eb1e2f683f05cc13c56664be2f2972a96bce
 src/fn/sub_081D3A98.c	PaletteTransition_UpdateBlink	one	30	open	
 src/fn/sub_081D4AC0.c	BestiaryDisplay_UpdateEntry	zero	57	open	
@@ -632,13 +632,13 @@ src/mimic.c	SaveStoppedControl	zero	21	removed	a7c5c51c3379993a08b095030f2889d7c
 src/mimic.c	SceneActor_RestoreSavedTargetOnCompletion	zero	356	removed	a7c5c51c3379993a08b095030f2889d7ce3ee24e
 src/mode_menu.c	ResultScreen_Initialize	zero	412	removed	1e30782e7f0b2f520f43bcb9930a722a684a3cbb
 src/name_entry.c	NameEntry_Update	zero	611	open	
-src/native_effect.c	NativeEffect_DestroyEntry	zero	112	open	
-src/native_particle.c	NativeParticle_AllocateEntry	one	57	open	
+src/native_effect.c	ProjectileEffect_DestroyEntry	zero	112	open	
+src/native_particle.c	ProjectileMote_AllocateEntry	one	57	open	
 src/options.c	Options_InitScreen	zero	138	removed	aaef3a876f8405f9ba58e200c0a0f9525157f8de
 src/orbit_contact_actor.c	OrbitContactActor_BeginExpansion	one	141	open	
 src/orbit_contact_actor.c	OrbitContactActor_BeginExpansion	zero	142	removed	2ae175a399e8b643a5b9c4ece7539272d5408dad
 src/orbiting_particles.c	OrbitingParticles_Initialize	one	222	removed	6ac4338b282091388d5360488aeb83688779940b
-src/particle_emitter.c	ParticleEmitter_OnStop	zero	37	open	
+src/particle_emitter.c	BallisticTrail_OnStop	zero	37	open	
 src/particle_pool.c	ParticlePool_InitParticles	zero	279	open	
 src/play_stats.c	PlayStats_Initialize	zero	481	open	
 src/player_3.c	Player_BuildActionModifiers	zero	1379	open	
@@ -654,7 +654,7 @@ src/pooled_motion.c	MotionPool_FindFreeSlot	one	165	open
 src/presentation.c	Presentation_InitListValues	zero	521	open	
 src/projectile_config.c	TimedEffect_SpawnProjectile	one	99	open	
 src/projectile_config.c	Projectile_SetEntryDirection	zero	329	open	
-src/region_actor.c	RegionActor_CreateFromScript	one	361	removed	80479e028e806fefc475b2ff576a29ed44ab87ed
+src/region_actor.c	IceBoulder_CreateFromScript	one	361	removed	80479e028e806fefc475b2ff576a29ed44ab87ed
 src/registry_actor_collision.c	Actor_ApplyKnockback	one	56	open	
 src/registry_actor_manager.c	RegistryA8CB_StartFallFromScript	zero	27	open	
 src/registry_actor_manager.c	RegistryA8CB_StartFallFromScript	one	28	open	
@@ -682,7 +682,7 @@ src/scene_panel_control_and_lifecycle.c	ScenePanel_BeginArrivalRamp	zero	834	ope
 src/scene_projectile_config.c	Projectile_SpawnAtPosition	zero	63	removed	bed1bb42ca48d66c2a74bb2070430e5264c59dcc
 src/scene_range_watch.c	SceneRangeWatch_Initialize	zero	92	open	
 src/scene_scheduled_effect.c	StateSprite_InitAnimation	zero	216	open	
-src/scene_script_object.c	SceneScriptObject_UpdateBurst	zero	159	removed	94d3226e341da466b86b5a02fa0a8827e2ce63ab
+src/scene_script_object.c	DungeonScenery_UpdateBurst	zero	159	removed	94d3226e341da466b86b5a02fa0a8827e2ce63ab
 src/scene_transition.c	SceneTransition_BeginOffsetMove	zero	119	open	
 src/scene_transition.c	SceneTransition_BeginVectorTween	zero	145	open	
 src/scene_transition.c	SceneTransition_Initialize	zero	408	removed	67c980fb8248adf2d888b4870a21423f58742d6b

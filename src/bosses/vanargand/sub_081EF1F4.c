@@ -1,11 +1,11 @@
 #include "bosses/vanargand/vanargand_head_transition.h"
 
-void SceneActors_UpdateMovingDisplay(void);
+void VanargandHead_UpdateMovingDisplay(void);
 
-void SceneActors_EnterAlternateMovementState(struct Slot7Transition *actor)
+void VanargandHead_EnterAlternateMovementState(struct VanargandHeadTransition *actor)
 {
-    if (Slot7_TakeActionEntry(actor) == TRUE) {
-        Slot7_TransitionTo(actor, SceneActors_UpdateMovingDisplay);
+    if (VanargandHead_TakeActionEntry(actor) == TRUE) {
+        VanargandHead_TransitionTo(actor, VanargandHead_UpdateMovingDisplay);
     }
     actor->actionTimer++;
 }

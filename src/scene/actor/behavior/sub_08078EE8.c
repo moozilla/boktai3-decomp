@@ -1,3 +1,5 @@
+#include "scene/actor/scene_actor_reaction.h"
+#include "scene/collision/scene_actor_delayed_response.h"
 #include "scene/actor/scene_actor_status.h"
 #include "scene/actor/scene_actor_placement.h"
 
@@ -28,23 +30,6 @@ typedef char Check_interactionCallback
 typedef char
     Check_responseCallback[(u32) & ((struct ChaseActor *)0)->group.responseCallback == 0x61C ? 1
                                                                                              : -1];
-struct UpdateRestorationCommand {
-    u8 unknown0[8];
-    u8 state, phase, behavior, unknownB;
-    u32 delay;
-    void *control;
-};
-static inline void ActorStatus_StoreRestoration(struct UpdateRestorationCommand *command,
-                                                void *control, u32 state, u32 phase, u32 behavior,
-                                                u32 delay)
-{
-    command->delay = delay;
-    command->control = control;
-    command->state = state;
-    command->phase = phase;
-    command->behavior = behavior;
-}
-
 void SceneActorRecord_RecordPair(u32, u32);
 void SceneActorAttachment_ReplaceResponseSlot(void *, s32, s32, s32);
 s32 Callback_InvokeActor(void *, void *);
@@ -52,7 +37,6 @@ s32 Div(s32, s32);
 s32 Nav_IsPositionInMesh(void *, struct ContactPosition *, struct ContactPosition *);
 s32 Terrain_ApplyBlocked(void *, struct ContactPosition *, struct ContactPosition *);
 u32 TetherActor_CanStartInteraction(void);
-void SceneActorReaction_RestoreAfterDelay(void);
 
 static inline u32 ActorStatus_HasBehaviorFlags(void *object, u32 mask)
 {
@@ -84,18 +68,10 @@ static inline void ActorStatus_ResetInteraction(void *object)
     struct ChaseActor *actor = object;
     ActorStatus_ResetInteractionAt(actor, (void *)&actor->group.common.control);
 }
-static inline void ActorStatus_ResetRouteAt(struct ChaseActor *actor,
-                                            struct SceneActorRegistryControl *control)
-{
-    SceneActorChase_ClearWordFlags(&actor->base.behaviorFlags, 0x141C0);
-    control->counter = 0;
-    control->field14 = 0;
-    control->timer = 0;
-}
 static inline void ActorStatus_ResetRoute(void *object)
 {
     struct ChaseActor *actor = object;
-    ActorStatus_ResetRouteAt(actor, (void *)&actor->group.common.control);
+    SceneActorReaction_ResetRouteControl(actor, (void *)&actor->group.common.control);
 }
 static inline void ActorStatus_ResetSelection(struct ChaseActor *actor)
 {
@@ -109,7 +85,7 @@ static inline void ActorStatus_ResetReaction(struct ChaseActor *actor)
     actor->group.common.gate.flags = 0;
     actor->group.common.gate.counter = 0;
     ActorStatus_ClearMotionFlags(actor, 0x380);
-    ActorStatus_ClearTrackingFlags((void *)&actor->base.tracking.target, 0x18);
+    ActorStatus_ClearTrackingFlags(&actor->base.tracking, 0x18);
     ActorStatus_ResetInteraction(actor);
     ActorStatus_ClearMotionFlags(actor, 0x400);
     ActorStatus_ResetSelection(actor);
@@ -125,13 +101,13 @@ static inline void ActorStatus_TickRouteControl(struct SceneActorRegistryControl
 }
 static inline void ActorStatus_TickAttachment(struct ChaseActor *actor)
 {
-    s32 remaining = (*(s16 *)&actor->base.attachmentTimer);
+    s32 remaining = (s16)actor->base.attachmentTimer;
     if (remaining <= 0) {
-        (*(s16 *)&actor->base.attachmentTimer) = 0;
+        actor->base.attachmentTimer = 0;
         if (ActorStatus_HasStatusFlags(actor, 0xC0))
             ActorStatus_SetWord(&actor->base.statusFlags, 0x100);
     } else {
-        (*(s16 *)&actor->base.attachmentTimer) = remaining - 1;
+        actor->base.attachmentTimer = remaining - 1;
     }
     if (actor->group.contactCooldown)
         actor->group.contactCooldown--;
@@ -210,8 +186,8 @@ static inline void ActorStatus_Wake(struct ChaseActor *actor)
         actor->base.reactionStart.z = actor->base.body.position.z;
         actor->base.reactionEnd.x = actor->base.body.position.x;
         actor->base.reactionEnd.z = actor->base.body.position.z;
-        if ((*(s16 *)&actor->base.attachmentTimer) >= actor->base.attachmentLimit)
-            (*(s16 *)&actor->base.attachmentTimer) = ActorStatus_AttachmentRestart(actor);
+        if ((s16)actor->base.attachmentTimer >= actor->base.attachmentLimit)
+            actor->base.attachmentTimer = ActorStatus_AttachmentRestart(actor);
         if (actor->base.health <= 0) {
             SceneActorChase_SetState(actor, 3, 0, 0);
             SceneActorChase_SetControl(actor, actor->base.onDefeat, 0x11);
@@ -244,6 +220,13 @@ static inline void ActorStatus_SetRecoveryDuration(struct ChaseActor *actor, u32
     actor->base.field2C2 = Div(0x40, 3);
 }
 
+static inline void ActorStatus_QueueRecovery(struct ChaseActor *actor)
+{
+    ActorStatus_ClearMotionFlags(actor, 0x2500);
+    ActorStatus_SetPendingBits(actor, 0x400);
+    SceneActorChase_ClearBits(&actor->base.reactionFlags, 0x980);
+}
+
 static inline void ActorStatus_ReactionFlags(void *object)
 {
     struct ChaseActor *actor = object;
@@ -264,14 +247,14 @@ static inline void ActorStatus_ReactionFlags(void *object)
 
         if (ActorStatus_MotionFlags(actor, 0x2000)) {
             ActorStatus_ResetReaction(object);
-            ActorStatus_ClearTrackingFlags((void *)&actor->base.tracking.target, 8);
+            ActorStatus_ClearTrackingFlags(&actor->base.tracking, 8);
             ActorStatus_ClearMotionFlags(actor, 0x500);
             ActorStatus_SetPendingBits(actor, 0x400);
             actor->base.field2C2 = 0x40;
             SceneActorChase_ClearBits(&actor->base.reactionFlags, 0x980);
         } else if (ActorStatus_MotionFlags(actor, 4)) {
             ActorStatus_ResetReaction(object);
-            ActorStatus_ClearTrackingFlags((void *)&actor->base.tracking.target, 8);
+            ActorStatus_ClearTrackingFlags(&actor->base.tracking, 8);
             ActorStatus_ClearMotionFlags(actor, 0x2500);
             ActorStatus_SetPendingBits(actor, 0x400);
             actor->base.field2C2 = 0x40;
@@ -279,19 +262,15 @@ static inline void ActorStatus_ReactionFlags(void *object)
             ActorStatus_SetWord(&actor->base.behaviorFlags, 0x2000);
         } else if (ActorStatus_MotionFlags(actor, 2)) {
             ActorStatus_ResetReaction(object);
-            ActorStatus_ClearTrackingFlags((void *)&actor->base.tracking.target, 8);
-            ActorStatus_ClearMotionFlags(actor, 0x2500);
-            ActorStatus_SetPendingBits(actor, 0x400);
-            SceneActorChase_ClearBits(&actor->base.reactionFlags, 0x980);
+            ActorStatus_ClearTrackingFlags(&actor->base.tracking, 8);
+            ActorStatus_QueueRecovery(actor);
         } else if (ActorStatus_MotionFlags(actor, 0x8000)) {
-            ActorStatus_ClearMotionFlags(actor, 0x2500);
-            ActorStatus_SetPendingBits(actor, 0x400);
-            SceneActorChase_ClearBits(&actor->base.reactionFlags, 0x980);
+            ActorStatus_QueueRecovery(actor);
         } else if (ActorStatus_MotionFlags(actor, 0x10)) {
-            ActorStatus_ResetRouteAt(actor, &group->common.control);
+            SceneActorReaction_ResetRouteControl(actor, &group->common.control);
             ActorStatus_ResetReaction(object);
             ActorStatus_ClearMotionFlags(actor, 0x2500);
-            (*(s16 *)&actor->base.attachmentTimer) = 0;
+            actor->base.attachmentTimer = 0;
             actor->base.field2C2 = Div(0x40, 6);
             ActorStatus_ReleaseContact(object);
             ActorStatus_ResetInteractionAt(actor, &group->common.control);
@@ -300,17 +279,15 @@ static inline void ActorStatus_ReactionFlags(void *object)
             ActorStatus_SetPendingBits(actor, 0x400);
             SceneActorChase_ClearBits(&actor->base.reactionFlags, 0x980);
         } else if (ActorStatus_MotionFlags(actor, 8)) {
-            ActorStatus_ResetRouteAt(actor, &group->common.control);
+            SceneActorReaction_ResetRouteControl(actor, &group->common.control);
             ActorStatus_ResetInteractionAt(actor, &group->common.control);
-            ActorStatus_ClearMotionFlags(actor, 0x2500);
-            ActorStatus_SetPendingBits(actor, 0x400);
-            SceneActorChase_ClearBits(&actor->base.reactionFlags, 0x980);
+            ActorStatus_QueueRecovery(actor);
         }
 
         if (ActorStatus_MotionFlags(actor, 0x803E)) {
             ActorStatus_ClearMotionFlags(actor, 0x201);
             SceneActorChase_ClearWordFlags(&actor->base.behaviorFlags, 0x4000);
-            ActorStatus_ClearTrackingFlags((void *)&actor->base.tracking.target, 0x10);
+            ActorStatus_ClearTrackingFlags(&actor->base.tracking, 0x10);
             if (!(ActorStatus_MotionFlags(actor, 0x20)))
                 SceneActorChase_ClearWordFlags(&actor->base.behaviorFlags, 0x80);
             SceneActorChase_ClearWordFlags(&actor->base.statusFlags, 0x100004);
@@ -383,16 +360,14 @@ static inline void ActorStatus_RecoverAndRelease(void *object)
         } else if ((cat = ((struct ChaseActor *)object)->base.category) != 2 && cat != 0x19 &&
                    !(ActorStatus_MotionFlags(object, 0x100))) {
             u8 *grp;
-            u8 *r5;
+            struct ContactPosition *position;
 
             ActorStatus_ResetReaction(object);
             SceneActorAttachment_ReplaceResponseSlot(object, 0, 2, cat);
             SceneActorAnimation_SelectDirectionalEntry(object, 0);
             SceneActorChase_SetControl(object, (void *)SceneActorReaction_RestoreAfterDelay, 0xE);
             SceneActorChase_SetState(object, 3, 1, 0);
-            ActorStatus_StoreRestoration(
-                (void *)&((struct ChaseActor *)object)->group.saved.control,
-                ((struct ChaseActor *)object)->base.onAlternateEntry, 0, 0, 7, 60);
+            SceneActorDelay_Prepare((void *)&actor->group.saved, actor->base.onAlternateEntry, 7, 60);
             ActorStatus_SetWord(&((struct ChaseActor *)object)->base.behaviorFlags, 0x10);
             SceneActorPlacement_ClearFlags(&((struct ChaseActor *)object)->base.reactionFlags,
                                            (u32)(s16)0xF636);
@@ -402,8 +377,8 @@ static inline void ActorStatus_RecoverAndRelease(void *object)
 
             group->destination->pad = 1;
             grp = group->route;
-            r5 = (u8 *)actor + 0x5C;
-            res = ActorStatus_TryRecoveryRoute(object, grp, (void *)r5, &targetPosition);
+            position = &actor->base.body.position;
+            res = ActorStatus_TryRecoveryRoute(object, grp, position, &targetPosition);
             if (!res)
                 Callback_InvokeActor(actor, group->fallback);
         }

@@ -1,7 +1,6 @@
 #include "global.h"
 #include "engine/video/render.h"
 // confidence=low: projects the source and positions a timed icon around the screen center.
-#define ScreenOrbitEffect_UpdateFixedSlot sub_08232BE8
 struct OrbitVec {
     s16 x, y, z, pad;
 };

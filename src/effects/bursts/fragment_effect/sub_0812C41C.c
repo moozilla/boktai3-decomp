@@ -5,7 +5,7 @@
 #include "engine/resource_registry.h"
 #include "engine/math/monster_particle_random.h"
 extern const s16 gUnk_086149C4[];
-void SceneMovingParticle_Create(struct ContactPosition *, struct ContactPosition *, s32, s32);
+void DebrisMote_Create(struct ContactPosition *, struct ContactPosition *, s32, s32);
 static inline s32 Truncate(s32 v)
 {
     if (v >= 0)
@@ -44,5 +44,5 @@ void FragmentEffect_SpawnRandomParticle(struct ContactPosition *position)
     vertical &= 63;
     vertical -= 48;
     velocity.y = vertical;
-    SceneMovingParticle_Create(position, &velocity, 60, 3);
+    DebrisMote_Create(position, &velocity, 60, 3);
 }

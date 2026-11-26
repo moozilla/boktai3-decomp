@@ -10,7 +10,7 @@ void Hud_SetMode(s32);
 
 u32 SunClock_GetPhase(void);
 
-void sub_082157EC(void);
+void Bg_ResetDisplay(void);
 
 u8 *sub_08216E54(u16);
 
@@ -116,7 +116,7 @@ void TownMap_InitAnimations(struct RegistryChoiceMenu *menu)
         ResourceHeader_Relocate(&menu->resource, resource);
         anim = menu->animations;
         for (count = 0; count < 5; count++) {
-            Widget_InitLinked(anim, &menu->resource, 0, 0x10, 2, 0, 0x3c, 0);
+            AnimSprite_InitLinked(anim, &menu->resource, 0, 0x10, 2, 0, 0x3c, 0);
             anim->attribute1A = 3;
             anim++;
         }
@@ -143,7 +143,7 @@ void TownMap_InitBackground(struct RegistryChoiceMenu *menu)
         mask &= flags;
         *control = mask;
     }
-    sub_082157EC();
+    Bg_ResetDisplay();
     Hud_SetMode(7);
     {
         u32 flags = 0xC00;

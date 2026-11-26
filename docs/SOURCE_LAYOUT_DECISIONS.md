@@ -53,9 +53,9 @@ the range directories above, and their identities are kept in the notes of
 
 ## 2. Mechanism names
 
-The identity tables settle none of the listed directories yet, so most stay
-as they are and are recorded in `needs_evidence.csv` with the script evidence
-found here (creating procedures, scenes, debug prints). Changed this pass:
+Pass 3 kept provisional mechanism names where it had no runtime evidence.
+Pass 4's runtime identifications below resolve those placements. Pass 3 moved
+these units based on their known roles:
 
 * `objects/orbit_motion.c` + `objects/scene_script_object.c` →
   `objects/dungeon_prop/`. They are one ROM unit (081B817C) whose constructor is
@@ -65,13 +65,10 @@ found here (creating procedures, scenes, debug prints). Changed this pass:
   EffectGroup parts spawned on actors through `SceneActorEffects_*`).
 * `effects/scene/bat_flock.c` → `effects/bat_flock.c`: a specific effect, out
   of the generic group.
-* The `effects/particles/` systems that serve many unrelated callers
-  (`groups`, `spark_particles`, `scene_particle_pool`, `scripted_particle`,
-  `native_effect`, `burst_emitter`) keep mechanism names: they are particle
-  systems, and that is what a contributor looks for. The ones with a single
-  likely owner (`particle_burst`, `particle_effect`, `sprite_particle`,
-  `proximity_emitter`) and `monsters/enemy_particle` are needs-evidence
-  candidates for folding.
+* Shared effects stay under `effects/`. Runtime evidence now distinguishes
+  impact fragments, hit effects, projectile motes, spell and trap dust,
+  tether rings, and enemy attack particles. Owner-specific effects follow
+  Player, Vanargand, and falling hazards.
 
 ## 3. Redundant prefixes dropped
 
@@ -120,10 +117,9 @@ The main decisions:
   `MenuPrompt_`, `MenuSequence_`, `PauseDisplay_`. One is the ship wheel's
   `ShipWheel_SlideOpen`. The six `ScenePanelEffect_` in Nidhoggr's block →
   `NidhoggrEffect_`.
-* `SceneInventory_` → `Shop_` (97). It is the shop screen in general: five
-  presentations, of which 0 is the Weapon Shop (武器屋). The other four shops
-  are needs-evidence for their names, not for the prefix. The 11 in Storage →
-  `Storage_`.
+* `SceneInventory_` → `Shop_` (97); the 11 in Storage → `Storage_`. The five
+  constructor variants are the Weapon, Item and Accessory shops, the
+  traveling merchant and GariGari-kun's stall.
 * `SingletonSlot7_` → `VanargandHead_` (40). The worker saw his head in the bike
   chase and the ending. `Vanargand_` stays for the arena body.
 * `BossSlot2_` → `Sabata_` (19), and the six helper prefixes in his block
@@ -136,8 +132,8 @@ The main decisions:
   fires an axe shockwave described by game text #2538 and observed in replay.
   D459 uses `monsters/axe_armor/` (08204748–08205944) and the prefix
   `AxeArmor_`. STATUE #28 uses the prefix `Statue_`.
-* `StateActor_` → `StoryCharacter_` (51), after its directory. The kinds are
-  needs-evidence.
+* `StateActor_` → `StoryCharacter_` (51), after its directory. The runtime
+  identifications below document the kinds seen in their original scenes.
 * Identified objects lose their mechanism prefixes:
   * Coffin Bike `Glove_`, `ActorRecoil_`
   * Centipede `TentacleActor_`, `TentacleEnemy_`, `TentacleBody_`. The terrain
@@ -173,17 +169,50 @@ palette bank and tiles, with an animation-list link. `Anim_*` and
 `struct Player`. `anim_sprite.h` also defines `AnimSpriteResource`,
 `AnimSpritePlayback`, and the `AnimSprite_Hide` and `AnimSprite_Show` helpers.
 
-## needs-evidence (left alone this pass)
+## Pass 4 runtime identifications
 
-`needs_evidence.csv` lists 20 paths:
-* `objects/{scene_objects,actor_group,named_object,cell_gate,bouncing_object,breakable_prop}`
-* loose `objects/{region_actor,collision_controller,directional_controller,tile_trigger,breakable}.c`
-* all four NPC directories
-* four single-owner particle systems and `monsters/enemy_particle`
+| Earlier name | Observed owner and placement |
+|---|---|
+| `scene_objects`, scene object controller | D9AE creates solid puzzle blocks in scene 3955 (`objects/puzzle_blocks.c`). The separate 6D69 controller creates sliding doors in scene 5297 (`objects/sliding_doors/`). |
+| `actor_group`, `named_object`, `cell_gate` | F1F9 creates breakable loot deposits in scene 3905. A4FC moves the scene 4808 route platforms. 71BA opens the passage at the Wind Cannon row. |
+| `bouncing_object`, `breakable_prop` | The same bomb pool runs in the Nidhoggr duel and in Mummy and Ratatosk attacks. 3DB0 shatters quest barriers and invokes the Trinity release script. |
+| `region_actor`, `collision_controller`, `directional_controller` | 377D creates ice boulders. 0866 creates strike-triggered traps. 883A dispatches directional interaction prompts. |
+| `tile_trigger`, `breakable` | 2FA5 reacts to floor-trap contact. 2E1C candlesticks, braziers and light fixtures use weapon reactions and scripts. |
+| Scripted NPC, tagged NPC, title actor | BB34 drives Otenko's field dialogue. D774 loads Kuro's cat model. The Options tutorial and title replay use the same Otenko controller. |
+| Story-character kinds | The shared body runs Trinity (kinds 27 and 28), Sabata's projection (29), Smith (15), Violet (19), the Coffin Shopkeeper (22), Coach (24), Elefan (43), Carmilla (9), the fleeing resident (17), the Girl with Braids (20), and her father (18). |
+| Particle systems | Player motion 13 runs the spiral trail. Original recoil callbacks emit the rising puffs. The special-action cue emits action flashes. The Vanargand chase uses its own sprite particle manager. The F156 rings respond to tether proximity. Enemy attack particles are shared by Wind Cannon, Poison Hand and Screamer. |
 
-The strongest lead is `objects/scene_objects`. Its creator runs in 64 dungeon
-procedures whose prints place chests and moving floors, which points to
-`gimmicks`, but a running scene should confirm it first.
+The Player range boundaries remain the Pass 3 boundaries. Two Pile Trap
+actions inside the motions range use `PileTrap_` symbols. The scenery
+files use their confirmed names under `objects/dungeon_prop/`, and the
+Status page stays in `ui/pause/status/`.
+
+## Pass 5 identity corrections
+
+The title emblem runs four units at ROM addresses 081EAB64 through
+081EB724. They and `text_entry_widget.h` belong to `ui/title/`.
+The supplied range ends before the constructor at 081EB7DC.
+The Bat Curtain owns its debris, and the Strike Crystal has its own file
+under `objects/`. Sabata’s White Forest encounter drives the frost emitter.
+The actor palette fade runs during Repair and belongs with palette effects.
+
+Identity correction row 27 traces the flying sprite to `PlayerCue_Shoot` in
+a cutscene. Its unit at 082373C8 stays in
+`src/player/effects/spiral_trail/moving_glyph.c`. Moving it into the cutscene
+directory would introduce a separate ROM range there. The unit stays intact
+within the reviewed Player range map.
+
+The function prefixes follow each defining unit and its callers. Loot
+deposit, moving platform, sliding door, Vanargand, and Hresvelgr helpers
+owned by their units adopt those names. Shared SceneActors services keep
+their names. Vanargand also calls the two shared Debug position helpers.
+The static Coffin Bike helper initializes its braking animation and names
+that action independently of the public stopping callback.
+
+The filename plan records twenty explicit basenames. Four names beyond the
+Sabata, rider, Pile Driver, Nidhoggr effect-pool, and animated sprite units
+describe the main Nidhoggr duel, its minions, its orbs, and its bursts.
+The tilemap units keep their two reviewed descriptive names.
 
 ## Counts
 

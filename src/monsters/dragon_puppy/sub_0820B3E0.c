@@ -11,7 +11,7 @@ void Sound_PlaySong(u32);
 void Collider_SetPosition(void *, void *, u32);
 void DamageNumberDisplay_Show(void *, s32, u32, void *, void *, u32);
 void SceneHud_SetTimedState(void *, s32, s32, s32, u32, s32);
-void sub_08014634(s32, s32, void *, void *, void *, s32, s32);
+void ImpactParticleGroup_SpawnBouncing(s32, s32, void *, void *, void *, s32, s32);
 void Anim_RestartSequence(void *, void *, u32, u32, u32);
 void DragonPuppy_UpdateAttackWindup(void);
 
@@ -47,11 +47,9 @@ s32 DragonPuppy_UpdateCombat(struct DragonPuppy *p)
         p->stateWord = p->savedStateWord;
         Sound_PlaySong(0x13e);
         if (p->damage > 0) {
-            DamageNumberDisplay_Show(collider, p->damage, 0,
-                                     &p->collider.position,
+            DamageNumberDisplay_Show(collider, p->damage, 0, &p->collider.position,
                                      &p->collider.offset, 1);
-            SceneHud_SetTimedState(p->context, p->health,
-                                   p->maxHealth, p->hudValue140,
+            SceneHud_SetTimedState(p->context, p->health, p->maxHealth, p->hudValue140,
                                    p->collider.costFlags == 4, p->hudValue148);
         }
         if (p->health <= 0) {
@@ -72,9 +70,8 @@ s32 DragonPuppy_UpdateCombat(struct DragonPuppy *p)
             size.y = (ParticleRandom_ReadDirectSample(table) & 3) + 1;
             size.z = 24;
             count = (ParticleRandom_ReadDirectSample(table) & 3) + 4;
-            sub_08014634(count, 0x16, &position, &velocity, &size, 15, 15);
-            Anim_RestartSequence(&p->animation, p->deathAnimation, 5,
-                                 p->deathVariant, 0);
+            ImpactParticleGroup_SpawnBouncing(count, 0x16, &position, &velocity, &size, 15, 15);
+            Anim_RestartSequence(&p->animation, p->deathAnimation, 5, p->deathVariant, 0);
             AnimData_SelectPaletteBank(p->palette, 0x1b9);
             p->flashTimer = 0;
             p->update = DragonPuppy_UpdateAttackWindup;

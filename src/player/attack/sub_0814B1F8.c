@@ -52,7 +52,7 @@ static inline void PlayerMotion_SetTarget(void *target)
 }
 u32 Player_ConsumeStateEntry(void *);
 void *ParticlePool_Create(void);
-void *sub_0814B078(void *, s32, s32);
+void *Player_SelectNearestMotionTarget(void *, s32, s32);
 void Player_OnTargetMotionExit(struct Player *);
 void Player_SetPendingCallback(void *, void *);
 void WirelessGame_ResetCyclingItemLatch(void);
@@ -66,7 +66,7 @@ s32 Math_Atan2(s32, s32);
 void Anim_SetKeyframes(void *, void *, u16, u16, u16);
 s32 Anim_Step(void *, void *);
 void ParticlePool_EmitTriple(void *, void *, s32, s32);
-u32 SceneMovingParticle_Create(void *, void *, s32, s32);
+u32 DebrisMote_Create(void *, void *, s32, s32);
 void PlayerCue_InitAttackCollider(void *, void *, s32, s32);
 s32 Div(s32, s32);
 void *TemporaryAnimationPool_CreateEntry(void *, u32, u32, s32, const void *);
@@ -189,7 +189,7 @@ void Player_UpdateTargetMotion(struct Player *p)
         if (MOTION->particles == 0)
             MOTION->particles = ParticlePool_Create();
         p->cueSpeed = 50;
-        PlayerMotion_SetTarget(sub_0814B078(p, 1000000, 0));
+        PlayerMotion_SetTarget(Player_SelectNearestMotionTarget(p, 1000000, 0));
         gUnk_0200051C = 0;
         gUnk_02000524 = 0;
         p->movementStart = p->position;
@@ -303,7 +303,7 @@ void Player_UpdateTargetMotion(struct Player *p)
                 {
                     particlePosition.value = *(struct ContactPosition *)TGT_POS();
                     particlePosition.value.y += 30;
-                    SceneMovingParticle_Create(&particlePosition.value, &vel.value, 60, 1);
+                    DebrisMote_Create(&particlePosition.value, &vel.value, 60, 1);
                 }
             } else {
                 p->secondaryAnimation.position.x +=
@@ -390,13 +390,13 @@ void Player_UpdateTargetMotion(struct Player *p)
                 {
                     particlePosition2.value = *(struct ContactPosition *)TGT_POS();
                     particlePosition2.value.y += 30;
-                    SceneMovingParticle_Create(&particlePosition2.value, &vel2.value, 60, 1);
+                    DebrisMote_Create(&particlePosition2.value, &vel2.value, 60, 1);
                 }
             }
             p->tetherFrame++;
             if (p->tetherFrame > 0x19) {
                 if (gUnk_0200051C != 0 && gUnk_02000524 == 0 && p->statusValue != 0) {
-                    PlayerMotion_SetTarget(sub_0814B078(p, 1000000, 0));
+                    PlayerMotion_SetTarget(Player_SelectNearestMotionTarget(p, 1000000, 0));
                     if (gUnk_02000538 != 0) {
                         MOTION->speed += 0x32;
                         if (MOTION->speed > 0xC8)

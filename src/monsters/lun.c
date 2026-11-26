@@ -475,7 +475,7 @@ void Lun_ResumeAfterLiftPenalty(struct ChaseActor *input, s32 elapsed)
             SceneActorChase_SetPhase(input, 2, 1);
         } else {
             SceneActorChase_SetControl(input, Lun_UpdateWaitingAnimation, 10);
-            SceneActorChase_SetState(input, zero8, 1, 1);
+            SceneActorChase_SetPhase(input, 1, 1);
             input->base.body.direction = input->base.tracking.heading;
             input->base.field2C2 = 64;
         }
@@ -698,7 +698,7 @@ void Centipede_SelectWanderRoute(void *);
 
 void Centipede_AdvanceMotionPhase(void *, s32);
 
-void sub_080A9DB0(void *, s32, s32);
+void Centipede_UpdateSegmentPositions(void *, s32, s32);
 
 void Centipede_UpdateOscillation(void *, s32, s32);
 
@@ -1989,7 +1989,7 @@ s32 Lun_Init(void *object)
         res = ScriptProc_Start(0xCB05, 0xD28E);
         *(struct DisplayResourceHeader *)heap = *(struct DisplayResourceHeader *)res;
         ResourceHeader_Relocate(heap, res);
-        Widget_InitLinked(heap + 0x20, heap, 0, 0, 2, 2, 0x3C, &tmp);
+        AnimSprite_InitLinked(heap + 0x20, heap, 0, 0, 2, 2, 0x3C, &tmp);
         actor->base.animationIndex = 0xFF;
     }
     MonsterInit_InitializeBody(actor);

@@ -5,7 +5,7 @@
 #include "scene/terrain/terrain_cell_probe.h"
 s32 Script_SeekToKeyword(s32);
 s32 Script_GetValue(void);
-void sub_08201784(void *);
+void MuspellHead_InitializeColliders(void *);
 u32 MuspellHead_TryProjectileAttack(u8 *);
 void MuspellHead_UpdateDefeatEffect(void);
 void TerrainModifiers_RegisterCell(void *, s32, s32, s32, s32, s32);
@@ -76,8 +76,7 @@ static inline void ScriptActor_StepAnimation(struct MuspellHead *p,
     }
 }
 
-#define ScriptCombatActor_InitializeFromScript sub_0820212C
-s32 ScriptCombatActor_InitializeFromScript(struct MuspellHead *p, void *parent)
+s32 MuspellHead_InitializeFromScript(struct MuspellHead *p, void *parent)
 {
     void *resource;
     void *sprite;
@@ -181,7 +180,7 @@ s32 ScriptCombatActor_InitializeFromScript(struct MuspellHead *p, void *parent)
     {
         s16 *initialDead = &p->initialDead;
         if (*initialDead == 0)
-            sub_08201784(p);
+            MuspellHead_InitializeColliders(p);
         if (p->terrain && *initialDead == 0) {
             s32 cell = cellIndexAt((struct Pos16 *)&p->sprite.position);
             TerrainModifiers_RegisterCell(p->cell, cell, 0, p->sprite.position.y >> 8, 0, 0x803);

@@ -488,10 +488,8 @@ s32 Golem_UpdateHitReaction(struct ChaseActor *actor)
 
 void Golem_UpdateScriptedAction(struct ChaseActor *obj)
 {
-    if (SceneActorControl_TakeFlag(((u8 *)obj) + 0x2B1)) {
+    if (SceneActorControl_TakeFlag(&obj->base.field2B1)) {
         u16 *h;
-        u16 value;
-        s32 off;
         SceneActorChase_SetControl(obj, SceneActorReaction_PlayAnimationBUntilComplete, 10);
         {
             u32 byte = obj->base.tracking.heading;
@@ -499,7 +497,7 @@ void Golem_UpdateScriptedAction(struct ChaseActor *obj)
         }
         SceneActorAttachment_ReplaceResponseSlot((u8 *)obj, 0, 0, obj->base.category);
         SceneActorBehavior_CallActionScript((u8 *)obj);
-        h = (u16 *)(((u8 *)obj) + 0x414);
+        h = (u16 *)&obj->group.common.gate.flags;
         {
             u32 flag = 4;
             flag |= *h;
@@ -507,19 +505,16 @@ void Golem_UpdateScriptedAction(struct ChaseActor *obj)
         }
         {
             u32 flag = 0x80;
-            u16 *flags = (u16 *)(((u8 *)obj) + 0x2D4);
+            u16 *flags = &obj->base.motionFlags;
             flag |= *flags;
             *flags = flag;
         }
-        off = 0x416;
-        value = *((u16 *)(((u8 *)obj) + off));
-        off += 2;
-        *((u16 *)(((u8 *)obj) - (-off))) = value;
+        obj->group.common.gate.counter = obj->group.common.gate.duration;
     }
     if (obj->base.stepDone) {
         Golem_ResetIdleControl((u8 *)obj);
     } else {
-        ++(*((u32 *)(((u8 *)obj) + 0x2AC)));
+        ++obj->base.counter2AC;
     }
 }
 
@@ -636,7 +631,7 @@ void Golem_ResumeDelayedRoute(struct ChaseActor *actor)
     SceneActorControl_TakeStateEntry(actor);
     if ((u8)Callback_InvokeActor(actor, actor->base.contactQuery.opaque))
         return;
-    if ((u8)sub_0812F3CC(actor))
+    if ((u8)SceneActorReaction_BeginContactResponse(actor))
         return;
     if ((s32)actor->base.counter2AC <= 60)
         goto waiting;

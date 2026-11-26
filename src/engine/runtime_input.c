@@ -1,4 +1,3 @@
-#define Input_UpdatePadStates sub_08219B24
 #include "engine/runtime_input.h"
 #include "engine/video/render.h"
 #include "engine/ram.h"

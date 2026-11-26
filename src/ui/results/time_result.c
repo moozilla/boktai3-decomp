@@ -248,10 +248,10 @@ void TimeResult_InitAnimations(struct ChallengeTimeResult *result)
     resource = ScriptProc_Start(0xCB05, 0xE2AB);
     result->digitGraphics = *resource;
     ResourceHeader_Relocate(&result->digitGraphics, resource);
-    Widget_InitLinked(&result->category, &result->categoryGraphics, 0, 0x10, 1, 0, 0x3C, 0);
-    Widget_InitLinked(&result->label, &result->categoryGraphics, 0, 0x10, 2, 0, 0x3C, 0);
+    AnimSprite_InitLinked(&result->category, &result->categoryGraphics, 0, 0x10, 1, 0, 0x3C, 0);
+    AnimSprite_InitLinked(&result->label, &result->categoryGraphics, 0, 0x10, 2, 0, 0x3C, 0);
     for (i = 0; i < 6; i++)
-        Widget_InitLinked(&result->digits[i], &result->digitGraphics, 0, 0x31, 2, 0, 0x3C, 0);
+        AnimSprite_InitLinked(&result->digits[i], &result->digitGraphics, 0, 0x31, 2, 0, 0x3C, 0);
     TimeResult_InitCategoryDisplay(result);
     TimeResult_SetElapsedDigits(result);
     result->category.flags |= 1;

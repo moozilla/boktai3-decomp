@@ -297,7 +297,7 @@ extern u8 *gSolarController; /* solar sensor controller (Solar_*) */
 extern u32 gScenePauseFlags; /* scene pause/mute flags (bit tests across effects and actors) */
 /* 0x02000060 */
 extern void *
-    gParticleGroupManager; /* provisional: six-group particle manager singleton (ParticleManager_Initialize) */
+    gParticleGroupManager; /* provisional: six-group particle manager singleton (ImpactParticleManager_Initialize) */
 /* 0x02000080 */
 extern s32
     gWeatherCooldownBase; /* weather cooldown base, configured by Weather_ConfigureCooldown */
@@ -347,7 +347,7 @@ extern s32 gHresvelgrVolleyCount; /* alternating Hresvelgr volley pulse counter 
 extern struct F3E4Actor *gRegistryF3E4Actor; /* provisional: registry F3E4 singleton actor */
 /* 0x02000278 */
 extern u16
-    gSceneNpcBlendPalette[16]; /* sixteen-color output palette blended by SceneNpc_BlendPalette */
+    gSceneNpcBlendPalette[16]; /* sixteen-color output palette blended by Kuro_BlendPalette */
 /* 0x020003C8 */
 extern u8
     *gScriptedActorController; /* provisional: singleton scripted actor animation controller */

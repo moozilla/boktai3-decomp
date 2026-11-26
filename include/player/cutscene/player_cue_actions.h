@@ -43,7 +43,7 @@ void Player_EmitQueuedEffects(void *);
 void Player_NotifyActionCategories(void *);
 void Player_SetFacingFromAngle(void *, s32);
 void ParticlePool_EmitTriple(u32, void *, u32, u32);
-void SceneMovingParticle_Create(void *, void *, s32, s32);
+void DebrisMote_Create(void *, void *, s32, s32);
 void PlayerCue_InitAttackCollider(void *, void *, u32, u32);
 s32 Div(s32, s32);
 

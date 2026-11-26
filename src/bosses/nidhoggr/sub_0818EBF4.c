@@ -2,12 +2,12 @@
 
 #define gScenePanelEffectColliderShape gUnk_0824F184
 
-struct ScenePanelEffectSlot {
+struct NidhoggrEffectSlot {
     u32 state;
     u32 flags;
     u8 unknown8[0x6C - 8];
 };
-struct ScenePanelCollisionEffect {
+struct NidhoggrCollisionEffect {
     u32 state;
     u32 flags;
     u8 unknown8[0xCC - 8];
@@ -15,10 +15,10 @@ struct ScenePanelCollisionEffect {
     u8 collider120[0x54];
     u8 unknown174[0x188 - 0x174];
 };
-struct ScenePanelEffectPool {
-    struct ScenePanelEffectSlot effects[24];
+struct NidhoggrEffectPool {
+    struct NidhoggrEffectSlot effects[24];
     void *resource;
-    struct ScenePanelCollisionEffect collisionEffects[48];
+    struct NidhoggrCollisionEffect collisionEffects[48];
     u32 position[2];
     void *script;
 };
@@ -26,12 +26,12 @@ extern u8 gScenePanelEffectColliderShape[];
 void Collider_Init(void *, u16, u32, u32, u32, void *, void *);
 void *ScriptProc_Start(u16, u16);
 
-void NidhoggrEffect_InitPool(struct ScenePanelEffectPool *pool)
+void NidhoggrEffect_InitPool(struct NidhoggrEffectPool *pool)
 {
     s32 i;
     u32 *word;
-    struct ScenePanelEffectSlot *effect;
-    struct ScenePanelCollisionEffect *collision;
+    struct NidhoggrEffectSlot *effect;
+    struct NidhoggrCollisionEffect *collision;
     pool->script = ScriptProc_Start(0x922E, 0xBB30);
     pool->resource = 0;
     i = 0;

@@ -1399,7 +1399,7 @@ The draft is excluded from exact progress. Project totals were not regenerated.
   the exact match commit. The existing symbols entry is named
   `SceneNpc_DispatchCommands_081CD484`; the new file-local alias intentionally
   supplies the address-free name for integration's name-promotion pass.
-- **081CF62C matched**, `SceneNpc_UpdateDescendingDash`, 544 bytes.
+- **081CF62C matched**, `Otenko_UpdateDescendingDash`, 544 bytes.
   Name is tentative, as marked in the source. On entry it selects animation 9,
   raises Y by 160, and initializes a height offset of 300. Phases select
   animations 10, 11 and 12, compute polar velocity, quarter off horizontal
@@ -1420,7 +1420,7 @@ The draft is excluded from exact progress. Project totals were not regenerated.
   projected-sum local, and temporary register hints closed the projection.
   Depinning reduced 15 hints to two pointer declarations (ip and r2), with
   no empty barriers retained.
-- **081CFDA4 matched**, `SceneNpc_UpdateProjectedMove`, 520 bytes, no hints.
+- **081CFDA4 matched**, `Otenko_UpdateProjectedMove`, 520 bytes, no hints.
   Enables the ground projection, plays animation 3, and interpolates saved
   position +0x23C toward target +0x54 over tag duration +0x12. It writes fixed
   point projection coordinates from +0x2F0, including camera X, then advances
@@ -1429,8 +1429,8 @@ The draft is excluded from exact progress. Project totals were not regenerated.
   081C3C1C changed this candidate directly from 89.5% to an exact match.
   Computing the target pointer inside a dedicated inline preserves the
   original projection-address/target-address ordering.
-- **081C29A4 drafted 91.6%**, `SparkleEmitter_EmitParticle`, 532-byte extent.
-  Caller `SparkleEmitter_UpdateEmitting` invokes it every other update.
+- **081C29A4 drafted 91.6%**, `CutsceneSparkle_EmitParticle`, 532-byte extent.
+  Caller `CutsceneSparkle_UpdateEmitting` invokes it every other update.
   `sub_081C2968` finds the free entry; this routine increments live count,
   clears the free bit, chooses a randomized point on a radius-150 circle,
   converts screen coordinates into world position, and chooses randomized
@@ -2201,7 +2201,7 @@ remains with the batch integrator.
   initialize height offset 300, animation 10 after frame three, then lower
   toward terrain while damping unsigned horizontal speed to three quarters.
   At rest plays song 680 and animations 11/12, then sets done. The callback
-  is present in the NPC state table; neighboring SceneNpc_PlayAnimation12
+  is present in the NPC state table; neighboring Otenko_PlayAnimation12
   uses the same flags, animation callback and tag height field. Scalar
   terrain-height lookup and a polar-vector inline matched on the first check.
   Final formatted source passed `check.py --target-size 544`. No register
@@ -2220,8 +2220,8 @@ remains with the batch integrator.
   MATCHING_CONCESSION: register-pinning. Final formatted source passed the
   reviewed 636-byte check.
 
-- **081C29A4 drafted 91.6%**, `SparkleEmitter_EmitParticle`, 532 bytes.
-  Called every other update by SparkleEmitter_UpdateEmitting (081C2BBC).
+- **081C29A4 drafted 91.6%**, `CutsceneSparkle_EmitParticle`, 532 bytes.
+  Called every other update by CutsceneSparkle_UpdateEmitting (081C2BBC).
   Allocates a free pool entry when speed is greater than one, activates it,
   chooses a randomized screen-edge position of radius 150, converts it into
   world coordinates, then sets jittered angle/speed and clears particle age.
@@ -2246,7 +2246,7 @@ remains with the batch integrator.
   No concession marker remains.
 
 - **081CEFCC stopped below draft threshold**, tentative
-  `SceneNpc_FollowSceneTarget`. Script behavior two (081D10D8) and the NPC
+  `Otenko_FollowSceneTarget`. Script behavior two (081D10D8) and the NPC
   creation paths select this update. Context 0x438 supplies a target with
   position at 0x30 and heading at 0x2D; context 0x434 supplies the comparison
   position. Squared distance above 0x90000 snaps the NPC 0x300 behind the
@@ -2553,14 +2553,14 @@ resumed rather than recreated. No make, full build, network operation,
 generated-file edit, or shared documentation/index edit. Combined ROM
 validation and name promotion remain the integrator's work.
 
-- **08113BBC — drafted 99.6%, NativeEffect_UpdateRotatingFlight.**
+- **08113BBC — drafted 99.6%, ProjectileEffect_UpdateRotatingFlight.**
   Retained the prior best draft and restored its required local address alias
   so it checks against this worktree's older ELF names. Two realigned
   register-only differences remain: the final height-address reload uses r3
   instead of r0. Scoped height pointers/values, input/output constraints and
   scratch-register clobbers did not improve it; several changed earlier PRE
   decisions and animation allocation. No functional change claimed.
-- **08114928 — drafted 83.9%, NativeEffect_CreateFromProfile.**
+- **08114928 — drafted 83.9%, ProjectileEffect_CreateFromProfile.**
   Retained the prior best draft, adding local aliases for its entry and the
   three motion-state callbacks whose names are absent from the base ELF.
   Still 53 realigned differing instructions, 23 with registers ignored.
@@ -2570,7 +2570,7 @@ validation and name promotion remain the integrator's work.
   constraints, volatile counter reads, scalar-result constraints and pinned
   input copies did not improve the candidate. Stronger input pinning also
   changed the struct-copy instruction selection, so those edits were rejected.
-- **08113920 — drafted 95.4%, NativeEffect_UpdateAcceleratingTrail.**
+- **08113920 — drafted 95.4%, ProjectileEffect_UpdateAcceleratingTrail.**
   Improved from 90.5% by factoring the random-table sample into an inline
   helper with a constrained scalar result. Keeping the seven-bit-range mask
   inside that helper fixes the particle-offset operand order. Thirteen

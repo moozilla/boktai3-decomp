@@ -1,6 +1,6 @@
 #ifndef GUARD_TERRAIN_EDGE_MARKER_H
 #define GUARD_TERRAIN_EDGE_MARKER_H
-#include "objects/scene_objects/scene_object.h"
+#include "objects/scene_object.h"
 #include "engine/task.h"
 union TerrainMarkerPosition {
     struct SceneVec world;

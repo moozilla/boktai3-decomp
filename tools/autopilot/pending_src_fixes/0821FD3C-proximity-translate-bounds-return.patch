@@ -5,8 +5,8 @@ the last test result, or the incoming out pointer when there were no tests.
 
 The explicit form changed the ROM bytes. The guarded form passed the unit ROM check.
 
---- a/src/nav_mesh.c
-+++ b/src/nav_mesh.c
+--- a/src/scene/terrain/nav_mesh.c
++++ b/src/scene/terrain/nav_mesh.c
 @@ -623,4 +623,7 @@
      struct NavHdr *hdr = ((struct World *)gTerrainMap)->nav;
      s32 i, j;

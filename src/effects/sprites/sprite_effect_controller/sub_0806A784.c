@@ -1,7 +1,5 @@
 #include "effects/sprites/sprite_effect_controller.h"
-/* SpriteEffectController_OnIdle: Empty controller callback taking pool and controller pointers; provisionally represents an idle state */
-#define SpriteEffectController_OnIdle    sub_0806A784
-#define SpriteEffectController_StateIdle sub_0806A784
+/* SpriteEffectController_StateIdle: Empty controller callback taking pool and controller pointers; provisionally represents an idle state */
 void SpriteEffectController_StateIdle(struct SpriteEffectControllerPool *unusedPool,
                                       struct SpriteEffectController *unusedController)
 {

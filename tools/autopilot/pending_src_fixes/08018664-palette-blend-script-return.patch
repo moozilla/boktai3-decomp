@@ -5,8 +5,8 @@ The following stores use r1 and r2, leaving r0 live for the VM.
 
 The explicit form changed the ROM bytes. The guarded form passed the unit ROM check.
 
---- a/src/palette_cycle.c
-+++ b/src/palette_cycle.c
+--- a/src/effects/palette/palette_cycle.c
++++ b/src/effects/palette/palette_cycle.c
 @@ -192,5 +192,14 @@
      entry->length[1] = Script_GetKeywordValue('D', 10);
      entry->hold[0] = Script_GetKeywordValue('w', 0);

@@ -65,39 +65,39 @@ void FieldHud_UpdateTimeDigits(struct FieldHudWidgets *widgets)
     minutes = Div(**source, 60);
     fraction = Div((**source - minutes * 60) * 169, 10);
     if (**source > 59999) {
-        Anim_SelectWidgetGlyph(&widgets->timeDigits[0], widgets->timeResource, 50);
-        Anim_SelectWidgetGlyph(&widgets->timeDigits[1], widgets->timeResource, 50);
-        Anim_SelectWidgetGlyph(&widgets->timeDigits[2], widgets->timeResource, 50);
-        Anim_SelectWidgetGlyph(&widgets->timeDigits[3], widgets->timeResource, 50);
-        Anim_SelectWidgetGlyph(&widgets->timeDigits[4], widgets->timeResource, 50);
-        Anim_SelectWidgetGlyph(&widgets->timeDigits[5], widgets->timeResource, 50);
+        AnimSprite_SelectGlyph(&widgets->timeDigits[0], widgets->timeResource, 50);
+        AnimSprite_SelectGlyph(&widgets->timeDigits[1], widgets->timeResource, 50);
+        AnimSprite_SelectGlyph(&widgets->timeDigits[2], widgets->timeResource, 50);
+        AnimSprite_SelectGlyph(&widgets->timeDigits[3], widgets->timeResource, 50);
+        AnimSprite_SelectGlyph(&widgets->timeDigits[4], widgets->timeResource, 50);
+        AnimSprite_SelectGlyph(&widgets->timeDigits[5], widgets->timeResource, 50);
     } else {
         digit = 0;
         while (minutes > 99) {
             digit++;
             minutes -= 100;
         }
-        Anim_SelectWidgetGlyph(&widgets->timeDigits[0], widgets->timeResource, (u16)(digit + 41));
+        AnimSprite_SelectGlyph(&widgets->timeDigits[0], widgets->timeResource, (u16)(digit + 41));
         digit = 0;
         while (minutes > 9) {
             digit++;
             minutes -= 10;
         }
-        Anim_SelectWidgetGlyph(&widgets->timeDigits[1], widgets->timeResource, (u16)(digit + 41));
-        Anim_SelectWidgetGlyph(&widgets->timeDigits[2], widgets->timeResource, (u16)(minutes + 41));
+        AnimSprite_SelectGlyph(&widgets->timeDigits[1], widgets->timeResource, (u16)(digit + 41));
+        AnimSprite_SelectGlyph(&widgets->timeDigits[2], widgets->timeResource, (u16)(minutes + 41));
         digit = 0;
         while (fraction > 99) {
             digit++;
             fraction -= 100;
         }
-        Anim_SelectWidgetGlyph(&widgets->timeDigits[3], widgets->timeResource, (u16)(digit + 41));
+        AnimSprite_SelectGlyph(&widgets->timeDigits[3], widgets->timeResource, (u16)(digit + 41));
         digit = 0;
         while (fraction > 9) {
             digit++;
             fraction -= 10;
         }
-        Anim_SelectWidgetGlyph(&widgets->timeDigits[4], widgets->timeResource, (u16)(digit + 41));
-        Anim_SelectWidgetGlyph(&widgets->timeDigits[5], widgets->timeResource,
+        AnimSprite_SelectGlyph(&widgets->timeDigits[4], widgets->timeResource, (u16)(digit + 41));
+        AnimSprite_SelectGlyph(&widgets->timeDigits[5], widgets->timeResource,
                                (u16)(fraction + 41));
     }
 }
@@ -136,7 +136,7 @@ s32 NumericDisplay_InitializeWidgets(struct FieldHudWidgets *widgets, s32 *timeS
                 x = 0;
                 break;
         }
-        result = Widget_InitLinked(&widgets->timeDigits[i], widgets->timeResource, 0x29, 0x10, 0, 0,
+        result = AnimSprite_InitLinked(&widgets->timeDigits[i], widgets->timeResource, 0x29, 0x10, 0, 0,
                                    0, 0);
         if (result != 0) {
             ret = -1;
@@ -280,28 +280,28 @@ void MeterDisplay_InitializeWidgets(struct FieldHudWidgets *widgets)
     s32 i, result;
     u32 zero;
     u32 *flags;
-    struct AnimSprite *widget;
+    struct AnimSprite *animSprite;
     void *script;
     script = ScriptProc_Start(0xCB05, 0x1289);
     widgets->meterScript = script;
     ResourceHeader_Relocate(widgets->meterResource, script);
     i = 0;
     zero = 0;
-    widget = widgets->meterWidgets;
+    animSprite = widgets->meterWidgets;
 
     do {
-        result = Widget_InitLinked(widget, widgets->meterResource, (u16)(i + 0x49), 0x10, zero,
-                                   zero, zero, (void *)zero);
+        result = AnimSprite_InitLinked(animSprite, widgets->meterResource, (u16)(i + 0x49), 0x10,
+                                       zero, zero, zero, (void *)zero);
         if (result)
             return;
-        widget->position.x = result;
-        widget->position.y = result;
-        widget->position.z = result;
+        animSprite->position.x = result;
+        animSprite->position.y = result;
+        animSprite->position.z = result;
         flags = &widgets->meterWidgets[0].flags;
-        flags = (u32 *)((u8 *)flags + i * sizeof(*widget));
+        flags = (u32 *)((u8 *)flags + i * sizeof(*animSprite));
         *flags &= ~1;
-        widget->attribute1A = zero;
-        widget++;
+        animSprite->attribute1A = zero;
+        animSprite++;
 
     } while (++i <= 1);
     /* The background API still declares this shared pointer with an opaque Camera tag. */

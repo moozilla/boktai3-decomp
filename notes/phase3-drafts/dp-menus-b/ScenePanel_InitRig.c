@@ -1,4 +1,4 @@
-#include "objects/pile_driver/scene_panel_rig_setup.h"
+#include "objects/pile_driver/pile_driver_rig_setup.h"
 
 void PileDriver_InitRig(struct ScenePanel *input)
 {

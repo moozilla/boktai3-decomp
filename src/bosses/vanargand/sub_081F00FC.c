@@ -32,7 +32,7 @@ static inline void SetCallback(void (*v)(void), void (**a)(void))
 {
     *a = v;
 }
-void SceneActors_AdvanceToHorizontalTween(struct SceneActorTween *p)
+void VanargandHead_AdvanceToHorizontalTween(struct SceneActorTween *p)
 {
     if (ConsumeEntry(p) == 1) {
         SetCallback(VanargandHead_UpdateShakingDeparture, &p->callback);

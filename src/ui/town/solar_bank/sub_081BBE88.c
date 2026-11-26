@@ -32,7 +32,6 @@ static inline void SolarBank_SetRate(s16 *rate, s32 level)
     *rate = 0x41 + level;
 }
 
-#define SolarBank_InitWidgets sub_081BBE88
 void SolarBank_InitWidgets(struct SolarBankDisplay *p)
 {
     struct AnimSpritePlayback labelPlayback;
@@ -56,7 +55,7 @@ void SolarBank_InitWidgets(struct SolarBankDisplay *p)
     pos.y = 0;
     pos.z = 0;
     labelPriority = labelPlayback.priority;
-    Widget_InitLinked(&p->label, &p->bankResource, 0, 0x30, labelPriority, labelPlayback.mode, 60,
+    AnimSprite_InitLinked(&p->label, &p->bankResource, 0, 0x30, labelPriority, labelPlayback.mode, 60,
                       &pos);
     if (Script_SeekToKeyword('R')) {
         s32 rate = Script_GetValue();
@@ -72,15 +71,15 @@ void SolarBank_InitWidgets(struct SolarBankDisplay *p)
     percent = ((100 * gGameState->solarBankRate) >> 6) - 100;
     tens = Div(percent, 10);
     percent -= tens * 10;
-    Widget_InitLinked(&p->rateDigits[0], &p->bankResource, (u16)(tens + 8), 0x30, 0, 0, 0x3C, &pos);
+    AnimSprite_InitLinked(&p->rateDigits[0], &p->bankResource, (u16)(tens + 8), 0x30, 0, 0, 0x3C, &pos);
     pos.x += 8;
-    Widget_InitLinked(&p->rateDigits[1], &p->bankResource, (u16)(percent + 8), 0x30, 0, 0, 0x3C,
+    AnimSprite_InitLinked(&p->rateDigits[1], &p->bankResource, (u16)(percent + 8), 0x30, 0, 0, 0x3C,
                       &pos);
     pos.x = 0;
-    Widget_InitLinked(&p->percentSign, &p->bankResource, 0x12, 0x30, 0, 0, 0x3C, &pos);
+    AnimSprite_InitLinked(&p->percentSign, &p->bankResource, 0x12, 0x30, 0, 0, 0x3C, &pos);
     pos.x = -8;
     pos.y = -8;
-    Widget_InitLinked(&p->prompt, &p->commonResource, 0x4B, 0x10, 0, 0, 0x3C, &pos);
+    AnimSprite_InitLinked(&p->prompt, &p->commonResource, 0x4B, 0x10, 0, 0, 0x3C, &pos);
     p->prompt.palette = p->promptPalette;
     pos.x = 0x28;
     pos.y = 0x28;
@@ -88,8 +87,8 @@ void SolarBank_InitWidgets(struct SolarBankDisplay *p)
     commonResource = &p->commonResource;
     for (i = 0; i < 4; i++) {
         struct ContactPosition *position = &pos;
-        struct AnimSprite *widget = &p->balanceDigits[i];
-        Widget_InitLinked(widget, commonResource, 0, 0x30, 0, 0, 0x3C, position);
+        struct AnimSprite *animSprite = &p->balanceDigits[i];
+        AnimSprite_InitLinked(animSprite, commonResource, 0, 0x30, 0, 0, 0x3C, position);
         pos.x += 8;
     }
 
@@ -97,8 +96,8 @@ void SolarBank_InitWidgets(struct SolarBankDisplay *p)
     pos.y = 0x28;
     for (i = 0; i < 4; i++) {
         struct ContactPosition *position = &pos;
-        struct AnimSprite *widget = &p->transferDigits[i];
-        Widget_InitLinked(widget, commonResource, 0, 0x30, 0, 0, 0x3C, position);
+        struct AnimSprite *animSprite = &p->transferDigits[i];
+        AnimSprite_InitLinked(animSprite, commonResource, 0, 0x30, 0, 0, 0x3C, position);
         pos.x += 8;
     }
 
@@ -116,8 +115,8 @@ void SolarBank_InitWidgets(struct SolarBankDisplay *p)
         p->sprites[i].position.z = 0;
     }
 
-    Widget_InitLinked(&p->transferLabel, bankResource, 0x21, 0x30, 0, 0, 0x3C, (void *)0);
+    AnimSprite_InitLinked(&p->transferLabel, bankResource, 0x21, 0x30, 0, 0, 0x3C, (void *)0);
     Vanargand_SetVector(&pos, -0x85, -0x18, 0);
-    Widget_InitLinked(&p->firstMarker, commonResource, 0x7E, 0x30, 0, 0, 0x3C, &pos);
-    Widget_InitLinked(&p->secondMarker, commonResource, 0x7F, 0x30, 0, 0, 0x3C, &pos);
+    AnimSprite_InitLinked(&p->firstMarker, commonResource, 0x7E, 0x30, 0, 0, 0x3C, &pos);
+    AnimSprite_InitLinked(&p->secondMarker, commonResource, 0x7F, 0x30, 0, 0, 0x3C, &pos);
 }

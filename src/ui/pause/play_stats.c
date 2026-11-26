@@ -389,7 +389,7 @@ void PlayStats_InitializeWidgets(struct PlayStatsScreen *screen)
     u8 data[8];
     struct SceneInputPackedPosition dims;
     int i;
-    struct AnimSprite *widget;
+    struct AnimSprite *animSprite;
 
     memcpy(data, gUnk_0824F999, 8);
     dims.y = 0x38;
@@ -397,15 +397,15 @@ void PlayStats_InitializeWidgets(struct PlayStatsScreen *screen)
 
     for (i = 0; i <= 7; i++) {
         dims.x = data[i];
-        Widget_InitLinked(&screen->entries[i], &screen->resources[0], 0, 0x30, 0, 0, 0x3c, &dims);
+        AnimSprite_InitLinked(&screen->entries[i], &screen->resources[0], 0, 0x30, 0, 0, 0x3c, &dims);
         AnimSprite_Hide(&screen->entries[i]);
     }
 
-    Widget_InitLinked(&screen->entries[8], &screen->resources[0], 0x3c, 0x30, 0, 0, 0x3c, NULL);
+    AnimSprite_InitLinked(&screen->entries[8], &screen->resources[0], 0x3c, 0x30, 0, 0, 0x3c, NULL);
 
-    widget = &screen->entries[9];
-    Widget_InitLinked(widget, &screen->resources[1], 0x80, 0x30, 0, 0, 0x3c, NULL);
-    widget->flags |= 1;
+    animSprite = &screen->entries[9];
+    AnimSprite_InitLinked(animSprite, &screen->resources[1], 0x80, 0x30, 0, 0, 0x3c, NULL);
+    animSprite->flags |= 1;
 }
 
 void PlayStats_LoadResources(struct PlayStatsScreen *screen)

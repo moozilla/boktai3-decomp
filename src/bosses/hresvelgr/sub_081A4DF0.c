@@ -1,7 +1,6 @@
 #include "global.h"
 
 // confidence=low: loads the projectile resource and initializes sixteen linked widgets.
-#define Hresvelgr_InitializeProjectilePool sub_081A4DF0
 struct ProjectileResource {
     u32 words[8];
 };
@@ -26,7 +25,7 @@ struct ProjectilePool {
 };
 struct ProjectileResource *ScriptProc_Start(u32, u32);
 s32 ResourceHeader_Relocate(void *, void *);
-s32 Widget_InitLinked(void *, void *, u16, u32, u8, u8, u8, const void *);
+s32 AnimSprite_InitLinked(void *, void *, u16, u32, u8, u8, u8, const void *);
 void Anim_SetKeyframes(void *, void *, u16, u16, u16);
 s32 Hresvelgr_InitializeProjectilePool(struct ProjectilePool *pool, s32 a, s32 b, s32 c)
 {
@@ -45,7 +44,7 @@ s32 Hresvelgr_InitializeProjectilePool(struct ProjectilePool *pool, s32 a, s32 b
     ZeroFill8(&position);
     entry = pool->entries;
     for (i = 0; i < 16; i++) {
-        Widget_InitLinked(entry, &pool->resource, 0, 0, 2, 0, 60, &position);
+        AnimSprite_InitLinked(entry, &pool->resource, 0, 0, 2, 0, 60, &position);
         Anim_SetKeyframes(entry, &pool->resource, 33, 2, 0);
         entry->flags |= 1;
         entry->timer = 0;

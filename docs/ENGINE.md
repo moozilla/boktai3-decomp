@@ -176,9 +176,9 @@ constructor's `size` argument:
 
 | Object | Header | Size | Embeds | Source |
 |---|---|---|---|---|
-| Scene object (block) | `struct SceneObject`, `SceneObjectManager` pool | `0x74` manager, `0x1A8` per object | `SceneBody` (position, velocity), `SceneAnimation`, `SceneDraw`, two `SceneCollider`s, `SceneCellRef` | [`include/objects/scene_objects/scene_object.h`](../include/objects/scene_objects/scene_object.h), [`src/objects/scene_objects/scene_object.c`](../src/objects/scene_objects/scene_object.c) |
+| Scene object (block) | `struct SceneObject`, `SceneObjectManager` pool | `0x74` manager, `0x1A8` per object | `SceneBody` (position, velocity), `SceneAnimation`, `SceneDraw`, two `SceneCollider`s, `SceneCellRef` | [`include/objects/scene_object.h`](../include/objects/scene_object.h), [`src/objects/puzzle_blocks.c`](../src/objects/puzzle_blocks.c) |
 | Pooled interactable | `PooledInteractableManager` | `0x80` manager, `0xEC` per slot | `PooledRoute`, `PooledDrawable`, collider | [`include/objects/breakable.h`](../include/objects/breakable.h) |
-| Collision prop | `CollisionManager` (`Task_Create(10, 0xA2C)`) | 16 slots | `CollisionSprite`, `CollisionAnim`, `SceneCollider` | [`src/objects/collision_controller.c`](../src/objects/collision_controller.c) |
+| Collision prop | `CollisionManager` (`Task_Create(10, 0xA2C)`) | 16 slots | `CollisionSprite`, `CollisionAnim`, `SceneCollider` | [`src/objects/strike_traps.c`](../src/objects/strike_traps.c) |
 | Homing or orbiting effect | `EffectManager` | six particle effects of four sprites | `EffectSprite`, packed vectors | [`src/effects/orbits/homing_effect.c`](../src/effects/orbits/homing_effect.c) |
 | Trigger (drop or container) | `TriggerManager` (`Task_Create(9, 0x5C)`) | linked list of `0xBC`-byte records | `TriggerAnim`, `TriggerGraphics`, shadow | [`include/objects/items/item_container.h`](../include/objects/items/item_container.h) |
 | Background / scrolling background | `BackgroundController` (`Task_Create(9, 0x140)`, scrolling `0xF8`) | command queue of 8 entries | `BackgroundCommandQueue` | [`include/effects/screen/background_controller.h`](../include/effects/screen/background_controller.h) |
@@ -210,7 +210,7 @@ An **intrusive list** links objects by pointer. The pooled actor manager
 Taking the trigger manager and scene objects as examples:
 
 1. **Script creates it.** The event bytecode calls a native command, for example
-   `SceneObjects_CreateFromScript` ([`src/objects/scene_objects/scene_object.c`](../src/objects/scene_objects/scene_object.c),
+   `PuzzleBlock_CreateFromScript` ([`src/objects/puzzle_blocks.c`](../src/objects/puzzle_blocks.c),
    around line 1536). It reads its parameters with keyword lookups:
 
    ```c
@@ -242,8 +242,8 @@ Taking the trigger manager and scene objects as examples:
 State machines are a `state` (or `kind`) field plus a `counter` or `timer`, and
 an `entered` flag. The first frame of a new state sets `entered`, and the state
 handler clears it on its first run. Examples: `sub_08008A98` and `sub_08008AA4`
-in [`src/objects/breakable.c`](../src/objects/breakable.c), and the
-comment on `struct SceneObject.entered` in `include/objects/scene_objects/scene_object.h`.
+in [`src/objects/light_fixtures.c`](../src/objects/light_fixtures.c), and the
+comment on `struct SceneObject.entered` in `include/objects/scene_object.h`.
 
 ---
 
@@ -289,7 +289,7 @@ The payload length comes from the low nibble. Values 0 to 12 are literal lengths
 Native commands are registered as linked tables of `{id, function}` entries
 (`sub_0821ABE8` registers, `sub_0821AC30` searches). The engine commands are
 the functions that these tables point at. Examples by name are
-`SceneObjects_CreateFromScript`, `Trigger_CreateDrop` and
+`PuzzleBlock_CreateFromScript`, `Trigger_CreateDrop` and
 `ChoiceMenu_CreateFromScript` *(guess: the table entries themselves are not yet
 listed)*. Their names carry the `_FromScript` suffix
 when they parse keywords.
@@ -564,18 +564,18 @@ The current map's collision grid is `gUnk_030052F4` (an `EngineMap`, with
 `gUnk_030052F8`/`gUnk_030052FC` as width and height in cells). Each cell in
 `struct SceneCell` is four bytes: `height` (low nibble = level 0–15; high nibble =
 kind, 0 = solid floor), `tile`, and `flags` (bit 0 = occupied by an object,
-bit 3 = blocks entry; `include/objects/scene_objects/scene_object.h`).
+bit 3 = blocks entry; `include/objects/scene_object.h`).
 
-Scene objects move one cell at a time. `Scene_CanEnterNeighborCell` and
-`Scene_CheckNeighborHeight` in `src/objects/scene_objects/scene_object.c` test the neighbour;
-`Scene_TryStepDown` and `Scene_DropObjectsAbove` handle falls; terrain
+Scene objects move one cell at a time. `PuzzleBlock_CanEnterNeighborCell` and
+`PuzzleBlock_CheckNeighborHeight` in `src/objects/puzzle_blocks.c` test the neighbour;
+`PuzzleBlock_TryStepDown` and `PuzzleBlock_DropObjectsAbove` handle falls; terrain
 modifiers (`TerrainModifiers_Change`, `src/scene/terrain/terrain_modifier.c`) rewrite cells at
 runtime. The overlays (`src/scene/terrain/terrain_overlay.c`) draw terrain-edge sprites for
 tracked actors.
 
 ### Colliders
 
-A `SceneCollider` (in `include/objects/scene_objects/scene_object.h`) carries a state word (bit 2 =
+A `SceneCollider` (in `include/objects/scene_object.h`) carries a state word (bit 2 =
 collision disabled) and contact flags describing the colliding thing, such as
 the attack kind. The engine-wide API is in `include/engine/engine.h`:
 
@@ -596,7 +596,7 @@ families listed in [GAME_LAYOUT.md](GAME_LAYOUT.md) (`0802C678` to `0802D9F8`,
 `ActorShadow_Enable`/`ActorShadow_Disable` (`08013424`, `08013440`) to add or
 remove a shadow that follows the terrain (the shadow's update is installed at
 `+0x34`). `Actor_CanInteractWithController` (`080096A0`) and
-`DirectionalController_CheckInput` (`080097E0`) gate interactions by distance,
+`InteractionPrompt_CheckInput` (`080097E0`) gate interactions by distance,
 facing and input.
 
 ---
@@ -825,7 +825,7 @@ These show up across units. Learn them once and the code reads quickly.
 1. [GAME_LAYOUT.md](GAME_LAYOUT.md) for the map of subsystems.
 2. `include/engine/engine.h` for the shared API, then `include/system/game_state/game_state.h` and `include/player/player.h`.
 3. One example object end to end: `src/objects/items/item_container.c` (triggers) or
-   `src/objects/scene_objects/scene_object.c` (blocks). Start at its `*_CreateFromScript`.
+   `src/objects/puzzle_blocks.c` (blocks). Start at its `*_CreateFromScript`.
 4. [SCRIPT_TRACING.md](SCRIPT_TRACING.md) to see what a script command does at runtime.
 
 ### Open questions in the engine

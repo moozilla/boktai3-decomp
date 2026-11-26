@@ -8,8 +8,8 @@ MessageWindow_SetAutoAdvance leaves the incoming mode in r0 when a window exists
 
 The explicit form changed the ROM bytes. The guarded form passed the unit ROM check.
 
---- a/src/message_window.c
-+++ b/src/message_window.c
+--- a/src/ui/dialogue/message_window/message_window.c
++++ b/src/ui/dialogue/message_window/message_window.c
 @@ -155,5 +155,10 @@
          }
      }

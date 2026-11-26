@@ -1,6 +1,6 @@
-#include "bosses/sabata/actor_decision.h"
+#include "bosses/sabata/sabata_combat_states.h"
 
-static inline s32 GetPulseTrigger(struct ActorStateOwner *owner, u8 **trigger)
+static inline s32 GetPulseTrigger(struct SabataActorStateOwner *owner, u8 **trigger)
 {
     *trigger = &owner->actor.triggered;
     return **trigger;
@@ -15,10 +15,10 @@ static inline s32 RandomValue(void)
     return *(u16 *)(offset + (u32)values);
 }
 
-void SabataDecision_UpdateTimedPhase(struct ActorState *actor)
+void Sabata_UpdateTimedAttackChoice(struct SabataActorState *actor)
 {
-    struct ActorState *stateData = actor;
-    if (ActorState_TakeEntryTrigger(actor)) {
+    struct SabataActorState *stateData = actor;
+    if (SabataState_TakeEntryTrigger(actor)) {
         stateData->animationState = 3;
         stateData->movementTarget = stateData->nearbyPosition;
         {
@@ -34,13 +34,13 @@ void SabataDecision_UpdateTimedPhase(struct ActorState *actor)
             actor->state = phase;
         }
     } else if (ActorMovement_CanReachTarget(stateData))
-        SabataVolume_BeginPhase(actor, 1);
-    else if (SabataVolume_GetActivityState(actor))
-        SabataVolume_BeginPhase(actor, 2);
-    else if (actor->timer > 60 && SabataVolume_FindNearbyPosition(stateData) == 1)
-        SabataVolume_BeginPhase(actor, 3);
-    else if (actor->timer > 600 || SabataVolume_ConsumePendingEvent(stateData)) {
-        SceneVolume_RequestRestart(actor);
+        Sabata_BeginCombatPhase(actor, 1);
+    else if (Sabata_GetAttackActivity(actor))
+        Sabata_BeginCombatPhase(actor, 2);
+    else if (actor->timer > 60 && Sabata_FindNearbyAttackPosition(stateData) == 1)
+        Sabata_BeginCombatPhase(actor, 3);
+    else if (actor->timer > 600 || Sabata_TakeReachedTarget(stateData)) {
+        Sabata_RequestRestart(actor);
     } else if (actor->pending) {
         stateData->animationState = 3;
         {
@@ -51,40 +51,40 @@ void SabataDecision_UpdateTimedPhase(struct ActorState *actor)
     actor->timer++;
 }
 
-void SabataDecision_UpdateDelayPhase(struct ActorState *actor)
+void Sabata_WaitBeforeRestart(struct SabataActorState *actor)
 {
-    struct ActorState *stateData = actor;
-    if (ActorState_TakeEntryTrigger(actor)) {
+    struct SabataActorState *stateData = actor;
+    if (SabataState_TakeEntryTrigger(actor)) {
         u32 phase = 5;
         actor->state = phase;
     }
     stateData->decisionTimeout = 600;
     if (actor->timer > 30) {
-        SceneVolume_RequestRestart(actor);
+        Sabata_RequestRestart(actor);
     }
     actor->timer++;
 }
 
-void SabataDecision_UpdatePulsePhase(struct ActorStateOwner *input)
+void Sabata_UpdateTurningAttackChoice(struct SabataActorStateOwner *input)
 {
-    struct ActorStateOwner *owner = input;
-    struct ActorStateOwner *actor;
+    struct SabataActorStateOwner *owner = input;
+    struct SabataActorStateOwner *actor;
     u8 *trigger;
     s32 result;
     actor = input;
     if (GetPulseTrigger(owner, &trigger)) {
-        actor = (struct ActorStateOwner *)(trigger - ((u8 *)&owner->actor.triggered - (u8 *)owner));
+        actor = (struct SabataActorStateOwner *)(trigger - ((u8 *)&owner->actor.triggered - (u8 *)owner));
         actor->actor.triggered = 0;
         owner->actor.pending = 0;
     }
     if (ActorMovement_CanReachTarget(&actor->actor))
-        SabataVolume_BeginPhase(&owner->actor, 1);
-    else if (SabataVolume_GetActivityState(&owner->actor))
-        SabataVolume_BeginPhase(&owner->actor, 2);
-    else if (owner->actor.timer > 60 && SabataVolume_FindNearbyPosition(&actor->actor) == 1)
-        SabataVolume_BeginPhase(&owner->actor, 3);
+        Sabata_BeginCombatPhase(&owner->actor, 1);
+    else if (Sabata_GetAttackActivity(&owner->actor))
+        Sabata_BeginCombatPhase(&owner->actor, 2);
+    else if (owner->actor.timer > 60 && Sabata_FindNearbyAttackPosition(&actor->actor) == 1)
+        Sabata_BeginCombatPhase(&owner->actor, 3);
     else if (owner->actor.timer > 210) {
-        SceneVolume_RequestRestart(&owner->actor);
+        Sabata_RequestRestart(&owner->actor);
     }
     if (actor->actor.requestMode == 2)
         result = ActorEffect_StepTurn(&owner->actor, owner->actor.timer, 30, 30, 1);
@@ -97,10 +97,10 @@ void SabataDecision_UpdatePulsePhase(struct ActorStateOwner *input)
     owner->actor.timer++;
 }
 
-void SabataDecision_UpdateHazardPath(struct ActorState *actor)
+void Sabata_FollowHazardPath(struct SabataActorState *actor)
 {
-    struct ActorState *path = actor;
-    if (ActorState_TakeEntryTrigger(actor)) {
+    struct SabataActorState *path = actor;
+    if (SabataState_TakeEntryTrigger(actor)) {
         path->animationState = 3;
         path->animationIndex = (RandomValue() >> 8) & 3;
         path->animationDetail = Mod(RandomValue(), 5);
@@ -114,13 +114,13 @@ void SabataDecision_UpdateHazardPath(struct ActorState *actor)
             path->attackFlags |= 2;
         }
     }
-    if (SabataVolume_GetActivityState(actor))
-        SabataVolume_BeginPhase(actor, 2);
+    if (Sabata_GetAttackActivity(actor))
+        Sabata_BeginCombatPhase(actor, 2);
     if (actor->pending == 1) {
-        if (SabataVolume_ConsumePendingEvent(path)) {
+        if (Sabata_TakeReachedTarget(path)) {
             path->animationDetail++;
             if (++actor->timer > 3) {
-                SceneVolume_RequestRestart(actor);
+                Sabata_RequestRestart(actor);
             } else
                 AnimatedHazard_CreateProximity(&actor->body.position, path->hazardParameter, 800,
                                                60);
@@ -141,57 +141,57 @@ void SabataDecision_UpdateHazardPath(struct ActorState *actor)
     }
 }
 
-void SabataDecision_UpdateFlagPhase(struct ActorState *actor)
+void Sabata_WaitForAttackActivity(struct SabataActorState *actor)
 {
-    struct ActorState *stateData = actor;
+    struct SabataActorState *stateData = actor;
     s32 result;
-    if (ActorState_TakeEntryTrigger(actor)) {
+    if (SabataState_TakeEntryTrigger(actor)) {
         u32 phase = 8;
         actor->state = phase;
     }
-    result = SabataVolume_GetActivityState(actor);
+    result = Sabata_GetAttackActivity(actor);
     if (result) {
-        SabataVolume_BeginPhase(actor, 2);
+        Sabata_BeginCombatPhase(actor, 2);
         stateData->attackFlags |= 1;
     } else if (actor->timer > 600) {
-        SceneVolume_RequestRestart(actor);
+        Sabata_RequestRestart(actor);
     }
     actor->timer++;
 }
 
-void SceneActorState_UpdateAnimationRequest(struct ActorState *actor)
+void SceneActorState_UpdateAnimationRequest(struct SabataActorState *actor)
 {
-    if (ActorState_TakeEntryTrigger(actor)) {
+    if (SabataState_TakeEntryTrigger(actor)) {
         u32 state = 7;
         actor->state = state;
     }
     if (actor->pending == 1) {
         actor->state = 1;
-        SceneVolume_RequestRestart(actor);
+        Sabata_RequestRestart(actor);
     }
     actor->timer++;
 }
 
-void SabataDecision_UpdatePendingPhase(struct ActorState *actor)
+void Sabata_WaitForPendingAttackEvent(struct SabataActorState *actor)
 {
-    struct ActorState *stateData = actor;
-    if (ActorState_TakeEntryTrigger(actor)) {
+    struct SabataActorState *stateData = actor;
+    if (SabataState_TakeEntryTrigger(actor)) {
         u32 phase = 2;
         actor->state = phase;
     } else if (actor->pending == 1) {
         if (stateData->transitionBlocked)
-            SabataVolume_BeginPhase(actor, 1);
+            Sabata_BeginCombatPhase(actor, 1);
         else {
-            SceneVolume_RequestRestart(actor);
+            Sabata_RequestRestart(actor);
         }
     }
     actor->timer++;
 }
 
-void SabataDecision_UpdateThresholdPhase(struct ActorState *actor)
+void Sabata_UpdateAttackThreshold(struct SabataActorState *actor)
 {
-    struct ActorState *stateData = actor;
-    if (ActorState_TakeEntryTrigger(actor)) {
+    struct SabataActorState *stateData = actor;
+    if (SabataState_TakeEntryTrigger(actor)) {
         stateData->animationState = 3;
         ActorMovement_FindQuarterTurnPoint(stateData, &stateData->movementTarget);
         {
@@ -209,7 +209,7 @@ void SabataDecision_UpdateThresholdPhase(struct ActorState *actor)
         }
     } else if (actor->controlPhase == 3) {
         if (actor->pending == 1) {
-            SceneVolume_RequestRestart(actor);
+            Sabata_RequestRestart(actor);
         }
     } else if (actor->pending == 1) {
         if (stateData->requestMode == 0)
@@ -221,21 +221,21 @@ void SabataDecision_UpdateThresholdPhase(struct ActorState *actor)
             actor->state = phase;
         }
     }
-    if (SabataVolume_GetActivityState(actor) == 2)
-        SabataVolume_BeginPhase(actor, 2);
+    if (Sabata_GetAttackActivity(actor) == 2)
+        Sabata_BeginCombatPhase(actor, 2);
     actor->timer++;
 }
 
-void SabataDecision_ClearTrigger(struct ActorState *actor)
+void Sabata_ClearCombatEntryTrigger(struct SabataActorState *actor)
 {
-    ActorState_TakeEntryTrigger(actor);
+    SabataState_TakeEntryTrigger(actor);
 }
 
-void SabataDecision_UpdateFlaggedWait(struct ActorState *actor)
+void Sabata_WaitForVariantTrigger(struct SabataActorState *actor)
 {
     u32 mask;
     u32 flags;
-    if (ActorState_TakeEntryTrigger(actor)) {
+    if (SabataState_TakeEntryTrigger(actor)) {
         u32 state = 0xc;
         actor->state = state;
     }
@@ -253,31 +253,31 @@ void SabataDecision_UpdateFlaggedWait(struct ActorState *actor)
         actor->timer++;
 }
 
-void SabataState_UpdateTrigger(struct ActorState *actor)
+void SabataState_UpdateTrigger(struct SabataActorState *actor)
 {
-    struct ActorState *actorData = actor;
-    if (ActorState_TakeEntryTrigger(actor)) {
+    struct SabataActorState *actorData = actor;
+    if (SabataState_TakeEntryTrigger(actor)) {
         u32 state = 9;
         actor->state = state;
         ActorExtension_ResetState(actorData);
         actorData->hitParameter = 0x70;
     }
     if (actor->pending) {
-        SceneVolume_RequestRestart(actor);
+        Sabata_RequestRestart(actor);
     }
     actor->timer++;
 }
 
-void SabataState_UpdateConditionalTrigger(struct ActorState *actor)
+void SabataState_UpdateConditionalTrigger(struct SabataActorState *actor)
 {
-    if (ActorState_TakeEntryTrigger(actor)) {
+    if (SabataState_TakeEntryTrigger(actor)) {
         u32 state = 10;
         actor->state = state;
     }
-    if (SabataVolume_GetActivityState(actor)) {
-        SabataVolume_BeginPhase(actor, 2);
+    if (Sabata_GetAttackActivity(actor)) {
+        Sabata_BeginCombatPhase(actor, 2);
     } else if (actor->pending) {
-        SceneVolume_RequestRestart(actor);
+        Sabata_RequestRestart(actor);
     }
     actor->timer++;
 }

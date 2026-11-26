@@ -4,8 +4,8 @@ After the success branch, the position copy uses r1 through r3 and leaves the di
 
 The explicit form changed the ROM bytes. The guarded form passed the unit ROM check.
 
---- a/src/display_animation.c
-+++ b/src/display_animation.c
+--- a/src/engine/video/display_animation.c
++++ b/src/engine/video/display_animation.c
 @@ -165,5 +165,7 @@
          return -1;
      *display->position = *position;

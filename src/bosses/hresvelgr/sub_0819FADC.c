@@ -10,7 +10,7 @@ struct ActorReaction {
 };
 void Hresvelgr_SetAnimation(struct ActorReaction *, void *, void *, u32, u32, u32);
 void Anim_SetFrameDurationScale(void *, u32);
-void sub_0819C8F8(struct ActorReaction *, u32, u32);
+void Hresvelgr_SetCosineScaledVelocity(struct ActorReaction *, u32, u32);
 static inline s32 UpdateMotionAnimation(struct ActorReaction *p)
 {
     if (p->pending) {
@@ -32,5 +32,5 @@ void Hresvelgr_UpdateMotionPhase(struct ActorReaction *actor, u32 frame)
     q = actor;
     a2 = *(&actor);
     if (!UpdateMotionAnimation(q))
-        sub_0819C8F8(a2, 12, frame << 2);
+        Hresvelgr_SetCosineScaledVelocity(a2, 12, frame << 2);
 }

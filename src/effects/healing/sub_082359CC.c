@@ -4,7 +4,7 @@ struct Blob59 {
 };
 struct Blob59 *ScriptProc_Start(u32, u32);
 void ResourceHeader_Relocate(struct Blob59 *, struct Blob59 *);
-void Widget_InitLinked(u8 *, struct Blob59 *, u32, u32, u32, u32, u32, void *);
+void AnimSprite_InitLinked(u8 *, struct Blob59 *, u32, u32, u32, u32, u32, void *);
 void sub_082359CC(u8 *p)
 {
     struct Blob59 *data = ScriptProc_Start(0xcb05, 0x5d04);
@@ -27,7 +27,7 @@ void sub_082359CC(u8 *p)
     v = *(u16 *)(p + 0x88);
     q = (u16 *)(p + 0x80);
     *q = v;
-    Widget_InitLinked((u8 *)q - 0x64, &copy, kind + 104, 50, 1, zero, 60, src);
+    AnimSprite_InitLinked((u8 *)q - 0x64, &copy, kind + 104, 50, 1, zero, 60, src);
     p[0x51] = 34;
     p[0x50] = 34;
 }

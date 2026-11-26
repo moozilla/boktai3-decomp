@@ -1,5 +1,5 @@
 #include "ui/town/shop_states.h"
-void Shop_BeginRemovalConfirmation(struct SceneInventoryControlView *panel)
+void Shop_BeginRemovalConfirmation(struct ShopControlView *panel)
 {
     SceneInput_SaveSelection(&panel->grid);
     panel->interactionFlags = 4;
@@ -18,5 +18,5 @@ void Shop_BeginRemovalConfirmation(struct SceneInventoryControlView *panel)
     SceneInput_BeginChoice(&panel->display.prompt, &panel->display.widgetResource,
                            &panel->choiceValue, 0, &panel->choiceBlink);
     Shop_SetControllerCallback(
-        panel, (SceneInventoryCallback)Shop_TickDiscardConfirmation);
+        panel, (ShopCallback)Shop_TickDiscardConfirmation);
 }

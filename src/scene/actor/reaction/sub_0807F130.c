@@ -2,7 +2,6 @@
 #include "scene/collision/scene_actor_contact_list.h"
 #include "scene/motion/scene_actor_position_search.h"
 #include "scene/collision/scene_actor_stimulus.h"
-#include "engine/word_flags.h"
 
 s8 SceneStimulus_FindOverlap(u32, u32, u32, u8, u16);
 void SceneActorAttachment_ReplaceResponseSlot(void *, u32, u32, u32);
@@ -93,7 +92,8 @@ u32 SceneActorTarget_TryStimulusRoute(void *object)
     }
     actor->base.field2C2 = 0x20;
     {
-        WordFlags_Set(0x1000000, &actor->base.statusFlags);
+        u32 mask = ROOM_ACTOR_STATUS_INTERACTING;
+        actor->base.statusFlags |= mask;
     }
     SceneActorAttachment_RetargetNearestPlayer(object, &group->common.control.targetPosition);
     if (started)

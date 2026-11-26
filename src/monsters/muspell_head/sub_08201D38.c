@@ -66,8 +66,7 @@ void SceneHud_SetTimedState(void *, int, int, int, int, int);
 u32 MuspellHead_UpdateDefeatEffect(void *);
 
 // confidence=low: runs the actor action, damage response, palette timers and sprite playback.
-#define ScriptCombatActor_UpdateState sub_08201D38
-u32 ScriptCombatActor_UpdateState(struct ScriptCombatActorState *p)
+u32 MuspellHead_UpdateState(struct ScriptCombatActorState *p)
 {
     if (Engine_PauseBits(0x400))
         return 0;

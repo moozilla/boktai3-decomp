@@ -1,10 +1,10 @@
 #include "objects/pile_driver/pile_driver_rig.h"
 void PileDriverRig_ApplyContact(struct ContactCollider *source, struct ContactCollider *target,
-                                struct ScenePanelRig *input)
+                                struct PileDriverRig *input)
 {
     u32 reactionMask = 0x7F;
     if (source->reactionFlags & reactionMask) {
-        struct ScenePanelRig *rig = input;
+        struct PileDriverRig *rig = input;
         s32 force;
         u32 flags, mask;
         rig->contactDirection = source->direction;

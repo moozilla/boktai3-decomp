@@ -73,8 +73,8 @@ src/actors/scene_actor_visibility_and_stored_motion,src/scene/actor/control,visi
 src/actors/scene_character,src/npc/story_character,story characters placed and commanded by script (SceneCharacter); merge:src/actors/scripted_message_actor_08612344 src/actors/state_actor_kind_086121_c4
 src/actors/scene_combat_actor,src/monsters/armor,Armor combat categories and overlay (called by Armor); merge:src/actors/actor_controller src/actors/actor_marker src/actors/actor_palette src/actors/spinning_approach_motion src/monsters/armor
 src/actors/scene_event_actor,src/bosses/sabata,"Sabata event actor (0817E378, BossSlot2 calls); merge:src/actors/actor_decision src/actors/actor_impact src/actors/actor_position src/actors/actor_state src/bosses/boss_slot_2 src/field/scene_volume"
-src/actors/scene_npc,src/npc/scripted_npc,scripted NPC created and commanded by scenes (SceneNpc)
-src/actors/scene_object_controller,src/objects/scene_objects,scene object slots and script handlers (SceneObjects_Script*); merge:src/field/scene_objects
+src/actors/scene_npc,src/npc/otenko,BB34 and resource 97D3 witness Otenko in the garage and home at 2201/2544. This unit owns the field companion and its transition effect. The named Otenko ending at 0085→6612 runs the same update.
+src/actors/scene_object_controller,src/objects/sliding_doors,0054→5297. 6D69 controller holds D4E3 door slots and loads the 7ACD/7AD3 sliding door graphics. The E02A puzzle block task has a separate lifetime.
 src/actors/scene_pooled_motion_and_actor_controls,src/link/wireless/battle,ScenePool: four player slots with cruise steering in the wireless battle; merge:src/link/wireless_game_items_and_display src/link/wireless_scene_objects
 src/actors/script_actor,src/player/cutscene,"script commands that drive the player in cutscenes (stand, kneel, aim, shoot, set stats)"
 src/actors/script_combat_actor,src/monsters/muspell_head,GCL 3991 → 1604 → 1606 creates key 5153. Book index 31 (#9869). The head in package 7E7D is visible next to Django after moving the player onto the neighboring tile.
@@ -84,7 +84,7 @@ src/actors/singleton_slot_7,src/bosses/vanargand,"GCL 6325 calls 6314, which cre
 src/actors/spinning_approach_motion,src/monsters/armor,Armor spinning approach (between Armor ROM blocks); merge:src/actors/actor_controller src/actors/actor_marker src/actors/actor_palette src/actors/scene_combat_actor src/monsters/armor
 src/actors/state_actor_kind_086121_c4,src/npc/story_character,96-state animation table of story characters (StateActor); merge:src/actors/scene_character src/actors/scripted_message_actor_08612344
 src/actors/steering_actor_pool,src/scene/actor/steering_actor,steering sprite actors used by bosses and scene volumes
-src/actors/tagged_scene_npc,src/npc/tagged_npc,scripted NPC variant with tags zero/one (TaggedSceneNpc)
+src/actors/tagged_scene_npc,src/npc/kuro,"D774→E00E with name ID 51E2. Procs 2235/2266 connect that actor to text #3515, Kuro."
 src/actors/task_4_e01,src/effects/projectiles/projectile,projectile task with trail sprites and impacts (key 4E01); merge:src/effects/projectile src/effects/timed_effect
 src/bosses/boss_slot_2,src/bosses/sabata,"the slot-2 boss; the boss list is フレスベルグ, サバタ, ニーズホッグ, ラタトスク, ヴァナルガンド and the other four are named guess; merge:src/actors/actor_decision src/actors/actor_impact src/actors/actor_position src/actors/actor_state src/actors/scene_event_actor src/field/scene_volume"
 src/bosses/hresvelgr,src/bosses/hresvelgr,"Hresvelgr (フレスベルグ), the eagle boss"
@@ -92,7 +92,7 @@ src/bosses/nidhoggr,src/bosses/nidhoggr,"Nidhoggr (ニーズホッグ), the drag
 src/bosses/ratatosk,src/bosses/ratatosk,Ratatosk (ラタトスク)
 src/bosses/vanargand,src/bosses/vanargand,"Vanargand (ヴァナルガンド), the wolf boss; merge:src/actors/actor_status src/actors/paired_scene_actor src/bosses/vanargand_projectile src/effects/positioned_effect"
 src/bosses/vanargand_projectile,src/bosses/vanargand,Vanargand projectiles and afterimages; merge:src/actors/actor_status src/actors/paired_scene_actor src/bosses/vanargand src/effects/positioned_effect
-src/effects/animated_particles,src/effects/particles/groups,animated particle manager; merge:src/effects/fading_particle_groups src/effects/fragment_groups src/effects/particle_groups
+src/effects/animated_particles,src/effects/particles/impact_bursts,3DB0’s shatter dust and the Vanargand burst use the same animated manager.
 src/effects/background_controllers,src/effects/screen/background_controller.c,scripted background layers and scrolling backgrounds
 src/effects/ballistic_sprite_effect,src/effects/sprites/ballistic_sprite_effect.c,ballistic sprite effect
 src/effects/bg1_flash_and_scrolling_controller,src/effects/screen/background_flash,BG1 flash and dual-page scrolling (BackgroundFlash)
@@ -100,24 +100,24 @@ src/effects/buffered_animation_task,src/effects/palette/palette_effect.c,buffere
 src/effects/charged_burst,src/effects/bursts/charged_burst,charged burst
 src/effects/circular_scanline_window,src/effects/screen/circle_window,circular window drawn with scanlines (CircleWindow)
 src/effects/color_and_fade_controller,src/effects/palette/color_fade_controller.c,color interpolation and fade queue
-src/effects/debris_particles,src/effects/particles/debris_particles.c,debris particles
+src/effects/debris_particles,src/objects/bat_curtain,0014→6401 5734 Count rematch. A staged hit on the live curtain calls 08012B34 and draws DA6D debris while the curtain flashes.
 src/effects/directional_effect,src/effects/directional_effect,directional effect around the player
-src/effects/directional_particles,src/effects/particles,directional particles (two files)
+src/effects/directional_particles,src/effects/particles/impact_fragments,0046→4915. Nidhoggr’s native ContactBurst release creates eight 4147 fragments. Keep its two files with the other impact fragment primitives.
 src/effects/directional_sprite_effect,src/effects/sprites/directional_sprite_effect.c,directional sprite effect
-src/effects/effect_emitter,src/effects/particles/effect_emitter.c,generic effect emitter
+src/effects/effect_emitter,src/objects/strike_crystal.c,Green 066A strike crystal drawn by original 95A8 and proc 1179. The same crystal actor runs in Pirate Island.
 src/effects/effect_part,src/effects/scene/actor_effects,EffectPart/EffectGroup parts spawned on actors (SceneActorEffects)
 src/effects/explosion,src/effects/bursts/explosion.c,explosion
-src/effects/fading_particle_groups,src/effects/particles/groups,fading particle groups; merge:src/effects/animated_particles src/effects/fragment_groups src/effects/particle_groups
+src/effects/fading_particle_groups,src/objects/hazards/falling_object_effects,Original FallingObject burst calls this group; recorded standalone red-orange flame motes in 3955. Keep with falling hazards.
 src/effects/feather_effect_pool,src/effects/feathers,falling feather sprites
 src/effects/five_entry_projected_display,src/effects/sprites/projected_display.c,five animations projected onto the ground
-src/effects/five_slot_burst_emitter,src/effects/particles/burst_emitter,five-slot burst emitter
+src/effects/five_slot_burst_emitter,src/effects/particles/spark_explosions,"Original registry 1488 through proc 1043. Native emitter draws sparks, then smoke."
 src/effects/floating_item_effects,src/effects/floating_item_effect.c,bobbing item sprite and its collection animation
 src/effects/following_sprite_effect,src/player/core/player_core.c,"the player's facing, animation and screen-mote code (0813ADC4, Player_*), misfiled under effects"
 src/effects/four_effect_center_controller,src/effects/orbits/converging_effects.c,four effects converging on a center
 src/effects/fragment_burst,src/effects/bursts/fragment_burst,fragment burst
 src/effects/fragment_effect,src/effects/bursts/fragment_effect,fragment effect
-src/effects/fragment_groups,src/effects/particles/groups,fragment particle groups; merge:src/effects/animated_particles src/effects/fading_particle_groups src/effects/particle_groups
-src/effects/frost_emitter,src/effects/particles/frost_emitter.c,frost particle emitter
+src/effects/fragment_groups,src/effects/particles/impact_fragments,Staged type 0 uses 84EE and creates a radial spread of white-blue fragments. The implementation accepts several debris sprite types.
+src/effects/frost_emitter,src/effects/particles/sabata_frost.c,EC71 boss creates the emitter. Controlled start during White Forest fight draws 4384 frost. The source also contains one Otenko script mode entry.
 src/effects/hardware_blend_transitions,src/effects/screen/blend_transition.c,hardware alpha-blend transitions
 src/effects/health_burst_effect,src/effects/healing,health burst effect; merge:src/effects/health_restore_effect
 src/effects/health_restore_effect,src/effects/healing,health restore effect; merge:src/effects/health_burst_effect
@@ -139,11 +139,11 @@ src/effects/palette_frame_cycling,src/effects/palette/palette_frames.c,seven-fra
 src/effects/palette_level_transitions,src/effects/palette/palette_level_transitions.c,palette channel level transitions
 src/effects/palette_sets,src/effects/palette,palette sets (two files)
 src/effects/palette_transition,src/ui/books/monster_book,"Monster Book display and palette transitions (BestiaryDisplay_Create, 081D374C just before the Bestiary); merge:src/menus/bestiary src/menus/monster_book"
-src/effects/particle_burst,src/effects/particles/particle_burst,"particle burst, moving glyphs, rising puffs"
+src/effects/particle_burst,src/player/effects/spiral_trail,Django’s native form and charge-spin cues create this trail. Stage Player motion 13 at 6201 for the original assembly of orbiting sprites. Apply shot and recoil puff file overrides.
 src/effects/particle_burst_effect,src/effects/particles,particle burst and following sprite effects (two files)
-src/effects/particle_effect,src/effects/particles/particle_effect,particle effect
-src/effects/particle_emitter,src/effects/particles/particle_emitter.c,particle emitter
-src/effects/particle_groups,src/effects/particles/groups,particle group manager; merge:src/effects/animated_particles src/effects/fading_particle_groups src/effects/fragment_groups
+src/effects/particle_effect,src/player/effects/action_flash,The two calls come from Django’s held energy motions. Staged Player motion 9 at 6201 draws the attached gold flash and sparks.
+src/effects/particle_emitter,src/effects/sprites/ballistic_trail.c,Original 081394B4 initializes the 409C launch. Flight ends in 8639 scatter effects from this unit.
+src/effects/particle_groups,src/effects/particles/impact_fragments,Staged bouncing chunks at 3955 and active during timed attack at 6165. Shared debris motion and fragment constructor; merge src/effects/fragment_groups.
 src/effects/positioned_effect,src/bosses/vanargand,"Vanargand positioned effect (081A6104, between Vanargand blocks); merge:src/actors/actor_status src/actors/paired_scene_actor src/bosses/vanargand src/bosses/vanargand_projectile"
 src/effects/presentation,src/ui/pause/presentation.c,pause-menu graphic presentation and text labels
 src/effects/projected_ground_effects,src/effects/scene/ground_effect.c,world-positioned ground effects
@@ -159,22 +159,22 @@ src/effects/scene_arc_slot_effects,src/effects/scene/scene_arc.c,eight-slot arc 
 src/effects/scene_collider_effect,src/effects/scene/collider_effect,effects with colliders
 src/effects/scene_effect,src/effects/scene/scene_effect.c,scene effect and shadow actor
 src/effects/scene_effect_queue,src/effects/scene/scene_effect_queue.c,scene effect request queue
-src/effects/scene_particle,src/effects/particles/particle_effect_pool.c,scripted collider particles
-src/effects/scene_particle_pools,src/effects/particles/scene_particle_pool,scene particle pools and bursts
+src/effects/scene_particle,src/effects/particles/linear_motes.c,Controlled 0812D7A8 spawns the visible 1C1E mote. Its motion is separate from the gravity and terrain behavior in SceneMovingParticle.
+src/effects/scene_particle_pools,src/effects/particles/hit_effects,"Shared actor hit bursts at Centipede 4076 and Black Knight 6265, distinct from the anchored attachment group."
 src/effects/scene_presentation_commands,src/effects/screen/scene_presentation_commands.c,effect palette fade and blend command handlers
 src/effects/scene_projectile,src/effects/projectiles/scene_projectile.c,scene projectile pool
 src/effects/scene_scheduled_effect,src/effects/scene,scheduled effects and sprite notices (two files)
 src/effects/scheduled_scene_effects,src/effects/scene/scene_effect_schedule.c,twelve-entry effect schedule
 src/effects/screen_orbit_effect,src/effects/orbits/screen_orbit_effect,screen-space orbit effect and explosion sprites
 src/effects/scripted_display_tracks,src/effects/sprites/display_track,script-controlled animation tracks
-src/effects/scripted_particle,src/effects/particles/scripted_particle,"scripted particles, burst sparks, status indicator"
+src/effects/scripted_particle,src/effects/particles/trap_and_spell_effects,A945 floor traps call this 4384 puff and marker family. Ratatosk also uses the shared drifting-sprite branch.
 src/effects/scripted_presentation,src/effects/screen/presentation,scripted full-screen presentation; merge:src/effects/timed_presentation
 src/effects/shadow_registry,src/effects/shadows,shadow registry; merge:src/effects/scaled_shadows src/field/terrain_shadows
 src/effects/shared_display_animation_wrapper,src/engine/video/display_animation.c,shared sequence/keyframe display playback
-src/effects/sparkle_emitter,src/effects/particles/sparkle_emitter.c,sparkle emitter
+src/effects/sparkle_emitter,src/effects/particles/cutscene_sparkles.c,3D64 in Trinity release proc 3845. Green CC88 sparkles observed during the isolated script replay.
 src/effects/spiral_burst,src/effects/bursts/spiral_burst,spiral burst
 src/effects/sprite_effect_controllers,src/effects/sprites/sprite_effect_controller,24-entry sprite effect controllers
-src/effects/sprite_particle,src/effects/particles/sprite_particle,sprite particles
+src/effects/sprite_particle,src/bosses/vanargand,"0072→6323. Staged burst timer engages live Vanargand’s update, which calls 081FF09C and its original manager. Only the two Vanargand callbacks use this exact unit; the screenshots show the 61F9 and 2E90 burst."
 src/effects/sprite_projectile,src/effects/projectiles/sprite_projectile,sprite projectile
 src/effects/sprite_trail,src/bosses/vanargand,"GCL 6325 calls 6314, which creates registry 5856 with actor ID 7C56 (Vanargand). The head is on the left during Django’s bike chase."
 src/effects/staged_sprite_effect,src/effects/sprites/staged_effect.c,five-sprite scripted effect
@@ -228,35 +228,35 @@ src/engine/task_scheduler,src/engine/task_scheduler.c,task scheduler (fourteen p
 src/engine/terrain,src/scene/terrain/terrain.c,terrain cells and modifiers
 src/engine/text,src/engine/video,"font tile uploads, scanline effects, mosaic (two files)"
 src/engine/tile_animation,src/engine/video/tile_animation.c,eight-channel tile animation
-src/field/actor_group,src/objects/actor_group,"scripted actor groups (ActorGroup, Pool184); merge:src/other/callback_pool"
+src/field/actor_group,src/objects/loot_deposits,0029→3905. Proc 3904 reaches F1F9 via 1553→10801. Sword hits break the 9385 deposit. The original drop script creates an item on the successful roll. Merge the hit-feedback unit.
 src/field/animated_hazards,src/objects/hazards/animated_hazard.c,"warning, attack, hold and retract hazards"
 src/field/animated_tile,src/objects/animated_tile.c,animated tiles
-src/field/bouncing_object_pool,src/objects/bouncing_object,bouncing physics objects
+src/field/bouncing_object_pool,src/objects/bouncing_bombs,Nidhoggr’s grid attack calls the bomb pool at frame 1921. Dark spheres bounce across active floor tiles and the pool’s removal callback triggers the explosions. The same pool is reached from Mummy and Ratatosk projectile code.
 src/field/breakable_barriers,src/objects/bat_curtain,"breakable barrier and the Bat Curtain (コウモリカーテン, BatCurtain_Create)"
-src/field/breakable_props,src/objects/breakable_prop,breakable props
-src/field/cell_traversal_gates,src/objects/cell_gate,cell gates that constrain player traversal
+src/field/breakable_props,src/objects/quest_barriers,0029→3931. 3DB0 E912 and sprite 474D shatter and unlock the Trinity scene when the recorded task is triggered. Other scenes supply different barrier sprites.
+src/field/cell_traversal_gates,src/objects/passage_barriers,0042→4755. GCL 71BA controls edge passage along the Wind Cannon row. Live approach clears the collision boundary and starts traversal.
 src/field/collectible,src/objects/items/collectible,collectibles
-src/field/collision_controllers,src/objects/collision_controller.c,collision-triggered animations
+src/field/collision_controllers,src/objects/strike_traps.c,0866 slots respond to collision. Staged original hit in 3955 produces a visible marker and delayed particle blast.
 src/field/damage_controller,src/objects/hazards/damage_controller.c,damage controller
 src/field/directional_force_controller,src/objects/hazards/directional_force,scripted pushing force
-src/field/directional_interaction_controllers,src/objects/directional_controller.c,facing and input gates for interactions
+src/field/directional_interaction_controllers,src/objects/interaction_prompts.c,0029→3955. Live A-button handler selects 883A slot E6CC and script 3954 opens the Fireball hint.
 src/field/falling_objects,src/objects/hazards/falling_objects.c,falling objects
 src/field/floor_switch,src/objects/floor_switch,floor switch
 src/field/group_objects,src/effects/bat_flock.c,a specific effect (E534 bat flock) out of the generic scene-effect group
 src/field/hit_switch,src/objects/hit_switch.c,switch activated by hitting it
 src/field/interaction_marker,src/objects/markers/interaction,drop redundant suffix
 src/field/items_and_containers,src/objects/items/item_container.c,dropped items and opening containers
-src/field/named_object,src/objects/named_object,"objects addressed by script name, with routes and speeds"
-src/field/native_effect,src/effects/particles/native_effect,native particles; merge:src/field/scene_debris
-src/field/pooled_interactables,src/objects/breakable.c,script-created breakables with timeouts
-src/field/proximity_actor,src/objects/region_actor.c,region and proximity actors
+src/field/named_object,src/objects/moving_platforms,"0042→4808. A4FC ID 085F loads B019, updates its route and is released by a floor switch. Text #7181 calls it a moving platform."
+src/field/native_effect,src/effects/particles/projectile_motes.c,Staged 1C1A motion and real launch callback use the native trail particles.
+src/field/pooled_interactables,src/objects/light_fixtures.c,0038→4479. Script 2E1C ID B8CC draws the F099 candlestick. Its native hit response toggles a script flag and lights the room. Other kinds use the B991 and 999B fixtures.
+src/field/proximity_actor,src/objects/ice_boulders.c,0029→3955. Proc 1176 creates 377D. Native update draws the large blue 863A ice boulder.
 src/field/proximity_icon,src/objects/markers/proximity_icon.c,icon shown near an object
-src/field/proximity_particle_emitter,src/effects/particles/proximity_emitter,particles emitted near an owner
+src/field/proximity_particle_emitter,src/effects/particles/tether_rings,Stock 0024→3472 runs and renders F156 at the coffin. Proc 3475 calls 851→852. Staged 3955 run verifies the constructor and 0BA8 art.
 src/field/rectangular_area_effects,src/scene/areas,"rectangular gameplay areas (terrain values, resource gain), not visual effects: avoid the effects/scene clash"
 src/field/roaming_objects,src/objects/roaming_object.c,wandering objects
 src/field/saved_position_marker,src/objects/markers/saved_position,drop redundant suffix
 src/field/scene_debris,src/effects/particles/native_effect,native effects and scene debris; merge:src/field/native_effect
-src/field/scene_objects,src/objects/scene_objects,scene object manager (SceneObjects_CreateFromScript); merge:src/actors/scene_object_controller
+src/field/scene_objects,src/objects/puzzle_blocks.c,"0029→3955. D9AE creates a 0x1A8-byte-slot pool. E02A adds the 9D41 stone blocks that proc 3953 removes. A camera-only replay captures and attributes both live rocks, then isolation removes one."
 src/field/scene_script_object,src/objects/dungeon_prop,scripted dungeon prop and its orbit motion (two files)
 src/field/scene_volume,src/bosses/sabata,"Sabata scene volumes (0817A900 and 0817D67C, interleaved with the boss-slot-2 code); merge:src/actors/actor_decision src/actors/actor_impact src/actors/actor_position src/actors/actor_state src/actors/scene_event_actor src/bosses/boss_slot_2"
 src/field/ship_wheel,src/objects/ship_wheel.c,"ship wheel that slides open, plus scripted falling and movement sequences"
@@ -270,7 +270,7 @@ src/field/terrain_modifiers,src/scene/terrain,terrain modifiers (two files)
 src/field/terrain_overlays,src/scene/terrain,terrain overlays (two files)
 src/field/terrain_shadows,src/effects/shadows,actor shadows on terrain; merge:src/effects/scaled_shadows src/effects/shadow_registry
 src/field/tether_actor,src/objects/coffin,"the coffin Django drags on a chain (棺桶, key 0B50, TetherActor)"
-src/field/tile_trigger,src/objects/tile_trigger.c,tile triggers
+src/field/tile_trigger,src/objects/floor_traps.c,0013→3161. Django entering the 2FA5 slot’s contact range starts the original countdown and A945 press animation.
 src/field/timed_hazard,src/objects/hazards/timed_hazard,timed hazard
 src/field/trap,src/scene/terrain/path,"paths and routes (Path_*; ""trap"" was a misnomer)"
 src/field/weather_and_storm_controller,src/effects/weather,weather and storms
@@ -330,7 +330,7 @@ src/menus/hud_tilemaps_and_clock_digits,src/ui/hud/hud_tilemaps.c,HUD tile maps 
 src/menus/input_grid_and_navigation,src/ui/widgets/input_grid,input grid and saved cursor; merge:src/menus/input_marker_widgets
 src/menus/input_marker_widgets,src/ui/widgets/input_grid,input marker widgets; merge:src/menus/input_grid_and_navigation
 src/menus/inventory,src/system/inventory,item and equipment data (Inventory_*FromScript) plus pause-inventory helpers
-src/menus/inventory_action_transitions,src/ui/town/shop,shop screen actions (SceneInventory; Weapon Shop 武器屋 = Shop_CreatePresentation0); merge:src/menus/inventory_transactions_and_catalogs src/menus/inventory_values_and_display
+src/menus/inventory_action_transitions,src/ui/town/shop,shop screen actions (SceneInventory; Weapon Shop 武器屋 = Shop_CreateWeaponShop); merge:src/menus/inventory_transactions_and_catalogs src/menus/inventory_values_and_display
 src/menus/inventory_grid,src/ui/pause/inventory_grid.c,pause inventory grid
 src/menus/inventory_panel,src/ui/pause/inventory_panel.c,pause inventory panel
 src/menus/inventory_transactions_and_catalogs,src/ui/town/shop,shop transactions and catalogs; merge:src/menus/inventory_action_transitions src/menus/inventory_values_and_display
@@ -401,7 +401,7 @@ src/monsters/dog,src/monsters/dog.c,"Dog family: Hound, Hot Dog, Ice Dog"
 src/monsters/dragon_puppy,src/monsters/dragon_puppy,Dragon Puppy
 src/monsters/enemy_d459,src/monsters/axe_armor,"Axe-wielding Armor (Monster Book #29, 甲冑); text #2538 describes its observed axe shockwave. Distinct from Armor_ knights (Book #52–64)."
 src/monsters/enemy_f426,src/monsters/statue,"GCL 3184 → 1589 → 1590 spawns F426. Shared sprite package 7E82, palette 0225. Bestiary index 28 is string #9866, STATUE."
-src/monsters/enemy_particle,src/monsters/enemy_particle,particles shared by the late enemy block
+src/monsters/enemy_particle,src/effects/particles/enemy_attacks,Wind Cannon provenance comes from the original caller 082099F1 at 4755. Screamer and Poison Hand use the same pool.
 src/monsters/fan_cannon,src/monsters/cannons/wind,GCL 4751 → 1609 spawns the fan cannon manager 9CC2 and two color variants. The replay runs the actor update in view. Bestiary index 34 is text #9872.
 src/monsters/fan_cannon_manager,src/monsters/cannons/wind,Proc 1609 creates shared manager 9CC2 and its cannon instances. The actor callbacks run under the same pool.
 src/monsters/ghost,src/monsters/ghost.c,Ghost (ゴースト)
@@ -427,12 +427,12 @@ src/monsters/tentacle_actor,src/monsters/centipede,"Proc 4075 calls 1574 and 157
 src/monsters/tentacle_body,src/monsters/centipede,"Proc 4075 calls 1574 and 1576 to create 0AC7. The visible category-9 actor maps to Monster Book entry 13, text #9851, Centipede. The replay executes its constructor, component update and the shared body windup and spread callbacks."
 src/monsters/vorn,src/monsters/vorn,Vorn (ヴォーン)
 src/monsters/vulcan_cannon,src/monsters/cannons/vulcan,Vulcan Cannon (バルカン砲)
-src/other/callback_pool,src/objects/actor_group,"callback pool feedback of actor groups (08104F08, right after them; only caller); merge:src/field/actor_group"
+src/other/callback_pool,src/objects/loot_deposits,0029→3905. LootDepositCallbackPool_ApplyDamage receives the F1F9 slot and creates its visible impact particles. Merge src/field/actor_group.
 src/other/registry_selection,src/ui/world_map.c,GCL 2570 creates key 2388 for the nine world destinations. WORLD is visible in the stock save. Confirm selects San Miguel in this replay.
 src/other/scene_terrain_probe,src/effects/particles,"terrain probe, moving particle and spread shot (two files)"
 src/other/solar_calibration,src/system/solar,solar sensor calibration screen; merge:src/system/cartridge_solar_sensor src/system/solar
 src/player/player_attack_effect,src/player/effects/attack,player attack effect
-src/player/player_barrier,src/player/effects/barrier,player barrier
+src/player/player_barrier,src/player/pile_trap,"Text #4166 names Pile Trap. In the 0037 warp to 6201, Quick Change, L and A place the native DC7A/A680 trap and activate its Solar Pile."
 src/player/player_burst,src/player/effects/burst,"player burst, debris, transition"
 src/player/player_clone,src/player/clone.c,player clone (afterimage copies)
 src/player/player_contact,src/player/core,player contact damage
@@ -515,3 +515,22 @@ src/player/sub_08238060.c,src/effects/sprites/timed_character_effects,The 082381
 src/player/sub_08238110.c,src/effects/sprites/timed_character_effects,The 082381C8 standalone timed sprite is rendered in the 3955 controlled call. Original story-character updates 081CB3F4 and 081CBE30 call its constructor. Apply after the Pass 3 Player ROM range.
 src/player/sub_082381C8.c,src/effects/sprites/timed_character_effects,The 082381C8 standalone timed sprite is rendered in the 3955 controlled call. Original story-character updates 081CB3F4 and 081CBE30 call its constructor. Apply after the Pass 3 Player ROM range.
 src/player/sub_08243B54.c,src/ui/pause/menu_sequences,0032 Dark Card → Dark Loans. DarkLoan_DrawPreview calls StatGauge_Draw and the offer displays its gauge. Apply after the Pass 3 Player ROM range.
+src/field/scene_debris/scene_debris.c,src/effects/particles/scene_debris.c,Coffin Bike impacts and Vanargand cutscenes use this debris pool. Preserve separate projectile-effect routing.
+src/field/scene_debris/native_effect.c,src/effects/sprites/projectile_effects.c,"This file owns profile-driven rotating, accelerating and linear projectile effects. Keep it apart from Coffin Bike and cutscene scene debris."
+src/other/scene_terrain_probe/spread_shot.c,src/effects/particles/spread_shot.c,The original type 2 shot and its spread bursts execute in the staged 3955 comparison.
+src/other/scene_terrain_probe/scene_moving_particle.c,src/effects/particles/debris_motes.c,Controlled 08125EC4 draws a 1C1E mote and applies gravity and terrain bounces. Keep the separate spread projectile in its own file.
+src/effects/particle_burst_effect/particle_burst_effect.c,src/effects/sprites/ability_scatter.c,Original ability dispatcher uses the 08139E24 slot to drop a sprite and scatter it. The rotating appearance helper has a separate file.
+src/effects/particle_burst_effect/following_sprite_effect.c,src/effects/sprites/bike_charge_and_following_effects.c,"0037→6274. The saved piercing Blaster (front 2) gathers motes on B hold, reveals the 409C marker, and emits the visible shot on release. A separate 409C following ability pool shares this file."
+src/field/scene_script_object/scene_script_object.c,src/objects/dungeon_prop/scenery.c,"0029→3905. The B07C scenery uses the native flash, burst and update callbacks."
+src/field/scene_script_object/orbit_motion.c,src/objects/dungeon_prop/scenery_motion.c,0029→3905. 3D91 scenery constructor installs the update in scenery.c. Keep both files at the objects level.
+src/actors/actor_animation_controller/actor_animation_controller.c,src/ui/title/tutorial_otenko.c,Tutorial dispatcher uses 8AAB to create the visible Otenko actor for the title/Options tutorial. Proc 1482 configures the visible sunflower with key 5B01.
+src/effects/particle_burst/sub_082371E4.c,src/player/effects/recoil_puffs,Django’s ordinary and alternate Player recoil callbacks use the 08237368 puffs. Original spawn and rising update observed in the controlled 3955 replay. This is a separate range from the spiral trail.
+src/effects/particle_burst/sub_082371F0.c,src/player/effects/recoil_puffs,Django’s ordinary and alternate Player recoil callbacks use the 08237368 puffs. Original spawn and rising update observed in the controlled 3955 replay. This is a separate range from the spiral trail.
+src/effects/particle_burst/sub_0823722C.c,src/player/effects/recoil_puffs,Django’s ordinary and alternate Player recoil callbacks use the 08237368 puffs. Original spawn and rising update observed in the controlled 3955 replay. This is a separate range from the spiral trail.
+src/effects/particle_burst/sub_08237258.c,src/player/effects/recoil_puffs,Django’s ordinary and alternate Player recoil callbacks use the 08237368 puffs. Original spawn and rising update observed in the controlled 3955 replay. This is a separate range from the spiral trail.
+src/effects/particle_burst/sub_08237280.c,src/player/effects/recoil_puffs,Django’s ordinary and alternate Player recoil callbacks use the 08237368 puffs. Original spawn and rising update observed in the controlled 3955 replay. This is a separate range from the spiral trail.
+src/effects/particle_burst/sub_082372F8.c,src/player/effects/recoil_puffs,Django’s ordinary and alternate Player recoil callbacks use the 08237368 puffs. Original spawn and rising update observed in the controlled 3955 replay. This is a separate range from the spiral trail.
+src/effects/particle_burst/sub_0823731C.c,src/player/effects/recoil_puffs,Django’s ordinary and alternate Player recoil callbacks use the 08237368 puffs. Original spawn and rising update observed in the controlled 3955 replay. This is a separate range from the spiral trail.
+src/effects/particle_burst/sub_08237368.c,src/player/effects/recoil_puffs,Django’s ordinary and alternate Player recoil callbacks use the 08237368 puffs. Original spawn and rising update observed in the controlled 3955 replay. This is a separate range from the spiral trail.
+081EAB64-081EB7DC,src/ui/title,The four Params3D0 files build the live title emblem at boot. Keep the tutorial Otenko main file on its own per-file route.
+src/effects/pal_fade/actor_palette_fade.c,src/effects/palette/actor_palette_fade.c,0037→6274. Saved Repair equipment and ordinary A hold after collision run the native green recovery palette and the restoration of rows 0378/0379. HP and original colors recover.

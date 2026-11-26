@@ -47,8 +47,7 @@ u8 SceneActorTarget_UpdateTrackedContact(struct ChaseActor *actor)
         return 0;
     motionFlags = SceneActorContact_MotionField(actor);
     {
-        u16 flags;
-        SCENE_ACTOR_CONTACT_READ_MOTION_FIELD(flags, motionFlags);
+        u16 flags = *motionFlags;
         zero = flags & 0x100;
     }
     savedFlags = motionFlags;
@@ -73,7 +72,7 @@ u8 SceneActorTarget_UpdateTrackedContact(struct ChaseActor *actor)
     work = actor;
     SceneActorChase_ClearFlagComponent(SceneActorContact_GateFromWork(&work), 2);
     if (motion->active) {
-        if (SceneActorContact_TestTracking(motion, 8)) {
+        if (SceneActorChase_TrackingFlags(&motion->tracking, 8)) {
             if (SceneActorContact_SavedTargetCell(actor) != cell) {
                 SceneActorTarget_UpdateContactRoute(actor, savedFlags, group->route,
                                                     &actor->base.body.position,

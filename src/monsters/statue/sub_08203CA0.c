@@ -1,5 +1,5 @@
 #include "global.h"
-struct EnemyF426 {
+struct Statue {
     u8 unk0[0x18];
     s32 timer;
     u8 unk1C[0x134 - 0x1C];
@@ -11,11 +11,11 @@ struct EnemyF426 {
     s16 patternIndex;
     s16 intervals[1];
 };
-void Statue_SpawnProjectile(struct EnemyF426 *);
+void Statue_SpawnProjectile(struct Statue *);
 s32 Mod(s32, s32);
 // confidence=low: fires a projectile either on the pattern's next interval (then advances and
 // wraps the pattern) or every period frames.
-s32 sub_08203CA0(struct EnemyF426 *p)
+s32 sub_08203CA0(struct Statue *p)
 {
     if (p->pattern) {
         s16 *index = &p->patternIndex;

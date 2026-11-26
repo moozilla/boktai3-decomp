@@ -25,7 +25,6 @@ static inline u32 CellFlag(u8 *props)
     return value;
 }
 // confidence=low: rejects a candidate position if terrain height changes or its cell blocks movement.
-#define Player_IsTerrainStepBlocked sub_0823BB48
 s32 Player_IsTerrainStepBlocked(u8 *p, struct Pos16 *position)
 {
     if (Height(position) != *(s16 *)(p + 0x32))

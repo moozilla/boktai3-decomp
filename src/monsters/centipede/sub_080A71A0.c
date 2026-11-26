@@ -4,11 +4,7 @@
 #include "scene/actor/scene_actor_control_phase.h"
 #include "scene/actor/scene_actor_init_actor.h"
 
-struct TentacleTrailState {
-    u8 unknown0[0x8EA];
-    u8 segmentCount;
-    u8 healthPerSegment;
-};
+#include "monsters/centipede/centipede_body.h"
 s32 ActorTrail_RemoveLastSegment(struct ChaseActor *);
 
 static inline s32 Tentacle_Shift(s32 value, u32 bits)
@@ -57,12 +53,12 @@ static inline void Tentacle_PrepareRecoil(struct ChaseActor *actor, u16 bits)
 
 void CentipedeBody_ConvergeReactionMotion(struct ChaseActor *actor)
 {
-    struct TentacleTrailState *trail = actor->base.context;
+    struct TentacleBody *trail = actor->base.context;
     if (SceneActorControl_TakeFlag(&actor->base.field2B2)) {
         s32 segments;
         Tentacle_PrepareRecoil(actor, 0x20);
         segments = Div(actor->base.health, trail->healthPerSegment);
-        for (; segments < trail->segmentCount; segments++)
+        for (; segments < trail->spreadStage; segments++)
             ActorTrail_RemoveLastSegment(actor);
     }
     if (Tentacle_ApproachReactionEnd(actor)) {

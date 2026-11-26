@@ -1,6 +1,6 @@
 #include "monsters/cannons/wind_cannon.h"
 #include "engine/ram.h"
-#define FanCannonManager_RemoveCannon WindCannonManager_DestroySlot
+#define WindCannonManager_RemoveCannon WindCannonManager_DestroySlot
 void Sound_StopSong(u32);
 void WindCannonManager_DestroySlot(struct FanCannonManager *, struct FanCannon *, u32);
 u32 WindCannonManager_Destroy(struct FanCannonManager *p)

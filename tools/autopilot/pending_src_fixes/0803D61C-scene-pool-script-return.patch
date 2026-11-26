@@ -5,8 +5,8 @@ The subsequent entry stores preserve that register until the handler returns.
 
 The explicit form changed the ROM bytes. The guarded form passed the unit ROM check.
 
---- a/src/fn/sub_0803D61C.c
-+++ b/src/fn/sub_0803D61C.c
+--- a/src/link/wireless/battle/sub_0803D61C.c
++++ b/src/link/wireless/battle/sub_0803D61C.c
 @@ -24,4 +24,6 @@
      entry->active = 1;
      manager->activeCount++;

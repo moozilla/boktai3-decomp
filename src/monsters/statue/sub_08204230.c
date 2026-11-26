@@ -12,7 +12,7 @@ void TerrainModifiers_RegisterCell(void *, s32, s32, s32, s32, s32);
 void SceneBody_Init(void *, void *, void *, u32, u32, void *);
 void SceneBody_SetSprite(void *, void *);
 void TerrainOverlay_QueueAddActor(void *);
-static inline s32 EnemyF426_CellIndex(struct ContactPosition *v)
+static inline s32 Statue_CellIndex(struct ContactPosition *v)
 {
     s32 x = (s16)v->x >> 8, z = (s16)v->z >> 8;
     if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
@@ -114,7 +114,7 @@ s32 Statue_InitializeFromScript(struct Statue *p, void *parent)
     if (!p->initialDead)
         Statue_InitCollider(p);
     if (p->terrainEnabled && !p->initialDead) {
-        s32 cell = EnemyF426_CellIndex(&p->sprite.position);
+        s32 cell = Statue_CellIndex(&p->sprite.position);
         TerrainModifiers_RegisterCell(p->terrain, cell, 0, p->sprite.position.y >> 8, 0, 1);
     }
     if (p->showTerrainBody) {

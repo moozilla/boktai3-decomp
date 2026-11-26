@@ -28,7 +28,7 @@ void Combat_SpawnDirectionalProjectile(struct PinkSpineState *emitter, u8 direct
     struct ProjectileConfig config;
     struct ContactPosition position;
     struct ContactPosition offset;
-    PinkSpine_ProjectileOrigin(&position, emitter);
+    Popbud_ProjectileOrigin(&position, emitter);
     polar(&offset, (u8)(((direction + 5) & 7) << 5), 0x40);
     add(&position, &position, &offset);
     ProjectileConfig_Init(&config);

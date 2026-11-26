@@ -67,7 +67,7 @@ void ActorPhase_UpdateAcceleratingTrail(struct ChaseActor *actor, s32 frame)
 
 u8 ActorPhase_UpdateReverseFlickerTimer(u32 *, s32, s32, s32);
 
-void Axe_SetAuxiliarySpriteParameters(struct ChaseActor *, const u16 *, u32);
+void Axe_SetAuxiliarySpriteParameters(void *, const u16 *, u32);
 
 void ActorPhase_UpdateReverseFlickerExit(struct ChaseActor *, s32);
 

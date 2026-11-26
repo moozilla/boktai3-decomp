@@ -1,4 +1,4 @@
-# Actor_MoveTowardTarget
+# TutorialOtenko_MoveTowardTarget
 
 All 1,640 bytes match in ordinary C. The eight-way direction helper keeps the
 sector in a signed halfword. The caller subtracts four and masks the promoted

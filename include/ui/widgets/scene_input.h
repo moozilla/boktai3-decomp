@@ -19,8 +19,8 @@ struct SceneInputPair {
     u16 frame, duration;
 };
 
-s32 Anim_SelectWidgetGlyph(void *, void *, u32);
-s32 Widget_InitLinked(void *, void *, u32, u32, u32, u32, u32, void *);
+s32 AnimSprite_SelectGlyph(void *, void *, u32);
+s32 AnimSprite_InitLinked(void *, void *, u32, u32, u32, u32, u32, void *);
 void SceneInput_BeginChoice(struct AnimSprite *, void *, u8 *, u32, u8 *);
 s32 SceneInput_TickChoice(struct AnimSprite *, void *, u8 *, u8 *);
 void SceneInput_InitGlyphPair(struct SceneInputPair *);

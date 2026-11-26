@@ -9,7 +9,7 @@
 #include "monsters/skeleton/enemy_defeat_statistics.h"
 
 /* Skeleton defeat state (tentative). On entry: releases attachments, clears the route and,
- * for categories 6/7, emits a bone burst through sub_08127590. Then three outcomes:
+ * for categories 6/7, emits a bone burst through SpriteProjectile_Create. Then three outcomes:
  * flag 0x4000 (no reward) sparks and idles; while the context is not finished it switches to
  * SceneActorReaction_TickHiddenTimeout (revival is disabled for delays above 19999); otherwise the
  * full defeat: script, reward, kill counters per category (saturating at 9999, plus one
@@ -17,12 +17,13 @@
  * The burst arguments live in function-scope variables and are rematerialized at each call. */
 void SceneActorAttachment_ReplaceResponseSlot(void *, u32, u32, u32);
 void SceneActorEffects_AdvanceSteps(void *, u32);
-void *Bestiary_GetEntryForActor(u32, u32);
-void Bestiary_UnlockEntry(void *);
+s32 Bestiary_GetEntryForActor(u32, s32);
+void Bestiary_UnlockEntry(u32);
 void SceneActorBehavior_CallTerrainScript(void *);
 void SceneActorPlacement_PlayCategoryEventSound(void *);
-void sub_08127590(void *, void *, u32, u32, u32, u32, u32, u32, u32, u32, u32, u32, u32, u32, u32);
-void sub_08159164(u32);
+void SpriteProjectile_Create(void *, void *, u32, u32, u32, u32, u32, u32, u32, u32, u32, u32, u32,
+                             u32, u32);
+void Player_AddExperience(u32);
 void Player_RefreshLifeState(u32, u32);
 void Skeleton_InitializeCategoryProfile(void *);
 void Skeleton_InitVariantMotion(void *);
@@ -70,8 +71,7 @@ static inline u32 RandomFrom(const u16 *table, u32 wrap, u32 bits)
     u32 index = (gRandomIndex + 1) & wrap;
     u32 v;
     gRandomIndex = index;
-    index *= 2;
-    v = *(const u16 *)(index + (u32)table);
+    v = table[index];
     v &= bits;
     return v + 1;
 }
@@ -90,7 +90,8 @@ static inline void Polar(struct ContactPosition *v, s32 angle, s32 radius)
         pos = actor->base.body.position;                                                           \
         pos.y += 200;                                                                              \
         vec.y = 54;                                                                                \
-        sub_08127590(&pos, &vec, 0xD45E, 0x1DC3, kind, 0x1A, 2, 0, 0x13C, 0, 0, 0, 0, 0, 0);       \
+        SpriteProjectile_Create(&pos, &vec, 0xD45E, 0x1DC3, kind, 0x1A, 2, 0, 0x13C, 0, 0, 0, 0,   \
+                                0, 0);                                                             \
     } while (0)
 #define FLAG_COUNTS()                                                                              \
     {                                                                                              \
@@ -106,13 +107,12 @@ static inline void Polar(struct ContactPosition *v, s32 angle, s32 radius)
         else if (flags & 0x400)                                                                    \
             ((struct EnemyDefeatStatistics *)gGameState)->reactionCounts[3] =                      \
                 Clamp(((struct EnemyDefeatStatistics *)gGameState)->reactionCounts[3] + 1);        \
-        else if (flags &= 0x800)                                                                   \
+        else if (flags & 0x800)                                                                   \
             ((struct EnemyDefeatStatistics *)gGameState)->reactionCounts[4] =                      \
                 Clamp(((struct EnemyDefeatStatistics *)gGameState)->reactionCounts[4] + 1);        \
     }
-static inline void RecordKill(struct ChaseActor *actor, u8 *category)
+static inline void RecordKill(struct ContactCollider *collider, u8 *category)
 {
-    struct ContactCollider *collider = &actor->base.colliderA;
     switch (*category) {
         case 4: {
             u32 flags = collider->reactionFlags;
@@ -228,16 +228,35 @@ static inline void RecordKill(struct ChaseActor *actor, u8 *category)
     }
 }
 
+static inline void Skeleton_RunDefeatScript(struct ChaseActor *actor)
+{
+    u16 script = (u16)actor->base.script1F8;
+    if (script) {
+        s32 values[8];
+        struct ScriptUtilityArguments arguments;
+        values[0] = actor->base.body.position.x;
+        values[1] = actor->base.body.position.y;
+        values[2] = actor->base.body.position.z;
+        values[3] = actor->base.parameters1FC[0];
+        values[4] = actor->base.parameters1FC[1];
+        values[5] = actor->base.parameters1FC[2];
+        values[6] = actor->base.hitOwners;
+        values[7] = actor->base.body.id;
+        arguments.count = 8;
+        arguments.values = values;
+        Script_Call(script, &arguments);
+    }
+}
+
 void Skeleton_UpdateDefeat(struct ChaseActor *actor)
 {
-    s32 values[8];
     /* Allocation-only: reuse disjoint pointer and spark-priority lifetimes. */
     union {
         struct Skeleton *context;
         s32 one;
     } state = {actor->base.context};
     struct SceneActorRegistryControlGroup *group = &actor->group.common;
-    u32 mask;
+    u32 mask, test;
     u32 wrap = 1023;
     u32 bits = 3;
     s32 count = 4;
@@ -288,28 +307,10 @@ void Skeleton_UpdateDefeat(struct ChaseActor *actor)
     actor->base.attachmentTimer = 0;
     actor->base.colliderA.responseValue = 0;
     mask = 0x4000;
-    {
-        u32 test = actor->base.motionFlags & mask;
-        response.flags = &actor->base.motionFlags;
-        if (!test)
-            goto notHidden;
-    }
-    {
-        u16 script = (u16)actor->base.script1F8;
-        if (script) {
-            struct ScriptUtilityArguments arguments;
-            values[0] = actor->base.body.position.x;
-            values[1] = actor->base.body.position.y;
-            values[2] = actor->base.body.position.z;
-            values[3] = actor->base.parameters1FC[0];
-            values[4] = actor->base.parameters1FC[1];
-            values[5] = actor->base.parameters1FC[2];
-            values[6] = actor->base.hitOwners;
-            values[7] = actor->base.body.id;
-            arguments.count = 8;
-            arguments.values = values;
-            Script_Call(script, &arguments);
-        }
+    test = actor->base.motionFlags & mask;
+    response.flags = &actor->base.motionFlags;
+    if (test) {
+        Skeleton_RunDefeatScript(actor);
         {
             u32 t = *response.flags & mask;
             categoryp = &actor->base.category;
@@ -359,7 +360,6 @@ void Skeleton_UpdateDefeat(struct ChaseActor *actor)
         Trigger_ConsumePending(actor->base.receiver, 1);
         return;
     }
-notHidden:
     if (actor->base.hitReactionFlags & 0x7F) {
         u32 hit = actor->base.hitAttributes & 0x100017;
         ctxFlags = &state.context->actionFlags;
@@ -388,28 +388,14 @@ notHidden:
             }
         }
         if (state.context->revivalDelay > 19999) {
-            u16 script = (u16)actor->base.script1F8;
-            if (script) {
-                struct ScriptUtilityArguments arguments;
-                values[0] = actor->base.body.position.x;
-                values[1] = actor->base.body.position.y;
-                values[2] = actor->base.body.position.z;
-                values[3] = actor->base.parameters1FC[0];
-                values[4] = actor->base.parameters1FC[1];
-                values[5] = actor->base.parameters1FC[2];
-                values[6] = actor->base.hitOwners;
-                values[7] = actor->base.body.id;
-                arguments.count = 8;
-                arguments.values = values;
-                Script_Call(script, &arguments);
-            }
+            Skeleton_RunDefeatScript(actor);
             if (!Masked16(response.flags, 0x4000) && (u32)(actor->base.category - 11) > 2)
                 Bestiary_UnlockEntry(
                     Bestiary_GetEntryForActor(actor->base.category, actor->base.paletteOffset));
-            sub_08159164(state.context->defeatExperience);
+            Player_AddExperience(state.context->defeatExperience);
             Player_RefreshLifeState(actor->base.hitAttributes, actor->base.fieldA1);
         } else {
-            sub_08159164(state.context->downedExperience);
+            Player_AddExperience(state.context->downedExperience);
         }
         {
             u32 m = 0x10;
@@ -434,29 +420,15 @@ notHidden:
         }
         SceneActorBehavior_CallTerrainScript(actor);
         {
-            u16 script = (u16)actor->base.script1F8;
-            if (script) {
-                struct ScriptUtilityArguments arguments;
-                values[0] = actor->base.body.position.x;
-                values[1] = actor->base.body.position.y;
-                values[2] = actor->base.body.position.z;
-                values[3] = actor->base.parameters1FC[0];
-                values[4] = actor->base.parameters1FC[1];
-                values[5] = actor->base.parameters1FC[2];
-                values[6] = actor->base.hitOwners;
-                values[7] = actor->base.body.id;
-                arguments.count = 8;
-                arguments.values = values;
-                Script_Call(script, &arguments);
-            }
+            Skeleton_RunDefeatScript(actor);
         }
         if (!Masked16(response.flags, 0x4000) && (u32)(*categoryp - 11) > 2)
             Bestiary_UnlockEntry(Bestiary_GetEntryForActor(*categoryp, actor->base.paletteOffset));
-        sub_08159164(state.context->defeatExperience);
+        Player_AddExperience(state.context->defeatExperience);
         Player_RefreshLifeState(actor->base.hitAttributes, actor->base.fieldA1);
         Count(&((struct EnemyDefeatStatistics *)gGameState)->lifetimeTotal);
         Count(&((struct EnemyDefeatStatistics *)gGameState)->total);
-        RecordKill(actor, categoryp);
+        RecordKill(&actor->base.colliderA, categoryp);
         {
             struct ContactPosition range;
             u8 category;

@@ -48,6 +48,13 @@ struct SceneActorRegistryMessage {
     u16 receiverId, unknown2;
     u8 *data;
 };
+/* Registry categories 10 and 23 have independent 32-step RGB15 transitions. */
+struct SceneActorPaletteTransition {
+    u16 colors[16];
+    u16 remaining, destinationBank;
+    s16 red[16], green[16], blue[16];
+    s8 deltaRed[16], deltaGreen[16], deltaBlue[16];
+};
 struct SceneActorRegistryManager {
     struct Task task;
     struct SceneActorRegistryMessage *messages;
@@ -64,7 +71,8 @@ struct SceneActorRegistryManager {
     u8 unknown5A[6];
     u16 category14TaskId;
     u16 field62;
-    u8 unknown64[0x21C];
+    struct SceneActorPaletteTransition category10, category23;
+    u8 unknown1CC[0xB4];
     u32 subsystem[2];
 };
 /* 0x020004A8 */

@@ -5,7 +5,7 @@ s32 sub_08239F74(u8 *, s32);
 s32 sub_08239EB4(u8 *, s32);
 s32 ActorEffect_SelectFlashingValue(u8 *, s32);
 void sub_08239A20(u8 *, s32);
-void sub_082386DC(u8 *);
+void SpriteEffect_UpdateBriefAnimation(u8 *);
 void Player_UpdateOrbitingAuraEffect(u8 *);
 void sub_08238FE0(u8 *);
 void Player_UpdateConvergingParticles(u8 *);
@@ -23,7 +23,7 @@ void sub_0823A2E4(u8 *p)
     sub_0823A060(p);
     LinkPlayer_AdvanceActionTick(p);
     sub_08239A20(p, ActorEffect_SelectFlashingValue(p, sub_08239EB4(p, sub_08239F74(p, 0))));
-    sub_082386DC(p);
+    SpriteEffect_UpdateBriefAnimation(p);
     Player_UpdateOrbitingAuraEffect(p);
     sub_08238FE0(p);
     Player_UpdateConvergingParticles(p);

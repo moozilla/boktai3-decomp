@@ -65,7 +65,6 @@ static inline void choose(struct Ratatosk *p, struct Ratatosk *q, struct ChoiceT
     }
 }
 // confidence=low: runs the active callback and chooses attacks according to health phase and interrupts.
-#define Ratatosk_UpdateAttackSelection sub_081F92C8
 void Ratatosk_UpdateAttackSelection(struct Ratatosk *p)
 {
     struct Ratatosk *q = p;

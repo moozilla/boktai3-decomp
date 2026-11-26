@@ -1,4 +1,4 @@
-# BouncingObject_TickActive
+# BouncingBomb_TickActive
 
 All 1,584 bytes match with stock agbcc. Gravity reads the signed sprite height
 before querying the terrain. After that test, the handler keeps the sprite

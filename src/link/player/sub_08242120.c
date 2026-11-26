@@ -3,7 +3,7 @@
 #include "player/player.h"
 /* Tests whether the terrain cell just ahead of the player is low enough to step onto (tentative). */
 u8 *TerrainModifiers_FindCellOverride(s32, s32);
-void sub_08238238(struct Player *);
+void Player_UpdateActionFacingSide(struct Player *);
 extern const s16 gUnk_086149C4[];
 
 struct FloorPoint {
@@ -68,11 +68,11 @@ s32 Player_TryStepForward(struct Player *p)
             if (height >= (u32)(p->position.y + 0xc8))
                 return 1;
             p->facing = (p->coordinateAxis + 4) & 7;
-            sub_08238238(p);
+            Player_UpdateActionFacingSide(p);
             p->tetherMode = 0;
         } else {
             p->facing = (axis + 4) & 7;
-            sub_08238238(p);
+            Player_UpdateActionFacingSide(p);
             p->tetherMode = zero;
         }
     }

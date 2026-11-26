@@ -1,11 +1,11 @@
 #include "ui/town/shop_lifecycle.h"
-s32 Shop_FinishAndCallScript(struct SceneInventoryLifecycle *p)
+s32 Shop_FinishAndCallScript(struct ShopLifecycle *p)
 {
     if (p->frame > 31) {
         u32 script = p->completionScript;
         if (script != 0) {
-            struct SceneInventoryScriptArgs args;
-            struct SceneInventoryScriptCall call;
+            struct ShopScriptArgs args;
+            struct ShopScriptCall call;
             call.argumentCount = 2;
             args.purchased = p->purchased;
             args.sold = p->sold;

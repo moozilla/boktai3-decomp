@@ -1,12 +1,13 @@
-#include "global.h"
+#include "scene/camera/scene_camera_controller.h"
+#include "engine/ram.h"
 
 void Camera_FollowPlayer(u32);
 
 void Camera_FollowPlayerWithoutCompletion(u32 a)
 {
-    u8 *s = *(u8 **)0x03005420;
-    if (s != 0) {
-        *(u16 *)(s + 0x1e) = 0;
+    struct SceneCameraController *camera = (void *)gActiveCamera;
+    if (camera != NULL) {
+        camera->completionMode = 0;
         Camera_FollowPlayer(a);
     }
 }

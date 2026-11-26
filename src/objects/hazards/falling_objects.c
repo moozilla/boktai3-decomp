@@ -364,7 +364,7 @@ void FallingObject_UpdateLanding(struct FallingObject *object)
     }
 }
 
-void sub_08014634(u32, u32, void *, void *, void *, u32, u32);
+void ImpactParticleGroup_SpawnBouncing(u32, u32, void *, void *, void *, u32, u32);
 
 void Camera_RequestShake(u32);
 
@@ -381,7 +381,7 @@ void FallingObject_UpdateShatter(struct FallingObject *object)
             high.x = 30;
             high.y = 22;
             high.z = 30;
-            sub_08014634(8, 3, &object->position, &low, &high, 60, 60);
+            ImpactParticleGroup_SpawnBouncing(8, 3, &object->position, &low, &high, 60, 60);
         }
         object->parameter = 30;
     }
@@ -419,7 +419,7 @@ void FallingObject_UpdateBounceAway(struct FallingObject *object)
             high.x = 30;
             high.y = 22;
             high.z = 30;
-            sub_08014634(8, 3, &object->position, &low, &high, 60, 60);
+            ImpactParticleGroup_SpawnBouncing(8, 3, &object->position, &low, &high, 60, 60);
         }
         object->parameter = 25;
     }
@@ -471,7 +471,7 @@ void FallingObject_UpdateWaiting(struct FallingObject *object)
 
 void FallingObject_ClearEffect(void *);
 
-s32 AnimatedParticles_EmitBurst(void *, u32, u32, u32, u32, u32, u32, u32);
+s32 ImpactBurst_EmitBurst(void *, u32, u32, u32, u32, u32, u32, u32);
 
 s32 FallingObject_SpawnFinishParticles(struct FallingObject *object)
 {
@@ -479,7 +479,7 @@ s32 FallingObject_SpawnFinishParticles(struct FallingObject *object)
     position.x = object->sprite.position.x;
     position.y = object->sprite.position.y;
     position.z = object->sprite.position.z;
-    return AnimatedParticles_EmitBurst(&position, 2, 0, 64, 8, 4, 0, 0);
+    return ImpactBurst_EmitBurst(&position, 2, 0, 64, 8, 4, 0, 0);
 }
 
 void FallingObject_UpdateFinish(struct FallingObject *object)

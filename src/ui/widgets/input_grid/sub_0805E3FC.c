@@ -12,5 +12,5 @@ void SceneInput_InitMarkerPair(struct SceneInputPair *pair)
         position.z = 0;
     }
     for (i = 0; i < 2; i++)
-        Widget_InitLinked(&pair->widgets[i], pair, 0, 0x31, 0, 0, 60, &position);
+        AnimSprite_InitLinked(&pair->widgets[i], pair, 0, 0x31, 0, 0, 60, &position);
 }

@@ -1,7 +1,7 @@
 #ifndef GUARD_ACTOR_STATS_H
 #define GUARD_ACTOR_STATS_H
 #include "global.h"
-#include "system/game_state/actor_palette_fade.h"
+#include "effects/palette/actor_palette_fade.h"
 #include "scene/collision/contact_position.h"
 #include "scene/actor/actor_ability_types.h"
 struct ModifierDrainState {

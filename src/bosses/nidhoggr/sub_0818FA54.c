@@ -39,7 +39,6 @@ void Sound_PlaySongChecked(u32);
 void ScaledShadow_InitializeDefaultSmall(void *, void *);
 void ScaledShadow_Disable(void *);
 // confidence=low: allocates a falling effect with attack/body colliders and an initially disabled shadow.
-#define Nidhoggr_CreateFallingAttackEffect sub_0818FA54
 void Nidhoggr_CreateFallingAttackEffect(u8 *owner, struct NidhoggrEffectVector *anchor,
                                         struct NidhoggrEffectVector *offset, u8 *boss)
 {

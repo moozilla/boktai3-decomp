@@ -2,7 +2,7 @@
 #include "monsters/popbud/popbud_playback.h"
 #include "global.h"
 void Bestiary_UnlockEntry(s32);
-void sub_08159164(s32);
+void Player_AddExperience(s32);
 #define H(p, n) (*(s16 *)((u8 *)(p) + (n)))
 static inline s32 clamp(s32 v)
 {
@@ -32,7 +32,7 @@ void Popbud_RecordDefeat(struct PinkSpineState *p)
     }
     Bestiary_UnlockEntry(2);
     if (p->f144 & 1) {
-        sub_08159164(p->f13C);
+        Player_AddExperience(p->f13C);
         H(gGameState, 0x87C) = H(gGameState, 0x87C) < 9999 ? H(gGameState, 0x87C) + 1 : 9999;
         H(gGameState, 0x538) = H(gGameState, 0x538) < 9999 ? H(gGameState, 0x538) + 1 : 9999;
         H(gGameState, 0x56E) = H(gGameState, 0x56E) < 9999 ? H(gGameState, 0x56E) + 1 : 9999;

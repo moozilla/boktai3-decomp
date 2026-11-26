@@ -11,6 +11,7 @@ void SceneActorControl_StartPositionCurve(struct ChaseActor *actor,
         u32 fill;
         struct ContactPosition delta;
     } temporary;
+    struct ContactPosition *vector;
     u32 zeroValue;
     u32 one;
     SceneActorControl_InitPositionCurveEndpoints(actor, target);
@@ -33,9 +34,7 @@ void SceneActorControl_StartPositionCurve(struct ChaseActor *actor,
         difference->z = target->z - position->z;
         actor->base.nextDirection = Math_Atan2(difference->x, difference->z);
     }
-    {
-        state = (void *)((u8 *)state + 0x42C);
-    }
+    vector = &state->vectors[2];
     temporary.fill = zeroValue;
-    CpuSet_2(0x05000002, state, &temporary.fill);
+    CpuSet_2(0x05000002, vector, &temporary.fill);
 }

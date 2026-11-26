@@ -13,7 +13,7 @@ void Sound_PlaySong(u32);
 void Collider_SetPosition(void *, void *, u32);
 void DamageNumberDisplay_Show(void *, s32, u32, void *, void *, u32);
 void SceneHud_SetTimedState(void *, s32, s32, s32, u32, s32);
-void sub_08014634(s32, s32, void *, void *, void *, s32, s32);
+void ImpactParticleGroup_SpawnBouncing(s32, s32, void *, void *, void *, s32, s32);
 void sub_082086B8(void);
 void GarmrStatue_FireAimedVolley(void);
 void Anim_SetDurationScale(void *, u16);
@@ -72,7 +72,7 @@ s32 GarmrStatue_UpdateCombat(struct GarmrStatue *p)
             size.y = (ParticleRandom_ReadDirectSample(table) & 7) + 3;
             size.z = 24;
             count = (ParticleRandom_ReadDirectSample(table) & 3) + 4;
-            sub_08014634(count, 2, &position, &velocity, &size, 15, 15);
+            ImpactParticleGroup_SpawnBouncing(count, 2, &position, &velocity, &size, 15, 15);
             Anim_RestartSequence(&p->sequence, p->resource, 10, 0, 0);
             AnimData_SelectPaletteBank(p->graphics, 0x1bc);
             p->flashTimer = 0;

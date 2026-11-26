@@ -1,16 +1,5 @@
-#include "global.h"
+#include "monsters/centipede/centipede_body.h"
 
-struct Entry080A9374 {
-    u8 pad0[0x105];
-    u8 flags;
-    u8 pad106[0x128 - 0x106];
-};
-struct Group080A9374 {
-    u8 pad0[0x3d4];
-    struct Entry080A9374 entries[4];
-    u8 pad874[0x8da - 0x874];
-    s16 count;
-};
 void Sprite_BlinkUntilExpired(void *, void *, u32, u32);
 
 static inline u8 TestMask(u8 *flags, u32 mask)
@@ -20,13 +9,13 @@ static inline u8 TestMask(u8 *flags, u32 mask)
     return FALSE;
 }
 
-void CentipedeBody_UpdateSegmentMotion(u8 *p, void *arg)
+void CentipedeBody_UpdateSegmentMotion(struct RoomActor *actor, void *arg)
 {
-    struct Group080A9374 *g = *(struct Group080A9374 **)(p + 0x3d0);
-    struct Entry080A9374 *e = g->entries;
+    struct TentacleBody *g = actor->context;
+    struct TentacleAnimationSegment *e = g->segments;
     s32 i;
-    for (i = 0; i < g->count; i++) {
-        if (!TestMask(&e[i].flags, 1))
+    for (i = 0; i < g->segmentCount; i++) {
+        if (!TestMask(&e[i].animation.status, 1))
             Sprite_BlinkUntilExpired(&e[i], arg, 10, 30);
     }
 }

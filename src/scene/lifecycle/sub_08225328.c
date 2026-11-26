@@ -2,7 +2,7 @@
 #include "engine/ram.h"
 #include "engine/runtime.h"
 #include "engine/engine_globals.h"
-extern u8 *gGameState;
+#include "system/game_state/game_state.h"
 void Script_InitActorRegistry(void);
 void SceneLifecycle_ResetSceneRegistries(void);
 void Script_RegisterEngineCommands(void);
@@ -36,7 +36,7 @@ void SceneLifecycle_InitManager(void)
     gRuntimeFrameCounter = 0;
     gSceneTransitionActive = 0;
     gPlayTimeCounterEnabled = 0;
-    *(u32 *)(gGameState + 0x868) = 0;
+    gGameState->flags868 = 0;
     gSceneTransitionFlags = 0;
     gRegionOverride = 0;
     Settings_LoadOrInitializeDefaults();
@@ -45,7 +45,7 @@ void SceneLifecycle_InitManager(void)
     Hud_ResetGlobals();
     {
         u32 value = 2;
-        *(u16 *)(gGameState + 0x12) = value;
+        gGameState->unk12 = value;
     }
     task = &gSceneLifecycleTask;
     Task_SetCallbacks(task, SceneLifecycle_UpdateTask, SceneLifecycle_DestroyTask);

@@ -1,5 +1,5 @@
 #include "global.h"
-void Anim_SelectWidgetGlyph(void *, void *, int);
+void AnimSprite_SelectGlyph(void *, void *, int);
 struct Flags {
     u8 pad[0x71dc];
     u8 flags[52];
@@ -23,7 +23,7 @@ void SceneAnimation_SetSlotFrameThirtyOne(u8 *p, int i)
     if (!(*(*flag_pointer))) {
         u32 off = i * 0x60;
         ((struct Entries *)p)->items[i].flags &= ~1;
-        Anim_SelectWidgetGlyph(p + (off + 0x543c), p + 0x541c, 31);
+        AnimSprite_SelectGlyph(p + (off + 0x543c), p + 0x541c, 31);
         (*(*flag_pointer))++;
         ((struct Flags *)p)->done[i] = 1;
     }

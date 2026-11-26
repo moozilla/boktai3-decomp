@@ -1,5 +1,5 @@
-#include "objects/pile_driver/scene_panel_subject_tail.h"
-s32 PileDriverSubject_Update(struct ScenePanelSubject *subject)
+#include "objects/pile_driver/pile_driver_subject_tail.h"
+s32 PileDriverSubject_Update(struct PileDriverSubject *subject)
 {
     if (subject->state)
         PileDriverSubject_KeepPlayerOutside((void *)subject);
@@ -12,7 +12,7 @@ s32 PileDriverSubject_Update(struct ScenePanelSubject *subject)
     {
         u16 *hold = &subject->hold;
         if (*hold) {
-            u32 mode = SCENE_PANEL_GLOBAL->paletteMode;
+            u32 mode = PILE_DRIVER_GLOBAL->paletteMode;
             if (mode) {
                 if (subject->state != 4)
                     *hold = 0;

@@ -2,7 +2,7 @@
 void sub_0822D080(u32, u32);
 void Inventory_SwapEquipmentEntries(u32, u32);
 void MenuPanel_SwapConsumableSlots(u32, u32);
-struct SceneInventoryCategoryMenu {
+struct StorageCategoryMenu {
     u8 unknown0[0x1754];
     u8 selectedCategory;
     u8 unknown1755[3];
@@ -13,7 +13,7 @@ struct SceneInventoryCategoryMenu {
     u8 unknown1767[0x29];
     u8 slots[1];
 };
-void sub_081BECF0(struct SceneInventoryCategoryMenu *p)
+void sub_081BECF0(struct StorageCategoryMenu *p)
 {
     switch (p->categories[p->selectedCategory] >> 1) {
         case 0:

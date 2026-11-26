@@ -3,7 +3,7 @@
 #include "engine/word_flags.h"
 void SceneActorPalette_ClearCompletedTransitions(void)
 {
-    struct SceneActorPaletteManagerView *manager = (void *)gSceneActorRegistryManager;
+    struct SceneActorRegistryManager *manager = gSceneActorRegistryManager;
     s32 pending;
     if (!manager || !WordFlags_Has(0x2000, &manager->flags))
         return;

@@ -1,10 +1,10 @@
 #include "global.h"
 #include "minigames/coffin_bike/coffin_bike.h"
-extern struct GloveCamera {
+extern struct CoffinBikeCamera {
     u8 unknown0[0x44];
     s32 x;
 } *gSceneCamera;
-extern struct GloveGlobals {
+extern struct CoffinBikeGlobals {
     u8 unknown0[0x24], bank;
 } *gSceneEventDispatchState;
 void CoffinBike_UpdateRecoil(void *);
@@ -18,20 +18,20 @@ void *ActorAttachment_UpdateFromDescriptor(void *, void *, s32, s32, s32, s32, s
 void *ActorAttachment_ReleaseResource(void *, s32, u32);
 void *ActorAttachment_ReleasePartsResource(void *, s32, u32);
 void SceneMessages_SetPendingTrigger(void *, void *);
-static inline u8 IsActive(struct GloveDraw *motion)
+static inline u8 IsActive(struct CoffinBikeDraw *motion)
 {
     u16 bit = 1;
     if (motion->flags & bit)
         return 1;
     return 0;
 }
-static inline void SetState(struct Glove *p, void (*callback)(void *))
+static inline void SetState(struct CoffinBike *p, void (*callback)(void *))
 {
     p->active = 1;
     p->update = callback;
     p->timer = 0;
 }
-static inline void ReadMotion(struct GloveDraw *motion, struct GloveCommand *cmd)
+static inline void ReadMotion(struct CoffinBikeDraw *motion, struct CoffinBikeCommand *cmd)
 {
     motion->x = cmd->x << 12;
     motion->y = 0;
@@ -42,23 +42,23 @@ static inline void ReadMotion(struct GloveDraw *motion, struct GloveCommand *cmd
     motion->d = cmd->f;
 }
 // confidence=low: message kinds select glove recoil states and attachment effects.
-s32 CoffinBike_DispatchCommands(struct Glove *p)
+s32 CoffinBike_DispatchCommands(struct CoffinBike *p)
 {
-    struct GloveMotion *state = &p->motion;
-    struct GloveDraw *motion = &p->draw;
-    struct GloveQueue *queue;
+    struct CoffinBikeMotion *state = &p->motion;
+    struct CoffinBikeDraw *motion = &p->draw;
+    struct CoffinBikeQueue *queue;
     s32 i;
-    struct GloveCommand *cmd;
+    struct CoffinBikeCommand *cmd;
     if (!IsActive(motion))
         return 0;
     p->offsetX = 4;
     p->offsetY = -24;
     {
-        struct GloveAttachment *desc = &p->attachmentDesc;
+        struct CoffinBikeAttachment *desc = &p->attachmentDesc;
         desc->flags |= 4;
     }
     {
-        struct GlovePosition *pos = &p->screenPosition;
+        struct CoffinBikePosition *pos = &p->screenPosition;
         pos->x = (state->position.x >> 12) - gSceneCamera->x;
         pos->y = ((state->position.z + (state->position.y + state->unk38)) >> 12) + 90;
         pos->z = state->position.z >> 12;
@@ -68,7 +68,7 @@ s32 CoffinBike_DispatchCommands(struct Glove *p)
     if (i < queue->count[gSceneEventDispatchState->bank])
         do {
             {
-                struct GloveGlobals *g = gSceneEventDispatchState;
+                struct CoffinBikeGlobals *g = gSceneEventDispatchState;
                 cmd = queue->commands[g->bank][i];
             }
             switch (cmd->type) {

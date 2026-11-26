@@ -1,11 +1,11 @@
 #include "ui/town/shop_actions.h"
-struct SceneInventoryRestoreView {
+struct ShopRestoreView {
     u8 unknown0[0x1AEC];
     u16 fallbackSelection;
     u8 unknown1AEE[0x1BE5 - 0x1AEE];
     u8 cursorX, cursorY, selection;
 };
-s32 Shop_ClassifyEquipmentMove(struct SceneInventoryActionView *panel)
+s32 Shop_ClassifyEquipmentMove(struct ShopActionView *panel)
 {
     u8 saved = panel->savedSelection;
     u32 current;
@@ -21,7 +21,7 @@ s32 Shop_ClassifyEquipmentMove(struct SceneInventoryActionView *panel)
         if (panel->valueMode == 1)
             return 1;
     } else {
-        struct SceneInventoryRestoreView *restore = (void *)panel;
+        struct ShopRestoreView *restore = (void *)panel;
         if (panel->selection == saved) {
             u32 fallback = restore->fallbackSelection;
             u32 column;

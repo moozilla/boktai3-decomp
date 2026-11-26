@@ -13,7 +13,7 @@ static inline u32 RandomValue(void)
     return gUnk_086141BC[gEffectRandomTableIndex];
 }
 
-void SceneActors_UpdateHitSensitiveDeparture(struct DepartureActor *input, s32 time)
+void VanargandHead_UpdateHitSensitiveDeparture(struct DepartureActor *input, s32 time)
 {
     struct DepartureActor *actor = input;
     if (input->entered) {
@@ -47,7 +47,7 @@ void SceneActors_UpdateHitSensitiveDeparture(struct DepartureActor *input, s32 t
             ActorDisplay_UpdateScreenAnchor(input);
             ActorDisplay_UpdateForegroundSprite(input);
             ActorDisplay_UpdateAccentSprite(input);
-            SceneActors_EmitPeriodicParticles(input, time);
+            VanargandHead_EmitPeriodicParticles(input, time);
             break;
         case 1:
             if (time > 150) {
@@ -60,7 +60,7 @@ void SceneActors_UpdateHitSensitiveDeparture(struct DepartureActor *input, s32 t
             ActorDisplay_UpdateScreenAnchor(input);
             ActorDisplay_UpdateForegroundSprite(input);
             ActorDisplay_UpdateAccentSprite(input);
-            SceneActors_EmitPeriodicParticles(input, time);
+            VanargandHead_EmitPeriodicParticles(input, time);
             break;
         case 2: {
             s32 velocity = Player_GetHorizontalVelocity(actor->playerIndex);
@@ -74,7 +74,7 @@ void SceneActors_UpdateHitSensitiveDeparture(struct DepartureActor *input, s32 t
             ActorDisplay_UpdateScreenAnchor(input);
             ActorDisplay_UpdateForegroundSprite(input);
             ActorDisplay_UpdateAccentSprite(input);
-            SceneActors_EmitPeriodicParticles(input, time);
+            VanargandHead_EmitPeriodicParticles(input, time);
             if (actor->foreground.ended)
                 actor->foreground.mode = 1;
             Player_GetWorldPosition(0, &position);
@@ -98,7 +98,7 @@ void SceneActors_UpdateHitSensitiveDeparture(struct DepartureActor *input, s32 t
             ActorDisplay_UpdateScreenAnchor(input);
             ActorDisplay_UpdateForegroundSprite(input);
             ActorDisplay_UpdateAccentSprite(input);
-            SceneActors_EmitPeriodicParticles(input, time);
+            VanargandHead_EmitPeriodicParticles(input, time);
             actor->foreground.mode = 0;
             actor->foreground.sequenceId = 3;
             actor->foreground.sequence.flags |= 4;
@@ -114,7 +114,7 @@ void SceneActors_UpdateHitSensitiveDeparture(struct DepartureActor *input, s32 t
             ActorDisplay_UpdateScreenAnchor(input);
             ActorDisplay_UpdateForegroundSprite(input);
             ActorDisplay_UpdateAccentSprite(input);
-            SceneActors_EmitPeriodicParticles(input, time);
+            VanargandHead_EmitPeriodicParticles(input, time);
             if (actor->foreground.ended) {
                 actor->foreground.sequence.flags &= ~4;
                 input->finished = 1;

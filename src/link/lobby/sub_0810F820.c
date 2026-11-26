@@ -2,9 +2,8 @@
 #include "global.h"
 #include "engine/ram.h"
 /* LinkLobbyPanel_ResetInstance: Clears the panel singleton pointer */
-#define LinkLobbyPanel_ResetInstance sub_0810F820
 
-void sub_0810F820(void)
+void LinkLobbyPanel_ResetInstance(void)
 {
     gActiveRecordMenu = 0;
 }

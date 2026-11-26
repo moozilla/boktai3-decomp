@@ -15,10 +15,9 @@ struct Drawable {
 void ActorDisplay_UpdateScreenAnchor(void *);
 void ActorDisplay_UpdateForegroundSprite(void *);
 void ActorDisplay_UpdateAccentSprite(void *);
-void SceneActors_EmitPeriodicParticles(void *, s32);
-void SceneActors_UpdateIdleDisplay(void *);
+void VanargandHead_EmitPeriodicParticles(void *, s32);
+void VanargandHead_UpdateIdleDisplay(void *);
 // confidence=low: departs past the left edge, then schedules destruction.
-#define SceneActors_UpdatePastEdgeDeparture sub_081EDE4C
 /* Tentative fields of the actor's departure display state. */
 struct DepartureActor {
     u8 unknown0[0x90];
@@ -46,7 +45,7 @@ static inline u32 RandomValue(void)
     return gUnk_086141BC[gEffectRandomTableIndex];
 }
 
-void SceneActors_UpdatePastEdgeDeparture(struct DepartureActor *input, s32 time)
+void VanargandHead_UpdatePastEdgeDeparture(struct DepartureActor *input, s32 time)
 {
     s32 result = 0;
     struct DepartureActor *p = input;
@@ -77,10 +76,10 @@ void SceneActors_UpdatePastEdgeDeparture(struct DepartureActor *input, s32 time)
         ActorDisplay_UpdateScreenAnchor(input);
         ActorDisplay_UpdateForegroundSprite(input);
         ActorDisplay_UpdateAccentSprite(input);
-        SceneActors_EmitPeriodicParticles(input, time);
+        VanargandHead_EmitPeriodicParticles(input, time);
         if (result) {
             {
-                void (*callback)(void *) = SceneActors_UpdateIdleDisplay;
+                void (*callback)(void *) = VanargandHead_UpdateIdleDisplay;
                 input->callback = callback;
             }
             input->stateTimer = 0;

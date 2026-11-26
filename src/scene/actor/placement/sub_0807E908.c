@@ -13,13 +13,13 @@ static inline u8 TestValue(u32 value)
         return 1;
     return 0;
 }
-void SceneActorEffects_ReleaseResources(struct SceneActorEffectsView *actor)
+void SceneActorEffects_ReleaseResources(struct ChaseActor *actor)
 {
-    u8 *control = actor->control;
-    u8 *drawable = actor->drawable;
+    struct SceneActorChaseGroup *group = &actor->group;
+    u8 *drawable = actor->base.drawable;
     u16 *flags;
     void *identity;
-    if (actor->drawableKind == 0)
+    if (actor->base.drawableKind == 0)
         Sprite_Remove(drawable);
     else
         Anim_Remove(drawable + 0x20);
@@ -28,31 +28,31 @@ void SceneActorEffects_ReleaseResources(struct SceneActorEffectsView *actor)
         u32 mask = 0x100;
         u16 *pointer;
         u32 value;
-        pointer = &actor->flags2C0;
+        pointer = &actor->base.placementFlags;
         value = *pointer & mask;
         flags = pointer;
         if (TestValue(value))
-            SceneMessages_UnregisterReceiver((u8 *)actor + 0xC);
+            SceneMessages_UnregisterReceiver(actor->base.receiver);
     }
     {
         u8 *shadow;
-        shadow = actor->shadow;
+        shadow = actor->base.shadow;
         if (*shadow)
             Shadow_Destroy(shadow);
     }
-    if (*(u8 *)(control + 0xA8))
-        SceneActorEffects_DestroyGroup(control + 0xA8);
+    if (*(u8 *)group->effectConfig)
+        SceneActorEffects_DestroyGroup(group->effectConfig);
     {
         u32 mask = 0x02000000;
         u32 flags;
-        flags = actor->flags2D0 & mask;
-        identity = (u8 *)actor + 0x50;
+        flags = actor->base.statusFlags & mask;
+        identity = &actor->base.body;
         if (!flags)
             TerrainOverlay_QueueRemoveActor(identity);
     }
     if (SceneActorChase_TestField(flags, 0x200))
-        SceneLink_RemoveNode(control + 0x30);
+        SceneLink_RemoveNode(&group->common.placement);
     SceneBody_Unregister(identity);
-    Collider_Remove((u8 *)actor + 0x134);
+    Collider_Remove(&actor->base.colliderA);
     SceneActorRegistry_UnlinkActor((void *)actor);
 }

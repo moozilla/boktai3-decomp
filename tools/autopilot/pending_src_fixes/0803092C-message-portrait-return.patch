@@ -6,8 +6,8 @@ to Anim_SetSequence at 08030A68 in r0 through playback and flag updates.
 
 The explicit form changed the ROM bytes. The guarded form passed the unit ROM check.
 
---- a/src/message_window.c
-+++ b/src/message_window.c
+--- a/src/ui/dialogue/message_window/message_window.c
++++ b/src/ui/dialogue/message_window/message_window.c
 @@ -42,4 +42,7 @@
  {
      struct MessagePlaybackState *state = &window->state;

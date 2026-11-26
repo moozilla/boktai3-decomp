@@ -14,7 +14,7 @@ static inline s32 Truncate12(s32 v)
 
 s32 ActorVariant_GetTableValue(u32, s32);
 s32 Player_SetAnimationIndex(struct Player *, s32, s32);
-void sub_08238238(struct Player *);
+void Player_UpdateActionFacingSide(struct Player *);
 void Player_SetTetherMode(struct Player *, s32, s32);
 void Player_PlayLocalSong(s32, s32);
 
@@ -83,7 +83,7 @@ void Player_UpdateKnockback(struct Player *p)
             if (Player_SetAnimationIndex(p, ActorVariant_GetTableValue(p->actionMode, 0x2D),
                                          0x40)) {
                 p->contactSpecial = 0;
-                sub_08238238(p);
+                Player_UpdateActionFacingSide(p);
                 Player_SetTetherMode(p, 0, 0);
             }
             break;

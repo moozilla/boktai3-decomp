@@ -7,7 +7,6 @@
 #include "engine/math/monster_particle_random.h"
 #include "engine/engine_pause.h"
 // confidence=low: creates a pooled projectile with optional spin and collider.
-#define SpriteProjectile_Create sub_08127590
 void *SpriteProjectile_EnsurePool(void);
 struct Projectile *SpriteProjectilePool_AllocateSlot(void *);
 extern u32 gUnk_02000560;

@@ -2,7 +2,6 @@
 #include "player/player.h"
 
 // Tentative: linked action handlers smooth the recent direction history.
-#define Player_GetLinkedSmoothedDirection sub_0823C4B4
 s32 Player_GetLinkedSmoothedDirection(struct Player *arg)
 {
     struct Player *p = arg;

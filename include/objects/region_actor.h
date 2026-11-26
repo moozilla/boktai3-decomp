@@ -40,15 +40,15 @@ static inline u8 RegionActor_HasBehavior(struct RegionActor *actor, u32 mask)
 struct RegionActorColliderVector {
     s16 x, y, z;
 };
-void ProximityActor_UpdateDamageAnimation(struct RegionActor *);
-void RegionActor_UnregisterTerrain(struct RegionActor *);
-struct RegionActor *ProximityActorPool_Allocate(struct RegionSpriteManager *);
-void ProximityActor_InitializeCollider(struct RegionActor *, s16, s16);
-void ProximityActor_ApplyContactDamage(struct ContactCollider *, struct ContactCollider *,
+void IceBoulder_UpdateDamageAnimation(struct RegionActor *);
+void IceBoulder_UnregisterTerrain(struct RegionActor *);
+struct RegionActor *IceBoulderPool_Allocate(struct RegionSpriteManager *);
+void IceBoulder_InitializeCollider(struct RegionActor *, s16, s16);
+void IceBoulder_ApplyContactDamage(struct ContactCollider *, struct ContactCollider *,
                                        struct RegionActor *);
-s32 RegionActorPool_UpdateActors(struct RegionSpriteManager *);
-s32 RegionActorPool_DestroyActors(struct RegionSpriteManager *);
-s32 ProximityActorPool_InitManager(struct RegionSpriteManager *);
+s32 IceBoulderPool_UpdateActors(struct RegionSpriteManager *);
+s32 IceBoulderPool_DestroyActors(struct RegionSpriteManager *);
+s32 IceBoulderPool_InitManager(struct RegionSpriteManager *);
 void TerrainModifiers_UnregisterCell(void *);
 void TerrainModifiers_RegisterCell(void *, s32, s32, s32, s32, s32);
 void SceneBody_Init(void *, s32, void *, s32, s32, void *);

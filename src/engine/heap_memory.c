@@ -1,5 +1,3 @@
-#define Memory_FillBytes sub_08219E44
-#define Memory_FillWords sub_08219DB4
 #include "engine/heap_memory.h"
 #include "engine/heap.h"
 

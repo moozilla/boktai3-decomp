@@ -1,6 +1,6 @@
 #include "bosses/vanargand/paired_scene_actor.h"
 #include "global.h"
-void ActorStatus_Deactivate(struct VanargandAttackPair *owner, struct PairedSceneHalf *status)
+void VanargandCombat_Deactivate(struct VanargandAttackPair *owner, struct PairedSceneHalf *status)
 {
     u32 mask = 0x100;
     if (!(status->actionFlags & mask)) {

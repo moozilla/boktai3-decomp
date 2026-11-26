@@ -1,14 +1,9 @@
-#include "global.h"
+#include "scene/actor/scene_actor_components.h"
 
-u32 SceneBody_SetPositionOffset(u8 *p, u32 *q)
+u32 SceneBody_SetPositionOffset(struct SceneActorBody *body, const struct ContactPosition *offset)
 {
-    u32 y;
-    u32 x;
-    u32 f = 4;
-    *(u32 *)(p + 4) |= f;
-    y = q[1];
-    x = q[0];
-    *(u32 *)(p + 0x34) = x;
-    *(u32 *)(p + 0x38) = y;
+    u32 flag = 4;
+    body->flags |= flag;
+    body->positionOffset = *offset;
     return 1;
 }

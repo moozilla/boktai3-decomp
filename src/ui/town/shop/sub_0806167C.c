@@ -1,5 +1,5 @@
 #include "ui/town/shop_states.h"
-void Shop_BeginPurchaseConfirmation(struct SceneInventoryControlView *panel)
+void Shop_BeginPurchaseConfirmation(struct ShopControlView *panel)
 {
     SceneInput_SaveSelection(&panel->grid);
     panel->interactionFlags = 0x14;
@@ -13,7 +13,7 @@ void Shop_BeginPurchaseConfirmation(struct SceneInventoryControlView *panel)
             s32 index = panel->page * 8 - 16;
             index += *saved;
             SceneInputPanel_ShowDescription(
-                panel, 0, message, ((struct SceneInventoryCatalogView *)panel)->entries[index]);
+                panel, 0, message, ((struct ShopCatalogView *)panel)->entries[index]);
             break;
         }
         case 2: {
@@ -22,7 +22,7 @@ void Shop_BeginPurchaseConfirmation(struct SceneInventoryControlView *panel)
             s32 index = panel->page * 8 - 16;
             index += *saved;
             SceneInputPanel_ShowDescription(
-                panel, 0, message, ((struct SceneInventoryCatalogView *)panel)->entries[index]);
+                panel, 0, message, ((struct ShopCatalogView *)panel)->entries[index]);
             break;
         }
     }
@@ -30,5 +30,5 @@ void Shop_BeginPurchaseConfirmation(struct SceneInventoryControlView *panel)
     SceneInput_BeginChoice(&panel->display.prompt, &panel->display.widgetResource,
                            &panel->choiceValue, 1, &panel->choiceBlink);
     Shop_SetControllerCallback(
-        panel, (SceneInventoryCallback)Shop_TickPurchaseConfirmation);
+        panel, (ShopCallback)Shop_TickPurchaseConfirmation);
 }

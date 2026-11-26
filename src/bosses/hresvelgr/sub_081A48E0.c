@@ -9,14 +9,14 @@ struct MotionEntry {
     struct MotionPosition delta;
 };
 void *Hresvelgr_CreateEffectPool(void);
-struct MotionEntry *MotionEntry_Create(u32, u32, u32, u32);
-void *MotionEntry_CreateWithDelta(u32 a, struct MotionPosition *delta, u32 b, u32 c)
+struct MotionEntry *HresvelgrMotion_Create(u32, u32, u32, u32);
+void *HresvelgrMotion_CreateWithDelta(u32 a, struct MotionPosition *delta, u32 b, u32 c)
 {
     struct MotionEntry *entry;
     void *result;
     if (!gMotionEntryManager)
         gMotionEntryManager = Hresvelgr_CreateEffectPool();
-    entry = MotionEntry_Create(a, b, 1, c);
+    entry = HresvelgrMotion_Create(a, b, 1, c);
     if (entry) {
         entry->delta = *delta;
         result = &entry->unknown0;

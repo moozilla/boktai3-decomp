@@ -3,19 +3,14 @@
 u8 *TerrainModifiers_FindCellOverride(s32, s32);
 void AreaEffect_InitializeEntry(struct AreaEffectEntry *, s32, struct SceneVec *, s32,
                                 u32);
-struct PackedPosition {
-    s32 x : 16;
-    s32 y : 16;
-    s32 z : 16;
-};
-static inline s32 AreaEffect_GetCellIndex(struct PackedPosition *pos)
+static inline s32 AreaEffect_GetCellIndex(struct SceneVec *pos)
 {
     s32 x = pos->x >> 8, z = pos->z >> 8;
     if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
         return 0;
     return gTerrainMap->rows[z] + x;
 }
-static inline s32 AreaEffect_GetGroundHeight(struct PackedPosition *position)
+static inline s32 AreaEffect_GetGroundHeight(struct SceneVec *position)
 {
     s32 index = AreaEffect_GetCellIndex(position), height;
     u8 *cell = TerrainModifiers_FindCellOverride(index, 1);
@@ -46,7 +41,7 @@ void AreaEffect_AddSpriteFromScript(void)
     if (manager == NULL || manager->count > 15)
         return;
     {
-        struct PackedPosition position;
+        struct SceneVec position;
         u32 kind, rotated;
         if (Script_SeekToKeyword(0x6E))
             manager->entries[manager->count].tag = Script_GetValue();
@@ -71,7 +66,7 @@ void AreaEffect_AddSpriteFromScript(void)
         else
             rotated = 0;
         AreaEffect_InitializeEntry(&manager->entries[manager->count], kind,
-                                   (struct SceneVec *)&position, rotated,
+                                   &position, rotated,
                                    manager->graphicsId);
         manager->entries[manager->count].enabled = 1;
         if (!AreaEffect_IsVisible(manager))

@@ -52,7 +52,7 @@ KINDS = {
     2: ("player", "Player_RegisterSceneMessageReceiver", "PlayerCue_Dispatch"),
     3: ("registry actor", "SceneActorRegistry_RegisterCategoryReceiver", None),
     4: ("scene actor", "SceneActors_Initialize", "SceneActors_DispatchCommands"),
-    5: ("npc", "SceneNpc_CreateFromScript", "SceneNpc_DispatchCommands"),
+    5: ("npc", "Otenko_CreateFromScript", "Otenko_DispatchCommands"),
     6: ("camera", "Camera_Initialize", "Camera_DispatchCommands"),
     7: ("screen", "sub_08021394", "SceneCommands_Dispatch"),
     8: ("audio", "SceneAudioEvent_Register", "SceneAudioEvent_DispatchPending"),
@@ -82,7 +82,7 @@ COMMANDS = {
         48: "overlay_set", 49: "overlay_off", 50: "overlay_set", 51: "motion38_to"},
     # scene actors (SceneActors_DispatchCommands): most commands only set a sub-state
     4: {2: "place", 9: "effect", 25: "flash"},
-    # npc (SceneNpc_DispatchCommands), the same shapes as the player's
+    # npc (Otenko_DispatchCommands), the same shapes as the player's
     5: {1: "stand", 3: "face", 4: "walk_to", 5: "run_to", 25: "pose", 26: "pose_end",
         64: "place"},
     # camera (Camera_DispatchCommands): 3 sub_08226474 (mode 5 over N frames)

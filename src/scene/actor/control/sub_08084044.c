@@ -1,3 +1,4 @@
+#include "scene/motion/scene_actor_terrain_reaction.h"
 #include "scene/actor/scene_actor_control_helpers.h"
 #include "player/player.h"
 #include "scene/actor/scene_actor_reaction.h"
@@ -11,12 +12,7 @@ static inline void OrTrackingFlags(struct SceneActorChaseTracking *tracking, u32
     tracking->flags = mask;
 }
 
-static inline void SelectState(struct ChaseActor *actor, u8 state, u8 phase, u8 behavior)
-{
-    actor->base.state2A8 = state;
-    actor->base.phase2A9 = phase;
-    actor->base.behavior2AA = behavior;
-}
+
 
 void SceneActorControl_RestartPositionCurve(struct ChaseActor *actor)
 {
@@ -28,9 +24,7 @@ void SceneActorControl_RestartPositionCurve(struct ChaseActor *actor)
     OrTrackingFlags(&actor->base.tracking, 8);
     WordFlags_Set(0x100000, &actor->base.statusFlags);
     SceneActorReaction_EnableMotionFlags(0x100, &actor->base.motionFlags);
-    SelectState(actor, 0, 2, 0);
-    actor->base.counter2AC = 0;
-    actor->base.field2B1 = 1;
+    SceneActorTerrain_EnterState(actor, 0, 2, 0);
     ActorShadow_Enable(actor->base.shadow);
-    SceneActorControl_StartPositionCurve(actor, &gPlayers[0]->position);
+    SceneActorControl_StartPositionCurve(actor, (const struct ContactPosition *)&gPlayers[0]->position);
 }

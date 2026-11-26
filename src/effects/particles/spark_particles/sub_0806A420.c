@@ -1,6 +1,5 @@
 #include "effects/particles/spark_particle.h"
 /* SparkParticle_CreateFromScript: Parses particle count and position plus optional spread and motion settings from script keywords and calls the particle creator */
-#define SparkParticle_CreateFromScript sub_0806A420
 union SparkParticleVector {
     struct ContactPackedVector packed;
     struct ContactPosition position;

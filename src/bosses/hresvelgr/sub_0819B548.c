@@ -1,6 +1,5 @@
 #include "global.h"
 /* Math_ApproachAngleArrayByQuarter: Approaches each target angle by one quarter of the shortest difference with a minimum unit step */
-#define Math_ApproachAngleArrayByQuarter sub_0819B548
 
 static inline s32 AngleNear(s32 angle, s32 ref)
 {
@@ -37,7 +36,7 @@ static inline void ApproachArray(s32 count, s16 *cur, s16 *target)
     }
 }
 
-void sub_0819B548(s16 *cur, s16 *target, s32 count)
+void Math_ApproachAngleArrayByQuarter(s16 *cur, s16 *target, s32 count)
 {
     ApproachArray(count, cur, target);
 }

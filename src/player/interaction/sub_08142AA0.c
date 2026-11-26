@@ -7,7 +7,7 @@ extern const s16 gUnk_086149C4[];
 s32 ActorVariant_GetTableValue(u32, s32);
 s32 Player_SetAnimation(void *, s32, s32, s32);
 void ActorSequence_Begin(void *, s32, s32);
-s32 SceneObjects_TryPushNeighborByIndex(void *, u32);
+s32 PuzzleBlock_TryPushNeighborByIndex(void *, u32);
 static inline s32 Scale(s32 v)
 {
     if (v >= 0)
@@ -37,7 +37,7 @@ void Player_UpdateObjectPushRecovery(u8 *p)
         case 1:
             Player_SetAnimation(p, ActorVariant_GetTableValue(F8(0x418), 6), 0x40, 1);
             if (*(s16 *)(p + 0x34c) == F8(0x4a5) &&
-                SceneObjects_TryPushNeighborByIndex(p + 0x30, F8(0x3a4)) > 0) {
+                PuzzleBlock_TryPushNeighborByIndex(p + 0x30, F8(0x3a4)) > 0) {
                 if (p && IsTwo(p))
                     ActorSequence_Begin(p, 0, 0);
                 else

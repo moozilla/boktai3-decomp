@@ -1,20 +1,8 @@
-#include "global.h"
+#include "monsters/centipede/centipede_body.h"
 #include "scene/actor/scene_actor_reset.h"
+#include "scene/motion/scene_actor_availability.h"
 #include "scene/motion/scene_actor_terrain.h"
 #include "scene/motion/scene_actor_chase.h"
-static inline u32 WordFlag(struct ChaseActor *p, u32 mask)
-{
-    return mask & p->base.statusFlags;
-}
-static inline u8 IsInactive(struct ChaseActor *actor)
-{
-    if (actor) {
-        u32 mask = 0x40;
-        if ((actor->base.motionFlags & mask) || WordFlag(actor, 0x20000) || actor->base.health <= 0)
-            return 1;
-    }
-    return 0;
-}
 static inline s32 Height(s32 cell, struct ContactPosition *p)
 {
     u32 attr = *SceneActorTerrain_GetCell(cell);
@@ -45,11 +33,11 @@ static inline void Add(struct ContactPosition *out, const struct ContactPosition
 }
 void Centipede_ResolveBlockedMovement(struct ChaseActor *actor)
 {
-    u8 *trail;
+    struct TentacleBody *trail;
     struct ContactPosition target;
     s32 index, height;
     u32 attributes;
-    if (IsInactive(actor))
+    if (SceneActor_ActionsBlocked(actor))
         return;
     trail = actor->base.context;
     Add(&target, &actor->base.body.position, &actor->base.secondaryMotion);
@@ -66,13 +54,13 @@ void Centipede_ResolveBlockedMovement(struct ChaseActor *actor)
         *flags = *flags | mask;
     }
     if (**(u8 **)((u8 *)actor + 0x6c) & 1) {
-        u8 *count = trail + 0x879;
+        u8 *count = &trail->blockedFrameCount;
         ++*count;
         if (*count > 30) {
             s32 difference;
-            trail[0x8e9] = (trail[0x8e9] + 1) & 3;
+            trail->wanderDirection = (trail->wanderDirection + 1) & 3;
             Centipede_SelectWanderRoute(actor);
-            Chase_Delta(&target, &actor->base.body.position, (void *)(trail + 0x904));
+            Chase_Delta(&target, &actor->base.body.position, &trail->waypoint);
             actor->base.nextDirection = Math_Atan2(target.x, target.z);
             difference = actor->base.nextDirection - actor->base.body.direction;
             if (difference > 128)
@@ -91,5 +79,5 @@ void Centipede_ResolveBlockedMovement(struct ChaseActor *actor)
             }
         }
     } else
-        trail[0x879] = 0;
+        trail->blockedFrameCount = 0;
 }

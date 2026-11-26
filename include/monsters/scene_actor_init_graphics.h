@@ -12,7 +12,7 @@ void AnimData_SelectPaletteBank(void *, s32);
 void Sprite_Init(void *, void *, s32);
 void SceneActorAnimation_InitEnemySequence(void *, u32);
 void *ScriptProc_Start(u16, u16);
-s32 Widget_InitLinked(u8 *, void *, u16, u32, u8, u8, u8, const struct ContactPosition *);
+s32 AnimSprite_InitLinked(u8 *, void *, u16, u32, u8, u8, u8, const struct ContactPosition *);
 
 static inline void MonsterInit_InitializeSprite(u8 *drawable, u16 resource, u16 sequence)
 {
@@ -27,7 +27,7 @@ static inline void MonsterInit_InitializeWidget(u8 *drawable, u16 script, u16 re
     void *source = ScriptProc_Start(script, resource);
     *(struct DisplayResourceHeader *)drawable = *(struct DisplayResourceHeader *)source;
     ResourceHeader_Relocate(drawable, source);
-    Widget_InitLinked(drawable + 0x20, drawable, 0, 0, 2, 2, 0x3C, position);
+    AnimSprite_InitLinked(drawable + 0x20, drawable, 0, 0, 2, 2, 0x3C, position);
 }
 
 static inline void MonsterInit_SetWidgetPalette(struct DisplayKeyframeState *widget, u32 palette)

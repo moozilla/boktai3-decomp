@@ -5,8 +5,8 @@ returns it unchanged in r0. ProximityVolume_InitializeCallbacks forwards it.
 
 The explicit form changed the ROM bytes. The guarded form passed the unit ROM check.
 
---- a/src/fn/sub_081806C4.c
-+++ b/src/fn/sub_081806C4.c
+--- a/src/engine/video/sprite_component/sub_081806C4.c
++++ b/src/engine/video/sprite_component/sub_081806C4.c
 @@ -23,4 +23,6 @@
      motion->task = task;
      motion->active = 0;

@@ -1,6 +1,6 @@
+#include "scene/motion/scene_actor_terrain_reaction.h"
 #include "global.h"
 // confidence=low: contact healing updates health feedback and selects a recovery phase.
-#define SceneActorControl_ApplyRecoveryContact sub_08082648
 #include "scene/actor/scene_actor_control_phase.h"
 #include "scene/actor/scene_actor_reaction.h"
 #include "scene/areas/area_effect_link.h"
@@ -51,13 +51,7 @@ static inline void Set32(struct SceneActorControlState *state, u32 mask)
 {
     *ControlFlags(state) |= mask;
 }
-static inline u8 TestMotion(struct SceneActorReactionMotion *motion, u32 mask)
-{
-    if (motion->flags & mask)
-        return 1;
-    return 0;
-}
-static inline void SetMotion(struct SceneActorReactionMotion *motion, u32 mask)
+static inline void SetMotion(struct SceneActorChaseTracking *motion, u32 mask)
 {
     u32 value = mask;
     value |= motion->flags;
@@ -71,36 +65,6 @@ static inline u8 Unavailable(struct ChaseActor *a)
             return 1;
     }
     return 0;
-}
-static inline void Control(struct ChaseActor *a, void *callback, u32 kind, u32 zero)
-{
-    a->base.field2B2 = 1;
-    a->base.stepDone = zero;
-    a->base.controlKind = kind;
-    a->base.target = callback;
-    a->base.field2C8 = zero;
-    {
-        u32 *p = &a->base.pendingControlFlags;
-        s32 mask = ~1;
-        *p &= mask;
-    }
-    a->base.pendingControl = zero;
-}
-static inline void PhaseStart(struct ChaseActor *a, u32 phase, u32 behavior)
-{
-    a->base.state2A8 = 0;
-    a->base.phase2A9 = phase;
-    a->base.behavior2AA = behavior;
-    a->base.counter2AC = 0;
-    a->base.field2B1 = 1;
-}
-static inline void Phase(struct ChaseActor *a, u32 phase, u32 behavior, u32 counter)
-{
-    a->base.state2A8 = 0;
-    a->base.phase2A9 = phase;
-    a->base.behavior2AA = behavior;
-    a->base.counter2AC = counter;
-    a->base.field2B1 = 1;
 }
 static inline void Fill(u32 *zero, void *dst)
 {
@@ -118,7 +82,7 @@ void SceneActorControl_ApplyRecoveryContact(struct SceneActorBehaviorContactView
     } contact;
     struct ChaseActor *a;
     u32 zero;
-    struct SceneActorReactionMotion *motion;
+    struct SceneActorChaseTracking *motion;
     contact.collider = inputHit;
     if (contact.collider->kind != 1)
         return;
@@ -194,17 +158,17 @@ void SceneActorControl_ApplyRecoveryContact(struct SceneActorBehaviorContactView
         if (zero)
             return;
     }
-    Control(a, (void *)SceneActorControl_OnIdle, 16, zero);
-    motion = (void *)&a->base.tracking.target;
-    zero = TestMotion(motion, 8);
+    SceneActorTerrain_InstallControl(a, SceneActorControl_OnIdle, 16);
+    motion = &a->base.tracking;
+    zero = SceneActorChase_TrackingFlags(motion, 8);
     if (zero) {
-        PhaseStart(a, 2, 1);
+        SceneActorTerrain_EnterState(a, 0, 2, 1);
         Set32((struct SceneActorControlState *)((struct RecoveryContextView *)a)->controlAddress,
               4);
     } else {
         SetMotion(motion, 8);
         SceneActorChase_SetMotionFlags(a, 0x100);
-        Phase(a, 0, 3, zero);
+        SceneActorTerrain_EnterState(a, 0, 0, 3);
         SceneActorControl_ResetCollisionPhase(a);
     }
 }

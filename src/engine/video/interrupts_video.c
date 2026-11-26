@@ -49,7 +49,7 @@ void InterruptsAndVideo_Initialize(void)
 
 void Mosaic_Initialize(void);
 
-void sub_082156D8(u32);
+void Bg_Initialize(u32);
 
 void Video_SetWindowBounds(u32, u32, u32, u32, u32);
 
@@ -123,7 +123,7 @@ void InterruptsAndVideo_InitRuntime(void)
     REG_KEYCNT = 0;
     gSpriteAttrFlags = 0;
     Mosaic_Initialize();
-    sub_082156D8(0);
+    Bg_Initialize(0);
     Video_SetWindowBounds(0, 0, 0, 240, 160);
     Video_SetWindowBounds(1, 0, 0, 240, 160);
     Video_SetWindowLayerMasks(0x3f, 1, 0, 0);
@@ -184,7 +184,6 @@ void RfuManager_CheckVBlankSync(void);
 
 void SunClock_TickFrame(void);
 
-#define InterruptsAndVideo_OnVBlank sub_08213FD8
 void InterruptsAndVideo_OnVBlank(void)
 {
     m4aSoundVSync();
@@ -235,7 +234,6 @@ void InterruptsAndVideo_OnVBlank(void)
 
 void m4aSoundMain(void);
 
-#define InterruptsAndVideo_OnVCount sub_08214144
 void InterruptsAndVideo_OnVCount(void)
 {
     if (gVideoIrqPhase == 0) {
@@ -258,14 +256,12 @@ void InterruptsAndVideo_OnVCount(void)
 
 /* InterruptsAndVideo_RunIdleHook: Unused empty hook near the frame callbacks; role tentative */
 
-#define InterruptsAndVideo_RunIdleHook sub_082141B4
 void InterruptsAndVideo_RunIdleHook(void)
 {
 }
 
 /* InterruptsAndVideo_RunFrameHook: Unused empty hook near the frame callbacks; role tentative */
 
-#define InterruptsAndVideo_RunFrameHook sub_082141B8
 void InterruptsAndVideo_RunFrameHook(void)
 {
 }
@@ -280,15 +276,15 @@ void ScanlineEffect_StageTransfer(void);
 
 void Palette_UploadBuffers(void);
 
-void sub_0821537C(void);
+void ObjGfx_UploadQueuedTiles(void);
 
 void Text_FlushTileUploads(void);
 
-void sub_08215964(void);
+void Bg_UploadMapsAndTiles(void);
 
 void TileAnimation_Upload(void);
 
-void sub_08219134(void);
+void Mosaic_UploadRegisters(void);
 
 u32 InterruptsAndVideo_OnVideoUploadTask(void)
 {
@@ -307,9 +303,9 @@ u32 InterruptsAndVideo_OnVideoUploadTask(void)
         *flags &= ~1;
     }
     Palette_UploadBuffers();
-    sub_0821537C();
+    ObjGfx_UploadQueuedTiles();
     Text_FlushTileUploads();
-    sub_08215964();
+    Bg_UploadMapsAndTiles();
     TileAnimation_Upload();
     disp = &REG_DISPCNT;
     *disp &= 0xe0ff;
@@ -317,7 +313,7 @@ u32 InterruptsAndVideo_OnVideoUploadTask(void)
         u16 mask = gDispCntShadow;
         *disp |= mask | 0x1000;
     }
-    sub_08219134();
+    Mosaic_UploadRegisters();
     return gVBlankUploadPending = 0;
 }
 

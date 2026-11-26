@@ -25,18 +25,18 @@ void sub_0810FDDC(struct ScoreDigits *p, s32 row, s32 n)
         n -= 100;
     }
     SetDigitVisible(p, base, glyph);
-    Anim_SelectWidgetGlyph(&p->slots[base], &p->glyphs, (u16)glyph);
+    AnimSprite_SelectGlyph(&p->slots[base], &p->glyphs, (u16)glyph);
     glyph = 0x3e;
     while (n > 9) {
         glyph++;
         n -= 10;
     }
     SetDigitVisible(p, base + 1, glyph);
-    Anim_SelectWidgetGlyph(&p->slots[base + 1], &p->glyphs, (u16)glyph);
+    AnimSprite_SelectGlyph(&p->slots[base + 1], &p->glyphs, (u16)glyph);
     glyph = 0x3e;
     while (n > 0) {
         glyph++;
         n--;
     }
-    Anim_SelectWidgetGlyph(&p->slots[base + 2], &p->glyphs, (u16)glyph);
+    AnimSprite_SelectGlyph(&p->slots[base + 2], &p->glyphs, (u16)glyph);
 }

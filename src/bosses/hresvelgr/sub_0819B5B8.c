@@ -1,6 +1,5 @@
 #include "global.h"
 /* Math_ApproachAngleArrayByEighth: Approaches each target angle by one eighth of the shortest difference with a minimum unit step */
-#define Math_ApproachAngleArrayByEighth sub_0819B5B8
 
 static inline s32 AngleNear(s32 angle, s32 ref)
 {
@@ -37,7 +36,7 @@ static inline void ApproachArray(s32 count, s16 *cur, s16 *target)
     }
 }
 
-void sub_0819B5B8(s16 *cur, s16 *target, s32 count)
+void Math_ApproachAngleArrayByEighth(s16 *cur, s16 *target, s32 count)
 {
     ApproachArray(count, cur, target);
 }

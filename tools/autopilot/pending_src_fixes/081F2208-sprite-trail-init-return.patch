@@ -4,11 +4,11 @@ SpatialIndex_InitEntry returns by popping LR into r0.
 
 The explicit form changed the ROM bytes. The guarded form passed the unit ROM check.
 
---- a/src/fn/sub_081F2208.c
-+++ b/src/fn/sub_081F2208.c
+--- a/src/bosses/vanargand/sub_081F2208.c
++++ b/src/bosses/vanargand/sub_081F2208.c
 @@ -64,3 +64,6 @@
      SpatialIndex_InitEntry(collider, &position, &size, &offset, 12, 5, 1, p->collisionArg0,
-                            p->collisionArg1, SingletonSlot7_OnEffectMotionComplete, p);
+                            p->collisionArg1, VanargandHead_OnEffectMotionComplete, p);
 +#ifdef UBFIX
 +    return 0x081F2377; // preserve the inherited GBA return value
 +#endif

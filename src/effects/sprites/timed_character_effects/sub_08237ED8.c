@@ -26,7 +26,6 @@ struct OrbitParticle {
     u16 variant, timer;
 };
 // confidence=low: moving collider stops on terrain, then plays a short variant-dependent impact.
-#define PlayerOrbitEffect_UpdateMovingParticle sub_08237ED8
 s32 PlayerOrbitEffect_UpdateMovingParticle(struct OrbitParticle *p)
 {
     if (p->phase) {

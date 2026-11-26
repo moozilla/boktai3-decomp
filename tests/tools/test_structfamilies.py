@@ -97,6 +97,24 @@ void F(struct Owner *p, int n) {
         refs = evidence.References(ast, tu, "src/a.c")
         self.assertEqual([r[5] for r in refs.calls], [("src/a.c:struct Item", (), 0)])
 
+    @unittest.skipUnless(hasattr(evidence.c_parser.CParser, "_parse_primary_expression"),
+                         "GNU statement expressions need recursive-descent pycparser")
+    def test_statement_expression_preserves_embedded_call_evidence(self):
+        path = "src/a.c"
+        text = TYPES + """
+struct Body { u16 flags; };
+struct Host { struct Body body; };
+void Tick(struct Body *);
+unsigned Host_Run(struct Host *p) {
+    unsigned direction = ({ Tick(&p->body); 3; }) << 6;
+    return direction | ({ Tick(&p->body); 1; });
+}
+"""
+        _, _, ast, tu = parse(text, path)
+        refs = evidence.References(ast, tu, path)
+        self.assertEqual([call[5] for call in refs.calls], [(f"{path}:struct Host", ("body",), 0)] * 2)
+        self.assertEqual([call[6] for call in refs.calls], [f"{path}:struct Body"] * 2)
+
     def test_distinct_layouts_need_object_evidence(self):
         a = "src/a.c:struct PlayerWork"
         b = "src/b.c:struct PlayerWork"

@@ -7,10 +7,12 @@ import io
 import os
 from pathlib import Path
 import re
+import shutil
 import subprocess
+import sys
 
 from source_layout import (
-    HEADER_DIRS, SOURCE_DIRS, SOURCE_FILES, directory_for, groups, header_paths, is_upstream,
+    ADDRESS, HEADER_DIRS, SOURCE_DIRS, SOURCE_FILES, directory_for, groups, header_paths, is_upstream,
     layout_path, manifest, new_filename, scan, source_paths, source_placements, source_rules, symbol_names,
 )
 
@@ -18,16 +20,57 @@ ROOT = Path(__file__).resolve().parents[1]
 INCLUDE = re.compile(r'(?P<begin>#[ \t]*include[ \t]+\\?")(?P<name>[^"\\\n]+)(?P<end>\\?")')
 HEADER_LITERAL = re.compile(r'''(?P<quote>["'])(?P<name>[\w.-]+/[\w/.-]+\.h)(?P=quote)''')
 PATH = re.compile(r'(?<![\w/])((?:\.\./)*)(?P<path>(?:src|include)/[\w./-]+\.[ch])(?![\w.-])')
+PATCH_HEAD = re.compile(r'^(diff --git |--- |\+\+\+ |rename (?:from|to) )([^\n]*)', re.M)
+PATCH_PATH = re.compile(r'(?<!\S)(?P<side>[ab]/)?(?P<path>(?:src|include)/[\w./-]+\.[ch])(?=$|\s)')
 TEXT_SUFFIXES = {".c", ".h", ".csv", ".ld", ".md", ".py", ".js", ".mjs", ".html", ".sh", ".ts", ".tsx", ".yml"}
 IDENTIFIER = re.compile(r"[A-Za-z_][A-Za-z_0-9]*")
 SYMBOL = re.compile(r"\b[A-Za-z_][A-Za-z_0-9]*\b")
 FILE_SUFFIX = re.compile(r"\.(?:c|h|s|inc|py|ts|md)\b")
+TYPE_TAG = re.compile(r"\b(?:struct|union|enum)\s+([A-Za-z_]\w*)")
+# Layout audit records: their old paths and names are the record, so replay leaves them alone.
+LAYOUT_RECORDS = (Path("symbols/identity_corrections.csv"), Path("symbols/identity_prefix_evidence.csv"))
+IDENTITY_RECORDS = {Path("symbols/identities.csv"), *LAYOUT_RECORDS}
+PENDING_PATCH_DIRS = {("tools", "autopilot", "pending_src_fixes"), ("tools", "testbench", "pending_src_fixes")}
 
 
-# Layout audit records: their old paths are the record, so replay leaves them alone.
-LAYOUT_RECORDS = (Path("symbols/identity_corrections.csv"), Path("symbols/prefix_renames.csv"))
+def pending_patch(path):
+    return path.suffix == ".patch" and path.parts[:3] in PENDING_PATCH_DIRS
+
+
+def column_limit():
+    style = ROOT / ".clang-format"
+    if not style.is_file():
+        return 0
+    limit = re.search(r"^ColumnLimit:\s*(\d+)", style.read_text(), re.M)
+    return int(limit[1]) if limit else 0
+
+
+def overlong_rewrites(before, after, limit):
+    """Select lines that crossed the column limit during a name-only rewrite."""
+    return [index for index, (old, new) in enumerate(zip(before.splitlines(), after.splitlines()), 1)
+            if len(old.expandtabs()) <= limit < len(new.expandtabs())]
+
+
+def format_lines(path, raw, lines):
+    if not lines:
+        return raw
+    bundled = ROOT / "build" / "venv" / "bin" / "clang-format"
+    formatter = os.environ.get("CLANG_FORMAT") or (str(bundled) if bundled.is_file()
+                                                   else shutil.which("clang-format"))
+    if not formatter:
+        raise ValueError(f"{path}: clang-format is needed to wrap renamed lines")
+    return subprocess.run([formatter, f"--assume-filename={ROOT / path}",
+                           *(f"--lines={line}:{line}" for line in lines)], cwd=ROOT,
+                          input=raw.encode("utf-8", errors="surrogateescape"), stdout=subprocess.PIPE,
+                          check=True).stdout.decode("utf-8", errors="surrogateescape")
+
 
 def tracked_paths():
+    if file_list := os.environ.get("BOKTAI3_REPLAY_PATHS"):
+        paths = {Path(path) for path in Path(file_list).read_text().split("\0") if path}
+        if any(path.is_absolute() or ".." in path.parts for path in paths):
+            raise ValueError(f"{file_list}: expected repository-relative paths")
+        return paths
     out = subprocess.check_output(["git", "ls-files", "--cached", "--others", "--exclude-standard", "-z"], cwd=ROOT)
     return {Path(path) for path in out.decode().split("\0") if path}
 
@@ -54,101 +97,190 @@ def write_updates(updates):
         raise
 
 
-def prefix_rows(table, names):
-    """Resolve prefix rules in the directories that define their functions."""
-    rules = table_rows(table, ("old_prefix", "new_prefix"))
-    files = scan(ROOT).files if any(row.get("scope") not in (None, "", "all") for row in rules) else {}
-    rows = {}
-    for rule in rules:
-        old, new = rule["old_prefix"] or "", rule["new_prefix"] or ""
+def prefix_rules(table):
+    rules = []
+    for row in table_rows(table, ("old_prefix", "new_prefix")):
+        old, new = row["old_prefix"] or "", row["new_prefix"] or ""
         if not all(IDENTIFIER.fullmatch(prefix) for prefix in (old, new)):
             raise ValueError(f"{table}: invalid prefix rule {old!r} -> {new!r}")
-        scope = (rule.get("scope") or "all").rstrip("/")
-        for address, name in names.items():
-            if not name.startswith(old):
-                continue
-            path, _ = files.get(address, ("", ""))
-            if scope != "all" and not (path == scope or path.startswith(scope + "/")):
-                continue
-            change = {"addr": f"{address:08X}", "old_name": name, "new_name": new + name[len(old):]}
-            if rows.setdefault(address, change) != change:
-                raise ValueError(f"{table}: overlapping prefix rules for {name} at {address:08X}")
-    return list(rows.values())
+        rules.append((old, new, (row.get("scope") or "all").rstrip("/")))
+    return rules
 
 
-def function_renames(table, prefixes=False, apply=False):
+def in_scope(path, scope):
+    return scope == "all" or path == scope or path.startswith(scope + "/")
+
+
+def prefix_targets(name, prefixes):
+    """Use the most specific spelling when a particular helper needs its own name."""
+    matches = [(len(old), new + name[len(old):]) for old, new in prefixes if name.startswith(old)]
+    longest = max((length for length, _ in matches), default=0)
+    return {target for length, target in matches if length == longest}
+
+
+def prefix_rows(table, rules, names):
+    """Resolve prefix rules in the directories that define their functions."""
+    files = scan(ROOT).files if any(scope != "all" for _, _, scope in rules) else {}
+    starts = tuple(old for old, _, _ in rules)
+    rows = []
+    for address, name in names.items():
+        if not name.startswith(starts):
+            continue
+        path, _ = files.get(address, ("", ""))
+        choices = prefix_targets(name, [(old, new) for old, new, scope in rules if in_scope(path, scope)])
+        if len(choices) > 1:
+            raise ValueError(f"{table}: overlapping prefix rules for {name} at {address:08X}")
+        if choices:
+            rows.append({"addr": f"{address:08X}", "old_name": name, "new_name": choices.pop()})
+    return rows
+
+
+def skip_prefix_collisions(table, rows, names):
+    remaining = {int(row["addr"], 16): row for row in rows}
+    protected = set()
+    while True:
+        current = names | {address: row["new_name"] for address, row in remaining.items()}
+        counts = Counter(current.values())
+        collisions = [address for address, row in remaining.items() if counts[row["new_name"]] > 1]
+        if not collisions:
+            return list(remaining.values()), protected
+        for address in collisions:
+            row = remaining.pop(address)
+            protected.add(row["old_name"])
+            print(f"skip {table}: {address:08X} {row['old_name']} -> {row['new_name']} would collide",
+                  file=sys.stderr)
+
+
+def function_renames(table, prefixes=False, apply=False, *, skip_diverged=False,
+                     skip_collisions=False, warn_types=False, settled_references=False, wrap=False):
     """Rewrite reviewed function symbols as one simultaneous substitution."""
     names = symbol_names(ROOT)
-    rows = prefix_rows(table, names) if prefixes else table_rows(table, ("addr", "old_name", "new_name"))
-    new_names, replacements, settled = {}, {}, set()
+    rules = prefix_rules(table) if prefixes else []
+    rows = prefix_rows(table, rules, names) if prefixes else table_rows(table, ("addr", "old_name", "new_name"))
+    protected = set()
+    if skip_collisions:
+        rows, protected = skip_prefix_collisions(table, rows, names)
+    new_names, replacements, settled, seen = {}, {}, set(), set()
+    retired = defaultdict(set)
     for row in rows:
         address = int(row["addr"] or "", 16)
         old, new = row["old_name"] or "", row["new_name"] or ""
-        if not all(IDENTIFIER.fullmatch(name) for name in (old, new)) or address in new_names:
+        prior = (row.get("prior_names") or "").split("|") if row.get("prior_names") else ()
+        if not all(IDENTIFIER.fullmatch(name) for name in (old, new, *prior)) or address in seen:
             raise ValueError(f"{table}: invalid or repeated rename at {address:08X}")
+        seen.add(address)
         current = names.get(address)
-        if current not in (old, new):
-            raise ValueError(f"{table}: {address:08X} is {current!r}, expected {old!r} or {new!r}")
+        if current not in (old, new, *prior):
+            message = f"{table}: {address:08X} is {current!r}, expected {old!r} or {new!r}"
+            if not skip_diverged:
+                raise ValueError(message)
+            print(f"skip {message}", file=sys.stderr)
+            continue
         new_names[address] = new
         if current == new:
             settled.add(new)
-        elif replacements.setdefault(old, new) != new:
-            raise ValueError(f"{table}: {old} cannot be renamed unambiguously")
+            if settled_references:
+                for previous in (old, *prior):
+                    if previous != new:
+                        retired[previous].add(new)
+        elif replacements.setdefault(current, new) != new:
+            raise ValueError(f"{table}: {current} cannot be renamed unambiguously")
     collisions = Counter((names | new_names).values())
     for name in new_names.values():
         if collisions[name] != 1:
             raise ValueError(f"{table}: function name {name} would collide")
     if settled & replacements.keys():
         raise ValueError(f"{table}: a completed rename overlaps a pending old name")
+    tooling = {}
+    active = set(names.values()) | set(new_names.values())
+    for old, targets in retired.items():
+        if old in active or len(targets) != 1:
+            print(f"skip {table}: retired spelling {old} is active or ambiguous", file=sys.stderr)
+            continue
+        new = next(iter(targets))
+        tooling[old] = new
+        tooling[old + "__addr"] = new + "__addr"
     replacements.update({old + "__addr": new + "__addr" for old, new in list(replacements.items())})
-    return rewrite_identifiers(table, replacements, apply)
+    return rewrite_identifiers(table, replacements, apply, prefix_scopes=rules,
+                               protected=protected, warn_types=warn_types, tooling=tooling, wrap=wrap)
 
 
-def type_renames(table, apply=False):
+def type_renames(table, apply=False, *, wrap=False):
     """Replay whole-identifier type and inline-helper names without changing the symbol map."""
-    replacements = {}
+    by_scope = defaultdict(dict)
     for row in table_rows(table, ("old_name", "new_name")):
         old, new = row["old_name"] or "", row["new_name"] or ""
-        if not all(IDENTIFIER.fullmatch(name) for name in (old, new)) or old in replacements:
+        scope = (row.get("scope") or "all").rstrip("/")
+        if not all(IDENTIFIER.fullmatch(name) for name in (old, new)) or old in by_scope[scope]:
             raise ValueError(f"{table}: invalid or repeated type rename {old!r} -> {new!r}")
-        replacements[old] = new
-    names = set(replacements.values())
-    if len(names) != len(replacements) or names & replacements.keys():
-        raise ValueError(f"{table}: overlapping type renames")
-    return rewrite_identifiers(table, replacements, apply)
+        by_scope[scope][old] = new
+    for replacements in by_scope.values():
+        names = set(replacements.values())
+        if len(names) != len(replacements) or names & replacements.keys():
+            raise ValueError(f"{table}: overlapping type renames")
+    return rewrite_identifiers(table, by_scope.pop("all", {}), apply, exact_scopes=by_scope, wrap=wrap)
 
 
-def rewrite_identifiers(table, replacements, apply):
-    if not replacements:
+def rewrite_identifiers(table, replacements, apply, *, prefix_scopes=(), exact_scopes=None,
+                        protected=(), warn_types=False, tooling=None, wrap=False):
+    if not (replacements or prefix_scopes or exact_scopes or tooling):
         return 0
 
-    def rewrite(raw):
+    warned = set()
+
+    def rewrite(raw, rel):
+        path = rel.as_posix()
+        retired = tooling if tooling and rel.parts[0] in ("tools", "port", "tests") else {}
+        exact = [names for scope, names in (exact_scopes or {}).items() if in_scope(path, scope)]
+        prefixes = [(old, new) for old, new, scope in prefix_scopes
+                    if rel.suffix in (".c", ".h") and in_scope(path, scope)]
+        starts = tuple(old for old, _ in prefixes)
+        if warn_types and prefixes:
+            type_prefixes = tuple(old.rstrip("_") for old in starts if old.endswith("_"))
+            for name in TYPE_TAG.findall(raw):
+                if name not in warned and name.startswith(type_prefixes):
+                    warned.add(name)
+                    print(f"warning: {rel}: check legacy type {name} against the reviewed type table",
+                          file=sys.stderr)
+
         def replace(match):
             name = match[0]
-            renamed = replacements.get(name)
-            if renamed is None or FILE_SUFFIX.match(raw, match.end()):
+            if protected and name.removesuffix("__addr") in protected:
                 return name
-            return renamed
+            renamed = replacements.get(name) or retired.get(name)
+            if renamed is None and (exact or name.startswith(starts)):
+                choices = {names[name] for names in exact if name in names}
+                choices.update(prefix_targets(name, prefixes))
+                if len(choices) > 1:
+                    raise ValueError(f"{rel}: conflicting scoped renames for {name}")
+                renamed = next(iter(choices), None)
+            return name if renamed is None or FILE_SUFFIX.match(raw, match.end()) else renamed
 
-        return SYMBOL.sub(replace, raw)
+        return SYMBOL.sub(replace, raw) if replacements or retired or exact or prefixes else raw
 
     paths = tracked_paths() | {Path("symbols/functions.csv")}
     paths.update(p.relative_to(ROOT) for p in source_paths(ROOT) + header_paths(ROOT))
     changed = []
     input_table = table.resolve()
+    limit = column_limit() if wrap else 0
     for rel in sorted(paths):
-        if (rel.parts[0] == "build" or rel.parts[:2] == ("docs", "history") or
+        if (rel.parts[0] in ("build", "notes") or rel in IDENTITY_RECORDS or
+                rel.parts[:2] == ("docs", "history") or
                 rel.name in ("PROGRESS.json", "PROGRESS.md") or
-                rel in (Path("symbols/function_renames.csv"), Path("symbols/type_renames.csv")) or
-                rel.suffix not in TEXT_SUFFIXES | {".s", ".inc", ".json", ".txt", ".tsv"}):
+                rel in (Path("symbols/function_renames.csv"), Path("symbols/type_renames.csv"),
+                        Path("symbols/prefix_renames.csv")) or
+                (rel.suffix not in TEXT_SUFFIXES | {".s", ".inc", ".json", ".txt", ".tsv"}
+                 and not (tooling and pending_patch(rel)))):
             continue
         path = ROOT / rel
         if not path.is_file() or path.resolve() == input_table:
             continue
         original = path.read_bytes()
         raw = original.decode("utf-8", errors="surrogateescape")
-        updated = rewrite(raw)
+        updated = rewrite(raw, rel)
         if updated != raw:
+            if limit and rel.parts[0] in ("src", "include") and not is_upstream(rel):
+                updated = format_lines(rel, updated, overlong_rewrites(raw, updated, limit))
             print(f"rewrite {rel}")
             changed.append((path, original, updated.encode("utf-8", errors="surrogateescape")))
     if apply:
@@ -204,9 +336,10 @@ def header_destination(old, recorded, folders, owners, rules):
     raise ValueError(f"{old}: {reason}; add a placement in {HEADER_DIRS}")
 
 
-def plan_files(recorded, rename):
-    manifest = scan(ROOT)
+def plan_files(recorded, rename, manifest):
     names = symbol_names(ROOT)
+    plans = {record.start: record.planned_basename for record in source_placements(ROOT)
+             if record.planned_basename} if rename else {}
     spellings = {}
     for old, target in recorded.items():
         casefolded = old.as_posix().casefold()
@@ -224,8 +357,13 @@ def plan_files(recorded, rename):
         new = spellings.get(old.as_posix().casefold(), directory / old.name)
         if new.parent != directory:
             raise ValueError(f"{old}: first function {first:08X} belongs under {directory}")
-        if rename and len(addresses) == 1 and not is_upstream(old):
-            new = new.with_name(new_filename(names.get(first, f"sub_{first:08X}"), first))
+        if rename and not is_upstream(old):
+            if first in plans:
+                new = new.with_name(plans[first])
+            elif len(addresses) == 1 or ADDRESS.fullmatch(old.stem):
+                name = names.get(first, f"sub_{first:08X}")
+                if not ADDRESS.fullmatch(name) or ADDRESS.fullmatch(new.stem):
+                    new = new.with_name(new_filename(name, first))
         moves[old] = new
         folder = Path("include", *new.parent.parts[1:3])
         owners[old.stem].add(folder)
@@ -252,6 +390,15 @@ def transform(path, raw, moves, includes):
 
     raw = INCLUDE.sub(include, raw)
     raw = HEADER_LITERAL.sub(literal, raw)
+    if "src/" not in raw and "include/" not in raw:
+        return raw
+
+    if pending_patch(path):
+        def patch_path(match):
+            old = Path(match["path"])
+            return (match["side"] or "") + moves.get(old, old).as_posix()
+
+        raw = PATCH_HEAD.sub(lambda match: match[1] + PATCH_PATH.sub(patch_path, match[2]), raw)
 
     def reference(match):
         old = Path(match["path"])
@@ -263,27 +410,49 @@ def transform(path, raw, moves, includes):
     return PATH.sub(reference, raw)
 
 
-def migrate(rename=False, apply=False):
+def migrate(rename=False, apply=False, *, remember=None):
     recorded = recorded_moves()
-    moves = plan_files(recorded, rename)
+    manifest = scan(ROOT)
+    moves = plan_files(recorded, rename, manifest)
+
+    # An already renamed file can still have historical paths in the placement table.
+    live_sources = {}
+    for placement in source_placements(ROOT):
+        if placement.target in moves:
+            continue
+        entry = manifest.files.get(placement.start)
+        if entry is not None:
+            source = Path(entry[0])
+            if moves[source].parent == placement.target.parent:
+                live_sources[placement.target] = source
+    if live_sources:
+        recorded = {old: live_sources.get(target, target) for old, target in recorded.items()}
+    if remember:
+        remember(recorded | moves)
     return rewrite_moves(recorded, moves, apply)
 
 
 def rewrite_moves(recorded, moves, apply, *, input_table=None):
     occupied = {}
+    duplicates = set()
     for old, new in moves.items():
+        if old != new and (ROOT / new).exists() and not (ROOT / old).samefile(ROOT / new):
+            if (old.suffix == ".h" and moves.get(new) == new
+                    and (ROOT / old).read_bytes() == (ROOT / new).read_bytes()):
+                duplicates.add(old)
+                continue
+            raise ValueError(f"{old}: {new} already exists")
         previous = occupied.setdefault(new.as_posix().casefold(), old)
         if previous != old:
             raise ValueError(f"{previous} and {old} both map to {new}")
-        if old != new and (ROOT / new).exists() and not (ROOT / old).samefile(ROOT / new):
-            raise ValueError(f"{old}: {new} already exists")
 
     references = {old: moves.get(new, new) for old, new in recorded.items()} | moves
     includes = {old.relative_to("include").as_posix(): new.relative_to("include").as_posix()
                 for old, new in references.items() if old.parts[0] == "include"}
     paths = set(moves)
     for path in tracked_paths():
-        if (path.parts[0] not in ("src", "include", "tests", "build") and path.suffix in TEXT_SUFFIXES
+        if (path.parts[0] not in ("src", "include", "tests", "build")
+                and (path.suffix in TEXT_SUFFIXES or pending_patch(path))
                 and path not in (SOURCE_DIRS, SOURCE_FILES, HEADER_DIRS, *LAYOUT_RECORDS)
                 and path not in (Path("PROGRESS.md"), Path("docs/SOURCE_LAYOUT_DECISIONS.md"))
                 and path.parts[:2] != ("docs", "history")):
@@ -296,7 +465,9 @@ def rewrite_moves(recorded, moves, apply, *, input_table=None):
         raw = (ROOT / old).read_bytes().decode("utf-8", errors="surrogateescape")
         new = moves.get(old, old)
         updated = transform(old, raw, references, includes)
-        if new != old:
+        if old in duplicates:
+            print(f"remove {old} (identical to {new})")
+        elif new != old:
             print(f"{old} -> {new}")
         elif updated != raw:
             print(f"rewrite {old}")
@@ -305,6 +476,9 @@ def rewrite_moves(recorded, moves, apply, *, input_table=None):
 
     if apply:
         for old, new, updated in changed:
+            if old in duplicates:
+                (ROOT / old).unlink()
+                continue
             if new != old:
                 (ROOT / new).parent.mkdir(parents=True, exist_ok=True)
                 (ROOT / old).rename(ROOT / new)
@@ -399,22 +573,39 @@ def main():
     action.add_argument("--apply", action="store_true", help="perform the printed plan")
     action.add_argument("--check", action="store_true", help="fail if the tree disagrees with the reviewed layout")
     operation = parser.add_mutually_exclusive_group()
-    operation.add_argument("--rename", action="store_true", help="also name one-function files from the symbol map")
+    operation.add_argument("--rename", action="store_true", help="also plan source basenames from ROM order and the naming table")
     operation.add_argument("--function-renames", type=Path, help="read exact addr,old_name,new_name rows")
     operation.add_argument("--function-prefixes", type=Path, help="read old_prefix,new_prefix[,scope] rows")
     operation.add_argument("--player-moves", type=Path, help="read file,new_path[,note] Player routes")
     operation.add_argument("--type-renames", type=Path, help="read exact old_name,new_name identifier rows")
+    parser.add_argument("--skip-diverged", action="store_true",
+                        help="report and skip exact rows with a different symbol at the address")
+    parser.add_argument("--skip-collisions", action="store_true", help="report and skip colliding prefix renames")
+    parser.add_argument("--warn-types", action="store_true", help="report remaining scoped legacy type tags")
+    parser.add_argument("--settled-references", action="store_true",
+                        help="also update retired spellings in tools, port, and tests")
+    parser.add_argument("--wrap-renames", action="store_true",
+                        help="format C lines pushed beyond the configured width")
     args = parser.parse_args()
+    if (args.skip_diverged or args.settled_references) and not args.function_renames:
+        parser.error("--skip-diverged and --settled-references require --function-renames")
+    if (args.skip_collisions or args.warn_types) and not args.function_prefixes:
+        parser.error("--skip-collisions and --warn-types require --function-prefixes")
+    if args.wrap_renames and not (args.function_renames or args.function_prefixes or args.type_renames):
+        parser.error("--wrap-renames requires a rename table")
     try:
         if table := args.function_renames or args.function_prefixes:
-            changes = function_renames(table, prefixes=args.function_prefixes is not None, apply=args.apply)
+            changes = function_renames(table, prefixes=args.function_prefixes is not None,
+                                       apply=args.apply, skip_diverged=args.skip_diverged,
+                                       skip_collisions=args.skip_collisions, warn_types=args.warn_types,
+                                       settled_references=args.settled_references, wrap=args.wrap_renames)
         elif args.type_renames:
-            changes = type_renames(args.type_renames, args.apply)
+            changes = type_renames(args.type_renames, args.apply, wrap=args.wrap_renames)
         elif args.player_moves:
             changes = player_moves(args.player_moves, args.apply)
         else:
             changes = migrate(args.rename, args.apply)
-    except ValueError as error:
+    except (ValueError, subprocess.CalledProcessError) as error:
         parser.error(str(error))
     print(f"{changes} paths {'updated' if args.apply else 'to update'}")
     return int(args.check and changes != 0)

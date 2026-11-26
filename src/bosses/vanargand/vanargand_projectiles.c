@@ -504,7 +504,6 @@ initializeSprite:
 
 // confidence=low: the extra source position is retained for the approach-launch state.
 
-#define VanargandProjectile_CreateWithSource sub_081B71D4
 
 s32 VanargandProjectile_CreateWithSource(struct VanargandProjectilePool *pool,
                                          struct ContactPosition *position,

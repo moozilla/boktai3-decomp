@@ -1,6 +1,6 @@
 #include "ui/town/shop_catalog.h"
 extern const s8 gUnk_0824DF6C[];
-void Shop_BuildUnlockedItemCatalog(struct SceneInventoryScriptCatalog *p)
+void Shop_BuildUnlockedItemCatalog(struct ShopScriptCatalog *p)
 {
     s32 page;
     s32 i;

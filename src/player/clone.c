@@ -401,7 +401,7 @@ void PlayerClone_InitSlot(void *unused, struct PlayerCloneSlot *s, u32 arg)
         ResourceHeader_Relocate(obj, res);
         {
             struct AnimSprite *p = &s->animation;
-            Widget_InitLinked(p, obj, 0, 0, 2, 1, zero, zero);
+            AnimSprite_InitLinked(p, obj, 0, 0, 2, 1, zero, zero);
             s->animation.flags |= 1;
             value = ActorDebris_Create(p, &s->foldedFacing, &s->mirrored);
             s->debris = value;
@@ -766,7 +766,6 @@ static inline void PlayerClone_ClearVelocity(const u32 *zero, struct ContactPosi
     CpuSet(zero, velocity, 0x05000002);
 }
 
-#define PlayerClone_Spawn sub_08201160
 
 s32 PlayerClone_Spawn(struct PlayerCloneConfiguration *resource, struct ContactPosition *pos)
 {

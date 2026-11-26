@@ -1,7 +1,6 @@
 #include "scene/actor/scene_actor_control_helpers.h"
 #include "scene/motion/scene_actor_terrain.h"
 /* SceneActorControl_ReflectTerrainProbe: Reverses secondary horizontal motion and stops primary horizontal motion when projected terrain exceeds current ground height. */
-#define SceneActorControl_ReflectTerrainProbe sub_08083F5C
 
 void SceneActorControl_ReflectTerrainProbe(struct ChaseActor *actor)
 {

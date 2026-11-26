@@ -9,7 +9,6 @@ static inline s32 scale(s32 v)
 }
 
 // confidence=low: initializes a fixed radial offset opposite the stored action heading.
-#define Player_InitFacingDriftOffset sub_0823B5D8
 void Player_InitFacingDriftOffset(struct Player *p)
 {
     if (!p->cameraOffsetActive) {

@@ -28,7 +28,7 @@ extern const u32 gUnk_086140A4[];
 
 struct CollectionRes *ScriptProc_Start(u32, u32);
 void ResourceHeader_Relocate(void *, void *);
-void Widget_InitLinked(void *, void *, int, int, int, int, int, void *);
+void AnimSprite_InitLinked(void *, void *, int, int, int, int, int, void *);
 s32 CollectionBook_IsComplete(void);
 s32 Mod(s32, s32);
 void AnimData_Load(void *, u32);
@@ -47,25 +47,25 @@ void sub_0821358C(u8 *m)
     res = ScriptProc_Start(0xcb05, 0xe2ab);
     *(struct CollectionRes *)(m + 0x24) = *res;
     ResourceHeader_Relocate(m + 0x24, res);
-    Widget_InitLinked(m + 0x64, m + 0x24, 0x57, 0x10, 0, 0, 0, 0);
-    Widget_InitLinked(m + 0xc4, m + 0x24, 0x58, 0x10, 0, 0, 0, 0);
-    Widget_InitLinked(m + 0x124, m + 0x24, 0x3e, 0x10, 0, 0, 0, 0);
+    AnimSprite_InitLinked(m + 0x64, m + 0x24, 0x57, 0x10, 0, 0, 0, 0);
+    AnimSprite_InitLinked(m + 0xc4, m + 0x24, 0x58, 0x10, 0, 0, 0, 0);
+    AnimSprite_InitLinked(m + 0x124, m + 0x24, 0x3e, 0x10, 0, 0, 0, 0);
     if (!CollectionBook_IsComplete())
         *(u32 *)(m + 0x12c) |= 1;
     pos.x = 0xb8;
     pos.y = 0x68;
     pos.z = 0;
     for (i = 0; i < 4; i++) {
-        Widget_InitLinked(m + 0x1e4 + i * 0x60, m + 0x24, 0, 0x10, 0, 0, 0, &pos);
+        AnimSprite_InitLinked(m + 0x1e4 + i * 0x60, m + 0x24, 0, 0x10, 0, 0, 0, &pos);
         pos.x += 8;
         if (i == 1)
             pos.x += 8;
     }
-    Widget_InitLinked(m + 0x184, m + 0x24, 0x59, 0x10, 0, 0, 0, 0);
+    AnimSprite_InitLinked(m + 0x184, m + 0x24, 0x59, 0x10, 0, 0, 0, 0);
     res = ScriptProc_Start(0xcb05, 0x530d);
     *(struct CollectionRes *)(m + 0x44) = *res;
     ResourceHeader_Relocate(m + 0x44, res);
-    Widget_InitLinked(m + 0x364, m + 0x44, 0x50, 0x10, 0, 0, 0, 0);
+    AnimSprite_InitLinked(m + 0x364, m + 0x44, 0x50, 0x10, 0, 0, 0, 0);
     pos.x = 0x28;
     pos.y = 0x28;
     for (i = 0; i < 10; i++) {

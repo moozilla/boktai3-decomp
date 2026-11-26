@@ -78,7 +78,6 @@ void SceneActorGraphics_SelectResource(struct T *t)
     }
 }
 
-#define SceneActorGraphics_OnDamageContact sub_08021F4C
 void Collision_CalculateDamageResponse(void *, void *);
 void PlayerStats_AddContactHundredths(void *, void *, s32);
 void Sound_PlaySongChecked(u32);
@@ -227,7 +226,7 @@ void SceneActorGraphics_InitializeBody(struct StateActor *p)
     }
 }
 
-void sub_08021F4C(u8 *, u8 *, u8 *);
+void SceneActorGraphics_OnDamageContact(u8 *, u8 *, u8 *);
 
 void SceneActorGraphics_InitializeOverlay(struct StateActor *p, int resource)
 {
@@ -241,7 +240,7 @@ void SceneActorGraphics_InitializeOverlay(struct StateActor *p, int resource)
     rotation.z = 0;
     Collider_Init(drawable, 0, 0x5101, 0, 16, &scale, &rotation);
     Collider_SetPosition(drawable, &p->worldPosition, 0);
-    Collider_SetCallback(drawable, sub_08021F4C, p);
+    Collider_SetCallback(drawable, SceneActorGraphics_OnDamageContact, p);
     Collider_SetBodyProperties(drawable, resource, 0x802, 1);
     Collider_Refresh(drawable);
 }
@@ -529,7 +528,7 @@ typedef struct BurstVec {
 extern const BurstVec gUnk_08604D84[];
 u16 Sqrt(u32);
 s32 Div(s32, s32);
-void AnimatedParticles_EmitBurst(void *, s32, s32, s32, s32, s32, s32, s32);
+void ImpactBurst_EmitBurst(void *, s32, s32, s32, s32, s32, s32, s32);
 void TransientSpriteEffects_Spawn(int, int, void *, void *, int, int);
 
 /* Emit particles away from a point above the center of the burst. */
@@ -563,7 +562,7 @@ void sub_08022878(BurstVec *p)
         pos.y = (s16)(p->y + gUnk_08604D84[i].y - 16) + (BurstRandom(data) & 0x1f);
         pos.z = (s16)(p->z + gUnk_08604D84[i].z - 16) + (BurstRandom(data) & 0x1f);
         data = &pos;
-        AnimatedParticles_EmitBurst(data, 1, 0, 0x40, 0xc, 0xc, 4, 4);
+        ImpactBurst_EmitBurst(data, 1, 0, 0x40, 0xc, 0xc, 4, 4);
         vel.x = pos.x - center.x;
         vel.y = pos.y - center.y;
         vel.z = pos.z - center.z;
@@ -745,7 +744,6 @@ fail:
 }
 
 // confidence=low: chooses the next action phase from the reaction kind and flash state.
-#define SceneActorState_SelectReactionPhase sub_08022DBC
 static inline s32 SceneActorState_GetHealthRatio(const struct StateActor *actor)
 {
     s32 ratio = actor->healthRatio;
@@ -805,7 +803,6 @@ void SceneActorState_SelectReactionPhase(u8 *p)
 }
 
 // confidence=low: reaction-kind selector controls the far-point mode and motion timer.
-#define SceneActorState_SnapReactionPosition sub_08022EA4
 void Path_SnapToRandomFarPoint(void *, void *, u32, u32);
 struct SnapVector {
     u32 a, b;
@@ -1656,7 +1653,6 @@ void SceneActorState_UpdateLongRecovery(struct SceneGraphicsActor *actor)
         p->actionTimer++;
 }
 // confidence=low: variant-dependent recovery animations and timed return to the default action.
-#define SceneActorState_UpdateVariantRecovery sub_0802483C
 void SceneActorState_UpdateVariantRecovery(struct SceneGraphicsActor *actor)
 {
     struct StateActor *p = (struct StateActor *)actor;

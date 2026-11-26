@@ -97,7 +97,6 @@ static inline void FragmentEffect_ComputeOffset(struct ContactPosition *out, u32
     out->y = 0;
     out->z = FragmentEffect_Truncate(scale * gUnk_086149C4[angle & 255]);
 }
-#define FragmentEffect_Create sub_0812CAAC
 void FragmentEffect_Create(const struct ContactPosition *position, u32 angle, u32 angularSpeed,
                            s32 radius, s32 direction, s32 lifetime, u32 a, u32 b, u32 c, u32 d)
 {

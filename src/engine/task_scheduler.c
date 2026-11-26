@@ -1,5 +1,3 @@
-#define Task_KillById   sub_0821A168
-#define Task_TryDestroy sub_0821A0CC
 #include "engine/task_scheduler.h"
 #include "engine/engine_globals.h"
 #include "engine/video/render.h"

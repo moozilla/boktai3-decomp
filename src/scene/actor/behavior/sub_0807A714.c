@@ -4,20 +4,6 @@
 #include "scene/motion/scene_actor_chase_shared.h"
 #include "scene/motion/scene_actor_terrain_reaction.h"
 void SceneActorAttachment_BeginReturnResponse(struct ChaseActor *);
-static inline void SetControl(struct ChaseActor *actor, void *control, u32 kind)
-{
-    actor->base.field2B2 = 1;
-    actor->base.stepDone = 0;
-    actor->base.controlKind = kind;
-    actor->base.target = control;
-    actor->base.field2C8 = 0;
-    {
-        u32 *flags = &actor->base.pendingControlFlags;
-        u32 mask = ~1;
-        *flags &= mask;
-    }
-    actor->base.pendingControl = 0;
-}
 s32 SceneActorBehavior_DispatchPendingFlags(struct ChaseActor *actor)
 {
     u32 unavailable = SceneActor_ActionsBlocked((void *)actor);
@@ -31,7 +17,7 @@ s32 SceneActorBehavior_DispatchPendingFlags(struct ChaseActor *actor)
         }
         if (SceneActorPlacement_TestFlags(flags, 2)) {
             SceneActorTerrain_EnterState(actor, 3, 0, 0);
-            SetControl(actor, group->contactControl, 7);
+            SceneActorTerrain_InstallControl(actor, group->contactControl, 7);
             {
                 s32 value = actor->base.attachmentRestart;
                 actor->base.attachmentTimer = value;

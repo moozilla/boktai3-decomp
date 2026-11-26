@@ -1,5 +1,5 @@
 #include "effects/particles/proximity_emitter.h"
-s32 ProximityEmitter_InitializeFromScript(struct ProximityEmitter *emitter, u32 unused1,
+s32 TetherRing_InitializeFromScript(struct ProximityEmitter *emitter, u32 unused1,
                                           u32 unused2)
 {
     struct ContactPosition *position;
@@ -109,16 +109,16 @@ s32 ProximityEmitter_InitializeFromScript(struct ProximityEmitter *emitter, u32 
         *destination = *source;
     }
     }
-    ProximityEmitter_InitializeParticles(emitter);
+    TetherRing_InitializeParticles(emitter);
     if (Script_SeekToKeyword('m') && Script_GetValue()) {
         emitter->primary.sprite.flags |= 1;
         emitter->secondary.sprite.flags |= 1;
-        emitter->update = ProximityEmitter_TickGrow;
+        emitter->update = TetherRing_TickGrow;
         Sound_PlaySong(0x15E);
     } else
-        emitter->update = ProximityEmitter_TickActive;
+        emitter->update = TetherRing_TickActive;
     emitter->stateFrame = 0;
-    if (ProximityEmitter_IsTetherNearby(emitter)) {
+    if (TetherRing_IsTetherNearby(emitter)) {
         emitter->nearby = 1;
         nearby = &emitter->nearby;
     } else {
@@ -135,7 +135,7 @@ s32 ProximityEmitter_InitializeFromScript(struct ProximityEmitter *emitter, u32 
         emitter->leaveScriptId = Script_GetValue();
     else
         emitter->leaveScriptId = script;
-    if (ProximityEmitter_IsTetherNearby(emitter)) {
+    if (TetherRing_IsTetherNearby(emitter)) {
         u32 value = 1;
         *nearby = value;
         TetherActor_RequestPaletteBlend(value);

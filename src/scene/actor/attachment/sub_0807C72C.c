@@ -1,13 +1,6 @@
 #include "scene/actor/scene_actor_attachment_dispatch.h"
 
 void SceneStimulus_AddTagged(s32, s32, s32, u32, u32, u16);
-struct SceneActorAttachmentResponseGroup {
-    u8 unknown0[0x4C];
-    s16 stimulusHeight;
-    u8 unknown4E[0xA0 - 0x4E];
-    void *attachment;
-};
-
 void SceneActorAttachment_ReplaceResponseSlot(struct ChaseActor *actor, u32 inputkind,
                                               u32 inputevent, u32 inputcategory)
 {
@@ -15,7 +8,7 @@ void SceneActorAttachment_ReplaceResponseSlot(struct ChaseActor *actor, u32 inpu
     u8 event = inputevent;
     u8 category = inputcategory;
     struct ChaseActor *owner = actor;
-    struct SceneActorAttachmentResponseGroup *group = (void *)&actor->group.common;
+    struct SceneActorChaseGroup *group = &actor->group;
     struct ActorAttachmentFollowView *follow = (void *)(&actor->base.body.id);
     s32 y;
     s32 z;
@@ -56,7 +49,7 @@ void SceneActorAttachment_ReplaceResponseSlot(struct ChaseActor *actor, u32 inpu
                                                             *(u8 *)&owner->base.paletteOffset);
                 if ((event == 0) || (event == 3))
                     SceneStimulus_AddTagged(follow->anchor.x, follow->anchor.z,
-                                            group->stimulusHeight, 0, 1, (u16)follow->identity);
+                                            (s16)group->common.control.parameter, 0, 1, (u16)follow->identity);
                 break;
 
             case 1:

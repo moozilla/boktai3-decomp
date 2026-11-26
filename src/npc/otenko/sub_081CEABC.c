@@ -1,0 +1,16 @@
+#include "global.h"
+struct P {
+    u32 a, b;
+};
+void Trigger_ConsumePending(u8 *, u32);
+void Otenko_UpdateAnimation3AtCurrentPosition(u8 *a, u8 *b)
+{
+    if (b[8]) {
+        b[8] = 0;
+        b[7] = 0;
+        *(struct P *)(b + 0x54) = *(struct P *)(b + 0x68);
+        b[5] = 3;
+        Trigger_ConsumePending(b + 0x168, 1);
+    }
+    *(u32 *)(b + 0x14) += 1;
+}

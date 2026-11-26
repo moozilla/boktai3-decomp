@@ -31,7 +31,7 @@ static inline void SetCallback(void (*v)(void), void (**a)(void))
 {
     *a = v;
 }
-void SceneActors_EnterHorizontalTweenState(struct SceneActorTween *p)
+void VanargandHead_EnterHorizontalTweenState(struct SceneActorTween *p)
 {
     struct SceneActorTween *actor = p;
     if (ConsumeEntry(p) == 1) {

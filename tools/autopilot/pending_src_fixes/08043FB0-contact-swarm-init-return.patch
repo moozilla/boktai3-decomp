@@ -4,10 +4,10 @@ The final Collider_SetAttackProperties returns through r0.
 
 The explicit form changed the ROM bytes. The guarded form passed the unit ROM check.
 
---- a/src/fn/sub_08043FB0.c
-+++ b/src/fn/sub_08043FB0.c
+--- a/src/bosses/count/sub_08043FB0.c
++++ b/src/bosses/count/sub_08043FB0.c
 @@ -59,3 +59,6 @@
-     Collider_SetCallback(collider, ContactSwarm_IgnoreResourceContact, slot);
+     Collider_SetCallback(collider, CountBats_IgnoreResourceContact, slot);
      Collider_SetAttackProperties(collider, 10, 30, 0x8000, 0, 8);
 +#ifdef UBFIX
 +    return 0x080440E3; // preserve the inherited GBA return value

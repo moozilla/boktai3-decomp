@@ -13,7 +13,7 @@ void TerrainModifiers_RegisterCell(void *, s32, s32, s32, s32, s32);
 void SceneBody_Init(void *, void *, void *, u32, u32, void *);
 void SceneBody_SetSprite(void *, void *);
 void TerrainOverlay_QueueAddActor(void *);
-static inline s32 OrangeSpine_CellIndex(struct SceneVec *v)
+static inline s32 PlasmaCannon_CellIndex(struct SceneVec *v)
 {
     s32 x = (s16)v->x >> 8, z = (s16)v->z >> 8;
     if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
@@ -121,7 +121,7 @@ s32 PlasmaCannon_InitializeFromScript(struct OrangeSpineActor *p, void *parent)
     if (!p->defeatDelay)
         PlasmaCannon_InitCollider(p);
     if (p->registerTerrain && !p->defeatDelay) {
-        s32 cell = OrangeSpine_CellIndex(&p->sprite.coordinates.position);
+        s32 cell = PlasmaCannon_CellIndex(&p->sprite.coordinates.position);
         TerrainModifiers_RegisterCell(p->terrainRegistration, cell, 0, p->sprite.display.position.y >> 8, 0, 1);
     }
     if (p->showTerrainBody) {

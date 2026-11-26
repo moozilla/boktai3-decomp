@@ -7,8 +7,8 @@ exports.closedLock = (locks, box) => {
   return locks.find((lock) => lock.box === box && !(g.u8(bank + 0x62 + (lock.bit >> 3)) & (1 << (lock.bit & 7))));
 };
 
-// Proc 1185 assigns bit + 1 as the slot ID. SceneObjects_ScriptAppend uses
-// the registered controller pool, and SceneObject_InitSlotPlacement applies
+// Proc 1185 assigns bit + 1 as the slot ID. SlidingDoors_ScriptAppend uses
+// the registered controller pool, and SlidingDoors_InitSlotPlacement applies
 // the facing-dependent offset before the interaction radius is checked.
 exports.keyDoorPosition = (lock) => {
   const address = g.fn.ResourceRegistry_GetResource(0x85e6);
@@ -24,7 +24,7 @@ exports.keyDoorPosition = (lock) => {
 };
 
 // The controller accepts A within its interaction radius and three facings
-// from SceneObject_CheckActorCompatibility. Approach on the usable side.
+// from SlidingDoors_CheckActorCompatibility. Approach on the usable side.
 const offsets = [[128, 0], [0, 128], [-128, 0], [0, -128]];
 const facings = [
   ['left', 'up+left', 'up'], ['up', 'up+right', 'right'],

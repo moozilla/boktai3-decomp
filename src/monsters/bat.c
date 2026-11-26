@@ -226,7 +226,7 @@ s32 Bat_Init(void *object)
         res = ScriptProc_Start(0xCB05, 0xDA6D);
         *(struct DisplayResourceHeader *)heap = *(struct DisplayResourceHeader *)res;
         ResourceHeader_Relocate(heap, res);
-        Widget_InitLinked(heap + 0x20, heap, 0, 0, 2, 2, 0x3C, &tmp);
+        AnimSprite_InitLinked(heap + 0x20, heap, 0, 0, 2, 2, 0x3C, &tmp);
         actor->base.animationIndex = 0xFF;
     }
     MonsterInit_InitializeBody(actor);

@@ -31,7 +31,7 @@ struct DisplayAnimationSequence {
 };
 struct DisplayAnimationKeyframes {
     struct AnimSpriteResource resource;
-    struct AnimSprite widget;
+    struct AnimSprite sprite;
 };
 union DisplayAnimationBody {
     struct DisplayAnimationSequence sequence;

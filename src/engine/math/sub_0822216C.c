@@ -1,8 +1,7 @@
 #include "engine/math/scalar_approach.h"
-/* ScalarApproach_ApplyAngleProfileArray: Unwraps each period-256 angle relative to its target and applies the selected interpolation profile */
-#define ScalarApproach_ApplyAngleProfileArray sub_0822216C
-#define ScalarApproach_ApplyAngleProfileArray sub_0822216C
-void ScalarApproach_ApplyAngleProfileArray(s16 *values, const s16 *targets, s32 profile, s32 count)
+/* ScalarApproach_ApplyAngleProfileArray_0822216C: Unwraps each period-256 angle relative to its target and applies the selected interpolation profile */
+void ScalarApproach_ApplyAngleProfileArray_0822216C(s16 *values, const s16 *targets, s32 profile,
+                                                    s32 count)
 {
     s16 *cursor;
     if (profile > 15) {

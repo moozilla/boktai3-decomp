@@ -1,6 +1,5 @@
 #include "global.h"
 /* Math_WrapAngleArrayNearTargets: Replaces each angle with its equivalent nearest the corresponding target without approaching it */
-#define Math_WrapAngleArrayNearTargets sub_0819B3C8
 
 static inline s32 AngleNear(s32 angle, s32 ref)
 {
@@ -11,7 +10,7 @@ static inline s32 AngleNear(s32 angle, s32 ref)
     return ref + d;
 }
 
-void sub_0819B3C8(s16 *cur, s16 *target, s32 count)
+void Math_WrapAngleArrayNearTargets(s16 *cur, s16 *target, s32 count)
 {
     while (--count >= 0) {
         *cur = AngleNear(*cur, *target);
