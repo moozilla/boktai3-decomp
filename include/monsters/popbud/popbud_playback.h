@@ -39,6 +39,8 @@ struct PinkSpineState {
     u32 f158;
     void *f15C;
 };
+typedef char PinkSpineStateSizeCheck[sizeof(struct PinkSpineState) == 0x160 ? 1 : -1];
+
 u32 ProjectileEmitter_EmitAttackFrame(struct PinkSpineState *p);
 void Combat_SpawnDirectionalProjectile(struct PinkSpineState *emitter, u8 direction);
 
@@ -51,7 +53,7 @@ static inline void PinkSpine_ProjectileOrigin(struct ContactPosition *position,
 
 static inline u32 PinkSpine_StepAnimation(struct PinkSpineState *owner)
 {
-    return PlayerCue_StepSequenceEnded(&owner->sprite, &owner->sequence);
+    return PlayerCue_StepSequenceEnded((void *)&owner->sprite, &owner->sequence);
 }
 
 #endif
