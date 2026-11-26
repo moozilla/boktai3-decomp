@@ -282,3 +282,67 @@ zero errors.
   scripted gate and motion writes still each differ by one instruction.
 
 All three edited units matched their full ROM extents.
+
+## Follow-up after PR 1072
+
+| Class | Report lines before and after | Steering uses before and after |
+|---|---:|---:|
+| Skeleton | 241 → 240 | 297 → 296 |
+| Vorn | 219 → 217 | 227 → 225 |
+| Mummy | 169 → 169 | 171 → 171 |
+
+Skeleton and Vorn share the animation duration update for sequence and
+tile drawables. Skeleton reads the registered `SurfaceTrack` and uses
+the chase-group route and the terrain cell center in rerouting. Vorn reads
+its script request, gate, tracking flags, and route fields through the
+class and chase group. Mummy uses the sequence drawable in the animation
+callbacks and the shared terrain center in adjacent-cell routing. The
+revival step takes its specialized control drawable.
+
+All seven edited units matched their full ROM extents. Scoped lint reported
+zero errors. The direct Vorn tracking clear still folds the component offset
+and moves the mask below the byte load. Mummy's direct tracking clear uses
+an immediate byte where the ROM forms a full-width complemented mask.
+
+## Initialization and combat follow-up
+
+| Class | Report lines before and after | Steering uses before and after |
+|---|---:|---:|
+| Skeleton | 240 → 238 | 296 → 295 |
+| Vorn | 217 → 213 | 225 → 222 |
+| Mummy | 169 → 169 | 171 → 171 |
+
+All three classes size their drawable allocations from the matching
+types. Skeleton and Vorn share the probe animation duration update
+with direct callback arguments. Vorn uses the common pending-control
+installation in route recovery and uses native collider positions and
+palette fields. Mummy uses its native tracking component and the
+actual room actor and route start signatures.
+
+All five edited units matched their full ROM extents, and the scoped
+linter reported zero errors. Direct bone burst, sprite priority, and
+burn overlay candidates still changed the generated instructions.
+
+## Combat animation and delayed controls
+
+| Class | Report lines before and after | Steering uses before and after |
+|---|---:|---:|
+| Skeleton | 238 → 228 | 295 → 281 |
+| Vorn | 213 → 211 | 222 → 220 |
+| Mummy | 169 → 169 | 171 → 171 |
+
+Skeleton reads combat tile frames and attack collider fields by name
+and shares the contact control transitions. Vorn uses the common
+delayed response and contact animation and reads the typed route
+branches. Mummy shares cardinal direction and reads its dying and
+saved-target animation through the native types.
+
+All four edited units matched. Scoped lint reported zero errors.
+The statement-macro census now reuses scans for unchanged sources.
+Its repository-sized benchmark with one file to rescan took 4.5 seconds,
+compared with 89.8 seconds for the old full rescan. The counts agreed,
+and all 13 focused tests passed.
+
+The final Skeleton change uses `ContactPosition` for the four collider
+shapes and their offsets. The full 31,956-byte unit matched with direct
+X, Y and Z assignments.

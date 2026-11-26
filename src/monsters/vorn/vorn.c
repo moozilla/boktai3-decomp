@@ -34,18 +34,18 @@ void Vorn_OnContactEvent(u8 *unused, struct ContactCollider *collider, struct Ch
 
 extern const u8 gUnk_0824E20C[];
 
-s32 SceneActor_TryLaunchSelectedItem(u8 *);
+s32 SceneActor_TryLaunchSelectedItem(struct Vorn *);
 
-void Vorn_BeginResponsePursuit(u8 *, u32, const u8 *, u32);
+void Vorn_BeginResponsePursuit(struct Vorn *, u32, const void *, u32);
 
-void Vorn_OnScriptActionRequest(u32 a, u32 b, u8 *p)
+void Vorn_OnScriptActionRequest(u32 a, u32 b, struct Vorn *actor)
 {
-    u8 *q = *(u8 **)(p + 0x3d0);
-    switch (SceneActor_TryLaunchSelectedItem(q)) {
+    struct Vorn *context = actor->chase.base.context;
+    switch (SceneActor_TryLaunchSelectedItem(context)) {
         case 0:
-            *(u16 *)(q + 0x682) = 1;
+            context->field682 = 1;
         case 1:
-            Vorn_BeginResponsePursuit(p, 1, gUnk_0824E20C, 0x4a);
+            Vorn_BeginResponsePursuit(actor, 1, gUnk_0824E20C, 0x4a);
             break;
     }
 }
@@ -84,20 +84,11 @@ void SceneActor_UpdateTargetedAttack(struct ChaseActor *s)
 
 void SceneActorAnimation_SelectDirectionalEntry(struct RoomActor *, s32);
 
-void SceneActor_RunPositionScript(void *);
-
-static inline u8 TakeFlag(u8 *flag)
-{
-    if (*flag) {
-        *flag = 0;
-        return TRUE;
-    }
-    return FALSE;
-}
+void SceneActor_RunPositionScript(struct Vorn *);
 
 void Vorn_UpdateScriptedAnimation(struct ChaseActor *p)
 {
-    if (TakeFlag(&p->base.field2B2))
+    if (SceneActorReaction_TakePrepared(p))
         SceneActorAnimation_SelectDirectionalEntry(&p->base, 0xF);
     {
         struct SceneActorAnimationTileDrawable *drawable = p->base.drawable;
@@ -109,10 +100,11 @@ void Vorn_UpdateScriptedAnimation(struct ChaseActor *p)
         p->base.stepDone = 1;
 }
 
-void Vorn_ResetStateEntry(u8 *p)
+void Vorn_ResetStateEntry(void *object)
 {
-    if (p[0x2b2] != 0)
-        p[0x2b2] = 0;
+    struct RoomActor *actor = object;
+    if (actor->field2B2)
+        actor->field2B2 = 0;
 }
 
 void SceneActor_UpdateDelayedAnimation(struct ChaseActor *s)
@@ -133,11 +125,12 @@ void SceneActor_UpdateDelayedAnimation(struct ChaseActor *s)
     }
 }
 
-void Vorn_BeginIdle(u8 *p)
+void Vorn_BeginIdle(void *object)
 {
-    if (p[0x2b2] != 0)
-        p[0x2b2] = 0;
-    SceneActorAnimation_SelectDirectionalEntry(p, 0);
+    struct RoomActor *actor = object;
+    if (actor->field2B2)
+        actor->field2B2 = 0;
+    SceneActorAnimation_SelectDirectionalEntry(actor, 0);
 }
 
 u16 Route_GetCurrentPointFacing(void *);
@@ -153,7 +146,6 @@ void Vorn_UpdateIdleFacing(struct ChaseActor *actor)
 {
     u8 *group = (u8 *)actor + 0x50;
     void *route = &actor->group.homeRoute;
-    u16 *scale;
     if (SceneActorReaction_TakePrepared(actor)) {
         s32 direction;
         s32 facing;
@@ -167,27 +159,13 @@ void Vorn_UpdateIdleFacing(struct ChaseActor *actor)
             facing = actor->base.nextDirection;
         if (direction == (facing >> 1)) {
             actor->base.stepDone = 1;
-            SceneActorAnimation_SelectDirectionalEntry(actor, 0);
+            SceneActorAnimation_SelectDirectionalEntry(&actor->base, 0);
             return;
         }
-        SceneActorAnimation_SelectDirectionalEntry(actor, 0);
+        SceneActorAnimation_SelectDirectionalEntry(&actor->base, 0);
         actor->base.restart = 0;
     }
-    if (SceneActorContact_MotionFlags(actor, 0xA02F)) {
-        u16 *p = &actor->base.field2C2;
-        *p = 64;
-        scale = p;
-    } else {
-        u16 *p = &actor->base.field2C2;
-        u16 value = *p;
-        scale = p;
-        if (!value)
-            *scale = 64;
-    }
-    if (actor->base.drawableKind == 0)
-        Anim_SetDurationScale((u8 *)actor->base.drawable + 0x48, *scale);
-    else
-        Anim_SetFrameDurationScale((u8 *)actor->base.drawable + 0x20, *scale);
+    SceneActorTurn_ApplyActorDuration(actor);
     if (actor->base.restart) {
         group[9] = (actor->base.nextDirection + 5) << 5;
         actor->base.stepDone = 1;
@@ -197,7 +175,7 @@ void Vorn_UpdateIdleFacing(struct ChaseActor *actor)
             quadrant &= facing;
             actor->base.body.direction = (quadrant << 6) - 64;
         }
-        SceneActorAnimation_SelectDirectionalEntry(actor, 0);
+        SceneActorAnimation_SelectDirectionalEntry(&actor->base, 0);
     }
 }
 
@@ -430,16 +408,9 @@ static inline u8 Vorn_DisplacementStopped(s32 x, s32 z)
     return 0;
 }
 
-static inline u8 Vorn_ContextFlags(struct SceneActorAnimationLink *context, u32 mask)
-{
-    if (context->flags & mask)
-        return 1;
-    return 0;
-}
-
 void Vorn_UpdateStaggerRecovery(struct ChaseActor *actor, s32 frame)
 {
-    struct SceneActorAnimationLink *context = actor->base.context;
+    struct Vorn *context = actor->base.context;
     struct SceneActorAnimationTileDrawable *drawable = actor->base.drawable;
     struct AnimSprite *tile = &drawable->tile;
     struct SceneActorChaseGroup *group = SceneActorChase_GroupOf(actor);
@@ -507,7 +478,7 @@ void Vorn_UpdateStaggerRecovery(struct ChaseActor *actor, s32 frame)
         SceneActorChase_SetControl(actor, Vorn_ResumeRouteAfterDelay, 20);
         SceneActorChase_ClearMotionFlagComponent(actor, 8);
         actor->base.field2C2 = 64;
-    } else if (Vorn_ContextFlags(context, 0x1D))
+    } else if (ContextFlags(context, 0x1D))
         SceneActor_DispatchContextAction(context, 1);
     else {
         SceneActorChase_TrackPlayer(actor);

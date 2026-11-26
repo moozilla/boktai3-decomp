@@ -5,6 +5,8 @@
 #include "scene/actor/scene_actor_control_phase.h"
 #include "scene/motion/scene_actor_chase_reaction.h"
 #include "scene/motion/scene_actor_terrain.h"
+#include "scene/motion/scene_actor_turn.h"
+#include "scene/terrain/terrain_collision.h"
 
 void SceneActorReaction_TickQueuedContact(void);
 
@@ -71,8 +73,6 @@ void SceneActorApproach_RunAlternateTimedAction(struct ChaseActor *actor)
         actor->base.counter2AC++;
 }
 
-// foundry draft (worker best 94.9%); what differs is mostly register allocation and instruction order
-
 void Skeleton_BeginHomingBurst(void);
 
 void SceneActorApproach_CaptureTargetAndRunAction(struct ChaseActor *actor)
@@ -101,10 +101,6 @@ s32 Math_Atan2(s32, s32);
 void Anim_SetDurationScale(void *, u32);
 
 void Anim_SetFrameDurationScale(void *, u32);
-
-struct SkeletonApproachProbe {
-    u8 flags;
-};
 
 static inline s32 Skeleton_ScaleApproachMotion(s32 n)
 {
@@ -197,32 +193,11 @@ success:
     return 1;
 }
 
-static inline void Skeleton_UpdateApproachAnimation(struct ChaseActor *actor)
-{
-    u32 mask = 0xA02F;
-    u16 *scale;
-    if (actor->base.motionFlags & mask) {
-        actor->base.field2C2 = 0x40;
-        scale = &actor->base.field2C2;
-    } else {
-        u16 t = actor->base.field2C2;
-        scale = &actor->base.field2C2;
-        if (t == 0)
-            *scale = 0x40;
-    }
-    if (actor->base.drawableKind == 0)
-        Anim_SetDurationScale(
-            &((struct SceneActorAnimationSequenceDrawable *)actor->base.drawable)->sequence, *scale);
-    else
-        Anim_SetFrameDurationScale(
-            &((struct SceneActorAnimationTileDrawable *)actor->base.drawable)->tile, *scale);
-}
-
 static inline void Skeleton_ApplyApproachMotion(struct ChaseActor *actor,
                                                 struct Skeleton *body, u32 angle,
                                                 s32 speed)
 {
-    Skeleton_UpdateApproachAnimation(actor);
+    SceneActorTurn_ApplyActorDuration(actor);
     actor->base.body.motion.x +=
         Skeleton_ScaleApproachMotion(gUnk_086149C4[(angle + 0x40) & 0xFF] * speed);
     actor->base.body.motion.z += Skeleton_ScaleApproachMotion(gUnk_086149C4[angle & 0xFF] * speed);
@@ -246,7 +221,7 @@ void Skeleton_UpdateTargetApproach(struct ChaseActor *actor)
         void *target = Skeleton_UpdateScriptWaitState;
         SceneActorChase_SetControl(actor, target, 0x26);
     }
-    if (((struct SkeletonApproachProbe *)actor->base.body.movementProbe)->flags & 1) {
+    if (((struct SurfaceTrack *)actor->base.body.movementProbe)->blocked & 1) {
         Skeleton_SetApproachState(actor, 0, 0, 12);
         SceneActorChase_SetControl(actor, group->common.gate.control, 0x1A);
         Skeleton_ApproachTargetCell(actor);
