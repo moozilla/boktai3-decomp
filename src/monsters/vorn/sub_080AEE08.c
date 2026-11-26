@@ -1,6 +1,7 @@
 #include "scene/motion/scene_actor_turn.h"
 #include "scene/motion/scene_actor_chase_reaction.h"
 #include "scene/actor/scene_actor_reaction.h"
+#include "scene/actor/scene_actor_drawable_flags.h"
 #include "scene/actor/scene_actor_behavior.h"
 #include "script/script_utility.h"
 #include "effects/particles/spark_particle.h"
@@ -30,11 +31,6 @@ static inline void Vorn_ClearRoute(struct ChaseActor *actor,
     control->counter = cleared;
     control->field14 = cleared;
     control->timer = cleared;
-}
-
-static inline void Vorn_SetTileFlags(struct AnimSprite *tile, u32 bits)
-{
-    tile->flags |= bits;
 }
 
 static inline void Vorn_InstallIdleControl(struct ChaseActor *actor, void *callback, u32 kind,
@@ -148,14 +144,7 @@ void Vorn_UpdateDefeat(struct ChaseActor *actor)
         Bestiary_UnlockEntry(
             Bestiary_GetEntryForActor(actor->base.category, actor->base.paletteOffset));
     actor->base.attachmentTimer = 0;
-    {
-        u32 mask = 1;
-        if (!actor->base.drawableKind)
-            ((struct SceneActorRegistrySequenceDrawable *)actor->base.drawable)->flags |= mask;
-        else
-            Vorn_SetTileFlags(
-                &((struct SceneActorAnimationTileDrawable *)actor->base.drawable)->tile, mask);
-    }
+    ActorStatus_SetDrawableFlags(actor, 1);
     Vorn_InstallIdleControl(actor, SceneActorControl_OnIdle, 16, completedState);
     SceneActorChase_SelectState(actor, completedState, 0, 2);
     Vorn_ResetStateEntry(actor, completedState);
