@@ -98,7 +98,7 @@ s32 TimedEffect_SpawnProjectile(struct TimedEffectManager *manager, struct Task4
         u8 *priority = &entry->sprite.priority;
         u32 one = 1;
         *priority = one;
-        manager->activeMask |= one << index;
+        manager->activeMask |= 1U << index;
     }
     if (!config->callback)
         return -1;
