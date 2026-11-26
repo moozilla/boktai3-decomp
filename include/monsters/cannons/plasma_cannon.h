@@ -1,5 +1,5 @@
-#ifndef GUARD_ORANGE_SPINE_H
-#define GUARD_ORANGE_SPINE_H
+#ifndef GUARD_MONSTERS_CANNONS_PLASMA_CANNON_H
+#define GUARD_MONSTERS_CANNONS_PLASMA_CANNON_H
 
 #include "engine/video/display_animation.h"
 #include "scene/collision/contact_collider.h"

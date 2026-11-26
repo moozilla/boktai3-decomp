@@ -1,5 +1,5 @@
-#ifndef GUARD_REGISTRY_SELECTION_MENU_H
-#define GUARD_REGISTRY_SELECTION_MENU_H
+#ifndef GUARD_UI_WORLD_MAP_H
+#define GUARD_UI_WORLD_MAP_H
 #include "ui/widgets/menu_cursor.h"
 
 struct PositionMotion {

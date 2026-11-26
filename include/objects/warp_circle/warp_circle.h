@@ -1,5 +1,5 @@
-#ifndef GUARD_STACKED_ACTOR_H
-#define GUARD_STACKED_ACTOR_H
+#ifndef GUARD_OBJECTS_WARP_CIRCLE_WARP_CIRCLE_H
+#define GUARD_OBJECTS_WARP_CIRCLE_WARP_CIRCLE_H
 #include "system/game_state/game_state.h"
 #include "engine/engine_globals.h"
 /* Tentative identity: an actor with three vertically stacked display segments. */

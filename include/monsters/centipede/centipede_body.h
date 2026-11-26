@@ -1,5 +1,5 @@
-#ifndef GUARD_TENTACLE_BODY_H
-#define GUARD_TENTACLE_BODY_H
+#ifndef GUARD_MONSTERS_CENTIPEDE_CENTIPEDE_BODY_H
+#define GUARD_MONSTERS_CENTIPEDE_CENTIPEDE_BODY_H
 #include "scene/actor/scene_actor_reset.h"
 #include "npc/manager/scene_actor_animation.h"
 #include "scene/actor/scene_actor_control_phase.h"

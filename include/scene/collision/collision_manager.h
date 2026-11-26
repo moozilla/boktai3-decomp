@@ -1,5 +1,5 @@
-#ifndef GUARD_REGISTRY_E7BC_H
-#define GUARD_REGISTRY_E7BC_H
+#ifndef GUARD_SCENE_COLLISION_COLLISION_MANAGER_H
+#define GUARD_SCENE_COLLISION_COLLISION_MANAGER_H
 
 #include "scene/collision/spatial_index.h"
 

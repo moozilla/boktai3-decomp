@@ -1,5 +1,5 @@
-#ifndef EFFECT_EMITTER_H
-#define EFFECT_EMITTER_H
+#ifndef GUARD_OBJECTS_STRIKE_CRYSTAL_H
+#define GUARD_OBJECTS_STRIKE_CRYSTAL_H
 #include "global.h"
 #include "scene/collision/contact_collider.h"
 #include "objects/scene_object.h"

@@ -421,3 +421,37 @@ sub_0813BAD8,Player_UpdateDirectionalEffectPair,identifier,,Use the reviewed nam
 sub_0813BAD8__addr,Player_UpdateDirectionalEffectPair__addr,identifier,,Use the reviewed name for this address,src/
 sub_0813BAD8__addr,Player_UpdateDirectionalEffectPair__addr,identifier,,Use the reviewed name for this address,include/
 Vorn_ResetStateEntry,Vorn_PrepareDefeatStateEntry,identifier,,Reviewed in-game owner,src/monsters/vorn/sub_080AEE08.c
+GUARD_ACTOR_GRAPHICS_AND_BASIC_STATES_H,GUARD_BOSSES_COUNT_COUNT_GRAPHICS_H,identifier,,Reviewed in-game owner,include/bosses/count/count_graphics.h
+GUARD_LARGE_SCENE_ANIMATION_CONTROLLER_H,GUARD_BOSSES_NIDHOGGR_NIDHOGGR_ANIMATION_H,identifier,,Reviewed in-game owner,include/bosses/nidhoggr/nidhoggr_animation.h
+GUARD_GRID_ATTACK_ACTOR_H,GUARD_BOSSES_NIDHOGGR_NIDHOGGR_DUEL_H,identifier,,Reviewed in-game owner,include/bosses/nidhoggr/nidhoggr_duel.h
+GUARD_CONTACT_BURST_H,GUARD_BOSSES_NIDHOGGR_NIDHOGGR_DUEL_BURST_H,identifier,,Reviewed in-game owner,include/bosses/nidhoggr/nidhoggr_duel_burst.h
+GUARD_CONTACT_SEQUENCE_ACTOR_H,GUARD_BOSSES_NIDHOGGR_NIDHOGGR_DUEL_MINION_H,identifier,,Reviewed in-game owner,include/bosses/nidhoggr/nidhoggr_duel_minion.h
+GUARD_CONTACT_SEQUENCE_POOL_H,GUARD_BOSSES_NIDHOGGR_NIDHOGGR_DUEL_MINION_POOL_H,identifier,,Reviewed in-game owner,include/bosses/nidhoggr/nidhoggr_duel_minion_pool.h
+GUARD_ORBIT_CONTACT_ACTOR_H,GUARD_BOSSES_NIDHOGGR_NIDHOGGR_DUEL_ORB_H,identifier,,Reviewed in-game owner,include/bosses/nidhoggr/nidhoggr_duel_orb.h
+GUARD_FROST_EMITTER_H,GUARD_EFFECTS_PARTICLES_SABATA_FROST_H,identifier,,Reviewed in-game owner,include/effects/particles/sabata_frost.h
+GUARD_TASK4E01_PROJECTILE_H,GUARD_EFFECTS_PROJECTILES_PROJECTILE_TASK_H,identifier,,Reviewed in-game owner,include/effects/projectiles/projectile_task.h
+GUARD_SCENE_TRANSITION_H,GUARD_EFFECTS_SCREEN_MAGIC_CANNON_DEPARTURE_H,identifier,,Reviewed in-game owner,include/effects/screen/magic_cannon_departure.h
+GUARD_SCENE_INPUT_WIDGET_H,GUARD_ENGINE_VIDEO_ANIM_SPRITE_H,identifier,,Reviewed in-game owner,include/engine/video/anim_sprite.h
+GUARD_LIBRFU_H,GUARD_LIB_RFU_RFU_COMPAT_H,identifier,,Reviewed in-game owner,include/lib/rfu/rfu_compat.h
+GUARD_CONTROL_PANEL_H,GUARD_MINIGAMES_DARK_GENERATOR_H,identifier,,Reviewed in-game owner,include/minigames/dark_generator.h
+GUARD_MOTION_0818_H,GUARD_MONSTERS_ARMOR_SPINNING_APPROACH_CHAIN_H,identifier,,Reviewed in-game owner,include/monsters/armor/spinning_approach_chain.h
+GUARD_ORANGE_SPINE_H,GUARD_MONSTERS_CANNONS_PLASMA_CANNON_H,identifier,,Reviewed in-game owner,include/monsters/cannons/plasma_cannon.h
+GUARD_TENTACLE_BODY_H,GUARD_MONSTERS_CENTIPEDE_CENTIPEDE_BODY_H,identifier,,Reviewed in-game owner,include/monsters/centipede/centipede_body.h
+GUARD_TENTACLE_SEGMENT_ANIMATION_H,GUARD_MONSTERS_CENTIPEDE_CENTIPEDE_SEGMENT_ANIMATION_H,identifier,,Reviewed in-game owner,include/monsters/centipede/centipede_segment_animation.h
+GUARD_PINK_SPINE_PLAYBACK_H,GUARD_MONSTERS_POPBUD_POPBUD_PLAYBACK_H,identifier,,Reviewed in-game owner,include/monsters/popbud/popbud_playback.h
+GUARD_REGISTRY_ACTOR_H,GUARD_NPC_SABATA_RIDER_SABATA_RIDER_H,identifier,,Reviewed in-game owner,include/npc/sabata_rider/sabata_rider.h
+GUARD_REGISTRY_ACTOR_COLLISION_H,GUARD_NPC_SABATA_RIDER_SABATA_RIDER_COLLISION_H,identifier,,Reviewed in-game owner,include/npc/sabata_rider/sabata_rider_collision.h
+GUARD_STACKED_ACTOR_H,GUARD_OBJECTS_WARP_CIRCLE_WARP_CIRCLE_H,identifier,,Reviewed in-game owner,include/objects/warp_circle/warp_circle.h
+GUARD_PLAYER_3_H,GUARD_PLAYER_APPEARANCE_PLAYER_VISUALS_H,identifier,,Reviewed in-game owner,include/player/appearance/player_visuals.h
+GUARD_REGISTRY_E7BC_H,GUARD_SCENE_COLLISION_COLLISION_MANAGER_H,identifier,,Reviewed in-game owner,include/scene/collision/collision_manager.h
+GUARD_SCENE_MESSAGES_H,GUARD_SCRIPT_DEMO_MANAGER_H,identifier,,Reviewed in-game owner,include/script/demo_manager.h
+GUARD_SCENE_CATALOG_H,GUARD_UI_PAUSE_STATUS_OPTIONS_H,identifier,,Reviewed in-game owner,include/ui/pause/status_options.h
+GUARD_DATE_ENTRY_MENU_H,GUARD_UI_TITLE_DATE_MENU_H,identifier,,Reviewed in-game owner,include/ui/title/date_menu.h
+GUARD_SCENE_ITEM_VALUES_H,GUARD_UI_TOWN_SHOP_ITEM_VALUES_H,identifier,,Reviewed in-game owner,include/ui/town/shop_item_values.h
+GUARD_REGISTRY_CHOICE_MENU_H,GUARD_UI_TOWN_TOWN_MAP_H,identifier,,Reviewed in-game owner,include/ui/town/town_map.h
+GUARD_REGISTRY_SELECTION_MENU_H,GUARD_UI_WORLD_MAP_H,identifier,,Reviewed in-game owner,include/ui/world_map.h
+FOUNDRY_ACTOR_STATE_H,GUARD_BOSSES_SABATA_SABATA_ACTOR_STATE_H,identifier,,Reviewed in-game owner,include/bosses/sabata/sabata_actor_state.h
+GROUP_OBJECTS_H,GUARD_EFFECTS_BAT_FLOCK_H,identifier,,Reviewed in-game owner,include/effects/bat_flock.h
+POOLED_INTERACTABLE_H,GUARD_OBJECTS_BREAKABLE_H,identifier,,Reviewed in-game owner,include/objects/breakable.h
+DIRECTIONAL_INTERACTION_H,GUARD_OBJECTS_DIRECTIONAL_CONTROLLER_H,identifier,,Reviewed in-game owner,include/objects/directional_controller.h
+EFFECT_EMITTER_H,GUARD_OBJECTS_STRIKE_CRYSTAL_H,identifier,,Reviewed in-game owner,include/objects/strike_crystal.h

@@ -1,5 +1,5 @@
-#ifndef GUARD_FROST_EMITTER_H
-#define GUARD_FROST_EMITTER_H
+#ifndef GUARD_EFFECTS_PARTICLES_SABATA_FROST_H
+#define GUARD_EFFECTS_PARTICLES_SABATA_FROST_H
 
 #include "engine/engine.h"
 #include "scene/collision/contact_swarm.h"

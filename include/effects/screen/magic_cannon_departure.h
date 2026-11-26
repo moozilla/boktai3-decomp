@@ -1,5 +1,5 @@
-#ifndef GUARD_SCENE_TRANSITION_H
-#define GUARD_SCENE_TRANSITION_H
+#ifndef GUARD_EFFECTS_SCREEN_MAGIC_CANNON_DEPARTURE_H
+#define GUARD_EFFECTS_SCREEN_MAGIC_CANNON_DEPARTURE_H
 #include "engine/engine.h"
 #include "objects/dungeon_prop/orbit_motion.h"
 #include "scene/collision/contact_swarm.h"

@@ -1,5 +1,5 @@
-#ifndef GUARD_ACTOR_GRAPHICS_AND_BASIC_STATES_H
-#define GUARD_ACTOR_GRAPHICS_AND_BASIC_STATES_H
+#ifndef GUARD_BOSSES_COUNT_COUNT_GRAPHICS_H
+#define GUARD_BOSSES_COUNT_COUNT_GRAPHICS_H
 #include "engine/engine.h"
 #include "npc/story_character/state_actor.h"
 #include "scene/collision/contact_actor.h"
