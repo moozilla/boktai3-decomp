@@ -1,3 +1,5 @@
+#include "scene/actor/scene_actor_status.h"
+#include "scene/actor/scene_actor_damage_flash.h"
 #include "global.h"
 #include "scene/motion/scene_actor_chase.h"
 #include "scene/motion/scene_actor_chase_shared.h"
@@ -9,18 +11,6 @@ struct ReactionOwner {
     struct ChaseActor *actor;
 };
 extern const s16 gUnk_086149C4[];
-static inline u8 Reaction_IsBlocked(struct ChaseActor *actor)
-{
-    if (!actor)
-        return 0;
-    if (SceneActorContact_MotionFlags(actor, 0x40))
-        return 1;
-    if (SceneActorChase_StatusFlags(actor, 0x20000))
-        return 1;
-    if (actor->base.health <= 0)
-        return 1;
-    return 0;
-}
 static inline u8 Reaction_IsBlockedFlags(struct ChaseActor *actor, u32 flags)
 {
     if (!actor)
@@ -46,7 +36,7 @@ u32 SceneActorReaction_SetMotionMode(struct ReactionOwner *owner, s32 mode, s32 
     struct SceneActorChaseGroup *group = &actor->group;
     struct ContactCollider *second = &actor->base.colliderB;
     struct ContactCollider *first = &actor->base.colliderA;
-    if (Reaction_IsBlocked(actor))
+    if (ActorStatus_IsDown(actor))
         return 0;
     switch (mode) {
         case 0: {
@@ -72,24 +62,10 @@ u32 SceneActorReaction_SetMotionMode(struct ReactionOwner *owner, s32 mode, s32 
                             u32 statusMask = 0x803E;
                             u32 flags = *motion;
                             if (statusMask & flags) {
-                                {
-                                    union {
-                                        u32 raw;
-                                        struct {
-                                            s16 bits : 16;
-                                            u32 upper : 16;
-                                        } field;
-                                    } mask;
-                                    u32 value;
-                                    mask.raw = flags;
-                                    mask.field.bits = ~0x201;
-                                    value = mask.field.bits & flags;
-                                    *motion = value;
-                                }
+                                SceneActorDamage_ClearHitStart(motion, flags);
                                 SceneActorChase_ClearWordFlags(&actor->base.behaviorFlags, 0x4000);
                                 {
-                                    struct SceneActorReactionMotion *tracking =
-                                        (void *)&actor->base.tracking.target;
+                                    struct SceneActorChaseTracking *tracking = &actor->base.tracking;
                                     s32 mask = ~0x10;
                                     tracking->flags &= mask;
                                 }
