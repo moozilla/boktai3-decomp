@@ -186,7 +186,7 @@ void SceneActorReaction_HandleColliderContact(struct ContactCollider *source,
                     if (d <= 0x20) {
                         actor->base.hitLockTimer = source->unknown3C;
                         actor->base.field2E6 = 1;
-                        *(u16 *)actor->group.unknown5CE = Div(actor->base.hitLockTimer, 3);
+                        actor->group.hitBurstInterval = Div(actor->base.hitLockTimer, 3);
                         {
                             u32 bit = 0x2000;
                             *motion = bit | *motion;

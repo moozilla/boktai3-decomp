@@ -96,7 +96,7 @@ struct SceneActorChaseGroup {
     u16 contactCooldown; /* set to 60 frames on a collider contact, counted down each frame */
     u8 hitReactionLatch, unknown5CB;
     u16 effect;
-    u8 unknown5CE[2];
+    u16 hitBurstInterval; /* one third of the contact lock time */
     void *route;
     struct ContactPosition *destination;
     struct SceneActorChaseTurnState turn;
