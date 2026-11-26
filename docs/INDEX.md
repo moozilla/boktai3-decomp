@@ -240,6 +240,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [docs/history/2026-11-17.md](../docs/history/2026-11-17.md) | 2026-11-17 | #compiler #depin #matching #phase3 #round13 #round15 #structs | 3 |
 | [docs/history/2026-11-20.md](../docs/history/2026-11-20.md) | 2026-11-20 | #actors #compiler #matching #monsters #phase3 #scene #scene-actors #tooling #wireless | 2 |
 | [docs/history/2026-11-25.md](../docs/history/2026-11-25.md) | 2026-11-25 | #hardware #menu #tooling | 0 |
+| [docs/history/2026-11-26.md](../docs/history/2026-11-26.md) | 2026-11-26 | #autopilot #port #verification | 0 |
 | [docs/history/HANDOFF_2026-10-23.md](../docs/history/HANDOFF_2026-10-23.md) | Handoff: current state and how to continue | #process | 14 |
 | [docs/history/MANAGER_HANDOFF_2026-10-19.md](../docs/history/MANAGER_HANDOFF_2026-10-19.md) | Manager handoff (2026-10-19) | #process #tooling | 6 |
 | [docs/history/README.md](../docs/history/README.md) | Handoff history |  | 17 |
@@ -263,6 +264,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [notes/area-effect-link_2026-10-14.md](../notes/area-effect-link_2026-10-14.md) | Link variant of area effects (Sol, 2026-10-14) |  | 2 |
 | [notes/area-effect_2026-10-14.md](../notes/area-effect_2026-10-14.md) | Rectangular area effect manager (Sol, 2026-10-14) | *#tooling* | 4 |
 | [notes/arm-08000430.md](../notes/arm-08000430.md) | sub_08000430: unpinned exact match, and how it works | #matching #compiler #register-pinning #arm | 6 |
+| [notes/autopilot-port-conformance_2026-11-26.md](../notes/autopilot-port-conformance_2026-11-26.md) | Autopilot checkpoint conformance, 2026-11-26 | #port #autopilot #verification | 2 |
 | [notes/autopilot-port-stress_2026-11-25.md](../notes/autopilot-port-stress_2026-11-25.md) | Autopilot port stress run, 2026-11-25 | #hardware #tooling #menu #scene | 2 |
 | [notes/axe-trail-playback.md](../notes/axe-trail-playback.md) | Axe trail playback | #monsters #matching | 0 |
 | [notes/background-palette-fade_2026-11-01.md](../notes/background-palette-fade_2026-11-01.md) | Background palette fade | *#assets* | 0 |

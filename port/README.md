@@ -609,7 +609,8 @@ random index.
 Run one recording with `build/venv/bin/python port/tests/verify.py --case NAME`.
 For randomized input across the entire bank, run
 `build/venv/bin/python port/tests/verify.py --all --seed 1 --seed 2 --seed 3 --resume`.
-Add `--case CHECKPOINT` to select one save or use a fresh `--out-root` after
+Use `--jobs 2` for two simultaneous comparisons. Add `--case CHECKPOINT` to
+select one save or use a fresh `--out-root` after
 rebuilding the wasm to keep the old comparisons. Results, movies and action logs
 are under `build/autopilot/`. Run `node tools/autopilot/tickdiff.mjs DIR FROM TO`
 to compare RAM around a failing tick.

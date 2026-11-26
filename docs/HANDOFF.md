@@ -47,6 +47,7 @@ the README badges. Use `python3 tools/progress.py` for the current figures and
 | Phase 4 | the object model: [OBJECT_MODEL.md](OBJECT_MODEL.md) describes tasks, the registry actor and pool slots. Monsters derive from `struct RoomActor` (`include/room_actor.h`) or `struct ChaseActor` (`include/chase_actor.h`), with named and typed method slots and `enum MonsterCategory`; the per-header views and the `SCENE_ACTOR_CHASE_*` selector macros are gone. The eleven registry classes (Spider, Octopus, Ivy, Lun, Bat, Axe, Dog, Mummy, Vorn, Golem, Skeleton) are class units in `src/`; the functions that match only alone are explained in [notes/unit-context-sensitivity_2026-11-16.md](../notes/unit-context-sensitivity_2026-11-16.md) |
 | Data | fully relocatable; `make shifttest` compares 35 emulator screenshots after moving data. decomp.dev's data measure is ROM data that round-trips through an editable form (`tools/data_roundtrip.py`), by kind ([DATA_TRACKING.md](DATA_TRACKING.md)); RAM is tracked in PROGRESS.md |
 | Report | every function in one of ~490 subsystem units under 11 categories plus Libraries ([REPORT_SUBSYSTEMS.md](REPORT_SUBSYSTEMS.md)); main-only CI publishes to decomp.dev |
+| Source port | 249 randomized checkpoint movies match the ROM after the wasm ABI repair. Run `make port-verify` for the short recorded suite. [Conformance evidence and pending source repairs](../notes/autopilot-port-conformance_2026-11-26.md). |
 
 Recent (details in [docs/history/](history/README.md) and the notes they link):
 
