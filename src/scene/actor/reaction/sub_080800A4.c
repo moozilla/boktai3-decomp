@@ -25,9 +25,9 @@ static inline void Reaction_Show(struct ChaseActor *actor)
 static inline void Reaction_SetDrawMode(struct ChaseActor *actor, u32 mode)
 {
     if (!actor->base.drawableKind)
-        *((u8 *)actor->base.drawable + 7) = mode;
+        ((struct SceneActorAnimationSequenceDrawable *)actor->base.drawable)->sprite.priority = mode;
     else
-        *((u8 *)actor->base.drawable + 0x3A) = mode;
+        ((struct SceneActorAnimationTileDrawable *)actor->base.drawable)->tile.attribute1A = mode;
 }
 static inline u32 AnyMotion(u32 mask, u32 *flags)
 {
@@ -40,10 +40,6 @@ static inline void ApplyColliderMask(u16 *field, u16 bits)
     mask &= old;
     *field = mask;
 }
-static inline u32 *Reaction_ControlFlags(struct ChaseActor *actor)
-{
-    return &actor->base.behaviorFlags;
-}
 void SceneActorReaction_UpdateContactRouteRecovery(struct ChaseActor *actor)
 {
     struct SceneActorChaseGroup *group = &actor->group;
@@ -53,11 +49,7 @@ void SceneActorReaction_UpdateContactRouteRecovery(struct ChaseActor *actor)
 
     if (prepared) {
         {
-            struct SceneActorRegistryControl *control = &group->common.control;
-            SceneActorChase_ClearWordFlags(Reaction_ControlFlags(actor), 0x141C0);
-            control->counter = 0;
-            control->field14 = 0;
-            control->timer = 0;
+            SceneActorReaction_ResetRouteControl(actor, &group->common.control);
         }
         SceneActorAnimation_SelectDirectionFlagsVariant((void *)actor, 3, 1);
         collider->flags |= 4;
