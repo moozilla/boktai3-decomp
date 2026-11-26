@@ -2204,47 +2204,32 @@ void SceneActorReaction_ApplyThreshold(struct ChaseActor *actor, s32 value);
 
 void SceneActorReaction_TickContactAnimation(struct ChaseActor *p)
 {
-    u8 *state = p->base.context;
-    u16 *animation = (u16 *)((u8 *)p->base.drawable + 0x20);
+    struct Skeleton *state = p->base.context;
+    struct SceneActorAnimationTileDrawable *drawable = p->base.drawable;
+    struct AnimSprite *animation = &drawable->tile;
     u8 *category;
     u32 kind;
     if (SceneActorReaction_TakePrepared(p))
         SceneActorAnimation_SelectDirectionalEntry(&p->base, 5);
     kind = p->base.category;
     category = &p->base.category;
-    if (kind == 5 && animation[10] == 2 && animation[6] == 0)
+    if (kind == MONSTER_CATEGORY_SKELETON && animation->frameIndex == 2 && animation->elapsed == 0)
         Sound_PlaySong(0x3A9);
-    if (animation[10] == 3) {
-        Collider_Refresh(state + 0x678);
-        if (animation[6] == 0 && *category == MONSTER_CATEGORY_SKELETON_GUARD)
+    if (animation->frameIndex == 3) {
+        Collider_Refresh(&state->attackCollider);
+        if (animation->elapsed == 0 && *category == MONSTER_CATEGORY_SKELETON_GUARD)
             Sound_PlaySong(0x3AA);
     }
-    if (p->base.restart) {
-        void (*f)(void) = SceneActorReaction_ApplyThreshold;
-        u32 k = 0x3e;
-        u32 z;
-        u8 *a = &p->base.field2B2;
-        u32 *w;
-        s32 m;
-        z = 0;
-        *a = 1;
-        p->base.stepDone = z;
-        p->base.controlKind = k;
-        p->base.target = f;
-        p->base.field2C8 = z;
-        w = &p->base.pendingControlFlags;
-        m = -2;
-        *w = m & *w;
-        p->base.pendingControl = z;
-    }
+    if (p->base.restart)
+        SceneActorChase_SetControl(p, SceneActorReaction_ApplyThreshold, 0x3E);
 }
 
 void SceneActorReaction_ApplyThreshold(struct ChaseActor *actor, s32 value)
 {
-    struct SceneActorScriptPropertiesView *context = actor->base.context;
+    struct Skeleton *context = actor->base.context;
 
     if (SceneActorControl_TakeFlag(&actor->base.field2B2))
-        SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0);
+        SceneActorAnimation_SelectDirectionalEntry(&actor->base, 0);
 
     if (value > context->parameter706)
         actor->base.stepDone = 1;
@@ -2258,20 +2243,21 @@ void Skeleton_UpdateAttackRecovery(struct ChaseActor *p);
 
 void SceneActorReaction_TickQueuedContact(struct ChaseActor *p)
 {
-    u8 *state = p->base.context;
-    u16 *animation = (u16 *)((u8 *)p->base.drawable + 0x20);
+    struct Skeleton *state = p->base.context;
+    struct SceneActorAnimationTileDrawable *drawable = p->base.drawable;
+    struct AnimSprite *animation = &drawable->tile;
     u32 *flags;
     u32 queued;
     if (SceneActorReaction_TakePrepared(p))
         SceneActorAnimation_SelectDirectionalEntry(&p->base, 5);
-    if (animation[10] == 2 && animation[6] == 0)
+    if (animation->frameIndex == 2 && animation->elapsed == 0)
         Sound_PlaySong(0x3A9);
-    if (animation[10] == 3) {
-        Collider_Refresh(state + 0x678);
+    if (animation->frameIndex == 3) {
+        Collider_Refresh(&state->attackCollider);
     }
     {
         u32 mask = 0x20;
-        u32 *address = (u32 *)(state + 0x6DC);
+        u32 *address = &state->actionFlags;
         u32 value = *address & mask;
         flags = address;
         queued = Test(value, ~0);
@@ -2281,41 +2267,9 @@ void SceneActorReaction_TickQueuedContact(struct ChaseActor *p)
             s32 mask = ~0x20;
             *flags &= mask;
         }
-        {
-            void (*f)(void) = Skeleton_ShedBones;
-            u32 k = 0x25;
-            u32 z;
-            u8 *a = &p->base.field2B2;
-            u32 *w;
-            s32 m;
-            z = 0;
-            *a = 1;
-            p->base.stepDone = z;
-            p->base.controlKind = k;
-            p->base.target = f;
-            p->base.field2C8 = z;
-            w = &p->base.pendingControlFlags;
-            m = -2;
-            *w = m & *w;
-            p->base.pendingControl = z;
-        }
+        SceneActorChase_SetControl(p, Skeleton_ShedBones, 0x25);
     } else if (p->base.restart) {
-        void (*f)(void) = Skeleton_UpdateAttackRecovery;
-        u32 k = 0x24;
-        u32 z;
-        u8 *a = &p->base.field2B2;
-        u32 *w;
-        s32 m;
-        z = queued;
-        *a = 1;
-        p->base.stepDone = z;
-        p->base.controlKind = k;
-        p->base.target = f;
-        p->base.field2C8 = z;
-        w = &p->base.pendingControlFlags;
-        m = -2;
-        *w = m & *w;
-        p->base.pendingControl = z;
+        SceneActorChase_SetControl(p, Skeleton_UpdateAttackRecovery, 0x24);
     }
 }
 
@@ -2536,7 +2490,7 @@ static inline s32 Half(s32 value)
 
 void Skeleton_TickDecayingLunge(struct ChaseActor *p, s32 tick_)
 {
-    u8 *context;
+    struct Skeleton *context;
     s32 tick = tick_;
     struct {
         u32 zero;
@@ -2545,12 +2499,12 @@ void Skeleton_TickDecayingLunge(struct ChaseActor *p, s32 tick_)
     struct ContactPosition jitter;
     struct ContactPosition empty;
     struct ContactPosition *np;
-    context = *(u8 **)((u8 *)p + 0x3D0);
+    context = p->base.context;
     if (SceneActorReaction_TakePrepared(p)) {
         SceneActorAnimation_SelectDirectionalEntry(&p->base, 0x15);
-        context[0x6D1] = 0x48;
+        context->unknown6D1 = 0x48;
     }
-    HeadingStep_TickDecayingLunge(&p->base.body.direction, context + 0x6D1, &scratch.step);
+    HeadingStep_TickDecayingLunge(&p->base.body.direction, &context->unknown6D1, &scratch.step);
     {
         struct ContactPosition *v = &scratch.step;
         AddHalf(&p->base.body.motion.x, &v->x);
@@ -2564,8 +2518,8 @@ void Skeleton_TickDecayingLunge(struct ChaseActor *p, s32 tick_)
     }
     if (Mod(tick, 4) == 0) {
         u32 z;
-        s32 h = Half(context[0x6D1]);
-        u8 *cp = context + 0x6D1;
+        s32 h = Half(context->unknown6D1);
+        u8 *cp = &context->unknown6D1;
         z = 0;
         *cp = h;
         jitter.x = 0x52;
@@ -2576,8 +2530,8 @@ void Skeleton_TickDecayingLunge(struct ChaseActor *p, s32 tick_)
         Clear(&scratch.zero, np, 0x05000002);
         SceneParticleBurst_CreateWithPause(&p->base.body.position, np, &jitter, 1, 2, 4);
     }
-    Collider_Refresh(context + 0x678);
-    if (p->base.restart && context[0x6D1] == 0)
+    Collider_Refresh(&context->attackCollider);
+    if (p->base.restart && context->unknown6D1 == 0)
         SceneActorChase_SetControl(p, Skeleton_UpdateAlternateAttackRecovery, 0x2A);
 }
 
@@ -2593,15 +2547,16 @@ void Skeleton_UpdateAlternateAttackRecovery(struct ChaseActor *p)
 
 void SceneActorReaction_TickMultiHitAnimation(struct ChaseActor *p)
 {
-    u8 *state = p->base.context;
-    u16 *animation = (u16 *)((u8 *)p->base.drawable + 0x20);
+    struct Skeleton *state = p->base.context;
+    struct SceneActorAnimationTileDrawable *drawable = p->base.drawable;
+    struct AnimSprite *animation = &drawable->tile;
     u32 frame;
     if (SceneActorReaction_TakePrepared(p))
         SceneActorAnimation_SelectDirectionalEntry(&p->base, 0x17);
-    frame = animation[10];
+    frame = animation->frameIndex;
     if ((u16)(frame - 3) <= 2 || (u16)(frame - 7) <= 2)
-        Collider_Refresh(state + 0x678);
-    if ((animation[10] == 4 || animation[10] == 7) && animation[6] == 0)
+        Collider_Refresh(&state->attackCollider);
+    if ((animation->frameIndex == 4 || animation->frameIndex == 7) && animation->elapsed == 0)
         Sound_PlaySong(0x3AA);
     if (p->base.restart)
         SceneActorChase_SetControl(p, SceneActorReaction_ApplyThreshold, 0x3E);
@@ -2975,9 +2930,9 @@ void SceneActorReaction_TickHiddenTimeout(struct ChaseActor *p, s32 elapsed)
             return;
         if (Test(StateFlag(state, 2), ~0))
             return;
-        if (state->parameter6D2 > 19999)
+        if (((struct Skeleton *)state)->revivalDelay > 19999)
             return;
-        if (state->parameter6D2 >= elapsed)
+        if (((struct Skeleton *)state)->revivalDelay >= elapsed)
             return;
         mode = 1;
         SceneActorPlacement_ResetActorState(p, &mode);
@@ -2988,36 +2943,14 @@ void SceneActorReaction_TickHiddenTimeout(struct ChaseActor *p, s32 elapsed)
 
 void Actor_RestoreSnapshot(struct ChaseActor *s);
 
-static inline u8 take(u8 *s)
-{
-    if (s[0x2B2]) {
-        s[0x2B2] = 0;
-        return 1;
-    }
-    return 0;
-}
-
 void Skeleton_UpdateReactionTransition(u8 *s, s32 arg)
 {
-    u32 queued = take(s);
+    struct ChaseActor *actor = (void *)s;
+    u32 queued = SceneActorReaction_TakePrepared(actor);
     if (queued || arg == 0x1E || arg == 0x37) {
-        SceneActorAnimation_SelectDirectionalEntry(s, 0x12);
+        SceneActorAnimation_SelectDirectionalEntry(&actor->base, 0x12);
     } else if (arg > 0x5F) {
-        void (*fn)(void);
-        u32 code;
-        u32 *flags;
-        u32 mask;
-        fn = Actor_RestoreSnapshot;
-        code = 0xD;
-        s[0x2B2] = 1;
-        s[0x2B0] = queued;
-        s[0x2B5] = code;
-        *(void (**)(void))(s + 0x21C) = fn;
-        *(u16 *)(s + 0x2C8) = queued;
-        flags = (u32 *)(s + 0x114);
-        mask = ~1;
-        *flags &= mask;
-        *(u32 *)(s + 0x104) = queued;
+        SceneActorChase_SetControl(actor, Actor_RestoreSnapshot, 13);
     }
 }
 
