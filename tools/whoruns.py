@@ -23,7 +23,7 @@ from tempfile import TemporaryDirectory
 
 from assets import saves
 from romlib import ROOT
-from source_layout import address_of, manifest, symbol_names
+from source_layout import address_of, manifest, scan, symbol_names
 from split import inventory_starts
 
 ROOT = Path(ROOT)
@@ -49,17 +49,31 @@ def resolve(query, entries):
     if address is not None:
         return {address} if address in entries else set()
 
-    source = manifest()
-    address = source.names.get(query)
-    if address is not None:
-        return {address}
-
     path = Path(query)
     if path.is_relative_to(ROOT):
         path = path.relative_to(ROOT)
     if path.parts and path.parts[0] != "src":
         path = Path("src") / path
     prefix = path.as_posix()
+
+    # A path is unambiguous without a project-wide symbol or suffix lookup.
+    if ("/" in query or path.suffix == ".c") and ".." not in path.parts:
+        target = ROOT / path
+        if target.is_relative_to(ROOT / "src"):
+            if target.is_dir():
+                addresses = {a for values in scan(ROOT, target).by_file.values() for a in values}
+            elif target.is_file() and target.suffix == ".c":
+                addresses = set(scan(ROOT, target.parent).by_file.get(prefix, ()))
+            else:
+                addresses = set()
+            if addresses:
+                return addresses
+
+    source = manifest()
+    address = source.names.get(query)
+    if address is not None:
+        return {address}
+
     units = set(source.by_file) | {p.as_posix() for file in source.by_file for p in Path(file).parents}
     if prefix not in units:
         matches = {unit for unit in units if unit.endswith("/" + query)}

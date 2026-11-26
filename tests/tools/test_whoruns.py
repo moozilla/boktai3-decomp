@@ -46,6 +46,21 @@ class WhoRunsTest(unittest.TestCase):
             self.assertEqual(whoruns.resolve("book", entries), set(entries))
             self.assertEqual(whoruns.resolve("book.c", entries), {entries[0]})
 
+    def test_explicit_paths_only_read_their_source_directory(self):
+        with TemporaryDirectory() as directory:
+            root = Path(directory)
+            unit = root / "src/ui/book"
+            unit.mkdir(parents=True)
+            path = unit / "book.c"
+            path.write_text("void sub_08000002(void) {}\n")
+            (unit / "pages.c").write_text("void sub_08000004(void) {}\n")
+            entries = [0x08000002, 0x08000004]
+            with patch.object(whoruns, "ROOT", root), patch.object(whoruns, "manifest") as all_sources:
+                self.assertEqual(whoruns.resolve("src/ui/book", entries), set(entries))
+                self.assertEqual(whoruns.resolve("ui/book/book.c", entries), {entries[0]})
+                self.assertEqual(whoruns.resolve(str(path), entries), {entries[0]})
+                all_sources.assert_not_called()
+
     def test_multiple_queries_report_each_unit_separately(self):
         with TemporaryDirectory() as directory:
             index = Path(directory)
