@@ -27,7 +27,7 @@ u32 MovingPlatform_Destroy(struct NamedObjectManager *group)
         if (HasBit(*active, 1 << i)) {
             struct NamedObject *member = &group->slots[i];
             if (HasBit((u16)member->flags, 1))
-                TerrainModifiers_UnregisterCell(member->registration);
+                TerrainModifiers_UnregisterCell(&member->registration);
             MovingPlatform_ReleaseMember(member);
             SceneBody_Unregister(&member->body);
             Sprite_Remove(member);
