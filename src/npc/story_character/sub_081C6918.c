@@ -1,14 +1,12 @@
-#include "global.h"
+#include "npc/story_character/state_actor.h"
 
-void StoryCharacter_ProcessDirectionMessages(u8 *);
-void Actor_UpdateMovementAnimationAndEffects(u32, u8 *);
+void StoryCharacter_ProcessDirectionMessages(struct StateActor *);
+void Actor_UpdateMovementAnimationAndEffects(u32, struct StateActor *);
 
-s32 StoryCharacter_OnUpdateDisplay(u32 a, u8 *b)
+s32 StoryCharacter_OnUpdateDisplay(u32 a, struct StateActor *b)
 {
-    s32 z;
     StoryCharacter_ProcessDirectionMessages(b);
     Actor_UpdateMovementAnimationAndEffects(a, b);
-    z = 0;
-    b[5] = z;
-    return z;
+    b->nextState = 0;
+    return 0;
 }
