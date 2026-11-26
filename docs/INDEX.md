@@ -602,6 +602,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [notes/scene-actor-defeat-burst_2026-11-01.md](../notes/scene-actor-defeat-burst_2026-11-01.md) | Defeat burst at 08080494 | #scene-actors #matching #compiler | 1 |
 | [notes/scene-actor-evaluate-candidate.md](../notes/scene-actor-evaluate-candidate.md) | SceneActorContacts_EvaluateCandidate |  | 1 |
 | [notes/scene-actor-groups_2026-10-30.md](../notes/scene-actor-groups_2026-10-30.md) | Canonical scene actor groups and routes | #structs #ram #monster #matching | 4 |
+| [notes/scene-actor-placement-cleanup_2026-11-26.md](../notes/scene-actor-placement-cleanup_2026-11-26.md) | Scene actor placement cleanup | #matching #types #phase3 #scene | 2 |
 | [notes/scene-actor-position-curve.md](../notes/scene-actor-position-curve.md) | Scene actor position curve | #scene-actors #matching | 0 |
 | [notes/scene-actor-pursuit-recovery.md](../notes/scene-actor-pursuit-recovery.md) | Pursuit after contact release | #scene-actors #matching | 0 |
 | [notes/scene-actor-recovery-route.md](../notes/scene-actor-recovery-route.md) | SceneActorRoute_TryRecoveryDetour | *#actors* | 1 |
