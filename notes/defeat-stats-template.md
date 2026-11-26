@@ -2,7 +2,7 @@
 
 Tags: #matching (cloud task 08132748, 2026-10-19)
 
-`src/actors/scene_actor_reaction/sub_08132D2C.c` (`SceneActorReaction_DefeatRecordStats`) matches. It is about 2400 instructions, counting the tails that `notes/far-branch-tails.md` merges back in. Close siblings use the same template:
+`src/scene/actor/reaction/sub_08132D2C.c` (`SceneActorReaction_DefeatRecordStats`) matches. It is about 2400 instructions, counting the tails that `notes/far-branch-tails.md` merges back in. Close siblings use the same template:
 * `08134398` (in progress on this branch);
 * `080BD1F0` (with tail `080BEEE8`);
 * `080BFCC4` and `080BF0E4` (the 0x592/0x270F tails);

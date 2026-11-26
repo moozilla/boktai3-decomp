@@ -1,0 +1,37 @@
+#include "global.h"
+
+void Memory_Clear(void *, u32);
+
+struct E {
+    u8 a[0x157];
+    u8 idx;
+    u8 b[0x160 - 0x157 - sizeof(u8)];
+};
+struct S {
+    u8 pad0[0x38];
+    u32 mask;
+    struct E e[4];
+};
+
+static inline u8 Tst(u32 *m, s32 i)
+{
+    if (*m & (1 << i))
+        return TRUE;
+    return FALSE;
+}
+
+struct E *FragmentBurst_AllocateSlot(struct S *b)
+{
+    s32 i;
+    struct E *e;
+    for (i = 0; i < 4; i++) {
+        if (!Tst(&b->mask, i)) {
+            e = &b->e[i];
+            b->mask |= 1 << i;
+            Memory_Clear(e, 0x160);
+            e->idx = i;
+            return e;
+        }
+    }
+    return 0;
+}

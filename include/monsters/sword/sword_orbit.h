@@ -1,7 +1,7 @@
 #ifndef GUARD_SWORD_ORBIT_H
 #define GUARD_SWORD_ORBIT_H
 
-#include "engine/shared/global.h"
+#include "global.h"
 
 static inline s8 Sword_OrbitDirection(u32 positive)
 {

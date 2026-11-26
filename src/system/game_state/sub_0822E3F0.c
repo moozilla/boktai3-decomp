@@ -1,5 +1,5 @@
-#include "engine/shared/global.h"
-#include "engine/shared/debug.h"
+#include "global.h"
+#include "debug.h"
 u32 Inventory_GetConsumableObtainedFlag(u32);
 u32 GameState_CountCollectedConsumableTypes(void)
 {

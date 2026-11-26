@@ -1,5 +1,5 @@
-#include "engine/shared/global.h"
-#include "engine/shared/player_slot_status.h"
+#include "global.h"
+#include "player/player_slot_status.h"
 extern const u32 gUnk_08611E04[];
 s32 Hresvelgr_TryStartReaction(void *);
 void Callback_InvokeActor(void *, u32);

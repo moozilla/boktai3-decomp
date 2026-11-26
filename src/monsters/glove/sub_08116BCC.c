@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 extern u8 *gGameState;
 struct S {
     u8 f[0x74];

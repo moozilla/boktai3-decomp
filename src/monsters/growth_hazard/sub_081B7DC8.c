@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 
 // confidence=low: RepeatedEffect_InitCollider for an effect with its collider at 0x48 and its
 // position at 0xE4: a 0x80 by 0x100 attack box calling GrowthHazard_ApplyAnimationEvent.

@@ -1,6 +1,6 @@
-#include "engine/shared/global.h"
+#include "global.h"
 #include "monsters/pink_spine/pink_spine_playback.h"
-#include "engine/shared/display_sequence_inline.h"
+#include "engine/video/display_sequence_inline.h"
 // confidence=low: prefix follows the neighboring creator; species identity remains tentative.
 void ProjectileEmitter_WaitForPlayerApproach(void);
 s32 PinkSpine_InitCollider(struct PinkSpineState *);

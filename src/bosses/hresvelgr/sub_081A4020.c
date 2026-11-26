@@ -1,5 +1,5 @@
-#include "engine/shared/global.h"
-#include "engine/shared/ram.h"
+#include "global.h"
+#include "engine/ram.h"
 struct E {
     u32 fl;
     u8 f[0x50 - 4];

@@ -1,5 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
-#include "display_track.h"
+#include "engine/video/display_track.h"
 
 void DisplayTrack_Update(struct DisplayTrack *track)
 {

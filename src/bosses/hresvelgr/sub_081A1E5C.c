@@ -1,5 +1,5 @@
-#include "engine/shared/global.h"
-#include "engine/shared/player_slot_status.h"
+#include "global.h"
+#include "player/player_slot_status.h"
 #include "bosses/hresvelgr/hresvelgr_travel.h"
 
 void SceneActors_RunStateCallback(u32);

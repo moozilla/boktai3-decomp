@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 
 struct VanargandGroupSprite {
     u32 flags;

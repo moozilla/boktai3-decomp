@@ -1,10 +1,10 @@
-#include "engine/shared/global.h"
-#include "engine/shared/engine.h"
-#include "engine/shared/render.h"
+#include "global.h"
+#include "engine/engine.h"
+#include "engine/video/render.h"
 #include "gba/io_reg.h"
-#include "engine/shared/ram.h"
-#include "engine/shared/runtime.h"
-#include "engine/shared/engine_pause_flags.h"
+#include "engine/ram.h"
+#include "engine/runtime.h"
+#include "engine/engine_pause_flags.h"
 struct ScriptPanel {
     u8 unk0[0x30];
     u32 counter;

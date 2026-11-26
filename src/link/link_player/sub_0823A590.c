@@ -1,5 +1,5 @@
-#include "engine/shared/global.h"
-#include "engine/shared/player.h"
+#include "global.h"
+#include "player/player.h"
 void Player_ApplyPeriodicStatChanges(struct Player *);
 void Player_NotifyFirstSelectedSlot(u32 slots, u32 flags)
 {

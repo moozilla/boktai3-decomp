@@ -1,6 +1,6 @@
-#include "effect_group.h"
-#include "engine.h"
-#include "ram.h"
+#include "effects/effect_group.h"
+#include "engine/engine.h"
+#include "engine/ram.h"
 // confidence=low: fills the first inactive group with randomized bouncing particles.
 #define ParticleGroup_SpawnBouncing sub_08014634
 struct Particle {

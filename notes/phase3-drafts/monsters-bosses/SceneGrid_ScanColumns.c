@@ -1,4 +1,4 @@
-#include "scene_grid.h"
+#include "scene/terrain/scene_grid.h"
 /* The 10 x 8 board, placed at grid column 5, row 8. */
 extern const s8 gUnk_08605BC8[][8];
 

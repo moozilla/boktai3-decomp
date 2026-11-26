@@ -1,5 +1,5 @@
-#include "engine/shared/global.h"
-#include "engine/shared/engine.h"
+#include "global.h"
+#include "engine/engine.h"
 void GameState_AddEquipment(s32 value);
 /* game state fields, addressed index-first as the original does */
 #define STATE_U32(offset) (*(u32 *)((u8 *)gGameState + (offset)))

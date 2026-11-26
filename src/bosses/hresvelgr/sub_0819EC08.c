@@ -1,9 +1,9 @@
-#include "engine/shared/global.h"
+#include "global.h"
 
 /* tentative: burst phase that also pushes the body back along its facing while firing */
 
 #include "bosses/hresvelgr/hresvelgr_travel.h"
-#include "engine/shared/scene_vec_polar.h"
+#include "engine/math/scene_vec_polar.h"
 
 struct ReactionIds {
     u32 ids[2];

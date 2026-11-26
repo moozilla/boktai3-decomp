@@ -317,7 +317,7 @@ class Walker:
             # (also RegistrySelection, San Miguel's gate 2569: 9 entries, f = enabled flags)
             self.hub_key = key
         if key is not None and getattr(self, 'hub_key', None) == key:
-            # a town map (Registry3F74, src/menus/registry_3_f74/registry_choice_menu.c): keyword p lists the
+            # a town map (Registry3F74, src/ui/widgets/scripted_choice.c): keyword p lists the
             # script each of its 11 cursor entries runs; their transitions are doors with
             # hub = the entry index (no box)
             k = dict((x, v) for x, v, _ in kw)

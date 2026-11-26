@@ -1,4 +1,4 @@
-#include "area_effect_link.h"
+#include "scene/area_effect/area_effect_link.h"
 // MATCHING_CONCESSION: register-pinning
 void Player_AddEnergy(struct AreaEffectPlayer *, s32);
 static inline u32 playerMode(struct AreaEffectPlayer *player)

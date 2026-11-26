@@ -1,6 +1,6 @@
 #ifndef SCENE_ACTOR_TIMED_BEHAVIOR_H
 #define SCENE_ACTOR_TIMED_BEHAVIOR_H
-#include "engine/shared/scene_actor_reset.h"
+#include "scene/actor/scene_actor_reset.h"
 /* Narrow view of actor->context used by the behavior 56/57 helpers. */
 struct SceneActorTimedBehaviorContext {
     u8 unknown0[0x6D0];

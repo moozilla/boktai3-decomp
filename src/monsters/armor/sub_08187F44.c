@@ -1,7 +1,7 @@
-#include "engine/shared/global.h"
-#include "engine/shared/contact_collider.h"
+#include "global.h"
+#include "scene/actor/contact_collider.h"
 
-#include "engine/shared/engine.h"
+#include "engine/engine.h"
 #include "system/game_state/game_state.h"
 
 void ActorController_SetBehavior(void *actor, u32 behavior);

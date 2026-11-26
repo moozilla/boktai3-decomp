@@ -1,8 +1,8 @@
-#include "engine/shared/global.h"
+#include "global.h"
 #define Callback_InvokeActor _call_via_r1
 #include "bosses/hresvelgr/hresvelgr_travel.h"
 
-#include "engine/shared/scene_facing.h"
+#include "scene/actor/scene_facing.h"
 void Hresvelgr_SetAnimation(void *, void *, void *, s32, s32, s32);
 void Sound_PlaySong(u32);
 s32 Callback_InvokeActor(void *, void *);

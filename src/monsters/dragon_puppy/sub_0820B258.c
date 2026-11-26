@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 void Anim_SetSequence(void *, u32, u32, u32, u32);
 void DragonPuppy_UpdateAttackTiming(void);
 u32 DragonPuppy_UpdateAttackRecovery(u8 *p)

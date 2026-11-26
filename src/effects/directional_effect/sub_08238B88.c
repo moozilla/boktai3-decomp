@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 
 struct S08238B88 {
     u8 f0[0xC6];

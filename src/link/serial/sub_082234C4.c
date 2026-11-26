@@ -1,7 +1,7 @@
 #define Interrupts_DisableMaster Serial_DisableGlobalInterrupts
 #define Interrupts_EnableMaster  Serial_EnableGlobalInterrupts
-#include "engine/shared/global.h"
-#include "engine/shared/ram.h"
+#include "global.h"
+#include "engine/ram.h"
 void Serial_DisableGlobalInterrupts(void);
 void Serial_EnableGlobalInterrupts(void);
 s32 Serial_ReadLatestPacket(u16 *out)

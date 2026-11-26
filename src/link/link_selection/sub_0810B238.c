@@ -1,6 +1,6 @@
-#include "engine/shared/global.h"
+#include "global.h"
 #include "link/link_selection/link_selection_mode.h"
-#include "engine/shared/area_effect_link.h"
+#include "scene/area_effect/area_effect_link.h"
 
 // foundry draft (worker best 96.4%); what differs is mostly register allocation and instruction order
 u8 Registry1745_ConsumeStateEntry(struct AreaEffectLinkState *);

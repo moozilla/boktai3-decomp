@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 
 extern u32 gUnk_02000560;
 struct A {

@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 /* Math_ApproachAngleArrayByHalf: Approaches each target angle by half the shortest angular difference and snaps within one unit */
 #define Math_ApproachAngleArrayByHalf sub_0819B4E4
 

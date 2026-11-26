@@ -1,5 +1,5 @@
-#include "engine/shared/global.h"
-#include "engine/shared/engine.h"
+#include "global.h"
+#include "engine/engine.h"
 struct HresvelgrPosition {
     s16 x, y, z, pad;
 };

@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 extern u8 *gGameState;
 u8 *Save_GetContinuationData(void)
 {

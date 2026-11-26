@@ -16,7 +16,7 @@ Verified seeds and ports so far: `080A2048`, `080A5B8C`, `080ACCF0`, `080E7D08` 
 
 `0816B390` matched (48 bytes): `FDFF` in retained WIP produced wrong high mask halfword. Pointer-first local plus u32 `~0x200` preserves the original full-width `FFFFFDFF` literal and mask load before halfword read. Independent compiler correctness, no naming inference.
 
-`08115A6C` matched (44 bytes): initial mismatch was pointer register r1 instead of r2. Assembly leaves r1 live across setup and passes it to `08115A20`; adding the hidden second arg fixes allocation. Matched callee `src/field/collectible/sub_08115A20.c` confirms it dereferences its second argument's +4 field. Local pointer then constant mask 1 reproduces mask-before-read.
+`08115A6C` matched (44 bytes): initial mismatch was pointer register r1 instead of r2. Assembly leaves r1 live across setup and passes it to `08115A20`; adding the hidden second arg fixes allocation. Matched callee `src/objects/items/collectible/sub_08115A20.c` confirms it dereferences its second argument's +4 field. Local pointer then constant mask 1 reproduces mask-before-read.
 
 `080A0894` matched (120 bytes): pointer computed before predicate constant; failure label before success block keeps original forward `blo`; update masks written as `mask |= *flags` rather than compound memory OR preserve original constant-register destination.
 

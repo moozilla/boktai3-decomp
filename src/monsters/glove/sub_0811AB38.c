@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 u8 *Task_Create(u32, u32);
 void Task_SetCallbacks(u8 *, void (*)(void), void (*)(void));
 s32 Glove_InitFromScript(u8 *);

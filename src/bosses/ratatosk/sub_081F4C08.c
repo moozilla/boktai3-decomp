@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 #include "bosses/ratatosk/ratatosk.h"
 struct RatatoskAnimation {
     u32 unknown[2];

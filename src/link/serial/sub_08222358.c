@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 
 struct Interp {
     u8 pad0[4];

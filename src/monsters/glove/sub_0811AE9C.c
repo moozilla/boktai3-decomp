@@ -1,5 +1,5 @@
-#include "engine/shared/global.h"
-#include "engine/shared/ram.h"
+#include "global.h"
+#include "engine/ram.h"
 struct PackedMotionPosition {
     u32 x : 16;
     s32 y : 16;

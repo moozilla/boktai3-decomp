@@ -1,6 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
-#include "record_menu.h"
+#include "link/lobby/record_menu.h"
 #define TileNumber_GetCell     Video_GetWrappedBackgroundMapEntry
 #define TileNumber_DrawDecimal PanelText_DrawDigits
 #define TimerDisplay_DrawEmpty Video_DrawBackgroundRowMarkers

@@ -1,0 +1,22 @@
+#include "debug.h"
+#include "scene/actor/scene_actor_reaction.h"
+#include "npc/manager/scene_actor_animation.h"
+void SceneActorReaction_UpdateAnimationGate(struct ChaseActor *actor)
+{
+    struct SceneActorRegistryControlGroup *group = &actor->group.common;
+    if (SceneActorReaction_TakePrepared(actor)) {
+        DEBUG_PRINT();
+    }
+    if (actor->base.tracking.distance <= 0xFFFFF) {
+        u16 *field = &group->gate.flags;
+        u32 mask = 1;
+        mask |= *field;
+        *field = mask;
+    } else {
+        u16 *field = &group->gate.flags;
+        u32 mask = ~1;
+        mask &= *field;
+        *field = mask;
+    }
+    SceneActorAnimation_SelectDirectionalEntry((void *)actor, 1);
+}

@@ -1,7 +1,7 @@
 #include "global.h"
-#include "engine.h"
-#include "ram.h"
-#include "monster_particle_random.h"
+#include "engine/engine.h"
+#include "engine/ram.h"
+#include "engine/math/monster_particle_random.h"
 // confidence=low: integrates group particles and bounces them against terrain.
 #define ParticleGroup_UpdateBouncing sub_0801404C
 struct Vec {

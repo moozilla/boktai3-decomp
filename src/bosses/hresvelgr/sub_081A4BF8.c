@@ -1,6 +1,6 @@
-#include "engine/shared/global.h"
-#include "engine/shared/engine.h"
-#include "engine/shared/ram.h"
+#include "global.h"
+#include "engine/engine.h"
+#include "engine/ram.h"
 
 // confidence=low: advances falling projectiles and switches to impact on terrain contact.
 #define Hresvelgr_UpdateFallingProjectile sub_081A4BF8

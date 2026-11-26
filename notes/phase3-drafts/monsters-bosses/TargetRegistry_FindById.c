@@ -1,7 +1,7 @@
 #include "global.h"
-#include "scene_object.h"
-#include "contact_collider.h"
-#include "ram.h"
+#include "objects/scene_objects/scene_object.h"
+#include "scene/actor/contact_collider.h"
+#include "engine/ram.h"
 struct MotionTarget {
     union {
         struct SceneBody *actor;

@@ -1,6 +1,6 @@
 #include "bosses/hresvelgr/hresvelgr_travel.h"
-#include "engine/shared/scene_facing.h"
-#include "bosses/vanargand_projectile/vanargand_projectiles.h"
+#include "scene/actor/scene_facing.h"
+#include "bosses/vanargand/vanargand_projectiles.h"
 
 struct HresvelgrAngles {
     s32 a[2];

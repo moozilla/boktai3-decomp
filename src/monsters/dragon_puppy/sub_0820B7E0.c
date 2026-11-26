@@ -1,7 +1,7 @@
-#include "engine/shared/global.h"
-#include "player/player_cue/player_cue_sequence.h"
-#include "engine/shared/scene_vec.h"
-#include "engine/shared/engine_globals.h"
+#include "global.h"
+#include "player/cues/player_cue_sequence.h"
+#include "engine/math/scene_vec.h"
+#include "engine/engine_globals.h"
 struct PHVec {
     s16 x, y, z, pad;
 };

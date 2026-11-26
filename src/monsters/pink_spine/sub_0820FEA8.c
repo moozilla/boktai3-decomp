@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 /* Names and field interpretations are tentative. */
 
 struct HitSource {

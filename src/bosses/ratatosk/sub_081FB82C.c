@@ -1,5 +1,5 @@
-#include "engine/shared/global.h"
-#include "field/terrain_overlays/terrain_overlay.h"
+#include "global.h"
+#include "scene/terrain/terrain_overlay.h"
 struct OverlaySlot {
     u32 flags;
     u8 pad4[8];

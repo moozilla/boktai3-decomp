@@ -1,8 +1,0 @@
-#include "engine/shared/global.h"
-
-u32 Sprite_Remove(u8 *);
-
-void SpiralTrail_RemoveSprite(u8 *p)
-{
-    Sprite_Remove(p + 0x2C);
-}

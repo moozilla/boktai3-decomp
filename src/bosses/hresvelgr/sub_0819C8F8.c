@@ -1,6 +1,6 @@
-#include "engine/shared/global.h"
-#include "engine/shared/engine.h"
-#include "engine/shared/ram.h"
+#include "global.h"
+#include "engine/engine.h"
+#include "engine/ram.h"
 
 // confidence=low: projects a cosine-scaled speed opposite the actor side.
 #define Hresvelgr_SetCosineScaledVelocity sub_0819C8F8

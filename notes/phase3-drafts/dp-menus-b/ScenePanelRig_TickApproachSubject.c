@@ -1,4 +1,4 @@
-#include "scene_panel_rig.h"
+#include "objects/pile_driver/scene_panel_rig.h"
 static inline s32 scale12(s32 value)
 {
     return value >= 0 ? value >> 12 : -((-value) >> 12);

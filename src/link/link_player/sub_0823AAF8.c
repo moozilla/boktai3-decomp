@@ -1,6 +1,6 @@
 #define Player_GetResourceCost LinkPlayer_GetSelectedAbilityCost
-#include "engine/shared/global.h"
-#include "engine/shared/player.h"
+#include "global.h"
+#include "player/player.h"
 struct ResourceUsage {
     u8 pad0[0x94];
     u32 consumed;

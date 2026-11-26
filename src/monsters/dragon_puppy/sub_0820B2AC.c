@@ -1,6 +1,6 @@
-#include "engine/shared/global.h"
-#include "engine/shared/engine_globals.h"
-#include "engine/shared/ram.h"
+#include "global.h"
+#include "engine/engine_globals.h"
+#include "engine/ram.h"
 
 struct DragonPuppyPosition {
     s16 x, y, z, unk_06;

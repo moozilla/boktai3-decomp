@@ -1,9 +1,9 @@
-#include "engine/shared/global.h"
+#include "global.h"
 #include "bosses/ratatosk/ratatosk.h"
 #include "bosses/ratatosk/ratatosk_particle.h"
 #include "bosses/ratatosk/ratatosk_facing.h"
-#include "engine/shared/ram.h"
-#include "engine/shared/scene_actor_components.h"
+#include "engine/ram.h"
+#include "scene/actor/scene_actor_components.h"
 
 extern const u16 gUnk_086141BC[];
 extern const s16 gUnk_086149C4[];

@@ -1,5 +1,5 @@
-#include "engine/shared/global.h"
-#include "engine/shared/runtime.h"
+#include "global.h"
+#include "engine/runtime.h"
 /* SiiRtcSetAlarm: writes the BCD alarm hour (with AM/PM flag) and minute.
  * Reconstructed from B3 instructions; SIIRTC correspondence: docs/RTC.md.
  * The packed union makes the alarm buffer BLKmode, so agbcc forces its

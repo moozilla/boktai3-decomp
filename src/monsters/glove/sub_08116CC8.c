@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 #include "monsters/glove/glove.h"
 void Glove_OnActionComplete(struct Glove *s)
 {

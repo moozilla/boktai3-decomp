@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 typedef struct TimedSceneActor {
     u8 pad0[0xaf];
     u8 finished, padB0, enter;

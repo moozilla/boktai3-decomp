@@ -1,4 +1,4 @@
-#include "scene_pool.h"
+#include "link/wireless/scene_pool.h"
 void ScenePool_UpdateSpeedPulse(struct ScenePoolActor *, struct ScenePoolEntry *,
                                 const struct ScenePoolSpeedBounds *);
 extern const struct ScenePoolSpeedBounds gUnk_0860588C[];

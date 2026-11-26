@@ -1,5 +1,5 @@
-#include "wireless_game_items_and_display.h"
-#include "render.h"
+#include "link/wireless/wireless_game_items_and_display.h"
+#include "engine/video/render.h"
 
 void WirelessGame_AddItem(void *p, int index)
 {

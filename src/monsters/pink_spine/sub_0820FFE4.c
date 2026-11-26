@@ -1,5 +1,5 @@
 #include "monsters/pink_spine/pink_spine_playback.h"
-#include "effects/projectile_pool/projectile_pool.h"
+#include "effects/projectiles/projectile_pool.h"
 extern const s16 gUnk_086149C4[];
 void ProjectileConfig_Init(void *);
 void ProjectileConfig_SetAppearance(void *, u32, u32, s32);

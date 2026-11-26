@@ -1,6 +1,6 @@
 #include "global.h"
-#include "scene_actor_reaction.h"
-#include "area_effect_link.h"
+#include "scene/actor/scene_actor_reaction.h"
+#include "scene/area_effect/area_effect_link.h"
 void SceneHud_SetTimedState(u32, s32, u32, u32, u32, u32);
 void DamageNumberDisplay_Show(void *, int, int, void *, void *, int);
 void SceneActorRecord_RecordPair(u16, u16);

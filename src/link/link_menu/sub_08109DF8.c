@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 
 struct PollPanel {
     u8 pad0[0x1d];

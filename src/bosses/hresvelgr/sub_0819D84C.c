@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 #include "bosses/hresvelgr/hresvelgr_travel.h"
 
 u32 TetherActor_GetRequestStatus(void);

@@ -1,7 +1,7 @@
 /* Provisional family and semantic names; inferred from static accesses and callers. */
-#include "engine/shared/global.h"
-#include "engine/shared/scene_pool.h"
-#include "engine/shared/ram.h"
+#include "global.h"
+#include "link/wireless/scene_pool.h"
+#include "engine/ram.h"
 struct TerrainCoordinate {
     s32 x : 16;
     s32 y : 16;

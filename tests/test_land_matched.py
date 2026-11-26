@@ -56,7 +56,7 @@ class LandMatched(unittest.TestCase):
         self.assertEqual(land.where(self.root, "C", 0x08000200), ("unit", "src/fn/draft.c", "C"))
 
     def test_an_unknown_function_is_plain(self):
-        self.assertEqual(land.where(self.root, "D", 0x08000300), ("plain", "src/other/unclassified/d.c", None))
+        self.assertEqual(land.where(self.root, "D", 0x08000300), ("plain", "src/engine/d.c", None))
 
     def test_multiline_pointer_return_is_part_of_the_definition(self):
         before = "struct Entry;\nstruct Entry *Find(int);\n#define ENABLED 1\n"

@@ -1,6 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
-#include "scene_departure_display.h"
-#include "slot7_transition.h"
+#include "bosses/vanargand/scene_departure_display.h"
+#include "bosses/vanargand/layered_boss_transition.h"
 
 static inline u32 StepPlayback(struct DepartureDrawable *owner, struct DisplaySequenceState *state)
 {

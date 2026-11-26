@@ -1,8 +1,8 @@
 #include "global.h"
-#include "engine.h"
-#include "ram.h"
-#include "monster_particle_random.h"
-#include "player_particle_cloud.h"
+#include "engine/engine.h"
+#include "engine/ram.h"
+#include "engine/math/monster_particle_random.h"
+#include "player/effects/player_particle_cloud.h"
 
 // confidence=low: scatters particle anchors horizontally and raises them by sixteen units.
 #define PlayerParticleCloud_ScatterAnchors sub_081D3620

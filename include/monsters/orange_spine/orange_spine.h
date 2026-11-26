@@ -1,10 +1,10 @@
 #ifndef GUARD_ORANGE_SPINE_H
 #define GUARD_ORANGE_SPINE_H
 
-#include "effects/shared_display_animation_wrapper/display_animation.h"
-#include "engine/shared/contact_collider.h"
-#include "engine/shared/scene_vec.h"
-#include "engine/shared/task.h"
+#include "engine/video/display_animation.h"
+#include "scene/actor/contact_collider.h"
+#include "engine/math/scene_vec.h"
+#include "engine/task.h"
 
 union OrangeSpineSprite {
     struct DisplaySequenceSprite display;

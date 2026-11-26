@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 /* Vanargand_RunDefeatSequence: waits, rises along a motion track, approaches the part position while the paired halves play cues 0x14/0x18/0x1A, then plays animation 0xF for 256 frames, sets event flags 0x42/0x43/0x52 and runs the second event script (provisional name) */
 struct VanargandPart {
     u8 pad0[0x10];

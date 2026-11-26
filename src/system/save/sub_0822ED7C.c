@@ -1,7 +1,7 @@
-#include "engine/shared/global.h"
-#include "engine/shared/ram.h"
-#include "engine/shared/runtime.h"
-#include "engine/shared/render.h"
+#include "global.h"
+#include "engine/ram.h"
+#include "engine/runtime.h"
+#include "engine/video/render.h"
 struct Snapshot {
     u32 a, b;
     u16 c, d;

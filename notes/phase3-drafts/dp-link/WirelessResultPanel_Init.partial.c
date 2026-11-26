@@ -1,7 +1,7 @@
-#include "display_sequence_sprite.h"
+#include "engine/video/display_sequence_sprite.h"
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
-#include "ram.h"
+#include "engine/ram.h"
 struct Blob {
     u32 words[8];
 };

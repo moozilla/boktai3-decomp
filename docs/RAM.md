@@ -75,11 +75,11 @@ private struct pointer. Unifying gives the object one name and one declaration:
 
 ```bash
 python3 tools/ramlayout.py unify 030042E4 --decl 'extern u8 *gPaletteBankData;' \
-    --header include/engine/shared/render.h --note 'palette-bank data (AnimData_SelectPaletteBank)'
+    --header include/engine/video/render.h --note 'palette-bank data (AnimData_SelectPaletteBank)'
 ```
 
 ```bash
-python3 tools/ramlayout.py unify --batch FILE --header include/engine/shared/ram.h
+python3 tools/ramlayout.py unify --batch FILE --header include/engine/ram.h
 ```
 
 A batch file has one `ADDR | DECL | NOTE` line per object. The tool:
@@ -116,7 +116,7 @@ Options for sweeps:
   sweep of `ram.h` leaves the EWRAM rows' declarations alone).
 - `--confidence ''`: keep the rows' confidence (the default sets `low`).
 - Re-running a header's rows (`ADDR | DECL |` lines, empty note) adopts whatever is left.
-- `src/engine/iwram_arm_code/iwram_code.c` is never edited (`PROTECTED` in `ramlayout.py`); its declarations still
+- `src/engine/iwram_code.c` is never edited (`PROTECTED` in `ramlayout.py`); its declarations still
   count as leftovers.
 
 Two things the tool cannot see, which the full build catches: a declaration with parentheses
@@ -126,18 +126,18 @@ after checking their includers, then run the sweep.
 
 ### Where declarations live
 
-- `include/engine/shared/render.h`: the renderer block `03004280`-`0300523F` (OAM, BG affine
+- `include/engine/video/render.h`: the renderer block `03004280`-`0300523F` (OAM, BG affine
   and scroll shadows, palette fade state), named from the audited address map.
-- `include/engine/shared/engine.h`, `include/system/game_state/game_state.h`: engine-wide objects already declared
+- `include/engine/engine.h`, `include/system/game_state/game_state.h`: engine-wide objects already declared
   there: `gGameState`, `gTerrainMap`, `gRandomIndex`, `gEngineFlags`, ....
-- `include/engine/shared/engine_globals.h`: the engine-wide scalars and pointers that `engine.h` and
+- `include/engine/engine_globals.h`: the engine-wide scalars and pointers that `engine.h` and
   `runtime.h` used to declare (`gEngineFlags`, `gRandomIndex`, `gTerrainMap`, `gTerrainWidth`,
   `gTerrainHeight`, `gNextTaskId`, `gScriptEntryProcedure`). Light on purpose, so any draft
   can include it; `engine.h` and `runtime.h` include it for their users.
-- `include/engine/shared/input.h`: the pad state `gPadState`.
+- `include/engine/input.h`: the pad state `gPadState`.
 - `include/lib/rfu/rfu_compat.h` and `include/gba/m4a_internal.h`: the librfu and MP2K library objects, under
   their SDK names.
-- `include/engine/shared/ram.h`: everything else for now. It is deliberately light: scalars,
+- `include/engine/ram.h`: everything else for now. It is deliberately light: scalars,
   arrays of scalars and pointers to incomplete structs, no definitions. Any draft
   can include it without tag clashes, which `engine.h` doesn't allow for about 190
   drafts. An object moves to its subsystem's header once that header's struct is

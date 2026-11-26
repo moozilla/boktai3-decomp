@@ -1,0 +1,6 @@
+#include "objects/wooden_crate/wooden_crate.h"
+
+void WoodenCrate_ClearFlags(struct WoodenCrate *p, u16 flags)
+{
+    p->crateFlags &= ~flags;
+}

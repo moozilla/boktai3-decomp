@@ -1,8 +1,8 @@
-#include "engine/shared/global.h"
-#include "engine/shared/render.h"
+#include "global.h"
+#include "engine/video/render.h"
 #include "bosses/vanargand/vanargand_stage_colors.h"
-#include "engine/shared/input.h"
-#include "engine/shared/engine_globals.h"
+#include "engine/input.h"
+#include "engine/engine_globals.h"
 
 // confidence=low: applies camera, collision, palette and shake presentation effects.
 #define RANDOM_TABLE_ADDR            0x0203B400

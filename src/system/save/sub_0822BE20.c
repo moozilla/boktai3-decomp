@@ -1,5 +1,5 @@
-#include "engine/shared/global.h"
-#include "engine/shared/runtime.h"
+#include "global.h"
+#include "engine/runtime.h"
 u8 Save_WriteMainState(s32);
 u8 Save_WriteContinuation(s32);
 u8 Save_WriteHeader(void);

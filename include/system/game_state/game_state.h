@@ -1,7 +1,7 @@
 #ifndef GUARD_GAME_STATE_H
 #define GUARD_GAME_STATE_H
 
-#include "engine/shared/global.h"
+#include "global.h"
 
 /*
  * The main game-state block behind gGameState (guess: save data plus world state; clearing

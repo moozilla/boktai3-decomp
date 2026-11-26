@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 void *Task_Create(u32, u32);
 void Task_SetCallbacks(void *, void (*)(void), void (*)(void));
 s32 EnemyParticle_InitPool(void *);

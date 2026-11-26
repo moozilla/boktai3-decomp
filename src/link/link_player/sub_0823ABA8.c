@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 
 bool32 sub_0823ABA8(u8 *p, s32 value)
 {

@@ -3,8 +3,8 @@
 Tags: #selection-menu #translation-unit #matching
 
 Range: 08019E58–0801B49C (end exclusive). Consolidated the 45 input files
-into `src/menus/selection_menu/selection_menu.c`, with every function and remaining assembly body in
-ROM order. `include/menus/selection_menu/selection_menu.h` holds the shared owner, script-call
+into `src/ui/widgets/selection_menu.c`, with every function and remaining assembly body in
+ROM order. `include/ui/widgets/selection_menu.h` holds the shared owner, script-call
 arguments, packed-copy position, and the observed actor/item table layouts.
 The owner reuses `Task`, `SceneInputResource`, `SceneInputWidget`,
 `SceneInputPanelDrawable`, and `ContactPosition` from existing headers.
@@ -61,7 +61,7 @@ No extra/gap functions were needed: the exact unit spans all 5700 bytes.
 - The page-refresh routines explicitly pass `Script_ParseStringRef`'s return
   to `Text_LookupString`, replacing their old missing-argument declaration;
   this matches exactly with the existing engine prototype.
-- `tools/depin.py src/menus/selection_menu/selection_menu.c --write` kept all 19 existing hints.
+- `tools/depin.py src/ui/widgets/selection_menu.c --write` kept all 19 existing hints.
   Existing concession markers stay beside the affected functions.
 
 ## Validation

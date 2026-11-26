@@ -7,7 +7,7 @@ Accepted source at integration: `eee8e20b6abe7d3a8fc433d8e73f71c8e549b665`.
 Worker source head: `eee8e20b6abe7d3a8fc433d8e73f71c8e549b665`.
 
 The shared consumers now use the existing `struct Player *gPlayers[4]`
-declaration in `include/engine/shared/player.h`. Twenty-four source units lose their legacy
+declaration in `include/player/player.h`. Twenty-four source units lose their legacy
 name completely; Octopus's capture request also moves to the canonical array.
 Five chase/status headers use the same owner. Thirteen of fifteen conflicting
 private declarations are removed, and twenty-five known status-flag accesses
@@ -46,19 +46,19 @@ No declarations or direct references to separate `02000584`, `02000588`, or
 
 | Lifecycle operation | Existing source evidence |
 |---|---|
-| Reset all slots | `Player_ResetLinkState` (`src/player/sub_08158C14.c`) clears four `gPlayers`, tracked-ID, and slot-status entries, then clears the player count and related state. |
+| Reset all slots | `Player_ResetLinkState` (`src/player/interaction/sub_08158C14.c`) clears four `gPlayers`, tracked-ID, and slot-status entries, then clears the player count and related state. |
 | Publish regular player | `Player_InitializeFromScript` (`src/player/target_registry/sub_0815F2C8.c`) initializes components, publishes the actor by its body-mode slot byte, and increments `gPlayerCount`. |
 | Remove regular player | `Player_Destroy` (`src/player/target_registry/sub_0815F224.c`) removes the actor's components, clears that slot, and decrements the count. |
-| Publish link player | `Player_OnCreate` (`src/player/sub_08243A50.c`) initializes the link-player components, publishes the actor, and increments the count. |
-| Remove link player | `Player_OnDestroy` (`src/player/sub_082439EC.c`) unregisters its components, clears the slot indexed by the word at actor `+0x18`, and decrements the count. |
+| Publish link player | `Player_OnCreate` (`src/player/core/sub_08243A50.c`) initializes the link-player components, publishes the actor, and increments the count. |
+| Remove link player | `Player_OnDestroy` (`src/player/core/sub_082439EC.c`) unregisters its components, clears the slot indexed by the word at actor `+0x18`, and decrements the count. |
 
 The apparent slot-offset disagreement is explained by the body initializer.
-`Player_InitSlotFromScript` in `src/player/player_3.c` and
+`Player_InitSlotFromScript` in `src/player/appearance/player_visuals.c` and
 `LinkPlayer_ReadSlotFromScript` in `src/link/link_player/sub_0823AC78.c` store script option
 `i`, defaulting to zero, at actor `+0x18`. Both
-`Player_InitBodyFromScript` (`src/player/sub_0813FFE4.c`) and
-`KeyframeActor_InitBodyFromScript` (`src/actors/keyframe_actor/keyframe_actor.c`) pass its low byte to
-`SceneBody_Init`. That function (`src/engine/scene_body/sub_08225AB4.c`) stores the value at
+`Player_InitBodyFromScript` (`src/player/script/sub_0813FFE4.c`) and
+`KeyframeActor_InitBodyFromScript` (`src/player/appearance/keyframe_actor.c`) pass its low byte to
+`SceneBody_Init`. That function (`src/scene/collision/body/sub_08225AB4.c`) stores the value at
 body `+8`, hence player `+0x2C`. The normal four-slot domain makes these indices
 consistent. The provisional Player field name `movementRequestBlocked` at
 `+0x2C` was not renamed during this ownership pass.
@@ -69,8 +69,8 @@ with the session's local-player index; the cleanup does not infer that every
 link session's local player is necessarily slot zero.
 
 The array is also traversed as an array outside these lifecycle functions:
-`ActorPool_RefreshTargets` (`src/actors/pooled_actor_manager/actor_pool.c`) copies four targets, while
-`SceneActorAttachment_RetargetNearestPlayer` (`src/actors/scene_actor_attachment_responses/sub_0807D220.c`) walks
+`ActorPool_RefreshTargets` (`src/scene/actor/actor_pool/actor_pool.c`) copies four targets, while
+`SceneActorAttachment_RetargetNearestPlayer` (`src/scene/actor/attachment/sub_0807D220.c`) walks
 `gPlayerCount` entries and skips null actors. This pass preserves each caller's
 existing iteration bound; it introduces neither a new clamp nor a new bound.
 
@@ -150,14 +150,14 @@ debt, not a claim that the body view has been eliminated.
 The pointer at `+0x40` refers to a separate movement-source record; it is not a
 license to substitute a fixed field in the Player object. For example, body
 initialization installs the record at player `+0x284`, and named-object release
-in `src/field/named_object/sub_081029F8.c` restores that self-owned source. A coherent body/probe
+in `src/objects/named_object/sub_081029F8.c` restores that self-owned source. A coherent body/probe
 component definition is separate work from choosing the owner of `gPlayers`.
 
 ## Remaining matching dependencies
 
 ### Octopus nearby-player query
 
-`SceneActorTarget_FindNearbyPlayer` (`0x080EC024`, inside `src/monsters/octopus/octopus.c`)
+`SceneActorTarget_FindNearbyPlayer` (`0x080EC024`, inside `src/monsters/octopus.c`)
 initially reads slot-zero flags through `gUnknown_02000580`, then traverses
 `gPlayers` through its existing union view. Using one canonical object lets the
 compiler retain the array address between those regions. The second table
@@ -180,7 +180,7 @@ indexed access does match and is included in the accepted Octopus change.
 
 ### Route planner's source view
 
-`RouteSpriteActor_PlanWanderPath` (`src/actors/route_sprite_actor_pool/sub_0806D438.c`) passes the address of
+`RouteSpriteActor_PlanWanderPath` (`src/scene/actor/route_sprite_actor/sub_0806D438.c`) passes the address of
 the legacy scalar slot to an existing generic helper. That helper binds the
 loaded object to a private `WanderSource` whose position has type
 `ContactPosition`. Canonical Player access instead exposes `SceneVec`.

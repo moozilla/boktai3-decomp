@@ -3,8 +3,8 @@
 #define LinkMenu_CheckSession          Registry1745_CheckSessionReady
 #define LinkMenu_ResetSelection        Registry1745_BeginShutdown
 #define LinkMenu_ClearExchangeCounters Registry1745_ClearParticipantCounters
-#include "engine/shared/global.h"
-#include "engine/shared/area_effect_link.h"
+#include "global.h"
+#include "scene/area_effect/area_effect_link.h"
 u8 Registry1745_ConsumeStateEntry(void *);
 void Registry1745_ClearParticipantCounters(void *);
 s32 Registry1745_CheckSessionReady(void *);

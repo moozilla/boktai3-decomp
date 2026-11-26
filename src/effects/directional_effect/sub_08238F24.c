@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 
 typedef struct Point {
     u32 a, b;

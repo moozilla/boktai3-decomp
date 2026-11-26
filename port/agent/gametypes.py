@@ -191,7 +191,7 @@ def compile_header(header, names, work):
     src = work / (header.stem + '.c')
     obj = work / (header.stem + '.o')
     for _ in range(3):
-        text = '#include "engine/shared/global.h"\n#include "%s"\n' % header.relative_to(ROOT / 'include').as_posix()
+        text = '#include "global.h"\n#include "%s"\n' % header.relative_to(ROOT / 'include').as_posix()
         text += ''.join(f'__typeof__({n}) *__agent_var_{n};\n' for n in names)
         src.write_text(text)
         r = subprocess.run([CC, *FLAGS, '-c', str(src), '-o', str(obj)], cwd=ROOT, text=True, capture_output=True)

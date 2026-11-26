@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 void AnimData_Load(void *, u32);
 void Sprite_Init(void *, void *, u32);
 void *ScriptProc_Start(u32, u32);

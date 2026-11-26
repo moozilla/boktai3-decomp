@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 
 u32 Heap_Alloc(u32);
 void Memory_Clear(u32, u32);

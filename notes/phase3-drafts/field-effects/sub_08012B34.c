@@ -1,4 +1,4 @@
-// Pin-free draft of sub_08012B34 (src/effects/debris_particles/debris_particles.c): 20 ROM / 20 draft; AGBCC_PRI=setup:+2908 matches.
+// Pin-free draft of sub_08012B34 (src/effects/particles/debris_particles.c): 20 ROM / 20 draft; AGBCC_PRI=setup:+2908 matches.
 // `setup & 3` is 0: combine folds it through nonzero_bits after flow, so the dead constant load survives.
 s32 sub_08012B34(void *arg0, struct BreakableBarrier *b)
 {

@@ -1,8 +1,8 @@
-#include "engine/shared/global.h"
-#include "engine/shared/engine.h"
-#include "engine/shared/runtime.h"
-#include "engine/shared/input.h"
-#include "engine/shared/area_effect_link.h"
+#include "global.h"
+#include "engine/engine.h"
+#include "engine/runtime.h"
+#include "engine/input.h"
+#include "scene/area_effect/area_effect_link.h"
 
 u16 sub_0822C8D8(u8 *p)
 {

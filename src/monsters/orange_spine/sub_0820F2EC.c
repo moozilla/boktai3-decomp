@@ -1,8 +1,8 @@
 #define gEffectRandomIndex gRandomIndex
 // Orange spine family and descriptive names are tentative (low confidence).
-#include "engine/shared/global.h"
-#include "engine/shared/engine_globals.h"
-#include "engine/shared/ram.h"
+#include "global.h"
+#include "engine/engine_globals.h"
+#include "engine/ram.h"
 struct OrangeSpinePosition {
     s16 x, y, z, pad;
 };

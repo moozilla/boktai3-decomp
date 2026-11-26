@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 #include "bosses/ratatosk/ratatosk.h"
 
 void Ratatosk_UpdateRestartState17(struct Ratatosk *p)

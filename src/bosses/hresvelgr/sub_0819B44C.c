@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 /* Math_StepShortArrayTowardTargets: Moves each signed halfword toward its target by a shared step without overshooting */
 #define Math_StepShortArrayTowardTargets sub_0819B44C
 

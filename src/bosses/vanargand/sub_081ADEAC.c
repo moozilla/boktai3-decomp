@@ -1,5 +1,5 @@
-#include "engine/shared/global.h"
-#include "engine/shared/render.h"
+#include "global.h"
+#include "engine/video/render.h"
 struct VanargandBackgroundAttachment {
     void *resource;
     void *position;

@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 #include "monsters/glove/glove.h"
 extern struct GloveCamera {
     u8 unknown0[0x44];

@@ -1,5 +1,5 @@
-#include "scene_actor_palette.h"
-#include "scene_actor_placement.h"
+#include "scene/actor/scene_actor_palette.h"
+#include "scene/actor/scene_actor_placement.h"
 static inline u8 Test(u32 value, u32 mask)
 {
     if (value & mask)

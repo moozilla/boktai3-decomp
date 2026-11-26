@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 /* Tentative homing-shot layout, established by its collider and position uses. */
 struct HomingShot {
     u8 unknown0[0x1c];

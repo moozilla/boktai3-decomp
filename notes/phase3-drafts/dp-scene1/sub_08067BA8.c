@@ -1,5 +1,5 @@
-#include "scene_actor_control.h"
-#include "ram.h"
+#include "scene/actor/scene_actor_control.h"
+#include "engine/ram.h"
 /* SceneActorControl_RequestAllDepartures: Requests departure and sets collider flags for every occupied slot not already departing */
 #define SceneActorControl_RequestAllDepartures sub_08067BA8
 union SlotMask { u32 bits; u16 halves[2]; };

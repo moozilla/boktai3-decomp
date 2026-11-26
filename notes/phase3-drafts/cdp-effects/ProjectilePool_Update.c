@@ -1,9 +1,9 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
-#include "engine.h"
-#include "ram.h"
-#include "display_sequence_inline.h"
-#include "projectile_pool.h"
+#include "engine/engine.h"
+#include "engine/ram.h"
+#include "engine/video/display_sequence_inline.h"
+#include "effects/projectiles/projectile_pool.h"
 extern u32 gUnk_02000560;
 u8 *TerrainModifiers_FindCellOverride(int, int);
 static inline s32 Truncate(s32 v)

@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 void Collider_Init(void *, u32, s32, s32, s32, s32, s32);
 void Collider_SetCallback(void *, s32, s32);
 void Collider_SetPosition(void *, s32, s32);

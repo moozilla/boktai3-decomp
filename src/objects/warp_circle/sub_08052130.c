@@ -1,0 +1,27 @@
+#include "objects/warp_circle/stacked_actor.h"
+void *AnimData_FindEntry(u32);
+void SpriteDrawable_SelectTileFrame(struct StackedActorParticle *, void *, u32);
+static inline s32 damp(s32 v)
+{
+    s32 scaled = v * 15;
+    if (scaled >= 0)
+        return scaled >> 4;
+    return -((-scaled) >> 4);
+}
+void StackedActor_TickParticle(struct StackedActorParticle *particle)
+{
+    particle->life--;
+    if (particle->life == 0) {
+        particle->flags |= 1;
+        particle->enabled = 0;
+    } else {
+        particle->position.x += particle->velocityX;
+        particle->position.y += particle->velocityY;
+        particle->position.z += particle->velocityZ;
+        SpriteDrawable_SelectTileFrame(particle, AnimData_FindEntry(0x1C1E),
+                                       ((particle->life >> 2) & 1) + 2);
+        particle->velocityX = damp(particle->velocityX);
+        particle->velocityY = damp(particle->velocityY);
+        particle->velocityZ = damp(particle->velocityZ);
+    }
+}

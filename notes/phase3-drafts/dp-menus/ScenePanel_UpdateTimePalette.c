@@ -1,4 +1,4 @@
-#include "scene_panel_effects.h"
+#include "objects/pile_driver/scene_panel_effects.h"
 /* Loop scratch state from the matching version. */
 struct ScenePanelPaletteScratch {
     s32 column;

@@ -11,7 +11,7 @@ no commits or combined build were made.
 
 0811C5F8 applies a pending clamped increment; 0811D0C4 applies modifier-adjusted
 pending damage and sets a depleted flag. Their shared tentative ActorStats
-view and 0811D4AC's scaled parameter fields are in `include/engine/shared/actor_stats.h`.
+view and 0811D4AC's scaled parameter fields are in `include/scene/actor/actor_stats.h`.
 These stat-bearing objects must not be confused with scene actors solely
 because some offsets coincide. 0811D4AC's modifier callee 0811E970 filters
 kind 7, as established by its retained neighboring C.

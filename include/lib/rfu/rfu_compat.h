@@ -2,7 +2,7 @@
 #ifndef GUARD_LIBRFU_H
 #define GUARD_LIBRFU_H
 
-#include "engine/shared/global.h"
+#include "global.h"
 #include "gba/io_reg.h"
 #include "gba/macro.h"
 #include "gba/syscall.h"

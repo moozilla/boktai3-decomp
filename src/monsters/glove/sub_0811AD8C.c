@@ -1,5 +1,5 @@
-#include "engine/shared/global.h"
-#include "engine/shared/ram.h"
+#include "global.h"
+#include "engine/ram.h"
 struct TerrainColumn {
     u16 cells[80];
 };

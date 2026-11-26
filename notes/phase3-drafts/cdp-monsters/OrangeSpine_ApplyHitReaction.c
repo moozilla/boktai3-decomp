@@ -1,10 +1,10 @@
-#include "orange_spine.h"
-#include "collision_response.h"
-#include "damage_number_display.h"
-#include "ram.h"
-#include "scene_hud_display.h"
-#include "hit_spark_random.h"
-#include "engine.h"
+#include "monsters/orange_spine/orange_spine.h"
+#include "scene/actor/collision_response.h"
+#include "ui/hud/damage_number_display.h"
+#include "engine/ram.h"
+#include "ui/pause/scene_hud_display.h"
+#include "engine/math/hit_spark_random.h"
+#include "engine/engine.h"
 extern const struct ContactPosition gUnk_0824FEAC;
 void Sound_PlaySong(u32);
 void PlayerStats_AddContactHundredths(void *, void *, s32);

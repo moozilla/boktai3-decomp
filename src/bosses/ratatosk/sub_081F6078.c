@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 #include "bosses/ratatosk/ratatosk.h"
 void SceneActors_StartDirectionalAnimation(void *, void *, void *, int, int, int, int);
 static inline void setFacing(struct Ratatosk *p, int angle)

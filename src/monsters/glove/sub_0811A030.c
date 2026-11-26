@@ -1,6 +1,6 @@
-#include "engine/shared/global.h"
-#include "engine/shared/ram.h"
-#include "engine/shared/engine_globals.h"
+#include "global.h"
+#include "engine/ram.h"
+#include "engine/engine_globals.h"
 #include "monsters/glove/glove.h"
 void Hud_SetMode(s32);
 void sub_08116E44(void);

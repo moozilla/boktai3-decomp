@@ -22,7 +22,7 @@ static inline u8 TakeEntry(u8 *p)
     return 0;
 }
 
-#include "scene_actor_reset.h"
+#include "scene/actor/scene_actor_reset.h"
 static inline void SetControl(struct SceneActorRegistryResetView *s, void *control, u32 code)
 {
     u32 zero;

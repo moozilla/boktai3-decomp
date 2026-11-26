@@ -1,8 +1,8 @@
-#include "engine/shared/global.h"
+#include "global.h"
 #include "bosses/ratatosk/ratatosk.h"
-#include "engine/shared/engine.h"
-#include "engine/shared/input.h"
-#include "engine/shared/ram.h"
+#include "engine/engine.h"
+#include "engine/input.h"
+#include "engine/ram.h"
 s32 Mod(s32, s32);
 u32 HomingProjectile_GetActiveCount(void);
 static inline u32 NextRandom(const u16 *table)

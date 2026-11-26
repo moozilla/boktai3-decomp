@@ -1,10 +1,10 @@
-#include "engine/shared/global.h"
-#include "player/player_cue/player_cue_sequence.h"
-#include "engine/shared/scene_vec.h"
-#include "engine/shared/engine.h"
-#include "engine/shared/ram.h"
-#include "engine/shared/engine_pause.h"
-#include "engine/shared/monster_particle_random.h"
+#include "global.h"
+#include "player/cues/player_cue_sequence.h"
+#include "engine/math/scene_vec.h"
+#include "engine/engine.h"
+#include "engine/ram.h"
+#include "engine/engine_pause.h"
+#include "engine/math/monster_particle_random.h"
 struct EffectVector {
     s32 x : 16;
     u32 y : 16;

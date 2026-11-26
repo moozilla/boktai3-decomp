@@ -1,5 +1,5 @@
-#include "engine/shared/global.h"
-#include "engine/shared/render.h"
+#include "global.h"
+#include "engine/video/render.h"
 
 struct GrowthHazardManager {
     u8 unk_00[0x18];

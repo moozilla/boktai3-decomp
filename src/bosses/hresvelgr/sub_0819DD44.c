@@ -1,6 +1,6 @@
 #include "bosses/hresvelgr/hresvelgr_travel.h"
 
-#include "engine/shared/ram.h"
+#include "engine/ram.h"
 
 
 void Hresvelgr_UpdateAttackCycle(struct HresvelgrTravelActor *p)

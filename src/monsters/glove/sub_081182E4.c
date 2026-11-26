@@ -1,11 +1,11 @@
-#include "engine/shared/global.h"
-#include "engine/shared/scene_actor_style.h"
+#include "global.h"
+#include "scene/actor/scene_actor_style.h"
 #include "system/game_state/game_state.h"
-#include "engine/shared/ram.h"
-#include "engine/shared/engine_globals.h"
-#include "engine/shared/area_effect_link.h"
-#include "engine/shared/word_flags.h"
-#include "engine/shared/game_state_flags.h"
+#include "engine/ram.h"
+#include "engine/engine_globals.h"
+#include "scene/area_effect/area_effect_link.h"
+#include "engine/word_flags.h"
+#include "system/game_state/game_state_flags.h"
 #include "monsters/glove/glove.h"
 
 // Clears action effects, emits defeat bursts, and selects the recovery callback.

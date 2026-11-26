@@ -1,5 +1,5 @@
-#include "engine/shared/global.h"
-#include "engine/shared/engine.h"
+#include "global.h"
+#include "engine/engine.h"
 
 struct HresvelgrAnimActor {
     u8 pad0[0xA3];

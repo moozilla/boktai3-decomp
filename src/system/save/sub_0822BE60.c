@@ -1,5 +1,5 @@
-#include "engine/shared/global.h"
-#include "engine/shared/runtime.h"
+#include "global.h"
+#include "engine/runtime.h"
 u8 Save_ReadContinuation(u8);
 
 u8 sub_0822BE60(void)

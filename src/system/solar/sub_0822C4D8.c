@@ -1,5 +1,5 @@
-#include "engine/shared/global.h"
-#include "engine/shared/engine.h"
+#include "global.h"
+#include "engine/engine.h"
 void Solar_SaveExposureTimestamp(void);
 u32 Solar_HasExposureCooldownElapsed(void);
 #define GS(type, offset) (*(type *)((u8 *)gGameState + (offset)))

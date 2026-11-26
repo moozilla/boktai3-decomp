@@ -16,10 +16,10 @@ were removed. Each complete source unit independently matches stock bytes.
 
 ## Source evidence and adopted algorithm
 
-`Palette_InterpolateBanks` in `src/engine/anim/sub_08221110.c` reads two arrays of sixteen
+`Palette_InterpolateBanks` in `src/engine/video/anim/sub_08221110.c` reads two arrays of sixteen
 halfword colors and writes sixteen interpolated colors. Its final two arguments
 are the interpolation weight and scale shift. `struct PaletteResource` in
-`include/engine/shared/palette_resource.h` independently declares the resource payload as
+`include/engine/video/palette_resource.h` independently declares the resource payload as
 `u16 banks[16][16]`; `PaletteSetEntry` also stores its color sets as sixteen
 halfwords. Thus the wrappers' `0x20` byte stride represents one complete bank.
 

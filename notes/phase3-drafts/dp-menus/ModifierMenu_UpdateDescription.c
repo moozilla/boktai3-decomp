@@ -1,4 +1,4 @@
-#include "modifier_list.h"
+#include "scene/actor/modifier_list.h"
 u32 StateFlags_GetCategoryBit(s32, s32);
 void ScrollingDialogue_SetScript(const u8 *);
 extern const u8 gUnk_086058C8[];

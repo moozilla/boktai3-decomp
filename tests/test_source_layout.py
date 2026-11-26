@@ -8,6 +8,11 @@ import source_layout
 
 
 class SourceLayoutTests(unittest.TestCase):
+    def test_slug_keeps_hex_and_acronyms_together(self):
+        self.assertEqual(source_layout.slug("M4A_Init"), "m4a_init")
+        self.assertEqual(source_layout.slug("Registry A8CB"), "registry_a8cb")
+        self.assertEqual(source_layout.slug("Actor 086121c4"), "actor_086121C4")
+
     def test_resolves_names_addresses_aliases_and_drafts(self):
         with tempfile.TemporaryDirectory() as scratch:
             root = Path(scratch)

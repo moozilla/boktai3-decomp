@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 struct AnimatedMarker {
     u8 pad0[7];
     u8 mode;

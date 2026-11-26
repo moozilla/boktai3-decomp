@@ -1,6 +1,6 @@
-#include "engine/shared/global.h"
-#include "engine/shared/ram.h"
-#include "engine/shared/word_flags.h"
+#include "global.h"
+#include "engine/ram.h"
+#include "engine/word_flags.h"
 
 struct GrowthHazardAnimationEvent {
     u8 unk0[4];

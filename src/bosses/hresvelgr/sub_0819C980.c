@@ -1,6 +1,6 @@
-#include "engine/shared/global.h"
+#include "global.h"
 #include "bosses/hresvelgr/hresvelgr_travel.h"
-#include "engine/shared/scene_facing.h"
+#include "scene/actor/scene_facing.h"
 u16 Sqrt(u32);
 s32 __divsi3(s32, s32);
 static inline void SetTravelTime(struct HresvelgrTravelActor *actor, u32 time)

@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 
 // foundry draft (worker best 83.3%); what differs is mostly register allocation and instruction order
 struct AnimatedMarkerSprite {

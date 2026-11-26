@@ -1,6 +1,6 @@
-#include "engine/shared/global.h"
-#include "engine/shared/engine.h"
-#include "engine/shared/ram.h"
+#include "global.h"
+#include "engine/engine.h"
+#include "engine/ram.h"
 extern const s16 gUnk_086149C4[];
 s32 Div(s32, s32);
 struct StretchBody {

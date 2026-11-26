@@ -1,5 +1,5 @@
-#include "actors/orbit_motion/motion_track.h"
-#include "actors/paired_scene_actor/paired_scene_actor.h"
+#include "scene/actor/motion_track.h"
+#include "bosses/vanargand/paired_scene_actor.h"
 
 // confidence=low: coordinates paired animations with an offset motion track.
 struct MovingPairActor {

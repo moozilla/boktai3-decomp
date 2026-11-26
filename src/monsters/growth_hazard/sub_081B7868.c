@@ -1,6 +1,6 @@
 #define AnimatedMarker_RegisterEmptyCell GrowthHazard_RegisterCellEffect
 #define AnimatedMarker_TickReveal        GrowthHazard_UpdateIdle
-#include "engine/shared/global.h"
+#include "global.h"
 /* Tentative proximity-marker family; collider extent interpretation is provisional. */
 struct AnimatedMarkerCollider {
     u8 pad0[10];

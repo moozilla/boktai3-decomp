@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 
 typedef struct {
     u8 pad0[0x2c];

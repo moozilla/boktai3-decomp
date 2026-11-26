@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 
 /* Tentative angle gate: the two modes select overlapping half-circle ranges. */
 struct DirectionGate {

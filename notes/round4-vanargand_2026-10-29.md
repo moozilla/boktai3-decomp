@@ -22,7 +22,7 @@ reproduce the same bytes from the complete translation unit.
   and detached part. Shared palette restoration preserves the actual palette
   reference across state changes. Ordinary interpolation and paired color stores
   follow the already matched `Vanargand_UpdatePaletteTransition` implementation.
-- A focused [motion-track header](../include/actors/orbit_motion/motion_track.h) shares the proven
+- A focused [motion-track header](../include/scene/actor/motion_track.h) shares the proven
   `0x38`-byte track and `0x08`-byte vector layouts with
   `MotionTrack_Initialize` (`0x081B9334`). Vanargand uses the component reset in
   observed store order. The initializer retains its existing vector-clear

@@ -1,7 +1,7 @@
 #define Interrupts_DisableMaster Serial_DisableGlobalInterrupts
 #define Interrupts_EnableMaster  Serial_EnableGlobalInterrupts
-#include "engine/shared/global.h"
-#include "engine/shared/ram.h"
+#include "global.h"
+#include "engine/ram.h"
 struct SerialPacket {
     u16 words[4];
 };

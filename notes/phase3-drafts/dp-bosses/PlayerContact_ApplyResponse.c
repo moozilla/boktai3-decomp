@@ -1,7 +1,7 @@
 #include "global.h"
-#include "engine.h"
-#include "player.h"
-#include "contact_actor.h"
+#include "engine/engine.h"
+#include "player/player.h"
+#include "scene/actor/contact_actor.h"
 void sub_0815E034(struct Player *, struct ContactCollider *, struct ContactCollider *);
 void SceneActorControl_RequestDeparture(s32);
 s32 Player_RequestTimedReset(struct Player *, u32);

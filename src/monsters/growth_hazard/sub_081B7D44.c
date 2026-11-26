@@ -1,5 +1,5 @@
-#include "engine/shared/global.h"
-#include "engine/shared/ram.h"
+#include "global.h"
+#include "engine/ram.h"
 
 // confidence=low: HitSwitch_DestroyManager for the growth hazard's entries (0x118 bytes each,
 // the cell always registered).

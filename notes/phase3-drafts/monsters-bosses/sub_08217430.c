@@ -1,5 +1,5 @@
 #include "global.h"
-#include "render.h"
+#include "engine/video/render.h"
 
 
 void CpuFastSet(const void *src, void *dst, u32 control);

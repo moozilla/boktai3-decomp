@@ -1,8 +1,8 @@
-#include "engine/shared/global.h"
-#include "engine/shared/engine.h"
-#include "engine/shared/player.h"
-#include "engine/shared/proximity_emitter.h"
-#include "engine/shared/scene_actor_terrain.h"
+#include "global.h"
+#include "engine/engine.h"
+#include "player/player.h"
+#include "effects/particles/proximity_emitter.h"
+#include "scene/actor/scene_actor_terrain.h"
 
 // foundry draft (worker best 99.1%); what differs is mostly register allocation and instruction order
 #define GrowthHazard_EmitRevealEffects GrowthHazard_PlayImpactEffect

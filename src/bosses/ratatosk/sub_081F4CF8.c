@@ -1,9 +1,9 @@
-#include "engine/shared/global.h"
+#include "global.h"
 #include "bosses/ratatosk/ratatosk_particle.h"
-#include "engine/shared/ram.h"
-#include "engine/shared/contact_position.h"
-#include "engine/shared/engine_globals.h"
-#include "engine/shared/scene_actor_components.h"
+#include "engine/ram.h"
+#include "scene/actor/contact_position.h"
+#include "engine/engine_globals.h"
+#include "scene/actor/scene_actor_components.h"
 
 struct Actor {
     u8 pad0[0x48];

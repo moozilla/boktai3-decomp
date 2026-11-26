@@ -1,6 +1,6 @@
-#include "engine/shared/global.h"
-#include "engine/shared/engine.h"
-#include "engine/shared/ram.h"
+#include "global.h"
+#include "engine/engine.h"
+#include "engine/ram.h"
 void *SceneActors_GetBySlot(u32);
 void Vanargand_Update(void *);
 void SceneComposite_Destroy(void *);

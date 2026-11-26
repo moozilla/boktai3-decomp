@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 /* Vanargand_UpdateLeapTrack: plays animation 4 with sound 0x587, rides a motion track (origin 0x280/0x300/0x280) spawning afterimages, then plays animation 0xF and once both halves are ready applies them and finishes (provisional name) */
 struct VanargandPart {
     u8 pad0[0x10];

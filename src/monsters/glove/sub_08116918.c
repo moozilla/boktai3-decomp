@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 struct ScriptPosition {
     s32 x, y, z, unused;
 };

@@ -1,5 +1,5 @@
-#include "engine/shared/global.h"
-#include "engine/shared/scene_pool.h"
+#include "global.h"
+#include "link/wireless/scene_pool.h"
 s32 Glove_GetHorizontalBounds(s32 index, s32 *left, s32 *right)
 {
     struct ScenePoolPlayer *glove;

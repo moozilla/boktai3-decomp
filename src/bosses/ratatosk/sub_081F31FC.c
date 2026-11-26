@@ -1,7 +1,7 @@
 #define gRatatoskPlayerOffsets gUnk_0824FDD0
 // Checker ELF predates promotion of these two names.
-#include "engine/shared/global.h"
-#include "engine/shared/scene_vec.h"
+#include "global.h"
+#include "engine/math/scene_vec.h"
 
 struct RatatoskPlayerOffsets {
     struct SceneVec points[4];

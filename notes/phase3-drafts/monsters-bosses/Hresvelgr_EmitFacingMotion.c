@@ -1,8 +1,8 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
-#include "engine.h"
-#include "monster_particle_random.h"
-#include "ram.h"
+#include "engine/engine.h"
+#include "engine/math/monster_particle_random.h"
+#include "engine/ram.h"
 
 /* Tentative: emit a motion entry from a randomized point ahead or behind the actor. */
 

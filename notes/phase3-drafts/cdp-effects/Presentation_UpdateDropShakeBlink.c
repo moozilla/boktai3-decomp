@@ -1,6 +1,6 @@
-#include "presentation_sequence.h"
-#include "engine_globals.h"
-#include "ram.h"
+#include "effects/screen/presentation_sequence.h"
+#include "engine/engine_globals.h"
+#include "engine/ram.h"
 // Provisional name: Presentation_UpdateDropShakeBlink
 // MATCHING_CONCESSION: register-pinning
 void Anim_LoadKeyframe(void *, void *, s32, s32);

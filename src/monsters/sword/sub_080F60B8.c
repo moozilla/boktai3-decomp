@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 
 void Ivy_UpdateChildBobbing(u8 *);
 void Callback_InvokeActor(u8 *, void (*)(u8 *));

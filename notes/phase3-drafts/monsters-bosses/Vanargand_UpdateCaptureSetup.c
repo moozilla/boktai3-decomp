@@ -1,5 +1,5 @@
-#include "vanargand_pair_attack.h"
-#include "player.h"
+#include "bosses/vanargand/vanargand_pair_attack.h"
+#include "player/player.h"
 
 /* Copy the selected player palette and complete the capture position request. */
 #define Vanargand_UpdateCaptureSetup sub_081A8E08

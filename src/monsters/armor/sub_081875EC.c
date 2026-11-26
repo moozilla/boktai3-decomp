@@ -1,6 +1,6 @@
-#include "engine/shared/global.h"
+#include "global.h"
 #include "monsters/armor/armor_decision_ops.h"
-#include "engine/shared/engine_globals.h"
+#include "engine/engine_globals.h"
 
 struct ArmorDecisionActor {
     u8 pad0[0x18];

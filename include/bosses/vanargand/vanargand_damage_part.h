@@ -1,8 +1,8 @@
 #ifndef GUARD_VANARGAND_DAMAGE_PART_H
 #define GUARD_VANARGAND_DAMAGE_PART_H
 
-#include "engine/shared/contact_position.h"
-#include "engine/shared/damage_number_source.h"
+#include "scene/actor/contact_position.h"
+#include "ui/hud/damage_number_source.h"
 
 struct VanargandDamagePart {
     u8 unknown0[0x10];

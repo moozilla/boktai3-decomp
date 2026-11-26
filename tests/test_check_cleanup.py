@@ -3,36 +3,38 @@
 Needs a built tree (build/boktai3.elf and baserom.gba); skipped otherwise."""
 import glob
 import os
-import shutil
 import subprocess
 import sys
 import tempfile
 import unittest
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-UNIT = "src/system/clock_and_sun_schedule/sun_clock.c"
-
-
-def runs():
-    return set(glob.glob(os.path.join(ROOT, "build", "check", "run-*")))
+UNIT = "src/system/clock/sun_clock.c"
 
 
 @unittest.skipUnless(os.path.exists(os.path.join(ROOT, "build", "boktai3.elf"))
                      and os.path.exists(os.path.join(ROOT, "baserom.gba")), "needs a built tree")
 class CheckCleanup(unittest.TestCase):
+    def setUp(self):
+        scratch = tempfile.TemporaryDirectory(dir=os.path.join(ROOT, "build"))
+        self.addCleanup(scratch.cleanup)
+        self.scratch = scratch.name
+
+    def runs(self):
+        return set(glob.glob(os.path.join(self.scratch, "run-*")))
+
     def check(self, src, *flags):
         return subprocess.run([sys.executable, os.path.join(ROOT, "tools", "check.py"), src, *flags],
-                              cwd=ROOT, capture_output=True, text=True)
+                              cwd=ROOT, capture_output=True, text=True,
+                              env={**os.environ, "BOKTAI3_CHECK_DIR": self.scratch})
 
     def test_scratch_folder_removed_on_match(self):
-        before = runs()
         r = self.check(UNIT)
         self.assertIn("MATCH", r.stdout)
-        self.assertEqual(runs() - before, set())
+        self.assertEqual(self.runs(), set())
         self.assertNotIn("artifacts:", r.stdout)
 
     def test_scratch_folder_removed_on_mismatch_and_failure(self):
-        before = runs()
         with tempfile.TemporaryDirectory(dir=os.path.join(ROOT, "build")) as d:
             bad = os.path.join(d, "bad.c")
             src = open(os.path.join(ROOT, UNIT)).read()
@@ -43,20 +45,13 @@ class CheckCleanup(unittest.TestCase):
             open(broken, "w").write(src + "\nthis is not C\n")
             r = self.check(broken)
             self.assertNotEqual(r.returncode, 0)
-        self.assertEqual(runs() - before, set())
+        self.assertEqual(self.runs(), set())
 
     def test_keep_leaves_the_folder(self):
-        before = runs()
         r = self.check(UNIT, "--keep")
-        new = runs() - before
-        try:
-            self.assertEqual(len(new), 1)
-            (run,) = new
-            self.assertTrue(os.path.exists(os.path.join(run, "comparison.json")))
-            self.assertIn("artifacts: build/check/run-", r.stdout)
-        finally:
-            for run in new:
-                shutil.rmtree(run, ignore_errors=True)
+        (run,) = self.runs()
+        self.assertTrue(os.path.exists(os.path.join(run, "comparison.json")))
+        self.assertIn("artifacts: " + os.path.relpath(run, ROOT), r.stdout)
 
 
 if __name__ == "__main__":

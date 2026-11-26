@@ -1,6 +1,6 @@
-#include "engine/shared/global.h"
-#include "engine/shared/runtime.h"
-#include "engine/shared/ram.h"
+#include "global.h"
+#include "engine/runtime.h"
+#include "engine/ram.h"
 extern u32 *gGameState;
 u32 Save_AlignSizeToEightBytes(u32);
 u32 Save_GetPrimaryRegionBlock(u32, u32), Save_GetMainStateSize(void);

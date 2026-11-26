@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 /* Math_UnwrapAngleNearReference: Returns an equivalent byte angle within half a turn of the reference angle */
 #define Math_UnwrapAngleNearReference sub_0819AF7C
 

@@ -1,5 +1,5 @@
-#include "engine/shared/contact_swarm.h"
-#include "engine/shared/display_sequence_inline.h"
+#include "scene/actor/contact_swarm.h"
+#include "engine/video/display_sequence_inline.h"
 
 struct SwordSize {
     u32 x : 16, y : 16, z : 16;

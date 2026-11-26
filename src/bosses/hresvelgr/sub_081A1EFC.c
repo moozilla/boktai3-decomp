@@ -1,6 +1,6 @@
-#include "engine/shared/global.h"
-#include "engine/shared/engine_globals.h"
-#include "engine/shared/ram.h"
+#include "global.h"
+#include "engine/engine_globals.h"
+#include "engine/ram.h"
 
 struct PackedVector {
     s32 x : 16, y : 16, z : 16, pad : 16;

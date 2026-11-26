@@ -1,7 +1,7 @@
 #include "global.h"
-#include "render.h"
-#include "engine.h"
-#include "monster_particle_random.h"
+#include "engine/video/render.h"
+#include "engine/engine.h"
+#include "engine/math/monster_particle_random.h"
 // confidence=low: scrolls weather tilemap layers and adjusts their randomized drift.
 #define Weather_UpdateTilemapScroll sub_08017510
 struct Weather {

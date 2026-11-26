@@ -1,6 +1,6 @@
-#include "engine/shared/global.h"
+#include "global.h"
 #include "bosses/ratatosk/ratatosk.h"
-#include "engine/shared/state_actor_action_entry.h"
+#include "bosses/state_actor_action_entry.h"
 
 void SceneActor_UpdateState24AndConditionalReturnCommand(struct StateActor *actor)
 {

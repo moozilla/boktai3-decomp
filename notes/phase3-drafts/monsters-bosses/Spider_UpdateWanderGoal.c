@@ -1,4 +1,4 @@
-#include "scene_actor_chase.h"
+#include "scene/actor/scene_actor_chase.h"
 // MATCHING_CONCESSION: register-pinning
 
 // confidence=low: periodically probes a randomized heading and updates the Spider route endpoint and cooldown.

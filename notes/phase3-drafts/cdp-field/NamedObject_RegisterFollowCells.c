@@ -1,8 +1,8 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
-#include "player.h"
-#include "terrain_cell_probe.h"
-#include "ram.h"
+#include "player/player.h"
+#include "scene/terrain/terrain_cell_probe.h"
+#include "engine/ram.h"
 struct NamedObject {
     u8 pad0[0xB6];
     u16 state;

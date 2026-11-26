@@ -1,0 +1,9 @@
+#include "scene/actor/actor_attachment_manager.h"
+struct ActorAttachmentSlotView *
+ActorAttachment_CreatePartsSlotWithCount(u8 frame, struct ContactPosition *anchor, void *update,
+                                         s32 z, u32 action, s16 *value, s32 count, u32 partCount,
+                                         struct ActorAttachmentFollowView *follow, u32 unused)
+{
+    return ActorAttachment_CreateMeterPartsSlot(frame, anchor, update, z, action, value, count,
+                                                partCount, follow, unused);
+}

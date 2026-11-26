@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 
 #define ActorSoundPhase_StopSong Vanargand_StopActionSequence
 struct ActorSoundPhase {

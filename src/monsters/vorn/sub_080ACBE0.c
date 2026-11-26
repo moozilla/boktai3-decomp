@@ -1,6 +1,6 @@
-#include "engine/shared/global.h"
-#include "engine/shared/scene_actor_reset.h"
-#include "engine/shared/player.h"
+#include "global.h"
+#include "scene/actor/scene_actor_reset.h"
+#include "player/player.h"
 extern const s16 gUnk_086149C4[];
 s32 Math_Atan2(s32, s32);
 s32 Div(s32, s32);

@@ -5,7 +5,7 @@
 contracts support the name `LevelAdvanceDisplay`; no execution coverage or
 particular on-screen artwork is established here.
 
-`include/menus/level_advance_display/level_advance_display.h` gives a shared layout. The sprite is at
+`include/ui/hud/level_advance_display.h` gives a shared layout. The sprite is at
 `0x18`, graphics at `0x44`, animation kind/active/frame at `0x60/0x62/0x64`,
 secondary-event kind at `0x72`, next threshold at `0x74`, threshold-table
 pointer at `0x78`, and particle resource at `0x7C`. Eight `0x3C` particles

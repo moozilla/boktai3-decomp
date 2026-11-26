@@ -1,7 +1,7 @@
-#include "engine/shared/global.h"
-#include "engine/shared/render.h"
-#include "engine/shared/ram.h"
-#include "engine/shared/engine_pause_flags.h"
+#include "global.h"
+#include "engine/video/render.h"
+#include "engine/ram.h"
+#include "engine/engine_pause_flags.h"
 
 struct SceneSelection {
     u8 pad0[0x1a];

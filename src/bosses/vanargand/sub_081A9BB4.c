@@ -1,5 +1,5 @@
-#include "engine/shared/global.h"
-#include "engine/shared/engine_globals.h"
+#include "global.h"
+#include "engine/engine_globals.h"
 // confidence=low: facing and active-half mask choose the side for randomized commands 8/11.
 struct Pair {
     u8 pad0[0x205];

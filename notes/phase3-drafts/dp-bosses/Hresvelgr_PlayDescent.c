@@ -1,4 +1,4 @@
-#include "hresvelgr_travel.h"
+#include "bosses/hresvelgr/hresvelgr_travel.h"
 
 void ActionState_Reset(u8 *);
 void ActionState_AdvanceState(u8 *);

@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 void *Heap_Alloc(s32 size);
 void Memory_Clear(void *dst, s32 bytes);
 s32 Heap_Free(void *block); /* void in engine.h; the caller returns its r0 */

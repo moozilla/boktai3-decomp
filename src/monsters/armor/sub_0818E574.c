@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 struct Vec {
     s32 x : 16;
     s32 y : 16;

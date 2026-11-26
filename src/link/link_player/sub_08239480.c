@@ -1,7 +1,7 @@
-#include "engine/shared/global.h"
-#include "engine/shared/monster_particle_random.h"
-#include "engine/shared/engine_globals.h"
-#include "engine/shared/ram.h"
+#include "global.h"
+#include "engine/math/monster_particle_random.h"
+#include "engine/engine_globals.h"
+#include "engine/ram.h"
 // Cleanup: remove the angle register hint while retaining exact codegen.
 /* Tentative role: periodically spawn an inward-moving effect in a four-slot ring. */
 typedef struct Point {

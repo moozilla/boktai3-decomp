@@ -1,8 +1,8 @@
-#include "engine/shared/scene_combat_colliders.h"
-#include "engine/shared/global.h"
-#include "engine/shared/engine.h"
-#include "engine/shared/ram.h"
-#include "engine/shared/contact_actor.h"
+#include "monsters/armor/scene_combat_colliders.h"
+#include "global.h"
+#include "engine/engine.h"
+#include "engine/ram.h"
+#include "scene/actor/contact_actor.h"
 
 struct ArmorActor {
     u8 pad0[0x94];

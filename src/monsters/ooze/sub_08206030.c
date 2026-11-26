@@ -1,8 +1,8 @@
-#include "engine/shared/global.h"
-#include "engine/shared/engine.h"
-#include "engine/shared/ram.h"
-#include "engine/shared/engine_pause.h"
-#include "engine/shared/word_flags.h"
+#include "global.h"
+#include "engine/engine.h"
+#include "engine/ram.h"
+#include "engine/engine_pause.h"
+#include "engine/word_flags.h"
 struct SceneDispatchTask {
     u8 unknown0[0x20];
     u32 flags;

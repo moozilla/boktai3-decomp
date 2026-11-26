@@ -1,9 +1,9 @@
 #include "global.h"
-#include "scene_actor_components.h"
-#include "scene_facing.h"
-#include "player.h"
-#include "engine.h"
-#include "ram.h"
+#include "scene/actor/scene_actor_components.h"
+#include "scene/actor/scene_facing.h"
+#include "player/player.h"
+#include "engine/engine.h"
+#include "engine/ram.h"
 // confidence=low: charges along the facing axis, turning by a random signed offset on contact.
 struct Action {
     u8 state, pad[3];

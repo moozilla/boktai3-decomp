@@ -383,7 +383,7 @@ def cmd_pause(a):
 
 
 def cmd_goto(a):
-    """Put the player at world x, z (and y) through struct Player (include/engine/shared/player.h)."""
+    """Put the player at world x, z (and y) through struct Player (include/player/player.h)."""
     y = '' if a.y is None else f'p->position.y = {a.y};'
     r = run_snippet(f'struct Player *p = gPlayers[0]; p->position.x = {a.x}; p->position.z = {a.z}; {y} '
                     'p->previousPosition = p->position; print("%d %d %d\\n", p->position.x, p->position.y, p->position.z);',

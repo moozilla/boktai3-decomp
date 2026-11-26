@@ -1,5 +1,5 @@
-#include "engine/shared/global.h"
-#include "engine/shared/scene_pool.h"
+#include "global.h"
+#include "link/wireless/scene_pool.h"
 struct Q {
     u8 f[0x28];
     u32 a, b, c;

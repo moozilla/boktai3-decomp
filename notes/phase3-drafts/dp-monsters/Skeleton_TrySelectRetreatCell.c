@@ -1,6 +1,6 @@
 #include "global.h"
-#include "scene_actor_reaction.h"
-#include "scene_actor_terrain.h"
+#include "scene/actor/scene_actor_reaction.h"
+#include "scene/actor/scene_actor_terrain.h"
 // confidence=low: neighboring Skeleton controls establish provisional role
 // MATCHING_CONCESSION: register-pinning
 // Keep the map address live through each final signed width load.

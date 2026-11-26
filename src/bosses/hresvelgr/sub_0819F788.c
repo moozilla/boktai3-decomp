@@ -1,6 +1,6 @@
-#include "engine/shared/global.h"
-#include "engine/shared/engine.h"
-#include "engine/shared/ram.h"
+#include "global.h"
+#include "engine/engine.h"
+#include "engine/ram.h"
 #include "bosses/hresvelgr/hresvelgr_travel.h"
 // confidence=low: alternates side-specific sequences and emits four directional shots per pulse.
 struct Sequences {

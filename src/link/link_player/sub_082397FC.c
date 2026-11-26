@@ -1,5 +1,5 @@
-#include "engine/shared/global.h"
-#include "engine/shared/render.h"
+#include "global.h"
+#include "engine/video/render.h"
 
 struct P0813C94C {
     u8 f0[0x36A];

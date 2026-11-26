@@ -1,8 +1,8 @@
-#include "engine/shared/global.h"
+#include "global.h"
 #include "system/game_state/game_state.h"
-#include "engine/shared/ram.h"
-#include "engine/shared/engine_globals.h"
-#include "engine/shared/area_effect_link.h"
+#include "engine/ram.h"
+#include "engine/engine_globals.h"
+#include "scene/area_effect/area_effect_link.h"
 #include "monsters/glove/glove.h"
 
 // confidence=low: recoil completion returns to the callback at 081198F8.

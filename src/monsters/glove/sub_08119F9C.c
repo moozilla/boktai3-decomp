@@ -1,6 +1,6 @@
-#include "engine/shared/global.h"
-#include "engine/shared/scene_pool.h"
-#include "engine/shared/ram.h"
+#include "global.h"
+#include "link/wireless/scene_pool.h"
+#include "engine/ram.h"
 #define Packet_Send SceneMessages_Send
 struct Packet {
     u16 id;

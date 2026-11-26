@@ -1,6 +1,6 @@
-#include "engine/shared/global.h"
-#include "engine/shared/engine.h"
-#include "engine/shared/scene_vec.h"
+#include "global.h"
+#include "engine/engine.h"
+#include "engine/math/scene_vec.h"
 struct Hresvelgr {
     u8 unknown0[0x1B4];
     struct SceneVec colliderPosition;

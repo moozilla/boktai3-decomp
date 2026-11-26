@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 void Anim_SetSequence(void *, u32, u32, u32, u32);
 void OrangeSpine_TryFireAtPlayer(void);
 u32 OrangeSpine_UpdateRecoveryDelay(u8 *p)

@@ -1,7 +1,7 @@
 #ifndef GUARD_SERIAL_H
 #define GUARD_SERIAL_H
 
-#include "engine/shared/global.h"
+#include "global.h"
 
 /* RAM objects; each row of symbols/ram.csv with header include/serial.h. */
 /* 0x03001690 */

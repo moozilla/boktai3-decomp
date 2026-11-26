@@ -1,5 +1,5 @@
-#include "engine/shared/global.h"
-#include "engine/shared/ram.h"
+#include "global.h"
+#include "engine/ram.h"
 void Serial_DisableTimer3Polling(void);
 void Serial_DisableReceiveInterrupt(void);
 

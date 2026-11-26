@@ -1,8 +1,8 @@
 #ifndef GUARD_SCENE_PAUSE_H
 #define GUARD_SCENE_PAUSE_H
 
-#include "engine/shared/engine_globals.h"
-#include "engine/shared/ram.h"
+#include "engine/engine_globals.h"
+#include "engine/ram.h"
 
 /* The engine and scene pause words are tested together (bit 10 holds every
  * effect spawn); some eighty sites do this, several through per-header copies

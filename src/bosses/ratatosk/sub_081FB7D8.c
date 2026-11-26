@@ -1,5 +1,5 @@
-#include "engine/shared/global.h"
-#include "engine/shared/player.h"
+#include "global.h"
+#include "player/player.h"
 static inline s32 Sub256(s32 x)
 {
     return x - 256;

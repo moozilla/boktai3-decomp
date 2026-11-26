@@ -1,5 +1,5 @@
-#include "engine/shared/global.h"
-#include "engine/shared/engine.h"
+#include "global.h"
+#include "engine/engine.h"
 struct MotionPackedVector {
     s32 x : 16, y : 16, z : 16;
 };

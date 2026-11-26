@@ -1,8 +1,8 @@
 #ifndef GUARD_VANARGAND_PAIR_ATTACK_H
 #define GUARD_VANARGAND_PAIR_ATTACK_H
 
-#include "actors/paired_scene_actor/paired_scene_actor.h"
-#include "engine/shared/scene_vec.h"
+#include "bosses/vanargand/paired_scene_actor.h"
+#include "engine/math/scene_vec.h"
 #include "bosses/vanargand/positioned_effect_coordinates.h"
 #include "bosses/vanargand/vanargand_damage_part.h"
 #include "bosses/vanargand/vanargand_stage_colors.h"

@@ -1,9 +1,9 @@
 #ifndef GUARD_GLOVE_H
 #define GUARD_GLOVE_H
-#include "engine/shared/global.h"
-#include "engine/shared/scene_pool.h"
-#include "engine/shared/scene_actor_style.h"
-#include "engine/shared/spatial_entry.h"
+#include "global.h"
+#include "link/wireless/scene_pool.h"
+#include "scene/actor/scene_actor_style.h"
+#include "scene/collision/spatial_entry.h"
 
 /* The Glove controller (0811697C-0811A9xx): the player's glove actor, a 0x968-byte
  * object whose movement body sits at +0x18 and whose sprite model follows it.

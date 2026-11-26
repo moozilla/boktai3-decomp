@@ -1,5 +1,5 @@
-#include "contact_actor.h"
-#include "monster_particle_random.h"
+#include "scene/actor/contact_actor.h"
+#include "engine/math/monster_particle_random.h"
 void ContactActor_SetDirectionalSequence(struct ContactActorPool *, struct ContactActor *, u32);
 u8 *TerrainModifiers_FindCellOverride(s32, s32);
 static inline s32 truncateShift12(s32 value)

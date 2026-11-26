@@ -1,7 +1,7 @@
-#include "engine/shared/global.h"
+#include "global.h"
 #include "bosses/ratatosk/ratatosk.h"
-#include "engine/shared/engine_globals.h"
-#include "engine/shared/ram.h"
+#include "engine/engine_globals.h"
+#include "engine/ram.h"
 
 struct Vec {
     s16 x, y, z, pad;

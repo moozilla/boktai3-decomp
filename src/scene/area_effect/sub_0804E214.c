@@ -1,0 +1,32 @@
+#include "scene/area_effect/area_effect.h"
+void AnimData_Load(void *, u32);
+void Sprite_Init(void *, void *, u32);
+void AnimData_SelectPaletteBank(void *, u32);
+u32 Region_FindContaining(void *);
+void AreaEffect_InitializeEntry(struct AreaEffectEntry *entry, s32 kind,
+                                struct SceneVec *position, s32 rotated, u32 graphicsId)
+{
+    u32 mirror;
+    u8 *kindField;
+    u8 *graphics;
+    struct Sprite {
+        u8 unknown0[0x10];
+        u16 priority;
+    };
+    struct Sprite *sprite;
+    entry->position = *position;
+    mirror = rotated ? 4 : 0;
+    kindField = &entry->kind;
+    *kindField = kind;
+    graphics = entry->graphics[0];
+    AnimData_Load(graphics, 0xCBE1);
+    sprite = (struct Sprite *)&entry->spriteFlags;
+    Sprite_Init(sprite, graphics, mirror);
+    sprite->priority = *kindField;
+    AnimData_SelectPaletteBank(graphics, graphicsId);
+    entry->displayPosition = entry->position;
+    entry->renderMode = 3;
+    entry->hasSprite = 1;
+    AreaEffect_SetBounds(entry, kind, position, rotated);
+    entry->cachedValue = Region_FindContaining(entry);
+}

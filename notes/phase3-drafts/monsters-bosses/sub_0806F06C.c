@@ -2,7 +2,7 @@
 /* SceneActorQuery_FindInBox: like sub_0806EFB8, but skips actors with flag 0x400 before
    advancing the cursor and tests a center +/- radius box on all three axes.
    The loop counter is pinned to r5 (rasolve: needs priority above the three pointers). */
-#include "scene_actor_registry.h"
+#include "scene/actor/scene_actor_registry.h"
 struct SceneActorRegistryActor *SceneActorRegistry_FindAvailableAfterId(u32);
 static inline u8 Inactive(struct SceneActorRegistryActor *a)
 {

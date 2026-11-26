@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 void Debug_NudgeScreenPositionWithB(s16 *);
 s32 __divsi3(s32, s32);
 static inline s32 shift(s32 x, s32 n)

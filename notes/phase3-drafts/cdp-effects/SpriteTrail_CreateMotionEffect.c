@@ -1,6 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
-#include "sprite_trail.h"
-#include "background_controller.h"
+#include "bosses/vanargand/sprite_trail.h"
+#include "effects/screen/background_controller.h"
 struct Camera {
     u8 unknown0[0x44];
     s32 x;

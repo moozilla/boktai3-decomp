@@ -1,7 +1,7 @@
-#include "engine/shared/global.h"
-#include "engine/shared/contact_collider.h"
+#include "global.h"
+#include "scene/actor/contact_collider.h"
 #include "system/game_state/game_state.h"
-#include "engine/shared/scene_combat_colliders.h"
+#include "monsters/armor/scene_combat_colliders.h"
 
 struct ArmorChargeActor {
     u8 pad0[0x18];

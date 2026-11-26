@@ -1,12 +1,12 @@
-#include "engine/shared/global.h"
-#include "engine/shared/engine.h"
-#include "engine/shared/ram.h"
+#include "global.h"
+#include "engine/engine.h"
+#include "engine/ram.h"
 
 /* tentative: adjacent-side variant of the random burst phase; the spread turns the other way */
 
 #include "bosses/hresvelgr/hresvelgr_travel.h"
-#include "engine/shared/scene_vec_polar.h"
-#include "field/group_objects/group_objects.h"
+#include "engine/math/scene_vec_polar.h"
+#include "objects/board_pieces.h"
 
 struct ReactionIds {
     u32 a, b;

@@ -1,9 +1,9 @@
 // MATCHING_CONCESSION: register-pinning
-#include "scene_actor_behavior.h"
-#include "scene_actor_reaction.h"
-#include "script_utility.h"
-#include "engine.h"
-#include "runtime.h"
+#include "scene/actor/scene_actor_behavior.h"
+#include "scene/actor/scene_actor_reaction.h"
+#include "script/script_utility.h"
+#include "engine/engine.h"
+#include "engine/runtime.h"
 
 /* Ivy defeat state (tentative), a variant of Skeleton_UpdateDefeat (Skeleton_UpdateDefeat). On entry:
  * hides the actor, launches a particle burst through sub_08127590 and either plays cue 0xE5

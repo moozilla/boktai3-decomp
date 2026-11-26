@@ -1,4 +1,4 @@
-#include "scene_object_slot.h"
+#include "objects/scene_objects/scene_object_slot.h"
 void SceneObject_UpdateLowered(void);
 int SceneObjects_ScriptLower(void)
 {

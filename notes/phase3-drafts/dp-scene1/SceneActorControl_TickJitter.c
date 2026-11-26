@@ -1,7 +1,7 @@
-#include "scene_actor_control.h"
-#include "engine.h"
-#include "ram.h"
-#include "monster_particle_random.h"
+#include "scene/actor/scene_actor_control.h"
+#include "engine/engine.h"
+#include "engine/ram.h"
+#include "engine/math/monster_particle_random.h"
 void SceneActorControl_TickJitter(void *unused, struct SceneActorControlSlot *slot)
 {
     s16 *timer = &slot->timer;

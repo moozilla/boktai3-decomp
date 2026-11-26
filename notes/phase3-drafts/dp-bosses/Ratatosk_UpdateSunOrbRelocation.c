@@ -1,5 +1,5 @@
 #include "global.h"
-#include "sun_orb_effect.h"
+#include "objects/sun_orb/sun_orb_effect.h"
 struct RatatoskOrbTarget {
     u32 active;
     struct OrbitEffectPosition position;

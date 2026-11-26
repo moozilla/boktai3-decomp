@@ -1,6 +1,6 @@
-#include "engine/shared/global.h"
-#include "engine/shared/contact_actor.h"
-#include "engine/shared/scene_actor_turn.h"
+#include "global.h"
+#include "scene/actor/contact_actor.h"
+#include "scene/actor/scene_actor_turn.h"
 struct Hresvelgr {
     u8 unknown0[0xBC];
     u32 contactMask, contactFlags;

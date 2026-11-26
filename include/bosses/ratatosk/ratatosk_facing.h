@@ -1,7 +1,7 @@
 #ifndef GUARD_RATATOSK_FACING_H
 #define GUARD_RATATOSK_FACING_H
 
-#include "engine/shared/global.h"
+#include "global.h"
 
 #define RATATOSK_SET_FACING(actor_, heading_)                                                      \
     do {                                                                                           \

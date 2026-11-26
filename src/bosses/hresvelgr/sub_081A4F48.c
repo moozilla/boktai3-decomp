@@ -1,5 +1,5 @@
-#include "engine/shared/global.h"
-#include "engine/shared/ram.h"
+#include "global.h"
+#include "engine/ram.h"
 
 void *Hresvelgr_CreateProjectilePool(s32, s32, s32);
 void Hresvelgr_InitializeProjectile(s32, s32, s32);

@@ -1,8 +1,8 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
-#include "runtime.h"
-#include "engine_globals.h"
-#include "ram.h"
+#include "engine/runtime.h"
+#include "engine/engine_globals.h"
+#include "engine/ram.h"
 
 // Tentative result panel and drawable offsets.
 struct Drawing {

@@ -1,7 +1,7 @@
 #ifndef GUARD_VANARGAND_STAGE_COLORS_H
 #define GUARD_VANARGAND_STAGE_COLORS_H
 
-#include "engine/shared/render.h"
+#include "engine/video/render.h"
 
 static inline s32 Vanargand_InterpolateStageChannel(s32 start, s32 end, s32 frame, s32 duration)
 {

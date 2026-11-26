@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 extern void *Heap_Alloc(s32 size);
 extern void Heap_Free(void *p);
 extern void Save_WriteBlockWithRetries(u16 block, void *data, s32 size);

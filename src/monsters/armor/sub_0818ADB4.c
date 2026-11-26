@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 
 struct Armor6CallbackSlot {
     u32 active;

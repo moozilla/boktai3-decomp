@@ -1,5 +1,5 @@
 #include "global.h"
-#include "scene_actor_reset.h"
+#include "scene/actor/scene_actor_reset.h"
 struct Group {
     u8 pad0[0x8d0];
     u16 flags;

@@ -2,8 +2,8 @@
 #define SceneDistance_ApplyRequestedState  Ratatosk_InitRequestedState
 #define SceneDistance_RunStateCallback     Ratatosk_RunStateCallback
 #define SceneDistance_DispatchState        Ratatosk_UpdateBehavior
-#include "engine/shared/global.h"
-#include "engine/shared/scene_vec.h"
+#include "global.h"
+#include "engine/math/scene_vec.h"
 struct SceneDistanceActor {
     u8 pad0[0xA0];
     u8 nearTarget;

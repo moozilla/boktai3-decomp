@@ -1,6 +1,6 @@
 #include "global.h"
-#include "scene_departure_display.h"
-#include "player_cue_sequence.h"
+#include "bosses/vanargand/scene_departure_display.h"
+#include "player/cues/player_cue_sequence.h"
 
 void ActorDisplay_UpdateForegroundSprite(struct DepartureActor *actor)
 {

@@ -1,10 +1,10 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
-#include "area_effect_link.h"
-#include "game_state.h"
-#include "engine.h"
-#include "ram.h"
-#include "scene_pool.h"
+#include "scene/area_effect/area_effect_link.h"
+#include "system/game_state/game_state.h"
+#include "engine/engine.h"
+#include "engine/ram.h"
+#include "link/wireless/scene_pool.h"
 u8 Registry1745_ConsumeStateEntry(void *);
 s32 Registry1745_CheckSessionReady(void *);
 void Registry1745_BeginShutdown(void *, void *);

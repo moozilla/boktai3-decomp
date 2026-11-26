@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 #include "monsters/glove/glove.h"
 void Anim_SetKeyframes(void *, void *, u32, u32, u32);
 void Glove_SetAnimationKeyframes(struct Glove *s, u32 x)

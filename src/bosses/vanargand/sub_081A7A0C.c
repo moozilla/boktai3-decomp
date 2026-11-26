@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 /* Tentative ScenePanel family; names describe observed state and sprite operations. */
 struct ScenePanelPairState {
     u8 pad0[0x56C];

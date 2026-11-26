@@ -1,8 +1,8 @@
 #include "bosses/ratatosk/ratatosk.h"
-#include "engine/shared/contact_position.h"
-#include "engine/shared/ram.h"
-#include "engine/shared/engine_globals.h"
-#include "engine/shared/monster_particle_random.h"
+#include "scene/actor/contact_position.h"
+#include "engine/ram.h"
+#include "engine/engine_globals.h"
+#include "engine/math/monster_particle_random.h"
 
 struct PositionWords {
     u32 xy, zPad;

@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 struct ArmorActor {
     u8 pad0[0x238];
     u8 damageDisplay[0x244 - 0x238];

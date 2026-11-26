@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 u16 Eeprom_ReadBlock(u16, u16 *);
 
 s32 Save_ReadBlock(u16 address, u16 *data, s32 length)

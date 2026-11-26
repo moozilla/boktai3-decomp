@@ -1,5 +1,5 @@
 #define ActorSoundPhase_SetMode Vanargand_SetPendingCue
-#include "engine/shared/global.h"
+#include "global.h"
 struct ActorSoundPhase {
     u8 pad0[0x9c];
     u32 flags;

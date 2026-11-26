@@ -1,10 +1,10 @@
-#include "engine/shared/global.h"
-#include "engine/shared/engine.h"
-#include "engine/script_utility_references/script_utility.h"
-#include "engine/shared/scene_vec.h"
-#include "engine/shared/contact_collider.h"
-#include "engine/shared/ram.h"
-#include "engine/shared/engine_globals.h"
+#include "global.h"
+#include "engine/engine.h"
+#include "script/script_utility.h"
+#include "engine/math/scene_vec.h"
+#include "scene/actor/contact_collider.h"
+#include "engine/ram.h"
+#include "engine/engine_globals.h"
 
 struct IvyBurstVector {
     s32 x : 16;

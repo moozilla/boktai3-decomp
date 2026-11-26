@@ -1,8 +1,8 @@
-#include "engine/shared/global.h"
+#include "global.h"
 #include "monsters/armor/armor_action.h"
-#include "engine/shared/player.h"
-#include "engine/shared/ram.h"
-#include "engine/shared/engine_globals.h"
+#include "player/player.h"
+#include "engine/ram.h"
+#include "engine/engine_globals.h"
 
 extern u8 *gGameState;
 

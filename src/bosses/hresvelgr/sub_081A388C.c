@@ -1,6 +1,6 @@
-#include "engine/shared/global.h"
-#include "engine/shared/ram.h"
-#include "engine/shared/engine_globals.h"
+#include "global.h"
+#include "engine/ram.h"
+#include "engine/engine_globals.h"
 
 // confidence=low: updates homing effect entries, animation, trails and lifetime.
 

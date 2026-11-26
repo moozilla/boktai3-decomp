@@ -1,6 +1,6 @@
 #include "bosses/vanargand/vanargand_pair_attack.h"
-#include "engine/shared/engine.h"
-#include "engine/shared/ram.h"
+#include "engine/engine.h"
+#include "engine/ram.h"
 
 struct T {
     u32 v[2];

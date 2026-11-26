@@ -1,5 +1,5 @@
-#include "engine/shared/global.h"
-#include "engine/shared/scene_actor_init_actor.h"
+#include "global.h"
+#include "scene/actor/scene_actor_init_actor.h"
 
 // confidence=low: slows the sword component and selects its return path when it stops.
 struct SwordReturn {

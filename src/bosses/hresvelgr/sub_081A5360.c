@@ -1,5 +1,5 @@
-#include "engine/shared/global.h"
-#include "menus/floating_number_display/damage_number_display.h"
+#include "global.h"
+#include "ui/hud/damage_number_display.h"
 static inline void SetScale(struct ContactPosition *p, s16 x, s16 y, s16 z)
 {
     p->x = x;

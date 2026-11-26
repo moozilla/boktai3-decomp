@@ -1,6 +1,6 @@
-#include "engine/shared/global.h"
-#include "engine/shared/engine.h"
-#include "engine/shared/scene_pool.h"
+#include "global.h"
+#include "engine/engine.h"
+#include "link/wireless/scene_pool.h"
 #include "monsters/glove/glove.h"
 void Glove_UpdateRecoil(struct Glove *);
 /* Registry routine E3EE (Glove): starts glove -i (default 0): active, update

@@ -1,6 +1,6 @@
 #include "global.h"
-#include "ram.h"
-#include "player_cue_sequence.h"
+#include "engine/ram.h"
+#include "player/cues/player_cue_sequence.h"
 
 struct MsgTextState {
     u8 pad0[9];

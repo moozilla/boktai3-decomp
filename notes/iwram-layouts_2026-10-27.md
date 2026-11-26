@@ -4,7 +4,7 @@ Tags: #matching #tooling #ram
 
 ## 030042A0: render camera
 
-`gCamera` in `include/engine/shared/render.h` is a 0x14-byte `CameraRenderState`, distinct
+`gCamera` in `include/engine/video/render.h` is a 0x14-byte `CameraRenderState`, distinct
 from the active camera task pointer. The merged declarations and ROM agree on
 signed position X/Y/Z, screen offsets at +08/+0A, and projection mode at +12.
 The position tail at +06 is copied; its independent meaning is unresolved.
@@ -22,7 +22,7 @@ file exclusion list would avoid manual baseline collection and repeated checks.
 
 ## 03004C30 / 03004CC0: background records
 
-`gBgRecords[4]` shares one 0x30-byte `BackgroundLayer` in `include/engine/shared/render.h`.
+`gBgRecords[4]` shares one 0x30-byte `BackgroundLayer` in `include/engine/video/render.h`.
 The storage map agrees with the ROM and the outside audit: +00/+02 carry
 resource mode/layer, +10/+12 scale or overlay tile coordinates, +14/+16 origin,
 +18/+1A dimensions, +1C/+1E copied dimensions, +20/+22 scroll, and +24/+28/+2C

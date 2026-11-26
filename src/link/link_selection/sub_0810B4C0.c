@@ -1,9 +1,9 @@
-#include "engine/shared/global.h"
+#include "global.h"
 #define SessionMenu_SetState          Registry1745_SetState
 #define SessionMenu_ConsumeEntryFlag  Registry1745_ConsumeStateEntry
 #define SessionMenu_ResetWithCallback Registry1745_BeginShutdown
-#include "engine/shared/area_effect_link.h"
-#include "engine/shared/engine.h"
+#include "scene/area_effect/area_effect_link.h"
+#include "engine/engine.h"
 s32 TextWindow_Create(s32, s32, s32, s32);
 void TextWindow_StartPlayback(s32);
 u8 Registry1745_ConsumeStateEntry(void *);

@@ -1,6 +1,6 @@
 #include "global.h"
 
-#include "scene_actor_registry.h"
+#include "scene/actor/scene_actor_registry.h"
 struct SceneActorRegistryManager *SceneActorRegistry_GetManager(void);
 void SceneActorControl_OnIdle(u8 *);
 

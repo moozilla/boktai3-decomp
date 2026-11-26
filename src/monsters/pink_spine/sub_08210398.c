@@ -1,10 +1,10 @@
-#include "engine/shared/word_flags.h"
-#include "engine/shared/global.h"
+#include "engine/word_flags.h"
+#include "global.h"
 #include "monsters/pink_spine/pink_spine_playback.h"
-#include "engine/shared/ram.h"
-#include "engine/shared/contact_collider.h"
-#include "player/player_cue/player_cue_sequence.h"
-#include "engine/shared/engine_pause.h"
+#include "engine/ram.h"
+#include "scene/actor/contact_collider.h"
+#include "player/cues/player_cue_sequence.h"
+#include "engine/engine_pause.h"
 /* Species identity is tentative. The update callback increments age after animation. */
 extern u32 gUnk_02000560;
 void Anim_RestartSequence(void *, void *, u32, u32, u32);

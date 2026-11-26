@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 
 void EnemyParticle_SetGraphicsParameters(u8 *p, u32 a, u32 b, u32 c)
 {

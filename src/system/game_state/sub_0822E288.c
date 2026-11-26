@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 extern u8 gUnk_08E60F80[];
 u8 *GameState_GetConsumableDescriptor(u32 x)
 {

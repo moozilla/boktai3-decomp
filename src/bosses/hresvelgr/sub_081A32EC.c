@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 #define gEffectVariantValues    gUnk_08611EB8
 #define gEffectVariantFlagModes gUnk_08611EF8
 extern const u32 gUnk_08611EB8[];

@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 
 u32 Trigger_ConsumePending(void *latch, u32 expected);
 

@@ -1,9 +1,9 @@
 #ifndef GUARD_PINK_SPINE_PLAYBACK_H
 #define GUARD_PINK_SPINE_PLAYBACK_H
-#include "effects/shared_display_animation_wrapper/display_animation.h"
-#include "engine/shared/contact_collider.h"
-#include "player/player_cue/player_cue_sequence.h"
-#include "engine/shared/task.h"
+#include "engine/video/display_animation.h"
+#include "scene/actor/contact_collider.h"
+#include "player/cues/player_cue_sequence.h"
+#include "engine/task.h"
 struct PinkSpineState {
     struct Task task;
     u32 age;

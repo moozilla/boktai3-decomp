@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 extern const u32 gUnk_08613E14[];
 struct T {
     u8 p0[0x90];

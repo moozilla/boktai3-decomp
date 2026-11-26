@@ -1,5 +1,5 @@
-#include "engine/shared/global.h"
-#include "engine/shared/runtime.h"
+#include "global.h"
+#include "engine/runtime.h"
 /* Rtc_WriteTime: Writes hours minutes and seconds from record offsets four through six */
 #define Rtc_WriteTime sub_08248E70
 // concession-ok(cflags): SDK RTC driver (SIIRTC), built unoptimized as the SDK built siirtc.c

@@ -1,7 +1,7 @@
-#include "engine/shared/global.h"
-#include "engine/shared/engine.h"
-#include "engine/shared/ram.h"
-#include "engine/shared/scene_pool.h"
+#include "global.h"
+#include "engine/engine.h"
+#include "engine/ram.h"
+#include "link/wireless/scene_pool.h"
 struct MotionActorAnimation {
     u8 unknown0[0x60];
 };

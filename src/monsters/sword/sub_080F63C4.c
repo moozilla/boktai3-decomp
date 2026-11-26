@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 
 extern const u32 gUnk_0860643C[];
 void Callback_InvokeActor(u8 *, u32);

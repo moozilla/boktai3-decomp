@@ -1,6 +1,6 @@
-#include "engine/shared/global.h"
-#include "engine/shared/ram.h"
-#include "engine/shared/engine_globals.h"
+#include "global.h"
+#include "engine/ram.h"
+#include "engine/engine_globals.h"
 struct MotionActorState {
     u8 unknown0[0x68];
     u32 pending;

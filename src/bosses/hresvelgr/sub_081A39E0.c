@@ -1,8 +1,8 @@
-#include "engine/shared/global.h"
-#include "player/player_cue/player_cue_sequence.h"
-#include "engine/shared/engine_globals.h"
-#include "engine/shared/ram.h"
-#include "menus/scene_indicators/scene_indicator.h"
+#include "global.h"
+#include "player/cues/player_cue_sequence.h"
+#include "engine/engine_globals.h"
+#include "engine/ram.h"
+#include "ui/hud/scene_indicator.h"
 
 // confidence=low: updates homing effect entries, animation, trails and lifetime.
 

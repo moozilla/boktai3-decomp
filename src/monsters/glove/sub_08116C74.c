@@ -1,7 +1,7 @@
-#include "engine/shared/global.h"
-#include "engine/shared/area_effect_link.h"
-#include "engine/shared/engine.h"
-#include "engine/shared/ram.h"
+#include "global.h"
+#include "scene/area_effect/area_effect_link.h"
+#include "engine/engine.h"
+#include "engine/ram.h"
 struct LinkParticipant {
     u8 unknown0[0x8F8];
     s8 playerIndex;

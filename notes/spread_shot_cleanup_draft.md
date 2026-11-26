@@ -2,7 +2,7 @@
 
 Tags: #matching #scene #particles #structs #compiler
 
-The inspected draft is now implemented and checked. Commit request 0036 consolidated the sprite-notice range 08122DF0–08123194 into `src/effects/scene_scheduled_effect/sprite_notice.c`; request 0037 consolidates 08123194–08125B64 into `src/other/scene_terrain_probe/spread_shot.c`. Both complete units match the stock compiler. Matching coverage is unchanged.
+The inspected draft is now implemented and checked. Commit request 0036 consolidated the sprite-notice range 08122DF0–08123194 into `src/effects/scene/sprite_notice.c`; request 0037 consolidates 08123194–08125B64 into `src/effects/particles/spread_shot.c`. Both complete units match the stock compiler. Matching coverage is unchanged.
 
 ## Shared layouts
 
@@ -14,8 +14,8 @@ Terrain lookup reuses `SceneActorChaseTerrainCell`, `SceneActorChaseTerrainGrid`
 
 ## Exact checks and retained forms
 
-- `tools/check.py src/effects/scene_scheduled_effect/sprite_notice.c`: all 11 functions MATCH, 932 bytes.
-- `tools/check.py src/other/scene_terrain_probe/spread_shot.c`: all 13 functions MATCH, 10,704 bytes; final artifact `build/check/run-kiyi77q4`.
+- `tools/check.py src/effects/scene/sprite_notice.c`: all 11 functions MATCH, 932 bytes.
+- `tools/check.py src/effects/particles/spread_shot.c`: all 13 functions MATCH, 10,704 bytes; final artifact `build/check/run-kiyi77q4`.
 - The new spread-shot header has only its own source as a consumer; existing shared headers were not modified. Concession lint reports no findings.
 - The terrain probe retains its function-scope cell and signed/unsigned height round trip. Their GCSE/PRE implications are documented in `notes/cloud-08122DF4.md`.
 - Sharing the two height helpers changes the step's code (12 realigned instruction differences, candidate four bytes shorter). The matching private helper remains.

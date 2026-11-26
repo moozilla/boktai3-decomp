@@ -1,6 +1,6 @@
-#include "engine/shared/global.h"
-#include "player/player_cue/player_cue_sequence.h"
-#include "engine/shared/ram.h"
+#include "global.h"
+#include "player/cues/player_cue_sequence.h"
+#include "engine/ram.h"
 struct Pos {
     s16 x, y, z, pad;
 };

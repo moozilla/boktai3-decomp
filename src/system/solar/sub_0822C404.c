@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 #include "system/game_state/game_state.h"
 struct Context {
     u8 pad[0x4f0];

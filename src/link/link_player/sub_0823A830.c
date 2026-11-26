@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 
 typedef struct Vec4 {
     s16 x, y, z, w;

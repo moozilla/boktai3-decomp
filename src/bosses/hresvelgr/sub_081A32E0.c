@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 
 void Hresvelgr_SetLinkedActor(u8 *p, u32 v)
 {

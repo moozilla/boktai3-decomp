@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 #include "bosses/ratatosk/ratatosk_particle.h"
 
 void Memory_Clear(void *, u32);

@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 struct Ooze {
     u8 pad0[0x104];
     void (*state)(void);

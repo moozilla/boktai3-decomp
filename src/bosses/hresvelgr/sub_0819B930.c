@@ -1,5 +1,5 @@
-#include "engine/shared/global.h"
-#include "engine/shared/ram.h"
+#include "global.h"
+#include "engine/ram.h"
 extern u8 *gGameState;
 s32 AreaEffect_IsPositionCovered(void *);
 s32 Hresvelgr_GetEnvironmentalLevel(u8 *p)

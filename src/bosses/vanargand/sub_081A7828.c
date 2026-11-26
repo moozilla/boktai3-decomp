@@ -1,5 +1,5 @@
-#include "engine/shared/global.h"
-#include "engine/shared/scene_event_dispatch.h"
+#include "global.h"
+#include "scene/actor/scene_event_dispatch.h"
 struct ScenePanelCommandState {
     u8 unknown0[0xAC];
     u8 mode, substate, transition, unknownAF, pending;

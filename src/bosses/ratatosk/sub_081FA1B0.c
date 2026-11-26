@@ -1,5 +1,5 @@
 #define gSineTable gUnk_086149C4
-#include "engine/shared/global.h"
+#include "global.h"
 struct ColliderVector {
     s32 x : 16, y : 16, z : 16, pad : 16;
 };

@@ -1,5 +1,5 @@
-#include "engine/shared/global.h"
-#include "engine/shared/runtime.h"
+#include "global.h"
+#include "engine/runtime.h"
 u32 Save_AlignSizeToEightBytes(u32);
 s32 Save_ReadBlockWithRetries(u32, void *, u32);
 void Memory_Clear(void *, u32);

@@ -1,5 +1,5 @@
-#include "scene_actor_control.h"
-#include "player.h"
+#include "scene/actor/scene_actor_control.h"
+#include "player/player.h"
 struct SceneActorControlPlayerView {
     u8 unknown0[0x20];
     u32 flags;

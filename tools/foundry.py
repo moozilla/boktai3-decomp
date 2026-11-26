@@ -207,7 +207,7 @@ def context(func):
         for path, addresses in manifest().by_file.items():
             if any(lo <= a < hi for a in addresses):
                 inc.update(re.findall(r'#include "([^"]+\.h)"', open(path, errors="replace").read()))
-        inc.pop("engine/shared/global.h", None)
+        inc.pop("global.h", None)
         pack += [f"## Subsystem: {sname} ({lo:08X}-{hi:08X})", "",
                  "Headers its matched functions include (shared types live here; extend them):", ""]
         pack += [f"* include/{h} (used by {n} matched functions)" for h, n in inc.most_common(6)] or ["* (none yet)"]
@@ -227,7 +227,7 @@ matched relatives (start from a relative's C when one covers most of the functio
 Read docs/AGBCC_TIPS.md, including "Wrong values in the right shape"
 bullet for compiler idioms.
 
-Write your C to wip/{run}/{func}.c: `#include "engine/shared/global.h"`, local declarations, then the one
+Write your C to wip/{run}/{func}.c: `#include "global.h"`, local declarations, then the one
 function {func} (keep the sub_ name). Use the names the context pack shows: the linker
 does not resolve sub_XXXXXXXX for a function that has a real name, or D_XXXXXXXX labels. No data definitions, no string literals, no register
 pins (`register ... asm("rN")`), no asm() statements.
@@ -522,7 +522,7 @@ For EACH function FUNC:
      existing offset. After editing a header run
        build/venv/bin/python tools/foundry.py hdrcheck include/HEADER.h
      which re-checks every matched file that includes it; undo the edit if anything breaks.
-     Don't edit include/engine/shared/global.h or headers outside this subsystem. If the object has no
+     Don't edit include/global.h or headers outside this subsystem. If the object has no
      header yet, define its struct locally, named after the object (not `struct S1`).
 3. Write build/foundry/FUNC/result.txt with these lines:
      RESULT FUNC MATCH checks=K            (or: RESULT FUNC fuzzy N% checks=K)

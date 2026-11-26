@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 void Trigger_ConsumePending(void *, u32);
 struct S {
     u8 f0[0xaa];

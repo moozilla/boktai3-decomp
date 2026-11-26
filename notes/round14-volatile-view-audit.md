@@ -51,7 +51,7 @@ worker did not run a full build or regenerate project progress reports.
 
 The worker commit IDs below may change when cherry-picked for integration.
 All byte extents include the entire translation unit, including pools and
-padding. `src/minigames/result_game_tutorial/result_tutorial.c` contains 30 functions; each other listed unit
+padding. `src/minigames/result_game/result_tutorial.c` contains 30 functions; each other listed unit
 contains one.
 
 | Unit | Source improvement | Warning lines removed | Bytes | Worker commit |
@@ -71,7 +71,7 @@ contains one.
 | `08223580` | Use shared RFU clock/ACK fields and remove the dummy pre-store read. | 1 | 64 | `28cee231e` |
 | `08224C84` | Clear the shared clock flag directly; remove the dummy read. | 1 | 32 | `6501b47d9` |
 | `08224CA4` | Request completion through the shared clock flag; remove the dummy read. | 1 | 40 | `a7e4599da` |
-| `src/minigames/result_game_tutorial/result_tutorial.c` | Clear the scheduler pause word through an ordinary pointer. | 1 | 3,836 | `9104426f1` |
+| `src/minigames/result_game/result_tutorial.c` | Clear the scheduler pause word through an ordinary pointer. | 1 | 3,836 | `9104426f1` |
 
 The existing duplicate flag pointers and once-loop in `080838AC`, the
 cursor/sample union in `08128F98`, and the constant locals in the actor and
@@ -84,7 +84,7 @@ Four units exposed the same first symptom when their qualifiers were removed:
 the final `command & 15` access narrowed from the ROM's halfword load to a byte
 load. Merely retaining a cast elsewhere would not recover the source.
 
-`include/engine/shared/display_sequence_inline.h` already provides
+`include/engine/video/display_sequence_inline.h` already provides
 `DisplaySequence_UpdateWeight`, used by the common sprite playback helpers.
 Using that real operation in `SpriteProjectile_UpdateRebounds` (`08126D88`)
 and `HomingProjectile_UpdateManager` (`081FFAB8`) matches exactly and removes
@@ -92,7 +92,7 @@ their copied duration arithmetic. Their wider copied playback blocks remain;
 the full common-step candidates did not match.
 
 `FeatherEffectPool_CreateDirectional` (`081294B4`) matches with the complete
-`PlayerCue_StepSequence` helper from `include/player/player_cue/player_cue_sequence.h`, the
+`PlayerCue_StepSequence` helper from `include/player/cues/player_cue_sequence.h`, the
 shared `DisplaySequenceState`, and the existing graphics API declarations.
 Adjacent effect functions including `081299F8` and `08129B04` already use that
 helper. This removes the private sequence layout and the entire duplicated
@@ -101,7 +101,7 @@ playback block. `Anim_SetSequence` (`08220C8C`) remains open, as described below
 ### Ordinary random state
 
 `gRandomTable` is a writable **RAM** sample bank at `0x0203B400`, not a ROM
-resource. `include/engine/shared/ram.h` declares 1,024 halfwords;
+resource. `include/engine/ram.h` declares 1,024 halfwords;
 `Random_InitValueTable` (`082210B8`) initializes them, and normal gameplay
 consumers index the table with `gRandomIndex`. The scatter cleanup uses
 ordinary indexed reads. No asynchronous writer was established for this
@@ -128,10 +128,10 @@ than by the presence of a busy-wait alone:
    callback. The link-event handler can clear `gWirelessSessionState`.
 
 Consequently, the existing `volatile u8 gWirelessSessionState` declaration
-in `include/engine/shared/ram.h` is justified. The two accepted poller changes remove their
+in `include/engine/ram.h` is justified. The two accepted poller changes remove their
 local aliases without weakening the accesses.
 
-The existing `include/link/rfu_manager/rfu_manager.h` also correctly declares
+The existing `include/link/wireless/rfu_manager.h` also correctly declares
 `childClockSlave_flag` at offset 2 and `parentAck_flag` at offset 3 as `vu8`.
 `Rfu_ReqCallback` updates the ACK flag and can call
 `RfuManager_CompletePendingMscCycle`; `RfuManager_ApplyRequestResult` writes
@@ -156,14 +156,14 @@ not remove the genuine asynchronous accesses. No annotation was added.
 | `SceneInput_GetNavigationKeys` (`0805E7D8`) | 1 | Ordinary sampled input, with no IRQ writer established. Ordinary array access, direct global access, and the real `RuntimePadState` fields each produce 64 bytes versus 72. The volatile pointer and existing once-loop remain open. |
 | `ActorController_UpdateAnimation` (`08184F04`) | 1 | Ordinary keyframe status. The shared widget `status` field produces 224 bytes versus 228; an actual byte local produces 220. The volatile read remains an unresolved allocation form. |
 | `Anim_SetSequence` (`08220C8C`) | 2 | Ordinary sequence command data. Qualifier removal changes one load-width byte; the existing shared command read restores halfword width but swaps two operand registers. The volatile command declaration and cast remain open. |
-| `TileAnimation_Upload` (`src/engine/tile_animation/tile_animation.c`, `08019788`) | 1 | Real DMA3 register access at `0x040000D4`; volatility must remain. The declaration warning is a hardware-recognition limitation in the scanner. |
+| `TileAnimation_Upload` (`src/engine/video/tile_animation.c`, `08019788`) | 1 | Real DMA3 register access at `0x040000D4`; volatility must remain. The declaration warning is a hardware-recognition limitation in the scanner. |
 
 The DMA case is established by the actual stores to source, destination and
 control registers, followed by a control read. `include/gba/io_reg.h` declares
 DMA3 source/destination/control at offsets `0xD4/0xD8/0xDC` with volatile
 register access. The local qualifier was not removed or disguised.
 
-For navigation input, `src/engine/runtime_input_and_utilities/runtime_input.c` writes the real
+For navigation input, `src/engine/runtime_input.c` writes the real
 `RuntimePadState` record (`held`, `pressed`, `released`, `reserved`). The typed
 candidate does not restore the ROM's separate held-value reload or its extra
 mask copy/register lifetime. No private replacement volatile type was added.
@@ -199,7 +199,7 @@ provenance. No credible IRQ writer was established.
 The named stores to `gSceneLinkList` are in `TargetRegistry_Init` (`0815F77C`)
 and `TargetRegistry_Destroy` (`0815F770`). The named stores to `gSceneCamera`
 are in `TilemapPanel_Initialize` and `SceneTilemap_Destroy` in
-`src/menus/save_menu/scene_tilemap.c`. This evidence does not justify centralizing either
+`src/ui/save/scene_tilemap.c`. This evidence does not justify centralizing either
 volatile declaration. Those root-owned errors were left unchanged; they are
 outside the 21-unit counts above.
 

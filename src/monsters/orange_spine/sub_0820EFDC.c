@@ -1,6 +1,6 @@
 #include "monsters/orange_spine/orange_spine.h"
-#include "engine/shared/collision_response.h"
-#include "engine/shared/engine.h"
+#include "scene/actor/collision_response.h"
+#include "engine/engine.h"
 struct H {
     u32 lo : 16;
     u32 hi : 16;

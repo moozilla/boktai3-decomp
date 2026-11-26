@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 
 s32 sub_081F339C(u8 *p)
 {

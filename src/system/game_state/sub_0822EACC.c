@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 extern u8 *gGameState;
 void SolarFruit_ClearEquippedSlot(u32 i)
 {

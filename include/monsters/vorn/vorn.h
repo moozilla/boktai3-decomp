@@ -1,7 +1,7 @@
 #ifndef GUARD_VORN_H
 #define GUARD_VORN_H
 
-#include "engine/shared/chase_actor.h"
+#include "monsters/chase_actor.h"
 
 /* Vorn's class fields past the chase actor, as far as its code reads them (provisional). */
 struct Vorn {

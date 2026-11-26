@@ -1,5 +1,5 @@
-#include "engine/shared/global.h"
-#include "engine/shared/ram.h"
+#include "global.h"
+#include "engine/ram.h"
 bool32 Script_SeekToKeyword(s32);
 s32 Script_GetValue(void);
 

@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 struct LinkSession {
     u8 pad0[0x610];
     u16 f610;

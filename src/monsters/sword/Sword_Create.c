@@ -1,5 +1,5 @@
-#include "engine/shared/global.h"
-#include "engine/shared/engine.h"
+#include "global.h"
+#include "engine/engine.h"
 void Sword_UpdateTask(void *);
 void Sword_DestroyTask(void *);
 s32 Sword_InitializeFromScript(void *);

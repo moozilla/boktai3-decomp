@@ -48,7 +48,7 @@ palette index at 0x3A and palette-data pointer at 0x48; its 0x60 size is unchang
 
 ## Contact-burst controller and particles
 
-`include/actors/contact_burst_effects/contact_burst.h` describes a **0xC4 task on list 8**. The name and exact
+`include/bosses/nidhoggr/contact_burst.h` describes a **0xC4 task on list 8**. The name and exact
 actor identity remain tentative. A static owner constructor near **0802C5xx**
 passes its position at owner offset 0x8A4 and stores this task at **0x90C**, next
 to the contact-sequence pool and orbiting contact actor. The controller holds
@@ -83,7 +83,7 @@ selection uses its low byte.
 
 On an enabled-to-disabled transition, eight particles are spawned with angles
 `index*32 + (random & 15)`, frames **29–31**, then sound **3B7** plays. The
-sprite is hidden and collider disabled. `include/effects/directional_particles/directional_particles.h`
+sprite is hidden and collider disabled. `include/effects/particles/directional_particles.h`
 recovers the shared sprite-pool position at 0x28 and appended motion at 0x6C:
 velocity occupies eight bytes and lifetime follows at 0x74. Its exact callback
 adds velocity into the three halfword coordinates and requests removal when

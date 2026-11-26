@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 extern u32 gParticipantActors[];
 u32 Script_GetKeywordValue(u32, u32);
 void StageIconDisplay_Create(u32, u32, void (*)(void), u32);

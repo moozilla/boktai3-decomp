@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 s32 LinkPlayer_GetSelectedAbilityCost(void *);
 u32 LinkPlayer_HasAbilityEnergy(u8 *s)
 {

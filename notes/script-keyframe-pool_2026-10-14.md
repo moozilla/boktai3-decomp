@@ -3,7 +3,7 @@
 `08055678–08055B74` is a complete thirteen-function cohort /1,276 bytes, with
 four new exact functions /672 bytes (+0.0278 percentage points). Nine existing
 helpers, including the260-byte updater, were typed/named without new credit.
-The shared layout is `include/engine/script_keyframe_pool/script_keyframe_pool.h`. These are static
+The shared layout is `include/script/script_keyframe_pool.h`. These are static
 contracts, with no new execution coverage or identified in-game object.
 
 Manager `gUnk_02000498` has capacity/count18/19 and0xBC entries at1C. The creator

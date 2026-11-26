@@ -94,7 +94,7 @@ with zero errors and the full translation unit exact.
   drawable operations replace duplicated state writes. The ordinary cell
   coordinate operation replaces both statement expressions. Three address
   indirections are gone. The typed trail vector uses a direct zero store.
-- `include/monsters/dog/dog.h` names the 0x696 action cooldown beside the near and far
+- `include/monsters/dog.h` names the 0x696 action cooldown beside the near and far
   attack timers. Its dependent unit matches.
 - `concession-ok` at 080E5744. Both `CpuSet` calls pass sp+0x10 and
   0x05000002. The `Memory_Clear` candidate changes the call and block.
@@ -163,7 +163,7 @@ with zero errors and the full translation unit exact.
   The remaining literal and zero locals affect flag-load and state-store
   order. See `build/cx/work/ivy-ready-warn.log`.
 - The existing drawable flag family moved into
-  `include/engine/shared/scene_actor_drawable_flags.h`. All eight existing dependents
+  `include/scene/actor/scene_actor_drawable_flags.h`. All eight existing dependents
   passed and the same operation removed one more warning in Mummy and
   two in Octopus on revisiting those units.
 

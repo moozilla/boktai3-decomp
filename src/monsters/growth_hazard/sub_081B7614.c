@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 
 struct GrowthHazardPosition {
     s16 x, y, z, unk6;

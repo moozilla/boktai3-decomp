@@ -1,8 +1,8 @@
-#include "engine/shared/global.h"
-#include "engine/shared/ram.h"
-#include "engine/shared/engine_globals.h"
-#include "engine/shared/area_effect_link.h"
-#include "engine/shared/engine_pause.h"
+#include "global.h"
+#include "engine/ram.h"
+#include "engine/engine_globals.h"
+#include "scene/area_effect/area_effect_link.h"
+#include "engine/engine_pause.h"
 #include "monsters/glove/glove.h"
 
 struct LinkMenu {

@@ -1,5 +1,5 @@
 /* Tentative family and field names, based on static accesses. */
-#include "engine/shared/global.h"
+#include "global.h"
 struct ProximityPosition {
     s16 x, y, z, unknown6;
 };

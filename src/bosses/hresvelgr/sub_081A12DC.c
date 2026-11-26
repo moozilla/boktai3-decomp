@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 // confidence=low: launches a moving projectile and approaches the elevated rest position.
 struct Vec {
     s16 x, y, z, pad;

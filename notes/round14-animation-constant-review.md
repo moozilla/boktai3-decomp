@@ -14,12 +14,12 @@ settings changed. The parent integration task owns the full-ROM build gate.
 
 | Unit | Const-local before → after | Stock bytes | Commit |
 | --- | ---: | ---: | --- |
-| `src/actors/scene_actor_animation_and_scripted_actions/scene_actor_animation.c` | 41 → 13 | 11,544 | `0c162ae12` |
-| `src/actors/actor_animation_controller/actor_animation_controller.c` | 36 → 31 | 30,356 | `7474978c5` |
-| `src/actors/actor_graphics_and_basic_states/actor_graphics_and_basic_states.c` | 16 → 10 | 12,420 | `0f429931e` |
-| `src/actors/actor_controller/actor_controller_transitions.c` | 13 → 6 | 3,404 | `88e29c2bf` |
-| `src/actors/scene_event_actor/scene_event_actor.c` | 14 → 2 | 4,024 | `0bb3db59d` |
-| `src/actors/scene_actor_visibility_and_stored_motion/scene_actor_stored_motion.c` | 6 → 5 | 3,268 | `9e798c993` |
+| `src/npc/manager/scene_actor_animation.c` | 41 → 13 | 11,544 | `0c162ae12` |
+| `src/npc/cutscene_actor/actor_animation_controller.c` | 36 → 31 | 30,356 | `7474978c5` |
+| `src/bosses/vampire/actor_graphics_and_basic_states.c` | 16 → 10 | 12,420 | `0f429931e` |
+| `src/monsters/armor/actor_controller_transitions.c` | 13 → 6 | 3,404 | `88e29c2bf` |
+| `src/bosses/sabata/scene_event_actor.c` | 14 → 2 | 4,024 | `0bb3db59d` |
+| `src/scene/actor/control/scene_actor_stored_motion.c` | 6 → 5 | 3,268 | `9e798c993` |
 
 All six combined units total **65,016 exact bytes**. Their final concession scan
 has 0 errors and 70 warnings: 67 const-local, 2 once-loop and 1 local-union. It
@@ -72,7 +72,7 @@ also do not match.
 Both sites are solved by merging the existing mask with the actual field value
 before storing that result. This removes the artificial address/dereference
 without a new local or a new warning. Commit `ff28ffb91` contains the change;
-all **14,980 stock bytes** in `src/monsters/octopus/octopus.c` match. The unit has 0 errors and 22
+all **14,980 stock bytes** in `src/monsters/octopus.c` match. The unit has 0 errors and 22
 remaining const-local warnings, with no compiler or addr-deref diagnostics.
 
 The complete accepted source delta in this bounded pass removes **61 warnings**:

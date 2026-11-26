@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 
 void Serial_DisableGlobalInterrupts(void);
 void Serial_EnableGlobalInterrupts(void);

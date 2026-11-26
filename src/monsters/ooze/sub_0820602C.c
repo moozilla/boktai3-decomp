@@ -1,5 +1,5 @@
 // COMPILER: old_agbcc
-#include "engine/shared/global.h"
+#include "global.h"
 /* Ooze_UpdateIdle: Tentative idle state handler that returns zero without changing state */
 #define Ooze_UpdateIdle sub_0820602C
 

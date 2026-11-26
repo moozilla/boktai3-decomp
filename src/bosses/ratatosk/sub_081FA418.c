@@ -1,6 +1,6 @@
-#include "engine/shared/global.h"
+#include "global.h"
 #include "bosses/ratatosk/ratatosk.h"
-#include "engine/shared/player.h"
+#include "player/player.h"
 // confidence=low: slot checks gate a two-stage transfer of the player to a sun-orb position.
 struct Target {
     u32 distance;

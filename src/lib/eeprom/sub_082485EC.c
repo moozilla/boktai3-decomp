@@ -1,5 +1,5 @@
-#include "engine/shared/global.h"
-#include "engine/shared/ram.h"
+#include "global.h"
+#include "engine/ram.h"
 extern const u8 gUnk_08602D2C[], gUnk_08602D38[];
 u32 Eeprom_SetCapacity(u16 x)
 {

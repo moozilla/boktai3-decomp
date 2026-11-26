@@ -1,4 +1,4 @@
-#include "scene_input.h"
+#include "ui/widgets/scene_input.h"
 // MATCHING_CONCESSION: register-pinning
 
 struct ScoreDigits {

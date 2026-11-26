@@ -1,6 +1,6 @@
-#include "engine/shared/global.h"
-#include "engine/shared/engine.h"
-#include "engine/shared/ram.h"
+#include "global.h"
+#include "engine/engine.h"
+#include "engine/ram.h"
 #include "monsters/glove/glove.h"
 void SceneMessages_RegisterReceiver(void *, u32, u32);
 void Glove_RegisterMessageReceiver(struct Glove *s)

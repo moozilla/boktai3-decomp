@@ -1,6 +1,6 @@
 #define gHresvelgrAnimationPresets gUnk_0824F700
-#include "engine/shared/global.h"
-#include "engine/shared/player.h"
+#include "global.h"
+#include "player/player.h"
 struct Hresvelgr {
     u8 unknown0[0x10C];
     struct Player *player;

@@ -1,9 +1,9 @@
 #ifndef GUARD_HRESVELGR_TRAVEL_H
 #define GUARD_HRESVELGR_TRAVEL_H
 
-#include "engine/shared/scene_vec.h"
+#include "engine/math/scene_vec.h"
 #include "bosses/hresvelgr/boss_action_state.h"
-#include "engine/shared/scene_input_widget.h"
+#include "ui/widgets/scene_input_widget.h"
 
 struct HresvelgrTravelActor {
     u8 pad0[0x51];

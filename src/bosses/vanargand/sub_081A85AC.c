@@ -1,5 +1,5 @@
 #include "bosses/vanargand/vanargand_pair_attack.h"
-#include "engine/shared/player.h"
+#include "player/player.h"
 
 void Vanargand_UpdateTargetFlagTransition(struct VanargandPairAttack *p)
 {

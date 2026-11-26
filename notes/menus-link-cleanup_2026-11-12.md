@@ -4,7 +4,7 @@ Tags: #cleanup #menus #wireless #types
 
 ## Result tutorial: 0801D104–0801E000
 
-Consolidated 30 single-function files into `src/minigames/result_game_tutorial/result_tutorial.c`. The shared
+Consolidated 30 single-function files into `src/minigames/result_game/result_tutorial.c`. The shared
 `ResultMenu` task now exposes tutorial phases, timers, fixed-point player and target
 positions, input state, prompt state, resources, fifteen existing `SceneInputWidget`
 objects, and four marker sprites. Unknown regions remain explicitly unknown.
@@ -22,7 +22,7 @@ source organization and type recovery. The coordinator runs the combined ROM bui
 
 ## Message window: 080308BC–0803198C
 
-Consolidated 41 files into `src/menus/dialogue_controls_and_animation/message_window.c`. One shared MessageWindow task
+Consolidated 41 files into `src/ui/dialogue/message_window/message_window.c`. One shared MessageWindow task
 uses the full text playback state, shared SceneInputWidget, ContactSwarmSprite
 and DisplaySequenceState layouts, a bounded message-frame table, and typed
 palette banks. Seven unnamed functions gained provisional MessageWindow names.
@@ -45,7 +45,7 @@ concessions; exact-code coverage gain remains 0.0 percentage points.
 
 ## Scrolling dialogue: 08032EDC–080335D4
 
-Consolidated 20 files into `src/menus/scrolling_dialogue_controller/scrolling_dialogue.c`, reusing the full message
+Consolidated 20 files into `src/ui/dialogue/scrolling_dialogue/scrolling_dialogue.c`, reusing the full message
 playback state and exposing the scrolling task's requests, counters, row/column
 and script fields. Four script wrappers gained ScrollingDialogue names. Five
 simple fail/done goto wrappers became ordinary if/else and still match. A while
@@ -60,7 +60,7 @@ at the task API boundary; shared headers remain unchanged.
 
 ## Scripted dialogue transitions: 08033C58–08034084
 
-Consolidated twelve functions into `src/menus/scripted_dialogue_transitions/dialogue_transition.c`. The shared
+Consolidated twelve functions into `src/ui/dialogue/dialogue_transition.c`. The shared
 DialogueTransition task exposes state-entry flags, the current and final message
 indices, display control restoration, completion/skip procedures, and parallel
 64-entry timing/bounds arrays. Initialize gained a provisional descriptive name.
@@ -70,7 +70,7 @@ which retain the original return-width check. Exact MATCH: 1,068 bytes.
 
 ## Wireless text: 08036CA4–08036E08
 
-Consolidated six functions into `src/link/wireless_text_encoding/wireless_text.c`. The API consistently uses
+Consolidated six functions into `src/link/wireless/wireless_text.c`. The API consistently uses
 u16 character codes and u8 encoded indices. GetCharacterCode replaces the misleading
 GetCharacterTableByte name. Named progress fields replace the initializer's two
 anonymous counters; its indexed table address keeps the original byte-address
@@ -79,12 +79,12 @@ address pending centralized ownership of that region. All 356 bytes match.
 
 ## Wireless status menu: 08036E08–08037228
 
-Consolidated twelve functions into `src/link/wireless_status_menu/wireless_status_menu.c`. A shared task
+Consolidated twelve functions into `src/link/wireless/status_menu.c`. A shared task
 layout uses the real 0x60-byte widget and 32-byte resource header. The exit
 procedure is an integer script key rather than a generic resource pointer.
 Primary-background loading gained a descriptive name. Replaced the create and
 script-loader goto branches with ordinary guards and returns. Shared palette
-resources now live in `include/engine/shared/palette_resource.h`; all three previously landed
+resources now live in `include/engine/video/palette_resource.h`; all three previously landed
 dependents passed their unit checks. This unit matches all 1,056 bytes.
 
 ## Deferred peer panel: 08037228–08037B20
@@ -109,14 +109,14 @@ row; continue in ROM order per the cleanup brief's resistant-type rule.
 
 ## Wireless exit task: 080394D4–080395D4
 
-Four functions now share `src/link/wireless_exit_task/wireless_exit.c` and a WirelessExit task containing
+Four functions now share `src/link/wireless/wireless_exit.c` and a WirelessExit task containing
 a completion script key and shutdown state. The old generic Task and listener
 pointer views are gone. Creation uses the shared engine task API; all 256 bytes
 match. Existing function names retained.
 
 ## Deferred wireless scene objects: 0803BAA0–0803CDF0
 
-This row uses the same ScenePoolActor already defined by include/engine/shared/scene_pool.h,
+This row uses the same ScenePoolActor already defined by include/link/wireless/scene_pool.h,
 not a separate wireless-object allocation. That header is consumed by 43 units,
 including several units on the concurrent depinning list. A canonical merge
 requires nesting the shared 44-byte scaled-parameter aggregate at actor+0084
@@ -129,7 +129,7 @@ Coordinate a shared scene-pool type pass before consolidating it.
 
 ## Floating numbers: 08046B34–0804732C
 
-Consolidated sixteen functions into `src/menus/floating_number_display/damage_number_display.c` and promoted
+Consolidated sixteen functions into `src/ui/hud/damage_numbers/damage_number_display.c` and promoted
 the existing shared display/group/glyph API into its header. Replaced the opaque
 task prefix with Task. FindSource and Show now use structured return paths; the
 allocation helper's shared exit remains because splitting it changes branches.
@@ -140,7 +140,7 @@ resets at either edge remain separate compiler units.
 
 ## Wireless link indicator: 080483A0–080485FC
 
-Nine functions share `src/link/wireless_link_indicator/wireless_link_indicator.c` and the existing resource/
+Nine functions share `src/link/wireless/link_indicator.c` and the existing resource/
 projected-display types. Replaced the opaque task prefix and promoted the
 child-status alias to symbols/functions.csv. Creation now uses ordinary guard
 returns and sizeof the real object. Exact MATCH: 604 bytes; this is the only
@@ -161,7 +161,7 @@ return register lifetime with scope before changing the C shape again.
 
 ## Shaking icon: 08056D70–08056F20
 
-Five functions share `src/menus/shaking_icon_display/shake_icon_display.c`, a real Task prefix and the
+Five functions share `src/ui/hud/shake_icon_display.c`, a real Task prefix and the
 existing resource/animation layout. Published the creator declaration. A direct
 symbolic random-table index changes the order of the address load and index
 shift, so its existing fixed-table expression remains. Exact MATCH: 432 bytes;
@@ -169,7 +169,7 @@ only this unit includes the modified header.
 
 ## Countdown timer: 0805751C–08057678
 
-Eight functions now share `src/menus/countdown_timer/countdown_timer.c` and a complete timer API with
+Eight functions now share `src/ui/hud/countdown_timer.c` and a complete timer API with
 Task, remaining time, lock and completion script. The manual shifted-integer
 zero test became a direct check of the remaining halfword; the script-add
 conditions became a single guard. All 348 bytes match; no other unit includes
@@ -221,14 +221,14 @@ Unit-file guard: tools/unit_files.py now warns when a selected merged source con
 
 Countdown controller revisit: four files consolidate to 344 bytes. Real Task/Player/GameState fields replace raw views. A signed lvalue through the named u16 interval field preserves the script-result store before return-zero initialization; signed fields or RHS-only casts still hoist zero and add four bytes. The matching adaptation uses corresponding signed/unsigned halfword types, no raw offsets or concessions.
 
-HUD completion: the warning-meter helper now reads counters628[0] through a GameState view advanced by slot * sizeof(s32). This preserves the original addition order without a fixed byte offset or partial struct. All 32 HUD functions now share src/menus/hud/hud.c (5840 bytes); the two earlier groups and the last one-function source were removed. Warning-meter name promoted; both external callers MATCH.
+HUD completion: the warning-meter helper now reads counters628[0] through a GameState view advanced by slot * sizeof(s32). This preserves the original addition order without a fixed byte offset or partial struct. All 32 HUD functions now share src/ui/hud/display/hud.c (5840 bytes); the two earlier groups and the last one-function source were removed. Warning-meter name promoted; both external callers MATCH.
 
 Pause menu completion: the four sprite helpers now index a full SceneHudState view by widget sizeof, then access the named first category widget. The status query uses the same typed indexed-state approach for counters628 and now has structured if/else. This restores all 30 functions to one 2564-byte unit, removes three intermediate units/five original files, and gives every function the PauseMenu prefix. The prompt table parameter is typed as a pointer. All six header consumers and five renamed callers MATCH.
 
 
 ## Final menu display: 081663A0–08166D74
 
-All fourteen functions now share src/menus/menu_display/menu_display.c (2516 bytes). The empty-entry
+All fourteen functions now share src/ui/pause/menu_display.c (2516 bytes). The empty-entry
 predicate uses the canonical GameState fields through dynamically indexed owner
 views, preserving the original address-addition order. SceneHudActionGrid names
 its current and saved selection bytes without changing its layout. All public

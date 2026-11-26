@@ -1,10 +1,10 @@
-#include "engine/shared/engine_pause.h"
-#include "engine/shared/global.h"
-#include "engine/shared/area_effect_link.h"
+#include "engine/engine_pause.h"
+#include "global.h"
+#include "scene/area_effect/area_effect_link.h"
 #include "system/game_state/game_state.h"
-#include "engine/shared/engine.h"
-#include "engine/shared/ram.h"
-#include "engine/shared/scene_pool.h"
+#include "engine/engine.h"
+#include "engine/ram.h"
+#include "link/wireless/scene_pool.h"
 u8 Registry1745_ConsumeStateEntry(void *);
 s32 Registry1745_CheckSessionReady(void *);
 void Registry1745_BeginShutdown(void *, void *);

@@ -1,7 +1,7 @@
-#include "engine/shared/contact_actor.h"
+#include "scene/actor/contact_actor.h"
 #include "monsters/pink_spine/pink_spine_playback.h"
-#include "engine/shared/engine.h"
-#include "engine/shared/monster_particle_random.h"
+#include "engine/engine.h"
+#include "engine/math/monster_particle_random.h"
 
 void PinkSpine_RecordDefeat(struct PinkSpineState *);
 struct SpriteEffectController *SpriteEffectController_Create(const struct ContactPosition *,

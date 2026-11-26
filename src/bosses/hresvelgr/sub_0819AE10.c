@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 /* DamageNumberDisplay_ShowDefaultSize: Shows a damage number using a fixed size vector of 32 by zero by 32 */
 #define DamageNumberDisplay_ShowDefaultSize sub_0819AE10
 

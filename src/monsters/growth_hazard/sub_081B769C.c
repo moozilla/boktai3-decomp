@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 void TerrainModifiers_RegisterCell(void *, u32, u32, u32, u32, u32);
 static inline int trunc8(int x)
 {

@@ -1,5 +1,5 @@
-#include "actors/paired_scene_actor/paired_scene_actor.h"
-#include "engine/shared/player.h"
+#include "bosses/vanargand/paired_scene_actor.h"
+#include "player/player.h"
 
 struct Vanargand {
     u8 pad0[0x9C];

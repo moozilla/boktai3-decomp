@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 u8 *Script_GetPc(void);
 void Script_ReadReference(u8 *);
 u32 Script_ReadReferenceValue(u8 *, s32);

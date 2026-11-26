@@ -1,5 +1,5 @@
-#include "display_sequence_sprite.h"
-#include "background_controller.h"
+#include "engine/video/display_sequence_sprite.h"
+#include "effects/screen/background_controller.h"
 struct Camera { u8 unknown0[0x44]; s32 screenX, screenY; };
 // Per-frame update of a pooled collectible: animates, tests proximity and handles pickup hit.
 struct Render {

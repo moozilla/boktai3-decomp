@@ -73,7 +73,7 @@ the complete landed-source audit is `build/player_cue_final/final_audit.json`.
 
 ## Shared ownership, fields and operations
 
-`include/player/player_cue.h` keeps `struct Player` as the owner and supplies six shared
+`include/player/cues/player_cue.h` keeps `struct Player` as the owner and supplies six shared
 views for cue-specific fields: graphics, auxiliary display, motion, timers,
 messages and aligned coordinates. The broad Player declaration is unchanged.
 Eighty-six file-local struct definitions disappear; the two remaining records
@@ -102,7 +102,7 @@ No duplicated player owner records, copied playback routines or numeric player
 address accesses remain in these units. The pending-notification and packet
 payloads stay distinct.
 
-`include/player/player_cue/player_cue_sequence.h` now also offers
+`include/player/cues/player_cue_sequence.h` now also offers
 `PlayerCue_StepSequenceEndedWithFirstFlipMask`; the existing completion-aware API
 wraps it with mask 1. Its prior alternate-form consumer remains stock exact.
 SideArrival passes its already-live phase, whose case value is 1. This removes

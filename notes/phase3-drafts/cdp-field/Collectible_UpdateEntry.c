@@ -1,6 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
-#include "display_animation.h"
-#include "background_controller.h"
+#include "engine/video/display_animation.h"
+#include "effects/screen/background_controller.h"
 // Per-frame update of a pooled collectible: animates, tests proximity and handles pickup hit.
 struct Render {
     u32 flags;

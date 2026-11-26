@@ -1,5 +1,5 @@
-#include "engine/shared/global.h"
-#include "engine/shared/ram.h"
+#include "global.h"
+#include "engine/ram.h"
 void Terrain_SetColumnLayout(u32 x)
 {
     gTerrainColumnIndices = x;

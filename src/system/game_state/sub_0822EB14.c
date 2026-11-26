@@ -1,5 +1,5 @@
-#include "engine/shared/global.h"
-#include "engine/shared/engine.h"
+#include "global.h"
+#include "engine/engine.h"
 s32 SolarFruit_GetInventorySlot(s32 index);
 void SolarFruit_SetInventorySlot(s32 index, s32 value);
 s32 SolarFruit_IsInventorySlotEquipped(s32 index);

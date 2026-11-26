@@ -1,5 +1,5 @@
-#include "engine/shared/global.h"
-#include "engine/shared/render.h"
+#include "global.h"
+#include "engine/video/render.h"
 
 #define PaletteEffect_GetPaletteIndex ActorResource_GetFixedId
 #define gEffectPaletteBanks           gPaletteBankData

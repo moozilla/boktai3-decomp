@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 struct Spark {
     u32 flags;
     u8 pad4[0x18 - 4];

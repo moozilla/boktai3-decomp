@@ -36,8 +36,8 @@ struct Engine {
     void *head, *tail;
 };
 void Memory_Clear(void *, int);
-#include "rfu_compat.h"
-#include "ram.h"
+#include "lib/rfu/rfu_compat.h"
+#include "engine/ram.h"
 static inline void setOperation(struct Engine *p, int op, int zero)
 {
     p->flag = zero;

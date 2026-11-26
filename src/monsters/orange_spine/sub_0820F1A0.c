@@ -1,5 +1,5 @@
 // Orange spine family and descriptive names are tentative (low confidence).
-#include "engine/shared/global.h"
+#include "global.h"
 struct OrangeSpinePosition {
     s16 x, y, z, pad;
 };

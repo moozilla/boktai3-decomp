@@ -1,7 +1,7 @@
 #ifndef GUARD_SOUND_H
 #define GUARD_SOUND_H
 
-#include "engine/shared/global.h"
+#include "global.h"
 
 /* RAM objects; each row of symbols/ram.csv with header include/sound.h. */
 /* 0x030035F0 */

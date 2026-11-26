@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 struct FlashBody {
     u8 pad0[0x5BC];
     u16 palette;

@@ -1,5 +1,5 @@
-#include "engine/shared/global.h"
-#include "engine/shared/scene_vec.h"
+#include "global.h"
+#include "engine/math/scene_vec.h"
 
 struct SceneDistanceEntry {
     struct SceneVec position;

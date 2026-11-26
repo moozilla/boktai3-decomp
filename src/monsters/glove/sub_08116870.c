@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 #define MotionActor_ApplyPendingSong Character_UpdateLoopingSound
 struct MotionActorState {
     u8 unknown0[0xAC];

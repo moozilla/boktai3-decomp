@@ -1,4 +1,4 @@
-#include "resource_station.h"
+#include "objects/solar_stand/resource_station.h"
 void Player_BeginResourceStationInteraction(struct ResourceStationPlayer *,
                                             struct ResourceStationPosition *, u32);
 void ResourceStation_CheckInteraction(struct ResourceStation *station)

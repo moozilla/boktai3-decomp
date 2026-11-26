@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 struct ScenePanelPairReaction {
     u8 unknown0[0x9C];
     u32 flags;

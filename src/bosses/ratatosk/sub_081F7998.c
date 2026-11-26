@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 #include "bosses/ratatosk/ratatosk.h"
 void Sound_StopSong(u32);
 void Ratatosk_BeginInterruptState(struct Ratatosk *p)

@@ -1,5 +1,5 @@
 #define Sword_DispatchState Ivy_DispatchState
-#include "engine/shared/global.h"
+#include "global.h"
 struct SwordOwner {
     u8 unknown0[0x1C];
     u32 flags;

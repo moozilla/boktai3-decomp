@@ -1,9 +1,9 @@
 // 0819BB18 best draft: 4 rows, no concessions. Halves union built before the loop, table = GetTable at loop top;
 // left: &gRandomIndex for draws 2-3 is hoisted in loop pass 1 (PRE inserts it right after draw 1, lifetime 68), ROM hoists it in pass 2 after the counter init.
 #include "global.h"
-#include "engine.h"
-#include "monster_particle_random.h"
-#include "resource_registry.h"
+#include "engine/engine.h"
+#include "engine/math/monster_particle_random.h"
+#include "engine/resource_registry.h"
 
 // confidence=low: emits sixteen motion entries around the actor's facing direction.
 #define Hresvelgr_EmitFacingMotionBurst sub_0819BB18

@@ -1,5 +1,5 @@
-#include "engine/shared/global.h"
-#include "engine/shared/ram.h"
+#include "global.h"
+#include "engine/ram.h"
 #include "link/serial/serial.h"
 
 /* Timer 3 handler for the multiplayer serial link: reads the three peer

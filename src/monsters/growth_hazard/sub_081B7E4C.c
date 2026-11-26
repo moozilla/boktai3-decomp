@@ -1,6 +1,6 @@
-#include "engine/shared/global.h"
-#include "engine/shared/engine.h"
-#include "engine/terrain/terrain_cell_probe.h"
+#include "global.h"
+#include "engine/engine.h"
+#include "scene/terrain/terrain_cell_probe.h"
 
 void SceneBody_Init(void *, u32, void *, u32, u32, void *);
 void TerrainOverlay_QueueAddActor(void *);

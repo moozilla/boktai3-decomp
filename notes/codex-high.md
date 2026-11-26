@@ -72,7 +72,7 @@ or direct Git mutations. Commits were queued through `build/commit.sh`.
   Read with `asmat.py`, `condense.py`, and `relatives.py`; the Ghidra export is
   absent in this checkout. Three repeated chase/arrival expansions dominate
   the body, interleaved with sound, reaction flags and Ghoul-specific paths.
-  `include/engine/shared/scene_actor_chase.h` supplies useful `Chase_Arrive`, terrain height,
+  `include/scene/actor/scene_actor_chase.h` supplies useful `Chase_Arrive`, terrain height,
   route and state/control templates; 080E4468 explains 38% of the target's
   instruction runs, with further matches in 080CEDF0 and 080C4A9C. The repeated
   expansions start around the terrain snap sequences at 0808B4B0, 0808BD54

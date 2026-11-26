@@ -1,7 +1,7 @@
-#include "engine/shared/global.h"
-#include "engine/shared/ram.h"
-#include "engine/shared/engine_globals.h"
-#include "engine/shared/player.h"
+#include "global.h"
+#include "engine/ram.h"
+#include "engine/engine_globals.h"
+#include "player/player.h"
 extern u8 *gGameState;
 s32 Solar_GetLevelForIntensity(s32);
 s32 Solar_GetLevelUpperBound(s32);

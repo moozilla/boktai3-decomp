@@ -1,7 +1,7 @@
 #ifndef GUARD_SWORD_WAVE_COMPONENT_H
 #define GUARD_SWORD_WAVE_COMPONENT_H
 
-#include "engine/shared/global.h"
+#include "global.h"
 
 struct SwordWaveComponent {
     u8 pad0[6];

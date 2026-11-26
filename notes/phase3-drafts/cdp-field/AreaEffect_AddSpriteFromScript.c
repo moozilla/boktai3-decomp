@@ -1,5 +1,5 @@
-#include "area_effect.h"
-#include "engine.h"
+#include "scene/area_effect/area_effect.h"
+#include "engine/engine.h"
 // MATCHING_CONCESSION: register-pinning
 u8 *TerrainModifiers_FindCellOverride(s32, s32);
 void AreaEffect_InitializeEntry(struct AreaEffectEntry *, s32, struct AreaEffectPosition *, s32,

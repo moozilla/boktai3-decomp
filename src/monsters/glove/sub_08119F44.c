@@ -1,7 +1,7 @@
-#include "engine/shared/global.h"
+#include "global.h"
 
-#include "engine/shared/engine.h"
-#include "engine/shared/scene_pool.h"
+#include "engine/engine.h"
+#include "link/wireless/scene_pool.h"
 #include "monsters/glove/glove.h"
 void Glove_UpdateStopping(struct Glove *);
 static inline void clearDrawFlags(struct GloveDraw *d, s32 mask)

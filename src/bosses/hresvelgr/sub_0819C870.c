@@ -1,6 +1,6 @@
-#include "engine/shared/global.h"
-#include "engine/shared/engine.h"
-#include "engine/shared/ram.h"
+#include "global.h"
+#include "engine/engine.h"
+#include "engine/ram.h"
 
 // confidence=low: projects a sine-scaled speed opposite the actor side.
 #define Hresvelgr_SetSineScaledVelocity sub_0819C870
