@@ -98,19 +98,22 @@ class Manifest:
         return None
 
 
-def scan(root=ROOT, source_root=None):
+def source_definitions(text):
     from split import draft_functions, source_functions
 
+    aliases = dict(ALIASES.findall(text))
+    names = source_functions(text, resolve_aliases=False) + [name for name, _ in draft_functions(text)]
+    return [(name, aliases.get(name, name)) for name in dict.fromkeys(names)]
+
+
+def scan(root=ROOT, source_root=None):
     root = Path(root)
     names = {name: address for address, name in symbol_names(root).items()}
     files, by_file = {}, defaultdict(list)
     for path in sorted(Path(source_root or root / "src").rglob("*.c")):
         rel = path.relative_to(root).as_posix()
-        text = path.read_text()
-        aliases = dict(ALIASES.findall(text))
-        definitions = source_functions(text, resolve_aliases=False) + [name for name, _ in draft_functions(text)]
-        for definition in dict.fromkeys(definitions):
-            address = address_of(aliases.get(definition, definition), names)
+        for definition, spelling in source_definitions(path.read_text()):
+            address = address_of(spelling, names)
             if address is None:
                 continue
             names.setdefault(definition, address)
@@ -142,6 +145,22 @@ def resolve(value, root=ROOT):
     if len(matches) == 1:
         return matches[0].relative_to(root).as_posix()
     raise ValueError(f"{value}: " + ("ambiguous source filename" if matches else "source file not found"))
+
+
+def first_function(path, root=ROOT):
+    """Return the first ROM function defined by one file, by canonical name."""
+    repo = Path(root).resolve()
+    candidate = (repo / path).resolve()
+    if not candidate.is_relative_to(repo) or not candidate.is_file():
+        return None
+    symbols = symbol_names(root)
+    names = {name: address for address, name in symbols.items()}
+    addresses = [(address, definition) for definition, spelling in source_definitions(candidate.read_text())
+                 if (address := address_of(spelling, names)) is not None]
+    if not addresses:
+        return None
+    address, definition = min(addresses)
+    return symbols.get(address, definition)
 
 
 def report_path(tree, address, index, root=ROOT):

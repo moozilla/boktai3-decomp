@@ -60,6 +60,8 @@ class SourceLayoutTests(unittest.TestCase):
             )
             for name in ("Actor_Move", "MoveActor", "0x08001000", "sub_08001020", "actions.c"):
                 self.assertEqual(source_layout.resolve(name, root), unit)
+            self.assertEqual(source_layout.first_function(unit, root), "Actor_Move")
+            self.assertEqual(source_layout.first_function(root / unit, root), "Actor_Move")
             manifest = source_layout.scan(root)
             self.assertEqual(manifest.locate("Actor_Move"), (unit, "MoveActor"))
             self.assertEqual(manifest.by_file[unit], [0x08001000, 0x08001020])

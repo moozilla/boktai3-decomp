@@ -18,7 +18,6 @@ code, as the preprocessor resolved it. Without --write it prints the plan. Check
 file afterwards (tools/check.py); clang-format runs on --write.
 """
 import argparse
-import csv
 import os
 import re
 import subprocess
@@ -28,6 +27,7 @@ import tempfile
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(ROOT, "tools"))
 import build  # noqa: E402
+from source_layout import first_function  # noqa: E402
 
 _INLINE = re.compile(r"\b(?:static\s+inline|inline\s+static)\b[^;{}()]*?\b(\w+)\s*\(")
 
@@ -72,10 +72,9 @@ def calls(text, names):
 
 
 def class_prefix(path):
-    m = re.search(r"sub_([0-9A-Fa-f]{8})", path)
-    rows = {r[0].upper(): r[1] for r in csv.reader(open(os.path.join(ROOT, "symbols/functions.csv"))) if r}
-    if m and m.group(1).upper() in rows:
-        return rows[m.group(1).upper()].split("_")[0]
+    name = first_function(path, ROOT)
+    if name:
+        return name.split("_", 1)[0]
     return os.path.splitext(os.path.basename(path))[0].split("_")[0].capitalize()
 
 
