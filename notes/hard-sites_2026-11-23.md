@@ -454,3 +454,56 @@ phase adds separate instructions. The signed subtraction experiment is
 still the only exact clean-lint candidate, and remains scratch because
 the displacement is negated solely for the immediate subtraction.
 See `build/hard-sites/game-state/second-review/`.
+
+## 2026-11-26: Registry shared wrapper
+
+A shared inline for the entire typed registration, with the existing
+actor/collider union passed by value, still loses the singleton reload.
+Passing the next slot separately or factoring out the search also
+misses in both wrappers. Reusing the search cursor for the new head
+and writing through its next slot leaves additional differences.
+The ordinary typed volatile implementations remain the exact fallback.
+See `build/hard-sites/registry/third-review/`.
+
+## 2026-11-26: Fragment table priority with equivalence retained
+
+The symbolic plain-loop draft matches 704 bytes with
+`AGBCC_PRI=122:+1988` while its table retains REG_EQUIV. The priority
+change alone reproduces the previous NOEQUIV match. In the ordinary
+allocation pass the copied group cursor (pseudo 395) takes r7 first,
+and the table is rematerialized at draws. Demoting that cursor alone
+does not recover the rest of the allocation. Explicit group cursors
+and an inner group alias change additional instructions. The useful
+source variable is the table pointer's relative priority across all
+of its uses. See `build/hard-sites/fragment/third-review/`.
+
+## 2026-11-26: SpiralBurst phase order isolated
+
+In `shared-mask-first-index.c`, the phase draw uses the incremented
+local index and the same wrap mask as the later draws. Raising the
+table priority by 3600 matches all 428 bytes, including the phase
+draw and the preheader mask copy. The old draft with the unused index
+local differed by the position of that increment, even under the
+same priority control. Suppressing table equivalence on this new
+draft still emits 420 bytes. The table has 11 weighted references
+across 148 instructions before equivalence doubles its live length
+to 296. Demoting the competing sprite register, using typed particle
+cursors, and inlining the full particle fill do not reproduce the
+allocation. See `build/hard-sites/spiral/third-review/`.
+
+## 2026-11-26: Other source alternatives
+
+In Hresvelgr, narrowing the boundary direction to the native byte
+domain preserves the two mask differences. A direction switch and
+selecting the boundary coordinate through a conditional both change
+more instructions. In GameState, packing the offset into the
+aligned backing pointer with OR or XOR leaves a bit operation, and
+splitting the aligned address from its offset adds instructions.
+Those trials use the named timer and live under the corresponding
+`build/hard-sites/*/third-review/` directories.
+
+SpriteTrail's ordinary byte-pointer arithmetic still reverses the
+history address operand order. Moving the decrement into the
+non-wrap path adds instructions. Wireless's native flip bitfields
+also change the current match. Neither follow-up changes the
+verified SpriteTrail or Wireless fixes.
