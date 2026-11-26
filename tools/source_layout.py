@@ -5,10 +5,14 @@ import argparse
 import csv
 from bisect import bisect_right
 from collections import defaultdict
+from contextlib import suppress
 from dataclasses import dataclass
 from functools import lru_cache
+from hashlib import sha256
+import json
 from pathlib import Path
 import re
+from tempfile import NamedTemporaryFile
 
 from romlib import ROOT
 
@@ -66,7 +70,6 @@ def is_upstream(path):
     return False
 
 
-@lru_cache(maxsize=4)
 def symbol_names(root=ROOT):
     path = Path(root) / "symbols/functions.csv"
     if not path.exists():
@@ -123,7 +126,59 @@ def scan(root=ROOT, source_root=None):
 
 @lru_cache(maxsize=4)
 def manifest(root=ROOT):
-    return scan(root)
+    root = Path(root)
+    cache = root / "build" / "source-layout.json"
+    if not cache.parent.is_dir():
+        return scan(root)
+    try:
+        fingerprint = manifest_fingerprint(root)
+    except OSError:
+        return scan(root)
+    try:
+        saved = json.loads(cache.read_text())
+        if saved["fingerprint"] == fingerprint:
+            return Manifest(
+                {int(address): tuple(entry) for address, entry in saved["files"].items()},
+                saved["names"],
+                saved["by_file"],
+            )
+    except (OSError, ValueError, KeyError, TypeError, AttributeError):
+        pass
+
+    result = scan(root)
+    temporary = None
+    try:
+        with NamedTemporaryFile("w", dir=cache.parent, delete=False) as stream:
+            temporary = Path(stream.name)
+            json.dump(
+                {"fingerprint": fingerprint, "files": result.files,
+                 "names": result.names, "by_file": result.by_file},
+                stream,
+            )
+        temporary.replace(cache)
+        temporary = None
+    except OSError:
+        pass
+    finally:
+        if temporary is not None:
+            with suppress(OSError):
+                temporary.unlink()
+    return result
+
+
+def manifest_fingerprint(root):
+    """Track source edits and moves, symbol renames, and parser changes."""
+    fingerprint = sha256()
+    symbol_table = root / "symbols/functions.csv"
+    parser = Path(__file__)
+    paths = [parser, parser.with_name("split.py"), *source_paths(root)]
+    if symbol_table.is_file():
+        paths.append(symbol_table)
+    for path in paths:
+        info = path.stat()
+        cache_key = (str(path), info.st_ino, info.st_size, info.st_mtime_ns, info.st_ctime_ns)
+        fingerprint.update(repr(cache_key).encode())
+    return fingerprint.hexdigest()
 
 
 def locate(value, root=ROOT):
