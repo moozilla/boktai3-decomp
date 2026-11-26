@@ -60,3 +60,11 @@ The inventory recording still trapped before tick 1709 on the old wasm.
 With reused ROM samples, the full headless suite took 145.9 seconds on
 one worker and 80.1 seconds on two. The two-worker suite finishes the
 in-flight pair after a failure, then exits before launching another pair.
+
+Each short recording now fixes the ROM's input masks using its verified
+tick replay, while the port continues to take input by video frame.
+Shortening the Sealed Prison Right press by one frame preserved the
+total poll count and failed at tick 1690. The ROM script and capture
+agreed byte for byte with the verified replay. The 13 unmodified
+recordings passed in 109.8 seconds using two workers and retained ROM
+samples. A focused seeded run also matched its earlier samples.

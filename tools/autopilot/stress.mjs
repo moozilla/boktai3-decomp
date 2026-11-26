@@ -8,6 +8,7 @@ import { setFlagsFromString } from 'node:v8';
 import { openSession } from '../../port/agent/session.mjs';
 import { root, rom, clock, lux, holdTicks, runRom } from './lib/rom.mjs';
 import { replayAgainstRom } from './lib/rom-reference.mjs';
+import { compareSamples } from './lib/tick-samples.mjs';
 
 // A wasm fault must reach the catch below so we can replay its input prefix.
 // On this host Node's signal-based bounds checks can exit with SIGBUS instead.
@@ -25,8 +26,12 @@ if (!['fuzz', 'smoke', 'swords', 'reset'].includes(opts.mode)) throw new Error('
 const replay = opts.from ? JSON.parse(fs.readFileSync(opts.from, 'utf8')) : null;
 const mode = replay?.mode ?? opts.mode;
 const save = opts.save || replay?.save;
-const replayKeys = replay?.movie ?? replay?.keyRuns?.flatMap(([keys, count]) => Array(count).fill(keys));
+const expandKeys = (runs) => runs?.flatMap(([keys, count]) => Array(count).fill(keys));
+const replayKeys = replay?.movie ?? expandKeys(replay?.keyRuns);
+const expectedReads = expandKeys(replay?.tickKeyRuns);
 if (replay && !replayKeys?.length) throw new Error('Replay contains no controller input');
+if (expectedReads && (!expectedReads.length || (replay.ticks !== undefined && expectedReads.length !== replay.ticks)))
+  throw new Error('Replay tick input does not match its expected tick count');
 const frames = Number(opts.frames);
 let seed = Number(opts.seed);
 if (!Number.isSafeInteger(frames) || frames < 1 || frames > 20000 ||
@@ -123,13 +128,14 @@ try {
 }
 const movie = replayKeys || s.movie;
 const run = { save: save ? path.relative(root, path.resolve(save)) : null, movie, readFrames, firstCheck, seed: Number(opts.seed),
-  mode, boots, fault };
+  mode, boots, fault, tickKeyRuns: replay?.tickKeyRuns };
 fs.writeFileSync(path.join(out, 'movie.json'), JSON.stringify(run));
 const script = path.join(out, 'harness.txt');
 const spec = regions.map(({ address, offset, size }) =>
   `${address.toString(16)}${offset === undefined ? '' : '+' + offset.toString(16)}:${size.toString(16)}`).join(',');
+const romReads = expectedReads ?? reads;
 const lines = ['trace off', `rtc ${Date.parse(clock) / 1000}`, `lux ${lux}`, `fasttick ${tick.toString(16)}`,
-  `tickdump ticks 0:${Math.max(1, reads.length)} ${spec}`, ...holdTicks(reads)];
+  `tickdump ticks 0:${Math.max(1, romReads.length)} ${spec}`, ...holdTicks(romReads)];
 fs.writeFileSync(script, lines.join('\n') + '\n');
 fs.writeFileSync(path.join(out, 'port.bin'), Buffer.concat(samples));
 
@@ -138,12 +144,13 @@ let difference;
 try {
   const ticks = replayAgainstRom({
     rom, save, script, out: romOut, reference,
-    expectedBytes: reads.length * regions.reduce((length, region) => length + region.size, 0),
+    expectedBytes: romReads.length * regions.reduce((length, region) => length + region.size, 0),
     run: () => runRom(script, romOut, { save, render: false, timeout: 480_000 }),
   });
-  difference = compare(ticks, samples, regions, readFrames);
+  difference = compareSamples(ticks, samples, regions, readFrames, reads, expectedReads);
 } catch (error) {
-  const partial = fs.existsSync(romSamples) && compare(fs.readFileSync(romSamples), samples, regions, readFrames);
+  const partial = fs.existsSync(romSamples) &&
+    compareSamples(fs.readFileSync(romSamples), samples, regions, readFrames, reads, expectedReads);
   difference = { ...partial, error: String(error) };
 }
 const result = { save: run.save, seed: run.seed, ticks: reads.length, frames: movie.length, firstCheck, boots,
@@ -187,26 +194,6 @@ function sample(memory, fields) {
     if (!inRam(base, 1) || !inRam(start, size)) return Buffer.alloc(size);
     return Buffer.from(new Uint8Array(memory, start, size));
   }));
-}
-
-function compare(rom, port, fields, frames) {
-  const size = fields.reduce((n, f) => n + f.size, 0);
-  for (let tick = 0; tick < port.length; tick++) {
-    const record = rom.subarray(tick * size, (tick + 1) * size);
-    if (record.length !== size) break;
-    if (record.equals(port[tick])) continue;
-    const changes = {};
-    for (let i = 0, offset = 0; i < fields.length; i++) {
-      const { name, size } = fields[i];
-      const a = port[tick].subarray(offset, offset + size), b = record.subarray(offset, offset + size);
-      if (!a.equals(b)) changes[name] = { port: a.toString('hex'), rom: b.toString('hex') };
-      offset += size;
-    }
-    return { tick, frame: frames[tick], changes };
-  }
-  if (rom.length !== port.length * size) return { portTicks: port.length, romTicks: rom.length / size };
-  if (!port.length) return { error: 'No input ticks sampled' };
-  return null;
 }
 
 function* tap(g, key, rest) {

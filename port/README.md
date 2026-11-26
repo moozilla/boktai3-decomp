@@ -602,10 +602,11 @@ Build the full-game wasm first. The suite replays the controller recordings in
 `port/tests/verify-movies.json` across the checkpoint areas, including the swords
 page, equipment details after receiving iron armor, and a soft reset followed by
 Continue. The runner checks that the port reaches each expected scene, then aligns
-the comparison by input tick. It stops at the first failing recording and reports
-the first differing scene, position, player stat, HUD state, previous input or
-random index. Recorded movies run with pixel rendering disabled. Equipment
-callbacks and game state are still checked. Use
+the comparison by input tick. Each recording stores controller masks by video
+frame for the port and by input poll for the ROM. The runner stops at the first
+failing recording and reports the earliest differing controller input, scene,
+position, player stat, HUD state, previous input or random index. Recorded movies
+run with pixel rendering disabled and still check equipment callbacks. Use
 `node tools/autopilot/stress.mjs --from FILE --render` to enable the port renderer
 for a standalone replay.
 
