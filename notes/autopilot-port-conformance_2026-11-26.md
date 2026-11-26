@@ -35,8 +35,11 @@ fill source in the port address space.
 Modifier_OnTableTaskDestroy at 0811DEE0 preserves the retiring owner through
 the matching published table pointer, confirmed by a ROM probe.
 The pending patches can be applied to generated copies before the port's
-source preparation. The source reorganization can integrate them by symbol
-and recheck each unit separately.
+source preparation. The 85 patches were relocated against the main source
+layout at `744333be7`. All 76 affected units passed individual ROM checks
+and wasm32 syntax checks after applying the patches together. The relocation
+preserves every added and removed C line. The source address and check
+records accompany the patches in the worker archive.
 
 The worktree report retains the complete save/seed table, baseline trap
 ticks, reached functions and overlay verification results.

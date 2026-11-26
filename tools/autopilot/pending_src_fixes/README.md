@@ -11,6 +11,20 @@ To apply the patches to generated port copies in the current layout:
 build/venv/bin/python port/build_game.py --source-patches tools/autopilot/pending_src_fixes
 ```
 
+## Reorganized source layout
+
+The worker archive at `build/return-layout-audit/reorganized-return-overlays.zip`
+targets main revision `744333be7`. It contains the 85 relocated patches in
+`mapped/`, their ROM-address mapping and the verification records. All 76
+combined source units passed the per-unit ROM check and wasm32 syntax checks
+with `UBFIX` enabled for the latter. The C additions and removals are identical
+to those in this directory. The scene stimulus destroy patch at `0822B8E0`
+also needed its include context updated.
+
+The port overlay loader accepts the relocated directory once it is combined
+with the reorganized source discovery. The integration build can then point
+`--source-patches` at the extracted `mapped/` directory.
+
 ## Other reported direct uses
 
 | Function | ROM or caller evidence |
