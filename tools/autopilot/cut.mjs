@@ -11,6 +11,7 @@ const F = +frameArg;
 fs.mkdirSync(out, { recursive: true });
 const cut = { ...run, frames: F, movie: run.movie.slice(0, F), readFrames: run.readFrames.slice(0, tickAt(run.readFrames, F)),
   solar: (run.solar || []).filter(([n]) => n < F),
+  landingDetour: F < run.frames ? undefined : run.landingDetour,
   rooms: (run.rooms || []).filter((r) => r.frame < F), end: undefined, tried: undefined, visited: undefined, cutFrom: path.relative(process.cwd(), dir) };
 fs.writeFileSync(path.join(out, 'movie.json'), JSON.stringify(cut));
 console.log(`${out}/movie.json: ${F} frames, ${cut.readFrames.length} input reads, rooms ${cut.rooms.map((r) => r.scene).join(' ')}`);
