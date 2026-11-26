@@ -12,15 +12,15 @@
 // Output: build/autopilot/tickdiff/{port,rom}.bin (deleted unless --keep) and a report.
 import fs from 'node:fs';
 import path from 'node:path';
-import { spawnSync } from 'node:child_process';
 import { openSession } from '../../port/agent/session.mjs';
+import { runRom } from './lib/rom.mjs';
 
 const ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname), '../..');
 const [dirArg, fromArg, toArg] = process.argv.slice(2);
 const dir = path.resolve(dirArg), FROM = +fromArg, TO = +toArg;
-const out = path.join(ROOT, 'build/autopilot/tickdiff');
-fs.mkdirSync(out, { recursive: true });
 const opt = (k, d) => { const i = process.argv.indexOf(k); return i < 0 ? d : process.argv[i + 1]; };
+const out = path.resolve(opt('--out', path.join(ROOT, 'build/autopilot/tickdiff')));
+fs.mkdirSync(out, { recursive: true });
 // --regions ADDR:LEN,... (hex) to dump less (default all of EWRAM and IWRAM)
 const REG = opt('--regions', '2000000:40000,3000000:8000').split(',').map((x) => x.split(':').map((v) => parseInt(v, 16)));
 const REC = REG.reduce((a, [, n]) => a + n, 0);
@@ -28,11 +28,10 @@ const run = JSON.parse(fs.readFileSync(path.join(dir, 'movie.json'), 'utf8'));
 
 // ROM side: the run's harness script with a tickdump after "tick"
 const script = fs.readFileSync(path.join(dir, 'harness.txt'), 'utf8').split('\n')
-  .filter((l) => !/^(save |dump |shot |trace )/.test(l))
-  .flatMap((l) => (/^tick /.test(l) ? ['trace off', l, `tickdump rom ${FROM}:${TO} ${REG.map(([a, n]) => `${a.toString(16)}:${n.toString(16)}`).join(',')}`] : [l]));
+  .filter((l) => !/^(save |dump |shot |trace |tickdump )/.test(l))
+  .flatMap((l) => (/^(fast)?tick /.test(l) ? ['trace off', l.replace(/^fast/, ''), `tickdump rom ${FROM}:${TO} ${REG.map(([a, n]) => `${a.toString(16)}:${n.toString(16)}`).join(',')}`] : [l]));
 fs.writeFileSync(path.join(out, 'harness.txt'), script.join('\n'));
-const r = spawnSync(path.join(ROOT, 'tools/emu/harness'), [path.join(ROOT, 'baserom.gba'), path.join(out, 'harness.txt'), out], { encoding: 'utf8', maxBuffer: 1 << 26 });
-if (r.status) { console.error(r.stderr); process.exit(1); }
+runRom(path.join(out, 'harness.txt'), out, { save: run.save, timeout: 600_000 });
 
 // Port side: hooks installed at boot see the replayed movie
 const fd = fs.openSync(path.join(out, 'port.bin'), 'w');
