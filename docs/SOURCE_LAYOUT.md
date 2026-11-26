@@ -211,3 +211,21 @@ reports which table to update.
 3. Run `python3 tools/reorg.py --apply`, then `python3 tools/reorg.py --check`.
 4. Commit the replay and merge `main` with a high rename limit, for example
    `git -c merge.renameLimit=20000 merge main`.
+
+### Reviewed symbol and Player tables
+
+Preview an exact symbol table with `tools/reorg.py --function-renames CSV`.
+The table gives `addr`, `old_name`, and `new_name`. The tool checks the name
+at each address, then rewrites all symbol references together. A prefix table
+uses `--function-prefixes CSV` with `old_prefix`, `new_prefix`, and an
+optional defining file or directory in `scope`. Use the exact table when
+the reviewed scopes refer to a layout you have yet to apply.
+
+`tools/reorg.py --player-moves CSV` previews a Player routing table with
+`file`, `new_path` (a directory), and an optional `note`. It preserves each
+source basename and records the previous path in the placement tables for
+replay. Run the regular directory replay before applying a Player table to
+an older worker branch.
+
+Use `--apply` after reviewing a table's preview. These operations are separate
+from the filename pass. Run the stock ROM build after any applied symbol table.

@@ -10,6 +10,20 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "tools"))
 import reorg
 
 
+@contextlib.contextmanager
+def fixture(files):
+    with tempfile.TemporaryDirectory() as scratch:
+        root = Path(scratch)
+        for name, text in files.items():
+            path = root / name
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_text(text)
+        with (patch.object(reorg, "ROOT", root),
+              patch.object(reorg, "tracked_paths", return_value={Path(name) for name in files}),
+              contextlib.redirect_stdout(io.StringIO())):
+            yield root
+
+
 class ReorgTests(unittest.TestCase):
     def test_replays_both_old_layouts_and_ignores_report_regrouping(self):
         for flat in (True, False):
@@ -67,6 +81,63 @@ class ReorgTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, r"include/shared\.h: ambiguous owner.*header_dirs\.csv"):
             reorg.header_destination(Path("include/shared.h"), {}, set(),
                                      {"shared": {Path("include/scene"), Path("include/ui")}}, {})
+
+    def test_address_renames_are_simultaneous_and_keep_source_basenames(self):
+        files = {
+            "symbols/functions.csv": "addr,name\n08001000,Old_Thing\n08001020,New_Thing\n",
+            "src/engine/Old_Thing.c": "void Old_Thing(void) { New_Thing(); }\n",
+            "include/engine/example.h": "void Old_Thing(void);\n",
+            "port/example.c": "void *const target = Old_Thing__addr;\n",
+            "docs/example.md": "`Old_Thing` in `src/engine/Old_Thing.c`.\n",
+            "build/renames.csv": "addr,old_name,new_name\n08001000,Old_Thing,New_Thing\n08001020,New_Thing,Final_Thing\n",
+        }
+        with fixture(files) as root:
+            table = root / "build/renames.csv"
+            preview = reorg.function_renames(table)
+            self.assertEqual((root / "symbols/functions.csv").read_text(), files["symbols/functions.csv"])
+            self.assertEqual(reorg.function_renames(table, apply=True), preview)
+            self.assertEqual(reorg.function_renames(table, apply=True), 0)
+            self.assertIn("void New_Thing(void) { Final_Thing(); }", (root / "src/engine/Old_Thing.c").read_text())
+            self.assertIn("void New_Thing(void);", (root / "include/engine/example.h").read_text())
+            self.assertIn("New_Thing__addr", (root / "port/example.c").read_text())
+            self.assertEqual((root / "docs/example.md").read_text(), "`New_Thing` in `src/engine/Old_Thing.c`.\n")
+
+    def test_prefixes_use_owner_scope_for_every_reference(self):
+        files = {
+            "symbols/functions.csv": "addr,name\n08001000,Shared_One\n08001020,Shared_Two\n",
+            "src/player/one.c": "void Shared_One(void) {}\n",
+            "src/npc/two.c": "void Shared_Two(void) { Shared_One(); }\n",
+            "build/prefixes.csv": "old_prefix,new_prefix,scope\nShared_,Player_,src/player/\nShared_,Npc_,src/npc/\n",
+        }
+        with fixture(files) as root:
+            table = root / "build/prefixes.csv"
+            self.assertEqual(reorg.function_renames(table, prefixes=True, apply=True), 3)
+            self.assertEqual(reorg.function_renames(table, prefixes=True, apply=True), 0)
+            self.assertIn("void Npc_Two(void) { Player_One(); }", (root / "src/npc/two.c").read_text())
+
+    def test_player_file_routes_update_placement_and_replay(self):
+        old = "src/player/core/sub_08001000.c"
+        new = "src/link/player/sub_08001000.c"
+        files = {
+            "symbols/functions.csv": "addr,name\n08001000,Player_Move\n",
+            "symbols/source_dirs.csv": "current_path,new_path,note\nplayer_files_core.txt,src/player/core,fixture\n",
+            "symbols/source_files.csv": "original_path,current_path,rule,filename,start,end\n"
+            "src/fn/sub_08001000.c,src/player/sub_08001000.c,player_files_core.txt,sub_08001000.c,08001000,08001020\n",
+            "symbols/header_dirs.csv": "current_path,new_path,note\n",
+            "docs/example.md": f"[Source](../{old})\n",
+            old: "void Player_Move(void) {}\n",
+            "build/player_moves.csv": f"file,new_path,note\n{old},src/link/player,fixture\n",
+        }
+        with fixture(files) as root:
+            table = root / "build/player_moves.csv"
+            preview = reorg.player_moves(table)
+            self.assertTrue((root / old).is_file())
+            self.assertEqual(reorg.player_moves(table, apply=True), preview)
+            self.assertEqual(reorg.player_moves(table, apply=True), 0)
+            self.assertEqual((root / new).read_text(), files[old])
+            self.assertEqual((root / "docs/example.md").read_text(), f"[Source](../{new})\n")
+            self.assertEqual(reorg.recorded_moves()[Path(old)], Path(new))
+            self.assertEqual(reorg.migrate(), 0)
 
     def test_repository_agrees_with_layout_tables(self):
         plan = io.StringIO()

@@ -1,15 +1,16 @@
 #!/usr/bin/env python3
 """Replay the reviewed source and header placement from either earlier layout."""
 import argparse
-from collections import defaultdict
+from collections import Counter, defaultdict
 import csv
+import io
 import os
 from pathlib import Path
 import re
 import subprocess
 
 from source_layout import (
-    HEADER_DIRS, SOURCE_DIRS, SOURCE_FILES, directory_for, header_paths, is_upstream,
+    HEADER_DIRS, SOURCE_DIRS, SOURCE_FILES, directory_for, groups, header_paths, is_upstream,
     layout_path, new_filename, scan, source_paths, source_placements, source_rules, symbol_names,
 )
 
@@ -17,14 +18,127 @@ ROOT = Path(__file__).resolve().parents[1]
 INCLUDE = re.compile(r'(?P<begin>#[ \t]*include[ \t]+\\?")(?P<name>[^"\\\n]+)(?P<end>\\?")')
 HEADER_LITERAL = re.compile(r'''(?P<quote>["'])(?P<name>[\w.-]+/[\w/.-]+\.h)(?P=quote)''')
 PATH = re.compile(r'(?<![\w/])((?:\.\./)*)(?P<path>(?:src|include)/[\w./-]+\.[ch])(?![\w.-])')
-TEXT_SUFFIXES = {".c", ".h", ".csv", ".ld", ".md", ".py", ".js", ".mjs", ".html", ".sh", ".ts", ".yml"}
+TEXT_SUFFIXES = {".c", ".h", ".csv", ".ld", ".md", ".py", ".js", ".mjs", ".html", ".sh", ".ts", ".tsx", ".yml"}
+IDENTIFIER = re.compile(r"[A-Za-z_][A-Za-z_0-9]*")
+SYMBOL = re.compile(r"\b[A-Za-z_][A-Za-z_0-9]*\b")
+FILE_SUFFIX = re.compile(r"\.(?:c|h|s|inc|py|ts|md)\b")
+
+
+def tracked_paths():
+    out = subprocess.check_output(["git", "ls-files", "--cached", "--others", "--exclude-standard", "-z"], cwd=ROOT)
+    return {Path(path) for path in out.decode().split("\0") if path}
+
+
+def table_rows(path, fields):
+    with path.open(newline="") as stream:
+        reader = csv.DictReader(stream)
+        if not set(fields).issubset(reader.fieldnames or ()):
+            raise ValueError(f"{path}: expected columns {', '.join(fields)}")
+        return list(reader)
+
+
+def write_updates(updates):
+    """Restore earlier files if a table rewrite is interrupted."""
+    originals = []
+    try:
+        for path, original, updated in updates:
+            originals.append((path, original))
+            path.write_bytes(updated)
+    except BaseException:
+        for path, original in reversed(originals):
+            if path.read_bytes() != original:
+                path.write_bytes(original)
+        raise
+
+
+def prefix_rows(table, names):
+    """Resolve prefix rules in the directories that define their functions."""
+    rules = table_rows(table, ("old_prefix", "new_prefix"))
+    files = scan(ROOT).files if any(row.get("scope") not in (None, "", "all") for row in rules) else {}
+    rows = {}
+    for rule in rules:
+        old, new = rule["old_prefix"] or "", rule["new_prefix"] or ""
+        if not all(IDENTIFIER.fullmatch(prefix) for prefix in (old, new)):
+            raise ValueError(f"{table}: invalid prefix rule {old!r} -> {new!r}")
+        scope = (rule.get("scope") or "all").rstrip("/")
+        for address, name in names.items():
+            if not name.startswith(old):
+                continue
+            path, _ = files.get(address, ("", ""))
+            if scope != "all" and not (path == scope or path.startswith(scope + "/")):
+                continue
+            change = {"addr": f"{address:08X}", "old_name": name, "new_name": new + name[len(old):]}
+            if rows.setdefault(address, change) != change:
+                raise ValueError(f"{table}: overlapping prefix rules for {name} at {address:08X}")
+    return list(rows.values())
+
+
+def function_renames(table, prefixes=False, apply=False):
+    """Rewrite reviewed function symbols as one simultaneous substitution."""
+    names = symbol_names(ROOT)
+    rows = prefix_rows(table, names) if prefixes else table_rows(table, ("addr", "old_name", "new_name"))
+    new_names, replacements, settled = {}, {}, set()
+    for row in rows:
+        address = int(row["addr"] or "", 16)
+        old, new = row["old_name"] or "", row["new_name"] or ""
+        if not all(IDENTIFIER.fullmatch(name) for name in (old, new)) or address in new_names:
+            raise ValueError(f"{table}: invalid or repeated rename at {address:08X}")
+        current = names.get(address)
+        if current not in (old, new):
+            raise ValueError(f"{table}: {address:08X} is {current!r}, expected {old!r} or {new!r}")
+        new_names[address] = new
+        if current == new:
+            settled.add(new)
+        elif replacements.setdefault(old, new) != new:
+            raise ValueError(f"{table}: {old} cannot be renamed unambiguously")
+    collisions = Counter((names | new_names).values())
+    for name in new_names.values():
+        if collisions[name] != 1:
+            raise ValueError(f"{table}: function name {name} would collide")
+    if settled & replacements.keys():
+        raise ValueError(f"{table}: a completed rename overlaps a pending old name")
+    if not replacements:
+        return 0
+    replacements.update({old + "__addr": new + "__addr" for old, new in list(replacements.items())})
+
+    def rewrite(raw):
+        def replace(match):
+            name = match[0]
+            renamed = replacements.get(name)
+            if renamed is None or FILE_SUFFIX.match(raw, match.end()):
+                return name
+            return renamed
+
+        return SYMBOL.sub(replace, raw)
+
+    paths = tracked_paths() | {Path("symbols/functions.csv")}
+    paths.update(p.relative_to(ROOT) for p in source_paths(ROOT) + header_paths(ROOT))
+    changed = []
+    input_table = table.resolve()
+    for rel in sorted(paths):
+        if (rel.parts[0] == "build" or rel.name in ("PROGRESS.json", "PROGRESS.md") or
+                rel.suffix not in TEXT_SUFFIXES | {".s", ".inc", ".json", ".txt"}):
+            continue
+        path = ROOT / rel
+        if not path.is_file() or path.resolve() == input_table:
+            continue
+        original = path.read_bytes()
+        raw = original.decode("utf-8", errors="surrogateescape")
+        updated = rewrite(raw)
+        if updated != raw:
+            print(f"rewrite {rel}")
+            changed.append((path, original, updated.encode("utf-8", errors="surrogateescape")))
+    if apply:
+        write_updates(changed)
+        symbol_names.cache_clear()
+    return len(changed)
 
 
 def recorded_moves():
     """Map prior paths to the recorded destinations."""
     sources = {}
     for record in source_placements(ROOT):
-        for previous in (record.original, record.current, record.pass2, record.target):
+        for previous in (record.original, record.current, record.pass2, record.target, *record.prior_paths):
             if previous is not None and sources.setdefault(previous, record.target) != record.target:
                 raise ValueError(f"{SOURCE_FILES}: conflicting destination for {previous}")
     headers = {}
@@ -128,6 +242,10 @@ def transform(path, raw, moves, includes):
 def migrate(rename=False, apply=False):
     recorded = recorded_moves()
     moves = plan_files(recorded, rename)
+    return rewrite_moves(recorded, moves, apply)
+
+
+def rewrite_moves(recorded, moves, apply, *, input_table=None):
     occupied = {}
     for old, new in moves.items():
         previous = occupied.setdefault(new.as_posix().casefold(), old)
@@ -139,11 +257,9 @@ def migrate(rename=False, apply=False):
     references = {old: moves.get(new, new) for old, new in recorded.items()} | moves
     includes = {old.relative_to("include").as_posix(): new.relative_to("include").as_posix()
                 for old, new in references.items() if old.parts[0] == "include"}
-    tracked = subprocess.check_output(["git", "ls-files", "--cached", "--others", "--exclude-standard", "-z"], cwd=ROOT).decode().split("\0")
     paths = set(moves)
-    for value in filter(None, tracked):
-        path = Path(value)
-        if (path.parts[0] not in ("src", "include", "tests") and path.suffix in TEXT_SUFFIXES
+    for path in tracked_paths():
+        if (path.parts[0] not in ("src", "include", "tests", "build") and path.suffix in TEXT_SUFFIXES
                 and path not in (SOURCE_DIRS, SOURCE_FILES, HEADER_DIRS)
                 and path not in (Path("PROGRESS.md"), Path("docs/SOURCE_LAYOUT_DECISIONS.md"))
                 and path.parts[:2] != ("docs", "history")):
@@ -151,7 +267,7 @@ def migrate(rename=False, apply=False):
 
     changed = []
     for old in sorted(paths):
-        if not (ROOT / old).is_file():
+        if ROOT / old == input_table or not (ROOT / old).is_file():
             continue
         raw = (ROOT / old).read_bytes().decode("utf-8", errors="surrogateescape")
         new = moves.get(old, old)
@@ -178,15 +294,99 @@ def migrate(rename=False, apply=False):
     return len(changed)
 
 
+def csv_text(rows):
+    with io.StringIO(newline="") as stream:
+        writer = csv.DictWriter(stream, fieldnames=list(dict.fromkeys(key for row in rows for key in row)),
+                                lineterminator="\n")
+        writer.writeheader()
+        writer.writerows(rows)
+        return stream.getvalue()
+
+
+def player_moves(table, apply=False):
+    """Replay reviewed per-file Player routes, then record them in the placement tables."""
+    placements = source_placements(ROOT)
+    aliases = {}
+    for record in placements:
+        for path in (record.original, record.current, record.pass2, record.target, *record.prior_paths):
+            if path is not None and aliases.setdefault(path, record) != record:
+                raise ValueError(f"{SOURCE_FILES}: ambiguous source path {path}")
+    moves, references, pending = {}, {}, {}
+    already_moved = None
+    for row in table_rows(table, ("file", "new_path")):
+        path = layout_path(row["file"] or "", "src")
+        directory = layout_path(row["new_path"] or "", "src")
+        if (path.parts[:2] != ("src", "player") or path.suffix != ".c" or
+                not (directory.parts[:2] == ("src", "player") or directory.parts == ("src", "link", "player")) or
+                not 3 <= len(directory.parts) <= 4 or directory.suffix):
+            raise ValueError(f"{table}: invalid Player route {path} -> {directory}")
+        record = aliases.get(path)
+        if record is None or record.current in pending:
+            raise ValueError(f"{table}: missing or repeated placement for {path}")
+        old = record.target
+        target = directory / old.name
+        pending[record.current] = (record, target, row.get("note") or "reviewed Player placement")
+        if old == target:
+            continue
+        if (ROOT / old).is_file():
+            moves[old] = target
+        else:
+            # A previous apply may have moved the file before writing the tables.
+            if already_moved is None:
+                already_moved = scan(ROOT).files
+            if already_moved.get(record.start, (None,))[0] != target.as_posix():
+                raise ValueError(f"{table}: expected source at {old} or {target}")
+        for previous in (path, old, record.original, record.current, record.pass2, *record.prior_paths):
+            if previous is not None:
+                references[previous] = target
+    expected = [pending[record.current][1] if record.current in pending else record.target for record in placements]
+    if len({path.as_posix().casefold() for path in expected}) != len(expected):
+        raise ValueError(f"{table}: colliding Player destinations")
+    pending = {path: plan for path, plan in pending.items() if plan[0].target != plan[1]}
+    if not pending:
+        return 0
+
+    file_rows = table_rows(ROOT / SOURCE_FILES, ("current_path", "rule"))
+    rule_rows = table_rows(ROOT / SOURCE_DIRS, ("current_path", "new_path", "note"))
+    rules = {row["current_path"]: row for row in rule_rows}
+    for row in file_rows:
+        key = Path(row["current_path"])
+        if key not in pending:
+            continue
+        record, target, note = pending[key]
+        row["rule"] = key.as_posix()
+        rules[row["rule"]] = {"current_path": row["rule"], "new_path": target.parent.as_posix(), "note": note}
+        row["prior_paths"] = "|".join(path.as_posix() for path in dict.fromkeys((*record.prior_paths, record.target)))
+    tables = {SOURCE_DIRS: csv_text(list(rules.values())), SOURCE_FILES: csv_text(file_rows)}
+    metadata = [(ROOT / path, (ROOT / path).read_bytes(), contents.encode()) for path, contents in tables.items()]
+    changes = rewrite_moves(references, moves, apply, input_table=table.resolve())
+    for path in tables:
+        print(f"rewrite {path}")
+    if apply:
+        write_updates(metadata)
+        source_placements.cache_clear()
+        groups.cache_clear()
+    return changes + len(metadata)
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     action = parser.add_mutually_exclusive_group()
     action.add_argument("--apply", action="store_true", help="perform the printed plan")
     action.add_argument("--check", action="store_true", help="fail if the tree disagrees with the reviewed layout")
-    parser.add_argument("--rename", action="store_true", help="also name one-function files from the symbol map")
+    operation = parser.add_mutually_exclusive_group()
+    operation.add_argument("--rename", action="store_true", help="also name one-function files from the symbol map")
+    operation.add_argument("--function-renames", type=Path, help="read exact addr,old_name,new_name rows")
+    operation.add_argument("--function-prefixes", type=Path, help="read old_prefix,new_prefix[,scope] rows")
+    operation.add_argument("--player-moves", type=Path, help="read file,new_path[,note] Player routes")
     args = parser.parse_args()
     try:
-        changes = migrate(args.rename, args.apply)
+        if table := args.function_renames or args.function_prefixes:
+            changes = function_renames(table, prefixes=args.function_prefixes is not None, apply=args.apply)
+        elif args.player_moves:
+            changes = player_moves(args.player_moves, args.apply)
+        else:
+            changes = migrate(args.rename, args.apply)
     except ValueError as error:
         parser.error(str(error))
     print(f"{changes} paths {'updated' if args.apply else 'to update'}")

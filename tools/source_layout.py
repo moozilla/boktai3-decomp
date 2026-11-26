@@ -166,6 +166,7 @@ class SourcePlacement:
     start: int
     end: int
     pass2: Path | None = None
+    prior_paths: tuple[Path, ...] = ()
 
 
 def layout_path(value, category):
@@ -208,7 +209,8 @@ def source_placements(root=ROOT):
                 raise ValueError(f"{SOURCE_FILES}: invalid or overlapping range at {start:08X}")
             previous = row.get("pass2_path")
             pass2 = layout_path(previous, "src") if previous else None
-            placements.append(SourcePlacement(original, current, target, start, end, pass2))
+            prior_paths = tuple(layout_path(path, "src") for path in (row.get("prior_paths") or "").split("|") if path)
+            placements.append(SourcePlacement(original, current, target, start, end, pass2, prior_paths))
     for field in ("original", "current", "target"):
         paths = [getattr(placement, field).as_posix().casefold() for placement in placements]
         if len(paths) != len(set(paths)):
