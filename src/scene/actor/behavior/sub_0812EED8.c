@@ -1,3 +1,4 @@
+#include "scene/collision/scene_actor_delayed_response.h"
 #include "scene/motion/scene_actor_chase_shared.h"
 #include "global.h"
 #include "scene/motion/scene_actor_chase.h"
@@ -7,8 +8,8 @@
 // confidence=low: preserves the existing tentative reaction-state interpretation.
 
 // confidence=low: target contact flags enable a delayed return to route behavior.
-static inline u8 HasTargetFlag(struct SceneActorReactionMotion **out,
-                               struct SceneActorReactionMotion *motion, u32 mask)
+static inline u8 HasTargetFlag(struct SceneActorChaseTracking **out,
+                               struct SceneActorChaseTracking *motion, u32 mask)
 {
     u32 value = motion->flags & mask;
     *out = motion;
@@ -16,30 +17,17 @@ static inline u8 HasTargetFlag(struct SceneActorReactionMotion **out,
         return 1;
     return 0;
 }
-static inline void SaveDelay(u8 *packet, void *control, u8 behavior)
-{
-    *(u32 *)(packet + 12) = 30;
-    *(void **)(packet + 16) = control;
-    packet[8] = 0;
-    packet[9] = 0;
-    packet[10] = behavior;
-}
-static inline void ClearTargetFlags(struct SceneActorReactionMotion *motion, u32 mask)
+static inline void ClearTargetFlags(struct SceneActorChaseTracking *motion, u32 mask)
 {
     motion->flags &= mask;
-}
-static inline struct SceneActorReactionMotion *MakeMotionPointer(void *actor)
-{
-    u8 *bytes = actor;
-    return (void *)(bytes + 0xdc);
 }
 u8 SceneActorReaction_BeginTargetRecovery(struct ChaseActor *actor)
 {
     struct SceneActorChaseGroup *group = &actor->group;
-    struct SceneActorReactionMotion *motion;
+    struct SceneActorChaseTracking *motion;
     if (!ActorStatus_BehaviorFlags(actor, 0x400000) ||
         !ActorStatus_BehaviorFlags(actor, 0x200000) ||
-        !HasTargetFlag(&motion, MakeMotionPointer(actor), 1))
+        !HasTargetFlag(&motion, &actor->base.tracking, 1))
         return 0;
     SceneActorChase_SetActorFlags(actor, 0x100);
     actor->base.field2C2 = 64;
@@ -47,7 +35,7 @@ u8 SceneActorReaction_BeginTargetRecovery(struct ChaseActor *actor)
     SceneActorTerrain_EnterState(actor, 3, 1, 0);
     SceneActorTerrain_InstallControl(actor, SceneActorReaction_RestoreAfterDelay, 14);
     SceneActorChase_SetActorFlags(actor, 0x10);
-    SaveDelay((u8 *)&group->saved, actor->base.onStanding, 9);
+    SceneActorDelay_Prepare((void *)&group->saved, actor->base.onStanding, 9, 30);
     Chase_SnapToRoute(group->destination, &group->homeRoute);
     group->destination->pad = 1;
     actor->base.field2C2 = 64;
