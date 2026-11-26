@@ -110,6 +110,17 @@ test('armor targets model damage to the guard and the contact cooldown', () => {
   assert.equal(armorCombatant(0x02010000).guard, 0);
 });
 
+test('dark Trance requires a full gauge and uses the transformed actions', () => {
+  const player = { actionMode: 0, tetherMode: 1, statHundredths: 999 };
+  const { darkTranceReady, darkTranceTactics } = skill('trance', {}, { gPlayers: [player] });
+  assert.equal(darkTranceReady(), false);
+  player.statHundredths = 1000;
+  assert.equal(darkTranceReady(), true);
+  player.tetherMode = 3;
+  assert.equal(darkTranceReady(), false);
+  assert.deepEqual(darkTranceTactics('up')[0], [['up', 4], ['a', 2], [0, 18]]);
+});
+
 test('curtain segments are targets only while standing and have hit cooldowns', () => {
   const lists = Array.from({ length: 9 }, () => ({ head: null }));
   lists[8].head = { $addr: 0x02010000, flags: 0, update: 0x0801324d, next: null };

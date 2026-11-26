@@ -772,14 +772,18 @@ exports.fight = function* (opts = {}) {
     return KEY8[`${sx},${sz}`];
   };
   const life = () => $.gPlayers[0]?.currentStatA ?? 0;
-  let steps = 0;
+  let steps = 0, interruptions = 0;
   while (exports.where().scene === scene && p && life() > 0 && living().length && g.frameNo - start < (opts.frames ?? 6000)) {
-    if (yield* exports.clearInterruptions(opts)) continue;
+    if (yield* exports.clearInterruptions(opts)) {
+      interruptions++;
+      continue;
+    }
     const distance = (e) => Math.hypot(e.x - p.position.x, e.z - p.position.z, 2 * (e.y - p.position.y));
     const target = living().sort((a, b) => Number(Boolean(b.barrier)) - Number(Boolean(a.barrier)) || distance(a) - distance(b))[0];
     const tk = toward(target);
     const weapon = exports.weapon();
-    const frame = exports.gunFrame();
+    const darkTrance = p.actionMode === 1;
+    const frame = darkTrance ? null : exports.gunFrame();
     // Once the last curtain starts breaking, the sensor can settle while
     // the sprite's destruction timer still holds the Count's damage guard.
     if (target.solarReactive && S.solar > 64) {
@@ -789,18 +793,24 @@ exports.fight = function* (opts = {}) {
     const pr = progress.get(target.addr) || { hp: target.health, since: steps };
     if (target.health < pr.hp) { pr.hp = target.health; pr.since = steps; }
     progress.set(target.addr, pr);
+    if (target.boss === 'Armor' && pr.tranceAttempt !== interruptions && steps - pr.since >= 8 && exports.darkTranceReady()) {
+      pr.tranceAttempt = interruptions;
+      const changed = yield* exports.enterDarkTrance();
+      if (opts.trace) opts.trace({ trance: changed, target: target.addr });
+      if (changed) continue;
+    }
     if (frame && weapon.energy < frame.cost && distance(target) > 512 && !pr.triedCharge) {
       pr.triedCharge = true;
       const charge = yield* exports.chargeEnergy(frame.cost, { stopIf: () => living().some((e) => distance(e) < 512) });
       if (charge.done) continue;
     }
-    if (target.barrier && weapon.gun && !pr.triedSword) {
+    if (!darkTrance && target.barrier && weapon.gun && !pr.triedSword) {
       pr.triedSword = true;
       const equip = yield* exports.quickChange({ gun: false });
       if (opts.trace) opts.trace({ equip, target: target.addr });
       if (equip.done) continue;
     }
-    if (!target.barrier && !triedOtherWeapon.has(target.addr) && exports.bags().frames.length &&
+    if (!darkTrance && !target.barrier && !triedOtherWeapon.has(target.addr) && exports.bags().frames.length &&
         ((frame && weapon.energy < frame.cost) || steps - pr.since >= 8)) {
       triedOtherWeapon.add(target.addr);
       const equip = yield* exports.quickChange({ gun: !weapon.gun });
@@ -808,9 +818,10 @@ exports.fight = function* (opts = {}) {
       if (equip.done) continue;
     }
     const tactics = DIRS8.map((k) => [[k, 12]]);
-    if (weapon.gun) tactics.push(...exports.gunTactics(tk));
+    if (darkTrance) tactics.push(...exports.darkTranceTactics(tk));
+    else if (weapon.gun) tactics.push(...exports.gunTactics(tk));
     else tactics.push([['b', 2], [0, 10]], ...(tk ? [[[tk, 6], ['b', 2], [0, 4]]] : []));
-    if ((target.barrier || target.boss) && tk && !weapon.gun) tactics.push([[tk, 4], [tk + '+b', 4], [0, 16]]);
+    if (!darkTrance && (target.barrier || target.boss) && tk && !weapon.gun) tactics.push([[tk, 4], [tk + '+b', 4], [0, 16]]);
     const wait = exports.combatWait(target);
     if (target.boss || wait) tactics.push([[0, wait || 18]]);
     const root = S.snapshot(), hp0 = hpSum(), life0 = life();
@@ -838,7 +849,8 @@ exports.fight = function* (opts = {}) {
       const enemies = living();
       const hp = enemies.reduce((sum, enemy) => sum + enemy.health, 0);
       const guard = enemies.reduce((sum, enemy) => sum + (enemy.guard ?? 0), 0);
-      opts.trace({ fight: steps, hp, guard, ...exports.where(), enemies: enemies.length });
+      const { scene, life, x, y, z } = exports.where();
+      opts.trace({ fight: steps, hp, guard, scene, life, x, y, z, form: p.actionMode, enemies: enemies.length });
     }
   }
   S.setSolar(initialLight);
