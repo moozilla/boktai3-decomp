@@ -532,21 +532,12 @@ static inline void clearBits16(u16 *field, u32 bits)
     *field = mask;
 }
 
-struct SkeletonResetContext {
-    u8 unknown0[0x6D0];
-    u8 timer;
-    u8 unknown6D1[0xB];
-    u32 savedFlags;
-    u8 unknown6E0[0x24];
-    u16 counter;
-};
-
 void Skeleton_ResetRouteReaction(struct ChaseActor *actor)
 {
-    struct SkeletonResetContext *context = actor->base.context;
-    context->timer = 0;
-    context->counter = 0;
-    context->savedFlags = actor->base.saved.privateFlags;
+    struct Skeleton *context = actor->base.context;
+    context->collisionDelay = 0;
+    context->actionCooldown = 0;
+    context->actionFlags = actor->base.saved.privateFlags;
     Memory_Clear(actor->group.destination, 8);
     SceneActorReaction_ResetResponseState(&actor->group.saved.control, gUnk_0824E250, 0x120);
     actor->base.field2C2 = 64;
@@ -556,10 +547,10 @@ void Skeleton_ResetRouteReaction(struct ChaseActor *actor)
         struct SceneActorRegistryControl *control;
         clearBits16(&actor->base.motionFlags, 0x380);
         {
-            u8 *motion = (u8 *)&actor->base.tracking.target;
+            struct SceneActorChaseTracking *tracking = &actor->base.tracking;
             s32 mask = ~0x18;
-            mask &= motion[15];
-            motion[15] = mask;
+            mask &= tracking->flags;
+            tracking->flags = mask;
         }
         control = &actor->group.common.control;
         if (SceneActorTurn_ActorFlags(actor, 0x200000)) {
@@ -579,7 +570,10 @@ void Skeleton_ResetRouteReaction(struct ChaseActor *actor)
         Chase_SetBehavior(actor, 2);
     else
         Chase_SetBehavior(actor, 0);
-    Anim_Step((u8 *)actor->base.drawable + 32, actor->base.drawable);
+    {
+        struct SceneActorAnimationTileDrawable *drawable = actor->base.drawable;
+        Anim_Step(&drawable->tile, drawable);
+    }
 }
 
 void SceneActorCollision_InitExternalBody(struct ChaseActor *, struct ContactCollider *, void *,
