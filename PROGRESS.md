@@ -10,7 +10,7 @@ Without concessions: **100.000%**. With concessions (register pins, asm barriers
 |---|---:|
 | `volatile` | 2 (+17 excused) |
 | `cflags` | 0 (+50 excused) |
-| `goto` (tracked, not scored) | 2,031 |
+| `goto` (tracked, not scored) | 2,011 |
 
 | Warnings (`python3 tools/concessions.py`; not scored) | |
 |---|---:|
@@ -18,20 +18,20 @@ Without concessions: **100.000%**. With concessions (register pins, asm barriers
 | `proved-zero` | 17 |
 | `once-loop` | 77 (+1 excused) |
 | `stmt-expr` | 1 |
-| `const-local` | 1,199 (+9 excused) |
-| `literal-local` | 2,967 |
-| `addr-deref` | 21 |
-| `subtract-negative` | 13 |
+| `const-local` | 1,058 (+12 excused) |
+| `literal-local` | 2,751 |
+| `addr-deref` | 20 |
+| `subtract-negative` | 8 |
 | `duplicate-branches` | 18 (+6 excused) |
-| `placeholder-name` | 5 |
+| `placeholder-name` | 4 |
 | `volatile-view` | 2 |
-| `local-union` | 71 (+2 excused) |
-| `literal-param` | 2,871 (+79 excused) |
-| total | 7,273 |
+| `local-union` | 67 (+2 excused) |
+| `literal-param` | 2,736 (+91 excused) |
+| total | 6,770 |
 
-Steering debt (parked constant uses and unresolved inline constant arguments): **7,037**.
+Steering debt (parked constant uses and unresolved inline constant arguments): **6,545**.
 
-Source files with no warning: **4,497** of 6,041.
+Source files with no warning: **4,521** of 6,041.
 
 Nonmatching drafts (`#ifdef NONMATCHING`, not counted above): **0 functions**, 0.000% of code, mean fuzzy match 0.0%.
 
