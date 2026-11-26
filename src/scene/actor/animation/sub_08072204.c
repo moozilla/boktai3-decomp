@@ -1,10 +1,11 @@
+#include "npc/manager/scene_actor_animation.h"
 #include "scene/actor/scene_actor_palette.h"
 /* SceneActorPalette_BindActiveTransition: Binds the active category transition colors and actor palette offset to the actor drawable without advancing the transition */
 #define SceneActorPalette_BindActiveTransition sub_08072204
 void SceneActorPalette_BindActiveTransition(struct ChaseActor *actor)
 {
-    struct SceneActorPaletteManagerView *manager = (void *)gSceneActorRegistryManager;
-    struct SceneActorPaletteManagerView *view = manager;
+    struct SceneActorRegistryManager *manager = gSceneActorRegistryManager;
+    struct SceneActorRegistryManager *view = manager;
     struct SceneActorPaletteTransition *transition;
 
     if (!manager)
@@ -22,17 +23,14 @@ void SceneActorPalette_BindActiveTransition(struct ChaseActor *actor)
     if (!transition->remaining)
         return;
     if (actor->base.drawableKind == 0) {
-        ((struct SceneActorPaletteSequenceView *)actor->base.drawable)->paletteOffset =
+        ((struct SceneActorAnimationSequenceDrawable *)actor->base.drawable)->graphics.paletteKey =
             actor->base.paletteOffset;
-        ((struct SceneActorPaletteSequenceView *)actor->base.drawable)->palette =
+        ((struct SceneActorAnimationSequenceDrawable *)actor->base.drawable)->graphics.palette =
             transition->colors;
     } else {
-        struct TilePaletteTail {
-            u8 unknown0[0x3A];
-            u16 paletteOffset;
-        };
-        struct TilePaletteTail *tail = (void *)((u32)actor->base.drawable + 0x20);
-        tail->paletteOffset = actor->base.paletteOffset;
-        ((struct SceneActorPaletteTileView *)actor->base.drawable)->palette = transition->colors;
+        struct SceneActorAnimationTileDrawable *drawable = actor->base.drawable;
+        struct AnimSprite *tile = &drawable->tile;
+        tile->paletteBank = actor->base.paletteOffset;
+        ((struct SceneActorAnimationTileDrawable *)actor->base.drawable)->tile.palette = transition->colors;
     }
 }
