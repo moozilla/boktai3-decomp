@@ -429,7 +429,7 @@ test('Battle Drive waits while the rig is trapped above the coffin', () => {
 
 test('bike search keeps steering that avoids damage on the same stretch', () => {
   const motion = { position: { x: 0, z: 0 }, style: { initialWord: 80 } };
-  const g = { name: () => 'Glove_UpdateStopping', press: (key, frames) => ({ key, frames }) };
+  const g = { name: () => 'CoffinBike_UpdateStopping', press: (key, frames) => ({ key, frames }) };
   const lib = skill('bike', g, {}, {
     session: {
       snapshot: () => structuredClone(motion),

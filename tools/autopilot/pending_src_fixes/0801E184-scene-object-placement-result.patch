@@ -1,7 +1,7 @@
 0801E184 scene-object-placement-result
 
 All three placement helpers and Memory_Clear are void and end with
-pop {r0}; bx r0. SceneObjects_Append keeps that Thumb return address
+pop {r0}; bx r0. SlidingDoors_Append keeps that Thumb return address
 in r0 through its slot bookkeeping and returns via r1. The script
 wrapper consumes this value. Allocation and full-pool failures already
 return -1 explicitly.
@@ -17,7 +17,7 @@ The explicit form changed the ROM bytes. The guarded form passed the unit ROM ch
 +    // The last void helper returns through r0, leaving its Thumb return address.
 +    switch (slot->type) {
 +        case 1:
-+            return 0x0801E2B5; // SceneObject_InitLiftPlacement
++            return 0x0801E2B5; // SlidingDoors_InitLiftPlacement
 +        case 2:
 +        case 8:
 +        case 9:
@@ -26,9 +26,9 @@ The explicit form changed the ROM bytes. The guarded form passed the unit ROM ch
 +        case 12:
 +        case 13:
 +        case 14:
-+            return 0x0801E2FF; // SceneObject_InitSlotPlacement with a palette
++            return 0x0801E2FF; // SlidingDoors_InitSlotPlacement with a palette
 +        case 16:
-+            return 0x0801E313; // SceneObject_InitSlotPlacement
++            return 0x0801E313; // SlidingDoors_InitSlotPlacement
 +        case 0:
 +        case 3:
 +        case 4:
@@ -36,7 +36,7 @@ The explicit form changed the ROM bytes. The guarded form passed the unit ROM ch
 +        case 6:
 +        case 7:
 +        case 15:
-+            return 0x0801E309; // SceneObject_InitPlacement
++            return 0x0801E309; // SlidingDoors_InitPlacement
 +        default:
 +            return 0x0801E253; // Memory_Clear
 +    }

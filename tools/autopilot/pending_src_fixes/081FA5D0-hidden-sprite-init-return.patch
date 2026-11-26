@@ -1,6 +1,6 @@
 081FA5D0 hidden-sprite-init-return
 
-The flags update uses r1 through r3. r0 remains the result of Widget_InitLinked.
+The flags update uses r1 through r3. r0 remains the result of AnimSprite_InitLinked.
 
 The explicit form passed the unit ROM check.
 
@@ -9,17 +9,17 @@ The explicit form passed the unit ROM check.
 @@ -11,5 +11,5 @@
  void *ScriptProc_Start(u16, u16);
  s32 ResourceHeader_Relocate(void *, void *);
--void Widget_InitLinked(void *, void *, int, int, int, int, int, void *);
-+s32 Widget_InitLinked(void *, void *, int, int, int, int, int, void *);
+-void AnimSprite_InitLinked(void *, void *, int, int, int, int, int, void *);
++s32 AnimSprite_InitLinked(void *, void *, int, int, int, int, int, void *);
  u32 SceneResource_InitializeHiddenSprite(struct SceneResourceObject *p)
  {
 @@ -17,5 +17,8 @@
      void *resource = p->resource;
      ResourceHeader_Relocate(resource, source);
--    Widget_InitLinked(&p->sprite, resource, 0, 0, 2, 0, 0, 0);
+-    AnimSprite_InitLinked(&p->sprite, resource, 0, 0, 2, 0, 0, 0);
 -    p->sprite.flags |= 1;
 +    {
-+        s32 result = Widget_InitLinked(&p->sprite, resource, 0, 0, 2, 0, 0, 0);
++        s32 result = AnimSprite_InitLinked(&p->sprite, resource, 0, 0, 2, 0, 0, 0);
 +        p->sprite.flags |= 1;
 +        return result;
 +    }

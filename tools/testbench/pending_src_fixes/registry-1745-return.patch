@@ -3,7 +3,7 @@ diff --git a/src/link/session/sub_0810B914.c b/src/link/session/sub_0810B914.c
 +++ b/src/link/session/sub_0810B914.c
 @@ -131,4 +131,9 @@
      Hud_SetMode(7);
-     p->fieldB4 = Registry1745_RunSession;
+     p->fieldB4 = LinkSession_RunSession;
      p->field53 = 1;
 +#ifdef UBFIX
 +    /* agbcc leaves Hud_SetMode's return address in r0 after the void call.

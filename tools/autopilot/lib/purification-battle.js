@@ -7,7 +7,7 @@ const direction = (dx, dz) => {
 
 exports.purificationBattle = () => $.gPileDriver?.initialMode === 1;
 
-// ScenePanelRig_TickResourceDrain drains darkness four times as fast with
+// PileDriverRig_TickResourceDrain drains darkness four times as fast with
 // the rig over the coffin (state 2). When it wanders or approaches a
 // generator, try gunfire from the outside of its route to push it back.
 exports.fightPurification = function* (opts = {}) {

@@ -1,13 +1,13 @@
 exports.bikeRider = () => {
-  const task = exports.tasks().find((t) => !t.dead && t.update === 'Glove_UpdateTask');
+  const task = exports.tasks().find((t) => !t.dead && t.update === 'CoffinBike_UpdateTask');
   return task ? g.at(Number(task.task), 'struct Glove') : null;
 };
 
-// Glove_UpdatePostState applies damage to style.initialWord. The course moves
+// CoffinBike_UpdatePostState applies damage to style.initialWord. The course moves
 // along X and steering changes Z. First try ordinary acceleration. Search
 // steering and bike actions when that trial takes damage or stops advancing.
 exports.rideBike = function* (bike, opts = {}) {
-  if (g.name(bike.update) !== 'Glove_UpdateStopping') {
+  if (g.name(bike.update) !== 'CoffinBike_UpdateStopping') {
     yield g.press('r', 4);
     return null;
   }

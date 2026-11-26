@@ -1,7 +1,7 @@
 08009E98 collision-slot-init-return
 
 Effect_SetOrigin performs two byte stores using r0 as their base. The following
-store in CollisionController_InitSlot uses r1, preserving the sprite pointer.
+store in StrikeTrap_InitSlot uses r1, preserving the sprite pointer.
 
 The explicit form changed the ROM bytes. The guarded form passed the unit ROM check.
 

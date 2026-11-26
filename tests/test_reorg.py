@@ -163,6 +163,27 @@ class ReorgTests(unittest.TestCase):
             self.assertIn("void Final_Run(void) { Branch_Run(); }", (root / "src/engine/run.c").read_text())
             self.assertEqual(reorg.function_renames(table, skip_diverged=True), 0)
 
+    def test_settled_references_update_tooling_without_reusing_active_names(self):
+        table_path = "symbols/function_renames.csv"
+        files = {
+            "symbols/functions.csv": "addr,name\n08001000,Final_Run\n08001020,InUse\n08001040,Other_Run\n",
+            table_path: "addr,old_name,new_name,prior_names\n"
+            "08001000,Old_Run,Final_Run,Interim_Run\n08001040,InUse,Other_Run,\n",
+            "tools/example.js": "Old_Run(); Interim_Run__addr; InUse(); Old_Runner();\n",
+            "port/example.c": "void Old_Run(void);\n",
+            "tests/example.py": "target = 'Interim_Run'\n",
+            "src/engine/Old_Run.c": "void Final_Run(void) {} /* Old_Run */\n",
+        }
+        with fixture(files) as root, contextlib.redirect_stderr(io.StringIO()) as messages:
+            table = root / table_path
+            self.assertEqual(reorg.function_renames(table), 0)
+            self.assertEqual(reorg.function_renames(table, apply=True, settled_references=True), 3)
+            self.assertEqual(reorg.function_renames(table, settled_references=True), 0)
+            self.assertIn("retired spelling InUse is active", messages.getvalue())
+            self.assertEqual((root / "tools/example.js").read_text(),
+                             "Final_Run(); Final_Run__addr; InUse(); Old_Runner();\n")
+            self.assertEqual((root / "src/engine/Old_Run.c").read_text(), files["src/engine/Old_Run.c"])
+
     def test_scoped_helpers_and_types_do_not_change_another_owner(self):
         player, npc = "src/player/local.c", "src/npc/local.c"
         body = ("struct SharedSprite;\nstatic void Shared_Helper(struct SharedSprite *it) {}\n"

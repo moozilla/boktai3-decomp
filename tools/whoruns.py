@@ -2,7 +2,7 @@
 """Find checkpoint replays that executed a function or source unit.
 
 Examples:
-  python3 tools/whoruns.py BossSlot2_UpdateFrame
+  python3 tools/whoruns.py Sabata_UpdateFrame
   python3 tools/whoruns.py src/bosses/boss_slot_2 --functions
   python3 tools/whoruns.py cannon_battery growth_hazard
   python3 tools/whoruns.py 08179B9C-08180488
