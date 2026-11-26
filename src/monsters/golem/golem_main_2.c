@@ -39,21 +39,6 @@ static inline u8 TakeFlag2B1(struct ChaseActor *actor)
     return 0;
 }
 
-static inline void SetControl(struct ChaseActor *actor, u32 kind, void *control)
-{
-    actor->base.field2B2 = 1;
-    actor->base.stepDone = 0;
-    actor->base.controlKind = kind;
-    actor->base.target = control;
-    actor->base.field2C8 = 0;
-    {
-        u32 *flags = &actor->base.pendingControlFlags;
-        s32 mask = ~1;
-        *flags &= mask;
-    }
-    actor->base.pendingControl = 0;
-}
-
 void Golem_ReturnHome(struct ChaseActor *actor)
 {
     struct SceneActorChaseGroup *group = &actor->group;
@@ -62,7 +47,7 @@ void Golem_ReturnHome(struct ChaseActor *actor)
     struct ContactPosition diff;
     if (TakeFlag2B1(actor)) {
         void *target = Golem_BeginChargeBuildup;
-        SetControl(actor, 0x25, target);
+        SceneActorChase_SetControl(actor, target, 0x25);
         actor->base.body.direction = actor->base.tracking.heading;
         actor->base.stepDone = 0;
         body->charge688 = 0;
@@ -95,7 +80,7 @@ void Golem_ReturnHome(struct ChaseActor *actor)
         }
         {
             void *target = Golem_UpdateRouteMotion;
-            SetControl(actor, 0x23, target);
+            SceneActorChase_SetControl(actor, target, 0x23);
         }
         SceneActorChase_SetPhase(actor, 2, 1);
     } else
@@ -482,13 +467,13 @@ void Golem_ChargeOrApproach(struct ChaseActor *actor)
         Golem_Charge(body);
         if (CanCharge(body)) {
             void *target = Golem_UpdateChargeWindup;
-            SetControl(actor, 0x28, target);
+            SceneActorChase_SetControl(actor, target, 0x28);
             SceneActorChase_SetPhase(actor, 2, 4);
             return;
         }
         {
             void *target = Golem_UpdateRouteMotion;
-            SetControl(actor, 0x23, target);
+            SceneActorChase_SetControl(actor, target, 0x23);
         }
         SceneActorChase_SetPhase(actor, 2, 1);
     } else
@@ -553,11 +538,6 @@ void Golem_ResumeRouteAfterControl(struct ChaseActor *actor)
         actor->base.counter2AC++;
 }
 
-struct Golem080CEAC4Body {
-    u8 unknown0[9];
-    u8 direction;
-};
-
 static inline u8 TakeFlag(u8 *flag)
 {
     if (*flag) {
@@ -567,25 +547,16 @@ static inline u8 TakeFlag(u8 *flag)
     return FALSE;
 }
 
-static inline void SetPhase(struct Golem *actor, u32 state, u32 phase, u32 behavior)
-{
-    actor->chase.base.state2A8 = state;
-    actor->chase.base.phase2A9 = phase;
-    actor->chase.base.behavior2AA = behavior;
-    actor->chase.base.counter2AC = 0;
-    actor->chase.base.field2B1 = 1;
-}
-
 void Golem_UpdateHoldTimer(struct Golem *actor)
 {
     struct Golem *context = actor->chase.base.context;
-    struct Golem080CEAC4Body *body = (struct Golem080CEAC4Body *)((u8 *)actor + 0x50);
+    struct SceneActorBody *body = &actor->chase.base.body;
     TakeFlag(&actor->chase.base.field2B1);
     if (Golem_InvokeEnabledBehavior(&actor->chase))
         return;
     body->direction = actor->chase.base.tracking.heading;
     if ((s32)actor->chase.base.counter2AC > 0x77) {
-        SetPhase(actor, 0, 2, 5);
+        SceneActorChase_SetState(&actor->chase, 0, 2, 5);
         context->charge688 = 0;
     }
     actor->chase.base.counter2AC++;
@@ -836,14 +807,9 @@ void Golem_ArriveAndRestore(struct ChaseActor *actor)
 
 extern const u8 gUnk_0860613C[];
 
-struct S {
-    u8 filler[652];
-    const u8 *p;
-};
-
-void Golem_InitSpecialActionHandlers(struct S *s)
+void Golem_InitSpecialActionHandlers(struct Golem *actor)
 {
-    s->p = gUnk_0860613C;
+    actor->chase.base.behaviorCallbacks = (void **)gUnk_0860613C;
 }
 
 void Golem_TickFacingQuadrant(void *);
@@ -854,27 +820,16 @@ void SceneActorControl_DispatchControl(void *);
 
 void Golem_UpdateEffectsAndContacts(void *);
 
-struct SOnUpdate {
-    u8 filler[0x27c];
-    u32 *tbl;
-    u8 filler2[0x2a8 - 0x280];
-    u8 idx;
-    u8 filler3[0x2b8 - 0x2a9];
-    u16 h2b8;
-    u8 filler4[0x2d4 - 0x2ba];
-    u16 flags;
-};
-
-s32 Golem_OnUpdate(struct SOnUpdate *s)
+s32 Golem_OnUpdate(struct ChaseActor *actor)
 {
     u32 m;
-    Golem_TickFacingQuadrant(s);
+    Golem_TickFacingQuadrant(actor);
     m = 0x2000;
-    if ((s->flags & m) || s->h2b8 == 0) {
-        Callback_InvokeActor(s, s->tbl[s->idx]);
-        SceneActorControl_DispatchControl(s);
+    if ((actor->base.motionFlags & m) || actor->base.hitLockTimer == 0) {
+        Callback_InvokeActor(actor, actor->base.stateCallbacks[actor->base.state2A8]);
+        SceneActorControl_DispatchControl(actor);
     }
-    Golem_UpdateEffectsAndContacts(s);
+    Golem_UpdateEffectsAndContacts(actor);
     return 1;
 }
 
@@ -1033,9 +988,9 @@ void Golem_InitColliders(void *);
 
 void Golem_InitActionHandlers(void *);
 
-void Golem_InitSpecialActionHandlers(struct S *s);
+void Golem_InitSpecialActionHandlers(struct Golem *actor);
 
-s32 Golem_OnUpdate(struct SOnUpdate *s);
+s32 Golem_OnUpdate(struct ChaseActor *actor);
 
 u16 Skeleton_LookupAnimationEntry(void *);
 
@@ -1212,11 +1167,11 @@ void Heap_Free(void *);
 
 void Golem_Create(void)
 {
-    u8 *p = Heap_Alloc(0x6b0);
+    struct Golem *p = Heap_Alloc(sizeof(*p));
     if (p != 0) {
-        Memory_Clear(p, 0x6b0);
+        Memory_Clear(p, sizeof(*p));
         if (Golem_Init(p) < 0) {
-            Golem_OnDestroy(p);
+            Golem_OnDestroy((void *)p);
             Heap_Free(p);
         }
     }
