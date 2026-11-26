@@ -6,6 +6,7 @@
 #include "scene/collision/contact_swarm.h"
 #include "scene/actor/scene_actor_components.h"
 #include "scene/motion/scene_actor_route.h"
+#include "scene/terrain/terrain_collision.h"
 
 /* Tentative: a scripted scene object (kinds 0-3) from the 12-slot pool owned by
  * gNamedActorManager. Slots are 0x19C bytes. */
@@ -37,8 +38,8 @@ struct NamedObject {
     u8 routeId, routeParameter, routePoint, kind;
     struct SceneActorRouteCursor route;
     struct SceneActorBody body;
-    u8 registration[0x10];
-    u8 cellRegistrations[4][0x10];
+    struct TerrainCellOverride registration;
+    struct TerrainCellOverride cellRegistrations[4];
     u8 cellRegistered[4];
 };
 typedef char NamedObjectSizeCheck[(sizeof(struct NamedObject) == 0x19C) ? 1 : -1];
