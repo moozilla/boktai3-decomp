@@ -216,6 +216,7 @@ exports.clearInterruptions = function* (opts = {}) {
     }
     const m = exports.message();
     if (m.open) {
+      opts.beforeText?.();
       const id = m.id;
       yield* exports.advanceText(900);
       opts.seen.set(id, (opts.seen.get(id) || 0) + 1);

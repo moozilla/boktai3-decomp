@@ -185,7 +185,7 @@ const GOALS = {
         }
       }
       // Both HP traps and live pressure plates can run scripts on contact.
-      let prioritizeExit = false;
+      let prioritizeExit = L.coffinAvailable();
       const switches = (stageOf(here).switches || []).concat(L.floorSwitches().filter((sw) => !sw.pressed));
       for (const sw of switches) {
         const key = `${here}:switch:${sw.box ?? sw.name}`;
@@ -433,6 +433,16 @@ function exploreDistances(here, visited) {
 function* throughDoor(g, L, box) {
   const scene = L.where().scene, tried = new Set();
   const avoid = stageOf(scene).doors.map((d) => d.box).filter((b) => b !== box);
+  if (L.coffinAvailable()) {
+    yield* untilControl(g, L, () => !g.fn.ScriptUtility_IsControlFlagSet(), 30, 2400);
+    if (L.where().scene !== scene) return true;
+    if (L.coffinAvailable() && g.$.gPlayers[0]) {
+      const r = yield* L.carryCoffin(box, { avoid, trace: (e) => event({ skill: 'nav', ...e }) });
+      event({ skill: 'coffin', box, ...r });
+      if (r.reached || L.where().scene !== scene) return true;
+      if (L.coffinAvailable()) return false;
+    }
+  }
   const lock = L.closedLock(LOCKS[scene] || [], box);
   if (lock && L.hasItem(lock.item)) {
     const r = yield* L.openKeyDoor(lock, { avoid, trace: (e) => event({ skill: 'nav', ...e }) });

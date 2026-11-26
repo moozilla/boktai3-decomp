@@ -199,6 +199,29 @@ test('combat waits while a story script controls the player', () => {
   assert.equal(result.value.steps, 0);
 });
 
+test('coffin navigation holds A until the exit text opens', () => {
+  const player = { $addr: 0x02010000, tetherMode: 0 };
+  const g = { keys: 0, keyMask: () => 1, fn: { Player_TestNearbyInteraction: () => true },
+    press: (key, frames) => ({ key, frames }) };
+  const game = { gPlayers: [player], gTetherActor: { interactionScriptId: 841, position: { x: 128, z: 128 } } };
+  const lib = skill('coffin', g, game, {
+    session: { snapshot: () => null, restore: () => {} },
+    navigate: function* (target, opts) {
+      assert.equal(target, 'CD22');
+      assert.equal(g.keys, 1);
+      opts.beforeText();
+      assert.equal(g.keys, 0);
+      return { reached: true };
+    },
+  });
+  assert.equal(lib.coffinAvailable(), true);
+  const carry = lib.carryCoffin('CD22', {});
+  assert.deepEqual(carry.next().value, { key: 'a', frames: 2 });
+  player.tetherMode = 6;
+  assert.deepEqual(carry.next(), { done: true, value: { grabbed: true, reached: true } });
+  assert.equal(g.keys, 0);
+});
+
 test('armor targets model damage to the guard and the contact cooldown', () => {
   const fields = { 0xb1c: 240, 0xb20: 65, 0xb2c: 9, 0xb32: 2 };
   const read = (addr) => fields[addr - 0x02010000] ?? 0;
