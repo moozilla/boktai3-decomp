@@ -77,6 +77,7 @@ const SEEN = new Map();  // person id -> rooms they were in
 const VISITS = new Map();  // room visits this run: least visited doors first
 const TRIED = new Set(from && from.tried ? from.tried : []);  // floor items already gone for
 const VISITED = new Set(from ? [...(from.visited || []), ...(from.rooms || []).map((r) => r.scene)] : []);
+let landingDetour;
 const event = (what) => {
   const e = { frame: s.frame, ...what };
   log.push(e);
@@ -150,7 +151,8 @@ const GOALS = {
     const storyGoal = +opt('--until-story', -1), endpoint = destination >= 0 || storyGoal >= 0;
     const reachedScene = () => destination >= 0 && L.where().scene === destination;
     const reached = () => reachedScene() || (storyGoal >= 0 && L.story() >= storyGoal);
-    let prev, keyGoal, landingDetour;
+    if (from?.landingDetour?.goal === routeGoal) landingDetour = from.landingDetour;
+    let prev, keyGoal;
     const failedKeyRooms = new Set();
     const bossActive = () => L.fightTargets().some((target) => target.boss || target.barrier);
     for (let rooms = 0; rooms < limit; rooms++) {
@@ -412,7 +414,7 @@ const GOALS = {
           if (L.where().scene === here) UNREACHABLE.add(edge);
           if (L.where().scene !== here) { moved = true; break; }
           if (alternate) {
-            landingDetour = alternate;
+            landingDetour = { ...alternate, goal: routeGoal };
             event({ skill: 'landing', ...alternate });
           }
         }
@@ -645,6 +647,7 @@ function writeMovie(file, end) {
   const frames = s.movie.length;
   const movie = {
     goal, save: battery, frames, end, visited: [...VISITED], tried: [...TRIED], unreachable: [...UNREACHABLE],
+    landingDetour,
     rooms: rooms.filter((entry) => entry.frame < frames), solar: s.solarLog,
     readFrames: readFrames.slice(0, tickAt(readFrames, frames)), movie: s.movie,
   };
