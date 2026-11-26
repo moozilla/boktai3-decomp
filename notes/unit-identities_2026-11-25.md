@@ -457,6 +457,23 @@ race. It also records zero calls to their three observed dispatch parents.
 Battle control for the late Player files, whose actual gameplay route
 remains open.
 
+### Crossover Battle 2 control
+
+Stock 0032 reaches **Link → Crossover Battle 2** through the title menu.
+The original menu opens `Wireless_CreateController` and
+`WirelessPeerPanel_Create`. In `build/identify/crossover-title/no-adapter.png`
+the peer slot stays empty and the prompt calls for a wireless adapter.
+The inputs and trace are in the same directory.
+
+The round procedure is 1656. Warp the same 0032 battery to
+`scene=1656 entrance=47 story=194` to isolate local arena behavior. The
+stock ROM draws the duel and both health readouts in
+`build/identify/replays/crossover-arena/start.png`. The Count's normal
+`Vampire_Create` runs, and every observed Player task update is the ordinary
+0815F0D0 `Player_Update`. `Player_UpdateLinkCore`, `Player_UpdateLinkKind`
+and `Player_UpdateHalfChargeLinkKind` have no hits. This warp establishes
+the local round's task ownership. Full wireless play still needs a peer.
+
 The extra `src/player/sub_*.c` rows in `corrections.csv` override the
 corresponding `player_files_*.txt` membership. Apply them by removing each
 file from its original list and using the corrected destination directory.
