@@ -43,7 +43,7 @@ extern const u8 gUnk_0824E218[];
 
 void SceneActorReaction_PlayAnimationBUntilComplete(void);
 
-void SceneActorBehavior_CallActionScript(void *);
+void SceneActorBehavior_CallActionScript(struct RoomActor *actor);
 
 void Vorn_SelectRecoveryAction(u8 *, const u8 *, u32);
 
@@ -52,12 +52,11 @@ void Vorn_UpdateScriptedAction(struct ChaseActor *actor)
     if (Chase_TakeArrived(actor)) {
         Chase_SetCtl(actor, SceneActorReaction_PlayAnimationBUntilComplete, 10);
         actor->base.body.direction = actor->base.tracking.heading;
-        SceneActorBehavior_CallActionScript(actor);
+        SceneActorBehavior_CallActionScript(&actor->base);
     }
     if (actor->base.stepDone) {
-        u8 *group = (u8 *)actor;
         {
-            u16 *h = (u16 *)(group + 0x414);
+            u16 *h = (u16 *)&actor->group.common.gate.flags;
             u32 flag = 4;
             flag |= *h;
             *h = flag;
@@ -68,10 +67,7 @@ void Vorn_UpdateScriptedAction(struct ChaseActor *actor)
             flag |= *flags;
             *flags = flag;
         }
-        {
-            u16 value = *(u16 *)(group + 0x416);
-            *(u16 *)(group + 0x418) = value;
-        }
+        actor->group.common.gate.counter = actor->group.common.gate.duration;
         Vorn_SelectRecoveryAction(actor, gUnk_0824E218, 0x27);
     } else {
         actor->base.counter2AC++;
@@ -276,7 +272,7 @@ void Vorn_SelectPursuitAfterAction(struct ChaseActor *a)
         a->base.counter2AC++;
 }
 
-void Vorn_ClearRouteResumeFlag(u8 *p);
+void Vorn_ClearRouteResumeFlag(struct Vorn *p);
 
 void SceneActorMovement_ResolveRoutePosition(void *);
 
@@ -315,8 +311,8 @@ static inline void Route_RestoreMotion(struct ChaseActor *actor, u32 result, u32
 
 void Vorn_RestoreRouteMovement(struct ChaseActor *a)
 {
-    u8 *context = a->base.context;
-    u8 *group = context + 0x3D4;
+    struct Vorn *context = a->base.context;
+    struct SceneActorChaseGroup *group = &context->chase.group;
     u32 *action;
     u32 *flags;
     if (Chase_TakeArrived(a)) {
@@ -331,7 +327,7 @@ void Vorn_RestoreRouteMovement(struct ChaseActor *a)
         u32 actionMask;
         Vorn_ClearRouteResumeFlag(context);
         SceneActorMovement_ResolveRoutePosition(a);
-        control = (void *)(group + 0x4C);
+        control = &group->common.control;
         actionMask = 0x200000;
         action = &a->base.behaviorFlags;
         if (Chase_Bits32(action, actionMask)) {
@@ -353,9 +349,9 @@ void Vorn_RestoreRouteMovement(struct ChaseActor *a)
             *action = mask & *action;
         }
         a->base.field2C2 = 64;
-        Memory_Clear(*(void **)(group + 0x200), 8);
+        Memory_Clear(group->destination, 8);
         Chase_SetBehavior(a, 2);
-        flags = Route_SetCtl(a, *(void **)((u8 *)a + 0x22C), 0);
+        flags = Route_SetCtl(a, a->base.onStanding, 0);
         Route_RestoreMotion(a, 0, flags);
     } else
         a->base.counter2AC++;
@@ -373,53 +369,33 @@ void Anim_SetDurationScale(void *, u32);
 
 void Anim_SetFrameDurationScale(void *, u32);
 
-#define FIELD(p, off, T) (*(T *)((u8 *)(p) + (off)))
-
 void SceneActorReaction_BeginSideStep(void);
 
 void Vorn_UpdateRouteApproach(struct ChaseActor *actor)
 {
-    u8 *group = (u8 *)&actor->group.common;
+    struct SceneActorChaseGroup *group = &actor->group;
     s32 speed;
     u32 event;
-    u16 *scale;
-    if (actor->base.field2B1)
-        actor->base.field2B1 = 0;
+    SceneActorControl_TakeStateEntry(actor);
     if ((u8)Callback_InvokeActor(actor, actor->base.contactQuery.opaque))
         return;
     if (sub_0812F3CC(actor))
         return;
     SceneActorAnimation_SelectDirectionalEntry(actor, 1);
-    speed = Callback_InvokeActor(actor, FIELD(actor, 0x260, void *));
-    {
-        if (SceneActorContact_MotionFlags(actor, 0xa02f)) {
-            u16 *p = &actor->base.field2C2;
-            *p = 64;
-            scale = p;
-        } else {
-            u16 *p = &actor->base.field2C2;
-            u16 v = *p;
-            scale = p;
-            if (v == 0)
-                *scale = 64;
-        }
-    }
-    if (actor->base.drawableKind == 0)
-        Anim_SetDurationScale((u8 *)actor->base.drawable + 0x48, *scale);
-    else
-        Anim_SetFrameDurationScale((u8 *)actor->base.drawable + 0x20, *scale);
-    event = NavMesh_ConsumeProbeEvent(FIELD(group, 0x1fc, void *));
+    speed = Callback_InvokeActor(actor, actor->base.animationQuery.opaque);
+    SceneActorTurn_ApplyActorDuration(actor);
+    event = NavMesh_ConsumeProbeEvent(group->route);
     if (event == 0) {
-        if (SceneActorBehavior_AccelerateTowardDescriptor(actor, FIELD(group, 0x1fc, void *), 32,
+        if (SceneActorBehavior_AccelerateTowardDescriptor(actor, group->route, 32,
                                                           32, speed)) {
             Chase_SetBehavior(actor, 18);
             Chase_SetCtl(actor, actor->base.onStanding, 0);
             MonsterInit_SetMotionControl(actor, SceneActorReaction_BeginSideStep, 38);
             actor->base.field2C2 = 64;
-            *(u16 *)(group + 0x54) = 0;
+            group->common.control.timer = 0;
             return;
         }
-    } else if (SceneActorBehavior_RequestDescriptorTurn(actor, FIELD(group, 0x1fc, void *), 32, 32,
+    } else if (SceneActorBehavior_RequestDescriptorTurn(actor, group->route, 32, 32,
                                                         speed)) {
         Chase_SetBehavior(actor, 20);
         Chase_SetCtl(actor, actor->base.onStanding, 0);
@@ -667,9 +643,9 @@ void Vorn_InitReactionActionTable(struct ChaseActor *actor)
 
 void Vorn_UpdateScriptedAnimation(struct ChaseActor *);
 
-static inline u8 TestContext(u8 *base, u32 mask, u16 **out)
+static inline u8 TestContext(struct Vorn *context, u32 mask, u16 **out)
 {
-    u16 *field = (u16 *)(base + 0x6D4);
+    u16 *field = &context->flags6D4;
     u32 value = *field & mask;
     *out = field;
     if (value)
@@ -679,12 +655,12 @@ static inline u8 TestContext(u8 *base, u32 mask, u16 **out)
 
 void SceneActorPhase_TryBeginSpecialMotion(struct ChaseActor *p)
 {
-    u8 *base = (u8 *)p;
+    struct Vorn *context = (void *)p;
 
-    if (!SceneActor_ActionsBlocked((struct ChaseActor *)base) && *(s16 *)(base + 0x682) == 1 && p->base.controlKind != 0x29 &&
+    if (!SceneActor_ActionsBlocked(p) && context->field682 == 1 && p->base.controlKind != 0x29 &&
         !SceneActorContact_MotionFlags(p, 0xE3BF)) {
         u16 *flags;
-        if (!TestContext(base, 0xC, &flags) && SceneActorChase_TestField(flags, 2)) {
+        if (!TestContext(context, 0xC, &flags) && SceneActorChase_TestField(flags, 2)) {
             Chase_SetBehavior(p, 0x18);
             Chase_SetCtl(p, p->base.onStanding, 0);
             MonsterInit_SetMotionControl(p, Vorn_UpdateScriptedAnimation, 0x29);
@@ -938,9 +914,9 @@ void Vorn_InitTimedAction(struct Vorn *p)
     p->uphillRouteId = Script_GetKeywordValue(0x68, -1);
 }
 
-void Vorn_ClearRouteResumeFlag(u8 *p)
+void Vorn_ClearRouteResumeFlag(struct Vorn *p)
 {
-    u16 *q = (u16 *)(p + 0x6d4);
+    u16 *q = &p->flags6D4;
     u32 m = ~8;
     *q = m & *q;
 }
@@ -2784,9 +2760,9 @@ s32 Vorn_OnUpdate(struct ChaseActor *s)
     if ((s->base.motionFlags & m) || s->base.hitLockTimer == 0) {
         Callback_InvokeActor(s, s->base.stateCallbacks[s->base.state2A8]);
         {
-            u8 *c = (u8 *)s + 0xDC;
+            struct SceneActorChaseTracking *tracking = &s->base.tracking;
             u32 mask = ~0x20;
-            c[0xF] &= mask;
+            tracking->flags &= mask;
         }
         SceneActorControl_DispatchControl(s);
     }
