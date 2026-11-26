@@ -96,7 +96,7 @@ const describe = (e) => {
 };
 
 const ff = spawn('ffmpeg', ['-y', '-loglevel', 'error', '-filter_threads', '1', '-f', 'rawvideo', '-pix_fmt', 'rgb24', '-s', '240x160', '-r', String(fps), '-i', '-',
-  '-vf', 'scale=720:480:flags=neighbor', '-c:v', 'libx264', '-threads', '1', '-pix_fmt', 'yuv420p', '-crf', '20', outPath], { stdio: ['pipe', 'inherit', 'inherit'] });
+  '-vf', 'scale=720:480:flags=neighbor', '-c:v', 'libx264', '-preset', 'veryfast', '-threads', '1', '-pix_fmt', 'yuv420p', '-crf', '20', outPath], { stdio: ['pipe', 'inherit', 'inherit'] });
 const encoded = new Promise((resolve, reject) => {
   ff.once('error', reject);
   ff.once('close', (code) => code === 0 ? resolve() : reject(new Error(`ffmpeg exited with status ${code}`)));
