@@ -1,3 +1,4 @@
+#include "scene/motion/scene_actor_terrain_reaction.h"
 #include "scene/actor/scene_actor_reaction.h"
 #include "engine/engine.h"
 #include "scene/motion/scene_actor_position_search.h"
@@ -58,20 +59,6 @@ static inline s32 HeightAt(struct ContactPosition *position)
     }
     return height;
 }
-static inline void SetControl(struct ChaseActor *actor, void *callback, u32 kind)
-{
-    actor->base.field2B2 = 1;
-    actor->base.stepDone = 0;
-    actor->base.controlKind = kind;
-    actor->base.target = callback;
-    actor->base.field2C8 = 0;
-    {
-        u32 *field = &actor->base.pendingControlFlags;
-        u32 mask = ~1;
-        *field &= mask;
-    }
-    actor->base.pendingControl = 0;
-}
 static inline void *ReadNavigationShape(struct ReturnResponseGroup *const *group)
 {
     return (*group)->shape;
@@ -96,9 +83,9 @@ static inline u8 MoveTo(struct ChaseActor *owner, struct ChaseActor *actor,
 
 static inline void SetCoordinates(struct ContactPosition *out, struct ReturnResponseGroup *group)
 {
-    s16 *coordinates = group->coordinates;
-    out->x = coordinates[0];
-    out->z = coordinates[1];
+    struct SceneActorChaseRoutePoint *point = (void *)group->coordinates;
+    out->x = point->x;
+    out->z = point->z;
     out->y = HeightAt(out);
 }
 static inline void ArmCommand(struct SceneActorReactionCommand *command, void *payload, u32 kind,
@@ -109,14 +96,6 @@ static inline void ArmCommand(struct SceneActorReactionCommand *command, void *p
     command->first = 0;
     command->second = 0;
     command->kind = kind;
-}
-static inline void SetResponseState(struct ChaseActor *actor, u32 state, u32 phase, u8 behavior)
-{
-    actor->base.state2A8 = state;
-    actor->base.phase2A9 = phase;
-    actor->base.behavior2AA = behavior;
-    actor->base.counter2AC = 0;
-    actor->base.field2B1 = 1;
 }
 
 static inline u8 MoveToSource(struct ChaseActor *owner, struct ChaseActor *actor,
@@ -154,13 +133,13 @@ void SceneActorAttachment_BeginReturnResponse(struct ChaseActor *actor)
     if (!MoveToSource(owner, actor, group, group->source)) {
         SetCoordinates(&position, group);
         MoveTo(owner, actor, group, &position);
-        SetControl(actor, actor->base.onAlternateEntry, 1);
-        SetResponseState(actor, 0, 0, 2);
+        SceneActorTerrain_InstallControl(actor, actor->base.onAlternateEntry, 1);
+        SceneActorTerrain_EnterState(actor, 0, 0, 2);
     } else {
         struct SceneActorReactionCommand *command;
         SceneActorAttachment_ReplaceResponseSlot(owner, 0, 1, actor->base.category);
-        SetResponseState(actor, 3, 1, 0);
-        SetControl(actor, (void *)SceneActorReaction_RestoreAfterDelay, 14);
+        SceneActorTerrain_EnterState(actor, 3, 1, 0);
+        SceneActorTerrain_InstallControl(actor, SceneActorReaction_RestoreAfterDelay, 14);
         command = &group->command;
         ArmCommand(command, actor->base.onAlternateEntry, 7, 30);
         SceneActorChase_SetBehaviorFlags(actor, 0x10);
