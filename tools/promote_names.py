@@ -75,6 +75,7 @@ def main():
     action.add_argument("--dry-run", action="store_true")
     action.add_argument("--check", action="store_true", help="verify that the selected addresses are named")
     ap.add_argument("--only-table", type=Path, help="promote the selected addr,alias rows")
+    ap.add_argument("--wrap-renames", action="store_true", help="format C lines pushed beyond the configured width")
     args = ap.parse_args()
     if args.check and not args.only_table:
         ap.error("--check requires --only-table")
@@ -162,14 +163,21 @@ def main():
                 for label in candidates if label in alias and name not in names and name not in alias.values()}
     rewrites.update(renames)
     ref = re.compile(r"\b[A-Za-z_][A-Za-z_0-9]*\b(?!\.[ch]\b)")
+    if args.wrap_renames:
+        from reorg import column_limit, format_lines, is_upstream, overlong_rewrites
+        limit = column_limit()
+    else:
+        limit = 0
     changed = 0
     for path in sources():
         text = Path(path).read_text()
-        out = ALIAS.sub(lambda m: ((m.group(3) or "").strip() + "\n").lstrip("\n")
-                        if ((selected is not None and m.group(2) in alias)
-                            or renames.get(m.group(2)) == m.group(1)) else m.group(0), text)
+        stripped = ALIAS.sub(lambda m: ((m.group(3) or "").strip() + "\n").lstrip("\n")
+                             if ((selected is not None and m.group(2) in alias)
+                                 or renames.get(m.group(2)) == m.group(1)) else m.group(0), text)
         names_in_file = {name: alias[label] for name, label in local_aliases[path].items() if label in alias}
-        out = ref.sub(lambda m: names_in_file.get(m[0], rewrites.get(m[0], m[0])), out)
+        out = ref.sub(lambda m: names_in_file.get(m[0], rewrites.get(m[0], m[0])), stripped)
+        if limit and not is_upstream(path):
+            out = format_lines(Path(path), out, overlong_rewrites(stripped, out, limit))
         if out != text:
             Path(path).write_text(out)
             changed += 1

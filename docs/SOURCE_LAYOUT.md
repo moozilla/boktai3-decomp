@@ -195,24 +195,44 @@ From the worker checkout root, run
 `nice -n 19 sh ~/git/boktai3-decomp/tools/replay_layout.sh ~/git/boktai3-decomp`
 with the path to the reviewed checkout. The script runs these steps in order.
 
-1. Copy `reorg.py`, `source_layout.py`, `split.py`, `promote_names.py`, and `test_all.py`,
-   plus the eight tables in `symbols/`: `source_dirs.csv`, `header_dirs.csv`,
+1. Record which paths and function rows the lane changed since its fork.
+   The script uses the merge base unless you pass `--fork COMMIT` after the
+   reviewed checkout. Install the reviewed replay tools and the eight tables
+   in `symbols/`: `source_dirs.csv`, `header_dirs.csv`,
    `source_files.csv`, `function_renames.csv`, `prefix_renames.csv`,
    `type_renames.csv`, `function_aliases.csv`, and `identity_corrections.csv`.
-   Keep the worker's `functions.csv`.
+   Keep rows the lane added. The lane's `functions.csv` supplies the
+   function names during replay.
 2. Preview, apply, and check the placement.
 3. Apply exact function renames with `--skip-diverged`. Apply scoped
    prefixes with `--skip-collisions` so branch-added names and local aliases
    are available under their reviewed prefixes.
 4. Run `make disasm`, then promote `function_aliases.csv` with
    `tools/promote_names.py --only-table` and check those selected addresses.
-5. Apply the exact type table, check the layout and all three rename tables,
-   and build the stock ROM.
-6. Review reported skips and legacy type warnings, especially types a branch
+5. Apply the exact type table. The rename passes wrap C lines pushed beyond
+   the column limit. Synchronize untouched files to the reviewed commit,
+   carrying lane edits to their new paths. Keep the merged tables and combine
+   function rows by ROM address, taking the lane's replayed rows where it
+   changed them. The checked-in progress reports stay for integration.
+6. Use `--settled-references` to update retired spellings in `tools/`,
+   `port/`, and `tests/` after copying the reviewed files. This skips a
+   spelling still assigned to any active function. Check the placement and
+   rename tables and build the stock ROM.
+7. Review reported skips and legacy type warnings, especially types a branch
    added under an old prefix. Run the full test command below and commit the
    replay. Merge `main` with `git -c merge.renameLimit=20000 merge main`.
 
-An archive copy can set `BOKTAI3_REPLAY_PATHS` to an absolute path to a
+If Git reports a rename/delete conflict for the enemy particle directory,
+use the source table to match the old
+`src/monsters/enemy_particle/` path to
+`src/effects/particles/enemy_attacks/`. Keep the combined source at the
+reviewed destination and leave the old path deleted. The header lives at
+`include/effects/particles/enemy_particle.h`. Git infers renames from
+similarity, so the path can appear as a deletion and an addition even when
+the ROM range and placement agree.
+
+An archive copy can pass `--branch-ref COMMIT` and set
+`BOKTAI3_REPLAY_PATHS` to an absolute path to a
 NUL-delimited list of the archive's repository-relative paths. This lets
 the replay enumerate the archive independently of an enclosing checkout.
 
