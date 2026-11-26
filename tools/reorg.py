@@ -12,7 +12,7 @@ import sys
 
 from source_layout import (
     HEADER_DIRS, SOURCE_DIRS, SOURCE_FILES, directory_for, groups, header_paths, is_upstream,
-    layout_path, new_filename, scan, source_paths, source_placements, source_rules, symbol_names,
+    layout_path, manifest, new_filename, scan, source_paths, source_placements, source_rules, symbol_names,
 )
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -23,9 +23,16 @@ TEXT_SUFFIXES = {".c", ".h", ".csv", ".ld", ".md", ".py", ".js", ".mjs", ".html"
 IDENTIFIER = re.compile(r"[A-Za-z_][A-Za-z_0-9]*")
 SYMBOL = re.compile(r"\b[A-Za-z_][A-Za-z_0-9]*\b")
 FILE_SUFFIX = re.compile(r"\.(?:c|h|s|inc|py|ts|md)\b")
+TYPE_TAG = re.compile(r"\b(?:struct|union|enum)\s+([A-Za-z_]\w*)")
+IDENTITY_RECORDS = {Path("symbols/identities.csv"), Path("symbols/identity_corrections.csv")}
 
 
 def tracked_paths():
+    if file_list := os.environ.get("BOKTAI3_REPLAY_PATHS"):
+        paths = {Path(path) for path in Path(file_list).read_text().split("\0") if path}
+        if any(path.is_absolute() or ".." in path.parts for path in paths):
+            raise ValueError(f"{file_list}: expected repository-relative paths")
+        return paths
     out = subprocess.check_output(["git", "ls-files", "--cached", "--others", "--exclude-standard", "-z"], cwd=ROOT)
     return {Path(path) for path in out.decode().split("\0") if path}
 
@@ -90,11 +97,31 @@ def prefix_rows(table, rules, names):
     return rows
 
 
-def function_renames(table, prefixes=False, apply=False, *, skip_diverged=False):
+def skip_prefix_collisions(table, rows, names):
+    remaining = {int(row["addr"], 16): row for row in rows}
+    protected = set()
+    while True:
+        current = names | {address: row["new_name"] for address, row in remaining.items()}
+        counts = Counter(current.values())
+        collisions = [address for address, row in remaining.items() if counts[row["new_name"]] > 1]
+        if not collisions:
+            return list(remaining.values()), protected
+        for address in collisions:
+            row = remaining.pop(address)
+            protected.add(row["old_name"])
+            print(f"skip {table}: {address:08X} {row['old_name']} -> {row['new_name']} would collide",
+                  file=sys.stderr)
+
+
+def function_renames(table, prefixes=False, apply=False, *, skip_diverged=False,
+                     skip_collisions=False, warn_types=False):
     """Rewrite reviewed function symbols as one simultaneous substitution."""
     names = symbol_names(ROOT)
     rules = prefix_rules(table) if prefixes else []
     rows = prefix_rows(table, rules, names) if prefixes else table_rows(table, ("addr", "old_name", "new_name"))
+    protected = set()
+    if skip_collisions:
+        rows, protected = skip_prefix_collisions(table, rows, names)
     new_names, replacements, settled, seen = {}, {}, set(), set()
     for row in rows:
         address = int(row["addr"] or "", 16)
@@ -122,7 +149,8 @@ def function_renames(table, prefixes=False, apply=False, *, skip_diverged=False)
     if settled & replacements.keys():
         raise ValueError(f"{table}: a completed rename overlaps a pending old name")
     replacements.update({old + "__addr": new + "__addr" for old, new in list(replacements.items())})
-    return rewrite_identifiers(table, replacements, apply, prefix_scopes=rules)
+    return rewrite_identifiers(table, replacements, apply, prefix_scopes=rules,
+                               protected=protected, warn_types=warn_types)
 
 
 def type_renames(table, apply=False):
@@ -141,9 +169,12 @@ def type_renames(table, apply=False):
     return rewrite_identifiers(table, by_scope.pop("all", {}), apply, exact_scopes=by_scope)
 
 
-def rewrite_identifiers(table, replacements, apply, *, prefix_scopes=(), exact_scopes=None):
+def rewrite_identifiers(table, replacements, apply, *, prefix_scopes=(), exact_scopes=None,
+                        protected=(), warn_types=False):
     if not (replacements or prefix_scopes or exact_scopes):
         return 0
+
+    warned = set()
 
     def rewrite(raw, rel):
         path = rel.as_posix()
@@ -151,9 +182,18 @@ def rewrite_identifiers(table, replacements, apply, *, prefix_scopes=(), exact_s
         prefixes = [(old, new) for old, new, scope in prefix_scopes
                     if rel.suffix in (".c", ".h") and in_scope(path, scope)]
         starts = tuple(old for old, _ in prefixes)
+        if warn_types and prefixes:
+            type_prefixes = tuple(old.rstrip("_") for old in starts if old.endswith("_"))
+            for name in TYPE_TAG.findall(raw):
+                if name not in warned and name.startswith(type_prefixes):
+                    warned.add(name)
+                    print(f"warning: {rel}: check legacy type {name} against the reviewed type table",
+                          file=sys.stderr)
 
         def replace(match):
             name = match[0]
+            if protected and name.removesuffix("__addr") in protected:
+                return name
             renamed = replacements.get(name)
             if renamed is None and (exact or name.startswith(starts)):
                 choices = {names[name] for names in exact if name in names}
@@ -170,7 +210,8 @@ def rewrite_identifiers(table, replacements, apply, *, prefix_scopes=(), exact_s
     changed = []
     input_table = table.resolve()
     for rel in sorted(paths):
-        if (rel.parts[0] == "build" or rel.parts[:2] == ("docs", "history") or
+        if (rel.parts[0] in ("build", "notes") or rel in IDENTITY_RECORDS or
+                rel.parts[:2] == ("docs", "history") or
                 rel.name in ("PROGRESS.json", "PROGRESS.md") or
                 rel in (Path("symbols/function_renames.csv"), Path("symbols/type_renames.csv"),
                         Path("symbols/prefix_renames.csv")) or
@@ -188,6 +229,7 @@ def rewrite_identifiers(table, replacements, apply, *, prefix_scopes=(), exact_s
     if apply:
         write_updates(changed)
         symbol_names.cache_clear()
+        manifest.cache_clear()
     return len(changed)
 
 
@@ -333,7 +375,7 @@ def rewrite_moves(recorded, moves, apply, *, input_table=None):
     paths = set(moves)
     for path in tracked_paths():
         if (path.parts[0] not in ("src", "include", "tests", "build") and path.suffix in TEXT_SUFFIXES
-                and path not in (SOURCE_DIRS, SOURCE_FILES, HEADER_DIRS)
+                and path not in (SOURCE_DIRS, SOURCE_FILES, HEADER_DIRS, Path("symbols/identity_corrections.csv"))
                 and path not in (Path("PROGRESS.md"), Path("docs/SOURCE_LAYOUT_DECISIONS.md"))
                 and path.parts[:2] != ("docs", "history")):
             paths.add(path)
@@ -455,13 +497,18 @@ def main():
     operation.add_argument("--type-renames", type=Path, help="read exact old_name,new_name identifier rows")
     parser.add_argument("--skip-diverged", action="store_true",
                         help="report and skip exact rows with a different symbol at the address")
+    parser.add_argument("--skip-collisions", action="store_true", help="report and skip colliding prefix renames")
+    parser.add_argument("--warn-types", action="store_true", help="report remaining scoped legacy type tags")
     args = parser.parse_args()
     if args.skip_diverged and not args.function_renames:
         parser.error("--skip-diverged requires --function-renames")
+    if (args.skip_collisions or args.warn_types) and not args.function_prefixes:
+        parser.error("--skip-collisions and --warn-types require --function-prefixes")
     try:
         if table := args.function_renames or args.function_prefixes:
             changes = function_renames(table, prefixes=args.function_prefixes is not None,
-                                       apply=args.apply, skip_diverged=args.skip_diverged)
+                                       apply=args.apply, skip_diverged=args.skip_diverged,
+                                       skip_collisions=args.skip_collisions, warn_types=args.warn_types)
         elif args.type_renames:
             changes = type_renames(args.type_renames, args.apply)
         elif args.player_moves:

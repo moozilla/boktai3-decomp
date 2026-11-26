@@ -8,7 +8,7 @@ from returns import repair_returns, verify_returns
 ROOT = Path(__file__).resolve().parents[2]
 ROOT_SRC = ROOT / 'src'
 sys.path.insert(0, str(ROOT / 'tools'))
-from source_layout import new_filename, resolve, symbol_names
+from source_layout import resolve
 
 
 def source_units(root, *functions):
@@ -16,12 +16,8 @@ def source_units(root, *functions):
 
 
 @cache
-def _function_basenames(*addresses):
-    """Recognize the address and symbol basenames of the same translation unit."""
-    names = symbol_names(ROOT)
-    basenames = {f'sub_{address:08X}.c' for address in addresses}
-    basenames.update(new_filename(names[address], address) for address in addresses if address in names)
-    return frozenset(basenames)
+def _function_sources(*functions):
+    return frozenset(ROOT / source for source in source_units(ROOT, *functions))
 
 
 def prepare_source(path, target):
@@ -46,21 +42,21 @@ def prepare_source(path, target):
     if path.name == 'ghost.c':
         # Called before its prototype; agbcc accepts the implicit int, clang does not.
         text = 'void Anim_SetDurationScale(void *, unsigned int);\n' + text
-    if path.name in _function_basenames(0x08224980):
+    if path in _function_sources('RfuManager_NotifyEvent'):
         # The portable SDK call-via bridge returns a word; this caller ignores it.
         text = text.replace('void sub_08249240(', 'int sub_08249240(')
-    if path.name in _function_basenames(0x08228C40):
+    if path in _function_sources('SunClock_SetDateTime'):
         # The GBA call carries the incoming date in r0/r1/r2 unchanged.
         # wasm needs explicit arguments; see the original 08228C40 prologue.
         text = text.replace('u32 Clock_PackDate(void);', 'u32 Clock_PackDate(s32, s32, s32);')
         text = text.replace('Clock_PackDate();', 'Clock_PackDate(a, b, c);')
-    if path.name in _function_basenames(0x082290F4, 0x08229380):
+    if path in _function_sources('Clock_CheckRtcDate', 'Clock_SyncFromRtc'):
         # These callers discard the result, but wasm still checks the type.
         text = text.replace('void SunClock_SetDateTime(', 's32 SunClock_SetDateTime(')
     if path.name == 'sub_08213D10.c':
         # The dispatcher copy is data; a wasm function pointer is not ROM bytes.
         text = text.replace('(u32)IntrMain', '(u32)0x080001f0')
-    if path.name in _function_basenames(0x082486B4):
+    if path in _function_sources('Eeprom_ReadBlock'):
         text = text.replace('(u8 *)ptr += (gEEPROMConfig->address_width << 1) + 1;',
                             'ptr = (u16 *)((u8 *)ptr + (gEEPROMConfig->address_width << 1) + 1);')
         text = text.replace('((u8 *)ptr)++;', 'ptr = (u16 *)((u8 *)ptr + 1);')

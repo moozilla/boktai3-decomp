@@ -174,25 +174,36 @@ unique owner reports which table to update.
 
 ### Replay on a worker branch
 
-1. Bring `tools/reorg.py`, `tools/source_layout.py`, `tools/promote_names.py`,
-   and the placement and rename tables listed below from `main` onto the
-   worker branch.
-2. Run `python3 tools/reorg.py` from the repository root. The preview should
-   succeed, and every destination should use the current top-level layout.
-3. Run `python3 tools/reorg.py --apply`, then `python3 tools/reorg.py --check`.
-4. Run `make disasm`, then `python3 tools/promote_names.py --only-table
-   symbols/function_aliases.csv` to promote the selected address aliases.
-5. Run `python3 tools/reorg.py --function-renames symbols/function_renames.csv
-   --skip-diverged --apply`. Review every reported skip. The address table
-   accepts the reviewed earlier spellings and reports a branch's own name.
-6. Run `python3 tools/reorg.py --function-prefixes symbols/prefix_renames.csv
-   --apply`. The prefix rules follow defining files, including branch-added
-   functions and file-local helpers in the recorded directories.
-7. Run `python3 tools/reorg.py --type-renames symbols/type_renames.csv --apply`.
-8. Repeat each reorg command with `--check` in place of `--apply` and build
-   the stock ROM. Review the exact-table skips before committing.
-9. Commit the replay and merge `main` with a high rename limit, for example
-   `git -c merge.renameLimit=20000 merge main`.
+From the worker checkout root, run
+`nice -n 19 sh ~/git/boktai3-decomp/tools/replay_layout.sh ~/git/boktai3-decomp`
+with the path to the reviewed checkout. The script runs these steps in order.
+
+1. Copy `reorg.py`, `source_layout.py`, `split.py`, `promote_names.py`, and `test_all.py`,
+   plus the eight tables in `symbols/`: `source_dirs.csv`, `header_dirs.csv`,
+   `source_files.csv`, `function_renames.csv`, `prefix_renames.csv`,
+   `type_renames.csv`, `function_aliases.csv`, and `identity_corrections.csv`.
+   Keep the worker's `functions.csv`.
+2. Preview, apply, and check the placement.
+3. Apply exact function renames with `--skip-diverged`. Apply scoped
+   prefixes with `--skip-collisions` so branch-added names and local aliases
+   are available under their reviewed prefixes.
+4. Run `make disasm`, then promote `function_aliases.csv` with
+   `tools/promote_names.py --only-table` and check those selected addresses.
+5. Apply the exact type table, check the layout and all three rename tables,
+   and build the stock ROM.
+6. Review reported skips and legacy type warnings, especially types a branch
+   added under an old prefix. Run the full test command below and commit the
+   replay. Merge `main` with `git -c merge.renameLimit=20000 merge main`.
+
+An archive copy can set `BOKTAI3_REPLAY_PATHS` to an absolute path to a
+NUL-delimited list of the archive's repository-relative paths. This lets
+the replay enumerate the archive independently of an enclosing checkout.
+
+### Full Python tests
+
+Run `build/venv/bin/python tools/test_all.py` from the repository root. It
+runs discovery separately in every directory containing `test_*.py`,
+including `tests/tools/` and the tooling suites under `tools/`.
 
 ### Reviewed tables
 

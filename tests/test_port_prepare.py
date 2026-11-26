@@ -25,11 +25,20 @@ class PrepareSourceTests(unittest.TestCase):
              'ptr = (u16 *)((u8 *)ptr + 1);'),
         )
         names = symbol_names(ROOT)
+        self.addCleanup(prepare._function_sources.cache_clear)
         for address, content, adaptation in sources:
             symbol = names[address]
-            with self.subTest(symbol=symbol), patch.object(Path, 'read_text', return_value=content):
-                old = ROOT / 'src' / f'sub_{address:08X}.c'
-                named = old.with_name(new_filename(symbol, address))
-                prepared = prepare.prepare_source(old, 'wasm32')
-                self.assertIn(adaptation, prepared)
-                self.assertEqual(prepare.prepare_source(named, 'wasm32'), prepared)
+            old = Path('src', f'sub_{address:08X}.c')
+            named = old.with_name(new_filename(symbol, address))
+            prepared = []
+            for source in (old, named):
+                def locate(function, root):
+                    return source if function == symbol else Path('src', f'{function}.fixture.c')
+
+                prepare._function_sources.cache_clear()
+                with self.subTest(symbol=symbol, basename=source.name), \
+                     patch.object(Path, 'read_text', return_value=content), \
+                     patch.object(prepare, 'resolve', side_effect=locate):
+                    prepared.append(prepare.prepare_source(ROOT / source, 'wasm32'))
+                    self.assertIn(adaptation, prepared[-1])
+            self.assertEqual(*prepared)

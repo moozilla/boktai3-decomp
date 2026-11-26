@@ -144,6 +144,7 @@ RisingSprite_,RecoilPuff_,,Observed identity of the defining unit (Pass 4),src/p
 ParticleEffect_,ActionFlash_,,Observed identity of the defining unit (Pass 4),src/player/effects/action_flash/
 ActorBurst_,ActionFlashBurst_,,Observed identity of the defining unit (Pass 4),src/player/effects/action_flash/
 PlayerBarrier_,PileTrap_,,Observed identity of the defining unit (Pass 4),src/player/pile_trap/
+Player_UpdateBarrierRecovery,PileTrap_UpdateSolarPileRecovery,,Promote the recovery alias after exact replay,src/player/motions/sub_08144AAC.c
 TentacleSpread_,CentipedeSpread_,,Observed identity of the defining unit (Pass 4),src/monsters/centipede/
 TentacleSpread_,CentipedeSpread_,,Observed identity of the defining unit (Pass 4),src/monsters/slime.c
 TentacleSpread_,CentipedeSpread_,,Observed identity of the defining unit (Pass 4),include/monsters/centipede_spread.h

@@ -58,9 +58,13 @@ def selected_aliases(path):
 
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("--dry-run", action="store_true")
+    action = ap.add_mutually_exclusive_group()
+    action.add_argument("--dry-run", action="store_true")
+    action.add_argument("--check", action="store_true", help="verify that the selected addresses are named")
     ap.add_argument("--only-table", type=Path, help="promote the selected addr,alias rows")
     args = ap.parse_args()
+    if args.check and not args.only_table:
+        ap.error("--check requires --only-table")
 
     with open(CSV, newline="") as stream:
         reader = csv.DictReader(stream)
@@ -72,8 +76,19 @@ def main():
             row[fields[-1]] = ",".join((row[fields[-1]], *extra))
     by_addr = {r["addr"].upper(): r["name"] for r in rows}
     names = set(by_addr.values())
-    labels = func_labels()
     selected = selected_aliases(args.only_table) if args.only_table else None
+    if args.check:
+        missing = []
+        for label, name in selected.items():
+            current = by_addr.get(label[4:])
+            if current is None:
+                missing.append(f"{label}: {name}")
+            elif current != name:
+                print(f"skip {label}: branch retained {current} (reviewed name {name})", file=sys.stderr)
+        if missing:
+            sys.exit("Selected aliases still absent from functions.csv:\n" + "\n".join(missing))
+        return
+    labels = func_labels()
     alias = {}  # sub_X -> Name
     alternatives = {}
     for path in sources():

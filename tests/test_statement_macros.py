@@ -3,6 +3,7 @@ from pathlib import Path
 import sys
 import tempfile
 import unittest
+from unittest.mock import patch
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "tools"))
@@ -87,8 +88,8 @@ class RepoMacros(unittest.TestCase):
 
     def test_progress_marks_its_users(self):
         import progress
-        self.assertIn("single-use-macro", progress.hint_kinds("void f(void) { %s(x); }" % sorted(
-            __import__("statement_macros").single_use_names())[0]))
+        with patch.object(sm, "single_use_names", return_value={"BUMP"}):
+            self.assertIn("single-use-macro", progress.hint_kinds("void f(void) { BUMP(x); }"))
 
 
 if __name__ == "__main__":

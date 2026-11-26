@@ -186,6 +186,25 @@ class ReorgTests(unittest.TestCase):
             self.assertIn("Player_HandleSprite(struct PlayerSprite *it)", (root / player).read_text())
             self.assertIn("Player_Step(void)", (root / player).read_text())
 
+    def test_prefix_replay_reports_collisions_and_leaves_audit_records(self):
+        path = "src/engine/probe.c"
+        audit = ["symbols/identities.csv", "symbols/identity_corrections.csv", "notes/identities.md"]
+        files = {
+            "symbols/functions.csv": "addr,name\n08001000,Old_Move\n08001020,New_Move\n08001040,Old_Step\n",
+            path: "struct OldBody;\nvoid Old_Move(void) {}\nvoid Old_Step(void) { Old_Move(); }\n",
+            "symbols/prefix_renames.csv": "old_prefix,new_prefix,scope\nOld_,New_,src/engine/\n",
+            **{name: "Old_Step\n" for name in audit},
+        }
+        with fixture(files) as root, contextlib.redirect_stderr(io.StringIO()) as messages:
+            table = root / "symbols/prefix_renames.csv"
+            self.assertEqual(reorg.function_renames(table, prefixes=True, apply=True,
+                                                   skip_collisions=True, warn_types=True), 2)
+            self.assertIn("Old_Move -> New_Move would collide", messages.getvalue())
+            self.assertIn("check legacy type OldBody", messages.getvalue())
+            self.assertIn("void New_Step(void) { Old_Move(); }", (root / path).read_text())
+            for name in audit:
+                self.assertEqual((root / name).read_text(), files[name])
+
     def test_type_renames_keep_related_identifiers_and_the_input_table_intact(self):
         path = "include/engine/video/sprite.h"
         table_path = "symbols/type_renames.csv"
