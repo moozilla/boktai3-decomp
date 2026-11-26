@@ -16,7 +16,9 @@ struct Golem {
     u8 unknown636[2];
     struct ChaseRouteProbe routeProbe;
     struct ContactPosition destination;
-    u8 unknown664[0x1C];
+    u8 unknown664[0x10];
+    u8 unknown674[8];
+    u32 field67C;
     s16 routeDelay;
     s16 pushSpeed;
     u16 field684;
@@ -37,5 +39,6 @@ struct Golem {
     u16 shakeStrength;
     u16 shakeTimer;
 };
+typedef char GolemSize[(sizeof(struct Golem) == 0x6B0) ? 1 : -1];
 
 #endif // GUARD_GOLEM_H

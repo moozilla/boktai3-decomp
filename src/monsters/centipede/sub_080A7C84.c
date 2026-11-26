@@ -1,5 +1,7 @@
 #include "scene/motion/scene_actor_chase_reaction.h"
+#include "monsters/scene_route_sample.h"
 #include "global.h"
+#include "monsters/centipede/centipede_body.h"
 #include "scene/actor/scene_actor_reaction.h"
 #include "scene/motion/scene_actor_terrain.h"
 #include "scene/motion/scene_actor_chase.h"
@@ -19,12 +21,6 @@ static inline u8 Take(u8 *p)
     return 0;
 }
 
-static inline s32 Shift(s32 n, u32 bits)
-{
-    if (n >= 0)
-        return n >> bits;
-    return -((-n) >> bits);
-}
 
 static inline void State0(struct ChaseActor *a)
 {
@@ -63,15 +59,16 @@ void Centipede_UpdateSegmentPositions(void *, s32, s32);
 void Centipede_UpdateOscillation(void *, s32, s32);
 static inline u8 Approach(struct ChaseActor *actor, struct SavedMotion *saved, s32 speed)
 {
-    u8 *motion = (u8 *)actor + 0x50;
-    s16 dx = saved->position.x - *(u16 *)(motion + 12);
-    s16 dz = saved->position.z - *(u16 *)(motion + 16);
+    struct SceneActorBody *body = &actor->base.body;
+    s16 dx = saved->position.x - body->position.x;
+    s16 dz = saved->position.z - body->position.z;
     if ((dx < 0 ? -dx : dx) <= 32 && (dz < 0 ? -dz : dz) <= 32)
         return 1;
     if (dx || dz) {
-        motion[9] = Math_Atan2(dx, dz);
-        *(u16 *)(motion + 20) += Shift(gUnk_086149C4[(motion[9] + 64) & 255] * speed, 12);
-        *(u16 *)(motion + 24) += Shift(gUnk_086149C4[motion[9]] * speed, 12);
+        body->direction = Math_Atan2(dx, dz);
+        body->motion.x +=
+            SceneRoute_ScaleComponent(gUnk_086149C4[(body->direction + 64) & 255] * speed);
+        body->motion.z += SceneRoute_ScaleComponent(gUnk_086149C4[body->direction] * speed);
     }
     return 0;
 }
@@ -79,45 +76,42 @@ static inline void Scale(struct ChaseActor *actor)
 {
     u16 *scale = SceneActorChase_PrepareAnimationScale(actor, 0xA02F);
     if (actor->base.drawableKind == 0)
-        Anim_SetDurationScale((u8 *)actor->base.drawable + 0x48, *scale);
+        Anim_SetDurationScale(&((struct SceneActorAnimationSequenceDrawable *)actor->base.drawable)->sequence, *scale);
     else
-        Anim_SetFrameDurationScale((u8 *)actor->base.drawable + 0x20, *scale);
+        Anim_SetFrameDurationScale(&((struct SceneActorAnimationTileDrawable *)actor->base.drawable)->tile, *scale);
 }
 // confidence=low: pursues saved waypoints with an 800-frame transition.
 void CentipedeBody_UpdatePursuit(struct ChaseActor *actor)
 {
-    u8 *body = actor->base.context;
+    struct TentacleBody *body = actor->base.context;
     s32 speed;
-    u32 o;
     struct ContactPosition delta;
-    typeof(o) t1;
     if (Take(&actor->base.field2B1)) {
         SceneActorChase_SetControl(actor, actor->base.onAlternateEntry, 1);
         Centipede_ResetOscillation(actor);
         {
-            u32 direction = (((*(((u8 *)actor) + 0xE9)) + 32) & 255) >> 6;
-            body[0x8E9] = direction;
+            u32 direction = (((actor->base.tracking.heading) + 32) & 255) >> 6;
+            body->wanderDirection = direction;
         }
-        body[0x8E8] = 0;
+        body->wanderAttempts = 0;
         Centipede_SelectWanderRoute(actor);
     }
-    o = (t1 = 0x270);
-    if ((u8)Callback_InvokeActor(actor, *((void **)(((u8 *)actor) + o)))) {
+    if ((u8)Callback_InvokeActor(actor, actor->base.contactQuery.opaque)) {
         State0(actor);
         return;
     }
-    if ((*((s16 *)(body + 0x8D6))) <= 0)
-        *((s16 *)(body + 0x8D6)) = 1;
-    speed = Callback_InvokeActor(actor, *((void **)(((u8 *)actor) + 0x260)));
+    if (body->hitReactionTimer <= 0)
+        body->hitReactionTimer = 1;
+    speed = Callback_InvokeActor(actor, actor->base.animationQuery.opaque);
     Scale(actor);
-    if (Approach(actor, (void *)(body + 0x8F8), speed)) {
+    if (Approach(actor, (void *)((u8 *)body + 0x8F8), speed)) {
         Centipede_SelectWanderRoute(actor);
-        Chase_Delta(&delta, &actor->base.body.position, (void *)(body + 0x904));
-        *(((u8 *)actor) + 0x3CD) = Math_Atan2(delta.x, delta.z);
+        Chase_Delta(&delta, &actor->base.body.position, &body->waypoint);
+        actor->base.nextDirection = Math_Atan2(delta.x, delta.z);
     }
     Centipede_AdvanceMotionPhase(actor, speed);
     {
-        u16 *p = (void *)(body + 0x8E4);
+        u16 *p = &body->routeMotionTimer;
         if (*p) {
             Centipede_UpdateSegmentPositions(actor, 18, 0x1000);
             --(*p);

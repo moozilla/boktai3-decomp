@@ -520,6 +520,7 @@ include/monsters/armor/armor_decision_ops.h,include/monsters/armor/armor_decisio
 include/monsters/armor/armor_part_queue.h,include/monsters/armor/armor_part_queue.h,beside its unit,,
 include/monsters/armor/motion_0818.h,include/monsters/armor/spinning_approach_chain.h,beside its unit; renamed from motion_0818.h,,
 include/monsters/axe/axe.h,include/monsters/axe/axe.h,beside its unit,,
+include/monsters/axe_armor/axe_armor.h,include/monsters/axe_armor/axe_armor.h,beside its unit,,
 include/monsters/bat/bat.h,include/monsters/bat.h,beside its unit,,
 include/monsters/bee/bee.h,include/monsters/bee.h,beside its unit,,
 include/monsters/crow/crow.h,include/monsters/crow.h,beside its unit,,

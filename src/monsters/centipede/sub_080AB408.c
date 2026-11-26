@@ -1,4 +1,5 @@
 #include "global.h"
+#include "scene/motion/scene_actor_availability.h"
 #include "scene/actor/scene_actor_reset.h"
 #include "scene/motion/scene_actor_chase_shared.h"
 s32 Div(s32, s32);
@@ -9,20 +10,10 @@ struct ActorTrail {
     u8 unknown8D8[0x1C];
     u16 soundDelay;
 };
-static inline u32 stateFlag(struct ChaseActor *p, u32 mask)
-{
-    return p->base.motionFlags & mask;
-}
-static inline u8 unavailable(struct ChaseActor *p)
-{
-    if (p && (stateFlag(p, 0x40) || SceneActorChase_StatusFlags(p, 0x20000) || p->base.health <= 0))
-        return 1;
-    return 0;
-}
 void ActorTrail_UpdateTimedScale(struct ChaseActor *actor)
 {
     struct ActorTrail *trail;
-    if (unavailable(actor))
+    if (SceneActor_ActionsBlocked(actor))
         return;
     trail = actor->base.context;
     if (trail->timer > 0) {

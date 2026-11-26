@@ -93,13 +93,7 @@ void ActorController_UpdateAttackCollider(struct SceneCombatActor *actor)
             if (actor->animationComplete != 0) {
                 *phase = 0xFF;
                 actor->actionReady = initialPhase;
-                {
-                    u16 *flags = &actor->colliderGroup.colliders[0].flags;
-                    u32 oldFlags = *flags;
-                    u32 activeFlag = 4;
-                    activeFlag |= oldFlags;
-                    *flags = activeFlag;
-                }
+                actor->colliderGroup.colliders[0].flags |= 4;
             }
             break;
     }
@@ -259,20 +253,8 @@ void ActorController_UpdateMovementVelocity(struct SceneCombatActor *actor)
 {
     ActorController_UpdateMovingAttackCollider(actor);
     if ((u16)(actor->animationEvent - 7) <= 4) {
-        struct ActorControllerVelocity *velocity;
-        u8 *heading;
-        int angle, speed;
         actor->flags |= 0x20;
-        heading = &actor->heading;
-        velocity = &actor->velocity;
-        angle = *heading;
-        speed = 25;
-        {
-            int x = ActorController_TruncateFixed(gUnk_086149C4[(angle + 64) & 255] * speed);
-            velocity->x = x;
-            velocity->y = 0;
-        }
-        velocity->z = ActorController_TruncateFixed(gUnk_086149C4[angle] * speed);
+        ActorController_SetMotion(&actor->velocity, actor->heading, 25);
     } else
         actor->flags &= ~0x20;
 }

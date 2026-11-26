@@ -79,9 +79,8 @@ static inline void Golem_SelectAnimation(struct ChaseActor *actor, u32 selection
         }
         *savedSelection = selection;
         {
-            u32 mask = 4;
             u32 mode;
-            if (flags & mask)
+            if (flags & 4)
                 mode = 6;
             else
                 mode = 4;
@@ -90,7 +89,7 @@ static inline void Golem_SelectAnimation(struct ChaseActor *actor, u32 selection
                 actor->base.drawable, (u16)selection, 2, (u16)mode);
             flags &= 1;
             if (flags)
-                tile->flags |= mask;
+                tile->flags |= 4;
             else
                 tile->flags &= ~4;
         }

@@ -209,8 +209,8 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [docs/SHARED_MONSTER_REACTIONS.md](../docs/SHARED_MONSTER_REACTIONS.md) | Shared monster pursuit and contact operations | #matching #scene-actor #golem #skeleton #ghoul #mummy #regalloc #080C9C04 #080C12FC #0808B3EC #080DA97C #080D2584 #08078EE8 | 9 |
 | [docs/SHIFTABILITY.md](../docs/SHIFTABILITY.md) | Shiftable data: how it was proven | #tooling #assets | 1 |
 | [docs/SOLAR_SENSOR.md](../docs/SOLAR_SENSOR.md) | Cartridge solar sensor: code and runtime evidence | *#hardware* | 5 |
-| [docs/SOURCE_LAYOUT.md](../docs/SOURCE_LAYOUT.md) | Source layout | #tooling #process | 13 |
-| [docs/SOURCE_LAYOUT_DECISIONS.md](../docs/SOURCE_LAYOUT_DECISIONS.md) | Source layout pass 3: decisions | #tooling #process | 13 |
+| [docs/SOURCE_LAYOUT.md](../docs/SOURCE_LAYOUT.md) | Source layout | #tooling #process | 15 |
+| [docs/SOURCE_LAYOUT_DECISIONS.md](../docs/SOURCE_LAYOUT_DECISIONS.md) | Source layout pass 3: decisions | #tooling #process | 14 |
 | [docs/SPARK_PARTICLE.md](../docs/SPARK_PARTICLE.md) | Moving tile particles (tentative identity) | *#particles #assets* | 3 |
 | [docs/SPRITE_EFFECT_CONTROLLER.md](../docs/SPRITE_EFFECT_CONTROLLER.md) | Sprite effect controllers (tentative) | *#assets* | 2 |
 | [docs/SPRITE_EFFECT_STEERING_ACTORS.md](../docs/SPRITE_EFFECT_STEERING_ACTORS.md) | Sprite/effect controllers and steering actors (0806B2C4–0806CA3C) | *#actors #assets* | 13 |
@@ -242,7 +242,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [docs/history/2026-11-17.md](../docs/history/2026-11-17.md) | 2026-11-17 | #compiler #depin #matching #phase3 #round13 #round15 #structs | 3 |
 | [docs/history/2026-11-20.md](../docs/history/2026-11-20.md) | 2026-11-20 | #actors #compiler #matching #monsters #phase3 #scene #scene-actors #tooling #wireless | 2 |
 | [docs/history/2026-11-25.md](../docs/history/2026-11-25.md) | Work log, 2026-11-25 | #actors #assets #compiler #hardware #matching #menu #phase3 #process #scene #tooling | 5 |
-| [docs/history/2026-11-26.md](../docs/history/2026-11-26.md) | Work log, 2026-11-26 | #actors #autopilot #compiler #matching #menu #phase3 #port #scripts #tooling #tools #types #verification | 11 |
+| [docs/history/2026-11-26.md](../docs/history/2026-11-26.md) | Work log, 2026-11-26 | #actors #autopilot #compiler #matching #menu #monsters #phase3 #port #scripts #tooling #tools #types #verification | 12 |
 | [docs/history/HANDOFF_2026-10-23.md](../docs/history/HANDOFF_2026-10-23.md) | Handoff: current state and how to continue | #process | 14 |
 | [docs/history/MANAGER_HANDOFF_2026-10-19.md](../docs/history/MANAGER_HANDOFF_2026-10-19.md) | Manager handoff (2026-10-19) | #process #tooling | 6 |
 | [docs/history/README.md](../docs/history/README.md) | Handoff history |  | 17 |
@@ -291,9 +291,12 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [notes/cloud-081AA438.md](../notes/cloud-081AA438.md) | Cloud task 081AA438 (Vanargand phase scripts) | *#scripts* | 3 |
 | [notes/cloud-08228DB8.md](../notes/cloud-08228DB8.md) | Cloud task 08228DB8: SunClock_GetPhase (and Camera_SetPosition) |  | 3 |
 | [notes/cloud-08231A0C.md](../notes/cloud-08231A0C.md) | Cloud task 08231A0C | *#animation #assets* | 1 |
+| [notes/codex-centipede-armor-cleanup_2026-11-26.md](../notes/codex-centipede-armor-cleanup_2026-11-26.md) | Centipede and Armor actor cleanup | #monsters #types #phase3 #matching | 3 |
 | [notes/codex-high.md](../notes/codex-high.md) | Codex high: task 0808AF38 | #matching #ghoul #slime #register-pinning | 244 |
 | [notes/codex-low.md](../notes/codex-low.md) | Task 080D812C — 2026-10-20 | #matching #dog | 376 |
 | [notes/codex-medium.md](../notes/codex-medium.md) | Codex medium worker: task 080D6FDC | #matching #scene-actor #terrain #mummy #dog | 476 |
+| [notes/codex-monster-continuation_2026-11-26.md](../notes/codex-monster-continuation_2026-11-26.md) | Monster route, control, and sprite follow-up | #monsters #types #phase3 #matching | 7 |
+| [notes/codex-monster-layout-cleanup_2026-11-26.md](../notes/codex-monster-layout-cleanup_2026-11-26.md) | Golem, Dog, Axe and Axe Armor layouts | #monsters #types #phase3 #matching | 3 |
 | [notes/collision-process-pairs-round9.md](../notes/collision-process-pairs-round9.md) | Collision_ProcessPairs |  | 0 |
 | [notes/compiler-debugger-2026-10-23.md](../notes/compiler-debugger-2026-10-23.md) | Compiler debugger: first session (2026-10-23) | #matching #tooling #regalloc | 12 |
 | [notes/contact-actor-pool_2026-10-14.md](../notes/contact-actor-pool_2026-10-14.md) | Contact actor pool setup and display (tentative) | *#actors* | 7 |

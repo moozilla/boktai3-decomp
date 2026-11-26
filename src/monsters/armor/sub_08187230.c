@@ -1,4 +1,5 @@
 #include "global.h"
+#include "monsters/armor/armor_part_queue.h"
 #include "system/game_state/game_state.h"
 #include "scene/actor/scene_actor_components.h"
 #include "scene/collision/contact_collider.h"
@@ -18,7 +19,7 @@ struct ArmorDecisionActor {
     u8 padb3a[2];
     u8 behavior, phase;
     u8 padB3E[0xB58 - 0xB3E];
-    u8 sequence[0x1120 - 0xB58];
+    struct ArmorLaunchGroup sequence;
     u8 decision, fastMode;
     s16 attackCooldown, secondaryCooldown, collisionCooldown;
 };
@@ -189,7 +190,7 @@ void Armor_UpdateAxisAttackDecision(struct ArmorDecisionActor *p)
                 }
             far:
                 if (++p->collisionCooldown > 300 &&
-                    Armor_IsSequenceIncomplete(p->sequence)) {
+                    Armor_IsSequenceIncomplete(&p->sequence)) {
                     ActorController_SetBehavior(p, 31);
                     p->collisionCooldown = 0;
                     break;

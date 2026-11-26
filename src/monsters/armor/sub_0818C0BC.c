@@ -1,4 +1,4 @@
-#include "global.h"
+#include "monsters/armor/scene_combat_actor.h"
 
 s32 Script_GetValue(void);
 s32 Script_SeekToKeyword(u32);
@@ -106,17 +106,16 @@ struct S {
 
 s32 Armor_InitFromScript(struct S *p, u32 arg)
 {
+    struct SceneCombatActor *actor = (void *)p;
     struct T t;
     void *q;
     u32 r;
     s32 i;
-    struct E *e;
     u32 *n;
     u8 *a;
     u8 *w;
     u8 *x;
     struct T *y;
-    u32 z0;
     u32 one;
 
     t.a = 0x480;
@@ -172,15 +171,10 @@ s32 Armor_InitFromScript(struct S *p, u32 arg)
     x = p->f3c;
     y = &p->fd4;
     a = p->f18;
-    z0 = 0;
-    e = &p->e[1];
-    e += 2;
-    i = 8;
-    do {
-        e->a = z0;
-        e->b = z0;
-        e++;
-    } while (--i >= 0);
+    for (i = 0; i < 9; i++) {
+        actor->fragments[i].update = NULL;
+        actor->fragments[i].destroy = NULL;
+    }
     AnimData_Load(p->f2e0, 0x24B9);
     AnimData_Load(p->f2fc, 0x24B9);
     AnimData_Load(p->f318, 0x24B9);

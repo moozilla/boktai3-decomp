@@ -54,7 +54,7 @@ def src_files(paths=None, skip=()):
 
 def check(rel):
     """(matched, last line of tools/check.py's output)."""
-    r = subprocess.run([sys.executable, os.path.join(TOOLS, "check.py"), rel, "--quiet"], cwd=ROOT,
+    r = subprocess.run([sys.executable, os.path.join(TOOLS, "check.py"), rel, "--match-only"], cwd=ROOT,
                        capture_output=True, text=True)
     lines = (r.stdout.strip() or r.stderr.strip() or "?").splitlines()
     matched = r.returncode == 0 and ": MATCH (" in r.stdout

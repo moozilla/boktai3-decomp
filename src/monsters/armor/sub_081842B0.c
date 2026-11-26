@@ -12,7 +12,7 @@ void ScaledShadow_Disable(void *);
 void ActorMarker_InitMovingSprite(void *);
 void SceneCombatActor_SpawnBouncingEffect(u8 *);
 void ActorMarker_LaunchFragments(u8 *, u32);
-void SpriteColliderGroup_ResetActiveParts(void *);
+void SpriteColliderGroup_ResetActiveParts(struct ArmorLaunchGroup *);
 void ActorMarker_InitOffsetPosition(u8 *);
 static inline void Armor_CheckFlagRefresh(u8 *q)
 {
@@ -27,19 +27,19 @@ void Armor_UpdateDefeatSequence(struct SceneCombatActor *actor)
     switch (st) {
         case 0: {
             u32 one;
-            Armor_SetAnimationFromStart(actor, &gUnk_0824EE40[((p[0xb39] + 0x60) >> 6) & 3]);
+            Armor_SetAnimationFromStart(actor, &gUnk_0824EE40[((actor->heading + 0x60) >> 6) & 3]);
             (*s)++;
-            p[0xb41] = st;
+            actor->actionReady = st;
             ((struct ContactCollider *)(p + 0x238))->flags |= 4;
             ((struct ContactCollider *)(p + 0x1e4))->flags |= 4;
             ((struct ContactCollider *)(p + 0x28c))->flags |= 4;
             ((struct ContactCollider *)(p + 0x190))->flags |= 4;
             {
-                struct ActorControllerMotion *render = (void *)(p + 0x180);
+                struct ActorControllerMotion *render = &actor->colliderGroup.motion;
                 one = 1;
                 render->flags |= one;
             }
-            *(u16 *)(p + 0xb32) &= ~0x20;
+            actor->flags &= ~0x20;
             Armor_CheckFlagRefresh(p);
         }
         case 1:
@@ -58,7 +58,7 @@ void Armor_UpdateDefeatSequence(struct SceneCombatActor *actor)
             ActorMarker_InitMovingSprite(p);
             SceneCombatActor_SpawnBouncingEffect(p);
             ActorMarker_LaunchFragments(p, 0);
-            SpriteColliderGroup_ResetActiveParts(p + 0xb58);
+            SpriteColliderGroup_ResetActiveParts(&actor->parts);
             {
                 u8 v = *s + 1;
                 u8 zero = 0;

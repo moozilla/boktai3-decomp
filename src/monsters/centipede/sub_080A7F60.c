@@ -30,14 +30,6 @@ static inline s32 Shift(s32 n, u32 bits)
     return r;
 }
 
-struct SavedPair {
-    u32 x, z;
-};
-struct SavedMotion {
-    u8 pad[12];
-    struct ContactPosition position;
-};
-
 void Centipede_ResetOscillation(void *);
 s32 Callback_InvokeActor(void *, void *);
 void Anim_SetDurationScale(void *, u32);
@@ -46,20 +38,6 @@ void Centipede_SelectWanderRoute(void *);
 void Centipede_AdvanceMotionPhase(void *, s32);
 void Centipede_UpdateSegmentPositions(void *, s32, s32);
 void Centipede_UpdateOscillation(void *, s32, s32);
-static inline u8 Approach(struct ChaseActor *actor, struct SavedMotion *saved, s32 speed)
-{
-    u8 *motion = (u8 *)actor + 0x50;
-    s16 dx = saved->position.x - *(u16 *)(motion + 12);
-    s16 dz = saved->position.z - *(u16 *)(motion + 16);
-    if ((dx < 0 ? -dx : dx) <= 32 && (dz < 0 ? -dz : dz) <= 32)
-        return 1;
-    if (dx || dz) {
-        motion[9] = Math_Atan2(dx, dz);
-        *(u16 *)(motion + 20) += Shift(gUnk_086149C4[(motion[9] + 64) & 255] * speed, 12);
-        *(u16 *)(motion + 24) += Shift(gUnk_086149C4[motion[9]] * speed, 12);
-    }
-    return 0;
-}
 
 s32 Mod(s32, s32);
 static inline u8 Turned(s32 angle)

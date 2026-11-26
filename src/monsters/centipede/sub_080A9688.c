@@ -1,23 +1,5 @@
-#include "global.h"
+#include "monsters/centipede/centipede_body.h"
 
-struct Vec080A9688 {
-    s16 x, y, z, w;
-};
-struct Entry080A9688 {
-    u8 pad0[0x1c];
-    struct Vec080A9688 pos;
-    u8 pad24[0x104 - 0x24];
-    u8 heading;
-    u8 flags;
-    u8 pad106[0x128 - 0x106];
-};
-struct Group080A9688 {
-    u8 pad0[0x3d4];
-    struct Entry080A9688 entries[4];
-    u8 pad874[0x8da - 0x874];
-    s16 count;
-};
-u8 Math_Atan2(s32, s32);
 
 static inline u8 TestMask(u8 *flags, u32 mask)
 {
@@ -26,24 +8,24 @@ static inline u8 TestMask(u8 *flags, u32 mask)
     return FALSE;
 }
 
-static inline void VecSub(struct Vec080A9688 *d, struct Vec080A9688 *a, struct Vec080A9688 *b)
+static inline void VecSub(struct ContactPosition *d, struct ContactPosition *a, struct ContactPosition *b)
 {
     d->x = a->x - b->x;
     d->y = a->y - b->y;
     d->z = a->z - b->z;
 }
 
-void Centipede_UpdateSegmentHeadings(u8 *p)
+void Centipede_UpdateSegmentHeadings(struct RoomActor *actor)
 {
-    struct Group080A9688 *g = *(struct Group080A9688 **)(p + 0x3d0);
-    struct Vec080A9688 d;
-    struct Vec080A9688 prev = *(struct Vec080A9688 *)(p + 0x5c);
+    struct TentacleBody *g = actor->context;
+    struct ContactPosition d;
+    struct ContactPosition prev = actor->body.position;
     s32 i;
-    for (i = 0; i < g->count; i++) {
-        if (!TestMask(&g->entries[i].flags, 1)) {
-            VecSub(&d, &prev, &g->entries[i].pos);
-            g->entries[i].heading = Math_Atan2(d.x, d.z);
-            prev = g->entries[i].pos;
+    for (i = 0; i < g->segmentCount; i++) {
+        if (!TestMask(&g->segments[i].animation.status, 1)) {
+            VecSub(&d, &prev, &g->segments[i].position);
+            g->segments[i].animation.direction = Math_Atan2(d.x, d.z);
+            prev = g->segments[i].position;
         }
     }
 }
