@@ -22,19 +22,19 @@ void Otenko_SetBehaviorFourFromScript(void)
         u8 *q = &p->controlled;
         s32 zero = 0, one = 1;
         void (*f)(void);
-        *q = one;
+        *q = 1;
         {
             s32 kind = 6;
-            p->stage = zero;
-            p->stageEntered = zero;
+            p->stage = 0;
+            p->stageEntered = 0;
             p->state = kind;
         }
-        p->timer = zero;
-        p->commandEntered = one;
+        p->timer = 0;
+        p->commandEntered = 1;
         f = Actor_OnConfiguredAnimationUpdate;
         p->prevState = 7;
         p->stateCallback = f;
-        p->stateFrame = zero;
+        p->stateFrame = 0;
         p->animationEntered = one;
         p->animationPhase = zero;
     }
