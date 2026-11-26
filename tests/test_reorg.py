@@ -82,6 +82,29 @@ class ReorgTests(unittest.TestCase):
             reorg.header_destination(Path("include/shared.h"), {}, set(),
                                      {"shared": {Path("include/scene"), Path("include/ui")}}, {})
 
+    def test_replays_legacy_links_after_a_source_basename_changes(self):
+        legacy = "src/fn/sub_08001000.c"
+        earlier = "src/scene/actor/sub_08001000.c"
+        active = "src/scene/actor/Actor_Move.c"
+        guide = "docs/example.md"
+        files = {
+            "symbols/functions.csv": "addr,name\n08001000,Actor_Move\n",
+            "symbols/source_dirs.csv": "current_path,new_path,note\n"
+            "src/actors/mover,src/scene/actor,fixture\n",
+            "symbols/source_files.csv": "original_path,current_path,rule,filename,start,end\n"
+            f"{legacy},src/actors/mover/sub_08001000.c,src/actors/mover,sub_08001000.c,08001000,08001020\n",
+            "symbols/header_dirs.csv": "current_path,new_path,note\n",
+            active: "void Actor_Move(void) {}\n",
+            guide: f"[Flat](../{legacy}) and [Nested](../{earlier}).\n",
+        }
+        with fixture(files) as root:
+            self.assertEqual(reorg.migrate(), 1)
+            self.assertEqual((root / guide).read_text(), files[guide])
+            self.assertEqual(reorg.migrate(apply=True), 1)
+            self.assertEqual((root / guide).read_text(), f"[Flat](../{active}) and [Nested](../{active}).\n")
+            self.assertEqual((root / active).read_text(), files[active])
+            self.assertEqual(reorg.migrate(), 0)
+
     def test_address_renames_are_simultaneous_and_keep_source_basenames(self):
         files = {
             "symbols/functions.csv": "addr,name\n08001000,Old_Thing\n08001020,New_Thing\n",

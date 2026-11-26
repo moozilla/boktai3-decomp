@@ -238,8 +238,7 @@ def header_destination(old, recorded, folders, owners, rules):
     raise ValueError(f"{old}: {reason}; add a placement in {HEADER_DIRS}")
 
 
-def plan_files(recorded, rename):
-    manifest = scan(ROOT)
+def plan_files(recorded, rename, manifest):
     names = symbol_names(ROOT)
     spellings = {}
     for old, target in recorded.items():
@@ -299,7 +298,21 @@ def transform(path, raw, moves, includes):
 
 def migrate(rename=False, apply=False):
     recorded = recorded_moves()
-    moves = plan_files(recorded, rename)
+    manifest = scan(ROOT)
+    moves = plan_files(recorded, rename, manifest)
+
+    # An already renamed file can still have historical paths in the placement table.
+    live_sources = {}
+    for placement in source_placements(ROOT):
+        if placement.target in moves:
+            continue
+        entry = manifest.files.get(placement.start)
+        if entry is not None:
+            source = Path(entry[0])
+            if moves[source].parent == placement.target.parent:
+                live_sources[placement.target] = source
+    if live_sources:
+        recorded = {old: live_sources.get(target, target) for old, target in recorded.items()}
     return rewrite_moves(recorded, moves, apply)
 
 
