@@ -1,3 +1,4 @@
+#include "scene/camera/scene_camera_controller.h"
 #include "global.h"
 #include "engine/video/render.h"
 #include "engine/ram.h"
@@ -6,20 +7,7 @@ struct Vec {
     s16 x, y, z;
 };
 
-struct Camera {
-    u8 pad[0x1c];
-    u16 f1c;
-    u8 pad1e[0x54 - 0x1e];
-    u16 f54;
-    u16 f56;
-    u8 pad58[0x60 - 0x58];
-    u16 x, y, z;
-    u8 pad66[0x80 - 0x66];
-    u16 f80;
-    u16 f82;
-};
-
-void Camera_ApplyPositionBounds(struct Camera *, u16 *);
+void Camera_ApplyPositionBounds(struct SceneCameraController *, s16 *);
 
 static inline int project(int input)
 {
@@ -43,18 +31,18 @@ static inline void updateScroll(void)
    (f1c == 0) refresh the scroll position from it plus the offset at 0x80. */
 void Camera_SetPosition(u16 *pos)
 {
-    struct Camera *c = gActiveCamera;
+    struct SceneCameraController *c = (void *)gActiveCamera;
     if (c) {
-        c->x = pos[0];
-        c->y = pos[1];
-        c->z = pos[2];
-        Camera_ApplyPositionBounds(c, &c->x);
-        c = gActiveCamera;
-        c->f54 = 1;
-        if (c->f1c == 0) {
-            gCamera.position.x = c->x + c->f80;
-            gCamera.position.y = c->y;
-            gCamera.position.z = c->z + c->f82;
+        c->target.x = pos[0];
+        c->target.y = pos[1];
+        c->target.z = pos[2];
+        Camera_ApplyPositionBounds(c, &c->target.x);
+        c = (void *)gActiveCamera;
+        c->secondaryMode = 1;
+        if (c->moving == 0) {
+            gCamera.position.x = c->target.x + c->field80;
+            gCamera.position.y = c->target.y;
+            gCamera.position.z = c->target.z + c->field82;
             updateScroll();
         }
     }
