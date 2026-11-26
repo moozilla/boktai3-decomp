@@ -151,7 +151,7 @@ key,callback,name
 34EA,081D6BC1,MonsterBook_Create
 352D,0803107D,MessageWindow_SetStringReferenceFromScript
 3535,08016765,PaletteLevels_ConfigureFromScript
-3578,081EB725,CutsceneDisplay_SetFromScript
+3578,081EB725,TitleDisplay_SetFromScript
 3613,0815CAF1,ScriptActor_StandFromScript
 3620,0811D6A1,GameState_SetChallengeValueFromScript
 364D,0822AF5D,Sound_StopTrackedSongFromScript
@@ -215,7 +215,7 @@ key,callback,name
 4963,080126DD,AnimatedHazardManager_Create
 4A0A,08210A61,Collection_UnlockEntryFromScript
 4A16,080510D5,DirectionalForce_StopFromScript
-4A25,081EB7DD,CutsceneDisplay_CreateDisplay
+4A25,081EB7DD,TitleDisplay_Create
 4A8D,0815AA39,ScriptActor_TestCounter628FromScript
 4AE5,080033FD,Palette_GetOrCreate
 4B39,0822C18D,Solar_DisableControlFlag

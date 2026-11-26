@@ -1,7 +1,7 @@
 #include "global.h"
 void TimeDisplay_RemoveAnimatedObjects(void *);
 void Bg_ClearTilemap(s32);
-void CutsceneDisplay_DestroyDisplay(void *display)
+void TitleDisplay_Destroy(void *display)
 {
     TimeDisplay_RemoveAnimatedObjects(display);
     Bg_ClearTilemap(2);

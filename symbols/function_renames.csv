@@ -1618,11 +1618,11 @@ addr,old_name,new_name,file_after_pass3,prior_names
 081EA730,Actor_EnsureController,TutorialOtenko_EnsureController,src/ui/title/tutorial_otenko.c,
 081EAAAC,Actor_HideAuxiliarySprites,TutorialOtenko_HideAuxiliarySprites,src/ui/title/tutorial_otenko.c,
 081EAAE4,Actor_UpdatePairedSpriteAnimation,TutorialOtenko_UpdatePairedSpriteAnimation,src/ui/title/tutorial_otenko.c,
-081EAB64,Params3D0_UpdateDisplay,CutsceneDisplay_UpdateDisplay,src/ui/title/sub_081EAB64.c,
-081EB598,Params3D0_DestroyDisplay,CutsceneDisplay_DestroyDisplay,src/ui/title/sub_081EB598.c,
-081EB5A8,Params3D0_InitDisplay,CutsceneDisplay_InitDisplay,src/ui/title/sub_081EB5A8.c,
-081EB724,Params3D0_SetFromScript,CutsceneDisplay_SetFromScript,src/ui/title/sub_081EB724.c,
-081EB7DC,Params3D0_CreateDisplay,CutsceneDisplay_CreateDisplay,src/npc/cutscene_actor/sub_081EB7DC.c,
+081EAB64,Params3D0_UpdateDisplay,TitleDisplay_Update,src/ui/title/sub_081EAB64.c,CutsceneDisplay_UpdateDisplay
+081EB598,Params3D0_DestroyDisplay,TitleDisplay_Destroy,src/ui/title/sub_081EB598.c,CutsceneDisplay_DestroyDisplay
+081EB5A8,Params3D0_InitDisplay,TitleDisplay_Initialize,src/ui/title/sub_081EB5A8.c,CutsceneDisplay_InitDisplay
+081EB724,Params3D0_SetFromScript,TitleDisplay_SetFromScript,src/ui/title/sub_081EB724.c,CutsceneDisplay_SetFromScript
+081EB7DC,Params3D0_CreateDisplay,TitleDisplay_Create,src/ui/title/sub_081EB7DC.c,CutsceneDisplay_CreateDisplay
 081EC380,SceneActors_InitResources,VanargandHead_InitResources,src/bosses/vanargand/sub_081EC380.c,
 081EC384,SceneActors_IsReady,VanargandHead_IsReady,src/bosses/vanargand/sub_081EC384.c,
 081EC5C8,SceneActors_EmitPeriodicParticles,VanargandHead_EmitPeriodicParticles,src/bosses/vanargand/sub_081EC5C8.c,

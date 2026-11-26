@@ -9107,11 +9107,11 @@ addr,name,mode,confidence,source,notes
 081EAA80,TimeDisplay_SetSelectionKeyframe,thumb,low,src-alias,Loads a keyframe offset by twelve from the stored selection value into the display object
 081EAAAC,TutorialOtenko_HideAuxiliarySprites,thumb,low,src-alias,Clears visibility bit 0 on four embedded sprite records starting at offset 0x238.
 081EAAE4,TutorialOtenko_UpdatePairedSpriteAnimation,thumb,low,src-alias,Advances a four-step paired keyframe sequence every ten ticks for the sprites at offsets 0x238 and 0x2C0.
-081EAB64,CutsceneDisplay_UpdateDisplay,thumb,low,src-alias,
-081EB598,CutsceneDisplay_DestroyDisplay,thumb,low,src-alias,Task destructor releases nine animations and clears background layer 2
-081EB5A8,CutsceneDisplay_InitDisplay,thumb,low,src-alias,
-081EB724,CutsceneDisplay_SetFromScript,thumb,low,src-alias,
-081EB7DC,CutsceneDisplay_CreateDisplay,thumb,low,src-alias,Creates and initializes the display task configured through Params3D0
+081EAB64,TitleDisplay_Update,thumb,low,src-alias,
+081EB598,TitleDisplay_Destroy,thumb,low,src-alias,Task destructor releases nine animations and clears background layer 2
+081EB5A8,TitleDisplay_Initialize,thumb,low,src-alias,
+081EB724,TitleDisplay_SetFromScript,thumb,low,src-alias,
+081EB7DC,TitleDisplay_Create,thumb,low,src-alias,Creates and initializes the display task configured through Params3D0
 081EB81C,ModeMenu_ShowDescription,thumb,low,src-alias,Mode selection screen with saved choice; description; timed unlock-key history and save validation; trailing result-delay screen.
 081EB864,ModeMenu_LoadAvailableSave,thumb,low,src-alias,Mode selection screen with saved choice; description; timed unlock-key history and save validation; trailing result-delay screen.
 081EB8E0,ModeMenu_Update,thumb,low,src-alias,Mode selection screen with saved choice; description; timed unlock-key history and save validation; trailing result-delay screen.

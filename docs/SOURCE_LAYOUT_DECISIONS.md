@@ -189,9 +189,9 @@ Status page stays in `ui/pause/status/`.
 
 ## Pass 5 identity corrections
 
-The title emblem runs four units at ROM addresses 081EAB64 through
-081EB724. They and `text_entry_widget.h` belong to `ui/title/`.
-The supplied range ends before the constructor at 081EB7DC.
+The title emblem runs five units at ROM addresses 081EAB64 through
+081EB7DC, including its constructor. They and
+`text_entry_widget.h` belong to `ui/title/`.
 The Bat Curtain owns its debris, and the Strike Crystal has its own file
 under `objects/`. Sabata’s White Forest encounter drives the frost emitter.
 The actor palette fade runs during Repair and belongs with palette effects.

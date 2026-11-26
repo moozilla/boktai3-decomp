@@ -50,7 +50,7 @@ Pool128_,IceBoulderPool_,3,377D blue ice boulders in scene 3955,src/objects/ice_
 Pool1B8_,FloorTrapPool_,9,2FA5 contact traps in scene 3161,src/objects/floor_traps.c
 Pool1BC_,AnimatedTilePool_,2,pool of the animated tile,all
 Slot600_,WindCannonSlot_,3,Wind Cannon slots (activate/deactivate from script),all
-Params3D0_,CutsceneDisplay_,5,display parameters of the cutscene actor,all
+Params3D0_,TitleDisplay_,5,Animated title emblem and display at cold boot,all
 ScreenParams310_,RegionMenuParams_,1,parameters of the region menu,all
 ScreenParams328_,NameEntryParams_,1,parameters of Name Entry,all
 SceneActor14_,SpriteEffectSet_,7,shared animation set of actor category 14 sprite effects,all
