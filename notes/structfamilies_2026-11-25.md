@@ -31,6 +31,12 @@ suffix because a shared `struct Vec` already exists. The other generated types u
 dominant tag. The linter counts cover the affected source units and the generated headers.
 The trials recover types so future cleanup can tackle the parked constants separately.
 
+The follow-up converted all three `Args-3a9bc39e` units to `struct ScriptCallArguments`.
+The two original bitfield declarations had different type spellings and measured the same
+16-bit span. They voted together, and the emitted bitfield kept its measured position and width.
+All three header dependents matched. The scoped linter reported six warnings and zero errors
+before and after.
+
 The full report at `build/structfamilies/REPORT.md` ranks the top fifty of 350 families and
 records 1,818 embedded-type findings.
 For `struct Player` it confirms `struct SceneInputWidget` at 0x8C and 0xEC from 12 and four

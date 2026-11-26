@@ -211,6 +211,35 @@ int X(struct R *r, struct Q *q) { return r->old + q->old; }
         self.assertEqual(merge.probe_header(generated, "union W", expected, views[0]["size"], views[0]["align"])
                          ["kind"], "union")
 
+    def test_whole_byte_bitfields_vote_by_storage_type_and_keep_positions(self):
+        copies = [
+            "unsigned count : 16; unsigned extra : 16;",
+            "u32 count : 16; u32 extra : 16;",
+            "u16 count; u16 extra;",
+        ]
+        views = [next(iter(measure(TYPES + "typedef unsigned u32; struct W { " + fields
+                                   + " int *values; };", f"src/{i}.c").values()))
+                 for i, fields in enumerate(copies)]
+        family = {"kind": "struct", "size": views[0]["size"], "loads": []}
+        generated, expected, _, _ = merge.plan_header(family, views, "W", Path("include/w.h"))
+        self.assertEqual(expected, {"count": (0, 2, 0, 16), "extra": (2, 2, 16, 16), "values": (4, 4)})
+        measured = merge.probe_header(generated, "struct W", expected, views[0]["size"], views[0]["align"])
+        self.assertEqual(merge.field_paths(views[2], measured), {"count": "count", "extra": "extra", "values": "values"})
+        loads = [(0, 2, False, "Halfword", 0x8000010), (0, 4, None, "Word", 0x8000020),
+                 (0, 2, True, "Signed", 0x8000030)]
+        self.assertEqual(merge.load_vote(views[0], views[0]["members"][0], loads), {(0, "Halfword")})
+        with self.assertRaisesRegex(merge.Holdout, "generated extra measured"):
+            merge.probe_header(generated, "struct W", {**expected, "extra": (2, 2, 17, 15)},
+                               views[0]["size"], views[0]["align"])
+
+    def test_sub_byte_bitfield_rewrite_requires_the_same_bits(self):
+        old = next(iter(measure("struct W { unsigned low : 4; unsigned high : 4; };", "src/a.c").values()))
+        new = next(iter(measure("struct W { unsigned whole : 8; };", "include/w.h").values()))
+        family = {"kind": "struct", "size": old["size"], "loads": []}
+        with self.assertRaisesRegex(merge.Holdout, "allocation-group"):
+            merge.plan_header(family, [old], "W", Path("include/w.h"))
+        self.assertEqual(merge.field_paths(old, new), {"low": None, "high": None})
+
 
 class GateTests(unittest.TestCase):
     @unittest.skipUnless(sys.platform == "darwin" and Path(deadcode.CLANG).is_file(), "macOS clang required")

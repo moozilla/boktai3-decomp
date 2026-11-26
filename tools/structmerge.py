@@ -40,6 +40,15 @@ def type_key(member):
     return tuple(member.get(k) for k in ("ctype", "size", "align", "array", "esize", "bits", "bitpos"))
 
 
+def bit_spans(view):
+    return {lf["name"]: (lf["bitpos"], lf["bits"]) for lf in view["leaves"]
+            if lf.get("bits") is not None and lf.get("bitpos") is not None}
+
+
+def whole_byte_bits(member, span):
+    return span == (member["off"] * 8, member["size"] * 8)
+
+
 def related_width(member):
     if member["array"]:
         return member.get("esize")
@@ -48,6 +57,10 @@ def related_width(member):
 
 def load_vote(view, member, loads):
     """Count voters at measured leaf offsets, including leaves within aggregates."""
+    if member["bits"]:
+        width = member["size"]
+        signatures = {(member["off"], width, member["signed"] if width < 4 else None)}
+        return {(off, fn) for off, width, signed, fn, _ in loads if (off, width, signed) in signatures}
     root = member["name"]
     leaves = [lf for lf in view["known"] if lf["name"] == root or lf["name"].startswith((root + ".", root + "["))]
     signatures = {(lf["off"], lf.get("esize") if lf["array"] else lf["width"], lf["signed"])
@@ -64,18 +77,19 @@ def pick_candidates(views, loads):
     choices = defaultdict(list)
     for view in views:
         occurrences = Counter()
+        spans = bit_spans(view)
         for m in view["members"]:
             if families.opaque(m):
                 continue
             if not m.get("name") or m.get("off") is None or m.get("size") is None:
                 raise Holdout(f"{view['id']} has an unmeasured member")
-            if m["bits"]:
+            if m["bits"] and not whole_byte_bits(m, spans.get(m["name"])):
                 raise Holdout(f"{view['id']} contains bitfields that need an allocation-group review")
             slot = (m["off"],)
             if view["kind"] == "union":
                 # Deliberate union overlays are separate alternatives. Compare names
                 # across copies only within the same scalar/array/aggregate shape.
-                shape = (m["off"], m["size"], m["base"], m["array"], m.get("esize"), m.get("signed"))
+                shape = (m["off"], m["size"], m["base"], m["array"], m.get("esize"), m.get("signed"), m["bits"])
                 occurrences[shape] += 1
                 slot = (*shape, occurrences[shape])
             choices[slot].append((view, m))
@@ -83,7 +97,8 @@ def pick_candidates(views, loads):
     for entries in choices.values():
         grouped = defaultdict(list)
         for view, m in entries:
-            grouped[type_key(m)].append((view, m))
+            key = (m["base"], m["width"], m["signed"], m["size"], m["bitpos"]) if m["bits"] else type_key(m)
+            grouped[key].append((view, m))
         proposals = []
         for supporters in grouped.values():
             eligible = [(v, m) for v, m in supporters if not m["private"] and not VOLATILE_TYPE.search(m["decl"])]
@@ -142,7 +157,7 @@ def plan_header(family, views, name, header):
             member = available_name(f"{member}{off:X}", names | used)
             guess = True
         used.add(member)
-        expected[member] = off, size
+        expected[member] = (off, size, original["bitpos"], size * 8) if original["bits"] else (off, size)
         decl = original["decl"]
         if original["self_ref"]:
             decl = re.sub(rf"\b{re.escape(view['spell'])}\b", f"{kind} {name}", decl)
@@ -192,9 +207,13 @@ def probe_header(text, spell, expected, size, align):
     if not view or view["size"] != size or view["align"] != align:
         actual = (view["size"], view["align"]) if view else None
         raise Holdout(f"generated header measured {actual}, expected size/alignment ({size}, {align})")
-    for m in view["members"]:
-        if m["name"] in expected and (m.get("off"), m.get("size")) != expected[m["name"]]:
-            raise Holdout(f"generated {m['name']} measured {m.get('off'), m.get('size')}, expected {expected[m['name']]}")
+    spans = bit_spans(view)
+    measured_members = {m["name"]: (m.get("off"), m.get("size"), *spans.get(m["name"], ()))
+                        for m in view["members"]}
+    for name, layout in expected.items():
+        actual = measured_members.get(name)
+        if actual != layout:
+            raise Holdout(f"generated {name} measured {actual}, expected {layout}")
     view["known"] = families.inhabited(view)
     return view
 
@@ -202,14 +221,18 @@ def probe_header(text, spell, expected, size, align):
 def field_paths(old, new):
     """Storage-preserving replacements for direct members, including a flattened leaf."""
     fields = {}
+    old_bits, new_bits = bit_spans(old), bit_spans(new)
     choices = new["members"] + [dict(lf, name=lf["name"], base=lf["base"])
                                for lf in new["known"] if "." in lf["name"]]
     for m in old["members"]:
-        if m.get("off") is None:
+        if m.get("off") is None or m.get("size") is None:
             continue
+        whole_bytes = (m["off"] * 8, m["size"] * 8)
+        occupied_bits = old_bits.get(m["name"], whole_bytes)
         hits = {n["name"] for n in choices if n.get("off") == m["off"] and n.get("size") == m["size"]
                 and n.get("array") == m["array"] and n.get("esize") == m.get("esize")
-                and (n.get("base") == m["base"] or {m["base"], n.get("base")} <= {"int", "enum"})}
+                and (n.get("base") == m["base"] or {m["base"], n.get("base")} <= {"int", "enum"})
+                and occupied_bits == new_bits.get(n["name"], whole_bytes)}
         if m["name"] in hits:
             fields[m["name"]] = m["name"]
         elif len(hits) == 1:

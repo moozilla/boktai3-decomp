@@ -297,6 +297,10 @@ marks uncertain choices, checks the total size, and leaves unnamed bytes as padd
 `--name TAG` or `--header include/PATH.h` to choose another destination, or
 `--use-shared 'struct TAG'` to adopt a related type listed in the report.
 
+The generated header can retain byte-aligned bitfields that occupy whole bytes. The compiler
+probe checks each emitted bitfield's position and width. Sub-byte fields need an allocation-group
+review before the tool can generate a header for them.
+
 Add `--apply` in a writable worker checkout to try the proposals. Each unit goes through
 `keepcheck.py`, and the tool checks every dependent of a newly written header. The output
 lists units held back by layout changes, ambiguous member uses, or compiler differences.
