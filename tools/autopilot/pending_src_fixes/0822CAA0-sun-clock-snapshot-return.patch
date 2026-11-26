@@ -1,0 +1,15 @@
+0822CAA0 sun-clock-snapshot-return
+
+The base minute call leaves the minute in r0. Later reads and writes use r1 through r6.
+
+The explicit form changed the ROM bytes. The guarded form passed the unit ROM check.
+
+--- a/src/fn/sub_0822CAA0.c
++++ b/src/fn/sub_0822CAA0.c
+@@ -21,3 +21,6 @@
+         flag = 1;
+     *(u32 *)(gGameState + 0x4ec) = flag;
++#ifdef UBFIX
++    return minute; // preserve the inherited GBA return value
++#endif
+ }
