@@ -278,6 +278,17 @@ bats. See `build/identify/replays/flock/{before,flock,advance}.png` and the
 `stageflock` test extension under `build/identify/`. This verifies the
 unit's display and action. Its story placement remains unobserved.
 
+The registry entry at 08604748 is the only 32-bit literal E534 in the ROM,
+and the following word at 0860474C is the only pointer to the constructor.
+The 558,244-byte GCX procedure body starts at 08DD6BA0 and has zero
+little-endian E534 literals. `build/venv/bin/python tools/assets/cutscenes.py
+--commands` gives the message routing, and `cutscenes.table()` enumerates
+the shipped packet rows. The seven cutscenes with kind 10 packets address
+01FD, 1ACF, A013, A3E7 and F3E4 with commands 6–10 and 12–13. The flock's
+dispatcher implements only 0, 1, 2 and 11. This narrows the missing
+placement to a dynamic route outside the built-in cutscene packets, if
+any exists. The name records the observed effect and its registered key.
+
 ## Coffin Bike and Sabata’s scripted rider
 
 Warp 0008 to `scene=6274 entrance=130 story=31` and continue. Proc 6275 calls
