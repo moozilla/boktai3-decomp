@@ -1,0 +1,26 @@
+0802E5E8 actor-end-script-return
+
+Script_GetKeywordValue leaves the i value in r0. The switch branches
+rewrite actor flags through r1 and r2, preserving r0 for the script VM.
+
+The explicit form changed the ROM bytes. The guarded form passed the unit ROM check.
+
+--- a/src/scene_actor_animation.c
++++ b/src/scene_actor_animation.c
+@@ -704,8 +704,13 @@
+                     (*alias)->commandEntered = command;
+                     break;
++#ifndef UBFIX
+                     return mode;
+-            }
+-        }
+-    }
++#endif
++            }
++        }
++    }
++#ifdef UBFIX
++    return mode;
++#endif
+ }
+ 
