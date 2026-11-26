@@ -817,3 +817,60 @@ The committed matching source in each unit retains its priority site.
 The scoped recheck of the seven named units reports the two registry
 volatile declarations and five proved-zero expressions. SpriteTrail
 and Wireless have no priority findings.
+
+## 2026-11-26: SpriteTrail component copy and shared barrage sampling
+
+`Vector3_CopyComponents` (081F21B0) copies the three named `TrailVector`
+coordinates and matches all 16 bytes with zero lint findings. Its
+callers already pass vectors of this layout. SpriteTrail's update
+still matches 304 bytes, and Wireless still matches 684 bytes with
+no priority findings.
+
+`Hresvelgr_UpdateBoundaryBarrage` (081A0BC8) uses the shared
+`ContactPosition` and `Terrain_SampleHeight`. This removes the
+private vector and duplicate height calculation and matches all
+732 bytes. Lint still reports the same six findings. Removing
+the direction adjustment from this source brings back the same two
+mask operands in sl instead of ip. `AGBCC_FORCE=220:12` is exact
+on this source. The GameState variants that
+index each published region independently all increase the miss to
+27 ROM and 35 draft rows. The direct add still differs at one operand
+order. See `build/hard-sites/barrage/native-position/` and
+`build/hard-sites/game-state/ninth-review/`.
+
+## 2026-11-26: Real second table assignments in fading and fragment spawn
+
+Removing the address-construction union in `FadingParticleGroup_Spawn`
+(08015F60) gives a symbolic 440-byte draft with 26 differing instructions
+on each side. The table holds REG_EQUIV as pseudo 35 with priority 1735
+and goes to sl. `AGBCC_NOEQUIV=35`, `AGBCC_PRI=35:+2000`, and
+`AGBCC_FORCE=35:6` each match all 440 bytes. Shared draws, a local sample
+index, and a sampler holding both pointers miss in stock agbcc.
+
+Reusing the table local for the actual animation array gives it a second
+set and r6 under stock agbcc. Starting that local within the loop moves
+the first sample table load into the loop. Loading it before the loop
+and restoring it after `Anim_SetSequence` emits 448 bytes. This preserves
+the earlier code but loads the animation array into r6 instead of r1,
+adds a move to r1, and reloads the random table on each iteration.
+Both drafts are in `build/matchsearch/FadingParticleGroup_Spawn`.
+The stock unit matches 440 bytes and has no priority findings.
+
+Reusing the FragmentGroup table for the actual sprite frame array and
+restoring it before the byte draw likewise allocates the sampler to r7.
+Pseudo 54 has no REG_EQUIV and priority 4062. With an ordinary `for`, the
+stock draft emits 708 bytes, with four differing ROM rows and five draft
+rows. The sample table load is before the particle-count guard, and
+r7 holds both the frame table and the per-iteration random table reload.
+Adding a source guard or explicitly copying the sample table worsens the
+miss. The closest draft is `frame-data-reuse-preheader.c` under
+`build/hard-sites/fragment/ninth-review/` and the forked store
+`build/matchsearch/FragmentGroup_SpawnRadial-frame-reuse`.
+
+## 2026-11-26: Registry inline search result reuse
+
+Reusing the pointer returned by the inline registry scan for the new
+node gives six differing instructions on each side and two moved branch
+targets in each registration. A plain member store, an explicit next
+slot, and a reacquired head slot give the same score. The previous
+inline search form without result reuse remains a holdout.
