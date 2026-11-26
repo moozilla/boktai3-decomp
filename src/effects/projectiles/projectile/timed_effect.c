@@ -12,14 +12,15 @@ void Boss_FinalExplosions(void);
 void ProjectileTask_StartTerminalAnimation(void *);
 
 void TimedEffect_OnContact(struct ContactCollider *self,
-                                 struct ContactCollider *other, struct TimedEffect *entry)
+                                 struct ContactCollider *other, void *owner)
 {
+    struct TimedEffect *entry = owner;
     struct TimedEffectConfig *config = &entry->config;
     struct ContactCollider *o;
     struct TimedEffect *e;
 
     if (config->type == 3) {
-        (*(&entry))->config.flags |= 0x80;
+        entry->config.flags |= 0x80;
         Projectile_SetUpdateCallback(config, ProjectileTask_SpawnImpactChildren);
     } else if (config->type != 8) {
         if (config->type == 9) {
