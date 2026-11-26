@@ -1,16 +1,13 @@
-#include "global.h"
+#include "monsters/cannons/wind_cannon.h"
 #include "engine/ram.h"
-struct E {
-    u8 p[0x180];
-};
-void WindCannonManager_InitSlot(u8 *, struct E *, s32);
-u32 WindCannonManager_Init(u8 *a)
+void WindCannonManager_InitSlot(struct FanCannonManager *, struct FanCannon *, s32);
+u32 WindCannonManager_Init(struct FanCannonManager *a)
 {
-    struct E *e;
+    struct FanCannon *e;
     s32 i;
     gFanCannonManager = a;
-    *(u32 *)(a + 0x18) = 0;
-    e = (struct E *)(a + 0x1c);
+    a->occupiedSlots = 0;
+    e = a->slots;
     i = 0;
     do {
         WindCannonManager_InitSlot(a, e, i);
