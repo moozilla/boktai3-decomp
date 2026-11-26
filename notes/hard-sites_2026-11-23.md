@@ -906,3 +906,44 @@ scatter code farther from the ROM. Keeping a GameState byte address
 in an integer local before casting it back also changes 15 rows on
 each side. Neither improves on the existing exact diagnostics. SpriteTrail
 and Wireless rechecked at 304 and 684 bytes.
+
+## 2026-11-26: Shared fragment scaling and typed save regions
+
+`FragmentGroup_SpawnRadial` (08014CA4) uses the shared fixed-point
+component truncation helper for both displacement products. The
+704-byte stock unit still matches and reports the same three
+proved-zero sites. Using the helper in the direct symbolic and
+frame-table reuse drafts leaves each draft's existing differences.
+Displacement scaling is independent of the table allocation in
+these trials.
+
+`GameState_SelectRamBase` (0821B084) publishes the regions through a
+private layout with a native active `GameState` and explicitly sized
+backup and variable areas. This preserves the 88-byte function and
+the entire 5,800-byte script VM unit. The same layout with the timer
+zero term removed leaves the existing one operand-order difference.
+See `build/hard-sites/game-state/eleventh-review/`.
+
+## 2026-11-26: Registry update order, barrage flags, and Ratatosk
+
+Scanning the registry first and updating the found or incoming node
+through a common pointer gives the pointer two values in source.
+The two registration drafts change the field-write placement and
+miss by at least 10 ROM and 15 draft rows. An explicit next slot
+does not recover the ROM shape. The earlier splice trials remain
+closer. Direct barrage flag operations by member or a local field
+pointer both change three rows, versus the two mask-register rows
+in the shared terrain draft.
+
+The direct Ratatosk appearance stores reproduce the historical
+948-byte draft for a 940-byte target. UID 273 puts literal one in
+r0 even though r3 is available. `AGBCC_FORCE=120:3` restores the
+correct store merge and literal pool order. The only remaining
+change at 940 bytes is the ROM copy from r3 to r0 and a compensating
+NOP in the draft. A switch for the special appearance gives the
+same stock miss. Reading the narrower local instead of the stored
+field is farther away. The direct draft is in
+`build/matchsearch/sub_081FC26C`.
+
+SpriteTrail and Wireless rechecked at 304 and 684 bytes. The seven
+named units report two volatile errors and five proved-zero warnings.
