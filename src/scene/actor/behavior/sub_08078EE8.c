@@ -1,3 +1,4 @@
+#include "scene/actor/scene_actor_reaction.h"
 #include "scene/collision/scene_actor_delayed_response.h"
 #include "scene/actor/scene_actor_status.h"
 #include "scene/actor/scene_actor_placement.h"
@@ -36,7 +37,6 @@ s32 Div(s32, s32);
 s32 Nav_IsPositionInMesh(void *, struct ContactPosition *, struct ContactPosition *);
 s32 Terrain_ApplyBlocked(void *, struct ContactPosition *, struct ContactPosition *);
 u32 TetherActor_CanStartInteraction(void);
-void SceneActorReaction_RestoreAfterDelay(void);
 
 static inline u32 ActorStatus_HasBehaviorFlags(void *object, u32 mask)
 {
@@ -68,18 +68,10 @@ static inline void ActorStatus_ResetInteraction(void *object)
     struct ChaseActor *actor = object;
     ActorStatus_ResetInteractionAt(actor, (void *)&actor->group.common.control);
 }
-static inline void ActorStatus_ResetRouteAt(struct ChaseActor *actor,
-                                            struct SceneActorRegistryControl *control)
-{
-    SceneActorChase_ClearWordFlags(&actor->base.behaviorFlags, 0x141C0);
-    control->counter = 0;
-    control->field14 = 0;
-    control->timer = 0;
-}
 static inline void ActorStatus_ResetRoute(void *object)
 {
     struct ChaseActor *actor = object;
-    ActorStatus_ResetRouteAt(actor, (void *)&actor->group.common.control);
+    SceneActorReaction_ResetRouteControl(actor, (void *)&actor->group.common.control);
 }
 static inline void ActorStatus_ResetSelection(struct ChaseActor *actor)
 {
@@ -109,13 +101,13 @@ static inline void ActorStatus_TickRouteControl(struct SceneActorRegistryControl
 }
 static inline void ActorStatus_TickAttachment(struct ChaseActor *actor)
 {
-    s32 remaining = (*(s16 *)&actor->base.attachmentTimer);
+    s32 remaining = (s16)actor->base.attachmentTimer;
     if (remaining <= 0) {
-        (*(s16 *)&actor->base.attachmentTimer) = 0;
+        actor->base.attachmentTimer = 0;
         if (ActorStatus_HasStatusFlags(actor, 0xC0))
             ActorStatus_SetWord(&actor->base.statusFlags, 0x100);
     } else {
-        (*(s16 *)&actor->base.attachmentTimer) = remaining - 1;
+        actor->base.attachmentTimer = remaining - 1;
     }
     if (actor->group.contactCooldown)
         actor->group.contactCooldown--;
@@ -194,8 +186,8 @@ static inline void ActorStatus_Wake(struct ChaseActor *actor)
         actor->base.reactionStart.z = actor->base.body.position.z;
         actor->base.reactionEnd.x = actor->base.body.position.x;
         actor->base.reactionEnd.z = actor->base.body.position.z;
-        if ((*(s16 *)&actor->base.attachmentTimer) >= actor->base.attachmentLimit)
-            (*(s16 *)&actor->base.attachmentTimer) = ActorStatus_AttachmentRestart(actor);
+        if ((s16)actor->base.attachmentTimer >= actor->base.attachmentLimit)
+            actor->base.attachmentTimer = ActorStatus_AttachmentRestart(actor);
         if (actor->base.health <= 0) {
             SceneActorChase_SetState(actor, 3, 0, 0);
             SceneActorChase_SetControl(actor, actor->base.onDefeat, 0x11);
@@ -275,10 +267,10 @@ static inline void ActorStatus_ReactionFlags(void *object)
         } else if (ActorStatus_MotionFlags(actor, 0x8000)) {
             ActorStatus_QueueRecovery(actor);
         } else if (ActorStatus_MotionFlags(actor, 0x10)) {
-            ActorStatus_ResetRouteAt(actor, &group->common.control);
+            SceneActorReaction_ResetRouteControl(actor, &group->common.control);
             ActorStatus_ResetReaction(object);
             ActorStatus_ClearMotionFlags(actor, 0x2500);
-            (*(s16 *)&actor->base.attachmentTimer) = 0;
+            actor->base.attachmentTimer = 0;
             actor->base.field2C2 = Div(0x40, 6);
             ActorStatus_ReleaseContact(object);
             ActorStatus_ResetInteractionAt(actor, &group->common.control);
@@ -287,7 +279,7 @@ static inline void ActorStatus_ReactionFlags(void *object)
             ActorStatus_SetPendingBits(actor, 0x400);
             SceneActorChase_ClearBits(&actor->base.reactionFlags, 0x980);
         } else if (ActorStatus_MotionFlags(actor, 8)) {
-            ActorStatus_ResetRouteAt(actor, &group->common.control);
+            SceneActorReaction_ResetRouteControl(actor, &group->common.control);
             ActorStatus_ResetInteractionAt(actor, &group->common.control);
             ActorStatus_QueueRecovery(actor);
         }
