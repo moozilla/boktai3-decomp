@@ -288,6 +288,27 @@ test('Battle Drive waits while the rig is trapped above the coffin', () => {
   assert.deepEqual(fight.next(), { done: true, value: { done: true, steps: 0, darkness: 0, life: 80 } });
 });
 
+test('bike search keeps steering that avoids damage on the same stretch', () => {
+  const motion = { position: { x: 0, z: 0 }, style: { initialWord: 80 } };
+  const g = { name: () => 'Glove_UpdateStopping', press: (key, frames) => ({ key, frames }) };
+  const lib = skill('bike', g, {}, {
+    session: {
+      snapshot: () => structuredClone(motion),
+      restore: (state) => { Object.assign(motion.position, state.position); Object.assign(motion.style, state.style); },
+    },
+    where: () => ({ scene: 1 }), story: () => 64, message: () => ({ open: false }),
+  });
+  const ride = lib.rideBike({ motion }, { horizon: 32 });
+  let step = ride.next();
+  for (; !step.done; step = ride.next()) {
+    const { key, frames } = step.value;
+    if (key === 'r+up') motion.position.z = -12 * 4096;
+    if (key !== 0) motion.position.x += frames * 4096;
+    if (motion.position.x === 32 * 4096 && motion.position.z === 0) motion.style.initialWord -= 20;
+  }
+  assert.deepEqual(step.value, { key: 'r+up', frames: 24, x: 32, lane: -12, life: 80 });
+});
+
 test('armor targets model damage to the guard and the contact cooldown', () => {
   const fields = { 0xb1c: 240, 0xb20: 65, 0xb2c: 9, 0xb32: 2 };
   const read = (addr) => fields[addr - 0x02010000] ?? 0;

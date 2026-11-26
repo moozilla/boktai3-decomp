@@ -85,6 +85,8 @@ const event = (what) => {
     writeMovie('checkpoint.json', s.g.lib.where());
   if ((e.skill === 'purification' && e.phase !== undefined) || (e.skill === 'drive' && e.steps !== undefined))
     writeMovie('checkpoint.json', s.g.lib.where());
+  if (e.skill === 'ride' && e.key)
+    writeMovie('checkpoint.json', s.g.lib.where());
   if (shots) fs.writeFileSync(path.join(out, 'shots', `${String(s.frame).padStart(6, '0')}.png`), png(s.pixels()));
 };
 
@@ -548,11 +550,10 @@ function* untilControl(g, L, ready = () => true, quiet = 120, limit = 60000) {
     // with B, or START (the bike parts menu closes on START when it was opened from a
     // story scene: ModifierMenu_HandleOverviewInput), now and then confirm with A
     stuck = field ? 0 : stuck + 1;
-    // riding the coffin bike (the Glove task; src/registry_actor_collision.c
-    // ActorMotion_ApplyInput: R accelerates, L boosts, up/down steer): ride on with R
-    if (!field && !msg.open && L.tasks().some((t) => !t.dead && t.update === 'Glove_UpdateTask')) {
-      if (stuck % 600 === 1) event({ skill: 'ride', ...L.where() });
-      yield g.press('r', 4);
+    const bike = !field && L.bikeRider();
+    if (bike && !msg.open) {
+      const result = yield* L.rideBike(bike);
+      if (result) event({ skill: 'ride', ...L.where(), ...result });
       continue;
     }
     if (stuck && stuck % 180 === 0) {
