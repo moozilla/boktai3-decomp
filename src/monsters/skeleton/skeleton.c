@@ -1,8 +1,10 @@
+#include "scene/motion/scene_actor_availability.h"
 #include "monsters/skeleton/skeleton.h"
 #include "monsters/golem/golem.h"
 #include "scene/collision/scene_actor_contact_response.h"
 #include "scene/motion/scene_actor_chase_shared.h"
 #include "engine/word_flags.h"
+#include "engine/engine_pause.h"
 
 /* Resolve contact flags, animation, and pursuit routing. The normal chase
  * continuation returns zero even after installing its control. */
@@ -240,15 +242,6 @@ static inline u8 sameRegion(u16 *region)
     return 0;
 }
 
-static inline u8 unavailable(struct ChaseActor *actor)
-{
-    if (actor) {
-        if (SceneActorContact_MotionFlags(actor, 0x40) || SceneActorChase_StatusFlags(actor, 0x20000) || actor->base.health <= 0)
-            return 1;
-    }
-    return 0;
-}
-
 static inline u32 test(u32 mask, u32 flags)
 {
     return mask & flags;
@@ -271,7 +264,7 @@ s32 Skeleton_UpdateBehaviorCallbacks(struct ChaseActor *actor)
 {
     struct Skeleton *state = (void *)actor;
     struct SceneActorRegistryControlGroup *block = &state->chase.group.common;
-    if (SceneActorBehavior_GlobalPauseBits(0x400))
+    if (Engine_PauseBits(0x400))
         return 0;
     if (test(4, gUnk_02000560))
         return 0;
@@ -280,7 +273,7 @@ s32 Skeleton_UpdateBehaviorCallbacks(struct ChaseActor *actor)
             SceneActorPlacement_HideActor(actor, 0);
             return 0;
         }
-        if (!unavailable(actor) && !pending(state)) {
+        if (!SceneActor_ActionsBlocked(actor) && !pending(state)) {
             if (!(u8)Callback_InvokeActor(actor, actor->base.onDamage))
                 Callback_InvokeActor(actor, block->fallback);
         }
