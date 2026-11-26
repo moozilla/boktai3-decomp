@@ -487,16 +487,12 @@ void SparkParticle_Spawn(void *, u32, void *, s32, s32, s32, s32, s32);
 
 void Lun_ResumeAfterLiftPenalty(struct ChaseActor *input, s32 elapsed);
 
-struct LunFlagWord {
-    s16 bits : 16;
-};
-
-static inline s32 SetFlag(u16 mask, struct LunFlagWord *p)
+static inline s32 SetFlag(u16 mask, struct SceneActorReactionMotionFlags *p)
 {
     return p->bits = mask | p->bits;
 }
 
-static inline s32 ClearFlag(struct LunFlagWord *p, u32 mask)
+static inline s32 ClearFlag(struct SceneActorReactionMotionFlags *p, u32 mask)
 {
     return p->bits = mask & p->bits;
 }
@@ -561,7 +557,7 @@ void Lun_ApproachMovementTarget(struct ChaseActor *a, s32 frame)
 {
     struct Lun *ctx = a->base.context;
     if (TakeFlag(&a->base.field2B2)) {
-        SetFlag(32, (struct LunFlagWord *)&a->base.motionFlags);
+        SetFlag(32, (struct SceneActorReactionMotionFlags *)&a->base.motionFlags);
         if (a->base.motionFlags & 8)
             Sound_PlaySong(0x12A);
         {
@@ -585,7 +581,7 @@ void Lun_ApproachMovementTarget(struct ChaseActor *a, s32 frame)
     SetMotionFlags(a, 0x100000);
     if (Move(a)) {
         a->base.stepDone = 1;
-        ClearFlag((struct LunFlagWord *)&a->base.motionFlags, ~0x120);
+        ClearFlag((struct SceneActorReactionMotionFlags *)&a->base.motionFlags, ~0x120);
         {
             SceneActorChase_ClearWordFlags(&a->base.behaviorFlags, 0x80);
         }
@@ -596,10 +592,10 @@ void Lun_ApproachMovementTarget(struct ChaseActor *a, s32 frame)
             if (a->base.motionFlags & liftFlag) {
                 MonsterInit_SetState(a, 3, 0, 0);
                 SceneActorChase_SetControl(a, Lun_ResumeAfterLiftPenalty, 20);
-                ClearFlag((struct LunFlagWord *)&a->base.motionFlags, ~8);
+                ClearFlag((struct SceneActorReactionMotionFlags *)&a->base.motionFlags, ~8);
                 a->base.field2C2 = 64;
             } else if (ctx->routeDelay) {
-                SetFlag(0x100, (struct LunFlagWord *)&a->base.motionFlags);
+                SetFlag(0x100, (struct SceneActorReactionMotionFlags *)&a->base.motionFlags);
                 ctx->routeDelay = ctx->field442;
                 Lun_BeginMoveToPosition(a, &gPlayers[0]->position);
                 MonsterInit_SetState(a, 0, 2, 1);
@@ -989,19 +985,7 @@ static inline u8 LinkedFlag(struct Lun *p)
 void SceneActor_BeginLinkedIdleReaction_0809C834(struct ChaseActor *s)
 {
     if (!SceneActor_ActionsBlocked(s) && LinkedFlag(s->base.context)) {
-        u32 three = 3;
-        u8 *state = &s->base.state2A8;
-        u8 zero = 0;
-        u8 one;
-        *state = zero;
-        s->base.phase2A9 = zero;
-        s->base.behavior2AA = three;
-        s->base.counter2AC = zero;
-        {
-            u8 *queued = &s->base.field2B1;
-            one = 1;
-            *queued = one;
-        }
+        SceneActorTerrain_EnterState(s, 0, 0, 3);
         SceneActorChase_SetControl(s, SceneActorControl_OnIdle, 0x10);
     }
 }
@@ -1016,7 +1000,7 @@ static inline void SetHeightFromGround(struct ChaseActor *actor)
 
 void Lun_UpdateHoverHeight(struct ChaseActor *actor)
 {
-    struct SceneActorControlMotionState *state = SceneActorControl_GetMotionState(actor);
+    struct Lun *state = actor->base.context;
     s32 delta, magnitude;
     s32 cap;
 
@@ -1047,9 +1031,9 @@ void Lun_UpdateHoverHeight(struct ChaseActor *actor)
             cap = 0x104;
     }
     if ((s16)actor->base.heightOffset < cap) {
-        actor->base.heightOffset += Vanargand_TruncateShift(gUnk_086149C4[state->phase], 9);
-        if (state->phase <= 0x3f)
-            state->phase++;
+        actor->base.heightOffset += Math_ShiftTowardZero(gUnk_086149C4[state->hoverPhase], 9);
+        if (state->hoverPhase <= 0x3f)
+            state->hoverPhase++;
         actor->base.body.position.y =
             actor->base.groundHeight + actor->base.heightOffset;
     }
@@ -1065,9 +1049,9 @@ void Lun_UpdateHoverHeight(struct ChaseActor *actor)
     SetHeightFromGround(actor);
     {
         struct SceneActorRegistrySequenceDrawable *drawable = actor->base.drawable;
-        drawable->position.y += Vanargand_TruncateShift(gUnk_086149C4[state->phase] * 32, 12);
+        drawable->position.y += Math_ShiftTowardZero(gUnk_086149C4[state->hoverPhase] * 32, 12);
     }
-    state->phase += 2;
+    state->hoverPhase += 2;
 }
 
 void Lun_UpdateSway(struct ChaseActor *actor)
@@ -1182,17 +1166,6 @@ void Lun_InitProfile(u8 *p)
 {
     *(u32 *)(p + 0x308) = SceneActorProfiles_FindOrAdd(0x11, 0);
 }
-
-struct IvyContext {
-    u8 unknown0[0x62C];
-    u32 flags;
-    u8 unknown630[4];
-    u16 field634;
-};
-
-struct IvyPlacement {
-    u32 xy, z;
-};
 
 // confidence=low: resets movement interpolation and starts the directional animation.
 
@@ -1460,7 +1433,7 @@ void Lun_EnterIdleOrCopyCell(struct ChaseActor *s)
     }
 }
 
-static inline u8 LiftFlag(struct SceneActorControlMotionState *state)
+static inline u8 LiftFlag(struct Lun *state)
 {
     u32 mask = 2;
     return Test(state->flags3D4, mask);
@@ -1470,7 +1443,7 @@ void SceneActorControl_ConsumeLiftFlagPenalty(struct ChaseActor *input)
 {
     struct ChaseActor *actor = input;
     struct Lun *state = actor->base.context;
-    if (!LiftFlag((void *)state))
+    if (!LiftFlag(state))
         return;
     if (actor->base.paletteOffset == 0) {
         gPlayers[0]->movementSpeedReduction--;
