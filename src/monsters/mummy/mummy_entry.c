@@ -47,24 +47,15 @@
 
 void SceneActorAnimation_SelectDirectionalEntry(struct RoomActor *, s32);
 
-static inline u8 TakeFlag(u8 *flag)
+void SceneActorAnimation_UpdateDirectionalEntry(struct ChaseActor *actor, s32 frame)
 {
-    if (*flag) {
-        *flag = 0;
-        return TRUE;
+    if (SceneActorReaction_TakePrepared(actor)) {
+        SceneActorAnimation_SelectDirectionalEntry(&actor->base, 0);
+        actor->base.restart = 0;
     }
-    return FALSE;
-}
-
-void SceneActorAnimation_UpdateDirectionalEntry(u8 *p, s32 arg1)
-{
-    if (TakeFlag(p + 0x2B2)) {
-        SceneActorAnimation_SelectDirectionalEntry(p, 0);
-        *(u8 *)(p + 0x2B3) = 0;
-    }
-    if (arg1 > 0x10 && *(u8 *)(p + 0x2B3) && *(u8 *)(p + 0x2B0) != 1) {
-        *(u8 *)(p + 0x2B0) = 1;
-        SceneActorAnimation_SelectDirectionalEntry(p, 0);
+    if (frame > 0x10 && actor->base.restart && actor->base.stepDone != 1) {
+        actor->base.stepDone = 1;
+        SceneActorAnimation_SelectDirectionalEntry(&actor->base, 0);
     }
 }
 
@@ -123,15 +114,14 @@ void Mummy_ResumeSavedTarget(struct ChaseActor *actor, s32 frame)
 
 // confidence=low: hidden recovery disables the shadow and waits to enter revival.
 
-static inline void Mummy_GetDirectionVariant(struct ChaseActor *actor, u8 *variant, u8 *mirror,
-                                             u32 zero)
+static inline void Mummy_GetDirectionVariant(struct ChaseActor *actor, u8 *variant, u8 *mirror)
 {
     s32 quadrant = ((actor->base.body.direction + 0x60) >> 6) & 3;
     if (quadrant > 1) {
         *mirror = 1;
         *variant = 3 - quadrant;
     } else {
-        *mirror = zero;
+        *mirror = 0;
         *variant = quadrant;
     }
 }
@@ -198,7 +188,7 @@ void Mummy_UpdateHiddenRecovery(struct ChaseActor *actor, s32 frame)
     } else if (frame > 0x1A) {
         {
             u8 directionVariant, mirror;
-            Mummy_GetDirectionVariant(actor, &directionVariant, &mirror, queued);
+            Mummy_GetDirectionVariant(actor, &directionVariant, &mirror);
             Mummy_SelectAnimation(actor, 8, directionVariant, mirror | 4);
         }
         SceneActorChase_SetControl(actor, Mummy_UpdateRevival, 13);
@@ -234,11 +224,7 @@ void Mummy_UpdateRevival(void *object)
             u32 mask = ~1;
             tile->flags = mask & tile->flags;
         }
-        {
-            u16 one = 1;
-            actor->base.health = one;
-        }
-        actor->base.colliderA.responseValue = 60;
+        SceneActorReaction_BeginRevival(&actor->base, 1);
     }
     if (!peek_flag(actor))
         return;
@@ -283,31 +269,20 @@ void SceneActorAttachment_ReplaceResponseSlot(void *, u32, u32, u32);
 
 void Mummy_UpdateDeath(struct ChaseActor *actor, s32 frame);
 
-struct Sub {
-    u8 f0[8];
-    u16 h8;
-    u8 fA[4];
-    u16 hE;
-};
-
-struct Ctx {
-    u8 f0[0x48];
-    struct Sub sub;
-};
-
-void Mummy_UpdateDying(u8 *s, s32 arg)
+void Mummy_UpdateDying(struct ChaseActor *actor, s32 frame)
 {
-    struct Sub *c = &(*(struct Ctx **)(s + 4))->sub;
-    u8 *part = s + 0x3D4;
+    struct SceneActorControlMotionDrawable *drawable = actor->base.drawable;
+    struct DisplaySequenceState *sequence = &drawable->sequence;
+    u8 *part = (u8 *)&actor->group;
     u32 mask;
     s32 off;
-    if (TakeFlag(s + 0x2B2)) {
+    if (SceneActorReaction_TakePrepared(actor)) {
         u32 test;
         u16 *flags;
         u32 value;
-        SceneActorAnimation_SelectDirectionalEntry(s, 8);
+        SceneActorAnimation_SelectDirectionalEntry(&actor->base, 8);
         test = 2;
-        flags = (u16 *)(s + 0x2D4);
+        flags = &actor->base.motionFlags;
         value = *flags;
         test &= value;
         if (test == 0) {
@@ -316,21 +291,21 @@ void Mummy_UpdateDying(u8 *s, s32 arg)
             *flags = test;
         }
     }
-    if (Mod(arg, 60) == 0) {
-        SceneActorAttachment_ReplaceResponseSlot(s, 2, 0, s[0x98]);
+    if (Mod(frame, 60) == 0) {
+        SceneActorAttachment_ReplaceResponseSlot(actor, 2, 0, actor->base.category);
     }
     off = 0xF9;
     off <<= 1;
     if ((*((s16 *)(part + off))) <= 0) {
         mask = 0x80;
         mask <<= 5;
-        if (!(((struct ChaseActor *)s)->base.statusFlags & mask)) {
-            SceneActorChase_SetControl(s, Mummy_UpdateDeath, 6);
+        if (!(actor->base.statusFlags & mask)) {
+            SceneActorChase_SetControl(actor, Mummy_UpdateDeath, 6);
             return;
         }
     }
-    if (c->h8 == 2)
-        c->hE = 0;
+    if (sequence->index == 2)
+        sequence->elapsed = 0;
 }
 
 /* Mummy poses after dying before signaling that the control finished. */
@@ -1303,8 +1278,6 @@ s32 Mummy_UpdateSpecialFlags(void *actor)
     Mummy_ClearInactiveActionFlags(actor);
     return 1;
 }
-
-void SceneActorAnimation_UpdateDirectionalEntry(u8 *p, s32 arg1);
 
 void SceneActorBehavior_CallActionScript(u8 *);
 
@@ -2660,10 +2633,7 @@ void Mummy_UpdateBurnDamage(struct ChaseActor *actor)
     actor->base.behavior2AA = 0;
     actor->base.counter2AC = 0;
     actor->base.field2B1 = 1;
-    {
-        void *control = *(void **)((u8 *)actor + 0x234);
-        SceneActorChase_SetControl(actor, control, 17);
-    }
+    SceneActorChase_SetControl(actor, actor->base.onDefeat, 17);
     if (Test(gEngineFlags, 0x4800)) {
         Player_NotifyFirstSelectedSlot(actor->base.hitOwners, actor->base.hitAttributes);
         goto done;
@@ -3069,7 +3039,7 @@ static inline u32 WordFlag(u8 *p, u32 mask, u32 off)
 void Mummy_ResetResponseState(struct ChaseActor *actor)
 {
     u8 *p = (u8 *)actor;
-    struct SceneActorChaseTracking *body = (void *)(p + 0xDC);
+    struct SceneActorChaseTracking *body = &actor->base.tracking;
     u32 mask = ~0x18;
     u32 *flags;
     u16 *motion;
@@ -3643,8 +3613,6 @@ void Mummy_UpdateDisplacementRecovery(struct ChaseActor *actor, s32 frame);
 void Mummy_UpdateHiddenRecovery(struct ChaseActor *actor, s32 frame);
 
 void SceneActorTarget_ResolvePendingObject(void);
-
-void Mummy_UpdateDying(u8 *s, s32 arg);
 
 void Mummy_ResumeSavedTarget(struct ChaseActor *actor, s32 frame);
 
