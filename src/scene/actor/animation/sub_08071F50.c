@@ -1,22 +1,22 @@
+#include "npc/manager/scene_actor_animation.h"
 #include "scene/actor/scene_actor_palette.h"
 #include "scene/actor/scene_actor_status.h"
-#include "engine/word_flags.h"
 
-static inline u8 TestManagerFlag(struct SceneActorPaletteManagerView *manager, u32 mask)
+static inline u8 TestManagerFlag(struct SceneActorRegistryManager *manager, u32 mask)
 {
     if (manager->flags & mask)
         return TRUE;
     return FALSE;
 }
 
-static inline void BindPalette(struct RoomActor *actor, const u16 *colors)
+static inline void BindPalette(struct RoomActor *actor, u16 *colors)
 {
     if (ActorStatus_BehaviorFlags(actor, 0x02008000))
         return;
     if (actor->drawableKind == 0)
-        ((struct SceneActorPaletteSequenceView *)actor->drawable)->palette = colors;
+        ((struct SceneActorAnimationSequenceDrawable *)actor->drawable)->graphics.palette = colors;
     else
-        ((struct SceneActorPaletteTileView *)actor->drawable)->palette = colors;
+        ((struct SceneActorAnimationTileDrawable *)actor->drawable)->tile.palette = colors;
 }
 
 static inline void AdvancePaletteTransition(struct SceneActorPaletteTransition *transition)
@@ -33,7 +33,7 @@ static inline void AdvancePaletteTransition(struct SceneActorPaletteTransition *
     transition->remaining--;
 }
 
-u32 SceneActorPalette_ApplyTransition(struct SceneActorPaletteManagerView *manager,
+u32 SceneActorPalette_ApplyTransition(struct SceneActorRegistryManager *manager,
                                       struct ChaseActor *actor)
 {
     struct SceneActorPaletteTransition *transition;
@@ -67,11 +67,13 @@ u32 SceneActorPalette_ApplyTransition(struct SceneActorPaletteManagerView *manag
         AdvancePaletteTransition(transition);
         switch (category) {
             case 23: {
-                WordFlags_Set(0x8000, &manager->flags);
+                u32 mask = 0x8000;
+                manager->flags |= mask;
                 break;
             }
             case 10: {
-                WordFlags_Set(0x4000, &manager->flags);
+                u32 mask = 0x4000;
+                manager->flags |= mask;
                 break;
             }
         }
