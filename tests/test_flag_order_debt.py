@@ -99,3 +99,16 @@ class FlagDebt(unittest.TestCase):
         self.assertEqual(self.debt(temp + use), 1)
         self.assertEqual(self.debt(temp.replace("k", "K") + use), 1)
         self.assertEqual(self.debt(temp.replace("& m", "+ m") + use), 0)
+
+    def test_summary_and_total_include_the_same_weighted_uses(self):
+        import contextlib
+        import io
+        from unittest.mock import patch
+        source = self.root / "src/a.c"
+        source.write_text("static inline unsigned Test(unsigned x, unsigned m) { return x & m; }\n"
+                          "unsigned f(unsigned x) { unsigned m = 4; return Test(x, 2) + (x & m) + (x | m); }")
+        output = io.StringIO()
+        with contextlib.redirect_stderr(output), patch("statement_macros.single_use_names", return_value=frozenset()):
+            self.assertEqual(c.main(["--no-compiler", "--summary", str(source)]), 0)
+        self.assertIn("steering debt: 3 constant uses", output.getvalue())
+        self.assertIn("0 errors, 3 warnings in 1 files", output.getvalue())
