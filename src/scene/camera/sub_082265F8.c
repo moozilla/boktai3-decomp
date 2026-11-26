@@ -1,9 +1,6 @@
 #include "scene/camera/scene_camera_controller.h"
-#include "global.h"
+#include "engine/engine.h"
 
-u32 Script_SeekToKeyword(u32);
-s32 Script_GetValue(void);
-u8 *Script_GetPc(void);
 u8 *Script_DecodeOperand(u8 *, s32 *, s32 *);
 
 /* Shared by the camera move commands (tentative): reads the move rate from
