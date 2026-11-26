@@ -1,6 +1,9 @@
 #ifndef GUARD_BOSSES_NIDHOGGR_NIDHOGGR_ANIMATION_H
 #define GUARD_BOSSES_NIDHOGGR_NIDHOGGR_ANIMATION_H
 #include "global.h"
+#include "bosses/nidhoggr/nidhoggr_effect_pool.h"
+#include "player/target_registry/target_registry.h"
+#include "engine/video/sprite.h"
 #include "engine/engine.h"
 #include "engine/math/scene_vec.h"
 #include "scene/collision/contact_collider.h"
@@ -16,14 +19,6 @@
  * (confidence=low); several short byte/word fields, and most of the suspended-object
  * and terrain-cell sub-regions, are still guesses. */
 
-/* A part's registration with the scene target registry. */
-struct NidhoggrPartExtra {
-    void *collider;
-    u32 flags; /* 0x04: bit 0 set when the part is hidden */
-    void *callback;
-    void *next;
-};
-
 struct NidhoggrTerrainCell {
     u8 unknown0[6];
     u16 flags;
@@ -36,7 +31,7 @@ struct Nidhoggr {
     u8 unknown40[0x4C - 0x40];
     u32 actorId;                  /* 0x4C: id used for SceneMessages/MessageQueue routing */
     void *bgScript;               /* 0x50: ScriptProc_Start handle for the background layers */
-    u8 effectPool[0x5404 - 0x54]; /* 0x54: small/large sprite-effect slot pools */
+    struct NidhoggrEffectPool effectPool; /* 0x54 */
     struct SceneVec pos;          /* 0x5404: current world position */
     struct SceneVec basePos;      /* 0x540C: anchor/base position that sway offsets add to */
     s16 speed;                    /* 0x5414 */
@@ -49,13 +44,11 @@ struct Nidhoggr {
                                                  * flags[0] counts down */
     struct ContactCollider attackColliders[26]; /* 0x5E50: one per part */
     struct ContactCollider colliders[26];  /* 0x66D8 */
-    struct NidhoggrPartExtra partExtra[26]; /* 0x6F60 */
+    struct MotionTarget partExtra[26]; /* 0x6F60 */
     struct NidhoggrTerrainCell
         terrainCells[2];      /* 0x7100: registered via TerrainModifiers_RegisterCell */
-    u8 suspendedAnim[0x1C];   /* 0x7120: suspended-object sprite animation data */
-    u8 suspendedSprite[0x1C]; /* 0x713C */
-    struct ContactPosition suspendedPos; /* 0x7158 */
-    u8 unknown7160[0x7168 - 0x7160];
+    struct SpriteRenderResource suspendedAnim; /* 0x7120 */
+    struct DisplaySequenceSprite suspendedSprite; /* 0x713C */
     struct ContactCollider suspendedCollider; /* 0x7168 */
     u8 suspendedState;          /* 0x71BC: descent/retraction/shake sub-state */
     u8 terrainCellsRegistered;  /* 0x71BD */
@@ -108,13 +101,15 @@ struct Nidhoggr {
     u8 paletteTransition[0x38]; /* 0x72C4 */
 };
 
+typedef char NidhoggrSizeCheck[sizeof(struct Nidhoggr) == 0x72FC ? 1 : -1];
+
 /* Bit 2 of a part collider's flags disables it. */
 static inline void Nidhoggr_DisablePartCollider(struct ContactCollider *collider)
 {
     collider->flags |= 4;
 }
 
-static inline void Nidhoggr_SetPartExtraFlags(struct NidhoggrPartExtra *extra, u32 mask)
+static inline void Nidhoggr_SetPartExtraFlags(struct MotionTarget *extra, u32 mask)
 {
     extra->flags |= mask;
 }

@@ -1551,7 +1551,7 @@ void Nidhoggr_InitParts(void *arg0)
     struct AnimSpriteResource *src;
     s32 i;
     struct AnimSprite *row;
-    struct NidhoggrPartExtra *target;
+    struct MotionTarget *target;
     struct ContactCollider *collider;
     u32 damage;
     u32 partAttributes = 0x120;
@@ -1707,19 +1707,19 @@ void Collider_SetAttackProperties(void *, s32, s32, u32, u32, s32);
 
 void Nidhoggr_InitSuspendedObject(struct Nidhoggr *t)
 {
-    u8 *anim = t->suspendedAnim;
-    u8 *sprite;
+    struct SpriteRenderResource *anim = &t->suspendedAnim;
+    struct DisplaySequenceSprite *sprite;
     u32 h;
     u8 *collider;
     u8 bz;
     AnimData_Load(anim, 0xc7f0);
     AnimData_SelectPaletteBank(anim, 0x1a3);
-    sprite = t->suspendedSprite;
+    sprite = &t->suspendedSprite;
     Sprite_Init(sprite, anim, 0);
-    *(u32 *)sprite |= 1;
+    sprite->flags |= 1;
     bz = 0;
-    *(u16 *)(sprite + 0x10) = 0;
-    t->suspendedPos = gUnk_0824F4E4;
+    sprite->frame = 0;
+    t->suspendedSprite.position = gUnk_0824F4E4;
     t->suspendedState = bz;
     t->terrainCellsRegistered = bz;
     t->suspendedTimer = 0;
@@ -1733,7 +1733,7 @@ void Nidhoggr_InitSuspendedObject(struct Nidhoggr *t)
 
 void Nidhoggr_DestroySuspendedObjectSprite(struct Nidhoggr *p)
 {
-    Sprite_Remove(p->suspendedSprite);
+    Sprite_Remove(&p->suspendedSprite);
 }
 
 void Nidhoggr_StartSuspendedObjectDescent(struct Nidhoggr *p)
@@ -1801,36 +1801,36 @@ void Nidhoggr_CreateThreePointBurst(const void *);
 
 void Nidhoggr_UpdateSuspendedObject(struct Nidhoggr *t)
 {
-    u8 *sp;
+    struct DisplaySequenceSprite *sp;
     switch (t->suspendedState) {
         case 0: {
-            u8 *sp = t->suspendedSprite;
-            *(u32 *)sp |= 1;
+            struct DisplaySequenceSprite *sp = &t->suspendedSprite;
+            sp->flags |= 1;
         } break;
         case 1:
-            sp = t->suspendedSprite;
-            *(u32 *)sp &= ~1;
-            *(u16 *)(sp + 0x10) = 1;
-            t->suspendedPos.x = 0xdc0;
-            t->suspendedPos.y = 0xfcc0;
-            t->suspendedPos.z = 0xa80;
+            sp = &t->suspendedSprite;
+            sp->flags &= ~1;
+            sp->frame = 1;
+            t->suspendedSprite.position.x = 0xdc0;
+            t->suspendedSprite.position.y = 0xfcc0;
+            t->suspendedSprite.position.z = 0xa80;
             t->suspendedState++;
             t->suspendedTimer = 0x14;
             Nidhoggr_CreateThreePointBurst(gUnk_0824F4FC);
             break;
         case 2:
-            t->suspendedPos.y += 0x33;
-            if (t->suspendedPos.y > -0x140)
-                t->suspendedPos.y = 0xfec0;
+            t->suspendedSprite.position.y += 0x33;
+            if (t->suspendedSprite.position.y > -0x140)
+                t->suspendedSprite.position.y = 0xfec0;
             if ((s16)--t->suspendedTimer <= 0)
                 t->suspendedState++;
             break;
         case 3: {
-            u8 *sp2 = t->suspendedSprite;
-            *(u16 *)(sp2 + 0x10) = 0;
+            struct DisplaySequenceSprite *sp2 = &t->suspendedSprite;
+            sp2->frame = 0;
         }
             Collider_Refresh(&t->suspendedCollider);
-            Collider_SetPosition(&t->suspendedCollider, &t->suspendedPos, 0);
+            Collider_SetPosition(&t->suspendedCollider, &t->suspendedSprite.position, 0);
             t->suspendedState++;
             Sound_PlaySongChecked(0x1be);
             break;
@@ -1846,25 +1846,25 @@ void Nidhoggr_UpdateSuspendedObject(struct Nidhoggr *t)
             const struct ContactPosition *tab = gUnk_0824F504;
             const struct ContactPosition *e;
             e = tab + i;
-            t->suspendedPos.x = 0xdc0 + e->x;
-            t->suspendedPos.z = 0xa80 + e->z;
+            t->suspendedSprite.position.x = 0xdc0 + e->x;
+            t->suspendedSprite.position.z = 0xa80 + e->z;
             (*tm)++;
             break;
         }
         case 7: {
-            u8 *sp3 = t->suspendedSprite;
-            *(u16 *)(sp3 + 0x10) = 1;
+            struct DisplaySequenceSprite *sp3 = &t->suspendedSprite;
+            sp3->frame = 1;
         }
             t->suspendedState++;
             break;
         case 8:
-            t->suspendedPos.y -= 0x33;
-            if (t->suspendedPos.y < -0x340) {
+            t->suspendedSprite.position.y -= 0x33;
+            if (t->suspendedSprite.position.y < -0x340) {
                 {
-                    u8 *sp = t->suspendedSprite;
-                    *(u32 *)sp |= 1;
+                    struct DisplaySequenceSprite *sp = &t->suspendedSprite;
+                    sp->flags |= 1;
                 }
-                t->suspendedPos.y = 0xfcc0;
+                t->suspendedSprite.position.y = 0xfcc0;
                 t->suspendedState = 0;
                 Nidhoggr_CreateThreePointBurst(gUnk_0824F4FC);
             }
@@ -3166,7 +3166,7 @@ void Nidhoggr_UpdateEffectAttack(struct Nidhoggr *t)
             goto update;
         case 5:
             if (!(t->timer & 1))
-                Nidhoggr_CreateDistanceLimitedEffect(t->effectPool, &t->pos, gUnk_0824F5A0, t);
+                Nidhoggr_CreateDistanceLimitedEffect(&t->effectPool, &t->pos, gUnk_0824F5A0, t);
             Nidhoggr_TrackPlayerDepth(t);
             Nidhoggr_UpdateWideSway(t);
             if (t->timer > 0x78) {
@@ -3540,7 +3540,7 @@ s32 Nidhoggr_Update(struct Nidhoggr *t)
     Nidhoggr_UpdateSuspendedObject(t);
     Nidhoggr_UpdateBackgroundScroll(t);
     Nidhoggr_UpdatePartMotion(t);
-    NidhoggrEffect_UpdatePool(t->effectPool);
+    NidhoggrEffect_UpdatePool(&t->effectPool);
     Nidhoggr_ApproachCameraTarget(t);
     if (t->targetMode)
         Camera_SetPosition(&t->cameraPos);
@@ -3554,7 +3554,7 @@ void Nidhoggr_ClearEffectPools(void *);
 
 s32 Nidhoggr_Destroy(struct Nidhoggr *t)
 {
-    Nidhoggr_ClearEffectPools(t->effectPool);
+    Nidhoggr_ClearEffectPools(&t->effectPool);
     Nidhoggr_DestroyParts(t);
     Nidhoggr_DestroySuspendedObjectSprite(t);
     Nidhoggr_UnregisterTerrainCells(t);
@@ -3661,7 +3661,7 @@ s32 Nidhoggr_Init(struct Nidhoggr *t, s32 unusedA, s32 unusedB)
         for (i = 8, p = &t->dead[8]; i >= 0; p--, i--)
             *p = z;
     }
-    NidhoggrEffect_InitPool(t->effectPool);
+    NidhoggrEffect_InitPool(&t->effectPool);
     Nidhoggr_InitBackgrounds(t);
     Nidhoggr_InitParts(t);
     Nidhoggr_InitSuspendedObject(t);
