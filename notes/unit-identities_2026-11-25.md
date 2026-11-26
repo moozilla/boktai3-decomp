@@ -1241,6 +1241,53 @@ host drains due events and uses the same next-instruction PC as the
 headless harness. The connected race screenshots are
 `build/identify/pass3/pass3-connected-race-{0,1}.png`.
 
+### The Count's White Django awakening sequence
+
+Tags: White Django, Ancient Tree, Count, cutscene, orbiting particles
+
+Warp 0026 to scene 6231 at story 88 and entrance 62. Proc 6231
+runs 6225, which prints the White Django awakening setup message.
+Entrance 62 runs 3345 and 3346, then 3315 starts cutscene 40.
+The entrance 47 control stays in the open field. Use the original
+dialogue inputs in the entrance-62 replay to pass the Count's
+lines #6361–6370.
+
+At frame 2088, the ordinary Django at 0200ADB4 runs
+`PlayerCue_Stand` 0815AF14, entering motion zero. At 2099,
+cutscene 40 step 10 sends kind 7 command zero from 08E6764C.
+`SceneCommands_CreateEffect` 08020F84 reads the packet and calls
+`OrbitingParticles_Create` at (2000, 512, 2100) with radius 128,
+duration 180, and type 2. Task 02012174 uses the 1C1E particle
+resource and its original update runs beside the ordinary Player.
+`resume5-white-django-render/particles06.png` shows Django,
+the Count, and the gold stars.
+
+The matched comparison saves at frame 2145. In one arm, let
+task 02012174 continue. In the other, call `Task_Kill` 0821A0C0
+on that task and observe its original destructor at 080189A8.
+At frame 2153 exactly 126 RGB pixels differ, all inside the
+rectangle from (85, 62) to (114, 111) with exclusive upper
+bounds. The particles disappear and the ordinary Player keeps
+updating on the same pointer. Compare `control.png` and
+`suppressed.png` in `resume5-white-django-compare`.
+
+This is a story control for the alternate Link Player and the
+forced Player motions. The reveal has zero function entry hits
+in 08238238–082389D8 and 08239130–08243B54 or in the ordinary
+mode 9, 13, 14, 16, or 17 callbacks. The scene commands and orbit
+task account for the visible stars. Other cutscenes also use the
+orbit task, so keep it in the shared effects layout.
+
+```sh
+build/venv/bin/python tools/assets/cutscenes.py 40
+run=build/identify/replays/resume5-white-django-render
+runner=build/identify/pass3/link_harness
+BOKTAI3_SAV="$run/start.sav" nice -n 19 "$runner" baserom.gba "$run/commands.txt" "$run"
+build/venv/bin/python tools/whoruns.py 08238238-082389D8 08239130-08243B54 --coverage "$run"
+run=build/identify/replays/resume5-white-django-compare
+BOKTAI3_SAV="$run/start.sav" nice -n 19 "$runner" baserom.gba "$run/commands.txt" "$run"
+```
+
 ## Pass 3 object paths, rows 1–11
 
 Tags: scene objects, D9AE, F1F9, moving platform, passages, ice, traps, candlestick
