@@ -1083,3 +1083,49 @@ a red drop remains in `hit07.png`. The earlier control used the
 same attack tape and lacked the drop from this slot.
 This verifies the loot-deposit role. The path describes that
 role while its exact in-game label remains unknown.
+
+## Pass 3 Player range
+
+Tags: Link Player, Crossover Battle, Coffin Bike, timed sprite, Dark Loans
+
+Search both half-open ranges before moving them. The existing checkpoint
+and replay index has zero hits in the alternate Player scheduler loop
+before the controlled actor test. The local Crossover round (0032 to
+1656) runs `Player_Update` 0815F0D0. The Back Street cable match uses the
+Coffin Bike scheduler on both units. The adapter-connected Crossover
+session remains unobserved. The direct Thumb call and little-endian ROM
+literal scan in `build/identify/pass3/constructor_refs.py` finds no
+references to the alternate constructor 08243B0C. The sole pointer to
+`Player_UpdateLinkCore` is 08243B44, inside that constructor.
+
+```sh
+build/venv/bin/python tools/whoruns.py 08237EC8-082389D8 08239130-08243C10 --functions
+build/venv/bin/python build/identify/pass3/constructor_refs.py
+build/venv/bin/python build/identify/pass3/replay_link_actor.py
+```
+
+The controlled `pass3-staged-isolated-django` replay starts from stock
+0029 warped to White Forest room 3955. Its harness calls 08243B0C with
+an emulated session record and native script keywords for slot one and a
+position near ordinary Django. The constructor uses DE23 for the body and
+loads D495 for the auxiliary sprite. It returns task 0200ED14. Restore the
+original script and session globals and the published slot and count
+before continuing. Arm the new actor's action initializer by setting its
+byte at +464. The original scheduler runs `Player_UpdateLinkCore` then
+`Player_UpdateLinkKind` on the new task starting at frame 1856. Compare
+`before.png`, `second.png`, and `move.png`. The normal red Django and the
+blue alternate body are both visible. This proves the actor and dispatch
+family. The capture stages the constructor and initial state, so its normal
+mode and shipped entry point remain open. Use `link/player` as an ownership
+name for the alternate actor and its local effects and controls.
+
+Pass 3's first and last boundaries also cover two independent units. The
+seven files 08237EC8 through 082381C8 are a standalone timed sprite task.
+`review-native-timed-visual` calls its original constructor in the 3955
+room, then its sprite draws, ticks and expires. The original callers at
+081CB3F4 and 081CBE30 are story-character state callbacks. Route those seven
+files to `effects/sprites/timed_character_effects`. Start the alternate
+Player block at 08238238. At the far end, 08243B54 is the stat gauge. In the
+0032 Dark Card replay, `DarkLoan_DrawPreview` calls it during the loan offer.
+Use `ui/pause/menu_sequences` for that file. End the alternate player block
+at 08243B54, exclusive. The gap 082389D8–08239130 remains directional effects.

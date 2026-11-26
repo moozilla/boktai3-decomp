@@ -45,3 +45,5 @@ SceneProcSprites_,BallisticSprite_,src/effects/ballistic_sprite_effect,"Controll
 ParticleEmitter_,BallisticTrail_,src/effects/particle_emitter,Controlled original 081394B4 reaches ParticleEmitter_UpdateFlight and the 8639 scatter trail.
 Breakable_,LightFixture_,src/field/pooled_interactables,"0038→4479. Original 2E1C slot B8CC draws F099 and its hit response calls 4478, lighting the room."
 ActorMarker_,BikeChargeMarker_,src/effects/particle_burst_effect/following_sprite_effect.c,0008→6274. Glove’s reserved compact slot becomes visible in the original B-hold charge loop; renderer records drawable 0200F4E8.
+Player_UpdateLink,LinkPlayer_Update,0824261C / 082438F4,Controlled 3955 alternate Django runs both entry points on the task returned by the original constructor. The ordinary Player task keeps its existing update name.
+sub_08243B0C,LinkPlayer_Create,08243B0C,Original constructor creates the 0xCAC task. The 3955 controlled run shows a second blue Django and traces the task owner into LinkPlayer update.
