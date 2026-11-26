@@ -267,7 +267,7 @@ void Actor_DispatchStateHandler(struct PooledActor *actor)
 void Actor_OnTrackingAction(struct PooledActor *actor, u32 tick)
 {
     struct MotionPoolParams params;
-    struct ActorParticlePosition position;
+    struct ContactPosition position;
     s32 (*callback)(void *);
     if (actor->actionChanged)
         actor->actionChanged = 0;
@@ -293,12 +293,20 @@ void Actor_OnTrackingAction(struct PooledActor *actor, u32 tick)
                 MotionPool_SetContact(&params, 0, 0x200004, 0x64, 0x32, 0x28);
                 MotionPool_SetBounds(&params, 0x10, 0x10, 0x10);
                 MotionPool_SetGraphics(&params, 0x61f9, 0x29, 0x29f);
-                position = *(struct ActorParticlePosition *)&actor->body.position;
+                position = actor->body.position;
                 position.y += 0x80;
                 MotionPool_Spawn(&params, &position);
             }
         }
     }
+}
+
+static inline void ActorController_SetAction(struct PooledActor *actor, void (*action)(void *, int), u16 id)
+{
+    actor->actionCallback = action;
+    actor->currentAction = id;
+    actor->actionChanged = 1;
+    actor->actionTicks = 0;
 }
 
 s32 Actor_TryStartPendingAction(struct PooledActor *actor)
@@ -309,10 +317,7 @@ s32 Actor_TryStartPendingAction(struct PooledActor *actor)
         u16 id = actor->pendingAction;
         void (*action)(void *, int);
         action = table[id];
-        actor->actionCallback = action;
-        actor->currentAction = id;
-        actor->actionChanged = 1;
-        actor->actionTicks = 0;
+        ActorController_SetAction(actor, action, id);
         started = 1;
     } else
         started = 0;
@@ -377,14 +382,6 @@ static inline void ActorController_SetDamageCallback(struct PooledActor *actor, 
     actor->handleDamage = fn;
 }
 
-static inline void ActorController_SetAction(struct PooledActor *actor, void *fn, int zero, int one)
-{
-    actor->actionCallback = fn;
-    actor->currentAction = zero;
-    actor->actionChanged = one;
-    actor->actionTicks = zero;
-}
-
 static inline void ActorController_InitHitSensor(struct PooledActor *actor, struct SceneVec *size,
                                                  void *fn, struct SceneVec *offset)
 {
@@ -425,7 +422,7 @@ int Actor_InitializeControllerFromScript(struct PooledActor *actor)
     actor->state = 0;
     actor->stateChanged = 1;
     actor->stateTicks = 0;
-    ActorController_SetAction(actor, Actor_OnTrackingAction, 0, 1);
+    ActorController_SetAction(actor, (void *)Actor_OnTrackingAction, 0);
     return 0;
 }
 
