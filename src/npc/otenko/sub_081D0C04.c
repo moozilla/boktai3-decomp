@@ -59,7 +59,6 @@ void Otenko_CreateFromScript(void)
     struct OtenkoActor *npc;
     void (*updateC)(void);
     struct PackedVec position;
-    u32 zero;
     struct OtenkoEffectState *effect;
     struct SceneActorBody *body;
     if (!manager) {
@@ -86,15 +85,15 @@ void Otenko_CreateFromScript(void)
     if (Actor_InitMotion(npc, name, &position, angle) < 0) {
         return;
     }
-    if (Actor_InitDrawable(npc, 1, 0x97D3, 0xC6A0, zero = 0) < 0) {
+    if (Actor_InitDrawable(npc, 1, 0x97D3, 0xC6A0, 0) < 0) {
         return;
     }
     body = &npc->body;
     {
         s32 speed = 400;
-        body->positionOffset.x = zero;
+        body->positionOffset.x = 0;
         body->positionOffset.y = speed;
-        body->positionOffset.z = zero;
+        body->positionOffset.z = 0;
     }
     Actor_InitShadow(npc, (u32)npc->display.position, 1, 0, 0x40);
     SceneMessages_RegisterReceiver(&npc->receiver, name, 5);
@@ -128,7 +127,7 @@ void Otenko_CreateFromScript(void)
     Actor_LinkToManager(manager, npc);
     Actor_InitBehaviorFromScript(manager, npc);
     effect = &npc->effect;
-    npc->commandFlags = zero;
+    npc->commandFlags = 0;
     effect->projected = 0;
     switch (Script_GetKeywordValue('i', 0)) {
         case 0: {
