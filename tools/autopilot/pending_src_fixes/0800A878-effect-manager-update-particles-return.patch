@@ -1,0 +1,30 @@
+0800A878 effect-manager-update-particles-return
+
+The last particle callback decides r0. State zero uses a leaf no-op and
+keeps the manager argument. All other entries of 08604A78 return
+through r0 via the call trampoline with LR 0800A8C9.
+
+The explicit form changed the ROM bytes. The guarded form passed the unit ROM check.
+
+--- a/src/homing_effect.c
++++ b/src/homing_effect.c
+@@ -55,7 +55,19 @@
+     struct EffectParticle *p;
+     i = 0;
++#ifdef UBFIX
++    p = effect->particles;
++    {
++        u8 state;
++        for (; i < 4; p++, i++) {
++            state = p->state;
++            gUnk_08604A78[effect->type][state](manager, effect, i, one, mask, context);
++        }
++        return state == 0 ? (s32)manager : 0x0800A8C9;
++    }
++#else
+     p = effect->particles;
+     for (; i < 4; p++, i++)
+         gUnk_08604A78[effect->type][p->state](manager, effect, i, one, mask, context);
++#endif
+ }
+ 

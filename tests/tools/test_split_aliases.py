@@ -12,6 +12,13 @@ import split
 
 
 class SplitAliasTests(unittest.TestCase):
+    def test_source_without_drafts_keeps_whitespace_and_alias_handling(self):
+        source = "#define Panel_Update sub_08004000\n\nvoid Panel_Update(void) {}\n\n"
+
+        self.assertEqual(split.split_nonmatching(source), (source, []))
+        self.assertEqual(split.source_functions(source), ['sub_08004000'])
+        self.assertEqual(split.source_functions(source, resolve_aliases=False), ['Panel_Update'])
+
     def test_promoted_and_unpromoted_generated_names(self):
         for generated, definition in [('Panel_Update', 'sub_08004000'),
                                       ('sub_08004000', 'Panel_Update'),

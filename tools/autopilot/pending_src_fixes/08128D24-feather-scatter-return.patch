@@ -1,0 +1,53 @@
+08128D24 feather-scatter-return
+
+After an unobstructed traversal the last TerrainModifiers_FindCellOverride
+result is in r0. The caller tests its low byte. On a same-cell call,
+the cartridge system stack starts at 03007DA0 and the sole call chain
+to ClipScatterPath consumes D0 bytes (24/20/24/20/120 from AgbMain
+through the scheduler and the feather callbacks). Both call veneers
+branch without a frame. ClipScatterPath consumes 74h bytes and passes
+SP+38h to the CpuSet word fill. The ROM harness BIOS advances r0 four
+bytes, leaving 03007C98, whose low byte the caller tests.
+
+The explicit form changed the ROM bytes. The guarded form passed the unit ROM check.
+
+--- a/src/fn/sub_08128D24.c
++++ b/src/fn/sub_08128D24.c
+@@ -59,8 +59,14 @@
+     s32 height;
+     struct ContactPosition *velocity = &local.velocity;
++#ifdef UBFIX
++    u8 *lastOverride;
++#endif
+     local.zero = 0;
+     FeatherEffectPool_ClearWords(&local.zero, velocity, 0x05000002);
+     if (cursor != target) {
+         do {
++#ifdef UBFIX
++            u8 *cell;
++#endif
+             previous = cursor;
+             switch (direction) {
+@@ -85,5 +91,11 @@
+                 return 1;
+             height = (*SceneActorTerrain_GetCell(previous)) & 15;
++#ifdef UBFIX
++            lastOverride = TerrainModifiers_FindCellOverride(cursor, 1);
++            cell = lastOverride ? lastOverride + 4 : gTerrainMap->cells + (cursor * 4 + 12);
++            if (height < (*cell & 15)) {
++#else
+             if (height < ((*SceneActorTerrain_GetCell(cursor)) & 15)) {
++#endif
+                 struct ContactPosition *center;
+                 FeatherEffectPool_GetCellCenter(cursor, &local.center, &center);
+@@ -140,4 +152,10 @@
+             }
+         } while (cursor != target);
++#ifdef UBFIX
++        return (u8)(u32)lastOverride; // r0 retains the last override lookup
++#endif
+     }
++#ifdef UBFIX
++    return 0x98; // The GBA CpuSet source register ends at 0x03007C98
++#endif
+ }

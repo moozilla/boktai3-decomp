@@ -1,4 +1,5 @@
 #include "effects/particles/fragment_group.h"
+#include "engine/math/scene_vec_polar.h"
 // confidence=low: allocates a fragment group with randomized direction and lifetime.
 #define FragmentGroup_SpawnRadial sub_08014CA4
 extern u16 gUnk_08604C42[], gUnk_08604C30[];
@@ -14,13 +15,6 @@ static inline s32 RandomByte(const u16 *table, u32 *rng)
     u32 r = (*rng + 1) & 0x3ff;
     *rng = r;
     return *(u8 *)&table[r];
-}
-static inline s32 Scale(s32 a, s32 b)
-{
-    s32 v = a * b;
-    if (v >= 0)
-        return v >> 12;
-    return -(-v >> 12);
 }
 s32 FragmentGroup_SpawnRadial(s32 count, s32 type, const struct ContactPosition *position,
                               s32 radius, s32 lifetime, s32 lifetimeRange, s32 speed,
@@ -125,8 +119,8 @@ s32 FragmentGroup_SpawnRadial(s32 count, s32 type, const struct ContactPosition 
                         }
                         p->flags &= ~1;
                         p->position = *position;
-                        p->position.x += Scale(velocity->x, radius);
-                        p->position.z += Scale(velocity->z, radius);
+                        p->position.x += SceneVec_TruncateComponent(velocity->x * radius);
+                        p->position.z += SceneVec_TruncateComponent(velocity->z * radius);
                         Sprite_Init(p, animation, 0x200);
                         p->frame = gUnk_08604C30[g->type];
                         if (RandomByte(table, rng) <= 128)

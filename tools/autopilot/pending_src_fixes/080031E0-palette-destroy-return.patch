@@ -1,0 +1,19 @@
+080031E0 palette-destroy-return
+
+TaskSystem_RunFrame passes the retiring task in r0 at 0821A09A.
+The callback clears its global through r1 and r2, preserving r0.
+
+The explicit form passed the unit ROM check.
+
+--- a/src/palette_controller.c
++++ b/src/palette_controller.c
+@@ -440,7 +440,8 @@
+ }
+ 
+-u32 Palette_Destroy(void)
++u32 Palette_Destroy(void *task)
+ {
+     gPaletteController = 0;
++    return (u32)task;
+ }
+ 

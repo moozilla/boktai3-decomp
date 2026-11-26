@@ -22,8 +22,12 @@ exports.grid = () => {
       // getCell (scene_object.c): a terrain modifier's override wins over the map
       // (pushed blocks, raised bridges)
       const over = g.fn.TerrainModifiers_FindCellOverride(row + x, 1);
-      const a = over ? over + 4 : base + 12 + 4 * (row + x), hb = g.u8(a), flags = g.u16(a + 2);
-      cells.push({ x, z, index: row + x, level: hb & 15, slope: hb >> 4 !== 0, kind: hb >> 4, flags, open: !(flags & 1) });  // Player_IsTurnTerrainBlocked: bit 0 blocks (walls 0x040B/0x040F, outside 0x0003)
+      const original = base + 12 + 4 * (row + x);
+      const a = over ? over + 4 : original, hb = g.u8(a), flags = g.u16(a + 2);
+      // CellGate_UpdatePassageBarrier hides an authored gap with 0x82a while
+      // waiting for the player to enter the cell. That override adds no floor.
+      const gatedGap = flags === 0x82a && (g.u16(original + 2) & 0x40) !== 0;
+      cells.push({ x, z, index: row + x, level: hb & 15, slope: hb >> 4 !== 0, kind: hb >> 4, flags, gatedGap, open: !(flags & 1) });
     }
   }
   return { w, h, cells, at: (x, z) => (x < 0 || z < 0 || x >= w || z >= h ? null : cells[z * w + x]) };
@@ -43,7 +47,7 @@ exports.blocks = () => {
     if (!o.active || o.mode === 2 || o.mode === 3) continue;
     const idx = o.cellRef.index;
     out.push({ slot: i, type: o.type, kind: o.kind, x: idx % w, z: Math.floor(idx / w), top: o.cellRef.cell.height & 15,
-      health: o.health, pushes: o.pushLimited ? o.pushesLeft : Infinity, view: o });
+      health: o.health, pushes: o.pushLimited ? o.pushesLeft : Infinity, survivesFall: !(o.flags & 8), view: o });
   }
   return out;
 };
@@ -95,7 +99,9 @@ exports.findPath = (grid, start, goals, blocked = new Set(), loose = false) => {
       // person or a piece of furniture that blocks the other)
       const side = (cx, cz) => open(cx, cz) && step(from, grid.at(cx, cz), cx - x, cz - z);
       if (dx && dz && !(loose ? side(x + dx, z) || side(x, z + dz) : side(x + dx, z) && side(x, z + dz))) continue;
-      const nk = key(nx, nz), c = cost.get(k) + (dx && dz ? 1.414 : 1);
+      // Prefer a longer solid route while the gap is exposed.
+      const gapCost = (to?.flags & 0x40) || to?.gatedGap ? 8 : 0;
+      const nk = key(nx, nz), c = cost.get(k) + (dx && dz ? 1.414 : 1) + gapCost;
       if (c < (cost.get(nk) ?? Infinity)) { cost.set(nk, c); came.set(nk, k); frontier.push([c + hfn(nx, nz), nx, nz]); }
     }
   }
@@ -148,7 +154,11 @@ exports.safeStep = function* (cx, cz, opts = {}) {
   if (S && (narrow(to) || narrow(here))) return yield* exports.searchTo(cx, cz, opts);
   const snap = S ? S.snapshot() : null;
   const r = yield* exports.stepTo(cx, cz, opts);
-  if (snap && p.position.y < y0 - 64 && !(to && to.level < here.level)) {
+  // Player_TestTetherTarget computes the surface of a slope by subtracting
+  // the fractional cell coordinate along the slope's axis from its height.
+  const slopeOffset = to?.kind === 1 ? p.position.z & 255 : to?.kind === 2 ? p.position.x & 255 : null;
+  const reachedSlope = r.reached && slopeOffset !== null && p.position.y >= to.level * CELL - slopeOffset - 64;
+  if (snap && p.position.y < y0 - 64 && !(to && to.level < here.level) && !reachedSlope) {
     S.restore(snap);
     if (opts.trace) opts.trace({ fell: [cx, cz], searching: true });
     return yield* exports.searchTo(cx, cz, opts);
@@ -166,7 +176,8 @@ exports.searchTo = function* (cx, cz, opts = {}) {
   const KEYS = ['up', 'down', 'left', 'right', 'up+left', 'up+right', 'down+left', 'down+right'];
   // distance to the cell (0 inside it): clinging to a wall keeps the player off the middle
   const dist = () => Math.max(Math.max(0, Math.abs(tx - p.position.x) - 127), Math.max(0, Math.abs(tz - p.position.z) - 127));
-  let beam = [{ snap: S.snapshot(), d: dist(), keys: [] }];
+  const root = S.snapshot();
+  let beam = [{ snap: root, d: dist(), keys: [] }];
   const seen = new Set();
   for (let depth = 0; depth < (opts.depth ?? 24); depth++) {
     const next = [];
@@ -197,7 +208,7 @@ exports.searchTo = function* (cx, cz, opts = {}) {
     if (!beam.length) break;
   }
   // no route: go back to where the search started
-  S.restore(beam.length ? beam[0].snap : S.snapshot());
+  S.restore(root);
   return { reached: false, reason: 'search failed' };
 };
 
@@ -207,8 +218,16 @@ exports.clearInterruptions = function* (opts = {}) {
   let any = false;
   opts.seen = opts.seen || new Map();
   for (let i = 0; i < 20; i++) {
+    if (exports.gameOverActive?.() && exports.activeMenu()?.name === 'GameOver_OnUpdate') {
+      const step = yield* exports.menuStep(opts.policy || {});
+      if (opts.trace) opts.trace({ menu: step.menu, keys: step.keys });
+      any = true;
+      if (!step.done) break;
+      continue;
+    }
     const m = exports.message();
     if (m.open) {
+      opts.beforeText?.();
       const id = m.id;
       yield* exports.advanceText(900);
       opts.seen.set(id, (opts.seen.get(id) || 0) + 1);
@@ -229,7 +248,7 @@ exports.clearInterruptions = function* (opts = {}) {
 exports.navigate = function* (target, opts = {}) {
   const start = g.frameNo, scene0 = exports.where().scene, blocked = new Set(), budget = opts.frames ?? 3600;
   // never walk through another door's box on the way (opts.avoid: box names)
-  const avoid = new Set();
+  const avoid = new Set(opts.avoidCells);
   for (const b of exports.boxes()) if ((opts.avoid || []).includes(b.name) && b.name !== String(target).toUpperCase())
     for (let cz = b.z0 >> 8; cz <= (b.z1 - 1) >> 8; cz++) for (let cx = b.x0 >> 8; cx <= (b.x1 - 1) >> 8; cx++) avoid.add(`${cx},${cz}`);
   let plans = 0, pushes = 0;
@@ -239,6 +258,7 @@ exports.navigate = function* (target, opts = {}) {
   const done = (reached, reason, extra) => ({ reached, reason, scene: exports.where().scene, frames: g.frameNo - start, plans, ...extra });
   while (g.frameNo - start < budget) {
     if (exports.where().scene !== scene0) return done(true, 'scene changed');
+    if (opts.stopIf?.()) return done(false, 'stopped');
     const grid = exports.grid(), p = $.gPlayers[0];
     if (!grid || !p) { yield 1; continue; }
     let goals = new Set(), aim;
@@ -323,13 +343,14 @@ exports.navigate = function* (target, opts = {}) {
     }
     if (interrupted) continue;
     // at the goal: push into the box's middle (a door triggers on contact)
+    if (opts.stopIf?.()) return done(false, 'stopped');
     const here2 = exports.cellOf(p.position.x, p.position.z);
     if (goals.has(here2.join(','))) {
-      const r = yield* exports.walkTo(aim[0], aim[1], { tolerance: 8, patience: 120 });
+      const r = yield* exports.walkTo(aim[0], aim[1], { tolerance: opts.tolerance ?? 8, patience: 120 });
       if (exports.where().scene !== scene0) return done(true, 'scene changed');
       if (yield* exports.clearInterruptions(opts)) continue;
       if (typeof target !== 'string' && r.reached) return done(true, 'arrived');
-      yield g.until(() => exports.where().scene !== scene0 || exports.message().open, opts.eventWait ?? 600);
+      yield g.until(() => exports.where().scene !== scene0 || exports.message().open || opts.stopIf?.(), opts.eventWait ?? 600);
       if (exports.where().scene !== scene0) return done(true, 'scene changed');
       if (yield* exports.clearInterruptions(opts)) continue;
       if (++pushes > 3) return done(false, 'at the box, no transition');
@@ -358,6 +379,7 @@ exports.interact = function* (x, z, opts = {}) {
   for (const goals of [near, across]) {
     const tried = new Set();
     for (let attempt = 0; attempt < 2 && goals.size > tried.size; attempt++) {
+      if (opts.stopIf?.()) return { done: false, reason: 'stopped' };
       const here = exports.cellOf(p.position.x, p.position.z);
       const left = new Set([...goals].filter((k) => !tried.has(k)));
       const path = left.has(here.join(',')) ? [here] : exports.findPath(grid, here, left);
@@ -365,6 +387,7 @@ exports.interact = function* (x, z, opts = {}) {
       const [sx, sz] = path[path.length - 1];
       tried.add(`${sx},${sz}`);
       const r = yield* exports.navigate([sx * 256 + 128, sz * 256 + 128], opts);
+      if (opts.stopIf?.()) return { done: false, reason: 'stopped' };
       if (!r.reached) { last = { done: false, reason: 'could not get there: ' + r.reason }; continue; }
       yield* exports.walkTo(x, z, { tolerance: 8, patience: 20, frames: 60 });  // face it
       const seen = new Map();
@@ -387,9 +410,13 @@ exports.bags = () => {
   // gun lenses +0x828 (u16 lens id = the gun's element mode, SolarFruit_GetInventorySlot),
   // gun frames +0x4C0 (index + 1 into gUnk_08E60F4C, 0 empty: GameState_GetUnlockEntry)
   const frames = []; for (let i = 0; i < 16; i++) { const v = g.u16(gs + 0x4c0 + i * 2); if (v) frames.push(v - 1); }
-  return { items: read(0xa0, 16, 2, 2), accessories: read(0x160, 16, 2, 2), swords: read(0x1c0, 8, 16, 1),
+  return { items: read(0xa0, 16, 2, 2), valuables: read(0x838, 16, 2, 2),
+    accessories: read(0x160, 16, 2, 2), swords: read(0x1c0, 8, 16, 1),
     lenses: read(0x828, 8, 2, 2), frames };
 };
+
+// The game dispatches by item ID to its consumable or valuables inventory.
+exports.hasItem = (id) => g.fn.Inventory_HasItem(id) > 0;
 
 // Pick up a floor item (stages.json proc_1118: it sits in the middle of its cell): walk
 // onto it, then let the pickup message play out. Returns what the bags gained.
@@ -398,7 +425,7 @@ exports.collect = function* (x, z, opts = {}) {
   // an item actor (proc_1119/1120, chest or not) opens with A from a neighboring cell;
   // a plain floor pickup is taken by walking onto it
   const i = yield* exports.interact(x, z, opts);
-  if (JSON.stringify(exports.bags()) === before && i.reason !== 'no path') {
+  if (JSON.stringify(exports.bags()) === before && i.reason !== 'no path' && i.reason !== 'stopped') {
     yield* exports.walkTo(x, z, { tolerance: 16, patience: 30, frames: 90 });
     yield g.until(() => exports.message().open, 40);
     yield* exports.clearInterruptions(opts);
@@ -447,35 +474,28 @@ exports.weapon = () => {
   const gs = g.u32(g.types.globals.gGameState.addr), s16 = (o) => g.u16(gs + o) << 16 >> 16;
   const slot = s16(0x50), aux = s16(0x54), li = s16(0x90 + aux * 2);
   const p = $.gPlayers[0];
-  return { slot, gun: slot > 7, lens: li >= 0 ? s16(0x828 + li * 2) : -1, energy: p ? p.currentStatB : 0, energyMax: p ? p.maximumStatB : 0 };
+  const frameSlot = slot >= 8 && slot < 16 ? s16(0x68 + slot * 2) : -1;
+  const frame = frameSlot >= 0 && frameSlot < 16 ? s16(0x4c0 + frameSlot * 2) - 1 : -1;
+  return { slot, gun: slot > 7, frame, lens: li >= 0 ? s16(0x828 + li * 2) : -1, energy: p ? p.currentStatB : 0, energyMax: p ? p.maximumStatB : 0 };
 };
 
-// Quick Change (Otenko 8759/8893: hold SELECT and press R to swap the sword and the gun,
-// SELECT + B to swap the lens) until the weapon matches: { gun: bool, lens: id }.
+// Quick Change (Otenko 8759/8893: SELECT + R cycles equipped weapons and
+// frames, SELECT + B cycles lenses) until the requested loadout is active.
 exports.quickChange = function* (want) {
-  for (let i = 0; i < 12; i++) {
+  const limit = want.frame === undefined ? 12 : 16;
+  for (let i = 0; i <= limit; i++) {
     const w = exports.weapon();
-    const key = want.gun !== undefined && w.gun !== want.gun ? 'r' : want.lens !== undefined && w.gun && w.lens !== want.lens ? 'b' : null;
+    const differentWeapon = want.gun !== undefined && w.gun !== want.gun;
+    const differentFrame = want.frame !== undefined && w.frame !== want.frame;
+    const key = differentWeapon || differentFrame ? 'r' : want.lens !== undefined && w.gun && w.lens !== want.lens ? 'b' : null;
     if (!key) return { done: true, ...w };
+    if (i === limit) break;
     yield g.press('select', 6);
     yield g.press('select+' + key, 4);
     yield g.press('select', 6);
     yield g.press(0, 20);
   }
   return { done: false, ...exports.weapon() };
-};
-
-// Wait for energy in sunlight (src/scene/areas/sub_0804E618.c: the area effect adds gGameState->unk876,
-// the sun level, per frame; 120 make one energy). The light is the solar sensor (session
-// setSolar: 0 bright .. 255 dark), written into the ROM script as `lux` lines.
-exports.chargeEnergy = function* (need, opts = {}) {
-  const session = exports.session, before = exports.weapon().energy;
-  if (before >= need) return { done: true, energy: before };
-  if (session && opts.lux !== undefined) session.setSolar(opts.lux);
-  let t = 0;
-  for (; t < (opts.frames ?? 3600) && exports.weapon().energy < need; t += 30) yield g.press(0, 30);
-  if (session && opts.restore !== undefined) session.setSolar(opts.restore);
-  return { done: exports.weapon().energy >= need, energy: exports.weapon().energy, before, frames: t };
 };
 
 // The pause menu (START) lives in the field HUD task (Hud_UpdateWithCallback,
@@ -601,7 +621,7 @@ exports.chooseHub = function* (index, opts = {}) {
 // Script_DecodeVariableValue).
 // San Miguel's facility flags r708[0x19a.0][i] (one bit each; proc 2566 needs ten of them).
 exports.facilities = () => { const b = g.u32(g.types.globals.gGameVariables.addr); if (!b) return []; const v = g.u16(b + 0x19a) | (g.u8(b + 0x19c) << 16); const out = []; for (let i = 0; i < 16; i++) if (v & (1 << i)) out.push(i); return out; };
-exports.story = () => { const b = g.u32(g.types.globals.gGameVariables.addr); return b ? g.u8(b + 0x3c) : null; };
+exports.story = () => { const b = g.u32(g.types.globals.gGameVariables.addr); return b ? g.s16(b + 0x3c) : null; };
 
 // People in a town (src/npc/manager/scene_actor_lifecycle.c SceneActorManager: head, then each
 // actor's previous; body.id is the character's id as place_character gives it).
@@ -627,7 +647,7 @@ exports.people = () => {
 // [{x, z, dir, from: [px, pz]}] after which a goal cell is reachable, or null.
 const DIRS = [[0, -1], [1, 0], [0, 1], [-1, 0]];  // the game's 0 north (-z), 1 east (+x), 2 south, 3 west
 exports.DIR_KEYS = ['up+right', 'down+right', 'down+left', 'up+left'];
-exports.planPushes = (grid, start, goals, blocks, maxStates = 20000) => {
+exports.planPushes = (grid, start, goals, blocks, maxStates = 20000, opts = {}) => {
   const W = grid.w, H = grid.h;
   const lvl0 = grid.cells.map((c) => c.level), slope = grid.cells.map((c) => c.slope), open = grid.cells.map((c) => c.open);
   const flag8 = grid.cells.map((c) => !!(c.flags & 8));
@@ -648,12 +668,14 @@ exports.planPushes = (grid, start, goals, blocks, maxStates = 20000) => {
     return seen;
   };
   const goalIdx = [...goals].map((k) => { const [x, z] = k.split(',').map(Number); return ix(x, z); });
-  const s0 = { lvl: lvl0.slice(), blocks: blocks.filter((b) => b.kind === 0).map((b) => ({ c: ix(b.x, b.z), pushes: b.pushes })), player: ix(...start), path: [] };
+  const s0 = { lvl: lvl0.slice(), blocks: blocks.filter((b) => b.kind === 0).map((b) => ({
+    c: ix(b.x, b.z), pushes: b.pushes, survivesFall: b.survivesFall,
+  })), player: ix(...start), path: [] };
   const key = (st, region) => st.blocks.map((b) => b.c).sort((a, b) => a - b).join(',') + '|' + Math.min(...region) + '|' + st.lvl.join('');
   const q = [s0], seen = new Set();
   while (q.length && seen.size < maxStates) {
     const st = q.shift(), bset = new Set(st.blocks.map((b) => b.c)), region = reach(st.lvl, bset, st.player);
-    if (goalIdx.some((c) => region.has(c))) return st.path;
+    if (opts.occupy ? goalIdx.every((c) => bset.has(c)) : goalIdx.some((c) => region.has(c))) return st.path;
     const k = key(st, region);
     if (seen.has(k)) continue;
     seen.add(k);
@@ -668,8 +690,11 @@ exports.planPushes = (grid, start, goals, blocks, maxStates = 20000) => {
         if (slope[T] || flag8[T] || bset.has(T) || !(st.lvl[T] < top)) return;
         const lvl = st.lvl.slice(), nb = st.blocks.map((x) => ({ ...x }));
         lvl[b.c] = top - 1;
-        if (top - lvl[T] === 1) { lvl[T] = top; nb[bi].c = T; nb[bi].pushes--; }
-        else { lvl[T] += 1; nb.splice(bi, 1); }  // fell in: now floor
+        lvl[T] += 1;
+        // Scene_UpdateFallingObject leaves an unbroken block on the lower
+        // floor, where its body continues to occupy a pressure plate.
+        if (lvl[T] === top || (opts.occupy && b.survivesFall)) { nb[bi].c = T; nb[bi].pushes--; }
+        else nb.splice(bi, 1);
         q.push({ lvl, blocks: nb, player: P, path: [...st.path, { x: bx, z: bz, dir: d, from: [px, pz] }] });
       });
     });
@@ -700,7 +725,7 @@ exports.enemies = () => {
     if (!actor) break;
     const a = g.at(actor, 'struct RoomActor');
     const pos = a.body.position;
-    out.push({ addr: actor, category: a.category, health: a.health, alive: a.health > 0 && !(a.statusFlags & 0x20000),
+    out.push({ addr: actor, category: a.category, health: a.health, alive: a.health > 0 && !(a.statusFlags & 0x20000), hitLock: a.hitLockTimer,
       x: pos.x, y: pos.y, z: pos.z, state: a.state2A8, view: a });
     node = g.u32(node);
   }
@@ -726,40 +751,107 @@ exports.targets = () => {
     const body = g.u32(e), flags = g.u32(e + 4), cb = g.u32(e + 8);
     if (!body) continue;
     const owner = g.u32(body + 60), fn = cb ? g.name(cb) : '';
-    let health = null;
-    if (flags & 0x10) health = g.s16(owner + 0x9c);
-    else if (/^Armor_ReceiveTargetEvent/.test(fn)) health = g.s16(owner + 0xb1c);
+    const armor = /^Armor_ReceiveTargetEvent/.test(fn) ? exports.armorCombatant(owner) : undefined;
+    const health = flags & 0x10 ? g.s16(owner + 0x9c) : null;
     out.push({ addr: owner, entry: e, enabled: !!(flags & 1), callback: fn, x: g.s16(body + 12), y: g.s16(body + 14), z: g.s16(body + 16),
-      health, alive: health === null ? !!(flags & 1) : health > 0 });
+      health, alive: health === null ? !!(flags & 1) : health > 0, ...armor });
   }
   return out;
+};
+
+let ignoredScene, ignored;
+exports.fightTargets = () => {
+  const scene = exports.where().scene;
+  if (scene !== ignoredScene) {
+    ignoredScene = scene;
+    ignored = new Set();
+  }
+  // The scene heap can give a later enemy the same address.
+  const scripted = exports.barrierTargets().concat(exports.vampireTargets(), exports.hresvelgrTargets());
+  const reg = scripted.concat(exports.enemies().filter((e) => e.alive && !ignored.has(e.addr) &&
+    !scripted.some((actor) => actor.addr === e.addr)));
+  const owners = new Set(reg.map((e) => e.addr));
+  for (const t of exports.targets()) {
+    if (t.alive && t.health !== null && !owners.has(t.addr) && !ignored.has(t.addr)) {
+      reg.push(t);
+      owners.add(t.addr);
+    }
+  }
+  return reg;
 };
 
 exports.fight = function* (opts = {}) {
   const S = exports.session, p = $.gPlayers[0], start = g.frameNo, scene = exports.where().scene;
   const DIRS8 = ['up', 'down', 'left', 'right', 'up+left', 'up+right', 'down+left', 'down+right'];
-  // a target that takes no damage for 40 steps is not a fight (a scripted thief,
-  // an invulnerable actor): leave it alone
-  const ignored = exports.fightIgnored || (exports.fightIgnored = new Set()), progress = new Map();
-  // registry enemies, plus lock-on targets outside the registry (bosses, armors)
-  const living = () => {
-    const reg = exports.enemies().filter((e) => e.alive && !ignored.has(e.addr));
-    const more = exports.targets().filter((t) => t.alive && t.health !== null && !reg.some((e) => e.addr === t.addr) && !ignored.has(t.addr));
-    return reg.concat(more);
-  };
-  const hpSum = () => living().reduce((s, e) => s + Math.max(0, e.health), 0);
+  const progress = new Map(), living = exports.fightTargets, triedOtherWeapon = new Set();
+  const initialGun = exports.weapon().gun;
+  const initialLight = S.solar;
+  const scriptControlsPlayer = () => Boolean(g.fn.ScriptUtility_IsControlFlagSet());
+  const hpSum = () => living().reduce((s, e) => s + Math.max(0, e.health) * (e.barrier ? 20 : 1) + (e.guard ?? 0) / 2, 0);
   const toward = (e) => {
     const dx = e.x - p.position.x, dz = e.z - p.position.z;
     const sx = Math.abs(dx) > 40 ? Math.sign(dx) : 0, sz = Math.abs(dz) > 40 ? Math.sign(dz) : 0;
     return KEY8[`${sx},${sz}`];
   };
-  const life = () => exports.where().life ?? 0;
-  let steps = 0;
-  while (living().length && g.frameNo - start < (opts.frames ?? 6000) && exports.where().scene === scene) {
-    if (yield* exports.clearInterruptions(opts)) continue;
-    const target = living().sort((a, b) => Math.hypot(a.x - p.position.x, a.z - p.position.z) - Math.hypot(b.x - p.position.x, b.z - p.position.z))[0];
+  const life = () => $.gPlayers[0]?.currentStatA ?? 0;
+  let steps = 0, interruptions = 0;
+  while (exports.where().scene === scene && p && life() > 0 && living().length && g.frameNo - start < (opts.frames ?? 6000)) {
+    if (yield* exports.clearInterruptions(opts)) {
+      interruptions++;
+      continue;
+    }
+    // Intro and defeat scripts can expose a live target before input returns.
+    // Wait for the next message or transition while the VM owns player control.
+    if (scriptControlsPlayer()) {
+      yield g.until(() => !scriptControlsPlayer() || exports.message().open || exports.where().scene !== scene, 120);
+      continue;
+    }
+    const distance = (e) => Math.hypot(e.x - p.position.x, e.z - p.position.z, 2 * (e.y - p.position.y));
+    const target = living().sort((a, b) => Number(Boolean(b.barrier)) - Number(Boolean(a.barrier)) || distance(a) - distance(b))[0];
     const tk = toward(target);
-    const tactics = [...DIRS8.map((k) => [[k, 12]]), [['b', 2], [0, 10]], ...(tk ? [[[tk, 6], ['b', 2], [0, 4]]] : [])];
+    const weapon = exports.weapon();
+    const darkTrance = p.actionMode === 1;
+    const frame = darkTrance ? null : exports.gunFrame();
+    // Once the last curtain starts breaking, the sensor can settle while
+    // the sprite's destruction timer still holds the Count's damage guard.
+    if (target.solarReactive && S.solar > 64) {
+      S.setSolar(64);
+      if (opts.trace) opts.trace({ boss: target.boss, threshold: 64, guard: target.solarGuard });
+    }
+    const pr = progress.get(target.addr) || { hp: target.health, since: steps };
+    if (target.health < pr.hp) { pr.hp = target.health; pr.since = steps; }
+    progress.set(target.addr, pr);
+    if (target.boss === 'Armor' && pr.tranceAttempt !== interruptions && steps - pr.since >= 8 && exports.darkTranceReady()) {
+      pr.tranceAttempt = interruptions;
+      const changed = yield* exports.enterDarkTrance();
+      if (opts.trace) opts.trace({ trance: changed, target: target.addr });
+      if (changed) continue;
+    }
+    if (frame && weapon.energy < frame.cost && distance(target) > 512 && !pr.triedCharge) {
+      pr.triedCharge = true;
+      const charge = yield* exports.chargeEnergy(frame.cost, { stopIf: () => living().some((e) => distance(e) < 512) });
+      if (charge.done) continue;
+    }
+    if (!darkTrance && target.barrier && weapon.gun && !pr.triedSword) {
+      pr.triedSword = true;
+      const equip = yield* exports.quickChange({ gun: false });
+      if (opts.trace) opts.trace({ equip, target: target.addr });
+      if (equip.done) continue;
+    }
+    if (!darkTrance && !target.barrier && !triedOtherWeapon.has(target.addr) && exports.bags().frames.length &&
+        ((frame && weapon.energy < frame.cost) || steps - pr.since >= 8)) {
+      triedOtherWeapon.add(target.addr);
+      const equip = yield* exports.quickChange({ gun: !weapon.gun });
+      if (opts.trace) opts.trace({ equip, target: target.addr });
+      if (equip.done) continue;
+    }
+    const tactics = DIRS8.map((k) => [[k, 12]]);
+    if (darkTrance) tactics.push(...exports.darkTranceTactics(tk));
+    else if (weapon.gun) tactics.push(...exports.gunTactics(tk));
+    else tactics.push([['b', 2], [0, 10]], ...(tk ? [[[tk, 6], ['b', 2], [0, 4]]] : []));
+    if (!darkTrance && (target.barrier || target.boss) && tk && !weapon.gun) tactics.push([[tk, 4], [tk + '+b', 4], [0, 16]]);
+    const wait = exports.combatWait(target);
+    if (target.boss || wait) tactics.push([[0, wait || 18]]);
     const root = S.snapshot(), hp0 = hpSum(), life0 = life();
     let best = null;
     for (const t of tactics) {
@@ -767,21 +859,30 @@ exports.fight = function* (opts = {}) {
       for (const [k, n] of t) yield g.press(k, n);
       if (exports.where().scene !== scene) continue;  // walked out through a door
       const mid = S.snapshot();
-      yield g.press(0, opts.look ?? 20);
+      yield g.press(0, opts.look ?? (target.boss ? 60 : weapon.gun ? 40 : 20));
       if (exports.where().scene !== scene) continue;
-      const dealt = hp0 - hpSum(), lost = life0 - life();
-      const e = living()[0], dist = e ? Math.hypot(e.x - p.position.x, e.z - p.position.z) : 0;
-      const score = dealt - (opts.lifeCost ?? 3) * lost - dist / 400;
+      const e = living().find((actor) => actor.addr === target.addr), dist = e ? distance(e) : 0;
+      const dealt = target.barrier ? 20 * (target.health - (e?.health ?? 0)) : hp0 - hpSum();
+      const lost = life0 - life();
+      const spent = Math.max(0, weapon.energy - exports.weapon().energy);
+      const score = dealt - (opts.lifeCost ?? 3) * lost - spent / 8 - dist / 400 - (life() > 0 ? 0 : 10000);
       if (!best || score > best.score) best = { score, t, mid };
     }
     if (!best) { S.restore(root); break; }
     S.restore(best.mid);
     steps++;
-    const pr = progress.get(target.addr) || { hp: target.health, since: steps };
-    if (target.health < pr.hp) { pr.hp = target.health; pr.since = steps; }
-    progress.set(target.addr, pr);
-    if (steps - pr.since > 40) { ignored.add(target.addr); if (opts.trace) opts.trace({ ignore: target.addr, category: target.category }); }
-    if (opts.trace && steps % 10 === 0) opts.trace({ fight: steps, hp: hpSum(), life: life(), enemies: living().length });
+    // Some targets are scripted actors or invulnerable during this encounter.
+    if (!target.boss && !target.barrier && steps - pr.since > 40) { ignored.add(target.addr); if (opts.trace) opts.trace({ ignore: target.addr, category: target.category }); }
+    if (opts.trace && steps % 10 === 0) {
+      const enemies = living();
+      const hp = enemies.reduce((sum, enemy) => sum + enemy.health, 0);
+      const guard = enemies.reduce((sum, enemy) => sum + (enemy.guard ?? 0), 0);
+      const { scene, life, x, y, z } = exports.where();
+      opts.trace({ fight: steps, hp, guard, scene, life, x, y, z, form: p.actionMode, enemies: enemies.length });
+    }
   }
-  return { won: !living().length, life: life(), frames: g.frameNo - start, steps };
+  S.setSolar(initialLight);
+  if (exports.where().scene === scene && life() > 0 && exports.weapon().gun !== initialGun)
+    yield* exports.quickChange({ gun: initialGun });
+  return { won: exports.where().scene === scene && life() > 0 && !living().length, life: life(), frames: g.frameNo - start, steps };
 };

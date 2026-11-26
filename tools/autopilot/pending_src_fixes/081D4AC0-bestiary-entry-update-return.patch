@@ -1,0 +1,88 @@
+081D4AC0 bestiary-entry-update-return
+
+The visible-entry path preserves the final call result in r0. The
+ROM table at 086126E0 contains eight non-null update callbacks. Each
+returns through r0, as do PaletteTransition_Restart and DisplayEntry_SetAnim.
+Animation clear and playback return defined values, and a path with no
+call preserves the incoming entry pointer.
+
+The explicit form changed the ROM bytes. The guarded form passed the unit ROM check.
+
+--- a/src/fn/sub_081D4AC0.c
++++ b/src/fn/sub_081D4AC0.c
+@@ -15,10 +15,18 @@
+ extern const s16 gUnk_086149C4[];
+ void DisplayAnimation_SetFlags(void *, u32);
++#ifdef UBFIX
++s32 DisplayAnimation_ClearFlags(void *, u32);
++#else
+ void DisplayAnimation_ClearFlags(void *, u32);
++#endif
+ void PaletteTransition_Restart(void *);
+ void Callback_InvokeActor(void *, void *);
+ void Dir_Decompose(s32, u8 *, u8 *, u32);
+ void DisplayAnimation_SetEntry(void *, u32, u32, u32, u32, u32, u32);
++#ifdef UBFIX
++s32 DisplayAnimation_UpdatePlayback(void *);
++#else
+ void DisplayAnimation_UpdatePlayback(void *);
++#endif
+ void DisplayEntry_SetAnim(void *, s32);
+ static inline s32 Scale(s32 n, s32 bits)
+@@ -34,4 +42,7 @@
+     s32 off;
+     const struct BestiaryConfig *config;
++#ifdef UBFIX
++    s32 result = (s32)p;
++#endif
+     if (p[0x25]) {
+         i = 0;
+@@ -50,5 +61,9 @@
+         s32 o2 = i * 0x94;
+         if (*(u32 *)(animations + o2))
++#ifdef UBFIX
++            result = DisplayAnimation_ClearFlags(p + 0x28 + o2, 1);
++#else
+             DisplayAnimation_ClearFlags(p + 0x28 + o2, 1);
++#endif
+     }
+     *(u32 *)(p + 0x9a4) &= ~1;
+@@ -64,12 +79,26 @@
+             p[0x24] = zero;
+             PaletteTransition_Restart(p);
++#ifdef UBFIX
++            result = 0x081D4B81;
++#endif
+         }
+     }
++#ifdef UBFIX
++    if (config->callback) {
++        Callback_InvokeActor(p, config->callback);
++        result = 0x081D4B8D;
++    }
++#else
+     if (config->callback)
+         Callback_InvokeActor(p, config->callback);
++#endif
+     if (!(config->flags & 4) && !p[0xa02]) {
+         Dir_Decompose(config->animation, p + 0x9fe, p + 0x9ff, *(u16 *)(p + 0xa00));
+         DisplayAnimation_SetEntry(animations, *(u16 *)(p + 0x9fc), p[0x9fe], p[0x9ff], 1, 0, 5);
++#ifdef UBFIX
++        result = DisplayAnimation_UpdatePlayback(animations);
++#else
+         DisplayAnimation_UpdatePlayback(animations);
++#endif
+     }
+     if (config->flags & 2) {
+@@ -89,5 +118,11 @@
+         *(u32 *)(p + 0x9a4) &= ~1;
+         DisplayEntry_SetAnim(p, config->overlay);
++#ifdef UBFIX
++        result = 0x081D4C87;
++#endif
+     }
+     p[0xa03] = 0;
++#ifdef UBFIX
++    return result; // r0 holds the last call result or entry pointer
++#endif
+ }

@@ -1,0 +1,16 @@
+081FFE20 homing-projectile-manager
+
+The failed Task_Create branch exits with its null result still in r0.
+Ratatosk checks this result before continuing boss initialization.
+
+The explicit form changed the ROM bytes. The guarded form passed the unit ROM check.
+
+--- a/src/fn/sub_081FFE20.c
++++ b/src/fn/sub_081FFE20.c
+@@ -17,3 +17,6 @@
+         return r;
+     }
++#ifdef UBFIX
++    return r; // r0 is zero when Task_Create fails
++#endif
+ }

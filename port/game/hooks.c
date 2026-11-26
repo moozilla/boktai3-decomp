@@ -44,16 +44,25 @@ struct HookState {
     uint32_t args[4];  /* entry: r0..r3; exit: result in args[0] */
     uint32_t depth;
     uint32_t frame;
+    uint32_t coverage;  /* collect function entries in the port_trace_map bitmap */
 };
 
 static struct HookState state = {0, 0, 0, 0, 0, 0, RING_BYTES / (4 * EVENT_WORDS)};
 static uint8_t flags[ROM_CODE_SPAN / 2];
 
 PORT_IMPORT(hook) void port_host_hook(uint32_t kind, uint32_t address);
+void port_trace(uint32_t address);
 
 struct HookState *port_hook_state(void) { return &state; }
 uint8_t *port_hook_flags(void) { return flags; }
 uint32_t port_hook_ring(void) { return RING_BASE; }
+
+void port_hook_unwind(void)
+{
+    state.depth = 0;
+    state.inside = 0;
+    state.suspend = 0;
+}
 
 static uint32_t index_of(uint32_t address)
 {
@@ -89,6 +98,8 @@ void port_hook_frame(uint32_t frame)
 void port_hook_enter(uint32_t address, uint32_t a0, uint32_t a1, uint32_t a2, uint32_t a3)
 {
     uint32_t i;
+    if (state.coverage && !state.suspend)
+        port_trace(address - IWRAM_CODE < IWRAM_CODE_SIZE ? address - IWRAM_CODE + IWRAM_CODE_ROM : address);
     if (!state.active || state.suspend)
         return;
     state.depth++;

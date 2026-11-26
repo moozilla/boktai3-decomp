@@ -1,0 +1,44 @@
+0801E184 scene-object-placement-result
+
+All three placement helpers and Memory_Clear are void and end with
+pop {r0}; bx r0. SceneObjects_Append keeps that Thumb return address
+in r0 through its slot bookkeeping and returns via r1. The script
+wrapper consumes this value. Allocation and full-pool failures already
+return -1 explicitly.
+
+The explicit form changed the ROM bytes. The guarded form passed the unit ROM check.
+
+--- a/src/fn/sub_0801E184.c
++++ b/src/fn/sub_0801E184.c
+@@ -88,3 +88,31 @@
+         slot->args.words[0] = 0;
+     ++p->count;
++#ifdef UBFIX
++    // The last void helper returns through r0, leaving its Thumb return address.
++    switch (slot->type) {
++        case 1:
++            return 0x0801E2B5; // SceneObject_InitLiftPlacement
++        case 2:
++        case 8:
++        case 9:
++        case 10:
++        case 11:
++        case 12:
++        case 13:
++        case 14:
++            return 0x0801E2FF; // SceneObject_InitSlotPlacement with a palette
++        case 16:
++            return 0x0801E313; // SceneObject_InitSlotPlacement
++        case 0:
++        case 3:
++        case 4:
++        case 5:
++        case 6:
++        case 7:
++        case 15:
++            return 0x0801E309; // SceneObject_InitPlacement
++        default:
++            return 0x0801E253; // Memory_Clear
++    }
++#endif
+ }

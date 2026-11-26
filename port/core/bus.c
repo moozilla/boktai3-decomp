@@ -3,7 +3,8 @@
 #include "devices.h"
 
 /* Full-game builds enable spin detection: a loop re-reading one volatile
- * address with no store in between is waiting for time to pass. */
+ * address without writing it is waiting for time to pass. RFU polls a timer
+ * while writing RCNT on every iteration. */
 static int spin_enabled;
 static uintptr_t spin_address;
 static unsigned spin_count;
@@ -22,6 +23,11 @@ static void spin(uintptr_t address)
         spin_count = 0;
         port_spin_advance();
     }
+}
+
+static void spin_store(uintptr_t address, unsigned width)
+{
+    if (spin_address - address < width) spin_address = 0;
 }
 
 static int is_device(uintptr_t address)
@@ -72,7 +78,7 @@ void port_bus_store_i8(volatile void *p, uint8_t value)
 {
     Hw *hw = hw_bound();
     uintptr_t address = (uintptr_t)p;
-    spin_address = 0;
+    spin_store(address, 1);
     if (hw && is_device(address)) {
         port_devices_sync_timing();
         hw_write8(hw, (uint32_t)address, value);
@@ -84,7 +90,7 @@ void port_bus_store_i16(volatile void *p, uint16_t value)
 {
     Hw *hw = hw_bound();
     uintptr_t address = (uintptr_t)p;
-    spin_address = 0;
+    spin_store(address, 2);
     if (hw && is_device(address)) {
         port_devices_sync_timing();
         hw_write16(hw, (uint32_t)address, value);
@@ -96,7 +102,7 @@ void port_bus_store_i32(volatile void *p, uint32_t value)
 {
     Hw *hw = hw_bound();
     uintptr_t address = (uintptr_t)p;
-    spin_address = 0;
+    spin_store(address, 4);
     if (hw && is_device(address)) {
         port_devices_sync_timing();
         hw_write32(hw, (uint32_t)address, value);

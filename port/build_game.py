@@ -56,6 +56,7 @@ PORT_CODE = {
 # is not game memory), the picture processor (reads game memory, writes only its own).
 RECORD_SKIP = {'tools/recorder/rec_rt.c', 'port/hw/psg.c', 'port/game/hooks.c', 'port/ppu/ppu.c', 'port/game/code_table'}
 EXPORTS = ['port_trace_map', 'port_memory_init', 'port_load_rom', 'port_game_run', 'port_game_set_solar',
+           'port_game_reset_pending', 'port_game_resume',
            'port_game_set_time', 'port_frame_count', 'port_game_save_stage', 'port_game_save_dirty',
            'port_game_save_data', 'port_game_save_size', 'port_video_set_enabled',
            # agent harness (port/agent/): hooks, calls into the game, C snippets
@@ -69,6 +70,21 @@ EXPORTS = ['port_trace_map', 'port_memory_init', 'port_load_rom', 'port_game_run
 def game_sources():
     return source_paths(ROOT)
 
+
+
+def source_patches(directory, units):
+    """Read one-source unified diffs supplied for the generated port build."""
+    result = {}
+    for patch in sorted(directory.glob('*.patch')):
+        data = patch.read_bytes()
+        old = re.findall(rb'^--- a/(\S+)$', data, re.M)
+        new = re.findall(rb'^\+\+\+ b/(\S+)$', data, re.M)
+        if len(old) != 1 or old != new or old[0].decode() not in units:
+            raise ValueError(f'{patch}: expected a patch to one existing game source')
+        result.setdefault(old[0].decode(), []).append(data)
+    if not result:
+        raise ValueError(f'{directory}: no source patches found')
+    return result
 
 
 def code_addresses():
@@ -109,6 +125,8 @@ def main():
                          '(tools/recorder/, build/port/game-rec/)')
     ap.add_argument('--watch', metavar='FUNC[,FUNC]',
                     help='log these functions\' first three arguments at every entry (build/port/game-watch/)')
+    ap.add_argument('--source-patches', type=Path, metavar='DIR',
+                    help='apply temporary unified diffs to generated game sources only')
     args = ap.parse_args()
     os.chdir(ROOT)
     global OUT
@@ -148,6 +166,7 @@ def main():
     context = hasher.digest()
 
     units = [(str(p.relative_to(ROOT)), True) for p in game_sources()]
+    overlays = source_patches(args.source_patches, {name for name, _ in units}) if args.source_patches else {}
     doubles = {int(m, 16) for p in game_sources()
                for m in re.findall(r'extern const double gUnk_([0-9A-F]{8})\[\]', p.read_text())}
     listed = {int(m, 16) for m in re.findall(r'\{0x([0-9A-F]{8}), \d+\}', (ROOT / 'port/game/game.c').read_text())}
@@ -161,13 +180,26 @@ def main():
         src = ROOT / name
         ll = OUT / 'ir' / (name + '.ll')
         stamp = ll.with_suffix('.key')
-        key = hashlib.sha256(context + src.read_bytes()).hexdigest()
+        patches = overlays.get(name, [])
+        source = src.read_bytes()
+        key = hashlib.sha256(context + source + b''.join(patches)).hexdigest()
         if not args.force and ll.exists() and stamp.exists() and stamp.read_text() == key:
             return name, None
         ll.parent.mkdir(parents=True, exist_ok=True)
         prepared = OUT / 'prepared' / name
         prepared.parent.mkdir(parents=True, exist_ok=True)
-        prepared.write_text('#line 1 "' + name + '"\n' + prepare_source(src, 'wasm32'))
+        # Pending diffs are against the tracked source. Apply them before
+        # prepare_source rewrites declarations or lifts prototypes.
+        for patch in patches:
+            prepared.write_bytes(source)
+            result = subprocess.run(['patch', '-s', '-t', '-N', '-F', '0',
+                                     '-r', '-', '-o', '-', str(prepared)],
+                                    input=patch, capture_output=True)
+            if result.returncode:
+                raise RuntimeError(f'{name}: source patch failed\n{result.stderr.decode()}'
+                                   f'{result.stdout.decode()}')
+            source = result.stdout
+        prepared.write_text('#line 1 "' + name + '"\n' + prepare_source(src, 'wasm32', source.decode()))
         r = run([args.cc, *flags, '-S', '-emit-llvm', str(prepared), '-o', str(ll)])
         if r.returncode:
             return name, r.stderr[-2000:]

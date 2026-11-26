@@ -1,6 +1,6 @@
 #include "global.h"
 void Sound_StopSong(u32);
-void SceneLink_RemoveNode(u8 *);
+void SceneLink_RemoveNode(void *);
 void SpatialIndex_RemoveEntry(u8 *);
 void SceneActors_Destroy(u8 *);
 void VanargandHead_RemoveSprites(u8 *);

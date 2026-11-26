@@ -23,6 +23,7 @@ with the most fields.
 
     python3 port/agent/gametypes.py          # -> build/port/agent/types.json (cached)
 """
+import argparse
 from concurrent.futures import ThreadPoolExecutor
 import hashlib
 import json
@@ -41,7 +42,7 @@ DWARFDUMP = str(LLVM / 'llvm-dwarfdump') if (LLVM / 'llvm-dwarfdump').exists() e
 FLAGS = ['--target=wasm32', '-ffreestanding', '-std=gnu89', '-funsigned-char', '-fno-builtin',
          '-Wno-everything', '-Iport/include', '-Iport/core', '-I' + str(GAME / 'include'),
          '-iquote', '.', '-include', 'port/core/compat.h', '-g', '-fno-eliminate-unused-debug-types']
-VERSION = '3:'  # bump when the output format changes
+VERSION = '4:'  # bump when the output or header selection changes
 EXTERN = re.compile(r'^\s*extern\b([^;(]*?)\b([A-Za-z_]\w*)\s*(?:\[[^\]]*\]\s*)*;', re.M)
 ENTRY = re.compile(r'^0x([0-9a-f]+):( +)(DW_TAG_\w+|NULL)')
 ATTR = re.compile(r'^\s+DW_AT_(\w+)\t\((.*)\)$')
@@ -188,10 +189,12 @@ class Folder:
 
 
 def compile_header(header, names, work):
-    src = work / (header.stem + '.c')
-    obj = work / (header.stem + '.o')
+    relative = header.relative_to(GAME / 'include')
+    src = (work / relative).with_suffix('.c')
+    obj = src.with_suffix('.o')
+    src.parent.mkdir(parents=True, exist_ok=True)
     for _ in range(3):
-        text = '#include "global.h"\n#include "%s"\n' % header.relative_to(ROOT / 'include').as_posix()
+        text = '#include "global.h"\n#include "%s"\n' % relative.as_posix()
         text += ''.join(f'__typeof__({n}) *__agent_var_{n};\n' for n in names)
         src.write_text(text)
         r = subprocess.run([CC, *FLAGS, '-c', str(src), '-o', str(obj)], cwd=ROOT, text=True, capture_output=True)
@@ -223,14 +226,16 @@ def first_params(code, types):
     return out
 
 
-def build(force=False):
+def build(force=False, jobs=None):
     include = GAME / 'include'
-    headers = sorted(h for h in include.rglob('*.h') if 'gba' not in h.relative_to(include).parts)
+    headers = {h.relative_to(include).as_posix(): h for h in sorted(include.rglob('*.h'))
+               if 'gba' not in h.relative_to(include).parts}
     syms = symbols()
     data = syms['data']
     sources = sorted(ROOT.glob('src/**/*.c'))
-    stamp = VERSION + hashlib.sha256(''.join(f'{h.name}:{h.stat().st_mtime_ns};' for h in headers + sources).encode()
-                           + syms['stamp'].encode()).hexdigest()[:16]
+    inputs = [*headers.values(), *sources]
+    mtimes = ''.join(f'{p.relative_to(ROOT)}:{p.stat().st_mtime_ns};' for p in inputs)
+    stamp = VERSION + hashlib.sha256((mtimes + syms['stamp']).encode()).hexdigest()[:16]
     out = OUT / 'types.json'
     if out.exists() and not force:
         try:
@@ -245,24 +250,25 @@ def build(force=False):
     import csv
     with open(ROOT / 'symbols/ram.csv') as f:
         for row in csv.DictReader(f):
-            if row['header'].startswith('include/'):
-                owner[row['name']] = row['header'][len('include/'):]
-    plan = {h.name: [] for h in headers}
-    texts = {h.name: h.read_text(errors='replace') for h in headers}
-    for h in headers:
-        for n in header_globals(texts[h.name], data):
-            owner.setdefault(n, h.name)
-    for n, h in owner.items():
-        if h in plan and n in data:
-            plan[h].append(n)
+            header = row['header'].removeprefix('include/')
+            if row['header'].startswith('include/') and header in headers:
+                owner[row['name']] = header
+    plan = {name: [] for name in headers}
+    for name, header in headers.items():
+        for n in header_globals(header.read_text(errors='replace'), data):
+            owner.setdefault(n, name)
+    for name, header in owner.items():
+        if name in data:
+            plan[header].append(name)
     folder = Folder()
     globals_ = {}
-    with ThreadPoolExecutor(os.cpu_count() or 4) as pool:
-        results = list(pool.map(lambda h: (h, *compile_header(h, sorted(set(plan[h.name])), work)), headers))
+    with ThreadPoolExecutor(jobs or os.cpu_count() or 4) as pool:
+        results = list(pool.map(
+            lambda h: (h, *compile_header(headers[h], sorted(plan[h]), work)), headers))
     failed = []
     for h, obj, names in results:
         if obj is None:
-            failed.append(h.name)
+            failed.append(h)
             continue
         entries = dwarf_entries(obj)
         for off, e in entries.items():
@@ -286,7 +292,13 @@ def build(force=False):
 
 
 if __name__ == '__main__':
-    path = build(force='--force' in sys.argv)
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--force', action='store_true')
+    parser.add_argument('-j', '--jobs', type=int)
+    args = parser.parse_args()
+    if args.jobs is not None and args.jobs < 1:
+        parser.error('--jobs must be positive')
+    path = build(force=args.force, jobs=args.jobs)
     d = json.loads(path.read_text())
     print(f"{path}: {len(d['types'])} types, {len(d['globals'])} typed globals, "
           f"{len(d['functions'])} functions ({len(d['params'])} with a struct parameter), "

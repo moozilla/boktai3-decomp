@@ -1,0 +1,55 @@
+08208740 cannon-turret-update-return
+
+The inlined animation step preserves r0 from the palette call. If the
+step triggers an animation reset, Anim_SetSequence supplies the result.
+
+The explicit form changed the ROM bytes. The guarded form passed the unit ROM check.
+
+--- a/src/fn/sub_08208740.c
++++ b/src/fn/sub_08208740.c
+@@ -160,4 +160,7 @@
+     struct ColliderView *collider;
+     u32 ended;
++#ifdef UBFIX
++    s32 result;
++#endif
+     if (Engine_PauseBits(0x400))
+         goto paused;
+@@ -227,4 +230,14 @@
+         p->activeAnimation = 1;
+     }
++#ifdef UBFIX
++    if (p->flashTimer > 0) {
++        AnimData_SelectPaletteBank(p->graphics, 0x192);
++        p->flashTimer--;
++        result = 0x08208A1F;
++    } else {
++        AnimData_SelectPaletteBank(p->graphics, 0x1bc);
++        result = 0x08208A57;
++    }
++#else
+     if (p->flashTimer > 0) {
+         AnimData_SelectPaletteBank(p->graphics, 0x192);
+@@ -232,4 +245,5 @@
+     } else
+         AnimData_SelectPaletteBank(p->graphics, 0x1bc);
++#endif
+     if (p->invulnerability) {
+         p->invulnerability--;
+@@ -243,8 +257,15 @@
+ 
+     if ((ended && (p->activeAnimation != 0)) && (p->defeated == 0)) {
++#ifdef UBFIX
++        result = Anim_SetSequence(&p->sequence, p->resource, 8, 0, 0);
++#else
+         Anim_SetSequence(&p->sequence, p->resource, 8, 0, 0);
++#endif
+         p->activeAnimation = 0;
+     }
+     p->age++;
+     /* The task callback has no explicit return assignment on the active path. */
+-}
++#ifdef UBFIX
++    return result; // r0 preserves the last call result
++#endif
++}

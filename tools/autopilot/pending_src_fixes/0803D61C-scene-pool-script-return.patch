@@ -1,0 +1,17 @@
+0803D61C scene-pool-script-return
+
+ScenePool_RegisterEntry returns through r0, leaving 0803D64D.
+The subsequent entry stores preserve that register until the handler returns.
+
+The explicit form changed the ROM bytes. The guarded form passed the unit ROM check.
+
+--- a/src/fn/sub_0803D61C.c
++++ b/src/fn/sub_0803D61C.c
+@@ -24,4 +24,6 @@
+     entry->active = 1;
+     manager->activeCount++;
+-    /* Success leaves the original unused r0 value; only failure returns -1. */
++#ifdef UBFIX
++    return 0x0803D64D; // r0 holds the Thumb return address from ScenePool_RegisterEntry
++#endif
+ }

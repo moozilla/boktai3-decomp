@@ -1,0 +1,16 @@
+08032CD4 text-state-return
+
+TextState_SetString copies r0 to r3 for the indexed write and returns via r1.
+MessageWindow_SetStringArgument and ScrollingDialogue_SetStringArgument forward r0.
+
+The explicit form changed the ROM bytes. The guarded form passed the unit ROM check.
+
+--- a/src/fn/sub_08032CD4.c
++++ b/src/fn/sub_08032CD4.c
+@@ -8,3 +8,6 @@
+ {
+     p->a[i] = v;
++#ifdef UBFIX
++    return (u32)p; // r0 retains the input state pointer on hardware
++#endif
+ }

@@ -1,0 +1,18 @@
+0822B8E0 scene-stimulus-destroy-return
+
+TaskSystem_RunFrame passes the retiring task in r0 at 0821A09A.
+The callback clears its global through r1 and r2, preserving r0.
+
+The explicit form passed the unit ROM check.
+
+--- a/src/fn/sub_0822B8E0.c
++++ b/src/fn/sub_0822B8E0.c
+@@ -1,6 +1,7 @@
+ #include "global.h"
+ #include "scene_stimulus.h"
+-u32 SceneStimulus_DestroyTask(void)
++u32 SceneStimulus_DestroyTask(void *task)
+ {
+     gSceneStimulusState = 0;
++    return (u32)task;
+ }

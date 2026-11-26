@@ -1,0 +1,53 @@
+0822725C camera-update-shake-return
+
+r0 starts with the camera pointer. Updating the amplitude leaves the
+quotient or, on motion completion, the return address. If the shake
+is applied, the final vertical remainder replaces r0 before centering.
+
+The explicit form changed the ROM bytes. The guarded form passed the unit ROM check.
+
+--- a/src/fn/sub_0822725C.c
++++ b/src/fn/sub_0822725C.c
+@@ -21,7 +21,15 @@
+ u32 Camera_UpdateShake(struct Camera0822725C *c)
+ {
++#ifdef UBFIX
++    u32 result = (u32)c;
++#endif
+     if (c->active) {
+         if (c->steps) {
++#ifdef UBFIX
++            result = Div(c->cur * c->steps + c->target, c->steps + 1);
++            c->cur = result;
++#else
+             c->cur = Div(c->cur * c->steps + c->target, c->steps + 1);
++#endif
+             c->amp = c->cur;
+             c->steps--;
+@@ -35,4 +43,7 @@
+                     c->cur = c->target;
+                 Camera_NotifyMoveComplete(c);
++#ifdef UBFIX
++                result = 0x082272CD;
++#endif
+             }
+         } else
+@@ -42,6 +53,11 @@
+         c->offX = DivArmMod(c->amp, gRandomTable[gRandomIndex = (gRandomIndex + 1) & 0x3FF]) -
+                   (c->amp >> 1);
++#ifdef UBFIX
++        result = DivArmMod(c->amp, gRandomTable[gRandomIndex = (gRandomIndex + 1) & 0x3FF]);
++        c->offY = (s32)result - (c->amp >> 1);
++#else
+         c->offY = DivArmMod(c->amp, gRandomTable[gRandomIndex = (gRandomIndex + 1) & 0x3FF]) -
+                   (c->amp >> 1);
++#endif
+         gCamera.position.x += c->offX;
+         gCamera.position.z += c->offY;
+@@ -51,3 +67,6 @@
+         c->offY = 0;
+     }
++#ifdef UBFIX
++    return result; // r0 holds the final uncentered remainder or motion result
++#endif
+ }

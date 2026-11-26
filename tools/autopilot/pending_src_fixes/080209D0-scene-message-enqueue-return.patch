@@ -1,0 +1,17 @@
+080209D0 scene-message-enqueue-return
+
+SceneMessages_Enqueue keeps SceneMessages_FindReceiver result in r0.
+Capacity and write operations use r1-r6. SceneMessages_Send forwards it.
+
+The explicit form changed the ROM bytes. The guarded form passed the unit ROM check.
+
+--- a/src/scene_messages.c
++++ b/src/scene_messages.c
+@@ -49,4 +49,7 @@
+         entry->queue.count[buffer]++;
+     }
++#ifdef UBFIX
++    return (int)entry; // r0 retains the receiver lookup result
++#endif
+ }
+ 

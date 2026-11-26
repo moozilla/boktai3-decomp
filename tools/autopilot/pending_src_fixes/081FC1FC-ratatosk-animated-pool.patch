@@ -1,0 +1,16 @@
+081FC1FC ratatosk-animated-pool
+
+The failed Task_Create branch exits with its null result still in r0.
+Ratatosk checks this result before continuing boss initialization.
+
+The explicit form changed the ROM bytes. The guarded form passed the unit ROM check.
+
+--- a/src/fn/sub_081FC1FC.c
++++ b/src/fn/sub_081FC1FC.c
+@@ -15,3 +15,6 @@
+         return r;
+     }
++#ifdef UBFIX
++    return r; // r0 is zero when Task_Create fails
++#endif
+ }

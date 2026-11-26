@@ -1,0 +1,15 @@
+080612D0 inventory-action-default
+
+The out-of-range category branch returns with panel in r0
+
+The explicit form changed the ROM bytes. The guarded form passed the unit ROM check.
+
+--- a/src/fn/sub_080612D0.c
++++ b/src/fn/sub_080612D0.c
+@@ -10,3 +10,6 @@
+             return SceneInventory_ClassifyConsumableAction(panel);
+     }
++#ifdef UBFIX
++    return (s32)panel; // The out-of-range category branch returns with panel in r0
++#endif
+ }

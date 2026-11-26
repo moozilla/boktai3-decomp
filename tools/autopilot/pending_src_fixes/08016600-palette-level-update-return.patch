@@ -1,0 +1,27 @@
+08016600 palette-level-update-return
+
+Both callbacks in the ROM table, PaletteLevels_Increase and PaletteLevels_Decrease,
+return via r0. Callback_InvokeActor tail-calls them, so their LR is 08016617.
+The null callback leaves the input p in r0.
+
+The explicit form changed the ROM bytes. The guarded form passed the unit ROM check.
+
+--- a/src/palette_level_transitions.c
++++ b/src/palette_level_transitions.c
+@@ -53,7 +53,16 @@
+ s32 PaletteLevels_Update(struct PaletteLevels *p)
+ {
++#ifdef UBFIX
++    s32 (*f)(struct PaletteLevels *) = gUnk_08604C58[p->state];
++    if (f) {
++        f(p);
++        return 0x08016617;
++    }
++    return (s32)p;
++#else
+     s32 (*f)(struct PaletteLevels *) = gUnk_08604C58[p->state];
+     if (f)
+         f(p);
++#endif
+ }
+ 

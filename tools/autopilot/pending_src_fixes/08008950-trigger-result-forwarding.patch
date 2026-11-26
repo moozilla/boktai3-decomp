@@ -1,0 +1,41 @@
+08008950 trigger-result-forwarding
+
+The script wrappers consume these results. In the successful destroy
+path, r0 is the manager pointer until a Trigger_Destroy call replaces
+it with zero. The move path preserves the manager pointer in r0.
+
+The explicit form changed the ROM bytes. The guarded form passed the unit ROM check.
+
+--- a/src/item_container.c
++++ b/src/item_container.c
+@@ -973,4 +973,7 @@
+     struct TriggerManager *s = TriggerManager_GetOrCreate();
+     struct Trigger *n;
++#ifdef UBFIX
++    s32 result = (s32)s;
++#endif
+     if (s == 0)
+         return -1;
+@@ -979,7 +982,14 @@
+         struct Trigger *next = n->next;
+         if (n->type == type)
++#ifdef UBFIX
++            result = Trigger_Destroy(n);
++#else
+             Trigger_Destroy(n);
++#endif
+         n = next;
+     }
++#ifdef UBFIX
++    return result; // r0 holds the manager or last Trigger_Destroy result
++#endif
+ }
+ u32 TriggerManager_DestroyAllOfTypeFromScript(void)
+@@ -1000,4 +1010,7 @@
+             *p->position = *position;
+     }
++#ifdef UBFIX
++    return (s32)manager; // r0 retains the manager pointer
++#endif
+ }
+ 

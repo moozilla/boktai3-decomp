@@ -1,23 +1,17 @@
 #include "global.h"
 #include "engine/ram.h"
+#include "player/target_registry/target_registry.h"
 
-struct SceneLinkNode {
-    u8 unknown0[0xC];
-    struct SceneLinkNode *next;
-};
-struct SceneLinkList {
-    u8 unknown0[0x18];
-    struct SceneLinkNode *head;
-};
-void SceneLink_RemoveNode(struct SceneLinkNode *target)
+void SceneLink_RemoveNode(void *object)
 {
-    struct SceneLinkList *list = gSceneLinkList;
+    struct MotionTarget *target = object;
+    struct MotionTargets *list = gSceneLinkList;
     if (list) {
-        struct SceneLinkNode *node = list->head;
+        struct MotionTarget *node = list->first;
         if (node == target)
-            list->head = node->next;
+            list->first = node->next;
         else {
-            struct SceneLinkNode *next;
+            struct MotionTarget *next;
             for (; (next = node->next) != 0; node = node->next) {
                 if (next == target) {
                     node->next = next->next;

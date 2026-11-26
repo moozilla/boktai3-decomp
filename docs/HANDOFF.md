@@ -37,6 +37,8 @@ not by fuzzy scores. Blind spelling sweeps don't count.
 Source and headers use the reviewed placement tables in `symbols/`.
 [SOURCE_LAYOUT.md](SOURCE_LAYOUT.md) maps the directories and explains where
 new files belong and how to find a function.
+The [runtime layout audit](../notes/unit-identities_2026-11-25.md) ties the
+revised names to checkpoint replays and the Monster Book.
 
 Numbers live only in [PROGRESS.md](../PROGRESS.md) (regenerated at batch integration) and
 the README badges. Use `python3 tools/progress.py` for the current figures and
@@ -51,6 +53,7 @@ the README badges. Use `python3 tools/progress.py` for the current figures and
 | Phase 3 | 3b in progress: 3 linter errors (volatile: the two scene link-list insertions and the scene camera global) and a use-weighted steering-debt subtotal in the linter summary. The [flag-order survey](../notes/flag-accessors_2026-11-25.md) gives the evidence for accepting a shared flag operation. The 2026-11-22 run recovered boss, Player, monster and menu types by subsystem and cleared two hard sites; its [report](../notes/claude-warning-run_2026-11-22.md) says what worked (type recovery first, plain loops), what the count hides (constants moved into accessor arguments) and the leads not taken. Hard sites: [hard-sites_2026-11-23.md](../notes/hard-sites_2026-11-23.md). Earlier: the [round-15 report](../notes/round15-priority-recovery.md) and [union review](../notes/round15-union-review.md). A falling count is not evidence of plausible original source. |
 | Data | fully relocatable; `make shifttest` compares 35 emulator screenshots after moving data. decomp.dev's data measure is ROM data that round-trips through an editable form (`tools/data_roundtrip.py`), by kind ([DATA_TRACKING.md](DATA_TRACKING.md)); RAM is tracked in PROGRESS.md |
 | Report | every function in one of ~490 subsystem units under 11 categories plus Libraries ([REPORT_SUBSYSTEMS.md](REPORT_SUBSYSTEMS.md)); main-only CI publishes to decomp.dev |
+| Source port | 249 randomized checkpoint movies match the ROM after the wasm ABI repair and with the pending source return patches applied together. Run `make port-verify` for the short recorded suite. [Conformance evidence and pending source repairs](../notes/autopilot-port-conformance_2026-11-26.md). |
 
 Recent (details in [docs/history/](history/README.md) and the notes they link):
 
@@ -118,6 +121,7 @@ Recent (details in [docs/history/](history/README.md) and the notes they link):
 | `tools/relatives.py`, `rasolve.py`, `fix.py`, `hint.py`, `permute.py` | when stuck ([WORKER.md](WORKER.md) "When stuck") |
 | `tools/docindex.py [ADDR / --tag T]` | who wrote about an address or topic |
 | `tools/emu/harness`, `tools/studio/serve.py` | headless mGBA runs; the Studio (text, sprites, maps, actors, scripts) |
+| [tools/testbench](../tools/testbench/README.md) | stage a scene, create actors, drive menus and scripts, and record function coverage and ROM replay results |
 
 ## Running workers
 

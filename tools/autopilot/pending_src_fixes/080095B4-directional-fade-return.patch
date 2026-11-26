@@ -1,0 +1,24 @@
+080095B4 directional-fade-return
+
+The disabled path leaves the incoming controller pointer in r0.
+On the active path AnimData_SelectPaletteBank returns through r0.
+
+The explicit form changed the ROM bytes. The guarded form passed the unit ROM check.
+
+--- a/src/directional_interaction.c
++++ b/src/directional_interaction.c
+@@ -61,6 +61,14 @@
+ {
+     void *animation = &p->graphics;
++#ifdef UBFIX
++    if (p->disabled == 0) {
++        AnimData_SelectPaletteBank(animation, level + 0x6b);
++        return 0x080095CF;
++    }
++    return (u32)p;
++#else
+     if (p->disabled == 0)
+         AnimData_SelectPaletteBank(animation, level + 0x6b);
++#endif
+ }
+ 

@@ -1,0 +1,16 @@
+0812A418 effect-pool-update-return
+
+The suspended path branches directly to the epilogue while r0 still holds pool.
+
+The explicit form changed the ROM bytes. The guarded form passed the unit ROM check.
+
+--- a/src/fn/sub_0812A418.c
++++ b/src/fn/sub_0812A418.c
+@@ -40,4 +40,6 @@
+         return 0;
+     }
+-    // No return value on this path: the ROM leaves the argument in r0.
++#ifdef UBFIX
++    return (s32)pool; // the suspended path preserves its incoming r0
++#endif
+ }

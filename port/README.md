@@ -588,6 +588,57 @@ uses valid inactive sound state and leaves wireless uncreated; active audio/RFU
 callbacks are not covered. This focused resolver
 is a tested integration boundary, not the full game's callback registry.
 
+## Checkpoint replays against the ROM
+
+```sh
+make -f tools/emu/Makefile build/emu/harness
+build/venv/bin/python port/agent/gametypes.py
+build/venv/bin/python tools/assets/saves.py bank --make
+make port-verify
+```
+
+Build the full-game wasm first. The suite replays the controller recordings in
+`port/tests/verify-movies.json` across the checkpoint areas, including the swords
+page, equipment details after receiving iron armor, and a soft reset followed by
+Continue. The runner checks that the port reaches each expected scene, then aligns
+the comparison by input tick. Each recording stores controller masks by video
+frame for the port and by input poll for the ROM. The runner samples the port's
+emulated KEYINPUT register at each poll. It stops at the first failing recording
+and reports the earliest differing controller input, scene,
+position, player stat, HUD state, previous input or random index. Recorded movies
+run with pixel rendering disabled and still check equipment callbacks. Use
+`node tools/autopilot/stress.mjs --from FILE --render` to enable the port renderer
+for a standalone replay.
+
+Run one recording with `build/venv/bin/python port/tests/verify.py --case NAME`.
+Pass `--jobs 2` to run the regression recordings in pairs. On a failure, the
+runner reports the first differing tick and finishes the in-flight pair.
+For randomized input across the entire bank, run
+`build/venv/bin/python port/tests/verify.py --all --seed 1 --seed 2 --seed 3 --resume`.
+Use `--jobs 2` for two simultaneous comparisons or `--case CHECKPOINT` for one
+save. `--resume` skips successful cases when the result and its recorded inputs
+still match, including the wasm, ROM, saves and verifier files. It reruns failures
+and older results that lack this record. Use a fresh `--out-root` to keep results
+from multiple builds. Results, movies and action logs are under
+`build/autopilot/`. Run `node tools/autopilot/tickdiff.mjs DIR FROM TO` to compare
+RAM and the sampled controller masks around a failing tick. The RAM noise window
+does not suppress controller mismatches.
+
+To rerun the port against previously captured ROM ticks, pass the earlier output
+root to `--rom-reference` and select a separate `--out-root`. The verifier hashes
+the ROM, checkpoint save and complete harness script, including the input sequence,
+RTC and sampled addresses. It uses the original ticks when these inputs and the
+full tick dump agree with the reference record. It runs the emulator for new
+inputs, incomplete captures or older runs without a reference record.
+
+After a direct `make port-verify` run, replay a later build with two workers and
+the captured ROM samples.
+
+```sh
+build/venv/bin/python port/tests/verify.py --jobs 2 \
+  --rom-reference build/autopilot --out-root build/autopilot/verify-follow-up
+```
+
 ## Undefined behavior the GBA forgives (UBFIX)
 
 Some original code relies on what a register happens to hold: a call passing fewer
@@ -608,6 +659,10 @@ stops with the list of any call still passing fewer arguments than its callee ta
 (`build/port/game/padded_calls.txt`); fix each in the source as above. Divergences the autopilot found this way:
 `LinkedWidgetSet_Init` fell off the end, so the floating-item effect manager was killed at
 creation on the port, which skipped random draws and desynced every later random number.
+
+`port/build_game.py --source-patches tools/autopilot/pending_src_fixes` applies
+pending one-unit source repairs to the generated port copies. The patches give
+the original instruction evidence and their ROM unit-check result.
 
 ## Discarded return declarations
 

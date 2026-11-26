@@ -44,11 +44,11 @@ void RegisterRamReset(uint32_t flags)
 void SoftReset(uint32_t flags)
 {
     Hw *hw = hw_bound();
-    RegisterRamReset(flags);
     if (!hw) return;
     hw_write16(hw, HW_IO_BASE + 0x208, 0);
-    if (hw->host.reset) hw->host.reset(hw->host.user);
-    else report(0, HW_UNSUPPORTED);
+    RegisterRamReset(flags);
+    uintptr_t regs[4] = {0};
+    report(0, hw_bios_call(0, regs));
 }
 
 void VBlankIntrWait(void)
@@ -99,6 +99,12 @@ int hw_bios_call(unsigned swi, uintptr_t r[4])
     switch (swi) {
     case 0:
         if (!hw || !hw->host.reset) return HW_UNSUPPORTED;
+        /* The game always requests a cartridge reboot. The BIOS clears its
+         * work area at the top of IWRAM before transferring control. */
+        {
+            uint8_t *bios_ram = hw_map(hw, 0x03007e00, 0x200);
+            if (bios_ram) hw_zero(bios_ram, 0x200);
+        }
         hw->host.reset(hw->host.user);
         return HW_OK;
     case 1: RegisterRamReset((uint32_t)r[0]); return hw ? HW_OK : HW_BAD_DATA;

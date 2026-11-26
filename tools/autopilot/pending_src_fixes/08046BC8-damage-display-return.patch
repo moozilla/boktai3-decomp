@@ -1,0 +1,17 @@
+08046BC8 damage-display-return
+
+The digit count is at least one before the render loop.
+The last sub_08217E40 returns through r0 and the loop increment preserves it.
+
+The explicit form changed the ROM bytes. The guarded form passed the unit ROM check.
+
+--- a/src/damage_number_display.c
++++ b/src/damage_number_display.c
+@@ -165,4 +165,7 @@
+         } while (index < group->digitCount);
+     }
++#ifdef UBFIX
++    return 0x08046DC9; // r0 retains the last link return address
++#endif
+ }
+ 

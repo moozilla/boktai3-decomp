@@ -297,6 +297,45 @@ to clean, before reading warnings by hand, in this order:
 
 Use the field and call-site evidence above when considering an accessor.
 
+For type recovery across units, run `build/venv/bin/python tools/structfamilies.py`. It
+leaves the source tree alone and writes the top 50 families and embedded-object observations to
+`build/structfamilies/REPORT.md`, with the complete catalog in `families.json` in the same
+directory. Pass source paths or directories for a smaller scan. Inspect any family with
+`tools/structfamilies.py --family FAMILY`, using the ID in the report. A family needs compatible
+compiler-measured storage plus evidence from calls, a RAM object, or a report unit. Check the
+evidence before applying a family with only report-unit or shared-parameter support.
+
+Two supported parent declarations can provide evidence for a child family when both embed
+compatible private types in the same named member slot. Merge the child first if the parent
+preview reports a private type dependency, then rescan the parent units for their new layouts.
+For a focused rescan, pass the parent source paths and repeat `--shared-header include/PATH.h`
+for the known shared types. Write the focused catalog with `--out build/structfamilies/focus`
+and give its `families.json` to `structmerge.py --catalog`. The report identifies the restricted
+header scope.
+
+`build/venv/bin/python tools/structmerge.py FAMILY` previews the shared type and source
+proposals. Distinct ROM functions that load an offset vote on its width and extension. The type
+used by the most copies breaks ties, and the name comes from the most specific copy. The header
+marks uncertain choices, checks the total size, and leaves unnamed bytes as padding. Use
+`--name TAG` or `--header include/PATH.h` to choose another destination, or
+`--use-shared 'struct TAG'` to adopt a related type listed in the report. The merger
+remeasures that header and its included definitions with agbcc before planning a rewrite.
+Rescan if it reports layout drift.
+
+The generated header can retain byte-aligned bitfields that occupy whole bytes. The compiler
+probe checks each emitted bitfield's position and width. Sub-byte fields need an allocation-group
+review before the tool can generate a header for them.
+
+An aggregate layout conflict lists the direct declarations alongside the flattened field votes.
+Use this evidence to review overlays, such as an array and a union that cover the same bytes.
+
+Add `--apply` in a writable worker checkout to try the proposals. Each unit goes through
+`keepcheck.py`, and the tool checks every dependent of a newly written header. The output
+lists units held back by layout changes, ambiguous member uses, or compiler differences.
+After adopting a type, run `rawfield.py` on its users and test the parked constants separately.
+Rescan after moving source files or editing a family. Use `-j 2` to limit the scanner and
+header-dependent checks while sharing a machine.
+
 ## Recording what you learned
 
 * Per function: what `why` said and which C change it led to; what still differs and

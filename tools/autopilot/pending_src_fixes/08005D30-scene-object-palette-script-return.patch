@@ -1,0 +1,36 @@
+08005D30 scene-object-palette-script-return
+
+AnimData_SelectPaletteBank and Sound_PlaySong return through r0.
+The handler returns through r1 and preserves whichever Thumb return
+address is left in r0 by its final call.
+
+The explicit form changed the ROM bytes. The guarded form passed the unit ROM check.
+
+--- a/src/scene_object.c
++++ b/src/scene_object.c
+@@ -1493,7 +1493,13 @@
+             p->basePalette = 4;
+             AnimData_SelectPaletteBank(&p->animationData, 4);
++#ifdef UBFIX
++            return 0x08005DA3;
++#endif
+         } else {
+             p->basePalette = 5;
+             AnimData_SelectPaletteBank(&p->animationData, 5);
++#ifdef UBFIX
++            return 0x08005DB3;
++#endif
+         }
+     } else {
+@@ -1510,4 +1516,9 @@
+         if (sound)
+             Sound_PlaySong(0x149);
+-    }
+-}
++#ifdef UBFIX
++        if (sound)
++            return 0x08005E01;
++        return (draw->mode == 0 || draw->mode == 2) ? 0x08005DCF : 0x08005DE7;
++#endif
++    }
++}

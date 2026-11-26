@@ -2,6 +2,7 @@
 // The Autopilot: plays Boktai 3 on the source port from typed game state.
 //
 //   node tools/autopilot/autopilot.mjs m1 [--save F] [--out DIR] [--shots]
+//   node tools/autopilot/autopilot.mjs story [--from MOVIE|--save SAV] [--until-scene SCENE|--until-story N] [--verify]
 //
 // Runs headless in-process (port/agent/session.mjs) with the agent library plus
 // tools/autopilot/lib/*.js. Each milestone is a goal; the run writes the input
@@ -17,6 +18,10 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { openSession, png } from '../../port/agent/session.mjs';
+import { runRom } from './lib/rom.mjs';
+import { tickAt } from './movie-index.mjs';
+import { distanceFromEntrance, routeDistances, storyEntrances } from './route-entrances.mjs';
+import { landingReturn } from './higher-landings.mjs';
 
 const ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname), '../..');
 const args = process.argv.slice(2);
@@ -29,18 +34,33 @@ if (shots) fs.mkdirSync(path.join(out, 'shots'), { recursive: true });
 
 // --from DIR/movie.json: start where an earlier run ended (its movie is replayed).
 const from = opt('--from') ? JSON.parse(fs.readFileSync(opt('--from'), 'utf8')) : null;
+const battery = opt('--save') || from?.save || null;
 const s = await openSession({
   movie: from ? from.movie : undefined, solarLog: from ? from.solar : undefined,
-  save: opt('--save') || (from && from.save) || undefined, render: shots, print: () => {},
+  save: battery || undefined, render: shots, print: () => {},
   lib: [path.join(ROOT, 'port/agent/lib'), path.join(ROOT, 'tools/autopilot/lib')],
+  onBoot: (g) => g.lib.message(),
 });
-// Script-derived stage data (doors, entrances, items, enemies): tools/assets/stages.py json.
-const STAGES = (() => { try { return JSON.parse(fs.readFileSync(path.join(ROOT, 'build/assets/stages.json'), 'utf8')); } catch { return []; } })();
+const venvPython = path.join(ROOT, 'build/venv/bin/python');
+const python = fs.existsSync(venvPython) ? venvPython : 'python3';
+function stageData(file, generator, args, fallback) {
+  file = path.join(ROOT, file);
+  const script = path.join(ROOT, generator);
+  if (goal === 'story' && (!fs.existsSync(file) || fs.statSync(file).mtimeMs < fs.statSync(script).mtimeMs)) {
+    const result = spawnSync(python, [script, ...args], { cwd: ROOT, encoding: 'utf8' });
+    if (result.error || result.status !== 0) throw new Error(`Could not generate ${file}: ${result.error || result.stderr}`);
+  }
+  return fs.existsSync(file) ? JSON.parse(fs.readFileSync(file, 'utf8')) : fallback;
+}
+const STAGES = stageData('build/assets/stages.json', 'tools/assets/stages.py', ['json'], []);
+const LOCKS = stageData('build/autopilot/locks.json', 'tools/autopilot/locks.py', [], {});
+const PLATE_PUZZLES = stageData('build/autopilot/plate-puzzles.json', 'tools/autopilot/plate-puzzles.py', [], {});
+const ESCORT_TARGETS = stageData('build/autopilot/escort-targets.json', 'tools/autopilot/escort-targets.py', [], {});
 // What carries which reaction flag (tools/autopilot/breakers.py: Breakable_OnHit, the gun's
 // lens table, weapon modifiers, read from the source and the ROM's weapon records).
 const BREAKERS = (() => {
   const f = path.join(ROOT, 'build/autopilot/breakers.json');
-  if (!fs.existsSync(f)) spawnSync('python3', [path.join(ROOT, 'tools/autopilot/breakers.py'), f]);
+  if (!fs.existsSync(f)) spawnSync(python, [path.join(ROOT, 'tools/autopilot/breakers.py'), f]);
   try { return JSON.parse(fs.readFileSync(f, 'utf8')); } catch { return { targets: { Breakable: {} }, lens: [], weapons: [] }; }
 })();
 // means(flag, bags): the lenses and swords that carry the flag, owned first
@@ -48,18 +68,30 @@ const means = (flag, bags) => [
   ...BREAKERS.lens.filter((l) => l.flags & flag).map((l) => ({ kind: 'lens', id: l.id, name: l.name, owned: bags.lenses.includes(l.id) })),
   ...BREAKERS.weapons.filter((w) => w.flags & flag).map((w) => ({ kind: 'sword', id: w.id, name: w.name, owned: bags.swords.includes(w.id) })),
 ].sort((a, b) => b.owned - a.owned);
-const stageOf = (scene) => STAGES.find((x) => x.scene === scene) || { items: [], doors: [], entrances: [] };
+const stageIndex = new Map(STAGES.map((stage) => [stage.scene, stage]));
+const emptyStage = { items: [], doors: [], entrances: [] };
+const stageOf = (scene) => stageIndex.get(scene) || emptyStage;
 const log = [];
 // scenes the run has been in (carried over from --from), for door choice
 const UNREACHABLE = new Set(from && from.unreachable ? from.unreachable : []);  // 'scene:box' doors no route reached
+const distancesTo = (scene, locked, entrances) => routeDistances(STAGES, scene, UNREACHABLE, locked, entrances);
 const SEEN = new Map();  // person id -> rooms they were in
 const VISITS = new Map();  // room visits this run: least visited doors first
 const TRIED = new Set(from && from.tried ? from.tried : []);  // floor items already gone for
 const VISITED = new Set(from ? [...(from.visited || []), ...(from.rooms || []).map((r) => r.scene)] : []);
+let landingDetour;
 const event = (what) => {
   const e = { frame: s.frame, ...what };
   log.push(e);
   console.log(JSON.stringify(e));
+  if (e.skill === 'entry' || e.skill === 'room' || e.skill === 'goal')
+    writeMovie('checkpoint.json', { scene: e.scene, x: e.x, y: e.y, z: e.z });
+  if (e.skill === 'fight' && (e.dialogue !== undefined || e.trance || e.fight !== undefined))
+    writeMovie('checkpoint.json', s.g.lib.where());
+  if ((e.skill === 'purification' && e.phase !== undefined) || (e.skill === 'drive' && e.steps !== undefined))
+    writeMovie('checkpoint.json', s.g.lib.where());
+  if ((e.skill === 'ride' && e.key) || (e.skill === 'moving-floor' && e.done))
+    writeMovie('checkpoint.json', s.g.lib.where());
   if (shots) fs.writeFileSync(path.join(out, 'shots', `${String(s.frame).padStart(6, '0')}.png`), png(s.pixels()));
 };
 
@@ -112,44 +144,137 @@ const GOALS = {
   // scenes not visited yet (stages.json doors, else any box the live map has that a
   // door record names). Logs each stop; --scenes N stops after N rooms.
   *story(g, L) {
-    if (!from && !(yield* GOALS.m1(g, L))) return false;
+    if (!from) {
+      if (battery) yield* L.continueSave();
+      else if (!(yield* GOALS.m1(g, L))) return false;
+    }
     const visited = VISITED, limit = +(opt('--scenes', 8));
-    let prev;
+    const destination = +opt('--until-scene', -1), routeGoal = +opt('--goal', destination);
+    const storyGoal = +opt('--until-story', -1), endpoint = destination >= 0 || storyGoal >= 0;
+    const reachedScene = () => destination >= 0 && L.where().scene === destination;
+    const reached = () => reachedScene() || (storyGoal >= 0 && L.story() >= storyGoal);
+    const arrivalForGoal = () => routeGoal >= 0 && storyGoal > L.story() ?
+      storyEntrances(stageOf(routeGoal), storyGoal, L.conditionsAllow) : undefined;
+    if (from?.landingDetour?.goal === routeGoal) landingDetour = from.landingDetour;
+    let prev, keyGoal;
+    const failedKeyRooms = new Set();
+    const bossActive = () => L.fightTargets().some((target) => target.boss || target.barrier);
     for (let rooms = 0; rooms < limit; rooms++) {
-      const doorsHere = () => (L.hub() ? stageOf(L.where().scene).doors.filter((d) => d.hub !== undefined && (!d.hubMenu || d.hubMenu === L.hub().kind))
-          .filter((d, i, all) => all.findIndex((e) => e.hub === d.hub) === i)  // one per entry (its conditional destinations)
-        : stageOf(L.where().scene).doors.filter((d) => L.boxes().some((b) => b.name === d.box)));
-      if (!(yield* untilControl(g, L, () => doorsHere().length > 0, 120, 30000))) { event({ skill: 'stop', why: 'no control with a door in 30000 frames', ...L.where() }); return rooms > 0; }
-      // enemies in the room: fight them first (the "defeat all" rooms lock the doors)
-      if (L.enemies().some((e) => e.alive && !(L.fightIgnored && L.fightIgnored.has(e.addr)))) {
+      const doorsHere = (resolve = true) => {
+        const doors = stageOf(L.where().scene).doors, hub = L.hub();
+        if (hub) {
+          const entries = doors.filter((d) => d.hub !== undefined && (!d.hubMenu || d.hubMenu === hub.kind));
+          return resolve ? L.doorBranches(entries, (d) => d.hub) : entries;
+        }
+        const boxes = new Set(L.boxes().map((b) => b.name));
+        const portals = doors.filter((d) => boxes.has(d.box));
+        return resolve ? L.doorBranches(portals, (d) => d.box) : portals;
+      };
+      const ready = () => reached() || L.purificationPanel() || L.purificationBattle() || doorsHere(false).length > 0 || L.fightTargets().length > 0;
+      if (!(yield* untilControl(g, L, ready, 120, 30000))) { event({ skill: 'stop', why: 'no control with a door or enemy in 30000 frames', ...L.where() }); return !endpoint && rooms > 0; }
+      event({ skill: 'entry', ...L.where(), story: L.story() });
+      if (reached()) {
+        event({ skill: 'goal', reached: reachedScene() ? `scene ${destination}` : `story ${storyGoal}`, ...L.where(), story: L.story() });
+        return true;
+      }
+      // Boss fights can advance the scene themselves. Rooms with exits can
+      // defer patrols until a door is blocked or the player takes damage.
+      const targets = L.fightTargets();
+      if (targets.some((t) => t.boss || t.barrier) || (targets.length && !doorsHere(false).length)) {
         const f = yield* L.fight({ trace: (e) => event({ skill: 'fight', ...e }) });
         event({ skill: 'fought', ...f, scene: L.where().scene });
-        if (!(yield* untilControl(g, L, () => doorsHere().length > 0, 60, 30000))) { event({ skill: 'stop', why: 'no control after the fight', ...L.where() }); return rooms > 0; }
+        if (!(yield* untilControl(g, L, ready, 60, 30000))) { event({ skill: 'stop', why: 'no control after the fight', ...L.where() }); return !endpoint && rooms > 0; }
+        if (reached()) { rooms--; continue; }
       }
       const here = L.where().scene;
+      if (landingDetour?.via === here && stageOf(landingDetour.room).doors.some((d) => d.box === landingDetour.box && d.scene === here)) {
+        event({ skill: 'landing-bypass', scene: here, from: landingDetour.room, box: landingDetour.box });
+        landingDetour = undefined;
+      }
+      if (landingDetour?.room === here && (landingDetour.descending ? L.where().y <= landingDetour.height : L.where().y >= landingDetour.height)) {
+        UNREACHABLE.delete(`${here}:${landingDetour.box}`);
+        landingDetour = undefined;
+      }
+      if (L.purificationBattle()) {
+        const result = yield* L.fightPurification({ trace: (e) => event({ skill: 'drive', ...e }) });
+        event({ skill: 'drive-result', ...result, scene: L.where().scene, story: L.story() });
+        if (result.done) continue;
+        return false;
+      }
+      if (L.purificationPanel()) {
+        const result = yield* L.preparePurification({ avoid: stageOf(here).doors.map((d) => d.box),
+          trace: (e) => event({ skill: 'purification', ...e }) });
+        event({ skill: 'purification-result', ...result, scene: L.where().scene, story: L.story() });
+        if (result.done) continue;
+        return false;
+      }
+      if (L.coffinAvailable()) {
+        const before = L.story(), advanced = () => L.story() > before;
+        for (const { box, cond } of ESCORT_TARGETS[here] || []) {
+          if (L.conditionsAllow(cond) && L.boxes().some((b) => b.name === box) && (yield* throughDoor(g, L, box, { stopIf: advanced }))) break;
+        }
+        if (L.where().scene !== here || advanced()) continue;
+      }
       // healing: below a third of the life bar with something in the item bag, find the
       // use of an item in the pause menu that raises life (menuSearch; once per room)
       {
         const p = $player(g) && g.$.gPlayers[0], life = () => g.$.gPlayers[0] ? g.$.gPlayers[0].currentStatA : 0;
         if (p && p.maximumStatA && p.currentStatA * 3 < p.maximumStatA && L.bags().items.length) {
-          const life0 = p.currentStatA, items0 = JSON.stringify(L.bags().items);
-          // items page only (L/R over the other pages crashed the port); the life bar fills
-          // over many frames, so a used item is judged by the bag changing as well
-          const r = yield* L.menuSearch(() => life() > life0 || JSON.stringify(L.bags().items) !== items0,
+          const life0 = p.currentStatA;
+          // Judge the actual life gain so the search keeps solar fruit and
+          // passes over items with unrelated effects.
+          const r = yield* L.menuSearch(() => life() > life0,
             { max: 300, page: 1, keys: ['down', 'right', 'up', 'left', 'a', 'b'], settle: 90 });
           if (r.done) yield g.press(0, 120);
           event({ skill: 'heal', from: life0, to: life(), ...r });
         }
       }
-      // floor switches (stages.json: a trap on an HP box that runs a script once, e.g. a
-      // chest appears): step on each once
-      for (const sw of (stageOf(here).switches || []).filter((sw) => !TRIED.has(`${here}:switch:${sw.box}`))) {
-        TRIED.add(`${here}:switch:${sw.box}`);
-        const r = yield* L.navigate([sw.x, sw.z], { avoid: stageOf(here).doors.map((d) => d.box), trace: (e) => event({ skill: 'nav', ...e }) });
-        yield* L.clearInterruptions({});
-        event({ skill: 'switch', box: sw.box, reached: r.reached, reason: r.reason });
+      // Both HP traps and live pressure plates can run scripts on contact.
+      let prioritizeExit = Boolean(landingDetour) || L.coffinAvailable() || L.movingFloors().length > 0;
+      const arrivals = arrivalForGoal();
+      if (arrivals && doorsHere().some((door) => door.scene === routeGoal && arrivals.has(door.entrance))) prioritizeExit = true;
+      const completedPlates = new Set();
+      for (const puzzle of PLATE_PUZZLES[here] || []) {
+        if (!L.conditionsAllow(puzzle.cond)) {
+          for (const name of puzzle.plates) completedPlates.add(name);
+          continue;
+        }
+        const solved = yield* L.solvePlatePuzzle(puzzle, { avoid: stageOf(here).doors.map((d) => d.box),
+          trace: (e) => event({ skill: 'nav', ...e }) });
+        event({ skill: 'plate-puzzle', ...solved, scene: here });
+        if (solved.done) {
+          prioritizeExit = true;
+          for (const name of puzzle.plates) completedPlates.add(name);
+          yield* untilControl(g, L, () => !g.fn.ScriptUtility_IsControlFlagSet(), 30, 1800);
+        }
+      }
+      const switches = (stageOf(here).switches || []).concat(L.floorSwitches().filter((sw) => !sw.pressed && !completedPlates.has(sw.name)));
+      for (const sw of switches) {
+        const key = `${here}:switch:${sw.box ?? sw.name}`;
+        if (TRIED.has(key)) continue;
+        const pressed = sw.addr ? () => L.floorSwitches().some((plate) => plate.addr === sw.addr && plate.pressed) : undefined;
+        const opts = { avoid: stageOf(here).doors.map((d) => d.box) };
+        const probe = yield* L.probeFloorSwitch(sw, opts);
+        if (probe?.hazard) {
+          prioritizeExit = true;
+          event({ skill: 'switch', name: sw.name, reached: false, reason: 'falling object at the switch' });
+          continue;
+        }
+        const delayed = probe?.ready;
+        const r = delayed ? { reason: 'released before delayed script' } :
+          probe?.pressed ? { reason: 'pressed' } :
+          yield* L.navigate([sw.x, sw.z], { ...opts, stopIf: pressed, trace: (e) => event({ skill: 'nav', ...e }) });
+        const clear = () => !g.fn.ScriptUtility_IsControlFlagSet();
+        const completed = delayed ? (yield* untilControl(g, L, () => delayed() && clear(), 24, 900)) :
+          pressed ? pressed() || L.where().scene !== here : r.reached;
+        prioritizeExit ||= Boolean(delayed && completed);
+        if (!pressed || completed) TRIED.add(key);
+        if (pressed && completed && !delayed) yield* untilControl(g, L, clear, 24, 900);
+        else yield* L.clearInterruptions({});
+        event({ skill: 'switch', box: sw.box, name: sw.name, reached: completed, reason: r.reason });
         if (L.where().scene !== here) break;
       }
+      if (L.where().scene !== here) { rooms--; continue; }
       // hittables with a script (lever switches): strike each once
       for (const h of (stageOf(here).hittables || []).filter((h) => h.flags === 9 && !TRIED.has(`${here}:${h.breakable ? 'break' : 'hit'}:${h.name}`))) {
         if (h.breakable) {
@@ -168,7 +293,9 @@ const GOALS = {
             event({ skill: 'menu', goal: `lens ${way.name}`, ...m });
             qc = yield* L.quickChange({ gun: true, lens: way.id });
           }
-          const ch = yield* L.chargeEnergy(6, { lux: 0, restore: 232 });
+          const frame = yield* L.equipBestFrame();
+          if (frame) event({ skill: 'equip', ...frame });
+          const ch = yield* L.chargeEnergy(6);
           event({ skill: 'equip', ...way, quickChange: qc, charge: ch });
           const changed = () => { const b = L.breakables().find((x) => x.id === live.id); return !b || b.state !== live.state; };
           let r = { done: false };
@@ -190,7 +317,9 @@ const GOALS = {
       // people: talk to each once (towns count who was heard before the story goes on).
       // The live actors (world.js people(): SceneActorManager) where they stand now, else
       // the characters the script placed (stages.json talk).
-      if (!opt('--no-talk')) {
+      // Cross a scripted opening before it resets. Defer detours when a plate
+      // preview has shown an attack on the route to an optional reward.
+      if (!prioritizeExit && !opt('--no-talk')) {
         const live = L.people();
         // someone met in three or more rooms travels with the player (Otenko): talk once
         for (const q of live) { const k = q.id.toString(16); SEEN.set(k, (SEEN.get(k) || new Set()).add(here)); }
@@ -201,9 +330,15 @@ const GOALS = {
         // on the second talk in 2370), again when the story counter moved
         const tkey = (t) => `${here}:talk:${t.key}:${L.story()}`;
         for (const t0 of targets.filter((t) => !TRIED.has(tkey(t)))) for (let round = 0; round < 2; round++) {
+          if (reached()) break;
           const t = t0;
           const story0 = L.story(), now = t.addr ? L.people().find((q) => q.addr === t.addr) : null;
           const r = yield* L.interact(now ? now.x : t.x, now ? now.z : t.z, { avoid: stageOf(here).doors.map((d) => d.box), trace: (e) => event({ skill: 'nav', ...e }) });
+          if (L.shopState()) {
+            const purchase = yield* L.buyHealing();
+            event({ skill: 'shop', scene: here, ...purchase });
+            yield* L.leaveShop();
+          }
           // a shop or service menu the talk opened: back out of it
           for (let i = 0; i < 8 && !$player(g); i++) { yield g.press('b', 2); yield g.press(0, 10); yield* L.clearInterruptions({}); }
           if (round === 0 && r.done) TRIED.add(tkey(t));  // a failed talk is tried again on the next visit
@@ -213,27 +348,65 @@ const GOALS = {
           if (L.where().scene !== here || !r.done || companion(t.key)) break;
         }
       }
-      // items: pick them up on the way (floor items, chests: a sword, fruit, potions)
-      for (const it of stageOf(here).items.filter((it) => !TRIED.has(`${here}:${it.x},${it.z}`))) {
+      if (reached()) { rooms--; continue; }
+      // A key detour has a specific pickup. Other items can wait until the
+      // detour ends, since the approach can consume life or change floors.
+      if (keyGoal && L.hasItem(keyGoal.item)) keyGoal = undefined;
+      const pickups = prioritizeExit ? [] : stageOf(here).items.filter((it) => !keyGoal || (it.category === 0 && it.item === keyGoal.item));
+      for (const it of pickups.filter((it) => !TRIED.has(`${here}:${it.x},${it.z}`))) {
+        if (bossActive()) break;
         TRIED.add(`${here}:${it.x},${it.z}`);
-        const c = yield* L.collect(it.x, it.z, { avoid: stageOf(here).doors.map((d) => d.box), trace: (e) => event({ skill: 'nav', ...e }) });
+        const life = L.where().life;
+        const tooCostly = () => L.where().life < life - Math.max(4, Math.floor(life / 10));
+        const c = yield* L.collect(it.x, it.z, { avoid: stageOf(here).doors.map((d) => d.box), stopIf: () => bossActive() || tooCostly(),
+          trace: (e) => event({ skill: 'nav', ...e }) });
         event({ skill: 'collect', item: it.name || `${it.category}:${it.item}`, x: it.x, z: it.z, ...c });
-        if (c.reason === 'no path') TRIED.delete(`${here}:${it.x},${it.z}`);  // another part of the room: next visit
-        if (L.where().scene !== here) break;
+        if (c.reason === 'no path' || (c.reason === 'stopped' && !tooCostly())) TRIED.delete(`${here}:${it.x},${it.z}`);
+        if (L.where().scene !== here || c.reason === 'stopped' || tooCostly()) break;
       }
-      if (L.where().scene !== here) { rooms--; continue; }
+      if (reached() || L.where().scene !== here) { rooms--; continue; }
       visited.add(here);
       if (prev !== undefined) visited.add(prev);
+      if (keyGoal && L.hasItem(keyGoal.item)) keyGoal = undefined;
+      if (keyGoal && here === keyGoal.scene) {
+        failedKeyRooms.add(`${keyGoal.item}:${here}`);
+        keyGoal = undefined;
+      }
       // --toward SCENE: a door there first; --goal SCENE: the door on the shortest route
       // over the door graph (stages.json); then unvisited scenes
       const toward = rooms === 0 ? +opt('--toward', -1) : -1;
       // with no --goal: explore, the door on the shortest route (over doors not known to
       // be unreachable) to the nearest scene not visited yet
-      const dist = +opt('--goal', -1) >= 0 ? routeDistances(+opt('--goal', -1)) : exploreDistances(here, visited);
+      let arrival = !keyGoal && !landingDetour ? arrivalForGoal() : undefined;
+      let dist = keyGoal ? distancesTo(keyGoal.scene, keyGoal.blocked)
+        : routeGoal >= 0 ? distancesTo(landingDetour?.via ?? routeGoal, undefined, arrival) : exploreDistances(here, visited);
+      if (arrival && !dist.has(here)) {
+        arrival = undefined;
+        dist = distancesTo(routeGoal);
+      }
       VISITS.set(here, (VISITS.get(here) || 0) + 1);
-      const doors = doorsHere().sort((a, b) => (b.scene === toward) - (a.scene === toward) ||
-        (dist.get(a.scene) ?? 1e9) - (dist.get(b.scene) ?? 1e9) || visited.has(a.scene) - visited.has(b.scene) ||
-        (VISITS.get(a.scene) || 0) - (VISITS.get(b.scene) || 0));
+      const distanceFromDoor = (d) => distanceFromEntrance(d, stageOf, dist);
+      const hops = (d) => d.scene === routeGoal && arrival?.has(d.entrance) ? 0 : dist.get(d.scene) ?? 1e9;
+      const returnDoor = (d) => landingDetour?.via === here && d.box === landingDetour.returnBox && d.entrance === landingDetour.entrance;
+      const doors = doorsHere().sort((a, b) => returnDoor(b) - returnDoor(a) || (b.scene === toward) - (a.scene === toward) ||
+        hops(a) - hops(b) || visited.has(a.scene) - visited.has(b.scene) ||
+        (VISITS.get(a.scene) || 0) - (VISITS.get(b.scene) || 0) || distanceFromDoor(a) - distanceFromDoor(b));
+      const lock = doors.length && L.closedLock(LOCKS[here] || [], doors[0].box);
+      if (!keyGoal && lock && !L.hasItem(lock.item)) {
+        const blocked = `${here}:${lock.box}`;
+        const keyRoutes = STAGES.filter((st) => st.scene !== here && !failedKeyRooms.has(`${lock.item}:${st.scene}`) &&
+            st.items.some((it) => it.category === 0 && it.item === lock.item))
+          .map((st) => ({ scene: st.scene, dist: distancesTo(st.scene, blocked) }))
+          .filter((r) => r.dist.has(here)).sort((a, b) => a.dist.get(here) - b.dist.get(here));
+        if (keyRoutes.length) {
+          const route = keyRoutes[0];
+          keyGoal = { item: lock.item, scene: route.scene, blocked };
+          doors.sort((a, b) => (a.box === lock.box) - (b.box === lock.box) ||
+            (route.dist.get(a.scene) ?? Infinity) - (route.dist.get(b.scene) ?? Infinity) ||
+            distanceFromEntrance(a, stageOf, route.dist) - distanceFromEntrance(b, stageOf, route.dist));
+          event({ skill: 'key', scene: here, box: lock.box, item: lock.item, toward: route.scene });
+        }
+      }
       event({ skill: 'room', ...L.where(), doors: doors.map((d) => `${d.hub !== undefined ? 'hub' + d.hub : d.box}->${d.scene}`) });
       let moved = false;
       // a room can still be playing its arrival event (a dialogue that starts late, the
@@ -254,26 +427,35 @@ const GOALS = {
             if (L.where().scene !== here) { moved = true; break; }
             continue;
           }
-          if (yield* throughDoor(g, L, d.box)) { moved = true; break; }
-          if (L.where().scene === here) UNREACHABLE.add(`${here}:${d.box}`);
+          const edge = `${here}:${d.box}`;
+          const floor = L.where().y;
+          const alternate = !keyGoal && !landingDetour && routeGoal >= 0 && d.y !== floor &&
+            landingReturn(STAGES, stageOf(here), d, floor, (scene) => distancesTo(scene, edge));
+          if (yield* throughDoor(g, L, d.box, { alternateLanding: Boolean(alternate) })) { UNREACHABLE.delete(edge); moved = true; break; }
+          if (L.where().scene === here) UNREACHABLE.add(edge);
           if (L.where().scene !== here) { moved = true; break; }
+          if (alternate) {
+            landingDetour = { ...alternate, goal: routeGoal };
+            event({ skill: 'landing', ...alternate });
+          }
         }
       }
-      if (!moved) { event({ skill: 'stop', why: 'no door worked', ...L.where() }); return rooms > 0; }
+      if (!moved) { event({ skill: 'stop', why: 'no door worked', ...L.where() }); return !endpoint && rooms > 0; }
     }
-    return true;
+    return !endpoint || reached();
   },
 
   // With --from: nothing more (to verify, cover and save states for an earlier run).
   *replay(g) { yield 1; return true; },
 
-  // With --from: hold --keys (default none) for --frames frames, logging scene changes
-  // and life every 300 frames (to see what a section does on its own).
+  // With --from: hold --keys (default none) for --frames frames, optionally
+  // changing the raw solar threshold with --lux, and log live state.
   *hold(g, L) {
     const keys = opt('--keys', '') || 0, n = +opt('--frames', 3000);
+    if (opt('--lux') !== undefined) s.setSolar(+opt('--lux'));
     for (let i = 0; i < n; i += 300) {
-      yield g.press(keys, 300);
-      event({ skill: 'hold', keys, ...L.where(), story: L.story() });
+      yield g.press(keys, Math.min(300, n - i));
+      event({ skill: 'hold', keys, ...L.where(), story: L.story(), solar: L.solarStatus() });
     }
     return true;
   },
@@ -324,36 +506,61 @@ function exploreDistances(here, visited) {
   return out;
 }
 
-// Door-graph distances to GOAL (breadth first over stages.json doors, walked backwards):
-// scene -> number of doors to the goal. Empty without a goal.
-function routeDistances(goal) {
-  const d = new Map();
-  if (goal < 0) return d;
-  d.set(goal, 0);
-  for (let frontier = [goal]; frontier.length;) {
-    const next = [];
-    for (const st of STAGES) for (const door of st.doors)
-      if (frontier.includes(door.scene) && !d.has(st.scene)) { d.set(st.scene, d.get(door.scene) + 1); next.push(st.scene); }
-    frontier = next;
-  }
-  return d;
-}
-
 // Through door box BOX: navigate; when a scripted gate turns the player back, open
 // the room's chests and items (the usual ask), then try again.
-function* throughDoor(g, L, box) {
+function* throughDoor(g, L, box, { stopIf, alternateLanding } = {}) {
   const scene = L.where().scene, tried = new Set();
+  const avoid = stageOf(scene).doors.map((d) => d.box).filter((b) => b !== box);
+  const landing = yield* L.approachLift(box, { avoid, trace: (e) => event({ skill: 'nav', ...e }) });
+  if (landing) event({ skill: 'lift', box, ...landing });
+  if (L.where().scene !== scene) return true;
+  if (L.coffinAvailable()) {
+    let foughtPatrol = false;
+    for (let attempt = 0; attempt < 3 && L.coffinAvailable(); attempt++) {
+      yield* untilControl(g, L, () => !g.fn.ScriptUtility_IsControlFlagSet(), 30, 2400);
+      if (L.where().scene !== scene) return true;
+      if (!L.coffinAvailable() || !g.$.gPlayers[0]) break;
+      const life = L.where().life;
+      const r = yield* L.carryCoffin(box, { avoid, stopIf, trace: (e) => event({ skill: 'nav', ...e }) });
+      event({ skill: 'coffin', box, ...L.where(), ...r });
+      if (r.reached || L.where().scene !== scene || stopIf?.()) return true;
+      if (r.reason !== 'lost grip') break;
+      if (!foughtPatrol && L.where().life < life && L.fightTargets().length) {
+        foughtPatrol = true;
+        const f = yield* L.fight({ frames: 600, trace: (e) => event({ skill: 'fight', ...e }) });
+        event({ skill: 'fought', ...f, scene: L.where().scene });
+        if (L.where().scene !== scene) return true;
+      }
+    }
+    if (L.coffinAvailable()) return false;
+  }
+  const lock = L.closedLock(LOCKS[scene] || [], box);
+  if (lock && L.hasItem(lock.item)) {
+    const r = yield* L.openKeyDoor(lock, { avoid, trace: (e) => event({ skill: 'nav', ...e }) });
+    event({ skill: 'unlock', scene, box, item: lock.item, ...r });
+    if (L.where().scene !== scene) return true;
+  }
   let fights = 0;
   for (let attempt = 0; attempt < 6; attempt++) {
-    const avoid = stageOf(scene).doors.map((d) => d.box).filter((b) => b !== box);
-    // enemies that appear on the way (a scripted ambush, a boss after its banner): fight
-    const foes = () => L.enemies().concat(L.targets().filter((t) => t.health !== null)).some((e) => e.alive && !(L.fightIgnored && L.fightIgnored.has(e.addr)));
-    const r = yield* L.navigate(box, { avoid, stopIf: foes, trace: (e) => event({ skill: 'nav', ...e }) });
+    const floorGaps = yield* L.crossMovingFloors(box, { avoid, trace: (trip) => event({ skill: 'moving-floor', box, ...trip }) });
+    const initial = new Set(L.fightTargets().map((t) => t.addr));
+    const life = () => g.$.gPlayers[0]?.currentStatA ?? 0;
+    const lifeBefore = life();
+    const lossBudget = Math.max(4, Math.floor(lifeBefore / 10));
+    const interrupted = () => {
+      const targets = L.fightTargets();
+      return targets.some((t) => t.boss || t.barrier || !initial.has(t.addr)) ||
+        (targets.length && lifeBefore - life() >= lossBudget);
+    };
+    const r = yield* L.navigate(box, { avoid, avoidCells: floorGaps, stopIf: interrupted, trace: (e) => event({ skill: 'nav', ...e }) });
     event({ skill: 'navigate', box, ...r, from: scene });
     if (r.reached) return true;
-    if (r.reason === 'stopped' && fights++ < 5) {
+    if (alternateLanding && r.reason === 'no path') return false;
+    if (L.fightTargets().length && fights < 5 && (!lock || L.hasItem(lock.item))) {
+      fights++;
       const f = yield* L.fight({ trace: (e) => event({ skill: 'fight', ...e }) });
       event({ skill: 'fought', ...f, scene: L.where().scene });
+      if (L.where().scene !== scene) return true;
       attempt--;
       continue;
     }
@@ -367,13 +574,14 @@ function* throughDoor(g, L, box) {
   return false;
 }
 
-// End a run at a stable point (the player still for 30 frames, at most 600), so a
-// replay compares positions rather than a frame inside a walk.
+// End a run after 30 still frames (at most 600), including elevation and scene
+// changes so the final comparison is outside a fall or entrance animation.
 function* settle(g) {
   let last = '', still = 0;
   for (let i = 0; i < 600 && still < 30; i++) {
     yield 1;
-    const p = g.$.gPlayers[0], k = p ? `${p.position.x},${p.position.z}` : '-';
+    const p = g.$.gPlayers[0];
+    const k = p ? `${g.lib.where().scene}:${p.position.x},${p.position.y},${p.position.z}` : '-';
     still = k === last ? still + 1 : 0;
     last = k;
   }
@@ -397,11 +605,10 @@ function* untilControl(g, L, ready = () => true, quiet = 120, limit = 60000) {
     // with B, or START (the bike parts menu closes on START when it was opened from a
     // story scene: ModifierMenu_HandleOverviewInput), now and then confirm with A
     stuck = field ? 0 : stuck + 1;
-    // riding the coffin bike (the Glove task; src/npc/sabata_rider/registry_actor_collision.c
-    // ActorMotion_ApplyInput: R accelerates, L boosts, up/down steer): ride on with R
-    if (!field && !msg.open && L.tasks().some((t) => !t.dead && t.update === 'CoffinBike_UpdateTask')) {
-      if (stuck % 600 === 1) event({ skill: 'ride', ...L.where() });
-      yield g.press('r', 4);
+    const bike = !field && L.bikeRider();
+    if (bike && !msg.open) {
+      const result = yield* L.rideBike(bike);
+      if (result) event({ skill: 'ride', ...L.where(), ...result });
       continue;
     }
     if (stuck && stuck % 180 === 0) {
@@ -418,34 +625,36 @@ if (!GOALS[goal]) { console.error(`unknown goal ${goal} (${Object.keys(GOALS).jo
 const t0 = performance.now();
 // The keys each input read saw (Input_UpdatePadStates runs once per game tick; the
 // port has no lag frames, the hardware does, so replays key inputs to these reads).
-// readAt[n]: frame n ran an input read (truncated with the movie on a restore).
-const readAt = [];
-if (from && from.readFrames) for (const n of from.readFrames) readAt[n] = 1;
+let readFrames = from?.readFrames?.slice() ?? [];
+let rooms = from?.rooms?.slice() ?? [];
 const snapshot = s.snapshot, restore = s.restore;
-s.snapshot = () => ({ ...snapshot(), readAt: readAt.slice() });
-s.restore = (snap) => { restore(snap); readAt.length = 0; for (let i = 0; i < snap.movie; i++) readAt[i] = snap.readAt[i]; };
-const ok = s.run(function* (g) {
+s.snapshot = () => ({ ...snapshot(), readFrames: readFrames.slice(), rooms: rooms.slice() });
+s.restore = (snap) => { restore(snap); readFrames = snap.readFrames.slice(); rooms = snap.rooms.slice(); };
+const { ok, end } = s.run(function* (g) {
   g.lib.session = s;
-  g.on('Input_UpdatePadStates', () => { readAt[s.frame] = 1; });
+  const gameState = g.types.globals.gGameState.addr;
+  g.on('Input_UpdatePadStates', () => {
+    if (readFrames.at(-1) !== s.frame) readFrames.push(s.frame);
+    const state = g.u32(gameState), scene = state ? g.u32(state + 0x5a4) : 0;
+    if (scene && rooms.at(-1)?.scene !== scene) rooms.push({ frame: s.frame, scene });
+  });
   // --life N: set the player's life to N before the goal (a port-only test aid, e.g. of
   // healing; such a run cannot be verified on the ROM)
   if (opt('--life') && g.$.gPlayers[0]) g.$.gPlayers[0].currentStatA = +opt('--life');
   const reached = yield* GOALS[goal](g, g.lib);
   yield* settle(g);
-  return reached;
+  const w = g.lib.where();
+  return { ok: reached, end: { scene: w.scene, story: g.lib.story(), x: w.x, y: w.y, z: w.z,
+    ...(s.solarLog.length ? { solar: g.lib.solarStatus() } : {}) } };
 });
 const secs = (performance.now() - t0) / 1000;
-const end = s.run(function* (g) { const w = g.lib.where(); return { scene: w.scene, x: w.x, y: w.y, z: w.z }; });
 
 const movie = s.movie.map((k) => k | 0);
-const readFrames = [];
-for (let n = 0; n < movie.length; n++) if (readAt[n]) readFrames.push(n);
+readFrames = readFrames.filter((n) => n < movie.length);
+rooms = rooms.filter((entry) => entry.frame < movie.length);
 const reads = readFrames.map((n) => movie[n]);
-function readFramesOf() { return readFrames; }
-// a savestate on the ROM at each room the run entered: the input read index there
-const allEvents = [...(from && from.rooms ? from.rooms : []), ...log.filter((e) => e.skill === 'room' || e.skill === 'goal').map((e) => ({ frame: e.frame, scene: e.scene }))];
-const saves = allEvents.map((e) => ({ at: readFrames.filter((n) => n < e.frame).length, name: `scene_${e.scene}_f${e.frame}` }));
-fs.writeFileSync(path.join(out, 'movie.json'), JSON.stringify({ goal, save: opt('--save') || (from && from.save) || null, frames: movie.length, end, visited: [...VISITED], tried: [...TRIED], unreachable: [...UNREACHABLE], rooms: allEvents, solar: s.solarLog, readFrames, movie }));
+const saves = rooms.map(({ frame, scene }) => ({ at: tickAt(readFrames, frame), name: `scene_${scene}_f${frame}` }));
+writeMovie('movie.json', end);
 fs.writeFileSync(path.join(out, 'harness.txt'), harnessScript(reads, saves, `autopilot ${goal}: ${ok ? 'reached' : 'NOT reached'}; port end ${JSON.stringify(end)}`));
 fs.writeFileSync(path.join(out, 'log.json'), JSON.stringify(log, null, 1));
 console.log(`${goal}: ${ok ? 'reached' : 'NOT reached'} at frame ${s.frame} (${secs.toFixed(1)} s), end ${JSON.stringify(end)} -> ${path.relative(ROOT, out)}`);
@@ -453,6 +662,21 @@ let verified = true;
 if (args.includes('--verify') && opt('--life')) console.log('--verify skipped: --life changed the port\'s memory');
 else if (args.includes('--verify')) verified = verify(end);
 process.exit(ok && verified ? 0 : 1);
+
+// Refresh the resume point at each room before trying its exits. If the
+// port traps while testing a later step, this still contains accepted input.
+function writeMovie(file, end) {
+  const frames = s.movie.length;
+  const movie = {
+    goal, save: battery, frames, end, visited: [...VISITED], tried: [...TRIED], unreachable: [...UNREACHABLE],
+    landingDetour,
+    rooms: rooms.filter((entry) => entry.frame < frames), solar: s.solarLog,
+    readFrames: readFrames.slice(0, tickAt(readFrames, frames)), movie: s.movie,
+  };
+  const dst = path.join(out, file);
+  fs.writeFileSync(dst + '.tmp', JSON.stringify(movie));
+  fs.renameSync(dst + '.tmp', dst);
+}
 
 // The run as a tools/emu/harness script for the original ROM: `holdt KEYS N` holds
 // keys for N calls of Input_UpdatePadStates (tick), so the ROM sees the same keys
@@ -466,9 +690,10 @@ function harnessScript(reads, saves, title) {
   const lines = [`# ${title}`, '# generated by tools/autopilot/autopilot.mjs (inputs keyed to game ticks)',
     args.includes('--coverage') ? 'trace on' : 'trace off', `rtc ${time}`, 'lux 232', `tick ${tick.toString(16).toUpperCase()}`];
   // sensor changes (session solar log, by frame) as `lux` lines before the first tick at or after them
-  const lux = s.solarLog.map(([f, v]) => ({ at: readFramesOf().filter((n) => n < f).length, lux: v }));
+  const lux = s.solarLog.map(([f, v]) => ({ at: tickAt(readFrames, f), lux: v }));
   const marks = [...saves, ...lux].sort((a, b) => a.at - b.at);
-  for (let i = 0, m = 0; i < reads.length;) {
+  let m = 0;
+  for (let i = 0; i < reads.length;) {
     while (m < marks.length && marks[m].at <= i) { const k = marks[m++]; lines.push(k.lux !== undefined ? `lux ${k.lux}` : `save ${k.name}`); }
     let j = i;
     const stop = m < marks.length ? marks[m].at : Infinity;
@@ -477,6 +702,7 @@ function harnessScript(reads, saves, title) {
     lines.push(`holdt ${keys} ${j - i}`);
     i = j;
   }
+  for (; m < marks.length; m++) { const k = marks[m]; lines.push(k.lux !== undefined ? `lux ${k.lux}` : `save ${k.name}`); }
   lines.push('holdt NONE 1', 'dump ewram 02000000:40000', 'dump iwram 03000000:8000', 'shot end');
   return lines.join('\n') + '\n';
 }
@@ -486,18 +712,35 @@ function harnessScript(reads, saves, title) {
 function verify(end) {
   const dir = path.join(out, 'rom');
   fs.mkdirSync(dir, { recursive: true });
-  const harness = path.join(ROOT, 'tools/emu/harness');
-  const r = spawnSync(harness, [path.join(ROOT, 'baserom.gba'), path.join(out, 'harness.txt'), dir], { encoding: 'utf8', maxBuffer: 1 << 26 });
-  const warn = (r.stderr || '').split('\n').filter((l) => /ticks$|not reached|times in|error/i.test(l));
+  // Input_UpdatePadStates starts with PUSH and two literal loads. Its first
+  // LDRH reads REG_KEYINPUT once before any branches, which permits untraced
+  // replays to use mGBA's normal frame loop while keeping game-tick input.
+  const input = s.g.addr('Input_UpdatePadStates') & ~1;
+  const keyTickPc = s.g.u16(input + 6) === 0x8802 ? input + 6 : undefined;
+  let warn;
+  try {
+    warn = runRom(path.join(out, 'harness.txt'), dir, {
+      save: battery || undefined, coverage: args.includes('--coverage'), timeout: 900_000, keyTickPc,
+    });
+  } catch (error) {
+    console.error(`verify on ROM: ${error.message} (${path.relative(ROOT, dir)}/harness.log)`);
+    return false;
+  }
   const ew = fs.readFileSync(path.join(dir, 'ewram.bin')), iw = fs.readFileSync(path.join(dir, 'iwram.bin'));
   const rd = (addr, n) => { const b = addr >= 0x03000000 ? iw : ew, o = addr - (addr >= 0x03000000 ? 0x03000000 : 0x02000000); return n === 2 ? b.readInt16LE(o) : b.readUInt32LE(o); };
-  const gs = rd(0x02000710, 4), scene = rd(gs + 0x5a4, 4);
+  const gs = rd(0x02000710, 4), scene = gs ? rd(gs + 0x5a4, 4) : undefined;
   const players = s.types.globals.gPlayers.addr, p = rd(players, 4);
   const pos = p ? { x: rd(p + 0x30, 2), y: rd(p + 0x32, 2), z: rd(p + 0x34, 2) } : {};
-  const rom = { scene, ...pos };
-  const same = rom.scene === end.scene && rom.x === end.x && rom.z === end.z;
+  const vars = rd(s.types.globals.gGameVariables.addr, 4);
+  const rom = { scene, story: vars ? rd(vars + 0x3c, 2) : null, ...pos };
+  if (end.solar) rom.solar = { measurement: rd(s.types.globals.gSolarMeasurement.addr, 4) | 0,
+    intensity: gs ? rd(gs + 0x874, 2) : 0, level: gs ? rd(gs + 0x876, 2) : 0 };
+  const same = !warn.some((line) => line.startsWith('holdt:')) &&
+    rom.scene === end.scene && rom.story === end.story &&
+    rom.x === end.x && rom.y === end.y && rom.z === end.z &&
+    (!end.solar || (rom.solar.intensity === end.solar.intensity && rom.solar.level === end.solar.level));
   console.log(`verify on ROM: ${same ? 'MATCH' : 'DIFFER'} rom ${JSON.stringify(rom)} port ${JSON.stringify(end)}${warn.length ? ' ' + warn.join('; ') : ''}`);
-  if (args.includes('--coverage')) coverage(path.join(dir, 'total.exec'));
+  if (same && args.includes('--coverage')) coverage(path.join(dir, 'total.exec'));
   for (const f of fs.readdirSync(dir)) if (/^total\./.test(f)) fs.rmSync(path.join(dir, f));
   return same;
 }

@@ -265,6 +265,8 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [notes/area-effect-link_2026-10-14.md](../notes/area-effect-link_2026-10-14.md) | Link variant of area effects (Sol, 2026-10-14) |  | 2 |
 | [notes/area-effect_2026-10-14.md](../notes/area-effect_2026-10-14.md) | Rectangular area effect manager (Sol, 2026-10-14) | *#tooling* | 4 |
 | [notes/arm-08000430.md](../notes/arm-08000430.md) | sub_08000430: unpinned exact match, and how it works | #matching #compiler #register-pinning #arm | 6 |
+| [notes/autopilot-port-conformance_2026-11-26.md](../notes/autopilot-port-conformance_2026-11-26.md) | Autopilot checkpoint conformance, 2026-11-26 | #port #autopilot #verification | 6 |
+| [notes/autopilot-port-stress_2026-11-25.md](../notes/autopilot-port-stress_2026-11-25.md) | Autopilot port stress run, 2026-11-25 | #hardware #tooling #menu #scene | 2 |
 | [notes/axe-trail-playback.md](../notes/axe-trail-playback.md) | Axe trail playback | #monsters #matching | 0 |
 | [notes/background-palette-fade_2026-11-01.md](../notes/background-palette-fade_2026-11-01.md) | Background palette fade | *#assets* | 0 |
 | [notes/bee-cleanup_2026-11-13.md](../notes/bee-cleanup_2026-11-13.md) | Bee cleanup draft | #monsters #cleanup #bee #volatile | 2 |
@@ -648,12 +650,14 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [notes/stage-icon-display_2026-10-14.md](../notes/stage-icon-display_2026-10-14.md) | Staged keyframe icon display |  | 3 |
 | [notes/staged-effect_2026-10-14.md](../notes/staged-effect_2026-10-14.md) | Contiguous staged effect subsection (Sol, 2026-10-14) | *#tooling* | 4 |
 | [notes/storage-equipment-slots-round9.md](../notes/storage-equipment-slots-round9.md) | Storage_RefreshEquipmentSlots |  | 1 |
+| [notes/structfamilies_2026-11-25.md](../notes/structfamilies_2026-11-25.md) | Private record recovery, 2026-11-25 | #tooling #matching #process | 6 |
 | [notes/sub_082392E8.md](../notes/sub_082392E8.md) | sub_082392E8.md | *#particles* | 1 |
 | [notes/subsystem-run_2026-10-25.md](../notes/subsystem-run_2026-10-25.md) | Subsystem scope run, 2026-10-25/26 | #process #tooling #matching | 4 |
 | [notes/subsystem-run_2026-10-27.md](../notes/subsystem-run_2026-10-27.md) | Subsystem scope run, 2026-10-27 | #process #tooling #matching #ram | 1 |
 | [notes/sword-script-kind.md](../notes/sword-script-kind.md) | Sword script kind | #monsters #matching | 0 |
 | [notes/tentacle-body-cleanup_2026-11-13.md](../notes/tentacle-body-cleanup_2026-11-13.md) | Tentacle body unit cleanup |  | 2 |
 | [notes/terrain-footprint-round9.md](../notes/terrain-footprint-round9.md) | Terrain_MoveFootprint |  | 1 |
+| [notes/testbench_2026-11-26.md](../notes/testbench_2026-11-26.md) | Source-port testbench and fixture findings | #tooling #scripts #actors #menu | 3 |
 | [notes/tether-emission-palette_2026-10-14.md](../notes/tether-emission-palette_2026-10-14.md) | Tether actor emissions, palette and movement effects, October 14 | *#actors #tether #assets* | 8 |
 | [notes/tether-initialization_2026-10-14.md](../notes/tether-initialization_2026-10-14.md) | Tether initialization, charge and flagged terrain | *#actors #tether* | 7 |
 | [notes/tether-interaction_2026-10-14.md](../notes/tether-interaction_2026-10-14.md) | Tether actor entry, interaction and script controls | *#scripts #actors #tether* | 5 |
@@ -664,6 +668,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [notes/tilemap-stream-columns-round9.md](../notes/tilemap-stream-columns-round9.md) | TilemapPanel_StreamColumns |  | 0 |
 | [notes/uncounted-concessions_2026-11-16.md](../notes/uncounted-concessions_2026-11-16.md) | Steering C the concession scanner does not count (first sweep) | #concessions #phase3 #phase4 #tooling | 4 |
 | [notes/unit-context-sensitivity_2026-11-16.md](../notes/unit-context-sensitivity_2026-11-16.md) | Functions that match alone but not inside a unit | #units #selector-macros #scene-actors | 7 |
+| [notes/unit-identities_2026-11-25.md](../notes/unit-identities_2026-11-25.md) | Unit identities from checkpoint replays | #actors #scene #assets #tooling | 85 |
 | [notes/volatile-typedef-scanner_2026-11-13.md](../notes/volatile-typedef-scanner_2026-11-13.md) | Volatile typedef detection in the concession scanner | #tooling #matching #progress | 2 |
 | [notes/w0.md](../notes/w0.md) | w0 notes | *#tooling* | 5 |
 | [notes/w1.md](../notes/w1.md) | w1 notes (range 0803CC90-0806FC64) |  | 2 |

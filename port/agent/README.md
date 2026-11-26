@@ -98,6 +98,8 @@ agent can add a skill and use it in the next command). `core.js` has:
 Types come from `gametypes.py`: each prepared header compiled with debug info,
 DWARF folded into `build/port/agent/types.json` (about 1400 types and 560
 typed globals; `start` rebuilds it when headers change).
+The generator keeps the prepared header paths when resolving global declarations.
+Pass `--jobs 2` to limit header compilation to two workers.
 
 ## In the browser
 

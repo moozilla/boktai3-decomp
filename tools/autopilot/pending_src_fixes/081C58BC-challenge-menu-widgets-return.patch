@@ -1,0 +1,40 @@
+081C58BC challenge-menu-widgets-return
+
+The last call for selection zero or beyond three is Palette_UpdateHighlightPulse,
+which returns through r0. With a rank, r0 has either the negative rank keyframe
+result or the result of Anim_LoadKeyframe. Widget flag stores preserve it.
+
+The explicit form changed the ROM bytes. The guarded form passed the unit ROM check.
+
+--- a/src/challenge_menu.c
++++ b/src/challenge_menu.c
+@@ -233,4 +233,23 @@
+     Palette_UpdateHighlightPulse(menu->highlightPalette, &menu->highlightPhase);
+     SceneInputWidget_Show(&menu->widgets[3]);
++#ifdef UBFIX
++    {
++        s32 result = 0x081C591B;
++        if (menu->selection == 0) {
++            SceneInputWidget_Hide(&menu->widgets[2]);
++        } else if (menu->selection <= 3) {
++            rank = ChallengeMenu_GetRankKeyframe(
++                ChallengeMenu_GetStoredRank(menu->group, menu->selection - 1));
++            result = rank;
++            if (rank >= 0) {
++                result = Anim_LoadKeyframe(&menu->widgets[2], &menu->resources[1], (u16)rank, 0);
++                SceneInputWidget_Show(&menu->widgets[2]);
++            } else {
++                SceneInputWidget_Hide(&menu->widgets[2]);
++            }
++        }
++        return result;
++    }
++#else
+     if (menu->selection == 0) {
+         SceneInputWidget_Hide(&menu->widgets[2]);
+@@ -245,4 +264,5 @@
+         }
+     }
++#endif
+ }
+ 

@@ -1,0 +1,38 @@
+08016EA8 floating-effect-manager-update-return
+
+All six callbacks in the ROM table return through r0. The loop
+preserves their return address, or retains its manager argument if
+no slot is dispatched.
+
+The explicit form changed the ROM bytes. The guarded form passed the unit ROM check.
+
+--- a/src/floating_item_effect.c
++++ b/src/floating_item_effect.c
+@@ -277,12 +277,25 @@
+     u8 *state;
+     struct FloatingEffect *effect;
++#ifdef UBFIX
++    s32 result = (s32)manager;
++#endif
+     state = &manager->effects[0].state;
+     effect = manager->effects;
+     for (; i <= 7; state += sizeof(*effect), effect++, i++) {
+         if (manager->active & (1 << i)) {
++#ifdef UBFIX
++            if (*state <= FLOATING_EFFECT_FLY) {
++                table[*state](manager, effect, i);
++                result = 0x08016EE3;
++            }
++#else
+             if (*state <= FLOATING_EFFECT_FLY)
+                 table[*state](manager, effect, i);
+-        }
+-    }
++#endif
++        }
++    }
++#ifdef UBFIX
++    return result;
++#endif
+ }
+ 

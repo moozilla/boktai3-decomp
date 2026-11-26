@@ -687,7 +687,8 @@ def _file_calls(text: str, names, called=None):
     return calls, defines
 
 
-def _file_definitions(rel: str, text: str) -> list:
+def literal_param_definitions(rel: str, text: str) -> list:
+    """Local inline definitions eligible for literal-param diagnostics."""
     if "inline" not in text or is_library(rel):
         return []
     return list(_inline_definitions(strip(text)))
@@ -701,7 +702,7 @@ def _tree_index(root) -> dict:
         for sub in ("src", "include"):
             for path in sorted(Path(root, sub).rglob("*.[ch]")):
                 texts[path.relative_to(root).as_posix()] = path.read_text(errors="replace")
-        definitions = {rel: found for rel, text in texts.items() if (found := _file_definitions(rel, text))}
+        definitions = {rel: found for rel, text in texts.items() if (found := literal_param_definitions(rel, text))}
         names = {name for found in definitions.values() for name, _, _ in found}
         called = {rel: set(_CALLED.findall(text)) for rel, text in texts.items()}
         _literal_params_cache[str(root)] = {
@@ -726,7 +727,7 @@ def literal_params(root=None, overlay=None) -> dict[str, list[Site]]:
     if overlay:
         texts, per_file = {**texts, **overlay}, dict(per_file)
         for rel, text in overlay.items():
-            per_file[rel] = _file_definitions(rel, text)
+            per_file[rel] = literal_param_definitions(rel, text)
         names = {name for found in per_file.values() for name, _, _ in found}
         file_calls = {**file_calls, **{rel: _file_calls(text, names) for rel, text in overlay.items()}}
         new = names - index["names"]
@@ -1064,9 +1065,11 @@ def main(argv=None) -> int:
     ap.add_argument("--errors-only", action="store_true")
     ap.add_argument("--kind", action="append", help="only these kinds")
     ap.add_argument("--summary", action="store_true", help="totals per kind only")
-    ap.add_argument("--jobs", type=int, default=2, help="parallel compiler checks (default 2)")
+    ap.add_argument("-j", "--jobs", type=int, default=2, help="parallel compiler checks (default 2)")
     ap.add_argument("--no-compiler", action="store_true", help="skip dead-code and proved-zero (no compiles)")
     args = ap.parse_args(argv)
+    if args.jobs < 1:
+        ap.error("jobs must be positive")
     from statement_macros import single_use_names
     once = None if args.kind and "single-use-macro" not in args.kind else single_use_names(root)
     files = []

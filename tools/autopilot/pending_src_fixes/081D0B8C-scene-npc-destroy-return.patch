@@ -1,0 +1,26 @@
+081D0B8C scene-npc-destroy-return
+
+GroundEffect_Destroy explicitly returns zero when called. On the other
+path ParticlePool_Destroy returned via r0 and left 081D0BA5.
+
+The explicit form changed the ROM bytes. The guarded form passed the unit ROM check.
+
+--- a/src/fn/sub_081D0B8C.c
++++ b/src/fn/sub_081D0B8C.c
+@@ -9,6 +9,16 @@
+     SceneMessages_UnregisterReceiver(b + 0x168);
+     ParticlePool_Destroy(*(u32 *)(q + 4));
++#ifdef UBFIX
++    if (q[0xd] != 0) {
++        GroundEffect_Destroy(b + 0x344);
++        gSceneNpc = 0;
++        return 0;
++    }
++    gSceneNpc = 0;
++    return 0x081D0BA5;
++#else
+     if (q[0xd] != 0)
+         GroundEffect_Destroy(b + 0x344);
+     gSceneNpc = 0;
++#endif
+ }

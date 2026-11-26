@@ -1,19 +1,13 @@
 #include "scene/terrain/terrain_sampling.h"
 #include "global.h"
 
+#include "bosses/hresvelgr/boss_action_state.h"
 #include "engine/engine.h"
-struct Vec {
-    s16 x, y, z, pad;
-} __attribute__((aligned(4)));
-struct Action {
-    u8 state, pad[3];
-    u32 frame;
-};
 struct Hresvelgr {
     u8 pad0[0x51];
     u8 heading;
     u8 pad52[2];
-    struct Vec position;
+    struct ContactPosition position;
     u8 pad5C[0x40];
     u32 flags;
     u8 padA0[8];
@@ -23,7 +17,7 @@ struct Hresvelgr {
     u8 padB2[0x1a];
     u8 targetHeading;
     u8 padCD[0x43];
-    struct Vec *target;
+    struct ContactPosition *target;
     u8 pad114[0x60];
     u8 animationData[0x20], animation[0x20];
     u8 pad1B4[0x1a];
@@ -31,20 +25,16 @@ struct Hresvelgr {
     u8 pad1D0[0xc];
     void *collisionBounds;
     u8 pad1E0[0x110];
-    struct Action action;
-    u8 pad2F8[0x33];
+    struct BossActionState action;
+    u8 pad300[0x2b];
     u8 side;
     u8 pad32C[0xf8];
     u8 boundsLow[0x2e0];
     u8 boundsHigh[4];
 };
-void ActionState_Reset(void *);
-void ActionState_SetState(void *, u32);
-void ActionState_AdvanceState(void *);
 void Hresvelgr_SetAnimation(void *, void *, void *, u32, u32, u32);
 void Actor_SetHeadingVelocity(void *, u32);
 void Hresvelgr_SpawnProjectile(void *, u32, u32);
-u8 *TerrainModifiers_FindCellOverride(s32, s32);
 static inline s32 FacingSector4(s16 angle)
 {
     return (angle + 96) >> 6;
@@ -76,33 +66,11 @@ static inline s32 RandomValue(const u16 *table)
     offset = gRandomIndex * 2;
     return *(const u16 *)((u32)table + offset);
 }
-static inline void SetVector(struct Vec *p, s32 x, s32 y, s32 z)
+static inline void SetVector(struct ContactPosition *p, s32 x, s32 y, s32 z)
 {
     p->x = x;
     p->y = y;
     p->z = z;
-}
-static inline u8 *CellProperties(s32 cell)
-{
-    u8 *p = TerrainModifiers_FindCellOverride(cell, 1);
-    if (p)
-        return p + 4;
-    return (cell * 4 + 12) + gTerrainMap->cells;
-}
-static inline s32 Height(struct Vec *p)
-{
-    u8 *cell = CellProperties(Terrain_GetCellIndex(p));
-    u32 shape = *cell >> 4;
-    s32 height = (*cell & 15) << 8;
-    switch (shape) {
-        case 1:
-            height -= *(u8 *)&p->z;
-            break;
-        case 2:
-            height -= *(u8 *)&p->x;
-            break;
-    }
-    return height;
 }
 static inline u32 *EnableFlags(struct Hresvelgr *actor, u32 mask)
 {
@@ -118,8 +86,8 @@ static inline void SetCollisionMask(struct Hresvelgr *actor, u32 mask)
 void Hresvelgr_UpdateBoundaryBarrage(struct Hresvelgr *actor, u32 tick)
 {
     u32 normalCollisionMask = 0x2f0;
-    struct Action *action = &actor->action;
-    struct Vec *target = actor->target;
+    struct BossActionState *action = &actor->action;
+    struct ContactPosition *target = actor->target;
     u32 *flags;
     s32 state;
     if (actor->pending) {
@@ -158,7 +126,7 @@ void Hresvelgr_UpdateBoundaryBarrage(struct Hresvelgr *actor, u32 tick)
                     *flags |= mask;
                 }
                 if (!(tick & 7)) {
-                    struct Vec pos;
+                    struct ContactPosition pos;
                     const u16 *table = gRandomTable;
                     s32 rawX = RandomValue(table);
                     s32 px = actor->position.x;
@@ -170,7 +138,7 @@ void Hresvelgr_UpdateBoundaryBarrage(struct Hresvelgr *actor, u32 tick)
                     s32 pz = actor->position.z;
                     u32 height;
                     SetVector(&pos, px + x - 256, 0x2000, pz + ((rawZ >> 3) % 512) - 256);
-                    height = Height(&pos) - 256;
+                    height = Terrain_SampleHeight(&pos) - 256;
                     if (height <= 0x6ff)
                         Hresvelgr_SpawnProjectile(&pos, 0, 1);
                 }

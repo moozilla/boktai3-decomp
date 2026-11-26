@@ -25,10 +25,12 @@
 // again and replays the movie, so it stays deterministic).
 import fs from 'node:fs';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import * as zlibModule from 'node:zlib';
 import { createGame, keyMask } from './gameapi.mjs';
+import { runGame } from '../web/run-game.mjs';
 
-const ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname), '../..');
+const ROOT = fileURLToPath(new URL('../..', import.meta.url));
 const REGIONS = [[0x02000000, 0x40000], [0x03000000, 0x8000], [0x04000000, 0x400], [0x05000000, 0x400],
   [0x06000000, 0x18000], [0x07000000, 0x400]];
 const STACK_TOP = 4194304; // -z stack-size, --stack-first (port/build_game.py)
@@ -52,7 +54,7 @@ export async function openSession(opts = {}) {
   const out = opts.print || ((s) => process.stderr.write(s + '\n'));
 
   let ex = null, memory = null, g = null, frameNo = 0, lastPixels = 0;
-  let script = null, replay = null, stopped = null, pending = null;
+  let script = null, replay = null, stopped = null, pending = null, stepping = false;
   const movie = (opts.movie || []).slice();  // movie[n] = keys returned for frame n; opts.movie replays first
   const session = {};
 
@@ -60,20 +62,30 @@ export async function openSession(opts = {}) {
     frame(ptr, n) {
       frameNo = n;
       lastPixels = ptr;
+      if (opts.onFrame) opts.onFrame(n);
       if (solarAt.has(n) && solarAt.get(n) !== solar) { solar = solarAt.get(n); ex.port_game_set_solar(solar); }
       let keys;
-      if (replay && n < replay.length) {
+      if (stepping) {
+        // Calls made by a scenario can themselves wait for VBlank. The running
+        // generator cannot be resumed from inside its own call into the game.
+        keys = g.currentKeys();
+      } else if (replay && n < replay.length) {
         keys = replay[n] | 0;
       } else {
         replay = null;
-        if (!script) {
-          if (!pending) throw new Stop();
-          const gen = pending;
-          pending = null;
-          script = g.spawn(() => gen(g, session), { name: 'autopilot' });
+        stepping = true;
+        try {
+          if (!script) {
+            if (!pending) throw new Stop();
+            const gen = pending;
+            pending = null;
+            script = g.spawn(() => gen(g, session), { name: opts.name || 'autopilot' });
+          }
+          if (!script.done) keys = g.frame(frameNo);
+          if (script.done) { stopped = script; throw new Stop(); }
+        } finally {
+          stepping = false;
         }
-        if (!script.done) keys = g.frame(n);
-        if (script.done) { stopped = script; throw new Stop(); }
       }
       // frameNo, not n: a restore inside this call moved the game back to snap.frame,
       // and these keys are what that frame runs with
@@ -105,8 +117,9 @@ export async function openSession(opts = {}) {
     solar = solarAt.has(0) ? solarAt.get(0) : solar0;
     ex.port_game_set_solar(solar);
     if (ex.port_video_set_enabled) ex.port_video_set_enabled(render ? 1 : 0);
-    g = createGame({ memory, exports: ex, types, print: out });
+    g = createGame({ memory, exports: ex, types, print: out, onWrite: opts.onWrite });
     g.loadLib(libSources);
+    if (opts.coverage) session.setCoverage(true);
     if (save) new Uint8Array(memory.buffer, ex.port_game_save_stage(), save.length).set(save);
     if (opts.onBoot) opts.onBoot(g, session);  // hooks that also see the replayed movie
     return save ? save.length : 0;
@@ -121,6 +134,7 @@ export async function openSession(opts = {}) {
   Object.defineProperties(session, {
     g: { get: () => g }, frame: { get: () => frameNo }, movie: { get: () => movie },
     exports: { get: () => ex }, memory: { get: () => memory },
+    solar: { get: () => solar },
     solarLog: { get: () => [...solarAt].sort((a, b) => a[0] - b[0]).filter(([f]) => f < movie.length) },
   });
   Object.assign(session, {
@@ -135,7 +149,7 @@ export async function openSession(opts = {}) {
       movie.length = 0;
       script = null;
       pending = gen;
-      try { ex.port_game_run(saveSize); } catch (e) { if (!(e instanceof Stop)) throw e; }
+      try { runGame(ex, saveSize); } catch (e) { if (!(e instanceof Stop)) throw e; }
       const t = stopped;
       script = null;
       pending = null;
@@ -149,7 +163,7 @@ export async function openSession(opts = {}) {
       const parts = [[s, new Uint8Array(memory.buffer.slice(s, STACK_TOP))], [d0, new Uint8Array(memory.buffer.slice(d0, d1))]];
       for (const [a, n] of REGIONS) parts.push([a, new Uint8Array(memory.buffer.slice(a, a + n))]);
       // the movie itself, not just its length: another branch may have overwritten it
-      return { frame: frameNo, sp: s, parts, movie: movie.length, keys: movie.slice(), solar };
+      return { frame: frameNo, sp: s, parts, movie: movie.length, keys: movie.slice(), solar, solarAt: new Map(solarAt) };
     },
     restore(snap) {
       if (snap.sp !== sp()) throw new Error(`restore at a different stack depth (sp ${sp()} vs ${snap.sp})`);
@@ -158,12 +172,25 @@ export async function openSession(opts = {}) {
       movie.length = 0;
       for (let i = 0; i < snap.movie; i++) movie.push(snap.keys[i]);
       frameNo = snap.frame;
-      for (const f of [...solarAt.keys()]) if (f > snap.frame) solarAt.delete(f);
-      if (snap.solar !== solar) session.setSolar(snap.solar);
+      solar = snap.solar;
+      solarAt.clear();
+      for (const [f, v] of snap.solarAt) solarAt.set(f, v);
       g.refresh();  // hooks set since the snapshot
     },
     setRender(on) { render = !!on; if (ex && ex.port_video_set_enabled) ex.port_video_set_enabled(render ? 1 : 0); },
-    setSolar(v) { solar = v; ex.port_game_set_solar(v); solarAt.set(frameNo, v); },
+    setCoverage(on, { clear = false } = {}) {
+      if (clear) session.coverageMap().fill(0);
+      // coverage is word 16 of struct HookState in port/game/hooks.c.
+      new DataView(memory.buffer).setUint32(ex.port_hook_state() + 16 * 4, Number(on), true);
+    },
+    coverageMap() { return new Uint8Array(memory.buffer, ex.port_trace_map(), 0x800000); },
+    setSolar(v) {
+      if (!Number.isInteger(v) || v < 0 || v > 255) throw new RangeError('solar threshold must be an integer from 0 to 255');
+      if (v === solar) return;
+      solar = v;
+      ex.port_game_set_solar(v);
+      solarAt.set(frameNo, v);
+    },
     pixels() { return new Uint16Array(memory.buffer, lastPixels, 240 * 160).slice(); },
     keyMask,
   });
