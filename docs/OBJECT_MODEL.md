@@ -28,7 +28,7 @@ that some task owns.
 first 0x18 bytes are that header; its size is the `size` argument to `Task_Create`, and its
 "class" is the pair of callbacks given to `Task_SetCallbacks`.
 
-* **The player** is a task. `struct Player` (`include/engine/shared/player.h`) begins with
+* **The player** is a task. `struct Player` (`include/player/player.h`) begins with
   `struct Task task;` and is created by `Player_Create` (`Task_Create(6, 0xCAC)`).
 * **Each boss** is its own task class with a very large body. `struct Nidhoggr`
   (`include/effects/large_scene_animation_controller/large_scene_animation_controller.h`) is `struct Task`, a `SceneEventReceiver`,
@@ -208,7 +208,7 @@ workers are idle, because it touches most gameplay files.
    through a cast (`(*(u8 **)gPlayers)[0x418]`, `(struct SceneActorChasePlayer *)gPlayers[0]`
    and 21 other view types).
 4. *(done 2026-11-15)* **Duplicate boss structs.** `struct Nidhoggr` was defined in its
-   header and again in `src/effects/large_scene_animation_controller/sub_08191508.c`, and `src/effects/large_scene_animation_controller/sub_08190C98.c` had a third
+   header and again in `src/effects/large_scene_animation_controller/nidhoggr_hide_part_with_explosion.c`, and `src/effects/large_scene_animation_controller/nidhoggr_change_completed_part_state.c` had a third
    view (`struct BossParts`). One definition, in the header.
 5. *(done 2026-11-16)* **The registry-actor base.** It was eleven overlapping views
    (`SceneActorRegistryResetView`, about 2,700 uses; `SceneActorRegistryActor`, about 320;

@@ -11,7 +11,7 @@ whose instruction-trigram overlap is at least 0.5; they are ranked by
 difflib's ratio. Interior labels (disassembler starts the inventory does not list) are skipped.
 
 Each row shows where the unmatched function lives: "asm" (no C yet), "unit
-FILE" (an INCLUDE_ASM in a src/*.c unit), or "draft N%" (a NONMATCHING draft
+FILE" (an INCLUDE_ASM in a C unit), or "draft N%" (a NONMATCHING draft
 and its recorded fuzzy score). Rows are sorted by the gap between the best
 sibling's ratio and the draft's score: an old draft written without the
 sibling often scores well below what porting the sibling's C reaches, so the

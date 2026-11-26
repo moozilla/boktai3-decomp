@@ -1,5 +1,5 @@
 #include "field/hit_switch/hit_switch.h"
-#include "engine/shared/player.h"
+#include "player/player.h"
 
 void HitSwitch_SetUpdate(struct HitSwitchEntry *entry, void (*update)(struct HitSwitchEntry *))
 {

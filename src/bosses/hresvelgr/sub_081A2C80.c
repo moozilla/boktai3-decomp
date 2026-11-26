@@ -1,5 +1,5 @@
 #include "engine/shared/global.h"
-#include "engine/shared/player.h"
+#include "player/player.h"
 #include "engine/shared/render.h"
 #include "system/game_state/game_state.h"
 

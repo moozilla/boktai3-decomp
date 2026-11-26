@@ -17,7 +17,7 @@ Repeated report ranges for the same family share a directory. A translation unit
 
 Put a header with the unit that owns its API and include it by its path relative to `include/`, for example `#include "monsters/ghoul/ghoul.h"`. Put shared engine headers with the relevant engine service or in `include/engine/shared/`. For a new matching draft, `scope.py new FUNC` opens a workspace and `scope.py land FUNC` places the checked C.
 
-Find a translation unit by ROM address or build symbol:
+Pass a ROM address or build symbol to find its translation unit.
 
 ```sh
 build/venv/bin/python tools/source_layout.py 08033568 Ghoul_Create

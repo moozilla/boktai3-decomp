@@ -35,7 +35,7 @@ The two hidden functions were counted as part of the entry point before them
 ## Not matched yet
 
 * 08225624, the `trap` command (`Trap_CreateFromScript`): guarded draft at 93.5%
-  in `src/engine/script/sub_08225624.c`. Everything matches except the two loops that clear
+  in `src/engine/script/trap_create_from_script.c`. Everything matches except the two loops that clear
   the four-entry `-w` and `-s` lists. The original runs a pointer from
   `&list[3]` down and compares it with the list base (`cmp r0, r2; bge`), no
   counter, no entry check. Tried: index loops (`for`, `do`, count up/down,

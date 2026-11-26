@@ -39,7 +39,7 @@ const MENUS = {
     ready: (v) => v.state === 0 && v.timer > (1 << v.minShift) + 1 && $.gHeapEndGuard === 0x516B92EE,
     decide: () => 'a',
   },
-  // src/actors/actor_animation_controller/sub_081EAB64.c, the title screen. Its struct Display is local to that
+  // src/actors/actor_animation_controller/params3_d0_update_display.c, the title screen. Its struct Display is local to that
   // file (not in types.json), so `view` is a raw-offset reader of the same layout.
   // States 1 and 5 skip the logo animation with A (after 10 frames / once), state 6
   // is PRESS START (A or START once timer > 1 << fadeShift), state 8 the menu

@@ -441,7 +441,7 @@ The existing tools/cloud_task.py modification was left untouched.
   concession marker. `depin.py --write` was invoked; it skips a nonexact base.
   Remaining realigned differences: 83 total, 61 ignoring registers, chiefly
   flag insertion, branch layout and address/zero lifetimes. Default build uses
-  INCLUDE_ASM. Final command: tools/check.py src/bosses/hresvelgr/sub_081A2858.c
+  INCLUDE_ASM. Final command: tools/check.py src/bosses/hresvelgr/hresvelgr_update_collision_presentation.c
   --nonmatching --record. Candidate emits 860 bytes against an 868-byte extent;
   this is a guarded draft only, not exact progress.
 - **081A39E0 — stopped, candidate 65.2%.** Existing canonical name is
@@ -2983,7 +2983,7 @@ Exact progress gain: 0 percentage points; no byte-identical matches.
 - 080A62DC: stopped at 70.1%; retained locally in wip/sub_080A62DC.c. Response windup sets flags2D0 bit 0x100000, starts segment animation 18, clears secondary motion with CpuSet, and grows field2EA by 10 or 40 depending on counter2AC. Threshold is 200 or 300 based on body[0x8EA] > 3, then transitions to 080A65A8. Otherwise moves backward with speed 1 or 2 and performs the shared segment positioning. Strength-reduced loop and register lifetimes still differ (132 realigned / 87 ignoring registers).
 - 080A4798: stopped at 32.9%; retained locally in wip/sub_080A4798.c. Contact-route selection computes an angle toward fieldDC's position, forms a 160-scaled direction vector, scans route points for a negative dot product while excluding the current point, and otherwise calls Spider_SelectRandomEntry. Packed-vector bitfields and inline output lifetimes need further reconstruction; current candidate does not reproduce the stack/register layout.
 
-Useful seed: src/monsters/tentacle_body/sub_080A73B4.c has TentacleBody's inline Select implementation. Naming prefix follows TentacleBody_GetDirectionFrame and TentacleBody_UpdateDefeat. Ghidra export gen/ghidra/decomp.c is absent. Only fast per-file checks were run; no full build or network actions.
+Useful seed: src/monsters/tentacle_body/tentacle_body_update_defeat.c has TentacleBody's inline Select implementation. Naming prefix follows TentacleBody_GetDirectionFrame and TentacleBody_UpdateDefeat. Ghidra export gen/ghidra/decomp.c is absent. Only fast per-file checks were run; no full build or network actions.
 
 Tool caveat: depin.py --write on guarded NONMATCHING drafts checked the default assembly branch and removed both pins as apparent matches. Restored the pins and explicitly rechecked with check.py --nonmatching --record. Integrators should strip the guard or fix depin's draft checking before using it on these files.
 

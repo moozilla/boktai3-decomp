@@ -438,7 +438,7 @@ exports.hitAt = function* (tx, tz, opts = {}) {
   return { done: done(), hits, lines };
 };
 
-// The weapon in hand (src/player/sub_081401A0.c Player_RefreshActionEquipment): GameState+0x50
+// The weapon in hand (src/player/player_refresh_action_equipment.c Player_RefreshActionEquipment): GameState+0x50
 // is the selected slot of the equip list at +0x68 (0-7 swords, 8-15 the Gun Del Sol with a
 // frame); the gun's lens is lenses[slots88[4 + actionAuxiliarySlot]] (+0x828, +0x90, +0x54),
 // whose id is the element mode Player_GetAttackAttributeFlags maps to reaction flags.
@@ -465,7 +465,7 @@ exports.quickChange = function* (want) {
   return { done: false, ...exports.weapon() };
 };
 
-// Wait for energy in sunlight (src/field/rectangular_area_effects/sub_0804E618.c: the area effect adds gGameState->unk876,
+// Wait for energy in sunlight (src/field/rectangular_area_effects/area_effect_accumulate_player_resource.c: the area effect adds gGameState->unk876,
 // the sun level, per frame; 120 make one energy). The light is the solar sensor (session
 // setSolar: 0 bright .. 255 dark), written into the ROM script as `lux` lines.
 exports.chargeEnergy = function* (need, opts = {}) {
@@ -479,7 +479,7 @@ exports.chargeEnergy = function* (need, opts = {}) {
 };
 
 // The pause menu (START) lives in the field HUD task (Hud_UpdateWithCallback,
-// src/menus/hud/sub_08178B98.c): its state is the callback at +0xA50 (SceneHud_UpdatePageInput,
+// src/menus/hud/hud_update_with_callback.c): its state is the callback at +0xA50 (SceneHud_UpdatePageInput,
 // PauseMenu_UpdateItemActions, ...), the page at +0x1414 (1 items, 2 valuables, ...), the
 // grid cursor at +0x4384 (Inventory_InitializeSelectionGrid; +0x4387 the cell id).
 exports.hudTask = () => { const t = exports.tasks().find((x) => !x.dead && x.update === 'Hud_UpdateWithCallback'); return t ? Number(t.task) : 0; };
@@ -713,12 +713,12 @@ exports.enemies = () => {
 // the best by damage dealt minus lost life (life costs more: opts.lifeCost); the
 // distance to the target breaks ties. B is the weapon (measured: it kills the first
 // skeletons; A and the shoulder buttons do nothing in a fight).
-// Targets the game itself tracks for lock-on (src/player/target_registry/sub_0815F5F8.c TargetRegistry:
+// Targets the game itself tracks for lock-on (src/player/target_registry/target_registry_find_nearest_in_cone.c TargetRegistry:
 // gSceneLinkList->first, entries {body, flags, callback, next}, flag 1 enabled): every
 // hittable enemy, including the ones outside the scene actor registry (the Bronze Armor
 // of 2803). body is a SceneActorBody (position at +12, owner at +60). Health by layout:
 // flag 0x10 a RoomActor (health +0x9C); Armor_ReceiveTargetEvent the armor
-// (src/monsters/armor/sub_0818B7AC.c ArmorContactOwner: health +0xB1C, max +0xB1E).
+// (src/monsters/armor/armor_receive_collider_contact.c ArmorContactOwner: health +0xB1C, max +0xB1E).
 exports.targets = () => {
   const reg = g.u32(g.types.globals.gSceneLinkList.addr), out = [];
   if (!reg) return out;

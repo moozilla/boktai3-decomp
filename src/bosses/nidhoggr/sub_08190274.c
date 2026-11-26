@@ -2,7 +2,7 @@
 #include "engine/shared/contact_collider.h"
 #include "engine/shared/ram.h"
 #include "engine/shared/engine_globals.h"
-#include "engine/shared/player_slot_status.h"
+#include "player/player_slot_status.h"
 #include "bosses/nidhoggr/scene_pause.h"
 struct NidhoggrEffectVector {
     u16 x, y, z, pad;

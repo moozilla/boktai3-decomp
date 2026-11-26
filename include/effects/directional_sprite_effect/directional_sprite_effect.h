@@ -1,7 +1,7 @@
 #ifndef GUARD_DIRECTIONAL_SPRITE_EFFECT_H
 #define GUARD_DIRECTIONAL_SPRITE_EFFECT_H
 #include "engine/shared/engine.h"
-#include "engine/shared/player.h"
+#include "player/player.h"
 #include "engine/shared/display_sequence.h"
 
 void DirectionalSpriteEffect_Activate(struct Player *);

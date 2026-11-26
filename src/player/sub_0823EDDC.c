@@ -1,5 +1,5 @@
 #include "engine/shared/global.h"
-#include "engine/shared/player.h"
+#include "player/player.h"
 u32 Player_GetConfiguredActionPower(struct Player *);
 void AnimData_SelectPaletteBank(u8 *, u32);
 void Collider_SetAttackProperties(void *, u32, u32, u32, u32, u32);

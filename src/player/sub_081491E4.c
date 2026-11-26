@@ -1,5 +1,5 @@
 #include "engine/shared/contact_swarm.h"
-#include "engine/shared/player.h"
+#include "player/player.h"
 #include "player/player_cue/player_cue_sequence.h"
 u32 Player_ConsumeStateEntry(struct Player *);
 void Player_EmitQueuedEffects(struct Player *);

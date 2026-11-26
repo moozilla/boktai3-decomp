@@ -7,7 +7,7 @@
 #include "engine/shared/scene_actor_terrain.h"
 #include "actors/scene_actor_reaction/scene_actor_reaction.h"
 #include "engine/shared/engine_globals.h"
-#include "engine/shared/player.h"
+#include "player/player.h"
 
 void Skeleton_UpdateScriptWaitState(u8 *p);
 void SceneActorTerrain_RequestRetreatRoute(struct ChaseActor *);

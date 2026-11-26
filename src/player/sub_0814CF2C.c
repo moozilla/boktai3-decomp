@@ -1,5 +1,5 @@
 #include "engine/shared/global.h"
-#include "engine/shared/player.h"
+#include "player/player.h"
 void Sound_PlaySong(u32);
 s32 Player_SetAnimation(struct Player *, s32, s32, s32);
 void ActorSequence_Begin(struct Player *, s32, s32);

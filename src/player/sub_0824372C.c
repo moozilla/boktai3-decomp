@@ -1,5 +1,5 @@
 #include "engine/shared/global.h"
-#include "engine/shared/player.h"
+#include "player/player.h"
 extern u8 *gLinkSession;
 s32 Script_GetOptionalIValue(void);
 bool32 Script_SeekToKeyword(s32);

@@ -3,7 +3,7 @@
 #include "engine/shared/contact_swarm.h"
 #include "engine/shared/input.h"
 #include "engine/shared/task.h"
-#include "engine/shared/player.h"
+#include "player/player.h"
 struct InteractionMarker {
     struct Task task;
     u16 id;

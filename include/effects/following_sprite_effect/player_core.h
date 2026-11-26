@@ -1,7 +1,7 @@
 #ifndef GUARD_PLAYER_CORE_H
 #define GUARD_PLAYER_CORE_H
 #include "engine/shared/engine.h"
-#include "engine/shared/player.h"
+#include "player/player.h"
 #include "engine/shared/contact_actor.h"
 #include "field/scene_objects/scene_object.h"
 /* Script argument header is a packed count word; upper bits are preserved. */

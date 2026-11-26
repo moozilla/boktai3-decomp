@@ -1,6 +1,6 @@
 #include "engine/shared/global.h"
 #include "system/game_state/game_state.h"
-#include "engine/shared/player.h"
+#include "player/player.h"
 #include "effects/health_burst_effect/health_burst.h"
 struct BurstVector {
     s32 x : 16, y : 16, z : 16, pad : 16;

@@ -2,7 +2,7 @@
 #include "engine/shared/global.h"
 #include "engine/shared/ram.h"
 #include "engine/shared/engine.h"
-#include "engine/shared/player.h"
+#include "player/player.h"
 #include "engine/shared/contact_actor.h"
 #include "engine/shared/engine_pause.h"
 

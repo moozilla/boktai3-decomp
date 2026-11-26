@@ -54,11 +54,10 @@ def _sources(root: Path, exclude: Path | None):
     skip = os.fspath(Path(exclude).resolve()) if exclude else None
     for sub in ROOTS:
         for directory, _, files in os.walk(root / sub):
-            folder = os.path.realpath(directory)
             for name in sorted(files):
                 if not name.endswith((".c", ".h")):
                     continue
-                path = os.path.join(folder, name)
+                path = os.path.join(directory, name)
                 if skip and (path == skip or os.path.islink(path) and os.path.realpath(path) == skip):
                     continue
                 stat = os.stat(path)

@@ -243,7 +243,7 @@ void Actor_ProjectAndClampToScreen(struct ActorAnimController *p)
 // Provisional name: Actor_TryInteraction
 
 #include "system/game_state/game_state.h"
-#include "engine/shared/player.h"
+#include "player/player.h"
 
 u8 Math_Atan2(s32, s32);
 

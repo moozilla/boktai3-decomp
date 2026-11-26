@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Check one C file against the ROM without a full build, and show a diff.
 
-  check.py src/fn/sub_08033568.c [--quiet]
+  check.py FILE.c [--quiet]
   check.py sub_08033568              (resolve a ROM address or function name)
 
 Compiles the file exactly as build.py does, links it alone at the address of
@@ -73,7 +73,7 @@ def disasm(code, addr, *, arm=False):
     return out
 
 
-def link_object(obj, elf, *, syms=None, address=None):
+def link_object(obj, elf, *, syms=None, address=None, ram=None):
     """Resolve a standalone object as in the ROM; also used by the permuter.
 
     A supplied symbol snapshot keeps a search reproducible if the full build
@@ -106,7 +106,8 @@ def link_object(obj, elf, *, syms=None, address=None):
 
     stub = ["\t.syntax unified"]
     missing = []
-    ram = build.ram_symbols()
+    if ram is None:
+        ram = build.ram_symbols()
     for name in undefined:
         key = name[:-6] if name.endswith("__addr") else name
         if key in syms:
@@ -289,13 +290,19 @@ def main():
             shutil.rmtree(os.path.join(ROOT, work), ignore_errors=True)
 
 
-def run(a, src, work):
+def linked_bytes(src, work, *, syms=None, ram=None):
+    """Compile and link the stock source, returning its ROM address, symbols and bytes."""
     base = os.path.join(work, os.path.basename(src)[:-2])
     obj = base + ".o"
     build.build_c(src, obj)
-    addr, defined = link_object(obj, base + ".elf")
+    addr, defined = link_object(obj, base + ".elf", syms=syms, ram=ram)
     build.sh(["arm-none-eabi-objcopy", "-O", "binary", "-j", ".text", base + ".elf", base + ".bin"])
-    mine = open(os.path.join(ROOT, base + ".bin"), "rb").read()
+    with open(os.path.join(ROOT, base + ".bin"), "rb") as stream:
+        return obj, addr, defined, stream.read()
+
+
+def run(a, src, work):
+    obj, addr, defined, mine = linked_bytes(src, work)
     rom = load_rom(verify=False)
     if a.nonmatching and a.target_size is None:
         a.target_size = draft_extent(src, defined)

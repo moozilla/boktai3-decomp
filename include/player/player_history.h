@@ -1,7 +1,7 @@
 #ifndef GUARD_PLAYER_HISTORY_H
 #define GUARD_PLAYER_HISTORY_H
 
-#include "engine/shared/player.h"
+#include "player/player.h"
 
 static inline s32 Player_ReadHistoryDirection(struct Player *player)
 {

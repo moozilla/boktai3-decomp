@@ -4,10 +4,10 @@ addr,name,evidence
 08197DD0,TimePalette_SelectPhaseIndex,src/fn/sub_08197DD0.c; map phase3 to1 and phases0/4/5 to2; default0
 08197E0C,TimePalette_UpdateBlend,src/fn/sub_08197E0C.c; select phase sources and interpolate over64 ticks
 08197E74,TimePalette_InitializeBlend,src/fn/sub_08197E74.c; initialize three sources phase indices and update callback
-08221774,ScalarApproach_StepHalf,src/engine/scalar_and_vector_interpolation/sub_08221774.c; halve signed distance and snap withinone
-08221798,ScalarApproach_StepQuarter,src/engine/scalar_and_vector_interpolation/sub_08221798.c; quarter signed distance with minimum step
-082217CC,ScalarApproach_StepEighth,src/engine/scalar_and_vector_interpolation/sub_082217CC.c; eighth signed distance with minimum step
-08221800,ScalarApproach_StepSixteenth,src/engine/scalar_and_vector_interpolation/sub_08221800.c; full52-byte independently verified helper
+08221774,ScalarApproach_StepHalf,src/engine/scalar_and_vector_interpolation/scalar_approach_step_half.c; halve signed distance and snap withinone
+08221798,ScalarApproach_StepQuarter,src/engine/scalar_and_vector_interpolation/scalar_approach_step_quarter.c; quarter signed distance with minimum step
+082217CC,ScalarApproach_StepEighth,src/engine/scalar_and_vector_interpolation/scalar_approach_step_eighth.c; eighth signed distance with minimum step
+08221800,ScalarApproach_StepSixteenth,src/engine/scalar_and_vector_interpolation/scalar_approach_step_sixteenth.c; full52-byte independently verified helper
 08221834,ScalarApproach_UnwrapAngle,src/engine/scalar_and_vector_interpolation/sub_08221834.c; provisional semantic name from reviewed full-extent C
 0822185C,ScalarApproach_ClampCentered,src/engine/scalar_and_vector_interpolation/sub_0822185C.c; provisional semantic name from reviewed full-extent C
 08221870,ScalarApproach_ClampAngle,src/engine/scalar_and_vector_interpolation/sub_08221870.c; provisional semantic name from reviewed full-extent C

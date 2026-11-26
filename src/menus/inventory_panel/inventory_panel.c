@@ -1,7 +1,7 @@
 #include "engine/shared/global.h"
 #include "engine/shared/scene_item_values.h"
 #include "system/game_state/game_state.h"
-#include "engine/shared/player.h"
+#include "player/player.h"
 #include "menus/inventory_panel/inventory_panel.h"
 #include "menus/scene_hud/scene_hud_display.h"
 #include "engine/shared/monster_particle_random.h"

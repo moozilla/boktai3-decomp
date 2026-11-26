@@ -1,4 +1,4 @@
-#include "engine/shared/player_slot_status.h"
+#include "player/player_slot_status.h"
 #include "engine/shared/scene_actor_actions.h"
 #include "bosses/vanargand/vanargand_parts.h"
 #include "monsters/ghoul/ghoul_disc.h"
@@ -17,7 +17,7 @@ struct ContactPosition *TetherActor_GetPosition(void);
 
 #include "engine/shared/input.h"
 
-#include "engine/shared/player.h"
+#include "player/player.h"
 
 #include "engine/shared/scene_facing.h"
 

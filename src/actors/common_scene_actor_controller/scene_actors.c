@@ -1,7 +1,7 @@
 #include "actors/common_scene_actor_controller/scene_actors.h"
 #include "engine/shared/hit_spark_random.h"
-#include "engine/shared/player.h"
-#include "engine/shared/player_slot_status.h"
+#include "player/player.h"
+#include "player/player_slot_status.h"
 
 void SceneActors_Register(struct StateActor *actor, u32 slot)
 {

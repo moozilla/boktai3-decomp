@@ -128,9 +128,9 @@ validation logs are retained under `build/`.
 | 02000480 | `gSceneActorListManager` | unified | `include/engine/shared/ram.h` |
 | 02000484 | `gWirelessController` | unified | `include/engine/shared/ram.h` |
 | 02000488 | `gUnk_02000488` | skipped | restored protected src/field/tether_actor/tether_actor.c needs the old header declaration; renamed header leaves old gUnk references undeclared; full batch restored |
-| 020004B4 | `gUnk_020004B4` | skipped | protected src/actors/scene_actor_reaction/sub_08135F70.c uses the old declaration from include/engine/shared/area_effect_link.h; header rename gives compile error after restoring consumer |
+| 020004B4 | `gUnk_020004B4` | skipped | protected src/actors/scene_actor_reaction/scene_actor_reaction_resolve_damage.c uses the old declaration from include/engine/shared/area_effect_link.h; header rename gives compile error after restoring consumer |
 | 020004B8 | `gUnk_020004B8` | skipped | protected src/fn/sub_0803EF4C.c uses the old declaration from include/effects/scene_arc_slot_effects/scene_arc.h; header rename gives compile error after restoring consumer |
-| 020004F0 | `gUnk_020004F0` | skipped | protected src/actors/scene_pooled_motion_and_actor_controls/sub_0803DF90.c uses the old declaration from include/engine/shared/scene_pool.h; header rename gives compile error after restoring consumer |
+| 020004F0 | `gUnk_020004F0` | skipped | protected src/actors/scene_pooled_motion_and_actor_controls/scene_pool_state_track_adaptive.c uses the old declaration from include/engine/shared/scene_pool.h; header rename gives compile error after restoring consumer |
 | 02000500 | `gPlayerInteractionMode` | unified | `include/engine/shared/ram.h` |
 | 02000504 | `gPlayerSavedMenuOption` | unified | `include/engine/shared/ram.h` |
 | 02000514 | `gPlayerLinkAttackBonus` | unified | `include/engine/shared/ram.h` |
@@ -145,7 +145,7 @@ validation logs are retained under `build/`.
 | 02000554 | `gPlayerAbilityLatched` | unified | `include/engine/shared/ram.h` |
 | 02000560 | `gUnk_02000560` | skipped | four-word array declaration conflicts with existing scalar views in shared headers (e.g. area_effect.h); ramlayout rolled back all changes |
 | 02000570 | `gPlayerSolarActionPending` | unified | `include/engine/shared/ram.h` |
-| 02000580 | `gUnk_02000580` | skipped | protected src/fn/sub_080CCD7C.c uses the old declaration from include/engine/shared/player.h; header rename gives compile error after restoring consumer |
+| 02000580 | `gUnk_02000580` | skipped | protected src/fn/sub_080CCD7C.c uses the old declaration from include/player/player.h; header rename gives compile error after restoring consumer |
 | 02000590 | `gPlayerEffectPendingCount` | unified | `include/engine/shared/ram.h` |
 | 0200059C | `gPlayerAttackEffect` | unified | `include/engine/shared/ram.h` |
 | 020005A8 | `gHudResetFlag` | unified | `include/engine/shared/ram.h` |
@@ -162,5 +162,5 @@ validation logs are retained under `build/`.
 | 02037000 | `gBgMapWorkBuffer` | unified | `include/engine/shared/ram.h` |
 | 02039000 | `gObjTileUploadRequests` | struct | `include/engine/interrupts_and_video/obj_tile_upload.h` |
 | 0203B000 | `gResourceRegistryEntries` | struct | `include/engine/resource_registry/resource_registry.h` |
-| 0203B400 | `gUnk_0203B400` | skipped | protected src/actors/actor_animation_and_action_controllers/sub_08025FFC.c relies on old random-table declaration in engine.h; header rename leaves old uses undeclared |
+| 0203B400 | `gUnk_0203B400` | skipped | protected src/actors/actor_animation_and_action_controllers/scene_actor_animation_update_impact_hazard.c relies on old random-table declaration in engine.h; header rename leaves old uses undeclared |
 | 0203C400 | `gGameStateStorage` | unified | `include/engine/shared/ram.h` |

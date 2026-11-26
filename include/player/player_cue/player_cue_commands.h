@@ -2,7 +2,7 @@
 
 #define GUARD_PLAYER_CUE_COMMANDS_H
 
-#include "engine/shared/player.h"
+#include "player/player.h"
 
 #include "engine/shared/engine.h"
 

@@ -59,7 +59,7 @@ constant (`ldr rN, =0x203B400`) at each use and deleted the set.
 ## What the draft gets right
 
 1. **The twin's shape.** FlickerParticle_StartSecondaryBurst
-   (`src/effects/health_burst_effect/sub_08235174.c`, matched) steps the motion pointer by
+   (`src/effects/health_burst_effect/flicker_particle_start_secondary_burst.c`, matched) steps the motion pointer by
    `sizeof(struct FlickerParticle)`, keeps an `offset` BIV, and writes the
    flags and update stores through block-local base pointers. This draft does
    the same.

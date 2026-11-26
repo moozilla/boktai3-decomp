@@ -1,7 +1,7 @@
 #ifndef HOMING_EFFECT_H
 #define HOMING_EFFECT_H
 #include "engine/shared/global.h"
-#include "engine/shared/player.h"
+#include "player/player.h"
 #include "engine/shared/engine_globals.h"
 #include "engine/shared/ram.h"
 #include "engine/shared/task.h"

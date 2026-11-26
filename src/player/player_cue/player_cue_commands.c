@@ -1,5 +1,5 @@
 #include "player/player_cue/player_cue_commands.h"
-#include "engine/shared/player_status_flags.h"
+#include "player/player_status_flags.h"
 #include "field/group_objects/group_objects.h"
 
 /* Enable the first player's stat gauge. */

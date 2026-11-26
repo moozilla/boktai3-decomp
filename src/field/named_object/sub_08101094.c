@@ -1,5 +1,5 @@
 #include "engine/shared/global.h"
-#include "engine/shared/player.h"
+#include "player/player.h"
 
 struct P457 {
     u8 pad[0x457];

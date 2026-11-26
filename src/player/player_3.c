@@ -2,7 +2,7 @@
 #include "player/player_3.h"
 #include "engine/shared/ram.h"
 #include "player/scene_consumable_definition.h"
-#include "engine/shared/player_slot_status.h"
+#include "player/player_slot_status.h"
 #include "field/group_objects/group_objects.h"
 
 /* Tentative role: select an effect flag from actor and global state. */

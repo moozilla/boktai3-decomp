@@ -1,7 +1,7 @@
 #include "engine/shared/global.h"
 #include "engine/shared/engine_globals.h"
 #include "engine/shared/input.h"
-#include "engine/shared/player.h"
+#include "player/player.h"
 /* Solar exposure tick, called from Solar_UpdateMeasurement after each
  * sample: accumulates exposure totals in the game-state block (offsets
  * 0x504, 0x520, 0x528, 0x77C) every 64 frames. Field roles are tentative. */

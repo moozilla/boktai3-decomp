@@ -1,5 +1,5 @@
 #include "engine/shared/global.h"
-#include "engine/shared/player_slot_status.h"
+#include "player/player_slot_status.h"
 #define B(n) (*(u8 *)(p + (n)))
 #define H(n) (*(u16 *)(p + (n)))
 #define W(n) (*(u32 *)(p + (n)))

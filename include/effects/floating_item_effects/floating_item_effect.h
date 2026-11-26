@@ -2,7 +2,7 @@
 #define GUARD_FLOATING_ITEM_EFFECT_H
 #include "menus/choice_menu/choice_menu.h"
 #include "engine/shared/scene_input_widget.h"
-#include "engine/shared/player.h"
+#include "player/player.h"
 
 /* Eight item icons can bob, wait, spin away, or fly toward a player/target. */
 struct FloatingEffect {

@@ -2,7 +2,7 @@
 #define GUARD_CONTROL_PANEL_H
 #include "engine/shared/scene_input.h"
 #include "actors/task_4_e01/contact_swarm_sprite.h"
-#include "engine/shared/player.h"
+#include "player/player.h"
 #include "gba/io_reg.h"
 #include "engine/script_utility_references/script_utility.h"
 

@@ -1,6 +1,6 @@
 #include "engine/shared/global.h"
 #include "engine/shared/engine.h"
-#include "engine/shared/player.h"
+#include "player/player.h"
 struct MapInfo {
     u8 pad[0x24];
     u16 rows[1];

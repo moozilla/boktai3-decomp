@@ -54,7 +54,7 @@ def save(st):
 
 
 def own_patch(st):
-    """The unit's own changes, without its src/fn/ deletions (returned separately: main may have
+    """The unit's own changes, without its deleted input files (returned separately: main may have
     edited those files since, e.g. renamed callees, and the unit replaces them whatever they hold)."""
     b = st["branch"]
     status = [l.split("\t") for l in git("diff", "--no-renames", "--name-status", f"{b}~1", b).stdout.splitlines()]
@@ -150,7 +150,7 @@ def attempt(batch, dry):
     git("add", "PROGRESS.md")
     git("commit", "-q", "-m", "Regenerate PROGRESS.md\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>")
     git("-c", "http.postBuffer=524288000", "push", "-q", "-u", "origin", name, check=True)
-    body = ("Subsystem units from `tools/unitize.py`. Each merges its `src/fn/` files into one unit with "
+    body = ("Subsystem units from `tools/unitize.py`. Each merges its standalone source files into one unit with "
             "shared types, and each was verified in its own worktree and again here in a combined build "
             "(`build/boktai3.gba: OK`).\n\n" + "\n".join(f"- {s['name']} (`{s['slug']}`)" for s in applied)
             + "\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)")

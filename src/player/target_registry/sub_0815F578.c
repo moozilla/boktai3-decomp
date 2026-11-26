@@ -1,6 +1,6 @@
 // COMPILER: old_agbcc
 #include "engine/shared/global.h"
-#include "engine/shared/player.h"
+#include "player/player.h"
 /* Player_GetBasePosition: Returns the position block at offset 0x24 for the indexed player */
 #define Player_GetBasePosition sub_0815F578
 

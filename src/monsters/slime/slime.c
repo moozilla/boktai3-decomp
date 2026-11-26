@@ -19,7 +19,7 @@
 #include "engine/shared/scene_actor_terrain.h"
 #include "engine/shared/engine_globals.h"
 #include "engine/shared/scene_actor_motion.h"
-#include "engine/shared/player.h"
+#include "player/player.h"
 #include "engine/shared/scene_actor_state.h"
 #include "engine/scene_body/scene_body_api.h"
 #include "engine/shared/render.h"

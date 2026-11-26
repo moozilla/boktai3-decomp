@@ -16,7 +16,7 @@ were removed. Each complete source unit independently matches stock bytes.
 
 ## Source evidence and adopted algorithm
 
-`Palette_InterpolateBanks` in `src/engine/anim/sub_08221110.c` reads two arrays of sixteen
+`Palette_InterpolateBanks` in `src/engine/anim/palette_interpolate_banks.c` reads two arrays of sixteen
 halfword colors and writes sixteen interpolated colors. Its final two arguments
 are the interpolation weight and scale shift. `struct PaletteResource` in
 `include/engine/shared/palette_resource.h` independently declares the resource payload as

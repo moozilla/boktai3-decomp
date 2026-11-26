@@ -1,5 +1,5 @@
 #include "engine/shared/global.h"
-#include "engine/shared/player.h"
+#include "player/player.h"
 
 void sub_0814B02C(struct Player *p, s32 angle)
 {

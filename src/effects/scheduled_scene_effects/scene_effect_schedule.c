@@ -1,6 +1,6 @@
 #include "effects/scheduled_scene_effects/scene_effect_schedule.h"
 #include "engine/shared/engine.h"
-#include "engine/shared/player.h"
+#include "player/player.h"
 #include "system/game_state/game_state.h"
 #include "engine/shared/ram.h"
 #include "engine/shared/engine_pause.h"

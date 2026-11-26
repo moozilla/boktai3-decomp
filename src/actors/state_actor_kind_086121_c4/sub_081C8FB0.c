@@ -1,6 +1,6 @@
 #include "engine/shared/global.h"
 #include "engine/shared/state_actor.h"
-#include "engine/shared/player.h"
+#include "player/player.h"
 
 s32 Math_Atan2(s32 x, s32 z); // include/field/directional_interaction_controllers/directional_interaction.h
 

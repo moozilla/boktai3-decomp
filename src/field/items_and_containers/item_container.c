@@ -3,7 +3,7 @@
 #include "engine/shared/ram.h"
 #include "engine/shared/display_sequence_inline.h"
 #include "player/player_cue/player_cue_sequence.h"
-#include "engine/shared/player_slot_status.h"
+#include "player/player_slot_status.h"
 
 void ScaledShadow_Destroy(void *);
 s32 sub_0822D490(s32, s32);

@@ -26,6 +26,15 @@ LIBRARY_DIRS = {
     "libc (newlib)": "libc",
 }
 
+UPSTREAM_SOURCES = {
+    "m4a.c", "libc_memcpy.c", "libc_memset.c", "libgcc_dp.c", "libgcc_fp.c",
+    "librfu_intr.c", "librfu_rfu.c", "librfu_sio32id.c", "librfu_stwi.c",
+} | {f"libm_{stem}.c" for stem in (
+    "e_acos", "e_asin", "e_fmod", "e_rem_pio2", "e_sqrt", "k_cos", "k_rem_pio2", "k_sin", "k_tan",
+    "s_atan", "s_copysign", "s_cos", "s_fabs", "s_floor", "s_isnan", "s_matherr", "s_scalbn", "s_sin",
+    "s_tan", "w_acos", "w_asin", "w_fmod",
+)}
+
 
 def slug(name):
     """Snake case, including acronym boundaries such as RFU_Init and CRC32."""
@@ -61,8 +70,7 @@ def is_upstream(path):
         if parts[i:i + 2] == ("src", "lib"):
             if len(parts) == i + 3:  # Historical revisions.
                 return True
-            return (parts[-1] == "m4a.c" or
-                    parts[-1].startswith(("libc_", "libgcc_", "libm_", "librfu_")))
+            return parts[-1] in UPSTREAM_SOURCES
     return False
 
 
@@ -100,15 +108,16 @@ class Manifest:
 
 
 def scan(root=ROOT, source_root=None):
-    from split import c_functions, nonmatching_functions
+    from split import draft_functions, source_functions
 
     root = Path(root)
     names = {name: address for address, name in symbol_names(root).items()}
     files, by_file = {}, defaultdict(list)
     for path in sorted(Path(source_root or root / "src").rglob("*.c")):
         rel = path.relative_to(root).as_posix()
-        aliases = dict(ALIASES.findall(path.read_text()))
-        definitions = c_functions(path) + [name for name, _ in nonmatching_functions(path)]
+        text = path.read_text()
+        aliases = dict(ALIASES.findall(text))
+        definitions = source_functions(text, resolve_aliases=False) + [name for name, _ in draft_functions(text)]
         for definition in dict.fromkeys(definitions):
             address = address_of(aliases.get(definition, definition), names)
             if address is None:
@@ -135,7 +144,17 @@ def resolve(value, root=ROOT):
     if path.is_file():
         return path.relative_to(root).as_posix() if path.is_relative_to(root) else str(path)
     name = Path(value).name
-    entry = locate(Path(name).stem, root)
+    stem = Path(name).stem
+    symbols = symbol_names(root)
+    address = address_of(stem, {name: address for address, name in symbols.items()})
+    if address is not None:
+        directory = Path("src") / directory_for(address, root)
+        named = symbols.get(address, f"sub_{address:08X}")
+        for filename in (new_filename(named, address), f"sub_{address:08X}.c"):
+            candidate = directory / filename
+            if (Path(root) / candidate).is_file():
+                return candidate.as_posix()
+    entry = locate(stem, root)
     if entry:
         return entry[0]
     matches = [p for p in source_paths(root) if p.name == name or p.stem == name]
@@ -173,7 +192,7 @@ def groups(root=ROOT):
                 start, end = int(row["start"], 16), int(row["end"], 16)
                 title = row["name"]
                 if table == "progress_libraries.csv":
-                    directory = Path("lib", LIBRARY_DIRS[title])
+                    directory = Path("lib", LIBRARY_DIRS.get(title, slug(title)))
                 else:
                     category = category_of(categories, row | {"start": start})
                     category = CATEGORY_DIRS.get(category, category)

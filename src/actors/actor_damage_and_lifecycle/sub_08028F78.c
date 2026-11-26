@@ -1,5 +1,5 @@
 #include "engine/shared/global.h"
-#include "engine/shared/player.h"
+#include "player/player.h"
 #include "engine/shared/render.h"
 
 /* confidence=low: Initialize the Vampire actor from script options and create its visual and contact objects. */

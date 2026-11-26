@@ -1,7 +1,7 @@
 #ifndef GUARD_PLAYER_CUE_H
 #define GUARD_PLAYER_CUE_H
 
-#include "engine/shared/player.h"
+#include "player/player.h"
 #include "engine/shared/contact_swarm.h"
 #include "engine/shared/display_sequence.h"
 #include "engine/script_utility_references/script_utility.h"

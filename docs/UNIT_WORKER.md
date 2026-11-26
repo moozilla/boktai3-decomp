@@ -1,8 +1,8 @@
 # Subsystem unit worker
 
 Turn one subsystem (a contiguous ROM range from `symbols/progress_subsystems.csv`)
-into a single translation unit `src/<subsystem>.c` with shared types in
-`include/<subsystem>.h`. Matching must stay byte-identical. Read `CLAUDE.md` first.
+into a single translation unit `src/<category>/<unit>/<unit>.c` with shared types in
+`include/<category>/<unit>/<unit>.h`. Matching must stay byte-identical. Read `CLAUDE.md` first.
 
 ## Setup
 
@@ -59,7 +59,7 @@ for your callers, say so in your report rather than working around it silently.
 
 ## Loop
 
-* `tools/check.py src/fn/sub_X.c` per function before merging, then
+* `tools/check.py FUNCTION` per function before merging, then
   `tools/check.py src/<subsystem>.c` after.
 * A field type change that breaks a match usually means the type is wrong (width,
   signedness). If a function truly needs its old shape, keep a minimal local

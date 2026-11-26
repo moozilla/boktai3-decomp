@@ -2,7 +2,7 @@
 #include "system/game_state/game_state.h"
 #include "engine/shared/render.h"
 #include "engine/shared/ram.h"
-#include "engine/shared/player.h"
+#include "player/player.h"
 #include "engine/camera/camera_tracking.h"
 
 struct FDE0Header {

@@ -1,7 +1,7 @@
-#include "engine/shared/player.h"
+#include "player/player.h"
 #include "engine/shared/scene_particle_burst_api.h"
 #include "engine/shared/global.h"
-#include "engine/shared/player.h"
+#include "player/player.h"
 // confidence=low: charge phases and orbiting attack collider identify a spinning attack.
 #define B(o) (*(u8 *)(p + (o)))
 #define H(o) (*(u16 *)(p + (o)))

@@ -1,5 +1,5 @@
 #include "effects/scene_projectile/scene_projectile_pool.h"
-#include "engine/shared/player.h"
+#include "player/player.h"
 #include "engine/shared/display_sequence_inline.h"
 #include "engine/terrain/terrain_sampling.h"
 

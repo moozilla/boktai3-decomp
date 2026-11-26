@@ -7,7 +7,7 @@
 
 #include "actors/scene_actor_animation_and_scripted_actions/scene_actor_animation.h"
 
-#include "engine/shared/player.h"
+#include "player/player.h"
 
 #include "actors/scene_actor_behavior/scene_actor_behavior.h"
 

@@ -1,0 +1,51 @@
+#include "engine/shared/contact_swarm.h"
+#include "player/player.h"
+#include "player/player_cue/player_cue_sequence.h"
+// confidence=low: provisional action interpretation from retained C and assembly.
+static inline u32 Step(struct ContactSwarmSprite *sp, struct DisplaySequenceState *st, u32 firstBit,
+                       u32 pin)
+{
+    return PlayerCue_StepSequenceEnded(sp, st);
+}
+
+u32 Player_ConsumeStateEntry(struct Player *);
+void Player_AddControlFlags(struct Player *, u32);
+void Player_UpdateFacingSide(struct Player *);
+void ActorSequence_Begin(struct Player *, s32, s32);
+void Sound_PlaySong(u32);
+// confidence=low: decays the stored recovery amount before playing the finishing pose.
+void Player_UpdatePoseRecovery(struct Player *p)
+{
+    u32 phase;
+    Player_AddControlFlags(p, 8);
+    phase = p->tetherPhase;
+    switch (phase) {
+        case 0:
+            p->facing |= 1;
+            if (p->facing > 4) {
+                p->heading = (8 - p->facing) >> 1;
+                p->side = 1;
+            } else {
+                p->heading = p->facing >> 1;
+                p->side = 0;
+            }
+            Anim_SetSequence(&p->cueCollider.sequence, *(void **)((u8 *)p + 0x410), 2, p->heading,
+                             p->side);
+            Step((void *)((u8 *)p + 0x14C), &p->cueCollider.sequence, 1, 1);
+            if (p->actionCountdown <= 30) {
+                p->actionCountdown = 0;
+                Sound_PlaySong(0x1B0);
+                p->tetherPhase = 1;
+            } else
+                p->actionCountdown -= 30;
+            break;
+        case 1:
+            Anim_SetSequence(&p->cueCollider.sequence, *(void **)((u8 *)p + 0x410), 3, p->heading,
+                             p->side);
+            if (Step((void *)((u8 *)p + 0x14C), &p->cueCollider.sequence, phase, 2)) {
+                Player_UpdateFacingSide(p);
+                ActorSequence_Begin(p, 0, 0);
+            }
+            break;
+    }
+}

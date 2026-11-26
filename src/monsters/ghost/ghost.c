@@ -10,7 +10,7 @@
 
 #include "engine/shared/scene_actor_reset.h"
 
-#include "engine/shared/player.h"
+#include "player/player.h"
 
 #include "engine/shared/scene_actor_state.h"
 

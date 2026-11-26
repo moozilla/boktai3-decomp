@@ -1,6 +1,6 @@
 #ifndef GUARD_PLAYER_ORBIT_EFFECT_H
 #define GUARD_PLAYER_ORBIT_EFFECT_H
-#include "engine/shared/player.h"
+#include "player/player.h"
 #include "engine/shared/engine.h"
 #include "engine/shared/contact_collider.h"
 

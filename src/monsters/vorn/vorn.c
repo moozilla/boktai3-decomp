@@ -2,7 +2,7 @@
 #include "engine/shared/scene_actor_reset.h"
 #include "actors/scene_actor_animation_and_scripted_actions/scene_actor_animation.h"
 #include "actors/scene_actor_reaction/scene_actor_reaction.h"
-#include "engine/shared/player.h"
+#include "player/player.h"
 #include "engine/shared/scene_actor_chase.h"
 #include "engine/shared/debug.h"
 #include "engine/shared/scene_actor_displacement.h"

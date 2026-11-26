@@ -2,8 +2,8 @@
 
 #include "engine/shared/global.h"
 
-#include "engine/shared/player_status_flags.h"
-#include "engine/shared/player_slot_status.h"
+#include "player/player_status_flags.h"
+#include "player/player_slot_status.h"
 
 #include "engine/shared/scene_vec.h"
 

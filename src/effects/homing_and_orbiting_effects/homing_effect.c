@@ -1,4 +1,4 @@
-#include "engine/shared/player_slot_status.h"
+#include "player/player_slot_status.h"
 #include "effects/homing_and_orbiting_effects/homing_effect.h"
 #include "engine/shared/display_sequence_inline.h"
 /* EffectManager_ClearGlobal: sets the global EffectManager pointer to 0; matches an existing vetted proposal and the body's single store */

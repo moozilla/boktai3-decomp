@@ -1,5 +1,5 @@
 #include "engine/shared/global.h"
-#include "engine/shared/player.h"
+#include "player/player.h"
 
 // confidence=low: table-driven weapon cue and combo phases drive the attack collider.
 #define Player_UpdateWeaponCueCombo sub_0814D9C4

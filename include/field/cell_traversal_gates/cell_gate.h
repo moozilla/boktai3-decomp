@@ -4,7 +4,7 @@
 #include "system/game_state/game_state.h"
 #include "engine/shared/ram.h"
 #include "engine/shared/task.h"
-#include "engine/shared/player.h"
+#include "player/player.h"
 /* Tentative cell-local traversal gate; flags select behavior and constrained axis. */
 struct CellGate {
     struct Task task;

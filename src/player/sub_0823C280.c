@@ -1,5 +1,5 @@
 #include "engine/shared/global.h"
-#include "engine/shared/player.h"
+#include "player/player.h"
 extern const u8 gUnk_08E6290C[];
 void Player_InitializeActionState(void *, const void *);
 void CellObject_Init(void *, void *);

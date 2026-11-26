@@ -413,7 +413,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [notes/opus-golem-charge-pursuit_2026-11-01.md](../notes/opus-golem-charge-pursuit_2026-11-01.md) | Golem_UpdateChargePursuit (080CCD7C): matched in ordinary C | #matching #golem #pre #stack-slots #gcse #integrate #cross-jump #reload | 4 |
 | [notes/opus-golem-displacement-recovery_2026-11-01.md](../notes/opus-golem-displacement-recovery_2026-11-01.md) | Golem_ResumeBehaviorAfterDisplacement (080C8774): matched in ordinary C | #matching #golem #random-table #reg-equiv #pre #stack-slots #gcse | 4 |
 | [notes/opus-health-restore-burst_2026-11-01.md](../notes/opus-health-restore-burst_2026-11-01.md) | HealthRestoreEffect_StartParticleBurst (08234868): matched (2026-11-01) | #matching #health-restore #random-table #compiler #loop #local-alloc #reload | 10 |
-| [notes/opus-inventory-grids_2026-11-01.md](../notes/opus-inventory-grids_2026-11-01.md) | SceneInventory_Populate{Equipment,Item,Consumable}Grid: all three grids matched pin-free | #loop-reduction #goto #reload-rotation #inventory #spilled-locals #giv #incremented-index #live-length | 12 |
+| [notes/opus-inventory-grids_2026-11-01.md](../notes/opus-inventory-grids_2026-11-01.md) | SceneInventory_Populate{Equipment,Item,Consumable}Grid: all three grids matched pin-free | #loop-reduction #goto #reload-rotation #inventory #spilled-locals #giv #incremented-index #live-length | 13 |
 | [notes/opus-link-blend-palette_2026-11-01.md](../notes/opus-link-blend-palette_2026-11-01.md) | LinkPlayer_BlendPalette (08239848) and its Player twin sub_0813C9B4: matched without pins | #matching #twin #depin #palette #himode-narrowing #reload | 3 |
 | [notes/opus-nidhoggr-init-parts_2026-10-31.md](../notes/opus-nidhoggr-init-parts_2026-10-31.md) | Nidhoggr_InitParts (081940F8): holdout | #matching #nidhoggr #compiler #cse #combine #local-alloc #loop #scope-gap | 7 |
 | [notes/opus-orbit-effect-manager_2026-10-31.md](../notes/opus-orbit-effect-manager_2026-10-31.md) | OrbitEffect_UpdateManager (081FE2C4): exact match | #matching #orbit-effect #compiler #loop #giv #gcse #pre #reload | 7 |
@@ -433,7 +433,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [notes/parameterized-motion-pool_2026-10-14.md](../notes/parameterized-motion-pool_2026-10-14.md) | Parameterized motion pool, 080454C0–08045A20 |  | 5 |
 | [notes/phase3-dp-bosses_2026-11-13.md](../notes/phase3-dp-bosses_2026-11-13.md) | Bosses, Player and Engine core phase 3 results | #matching #phase3 #bosses #player #tooling | 4 |
 | [notes/phase3-dp-field-b_2026-11-13.md](../notes/phase3-dp-field-b_2026-11-13.md) | Field objects and hazards: dp-field-b run | #phase3 #actors #particles #animation #tools | 4 |
-| [notes/phase3-holdouts.md](../notes/phase3-holdouts.md) | Phase 3 holdouts | #matching #phase3 #holdouts | 368 |
+| [notes/phase3-holdouts.md](../notes/phase3-holdouts.md) | Phase 3 holdouts | #matching #phase3 #holdouts | 370 |
 | [notes/pilot-haiku.md](../notes/pilot-haiku.md) | pilot-haiku notes |  | 1 |
 | [notes/pilot-sonnet.md](../notes/pilot-sonnet.md) | pilot-sonnet.md |  | 0 |
 | [notes/player-clone-fill_2026-11-13.md](../notes/player-clone-fill_2026-11-13.md) | Player clone fill-local cleanup | #matching #actors #animation | 2 |
@@ -496,7 +496,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [notes/round14-pool-cursor_2026-11-16.md](../notes/round14-pool-cursor_2026-11-16.md) | Round 14 checkpoint 4: indexed pool callbacks |  | 7 |
 | [notes/round14-proved-zero-expansion-audit.md](../notes/round14-proved-zero-expansion-audit.md) | Round 14: proved-zero reports from compiler expansion intermediates | #matching #tooling #compiler #concessions | 9 |
 | [notes/round14-random-draw-operation.md](../notes/round14-random-draw-operation.md) | Round 14: shared random-table draw operation | #round14 #matching #once-loop #random-table | 4 |
-| [notes/round14-scoped-constant-review.md](../notes/round14-scoped-constant-review.md) | Round 14: independent block-local constants | #round14 #concessions #matching #cleanup | 3 |
+| [notes/round14-scoped-constant-review.md](../notes/round14-scoped-constant-review.md) | Round 14: independent block-local constants | #round14 #concessions #matching #cleanup | 4 |
 | [notes/round14-state-union-review_2026-11-16.md](../notes/round14-state-union-review_2026-11-16.md) | Round 14: shared state operations and ordinary union alternatives | #round14 #matching #concessions #object-model #cleanup | 4 |
 | [notes/round14-statement-expression-review.md](../notes/round14-statement-expression-review.md) | Round 14: remaining statement expressions | #matching #cleanup #round14 #compiler | 8 |
 | [notes/round14-structural-followup_2026-11-16.md](../notes/round14-structural-followup_2026-11-16.md) | Round 14: structural follow-up | #round14 #matching #shared-operation #source-evidence #checkpoint4 | 4 |
@@ -619,7 +619,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [notes/scene_actor_contact_candidates.md](../notes/scene_actor_contact_candidates.md) | Scene actor contact candidates | #matching #scene-actors | 1 |
 | [notes/scene_body_owner_validation_2026-10-30.md](../notes/scene_body_owner_validation_2026-10-30.md) | SceneBody owner validation | #matching #compiler #structs #ram | 4 |
 | [notes/scene_panel_control_and_lifecycle.md](../notes/scene_panel_control_and_lifecycle.md) | Scene panel control and lifecycle unit | #scene #panel #matching #types | 5 |
-| [notes/script-entry-points_2026-10-16.md](../notes/script-entry-points_2026-10-16.md) | Script entry points, batches 1-9 (2026-10-16) | #scripts #text #actors #tooling | 23 |
+| [notes/script-entry-points_2026-10-16.md](../notes/script-entry-points_2026-10-16.md) | Script entry points, batches 1-9 (2026-10-16) | #scripts #text #actors #tooling | 24 |
 | [notes/script-keyframe-pool_2026-10-14.md](../notes/script-keyframe-pool_2026-10-14.md) | Script keyframe pool | *#scripts* | 2 |
 | [notes/script-selector-display_2026-10-14.md](../notes/script-selector-display_2026-10-14.md) | Script selector and shared display animation | *#scripts #animation* | 7 |
 | [notes/script-utility_2026-10-14.md](../notes/script-utility_2026-10-14.md) | Script utility commands and reference ABI | *#scripts #inventory* | 3 |

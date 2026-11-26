@@ -204,9 +204,9 @@ addr,name,size,kind,decl,header,confidence,notes
 02000550,gPlayerBackgroundState,2,object,extern u16 gPlayerBackgroundState;,include/engine/shared/ram.h,low,provisional: shared background/player state halfword
 02000554,gPlayerAbilityLatched,2,object,extern u16 gPlayerAbilityLatched;,include/engine/shared/ram.h,low,provisional: ability request latch; ROM reader loads an unsigned halfword
 02000558,gForceDirectionMode,2,object,extern u16 gForceDirectionMode;,include/engine/shared/ram.h,low,
-02000560,gPlayerSlotStatus,10,object,extern u32 gPlayerSlotStatus[4];,include/engine/shared/player.h,high,Four words cleared at 08158C14. Player creation publishes status by slot and targeting tests bit 3.
+02000560,gPlayerSlotStatus,10,object,extern u32 gPlayerSlotStatus[4];,include/player/player.h,high,Four words cleared at 08158C14. Player creation publishes status by slot and targeting tests bit 3.
 02000570,gPlayerSolarActionPending,2,object,extern u16 gPlayerSolarActionPending;,include/engine/shared/ram.h,low,provisional: solar action pending flag; separate from four slot words
-02000580,gPlayers,10,object,extern struct Player *gPlayers[4];,include/engine/shared/player.h,low,the four player actors (slot 0 is the local player)
+02000580,gPlayers,10,object,extern struct Player *gPlayers[4];,include/player/player.h,low,the four player actors (slot 0 is the local player)
 02000590,gPlayerEffectPendingCount,2,object,extern u16 gPlayerEffectPendingCount;,include/engine/shared/ram.h,low,provisional: pending player effect count; separate from actor pointers
 02000594,gPlayerNotificationPending,2,object,extern u16 gPlayerNotificationPending;,include/engine/shared/ram.h,low,
 02000598,gSceneLinkList,4,object,extern struct MotionTargets *gSceneLinkList;,include/engine/shared/ram.h,low,

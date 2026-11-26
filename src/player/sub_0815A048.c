@@ -1,6 +1,6 @@
 #include "engine/shared/global.h"
 #include "engine/shared/ram.h"
-#include "engine/shared/player.h"
+#include "player/player.h"
 void Player_AddControlFlags(void *, u32);
 void Sound_PlaySong(u32);
 // confidence=low: forced variant clears movement state before starting or refreshing stun.

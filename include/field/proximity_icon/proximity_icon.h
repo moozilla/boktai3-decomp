@@ -2,7 +2,7 @@
 #define GUARD_PROXIMITY_ICON_H
 #include "effects/five_entry_projected_display/projected_display.h"
 #include "field/scene_objects/scene_object.h"
-#include "engine/shared/player.h"
+#include "player/player.h"
 struct ProximityIcon {
     struct Task task;
     u16 type, radius;

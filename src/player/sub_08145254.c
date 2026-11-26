@@ -1,6 +1,6 @@
 #include "engine/shared/global.h"
-#include "engine/shared/player.h"
-#include "engine/shared/player_slot_status.h"
+#include "player/player.h"
+#include "player/player_slot_status.h"
 #include "field/scene_script_object/orbit_motion.h"
 
 // confidence=low: interpolates from the saved origin to a scripted endpoint.

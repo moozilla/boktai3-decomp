@@ -2,7 +2,7 @@
 #include "engine/shared/scene_actor_status.h"
 #include "engine/shared/sprite_effect_controller.h"
 #include "system/clock_and_sun_schedule/sun_clock.h"
-#include "engine/shared/player_slot_status.h"
+#include "player/player_slot_status.h"
 
 static inline void CollisionController_SetManager(struct CollisionManager *manager)
 {

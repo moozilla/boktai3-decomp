@@ -2,7 +2,7 @@
 #define GUARD_SCENE_ACTOR_CHASE_SHARED_H
 
 #include "engine/shared/scene_actor_chase_types.h"
-#include "engine/shared/player.h"
+#include "player/player.h"
 #include "engine/shared/engine.h"
 #include "engine/shared/engine_globals.h"
 #include "engine/shared/ram.h"
