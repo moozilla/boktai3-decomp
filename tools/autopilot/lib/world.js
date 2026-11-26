@@ -787,7 +787,13 @@ exports.fight = function* (opts = {}) {
       const charge = yield* exports.chargeEnergy(frame.cost, { stopIf: () => living().some((e) => distance(e) < 512) });
       if (charge.done) continue;
     }
-    if (!triedOtherWeapon.has(target.addr) && exports.bags().frames.length &&
+    if (target.barrier && weapon.gun && !pr.triedSword) {
+      pr.triedSword = true;
+      const equip = yield* exports.quickChange({ gun: false });
+      if (opts.trace) opts.trace({ equip, target: target.addr });
+      if (equip.done) continue;
+    }
+    if (!target.barrier && !triedOtherWeapon.has(target.addr) && exports.bags().frames.length &&
         ((frame && weapon.energy < frame.cost) || steps - pr.since >= 8)) {
       triedOtherWeapon.add(target.addr);
       const equip = yield* exports.quickChange({ gun: !weapon.gun });
@@ -797,6 +803,7 @@ exports.fight = function* (opts = {}) {
     const tactics = DIRS8.map((k) => [[k, 12]]);
     if (weapon.gun) tactics.push(...exports.gunTactics(tk));
     else tactics.push([['b', 2], [0, 10]], ...(tk ? [[[tk, 6], ['b', 2], [0, 4]]] : []));
+    if (target.barrier && tk && !weapon.gun) tactics.push([[tk, 4], [tk + '+b', 4], [0, 16]]);
     const wait = exports.combatWait(target);
     if (target.boss || wait) tactics.push([[0, wait || 18]]);
     const root = S.snapshot(), hp0 = hpSum(), life0 = life();
@@ -808,8 +815,9 @@ exports.fight = function* (opts = {}) {
       const mid = S.snapshot();
       yield g.press(0, opts.look ?? (target.boss ? 60 : weapon.gun ? 40 : 20));
       if (exports.where().scene !== scene) continue;
-      const dealt = hp0 - hpSum(), lost = life0 - life();
       const e = living().find((actor) => actor.addr === target.addr), dist = e ? distance(e) : 0;
+      const dealt = target.barrier ? 20 * (target.health - (e?.health ?? 0)) : hp0 - hpSum();
+      const lost = life0 - life();
       const spent = Math.max(0, weapon.energy - exports.weapon().energy);
       const score = dealt - (opts.lifeCost ?? 3) * lost - spent / 8 - dist / 400 - (life() > 0 ? 0 : 10000);
       if (!best || score > best.score) best = { score, t, mid };
