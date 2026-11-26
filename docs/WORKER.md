@@ -303,7 +303,9 @@ proposals. Distinct ROM functions that load an offset vote on its width and exte
 used by the most copies breaks ties, and the name comes from the most specific copy. The header
 marks uncertain choices, checks the total size, and leaves unnamed bytes as padding. Use
 `--name TAG` or `--header include/PATH.h` to choose another destination, or
-`--use-shared 'struct TAG'` to adopt a related type listed in the report.
+`--use-shared 'struct TAG'` to adopt a related type listed in the report. The merger
+remeasures that header and its included definitions with agbcc before planning a rewrite.
+Rescan if it reports layout drift.
 
 The generated header can retain byte-aligned bitfields that occupy whole bytes. The compiler
 probe checks each emitted bitfield's position and width. Sub-byte fields need an allocation-group

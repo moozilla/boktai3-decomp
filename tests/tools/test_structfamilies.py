@@ -5,6 +5,7 @@ import sys
 import subprocess
 import tempfile
 import unittest
+from types import SimpleNamespace
 from unittest.mock import patch
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -159,6 +160,32 @@ void F(struct Owner *p, int n) {
 
 @unittest.skipUnless(Path(lm.AGBCC).is_file(), "agbcc required for layout probes")
 class CompilerTests(unittest.TestCase):
+    def test_shared_header_rejects_same_size_layout_drift_from_an_include(self):
+        path = "include/shared.h"
+        key = f"{path}:struct Shared"
+        source = '#include "entry.h"\nstruct Shared { struct Entry entry; };\n'
+        with tempfile.TemporaryDirectory(dir=ROOT / "build") as tmp:
+            root = Path(tmp)
+            (root / "include").mkdir()
+            (root / "build").mkdir()
+            (root / "include/global.h").write_text(TYPES)
+            (root / path).write_text(source)
+            entry = root / "include/entry.h"
+            entry.write_text("struct Entry { u16 phase; u16 target; };\n")
+            with patch.object(families, "ROOT", root), patch.object(lm, "ROOT", root):
+                scan = families.scan_file(path, source)
+                catalog = {"files": {path: scan["digest"]}, "records": scan["records"]}
+                family = {"shared": [(key, "equals", "fixture", 2)]}
+                args = SimpleNamespace(use_shared="struct Shared")
+                view = merge.header_choice(catalog, family, [], args)[3]
+                self.assertEqual([(leaf["name"], leaf["off"]) for leaf in view["known"]],
+                                 [("entry.phase", 0), ("entry.target", 2)])
+                entry.write_text("struct Entry { u16 target; u16 phase; };\n")
+                changed = families.scan_file(path, source)["records"][key]
+                self.assertEqual(changed["size"], view["size"])
+                with self.assertRaisesRegex(merge.Holdout, "shared layout changed"):
+                    merge.header_choice(catalog, family, [], args)
+
     def test_layout_rows_report_direct_shapes_before_the_first_named_leaf(self):
         entry = TYPES + "struct Entry { u8 pad0[4]; u16 phase; };\n"
         array = entry + "struct Host { unsigned state; struct Entry linked[2]; };\n"

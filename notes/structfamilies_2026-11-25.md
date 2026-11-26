@@ -73,6 +73,16 @@ Stock agbcc verified the layout. All three units and header dependents matched
 scoped linter. The generated scratch header is
 `build/structmerge_trial/include/recovered/ratatosk_orb_distance_view.h`.
 
+## Shared header remeasurement
+
+`--use-shared` now remeasures the selected type with its current includes. A compiler fixture
+reordered the fields of an included type while preserving the outer header text and size.
+The merger asked for a rescan before proposing source changes.
+
+The scratch trial adopted `struct TerrainTrap` from `include/engine_map.h` in three units
+(0821E040, 0821E190, 08225624). All three matched. The scoped linter reported two warnings
+and zero errors before and after.
+
 ## Scan cost
 
 The argument prefilter reduced scan inputs from 4,554 to 3,584. A two-header test uses one

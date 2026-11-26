@@ -380,6 +380,12 @@ def path_under(path, directory, suffix):
     return path
 
 
+def shared_layout(view):
+    members = [(m.get("name"), m.get("off"), m.get("base"), m.get("width"), m.get("signed"), type_key(m))
+               for m in view["members"]]
+    return view["kind"], view["size"], view["align"], members, view["leaves"], view["containers"]
+
+
 def header_choice(catalog, family, views, args):
     existing = catalog["records"]
     if args.use_shared:
@@ -387,11 +393,21 @@ def header_choice(catalog, family, views, args):
                 and args.use_shared in {v["spell"], key}]
         if len(keys) != 1 or keys[0] not in {row[0] for row in family["shared"]}:
             raise Holdout("--use-shared needs a unique related shared spelling or catalog key")
-        view = existing[keys[0]]
+        key = keys[0]
+        view = existing[key]
         header = path_under(Path(view["file"]), "include", ".h")
-        if families.digest(header.read_bytes()) != catalog["files"][str(header)]:
+        content = (families.ROOT / header).read_bytes()
+        if families.digest(content) != catalog["files"][str(header)]:
             raise Holdout(f"stale catalog for {header}; rescan the tree")
-        return header, view["spell"], None, view, [], []
+        result = families.scan_file(str(header), content.decode(errors="replace"))
+        fresh = result["records"].get(key)
+        if not fresh:
+            detail = result.get("error", f"no measured definition for {view['spell']}")
+            raise Holdout(f"cannot remeasure {header}: {detail}")
+        if shared_layout(view) != shared_layout(fresh):
+            raise Holdout(f"shared layout changed for {view['spell']} in {header}; rescan the tree")
+        fresh["known"] = families.inhabited(fresh)
+        return header, view["spell"], None, fresh, [], []
 
     used_tags = {families.short(v) for v in existing.values() if v["file"].startswith("include/")}
     default_name = family["name"] if family["name"] not in used_tags else family["name"] + "Recovered"
