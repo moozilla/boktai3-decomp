@@ -1,17 +1,14 @@
 #include "global.h"
 #include "engine/engine_globals.h"
 #include "engine/ram.h"
-
-struct DragonPuppyPosition {
-    s16 x, y, z, unk_06;
-};
+#include "scene/collision/contact_position.h"
 
 struct DragonPuppy {
     u8 unk_00[0x18];
     s32 timer;
-    struct DragonPuppyPosition position;
+    struct ContactPosition position;
     u8 unk_24[0x1c];
-    struct DragonPuppyPosition displayPosition;
+    struct ContactPosition displayPosition;
     u8 unk_48[0xc0];
     void (*update)(void);
     u8 animation[0x1a];
