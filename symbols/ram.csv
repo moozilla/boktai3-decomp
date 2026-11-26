@@ -55,7 +55,7 @@ addr,name,size,kind,decl,header,confidence,notes
 0200010C,gAreaEffectManager,4,object,extern struct AreaEffectManager *gAreaEffectManager;,include/scene/areas/area_effect.h,low,
 02000110,gRepeatedEffectManager,4,object,extern struct RepeatedEffectManager *gRepeatedEffectManager;,include/effects/scene/repeated_effect.h,low,
 02000114,gDirectionalForce,4,object,extern struct DirectionalForce *gDirectionalForce;,include/objects/hazards/directional_force.h,low,
-02000118,gStackedActor,4,object,extern struct StackedActor *gStackedActor;,include/objects/warp_circle/stacked_actor.h,low,
+02000118,gStackedActor,4,object,extern struct StackedActor *gStackedActor;,include/objects/warp_circle/warp_circle.h,low,
 0200011C,gStageIconDisplay,4,object,extern struct StageIconDisplay *gStageIconDisplay;,include/ui/hud/stage_icon_display.h,low,
 02000120,gLevelAdvanceManager,4,object,extern struct LevelAdvanceManager *gLevelAdvanceManager;,include/ui/hud/level_advance_display.h,low,
 02000124,gActorAttachmentManager,4,object,extern struct ActorAttachmentManagerView *gActorAttachmentManager;,include/engine/ram.h,low,actor attachment manager singleton

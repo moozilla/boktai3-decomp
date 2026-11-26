@@ -1,18 +1,18 @@
-#include "objects/warp_circle/stacked_actor.h"
+#include "objects/warp_circle/warp_circle.h"
 #include "engine/input.h"
 #include "engine/engine_globals.h"
 #include "player/player.h"
 extern u32 gUnk_02000560;
-s32 StackedActor_IsPlayerNearby(struct StackedActor *);
+s32 WarpCircle_IsPlayerNearby(struct WarpCircle *);
 void Sound_PlaySong(u32);
 void AnimData_SelectPaletteBank(void *, u32);
-void PlayerCue_WalkTo(u8 *, struct StackedActorPosition *, u32, u32);
-void StackedActor_TickIdle(struct StackedActor *actor)
+void PlayerCue_WalkTo(u8 *, struct WarpCirclePosition *, u32, u32);
+void WarpCircle_TickIdle(struct WarpCircle *actor)
 {
     if (!(gEngineFlags & 0x200) && actor->interactionDelay <= 9)
         actor->interactionDelay++;
     {
-        s32 nearby = StackedActor_IsPlayerNearby(actor);
+        s32 nearby = WarpCircle_IsPlayerNearby(actor);
         if (nearby) {
             if (!actor->interactionEnabled) {
                 u32 mask = 1;
@@ -39,7 +39,7 @@ void StackedActor_TickIdle(struct StackedActor *actor)
                         if (!(player->statusFlags & playerMask) && actor->interactionDelay > 9) {
                             actor->animationPhase = 8;
                             PlayerCue_WalkTo((void *)gPlayers[0], &actor->world, 0, 4);
-                            StackedActor_SetUpdate(actor, StackedActor_BeginPlayerInteraction);
+                            WarpCircle_SetUpdate(actor, WarpCircle_BeginPlayerInteraction);
                         }
                     }
                 }

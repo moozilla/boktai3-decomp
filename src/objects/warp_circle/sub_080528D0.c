@@ -1,16 +1,16 @@
-#include "objects/warp_circle/stacked_actor.h"
+#include "objects/warp_circle/warp_circle.h"
 void Trigger_ConsumePending(void *, u32);
-void StackedActor_RetractToIdle(struct StackedActor *o)
+void WarpCircle_RetractToIdle(struct WarpCircle *o)
 {
     o->sprite.flags &= ~1;
     if (o->sprite.position.y < o->world.y + 22)
         o->sprite.position.y += 2;
     if (o->height != 0) {
         o->height--;
-        StackedActor_UpdateSegments(o);
+        WarpCircle_UpdateSegments(o);
     } else {
         o->shadow.flags &= ~1;
-        StackedActor_SetUpdate(o, StackedActor_TickIdle);
+        WarpCircle_SetUpdate(o, WarpCircle_TickIdle);
         Trigger_ConsumePending(&o->trigger, 1);
     }
 }

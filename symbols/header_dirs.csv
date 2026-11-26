@@ -410,7 +410,7 @@ include/field/scene_volume/actor_spatial_query.h,include/bosses/sabata/sabata_sp
 include/field/scene_volume/scene_volume.h,include/bosses/sabata/sabata_attack_state.h,Pass 4: beside its documented owner,,include/bosses/sabata/scene_volume.h
 include/field/ship_wheel/shipwheel_presentation.h,include/objects/ship_wheel.h,beside its unit; renamed from shipwheel_presentation.h,,
 include/field/stacked_actor/engine_map.h,include/objects/warp_circle/engine_map.h,beside its unit,,
-include/field/stacked_actor/stacked_actor.h,include/objects/warp_circle/stacked_actor.h,beside its unit,,
+include/field/stacked_actor/stacked_actor.h,include/objects/warp_circle/warp_circle.h,beside its unit,,include/objects/warp_circle/stacked_actor.h
 include/field/stored_resource_station/resource_station.h,include/objects/solar_stand/resource_station.h,beside its unit,,
 include/field/sun_orb/sun_orb_effect.h,include/objects/sun_orb/sun_orb_effect.h,beside its unit,,
 include/field/terrain_modifiers/terrain_modifier.h,include/scene/terrain/terrain_modifier.h,beside its unit,,

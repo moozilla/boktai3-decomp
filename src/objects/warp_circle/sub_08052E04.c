@@ -1,18 +1,18 @@
-#include "objects/warp_circle/stacked_actor.h"
-/* StackedActor_RetractSegments: Retracts stacked segments then selects disappearance or idle; preserves the existing provisional source alias */
-void StackedActor_RetractSegments(struct StackedActor *actor)
+#include "objects/warp_circle/warp_circle.h"
+/* WarpCircle_RetractSegments: Retracts stacked segments then selects disappearance or idle; preserves the existing provisional source alias */
+void WarpCircle_RetractSegments(struct WarpCircle *actor)
 {
     actor->sprite.flags &= ~1;
     if (actor->sprite.position.y < actor->world.y + 22)
         actor->sprite.position.y += 2;
     if (actor->height) {
         actor->height--;
-        StackedActor_UpdateSegments(actor);
+        WarpCircle_UpdateSegments(actor);
     } else {
         actor->shadow.flags &= ~1;
         if (actor->removeAfterUse)
-            StackedActor_SetUpdate(actor, StackedActor_Disappear);
+            WarpCircle_SetUpdate(actor, WarpCircle_Disappear);
         else
-            StackedActor_SetUpdate(actor, StackedActor_TickIdle);
+            WarpCircle_SetUpdate(actor, WarpCircle_TickIdle);
     }
 }

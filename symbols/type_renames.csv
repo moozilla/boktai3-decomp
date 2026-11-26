@@ -375,3 +375,13 @@ FrostEmitter,SabataFrost,identifier,,Reviewed in-game owner,src/effects/particle
 FrostEmitterStatus,SabataFrostStatus,identifier,,Reviewed in-game owner,src/effects/particles/sabata_frost.c
 FrostEmitter,SabataFrost,identifier,,Reviewed in-game owner,include/effects/particles/sabata_frost.h
 FrostEmitterStatus,SabataFrostStatus,identifier,,Reviewed in-game owner,include/effects/particles/sabata_frost.h
+StackedActor,WarpCircle,identifier,,Reviewed in-game owner,src/objects/warp_circle/
+StackedActorParticle,WarpCircleParticle,identifier,,Reviewed in-game owner,src/objects/warp_circle/
+StackedActorPosition,WarpCirclePosition,identifier,,Reviewed in-game owner,src/objects/warp_circle/
+StackedActorSprite,WarpCircleSprite,identifier,,Reviewed in-game owner,src/objects/warp_circle/
+StackedActorSprite_SetFrame,WarpCircleSprite_SetFrame,identifier,,Reviewed in-game owner,src/objects/warp_circle/
+StackedActorTetherView,WarpCircleTetherView,identifier,,Reviewed in-game owner,src/objects/warp_circle/
+StackedActor,WarpCircle,identifier,,Reviewed in-game owner,include/objects/warp_circle/warp_circle.h
+StackedActorParticle,WarpCircleParticle,identifier,,Reviewed in-game owner,include/objects/warp_circle/warp_circle.h
+StackedActorPosition,WarpCirclePosition,identifier,,Reviewed in-game owner,include/objects/warp_circle/warp_circle.h
+StackedActorSprite,WarpCircleSprite,identifier,,Reviewed in-game owner,include/objects/warp_circle/warp_circle.h

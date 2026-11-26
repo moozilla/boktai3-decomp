@@ -1,11 +1,11 @@
-#include "objects/warp_circle/stacked_actor.h"
+#include "objects/warp_circle/warp_circle.h"
 struct ScriptParticleArgs {
     u32 count : 16;
     u32 pad : 16;
     u32 *values;
 };
 s32 Script_Call(u32, struct ScriptParticleArgs *);
-void StackedActor_EmitScriptParticles(struct StackedActor *actor)
+void WarpCircle_EmitScriptParticles(struct WarpCircle *actor)
 {
     u32 next_2;
     u32 frame = actor->frame;
@@ -14,7 +14,7 @@ void StackedActor_EmitScriptParticles(struct StackedActor *actor)
         u32 mask = 3;
         mask &= frame;
         if (!mask) {
-            StackedActor_InitFallingParticle(&actor->particles[shifted >> 18], &actor->world);
+            WarpCircle_InitFallingParticle(&actor->particles[shifted >> 18], &actor->world);
         }
     }
     {

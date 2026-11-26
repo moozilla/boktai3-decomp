@@ -24,7 +24,7 @@ key,callback,name
 09F8,081DF06D,DateMenu_SetParametersFromScript
 0AC7,080ACBA9,Centipede_Create
 0AD8,08004195,CentipedeOverlay_Create
-0B49,080537B5,StackedActor_RequestRetraction
+0B49,080537B5,WarpCircle_RequestRetraction
 0B50,0804D5CD,TetherActor_CreateFromScript
 0BCE,08103EBD,MovingPlatformActor_ClearFlag1000FromScript
 0BFD,0816B8D9,GameState_ClearAreaFlagFromScript
@@ -482,7 +482,7 @@ A7CE,081D53A1,Script_ConsumeOptionalKeywordValue
 A801,08226CD5,Camera_SetScreenOffsetFromScript
 A864,081C1E01,DarkGenerator_BeginInteraction
 A8CB,08121269,SabataRider_CreateFromScript
-A8F1,0805376D,StackedActor_CreateFromScript
+A8F1,0805376D,WarpCircle_CreateFromScript
 A92E,0822E011,Inventory_ResetEquipmentAssignments
 A995,0816B835,GameState_ClearAreaFlagsFromScript
 A99F,081E4561,TutorialOtenko_BeginAnimationPhaseOne

@@ -262,7 +262,7 @@ src/field/scene_volume,src/bosses/sabata,"Sabata scene volumes (0817A900 and 081
 src/field/ship_wheel,src/objects/ship_wheel.c,"ship wheel that slides open, plus scripted falling and movement sequences"
 src/field/solar_bomb,src/objects/solar_bomb,solar bomb
 src/field/sprite_drop,src/objects/items/sprite_drop,dropped sprites
-src/field/stacked_actor,src/objects/warp_circle,"the Warp Circle (ワープ魔方陣, StackedActor_CreateFromScript)"
+src/field/stacked_actor,src/objects/warp_circle,"the Warp Circle (ワープ魔方陣, WarpCircle_CreateFromScript)"
 src/field/stored_resource_station,src/objects/solar_stand,"the Solar Stand (太陽スタンド, ResourceStation_CreateFromScript)"
 src/field/sun_orb,src/objects/sun_orb,sun orbs
 src/field/terrain_edge_markers,src/scene/terrain/edge_marker,terrain edge markers

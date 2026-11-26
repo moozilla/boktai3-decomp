@@ -1,7 +1,7 @@
-#include "objects/warp_circle/stacked_actor.h"
+#include "objects/warp_circle/warp_circle.h"
 void AnimData_SelectPaletteBank(void *, u32);
-void Task_Kill(struct StackedActor *);
-void StackedActor_Disappear(struct StackedActor *actor)
+void Task_Kill(struct WarpCircle *);
+void WarpCircle_Disappear(struct WarpCircle *actor)
 {
     if (actor->lift > 2) {
         actor->lift -= 2;

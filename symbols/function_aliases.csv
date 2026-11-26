@@ -55,7 +55,7 @@ addr,alias,prior_alias,mode
 0804E1E0,AreaEffect_SetModeFromScript,,
 0804F6C4,RepeatedEffect_ResetManager,,
 080511EC,DirectionalForce_SetThreshold,,
-08052E04,StackedActor_RetractSegments,,
+08052E04,WarpCircle_RetractSegments,,
 08058168,PileDriver_SetChannelTwo,,
 08058184,PileDriver_SetChannelFive,,
 0805822C,PileDriver_BeginReverseSequence,,

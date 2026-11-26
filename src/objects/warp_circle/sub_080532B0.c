@@ -1,4 +1,4 @@
-#include "objects/warp_circle/stacked_actor.h"
+#include "objects/warp_circle/warp_circle.h"
 #include "engine/engine_globals.h"
 #include "objects/warp_circle/engine_map.h"
 #include "player/player.h"
@@ -8,22 +8,22 @@ u8 *TerrainModifiers_FindCellOverride(u32, u32);
 void AnimData_Load(void *, u32);
 void Sprite_Init(void *, void *, u32);
 void AnimData_SelectPaletteBank(void *, u32);
-void StackedActor_InitParticles(struct StackedActor *);
+void WarpCircle_InitParticles(struct WarpCircle *);
 s32 SceneMessages_RegisterReceiver(void *, s32, s32);
 void Sound_PlaySong(u32);
 void ScriptUtility_SetControlFlag(u32);
-void Player_SetPositionAndSave(u8 *, struct StackedActorPosition *);
+void Player_SetPositionAndSave(u8 *, struct WarpCirclePosition *);
 void PlayerCue_Hide(u8 *);
-void StackedActor_TickDisabled(struct StackedActor *);
-void StackedActor_Appear(struct StackedActor *);
-void StackedActor_WaitForPlayerRelease(struct StackedActor *);
+void WarpCircle_TickDisabled(struct WarpCircle *);
+void WarpCircle_Appear(struct WarpCircle *);
+void WarpCircle_WaitForPlayerRelease(struct WarpCircle *);
 s32 TetherActor_BeginKindFourStateTen(void);
-void TetherActor_SetPosition(struct StackedActorPosition *);
-static inline void StackedActorSprite_SetFrame(struct StackedActorSprite *sprite, u32 frame)
+void TetherActor_SetPosition(struct WarpCirclePosition *);
+static inline void WarpCircleSprite_SetFrame(struct WarpCircleSprite *sprite, u32 frame)
 {
     sprite->frame = frame;
 }
-s32 StackedActor_Initialize(struct StackedActor *actor, s32 tag, s32 unused)
+s32 WarpCircle_Initialize(struct WarpCircle *actor, s32 tag, s32 unused)
 {
     u32 mode;
     s32 i;
@@ -32,7 +32,7 @@ s32 StackedActor_Initialize(struct StackedActor *actor, s32 tag, s32 unused)
         u32 cell;
         u32 height, surface;
         u8 *properties;
-        struct StackedActorPosition *point;
+        struct WarpCirclePosition *point;
         s32 x, z;
         actor->world.x = Script_GetValue();
         actor->world.y = Script_GetValue();
@@ -105,7 +105,7 @@ s32 StackedActor_Initialize(struct StackedActor *actor, s32 tag, s32 unused)
     actor->paletteBase = (actor->baseFrame >> 1) * 3 + 160;
     AnimData_Load(actor->graphics, 0xBA8);
     {
-        struct StackedActorSprite *sprite = &actor->sprite;
+        struct WarpCircleSprite *sprite = &actor->sprite;
         Sprite_Init(sprite, actor->graphics, 0);
         sprite->frame = actor->baseFrame;
     }
@@ -115,7 +115,7 @@ s32 StackedActor_Initialize(struct StackedActor *actor, s32 tag, s32 unused)
     actor->sprite.position = actor->world;
     AnimData_Load(actor->shadowGraphics, 0xBA8);
     {
-        struct StackedActorSprite *shadow = &actor->shadow;
+        struct WarpCircleSprite *shadow = &actor->shadow;
         Sprite_Init(shadow, actor->shadowGraphics, 0);
         shadow->frame = actor->baseFrame;
     }
@@ -128,20 +128,20 @@ s32 StackedActor_Initialize(struct StackedActor *actor, s32 tag, s32 unused)
     do {
         AnimData_Load(actor->segmentGraphics[i], 0xBA8);
         Sprite_Init(&actor->segments[i], actor->segmentGraphics[i], 0);
-        StackedActorSprite_SetFrame(&actor->segments[i], (actor->baseFrame & 1) + 16);
+        WarpCircleSprite_SetFrame(&actor->segments[i], (actor->baseFrame & 1) + 16);
         AnimData_SelectPaletteBank(actor->segmentGraphics[i], actor->paletteBase + 2);
         actor->segments[i].flags |= 0x201;
         actor->segments[i].renderMode = 1;
         actor->segments[i].position = actor->world;
     } while (++i < 3);
-    StackedActor_InitParticles(actor);
+    WarpCircle_InitParticles(actor);
     SceneMessages_RegisterReceiver(actor->trigger, tag, 10);
     if (Script_SeekToKeyword('D')) {
         actor->proximityState = 0;
         actor->animationPhase = 0;
         actor->interactionDelay = 0;
         actor->lift = 0;
-        StackedActor_SetUpdate(actor, StackedActor_TickDisabled);
+        WarpCircle_SetUpdate(actor, WarpCircle_TickDisabled);
     } else {
         s32 active = 0;
         s32 appear;
@@ -161,13 +161,13 @@ s32 StackedActor_Initialize(struct StackedActor *actor, s32 tag, s32 unused)
             AnimData_SelectPaletteBank(graphics, actor->paletteBase + 2);
             actor->shadow.flags |= 1;
             actor->height = 7;
-            StackedActor_UpdateSegments(actor);
+            WarpCircle_UpdateSegments(actor);
             actor->animationPhase = 8;
             actor->proximityState = 1;
             actor->interactionDelay = 10;
             actor->lift = 24;
             actor->removeAfterUse = appear;
-            StackedActor_SetUpdate(actor, StackedActor_WaitForPlayerRelease);
+            WarpCircle_SetUpdate(actor, WarpCircle_WaitForPlayerRelease);
             tether = 0;
             if (Script_SeekToKeyword('w'))
                 tether = Script_GetValue();
@@ -189,9 +189,9 @@ s32 StackedActor_Initialize(struct StackedActor *actor, s32 tag, s32 unused)
                 actor->sprite.scaleY = 1;
                 actor->shadow.scaleX = 1;
                 actor->shadow.scaleY = 1;
-                StackedActor_SetUpdate(actor, StackedActor_Appear);
+                WarpCircle_SetUpdate(actor, WarpCircle_Appear);
             } else
-                StackedActor_SetUpdate(actor, StackedActor_TickIdle);
+                WarpCircle_SetUpdate(actor, WarpCircle_TickIdle);
         }
     }
     gStackedActor = actor;

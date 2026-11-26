@@ -1,7 +1,7 @@
-#include "objects/warp_circle/stacked_actor.h"
+#include "objects/warp_circle/warp_circle.h"
 void AnimData_SelectPaletteBank(void *, u32);
 void Sound_PlaySong(u32);
-void StackedActor_HoldLift(struct StackedActor *o)
+void WarpCircle_HoldLift(struct WarpCircle *o)
 {
     o->lift = 0x18;
     o->animationPhase = 8;

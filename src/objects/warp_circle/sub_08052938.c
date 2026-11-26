@@ -1,6 +1,6 @@
-#include "objects/warp_circle/stacked_actor.h"
+#include "objects/warp_circle/warp_circle.h"
 void AnimData_SelectPaletteBank(void *, u32);
-void StackedActor_Appear(struct StackedActor *actor)
+void WarpCircle_Appear(struct WarpCircle *actor)
 {
     u16 *frame = &actor->frame;
     u32 value;
@@ -37,7 +37,7 @@ void StackedActor_Appear(struct StackedActor *actor)
         else {
             AnimData_SelectPaletteBank(actor->graphics, actor->paletteBase);
             actor->sprite.flags |= 1;
-            StackedActor_SetUpdate(actor, StackedActor_TickIdle);
+            WarpCircle_SetUpdate(actor, WarpCircle_TickIdle);
         }
     }
 }

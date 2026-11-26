@@ -116,7 +116,7 @@ Orbit background controller,08050820,080510B8,,,notes/orbit-background_2026-10-1
 Directional force controller,080510B8,080515C0,,,notes/directional-force_2026-10-14.md; threshold state and scripted force task
 Breakable props (tentative),080515C0,08051A3C,,,notes/breakable-prop_2026-10-14.md; contact transition and prop lifecycle
 Proximity particle emitter,08051A3C,08052130,,,notes/proximity-emitter_2026-10-14.md; particle slots and proximity owner
-Stacked actor (tentative),08052130,080537D0,,,include/objects/warp_circle/stacked_actor.h; StackedActor state callbacks and shared task ownership
+Stacked actor (tentative),08052130,080537D0,,,include/objects/warp_circle/warp_circle.h; StackedActor state callbacks and shared task ownership
 Interaction marker,080537D0,08053D8C,,,notes/interaction-marker_2026-10-14.md; proximity marker state and lifecycle
 Saved-position marker,08053D8C,08054294,,,notes/saved-position-marker_2026-10-14.md; stored-position predicate and marker lifecycle
 Hit switch (tentative),08054294,08054B80,,,include/objects/hit_switch.h; HitSwitch state callbacks contact and lifecycle
