@@ -1,13 +1,10 @@
 #include "scene/actor/scene_actor_effects.h"
 #include "scene/motion/scene_actor_route.h"
-struct SceneActorRouteTargetPosition {
-    s16 x, y, z, pad;
-};
 u32 Nav_IsPositionInMesh(void *, const struct ContactPosition *,
-                         struct SceneActorRouteTargetPosition *);
+                         struct ContactPosition *);
 u32 Terrain_ApplyBlocked(void *, const struct ContactPosition *,
-                         struct SceneActorRouteTargetPosition *);
-static inline s32 GetCell(struct SceneActorRouteTargetPosition *p)
+                         struct ContactPosition *);
+static inline s32 GetCell(struct ContactPosition *p)
 {
     s32 x = p->x >> 8, z = p->z >> 8;
     if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
@@ -16,14 +13,13 @@ static inline s32 GetCell(struct SceneActorRouteTargetPosition *p)
 }
 void SceneActorMovement_ResolveRoutePosition(struct ChaseActor *actor)
 {
-    /* This local vector has halfword alignment; aggregate copies are not used. */
-    struct SceneActorRouteTargetPosition target;
+    struct ContactPosition target;
     struct ChaseActor *owner = actor;
     struct ChaseActor *base = owner;
     u8 *control = (u8 *)owner + 0x3D4;
     void *context;
     {
-        struct SceneActorRouteTargetPosition *p = &target;
+        struct ContactPosition *p = &target;
         struct SceneActorRouteCursor *route = (void *)((u8 *)owner + 0x448);
         s32 cell;
         {
@@ -32,7 +28,7 @@ void SceneActorMovement_ResolveRoutePosition(struct ChaseActor *actor)
             p->z = point->z;
         }
         cell = GetCell(p);
-        p->y = SceneActorTerrain_GetHeight(cell, (const struct ContactPosition *)p);
+        p->y = SceneActorTerrain_GetHeight(cell, p);
     }
     target.y = base->base.body.position.y;
     context = *(void **)(control + 0x1FC);
