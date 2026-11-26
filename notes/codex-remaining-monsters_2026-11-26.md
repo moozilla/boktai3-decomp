@@ -142,3 +142,18 @@ the size-checked instance type. The direct clear in Slime's body-hit handler
 still loads the field before the 0xFEFFFFFF mask. The ROM loads the mask
 first. All five changed translation units matched. This pass removes eleven
 printed warnings and twelve weighted constant uses.
+
+## Mimic and Bat native access
+
+Mimic uses the shared terrain transition in its recovery, hit reaction,
+and initialization. The recovery writes the native gate flag. The
+nearby-player scan takes all three coordinates from the same typed position
+pointer. Indexing the slot array directly still changes the callback's
+register allocation and branch layout. A direct leap completion test moves
+the 0x10 mask four instructions later than in the ROM.
+
+Bat uses the terrain transition in its constructor, passes the body to its
+facing update, and reads the native behavior and motion flags during defeat.
+The direct defeat sound test moves the motion mask across the field offset
+setup and gives the mask a different register. The constructor's typed
+alternate drawable step also changes the unit's output.
