@@ -1696,24 +1696,18 @@ void Vorn_ParseField624(struct ChaseActor *actor)
     }
 }
 
-struct VornDeferredScript {
-    u8 unknown0[0x624];
-    u16 script;
-    u8 duration, elapsed;
-};
-
 // confidence=low: context script 624 is invoked once the byte-sized delay expires.
 
 void Vorn_UpdateDelayedScript(struct ChaseActor *actor)
 {
-    struct VornDeferredScript *context = actor->base.context;
-    if (context->script) {
-        context->elapsed++;
-        if (context->elapsed >= context->duration) {
-            Script_Call(context->script, 0);
-            context->script = 0;
-            context->duration = 0;
-            context->elapsed = 0;
+    struct Vorn *context = actor->base.context;
+    if (context->field624) {
+        context->field627++;
+        if (context->field627 >= context->field626) {
+            Script_Call(context->field624, 0);
+            context->field624 = 0;
+            context->field626 = 0;
+            context->field627 = 0;
         }
     }
 }
@@ -1814,18 +1808,11 @@ u8 Vorn_BeginPursuitRoute(struct Vorn *actor, u32 reset)
     return 1;
 }
 
-struct PInitMotionLimits {
-    u8 f[0x6c4];
-    u32 a;
-    u32 b;
-    u32 c;
-};
-
-void Vorn_InitMotionLimits(struct PInitMotionLimits *p)
+void Vorn_InitMotionLimits(struct Vorn *p)
 {
-    p->a = 0;
-    p->b = 0x10000;
-    p->c = 0x90000;
+    p->retreatRequests = 0;
+    p->minimumDistance = 0x10000;
+    p->maximumDistance = 0x90000;
 }
 
 /* This class's own copies of the shared chase inlines it compiles differently. */
@@ -1996,17 +1983,10 @@ struct VornRetreatFlags {
     s16 bits : 16;
 };
 
-struct VornRetreatContext {
-    u8 unknown0[0x6C4];
-    u32 requests, nearDistance, farDistance;
-    u16 timer, unknown6D2;
-    struct VornRetreatFlags flags;
-};
-
-static inline void Vorn_AdjustContextFlags(struct VornRetreatContext *body, u16 set, u32 clear)
+static inline void Vorn_AdjustContextFlags(struct Vorn *body, u16 set, u32 clear)
 {
     u16 bit = set;
-    struct VornRetreatFlags *flags = &body->flags;
+    struct VornRetreatFlags *flags = (void *)&body->flags6D4;
     flags->bits |= bit;
     flags->bits &= ~clear;
 }
@@ -2047,24 +2027,24 @@ static inline u8 Vorn_TryTrackedCell(void *object)
 
 u32 Vorn_SelectRetreatRoute(struct ChaseActor *actor, u32 reset)
 {
-    struct VornRetreatContext *body = actor->base.context;
+    struct Vorn *body = actor->base.context;
     struct SceneActorChaseGroup *group = &actor->group;
     u8 old;
-    if ((!reset) && body->timer)
+    if ((!reset) && body->field6D0)
         return 0;
-    body->timer = 60;
+    body->field6D0 = 60;
     SceneActorChase_ClearActorFlags(actor, 0x10);
     Vorn_AdjustContextFlags(body, 0x10, 0x40);
     SceneActorReaction_ResetResponseState(&group->saved, gUnk_0824E230, 0x486);
-    body->requests++;
-    if (actor->base.tracking.distance < body->nearDistance) {
+    body->retreatRequests++;
+    if (actor->base.tracking.distance < body->minimumDistance) {
         old = actor->base.body.direction;
         actor->base.body.direction = actor->base.tracking.heading + 0x80;
         if (!Vorn_SelectReachableEscapeCell(actor, old))
             return 0;
         SceneActorChase_SetControl(actor, SceneActorControl_OnIdle, 0x10);
         SceneActorChase_SetBehavior(actor, 0x15);
-    } else if (actor->base.tracking.distance > body->farDistance) {
+    } else if (actor->base.tracking.distance > body->maximumDistance) {
         old = actor->base.body.direction;
         {
             u32 random = Vorn_RandomSample();
@@ -3132,7 +3112,7 @@ void Vorn_ParseField69A(struct Vorn *ctx);
 
 void Vorn_ResetRecoveryMode(u8 *p);
 
-void Vorn_InitMotionLimits(struct PInitMotionLimits *p);
+void Vorn_InitMotionLimits(struct Vorn *p);
 
 void Vorn_ParseField688(struct Vorn *ctx);
 
@@ -3175,7 +3155,7 @@ s32 Vorn_Init(void *object)
     Vorn_InitTimedAction(actor);
     Vorn_ParseField69A(actor);
     Vorn_ResetRecoveryMode(actor);
-    Vorn_InitMotionLimits(actor);
+    Vorn_InitMotionLimits(vorn);
     Vorn_ParseField688(actor);
     if (MonsterInit_GetDrawableKind(actor) == 0) {
         u8 *heap;
