@@ -93,7 +93,7 @@ static inline void ActorStatus_ResetReaction(struct ChaseActor *actor)
     actor->group.common.gate.flags = 0;
     actor->group.common.gate.counter = 0;
     ActorStatus_ClearMotionFlags(actor, 0x380);
-    ActorStatus_ClearTrackingFlags((void *)&actor->base.tracking.target, 0x18);
+    ActorStatus_ClearTrackingFlags(&actor->base.tracking, 0x18);
     ActorStatus_ResetInteraction(actor);
     ActorStatus_ClearMotionFlags(actor, 0x400);
     ActorStatus_ResetSelection(actor);
@@ -255,14 +255,14 @@ static inline void ActorStatus_ReactionFlags(void *object)
 
         if (ActorStatus_MotionFlags(actor, 0x2000)) {
             ActorStatus_ResetReaction(object);
-            ActorStatus_ClearTrackingFlags((void *)&actor->base.tracking.target, 8);
+            ActorStatus_ClearTrackingFlags(&actor->base.tracking, 8);
             ActorStatus_ClearMotionFlags(actor, 0x500);
             ActorStatus_SetPendingBits(actor, 0x400);
             actor->base.field2C2 = 0x40;
             SceneActorChase_ClearBits(&actor->base.reactionFlags, 0x980);
         } else if (ActorStatus_MotionFlags(actor, 4)) {
             ActorStatus_ResetReaction(object);
-            ActorStatus_ClearTrackingFlags((void *)&actor->base.tracking.target, 8);
+            ActorStatus_ClearTrackingFlags(&actor->base.tracking, 8);
             ActorStatus_ClearMotionFlags(actor, 0x2500);
             ActorStatus_SetPendingBits(actor, 0x400);
             actor->base.field2C2 = 0x40;
@@ -270,7 +270,7 @@ static inline void ActorStatus_ReactionFlags(void *object)
             ActorStatus_SetWord(&actor->base.behaviorFlags, 0x2000);
         } else if (ActorStatus_MotionFlags(actor, 2)) {
             ActorStatus_ResetReaction(object);
-            ActorStatus_ClearTrackingFlags((void *)&actor->base.tracking.target, 8);
+            ActorStatus_ClearTrackingFlags(&actor->base.tracking, 8);
             ActorStatus_QueueRecovery(actor);
         } else if (ActorStatus_MotionFlags(actor, 0x8000)) {
             ActorStatus_QueueRecovery(actor);
@@ -295,7 +295,7 @@ static inline void ActorStatus_ReactionFlags(void *object)
         if (ActorStatus_MotionFlags(actor, 0x803E)) {
             ActorStatus_ClearMotionFlags(actor, 0x201);
             SceneActorChase_ClearWordFlags(&actor->base.behaviorFlags, 0x4000);
-            ActorStatus_ClearTrackingFlags((void *)&actor->base.tracking.target, 0x10);
+            ActorStatus_ClearTrackingFlags(&actor->base.tracking, 0x10);
             if (!(ActorStatus_MotionFlags(actor, 0x20)))
                 SceneActorChase_ClearWordFlags(&actor->base.behaviorFlags, 0x80);
             SceneActorChase_ClearWordFlags(&actor->base.statusFlags, 0x100004);
