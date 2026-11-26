@@ -146,23 +146,24 @@ static inline u32 RetryDuration(void)
 
 void Vorn_UpdateAnimationRetries(struct ChaseActor *actor)
 {
-    u8 *context = actor->base.context;
+    struct Vorn *context = actor->base.context;
     if (Chase_TakeArrived(actor)) {
         Chase_SetCtl(actor, SceneActor_UpdateDelayedAnimation, 0x24);
-        context[0x696] = 0;
-        context[0x697] = RetryDuration();
-        *(u16 *)(context + 0x694) = 0;
+        context->unknown696 = 0;
+        context->delayedAnimationTimer = RetryDuration();
+        context->delayedAnimationFlags = 0;
     }
     Callback_InvokeActor(actor, actor->base.contactQuery.opaque);
     if (actor->base.stepDone) {
-        u8 *retries = context + 0x696;
+        u8 *retries = &context->unknown696;
         if (*retries) {
             Chase_SetCtl(actor, SceneActor_UpdateDelayedAnimation, 0x24);
             --*retries;
-            context[0x697] = RetryDuration();
-            ++*(u16 *)(context + 0x694);
+            context->delayedAnimationTimer = RetryDuration();
+            ++context->delayedAnimationFlags;
         } else {
-            u16 *flags = (void *)((u8 *)actor->base.context + 0x6D4);
+            struct Vorn *current = actor->base.context;
+            u16 *flags = &current->flags6D4;
             s32 mask = ~3;
             *flags &= mask;
             Vorn_BeginResponsePursuit(actor, 1, gUnk_0824E224, 0x41);
@@ -1318,13 +1319,9 @@ static inline u8 NeedsResponse(struct Vorn *p)
 
 void Vorn_BeginTargetPursuit(struct Vorn *actor)
 {
-    u8 *group;
+    struct SceneActorChaseGroup *group;
     struct ContactPosition *dest;
-    struct RouteLink {
-        u8 pad[8];
-        u16 *point;
-    };
-    struct RouteLink *point;
+    struct SceneActorRegistryRoute *point;
     Chase_ClearBits((void *)((u8 *)actor->chase.base.context + 0x6d4), 8);
     if (NeedsResponse(actor->chase.base.context)) {
         Vorn_BeginResponsePursuit(actor, 1, gUnk_0824E230, 0x29a);
@@ -1332,7 +1329,7 @@ void Vorn_BeginTargetPursuit(struct Vorn *actor)
     }
     if (SceneActorContact_MotionFlags(&actor->chase, 0x100))
         return;
-    group = (u8 *)&actor->chase.group.common;
+    group = &actor->chase.group;
     if (TestContext_BeginTargetPursuit(actor->chase.base.context, 0x1d)) {
         actor->chase.base.field2C2 = 32;
         if (TestContext_BeginTargetPursuit(actor->chase.base.context, 4) &&
@@ -1362,7 +1359,7 @@ void Vorn_BeginTargetPursuit(struct Vorn *actor)
     }
     actor->chase.base.field2C2 = 32;
     {
-        struct SceneActorReactionCommand *command = (void *)(group + 0x8c);
+        struct SceneActorReactionCommand *command = (void *)((u8 *)group + 0x8c);
         void *payload = actor->chase.base.onAlternateEntry;
         u32 kind = 7;
         command->duration = 60;
@@ -1371,15 +1368,15 @@ void Vorn_BeginTargetPursuit(struct Vorn *actor)
         command->second = 0;
         command->kind = kind;
     }
-    dest = *(struct ContactPosition **)(group + 0x200);
-    point = (struct RouteLink *)(group + 0x74);
-    dest->x = point->point[0];
-    dest->z = point->point[1];
+    dest = group->destination;
+    point = &group->homeRoute;
+    dest->x = point->point->x;
+    dest->z = point->point->z;
     dest->y = CellHeight(dest, Terrain_GetCellIndex(dest));
-    (*(struct ContactPosition **)(group + 0x200))->pad = 0;
-    if (!TryRoute(actor, *(void **)(group + 0x1fc), &actor->chase.base.body.position,
+    group->destination->pad = 0;
+    if (!TryRoute(actor, group->route, &actor->chase.base.body.position,
                   &actor->chase.base.tracking.target->position))
-        Callback_InvokeActor(actor, *(void **)(group + 0x224));
+        Callback_InvokeActor(actor, group->fallback);
 }
 
 // Tentative scene-actor family names; behavior inferred from static accesses.
@@ -1444,7 +1441,10 @@ void SceneActor_ResetContextAnimation(struct Vorn *p)
     SceneActorReaction_ResetResponseState(&p->chase.group.saved.control, gUnk_0824E230, 0x2F8);
     SceneActorMovement_ResolveRoutePosition(p);
     SceneActorAnimation_SelectDirectionalEntry(p, 0);
-    Anim_Step((u8 *)p->chase.base.drawable + 0x20, p->chase.base.drawable);
+    {
+        struct SceneActorAnimationTileDrawable *drawable = p->chase.base.drawable;
+        Anim_Step(&drawable->tile, &drawable->resource);
+    }
 }
 
 void Vorn_OnAnimationCleanup(void)
@@ -1703,7 +1703,7 @@ u8 Vorn_BeginPursuitRoute(struct Vorn *actor, u32 reset)
         Vorn_SetResponseFlags(flags, 4);
         flags->bits &= ~2;
     }
-    *((u16 *)(((u8 *)context) + 0x6ec)) = 60;
+    context->field6EC = 60;
     if (reset == 1)
         StartRoute(&actor->chase.base.body.id, group + 0x74, group);
     Vorn_SelectRouteAwayFromTarget(&actor->chase);
@@ -1722,15 +1722,12 @@ u8 Vorn_BeginPursuitRoute(struct Vorn *actor, u32 reset)
         *field = bit;
     }
     SetFlags(0x80, &actor->chase.base.motionFlags);
+    actor->chase.group.common.gate.counter = actor->chase.group.common.gate.duration;
     {
-        u32 timer = actor->chase.group.common.gate.duration;
-        actor->chase.group.common.gate.counter = timer;
-    }
-    {
-        u8 *field = ((u8 *)actor) + 0xdc;
+        struct SceneActorChaseTracking *tracking = &actor->chase.base.tracking;
         u32 bit = 8;
-        bit |= field[15];
-        field[15] = bit;
+        bit |= tracking->flags;
+        tracking->flags = bit;
     }
     actor->chase.base.behaviorFlags |= 0x80;
     return 1;
