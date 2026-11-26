@@ -1,0 +1,15 @@
+08031ED8 text-cursor-return
+
+TextState_AdvanceCursor updates the state through r2 and preserves the input r0.
+
+The explicit form changed the ROM bytes. The guarded form passed the unit ROM check.
+
+--- a/src/fn/sub_08031ED8.c
++++ b/src/fn/sub_08031ED8.c
+@@ -19,3 +19,6 @@
+     else
+         p->x += 2;
++#ifdef UBFIX
++    return (int)p; // preserve the inherited GBA return value
++#endif
+ }
