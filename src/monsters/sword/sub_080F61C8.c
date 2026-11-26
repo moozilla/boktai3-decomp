@@ -1,10 +1,9 @@
-#include "global.h"
-void Sword_InitSpinningLunge(u8 *);
-void Callback_InvokeActor(u8 *, void (*)(u8 *));
-static inline u8 Take(u8 *s)
+#include "monsters/sword/sword_task.h"
+void Sword_InitSpinningLunge(struct SwordComponent *);
+static inline u8 Take(struct SwordComponent *s)
 {
     u32 test = 1;
-    u8 *p = s + 0x119;
+    u8 *p = &s->entryFlags;
     u8 value = *p;
     test &= value;
     if (test) {
@@ -13,20 +12,18 @@ static inline u8 Take(u8 *s)
         mask &= value;
         zero = 0;
         *p = mask;
-        s[0x12E] = zero;
+        s->entryReset = zero;
         return 1;
     }
     return 0;
 }
-void Sword_UpdateSpinningLungeAttack(u8 *s)
+void Sword_UpdateSpinningLungeAttack(struct SwordComponent *s)
 {
     if (Take(s)) {
-        void (**p)(u8 *) = (void (**)(u8 *))(s + 0x17c);
-        void (*fn)(u8 *) = Sword_InitSpinningLunge;
-        *p = fn;
+        s->lungeUpdate = Sword_InitSpinningLunge;
     }
     {
-        void (*fn)(u8 *) = *(void (**)(u8 *))(s + 0x17c);
+        void (*fn)(struct SwordComponent *) = s->lungeUpdate;
         if (fn)
             Callback_InvokeActor(s, fn);
     }
