@@ -1,14 +1,8 @@
 #ifndef GUARD_BOSSES_SABATA_SABATA_ACTOR_STATE_H
 #define GUARD_BOSSES_SABATA_SABATA_ACTOR_STATE_H
+#include "engine/video/anim_sprite.h"
 #include "scene/actor/scene_actor_components.h"
 #include "bosses/sabata/converging_particles.h"
-struct SabataActorAnimationResource {
-    u8 id;
-    u8 unknown1[0x1C];
-    u8 eventFlags;
-    u8 unknown1E[2];
-    u8 eventScripts[0x28];
-};
 /* Tentative actor state prefix shared by the adjacent state callbacks. */
 struct SabataActorState {
     u8 unknown0[0x48];
@@ -41,10 +35,8 @@ struct SabataActorState {
     u8 unknown115[0x173];
     u8 bounds[0x1C];
     struct ContactPosition destination;
-    u8 animationData[0x20];
-    struct SabataActorAnimationResource graphics;
-    void *palette;
-    u8 unknown318[0x14];
+    struct AnimSpriteResource animationResource;
+    struct AnimSprite graphics;
     u8 effect[0xFC];
     u8 proximityVolume[0x40];
     s16 height;
