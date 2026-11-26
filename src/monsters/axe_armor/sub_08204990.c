@@ -15,7 +15,8 @@ void AxeArmor_ApplyHitReaction(struct ContactCollider *sourceInput, struct Conta
                                 struct AxeArmor *targetInput)
 {
     struct {
-        struct Vec position, velocity;
+        struct ContactPosition position;
+        struct Vec velocity;
     } frame;
     struct ContactCollider *source = sourceInput;
     struct ContactCollider *hit = input;
@@ -53,7 +54,7 @@ void AxeArmor_ApplyHitReaction(struct ContactCollider *sourceInput, struct Conta
         if (source->reactionFlags & (u16)target->rangeB) {
             s32 i;
             struct Vec *vel = &frame.velocity;
-            struct Vec *pos = &frame.position;
+            struct ContactPosition *pos = &frame.position;
             u32 *index = &gRandomIndex;
             u32 limit = 0x3ff;
             u32 mask = 0x7f;
@@ -64,11 +65,11 @@ void AxeArmor_ApplyHitReaction(struct ContactCollider *sourceInput, struct Conta
                 u32 sample;
                 u32 x;
                 frame.velocity = gUnk_0824FE54;
-                frame.position = *(struct Vec *)&target->sprite.position;
+                frame.position = target->sprite.position;
                 value = (u32)gRandomTable;
                 random = HitSpark_NextIndex(*index, limit);
                 sample = HitSpark_Sample(value, random);
-                x = pos->x - 0x40;
+                x = (u16)pos->x - 0x40;
                 sample &= mask;
                 x += sample;
                 pos->x = x;
@@ -78,7 +79,7 @@ void AxeArmor_ApplyHitReaction(struct ContactCollider *sourceInput, struct Conta
                 *index = random;
                 {
                     u32 last = HitSpark_Sample(value, random);
-                    x = pos->z - 0x40;
+                    x = (u16)pos->z - 0x40;
                     last &= mask;
                     x += last;
                     pos->z = x;
