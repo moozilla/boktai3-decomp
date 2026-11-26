@@ -12,7 +12,7 @@ s32 PileDriverSubject_Update(struct PileDriverSubject *subject)
     {
         u16 *hold = &subject->hold;
         if (*hold) {
-            u32 mode = SCENE_PANEL_GLOBAL->paletteMode;
+            u32 mode = PILE_DRIVER_GLOBAL->paletteMode;
             if (mode) {
                 if (subject->state != 4)
                     *hold = 0;

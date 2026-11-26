@@ -40,7 +40,7 @@ void DarkLoan_EnableAlternateRenderMode(struct DarkLoanScreen *panel)
 {
     s32 i;
     u32 bit = 0x80;
-    /* Advance through the widget run while retaining owner-relative flag access. */
+    /* Advance through the animSprite run while retaining owner-relative flag access. */
     struct DarkLoanScreen *current = panel;
     for (i = 21; i >= 0; i--) {
         current->widgets[DARK_LOAN_BACKGROUND].flags |= bit;
@@ -642,16 +642,16 @@ void DarkLoan_BuildDisplay(struct DarkLoanScreen *panel, s32 alternate)
     secondary = savedSecondary;
     for (i = 0; i < 4; i++) {
         struct ContactPosition *position = &pos;
-        struct AnimSprite *widget = &panel->widgets[DARK_LOAN_BALANCE_DIGITS + i];
-        AnimSprite_InitLinked(widget, secondary, 0x14, flags, 0, 0, 0x3C, position);
+        struct AnimSprite *animSprite = &panel->widgets[DARK_LOAN_BALANCE_DIGITS + i];
+        AnimSprite_InitLinked(animSprite, secondary, 0x14, flags, 0, 0, 0x3C, position);
         pos.x += 8;
     }
     pos.x = -0x38;
     pos.y = 0x38;
     for (i = 0; i < 4; i++) {
         struct ContactPosition *position = &pos;
-        struct AnimSprite *widget = &panel->widgets[DARK_LOAN_ADJUSTMENT_DIGITS + i];
-        AnimSprite_InitLinked(widget, primary, 8, flags, 0, 0, 0x3C, position);
+        struct AnimSprite *animSprite = &panel->widgets[DARK_LOAN_ADJUSTMENT_DIGITS + i];
+        AnimSprite_InitLinked(animSprite, primary, 8, flags, 0, 0, 0x3C, position);
         pos.x += 8;
     }
     AnimSprite_InitLinked(&panel->widgets[DARK_LOAN_LABEL], primary, 0x22, flags, 0, 0, 0x3C, 0);
@@ -667,8 +667,8 @@ void DarkLoan_BuildDisplay(struct DarkLoanScreen *panel, s32 alternate)
     pos.y = 0x48;
     for (i = 0; i < 4; i++) {
         struct ContactPosition *position = &pos;
-        struct AnimSprite *widget = &panel->widgets[DARK_LOAN_AMOUNT_DIGITS + i];
-        AnimSprite_InitLinked(widget, primary, 8, flags, 0, 0, 0x3C, position);
+        struct AnimSprite *animSprite = &panel->widgets[DARK_LOAN_AMOUNT_DIGITS + i];
+        AnimSprite_InitLinked(animSprite, primary, 8, flags, 0, 0, 0x3C, position);
         pos.x += 8;
     }
     AnimData_Load(panel->animation, 0xA47C);

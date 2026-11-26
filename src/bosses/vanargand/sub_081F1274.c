@@ -3,8 +3,8 @@
 #include "effects/palette/palette_set.h"
 #include "engine/math/monster_particle_random.h"
 
-typedef u16 Slot7PaletteBank[16];
-extern Slot7PaletteBank gUnk_03005040[4];
+typedef u16 VanargandHeadPaletteBank[16];
+extern VanargandHeadPaletteBank gUnk_03005040[4];
 void Collider_SetFixedPositionWithYOffset(void *, void *, s32);
 void SpatialIndex_InsertEntry(void *);
 void Anim_SetDurationScale(void *, u32);
@@ -19,10 +19,10 @@ u8 Sprite_BlinkUntilExpired(void *, s32, s32, s32);
 
 #define RESTORE_BACKGROUND_PALETTES(actor, i, writeRow)                                            \
     do {                                                                                           \
-        Slot7PaletteBank *readRow;                                                                 \
+        VanargandHeadPaletteBank *readRow;                                                                 \
         u16 *bg = gBgPaletteBuffer;                                                                \
         u32 bank = 4;                                                                              \
-        writeRow = (Slot7PaletteBank *)(bg + bank * 16);                                           \
+        writeRow = (VanargandHeadPaletteBank *)(bg + bank * 16);                                           \
         readRow = (actor)->savedPalettes;                                                          \
         for (i = 0; i < 4; i++)                                                                    \
             CpuSet(readRow + i, writeRow + i, 16);                                                 \
@@ -81,7 +81,7 @@ void VanargandHead_UpdatePresentation(struct DepartureActor *actor)
     struct DepartureActor *base = actor;
     s32 dx, dz;
     u8 *mode;
-    Slot7PaletteBank *writeRow;
+    VanargandHeadPaletteBank *writeRow;
     u32 hidden;
     s32 i;
     if (actor->invincibilityTimer) {
@@ -150,7 +150,7 @@ void VanargandHead_UpdatePresentation(struct DepartureActor *actor)
                             gUnk_03005040[i], actor->paletteLinks.banks.from[i],
                             actor->paletteLinks.banks.to[i], actor->fadeFrame, actor->fadeShift);
                     if (actor->fadeFrame == (u32)(1 << actor->fadeShift)) {
-                        Slot7PaletteBank *readRow;
+                        VanargandHeadPaletteBank *readRow;
                         writeRow = actor->savedPalettes;
                         readRow = gUnk_03005040;
                         for (i = 0; i < 4; i++) {

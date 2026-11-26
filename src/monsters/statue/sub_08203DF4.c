@@ -7,34 +7,34 @@
 #include "engine/engine_pause.h"
 #include "engine/word_flags.h"
 #include "engine/math/monster_particle_random.h"
-struct EnemyF426Collider {
+struct StatueCollider {
     u8 pad[6];
     u16 flags;
 };
-struct EnemyF426Sprite {
+struct StatueSprite {
     u32 flags;
     u8 pad[12];
     u16 frame;
 };
-struct EnemyF426Position {
+struct StatuePosition {
     u16 x, y, z, w;
 };
-struct EnemyF426EffectPair {
+struct StatueEffectPair {
     s32 lo : 16;
     u32 hi : 16;
 };
-struct EnemyF426Actor {
+struct StatueActor {
     u8 p0[0x18];
     s32 timer;
     u8 p1c[0x24 - 0x1c];
-    struct EnemyF426Sprite spr;
+    struct StatueSprite spr;
     u8 p38[0x40 - 0x38];
-    struct EnemyF426Position pos;
+    struct StatuePosition pos;
     u8 p48[0x50 - 0x48];
     u8 anim[0x5c - 0x50];
     void *ptr5c;
     u8 p60[0x6c - 0x60];
-    struct EnemyF426Collider col;
+    struct StatueCollider col;
     u8 p74[0x78 - 0x74];
     u8 dmgA[8];
     u8 dmgB[0xaf - 0x80];
@@ -79,7 +79,7 @@ void SceneHud_SetTimedState(void *, int, int, int, int, int);
 void ImpactParticleGroup_SpawnBouncing(s32, s32, void *, void *, void *, s32, s32);
 void Statue_UpdateDeath(void);
 
-static inline u32 Statue_StepSequence(struct EnemyF426Sprite *owner,
+static inline u32 Statue_StepSequence(struct StatueSprite *owner,
                                          struct DisplaySequenceState *state)
 {
     const u16 *command;
@@ -150,20 +150,20 @@ static inline u32 Statue_StepSequence(struct EnemyF426Sprite *owner,
     return ended;
 }
 
-u32 Statue_UpdateDamageState(struct EnemyF426Actor *p)
+u32 Statue_UpdateDamageState(struct StatueActor *p)
 {
-    struct EnemyF426Collider *collider;
+    struct StatueCollider *collider;
     if (Engine_PauseBits(0x400) || Flags_MaskedWord(4, &gUnk_02000560))
         return 0;
     Callback_InvokeActor(p, p->fn);
     p->spr.flags &= ~1;
     if (p->dead == 0) {
-        struct EnemyF426Collider *c = &p->col;
+        struct StatueCollider *c = &p->col;
         c->flags &= ~4;
         Collider_SetPosition(c, &p->pos, 0);
         collider = c;
     } else {
-        struct EnemyF426Collider *c = &p->col;
+        struct StatueCollider *c = &p->col;
         c->flags |= 4;
         collider = c;
     }
@@ -178,19 +178,19 @@ u32 Statue_UpdateDamageState(struct EnemyF426Actor *p)
                                        p->hudTime);
             }
             if (p->hp <= 0) {
-                struct EnemyF426EffectVector {
-                    struct EnemyF426EffectPair a;
-                    struct EnemyF426EffectPair b;
+                struct StatueEffectVector {
+                    struct StatueEffectPair a;
+                    struct StatueEffectPair b;
                 } spread;
-                struct EnemyF426EffectVector velocity;
-                struct EnemyF426Position center;
+                struct StatueEffectVector velocity;
+                struct StatuePosition center;
                 const u16 *table;
                 u32 sample;
                 p->dead = 1;
                 if (p->terrainEnabled)
                     TerrainModifiers_UnregisterCell(p->terrain);
                 {
-                    struct EnemyF426Position *cp = &center;
+                    struct StatuePosition *cp = &center;
                     *cp = p->pos;
                     cp->y += 0x12c;
                 }

@@ -3,18 +3,18 @@
 #include "engine/video/display_animation.h"
 #include "engine/video/display_sequence_inline.h"
 #include "engine/engine_globals.h"
-union EnemyD459Sprite {
+union AxeArmorSprite {
     struct DisplaySequenceSprite display;
     struct {
         u8 unknown0[0x1C];
         struct SceneVec position;
     } coordinates;
 };
-struct EnemyD459Actor {
+struct AxeArmorActor {
     u8 unknown0[0x18];
     s32 timer;
     struct SceneVec initialPosition;
-    union EnemyD459Sprite sprite;
+    union AxeArmorSprite sprite;
     u8 graphics[0x18];
     u8 unknown68[0x58];
     u8 body[0x48];
@@ -87,7 +87,7 @@ static inline void AxeArmor_GetFlags(u32 **out, struct DisplaySequenceSprite *sp
 {
     *out = &sprite->flags;
 }
-static inline u32 AxeArmor_StepSequence(u32 *flipFlags, struct EnemyD459Actor *actor,
+static inline u32 AxeArmor_StepSequence(u32 *flipFlags, struct AxeArmorActor *actor,
                                          struct DisplaySequenceSprite *owner,
                                          struct DisplaySequenceState *state)
 {
@@ -164,7 +164,7 @@ inline static u32 Arg1(u32 k_, u8 *p)
     return p + k_;
 }
 
-s32 AxeArmor_InitializeFromScript(struct EnemyD459Actor *p, void *parent)
+s32 AxeArmor_InitializeFromScript(struct AxeArmorActor *p, void *parent)
 {
     struct SpawnOffsets offsets = gUnk_0824FE5C;
     void *resource;

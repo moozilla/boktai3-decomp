@@ -1,5 +1,5 @@
 #include "ui/town/shop_control.h"
-void Shop_SelectActionDestination(struct SceneInventoryControlView *panel)
+void Shop_SelectActionDestination(struct ShopControlView *panel)
 {
     short destination = (u16)panel->destination;
     panel->grid.selection = destination;

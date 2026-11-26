@@ -1,7 +1,7 @@
 #include "ui/town/shop_tail.h"
-void Shop_BeginSpecialTransition(struct SceneInventoryTail *);
-void Shop_BeginAlternateSelection(struct SceneInventoryTail *);
-s32 Shop_TickSaleConfirmation(struct SceneInventoryTail *p)
+void Shop_BeginSpecialTransition(struct ShopTail *);
+void Shop_BeginAlternateSelection(struct ShopTail *);
+s32 Shop_TickSaleConfirmation(struct ShopTail *p)
 {
     s32 result;
     SceneInputPanel_HighlightPrompt(&p->display, p->highlight.colors);

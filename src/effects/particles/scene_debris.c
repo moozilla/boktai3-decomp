@@ -42,7 +42,7 @@ s32 PanelKeyframeSprite_Create(struct SceneDebris *owner, u32 key, u32 index, u3
         s32 position[2];
     } local;
     void *position;
-    struct AnimSprite *widget;
+    struct AnimSprite *sprite;
     u32 spriteFlags;
     u32 frame;
     owner->visual = Heap_Alloc(0x80);
@@ -56,11 +56,11 @@ s32 PanelKeyframeSprite_Create(struct SceneDebris *owner, u32 key, u32 index, u3
     ClearPosition(&local.zero, position);
     ResourceHeader_Relocate(visual, ScriptProc_Start(0xCB05, (u16)key));
     spriteFlags = flags | 0x11;
-    widget = &visual->widget;
+    sprite = &visual->sprite;
     frame = (u16)index;
-    AnimSprite_InitLinked(widget, visual, frame, spriteFlags, (u8)priority, 2, 0x3C, position);
-    Anim_SetKeyframes(widget, visual, frame, 2, 0);
-    Anim_Step(widget, visual);
+    AnimSprite_InitLinked(sprite, visual, frame, spriteFlags, (u8)priority, 2, 0x3C, position);
+    Anim_SetKeyframes(sprite, visual, frame, 2, 0);
+    Anim_Step(sprite, visual);
     return 1;
 }
 
@@ -83,8 +83,8 @@ void Anim_Remove(void *);
 void SceneDebris_ReleaseAnimation(struct SceneDebris *debris)
 {
     union SceneDebrisVisual *visual = debris->visual;
-    if (visual->keyframes.widget.active != 0) {
-        Anim_Remove(&visual->keyframes.widget);
+    if (visual->keyframes.sprite.active != 0) {
+        Anim_Remove(&visual->keyframes.sprite);
         Heap_Free(debris->visual);
         debris->active = 0;
     }
@@ -124,7 +124,7 @@ void SceneDebris_UpdateBouncingMotion(struct SceneDebris *debris)
         if (!debris->visualType)
             flags = &debris->visual->sequence.sprite.flags;
         else
-            flags = &debris->visual->keyframes.widget.flags;
+            flags = &debris->visual->keyframes.sprite.flags;
         {
             u32 mask = ~1;
             *flags &= mask;
@@ -161,15 +161,15 @@ void SceneDebris_UpdateBouncingMotion(struct SceneDebris *debris)
         visual->sprite.position.z = ((struct ContactPosition *)&projected)->z;
     } else {
         struct DisplayAnimationKeyframes *visual = &debris->visual->keyframes;
-        visual->widget.position.x = ((struct ContactPosition *)&projected)->x;
-        visual->widget.position.y = ((struct ContactPosition *)&projected)->y;
-        visual->widget.position.z = ((struct ContactPosition *)&projected)->z;
+        visual->sprite.position.x = ((struct ContactPosition *)&projected)->x;
+        visual->sprite.position.y = ((struct ContactPosition *)&projected)->y;
+        visual->sprite.position.z = ((struct ContactPosition *)&projected)->z;
     }
     if (!debris->visualType)
         PlayerCue_StepSequenceEnded((void *)&debris->visual->sequence.sprite,
                                     &debris->visual->sequence.playback);
     else
-        Anim_Step(&debris->visual->keyframes.widget, debris->visual);
+        Anim_Step(&debris->visual->keyframes.sprite, debris->visual);
     if (debris->timer)
         debris->timer--;
     else {
@@ -192,7 +192,7 @@ void SceneDebris_UpdateAnimatedMotion(struct SceneDebris *debris)
         if (!debris->visualType)
             flags = &debris->visual->sequence.sprite.flags;
         else
-            flags = &debris->visual->keyframes.widget.flags;
+            flags = &debris->visual->keyframes.sprite.flags;
         {
             u32 mask = ~1;
             *flags &= mask;
@@ -211,15 +211,15 @@ void SceneDebris_UpdateAnimatedMotion(struct SceneDebris *debris)
         visual->sprite.position.z = output->z;
     } else {
         struct DisplayAnimationKeyframes *visual = &debris->visual->keyframes;
-        visual->widget.position.x = ((struct ContactPosition *)&projected)->x;
-        visual->widget.position.y = output->y;
-        visual->widget.position.z = output->z;
+        visual->sprite.position.x = ((struct ContactPosition *)&projected)->x;
+        visual->sprite.position.y = output->y;
+        visual->sprite.position.z = output->z;
     }
     if (!debris->visualType) {
         ended = PlayerCue_StepSequenceEnded((void *)&debris->visual->sequence.sprite,
                                             &debris->visual->sequence.playback);
     } else
-        ended = Anim_Step(&debris->visual->keyframes.widget, debris->visual);
+        ended = Anim_Step(&debris->visual->keyframes.sprite, debris->visual);
     if (ended) {
         debris->update = SceneDebris_OnMotionEnd;
         debris->entered = 1;
@@ -334,7 +334,7 @@ s32 sub_08113398(const struct ContactPosition *position, const struct ContactPos
                 PanelKeyframeSprite_Create(debris, resourceId, sequence, visualFlags, priority);
                 visual = debris->visual;
                 if (palette >= 0)
-                    visual->keyframes.widget.palette = (void *)(gPaletteBankData + palette * 32);
+                    visual->keyframes.sprite.palette = (void *)(gPaletteBankData + palette * 32);
             }
             switch (motion) {
                 case 0:

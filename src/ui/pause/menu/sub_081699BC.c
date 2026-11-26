@@ -1,6 +1,6 @@
 #define SceneHud_BeginControlPhase       Hud_SetUpdateCallback
 #define SceneHud_SetPulseHighlight       Hud_DrawHealthMeter
-#define ScenePanel_ToggleAuxiliaryOption WirelessGame_ToggleItemMode
+#define PauseMenu_ToggleAuxiliaryOption WirelessGame_ToggleItemMode
 #include "global.h"
 #include "ui/pause/scene_hud_display.h"
 void SceneHud_CyclePrimarySecondaryOptions(struct SceneHudState *);

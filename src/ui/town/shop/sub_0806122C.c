@@ -1,12 +1,12 @@
 #include "ui/town/shop_control.h"
-s32 Shop_ClassifyConsumableAction(struct SceneInventoryControlView *panel)
+s32 Shop_ClassifyConsumableAction(struct ShopControlView *panel)
 {
     s32 result;
     s32 item;
     if (panel->grid.selection > 15) {
         s32 pageIndex = (panel->page << 3) - 16;
         item =
-            ((struct SceneInventoryCatalogView *)panel)->entries[pageIndex + panel->grid.selection];
+            ((struct ShopCatalogView *)panel)->entries[pageIndex + panel->grid.selection];
         result = 1;
         if (item < 0)
             result = 0;

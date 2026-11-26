@@ -1,9 +1,9 @@
-#ifndef GUARD_SCENE_INVENTORY_CATALOG_H
-#define GUARD_SCENE_INVENTORY_CATALOG_H
+#ifndef GUARD_SHOP_CATALOG_H
+#define GUARD_SHOP_CATALOG_H
 #include "ui/widgets/scene_input.h"
 /* The builders clear seven pages of eight entries. The wider phase workspace
  * overlaps transition/grid storage; script population relies on ROM data limits. */
-struct SceneInventoryScriptCatalog {
+struct ShopScriptCatalog {
     u8 unknown0[0x1A8C];
     u32 equipmentText, equipmentLabel;
     u32 itemText, consumableText;

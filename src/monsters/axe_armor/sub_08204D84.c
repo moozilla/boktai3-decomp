@@ -1,15 +1,15 @@
 #include "global.h"
 
-struct EnemyD459Vector {
+struct AxeArmorVector {
     s16 x, y, z, pad;
 };
-struct EnemyD459 {
+struct AxeArmor {
     u8 pad0[0x18];
     s32 timer;
     u8 pad1c[0x40 - 0x1c];
-    struct EnemyD459Vector position;
+    struct AxeArmorVector position;
     u8 pad48[0x108 - 0x48];
-    u32 (*callback)(struct EnemyD459 *);
+    u32 (*callback)(struct AxeArmor *);
     u8 animation[0x20];
     u16 attackDuration;
     u8 pad12e[4];
@@ -29,9 +29,9 @@ struct EnemyD459 {
 void Anim_RestartSequence(void *, void *, u32, u32, u32);
 void Anim_SetDurationScale(void *, u32);
 s32 Mod(s32, s32);
-u32 AxeArmor_UpdateCountdown(struct EnemyD459 *);
+u32 AxeArmor_UpdateCountdown(struct AxeArmor *);
 
-u32 AxeArmor_UpdateAttackTiming(struct EnemyD459 *enemy)
+u32 AxeArmor_UpdateAttackTiming(struct AxeArmor *enemy)
 {
     if (enemy->useAttackSchedule) {
         s16 *index = &enemy->attackIndex;

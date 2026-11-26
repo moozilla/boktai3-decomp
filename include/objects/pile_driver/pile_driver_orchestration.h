@@ -4,7 +4,7 @@
 #include "system/save/script_reference.h"
 #include "objects/pile_driver/pile_driver_config.h"
 
-#define SCENE_PANEL_GLOBAL ((struct PileDriver *)gScenePanel)
+#define PILE_DRIVER_GLOBAL ((struct PileDriver *)gPileDriver)
 void PileDriver_InitRig(struct PileDriver *);
 void PileDriver_InitBackground(struct PileDriver *);
 void PileDriver_InitOverlay(struct PileDriver *);

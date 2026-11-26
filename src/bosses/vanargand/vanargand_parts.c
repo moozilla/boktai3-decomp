@@ -1322,11 +1322,11 @@ void Vanargand_UpdatePartEmergence(struct VanargandAttackPair *boss, struct Pair
             p->actionEntered = 1;
             return;
         }
-        boss->widget.flags &= ~1;
+        boss->animSprite.flags &= ~1;
         if (p->mode == 0)
-            boss->widget.flags |= 4;
+            boss->animSprite.flags |= 4;
         else
-            boss->widget.flags &= ~4;
+            boss->animSprite.flags &= ~4;
         {
             void *data = boss->effectResource;
             u32 zero = 0;
@@ -1348,7 +1348,7 @@ void Vanargand_UpdatePartEmergence(struct VanargandAttackPair *boss, struct Pair
         case 0:
             entering = p->actionEntered;
             enter = &p->actionEntered;
-            animation = &boss->widget;
+            animation = &boss->animSprite;
             keyframes = &boss->resource;
             if (entering) {
                 p->actionEntered = 0;
@@ -1365,7 +1365,7 @@ void Vanargand_UpdatePartEmergence(struct VanargandAttackPair *boss, struct Pair
         case 1:
             entering = p->actionEntered;
             enter = &p->actionEntered;
-            animation = &boss->widget;
+            animation = &boss->animSprite;
             keyframes = &boss->resource;
             if (entering) {
                 p->actionEntered = 0;
@@ -1374,7 +1374,7 @@ void Vanargand_UpdatePartEmergence(struct VanargandAttackPair *boss, struct Pair
             if (Anim_Step(animation, keyframes)) {
                 Vanargand_SetState(p, 2);
                 *enter = 1;
-                boss->widget.flags |= 1;
+                boss->animSprite.flags |= 1;
             }
             p->sprite.position = *((struct ContactPosition *)p->origin);
             break;
@@ -1408,7 +1408,7 @@ void Vanargand_UpdatePartEmergence(struct VanargandAttackPair *boss, struct Pair
     Vanargand_Project(&projected, p->origin);
     projected.x = (projected.x - gCameraOrigin[0]) + 120;
     projected.y = (projected.y - gCameraOrigin[1]) + 92;
-    boss->widget.position = projected;
+    boss->animSprite.position = projected;
 }
 
 // confidence=low: moves to the radial target and fades from the alternate palette.
@@ -1546,7 +1546,7 @@ void Vanargand_DestroyPartController(struct VanargandAttackPair *controller)
     struct ContactCollider *collider;
     struct ContactSwarmSprite *sprite;
     s32 i;
-    Anim_Remove(&controller->widget);
+    Anim_Remove(&controller->animSprite);
     node = &controller->halves[0].target;
     shadow = controller->halves[0].shadow;
     collider = &controller->halves[0].damageCollider;
@@ -1590,7 +1590,7 @@ s32 Vanargand_InitializePartController(struct VanargandAttackPair *boss, void *o
     void *data = ScriptProc_Start(0xcb05, 0xb3de);
     resource = &boss->resource;
     ResourceHeader_Relocate(resource, data);
-    animation = &boss->widget;
+    animation = &boss->animSprite;
     AnimSprite_InitLinked(animation, resource, 0, 16, 3, 1, 60, 0);
     Anim_SetKeyframes(animation, resource, 0, 1, 0);
     if (!palettes)
@@ -1603,7 +1603,7 @@ s32 Vanargand_InitializePartController(struct VanargandAttackPair *boss, void *o
     CpuSet(source, boss->palettes[4], 0x04000008);
     source = gPaletteBankData + 0x1060;
     CpuSet(source, boss->palettes[5], 0x04000010);
-    boss->widget.flags |= 1;
+    boss->animSprite.flags |= 1;
     boss->effectResource = ScriptProc_Start(0x922e, 0x572b);
     for (i = 0; i < 2; i++) {
         struct PairedSceneHalf *part = &boss->halves[i];

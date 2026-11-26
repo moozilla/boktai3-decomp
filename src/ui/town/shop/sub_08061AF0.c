@@ -1,5 +1,5 @@
 #include "ui/town/shop_states.h"
-void Shop_BeginRemovalTransition(struct SceneInventoryControlView *panel)
+void Shop_BeginRemovalTransition(struct ShopControlView *panel)
 {
     panel->interactionFlags = 0x80;
     switch (panel->category) {
@@ -14,5 +14,5 @@ void Shop_BeginRemovalTransition(struct SceneInventoryControlView *panel)
             break;
     }
     Shop_SetControllerCallback(
-        panel, (SceneInventoryCallback)Shop_TickDiscardTransition);
+        panel, (ShopCallback)Shop_TickDiscardTransition);
 }

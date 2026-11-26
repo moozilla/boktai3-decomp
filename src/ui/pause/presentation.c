@@ -182,7 +182,7 @@ void SceneHud_RefreshEquipmentValues(struct SceneHudState *p)
     s32 difference;
     s32 changed;
     u16 *cell;
-    struct AnimSprite *widget;
+    struct AnimSprite *animSprite;
     struct SceneInputItemDescriptor *equippedDescriptor;
 
     /* categoryWidgets[62 + i] and motionWidgets[2 + i] are overlapping HUD views. */
@@ -243,13 +243,13 @@ void SceneHud_RefreshEquipmentValues(struct SceneHudState *p)
                 frameBase = difference + 10;
                 digit = digits;
                 display = &p->motionWidgets[2].flags;
-                widget = &p->motionWidgets[2];
-                for (j = 0; j < 3; display += sizeof(*widget) / sizeof(*display), widget++, j++) {
+                animSprite = &p->motionWidgets[2];
+                for (j = 0; j < 3; display += sizeof(*animSprite) / sizeof(*display), animSprite++, j++) {
                     *display &= ~1;
                     ((struct AnimSprite *)((u8 *)display - (u32) &
                                                  ((struct AnimSprite *)0)->flags))
                         ->position = position;
-                    Anim_LoadKeyframe(widget, resource, (u16)(*digit++ + frameBase), 1);
+                    Anim_LoadKeyframe(animSprite, resource, (u16)(*digit++ + frameBase), 1);
                     position.x += 8;
                 }
             }
@@ -302,36 +302,36 @@ void SceneHud_RefreshEquipmentAvailability(struct SceneHudState *owner)
     u32 mask;
 
     if (owner->actionOwner->actionMode == 6) {
-        struct AnimSprite *widget;
+        struct AnimSprite *animSprite;
         owner->categoryWidgets[10].flags &= ~1;
-        widget = &owner->categoryWidgets[10];
-        Anim_LoadKeyframe(widget, owner->motionResource, 0x2F, 1);
-        PauseMenu_SetSpritePalette(widget, 0x373);
+        animSprite = &owner->categoryWidgets[10];
+        Anim_LoadKeyframe(animSprite, owner->motionResource, 0x2F, 1);
+        PauseMenu_SetSpritePalette(animSprite, 0x373);
         mask = 1;
         flags = &owner->categoryWidgets[11].flags;
         i = 14;
         do {
             *flags |= mask;
-            flags += sizeof(*widget) / sizeof(*flags);
+            flags += sizeof(*animSprite) / sizeof(*flags);
         } while (--i >= 0);
     } else {
-        struct AnimSprite *widget;
+        struct AnimSprite *animSprite;
         i = 0;
-        widget = &owner->categoryWidgets[10];
+        animSprite = &owner->categoryWidgets[10];
         do {
             s32 id = Inventory_GetEquipmentId(i);
             if (id == 255) {
                 owner->categoryWidgets[i + 10].flags |= 1;
             } else {
                 owner->categoryWidgets[i + 10].flags &= ~1;
-                Anim_LoadKeyframe(widget, owner->motionResource, (u16)id, 1);
-                PauseMenu_SetSpritePalette(widget, 0x373);
+                Anim_LoadKeyframe(animSprite, owner->motionResource, (u16)id, 1);
+                PauseMenu_SetSpritePalette(animSprite, 0x373);
                 if (gGameState->level >= gUnk_08E6092C[id].requiredLevel)
-                    PauseMenu_SetSpritePalette(widget, 0x373);
+                    PauseMenu_SetSpritePalette(animSprite, 0x373);
                 else
-                    PauseMenu_SetSpritePalette(widget, 0x374);
+                    PauseMenu_SetSpritePalette(animSprite, 0x374);
             }
-            widget++;
+            animSprite++;
             i++;
         } while (i <= 15);
     }
@@ -341,14 +341,14 @@ void SceneHud_RefreshEquipmentAvailability(struct SceneHudState *owner)
 
 void SceneHud_ConfigureEquipmentTransfer(struct SceneHudState *owner, s32 index, s32 from, s32 to)
 {
-    struct AnimSprite *widget = &owner->motionWidgets[index];
+    struct AnimSprite *animSprite = &owner->motionWidgets[index];
     void *motion;
-    widget->flags &= ~1;
+    animSprite->flags &= ~1;
     motion = owner->motionResource;
-    Anim_LoadKeyframe(widget, motion, (u16)Inventory_GetEquipmentId(from), 1);
-    InventoryGrid_GetSlotPosition(&widget->position, from);
+    Anim_LoadKeyframe(animSprite, motion, (u16)Inventory_GetEquipmentId(from), 1);
+    InventoryGrid_GetSlotPosition(&animSprite->position, from);
     InventoryGrid_GetSlotPosition(&owner->actionTargets[index], to);
-    PauseMenu_SetSpritePalette(widget, owner->categoryWidgets[from + 10].paletteBank);
+    PauseMenu_SetSpritePalette(animSprite, owner->categoryWidgets[from + 10].paletteBank);
 }
 
 /* Tentative: availability bits for an equipment slot's action category. */

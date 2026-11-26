@@ -21,7 +21,7 @@ struct PileDriverInteractionPackedPosition {
     u32 z : 16;
 };
 
-#define SCENE_PANEL_PLAYER ((struct PileDriverInteractionPlayer *)gPlayers[0])
+#define PILE_DRIVER_PLAYER ((struct PileDriverInteractionPlayer *)gPlayers[0])
 s32 PileDriver_IsWithinHorizontalRadius(const struct ContactPosition *,
                                         const struct ContactPosition *, s32);
 s32 PileDriver_CanAcquireTether(struct PileDriver *);

@@ -1,9 +1,9 @@
 #include "ui/town/shop_panel.h"
-void Shop_PopulateEquipmentGrid(struct SceneInventoryPanel *panel)
+void Shop_PopulateEquipmentGrid(struct ShopPanel *panel)
 {
     s32 column;
     s32 nextRow;
-    struct SceneInventoryWidgetFlags *flagsBase;
+    struct ShopWidgetFlags *flagsBase;
     u32 rowBytes;
     s32 rowSlot;
     s32 row;
@@ -11,16 +11,16 @@ void Shop_PopulateEquipmentGrid(struct SceneInventoryPanel *panel)
     s32 kind;
     AnimSprite_SelectGlyph(&panel->display.heading, &panel->display.widgetResource, 0x65);
     row = 0;
-    flagsBase = ((struct SceneInventoryFlagsView *)(void *)panel)->widgets;
+    flagsBase = ((struct ShopFlagsView *)(void *)panel)->widgets;
     rowBytes = 0;
     do {
-        struct AnimSprite *widget;
+        struct AnimSprite *animSprite;
         s32 flagIndex;
         column = 0;
         rowSlot = row * 4;
         {
             struct AnimSprite *base = panel->display.primary;
-            widget = (void *)(rowBytes + (u32)base);
+            animSprite = (void *)(rowBytes + (u32)base);
         }
         flagIndex = rowSlot + 5;
         do {
@@ -28,21 +28,21 @@ void Shop_PopulateEquipmentGrid(struct SceneInventoryPanel *panel)
             kind = Inventory_GetEquipmentId(slot);
             if (kind != 255) {
                 flagsBase[flagIndex].flags &= ~1;
-                Anim_LoadKeyframe(widget, &panel->display.gridResource, (u16)(kind + 240), 1);
+                Anim_LoadKeyframe(animSprite, &panel->display.gridResource, (u16)(kind + 240), 1);
             } else
                 flagsBase[flagIndex].flags |= 1;
             if (Inventory_CanAssignEquipment(slot))
-                SceneHud_SetKeyframePaletteBank(widget, 0x373);
+                SceneHud_SetKeyframePaletteBank(animSprite, 0x373);
             else
-                SceneHud_SetKeyframePaletteBank(widget, 0x374);
-            widget++;
+                SceneHud_SetKeyframePaletteBank(animSprite, 0x374);
+            animSprite++;
             flagIndex++;
             column++;
         } while (column <= 3);
         rowBytes += 0x180;
     } while (++row <= 3);
     for (row = 0; row <= 1; row = nextRow) {
-        struct AnimSprite *widget;
+        struct AnimSprite *animSprite;
         u32 flagIndex;
         u32 offset;
         column = 0;
@@ -52,7 +52,7 @@ void Shop_PopulateEquipmentGrid(struct SceneInventoryPanel *panel)
         offset = ((row << 3) + rowSlot) << 5;
         {
             struct AnimSprite *base = panel->display.secondary;
-            widget = (void *)(offset + (u32)base);
+            animSprite = (void *)(offset + (u32)base);
         }
         do {
             slot = column + rowSlot;
@@ -60,22 +60,22 @@ void Shop_PopulateEquipmentGrid(struct SceneInventoryPanel *panel)
             if (kind >= 0) {
                 struct SceneValueEquipmentDefinition *definition = Equipment_GetDefinition(kind);
                 flagsBase[flagIndex].flags &= ~1;
-                Anim_LoadKeyframe(widget, &panel->display.gridResource, (u16)(kind + 240), 1);
+                Anim_LoadKeyframe(animSprite, &panel->display.gridResource, (u16)(kind + 240), 1);
                 if (gGameState->unk7B0 < definition->baseValue)
-                    SceneHud_SetKeyframePaletteBank(widget, 0x374);
+                    SceneHud_SetKeyframePaletteBank(animSprite, 0x374);
                 else
-                    SceneHud_SetKeyframePaletteBank(widget, 0x373);
+                    SceneHud_SetKeyframePaletteBank(animSprite, 0x373);
             } else
                 flagsBase[flagIndex].flags |= 1;
             flagIndex++;
-            widget++;
+            animSprite++;
             column++;
         } while (column <= 3);
     }
     {
         const s16 *materials = gGameState->inventory;
         struct ContactPosition *position = &panel->display.digits[0].position;
-        struct SceneInventoryWidgetFlags *entry = &flagsBase[41];
+        struct ShopWidgetFlags *entry = &flagsBase[41];
         s32 i;
         for (i = 0; i < 8; i++) {
             u16 packed = *materials;

@@ -1,5 +1,5 @@
 #include "ui/town/shop_states.h"
-void Shop_BeginAlternateConsumableSelection(struct SceneInventoryControlView *panel)
+void Shop_BeginAlternateConsumableSelection(struct ShopControlView *panel)
 {
     Shop_BeginActionSelection(panel, 2);
     panel->interactionFlags |= 0x80;

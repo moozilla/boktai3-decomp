@@ -1,5 +1,5 @@
-#ifndef GUARD_SCENE_PANEL_RIG_H
-#define GUARD_SCENE_PANEL_RIG_H
+#ifndef GUARD_PILE_DRIVER_RIG_H
+#define GUARD_PILE_DRIVER_RIG_H
 #include "objects/pile_driver/pile_driver.h"
 #include "scene/collision/contact_actor.h"
 #include "engine/video/display_sequence_inline.h"

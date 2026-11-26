@@ -2,7 +2,7 @@
 #include "ui/town/shop_panel.h"
 void ScrollingDialogue_RequestShow(void);
 void MessageWindow_SetPalette(s32);
-void Shop_InitMessageBox(struct SceneInventoryPanel *p)
+void Shop_InitMessageBox(struct ShopPanel *p)
 {
     if (Script_SeekToKeyword(0x73))
         p->unknown1A88 = Script_GetTextSourcePc();

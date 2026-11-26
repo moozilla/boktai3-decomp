@@ -1,5 +1,5 @@
 #include "ui/town/shop_states.h"
-void Shop_BeginCatalogTransition(struct SceneInventoryControlView *panel)
+void Shop_BeginCatalogTransition(struct ShopControlView *panel)
 {
     panel->interactionFlags = 0x80;
     SceneInput_SaveSelection(&panel->grid);
@@ -16,5 +16,5 @@ void Shop_BeginCatalogTransition(struct SceneInventoryControlView *panel)
             break;
     }
     Shop_SetControllerCallback(
-        panel, (SceneInventoryCallback)Shop_TickPurchaseTransition);
+        panel, (ShopCallback)Shop_TickPurchaseTransition);
 }

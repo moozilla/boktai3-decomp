@@ -1,6 +1,6 @@
 #include "global.h"
 #include "scene/actor/scene_event_dispatch.h"
-struct ScenePanelCommandState {
+struct VanargandPairCommandState {
     u8 unknown0[0xAC];
     u8 mode, substate, transition, unknownAF, pending;
     u8 unknownB1[0xC4 - 0xB1];
@@ -10,7 +10,7 @@ struct ScenePanelCommandState {
 };
 void SceneActors_ConfigureEffect(void *, s32, s32, s32);
 u32 Trigger_ConsumePending(void *, u32);
-static inline void VanargandPair_RequestTransition(struct ScenePanelCommandState *panel, u32 mode,
+static inline void VanargandPair_RequestTransition(struct VanargandPairCommandState *panel, u32 mode,
                                                 u32 substate, u32 transition)
 {
     panel->mode = mode;
@@ -19,7 +19,7 @@ static inline void VanargandPair_RequestTransition(struct ScenePanelCommandState
     panel->counter = 0;
     panel->pending = 1;
 }
-void VanargandPair_DispatchTransitionCommands(struct ScenePanelCommandState *panel)
+void VanargandPair_DispatchTransitionCommands(struct VanargandPairCommandState *panel)
 {
     struct SceneEventReceiver *receiver = &panel->receiver;
     s32 i = 0;

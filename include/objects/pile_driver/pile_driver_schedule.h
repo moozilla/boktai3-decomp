@@ -1,5 +1,5 @@
-#ifndef GUARD_SCENE_PANEL_SCHEDULE_H
-#define GUARD_SCENE_PANEL_SCHEDULE_H
+#ifndef GUARD_PILE_DRIVER_SCHEDULE_H
+#define GUARD_PILE_DRIVER_SCHEDULE_H
 #include "objects/pile_driver/pile_driver.h"
 #include "scene/collision/contact_actor.h"
 /* Observed scheduled action view of the same PileDriver; identities tentative. */

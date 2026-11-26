@@ -8,7 +8,7 @@ struct Sprite {
     u8 pad0[12];
     struct Vec position;
 };
-struct BossSlot2Tick {
+struct SabataTick {
     u8 pad0[0x48];
     struct Sprite sprite;
     u8 pad5C[0x8];
@@ -49,10 +49,10 @@ void SceneActors_UpdateAnimation(void *, void *, void *);
 void SceneActors_UpdateTargetMetrics(void *);
 s32 Math_Atan2(s32, s32);
 
-void Sabata_UpdateFrame(struct BossSlot2Tick *p)
+void Sabata_UpdateFrame(struct SabataTick *p)
 {
-    struct BossSlot2Tick *actor = p;
-    struct BossSlot2Tick *owner = p;
+    struct SabataTick *actor = p;
+    struct SabataTick *owner = p;
     struct Sprite *sprite = &p->sprite;
     s32 i;
     sub_0817B2DC(actor);

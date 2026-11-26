@@ -8,7 +8,7 @@ void PileDriverRig_TickHideBurst(struct PileDriverRig *rig)
     if (*counter <= 63) {
         if (*counter == 0) {
             PileDriverRig_HideSprites(rig);
-            ((struct SceneRigParentView *)gScenePanel)->activated = 1;
+            ((struct SceneRigParentView *)gPileDriver)->activated = 1;
         }
         {
             u32 frame = *counter;

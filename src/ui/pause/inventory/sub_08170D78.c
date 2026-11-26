@@ -15,7 +15,7 @@ void PauseInventory_RefreshConsumableIcons(struct PauseInventory *p)
 {
     s32 i;
     s32 markers;
-    struct AnimSprite *widget;
+    struct AnimSprite *animSprite;
     struct AnimSprite *equippedWidget;
     s32 consumableSlot;
     for (i = 0; i < 4; i++)
@@ -24,24 +24,24 @@ void PauseInventory_RefreshConsumableIcons(struct PauseInventory *p)
     markers = 0;
     i = 0;
     consumableSlot = i;
-    widget = &p->hud.categoryWidgets[10];
+    animSprite = &p->hud.categoryWidgets[10];
     do {
         s32 id = Inventory_GetConsumableId(consumableSlot);
         if (id == -1)
-            widget->flags |= 1;
+            animSprite->flags |= 1;
         else {
-            widget->flags &= ~1;
-            Anim_LoadKeyframe(widget, p->hud.motionResource, (u16)(id + 0x121), 0);
-            PauseMenu_SetSpritePalette(widget, 0x373);
+            animSprite->flags &= ~1;
+            Anim_LoadKeyframe(animSprite, p->hud.motionResource, (u16)(id + 0x121), 0);
+            PauseMenu_SetSpritePalette(animSprite, 0x373);
             if (GameState_IsConsumableSlotEquipped(consumableSlot)) {
                 s32 marker = markers + 30;
                 PauseMenu_ClearSpriteFlags(p, marker, 1);
-                PauseMenu_SetSpritePosition(p, marker, widget->position.x, widget->position.y);
+                PauseMenu_SetSpritePosition(p, marker, animSprite->position.x, animSprite->position.y);
                 p->equippedConsumableSlots[markers] = consumableSlot;
                 markers++;
             }
         }
-        widget++;
+        animSprite++;
         consumableSlot++;
     } while (consumableSlot <= 15);
     for (; markers <= 15; markers++)

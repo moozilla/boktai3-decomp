@@ -1,6 +1,6 @@
 #include "global.h"
 
-struct ScenePanelPairState {
+struct VanargandPairState {
     u8 unknown0[0xE1];
     u8 threshold : 8;
     u8 unknownE2[0x56C - 0xE2];
@@ -9,7 +9,7 @@ struct ScenePanelPairState {
     u8 state;
 };
 s32 ScenePair_CountPositiveCounters(void *);
-void VanargandPair_AdvanceConditionalPairState(struct ScenePanelPairState *panel)
+void VanargandPair_AdvanceConditionalPairState(struct VanargandPairState *panel)
 {
     s32 count;
     switch (panel->state) {

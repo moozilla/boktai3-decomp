@@ -64,25 +64,25 @@ void PauseMenu_HideAllSprites(struct SceneHudState *hud)
     u32 hidden = 1;
     s32 i;
     u32 *flags = &hud->categoryWidgets[0].flags;
-    struct AnimSprite *widget;
+    struct AnimSprite *animSprite;
     for (i = 0x7b; i >= 0; i--) {
         *flags |= hidden;
         flags += sizeof(struct AnimSprite) / sizeof(*flags);
     }
     hud->selectorFlags |= 1;
-    widget = &hud->comparisonUnlockWidget;
-    widget->flags |= 1;
-    widget = &hud->comparisonActionWidget;
-    widget->flags |= 1;
+    animSprite = &hud->comparisonUnlockWidget;
+    animSprite->flags |= 1;
+    animSprite = &hud->comparisonActionWidget;
+    animSprite->flags |= 1;
     hud->promptSprite.flags |= 1;
 }
 
 void PauseMenu_LoadSpriteKeyframe(struct SceneHudState *hud, s32 index, u32 keyframe)
 {
-    struct AnimSprite *widget =
+    struct AnimSprite *animSprite =
         &((struct SceneHudState *)(index * sizeof(struct AnimSprite) + (u32)hud))
              ->categoryWidgets[0];
-    widget->flags &= ~1;
+    animSprite->flags &= ~1;
     Anim_LoadKeyframe(&hud->categoryWidgets[index], hud->widgetResource, (u16)keyframe, 0);
 }
 
@@ -100,18 +100,18 @@ void PauseMenu_SetSpritePosition(struct SceneHudState *hud, s32 index, u16 x, u1
 
 void PauseMenu_AddSpriteFlags(struct SceneHudState *hud, s32 index, u32 mask)
 {
-    struct AnimSprite *widget =
+    struct AnimSprite *animSprite =
         &((struct SceneHudState *)(index * sizeof(struct AnimSprite) + (u32)hud))
              ->categoryWidgets[0];
-    widget->flags |= mask;
+    animSprite->flags |= mask;
 }
 
 void PauseMenu_ClearSpriteFlags(struct SceneHudState *hud, s32 index, u32 mask)
 {
-    struct AnimSprite *widget =
+    struct AnimSprite *animSprite =
         &((struct SceneHudState *)(index * sizeof(struct AnimSprite) + (u32)hud))
              ->categoryWidgets[0];
-    widget->flags &= ~mask;
+    animSprite->flags &= ~mask;
 }
 
 void PauseMenu_ClearTileRect(s32 x, s32 y, s32 width, s32 height)
@@ -271,7 +271,7 @@ void PauseMenu_BeginSpriteMotion(struct SceneHudState *hud, u32 index, u32 keyfr
                                  struct SceneVec *from, struct SceneVec *to, s32 bend, u32 duration)
 {
     struct SceneHudWidgetMotion *motion = &hud->widgetMotions[index];
-    struct AnimSprite *widget;
+    struct AnimSprite *animSprite;
     motion->from = *from;
     motion->to = *to;
     if (bend != 0) {
@@ -284,11 +284,11 @@ void PauseMenu_BeginSpriteMotion(struct SceneHudState *hud, u32 index, u32 keyfr
         motion->bendX = bend;
         motion->bendY = bend;
     }
-    widget = &hud->motionWidgets[index];
-    Anim_LoadKeyframe(widget, hud->motionResource, (u16)keyframe, 1);
-    PauseMenu_SetSpritePalette(widget, palette);
-    *(struct SceneVec *)&widget->position = motion->from;
-    widget->flags &= ~1;
+    animSprite = &hud->motionWidgets[index];
+    Anim_LoadKeyframe(animSprite, hud->motionResource, (u16)keyframe, 1);
+    PauseMenu_SetSpritePalette(animSprite, palette);
+    *(struct SceneVec *)&animSprite->position = motion->from;
+    animSprite->flags &= ~1;
     motion->timer = 0;
     motion->duration = duration;
     motion->active = 1;
@@ -296,26 +296,26 @@ void PauseMenu_BeginSpriteMotion(struct SceneHudState *hud, u32 index, u32 keyfr
 
 u32 PauseMenu_UpdateSpriteMotion(struct SceneHudState *hud, u32 index)
 {
-    struct AnimSprite *widget = &hud->motionWidgets[index];
+    struct AnimSprite *animSprite = &hud->motionWidgets[index];
     struct SceneHudWidgetMotion *motion = &hud->widgetMotions[index];
     s32 remaining;
     if (motion->active == 0)
         return 1;
     motion->timer++;
     if (motion->timer >= motion->duration) {
-        *(struct SceneVec *)&widget->position = motion->to;
+        *(struct SceneVec *)&animSprite->position = motion->to;
         motion->active = 0;
         return 1;
     }
     remaining = motion->duration - motion->timer;
-    widget->position.x =
+    animSprite->position.x =
         Div(motion->from.x * remaining + motion->to.x * motion->timer, motion->duration);
-    widget->position.y =
+    animSprite->position.y =
         Div(motion->from.y * remaining + motion->to.y * motion->timer, motion->duration);
     if (*(u32 *)&motion->bendX) {
         s32 wave = gUnk_086149C4[Div(motion->timer * 128, motion->duration) & 255];
-        widget->position.x += ScaleBend(motion->bendX * wave);
-        widget->position.y += ScaleBend(motion->bendY * wave);
+        animSprite->position.x += ScaleBend(motion->bendX * wave);
+        animSprite->position.y += ScaleBend(motion->bendY * wave);
     }
     return 0;
 }

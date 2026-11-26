@@ -24,13 +24,13 @@ void SceneInputPanel_ShowAttributeComparison(struct AnimSprite *first,
     {
         s32 offset;
         s32 *digit;
-        struct AnimSprite *widget;
+        struct AnimSprite *animSprite;
         offset = comparison * 10;
         digit = digits;
-        widget = first;
+        animSprite = first;
         for (i = 2; i >= 0; i--) {
-            Anim_LoadKeyframe(widget, resource, (u16)(*digit++ + offset), 1);
-            widget++;
+            Anim_LoadKeyframe(animSprite, resource, (u16)(*digit++ + offset), 1);
+            animSprite++;
         }
     }
     comparison = 1;
@@ -43,13 +43,13 @@ void SceneInputPanel_ShowAttributeComparison(struct AnimSprite *first,
     {
         s32 offset;
         s32 *digit;
-        struct AnimSprite *widget;
+        struct AnimSprite *animSprite;
         offset = comparison * 10;
         digit = digits;
-        widget = second;
+        animSprite = second;
         for (i = 2; i >= 0; i--) {
-            Anim_LoadKeyframe(widget, resource, (u16)(*digit++ + offset), 1);
-            widget++;
+            Anim_LoadKeyframe(animSprite, resource, (u16)(*digit++ + offset), 1);
+            animSprite++;
         }
     }
     comparison = 1;
@@ -62,13 +62,13 @@ void SceneInputPanel_ShowAttributeComparison(struct AnimSprite *first,
     {
         s32 offset;
         s32 *digit;
-        struct AnimSprite *widget;
+        struct AnimSprite *animSprite;
         offset = comparison * 10;
         digit = digits;
-        widget = third;
+        animSprite = third;
         for (i = 2; i >= 0; i--) {
-            Anim_LoadKeyframe(widget, resource, (u16)(*digit++ + offset), 1);
-            widget++;
+            Anim_LoadKeyframe(animSprite, resource, (u16)(*digit++ + offset), 1);
+            animSprite++;
         }
     }
 }

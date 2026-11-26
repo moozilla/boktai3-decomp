@@ -1,12 +1,12 @@
 #define gSineTable gUnk_086149C4
 #include "global.h"
 
-struct EnemyD459Vector {
+struct AxeArmorVector {
     s16 x, y, z, pad;
 };
-struct EnemyD459 {
+struct AxeArmor {
     u8 pad0[0x40];
-    struct EnemyD459Vector position;
+    struct AxeArmorVector position;
     u8 pad48[0x120 - 0x48];
     s16 collisionA, collisionB, collisionC;
     u8 pad126[0x132 - 0x126];
@@ -22,31 +22,31 @@ void ProjectileConfig_SetCollisionExtents(void *, u16, u16, u16);
 void ProjectileConfig_SetCollisionOffset(void *, u32, u32, u32);
 void ProjectileConfig_SetMovement(void *, u32, u32, u32, u32);
 void ProjectileConfig_SetAnimation(void *, u32, u32, u32);
-s32 Projectile_SpawnFromConfig(void *, struct EnemyD459Vector *);
+s32 Projectile_SpawnFromConfig(void *, struct AxeArmorVector *);
 void Sound_PlaySong(u32);
 static inline s32 scale(s32 value)
 {
     return value >= 0 ? value >> 12 : -((-value) >> 12);
 }
-static inline void polar(struct EnemyD459Vector *v, s32 angle, s32 radius)
+static inline void polar(struct AxeArmorVector *v, s32 angle, s32 radius)
 {
     v->x = scale(gSineTable[(angle + 64) & 255] * radius);
     v->y = 0;
     v->z = scale(gSineTable[angle & 255] * radius);
 }
-static inline void addVector(struct EnemyD459Vector *out, struct EnemyD459Vector *a,
-                             struct EnemyD459Vector *b)
+static inline void addVector(struct AxeArmorVector *out, struct AxeArmorVector *a,
+                             struct AxeArmorVector *b)
 {
     out->x = a->x + b->x;
     out->y = a->y + b->y;
     out->z = a->z + b->z;
 }
-void AxeArmor_FireProjectile(struct EnemyD459 *enemy)
+void AxeArmor_FireProjectile(struct AxeArmor *enemy)
 {
     u8 config[0x5c];
-    struct EnemyD459Vector offset;
-    struct EnemyD459Vector position;
-    struct EnemyD459Vector *pos = &position;
+    struct AxeArmorVector offset;
+    struct AxeArmorVector position;
+    struct AxeArmorVector *pos = &position;
     position = enemy->position;
     pos->y += 200;
     polar(&offset, (u8)(enemy->facing * 64 + 192), 128);

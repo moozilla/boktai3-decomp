@@ -38,11 +38,11 @@ void Anim_Remove(struct AnimSprite *animSprite)
 
 void Anim_RemoveAllInCurrentList(void)
 {
-    struct AnimSprite *widget = gMainSpriteListHeads[gRenderListIndex];
-    while (widget) {
-        struct AnimSprite *next = widget->next;
-        Anim_Remove(widget);
-        widget = next;
+    struct AnimSprite *animSprite = gMainSpriteListHeads[gRenderListIndex];
+    while (animSprite) {
+        struct AnimSprite *next = animSprite->next;
+        Anim_Remove(animSprite);
+        animSprite = next;
     }
 }
 

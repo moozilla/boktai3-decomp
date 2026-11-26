@@ -22,7 +22,7 @@ s32 PileDriver_CanAcquireTether(struct PileDriver *input)
     struct PileDriver *panel = (void *)input;
     struct TetherActor *tether = gTetherActor;
     if (tether) {
-        struct PileDriverInteractionPlayer *player = SCENE_PANEL_PLAYER;
+        struct PileDriverInteractionPlayer *player = PILE_DRIVER_PLAYER;
         if (player->kindValue == 1 && player->tetherMode == 6) {
             if (PileDriver_IsWithinHorizontalRadius(&tether->position, &panel->center, 70))
                 return 1;
@@ -52,7 +52,7 @@ s32 PileDriver_AreSubjectsSettled(struct PileDriver *input)
 s32 PileDriver_CanAcceptPlayer(struct PileDriver *input)
 {
     struct PileDriver *panel = (void *)input;
-    struct PileDriverInteractionPlayer *player = SCENE_PANEL_PLAYER;
+    struct PileDriverInteractionPlayer *player = PILE_DRIVER_PLAYER;
     if (player->kindValue != 1)
         return 0;
     if ((u8)(player->actionMode - 3) <= 2)
@@ -77,7 +77,7 @@ void PileDriver_WaitInitialTether(struct PileDriver *panel)
 {
     if (!PileDriver_CanAcquireTether(panel))
         return;
-    PlayerCue_MoveTo(SCENE_PANEL_PLAYER, 0, -1, 0, 0);
+    PlayerCue_MoveTo(PILE_DRIVER_PLAYER, 0, -1, 0, 0);
     panel->variant = 0;
     PileDriver_SetEffectState(panel, 1);
 }
@@ -145,14 +145,14 @@ void PileDriver_AdvanceTetherAcquisition(struct PileDriver *panel)
                 i++;
             } while (i < panel->subjectCount);
         }
-        PlayerCue_Stand(SCENE_PANEL_PLAYER, -1);
+        PlayerCue_Stand(PILE_DRIVER_PLAYER, -1);
         Sound_PlaySong(250);
         PileDriver_SetEffectState((void *)panel, 2);
     } else if (panel->variant == 1) {
         s32 anyActive;
         u32 count;
-        PlayerCue_Stand(SCENE_PANEL_PLAYER, -1);
-        PlayerCue_ReleaseControl(SCENE_PANEL_PLAYER);
+        PlayerCue_Stand(PILE_DRIVER_PLAYER, -1);
+        PlayerCue_ReleaseControl(PILE_DRIVER_PLAYER);
         anyActive = 0;
         count = panel->subjectCount;
         if (anyActive < (s32)count) {
@@ -170,8 +170,8 @@ void PileDriver_AdvanceTetherAcquisition(struct PileDriver *panel)
         else
             PileDriver_SetEffectState((void *)panel, 3);
     } else {
-        PlayerCue_Stand(SCENE_PANEL_PLAYER, -1);
-        PlayerCue_ReleaseControl(SCENE_PANEL_PLAYER);
+        PlayerCue_Stand(PILE_DRIVER_PLAYER, -1);
+        PlayerCue_ReleaseControl(PILE_DRIVER_PLAYER);
         Sound_PlaySong(490);
         gTetherActor->state = 14;
         PileDriverRig_SetState(&panel->rig, 1);
@@ -182,7 +182,7 @@ void PileDriver_AdvanceTetherAcquisition(struct PileDriver *panel)
 void PileDriver_WaitSettledSubjects(struct PileDriver *input)
 {
     if (PileDriver_AreSubjectsSettled(input) != 0) {
-        PlayerCue_ReleaseControl(SCENE_PANEL_PLAYER);
+        PlayerCue_ReleaseControl(PILE_DRIVER_PLAYER);
         PileDriver_SetEffectState(input, 3);
         PileDriver_CallPendingScript(input, 0);
     }
@@ -193,7 +193,7 @@ void PileDriver_WaitTetherOrActiveSubject(struct PileDriver *input)
     struct PileDriver *panel = (void *)input;
     s32 i, count;
     if (gTetherActor->state != 12 && PileDriver_CanAcquireTether((void *)panel)) {
-        PlayerCue_MoveTo(SCENE_PANEL_PLAYER, 0, -1, 0, 0);
+        PlayerCue_MoveTo(PILE_DRIVER_PLAYER, 0, -1, 0, 0);
         panel->variant = 1;
         PileDriver_SetEffectState((void *)panel, 1);
     }
@@ -237,7 +237,7 @@ void PileDriver_UpdateActiveSubjects(struct PileDriver *input)
     if (!panel->state)
         PileDriver_SetState((void *)panel, PileDriver_BeginPulseSequence);
     if (PileDriver_CanAcceptPlayer((void *)panel)) {
-        PlayerCue_WalkTo(SCENE_PANEL_PLAYER, &panel->approachPosition, 0, 4);
+        PlayerCue_WalkTo(PILE_DRIVER_PLAYER, &panel->approachPosition, 0, 4);
         PileDriver_SetEffectState((void *)panel, 5);
     }
 }
@@ -245,7 +245,7 @@ void PileDriver_UpdateActiveSubjects(struct PileDriver *input)
 void PileDriver_AdvancePlayerArrival(struct PileDriver *input)
 {
     struct PileDriver *panel = (void *)input;
-    struct PileDriverInteractionPlayer *player = SCENE_PANEL_PLAYER;
+    struct PileDriverInteractionPlayer *player = PILE_DRIVER_PLAYER;
     if (player->tetherMode == 0) {
         struct PileDriverInteractionPackedPosition position;
         position.x = (u32)(panel->origin.x * 3 + player->position.x) >> 2;
@@ -253,12 +253,12 @@ void PileDriver_AdvancePlayerArrival(struct PileDriver *input)
         position.z = (u32)(panel->origin.z * 3 + player->position.z) >> 2;
         sub_08226380(16, &position);
         if (panel->paletteMode) {
-            PlayerCue_Motion7Front(SCENE_PANEL_PLAYER, 1, 0);
+            PlayerCue_Motion7Front(PILE_DRIVER_PLAYER, 1, 0);
             Sound_PlaySong(5);
             PileDriver_SetState(input, PileDriver_BeginForwardSequence);
             PileDriver_SetEffectState(input, 7);
         } else {
-            PlayerCue_Motion7Front(SCENE_PANEL_PLAYER, 0, 0);
+            PlayerCue_Motion7Front(PILE_DRIVER_PLAYER, 0, 0);
             Sound_PlaySong(407);
             PileDriver_SetEffectState(input, 6);
         }
@@ -281,9 +281,9 @@ void PileDriver_AdvanceSubjectDeparture(struct PileDriver *panel)
         Sound_FadeOutChannel10(4);
     } else if (frame == 90) {
         Camera_FollowPlayerWithoutCompletion(16);
-        PlayerCue_Motion7End(SCENE_PANEL_PLAYER, 0);
+        PlayerCue_Motion7End(PILE_DRIVER_PLAYER, 0);
     } else if (frame > 105) {
-        struct PileDriverInteractionPlayer *player = SCENE_PANEL_PLAYER;
+        struct PileDriverInteractionPlayer *player = PILE_DRIVER_PLAYER;
         if (!player->tetherMode) {
             PlayerCue_ReleaseControl(player);
             PileDriver_SetEffectState((void *)panel, 3);
@@ -374,13 +374,13 @@ void PileDriver_WaitTetherReturn(struct PileDriver *input)
 {
     struct PileDriver *panel = (void *)input;
     if (PileDriver_CanAcquireTether(input)) {
-        PlayerCue_MoveTo(SCENE_PANEL_PLAYER, 0, -1, 0, 0);
+        PlayerCue_MoveTo(PILE_DRIVER_PLAYER, 0, -1, 0, 0);
         panel->variant = 2;
         PileDriver_SetEffectState(input, 1);
     } else if (PileDriver_IsTetherDistant(input)) {
         struct TetherActor *tether = gTetherActor;
         s32 sourceX = tether->position.x;
-        struct PileDriverInteractionPlayer *player = SCENE_PANEL_PLAYER;
+        struct PileDriverInteractionPlayer *player = PILE_DRIVER_PLAYER;
         s32 x = sourceX - player->position.x;
         s32 z = tether->position.z - player->position.z;
         s32 direction;
@@ -390,7 +390,7 @@ void PileDriver_WaitTetherReturn(struct PileDriver *input)
         } else {
             direction = (((u16)Math_Atan2(x, z) + 112) >> 5) & 7;
             PlayerCue_Stand(player, direction);
-            PlayerCue_StateMotion(SCENE_PANEL_PLAYER, 0);
+            PlayerCue_StateMotion(PILE_DRIVER_PLAYER, 0);
         }
         TetherActor_BeginAuxiliaryState(gTetherActor);
         sub_08226380(16, &gTetherActor->position);
@@ -407,7 +407,7 @@ void PileDriver_AdvanceTetherReturn(struct PileDriver *input)
         case 33: {
             struct TetherActor *tether = gTetherActor;
             s32 sourceX = tether->position.x;
-            struct PileDriverInteractionPlayer *player = SCENE_PANEL_PLAYER;
+            struct PileDriverInteractionPlayer *player = PILE_DRIVER_PLAYER;
             s32 x = sourceX - player->position.x;
             s32 z = tether->position.z - player->position.z;
             s32 direction = (((u16)Math_Atan2(x, z) + 112) >> 5) & 7;
@@ -418,12 +418,12 @@ void PileDriver_AdvanceTetherReturn(struct PileDriver *input)
             Sound_PlaySong(453);
             break;
         case 300:
-            sub_08226380(16, &SCENE_PANEL_PLAYER->position);
+            sub_08226380(16, &PILE_DRIVER_PLAYER->position);
             break;
         case 316:
             if (panel->warningSounds[3])
                 Sound_PlaySong(panel->warningSounds[3]);
-            PlayerCue_Kneel(SCENE_PANEL_PLAYER, -1, 0);
+            PlayerCue_Kneel(PILE_DRIVER_PLAYER, -1, 0);
             break;
         case 360:
             PileDriver_CallPendingScript(input, 7);
@@ -750,11 +750,11 @@ void PileDriver_ReadInitialMode(struct PileDriver *input)
 
 void PileDriver_SuppressMainPresentation(void)
 {
-    if (gScenePanel) {
+    if (gPileDriver) {
         struct PileDriver *panel;
         u8 mode;
-        SCENE_PANEL_GLOBAL->skipMainSprite = 1;
-        panel = SCENE_PANEL_GLOBAL;
+        PILE_DRIVER_GLOBAL->skipMainSprite = 1;
+        panel = PILE_DRIVER_GLOBAL;
         mode = panel->paletteMode;
         panel->savedMode = mode;
     }
@@ -762,11 +762,11 @@ void PileDriver_SuppressMainPresentation(void)
 
 void PileDriver_WriteFullScriptStatus(void)
 {
-    if (gScenePanel) {
+    if (gPileDriver) {
         struct ScriptUtilityReference reference;
         s32 i;
         Script_ReadReference(&reference);
-        Script_WriteReferenceValue(&reference, 0, SCENE_PANEL_GLOBAL->initialMode);
+        Script_WriteReferenceValue(&reference, 0, PILE_DRIVER_GLOBAL->initialMode);
         Script_ReadReference(&reference);
         if (gTetherActor) {
             if (gTetherActor->state == 12)
@@ -779,7 +779,7 @@ void PileDriver_WriteFullScriptStatus(void)
         do {
             struct PileDriverSubject *subject;
             Script_ReadReference(&reference);
-            subject = SCENE_PANEL_GLOBAL->subjects[i];
+            subject = PILE_DRIVER_GLOBAL->subjects[i];
             if (!subject || subject->state <= 1)
                 Script_WriteReferenceValue(&reference, 0, 0);
             else if (subject->state == 4)
@@ -793,7 +793,7 @@ void PileDriver_WriteFullScriptStatus(void)
 
 void PileDriver_WriteScriptStatus(void)
 {
-    if (gScenePanel) {
+    if (gPileDriver) {
         struct ScriptUtilityReference reference;
         s32 i;
         Script_ReadReference(&reference);
@@ -808,7 +808,7 @@ void PileDriver_WriteScriptStatus(void)
         do {
             struct PileDriverSubject *subject;
             Script_ReadReference(&reference);
-            subject = SCENE_PANEL_GLOBAL->subjects[i];
+            subject = PILE_DRIVER_GLOBAL->subjects[i];
             if (!subject || subject->state <= 1)
                 Script_WriteReferenceValue(&reference, 0, 0);
             else if (subject->state == 4)
@@ -822,23 +822,23 @@ void PileDriver_WriteScriptStatus(void)
 
 void PileDriver_BeginArrivalRamp(void)
 {
-    struct PileDriver *panel = SCENE_PANEL_GLOBAL;
+    struct PileDriver *panel = PILE_DRIVER_GLOBAL;
     if (panel) {
         panel->arrivalRampEnabled = 1;
-        SCENE_PANEL_GLOBAL->arrivalRampFrame = 0;
+        PILE_DRIVER_GLOBAL->arrivalRampFrame = 0;
     }
 }
 
 void PileDriver_SetTransitionGate(void)
 {
-    struct PileDriver *panel = SCENE_PANEL_GLOBAL;
+    struct PileDriver *panel = PILE_DRIVER_GLOBAL;
     if (panel)
         panel->gateC12 = 1;
 }
 
 void PileDriver_ClearTransitionGate(void)
 {
-    struct PileDriver *panel = SCENE_PANEL_GLOBAL;
+    struct PileDriver *panel = PILE_DRIVER_GLOBAL;
     if (panel)
         panel->gateC12 = 0;
 }
@@ -883,12 +883,12 @@ void PileDriver_RegisterReceiver(struct PileDriver *panel)
 
 void PileDriver_ClearGlobal(void)
 {
-    gScenePanel = NULL;
+    gPileDriver = NULL;
 }
 
 u32 PileDriver_IsPresent(void)
 {
-    u32 present = (u32)gScenePanel;
+    u32 present = (u32)gPileDriver;
     if (present != 0)
         present = 1;
     return present;
@@ -942,7 +942,7 @@ void PileDriver_UpdateApproachSprite(struct PileDriver *panel)
 void PileDriver_SubmitPlayerMidpoint(struct PileDriver *panel)
 {
     struct PileDriverInteractionPackedPosition position;
-    struct PileDriverInteractionPlayer *player = SCENE_PANEL_PLAYER;
+    struct PileDriverInteractionPlayer *player = PILE_DRIVER_PLAYER;
     position.x = ((u32)(player->position.x + panel->origin.x) << 15) >> 16;
     position.y = (u16)player->position.y + 150;
     position.z = ((u32)(player->position.z + panel->origin.z) << 15) >> 16;
@@ -955,7 +955,7 @@ s32 PileDriver_TickLifecycle(struct PileDriver *parent)
     PileDriver_DispatchCommands((void *)parent);
     PileDriver_SelectMode((void *)parent);
     parent->activeCount = PileDriver_CountActiveSubjects((void *)parent);
-    playerKind = SCENE_PANEL_PLAYER->kindValue;
+    playerKind = PILE_DRIVER_PLAYER->kindValue;
     if (playerKind == 4)
         return 0;
     if (parent->initialMode == 1 && parent->effectState != 14 && playerKind == 1 &&
@@ -1004,7 +1004,7 @@ s32 PileDriver_DestroyLifecycle(struct PileDriver *parent)
     }
     PileDriver_DestroyParticles((void *)parent);
     PileDriver_UnregisterReceiver((void *)parent);
-    gScenePanel = 0;
+    gPileDriver = 0;
     return 0;
 }
 
@@ -1016,7 +1016,7 @@ s32 PileDriver_InitializeLifecycle(struct PileDriver *parent)
     else
         parent->skipMainSprite = found;
     {
-        struct PileDriverInteractionPlayer *player = SCENE_PANEL_PLAYER;
+        struct PileDriverInteractionPlayer *player = PILE_DRIVER_PLAYER;
         parent->savedPlayer = player;
     }
     parent->savedTether = gTetherActor;
@@ -1036,15 +1036,15 @@ s32 PileDriver_InitializeLifecycle(struct PileDriver *parent)
         s32 mode = gGameState->unk876;
         parent->paletteMode = mode;
     }
-    gScenePanel = (void *)parent;
+    gPileDriver = (void *)parent;
     return 0;
 }
 
 struct PileDriver *PileDriver_Create(u32 actorId)
 {
     struct PileDriver *panel;
-    if (gScenePanel)
-        return gScenePanel;
+    if (gPileDriver)
+        return gPileDriver;
     panel = Task_Create(9, 0x17E4);
     if (panel) {
         Task_SetCallbacks(panel, (void (*)(void *))PileDriver_TickLifecycle,

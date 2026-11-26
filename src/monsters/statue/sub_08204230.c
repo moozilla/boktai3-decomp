@@ -30,7 +30,7 @@ static inline s32 Statue_CellIndex(struct PHVec *v)
 }
 /* The state callback, sequence, hit flag, facing, defeat flag and resource slot the script setup writes. */
 // confidence=low: field names follow FanCannon, whose setup tail this mirrors.
-struct EnemyF426Tail {
+struct StatueTail {
     u8 pad0[0x108];
     void (*update)(void);
     u8 sequence[0x22];
@@ -124,19 +124,19 @@ s32 Statue_InitializeFromScript(u8 *p, void *parent)
     *(struct SceneVec *)(p + 0x40) = *(struct SceneVec *)(p + 0x1c);
     AnimData_SelectPaletteBank(p + 0x50, 0x225);
     resource = ScriptProc_Start(0x922e, 0xfa45);
-    ((struct EnemyF426Tail *)p)->resource = resource;
-    if (!((struct EnemyF426Tail *)p)->dead) {
-        Anim_SetSequence(p + 0x10c, resource, 0, ((struct EnemyF426Tail *)p)->direction, 0);
+    ((struct StatueTail *)p)->resource = resource;
+    if (!((struct StatueTail *)p)->dead) {
+        Anim_SetSequence(p + 0x10c, resource, 0, ((struct StatueTail *)p)->direction, 0);
     } else {
-        ((struct EnemyF426Tail *)p)->hit = 1;
-        Anim_SetSequence(p + 0x10c, ((struct EnemyF426Tail *)p)->resource, 1,
-                         ((struct EnemyF426Tail *)p)->direction, 0);
+        ((struct StatueTail *)p)->hit = 1;
+        Anim_SetSequence(p + 0x10c, ((struct StatueTail *)p)->resource, 1,
+                         ((struct StatueTail *)p)->direction, 0);
     }
     PlayerCue_StepSequence((struct ContactSwarmSprite *)(p + 0x24),
                            (struct DisplaySequenceState *)(p + 0x10c));
-    if (!((struct EnemyF426Tail *)p)->dead)
+    if (!((struct StatueTail *)p)->dead)
         Statue_InitCollider(p);
-    if (W(0x150) && !((struct EnemyF426Tail *)p)->dead) {
+    if (W(0x150) && !((struct StatueTail *)p)->dead) {
         s32 cell = Statue_CellIndex((struct PHVec *)(p + 0x40));
         TerrainModifiers_RegisterCell(p + 0x174, cell, 0, H(0x42) >> 8, 0, 1);
     }

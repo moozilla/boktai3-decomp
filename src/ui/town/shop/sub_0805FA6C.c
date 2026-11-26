@@ -1,5 +1,5 @@
 #include "ui/town/shop_panel.h"
-void Shop_ShowItemDescription(struct SceneInventoryPanel *panel)
+void Shop_ShowItemDescription(struct ShopPanel *panel)
 {
     s32 item;
     s32 frame;

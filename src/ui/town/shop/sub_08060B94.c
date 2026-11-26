@@ -1,14 +1,14 @@
 #include "ui/town/shop_actions.h"
 #include "system/game_state/game_state.h"
-struct SceneInventoryOwnedConsumables {
+struct ShopOwnedConsumables {
     u8 unknown0[0x160];
     s16 id;
 };
-void Shop_BeginConsumableSpecialMove(struct SceneInventoryActionView *panel)
+void Shop_BeginConsumableSpecialMove(struct ShopActionView *panel)
 {
     struct SceneInputPosition starts[2], targets[2];
     u32 enabled[2], frames[2], attributes[2];
-    struct SceneInventoryActionFlagsView *display = (void *)panel;
+    struct ShopActionFlagsView *display = (void *)panel;
     struct SceneInputPosition *target;
     enabled[0] = 1;
     display->widgets[panel->savedSelection + 5].flags |= 1;
@@ -18,7 +18,7 @@ void Shop_BeginConsumableSpecialMove(struct SceneInventoryActionView *panel)
         game = gGameState;
         address <<= 1;
         address += (u32)game;
-        frames[0] = ((struct SceneInventoryOwnedConsumables *)address)->id + 0x121;
+        frames[0] = ((struct ShopOwnedConsumables *)address)->id + 0x121;
     }
     attributes[0] = 0x373;
     SceneInput_GetGridPosition(starts, panel->savedSelection);
@@ -36,7 +36,7 @@ void Shop_BeginConsumableSpecialMove(struct SceneInventoryActionView *panel)
     target[1].x = 0;
     target[1].y = 0;
     target[1].z = 0;
-    SceneInput_BeginPairTransition(&((struct SceneInventoryTransitionView *)panel)->pair, enabled,
+    SceneInput_BeginPairTransition(&((struct ShopTransitionView *)panel)->pair, enabled,
                                    starts, target, frames, attributes, 12);
     Sound_PlaySong(0x38A);
 }
