@@ -21,25 +21,6 @@ struct Slime {
     u16 splitScript, splitParameter, waitTimer, flags;
 };
 
-struct SlimeHalfFlags {
-    s16 bits : 16;
-};
-
-struct SlimePackedPair {
-    u32 first : 16, second : 16;
-};
-struct SlimeCollisionVector {
-    struct SlimePackedPair xy, zw;
-};
-
-static inline u8 Slime_TakePrepared(struct ChaseActor *actor)
-{
-    if (actor->base.field2B2) {
-        actor->base.field2B2 = 0;
-        return 1;
-    }
-    return 0;
-}
 void SceneActorControl_OnIdle(u8 *);
 void Slime_ApplyBodyHit(struct ContactCollider *target, struct ContactCollider *info,
                         struct ChaseActor *actor);
