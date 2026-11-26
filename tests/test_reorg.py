@@ -244,6 +244,50 @@ class ReorgTests(unittest.TestCase):
             self.assertEqual(reorg.recorded_moves()[Path(old)], Path(new))
             self.assertEqual(reorg.migrate(), 0)
 
+    def test_filename_plan_covers_multi_function_units_and_pending_patches(self):
+        folder = "src/world/monster"
+        multi = Path(folder, "sub_08001000.c")
+        named = Path(folder, "sub_08001020.c")
+        review = Path(folder, "legacy.c")
+        unnamed = Path(folder, "sub_08001040.c")
+        tilemap = Path(folder, "wrapped_tilemap_cells.c")
+        metadata = (f"diff --git a/{multi} b/{multi}\n--- a/{multi}\n+++ b/{multi}\n"
+                    f"rename from {multi}\nrename to {multi}\n")
+        patch_paths = [f"tools/{tool}/pending_src_fixes/draft.patch"
+                       for tool in ("autopilot", "testbench")]
+        files = {
+            "symbols/functions.csv": "addr,name\n08001000,Monster_Init\n08001010,Monster_Update\n"
+                                     "08001020,Monster_Draw_08001020\n08001030,Monster_Use\n",
+            "symbols/source_dirs.csv": f"current_path,new_path,note\n{folder},{folder},fixture\n",
+            "symbols/source_files.csv": "original_path,current_path,rule,filename,start,end,planned_basename\n"
+                                        f"{multi},{multi},{folder},{multi.name},08001000,08001020,\n"
+                                        f"{named},{named},{folder},{named.name},08001020,08001030,\n"
+                                        f"{review},{review},{folder},{review.name},08001030,08001040,overview.c\n"
+                                        f"{unnamed},{unnamed},{folder},{unnamed.name},08001040,08001050,\n"
+                                        f"{tilemap},{tilemap},{folder},{tilemap.name},08001050,08001060,\n",
+            "symbols/header_dirs.csv": "current_path,new_path,note\n",
+            str(multi): "void Monster_Init(void) {}\nvoid Monster_Update(void) {}\n",
+            str(named): "void Monster_Draw_08001020(void) {}\n",
+            str(review): "void Monster_Use(void) {}\n",
+            str(unnamed): "void sub_08001040(void) {}\n",
+            str(tilemap): "void sub_08001050(void) {}\n",
+            **dict.fromkeys(patch_paths, metadata),
+        }
+        with fixture(files) as root:
+            manifest = reorg.scan(root)
+            recorded = reorg.recorded_moves()
+            self.assertEqual(reorg.plan_files(recorded, False, manifest)[multi], multi)
+            plan = reorg.plan_files(recorded, True, manifest)
+            self.assertEqual(plan[multi], multi.with_name("Monster_Init.c"))
+            self.assertEqual(plan[named], named.with_name("Monster_Draw_08001020.c"))
+            self.assertEqual(plan[review], review.with_name("overview.c"))
+            self.assertEqual(plan[unnamed], unnamed)
+            self.assertEqual(plan[tilemap], tilemap)
+            for path in patch_paths:
+                transformed = reorg.transform(Path(path), metadata, plan, {})
+                self.assertEqual(transformed, metadata.replace(str(multi), str(plan[multi])))
+            self.assertTrue((root / multi).is_file())
+
     def test_repository_agrees_with_layout_tables(self):
         plan = io.StringIO()
         with contextlib.redirect_stdout(plan):

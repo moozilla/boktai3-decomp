@@ -167,6 +167,7 @@ class SourcePlacement:
     end: int
     pass2: Path | None = None
     prior_paths: tuple[Path, ...] = ()
+    planned_basename: str = ""
 
 
 def layout_path(value, category):
@@ -210,7 +211,10 @@ def source_placements(root=ROOT):
             previous = row.get("pass2_path")
             pass2 = layout_path(previous, "src") if previous else None
             prior_paths = tuple(layout_path(path, "src") for path in (row.get("prior_paths") or "").split("|") if path)
-            placements.append(SourcePlacement(original, current, target, start, end, pass2, prior_paths))
+            planned = row.get("planned_basename") or ""
+            if planned and not re.fullmatch(r"[A-Za-z_][A-Za-z_0-9]*\.c", planned):
+                raise ValueError(f"{SOURCE_FILES}: invalid planned basename {planned}")
+            placements.append(SourcePlacement(original, current, target, start, end, pass2, prior_paths, planned))
     for field in ("original", "current", "target"):
         paths = [getattr(placement, field).as_posix().casefold() for placement in placements]
         if len(paths) != len(set(paths)):

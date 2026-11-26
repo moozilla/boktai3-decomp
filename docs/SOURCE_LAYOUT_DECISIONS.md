@@ -202,6 +202,18 @@ a cutscene. Its unit at 082373C8 stays in
 directory would introduce a separate ROM range there. The unit stays intact
 within the reviewed Player range map.
 
+The function prefixes follow each defining unit and its callers. Loot
+deposit, moving platform, sliding door, Vanargand, and Hresvelgr helpers
+owned by their units adopt those names. Shared SceneActors services keep
+their names. Vanargand also calls the two shared Debug position helpers.
+The static Coffin Bike helper initializes its braking animation and names
+that action independently of the public stopping callback.
+
+The filename plan records twenty explicit basenames. Four names beyond the
+Sabata, rider, Pile Driver, Nidhoggr effect-pool, and animated sprite units
+describe the main Nidhoggr duel, its minions, its orbs, and its bursts.
+The tilemap units keep their two reviewed descriptive names.
+
 ## Counts
 
 | | Baseline (pass 2 + corrections) | Pass 3 |

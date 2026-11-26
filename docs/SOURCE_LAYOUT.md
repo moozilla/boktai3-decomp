@@ -48,10 +48,9 @@ list the evidence and the names still awaiting confirmation.
   become one unit file.
 * Function names are `Object_Action` with the object's game name
   (`PileDriver_`, `VanargandHead_`, `Sabata_`, `Shop_`), never a registry key,
-  slot or address. One-function files are named after their function
-  (`Hresvelgr_Create.c`); an unnamed function keeps `sub_XXXXXXXX.c`.
-  If the symbol ends in a disambiguating address, preserve that suffix in
-  the filename too.
+  slot or address. Use a function's exact name for a one-function game
+  file, including any disambiguating address suffix on the symbol.
+  `Hresvelgr_Create.c` is one example.
 * Headers sit beside their object under the mirrored path in `include/`, at
   most two directories deep (`#include "monsters/ghoul.h"`,
   `#include "objects/pile_driver/pile_driver_rig.h"`); a three-level source
@@ -63,6 +62,22 @@ list the evidence and the names still awaiting confirmation.
   `include/scene/motion/` (routes, chase, turning, terrain movement). Engine-wide
   headers: `include/engine/` (memory, tasks, input, RAM), `include/engine/video/`
   (display sequences, palettes, render, `anim_sprite.h`), `include/engine/math/`.
+
+### Source filenames
+
+A `sub_XXXXXXXX.c` file with several functions takes the name of its first
+function in ROM order. An unnamed first function keeps the address basename.
+The two tilemap files already reviewed as `fill_tilemap_rectangle.c` and
+`wrapped_tilemap_cells.c` keep their descriptive names. Imported SDK files
+keep their upstream naming.
+
+Multi-function files with established descriptive basenames keep them.
+`symbols/source_files.csv` gives an explicit `planned_basename` for 20
+stale names whose whole-unit role is clearer than their first function.
+`tools/reorg.py --rename` previews the filename pass. The regular directory
+replay preserves basenames. Pending source-fix patches under both
+`tools/autopilot/pending_src_fixes/` and `tools/testbench/pending_src_fixes/`
+follow recorded source paths in their patch headers.
 
 ## Where is it?
 
