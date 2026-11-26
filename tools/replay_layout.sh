@@ -35,6 +35,10 @@ make -j1 PY="$PY" disasm
 "$PY" tools/promote_names.py --only-table symbols/function_aliases.csv --check
 "$PY" tools/reorg.py --type-renames symbols/type_renames.csv --wrap-renames --apply
 "$PY" tools/replay_support.py sync "$state"
+if [ -f "$state/tracked-paths" ]; then
+    BOKTAI3_REPLAY_PATHS="$state/tracked-paths"
+    export BOKTAI3_REPLAY_PATHS
+fi
 "$PY" tools/reorg.py --function-renames symbols/function_renames.csv --skip-diverged --settled-references --wrap-renames --apply
 "$PY" tools/reorg.py --check
 "$PY" tools/reorg.py --function-renames symbols/function_renames.csv --skip-diverged --settled-references --check

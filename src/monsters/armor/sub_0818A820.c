@@ -54,7 +54,8 @@ void Armor_DispatchTypeUpdate(void *);
 void Armor_DispatchBehaviorUpdate(void *);
 void ActorController_UpdateAnimation(void *);
 void SceneBody_ClearMovementProbe(struct SceneActorBody *);
-u32 Terrain_AdjustBlockedMovement(void *, const struct ContactPosition *, struct ContactPosition *, u32);
+u32 Terrain_AdjustBlockedMovement(void *, const struct ContactPosition *, struct ContactPosition *,
+                                  u32);
 void Obj_StepPosition(struct SceneActorBody *);
 void Armor_StartAccentPaletteFade(void *);
 void SceneEffectPool_Update(void *, const struct ContactPosition *);

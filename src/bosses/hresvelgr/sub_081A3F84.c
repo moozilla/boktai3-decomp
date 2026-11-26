@@ -15,7 +15,8 @@ void *HresvelgrEffectPool_Create(s32 a, s32 b, s32 c)
     gEffectPoolManager = Task_Create(8, 0x4b8);
     pool = gEffectPoolManager;
     if (pool) {
-        Task_SetCallbacks(pool, HresvelgrEffectPool_UpdateActiveEntries, Hresvelgr_DestroyHomingShotPool);
+        Task_SetCallbacks(pool, HresvelgrEffectPool_UpdateActiveEntries,
+                          Hresvelgr_DestroyHomingShotPool);
         if (HresvelgrEffectPool_Initialize(pool, a, b, c) < 0) {
             Task_Kill(pool);
             return NULL;

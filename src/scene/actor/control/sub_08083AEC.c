@@ -11,8 +11,9 @@ void SceneActorCollision_InitExternalAttackWithField34(struct ChaseActor *,
 void SceneActorControl_ApplyContactPowerFloor(struct SceneActorBehaviorContactView *,
                                               struct SceneActorBehaviorContactView *,
                                               struct ChaseActor *);
-void SceneActorControl_ApplyRecoveryContact(struct SceneActorBehaviorContactView *, struct SceneActorBehaviorContactView *,
-                  struct ChaseActor *);
+void SceneActorControl_ApplyRecoveryContact(struct SceneActorBehaviorContactView *,
+                                            struct SceneActorBehaviorContactView *,
+                                            struct ChaseActor *);
 void SceneActorControl_InitContactColliders(u8 *p)
 {
     struct Z s1, s2, s3, s4;
@@ -30,7 +31,7 @@ void SceneActorControl_InitContactColliders(u8 *p)
     s4.bits.x = 0;
     s4.bits.y = 0;
     s4.bits.z = 0;
-    SceneActorCollision_InitExternalAttackWithField34((struct ChaseActor *)p,
-                                                      (struct ContactCollider *)(p + 0x188), &s3,
-                                                      &s4, (void *)SceneActorControl_ApplyRecoveryContact, 0, 0x200000, p);
+    SceneActorCollision_InitExternalAttackWithField34(
+        (struct ChaseActor *)p, (struct ContactCollider *)(p + 0x188), &s3, &s4,
+        (void *)SceneActorControl_ApplyRecoveryContact, 0, 0x200000, p);
 }

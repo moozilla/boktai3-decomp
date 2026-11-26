@@ -15,7 +15,8 @@ u8 *LootDepositPool_CreateManager(void)
         return gActorGroupPool;
     p = Task_Create(0xa, 0x630);
     if (p != 0) {
-        Task_SetCallbacks(p, LootDepositCallbackPool_UpdateEntries, LootDepositCallbackPool_DestroyEntries);
+        Task_SetCallbacks(p, LootDepositCallbackPool_UpdateEntries,
+                          LootDepositCallbackPool_DestroyEntries);
         if (LootDepositPool_InitManager(p) < 0) {
             Task_Kill(p);
             return 0;

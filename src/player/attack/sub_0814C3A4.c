@@ -199,7 +199,8 @@ void Player_UpdateGrabMotion(struct Player *p)
             else
                 PlayerAnimation_SelectSecondaryKeyframes(p, 0xE9, 0x40);
             PlayerGrab_CopyPosition(p);
-            (*(struct PlayerGrabTarget **)&gPlayerPendingActor) = Player_FindNearestVisibleTarget(p);
+            (*(struct PlayerGrabTarget **)&gPlayerPendingActor) =
+                Player_FindNearestVisibleTarget(p);
             if ((*(struct PlayerGrabTarget **)&gPlayerPendingActor) == 0) {
                 Player_AddStatusFlags(p, 0x4000);
             } else {
@@ -209,7 +210,8 @@ void Player_UpdateGrabMotion(struct Player *p)
             p->tetherFrame++;
             if (p->tetherFrame <= 0x1D)
                 return;
-            (*(struct PlayerGrabTarget **)&gPlayerPendingActor) = Player_FindNearestVisibleTarget(p);
+            (*(struct PlayerGrabTarget **)&gPlayerPendingActor) =
+                Player_FindNearestVisibleTarget(p);
             if ((*(struct PlayerGrabTarget **)&gPlayerPendingActor))
                 return;
             Player_SetActionPhase(p, 5);

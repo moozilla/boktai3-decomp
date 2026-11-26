@@ -80,8 +80,8 @@ s32 AxeArmor_Update(u8 *p)
             spread.a.lo = 24;
             spread.a.hi = (ParticleRandom_ReadDirectSample(table) & 7) + 3;
             spread.b.lo = 24;
-            ImpactParticleGroup_SpawnBouncing((ParticleRandom_ReadDirectSample(table) & 3) + 4, 13, &center, &velocity,
-                         &spread, 15, 15);
+            ImpactParticleGroup_SpawnBouncing((ParticleRandom_ReadDirectSample(table) & 3) + 4, 13,
+                                              &center, &velocity, &spread, 15, 15);
             Anim_RestartSequence(p + 0x10c, *(void **)(p + 0x158), 4, 0, 0);
             *position = U(0x1c) + 0x40;
             {

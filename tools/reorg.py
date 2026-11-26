@@ -433,12 +433,17 @@ def migrate(rename=False, apply=False, *, remember=None):
 
 def rewrite_moves(recorded, moves, apply, *, input_table=None):
     occupied = {}
+    duplicates = set()
     for old, new in moves.items():
+        if old != new and (ROOT / new).exists() and not (ROOT / old).samefile(ROOT / new):
+            if (old.suffix == ".h" and moves.get(new) == new
+                    and (ROOT / old).read_bytes() == (ROOT / new).read_bytes()):
+                duplicates.add(old)
+                continue
+            raise ValueError(f"{old}: {new} already exists")
         previous = occupied.setdefault(new.as_posix().casefold(), old)
         if previous != old:
             raise ValueError(f"{previous} and {old} both map to {new}")
-        if old != new and (ROOT / new).exists() and not (ROOT / old).samefile(ROOT / new):
-            raise ValueError(f"{old}: {new} already exists")
 
     references = {old: moves.get(new, new) for old, new in recorded.items()} | moves
     includes = {old.relative_to("include").as_posix(): new.relative_to("include").as_posix()
@@ -459,7 +464,9 @@ def rewrite_moves(recorded, moves, apply, *, input_table=None):
         raw = (ROOT / old).read_bytes().decode("utf-8", errors="surrogateescape")
         new = moves.get(old, old)
         updated = transform(old, raw, references, includes)
-        if new != old:
+        if old in duplicates:
+            print(f"remove {old} (identical to {new})")
+        elif new != old:
             print(f"{old} -> {new}")
         elif updated != raw:
             print(f"rewrite {old}")
@@ -468,6 +475,9 @@ def rewrite_moves(recorded, moves, apply, *, input_table=None):
 
     if apply:
         for old, new, updated in changed:
+            if old in duplicates:
+                (ROOT / old).unlink()
+                continue
             if new != old:
                 (ROOT / new).parent.mkdir(parents=True, exist_ok=True)
                 (ROOT / old).rename(ROOT / new)

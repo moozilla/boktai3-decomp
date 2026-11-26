@@ -23,7 +23,8 @@ void Shop_InitPanel(struct ShopTail *p, s32 mode)
         resource = &p->display.widgetResource;
         animSprite = ((struct ShopPanel *)p)->comparison[0];
         for (i = 0; i < 3; i++) {
-            AnimSprite_InitLinked(animSprite, &p->display.widgetResource, 0, 0x30, 0, 0, 60, location);
+            AnimSprite_InitLinked(animSprite, &p->display.widgetResource, 0, 0x30, 0, 0, 60,
+                                  location);
             location->x += 8;
             animSprite++;
         }

@@ -152,8 +152,8 @@ s32 PlasmaCannon_UpdateDamageState(struct OrangeSpineActor *p)
             spread.a.lo = 24;
             spread.a.hi = (ParticleRandom_ReadDirectSample(table) & 7) + 3;
             spread.b.lo = 24;
-            ImpactParticleGroup_SpawnBouncing(PlasmaCannon_RandomBurstCount(table), 13, &center, &velocity, &spread, 15,
-                         15);
+            ImpactParticleGroup_SpawnBouncing(PlasmaCannon_RandomBurstCount(table), 13, &center,
+                                              &velocity, &spread, 15, 15);
             {
                 struct SceneVec *smokePosition = &smoke;
                 *smokePosition = p->sprite.coordinates.position;

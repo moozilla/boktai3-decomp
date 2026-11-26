@@ -5,7 +5,8 @@ struct GrowthHazard {
     u8 unk0[0x1C];
     struct SceneVec position;
 };
-void ImpactFragmentGroup_SpawnRadial(u32, u32, struct SceneVec *, u32, u32, u32, u32, u32, u32, u32, u32, u32);
+void ImpactFragmentGroup_SpawnRadial(u32, u32, struct SceneVec *, u32, u32, u32, u32, u32, u32, u32,
+                                     u32, u32);
 
 void SolarRoot_PlayImpactEffect(struct GrowthHazard *hazard)
 {

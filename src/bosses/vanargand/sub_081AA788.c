@@ -163,7 +163,8 @@ static inline void SpawnPartProjectile(struct Vanargand *owner, struct ContactPo
     sampleOffset = *cursor * 2;
     r = *(u16 *)(sampleOffset + (u32)table);
     index = sub_08249350(r >> 3, 6);
-    VanargandProjectile_CreateWithSource(owner->sprite, position, target, source, spread, sideOffset, index);
+    VanargandProjectile_CreateWithSource(owner->sprite, position, target, source, spread,
+                                         sideOffset, index);
 }
 static inline void SpawnFreeProjectile(struct Vanargand *owner, struct ContactPosition *position,
                                        void *target, u16 base, s32 sideOffset)

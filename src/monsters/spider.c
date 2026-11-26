@@ -1594,7 +1594,8 @@ u8 SceneActorPlacement_SelectPlayerApproach(struct ChaseActor *a)
         angle = -angle;
     if (angle > 32)
         return 0;
-    if (!Terrain_IsSegmentBelowHeightLimit(transform + 12, &((struct SpiderApproachPlayer *)player)->position, 5, 256))
+    if (!Terrain_IsSegmentBelowHeightLimit(
+            transform + 12, &((struct SpiderApproachPlayer *)player)->position, 5, 256))
         return 0;
     a->base.tracking.target = (u32)((struct SpiderApproachPlayer *)player)->unknown24;
     if (((s32)distance) <= 0x3fff)

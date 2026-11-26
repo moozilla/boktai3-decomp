@@ -367,3 +367,5 @@ CallbackPool_Subtract,LootDepositCallbackPool_Subtract,helper,,Inline helper use
 CallbackPool_Subtract,LootDepositCallbackPool_Subtract,helper,,Inline helper used by this owner,include/objects/loot_deposits/callback_pool.h
 ProximityActor_NextSpawnSample,LootDepositFeedback_NextSpawnSample,helper,,Inline helper used by this owner,src/objects/loot_deposits/
 MotionEntry_AddVelocity,HresvelgrMotion_AddVelocity,helper,,Inline helper used by this owner,src/bosses/hresvelgr/
+RegistrySelectionMenu,WorldMapMenu,struct,,San Miguel world map destination chooser,src/ui/world_map.c
+RegistrySelectionMenu,WorldMapMenu,struct,,San Miguel world map destination chooser,include/ui/world_map.h

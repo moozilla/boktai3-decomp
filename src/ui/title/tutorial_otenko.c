@@ -2943,14 +2943,22 @@ void TutorialOtenko_UpdateBlinkBurstDisappearance(struct ActorAnimController *p)
             ImpactBurst_EmitBurst(&p->obj.x, 1, 512, 48, 8, 8, 8, 4);
             ImpactBurst_EmitBurst(&p->obj.x, 1, 512, 48, 8, 8, 8, 4);
             ImpactBurst_EmitBurst(&p->obj.x, 1, 512, 48, 8, 8, 8, 4);
-            ImpactParticleGroup_SpawnRadial(1, 3, &p->obj.x, 32, 60, duration, 3, duration, 5, 60, duration);
-            ImpactParticleGroup_SpawnRadial(1, 3, &p->obj.x, 64, 60, duration, 3, duration, 5, 60, duration);
-            ImpactParticleGroup_SpawnRadial(1, 3, &p->obj.x, 96, 60, duration, 3, duration, 5, 60, duration);
-            ImpactParticleGroup_SpawnRadial(1, 3, &p->obj.x, 128, 60, duration, 3, duration, 5, 60, duration);
-            ImpactParticleGroup_SpawnRadial(1, 3, &p->obj.x, 160, 60, duration, 3, duration, 5, 60, duration);
-            ImpactParticleGroup_SpawnRadial(1, 3, &p->obj.x, 192, 60, duration, 3, duration, 5, 60, duration);
-            ImpactParticleGroup_SpawnRadial(1, 3, &p->obj.x, 224, 60, duration, 3, duration, 5, 60, duration);
-            ImpactParticleGroup_SpawnRadial(1, 3, &p->obj.x, 256, 60, duration, 3, duration, 5, 60, duration);
+            ImpactParticleGroup_SpawnRadial(1, 3, &p->obj.x, 32, 60, duration, 3, duration, 5, 60,
+                                            duration);
+            ImpactParticleGroup_SpawnRadial(1, 3, &p->obj.x, 64, 60, duration, 3, duration, 5, 60,
+                                            duration);
+            ImpactParticleGroup_SpawnRadial(1, 3, &p->obj.x, 96, 60, duration, 3, duration, 5, 60,
+                                            duration);
+            ImpactParticleGroup_SpawnRadial(1, 3, &p->obj.x, 128, 60, duration, 3, duration, 5, 60,
+                                            duration);
+            ImpactParticleGroup_SpawnRadial(1, 3, &p->obj.x, 160, 60, duration, 3, duration, 5, 60,
+                                            duration);
+            ImpactParticleGroup_SpawnRadial(1, 3, &p->obj.x, 192, 60, duration, 3, duration, 5, 60,
+                                            duration);
+            ImpactParticleGroup_SpawnRadial(1, 3, &p->obj.x, 224, 60, duration, 3, duration, 5, 60,
+                                            duration);
+            ImpactParticleGroup_SpawnRadial(1, 3, &p->obj.x, 256, 60, duration, 3, duration, 5, 60,
+                                            duration);
             ActorShadow_Disable(p->p2);
             p->obj.flags |= 1;
             TutorialOtenko_SetState(p, 1, 2);

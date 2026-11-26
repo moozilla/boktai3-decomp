@@ -290,8 +290,8 @@ void MeterDisplay_InitializeWidgets(struct FieldHudWidgets *widgets)
     animSprite = widgets->meterWidgets;
 
     do {
-        result = AnimSprite_InitLinked(animSprite, widgets->meterResource, (u16)(i + 0x49), 0x10, zero,
-                                   zero, zero, (void *)zero);
+        result = AnimSprite_InitLinked(animSprite, widgets->meterResource, (u16)(i + 0x49), 0x10,
+                                       zero, zero, zero, (void *)zero);
         if (result)
             return;
         animSprite->position.x = result;

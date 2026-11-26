@@ -578,3 +578,4 @@ include/system/game_state/game_state.h,include/system/game_state/game_state.h,be
 include/system/save_data/script_reference.h,include/system/save/script_reference.h,beside its unit,,
 include/system/time/region_menu.h,include/system/clock/region_menu.h,beside its unit,,
 include/system/time_palette_transitions/time_palette.h,include/system/clock/time_palette.h,beside its unit,,
+include/monsters/enemy_particle.h,include/effects/particles/enemy_particle.h,Shared enemy attack particle pool,,

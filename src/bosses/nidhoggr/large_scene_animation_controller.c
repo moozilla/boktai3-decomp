@@ -2078,8 +2078,9 @@ void Nidhoggr_PlayNearbyRandomSound(struct SceneVec *pos)
 /* Tentative: called once per frame from Nidhoggr_Update, drives a death-flash effect while
  * t->flags[1] (0x724D) counts down (Blend_SetAlpha from a fade table gUnk_0824F588, toggling
  * bg blend bits in gDispCntShadow, and refreshing t->timedCollider at 0x5DFC), otherwise
- * sets bits in t->flags[2] (0x724E); also calls Nidhoggr_RestoreFirstPartRanges/Nidhoggr_RestoreSecondPartRanges (part completion)
- * further down. 564 bytes; not attempted byte-for-byte this pass. confidence=low. */
+ * sets bits in t->flags[2] (0x724E). Calls Nidhoggr_RestoreFirstPartRanges and
+ * Nidhoggr_RestoreSecondPartRanges for part completion further down.
+ * 564 bytes; not attempted byte-for-byte this pass. confidence=low. */
 
 extern const u8 gUnk_0824F584[];
 extern const u8 gUnk_0824F588[];

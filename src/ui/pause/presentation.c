@@ -244,7 +244,8 @@ void SceneHud_RefreshEquipmentValues(struct SceneHudState *p)
                 digit = digits;
                 display = &p->motionWidgets[2].flags;
                 animSprite = &p->motionWidgets[2];
-                for (j = 0; j < 3; display += sizeof(*animSprite) / sizeof(*display), animSprite++, j++) {
+                for (j = 0; j < 3;
+                     display += sizeof(*animSprite) / sizeof(*display), animSprite++, j++) {
                     *display &= ~1;
                     ((struct AnimSprite *)((u8 *)display - (u32) &
                                                  ((struct AnimSprite *)0)->flags))

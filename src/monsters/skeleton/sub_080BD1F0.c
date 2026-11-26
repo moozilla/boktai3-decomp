@@ -21,7 +21,8 @@ void *Bestiary_GetEntryForActor(u32, u32);
 void Bestiary_UnlockEntry(void *);
 void SceneActorBehavior_CallTerrainScript(void *);
 void SceneActorPlacement_PlayCategoryEventSound(void *);
-void SpriteProjectile_Create(void *, void *, u32, u32, u32, u32, u32, u32, u32, u32, u32, u32, u32, u32, u32);
+void SpriteProjectile_Create(void *, void *, u32, u32, u32, u32, u32, u32, u32, u32, u32, u32, u32,
+                             u32, u32);
 void Player_AddExperience(u32);
 void Player_RefreshLifeState(u32, u32);
 void Skeleton_InitializeCategoryProfile(void *);
@@ -90,7 +91,8 @@ static inline void Polar(struct ContactPosition *v, s32 angle, s32 radius)
         pos = actor->base.body.position;                                                           \
         pos.y += 200;                                                                              \
         vec.y = 54;                                                                                \
-        SpriteProjectile_Create(&pos, &vec, 0xD45E, 0x1DC3, kind, 0x1A, 2, 0, 0x13C, 0, 0, 0, 0, 0, 0);       \
+        SpriteProjectile_Create(&pos, &vec, 0xD45E, 0x1DC3, kind, 0x1A, 2, 0, 0x13C, 0, 0, 0, 0,   \
+                                0, 0);                                                             \
     } while (0)
 #define FLAG_COUNTS()                                                                              \
     {                                                                                              \

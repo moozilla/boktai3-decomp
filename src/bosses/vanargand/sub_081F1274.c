@@ -19,10 +19,10 @@ u8 Sprite_BlinkUntilExpired(void *, s32, s32, s32);
 
 #define RESTORE_BACKGROUND_PALETTES(actor, i, writeRow)                                            \
     do {                                                                                           \
-        VanargandHeadPaletteBank *readRow;                                                                 \
+        VanargandHeadPaletteBank *readRow;                                                         \
         u16 *bg = gBgPaletteBuffer;                                                                \
         u32 bank = 4;                                                                              \
-        writeRow = (VanargandHeadPaletteBank *)(bg + bank * 16);                                           \
+        writeRow = (VanargandHeadPaletteBank *)(bg + bank * 16);                                   \
         readRow = (actor)->savedPalettes;                                                          \
         for (i = 0; i < 4; i++)                                                                    \
             CpuSet(readRow + i, writeRow + i, 16);                                                 \
@@ -50,11 +50,13 @@ u8 Sprite_BlinkUntilExpired(void *, s32, s32, s32);
 #define SET_RANDOM_EFFECT_TRACK(actor, params, paletteBank)                                        \
     {                                                                                              \
         if ((s32)(ParticleRandom_ReadSample(gRandomTable) & 255) > 128) {                          \
-            VanargandParticle_SetSpriteResource(params, (actor)->effectResource, 0, (paletteBank));   \
-            VanargandParticle_SetAnimationTrack(params, (actor)->effectGraphics, 5);                  \
+            VanargandParticle_SetSpriteResource(params, (actor)->effectResource, 0,                \
+                                                (paletteBank));                                    \
+            VanargandParticle_SetAnimationTrack(params, (actor)->effectGraphics, 5);               \
         } else {                                                                                   \
-            VanargandParticle_SetSpriteResource(params, (actor)->effectResource, 0, (paletteBank));   \
-            VanargandParticle_SetAnimationTrack(params, (actor)->effectGraphics, 6);                  \
+            VanargandParticle_SetSpriteResource(params, (actor)->effectResource, 0,                \
+                                                (paletteBank));                                    \
+            VanargandParticle_SetAnimationTrack(params, (actor)->effectGraphics, 6);               \
         }                                                                                          \
     }
 

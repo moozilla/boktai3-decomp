@@ -56,7 +56,8 @@ void Transformation_Reveal(struct ResultMenu *p)
 
             for (i = 0; i < 3; i++) {
                 angle = i * REVEAL_BURST_SPACING;
-                ImpactParticleGroup_SpawnRadial(4, 0x218, origin, angle, REVEAL_BURST_SPACING, 8, 8, 8, 1, 12, 8);
+                ImpactParticleGroup_SpawnRadial(4, 0x218, origin, angle, REVEAL_BURST_SPACING, 8, 8,
+                                                8, 1, 12, 8);
             }
         }
     }

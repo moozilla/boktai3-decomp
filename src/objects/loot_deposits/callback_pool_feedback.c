@@ -19,8 +19,10 @@ void LootDepositCallbackPool_UpdateShake(struct CallbackPoolEntry *entry)
     if (entry->shakeTimer == 0) {
         entry->sprite.position = entry->savedPosition;
     } else {
-        entry->sprite.position.x = entry->savedPosition.x + Mod(LootDepositCallbackPool_NextRandom(), 20) - 10;
-        entry->sprite.position.z = entry->savedPosition.z + Mod(LootDepositCallbackPool_NextRandom(), 20) - 10;
+        entry->sprite.position.x =
+            entry->savedPosition.x + Mod(LootDepositCallbackPool_NextRandom(), 20) - 10;
+        entry->sprite.position.z =
+            entry->savedPosition.z + Mod(LootDepositCallbackPool_NextRandom(), 20) - 10;
         entry->shakeTimer--;
     }
 }
@@ -39,8 +41,9 @@ static inline void ClearVector(void *dest, u32 *zero)
     CpuSet(zero, dest, 0x05000002);
 }
 
-void LootDepositCallbackPool_ApplyDamage(struct ContactCollider *source, struct ContactCollider *target,
-                              struct CallbackPoolEntry *entry)
+void LootDepositCallbackPool_ApplyDamage(struct ContactCollider *source,
+                                         struct ContactCollider *target,
+                                         struct CallbackPoolEntry *entry)
 {
 
     s32 damage;
@@ -77,8 +80,8 @@ void LootDepositCallbackPool_ApplyDamage(struct ContactCollider *source, struct 
     }
 }
 
-void ImpactParticleGroup_SpawnBouncing(u32, u32, struct SceneExtent *, struct SceneExtent *, struct SceneExtent *, u32,
-                  u32);
+void ImpactParticleGroup_SpawnBouncing(u32, u32, struct SceneExtent *, struct SceneExtent *,
+                                       struct SceneExtent *, u32, u32);
 
 static inline s32 NextRandom(void)
 {
@@ -99,14 +102,15 @@ void LootDepositCallbackPool_SpawnHitParticles(struct CallbackPoolEntry *entry)
     spread.x = (NextRandom() & 3U) + 15U;
     spread.y = (NextRandom() & 7U) + 15U;
     spread.z = (NextRandom() & 3U) + 15U;
-    ImpactParticleGroup_SpawnBouncing((NextRandom() & 3) + 2, 17, (struct SceneExtent *)&entry->sprite.position,
-                 velocity, &spread, 12, 15);
+    ImpactParticleGroup_SpawnBouncing((NextRandom() & 3) + 2, 17,
+                                      (struct SceneExtent *)&entry->sprite.position, velocity,
+                                      &spread, 12, 15);
 }
 
 void LootDepositCallbackPool_ApplyDamage(struct ContactCollider *, struct ContactCollider *,
                               struct CallbackPoolEntry *);
 
-/* LootDepositCallbackPool_InitializeCollider: retain the address symbol used by the earlier constructor. */
+/* The earlier constructor refers to LootDepositCallbackPool_InitializeCollider by address. */
 
 void sub_08105194(struct CallbackPoolEntry *entry, u32 a, u32 b, u32 c)
 {
@@ -128,7 +132,8 @@ void sub_08105194(struct CallbackPoolEntry *entry, u32 a, u32 b, u32 c)
 
 extern const s16 gUnk_086149C4[];
 
-void SpriteProjectile_Create(void *, void *, u32, u32, s32, s32, s32, s32, s32, s32, s32, s32, s32, s32, s32);
+void SpriteProjectile_Create(void *, void *, u32, u32, s32, s32, s32, s32, s32, s32, s32, s32, s32,
+                             s32, s32);
 
 static inline s32 Scale(s32 x)
 {
@@ -165,19 +170,24 @@ void LootDeposit_EmitRemovalDebris(struct CallbackPoolEntry *entry)
         Polar(direction, selected, 10);
     }
     v.y = 64;
-    SpriteProjectile_Create(&entry->sprite.position, &v, 0x9385, 0x74C9, 1, 30, 2, 0, 490, 0, 0, 0, 0, 0, 0);
+    SpriteProjectile_Create(&entry->sprite.position, &v, 0x9385, 0x74C9, 1, 30, 2, 0, 490, 0, 0, 0,
+                            0, 0, 0);
     Polar(Rand() & 255, &v, 10);
     v.y = 34;
-    SpriteProjectile_Create(&entry->sprite.position, &v, 0x9385, 0x74C9, 1, 30, 2, 0, 490, 0, 0, 0, 0, 0, 0);
+    SpriteProjectile_Create(&entry->sprite.position, &v, 0x9385, 0x74C9, 1, 30, 2, 0, 490, 0, 0, 0,
+                            0, 0, 0);
     Polar(Rand() & 255, &v, 10);
     v.y = 34;
-    SpriteProjectile_Create(&entry->sprite.position, &v, 0x9385, 0x74C9, 1, 30, 2, 0, 490, 0, 1, 0, 0, 0, 0);
+    SpriteProjectile_Create(&entry->sprite.position, &v, 0x9385, 0x74C9, 1, 30, 2, 0, 490, 0, 1, 0,
+                            0, 0, 0);
     Polar(Rand() & 255, &v, 10);
     v.y = 34;
-    SpriteProjectile_Create(&entry->sprite.position, &v, 0x9385, 0x74C9, 1, 30, 2, 0, 490, 1, 0, 0, 0, 0, 0);
+    SpriteProjectile_Create(&entry->sprite.position, &v, 0x9385, 0x74C9, 1, 30, 2, 0, 490, 1, 0, 0,
+                            0, 0, 0);
     Polar(Rand() & 255, &v, 10);
     v.y = 34;
-    SpriteProjectile_Create(&entry->sprite.position, &v, 0x9385, 0x74C9, 1, 30, 2, 0, 490, 2, 0, 0, 0, 0, 0);
+    SpriteProjectile_Create(&entry->sprite.position, &v, 0x9385, 0x74C9, 1, 30, 2, 0, 490, 2, 0, 0,
+                            0, 0, 0);
     LootDepositCallbackPool_SpawnHitParticles(entry);
 }
 

@@ -204,7 +204,8 @@ u32 Statue_UpdateDamageState(struct StatueActor *p)
                 spread.a.hi = (sample & 7) + 3;
                 spread.b.lo = 0x18;
                 sample = ParticleRandom_ReadDirectSample(table);
-                ImpactParticleGroup_SpawnBouncing((sample & 3) + 4, 3, &center, &velocity, &spread, 15, 15);
+                ImpactParticleGroup_SpawnBouncing((sample & 3) + 4, 3, &center, &velocity, &spread,
+                                                  15, 15);
                 Anim_RestartSequence(&p->seq, p->resource, 1, p->facing, 0);
                 AnimData_SelectPaletteBank(p->anim, 0x1b7);
                 p->ptr5c = gPaletteBankData + 0x44a0;

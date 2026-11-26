@@ -27,7 +27,8 @@ void Projectile_SetSpriteParameters(void *, u32, u32, u32);
 void Projectile_SetCollisionParameters(void *, s32, u32, s32, s32, s32);
 void Projectile_SetBehaviorMode(void *, u16);
 void Projectile_SpawnAtPosition(void *, void *);
-void SpriteProjectile_Create(void *, void *, u32, u32, s32, s32, s32, s32, s32, s32, s32, s32, s32, s32, s32);
+void SpriteProjectile_Create(void *, void *, u32, u32, s32, s32, s32, s32, s32, s32, s32, s32, s32,
+                             s32, s32);
 void Sound_PlaySong(u32);
 
 s32 OrbitEffect_FireVolley(struct OrbitEffect *p, s32 slot)

@@ -48,8 +48,8 @@ static inline void SceneObjSlot_ApplyActivation(struct SceneObjSlot *slot,
         SceneObjSlot_EnterIdle(slot, state);
     } else {
         slot->variant = state;
-        slot->callback =
-            state == SCENE_OBJ_ACTIVATING ? SlidingDoors_AnimateActive : SlidingDoors_AnimateInactive;
+        slot->callback = state == SCENE_OBJ_ACTIVATING ? SlidingDoors_AnimateActive
+                                                       : SlidingDoors_AnimateInactive;
     }
     SceneObjSlot_ResetPose(
         slot, (state == SCENE_OBJ_INACTIVE || state == SCENE_OBJ_DEACTIVATING) ? 2 : 0);

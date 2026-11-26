@@ -77,7 +77,8 @@ s32 VulcanCannon_UpdateDamageState(struct VulcanCannon *p)
             spread.a.lo = 24;
             spread.a.hi = (CannonRandom(table) & 7) + 3;
             spread.b.lo = 24;
-            ImpactParticleGroup_SpawnBouncing((CannonRandom(table) & 3) + 4, 13, &center, &velocity, &spread, 15, 15);
+            ImpactParticleGroup_SpawnBouncing((CannonRandom(table) & 3) + 4, 13, &center, &velocity,
+                                              &spread, 15, 15);
             VulcanCannon_GetEffectPosition(&smoke, p);
             Explosion_CreateAt(&smoke, 16, 0, 0, 0, 60, explosionFrame, 0);
             smoke.x += 128;

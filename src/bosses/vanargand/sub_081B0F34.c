@@ -31,7 +31,8 @@ static inline u8 MotionEnded(struct PairedSceneHalf *p)
         result = 1;
     return result;
 }
-void VanargandCombat_UpdatePlayerCapture(struct VanargandAttackPair *boss, struct PairedSceneHalf *p)
+void VanargandCombat_UpdatePlayerCapture(struct VanargandAttackPair *boss,
+                                         struct PairedSceneHalf *p)
 {
     struct SceneVec target;
     struct SceneVec playerTarget;

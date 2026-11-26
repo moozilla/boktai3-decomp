@@ -32,8 +32,8 @@ void Terrain_SetRenderModeFromScript(void)
             return;
         }
     } else {
-        Video_SetRenderCallbacks(r, SpriteOam_QueueCameraRelativeSprites, Sprite_RenderCameraRelativeList,
-                                 sub_0821964C);
+        Video_SetRenderCallbacks(r, SpriteOam_QueueCameraRelativeSprites,
+                                 Sprite_RenderCameraRelativeList, sub_0821964C);
     }
     gCamera.offsetX = 0;
     gCamera.offsetY = 0;

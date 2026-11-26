@@ -1115,7 +1115,8 @@ u32 Slime_GetRandomVariantFlags(struct ChaseActor *actor)
 
 // confidence=low: emits three debris particles during the Slime death reaction.
 
-void SpriteProjectile_Create(void *, void *, u32, u32, s32, s32, s32, s32, s32, s32, s32, s32, s32, s32, s32);
+void SpriteProjectile_Create(void *, void *, u32, u32, s32, s32, s32, s32, s32, s32, s32, s32, s32,
+                             s32, s32);
 
 static inline s32 Slime_DebrisFixed12(s32 x)
 {
@@ -1270,8 +1271,8 @@ void Slime_EmitTargetedReactionBurst(struct ChaseActor *input)
         value = &actor->base.attacks.parameter[1];
         v = *value;
         position = &actor->base.body.position;
-        SpriteProjectile_Create(position, &velocity, 0xB96C, 0xA929, 6, 24, 0, 0, sum, 0, 0, attack, response,
-                     bits, v);
+        SpriteProjectile_Create(position, &velocity, 0xB96C, 0xA929, 6, 24, 0, 0, sum, 0, 0, attack,
+                                response, bits, v);
     }
     jitter = Slime_TargetBurstRandom() & 15;
     Slime_TargetBurstPolarMotion(&velocity, angle + jitter, (Slime_TargetBurstRandom() & 7) + 6);
@@ -1297,8 +1298,8 @@ void Slime_EmitTargetedReactionBurst(struct ChaseActor *input)
         value = &actor->base.attacks.parameter[1];
         v = *value;
         position = &actor->base.body.position;
-        SpriteProjectile_Create(position, &velocity, 0xB96C, 0xA929, 7, 24, 0, 0, sum, 0, 0, attack, response,
-                     bits, v);
+        SpriteProjectile_Create(position, &velocity, 0xB96C, 0xA929, 7, 24, 0, 0, sum, 0, 0, attack,
+                                response, bits, v);
     }
     jitter = Slime_TargetBurstRandom() & 15;
     Slime_TargetBurstPolarMotion(&velocity, angle + jitter, (Slime_TargetBurstRandom() & 7) + 6);
@@ -1324,8 +1325,8 @@ void Slime_EmitTargetedReactionBurst(struct ChaseActor *input)
         value = &actor->base.attacks.parameter[1];
         v = *value;
         position = &actor->base.body.position;
-        SpriteProjectile_Create(position, &velocity, 0xB96C, 0xA929, 6, 24, 0, 0, sum, 1, 0, attack, response,
-                     bits, v);
+        SpriteProjectile_Create(position, &velocity, 0xB96C, 0xA929, 6, 24, 0, 0, sum, 1, 0, attack,
+                                response, bits, v);
     }
 }
 
@@ -1420,8 +1421,8 @@ void Slime_EmitScatteredReactionBurst(struct ChaseActor *input)
         value = Slime_AttackParameter(actor);
         v = *value;
         position = Slime_Position(actor);
-        SpriteProjectile_Create(position, &velocity, 0xB96C, 0xA929, 6, 24, 0, 0, sum, 0, 0, attack, response,
-                     bits, v);
+        SpriteProjectile_Create(position, &velocity, 0xB96C, 0xA929, 6, 24, 0, 0, sum, 0, 0, attack,
+                                response, bits, v);
     }
     jitter = Slime_RandomSample() & 15;
     angle = Slime_RandomSample() & 255;
@@ -1448,8 +1449,8 @@ void Slime_EmitScatteredReactionBurst(struct ChaseActor *input)
         value = Slime_AttackParameter(actor);
         v = *value;
         position = Slime_Position(actor);
-        SpriteProjectile_Create(position, &velocity, 0xB96C, 0xA929, 7, 24, 0, 0, sum, 0, 0, attack, response,
-                     bits, v);
+        SpriteProjectile_Create(position, &velocity, 0xB96C, 0xA929, 7, 24, 0, 0, sum, 0, 0, attack,
+                                response, bits, v);
     }
     jitter = Slime_RandomSample() & 15;
     angle = Slime_RandomSample() & 255;
@@ -1476,8 +1477,8 @@ void Slime_EmitScatteredReactionBurst(struct ChaseActor *input)
         value = Slime_AttackParameter(actor);
         v = *value;
         position = Slime_Position(actor);
-        SpriteProjectile_Create(position, &velocity, 0xB96C, 0xA929, 6, 24, 0, 0, sum, 1, 0, attack, response,
-                     bits, v);
+        SpriteProjectile_Create(position, &velocity, 0xB96C, 0xA929, 6, 24, 0, 0, sum, 1, 0, attack,
+                                response, bits, v);
     }
 }
 

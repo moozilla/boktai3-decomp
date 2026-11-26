@@ -44,7 +44,8 @@ void SceneAnimation_UpdateSlotSequenceSevenEffect(u8 *p, int i)
                 struct SceneAnimationEffectPair v;
                 *q = 2;
                 v = gUnk_0824F354;
-                Nidhoggr_CreateSeekingAttackEffect(p + 0x54, (void *)(i * 0x60 + (u32)p + 0x545c), &v, p);
+                Nidhoggr_CreateSeekingAttackEffect(p + 0x54, (void *)(i * 0x60 + (u32)p + 0x545c),
+                                                   &v, p);
             }
             break;
     }

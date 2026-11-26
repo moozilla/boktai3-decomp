@@ -42,18 +42,21 @@ static inline void EmitBurst(struct RoomActor *actor, const struct EmitPosition 
     {
         s32 count = (ParticleRandom_ReadDirectSample(table) & 3) + 2;
         s32 duration = (ParticleRandom_ReadDirectSample(table) & 3) + 6;
-        ImpactParticleGroup_SpawnRadial(count, kind, &position, angle, 8, duration, 4, 10, 8, 5, 10);
+        ImpactParticleGroup_SpawnRadial(count, kind, &position, angle, 8, duration, 4, 10, 8, 5,
+                                        10);
     }
     {
         u32 direction = (angle + (ParticleRandom_ReadDirectSample(table) & 7)) & 255;
         s32 duration = (ParticleRandom_ReadDirectSample(table) & 7) + 6;
-        ImpactParticleGroup_SpawnRadial(3, kind, &position, direction, 8, duration, 4, 14, 4, 6, 10);
+        ImpactParticleGroup_SpawnRadial(3, kind, &position, direction, 8, duration, 4, 14, 4, 6,
+                                        10);
     }
     {
         u32 direction = (angle + (ParticleRandom_ReadDirectSample(table) & 15)) & 255;
         s32 count = (ParticleRandom_ReadDirectSample(table) & 3) + 1;
         s32 duration = (ParticleRandom_ReadDirectSample(table) & 7) + 4;
-        ImpactParticleGroup_SpawnRadial(count, kind, &position, direction, 8, duration, 2, 6, 3, 5, 10);
+        ImpactParticleGroup_SpawnRadial(count, kind, &position, direction, 8, duration, 2, 6, 3, 5,
+                                        10);
     }
 }
 void SceneActorPlacement_EmitTimedParticles(struct RoomActor *actor)

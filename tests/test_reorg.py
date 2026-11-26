@@ -82,6 +82,24 @@ class ReorgTests(unittest.TestCase):
             reorg.header_destination(Path("include/shared.h"), {}, set(),
                                      {"shared": {Path("include/scene"), Path("include/ui")}}, {})
 
+    def test_move_removes_an_identical_old_header_left_by_integration(self):
+        old = Path("include/monsters/enemy_particle.h")
+        new = Path("include/effects/particles/enemy_particle.h")
+        source = Path("src/engine/example.c")
+        include = f'#include "{old.relative_to("include")}"\n'
+        files = {str(old): "struct EnemyParticle;\n", str(new): "struct EnemyParticle;\n", str(source): include}
+        with fixture(files) as root:
+            moves = {old: new, new: new, source: source}
+            (root / old).write_text("struct Different;\n")
+            with self.assertRaisesRegex(ValueError, "already exists"):
+                reorg.rewrite_moves({}, moves, apply=True)
+            self.assertTrue((root / old).is_file())
+            (root / old).write_text(files[str(old)])
+            self.assertEqual(reorg.rewrite_moves({}, moves, apply=True), 2)
+            self.assertFalse((root / old).exists())
+            self.assertEqual((root / new).read_text(), files[str(new)])
+            self.assertIn("effects/particles/enemy_particle.h", (root / source).read_text())
+
     def test_replays_legacy_links_after_a_source_basename_changes(self):
         legacy = "src/fn/sub_08001000.c"
         earlier = "src/scene/actor/sub_08001000.c"

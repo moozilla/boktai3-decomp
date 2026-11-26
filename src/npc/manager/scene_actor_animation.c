@@ -1184,13 +1184,13 @@ void Actor_OnPathFollowUpdate(void *unused, struct SceneActor *actor)
                         v = (u16)actor->radiusA >> 1;
                     else
                         v = (u16)actor->radiusA;
-                    actor->routeStepFinished = Route_GetMovementTowardCurrentPoint(ctx, &path->position, &path->motion,
-                                                            &path->direction, v, v, v);
+                    actor->routeStepFinished = Route_GetMovementTowardCurrentPoint(
+                        ctx, &path->position, &path->motion, &path->direction, v, v, v);
                 }
             } else {
                 u32 v = (u16)actor->radiusA;
-                actor->routeStepFinished =
-                    Route_GetMovementTowardCurrentPoint(ctx, pos, &actor->body.motion, &actor->body.direction, v, v, v);
+                actor->routeStepFinished = Route_GetMovementTowardCurrentPoint(
+                    ctx, pos, &actor->body.motion, &actor->body.direction, v, v, v);
             }
         }
         if (actor->routeStepFinished) {
