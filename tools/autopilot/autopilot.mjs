@@ -153,8 +153,10 @@ const GOALS = {
         event({ skill: 'goal', reached: `scene ${destination}`, ...L.where(), story: L.story() });
         return true;
       }
-      // enemies in the room: fight them first (the "defeat all" rooms lock the doors)
-      if (L.fightTargets().length) {
+      // Boss fights can advance the scene themselves. Rooms with exits can
+      // defer patrols until a door is blocked or the player takes damage.
+      const targets = L.fightTargets();
+      if (targets.some((t) => t.boss || t.barrier) || (targets.length && !doorsHere(false).length)) {
         const f = yield* L.fight({ trace: (e) => event({ skill: 'fight', ...e }) });
         event({ skill: 'fought', ...f, scene: L.where().scene });
         if (!(yield* untilControl(g, L, ready, 60, 30000))) { event({ skill: 'stop', why: 'no control after the fight', ...L.where() }); return destination < 0 && rooms > 0; }
@@ -417,14 +419,23 @@ function* throughDoor(g, L, box) {
   }
   let fights = 0;
   for (let attempt = 0; attempt < 6; attempt++) {
-    // enemies that appear on the way (a scripted ambush, a boss after its banner): fight
-    const foes = () => L.fightTargets().length > 0;
-    const r = yield* L.navigate(box, { avoid, stopIf: foes, trace: (e) => event({ skill: 'nav', ...e }) });
+    const initial = new Set(L.fightTargets().map((t) => t.addr));
+    const life = () => g.$.gPlayers[0]?.currentStatA ?? 0;
+    const lifeBefore = life();
+    const lossBudget = Math.max(4, Math.floor(lifeBefore / 10));
+    const interrupted = () => {
+      const targets = L.fightTargets();
+      return targets.some((t) => t.boss || t.barrier || !initial.has(t.addr)) ||
+        (targets.length && lifeBefore - life() >= lossBudget);
+    };
+    const r = yield* L.navigate(box, { avoid, stopIf: interrupted, trace: (e) => event({ skill: 'nav', ...e }) });
     event({ skill: 'navigate', box, ...r, from: scene });
     if (r.reached) return true;
-    if (r.reason === 'stopped' && fights++ < 5) {
+    if (L.fightTargets().length && fights < 5 && (!lock || L.bags().items.includes(lock.item))) {
+      fights++;
       const f = yield* L.fight({ trace: (e) => event({ skill: 'fight', ...e }) });
       event({ skill: 'fought', ...f, scene: L.where().scene });
+      if (L.where().scene !== scene) return true;
       attempt--;
       continue;
     }
