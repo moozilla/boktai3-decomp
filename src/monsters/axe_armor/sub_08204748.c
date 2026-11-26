@@ -12,7 +12,6 @@ static inline s32 clamp(s32 v)
         v = 0;
     return v;
 }
-#define INC(n) H(gGameState, n) = clamp(H(gGameState, n) + 1)
 void AxeArmor_RecordDefeat(struct AxeArmor *p)
 {
     s32 values[8];
@@ -40,15 +39,15 @@ void AxeArmor_RecordDefeat(struct AxeArmor *p)
         flags = p->rangeA;
         H(gGameState, 0x578) = H(gGameState, 0x578) < 9999 ? H(gGameState, 0x578) + 1 : 9999;
         if (flags & 0x80) {
-            INC(0x58A);
+            gGameState->targetFlagBonuses[0] = clamp(gGameState->targetFlagBonuses[0] + 1);
         } else if (flags & 0x100) {
-            INC(0x58C);
+            gGameState->targetFlagBonuses[1] = clamp(gGameState->targetFlagBonuses[1] + 1);
         } else if (flags & 0x200) {
-            INC(0x58E);
+            gGameState->targetFlagBonuses[2] = clamp(gGameState->targetFlagBonuses[2] + 1);
         } else if (flags & 0x400) {
-            INC(0x590);
+            gGameState->targetFlagBonuses[3] = clamp(gGameState->targetFlagBonuses[3] + 1);
         } else if (flags & 0x800) {
-            INC(0x592);
+            gGameState->targetFlagBonuses[4] = clamp(gGameState->targetFlagBonuses[4] + 1);
         }
     }
 }
