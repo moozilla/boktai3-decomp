@@ -444,6 +444,15 @@ def layout_rows(views):
     return rows
 
 
+def extension_of(extra, existing):
+    """Every extra typed span occupies storage the existing view leaves opaque."""
+    if not existing <= extra:
+        return False
+    ranges = [(off, off + shape[0]) for off, shape, _ in existing]
+    return all(not any(off < end and start < off + shape[0] for start, end in ranges)
+               for off, shape, _ in extra - existing)
+
+
 class SharedLayouts:
     def __init__(self, records, buckets):
         self.by_name, self.by_size, self.by_field, self.by_formal = (defaultdict(set) for _ in range(4))
@@ -484,9 +493,9 @@ class SharedLayouts:
                 continue
             if size == shared["size"] and observed == known:
                 relation = "equals"
-            elif shared["size"] <= size and known <= observed:
+            elif shared["size"] <= size and extension_of(observed, known):
                 relation = "extends"
-            elif size <= shared["size"] and observed <= known:
+            elif size <= shared["size"] and extension_of(known, observed):
                 relation = "contained by"
             else:
                 relation = "overlapping view"

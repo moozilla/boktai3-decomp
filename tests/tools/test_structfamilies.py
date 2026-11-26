@@ -120,6 +120,13 @@ void F(struct Owner *p, int n) {
             families.scan_cached((rel, "source", b"compiler 2"))
             self.assertEqual(scan.call_count, 3)
 
+    def test_a_shared_type_conflict_is_not_an_extension(self):
+        halfword = (2, None, "int", None, None)
+        shared = {(0, halfword, False)}
+        self.assertTrue(families.extension_of(shared | {(2, halfword, True)}, shared))
+        self.assertFalse(families.extension_of(shared | {(0, halfword, True)}, shared))
+        self.assertFalse(families.extension_of(shared | {(1, halfword, False)}, shared))
+
 
 @unittest.skipUnless(Path(lm.AGBCC).is_file(), "agbcc required for layout probes")
 class CompilerTests(unittest.TestCase):
