@@ -136,7 +136,7 @@ void Lun_HandlePlayerContact(void *unused, struct ContactCollider *other, void *
     }
     SceneActorChase_SetControl(actor, SceneActorControl_OnIdle, 16);
     phase = 2;
-    Lun_SetState(actor, 0, phase, 0);
+    Lun_SetState(actor, 0, 2, 0);
     EffectCollision_Disable(&actor->base.colliderB);
     EffectCollision_Disable(&actor->base.colliderA);
     Lun_SetContactFlag(actor, 0x800);
@@ -1359,7 +1359,7 @@ void RouteActor_ReflectAtRaisedTerrain(struct ChaseActor *actor)
             x_2 = &actor->base.secondaryMotion.z;
             value = -(*x_2);
             *x_2 = value;
-            actor->base.body.motion.x = zero;
+            actor->base.body.motion.x = 0;
             actor->base.body.motion.z = zero;
         }
     }
