@@ -57,7 +57,9 @@ def check(rel):
     r = subprocess.run([sys.executable, os.path.join(TOOLS, "check.py"), rel, "--quiet"], cwd=ROOT,
                        capture_output=True, text=True)
     lines = (r.stdout.strip() or r.stderr.strip() or "?").splitlines()
-    return r.returncode == 0 and ": MATCH (" in r.stdout, lines[-1][:200]
+    matched = r.returncode == 0 and ": MATCH (" in r.stdout
+    errors = re.findall(r"^stdin:\d+: (?!warning:).*", r.stderr, re.M)
+    return matched, (errors[0] if errors and not matched else lines[-1])[:200]
 
 
 def compile_warnings(rel, nonmatching=False):
@@ -95,7 +97,8 @@ class Unit:
     def __init__(self, rel):
         self.rel = rel
         self.path = os.path.join(ROOT, rel)
-        self.text = open(self.path).read()
+        with open(self.path) as source:
+            self.text = source.read()
         self._clean = None
         self._base = {}
         self.last = ""

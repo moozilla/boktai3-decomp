@@ -34,7 +34,8 @@ from source_layout import is_upstream, source_paths
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 AGBCC = os.path.join(ROOT, "build", "scope", "agbcc", "gcc", "agbcc")
-CPP = ["cc", "-E"] if sys.platform == "darwin" else ["cpp"]
+CLANG = "/Library/Developer/CommandLineTools/usr/bin/clang"
+CPP = [CLANG if os.path.exists(CLANG) else "cc", "-E"] if sys.platform == "darwin" else ["cpp"]
 CACHE = os.path.join(ROOT, "build", "deadcode")
 KIND = {"unreachable": "dead-code", "zero": "proved-zero"}
 # an unreachable register-only instruction is usually the compiler's own leftovers; these are a person's
