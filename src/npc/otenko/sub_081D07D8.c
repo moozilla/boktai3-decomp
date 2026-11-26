@@ -5,7 +5,7 @@ void DisplayAnimation_SetFlags(void *, s32);
 void Otenko_UpdateProjectedVisible(void);
 void Otenko_EnterProjectedIdle(void *unused, struct OtenkoActor *npc)
 {
-    s32 zero, st;
+    s32 st;
     struct OtenkoProjection *projection = &npc->projection;
     struct ContactPosition *position;
     void (*update)(void);
@@ -13,23 +13,22 @@ void Otenko_EnterProjectedIdle(void *unused, struct OtenkoActor *npc)
     position = &npc->body.position;
     projection->position.x = (position->x + gSceneCamera->x) << 12;
     projection->position.z = position->z << 12;
-    zero = 0;
-    projection->position.y = zero;
+    projection->position.y = 0;
     projection->height = position->y << 12;
     projection->height = npc->body.position.y << 12;
     GroundEffect_Initialize(&npc->groundEffect, &projection->position, 0);
     st = 0x22;
-    npc->stage = zero;
-    npc->stageEntered = zero;
+    npc->stage = 0;
+    npc->stageEntered = 0;
     npc->state = st;
-    npc->timer = zero;
+    npc->timer = 0;
     npc->commandEntered = 1;
     do {
         update = Otenko_UpdateProjectedVisible;
         npc->prevState = 0x1f;
         npc->stateCallback = update;
-        npc->stateFrame = zero;
+        npc->stateFrame = 0;
         npc->animationEntered = 1;
     } while (0);
-    npc->animationPhase = zero;
+    npc->animationPhase = 0;
 }
