@@ -24,7 +24,7 @@ ROOT = Path(__file__).resolve().parents[2]
 FIXTURES = Path(__file__).with_name('verify-movies.json')
 
 
-def run_case(save, out, frames, seed, recording):
+def run_case(save, out, frames, seed, recording, rom_reference):
     out.mkdir(parents=True, exist_ok=True)
     (out / 'result.json').unlink(missing_ok=True)
     cmd = ['node', 'tools/autopilot/stress.mjs', '--save', str(save), '--out', str(out),
@@ -33,6 +33,8 @@ def run_case(save, out, frames, seed, recording):
         replay = out / 'fixture.json'
         replay.write_text(json.dumps(recording) + '\n')
         cmd += ['--from', str(replay)]
+    if rom_reference:
+        cmd += ['--rom-reference', str(rom_reference)]
     with (out / 'run.log').open('w') as stream:
         process = subprocess.Popen(cmd, cwd=ROOT, stdout=stream, stderr=subprocess.STDOUT,
                                    start_new_session=True)
@@ -50,6 +52,8 @@ def main():
     parser.add_argument('--bank', type=Path, default=ROOT / 'build/saves')
     parser.add_argument('--out-root', type=Path, default=ROOT / 'build/autopilot',
                         help='separate output root for a different wasm build')
+    parser.add_argument('--rom-reference', type=Path,
+                        help='reuse matching ROM samples from a previous output root')
     parser.add_argument('--all', action='store_true', help='fuzz every checkpoint for 2800 frames')
     parser.add_argument('--resume', action='store_true', help='keep completed results from a bank sweep')
     parser.add_argument('--case', help='run one named regression or checkpoint ID')
@@ -93,6 +97,9 @@ def main():
         if not save.is_file():
             parser.error(f'{save} is missing')
     base = args.out_root.resolve()
+    reference = args.rom_reference.resolve() if args.rom_reference else None
+    if reference == base:
+        parser.error('--rom-reference requires a separate --out-root')
     started = time.monotonic()
 
     def compare_case(item):
@@ -100,13 +107,13 @@ def main():
         if (ROOT / 'build/STOP').exists():
             return 2
         save = bank / f'{checkpoint}.sav'
-        out_root = base / (f'fuzz-{seed}-{args.frames}' if args.all else 'verify')
-        out = out_root / name
+        case_dir = Path(f'fuzz-{seed}-{args.frames}' if args.all else 'verify') / name
+        out = base / case_dir
         label = f'{name} seed {seed}' if args.all else name
         result_path = out / 'result.json'
         status = 0
         if not args.resume or not result_path.is_file():
-            status = run_case(save, out, args.frames, seed, recording)
+            status = run_case(save, out, args.frames, seed, recording, reference and reference / case_dir)
         if not result_path.is_file() and status == 0:
             status = 1
         result = json.loads(result_path.read_text()) if result_path.is_file() else {}

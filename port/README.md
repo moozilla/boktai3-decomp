@@ -615,6 +615,13 @@ rebuilding the wasm to keep the old comparisons. Results, movies and action logs
 are under `build/autopilot/`. Run `node tools/autopilot/tickdiff.mjs DIR FROM TO`
 to compare RAM around a failing tick.
 
+To rerun the port against previously captured ROM ticks, pass the earlier output
+root to `--rom-reference` and select a separate `--out-root`. The verifier hashes
+the ROM, checkpoint save and complete harness script, including the input sequence,
+RTC and sampled addresses. It uses the original ticks when these inputs and the
+full tick dump agree with the reference record. It runs the emulator for new
+inputs, incomplete captures or older runs without a reference record.
+
 ## Undefined behavior the GBA forgives (UBFIX)
 
 Some original code relies on what a register happens to hold: a call passing fewer

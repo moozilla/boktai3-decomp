@@ -36,3 +36,10 @@ and recheck each unit separately.
 
 The worktree report retains the complete save/seed table, baseline trap
 ticks, reached functions and overlay verification results.
+
+For follow-up port builds, `verify.py --rom-reference DIR --out-root NEW`
+compares fresh port execution against saved emulator ticks when the ROM, save,
+full harness script and tick dump agree with the reference hashes. It invokes
+the emulator when any input changes or a capture is incomplete. Sealed Prison
+produced identical tick dumps in both modes, with the comparison taking
+18.4 seconds directly and 6.4 seconds with a reference on the worker.

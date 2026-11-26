@@ -6,7 +6,8 @@ import path from 'node:path';
 import { parseArgs } from 'node:util';
 import { setFlagsFromString } from 'node:v8';
 import { openSession } from '../../port/agent/session.mjs';
-import { root, clock, lux, holdTicks, runRom } from './lib/rom.mjs';
+import { root, rom, clock, lux, holdTicks, runRom } from './lib/rom.mjs';
+import { replayAgainstRom } from './lib/rom-reference.mjs';
 
 // A wasm fault must reach the catch below so we can replay its input prefix.
 // On this host Node's signal-based bounds checks can exit with SIGBUS instead.
@@ -16,6 +17,7 @@ const { values: opts } = parseArgs({ options: {
   save: { type: 'string' }, out: { type: 'string' }, scene: { type: 'string' },
   frames: { type: 'string', default: '2800' }, seed: { type: 'string', default: '1' },
   mode: { type: 'string', default: 'fuzz' }, from: { type: 'string' }, wasm: { type: 'string' },
+  'rom-reference': { type: 'string' },
 }});
 
 if (!opts.save && !opts.from) throw new Error('Supply --save FILE or --from DIR/movie.json');
@@ -31,6 +33,11 @@ if (!Number.isSafeInteger(frames) || frames < 1 || frames > 20000 ||
     !Number.isInteger(seed) || seed < 1 || seed > 0xffffffff) throw new Error('Invalid frame count or seed');
 const out = path.resolve(opts.out || path.join(root, 'build/autopilot/stress', path.basename(save || 'power-on', '.sav')));
 const romOut = path.join(out, 'rom');
+const reference = opts['rom-reference'] && path.resolve(opts['rom-reference'], 'rom');
+if (reference && (reference === romOut ||
+    (fs.existsSync(reference) && fs.existsSync(romOut) && fs.realpathSync(reference) === fs.realpathSync(romOut)))) {
+  throw new Error('Use a separate output directory when comparing with a ROM reference');
+}
 fs.mkdirSync(romOut, { recursive: true });
 const inputs = path.join(out, 'inputs.jsonl');
 fs.writeFileSync(inputs, '');
@@ -126,12 +133,14 @@ fs.writeFileSync(script, lines.join('\n') + '\n');
 fs.writeFileSync(path.join(out, 'port.bin'), Buffer.concat(samples));
 
 const romSamples = path.join(romOut, 'ticks.bin');
-fs.rmSync(romSamples, { force: true });
 let difference;
 try {
-  runRom(script, romOut, { save, render: false, timeout: 480_000 });
-  const rom = fs.readFileSync(romSamples);
-  difference = compare(rom, samples, regions, readFrames);
+  const ticks = replayAgainstRom({
+    rom, save, script, out: romOut, reference,
+    expectedBytes: reads.length * regions.reduce((length, region) => length + region.size, 0),
+    run: () => runRom(script, romOut, { save, render: false, timeout: 480_000 }),
+  });
+  difference = compare(ticks, samples, regions, readFrames);
 } catch (error) {
   const partial = fs.existsSync(romSamples) && compare(fs.readFileSync(romSamples), samples, regions, readFrames);
   difference = { ...partial, error: String(error) };

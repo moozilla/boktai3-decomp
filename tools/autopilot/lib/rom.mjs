@@ -4,6 +4,7 @@ import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 
 export const root = fileURLToPath(new URL('../../../', import.meta.url));
+export const rom = path.join(root, 'baserom.gba');
 export const clock = '2025-11-13T12:00:00Z';
 export const lux = 232;
 const keyNames = ['A', 'B', 'SELECT', 'START', 'RIGHT', 'LEFT', 'UP', 'DOWN', 'R', 'L'];
@@ -30,7 +31,7 @@ export function runRom(script, out, { save, coverage = false, render = true, tim
   if (save) env.BOKTAI3_SAV = path.resolve(save);
   if (!coverage) env.BOKTAI3_NO_COVERAGE = '1';
   if (!render) env.BOKTAI3_HEADLESS = '1';
-  const run = spawnSync(harness, [path.join(root, 'baserom.gba'), script, out], {
+  const run = spawnSync(harness, [rom, script, out], {
     env, timeout, encoding: 'utf8', maxBuffer: 1 << 25,
   });
   fs.writeFileSync(path.join(out, 'harness.log'), (run.stdout || '') + (run.stderr || ''));
