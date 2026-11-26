@@ -1,0 +1,15 @@
+081604C0 actor-debris-update-return
+
+FrameDisplay_UpdateSprite returns through r0. The frame counter update uses r1.
+
+The explicit form changed the ROM bytes. The guarded form passed the unit ROM check.
+
+--- a/src/fn/sub_081604C0.c
++++ b/src/fn/sub_081604C0.c
+@@ -10,3 +10,6 @@
+     FrameDisplay_UpdateSprite(display);
+     display->frameCounter++;
++#ifdef UBFIX
++    return 0x081604DF; // preserve the inherited GBA return value
++#endif
+ }
