@@ -784,3 +784,36 @@ explicit load. The one proved-zero report remains. Deriving the mapped
 regions from the backup or variable pointer and walking between regions
 also miss. The direct zero-free draft still differs on the operand order
 of the storage base and timer offset.
+
+## 2026-11-26: Registry loop condition and particle helper boundaries
+
+Moving the registry match test into the link-slot loop condition
+and checking the result after the loop leaves six differing rows on
+each side and two moved branch targets in both insertions. Reusing
+the search link to publish the head or naming the scalar slot for
+the next store gives the same score. The early-return search with a
+reacquired head loop still gives the closer splice. See
+`build/hard-sites/registry/eighth-review/`.
+
+The FragmentGroup motion helper with typed output pointers emits
+668 bytes. Its table still has REG_EQUIV and priority 2048 as pseudo
+108. Suppressing equivalence and adding 2048 to its priority each
+move the shape score from 102 to 120. The output-pointer helper
+therefore has differences beyond the table allocation that the
+same controls resolve in the 704-byte plain-loop draft. Capturing
+its animation resource halfword or moving the resource-address
+assignment into the call preserves the 20 substitutions in the
+separate two-set table draft. Indexing the animation table directly
+and advancing its pointer in two steps are farther away.
+
+Factoring the barrage's full projectile calculation into one inline
+leaves nine differing instructions on each side. Passing the random
+table to it gives the same score. Passing the position instead of the
+actor changes more operands. The two-mask-operand draft remains the
+closest basis. GameState's low-byte timer, named slot window, and
+modulo or byte-offset forms all add differences to the direct add.
+The committed matching source in each unit retains its priority site.
+
+The scoped recheck of the seven named units reports the two registry
+volatile declarations and five proved-zero expressions. SpriteTrail
+and Wireless have no priority findings.
