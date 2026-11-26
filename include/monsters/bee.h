@@ -34,15 +34,7 @@ struct Bee {
     u8 unknown458[0x18];
     struct ContactPosition start, end, motion, initialPosition;
 };
-struct BeePackedPair {
-    u32 lo : 16, hi : 16;
-};
-struct BeeCollisionVector {
-    struct BeePackedPair a, b;
-};
-struct BeePackedPosition {
-    u32 xy, z;
-};
+typedef char BeeSizeCheck[sizeof(struct Bee) == 0x490 ? 1 : -1];
 struct BeeDisplacement {
     s16 x, y, z;
 };
