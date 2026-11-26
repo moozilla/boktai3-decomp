@@ -26,7 +26,7 @@ struct SceneActorBody {
     void *currentRoute;
     void *sprite;
     struct DisplayKeyframeState *keyframeDisplay;
-    u8 unknown34[8];
+    struct ContactPosition positionOffset;
     void *owner;
     u8 unknown40[8];
 };

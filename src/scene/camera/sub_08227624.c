@@ -1,11 +1,8 @@
 #include "scene/camera/camera_tracking.h"
 #include "bosses/vanargand/vanargand_parts.h"
-struct CameraPackedPosition {
-    s32 x : 16, y : 16, z : 16, pad : 16;
-};
 u16 Sqrt(u32);
 s32 Div(s32, s32);
-void Camera_SetPosition(struct CameraPackedPosition *);
+void Camera_SetPosition(struct CameraPosition *);
 void CameraTracking_UpdatePosition(struct CameraTracking *tracking)
 {
     struct CameraPosition *first = tracking->first;
@@ -16,7 +13,7 @@ void CameraTracking_UpdatePosition(struct CameraTracking *tracking)
     s32 delta = value - tracking->scale;
     s32 magnitude = delta;
     s32 factor;
-    struct CameraPackedPosition position;
+    struct CameraPosition position;
     if (delta < 0)
         magnitude = -delta;
     if (magnitude < tracking->scaleStep)

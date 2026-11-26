@@ -1,3 +1,4 @@
+#include "player/player.h"
 #include "global.h"
 #include "scene/motion/scene_actor_chase.h"
 #include "scene/motion/scene_actor_straight_route.h"
@@ -5,11 +6,6 @@
 #include "scene/motion/scene_actor_terrain_reaction.h"
 u8 SceneActorAttachment_TestPositionWindow(struct ChaseActor *, const struct ContactPosition *, u32,
                                            u32);
-/* The local player's position, as gPlayers[0] holds it. */
-struct MovementModePlayer {
-    u8 unknown0[0x30];
-    struct ContactPosition position;
-};
 void SceneActorRegistry_SetMovementMode(struct ChaseActor *actor, s32 mode)
 {
     struct SceneActorChaseGroup *group = &actor->group;
@@ -35,8 +31,8 @@ void SceneActorRegistry_SetMovementMode(struct ChaseActor *actor, s32 mode)
             }
             {
                 struct ContactPosition *p = &target;
-                struct SceneActorChaseRoutePoint *route =
-                    ((struct SceneActorRegistryRoute *)((u8 *)actor + 0x448))->point;
+                struct SceneActorRegistryRoute *home = &group->homeRoute;
+                struct SceneActorChaseRoutePoint *route = home->point;
                 p->x = route->x;
                 p->z = route->z;
                 {
@@ -71,7 +67,7 @@ void SceneActorRegistry_SetMovementMode(struct ChaseActor *actor, s32 mode)
             break;
         }
         case 1: {
-            struct MovementModePlayer **players;
+            struct Player **players;
             void *route;
             struct ContactPosition *position;
             struct ContactPosition *target;
@@ -89,10 +85,10 @@ void SceneActorRegistry_SetMovementMode(struct ChaseActor *actor, s32 mode)
             }
             group->common.gate.counter = group->common.gate.duration;
             SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0);
-            players = (struct MovementModePlayer **)gPlayers;
+            players = gPlayers;
             route = group->route;
             position = &actor->base.body.position;
-            target = &players[0]->position;
+            target = (void *)&players[0]->position;
             if (Nav_IsPositionInMesh(route, position, target) &&
                 (result = Terrain_ApplyBlocked(route, position, target))) {
                 if (result != 2)

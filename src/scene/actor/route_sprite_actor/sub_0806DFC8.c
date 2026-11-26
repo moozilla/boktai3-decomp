@@ -13,7 +13,7 @@ void RouteSpriteActor_Create(struct ContactPosition *anchor, void *unused, s32 i
     struct RouteSpriteActor *actor;
     u32 zero;
     u32 one;
-    u8 *graphics;
+    struct ContactSwarmGraphics *graphics;
     pool = gRouteSpritePool;
     if (!pool) {
         pool = RouteSpritePool_Create();
@@ -50,7 +50,7 @@ void RouteSpriteActor_Create(struct ContactPosition *anchor, void *unused, s32 i
     }
     actor->elevatedPosition = *savedAnchor;
     actor->elevatedPosition.y += 0x2C8;
-    graphics = actor->graphics;
+    graphics = &actor->graphics;
     if (AnimData_Load(graphics, 0xD45E)) {
         Sprite_Init(&actor->sprite, graphics, 0);
         actor->sprite.flags |= one;

@@ -50,13 +50,18 @@ static inline void SceneActorReaction_BeginRevival(struct RoomActor *actor, s16 
     actor->colliderA.responseValue = 60;
 }
 
-static inline void SceneActorReaction_ClearRoute(struct ChaseActor *actor)
+/* Reset the pursuit flags and the control counters when a reaction takes over. */
+static inline void SceneActorReaction_ResetRouteControl(struct ChaseActor *actor,
+                                                        struct SceneActorRegistryControl *control)
 {
-    actor->base.behaviorFlags &= ~0x141C0;
-    actor->group.common.control.counter = 0;
-    *(u16 *)((u8 *)&actor->group.common.control + 0x14) = 0;
-    actor->group.common.control.timer = 0;
+    u32 *flags = &actor->base.behaviorFlags;
+    u32 mask = ~0x141C0;
+    *flags &= mask;
+    control->counter = 0;
+    control->field14 = 0;
+    control->timer = 0;
 }
+
 static inline void SceneActorReaction_Show(struct ChaseActor *actor)
 {
     if (actor->base.drawableKind == 0)

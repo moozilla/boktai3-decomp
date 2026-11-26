@@ -47,19 +47,25 @@ struct EmitterVector {
 };
 
 struct EmitterActor {
-    u8 pad0[0x38];
+    u8 pad0[0x10];
+    struct EmitterVector position;
+    u8 pad20[0x18];
     s32 height;
+    u8 pad3C[0x1C];
+    s16 energy;
+    u8 pad5A[0x25A];
+    union {
+        u8 data[0xC];
+        struct {
+            u8 data[0xA];
+            u16 emissionTimer;
+        } low;
+    } profile;
 };
 
 struct EmitterOwner {
-    u8 pad0[0x28];
-    struct EmitterVector position;
-    u8 pad38[0x18];
-    s32 height;
-    u8 pad54[0x1C];
-    s16 energy;
-    u8 pad72[0x25A];
-    u8 profile[0xC];
+    u8 pad0[0x18];
+    struct EmitterActor actor;
     u8 pad2D8[0x610];
     s32 velocity;
     u8 pad8EC[0xC];
@@ -67,18 +73,24 @@ struct EmitterOwner {
 };
 
 struct ActorEmitter {
-    u8 pad0[8];
+    u8 pad0[5];
+    u8 kind;
+    u8 pad6[2];
     u16 id;
     u8 padA[6];
     u16 duration;
-    u8 pad12[0x46];
+    u8 pad12[2];
+    u8 collision[0x40];
+    u8 unknown54, entered;
+    u8 pad56[2];
     u16 timer;
-    u8 pad5A[6];
+    u8 pad5A[2];
+    u16 animation;
+    u8 pad5E[2];
     struct EmitterOwner *owner;
 };
 
 u8 Modifier_IsFirstSourceReady();
-
 
 s32 ProjectileEffect_CreateFromProfile(struct EmitterVector *, s32, struct EmitterVector *, void *, s32,
                                    s32, s32, s32);
@@ -95,15 +107,15 @@ s32 ActorEmitter_TryEmit(struct ActorEmitter *emitter)
     if (!Modifier_IsFirstSourceReady(emitter))
         goto fail;
     owner = emitter->owner;
-    actor = (struct EmitterActor *)((u8 *)owner + 0x18);
+    actor = &owner->actor;
     cost = CallbackList_RunMatchingState(actor, emitter->id, 9);
-    if (owner->energy < cost)
+    if (owner->actor.energy < cost)
         goto fail;
     velocity.x = owner->velocity;
     velocity.y = 0;
     velocity.z = 0;
     height = actor->height - 0x16000;
-    if (ProjectileEffect_CreateFromProfile(&owner->position, height, &velocity, owner->profile,
+    if (ProjectileEffect_CreateFromProfile(&owner->actor.position, height, &velocity, owner->actor.profile.data,
                                        owner->kind + 1, 0, 1, 0) >= 0)
         goto success;
 fail:
@@ -114,40 +126,13 @@ success:
     return 1;
 }
 
-struct LowEmitterOwner {
-    u8 pad0[0x28];
-    struct EmitterVector position;
-    u8 pad38[0x18];
-    s32 height;
-    u8 pad54[0x1C];
-    s16 energy;
-    u8 pad72[0x25A];
-    u8 profile[0xA];
-    u16 emissionTimer;
-    u8 pad2D8[0x610];
-    s32 velocity;
-    u8 pad8EC[0xC];
-    s8 kind;
-};
-
-struct LowActorEmitter {
-    u8 pad0[8];
-    u16 id;
-    u8 padA[6];
-    u16 duration;
-    u8 pad12[0x46];
-    u16 timer;
-    u8 pad5A[6];
-    struct LowEmitterOwner *owner;
-};
-
 u8 Modifier_IsFirstSourceReady();
 
 void CallbackList_SubtractClampedValue();
 
-s32 ActorEmitter_TryEmitLow(struct LowActorEmitter *emitter)
+s32 ActorEmitter_TryEmitLow(struct ActorEmitter *emitter)
 {
-    struct LowEmitterOwner *owner;
+    struct EmitterOwner *owner;
     struct EmitterActor *actor;
     s32 cost;
     struct EmitterVector velocity;
@@ -155,41 +140,25 @@ s32 ActorEmitter_TryEmitLow(struct LowActorEmitter *emitter)
     if (!Modifier_IsFirstSourceReady(emitter))
         goto fail;
     owner = emitter->owner;
-    actor = (struct EmitterActor *)((u8 *)owner + 0x18);
+    actor = &owner->actor;
     cost = CallbackList_RunMatchingState(actor, emitter->id, 9);
-    if (owner->energy < cost)
+    if (owner->actor.energy < cost)
         goto fail;
     velocity.x = owner->velocity;
     velocity.y = 0;
     velocity.z = 0;
     height = actor->height - 0x12000;
-    if (ProjectileEffect_CreateFromProfile(&owner->position, height, &velocity, owner->profile,
+    if (ProjectileEffect_CreateFromProfile(&owner->actor.position, height, &velocity, owner->actor.profile.data,
                                        owner->kind + 1, 0, 1, 0) >= 0)
         goto success;
 fail:
     return 0;
 success:
     CallbackList_SubtractClampedValue(actor, emitter, cost);
-    owner->emissionTimer = 0;
+    owner->actor.profile.low.emissionTimer = 0;
     emitter->timer = emitter->duration;
     return 1;
 }
-
-struct AnimatedEmitter {
-    u8 pad0[8];
-    u16 id;
-    u8 padA[6];
-    u16 duration;
-    u8 pad12[2];
-    u8 collision[0x40];
-    u8 unknown54, entered;
-    u8 pad56[2];
-    u16 timer;
-    u8 pad5A[2];
-    u16 animation;
-    u8 pad5E[2];
-    struct EmitterOwner *owner;
-};
 
 u8 Modifier_IsFirstSourceReady();
 
@@ -209,7 +178,7 @@ void SpatialIndex_SetPosition(void *, s32, s32, s32);
 
 void SpatialIndex_InsertEntry(void *);
 
-s32 ActorEmitter_UpdateAnimation(struct AnimatedEmitter *emitter)
+s32 ActorEmitter_UpdateAnimation(struct ActorEmitter *emitter)
 {
     struct EmitterOwner *owner;
     struct EmitterActor *actor;
@@ -219,9 +188,9 @@ s32 ActorEmitter_UpdateAnimation(struct AnimatedEmitter *emitter)
     if (!Modifier_IsFirstSourceReady(emitter))
         goto fail;
     owner = emitter->owner;
-    actor = (struct EmitterActor *)((u8 *)owner + 0x18);
+    actor = &owner->actor;
     cost = CallbackList_RunMatchingState(actor, emitter->id, 9);
-    if (owner->energy >= cost)
+    if (owner->actor.energy >= cost)
         goto active;
 fail:
     return 0;
@@ -236,50 +205,28 @@ active:
     Anim_Step((u8 *)owner + 0x670, (u8 *)owner + 0x7F0);
     pos = position;
     Character_GetHeightAdjustedPosition(actor, pos);
-    emitter = (struct AnimatedEmitter *)emitter->collision;
+    emitter = (struct ActorEmitter *)emitter->collision;
     SpatialIndex_SetPosition(emitter, position[0], pos[1], pos[2]);
     SpatialIndex_InsertEntry(emitter);
     return 1;
 }
 
-struct PairEmitterActor {
-    u8 pad0[0x10];
-    struct EmitterVector position;
-    u8 pad20[0x18];
-    s32 height;
-    u8 pad3C[0x278];
-    u8 profile[0xC];
-};
-
-struct PairEmitter {
-    u8 pad0[5];
-    u8 kind;
-    u8 pad6[2];
-    u16 id;
-    u8 padA[6];
-    u16 duration;
-    u8 pad12[0x46];
-    u16 timer;
-    u8 pad5A[6];
-    struct EmitterOwner *owner;
-};
-
 u8 Modifier_IsFirstSourceReady();
 
 void CallbackList_SubtractClampedValue();
 
-s32 ActorEmitter_TryEmitPair(struct PairEmitter *emitter)
+s32 ActorEmitter_TryEmitPair(struct ActorEmitter *emitter)
 {
     struct EmitterOwner *owner;
-    struct PairEmitterActor *actor;
+    struct EmitterActor *actor;
     s32 cost, height;
     struct EmitterVector velocity;
     if (!Modifier_IsFirstSourceReady(emitter))
         goto fail;
     owner = emitter->owner;
-    actor = (struct PairEmitterActor *)((u8 *)owner + 0x18);
+    actor = &owner->actor;
     cost = CallbackList_RunMatchingState(actor, emitter->id, 9);
-    if (owner->energy < cost)
+    if (owner->actor.energy < cost)
         goto fail;
     velocity.x = owner->velocity;
     velocity.y = 0;
@@ -288,71 +235,47 @@ s32 ActorEmitter_TryEmitPair(struct PairEmitter *emitter)
         height = actor->height - 0x8000;
     else
         height = actor->height - 0x16000;
-    if (ProjectileEffect_CreateFromProfile(&actor->position, height, &velocity, actor->profile,
+    if (ProjectileEffect_CreateFromProfile(&actor->position, height, &velocity, actor->profile.data,
                                        owner->kind + 1, 1, 2, 0) >= 0)
         goto success;
 fail:
     return 0;
 success:
-    ProjectileEffect_CreateFromProfile(&actor->position, height, &velocity, actor->profile,
+    ProjectileEffect_CreateFromProfile(&actor->position, height, &velocity, actor->profile.data,
                                    owner->kind + 1, 0, 1, 1);
     CallbackList_SubtractClampedValue(actor, emitter, cost);
     emitter->timer = emitter->duration;
     return 1;
 }
 
-struct AnimatedPairActor {
-    u8 pad0[0x10];
-    struct EmitterVector position;
-    u8 pad20[0x18];
-    s32 height;
-    u8 pad3C[0x278];
-    u8 profile[0xC];
-};
-
-struct AnimatedPairEmitter {
-    u8 pad0[5];
-    u8 kind;
-    u8 pad6[2];
-    u16 id;
-    u8 padA[6];
-    u16 duration;
-    u8 pad12[0x46];
-    u16 timer;
-    u8 pad5A[2];
-    u16 animation;
-    u8 pad5E[2];
-    struct EmitterOwner *owner;
-};
-
 u8 Modifier_IsFirstSourceReady();
 
 void CallbackList_SubtractClampedValue();
 
-s32 ActorEmitter_TryEmitAnimatedPair(struct AnimatedPairEmitter *emitter)
+s32 ActorEmitter_TryEmitAnimatedPair(struct ActorEmitter *emitter)
 {
     struct EmitterOwner *owner;
-    struct AnimatedPairActor *actor;
+    struct EmitterActor *actor;
     s32 height, cost;
     struct EmitterVector velocity;
     if (!Modifier_IsFirstSourceReady(emitter))
         goto fail;
     owner = emitter->owner;
-    actor = (struct AnimatedPairActor *)((u8 *)owner + 0x18);
+    actor = &owner->actor;
     cost = CallbackList_RunMatchingState(actor, emitter->id, 9);
-    if (owner->energy < cost)
+    if (owner->actor.energy < cost)
         goto fail;
     velocity.x = owner->velocity;
     velocity.y = 0;
     velocity.z = 0;
     height = actor->height - 0x8000;
-    if (ProjectileEffect_CreateFromProfile(&owner->position, height, &velocity, owner->profile,
+    if (ProjectileEffect_CreateFromProfile(&owner->actor.position, height, &velocity, owner->actor.profile.data,
                                        owner->kind + 1, 1, 2, 0) >= 0)
         goto success;
 fail:
     return 0;
 success:
-    ProjectileEffect_CreateFromProfile(&owner->position, height, &velocity, owner->profile,
+    ProjectileEffect_CreateFromProfile(&owner->actor.position, height, &velocity, owner->actor.profile.data,
                                    owner->kind + 1, 0, 1, 1);
     Anim_SetKeyframes((u8 *)owner + 0x670, (u8 *)owner + 0x7F0, emitter->animation, 2, 0);
     CallbackList_SubtractClampedValue(actor, emitter, cost);

@@ -1,3 +1,5 @@
+#include "scene/motion/scene_actor_terrain_reaction.h"
+#include "scene/collision/scene_actor_delayed_response.h"
 #include "scene/actor/scene_actor_reaction.h"
 void SceneActorReaction_PlayAnimationBUntilComplete(void *);
 static inline u8 TakePrepared(struct ChaseActor *actor)
@@ -11,7 +13,7 @@ static inline u8 TakePrepared(struct ChaseActor *actor)
     return 0;
 }
 static inline void SceneActorReaction_UpdateReturnToRoute(struct ChaseActor *actor,
-                                                          struct SceneActorReactionGroup *group)
+                                                          struct SceneActorChaseGroup *group)
 {
     u32 mask;
     if (TakePrepared(actor)) {
@@ -20,53 +22,25 @@ static inline void SceneActorReaction_UpdateReturnToRoute(struct ChaseActor *act
     }
     mask = 0x10;
     if (actor->base.statusFlags & mask) {
-        struct SceneActorReactionCommand *command;
+        struct SceneActorDelayedResponse *command;
         void *callback;
         u8 one;
-        u8 kind;
         actor->base.behaviorFlags |= mask;
-        command = (void *)((u8 *)group + 0x8C);
+        command = (void *)&group->saved;
         callback = (void *)SceneActorReaction_PlayAnimationBUntilComplete;
         one = 1;
-        command->duration = 30;
-        command->payload = callback;
-        command->first = 0;
-        command->second = one;
-        command->kind = one;
-        callback = (void *)SceneActorReaction_RestoreAfterDelay;
-        kind = 14;
-        actor->base.field2B2 = one;
-        actor->base.stepDone = 0;
-        actor->base.controlKind = kind;
-        actor->base.target = callback;
-        {
-            u16 *halfField;
-            u32 *field;
-            u32 clearMask;
-            u32 state;
-            halfField = &actor->base.field2C8;
-            *halfField = 0;
-            field = &actor->base.pendingControlFlags;
-            clearMask = ~1;
-            *field &= clearMask;
-            actor->base.pendingControl = 0;
-            state = 3;
-            actor->base.state2A8 = state;
-            actor->base.phase2A9 = one;
-            actor->base.behavior2AA = 0;
-            {
-                actor->base.counter2AC = 0;
-            }
-            actor->base.field2B1 = one;
-            {
-                u16 *cooldown = &actor->base.field2C2;
-                *cooldown = 64;
-            }
-        }
+        command->delay = 30;
+        command->control = callback;
+        command->state = 0;
+        command->phase = one;
+        command->behavior = 1;
+        SceneActorTerrain_InstallControl(actor, SceneActorReaction_RestoreAfterDelay, 14);
+        SceneActorTerrain_EnterState(actor, 3, 1, 0);
+        actor->base.field2C2 = 64;
     }
 }
 
 void SceneActorReaction_TurnBackToRoute(struct ChaseActor *actor)
 {
-    SceneActorReaction_UpdateReturnToRoute(actor, (void *)&actor->group.common);
+    SceneActorReaction_UpdateReturnToRoute(actor, &actor->group);
 }

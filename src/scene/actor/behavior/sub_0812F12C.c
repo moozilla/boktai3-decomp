@@ -1,3 +1,4 @@
+#include "engine/engine_pause.h"
 #include "global.h"
 #include "scene/actor/scene_actor_registry.h"
 #include "system/game_state/game_state.h"
@@ -25,7 +26,7 @@ static inline void dispatch(void **callback, void *context)
 }
 s32 SceneActor_UpdateActiveCallbacks(struct ChaseActor *p)
 {
-    if (SceneActorBehavior_GlobalPauseBits(0x400))
+    if (Engine_PauseBits(0x400))
         return 0;
     if (SceneActorBehavior_OverrideBits(4, &gUnk_02000560))
         return 0;

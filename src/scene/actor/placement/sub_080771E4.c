@@ -15,7 +15,8 @@ static inline u8 IsDisposable(struct RoomActor *actor)
 void SceneActorTerrain_DisableCollision(struct RoomActor *actor)
 {
     struct ContactCollider *collider;
-    WordFlags_Set(3, &actor->behaviorFlags);
+    u32 mask = 3;
+    actor->behaviorFlags |= mask;
     collider = &actor->colliderA;
     collider->flags |= 4;
     SceneActorPalette_ClearCompletedTransitions();

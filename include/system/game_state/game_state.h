@@ -163,7 +163,8 @@ struct GameState {
     u8 unk878[0x2];
     s16 unk87A;
     u16 counter87C; /* (guess) capped at 9999 */
-    u8 unk87E[0xE];
+    u8 unk87E[6];
+    u16 actorDefeatsByPlayer[4]; /* tentative, incremented by the actor defeat record */
     s32 unk88C;
     s16 unk890;
     s16 unk892;

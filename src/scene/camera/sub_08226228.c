@@ -1,14 +1,13 @@
-#include "global.h"
-
+#include "scene/camera/scene_camera_controller.h"
+#include "engine/ram.h"
 void Camera_ClearTargetOffset(void);
 
 void Camera_Reset(void)
 {
-    u8 *s = *(u8 **)0x03005420;
-    if (s != 0) {
-        u32 z = 0;
-        *(u16 *)(s + 0x1c) = 1;
-        *(u16 *)(s + 0x68) = z;
+    struct SceneCameraController *camera = (void *)gActiveCamera;
+    if (camera) {
+        camera->moving = 1;
+        camera->positionMode = 0;
         Camera_ClearTargetOffset();
     }
 }

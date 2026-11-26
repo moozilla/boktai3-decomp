@@ -1,18 +1,6 @@
+#include "scene/motion/scene_actor_availability.h"
 #include "scene/actor/scene_actor_control_motion.h"
 #include "player/player.h"
-static inline u32 ActorFlag(struct ChaseActor *actor, u32 input, u32 offset)
-{
-    u32 mask = input;
-    return offset == 0x2D4 ? *(u16 *)((u8 *)actor + offset) & mask
-                           : *(u32 *)((u8 *)actor + offset) & mask;
-}
-static inline u8 IsUnavailable(struct ChaseActor *actor)
-{
-    if (actor && (ActorFlag(actor, 0x40, 0x2D4) || ActorFlag(actor, 0x20000, 0x2D0) ||
-                  actor->base.health <= 0))
-        return 1;
-    return 0;
-}
 static inline u8 Test(u32 value, u32 mask)
 {
     if (value & mask)
@@ -27,14 +15,10 @@ static inline u8 LiftFlag(struct SceneActorControlMotionState *state)
 struct LiftHalfBits {
     u16 bits : 16;
 };
-struct LiftParameters {
-    u8 unknown0[0xF];
-    u8 flags : 8;
-};
 void SceneActorControl_ConsumeLiftFlag(struct ChaseActor *actor)
 {
     struct SceneActorControlMotionState *state;
-    if (IsUnavailable(actor))
+    if (SceneActor_ActionsBlocked(actor))
         return;
     if (!gPlayers[0])
         return;
@@ -42,13 +26,13 @@ void SceneActorControl_ConsumeLiftFlag(struct ChaseActor *actor)
     if (LiftFlag(state)) {
         u32 *flags = &state->flags3D4;
         u32 clearMask;
-        struct LiftParameters *parameters;
+        struct SceneActorChaseTracking *tracking;
         clearMask = ~2;
         *flags &= clearMask;
-        parameters = (void *)((u8 *)actor + 0xDC);
+        tracking = &actor->base.tracking;
         {
             u8 bit = 8;
-            parameters->flags = bit | parameters->flags;
+            tracking->flags = bit | tracking->flags;
         }
         {
             u32 bit = 0x100;

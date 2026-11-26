@@ -242,7 +242,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [docs/history/2026-11-17.md](../docs/history/2026-11-17.md) | 2026-11-17 | #compiler #depin #matching #phase3 #round13 #round15 #structs | 3 |
 | [docs/history/2026-11-20.md](../docs/history/2026-11-20.md) | 2026-11-20 | #actors #compiler #matching #monsters #phase3 #scene #scene-actors #tooling #wireless | 2 |
 | [docs/history/2026-11-25.md](../docs/history/2026-11-25.md) | Work log, 2026-11-25 | #actors #assets #compiler #hardware #matching #menu #phase3 #process #scene #tooling | 5 |
-| [docs/history/2026-11-26.md](../docs/history/2026-11-26.md) | Work log, 2026-11-26 | #actors #autopilot #compiler #matching #menu #monster #monsters #phase3 #port #scripts #tooling #tools #types #verification | 14 |
+| [docs/history/2026-11-26.md](../docs/history/2026-11-26.md) | Work log, 2026-11-26 | #actors #autopilot #camera #compiler #matching #menu #monster #monsters #phase3 #port #scene #scripts #terrain #tooling #tools #types #verification | 18 |
 | [docs/history/HANDOFF_2026-10-23.md](../docs/history/HANDOFF_2026-10-23.md) | Handoff: current state and how to continue | #process | 14 |
 | [docs/history/MANAGER_HANDOFF_2026-10-19.md](../docs/history/MANAGER_HANDOFF_2026-10-19.md) | Manager handoff (2026-10-19) | #process #tooling | 6 |
 | [docs/history/README.md](../docs/history/README.md) | Handoff history |  | 17 |
@@ -598,22 +598,29 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [notes/s5.md](../notes/s5.md) | s5 notes | *#assets* | 13 |
 | [notes/saved-position-marker_2026-10-14.md](../notes/saved-position-marker_2026-10-14.md) | Saved-position marker, 08053D8C–08054294 |  | 2 |
 | [notes/scene-actor-apply-hit-response.md](../notes/scene-actor-apply-hit-response.md) | SceneActorReaction_ApplyHitResponse | *#actors #particles* | 1 |
+| [notes/scene-actor-behavior-cleanup_2026-11-26.md](../notes/scene-actor-behavior-cleanup_2026-11-26.md) | Scene actor behavior cleanup | #matching #types #phase3 #scene | 3 |
 | [notes/scene-actor-cleanup_2026-11-13.md](../notes/scene-actor-cleanup_2026-11-13.md) | Scene actor cleanup, 2026-11-13 | #actors #scene #matching | 7 |
 | [notes/scene-actor-collider-contact_2026-11-01.md](../notes/scene-actor-collider-contact_2026-11-01.md) | scene-actor-collider-contact_2026-11-01.md | *#actors #scene* | 1 |
 | [notes/scene-actor-components_2026-10-30.md](../notes/scene-actor-components_2026-10-30.md) | Canonical scene actor components | #ram #structs #monster #matching | 6 |
 | [notes/scene-actor-contact-route-probe.md](../notes/scene-actor-contact-route-probe.md) | Contact route probe | #scene-actors #matching | 0 |
+| [notes/scene-actor-control-cleanup_2026-11-26.md](../notes/scene-actor-control-cleanup_2026-11-26.md) | Scene actor control cleanup | #matching #types #phase3 #scene | 2 |
 | [notes/scene-actor-defeat-burst_2026-11-01.md](../notes/scene-actor-defeat-burst_2026-11-01.md) | Defeat burst at 08080494 | #scene-actors #matching #compiler | 1 |
 | [notes/scene-actor-evaluate-candidate.md](../notes/scene-actor-evaluate-candidate.md) | SceneActorContacts_EvaluateCandidate |  | 1 |
 | [notes/scene-actor-groups_2026-10-30.md](../notes/scene-actor-groups_2026-10-30.md) | Canonical scene actor groups and routes | #structs #ram #monster #matching | 4 |
+| [notes/scene-actor-placement-cleanup_2026-11-26.md](../notes/scene-actor-placement-cleanup_2026-11-26.md) | Scene actor placement cleanup | #matching #types #phase3 #scene | 2 |
 | [notes/scene-actor-position-curve.md](../notes/scene-actor-position-curve.md) | Scene actor position curve | #scene-actors #matching | 0 |
 | [notes/scene-actor-pursuit-recovery.md](../notes/scene-actor-pursuit-recovery.md) | Pursuit after contact release | #scene-actors #matching | 0 |
 | [notes/scene-actor-recovery-route.md](../notes/scene-actor-recovery-route.md) | SceneActorRoute_TryRecoveryDetour | *#actors* | 1 |
+| [notes/scene-actor-registry-cleanup_2026-11-26.md](../notes/scene-actor-registry-cleanup_2026-11-26.md) | Scene actor registry cleanup | #matching #types #phase3 #scene | 2 |
 | [notes/scene-actor-retreat-route.md](../notes/scene-actor-retreat-route.md) | Scene actor retreat route | #scene-actors #terrain #matching | 0 |
 | [notes/scene-actor-timed-burst_2026-11-01.md](../notes/scene-actor-timed-burst_2026-11-01.md) | Timed reaction burst | #scene-actor #matching #compiler | 1 |
 | [notes/scene-actor-twenty_2026-10-12.md](../notes/scene-actor-twenty_2026-10-12.md) | Scene actors and dialogue: reaching 20% | *#actors #scene* | 3 |
 | [notes/scene-actor-warning-cleanup_2026-11-20.md](../notes/scene-actor-warning-cleanup_2026-11-20.md) | Scene actor warning cleanup checkpoint | #scene-actors #phase3 #matching #0801E000 #080297E8 | 1 |
 | [notes/scene-actors-second-half_2026-11-20.md](../notes/scene-actors-second-half_2026-11-20.md) | Scene actors and NPCs, second half | #scene #actors #matching #tooling | 2 |
 | [notes/scene-arc-effects_2026-10-13.md](../notes/scene-arc-effects_2026-10-13.md) | Scene arc slots and projected ground effects (tentative) | *#scene* | 4 |
+| [notes/scene-area-collision-camera-cleanup_2026-11-26.md](../notes/scene-area-collision-camera-cleanup_2026-11-26.md) | Scene area, collision, lifecycle, and camera cleanup | #matching #types #phase3 #scene #camera | 3 |
+| [notes/scene-attachment-palette-pool-cleanup_2026-11-26.md](../notes/scene-attachment-palette-pool-cleanup_2026-11-26.md) | Scene attachment, palette, and pool cleanup | #matching #types #phase3 #scene | 2 |
+| [notes/scene-camera-receiver-and-reaction-owner_2026-11-26.md](../notes/scene-camera-receiver-and-reaction-owner_2026-11-26.md) | Scene camera receiver and registered reaction owner | #matching #types #phase3 #scene #camera | 2 |
 | [notes/scene-contact-pool-start_2026-11-01.md](../notes/scene-contact-pool-start_2026-11-01.md) | scene-contact-pool-start_2026-11-01.md | *#scene #assets* | 0 |
 | [notes/scene-departure-display_2026-11-01.md](../notes/scene-departure-display_2026-11-01.md) | Scene departure display | *#scene* | 1 |
 | [notes/scene-panel-background_2026-10-14.md](../notes/scene-panel-background_2026-10-14.md) | Scene panel background effects and overlay setup | *#scene #panel* | 2 |
@@ -624,6 +631,9 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [notes/scene-pool-manager_2026-11-01.md](../notes/scene-pool-manager_2026-11-01.md) | scene-pool-manager_2026-11-01.md | *#scene* | 0 |
 | [notes/scene-pool-states_2026-10-13.md](../notes/scene-pool-states_2026-10-13.md) | Scene pool state family: second contiguous batch | *#scene* | 6 |
 | [notes/scene-pool_2026-10-13.md](../notes/scene-pool_2026-10-13.md) | Scene pool and actor controls, 0803CDF0–0803EE58 | *#actors #scene #tooling* | 5 |
+| [notes/scene-reaction-cleanup_2026-11-26.md](../notes/scene-reaction-cleanup_2026-11-26.md) | Scene actor reaction cleanup | #matching #types #phase3 #scene | 3 |
+| [notes/scene-shared-reaction-route-reset_2026-11-26.md](../notes/scene-shared-reaction-route-reset_2026-11-26.md) | Shared scene reaction route reset | #matching #types #phase3 #scene | 1 |
+| [notes/scene-terrain-steering-return-cleanup_2026-11-26.md](../notes/scene-terrain-steering-return-cleanup_2026-11-26.md) | Terrain traps, steering, and attachment return | #matching #types #phase3 #scene #terrain | 2 |
 | [notes/scene_actor_animation_route_walk.md](../notes/scene_actor_animation_route_walk.md) | Scene actor route walk | #matching #scene-actors | 0 |
 | [notes/scene_actor_contact_candidates.md](../notes/scene_actor_contact_candidates.md) | Scene actor contact candidates | #matching #scene-actors | 1 |
 | [notes/scene_body_owner_validation_2026-10-30.md](../notes/scene_body_owner_validation_2026-10-30.md) | SceneBody owner validation | #matching #compiler #structs #ram | 4 |

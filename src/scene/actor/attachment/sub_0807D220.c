@@ -1,19 +1,12 @@
+#include "scene/actor/scene_actor_status.h"
 #include "scene/collision/contact_actor.h"
 #include "player/player.h"
 #include "scene/collision/scene_actor_contact_list.h"
 #include "engine/ram.h"
-struct RetargetActorView {
-    u8 unknown0[0xDC];
-    void *targetSource;
-    u8 unknownE0[0x2D4 - 0xE0];
-    u16 flags2D4;
-    u8 unknown2D6[0x45C - 0x2D6];
-    void *ownedTarget;
-};
-void SceneActorAttachment_RetargetNearestPlayer(struct RetargetActorView *input,
+void SceneActorAttachment_RetargetNearestPlayer(struct ChaseActor *input,
                                                 const struct ContactPosition *inputOrigin)
 {
-    struct RetargetActorView *actor = input;
+    struct ChaseActor *actor = input;
     const struct ContactPosition *origin = inputOrigin;
     u32 nearest = 0;
     s32 bestDistance = 0x7fffffff;
@@ -55,11 +48,11 @@ void SceneActorAttachment_RetargetNearestPlayer(struct RetargetActorView *input,
         } while (count != 0);
     }
     if (nearest) {
-        u32 mask = 0x1000;
-        u16 *flags = &actor->flags2D4;
+        u32 mask = ROOM_ACTOR_MOTION_HOLDS_CONTACT;
+        u16 *flags = &actor->base.motionFlags;
         u32 value = *flags;
         if (value & mask) {
-            void **owned = &actor->ownedTarget;
+            void **owned = &actor->group.contactNode;
             SceneActorContacts_ReleaseNode(*owned);
             {
                 u32 updated = *flags & ~mask;
@@ -68,6 +61,6 @@ void SceneActorAttachment_RetargetNearestPlayer(struct RetargetActorView *input,
                 *owned = (void *)zero;
             }
         }
-        actor->targetSource = (void *)nearest;
+        actor->base.tracking.target = (void *)nearest;
     }
 }

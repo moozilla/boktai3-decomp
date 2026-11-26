@@ -1,27 +1,24 @@
+#include "scene/camera/scene_camera_controller.h"
 #include "global.h"
-struct Camera {
-    u8 unknown[0x8e];
-    s16 minX, minZ, maxX, maxZ;
-};
-void Camera_ClampCenteredPosition(struct Camera *bounds, s16 *position)
+void Camera_ClampCenteredPosition(struct SceneCameraController *bounds, s16 *position)
 {
     s32 half = position[1] >> 1;
     s32 x = position[0] - half;
     s32 z = position[2] - half;
     s32 limit;
-    limit = bounds->minX;
+    limit = bounds->minBounds[0];
     if (x < limit)
         x = limit;
     else {
-        limit = bounds->maxX;
+        limit = bounds->maxBounds[0];
         if (x > limit)
             x = limit;
     }
-    limit = bounds->minZ;
+    limit = bounds->minBounds[1];
     if (z < limit)
         z = limit;
     else {
-        limit = bounds->maxZ;
+        limit = bounds->maxBounds[1];
         if (z > limit)
             z = limit;
     }

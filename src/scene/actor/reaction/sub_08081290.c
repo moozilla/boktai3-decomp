@@ -10,17 +10,6 @@ static inline u8 IsControlled(struct ChaseActor *a)
     return 0;
 }
 
-static inline void ClearRoute(struct ChaseActor *a)
-{
-    struct SceneActorRegistryControl *route = &a->group.common.control;
-    u32 *flags = &a->base.behaviorFlags;
-    u32 mask = ~0x141C0;
-    *flags &= mask;
-    route->counter = 0;
-    route->field14 = 0;
-    route->timer = 0;
-}
-
 static inline void Show(struct ChaseActor *a)
 {
     if (!a->base.drawableKind) {
@@ -36,13 +25,11 @@ static inline void Show(struct ChaseActor *a)
 
 void SceneActorReaction_SinkAndRemove(struct ChaseActor *actor, s32 frame)
 {
-    u32 state;
-
     if (SceneActorReaction_TakePrepared(actor)) {
         struct ContactCollider *collider = &actor->base.colliderA;
         u32 category = actor->base.category;
         if (IsControlled(actor))
-            ClearRoute(actor);
+            SceneActorReaction_ResetRouteControl(actor, &actor->group.common.control);
         SceneActorAnimation_SelectDirectionalEntry((void *)actor, 3);
         if (category != 2 && category != 22) {
             SceneActorAttachment_ReplaceResponseSlot(actor, 0, 1, (u8)category);
@@ -55,18 +42,7 @@ void SceneActorReaction_SinkAndRemove(struct ChaseActor *actor, s32 frame)
             *destination = mask;
         }
         Show(actor);
-        {
-            u32 zero;
-            u8 *first;
-            state = 3;
-            first = &actor->base.state2A8;
-            zero = 0;
-            *first = state;
-            actor->base.phase2A9 = zero;
-            actor->base.behavior2AA = zero;
-            actor->base.counter2AC = zero;
-            actor->base.field2B1 = 1;
-        }
+        SceneActorTerrain_EnterState(actor, 3, 0, 0);
         actor->base.attachmentTimer = 0;
         actor->base.restart = 0;
         collider->responseValue = 0;
@@ -80,14 +56,13 @@ void SceneActorReaction_SinkAndRemove(struct ChaseActor *actor, s32 frame)
     if (frame > 6) {
         actor->base.body.position.y -= (u32)(frame - 6) * 30;
         if (!actor->base.drawableKind)
-            *(struct ContactPosition *)((u8 *)actor->base.drawable + 0x1C) =
+            ((struct SceneActorAnimationSequenceDrawable *)actor->base.drawable)->sprite.position =
                 actor->base.body.position;
         else
-            *(struct ContactPosition *)((u8 *)actor->base.drawable + 0x40) =
+            ((struct SceneActorAnimationTileDrawable *)actor->base.drawable)->tile.position =
                 actor->base.body.position;
         if (frame > 8) {
             u16 zeroWord = 0;
-            u32 zeroByte = 0;
             {
                 s16 health = zeroWord;
                 actor->base.health = health;

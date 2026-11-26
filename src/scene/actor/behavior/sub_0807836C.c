@@ -45,10 +45,10 @@ u8 SceneActorBehavior_TickDrawableBlink(struct ChaseActor *inputActor, s32 input
                 u32 mask = ~1;
                 ((struct SceneActorRegistrySequenceDrawable *)drawable)->flags &= mask;
             } else {
-                u8 *base = (u8 *)drawable + 0x20;
+                struct AnimSprite *tile = (void *)((u8 *)drawable + 0x20);
                 {
                     u32 mask = ~1;
-                    *(u32 *)(base + 8) &= mask;
+                    tile->flags &= mask;
                 }
             }
         } else {
@@ -56,8 +56,8 @@ u8 SceneActorBehavior_TickDrawableBlink(struct ChaseActor *inputActor, s32 input
             if (!kind)
                 ((struct SceneActorRegistrySequenceDrawable *)drawable)->flags |= mask;
             else {
-                u8 *base = (u8 *)drawable + 0x20;
-                *(u32 *)(base + 8) |= mask;
+                struct AnimSprite *tile = (void *)((u8 *)drawable + 0x20);
+                tile->flags |= mask;
             }
         }
     }
@@ -67,9 +67,9 @@ u8 SceneActorBehavior_TickDrawableBlink(struct ChaseActor *inputActor, s32 input
             u32 mask = ~1;
             ((struct SceneActorRegistrySequenceDrawable *)base)->flags &= mask;
         } else {
-            u8 *base = (u8 *)actor->base.drawable + 0x20;
+            struct AnimSprite *tile = (void *)((u8 *)actor->base.drawable + 0x20);
             u32 mask = ~1;
-            *(u32 *)(base + 8) &= mask;
+            tile->flags &= mask;
         }
         return 1;
     }

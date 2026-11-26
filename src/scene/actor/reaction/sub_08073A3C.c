@@ -17,7 +17,7 @@ struct SceneActorContactNode *SceneActorContacts_SelectForActor(struct ChaseActo
     struct SceneActorContactNode *node, *best;
     s32 distance;
     s32 selectionStatus;
-    u8 *contactFlags;
+    struct SceneActorChaseTracking *tracking;
     manager = gSceneActorContactManager;
     if (SceneActorContacts_AreDisabled() || !manager)
         return 0;
@@ -25,7 +25,7 @@ struct SceneActorContactNode *SceneActorContacts_SelectForActor(struct ChaseActo
     distance = 0x7FFFFFFF;
     selectionStatus = -1;
     node = manager->head;
-    contactFlags = (u8 *)owner + 0xDC;
+    tracking = &owner->base.tracking;
     while (node) {
         if ((node->flags & 1) && node->object && (node->kind & kindMask) &&
             SceneActorContacts_CanSelectNode(node) &&
@@ -58,10 +58,9 @@ struct SceneActorContactNode *SceneActorContacts_SelectForActor(struct ChaseActo
     }
     {
         u32 clearMask = ~2;
-        u8 *flags = contactFlags;
         u8 result;
-        result = clearMask & flags[15];
-        flags[15] = result;
+        result = clearMask & tracking->flags;
+        tracking->flags = result;
     }
     return best;
 }

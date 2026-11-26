@@ -5,13 +5,7 @@ void SceneActorReaction_BeginReactionSound(struct ChaseActor *actor)
     u32 timerZero;
     struct SceneActorReactionGroup *group = (void *)&actor->group.common;
     if (SceneActorReaction_TakePrepared(actor)) {
-        struct SceneActorRegistryControl *control = &group->control;
-        u32 *field = &actor->base.behaviorFlags;
-        u32 mask = ~0x141C0;
-        *field &= mask;
-        control->counter = 0;
-        control->field14 = 0;
-        control->timer = 0;
+        SceneActorReaction_ResetRouteControl(actor, &group->control);
         {
             switch (actor->base.category) {
                 case 4:

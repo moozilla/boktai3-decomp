@@ -19,7 +19,7 @@ struct RouteSpriteRoute {
 };
 struct RouteSpriteActor {
     struct ContactSwarmSprite sprite;
-    u8 graphics[0x1C];
+    struct ContactSwarmGraphics graphics;
     struct DisplaySequenceState sequence;
     struct RouteSpriteRoute route;
     u8 shadow[0x6C];

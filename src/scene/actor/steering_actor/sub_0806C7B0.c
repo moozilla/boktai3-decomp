@@ -44,7 +44,7 @@ void SceneSteeringActor_CreateTravelActor(const struct ContactPosition *position
     sprite = slot;
     slot->position = *position;
     slot->sequenceResource = ScriptProc_Start(0x922E, 0x121B);
-    Sprite_Init(slot, pool->graphics, 0);
+    Sprite_Init(slot, &pool->graphics, 0);
     Anim_SetSequence(&slot->sequence, (void *)slot->sequenceResource, 7, 0, 0);
     AnimData_SelectPaletteBank(slot->graphics, 0x127);
     PlayerCue_StepSequence((struct ContactSwarmSprite *)slot, &slot->sequence);

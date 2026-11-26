@@ -1,21 +1,5 @@
+#include "scene/motion/scene_actor_availability.h"
 #include "scene/actor/scene_actor_behavior.h"
-static inline u8 Unavailable(struct RoomActor *actor)
-{
-    if (actor) {
-        u32 mask = 0x40;
-        u32 offset = 0x2D4;
-        u32 value;
-        value = *(u16 *)((u32)actor + offset);
-        if (value & mask)
-            return 1;
-        mask = 0x20000;
-        offset = 0x2D0;
-        value = *(u32 *)((u32)actor + offset);
-        if (value & mask || actor->health <= 0)
-            return 1;
-    }
-    return 0;
-}
 static inline u8 Test(u32 value, u32 mask)
 {
     if (value & mask)
@@ -29,7 +13,7 @@ void SceneActorBehavior_ActivatePendingControl(struct RoomActor *actor)
     u32 zero;
     const void *control;
     u32 kind;
-    if (Unavailable(actor)) {
+    if (SceneActor_ActionsBlocked((void *)actor)) {
         u32 *field = &actor->pendingControlFlags;
         u32 mask = ~1;
         *field &= mask;

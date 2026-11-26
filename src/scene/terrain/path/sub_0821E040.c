@@ -1,15 +1,6 @@
+#include "scene/terrain/terrain_trap_probe.h"
+#include "objects/warp_circle/engine_map.h"
 #include "global.h"
-struct Trigger {
-    u16 id, pad;
-    s16 *position;
-};
-struct Trap {
-    u32 serial;
-    u16 f4, f6, f8, fa, flags, fe;
-    u16 w[4], s[4];
-    u32 f20, command;
-    void *f28;
-};
 struct Args {
     u32 count : 16;
     u32 reserved : 16;
@@ -17,19 +8,19 @@ struct Args {
 };
 void Script_CallProcedureWrapper(u32, struct Args *);
 void Script_ExecuteBlockWrapper(u32, struct Args *);
-void Trap_DispatchEvent(struct Trigger *trigger, struct Trap *trap, u16 event)
+void Trap_DispatchEvent(struct TrapProbe *trigger, struct TerrainTrap *trap, u16 event)
 {
     u32 values[14];
     struct Args args;
     u32 *out = values;
     s32 i;
     u32 command;
-    *out++ = trigger->id;
-    *out++ = trap->f8;
+    *out++ = trigger->kind;
+    *out++ = trap->id;
     *out++ = event;
-    *out++ = trigger->position[0];
-    *out++ = trigger->position[1];
-    *out++ = trigger->position[2];
+    *out++ = trigger->position->x;
+    *out++ = trigger->position->y;
+    *out++ = trigger->position->z;
     for (i = 0; i < 4; i++)
         *out++ = trap->w[i];
     command = trap->command;

@@ -1,16 +1,5 @@
 #include "scene/actor/scene_actor_control.h"
 #include "player/player.h"
-#include "player/player.h"
-struct SceneActorControlPlayerView {
-    u8 unknown0[0x20];
-    u32 flags;
-    u8 unknown24[0x4F4 - 0x24];
-    u8 parameter;
-};
-struct SceneActorControlGameView {
-    u8 unknown0[0x876];
-    s16 parameter;
-};
 void Sprite_LinkToList(void *, u32);
 void Sprite_UnlinkFromList(void *, u32);
 void SceneActorControl_TickJitter(struct SceneActorControlManager *,
@@ -21,7 +10,7 @@ void SceneActorControl_TryActivateNearby(struct SceneActorControlSlot *);
 static inline u8 PlayerHasControlFlag(void)
 {
     u32 mask = 0x80000;
-    if (((struct SceneActorControlPlayerView **)gPlayers)[0]->flags & mask)
+    if (gPlayers[0]->statusFlags & mask)
         return 1;
     return 0;
 }
@@ -63,7 +52,7 @@ void SceneActorControl_TickActive(struct SceneActorControlManager *p,
     delta = (s16)HasFlag(initialFlags, 0x10);
     if (delta) {
         s32 parameter = slot->parameter;
-        s32 current = ((struct SceneActorControlPlayerView **)gPlayers)[0]->parameter;
+        s32 current = gPlayers[0]->facingChangeEffects;
         u16 *address, *previous;
         u32 stored;
         if (current < parameter) {
@@ -115,7 +104,7 @@ void SceneActorControl_TickActive(struct SceneActorControlManager *p,
         u32 visible = PlayerHasControlFlag();
         flags = &slot->flags;
         if (visible ||
-            ((*flags & 0x20) && ((struct SceneActorControlGameView *)gGameState)->parameter > 0) ||
+            ((*flags & 0x20) && gGameState->unk876 > 0) ||
             (u8)SceneActorControl_IsEnabledForScene(slot)) {
             if (!sprite->active)
                 Sprite_LinkToList(sprite, 0);

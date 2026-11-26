@@ -9,14 +9,6 @@ u8 SceneActorBehavior_AccelerateTowardDescriptor(void *, void *, u32, u32, u32);
 u8 SceneActorBehavior_RequestDescriptorTurn(void *, void *, u32, u32, u32);
 // confidence=low: chooses idle or turn behavior after advancing a route descriptor.
 
-static inline void State(struct ChaseActor *a, u32 state, u32 phase, u32 behavior, u32 zero)
-{
-    a->base.state2A8 = state;
-    a->base.phase2A9 = phase;
-    a->base.behavior2AA = behavior;
-    a->base.counter2AC = zero;
-    a->base.field2B1 = 1;
-}
 void SceneActorRoute_UpdateAdvancePhase(struct ChaseActor *actor)
 {
     struct SceneActorChaseGroup *group = &actor->group;
@@ -52,7 +44,7 @@ void SceneActorRoute_UpdateAdvancePhase(struct ChaseActor *actor)
     if (!event) {
         void *descriptor = *routeField;
         if (SceneActorBehavior_AccelerateTowardDescriptor(actor, descriptor, 32, 32, speed)) {
-            State(actor, event, event, event, event);
+            SceneActorTerrain_EnterState(actor, 0, 0, 0);
             return;
         }
     } else {

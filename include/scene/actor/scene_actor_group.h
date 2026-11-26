@@ -57,6 +57,16 @@ struct SceneActorChaseSavedControl {
     u8 state, phase, behavior, kind;
 };
 
+/* State restored when a reaction's delay elapses (actor +0x468). */
+struct SceneActorTimedRestoration {
+    u8 state, phase, behavior, reserved;
+    s32 threshold;
+    void *control;
+};
+
+typedef char SceneActorTimedRestorationSizeCheck[
+    sizeof(struct SceneActorTimedRestoration) == 0xC ? 1 : -1];
+
 struct SceneActorChaseTurnState {
     u8 direction, savedDirection;
     s8 turnsRemaining;
@@ -69,9 +79,7 @@ struct SceneActorChaseGroup {
     struct SceneActorRegistryRoute homeRoute;
     void *contactNode;
     struct SceneActorChaseSavedControl saved;
-    u32 field468;
-    u32 delay46C;
-    void *callback470;
+    struct SceneActorTimedRestoration restoration;
     void *attachment;
     u8 unknown478[4];
     u32 effectConfig[2];
@@ -88,7 +96,7 @@ struct SceneActorChaseGroup {
     u16 contactCooldown; /* set to 60 frames on a collider contact, counted down each frame */
     u8 hitReactionLatch, unknown5CB;
     u16 effect;
-    u8 unknown5CE[2];
+    u16 hitBurstInterval; /* one third of the contact lock time */
     void *route;
     struct ContactPosition *destination;
     struct SceneActorChaseTurnState turn;

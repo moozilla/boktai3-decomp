@@ -8,19 +8,9 @@ void AreaEffect_UpdateActionParticles(struct AreaEffectManager *manager)
     if (!manager->visible) {
         s32 i;
         manager->visible = 1;
-        i = 0;
-        if (i < manager->count) {
-            u32 mask = ~1;
-            u8 *enabled = &manager->entries[0].enabled;
-            u8 *base = (u8 *)manager;
-            u8 *count = &manager->count;
-            do {
-                if (*enabled)
-                    *(u32 *)(base + 0x34) &= mask;
-                enabled += 0xA8;
-                base += 0xA8;
-                i++;
-            } while (i < *count);
+        for (i = 0; i < manager->count; i++) {
+            if (manager->entries[i].enabled)
+                manager->entries[i].spriteFlags &= ~1;
         }
     }
     active = 0;
