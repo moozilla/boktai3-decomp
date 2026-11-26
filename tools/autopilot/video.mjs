@@ -68,6 +68,15 @@ const describe = (e) => {
     case 'coffin':
       if (e.reached) return `carried coffin through ${e.box}`;
       return e.reason === 'lost grip' ? 'lost grip - return to the coffin' : null;
+    case 'purification':
+      if (e.docked) return 'coffin docked at the Pile Driver';
+      if (e.subject && e.done) return 'generator activated';
+      if (e.sunlight) return `sunlight level ${e.sunlight.level}`;
+      if (e.charge) return 'charge at the Pile Driver emblem';
+      if (e.path) return `route ${e.path.map((p) => p.join(',')).join(' > ')}`;
+      return null;
+    case 'drive': case 'drive-result':
+      return e.darkness === undefined ? null : `battle drive: darkness ${e.darkness}, life ${e.life}`;
     case 'key': return `find key ${e.item} in scene ${e.toward}`;
     case 'unlock': return e.done ? `opened ${e.box} with key ${e.item}` : null;
     case 'interact': return `open ${e.item || 'object'}`;
@@ -114,7 +123,7 @@ s.run(function* (g) {
     while (ei < events.length && events[ei].frame <= n) {
       const e = events[ei++], d = describe(e);
       if (d) caption = d;
-      if (e.skill === 'nav' && e.path) { route = e.path; routeScene = g.lib.where().scene; }
+      if ((e.skill === 'nav' || e.skill === 'purification') && e.path) { route = e.path; routeScene = g.lib.where().scene; }
       if (e.skill === 'entry' || e.skill === 'room' || e.skill === 'goal') route = null;
     }
     const c = clipAt(n);
@@ -144,7 +153,11 @@ s.run(function* (g) {
     }
     for (let y = 151; y < 160; y++) for (let x = 0; x < 240; x++) dot(px, x, y, [0, 0, 0]);
     text(px, 2, 153, caption.slice(0, 58), [255, 255, 255]);
-    if (label) text(px, 2, 2, label.slice(0, 45), [255, 255, 160]);
+    if (label) {
+      text(px, 3, 3, label.slice(0, 45), [0, 0, 0]);
+      text(px, 2, 2, label.slice(0, 45), [255, 255, 160]);
+    }
+    text(px, 201, 3, `F${n}`, [0, 0, 0]);
     text(px, 200, 2, `F${n}`, [255, 255, 160]);
     pending.push(px);
     if (pending.length >= 16) { ff.stdin.write(Buffer.concat(pending)); pending.length = 0; }
