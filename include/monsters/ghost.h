@@ -98,9 +98,6 @@ struct Ghost {
 struct GhostSignedFlags16 {
     s32 bits : 16;
 };
-struct GhostPackedPosition {
-    u32 xy, z;
-};
 
 union GhostColliderVector {
     struct ContactPackedVector packed;

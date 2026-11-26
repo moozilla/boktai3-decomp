@@ -715,16 +715,6 @@ done:
 
 // confidence=low: decays saved horizontal route motion before returning to pursuit or rest.
 
-static inline void Ghost_SetDecelerationState(struct ChaseActor *actor, u32 phase, u32 behavior,
-                                              u32 zero)
-{
-    actor->base.state2A8 = 0;
-    actor->base.phase2A9 = phase;
-    actor->base.behavior2AA = behavior;
-    actor->base.counter2AC = zero;
-    actor->base.field2B1 = 1;
-}
-
 void Ghost_DecelerateMovement(struct ChaseActor *actor)
 {
     struct Ghost *ctx = actor->base.context;
@@ -739,9 +729,9 @@ void Ghost_DecelerateMovement(struct ChaseActor *actor)
     if (actor->base.stepDone) {
         u16 flags = SceneActor_MaskedHalfword(0x100, &actor->base.motionFlags);
         if (flags)
-            Ghost_SetDecelerationState(actor, 2, 1, 0);
+            SceneActorChase_SetPhase(actor, 2, 1);
         else
-            Ghost_SetDecelerationState(actor, 0, 0, flags);
+            SceneActorChase_SetBehavior(actor, 0);
     } else
         actor->base.counter2AC++;
 }
@@ -1019,12 +1009,7 @@ void Ghost_RequestVisibility(struct ChaseActor *input, const u16 *inputRequest)
             if (!active) {
                 u32 hidden = SceneActorVisibility_IsHidden(actor);
                 if (hidden) {
-                    {
-
-                        u16 *timer;
-                        timer = &state->visibilityTimer;
-                        *timer = 0;
-                    }
+                    state->visibilityTimer = 0;
                     {
                         u32 mask = ~0x240;
                         {
@@ -1054,14 +1039,7 @@ void Ghost_RequestVisibility(struct ChaseActor *input, const u16 *inputRequest)
             if (!active) {
                 u32 hidden = SceneActorVisibility_IsHidden(actor);
                 if (!hidden) {
-                    u32 hiddenZero = hidden;
-                    {
-                        u32 zero = hiddenZero;
-
-                        u16 *timer;
-                        timer = &state->visibilityTimer;
-                        *timer = zero;
-                    }
+                    state->visibilityTimer = 0;
                     {
                         u32 mask = ~0x220;
                         {
@@ -1224,8 +1202,7 @@ void Ghost_ResetMovementState(struct ChaseActor *actor)
     context->drainElapsed = 0;
     context->drainStart = 0;
     context->flags = actor->base.saved.privateFlags;
-    *(struct GhostPackedPosition *)&context->previousPlayer =
-        *(struct GhostPackedPosition *)&gPlayers[0]->position;
+    context->previousPlayer = *(struct ContactPosition *)&gPlayers[0]->position;
     ZeroFill8(&context->start);
     ZeroFill8(&context->end);
     ZeroFill8(&context->motion);
@@ -1332,7 +1309,6 @@ void Ghost_UpdateRandomDestination(struct ChaseActor *actor)
             u16 attr;
             u32 kind;
             s32 height;
-            u32 zero, two;
             Ghost_SelectRandomRouteEntry(route);
             p = &target;
             p->x = route->point->x;
@@ -1354,16 +1330,10 @@ void Ghost_UpdateRandomDestination(struct ChaseActor *actor)
                     break;
             }
             p->y = height;
-            zero = 0;
             Ghost_StartMovementToPosition(actor, &target);
             Ghost_ClearActionFlags(actor);
             SceneActor_EndLinkedReaction(actor);
-            two = 2;
-            actor->base.state2A8 = zero;
-            actor->base.phase2A9 = zero;
-            actor->base.behavior2AA = two;
-            actor->base.counter2AC = zero;
-            actor->base.field2B1 = 1;
+            SceneActorChase_SetState(actor, 0, 0, 2);
         }
     }
 }
@@ -1760,12 +1730,7 @@ void Ghost_TickVisibilityTransition(struct ChaseActor *input)
             flags = inputFlags;
             active = SceneActorControl_TestFlags(active, ~0);
             if (active) {
-                {
-                    u32 *field = actor->base.drawable;
-                    u32 value = *field;
-                    u32 mask = ~1;
-                    *field = value & mask;
-                }
+                ((struct ActorSprite *)actor->base.drawable)->flags &= ~1;
                 {
                     u32 mask = ~0x20;
                     *flags &= mask;
@@ -1951,7 +1916,7 @@ u32 ActorContact_UpdateColliderPositions(struct RoomActor *actor)
         if (*control & mask)
             goto done;
     }
-    if (SceneActorTurn_Flags(control, 0x110))
+    if (*control & 0x110)
         goto secondary;
     {
         u32 near = (u32)SceneActorBehavior_IsNearParticipant((void *)actor) << 24;
@@ -2774,9 +2739,9 @@ s32 Ghost_Init(void *object)
 
 void Ghost_Create(void)
 {
-    void *m = Heap_Alloc(0x62c);
+    void *m = Heap_Alloc(sizeof(struct Ghost));
     if (m != 0) {
-        Memory_Clear(m, 0x62c);
+        Memory_Clear(m, sizeof(struct Ghost));
         if (Ghost_Init(m) < 0) {
             Ghost_Destroy(m);
             Heap_Free(m);
