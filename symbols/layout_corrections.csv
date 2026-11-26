@@ -1,23 +1,29 @@
 current_path,new_path,note
+src/actors/actor_animation_controller,src/ui/tutorial/otenko,Original tutorial proc 1482 creates 8AAB and displays Otenko. Four adjacent Params3D0 files need their own UI path.
 src/actors/actor_display,src/bosses/vanargand,"GCL 6325 calls 6314, which creates registry 5856 with actor ID 7C56 (Vanargand). The head is on the left during Django’s bike chase."
 src/actors/actor_recoil,src/minigames/coffin_bike,A 6274 ride hits the crates and executes the named recoil functions. The same state at idle does not enter the recoil code. ActorParticles_SpawnImpactBurst runs at frame 2276.
 src/actors/contact_burst_effects,src/bosses/nidhoggr,GCL key 917F. Dialogue in scene 4915 identifies the visible opponent as Nidhoggr (#7368). His defeat unlocks Book index 80 (#9918). Scene 6425 replays the fight.
 src/actors/grid_attack_actor,src/bosses/nidhoggr,GCL key 917F. Dialogue in scene 4915 identifies the visible opponent as Nidhoggr (#7368). His defeat unlocks Book index 80 (#9918). Scene 6425 replays the fight.
 src/actors/orbit_contact_actor,src/bosses/nidhoggr,GCL key 917F. Dialogue in scene 4915 identifies the visible opponent as Nidhoggr (#7368). His defeat unlocks Book index 80 (#9918). Scene 6425 replays the fight.
 src/actors/registry_a8_cb,src/npc/sabata_rider,Proc 6316 creates A8CB in the Sabata ending branch. The purple bike is on screen alongside Django’s separate E881 bike. The dialogue lookup names Sabata (#5585).
+src/actors/scene_npc,src/npc/otenko,BB34 and resource 97D3 witness Otenko in the garage and home at 2201/2544. This unit owns the field companion and its transition effect.
+src/actors/scene_object_controller,src/objects/sliding_doors,0054→5297. 6D69 controller holds D4E3 door slots and loads the 7ACD/7AD3 sliding door graphics. The E02A puzzle block task has a separate lifetime.
 src/actors/script_combat_actor,src/monsters/muspell_head,GCL 3991 → 1604 → 1606 creates key 5153. Book index 31 (#9869). The head in package 7E7D is visible next to Django after moving the player onto the neighboring tile.
 src/actors/sequence_contact_actor_pool,src/bosses/nidhoggr,GCL key 917F. Dialogue in scene 4915 identifies the visible opponent as Nidhoggr (#7368). His defeat unlocks Book index 80 (#9918). Scene 6425 replays the fight.
 src/actors/singleton_slot_7,src/bosses/vanargand,"GCL 6325 calls 6314, which creates registry 5856 with actor ID 7C56 (Vanargand). The head is on the left during Django’s bike chase."
 src/effects/registry_6_a37,src/effects/screen/magic_cannon_departure.c,Warp to 4924 at entrance 57. Proc 4928 hides the ship sprites and creates 6A37 before the space flight. The scrolling sky is visible during its update.
 src/effects/sprite_trail,src/bosses/vanargand,"GCL 6325 calls 6314, which creates registry 5856 with actor ID 7C56 (Vanargand). The head is on the left during Django’s bike chase."
+src/engine/scene_state_and_spatial_queries/sub_0806F218.c,src/system/game_state/sub_0806F218.c,"0016→6195. Pile Driver proc 6192 calls 8954 to increment persistent counters, independently of the scene loader."
 src/field/actor_group,src/objects/loot_deposits,0029→3905. F1F9 key loads 9385 and breaks after sword strikes. Its result callback 1133 rolls an item drop. Merge the hit feedback unit.
 src/field/bouncing_object_pool,src/objects/bouncing_bombs,Nidhoggr’s grid attack calls the bomb pool at frame 1921. Dark spheres bounce across active floor tiles and the pool’s removal callback triggers the explosions. The same pool is reached from Mummy and Ratatosk projectile code.
 src/field/breakable_props,src/objects/quest_barriers,0029→3931. 3DB0 E912 and sprite 474D shatter and unlock the Trinity scene when the recorded task is triggered. Other scenes supply different barrier sprites.
 src/field/cell_traversal_gates,src/objects/passage_barriers,0042→4755. GCL 71BA controls edge passage along the Wind Cannon row. Live approach clears the collision boundary and starts traversal.
 src/field/group_objects,src/effects/scene/bat_flock.c,"The stock ROM draws a purple bat flock after a debugger call to the registered constructor and launch handler. Sprite package DA6D. The only constructor pointer is registry entry E534, absent from the GCX body. No shipped kind 10 cutscene packet sends any of its four commands."
 src/field/named_object,src/objects/moving_platforms,"0042→4808. A4FC ID 085F loads B019, updates its route and is released by a floor switch. Text #7181 calls it a moving platform."
+src/field/pooled_interactables,src/objects/light_puzzle_props.c,"0038→4479. B8CC is created by 2E1C from light-region wrapper 1174, with live Breakable_UpdateAll. The same GCL wrapper is used for candlestick and light spots."
 src/field/proximity_actor,src/objects/ice_boulders.c,0029→3955. Proc 1176 creates 377D. Native update draws the large blue 863A ice boulder.
 src/field/scene_objects,src/objects/puzzle_blocks.c,0029→3955. E02A creates the 9D41 blocks removed by a room switch. This pool owns collision and puzzle blocks independently from the 6D69 script controller.
+src/field/scene_script_object,src/objects/dungeon_scenery,0029→3905. 3D91 creates snow scenery with B07C. The constructor and hit/burst update live in these two files. Keep the matching motion implementation with them.
 src/menus/control_panel,src/minigames/dark_generator.c,The overdue-debt path starts proc 1001. Proc 1003 creates key B3D1 and explains the Dark Generator. The work gauge and treadmill move during input.
 src/menus/registry_3_f74,src/ui/town/town_map.c,GCL 2554 creates 3F74 with the 11 town service callbacks. SAN MIGUEL appears on the map in frame 1940.
 src/menus/scene_catalog,src/ui/pause/status_options.c,Pause Status is visible. This ROM interval runs while opening that page and updating its numbers and descriptions.

@@ -663,7 +663,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [notes/tilemap-stream-columns-round9.md](../notes/tilemap-stream-columns-round9.md) | TilemapPanel_StreamColumns |  | 0 |
 | [notes/uncounted-concessions_2026-11-16.md](../notes/uncounted-concessions_2026-11-16.md) | Steering C the concession scanner does not count (first sweep) | #concessions #phase3 #phase4 #tooling | 4 |
 | [notes/unit-context-sensitivity_2026-11-16.md](../notes/unit-context-sensitivity_2026-11-16.md) | Functions that match alone but not inside a unit | #units #selector-macros #scene-actors | 7 |
-| [notes/unit-identities_2026-11-25.md](../notes/unit-identities_2026-11-25.md) | Unit identities from checkpoint replays | #actors #scene #assets #tooling | 37 |
+| [notes/unit-identities_2026-11-25.md](../notes/unit-identities_2026-11-25.md) | Unit identities from checkpoint replays | #actors #scene #assets #tooling | 41 |
 | [notes/volatile-typedef-scanner_2026-11-13.md](../notes/volatile-typedef-scanner_2026-11-13.md) | Volatile typedef detection in the concession scanner | #tooling #matching #progress | 2 |
 | [notes/w0.md](../notes/w0.md) | w0 notes | *#tooling* | 5 |
 | [notes/w1.md](../notes/w1.md) | w1 notes (range 0803CC90-0806FC64) |  | 2 |

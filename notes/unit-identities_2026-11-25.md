@@ -690,3 +690,80 @@ The obstacle constructor takes IDs 0EEC and 0EED with graphics 9D41.
 Proc 3953 centers on those obstacles and dispatches both removals when
 the switch runs. `review-blocks-close` reframes the room. The 6D69
 controller has a separate task, script key and slot representation.
+
+### Sliding doors, dungeon scenery and light puzzles
+
+Tags: objects, doors, scenery, light puzzles, 6D69, D4E3, 3D91, 2E1C
+
+Warp 0054 to 5297, entrance 7, story 156. The
+`review-door-pool` trace runs 6D69's constructor, which loads the
+7ACD and 7AD3 door panels, then appends D4E3 slots and updates them.
+The camera walks past a raised panel in `after.png`. Keep this
+sliding-door pool separate from the E02A puzzle blocks.
+
+From the 0029 warp to 3905, load `review-jewels/arrived.ss` and run
+`review-prop-snow/commands.txt`. Proc 3908 calls 1093 for several
+3D91 props, including AAEE and AAEF. Their constructor loads B07C
+and runs `SceneScriptTask_Update`. At frames 1924 and 1926 a sword
+strike runs the flash and burst paths. Compare `near.png` and
+`after.png`. B07C includes several other prop shapes. Both source
+files belong with dungeon scenery.
+
+Warp 0038 to 4479, entrance 7, story 125. Proc 4477 calls 1174 for
+B8CC, creating a 2E1C slot and changing the light-region controls.
+`review-prop-s0` follows the active callbacks in the room.
+`after.png` captures the changed doorway view. Proc 1171's comments
+refer to light spots and candlesticks. The title given to the
+shared 2E1C pool describes the script role. The exact graphic for
+the B8CC slot still needs an isolated sprite capture.
+
+### Otenko and the field story cast
+
+Tags: Otenko, Trinity, tutorial, NPC, BB34, 8EA3, StateActor, 8AAB
+
+Load `bank/0000/checkpoint.ss` and use
+`review-state-params/commands.txt`. Stock scene 2201 shows Otenko in
+the garage beside the talkable character. In a separate 0006 warp to
+2544, entrance 57, story 30, proc 2489 calls 1676 and creates BB34
+ID 9CFE. `Actor_InitDrawable` receives 97D3 from 081D0CD5 and
+`SceneNpc_OnModeUpdate` runs. The stock screenshot shows the field
+companion. The 2544 warp supplies the constructor evidence before the
+World Map takes over.
+
+The staged `review-native-tutorial` run invokes original GCL proc
+1482 from an active room. The 8AAB task draws the tutorial Otenko
+over the active room. The real caller is chapter dispatcher 1474.
+Procs 1479 and 1480 select it from title attract demos and Options.
+The controlled call uses the original ROM data and renderer.
+The adjacent four Params3D0 files have a separate display registration
+through proc 1432 and 4A25.
+
+After the White Forest barrier shatters in `review-trinity-release`,
+Trinity shows his portrait and dialogue and the state unit runs
+`StateActor_UpdateDashAnimation13` and
+`StateActor_UpdateAnimation20State`. The 4915 Nidhoggr intro separately
+runs `StateActor_StartKind28Animation4` for another cast member.
+Use `StoryCharacter_` for the 51 scoped StateActor functions.
+
+### Pause Status, Inventory, and room lifecycle
+
+Tags: pause, status, inventory, Warp Leaf, scene lifecycle, game state, Pile Driver
+
+Load 0032 at 4217 and follow `pause-tabs/commands.txt`. Gun, Swords,
+and consumable pages use the PauseInventory cursors and item-use
+callbacks. Slots and unlock descriptors come from the separate game
+state unit. Status shows the level, Life, Ene, and allocation
+values. Entering Status calls `SceneCatalog_SetDescription` and
+`SceneCatalog_GetLevelScaledValue` in `to_05`. `page05.png` shows
+the tab. The prefix proposal scopes the status functions and leaves
+the settings helpers for their own names.
+
+Use the Warp Leaf in the same checkpoint as recorded in
+`warp-leaf-departure/commands.txt`. Selecting it calls the GCL load
+handler, old-room release, and new-room initialization. Compare
+`departure.png` and `landing.png`. This unit owns room lifetime.
+Pause ownership reads and gGameState updates are separate paths.
+In stock 0016's Pile Driver tutorial, proc 6192 calls registry command
+8954. Its 0806F218 callback increments the four persistent counters
+directly. Record the per-file move to game state so the mixed former
+scene state directory does not move it with the spatial queries.
