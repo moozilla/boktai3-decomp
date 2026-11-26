@@ -599,6 +599,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [notes/scene-actor-collider-contact_2026-11-01.md](../notes/scene-actor-collider-contact_2026-11-01.md) | scene-actor-collider-contact_2026-11-01.md | *#actors #scene* | 1 |
 | [notes/scene-actor-components_2026-10-30.md](../notes/scene-actor-components_2026-10-30.md) | Canonical scene actor components | #ram #structs #monster #matching | 6 |
 | [notes/scene-actor-contact-route-probe.md](../notes/scene-actor-contact-route-probe.md) | Contact route probe | #scene-actors #matching | 0 |
+| [notes/scene-actor-control-cleanup_2026-11-26.md](../notes/scene-actor-control-cleanup_2026-11-26.md) | Scene actor control cleanup | #matching #types #phase3 #scene | 2 |
 | [notes/scene-actor-defeat-burst_2026-11-01.md](../notes/scene-actor-defeat-burst_2026-11-01.md) | Defeat burst at 08080494 | #scene-actors #matching #compiler | 1 |
 | [notes/scene-actor-evaluate-candidate.md](../notes/scene-actor-evaluate-candidate.md) | SceneActorContacts_EvaluateCandidate |  | 1 |
 | [notes/scene-actor-groups_2026-10-30.md](../notes/scene-actor-groups_2026-10-30.md) | Canonical scene actor groups and routes | #structs #ram #monster #matching | 4 |
