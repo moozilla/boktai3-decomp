@@ -1,18 +1,8 @@
 #include "global.h"
+#include "scene/motion/scene_actor_chase_shared.h"
 #include "scene/actor/scene_actor_reset.h"
 
 s32 Math_Atan2(s32, s32);
-struct ActorReactionTarget {
-    u8 unknown0[0xC];
-    struct ContactPosition position;
-};
-struct ActorReactionSensor {
-    struct ActorReactionTarget *target;
-    u8 unknown4[0xB];
-    u8 flags;
-    u32 unknown10;
-    u32 distance, range;
-};
 struct ActorReactionDelta {
     s16 x, y, z;
 };
@@ -20,26 +10,18 @@ struct ActorReactionContext {
     u8 unknown0[0x8E8];
     u8 request, direction;
 };
-static inline u8 HasReactionFlag(struct ChaseActor *s)
-{
-    struct ActorReactionSensor *sensor = (void *)&s->base.tracking.target;
-    u32 mask = 2;
-    if (sensor->flags & mask)
-        return 1;
-    return 0;
-}
 s32 SceneActor_TryRequestFacingReaction(struct ChaseActor *s)
 {
     u32 range;
     struct ActorReactionDelta delta;
-    struct ActorReactionSensor *sensor, *sensor2;
-    struct ActorReactionTarget *target;
+    struct SceneActorChaseTracking *sensor, *sensor2;
+    struct SceneActorChaseTarget *target;
     s32 angle, height;
     struct ActorReactionDelta *out;
     struct ActorReactionContext *context;
-    if (!HasReactionFlag(s))
+    if (!SceneActorChase_TrackingFlags(&s->base.tracking, 2))
         return 0;
-    sensor = (void *)&s->base.tracking.target;
+    sensor = &s->base.tracking;
     {
         u32 mask = -3;
         sensor->flags &= mask;
@@ -57,7 +39,7 @@ s32 SceneActor_TryRequestFacingReaction(struct ChaseActor *s)
     {
         const s16 *own;
         const s16 *other;
-        struct ActorReactionTarget *t;
+        struct SceneActorChaseTarget *t;
         out = &delta;
         own = (const s16 *)&s->base.body.position;
         t = sensor2->target;
