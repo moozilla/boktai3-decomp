@@ -22,8 +22,12 @@ exports.grid = () => {
       // getCell (scene_object.c): a terrain modifier's override wins over the map
       // (pushed blocks, raised bridges)
       const over = g.fn.TerrainModifiers_FindCellOverride(row + x, 1);
-      const a = over ? over + 4 : base + 12 + 4 * (row + x), hb = g.u8(a), flags = g.u16(a + 2);
-      cells.push({ x, z, index: row + x, level: hb & 15, slope: hb >> 4 !== 0, kind: hb >> 4, flags, open: !(flags & 1) });  // Player_IsTurnTerrainBlocked: bit 0 blocks (walls 0x040B/0x040F, outside 0x0003)
+      const original = base + 12 + 4 * (row + x);
+      const a = over ? over + 4 : original, hb = g.u8(a), flags = g.u16(a + 2);
+      // CellGate_UpdatePassageBarrier hides an authored gap with 0x82a while
+      // waiting for the player to enter the cell. That override adds no floor.
+      const gatedGap = flags === 0x82a && (g.u16(original + 2) & 0x40) !== 0;
+      cells.push({ x, z, index: row + x, level: hb & 15, slope: hb >> 4 !== 0, kind: hb >> 4, flags, gatedGap, open: !(flags & 1) });
     }
   }
   return { w, h, cells, at: (x, z) => (x < 0 || z < 0 || x >= w || z >= h ? null : cells[z * w + x]) };
@@ -95,7 +99,9 @@ exports.findPath = (grid, start, goals, blocked = new Set(), loose = false) => {
       // person or a piece of furniture that blocks the other)
       const side = (cx, cz) => open(cx, cz) && step(from, grid.at(cx, cz), cx - x, cz - z);
       if (dx && dz && !(loose ? side(x + dx, z) || side(x, z + dz) : side(x + dx, z) && side(x, z + dz))) continue;
-      const nk = key(nx, nz), c = cost.get(k) + (dx && dz ? 1.414 : 1);
+      // Prefer a longer solid route while the gap is exposed.
+      const gapCost = (to?.flags & 0x40) || to?.gatedGap ? 8 : 0;
+      const nk = key(nx, nz), c = cost.get(k) + (dx && dz ? 1.414 : 1) + gapCost;
       if (c < (cost.get(nk) ?? Infinity)) { cost.set(nk, c); came.set(nk, k); frontier.push([c + hfn(nx, nz), nx, nz]); }
     }
   }

@@ -120,6 +120,17 @@ test('the fall guard accepts the surface of a downhill slope', () => {
   assert.equal(searched, 1);
 });
 
+test('a solid detour takes precedence over exposed and passage-gated gaps', () => {
+  const lib = skill('world', {});
+  for (const hazard of [{ flags: 0x84a }, { flags: 0x82a, gatedGap: true }]) {
+    const grid = { at: (x, z) => x >= 0 && x < 5 && z >= 0 && z < 3 ?
+      { open: true, level: 3, ...(x === 2 && z === 1 ? hazard : { flags: 0 }) } : undefined };
+    const route = lib.findPath(grid, [0, 1], new Set(['4,1']));
+    assert.deepEqual(route.at(-1), [4, 1]);
+    assert.ok(route.every(([x, z]) => x !== 2 || z !== 1));
+  }
+});
+
 test('a moving floor links reachable solid landings across authored gap cells', () => {
   const lib = skill('moving-floors', {}, {}, skill('world', {}));
   const cells = Array.from({ length: 5 }, (_, x) => ({ x, z: 0, open: true, level: 3 }));
