@@ -1,13 +1,12 @@
-#include "global.h"
+#include "monsters/sword/sword_task.h"
 
-extern const u32 gUnk_0860643C[];
-void Callback_InvokeActor(u8 *, u32);
+extern void (*const gUnk_0860643C[])(struct SwordComponent *);
 
-void Sword_UpdateComponents(u8 *s)
+void Sword_UpdateComponents(struct SwordTask *s)
 {
     s32 i;
-    for (i = 0; i < s[0xd2c]; i++) {
-        u8 *e = s + (i * 0x194 + 0x4bc);
-        Callback_InvokeActor(e, gUnk_0860643C[e[0x11e]]);
+    for (i = 0; i < s->count; i++) {
+        struct SwordComponent *e = &s->components[i];
+        Callback_InvokeActor(e, gUnk_0860643C[e->active]);
     }
 }
