@@ -118,9 +118,9 @@ waiting:
 
 extern const u32 gUnk_08605F94[];
 
-void Vorn_InitSpecialActionTable(u8 *p)
+void Vorn_InitSpecialActionTable(struct ChaseActor *actor)
 {
-    *(const u32 **)(p + 0x288) = gUnk_08605F94;
+    actor->base.alternateBehaviorCallbacks = (void **)gUnk_08605F94;
 }
 
 // confidence=low: repeats delayed animations before dispatching a context script.
@@ -605,26 +605,23 @@ void SceneActorPhase_BeginTimedMotion(struct ChaseActor *p)
         ++p->base.counter2AC;
 }
 
-void Vorn_UpdateActionCompletion(u8 *p)
+void Vorn_UpdateActionCompletion(struct ChaseActor *actor)
 {
-    SceneActorControl_TakeStateEntry((struct ChaseActor *)p);
-    if (p[0x2b0]) {
-        struct {
-            u8 pad[0xf];
-            u8 flags;
-        } *sprite = (void *)(p + 0xdc);
+    SceneActorControl_TakeStateEntry(actor);
+    if (actor->base.stepDone) {
+        struct SceneActorChaseTracking *tracking = &actor->base.tracking;
         u8 m = 8;
-        sprite->flags |= m;
-        Vorn_SelectRecoveryAction(p, gUnk_0824E224, 0x19b);
+        tracking->flags |= m;
+        Vorn_SelectRecoveryAction((u8 *)actor, gUnk_0824E224, 0x19b);
     } else
-        ++((struct ChaseActor *)p)->base.counter2AC;
+        ++actor->base.counter2AC;
 }
 
 extern const u32 gUnk_08605F9C[];
 
-void Vorn_InitAttackActionTable(u8 *p)
+void Vorn_InitAttackActionTable(struct ChaseActor *actor)
 {
-    *(const u32 **)(p + 0x284) = gUnk_08605F9C;
+    actor->base.callbacks284 = (void **)gUnk_08605F9C;
 }
 
 void SceneActor_UpdateTargetedAttack(struct ChaseActor *);
@@ -659,9 +656,9 @@ void SceneActorPhase_UpdateCooldown(struct ChaseActor *p)
 
 extern const u32 gUnk_08606000[];
 
-void Vorn_InitReactionActionTable(u8 *p)
+void Vorn_InitReactionActionTable(struct ChaseActor *actor)
 {
-    *(const u32 **)(p + 0x28c) = gUnk_08606000;
+    actor->base.behaviorCallbacks = (void **)gUnk_08606000;
 }
 
 void Vorn_UpdateScriptedAnimation(struct ChaseActor *);
@@ -2869,9 +2866,9 @@ void Vorn_RestoreControlAfterItemLaunch(struct ChaseActor *s)
 
 extern const u32 gUnk_08606010[];
 
-void Vorn_InitActionTable(u8 *p)
+void Vorn_InitActionTable(struct ChaseActor *actor)
 {
-    *(const u32 **)(p + 0x29c) = gUnk_08606010;
+    actor->base.callbacks29C = (void **)gUnk_08606010;
 }
 
 s32 Vorn_UpdateBehavior(void *);
@@ -3136,13 +3133,13 @@ void Vorn_InitMotionLimits(struct PInitMotionLimits *p);
 
 void Vorn_ParseField688(struct Vorn *ctx);
 
-void Vorn_InitAttackActionTable(u8 *p);
+void Vorn_InitAttackActionTable(struct ChaseActor *actor);
 
-void Vorn_InitSpecialActionTable(u8 *p);
+void Vorn_InitSpecialActionTable(struct ChaseActor *actor);
 
-void Vorn_InitReactionActionTable(u8 *p);
+void Vorn_InitReactionActionTable(struct ChaseActor *actor);
 
-void Vorn_InitActionTable(u8 *p);
+void Vorn_InitActionTable(struct ChaseActor *actor);
 
 void ActorShadow_Disable(void *);
 
