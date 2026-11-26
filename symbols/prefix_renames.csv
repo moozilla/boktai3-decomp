@@ -14,3 +14,5 @@ CannonEmitter_,PollenFlower_,src/monsters/cannon_emitter,98CB plants in 3504 and
 TentacleEnemy_,Centipede_,src/monsters/tentacle_actor,"Live 0AC7 actor in 4076 has category 9, which maps to Centipede #9851."
 TentacleActor_,CentipedeActor_,src/monsters/tentacle_actor,The 0AC7 component update runs around the visible Centipede in 4076.
 TentacleBody_,CentipedeBody_,src/monsters/tentacle_actor / src/monsters/tentacle_body,Windup and spread callbacks run while the 0AC7 Centipede attacks in 4076.
+BouncingObject_,BouncingBomb_,src/field/bouncing_object_pool,Nidhoggr’s grid attack calls the bomb pool at frame 1921. Dark spheres bounce across active floor tiles and the pool’s removal callback triggers the explosions. The same pool is reached from Mummy and Ratatosk projectile code.
+SceneInventory_,Shop_,src/menus/inventory_action_transitions / src/menus/inventory_transactions_and_catalogs / src/menus/inventory_values_and_display,The 744F weapons shop in 1929 runs all three ranges. Scope covers 97 symbols and excludes the same legacy prefix in other units.

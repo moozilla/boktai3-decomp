@@ -608,3 +608,21 @@ The isolated E534 test establishes the bat assets and the launch behavior.
 The flock's natural story placement and the usual controls for the forced
 Player motions remain open. Their records distinguish those limitations
 from the witnessed scenes.
+
+## Reviewer follow-up
+
+### Bouncing bombs and shop ranges
+
+Load 0046 in scene 4915 and wait for 080692C8. The Nidhoggr grid actor
+spawns a dark sphere at frame 1921. The next shots capture it bouncing
+across the active tiles while `BouncingObject_TickActive` runs. The removal
+callback fires from the same pool. Use `src/objects/bouncing_bombs` for
+this family of projectiles. `review-bouncing-bombs/commands.txt` has the
+trigger and timing.
+
+Warp 0007 to `scene=1929 entrance=7 story=30`. GCL proc 1926 opens key
+744F. The screen says Weapon Shop and shows Sheyenne and the swords for
+sale. A opens the purchase prompt. The comparison, action selection and
+purchase confirmation callbacks run in the three planned shop units.
+The capture is `review-shop/menu.png`. The scoped `SceneInventory_`
+prefix batch covers 97 symbols in these three units.
