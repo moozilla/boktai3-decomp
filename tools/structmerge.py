@@ -24,6 +24,7 @@ RULE = ("Choose the type whose width and extension have the most support from di
         "loading at that offset, then the type used by the most copies. Take the name from the copy "
         "with the most informative fields, then the most typed fields. Ties have stable spelling "
         "order and weak or disputed choices are marked confidence=low.")
+VOLATILE_TYPE = re.compile(r"\b(?:volatile|v[us](?:8|16|32|64))\b")
 
 
 class Holdout(ValueError):
@@ -84,7 +85,7 @@ def pick_candidates(views, loads):
             grouped[type_key(m)].append((view, m))
         proposals = []
         for supporters in grouped.values():
-            eligible = [(v, m) for v, m in supporters if not m["private"]]
+            eligible = [(v, m) for v, m in supporters if not m["private"] and not VOLATILE_TYPE.search(m["decl"])]
             if not eligible:
                 continue
             qualified = sorted(eligible, key=lambda vm: (
@@ -96,7 +97,8 @@ def pick_candidates(views, loads):
             proposals.append((score, view, member))
         if not proposals:
             view, member = entries[0]
-            raise Holdout(f"{view['id']}.{member['name']} depends on {', '.join(member['private'])}")
+            dependency = ", ".join(member["private"]) or "volatile storage"
+            raise Holdout(f"{view['id']}.{member['name']} depends on {dependency}")
         proposals.sort(key=lambda p: (-p[0][0], -p[0][1], tuple(-x for x in specificity(p[1])),
                                       p[2]["ctype"], p[2]["name"], p[1]["id"]))
         score, view, member = proposals[0]

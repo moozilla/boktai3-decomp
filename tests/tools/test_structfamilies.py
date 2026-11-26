@@ -1,6 +1,7 @@
 """Small source fixtures for compiler layouts, call evidence and gated merges."""
 from pathlib import Path
 import sys
+import subprocess
 import tempfile
 import unittest
 from unittest.mock import patch
@@ -30,6 +31,7 @@ void Tick(struct Body *arg);
 void Host_Run(struct Host *p) {
     Tick((struct Body *)&p->bytes[2]);
     Tick((struct Body *)((u8 *)p + (2 << 1)));
+    Tick((struct Body *)((u8 *)p + 0));
     Tick(&p->body);
 }
 """
@@ -71,8 +73,11 @@ class SourceEvidenceTests(unittest.TestCase):
         path = "src/moved/a.c"
         _, _, ast, tu = parse(A, path)
         refs = evidence.References(ast, tu, path)
-        self.assertEqual([call[5][1:] for call in refs.calls], [(("bytes", 2), 0), ((), 4), (("body",), 0)])
-        self.assertEqual([call[6] for call in refs.calls], [f"{path}:struct Body"] * 3)
+        self.assertEqual([call[5][1:] for call in refs.calls], [(("bytes", 2), 0), ((), 4), ((), 0), (("body",), 0)])
+        self.assertEqual([call[6] for call in refs.calls], [f"{path}:struct Body"] * 4)
+        self.assertTrue(families.ADDRESS_CANDIDATE.search("f(&p->bytes[0]);"))
+        self.assertTrue(families.ADDRESS_CANDIDATE.search("f((Thing *) ((u8 *)p + 0x10));"))
+        self.assertFalse(families.ADDRESS_CANDIDATE.search("struct Thing *p = (void *)(base + n);"))
 
     def test_pointer_member_and_nonconstant_offsets(self):
         text = TYPES + """
@@ -103,9 +108,34 @@ void F(struct Owner *p, int n) {
         self.assertEqual(families.family_components({a, b}, views, {}, defaultdict(set, {
             (a, b): {("flow", "A parameter 1")}})), [])
 
+    def test_scan_cache_rechecks_changed_source_or_version(self):
+        rel = "src/moved/a.c"
+        with tempfile.TemporaryDirectory() as tmp, patch.object(families, "ROOT", Path(tmp)), \
+                patch.object(families, "scan_file", return_value={"file": rel}) as scan:
+            families.scan_cached((rel, "source", b"compiler 1"))
+            families.scan_cached((rel, "source", b"compiler 1"))
+            self.assertEqual(scan.call_count, 1)
+            families.scan_cached((rel, "new source", b"compiler 1"))
+            families.scan_cached((rel, "source", b"compiler 2"))
+            self.assertEqual(scan.call_count, 3)
+
 
 @unittest.skipUnless(Path(lm.AGBCC).is_file(), "agbcc required for layout probes")
 class CompilerTests(unittest.TestCase):
+    def test_probe_compatible_headers_once_and_reuse_the_results(self):
+        one = "struct A { u16 flags; };\n"
+        two = "struct B { struct A a; u16 next; };\n"
+        pre = TYPES + '# 1 "include/a.h"\n' + one + '# 1 "include/b.h"\n' + two
+        jobs = [("include/a.h", one, b"version"), ("include/b.h", two, b"version")]
+        with tempfile.TemporaryDirectory() as tmp, patch.object(families, "OUT", Path(tmp)), \
+                patch.object(lm, "preprocess", return_value=pre) as cpp:
+            first = families.scan_header_batch(jobs)
+            second = families.scan_header_batch(jobs)
+            self.assertEqual(cpp.call_count, 1)
+        self.assertEqual(first, second)
+        b = first[1]["records"]["include/b.h:struct B"]
+        self.assertEqual((b["size"], b["members"][0]["record"]), (8, "include/a.h:struct A"))
+
     def test_real_offsets_nested_types_and_votes(self):
         path = "src/moved/a.c"
         views = measure(A, path) | measure(B, "src/moved/b.c")
@@ -124,7 +154,7 @@ class CompilerTests(unittest.TestCase):
             _, _, _, embeds, _ = families.flow(
                 [{"file": path, "calls": refs.calls, "params": refs.params}], views, {})
         self.assertEqual({(off, declared, len(sites)) for (_, off, _, declared), sites in embeds.items()},
-                         {(4, False, 1), (4, True, 1), (10, False, 1)})
+                         {(0, False, 1), (4, False, 1), (4, True, 1), (10, False, 1)})
 
     def test_rom_vote_precedes_majority_and_padding_stays_padding(self):
         text = TYPES + "struct R { u8 pad0[4]; u16 flags; };\n"
@@ -164,8 +194,23 @@ int X(struct R *r, struct Q *q) { return r->old + q->old; }
             with self.assertRaisesRegex(merge.Holdout, "initializer"):
                 merge.rewrite_unit(old_text, old, new, Path("include/s.h"), "struct S")
 
+    def test_union_preserves_deliberate_overlays(self):
+        text = TYPES + "union W { unsigned word; u16 halves[2]; };\n"
+        views = [next(iter(measure(text, f"src/{i}.c").values())) for i in range(2)]
+        f = {"kind": "union", "size": views[0]["size"], "loads": []}
+        generated, expected, _, _ = merge.plan_header(f, views, "W", Path("include/w.h"))
+        self.assertEqual(expected, {"word": (0, 4), "halves": (0, 4)})
+        self.assertEqual(merge.probe_header(generated, "union W", expected, views[0]["size"], views[0]["align"])
+                         ["kind"], "union")
+
 
 class GateTests(unittest.TestCase):
+    def test_check_surfaces_the_compiler_failure(self):
+        error = "stdin:18: structure has no member named `flags'"
+        process = subprocess.CompletedProcess([], 1, "", error + "\nCalledProcessError\n")
+        with patch.object(keepcheck.subprocess, "run", return_value=process):
+            self.assertEqual(keepcheck.check("src/moved/a.c"), (False, error))
+
     def test_exact_gate_restores_rejected_units(self):
         with tempfile.TemporaryDirectory() as tmp:
             path = Path(tmp) / "test.c"

@@ -10,6 +10,7 @@ from concurrent.futures import ProcessPoolExecutor, ThreadPoolExecutor
 import csv
 import hashlib
 import inspect
+from itertools import combinations
 import json
 import os
 from pathlib import Path
@@ -31,7 +32,11 @@ from pycparser import c_ast
 ROOT = Path(keepcheck.ROOT)
 OUT = Path("build/structfamilies")
 SCHEMA = 1
-ADDRESS_CANDIDATE = re.compile(r"&[^;,{}]{0,200}->|\([^)]*\*\s*\)[^;,{}]{0,150}\+")
+POINTER_CAST = r"\([^;{}()]*\*\s*(?:const\s*)?\)"
+BYTE_CAST = r"\(\s*(?:const\s+)?(?:u8|s8|(?:unsigned\s+|signed\s+)?char)\s*\*\s*(?:const\s*)?\)"
+ADDRESS_CANDIDATE = re.compile(
+    rf"[(,]\s*(?:{POINTER_CAST}\s*){{0,2}}(?:\(\s*)*"
+    rf"(?:&[^;,{{}}]{{0,200}}->|{BYTE_CAST}[^;,{{}}]{{0,150}}[+-])")
 
 
 def digest(data):
@@ -84,15 +89,73 @@ def scan_file(rel, text):
     return result
 
 
+def cache_path(rel, text, version):
+    key = digest(rel.encode() + b"\0" + version + b"\0" + text.encode())
+    return ROOT / OUT / "cache" / key[:2] / f"{key}.json"
+
+
 def scan_cached(job):
     rel, text, version = job
-    key = digest(rel.encode() + b"\0" + version + b"\0" + text.encode())
-    path = ROOT / OUT / "cache" / key[:2] / f"{key}.json"
+    path = cache_path(rel, text, version)
     if path.is_file():
         return json.loads(path.read_text())
     result = scan_file(rel, text)
     json_write(path, result)
     return result
+
+
+def scan_header_batch(jobs):
+    """Probe compatible shared headers together. Retry individual headers when needed."""
+    cached, missing = {}, []
+    for rel, text, version in jobs:
+        cache = cache_path(rel, text, version)
+        if cache.exists():
+            cached[rel] = json.loads(cache.read_text())
+        else:
+            missing.append((rel, text, version))
+    if len(missing) < 2:
+        return [cached.get(job[0]) or scan_cached(job) for job in jobs]
+
+    with tempfile.NamedTemporaryFile(mode="w", suffix=".c", dir=ROOT / "build") as file:
+        file.write('#include "global.h"\n' + "".join(f'#include "{rel}"\n' for rel, _, _ in missing))
+        file.flush()
+        pre = lm.preprocess(file.name, nonmatching=False)
+    if pre:
+        try:
+            body, _, tu, _ = evidence.parse(pre, file.name, declarations_only=True)
+        except lm.pycparser.c_parser.ParseError:
+            pre = None
+    if not pre:
+        mid = len(missing) // 2
+        rows = scan_header_batch(missing[:mid]) + scan_header_batch(missing[mid:])
+        cached.update((row["file"], row) for row in rows)
+        return [cached[job[0]] for job in jobs]
+
+    selections = {rel: evidence.selected_records(tu, rel) for rel, _, _ in missing}
+    combined = {key: node for selected in selections.values() for key, node in selected.items()}
+    measured = lm.probe_records(body, tu, combined)
+    if not measured:
+        mid = len(missing) // 2
+        rows = scan_header_batch(missing[:mid]) + scan_header_batch(missing[mid:])
+        cached.update((row["file"], row) for row in rows)
+        return [cached[job[0]] for job in jobs]
+    for job in missing:
+        rel, text, version = job
+        selected = selections[rel]
+        expected = {f"{rel}:{r.name if r.typedef else f'{r.kind} {r.name}'}" for r in inline_twins.records(text)}
+        if not selected or not (selected.keys() | expected) <= measured.keys():
+            cached[rel] = scan_cached(job)
+            continue
+        for key, (spell, node) in selected.items():
+            view = measured[key]
+            for member, decl in zip(view["members"], node.decls):
+                t = tu.resolve(decl.type)
+                member["record"] = evidence.record_of(tu, t.type if isinstance(t, c_ast.ArrayDecl) else decl.type)
+            view.update(file=rel, line=node.coord.line)
+        row = {"file": rel, "digest": digest(text.encode()), "records": {k: measured[k] for k in selected}}
+        json_write(cache_path(rel, text, version), row)
+        cached[rel] = row
+    return [cached[job[0]] for job in jobs]
 
 
 def scan_tree(paths, jobs):
@@ -104,8 +167,9 @@ def scan_tree(paths, jobs):
         src = (root / rel).read_text(errors="replace")
         if inline_twins.RECORD.search(src) or ADDRESS_CANDIDATE.search(keepcheck.blank_comments(src)):
             candidates.append((rel, src))
-    candidates += [(rel, text) for rel, text in sorted(headers.items())
-                   if rel.startswith("include/") and inline_twins.RECORD.search(text)]
+    shared = [(rel, text) for rel, text in sorted(headers.items())
+              if rel.startswith("include/") and inline_twins.RECORD.search(text)]
+    print(f"Scanning {len(candidates)} source units and {len(shared)} headers", file=sys.stderr, flush=True)
     stat = Path(lm.AGBCC).stat()
     key = hashlib.sha256(f"{stat.st_mtime_ns}:{stat.st_size}".encode())
     key.update(inspect.getsource(scan_file).encode())
@@ -115,12 +179,18 @@ def scan_tree(paths, jobs):
         key.update(rel.encode())
         key.update(text.encode())
     results = []
+    header_version = key.copy()
+    header_version.update(inspect.getsource(scan_header_batch).encode())
     with ProcessPoolExecutor(jobs) as executor:
         tasks = ((rel, text, key.digest()) for rel, text in candidates)
         for result in executor.map(scan_cached, tasks, chunksize=8):
             results.append(result)
             if len(results) % 500 == 0:
-                print(f"Scanned {len(results)} of {len(candidates)} files", file=sys.stderr, flush=True)
+                print(f"Scanned {len(results)} of {len(candidates)} units", file=sys.stderr, flush=True)
+        tasks = [(rel, text, header_version.digest()) for rel, text in shared]
+        batches = (tasks[i:i + 12] for i in range(0, len(tasks), 12))
+        for batch in executor.map(scan_header_batch, batches):
+            results.extend(batch)
     return results
 
 
@@ -255,17 +325,18 @@ def flow(scans, records, groups):
             defined = params.get(slot, set())
             if len(defined) != 1:
                 defined = set()
-            if steps or delta:
+            offset_address = bool(steps or delta)
+            if offset_address or cast and cast != key:
                 position = address_offset(origin, records)
                 targets = defined or {declared}
                 if position:
                     off, native = position
                     for dest in targets:
-                        # A typed cast helps identify the subobject when a void* formal
-                        # erased it, but a concrete incompatible formal is a conflict.
+                        # A concrete incompatible formal conflicts with the cast.
                         if dest in records and (not cast or cast == dest) and dest != key and off >= 0:
                             if off + records[dest]["size"] <= records[key]["size"]:
                                 embeds[(key, off, dest, native == dest and delta == 0)].add((loc, caller, fn, i))
+            if offset_address:
                 continue
             if key in private:
                 buckets[("parameter", *slot)].add(key)
@@ -282,8 +353,6 @@ def flow(scans, records, groups):
 
 def family_components(private, records, buckets, edges):
     """Merge supported pairs, keeping every pair in a component layout-compatible."""
-    from itertools import combinations
-
     for anchor, keys in buckets.items():
         kind, *context = anchor
         if kind == "parameter" and len(keys) > 64:
@@ -474,8 +543,14 @@ def make_catalog(scans, *, jobs=2, compiler=True, rom=True):
                          "score": len(views) * wc, "rows": layout_rows(views), "evidence": reasons,
                          "shared": shared.relations(views), "loads": [r for k in keys for r in loads[k]]})
     families.sort(key=lambda f: (-f["score"], -len(f["records"]), f["id"]))
-    findings = [{"parent": p, "offset": o, "child": c, "declared": native, "sites": sorted(sites)}
-                for (p, o, c, native), sites in embeds.items()]
+    sites_by_object = defaultdict(set)
+    declared = set()
+    for (p, o, c, native), sites in embeds.items():
+        sites_by_object[p, o, c].update(sites)
+        if native:
+            declared.add((p, o, c))
+    findings = [{"parent": p, "offset": o, "child": c, "declared": (p, o, c) in declared, "sites": sorted(sites)}
+                for (p, o, c), sites in sites_by_object.items()]
     findings.sort(key=lambda r: (r["declared"], -len(r["sites"]), r["parent"], r["offset"], r["child"]))
     for v in records.values():
         del v["_offsets"]
