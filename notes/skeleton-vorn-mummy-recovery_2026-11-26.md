@@ -282,3 +282,24 @@ zero errors.
   scripted gate and motion writes still each differ by one instruction.
 
 All three edited units matched their full ROM extents.
+
+## Follow-up after PR 1072
+
+| Class | Report lines before and after | Steering uses before and after |
+|---|---:|---:|
+| Skeleton | 241 → 240 | 297 → 296 |
+| Vorn | 219 → 217 | 227 → 225 |
+| Mummy | 169 → 169 | 171 → 171 |
+
+Skeleton and Vorn share the animation duration update for sequence and
+tile drawables. Skeleton reads the registered `SurfaceTrack` and uses
+the chase-group route and the terrain cell center in rerouting. Vorn reads
+its script request, gate, tracking flags, and route fields through the
+class and chase group. Mummy uses the sequence drawable in the animation
+callbacks and the shared terrain center in adjacent-cell routing. The
+revival step takes its specialized control drawable.
+
+All seven edited units matched their full ROM extents. Scoped lint reported
+zero errors. The direct Vorn tracking clear still folds the component offset
+and moves the mask below the byte load. Mummy's direct tracking clear uses
+an immediate byte where the ROM forms a full-width complemented mask.
