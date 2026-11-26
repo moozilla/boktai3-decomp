@@ -14,7 +14,7 @@ src/actors/sequence_contact_actor_pool,src/bosses/nidhoggr,GCL key 917F. Dialogu
 src/actors/singleton_slot_7,src/bosses/vanargand,"GCL 6325 calls 6314, which creates registry 5856 with actor ID 7C56 (Vanargand). The head is on the left during Django’s bike chase."
 src/actors/tagged_scene_npc,src/npc/kuro,"D774→E00E with name ID 51E2. Procs 2235/2266 connect that actor to text #3515, Kuro."
 src/effects/animated_particles,src/effects/particles/impact_bursts,3DB0’s shatter dust and the Vanargand burst use the same animated manager.
-src/effects/debris_particles,src/objects/bat_curtain,DA6D fragment update is visible in a staged barrier run. All callers are in the Bat Curtain unit.
+src/effects/debris_particles,src/objects/bat_curtain,0014→6401 5734 Count rematch. A staged hit on the live curtain calls 08012B34 and draws DA6D debris while the curtain flashes.
 src/effects/directional_particles,src/effects/particles/impact_fragments,Stage original 4147 scattering sprites and trace ContactBurst_Update ownership. Place with the other impact fragments.
 src/effects/effect_emitter,src/objects/strike_crystal.c,Green 066A strike crystal drawn by original 95A8 and proc 1179. The same crystal actor runs in Pirate Island.
 src/effects/effect_part,src/effects/actor_attachments,"Live attack effects attach to the Player through 0E10, with the shared manager in other actor encounters."
@@ -60,7 +60,7 @@ src/field/scene_debris/scene_debris.c,src/effects/particles/scene_debris.c,Coffi
 src/field/scene_objects,src/objects/puzzle_blocks.c,0029→3955. E02A creates the 9D41 blocks removed by a room switch. This pool owns collision and puzzle blocks independently from the 6D69 script controller.
 src/field/scene_script_object/orbit_motion.c,src/objects/scenery_motion.c,0029→3905. 3D91 scenery constructor installs the update in scenery.c. Keep both files at the objects level.
 src/field/scene_script_object/scene_script_object.c,src/objects/scenery.c,"0029→3905. The B07C scenery uses the native flash, burst and update callbacks."
-src/field/tile_trigger,src/objects/floor_traps.c,2FA5 slots activate on Player or creature contact. Recorded at 3161 with A945 and native press and contact callbacks.
+src/field/tile_trigger,src/objects/floor_traps.c,0013→3161. Django entering the 2FA5 slot’s contact range starts the original countdown and A945 press animation.
 src/menus/control_panel,src/minigames/dark_generator.c,The overdue-debt path starts proc 1001. Proc 1003 creates key B3D1 and explains the Dark Generator. The work gauge and treadmill move during input.
 src/menus/registry_3_f74,src/ui/town/town_map.c,GCL 2554 creates 3F74 with the 11 town service callbacks. SAN MIGUEL appears on the map in frame 1940.
 src/menus/scene_catalog,src/ui/pause/status_options.c,Pause Status is visible. This ROM interval runs while opening that page and updating its numbers and descriptions.

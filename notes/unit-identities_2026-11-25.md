@@ -963,3 +963,28 @@ For both position preparations, read the current Player pointer from
 `gPlayers` at 02000580. Confirm it against the `Player_Update`
 probe and add the position field offset 0x30. The actor address
 varies by room and checkpoint.
+
+### Floor trap contact and Bat Curtain debris follow-up
+
+Tags: floor traps, Bat Curtain, Count, sprite attribution, contact
+
+For the unforced trap transition, load the 0013 room state
+`review-stage-pressure/idle.ss`. The `resume-floor-inspect` dump
+locates Django and the first 2FA5 slot. Run
+`resume-floor-walk/commands.txt`. This writes position (1152, 512,
+896) to the Player and leaves the trap slot untouched. The original
+idle handler enters the countdown at frame 1841. The slot starts
+the press animation at frame 1852 and runs contact effects at 1858.
+`trap.png` shows the active tile. The earlier renderer trace provides
+the matching A945 screen pieces.
+
+Warp 0014 to the Count rematch, scene 6401, entrance 47, story 55.
+`resume-count-curtain` logs native creation of the 5734 Bat Curtain
+and saves the running arena. In `resume-count-debris-fourth`,
+position Django beside the fourth curtain and call its registered
+hit handler at 08012D78 with slot 0200DD88. Its own update calls
+08012B34 and loads DA6D at frame 1849. `Debris_Update` then runs
+for the flying pieces. Compare `before.png`, `debris.png` and
+`scatter.png`. At frame 1851, the renderer ties the curtain pieces
+to 0200DD88 and the debris pieces to 02011C78, 02011D28 and 02011DD8.
+The staged hit proves the ownership in its retail arena.
