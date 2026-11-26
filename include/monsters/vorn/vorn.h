@@ -24,7 +24,7 @@ struct Vorn {
     u8 unknown696, delayedAnimationTimer;
     u16 field698;
     u16 frame69A;
-    u8 unknown69C[2];
+    u16 pursuitWaitTimer;
     u16 field69E;
     u8 unknown6A0[8];
     u16 nearTimer;

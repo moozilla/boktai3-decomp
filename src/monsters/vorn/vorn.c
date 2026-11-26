@@ -506,16 +506,6 @@ void Vorn_ResumeRouteAfterDelay(struct ChaseActor *actor, s32 frame)
 
 void Vorn_ResumeRouteAfterDelay(struct ChaseActor *, s32);
 
-struct VornAnimationState {
-    u8 unknown0[12];
-    u16 delay;
-};
-
-struct VornDrawable {
-    u8 unknown0[0x20];
-    struct VornAnimationState animation;
-};
-
 static inline u8 Vorn_DisplacementStopped(s32 x, s32 z)
 {
     if (!x && !z)
@@ -533,10 +523,10 @@ static inline u8 Vorn_ContextFlags(struct SceneActorAnimationLink *context, u32 
 void Vorn_UpdateStaggerRecovery(struct ChaseActor *actor, s32 frame)
 {
     struct SceneActorAnimationLink *context = actor->base.context;
-    struct VornAnimationState *animation =
-        &((struct VornDrawable *)actor->base.drawable)->animation;
+    struct SceneActorAnimationTileDrawable *drawable = actor->base.drawable;
+    struct AnimSprite *tile = &drawable->tile;
     struct SceneActorChaseGroup *group = SceneActorChase_GroupOf(actor);
-    struct ContactPackedVector range;
+    struct ContactPosition range;
     s16 *x, *z;
     s32 dx, dz;
     if (SceneActorReaction_TakePrepared(actor)) {
@@ -551,7 +541,7 @@ void Vorn_UpdateStaggerRecovery(struct ChaseActor *actor, s32 frame)
     SceneActorChase_SetActorFlags(actor, 0x2000);
     SceneActorChase_SetStatusFlags(actor, 0x10000);
     if (frame <= 17)
-        animation->delay = 0;
+        tile->elapsed = 0;
     if (Mod(frame, 12) == 0 && SceneActorChase_QueryMotionFlagComponent(actor, 8)) {
         u32 index, sample;
         u8 count;
@@ -565,7 +555,7 @@ void Vorn_UpdateStaggerRecovery(struct ChaseActor *actor, s32 frame)
         sample &= 3;
         count = sample + 1;
         SparkParticle_Spawn(&actor->base.body.position, count,
-                            (const struct ContactPosition *)&range,
+                            &range,
                             actor->base.body.direction + 128, 10, 6, 2, 2);
     }
     dx = SceneActorDisplacement_ReadAxis(actor->base.reactionStart.x, &actor->base.reactionEnd.x,
@@ -631,21 +621,17 @@ static inline u8 Pending(u8 *context, u16 **out)
     return 0;
 }
 
-struct VornWaitTimer {
-    u16 value : 16;
-};
-
 // confidence=low: waits for pursuit distance or timeout before restoring behavior 15.
 
 
 void Vorn_UpdatePursuitWait(struct ChaseActor *input)
 {
     struct ChaseActor *a = input;
-    u8 *context = a->base.context;
+    struct Vorn *context = a->base.context;
     u16 *flags;
     if (SceneActorControl_TakeFlag(&a->base.field2B2)) {
-        *(u16 *)(context + 0x69C) = 0;
-    } else if (Pending(context, &flags)) {
+        context->pursuitWaitTimer = 0;
+    } else if (Pending((u8 *)context, &flags)) {
         if (a->base.tracking.distance <= 0x18FFF) {
             Vorn_SelectRouteAwayFromTarget(a);
             {
@@ -654,19 +640,17 @@ void Vorn_UpdatePursuitWait(struct ChaseActor *input)
             }
             Chase_SetState(a, 0, 0, 15);
         } else {
-            struct VornWaitTimer *timer;
             a->base.body.direction = a->base.tracking.heading;
             SceneActorAnimation_SelectDirectionalEntry((void *)a, 0);
-            timer = (void *)(context + 0x69C);
-            ++timer->value;
-            if (timer->value > 120) {
+            ++context->pursuitWaitTimer;
+            if (context->pursuitWaitTimer > 120) {
                 Vorn_SelectRouteAwayFromTarget(a);
                 {
                     s32 mask = ~2;
                     ((struct ChaseFlags40 *)flags)->bits &= mask;
                 }
                 Chase_SetState(a, 0, 0, 15);
-                timer->value = 0;
+                context->pursuitWaitTimer = 0;
             }
         }
     } else
