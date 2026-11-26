@@ -62,8 +62,11 @@ const describe = (e) => {
       return `menu ${e.menu.replace(/_Update|_Handle\w*/, '')} ${e.keys.map((k) => k.key || k).join(' ')}`;
     case 'narration': case 'dialogue': return `reading text ${e.string ?? ''}`;
     case 'goal': return `goal reached: ${e.reached}`;
+    case 'entry': return `scene ${e.scene}, story ${e.story}`;
     case 'room': return `room ${e.scene}: doors ${(e.doors || []).join(' ')}`;
     case 'navigate': return `door ${e.box}: ${e.reason}`;
+    case 'key': return `find key ${e.item} in scene ${e.toward}`;
+    case 'unlock': return e.done ? `opened ${e.box} with key ${e.item}` : null;
     case 'interact': return `open ${e.item || 'object'}`;
     case 'equip': return `equip ${e.kind} ${e.name || e.id}`;
     case 'hit': return `hit ${e.with ? `with ${e.with}` : 'it'}: ${e.lit ? 'lit' : e.done ? 'done' : `${e.hits} hits, no effect`}`;
@@ -73,6 +76,8 @@ const describe = (e) => {
     case 'fight':
       if (e.threshold !== undefined) return `sunlight: threshold ${e.threshold}, guard ${e.guard}`;
       if (e.equip) return e.equip.gun ? 'equip the solar gun' : 'equip a sword';
+      if (e.trance) return 'enter Dark Trance';
+      if (e.dialogue !== undefined) return `battle dialogue ${e.dialogue}`;
       if (e.hp !== undefined) return `fight: targets ${e.enemies}, health ${e.hp}`;
       return null;
     case 'fought': return `fight ${e.won ? 'won' : 'left'} life ${e.life}`;
@@ -107,7 +112,7 @@ s.run(function* (g) {
       const e = events[ei++], d = describe(e);
       if (d) caption = d;
       if (e.skill === 'nav' && e.path) { route = e.path; routeScene = g.lib.where().scene; }
-      if (e.skill === 'room' || e.skill === 'goal') route = null;
+      if (e.skill === 'entry' || e.skill === 'room' || e.skill === 'goal') route = null;
     }
     const c = clipAt(n);
     if (!c || (n - c.a) % c.step) continue;
