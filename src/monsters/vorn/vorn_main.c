@@ -950,11 +950,6 @@ s32 SceneActor_TryLaunchSelectedItem(struct SceneActorItemLaunch *p)
 
 /* Descriptive aliases and object roles are tentative (confidence: low). */
 
-struct SceneActorForwardCollider {
-    u8 unknown0[0x628];
-    struct ContactCollider collider;
-};
-
 static inline u8 unavailable(struct ChaseActor *p)
 {
     if (p) {
@@ -979,7 +974,7 @@ static inline s32 scaled(s32 x)
 
 void SceneActor_UpdateForwardCollider(struct ChaseActor *p)
 {
-    struct SceneActorForwardCollider *context = p->base.context;
+    struct Vorn *context = p->base.context;
     union SceneActorRegistryPackedPosition pos;
     union SceneActorRegistryPackedPosition bounds;
     if (!unavailable(p) && p->base.controlKind == 0x22) {
@@ -990,30 +985,23 @@ void SceneActor_UpdateForwardCollider(struct ChaseActor *p)
         bounds.packed.z = 64;
         bounds.packed.y = 100;
         {
-            struct ContactCollider *collider = &context->collider;
+            struct ContactCollider *collider = &context->attackCollider;
             collider->bounds = *(struct ContactPosition *)&bounds;
             Collider_SetPosition(collider, &pos, 0);
         }
     }
 }
 
-void Vorn_InitActionCooldown(u8 *p)
+void Vorn_InitActionCooldown(struct Vorn *p)
 {
-    *(u16 *)(p + 0x692) = 0x78;
-    *(u16 *)(p + 0x690) = 0x78;
+    p->randomReactionPeriod = 0x78;
+    p->randomReactionTimer = 0x78;
 }
 
-struct SceneActorRandomReaction {
-    u8 unknown0[0x690];
-    u16 timer, period;
-    u8 unknown694[0x6d4 - 0x694];
-    u16 flags;
-};
-
-static inline u8 active(struct SceneActorRandomReaction *p)
+static inline u8 active(struct Vorn *p)
 {
     u32 mask = 1;
-    if (p->flags & mask)
+    if (p->flags6D4 & mask)
         return 1;
     return 0;
 }
@@ -1025,12 +1013,12 @@ static inline u32 blocked(struct ChaseActor *p)
 
 void SceneActor_TickRandomReaction(struct ChaseActor *p)
 {
-    struct SceneActorRandomReaction *context = p->base.context;
+    struct Vorn *context = p->base.context;
     if (!unavailable(p) && !blocked(p) && p->base.controlKind == 0x23 && active(context)) {
-        if (context->timer) {
-            context->timer--;
+        if (context->randomReactionTimer) {
+            context->randomReactionTimer--;
         } else {
-            context->timer = context->period;
+            context->randomReactionTimer = context->randomReactionPeriod;
             gRandomIndex = (gRandomIndex + 1) & 0x3ff;
             {
                 s32 random = *(u8 *)&gRandomTable[gRandomIndex];
@@ -1582,7 +1570,7 @@ void Vorn_OnScriptActionRequest(void);
 void SceneActor_InitContextColliders(struct ChaseActor *p)
 {
     struct ContactPackedVector size, offset;
-    u8 *q = p->base.context;
+    struct Vorn *context = p->base.context;
     size.x = 0x40;
     size.y = 0x80;
     size.z = 0x40;
@@ -1602,7 +1590,7 @@ void SceneActor_InitContextColliders(struct ChaseActor *p)
     ((struct ContactPosition *)&offset)->x = 0;
     ((struct ContactPosition *)&offset)->y = 0x80;
     ((struct ContactPosition *)&offset)->z = 0;
-    SceneActorCollision_InitExternalAttack(p, q + 0x628, &size, &offset, Vorn_OnScriptActionRequest,
+    SceneActorCollision_InitExternalAttack(p, &context->attackCollider, &size, &offset, Vorn_OnScriptActionRequest,
                                            1, p);
 }
 
@@ -3363,7 +3351,7 @@ void Vorn_ParseField624(struct ChaseActor *actor);
 
 void Vorn_InitScriptCallback(struct Vorn *p);
 
-void Vorn_InitActionCooldown(u8 *p);
+void Vorn_InitActionCooldown(struct Vorn *);
 
 void Vorn_InitTimedAction(struct P *p);
 
