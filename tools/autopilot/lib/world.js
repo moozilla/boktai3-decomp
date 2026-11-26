@@ -396,9 +396,13 @@ exports.bags = () => {
   // gun lenses +0x828 (u16 lens id = the gun's element mode, SolarFruit_GetInventorySlot),
   // gun frames +0x4C0 (index + 1 into gUnk_08E60F4C, 0 empty: GameState_GetUnlockEntry)
   const frames = []; for (let i = 0; i < 16; i++) { const v = g.u16(gs + 0x4c0 + i * 2); if (v) frames.push(v - 1); }
-  return { items: read(0xa0, 16, 2, 2), accessories: read(0x160, 16, 2, 2), swords: read(0x1c0, 8, 16, 1),
+  return { items: read(0xa0, 16, 2, 2), valuables: read(0x838, 16, 2, 2),
+    accessories: read(0x160, 16, 2, 2), swords: read(0x1c0, 8, 16, 1),
     lenses: read(0x828, 8, 2, 2), frames };
 };
+
+// The game dispatches by item ID to its consumable or valuables inventory.
+exports.hasItem = (id) => g.fn.Inventory_HasItem(id) > 0;
 
 // Pick up a floor item (stages.json proc_1118: it sits in the middle of its cell): walk
 // onto it, then let the pickup message play out. Returns what the bags gained.

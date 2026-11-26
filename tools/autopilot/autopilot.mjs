@@ -19,6 +19,7 @@ import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { openSession, png } from '../../port/agent/session.mjs';
 import { tickAt } from './movie-index.mjs';
+import { distanceFromEntrance } from './route-entrances.mjs';
 
 const ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname), '../..');
 const args = process.argv.slice(2);
@@ -258,8 +259,11 @@ const GOALS = {
           if (L.where().scene !== here || !r.done || companion(t.key)) break;
         }
       }
-      // items: pick them up on the way (floor items, chests: a sword, fruit, potions)
-      for (const it of stageOf(here).items.filter((it) => !TRIED.has(`${here}:${it.x},${it.z}`))) {
+      // A key detour has a specific pickup. Other items can wait until the
+      // detour ends, since the approach can consume life or change floors.
+      if (keyGoal && L.hasItem(keyGoal.item)) keyGoal = undefined;
+      const pickups = stageOf(here).items.filter((it) => !keyGoal || (it.category === 0 && it.item === keyGoal.item));
+      for (const it of pickups.filter((it) => !TRIED.has(`${here}:${it.x},${it.z}`))) {
         TRIED.add(`${here}:${it.x},${it.z}`);
         const c = yield* L.collect(it.x, it.z, { avoid: stageOf(here).doors.map((d) => d.box), trace: (e) => event({ skill: 'nav', ...e }) });
         event({ skill: 'collect', item: it.name || `${it.category}:${it.item}`, x: it.x, z: it.z, ...c });
@@ -269,7 +273,7 @@ const GOALS = {
       if (L.where().scene !== here) { rooms--; continue; }
       visited.add(here);
       if (prev !== undefined) visited.add(prev);
-      if (keyGoal && L.bags().items.includes(keyGoal.item)) keyGoal = undefined;
+      if (keyGoal && L.hasItem(keyGoal.item)) keyGoal = undefined;
       if (keyGoal && here === keyGoal.scene) {
         failedKeyRooms.add(`${keyGoal.item}:${here}`);
         keyGoal = undefined;
@@ -282,11 +286,12 @@ const GOALS = {
       const dist = keyGoal ? routeDistances(keyGoal.scene, keyGoal.blocked)
         : routeGoal >= 0 ? routeDistances(routeGoal) : exploreDistances(here, visited);
       VISITS.set(here, (VISITS.get(here) || 0) + 1);
+      const distanceFromDoor = (d) => distanceFromEntrance(d, stageOf, dist);
       const doors = doorsHere().sort((a, b) => (b.scene === toward) - (a.scene === toward) ||
         (dist.get(a.scene) ?? 1e9) - (dist.get(b.scene) ?? 1e9) || visited.has(a.scene) - visited.has(b.scene) ||
-        (VISITS.get(a.scene) || 0) - (VISITS.get(b.scene) || 0));
+        (VISITS.get(a.scene) || 0) - (VISITS.get(b.scene) || 0) || distanceFromDoor(a) - distanceFromDoor(b));
       const lock = doors.length && L.closedLock(LOCKS[here] || [], doors[0].box);
-      if (!keyGoal && lock && !L.bags().items.includes(lock.item)) {
+      if (!keyGoal && lock && !L.hasItem(lock.item)) {
         const blocked = `${here}:${lock.box}`;
         const keyRoutes = STAGES.filter((st) => st.scene !== here && !failedKeyRooms.has(`${lock.item}:${st.scene}`) &&
             st.items.some((it) => it.category === 0 && it.item === lock.item))
@@ -296,7 +301,8 @@ const GOALS = {
           const route = keyRoutes[0];
           keyGoal = { item: lock.item, scene: route.scene, blocked };
           doors.sort((a, b) => (a.box === lock.box) - (b.box === lock.box) ||
-            (route.dist.get(a.scene) ?? Infinity) - (route.dist.get(b.scene) ?? Infinity));
+            (route.dist.get(a.scene) ?? Infinity) - (route.dist.get(b.scene) ?? Infinity) ||
+            distanceFromEntrance(a, stageOf, route.dist) - distanceFromEntrance(b, stageOf, route.dist));
           event({ skill: 'key', scene: here, box: lock.box, item: lock.item, toward: route.scene });
         }
       }
@@ -412,13 +418,10 @@ function* throughDoor(g, L, box) {
   const scene = L.where().scene, tried = new Set();
   const avoid = stageOf(scene).doors.map((d) => d.box).filter((b) => b !== box);
   const lock = L.closedLock(LOCKS[scene] || [], box);
-  if (lock && L.bags().items.includes(lock.item)) {
-    const door = stageOf(scene).doors.find((d) => d.box === box);
-    if (door?.x !== undefined && door.z !== undefined) {
-      const r = yield* L.interact(door.x, door.z, { avoid });
-      event({ skill: 'unlock', scene, box, item: lock.item, ...r });
-      if (L.where().scene !== scene) return true;
-    }
+  if (lock && L.hasItem(lock.item)) {
+    const r = yield* L.openKeyDoor(lock, { avoid, trace: (e) => event({ skill: 'nav', ...e }) });
+    event({ skill: 'unlock', scene, box, item: lock.item, ...r });
+    if (L.where().scene !== scene) return true;
   }
   let fights = 0;
   for (let attempt = 0; attempt < 6; attempt++) {
@@ -434,7 +437,7 @@ function* throughDoor(g, L, box) {
     const r = yield* L.navigate(box, { avoid, stopIf: interrupted, trace: (e) => event({ skill: 'nav', ...e }) });
     event({ skill: 'navigate', box, ...r, from: scene });
     if (r.reached) return true;
-    if (L.fightTargets().length && fights < 5 && (!lock || L.bags().items.includes(lock.item))) {
+    if (L.fightTargets().length && fights < 5 && (!lock || L.hasItem(lock.item))) {
       fights++;
       const f = yield* L.fight({ trace: (e) => event({ skill: 'fight', ...e }) });
       event({ skill: 'fought', ...f, scene: L.where().scene });

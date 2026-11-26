@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import test from 'node:test';
+import { distanceFromEntrance } from './route-entrances.mjs';
 
 function skill(file, g, game = {}, exports = {}) {
   const source = fs.readFileSync(new URL(`lib/${file}.js`, import.meta.url), 'utf8');
@@ -55,6 +56,29 @@ test('a lock tracks its saved bit across the script bank bytes', () => {
   assert.equal(closedLock([lock], 'CD23'), lock);
   value = 2;
   assert.equal(closedLock([lock], 'CD23'), undefined);
+});
+
+test('a key targets the registered door object at unlock bit plus one', () => {
+  const position = { x: 2048, y: 256, z: 512 };
+  const slot = { id: 10, dir: 1, pos: { signedPosition: position } };
+  const pool = { count: 1, slots: { $at: () => slot } };
+  const g = {
+    fn: { ResourceRegistry_GetResource: (id) => id === 0x85e6 ? 0x02010000 : 0 },
+    at: () => pool,
+  };
+  const { keyDoorPosition } = skill('locks', g);
+  assert.deepEqual(keyDoorPosition({ bit: 9 }), { ...position, direction: 1 });
+  assert.equal(keyDoorPosition({ bit: 7 }), undefined);
+});
+
+test('doors to the same scene prefer the arrival nearer a forward exit', () => {
+  const stage = { scene: 2, entrances: [{ id: 7, x: 0, z: 0 }, { id: 8, x: 0, z: 4096 }],
+    doors: [{ scene: 1, x: 0, z: 64 }, { scene: 3, x: 0, z: 3840 }] };
+  const distances = new Map([[1, 2], [2, 1], [3, 0]]);
+  const distance = (entrance) => distanceFromEntrance({ scene: 2, entrance }, () => stage, distances);
+  assert.equal(distance(7), 3840);
+  assert.equal(distance(8), 256);
+  assert.equal(distance(9), Infinity);
 });
 
 test('the vampire model uses signed health and the source sunlight flag', () => {
