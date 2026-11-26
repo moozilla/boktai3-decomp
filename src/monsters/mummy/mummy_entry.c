@@ -1029,16 +1029,16 @@ void Mummy_UpdatePlayerRoute(struct ChaseActor *actor)
     struct SceneActorChaseGroup *group = &actor->group;
     if (SceneActorReaction_TakePrepared(actor)) {
         u32 mask;
-        SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0);
+        SceneActorAnimation_SelectDirectionalEntry(&actor->base, 0);
         mask = 4;
         actor->base.statusFlags |= mask;
     }
     if (BouncingObject_RefreshNearbyHeading(actor))
         Chase_SetBehavior(actor, 16);
     if (actor->base.behavior2AA == 16)
-        SceneActorAnimation_SelectDirectionalEntry((void *)actor, 1);
+        SceneActorAnimation_SelectDirectionalEntry(&actor->base, 1);
     else if (actor->base.behavior2AA == 18)
-        SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0);
+        SceneActorAnimation_SelectDirectionalEntry(&actor->base, 0);
     actor->base.field2C2 = 32;
     if (!body->savedTick) {
         SceneActorChase_TrackPlayer(actor);
@@ -1505,8 +1505,7 @@ void Mummy_UpdateDescriptorPursuit(struct ChaseActor *a)
     struct SceneActorChaseGroup *group = &a->group;
     s32 motion;
     s32 event;
-    if (a->base.field2B1)
-        a->base.field2B1 = 0;
+    SceneActorControl_TakeStateEntry(a);
     if ((u8)Callback_InvokeActor(a, a->base.contactQuery.opaque))
         return;
     motion = Callback_InvokeActor(a, a->base.animationQuery.opaque);
@@ -1862,8 +1861,6 @@ bool32 Mummy_IsPlayerFlag8Set(void)
     return FALSE;
 }
 
-#define FIELD(p, off, T) (*(T *)((u8 *)(p) + (off)))
-
 // confidence=low: scans to the last open cell in the current facing and starts a route.
 
 u8 Mummy_RequestStraightRoute(struct ChaseActor *actor)
@@ -1934,12 +1931,12 @@ void SceneActor_EnterMotionPhase(struct ChaseActor *actor)
         SceneActorChase_SetControl(actor, SceneActorControl_OnIdle, 0x10);
     }
     {
-        struct SceneActorReactionMotion *motion = (void *)&actor->base.tracking.target;
+        struct SceneActorChaseTracking *tracking = &actor->base.tracking;
         u32 mask = 8;
         {
-            u32 value = motion->flags;
+            u32 value = tracking->flags;
             mask |= value;
-            motion->flags = mask;
+            tracking->flags = mask;
         }
     }
 }
@@ -3505,8 +3502,8 @@ s32 Mummy_Init(void *object)
     Mummy_InitProfile(&actor->chase);
     if (MonsterInit_GetDrawableKind(&actor->chase) == 0) {
         u8 *heap;
-        actor->chase.base.drawable = Heap_Alloc(0x5C);
-        Memory_Clear(actor->chase.base.drawable, 0x5C);
+        actor->chase.base.drawable = Heap_Alloc(sizeof(struct SceneActorAnimationSequenceDrawable));
+        Memory_Clear(actor->chase.base.drawable, sizeof(struct SceneActorAnimationSequenceDrawable));
         heap = MonsterInit_Drawable(&actor->chase);
         MonsterInit_InitializeSprite(heap, 0x48DE, 0xA4B2);
         if (MonsterInit_GetCategory(actor) == 0x11 || MonsterInit_GetCategory(actor) == 0x17)
@@ -3514,8 +3511,8 @@ s32 Mummy_Init(void *object)
         actor->chase.base.body.direction = 0;
     } else {
         u8 *heap;
-        actor->chase.base.drawable = Heap_Alloc(0x80);
-        Memory_Clear(actor->chase.base.drawable, 0x80);
+        actor->chase.base.drawable = Heap_Alloc(sizeof(struct SceneActorAnimationTileDrawable));
+        Memory_Clear(actor->chase.base.drawable, sizeof(struct SceneActorAnimationTileDrawable));
         heap = MonsterInit_Drawable(&actor->chase);
         MonsterInit_ClearPosition(&zero, &tmp);
         MonsterInit_InitializeWidget(heap, 0xCB05, 0x48DE, &tmp);
@@ -3606,11 +3603,11 @@ void Heap_Free(void *);
 
 void Mummy_Create(void)
 {
-    u8 *p = Heap_Alloc(0x720);
+    struct Mummy *p = Heap_Alloc(sizeof(*p));
     if (p != 0) {
-        Memory_Clear(p, 0x720);
+        Memory_Clear(p, sizeof(*p));
         if (Mummy_Init(p) < 0) {
-            Mummy_OnReleaseResources(p);
+            Mummy_OnReleaseResources((u8 *)p);
             Heap_Free(p);
         }
     }
