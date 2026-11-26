@@ -3236,8 +3236,10 @@ s32 Vorn_Init(void *object)
     SceneActorAnimation_SelectDirectionalEntry(actor, 0);
     if (MonsterInit_GetDrawableKind(actor) == 0)
         DisplaySequence_Step(actor->base.drawable);
-    else
-        Anim_Step(actor->base.drawable + 0x20, actor->base.drawable);
+    else {
+        struct SceneActorAnimationTileDrawable *drawable = actor->base.drawable;
+        Anim_Step(&drawable->tile, drawable);
+    }
     MonsterInit_ClearReceiver(actor);
     SceneActorRegistry_RegisterCategoryReceiver(actor);
     SceneActorBehavior_InstallCallbackTables(actor);
