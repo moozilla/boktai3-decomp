@@ -2642,7 +2642,7 @@ NONMATCHING drafts earn no exact coverage. No network operations or full builds.
 All six functions have descriptive file-local address aliases.
 
 - **08119B80 — matched, Glove_DispatchCommands.** Reviewed extent 880 bytes;
-  `tools/check.py src/monsters/glove/sub_08119B80.c --target-size 880` reports zero differing
+  `tools/check.py src/minigames/coffin_bike/sub_08119B80.c --target-size 880` reports zero differing
   bytes. Glove command queue +870, recoil-motion parameters +8C8, attachment
   descriptor +91C, screen position +928 and attachment handle +964. Queue kinds
   2/6 populate recoil parameters and select 08119378/08119638; kinds 5/0/1 select

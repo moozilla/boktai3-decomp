@@ -397,7 +397,7 @@ function* untilControl(g, L, ready = () => true, quiet = 120, limit = 60000) {
     // with B, or START (the bike parts menu closes on START when it was opened from a
     // story scene: ModifierMenu_HandleOverviewInput), now and then confirm with A
     stuck = field ? 0 : stuck + 1;
-    // riding the coffin bike (the Glove task; src/npc/script_puppet/registry_actor_collision.c
+    // riding the coffin bike (the Glove task; src/npc/sabata_rider/registry_actor_collision.c
     // ActorMotion_ApplyInput: R accelerates, L boosts, up/down steer): ride on with R
     if (!field && !msg.open && L.tasks().some((t) => !t.dead && t.update === 'Glove_UpdateTask')) {
       if (stuck % 600 === 1) event({ skill: 'ride', ...L.where() });

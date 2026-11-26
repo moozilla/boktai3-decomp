@@ -1,6 +1,6 @@
 #include "player/cues/player_cue_commands.h"
 #include "player/player_status_flags.h"
-#include "objects/board_pieces.h"
+#include "effects/scene/bat_flock.h"
 
 /* Enable the first player's stat gauge. */
 

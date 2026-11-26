@@ -17,6 +17,7 @@ ALIASES = re.compile(r"^#define[ \t]+(\w+)[ \t]+(sub_[0-9A-F]{8})\b[ \t]*(?://[^
 SOURCE_DIRS = Path("symbols/source_dirs.csv")
 SOURCE_FILES = Path("symbols/source_files.csv")
 HEADER_DIRS = Path("symbols/header_dirs.csv")
+LAYOUT_RANGE = re.compile(r"([0-9A-F]{8})-([0-9A-F]{8})")
 
 
 def slug(name):
@@ -33,7 +34,7 @@ def slug(name):
 
 
 def new_filename(name, address):
-    return (f"sub_{address:08X}" if ADDRESS.fullmatch(name) else slug(name)) + ".c"
+    return (f"sub_{address:08X}" if ADDRESS.fullmatch(name) else name) + ".c"
 
 
 def source_paths(root=ROOT):
@@ -164,6 +165,7 @@ class SourcePlacement:
     target: Path
     start: int
     end: int
+    pass2: Path | None = None
 
 
 def layout_path(value, category):
@@ -173,17 +175,22 @@ def layout_path(value, category):
     return path
 
 
+def source_rules(root=ROOT):
+    with (Path(root) / SOURCE_DIRS).open(newline="") as stream:
+        rows = list(csv.DictReader(stream))
+    rules = {row["current_path"]: row["new_path"] for row in rows}
+    if len(rules) != len(rows):
+        raise ValueError(f"{SOURCE_DIRS}: duplicate source rule")
+    return rules
+
+
 @lru_cache(maxsize=4)
 def source_placements(root=ROOT):
     """Resolve the reviewed directory rules for each file in the base snapshot."""
     root = Path(root)
     if not (root / SOURCE_FILES).is_file():
         return ()
-    with (root / SOURCE_DIRS).open(newline="") as stream:
-        rows = list(csv.DictReader(stream))
-    rules = {row["current_path"]: row["new_path"] for row in rows}
-    if len(rules) != len(rows):
-        raise ValueError(f"{SOURCE_DIRS}: duplicate source rule")
+    rules = source_rules(root)
     placements = []
     with (root / SOURCE_FILES).open(newline="") as stream:
         for row in csv.DictReader(stream):
@@ -199,7 +206,9 @@ def source_placements(root=ROOT):
             start, end = int(row["start"], 16), int(row["end"], 16)
             if start >= end or placements and start < placements[-1].end:
                 raise ValueError(f"{SOURCE_FILES}: invalid or overlapping range at {start:08X}")
-            placements.append(SourcePlacement(original, current, target, start, end))
+            previous = row.get("pass2_path")
+            pass2 = layout_path(previous, "src") if previous else None
+            placements.append(SourcePlacement(original, current, target, start, end, pass2))
     for field in ("original", "current", "target"):
         paths = [getattr(placement, field).as_posix().casefold() for placement in placements]
         if len(paths) != len(set(paths)):
@@ -209,26 +218,33 @@ def source_placements(root=ROOT):
 
 @lru_cache(maxsize=4)
 def groups(root=ROOT):
-    records = source_placements(root)
-    return tuple(row.start for row in records), records
+    ranges = [(row.start, row.end, row.target.parent) for row in source_placements(root)]
+    if (Path(root) / SOURCE_DIRS).is_file():
+        for key, destination in source_rules(root).items():
+            if match := LAYOUT_RANGE.fullmatch(key):
+                start, end = (int(value, 16) for value in match.groups())
+                folder = layout_path(destination, "src")
+                if start >= end or not 2 <= len(folder.parts) <= 4 or folder.suffix:
+                    raise ValueError(f"{SOURCE_DIRS}: invalid range rule {key} -> {folder}")
+                ranges.append((start, end, folder))
+    ranges.sort()
+    if any(left[1] > right[0] for left, right in zip(ranges, ranges[1:])):
+        raise ValueError(f"{SOURCE_DIRS}: overlapping ROM layout ranges")
+    return tuple(row[0] for row in ranges), ranges
 
 
-def source_placement(address, root=ROOT):
-    starts, records = groups(root)
+def directory_for(address, root=ROOT, *, source=None):
+    starts, ranges = groups(root)
     index = bisect_right(starts, address) - 1
-    if index >= 0 and address < records[index].end:
-        return records[index]
-    if records:
-        raise ValueError(f"{address:08X}: no layout record in {SOURCE_FILES}")
-
-
-def directory_for(address, root=ROOT):
-    record = source_placement(address, root)
-    return record.target.parent.relative_to("src") if record else Path("engine")
+    if index >= 0 and address < ranges[index][1]:
+        return ranges[index][2].relative_to("src")
+    location = f"{source} ({address:08X})" if source else f"sub_{address:08X}.c"
+    raise ValueError(f"{location}: no ROM placement; add a rule in {SOURCE_DIRS} and {SOURCE_FILES}")
 
 
 def new_source(address, name, root=ROOT):
-    return (Path("src") / directory_for(address, root) / new_filename(name, address)).as_posix()
+    filename = new_filename(name, address)
+    return (Path("src") / directory_for(address, root, source=filename) / filename).as_posix()
 
 
 def main():

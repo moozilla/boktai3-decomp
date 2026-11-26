@@ -88,7 +88,7 @@ misleading.
 
 | Was | Now | Evidence |
 |---|---|---|
-| `actors/registry_a8_cb` | `npc/script_puppet/` | pool of script-named actors (FindEntryByName by script hash) with knockback, falls, health and command lists; guess |
+| `actors/registry_a8_cb` | `npc/sabata_rider/` | GCL 6316 creates A8CB for Sabata's purple bike alongside Django's E881 bike |
 | `actors/task_4_e01` | `effects/projectiles/projectile/` | trail sprites, impacts, terrain turns; calls into Projectile_* and TimedEffect_* in the same ROM block 081D75E8-081DAF50 |
 | `actors/singleton_slot_7` | `bosses/vanargand/` | GCL 6325 calls 6314, which creates Vanargand (actor 7C56) during Django's bike chase |
 | `actors/scene_actor_14` | `effects/sprites/sprite_effect/` | "shared animation data for category 14 actors": sprite bursts, groups and particles used by Nidhoggr, Octopus and effect schedules |
@@ -100,10 +100,10 @@ misleading.
 | `link/registry_1745` | `link/session/` | session state, handshake requests, transfer counters: the link session controller |
 | `link/registry_f246` | `link/link_panel/` | data/actor_registry.csv: key F246 is LinkPanel_Create |
 | `link/registry_33_ff` | `link/lobby/` | key 33FF is LinkLobbyPanel_Create |
-| `menus/registry_3_f74` | `ui/widgets/scripted_choice.c` | five animations, child selection, 60-frame delays, then runs the chosen entry's script; guess |
-| `effects/registry_6_a37` | `effects/screen/scrolling_backdrop.c` | scrolls BG3 through two interpolations, plays sound 0x50F, holds 180 frames, fades, runs the completion script; guess |
+| `menus/registry_3_f74` | `ui/town/town_map.c` | GCL 2554 creates 3F74, which displays San Miguel and has eleven town service callbacks |
+| `effects/registry_6_a37` | `effects/screen/magic_cannon_departure.c` | GCL 4928 creates 6A37 for the scrolling sky before the space flight |
 | `engine/registry_e7_bc` | `scene/collision/collision_manager.c` | the file starts with Bounds_TestOverlap, Collision_DispatchOverlaps, Collider_CreateManager; the E7BC pool and result counters follow |
-| `other/registry_selection` | `ui/widgets/indicator_selection.c` | selection screen with animated indicators and palette phases; guess |
+| `other/registry_selection` | `ui/world_map.c` | GCL 2570 creates 2388 for the nine world destinations |
 
 Other names that changed meaning, not only spelling:
 
@@ -121,7 +121,7 @@ Other names that changed meaning, not only spelling:
 | `effects/large_scene_animation_controller` | `bosses/nidhoggr/` | 114 of 159 functions are Nidhoggr_* |
 | `effects/palette_transition` | `ui/books/monster_book/` | BestiaryDisplay_Create; sits just before the Bestiary; callers are the Monster Book |
 | `effects/pal_fade` | `system/game_state/` | GameState challenge best ranks and records |
-| `field/group_objects` | `objects/board_pieces.c` | 15 BoardPiece_* of 32; guess at the in-game object |
+| `field/group_objects` | `effects/scene/bat_flock.c` | the registered E534 constructor and launch handler display a purple bat flock using sprite package DA6D |
 | `menus/scene_hud` | `ui/pause/pause_display/` | SceneHud ranges are interleaved with the pause menu and pause inventory |
 | Phrase names (`actor_animation_and_action_controllers`, `modifier_selection_and_stat_previews`, ...) | their object | see the table: each joined its owner |
 
@@ -137,9 +137,9 @@ Other names that changed meaning, not only spelling:
 | `monsters/armor/` (111) | armor, actor_controller, actor_marker, actor_palette, scene_combat_actor, spinning_approach_motion, enemy_d459 |
 | `monsters/ivy/` (18) | ivy, phase_object, child_group |
 | `monsters/axe/` (3) | axe, actor_phase |
-| `monsters/glove/` (50) | glove, actor_recoil |
-| `monsters/tentacle/` (73) | tentacle_actor, tentacle_body |
-| `monsters/cannons/fan/` (23) | fan_cannon, fan_cannon_manager |
+| `minigames/coffin_bike/` | glove, actor_recoil |
+| `monsters/centipede/` | tentacle_actor, tentacle_body |
+| `monsters/cannons/wind/` | fan_cannon, fan_cannon_manager |
 | `npc/story_character/` (109) | scene_character, state_actor_kind_086121_c4, scripted_message_actor_08612344 |
 | `npc/manager/` (7) | scene_actor_manager, scene_actor_resources_and_lifecycle, scene_actor_animation_and_scripted_actions |
 | `objects/scene_objects/` (44) | field/scene_objects, actors/scene_object_controller (both SceneObjects_*) |
@@ -183,7 +183,7 @@ embeds it.
 Rule: a header goes to `include/` + the first two levels of its owner's new
 source directory + its own name. `global.h`, `debug.h` at the root. When a
 single-file unit is renamed, its header follows (`group_objects.h` →
-`board_pieces.h`). 394 headers follow their unit; 2 are root headers; the rest
+`bat_flock.h`). 394 headers follow their unit; 2 are root headers; the rest
 (183, all from `include/engine/shared/` and the five loose `include/player/`
 headers) were placed by owner or by who includes them:
 
@@ -215,7 +215,7 @@ headers) were placed by owner or by who includes them:
 Placeholder header names renamed: registry_actor(_collision).h →
 script_puppet(_collision).h, slot7_*.h → layered_boss_*.h, task4e01_projectile.h →
 projectile_task.h, registry_e7bc.h → collision_manager.h, registry_choice_menu.h →
-scripted_choice.h, registry_selection_menu.h → indicator_selection.h,
+town_map.h, registry_selection_menu.h → world_map.h,
 motion_0818.h → spinning_approach_chain.h.
 
 ## Counts
@@ -223,17 +223,17 @@ motion_0818.h → spinning_approach_chain.h.
 | | Before | After |
 |---|---|---|
 | Top-level categories | 13 | 14 |
-| Directories containing C files | 449 | 231 |
+| Directories containing C files | 449 | 234 |
 | Loose files in a category with no structure | 379 (player) | 0 |
 | Largest directory | player (379 loose) | bosses/vanargand (287) |
-| Deepest | 2 levels | 3 levels (97 directories) |
+| Deepest | 2 levels | 3 levels (95 directories) |
 | `include/engine/shared` | 180 headers | gone |
 
 Per category, directories before → after (files after):
-actors 87 → 0; bosses 6 → 6 (886); effects 92 → 48 (729); engine 44 → 6 (185);
-field 47 → 0; objects 0 → 24 (465); lib 7 → 7 (61); link 25 → 19 (551);
-menus 80 → 0; ui 0 → 36 (872); minigames 2 → 1 (43); monsters 38 → 26 (532);
-npc 0 → 6 (241); other 4 → 0; player 9 → 16 (476); scene 0 → 22 (653);
+actors 87 → 0; bosses 6 → 6 (886); effects 92 → 48 (730); engine 44 → 6 (185);
+field 47 → 0; objects 0 → 26 (516); lib 7 → 7 (61); link 25 → 19 (551);
+menus 80 → 0; ui 0 → 36 (871); minigames 2 → 2 (94); monsters 38 → 23 (430);
+npc 0 → 6 (241); other 4 → 0; player 9 → 18 (476); scene 0 → 22 (653);
 script 0 → 2 (32); system 8 → 5 (315).
 
 Largest after: vanargand 287, hresvelgr 237, ratatosk 169, ui/town/shop 120,
@@ -248,10 +248,7 @@ link/wireless/connection 104, system/save 92.
    burst → gun; slash, spin, combo → attack). Some "burst"/"spiral" actions may
    be melee specials.
 
-Also open: the bike has no identified code; `npc/script_puppet`,
-`ui/widgets/scripted_choice.c`, `ui/widgets/indicator_selection.c`,
-`effects/screen/scrolling_backdrop.c`, `objects/board_pieces.c`,
-`ui/control_panel.c` and `ui/hud/hud_sequence/` are descriptive guesses.
+The shipped entry point for Player link action dispatchers remains unobserved.
 `system/inventory/` holds the item data (63 functions at 0822CCC8) and 14
 pause-inventory helpers from 0816CD6C that share the unit directory; a later
 pass could move those 14 to `ui/pause/inventory/`.

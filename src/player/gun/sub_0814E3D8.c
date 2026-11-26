@@ -1,7 +1,7 @@
 #include "player/player.h"
 #include "global.h"
 #include "scene/actor/contact_actor.h"
-#include "objects/board_pieces.h"
+#include "effects/scene/bat_flock.h"
 // confidence=low: role inferred from callers and callback phases.
 // confidence=low: charge tiers and buffered input inferred from phase transitions.
 extern const s16 gUnk_086149C4[];

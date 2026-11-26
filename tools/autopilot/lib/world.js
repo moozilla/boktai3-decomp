@@ -557,12 +557,12 @@ exports.breakBlock = function* (block, opts = {}) {
   return { ...r, health: (exports.blocks().find((b) => b.slot === block.slot) || {}).health };
 };
 
-// A town map (src/ui/widgets/scripted_choice.c, registry key 3F74): a cursor (src/ui/widgets/menu_cursor.c)
+// A town map (src/ui/town/town_map.c, registry key 3F74): a cursor (src/ui/widgets/menu_cursor.c)
 // moved freely with the D-pad over 11 entries; A on an entry runs its script (stages.json
 // doors with "hub": index). hub() is the live menu or null.
 exports.hub = () => {
   // a town map (Registry3F74, 11 entries) or San Miguel's gate (RegistrySelection,
-  // src/ui/widgets/indicator_selection.c, 9 entries with enabled flags)
+  // src/ui/world_map.c, 9 entries with enabled flags)
   const t = exports.tasks().find((x) => !x.dead && (x.update === 'Registry3F74_OnUpdate' || x.update === 'RegistrySelection_OnUpdate'));
   if (!t) return null;
   const sel = t.update === 'RegistrySelection_OnUpdate';

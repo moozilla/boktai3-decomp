@@ -209,7 +209,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [docs/SHARED_MONSTER_REACTIONS.md](../docs/SHARED_MONSTER_REACTIONS.md) | Shared monster pursuit and contact operations | #matching #scene-actor #golem #skeleton #ghoul #mummy #regalloc #080C9C04 #080C12FC #0808B3EC #080DA97C #080D2584 #08078EE8 | 9 |
 | [docs/SHIFTABILITY.md](../docs/SHIFTABILITY.md) | Shiftable data: how it was proven | #tooling #assets | 1 |
 | [docs/SOLAR_SENSOR.md](../docs/SOLAR_SENSOR.md) | Cartridge solar sensor: code and runtime evidence | *#hardware* | 5 |
-| [docs/SOURCE_LAYOUT.md](../docs/SOURCE_LAYOUT.md) | Source layout | #tooling #process | 12 |
+| [docs/SOURCE_LAYOUT.md](../docs/SOURCE_LAYOUT.md) | Source layout | #tooling #process | 14 |
 | [docs/SOURCE_LAYOUT_DECISIONS.md](../docs/SOURCE_LAYOUT_DECISIONS.md) | Source layout: decisions | #tooling #process | 18 |
 | [docs/SPARK_PARTICLE.md](../docs/SPARK_PARTICLE.md) | Moving tile particles (tentative identity) | *#particles #assets* | 3 |
 | [docs/SPRITE_EFFECT_CONTROLLER.md](../docs/SPRITE_EFFECT_CONTROLLER.md) | Sprite effect controllers (tentative) | *#assets* | 2 |
@@ -642,7 +642,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [notes/solo-family_2026-10-09.md](../notes/solo-family_2026-10-09.md) | Solo family tranche, October 9 |  | 5 |
 | [notes/sonnet-081EEECC-task.md](../notes/sonnet-081EEECC-task.md) | Task 081EEECC worker notes |  | 1 |
 | [notes/sonnet-from-end-08241504.md](../notes/sonnet-from-end-08241504.md) | sub_0824261C (Player update by kind) — unfinished |  | 1 |
-| [notes/source-layout_2026-11-25.md](../notes/source-layout_2026-11-25.md) | Source directory migration | #tooling #process | 1 |
+| [notes/source-layout_2026-11-25.md](../notes/source-layout_2026-11-25.md) | Source directory migration | #tooling #process | 2 |
 | [notes/spread_shot_cleanup_draft.md](../notes/spread_shot_cleanup_draft.md) | Spread-shot cleanup and matching evidence | #matching #scene #particles #structs #compiler | 3 |
 | [notes/sprite-unit-revisit_2026-11-13.md](../notes/sprite-unit-revisit_2026-11-13.md) | Sprite unit cleanup | #assets #animation #matching #process | 4 |
 | [notes/stage-icon-display_2026-10-14.md](../notes/stage-icon-display_2026-10-14.md) | Staged keyframe icon display |  | 3 |

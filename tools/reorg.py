@@ -10,7 +10,7 @@ import subprocess
 
 from source_layout import (
     HEADER_DIRS, SOURCE_DIRS, SOURCE_FILES, directory_for, header_paths, is_upstream,
-    layout_path, new_filename, scan, source_paths, source_placements, symbol_names,
+    layout_path, new_filename, scan, source_paths, source_placements, source_rules, symbol_names,
 )
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -21,11 +21,11 @@ TEXT_SUFFIXES = {".c", ".h", ".csv", ".ld", ".md", ".py", ".js", ".mjs", ".html"
 
 
 def recorded_moves():
-    """Map both original and milestone-one paths to the recorded destinations."""
+    """Map prior paths to the recorded destinations."""
     sources = {}
     for record in source_placements(ROOT):
-        for previous in (record.original, record.current, record.target):
-            if sources.setdefault(previous, record.target) != record.target:
+        for previous in (record.original, record.current, record.pass2, record.target):
+            if previous is not None and sources.setdefault(previous, record.target) != record.target:
                 raise ValueError(f"{SOURCE_FILES}: conflicting destination for {previous}")
     headers = {}
     targets = set()
@@ -38,15 +38,42 @@ def recorded_moves():
             if target.as_posix().casefold() in targets:
                 raise ValueError(f"{HEADER_DIRS}: duplicate destination {target}")
             targets.add(target.as_posix().casefold())
-            for previous in (Path("include", current.name), current, target):
+            aliases = [Path("include", current.name), current, target]
+            if row.get("pass2_path"):
+                aliases.append(layout_path(row["pass2_path"], "include"))
+            for previous in aliases:
                 if headers.setdefault(previous, target) != target:
                     raise ValueError(f"{HEADER_DIRS}: conflicting destination for {previous}")
     return sources | headers
 
 
+def header_destination(old, recorded, folders, owners, rules):
+    if old in recorded or old.parts[1] == "gba":
+        return recorded.get(old, old)
+    # Replay a new header in a previously recorded unit by following its owner.
+    unit = Path("src", *old.parent.parts[1:]).as_posix()
+    if unit in rules:
+        folder = Path(rules[unit])
+        if folder.suffix == ".c":
+            folder = folder.parent
+        return Path("include", *folder.parts[1:3], old.name)
+    if old.parent in folders:
+        return old
+    candidates = owners.get(old.stem, set())
+    if len(candidates) == 1:
+        return next(iter(candidates)) / old.name
+    reason = "ambiguous owner" if candidates else "unknown owner"
+    raise ValueError(f"{old}: {reason}; add a placement in {HEADER_DIRS}")
+
+
 def plan_files(recorded, rename):
     manifest = scan(ROOT)
     names = symbol_names(ROOT)
+    spellings = {}
+    for old, target in recorded.items():
+        casefolded = old.as_posix().casefold()
+        if spellings.setdefault(casefolded, target) != target:
+            raise ValueError(f"{old}: placement aliases have conflicting capitalization")
     moves = {}
     owners = defaultdict(set)
     for path in source_paths(ROOT):
@@ -55,26 +82,25 @@ def plan_files(recorded, rename):
         if not addresses:
             raise ValueError(f"{old}: no external function with a known ROM address")
         first = min(addresses)
-        directory = Path("src") / directory_for(first, ROOT)
-        new = recorded.get(old, directory / old.name)
+        directory = Path("src") / directory_for(first, ROOT, source=old)
+        new = spellings.get(old.as_posix().casefold(), directory / old.name)
         if new.parent != directory:
             raise ValueError(f"{old}: first function {first:08X} belongs under {directory}")
         if rename and len(addresses) == 1 and not is_upstream(old):
             new = new.with_name(new_filename(names.get(first, f"sub_{first:08X}"), first))
         moves[old] = new
-        owners[new.stem].add(new.parent.parts[1:3])
+        folder = Path("include", *new.parent.parts[1:3])
+        owners[old.stem].add(folder)
+        owners[new.stem].add(folder)
 
+    folders = {target.parent for target in recorded.values() if target.parts[0] == "include"}
+    folders.update(folder for candidates in owners.values() for folder in candidates)
+    # The include root is reserved for explicit project-wide headers.
+    folders.discard(Path("include"))
+    rules = source_rules(ROOT)
     for path in header_paths(ROOT):
         old = path.relative_to(ROOT)
-        if old in recorded or old.parts[1] == "gba":
-            new = recorded.get(old, old)
-        elif len(old.parts) > 2:
-            new = Path("include", *old.parent.parts[1:3], old.name)
-        else:
-            categories = owners[old.stem]
-            folder = next(iter(categories)) if len(categories) == 1 else ("engine",)
-            new = Path("include", *folder, old.name)
-        moves[old] = new
+        moves[old] = header_destination(old, recorded, folders, owners, rules)
     return moves
 
 

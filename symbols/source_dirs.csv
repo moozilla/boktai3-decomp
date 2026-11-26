@@ -18,7 +18,7 @@ src/actors/actor_particles,src/scene/actor/actor_particles.c,impact particle bur
 src/actors/actor_phase,src/monsters/axe,"Axe phase helper (080F8010, between the two Axe blocks); merge:src/monsters/axe"
 src/actors/actor_position,src/bosses/sabata,Sabata position search and targeting (0817A0FC); merge:src/actors/actor_decision src/actors/actor_impact src/actors/actor_state src/actors/scene_event_actor src/bosses/boss_slot_2 src/field/scene_volume
 src/actors/actor_projectile_and_reaction_controllers,src/bosses/vampire,"vampire projectiles, anchored reactions, destruction effects; merge:src/actors/actor_animation_and_action_controllers src/actors/actor_damage_and_lifecycle src/actors/actor_graphics_and_basic_states src/actors/contact_actor_pool_setup_and_display src/actors/contact_actor_pool_states_and_lifecycle src/actors/contact_swarm_states_and_spawning"
-src/actors/actor_recoil,src/monsters/glove,"Glove recoil (08116280, just before Glove; called only by it); merge:src/monsters/glove"
+src/actors/actor_recoil,src/minigames/coffin_bike,A 6274 ride hits the crates and executes the named recoil functions. The same state at idle does not enter the recoil code. ActorParticles_SpawnImpactBurst runs at frame 2276.
 src/actors/actor_state,src/bosses/sabata,Sabata state commands (0817B5C0); merge:src/actors/actor_decision src/actors/actor_impact src/actors/actor_position src/actors/scene_event_actor src/bosses/boss_slot_2 src/field/scene_volume
 src/actors/actor_status,src/bosses/vanargand,"timed status, contact and collider states of Vanargand's parts (081AFA28, between Vanargand blocks; called by Vanargand); merge:src/actors/paired_scene_actor src/bosses/vanargand src/bosses/vanargand_projectile src/effects/positioned_effect"
 src/actors/child_group,src/monsters/ivy,"child sprites of Ivy and Sword (called by Ivy, Sword, phase object); merge:src/actors/phase_object src/monsters/ivy"
@@ -39,7 +39,7 @@ src/actors/pooled_actor_controllers,src/scene/actor/actor_pool,controllers for t
 src/actors/pooled_actor_manager,src/scene/actor/actor_pool,intrusive pooled actor list (ActorPool); merge:src/actors/parameterized_motion_pool src/actors/pooled_actor_controllers src/actors/pooled_actor_shared_helpers
 src/actors/pooled_actor_shared_helpers,src/scene/actor/actor_pool,"facing, health and target helpers for pooled actors; merge:src/actors/parameterized_motion_pool src/actors/pooled_actor_controllers src/actors/pooled_actor_manager"
 src/actors/pursuing_actor,src/effects/projectiles/pursuing_actor.c,pursuing slash/swoosh projectile effect
-src/actors/registry_a8_cb,src/npc/script_puppet,"pool of script-named actors that take knockback, fall and follow script commands (key A8CB) guess"
+src/actors/registry_a8_cb,src/npc/sabata_rider,Proc 6316 creates A8CB in the Sabata ending branch. The purple bike is on screen alongside Django’s separate E881 bike. The dialogue lookup names Sabata (#5585).
 src/actors/route_sprite_actor_pool,src/scene/actor/route_sprite_actor,four-slot sprite actors that follow routes
 src/actors/scene_actor_14,src/effects/sprites/sprite_effect,"shared animated sprite effects of actor category 14 (bursts, groups, particles)"
 src/actors/scene_actor_animation_and_scripted_actions,src/npc/manager,"NPC terrain, path nodes, directional animation, scripted actions; merge:src/actors/scene_actor_manager src/actors/scene_actor_resources_and_lifecycle"
@@ -77,7 +77,7 @@ src/actors/scene_npc,src/npc/scripted_npc,scripted NPC created and commanded by 
 src/actors/scene_object_controller,src/objects/scene_objects,scene object slots and script handlers (SceneObjects_Script*); merge:src/field/scene_objects
 src/actors/scene_pooled_motion_and_actor_controls,src/link/wireless/battle,ScenePool: four player slots with cruise steering in the wireless battle; merge:src/link/wireless_game_items_and_display src/link/wireless_scene_objects
 src/actors/script_actor,src/player/script,"script commands that drive the player in cutscenes (stand, kneel, aim, shoot, set stats)"
-src/actors/script_combat_actor,src/monsters/scripted_combatant,"script-created enemy with simple combat states (08201388, enemy block) guess"
+src/actors/script_combat_actor,src/monsters/muspell_head,GCL 3991 → 1604 → 1606 creates key 5153. Book index 31 (#9869). The head in package 7E7D is visible next to Django after moving the player onto the neighboring tile.
 src/actors/scripted_message_actor_08612344,src/npc/story_character,story-character state table that waits on scene messages; merge:src/actors/scene_character src/actors/state_actor_kind_086121_c4
 src/actors/sequence_contact_actor_pool,src/bosses/nidhoggr,GCL key 917F. Dialogue in scene 4915 identifies the visible opponent as Nidhoggr (#7368). His defeat unlocks Book index 80 (#9918). Scene 6425 replays the fight.
 src/actors/singleton_slot_7,src/bosses/vanargand,"GCL 6325 calls 6314, which creates registry 5856 with actor ID 7C56 (Vanargand). The head is on the left during Django’s bike chase."
@@ -150,7 +150,7 @@ src/effects/projected_ground_effects,src/effects/scene/ground_effect.c,world-pos
 src/effects/projectile,src/effects/projectiles/projectile,projectile configuration and impacts; merge:src/actors/task_4_e01 src/effects/timed_effect
 src/effects/projectile_pool,src/effects/projectiles/projectile_pool,projectile pool and configurations
 src/effects/radial_burst_effect,src/effects/bursts/radial_burst,radial burst
-src/effects/registry_6_a37,src/effects/screen/scrolling_backdrop.c,"scrolling background held three seconds with a sound, then faded out; runs a script (key 6A37) guess"
+src/effects/registry_6_a37,src/effects/screen/magic_cannon_departure.c,Warp to 4924 at entrance 57. Proc 4928 hides the ship sprites and creates 6A37 before the space flight. The scrolling sky is visible during its update.
 src/effects/repeated_effects,src/effects/scene/repeated_effect,eight-entry repeated effect manager
 src/effects/scaled_shadows,src/effects/shadows,scaled shadow sprites; merge:src/effects/shadow_registry src/field/terrain_shadows
 src/effects/scanline_presentation,src/effects/screen/scanline_presentation.c,scanline animation with six display layers
@@ -242,7 +242,7 @@ src/field/directional_force_controller,src/objects/hazards/directional_force,scr
 src/field/directional_interaction_controllers,src/objects/directional_controller.c,facing and input gates for interactions
 src/field/falling_objects,src/objects/hazards/falling_objects.c,falling objects
 src/field/floor_switch,src/objects/floor_switch,floor switch
-src/field/group_objects,src/objects/board_pieces.c,sixteen board pieces moved on a grid (BoardPiece) guess
+src/field/group_objects,src/effects/scene/bat_flock.c,"The stock ROM draws a purple bat flock after a debugger call to the registered constructor and launch handler. Sprite package DA6D. The only constructor pointer is registry entry E534, absent from the GCX body. No shipped kind 10 cutscene packet sends any of its four commands."
 src/field/hit_switch,src/objects/hit_switch.c,switch activated by hitting it
 src/field/interaction_marker,src/objects/markers/interaction_marker,proximity interaction marker
 src/field/items_and_containers,src/objects/items/item_container.c,dropped items and opening containers
@@ -312,7 +312,7 @@ src/menus/challenge_menu,src/ui/results/challenge_menu.c,challenge menu
 src/menus/choice_menu,src/ui/dialogue,choice menu (two files)
 src/menus/collection,src/ui/books/collection,collection book entries; merge:src/menus/collection_menu
 src/menus/collection_menu,src/ui/books/collection,collection menu; merge:src/menus/collection
-src/menus/control_panel,src/ui/control_panel.c,in-world control panel interaction prompt guess
+src/menus/control_panel,src/minigames/dark_generator.c,The overdue-debt path starts proc 1001. Proc 1003 creates key B3D1 and explains the Dark Generator. The work gauge and treadmill move during input.
 src/menus/countdown_controller,src/ui/hud,countdown tick task
 src/menus/countdown_timer,src/ui/hud,countdown timer
 src/menus/dark_loan,src/ui/town,Dark Loan (暗黒ローン) (two files)
@@ -359,17 +359,17 @@ src/menus/pause_menu,src/ui/pause/pause_menu,pause menu
 src/menus/play_stats,src/ui/pause/play_stats.c,play statistics
 src/menus/record_menu,src/link/lobby,link lobby and record menu; merge:src/link/registry_33_ff
 src/menus/record_panel,src/link/records,"record panel (08 10D590, link menu block); merge:src/link/link_record_panel"
-src/menus/registry_3_f74,src/ui/widgets/scripted_choice.c,five-animation choice screen that runs the chosen entry's script after a fade (key 3F74) guess
+src/menus/registry_3_f74,src/ui/town/town_map.c,GCL 2554 creates 3F74 with the 11 town service callbacks. SAN MIGUEL appears on the map in frame 1940.
 src/menus/result_prompt,src/ui/results/result_prompt.c,result prompt
 src/menus/save_menu,src/ui/save,save menu and its tile map panel (two files)
-src/menus/scene_catalog,src/ui/pause/catalog.c,pause catalog descriptions and modifier preview guess
+src/menus/scene_catalog,src/ui/pause/status_options.c,Pause Status is visible. This ROM interval runs while opening that page and updating its numbers and descriptions.
 src/menus/scene_hud,src/ui/pause/pause_display,pause menu display layer: action previews and icons (SceneHud)
 src/menus/scene_indicators,src/ui/hud/scene_indicator.c,scene indicators
 src/menus/scene_panel_control_and_lifecycle,src/objects/pile_driver,"CBB0 is created by GCL 6182 outdoors and 6183 in the purification arena. The outdoor apparatus and the captive subject execute the same task family. Text #9293–9299 explains the generators, coffin and Solar Pile."
 src/menus/scene_panel_presentation,src/objects/pile_driver,"CBB0 is created by GCL 6182 outdoors and 6183 in the purification arena. The outdoor apparatus and the captive subject execute the same task family. Text #9293–9299 explains the generators, coffin and Solar Pile."
 src/menus/scene_panel_sprite_rig,src/objects/pile_driver,"CBB0 is created by GCL 6182 outdoors and 6183 in the purification arena. The outdoor apparatus and the captive subject execute the same task family. Text #9293–9299 explains the generators, coffin and Solar Pile."
 src/menus/scene_panel_subjects,src/objects/pile_driver,"CBB0 is created by GCL 6182 outdoors and 6183 in the purification arena. The outdoor apparatus and the captive subject execute the same task family. Text #9293–9299 explains the generators, coffin and Solar Pile."
-src/menus/scene_sequence,src/ui/hud/hud_sequence,"HUD sequences and ramps (Hud_*, SceneSequence_*) guess"
+src/menus/scene_sequence,src/ui/pause/menu_sequences,Stock Dark Card from Valuables opens Replay or Dark Loans with Doomy. Confirming the 400 Soll Replay runs the completion script and returns to the room; the other branch opens the loan screen. The pause-tabs/page02.png capture witnesses grid navigation.
 src/menus/screen_message,src/ui/dialogue/screen_message.c,screen message
 src/menus/script_prompt,src/ui/dialogue/script_prompt.c,script prompt
 src/menus/scripted_dialogue_transitions,src/ui/dialogue/dialogue_transition.c,scripted dialogue transitions
@@ -393,42 +393,42 @@ src/monsters/armor,src/monsters/armor,Armor (アーマー) and the elemental arm
 src/monsters/axe,src/monsters/axe,"Axe (アックス), sword family; merge:src/actors/actor_phase"
 src/monsters/bat,src/monsters,Bat (バット) (two files)
 src/monsters/bee,src/monsters/bee.c,Bee (ビー)
-src/monsters/cannon_battery,src/monsters/cannons/battery,cannon battery
-src/monsters/cannon_emitter,src/monsters/cannons/emitter,proximity cannon emitter
-src/monsters/cannon_turret,src/monsters/cannons/turret,cannon turret
+src/monsters/cannon_battery,src/objects/deck_cannons,"Stock 4906 and a warp to 4859 show banks of ship deck cannons as their update, slot constructor and initializer run. Procs 4860 and 4905 create the 55E9 manager. Text #7463 names the ship cannons around the helm."
+src/monsters/cannon_emitter,src/monsters/pollen_flowers,Key 98CB draws both flowers. Variant 1 in Ancient Tree 3504 applies status 0 for 1800 frames. Variant 0 in 5181 applies status 1 for 900 frames. The Monster Book identifies the poisonous and disorienting pollen as Poisoner and Perplexer.
+src/monsters/cannon_turret,src/monsters/garmr_statue,GCL 3884 → 1601 → 1603 creates 4CD8. The replay runs the actor update in view. Bestiary index 30 is text #9868.
 src/monsters/crow,src/monsters/crow.c,Crow (クロウ)
 src/monsters/dog,src/monsters/dog.c,"Dog family: Hound, Hot Dog, Ice Dog"
 src/monsters/dragon_puppy,src/monsters/dragon_puppy,Dragon Puppy
 src/monsters/enemy_d459,src/monsters/armor,"GCL 2996 → 1591 → 1593 spawns D459. Shared sprite package 7E82, palette 0227. Bestiary index 29 is string #9867, ARMOR."
 src/monsters/enemy_f426,src/monsters/statue,"GCL 3184 → 1589 → 1590 spawns F426. Shared sprite package 7E82, palette 0225. Bestiary index 28 is string #9866, STATUE."
 src/monsters/enemy_particle,src/monsters/enemy_particle,particles shared by the late enemy block
-src/monsters/fan_cannon,src/monsters/cannons/fan,fan cannon; merge:src/monsters/fan_cannon_manager
-src/monsters/fan_cannon_manager,src/monsters/cannons/fan,Fan Cannon Manager (扇風砲マネージャ); merge:src/monsters/fan_cannon
+src/monsters/fan_cannon,src/monsters/cannons/wind,GCL 4751 → 1609 spawns the fan cannon manager 9CC2 and two color variants. The replay runs the actor update in view. Bestiary index 34 is text #9872.
+src/monsters/fan_cannon_manager,src/monsters/cannons/wind,Proc 1609 creates shared manager 9CC2 and its cannon instances. The actor callbacks run under the same pool.
 src/monsters/ghost,src/monsters/ghost.c,Ghost (ゴースト)
 src/monsters/ghoul,src/monsters,Ghoul family (ボク/グール) (two files)
-src/monsters/glove,src/monsters/glove,Glove (グローブ); merge:src/actors/actor_recoil
+src/monsters/glove,src/minigames/coffin_bike,GCL 6275 calls 1277 to spawn bike key E881. R accelerates and UP steers visibly through Lifeless Town’s ride. The stock non-bike world map (2569) executes none of this unit. A two-core Back Street match also runs Glove_UpdateTask on both bikes. See link-peer/play-3-0.png and play-3-1.png.
 src/monsters/golem,src/monsters/golem,Golem (ゴーレム)
-src/monsters/growth_hazard,src/monsters/growth_hazard,growing hazard monster
+src/monsters/growth_hazard,src/objects/solar_roots,Hresvelgr setup 3594 and rematch 6397 place key 1FBA. The Earth shot makes the flat vegetation grow after AnimatedMarker_BeginActive at frame 2042. The comparison Sol shots hit without producing growth. Text #1817 and #9052 name Solar Roots.
 src/monsters/ivy,src/monsters/ivy,Ivy; merge:src/actors/child_group src/actors/phase_object
 src/monsters/lun,src/monsters/lun.c,Lun
 src/monsters/mimic,src/monsters/mimic.c,Mimic (ミミック)
 src/monsters/mummy,src/monsters/mummy,Mummy (マミー)
 src/monsters/octopus,src/monsters/octopus.c,Octopus (オクトパス)
 src/monsters/ooze,src/monsters/ooze,Wall/Floor Ooze (ウーズ)
-src/monsters/orange_spine,src/monsters/orange_spine,orange spine
-src/monsters/pink_spine,src/monsters/pink_spine,pink spine
+src/monsters/orange_spine,src/monsters/cannons/plasma,GCL 5874 → 1618 → 1619 creates 01A2. The replay runs the actor update in view. Bestiary index 36 is text #9874.
+src/monsters/pink_spine,src/monsters/popbud,GCL 3399 → 1597 → 1598 creates F639. The replay runs the actor update in view. Bestiary index 2 is text #9840.
 src/monsters/poison_hand,src/monsters/poison_hand,Poison Hand
 src/monsters/screamer,src/monsters/screamer,Screamer
 src/monsters/skeleton,src/monsters/skeleton,Skeleton (スケルトン)
 src/monsters/slime,src/monsters/slime.c,Slime (スライム)
 src/monsters/spider,src/monsters/spider.c,Spider (スパイダー)
 src/monsters/sword,src/monsters/sword,Sword (ソード)
-src/monsters/tentacle_actor,src/monsters/tentacle,tentacle enemy (TentacleEnemy_Create); merge:src/monsters/tentacle_body
-src/monsters/tentacle_body,src/monsters/tentacle,tentacle body segments; merge:src/monsters/tentacle_actor
+src/monsters/tentacle_actor,src/monsters/centipede,"Proc 4075 calls 1574 and 1576 to create 0AC7. The visible category-9 actor maps to Monster Book entry 13, text #9851, Centipede. The replay executes its constructor, component update and the shared body windup and spread callbacks."
+src/monsters/tentacle_body,src/monsters/centipede,"Proc 4075 calls 1574 and 1576 to create 0AC7. The visible category-9 actor maps to Monster Book entry 13, text #9851, Centipede. The replay executes its constructor, component update and the shared body windup and spread callbacks."
 src/monsters/vorn,src/monsters/vorn,Vorn (ヴォーン)
 src/monsters/vulcan_cannon,src/monsters/cannons/vulcan,Vulcan Cannon (バルカン砲)
 src/other/callback_pool,src/objects/actor_group,"callback pool feedback of actor groups (08104F08, right after them; only caller); merge:src/field/actor_group"
-src/other/registry_selection,src/ui/widgets/indicator_selection.c,selection screen with animated indicators and palette phases guess
+src/other/registry_selection,src/ui/world_map.c,GCL 2570 creates key 2388 for the nine world destinations. WORLD is visible in the stock save. Confirm selects San Miguel in this replay.
 src/other/scene_terrain_probe,src/effects/particles,"terrain probe, moving particle and spread shot (two files)"
 src/other/solar_calibration,src/system/solar,solar sensor calibration screen; merge:src/system/cartridge_solar_sensor src/system/solar
 src/player/player_attack_effect,src/player/effects/attack,player attack effect
@@ -459,3 +459,28 @@ player_files_interaction.txt,src/player/interaction,"47 loose Player files: inte
 player_files_movement.txt,src/player/movement,"75 loose Player files: walking, turning, terrain handling, forces and the player camera offsets"
 player_files_script.txt,src/player/script,1 loose Player files: player script commands; merge:src/actors/script_actor
 player_files_stats.txt,src/player/stats,"43 loose Player files: life, energy, resistance, equipment and modifier values"
+src/player/sub_08143604.c,src/player/special_actions,"Special motion effect callbacks, dispatched separately from mode 3 gun/melee. Controlled motion IDs 9, 16, and 17 reached three callbacks. 0814692C is the alternate table’s equivalent mode 9."
+src/player/sub_08144408.c,src/player/special_actions,"Special motion effect callbacks, dispatched separately from mode 3 gun/melee. Controlled motion IDs 9, 16, and 17 reached three callbacks. 0814692C is the alternate table’s equivalent mode 9."
+src/player/sub_08144624.c,src/player/special_actions,Controlled mode 17 startup requires sunlight. The ROM creates the green Spiral Burst with sunlight 8 and produces no cast at 0. Both weapon probes stay idle.
+src/player/sub_08144D60.c,src/player/damage,A staged 0060 warp puts Django in the Plasma Cannon firing lane. Its shot calls Player_RequestTimedReset with 70 at frame 1885. Motion 21 begins at 1900 and both the timed update and exit run. Stars circle Django. The control has zero hits.
+src/player/sub_08144D64.c,src/player/damage,A staged 0060 warp puts Django in the Plasma Cannon firing lane. Its shot calls Player_RequestTimedReset with 70 at frame 1885. Motion 21 begins at 1900 and both the timed update and exit run. Stars circle Django. The control has zero hits.
+src/player/sub_08144F40.c,src/player/cues,"Departure camera, fade and shrinking actor. Controlled motion 27 shows the departure and runs this update."
+src/player/sub_0814692C.c,src/player/special_actions,"Special motion effect callbacks, dispatched separately from mode 3 gun/melee. Controlled motion IDs 9, 16, and 17 reached three callbacks. 0814692C is the alternate table’s equivalent mode 9."
+src/player/sub_08147CF0.c,src/player/cues,Form and sprite motion callbacks. Controlled motion IDs 13 and 14 show the spiral form effect. The other four are equivalent or adjacent sprite playback callbacks in alternate motion tables.
+src/player/sub_08147FB8.c,src/player/cues,Form and sprite motion callbacks. Controlled motion IDs 13 and 14 show the spiral form effect. The other four are equivalent or adjacent sprite playback callbacks in alternate motion tables.
+src/player/sub_081481E4.c,src/player/cues,Form and sprite motion callbacks. Controlled motion IDs 13 and 14 show the spiral form effect. The other four are equivalent or adjacent sprite playback callbacks in alternate motion tables.
+src/player/sub_08148B64.c,src/player/cues,Form and sprite motion callbacks. Controlled motion IDs 13 and 14 show the spiral form effect. The other four are equivalent or adjacent sprite playback callbacks in alternate motion tables.
+src/player/sub_08148E4C.c,src/player/cues,Form and sprite motion callbacks. Controlled motion IDs 13 and 14 show the spiral form effect. The other four are equivalent or adjacent sprite playback callbacks in alternate motion tables.
+src/player/sub_08149DF0.c,src/player/cues,Form and sprite motion callbacks. Controlled motion IDs 13 and 14 show the spiral form effect. The other four are equivalent or adjacent sprite playback callbacks in alternate motion tables.
+src/player/sub_0814EEE0.c,src/player/gun,Gun frame 11 reaches this sustained rotating-spread update on held B. It belongs with the other Gun Del Sol frame callbacks.
+src/player/sub_0823C02C.c,src/player/link_actions,The 08E87A10 and 08E87A90 dispatch tables and their callers identify a Link Player family. All five entries were absent during a connected Back Street race. The Crossover round 1656 warp runs Player_Update and yields zero hits in these dispatchers. A shipped entry point for the five remains unobserved.
+src/player/sub_0823D080.c,src/player/link_actions,The 08E87A10 and 08E87A90 dispatch tables and their callers identify a Link Player family. All five entries were absent during a connected Back Street race. The Crossover round 1656 warp runs Player_Update and yields zero hits in these dispatchers. A shipped entry point for the five remains unobserved.
+src/player/sub_0823D3A0.c,src/player/link_actions,The 08E87A10 and 08E87A90 dispatch tables and their callers identify a Link Player family. All five entries were absent during a connected Back Street race. The Crossover round 1656 warp runs Player_Update and yields zero hits in these dispatchers. A shipped entry point for the five remains unobserved.
+src/player/sub_0823FE94.c,src/player/link_actions,The 08E87A10 and 08E87A90 dispatch tables and their callers identify a Link Player family. All five entries were absent during a connected Back Street race. The Crossover round 1656 warp runs Player_Update and yields zero hits in these dispatchers. A shipped entry point for the five remains unobserved.
+src/player/sub_08240F9C.c,src/player/link_actions,The 08E87A10 and 08E87A90 dispatch tables and their callers identify a Link Player family. All five entries were absent during a connected Back Street race. The Crossover round 1656 warp runs Player_Update and yields zero hits in these dispatchers. A shipped entry point for the five remains unobserved.
+08000000-08000350,src/engine,GBA header and SDK crt0 assembly
+0822F1B4-0822FDB4,src/lib/m4a,MP2K SDK mixer and track-handler assembly
+0824538C-08245398,src/lib/rfu,RFU SDK callback trampolines
+08248590-082485EC,src/lib/bios,libagbsyscall BIOS wrapper assembly
+08249238-0824930C,src/lib/libgcc,libgcc call veneers and division assembly
+08249350-08249558,src/lib/libgcc,libgcc division and modulo assembly

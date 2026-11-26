@@ -13,14 +13,14 @@ to follow meaning.
 
 | Directory | What is in it |
 |---|---|
-| `src/player/` | Django: core, movement, melee attacks, the gun, taking damage, stats, interacting with objects (dragging the coffin), animation cues, cutscene commands, appearance, his effects |
+| `src/player/` | Django: core, movement, melee attacks, the gun, taking damage, stats, object interactions, animation cues, cutscene commands, appearance, special actions, and link actions |
 | `src/monsters/` | Every enemy family, one file or directory per monster (the game's own word: the Monster Book, 魔物図鑑) |
 | `src/bosses/` | The Immortals (Hresvelgr, Nidhoggr, Ratatosk, Vanargand, Sabata) and the Vampire |
-| `src/npc/` | Townspeople, story characters and cutscene actors driven by scripts |
-| `src/objects/` | Things in the dungeons and town: coffin, crates, switches, Warp Circle, Solar Stand, Pile Driver, sun orbs, items, hazards, markers |
-| `src/effects/` | Visual effects: palette, particles, screen effects, projectiles, bursts, orbits, sprite effects, shadows, weather |
-| `src/ui/` | Everything drawn over the game: HUD, dialogue, pause menu, town services, the books, title screens, results |
-| `src/minigames/` | The result (transformation) minigame |
+| `src/npc/` | Townspeople, story characters and cutscene actors, including Sabata's bike rider |
+| `src/objects/` | Coffin, crates, switches, Warp Circle, Solar Stand, Pile Driver, ship deck cannons, Solar Roots, sun orbs, items, hazards, and markers |
+| `src/effects/` | Palette, particles, screen effects, projectiles, bursts, orbits, sprites, bat flocks, shadows, and weather |
+| `src/ui/` | HUD, dialogue, pause menu, town and world maps, town services, books, title screens, and results |
+| `src/minigames/` | Django's Coffin Bike, the Dark Generator, and the result (transformation) minigame |
 | `src/link/` | Two-player play: cable link (`serial`), wireless (`wireless/`), the link menus and the other player's avatar |
 | `src/system/` | The cartridge and persistent state: solar sensor, clock and sun schedule, saving, game state, inventory data |
 | `src/scene/` | The world simulation shared by everything that moves: the actor framework, collision, terrain and paths, camera, scene lifecycle |
@@ -60,10 +60,11 @@ to follow meaning.
   sequences, palettes, render), `include/engine/math/` (vectors, interpolation,
   random helpers), `include/scene/actor/` (the actor framework every monster
   uses). `include/gba/` holds the SDK headers.
-* Inside a directory, a file named after its function (`ghoul_on_body_collision.c`)
-  holds one function; an unnamed function keeps its address (`sub_08033568.c`);
-  a multi-function translation unit is named for what it contains. `lib/` keeps
-  upstream file names.
+* A one-function file uses the exact symbol spelling (`Hresvelgr_Create.c`).
+  An unnamed function keeps its address (`sub_08033568.c`). A multi-function
+  translation unit is named for what it contains. `lib/` keeps upstream file
+  names. The directory pass preserves existing basenames except where the
+  reviewed table explicitly gives a new one.
 
 ## Where is it?
 
@@ -80,6 +81,8 @@ to follow meaning.
 | Cutscene commands that move Django (kneel, aim, shoot) | `src/player/script/` |
 | Django's sprite model, palettes, visuals | `src/player/appearance/` |
 | Django's barrier, attack and burst effects | `src/player/effects/` |
+| Special motion effects, including Spiral Burst | `src/player/special_actions/` |
+| Link Player dispatchers | `src/player/link_actions/` |
 | Lock-on targets | `src/player/target_registry/` |
 | Ghoul (ボク family) | `src/monsters/ghoul.c`, `ghoul_states.c` |
 | Bat, Bee, Slime, Ghost, Crow, Spider, Mimic, Octopus, Dog (Hound, Hot Dog, Ice Dog), Lun | `src/monsters/<name>.c` |
@@ -87,14 +90,17 @@ to follow meaning.
 | Armor and the elemental armors | `src/monsters/armor/` |
 | Statue | `src/monsters/statue/` |
 | Sword, Axe | `src/monsters/sword/`, `src/monsters/axe/` |
-| Ivy, Glove, the tentacle enemy | `src/monsters/ivy/`, `glove/`, `tentacle/` |
-| Ooze, Screamer, Poison Hand, Dragon Puppy, orange and pink spines | `src/monsters/<name>/` |
-| Cannon battery, turret, Vulcan Cannon, fan cannons | `src/monsters/cannons/{battery,turret,vulcan,fan,emitter}/` |
+| Ivy, Centipede, Popbud | `src/monsters/ivy/`, `centipede/`, `popbud/` |
+| Ooze, Screamer, Poison Hand, Dragon Puppy | `src/monsters/<name>/` |
+| Poisoner and Perplexer | `src/monsters/pollen_flowers/` |
+| Garmr Statue and Muspell Head | `src/monsters/garmr_statue/`, `muspell_head/` |
+| Vulcan, Wind, and Plasma Cannons | `src/monsters/cannons/{vulcan,wind,plasma}/` |
 | Hresvelgr (eagle) | `src/bosses/hresvelgr/` |
 | Nidhoggr (dragon), including its grid attacks | `src/bosses/nidhoggr/` |
 | Ratatosk | `src/bosses/ratatosk/` |
 | Vanargand (wolf), its projectiles, parts and bike-chase appearance | `src/bosses/vanargand/` |
 | Sabata | `src/bosses/sabata/` |
+| Sabata riding the purple bike | `src/npc/sabata_rider/` |
 | The Vampire and its bat swarm | `src/bosses/vampire/` |
 | Townspeople and NPCs | `src/npc/scripted_npc/`, `src/npc/tagged_npc/` |
 | Story characters in cutscenes | `src/npc/story_character/`, `src/npc/cutscene_actor/` |
@@ -102,6 +108,7 @@ to follow meaning.
 | Warp Circle | `src/objects/warp_circle/` |
 | Solar Stand | `src/objects/solar_stand/` |
 | Pile Driver (purification) | `src/objects/pile_driver/` |
+| Ship deck cannons and Solar Roots | `src/objects/deck_cannons/`, `solar_roots/` |
 | Wooden crate, floor switch, hit switch, Bat Curtain | `src/objects/wooden_crate/`, `floor_switch/`, `hit_switch.c`, `bat_curtain/` |
 | Treasure chests and dropped items | `src/objects/items/` |
 | Sun orbs, the solar bomb | `src/objects/sun_orb/`, `src/objects/solar_bomb/` |
@@ -117,14 +124,17 @@ to follow meaning.
 | Dialogue boxes, text commands, text windows | `src/ui/dialogue/` |
 | HUD (life, energy, sun gauge), damage numbers | `src/ui/hud/display/`, `src/ui/hud/damage_numbers/` |
 | Pause menu, its inventory, map, status panel | `src/ui/pause/` |
+| Pause Status options and menu sequences | `src/ui/pause/status_options.c`, `menu_sequences/` |
 | Status screen | `src/ui/status_screen/` |
 | Weapon shop | `src/ui/town/shop/` |
+| San Miguel town map and world destination map | `src/ui/town/town_map.c`, `src/ui/world_map.c` |
 | Solar Bank, Dark Loan, Storage | `src/ui/town/solar_bank/`, `dark_loan.c`, `storage/` |
 | Monster Book, Forging Book, collection | `src/ui/books/` |
 | Equipment modifier menu | `src/ui/modifier_menu/` |
 | Title, Game Start, Options, Name Entry, Password, sound test | `src/ui/title/` |
 | Stage results, time result, challenges | `src/ui/results/` |
 | Game over | `src/ui/game_over/` |
+| Django's Coffin Bike and the Dark Generator | `src/minigames/coffin_bike/`, `dark_generator.c` |
 | Cable link | `src/link/serial/`, `handshake/`, `session/` |
 | Wireless adapter and connection | `src/link/wireless/connection/`, `rfu_manager/`; SDK `src/lib/rfu/` |
 | Wireless battle, trading | `src/link/wireless/battle/`, `trade_menu/` |
@@ -132,6 +142,7 @@ to follow meaning.
 | Palette fades and cycling | `src/effects/palette/` |
 | Particles | `src/effects/particles/` |
 | Screen effects (scanline, flashes, blends, scrolling backdrops) | `src/effects/screen/` |
+| Magic Cannon departure and the cutscene bat flock | `src/effects/screen/magic_cannon_departure.c`, `src/effects/scene/bat_flock.c` |
 | Projectiles | `src/effects/projectiles/` |
 | Explosions and bursts, healing sparkles | `src/effects/bursts/`, `src/effects/healing/` |
 | Weather and storms, shadows | `src/effects/weather/`, `src/effects/shadows/` |
@@ -141,7 +152,6 @@ to follow meaning.
 | Camera | `src/scene/camera/` |
 | Tasks, heap, interrupts, boot (`AgbMain`) | `src/engine/` |
 | Sprites, OAM, backgrounds, palettes, text tiles | `src/engine/video/` |
-| The bike | not yet identified in code; look for it under `src/player/` or `src/minigames/` once found |
 
 ## Finding a function's file
 
@@ -152,7 +162,9 @@ python3 tools/docindex.py 08033568
 
 The resolver reads definitions, placeholders, aliases and the symbol table, so
 it answers for any address or name. `symbols/functions.csv` gives the name; the
-file is the function's own `.c` or the unit that contains it.
+file is the function's own `.c` or the unit that contains it. The address
+`08033568` resolves to `src/ui/dialogue/scrolling_dialogue.c`. `Ghoul_Create`
+is a separate lookup by symbol.
 
 ## Where a new file goes
 
@@ -165,8 +177,12 @@ file is the function's own `.c` or the unit that contains it.
 3. Name the directory after the object (the game's name if known), never after
    an address, registry key or slot number.
 4. Put its header in `include/` at the mirrored path (at most two directories).
-5. `scope.py new FUNC` and `scope.py land FUNC` place drafted C in the right
-   unit automatically.
+5. The author adds the placement rule in the same commit as the file. For C,
+   record its path and ROM bounds in `symbols/source_files.csv` and use or add
+   its owner in `symbols/source_dirs.csv`. For a header, record its owner path
+   in `symbols/header_dirs.csv`. The test suite runs the same placement check
+   as `tools/reorg.py --check`. `scope.py new FUNC` and `scope.py land FUNC`
+   use these routes when they place drafted C.
 
 ## Layout tools
 
@@ -180,12 +196,18 @@ file is the function's own `.c` or the unit that contains it.
   header directly or through another header.
 
 `symbols/source_dirs.csv` and `symbols/header_dirs.csv` hold the reviewed
-placement rules. `symbols/source_files.csv` records the original and
-milestone-one paths, each file's ROM range, and the Player group that applies
-to each loose Player file. Progress report regrouping leaves these tables
-alone. Set a placement rule before adding a source outside a covered range.
+placement rules. `symbols/source_files.csv` records prior paths, ROM bounds,
+and per-file Player placement. `source_dirs.csv` also assigns the ROM ranges
+that contain intentional assembly. Progress report regrouping leaves these
+tables alone. An uncovered ROM address or a legacy header with no unique owner
+reports which table to update.
 
-To replay the directory move, bring the tables and layout tooling to the
-branch and run `build/venv/bin/python tools/reorg.py` from the repository
-root to preview. Run it with `--apply` to move the files and rewrite source
-and header references. Run it with `--check` to verify the resulting tree.
+### Replay on a worker branch
+
+1. Bring `tools/reorg.py`, `tools/source_layout.py`, and the three placement
+   tables from `main` onto the worker branch.
+2. Run `python3 tools/reorg.py` from the repository root. The preview should
+   succeed, and every destination should use the current top-level layout.
+3. Run `python3 tools/reorg.py --apply`, then `python3 tools/reorg.py --check`.
+4. Commit the replay and merge `main` with a high rename limit, for example
+   `git -c merge.renameLimit=20000 merge main`.

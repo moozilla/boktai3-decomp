@@ -16,3 +16,9 @@ evidence. In-game verification placed the Pile Driver with objects, joined
 the chase and grid-attack units to Vanargand and Nidhoggr respectively, and
 distinguished Armor from Statue. `tools/reorg.py --check` verifies the settled
 layout.
+
+Pass 2B records the additional in-game identifications, including both bike
+units, the overworld maps, the Dark Generator, and 19 Player files placed by
+observed role. The rule tables retain prior path aliases so a branch using
+pass 1 or pass 2 paths can replay the final placement. The replay reports
+uncovered ROM addresses and headers with uncertain ownership.

@@ -1,5 +1,5 @@
 #include "global.h"
-#include "monsters/tentacle/tentacle_segment_animation.h"
+#include "monsters/centipede/tentacle_segment_animation.h"
 #include "engine/video/display_sequence_inline.h"
 
 // confidence=low: refreshes segment animations from their direction.

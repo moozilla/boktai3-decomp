@@ -100,10 +100,9 @@ What's left:
   not been compared sample-for-sample with mGBA.
 * Wireless (RFU) link play is stubbed.
 * Soft-float and EEPROM SDK routines are port replacements, not the original C.
-* The older slice builds (`port/build.py --slice`, `run_boot.py`, `run_rtc.py`,
-  `run_returns_slice.py`, `run_display_bus.py`) name `src/fn/*.c` files that main
-  has since folded into units, so they fail on main too; the full-game build
-  replaces them.
+* The full-game build replaces the older slice builds (`port/build.py --slice`,
+  `run_boot.py`, `run_rtc.py`, `run_returns_slice.py`, `run_display_bus.py`).
+  Some of their individual source files now live inside larger units.
 
 ## Build the C
 ## Hardware slice

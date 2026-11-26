@@ -1,6 +1,6 @@
 #ifndef GUARD_HUD_CONFIG_MENU_H
 #define GUARD_HUD_CONFIG_MENU_H
-#include "ui/pause/catalog.h"
+#include "ui/pause/status_options.h"
 #include "engine/runtime.h"
 
 void SelectionPanel_UpdateCursor(struct SceneHudState *p, s32 visible);

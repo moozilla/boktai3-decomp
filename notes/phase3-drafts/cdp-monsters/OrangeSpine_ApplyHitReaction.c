@@ -1,4 +1,4 @@
-#include "monsters/orange_spine/orange_spine.h"
+#include "monsters/cannons/orange_spine.h"
 #include "scene/actor/collision_response.h"
 #include "ui/hud/damage_number_display.h"
 #include "engine/ram.h"

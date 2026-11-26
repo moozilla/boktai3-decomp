@@ -122,7 +122,7 @@ Next idea: C in which amplitude's address and the loop's `p->amplitude` don't sh
 equivalence at the preheader (a separate EBB, or a constant cse can't merge), so the hoisted
 add survives.
 
-### sub_08010C10 (src/objects/board_pieces.c, 08010C10): deferred, reload rotation only
+### sub_08010C10 (src/effects/scene/bat_flock.c, 08010C10): deferred, reload rotation only
 
 Draft: `notes/phase3-drafts/field-effects/sub_08010C10.c` (2 ROM / 2 draft), the pinned
 source without the `d` pin and barrier. The only difference is the scratch for the first
@@ -497,8 +497,8 @@ The coordinator said to leave the scoring alone for now. These are the ones in s
 * `src/fn/sub_0808CE50.c`: Ghoul_UpdateSpecialActionControl:61, Ghoul_UpdateSpecialActionControl:63
 * `src/fn/sub_0808CF54.c`: Ghoul_UpdateAnimationElevenControl:61, Ghoul_UpdateAnimationElevenControl:63
 * `src/fn/sub_0808D058.c`: Ghoul_UpdateAttackControl:61, Ghoul_UpdateAttackControl:63
-* `src/monsters/tentacle/sub_080A8144.c`: SceneActorPlacement_UpdateFlaggedResponse:27, SceneActorPlacement_UpdateFlaggedResponse:29
-* `src/monsters/tentacle/sub_080AA8C4.c`: TentacleActor_AlignSegmentsToTerrain:81
+* `src/monsters/centipede/sub_080A8144.c`: SceneActorPlacement_UpdateFlaggedResponse:27, SceneActorPlacement_UpdateFlaggedResponse:29
+* `src/monsters/centipede/sub_080AA8C4.c`: TentacleActor_AlignSegmentsToTerrain:81
 * `src/fn/sub_080B713C.c`: SceneActorTerrain_FindOpenNeighborDirection:11
 * `src/fn/sub_080BB4DC.c`: Skeleton_UpdateDownedState:57
 * `src/fn/sub_080C61AC.c`: Golem_UpdateDying:57
@@ -519,7 +519,7 @@ The coordinator said to leave the scoring alone for now. These are the ones in s
 * `src/link/session/sub_08109040.c`: SelectionSlots_ClearValue:23
 * `src/link/link_selection/sub_0810B3BC.c`: SceneMenu_UpdateRecords:45
 * `src/link/records/sub_0810D60C.c`: PanelText_DrawDecimal:17
-* `src/monsters/glove/sub_0811A030.c`: MotionActor_DispatchRequestedState:72
+* `src/minigames/coffin_bike/sub_0811A030.c`: MotionActor_DispatchRequestedState:72
 * `src/fn/sub_0811B094.c`: Collider_ScheduleUpdates:49
 * `src/fn/sub_0811BD30.c`: Actor_UpdateShadowSpriteParts:84, Actor_UpdateShadowSpriteParts:88
 * `src/fn/sub_0811D270.c`: PanelText_DrawDigits:17
@@ -570,7 +570,7 @@ The coordinator said to leave the scoring alone for now. These are the ones in s
 * `src/link/link_player/sub_0823A028.c`: ActorEffect_SelectFlashingValue:15
 * `src/lib/libgcc/sub_0824AC74.c`: Libgcc_MultiplyInt64:61
 * `src/monsters/golem/golem_2.c`: Golem_UpdateScriptedAction:393, Golem_UpdateScriptedAction:395
-* `src/objects/board_pieces.c`: BoardPiece_Wander:493, BoardPiece_Wander:494, BoardPiece_Wander:495, BoardPiece_Wander:496
+* `src/effects/scene/bat_flock.c`: BoardPiece_Wander:493, BoardPiece_Wander:494, BoardPiece_Wander:495, BoardPiece_Wander:496
 * `src/ui/modifier_menu/modifier_selection_and_stat_previews.c`: ModifierMenu_DrawSecondSourceStats:697, ModifierMenu_DrawSecondSourceStats:716, ModifierMenu_DrawBackground:863
 * `src/effects/palette/palette_controller.c`: Palette_BlendRange:69, Palette_InitializeFromScript:461, Palette_SetBrightnessFromScript:709
 * `src/ui/title/password.c`: Text_CopyWithoutTags:9, Password_DecodeEntry:174
@@ -775,7 +775,7 @@ shape 16, and the rest is the order of input, transform, table and heading. The 
 help here either: the target packing reuses 0xFFFF0000. Next: a general way to set a constant pointer
 without a REG_EQUAL note at function entry; this is the same blocker as Bat.
 
-### TentacleActor_SelectWanderRoute (src/monsters/tentacle/sub_080A8904.c, 080A8904): deferred
+### TentacleActor_SelectWanderRoute (src/monsters/centipede/sub_080A8904.c, 080A8904): deferred
 
 Draft: `TentacleActor_SelectWanderRoute.c`, every do/while(0) macro written out (46/48 differ, all
 allocation). The macros put their statements one loop level deeper, and flow weights REG_N_REFS by
@@ -785,7 +785,7 @@ The draft gives facing r6 and count r8. Next: C that really nests those statemen
 original had, for example the neighbor scan as an inner loop) or other refs that raise the mask
 and n by the same amount.
 
-### TentacleBody_RefreshDirectionalAnimations (src/monsters/tentacle/sub_080A8F38.c, 080A8F38): deferred
+### TentacleBody_RefreshDirectionalAnimations (src/monsters/centipede/sub_080A8F38.c, 080A8F38): deferred
 
 Draft: `TentacleBody_RefreshDirectionalAnimations.c` (41/37 differ, against 83/79 for the plain
 no-pin draft). Step is written as the shared DisplaySequenceState playback, with the flip tests
@@ -802,9 +802,9 @@ Next: find what holds r7 in the ROM (another long-lived value the draft lacks, m
 Same family as TentacleBody_RefreshDirectionalAnimations: the same Step helper and the same
 `frame` stack struct and segment loop. With Refresh's draft Step and ordinary body C, Reset scores
 54/52 (`TentacleBody_ResetDirectionalAnimations.c`); Restart is not tried yet. Solve Refresh first,
-then move the shared Step into `include/monsters/tentacle/tentacle_segment_animation.h` and port it to all three.
+then move the shared Step into `include/monsters/centipede/tentacle_segment_animation.h` and port it to all three.
 
-### TentacleActor_RemoveSegmentColliders (src/monsters/tentacle/sub_080AA688.c, 080AA688): deferred
+### TentacleActor_RemoveSegmentColliders (src/monsters/centipede/sub_080AA688.c, 080AA688): deferred
 
 Draft: `sub_080AA688.c` (`--trail->activeCount;`, 25/24 differ). The ROM rebuilds `trail + 0x8EA` in
 the loop; the draft hoists it. `hoist`: in loop pass 2 the address (insn 148) moves at 13 x 1 x 3 >=
@@ -812,7 +812,7 @@ the loop; the draft hoists it. `hoist`: in loop pass 2 the address (insn 148) mo
 `activeCount--`, a pointer local and `= activeCount - 1`; all are hoisted. Next: a form whose pass-2
 threshold or lifetime fails, or a count address that is not invariant (derived from the segment).
 
-### TentacleActor_AlignSegmentsToTerrain (src/monsters/tentacle/sub_080AA8C4.c, 080AA8C4): deferred
+### TentacleActor_AlignSegmentsToTerrain (src/monsters/centipede/sub_080AA8C4.c, 080AA8C4): deferred
 
 Draft: `TentacleActor_AlignSegmentsToTerrain.c`, 36/38 differ, all of it allocation. It passes
 `&segment->position` to Height (the landed code passes `&trail->segments[i].position`, which costs
@@ -834,7 +834,7 @@ records REG_EQUIV (const (plus sym k)) and the result is worse, and halves place
 writes. Next: a table source that cse does not see as constant and combine folds, with no mask
 constant in common with a bitfield write in the same block.
 
-### TentacleActor_UpdateRetraction (src/monsters/tentacle/sub_080AB968.c, 080AB968): deferred
+### TentacleActor_UpdateRetraction (src/monsters/centipede/sub_080AB968.c, 080AB968): deferred
 
 The ROM computes |secondaryMotion.x| and |secondaryMotion.z| (`adds r3, r1, #0; ...; rsbs r3, r1, #0`)
 and never uses them. The landed C keeps them with a volatile asm. So in the original they fed
@@ -845,7 +845,7 @@ the abs, 20/2), branching inside Advance, and a `speed` variable set before the 
 arms that stay identical after reload (all arguments set before the branch), or a switch on the
 abs values.
 
-### TentacleActor_RecoverFromSegmentLoss (src/monsters/tentacle/sub_080ABB18.c, 080ABB18): deferred
+### TentacleActor_RecoverFromSegmentLoss (src/monsters/centipede/sub_080ABB18.c, 080ABB18): deferred
 
 The ROM computes 15 field addresses of p before the segment-removal loop's first test and spills
 most of them to the stack. That looks like loop.c hoisting the invariants of a loop that contains
@@ -907,7 +907,7 @@ effect: local temps for angle/zero/speed/one, a shadow pointer, a struct copy th
 inline helpers for the ED6/ED4 stores (constant parameters are substituted), and simpler
 mask forms (those change the code).
 
-### Terrain_ResolveActorMotion (src/monsters/glove/sub_0811AE9C.c, 0811AE9C): 6 concessions, pin-free draft 10/10
+### Terrain_ResolveActorMotion (src/minigames/coffin_bike/sub_0811AE9C.c, 0811AE9C): 6 concessions, pin-free draft 10/10
 
 Resolved by dp-monsters: spell the offset as ~((difference << 12) - 1).
 CSE does not see the inner negation early enough to cancel Abs's negation;
@@ -1216,7 +1216,7 @@ A single `base` pointer, a per-iteration `cursor = base` copy, and `&pool->e[i]`
 Next: work out whether r8 is a cursor biv or loop's reduced giv (try `hoist`), then the C that puts sprite/state on the base side
 while the reads stay on r8.
 
-### OrangeSpine_ApplyHitReaction (src/monsters/orange_spine/sub_0820EE34.c, 0820EE34): deferred
+### OrangeSpine_ApplyHitReaction (src/monsters/cannons/plasma/sub_0820EE34.c, 0820EE34): deferred
 
 Landed: 2 pins and 4 barriers (r0 and r1 dummies around two statements).
 Draft: `notes/phase3-drafts/monsters-bosses/OrangeSpine_ApplyHitReaction.c` (36 ROM / 34 draft).
