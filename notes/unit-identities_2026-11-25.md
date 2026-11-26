@@ -1129,3 +1129,46 @@ Player block at 08238238. At the far end, 08243B54 is the stat gauge. In the
 0032 Dark Card replay, `DarkLoan_DrawPreview` calls it during the loan offer.
 Use `ui/pause/menu_sequences` for that file. End the alternate player block
 at 08243B54, exclusive. The gap 082389D8–08239130 remains directional effects.
+
+For the cable control, `build/identify/pass3/peer_range.txt` starts
+Back Street from 0032 and 0070. The second trace (`peer_range-corrected.log`)
+samples both whole ranges. At frames 3224–3313 there are zero executed
+instructions from those ranges on either core. `Glove_UpdateTask` runs
+on both. The first range sample used the wrong between-step PC adjustment
+and logged one apparent hit in the gauge's literal pool. The corrected
+host drains due events and uses the same next-instruction PC as the
+headless harness. The connected race screenshots are
+`build/identify/pass3/pass3-connected-race-{0,1}.png`.
+
+## Pass 3 object paths, rows 1–11
+
+Tags: scene objects, D9AE, F1F9, moving platform, passages, ice, traps, candlestick
+
+Rerun 0029 to 3955 (`build/identify/pass3/replay_blocks.py`). Proc 3952
+uses D9AE with name 4B5D and count two at frame 1473. The manager at
+0200E4E4 runs `SceneObjects_InitPool`. Next frame E02A builds IDs EEC
+and EED with 9D41 at slots 0200E574 and 0200E71C. The stride is 0x1A8.
+In `pass3-d9ae-camera/commands.txt`, keep Django at the entrance and pan
+the camera to the stones. At frame 1853 their draw records at 0200E604
+and 0200E7AC each submit three parts. `pair.png` catches the two solid
+stone blocks across the passage. After the staged removal of the first
+slot, only the second drawable submits and `after.png` shows one rock.
+GCL 3953 pans to the same pair and removes each ID at its fourth phase.
+Use `objects/puzzle_blocks.c` for this live collision and graphics pool.
+
+The remaining object leads cross-reference the following replay records
+by their pass-three order. All paths in the table are under
+`build/identify/replays/`.
+
+| Pass 3 path | Evidence and destination |
+|---|---|
+| `objects/actor_group` | 0029→3905, `resume-quarry-matched-drop/hit07.png`. GCL 3904→1553→10801 reaches F1F9 at ID 5639. The normal sword contact breaks the deposit and the staged drop counter makes proc 1133 create the visible drop. Use `objects/loot_deposits`. |
+| `objects/named_object` | 0042→4808, `review-platform-ride/ride.png`. A4FC ID 085F uses route state and B019. The puzzle text #7181 calls it a moving platform. Use `objects/moving_platforms`. |
+| `objects/cell_gate` | 0042→4755, `review-passage/hit.png`. Proc 4752→1071 registers four 71BA edge slots next to the Wind Cannons. The controlled approach reaches the original passage predicate and clears the blocking cell. Use `objects/passage_barriers`. |
+| `objects/bouncing_object` | 0046→4915, `review-bouncing-bombs/bounce.png`. The grid attack runs Spawn, TickActive and removal on the moving dark bombs. Mummy and Ratatosk projectile code also calls the pool. Use `objects/bouncing_bombs`. |
+| `objects/breakable_prop` | 0029→3931, `review-trinity-release/dialogue.png`. 3DB0 comes from proc 1091. White Forest's sprite 474D and ID E912 run the shatter and unlock Trinity. Proc 1090 in the lead configures a separate hit switch. Use `objects/quest_barriers` for the multi-sprite barrier unit. |
+| `objects/region_actor.c` | 0029→3955, `review-proximity/close.png`. Proc 1176 creates 377D and loads the large blue 863A ice boulder. Use `objects/ice_boulders.c`. |
+| `objects/collision_controller.c` | 0029→3955, `review-native-collision-blast/created.png`. Proc 1180 creates 0866 E811. The staged registered collision callback emits its bright marker and delayed sparks. Proc 1179 creates the separate floating 95A8 crystal. Use `objects/strike_traps.c`. |
+| `objects/directional_controller.c` | 0029→3955, `resume-hint-actions/prompt-1-1.png`. A selects the 883A sign position and opens the Fireball hint. Use `objects/interaction_prompts.c`. |
+| `objects/tile_trigger.c` | 0013→3161, `resume-floor-walk/trap.png`. Original 2FA5 runs its press and contact from Django stepping into the slot after repositioning. The renderer binds A945 to the displacement. Use `objects/floor_traps.c`. |
+| `objects/breakable.c` | 0038→4479, `resume-candlestick/lit.png`. ID B8CC uses F099 and its hit callback invokes the lighting script and brightens the doorway. Use `objects/light_fixtures.c`. |
