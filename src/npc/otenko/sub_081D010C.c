@@ -41,17 +41,17 @@ void sub_081D010C(struct OtenkoActor *npc, struct Msg081D010C *m)
     npc->targetAngle = ang;
     k = 0x24;
     zero = 0;
-    npc->stage = zero;
+    npc->stage = 0;
     do {
-        npc->stageEntered = zero;
+        npc->stageEntered = 0;
     } while (0);
     npc->state = k;
-    npc->timer = zero & 0xFFFFFFFFu;
+    npc->timer = 0;
     npc->commandEntered = 1;
     cb = Otenko_UpdateProjectedMove;
     npc->prevState = 0x21;
     npc->stateCallback = cb;
-    npc->stateFrame = zero;
+    npc->stateFrame = 0;
     npc->animationEntered = 1;
     npc->animationPhase = zero;
 }
