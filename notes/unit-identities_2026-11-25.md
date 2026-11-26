@@ -657,3 +657,36 @@ entrance 47. Use the `iron-armor-rematch` and `black-knight-dialogue`
 command files. GCL 1629 and 1639 give E043 type 1 and type 11 respectively.
 The Monster Book indexes resolve to #9891 (Iron Armor) and #9902 (Black
 Knight). `Armor_Create` and 0818A820 run for both.
+
+### White Forest loot deposits, quest barriers, ice boulders, and puzzle blocks
+
+Tags: objects, loot, quest barriers, White Forest, Trinity, F1F9, 3DB0, 377D, E02A
+
+Warp 0029 to 3905, entrance 7, story 95. Proc 3904 calls 1553, then 10801,
+creating F1F9 ID 5639 at (1856, 256, 832) with graphics 9385. From
+`review-jewels/arrived.ss`, use `review-quarries/commands.txt` to place
+Django nearby and repeat sword inputs. The attack path calls
+`CallbackPool_ApplyDamage` for slot 0200FC30, then
+`ActorGroup_CallMemberScript` for the same slot. Proc 1133 rolls its item
+drop and conditionally invokes 1138. Compare `intact.png`, `hit03.png` and
+`hit11.png`. Use a descriptive loot deposit name while the exact label
+remains unknown.
+
+Warp 0029 to 3931, entrance 7, story 95. Proc 3935 calls 1091, placing
+3DB0 ID E912 with graphics 474D. Ordinary sword contact ran the native
+contact callback. The break requires contact flag 0x200. In
+`review-trinity-release`, load the room state, stage Django near the prop,
+and write 1 to the watched task's `destroyRequested` byte. This stages
+the post-contact condition. The original game runs its shatter effect,
+dispatches proc 3845, and shows Trinity's acceptance in text #6834.
+`frozen.png`, `trinity.png`, and `dialogue.png` show the sequence.
+Other 3DB0 calls carry graphics 77CB and 77B3 and different quest callbacks.
+
+Warp 0029 to 3955, entrance 7, story 95. Proc 3952 creates the 377D
+ice boulder via 1176 and two E02A obstacles via 1059 and 1060. The
+`review-proximity` trace shows the 377D constructor load graphics 863A.
+The large blue boulder is visible at (896, cell height, 896).
+The obstacle constructor takes IDs 0EEC and 0EED with graphics 9D41.
+Proc 3953 centers on those obstacles and dispatches both removals when
+the switch runs. `review-blocks-close` reframes the room. The 6D69
+controller has a separate task, script key and slot representation.

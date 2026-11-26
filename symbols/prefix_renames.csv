@@ -18,3 +18,9 @@ BouncingObject_,BouncingBomb_,src/field/bouncing_object_pool,Nidhoggr’s grid a
 SceneInventory_,Shop_,src/menus/inventory_action_transitions / src/menus/inventory_transactions_and_catalogs / src/menus/inventory_values_and_display,The 744F weapons shop in 1929 runs all three ranges. Scope covers 97 symbols and excludes the same legacy prefix in other units.
 NamedObject_,MovingPlatform_,src/field/named_object,"0042→4808, A4FC ID 085F, B019 moving platform. Scoped to the route-platform unit."
 CellGate_,PassageBarrier_,src/field/cell_traversal_gates,"0042→4755, GCL 71BA. CellGate_TestPassage then TerrainModifiers_UnregisterCell on approach."
+ActorGroup_,LootDeposit_,src/field/actor_group,"0029→3905, F1F9 ID 5639; slot breaks and calls item-drop proc 1133."
+Pool184_,LootDepositPool_,src/field/actor_group,"F1F9 ID 5639 uses a slot in this pool, observed in 3905."
+CallbackPool_,LootDepositHit_,src/other/callback_pool,"0029→3905, F1F9 slot 0200FC30 passed to CallbackPool_ApplyDamage."
+BreakableProp_,QuestBarrier_,src/field/breakable_props,"0029→3931, 3DB0 ID E912 shatters and triggers the named Trinity sequence."
+RegionActor_,IceBoulder_,src/field/proximity_actor,"0029→3955, 377D at (896, y, 896) draws the blue 863A ice boulder."
+SceneObjects_,PuzzleBlocks_,src/field/scene_objects,"0029→3955, E02A IDs 0EEC and 0EED are puzzle obstacles using sprite 9D41. Scope this prefix to the E02A unit."
