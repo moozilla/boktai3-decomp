@@ -56,6 +56,22 @@ test('the best assigned gun frame uses Quick Change', () => {
     value: { kind: 'frame', id: 0, power: 10, cost: 3, done: true, method: 'quick change' } });
 });
 
+test('the free gun equips Luna before ranking the frame', () => {
+  const selection = { id: 9, power: 50, cost: 0 };
+  const lib = skill('gun', {}, {}, {
+    bags: () => ({ lenses: [1, 2] }), session: { snapshot: () => ({}) },
+    quickChange: function* (want) {
+      assert.deepEqual(want, { gun: true, lens: 1 });
+      return { done: true, frame: 1, lens: 1 };
+    },
+    weapon: () => ({ gun: true, lens: 1, frame: 9, energy: 2 }),
+  });
+  lib.equipBestFrame = function* () { return selection; };
+  assert.deepEqual(lib.equipEnergyFreeGun().next(), { done: true, value: {
+    done: true, gun: true, lens: 1, frame: 9, energy: 2, rankedFrame: selection,
+  } });
+});
+
 test('gun inventory navigation wraps past empty cells and honors the vertical option menu', () => {
   const { gunGridRoute } = skill('gun', {});
   const cells = Array(36).fill(0xff);

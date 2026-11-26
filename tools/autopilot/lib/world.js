@@ -827,6 +827,13 @@ exports.fight = function* (opts = {}) {
       if (opts.trace) opts.trace({ trance: changed, target: target.addr });
       if (changed) continue;
     }
+    if (target.boss === 'Hresvelgr' && !pr.triedFreeGun && !darkTrance &&
+        (weapon.energy < (frame?.cost ?? 3) || steps - pr.since >= 8)) {
+      pr.triedFreeGun = true;
+      const equip = yield* exports.equipEnergyFreeGun();
+      if (equip && opts.trace) opts.trace({ equip, target: target.addr });
+      if (equip?.done) { pr.since = steps; continue; }
+    }
     if (frame && weapon.energy < frame.cost && distance(target) > 512 && !pr.triedCharge) {
       pr.triedCharge = true;
       const charge = yield* exports.chargeEnergy(frame.cost, { stopIf: () => living().some((e) => distance(e) < 512) });
