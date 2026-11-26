@@ -37,11 +37,25 @@ The two original bitfield declarations had different type spellings and measured
 All three header dependents matched. The scoped linter reported six warnings and zero errors
 before and after.
 
-The full report at `build/structfamilies/REPORT.md` ranks the top fifty of 350 families and
+The full report at `build/structfamilies/REPORT.md` ranks the top fifty of 394 families and
 records 1,818 embedded-type findings.
 For `struct Player` it confirms `struct SceneInputWidget` at 0x8C and 0xEC from 12 and four
 call sites respectively. Some units use syntax the source parser cannot resolve. The catalog
 keeps those diagnostics, along with any layouts obtainable from declarations alone.
+
+## Nested member follow-up
+
+The scanner now carries evidence from related parents to compatible private types embedded
+at the same named member slot. The refreshed catalog grew from 350 to 394 families. It found
+two `SceneDistanceEntry` declarations through the `linked` array at offset 0xDF0 in their
+parents. Both units matched with the shared child header. A new scan of those units then
+produced a shared `SceneDistanceSet` header, and both units matched again. The linter counted
+six warnings and zero errors before and after across the three reviewed units.
+
+The wider parent proposal exposed a separate layout at 0xDF0 in `RatatoskOrbRelocation`.
+That unit uses an orb union, and the header it brings in conflicts with
+`SunOrb_GetPositionFromManager` declarations in the two distance units. The exact-match gate
+rolled back the wider proposal.
 
 ## Scan cost
 
@@ -50,4 +64,5 @@ compiler probe on the first pass and zero new probes on the cached pass. Compati
 share a probe and incompatible groups fall back to smaller groups or individual headers.
 On `src/grid_attack_actor.c`, three direct Clang preprocessing invocations took 5.304 seconds
 versus 10.161 through `cc`, with identical output. The final whole-tree refresh with cached
-probes took 1 minute 42 seconds at two jobs.
+probes took 1 minute 42 seconds at two jobs. The nested-evidence refresh took 3 minutes
+1 second and ranked the newly discovered families as well.
