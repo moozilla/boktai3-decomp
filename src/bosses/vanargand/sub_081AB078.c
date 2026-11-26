@@ -56,7 +56,7 @@ void Vanargand_UpdatePaletteLeap(struct VanargandPairAttack *p, s32 frame)
     if (complete(self) && savedFrame > 0x3C) {
         {
             struct VanargandDamagePart *part = &self->part;
-            part->state = 7;
+            part->sprite.frame = 7;
         }
         self->part.animation = 0;
         p->finished = 1;
