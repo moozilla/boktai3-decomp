@@ -402,3 +402,55 @@ the node copy after the scan, and changing local scope did not match.
 Both stock units keep their previously verified typed volatile
 implementation. See `build/hard-sites/registry/second-review/` and the
 two `build/matchsearch/TargetRegistry_*-second-review` stores.
+
+## 2026-11-26: Fragment sampler constructor
+
+An inline constructor taking a table parameter and returning a one-field
+descriptor emits a real early CLOBBER (UID 218, pseudo 95 in the
+inner-loop trial). CSE propagates the table from pseudo 94 into the
+constructor result. The CLOBBER survives cse2, but flow removes it
+because the output no longer uses the clobbered pseudo. The actual
+table still gets REG_EQUIV in local allocation. Using the descriptor
+from the preheader or inside each draw gives the same mismatch.
+Returning a two-field descriptor with both cursor and table changes
+the allocation further.
+
+A symbolic name for the table address matches if the existing type
+shift is retained. Removing the two active-field shifts via named
+array pointers, direct indexing, and incrementing flag cursors still
+misses. None of these remove a proved-zero report in matching code.
+See `build/hard-sites/fragment/second-review/`.
+
+## 2026-11-26: SpiralBurst phase and draw address
+
+Casting the initial halfword draw to `u8` produces the same code as
+the byte-pointer load in the symbolic draft. Splitting index advance
+from the table access, returning the sample address from a shared
+helper, and reusing one pointer for random and sine lookup all
+introduce additional differences. The plain symbolic draft is still
+416 of 428 bytes and the mask-copy placement remains unresolved.
+See `build/hard-sites/spiral/second-review/`.
+
+## 2026-11-26: Hresvelgr native action and mask placement
+
+Replacing the partial action struct with the native BossActionState
+and shrinking the following padding keeps the matching baseline
+exact. The clean symbolic draft still differs by two mask operands.
+Explicit entry-frame increment, setting the frame to one, and making
+the parity checks use tick directly all preserve the two differences.
+Passing the table mask as an explicit argument moves its literal ahead
+of the cursor load and introduces an extra move into r5. Writing the
+two cursor advances inline with a common index also misses. See
+`build/hard-sites/barrage/second-review/`. The production zero
+term remains pending an exact ordinary source shape.
+
+## 2026-11-26: GameState typed slot cursor
+
+An eight-byte array typedef for each jitter slot, followed by
+incrementing the slot pointer in place, gives the same single
+operand-order difference. Direct slot indexing changes more register
+operands. Indexing backward from the last slot using an inverted timer
+phase adds separate instructions. The signed subtraction experiment is
+still the only exact clean-lint candidate, and remains scratch because
+the displacement is negated solely for the immediate subtraction.
+See `build/hard-sites/game-state/second-review/`.
