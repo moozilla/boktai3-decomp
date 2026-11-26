@@ -71,11 +71,10 @@ static inline u8 ActorStatus_BodyFlags(struct ChaseActor *actor, u32 mask)
     return 0;
 }
 
-static inline void ActorStatus_ClearTrackingFlags(struct SceneActorReactionMotion *tracking,
+static inline void ActorStatus_ClearTrackingFlags(struct SceneActorChaseTracking *tracking,
                                                   u32 bits)
 {
-    u32 mask = ~bits;
-    tracking->flags &= mask;
+    tracking->flags &= ~bits;
 }
 
 static inline s16 ActorStatus_FlashRemaining(struct ChaseActor *actor)
