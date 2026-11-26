@@ -367,6 +367,7 @@ exports.interact = function* (x, z, opts = {}) {
   for (const goals of [near, across]) {
     const tried = new Set();
     for (let attempt = 0; attempt < 2 && goals.size > tried.size; attempt++) {
+      if (opts.stopIf?.()) return { done: false, reason: 'stopped' };
       const here = exports.cellOf(p.position.x, p.position.z);
       const left = new Set([...goals].filter((k) => !tried.has(k)));
       const path = left.has(here.join(',')) ? [here] : exports.findPath(grid, here, left);
@@ -374,6 +375,7 @@ exports.interact = function* (x, z, opts = {}) {
       const [sx, sz] = path[path.length - 1];
       tried.add(`${sx},${sz}`);
       const r = yield* exports.navigate([sx * 256 + 128, sz * 256 + 128], opts);
+      if (opts.stopIf?.()) return { done: false, reason: 'stopped' };
       if (!r.reached) { last = { done: false, reason: 'could not get there: ' + r.reason }; continue; }
       yield* exports.walkTo(x, z, { tolerance: 8, patience: 20, frames: 60 });  // face it
       const seen = new Map();
@@ -411,7 +413,7 @@ exports.collect = function* (x, z, opts = {}) {
   // an item actor (proc_1119/1120, chest or not) opens with A from a neighboring cell;
   // a plain floor pickup is taken by walking onto it
   const i = yield* exports.interact(x, z, opts);
-  if (JSON.stringify(exports.bags()) === before && i.reason !== 'no path') {
+  if (JSON.stringify(exports.bags()) === before && i.reason !== 'no path' && i.reason !== 'stopped') {
     yield* exports.walkTo(x, z, { tolerance: 16, patience: 30, frames: 90 });
     yield g.until(() => exports.message().open, 40);
     yield* exports.clearInterruptions(opts);
@@ -728,11 +730,10 @@ exports.targets = () => {
     const body = g.u32(e), flags = g.u32(e + 4), cb = g.u32(e + 8);
     if (!body) continue;
     const owner = g.u32(body + 60), fn = cb ? g.name(cb) : '';
-    let health = null;
-    if (flags & 0x10) health = g.s16(owner + 0x9c);
-    else if (/^Armor_ReceiveTargetEvent/.test(fn)) health = g.s16(owner + 0xb1c);
+    const armor = /^Armor_ReceiveTargetEvent/.test(fn) ? exports.armorCombatant(owner) : undefined;
+    const health = flags & 0x10 ? g.s16(owner + 0x9c) : null;
     out.push({ addr: owner, entry: e, enabled: !!(flags & 1), callback: fn, x: g.s16(body + 12), y: g.s16(body + 14), z: g.s16(body + 16),
-      health, alive: health === null ? !!(flags & 1) : health > 0 });
+      health, alive: health === null ? !!(flags & 1) : health > 0, ...armor });
   }
   return out;
 };
@@ -764,7 +765,7 @@ exports.fight = function* (opts = {}) {
   const progress = new Map(), living = exports.fightTargets, triedOtherWeapon = new Set();
   const initialGun = exports.weapon().gun;
   const initialLight = S.solar;
-  const hpSum = () => living().reduce((s, e) => s + Math.max(0, e.health) * (e.barrier ? 20 : 1), 0);
+  const hpSum = () => living().reduce((s, e) => s + Math.max(0, e.health) * (e.barrier ? 20 : 1) + (e.guard ?? 0) / 2, 0);
   const toward = (e) => {
     const dx = e.x - p.position.x, dz = e.z - p.position.z;
     const sx = Math.abs(dx) > 40 ? Math.sign(dx) : 0, sz = Math.abs(dz) > 40 ? Math.sign(dz) : 0;
@@ -774,7 +775,7 @@ exports.fight = function* (opts = {}) {
   let steps = 0;
   while (exports.where().scene === scene && p && life() > 0 && living().length && g.frameNo - start < (opts.frames ?? 6000)) {
     if (yield* exports.clearInterruptions(opts)) continue;
-    const distance = (e) => Math.hypot(e.x - p.position.x, e.z - p.position.z);
+    const distance = (e) => Math.hypot(e.x - p.position.x, e.z - p.position.z, 2 * (e.y - p.position.y));
     const target = living().sort((a, b) => Number(Boolean(b.barrier)) - Number(Boolean(a.barrier)) || distance(a) - distance(b))[0];
     const tk = toward(target);
     const weapon = exports.weapon();
@@ -809,7 +810,7 @@ exports.fight = function* (opts = {}) {
     const tactics = DIRS8.map((k) => [[k, 12]]);
     if (weapon.gun) tactics.push(...exports.gunTactics(tk));
     else tactics.push([['b', 2], [0, 10]], ...(tk ? [[[tk, 6], ['b', 2], [0, 4]]] : []));
-    if (target.barrier && tk && !weapon.gun) tactics.push([[tk, 4], [tk + '+b', 4], [0, 16]]);
+    if ((target.barrier || target.boss) && tk && !weapon.gun) tactics.push([[tk, 4], [tk + '+b', 4], [0, 16]]);
     const wait = exports.combatWait(target);
     if (target.boss || wait) tactics.push([[0, wait || 18]]);
     const root = S.snapshot(), hp0 = hpSum(), life0 = life();
@@ -833,7 +834,12 @@ exports.fight = function* (opts = {}) {
     steps++;
     // Some targets are scripted actors or invulnerable during this encounter.
     if (!target.boss && !target.barrier && steps - pr.since > 40) { ignored.add(target.addr); if (opts.trace) opts.trace({ ignore: target.addr, category: target.category }); }
-    if (opts.trace && steps % 10 === 0) opts.trace({ fight: steps, hp: hpSum(), life: life(), enemies: living().length });
+    if (opts.trace && steps % 10 === 0) {
+      const enemies = living();
+      const hp = enemies.reduce((sum, enemy) => sum + enemy.health, 0);
+      const guard = enemies.reduce((sum, enemy) => sum + (enemy.guard ?? 0), 0);
+      opts.trace({ fight: steps, hp, guard, ...exports.where(), enemies: enemies.length });
+    }
   }
   S.setSolar(initialLight);
   if (exports.where().scene === scene && life() > 0 && exports.weapon().gun !== initialGun)

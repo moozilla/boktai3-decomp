@@ -139,6 +139,7 @@ const GOALS = {
     const destination = +opt('--until-scene', -1), routeGoal = +opt('--goal', destination);
     let prev, keyGoal;
     const failedKeyRooms = new Set();
+    const bossActive = () => L.fightTargets().some((target) => target.boss || target.barrier);
     for (let rooms = 0; rooms < limit; rooms++) {
       const doorsHere = (resolve = true) => {
         const doors = stageOf(L.where().scene).doors, hub = L.hub();
@@ -264,11 +265,13 @@ const GOALS = {
       if (keyGoal && L.hasItem(keyGoal.item)) keyGoal = undefined;
       const pickups = stageOf(here).items.filter((it) => !keyGoal || (it.category === 0 && it.item === keyGoal.item));
       for (const it of pickups.filter((it) => !TRIED.has(`${here}:${it.x},${it.z}`))) {
+        if (bossActive()) break;
         TRIED.add(`${here}:${it.x},${it.z}`);
-        const c = yield* L.collect(it.x, it.z, { avoid: stageOf(here).doors.map((d) => d.box), trace: (e) => event({ skill: 'nav', ...e }) });
+        const c = yield* L.collect(it.x, it.z, { avoid: stageOf(here).doors.map((d) => d.box), stopIf: bossActive,
+          trace: (e) => event({ skill: 'nav', ...e }) });
         event({ skill: 'collect', item: it.name || `${it.category}:${it.item}`, x: it.x, z: it.z, ...c });
-        if (c.reason === 'no path') TRIED.delete(`${here}:${it.x},${it.z}`);  // another part of the room: next visit
-        if (L.where().scene !== here) break;
+        if (c.reason === 'no path' || c.reason === 'stopped') TRIED.delete(`${here}:${it.x},${it.z}`);
+        if (L.where().scene !== here || c.reason === 'stopped') break;
       }
       if (L.where().scene !== here) { rooms--; continue; }
       visited.add(here);

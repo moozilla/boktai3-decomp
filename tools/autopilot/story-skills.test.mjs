@@ -100,6 +100,16 @@ test('the vampire model uses signed health and the source sunlight flag', () => 
   assert.deepEqual(vampireTargets(), []);
 });
 
+test('armor targets model damage to the guard and the contact cooldown', () => {
+  const fields = { 0xb1c: 240, 0xb20: 65, 0xb2c: 9, 0xb32: 2 };
+  const read = (addr) => fields[addr - 0x02010000] ?? 0;
+  const { armorCombatant } = skill('armor', { u16: read, s16: read });
+  assert.deepEqual(armorCombatant(0x02010000), { boss: 'Armor', health: 240, alive: true, hitLock: 9, guard: 65 });
+  fields[0xb32] = 0x80;
+  assert.equal(armorCombatant(0x02010000).alive, false);
+  assert.equal(armorCombatant(0x02010000).guard, 0);
+});
+
 test('curtain segments are targets only while standing and have hit cooldowns', () => {
   const lists = Array.from({ length: 9 }, () => ({ head: null }));
   lists[8].head = { $addr: 0x02010000, flags: 0, update: 0x0801324d, next: null };
