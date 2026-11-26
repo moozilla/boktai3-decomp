@@ -8,6 +8,7 @@
 #include "scene/actor/scene_actor_behavior.h"
 #include "scene/actor/scene_actor_reaction.h"
 #include "scene/motion/scene_actor_turn.h"
+#include "scene/motion/scene_actor_route.h"
 #include "engine/video/display_sequence.h"
 #include "scene/actor/scene_actor_reset.h"
 #include "engine/engine.h"
@@ -792,11 +793,11 @@ void SceneActorControl_UpdateRouteResponse(struct ChaseActor *s)
     if (entered) {
         SceneActorChase_SetControl(s, s->base.onEntry, 2);
     } else if (Peek(s)) {
-        u8 *group = (u8 *)s + 0x3D4;
+        struct SceneActorChaseGroup *group = &s->group;
         void *fn;
         u32 kind;
         SceneActorChase_SetState(s, 0, 0, 12);
-        fn = *(void **)(group + 0x48);
+        fn = group->common.gate.control;
         kind = 26;
         s->base.field2B2 = 1;
         s->base.stepDone = entered;
@@ -816,9 +817,7 @@ void SceneActorControl_UpdateRouteResponse(struct ChaseActor *s)
 
 // confidence=low: spider action tick; restores entry state, picks a route or delayed recovery each frame.
 
-struct S080A48E0;
-
-void Spider_SelectRandomEntry(struct S080A48E0 *p);
+void Spider_SelectRandomEntry(struct SceneActorRouteCursor *p);
 
 s32 SceneActorPlacement_TriggerTetherAction(struct ChaseActor *a);
 
@@ -841,7 +840,7 @@ void Spider_UpdateIdleWander(struct ChaseActor *a)
         if (SceneActorChase_Test(ctx->flags62C, four)) {
             if ((u8)SceneActor_IsWithinTetherRange(a, 0x40, 0x40)) {
                 a->base.field2C2 = 0x40;
-                Spider_SelectRandomEntry(group + 0x74);
+                Spider_SelectRandomEntry((void *)(group + 0x74));
                 SceneActorMovement_ResolveRoutePosition(a);
                 ctx->recoveryDelay = 0;
                 Chase_SetState(a, 0, 0, 15);
@@ -850,7 +849,7 @@ void Spider_UpdateIdleWander(struct ChaseActor *a)
                 SceneActorPlacement_TriggerTetherAction(a);
             }
         } else if ((s32)a->base.counter2AC > 60) {
-            Spider_SelectRandomEntry(group + 0x74);
+            Spider_SelectRandomEntry((void *)(group + 0x74));
             SceneActorMovement_ResolveRoutePosition(a);
             if (a->base.paletteOffset == 0) {
                 if ((ParticleRandom_ReadDirectSample(gRandomTable) & 3) != 0) {
@@ -1582,7 +1581,7 @@ void Spider_SelectRouteEntryAwayFromTarget(struct ChaseActor *actor)
     u8 *group = (u8 *)(&actor->group.common);
     struct RouteCursor *route = (struct RouteCursor *)(group + 0x74);
     u8 selected = 0;
-    struct ChaseTarget *t;
+    struct SceneActorChaseTarget *t;
     struct ContactPosition dir;
     struct ContactPosition delta;
     u8 angle;
@@ -1590,7 +1589,7 @@ void Spider_SelectRouteEntryAwayFromTarget(struct ChaseActor *actor)
     s32 i;
     u8 found;
 
-    t = *((struct ChaseTarget **)(((u8 *)actor) + 0xDC));
+    t = actor->base.tracking.target;
     angle = Math_Atan2(t->position.x - actor->base.body.position.x,
                        t->position.z - actor->base.body.position.z);
     dir.x = (gUnk_086149C4[(angle + 64) & 255] * 10) >> 12;
@@ -1612,7 +1611,7 @@ void Spider_SelectRouteEntryAwayFromTarget(struct ChaseActor *actor)
     }
 
     if (!found) {
-        Spider_SelectRandomEntry(group + 0x74);
+        Spider_SelectRandomEntry((void *)(group + 0x74));
     } else {
         route->index = selected;
         route->unk3 = 0;
@@ -1622,24 +1621,17 @@ void Spider_SelectRouteEntryAwayFromTarget(struct ChaseActor *actor)
 
 s32 Mod(s32, s32);
 
-struct S080A48E0 {
-    u8 pad0[2];
-    u8 index;
-    u8 unk3;
-    u8 *data;
-    u8 *entry;
-};
-
-void Spider_SelectRandomEntry(struct S080A48E0 *p)
+void Spider_SelectRandomEntry(struct SceneActorRouteCursor *p)
 {
-    struct S080A48E0 *q = p;
+    struct SceneActorRouteCursor *q = p;
     u8 n;
-    n = Mod(Random(), *p->data);
-    if (n == p->index)
-        n = Mod(n + 1, *p->data);
-    q->index = n;
-    q->unk3 = 0;
-    q->entry = Path_GetPointData(q->data) + q->index * 8;
+    n = Mod(Random(), p->definition->pointCount);
+    if (n == p->pointIndex)
+        n = Mod(n + 1, p->definition->pointCount);
+    q->pointIndex = n;
+    q->unknown3 = 0;
+    q->point = (void *)(Path_GetPointData((void *)q->definition) +
+                       q->pointIndex * sizeof(*q->point));
 }
 
 extern const u16 gUnk_08605F30[];
