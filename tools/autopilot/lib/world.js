@@ -468,13 +468,17 @@ exports.weapon = () => {
   return { slot, gun: slot > 7, frame, lens: li >= 0 ? s16(0x828 + li * 2) : -1, energy: p ? p.currentStatB : 0, energyMax: p ? p.maximumStatB : 0 };
 };
 
-// Quick Change (Otenko 8759/8893: hold SELECT and press R to swap the sword and the gun,
-// SELECT + B to swap the lens) until the weapon matches: { gun: bool, lens: id }.
+// Quick Change (Otenko 8759/8893: SELECT + R cycles equipped weapons and
+// frames, SELECT + B cycles lenses) until the requested loadout is active.
 exports.quickChange = function* (want) {
-  for (let i = 0; i < 12; i++) {
+  const limit = want.frame === undefined ? 12 : 16;
+  for (let i = 0; i <= limit; i++) {
     const w = exports.weapon();
-    const key = want.gun !== undefined && w.gun !== want.gun ? 'r' : want.lens !== undefined && w.gun && w.lens !== want.lens ? 'b' : null;
+    const differentWeapon = want.gun !== undefined && w.gun !== want.gun;
+    const differentFrame = want.frame !== undefined && w.frame !== want.frame;
+    const key = differentWeapon || differentFrame ? 'r' : want.lens !== undefined && w.gun && w.lens !== want.lens ? 'b' : null;
     if (!key) return { done: true, ...w };
+    if (i === limit) break;
     yield g.press('select', 6);
     yield g.press('select+' + key, 4);
     yield g.press('select', 6);
