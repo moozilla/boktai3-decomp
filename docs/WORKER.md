@@ -309,6 +309,9 @@ The generated header can retain byte-aligned bitfields that occupy whole bytes. 
 probe checks each emitted bitfield's position and width. Sub-byte fields need an allocation-group
 review before the tool can generate a header for them.
 
+An aggregate layout conflict lists the direct declarations alongside the flattened field votes.
+Use this evidence to review overlays, such as an array and a union that cover the same bytes.
+
 Add `--apply` in a writable worker checkout to try the proposals. Each unit goes through
 `keepcheck.py`, and the tool checks every dependent of a newly written header. The output
 lists units held back by layout changes, ambiguous member uses, or compiler differences.

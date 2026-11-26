@@ -147,6 +147,29 @@ void F(struct Owner *p, int n) {
 
 @unittest.skipUnless(Path(lm.AGBCC).is_file(), "agbcc required for layout probes")
 class CompilerTests(unittest.TestCase):
+    def test_layout_rows_report_direct_shapes_before_the_first_named_leaf(self):
+        entry = TYPES + "struct Entry { u8 pad0[4]; u16 phase; };\n"
+        array = entry + "struct Host { unsigned state; struct Entry linked[2]; };\n"
+        union = entry + "union Slots { struct Entry items[2]; };\n" \
+            "struct Host { unsigned state; union Slots orbs; };\n"
+        views = [measure(src, path)[f"{path}:struct Host"]
+                 for src, path in ((array, "src/a.c"), (array, "src/b.c"), (union, "src/c.c"))]
+
+        rows = {row["offset"]: row for row in families.layout_rows(views)}
+        self.assertEqual(rows[4]["votes"], [])
+        self.assertIn("aggregate layout", rows[4]["conflicts"])
+        self.assertEqual(rows[4]["member_votes"], [("linked", "struct Entry [2]", 2),
+                                                  ("orbs", "union Slots", 1)])
+
+    def test_layout_rows_accept_union_alternatives_shared_by_every_copy(self):
+        entry = TYPES + "struct Entry { u16 phase; }; typedef struct Entry EntryAlias; "
+        union = "union Slot { %s item; unsigned word; };"
+        views = [measure(entry + union % spell, path)[f"{path}:union Slot"]
+                 for spell, path in (("struct Entry", "src/a.c"), ("EntryAlias", "src/b.c"))]
+        row = families.layout_rows(views)[0]
+        self.assertNotIn("aggregate layout", row["conflicts"])
+        self.assertNotIn("member_votes", row)
+
     def test_embedded_members_inherit_evidence_only_at_the_same_slot(self):
         def host(path, child_fields, member):
             return measure(TYPES + f"""

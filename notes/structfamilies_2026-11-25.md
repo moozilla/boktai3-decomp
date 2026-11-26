@@ -57,6 +57,22 @@ That unit uses an orb union, and the header it brings in conflicts with
 `SunOrb_GetPositionFromManager` declarations in the two distance units. The exact-match gate
 rolled back the wider proposal.
 
+## Orb overlay follow-up
+
+The report now lists direct member alternatives at aggregate layout conflicts. At 0xDF0 it
+shows two declarations of `linked` as a four-element `SceneDistanceEntry` array and one
+declaration of `orbs` as `union RatatoskLinkedOrbs`.
+
+A manual scratch trial gave the distance and relocation layouts separate members of the
+same 0x60-byte union. The 0xF30-byte shared parent is named `struct RatatoskOrbDistanceView`
+because the canonical Ratatosk header already describes that region differently. The
+distance routines use the anchor at 0x36C and the typed declaration of
+`SunOrb_GetPositionFromManager` from `sun_orb_effect.h`.
+Stock agbcc verified the layout. All three units and header dependents matched
+(081F2E88, 081F2EE0, 081F8988), with six warnings and zero errors before and after in the
+scoped linter. The generated scratch header is
+`build/structmerge_trial/include/recovered/ratatosk_orb_distance_view.h`.
+
 ## Scan cost
 
 The argument prefilter reduced scan inputs from 4,554 to 3,584. A two-header test uses one

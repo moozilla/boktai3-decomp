@@ -462,23 +462,49 @@ def family_components(private, records, buckets, edges):
     return sorted(sorted(c) for c in components.values() if len(c) > 1)
 
 
+def direct_shape(member):
+    kind = member["base"]
+    if kind == "aggregate":
+        tag = (member.get("record") or member["ctype"]).rsplit(":", 1)[-1].split(" ", 1)[0]
+        if tag in {"struct", "union"}:
+            kind = tag
+    return kind, member["array"], member["size"], member.get("esize")
+
+
 def layout_rows(views):
     """Count one vote per declaration for each name/type at each byte offset."""
     cells = defaultdict(dict)
     ends = defaultdict(list)
+    direct = defaultdict(dict)
     for view in views:
         for leaf in view["known"]:
             cells[leaf["off"]].setdefault(view["id"], []).append(leaf)
             ends[leaf["off"] + leaf["size"]].append(leaf)
+        for member in view["members"]:
+            if member.get("off") is not None and member.get("size") and not opaque(member):
+                direct[member["off"]].setdefault(view["id"], []).append(member)
+    member_conflicts = {}
+    for off, copies in direct.items():
+        if len(copies) < 2:
+            continue
+        members = [m for declarations in copies.values() for m in declarations]
+        if not any(m["base"] == "aggregate" for m in members):
+            continue
+        shapes = {frozenset(map(direct_shape, declarations)) for declarations in copies.values()}
+        if len(shapes) > 1:
+            votes = Counter()
+            for declarations in copies.values():
+                votes.update({(m["name"], m["ctype"]) for m in declarations})
+            member_conflicts[off] = [(name, ctype, votes[name, ctype]) for name, ctype in sorted(votes)]
     active = Counter()
     flags = lambda lf: (bool(lf["array"]), "." in lf["name"])
     rows = []
-    for off in sorted(cells.keys() | ends.keys()):
+    for off in sorted(cells.keys() | ends.keys() | member_conflicts.keys()):
         for lf in ends.get(off, ()):
             active[flags(lf)] -= 1
-        if off not in cells:
+        if off not in cells and off not in member_conflicts:
             continue
-        cells_at_offset = cells[off]
+        cells_at_offset = cells.get(off, {})
         votes = Counter()
         values = [lf for leaves in cells_at_offset.values() for lf in leaves]
         for leaves in cells_at_offset.values():
@@ -496,8 +522,12 @@ def layout_rows(views):
         if any(active.values()):
             conflicts.append("overlapping span")
         active.update(flags(lf) for lf in values)
-        rows.append({"offset": off, "votes": [(n, t, v) for (n, t), v in sorted(votes.items())],
-                     "conflicts": conflicts})
+        row = {"offset": off, "votes": [(n, t, v) for (n, t), v in sorted(votes.items())],
+               "conflicts": conflicts}
+        if off in member_conflicts:
+            conflicts.append("aggregate layout")
+            row["member_votes"] = member_conflicts[off]
+        rows.append(row)
     return rows
 
 
@@ -642,9 +672,13 @@ def family_lines(family):
     for row in f["rows"]:
         off = row["offset"]
         votes = ", ".join(f"`{n}` `{t}` ({v})" for n, t, v in row["votes"]).replace("|", r"\|")
+        conflicts = ", ".join(row["conflicts"])
+        if row.get("member_votes"):
+            members = ", ".join(f"`{n}` `{t}` ({v})" for n, t, v in row["member_votes"]).replace("|", r"\|")
+            conflicts += f" ({members})"
         observations = ", ".join(f"{'word' if s is None else 's' if s else 'u'}{w * 8} × {count}"
                                  for (o, w, s), count in sorted(loads.items()) if o == off)
-        rows.append(f"| `{off:#x}` | {votes} | {', '.join(row['conflicts'])} | {observations} |")
+        rows.append(f"| `{off:#x}` | {votes} | {conflicts} | {observations} |")
     return rows + [""]
 
 
