@@ -1,0 +1,16 @@
+08031FA0 text-wide-glyph-return
+
+TextState_AdvanceCursor preserves its incoming state pointer in r0.
+The last width store uses r1.
+
+The explicit form changed the ROM bytes. The guarded form passed the unit ROM check.
+
+--- a/src/fn/sub_08031FA0.c
++++ b/src/fn/sub_08031FA0.c
+@@ -25,3 +25,6 @@
+     TextState_AdvanceCursor(p, 1);
+     p->lastWidth = 1;
++#ifdef UBFIX
++    return (int)p; // preserve the inherited GBA return value
++#endif
+ }
