@@ -7,10 +7,13 @@ import json
 from pathlib import Path
 import re
 import subprocess
-
-from source_layout import report_path
+import sys
 
 ROOT = Path(__file__).resolve().parents[3]
+TOOLS = str(ROOT / "tools")
+if TOOLS not in sys.path:
+    sys.path.insert(0, TOOLS)
+from source_layout import report_path
 AGBCC = ROOT / "build/tools/agbcc/agbcc"
 TOKEN = re.compile(r"([A-Za-z_]\w*)((?:\[[0-9]{1,4}\]){0,3})", re.ASCII)
 OPERATOR = re.compile(r"->|\.")

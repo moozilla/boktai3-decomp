@@ -13,6 +13,7 @@ checks the layout of the whole ROM); this is the fast inner loop.
 
 The scratch folder (build/check/run-*: object, ELF, comparison.json, full.diff)
 is removed on exit; pass --keep to leave it for tools/anchordiff.py.
+Set BOKTAI3_CHECK_DIR to isolate artifacts from another check run.
 """
 import argparse
 import csv
@@ -280,7 +281,7 @@ def main():
         src = resolve(a.src)
     except ValueError as error:
         ap.error(str(error))
-    parent = os.path.join(ROOT, "build", "check")
+    parent = os.path.join(ROOT, os.environ.get("BOKTAI3_CHECK_DIR", "build/check"))
     os.makedirs(parent, exist_ok=True)
     work = os.path.relpath(tempfile.mkdtemp(prefix="run-", dir=parent), ROOT)
     try:
