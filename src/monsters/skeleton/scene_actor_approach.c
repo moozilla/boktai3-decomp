@@ -20,41 +20,16 @@ void Vorn_SpawnHazard(struct ChaseActor *, s32);
 
 void Skeleton_SelectDistanceReaction(struct ChaseActor *);
 
-static inline u8 TakeReady(struct ChaseActor *actor)
-{
-    if (actor->base.field2B1) {
-        actor->base.field2B1 = 0;
-        return 1;
-    }
-    return 0;
-}
-
-static inline void SetCategoryControl(struct ChaseActor *actor, void *fn)
-{
-    u8 code = 3;
-    actor->base.field2B2 = 1;
-    actor->base.stepDone = 0;
-    actor->base.controlKind = code;
-    actor->base.target = fn;
-    actor->base.field2C8 = 0;
-    {
-        u32 *flags = &actor->base.pendingControlFlags;
-        s32 mask = -2;
-        *flags &= mask;
-    }
-    actor->base.pendingControl = 0;
-}
-
 void SceneActorApproach_RunCategoryAction(struct ChaseActor *actor)
 {
     struct SceneActorApproachCategoryContext *context = actor->base.context;
-    if (TakeReady(actor)) {
+    if (SceneActorControl_TakeStateEntry(actor)) {
         SceneActorReaction_EnableMotionFlags(0x100, &actor->base.motionFlags);
         {
             if (actor->base.category == MONSTER_CATEGORY_SKELETON_ARMED)
-                SetCategoryControl(actor, SceneActorReaction_TickQueuedContact);
+                SceneActorChase_SetControl(actor, SceneActorReaction_TickQueuedContact, 3);
             else
-                SetCategoryControl(actor, SceneActorReaction_TickContactAnimation);
+                SceneActorChase_SetControl(actor, SceneActorReaction_TickContactAnimation, 3);
         }
         Vorn_SpawnHazard(actor, 1);
         context->timer = context->duration;
@@ -75,28 +50,12 @@ struct SceneActorApproachTimedContext {
 
 void Skeleton_UpdateAttackWindup(void);
 
-static inline void SetTimedControl(struct ChaseActor *actor, void *fn)
-{
-    u8 code = 0x27;
-    actor->base.field2B2 = 1;
-    actor->base.stepDone = 0;
-    actor->base.controlKind = code;
-    actor->base.target = fn;
-    actor->base.field2C8 = 0;
-    {
-        u32 *flags = &actor->base.pendingControlFlags;
-        s32 mask = -2;
-        *flags &= mask;
-    }
-    actor->base.pendingControl = 0;
-}
-
 void SceneActorApproach_RunTimedAction(struct ChaseActor *actor)
 {
     struct SceneActorApproachTimedContext *context = actor->base.context;
-    if (TakeReady(actor)) {
+    if (SceneActorControl_TakeStateEntry(actor)) {
         SceneActorReaction_EnableMotionFlags(0x100, &actor->base.motionFlags);
-        SetTimedControl(actor, Skeleton_UpdateAttackWindup);
+        SceneActorChase_SetControl(actor, Skeleton_UpdateAttackWindup, 0x27);
         context->timer = context->duration;
         Vorn_SpawnHazard(actor, 2);
     }
@@ -116,28 +75,12 @@ struct SceneActorApproachAlternateContext {
 
 void SceneActorReaction_TickMultiHitAnimation(void);
 
-static inline void SetAlternateControl(struct ChaseActor *actor, void *fn)
-{
-    u8 code = 0x2B;
-    actor->base.field2B2 = 1;
-    actor->base.stepDone = 0;
-    actor->base.controlKind = code;
-    actor->base.target = fn;
-    actor->base.field2C8 = 0;
-    {
-        u32 *flags = &actor->base.pendingControlFlags;
-        s32 mask = -2;
-        *flags &= mask;
-    }
-    actor->base.pendingControl = 0;
-}
-
 void SceneActorApproach_RunAlternateTimedAction(struct ChaseActor *actor)
 {
     struct SceneActorApproachAlternateContext *context = actor->base.context;
-    if (TakeReady(actor)) {
+    if (SceneActorControl_TakeStateEntry(actor)) {
         SceneActorReaction_EnableMotionFlags(0x100, &actor->base.motionFlags);
-        SetAlternateControl(actor, SceneActorReaction_TickMultiHitAnimation);
+        SceneActorChase_SetControl(actor, SceneActorReaction_TickMultiHitAnimation, 0x2B);
         context->timer = context->duration;
         Vorn_SpawnHazard(actor, 3);
     }
@@ -161,28 +104,12 @@ struct SceneActorApproachCaptureContext {
 
 void Skeleton_BeginHomingBurst(void);
 
-static inline void SetCaptureControl(struct ChaseActor *actor, void *fn)
-{
-    u8 code = 0x2C;
-    actor->base.field2B2 = 1;
-    actor->base.stepDone = 0;
-    actor->base.controlKind = code;
-    actor->base.target = fn;
-    actor->base.field2C8 = 0;
-    {
-        u32 *flags = &actor->base.pendingControlFlags;
-        s32 mask = -2;
-        *flags &= mask;
-    }
-    actor->base.pendingControl = 0;
-}
-
 void SceneActorApproach_CaptureTargetAndRunAction(struct ChaseActor *actor)
 {
     struct SceneActorApproachCaptureContext *context = actor->base.context;
-    if (TakeReady(actor)) {
+    if (SceneActorControl_TakeStateEntry(actor)) {
         SceneActorReaction_EnableMotionFlags(0x100, &actor->base.motionFlags);
-        SetCaptureControl(actor, Skeleton_BeginHomingBurst);
+        SceneActorChase_SetControl(actor, Skeleton_BeginHomingBurst, 0x2C);
         context->destination = actor->base.tracking.target->position;
         context->timer = context->duration;
         Vorn_SpawnHazard(actor, 2);
