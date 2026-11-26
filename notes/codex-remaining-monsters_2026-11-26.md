@@ -225,3 +225,19 @@ writes their position offsets directly.
 
 All thirteen changed units matched with the stock compiler. The printed
 warning and weighted-use totals are unchanged.
+
+## Popbud, Pollen Flower, and Ooze follow-up
+
+Popbud uses its native defeat fields, the shared script argument record,
+and a direct animation-completion test. The direct sprite flag pointer
+changes the initializer's allocation. Pollen Flower passes its typed
+playback state directly. A plain reverse palette loop introduces a
+separate loop-index initialization and decrement in the ROM comparison.
+
+Ooze indexes its eight-delay array and uses the existing playback
+operation for all three attack phases. The indexed read keeps the original
+count guard. Collapsing the guard into a single positive test changes
+the emitted branches.
+
+All five changed units matched. Printed warnings and weighted uses are
+unchanged across these objects.

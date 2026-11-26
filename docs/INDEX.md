@@ -294,7 +294,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [notes/codex-high.md](../notes/codex-high.md) | Codex high: task 0808AF38 | #matching #ghoul #slime #register-pinning | 244 |
 | [notes/codex-low.md](../notes/codex-low.md) | Task 080D812C — 2026-10-20 | #matching #dog | 376 |
 | [notes/codex-medium.md](../notes/codex-medium.md) | Codex medium worker: task 080D6FDC | #matching #scene-actor #terrain #mummy #dog | 476 |
-| [notes/codex-remaining-monsters_2026-11-26.md](../notes/codex-remaining-monsters_2026-11-26.md) | Remaining monster state and type recovery | #monster #types #matching #phase3 | 12 |
+| [notes/codex-remaining-monsters_2026-11-26.md](../notes/codex-remaining-monsters_2026-11-26.md) | Remaining monster state and type recovery | #monster #types #matching #phase3 | 13 |
 | [notes/collision-process-pairs-round9.md](../notes/collision-process-pairs-round9.md) | Collision_ProcessPairs |  | 0 |
 | [notes/compiler-debugger-2026-10-23.md](../notes/compiler-debugger-2026-10-23.md) | Compiler debugger: first session (2026-10-23) | #matching #tooling #regalloc | 12 |
 | [notes/contact-actor-pool_2026-10-14.md](../notes/contact-actor-pool_2026-10-14.md) | Contact actor pool setup and display (tentative) | *#actors* | 7 |
