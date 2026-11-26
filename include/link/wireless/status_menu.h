@@ -39,7 +39,7 @@ void SpriteOam_QueueProjectedSprites(void);
 void Sprite_RenderScaledList(void);
 void sub_08219624(void);
 void *Script_GetTextSourcePc(void);
-void Widget_InitLinked(void *, void *, int, int, int, int, int, void *);
+void AnimSprite_InitLinked(void *, void *, int, int, int, int, int, void *);
 struct WirelessStatusMenu *WirelessStatusMenu_Get(void);
 void WirelessStatusMenu_InitDisplay(struct WirelessStatusMenu *menu);
 void WirelessStatusMenu_LoadPrimaryBackground(struct WirelessStatusMenu *menu, u32 index);

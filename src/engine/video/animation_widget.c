@@ -1,7 +1,7 @@
 #define Anim_FindGlyphEntryById     sub_082196FC
 #define Anim_RemoveAllInCurrentList sub_082195F8
 #define Blend_Disable               sub_082195AC
-#include "engine/video/animation_widget.h"
+#include "engine/video/anim_sprite_glyph.h"
 #include "engine/video/render.h"
 #include "engine/video/display_resource.h"
 
@@ -77,9 +77,9 @@ s32 ResourceHeader_Relocate(void *destination, void *source)
     return 0;
 }
 
-struct WidgetGlyphEntry *Anim_FindGlyphEntryById(struct AnimSpriteResource *table, u16 id)
+struct AnimSpriteGlyph *Anim_FindGlyphEntryById(struct AnimSpriteResource *table, u16 id)
 {
-    struct WidgetGlyphEntry *entry = table->glyphs;
+    struct AnimSpriteGlyph *entry = table->glyphs;
     s32 i;
     for (i = 0; i < table->glyphCount; i++) {
         if (entry->kind == id)
@@ -89,10 +89,10 @@ struct WidgetGlyphEntry *Anim_FindGlyphEntryById(struct AnimSpriteResource *tabl
     return NULL;
 }
 
-s32 Anim_SelectWidgetGlyph(struct AnimSprite *widget, struct AnimSpriteResource *resource,
+s32 AnimSprite_SelectGlyph(struct AnimSprite *widget, struct AnimSpriteResource *resource,
                            u16 index)
 {
-    struct WidgetGlyphEntry *entry = resource->glyphs + index;
+    struct AnimSpriteGlyph *entry = resource->glyphs + index;
     if (entry == 0)
         return -1;
     widget->glyphKind = entry->kind;
@@ -115,11 +115,11 @@ s32 Anim_SelectWidgetGlyph(struct AnimSprite *widget, struct AnimSpriteResource 
     return 0;
 }
 
-s32 Anim_InitPositionedWidget(struct AnimSprite *widget, void *resource, u16 glyph, u32 flags,
+s32 AnimSprite_InitAtPosition(struct AnimSprite *widget, void *resource, u16 glyph, u32 flags,
                               u8 attributeA, u8 mode, u8 duration,
                               const struct ContactPosition *position)
 {
-    if (Anim_SelectWidgetGlyph(widget, resource, glyph) < 0)
+    if (AnimSprite_SelectGlyph(widget, resource, glyph) < 0)
         return -1;
     widget->stamp = gDefaultAnimFlags;
     widget->flags |= flags;
@@ -135,7 +135,7 @@ s32 Anim_InitPositionedWidget(struct AnimSprite *widget, void *resource, u16 gly
 s32 Anim_LoadKeyframe(struct AnimSprite *widget, struct AnimSpriteResource *resource,
                       u16 glyph, u8 mode)
 {
-    if (Anim_SelectWidgetGlyph(widget, resource, glyph) < 0)
+    if (AnimSprite_SelectGlyph(widget, resource, glyph) < 0)
         return -1;
     widget->stamp = gDefaultAnimFlags;
     widget->mode = mode;
@@ -144,7 +144,7 @@ s32 Anim_LoadKeyframe(struct AnimSprite *widget, struct AnimSpriteResource *reso
 
 void Anim_LinkToList(void *, u32);
 
-s32 Widget_InitLinked(struct AnimSprite *widget, void *resource, u16 glyph, u32 flags,
+s32 AnimSprite_InitLinked(struct AnimSprite *widget, void *resource, u16 glyph, u32 flags,
                       u8 attributeA, u8 mode, u8 duration,
                       const struct ContactPosition *position)
 {
@@ -180,7 +180,7 @@ s32 Widget_InitLinked(struct AnimSprite *widget, void *resource, u16 glyph, u32 
         widget->palette = zero;
         widget->tileData = zero;
         widget->extraData = zero;
-        Anim_InitPositionedWidget(widget, resource, glyph, flags, attributeA, mode,
+        AnimSprite_InitAtPosition(widget, resource, glyph, flags, attributeA, mode,
                                   duration, &initialPosition);
         gDefaultAnimFlags++;
         if (gDefaultAnimFlags == 0xFFFF)
@@ -195,7 +195,7 @@ s32 Widget_InitLinked(struct AnimSprite *widget, void *resource, u16 glyph, u32 
     return -1;
 }
 
-s32 Widget_InitCleared(struct AnimSprite *widget, void *resource, u16 glyph, u32 flags,
+s32 AnimSprite_InitCleared(struct AnimSprite *widget, void *resource, u16 glyph, u32 flags,
                        u8 attributeA, u8 mode, u8 duration, void *position)
 {
     u32 zero = widget->active;
@@ -223,7 +223,7 @@ s32 Widget_InitCleared(struct AnimSprite *widget, void *resource, u16 glyph, u32
         widget->palette = zero;
         widget->tileData = zero;
         widget->extraData = zero;
-        Anim_InitPositionedWidget(widget, resource, glyph, flags, attributeA, mode,
+        AnimSprite_InitAtPosition(widget, resource, glyph, flags, attributeA, mode,
                                   duration, position);
         gDefaultAnimFlags++;
         if (gDefaultAnimFlags == 0xFFFF)

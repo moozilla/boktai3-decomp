@@ -217,7 +217,7 @@ void StateSprite_InitAnimation(struct SceneScheduledEffect *sprite, s32 type, s3
     sprite->variant = variant;
     sprite->active = 1;
     data = &pool->resource;
-    Widget_InitLinked(&sprite->animation, data, 13, 0, 1, 2, 0x78, &sprite->position);
+    AnimSprite_InitLinked(&sprite->animation, data, 13, 0, 1, 2, 0x78, &sprite->position);
     Anim_SetKeyframes(&sprite->animation, data, gUnk_086106F0[0x12], 2, 0);
     Anim_Step(&sprite->animation, data);
     sprite->animation.flags &= ~1;

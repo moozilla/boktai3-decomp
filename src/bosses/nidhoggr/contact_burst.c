@@ -78,7 +78,7 @@ u32 NidhoggrDuelBurst_RandomParticleFrame(void)
     return Mod(nextRandomHighByte(), 3) + 29;
 }
 
-s32 DirectionalParticle_Spawn(struct DirectionalParticleSource *, u32, u32);
+s32 ImpactFragment_Spawn(struct DirectionalParticleSource *, u32, u32);
 
 static inline void projectPosition(struct ContactPosition *screen,
                                    const struct ContactPosition *world)
@@ -150,7 +150,7 @@ s32 NidhoggrDuelBurst_Update(struct ContactBurst *effect)
                 sample &= 15;
                 direction += sample;
                 frame = NidhoggrDuelBurst_RandomParticleFrame();
-                DirectionalParticle_Spawn((struct DirectionalParticleSource *)effect, direction,
+                ImpactFragment_Spawn((struct DirectionalParticleSource *)effect, direction,
                                           frame);
                 ++index;
             } while (index <= 7);

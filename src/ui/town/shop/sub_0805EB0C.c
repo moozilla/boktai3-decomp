@@ -62,7 +62,7 @@ void SceneInputPanel_InitWidgets(struct SceneInputPanel *owner, s32 mode)
     position.y = 0;
     position.z = 0;
     priority = playback.priority;
-    Widget_InitLinked(&panel->indicator, &panel->widgetResource, gUnk_0824DEEA[mode], 0x30,
+    AnimSprite_InitLinked(&panel->indicator, &panel->widgetResource, gUnk_0824DEEA[mode], 0x30,
                       priority, priority, 60, &position);
 
     sequenceResource = ScriptProc_Start(0x922E, 0x4BBF);
@@ -76,70 +76,70 @@ void SceneInputPanel_InitWidgets(struct SceneInputPanel *owner, s32 mode)
     panel->drawable.position.x = 8;
     panel->drawable.position.y = 80;
 
-    Widget_InitLinked(&panel->mode, &panel->widgetResource, gUnk_0824DEF4[mode], 0x30, 0, 0, 60,
+    AnimSprite_InitLinked(&panel->mode, &panel->widgetResource, gUnk_0824DEF4[mode], 0x30, 0, 0, 60,
                       &position);
-    Widget_InitLinked(&panel->valueA, &panel->widgetResource, 0x41, 0x31, 0, 0, 60, &position);
+    AnimSprite_InitLinked(&panel->valueA, &panel->widgetResource, 0x41, 0x31, 0, 0, 60, &position);
     position.x = 8;
-    Widget_InitLinked(&panel->valueB, &panel->widgetResource, 0x42, 0x31, 0, 0, 60, &position);
+    AnimSprite_InitLinked(&panel->valueB, &panel->widgetResource, 0x42, 0x31, 0, 0, 60, &position);
     for (i = 0; i <= 15; i++) {
         position.x = (i & 3) * 24 + 112;
         position.y = (i >> 2) * 24 + 32;
-        Widget_InitLinked(&panel->primary[i], &panel->gridResource, 0x151, 0x31, 0, 0, 60,
+        AnimSprite_InitLinked(&panel->primary[i], &panel->gridResource, 0x151, 0x31, 0, 0, 60,
                           &position);
     }
     for (i = 0; i <= 7; i++) {
         position.x = (i & 3) * 24 + 8;
         position.y = (i >> 2) * 24 + 32;
-        Widget_InitLinked(&panel->secondary[i], &panel->gridResource, 0x151, 0x31, 0, 0, 60,
+        AnimSprite_InitLinked(&panel->secondary[i], &panel->gridResource, 0x151, 0x31, 0, 0, 60,
                           &position);
     }
     position.x = 0;
     position.y = 128;
-    Widget_InitLinked(&panel->banner, &panel->gridResource, 0x189, 0x31, 0, 0, 60, &position);
+    AnimSprite_InitLinked(&panel->banner, &panel->gridResource, 0x189, 0x31, 0, 0, 60, &position);
     position.x = 216;
     position.y = 56;
-    Widget_InitLinked(&panel->buttons[1], &panel->gridResource, 0x192, 0x30, 0, 0, 60, &position);
+    AnimSprite_InitLinked(&panel->buttons[1], &panel->gridResource, 0x192, 0x30, 0, 0, 60, &position);
     position.x = 216;
     position.y = 80;
-    Widget_InitLinked(&panel->buttons[2], &panel->gridResource, 0x191, 0x30, 0, 0, 60, &position);
+    AnimSprite_InitLinked(&panel->buttons[2], &panel->gridResource, 0x191, 0x30, 0, 0, 60, &position);
     position.x = 216;
     position.y = 32;
-    Widget_InitLinked(&panel->buttons[0], &panel->gridResource, 0x18F, 0x30, 0, 0, 60, &position);
+    AnimSprite_InitLinked(&panel->buttons[0], &panel->gridResource, 0x18F, 0x30, 0, 0, 60, &position);
     position.x = 216;
     position.y = 104;
-    Widget_InitLinked(&panel->buttons[3], &panel->gridResource, 0x190, 0x30, 0, 0, 60, &position);
-    Widget_InitLinked(&panel->category, &panel->widgetResource, 0x4E, 0x31, 0, 0, 60, &position);
+    AnimSprite_InitLinked(&panel->buttons[3], &panel->gridResource, 0x190, 0x30, 0, 0, 60, &position);
+    AnimSprite_InitLinked(&panel->category, &panel->widgetResource, 0x4E, 0x31, 0, 0, 60, &position);
     position.x = 112;
     position.y = 32;
-    Widget_InitLinked(&panel->compareA, &panel->widgetResource, 0x4D, 0x31, 0, 0, 60, &position);
+    AnimSprite_InitLinked(&panel->compareA, &panel->widgetResource, 0x4D, 0x31, 0, 0, 60, &position);
     position.x = 216;
     position.y = 32;
-    Widget_InitLinked(&panel->modeCursor, &panel->widgetResource, 0x4D, 0x30, 0, 0, 60, &position);
+    AnimSprite_InitLinked(&panel->modeCursor, &panel->widgetResource, 0x4D, 0x30, 0, 0, 60, &position);
     position.x = 0;
     position.y = 0;
-    Widget_InitLinked(&panel->heading, &panel->widgetResource, gUnk_0824DEE0[mode], 0x30, 0, 0, 60,
+    AnimSprite_InitLinked(&panel->heading, &panel->widgetResource, gUnk_0824DEE0[mode], 0x30, 0, 0, 60,
                       &position);
     position.x = 8;
     position.y = 0;
-    Widget_InitLinked(&panel->valueLabel, &panel->widgetResource, 0x40, 0x30, 0, 0, 60, &position);
+    AnimSprite_InitLinked(&panel->valueLabel, &panel->widgetResource, 0x40, 0x30, 0, 0, 60, &position);
     position.x = 0;
     position.y = 0;
-    Widget_InitLinked(&panel->glyph, &panel->widgetResource, 0x67, 0x30, 0, 0, 60, &position);
+    AnimSprite_InitLinked(&panel->glyph, &panel->widgetResource, 0x67, 0x30, 0, 0, 60, &position);
     position.x = 56;
     position.y = 0;
-    Widget_InitLinked(&panel->meterGlyph, &panel->widgetResource, 0x68, 0x30, 0, 0, 60, &position);
+    AnimSprite_InitLinked(&panel->meterGlyph, &panel->widgetResource, 0x68, 0x30, 0, 0, 60, &position);
     for (i = 0; i < 8; i++)
-        Widget_InitLinked(&panel->digits[i], &panel->widgetResource, 0x50, 0x30, 0, 0, 60,
+        AnimSprite_InitLinked(&panel->digits[i], &panel->widgetResource, 0x50, 0x30, 0, 0, 60,
                           &position);
-    Widget_InitLinked(&panel->numericLabel, &panel->widgetResource, 0xA9, 0x31, 0, 0, 60,
+    AnimSprite_InitLinked(&panel->numericLabel, &panel->widgetResource, 0xA9, 0x31, 0, 0, 60,
                       &position);
     position.x -= 11;
     for (i = 0; i < 4; i++) {
-        Widget_InitLinked(&panel->smallDigits[i], &panel->widgetResource, 0xAA, 0x31, 0, 0, 60,
+        AnimSprite_InitLinked(&panel->smallDigits[i], &panel->widgetResource, 0xAA, 0x31, 0, 0, 60,
                           &position);
         position.x += 6;
     }
     position.x = 0;
     position.y = 0;
-    Widget_InitLinked(&panel->prompt, &panel->widgetResource, 0x4B, 0x11, 0, 0, 60, &position);
+    AnimSprite_InitLinked(&panel->prompt, &panel->widgetResource, 0x4B, 0x11, 0, 0, 60, &position);
 }

@@ -1,12 +1,12 @@
-#include "bosses/sabata/actor_state_commands.h"
+#include "bosses/sabata/sabata_state_commands.h"
 
-void SabataVolume_BeginPhase(struct ActorState *volume, s32 phase)
+void Sabata_BeginCombatPhase(struct SabataActorState *volume, s32 phase)
 {
     volume->requestedVariant = volume->variant;
     volume->requestPhase = phase;
 }
 
-static inline void update_facing(struct ActorState *actor, u8 *facingDirection)
+static inline void update_facing(struct SabataActorState *actor, u8 *facingDirection)
 {
     s32 direction = (*facingDirection + 96) >> 6;
     u8 mask = 3;
@@ -20,7 +20,7 @@ static inline void update_facing(struct ActorState *actor, u8 *facingDirection)
     actor->facing8 = mask;
 }
 
-s32 ActorEffect_StepTurn(struct ActorState *actor, s32 frame, s32 start, s32 period, s32 mode)
+s32 ActorEffect_StepTurn(struct SabataActorState *actor, s32 frame, s32 start, s32 period, s32 mode)
 {
     s32 elapsed = frame - start;
     s32 step = elapsed / period;
@@ -80,7 +80,7 @@ animate: {
     return 0;
 }
 
-s32 SabataState_BeginDepletedState(struct ActorState *actor)
+s32 SabataState_BeginDepletedState(struct SabataActorState *actor)
 {
     s32 result;
     actor->checking = 1;
@@ -110,19 +110,19 @@ s32 SabataState_BeginDepletedState(struct ActorState *actor)
     return result;
 }
 
-void SabataState_UpdateDepletedState(struct ActorStateOwner *owner)
+void SabataState_UpdateDepletedState(struct SabataActorStateOwner *owner)
 {
-    struct ActorState *actor = &owner->actor;
-    if (ActorState_TakeEntryTrigger(&owner->actor)) {
+    struct SabataActorState *actor = &owner->actor;
+    if (SabataState_TakeEntryTrigger(&owner->actor)) {
         u32 state = 1;
         owner->actor.state = state;
     }
     if (ActorMovement_CanReachTarget(actor))
-        SabataVolume_BeginPhase(&owner->actor, 1);
-    else if (SabataVolume_GetActivityState(&owner->actor))
-        SabataVolume_BeginPhase(&owner->actor, 2);
+        Sabata_BeginCombatPhase(&owner->actor, 1);
+    else if (Sabata_GetAttackActivity(&owner->actor))
+        Sabata_BeginCombatPhase(&owner->actor, 2);
     else if (owner->actor.timer > 60) {
-        SceneVolume_RequestRestart(&owner->actor);
+        Sabata_RequestRestart(&owner->actor);
     }
     owner->actor.timer++;
 }
@@ -135,12 +135,12 @@ static inline s32 RandomValue(void)
     return *(u16 *)(offset + (u32)gRandomTable);
 }
 
-void SabataState_UpdateRandomAnimation(struct ActorStateOwner *owner)
+void SabataState_UpdateRandomAnimation(struct SabataActorStateOwner *owner)
 {
-    struct ActorState *actor = &owner->actor;
+    struct SabataActorState *actor = &owner->actor;
     s32 duration;
     s32 result;
-    if (ActorState_TakeEntryTrigger(actor)) {
+    if (SabataState_TakeEntryTrigger(actor)) {
         actor->animationIndex = (RandomValue() >> 8) & 3;
         if (Path_PickRandomPoint(&actor->movementTarget, actor->animationIndex) >= 0)
             actor->animationState = 3;
@@ -151,28 +151,28 @@ void SabataState_UpdateRandomAnimation(struct ActorStateOwner *owner)
     }
     duration = actor->mode == 1 ? 20 : 60;
     if (ActorMovement_CanReachTarget(actor))
-        SabataVolume_BeginPhase(&owner->actor, 1);
-    else if (SabataVolume_GetActivityState(&owner->actor))
-        SabataVolume_BeginPhase(&owner->actor, 2);
-    else if (SabataVolume_FindNearbyPosition(actor) == 1)
-        SabataVolume_BeginPhase(&owner->actor, 3);
+        Sabata_BeginCombatPhase(&owner->actor, 1);
+    else if (Sabata_GetAttackActivity(&owner->actor))
+        Sabata_BeginCombatPhase(&owner->actor, 2);
+    else if (Sabata_FindNearbyAttackPosition(actor) == 1)
+        Sabata_BeginCombatPhase(&owner->actor, 3);
     if (actor->requestMode == 2)
         result = ActorEffect_StepTurn(&owner->actor, owner->actor.timer, duration, duration, 1);
     else
         result = ActorEffect_StepTurn(&owner->actor, owner->actor.timer, duration, duration, 0);
     if (result) {
-        SceneVolume_RequestRestart(&owner->actor);
+        Sabata_RequestRestart(&owner->actor);
     }
     owner->actor.timer++;
 }
 
-void SabataState_UpdateSelectedAnimation(struct ActorStateOwner *owner)
+void SabataState_UpdateSelectedAnimation(struct SabataActorStateOwner *owner)
 {
-    struct ActorState *actor = &owner->actor;
+    struct SabataActorState *actor = &owner->actor;
     s32 result;
-    if (ActorState_TakeEntryTrigger(&owner->actor)) {
+    if (SabataState_TakeEntryTrigger(&owner->actor)) {
         if (!SabataPosition_TestPath(actor, &actor->savedPosition)) {
-            SceneVolume_RequestRestart(&owner->actor);
+            Sabata_RequestRestart(&owner->actor);
             owner->actor.state = 1;
             return;
         }
@@ -184,25 +184,25 @@ void SabataState_UpdateSelectedAnimation(struct ActorStateOwner *owner)
         }
     }
     if (ActorMovement_CanReachTarget(actor))
-        SabataVolume_BeginPhase(&owner->actor, 1);
-    else if (SabataVolume_GetActivityState(&owner->actor))
-        SabataVolume_BeginPhase(&owner->actor, 2);
-    else if (owner->actor.timer > 60 && SabataVolume_FindNearbyPosition(actor) == 1)
-        SabataVolume_BeginPhase(&owner->actor, 3);
+        Sabata_BeginCombatPhase(&owner->actor, 1);
+    else if (Sabata_GetAttackActivity(&owner->actor))
+        Sabata_BeginCombatPhase(&owner->actor, 2);
+    else if (owner->actor.timer > 60 && Sabata_FindNearbyAttackPosition(actor) == 1)
+        Sabata_BeginCombatPhase(&owner->actor, 3);
     if (actor->requestMode == 2)
         result = ActorEffect_StepTurn(&owner->actor, owner->actor.timer, 30, 10, 1);
     else
         result = ActorEffect_StepTurn(&owner->actor, owner->actor.timer, 30, 10, 0);
     if (result) {
-        SceneVolume_RequestRestart(&owner->actor);
+        Sabata_RequestRestart(&owner->actor);
     }
     owner->actor.timer++;
 }
 
-void SabataState_BeginReverseAnimation(struct ActorStateOwner *owner)
+void SabataState_BeginReverseAnimation(struct SabataActorStateOwner *owner)
 {
-    struct ActorState *actor = &owner->actor;
-    if (ActorState_TakeEntryTrigger(&owner->actor)) {
+    struct SabataActorState *actor = &owner->actor;
+    if (SabataState_TakeEntryTrigger(&owner->actor)) {
         actor->animationState = 3;
         SabataImpact_FindNearbyPoint(actor, &actor->movementTarget, (actor->direction + 128) & 255);
         {
@@ -210,20 +210,20 @@ void SabataState_BeginReverseAnimation(struct ActorStateOwner *owner)
             owner->actor.state = state;
         }
     }
-    if (SabataVolume_ConsumePendingEvent(actor)) {
-        SceneVolume_RequestRestart(&owner->actor);
+    if (Sabata_TakeReachedTarget(actor)) {
+        Sabata_RequestRestart(&owner->actor);
         owner->actor.state = 1;
     } else if (owner->actor.pending) {
-        SceneVolume_RequestRestart(&owner->actor);
+        Sabata_RequestRestart(&owner->actor);
         owner->actor.state = 1;
     }
 }
 
-void SabataState_UpdateRestartableAnimation(struct ActorStateOwner *owner)
+void SabataState_UpdateRestartableAnimation(struct SabataActorStateOwner *owner)
 {
-    struct ActorState *actor = &owner->actor;
+    struct SabataActorState *actor = &owner->actor;
     u32 nextState;
-    if (ActorState_TakeEntryTrigger(&owner->actor)) {
+    if (SabataState_TakeEntryTrigger(&owner->actor)) {
         actor->animationState = 3;
         ActorVariation_SelectRandomPair(actor, &actor->movementTarget);
         actor->animationPhase = 0;
@@ -232,9 +232,9 @@ void SabataState_UpdateRestartableAnimation(struct ActorStateOwner *owner)
             owner->actor.state = state;
         }
     }
-    if (SabataVolume_GetActivityState(&owner->actor))
-        SabataVolume_BeginPhase(&owner->actor, 2);
-    else if (SabataVolume_ConsumePendingEvent(actor)) {
+    if (Sabata_GetAttackActivity(&owner->actor))
+        Sabata_BeginCombatPhase(&owner->actor, 2);
+    else if (Sabata_TakeReachedTarget(actor)) {
         owner->actor.requestedVariant = owner->actor.variant;
         {
             u8 *request = &owner->actor.request;

@@ -5,16 +5,16 @@
 void Hud_SetMode(s32);
 void sub_08116E44(void);
 void CoffinBike_UpdateDefeatEffects(void);
-void CoffinBike_DispatchCommands(struct Glove *);
-void ActorStats_ApplyPendingIncrement(struct GloveMotion *);
+void CoffinBike_DispatchCommands(struct CoffinBike *);
+void ActorStats_ApplyPendingIncrement(struct CoffinBikeMotion *);
 void StageIconDisplay_Create(u32, u32, void (*)(void), void *);
-static inline u8 TestActorFlags(struct Glove *p, u32 mask)
+static inline u8 TestActorFlags(struct CoffinBike *p, u32 mask)
 {
     if (p->motion.damageFlags & mask)
         return 1;
     return 0;
 }
-static inline u8 TestStateFlags(struct GloveMotion *state, u32 mask, u8 **output)
+static inline u8 TestStateFlags(struct CoffinBikeMotion *state, u32 mask, u8 **output)
 {
     u8 *p = &state->damageFlags;
     u32 value = *p & mask;
@@ -23,7 +23,7 @@ static inline u8 TestStateFlags(struct GloveMotion *state, u32 mask, u8 **output
         return 1;
     return 0;
 }
-static inline u8 IsUpdated(struct Glove *p)
+static inline u8 IsUpdated(struct CoffinBike *p)
 {
     if (p) {
         u32 flags = p->flags;
@@ -32,15 +32,15 @@ static inline u8 IsUpdated(struct Glove *p)
     }
     return 0;
 }
-static inline void SetCallback(struct Glove *p, void (*callback)(void), u32 zero)
+static inline void SetCallback(struct CoffinBike *p, void (*callback)(void), u32 zero)
 {
     p->active = 1;
     p->update = (void (*)(void *))callback;
     p->timer = zero;
 }
-void MotionActor_DispatchRequestedState(struct Glove *actor)
+void MotionActor_DispatchRequestedState(struct CoffinBike *actor)
 {
-    struct GloveMotion *state;
+    struct CoffinBikeMotion *state;
     state = &actor->motion;
     actor->flags = 0;
     if (TestActorFlags(actor, 4)) {

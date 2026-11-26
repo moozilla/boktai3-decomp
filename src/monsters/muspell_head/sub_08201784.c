@@ -19,8 +19,7 @@ s32 Collider_Refresh(u8 *);
 void MuspellHead_OnPassiveColliderContact(void);
 void MuspellHead_ApplyHitReaction(void);
 // confidence=low: initializes passive and damage-response colliders embedded in the actor.
-#define ScriptCombatActor_InitializeColliders sub_08201784
-void ScriptCombatActor_InitializeColliders(u8 *pArg)
+void MuspellHead_InitializeColliders(u8 *pArg)
 {
     u8 *p = pArg;
     struct Z a, b;

@@ -2,10 +2,10 @@
 
 void SceneActors_UpdateLeftDeparture(void);
 
-void VanargandHead_UpdateMainStateTransition(struct Slot7Transition *actor)
+void VanargandHead_UpdateMainStateTransition(struct VanargandHeadTransition *actor)
 {
-    if (Slot7_TakeActionEntry(actor) == TRUE) {
-        Slot7_TransitionTo(actor, SceneActors_UpdateLeftDeparture);
+    if (VanargandHead_TakeActionEntry(actor) == TRUE) {
+        VanargandHead_TransitionTo(actor, SceneActors_UpdateLeftDeparture);
     }
     actor->actionTimer++;
 }

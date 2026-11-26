@@ -1626,7 +1626,7 @@ sub_081B7340	27	matched	100.0	Explicit early success block and cached signed end
 sub_081B7394	40	draft	97.8	Only CpuSet control-literal load order remains different after three unchanged trials.
 sub_081B7568	82	matched	100.0	A typed local converted from the opaque object argument fixed register allocation; the recorded span also contains unlabelled following code at 081B7614.
 sub_081B7744	81	matched	100.0	Loading the identifier before the call and using mask helpers reproduced the original ordering without register pins.
-sub_081B77F4	56	matched	100.0	The matched Scene_PlayObjectImpactEffect relative supplied the exact two-call structure with different effect selectors and no sound call.
+sub_081B77F4	56	matched	100.0	The matched PuzzleBlock_PlayObjectImpactEffect relative supplied the exact two-call structure with different effect selectors and no sound call.
 sub_081B7868	43	matched	100.0	Inline callback setter preserves the separate field-address lifetimes needed for exact code.
 sub_081B78CC	37	matched	100.0	Reusing the inline callback setter reproduced the original address lifetimes on the first check.
 sub_081B7954	15	draft	83.3	Candidate reloads offset 0x102 rather than subtracting 0x12 from the live 0x114 constant.
@@ -1752,7 +1752,7 @@ sub_081C24D0	70	draft	87.2	Structure, calls, loop trip count (7, i<=6) and all v
 sub_081C2838	149	attempted	48.7	This is the largest/most complex of the four (149 ROM instructions, 13 branches); structure, the division/rounding idioms, the off-screen culling logic and all constants matched, getting CORE distance
 sub_081C2968	30	draft	83.3	The scan matches but loop preheader placement and the initial trampoline still differ.
 sub_081C2C04	100	attempted	51.9	Structure/CORE improved from 46 to 29 of 90 (identified the receiver/pending/count layout, the duration<=14 AnimData gate as an unsigned compare, the rotation bitfield as a (x+5)<<29>>24 shift pair, a
-sub_081C2D68	144	attempted	60.7	Semantics fully understood and reproduced (confirmed against the caller SparkleEmitter_CreateFromScript and against sub_081C2C04/sub_081C2ECC's identical field layout and emitting-state tail). CORE im
+sub_081C2D68	144	attempted	60.7	Semantics fully understood and reproduced (confirmed against the caller CutsceneSparkle_CreateFromScript and against sub_081C2C04/sub_081C2ECC's identical field layout and emitting-state tail). CORE im
 sub_081C2ECC	72	matched	100.0	No-op if the singleton (gUnk_02000264) doesn't exist; confirms the same field layout and rotation bit-packing ((v&7)<<5 + 0xA0) seen in sub_081C2D68 and the emitting tail seen in sub_081C2C04/sub_081C
 sub_081C35EC	127	attempted	77.6	CORE distance reached 0 (structure fully matches: null checks, skip-copy fast path, src-vs-own-position branches, the isometric screen-offset divide-by-3-then-halve idiom borrowed from Camera_SnapTo's
 sub_081C3950	53	attempted	68.5	CORE distance reached 1 of 42 (only one instruction's worth of pure register-allocation difference remains: ROM reuses the long-lived r4 holding the already-known-zero flags&1 result for the final `ti

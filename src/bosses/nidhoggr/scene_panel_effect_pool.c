@@ -2,7 +2,7 @@
 #include "player/player_slot_status.h"
 #include "bosses/nidhoggr/scene_pause.h"
 
-void sub_0818ECFC(struct ScenePanelEffectPool *);
+void NidhoggrEffect_UpdatePool(struct ScenePanelEffectPool *);
 
 void Nidhoggr_ClearEffectPools(struct ScenePanelEffectPool *);
 
@@ -58,7 +58,7 @@ static inline void AddPosition(struct ContactPosition *out, struct ContactPositi
 
 u32 NidhoggrEffect_UpdateTask(struct ScenePanelEffect *effect)
 {
-    sub_0818ECFC(&effect->pool);
+    NidhoggrEffect_UpdatePool(&effect->pool);
     return 0;
 }
 

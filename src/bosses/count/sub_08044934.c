@@ -1,11 +1,9 @@
 #include "scene/collision/contact_swarm.h"
-/* ContactSwarm_SpawnPairedAdvance: Fills free slots in the advance state with alternating paired headings and randomized timing then starts palette fading. */
-#define ContactSwarm_SpawnPairedAdvance sub_08044934
-#define ContactSwarm_SpawnPairedAdvance sub_08044934
+/* CountBats_SpawnPairedAdvance: Fills free slots in the advance state with alternating paired headings and randomized timing then starts palette fading. */
 void CountBats_SetDirectionalSequence(struct ContactSwarm *, struct ContactSwarmSlot *, u32);
 void Collider_SetAttackProperties(void *, u32, u32, u32, u32, u32);
 void Palette_InterpolateBanks(void *, void *, void *, s32, s32);
-s32 ContactSwarm_SpawnPairedAdvance(struct ContactSwarm *pool,
+s32 CountBats_SpawnPairedAdvance(struct ContactSwarm *pool,
                                     const struct ContactPosition *position, s32 direction,
                                     u32 speed, u32 resourceId, u32 cost, u32 option)
 {

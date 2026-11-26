@@ -154,7 +154,7 @@ void StagedEffect_ShakeAndReveal(struct StagedEffect *effect)
         effect->frame++;
 }
 
-void AnimatedParticles_EmitRing(void *, u32, u32, u32, u32, u32, u32, u32);
+void ImpactBurst_EmitRing(void *, u32, u32, u32, u32, u32, u32, u32);
 
 void StagedEffect_ContractBurst(struct StagedEffect *effect)
 {
@@ -172,7 +172,7 @@ void StagedEffect_ContractBurst(struct StagedEffect *effect)
         StagedEffect_SetState(effect, STAGED_EFFECT_BLEND_AND_SHAKE);
         Sound_PlaySong(0x1C4);
         StagedEffect_MarkOuterSprites(effect);
-        AnimatedParticles_EmitRing(&effect->sprites[0].position, 8, 1, 1, 64, 12, 40, 250);
+        ImpactBurst_EmitRing(&effect->sprites[0].position, 8, 1, 1, 64, 12, 40, 250);
         if (effect->hasScript)
             Trigger_ConsumePending(&effect->receiver, 1);
     } else

@@ -3,7 +3,7 @@
 #include "engine/ram.h"
 #include "engine/math/monster_particle_random.h"
 extern const s16 gUnk_086149C4[];
-void SceneMovingParticle_Create(struct ContactPosition *, struct ContactPosition *, s32, s32);
+void DebrisMote_Create(struct ContactPosition *, struct ContactPosition *, s32, s32);
 static inline s32 Truncate(s32 v)
 {
     if (v >= 0)
@@ -53,5 +53,5 @@ void SceneSteeringActor_EmitRandomParticle(struct ContactPosition *input)
     }
     velocity.y =
         (ParticleRandom_ReadRelativeSample(savedOrigin, (const u16 *)RANDOM_TABLE_ADDR) & 63) - 48;
-    SceneMovingParticle_Create(position, &velocity, 60, 3);
+    DebrisMote_Create(position, &velocity, 60, 3);
 }

@@ -1,7 +1,7 @@
 #include "bosses/vanargand/vanargand_head_cooldown.h"
 #include "system/game_state/game_state.h"
 
-struct Slot7Action {
+struct VanargandHeadAction {
     u8 pad0[0x3e];
     u16 phase;
     u8 pad40[3];
@@ -11,8 +11,8 @@ struct Slot7Action {
 void Collision_CalculateDamageResponse(void *, void *);
 s32 Div(s32, s32);
 
-void VanargandHead_BeginScaledCooldown(void *event, struct Slot7Action *action,
-                                        struct Slot7Actor *actor)
+void VanargandHead_BeginScaledCooldown(void *event, struct VanargandHeadAction *action,
+                                        struct VanargandHeadActorView *actor)
 {
     s16 level;
     s32 scaledLevel;
@@ -27,9 +27,9 @@ void VanargandHead_BeginScaledCooldown(void *event, struct Slot7Action *action,
         if (scaledLevel <= 2) {
             actor->duration = actor->baseDuration;
         } else if (scaledLevel <= 5) {
-            actor->duration = Slot7_IncreaseDuration(actor->baseDuration, 2);
+            actor->duration = VanargandHead_IncreaseDuration(actor->baseDuration, 2);
         } else {
-            actor->duration = Slot7_IncreaseDuration(actor->baseDuration, 1);
+            actor->duration = VanargandHead_IncreaseDuration(actor->baseDuration, 1);
         }
         action->cooldown = 30;
         actor->flashTimer = 15;

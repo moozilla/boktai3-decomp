@@ -40,5 +40,5 @@ void ScanlineWave_Reset(void);
 extern void (*gUnk_08604C64[])(struct LinkedWidgetSet *, struct FloatingEffect *, s32);
 u32 Selection_GetDisplayFrame(u32);
 s32 Inventory_IsKeyItemId(u32);
-s32 Widget_InitLinked(void *, void *, u16, u32, u8, u8, u8, const void *);
+s32 AnimSprite_InitLinked(void *, void *, u16, u32, u8, u8, u8, const void *);
 #endif

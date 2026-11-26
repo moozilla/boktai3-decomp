@@ -13,7 +13,7 @@ exports.liftAt = (box) => {
   return null;
 };
 
-// NamedObject_UpdateTerrainRegistration exposes the lift's floor tile only
+// MovingPlatform_UpdateTerrainRegistration exposes the lift's floor tile only
 // once the player reaches its height. Route to a landing first, then the
 // normal door skill can board and wait for the lift's contact timer.
 exports.approachLift = function* (door, opts = {}) {

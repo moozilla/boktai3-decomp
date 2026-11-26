@@ -123,7 +123,7 @@ void SelectionPanel_InitializeWidgets(struct SelectionPanel *panel)
     panel->widgetScript = t;
     ResourceHeader_Relocate(&panel->widgetResource, t);
     for (i = 0; i <= 6; i++) {
-        Widget_InitLinked(&panel->widgets[i], &panel->widgetResource, panel->entryIds[i], 0x10, 1,
+        AnimSprite_InitLinked(&panel->widgets[i], &panel->widgetResource, panel->entryIds[i], 0x10, 1,
                           0, 0, 0);
         panel->cachedIds[i] = 0xFFFF;
     }
@@ -134,7 +134,7 @@ void SelectionPanel_InitializeWidgets(struct SelectionPanel *panel)
     panel->auxiliaryScript = t;
     ResourceHeader_Relocate(&panel->auxiliaryResource, t);
     for (i = 7; i <= 9; i++) {
-        Widget_InitLinked(&panel->widgets[i], &panel->auxiliaryResource, panel->entryIds[i], 0x10,
+        AnimSprite_InitLinked(&panel->widgets[i], &panel->auxiliaryResource, panel->entryIds[i], 0x10,
                           1, 0, 0, 0);
         panel->cachedIds[i] = 0xFFFF;
         {
@@ -261,7 +261,7 @@ void SelectionPanel_HandleInput(struct SelectionPanel *panel)
             }
             if (panel->column > panel->maximumColumn)
                 panel->column = panel->maximumColumn;
-            Anim_SelectWidgetGlyph(&panel->widgets[1], &panel->widgetResource, panel->entryIds[1]);
+            AnimSprite_SelectGlyph(&panel->widgets[1], &panel->widgetResource, panel->entryIds[1]);
             RecordPanel_RefreshEntryLabels(panel);
         }
     }

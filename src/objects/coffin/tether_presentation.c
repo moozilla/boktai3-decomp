@@ -200,7 +200,7 @@ void TetherActor_DestroyRequestIndicator(void *arg)
 
 s32 ResourceHeader_Relocate(void *dst, void *src);
 
-void Widget_InitLinked(void *, void *, int, int, int, int, int, void *);
+void AnimSprite_InitLinked(void *, void *, int, int, int, int, int, void *);
 
 s32 TetherActor_InitRequestIndicator(struct TetherRequestIndicator *indicator)
 {
@@ -209,7 +209,7 @@ s32 TetherActor_InitRequestIndicator(struct TetherRequestIndicator *indicator)
     resource = ScriptProc_Start(0xCB05, 0xF771);
     indicator->resource = *resource;
     ResourceHeader_Relocate(&indicator->resource, resource);
-    Widget_InitLinked(&indicator->animation, &indicator->resource, 0, 0x10, 0, 1, 0x3c, 0);
+    AnimSprite_InitLinked(&indicator->animation, &indicator->resource, 0, 0x10, 0, 1, 0x3c, 0);
     Anim_SetKeyframes(&indicator->animation, &indicator->resource,
                       (u16)DirectionMarker_GetAnimation(0, 0), 0, 0);
     indicator->animation.flags |= 1;

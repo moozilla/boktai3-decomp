@@ -14,6 +14,6 @@ void ShakeIconDisplay_TickShake(struct ShakeIconDisplay *);
 s32 ShakeIconDisplay_Tick(struct ShakeIconDisplay *);
 u32 ShakeIconDisplay_Destroy(struct ShakeIconDisplay *);
 s32 ShakeIconDisplay_Initialize(struct ShakeIconDisplay *);
-void Widget_InitLinked(void *, void *, u32, u32, u32, u32, s32, const void *);
+void AnimSprite_InitLinked(void *, void *, u32, u32, u32, u32, s32, const void *);
 struct ShakeIconDisplay *ShakeIconDisplay_CreateFromScript(void);
 #endif

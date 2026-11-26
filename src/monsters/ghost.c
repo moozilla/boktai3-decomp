@@ -46,7 +46,7 @@
 
 #include "engine/video/display_sequence_inline.h"
 
-#include "npc/cutscene_actor/actor_animation_controller.h"
+#include "ui/title/actor_animation_controller.h"
 
 #include "debug.h"
 
@@ -616,7 +616,7 @@ void Centipede_SelectWanderRoute(void *);
 
 void Centipede_AdvanceMotionPhase(void *, s32);
 
-void sub_080A9DB0(void *, s32, s32);
+void Centipede_UpdateSegmentPositions(void *, s32, s32);
 
 void Centipede_UpdateOscillation(void *, s32, s32);
 
@@ -2590,7 +2590,7 @@ static inline void Ghost_InitializeDrawable(struct ChaseActor *actor)
         res = ScriptProc_Start(0xCB05, 0xD637);
         *(struct DisplayResourceHeader *)d = *(struct DisplayResourceHeader *)res;
         ResourceHeader_Relocate(d, res);
-        Widget_InitLinked(&((struct SceneActorAnimationTileDrawable *)d)->tile, d, 0, 0, 2, 2, 0x3C,
+        AnimSprite_InitLinked(&((struct SceneActorAnimationTileDrawable *)d)->tile, d, 0, 0, 2, 2, 0x3C,
                           &position);
         actor->base.animationIndex = 0xFF;
     }

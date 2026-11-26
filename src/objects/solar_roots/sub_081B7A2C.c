@@ -5,7 +5,7 @@
 #include "scene/motion/scene_actor_terrain.h"
 
 // foundry draft (worker best 99.1%); what differs is mostly register allocation and instruction order
-#define GrowthHazard_EmitRevealEffects SolarRoot_PlayImpactEffect
+#define SolarRoot_EmitRevealEffects SolarRoot_PlayImpactEffect
 
 /* Tentative growth-hazard view, consistent with AnimatedMarker_BeginReveal. */
 struct GrowthHazardCollider {

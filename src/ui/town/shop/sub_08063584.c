@@ -1,6 +1,6 @@
 #include "ui/town/shop_lifecycle.h"
 #include "engine/engine.h"
-struct SceneInventoryLifecycleView *Shop_CreatePresentation3(void)
+struct SceneInventoryLifecycleView *Shop_CreateTravelingMerchant(void)
 {
     struct SceneInventoryLifecycleView *owner = Task_Create(11, 0x1D24);
     if (owner) {

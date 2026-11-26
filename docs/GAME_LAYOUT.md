@@ -156,12 +156,12 @@ first ([ENGINE.md](ENGINE.md), sections 4 and 9).
 | Range | Subsystem (from progress_subsystems.csv) | C location | What it does |
 |---|---|---|---|
 | `08003B44`–`080041CC` | Terrain overlays (tentative) | [`src/scene/terrain/terrain_overlay.c`](../src/scene/terrain/terrain_overlay.c), [`src/scene/terrain/sub_080041C0.c`](../src/scene/terrain/sub_080041C0.c) | Overlays that track actors and draw terrain edges, with queued commands. |
-| `080041CC`–`08005E10` | Scene objects (tentative) | [`src/objects/scene_objects/scene_object.c`](../src/objects/scene_objects/scene_object.c) | Scene blocks: push, step, fall, flash, disappear. Created from script with keywords (`0x74` manager, `0x1A8` objects). |
+| `080041CC`–`08005E10` | Scene objects (tentative) | [`src/objects/puzzle_blocks.c`](../src/objects/puzzle_blocks.c) | Scene blocks: push, step, fall, flash, disappear. Created from script with keywords (`0x74` manager, `0x1A8` objects). |
 | `08005E10`–`08006374` | Terrain modifiers (tentative) | [`src/scene/terrain/terrain_modifier.c`](../src/scene/terrain/terrain_modifier.c), [`src/scene/terrain/sub_08006368.c`](../src/scene/terrain/sub_08006368.c) | Registers and changes terrain cells at runtime, including the script change commands. |
 | `08006F00`–`08008A70` | Items and containers (tentative) | [`src/objects/items/item_container.c`](../src/objects/items/item_container.c) | Dropped items (fall, land, bob, pick up) and treasure containers (open, locked). Singleton `TriggerManager`. |
-| `08008A70`–`08009500` | Pooled interactables (tentative) | [`src/objects/breakable.c`](../src/objects/breakable.c) | Fixed-pool breakable props with a five-state machine, placed and activated from script (`0xEC`-byte slots). |
-| `08009500`–`08009E30` | Directional interaction controllers (tentative) | [`src/objects/directional_controller.c`](../src/objects/directional_controller.c) | Interaction prompts gated by actor distance, facing and input. |
-| `08009E30`–`0800A800` | Collision controllers (tentative) | [`src/objects/collision_controller.c`](../src/objects/collision_controller.c) | Pool of 16 hit-detecting props with idle and hit animation and an effect burst. |
+| `08008A70`–`08009500` | Pooled interactables (tentative) | [`src/objects/light_fixtures.c`](../src/objects/light_fixtures.c) | Fixed-pool breakable props with a five-state machine, placed and activated from script (`0xEC`-byte slots). |
+| `08009500`–`08009E30` | Directional interaction controllers (tentative) | [`src/objects/interaction_prompts.c`](../src/objects/interaction_prompts.c) | Interaction prompts gated by actor distance, facing and input. |
+| `08009E30`–`0800A800` | Collision controllers (tentative) | [`src/objects/strike_traps.c`](../src/objects/strike_traps.c) | Pool of 16 hit-detecting props with idle and hit animation and an effect burst. |
 | `0800CBA0`–`0800D874` | Falling objects (tentative) | [`src/objects/hazards/falling_objects.c`](../src/objects/hazards/falling_objects.c) | Objects that fall onto the terrain, with allocation, update and cleanup. |
 | `0800F9C4`–`080111EC` | Group objects (tentative) | [`src/effects/bat_flock.c`](../src/effects/bat_flock.c) | Manager for sixteen objects with animation and movement; several movement callbacks are unmatched. |
 | `08011884`–`08012040` | Scene indicators (tentative) | [`src/ui/hud/scene_indicator.c`](../src/ui/hud/scene_indicator.c) | Scene indicators: lifecycle, timing, visibility, terrain placement, script pause and resume. |
@@ -195,7 +195,7 @@ descriptive, not confirmed roles.
 | `08030710`–`080308BC` | Scene actor manager | [`src/npc/manager/`](../src/npc/manager/) (5 files) | Scene actor manager: update, destruction, initialization and task creation. |
 | `0803CDF0`–`0803EE58` | Scene pooled motion and actor controls (tentative) | [`src/link/wireless/battle/`](../src/link/wireless/battle/) (37 files) | Four actor slots and configurable pooled state entries; target x/z metrics, speed/lateral controls and a twelve-state callback table (ten callbacks exact). Incomplete; gameplay identity unconfirmed. |
 | `0818D754`–`0818DC50` | Spinning approach motion (tentative) | [`src/monsters/armor/spinning_approach.c`](../src/monsters/armor/spinning_approach.c) | Two-stage spinning approach movement (four callbacks); see MOTION_0818.md. Not tied to a visible object yet. |
-| `081E34D0`–`081EAB64` | Actor animation controller (tentative) | [`src/npc/cutscene_actor/actor_animation_controller.c`](../src/npc/cutscene_actor/actor_animation_controller.c) | Actor animation controller: shared actor layout, child effects, state transitions, palette fades and interaction selection (ANIMATION_081E.md). |
+| `081E34D0`–`081EAB64` | Actor animation controller (tentative) | [`src/ui/title/tutorial_otenko.c`](../src/ui/title/tutorial_otenko.c) | Actor animation controller: shared actor layout, child effects, state transitions, palette fades and interaction selection (ANIMATION_081E.md). |
 
 Two families of pooled actors are listed here: `Pooled actor manager` and the
 helpers and controllers after it. The "Scene actor" rows are the scene's own
@@ -261,7 +261,7 @@ sprite and tile animation, and the timed presentations that run them.
 | `080136B4`–`08013C14` | Scaled shadows | [`src/effects/shadows/scaled_shadow.c`](../src/effects/shadows/scaled_shadow.c) | Scaled shadows: shadows scaled to the object's height. |
 | `08013C14`–`08013F98` | Shadow registry | [`src/effects/shadows/shadow_registry.c`](../src/effects/shadows/shadow_registry.c) | Shadow registry: the list of active shadows. |
 | `08013F98`–`08014F64` | Particle groups | [`src/effects/particles/groups/`](../src/effects/particles/groups/) (12 files) | Particle groups: manager lifecycle and particle creation, update and emission. |
-| `08014F64`–`08015160` | Fragment groups | [`src/effects/particles/groups/fragment_group.c`](../src/effects/particles/groups/fragment_group.c) | Fragment groups: manager and particle emission (provisional names). |
+| `08014F64`–`08015160` | Fragment groups | [`src/effects/particles/impact_fragments/fragment_group.c`](../src/effects/particles/impact_fragments/fragment_group.c) | Fragment groups: manager and particle emission (provisional names). |
 | `08015160`–`08015F60` | Animated particles | [`src/effects/particles/groups/`](../src/effects/particles/groups/) (16 files) | Animated particles: manager, ring, burst and directional emitters, script creation. |
 | `08015F60`–`080164B8` | Fading particle groups | [`src/effects/particles/groups/`](../src/effects/particles/groups/) (7 files) | Fading particle groups: group lifetime and fading animation. |
 | `080164B8`–`0801689C` | Palette level transitions | [`src/effects/palette/palette_level_transitions.c`](../src/effects/palette/palette_level_transitions.c) | Palette level transitions: increase, decrease, configure and reset per channel. |

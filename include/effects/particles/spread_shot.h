@@ -22,11 +22,11 @@ struct PairSlotPool {
     u32 allocated;
 };
 struct SpreadShot *PairSlotPool_Allocate(struct PairSlotPool *);
-struct PairSlotPool *SceneTerrainProbe_EnsurePool(void);
-s32 SceneTerrainProbe_InitPool(struct PairSlotPool *);
+struct PairSlotPool *SpreadShot_EnsurePool(void);
+s32 SpreadShot_InitPool(struct PairSlotPool *);
 s32 PairSlotPool_Update(struct PairSlotPool *);
-void SceneTerrainProbe_OnPoolDestroy(void);
+void SpreadShot_OnPoolDestroy(void);
 u8 SpreadShot_ResolveTerrain(struct SpreadShot *, s32, u32);
-void SceneTerrainProbe_NoopCollisionHook(void);
-void SceneTerrainProbe_NoopTrailHook(void);
+void SpreadShot_NoopCollisionHook(void);
+void SpreadShot_NoopTrailHook(void);
 #endif

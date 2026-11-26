@@ -398,7 +398,7 @@ void MenuDisplay_LoadDecimalDigits(struct MenuDisplay *hud, s32 value, s32 divis
         value = 999;
     for (i = 0; divisor > 0; i++) {
         s32 quotient = Div(value, divisor);
-        Anim_SelectWidgetGlyph(&hud->hud.categoryWidgets[firstWidget + i], hud->hud.widgetResource,
+        AnimSprite_SelectGlyph(&hud->hud.categoryWidgets[firstWidget + i], hud->hud.widgetResource,
                                (u16)(frameBase + quotient));
         value -= quotient * divisor;
         divisor = Div(divisor, 10);

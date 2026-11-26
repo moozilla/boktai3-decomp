@@ -1,8 +1,8 @@
-#include "bosses/sabata/scene_volume.h"
+#include "bosses/sabata/sabata_attack_state.h"
 #include "engine/video/render.h"
 // confidence=low: controls the actor palette fade and repeating pulse sequence
 void Palette_InterpolateBanks(u16 *, u16 *, u16 *, s32, s32);
-void SabataVolume_ResetPendingSequence(struct SceneVolumeActor *);
+void Sabata_ResetAttackSequence(struct SabataAttackActor *);
 static inline s32 Fraction(s32 time, s32 end)
 {
     s32 value;
@@ -27,7 +27,7 @@ static inline void GetFadeBanks(u16 **from, u16 **to, u32 fromOffset, u32 toOffs
     *to = (u16 *)(banks + toOffset);
 }
 
-void Sabata_UpdateSequencePalette(struct SceneVolumeActor *p)
+void Sabata_UpdateSequencePalette(struct SabataAttackActor *p)
 {
     switch (p->sequenceMode) {
         case 1: {
@@ -41,7 +41,7 @@ void Sabata_UpdateSequencePalette(struct SceneVolumeActor *p)
                                          Fraction(p->sequenceTimer, 1 << p->sequenceShift),
                                          p->sequenceShift);
             } else {
-                SabataVolume_ResetPendingSequence(p);
+                Sabata_ResetAttackSequence(p);
             }
             break;
         }
@@ -56,7 +56,7 @@ void Sabata_UpdateSequencePalette(struct SceneVolumeActor *p)
                                          Fraction(p->sequenceTimer, 1 << p->sequenceShift),
                                          p->sequenceShift);
             } else {
-                SabataVolume_ResetPendingSequence(p);
+                Sabata_ResetAttackSequence(p);
             }
             break;
         }
@@ -71,7 +71,7 @@ void Sabata_UpdateSequencePalette(struct SceneVolumeActor *p)
                                          Fraction(p->sequenceTimer, 1 << p->sequenceShift),
                                          p->sequenceShift);
             } else {
-                SabataVolume_ResetPendingSequence(p);
+                Sabata_ResetAttackSequence(p);
             }
             break;
         }

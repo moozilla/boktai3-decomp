@@ -28,8 +28,8 @@ static inline void ReverseEndingPose(struct DepartureDrawable *drawable)
 void VanargandHead_UpdateEndingScene(struct DepartureActor *input)
 {
     struct DepartureActor *screen = input;
-    struct Slot7Transition *motion = (struct Slot7Transition *)input;
-    u8 flag = Slot7_TakeActionEntry(motion);
+    struct VanargandHeadTransition *motion = (struct VanargandHeadTransition *)input;
+    u8 flag = VanargandHead_TakeActionEntry(motion);
     if (flag == 1) {
         struct DepartureDrawable *foreground = &screen->foreground;
         struct DisplaySequenceState *state;
@@ -41,7 +41,7 @@ void VanargandHead_UpdateEndingScene(struct DepartureActor *input)
         state = &screen->foreground.sequence;
         Anim_SetSequence(state, screen->sequenceResource, 2, 0, 0);
         StepPlaybackOne(foreground, state, flag);
-        Slot7_TransitionTo(motion, (void (*)(void))SceneMover_InterpolateScreenX);
+        VanargandHead_TransitionTo(motion, (void (*)(void))SceneMover_InterpolateScreenX);
         screen->endingPhase = 0;
     }
     switch (screen->endingPhase) {

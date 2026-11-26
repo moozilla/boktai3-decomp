@@ -3,9 +3,9 @@ static inline s32 scale(s32 value)
 {
     return value >= 0 ? value >> 12 : -((-value) >> 12);
 }
-void PileDriverRig_TickKnockback(struct ScenePanelRig *input)
+void PileDriverRig_TickKnockback(struct PileDriverRig *input)
 {
-    struct ScenePanelRig *rig = input;
+    struct PileDriverRig *rig = input;
     s32 dx, dz;
     u16 *zptr;
     rig->colliderHold = 6;

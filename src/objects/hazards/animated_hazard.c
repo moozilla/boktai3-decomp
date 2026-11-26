@@ -88,7 +88,7 @@ void AnimatedHazard_EmitWarning(void *m, struct AnimatedHazard *p)
             case 0:
             case 24:
             case 48:
-                AnimatedParticles_EmitOffset(&p->sprite.position, 1, 3, 0x3000, 64, 8, 256, 256);
+                ImpactBurst_EmitOffset(&p->sprite.position, 1, 3, 0x3000, 64, 8, 256, 256);
                 break;
         }
     }

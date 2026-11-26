@@ -37,7 +37,7 @@ void ScriptPanel_OpenTextWindow(void);
 void System_ShutdownAndSoftReset(void);
 
 
-static inline u8 Registry1745_FinishIfRequested(struct Reg1745Run *p)
+static inline u8 LinkSession_FinishIfRequested(struct Reg1745Run *p)
 {
     gLinkSessionStep = 14;
     if (p->shutdownRequested) {
@@ -107,7 +107,7 @@ u32 LinkSession_RunSession(struct Reg1745Run *p)
     gLinkSessionStep = 12;
     Callback_InvokeActor(p, q->callback);
     q->counter30++;
-    if (!Registry1745_FinishIfRequested(p))
+    if (!LinkSession_FinishIfRequested(p))
         gLinkSessionStep = 18;
     return 0;
 }

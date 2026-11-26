@@ -121,7 +121,7 @@ s32 WirelessLinkIndicator_Destroy(struct WirelessLinkIndicator *indicator)
     return 0;
 }
 
-s32 Widget_InitLinked(void *, void *, u32, u32, u32, u32, u32, void *);
+s32 AnimSprite_InitLinked(void *, void *, u32, u32, u32, u32, u32, void *);
 
 s32 WirelessLinkIndicator_Initialize(struct WirelessLinkIndicator *indicator)
 {
@@ -134,7 +134,7 @@ s32 WirelessLinkIndicator_Initialize(struct WirelessLinkIndicator *indicator)
         indicator->resource = *resource;
         relocated = &indicator->resource;
         ResourceHeader_Relocate(relocated, (void *)resource);
-        Widget_InitLinked(&indicator->animation, relocated, 34, 17, 0, 0, 60, NULL);
+        AnimSprite_InitLinked(&indicator->animation, relocated, 34, 17, 0, 0, 60, NULL);
         result = 0;
     } else
         result = -1;

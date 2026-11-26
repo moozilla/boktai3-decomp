@@ -20,15 +20,15 @@ struct ScriptArgs {
 };
 void LinkSession_SetMenuRequest(u32);
 s32 GameState_GetResultIndex(void);
-u8 LinkParticipant_IsLocallySelected(struct Glove *);
+u8 LinkParticipant_IsLocallySelected(struct CoffinBike *);
 void Sound_StopSong(u32);
 void Sound_StopTrackedSong(u32);
-void ScenePool_ClampMotionSpeeds(struct GloveMotion *);
-void Actor_ClampMovementSpeed(struct GloveMotion *);
+void ScenePool_ClampMotionSpeeds(struct CoffinBikeMotion *);
+void Actor_ClampMovementSpeed(struct CoffinBikeMotion *);
 s32 Div(s32, s32);
 s32 Math_Atan2(s32, s32);
-void Terrain_ResolveActorMotion(struct GloveMotion *);
-void Actor_UpdateShadowSpriteParts(struct GloveMotion *, void *);
+void Terrain_ResolveActorMotion(struct CoffinBikeMotion *);
+void Actor_UpdateShadowSpriteParts(struct CoffinBikeMotion *, void *);
 void CharacterModel_UpdateAccessoryAnimations(void *);
 void MotionActor_RunPendingScript(void *);
 void MotionActor_RunDelayedScript(void *);
@@ -51,21 +51,21 @@ static inline s32 LinkParticipant(void)
         return -1;
     return ((struct LinkMenu *)gLinkSession)->participant;
 }
-static inline void SetCallback(struct Glove *p, void (*callback)(void *), u32 zero)
+static inline void SetCallback(struct CoffinBike *p, void (*callback)(void *), u32 zero)
 {
     p->active = 1;
     p->update = callback;
     p->timer = zero;
 }
 // confidence=low: per-frame glove update: runs its entry script, steps the motion, or switches to a delayed callback when far from its origin.
-static inline s32 Glove_Participant(struct Glove *actor)
+static inline s32 CoffinBike_Participant(struct CoffinBike *actor)
 {
     return actor->participant;
 }
 
-void sub_08116E44(struct Glove *p)
+void sub_08116E44(struct CoffinBike *p)
 {
-    struct GloveMotion *self = &p->motion;
+    struct CoffinBikeMotion *self = &p->motion;
     s32 values[2];
     struct ScriptArgs args;
     s32 h, dx, dz;
@@ -74,9 +74,9 @@ void sub_08116E44(struct Glove *p)
     s32 *previousX, *previousZ, *lateral;
     if (p->active) {
         if (Engine_PauseBits(0x800)) {
-            values[0] = Glove_Participant(p);
+            values[0] = CoffinBike_Participant(p);
             values[1] = *LinkResult();
-            if (Glove_Participant(p) == LinkParticipant())
+            if (CoffinBike_Participant(p) == LinkParticipant())
                 LinkSession_SetMenuRequest(4);
         } else {
             values[0] = GameState_GetResultIndex();

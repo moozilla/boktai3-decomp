@@ -2,7 +2,7 @@
 #include "engine/math/math_shift.h"
 #include "scene/motion/scene_actor_displacement.h"
 #include "scene/motion/scene_actor_chase.h"
-#include "monsters/tentacle_spread.h"
+#include "monsters/centipede_spread.h"
 #include "monsters/slime.h"
 #include "scene/motion/scene_actor_turn.h"
 #include "scene/actor/scene_actor_visibility.h"
@@ -1855,7 +1855,7 @@ s32 Slime_Init(void *object)
         res = ScriptProc_Start(0xCB05, 0xB96C);
         *(struct DisplayResourceHeader *)heap = *(struct DisplayResourceHeader *)res;
         ResourceHeader_Relocate(heap, res);
-        Widget_InitLinked((void *)&((struct SceneActorAnimationTileDrawable *)heap)->tile, heap, 0,
+        AnimSprite_InitLinked((void *)&((struct SceneActorAnimationTileDrawable *)heap)->tile, heap, 0,
                           0, 2, 2, 0x3C, &tmp);
         actor->base.animationIndex = 0xFF;
     }

@@ -6,7 +6,7 @@ struct Pair081CBC44 {
 struct Pair081CBC44 *SunOrb_GetPosition(s32);
 void sub_081FED40(s32);
 void Sound_PlaySong(u32);
-void sub_081C8EC0(u8 *);
+void StoryCharacter_SpawnRadialEffect(u8 *);
 void SceneCharacter_UpdateParticleDissolve(u8 *a, u8 *b, s32 frame)
 {
     u8 *pos = b + 0x20;
@@ -22,11 +22,11 @@ void SceneCharacter_UpdateParticleDissolve(u8 *a, u8 *b, s32 frame)
     }
     if (frame <= 30) {
         if (frame <= 19 || Mod(frame, 2) == 0) {
-            sub_081C8EC0(b);
+            StoryCharacter_SpawnRadialEffect(b);
             if (frame <= 9) {
                 s32 i = 1;
                 do {
-                    sub_081C8EC0(b);
+                    StoryCharacter_SpawnRadialEffect(b);
                     i--;
                 } while (i >= 0);
             }

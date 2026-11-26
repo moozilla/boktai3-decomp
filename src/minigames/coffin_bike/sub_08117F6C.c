@@ -9,19 +9,19 @@
 
 s32 Div(s32, s32);
 s32 Math_Atan2(s32, s32);
-void Terrain_ResolveActorMotion(struct GloveMotion *);
-void PalFade_Update(struct GloveMotion *);
-void Actor_UpdateShadowSpriteParts(struct GloveMotion *, void *);
-void ActorParticles_SpawnImpactBurst(struct GloveMotion *);
+void Terrain_ResolveActorMotion(struct CoffinBikeMotion *);
+void PalFade_Update(struct CoffinBikeMotion *);
+void Actor_UpdateShadowSpriteParts(struct CoffinBikeMotion *, void *);
+void ActorParticles_SpawnImpactBurst(struct CoffinBikeMotion *);
 void CharacterModel_UpdateAccessoryAnimations(void *);
-void ScenePool_ClampMotionSpeeds(struct GloveMotion *);
-void Actor_ClampMovementSpeed(struct GloveMotion *);
-void MotionActor_UpdateMovementAudio(struct Glove *);
-u8 LinkParticipant_IsLocallySelected(struct Glove *);
+void ScenePool_ClampMotionSpeeds(struct CoffinBikeMotion *);
+void Actor_ClampMovementSpeed(struct CoffinBikeMotion *);
+void MotionActor_UpdateMovementAudio(struct CoffinBike *);
+u8 LinkParticipant_IsLocallySelected(struct CoffinBike *);
 void PalFade_Start(void *, s32, u16, s32, s32, s32, s32, s32);
 s32 CharacterModel_GetPrimaryPaletteIndex(void *);
 void ChargeMarker_TickHold(void *, void *, u32);
-void CoffinBike_UpdateStopping(struct Glove *);
+void CoffinBike_UpdateStopping(struct CoffinBike *);
 
 void GameState_AddActionCount894(s32);
 void CharacterModel_ClearAnimationFlags(void *, s32);
@@ -30,21 +30,20 @@ void ActorMarkerPool_ShowMarker(s32);
 void Character_SetLowResourceColorEffect(void *, void *);
 
 // confidence=low: restores appearance and resources after defeat recovery.
-#define Glove_UpdateRecoveryFlash sub_08117F6C
-union GloveResourceHalfword {
+union CoffinBikeResourceHalfword {
     u16 bits;
     s16 value;
 };
-static inline void Glove_ChangeUpdate(struct Glove *p, void (*callback)(void *))
+static inline void CoffinBike_ChangeUpdate(struct CoffinBike *p, void (*callback)(void *))
 {
     u8 *active = &p->active;
     *active = 1;
     p->update = callback;
     p->timer = 0;
 }
-void Glove_UpdateRecoveryFlash(struct Glove *p)
+void CoffinBike_UpdateRecoveryFlash(struct CoffinBike *p)
 {
-    struct GloveMotion *self = &p->motion;
+    struct CoffinBikeMotion *self = &p->motion;
     s32 h;
     s32 dx;
     s32 dz;
@@ -151,9 +150,9 @@ void Glove_UpdateRecoveryFlash(struct Glove *p)
     }
     self->style.initialWord = self->style.currentWord;
     {
-        union GloveResourceHalfword *current, *target;
-        union GloveResourceHalfword *currentField = (void *)&self->style.initialHalfword;
-        union GloveResourceHalfword *targetField = (void *)&self->style.currentHalfword;
+        union CoffinBikeResourceHalfword *current, *target;
+        union CoffinBikeResourceHalfword *currentField = (void *)&self->style.initialHalfword;
+        union CoffinBikeResourceHalfword *targetField = (void *)&self->style.currentHalfword;
         u32 currentBits = currentField->bits;
         s32 currentValue = (s16)currentBits;
         u32 targetBits = targetField->bits;
@@ -171,7 +170,7 @@ void Glove_UpdateRecoveryFlash(struct Glove *p)
             self->style.initialWord = self->style.currentWord;
             current->bits = target->bits;
             CharacterModel_ClearAnimationFlags(&p->model, 1);
-            Glove_ChangeUpdate(p, (void (*)(void *))CoffinBike_UpdateStopping);
+            CoffinBike_ChangeUpdate(p, (void (*)(void *))CoffinBike_UpdateStopping);
             ActorMarkerPool_ShowMarker(p->marker);
             {
                 s32 mask = ~1;

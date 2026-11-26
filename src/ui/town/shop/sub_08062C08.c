@@ -23,7 +23,7 @@ void Shop_InitPanel(struct SceneInventoryTail *p, s32 mode)
         resource = &p->display.widgetResource;
         widget = ((struct SceneInventoryPanel *)p)->comparison[0];
         for (i = 0; i < 3; i++) {
-            Widget_InitLinked(widget, &p->display.widgetResource, 0, 0x30, 0, 0, 60, location);
+            AnimSprite_InitLinked(widget, &p->display.widgetResource, 0, 0x30, 0, 0, 60, location);
             location->x += 8;
             widget++;
         }
@@ -34,7 +34,7 @@ void Shop_InitPanel(struct SceneInventoryTail *p, s32 mode)
         struct SceneInputPackedPosition *location = &position;
         struct AnimSprite *widget = ((struct SceneInventoryPanel *)p)->comparison[1];
         for (i = 0; i < 3; i++) {
-            Widget_InitLinked(widget, resource, 0, 0x30, 0, 0, 60, location);
+            AnimSprite_InitLinked(widget, resource, 0, 0x30, 0, 0, 60, location);
             location->x += 8;
             widget++;
         }
@@ -45,7 +45,7 @@ void Shop_InitPanel(struct SceneInventoryTail *p, s32 mode)
         struct SceneInputPackedPosition *location = &position;
         struct AnimSprite *widget = ((struct SceneInventoryPanel *)p)->comparison[2];
         for (i = 0; i < 3; i++) {
-            Widget_InitLinked(widget, resource, 0, 0x30, 0, 0, 60, location);
+            AnimSprite_InitLinked(widget, resource, 0, 0x30, 0, 0, 60, location);
             location->x += 8;
             widget++;
         }
@@ -56,7 +56,7 @@ void Shop_InitPanel(struct SceneInventoryTail *p, s32 mode)
         struct SceneInputPackedPosition *location = &position;
         struct AnimSprite *widget = ((struct SceneInventoryPanel *)p)->comparison[3];
         for (i = 0; i < 3; i++) {
-            Widget_InitLinked(widget, resource, 0, 0x30, 0, 0, 60, location);
+            AnimSprite_InitLinked(widget, resource, 0, 0x30, 0, 0, 60, location);
             location->x += 8;
             widget++;
         }
@@ -67,7 +67,7 @@ void Shop_InitPanel(struct SceneInventoryTail *p, s32 mode)
         struct SceneInputPackedPosition *location = &position;
         struct AnimSprite *widget = ((struct SceneInventoryPanel *)p)->comparison[4];
         for (i = 0; i < 3; i++) {
-            Widget_InitLinked(widget, resource, 0, 0x30, 0, 0, 60, location);
+            AnimSprite_InitLinked(widget, resource, 0, 0x30, 0, 0, 60, location);
             location->x += 8;
             widget++;
         }

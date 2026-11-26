@@ -453,7 +453,7 @@ extern const struct ContactPosition gUnk_0824F6A0, gUnk_0824F6B0, gUnk_0824F6A8;
 
 s32 ResourceHeader_Relocate(void *, void *);
 
-void Widget_InitLinked(void *, void *, int, int, int, int, int, const void *);
+void AnimSprite_InitLinked(void *, void *, int, int, int, int, int, const void *);
 
 void ScaledShadow_InitializeDefault(void *, void *);
 
@@ -472,7 +472,7 @@ void SceneEffect_InitActor(struct SceneEffectActor *actor, s32 mode, s32 flip)
     void (*destroy)(void *);
     ResourceHeader_Relocate(animationData, resource);
     animation = &actor->animation;
-    Widget_InitLinked(animation, animationData, 0, 0, 2, 0, 0x3c, &gUnk_0824F6A0);
+    AnimSprite_InitLinked(animation, animationData, 0, 0, 2, 0, 0x3c, &gUnk_0824F6A0);
     Anim_SetKeyframes(animation, animationData, 5, 1, 0);
     if (flip)
         actor->animation.flags |= 4;

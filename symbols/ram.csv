@@ -2,7 +2,7 @@ addr,name,size,kind,decl,header,confidence,notes
 02000000,gBackgrounds,10,object,extern struct Background *gBackgrounds[];,include/effects/screen/background_controller.h,low,
 02000010,gScrollingBackgrounds,10,object,extern struct ScrollingBackground *gScrollingBackgrounds[];,include/effects/screen/background_controller.h,low,
 02000020,gColorFadeController,4,object,extern struct ColorFadeController *gColorFadeController;,include/engine/ram.h,low,
-02000024,gSceneObjectManager,4,object,extern struct SceneObjectManager *gSceneObjectManager;,include/objects/scene_objects/scene_object.h,low,
+02000024,gSceneObjectManager,4,object,extern struct SceneObjectManager *gSceneObjectManager;,include/objects/scene_object.h,low,
 02000028,gTerrainModifierManager,4,object,extern struct TerrainModifierManager *gTerrainModifierManager;,include/scene/terrain/terrain_modifier.h,low,
 0200002C,gChoiceMenu,4,object,extern struct ChoiceMenu *gChoiceMenu;,include/ui/dialogue/choice_menu.h,low,
 02000030,gTriggerManager,4,object,extern struct TriggerManager *gTriggerManager;,include/objects/items/item_container.h,low,
@@ -17,7 +17,7 @@ addr,name,size,kind,decl,header,confidence,notes
 02000054,gShadowManager,4,object,extern u32 gShadowManager;,include/engine/ram.h,low,shadow task singleton (Shadow_*)
 02000058,gScaledShadowManager,4,object,extern u32 gScaledShadowManager;,include/engine/ram.h,low,scaled shadow manager singleton (ScaledShadow_*)
 0200005C,gSceneActorEffectsManager,4,object,extern void *gSceneActorEffectsManager;,include/engine/ram.h,low,scene actor effects manager (SceneActorEffects_*)
-02000060,gParticleGroupManager,4,object,extern void *gParticleGroupManager;,include/engine/ram.h,low,provisional: six-group particle manager singleton (ParticleManager_Initialize)
+02000060,gParticleGroupManager,4,object,extern void *gParticleGroupManager;,include/engine/ram.h,low,provisional: six-group particle manager singleton (ImpactParticleManager_Initialize)
 02000064,gFragmentManager,4,object,extern struct FragmentManager *gFragmentManager;,include/engine/ram.h,low,fragment manager singleton (FragmentManager_*)
 02000068,gAnimatedParticleManager,4,object,extern void *gAnimatedParticleManager;,include/engine/ram.h,low,animated particle manager (AnimatedParticleManager_*)
 0200006C,gFadingParticleManager,4,object,extern void *gFadingParticleManager;,include/engine/ram.h,low,fading particle manager (FadingParticleManager_*)
@@ -68,7 +68,7 @@ addr,name,size,kind,decl,header,confidence,notes
 02000140,gAnimatedBodyPool,4,object,extern struct SceneScheduledEffectPool *gAnimatedBodyPool;,include/engine/ram.h,low,
 02000144,gSpriteNoticeManager,4,object,extern struct SpriteNoticeManager *gSpriteNoticeManager;,include/engine/ram.h,low,
 02000148,gPairSlotPool,4,object,extern struct PairSlotPool *gPairSlotPool;,include/engine/ram.h,low,
-0200014C,gBouncingPool,4,object,extern struct BouncingPool *gBouncingPool;,include/objects/bouncing_object/bouncing_object.h,low,
+0200014C,gBouncingPool,4,object,extern struct BouncingPool *gBouncingPool;,include/objects/bouncing_bombs/bouncing_object.h,low,
 02000150,gSpriteBurstManager,4,object,extern u32 gSpriteBurstManager;,include/engine/ram.h,low,
 02000154,gScriptedParticlePool,4,object,extern u8 *gScriptedParticlePool;,include/engine/ram.h,low,scripted particle pool (ScriptedParticle_*)
 02000158,gSceneStatusIndicatorManager,4,object,extern u32 gSceneStatusIndicatorManager;,include/engine/ram.h,low,
@@ -136,7 +136,7 @@ addr,name,size,kind,decl,header,confidence,notes
 02000268,gRegistryF3E4Actor,4,object,extern struct F3E4Actor *gRegistryF3E4Actor;,include/engine/ram.h,low,provisional: registry F3E4 singleton actor
 0200026C,gShipWheel,4,object,extern u32 gShipWheel;,include/engine/ram.h,low,ship wheel task (ShipWheel_*)
 02000274,gSceneNpc,4,object,extern struct SceneNpc *gSceneNpc;,include/engine/ram.h,low,
-02000278,gSceneNpcBlendPalette,20,object,extern u16 gSceneNpcBlendPalette[16];,include/engine/ram.h,low,sixteen-color output palette blended by SceneNpc_BlendPalette
+02000278,gSceneNpcBlendPalette,20,object,extern u16 gSceneNpcBlendPalette[16];,include/engine/ram.h,low,sixteen-color output palette blended by Kuro_BlendPalette
 02000298,gCloudTask,4,object,extern struct CloudTask *gCloudTask;,include/engine/ram.h,low,
 020002A0,gOptionMenuParameters,20,object,extern struct OptionMenuParameters gOptionMenuParameters;,include/ui/menu_parameters.h,low,option-menu callbacks; keyword names retained; indexed and named views share eight words
 020002C0,gChoiceMenuParameters,28,object,extern struct ChoiceMenuParameters gChoiceMenuParameters;,include/ui/menu_parameters.h,low,provisional choice-menu parameters; script keyword fields retained; n2 is also called value
@@ -173,7 +173,7 @@ addr,name,size,kind,decl,header,confidence,notes
 02000498,gScriptKeyframeManager,4,object,extern struct ScriptKeyframeManager *gScriptKeyframeManager;,include/script/script_keyframe_pool.h,low,
 0200049C,gCountdownTimer,4,object,extern struct CountdownTimer *gCountdownTimer;,include/ui/hud/countdown_timer.h,low,
 020004A0,gRisingSpritePool,4,object,extern u32 gRisingSpritePool;,include/engine/ram.h,low,
-020004A4,gScenePanel,4,object,extern struct ScenePanel *gScenePanel;,include/objects/pile_driver/scene_panel.h,low,
+020004A4,gScenePanel,4,object,extern struct ScenePanel *gScenePanel;,include/objects/pile_driver/pile_driver.h,low,
 020004A8,gSceneActorRegistryManager,4,object,extern struct SceneActorRegistryManager *gSceneActorRegistryManager;,include/scene/actor/scene_actor_registry.h,low,
 020004AC,gSceneActorRegistryNode,4,object,extern struct SceneActorRegistryNode *gSceneActorRegistryNode;,include/scene/actor/scene_actor_registry.h,low,
 020004B0,gSlotMonitor,4,object,extern u32 gSlotMonitor;,include/engine/ram.h,low,

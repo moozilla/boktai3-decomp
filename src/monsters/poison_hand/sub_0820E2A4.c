@@ -20,13 +20,13 @@ void Anim_RestartSequence(void *, void *, u32, u32, u32);
 void AnimData_SelectPaletteBank(void *, s32);
 s32 PoisonHand_UpdateDefeatBurst(void *);
 s32 Mod(s32, s32);
-void EnemyParticle_InitParameters(void *);
-void EnemyParticle_SetGraphicsParameters(void *, u32, u32, s32);
-void EnemyParticle_SetMotionParameters(void *, u16, u16, u8, u32);
-void EnemyParticle_SetVerticalMotion(void *, s32, s32);
-void EnemyParticle_EnableShadow(void *);
-void EnemyParticle_AddFlags(void *, u32);
-void EnemyParticle_Emit(void *, void *);
+void EnemyAttackParticle_InitParameters(void *);
+void EnemyAttackParticle_SetGraphicsParameters(void *, u32, u32, s32);
+void EnemyAttackParticle_SetMotionParameters(void *, u16, u16, u8, u32);
+void EnemyAttackParticle_SetVerticalMotion(void *, s32, s32);
+void EnemyAttackParticle_EnableShadow(void *);
+void EnemyAttackParticle_AddFlags(void *, u32);
+void EnemyAttackParticle_Emit(void *, void *);
 
 s32 PoisonHand_Update(struct PoisonHand *p)
 {
@@ -74,26 +74,26 @@ s32 PoisonHand_Update(struct PoisonHand *p)
                     {
                         s32 frame = Mod(ParticleRandom_ReadSample(randomTable), 2) + 0x1d;
                         u8 direction;
-                        EnemyParticle_InitParameters(&parameters);
+                        EnemyAttackParticle_InitParameters(&parameters);
                         direction = ParticleRandom_ReadSample(randomTable);
-                        EnemyParticle_SetGraphicsParameters(&parameters, 0x7e7c, frame, 0x1c5);
-                        EnemyParticle_SetMotionParameters(&parameters, 0, 60, direction,
+                        EnemyAttackParticle_SetGraphicsParameters(&parameters, 0x7e7c, frame, 0x1c5);
+                        EnemyAttackParticle_SetMotionParameters(&parameters, 0, 60, direction,
                                                           ParticleRandom_ReadSample(randomTable) &
                                                               15);
-                        EnemyParticle_SetVerticalMotion(&parameters, 0x2000, 0x18000);
-                        EnemyParticle_EnableShadow(&parameters);
+                        EnemyAttackParticle_SetVerticalMotion(&parameters, 0x2000, 0x18000);
+                        EnemyAttackParticle_EnableShadow(&parameters);
                         if (i & 1)
-                            EnemyParticle_AddFlags(&parameters, 0x200);
+                            EnemyAttackParticle_AddFlags(&parameters, 0x200);
                         else
-                            EnemyParticle_AddFlags(&parameters, 0x400);
+                            EnemyAttackParticle_AddFlags(&parameters, 0x400);
                         {
                             const u16 *lateBank = (const u16 *)dataOwner;
                             if (ParticleRandom_ReadBankSample(lateBank) & 1)
-                                EnemyParticle_AddFlags(&parameters, 4);
+                                EnemyAttackParticle_AddFlags(&parameters, 4);
                             if (ParticleRandom_ReadBankSample(lateBank) & 1)
-                                EnemyParticle_AddFlags(&parameters, 8);
+                                EnemyAttackParticle_AddFlags(&parameters, 8);
                         }
-                        EnemyParticle_Emit(&parameters, &p->sprite.position);
+                        EnemyAttackParticle_Emit(&parameters, &p->sprite.position);
                     }
                 }
                 Anim_RestartSequence(&p->sequence, p->animationResource, 0x19, 0, 0);

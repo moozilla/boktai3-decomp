@@ -1,0 +1,33 @@
+#include "global.h"
+/* ImpactBurst_EmitFan: Builds a particle Config and emits a fan-shaped spread using a yaw/yawRange/count/decay parameter set (matches existing src alias) */
+#define ImpactBurst_EmitFan sub_08015B1C
+struct Config {
+    u16 v[20];
+};
+void ImpactBurst_Create(int, void *, struct Config *);
+#define ImpactBurst_EmitFan sub_08015B1C
+void ImpactBurst_EmitFan(void *pos, int yaw, int yawRange, int count, int type, int flags,
+                               int speed, int horizontal, int start, int decay)
+{
+    struct Config s;
+    s.v[0] = type;
+    s.v[1] = flags;
+    s.v[3] = speed;
+    s.v[4] = 0;
+    s.v[5] = 0;
+    s.v[6] = horizontal;
+    s.v[7] = 0;
+    s.v[8] = 0;
+    s.v[9] = 0;
+    s.v[10] = yaw;
+    s.v[11] = yawRange;
+    s.v[12] = start;
+    s.v[13] = 0;
+    s.v[14] = decay;
+    s.v[15] = 0;
+    s.v[16] = start;
+    s.v[17] = 0;
+    s.v[18] = decay;
+    s.v[19] = 0;
+    ImpactBurst_Create(count, pos, &s);
+}

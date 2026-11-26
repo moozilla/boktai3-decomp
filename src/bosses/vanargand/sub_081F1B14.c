@@ -1,7 +1,7 @@
 #include "global.h"
 #include "link/wireless/scene_pool.h"
 
-struct SingletonSlot7Actor {
+struct VanargandHeadActor {
     u8 pad0[0x90];
     u32 callbackTimer;
     u8 pad94[8];
@@ -31,14 +31,14 @@ struct SingletonSlot7Scroll {
 s32 Player_GetHorizontalVelocity(s32);
 void Player_GetWorldPosition(s32, s32 *);
 void SceneTilemap_CopyScrollSourceState(struct SingletonSlot7Scroll *);
-void VanargandHead_ResetDisplayState(struct SingletonSlot7Actor *);
-void VanargandHead_DispatchUpdateCallback(struct SingletonSlot7Actor *);
-void SceneActors_TickStateCallback(struct SingletonSlot7Actor *);
-void SceneActors_UpdateTargetMetrics(struct SingletonSlot7Actor *);
-void SceneActors_UpdateEffects(struct SingletonSlot7Actor *);
+void VanargandHead_ResetDisplayState(struct VanargandHeadActor *);
+void VanargandHead_DispatchUpdateCallback(struct VanargandHeadActor *);
+void SceneActors_TickStateCallback(struct VanargandHeadActor *);
+void SceneActors_UpdateTargetMetrics(struct VanargandHeadActor *);
+void SceneActors_UpdateEffects(struct VanargandHeadActor *);
 void Sound_StopSong(u32);
 void SceneActors_UpdateIdleDisplay(void);
-void VanargandHead_UpdatePresentation(struct SingletonSlot7Actor *);
+void VanargandHead_UpdatePresentation(struct VanargandHeadActor *);
 
 static inline u8 PlayerHasFlag(void)
 {
@@ -51,18 +51,18 @@ static inline u8 PlayerHasFlag(void)
     return 0;
 }
 
-static inline void (*SingletonSlot7_GetCallback(struct SingletonSlot7Actor *owner))(void)
+static inline void (*VanargandHead_GetCallback(struct VanargandHeadActor *owner))(void)
 {
     return owner->callback;
 }
 s32 VanargandHead_Update(void *arg)
 {
-    struct SingletonSlot7Actor *actor = arg;
-    struct SingletonSlot7Actor *p = actor;
+    struct VanargandHeadActor *actor = arg;
+    struct VanargandHeadActor *p = actor;
     struct SingletonSlot7Scroll scroll[2];
     if (actor->motionMode == 0) {
         u32 flagged = PlayerHasFlag();
-        if (flagged == 1 && SingletonSlot7_GetCallback(p) != SceneActors_UpdateIdleDisplay) {
+        if (flagged == 1 && VanargandHead_GetCallback(p) != SceneActors_UpdateIdleDisplay) {
             p->callback = SceneActors_UpdateIdleDisplay;
             p->callbackTimer = 0;
             p->callbackEntered = flagged;

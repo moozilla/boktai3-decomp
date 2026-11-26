@@ -401,7 +401,7 @@ void PlayerClone_InitSlot(void *unused, struct PlayerCloneSlot *s, u32 arg)
         ResourceHeader_Relocate(obj, res);
         {
             struct AnimSprite *p = &s->animation;
-            Widget_InitLinked(p, obj, 0, 0, 2, 1, zero, zero);
+            AnimSprite_InitLinked(p, obj, 0, 0, 2, 1, zero, zero);
             s->animation.flags |= 1;
             value = ActorDebris_Create(p, &s->foldedFacing, &s->mirrored);
             s->debris = value;

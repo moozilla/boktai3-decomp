@@ -1,6 +1,6 @@
 #include "global.h"
 #include "engine/video/display_sequence.h"
-#include "npc/cutscene_actor/actor_animation_controller.h"
+#include "ui/title/actor_animation_controller.h"
 #include "engine/video/display_sprite_playback.h"
 #include "engine/video/render.h"
 #include "engine/input.h"

@@ -102,8 +102,7 @@ static inline void SetDisplayFlag(struct StateActor *p, u32 mask)
 }
 
 /* Turn toward the tracked player and select the attachment on state entry. */
-#define StateActor_UpdateTargetTurn sub_081CC1B4
-void StateActor_UpdateTargetTurn(struct StateActorTargetContext *ctx, struct StateActor *p)
+void StoryCharacter_UpdateTargetTurn(struct StateActorTargetContext *ctx, struct StateActor *p)
 {
     u32 r;
     struct StateActorPos *target = ctx->target;

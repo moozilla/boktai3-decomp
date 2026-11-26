@@ -168,7 +168,7 @@ int WirelessStatusMenu_InitFromScript(struct WirelessStatusMenu *menu)
     ResourceHeader_Relocate(blob, resource);
     {
         void *drawable = &menu->widget;
-        Widget_InitLinked(drawable, blob, 3, 0x2011, 0, 0, 60, 0);
+        AnimSprite_InitLinked(drawable, blob, 3, 0x2011, 0, 0, 60, 0);
     }
     menu->completionProcedure = Script_GetKeywordValue('r', 0);
     menu->window = -1;

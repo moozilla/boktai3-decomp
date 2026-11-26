@@ -56,7 +56,7 @@ const STAGES = stageData('build/assets/stages.json', 'tools/assets/stages.py', [
 const LOCKS = stageData('build/autopilot/locks.json', 'tools/autopilot/locks.py', [], {});
 const PLATE_PUZZLES = stageData('build/autopilot/plate-puzzles.json', 'tools/autopilot/plate-puzzles.py', [], {});
 const ESCORT_TARGETS = stageData('build/autopilot/escort-targets.json', 'tools/autopilot/escort-targets.py', [], {});
-// What carries which reaction flag (tools/autopilot/breakers.py: Breakable_OnHit, the gun's
+// What carries which reaction flag (tools/autopilot/breakers.py: LightFixture_OnHit, the gun's
 // lens table, weapon modifiers, read from the source and the ROM's weapon records).
 const BREAKERS = (() => {
   const f = path.join(ROOT, 'build/autopilot/breakers.json');

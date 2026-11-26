@@ -1,5 +1,5 @@
-#include "objects/pile_driver/scene_panel_subject_tail.h"
-s32 PileDriverSubject_Update(struct ScenePanelSubject *subject)
+#include "objects/pile_driver/pile_driver_subject_tail.h"
+s32 PileDriverSubject_Update(struct PileDriverSubject *subject)
 {
     if (subject->state)
         PileDriverSubject_KeepPlayerOutside((void *)subject);

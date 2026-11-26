@@ -1,5 +1,5 @@
 #include "objects/pile_driver/pile_driver_subject.h"
-void PileDriverSubject_ResetPosition(struct ScenePanelSubject *subject)
+void PileDriverSubject_ResetPosition(struct PileDriverSubject *subject)
 {
     s32 random_2;
     s32 offset;

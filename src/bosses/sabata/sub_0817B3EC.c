@@ -1,19 +1,19 @@
-#include "bosses/sabata/scene_volume.h"
+#include "bosses/sabata/sabata_attack_state.h"
 extern u32 gUnk_02000560;
 struct EffectScriptArgs {
     u32 count;
     s32 *values;
 };
 s32 Player_IsSlotInActionTwelveOrThirtyEight(s32);
-void ActorEffect_UpdateIdleScript(struct SceneVolumeActor *actor)
+void ActorEffect_UpdateIdleScript(struct SabataAttackActor *actor)
 {
-    struct SceneVolumeActor *scriptsActor = actor;
+    struct SabataAttackActor *scriptsActor = actor;
     /* This path fills the argument slots and passes the adjacent uninitialized descriptor. */
     struct {
         s32 values[8];
         struct EffectScriptArgs args;
     } call;
-    if (SceneVolume_TakeQueued(actor)) {
+    if (Sabata_TakeQueued(actor)) {
         actor->alternateDirection = actor->requestedDirection;
         {
             u32 animation = 14;
