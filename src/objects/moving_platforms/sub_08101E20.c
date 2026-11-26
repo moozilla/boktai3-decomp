@@ -1,5 +1,4 @@
-#include "global.h"
-#include "engine/ram.h"
+#include "objects/moving_platforms/named_object.h"
 
 static inline u8 Tst(u16 *m, s32 one)
 {
@@ -8,13 +7,13 @@ static inline u8 Tst(u16 *m, s32 one)
     return FALSE;
 }
 
-u32 MovingPlatform_IsMapCellOccupied(u32 x)
+u32 MovingPlatform_IsMapCellOccupied(u32 cell)
 {
-    u8 *b = (u8 *)gNamedActorManager;
-    s32 i = 0;
-    for (; i < 12; i++) {
-        if (Tst((u16 *)(b + i * 0x19C + 0xD4), 1)) {
-            if (*(u16 *)(b + i * 0x19C + 0x166) == x)
+    struct NamedObjectManager *manager = gNamedActorManager;
+    s32 i;
+    for (i = 0; i < 12; i++) {
+        if (Tst((u16 *)&manager->slots[i].flags, 1)) {
+            if (manager->slots[i].registration.index == cell)
                 return 1;
         }
     }
