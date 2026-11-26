@@ -9,16 +9,6 @@ static inline u8 IsControlled(struct ChaseActor *a)
         return 1;
     return 0;
 }
-static inline void ClearRoute(struct ChaseActor *a, u8 *group)
-{
-    struct SceneActorRegistryControl *route = (void *)(group + 0x4C);
-    u32 *flags = &a->base.behaviorFlags;
-    u32 mask = ~0x141C0;
-    *flags &= mask;
-    route->counter = 0;
-    route->field14 = 0;
-    route->timer = 0;
-}
 void SceneActorReaction_PlayStaggerBurst(struct ChaseActor *actor, s32 frame)
 {
     struct SceneActorChaseGroup *group = &actor->group;
@@ -27,7 +17,7 @@ void SceneActorReaction_PlayStaggerBurst(struct ChaseActor *actor, s32 frame)
         u32 state;
         struct ContactPosition range;
         if (IsControlled(actor))
-            ClearRoute(actor, (u8 *)group);
+            SceneActorReaction_ResetRouteControl(actor, &group->common.control);
         if (category == 22)
             SceneActorAnimation_SelectProfileEntry((void *)actor, 3);
         else
