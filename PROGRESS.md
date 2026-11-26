@@ -10,11 +10,11 @@ Without concessions: **100.000%**. With concessions (register pins, asm barriers
 |---|---:|
 | `volatile` | 2 (+17 excused) |
 | `cflags` | 0 (+50 excused) |
-| `goto` (tracked, not scored) | 2,036 |
+| `goto` (tracked, not scored) | 2,031 |
 
 | Warnings (`python3 tools/concessions.py`; not scored) | |
 |---|---:|
-| `dead-code` | 13 (+1 excused) |
+| `dead-code` | 11 (+1 excused) |
 | `proved-zero` | 17 |
 | `once-loop` | 77 (+1 excused) |
 | `stmt-expr` | 1 |
@@ -27,7 +27,7 @@ Without concessions: **100.000%**. With concessions (register pins, asm barriers
 | `volatile-view` | 2 |
 | `local-union` | 71 (+2 excused) |
 | `literal-param` | 2,871 (+79 excused) |
-| total | 7,275 |
+| total | 7,273 |
 
 Steering debt (parked constant uses and unresolved inline constant arguments): **7,037**.
 
