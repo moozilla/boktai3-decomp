@@ -382,13 +382,6 @@ u8 Golem_InvokeEnabledBehavior(struct ChaseActor *actor)
     return r;
 }
 
-struct Seq {
-    u8 pad0[8];
-    u16 h8;
-    u8 padA[4];
-    u16 hE;
-};
-
 extern u16 gUnk_08606120[];
 
 u16 Skeleton_LookupAnimationEntry(struct ChaseActor *actor)
@@ -948,14 +941,15 @@ void Golem_UpdateDeath(struct ChaseActor *actor, s32 frame)
 
 void Skeleton_ClearDirectionalEntryFlag(struct RoomActor *s)
 {
-    struct Seq *seq = (struct Seq *)((u8 *)s->drawable + 0x48);
+    struct SceneActorControlMotionDrawable *drawable = s->drawable;
+    struct DisplaySequenceState *sequence = &drawable->sequence;
 
     if (SceneActorControl_TakeFlag(&s->field2B2)) {
         SceneActorAnimation_SelectDirectionalEntry(s, 0xE);
         s->restart = 0;
     }
-    if (seq->h8 == 1)
-        seq->hE = 0;
+    if (sequence->index == 1)
+        sequence->elapsed = 0;
 }
 
 void Golem_UpdateChargeBuildup(struct ChaseActor *actor, s32 frame);
