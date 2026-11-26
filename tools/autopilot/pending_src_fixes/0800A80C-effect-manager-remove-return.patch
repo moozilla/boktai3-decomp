@@ -1,0 +1,16 @@
+0800A80C effect-manager-remove-return
+
+The final Effect_Remove returns via r0. The active flag store uses r1.
+
+The explicit form changed the ROM bytes. The guarded form passed the unit ROM check.
+
+--- a/src/homing_effect.c
++++ b/src/homing_effect.c
+@@ -25,4 +25,7 @@
+     }
+     effect->active = 0;
++#ifdef UBFIX
++    return 0x0800A81D; // r0 keeps the final removal return address
++#endif
+ }
+ 
