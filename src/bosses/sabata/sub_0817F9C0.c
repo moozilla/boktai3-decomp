@@ -1,10 +1,6 @@
 #include "bosses/sabata/sabata_actor_state.h"
 #include "engine/word_flags.h"
 
-static inline void hide(struct AnimSprite *a)
-{
-    a->flags |= 1;
-}
 static inline void fade(struct AnimSprite *a)
 {
     a->flags = (a->flags & ~1) | 0x200;
@@ -88,12 +84,12 @@ void Sabata_UpdatePresentation(struct SabataActorState *p)
     else
         SabataFrost_StopEmission(q->frostEmitter);
     if (WordFlags_Test(flags, 0x10)) {
-        hide(&q->graphics);
+        AnimSprite_Hide(&q->graphics);
         ActorShadow_Disable(q->shadow);
         CameraTracking_ClearRequests(&q->camera, 1);
         ContactCollider_ClearFlags(&q->bodyCollider, 8);
         grounded = &p->special;
-    } else if (WordFlags_Test(flags, 0x40000)) {
+    } else if (*flags & 0x40000) {
         fade(&q->graphics);
         ActorShadow_Disable(q->shadow);
         CameraTracking_ClearRequests(&q->camera, 1);
