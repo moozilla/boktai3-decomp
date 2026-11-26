@@ -850,11 +850,11 @@ s32 Player_SelectFlashingVisualMode(struct Player *, s32);
 
 void Player_UpdateAlternateVisualPalette(struct Player *, u32);
 
-void sub_0813B950(void *);
+void Player_UpdateTimedEffect(void *);
 
 void Player_UpdateOrbitingEffect(void *);
 
-void sub_0813BAD8(void *);
+void Player_UpdateDirectionalEffectPair(void *);
 
 void ConvergingEffects_UpdateParticles(void *);
 
@@ -872,9 +872,9 @@ void SceneActor_UpdateVisualEffects(struct Player *p)
         Player_UpdateAlternateVisualPalette(p, mode);
     else
         Player_UpdateVisualPalette(p, mode);
-    sub_0813B950(p);
+    Player_UpdateTimedEffect(p);
     Player_UpdateOrbitingEffect(p);
-    sub_0813BAD8(p);
+    Player_UpdateDirectionalEffectPair(p);
     ConvergingEffects_UpdateParticles(p);
     {
         void **callback = &p->directionalEffectCallback;

@@ -54,7 +54,7 @@ static inline void Vorn_InstallIdleControl(struct ChaseActor *actor, void *callb
     actor->base.target = callback;
     SceneActorChase_ResetMotionControl(actor);
 }
-static inline void Vorn_ResetStateEntry(struct ChaseActor *actor, u32 prepared)
+static inline void Vorn_PrepareDefeatStateEntry(struct ChaseActor *actor, u32 prepared)
 {
     actor->base.counter2AC = 0;
     actor->base.field2B1 = prepared;
@@ -165,6 +165,6 @@ void Vorn_UpdateDefeat(struct ChaseActor *actor)
     }
     Vorn_InstallIdleControl(actor, SceneActorControl_OnIdle, 16, completedState);
     SceneActorChase_SelectState(actor, completedState, 0, 2);
-    Vorn_ResetStateEntry(actor, completedState);
+    Vorn_PrepareDefeatStateEntry(actor, completedState);
     ActorShadow_Disable(actor->base.shadow);
 }

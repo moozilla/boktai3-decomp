@@ -223,7 +223,7 @@ void ScriptActor_SetActionFlagsFromScript(void)
     struct Player *actor = gPlayers[index];
     struct Player *player = actor;
     if (actor != NULL && Script_SeekToKeyword('f')) {
-        sub_0813B3AC(actor, Script_GetValue());
+        Player_AddEventFlags(actor, Script_GetValue());
         if (Player_GetEventFlags(actor, 0x3ffe))
             actor->actionEnabled = Player_IsEnchantmentAvailable(actor, (s8)actor->thresholdMode);
         if (Script_SeekToKeyword('p'))

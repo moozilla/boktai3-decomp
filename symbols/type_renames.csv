@@ -388,3 +388,36 @@ StackedActorSprite,WarpCircleSprite,identifier,,Reviewed in-game owner,include/o
 StackedActor,WarpCircle,identifier,,Reviewed in-game owner,symbols/ram.csv
 gStackedActor,gWarpCircle,identifier,,Reviewed in-game owner,all
 SetState_UpdateEntryRecoveryPhase_080E55AC,Dog_QueueEntryRecoveryState,identifier,,Reviewed in-game owner,src/monsters/dog.c
+sub_08105194,LootDepositCallbackPool_InitializeCollider,identifier,,Use the reviewed name for this address,src/
+sub_08105194,LootDepositCallbackPool_InitializeCollider,identifier,,Use the reviewed name for this address,include/
+sub_08105194__addr,LootDepositCallbackPool_InitializeCollider__addr,identifier,,Use the reviewed name for this address,src/
+sub_08105194__addr,LootDepositCallbackPool_InitializeCollider__addr,identifier,,Use the reviewed name for this address,include/
+sub_08113398,SceneDebris_Create,identifier,,Use the reviewed name for this address,src/
+sub_08113398,SceneDebris_Create,identifier,,Use the reviewed name for this address,include/
+sub_08113398__addr,SceneDebris_Create__addr,identifier,,Use the reviewed name for this address,src/
+sub_08113398__addr,SceneDebris_Create__addr,identifier,,Use the reviewed name for this address,include/
+sub_0811CD70,ScenePool_ApplyMotionInput,identifier,,Use the reviewed name for this address,src/
+sub_0811CD70,ScenePool_ApplyMotionInput,identifier,,Use the reviewed name for this address,include/
+sub_0811CD70__addr,ScenePool_ApplyMotionInput__addr,identifier,,Use the reviewed name for this address,src/
+sub_0811CD70__addr,ScenePool_ApplyMotionInput__addr,identifier,,Use the reviewed name for this address,include/
+sub_0811EAB8,ModifierStats_ApplyKind3,identifier,,Use the reviewed name for this address,src/
+sub_0811EAB8,ModifierStats_ApplyKind3,identifier,,Use the reviewed name for this address,include/
+sub_0811EAB8__addr,ModifierStats_ApplyKind3__addr,identifier,,Use the reviewed name for this address,src/
+sub_0811EAB8__addr,ModifierStats_ApplyKind3__addr,identifier,,Use the reviewed name for this address,include/
+sub_0813B3AC,Player_AddEventFlags,identifier,,Use the reviewed name for this address,src/
+sub_0813B3AC,Player_AddEventFlags,identifier,,Use the reviewed name for this address,include/
+sub_0813B3AC__addr,Player_AddEventFlags__addr,identifier,,Use the reviewed name for this address,src/
+sub_0813B3AC__addr,Player_AddEventFlags__addr,identifier,,Use the reviewed name for this address,include/
+sub_0813B3CC,Player_CallCompletionScript,identifier,,Use the reviewed name for this address,src/
+sub_0813B3CC,Player_CallCompletionScript,identifier,,Use the reviewed name for this address,include/
+sub_0813B3CC__addr,Player_CallCompletionScript__addr,identifier,,Use the reviewed name for this address,src/
+sub_0813B3CC__addr,Player_CallCompletionScript__addr,identifier,,Use the reviewed name for this address,include/
+sub_0813B950,Player_UpdateTimedEffect,identifier,,Use the reviewed name for this address,src/
+sub_0813B950,Player_UpdateTimedEffect,identifier,,Use the reviewed name for this address,include/
+sub_0813B950__addr,Player_UpdateTimedEffect__addr,identifier,,Use the reviewed name for this address,src/
+sub_0813B950__addr,Player_UpdateTimedEffect__addr,identifier,,Use the reviewed name for this address,include/
+sub_0813BAD8,Player_UpdateDirectionalEffectPair,identifier,,Use the reviewed name for this address,src/
+sub_0813BAD8,Player_UpdateDirectionalEffectPair,identifier,,Use the reviewed name for this address,include/
+sub_0813BAD8__addr,Player_UpdateDirectionalEffectPair__addr,identifier,,Use the reviewed name for this address,src/
+sub_0813BAD8__addr,Player_UpdateDirectionalEffectPair__addr,identifier,,Use the reviewed name for this address,include/
+Vorn_ResetStateEntry,Vorn_PrepareDefeatStateEntry,identifier,,Reviewed in-game owner,src/monsters/vorn/sub_080AEE08.c

@@ -20,7 +20,7 @@ s32 PileTrap_IsActive(void *);
 void PileTrap_Hide(void *);
 s32 Player_SelectRequestedActionMode(struct Player *);
 s32 Player_GetEventFlags(struct Player *, u32);
-void sub_0813B3CC(struct Player *);
+void Player_CallCompletionScript(struct Player *);
 s32 Player_TestNearbyInteraction(struct Player *);
 static inline u32 HasActionFlag(struct Player *p, u32 mask)
 {
@@ -198,7 +198,7 @@ s32 Player_SelectActionSequence(struct Player *p)
                         goto primary;
                 cancel:
                     ActorSequence_Begin(p, 0, 0);
-                    sub_0813B3CC(p);
+                    Player_CallCompletionScript(p);
                     goto end;
                 }
                 goto normalAttack;

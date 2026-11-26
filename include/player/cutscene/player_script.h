@@ -20,7 +20,7 @@ s32 Player_IsActiveInLocomotionState(struct Player *);
 void Player_AddExperience(s32);
 s32 Div(s32, s32);
 void DamageNumberDisplay_Show(void *, s32, s32, void *, void *, s32);
-void sub_0813B3AC(struct Player *, s32);
+void Player_AddEventFlags(struct Player *, s32);
 u32 Player_GetEventFlags(struct Player *, u32);
 u8 Player_IsEnchantmentAvailable(struct Player *, s32);
 void Player_EmitQueuedEffects(struct Player *);

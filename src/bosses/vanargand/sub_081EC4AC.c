@@ -12,9 +12,9 @@ void ActorEffect_SpawnBurstAtAnchor(struct DepartureActor *actor, u32 variant)
     velocity.y = -DepartureBurst_NextBit();
     velocity.z = 0;
     if (variant == 0)
-        sub_08113398(&position, &velocity, actor->effectResource, actor->effectGraphics, 5, 0, 0, 0,
-                     2, 42, 0, 512, 1, 0);
+        SceneDebris_Create(&position, &velocity, actor->effectResource, actor->effectGraphics, 5, 0,
+                           0, 0, 2, 42, 0, 512, 1, 0);
     else
-        sub_08113398(&position, &velocity, actor->effectResource, actor->effectGraphics, 6, 0, 0, 0,
-                     2, 30, 0, 512, 1, 0);
+        SceneDebris_Create(&position, &velocity, actor->effectResource, actor->effectGraphics, 6, 0,
+                           0, 0, 2, 30, 0, 512, 1, 0);
 }
