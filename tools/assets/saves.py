@@ -2,9 +2,10 @@
 """Save files: read them, read savestates the same way, and write saves.
 
   saves.py info SAVE|STATE...        story progress, scene, entrance, level...
-  saves.py bank [DIR]                the savestate bank (default ../boktai3trans/saves)
+  saves.py bank [DIR]                list checkpoints in the savestate bank
   saves.py bank --make [OUT]         a battery save per checkpoint (default build/saves/NNNN.sav),
                                      for BOKTAI3_SAV=build/saves/0044.sav tools/emu/harness ...
+                                     --bank DIR selects the input for either command
   saves.py make STATE OUT.sav        a battery save holding a savestate's game
   saves.py set SAVE OUT.sav story=N [scene=N entrance=N]
 
@@ -37,15 +38,29 @@ save's variables into a checkpoint's until the door stopped firing).
 Fields read here: story progress `r708[0x3C]` (tools/assets/story.py), the
 entrance `r708[0x70]`, and the scene `GameState+0x5A4`.
 """
+import argparse
 import gzip
 import json
 import os
 import struct
 import sys
+from pathlib import Path
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(os.path.dirname(HERE))
-BANK = os.path.join(os.path.dirname(ROOT), "boktai3trans", "saves")
+
+
+def find_bank(root):
+    """Find the translation checkout beside this checkout or an enclosing worktree directory."""
+    parents = Path(root).resolve().parents
+    for parent in parents:
+        candidate = parent / "boktai3trans" / "saves"
+        if candidate.is_dir():
+            return str(candidate)
+    return str(parents[0] / "boktai3trans" / "saves")
+
+
+BANK = find_bank(ROOT)
 TEMPLATE = os.path.join(ROOT, "tests", "saves", "ShinBok2.sav")
 
 EWRAM_IN_SGM = 34271
@@ -149,6 +164,33 @@ def bank(directory=BANK):
     return rows
 
 
+def run_bank(args):
+    parser = argparse.ArgumentParser(prog="saves.py bank")
+    parser.add_argument("--bank", help="savestate input directory")
+    parser.add_argument("--make", action="store_true", help="write one battery save per checkpoint")
+    parser.add_argument("path", nargs="?", help="input directory for listing, output directory with --make")
+    options = parser.parse_args(args)
+    if options.bank and options.path and not options.make:
+        parser.error("give the input directory either positionally or with --bank")
+    directory = os.path.expanduser(options.bank or (options.path if not options.make else None) or BANK)
+    if not os.path.isdir(directory):
+        parser.error(f"save bank not found at {directory}. Select it with --bank DIR.")
+    if options.make:
+        out = os.path.expanduser(options.path or os.path.join(ROOT, "build", "saves"))
+        os.makedirs(out, exist_ok=True)
+        states = sorted(f for f in os.listdir(directory) if f.endswith(".sgm"))
+        for name in states:
+            save = current(read_sgm(os.path.join(directory, name)))
+            write_sav(save, os.path.join(out, name.split(" ", 1)[0] + ".sav"))
+        print(f"{len(states)} saves -> {os.path.relpath(out, ROOT)}")
+        return
+    for row in bank(directory):
+        if "error" in row:
+            print(f"{row['file']}: {row['error']}")
+        else:
+            print(f"story {row['story']:4d}  scene {row['scene']:5d}  entrance {row['entrance']:4d}  {row['label']}")
+
+
 def main():
     a = sys.argv[1:]
     if not a:
@@ -159,22 +201,8 @@ def main():
             s = load(p)
             for name, c in s["copies"].items():
                 print(f"{os.path.basename(p)} {name}: {'ok' if c['ok'] else 'bad checksum'} {json.dumps(fields(c))}")
-    elif cmd == "bank" and "--make" in a:
-        rest = [x for x in a[1:] if x != "--make"]
-        out = rest[0] if rest else os.path.join(ROOT, "build", "saves")
-        os.makedirs(out, exist_ok=True)
-        n = 0
-        for f in sorted(os.listdir(BANK)):
-            if f.endswith(".sgm"):
-                write_sav(current(read_sgm(os.path.join(BANK, f))), os.path.join(out, f.split(" ", 1)[0] + ".sav"))
-                n += 1
-        print(f"{n} saves -> {os.path.relpath(out, ROOT)}")
     elif cmd == "bank":
-        for r in bank(a[1] if len(a) > 1 else BANK):
-            if "error" in r:
-                print(f"{r['file']}: {r['error']}")
-            else:
-                print(f"story {r['story']:4d}  scene {r['scene']:5d}  entrance {r['entrance']:4d}  {r['label']}")
+        run_bank(a[1:])
     elif cmd == "make":
         c = current(load(a[1]))
         write_sav(c, a[2])
