@@ -306,6 +306,15 @@ def is_signed(attrs):
     return 'signext' in attrs
 
 
+def extension(attrs):
+    return next((word for word in attrs.split() if word in ('zeroext', 'signext')), '')
+
+
+def argument_type(ty, attrs):
+    ext = extension(attrs)
+    return f'{ty} {ext}' if ext else ty
+
+
 def emit_call(indent, dest, cc, ret, callee, args, trailer='', fresh=None):
     a = ', '.join(f'{t} {v}' for t, v in args)
     cc = (cc + ' ') if cc else ''
@@ -327,7 +336,8 @@ def adapt_direct(call, sig, fresh):
     A missing argument is zero (and the call is recorded in PADDED)."""
     have = [(t, v, at) for t, v, at in call['args']]
     same = (call['ret'] == sig.ret and len(have) == len(sig.params) and
-            all(h[0] == p[0] for h, p in zip(have, sig.params)))
+            all(h[0] == p[0] and extension(h[2]) == extension(p[1])
+                for h, p in zip(have, sig.params)))
     if sig.varargs or call['fnty'] or same:
         return None
     out = []
@@ -335,17 +345,20 @@ def adapt_direct(call, sig, fresh):
     if len(have) < len(sig.params):
         PADDED.append((call['callee'][1:], len(have), len(sig.params)))
     for i, (pty, pattrs) in enumerate(sig.params):
+        # Wasm carries subword integers in i32 slots. If the definition
+        # assumes a particular extension, the rewritten caller must perform it.
+        arg_type = argument_type(pty, pattrs)
         if i < len(have):
             t, v, at = have[i]
             if t == pty:
-                args.append((pty, v))
+                args.append((arg_type, v))
                 continue
             if t not in _SCALARS or pty not in _SCALARS:
-                args.append((pty, v if t == pty else zero(pty)))
+                args.append((arg_type, zero(pty)))
                 continue
-            args.append((pty, convert(v, t, pty, out, fresh, is_signed(at))))
+            args.append((arg_type, convert(v, t, pty, out, fresh, is_signed(at))))
         else:
-            args.append((pty, zero(pty)))
+            args.append((arg_type, zero(pty)))
     ind = call['indent']
     lines = [ind + x for x in out]
     want = call['ret']
@@ -435,11 +448,11 @@ def adapter(name, sig, symbol):
             return None
         v, used = from_slots(params[idx:idx + need], pty, body, fresh)
         idx += used
-        attr = ''
+        arg_type = argument_type(pty, pattrs)
         m = re.search(r'\b(byval|sret)\((%[\w.]+|[^)]*)\)', pattrs)
         if m:
-            attr = m[0] + ' '
-        args.append((pty + (' ' + attr.strip() if attr else ''), v))
+            arg_type += ' ' + m[0]
+        args.append((arg_type, v))
     cc = (sig.cc + ' ') if sig.cc else ''
     a = ', '.join(f'{t} {v}' for t, v in args)
     if sig.ret == 'void':
@@ -558,7 +571,7 @@ def rewrite_module(text, defs_global, addresses, module_id, game, synthetic, rea
 
 
 def render_declare(name, sig):
-    params = ', '.join(p[0] for p in sig.params)
+    params = ', '.join(argument_type(ty, attrs) for ty, attrs in sig.params)
     if sig.varargs:
         params = (params + ', ...') if params else '...'
     cc = (sig.cc + ' ') if sig.cc else ''
