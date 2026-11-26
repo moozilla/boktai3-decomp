@@ -876,7 +876,10 @@ def main(argv=None) -> int:
     ap.add_argument("--kind", action="append", help="only these kinds")
     ap.add_argument("--summary", action="store_true", help="totals per kind only")
     ap.add_argument("--no-compiler", action="store_true", help="skip dead-code and proved-zero (no compiles)")
+    ap.add_argument("-j", type=int, default=8, help="parallel compiler checks")
     args = ap.parse_args(argv)
+    if args.j < 1:
+        ap.error("jobs must be positive")
     from statement_macros import single_use_names
     once = frozenset(single_use_names(root))
     files = []
@@ -891,7 +894,7 @@ def main(argv=None) -> int:
         from concurrent.futures import ThreadPoolExecutor
         units = [str(f.resolve().relative_to(root)) for f in files
                  if f.suffix == ".c" and f.resolve().is_relative_to(root) and not is_library(f.resolve().relative_to(root))]
-        with ThreadPoolExecutor(8) as pool:
+        with ThreadPoolExecutor(args.j) as pool:
             list(pool.map(deadcode.unit, units))
     use_tree = not args.errors_only and (not args.kind or any(k in TREE for k in args.kind))
     totals: dict[str, int] = {}

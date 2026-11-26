@@ -282,6 +282,28 @@ to clean, before reading warnings by hand, in this order:
 Moving a parked constant into a helper's argument instead is steering under another name; no
 tool does it and neither should you.
 
+For type recovery across units, run `build/venv/bin/python tools/structfamilies.py`. It
+leaves the source tree alone and writes the top 50 families and embedded-object observations to
+`build/structfamilies/REPORT.md`, with the complete catalog in `families.json` in the same
+directory. Pass source paths or directories for a smaller scan. Inspect any family with
+`tools/structfamilies.py --family FAMILY`, using the ID in the report. A family needs compatible
+compiler-measured storage plus evidence from calls, a RAM object, or a report unit. Check the
+evidence before applying a family with only report-unit or shared-parameter support.
+
+`build/venv/bin/python tools/structmerge.py FAMILY` previews the shared type and source
+proposals. Distinct ROM functions that load an offset vote on its width and extension. The type
+used by the most copies breaks ties, and the name comes from the most specific copy. The header
+marks uncertain choices, checks the total size, and leaves unnamed bytes as padding. Use
+`--name TAG` or `--header include/PATH.h` to choose another destination, or
+`--use-shared 'struct TAG'` to adopt a related type listed in the report.
+
+Add `--apply` in a writable worker checkout to try the proposals. Each unit goes through
+`keepcheck.py`, and the tool checks every dependent of a newly written header. The output
+lists units held back by layout changes, ambiguous member uses, or compiler differences.
+After adopting a type, run `rawfield.py` on its users and test the parked constants separately.
+Rescan after moving source files or editing a family. Use `-j 2` to limit the scanner and
+header-dependent checks while sharing a machine.
+
 ## Recording what you learned
 
 * Per function: what `why` said and which C change it led to; what still differs and
