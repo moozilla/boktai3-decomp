@@ -11,7 +11,7 @@ import subprocess
 
 from source_layout import (
     HEADER_DIRS, SOURCE_DIRS, SOURCE_FILES, directory_for, groups, header_paths, is_upstream,
-    layout_path, new_filename, scan, source_paths, source_placements, source_rules, symbol_names,
+    layout_path, manifest, new_filename, scan, source_paths, source_placements, source_rules, symbol_names,
 )
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -153,7 +153,7 @@ def rewrite_identifiers(table, replacements, apply):
             changed.append((path, original, updated.encode("utf-8", errors="surrogateescape")))
     if apply:
         write_updates(changed)
-        symbol_names.cache_clear()
+        manifest.cache_clear()  # symbol_names reads the table on each call
     return len(changed)
 
 
