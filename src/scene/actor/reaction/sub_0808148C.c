@@ -25,11 +25,7 @@ void SceneActorReaction_PlayStaggerBurst(struct ChaseActor *actor, s32 frame)
     if (SceneActorReaction_TakePrepared(actor)) {
         u32 category = actor->base.category;
         u32 state;
-        /* Named components are initialized; aggregate padding is never read as a scalar. */
-        union {
-            struct ContactPackedVector packed;
-            struct ContactPosition position;
-        } range;
+        struct ContactPosition range;
         if (IsControlled(actor))
             ClearRoute(actor, (u8 *)group);
         if (category == 22)
@@ -63,15 +59,15 @@ void SceneActorReaction_PlayStaggerBurst(struct ChaseActor *actor, s32 frame)
         }
         SceneActorPlacement_PlayCategoryResponseSound((void *)actor);
         Sound_PlaySong(298);
-        range.packed.x = 60;
-        range.packed.y = 60;
-        range.packed.z = 40;
+        range.x = 60;
+        range.y = 60;
+        range.z = 40;
         {
             u32 mode;
             gRandomIndex = (gRandomIndex + 1) & 1023;
             mode = *(u16 *)(RANDOM_TABLE_ADDR + (gRandomIndex << 1)) & 3;
             mode++;
-            SparkParticle_Spawn(&actor->base.body.position, mode, &range.position,
+            SparkParticle_Spawn(&actor->base.body.position, mode, &range,
                                 actor->base.body.direction + 128, 10, 6, 2, 2);
         }
     }
