@@ -150,3 +150,25 @@ not being a single copy of r0. Next attempt: find C that gives either, starting 
 unit (already register-only with the integer form).
 
 `WirelessResultPanel_Init`: not started.
+
+## 2026-11-25: SpriteTrail camera reload recovered
+
+`SpriteTrail_UpdatePositions` (081F2404) matches in ordinary C with
+`next = head; next++;` and the unqualified camera pointer. Simply removing
+the qualifier produced 320 bytes against the ROM's 304. On that draft,
+`AGBCC_NOMOVE=164` was exact and `why 417` traced the new high-register copy
+to the loop pass.
+
+The split makes a difference even though the resulting address is the same.
+At the end of GCSE the split has `next = head` followed by
+`next = p + 308`. With the combined initializer, the first statement is
+absent. The second set in the split uses `p` in place of `next` as its base,
+so alias.c's `record_set` drops the base for `next`. A store through that
+cursor can then block hoisting the camera pointer. Later passes remove the
+initial copy. The split and the unsplit initializer with `&p->head[1]` were
+checked separately: the split matches and the unsplit form still hoists.
+
+The persistent search is in `build/matchsearch/SpriteTrail_UpdatePositions`.
+The landed unit passes the stock check at 304 bytes and has zero linter
+reports. This removes one volatile error. The precedent for the registry is
+a reassignment that survives through the alias pass and gets deleted later.
