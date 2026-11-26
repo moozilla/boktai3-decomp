@@ -33,3 +33,6 @@ SceneCatalog_,PauseStatus_,"src/menus/scene_catalog, addresses 08174F14–081758
 BurstEmitter_,SparkExplosion_,src/effects/five_slot_burst_emitter,Staged GCL 1043→1488/8639 shows a spark blast and smoke tail.
 SparkleEmitter_,CutsceneSparkles_,src/effects/sparkle_emitter,"Trinity release proc 3845 uses 3D64, instance A3E7 and CC88 green sparkle."
 EffectEmitter_,StrikeCrystal_,src/effects/effect_emitter,Proc 1179→95A8 loads 066A. A floating green crystal appears in the original renderer.
+TaggedSceneNpc_,Kuro_,src/actors/tagged_scene_npc,"D774 loads E00E, actor ID 51E2. Procs 2235/2266 and text #3515 tie this actor to Kuro."
+TileTrigger_,FloorTrap_,src/field/tile_trigger,"0013→3161, original 2FA5 slots are floor traps. The staged contact branch plays the press and particle callbacks."
+FrostEmitter_,SabataFrost_,src/effects/frost_emitter,0033/4233. EC71 attaches its 4384 cloud emitter. Staged constructor and draw confirm the effect in the battle.

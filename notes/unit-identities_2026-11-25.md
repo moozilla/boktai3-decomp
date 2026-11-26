@@ -805,3 +805,60 @@ Load 0042 at 4755 to trace the Wind Cannon. The
 `wind-cannon-west/gale.png` shows the room activity. The same emitter
 pool has live coverage in the Black Castle Screamer room and a
 separate Poison Hand caller.
+
+### Kuro, interaction prompts, and floor traps
+
+Tags: Kuro, NPC, D774, floor traps, 2FA5, interaction prompts, 883A, Sabata
+
+The 0006 house warp at 2537 runs D774 and loads E00E from
+`TaggedSceneNpc_Create`; the World Map interrupts some entrances.
+For an isolated view, `review-native-tagged-live` calls proc 1675 to
+create the actor manager and then proc 1790 with a nearby position
+and the original tag. It uses the same D774 ID 51E2 and E00E model.
+Kuro's scenes use that actor ID in proc 2266. Proc 2235 calls 2266
+and plays Kuro's named speaker line #3515. Text #2603 calls him
+Sumire's black kitten. The original E00E sprite sheet is under
+`build/assets/sprites/`.
+
+Use 0013 at 3161 for the floor traps. Proc 3163 places four 2FA5
+slots and the pool loads A945. `review-stage-pressure` dumps the
+initialized first slot at (1152, 512, 896). The
+`review-native-pressure-exact` replay loads `idle.ss` and sets that
+slot to state 2, the state assigned after contact. The native
+countdown, particle, press, and contact callbacks run and the slot
+calls the room actor and Player queries. This also witnesses the
+4384 sprite puffs from the adjacent trap and spell effect unit.
+
+For the prompt layer, warp 0030 to 3992, entrance 8, story 101.
+`review-directional` captures 883A construction and approach.
+The separate 3955 instance from proc 1030 targets 3954, the callback
+that shows the fireball instruction. The shared layer applies to
+other prompts and interactions.
+
+For the Sabata frost cloud, load 0033 in 4233 and use the native
+`review-native-frost-cloud` command file with the `battle.ss`
+snapshot. The effect task at 0200E864 is the live task from the EC71
+actor at 0200D824. Its production owner passes actor+41C in
+`BossSlot2_UpdatePresentation`. The experiment starts that task
+and seeds five particles at a staged source, then lets the original
+task animate them. Compare `before.png` and `after.png`.
+
+### Shared effect pools
+
+Tags: particles, spark effects, short-range shot, actor trails, Ratatosk
+
+The Trinity barrier's shatter activates AnimatedParticles, which also
+runs in the Vanargand fight. Ratatosk uses the independent moving
+spark pool. Player motion 13 exercises the action trail pool at 6201.
+The Count area also executes the nearby moving glyph file for a
+different subsystem. In the 6323 Vanargand chase, the following
+sprite manager updates character appearance slots. This is a
+different use from the separate scatter-effect implementation
+in the same source directory.
+
+The controlled `review-native-moving-contact` and
+`review-native-moving-impact` runs start two separate small-sprite
+motion pools. Their moving dots have low visibility against the
+pedestal. The `review-native-spread-shot` type 2 sweep has clear
+orange flashes and a separate moving collider. Its production
+trigger remains unknown.
