@@ -1,0 +1,16 @@
+08013B98 scaled-shadow-graphic-return
+
+Sprite_ApplyAnimation pops its Thumb return address into r0 and the frame write uses r6.
+
+The explicit form changed the ROM bytes. The guarded form passed the unit ROM check.
+
+--- a/src/scaled_shadow.c
++++ b/src/scaled_shadow.c
+@@ -242,4 +242,7 @@
+     Sprite_ApplyAnimation(sprite, resource);
+     sprite->frame = frame;
++#ifdef UBFIX
++    return 0x08013BB3; // preserve the inherited GBA return value
++#endif
+ }
+ 
