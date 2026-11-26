@@ -16,7 +16,7 @@ RETURNS = {
     'Task_Kill': 's32',
     'Script_Call': 's32',
     'Trigger_ConsumePending': 'u32',
-    'Widget_InitLinked': 's32',
+    'AnimSprite_InitLinked': 's32',
     'Actor_PlayAnimationEntry': 'int',
     'AnimData_Load': 's32',
     'Anim_SetFrameDurationScale': 's32',

@@ -203,7 +203,7 @@ Tags: #matching #vanargand #animation #effects
   Split flag/position/target cursors and constrained loop stride reduce
   structure but allocation is still far off. Needs deeper retry before list
   completion; scratch is ignored under wip/cx-sol02/.
-- 0818ECFC drafted 73.5%, `ScenePanelEffect_UpdatePool` (tentative).
+- 0818ECFC drafted 73.5%, `NidhoggrEffect_UpdatePool` (tentative).
   Full new C dispatches 24 simple and 48 collision effects, clears occupancy
   bits, applies anchored/delta motion and staggers collider updates by parity.
   Based on NidhoggrEffect_InitPool's observed layout. Separate motion/position
@@ -218,7 +218,7 @@ Tags: #matching #vanargand #animation #effects
   the stack acceleration vector; explicit low/high packing recovers paired
   stores. Owner binding improves fuzzy to 85.6% but adds structural copies;
   retained the full-sized 80.8% form with seven structural differences.
-- 0818F0FC matched, `ScenePanelEffect_TickSpriteLifetime` (tentative), 284 bytes.
+- 0818F0FC matched, `NidhoggrEffect_TickSpriteLifetime` (tentative), 284 bytes.
   Reused the complete stepper and lifetime tail from the moving-effect draft.
   Reviewed body plus alignment through 0818F218.
   Eleven hints remain after depin.
@@ -280,7 +280,7 @@ Tags: #matching #nidhoggr #effects #script-combat-actor
   improvement. Mask barriers, final-sample
   bindings, pointer bindings and alternate loop forms regress. Compiler-pass
   flips find no improvement. Default fallback remains exact over 432 bytes.
-- 08201784 matched, `ScriptCombatActor_InitializeColliders` (tentative),
+- 08201784 matched, `MuspellHead_InitializeColliders` (tentative),
   full 276-byte extent, without register hints. Explicitly preserving the
   upper packed word when clearing the first collider offset recovers the
   target word load/mask/store. Removing the owner binding then recovers all
@@ -305,13 +305,13 @@ Tags: #matching #script-combat-actor #scene-npc #palette
   the target sign extension; an inline vector copy emits the destination
   address before copying. Typed origin/position fields and staged RNG cursor
   updates recover the tail exactly.
-- 08201D38 matched, `ScriptCombatActor_UpdateState` (tentative), full
+- 08201D38 matched, `MuspellHead_UpdateState` (tentative), full
   1000-byte extent. Reused the packed sprite-playback helper, with first-bit,
   mask, duration and weight lifetimes adapted to this actor. Retaining the
   damage offset recovers constant reuse. A temporary disabled-collider pointer
   and a bound receiving pointer recover the final missing copy. Fourteen
   hints remain after depin. Callback use is confirmed by 08202608.
-- 0820212C matched, `ScriptCombatActor_InitializeFromScript` (tentative), full
+- 0820212C matched, `MuspellHead_InitializeFromScript` (tentative), full
   1244-byte extent. Ported the matched PoisonHand initializer, mapped every
   script field and added period/delay options. A complete typed actor layout
   moves the first draft from 85.9% to 98.8%. A sprite-load clobber, frame pointer
@@ -325,7 +325,7 @@ Tags: #matching #script-combat-actor #scene-npc #palette
   blocked-state zero recover scheduling. Passing the final sample to an inline
   coordinate setter permits destructive reuse of the dead index register.
   Four hints remain after depin. The script combat actor family is now exact.
-- 081D1908 drafted 44.5%, `SceneNpc_BlendPalette`, full new C for sixteen
+- 081D1908 drafted 44.5%, `Kuro_BlendPalette`, full new C for sixteen
   RGB555 palette entries. Explicit packed-color shifts, a palette-binding
   helper and retained blue channel reduce structure to 22 differences.
   Tested separate result variables, phase/divisor bindings, scratch records,

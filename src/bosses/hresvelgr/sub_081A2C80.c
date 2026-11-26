@@ -18,7 +18,7 @@ void Hresvelgr_CreateShotPool(s32, s32, s32);
 void EffectPool_Create(s32, s32, s32);
 void Hresvelgr_CreateProjectilePool(s32, s32, s32);
 void Hresvelgr_CreateEffectPool(void);
-void Widget_InitLinked(void *, void *, int, int, int, int, int, void *);
+void AnimSprite_InitLinked(void *, void *, int, int, int, int, int, void *);
 void SceneActors_StartUnmirroredAnimation(void *, void *, void *, s32, s32, s32);
 void SceneActors_SetHealthLimits(void *, s32, s32, s32);
 void Hresvelgr_InitializeCollider(void *, u32);
@@ -241,7 +241,7 @@ s32 sub_081A2C80(struct HresvelgrInit *self, void *arg1)
     Hresvelgr_CreateEffectPool();
     SceneActors_Initialize(actor, arg1, mode, &pk, r5);
     self->facingSide = (u8)(actor->direction4 >> 1);
-    Widget_InitLinked(&self->sprite, &self->resource, 0, 0, 2, 0, 0x3C, &pk);
+    AnimSprite_InitLinked(&self->sprite, &self->resource, 0, 0, 2, 0, 0x3C, &pk);
     SceneActors_StartUnmirroredAnimation(actor, &self->sprite, &self->resource, 0x18, 1, 0);
     SetDamageCallback(actor, Hresvelgr_ApplyContactDamage);
     SetStateCallback(actor, Hresvelgr_ApplyRequestedAction);

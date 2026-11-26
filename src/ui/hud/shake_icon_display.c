@@ -64,7 +64,7 @@ s32 ShakeIconDisplay_Initialize(struct ShakeIconDisplay *display)
     position->x = 0;
     display->position.y = 0;
     display->position.z = 0;
-    Widget_InitLinked(&display->animation, savedHeader, (u16)(variant + 75), 16, 1, 0, 60,
+    AnimSprite_InitLinked(&display->animation, savedHeader, (u16)(variant + 75), 16, 1, 0, 60,
                       position);
     {
         u32 found = Script_SeekToKeyword('p');

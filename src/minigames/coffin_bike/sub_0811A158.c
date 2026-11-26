@@ -27,20 +27,20 @@ void ActorMarkerPool_ShowMarker(s32);
 s32 ModifierStats_ApplyKind11(void *, s32);
 s32 ModifierStats_ApplyKinds2And5(void *, s32);
 s32 Div(s32, s32);
-static inline u32 Glove_ReadFlags(struct Glove *p)
+static inline u32 CoffinBike_ReadFlags(struct CoffinBike *p)
 {
     return p->flags;
 }
-static inline u32 Glove_ActorFlags(struct Glove *p, u32 mask)
+static inline u32 CoffinBike_ActorFlags(struct CoffinBike *p, u32 mask)
 {
     if (!p)
         return 0;
-    return Glove_ReadFlags(p) & mask;
+    return CoffinBike_ReadFlags(p) & mask;
 }
-static inline u8 Inactive(struct Glove *p)
+static inline u8 Inactive(struct CoffinBike *p)
 {
     if (p) {
-        if (Glove_ReadFlags(p) & 1)
+        if (CoffinBike_ReadFlags(p) & 1)
             return 1;
     }
     return 0;
@@ -64,14 +64,14 @@ static inline u8 ParticipantStatIndexed(s32 slot)
         return 0;
     return p->playerValues[index];
 }
-static inline void Glove_UpdateLocalPresentation(struct Glove *p)
+static inline void CoffinBike_UpdateLocalPresentation(struct CoffinBike *p)
 {
-    struct GloveMotion *view = &p->motion;
+    struct CoffinBikeMotion *view = &p->motion;
     if (Engine_PauseBits(0x800)) {
         if ((p->participant) == LocalParticipant()) {
             gUnk_020004E0[0] = ((view->position.x) - (view->x)) >> 12;
             gUnk_020004E0[2] = (view->position.z) >> 12;
-            if (p && ((Glove_ReadFlags(p)) & 4))
+            if (p && ((CoffinBike_ReadFlags(p)) & 4))
                 PaletteFade_SetScrollPosition(0, 0);
             else
                 PaletteFade_SetScrollPosition((p->height) >> 12, 0);
@@ -79,37 +79,37 @@ static inline void Glove_UpdateLocalPresentation(struct Glove *p)
     } else {
         gUnk_020004E0[0] = ((view->position.x) - (p->motion.x)) >> 12;
         gUnk_020004E0[2] = (view->position.z) >> 12;
-        if (p && ((Glove_ReadFlags(p)) & 4))
+        if (p && ((CoffinBike_ReadFlags(p)) & 4))
             PaletteFade_SetScrollPosition(0, 0);
         else
             PaletteFade_SetScrollPosition((p->height) >> 12, 0);
     }
 }
-static inline s32 *Glove_AccumulateResource(struct Glove *p, s32 amount)
+static inline s32 *CoffinBike_AccumulateResource(struct CoffinBike *p, s32 amount)
 {
     s32 *balance = &p->resourceFraction;
     *balance += amount;
     return balance;
 }
-static inline void Glove_ClearAnimationFlags(struct GloveModel *model, u32 flags)
+static inline void CoffinBike_ClearAnimationFlags(struct CoffinBikeModel *model, u32 flags)
 {
     CharacterModel_ClearAnimationFlags(model, flags);
 }
-static inline s16 Glove_SignedHeading(u16 raw)
+static inline s16 CoffinBike_SignedHeading(u16 raw)
 {
     return (s16)raw;
 }
 // confidence=low: updates spatial entries, local presentation and resource recovery.
-void CoffinBike_UpdatePostState(struct Glove *p)
+void CoffinBike_UpdatePostState(struct CoffinBike *p)
 {
-    struct GloveMotion *self = &p->motion;
+    struct CoffinBikeMotion *self = &p->motion;
     if (!Inactive(p)) {
         struct Vec16 pos;
         u32 *motion;
         s32 heading;
         Character_GetHeightAdjustedPosition(self, &pos);
         SpatialIndex_SetPosition(&self->motionFlags, pos.x, pos.y, pos.z);
-        heading = Glove_SignedHeading(self->angle);
+        heading = CoffinBike_SignedHeading(self->angle);
         motion = &self->motionFlags;
         if (heading < 0) {
             SpatialIndex_SetPosition(&self->contact, pos.x, pos.y, pos.z);
@@ -131,16 +131,16 @@ void CoffinBike_UpdatePostState(struct Glove *p)
         SpatialIndex_InsertEntry(&self->contact);
     }
     {
-        Glove_UpdateLocalPresentation(p);
-        if (!(p && ((Glove_ReadFlags(p)) & 0x14)))
+        CoffinBike_UpdateLocalPresentation(p);
+        if (!(p && ((CoffinBike_ReadFlags(p)) & 0x14)))
             ActorStats_ApplyPendingDamage(self);
         Character_UpdateTimedEffect(&self->pendingDamage);
-        if ((!Inactive(p)) && (!(p && ((Glove_ReadFlags(p)) & 0x10))))
+        if ((!Inactive(p)) && (!(p && ((CoffinBike_ReadFlags(p)) & 0x10))))
             ActorParticles_UpdateEmitter(self, &self->emitter, self->style.initialWord);
-        if (Glove_ActorFlags(p, 1)) {
+        if (CoffinBike_ActorFlags(p, 1)) {
             p->resourceFraction = 0;
             p->motion.recoveryTimer = 0;
-        } else if (Glove_ActorFlags(p, 2)) {
+        } else if (CoffinBike_ActorFlags(p, 2)) {
             if (Engine_PauseBits(0x800)) {
                 if ((p->participant) == LocalParticipant()) {
                     CharacterModel_SetAnimationFlags(&p->model, 0x200);
@@ -151,22 +151,22 @@ void CoffinBike_UpdatePostState(struct Glove *p)
             } else
                 CharacterModel_SetAnimationFlags(&p->model, 0x200);
         } else {
-            Glove_ClearAnimationFlags(&p->model, 0x200);
+            CoffinBike_ClearAnimationFlags(&p->model, 0x200);
             CharacterModel_ClearAnimationFlags(&p->model, 1);
             ActorMarkerPool_ShowMarker(p->marker);
         }
         {
-            struct GloveMotion *view = &p->motion;
-            if ((!Inactive(p)) && (!(p && ((Glove_ReadFlags(p)) & 4)))) {
+            struct CoffinBikeMotion *view = &p->motion;
+            if ((!Inactive(p)) && (!(p && ((CoffinBike_ReadFlags(p)) & 4)))) {
                 s32 *accumulator;
                 s16 *resource;
                 s32 balance;
                 if (Engine_PauseBits(0x800)) {
                     s32 participant = p->participant;
-                    accumulator = Glove_AccumulateResource(
+                    accumulator = CoffinBike_AccumulateResource(
                         p, ModifierStats_ApplyKind11(view, ParticipantStatIndexed(participant)));
                 } else
-                    accumulator = Glove_AccumulateResource(
+                    accumulator = CoffinBike_AccumulateResource(
                         p, ModifierStats_ApplyKind11(view, gGameState->unk876));
                 balance = *accumulator;
                 resource = &view->style.initialHalfword;
@@ -187,6 +187,6 @@ void CoffinBike_UpdatePostState(struct Glove *p)
         }
     }
     p->previousInput = *p->input;
-    if (!(p && ((Glove_ReadFlags(p)) & 0x14)))
+    if (!(p && ((CoffinBike_ReadFlags(p)) & 0x14)))
         (p->activeFrames)++;
 }

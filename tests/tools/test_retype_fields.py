@@ -83,7 +83,7 @@ class EndToEnd(unittest.TestCase):
                     "struct Thing { struct Base base; int own; };\n"
                     "static inline int Thing_Health(struct Thing *t) { return t->health; }\n")
         with open(os.path.join(self.dir, "probe.c"), "w") as f:
-            f.write('#include "engine/shared/global.h"\n'
+            f.write('#include "global.h"\n'
                     f'#include "{self.rel}/probe.h"\n'
                     "#define HURT(t) ((t)->health--)\n"
                     "#define OFFSET(m) ((unsigned)&((struct Thing *)0)->m)\n"

@@ -305,10 +305,10 @@ s32 ModeMenu_Initialize(struct ModeMenu *p)
            0x100);
     ResourceHeader_Relocate(res, ScriptProc_Start(0xCB05, 0x530D));
     if (gScreenTextParameters.mode)
-        Widget_InitLinked(w1, res, 0xD9, 0x10, 0, 0, 0, 0);
+        AnimSprite_InitLinked(w1, res, 0xD9, 0x10, 0, 0, 0, 0);
     else
-        Widget_InitLinked(w1, res, 0xD1, 0x10, 0, 0, 0, 0);
-    Widget_InitLinked(w2, res, 0x47, 0x10, 0, 0, 0, 0);
+        AnimSprite_InitLinked(w1, res, 0xD1, 0x10, 0, 0, 0, 0);
+    AnimSprite_InitLinked(w2, res, 0x47, 0x10, 0, 0, 0, 0);
     *flags |= 1;
     CpuSet(p->savedPalette = *pal, p->palette, 0x10);
     *pal = p->palette;
@@ -436,11 +436,11 @@ s32 ResultScreen_Initialize(struct ResultScreen *s)
     q = ScriptProc_Start(0xCB05, 0xE2AB);
     obj = &s->widgets[0].resource;
     ResourceHeader_Relocate(obj, q);
-    Widget_InitLinked(&s->widgets[0].sprite, obj, 0x3C, 0x10, 0, 0, 0, 0);
+    AnimSprite_InitLinked(&s->widgets[0].sprite, obj, 0x3C, 0x10, 0, 0, 0, 0);
     q = ScriptProc_Start(0xCB05, 0x530D);
     obj2 = &s->widgets[1].resource;
     ResourceHeader_Relocate(obj2, q);
-    Widget_InitLinked(&s->widgets[1].sprite, obj2, 0x80, 0x10, 0, 0, 0, 0);
+    AnimSprite_InitLinked(&s->widgets[1].sprite, obj2, 0x80, 0x10, 0, 0, 0, 0);
     s->fadeShift = 3;
     return Menu_StartFadeIn(3);
 }

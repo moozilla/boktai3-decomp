@@ -3,7 +3,7 @@
 
 #include "global.h"
 
-struct Slot7Transition {
+struct VanargandHeadTransition {
     u8 unk0[0x90];
     u32 callbackTimer;
     u8 unk94[0xA2 - 0x94];
@@ -18,7 +18,7 @@ struct Slot7Transition {
     void (*callback)(void);
 };
 
-static inline u8 Slot7_TakeActionEntry(struct Slot7Transition *actor)
+static inline u8 VanargandHead_TakeActionEntry(struct VanargandHeadTransition *actor)
 {
     u8 *enter = &actor->actionFlags[1];
     if (*enter) {
@@ -29,7 +29,7 @@ static inline u8 Slot7_TakeActionEntry(struct Slot7Transition *actor)
     return FALSE;
 }
 
-static inline void Slot7_TransitionTo(struct Slot7Transition *actor, void (*callback)(void))
+static inline void VanargandHead_TransitionTo(struct VanargandHeadTransition *actor, void (*callback)(void))
 {
     actor->callback = callback;
     actor->callbackTimer = 0;

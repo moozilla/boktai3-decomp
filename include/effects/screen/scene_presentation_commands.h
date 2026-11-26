@@ -2,7 +2,7 @@
 #define GUARD_SCENE_PRESENTATION_COMMANDS_H
 #include "effects/orbits/orbiting_particles.h"
 #include "scene/actor/scene_event_dispatch.h"
-#include "objects/scene_objects/scene_object.h"
+#include "objects/scene_object.h"
 
 /* Presentation messages extend the common eight-byte command header with operands. */
 struct ScenePresentationMessage {

@@ -16,8 +16,8 @@ ea3b1c59d	src/fn/sub_0803E998.c	ScenePool_StateEmitBursts	zero	63	accepted	9610d
 ea3b1c59d	src/fn/sub_0803E998.c	ScenePool_StateEmitBursts	zero	76	accepted	9610d6c9f49ce9014a27237e611c6a08c328fd63
 ea3b1c59d	src/fn/sub_0803ED84.c	ScenePool_StateDepartForward	zero	11	accepted	8e4bd902503c4b64805e8105c24d3c8143c91324
 ea3b1c59d	src/fn/sub_0803ED84.c	ScenePool_StateDepartForward	zero	20	open	
-ea3b1c59d	src/fn/sub_08051A8C.c	ProximityEmitter_EmitParticle	zero	48	accepted	48b466289b0caa889a7a9273972e265f14319cb4
-ea3b1c59d	src/fn/sub_08051A8C.c	ProximityEmitter_EmitParticle	zero	64	accepted	48b466289b0caa889a7a9273972e265f14319cb4
+ea3b1c59d	src/fn/sub_08051A8C.c	TetherRing_EmitParticle	zero	48	accepted	48b466289b0caa889a7a9273972e265f14319cb4
+ea3b1c59d	src/fn/sub_08051A8C.c	TetherRing_EmitParticle	zero	64	accepted	48b466289b0caa889a7a9273972e265f14319cb4
 ea3b1c59d	src/fn/sub_0805AE58.c	ScenePanelRig_InitPrimarySprites	zero	14	accepted	b967776fbee4f2226bcdaba4e2462b5fe9ecb49b
 ea3b1c59d	src/fn/sub_0805AE58.c	ScenePanelRig_InitPrimarySprites	zero	45	accepted	b967776fbee4f2226bcdaba4e2462b5fe9ecb49b
 ea3b1c59d	src/fn/sub_08064790.c	ActorAttachment_TickWideShake	one	6	open	

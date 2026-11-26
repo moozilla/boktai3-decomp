@@ -9,23 +9,23 @@
 
 s32 Div(s32, s32);
 s32 Math_Atan2(s32, s32);
-void Terrain_ResolveActorMotion(struct GloveMotion *);
-void PalFade_Update(struct GloveMotion *);
-void Actor_UpdateShadowSpriteParts(struct GloveMotion *, void *);
-void ActorParticles_SpawnImpactBurst(struct GloveMotion *);
+void Terrain_ResolveActorMotion(struct CoffinBikeMotion *);
+void PalFade_Update(struct CoffinBikeMotion *);
+void Actor_UpdateShadowSpriteParts(struct CoffinBikeMotion *, void *);
+void ActorParticles_SpawnImpactBurst(struct CoffinBikeMotion *);
 void CharacterModel_UpdateAccessoryAnimations(void *);
-void ScenePool_ClampMotionSpeeds(struct GloveMotion *);
-void Actor_ClampMovementSpeed(struct GloveMotion *);
-void CoffinBike_SetAnimationKeyframes(struct Glove *, s32);
-s32 CoffinBike_UpdateMotion(struct Glove *);
-void Actor_UpdateShadowSpriteParts(struct GloveMotion *, void *);
+void ScenePool_ClampMotionSpeeds(struct CoffinBikeMotion *);
+void Actor_ClampMovementSpeed(struct CoffinBikeMotion *);
+void CoffinBike_SetAnimationKeyframes(struct CoffinBike *, s32);
+s32 CoffinBike_UpdateMotion(struct CoffinBike *);
+void Actor_UpdateShadowSpriteParts(struct CoffinBikeMotion *, void *);
 void CoffinBike_UpdateStaggerRecoil(void *);
 
 void ActorParticles_UpdateEmitter(void *, void *, u32);
 // Stagger animation plays until recoil completes, then restores stagger motion.
-void CoffinBike_UpdateStaggerReturn(struct Glove *p)
+void CoffinBike_UpdateStaggerReturn(struct CoffinBike *p)
 {
-    struct GloveMotion *self = &p->motion;
+    struct CoffinBikeMotion *self = &p->motion;
     u8 complete;
     s32 h, dx, dz;
     u32 a, b;

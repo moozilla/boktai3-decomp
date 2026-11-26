@@ -1,6 +1,6 @@
-#include "objects/pile_driver/scene_panel.h"
+#include "objects/pile_driver/pile_driver.h"
 #include "gba/io_reg.h"
-void PileDriver_InitOverlay(struct ScenePanel *panel)
+void PileDriver_InitOverlay(struct PileDriver *panel)
 {
     struct OverlayResource {
         u32 words[3];

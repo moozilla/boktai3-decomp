@@ -2,7 +2,7 @@
 #include "effects/scene/repeated_effect.h"
 #include "engine/engine_globals.h"
 void Sound_PlaySong(s32);
-void AnimatedParticles_EmitChargeSparkle(u32, u32, u32, u32, struct RepeatedEffectPosition *);
+void ImpactBurst_EmitChargeSparkle(u32, u32, u32, u32, struct RepeatedEffectPosition *);
 void RepeatedEffect_TickUpperTransition(struct RepeatedEffect *effect)
 {
     u16 *frame = &effect->stateFrame;
@@ -42,7 +42,7 @@ void RepeatedEffect_TickUpperTransition(struct RepeatedEffect *effect)
                     position.z = z;
                 }
             }
-            AnimatedParticles_EmitChargeSparkle(1, 0, 1, 64, &position);
+            ImpactBurst_EmitChargeSparkle(1, 0, 1, 64, &position);
         }
     } else if (value <= 15) {
         struct RepeatedEffectPosition position;
@@ -77,7 +77,7 @@ void RepeatedEffect_TickUpperTransition(struct RepeatedEffect *effect)
                     position.z = z;
                 }
             }
-            AnimatedParticles_EmitChargeSparkle(1, 0, 1, 64, &position);
+            ImpactBurst_EmitChargeSparkle(1, 0, 1, 64, &position);
         }
     } else {
         effect->sprite.frame = 8;

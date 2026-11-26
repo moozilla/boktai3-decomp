@@ -1,4 +1,4 @@
-#include "bosses/sabata/scene_event_actor.h"
+#include "bosses/sabata/sabata_reactions.h"
 
 static inline u16 RandomSample(void)
 {
@@ -6,7 +6,7 @@ static inline u16 RandomSample(void)
     return *(const u16 *)(gRandomIndex * 2 + (u32)gRandomTable);
 }
 
-void SabataEvent_UpdateJitter(struct ActorState *eventActor)
+void Sabata_UpdateHitJitter(struct SabataActorState *eventActor)
 {
     if (eventActor->changed) {
         eventActor->changed = 0;
@@ -38,9 +38,9 @@ static inline s32 ScaleMovement(s32 value)
     return -((-value) >> 12);
 }
 
-void SabataEvent_UpdateRecoil(struct ActorState *eventActor)
+void Sabata_UpdateHitRecoil(struct SabataActorState *eventActor)
 {
-    struct ActorState *actor = eventActor;
+    struct SabataActorState *actor = eventActor;
     if (eventActor->changed) {
         eventActor->changed = 0;
         SceneActors_StartDirectionalAnimation(eventActor, &eventActor->graphics.id,
@@ -76,7 +76,7 @@ void SabataEvent_UpdateRecoil(struct ActorState *eventActor)
                 SceneActors_StartEightDirectionAnimation(eventActor, &actor->graphics.id,
                                                          actor->animationData, 0xf4, 1, 1, 1);
                 {
-                    SceneEventActor_EnterSequenceStep(eventActor, 2);
+                    Sabata_EnterSequenceStep(eventActor, 2);
                 }
             }
             break;
@@ -86,11 +86,11 @@ void SabataEvent_UpdateRecoil(struct ActorState *eventActor)
     }
 }
 
-void SabataEvent_UpdateRemovalSequence(struct ActorState *actor)
+void Sabata_UpdateRemovalSequence(struct SabataActorState *actor)
 {
     if (actor->changed) {
         actor->changed = 0;
-        SceneEventActor_EnterSequenceStep(actor, 0);
+        Sabata_EnterSequenceStep(actor, 0);
         SceneActors_StartEightDirectionAnimation(actor, &actor->graphics.id, actor->animationData,
                                                  0x114, 2, 1, 4);
         Sound_PlaySong(0x2EB);
@@ -100,7 +100,7 @@ void SabataEvent_UpdateRemovalSequence(struct ActorState *actor)
         case 0:
             if (++actor->pendingAction > 15 && !Player_IsSlotInActionTwelveOrThirtyEight(0)) {
                 SceneActors_RunFirstEventScript(actor, actor->graphics.eventScripts);
-                SceneEventActor_EnterSequenceStep(actor, 1);
+                Sabata_EnterSequenceStep(actor, 1);
             }
             break;
         case 1:
@@ -112,14 +112,14 @@ void SabataEvent_UpdateRemovalSequence(struct ActorState *actor)
             }
             if (actor->finished) {
                 {
-                    SceneEventActor_EnterSequenceStep(actor, 2);
+                    Sabata_EnterSequenceStep(actor, 2);
                 }
             }
             break;
         case 2:
             if (actor->graphics.eventFlags & 2) {
                 {
-                    SceneEventActor_EnterSequenceStep(actor, 3);
+                    Sabata_EnterSequenceStep(actor, 3);
                 }
                 SceneActors_RunSecondEventScript(actor, actor->graphics.eventScripts);
             }
@@ -131,7 +131,7 @@ void SabataEvent_UpdateRemovalSequence(struct ActorState *actor)
     }
 }
 
-static inline void SceneEventActor_SetDirection(struct ActorState *eventActor, int angle)
+static inline void Sabata_SetReactionDirection(struct SabataActorState *eventActor, int angle)
 {
     eventActor->body.direction = angle;
     {
@@ -197,7 +197,7 @@ static inline void SetVelocity(struct ContactPosition *velocity, u32 angle, s32 
     velocity->z = ScaleCoordinate(gUnk_086149C4[angle & 255] * speed);
 }
 
-static inline void SceneEventActor_SetPalette(struct ActorState *eventActor, u32 mode, u32 shift)
+static inline void Sabata_SetPalette(struct SabataActorState *eventActor, u32 mode, u32 shift)
 {
     eventActor->paletteMode = mode;
     eventActor->paletteShift = shift;
@@ -213,19 +213,19 @@ static inline void AddPosition(struct ContactPosition *out, struct SceneActorBod
     out->z = b->z + a->position.z;
 }
 
-static inline void SetHorizontalVelocity(struct ActorState *eventActor, u32 angle, s32 speed)
+static inline void SetHorizontalVelocity(struct SabataActorState *eventActor, u32 angle, s32 speed)
 {
     eventActor->body.motion.x = ScaleCoordinate(gUnk_086149C4[(angle + 64) & 255] * speed);
     eventActor->body.motion.z = ScaleCoordinate(gUnk_086149C4[angle & 255] * speed);
 }
 
-static inline void FinishLunge(struct ActorState *eventActor, void *callback, u32 one)
+static inline void FinishLunge(struct SabataActorState *eventActor, void *callback, u32 one)
 {
     eventActor->controlPhase = one;
     eventActor->stateCallback = callback;
     eventActor->stateTicks = 0;
     eventActor->changed = one;
-    SceneEventActor_EnterSequenceStep(eventActor, 0);
+    Sabata_EnterSequenceStep(eventActor, 0);
     eventActor->pending = one;
 }
 
@@ -234,10 +234,10 @@ static inline int HeightInvalid(u32 difference, u32 limit)
     return difference > limit;
 }
 
-void Sabata_UpdateLungeApproach(struct ActorState *eventActor)
+void Sabata_UpdateLungeApproach(struct SabataActorState *eventActor)
 {
     int zero = 0;
-    struct ActorState *actor = eventActor;
+    struct SabataActorState *actor = eventActor;
     int dx, dz, angle;
     int speed;
     if (eventActor->changed) {
@@ -249,7 +249,7 @@ void Sabata_UpdateLungeApproach(struct ActorState *eventActor)
         actor->attackFlags &= ~2;
     }
     if (actor->animationState == 1)
-        SabataVolume_TestPlayerPosition(actor);
+        Sabata_TestPlayerInAttackArea(actor);
     else if (actor->animationState == 3)
         SabataPosition_TestPath(actor, &actor->movementTarget);
     {
@@ -272,7 +272,7 @@ void Sabata_UpdateLungeApproach(struct ActorState *eventActor)
         eventActor->flags |= mask;
     }
     if (eventActor->pendingAction > 7)
-        SceneEventActor_SetPalette(actor, 1, 5);
+        Sabata_SetPalette(actor, 1, 5);
     {
         int radiusSquared = 2500;
         speed = 32;
@@ -300,16 +300,16 @@ void Sabata_UpdateLungeApproach(struct ActorState *eventActor)
     }
 advance:
     SetHorizontalVelocity(eventActor, angle, speed);
-    SceneEventActor_SetDirection(eventActor, angle);
+    Sabata_SetReactionDirection(eventActor, angle);
     SceneActors_StartEightDirectionAnimation(eventActor, &actor->graphics.id, actor->animationData,
                                              0xF9, 1, 1, 4);
 }
 
-void SabataEvent_UpdateTimedAnimation(struct ActorState *actor, s32 tick)
+void Sabata_UpdateTimedAnimation(struct SabataActorState *actor, s32 tick)
 {
     if (actor->changed) {
         actor->changed = 0;
-        SceneEventActor_SetDirection(actor, actor->requestedDirection);
+        Sabata_SetReactionDirection(actor, actor->requestedDirection);
         {
             u32 mask = 0x400004;
             actor->flags |= mask;
@@ -331,7 +331,7 @@ void SabataEvent_UpdateTimedAnimation(struct ActorState *actor, s32 tick)
     }
 }
 
-void SabataEvent_UpdateTimedResponse(struct ActorState *actor, s32 tick)
+void Sabata_UpdateTimedResponse(struct SabataActorState *actor, s32 tick)
 {
     if (actor->changed) {
         actor->changed = 0;
@@ -361,20 +361,20 @@ static inline u16 EightWay(u16 angle)
     return ((angle + 0x70) >> 5) & 7;
 }
 
-static inline void BossSlot2_SetDirection(struct ActorState *eventActor, u32 heading)
+static inline void Sabata_SetDirection(struct SabataActorState *eventActor, u32 heading)
 {
     eventActor->body.direction = heading;
     eventActor->facing4 = FourWay(eventActor->body.direction);
     eventActor->facing8 = EightWay(eventActor->body.direction);
 }
 
-void Sabata_UpdateSummonSpinSequence(struct ActorState *eventActor)
+void Sabata_UpdateSummonSpinSequence(struct SabataActorState *eventActor)
 {
-    struct ActorState *boss = eventActor;
+    struct SabataActorState *boss = eventActor;
     if (eventActor->changed) {
         eventActor->changed = 0;
         boss->impactCount = 0;
-        SceneEventActor_EnterSequenceStep(eventActor, 0);
+        Sabata_EnterSequenceStep(eventActor, 0);
     }
     {
         u32 mask = 0x400004;
@@ -384,7 +384,7 @@ void Sabata_UpdateSummonSpinSequence(struct ActorState *eventActor)
         case 0: {
             u32 zero = eventActor->pendingAction;
             if (!zero) {
-                BossSlot2_SetDirection(eventActor, 32);
+                Sabata_SetDirection(eventActor, 32);
                 {
                     SceneActors_StartEightDirectionAnimation(eventActor, &boss->graphics.id,
                                                              boss->animationData, 0xF4, 1, 1, 4);
@@ -400,7 +400,7 @@ void Sabata_UpdateSummonSpinSequence(struct ActorState *eventActor)
                 }
             }
             if ((++eventActor->pendingAction) > 8) {
-                SceneEventActor_EnterSequenceStep(eventActor, 1);
+                Sabata_EnterSequenceStep(eventActor, 1);
             }
             break;
         }
@@ -412,7 +412,7 @@ void Sabata_UpdateSummonSpinSequence(struct ActorState *eventActor)
                 eventActor->pendingAction++;
             }
             if (eventActor->finished == 1) {
-                SceneEventActor_EnterSequenceStep(eventActor, 2);
+                Sabata_EnterSequenceStep(eventActor, 2);
             }
             break;
 
@@ -423,7 +423,7 @@ void Sabata_UpdateSummonSpinSequence(struct ActorState *eventActor)
                 Sabata_SpawnBobbingFormation(eventActor);
             }
             if (eventActor->pendingAction > 30) {
-                SceneEventActor_EnterSequenceStep(eventActor, 3);
+                Sabata_EnterSequenceStep(eventActor, 3);
             } else
                 eventActor->pendingAction++;
             break;
@@ -433,24 +433,24 @@ void Sabata_UpdateSummonSpinSequence(struct ActorState *eventActor)
                 SceneActors_StartUnmirroredAnimation(eventActor, &boss->graphics.id,
                                                      boss->animationData, 0x12F, 2, 4);
             if ((++eventActor->pendingAction) > 30) {
-                SceneEventActor_EnterSequenceStep(eventActor, 4);
+                Sabata_EnterSequenceStep(eventActor, 4);
             }
             break;
 
         case 4:
             if (!eventActor->pendingAction) {
-                BossSlot2_SetDirection(eventActor, 0);
+                Sabata_SetDirection(eventActor, 0);
                 SceneActors_StartEightDirectionAnimation(eventActor, &boss->graphics.id,
                                                          boss->animationData, 0x134, 1, 1, 4);
                 Sound_PlaySong(0x2E9);
             }
             if ((++eventActor->pendingAction) > 20) {
-                SceneEventActor_EnterSequenceStep(eventActor, 5);
+                Sabata_EnterSequenceStep(eventActor, 5);
             }
             break;
 
         case 5: {
-            BossSlot2_SetDirection(eventActor, eventActor->pendingAction + 15);
+            Sabata_SetDirection(eventActor, eventActor->pendingAction + 15);
             SceneActors_StartEightDirectionAnimation(eventActor, &boss->graphics.id,
                                                      boss->animationData, 0x13E, 1, 1, 1);
             ActorEffect_SpawnAtAngle(boss->effect, &eventActor->body.position,
@@ -461,7 +461,7 @@ void Sabata_UpdateSummonSpinSequence(struct ActorState *eventActor)
                 eventActor->flags &= ~0x400000;
             }
             if ((eventActor->pendingAction += 16) > 512) {
-                SceneEventActor_EnterSequenceStep(eventActor, 7);
+                Sabata_EnterSequenceStep(eventActor, 7);
             }
             if (eventActor->pendingAction == 128)
                 sub_0806CCC8(eventActor->selectedPoint, 180, -2);
@@ -469,19 +469,19 @@ void Sabata_UpdateSummonSpinSequence(struct ActorState *eventActor)
 
         case 7:
             if (!eventActor->pendingAction) {
-                BossSlot2_SetDirection(eventActor, 0);
+                Sabata_SetDirection(eventActor, 0);
                 SceneActors_StartEightDirectionAnimation(eventActor, &boss->graphics.id,
                                                          boss->animationData, 0x134, 1, 1, 4);
             }
             if (eventActor->pendingAction > 20) {
-                SceneEventActor_EnterSequenceStep(eventActor, 8);
+                Sabata_EnterSequenceStep(eventActor, 8);
             } else
                 eventActor->pendingAction++;
             break;
 
         case 8:
             if (!eventActor->pendingAction) {
-                BossSlot2_SetDirection(eventActor, 32);
+                Sabata_SetDirection(eventActor, 32);
                 SceneActors_StartEightDirectionAnimation(eventActor, &boss->graphics.id,
                                                          boss->animationData, 0xF4, 1, 1, 1);
                 eventActor->pendingAction++;
@@ -496,7 +496,7 @@ void Sabata_UpdateSummonSpinSequence(struct ActorState *eventActor)
     }
 }
 
-void SabataEvent_UpdateDelayedFinish(struct ActorState *actor)
+void Sabata_UpdateDelayedFinish(struct SabataActorState *actor)
 {
     if (actor->changed)
         actor->changed = 0;
@@ -509,7 +509,7 @@ void SabataEvent_UpdateDelayedFinish(struct ActorState *actor)
             }
             if (actor->finished) {
                 ProximityVolume_SetPosition(actor->proximityVolume, &actor->body.position);
-                SceneEventActor_EnterSequenceStep(actor, 1);
+                Sabata_EnterSequenceStep(actor, 1);
             }
             break;
         case 1:
@@ -528,7 +528,7 @@ void SabataEvent_UpdateDelayedFinish(struct ActorState *actor)
             if (actor->pendingAction > 120) {
                 ProximityVolume_SetPosition(actor->proximityVolume, &actor->body.position);
                 {
-                    SceneEventActor_EnterSequenceStep(actor, 2);
+                    Sabata_EnterSequenceStep(actor, 2);
                 }
             }
             break;
@@ -549,15 +549,15 @@ void SabataEvent_UpdateDelayedFinish(struct ActorState *actor)
     }
 }
 
-void Sabata_UpdateChargePaletteSequence(struct ActorState *eventActor)
+void Sabata_UpdateChargePaletteSequence(struct SabataActorState *eventActor)
 {
     if (eventActor->changed) {
         eventActor->changed = 0;
-        SceneEventActor_SetDirection(eventActor, 32);
+        Sabata_SetReactionDirection(eventActor, 32);
         SceneActors_StartEightDirectionAnimation(eventActor, &eventActor->graphics.id,
                                                  eventActor->animationData, 0xF4, 1, 1, 1);
         SabataPosition_SetOffsetPoint(eventActor);
-        SceneEventActor_EnterSequenceStep(eventActor, 0);
+        Sabata_EnterSequenceStep(eventActor, 0);
     }
     {
         u32 mask = 0x400004;
@@ -571,7 +571,7 @@ void Sabata_UpdateChargePaletteSequence(struct ActorState *eventActor)
                 eventActor->pendingAction++;
             }
             if (eventActor->finished == 1) {
-                SceneEventActor_EnterSequenceStep(eventActor, 1);
+                Sabata_EnterSequenceStep(eventActor, 1);
             }
             break;
         case 1:
@@ -579,13 +579,13 @@ void Sabata_UpdateChargePaletteSequence(struct ActorState *eventActor)
                 SceneActors_StartUnmirroredAnimation(eventActor, &eventActor->graphics.id,
                                                      eventActor->animationData, 0x12D, 2, 4);
             if (eventActor->pendingAction > 30) {
-                SceneEventActor_EnterSequenceStep(eventActor, 2);
+                Sabata_EnterSequenceStep(eventActor, 2);
             } else
                 eventActor->pendingAction++;
             break;
         case 2:
             if (!eventActor->pendingAction) {
-                SceneEventActor_SetPalette(eventActor, 4, 5);
+                Sabata_SetPalette(eventActor, 4, 5);
                 Sound_PlaySong(0x239);
                 eventActor->finished = 1;
                 eventActor->pendingAction++;
@@ -595,12 +595,12 @@ void Sabata_UpdateChargePaletteSequence(struct ActorState *eventActor)
     }
 }
 
-void SabataEvent_UpdateSongStopTransition(struct ActorState *actor)
+void Sabata_UpdateSongStopTransition(struct SabataActorState *actor)
 {
     s16 k2;
     if (actor->changed) {
         actor->changed = 0;
-        SceneEventActor_EnterSequenceStep(actor, 0);
+        Sabata_EnterSequenceStep(actor, 0);
         Sound_StopSong(0x239);
     }
     {
@@ -610,8 +610,8 @@ void SabataEvent_UpdateSongStopTransition(struct ActorState *actor)
     switch (actor->stateReset) {
         case 0:
             if (++actor->pendingAction > 8 && !actor->paletteTimer) {
-                SabataVolume_ResetPendingSequence(actor);
-                SceneEventActor_EnterSequenceStep(actor, 1);
+                Sabata_ResetAttackSequence(actor);
+                Sabata_EnterSequenceStep(actor, 1);
             }
             break;
         case 2:
@@ -647,7 +647,7 @@ void SabataEvent_UpdateSongStopTransition(struct ActorState *actor)
                 }
                 SceneActors_StartEightDirectionAnimation(actor, &actor->graphics.id,
                                                          actor->animationData, 0xF4, 1, 1, 4);
-                SceneEventActor_EnterSequenceStep(actor, phase);
+                Sabata_EnterSequenceStep(actor, phase);
                 actor->pending = 1;
             }
             break;

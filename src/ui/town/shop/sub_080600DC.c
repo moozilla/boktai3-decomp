@@ -9,7 +9,7 @@ void Shop_PopulateConsumableGrid(struct SceneInventoryPanel *panel)
     s32 column;
     s32 slot;
     s32 kind;
-    Anim_SelectWidgetGlyph(&panel->display.heading, &panel->display.widgetResource, 0x66);
+    AnimSprite_SelectGlyph(&panel->display.heading, &panel->display.widgetResource, 0x66);
     row = 0;
     flagsBase = ((struct SceneInventoryFlagsView *)(void *)panel)->widgets;
     for (; row <= 3; row++) {

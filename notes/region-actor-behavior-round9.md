@@ -1,4 +1,4 @@
-# RegionActor_UpdateBehaviorAnimation
+# IceBoulder_UpdateBehaviorAnimation
 
 All 944 bytes match using the shared sequence helpers. The first branch needs
 the end-of-sequence result. The second and post-damage branches only advance

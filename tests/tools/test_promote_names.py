@@ -11,6 +11,36 @@ import promote_names
 
 
 class NamePromotionTests(unittest.TestCase):
+    def test_selected_table_resolves_one_alias_and_keeps_other_addresses(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            for name in ('src', 'include', 'symbols', 'gen'):
+                (root / name).mkdir()
+            table = root / 'symbols/functions.csv'
+            table.write_text('addr,name,mode,confidence,source,notes\n')
+            (root / 'gen/code.s').write_text('\tthumb_func_start sub_08000200\n'
+                                            '\tthumb_func_start sub_08000300\n')
+            (root / 'symbols/ram.ld').write_text('Alternate_Run = sub_08000200;\n')
+            selected = root / 'selected.csv'
+            selected.write_text('addr,alias\n08000200,Chosen_Run\n')
+            source = root / 'src/worker.c'
+            source.write_text('#include "sub_08000200.h"\n'
+                              '#define Alternate_Run sub_08000200\n'
+                              '#define Chosen_Run sub_08000200\n'
+                              '#define Other_Run sub_08000300\n'
+                              'void Alternate_Run(void) { Other_Run(); }\n')
+            with patch.object(promote_names, 'ROOT', directory), \
+                 patch.object(promote_names, 'CSV', str(table)), \
+                 patch.object(sys, 'argv', ['promote_names.py', '--only-table', str(selected)]):
+                promote_names.main()
+                promote_names.main()
+            self.assertEqual(source.read_text(), '#include "sub_08000200.h"\n'
+                             '#define Other_Run sub_08000300\n'
+                             'void Chosen_Run(void) { Other_Run(); }\n')
+            self.assertIn('08000200,Chosen_Run,', table.read_text())
+            self.assertNotIn('08000300', table.read_text())
+            self.assertEqual((root / 'symbols/ram.ld').read_text(), '')
+
     def test_existing_names_and_new_aliases_are_rewritten_together(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)

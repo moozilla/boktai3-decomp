@@ -21,7 +21,7 @@ void SceneBody_SetSprite(void *, void *);
 void TerrainOverlay_QueueAddActor(void *);
 #define H(o) (*(s16 *)(p + (o)))
 #define W(o) (*(u32 *)(p + (o)))
-static inline s32 EnemyF426_CellIndex(struct PHVec *v)
+static inline s32 Statue_CellIndex(struct PHVec *v)
 {
     s32 x = (s16)v->x >> 8, z = (s16)v->z >> 8;
     if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
@@ -137,7 +137,7 @@ s32 Statue_InitializeFromScript(u8 *p, void *parent)
     if (!((struct EnemyF426Tail *)p)->dead)
         Statue_InitCollider(p);
     if (W(0x150) && !((struct EnemyF426Tail *)p)->dead) {
-        s32 cell = EnemyF426_CellIndex((struct PHVec *)(p + 0x40));
+        s32 cell = Statue_CellIndex((struct PHVec *)(p + 0x40));
         TerrainModifiers_RegisterCell(p + 0x174, cell, 0, H(0x42) >> 8, 0, 1);
     }
     if (H(0x140)) {

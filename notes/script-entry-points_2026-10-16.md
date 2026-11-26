@@ -20,7 +20,7 @@ the "Unmatched entry points" table first. All names are provisional (`low` in
 | 082268C0 | `Camera_SetFollowFromScript` | CAEE | `-w` target, `-f` (1), `-N` (0) for sub_08226558 after stopping the camera move (tentative) |
 | 0815CBF8 | `ScriptActor_MoveToFromScript` | 933C | `-p` x y z, `-d`, `-e` for sub_0815B0A8 on the actor picked by `-i` |
 | 0815CC78 | (hidden) | | sibling of 0815CBF8 calling sub_0815BF18 |
-| 08103CF8 | `NamedActor_SetRouteFromScript` | 5D74 | `-n` actor, `-r` route id and mode (sub_0821E5C4) |
+| 08103CF8 | `MovingPlatformActor_SetRouteFromScript` | 5D74 | `-n` actor, `-r` route id and mode (sub_0821E5C4) |
 | 081780D4 | `Hud_SetLayoutFromScript` | 2FA0 | `-o` element visibility list (sub_08177C9C) unless the HUD is busy |
 | 08033BD4 | `TextWindowManager_Create` | 6273 | creates the text window manager task once |
 | 0811DE68 | `GameFlag_TestFromScript` | 1E6E | result = bit `-i` of flag set `-k` (sub_0811DD94) |
@@ -45,7 +45,7 @@ The two hidden functions were counted as part of the entry point before them
   from 895 and crashes intermittently on its own type inference
   (`KeyError` in `perm_temp_for_expr`). `trap.flags |= 0;` reproduces the
   redundant flags reload before sub_0821E104.
-* 081D0C04 (registry BB34, 804 bytes, scene NPC creator, `SceneNpc_CreateFromScript`):
+* 081D0C04 (registry BB34, 804 bytes, scene NPC creator, `Otenko_CreateFromScript`):
   draft at about 63%, not committed yet. Open issues: the 0xFFFF0000 mask is reloaded per
   bitfield write in the original (CSE'd into r4 in the draft), and the
   `-i` switch's five `setMode` bodies cross-jump differently.
@@ -72,7 +72,7 @@ Matched (27 functions, 3,448 bytes, +0.143 percentage points):
 | Address | Name | Key | Notes |
 |---|---|---|---|
 | 08225624 | `Trap_CreateFromScript` | command trap | see "trap" below |
-| 08103DCC | `NamedActor_SetSpeedFromScript` | 15ED | `-n` actor, `-s` (6) at +0xBE |
+| 08103DCC | `MovingPlatformActor_SetSpeedFromScript` | 15ED | `-n` actor, `-s` (6) at +0xBE |
 | 0815CA88 | `ScriptActor_SetAnimationFromScript` | C12D | `-p` + 366 to sub_0815AEAC |
 | 0815CCF8 | `ScriptActor_TurnFromScript` | 9763 | optional `-p` point, `-d`, `-f`, `-e` for sub_0815B15C |
 | 08225CB8 | `Terrain_LoadFromScript` | 30AD | `-p` HP resource or `-h`/`-t`/`-r`/`-z`; `-v` map callback set |
@@ -91,7 +91,7 @@ Matched (27 functions, 3,448 bytes, +0.143 percentage points):
 | 080F752C | `Sword_Create` | DB8D | |
 | 08073BA0 | `SceneActorContacts_Create` | D854 | |
 
-Guarded drafts (not counted): 081D0C04 `SceneNpc_CreateFromScript` (66.8%),
+Guarded drafts (not counted): 081D0C04 `Otenko_CreateFromScript` (66.8%),
 081AF4F4 `Vanargand_ResetFromScript` (97.3%, two zero constants in the other order),
 0815A838 (92.0%) and 0815A680 (51%), which both keep a second copy of the actor pointer
 that no tested source form reproduces, and 08119EF0 `CoffinBike_StartFromScript` (58.5%).
@@ -130,9 +130,9 @@ Matched (6 functions, 756 bytes, +0.031 percentage points): 081AF4F4
 (`ScreenParams2E8/310/2C0_SetFromScript`).
 
 New guarded drafts: 081803D8 `Sabata_AdvanceStepFromScript` (74.7%) and
-08103B94 `NamedActor_SetMoveModeFromScript` (47.7%).
+08103B94 `MovingPlatformActor_SetMoveModeFromScript` (47.7%).
 
-081D0C04 `SceneNpc_CreateFromScript` is at 92% in wip (not yet committed):
+081D0C04 `Otenko_CreateFromScript` is at 92% in wip (not yet committed):
 writing `zero = 0` inside the `sub_0802D760(..., zero = 0)` call fixes the whole
 front half (it shifts reload's register rotation, which also stops the mask
 constant from being kept in r4), setHandler/setBox inlines and a separate
@@ -150,7 +150,7 @@ Idioms:
 
 ## Batch 4: 081D0C04
 
-`SceneNpc_CreateFromScript` (registry BB34, 804 bytes) matches, so all of the
+`Otenko_CreateFromScript` (registry BB34, 804 bytes) matches, so all of the
 original top 15 are done. It took, in order:
 * `sub_0802D760(npc, 1, model, 0xC6A0, zero = 0)`: assigning zero inside the
   call fixed the whole front half (reload register rotation; the position
@@ -169,7 +169,7 @@ original top 15 are done. It took, in order:
 ## Batch 5
 
 Matched (3 functions, 1,108 bytes, +0.046 percentage points):
-* 081D0F28 `SceneNpc_CommandFromScript` (8918): selects an NPC (-n, else the
+* 081D0F28 `Otenko_CommandFromScript` (8918): selects an NPC (-n, else the
   last created) and puts it in the scripted state; -p, -d angle, -w face the
   player (Math_Atan2), -s. Its `setAngle` inline is the facing code of
   081D0C04, and needed the same register-pinning concession.
@@ -207,7 +207,7 @@ Matched 19 small entry points (1,880 bytes, +0.078 percentage points):
 (`ScriptActor_StartActionFromScript`), 0816B834 (`GameState_ClearAreaFlagsFromScript`),
 08178008, 08178588 (`Hud_RefreshSpriteFromScript`, `Hud_ShowPanelFromScript`),
 081BA57C, 081D51B0, 081F213C, 0820A540 (`WindCannonSlot_ResetFromScript`), 081D105C
-(`SceneNpc_StopFromScript`), 08227888 (`PlayerName_SetFromScript`, default name
+(`Otenko_StopFromScript`), 08227888 (`PlayerName_SetFromScript`, default name
 bytes 80 A2 80 98 80 91 80 9F), 0822E9C8 (`GameState_HasUnlockFromScript`) and
 five more screen parameter blocks (081D7510, 081E1A2C, 081E03F4, 081EC0A8).
 
@@ -254,7 +254,7 @@ Guarded drafts (no exact gain): FloorSwitch_Create (0810067C), 0810858C
 `AnimatedTile_CreateFromScript`, 08121268 `SabataRider_CreateFromScript`,
 0822BFC8 `SavedVariables_RunFromScript`, 0806F5C0
 `SceneEffectSchedule_AddFromScript`, 081C4080 `PopInSprite_Create`, 08111A48
-`PaletteFade_StartFromScript` and 08103110 `NamedObject_CreateFromScript`
+`PaletteFade_StartFromScript` and 08103110 `MovingPlatform_CreateFromScript`
 (registry A4FC, 66%; it inlines the packed-command sprite stepper of
 `include/scene/actor/actor_attachment_sprite_playback.h`). FloorSwitch_Create stays near
 70% after about an hour of permuter time: the "pressed" block is placed
@@ -294,7 +294,7 @@ Idioms:
   (081975C8).
 
 Guarded drafts: LinkSession_Create (0810B914, a singleton task creator),
-TileTriggerPool_FindByName (081081F0, 4 bytes off), Route_Start (0821E5C4),
+FloorTrapPool_FindByName (081081F0, 4 bytes off), Route_Start (0821E5C4),
 Anim_SetSequence (08220C8C, one register) and Math_Atan2 (082215E4); the
 CoffinBike_StartFromScript draft went from 58.5% to 82.9%. The remaining
 unmatched entry points are mostly large and inline the packed-command
@@ -304,7 +304,7 @@ sprite stepper.
 
 Matched 1: 08163E24 `ParticlePool_Create`, the 16-sprite task kept by scene
 NPCs and kind-29 characters (68 bytes). Guarded draft: 081D2A38
-`TaggedSceneNpc_Create`, the SceneNpc creator behind two tiny registry
+`Kuro_Create`, the SceneNpc creator behind two tiny registry
 routines (tag 0 and 1), at about 96%. agbcc keeps model E00E in sb for both
 calls; the original loads it from the pool each time.
 
@@ -380,13 +380,13 @@ Matched 20 small functions (1,240 bytes), working smallest first through the
 unmatched entry points and their direct callees, including those that no
 script uses yet:
 
-* Entry points: TileTriggerPool_IsReadyFromScript, GameState_HasEquipmentFromScript,
+* Entry points: FloorTrapPool_IsReadyFromScript, GameState_HasEquipmentFromScript,
   Hud_SetField13F1FromScript, ScriptActor_RequestFromScript,
   ScriptActor_FaceFromScript, SceneNpc_SetSpecialModeFromScript,
-  NamedObject_SetPaletteFromScript, ScriptMessage_SetFromScript,
+  MovingPlatform_SetPaletteFromScript, ScriptMessage_SetFromScript,
   GameState_ClearAreaFlagFromScript, Inventory_ContainsFromScript,
   Inventory_SetEntryFromScript and ProjectileTask_GetOrCreate.
-* Callees: TileTriggerPool_FindByName (draft promoted), SceneActorContacts_SetOwner,
+* Callees: FloorTrapPool_FindByName (draft promoted), SceneActorContacts_SetOwner,
   Hud_SaveMode, Hud_RestoreMode, GameState_SetPairFlag,
   GameState_GetUnlockEntry, GameState_ApplySelectedItem and SolarBank_Init.
 
@@ -404,7 +404,7 @@ Idioms:
 * `x = GetValue(); n = 0x10; if (x) n = 0x30;` (0822DE14).
 
 Still open (kept as wip): 0821F15C, 0822EA8C and 0811D600 (load order),
-0815A938, 0816B7EC, 0810853C (4 bytes) and the TaggedSceneNpc_Create model
+0815A938, 0816B7EC, 0810853C (4 bytes) and the Kuro_Create model
 constant. An s16 prototype parameter reproduces its two pool loads, but the
 value comes out sign-extended.
 
@@ -412,9 +412,9 @@ value comes out sign-extended.
 
 Matched 20 more small and medium functions (88-120 bytes) from the
 smallest-first list. Some are named (CoffinBike_StopFromScript,
-NamedObject_ReleaseFromScript, Player_SetSlotValueFromScript,
+MovingPlatform_ReleaseFromScript, Player_SetSlotValueFromScript,
 ScriptActor_SetLifeEnergyFromScript, ScriptPrompt_SetFromScript,
-SabataRider_ResetFromScript, GameState_SetEventFlag, TileTriggerPool_Allocate,
+SabataRider_ResetFromScript, GameState_SetEventFlag, FloorTrapPool_Allocate,
 Camera_SetBounds, Camera_SetCenteredBounds, Bg_SetLayerMap and
 Terrain_LoadHP). The rest keep `sub_` names where the C doesn't show their
 purpose.

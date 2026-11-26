@@ -19,6 +19,15 @@ class SplitAliasTests(unittest.TestCase):
         self.assertEqual(split.source_functions(source), ['sub_08004000'])
         self.assertEqual(split.source_functions(source, resolve_aliases=False), ['Panel_Update'])
 
+    def test_split_nonmatching_preserves_plain_source_and_nested_drafts(self):
+        plain = '#include "global.h"\r\n\r\nvoid Match(void) {}'
+        self.assertEqual(split.split_nonmatching(plain), (plain, []))
+
+        draft = '#ifdef FEATURE\nvoid Draft(void) {}\n#endif'
+        fallback = 'INCLUDE_ASM("asm/nonmatching", sub_08004000);'
+        mixed = f'{plain}\n# ifdef NONMATCHING\n{draft}\n#else\n{fallback}\n#endif\n'
+        self.assertEqual(split.split_nonmatching(mixed), (f'{plain}\n{fallback}\n', [(draft, fallback)]))
+
     def test_promoted_and_unpromoted_generated_names(self):
         for generated, definition in [('Panel_Update', 'sub_08004000'),
                                       ('sub_08004000', 'Panel_Update'),

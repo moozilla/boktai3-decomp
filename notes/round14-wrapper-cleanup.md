@@ -75,7 +75,7 @@ The palette transition pointer is a direct address of the real member.
 * Removing the labeled one-shot loop in Palette_SetBrightnessFromScript changes
   22 instructions' registers. Consistent transition-field addressing does not
   restore the allocation. Only the independent pointer expression was removed.
-* Scene_SpawnDirectionalDust's private sample-address statement macro was also
+* PuzzleBlock_SpawnDirectionalDust's private sample-address statement macro was also
   tried as direct array addresses. That nonmatching draft remains a holdout;
   it was not hidden behind a new macro or header name.
 * Direct removal of the three remaining constant locals changes 10 bytes in

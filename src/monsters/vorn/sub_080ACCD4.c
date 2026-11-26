@@ -1,7 +1,6 @@
 // COMPILER: old_agbcc
 #include "global.h"
-/* TentacleEnemy_SetSegmentPosition: Copies a position into an indexed segment entry used by the position trail */
-#define TentacleEnemy_SetSegmentPosition sub_080ACCD4
+/* Centipede_SetSegmentPosition: Copies a position into an indexed segment entry used by the position trail */
 
 struct Pos080ACCD4 {
     u32 a, b;
@@ -16,7 +15,7 @@ struct Group080ACCD4 {
     struct Entry080ACCD4 entries[4];
 };
 
-void sub_080ACCD4(struct Group080ACCD4 *g, s32 i, struct Pos080ACCD4 *pos)
+void Centipede_SetSegmentPosition(struct Group080ACCD4 *g, s32 i, struct Pos080ACCD4 *pos)
 {
     g->entries[i].pos = *pos;
 }

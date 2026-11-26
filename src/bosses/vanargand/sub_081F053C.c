@@ -1,18 +1,18 @@
 #include "global.h"
 #include "engine/engine.h"
-struct Slot7PackedVector {
+struct VanargandHeadPackedVector {
     u32 x : 16, y : 16, z : 16;
 };
-struct Slot7Actor {
+struct VanargandHeadActorView {
     u8 pad0[0x1fc];
     u8 contactCollider[0x64];
-    struct Slot7PackedVector position;
+    struct VanargandHeadPackedVector position;
 };
 void VanargandHead_BeginScaledCooldown(void);
 void Collider_SetBodyProperties(void *, s32, s32, s32);
-void VanargandHead_InitContactCollider(struct Slot7Actor *actor, s32 body)
+void VanargandHead_InitContactCollider(struct VanargandHeadActorView *actor, s32 body)
 {
-    struct Slot7PackedVector size, offset;
+    struct VanargandHeadPackedVector size, offset;
     void *collider = actor->contactCollider;
     size.x = 256;
     size.y = 256;

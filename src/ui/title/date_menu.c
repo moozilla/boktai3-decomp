@@ -18,7 +18,7 @@ void DateMenu_HideAnimations(struct DateMenu *p)
 
 extern const struct ContactPosition gUnk_0824FCCC[12];
 
-s32 Widget_InitLinked(u8 *, void *, u16, u32, u8, u8, u8, const struct ContactPosition *);
+s32 AnimSprite_InitLinked(u8 *, void *, u16, u32, u8, u8, u8, const struct ContactPosition *);
 
 void DateMenu_InitializeDigitWidgets(struct DateMenu *menu)
 {
@@ -26,7 +26,7 @@ void DateMenu_InitializeDigitWidgets(struct DateMenu *menu)
     s32 i;
     memcpy(pos, gUnk_0824FCCC, sizeof(pos));
     for (i = 0; i < 12; i++) {
-        Widget_InitLinked((u8 *)&menu->digits[i], menu->widgets[0].resource, 0, 0x30, 0, 0, 0,
+        AnimSprite_InitLinked((u8 *)&menu->digits[i], menu->widgets[0].resource, 0, 0x30, 0, 0, 0,
                           &pos[i]);
         menu->digits[i].flags |= 1;
     }
@@ -417,13 +417,13 @@ s32 DateMenu_Initialize(struct DateMenu *menu)
     resource = ScriptProc_Start(0xCB05, 0xE2AB);
     ResourceHeader_Relocate(menu->widgets[0].resource, resource);
     menu->digitResource = *(struct AnimSpriteResource *)menu->widgets[0].resource;
-    Widget_InitLinked((u8 *)&menu->widgets[0], menu->widgets[0].resource, 0x34, 0x10, 0, 0, 0,
+    AnimSprite_InitLinked((u8 *)&menu->widgets[0], menu->widgets[0].resource, 0x34, 0x10, 0, 0, 0,
                       NULL);
     ResourceHeader_Relocate(menu->widgets[1].resource, resource);
-    Widget_InitLinked((u8 *)&menu->widgets[1], menu->widgets[1].resource, 0x26, 0x10, 0, 0, 0,
+    AnimSprite_InitLinked((u8 *)&menu->widgets[1], menu->widgets[1].resource, 0x26, 0x10, 0, 0, 0,
                       NULL);
     ResourceHeader_Relocate(menu->widgets[2].resource, resource);
-    Widget_InitLinked((u8 *)&menu->widgets[2], menu->widgets[2].resource, 0x27, 0x10, 0, 0, 0,
+    AnimSprite_InitLinked((u8 *)&menu->widgets[2], menu->widgets[2].resource, 0x27, 0x10, 0, 0, 0,
                       NULL);
     menu->widgets[1].flags |= 1;
     menu->widgets[2].flags |= 1;
@@ -435,7 +435,7 @@ s32 DateMenu_Initialize(struct DateMenu *menu)
     menu->widgets[2].paletteBank = 0xE001;
     resource = ScriptProc_Start(0xCB05, 0x530D);
     RelocateDateCursor(menu, resource, &cursorGraphics);
-    Widget_InitLinked((u8 *)&menu->widgets[3], cursorGraphics, 0x80, 0x10, 0, 0, 0, NULL);
+    AnimSprite_InitLinked((u8 *)&menu->widgets[3], cursorGraphics, 0x80, 0x10, 0, 0, 0, NULL);
     DateMenu_InitializeDigitWidgets(menu);
     DateMenu_LoadCurrentDate(menu);
     DateMenu_UpdateDigits(menu);

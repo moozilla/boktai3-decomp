@@ -34,7 +34,7 @@ void TextWindow_Refresh(int, int);
 void TextWindow_StartPlayback(int);
 void WirelessLinkIndicator_SetPosition(int, int);
 void ScreenTransition_SendCommand(int, int, int, int, int, int, int);
-void Widget_InitLinked(void *, void *, int, int, int, int, int, int);
+void AnimSprite_InitLinked(void *, void *, int, int, int, int, int, int);
 int WirelessPeerPanel_Initialize(struct P *p)
 {
     struct Blob *b = ScriptProc_Start(0xcb05, 0x530d);
@@ -93,7 +93,7 @@ int WirelessPeerPanel_Initialize(struct P *p)
         goto fail;
     p->blob2 = *b;
     ResourceHeader_Relocate(&p->blob2, b);
-    Widget_InitLinked(p->draw, &p->blob2, 1, 16, 0, 0, 60, 0);
+    AnimSprite_InitLinked(p->draw, &p->blob2, 1, 16, 0, 0, 60, 0);
     return 0;
 fail:
     return -1;

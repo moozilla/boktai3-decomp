@@ -7,7 +7,7 @@ u32 Player_ConsumeStateEntry(struct Player *);
 void Player_UpdateFacingSide(struct Player *);
 void ActorSequence_Begin(struct Player *, s32, s32);
 void Sound_PlaySong(u32);
-void RisingSprite_Spawn(void *);
+void RecoilPuff_Spawn(void *);
 void SparkParticle_Spawn(void *, s32, s32, s32, s32, s32, s32, s32);
 void Camera_RequestShake(u32);
 extern const s16 gUnk_086149C4[];
@@ -67,7 +67,7 @@ void Player_UpdateRecoilMotion(struct Player *p)
                 if (H(0x45A) <= 5) {
                     if (!(H(0x45A) & 1)) {
                         Sound_PlaySong(0x191);
-                        RisingSprite_Spawn(&p->position);
+                        RecoilPuff_Spawn(&p->position);
                     }
                     H(0x45A)++;
                 }

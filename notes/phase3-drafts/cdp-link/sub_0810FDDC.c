@@ -31,7 +31,7 @@ void sub_0810FDDC(struct ScoreDigits *p, s32 row, s32 n)
     // Keep a separate visibility index and share its doubled term below.
     index = base;
     SetDigitVisible(p, index, glyph);
-    Anim_SelectWidgetGlyph((u8 *)p->slots +
+    AnimSprite_SelectGlyph((u8 *)p->slots +
                                ((index << 1) + base) * (sizeof(struct AnimSprite) / 3),
                            &p->glyphs, (u16)glyph);
     glyph = 0x3e;
@@ -44,7 +44,7 @@ void sub_0810FDDC(struct ScoreDigits *p, s32 row, s32 n)
         }
 
         SetDigitVisible(p, tens, glyph);
-        Anim_SelectWidgetGlyph((u8 *)&p->slots[1] +
+        AnimSprite_SelectGlyph((u8 *)&p->slots[1] +
                                    ((index << 1) + base) * (sizeof(struct AnimSprite) / 3),
                                &p->glyphs, (u16)glyph);
         glyph = 0x3e;
@@ -54,6 +54,6 @@ void sub_0810FDDC(struct ScoreDigits *p, s32 row, s32 n)
         }
 
         ones = base + 2;
-        Anim_SelectWidgetGlyph(&p->slots[ones], &p->glyphs, (u16)glyph);
+        AnimSprite_SelectGlyph(&p->slots[ones], &p->glyphs, (u16)glyph);
     }
 }

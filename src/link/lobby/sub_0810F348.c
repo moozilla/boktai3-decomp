@@ -13,7 +13,7 @@ void TextWindow_SetBounds(s32, s32, s32, s32, s32);
 void TextWindow_SetScript(s32, const u8 *);
 void TextWindow_Refresh(u32, u32);
 void TextWindow_StartPlayback(s32);
-s32 Anim_SelectWidgetGlyph(void *, void *, u32);
+s32 AnimSprite_SelectGlyph(void *, void *, u32);
 void LinkSession_SetSelectionResponse(s32);
 void Sound_PlaySong(u32);
 void SceneTask_UpdateTextDelay(struct RecordMenu *);
@@ -47,7 +47,7 @@ struct RecordMenuSelectionView {
 static inline void RecordMenu_PlayChoiceChange(struct RecordMenuSelectionView *view, u16 *glyph)
 {
     Sound_PlaySong(0xDC);
-    Anim_SelectWidgetGlyph(&view->cursor, &view->cursorResource, *glyph);
+    AnimSprite_SelectGlyph(&view->cursor, &view->cursorResource, *glyph);
 }
 void RecordMenu_UpdateSelection(struct RecordMenu *menu)
 {

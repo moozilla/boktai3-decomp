@@ -62,8 +62,7 @@ static inline s32 magnitude(struct Vec *v)
     return sum;
 }
 // confidence=low: advances marked segments and bridges gaps along the chain.
-#define TentacleActor_UpdateSegmentPositions sub_080A9DB0
-void TentacleActor_UpdateSegmentPositions(struct Actor *p, s32 divisor, s32 threshold)
+void Centipede_UpdateSegmentPositions(struct Actor *p, s32 divisor, s32 threshold)
 {
     struct Group *g = p->group;
     struct Vec delta;

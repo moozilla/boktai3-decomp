@@ -4,7 +4,7 @@
 struct SceneVec;
 struct SceneVec *Player_GetEffectivePosition(s32);
 s32 SabataPosition_TestPath(void *, struct SceneVec *);
-s32 SabataVolume_TestPlayerPosition(void *volume)
+s32 Sabata_TestPlayerInAttackArea(void *volume)
 {
     return SabataPosition_TestPath(volume, Player_GetEffectivePosition(0));
 }

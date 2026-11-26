@@ -65,7 +65,7 @@ void Count_UpdateSwayReaction(void *, int);
 void sub_08027214(void *, int);
 
 /* Health is stored in the signed halfword domain. */
-static inline s16 Vampire_GetHealthFloor(void)
+static inline s16 Count_GetHealthFloor(void)
 {
     return 0;
 }
@@ -146,7 +146,7 @@ int Count_ApplyPendingDamage(struct VampireDamage *p)
         size.z = 16;
         DamageNumberDisplay_Show(collider, damage, 0, sprite + 0xc, &size, 1);
         if ((*hp) <= 0) {
-            s16 health = Vampire_GetHealthFloor();
+            s16 health = Count_GetHealthFloor();
             *hp = health;
             SceneActorState_SetFlags((struct StateActor *)base, 2);
             SceneActorState_EnterAction((struct StateActor *)base, sub_08027214, 25);

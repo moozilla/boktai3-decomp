@@ -316,14 +316,14 @@ the large decision routine; the third includes the movement/effect callbacks.
 0817F444 also installs 0817E040 as an actor callback after an impact response.
 Names are explicitly tentative: the actor's species is not established.
 
-- **0817DA1C — matched, SabataVolume_UpdatePursuitSpin.** Starts animation 0x134,
+- **0817DA1C — matched, Sabata_UpdatePursuitSpin.** Starts animation 0x134,
   tests the path/player movement mode, pursues destination halfwords at
   0x2A4/0x2A8 with speed five, and rotates an effect by 16 angle units each tick.
   Collision status at the 0x32C effect gates sound 0x2E7. After elapsed time 96
   it requests phase two and restores the requested facing. Exact 940-byte check.
   Local masks declared before flag accesses reproduce the original instruction
   order; incrementing the initially zero impact flag avoids reusing phase one.
-- **0817E040 — matched, SabataVolume_UpdateKnockbackLanding.** Reverses facing
+- **0817E040 — matched, Sabata_UpdateKnockbackLanding.** Reverses facing
   relative to impact angle 0x471, decays speed 0x472 by three quarters, adds
   height 0x468 to the terrain floor, and plays landing/recovery animations.
   The terrain lookup handles cell overrides and sloped shapes one/two.
@@ -331,17 +331,17 @@ Names are explicitly tentative: the actor's species is not established.
   the velocity stores reproduces the zero load before the first store. A
   local mask for the terrain nibble fixes its operand tie; ordered phase/zero
   locals fix the phase-two transition stores.
-- **0817D7AC — matched, SabataVolume_UpdateRepeatedShot.** Alternates aiming,
+- **0817D7AC — matched, Sabata_UpdateRepeatedShot.** Alternates aiming,
   conditional projectile creation through 0817D67C, and impact-count states;
   the byte at 0x473 is capped at three. Exact 624-byte check. The explicit
   timer-zero jump to the increment path retains the original separate zero
   and >10 tests; the equivalent combined expression was optimized differently.
-- **0817DDC8 — matched, SabataVolume_UpdateImpactSlide.** Initializes effects
+- **0817DDC8 — matched, Sabata_UpdateImpactSlide.** Initializes effects
   through 0817AEC8 and the attack collider, then decays impact velocity by
   three quarters or three eighths according to byte 0x470. Once stopped,
   animation 0x116 completes before requesting the next phase. Exact 428-byte
   check on the first candidate.
-- **0817BDB0 — matched, SabataDecision_UpdateHazardPath.** Chooses a random path
+- **0817BDB0 — matched, Sabata_FollowHazardPath.** Chooses a random path
   and point, advances after pending events, spawns proximity hazards on the
   first three advances and requests a transition afterward. Exact 352-byte
   check. Materializing the RNG table pointer before advancing its index fixes
@@ -2315,7 +2315,7 @@ file-local aliases and tentative semantic interpretations, pending integration.
   skeleton as 080FDA44, but uses radius 256 on retarget, leaves speed intact
   at route wrap, and ramps to 18. Porting the matched sibling required only
   those changes. Same three register hints, verified with depin.py.
-- 08100C18: matched, `NamedObject_EmitMovementTrail`, 784 bytes. Emits at
+- 08100C18: matched, `MovingPlatform_EmitMovementTrail`, 784 bytes. Emits at
   alternating direction-dependent offsets from +10C, toggling +D2 and
   resetting +BC to four ticks. Kind +F3 selects default particles (0) or
   explicit resource/variant particles (3, resources F422/121B). Using a
@@ -2338,7 +2338,7 @@ file-local aliases and tentative semantic interpretations, pending integration.
   operand barriers and second flag mask/result pins preserve compiler operand
   ties. depin.py reduced five hints to four. Reviewed extent ends before the
   separate 080FFDD0 entry retained as bytes by the existing assembly inventory.
-- 081010E0: matched, `NamedObject_UpdateVerticalTravel`, 524 bytes. Clears
+- 081010E0: matched, `MovingPlatform_UpdateVerticalTravel`, 524 bytes. Clears
   motion, consumes the sound-entry byte +BA, respects pause flag 4, and moves
   toward upper/lower limits at +D8/+D4 according to flag 2. On arrival, snaps
   an attached player, sets flag 100, state 4 and the entry byte, stops movement
@@ -2370,7 +2370,7 @@ generated-file changes. All six assigned functions now have C: three exact
 matches and three guarded NONMATCHING drafts. Combined ROM validation and
 name promotion remain the integrator's work.
 
-- **08113F64 — matched, NativeEffect_UpdateTurningTrail (tentative).**
+- **08113F64 — matched, ProjectileEffect_UpdateTurningTrail (tentative).**
   Type-three profile update. Clears the entry flag, integrates fixed-point
   position and changes polar velocity over timer ranges 0–5, 6–19 and 20+.
   During the middle range the angle changes by twice the signed direction,
@@ -2383,16 +2383,16 @@ name promotion remain the integrator's work.
   parameter plus an explicit s16 angle local inside the inline polar helper
   fixed PRE ordering without adding instructions; actual callers supply the
   byte angle at +CA.
-- **08113BBC — drafted 99.6%, NativeEffect_UpdateRotatingFlight (tentative).**
+- **08113BBC — drafted 99.6%, ProjectileEffect_UpdateRotatingFlight (tentative).**
   Type-one update shares the same motion/animation/collider layout. Uses polar
   speed three before tick 20, then four; rotates every fourth tick initially,
   every second tick through tick 19, and every tick through tick 41. Ground
-  test uses margin eight and schedules NativeEffect_DestroyEntry. Full-size
+  test uses margin eight and schedules ProjectileEffect_DestroyEntry. Full-size
   checker leaves two register-only instruction differences: the final height
   address reload uses r3 instead of r0. Ten focused argument/pointer hint
   variants failed to improve it; preserving the simpler draft. The animation
   mask temporary must be r3 here, unlike the other family members.
-- **08114928 — drafted 83.9%, NativeEffect_CreateFromProfile (tentative).**
+- **08114928 — drafted 83.9%, ProjectileEffect_CreateFromProfile (tentative).**
   Confirms the 16-slot native-effect manager layout: entries begin at +18,
   stride D8, and the manager frame counter is +D98. Input profile byte +1
   selects five sprite initializers and corresponding motion states. Profile
@@ -2406,7 +2406,7 @@ name promotion remain the integrator's work.
   initialization/call order. Narrowing the stored group id directly causes
   agbcc to select an undesired byte load; the retained explicit helper keeps
   the original word load but hoists an extra manager-counter address.
-- **08113920 — drafted 90.5%, NativeEffect_UpdateAcceleratingTrail (tentative).**
+- **08113920 — drafted 90.5%, ProjectileEffect_UpdateAcceleratingTrail (tentative).**
   Called by EffectActor_BeginHorizontalMotion. Integrates position, projects
   and animates the sprite, updates the collider, then accelerates X velocity
   by direction * 512. Emits odd-tick particles through tick nine with each
@@ -2415,14 +2415,14 @@ name promotion remain the integrator's work.
   two with registers ignored: particle-offset operand order plus position and
   sprite-position spill order. Factoring the random load into a helper helped
   08113F64 but worsened this function; restored the best direct-load form.
-- **08113738 — matched, NativeEffect_UpdateLinearFlight (tentative).**
+- **08113738 — matched, ProjectileEffect_UpdateLinearFlight (tentative).**
   Shared type-zero/type-two fixed-velocity flight update; entry clears sprite
   bit zero, then integrates, projects, animates, places and inserts its collider.
-  Ground margin eight or lifetime expiry selects NativeEffect_DestroyEntry.
+  Ground margin eight or lifetime expiry selects ProjectileEffect_DestroyEntry.
   Exact extent: 488 bytes. Register-pinned category; depin retained 11 hints.
   The first packed flip comparison needs its result in r2 rather than the
   shared ActorAttachment_StepSprite helper's r1.
-- **08114CB0 — matched, NativeParticle_UpdateAnimatedMotion.**
+- **08114CB0 — matched, ProjectileMote_UpdateAnimatedMotion.**
   Updates the small particle position using signed halfword velocities, copies
   its packed coordinates into a 40-byte sprite selected by signed index +13,
   and advances the parallel sequence at manager +520. Computes sprite tile
@@ -3170,7 +3170,7 @@ All commits submitted separately through build/commit.sh.
   of four sprites (stride 0x60 at +0x3D4), selects the actor's directional
   animation frame, runs the packed animation stepper, copies its position,
   unhides it and sets lifetime eight. Index +0x554 wraps after three. The
-  middle animation-stepper run is shared with Actor_InitPaletteEffectPose.
+  middle animation-stepper run is shared with TutorialOtenko_InitPaletteEffectPose.
   Retained candidate has 28 realigned differences, six ignoring registers:
   sprite/animation address reuse, argument scheduling and allocation.
   Raw separate animation-base addressing improved 81.1% to 88.8%; forcing
@@ -3365,7 +3365,7 @@ points; 1300 of 4124 reviewed bytes including pools/alignment). Two exact
 functions and four NONMATCHING drafts, each in its own driver commit on the
 already-claimed cloud/08104350 branch. No network operations or full builds.
 
-- **08105AB4 — drafted 81.2%, ProximityActor_UpdateDamageAnimation.** Reads the
+- **08105AB4 — drafted 81.2%, IceBoulder_UpdateDamageAnimation.** Reads the
   context at 020001B4, health at FC, maximum at FE, damage step at 100 and flags
   at 108. Starts a terminal animation/state when health reaches zero; otherwise
   selects a damage frame or mirrored recovery frame, restores health in steps
@@ -3376,7 +3376,7 @@ already-claimed cloud/08104350 branch. No network operations or full builds.
   Pointer lifetimes, instruction ordering and allocation remain: 102 realigned
   differing instructions, 29 ignoring registers. Recorded against all 952 bytes;
   the candidate is 940 bytes. Guarded draft retains register hints.
-- **08104350 — drafted 84.0%, ActorGroup_CreateFromScript.** Creates/uses the
+- **08104350 — drafted 84.0%, LootDeposit_CreateFromScript.** Creates/uses the
   020001B0 Pool184 manager, allocates a member, loads sprite resource 9385 and
   reads m/p/r/n/a/b/A/P/I/G options. The A option supplies health, debris count,
   a byte and three arguments passed to 08105194; default health is 100 and the
@@ -3390,7 +3390,7 @@ already-claimed cloud/08104350 branch. No network operations or full builds.
   Remaining option/default ordering, argument-loop form, pointers and allocation
   give 120 realigned differences / 70 ignoring registers. Candidate 1008 bytes,
   reviewed target 1016. Only the guarded stepper retains matching concessions.
-- **0810523C — matched, ActorGroup_EmitRemovalDebris.** Five emissions through
+- **0810523C — matched, LootDeposit_EmitRemovalDebris.** Five emissions through
   08127590 with resource hashes 9385/74C9, radius ten, lifetime 30 and parameter
   490. The first vertical velocity is 64, the others 34; the last three select
   (0,1), (1,0), (2,0) variants. Ends by calling 081050BC. Keeping random-angle
@@ -3400,7 +3400,7 @@ already-claimed cloud/08104350 branch. No network operations or full builds.
   byte range. depin removed both explicit register bindings and retained only
   that constraint. Exact after formatting with --target-size 900; marked as a
   register-pinning concession because the empty constraint remains.
-- **0810480C — drafted 94.5%, ActorGroup_UpdateMemberProximity.** On entry clears
+- **0810480C — drafted 94.5%, LootDeposit_UpdateMemberProximity.** On entry clears
   the frame counter, exposes the sprite and initializes a rotated offset with
   radii 41/148. On odd frames tests origin range and player eligibility, starts
   turn step four when the distance changes, and decrements the health/countdown.
@@ -3410,7 +3410,7 @@ already-claimed cloud/08104350 branch. No network operations or full builds.
   improves allocation. Fourteen realigned differences, four ignoring registers:
   angle/Z register choices, a few address temporaries and flag-test/load order.
   Candidate and reviewed target both 484 bytes. Guarded draft with hints.
-- **081049F0 — drafted 82.2%, ActorGroup_UpdateMemberSway.** Wraps the byte angle,
+- **081049F0 — drafted 82.2%, LootDeposit_UpdateMemberSway.** Wraps the byte angle,
   rotates the two radii around the saved origin and adjusts/damps the turn step.
   Preserve -(radius * sine), rather than (-radius) * sine: agbcc selects a
   different negate/multiply order. Signed magnitude shifts reproduce the
@@ -3420,8 +3420,8 @@ already-claimed cloud/08104350 branch. No network operations or full builds.
   differences, four ignoring registers: primarily sine-table/scratch allocation,
   with redundant turn-step reads and two bytes of body length still off.
   Candidate 368 bytes, reviewed target 372. Guarded draft with hints.
-- **08105808 — matched, ProximityActor_ApplyContactDamage.** Collider callback
-  installed by ProximityActor_InitializeCollider (08105998). Flags at actor 108
+- **08105808 — matched, IceBoulder_ApplyContactDamage.** Collider callback
+  installed by IceBoulder_InitializeCollider (08105998). Flags at actor 108
   gate contact response; reaction bit eight emits variant-dependent sparkles and
   song 15C on a cooldown. Variant one loses 200 health per accepted contact;
   the other uses incoming collider damage. Both clamp health at zero. Variant
@@ -3887,8 +3887,8 @@ Shared docs/index and progress totals were not regenerated by this worker.
 
 Tags: #matching #named-object #terrain #actor-group
 
-- 08103F44 matched: NamedObject_PlayAdjacentExitSound. The caller is
-  081012EC, after NamedObject_StepTowardTarget reports arrival and the object
+- 08103F44 matched: MovingPlatform_PlayAdjacentExitSound. The caller is
+  081012EC, after MovingPlatform_StepTowardTarget reports arrival and the object
   changes to state 3.
   Checks attachment ownership/flags, then four adjacent cells for equal height
   and absence of terrain attributes 0xC3; plays song 0x151 on the first exit.
@@ -3896,11 +3896,11 @@ Tags: #matching #named-object #terrain #actor-group
   predicates preserve materialized booleans. Reading x/z through one u16
   position pointer and loading attributes through a u32-returning inline
   removed the final selection/register differences. No pinning.
-- 0810271C matched: NamedObject_ClampTetherToPlatform. Ported the matched
-  NamedObject_ConstrainTether (081023CC): sample tether cell instead of object
+- 0810271C matched: MovingPlatform_ClampTetherToPlatform. Ported the matched
+  MovingPlatform_ConstrainTether (081023CC): sample tether cell instead of object
   cell, accept same terrain height unless attribute 0x40 is set, and use bounds
-  at 086064B4. Installed for kind 1 by NamedObject_CreateFromScript. No pinning.
-- 08102570 matched: NamedObject_ClampTetherAtBarrier. Same family, but its guard
+  at 086064B4. Installed for kind 1 by MovingPlatform_CreateFromScript. No pinning.
+- 08102570 matched: MovingPlatform_ClampTetherAtBarrier. Same family, but its guard
   is terrain attribute 0x80. Installed for kinds 0/3. The rest of the clamp and
   attachment flag 0x200 update is shared with 0810271C. No pinning.
 - 080FD6D0 matched: ActorGroup_BeginExtendedMotion. Based on matched
@@ -3909,15 +3909,15 @@ Tags: #matching #named-object #terrain #actor-group
   sprite position from context+8A8 with mode 0x13D, marks ED0 active, and plays
   song 0x16F. Completion selects behavior 7. Correct context padding was the
   last mismatch. Name follows neighboring ActorGroup routines. No pinning.
-- 081021DC retained inherited draft at 86.5%: NamedObject_ConstrainPlayer.
+- 081021DC retained inherited draft at 86.5%: MovingPlatform_ConstrainPlayer.
   Independent sibling port converged on the same 33 register-only differences:
   delta pointer r5/r6 and y-difference/reload allocation. Signed state access
   is required. Pointer pin experiments worsened structure and were discarded.
   Kept the inherited readable source, added the required local alias, and
   corrected its default INCLUDE_ASM label to sub_081021DC (the named assembly
   filename is absent in this checkout). Default fallback passes exact check.
-- 08101340 drafted 84.5%: NamedObject_UpdateMovementSound, called by
-  NamedObject_UpdatePool. Selects songs 0x28A/0x288/0x289 by object kind, using
+- 08101340 drafted 84.5%: MovingPlatform_UpdateMovementSound, called by
+  MovingPlatform_UpdatePool. Selects songs 0x28A/0x288/0x289 by object kind, using
   manager byte 1378 as the playing latch. A switch rather than if/else prevents
   constant-delta folding and recovers the instruction structure. The 448-byte
   executable body has 17 register-only differences (91.9% candidate-length
@@ -3927,7 +3927,7 @@ Tags: #matching #named-object #terrain #actor-group
 
 Useful layout warning: sizeof(struct NamedObject) from named_object.h is
 0x198 in this checkout, while pool stride is 0x19C. Explicit integer stride
-arithmetic, as in matched NamedObject_UpdatePool, prevents incorrect indexing
+arithmetic, as in matched MovingPlatform_UpdatePool, prevents incorrect indexing
 and loop strength reduction. No shared header was changed.
 
 Bounded permuter attempts for the two remaining drafts stopped before search:
@@ -4386,7 +4386,7 @@ checkout, so they were not counted or blindly translated again:
   binds the profile, and parses field 0x624. It allocates either a 0x5C sprite
   using asset 0x9247 and sequence 0x1DF8, or a 0x80 drawable initialized from
   ScriptProc_Start(0xCB05,0x9247). The alternate header copy is exactly eight
-  words, followed by ResourceHeader_Relocate and Widget_InitLinked. It then
+  words, followed by ResourceHeader_Relocate and AnimSprite_InitLinked. It then
   clears state flags, sets field 0x2E8 to eight, parses keyword M, sets duration
   scale 64, parses N and seeks keyword a. The large common script-parameter
   parser and later route/callback setup remain untranslated. Ghidra export is

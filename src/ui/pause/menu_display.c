@@ -75,11 +75,11 @@ static inline void SetPos(struct ContactPosition *position, s32 x, s32 y)
     position->z = 0;
 }
 
-static inline void Show(struct AnimSprite *widget, s32 *mask)
+static inline void Show(struct AnimSprite *animSprite, s32 *mask)
 {
-    u32 flags = widget->flags;
+    u32 flags = animSprite->flags;
     *mask = ~1;
-    widget->flags = flags & *mask;
+    animSprite->flags = flags & *mask;
 }
 
 void MenuDisplay_DrawStatComparison(struct MenuDisplay *hud, s32 col, s32 row)
@@ -398,7 +398,7 @@ void MenuDisplay_LoadDecimalDigits(struct MenuDisplay *hud, s32 value, s32 divis
         value = 999;
     for (i = 0; divisor > 0; i++) {
         s32 quotient = Div(value, divisor);
-        Anim_SelectWidgetGlyph(&hud->hud.categoryWidgets[firstWidget + i], hud->hud.widgetResource,
+        AnimSprite_SelectGlyph(&hud->hud.categoryWidgets[firstWidget + i], hud->hud.widgetResource,
                                (u16)(frameBase + quotient));
         value -= quotient * divisor;
         divisor = Div(divisor, 10);

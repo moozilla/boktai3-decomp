@@ -2,10 +2,10 @@
 
 void SceneActors_UpdateMovingDisplay(void);
 
-void SceneActors_EnterMovementState(struct Slot7Transition *actor)
+void SceneActors_EnterMovementState(struct VanargandHeadTransition *actor)
 {
-    if (Slot7_TakeActionEntry(actor) == TRUE) {
-        Slot7_TransitionTo(actor, SceneActors_UpdateMovingDisplay);
+    if (VanargandHead_TakeActionEntry(actor) == TRUE) {
+        VanargandHead_TransitionTo(actor, SceneActors_UpdateMovingDisplay);
     }
     actor->actionTimer++;
 }

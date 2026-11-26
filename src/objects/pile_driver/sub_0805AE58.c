@@ -1,7 +1,7 @@
-#include "objects/pile_driver/scene_panel_rig_setup.h"
+#include "objects/pile_driver/pile_driver_rig_setup.h"
 #include "engine/math/monster_particle_random.h"
 
-void PileDriverRig_InitPrimarySprites(struct ScenePanelRig *rig)
+void PileDriverRig_InitPrimarySprites(struct PileDriverRig *rig)
 {
     s32 i;
     for (i = 0; i < 8; i++) {

@@ -1,7 +1,7 @@
 #include "effects/scene/repeated_effect.h"
 #include "engine/engine_globals.h"
 void Sound_PlaySong(s32);
-void AnimatedParticles_EmitChargeSparkle(u32, u32, u32, u32, struct RepeatedEffectPosition *);
+void ImpactBurst_EmitChargeSparkle(u32, u32, u32, u32, struct RepeatedEffectPosition *);
 static inline u32 RepeatedEffect_OffsetCoordinate(u16 value, const u8 *sample)
 {
     s32 base = value - 127;
@@ -35,7 +35,7 @@ void RepeatedEffect_TickUpperTransition(struct RepeatedEffect *effect)
         if (!(effect->stateFrame & 3)) {
             position = effect->sprite.position;
             REPEATED_EFFECT_SCATTER_POSITION(position);
-            AnimatedParticles_EmitChargeSparkle(1, 0, 1, 64, &position);
+            ImpactBurst_EmitChargeSparkle(1, 0, 1, 64, &position);
         }
     } else if (effect->stateFrame <= 15) {
         struct RepeatedEffectPosition position;
@@ -44,7 +44,7 @@ void RepeatedEffect_TickUpperTransition(struct RepeatedEffect *effect)
         if (!(effect->stateFrame & 3)) {
             position = effect->sprite.position;
             REPEATED_EFFECT_SCATTER_POSITION(position);
-            AnimatedParticles_EmitChargeSparkle(1, 0, 1, 64, &position);
+            ImpactBurst_EmitChargeSparkle(1, 0, 1, 64, &position);
         }
     } else {
         effect->sprite.frame = 8;

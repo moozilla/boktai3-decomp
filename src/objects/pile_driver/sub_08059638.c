@@ -1,5 +1,5 @@
 #include "objects/pile_driver/pile_driver_rig.h"
-void PileDriverRig_InitMovement(struct ScenePanelRig *rig)
+void PileDriverRig_InitMovement(struct PileDriverRig *rig)
 {
     s32 dx = rig->position.x - rig->origin.x, dz = rig->position.z - rig->origin.z;
     u32 angle = Math_Atan2(dx, dz);

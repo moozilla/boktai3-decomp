@@ -64,7 +64,7 @@ struct RecScore {
 };
 extern struct RecActor *gLinkSession;
 extern struct RecScore *gGameState;
-void Anim_SelectWidgetGlyph(void *, void *, u16);
+void AnimSprite_SelectGlyph(void *, void *, u16);
 void Sound_PlayTrackedSong(u32);
 static inline s32 Clamp999(s32 x)
 {
@@ -112,7 +112,7 @@ void RecordMenu_DrawRecords(struct RecordMenu *menu)
         menu->spriteIds[4] = 0x37;
         menu->spriteIds[5] = 0x37;
         for (i = 4; i <= 5; i++)
-            Anim_SelectWidgetGlyph(&menu->sprites[i], menu->rowResource, menu->spriteIds[i]);
+            AnimSprite_SelectGlyph(&menu->sprites[i], menu->rowResource, menu->spriteIds[i]);
         menu->sprites[4].x = 0;
         menu->sprites[5].x = 0x90;
     } else if (rec->ticksA < rec->ticksB) {

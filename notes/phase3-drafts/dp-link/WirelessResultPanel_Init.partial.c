@@ -23,7 +23,7 @@ struct ResultMenu {
 };
 int Script_SeekToKeyword(int);
 void *Script_GetTextSourcePc(void);
-void Widget_InitLinked(void *, void *, int, int, int, int, int, void *);
+void AnimSprite_InitLinked(void *, void *, int, int, int, int, int, void *);
 void Anim_RestartSequence(void *, void *, int, int, int);
 void *WirelessExchange_GetPeerEntry(int);
 int WirelessResultPanel_Init(struct ResultMenu *arg)
@@ -76,9 +76,9 @@ initialize:
     {
         struct Drawing *draw = p->draws;
         u32 drawFlags = 0x2011;
-        Widget_InitLinked(draw, secondary, 30, drawFlags, 0, 0, 60, 0);
+        AnimSprite_InitLinked(draw, secondary, 30, drawFlags, 0, 0, 60, 0);
         draw = p->draws + 1;
-        Widget_InitLinked(draw, secondary, 2, drawFlags, 0, 0, 60, 0);
+        AnimSprite_InitLinked(draw, secondary, 2, drawFlags, 0, 0, 60, 0);
         draw = p->draws + 2;
         glyph = p->glyph;
         savedSprite = &p->sprite;
@@ -90,7 +90,7 @@ initialize:
             register int zero asm("r5") = 0;
             int count = 19;
             do {
-                Widget_InitLinked(draw, primary, 51, 0x2011, zero, zero, 60, (void *)zero);
+                AnimSprite_InitLinked(draw, primary, 51, 0x2011, zero, zero, 60, (void *)zero);
                 count--;
                 draw++;
             } while (count >= 0);

@@ -2,7 +2,7 @@
 
 /* Tentative actor and motion-field interpretations, based on static accesses. */
 
-struct SingletonSlot7Actor {
+struct VanargandHeadActor {
     u8 pad0[0xAC];
     u8 state, stateFrame, stateEntered, padAF;
     u8 active, padB1[2], motionMode;
@@ -31,7 +31,7 @@ s32 Script_GetKeywordValue(u32, s32);
 
 void VanargandHead_SetMotionModeFromScript(void)
 {
-    struct SingletonSlot7Actor *p = SceneActors_GetBySlot(7);
+    struct VanargandHeadActor *p = SceneActors_GetBySlot(7);
     if (p) {
         u32 mode;
         if (p->motionMode == 1)

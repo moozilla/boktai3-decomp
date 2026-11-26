@@ -1262,7 +1262,7 @@ def sp_fresh_var(fn):
 
 
 def sp_neg_mul(fn):
-    """x = -x  ->  x *= -1  (ActorGroup_UpdateMemberSway)."""
+    """x = -x  ->  x *= -1  (LootDeposit_UpdateMemberSway)."""
     pred = lambda n, p, s: isinstance(n, ca.Assignment) and n.op == "=" and isinstance(n.rvalue, ca.UnaryOp) \
         and n.rvalue.op == "-" and text(n.rvalue.expr) == text(n.lvalue)
     for k in range(sites(fn, pred)):
@@ -1312,7 +1312,7 @@ def sp_member_ptr(fn):
 
 def sp_offset_local(fn):
     """P + i * K (or i << K) as an address  ->  { s32 off = i * K; ... P + off ... }  (CollectionBook_
-    UpdateMenu, ActorGroup_CreateFromScript: the scaled index computed first)."""
+    UpdateMenu, LootDeposit_CreateFromScript: the scaled index computed first)."""
     pred = lambda n, p, s: (isinstance(n, ca.BinaryOp) and n.op == "+" and isinstance(n.right, ca.BinaryOp)
                             and n.right.op in ("*", "<<") and _is_const(n.right.right))
     for k in range(sites(fn, pred)):

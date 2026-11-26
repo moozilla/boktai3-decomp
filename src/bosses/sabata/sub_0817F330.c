@@ -1,7 +1,7 @@
-#include "bosses/sabata/scene_volume.h"
+#include "bosses/sabata/sabata_attack_state.h"
 #include "scene/actor/scene_actor_components.h"
 
-static inline void SetDirection(struct SceneVolumeActor *actor, int angle)
+static inline void SetDirection(struct SabataAttackActor *actor, int angle)
 {
     actor->direction = angle;
     {
@@ -21,9 +21,9 @@ static inline void SetDirection(struct SceneVolumeActor *actor, int angle)
 void SceneActors_StartEightDirectionAnimation(void *, void *, void *, int, int, int, int);
 
 // confidence=low: turns toward the saved direction 8 steps a frame, finishing within 8.
-void sub_0817F330(struct SceneVolumeActor *p)
+void sub_0817F330(struct SabataAttackActor *p)
 {
-    struct SceneVolumeActor *actor = p;
+    struct SabataAttackActor *actor = p;
     struct SceneActorBody *body = (struct SceneActorBody *)((u8 *)p + 0x48);
     if (p->restart) {
         p->restart = 0;
@@ -33,7 +33,7 @@ void sub_0817F330(struct SceneVolumeActor *p)
         SceneActors_StartEightDirectionAnimation(p, &p->animation, p->animationState, 0xF4, 1, 1,
                                                  1);
     }
-    SceneVolume_SetFlags(actor, 0x400004);
+    Sabata_SetFlags(actor, 0x400004);
     {
         int delta = (s8)(body->direction - (u8)actor->alternateDirection), distance = delta;
         if (distance < 0)

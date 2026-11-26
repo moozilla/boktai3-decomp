@@ -1,9 +1,9 @@
 #ifndef GUARD_SCENE_PANEL_SCHEDULE_H
 #define GUARD_SCENE_PANEL_SCHEDULE_H
-#include "objects/pile_driver/scene_panel.h"
+#include "objects/pile_driver/pile_driver.h"
 #include "scene/collision/contact_actor.h"
-/* Observed scheduled action view of the same ScenePanel; identities tentative. */
-struct ScenePanelScheduleView {
+/* Observed scheduled action view of the same PileDriver; identities tentative. */
+struct PileDriverScheduleView {
     u8 unknown0[0x500];
     struct ContactPosition origin;
     u8 unknown508[0xE32];
@@ -11,7 +11,7 @@ struct ScenePanelScheduleView {
     u8 unknown133B[0x11];
     u16 frame, interval, step, resourceId, unknown1354, angle;
     u8 unknown1358[8];
-    void (*action)(struct ScenePanel *);
+    void (*action)(struct PileDriver *);
     void *handle;
     u8 unknown1368[0x5C];
     s16 parameter;
@@ -26,9 +26,9 @@ void SceneBurstEmitter_RequestCleanup(void *);
 void SceneOrbitHazard_Activate(void *);
 void Nidhoggr_CreateOwnedSeekingEffect(void *, const void *, const void *);
 extern const u8 gUnk_0824DEA4[];
-void PileDriver_TickHazardSpawner(struct ScenePanel *);
-void PileDriver_TickAngleBurst(struct ScenePanel *);
-void PileDriver_TickHandlePosition(struct ScenePanel *);
-void PileDriver_TickHandleActionA(struct ScenePanel *);
-void PileDriver_TickHandleActionB(struct ScenePanel *);
+void PileDriver_TickHazardSpawner(struct PileDriver *);
+void PileDriver_TickAngleBurst(struct PileDriver *);
+void PileDriver_TickHandlePosition(struct PileDriver *);
+void PileDriver_TickHandleActionA(struct PileDriver *);
+void PileDriver_TickHandleActionB(struct PileDriver *);
 #endif

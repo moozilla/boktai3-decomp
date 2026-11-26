@@ -1,7 +1,7 @@
-#define PooledInteractable_GetPosition NamedObject_GetPositionByName
+#define PooledInteractable_GetPosition MovingPlatform_GetPositionByName
 #include "global.h"
 #include "player/player.h"
-struct SceneVec *NamedObject_GetPositionByName(s32);
+struct SceneVec *MovingPlatform_GetPositionByName(s32);
 s32 Player_TestMovementPosition(struct PlayerColliderVector *);
 void Player_ClampInteractionVelocity(struct Player *p)
 {
@@ -10,7 +10,7 @@ void Player_ClampInteractionVelocity(struct Player *p)
     v.x = p->position.x + p->velocityX;
     v.z = p->position.z + p->velocityZ;
     if (p->tetherStatusFlags & 4) {
-        target = NamedObject_GetPositionByName(p->tetherStatusTag);
+        target = MovingPlatform_GetPositionByName(p->tetherStatusTag);
         if ((s16)v.x <= target->x - 100)
             v.x = (u16)target->x - 100;
         else if ((s16)v.x >= target->x + 100)

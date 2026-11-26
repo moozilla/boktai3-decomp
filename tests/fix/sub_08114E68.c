@@ -29,7 +29,7 @@ extern const u16 gUnk_086141BC[];
 extern u8 *gUnk_02000710;
 
 struct ParticleManager *EffectPool_CreateManager(void);
-struct ParticleEntry *NativeParticle_AllocateEntry(struct ParticleManager *);
+struct ParticleEntry *ProjectileMote_AllocateEntry(struct ParticleManager *);
 s32 Mod(s32, s32);
 void ParticleSprite_Initialize(void *, void *, u32);
 void Effect_SetOrigin(void *, s32, s32);
@@ -61,7 +61,7 @@ s32 sub_08114E68(struct ParticleVec *position, s16 *range, s16 *spread, s32 coun
     if ((!m) && (!(m = EffectPool_CreateManager())))
         return -1;
     for (i = 0; i < count; i++) {
-        struct ParticleEntry *e = NativeParticle_AllocateEntry(m);
+        struct ParticleEntry *e = ProjectileMote_AllocateEntry(m);
         s8 sequence;
         u32 flag;
         if (!e)

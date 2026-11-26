@@ -1,7 +1,7 @@
 #define Player_IsParticleSuppressedMode Player_IsInActionTwelveOrThirtyEight
 #include "global.h"
 #include "player/player.h"
-#include "objects/scene_objects/scene_object.h"
+#include "objects/scene_object.h"
 #include "objects/bat_curtain/breakable_barrier.h"
 s32 Player_IsInActionTwelveOrThirtyEight(struct Player *);
 void SparkParticle_Spawn(void *, s32, void *, s32, s32, s32, s32, s32);

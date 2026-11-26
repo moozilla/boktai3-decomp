@@ -54,7 +54,7 @@ void MessageMenu_InitializeTransition(struct MessageMenu *m)
     zero.x = 0;
     zero.y = 0;
     zero.z = 0;
-    Widget_InitLinked(m->transition, &m->resource, 57, 16, 0, 0, 60, &zero);
+    AnimSprite_InitLinked(m->transition, &m->resource, 57, 16, 0, 0, 60, &zero);
 }
 
 int MessageMenu_Update(struct MessageMenu *m)

@@ -1,5 +1,5 @@
 id	file	function	start_line	line	family	form	origin_evidence	source_comment	status	resolution	commit	trial_ids
-1	src/actor_animation_controller.c	Actor_ConfigureInteractionChildFromScript	4300	4303	cursor traversal or loop setup	once-loop wrapper	wrapper origin undetermined		open	source remains open		once-001
+1	src/actor_animation_controller.c	TutorialOtenko_ConfigureInteractionChildFromScript	4300	4303	cursor traversal or loop setup	once-loop wrapper	wrapper origin undetermined		open	source remains open		once-001
 2	src/actor_particles.c	Actor_UpdateShadowSpriteParts	126	128	terrain coordinate or particle geometry	once-loop wrapper	wrapper origin undetermined		open	source remains open		once-002,once-003
 3	src/actor_particles.c	Actor_UpdateShadowSpriteParts	130	132	terrain coordinate or particle geometry	once-loop wrapper	wrapper origin undetermined		open	source remains open		once-002,once-003
 4	src/actor_position_effects.c	SceneActors_SpawnConvergingParticle	97	99	terrain coordinate or particle geometry	once-loop wrapper	wrapper origin undetermined		accepted	ordinary shared sampling	9ff18ada7	
@@ -19,9 +19,9 @@ id	file	function	start_line	line	family	form	origin_evidence	source_comment	stat
 18	src/dog.c	Dog_UpdateDefeatDelay	1923	1927	flag mask, display flag, or control-bit update	once-loop wrapper	wrapper origin undetermined		open	source remains open		once-018
 19	src/dog.c	Dog_UpdateScriptedAction	3165	3167	scripted actor control-packet initialization	once-loop wrapper	wrapper origin undetermined		accepted	existing control setter	04e1bf508	
 20	src/dog.c	Dog_UpdateScriptedAction	3163	3173	scripted actor control-packet initialization	nested once-loop wrappers	wrapper origin undetermined		accepted	existing control setter	04e1bf508	
-21	src/fn/sub_0801F4C4.c	SceneObject_UpdateLowering	51	59	terrain coordinate or particle geometry	once-loop wrapper	wrapper origin undetermined		open	source remains open		once-019
-22	src/fn/sub_0801F5B8.c	SceneObject_UpdateLowered	9	11	state, parameter, animation, or UI update	once-loop wrapper	wrapper origin undetermined		open	source remains open		once-020
-23	src/fn/sub_0801F5B8.c	SceneObject_UpdateLowered	13	18	state, parameter, animation, or UI update	once-loop wrapper	wrapper origin undetermined		open	source remains open		once-020
+21	src/fn/sub_0801F4C4.c	SlidingDoor_UpdateLowering	51	59	terrain coordinate or particle geometry	once-loop wrapper	wrapper origin undetermined		open	source remains open		once-019
+22	src/fn/sub_0801F5B8.c	SlidingDoor_UpdateLowered	9	11	state, parameter, animation, or UI update	once-loop wrapper	wrapper origin undetermined		open	source remains open		once-020
+23	src/fn/sub_0801F5B8.c	SlidingDoor_UpdateLowered	13	18	state, parameter, animation, or UI update	once-loop wrapper	wrapper origin undetermined		open	source remains open		once-020
 24	src/fn/sub_08035958.c	Wireless_OnParentUniSendComplete	48	66	state, parameter, animation, or UI update	once-loop wrapper	explicit compiler-purpose source comment	/* do-while(0) only keeps agbcc's block layout */	open	source remains open		once-021
 25	src/fn/sub_08035F5C.c	Wireless_TryStartParentNiSend	56	58	flag mask, display flag, or control-bit update	once-loop wrapper	wrapper origin undetermined		open	source remains open		once-022
 26	src/fn/sub_080362E0.c	Wireless_ExchangeChildNiPacket	90	92	state, parameter, animation, or UI update	once-loop wrapper	wrapper origin undetermined		open	source remains open		once-023
@@ -60,8 +60,8 @@ id	file	function	start_line	line	family	form	origin_evidence	source_comment	stat
 59	src/fn/sub_080F645C.c	Sword_UpdateDamage	74	98	defeat statistics and saturation	once-loop wrapper	wrapper origin undetermined		open	source remains open		once-048
 60	src/fn/sub_080F645C.c	Sword_UpdateDamage	56	99	defeat statistics and saturation	nested once-loop wrappers	wrapper origin undetermined		open	source remains open		once-048
 61	src/fn/sub_081004F8.c	FloorSwitch_Release	43	48	state, parameter, animation, or UI update	once-loop wrapper	wrapper origin undetermined		open	source remains open		once-049
-62	src/fn/sub_081029F8.c	NamedObject_UpdatePlayerAttachment	73	75	flag mask, display flag, or control-bit update	once-loop wrapper	wrapper origin undetermined		open	source remains open		once-050
-63	src/fn/sub_08103110.c	NamedObject_CreateFromScript	209	211	state, parameter, animation, or UI update	once-loop wrapper	wrapper origin undetermined		open	source remains open		once-051
+62	src/fn/sub_081029F8.c	MovingPlatform_UpdatePlayerAttachment	73	75	flag mask, display flag, or control-bit update	once-loop wrapper	wrapper origin undetermined		open	source remains open		once-050
+63	src/fn/sub_08103110.c	MovingPlatform_CreateFromScript	209	211	state, parameter, animation, or UI update	once-loop wrapper	wrapper origin undetermined		open	source remains open		once-051
 64	src/fn/sub_08109040.c	SelectionSlots_ClearValue	23	25	flag mask, display flag, or control-bit update	once-loop wrapper	wrapper origin undetermined		open	source remains open		once-052
 65	src/fn/sub_0810B3BC.c	SceneMenu_UpdateRecords	45	52	state, parameter, animation, or UI update	once-loop wrapper	wrapper origin undetermined		open	source remains open		once-053
 66	src/fn/sub_0810D60C.c	PanelText_DrawDecimal	17	19	decimal digit remainder	once-loop wrapper	wrapper origin undetermined		open	source remains open		once-054
@@ -78,7 +78,7 @@ id	file	function	start_line	line	family	form	origin_evidence	source_comment	stat
 77	src/fn/sub_081A55D4.c	Vanargand_BlendPaletteBanks	16	18	cursor traversal or loop setup	once-loop wrapper	explicit compiler-purpose source comment	/* do-while(0) only keeps agbcc's block layout */ | /* do-while(0) only keeps agbcc's block layout */	accepted in delegated family	typed indexed palette banks	9bcb69ed6	
 78	src/fn/sub_081A8820.c	ActorSoundPhase_UpdateConditionalStop	39	42	state, parameter, animation, or UI update	once-loop wrapper	wrapper origin undetermined		open	source remains open		once-060
 79	src/fn/sub_081D010C.c	sub_081D010C	76	78	state, parameter, animation, or UI update	once-loop wrapper	wrapper origin undetermined		open	source remains open		once-061
-80	src/fn/sub_081D07D8.c	SceneNpc_EnterProjectedIdle	59	65	state, parameter, animation, or UI update	once-loop wrapper	wrapper origin undetermined		open	source remains open		once-062
+80	src/fn/sub_081D07D8.c	Otenko_EnterProjectedIdle	59	65	state, parameter, animation, or UI update	once-loop wrapper	wrapper origin undetermined		open	source remains open		once-062
 81	src/fn/sub_081E2910.c	ShakeSample	11	13	random-table step, generation, or sampling	once-loop wrapper	wrapper origin undetermined		accepted	shared complete draw macro	be5d42784	
 82	src/fn/sub_081F28C4.c	SpriteTrail_CreateFixedEffect	35	37	state, parameter, animation, or UI update	once-loop wrapper	wrapper origin undetermined		open	source remains open		once-063
 83	src/fn/sub_081F2A08.c	SpriteTrail_CreateMotionEffect	39	41	state, parameter, animation, or UI update	once-loop wrapper	wrapper origin undetermined		open	source remains open		once-064

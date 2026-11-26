@@ -150,7 +150,7 @@ debt, not a claim that the body view has been eliminated.
 The pointer at `+0x40` refers to a separate movement-source record; it is not a
 license to substitute a fixed field in the Player object. For example, body
 initialization installs the record at player `+0x284`, and named-object release
-in `src/objects/named_object/sub_081029F8.c` restores that self-owned source. A coherent body/probe
+in `src/objects/moving_platforms/sub_081029F8.c` restores that self-owned source. A coherent body/probe
 component definition is separate work from choosing the owner of `gPlayers`.
 
 ## Remaining matching dependencies

@@ -4,7 +4,7 @@ export const nativeActors = {
     spawn(s, opts) {
       const position = s.allocate('struct SceneParticleVector', { x: opts.screenX ?? 120, y: opts.screenY ?? 80 });
       const velocity = s.allocate('struct SceneParticleVector', { x: opts.velocityX ?? 2, y: opts.velocityY ?? -1 });
-      const address = s.call('SceneParticle_Create', position, velocity, opts.lifetime ?? 30, opts.kind ?? 0, opts.mode ?? 1) >>> 0;
+      const address = s.call('LinearMote_Create', position, velocity, opts.lifetime ?? 30, opts.kind ?? 0, opts.mode ?? 1) >>> 0;
       if (!address) return null;
       const pool = s.$.gSceneParticlePool;
       const view = s.typed(address, 'struct SceneParticle');

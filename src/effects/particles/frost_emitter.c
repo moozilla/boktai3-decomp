@@ -1,5 +1,5 @@
 #include "effects/particles/frost_emitter.h"
-#include "npc/scripted_npc/scene_npc_transition_palette.h"
+#include "npc/otenko/scene_npc_transition_palette.h"
 #include "engine/math/monster_particle_random.h"
 #include "player/cutscene/player_cue_sequence.h"
 

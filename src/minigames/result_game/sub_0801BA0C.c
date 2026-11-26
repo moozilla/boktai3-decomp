@@ -11,7 +11,7 @@ int ResultMenu_IsPhaseStart(void *);
 void ResultMenu_SendCommand(void *, int, int, void *);
 void PlayerCue_BeginModeSeven(void *, int);
 void Sound_PlaySong(int);
-void AnimatedParticles_EmitChargeSparkle(int, int, int, int, void *);
+void ImpactBurst_EmitChargeSparkle(int, int, int, int, void *);
 void ResultMenu_SetPhase(void *, void (*)(void));
 void Transformation_Reveal(void);
 void Transformation_Charge(u8 *p)
@@ -31,7 +31,7 @@ void Transformation_Charge(u8 *p)
             Vec *out = &pos;
             pos = positionActor->position;
             out->x += 200;
-            AnimatedParticles_EmitChargeSparkle(2, 0, 0x2000, 64, out);
+            ImpactBurst_EmitChargeSparkle(2, 0, 0x2000, 64, out);
         }
         Sound_PlaySong(0x1c5);
     }

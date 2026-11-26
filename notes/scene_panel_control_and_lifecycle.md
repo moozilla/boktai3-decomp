@@ -12,7 +12,7 @@ points (6,396 retained exact bytes).
 
 ## Shared types
 
-Reused `include/objects/pile_driver/scene_panel.h`, because these are the same parent, rig and
+Reused `include/objects/pile_driver/pile_driver.h`, because these are the same parent, rig and
 subjects already described by that header. It now contains the combined
 `ScenePanel` layout, the existing complete subject layout as
 `ScenePanelSubject`, the embedded `ScenePanelRig` and its sprite type, palette

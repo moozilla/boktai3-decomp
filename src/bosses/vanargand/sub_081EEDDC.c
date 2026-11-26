@@ -1,5 +1,5 @@
 #include "global.h"
-struct Slot7Advance {
+struct VanargandHeadAdvance {
     u8 unknown0[0xAF];
     u8 finished, unknownB0, initialize;
     u8 unknownB2[0x268 - 0xB2];
@@ -13,8 +13,7 @@ void ActorDisplay_UpdateScreenAnchor(void *);
 void ActorDisplay_UpdateForegroundSprite(void *);
 void ActorDisplay_UpdateAccentSprite(void *);
 // confidence=low: advances a display coordinate by four until the configured limit.
-#define SingletonSlot7_UpdateCoordinateAdvance sub_081EEDDC
-void SingletonSlot7_UpdateCoordinateAdvance(struct Slot7Advance *p)
+void VanargandHead_UpdateCoordinateAdvance(struct VanargandHeadAdvance *p)
 {
     if (p->initialize) {
         p->initialize = 0;

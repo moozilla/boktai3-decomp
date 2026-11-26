@@ -21,10 +21,10 @@ struct ParticleManager {
     struct DisplaySequenceState sequences[32];
     struct NativeParticle entries[32];
 };
-struct NativeParticle *NativeParticle_AllocateEntry(struct ParticleManager *);
+struct NativeParticle *ProjectileMote_AllocateEntry(struct ParticleManager *);
 struct ParticleManager *EffectPool_CreateManager(void);
-void NativeParticle_LoadResources(struct ParticleManager *);
+void ProjectileMote_LoadResources(struct ParticleManager *);
 s32 EffectPool_InitManager(struct ParticleManager *);
 s32 EffectPool_UpdateEntries(struct ParticleManager *);
-s32 NativeParticle_DestroyManager(struct ParticleManager *);
+s32 ProjectileMote_DestroyManager(struct ParticleManager *);
 #endif

@@ -57,7 +57,7 @@ struct Pool {
 };
 extern u32 gUnk_02000560;
 extern const s16 gUnk_086149C4[];
-void EnemyParticle_ReleaseSlot(struct Pool *, struct Entry *, s32);
+void EnemyAttackParticle_ReleaseSlot(struct Pool *, struct Entry *, s32);
 u8 *TerrainModifiers_FindCellOverride(s32, s32);
 static inline s32 Truncate(s32 v)
 {
@@ -80,7 +80,7 @@ static inline void ComputeVelocity(struct Pos *v, struct Params *params)
     v->y = 0;
     v->z = Truncate(magnitude * gUnk_086149C4[angle & 0xff]);
 }
-s32 EnemyParticle_UpdatePool(struct Pool *pool)
+s32 EnemyAttackParticle_UpdatePool(struct Pool *pool)
 {
     struct Entry *base, *cursor;
     s32 i;
@@ -138,7 +138,7 @@ s32 EnemyParticle_UpdatePool(struct Pool *pool)
                     index = gTerrainMap->rows[z] + x;
                 if ((u32)((*cell(index) & 15) << 8) > o->pos.y) {
                 release:
-                    EnemyParticle_ReleaseSlot(pool, base, i);
+                    EnemyAttackParticle_ReleaseSlot(pool, base, i);
                     continue;
                 }
             }

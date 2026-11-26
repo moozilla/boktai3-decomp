@@ -1,7 +1,7 @@
 #ifndef ITEM_CONTAINER_H
 #define ITEM_CONTAINER_H
 #include "global.h"
-#include "objects/scene_objects/scene_object.h"
+#include "objects/scene_object.h"
 #include "player/player.h"
 #include "engine/video/display_sequence.h"
 #include "engine/task.h"

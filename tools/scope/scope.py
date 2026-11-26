@@ -2969,7 +2969,7 @@ def flip_levers(nm, lo, lo_rec, hi, hi_rec, wd=None):
         out.append(f"{nm(lo)} is set in more than one place, one of them a plain register copy: if it holds"
                    " the same address on each path (an if/else that both take `&p->field`), give each arm its"
                    " own variable and name the address again at the later use; gcse then makes the"
-                   " long-lived copy, a new pseudo ranked on its own (ScriptCombatActor_UpdateState's"
+                   " long-lived copy, a new pseudo ranked on its own (MuspellHead_UpdateState's"
                    " collider)")
     for jl, stmt, paths, nl, nh, pl, ph in (join_lever(wd, lo, lo_rec, hi, hi_rec) if wd else []):
         out.append(f"line{'s' if len(stmt) > 1 else ''} {', '.join(map(str, stmt))}, right after a join of"
@@ -5392,7 +5392,7 @@ def explain_regmove(wd, uid, gone, new, nm, at):
               " `u8 left`/`u8 input` did not). For a u16/u8 field masked by a constant, write the and"
               " on the read itself, `(*field & K)`, not through u32 variables: the constant then sits in"
               " an HImode pseudo read through a subreg, which regmove does not tie, and cse does not move a"
-              " known-constant variable to operand 2 (README fact 37; ActorPalette_UpdateReverseFade's"
+              " known-constant variable to operand 2 (README fact 37; TutorialOtenkoPalette_UpdateReverseFade's"
               " `(*field & 15) | 0xd0` replaced three pins).")
         kept = byte_constant_operand(insn_list(wd, "combine"), u)
         if kept:
@@ -5401,7 +5401,7 @@ def explain_regmove(wd, uid, gone, new, nm, at):
                   f" `u8` local (`u8 one = {kept[1]}; p->flags |= one; ... q->flags |= one;`): a promoted"
                   " variable, so the narrowed byte op reads its SImode register directly and cse leaves it a"
                   " register, while the byte load is a subreg regmove does not tie (README fact 54;"
-                  " Actor_TryInteraction).")
+                  " TutorialOtenko_TryInteraction).")
     # the same tie in other inlined copies of this code: same pattern up to register numbers
     shape = lambda r: re.sub(r"\(reg(/\w)*:(\w+) \d+\)", r"(reg:\2)", r or "")
     rowline = {}

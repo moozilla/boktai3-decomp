@@ -69,7 +69,7 @@ struct EffectVector {
     s32 y : 16;
     s32 z : 16;
 };
-static inline void CannonTurret_FinishDamage(struct CannonTurretCombat *p)
+static inline void GarmrStatue_FinishDamage(struct CannonTurretCombat *p)
 {
     s16 *flash = &p->flashTimer;
     u32 zero = 0;
@@ -77,11 +77,11 @@ static inline void CannonTurret_FinishDamage(struct CannonTurretCombat *p)
     p->hitReaction = 1;
     p->damage = zero;
 }
-static inline void CannonTurret_ClearBlink(u16 *timer)
+static inline void GarmrStatue_ClearBlink(u16 *timer)
 {
     *timer = 0;
 }
-static inline u32 CannonTurret_StepSequence(struct DisplaySequenceSprite *owner,
+static inline u32 GarmrStatue_StepSequence(struct DisplaySequenceSprite *owner,
                                             struct DisplaySequenceState *state)
 {
     const u16 *command;
@@ -196,7 +196,7 @@ s32 GarmrStatue_UpdateCombat(struct CannonTurretCombat *p)
             const u16 *table;
             s32 count;
             p->defeated = 1;
-            CannonTurret_ClearBlink(&p->invulnerability);
+            GarmrStatue_ClearBlink(&p->invulnerability);
             SceneVec_Copy(&position, &p->sprite.coordinates.position);
             {
                 struct SceneVec *v = &position;
@@ -218,7 +218,7 @@ s32 GarmrStatue_UpdateCombat(struct CannonTurretCombat *p)
             p->age = 0;
             Sound_PlaySong(0x52c);
         }
-        CannonTurret_FinishDamage(p);
+        GarmrStatue_FinishDamage(p);
     }
     if (((Mod(p->age, 240) == 0) && (p->defeated == 0)) &&
         (p->update != GarmrStatue_FireAimedVolley)) {
@@ -239,7 +239,7 @@ s32 GarmrStatue_UpdateCombat(struct CannonTurretCombat *p)
             p->sprite.display.flags &= ~1;
     }
 
-    ended = CannonTurret_StepSequence(&p->sprite.display, &p->sequence);
+    ended = GarmrStatue_StepSequence(&p->sprite.display, &p->sequence);
 
     if ((ended && (p->activeAnimation != 0)) && (p->defeated == 0)) {
         Anim_SetSequence(&p->sequence, p->resource, 8, 0, 0);

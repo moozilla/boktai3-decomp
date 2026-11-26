@@ -1,5 +1,5 @@
-#include "objects/pile_driver/scene_panel_rig_setup.h"
-void PileDriverRig_RemoveSprites(struct ScenePanelRig *rig)
+#include "objects/pile_driver/pile_driver_rig_setup.h"
+void PileDriverRig_RemoveSprites(struct PileDriverRig *rig)
 {
     struct SceneRigSprite *sprite;
     s32 remaining;

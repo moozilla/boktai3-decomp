@@ -14,8 +14,8 @@ void sub_0813FE30(struct Player *p)
         *((struct AnimationHeader *)p->animationData) = *source;
         ResourceHeader_Relocate(p->animationData, source);
         c1 = &p->animation;
-        Widget_InitLinked(c1, p->animationData, 0, 0x9000, 2, 0, 60, &p->position);
-        Widget_InitLinked(&p->secondaryAnimation, p->animationData, 0, 0x1001, 2, 0, 60,
+        AnimSprite_InitLinked(c1, p->animationData, 0, 0x9000, 2, 0, 60, &p->position);
+        AnimSprite_InitLinked(&p->secondaryAnimation, p->animationData, 0, 0x1001, 2, 0, 60,
                           &p->position);
         if (Script_SeekToKeyword('d'))
             p->facing = Script_GetValue();

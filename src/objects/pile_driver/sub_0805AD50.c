@@ -1,10 +1,10 @@
-#include "objects/pile_driver/scene_panel_rig_setup.h"
+#include "objects/pile_driver/pile_driver_rig_setup.h"
 struct SceneRigColliderVector {
     u32 x : 16;
     u32 y : 16;
     u32 z : 16;
 };
-void PileDriverRig_InitCollider(struct ScenePanelRig *rig, u32 power)
+void PileDriverRig_InitCollider(struct PileDriverRig *rig, u32 power)
 {
     struct SceneRigColliderVector size, offset;
     void *collider = &rig->collider;

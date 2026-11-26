@@ -46,7 +46,7 @@ struct ProjectedDisplayFrame {
 
 extern const struct ProjectedDisplayFrame gUnk_08605960[];
 
-s32 Widget_InitLinked(void *, void *, u32, u32, u32, u32, u32, void *);
+s32 AnimSprite_InitLinked(void *, void *, u32, u32, u32, u32, u32, void *);
 
 s32 ProjectedDisplay_InitializeEntries(struct ProjectedDisplay *display)
 {
@@ -54,7 +54,7 @@ s32 ProjectedDisplay_InitializeEntries(struct ProjectedDisplay *display)
     s32 index = 0;
     struct AnimSpriteResource *resource = &display->resource;
     do {
-        if (Widget_InitLinked(entry, resource, 0, 16, 2, 0, 60, &display->screen) >= 0) {
+        if (AnimSprite_InitLinked(entry, resource, 0, 16, 2, 0, 60, &display->screen) >= 0) {
             Anim_SetKeyframes(entry, resource, gUnk_08605960[index].frame, 1, 4);
             ProjectedDisplay_PositionEntry(display, index);
             index++;

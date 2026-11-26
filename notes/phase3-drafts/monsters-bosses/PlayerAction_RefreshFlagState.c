@@ -2192,9 +2192,9 @@ s32 Player_CanSpendSharedResource(struct Player *p, s32 v)
 
 #define Player_IsActionRequestEnabled Player_IsEnchantmentAvailable
 
-void PlayerBarrier_Hide(void *);
+void PileTrap_Hide(void *);
 
-s32 PlayerBarrier_IsActive(void *);
+s32 PileTrap_IsActive(void *);
 
 static inline void ClearModeFlag(struct Player *p)
 {
@@ -2275,8 +2275,8 @@ void Player_SetActionRequest(struct Player *p, s32 kind)
         ClearModeFlag(p);
         if (kind == 3)
             SetModeFlag(p);
-        else if (PlayerBarrier_IsActive(p->actionRequestEffect))
-            PlayerBarrier_Hide(p->actionRequestEffect);
+        else if (PileTrap_IsActive(p->actionRequestEffect))
+            PileTrap_Hide(p->actionRequestEffect);
         if ((u8)request->kind > 5) {
             request->latched = 0;
             request->enabled = 0;

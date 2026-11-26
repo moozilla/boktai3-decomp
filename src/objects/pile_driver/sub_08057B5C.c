@@ -1,7 +1,7 @@
 #include "objects/pile_driver/pile_driver_effects.h"
-void PileDriver_SelectTimePalette(struct ScenePanel *input, s32 phase)
+void PileDriver_SelectTimePalette(struct PileDriver *input, s32 phase)
 {
-    struct ScenePanelEffectsView *panel = (void *)input;
+    struct PileDriverEffectsView *panel = (void *)input;
     switch (panel->timePhase) {
         case 0:
             panel->previousPalette = 2;
