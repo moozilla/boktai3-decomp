@@ -10,7 +10,7 @@ exports.hresvelgrTargets = () => {
   // GetEnvironmentalLevel uses an active area over the actor's position,
   // or an outstanding player effect. Contact handlers gate hits at 0x318.
   const effects = globals.gPlayerEffectPendingCount;
-  const solarReactive = Boolean((effects && g.u32(effects.addr)) || g.fn.AreaEffect_IsPositionCovered(addr + 0x54));
+  const solarReactive = Boolean((effects && g.u16(effects.addr)) || g.fn.AreaEffect_IsPositionCovered(addr + 0x54));
   return [{ addr, boss: 'Hresvelgr', health: actor.health, alive: true, x, y, z,
     hitLock: g.u16(addr + 0x318), solarReactive }];
 };

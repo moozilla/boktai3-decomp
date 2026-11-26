@@ -42,7 +42,11 @@ exports.darkTranceTactics = (direction) => {
 exports.solarTranceTactics = (direction) => {
   const aim = direction ? [[direction, 4]] : [];
   return [
-    [...aim, ['a', 2], [0, 20]],
-    [...aim, ['b', 2], [0, 20]],
+    [['a', 2], [0, 20]],
+    ...(aim.length ? [[...aim, ['a', 2], [0, 20]]] : []),
   ];
 };
+
+// SolarBomb_Init sets a 120-frame primed fuse after the 30-frame assembly.
+// The five explosions start up to 16 frames apart and refresh for eight frames.
+exports.solarBombLook = (elapsed) => Math.max(0, 180 - elapsed);
