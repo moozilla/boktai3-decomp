@@ -1,10 +1,10 @@
 #include "global.h"
-#include "display_sequence.h"
-#include "actor_animation_controller.h"
-#include "display_sprite_playback.h"
-#include "render.h"
-#include "input.h"
-#include "ram.h"
+#include "engine/video/display_sequence.h"
+#include "npc/cutscene_actor/actor_animation_controller.h"
+#include "engine/video/display_sprite_playback.h"
+#include "engine/video/render.h"
+#include "engine/input.h"
+#include "engine/ram.h"
 
 // Provisional name: ActorPalette_BeginFade
 

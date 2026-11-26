@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 #include "system/game_state/game_state.h"
 struct ActorEffectState {
     u8 unknown0[0x20];

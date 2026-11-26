@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 void Armor_InitPartOrbitTimer(void);
 void Armor_UpdatePartBobbing(void *);
 

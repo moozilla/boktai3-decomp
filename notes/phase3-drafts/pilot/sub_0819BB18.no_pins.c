@@ -1,7 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
-#include "engine.h"
-#include "monster_particle_random.h"
+#include "engine/engine.h"
+#include "engine/math/monster_particle_random.h"
 
 // confidence=low: emits sixteen motion entries around the actor's facing direction.
 #define Hresvelgr_EmitFacingMotionBurst sub_0819BB18

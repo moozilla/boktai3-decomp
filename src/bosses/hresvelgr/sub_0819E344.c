@@ -1,5 +1,5 @@
-#include "engine/shared/global.h"
-#include "engine/shared/debug.h"
+#include "global.h"
+#include "debug.h"
 #include "bosses/hresvelgr/hresvelgr_travel.h"
 
 void ActorState_Restart(struct HresvelgrTravelActor *p)

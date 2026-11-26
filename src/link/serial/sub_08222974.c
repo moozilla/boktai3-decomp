@@ -1,7 +1,7 @@
 #define gSerialStatus gSerialTransferStatus
 #define gSerialRole   gSerialConnectionRole
-#include "engine/shared/global.h"
-#include "engine/shared/ram.h"
+#include "global.h"
+#include "engine/ram.h"
 void Serial_ProbeConnection(void)
 {
     vu16 *send = (vu16 *)0x0400012A;

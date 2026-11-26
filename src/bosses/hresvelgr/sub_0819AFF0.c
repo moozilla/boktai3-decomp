@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 
 s32 Math_StepTowardTarget(s32 cur, s32 target, s32 step)
 {

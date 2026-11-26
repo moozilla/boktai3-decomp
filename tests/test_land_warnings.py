@@ -36,7 +36,7 @@ class LandWarnings(unittest.TestCase):
             self.assertEqual(land.added_warnings(helper, helper, self.path), ({}, None))
 
     def test_existing_header_cannot_hide_a_transfer_in_either_direction(self):
-        head = '#include "word_flags.h"\nu32 f(u32 *p) {\n'
+        head = '#include "engine/word_flags.h"\nu32 f(u32 *p) {\n'
         local = head + "    u32 mask = 4;\n    return *p & mask;\n}\n"
         call = head + "    return WordFlags_Test(p, 4);\n}\n"
         with patch.object(deadcode, "available", return_value=False):

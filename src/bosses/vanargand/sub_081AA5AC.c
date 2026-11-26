@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 struct Vanargand {
     u8 pad0[0x54];
     u8 motionData[0xAF - 0x54];

@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 typedef struct {
     u8 pad[0xE50];
     s16 scale, min, max, step;

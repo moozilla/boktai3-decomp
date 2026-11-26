@@ -1,7 +1,7 @@
-#include "engine/shared/global.h"
-#include "engine/shared/contact_swarm.h"
-#include "engine/shared/ram.h"
-#include "player/player_cue/player_cue_sequence.h"
+#include "global.h"
+#include "scene/actor/contact_swarm.h"
+#include "engine/ram.h"
+#include "player/cues/player_cue_sequence.h"
 struct ParticleConfig {
     u8 pad0[6];
     s8 angle;

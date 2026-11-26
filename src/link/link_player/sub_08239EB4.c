@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 
 extern const u8 gUnk_08E879D4[];
 s32 LinkPlayer_GetElapsedActionTicks(u8 *);

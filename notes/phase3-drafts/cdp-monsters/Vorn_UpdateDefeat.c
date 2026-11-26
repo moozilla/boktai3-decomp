@@ -1,9 +1,9 @@
 // MATCHING_CONCESSION: register-pinning
-#include "scene_actor_chase_reaction.h"
-#include "scene_actor_reaction.h"
-#include "scene_actor_behavior.h"
-#include "script_utility.h"
-#include "spark_particle.h"
+#include "scene/actor/scene_actor_chase_reaction.h"
+#include "scene/actor/scene_actor_reaction.h"
+#include "scene/actor/scene_actor_behavior.h"
+#include "script/script_utility.h"
+#include "effects/particles/spark_particle.h"
 
 void SceneActorAttachment_ReplaceResponseSlot(void *, u32, u32, u32);
 void SceneActorEffects_AdvanceSteps(void *, u32);

@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 struct SceneAnimation {
     u8 unknown0[0x10];
     u16 state;

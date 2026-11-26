@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 struct ActorReaction {
     u8 unknown0[0xAF];
     u8 finished;

@@ -1,5 +1,5 @@
-#include "engine/shared/global.h"
-#include "engine/shared/player.h"
+#include "global.h"
+#include "player/player.h"
 u32 Player_GetTetherMode(struct Player *s)
 {
     s8 *action = (s8 *)&s->thresholdMode;

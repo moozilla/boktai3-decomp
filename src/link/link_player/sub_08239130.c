@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 void Effect_Remove(void *);
 void Player_DestroySixParticleEffects(u8 *s)
 {

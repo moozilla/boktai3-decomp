@@ -1,6 +1,6 @@
-#include "stacked_actor.h"
-#include "engine_globals.h"
-#include "player.h"
+#include "objects/warp_circle/stacked_actor.h"
+#include "engine/engine_globals.h"
+#include "player/player.h"
 struct ActorMapView {
     u8 unknown0[4];
     u8 *cells;

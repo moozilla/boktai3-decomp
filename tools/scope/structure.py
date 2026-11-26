@@ -310,7 +310,7 @@ def layouts(root, compile_c):
             continue
 
         def table(items):
-            src = f'#include "engine/shared/global.h"\n#include "{rel}"\n'
+            src = f'#include "global.h"\n#include "{rel}"\n'
             for k, (s, ms) in enumerate(items):
                 vals = ", ".join(f"(unsigned)&((struct {s} *)0)->{x}, sizeof(((struct {s} *)0)->{x})" for x in ms)
                 src += f"const unsigned scope_layout{k}[] = {{ sizeof(struct {s}), {vals} }};\n"

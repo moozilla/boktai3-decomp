@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 
 struct EffectPoolSlot {
     u8 unknown[0x6C];

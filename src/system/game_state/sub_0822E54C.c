@@ -1,5 +1,5 @@
 // COMPILER: old_agbcc
-#include "engine/shared/global.h"
+#include "global.h"
 /* GameState_ClearEquipmentSlot: Marks one of the four equipment slots at offset 0x88 empty */
 #define GameState_ClearEquipmentSlot sub_0822E54C
 

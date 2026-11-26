@@ -1,8 +1,8 @@
-#include "debris_particles.h"
-#include "engine.h"
-#include "monster_particle_random.h"
-#include "heap.h"
-#include "resource_registry.h"
+#include "effects/particles/debris_particles.h"
+#include "engine/engine.h"
+#include "engine/math/monster_particle_random.h"
+#include "engine/heap.h"
+#include "engine/resource_registry.h"
 
 static inline void add(struct SceneVec *d, struct SceneVec *v)
 {

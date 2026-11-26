@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 struct Ooze {
     u8 pad0[0x68];
     u8 collider[0xb0];

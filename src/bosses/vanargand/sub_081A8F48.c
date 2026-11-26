@@ -1,5 +1,5 @@
 #include "bosses/vanargand/vanargand_pair_attack.h"
-#include "engine/shared/player.h"
+#include "player/player.h"
 
 // confidence=low: requests player contact damage and adds the returned amount to boss health.
 

@@ -1,7 +1,7 @@
-#include "engine/shared/global.h"
-#include "engine/shared/hit_spark_random.h"
-#include "engine/shared/engine.h"
-#include "engine/shared/ram.h"
+#include "global.h"
+#include "engine/math/hit_spark_random.h"
+#include "engine/engine.h"
+#include "engine/ram.h"
 struct Vec {
     u16 x, y, z, pad;
 };

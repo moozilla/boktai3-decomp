@@ -1,5 +1,5 @@
-#include "engine/shared/global.h"
-#include "engine/shared/ram.h"
+#include "global.h"
+#include "engine/ram.h"
 /* Effect pool family names and field interpretations are tentative. */
 struct EffectPoolEntry {
     u32 flags;

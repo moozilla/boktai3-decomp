@@ -7,7 +7,7 @@ Tags: #structs #ram #monster #matching
 at `0x624`, where the pre-existing animation storage still begins. The old flat
 actor members in that range are replaced by paths into this group.
 
-`include/engine/shared/scene_actor_group.h` owns the records. The full pursuit group contains
+`include/scene/actor/scene_actor_group.h` owns the records. The full pursuit group contains
 one `SceneActorRegistryControlGroup common` prefix, followed by the route,
 saved control, motion and callback fields. Other species retain their private
 tail records. The existing common prefix is enriched, not copied into a second

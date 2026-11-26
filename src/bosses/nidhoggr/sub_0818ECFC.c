@@ -1,6 +1,6 @@
-#include "engine/shared/global.h"
-#include "engine/shared/scene_vec.h"
-#include "engine/shared/ram.h"
+#include "global.h"
+#include "engine/math/scene_vec.h"
+#include "engine/ram.h"
 struct PanelEffectSlot {
     void *update, *onComplete;
     u8 unknown8[0x64];

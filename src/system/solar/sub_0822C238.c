@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 s32 Solar_GetLevelForIntensity(s32 v)
 {
     if (v == 0)

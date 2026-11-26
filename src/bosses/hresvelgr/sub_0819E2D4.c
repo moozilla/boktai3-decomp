@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 #include "bosses/hresvelgr/hresvelgr_travel.h"
 
 void ActorState_Hold35(struct HresvelgrTravelActor *p)

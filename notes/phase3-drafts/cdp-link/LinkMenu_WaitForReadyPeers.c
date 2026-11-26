@@ -1,6 +1,6 @@
 #include "global.h"
-#include "input.h"
-#include "area_effect_link.h"
+#include "engine/input.h"
+#include "scene/area_effect/area_effect_link.h"
 
 // MATCHING_CONCESSION: register-pinning
 struct LinkReadySessionFlags {

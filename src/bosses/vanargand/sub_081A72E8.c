@@ -1,5 +1,5 @@
-#include "engine/shared/global.h"
-#include "engine/shared/display_sequence_sprite.h"
+#include "global.h"
+#include "engine/video/display_sequence_sprite.h"
 struct VanargandAnimatedPart {
     struct DisplaySequenceSprite sprite;
     u8 graphics[0x1C];

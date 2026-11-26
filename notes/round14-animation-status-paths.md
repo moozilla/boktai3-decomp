@@ -13,7 +13,7 @@ writer/sibling review, with no new source experiment.
 **One source fix landed; `Anim_SetSequence` remains open.** Commit
 `c940902f6` uses the existing shared actor layout and removes the unjustified
 status-byte volatility from `08184F04`. An independent stock
-`tools/check.py src/actors/actor_controller/sub_08184F04.c --target-size 228` check reports zero
+`tools/check.py src/monsters/armor/sub_08184F04.c --target-size 228` check reports zero
 differing bytes across the entire unit. The compiler-aware concession scan
 changes from one `volatile-view` warning to zero warnings and zero errors.
 
@@ -35,7 +35,7 @@ separate conclusions about ordinary data, RFU interrupt state, and DMA.
 
 The previous ordinary-byte and widget-only candidates produced 224 or 220
 bytes instead of 228. The actual owning type already exists in
-`include/actors/scene_combat_actor/scene_combat_actor.h` and exposes every actor field used here:
+`include/monsters/armor/scene_combat_actor.h` and exposes every actor field used here:
 
 | Actor offset | Shared member |
 | --- | --- |
@@ -59,7 +59,7 @@ The status meaning is supported by actual writers. `Anim_Step`
 bit 1 when the sequence ends, and bit 2 when it advances a frame.
 `Anim_SetFrameDurationScale` (`08220F00`) recomputes bit 0 after changing the
 duration. `DisplayAnimation_TestFinished` and
-`DisplayAnimation_GetFrameBoundary` in `src/effects/shared_display_animation_wrapper/display_animation.c` consume
+`DisplayAnimation_GetFrameBoundary` in `src/engine/video/display_animation.c` consume
 bits 1 and 2 respectively. No asynchronous status writer was established.
 
 A scratch representation with three named status bitfields was also tested.
@@ -125,7 +125,7 @@ Both production volatile-view warnings in `08220C8C` remain visible.
 
 ## Input review: keep the ordinary sampled state distinct
 
-`src/engine/runtime_input_and_utilities/runtime_input.c` establishes the normal writer:
+`src/engine/runtime_input.c` establishes the normal writer:
 `TaskSystem_UpdateRoot` calls `Input_UpdatePadStates`, which reads hardware
 or synchronized link inputs and writes the shared `RuntimePadState`
 `held`, `pressed`, and `released` fields. The hardware register read itself

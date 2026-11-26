@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 void Palette_InterpolateBanks(void *, void *, void *, int, int);
 void Vanargand_BlendPaletteBanks(u8 *output, u8 *from, u8 *to, int amount, int shift,
                                   int bankCount)

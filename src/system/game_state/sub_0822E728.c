@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 #include "system/game_state/game_state.h"
 s32 GameState_GetUnlockEntry(s32 index);
 s32 GameState_HasUnlockedInventoryEntry(s32 value)

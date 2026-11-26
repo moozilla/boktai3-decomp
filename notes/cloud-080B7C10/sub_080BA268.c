@@ -1,5 +1,5 @@
 #include "global.h"
-#include "scene_actor_reaction.h"
+#include "scene/actor/scene_actor_reaction.h"
 /* Skeleton_BeginBoneScatter: on entry faces a cardinal direction, spawns two bone debris bursts (sub_08127590) above the body at random headings, becomes category 5, restarts its variant motion and re-arms the body's attack collider; hands over to the threshold reaction (kind 0x3E) once field2B3 is set (provisional name) */
 #define Skeleton_BeginBoneScatter sub_080BA268
 void sub_08127590(struct ContactPosition *, struct ContactPosition *, u32, u32, u32, u32, u32, u32,

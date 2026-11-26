@@ -1,7 +1,7 @@
 #ifndef GUARD_IVY_H
 #define GUARD_IVY_H
 
-#include "engine/shared/chase_actor.h"
+#include "monsters/chase_actor.h"
 
 /* Ivy's class fields past the chase actor (Ivy_Create allocates 0x640 bytes; provisional). */
 struct Ivy {

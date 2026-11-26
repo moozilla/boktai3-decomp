@@ -1,5 +1,5 @@
-#include "engine/shared/global.h"
-#include "engine/shared/input.h"
+#include "global.h"
+#include "engine/input.h"
 #include "bosses/vanargand/vanargand_pair_attack.h"
 
 void Vanargand_CycleDebugAnimation(struct VanargandPairAttack *p)

@@ -1,4 +1,4 @@
-#include "engine/shared/scalar_approach.h"
+#include "engine/math/scalar_approach.h"
 void sub_0819B410(s16 *values, const s16 *centers, const s16 *ranges, s32 count)
 {
     s32 n = count;

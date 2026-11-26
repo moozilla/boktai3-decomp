@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 bool32 PlayerLink_IsActionModeAllowed(void);
 s32 sub_0823A53C(void)
 {

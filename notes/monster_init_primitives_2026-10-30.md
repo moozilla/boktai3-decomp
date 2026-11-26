@@ -2,7 +2,7 @@
 
 All 17 Round 6 initializers match under the stock compiler after this extraction:
 67,936 bytes, with zero differing bytes in every full translation unit. The common
-operations live in `include/engine/shared/scene_actor_init_primitives.h`. There are no per-species
+operations live in `include/monsters/scene_actor_init_primitives.h`. There are no per-species
 selectors or separate copies of the terrain-height calculation.
 
 ## Shared contracts

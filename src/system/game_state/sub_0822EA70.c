@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 extern u8 *gGameState;
 s32 SolarFruit_GetInventorySlot(u32 i)
 {

@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 
 void Hresvelgr_ReleaseShot(u8 *);
 

@@ -1,6 +1,6 @@
-#include "player_3.h"
-#include "ram.h"
-#include "scene_consumable_definition.h"
+#include "player/appearance/player_visuals.h"
+#include "engine/ram.h"
+#include "ui/town/scene_consumable_definition.h"
 
 /* Tentative role: select an effect flag from actor and global state. */
 

@@ -1,6 +1,6 @@
 """Name heap memory by its allocation: which code allocated the block, when, and with what type.
 
-The game's allocator (src/engine/heap_and_memory_operations/heap_memory.c) keeps HeapBlock headers {prev, next, size,
+The game's allocator (src/engine/heap_memory.c) keeps HeapBlock headers {prev, next, size,
 unused} in front of each block and writes `block->unused = 0` exactly once per
 allocation, so the last such write in the write log dates the allocation. That frame is
 re-traced to find the allocator's invocation and its callers (Heap_Alloc <- Task_Create

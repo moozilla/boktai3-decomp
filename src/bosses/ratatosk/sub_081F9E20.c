@@ -1,5 +1,5 @@
-#include "engine/shared/global.h"
-#include "effects/projectile/projectile_config.h"
+#include "global.h"
+#include "effects/projectiles/projectile_config.h"
 
 struct PreviewProjectileOwner {
     u8 pad0[0x1a8];

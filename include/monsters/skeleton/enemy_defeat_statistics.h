@@ -1,7 +1,7 @@
 #ifndef GUARD_ENEMY_DEFEAT_STATISTICS_H
 #define GUARD_ENEMY_DEFEAT_STATISTICS_H
 
-#include "engine/shared/global.h"
+#include "global.h"
 
 /* Signed counter view of the game-state block. Category names describe the
  * switch cases that increment each field; their gameplay meanings are tentative.

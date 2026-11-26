@@ -1,8 +1,8 @@
-#include "engine/shared/global.h"
+#include "global.h"
 #define SessionMenu_SetState          Registry1745_SetState
 #define SessionMenu_ConsumeEntryFlag  Registry1745_ConsumeStateEntry
 #define SessionMenu_ResetWithCallback Registry1745_BeginShutdown
-#include "engine/shared/area_effect_link.h"
+#include "scene/area_effect/area_effect_link.h"
 u8 Registry1745_ConsumeStateEntry(void *);
 s32 Registry1745_CheckSessionReady(void *);
 void Registry1745_BeginShutdown(void *, void (*)(void));

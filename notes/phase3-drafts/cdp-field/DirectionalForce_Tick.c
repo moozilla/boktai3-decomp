@@ -1,4 +1,4 @@
-#include "directional_force.h"
+#include "objects/hazards/directional_force.h"
 // MATCHING_CONCESSION: register-pinning
 s32 DirectionalForce_Tick(struct DirectionalForce *force)
 {

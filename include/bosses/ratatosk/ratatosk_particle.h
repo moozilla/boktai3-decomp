@@ -1,9 +1,9 @@
 #ifndef GUARD_RATATOSK_PARTICLE_H
 #define GUARD_RATATOSK_PARTICLE_H
 
-#include "engine/shared/display_sequence.h"
-#include "engine/interrupts_and_video/sprite.h"
-#include "engine/shared/task.h"
+#include "engine/video/display_sequence.h"
+#include "engine/video/sprite.h"
+#include "engine/task.h"
 
 struct RatatoskParticle;
 typedef s32 (*RatatoskParticleUpdate)(struct RatatoskParticle *, s32);

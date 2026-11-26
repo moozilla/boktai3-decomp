@@ -1,4 +1,4 @@
-#include "scene_panel_rig.h"
+#include "objects/pile_driver/scene_panel_rig.h"
 struct SceneRigDriverView {
     u8 unknown0[0xC0F];
     u8 suppressDrain;

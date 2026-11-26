@@ -1,7 +1,7 @@
-#include "engine/shared/global.h"
+#include "global.h"
 #include "bosses/ratatosk/ratatosk.h"
-#include "engine/shared/engine.h"
-#include "engine/shared/ram.h"
+#include "engine/engine.h"
+#include "engine/ram.h"
 
 void Bestiary_UnlockEntry(s32);
 extern const struct ContactPosition gUnk_0824FDF0;

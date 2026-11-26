@@ -1,5 +1,5 @@
-#include "engine/shared/global.h"
-#include "engine/shared/engine.h"
+#include "global.h"
+#include "engine/engine.h"
 s32 Inventory_GetConsumableId(s32 slot);
 void Inventory_SetConsumableEntry(s32 slot, s32 value);
 /* Script: stores -a in the first empty (negative) entry of the first 16 of

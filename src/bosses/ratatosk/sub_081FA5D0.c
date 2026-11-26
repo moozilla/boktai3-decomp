@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 struct SceneResourceSprite {
     u8 pad0[8];
     u32 flags;

@@ -1,7 +1,7 @@
 #define Player_RemoveEffects Player_DestroyEffects
-#include "engine/shared/global.h"
-#include "engine/shared/player.h"
-#include "engine/shared/ram.h"
+#include "global.h"
+#include "player/player.h"
+#include "engine/ram.h"
 void SceneActorContacts_RemoveNode(void *);
 void Anim_Remove(void *);
 void Sprite_Remove(void *);

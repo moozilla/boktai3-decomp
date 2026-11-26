@@ -1,7 +1,7 @@
 #ifndef GUARD_BOSS_ACTION_STATE_H
 #define GUARD_BOSS_ACTION_STATE_H
 
-#include "engine/shared/global.h"
+#include "global.h"
 
 /* Each level has its own frame counter. Changing a level also resets its children. */
 struct BossActionState {

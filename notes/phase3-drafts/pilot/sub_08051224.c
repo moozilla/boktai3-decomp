@@ -1,4 +1,4 @@
-#include "directional_force.h"
+#include "objects/hazards/directional_force.h"
 
 static inline u32 Random_Next(void)
 {

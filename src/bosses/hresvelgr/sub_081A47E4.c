@@ -1,5 +1,5 @@
-#include "engine/shared/global.h"
-#include "engine/shared/ram.h"
+#include "global.h"
+#include "engine/ram.h"
 void *Task_Create(s32, s32);
 void Task_SetCallbacks(void *, void *, void *);
 void Task_Kill(void *);

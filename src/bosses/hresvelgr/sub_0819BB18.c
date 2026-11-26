@@ -1,6 +1,6 @@
-#include "engine/shared/global.h"
-#include "engine/shared/engine.h"
-#include "engine/resource_registry/resource_registry.h"
+#include "global.h"
+#include "engine/engine.h"
+#include "engine/resource_registry.h"
 
 // confidence=low: emits sixteen motion entries around the actor's facing direction.
 #define Hresvelgr_EmitFacingMotionBurst sub_0819BB18

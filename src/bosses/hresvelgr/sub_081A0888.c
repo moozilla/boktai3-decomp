@@ -1,6 +1,6 @@
-#include "engine/shared/global.h"
+#include "global.h"
 #include "bosses/hresvelgr/hresvelgr_travel.h"
-#include "engine/shared/scene_vec_polar.h"
+#include "engine/math/scene_vec_polar.h"
 
 static inline void AddVector(struct SceneVec *a, struct SceneVec *b)
 {

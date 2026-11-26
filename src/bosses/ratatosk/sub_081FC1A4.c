@@ -1,6 +1,6 @@
-#include "engine/shared/global.h"
+#include "global.h"
 #include "bosses/ratatosk/ratatosk_particle.h"
-#include "engine/shared/ram.h"
+#include "engine/ram.h"
 
 s32 AnimData_Load(struct SpriteRenderResource *, u32);
 void *ScriptProc_Start(u16, u16);

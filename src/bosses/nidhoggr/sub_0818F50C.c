@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 struct EffectPosition {
     u32 a, b;
 };

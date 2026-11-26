@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 #include "bosses/hresvelgr/hresvelgr_travel.h"
 extern const s16 gUnk_086149C4[];
 u16 Sqrt(u32);

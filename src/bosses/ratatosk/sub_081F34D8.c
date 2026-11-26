@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 
 u8 *SceneActors_GetBySlot(u32);
 

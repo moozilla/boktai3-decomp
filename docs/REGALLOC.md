@@ -88,7 +88,7 @@ Note: `check.py FILE` without `--nonmatching` compiles a draft's
   `(u32)gUnk_0203B400` turned its load into a reload, which advanced the
   rotation and fixed both registers. Three other random-table users lost
   their pins the same way (of 40 tried).
-  Write such literals through a named macro in `include/engine/shared/global.h`
+  Write such literals through a named macro in `include/global.h`
   (`#define RANDOM_TABLE_ADDR 0x0203B400 /* gUnk_0203B400 */`).
   `make` runs `tools/check_ram_literals.py`, which fails if the address no
   longer equals the symbol in the link map. These are RAM addresses, so the
@@ -308,7 +308,7 @@ A `do { ... } while (0)` that a match needs is not a trick to avoid; it is the
 expansion of a statement macro, which the original source almost certainly
 had. The rule is that it must be written as a named macro, not left bare:
 
-* An empty `do { } while (0);` is `DEBUG_NOP();` (include/engine/shared/global.h): the shape
+* An empty `do { } while (0);` is `DEBUG_NOP();` (include/global.h): the shape
   a debug check compiled out of a release build takes. Its loop notes still
   split the code around it, which is what the match needs.
 * fdlibm code uses newlib's own word macros (`EXTRACT_WORDS`,

@@ -1,5 +1,5 @@
-#include "engine/shared/global.h"
-#include "monsters/armor/motion_0818.h"
+#include "global.h"
+#include "monsters/armor/spinning_approach_chain.h"
 
 extern const s16 gUnk_086149C4[];
 s32 Div(s32, s32);

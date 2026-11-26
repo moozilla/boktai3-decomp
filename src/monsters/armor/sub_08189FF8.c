@@ -1,9 +1,9 @@
-#include "engine/shared/global.h"
+#include "global.h"
 #include "system/game_state/game_state.h"
-#include "engine/shared/engine.h"
-#include "engine/shared/ram.h"
-#include "engine/shared/scene_actor_components.h"
-#include "engine/shared/contact_collider.h"
+#include "engine/engine.h"
+#include "engine/ram.h"
+#include "scene/actor/scene_actor_components.h"
+#include "scene/actor/contact_collider.h"
 #include "monsters/armor/armor_decision_ops.h"
 
 struct ArmorDecisionActor {

@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 struct ColliderExtentPair {
     u32 lo : 16, hi : 16;
 };

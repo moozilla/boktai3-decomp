@@ -1,6 +1,6 @@
-#include "engine/shared/global.h"
+#include "global.h"
 #include "bosses/ratatosk/ratatosk.h"
-#include "field/sun_orb/sun_orb_effect.h"
+#include "objects/sun_orb/sun_orb_effect.h"
 struct RatatoskOrbTarget {
     u32 active;
     struct OrbitEffectPosition position;

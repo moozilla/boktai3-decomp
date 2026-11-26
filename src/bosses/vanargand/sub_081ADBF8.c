@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 
 #define Vanargand_OnDamage sub_081ADBF8
 struct VanargandDamage {

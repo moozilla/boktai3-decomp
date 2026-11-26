@@ -1,5 +1,5 @@
 #define Callback_InvokeWithArgument Callback_InvokeActor
-#include "engine/shared/global.h"
+#include "global.h"
 #include "bosses/ratatosk/ratatosk.h"
 void SceneActors_StartDirectionalAnimation(void *, void *, void *, int, int, int, int);
 void Sound_PlaySong(u32);

@@ -1,0 +1,24 @@
+#ifndef GUARD_DISPLAY_KEYFRAME_H
+#define GUARD_DISPLAY_KEYFRAME_H
+
+#include "global.h"
+
+struct DisplayKeyframeState {
+    u8 unknown0[8];
+    u32 flags;
+    u8 unknownC[8];
+    u16 frame;
+    u8 unknown16[4];
+    u8 priority;
+    u8 unknown1B[2];
+    u8 status;
+    u8 unknown1E[0xA];
+    struct ContactPosition *positionSource;
+    u8 unknown2C[8];
+    u8 palette, paletteVariant;
+    u16 attribute;
+    u8 unknown38[2];
+    u16 paletteIndex;
+};
+
+#endif

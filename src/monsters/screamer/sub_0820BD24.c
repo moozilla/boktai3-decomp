@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 struct Args {
     s32 x, y, z, a, b, c, d, e;
 };

@@ -1,0 +1,121 @@
+#include "global.h"
+#include "effects/particles/scene_particle_burst_api.h"
+#include "engine/engine.h"
+#include "scene/actor/scene_actor_reset.h"
+#include "scene/actor/scene_actor_behavior.h"
+#include "scene/actor/scene_actor_init_actor.h"
+s32 Div(s32, s32);
+s32 Mod(s32, s32);
+static inline s32 motionSquared(struct ContactPosition *motion)
+{
+    return motion->x * motion->x + motion->y * motion->y + motion->z * motion->z;
+}
+s32 SceneActorMovement_UpdateAirborne(struct ChaseActor *actor)
+{
+    u8 category;
+    u32 *flags;
+    u32 value;
+    u32 index;
+    struct ContactPosition *position;
+    const struct ContactPosition *local;
+    u8 *cell;
+    s32 height, kind;
+    struct ContactPosition extent;
+    struct ContactPosition *burst;
+    if (motionSquared(&actor->base.secondaryMotion) == 0 &&
+        *(s16 *)&actor->base.heightOffset == 0) {
+        u32 *clear = &actor->base.statusFlags;
+        u32 mask = ~0x10;
+        *clear &= mask;
+        return 1;
+    }
+    category = actor->base.category;
+    {
+        u32 mask = 0x2000;
+        actor->base.behaviorFlags |= mask;
+    }
+    {
+        u32 mask = 0x100000;
+        value = actor->base.statusFlags & mask;
+        flags = &actor->base.statusFlags;
+    }
+    if (!value) {
+        u16 *y = (u16 *)&actor->base.secondaryMotion.y;
+        s32 dy;
+        *y = dy = *y - 2;
+        actor->base.heightOffset += dy;
+        actor->base.body.motion.x += actor->base.secondaryMotion.x;
+        actor->base.body.motion.z += actor->base.secondaryMotion.z;
+        index = actor->base.terrainCell;
+        local = &actor->base.body.position;
+        cell = TerrainModifiers_FindCellOverride(index, 1);
+        position = (void *)local;
+        if (cell) {
+            cell += 4;
+            goto haveCell;
+        }
+    } else {
+        if (Mod(actor->base.frameCounter, 4) == 0) {
+            actor->base.secondaryMotion.x = MonsterInit_Half(actor->base.secondaryMotion.x);
+            actor->base.secondaryMotion.z = MonsterInit_Half(actor->base.secondaryMotion.z);
+        }
+        actor->base.body.motion.x += actor->base.secondaryMotion.x;
+        actor->base.body.motion.z += actor->base.secondaryMotion.z;
+        return 0;
+    }
+    cell = gTerrainMap->cells + (index * 4 + 12);
+haveCell:
+    kind = *cell >> 4;
+    height = (*cell & 15) << 8;
+    if (kind == 1)
+        goto slopeZ;
+    if (kind == 2)
+        goto slopeX;
+    goto done;
+slopeZ:
+    height -= *((u8 *)local + 4);
+    goto done;
+slopeX:
+    height -= *(u8 *)local;
+done:;
+    {
+        s16 *elevation = (s16 *)&actor->base.heightOffset;
+        if (*elevation + height <= height) {
+            u16 *bouncePtr;
+            u16 bounce;
+            extent.x = 0x52;
+            extent.y = 0;
+            extent.z = 0x52;
+            bouncePtr = &actor->base.field2E8;
+            bounce = *bouncePtr;
+            burst = &extent;
+            if (bounce == 0) {
+                ZeroFill8(&actor->base.secondaryMotion);
+                *elevation = bounce;
+            } else {
+                s32 y;
+                actor->base.secondaryMotion.x = Div(actor->base.secondaryMotion.x * 5, 10);
+                y = actor->base.secondaryMotion.y;
+                if (y < 0)
+                    y = -y;
+                actor->base.secondaryMotion.y = Div(*bouncePtr * y, 10);
+                actor->base.secondaryMotion.z = Div(actor->base.secondaryMotion.z * 5, 10);
+            }
+            if (category != 0x11 && category != 0x17 && category != 0x13 && category != 0x12 &&
+                category != 0xe && category != 0xc)
+                SceneParticleBurst_CreateWithPause(position, &actor->base.secondaryMotion, burst, 6,
+                                                   2, 4);
+            if (actor->base.field240)
+                Callback_InvokeActor(actor, actor->base.field240);
+            actor->base.heightOffset = 0;
+        }
+    }
+    if (motionSquared(&actor->base.secondaryMotion) == 0 &&
+        *(s16 *)&actor->base.heightOffset == 0) {
+        actor->base.heightOffset = 0;
+        ZeroFill8(&actor->base.secondaryMotion);
+        SceneActorBehavior_SetWordFlags(flags, 0x10);
+        return 1;
+    }
+    return 0;
+}

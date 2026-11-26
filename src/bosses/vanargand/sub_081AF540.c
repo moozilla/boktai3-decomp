@@ -1,5 +1,5 @@
-#include "engine/shared/global.h"
-#include "engine/shared/scene_actor_init_actor.h"
+#include "global.h"
+#include "scene/actor/scene_actor_init_actor.h"
 
 struct VanargandEffectVec {
     s16 x, y, z;

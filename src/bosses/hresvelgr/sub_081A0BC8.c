@@ -1,7 +1,7 @@
-#include "engine/terrain/terrain_sampling.h"
-#include "engine/shared/global.h"
+#include "scene/terrain/terrain_sampling.h"
+#include "global.h"
 
-#include "engine/shared/engine.h"
+#include "engine/engine.h"
 struct Vec {
     s16 x, y, z, pad;
 } __attribute__((aligned(4)));

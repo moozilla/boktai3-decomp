@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 #include "bosses/ratatosk/ratatosk.h"
 #include "bosses/ratatosk/ratatosk_facing.h"
 struct Sub081F62A8 {

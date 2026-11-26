@@ -4,7 +4,7 @@ Tags: #matching #twin #depin #palette #himode-narrowing #reload
 
 **Matched.** `LinkPlayer_BlendPalette` (472 bytes) is byte-identical in
 ordinary C. The same body replaces the pinned `sub_0813C9B4` in
-`src/player/player_3.c` (the same code over `struct Player`), which removes 13 register
+`src/player/appearance/player_visuals.c` (the same code over `struct Player`), which removes 13 register
 pins and barriers. Neither function has pins, barriers, selector macros or
 compiler overrides.
 

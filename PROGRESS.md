@@ -8,7 +8,7 @@ Without concessions: **100.000%**. With concessions (register pins, asm barriers
 
 | Concession sites | |
 |---|---:|
-| `volatile` | 3 (+17 excused) |
+| `volatile` | 2 (+17 excused) |
 | `cflags` | 0 (+50 excused) |
 | `goto` (tracked, not scored) | 2,036 |
 

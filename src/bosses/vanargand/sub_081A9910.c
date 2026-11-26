@@ -1,6 +1,6 @@
-#include "engine/shared/global.h"
-#include "engine/shared/engine_globals.h"
-#include "engine/shared/ram.h"
+#include "global.h"
+#include "engine/engine_globals.h"
+#include "engine/ram.h"
 // confidence=low: paired commands 3/4/5 repeat a synchronized attack before selected halves recover.
 #include "bosses/vanargand/vanargand_pair_attack.h"
 void Vanargand_SetPendingCue(void *, u16);

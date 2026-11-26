@@ -1,9 +1,9 @@
-#include "engine/shared/global.h"
-#include "engine/shared/engine.h"
-#include "engine/shared/monster_particle_random.h"
-#include "engine/shared/ram.h"
-#include "engine/shared/heap.h"
-#include "engine/resource_registry/resource_registry.h"
+#include "global.h"
+#include "engine/engine.h"
+#include "engine/math/monster_particle_random.h"
+#include "engine/ram.h"
+#include "engine/heap.h"
+#include "engine/resource_registry.h"
 
 /* Tentative: emit a motion entry from a randomized point ahead or behind the actor. */
 

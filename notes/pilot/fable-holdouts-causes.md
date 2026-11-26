@@ -14,7 +14,7 @@ in the source (`python3 tools/progress.py --list-pinned`).
   then copies the mask instead of tying the operand, and cse cannot share the zero
   (Scene_TryStepDown, WirelessGameItems_UpdateIncomingItem). Guessed wording.
 * A two-sided clamp ends the cse path, so constants after it are loaded again.
-* `ParticleRandomTableSource` halves (include/engine/shared/monster_particle_random.h) keep the random
+* `ParticleRandomTableSource` halves (include/engine/math/monster_particle_random.h) keep the random
   table register from being REG_EQUIV, so local-alloc does not double its life
   (sub_0801404C). With plain `ReadDirectSample` its priority then sits one point under
   the sprite pointer, as in the ROM.
@@ -80,7 +80,7 @@ through the halves union).
 
 ## Recipe: random-table register priority (scope README fact 231)
 
-1. In `u.i.lreg`, if the table's (or another once-set constant's) set carries `REG_EQUIV` and `scope.py A.c vs B.c FUNC` shows its `live` at twice the real span, it is doubled and ranks one register too low. Drop the pin or barrier and make combine, not cse, form the constant: `table = (const u16 *)(RANDOM_TABLE_ADDR + (p->someU8Field >> 8));` (no stack slot; sub_080399F4, 8a3ff6351), or the address-taken halves union from include/engine/shared/monster_particle_random.h when the ROM frame has a spare 4-byte slot (sub_0801404C, c34073c60). Build it once, outside the loop, where the ROM's `ldr =0x203B400` sits.
+1. In `u.i.lreg`, if the table's (or another once-set constant's) set carries `REG_EQUIV` and `scope.py A.c vs B.c FUNC` shows its `live` at twice the real span, it is doubled and ranks one register too low. Drop the pin or barrier and make combine, not cse, form the constant: `table = (const u16 *)(RANDOM_TABLE_ADDR + (p->someU8Field >> 8));` (no stack slot; sub_080399F4, 8a3ff6351), or the address-taken halves union from include/engine/math/monster_particle_random.h when the ROM frame has a spare 4-byte slot (sub_0801404C, c34073c60). Build it once, outside the loop, where the ROM's `ldr =0x203B400` sits.
 2. Then settle any remaining near tie with ref weights only: `ParticleRandom_ReadDirectSample(table)` (2 per site in a loop) against `ParticleRandom_ReadSample` (3), and the extern `gRandomTable` rather than a numeric `#define` when the ROM hoists the address. Group still open: ParticleGroup_UpdateFrozen, Vorn_UpdateDefeat, sub_08012B34, FadingParticleGroup_Spawn, FadingParticleGroup_Update, sub_08014CA4, sub_08014634 (table must outrank velocity: 17/165 undoubled).
 
 Both forms are guessed wording (an always-zero term; a pointer built in halves) and belong on the review list below with sub_080399F4 and sub_0801404C.

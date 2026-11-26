@@ -1,6 +1,6 @@
-#include "engine/shared/global.h"
+#include "global.h"
 #include "bosses/ratatosk/ratatosk.h"
-#include "engine/shared/render.h"
+#include "engine/video/render.h"
 void SceneActors_StartEightDirectionAnimation(void *, void *, void *, int, int, int, int);
 void SceneActors_StartDirectionalAnimation(void *, void *, void *, int, int, int, int);
 void PolarInterpolation_SetCurrentFromPoint(void *, void *);

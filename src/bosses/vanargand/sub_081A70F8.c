@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 struct VanargandBoss {
     u8 unk0[0x9c];
     u32 flags;

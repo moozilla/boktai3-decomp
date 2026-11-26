@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 
 s32 Ratatosk_FindPointNearestPlayer(u8 *p)
 {

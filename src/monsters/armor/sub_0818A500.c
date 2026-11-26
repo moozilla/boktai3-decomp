@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 // confidence=low: applies queued scene commands to the armor actor (behavior, attachments, flags).
 
 typedef struct {

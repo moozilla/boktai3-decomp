@@ -1,0 +1,35 @@
+#ifndef GUARD_SCENE_ITEM_VALUES_H
+#define GUARD_SCENE_ITEM_VALUES_H
+#include "engine/engine.h"
+#include "ui/town/scene_consumable_definition.h"
+/* Tentative inventory-value family: the callers select equipment/item slots. */
+#include "scene/scene_value_equipment.h"
+struct SceneValueEquipmentDefinition {
+    u8 descriptionTitle, unknown1, descriptionStyleA, descriptionStyleB;
+    u8 unknown4[2];
+    u16 baseValue;
+    u8 unknown8[4];
+    u8 modifierTextA, unknownD[3];
+    u8 modifierTextB, unknown11[4];
+    u8 gradeValues[3], unknown18[8];
+};
+struct SceneValueItemDefinition {
+    u16 unknown0;
+    u16 actionKind; /* 0x2: selected-action dispatch kind */
+    u16 conditionKey;
+    u16 effectValueA; /* 0x6: amount, duration, or effect selector according to actionKind */
+    u16 effectValueB; /* 0x8: secondary amount or duration */
+    u16 unknownA;
+    u32 baseValue;
+};
+u32 Inventory_GetEquipmentId(u32 slot);
+u32 Inventory_CanAssignEquipment(u32 slot);
+struct SceneValueEquipment *Inventory_GetEquipmentEntry(u32);
+struct SceneValueEquipmentDefinition *Equipment_GetDefinition(u32);
+struct SceneValueConsumableDefinition *GameState_GetConsumableDescriptor(u32);
+s32 SceneInventory_GetItemConditionFrame(u32);
+s32 Inventory_GetItemId(u32);
+s32 Inventory_GetConsumableId(u32);
+u32 SceneItemValue_GetItemBaseValue(s32);
+s32 SceneItemValue_GetConsumableBaseValue(u32);
+#endif

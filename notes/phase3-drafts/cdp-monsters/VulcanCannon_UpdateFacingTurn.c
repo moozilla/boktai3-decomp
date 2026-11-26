@@ -1,6 +1,6 @@
 #include "global.h"
-#include "vulcan_cannon_worker.h"
-#include "display_sequence_sprite.h"
+#include "monsters/cannons/vulcan_cannon_worker.h"
+#include "engine/video/display_sequence_sprite.h"
 void VulcanCannon_UpdateTargeting(void);
 s32 Anim_RestartSequence(void *, void *, u32, u32, u32);
 

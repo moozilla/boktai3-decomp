@@ -1,5 +1,5 @@
-#include "engine/shared/global.h"
-#include "engine/shared/area_effect_link.h"
+#include "global.h"
+#include "scene/area_effect/area_effect_link.h"
 #define SceneMenu_SetState Registry1745_SetState
 struct SceneMenu {
     u8 pad0[0x30];

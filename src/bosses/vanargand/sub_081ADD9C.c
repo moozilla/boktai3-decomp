@@ -1,8 +1,8 @@
 #define SceneComposite_RemoveAnimatedSprite Vanargand_DestroyAnimatedPart
 #define SceneComposite_RemoveSpriteArray    Vanargand_DestroyPartSprites
 #define SpritePair_Remove                   Vanargand_RemovePartSprites
-#include "engine/shared/global.h"
-#include "engine/shared/ram.h"
+#include "global.h"
+#include "engine/ram.h"
 struct SceneComposite {
     u8 actor[0x18c];
     u8 animatedSprite[0x144];

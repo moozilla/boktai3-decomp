@@ -1,6 +1,6 @@
-#include "engine/shared/contact_collider.h"
-#include "engine/shared/global.h"
-#include "engine/shared/ram.h"
+#include "scene/actor/contact_collider.h"
+#include "global.h"
+#include "engine/ram.h"
 struct NidhoggrEffectVector {
     u16 x, y, z, pad;
 };

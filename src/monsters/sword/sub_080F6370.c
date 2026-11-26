@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 void Callback_InvokeActor(void *, void *);
 void Armor_UpdatePartColliders_080F2260(void *);
 static inline u32 Flags(u8 *p, u32 mask)

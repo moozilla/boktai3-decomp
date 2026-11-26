@@ -1,7 +1,7 @@
-#include "engine/shared/global.h"
+#include "global.h"
 #include "system/game_state/game_state.h"
-#include "engine/shared/ram.h"
-#include "engine/shared/runtime.h"
+#include "engine/ram.h"
+#include "engine/runtime.h"
 void GameState_BackupRegionRange(void *, u32);
 u32 Save_AlignSizeToEightBytes(u32);
 u32 Save_GetPrimaryRegionBlock(u32, u32);

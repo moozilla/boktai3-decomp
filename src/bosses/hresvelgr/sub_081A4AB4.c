@@ -1,8 +1,8 @@
-#include "engine/shared/global.h"
-#include "engine/shared/engine.h"
-#include "engine/shared/ram.h"
-#include "engine/shared/contact_position.h"
-#include "engine/shared/monster_particle_random.h"
+#include "global.h"
+#include "engine/engine.h"
+#include "engine/ram.h"
+#include "scene/actor/contact_position.h"
+#include "engine/math/monster_particle_random.h"
 
 // confidence=low: emits one centered explosion and seven offset explosions.
 #define Hresvelgr_EmitImpactExplosions sub_081A4AB4

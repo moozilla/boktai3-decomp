@@ -1,4 +1,4 @@
-#include "scene_steering_actor.h"
+#include "scene/actor/scene_steering_actor.h"
 s32 BurstEmitter_Create(const struct ContactPosition *, u32, u32, s32, s32, s32, s32);
 void ScaledShadow_Destroy(void *);
 static inline s32 Dimension(u16 *field)

@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 #define gActorAnimationSequenceValues gUnk_08611D44
 extern const u32 gUnk_08611D44[];
 struct ActorAnimationSequence {

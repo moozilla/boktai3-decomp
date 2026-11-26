@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 void sub_0823A060(u8 *);
 void LinkPlayer_AdvanceActionTick(u8 *);
 s32 sub_08239F74(u8 *, s32);

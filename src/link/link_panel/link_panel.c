@@ -1,8 +1,8 @@
 #include "link/link_panel/link_panel.h"
-#include "engine/shared/area_effect_link.h"
-#include "menus/scrolling_dialogue_controller/scrolling_dialogue.h"
-#include "engine/shared/input.h"
-#include "engine/shared/ram.h"
+#include "scene/area_effect/area_effect_link.h"
+#include "ui/dialogue/scrolling_dialogue.h"
+#include "engine/input.h"
+#include "engine/ram.h"
 
 void LinkPanel_SelectActiveAnimation(struct LinkPanel *, s32);
 

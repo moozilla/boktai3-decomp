@@ -1,5 +1,5 @@
 #define GameState_SetListEntry SolarFruit_SetInventorySlot
-#include "engine/shared/global.h"
+#include "global.h"
 #include "system/game_state/game_state.h"
 void SolarFruit_SetInventorySlot(s32, s32);
 s32 GameState_InsertUniqueListEntry(s32 value)

@@ -1,5 +1,5 @@
-#include "engine/shared/global.h"
-#include "engine/shared/ram.h"
+#include "global.h"
+#include "engine/ram.h"
 #include "link/serial/serial.h"
 void sub_08223044(void);
 s32 sub_08223180(void)

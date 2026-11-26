@@ -50,7 +50,7 @@ through the word-flag helpers" (12 files). `docs/WORKER.md` "Mechanical cleanups
 * When the ROM loads a mask before the word it tests, the original used an inline accessor (its
   argument is set up before its body); the test written in place loads the word first.
 * `*(table + index)` builds the address index-first where `table[index]` adds the array offset
-  first (`RANDOM_NEXT()` in `include/link/wireless_connection_controller/random.h`; also game-state arrays).
+  first (`RANDOM_NEXT()` in `include/link/wireless/random.h`; also game-state arrays).
 * Hard sites: see [hard-sites_2026-11-23.md](hard-sites_2026-11-23.md). Two fell
   (`Text_FormatDecimal`, `SceneInput_TickChoice`); the random-table family is one instruction off
   and turns on `update_equiv_regs` in local-alloc.c.

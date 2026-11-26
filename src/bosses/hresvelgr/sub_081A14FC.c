@@ -1,7 +1,7 @@
-#include "engine/shared/global.h"
-#include "engine/shared/engine.h"
-#include "engine/shared/scene_input_widget.h"
-#include "engine/terrain/terrain_sampling.h"
+#include "global.h"
+#include "engine/engine.h"
+#include "ui/widgets/scene_input_widget.h"
+#include "scene/terrain/terrain_sampling.h"
 struct Action {
     u8 state, substate, step, pad3;
     u32 frame, substateFrame, stepFrame;

@@ -1,5 +1,5 @@
-#include "engine/shared/global.h"
-#include "engine/shared/input.h"
+#include "global.h"
+#include "engine/input.h"
 
 void sub_0819D190(u8 *p)
 {

@@ -15,24 +15,24 @@ those units passed independent stock checks with the original complete extents.
 
 | Unit | Locals removed | Integration commit |
 |---|---:|---|
-| `src/link/wireless_connection_controller/sub_08035288.c` | 1 | `600782650` |
-| `src/link/wireless_trade_and_selection_menu/sub_080386C8.c` | 1 | `edf27dbda` |
-| `src/link/wireless_trade_and_selection_menu/sub_08038928.c` | 1 | `bdfcdbbc8` |
-| `src/actors/scene_pooled_motion_and_actor_controls/sub_0803E998.c` | 2 | `9610d6c9f` |
-| `src/actors/scene_pooled_motion_and_actor_controls/sub_0803ED84.c` | 1 | `8e4bd9025` |
-| `src/field/proximity_particle_emitter/sub_08051A8C.c` | 2 | `48b466289` |
-| `src/menus/scene_panel_sprite_rig/sub_0805AE58.c` | 2 | `b967776fb` |
-| `src/actors/scene_actor_registry_manager/sub_080714E4.c` | 1 | `c0e5a4f91` |
-| `src/actors/scene_actor_reaction_callbacks/sub_08080868.c` | 1 | `098c7c036` |
-| `src/player/sub_08142CC0.c` | 1 | `e0f2d1b01` |
-| `src/player/sub_08142FC4.c` | 1 | `e077ab8b9` |
-| `src/player/sub_0814B1F8.c` | 1 | `e7fe304db` |
+| `src/link/wireless/connection/sub_08035288.c` | 1 | `600782650` |
+| `src/link/wireless/trade_menu/sub_080386C8.c` | 1 | `edf27dbda` |
+| `src/link/wireless/trade_menu/sub_08038928.c` | 1 | `bdfcdbbc8` |
+| `src/link/wireless/battle/sub_0803E998.c` | 2 | `9610d6c9f` |
+| `src/link/wireless/battle/sub_0803ED84.c` | 1 | `8e4bd9025` |
+| `src/effects/particles/proximity_emitter/sub_08051A8C.c` | 2 | `48b466289` |
+| `src/objects/pile_driver/sub_0805AE58.c` | 2 | `b967776fb` |
+| `src/scene/actor/registry/sub_080714E4.c` | 1 | `c0e5a4f91` |
+| `src/scene/actor/reaction/sub_08080868.c` | 1 | `098c7c036` |
+| `src/player/damage/sub_08142CC0.c` | 1 | `e0f2d1b01` |
+| `src/player/damage/sub_08142FC4.c` | 1 | `e077ab8b9` |
+| `src/player/movement/sub_0814B1F8.c` | 1 | `e7fe304db` |
 | `src/bosses/hresvelgr/sub_0819C29C.c` | 2 | `638f4df4d` |
 | `src/bosses/vanargand/sub_081A96E0.c` | 3 | `82d1bb19b` |
 | `src/bosses/vanargand/sub_081A9910.c` | 4 | `b5059a10e` |
 | `src/bosses/vanargand/sub_081A9DDC.c` | 2 | `fd86aef06` |
 | `src/bosses/vanargand/sub_081A9F88.c` | 4 | `4cfa9f021` |
-| `src/actors/singleton_slot_7/sub_081EF914.c` | 4 | `eb78da36e` |
+| `src/bosses/vanargand/sub_081EF914.c` | 4 | `eb78da36e` |
 
 ## Source and diagnostic checks
 

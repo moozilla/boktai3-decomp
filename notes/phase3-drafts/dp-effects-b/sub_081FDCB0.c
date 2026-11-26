@@ -1,5 +1,5 @@
 #include "global.h"
-#include "sun_orb_effect.h"
+#include "objects/sun_orb/sun_orb_effect.h"
 
 extern const s16 gUnk_086149C4[];
 s32 Math_Atan2(s32, s32);

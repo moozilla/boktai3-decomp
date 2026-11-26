@@ -1,5 +1,5 @@
-#include "engine/shared/global.h"
-#include "field/scene_script_object/orbit_motion.h"
+#include "global.h"
+#include "objects/orbit_motion.h"
 /* Math_BlendWithTableFactor: Blends endpoints using a capped table index and returns the target for a zero table entry */
 #define Math_BlendWithTableFactor sub_0819B010
 

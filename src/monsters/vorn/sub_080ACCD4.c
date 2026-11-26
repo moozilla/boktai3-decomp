@@ -1,5 +1,5 @@
 // COMPILER: old_agbcc
-#include "engine/shared/global.h"
+#include "global.h"
 /* TentacleEnemy_SetSegmentPosition: Copies a position into an indexed segment entry used by the position trail */
 #define TentacleEnemy_SetSegmentPosition sub_080ACCD4
 

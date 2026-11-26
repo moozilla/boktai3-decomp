@@ -1,7 +1,7 @@
 #ifndef GUARD_ARMOR_ACTION_H
 #define GUARD_ARMOR_ACTION_H
 
-#include "engine/shared/global.h"
+#include "global.h"
 
 struct ArmorActionController {
     u8 unk0[0xB3D];

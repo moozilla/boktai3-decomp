@@ -1,5 +1,5 @@
-#include "engine/shared/global.h"
-#include "monsters/armor/motion_0818.h"
+#include "global.h"
+#include "monsters/armor/spinning_approach_chain.h"
 
 static inline void finish(struct Motion0818Object *p, u32 one)
 {

@@ -1,5 +1,5 @@
-#include "sprite_trail.h"
-#include "background_controller.h"
+#include "bosses/vanargand/sprite_trail.h"
+#include "effects/screen/background_controller.h"
 // confidence=low: SpriteTrail_CreateMotionEffect without the velocity: the end point goes to the
 // slot that function uses for velocity (0x54), and the trail sprites start at the start point.
 // MATCHING_CONCESSION: register-pinning

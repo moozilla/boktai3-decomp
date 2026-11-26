@@ -1,5 +1,5 @@
 #include "bosses/vanargand/vanargand_pair_attack.h"
-#include "engine/shared/player.h"
+#include "player/player.h"
 
 /* Copy the selected player palette and complete the capture position request. */
 void Vanargand_SetPendingCue(void *, u16);

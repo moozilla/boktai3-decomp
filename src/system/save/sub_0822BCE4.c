@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 u32 Save_GetContinuationSize(void), Save_AlignSizeToEightBytes(u32),
     Save_GetContinuationRegionBlock(u32);
 void *Save_GetContinuationSnapshot(void);

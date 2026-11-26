@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 
 s32 sub_08239F74(u8 *p, s32 r)
 {

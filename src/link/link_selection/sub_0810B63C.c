@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 #include "link/link_selection/link_selection_mode.h"
 #define SceneMenu_SetState Registry1745_SetState
 struct SceneMenu {

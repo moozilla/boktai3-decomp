@@ -1,7 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
-#include "homing_projectile.h"
-#include "engine_globals.h"
-#include "ram.h"
+#include "effects/projectiles/homing_projectile.h"
+#include "engine/engine_globals.h"
+#include "engine/ram.h"
 struct LocalVec {
     s16 x, y, z;
 } __attribute__((aligned(4)));

@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 extern u8 *gGameState;
 s32 Inventory_GetConsumableId(u32);
 u32 GameState_HasEquippedConsumable(s32 a)

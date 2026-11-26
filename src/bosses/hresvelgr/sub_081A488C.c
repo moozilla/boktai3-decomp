@@ -1,5 +1,5 @@
-#include "engine/shared/global.h"
-#include "engine/shared/ram.h"
+#include "global.h"
+#include "engine/ram.h"
 #define MotionEntryManager_Create Hresvelgr_CreateEffectPool
 struct MotionEntry {
     u8 unknown0[0x54];

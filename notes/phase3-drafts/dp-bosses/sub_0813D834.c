@@ -1,5 +1,5 @@
-#include "player_3.h"
-#include "ram.h"
+#include "player/appearance/player_visuals.h"
+#include "engine/ram.h"
 
 void Player_EmitQueuedEffects(struct Player *);
 s32 Mod(s32, s32);

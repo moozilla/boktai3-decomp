@@ -1,9 +1,9 @@
-#include "engine/shared/global.h"
-#include "engine/shared/engine_globals.h"
-#include "engine/shared/ram.h"
-#include "engine/shared/scene_actor_components.h"
-#include "actors/orbit_motion/motion_track.h"
-#include "engine/shared/monster_particle_random.h"
+#include "global.h"
+#include "engine/engine_globals.h"
+#include "engine/ram.h"
+#include "scene/actor/scene_actor_components.h"
+#include "scene/actor/motion_track.h"
+#include "engine/math/monster_particle_random.h"
 
 // confidence=low: runs a seven-phase attack sequence for the paired actors: cues, animates the pair, and spawns projectiles.
 

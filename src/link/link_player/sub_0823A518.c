@@ -1,5 +1,5 @@
-#include "engine/shared/global.h"
-#include "engine/shared/area_effect_link.h"
+#include "global.h"
+#include "scene/area_effect/area_effect_link.h"
 struct L {
     u8 pad[0x5c];
     u8 arr[1];

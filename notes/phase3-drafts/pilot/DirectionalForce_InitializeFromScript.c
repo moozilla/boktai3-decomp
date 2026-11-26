@@ -1,5 +1,5 @@
-#include "directional_force.h"
-#include "monster_particle_random.h"
+#include "objects/hazards/directional_force.h"
+#include "engine/math/monster_particle_random.h"
 s32 Script_SeekToKeyword(s32);
 s32 Script_GetValue(void);
 static inline void readRanges(struct DirectionalForce *force)

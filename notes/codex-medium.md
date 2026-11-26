@@ -1594,7 +1594,7 @@ establish this family's ownership and provisional field meanings.
   options p/a/R/l/d/i/h/r/I/n/S/z/g/D/G/X/V, graphics 0x7E7D, resource
   0x922E/0x5184, initial active/inert states, optional terrain registration,
   scene-body setup and the delay list. Defaults and signed/narrow fields are
-  represented in include/monsters/vulcan_cannon/vulcan_cannon_worker.h, shared by this batch's new
+  represented in include/monsters/cannons/vulcan_cannon_worker.h, shared by this batch's new
   sources only. Uncertain fields retain offset names. Remaining: 23 differing
   instructions, six ignoring registers; switch bounds, position-pointer
   lifetime and explicit return-zero epilogue are the structural residue.

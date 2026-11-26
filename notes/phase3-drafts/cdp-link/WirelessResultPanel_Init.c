@@ -1,6 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
-#include "ram.h"
+#include "engine/ram.h"
 struct Blob {
     u32 words[8];
 };

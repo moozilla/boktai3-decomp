@@ -1,5 +1,5 @@
-#include "engine/shared/global.h"
-#include "engine/shared/input.h"
+#include "global.h"
+#include "engine/input.h"
 
 // confidence=low: cycles five auxiliary-animation debug modes on a key press.
 struct DebugPart {

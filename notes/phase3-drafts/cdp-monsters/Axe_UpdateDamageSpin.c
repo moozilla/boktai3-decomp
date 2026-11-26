@@ -1,7 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 
-#include "scene_actor_control_phase.h"
+#include "scene/actor/scene_actor_control_phase.h"
 void Sound_PlaySong(u32);
 void ActorShadow_Disable(void *);
 void ActorPhase_EmitTrailSprite(void *, void *, u32);

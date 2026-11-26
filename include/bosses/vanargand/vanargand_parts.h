@@ -1,11 +1,11 @@
 #ifndef GUARD_VANARGAND_PARTS_H
 #define GUARD_VANARGAND_PARTS_H
 
-#include "engine/shared/engine.h"
-#include "actors/paired_scene_actor/paired_scene_actor.h"
-#include "player/player_cue/player_cue_sequence.h"
-#include "engine/shared/vanargand_effect.h"
-#include "engine/shared/scene_actor_terrain.h"
+#include "engine/engine.h"
+#include "bosses/vanargand/paired_scene_actor.h"
+#include "player/cues/player_cue_sequence.h"
+#include "bosses/vanargand/vanargand_effect.h"
+#include "scene/actor/scene_actor_terrain.h"
 
 struct ContactPosition *Player_GetEffectivePosition(u32);
 void MotionTrack_Update(void *);

@@ -1,6 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
-#include "display_animation.h"
-#include "background_controller.h"
+#include "engine/video/display_animation.h"
+#include "effects/screen/background_controller.h"
 // Updates a dropped sprite only when its manager requests an animation tick.
 struct Render {
     u32 flags;

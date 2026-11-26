@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 extern u8 *gGameState;
 extern u32 gUnk_08E60F48[];
 u32 *GameState_GetUnlockDescriptor(u32 i)

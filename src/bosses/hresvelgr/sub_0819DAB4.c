@@ -1,7 +1,7 @@
 #include "bosses/hresvelgr/hresvelgr_travel.h"
 
-#include "engine/shared/ram.h"
-#include "engine/shared/player.h"
+#include "engine/ram.h"
+#include "player/player.h"
 
 // confidence=low: initial attack sequence before arena departure.
 

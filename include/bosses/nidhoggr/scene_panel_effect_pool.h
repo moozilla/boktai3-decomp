@@ -1,10 +1,10 @@
 #ifndef GUARD_SCENE_PANEL_EFFECT_POOL_H
 #define GUARD_SCENE_PANEL_EFFECT_POOL_H
-#include "engine/shared/engine.h"
-#include "actors/task_4_e01/contact_swarm_sprite.h"
-#include "engine/shared/display_sequence.h"
-#include "engine/shared/contact_collider.h"
-#include "player/player_cue/player_cue_sequence.h"
+#include "engine/engine.h"
+#include "effects/projectiles/contact_swarm_sprite.h"
+#include "engine/video/display_sequence.h"
+#include "scene/actor/contact_collider.h"
+#include "player/cues/player_cue_sequence.h"
 
 struct ScenePanelEffect;
 struct ScenePanelOwnedEffect {

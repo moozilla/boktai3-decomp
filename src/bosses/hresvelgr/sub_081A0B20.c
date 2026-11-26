@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 #include "bosses/hresvelgr/hresvelgr_travel.h"
 s32 Callback_InvokeActor(void *, void *);
 void Hresvelgr_GetTravelTarget(struct HresvelgrTravelActor *, struct SceneVec *);

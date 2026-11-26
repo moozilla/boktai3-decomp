@@ -1,4 +1,4 @@
-#include "engine/shared/state_actor_action_entry.h"
+#include "bosses/state_actor_action_entry.h"
 
 void sub_081A1D18(void *, int);
 

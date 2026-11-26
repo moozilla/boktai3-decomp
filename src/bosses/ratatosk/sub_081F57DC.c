@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 struct Ratatosk {
     u8 pad0[0x51];
     u8 angle;

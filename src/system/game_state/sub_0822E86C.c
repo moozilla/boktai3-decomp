@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 s32 GameState_GetUnlockEntry(u8 *);
 void sub_0822E764(u8 *, u8 *);
 void sub_0822E86C(u8 *p)

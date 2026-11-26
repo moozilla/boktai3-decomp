@@ -1,6 +1,6 @@
-#include "engine/shared/global.h"
-#include "engine/shared/render.h"
-#include "engine/shared/ram.h"
+#include "global.h"
+#include "engine/video/render.h"
+#include "engine/ram.h"
 #define ActorReaction_CommitRequestedState  Hresvelgr_ApplyRequestedAction
 #define ActorReaction_ResetFlagsAndDispatch Hresvelgr_UpdateBehaviorMode
 #define gActorUpdatePaused                  gEnginePauseFlags

@@ -1,4 +1,4 @@
-#include "armor_part_queue.h"
+#include "monsters/armor/armor_part_queue.h"
 
 void SpriteColliderGroup_ActivateParts(struct ArmorLaunchGroup *p, s32 requested)
 {

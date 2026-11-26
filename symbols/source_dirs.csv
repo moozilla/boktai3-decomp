@@ -1,0 +1,486 @@
+current_path,new_path,note
+src/actors/actor_ability,src/scene/actor/actor_ability.c,modifier-driven actor abilities shared by enemies and wireless objects
+src/actors/actor_animation_and_action_controllers,src/bosses/vampire,"vampire variant transitions, motion, recoil and timed effects (contiguous with Vampire_Create; called only by it); merge:src/actors/actor_damage_and_lifecycle src/actors/actor_graphics_and_basic_states src/actors/actor_projectile_and_reaction_controllers src/actors/contact_actor_pool_setup_and_display src/actors/contact_actor_pool_states_and_lifecycle src/actors/contact_swarm_states_and_spawning"
+src/actors/actor_animation_controller,src/npc/cutscene_actor,"script-driven cutscene actor: numbered animation phases, curves to position, fades (Actor_BeginAnimationPhase*)"
+src/actors/actor_attachment_manager,src/scene/actor/attachment,eight-slot attachment manager (docs/ACTOR_ATTACHMENT.md); merge:src/actors/scene_actor_attachment_responses
+src/actors/actor_controller,src/monsters/armor,Armor's motion/request/transition controller (called only by Armor; between Armor ROM blocks); merge:src/actors/actor_marker src/actors/actor_palette src/actors/scene_combat_actor src/actors/spinning_approach_motion src/monsters/armor
+src/actors/actor_damage_and_lifecycle,src/bosses/vampire,"the Vampire itself (Vampire_Create, GCL key D972 ヴァンパイア); merge:src/actors/actor_animation_and_action_controllers src/actors/actor_graphics_and_basic_states src/actors/actor_projectile_and_reaction_controllers src/actors/contact_actor_pool_setup_and_display src/actors/contact_actor_pool_states_and_lifecycle src/actors/contact_swarm_states_and_spawning"
+src/actors/actor_decision,src/bosses/sabata,"Sabata decision helper (0817BB54, inside the boss-slot-2 block); merge:src/actors/actor_impact src/actors/actor_position src/actors/actor_state src/actors/scene_event_actor src/bosses/boss_slot_2 src/field/scene_volume"
+src/actors/actor_display,src/bosses/vanargand,"GCL 6325 calls 6314, which creates registry 5856 with actor ID 7C56 (Vanargand). The head is on the left during Django’s bike chase."
+src/actors/actor_emitter,src/scene/actor/actor_emitter.c,"effect emitter attached to actors (glove, wireless battle)"
+src/actors/actor_glyph_trail,src/effects/sprites/glyph_trail.c,trail of glyph sprites behind an actor (player cues)
+src/actors/actor_graphics_and_basic_states,src/bosses/vampire,vampire drawable setup and basic animation states (08021EA8); merge:src/actors/actor_animation_and_action_controllers src/actors/actor_damage_and_lifecycle src/actors/actor_projectile_and_reaction_controllers src/actors/contact_actor_pool_setup_and_display src/actors/contact_actor_pool_states_and_lifecycle src/actors/contact_swarm_states_and_spawning
+src/actors/actor_impact,src/bosses/sabata,"Sabata hit/impact handling (08179B9C, start of the boss-slot-2 block); merge:src/actors/actor_decision src/actors/actor_position src/actors/actor_state src/actors/scene_event_actor src/bosses/boss_slot_2 src/field/scene_volume"
+src/actors/actor_marker,src/monsters/armor,Armor's marker sprite (called only by Armor and its controller); merge:src/actors/actor_controller src/actors/actor_palette src/actors/scene_combat_actor src/actors/spinning_approach_motion src/monsters/armor
+src/actors/actor_mode,src/scene/actor/actor_utilities.c,enemy animation init and terrain reachability helpers used by every monster family
+src/actors/actor_palette,src/monsters/armor,Armor palette controller (11 of 24 functions are Armor_*); merge:src/actors/actor_controller src/actors/actor_marker src/actors/scene_combat_actor src/actors/spinning_approach_motion src/monsters/armor
+src/actors/actor_particles,src/scene/actor/actor_particles.c,impact particle bursts shared by actors
+src/actors/actor_phase,src/monsters/axe,"Axe phase helper (080F8010, between the two Axe blocks); merge:src/monsters/axe"
+src/actors/actor_position,src/bosses/sabata,Sabata position search and targeting (0817A0FC); merge:src/actors/actor_decision src/actors/actor_impact src/actors/actor_state src/actors/scene_event_actor src/bosses/boss_slot_2 src/field/scene_volume
+src/actors/actor_projectile_and_reaction_controllers,src/bosses/vampire,"vampire projectiles, anchored reactions, destruction effects; merge:src/actors/actor_animation_and_action_controllers src/actors/actor_damage_and_lifecycle src/actors/actor_graphics_and_basic_states src/actors/contact_actor_pool_setup_and_display src/actors/contact_actor_pool_states_and_lifecycle src/actors/contact_swarm_states_and_spawning"
+src/actors/actor_recoil,src/minigames/coffin_bike,A 6274 ride hits the crates and executes the named recoil functions. The same state at idle does not enter the recoil code. ActorParticles_SpawnImpactBurst runs at frame 2276.
+src/actors/actor_state,src/bosses/sabata,Sabata state commands (0817B5C0); merge:src/actors/actor_decision src/actors/actor_impact src/actors/actor_position src/actors/scene_event_actor src/bosses/boss_slot_2 src/field/scene_volume
+src/actors/actor_status,src/bosses/vanargand,"timed status, contact and collider states of Vanargand's parts (081AFA28, between Vanargand blocks; called by Vanargand); merge:src/actors/paired_scene_actor src/bosses/vanargand src/bosses/vanargand_projectile src/effects/positioned_effect"
+src/actors/child_group,src/monsters/ivy,"child sprites of Ivy and Sword (called by Ivy, Sword, phase object); merge:src/actors/phase_object src/monsters/ivy"
+src/actors/common_scene_actor_controller,src/scene/actor/scene_actors.c,"shared controller for large combat actors: health, damage, animation setup (used by every boss, vampire, coffin, sun orb)"
+src/actors/contact_actor_pool_setup_and_display,src/bosses/vampire,vampire's sixteen-slot contact minions: display; merge:src/actors/actor_animation_and_action_controllers src/actors/actor_damage_and_lifecycle src/actors/actor_graphics_and_basic_states src/actors/actor_projectile_and_reaction_controllers src/actors/contact_actor_pool_states_and_lifecycle src/actors/contact_swarm_states_and_spawning
+src/actors/contact_actor_pool_states_and_lifecycle,src/bosses/vampire,vampire's contact minions: states and lifecycle; merge:src/actors/actor_animation_and_action_controllers src/actors/actor_damage_and_lifecycle src/actors/actor_graphics_and_basic_states src/actors/actor_projectile_and_reaction_controllers src/actors/contact_actor_pool_setup_and_display src/actors/contact_swarm_states_and_spawning
+src/actors/contact_burst_effects,src/bosses/nidhoggr,GCL key 917F. Dialogue in scene 4915 identifies the visible opponent as Nidhoggr (#7368). His defeat unlocks Book index 80 (#9918). Scene 6425 replays the fight.
+src/actors/contact_impact_effect,src/effects/contact_impact.c,impact effect at a contact point plus a scaling pop-in sprite (key F3E4)
+src/actors/contact_swarm_states_and_spawning,src/bosses/vampire,bat swarm spawned by the vampire (five-state sixteen-slot pool; called only from vampire code) guess; merge:src/actors/actor_animation_and_action_controllers src/actors/actor_damage_and_lifecycle src/actors/actor_graphics_and_basic_states src/actors/actor_projectile_and_reaction_controllers src/actors/contact_actor_pool_setup_and_display src/actors/contact_actor_pool_states_and_lifecycle
+src/actors/grid_attack_actor,src/bosses/nidhoggr,GCL key 917F. Dialogue in scene 4915 identifies the visible opponent as Nidhoggr (#7368). His defeat unlocks Book index 80 (#9918). Scene 6425 replays the fight.
+src/actors/keyframe_actor,src/player/appearance/keyframe_actor.c,keyframe-animated sprite owned by the player (only caller)
+src/actors/orbit_contact_actor,src/bosses/nidhoggr,GCL key 917F. Dialogue in scene 4915 identifies the visible opponent as Nidhoggr (#7368). His defeat unlocks Book index 80 (#9918). Scene 6425 replays the fight.
+src/actors/orbit_motion,src/scene/actor/motion_track.c,"orbit and timed position interpolation (used by Vanargand, vampire status, transitions)"
+src/actors/paired_scene_actor,src/bosses/vanargand,Vanargand's paired parts (PairedSceneActor + VanargandEffect); merge:src/actors/actor_status src/bosses/vanargand src/bosses/vanargand_projectile src/effects/positioned_effect
+src/actors/parameterized_motion_pool,src/scene/actor/actor_pool,sixteen configurable moving slots used by the pooled actor controllers; merge:src/actors/pooled_actor_controllers src/actors/pooled_actor_manager src/actors/pooled_actor_shared_helpers
+src/actors/phase_object,src/monsters/ivy,"Ivy's color-pulse phase object (080F2700, between the two Ivy blocks); merge:src/actors/child_group src/monsters/ivy"
+src/actors/pooled_actor_controllers,src/scene/actor/actor_pool,controllers for the pooled actor list; merge:src/actors/parameterized_motion_pool src/actors/pooled_actor_manager src/actors/pooled_actor_shared_helpers
+src/actors/pooled_actor_manager,src/scene/actor/actor_pool,intrusive pooled actor list (ActorPool); merge:src/actors/parameterized_motion_pool src/actors/pooled_actor_controllers src/actors/pooled_actor_shared_helpers
+src/actors/pooled_actor_shared_helpers,src/scene/actor/actor_pool,"facing, health and target helpers for pooled actors; merge:src/actors/parameterized_motion_pool src/actors/pooled_actor_controllers src/actors/pooled_actor_manager"
+src/actors/pursuing_actor,src/effects/projectiles/pursuing_actor.c,pursuing slash/swoosh projectile effect
+src/actors/registry_a8_cb,src/npc/sabata_rider,Proc 6316 creates A8CB in the Sabata ending branch. The purple bike is on screen alongside Django’s separate E881 bike. The dialogue lookup names Sabata (#5585).
+src/actors/route_sprite_actor_pool,src/scene/actor/route_sprite_actor,four-slot sprite actors that follow routes
+src/actors/scene_actor_14,src/effects/sprites/sprite_effect,"shared animated sprite effects of actor category 14 (bursts, groups, particles)"
+src/actors/scene_actor_animation_and_scripted_actions,src/npc/manager,"NPC terrain, path nodes, directional animation, scripted actions; merge:src/actors/scene_actor_manager src/actors/scene_actor_resources_and_lifecycle"
+src/actors/scene_actor_animation_selection,src/scene/actor/animation,directional animation selection for registry actors; merge:src/actors/scene_actor_palettes_and_scripts
+src/actors/scene_actor_attachment_responses,src/scene/actor/attachment,how actors respond to attachments; merge:src/actors/actor_attachment_manager
+src/actors/scene_actor_behavior,src/scene/actor/behavior,"generic monster behaviors (routes, reactions, targeting); merge:src/actors/scene_actor_behavior_dispatch src/actors/scene_actor_motion_and_updates"
+src/actors/scene_actor_behavior_dispatch,src/scene/actor/behavior,behavior dispatch and acceleration descriptors; merge:src/actors/scene_actor_behavior src/actors/scene_actor_motion_and_updates
+src/actors/scene_actor_collision_setup,src/scene/actor/placement,collider and receiver setup for registry actors; merge:src/actors/scene_actor_placement src/actors/scene_actor_placement_and_feedback src/actors/scene_actor_terrain_targets_and_effects src/actors/scene_actor_terrain_transitions
+src/actors/scene_actor_contact_candidates,src/scene/actor/reaction,contact candidate list and selection; merge:src/actors/scene_actor_reaction src/actors/scene_actor_reaction_callbacks src/actors/scene_actor_target_and_contact_control
+src/actors/scene_actor_control_phases,src/scene/actor/control,shared control phases of registry actors; merge:src/actors/scene_actor_slot_controller src/actors/scene_actor_visibility_and_stored_motion
+src/actors/scene_actor_manager,src/npc/manager,NPC/scene actor manager task; merge:src/actors/scene_actor_animation_and_scripted_actions src/actors/scene_actor_resources_and_lifecycle
+src/actors/scene_actor_motion_and_updates,src/scene/actor/behavior,"pending flags, animation and route motion; merge:src/actors/scene_actor_behavior src/actors/scene_actor_behavior_dispatch"
+src/actors/scene_actor_pair_records,src/scene/actor/registry,keyed actor pair records; merge:src/actors/scene_actor_profiles src/actors/scene_actor_registry_lifecycle src/actors/scene_actor_registry_manager src/actors/scene_actor_registry_queries src/actors/scene_actor_terrain_reactions
+src/actors/scene_actor_palettes_and_scripts,src/scene/actor/animation,palette transitions and script properties of registry actors; merge:src/actors/scene_actor_animation_selection
+src/actors/scene_actor_placement,src/scene/actor/placement,actor placement; merge:src/actors/scene_actor_collision_setup src/actors/scene_actor_placement_and_feedback src/actors/scene_actor_terrain_targets_and_effects src/actors/scene_actor_terrain_transitions
+src/actors/scene_actor_placement_and_feedback,src/scene/actor/placement,"placement reset, shake and category sounds; merge:src/actors/scene_actor_collision_setup src/actors/scene_actor_placement src/actors/scene_actor_terrain_targets_and_effects src/actors/scene_actor_terrain_transitions"
+src/actors/scene_actor_profiles,src/scene/actor/registry,per-kind actor profile table used by every monster; merge:src/actors/scene_actor_pair_records src/actors/scene_actor_registry_lifecycle src/actors/scene_actor_registry_manager src/actors/scene_actor_registry_queries src/actors/scene_actor_terrain_reactions
+src/actors/scene_actor_reaction,src/scene/actor/reaction,reaction states; merge:src/actors/scene_actor_contact_candidates src/actors/scene_actor_reaction_callbacks src/actors/scene_actor_target_and_contact_control
+src/actors/scene_actor_reaction_callbacks,src/scene/actor/reaction,reaction callbacks; merge:src/actors/scene_actor_contact_candidates src/actors/scene_actor_reaction src/actors/scene_actor_target_and_contact_control
+src/actors/scene_actor_registry_lifecycle,src/scene/actor/registry,actor registry lifecycle; merge:src/actors/scene_actor_pair_records src/actors/scene_actor_profiles src/actors/scene_actor_registry_manager src/actors/scene_actor_registry_queries src/actors/scene_actor_terrain_reactions
+src/actors/scene_actor_registry_manager,src/scene/actor/registry,actor registry manager; merge:src/actors/scene_actor_pair_records src/actors/scene_actor_profiles src/actors/scene_actor_registry_lifecycle src/actors/scene_actor_registry_queries src/actors/scene_actor_terrain_reactions
+src/actors/scene_actor_registry_queries,src/scene/actor/registry,actor registry queries; merge:src/actors/scene_actor_pair_records src/actors/scene_actor_profiles src/actors/scene_actor_registry_lifecycle src/actors/scene_actor_registry_manager src/actors/scene_actor_terrain_reactions
+src/actors/scene_actor_resources_and_lifecycle,src/npc/manager,"NPC resource lookup, allocation, destruction; merge:src/actors/scene_actor_animation_and_scripted_actions src/actors/scene_actor_manager"
+src/actors/scene_actor_sequence,src/npc/actor_sequence.c,script-started multi-step actor sequence (SceneActorSequence_CreateFromScript)
+src/actors/scene_actor_slot_controller,src/scene/actor/control,eight-slot actor controller; merge:src/actors/scene_actor_control_phases src/actors/scene_actor_visibility_and_stored_motion
+src/actors/scene_actor_target_and_contact_control,src/scene/actor/reaction,target resolution and contact ownership; merge:src/actors/scene_actor_contact_candidates src/actors/scene_actor_reaction src/actors/scene_actor_reaction_callbacks
+src/actors/scene_actor_terrain_reactions,src/scene/actor/registry,registry terrain reactions (script command); merge:src/actors/scene_actor_pair_records src/actors/scene_actor_profiles src/actors/scene_actor_registry_lifecycle src/actors/scene_actor_registry_manager src/actors/scene_actor_registry_queries
+src/actors/scene_actor_terrain_targets_and_effects,src/scene/actor/placement,terrain scans and route positions; merge:src/actors/scene_actor_collision_setup src/actors/scene_actor_placement src/actors/scene_actor_placement_and_feedback src/actors/scene_actor_terrain_transitions
+src/actors/scene_actor_terrain_transitions,src/scene/actor/placement,neighbor cells and slopes; merge:src/actors/scene_actor_collision_setup src/actors/scene_actor_placement src/actors/scene_actor_placement_and_feedback src/actors/scene_actor_terrain_targets_and_effects
+src/actors/scene_actor_visibility_and_stored_motion,src/scene/actor/control,visibility oscillation and stored positions; merge:src/actors/scene_actor_control_phases src/actors/scene_actor_slot_controller
+src/actors/scene_character,src/npc/story_character,story characters placed and commanded by script (SceneCharacter); merge:src/actors/scripted_message_actor_08612344 src/actors/state_actor_kind_086121_c4
+src/actors/scene_combat_actor,src/monsters/armor,Armor combat categories and overlay (called by Armor); merge:src/actors/actor_controller src/actors/actor_marker src/actors/actor_palette src/actors/spinning_approach_motion src/monsters/armor
+src/actors/scene_event_actor,src/bosses/sabata,"Sabata event actor (0817E378, BossSlot2 calls); merge:src/actors/actor_decision src/actors/actor_impact src/actors/actor_position src/actors/actor_state src/bosses/boss_slot_2 src/field/scene_volume"
+src/actors/scene_npc,src/npc/scripted_npc,scripted NPC created and commanded by scenes (SceneNpc)
+src/actors/scene_object_controller,src/objects/scene_objects,scene object slots and script handlers (SceneObjects_Script*); merge:src/field/scene_objects
+src/actors/scene_pooled_motion_and_actor_controls,src/link/wireless/battle,ScenePool: four player slots with cruise steering in the wireless battle; merge:src/link/wireless_game_items_and_display src/link/wireless_scene_objects
+src/actors/script_actor,src/player/script,"script commands that drive the player in cutscenes (stand, kneel, aim, shoot, set stats)"
+src/actors/script_combat_actor,src/monsters/muspell_head,GCL 3991 → 1604 → 1606 creates key 5153. Book index 31 (#9869). The head in package 7E7D is visible next to Django after moving the player onto the neighboring tile.
+src/actors/scripted_message_actor_08612344,src/npc/story_character,story-character state table that waits on scene messages; merge:src/actors/scene_character src/actors/state_actor_kind_086121_c4
+src/actors/sequence_contact_actor_pool,src/bosses/nidhoggr,GCL key 917F. Dialogue in scene 4915 identifies the visible opponent as Nidhoggr (#7368). His defeat unlocks Book index 80 (#9918). Scene 6425 replays the fight.
+src/actors/singleton_slot_7,src/bosses/vanargand,"GCL 6325 calls 6314, which creates registry 5856 with actor ID 7C56 (Vanargand). The head is on the left during Django’s bike chase."
+src/actors/spinning_approach_motion,src/monsters/armor,Armor spinning approach (between Armor ROM blocks); merge:src/actors/actor_controller src/actors/actor_marker src/actors/actor_palette src/actors/scene_combat_actor src/monsters/armor
+src/actors/state_actor_kind_086121_c4,src/npc/story_character,96-state animation table of story characters (StateActor); merge:src/actors/scene_character src/actors/scripted_message_actor_08612344
+src/actors/steering_actor_pool,src/scene/actor/steering_actor,steering sprite actors used by bosses and scene volumes
+src/actors/tagged_scene_npc,src/npc/tagged_npc,scripted NPC variant with tags zero/one (TaggedSceneNpc)
+src/actors/task_4_e01,src/effects/projectiles/projectile,projectile task with trail sprites and impacts (key 4E01); merge:src/effects/projectile src/effects/timed_effect
+src/bosses/boss_slot_2,src/bosses/sabata,"the slot-2 boss; the boss list is フレスベルグ, サバタ, ニーズホッグ, ラタトスク, ヴァナルガンド and the other four are named guess; merge:src/actors/actor_decision src/actors/actor_impact src/actors/actor_position src/actors/actor_state src/actors/scene_event_actor src/field/scene_volume"
+src/bosses/hresvelgr,src/bosses/hresvelgr,"Hresvelgr (フレスベルグ), the eagle boss"
+src/bosses/nidhoggr,src/bosses/nidhoggr,"Nidhoggr (ニーズホッグ), the dragon boss; merge:src/effects/large_scene_animation_controller"
+src/bosses/ratatosk,src/bosses/ratatosk,Ratatosk (ラタトスク)
+src/bosses/vanargand,src/bosses/vanargand,"Vanargand (ヴァナルガンド), the wolf boss; merge:src/actors/actor_status src/actors/paired_scene_actor src/bosses/vanargand_projectile src/effects/positioned_effect"
+src/bosses/vanargand_projectile,src/bosses/vanargand,Vanargand projectiles and afterimages; merge:src/actors/actor_status src/actors/paired_scene_actor src/bosses/vanargand src/effects/positioned_effect
+src/effects/animated_particles,src/effects/particles/groups,animated particle manager; merge:src/effects/fading_particle_groups src/effects/fragment_groups src/effects/particle_groups
+src/effects/background_controllers,src/effects/screen/background_controller.c,scripted background layers and scrolling backgrounds
+src/effects/ballistic_sprite_effect,src/effects/sprites/ballistic_sprite_effect.c,ballistic sprite effect
+src/effects/bg1_flash_and_scrolling_controller,src/effects/screen/background_flash,BG1 flash and dual-page scrolling (BackgroundFlash)
+src/effects/buffered_animation_task,src/effects/palette/palette_effect.c,buffered palette effect (PaletteEffect)
+src/effects/charged_burst,src/effects/bursts/charged_burst,charged burst
+src/effects/circular_scanline_window,src/effects/screen/circle_window,circular window drawn with scanlines (CircleWindow)
+src/effects/color_and_fade_controller,src/effects/palette/color_fade_controller.c,color interpolation and fade queue
+src/effects/debris_particles,src/effects/particles/debris_particles.c,debris particles
+src/effects/directional_effect,src/effects/directional_effect,directional effect around the player
+src/effects/directional_particles,src/effects/particles,directional particles (two files)
+src/effects/directional_sprite_effect,src/effects/sprites/directional_sprite_effect.c,directional sprite effect
+src/effects/effect_emitter,src/effects/particles/effect_emitter.c,generic effect emitter
+src/effects/effect_part,src/effects/scene/effect_part,effect parts and groups attached to actors
+src/effects/explosion,src/effects/bursts/explosion.c,explosion
+src/effects/fading_particle_groups,src/effects/particles/groups,fading particle groups; merge:src/effects/animated_particles src/effects/fragment_groups src/effects/particle_groups
+src/effects/feather_effect_pool,src/effects/feathers,falling feather sprites
+src/effects/five_entry_projected_display,src/effects/sprites/projected_display.c,five animations projected onto the ground
+src/effects/five_slot_burst_emitter,src/effects/particles/burst_emitter,five-slot burst emitter
+src/effects/floating_item_effects,src/effects/floating_item_effect.c,bobbing item sprite and its collection animation
+src/effects/following_sprite_effect,src/player/core/player_core.c,"the player's facing, animation and screen-mote code (0813ADC4, Player_*), misfiled under effects"
+src/effects/four_effect_center_controller,src/effects/orbits/converging_effects.c,four effects converging on a center
+src/effects/fragment_burst,src/effects/bursts/fragment_burst,fragment burst
+src/effects/fragment_effect,src/effects/bursts/fragment_effect,fragment effect
+src/effects/fragment_groups,src/effects/particles/groups,fragment particle groups; merge:src/effects/animated_particles src/effects/fading_particle_groups src/effects/particle_groups
+src/effects/frost_emitter,src/effects/particles/frost_emitter.c,frost particle emitter
+src/effects/hardware_blend_transitions,src/effects/screen/blend_transition.c,hardware alpha-blend transitions
+src/effects/health_burst_effect,src/effects/healing,health burst effect; merge:src/effects/health_restore_effect
+src/effects/health_restore_effect,src/effects/healing,health restore effect; merge:src/effects/health_burst_effect
+src/effects/homing_and_orbiting_effects,src/effects/orbits/homing_effect.c,homing and orbiting particles
+src/effects/homing_projectile,src/effects/projectiles/homing_projectile,homing projectile
+src/effects/large_fragment_effect,src/effects/bursts/large_fragment_effect.c,large fragment effect
+src/effects/large_scene_animation_controller,src/bosses/nidhoggr,Nidhoggr's large animation controller (114 of 159 functions are Nidhoggr_*); merge:src/bosses/nidhoggr
+src/effects/link_effect,src/effects/link_effect.c,orbiting hazard linked between two points
+src/effects/linked_effect,src/effects/bursts/linked_effect,linked fragment projectiles
+src/effects/moving_tile_particles,src/effects/particles/spark_particles,spark particles (SparkParticle)
+src/effects/orbit_background_controller,src/effects/screen/orbit_background,camera-relative orbiting BG1 projection
+src/effects/orbit_effect,src/effects/orbits/orbit_effect,orbit effect
+src/effects/orbiting_particles,src/effects/orbits/orbiting_particles.c,orbiting particles
+src/effects/pal_fade,src/system/game_state,challenge records and best ranks (GameState_*) with a palette fade task; merge:src/system/game_state
+src/effects/palette_controllers,src/effects/palette/palette_controller.c,palette blending and brightness tasks and script handlers
+src/effects/palette_cycling,src/effects/palette/palette_cycle.c,palette cycling
+src/effects/palette_fade,src/effects/palette/palette_fade.c,palette fade with scanline scroll
+src/effects/palette_frame_cycling,src/effects/palette/palette_frames.c,seven-frame palette cycling
+src/effects/palette_level_transitions,src/effects/palette/palette_level_transitions.c,palette channel level transitions
+src/effects/palette_sets,src/effects/palette,palette sets (two files)
+src/effects/palette_transition,src/ui/books/monster_book,"Monster Book display and palette transitions (BestiaryDisplay_Create, 081D374C just before the Bestiary); merge:src/menus/bestiary src/menus/monster_book"
+src/effects/particle_burst,src/effects/particles/particle_burst,"particle burst, moving glyphs, rising puffs"
+src/effects/particle_burst_effect,src/effects/particles,particle burst and following sprite effects (two files)
+src/effects/particle_effect,src/effects/particles/particle_effect,particle effect
+src/effects/particle_emitter,src/effects/particles/particle_emitter.c,particle emitter
+src/effects/particle_groups,src/effects/particles/groups,particle group manager; merge:src/effects/animated_particles src/effects/fading_particle_groups src/effects/fragment_groups
+src/effects/positioned_effect,src/bosses/vanargand,"Vanargand positioned effect (081A6104, between Vanargand blocks); merge:src/actors/actor_status src/actors/paired_scene_actor src/bosses/vanargand src/bosses/vanargand_projectile"
+src/effects/presentation,src/ui/pause/presentation.c,pause-menu graphic presentation and text labels
+src/effects/projected_ground_effects,src/effects/scene/ground_effect.c,world-positioned ground effects
+src/effects/projectile,src/effects/projectiles/projectile,projectile configuration and impacts; merge:src/actors/task_4_e01 src/effects/timed_effect
+src/effects/projectile_pool,src/effects/projectiles/projectile_pool,projectile pool and configurations
+src/effects/radial_burst_effect,src/effects/bursts/radial_burst,radial burst
+src/effects/registry_6_a37,src/effects/screen/magic_cannon_departure.c,Warp to 4924 at entrance 57. Proc 4928 hides the ship sprites and creates 6A37 before the space flight. The scrolling sky is visible during its update.
+src/effects/repeated_effects,src/effects/scene/repeated_effect,eight-entry repeated effect manager
+src/effects/scaled_shadows,src/effects/shadows,scaled shadow sprites; merge:src/effects/shadow_registry src/field/terrain_shadows
+src/effects/scanline_presentation,src/effects/screen/scanline_presentation.c,scanline animation with six display layers
+src/effects/scanline_wave_distortion,src/effects/screen/scanline_wave.c,scanline wave distortion
+src/effects/scene_arc_slot_effects,src/effects/scene/scene_arc.c,eight-slot arc effects
+src/effects/scene_collider_effect,src/effects/scene/collider_effect,effects with colliders
+src/effects/scene_effect,src/effects/scene/scene_effect.c,scene effect and shadow actor
+src/effects/scene_effect_queue,src/effects/scene/scene_effect_queue.c,scene effect request queue
+src/effects/scene_particle,src/effects/particles/particle_effect_pool.c,scripted collider particles
+src/effects/scene_particle_pools,src/effects/particles/scene_particle_pool,scene particle pools and bursts
+src/effects/scene_presentation_commands,src/effects/screen/scene_presentation_commands.c,effect palette fade and blend command handlers
+src/effects/scene_projectile,src/effects/projectiles/scene_projectile.c,scene projectile pool
+src/effects/scene_scheduled_effect,src/effects/scene,scheduled effects and sprite notices (two files)
+src/effects/scheduled_scene_effects,src/effects/scene/scene_effect_schedule.c,twelve-entry effect schedule
+src/effects/screen_orbit_effect,src/effects/orbits/screen_orbit_effect,screen-space orbit effect and explosion sprites
+src/effects/scripted_display_tracks,src/effects/sprites/display_track,script-controlled animation tracks
+src/effects/scripted_particle,src/effects/particles/scripted_particle,"scripted particles, burst sparks, status indicator"
+src/effects/scripted_presentation,src/effects/screen/presentation,scripted full-screen presentation; merge:src/effects/timed_presentation
+src/effects/shadow_registry,src/effects/shadows,shadow registry; merge:src/effects/scaled_shadows src/field/terrain_shadows
+src/effects/shared_display_animation_wrapper,src/engine/video/display_animation.c,shared sequence/keyframe display playback
+src/effects/sparkle_emitter,src/effects/particles/sparkle_emitter.c,sparkle emitter
+src/effects/spiral_burst,src/effects/bursts/spiral_burst,spiral burst
+src/effects/sprite_effect_controllers,src/effects/sprites/sprite_effect_controller,24-entry sprite effect controllers
+src/effects/sprite_particle,src/effects/particles/sprite_particle,sprite particles
+src/effects/sprite_projectile,src/effects/projectiles/sprite_projectile,sprite projectile
+src/effects/sprite_trail,src/bosses/vanargand,"GCL 6325 calls 6314, which creates registry 5856 with actor ID 7C56 (Vanargand). The head is on the left during Django’s bike chase."
+src/effects/staged_sprite_effect,src/effects/sprites/staged_effect.c,five-sprite scripted effect
+src/effects/sun_disc_pool,src/effects/sun_discs,sun disc sprites
+src/effects/temporary_animation_pool,src/effects/sprites/temporary_animation_pool.c,temporary animations
+src/effects/timed_effect,src/effects/projectiles/projectile,"timed effect of the projectile task (081DA048, inside its block); merge:src/actors/task_4_e01 src/effects/projectile"
+src/effects/timed_presentation,src/effects/screen/presentation,timed presentation; merge:src/effects/scripted_presentation
+src/effects/timed_sprite,src/effects/projectiles/timed_sprite,timed sprites and directional projectiles
+src/effects/transient_sprite_effects,src/effects/sprites/transient_sprite_effects,sixteen transient sprite effects
+src/engine/anim,src/engine/video/anim,sprite animation data and widgets
+src/engine/bg,src/engine/video/background_layers.c,background layers
+src/engine/bg_gfx,src/engine/video/background_tilemap.c,background tile maps
+src/engine/camera,src/scene/camera,the field camera
+src/engine/character_model,src/player/appearance,"Django's five-part character model, palettes and stats config"
+src/engine/clock_events,src/system/clock,clock-based script events; merge:src/system/clock_and_sun_schedule src/system/time src/system/time_palette_transitions
+src/engine/collider,src/scene/collision/collider.c,colliders
+src/engine/game_entry_point,src/engine,AgbMain and the boot helper (two files)
+src/engine/heap_and_memory_operations,src/engine/heap_memory.c,heap and memory operations
+src/engine/interrupts_and_video,src/engine/video,"interrupts, video and sprites (two files)"
+src/engine/iwram_arm_code,src/engine/iwram_code.c,ARM code copied to IWRAM
+src/engine/message_queue,src/engine/message_queue.c,double-buffered message queue
+src/engine/music_player_slots,src/engine/sound,game-side sound: song and fade wrappers over the m4a driver; merge:src/engine/scene_audio_events
+src/engine/nav_mesh,src/scene/terrain/nav_mesh.c,navigation mesh
+src/engine/palette,src/engine/video/palette,palette buffers and uploads
+src/engine/registry_e7_bc,src/scene/collision/collision_manager.c,"collision overlap dispatch and collider manager, then a twelve-entry script object pool and result counters (key E7BC)"
+src/engine/resource_registry,src/engine/resource_registry.c,resource registry
+src/engine/runtime_input_and_utilities,src/engine,"button polling, string hash, task system init"
+src/engine/scalar_and_vector_interpolation,src/engine/math,"scalar approach, angle wrap and vector helpers"
+src/engine/scanline_effect,src/engine/video/animation_widget.c,blend and animation widget helpers
+src/engine/scene_audio_events,src/engine/sound,event-to-song dispatcher; merge:src/engine/music_player_slots
+src/engine/scene_body,src/scene/collision/body,physical bodies of scene actors
+src/engine/scene_grid_queries,src/scene/terrain/grid,eight-by-ten terrain-relative board
+src/engine/scene_lifecycle,src/scene/lifecycle,"scene load, reset and teardown"
+src/engine/scene_message_controller,src/script/demo_manager.c,"the Demo Manager (デモマネージャ, key 4E69): runs cutscene message scripts"
+src/engine/scene_range_watcher,src/scene/range_watch.c,signed range transitions with script callbacks
+src/engine/scene_state_and_spatial_queries,src/scene/state,scene runtime fields and spatial filters
+src/engine/scene_stimulus,src/scene/collision/stimulus,stimulus regions and exclusions
+src/engine/script,src/script/runtime,"saved script variables, scheduling, session defaults"
+src/engine/script_entry_selector,src/script/script_selector.c,script-entry selector task
+src/engine/script_keyframe_pool,src/script/script_keyframe_pool.c,script-created keyframe sprites
+src/engine/script_options,src/script/script_options.c,"script options, game flags, modifiers"
+src/engine/script_record,src/script/script_record.c,script records and stat modifiers
+src/engine/script_utility_references,src/script/script_utility.c,script flag and operand helpers (Random etc.)
+src/engine/script_virtual_machine,src/script/script_virtual_machine.c,the GCL interpreter (MGS-derived script VM)
+src/engine/scripted_key_trigger,src/script/key_trigger,key-mask trigger tasks that post script messages
+src/engine/spatial_index,src/scene/collision/spatial_index.c,spatial index
+src/engine/sprite_component,src/engine/video/sprite_component,sprite components and proximity volumes
+src/engine/sprite_oam,src/engine/video/sprite_oam.c,OAM
+src/engine/sprite_pool,src/engine/video/sprite_pool.c,sixteen-slot sprite pool
+src/engine/task_scheduler,src/engine/task_scheduler.c,task scheduler (fourteen priority lists)
+src/engine/terrain,src/scene/terrain/terrain.c,terrain cells and modifiers
+src/engine/text,src/engine/video,"font tile uploads, scanline effects, mosaic (two files)"
+src/engine/tile_animation,src/engine/video/tile_animation.c,eight-channel tile animation
+src/field/actor_group,src/objects/actor_group,"scripted actor groups (ActorGroup, Pool184); merge:src/other/callback_pool"
+src/field/animated_hazards,src/objects/hazards/animated_hazard.c,"warning, attack, hold and retract hazards"
+src/field/animated_tile,src/objects/animated_tile.c,animated tiles
+src/field/bouncing_object_pool,src/objects/bouncing_object,bouncing physics objects
+src/field/breakable_barriers,src/objects/bat_curtain,"breakable barrier and the Bat Curtain (コウモリカーテン, BatCurtain_Create)"
+src/field/breakable_props,src/objects/breakable_prop,breakable props
+src/field/cell_traversal_gates,src/objects/cell_gate,cell gates that constrain player traversal
+src/field/collectible,src/objects/items/collectible,collectibles
+src/field/collision_controllers,src/objects/collision_controller.c,collision-triggered animations
+src/field/damage_controller,src/objects/hazards/damage_controller.c,damage controller
+src/field/directional_force_controller,src/objects/hazards/directional_force,scripted pushing force
+src/field/directional_interaction_controllers,src/objects/directional_controller.c,facing and input gates for interactions
+src/field/falling_objects,src/objects/hazards/falling_objects.c,falling objects
+src/field/floor_switch,src/objects/floor_switch,floor switch
+src/field/group_objects,src/effects/scene/bat_flock.c,"The stock ROM draws a purple bat flock after a debugger call to the registered constructor and launch handler. Sprite package DA6D. The only constructor pointer is registry entry E534, absent from the GCX body. No shipped kind 10 cutscene packet sends any of its four commands."
+src/field/hit_switch,src/objects/hit_switch.c,switch activated by hitting it
+src/field/interaction_marker,src/objects/markers/interaction_marker,proximity interaction marker
+src/field/items_and_containers,src/objects/items/item_container.c,dropped items and opening containers
+src/field/named_object,src/objects/named_object,"objects addressed by script name, with routes and speeds"
+src/field/native_effect,src/effects/particles/native_effect,native particles; merge:src/field/scene_debris
+src/field/pooled_interactables,src/objects/breakable.c,script-created breakables with timeouts
+src/field/proximity_actor,src/objects/region_actor.c,region and proximity actors
+src/field/proximity_icon,src/objects/markers/proximity_icon.c,icon shown near an object
+src/field/proximity_particle_emitter,src/effects/particles/proximity_emitter,particles emitted near an owner
+src/field/rectangular_area_effects,src/scene/area_effect,rectangular areas that change terrain values and resource gain
+src/field/roaming_objects,src/objects/roaming_object.c,wandering objects
+src/field/saved_position_marker,src/objects/markers/saved_position_marker,marker at a stored position
+src/field/scene_debris,src/effects/particles/native_effect,native effects and scene debris; merge:src/field/native_effect
+src/field/scene_objects,src/objects/scene_objects,scene object manager (SceneObjects_CreateFromScript); merge:src/actors/scene_object_controller
+src/field/scene_script_object,src/objects,scripted dungeon prop and its orbit motion (two files)
+src/field/scene_volume,src/bosses/sabata,"Sabata scene volumes (0817A900 and 0817D67C, interleaved with the boss-slot-2 code); merge:src/actors/actor_decision src/actors/actor_impact src/actors/actor_position src/actors/actor_state src/actors/scene_event_actor src/bosses/boss_slot_2"
+src/field/ship_wheel,src/objects/ship_wheel.c,"ship wheel that slides open, plus scripted falling and movement sequences"
+src/field/solar_bomb,src/objects/solar_bomb,solar bomb
+src/field/sprite_drop,src/objects/items/sprite_drop,dropped sprites
+src/field/stacked_actor,src/objects/warp_circle,"the Warp Circle (ワープ魔方陣, StackedActor_CreateFromScript)"
+src/field/stored_resource_station,src/objects/solar_stand,"the Solar Stand (太陽スタンド, ResourceStation_CreateFromScript)"
+src/field/sun_orb,src/objects/sun_orb,sun orbs
+src/field/terrain_edge_markers,src/scene/terrain/edge_marker,terrain edge markers
+src/field/terrain_modifiers,src/scene/terrain,terrain modifiers (two files)
+src/field/terrain_overlays,src/scene/terrain,terrain overlays (two files)
+src/field/terrain_shadows,src/effects/shadows,actor shadows on terrain; merge:src/effects/scaled_shadows src/effects/shadow_registry
+src/field/tether_actor,src/objects/coffin,"the coffin Django drags on a chain (棺桶, key 0B50, TetherActor)"
+src/field/tile_trigger,src/objects/tile_trigger.c,tile triggers
+src/field/timed_hazard,src/objects/hazards/timed_hazard,timed hazard
+src/field/trap,src/scene/terrain/path,"paths and routes (Path_*; ""trap"" was a misnomer)"
+src/field/weather_and_storm_controller,src/effects/weather,weather and storms
+src/field/wooden_crate,src/objects/wooden_crate,wooden crate (木箱)
+src/lib/eeprom,src/lib/eeprom,EEPROM SDK
+src/lib/libc,src/lib/libc,newlib pieces
+src/lib/libgcc,src/lib/libgcc,libgcc runtime
+src/lib/libm,src/lib/libm,fdlibm
+src/lib/m4a,src/lib/m4a,MP2K sound driver
+src/lib/rfu,src/lib/rfu,RFU wireless SDK
+src/lib/rtc,src/lib/rtc,SIIRTC real-time clock
+src/link/encoded_records_and_password_payloads,src/link/encoded_records,six-bit record formats for passwords and record exchange
+src/link/link_handshake,src/link/handshake,link handshake and connection monitoring
+src/link/link_menu,src/link/link_menu,link menu
+src/link/link_panel,src/link/link_panel,"link panel (LinkPanel_Create, key F246); merge:src/link/registry_f246"
+src/link/link_player,src/link/link_player,the other player's avatar in link play
+src/link/link_record_panel,src/link/records,link record panel; merge:src/menus/record_panel
+src/link/link_score_panel,src/link/score_panel,link score panel
+src/link/link_selection,src/link/link_selection,link selection menu
+src/link/link_session,src/link/session,link session state machine; merge:src/link/registry_1745
+src/link/registry_1745,src/link/session,link session controller and handshake requests (Registry1745_Create); merge:src/link/link_session
+src/link/registry_33_ff,src/link/lobby,"link lobby panel (LinkLobbyPanel_Create, key 33FF); merge:src/menus/record_menu"
+src/link/registry_f246,src/link/link_panel,link panel resources and slot frames (key F246 = LinkPanel_Create); merge:src/link/link_panel
+src/link/rfu_manager,src/link/wireless/rfu_manager,RFU manager
+src/link/serial,src/link/serial,cable link protocol
+src/link/wireless_connection_controller,src/link/wireless/connection,wireless connection controller
+src/link/wireless_exit_task,src/link/wireless/wireless_exit.c,wireless exit task
+src/link/wireless_game_items_and_display,src/link/wireless/battle,"wireless battle game: items, health, display; merge:src/actors/scene_pooled_motion_and_actor_controls src/link/wireless_scene_objects"
+src/link/wireless_link_indicator,src/link/wireless/link_indicator.c,wireless link indicator
+src/link/wireless_packet_exchange,src/link/wireless/packet_exchange,wireless packet exchange
+src/link/wireless_peer_panel,src/link/wireless/peer_panel.c,wireless peer panel
+src/link/wireless_result_panel,src/link/wireless/result_panel,wireless result panel
+src/link/wireless_scene_objects,src/link/wireless/battle,four scene slots of the wireless battle (ScenePool); merge:src/actors/scene_pooled_motion_and_actor_controls src/link/wireless_game_items_and_display
+src/link/wireless_status_menu,src/link/wireless/status_menu.c,wireless status menu
+src/link/wireless_text_encoding,src/link/wireless/wireless_text.c,wireless character table
+src/link/wireless_trade_and_selection_menu,src/link/wireless/trade_menu,wireless game and trade menus
+src/menus/bestiary,src/ui/books/monster_book,Bestiary unlocks (the Monster Book's data); merge:src/effects/palette_transition src/menus/monster_book
+src/menus/challenge_menu,src/ui/results/challenge_menu.c,challenge menu
+src/menus/choice_menu,src/ui/dialogue,choice menu (two files)
+src/menus/collection,src/ui/books/collection,collection book entries; merge:src/menus/collection_menu
+src/menus/collection_menu,src/ui/books/collection,collection menu; merge:src/menus/collection
+src/menus/control_panel,src/minigames/dark_generator.c,The overdue-debt path starts proc 1001. Proc 1003 creates key B3D1 and explains the Dark Generator. The work gauge and treadmill move during input.
+src/menus/countdown_controller,src/ui/hud,countdown tick task
+src/menus/countdown_timer,src/ui/hud,countdown timer
+src/menus/dark_loan,src/ui/town,Dark Loan (暗黒ローン) (two files)
+src/menus/date_menu,src/ui/title/date_menu.c,date entry
+src/menus/dialogue_controls_and_animation,src/ui/dialogue/message_window,"message window: text lookup, choices, scrolling; merge:src/menus/dialogue_task_setup"
+src/menus/dialogue_task_setup,src/ui/dialogue/message_window,message window allocation; merge:src/menus/dialogue_controls_and_animation
+src/menus/dialogue_text_interpreter,src/ui/dialogue/text_interpreter,"inline <...> text commands, speaker labels, number formatting"
+src/menus/field_hud,src/ui/hud/field_hud.c,field HUD gauges
+src/menus/floating_number_display,src/ui/hud/damage_numbers,damage numbers
+src/menus/forging_book,src/ui/books/forging_book,Forging Book (鍛冶図鑑)
+src/menus/game_over,src/ui/game_over,game over screen and its particle pool (two files; directory so the particle pool is not loose in ui)
+src/menus/game_start,src/ui/title/game_start.c,Game Start (ゲームスタート)
+src/menus/hud,src/ui/hud/display,"the main HUD: modes, panels, gauges"
+src/menus/hud_tilemaps_and_clock_digits,src/ui/hud/hud_tilemaps.c,HUD tile maps and clock digits
+src/menus/input_grid_and_navigation,src/ui/widgets/input_grid,input grid and saved cursor; merge:src/menus/input_marker_widgets
+src/menus/input_marker_widgets,src/ui/widgets/input_grid,input marker widgets; merge:src/menus/input_grid_and_navigation
+src/menus/inventory,src/system/inventory,item and equipment data (Inventory_*FromScript) plus pause-inventory helpers
+src/menus/inventory_action_transitions,src/ui/town/shop,shop screen actions (SceneInventory; Weapon Shop 武器屋 = SceneInventory_CreatePresentation0); merge:src/menus/inventory_transactions_and_catalogs src/menus/inventory_values_and_display
+src/menus/inventory_grid,src/ui/pause/inventory_grid.c,pause inventory grid
+src/menus/inventory_panel,src/ui/pause/inventory_panel.c,pause inventory panel
+src/menus/inventory_transactions_and_catalogs,src/ui/town/shop,shop transactions and catalogs; merge:src/menus/inventory_action_transitions src/menus/inventory_values_and_display
+src/menus/inventory_values_and_display,src/ui/town/shop,shop item values and comparisons; merge:src/menus/inventory_action_transitions src/menus/inventory_transactions_and_catalogs
+src/menus/level_advance_display,src/ui/hud/level_advance,level-up display
+src/menus/map_menu,src/ui/pause/map,map menu; merge:src/menus/map_screen
+src/menus/map_screen,src/ui/pause/map,map screen; merge:src/menus/map_menu
+src/menus/menu_cursor,src/ui/widgets/menu_cursor.c,menu cursor
+src/menus/menu_display,src/ui/pause/menu_display.c,pause menu stat display
+src/menus/menu_prompt,src/ui/pause/menu_prompt.c,pause menu prompt
+src/menus/menu_transition,src/ui/pause/menu_transition,pause menu transitions
+src/menus/message_menu,src/ui/dialogue/message_menu.c,message menu
+src/menus/message_panel,src/link/message_panel,message and clock panel of the link menus (08109480)
+src/menus/mode_menu,src/ui/title/mode_menu.c,mode menu and Results screen (リザルト)
+src/menus/modifier_menu_graphics_and_input,src/ui/modifier_menu,modifier menu graphics and input; merge:src/menus/modifier_menu_preview_and_lifecycle src/menus/modifier_selection_and_stat_previews
+src/menus/modifier_menu_preview_and_lifecycle,src/ui/modifier_menu,modifier menu preview and lifecycle; merge:src/menus/modifier_menu_graphics_and_input src/menus/modifier_selection_and_stat_previews
+src/menus/modifier_selection_and_stat_previews,src/ui/modifier_menu,modifier selection and stat previews; merge:src/menus/modifier_menu_graphics_and_input src/menus/modifier_menu_preview_and_lifecycle
+src/menus/monster_book,src/ui/books/monster_book,Monster Book (魔物図鑑); merge:src/effects/palette_transition src/menus/bestiary
+src/menus/name_entry,src/ui/title/name_entry.c,Name Entry (名前入力)
+src/menus/numeric_overlay,src/ui/status_screen,numeric overlay sibling of the status screen; merge:src/menus/status_screen
+src/menus/options,src/ui/title/options.c,Options (オプション)
+src/menus/password_decoding,src/ui/title/password.c,password decoding
+src/menus/password_menu,src/ui/title/password_menu.c,Password (パスワード)
+src/menus/pause_inventory,src/ui/pause/inventory,pause inventory
+src/menus/pause_menu,src/ui/pause/pause_menu,pause menu
+src/menus/play_stats,src/ui/pause/play_stats.c,play statistics
+src/menus/record_menu,src/link/lobby,link lobby and record menu; merge:src/link/registry_33_ff
+src/menus/record_panel,src/link/records,"record panel (08 10D590, link menu block); merge:src/link/link_record_panel"
+src/menus/registry_3_f74,src/ui/town/town_map.c,GCL 2554 creates 3F74 with the 11 town service callbacks. SAN MIGUEL appears on the map in frame 1940.
+src/menus/result_prompt,src/ui/results/result_prompt.c,result prompt
+src/menus/save_menu,src/ui/save,save menu and its tile map panel (two files)
+src/menus/scene_catalog,src/ui/pause/status_options.c,Pause Status is visible. This ROM interval runs while opening that page and updating its numbers and descriptions.
+src/menus/scene_hud,src/ui/pause/pause_display,pause menu display layer: action previews and icons (SceneHud)
+src/menus/scene_indicators,src/ui/hud/scene_indicator.c,scene indicators
+src/menus/scene_panel_control_and_lifecycle,src/objects/pile_driver,"CBB0 is created by GCL 6182 outdoors and 6183 in the purification arena. The outdoor apparatus and the captive subject execute the same task family. Text #9293–9299 explains the generators, coffin and Solar Pile."
+src/menus/scene_panel_presentation,src/objects/pile_driver,"CBB0 is created by GCL 6182 outdoors and 6183 in the purification arena. The outdoor apparatus and the captive subject execute the same task family. Text #9293–9299 explains the generators, coffin and Solar Pile."
+src/menus/scene_panel_sprite_rig,src/objects/pile_driver,"CBB0 is created by GCL 6182 outdoors and 6183 in the purification arena. The outdoor apparatus and the captive subject execute the same task family. Text #9293–9299 explains the generators, coffin and Solar Pile."
+src/menus/scene_panel_subjects,src/objects/pile_driver,"CBB0 is created by GCL 6182 outdoors and 6183 in the purification arena. The outdoor apparatus and the captive subject execute the same task family. Text #9293–9299 explains the generators, coffin and Solar Pile."
+src/menus/scene_sequence,src/ui/pause/menu_sequences,Stock Dark Card from Valuables opens Replay or Dark Loans with Doomy. Confirming the 400 Soll Replay runs the completion script and returns to the room; the other branch opens the loan screen. The pause-tabs/page02.png capture witnesses grid navigation.
+src/menus/screen_message,src/ui/dialogue/screen_message.c,screen message
+src/menus/script_prompt,src/ui/dialogue/script_prompt.c,script prompt
+src/menus/scripted_dialogue_transitions,src/ui/dialogue/dialogue_transition.c,scripted dialogue transitions
+src/menus/scrolling_dialogue_controller,src/ui/dialogue/scrolling_dialogue,scrolling dialogue
+src/menus/selection_menu,src/ui/widgets/selection_menu.c,actor/item grid selection menu
+src/menus/selection_panel,src/ui/widgets/selection_panel,"selection panel, HUD config menu, scene dialog"
+src/menus/shaking_icon_display,src/ui/hud/shake_icon_display.c,shaking icon
+src/menus/solar_bank,src/ui/town/solar_bank,Solar Bank (太陽バンク)
+src/menus/sound_test_menu,src/ui/title/sound_test.c,sound test
+src/menus/stage_icon_display,src/ui/hud/stage_icon,stage icons
+src/menus/stage_results,src/ui/results/stage_results,stage results
+src/menus/status_panel,src/ui/pause/status_panel,pause status panel
+src/menus/status_screen,src/ui/status_screen,status screen; merge:src/menus/numeric_overlay
+src/menus/storage,src/ui/town/storage,Storage (倉庫)
+src/menus/text_sequence,src/ui/dialogue,text sequence and option menu (two files)
+src/menus/text_window_manager,src/ui/dialogue/text_window,text windows
+src/menus/time_result,src/ui/results/time_result.c,time result
+src/minigames/result_game_tutorial,src/minigames/result_game,result game tutorial; merge:src/minigames/transformation_and_result_game
+src/minigames/transformation_and_result_game,src/minigames/result_game,"result game, result menu, transformation sequence; merge:src/minigames/result_game_tutorial"
+src/monsters/armor,src/monsters/armor,Armor (アーマー) and the elemental armors; merge:src/actors/actor_controller src/actors/actor_marker src/actors/actor_palette src/actors/scene_combat_actor src/actors/spinning_approach_motion
+src/monsters/axe,src/monsters/axe,"Axe (アックス), sword family; merge:src/actors/actor_phase"
+src/monsters/bat,src/monsters,Bat (バット) (two files)
+src/monsters/bee,src/monsters/bee.c,Bee (ビー)
+src/monsters/cannon_battery,src/objects/deck_cannons,"Stock 4906 and a warp to 4859 show banks of ship deck cannons as their update, slot constructor and initializer run. Procs 4860 and 4905 create the 55E9 manager. Text #7463 names the ship cannons around the helm."
+src/monsters/cannon_emitter,src/monsters/pollen_flowers,Key 98CB draws both flowers. Variant 1 in Ancient Tree 3504 applies status 0 for 1800 frames. Variant 0 in 5181 applies status 1 for 900 frames. The Monster Book identifies the poisonous and disorienting pollen as Poisoner and Perplexer.
+src/monsters/cannon_turret,src/monsters/garmr_statue,GCL 3884 → 1601 → 1603 creates 4CD8. The replay runs the actor update in view. Bestiary index 30 is text #9868.
+src/monsters/crow,src/monsters/crow.c,Crow (クロウ)
+src/monsters/dog,src/monsters/dog.c,"Dog family: Hound, Hot Dog, Ice Dog"
+src/monsters/dragon_puppy,src/monsters/dragon_puppy,Dragon Puppy
+src/monsters/enemy_d459,src/monsters/armor,"GCL 2996 → 1591 → 1593 spawns D459. Shared sprite package 7E82, palette 0227. Bestiary index 29 is string #9867, ARMOR."
+src/monsters/enemy_f426,src/monsters/statue,"GCL 3184 → 1589 → 1590 spawns F426. Shared sprite package 7E82, palette 0225. Bestiary index 28 is string #9866, STATUE."
+src/monsters/enemy_particle,src/monsters/enemy_particle,particles shared by the late enemy block
+src/monsters/fan_cannon,src/monsters/cannons/wind,GCL 4751 → 1609 spawns the fan cannon manager 9CC2 and two color variants. The replay runs the actor update in view. Bestiary index 34 is text #9872.
+src/monsters/fan_cannon_manager,src/monsters/cannons/wind,Proc 1609 creates shared manager 9CC2 and its cannon instances. The actor callbacks run under the same pool.
+src/monsters/ghost,src/monsters/ghost.c,Ghost (ゴースト)
+src/monsters/ghoul,src/monsters,Ghoul family (ボク/グール) (two files)
+src/monsters/glove,src/minigames/coffin_bike,GCL 6275 calls 1277 to spawn bike key E881. R accelerates and UP steers visibly through Lifeless Town’s ride. The stock non-bike world map (2569) executes none of this unit. A two-core Back Street match also runs Glove_UpdateTask on both bikes. See link-peer/play-3-0.png and play-3-1.png.
+src/monsters/golem,src/monsters/golem,Golem (ゴーレム)
+src/monsters/growth_hazard,src/objects/solar_roots,Hresvelgr setup 3594 and rematch 6397 place key 1FBA. The Earth shot makes the flat vegetation grow after AnimatedMarker_BeginActive at frame 2042. The comparison Sol shots hit without producing growth. Text #1817 and #9052 name Solar Roots.
+src/monsters/ivy,src/monsters/ivy,Ivy; merge:src/actors/child_group src/actors/phase_object
+src/monsters/lun,src/monsters/lun.c,Lun
+src/monsters/mimic,src/monsters/mimic.c,Mimic (ミミック)
+src/monsters/mummy,src/monsters/mummy,Mummy (マミー)
+src/monsters/octopus,src/monsters/octopus.c,Octopus (オクトパス)
+src/monsters/ooze,src/monsters/ooze,Wall/Floor Ooze (ウーズ)
+src/monsters/orange_spine,src/monsters/cannons/plasma,GCL 5874 → 1618 → 1619 creates 01A2. The replay runs the actor update in view. Bestiary index 36 is text #9874.
+src/monsters/pink_spine,src/monsters/popbud,GCL 3399 → 1597 → 1598 creates F639. The replay runs the actor update in view. Bestiary index 2 is text #9840.
+src/monsters/poison_hand,src/monsters/poison_hand,Poison Hand
+src/monsters/screamer,src/monsters/screamer,Screamer
+src/monsters/skeleton,src/monsters/skeleton,Skeleton (スケルトン)
+src/monsters/slime,src/monsters/slime.c,Slime (スライム)
+src/monsters/spider,src/monsters/spider.c,Spider (スパイダー)
+src/monsters/sword,src/monsters/sword,Sword (ソード)
+src/monsters/tentacle_actor,src/monsters/centipede,"Proc 4075 calls 1574 and 1576 to create 0AC7. The visible category-9 actor maps to Monster Book entry 13, text #9851, Centipede. The replay executes its constructor, component update and the shared body windup and spread callbacks."
+src/monsters/tentacle_body,src/monsters/centipede,"Proc 4075 calls 1574 and 1576 to create 0AC7. The visible category-9 actor maps to Monster Book entry 13, text #9851, Centipede. The replay executes its constructor, component update and the shared body windup and spread callbacks."
+src/monsters/vorn,src/monsters/vorn,Vorn (ヴォーン)
+src/monsters/vulcan_cannon,src/monsters/cannons/vulcan,Vulcan Cannon (バルカン砲)
+src/other/callback_pool,src/objects/actor_group,"callback pool feedback of actor groups (08104F08, right after them; only caller); merge:src/field/actor_group"
+src/other/registry_selection,src/ui/world_map.c,GCL 2570 creates key 2388 for the nine world destinations. WORLD is visible in the stock save. Confirm selects San Miguel in this replay.
+src/other/scene_terrain_probe,src/effects/particles,"terrain probe, moving particle and spread shot (two files)"
+src/other/solar_calibration,src/system/solar,solar sensor calibration screen; merge:src/system/cartridge_solar_sensor src/system/solar
+src/player/player_attack_effect,src/player/effects/attack,player attack effect
+src/player/player_barrier,src/player/effects/barrier,player barrier
+src/player/player_burst,src/player/effects/burst,"player burst, debris, transition"
+src/player/player_clone,src/player/clone.c,player clone (afterimage copies)
+src/player/player_contact,src/player/damage,player contact damage
+src/player/player_cue,src/player/cues,player animation cues
+src/player/player_orbit_effect,src/player/effects/orbit_effect.c,player orbit effect
+src/player/player_particle_cloud,src/player/effects/particle_cloud,player particle cloud
+src/player/target_registry,src/player/target_registry,targets the player can lock on to
+src/system/cartridge_solar_sensor,src/system/solar,cartridge solar sensor GPIO and timer (docs/SOLAR_SENSOR.md); merge:src/other/solar_calibration src/system/solar
+src/system/clock_and_sun_schedule,src/system/clock,RTC dates and sunrise/sunset schedule; merge:src/engine/clock_events src/system/time src/system/time_palette_transitions
+src/system/game_state,src/system/game_state,persistent game state and Solar Fruit; merge:src/effects/pal_fade
+src/system/save,src/system/save,save regions and records; merge:src/system/save_data
+src/system/save_data,src/system/save,"save data header, play time, delayed scripts; merge:src/system/save"
+src/system/solar,src/system/solar,solar level and controller; merge:src/other/solar_calibration src/system/cartridge_solar_sensor
+src/system/time,src/system/clock,region menu for sun times; merge:src/engine/clock_events src/system/clock_and_sun_schedule src/system/time_palette_transitions
+src/system/time_palette_transitions,src/system/clock,time-of-day palette transitions; merge:src/engine/clock_events src/system/clock_and_sun_schedule src/system/time
+"src/player/*.c (loose, see list files)",src/player/<group>,every loose file appears in exactly one player_files_<group>.txt
+player_files_appearance.txt,src/player/appearance,1 loose Player files: visual palette and sprite resources (player_3.c becomes player_visuals.c); merge:src/engine/character_model
+player_files_attack.txt,src/player/attack,"41 loose Player files: melee attacks: slash, spin, sweep, throw, combos, attack power"
+player_files_core.txt,src/player/core,"67 loose Player files: player object core: create, init, destroy, draw, action modes and flags"
+player_files_cues.txt,src/player/cues,35 loose Player files: animation cues and form changes; merge:src/player/player_cue
+player_files_damage.txt,src/player/damage,"44 loose Player files: taking hits: knockback, recoil, flinch, recovery, defeat and death; merge:src/player/player_contact"
+player_files_gun.txt,src/player/gun,"25 loose Player files: charged shots and bursts: projectiles, charge tiers, solar bomb charge guess"
+player_files_interaction.txt,src/player/interaction,"47 loose Player files: interacting with objects: coffin chain (tether), pushing, stations, link modes"
+player_files_movement.txt,src/player/movement,"75 loose Player files: walking, turning, terrain handling, forces and the player camera offsets"
+player_files_script.txt,src/player/script,1 loose Player files: player script commands; merge:src/actors/script_actor
+player_files_stats.txt,src/player/stats,"43 loose Player files: life, energy, resistance, equipment and modifier values"
+src/player/sub_08143604.c,src/player/special_actions,"Special motion effect callbacks, dispatched separately from mode 3 gun/melee. Controlled motion IDs 9, 16, and 17 reached three callbacks. 0814692C is the alternate table’s equivalent mode 9."
+src/player/sub_08144408.c,src/player/special_actions,"Special motion effect callbacks, dispatched separately from mode 3 gun/melee. Controlled motion IDs 9, 16, and 17 reached three callbacks. 0814692C is the alternate table’s equivalent mode 9."
+src/player/sub_08144624.c,src/player/special_actions,Controlled mode 17 startup requires sunlight. The ROM creates the green Spiral Burst with sunlight 8 and produces no cast at 0. Both weapon probes stay idle.
+src/player/sub_08144D60.c,src/player/damage,A staged 0060 warp puts Django in the Plasma Cannon firing lane. Its shot calls Player_RequestTimedReset with 70 at frame 1885. Motion 21 begins at 1900 and both the timed update and exit run. Stars circle Django. The control has zero hits.
+src/player/sub_08144D64.c,src/player/damage,A staged 0060 warp puts Django in the Plasma Cannon firing lane. Its shot calls Player_RequestTimedReset with 70 at frame 1885. Motion 21 begins at 1900 and both the timed update and exit run. Stars circle Django. The control has zero hits.
+src/player/sub_08144F40.c,src/player/cues,"Departure camera, fade and shrinking actor. Controlled motion 27 shows the departure and runs this update."
+src/player/sub_0814692C.c,src/player/special_actions,"Special motion effect callbacks, dispatched separately from mode 3 gun/melee. Controlled motion IDs 9, 16, and 17 reached three callbacks. 0814692C is the alternate table’s equivalent mode 9."
+src/player/sub_08147CF0.c,src/player/cues,Form and sprite motion callbacks. Controlled motion IDs 13 and 14 show the spiral form effect. The other four are equivalent or adjacent sprite playback callbacks in alternate motion tables.
+src/player/sub_08147FB8.c,src/player/cues,Form and sprite motion callbacks. Controlled motion IDs 13 and 14 show the spiral form effect. The other four are equivalent or adjacent sprite playback callbacks in alternate motion tables.
+src/player/sub_081481E4.c,src/player/cues,Form and sprite motion callbacks. Controlled motion IDs 13 and 14 show the spiral form effect. The other four are equivalent or adjacent sprite playback callbacks in alternate motion tables.
+src/player/sub_08148B64.c,src/player/cues,Form and sprite motion callbacks. Controlled motion IDs 13 and 14 show the spiral form effect. The other four are equivalent or adjacent sprite playback callbacks in alternate motion tables.
+src/player/sub_08148E4C.c,src/player/cues,Form and sprite motion callbacks. Controlled motion IDs 13 and 14 show the spiral form effect. The other four are equivalent or adjacent sprite playback callbacks in alternate motion tables.
+src/player/sub_08149DF0.c,src/player/cues,Form and sprite motion callbacks. Controlled motion IDs 13 and 14 show the spiral form effect. The other four are equivalent or adjacent sprite playback callbacks in alternate motion tables.
+src/player/sub_0814EEE0.c,src/player/gun,Gun frame 11 reaches this sustained rotating-spread update on held B. It belongs with the other Gun Del Sol frame callbacks.
+src/player/sub_0823C02C.c,src/player/link_actions,The 08E87A10 and 08E87A90 dispatch tables and their callers identify a Link Player family. All five entries were absent during a connected Back Street race. The Crossover round 1656 warp runs Player_Update and yields zero hits in these dispatchers. A shipped entry point for the five remains unobserved.
+src/player/sub_0823D080.c,src/player/link_actions,The 08E87A10 and 08E87A90 dispatch tables and their callers identify a Link Player family. All five entries were absent during a connected Back Street race. The Crossover round 1656 warp runs Player_Update and yields zero hits in these dispatchers. A shipped entry point for the five remains unobserved.
+src/player/sub_0823D3A0.c,src/player/link_actions,The 08E87A10 and 08E87A90 dispatch tables and their callers identify a Link Player family. All five entries were absent during a connected Back Street race. The Crossover round 1656 warp runs Player_Update and yields zero hits in these dispatchers. A shipped entry point for the five remains unobserved.
+src/player/sub_0823FE94.c,src/player/link_actions,The 08E87A10 and 08E87A90 dispatch tables and their callers identify a Link Player family. All five entries were absent during a connected Back Street race. The Crossover round 1656 warp runs Player_Update and yields zero hits in these dispatchers. A shipped entry point for the five remains unobserved.
+src/player/sub_08240F9C.c,src/player/link_actions,The 08E87A10 and 08E87A90 dispatch tables and their callers identify a Link Player family. All five entries were absent during a connected Back Street race. The Crossover round 1656 warp runs Player_Update and yields zero hits in these dispatchers. A shipped entry point for the five remains unobserved.
+08000000-08000350,src/engine,GBA header and SDK crt0 assembly
+0822F1B4-0822FDB4,src/lib/m4a,MP2K SDK mixer and track-handler assembly
+0824538C-08245398,src/lib/rfu,RFU SDK callback trampolines
+08248590-082485EC,src/lib/bios,libagbsyscall BIOS wrapper assembly
+08249238-0824930C,src/lib/libgcc,libgcc call veneers and division assembly
+08249350-08249558,src/lib/libgcc,libgcc division and modulo assembly

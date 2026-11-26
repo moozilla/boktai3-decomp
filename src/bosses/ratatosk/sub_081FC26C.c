@@ -1,9 +1,9 @@
-#include "engine/shared/global.h"
+#include "global.h"
 #include "bosses/ratatosk/ratatosk_particle.h"
 #define Ratatosk_SpawnAnimatedParticle sub_081FC26C
-#include "engine/shared/contact_swarm.h"
-#include "engine/shared/display_sequence_sprite.h"
-#include "engine/shared/ram.h"
+#include "scene/actor/contact_swarm.h"
+#include "engine/video/display_sequence_sprite.h"
+#include "engine/ram.h"
 
 extern RatatoskParticleUpdate const gUnk_08613F6C[];
 extern const s16 gUnk_086149C4[];

@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 u8 *Save_GetContinuationData(void);
 s32 Save_GetContinuationSize(void);
 void GameState_BackupRegionRange(u8 *, s32);

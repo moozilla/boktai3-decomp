@@ -1,4 +1,4 @@
-#include "scene_panel_rig.h"
+#include "objects/pile_driver/scene_panel_rig.h"
 static inline void stepSecondarySprite(struct SceneRigSprite *sprite, u32 byteMask)
 {
     struct DisplaySequenceState *state = &sprite->sequence;

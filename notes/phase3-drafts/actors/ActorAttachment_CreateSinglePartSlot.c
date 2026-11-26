@@ -1,4 +1,4 @@
-#include "actor_attachment_manager.h"
+#include "scene/actor/actor_attachment_manager.h"
 #include "gba/syscall.h"
 #include "gba/macro.h"
 void ParticleSprite_Initialize(void *, const void *, s32);

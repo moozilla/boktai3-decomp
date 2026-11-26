@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 /* Math_ClampAroundCenter: Clamps a signed value to the interval centered on center with the given range */
 #define Math_ClampAroundCenter sub_0819AFA4
 

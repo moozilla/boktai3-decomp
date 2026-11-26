@@ -1,5 +1,5 @@
-#include "engine/shared/global.h"
-#include "engine/shared/engine.h"
+#include "global.h"
+#include "engine/engine.h"
 void SolarFruit_SetInventorySlot(s32 slot, s32 value);
 void GameState_MoveSlotEntry(s32 value, s32 slot);
 /* game state fields, addressed index-first as the original does */

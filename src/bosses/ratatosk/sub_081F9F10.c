@@ -1,6 +1,6 @@
-#include "engine/shared/global.h"
+#include "global.h"
 #include "bosses/ratatosk/ratatosk.h"
-#include "engine/shared/player.h"
+#include "player/player.h"
 struct PackedVec {
     s32 x : 16, y : 16, z : 16, pad : 16;
 };

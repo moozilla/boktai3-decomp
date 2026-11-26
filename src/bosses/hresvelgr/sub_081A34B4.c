@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 struct HresvelgrShot {
     u8 unknown00[0x1C];
     u16 position[3];

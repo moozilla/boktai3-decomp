@@ -1,7 +1,7 @@
 #include "global.h"
-#include "engine_globals.h"
-#include "ram.h"
-#include "display_sequence_inline.h"
+#include "engine/engine_globals.h"
+#include "engine/ram.h"
+#include "engine/video/display_sequence_inline.h"
 struct Vec {
     s16 x, y, z, pad;
 };

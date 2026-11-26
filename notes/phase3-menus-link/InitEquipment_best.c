@@ -1,6 +1,6 @@
 #include "global.h"
-#include "ram.h"
-#include "engine_globals.h"
+#include "engine/ram.h"
+#include "engine/engine_globals.h"
 
 // Tentative panel/save fields used to choose four distinct available entries.
 struct P {

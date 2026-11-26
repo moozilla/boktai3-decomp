@@ -14,28 +14,27 @@ from romlib import ROOT
 
 ADDRESS = re.compile(r"(?:sub_|0x)?([0-9a-f]{8})", re.I)
 ALIASES = re.compile(r"^#define[ \t]+(\w+)[ \t]+(sub_[0-9A-F]{8})\b[ \t]*(?://[^\n]*)?$", re.M)
-CATEGORY_DIRS = {"ui": "menus", "libraries": "lib"}
-LIBRARY_DIRS = {
-    "MP2K (m4a)": "m4a",
-    "RFU SDK 1024": "rfu",
-    "libagbsyscall": "bios",
-    "EEPROM SDK V124": "eeprom",
-    "SIIRTC": "rtc",
-    "libgcc runtime": "libgcc",
-    "libm (Sun fdlibm)": "libm",
-    "libc (newlib)": "libc",
-}
+SOURCE_DIRS = Path("symbols/source_dirs.csv")
+SOURCE_FILES = Path("symbols/source_files.csv")
+HEADER_DIRS = Path("symbols/header_dirs.csv")
+LAYOUT_RANGE = re.compile(r"([0-9A-F]{8})-([0-9A-F]{8})")
 
 
 def slug(name):
-    """Snake case, including acronym boundaries such as RFU_Init and CRC32."""
-    name = re.sub(r"([A-Z]+)([A-Z][a-z])", r"\1_\2", name)
-    name = re.sub(r"([a-z0-9])([A-Z])", r"\1_\2", name)
-    return re.sub(r"[^a-z0-9]+", "_", name.lower()).strip("_")
+    """Lowercase words and acronyms, preserving digits within a word."""
+    words = []
+    for word in re.findall(r"[a-zA-Z0-9]+", name):
+        address = re.fullmatch(r"(?:0[xX])?([0-9a-fA-F]{8})", word)
+        if address:
+            words.append(address[1].upper())
+        else:
+            word = re.sub(r"([A-Z]+)([A-Z][a-z])", r"\1_\2", word)
+            words.append(re.sub(r"([a-z])([A-Z])", r"\1_\2", word).lower())
+    return "_".join(words)
 
 
 def new_filename(name, address):
-    return (f"sub_{address:08X}" if ADDRESS.fullmatch(name) else slug(name)) + ".c"
+    return (f"sub_{address:08X}" if ADDRESS.fullmatch(name) else name) + ".c"
 
 
 def source_paths(root=ROOT):
@@ -159,43 +158,93 @@ def report_path(tree, address, index, root=ROOT):
     return entry[0] if entry else path
 
 
+@dataclass(frozen=True)
+class SourcePlacement:
+    original: Path
+    current: Path
+    target: Path
+    start: int
+    end: int
+    pass2: Path | None = None
+
+
+def layout_path(value, category):
+    path = Path(value)
+    if not path.parts or path.parts[0] != category or ".." in path.parts:
+        raise ValueError(f"invalid {category} path: {value}")
+    return path
+
+
+def source_rules(root=ROOT):
+    with (Path(root) / SOURCE_DIRS).open(newline="") as stream:
+        rows = list(csv.DictReader(stream))
+    rules = {row["current_path"]: row["new_path"] for row in rows}
+    if len(rules) != len(rows):
+        raise ValueError(f"{SOURCE_DIRS}: duplicate source rule")
+    return rules
+
+
+@lru_cache(maxsize=4)
+def source_placements(root=ROOT):
+    """Resolve the reviewed directory rules for each file in the base snapshot."""
+    root = Path(root)
+    if not (root / SOURCE_FILES).is_file():
+        return ()
+    rules = source_rules(root)
+    placements = []
+    with (root / SOURCE_FILES).open(newline="") as stream:
+        for row in csv.DictReader(stream):
+            dest = layout_path(rules[row["rule"]], "src")
+            name = row["filename"]
+            if Path(name).name != name or not name.endswith(".c"):
+                raise ValueError(f"{SOURCE_FILES}: invalid filename {name}")
+            target = dest if dest.suffix == ".c" else dest / name
+            if not 3 <= len(target.parts) <= 5:
+                raise ValueError(f"{SOURCE_DIRS}: unexpected source depth: {target}")
+            original = layout_path(row["original_path"], "src")
+            current = layout_path(row["current_path"], "src")
+            start, end = int(row["start"], 16), int(row["end"], 16)
+            if start >= end or placements and start < placements[-1].end:
+                raise ValueError(f"{SOURCE_FILES}: invalid or overlapping range at {start:08X}")
+            previous = row.get("pass2_path")
+            pass2 = layout_path(previous, "src") if previous else None
+            placements.append(SourcePlacement(original, current, target, start, end, pass2))
+    for field in ("original", "current", "target"):
+        paths = [getattr(placement, field).as_posix().casefold() for placement in placements]
+        if len(paths) != len(set(paths)):
+            raise ValueError(f"{SOURCE_FILES}: duplicate {field} file path")
+    return tuple(placements)
+
+
 @lru_cache(maxsize=4)
 def groups(root=ROOT):
-    from progress import category_of, load_categories
-
-    symbols = Path(root) / "symbols"
-    if not (symbols / "progress_subsystems.csv").is_file():
-        return (), (), ()
-    categories = load_categories(symbols / "progress_categories.csv")
-    starts, ends, directories = [], [], []
-    for table in ("progress_subsystems.csv", "progress_libraries.csv"):
-        with (symbols / table).open(newline="") as stream:
-            for row in csv.DictReader(stream):
-                start, end = int(row["start"], 16), int(row["end"], 16)
-                title = row["name"]
-                if table == "progress_libraries.csv":
-                    directory = Path("lib", LIBRARY_DIRS[title])
-                else:
-                    category = category_of(categories, row | {"start": start})
-                    category = CATEGORY_DIRS.get(category, category)
-                    unit = slug(re.sub(r"\s+\(tentative\)$", "", title))
-                    directory = Path(category) if unit == category else Path(category, unit)
-                starts.append(start)
-                ends.append(end)
-                directories.append(directory)
-    return tuple(zip(*sorted(zip(starts, ends, directories))))
+    ranges = [(row.start, row.end, row.target.parent) for row in source_placements(root)]
+    if (Path(root) / SOURCE_DIRS).is_file():
+        for key, destination in source_rules(root).items():
+            if match := LAYOUT_RANGE.fullmatch(key):
+                start, end = (int(value, 16) for value in match.groups())
+                folder = layout_path(destination, "src")
+                if start >= end or not 2 <= len(folder.parts) <= 4 or folder.suffix:
+                    raise ValueError(f"{SOURCE_DIRS}: invalid range rule {key} -> {folder}")
+                ranges.append((start, end, folder))
+    ranges.sort()
+    if any(left[1] > right[0] for left, right in zip(ranges, ranges[1:])):
+        raise ValueError(f"{SOURCE_DIRS}: overlapping ROM layout ranges")
+    return tuple(row[0] for row in ranges), ranges
 
 
-def directory_for(address, root=ROOT):
-    starts, ends, directories = groups(root)
+def directory_for(address, root=ROOT, *, source=None):
+    starts, ranges = groups(root)
     index = bisect_right(starts, address) - 1
-    if index >= 0 and address < ends[index]:
-        return directories[index]
-    return Path("other", "unclassified")
+    if index >= 0 and address < ranges[index][1]:
+        return ranges[index][2].relative_to("src")
+    location = f"{source} ({address:08X})" if source else f"sub_{address:08X}.c"
+    raise ValueError(f"{location}: no ROM placement; add a rule in {SOURCE_DIRS} and {SOURCE_FILES}")
 
 
 def new_source(address, name, root=ROOT):
-    return (Path("src") / directory_for(address, root) / new_filename(name, address)).as_posix()
+    filename = new_filename(name, address)
+    return (Path("src") / directory_for(address, root, source=filename) / filename).as_posix()
 
 
 def main():

@@ -1,6 +1,6 @@
 #include "global.h"
-#include "contact_collider.h"
-#include "player.h"
+#include "scene/actor/contact_collider.h"
+#include "player/player.h"
 void Collision_AccumulateNearbyResponse(void *, void *, s32);
 void PlayerCue_ApplyColliderScale(void *, void *);
 void Anim_ApplyDurationScales(void *, void *);

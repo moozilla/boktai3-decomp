@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 
 void Sound_PlaySongChecked(u32);
 void Armor_UpdatePartLunge(void);

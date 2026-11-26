@@ -1,5 +1,5 @@
 #include "global.h"
-#include "display_sequence_sprite.h"
+#include "engine/video/display_sequence_sprite.h"
 struct PlayerSlotDisplaySlot {
     u8 resource[0x1C];
     struct DisplaySequenceSprite sprite;

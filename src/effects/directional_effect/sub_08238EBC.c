@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 struct DirectionalEffectPosition {
     u16 x, z, y, unknown6;
 };

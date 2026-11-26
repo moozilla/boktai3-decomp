@@ -1,7 +1,7 @@
-#include "engine/shared/global.h"
-#include "engine/shared/area_effect_link.h"
-#include "engine/shared/engine_globals.h"
-#include "engine/shared/ram.h"
+#include "global.h"
+#include "scene/area_effect/area_effect_link.h"
+#include "engine/engine_globals.h"
+#include "engine/ram.h"
 typedef struct Point {
     u16 x, pad2, y, pad6;
 } Point;

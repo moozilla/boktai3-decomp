@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 s16 *TetherActor_GetPosition(u8 *);
 void TetherActor_RequestKindNineAction(u16, u8);
 

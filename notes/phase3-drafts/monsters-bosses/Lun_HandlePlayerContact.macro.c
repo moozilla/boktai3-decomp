@@ -1,6 +1,6 @@
-#include "scene_actor_reset.h"
-#include "player.h"
-#include "ram.h"
+#include "scene/actor/scene_actor_reset.h"
+#include "player/player.h"
+#include "engine/ram.h"
 
 void SceneActorControl_OnIdle(void);
 void Player_IncrementActionSpeedBonus(struct Player *player, u32 value);

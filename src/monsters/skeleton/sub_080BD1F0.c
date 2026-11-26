@@ -1,11 +1,11 @@
-#include "engine/shared/scene_actor_chase_shared.h"
-#include "actors/scene_actor_behavior/scene_actor_behavior.h"
+#include "scene/actor/scene_actor_chase_shared.h"
+#include "scene/actor/scene_actor_behavior.h"
 #include "monsters/skeleton/skeleton.h"
-#include "actors/scene_actor_reaction/scene_actor_reaction.h"
-#include "engine/script_utility_references/script_utility.h"
-#include "engine/shared/engine.h"
-#include "engine/shared/runtime.h"
-#include "engine/shared/spark_particle.h"
+#include "scene/actor/scene_actor_reaction.h"
+#include "script/script_utility.h"
+#include "engine/engine.h"
+#include "engine/runtime.h"
+#include "effects/particles/spark_particle.h"
 #include "monsters/skeleton/enemy_defeat_statistics.h"
 
 /* Skeleton defeat state (tentative). On entry: releases attachments, clears the route and,

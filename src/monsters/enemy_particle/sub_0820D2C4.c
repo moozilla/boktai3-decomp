@@ -1,7 +1,7 @@
-#include "engine/shared/global.h"
-#include "engine/shared/engine.h"
-#include "engine/shared/ram.h"
-#include "engine/shared/display_sequence_sprite.h"
+#include "global.h"
+#include "engine/engine.h"
+#include "engine/ram.h"
+#include "engine/video/display_sequence_sprite.h"
 struct Pos {
     s16 x, y, z, pad;
 };

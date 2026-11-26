@@ -1,4 +1,4 @@
-#include "saved_position_marker.h"
+#include "objects/markers/saved_position_marker.h"
 u8 *TerrainModifiers_FindCellOverride(s32, s32);
 s32 SavedPositionMarker_InitializeFromScript(struct SavedPositionMarker *marker, u32 unused1,
                                              u32 unused2)

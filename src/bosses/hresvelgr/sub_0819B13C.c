@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 /* Math_ApproachAngleBySixteenth: Approaches the target by one sixteenth of the shortest angular difference with a minimum unit step */
 #define Math_ApproachAngleBySixteenth sub_0819B13C
 

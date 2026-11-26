@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 void SceneActorEffects_DestroyGroup(u8 *);
 void Shadow_Destroy(u8 *);
 void Effect_Remove(u8 *);

@@ -1,7 +1,7 @@
-#include "engine/shared/global.h"
+#include "global.h"
 #include "monsters/sword/sword_orbit.h"
-#include "engine/shared/engine_globals.h"
-#include "engine/shared/ram.h"
+#include "engine/engine_globals.h"
+#include "engine/ram.h"
 // confidence=low: computes a target-relative endpoint before accelerating the turn.
 
 struct Orbit {

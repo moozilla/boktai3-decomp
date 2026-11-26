@@ -1,8 +1,0 @@
-#include "menus/scene_panel_presentation/scene_panel.h"
-void ScenePanel_TickPulseTwo(struct ScenePanel *panel)
-{
-    if (++panel->stateFrame > 7) {
-        ScenePanel_SetChannelValue(panel, 2, 2);
-        ScenePanel_SetState(panel, ScenePanel_TickPulseRest);
-    }
-}

@@ -4,7 +4,7 @@ This contiguous subsection contains two 24-byte record encoders and decoders,
 six-bit packing helpers, seeded masking and four-row display formatting.
 Static callers confirm the connection to the message-menu and password systems;
 there are no new emulator execution claims. The alternate decoder is used by
-NameEntry_DecodeAndValidate in src/menus/password_decoding/password.c after version/checksum validation.
+NameEntry_DecodeAndValidate in src/ui/title/password.c after version/checksum validation.
 The first encoder and row formatter feed MessageMenu_Initialize.
 
 This batch adds six exact functions and **0.088 percentage points** (2,136 bytes):

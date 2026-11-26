@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 
 u32 Armor_IsSequenceIncomplete(u8 *p)
 {

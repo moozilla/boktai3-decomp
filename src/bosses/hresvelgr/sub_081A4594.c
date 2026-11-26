@@ -1,5 +1,5 @@
-#include "engine/shared/scene_steering_actor.h"
-#include "player/player_cue/player_cue_sequence.h"
+#include "scene/actor/scene_steering_actor.h"
+#include "player/cues/player_cue_sequence.h"
 void MotionEntry_UpdatePosition(void *);
 void Hresvelgr_ReleaseEffect(void *);
 void Hresvelgr_UpdateMotionEntry(struct SceneSteeringActor *p)

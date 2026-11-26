@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 void Memory_Clear(void *, u32);
 void EnemyParticle_SetMotionParameters(void *, u32, u32, u32, u32);
 void EnemyParticle_SetGraphicsParameters(void *, u32, u32, s32);

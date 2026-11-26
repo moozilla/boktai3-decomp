@@ -1,0 +1,147 @@
+#include "engine/video/sprite.h"
+#include "scene/actor/contact_collider.h"
+#include "engine/video/display_sequence_inline.h"
+#include "effects/scene_effect_projection.h"
+#include "global.h"
+#include "engine/video/render.h"
+#include "engine/video/display_sequence.h"
+struct FragmentBurst {
+    struct DisplaySequenceSprite sprites[4];
+    struct DisplaySequenceState sequences[4];
+    struct ContactPosition origin, position;
+    struct ContactCollider collider;
+    u16 age;
+    u8 state;
+    s8 slot;
+    u32 completionScript;
+    u16 timer;
+    u8 enter;
+};
+void Sound_PlaySong(u32);
+void Collider_SetPosition(void *, void *, u32);
+void Collider_Refresh(void *);
+static inline void Project(struct ContactPosition *out, struct ContactPosition *in)
+{
+    s32 x = in->x, z = in->z, h, y;
+    out->x = SceneEffect_ScaleProjection(3 * (x - z));
+    h = SceneEffect_ScaleProjection(3 * (x + z));
+    y = SceneEffect_ScaleProjection(3 * in->y);
+    out->y = h - y;
+    out->z = h + y;
+}
+// confidence=low: animates three projected burst sprites and enables their short-lived impact collider.
+static inline void ProjectShift(struct ContactPosition *out, struct ContactPosition *in,
+                                struct ContactPosition *camera)
+{
+    Project(out, in);
+    out->x = out->x - camera->x + 120;
+    out->y = out->y - camera->y + 80;
+    out->z -= camera->z;
+}
+/* Apply the current frame and flips, then advance the stored playback state.
+ * The duration calculation uses the newly selected command's low four bits. */
+static inline void FragmentBurst_StepAnimation(struct DisplaySequenceSprite *owner,
+                                               struct DisplaySequenceState *state, u32 endMask)
+{
+    const u16 *command;
+    {
+        u32 offset = DisplaySequence_GetIndex(state) << 1;
+        const u16 *table;
+        table = state->commands;
+        command = (const u16 *)((u32)table + offset);
+    }
+    owner->frame = *command >> 6;
+    {
+        u32 input = state->flags;
+        u32 first = 1;
+        u8 bit = 1;
+        first &= input;
+        if (first != (((*command & 0x30) >> 4) & bit))
+            owner->flags |= 4;
+        else
+            owner->flags &= ~4;
+    }
+    {
+        union DisplaySequenceControl control;
+        u32 bit, first;
+        control.raw = state->flags;
+        bit = 2;
+        first = (u8)(control.raw & bit);
+        if (first != (((*command & 0x30) >> 4) & bit))
+            owner->flags |= endMask;
+        else
+            owner->flags &= ~8;
+    }
+    if (++state->elapsed >= state->duration) {
+        union DisplaySequenceControl flags;
+        state->elapsed = 0;
+        flags = *(const union DisplaySequenceControl *)&state->flags;
+        if (flags.raw & 4) {
+            if (state->index == 0) {
+                if (flags.raw & endMask)
+                    state->elapsed = state->duration;
+                else
+                    state->index = state->frameCount - 1;
+            } else {
+                state->index--;
+            }
+        } else {
+            if (++state->index >= state->frameCount) {
+                u32 hold = endMask;
+                hold &= flags.raw;
+                if ((u8)hold) {
+                    state->elapsed = state->duration;
+                    state->index = state->frameCount - 1;
+                } else {
+                    state->index = 0;
+                }
+            }
+        }
+        command = state->commands + state->index;
+        state->frameWeight = DisplaySequence_MaskCommand(DisplaySequence_ReadCommand(command), 15);
+        state->duration = (state->frameWeight * (s32)state->speed) >> 6;
+        if (state->duration == 0)
+            state->duration = 1;
+    }
+}
+
+static inline struct DisplaySequenceState *
+FragmentBurst_BeginAnimation(struct FragmentBurst *p, struct ContactPosition **origin)
+{
+    *origin = &p->origin;
+    return p->sequences;
+}
+
+void FragmentBurst_UpdateImpactAnimation(void *unused, struct FragmentBurst *p)
+{
+    s32 i;
+    struct ContactPosition *camera;
+    struct ContactPosition *origin;
+    struct DisplaySequenceState *sequence;
+    u32 endMask;
+    if (p->enter) {
+        Sound_PlaySong(0x3B1);
+        p->enter = 0;
+    }
+    i = 0;
+    sequence = FragmentBurst_BeginAnimation(p, &origin);
+    do {
+        struct DisplaySequenceSprite *sprite = &p->sprites[i];
+        endMask = 8;
+        camera = (struct ContactPosition *)gCameraOrigin;
+        sprite->flags &= ~1;
+        FragmentBurst_StepAnimation(sprite, sequence, endMask);
+        ProjectShift(&sprite->position, origin, camera);
+        sprite->position.y += i * 32;
+        sequence++;
+        i++;
+    } while (i < 3);
+    if (p->timer > 4) {
+        p->state = 2;
+        p->enter = 1;
+    } else {
+        Collider_SetPosition(&p->collider, &p->position, 0);
+        Collider_Refresh(&p->collider);
+        p->timer++;
+    }
+}

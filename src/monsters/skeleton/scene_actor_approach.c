@@ -1,9 +1,9 @@
-#include "engine/shared/global.h"
-#include "engine/shared/player.h"
-#include "actors/scene_actor_reaction/scene_actor_reaction.h"
-#include "engine/shared/scene_actor_control_phase.h"
-#include "engine/shared/scene_actor_chase_reaction.h"
-#include "engine/shared/scene_actor_terrain.h"
+#include "global.h"
+#include "player/player.h"
+#include "scene/actor/scene_actor_reaction.h"
+#include "scene/actor/scene_actor_control_phase.h"
+#include "scene/actor/scene_actor_chase_reaction.h"
+#include "scene/actor/scene_actor_terrain.h"
 
 struct SceneActorApproachCategoryContext {
     u8 unknown0[0x6F0];

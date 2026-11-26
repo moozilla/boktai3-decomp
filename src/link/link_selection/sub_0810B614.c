@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 void Registry1745_ConsumeStateEntry(u8 *);
 void Registry1745_SetState(u8 *, u32, void (*)(void));
 void SceneMenu_WaitForConfirmation(void);

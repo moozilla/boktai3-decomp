@@ -1,5 +1,5 @@
 #define gSineTable gUnk_086149C4
-#include "engine/shared/global.h"
+#include "global.h"
 
 // confidence=low: a projectile spawn shaped like EnemyF426_SpawnProjectile (sub_08203B54):
 // lifted 224 (direction 1 or 2) or 128, offset 160 along direction * 64 + 192.

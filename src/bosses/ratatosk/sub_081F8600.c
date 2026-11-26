@@ -1,7 +1,7 @@
-#include "engine/shared/global.h"
+#include "global.h"
 #include "bosses/ratatosk/ratatosk.h"
-#include "engine/shared/engine.h"
-#include "engine/shared/ram.h"
+#include "engine/engine.h"
+#include "engine/ram.h"
 
 struct OrbConfig {
     u32 words[8];

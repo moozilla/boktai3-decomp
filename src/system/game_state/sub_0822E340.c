@@ -1,5 +1,5 @@
-#include "engine/shared/global.h"
-#include "engine/shared/engine.h"
+#include "global.h"
+#include "engine/engine.h"
 #include "system/game_state/game_state.h"
 void GameState_ClearConsumableSlot(s32 slot);
 void Inventory_SetConsumableEntry(s32 slot, s32 value);

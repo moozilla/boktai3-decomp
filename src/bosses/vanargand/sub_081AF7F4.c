@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 
 struct HalfVector {
     s16 x, y, z, pad;

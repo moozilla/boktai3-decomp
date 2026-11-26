@@ -1,6 +1,6 @@
-#include "engine/shared/global.h"
-#include "engine/shared/engine.h"
-#include "engine/shared/ram.h"
+#include "global.h"
+#include "engine/engine.h"
+#include "engine/ram.h"
 
 // confidence=low: stores a randomized elevated travel point in the actor.
 #define Hresvelgr_SetRandomTravelTarget sub_0819C6AC

@@ -1,5 +1,5 @@
-#include "engine/shared/global.h"
-#include "engine/shared/engine.h"
+#include "global.h"
+#include "engine/engine.h"
 #include "bosses/hresvelgr/hresvelgr_travel.h"
 
 void Hresvelgr_OnBodyContact(void);

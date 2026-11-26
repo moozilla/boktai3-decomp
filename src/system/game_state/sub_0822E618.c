@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 
 extern u8 *gGameState;
 extern const u8 gUnk_08E60F4C[][4];

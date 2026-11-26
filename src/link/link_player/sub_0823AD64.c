@@ -1,6 +1,6 @@
-#include "engine/shared/global.h"
-#include "engine/shared/player.h"
-#include "engine/shared/input.h"
+#include "global.h"
+#include "player/player.h"
+#include "engine/input.h"
 struct PlayerDirectionHistory {
     u16 samples[10];
 };

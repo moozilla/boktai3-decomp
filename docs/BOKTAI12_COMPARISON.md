@@ -175,7 +175,7 @@ Code that is not in the text path but changes anyway (counted by masked halfword
 single layout constants):
 
 * **JP-only password code** (`GlyphTable_FindPair`, B2 JP `08011178`, called from
-  `src/menus/password_decoding/password.c`'s equivalent): a kana-pair lookup absent from US/EU, which shrink the
+  `src/ui/title/password.c`'s equivalent): a kana-pair lookup absent from US/EU, which shrink the
   code by 208 B there. B3 still has it (`08011578`).
 * EU only: `SolarBank_BeginOpening` (a position constant `185 -> 233`),
   `TransitionPanel_UpdateCostSelection`, `SaveMenu_Update`, `ScriptSelector_UpdateTask`,

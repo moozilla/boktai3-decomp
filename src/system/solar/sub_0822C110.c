@@ -1,6 +1,6 @@
-#include "engine/shared/global.h"
-#include "engine/shared/ram.h"
-#include "engine/shared/runtime.h"
+#include "global.h"
+#include "engine/ram.h"
+#include "engine/runtime.h"
 /* Solar_ResetState: Clears the solar task pointer and current and cached intensity levels */
 #define Solar_ResetState sub_0822C110
 extern u8 *gGameState;

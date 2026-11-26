@@ -1,5 +1,5 @@
-#include "engine/shared/global.h"
-#include "engine/shared/render.h"
+#include "global.h"
+#include "engine/video/render.h"
 #include "bosses/vanargand/vanargand_stage_colors.h"
 
 // Tentative: palette ownership follows adjacent Vanargand transition routines.

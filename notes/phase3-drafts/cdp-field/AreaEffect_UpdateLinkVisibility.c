@@ -1,4 +1,4 @@
-#include "area_effect_link.h"
+#include "scene/area_effect/area_effect_link.h"
 // MATCHING_CONCESSION: register-pinning
 static inline s32 localPlayer(void)
 {

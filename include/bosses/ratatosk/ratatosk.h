@@ -1,14 +1,14 @@
 #ifndef GUARD_RATATOSK_H
 #define GUARD_RATATOSK_H
 
-#include "engine/shared/global.h"
-#include "engine/camera/camera_tracking.h"
-#include "engine/shared/contact_collider.h"
-#include "engine/shared/contact_position.h"
-#include "engine/shared/scene_actor_components.h"
+#include "global.h"
+#include "scene/camera/camera_tracking.h"
+#include "scene/actor/contact_collider.h"
+#include "scene/actor/contact_position.h"
+#include "scene/actor/scene_actor_components.h"
 
 /* The Ratatosk boss body (0xF30 bytes, Ratatosk_InitializeFromScript). Its first 0x178
- * bytes are the StateActor head (names as in include/engine/shared/state_actor.h); past that it has its
+ * bytes are the StateActor head (names as in include/npc/story_character/state_actor.h); past that it has its
  * own layout. Merged from the per-file copies of the Ratatosk states; field meanings are
  * provisional (confidence=low) unless a comment says where they come from. */
 
@@ -190,7 +190,7 @@ struct Ratatosk {
 
 typedef char RatatoskSizeCheck[sizeof(struct Ratatosk) == 0xF30 ? 1 : -1];
 
-/* The StateActor recovery-pipeline operations (include/engine/shared/state_actor_action_entry.h) on
+/* The StateActor recovery-pipeline operations (include/bosses/state_actor_action_entry.h) on
  * this type. */
 static inline u8 Ratatosk_ConsumeActionEntry(struct Ratatosk *actor)
 {

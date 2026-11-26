@@ -1,7 +1,7 @@
-#include "engine/shared/global.h"
-#include "engine/shared/engine.h"
-#include "engine/shared/ram.h"
-#include "menus/scene_indicators/scene_indicator.h"
+#include "global.h"
+#include "engine/engine.h"
+#include "engine/ram.h"
+#include "ui/hud/scene_indicator.h"
 // confidence=low: updates render shake and cached bearings/distances to tracked positions.
 struct Sprite {
     u8 pad0[12];

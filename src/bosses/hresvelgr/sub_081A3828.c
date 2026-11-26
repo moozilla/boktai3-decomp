@@ -1,5 +1,5 @@
-#include "engine/shared/global.h"
-#include "engine/shared/ram.h"
+#include "global.h"
+#include "engine/ram.h"
 struct EffectManager {
     u8 unknown0[0x3c];
     s32 activeCount;

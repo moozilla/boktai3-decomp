@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 extern u8 *gGameState;
 u8 *GameState_GetConsumableDescriptor(s32);
 void GameState_EquipConsumableSlot(u32 a)

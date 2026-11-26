@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 /* Hresvelgr_ApproachArrayQuarter: Approaches signed array targets by one quarter of the remaining difference and snaps near targets */
 #define Hresvelgr_ApproachArrayQuarter sub_0819B7DC
 

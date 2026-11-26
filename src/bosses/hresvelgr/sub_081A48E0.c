@@ -1,5 +1,5 @@
-#include "engine/shared/global.h"
-#include "engine/shared/ram.h"
+#include "global.h"
+#include "engine/ram.h"
 #define MotionEntryManager_Create Hresvelgr_CreateEffectPool
 struct MotionPosition {
     s16 x, y, z, pad;

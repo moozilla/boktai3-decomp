@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 struct O08239CDC {
     u8 f0[6];
     u16 f6;

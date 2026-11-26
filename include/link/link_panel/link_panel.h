@@ -1,6 +1,6 @@
 #ifndef GUARD_LINK_PANEL_H
 #define GUARD_LINK_PANEL_H
-#include "engine/shared/scene_input.h"
+#include "ui/widgets/scene_input.h"
 struct LinkPanelPaletteCycle {
     u16 colors[16], frame;
     u8 unknown22[2];

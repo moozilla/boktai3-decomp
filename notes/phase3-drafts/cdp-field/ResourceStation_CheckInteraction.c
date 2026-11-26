@@ -1,4 +1,4 @@
-#include "resource_station.h"
+#include "objects/solar_stand/resource_station.h"
 // MATCHING_CONCESSION: register-pinning
 void Player_BeginResourceStationInteraction(struct ResourceStationPlayer *,
                                             struct ResourceStationPosition *, u32);

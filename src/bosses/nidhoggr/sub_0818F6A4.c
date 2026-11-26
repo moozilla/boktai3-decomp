@@ -1,7 +1,7 @@
-#include "engine/shared/global.h"
-#include "player/player_cue/player_cue_sequence.h"
-#include "effects/shared_display_animation_wrapper/display_animation.h"
-#include "engine/shared/engine.h"
+#include "global.h"
+#include "player/cues/player_cue_sequence.h"
+#include "engine/video/display_animation.h"
+#include "engine/engine.h"
 struct NidhoggrVector {
     s16 x, y, z, pad;
 };

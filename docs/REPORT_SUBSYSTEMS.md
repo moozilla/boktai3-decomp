@@ -16,7 +16,8 @@ hierarchy:
 decomp.dev draws one flat treemap per view and does not nest tiles, so the
 category level is the category menu, not a border inside the treemap. Units are
 listed category by category, so each category occupies one area of the full
-treemap. The [source layout](SOURCE_LAYOUT.md) follows these categories and units.
+treemap. The [source layout](SOURCE_LAYOUT.md) has its own reviewed placement tables.
+Regrouping the progress report leaves source paths alone.
 
 Grouping never changes credit: every function keeps its address, size and
 exact or fuzzy status, and the totals are unchanged (`tests/tools/test_progress.py`).

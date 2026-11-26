@@ -26,8 +26,8 @@ proc,name,params,confidence,evidence
 886,spawn_area_effect,"count,resource,mode",low,sub_0801973C
 887,spawn_scanline_wave,"name,target,mode,amplitude,step,period",high,only spawns ScanlineWave
 888,set_stage_palette,"palette,,",high,"the stage BG palette resource (docs/ASSETS.md, Stage palettes)"
-892,spawn_palette_controller,"value_p,value_d,,,,,,",medium,sub_080033FC (src/effects/palette_controllers/palette_controller.c)
-894,spawn_terrain_overlay,"key,count",medium,"sub_080040F8 (src/field/terrain_overlays/terrain_overlay.c): a TerrainOverlay task, n = actor count (default 8)"
+892,spawn_palette_controller,"value_p,value_d,,,,,,",medium,sub_080033FC (src/effects/palette/palette_controller.c)
+894,spawn_terrain_overlay,"key,count",medium,"sub_080040F8 (src/scene/terrain/terrain_overlay.c): a TerrainOverlay task, n = actor count (default 8)"
 895,set_camera_area,box,medium,called with the camera box A679 (docs/ASSETS.md)
 896,area_trap,"box,w",low,traps on the box for the player and the coffin
 897,screen_fade_simple,"mode,color,frames",low,"calls screen_fade(mode, 3, color, frames, 8191, none)"

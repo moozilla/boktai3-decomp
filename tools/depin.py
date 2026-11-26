@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Remove register pins and empty asm() barriers that a match does not need.
 
-  depin.py src/link/wireless_trade_and_selection_menu/sub_080390C4.c [...]   [-j 8] [--write]
+  depin.py src/link/wireless/trade_menu/sub_080390C4.c [...]   [-j 8] [--write]
 
 For each file, tries deleting each hint on its own (``register T x asm("rN")``
 becomes ``T x``; ``asm("" ...);`` is dropped; hints inside ``#ifdef

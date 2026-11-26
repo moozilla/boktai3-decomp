@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 /* Tentative ScenePanel family; names describe observed state and sprite operations. */
 
 struct ScenePanelInput {

@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 struct ScriptPanel {
     u8 unk0[0x2E];
     u16 retryTimer;

@@ -1,6 +1,6 @@
-#include "scene_actor_reset.h"
-#include "player.h"
-#include "ram.h"
+#include "scene/actor/scene_actor_reset.h"
+#include "player/player.h"
+#include "engine/ram.h"
 #include "debug.h"
 
 void SceneActorControl_OnIdle(void);

@@ -1,5 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
-#include "scene_actor_chase.h"
+#include "scene/actor/scene_actor_chase.h"
 
 extern const u8 gUnk_0824E230[];
 void sub_080B3110(void *, u32, const void *, u32);

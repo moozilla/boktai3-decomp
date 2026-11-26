@@ -1,5 +1,5 @@
-#include "route_sprite_actor.h"
-#include "display_sequence_inline.h"
+#include "scene/actor/route_sprite_actor.h"
+#include "engine/video/display_sequence_inline.h"
 void RouteSpriteActor_RunEventScript(struct RouteSpriteActor *);
 void FragmentBurst_Create(struct ContactPosition *, u32, u32, u32, u32, u32, void *);
 union EmissionPosition {

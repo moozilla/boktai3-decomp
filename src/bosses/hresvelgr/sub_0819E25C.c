@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 #include "bosses/hresvelgr/hresvelgr_travel.h"
 
 void ActorAction_FinishRecoveryAnimation(struct HresvelgrTravelActor *p)

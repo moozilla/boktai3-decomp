@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 struct SwordReturnComponent {
     u8 pad0[6];
     u8 rotation; /* +006: wrapping orientation byte */

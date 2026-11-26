@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 
 struct S080F54D4 {
     u8 filler[0x178];

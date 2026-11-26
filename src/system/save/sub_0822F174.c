@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 s32 Save_AlignSizeToEightBytes(s32);
 void Save_SuspendRuntimeForTransfer(void);
 s32 Save_VerifyBlock(u16, s32);

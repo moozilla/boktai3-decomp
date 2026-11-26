@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 void LinkSession_GetSlotValues(u32, s32 *, s32 *, s32 *, s32 *);
 void LinkPlayer_LoadBaseStats(u8 *p)
 {

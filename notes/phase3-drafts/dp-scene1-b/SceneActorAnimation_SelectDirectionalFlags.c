@@ -1,4 +1,4 @@
-#include "scene_actor_animation.h"
+#include "npc/manager/scene_actor_animation.h"
 void SceneActorAnimation_SelectDirectionalFlags(struct SceneActorAnimationView *actor, s32 index)
 {
     struct SceneActorProfileEntry *entry =

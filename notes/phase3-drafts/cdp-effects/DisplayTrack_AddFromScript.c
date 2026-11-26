@@ -1,5 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
-#include "display_track.h"
+#include "engine/video/display_track.h"
 void Anim_SetDurationScale(void *, u32);
 void DisplayTrack_AddFromScript(void)
 {

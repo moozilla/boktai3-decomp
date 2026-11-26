@@ -1,10 +1,10 @@
-#include "engine/shared/global.h"
-#include "engine/shared/engine.h"
-#include "engine/shared/scene_actor_components.h"
-#include "engine/shared/scene_actor_registry.h"
-#include "engine/shared/scene_actor_terrain.h"
-#include "engine/scene_body/scene_body_api.h"
-#include "actors/actor_attachment_manager/actor_attachment_manager.h"
+#include "global.h"
+#include "engine/engine.h"
+#include "scene/actor/scene_actor_components.h"
+#include "scene/actor/scene_actor_registry.h"
+#include "scene/actor/scene_actor_terrain.h"
+#include "scene/collision/scene_body_api.h"
+#include "scene/actor/actor_attachment_manager.h"
 
 struct ArmorCallbackSlot {
     void *callback;

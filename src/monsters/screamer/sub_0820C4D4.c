@@ -1,6 +1,6 @@
-#include "engine/shared/global.h"
+#include "global.h"
 #include "monsters/screamer/screamer_playback.h"
-#include "player/player_cue/player_cue_sequence.h"
+#include "player/cues/player_cue_sequence.h"
 void Anim_RestartSequence(void *, void *, u32, u32, u32);
 void Anim_SetDurationScale(void *, u32);
 void Sound_PlaySong(u32);

@@ -1,4 +1,4 @@
-#include "armor_part_queue.h"
+#include "monsters/armor/armor_part_queue.h"
 
 void Sound_PlaySongChecked(u32);
 void SpriteColliderGroup_ResetActiveParts(struct ArmorLaunchGroup *p)

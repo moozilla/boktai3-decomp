@@ -1,10 +1,10 @@
 // MATCHING_CONCESSION: register-pinning
-#include "scene_actor_behavior.h"
+#include "scene/actor/scene_actor_behavior.h"
 #include "golem_2.h"
-#include "script_utility.h"
-#include "engine.h"
-#include "player.h"
-#include "ram.h"
+#include "script/script_utility.h"
+#include "engine/engine.h"
+#include "player/player.h"
+#include "engine/ram.h"
 
 void SceneActorReaction_PlayAnimationBUntilComplete(void);
 void SceneActorAttachment_ReplaceResponseSlot(u8 *, u32, u32, u32);
@@ -191,7 +191,7 @@ void SceneActorRoute_CommitReachableDestination(void *);
 #define SCENE_ACTOR_CHASE_FRACTION_ACCESSOR   1
 #define SCENE_ACTOR_CHASE_SCALAR_CELLS        1
 #define SCENE_ACTOR_CHASE_JOIN_ROUTE_FAILURES 1
-#include "scene_actor_chase_reaction.h"
+#include "scene/actor/scene_actor_chase_reaction.h"
 
 /* Fields are established by 080C9C04 and the ordinary ReturnHome/ChargeOrReturnHome
  * relatives. Names for the response count and flags are tentative. */

@@ -62,9 +62,9 @@ def subsystems(min_files, match_first=False):
         files = [(path, single) for a0, a1, path, single in where if a0 < hi and a1 >= lo]
         nfn = sum(single for _, single in files)
         folder = directory_for(lo)
-        stem = folder.name
+        stem = slug(r["name"])
         unit = (Path("src") / folder / (stem + ".c")).as_posix()
-        header = (Path("include") / folder / (stem + ".h")).as_posix()
+        header = (Path("include").joinpath(*folder.parts[:2], stem + ".h")).as_posix()
         if nfn >= min_files or (match_first and any(lo <= f["addr"] < hi for f in unmatched)):
             um = [f for f in unmatched if lo <= f["addr"] < hi]
             key = slug(r["name"])

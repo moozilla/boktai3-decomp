@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 
 void ExplosionEffect_Create(u32, u32, u32, u32, u32);
 

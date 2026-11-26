@@ -1,5 +1,5 @@
-#include "engine/shared/global.h"
-#include "engine/shared/area_effect_link.h"
+#include "global.h"
+#include "scene/area_effect/area_effect_link.h"
 u8 *LinkPlayer_GetSessionPlayerData(u8 *s)
 {
     s32 i = *(s32 *)(s + 0x18);

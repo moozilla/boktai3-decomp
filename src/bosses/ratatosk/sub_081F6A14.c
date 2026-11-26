@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 struct Actor {
     u8 pad0[0x48];
     u8 body[0x104];

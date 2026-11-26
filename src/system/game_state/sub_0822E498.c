@@ -1,6 +1,6 @@
-#include "engine/shared/global.h"
+#include "global.h"
 #include "system/game_state/game_state.h"
-#include "engine/shared/player.h"
+#include "player/player.h"
 void Equipment_AssignUniqueSlot(s32 slot, s32 id); /* sets slot */
 void Hud_RefreshEquipmentDisplay(void);
 void Player_SetActionRequest(u8 *actor, s32 id);

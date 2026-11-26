@@ -1,6 +1,6 @@
-"""`land` puts a rewrite of a function that matches already (a phase-3 depin) back into the unit that
-defines it, instead of a new src/fn file: land.where falls back to the defining unit."""
+"""`land` puts rewrites of already-matching functions in their defining units."""
 import os
+from pathlib import Path
 import sys
 import tempfile
 import unittest
@@ -55,8 +55,12 @@ class LandMatched(unittest.TestCase):
         self.assertIsNone(land.defining_unit(self.root, ["C"]))
         self.assertEqual(land.where(self.root, "C", 0x08000200), ("unit", "src/fn/draft.c", "C"))
 
-    def test_an_unknown_function_is_plain(self):
-        self.assertEqual(land.where(self.root, "D", 0x08000300), ("plain", "src/other/unclassified/d.c", None))
+    def test_a_new_function_uses_its_layout_range(self):
+        symbols = Path(self.root, "symbols")
+        symbols.mkdir()
+        (symbols / "source_dirs.csv").write_text(
+            "current_path,new_path,note\n08000300-08000320,src/engine,test range\n")
+        self.assertEqual(land.where(self.root, "D", 0x08000300), ("plain", "src/engine/D.c", None))
 
     def test_multiline_pointer_return_is_part_of_the_definition(self):
         before = "struct Entry;\nstruct Entry *Find(int);\n#define ENABLED 1\n"

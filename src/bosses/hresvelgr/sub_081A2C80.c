@@ -1,6 +1,6 @@
-#include "engine/shared/global.h"
-#include "engine/shared/player.h"
-#include "engine/shared/render.h"
+#include "global.h"
+#include "player/player.h"
+#include "engine/video/render.h"
 #include "system/game_state/game_state.h"
 
 // confidence=low: Hresvelgr setup: reads script keywords into the 0x358-0x372 parameter block, creates the pools, sets callbacks and animation state.

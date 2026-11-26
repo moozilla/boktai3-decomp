@@ -1,4 +1,4 @@
-#include "interaction_marker.h"
+#include "objects/markers/interaction_marker.h"
 u8 *TerrainModifiers_FindCellOverride(s32, s32);
 void SceneBody_Init(void *, u32, void *, u32, u32, void *);
 void TerrainOverlay_QueueAddActor(void *);

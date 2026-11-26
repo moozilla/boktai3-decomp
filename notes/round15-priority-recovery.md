@@ -181,7 +181,7 @@ array. The MenuPrompt price renderer and cross-group indexing remain partial.
 There are three cumulative exemptions so far, each grounded independently of
 matching behavior:
 
-1. `src/other/scene_terrain_probe/spread_shot.c`, `SpreadShot_ResolveTerrain`, `08123194`: the existing
+1. `src/effects/particles/spread_shot.c`, `SpreadShot_ResolveTerrain`, `08123194`: the existing
    bidirectional walker is specialized for the left-neighbor call. Its forward
    arm is genuinely used by the right-neighbor and runtime-target calls. The
    direct backward-only alternative misses; the annotation is specialization

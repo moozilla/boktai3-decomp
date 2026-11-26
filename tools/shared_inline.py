@@ -5,7 +5,7 @@
   shared_inline.py --queue QUEUE.md  the same for every concession file a queue lists
 
 Pinned matches often carry a private copy of a step the headers already share
-(PlayerCue_StepSequence and its Ended variants in include/player/player_cue/player_cue_sequence.h,
+(PlayerCue_StepSequence and its Ended variants in include/player/cues/player_cue_sequence.h,
 VulcanCannon_StepAnimation): the copy holds the pins, and calling the shared
 helper instead drops them (EnemyD459_Update, Ooze_BeginAttack,
 VulcanCannon_InitializeFromScript matched that way, unchanged otherwise). The

@@ -1,5 +1,5 @@
 /* Tentative family and field names, based on static accesses. */
-#include "engine/shared/global.h"
+#include "global.h"
 struct ActorResource {
     u8 unknown0[0xB3];
     u8 variant;

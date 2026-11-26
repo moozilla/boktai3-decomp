@@ -1,4 +1,4 @@
-#include "engine/shared/scalar_approach.h"
+#include "engine/math/scalar_approach.h"
 /* ScalarApproach_StepHalfArray: Updates signed halfword values toward corresponding targets using half steps */
 #define ScalarApproach_StepHalfArray sub_0819B2A4
 #define ScalarApproach_HalfArray     sub_0819B2A4

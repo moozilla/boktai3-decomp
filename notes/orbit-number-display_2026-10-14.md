@@ -23,7 +23,7 @@ and leaving update (nine). Every hinted exact candidate was minimized with
 
 ## Rotating contact actor
 
-`include/actors/orbit_contact_actor/orbit_contact_actor.h` recovers a **0xC8 list-8 task**, with signed
+`include/bosses/nidhoggr/orbit_contact_actor.h` recovers a **0xC8 list-8 task**, with signed
 radius at 0x18, angle/state/state flag at 0x1A/0x1B/0x1C, frame counter at 0x20,
 center at 0x24, collider at 0x2C, graphics at 0x80 and sprite at 0x9C. The state
 table gUnk_086059B4 selects inactive, expanding and contracting handlers.
@@ -51,7 +51,7 @@ this actor span are now exact; the four newly recovered bodies are 08046880,
 
 ## Floating number display
 
-`include/menus/floating_number_display/damage_number_display.h` recovers a **0x2F0 list-9 singleton** at
+`include/ui/hud/damage_number_display.h` recovers a **0x2F0 list-9 singleton** at
 RAM gUnk_02000074. The active mask is at 0x18, glyph resource at 0x1C, and four
 groups start at 0x20 with **0xB4 stride**. Each group has a source key, priority,
 phase/frame, digit count, anchor fields, world vector and four **0x28 glyphs**.

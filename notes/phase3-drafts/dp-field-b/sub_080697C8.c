@@ -1,5 +1,5 @@
 #include "global.h"
-#include "engine.h"
+#include "engine/engine.h"
 
 #include "gba/macro.h"
 #include "gba/syscall.h"

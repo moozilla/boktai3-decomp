@@ -1,4 +1,4 @@
-#include "orbit_background.h"
+#include "effects/screen/orbit_background.h"
 // MATCHING_CONCESSION: register-pinning
 static inline u32 isSpecial(void)
 {

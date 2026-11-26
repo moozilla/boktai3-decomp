@@ -1,6 +1,6 @@
 /* The current build ELF still exports these two original address names. */
-#include "engine/shared/global.h"
-#include "engine/shared/display_sequence.h"
+#include "global.h"
+#include "engine/video/display_sequence.h"
 
 struct NidhoggrEffectMotion {
     u16 x, y, z, unknown6;

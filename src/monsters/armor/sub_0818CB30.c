@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 
 extern const s16 gUnk_086149C4[];
 s32 Div(s32, s32);

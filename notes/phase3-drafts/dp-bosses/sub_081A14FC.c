@@ -1,6 +1,6 @@
 #include "global.h"
-#include "engine.h"
-#include "monster_particle_random.h"
+#include "engine/engine.h"
+#include "engine/math/monster_particle_random.h"
 struct Vec {
     s16 x, y, z, pad;
 } __attribute__((aligned(4)));

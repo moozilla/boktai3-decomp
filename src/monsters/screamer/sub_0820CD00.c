@@ -1,6 +1,6 @@
-#include "engine/shared/global.h"
+#include "global.h"
 #include "monsters/screamer/screamer_playback.h"
-#include "engine/shared/display_sequence_inline.h"
+#include "engine/video/display_sequence_inline.h"
 s32 Screamer_WaitForPlayerApproach(struct ScreamerState *);
 void SceneDrawablePair_SetFlags(void);
 s32 Screamer_InitColliders(struct ScreamerState *);

@@ -42,8 +42,8 @@ not nine source cleanups. No new compiler sites appear.
 
 The removed sites are:
 
-- `src/link/wireless_connection_controller/sub_08034310.c:47`
-- `src/field/floor_switch/sub_0810048C.c:32`
+- `src/link/wireless/connection/sub_08034310.c:47`
+- `src/objects/floor_switch/sub_0810048C.c:32`
 - `src/bosses/hresvelgr/sub_081A2858.c:137`
 - `src/link/serial/sub_082227D8.c:14`
 - `src/lib/eeprom/sub_08248778.c:78,96`

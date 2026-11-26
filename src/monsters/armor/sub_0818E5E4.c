@@ -1,5 +1,5 @@
-#include "engine/shared/global.h"
-#include "engine/shared/render.h"
+#include "global.h"
+#include "engine/video/render.h"
 extern const u8 gUnk_0824F174[];
 extern const u8 gUnk_0824F17C[];
 void *ScriptProc_Start(u32, u32);

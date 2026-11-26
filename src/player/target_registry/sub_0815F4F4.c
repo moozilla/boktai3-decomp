@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 
 void *Task_Create(s32, s32);
 void Task_SetCallbacks(void *, void *, void *);

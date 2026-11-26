@@ -1,8 +1,8 @@
 #ifndef GUARD_SCREAMER_STATE_H
 #define GUARD_SCREAMER_STATE_H
 
-#include "effects/shared_display_animation_wrapper/display_animation.h"
-#include "engine/shared/task.h"
+#include "engine/video/display_animation.h"
+#include "engine/task.h"
 struct ActorPosition {
     s16 x, y, z, pad;
 };

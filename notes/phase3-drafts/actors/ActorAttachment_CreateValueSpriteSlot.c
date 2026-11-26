@@ -1,4 +1,4 @@
-#include "actor_attachment_manager.h"
+#include "scene/actor/actor_attachment_manager.h"
 static inline u8 ActorAttachment_IsAlternateMode(void)
 {
     u32 bit = 0x80;

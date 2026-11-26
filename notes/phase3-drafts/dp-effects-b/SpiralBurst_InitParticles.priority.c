@@ -1,7 +1,7 @@
-#include "spiral_burst.h"
+#include "effects/bursts/spiral_burst.h"
 
-#include "engine_globals.h"
-#include "ram.h"
+#include "engine/engine_globals.h"
+#include "engine/ram.h"
 
 static inline u32 randomValue(const u16 *table, u32 mask)
 {

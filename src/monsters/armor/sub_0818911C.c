@@ -1,8 +1,8 @@
-#include "engine/shared/global.h"
-#include "engine/shared/contact_collider.h"
+#include "global.h"
+#include "scene/actor/contact_collider.h"
 #include "monsters/armor/armor_decision_ops.h"
 #include "system/game_state/game_state.h"
-#include "engine/shared/scene_combat_colliders.h"
+#include "monsters/armor/scene_combat_colliders.h"
 
 void ActorController_SetBehavior(void *, s32);
 s32 Math_Atan2(s32, s32);
