@@ -128,3 +128,17 @@ keeps the addressable word consumed by the BIOS fixed-source fill in its
 widget and pursuit initialization. Separate and combined SDK wrapper
 substitutions change code generation. The linter annotation records that
 source operand. All three changed units passed their stock checks.
+
+## Drawable and route-state follow-up
+
+Ivy's hidden cue uses the shared drawable operation and its target approach
+writes through the native contact collider. Ghoul uses the shared terrain
+transition at three route entries, decrements the native route delay in
+place, and uses the shared drawable operation in its hidden recovery.
+Octopus uses the same operation at nine sites, including the hidden follow-up
+that accessed the two drawable layouts through raw offsets. Slime reads
+its hit reaction flags directly, and its constructor allocates and clears
+the size-checked instance type. The direct clear in Slime's body-hit handler
+still loads the field before the 0xFEFFFFFF mask. The ROM loads the mask
+first. All five changed translation units matched. This pass removes eleven
+printed warnings and twelve weighted constant uses.
