@@ -25,10 +25,6 @@ static inline void polar(struct ContactPosition *v, s32 angle, s32 radius)
     v->y = 0;
     v->z = scale(gUnk_086149C4[angle & 255] * radius);
 }
-static inline void setFlags(struct Ratatosk *a, u32 mask)
-{
-    a->flags |= mask;
-}
 static inline void clearFlags(struct Ratatosk *a, u32 mask)
 {
     a->flags &= ~mask;
@@ -37,25 +33,9 @@ static inline void clearColliderFlags(struct ContactCollider *c, s32 mask)
 {
     c->flags = (s16)c->flags & ~mask;
 }
-static inline void setCameraFlags(struct CameraTracking *a, u32 mask)
-{
-    a->requests |= mask;
-}
-static inline void clearCameraFlags(struct CameraTracking *a, u32 mask)
-{
-    a->requests &= ~mask;
-}
 static inline u32 globalFlags(u32 mask)
 {
     return gUnk_02000560 & mask;
-}
-static inline void hide(struct AnimSprite *a)
-{
-    a->flags |= 1;
-}
-static inline void show(struct AnimSprite *a)
-{
-    a->flags &= ~1;
 }
 static inline void fade(struct AnimSprite *a)
 {
@@ -79,11 +59,11 @@ void Ratatosk_UpdateCollidersAndPalette(struct Ratatosk *p)
     u8 *palette;
     s32 zero;
     if (p->invulnerability) {
-        setFlags(actor, 4);
+        Ratatosk_SetFlags(actor, 4);
         p->invulnerability--;
     }
     if (p->damageTimer > 0)
-        setFlags(actor, 4);
+        Ratatosk_SetFlags(actor, 4);
     if (!p->locked) {
         collider = &p->hurtCollider;
         if (flags(actor, 4))
@@ -147,31 +127,31 @@ void Ratatosk_UpdateCollidersAndPalette(struct Ratatosk *p)
     }
     if (flags(actor, 16)) {
         if (!actor->locked)
-            clearCameraFlags(&p->camera, 1);
-        hide((struct AnimSprite *)p->animationData);
+            CameraTracking_ClearRequests(&p->camera, 1);
+        AnimSprite_Hide((struct AnimSprite *)p->animationData);
         ScaledShadow_Disable(p->shadow);
     } else {
-        show((struct AnimSprite *)p->animationData);
+        AnimSprite_Show((struct AnimSprite *)p->animationData);
         if (flags(actor, 0x40000)) {
             if (!actor->locked)
-                clearCameraFlags(&p->camera, 1);
+                CameraTracking_ClearRequests(&p->camera, 1);
             fade((struct AnimSprite *)p->animationData);
         } else {
             if (!actor->locked) {
-                setCameraFlags(&p->camera, 1);
+                CameraTracking_SetRequests(&p->camera, 1);
                 Camera_FollowPlayerWithoutCompletion(30);
             }
             unfade((struct AnimSprite *)p->animationData);
         }
         ScaledShadow_Enable(p->shadow);
-        setFlags(actor, 32);
+        Ratatosk_SetFlags(actor, 32);
     }
     if (!globalFlags(1)) {
         if (!actor->locked)
-            clearCameraFlags(&p->camera, 1);
+            CameraTracking_ClearRequests(&p->camera, 1);
     }
     if (!actor->locked && flags(actor, 0x1000000))
-        clearCameraFlags(&p->camera, 1);
+        CameraTracking_ClearRequests(&p->camera, 1);
     if (p->flashTimer > 0) {
         fade((struct AnimSprite *)p->animationData);
         p->flashTimer--;
@@ -185,9 +165,9 @@ void Ratatosk_UpdateCollidersAndPalette(struct Ratatosk *p)
     if (p->hurtCollider.responseValue) {
         p->hurtCollider.responseValue--;
         if ((p->hurtCollider.responseValue >> 2) & 1)
-            hide((struct AnimSprite *)p->animationData);
+            AnimSprite_Hide((struct AnimSprite *)p->animationData);
         else
-            show((struct AnimSprite *)p->animationData);
+            AnimSprite_Show((struct AnimSprite *)p->animationData);
     }
     if (p->damageTimer > 0) {
         AnimData_SelectPaletteBank(p->paletteAnimation, 402);
