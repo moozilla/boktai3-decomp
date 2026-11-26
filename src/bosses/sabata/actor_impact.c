@@ -1,4 +1,4 @@
-#include "bosses/sabata/actor_impact.h"
+#include "bosses/sabata/sabata_impact.h"
 #include "engine/engine.h"
 #include "engine/ram.h"
 
@@ -10,7 +10,7 @@ static inline u32 TestColliderFlags(struct ContactCollider *source, u32 mask)
 }
 
 void CollisionReaction_RecordImpact(struct ContactCollider *source, struct ContactCollider *target,
-                                    struct ActorImpact *actor)
+                                    struct SabataActorImpact *actor)
 {
     s32 delta = actor->direction - actor->body.direction;
     s32 distance;
@@ -36,20 +36,20 @@ void Collision_CalculateDamageResponse(struct ContactCollider *, struct ContactC
 
 void PlayerStats_AddContactHundredths(struct ContactCollider *, struct ContactCollider *, s32);
 
-static inline void SetRewardMask(struct ActorImpact *boss, u32 value)
+static inline void SetRewardMask(struct SabataActorImpact *boss, u32 value)
 {
     boss->rewardMask = value;
 }
 
-static inline void SetHitAttributes(struct ActorImpact *boss, u32 value)
+static inline void SetHitAttributes(struct SabataActorImpact *boss, u32 value)
 {
     boss->contactAttributes = value;
 }
 
 void SabataImpact_CopyContact(struct ContactCollider *attack, struct ContactCollider *defense,
-                             struct ActorImpact *actor)
+                             struct SabataActorImpact *actor)
 {
-    struct ActorImpact *boss = actor;
+    struct SabataActorImpact *boss = actor;
     u32 rewardMask;
     u32 attributes;
     u16 angleFlag;
@@ -85,7 +85,7 @@ void SabataImpact_NoOp(void)
 
 void Collider_SetAttackProperties(void *, s32, s32, s32, s32, s32);
 
-void SabataImpact_InitAttackCollider(struct ActorImpact *actor)
+void SabataImpact_InitAttackCollider(struct SabataActorImpact *actor)
 {
     struct ContactPackedVector size;
     struct ContactPackedVector offset;
@@ -104,7 +104,7 @@ void SabataImpact_InitAttackCollider(struct ActorImpact *actor)
 
 void Collider_SetBodyProperties(void *, s32, s32, s32);
 
-void SabataImpact_InitBodyCollider(struct ActorImpact *actor, s32 resource)
+void SabataImpact_InitBodyCollider(struct SabataActorImpact *actor, s32 resource)
 {
     struct ContactPackedVector size;
     struct ContactPackedVector offset;
@@ -122,7 +122,7 @@ void SabataImpact_InitBodyCollider(struct ActorImpact *actor, s32 resource)
     Collider_Refresh(collider);
 }
 
-void SabataImpact_InitCollider(struct ActorImpact *actor)
+void SabataImpact_InitCollider(struct SabataActorImpact *actor)
 {
     struct ContactPackedVector size;
     struct ContactPackedVector offset;
@@ -142,14 +142,14 @@ void SabataImpact_InitCollider(struct ActorImpact *actor)
 
 /* The original ABI leaves r0 incidental; callers must not consume a defined result. */
 
-u32 ActorExtension_ResetState(struct ActorImpact *actor)
+u32 ActorExtension_ResetState(struct SabataActorImpact *actor)
 {
     actor->damage = 0;
     actor->hitByLight = 0;
     actor->hitAttributes = 0;
 }
 
-s32 ActorResource_IsBelowSelectedLimit(struct ActorImpact *actor, s32 value)
+s32 ActorResource_IsBelowSelectedLimit(struct SabataActorImpact *actor, s32 value)
 {
     if (actor->resourceSelection == 0) {
         if (value < actor->resourceLimits[0])
@@ -161,7 +161,7 @@ s32 ActorResource_IsBelowSelectedLimit(struct ActorImpact *actor, s32 value)
     return 0;
 }
 
-s32 ActorResource_ClampDecrease(struct ActorImpact *actor, s32 decrease)
+s32 ActorResource_ClampDecrease(struct SabataActorImpact *actor, s32 decrease)
 {
     s32 result;
     s32 current = actor->currentResource;
@@ -188,14 +188,14 @@ extern const s16 gUnk_086149C4[];
 
 s32 Terrain_IsSegmentBelowHeightLimit(struct ContactPosition *, struct ContactPosition *, s32, s32);
 
-static inline s32 ActorImpact_TruncateFixed(s32 components)
+static inline s32 SabataImpact_TruncateFixed(s32 components)
 {
     if (components >= 0)
         return components >> 12;
     return -((-components) >> 12);
 }
 
-u8 SabataImpact_TestForwardPoint(struct ActorImpact *actor)
+u8 SabataImpact_TestForwardPoint(struct SabataActorImpact *actor)
 {
     struct ContactPosition point;
     u8 *anglePtr = &actor->body.direction;
@@ -203,13 +203,13 @@ u8 SabataImpact_TestForwardPoint(struct ActorImpact *actor)
     u32 angle = *anglePtr;
     s32 speed = 256;
     {
-        s32 x = ActorImpact_TruncateFixed(gUnk_086149C4[(angle + 64) & 255] * 256);
+        s32 x = SabataImpact_TruncateFixed(gUnk_086149C4[(angle + 64) & 255] * 256);
         components->x = x;
         components->y = 0;
     }
     {
         s32 sample = gUnk_086149C4[angle];
-        components->z = ActorImpact_TruncateFixed(sample * speed);
+        components->z = SabataImpact_TruncateFixed(sample * speed);
     }
     {
         struct ContactPosition *destination = &point;
@@ -230,7 +230,7 @@ u8 SabataImpact_TestForwardPoint(struct ActorImpact *actor)
 
 s32 AreaEffect_IsPositionCovered(void *);
 
-s32 SceneActors_GetEffectiveTimeStep(struct ActorImpact *actor)
+s32 SceneActors_GetEffectiveTimeStep(struct SabataActorImpact *actor)
 {
     s32 result;
     if (gPlayerEffectPendingCount != 0) {
@@ -243,7 +243,7 @@ s32 SceneActors_GetEffectiveTimeStep(struct ActorImpact *actor)
     return result;
 }
 
-void SabataImpact_FindNearbyPoint(struct ActorImpact *actor, struct ContactPosition *out, u32 start)
+void SabataImpact_FindNearbyPoint(struct SabataActorImpact *actor, struct ContactPosition *out, u32 start)
 {
     struct ContactPosition point;
     struct SceneActorBody *body = &actor->body;
@@ -255,14 +255,14 @@ void SabataImpact_FindNearbyPoint(struct ActorImpact *actor, struct ContactPosit
     for (; attempt <= 7; attempt++) {
         u32 angle = (start + (attempt << 5)) & mask;
         {
-            s32 x = ActorImpact_TruncateFixed(gUnk_086149C4[(angle + 64) & mask] * 256);
+            s32 x = SabataImpact_TruncateFixed(gUnk_086149C4[(angle + 64) & mask] * 256);
             components->x = x;
             components->y = 0;
         }
         {
             s32 sample = gUnk_086149C4[angle & mask];
             s32 value = sample * speed;
-            s32 z = ActorImpact_TruncateFixed(value);
+            s32 z = SabataImpact_TruncateFixed(value);
             components->z = z;
             {
                 u32 x = (u16)body->position.x;

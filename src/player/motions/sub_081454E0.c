@@ -22,7 +22,7 @@ static inline s32 scale(s32 v)
         return v >> 12;
     return -((-v) >> 12);
 }
-void RisingSprite_Spawn(struct SceneVec *);
+void RecoilPuff_Spawn(struct SceneVec *);
 void SparkParticle_Spawn(struct SceneVec *, s32, s32, s32, s32, s32, s32, s32);
 void Camera_RequestShake(u32);
 static inline s32 eighth(s32 v)
@@ -59,7 +59,7 @@ void Player_UpdateTerrainRecoil(struct Player *p)
             if (p->unk461[0] <= 5) {
                 if (!(p->unk461[0] & 1)) {
                     Sound_PlaySong(0x191);
-                    RisingSprite_Spawn(&p->position);
+                    RecoilPuff_Spawn(&p->position);
                 }
                 p->unk461[0]++;
             }

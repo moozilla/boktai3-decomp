@@ -4,7 +4,7 @@
 #include "engine/engine.h"
 u8 *TerrainModifiers_FindCellOverride(s32, s32);
 u32 Player_IsStatusBit4ActionActive(u32);
-u32 NamedObject_FindNearPosition(struct SceneVec *);
+u32 MovingPlatform_FindNearPosition(struct SceneVec *);
 s32 Mod(s32, s32);
 s32 Div(s32, s32);
 void Player_ClampPositionToStoredTerrainCell(struct Player *p)
@@ -29,7 +29,7 @@ void Player_ClampPositionToStoredTerrainCell(struct Player *p)
         return;
     if (p->terrainClampBlocked)
         return;
-    if (NamedObject_FindNearPosition(&p->position))
+    if (MovingPlatform_FindNearPosition(&p->position))
         return;
     cellX = Mod(p->storedTerrainCell, *(s16 *)(gTerrainMap->cells + 4));
     cellZ = Div(p->storedTerrainCell, *(s16 *)(gTerrainMap->cells + 4));

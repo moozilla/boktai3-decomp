@@ -2284,7 +2284,8 @@ void Skeleton_InitVariantMotion(void *);
 
 void Collider_SetAttackProperties(void *, s32, s32, s32, s32, s32);
 
-void sub_08127590(void *, void *, u32, u32, s32, s32, s32, s32, s32, s32, s32, s32, s32, s32, s32);
+void SpriteProjectile_Create(void *, void *, u32, u32, s32, s32, s32, s32, s32, s32, s32, s32, s32,
+                             s32, s32);
 
 extern const s16 gUnk_086149C4[];
 
@@ -2336,7 +2337,8 @@ static inline void Skeleton_SetCategory(struct ChaseActor *actor, u8 category)
 static inline void Skeleton_EmitBone(struct ContactPosition *position,
                                      struct ContactPosition *velocity, u32 sequence)
 {
-    sub_08127590(position, velocity, 0xD45E, 0x1DC3, sequence, 30, 2, 0, 316, 0, 0, 0, 0, 0, 0);
+    SpriteProjectile_Create(position, velocity, 0xD45E, 0x1DC3, sequence, 30, 2, 0, 316, 0, 0, 0, 0,
+                            0, 0);
 }
 
 /* Emit two bone fragments and restore the threshold reaction. */

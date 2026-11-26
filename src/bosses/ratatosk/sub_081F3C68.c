@@ -56,7 +56,7 @@ void HomingProjectile_Spawn(void *, struct ContactPosition *);
 void PlayerClone_InitConfig(void *);
 void PlayerClone_SetLifetimeAndBehavior(void *, s32, s32, u8);
 void PlayerClone_SetColliderExtents(void *, s32, s32, s32, s32, s32, s32);
-s32 sub_08201160(void *, struct ContactPosition *);
+s32 PlayerClone_Spawn(void *, struct ContactPosition *);
 static inline u32 randomB(void)
 {
     gRandomIndex = (gRandomIndex + 1) & 1023;
@@ -101,7 +101,6 @@ static inline void Ratatosk_CopyPositionWords(void *dest, const void *source)
 }
 
 // confidence=low: surrounds the player with homing projectiles or clone actors.
-#define Ratatosk_UpdateRadialSummonAttack sub_081F3C68
 void Ratatosk_UpdateRadialSummonAttack(struct Ratatosk *p, s32 tick)
 {
     struct SummonConfig projectile, clone;
@@ -196,7 +195,7 @@ void Ratatosk_UpdateRadialSummonAttack(struct Ratatosk *p, s32 tick)
                                                p2->cloneAttack[2], p2->cloneAttack[3],
                                                p2->cloneAttack[4], p2->cloneAttack[5]);
                 clampSpawn(&cloneSpawn);
-                sub_08201160(&clone, &cloneSpawn);
+                PlayerClone_Spawn(&clone, &cloneSpawn);
                 angle += Div(256, p2->cloneCount);
             }
         }

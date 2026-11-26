@@ -24,7 +24,6 @@ static inline s32 TransitionCellHeight(s32 cell, const struct ContactPosition *p
     return height;
 }
 
-#define SceneActorTerrain_CheckHeightTransition sub_08076CDC
 
 // confidence=low: steps an actor toward a neighboring cell when the height step and path allow it; returns -1 when blocked.
 s32 SceneActorTerrain_CheckHeightTransition(struct SceneActorTerrainView *actor,

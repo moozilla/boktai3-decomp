@@ -5,7 +5,7 @@ Tags: #cleanup #structs #engine #actors #tooling #object-model
 Phase-4 cleanup from the list at the end of `docs/OBJECT_MODEL.md`, items 1 to 5. Every change is byte-identical: each unit that
 includes a changed header was checked with `tools/check.py` through the new
 `tools/header_dependents.py --check`. No concession was added; one unit
-(`CellGate_ClampPlayerEdge`) lost its `*(u16 *)` casts along the way.
+(`PassageBarrier_ClampPlayerEdge`) lost its `*(u16 *)` casts along the way.
 
 ## Item 1: the script command table
 
@@ -24,7 +24,7 @@ includes a changed header was checked with `tools/check.py` through the new
 * Ran: the new test, test_gclroles, test_script_trace, test_actor_command_tables,
   test_actor_marker_studio, test_studio_search; `tools/datafmt/check.py` (all OK).
 * Not fixed: `tools/promote_names.py --dry-run` already stops on main with
-  "sub_0805CD60 has two names: ScenePanelSubject_TickInactive, ScenePanelSubject_Idle".
+  "sub_0805CD60 has two names: PileDriverSubject_TickInactive, ScenePanelSubject_Idle".
 
 ## Item 2: task headers
 
@@ -78,7 +78,7 @@ includes a changed header was checked with `tools/check.py` through the new
     sub_0819FE9C (Hresvelgr; its private `struct Player` went too); six units
     (sub_08030710/7D8/818/864, sub_081D0F28, sub_08226CF8) each with a private
     `struct Player` (position at 0x30) and its own `struct Vec`, now SceneVec.
-* No unit needed its old declaration form. CellGate_ClampPlayerEdge first mismatched:
+* No unit needed its old declaration form. PassageBarrier_ClampPlayerEdge first mismatched:
   the ROM reloads `gPlayers[0]` after storing the clamped coordinate. With the old scalar
   pointer, the `*(u16 *)&...position.x` store could alias it. With the array, agbcc
   keeps the pointer in a register. Writing the store as a field (`position.x = ...`)

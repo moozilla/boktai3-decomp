@@ -7,10 +7,10 @@ The first pass and ongoing continuation on `codex/finish-effects` have matched t
 | Address | Function | Bytes | Result | Deciding source property or open mechanism |
 |---|---|---:|---|---|
 | 080148CC | `ParticleGroup_SpawnRadial` | 860 | Exact | Addressable inline input homes, short direction output captures, typed samples, and phased setup values recover the full frame and remove all eight concessions. |
-| 08015A0C | `AnimatedParticles_EmitRandomBurst` | 272 | Exact | Full-width argument, signed local capture, countdown and dead table reset retain the loop-head load. |
+| 08015A0C | `ImpactBurst_EmitRandomBurst` | 272 | Exact | Full-width argument, signed local capture, countdown and dead table reset retain the loop-head load. |
 | 08017044 | `FloatingItemEffect_Spawn` | 544 | Exact | Projection helper caches x/z; multiplication belongs at the signed-shift call site. |
 | 0803EF4C | `SceneArc_UpdateSlot` | 1,112 | Exact | Addressable velocity builder, canonical playback, phase/table split and wide actor flag test. |
-| 08047DF4 | `DirectionalParticle_Spawn` | 372 | Exact | Shared raw/packed coordinate storage keeps the first mask in HImode and preserves the ROM reload copy. |
+| 08047DF4 | `ImpactFragment_Spawn` | 372 | Exact | Shared raw/packed coordinate storage keeps the first mask in HImode and preserves the ROM reload copy. |
 | 08068500 | `SceneParticle_CreateAnchoredRanges` | 644 | Exact | Shared counter/table iteration state, offset-first sampling, and an actual component operand with two definitions preserve the stack table and local clear mask. |
 | 0806A160 | `SparkParticle_Spawn` | 704 | Draft | Pool-handle/table storage phases recover table spilling and the loop body; the first pool load and reload setup remain. |
 | 0806AF74 | `SpriteEffectController_UpdateTileBounce` | 848 | Exact | Direct controller flags ownership gives frame and flag PRE values the original lifetimes and copy placement. |

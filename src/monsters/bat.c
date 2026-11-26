@@ -1,3 +1,4 @@
+#include "scene/motion/scene_actor_terrain_reaction.h"
 #include "scene/collision/scene_body_api.h"
 #include "global.h"
 #include "monsters/bat.h"
@@ -225,7 +226,7 @@ s32 Bat_Init(void *object)
         res = ScriptProc_Start(0xCB05, 0xDA6D);
         *(struct DisplayResourceHeader *)heap = *(struct DisplayResourceHeader *)res;
         ResourceHeader_Relocate(heap, res);
-        Widget_InitLinked(heap + 0x20, heap, 0, 0, 2, 2, 0x3C, &tmp);
+        AnimSprite_InitLinked(heap + 0x20, heap, 0, 0, 2, 2, 0x3C, &tmp);
         actor->base.animationIndex = 0xFF;
     }
     MonsterInit_InitializeBody(actor);
@@ -286,7 +287,7 @@ s32 Bat_Init(void *object)
         flag = 1;
     }
     if (flag != 1) {
-        MonsterInit_SetState(actor, 0, 0, 0);
+        SceneActorTerrain_EnterState(actor, 0, 0, 0);
         MonsterInit_SetControl(actor, MonsterInit_GetStandingControl(actor), 0);
     }
     MonsterInit_InitializeRegion(actor);
@@ -325,9 +326,9 @@ s32 Bat_Init(void *);
 
 void Bat_Create(void)
 {
-    void *m = Heap_Alloc(0x43c);
+    void *m = Heap_Alloc(sizeof(struct Bat));
     if (m != 0) {
-        Memory_Clear(m, 0x43c);
+        Memory_Clear(m, sizeof(struct Bat));
         if (Bat_Init(m) < 0) {
             Bat_Destroy(m);
             Heap_Free(m);

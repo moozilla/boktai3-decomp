@@ -39,7 +39,7 @@ class ReferenceTests(unittest.TestCase):
         self.assertEqual(role[0], 'game_state_set_area_flag')
 
     def test_snake(self):
-        self.assertEqual(gclroles.snake('SceneObjects_ScriptActivate'), 'scene_objects_activate')
+        self.assertEqual(gclroles.snake('SlidingDoors_ScriptActivate'), 'sliding_doors_activate')
         self.assertEqual(gclroles.snake('show_stage_icon'), 'show_stage_icon')
 
 

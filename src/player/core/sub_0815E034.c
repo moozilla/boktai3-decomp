@@ -6,7 +6,6 @@ void PlayerCue_ApplyColliderScale(void *, void *);
 void Anim_ApplyDurationScales(void *, void *);
 
 /* Select the elemental response and scale damage by the matching player defense. */
-#define PlayerContact_ComputeCost sub_0815E034
 void PlayerContact_ComputeCost(struct Player *player, struct ContactCollider *source,
                                struct ContactCollider *target)
 {

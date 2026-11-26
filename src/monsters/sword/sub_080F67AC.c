@@ -1,4 +1,4 @@
-#include "scene/collision/contact_swarm.h"
+#include "monsters/sword/sword_task.h"
 #include "player/player.h"
 #include "engine/video/display_sequence_inline.h"
 
@@ -20,51 +20,6 @@ union SwordVector {
     struct ContactPosition position;
 };
 
-struct SwordTask {
-    u8 unknown0[0x60];
-    void *target;
-    u16 field64, field66, field68, field6A, field6C, field6E, field70;
-    u8 unknown72[0xC];
-    s16 health, body80, field82, field84, field86, body88, body8A;
-    u8 field8C, flags8D, field8E, field8F, field90, field91, field92, field93;
-    u8 unknown94[0x6];
-    u16 field9A, field9C;
-    u8 field9E, field9F;
-    u8 unknownA0[0x8];
-    struct ContactSwarmSprite segments[4];
-    struct ContactSwarmGraphics segmentGraphics[4];
-    struct ContactCollider segmentAttacks[4];
-    struct ContactCollider segmentBodies[4];
-    u8 unknown468[0x6F0];
-    struct DisplaySequenceState sequence;
-    struct ContactSwarmSprite sprite;
-    struct ContactSwarmGraphics graphics;
-    u8 shadow[0x6C];
-    struct ContactCollider attack;
-    struct ContactCollider body;
-    u8 unknownCC4[0x4];
-    void *update;
-    u8 unknownCCC[0x4];
-    void *onContact;
-    u8 unknownCD4[0x18];
-    u32 fieldCEC;
-    void *colorUpdate;
-    u8 unknownCF4[0x4];
-    u32 duration;
-    u8 unknownCFC[0x8];
-    s16 attackD04[2], attackD08[2], attackD0C[2], attackD10[2];
-    u8 unknownD14[0x1C];
-    u16 palette[16];
-    u8 unknownD50[0x2];
-    u8 fieldD52, fieldD53, fieldD54, variant;
-    u16 paletteBank;
-    u8 unknownD58[0x4];
-    u16 initialHealth;
-    u8 parameter;
-    u8 unknownD5F[0x27];
-    u16 fieldD86;
-    u8 registry[4];
-};
 
 static inline s32 Sword_ReadArgument(void)
 {
@@ -434,5 +389,5 @@ void Sword_InitTask(struct SwordTask *p)
     ChildGroup_ReadScriptParameters(p);
     Script_GetKeywordValue(0x4E, 0);
     if (Script_GetKeywordValue(0x4D, 0) & 0x200)
-        TargetRegistry_RegisterSceneActor(p->registry, &p->body, ChildGroup_ProcessEvent);
+        TargetRegistry_RegisterSceneActor(p->status.registry, &p->body, ChildGroup_ProcessEvent);
 }

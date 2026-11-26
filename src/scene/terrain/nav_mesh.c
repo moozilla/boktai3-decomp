@@ -294,13 +294,13 @@ u32 NavMesh_FindRoute(void *route, void *origin, void *destination)
     return 0;
 }
 
-int Terrain_ApplyBlocked(u16 *out, void *arg, struct ContactPosition *pos)
+int Terrain_ApplyBlocked(struct NavMeshRoute *route, void *origin, struct ContactPosition *pos)
 {
     s32 x = (s16)pos->x >> 8;
     s32 z = (s16)pos->z >> 8;
     s32 cell;
     u8 *props;
-    u32 mask, flags;
+    u32 flags;
     if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
         cell = 0;
     else
@@ -314,13 +314,11 @@ int Terrain_ApplyBlocked(u16 *out, void *arg, struct ContactPosition *pos)
         props = map->cells + offset;
     }
     flags = *(u16 *)(props + 2);
-    mask = 2;
-    if (flags & mask) {
-        int z = 0;
-        *out = z;
-        return z;
+    if (flags & 2) {
+        route->status = 0;
+        return 0;
     }
-    return NavMesh_FindRoute(out, arg, pos);
+    return NavMesh_FindRoute(route, origin, pos);
 }
 
 /* NavMesh_ClearProbeFlags: Clears the navigation probe's flag word */
@@ -479,7 +477,7 @@ void NavMesh_UpdateProbe(struct NavSteeringProbe *probe, struct NavSteeringPosit
 
 extern const s16 gUnk_086149C4[];
 
-s32 sub_0821BF5C(s16 *, s16 *, s32);
+s32 Terrain_AreCellsConnected(s16 *, s16 *, s32);
 
 static inline s32 Mul12(s32 a, s32 b)
 {
@@ -501,7 +499,7 @@ s32 Actor_MoveAlongAngle(struct NavSteeringPosition *pos, u32 angle, s32 dist)
     d.x = d.x + pos->x;
     q->y = pos->y + q->y;
     q->z = q->z + pos->z;
-    return sub_0821BF5C((s16 *)pos, (s16 *)&d, 4);
+    return Terrain_AreCellsConnected((s16 *)pos, (s16 *)&d, 4);
 }
 
 // Steers a nav probe: when the probe lies to the side of `angle` (relative to `target`),

@@ -1,7 +1,7 @@
 #include "objects/pile_driver/pile_driver_effects.h"
-void PileDriver_UpdatePaletteState(struct ScenePanel *input)
+void PileDriver_UpdatePaletteState(struct PileDriver *input)
 {
-    struct ScenePanelEffectsView *panel = (void *)input;
+    struct PileDriverEffectsView *panel = (void *)input;
     if (panel->state)
         panel->state(input);
     PileDriver_UpdateTimePalette(panel);

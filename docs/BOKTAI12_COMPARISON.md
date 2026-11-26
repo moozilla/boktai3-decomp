@@ -43,7 +43,7 @@ Largest runs of identical code, B3 range to B2 JP rev 1 (full list: rerun
 
 | B3 range | what | B2 JP address |
 |---|---|---|
-| `08003B40-08004BD6` | `ColorFade_FromScript` .. `Scene_SpawnDirectionalDust` | `08002988` |
+| `08003B40-08004BD6` | `ColorFade_FromScript` .. `PuzzleBlock_SpawnDirectionalDust` | `08002988` |
 | `08006CC6-08008A70` | `ChoiceMenu_*` .. `Trigger_MoveDropsByItemFromScript` | `08005B4A` |
 | `08032754-08036E14` | `TextState_ProcessTag`, `DialogueTransition_*` (18 KB) | `08049198` |
 | `0804F21E-0805907C` | ResourceStation, BreakableProp, HitSwitch, StageIcon, ProximityIcon (about 30 KB) | `0809F1A0` |

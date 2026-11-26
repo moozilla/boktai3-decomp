@@ -1,16 +1,16 @@
-#include "bosses/sabata/scene_volume.h"
+#include "bosses/sabata/sabata_attack_state.h"
 #include "objects/pile_driver/pile_driver_commands.h"
-void sub_0817B2DC(struct SceneVolumeActor *p)
+void sub_0817B2DC(struct SabataAttackActor *p)
 {
     s32 i;
-    struct ScenePanelReceiver *receiver;
+    struct PileDriverReceiver *receiver;
     receiver = &p->receiver;
     i = 0;
     if (i < p->receiver.count[gSceneEventDispatchState->bank]) {
         do {
-            struct ScenePanelCommandGlobals *globals = gSceneEventDispatchState;
+            struct PileDriverCommandGlobals *globals = gSceneEventDispatchState;
             s32 op;
-            struct ScenePanelCommand *command = receiver->commands[globals->bank][i];
+            struct PileDriverCommand *command = receiver->commands[globals->bank][i];
             SceneMessages_SetPendingTrigger(receiver, command);
             op = command->opcode;
             switch (op) {

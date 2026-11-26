@@ -87,13 +87,7 @@ static inline void UpdateActors_SpawnContactParts(struct ChaseActor *actor)
     actor->base.hitLockTimer = 0;
 }
 
-struct UpdateActorsTile {
-    u8 unknown0[8];
-    u32 flags;
-    u8 unknown0C[0x2E];
-    u16 paletteOffset;
-};
-static inline void ClearTileFlags(struct UpdateActorsTile *tile, u32 bits)
+static inline void ClearTileFlags(struct AnimSprite *tile, u32 bits)
 {
     u32 keep = ~bits;
     tile->flags &= keep;
@@ -104,7 +98,7 @@ static inline void ClearDrawableFlags(struct ChaseActor *actor, u32 bits)
         SceneActorChase_ClearWordFlags(
             &((struct SceneActorRegistrySequenceDrawable *)actor->base.drawable)->flags, bits);
     else {
-        struct UpdateActorsTile *tile = (void *)((u8 *)actor->base.drawable + 0x20);
+        struct AnimSprite *tile = (void *)((u8 *)actor->base.drawable + 0x20);
         ClearTileFlags(tile, bits);
     }
 }
@@ -242,10 +236,10 @@ next:
                         ((struct SceneActorPaletteSequenceView *)draw)->paletteOffset =
                             actor->base.paletteBank;
                     } else {
-                        struct UpdateActorsTile *tile;
+                        struct AnimSprite *tile;
                         draw = actor->base.drawable;
                         tile = (void *)((u8 *)draw + 0x20);
-                        tile->paletteOffset = actor->base.paletteOffset;
+                        tile->paletteBank = actor->base.paletteOffset;
                     }
                 }
                 if ((u8)SceneActorPalette_ApplyTransition((void *)manager, actor)) {

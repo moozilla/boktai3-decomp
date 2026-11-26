@@ -1,14 +1,6 @@
-#include "global.h"
+#include "scene/actor/scene_event_dispatch.h"
 // confidence=low: applies queued scene commands to the armor actor (behavior, attachments, flags).
 
-typedef struct {
-    u8 pad0[6];
-    u8 count[2];
-    s16 *messages[2][4];
-} ArmorQueue;
-
-extern u8 *gSceneEventDispatchState;
-void SceneMessages_SetPendingTrigger(void *, void *);
 void ActorController_SetBehavior(void *, s32);
 u32 Trigger_ConsumePending(void *, u32);
 void *ActorAttachment_CreateSpriteSlot(u32, void *, void *, s32, s32, u32, void *, void *);
@@ -29,16 +21,17 @@ static inline void SETF_(u16 *fp)
 void Armor_ApplySceneCommands(u8 *arg)
 {
     u8 *p = arg;
-    ArmorQueue *q = (ArmorQueue *)(p + 0xADC);
+    struct SceneEventReceiver *q = (void *)(p + 0xADC);
     s32 i;
     i = 0;
-    if (i >= q->count[gSceneEventDispatchState[0x24]])
+    if (i >= q->count[gSceneEventDispatchState->phase])
         return;
     do {
-        u8 *scene = gSceneEventDispatchState;
-        s16 *m = q->messages[scene[0x24]][i];
-        SceneMessages_SetPendingTrigger(q, m);
-        switch (((u8 *)m)[6]) {
+        struct SceneEventDispatchState *scene = gSceneEventDispatchState;
+        struct SceneEventCommand *command = q->pending[scene->phase][i];
+        s16 *m = (void *)command;
+        SceneMessages_SetPendingTrigger(q, command);
+        switch (command->kind) {
             case 1:
                 ActorController_SetBehavior(p, 0x2a);
                 {
@@ -148,5 +141,5 @@ void Armor_ApplySceneCommands(u8 *arg)
                 }
                 break;
         }
-    } while (++i < q->count[gSceneEventDispatchState[0x24]]);
+    } while (++i < q->count[gSceneEventDispatchState->phase]);
 }

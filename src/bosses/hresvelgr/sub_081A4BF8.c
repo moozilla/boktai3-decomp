@@ -3,7 +3,6 @@
 #include "engine/ram.h"
 
 // confidence=low: advances falling projectiles and switches to impact on terrain contact.
-#define Hresvelgr_UpdateFallingProjectile sub_081A4BF8
 struct ProjectilePosition {
     s16 x, y, z, pad;
 };
@@ -21,7 +20,7 @@ struct FallingProjectile {
 u8 *TerrainModifiers_FindCellOverride(s32, s32);
 void ScaledShadow_Initialize(void *, void *, s32, s32, s32, s32, s32, s32, s32, s32, s32);
 void ScaledShadow_SetGraphic(void *, s32, s32);
-void sub_081A4AB4(void *);
+void Hresvelgr_EmitImpactExplosions(void *);
 void Hresvelgr_RepelNearbyTetherActor(void *);
 void Hresvelgr_UpdateProjectileImpact(void *);
 void Hresvelgr_SetFallingAttackState(void *, void (*)(void *));
@@ -81,7 +80,7 @@ void Hresvelgr_UpdateFallingProjectile(struct FallingProjectile *p)
         p->position = p->precisePosition;
         Anim_Step(p, resource);
         if ((u32)p->precisePosition.y <= Height(&p->precisePosition)) {
-            sub_081A4AB4(p);
+            Hresvelgr_EmitImpactExplosions(p);
             Hresvelgr_RepelNearbyTetherActor(p);
             Hresvelgr_SetFallingAttackState(p, Hresvelgr_UpdateProjectileImpact);
         } else

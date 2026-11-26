@@ -3,7 +3,7 @@
 #include "scene/motion/scene_actor_chase_reaction.h"
 #include "scene/actor/scene_actor_control_phase.h"
 #include "scene/motion/scene_actor_terrain.h"
-#include "npc/cutscene_actor/actor_animation_controller.h"
+#include "ui/title/actor_animation_controller.h"
 #include "monsters/scene_actor_init_primitives.h"
 #include "monsters/scene_actor_init_group.h"
 #include "scene/actor/scene_actor_init_dispatch.h"
@@ -46,7 +46,7 @@ typedef char SkeletonSize[(sizeof(struct Skeleton) == 0x74C) ? 1 : -1];
 
 void SceneActorScript_TriggerCallOnCount(struct ChaseActor *actor);
 u8 SceneActorReaction_IsRangeReady(struct ChaseActor *actor);
-u8 sub_0812F3CC(struct ChaseActor *);
+u8 SceneActorReaction_BeginContactResponse(struct ChaseActor *);
 void Skeleton_UpdateTargetTransition(struct ChaseActor *a);
 void Anim_SetDurationScale(void *, u32);
 void Anim_SetFrameDurationScale(void *, u32);

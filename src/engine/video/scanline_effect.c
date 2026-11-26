@@ -1,6 +1,3 @@
-#define ScanlineEffect_StopTransfer sub_082194D4
-#define Mosaic_UploadRegisters      sub_08219134
-#define TextWindow_LoadFramePalette sub_0821907C
 #include "engine/video/scanline_effect.h"
 #include "engine/engine.h"
 #include "engine/video/render.h"

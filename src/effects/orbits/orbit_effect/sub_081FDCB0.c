@@ -16,7 +16,6 @@ static inline void Polar(struct OrbitEffectPosition *p, u32 angle, s32 radius)
     p->z = Scale(gUnk_086149C4[angle & 255] * radius);
 }
 // confidence=low: advances a timed trail toward the owning effect's current position.
-#define OrbitEffect_UpdateHomingTrail sub_081FDCB0
 void OrbitEffect_UpdateHomingTrail(struct OrbitTrailSprite *trail, void *resource)
 {
     if ((u16)++trail->age < 32) {

@@ -32,8 +32,7 @@ static inline void SetCallback(void (*v)(void), void (**a)(void))
     *a = v;
 }
 // confidence=low: installs the terminal callback and marks the display transition complete.
-#define SingletonSlot7_BeginFinalTransition sub_081EF880
-void SingletonSlot7_BeginFinalTransition(struct SceneActorTween *p)
+void VanargandHead_BeginFinalTransition(struct SceneActorTween *p)
 {
     struct SceneActorTween *actor = p;
     if (ConsumeEntry(p) == 1) {

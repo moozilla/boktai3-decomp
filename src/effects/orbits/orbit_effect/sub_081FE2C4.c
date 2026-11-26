@@ -92,7 +92,7 @@ s32 OrbitEffect_UpdateManager(struct OrbitEffectManager *manager)
                 for (j = 0; j < 12; j++) {
                     struct OrbitTrailSprite *trail = &effect->trails[j];
                     if (trail->active)
-                        sub_081FDCB0(trail, effect->resource);
+                        OrbitEffect_UpdateHomingTrail(trail, effect->resource);
                 }
             }
             if (effect->params.kind == 2) {

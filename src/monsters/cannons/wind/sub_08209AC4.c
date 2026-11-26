@@ -1,61 +1,9 @@
-#include "global.h"
+#include "scene/collision/contact_actor.h"
+#include "monsters/cannons/wind_cannon.h"
 #include "player/cutscene/player_cue_sequence.h"
 #include "engine/ram.h"
 #include "engine/engine_globals.h"
 #include "engine/math/monster_particle_random.h"
-struct FanVec {
-    s16 x, y, z, pad;
-};
-struct FanCollider {
-    u8 pad[6];
-    u16 flags;
-};
-struct FanCannon {
-    s32 age;
-    void *hud;
-    struct FanVec initial;
-    u32 flags;
-    u8 p14[0x18];
-    struct FanVec position;
-    u8 p34[8];
-    u8 graphics[0x1c];
-    struct FanCollider collider;
-    u8 p60[4];
-    u8 colliderPosition[8];
-    u8 colliderExtra[0x2f];
-    u8 colliderDirection;
-    u16 blink;
-    u8 p9e[0xf4 - 0x9e];
-    void (*update)(void);
-    struct DisplaySequenceState sequence;
-    s32 range;
-    s16 maximumWind, health, damage, reaction;
-    s16 f114, dead, flash;
-    s8 direction;
-    u8 reverse;
-    s16 period, palette, wind, variant;
-    u8 activated, stopped;
-    s16 hasBody;
-    s16 maximumHealth, hudA, hudB, f12e, f130, f132, hudTime, initialDead;
-    void *schedule;
-    s32 f13c, terrain;
-    void *resource;
-    u8 terrainCell[8];
-    s32 f150, f154, f158, f15c, f160, f164, f168;
-    s16 scheduleCount, scheduleIndex;
-    s16 times[8];
-};
-struct EffectPair {
-    s32 lo : 16;
-    u32 hi : 16;
-};
-struct EffectVector {
-    struct EffectPair a, b;
-};
-struct FanTerrain {
-    u8 pad[0x24];
-    u16 rows[1];
-};
 s32 Mod(s32, s32);
 s32 Div(s32, s32);
 void WindCannon_Activate(struct FanCannon *);
@@ -70,31 +18,30 @@ void DamageNumberDisplay_Show(void *, s32, s32, void *, void *, s32);
 void SceneHud_SetTimedState(void *, s32, s32, s32, s32, s32);
 void TerrainModifiers_UnregisterCell(void *);
 void TerrainModifiers_RegisterCell(void *, s32, s32, s32, s32, s32);
-void sub_08014634(s32, s32, void *, void *, void *, s32, s32);
+void ImpactParticleGroup_SpawnBouncing(s32, s32, void *, void *, void *, s32, s32);
 void Explosion_CreateAt(void *, s32, s32, s32, s32, s32, s32, s32);
 void Anim_RestartSequence(void *, void *, u32, u32, u32);
-void Anim_SetDurationScale(void *, u32);
 void AnimData_SelectPaletteBank(void *, s32);
-struct FanVec *Player_GetEffectivePosition(s32);
+struct ContactPosition *Player_GetEffectivePosition(s32);
 
-static inline s32 Fan_Cell(struct FanVec *v)
+static inline s32 Fan_Cell(struct ContactPosition *v)
 {
     s32 x = (s16)v->x >> 8, z = (s16)v->z >> 8;
     if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
         return 0;
-    return ((struct FanTerrain *)gTerrainMap)->rows[z] + x;
+    return gTerrainMap->rows[z] + x;
 }
 static inline s32 Fan_Distance(struct FanCannon *p)
 {
-    struct FanVec *player = Player_GetEffectivePosition(0);
-    s32 dx = player->x - p->position.x;
-    s32 dz = player->z - p->position.z;
+    struct ContactPosition *player = Player_GetEffectivePosition(0);
+    s32 dx = player->x - p->sprite.position.x;
+    s32 dz = player->z - p->sprite.position.z;
     return dx * dx + dz * dz;
 }
 
 s32 WindCannon_Update(void *manager, struct FanCannon *p, s32 slot)
 {
-    struct FanCollider *collider;
+    struct ContactCollider *collider;
     if (p->activated && p->dead == 0) {
         p->wind = p->maximumWind;
         WindCannon_Activate(p);
@@ -120,14 +67,14 @@ s32 WindCannon_Update(void *manager, struct FanCannon *p, s32 slot)
     }
 invoke:
     Callback_InvokeActor(p, p->update);
-    p->flags &= ~1;
+    p->sprite.flags &= ~1;
     if (p->dead == 0) {
-        struct FanCollider *c = &p->collider;
+        struct ContactCollider *c = &p->collider;
         c->flags &= ~4;
-        Collider_SetPosition(c, &p->position, 0);
+        Collider_SetPosition(c, &p->sprite.position, 0);
         collider = c;
     } else {
-        struct FanCollider *c = &p->collider;
+        struct ContactCollider *c = &p->collider;
         c->flags |= 4;
         collider = c;
     }
@@ -138,39 +85,41 @@ invoke:
         p->f158 = p->f15c;
         Sound_PlaySong(0x13e);
         if (p->damage > 0) {
-            DamageNumberDisplay_Show(collider, p->damage, 0, p->colliderPosition, p->colliderExtra,
-                                     1);
-            SceneHud_SetTimedState(p->hud, p->health, p->maximumHealth, p->hudA,
-                                   p->colliderDirection == 4, p->hudTime);
+            DamageNumberDisplay_Show(collider, p->damage, 0, &p->collider.position,
+                                     &p->collider.offset, 1);
+            SceneHud_SetTimedState((void *)p->name, p->health, p->maximumHealth, p->hudA,
+                                   p->collider.costFlags == 4, p->hudTime);
         }
         if (p->health <= 0) {
-            struct EffectVector spread, velocity;
-            struct FanVec center;
-            struct FanVec smoke;
+            struct ContactPackedVector spread, velocity;
+            struct ContactPosition center;
+            struct ContactPosition smoke;
             const u16 *table;
             p->dead = 1;
             if (p->terrain) {
                 s32 cell;
                 TerrainModifiers_UnregisterCell(p->terrainCell);
-                cell = Fan_Cell(&p->position);
-                TerrainModifiers_RegisterCell(p->terrainCell, cell, 0, p->position.y >> 8, 0, 1);
+                cell = Fan_Cell(&p->sprite.position);
+                TerrainModifiers_RegisterCell(p->terrainCell, cell, 0, p->sprite.position.y >> 8, 0,
+                                              1);
             }
             {
-                struct FanVec *v = &center;
-                *v = p->position;
+                struct ContactPosition *v = &center;
+                *v = p->sprite.position;
                 v->y += 0x80;
             }
-            velocity.a.lo = -4;
+            velocity.x = -4;
             table = (const u16 *)RANDOM_TABLE_ADDR;
-            velocity.a.hi = ParticleRandom_ReadDirectSample(table) & 7;
-            velocity.b.lo = -4;
-            spread.a.lo = 24;
-            spread.a.hi = (ParticleRandom_ReadDirectSample(table) & 7) + 3;
-            spread.b.lo = 24;
-            sub_08014634((ParticleRandom_ReadDirectSample(table) & 3) + 4, 13, &center, &velocity, &spread, 15, 15);
+            velocity.y = ParticleRandom_ReadDirectSample(table) & 7;
+            velocity.z = -4;
+            spread.x = 24;
+            spread.y = (ParticleRandom_ReadDirectSample(table) & 7) + 3;
+            spread.z = 24;
+            ImpactParticleGroup_SpawnBouncing((ParticleRandom_ReadDirectSample(table) & 3) + 4, 13,
+                                              &center, &velocity, &spread, 15, 15);
             {
-                struct FanVec *v = &smoke;
-                *v = p->position;
+                struct ContactPosition *v = &smoke;
+                *v = p->sprite.position;
                 v->y += 0x80;
                 Explosion_CreateAt(v, 16, 0, 0, 0, 60, 0, 0);
                 v->x += 0x80;
@@ -194,26 +143,22 @@ invoke:
             p->stopped = 0;
             Sound_PlaySong(0x52d);
         }
-        {
-            s16 *flash = &p->flash;
-            s32 zero = 0;
-            *flash = 8;
-            p->reaction = 1;
-            p->damage = zero;
-        }
+        p->flash = 8;
+        p->reaction = 1;
+        p->damage = 0;
     }
     if (p->dead == 0 && p->update != WindCannon_UpdateInactive && !p->stopped) {
-        struct FanVec playerCopy;
-        struct FanVec *pl;
+        struct ContactPosition playerCopy;
+        struct ContactPosition *pl;
         s32 direction;
-        struct FanVec *src;
+        struct ContactPosition *src;
         src = Player_GetEffectivePosition(0);
         pl = &playerCopy;
         *pl = *src;
         direction = p->direction;
         if (direction == 0) {
-            if (p->position.z - 0x80 < pl->z && p->position.z + 0x80 > pl->z &&
-                p->position.x < pl->x && Fan_Distance(p) < p->range * p->range &&
+            if (p->sprite.position.z - 0x80 < pl->z && p->sprite.position.z + 0x80 > pl->z &&
+                p->sprite.position.x < pl->x && Fan_Distance(p) < p->range * p->range &&
                 WindCannon_IsPathToPlayerClear(p)) {
                 gPlayerBackgroundState = p->wind;
                 if (!p->reverse)
@@ -222,8 +167,8 @@ invoke:
                     gPlayerBackgroundMode = direction;
             }
         } else {
-            if (p->position.x - 0x80 < pl->x && p->position.x + 0x80 > pl->x &&
-                p->position.z < pl->z && Fan_Distance(p) < p->range * p->range &&
+            if (p->sprite.position.x - 0x80 < pl->x && p->sprite.position.x + 0x80 > pl->x &&
+                p->sprite.position.z < pl->z && Fan_Distance(p) < p->range * p->range &&
                 WindCannon_IsPathToPlayerClear(p)) {
                 gPlayerBackgroundState = p->wind;
                 if (!p->reverse)
@@ -239,12 +184,12 @@ tail:
         p->flash--;
     } else
         AnimData_SelectPaletteBank(p->graphics, p->palette);
-    if (p->blink) {
-        p->blink--;
-        if ((p->blink >> 2) & 1)
-            p->flags |= 1;
+    if (p->collider.responseValue) {
+        p->collider.responseValue--;
+        if ((p->collider.responseValue >> 2) & 1)
+            p->sprite.flags |= 1;
         else
-            p->flags &= ~1;
+            p->sprite.flags &= ~1;
     }
     if (p->dead == 0) {
         if (p->wind <= 1)
@@ -259,9 +204,8 @@ tail:
         Anim_SetDurationScale(&p->sequence, (u16)scale);
     }
     {
-        u32 *sprite = &p->flags;
-        PlayerCue_StepSequence((struct ContactSwarmSprite *)sprite,
-                               &p->sequence);
+        u32 *sprite = &p->sprite.flags;
+        PlayerCue_StepSequence((struct ContactSwarmSprite *)sprite, &p->sequence);
     }
     p->age++;
 }

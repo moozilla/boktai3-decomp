@@ -34,7 +34,7 @@ s32 sub_08249350(s32, s32);
 void *Player_GetEffectivePosition(s32);
 s32 Hresvelgr_GetHomingShotTargetAngle(void *, void *);
 s32 Mod(s32, s32);
-void *MotionEntry_CreateConfigured(void *, s32, s32, s32, u32, s32);
+void *HresvelgrMotion_CreateConfigured(void *, s32, s32, s32, u32, s32);
 void EffectEntry_Release(void *);
 
 static inline void SetVelocity(struct Vec *out, u8 angle, u8 speed)
@@ -75,7 +75,7 @@ static inline u32 Frame(struct Entry *p)
 {
     return p->frame;
 }
-void EffectPool_UpdateEntry(void *pool, struct Entry *p)
+void HresvelgrEffectPool_UpdateEntry(void *pool, struct Entry *p)
 {
     s32 reverse = 0;
     if (sub_08249350(p->frame, p->homingInterval) == 0) {
@@ -124,7 +124,7 @@ void EffectPool_UpdateEntry(void *pool, struct Entry *p)
             }
             angle = ((sample >> 3) & 127) + 64;
             p->trails[*trailCount] =
-                MotionEntry_CreateConfigured(&p->position, index, angle, 96, types[index], 200);
+                HresvelgrMotion_CreateConfigured(&p->position, index, angle, 96, types[index], 200);
             (*trailCount)++;
         }
     }

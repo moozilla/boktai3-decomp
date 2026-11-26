@@ -6,8 +6,8 @@ The last of those Thumb return addresses survives subsequent stores.
 
 The explicit form changed the ROM bytes. The guarded form passed the unit ROM check.
 
---- a/src/fn/sub_08017730.c
-+++ b/src/fn/sub_08017730.c
+--- a/src/effects/weather/sub_08017730.c
++++ b/src/effects/weather/sub_08017730.c
 @@ -22,4 +22,7 @@
      struct Drop *d = p->drops;
      int i;

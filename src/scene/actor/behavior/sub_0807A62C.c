@@ -2,21 +2,12 @@
 #include "scene/motion/scene_actor_availability.h"
 #include "engine/word_flags.h"
 void SceneActorBehavior_UpdateColliders(struct RoomActor *);
-static inline u8 Inactive(struct RoomActor *actor)
-{
-    if (!actor)
-        return 0;
-    if (SceneActor_MaskedHalfword(0x40, &actor->motionFlags) ||
-        Flags_MaskedWord(0x20000, &actor->statusFlags) || actor->health <= 0)
-        return 1;
-    return 0;
-}
 s32 SceneActorBehavior_UpdateTimersAndContacts(struct RoomActor *actor)
 {
     struct RoomActor *updateActor = actor;
     u32 inactive;
     actor->counter304 = 0;
-    inactive = Inactive(actor);
+    inactive = SceneActor_ActionsBlocked((void *)actor);
     if (!inactive) {
         struct SceneActorUpdateControl *control;
         SceneActorBehavior_UpdateColliders(updateActor);

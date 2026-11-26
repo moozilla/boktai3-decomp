@@ -1,5 +1,5 @@
 #include "global.h"
-void Anim_SelectWidgetGlyph(void *, void *, int);
+void AnimSprite_SelectGlyph(void *, void *, int);
 struct Flags {
     u8 pad[0x71dc];
     u8 flags[52];
@@ -28,7 +28,7 @@ struct Pair {
     u32 a, b;
 };
 extern const struct Pair gUnk_0824F35C;
-void sub_0818FA54(void *, void *, void *, void *);
+void Nidhoggr_CreateFallingAttackEffect(void *, void *, void *, void *);
 void SceneAnimation_UpdateSlotSequenceNineEffect(u8 *p, int i)
 {
     u8 *base = p + 0x71dc;
@@ -45,7 +45,7 @@ void SceneAnimation_UpdateSlotSequenceNineEffect(u8 *p, int i)
         (*q)++;
         ((struct Flags *)p)->done[i] = old;
         v = gUnk_0824F35C;
-        sub_0818FA54(p + 0x54, a + 0x20, &v, p);
+        Nidhoggr_CreateFallingAttackEffect(p + 0x54, a + 0x20, &v, p);
     }
     if (Anim_Step(p + (i * 0x60 + 0x543c), p + 0x541c)) {
         *q = 0xff;

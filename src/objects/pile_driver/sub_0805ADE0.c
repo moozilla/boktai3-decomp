@@ -1,5 +1,5 @@
-#include "objects/pile_driver/scene_panel_rig_setup.h"
-void PileDriverRig_InitMainSprite(struct ScenePanelRig *rig)
+#include "objects/pile_driver/pile_driver_rig_setup.h"
+void PileDriverRig_InitMainSprite(struct PileDriverRig *rig)
 {
     struct SceneRigSprite *sprite = (void *)&rig->main;
     void *graphics = sprite->graphics;

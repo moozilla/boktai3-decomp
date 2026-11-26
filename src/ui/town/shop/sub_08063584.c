@@ -1,8 +1,8 @@
 #include "ui/town/shop_lifecycle.h"
 #include "engine/engine.h"
-struct SceneInventoryLifecycleView *Shop_CreatePresentation3(void)
+struct ShopLifecycleView *Shop_CreateTravelingMerchant(void)
 {
-    struct SceneInventoryLifecycleView *owner = Task_Create(11, 0x1D24);
+    struct ShopLifecycleView *owner = Task_Create(11, 0x1D24);
     if (owner) {
         Task_SetCallbacks(owner, (void (*)(void *))Shop_TickController,
                           (void (*)(void *))Shop_DestroyController);

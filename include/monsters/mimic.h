@@ -3,6 +3,7 @@
 #define GUARD_MIMIC_H
 
 #include "scene/motion/scene_actor_chase_reaction.h"
+#include "scene/actor/scene_actor_reaction.h"
 
 #include "scene/actor/scene_actor_attachment.h"
 
@@ -14,7 +15,7 @@
 
 #include "scene/actor/scene_actor_placement.h"
 
-#include "npc/cutscene_actor/actor_animation_controller.h"
+#include "ui/title/actor_animation_controller.h"
 
 #include "scene/actor/scene_actor_init_dispatch.h"
 
@@ -37,19 +38,6 @@
 #include "script/script_utility.h"
 #include "monsters/chase_actor.h"
 
-struct MimicReactionFlags {
-    s16 bits : 16;
-};
-
-/* Deferred-response packet begins at the pursuit group's saved-control slot. */
-
-struct MimicDeferredResponse {
-    struct SceneActorChaseSavedControl snapshot;
-    u8 state, phase, behavior, unknownB;
-    u32 delay;
-    void *control;
-};
-
 /* Complete 0x664 allocation, with the common actor prefix kept flat. */
 
 struct Mimic {
@@ -63,61 +51,14 @@ struct Mimic {
     s32 healthThreshold;
 };
 
-static inline u8 MimicChase_TakeArrived(struct ChaseActor *actor)
-{
-    if (actor->base.field2B1) {
-        actor->base.field2B1 = 0;
-        return 1;
-    }
-    return 0;
-}
-
-static inline void MimicChase_SetState(struct ChaseActor *actor, u32 s, u32 p, u32 b)
-{
-    u32 behavior = b;
-    actor->base.state2A8 = s;
-    actor->base.phase2A9 = p;
-    actor->base.behavior2AA = behavior;
-    actor->base.counter2AC = 0;
-    actor->base.field2B1 = 1;
-}
-
 static inline void MimicChase_ClearBits(u16 *field, u32 bits)
 {
     *field &= ~bits;
 }
 
-static inline u8 MimicChase_TryRoute(struct ChaseActor *actor, void *route,
-                                     struct ContactPosition *position,
-                                     struct ContactPosition *target)
-{
-    s32 result = Nav_IsPositionInMesh(route, position, target);
-    if (!result) {
-        MimicChase_ClearBits(&actor->base.motionFlags, 0x200);
-        return 0;
-    }
-    result = Terrain_ApplyBlocked(route, position, target);
-    if (result) {
-        if (result != 2)
-            Memory_Clear(&actor->base.body.motion, 8);
-        return 1;
-    }
-    MimicChase_ClearBits(&actor->base.motionFlags, 0x200);
-    return 0;
-}
-
 s32 Nav_IsPositionInMesh(void *, struct ContactPosition *, struct ContactPosition *);
 
 s32 Terrain_ApplyBlocked(void *, struct ContactPosition *, struct ContactPosition *);
-
-static inline u8 SceneActorReaction_TakePrepared(struct ChaseActor *actor)
-{
-    if (actor->base.field2B2) {
-        actor->base.field2B2 = 0;
-        return 1;
-    }
-    return 0;
-}
 
 void SceneActorAttachment_ReplaceResponseSlot(void *, u32, u32, u32);
 extern const u8 gUnk_08606264[];
@@ -142,7 +83,6 @@ void Mimic_OnAttackContact(u8 *unused, struct ContactCollider *obj, struct Chase
 void Mimic_OnBodyContact(void *a, s32 b, void *actor);
 void SceneActorCollision_InitAttack(void *, void *, void *, void (*)(void), u32, void *);
 void SceneActorCollision_InitBody(void *, void *, void *, void (*)(void), void *);
-extern u32 gUnk_02000560[];
 void SceneActorBehavior_CallActionScript(u8 *);
 void *SceneActorContacts_FindObjectById(u16);
 u8 SceneActor_FindNearbyActivePlayer(struct ChaseActor *p);

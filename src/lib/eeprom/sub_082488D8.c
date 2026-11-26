@@ -3,7 +3,6 @@
 #include "global.h"
 #include "engine/ram.h"
 /* Eeprom_WriteBlockVerified: Retries block writing and readback verification up to three times */
-#define Eeprom_WriteBlockVerified sub_08248930
 /* Adapted from: laqieer/libgbabackup at 9597360b36d22df1ead5dd59566a3c8618cff6c0, src/eeprom.c (tmc lineage). */
 typedef struct EEPROMConfig {
     u32 unk_00;
@@ -51,7 +50,7 @@ u16 Eeprom_VerifyBlock(u16 address, const u16 *data)
 
 u16 Eeprom_WriteBlockWithFullDelay(u16, const u16 *);
 
-u16 sub_08248930(u16 address, const u16 *data)
+u16 Eeprom_WriteBlockVerified(u16 address, const u16 *data)
 {
     u8 i;
     u16 result;

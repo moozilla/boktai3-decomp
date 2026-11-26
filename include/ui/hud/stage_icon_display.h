@@ -33,5 +33,5 @@ void StageIconDisplay_InitAnimations(struct StageIconDisplay *, s32);
 s32 StageIconDisplay_Initialize(struct StageIconDisplay *, s32, u32,
                                 void (*)(void *, struct StageIconDisplay *), void *);
 s32 StageIconDisplay_InitFromScript(struct StageIconDisplay *);
-void Widget_InitLinked(void *, void *, u32, u32, u32, u32, s32, const void *);
+void AnimSprite_InitLinked(void *, void *, u32, u32, u32, u32, s32, const void *);
 #endif

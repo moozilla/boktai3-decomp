@@ -2,12 +2,11 @@
 #include "engine/engine.h"
 #include "engine/ram.h"
 /* LinkLobbyPanel_Close: Hides panel sprites and clears background tilemaps before killing the singleton task */
-#define LinkLobbyPanel_Close sub_0810F82C
 
 void LinkLobbyPanel_HideSprites(void *);
 void ScrollingDialogue_ClearScript(void);
 
-void sub_0810F82C(void)
+void LinkLobbyPanel_Close(void)
 {
     if (gActiveRecordMenu) {
         LinkLobbyPanel_HideSprites(gActiveRecordMenu);

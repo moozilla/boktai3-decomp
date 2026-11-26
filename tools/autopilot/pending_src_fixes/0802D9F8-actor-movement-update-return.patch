@@ -6,8 +6,8 @@ return address on the path that clears the flashing effect.
 
 The explicit form changed the ROM bytes. The guarded form passed the unit ROM check.
 
---- a/src/scene_actor_animation.c
-+++ b/src/scene_actor_animation.c
+--- a/src/npc/manager/scene_actor_animation.c
++++ b/src/npc/manager/scene_actor_animation.c
 @@ -46,4 +46,7 @@
      struct SceneActorBody *body = &actor->body;
      void *drawable = &actor->drawable.common.kind;

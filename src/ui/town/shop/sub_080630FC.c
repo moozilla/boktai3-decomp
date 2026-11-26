@@ -1,8 +1,8 @@
 #include "ui/town/shop_catalog.h"
 extern const s8 gUnk_0824DF7C[];
-void Shop_BuildConsumableCatalog(struct SceneInventoryScriptCatalog *input)
+void Shop_BuildConsumableCatalog(struct ShopScriptCatalog *input)
 {
-    struct SceneInventoryScriptCatalog *p = input;
+    struct ShopScriptCatalog *p = input;
     s32 page, next, count;
     s8 *destination;
     const s8 *source;

@@ -1,7 +1,7 @@
 #ifndef POOLED_INTERACTABLE_H
 #define POOLED_INTERACTABLE_H
 #include "engine/video/anim_sprite.h"
-#include "objects/scene_objects/scene_object.h"
+#include "objects/scene_object.h"
 #include "engine/task.h"
 
 /*
@@ -68,38 +68,38 @@ struct PooledPackedArgs {
 };
 
 /* Engine helpers. */
-void Widget_InitCleared(void *, void *, s32, s32, s32, s32, s32, void *);
+void AnimSprite_InitCleared(void *, void *, s32, s32, s32, s32, s32, void *);
 void Anim_SelectPaletteBank(void *, u32);
 void Anim_LinkToList(void *, u32);
-u32 sub_0821E67C(void *, void *, void *, void *, u32, u32, u32);
+u32 Route_GetMovementTowardCurrentPoint(void *, void *, void *, void *, u32, u32, u32);
 void Route_AdvancePoint(void *);
 u16 Route_GetCurrentPointNodeId(void *);
 u8 Route_Start(struct PooledRoute *, s32, s32, s32);
 void Path_GetPointPosition(struct ContactPosition *, void *, u32);
-struct ContactPosition *NamedObject_GetPositionByName(s32);
+struct ContactPosition *MovingPlatform_GetPositionByName(s32);
 s32 Region_FindContaining(struct ContactPosition *);
 u8 *TerrainModifiers_FindCellOverride(s32, s32);
 
 /* Slot helpers and state handlers. */
-struct PooledInteractable *Breakable_FindFreeSlot(struct PooledInteractableManager *);
-void Breakable_EnterState(struct PooledInteractable *, u32);
-u32 Breakable_ConsumeEnteredFlag(struct PooledInteractable *);
-void Breakable_OnHit(struct SceneCollider *, u32, struct PooledInteractable *);
-s32 Breakable_InitSlot(struct PooledInteractableManager *, struct PooledInteractable *);
-void Breakable_RunScript(struct PooledInteractable *);
-void Breakable_NullCallback(void);
-void Breakable_UpdateAnimation(struct PooledInteractableManager *, struct PooledInteractable *);
-void Breakable_Idle(struct PooledInteractableManager *, struct PooledInteractable *);
-void Breakable_React(struct PooledInteractableManager *, struct PooledInteractable *);
-void Breakable_Activate(struct PooledInteractableManager *, struct PooledInteractable *);
-void Breakable_UpdateRouteMotion(struct PooledInteractable *);
-void Breakable_UpdateFollowMotion(struct PooledInteractable *);
-s32 Breakable_UpdateAll(struct PooledInteractableManager *);
-s32 Breakable_DestroyManager(struct PooledInteractableManager *);
-s32 Breakable_InitManager(struct PooledInteractableManager *);
-void *Breakable_GetOrCreateManager(void);
-s32 Breakable_ScriptCreate(void);
-void Breakable_ScriptSetTimeout(void);
-void Breakable_ScriptSetState(void);
+struct PooledInteractable *LightFixture_FindFreeSlot(struct PooledInteractableManager *);
+void LightFixture_EnterState(struct PooledInteractable *, u32);
+u32 LightFixture_ConsumeEnteredFlag(struct PooledInteractable *);
+void LightFixture_OnHit(struct SceneCollider *, u32, struct PooledInteractable *);
+s32 LightFixture_InitSlot(struct PooledInteractableManager *, struct PooledInteractable *);
+void LightFixture_RunScript(struct PooledInteractable *);
+void LightFixture_NullCallback(void);
+void LightFixture_UpdateAnimation(struct PooledInteractableManager *, struct PooledInteractable *);
+void LightFixture_Idle(struct PooledInteractableManager *, struct PooledInteractable *);
+void LightFixture_React(struct PooledInteractableManager *, struct PooledInteractable *);
+void LightFixture_Activate(struct PooledInteractableManager *, struct PooledInteractable *);
+void LightFixture_UpdateRouteMotion(struct PooledInteractable *);
+void LightFixture_UpdateFollowMotion(struct PooledInteractable *);
+s32 LightFixture_UpdateAll(struct PooledInteractableManager *);
+s32 LightFixture_DestroyManager(struct PooledInteractableManager *);
+s32 LightFixture_InitManager(struct PooledInteractableManager *);
+void *LightFixture_GetOrCreateManager(void);
+s32 LightFixture_ScriptCreate(void);
+void LightFixture_ScriptSetTimeout(void);
+void LightFixture_ScriptSetState(void);
 
 #endif

@@ -2,7 +2,6 @@
 #include "scene/motion/scene_actor_terrain.h"
 
 // confidence=low: animation controller with terrain bounce and intermittent gravity.
-#define SpriteEffectController_UpdateTileBounce sub_0806AF74
 void Heap_Free(void *);
 static inline struct ContactPosition *AddVelocity(struct ContactPosition *position,
                                                   struct ContactPosition *velocity)

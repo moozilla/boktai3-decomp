@@ -12,7 +12,7 @@ s32 Player_SetAnimationIndex(u8 *, s32, s32);
 void Player_SetTetherMode(u8 *, s32, s32);
 void Player_PlayLocalSong(s32 a, u32 b);
 s32 Player_UpdateFacingFromInputHistory(u8 *p);
-void sub_0823B308(u8 *p);
+void Player_SpawnActionSpark(u8 *p);
 
 void Player_UpdateChargedTetherStrike(u8 *p)
 {
@@ -147,7 +147,7 @@ void Player_UpdateChargedTetherStrike(u8 *p)
     c = (u16 *)(p + 0xC12);
     if (*c > 0xE) {
         if (((struct Player *)p)->actionMode == 1)
-            sub_0823B308(p);
+            Player_SpawnActionSpark(p);
         *c = 0;
     }
     *(u8 *)(p + 0xAC9) = 8;

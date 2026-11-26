@@ -4,8 +4,8 @@ The projection and the screen-position copy both preserve the incoming display p
 
 The explicit form changed the ROM bytes. The guarded form passed the unit ROM check.
 
---- a/src/projected_display.c
-+++ b/src/projected_display.c
+--- a/src/effects/sprites/projected_display.c
++++ b/src/effects/sprites/projected_display.c
 @@ -25,4 +25,7 @@
          entry->position = display->screen;
      entry->position.z += gUnk_0860594C[index];

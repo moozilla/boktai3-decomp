@@ -1,35 +1,27 @@
-#include "global.h"
-struct S {
-    u8 p1[0x124];
-    s16 n;
-    s16 pad;
-    s16 d[8];
-    u8 p0[0x15c - 0x138];
-    u8 *pc;
-};
+#include "monsters/ooze.h"
 void Script_SetPc(u8 *);
 u8 *Script_GetPc(void);
 s32 Script_GetValue(void);
-void Ooze_ReadScriptValueList(struct S *p)
+void Ooze_ReadScriptValueList(struct Ooze *p)
 {
     s32 i;
     s16 *d;
     s16 *np;
-    Script_SetPc(p->pc);
+    Script_SetPc(p->delayScript);
     i = 0;
     if (Script_GetPc() != 0) {
         s32 v = Script_GetValue();
-        np = &p->n;
+        np = &p->delayCount;
         *np = v;
         if (*np > 8)
             *np = 8;
         if (*np != 0 && i < *np) {
-            d = p->d;
+            d = p->delays;
             do {
                 *d = Script_GetValue();
                 d++;
                 i++;
-            } while (i < p->n);
+            } while (i < p->delayCount);
         }
     }
 }

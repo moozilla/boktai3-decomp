@@ -79,9 +79,6 @@ void Collider_Remove(struct ContactCollider *n)
     }
 }
 
-struct V {
-    s16 x, y, z, pad;
-};
 
 struct Collider {
     u8 pad0[4];
@@ -90,8 +87,8 @@ struct Collider {
     u16 f8;
     u16 fa;
     u8 padc[8];
-    struct V offset;
-    struct V size;
+    struct ContactPosition offset;
+    struct ContactPosition size;
     u8 pad24[0x34 - 0x24];
     u32 f34;
     u32 f38;
@@ -106,8 +103,8 @@ struct Collider {
     u32 f4c;
 };
 
-void Collider_Init(struct Collider *c, u16 id, u32 flags, u32 a, u32 b, struct V *size,
-                   struct V *offset)
+void Collider_Init(struct Collider *c, u16 id, u32 flags, u32 a, u32 b, struct ContactPosition *size,
+                   struct ContactPosition *offset)
 {
     c->f6 = flags;
     c->id = id;
@@ -307,77 +304,64 @@ void Collision_CalculateDamageResponse(struct ContactCollider *a, struct Contact
     }
 }
 
-struct DamageCollider {
-    u8 pad0[6];
-    u16 flags;
-    u8 pad8[0x2C];
-    u32 resist;
-    u32 attr;
-    u16 power;
-    u16 damage;
-    u8 pad40[2];
-    u8 height;
-    u8 hitKind;
-};
-
 // Computes the damage `def` takes from `atk` (attribute vs. resistance), once per hit.
 
-void Collision_CalculateElementalResponse(struct DamageCollider *atk, struct DamageCollider *def)
+void Collision_CalculateElementalResponse(struct ContactCollider *atk, struct ContactCollider *def)
 {
     s32 dmg;
     u32 attr, defAttr, resist;
 
-    if (def->damage != 0)
+    if (def->cost != 0)
         return;
     {
         u32 m = 0x1000;
-        if (atk->attr & m)
-            dmg = atk->power;
+        if (atk->reactionFlags & m)
+            dmg = atk->unknown3C;
         else
-            dmg = atk->power - def->power;
+            dmg = atk->unknown3C - def->unknown3C;
     }
     if (dmg <= 0)
         dmg = 1;
-    attr = atk->attr;
+    attr = atk->reactionFlags;
     if (attr & 0x2000)
         defAttr = 0;
     else
-        defAttr = def->attr & 0x7F;
-    resist = def->resist & 0x7F;
+        defAttr = def->reactionFlags & 0x7F;
+    resist = def->statRewardFlags & 0x7F;
     attr &= 0x7F;
     if (attr == 0) {
-        def->damage = dmg;
-        def->hitKind = 1;
+        def->cost = dmg;
+        def->costFlags = 1;
     } else if (defAttr == 0) {
-        def->damage = (dmg * 5) >> 2;
-        def->hitKind = 1;
+        def->cost = (dmg * 5) >> 2;
+        def->costFlags = 1;
     } else if (defAttr == 0x40) {
-        def->damage = (dmg * 3) >> 2;
-        def->hitKind = 2;
+        def->cost = (dmg * 3) >> 2;
+        def->costFlags = 2;
     } else if (attr == 0x40) {
-        def->damage = (dmg * 5) >> 2;
-        def->hitKind = 1;
+        def->cost = (dmg * 5) >> 2;
+        def->costFlags = 1;
     } else if (defAttr & attr) {
-        def->damage = (dmg * 3) >> 2;
-        def->hitKind = 2;
+        def->cost = (dmg * 3) >> 2;
+        def->costFlags = 2;
     } else if (resist & attr) {
-        def->damage = (dmg * 3) >> 1;
-        def->hitKind = 4;
+        def->cost = (dmg * 3) >> 1;
+        def->costFlags = 4;
     } else {
-        def->damage = (dmg * 5) >> 2;
-        def->hitKind = 1;
+        def->cost = (dmg * 5) >> 2;
+        def->costFlags = 1;
     }
     if ((def->flags & 0x100) && (atk->flags & 0x100)) {
-        s32 d = def->height - atk->height;
+        s32 d = def->direction - atk->direction;
         if (d < 0)
             d = -d;
         if (d <= 0x20) {
-            def->damage = (def->damage * 3u) >> 1;
-            def->hitKind |= 8;
+            def->cost = (def->cost * 3u) >> 1;
+            def->costFlags |= 8;
         }
     }
-    if (def->damage == 0)
-        def->damage = 1;
+    if (def->cost == 0)
+        def->cost = 1;
 }
 
 struct ContactBox {
@@ -389,15 +373,12 @@ struct ContactBox {
     u8 dir; // facing angle
 };
 
-struct ContactVec {
-    s16 x, y, z;
-};
 
 // Collider contact helper: the push-out offset along the side `a` faces (+x, +z, -x, -z)
 
 // that separates box `a` from box `b`.
 
-void Collider_CalculateFacingSeparation(struct ContactBox *a, struct ContactBox *b, struct ContactVec *out)
+void Collider_CalculateFacingSeparation(struct ContactBox *a, struct ContactBox *b, struct ContactPosition *out)
 {
     s32 side = ((a->dir + 0x20) & 0xFF) >> 6;
 

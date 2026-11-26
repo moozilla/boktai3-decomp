@@ -20,7 +20,7 @@
 
 #include "scene/motion/scene_actor_route.h"
 
-#include "npc/cutscene_actor/actor_animation_controller.h"
+#include "ui/title/actor_animation_controller.h"
 
 #include "engine/video/display_sequence.h"
 
@@ -59,10 +59,9 @@ struct GhostVisual {
     struct GhostVisualSequence sequence;
 };
 
+/* Route playback cursor followed by the registry's branch and script fields. */
 struct GhostRouteCursor {
-    u8 unknown0[2], pointIndex, phase;
-    struct SceneActorRouteDefinition *definition;
-    struct SceneActorRoutePoint *point;
+    struct SceneActorRouteCursor cursor;
     u8 currentPoint, branches[2], activeBranch;
     u8 routeId, parameterB, pointId, unknown13;
 };
@@ -99,9 +98,6 @@ struct Ghost {
 struct GhostSignedFlags16 {
     s32 bits : 16;
 };
-struct GhostPackedPosition {
-    u32 xy, z;
-};
 
 union GhostColliderVector {
     struct ContactPackedVector packed;
@@ -122,7 +118,8 @@ void Ghost_NoOp(void);
 void Ghost_BeginContactReaction(void *unused, struct ContactCollider *contact,
                                 struct ChaseActor *input);
 
-void SceneActorBehavior_OnContactForward(u16 *source, void *destination, struct ChaseActor *actor);
+void SceneActorBehavior_OnContactForward(struct ContactCollider *source, void *destination,
+                                        struct ChaseActor *actor);
 
 void Ghost_UpdateEnergyDrainAnimation(struct RoomActor *actor);
 

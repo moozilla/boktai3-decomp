@@ -7,7 +7,6 @@ struct BriefAnimation {
     u8 unknown74C[0x24];
     u8 active, timer, firstFrame;
 };
-#define SpriteEffect_UpdateBriefAnimation sub_082386DC
 void SpriteEffect_UpdateBriefAnimation(struct BriefAnimation *p)
 {
     if (p->active) {

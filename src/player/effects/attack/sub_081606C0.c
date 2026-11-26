@@ -2,7 +2,6 @@
 #include "engine/video/display_sequence_sprite.h"
 
 // Allocate an attack particle and initialize its sequence when requested.
-#define PlayerAttackEffect_AllocateParticle sub_081606C0
 struct AttackParticleSlot {
     u32 life, sequence, mode;
     s32 angle;

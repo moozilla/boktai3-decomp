@@ -1,6 +1,5 @@
 #include "global.h"
 /* Math_ApproachAngleArrayByHalf: Approaches each target angle by half the shortest angular difference and snaps within one unit */
-#define Math_ApproachAngleArrayByHalf sub_0819B4E4
 
 static inline s32 AngleNear(s32 angle, s32 ref)
 {
@@ -35,7 +34,7 @@ static inline void ApproachArray(s32 count, s16 *cur, s16 *target)
     }
 }
 
-void sub_0819B4E4(s16 *cur, s16 *target, s32 count)
+void Math_ApproachAngleArrayByHalf(s16 *cur, s16 *target, s32 count)
 {
     ApproachArray(count, cur, target);
 }

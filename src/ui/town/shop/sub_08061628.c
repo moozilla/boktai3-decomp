@@ -1,5 +1,5 @@
 #include "ui/town/shop_states.h"
-void Shop_BeginReposition(struct SceneInventoryControlView *panel)
+void Shop_BeginReposition(struct ShopControlView *panel)
 {
     struct SceneInputGridView *grid = &panel->grid;
     SceneInput_SaveSelection(grid);
@@ -8,5 +8,5 @@ void Shop_BeginReposition(struct SceneInventoryControlView *panel)
     SceneInput_SetGridFlags(grid, 0x1E);
     Shop_UpdateModePrompt(panel, 1);
     Shop_SetControllerCallback(panel,
-                                         (SceneInventoryCallback)Shop_TickMoveSelection);
+                                         (ShopCallback)Shop_TickMoveSelection);
 }

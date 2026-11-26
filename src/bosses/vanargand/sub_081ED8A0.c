@@ -27,9 +27,9 @@ void ActorDisplay_UpdateScreenAnchor(void *);
 void ActorDisplay_UpdateForegroundSprite(void *);
 void ActorDisplay_UpdateAccentSprite(void *);
 s32 SceneMover_StepPastScreenX(void *, s32, s32);
-void SceneActors_EmitPeriodicParticles(void *, s32);
+void VanargandHead_EmitPeriodicParticles(void *, s32);
 extern const u16 gUnk_086141BC[];
-void SceneActors_UpdateDelayedMovement(u8 *p, s32 time)
+void VanargandHead_UpdateDelayedMovement(u8 *p, s32 time)
 {
     s32 savedTime;
     s32 completed;
@@ -70,7 +70,7 @@ void SceneActors_UpdateDelayedMovement(u8 *p, s32 time)
     ActorDisplay_UpdateScreenAnchor(p);
     ActorDisplay_UpdateForegroundSprite(p);
     ActorDisplay_UpdateAccentSprite(p);
-    SceneActors_EmitPeriodicParticles(p, savedTime);
+    VanargandHead_EmitPeriodicParticles(p, savedTime);
     if (completed) {
         p[0xAF] = 1;
         *(u32 *)(context + 0x284) = 16;

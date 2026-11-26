@@ -3,7 +3,7 @@
 #include "engine/ram.h"
 #include "engine/math/monster_particle_random.h"
 
-u32 SceneMovingParticle_Create(struct ContactPosition *, struct ContactPosition *, s32, s32);
+u32 DebrisMote_Create(struct ContactPosition *, struct ContactPosition *, s32, s32);
 
 static inline s32 ScaleComponent(s32 x)
 {
@@ -66,7 +66,7 @@ void LinkedEffect_SetVariant(struct ContactPosition *position, u8 variant)
         read.source = (const u16 *)((const u8 *)table + read.offset);
         lifeSample = *read.source;
         sample = 15;
-        SceneMovingParticle_Create(position, &velocity, (lifeSample & sample) + 30, 5);
+        DebrisMote_Create(position, &velocity, (lifeSample & sample) + 30, 5);
         angle += 14;
     } while (--count >= 0);
 }

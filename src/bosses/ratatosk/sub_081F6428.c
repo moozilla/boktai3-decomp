@@ -8,7 +8,7 @@ extern const struct ContactPosition gUnk_0824FDF0;
 struct ContactPosition *Ratatosk_GetRandomMovementPoint(void *);
 s32 Player_IsSlotInActionTwelveOrThirtyEight(s32);
 void Ratatosk_UpdateDefeatSequence(void);
-void sub_081F5290(void);
+void Ratatosk_UpdateKnockbackRecovery(void);
 void DamageNumberDisplay_Show(void *, s32, s32, void *, void *, s32);
 void SparkParticle_Spawn(void *, s32, void *, s32, s32, s32, s32, s32);
 void Sound_PlaySongChecked(u32);
@@ -23,7 +23,6 @@ static inline u32 randomB(void)
     return ((const u16 *)RANDOM_TABLE_ADDR)[gRandomIndex];
 }
 // confidence=low: consumes queued damage and transitions to recoil or defeat.
-#define Ratatosk_ApplyQueuedDamage sub_081F6428
 s32 Ratatosk_ApplyQueuedDamage(struct Ratatosk *p)
 {
     struct {
@@ -128,7 +127,7 @@ s32 Ratatosk_ApplyQueuedDamage(struct Ratatosk *p)
             p2->savedState = p->actionPhase;
             p2->savedSequence = p2->sequence;
             Ratatosk_SetFlags(p, 1);
-            Ratatosk_StartReaction(p, sub_081F5290, 18);
+            Ratatosk_StartReaction(p, Ratatosk_UpdateKnockbackRecovery, 18);
             return 1;
         }
         Sound_PlaySongChecked(318);

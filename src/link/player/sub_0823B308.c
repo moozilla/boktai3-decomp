@@ -4,7 +4,6 @@ struct SparkVector {
 };
 void SparkParticle_Spawn(void *, u32, const void *, u32, u32, u32, u32, u32);
 // confidence=low: chooses a raised position or stored interaction position for the action spark.
-#define Player_SpawnActionSpark sub_0823B308
 void Player_SpawnActionSpark(u8 *p)
 {
     struct SparkVector position;

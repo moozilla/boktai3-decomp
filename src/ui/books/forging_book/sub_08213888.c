@@ -36,7 +36,6 @@ void Task_Kill(void *);
 #define TRACKED     (*(s16 *)(m + 0x722))
 
 // confidence=low: handles collection-grid selection and the menu close transition.
-#define CollectionBook_UpdateMenu sub_08213888
 s32 CollectionBook_UpdateMenu(u8 *m)
 {
     u32 pageChanged = 0;

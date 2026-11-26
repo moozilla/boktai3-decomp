@@ -1,6 +1,5 @@
 #include "global.h"
-/* TentacleBody_UpdateSegmentPositions: Periodically shifts stored segment positions and inserts the supplied position at the front */
-#define TentacleBody_UpdateSegmentPositions sub_080A8CDC
+/* CentipedeBody_UpdateSegmentPositions: Periodically shifts stored segment positions and inserts the supplied position at the front */
 
 struct Entry080A8CDC {
     u8 pad0[0x1c];
@@ -15,9 +14,9 @@ struct Group080A8CDC {
     u8 pad8d4[0x8da - 0x8d4];
     s16 count;
 };
-void sub_080ACCD4(void *, s32, void *);
+void Centipede_SetSegmentPosition(void *, s32, void *);
 
-void sub_080A8CDC(u8 *p, void *pos)
+void CentipedeBody_UpdateSegmentPositions(u8 *p, void *pos)
 {
     struct Group080A8CDC *g = *(struct Group080A8CDC **)(p + 0x3d0);
     if (g->delay) {
@@ -25,7 +24,7 @@ void sub_080A8CDC(u8 *p, void *pos)
         return;
     }
     g->delay = 12;
-    sub_080ACCD4(g, g->count - 1, g->entries[g->count >> 1].pos);
-    sub_080ACCD4(g, g->count >> 1, g->entries[0].pos);
-    sub_080ACCD4(g, 0, pos);
+    Centipede_SetSegmentPosition(g, g->count - 1, g->entries[g->count >> 1].pos);
+    Centipede_SetSegmentPosition(g, g->count >> 1, g->entries[0].pos);
+    Centipede_SetSegmentPosition(g, 0, pos);
 }

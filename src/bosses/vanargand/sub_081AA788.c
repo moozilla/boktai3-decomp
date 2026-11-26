@@ -68,7 +68,7 @@ void SceneActors_StartUnmirroredAnimation(void *, void *, void *, s32, s32, s32)
 void Anim_SetSequence(void *, void *, u32, u32, u32);
 void Sprite_ApplyAnimation(void *, void *);
 void Sound_PlaySong(u32);
-s32 sub_081B71D4(void *, void *, void *, void *, u32, u32, u32);
+s32 VanargandProjectile_CreateWithSource(void *, void *, void *, void *, u32, u32, u32);
 s32 VanargandProjectile_Create(void *, void *, void *, u32, u32, u32);
 s32 sub_08249350(s32, s32);
 struct HalfOrder {
@@ -163,7 +163,8 @@ static inline void SpawnPartProjectile(struct Vanargand *owner, struct ContactPo
     sampleOffset = *cursor * 2;
     r = *(u16 *)(sampleOffset + (u32)table);
     index = sub_08249350(r >> 3, 6);
-    sub_081B71D4(owner->sprite, position, target, source, spread, sideOffset, index);
+    VanargandProjectile_CreateWithSource(owner->sprite, position, target, source, spread,
+                                         sideOffset, index);
 }
 static inline void SpawnFreeProjectile(struct Vanargand *owner, struct ContactPosition *position,
                                        void *target, u16 base, s32 sideOffset)

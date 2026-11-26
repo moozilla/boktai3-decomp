@@ -1,6 +1,5 @@
 #include "global.h"
 /* Math_StepShortArrayTowardTargets: Moves each signed halfword toward its target by a shared step without overshooting */
-#define Math_StepShortArrayTowardTargets sub_0819B44C
 
 static inline s32 StepToward(s32 cur, s32 target, s32 step)
 {
@@ -29,7 +28,7 @@ static inline void StepArray(s32 step, s16 *cur, s16 *target, s32 count)
     }
 }
 
-void sub_0819B44C(s16 *cur, s16 *target, s32 step, s32 count)
+void Math_StepShortArrayTowardTargets(s16 *cur, s16 *target, s32 step, s32 count)
 {
     StepArray(step, cur, target, count);
 }

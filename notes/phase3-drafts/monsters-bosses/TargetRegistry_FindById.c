@@ -1,5 +1,5 @@
 #include "global.h"
-#include "objects/scene_objects/scene_object.h"
+#include "objects/scene_object.h"
 #include "scene/collision/contact_collider.h"
 #include "engine/ram.h"
 struct MotionTarget {

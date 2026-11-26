@@ -1,12 +1,12 @@
 #include "ui/town/shop_control.h"
-static inline s32 SceneInventory_TurnPage(struct SceneInventoryControlView *panel)
+static inline s32 Shop_TurnPage(struct ShopControlView *panel)
 {
     Sound_PlaySong(0x10A);
     panel->interactionFlags |= 0x40;
     Shop_UpdateMixedCatalogCategory(panel);
     return 1;
 }
-s32 Shop_HandlePageKeys(struct SceneInventoryControlView *panel)
+s32 Shop_HandlePageKeys(struct ShopControlView *panel)
 {
     if (panel->interactionFlags & 1) {
         if (gPadState[1] & 0x200) {
@@ -14,7 +14,7 @@ s32 Shop_HandlePageKeys(struct SceneInventoryControlView *panel)
             if (page == 0)
                 page = panel->pageCount;
             panel->page = page - 1;
-            return SceneInventory_TurnPage(panel);
+            return Shop_TurnPage(panel);
         }
         if (gPadState[1] & 0x100) {
             s32 current = panel->page;
@@ -22,7 +22,7 @@ s32 Shop_HandlePageKeys(struct SceneInventoryControlView *panel)
                 panel->page = current + 1;
             else
                 panel->page = 0;
-            return SceneInventory_TurnPage(panel);
+            return Shop_TurnPage(panel);
         }
     }
     return 0;

@@ -1,7 +1,6 @@
 #include "global.h"
 #include "ui/pause/scene_hud_display.h"
 void PauseInventory_BeginConsumableDiscardSelection(void *, s32);
-#define PauseInventory_UpdateDiscardBounce sub_08171EFC
 void PauseInventory_UpdateDiscardBounce(struct SceneHudState *p)
 {
     if (p->actionTransferDelay == 0)

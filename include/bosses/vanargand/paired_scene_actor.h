@@ -50,7 +50,7 @@ struct PairedSceneHalf {
 };
 struct VanargandAttackPair {
     struct Task task;
-    struct AnimSprite widget;
+    struct AnimSprite animSprite;
     struct AnimSpriteResource resource;
     struct PairedSceneHalf halves[2];
     const void *effectResource;

@@ -1,5 +1,5 @@
 #include "ui/town/shop_actions.h"
-void Shop_BeginConsumableCatalogMove(struct SceneInventoryActionView *panel)
+void Shop_BeginConsumableCatalogMove(struct ShopActionView *panel)
 {
     struct SceneInputPosition starts[2], targets[2];
     u32 enabled[2], frames[2], attributes[2];
@@ -33,7 +33,7 @@ void Shop_BeginConsumableCatalogMove(struct SceneInventoryActionView *panel)
     target[1].x = 0;
     target[1].y = 0;
     target[1].z = 0;
-    SceneInput_BeginPairTransition(&((struct SceneInventoryTransitionView *)panel)->pair, enabled,
+    SceneInput_BeginPairTransition(&((struct ShopTransitionView *)panel)->pair, enabled,
                                    starts, target, frames, attributes, 12);
     Sound_PlaySong(0x38A);
 }

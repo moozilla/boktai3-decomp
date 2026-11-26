@@ -5,7 +5,6 @@ struct PackedVec {
     s32 x : 16, y : 16, z : 16, pad : 16;
 };
 void Ratatosk_UpdateDefeatSequence(struct Ratatosk *, s32);
-#define Ratatosk_ProcessDefeatState sub_081F79F8
 s32 Ratatosk_ProcessDefeatState(struct Ratatosk *p)
 {
     if (p->health <= 0 && p->vulnerable) {

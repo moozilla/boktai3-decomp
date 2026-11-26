@@ -5,8 +5,8 @@ Capacity and write operations use r1-r6. SceneMessages_Send forwards it.
 
 The explicit form changed the ROM bytes. The guarded form passed the unit ROM check.
 
---- a/src/scene_messages.c
-+++ b/src/scene_messages.c
+--- a/src/script/demo_manager.c
++++ b/src/script/demo_manager.c
 @@ -49,4 +49,7 @@
          entry->queue.count[buffer]++;
      }

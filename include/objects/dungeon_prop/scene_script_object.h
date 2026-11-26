@@ -28,12 +28,12 @@ struct SceneScriptObject {
 struct SceneScriptCallbacks {
     void *entries[2];
 };
-void SceneScriptObject_RunPendingScript(struct SceneScriptObject *);
-void SceneScriptObject_UpdateFade(struct SceneScriptObject *);
-void SceneScriptObject_UpdateBurst(struct SceneScriptObject *);
-void SceneScriptTask_Update(struct SceneScriptObject *);
+void DungeonScenery_RunPendingScript(struct SceneScriptObject *);
+void DungeonScenery_UpdateFade(struct SceneScriptObject *);
+void DungeonScenery_UpdateBurst(struct SceneScriptObject *);
+void DungeonScenery_Update(struct SceneScriptObject *);
 void DungeonProp_Destroy(struct SceneScriptObject *);
-void SceneScriptObject_ApplyHitFlash(struct ContactCollider *, void *, struct SceneScriptObject *);
-void SceneScriptObject_InitHitCollider(struct SceneScriptObject *);
-s32 SceneScriptObject_Initialize(struct SceneScriptObject *, u32);
+void DungeonScenery_ApplyHitFlash(struct ContactCollider *, void *, struct SceneScriptObject *);
+void DungeonScenery_InitHitCollider(struct SceneScriptObject *);
+s32 DungeonScenery_Initialize(struct SceneScriptObject *, u32);
 #endif

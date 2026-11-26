@@ -1,7 +1,7 @@
 #include "ui/town/shop_lifecycle.h"
 void SceneHud_DrawNumericStatus(u8);
 void SceneHud_DrawClock(u8);
-s32 Shop_TickController(struct SceneInventoryLifecycleView *owner)
+s32 Shop_TickController(struct ShopLifecycleView *owner)
 {
     u8 *mode = &owner->clockMode;
     SceneHud_DrawNumericStatus(*mode);

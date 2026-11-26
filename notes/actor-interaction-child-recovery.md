@@ -1,4 +1,4 @@
-# Actor_ConfigureInteractionChildFromScript
+# TutorialOtenko_ConfigureInteractionChildFromScript
 
 The script command at `081E9E44` claims the first of sixteen child slots with
 control bit 1 set. Each slot is `0xDC` bytes. Its world position begins at

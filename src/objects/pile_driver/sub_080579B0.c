@@ -1,13 +1,13 @@
 #include "objects/pile_driver/pile_driver_effects.h"
-void PileDriver_UpdateParticles(struct ScenePanel *input)
+void PileDriver_UpdateParticles(struct PileDriver *input)
 {
-    struct ScenePanelEffectsView *panel = (void *)input;
-    struct ScenePanelParticles *particles = (void *)&panel->particleResource;
+    struct PileDriverEffectsView *panel = (void *)input;
+    struct PileDriverParticles *particles = (void *)&panel->particleResource;
     if (particles->active) {
         u32 anyActive = 0;
         s32 i;
         for (i = 0; i < 32; i++) {
-            struct ScenePanelParticle *particle = &particles->entries[i];
+            struct PileDriverParticle *particle = &particles->entries[i];
             if (particle->active) {
                 if (particle->age >= particle->lifetime) {
                     particle->flags |= 1;

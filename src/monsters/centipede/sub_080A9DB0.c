@@ -2,9 +2,6 @@
 #include "ui/hud/scene_indicator.h"
 
 #define FIELD_OFFSET(type, member) ((u32) & ((type *)0)->member)
-#define SEGMENT_POSITION(group, index)                                                             \
-    ((struct Vec *)((u8 *)(group) + (index) * (s32)sizeof(struct Segment) +                        \
-                    FIELD_OFFSET(struct Group, segments[0].position)))
 struct Position {
     u32 xy, z;
 };
@@ -62,8 +59,7 @@ static inline s32 magnitude(struct Vec *v)
     return sum;
 }
 // confidence=low: advances marked segments and bridges gaps along the chain.
-#define TentacleActor_UpdateSegmentPositions sub_080A9DB0
-void TentacleActor_UpdateSegmentPositions(struct Actor *p, s32 divisor, s32 threshold)
+void Centipede_UpdateSegmentPositions(struct Actor *p, s32 divisor, s32 threshold)
 {
     struct Group *g = p->group;
     struct Vec delta;
@@ -76,7 +72,7 @@ void TentacleActor_UpdateSegmentPositions(struct Actor *p, s32 divisor, s32 thre
     for (i = 0; i < g->count; i++) {
         struct Segment *seg = &g->segments[i];
         if (test(seg, 2) && (!test(seg, 1))) {
-            difference(&delta, &seg->target, SEGMENT_POSITION(g, i));
+            difference(&delta, &seg->target, &g->segments[i].position);
             if (magnitude(&delta) > threshold) {
                 {
                     u8 minimumDivisor = 1;
@@ -90,12 +86,8 @@ void TentacleActor_UpdateSegmentPositions(struct Actor *p, s32 divisor, s32 thre
                     *(s16 *)(address + FIELD_OFFSET(struct Group, segments[0].position)) +=
                         quotient;
                 }
-                *((s16 *)((((u8 *)g) + (i * (s32)sizeof(struct Segment))) +
-                          FIELD_OFFSET(struct Group, segments[0].position.y))) +=
-                    Div(delta.y, divisor);
-                *((s16 *)((((u8 *)g) + (i * (s32)sizeof(struct Segment))) +
-                          FIELD_OFFSET(struct Group, segments[0].position.z))) +=
-                    Div(delta.z, divisor);
+                g->segments[i].position.y += Div(delta.y, divisor);
+                g->segments[i].position.z += Div(delta.z, divisor);
             }
         }
     }
@@ -109,13 +101,13 @@ void TentacleActor_UpdateSegmentPositions(struct Actor *p, s32 divisor, s32 thre
         if (!test(seg, 1)) {
             if (test(seg, 2)) {
                 if (first != 255)
-                    sub_080A9BD8(p, &head, SEGMENT_POSITION(g, i), first, first + run);
+                    sub_080A9BD8(p, &head, &g->segments[i].position, first, first + run);
                 else {
-                    difference(&firstDelta, (void *)(&head), SEGMENT_POSITION(g, i));
+                    difference(&firstDelta, (void *)(&head), &g->segments[i].position);
                     if (magnitude(&firstDelta) > 0x1a44) {
-                        SEGMENT_POSITION(g, i)->x += Div(firstDelta.x, 4);
-                        SEGMENT_POSITION(g, i)->y += Div(firstDelta.y, 4);
-                        SEGMENT_POSITION(g, i)->z += Div(firstDelta.z, 4);
+                        g->segments[i].position.x += Div(firstDelta.x, 4);
+                        g->segments[i].position.y += Div(firstDelta.y, 4);
+                        g->segments[i].position.z += Div(firstDelta.z, 4);
                     }
                 }
                 {

@@ -1,4 +1,5 @@
-#include "global.h"
+#include "engine/engine_pause.h"
+#include "monsters/muspell_head.h"
 #include "engine/video/render.h"
 #include "engine/ram.h"
 #include "engine/engine_globals.h"
@@ -54,8 +55,7 @@ struct ScriptCombatActorState {
     u32 w1cc;
     u8 w1d0[4];
 };
-extern u32 gUnk_02000560;
-void AnimData_SelectPaletteBank(void *, u32 animation);
+#include "player/player.h"
 void Collider_SetPosition(void *collider, void *position, u32 value);
 void DamageNumberDisplay_Show(void *, int, int, void *, void *, int);
 void Sound_PlaySong(u32 song);
@@ -66,25 +66,20 @@ void SceneHud_SetTimedState(void *, int, int, int, int, int);
 u32 MuspellHead_UpdateDefeatEffect(void *);
 
 // confidence=low: runs the actor action, damage response, palette timers and sprite playback.
-#define ScriptCombatActor_UpdateState sub_08201D38
-u32 ScriptCombatActor_UpdateState(struct ScriptCombatActorState *p)
+u32 MuspellHead_UpdateState(struct ScriptCombatActorState *p)
 {
-    u32 m = 0x400;
-    if ((gEngineFlags | gScenePauseFlags) & m)
+    if (Engine_PauseBits(0x400))
         return 0;
     {
         u32 m2 = 4;
-        if (gUnk_02000560 & m2)
+        if (gPlayerSlotStatus[0] & m2)
             return 0;
     }
     Callback_InvokeActor(p, p->fn15c);
     p->spr.flags &= ~1;
     if (p->dead == 0) {
         struct ActorColliderView *c = &p->col;
-        u32 flags = c->flags;
-        u32 mask = 0xfffb;
-        mask &= flags;
-        c->flags = mask;
+        c->flags &= ~4;
         Collider_SetPosition(c, &p->spr.position, 0);
     } else {
         struct ActorColliderView *disabled = &p->col;
@@ -94,16 +89,15 @@ u32 ScriptCombatActor_UpdateState(struct ScriptCombatActorState *p)
     {
         s16 *dp = &p->damage;
         u16 d = *dp;
-        if (*dp > 0 && *(s16 *)((u8 *)p + (0x180 + 6)) == 0) {
+        if (*dp > 0 && p->dead == 0) {
             u16 *hpp = &p->hp;
             *hpp -= d;
             p->w1b4 = p->w1b8;
             Sound_PlaySong(0x13e);
             if (*dp > 0) {
-                u32 off2 = 0x19e;
                 DamageNumberDisplay_Show(&p->col, *dp, 0, &p->dmgA, &p->dmgB, 1);
-                SceneHud_SetTimedState(p->w1ac, (s16)*hpp, p->w198, *(s16 *)((u8 *)p + off2),
-                                       *((u8 *)p + off2 - 0x9b) == 4, p->w1a2);
+                SceneHud_SetTimedState(p->w1ac, (s16)*hpp, p->w198, p->w19e,
+                                       p->b103 == 4, p->w1a2);
             }
             if ((s16)p->hp <= 0) {
                 p->dead = 1;

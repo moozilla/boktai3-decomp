@@ -99,8 +99,8 @@ int sub_0803198C(void *arg0, void *arg1)
     bufferMask = 0xFFFF0000;
     buf[0] = 0;
     buf[1] &= bufferMask;
-    Widget_InitLinked(&p->widget, &p->resource, 0x3D, 0x3071, 0, 1, 0x3C, buf);
-    Anim_SetKeyframes(&p->widget, &p->resource, 0, 1, 0);
+    AnimSprite_InitLinked(&p->animSprite, &p->resource, 0x3D, 0x3071, 0, 1, 0x3C, buf);
+    Anim_SetKeyframes(&p->animSprite, &p->resource, 0, 1, 0);
     AnimData_Load(p->portraitGraphics, 0x593A);
     p->portraitResource = ScriptProc_Start(0x922E, 0x4BBF);
     Sprite_Init(&p->portrait, p->portraitGraphics, 0x1051);

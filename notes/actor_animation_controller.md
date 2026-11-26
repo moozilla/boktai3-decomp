@@ -2,9 +2,9 @@
 
 ## End state
 
-One unit: `src/npc/cutscene_actor/actor_animation_controller.c`, 98 functions, `tools/check.py
-src/npc/cutscene_actor/actor_animation_controller.c` exits 0 (30356 bytes, exact). Shared types in
-`include/npc/cutscene_actor/actor_animation_controller.h`: `ActorAnimController` (the 0xFA4-byte
+One unit: `src/ui/title/tutorial_otenko.c`, 98 functions, `tools/check.py
+src/ui/title/tutorial_otenko.c` exits 0 (30356 bytes, exact). Shared types in
+`include/ui/title/actor_animation_controller.h`: `ActorAnimController` (the 0xFA4-byte
 controller), `ActorChildSlot`/`ActorChildCallbackView` (the 16-entry child
 array, viewed from its own start and from each slot's callback field),
 `ActorSprite`, `ActorAnim`, and `InteractionPartner`.
@@ -80,7 +80,7 @@ errors, so they're worth listing:
   picking a single version (the differences are real register-pinning
   concessions, not accidental drift).
 * A handful of forward-declared external functions/globals
-  (`Actor_EnsureController`, `gUnk_020003C8`, `Task_Kill`,
+  (`TutorialOtenko_EnsureController`, `gUnk_020003C8`, `Task_Kill`,
   `Anim_LoadKeyframe`, `Sound_PlaySong`, `Script_GetKeywordValue`, several
   `Actor_*` callbacks) were declared with mismatched types across different
   original files (`void *` vs a real struct pointer, `s32` vs `u32`, `u16[]`
@@ -110,20 +110,20 @@ matching concessions, not something to unify away:
 * `sub_081E728C` (949 lines of asm), `sub_081E9BA4` (154 lines, a 16-child
   double loop against an unidentified global table + a call to
   `sub_08249240`), `sub_081E9E44` (497 lines), `sub_081EA4DC` (293 lines,
-  called from `Actor_EnsureController` right after `Task_Create`, likely the
+  called from `TutorialOtenko_EnsureController` right after `Task_Create`, likely the
   controller's own init/setup) are still bare `INCLUDE_ASM`. None were
   attempted in depth beyond confirming they're gaps, not already-matched
   code; `sub_081EA4DC` is probably the best next target given it's called
   from code already understood here.
 * `sub_081E42C4` (idle-wait timer/phase-save, tentatively
-  `Actor_UpdateIdleWait`) is a 87.6% NONMATCHING draft. The remaining diff is
+  `TutorialOtenko_UpdateIdleWait`) is a 87.6% NONMATCHING draft. The remaining diff is
   pool-constant materialization/reuse around the `delay`/`interrupted`/
   `savedPhase` triple and the `phase << 4` mode write — structurally right,
   register/constant-sharing choice is off by one pool slot's worth of code
   size (4 bytes). Tried reusing a single pointer via subtraction/addition to
   mimic the original's apparent constant reuse; made things worse, so left
   as the simpler form.
-* `sub_081E3B6C` (`Actor_ProjectAndClampToScreen`) keeps a small local `Vec`
+* `sub_081E3B6C` (`TutorialOtenko_ProjectAndClampToScreen`) keeps a small local `Vec`
   struct for its own 3-`s16` helper type; not merged into `ActorSprite` since
   it's single-purpose and already matches.
 * Many `unkNNNN` padding ranges in the header (notably 0xE34-0xE74 "motion

@@ -1,5 +1,5 @@
 #include "ui/town/shop_panel.h"
-void Shop_ClearDescription(struct SceneInventoryPanel *p)
+void Shop_ClearDescription(struct ShopPanel *p)
 {
     p->display.banner.flags |= 1;
     MessageWindow_Clear();

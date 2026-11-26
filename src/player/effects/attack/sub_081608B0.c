@@ -10,7 +10,7 @@ struct Vec {
 extern const s16 gUnk_086149C4[];
 s32 Mod(s32, s32);
 s32 Div(s32, s32);
-void sub_081606C0(u8 *, struct Vec *, s32, void *, s32, s32);
+void PlayerAttackEffect_AllocateParticle(u8 *, struct Vec *, s32, void *, s32, s32);
 #define W(n) (*(u32 *)(p + (n)))
 #define I(n) (*(s32 *)(p + (n)))
 #define P(n) (*(u8 **)(p + (n)))
@@ -82,11 +82,11 @@ s32 PlayerAttackEffect_EmitPaletteBaseTrail(u8 *p)
             a.v.x = D(0x20) + shift12(I(0xC0) * SIN(angle + 64));
             a.v.y = D(0x22) + 200;
             a.v.z = D(0x24) + shift12(I(0xC0) * gUnk_086149C4[angle]);
-            sub_081606C0(p, &a.v, 5, p + 0x18, 0, 0);
+            PlayerAttackEffect_AllocateParticle(p, &a.v, 5, p + 0x18, 0, 0);
             a.h.x = D(0x20) + shift12(I(0xC0) * SIN(a6 + 64));
             a.h.y = D(0x22) + 200;
             a.h.z = D(0x24) + shift12(I(0xC0) * gUnk_086149C4[a6]);
-            sub_081606C0(p, &a.v, 5, p + 0x18, 0, 0);
+            PlayerAttackEffect_AllocateParticle(p, &a.v, 5, p + 0x18, 0, 0);
         }
         W(0x584)++;
     } else if (state == 2) {
@@ -110,13 +110,13 @@ s32 PlayerAttackEffect_EmitPaletteBaseTrail(u8 *p)
                 b.v.x = D(0x20) + shift12(product) - 16;
             }
             b.v.z = D(0x24) + shift12(distance * SIN(angle)) + 16;
-            sub_081606C0(p, &b.v, 5, p + 0x18, 0, 0);
+            PlayerAttackEffect_AllocateParticle(p, &b.v, 5, p + 0x18, 0, 0);
             pitch = (311 - W(0x584) * 10) & 255;
             b.h.y = D(0x22) + shift12(I(0xC0) * SIN(pitch)) + 190;
             distance = shift_distance(I(0xC0) * SIN(pitch + 64));
             b.h.x = D(0x20) + shift12(SIN(a64) * distance) - 16;
             b.h.z = D(0x24) + shift12(distance * SIN(angle)) + 16;
-            sub_081606C0(p, &b.v, 5, p + 0x18, 0, 0);
+            PlayerAttackEffect_AllocateParticle(p, &b.v, 5, p + 0x18, 0, 0);
         }
         W(0x584)++;
     } else if (state == 3) {
@@ -131,7 +131,7 @@ s32 PlayerAttackEffect_EmitPaletteBaseTrail(u8 *p)
         c.v.x = D(0x20) + shift12(I(0xC0) * SIN(angle + 64)) - 16;
         c.v.y = D(0x22) + 200;
         c.v.z = D(0x24) + shift12(I(0xC0) * gUnk_086149C4[angle]) + 16;
-        sub_081606C0(p, &c.v, 5, p + 0x18, 0, 0);
+        PlayerAttackEffect_AllocateParticle(p, &c.v, 5, p + 0x18, 0, 0);
         W(0x584)++;
     } else
         W(0x584) = 0;

@@ -2,14 +2,14 @@
 void Inventory_SortConsumables(u32);
 void Inventory_SortEquipment(u32);
 void GameState_SortConsumableSlots(u32);
-struct SceneInventoryCategoryMenu {
+struct StorageCategoryMenu {
     u8 unknown0[0x1754];
     u8 selectedCategory;
     u8 unknown1755[3];
     u8 categories[0x48];
     u8 sortMode;
 };
-void Storage_SortSelectedCategory(struct SceneInventoryCategoryMenu *p)
+void Storage_SortSelectedCategory(struct StorageCategoryMenu *p)
 {
     switch (p->categories[p->selectedCategory] >> 1) {
         case 0:

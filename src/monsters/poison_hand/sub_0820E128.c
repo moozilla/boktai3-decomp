@@ -1,27 +1,11 @@
-#include "global.h"
+#include "scene/collision/contact_actor.h"
+#include "monsters/poison_hand.h"
 #include "engine/math/scene_vec.h"
 #include "engine/engine.h"
 #include "engine/ram.h"
-struct PoisonHandBurst {
-    u8 pad0[0x18];
-    s32 frame;
-    u8 pad1C[0x24];
-    struct SceneVec position;
-    u8 pad48[0xd8];
-    s16 effectX, effectY, effectZ, unknown126;
-    u8 pad128[4];
-    u16 spread;
-    u8 pad12E[0x16];
-    s16 timer;
-};
 void PoisonHand_RecordDefeat(void *);
 void *SpriteEffectController_Create(void *, void *, u32, u32, u32, u32, u32, u32, u32, u32, u32,
                                     u32, s32, s32, u32, s32, u32, u32);
-struct BurstVelocity {
-    s32 x : 16;
-    s32 y : 16;
-    s32 z : 16;
-};
 static inline s32 PoisonHand_NextSpread(const u16 *table)
 {
     u32 offset;
@@ -37,19 +21,19 @@ static inline void PoisonHand_RaiseOrigin(struct SceneVec *p)
 {
     p->y += 0x80;
 }
-s32 PoisonHand_UpdateDefeatBurst(struct PoisonHandBurst *p)
+s32 PoisonHand_UpdateDefeatBurst(struct PoisonHand *p)
 {
     struct SceneVec position;
-    struct BurstVelocity velocity;
+    struct ContactPackedVector velocity;
     s32 random, base;
-    if (!p->timer) {
-        s32 f = p->frame;
+    if (!p->initialDead) {
+        s32 f = p->age;
         u32 attributes, palette;
         if (f <= 15) {
-            PoisonHand_CopyPosition(&position, &p->position);
+            PoisonHand_CopyPosition(&position, (struct SceneVec *)&p->sprite.position);
             PoisonHand_RaiseOrigin(&position);
             random = PoisonHand_NextSpread(gRandomTable);
-            base = p->spread - 8;
+            base = (u16)p->spread - 8;
             velocity.x = base + (random & 15);
             velocity.y = 0;
             velocity.z = base + (PoisonHand_NextSpread(gRandomTable) & 15);
@@ -64,7 +48,7 @@ s32 PoisonHand_UpdateDefeatBurst(struct PoisonHandBurst *p)
                                               palette, 2, 0, 0, 0, p->effectX, p->effectY,
                                               attributes, p->effectZ, 0, 0);
         }
-        if (p->frame == 16)
+        if (p->age == 16)
             PoisonHand_RecordDefeat(p);
     }
     return 0;

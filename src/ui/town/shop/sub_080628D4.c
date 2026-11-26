@@ -1,17 +1,17 @@
 #include "ui/town/shop_tail.h"
 #include "ui/town/shop_panel.h"
-struct SceneInventoryPageView {
+struct ShopPageView {
     u8 unknown0[0x1AB0];
     u8 page, pageCount;
 };
 void SceneInputPanel_SetMeterGlyph(struct SceneInputPanel *, u32, u32);
-void Shop_PopulateEquipmentGrid(struct SceneInventoryPanel *);
-void Shop_PopulateItemGrid(struct SceneInventoryPanel *);
-void Shop_PopulateConsumableGrid(struct SceneInventoryPanel *);
-void Shop_RefreshCatalogDisplay(struct SceneInventoryTail *p)
+void Shop_PopulateEquipmentGrid(struct ShopPanel *);
+void Shop_PopulateItemGrid(struct ShopPanel *);
+void Shop_PopulateConsumableGrid(struct ShopPanel *);
+void Shop_RefreshCatalogDisplay(struct ShopTail *p)
 {
-    struct SceneInventoryPanel *display = (struct SceneInventoryPanel *)p;
-    struct SceneInventoryPageView *pages = (struct SceneInventoryPageView *)p;
+    struct ShopPanel *display = (struct ShopPanel *)p;
+    struct ShopPageView *pages = (struct ShopPageView *)p;
     Shop_BeginBrowse(p);
     SceneInputPanel_SetMeterGlyph(&p->display, pages->page, pages->pageCount);
     switch (p->category) {

@@ -1,4 +1,4 @@
-void Actor_UpdateBlinkBurstDisappearance(struct ActorAnimController *p)
+void TutorialOtenko_UpdateBlinkBurstDisappearance(struct ActorAnimController *p)
 {
     struct ActorSprite *o;
     struct ActorAnim *a;
@@ -80,10 +80,10 @@ void Actor_UpdateBlinkBurstDisappearance(struct ActorAnimController *p)
             p->obj.flags |= 1;
         if (--(*(u16 *)&p->blinkInterval) == 0) {
             s32 duration = 10;
-            AnimatedParticles_EmitBurst((u8 *)p + 0xdf8, 1, 512, 48, 8, 8, 8, 4);
-            AnimatedParticles_EmitBurst((u8 *)p + 0xdf8, 1, 512, 48, 8, 8, 8, 4);
-            AnimatedParticles_EmitBurst((u8 *)p + 0xdf8, 1, 512, 48, 8, 8, 8, 4);
-            AnimatedParticles_EmitBurst((u8 *)p + 0xdf8, 1, 512, 48, 8, 8, 8, 4);
+            ImpactBurst_EmitBurst((u8 *)p + 0xdf8, 1, 512, 48, 8, 8, 8, 4);
+            ImpactBurst_EmitBurst((u8 *)p + 0xdf8, 1, 512, 48, 8, 8, 8, 4);
+            ImpactBurst_EmitBurst((u8 *)p + 0xdf8, 1, 512, 48, 8, 8, 8, 4);
+            ImpactBurst_EmitBurst((u8 *)p + 0xdf8, 1, 512, 48, 8, 8, 8, 4);
             sub_080148CC(1, 3, (u8 *)p + 0xdf8, 32, 60, duration, 3, duration, 5, 60, duration);
             sub_080148CC(1, 3, (u8 *)p + 0xdf8, 64, 60, duration, 3, duration, 5, 60, duration);
             sub_080148CC(1, 3, (u8 *)p + 0xdf8, 96, 60, duration, 3, duration, 5, 60, duration);
@@ -97,7 +97,7 @@ void Actor_UpdateBlinkBurstDisappearance(struct ActorAnimController *p)
             Actor_SetState(p, 1, 2);
             {
                 u32 active = 4;
-                register void (*fn)(void *, void *) = Actor_OnInteractionChildUpdate;
+                register void (*fn)(void *, void *) = TutorialOtenko_OnInteractionChildUpdate;
                 u8 reset = 1;
                 s32 i;
                 for (i = 0; i < 16; i++) {

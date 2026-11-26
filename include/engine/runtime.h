@@ -35,7 +35,7 @@ extern u8 gIwramCode
     []; /* IWRAM instruction buffer populated from Palette_CacheObjectBankArm through AgbMain__addr at startup; extent is not inferred from the partial RFU read */
 /* 0x03001110 */
 extern u32
-    gVideoIrqPhase; /* Two-phase video/sound IRQ handler latch; toggled by sub_08214144 (tentative name) */
+    gVideoIrqPhase; /* Two-phase video/sound IRQ handler latch; toggled by InterruptsAndVideo_OnVCount (tentative name) */
 /* 0x03001680 */
 extern u32
     gMessageQueueBufferIndex; /* Active double-buffered message queue index, toggled by MessageQueue_SwapBuffers */
@@ -137,7 +137,7 @@ extern u32
     gSceneControlWord3; /* Cleared during transitions and by Engine_ClearControlFlags; finer meaning unresolved */
 /* 0x030054B4 */
 extern u16
-    gSolarControlFlag; /* solar control flag set by sub_0822C180 and cleared by sub_0822C18C; purpose tentative */
+    gSolarControlFlag; /* solar control flag set by Solar_EnableControlFlag and cleared by Solar_DisableControlFlag; purpose tentative */
 /* 0x030054B8 */
 extern u16
     gSolarSimulatedIntensity; /* simulated solar intensity ramping 0..140 (0x8C), returned by sub_0822C8D8 */

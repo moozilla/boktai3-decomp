@@ -21,7 +21,7 @@ struct HudIconOffset {
     u32 z : 16;
     u32 pad : 16;
 };
-void Widget_InitLinked(void *, void *, int, int, int, int, int, void *);
+void AnimSprite_InitLinked(void *, void *, int, int, int, int, int, void *);
 void Hud_InitializeThreeIcons(struct Hud *hud)
 {
     struct HudIconOffset offset;
@@ -30,7 +30,7 @@ void Hud_InitializeThreeIcons(struct Hud *hud)
     offset.z = 0;
     for (i = 0; i < 3; i++) {
         offset.x = (i + 14) * 8;
-        Widget_InitLinked(&hud->icons[i], hud->resource, 0x29, 0x10031, 0, 0, 60, &offset);
+        AnimSprite_InitLinked(&hud->icons[i], hud->resource, 0x29, 0x10031, 0, 0, 60, &offset);
         hud->icons[i].tile = 0;
         hud->icons[i].tiles = gPaletteBankData + (hud->icons[i].tile << 5);
     }

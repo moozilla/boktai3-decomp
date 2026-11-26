@@ -1,10 +1,5 @@
 #include "scene/collision/scene_actor_contact_list.h"
-static inline u8 TestGate(struct SceneActorContactGateView *gate, u32 mask)
-{
-    if (gate->flags & mask)
-        return 1;
-    return 0;
-}
+#include "scene/motion/scene_actor_chase_shared.h"
 void SceneActorContacts_SetDistanceGate(struct ChaseActor *actor,
                                         struct SceneActorContactGateView *gate, u32 metric,
                                         u32 threshold, u32 mode, u32 flags)
@@ -14,7 +9,7 @@ void SceneActorContacts_SetDistanceGate(struct ChaseActor *actor,
         u32 result;
         if (!threshold && !mode)
             goto yes;
-        result = TestGate((void *)((u32)actor + 0xDC), 4);
+        result = SceneActorChase_TrackingFlags(&actor->base.tracking, 4);
         if (result)
             goto yes;
         if (mode == 2)

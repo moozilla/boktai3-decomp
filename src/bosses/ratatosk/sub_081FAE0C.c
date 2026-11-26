@@ -30,7 +30,7 @@ void *SunOrb_GetOrCreateManager(void);
 void *Ratatosk_CreateAnimatedParticlePool(void);
 void *Ratatosk_CreateParticlePool(void);
 s32 Mod(s32, s32);
-s32 sub_081F6428(void *);
+s32 Ratatosk_ApplyQueuedDamage(void *);
 void Ratatosk_InitRequestedState(void *);
 void Ratatosk_ApplyDamageReaction(void);
 
@@ -204,7 +204,6 @@ static inline void RatatoskInit_SetCameraOrbit(struct RatatoskCamera *camera, u3
 }
 
 // confidence=low: Initializes Ratatosk from script dimensions, timing values, paths, palettes, and pools.
-#define Ratatosk_InitializeFromScript sub_081FAE0C
 s32 Ratatosk_InitializeFromScript(struct RatatoskInit *actor, u32 id)
 {
     struct RatatoskInitBase *self;
@@ -443,7 +442,7 @@ s32 Ratatosk_InitializeFromScript(struct RatatoskInit *actor, u32 id)
             actor->orbSlots[i].position.y = 0x200;
         }
     }
-    RatatoskInit_SetDamageHandler(self, sub_081F6428);
+    RatatoskInit_SetDamageHandler(self, Ratatosk_ApplyQueuedDamage);
     RatatoskInit_SetStateHandler(self, Ratatosk_InitRequestedState);
     SceneActors_SetHealthLimits(self, hpA, hpA, hpB);
 

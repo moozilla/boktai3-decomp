@@ -1,28 +1,18 @@
-#include "global.h"
-struct Ooze {
-    u8 pad0[0x104];
-    void (*state)(void);
-    u8 pad108[0x18];
-    s16 interval, variant, delayCount, delayIndex;
-    s16 delays[13];
-    s16 timer;
-    u8 pad144[0x18];
-    u32 useDelayTable;
-};
+#include "monsters/ooze.h"
 s32 Mod(s32, s32);
 void Ooze_BeginAttack(void);
 s32 Ooze_UpdateAttackDelay(struct Ooze *p)
 {
-    if (p->useDelayTable) {
-        if (p->timer > p->delays[p->delayIndex]) {
+    if (p->delayScript) {
+        if (p->dispatchTicks > p->delays[p->delayIndex]) {
             p->state = Ooze_BeginAttack;
-            p->timer = 0;
+            p->dispatchTicks = 0;
             p->delayIndex++;
             if (p->delayIndex > p->delayCount - 1)
                 p->delayIndex = 0;
         }
     } else {
-        if (Mod(p->timer, p->interval) == 0)
+        if (Mod(p->dispatchTicks, p->interval) == 0)
             p->state = Ooze_BeginAttack;
     }
     return 0;

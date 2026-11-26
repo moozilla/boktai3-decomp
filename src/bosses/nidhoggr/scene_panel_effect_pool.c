@@ -2,17 +2,17 @@
 #include "player/player_slot_status.h"
 #include "bosses/nidhoggr/scene_pause.h"
 
-void sub_0818ECFC(struct ScenePanelEffectPool *);
+void NidhoggrEffect_UpdatePool(struct NidhoggrEffectPool *);
 
-void Nidhoggr_ClearEffectPools(struct ScenePanelEffectPool *);
+void Nidhoggr_ClearEffectPools(struct NidhoggrEffectPool *);
 
-void NidhoggrEffect_InitPool(struct ScenePanelEffectPool *);
+void NidhoggrEffect_InitPool(struct NidhoggrEffectPool *);
 
 void PlayerStats_AddContactHundredths(u32, u32, s32);
 
 void ExplosionEffect_Create(u32, u32, u32, u32, u32);
 
-struct ScenePanelOwnedEffect *SceneEffectPool_AllocateSlot(void *);
+struct NidhoggrOwnedEffect *SceneEffectPool_AllocateSlot(void *);
 
 void SceneEffect_ResetState(void *);
 
@@ -37,7 +37,7 @@ extern const struct ContactPosition gUnk_0824F2D4, gUnk_0824F2CC;
 
 extern struct ContactPosition gUnk_0824F2DC;
 
-static inline void StepSequence(struct ScenePanelOwnedEffect *slot)
+static inline void StepSequence(struct NidhoggrOwnedEffect *slot)
 {
     PlayerCue_StepSequence(&slot->sprite, &slot->sequence);
 }
@@ -56,21 +56,21 @@ static inline void AddPosition(struct ContactPosition *out, struct ContactPositi
 }
 
 
-u32 NidhoggrEffect_UpdateTask(struct ScenePanelEffect *effect)
+u32 NidhoggrEffect_UpdateTask(struct NidhoggrEffect *effect)
 {
-    sub_0818ECFC(&effect->pool);
+    NidhoggrEffect_UpdatePool(&effect->pool);
     return 0;
 }
 
-u32 NidhoggrEffect_DestroyTask(struct ScenePanelEffect *effect)
+u32 NidhoggrEffect_DestroyTask(struct NidhoggrEffect *effect)
 {
     Nidhoggr_ClearEffectPools(&effect->pool);
     return 0;
 }
 
-struct ScenePanelEffect *NidhoggrEffect_Create(u32 impactVariant, u32 contactHundredths)
+struct NidhoggrEffect *NidhoggrEffect_Create(u32 impactVariant, u32 contactHundredths)
 {
-    struct ScenePanelEffect *effect = Task_Create(8, sizeof(*effect));
+    struct NidhoggrEffect *effect = Task_Create(8, sizeof(*effect));
     if (effect != 0) {
         Task_SetCallbacks(effect, (void (*)(void *))NidhoggrEffect_UpdateTask,
                           (void (*)(void *))NidhoggrEffect_DestroyTask);
@@ -81,22 +81,22 @@ struct ScenePanelEffect *NidhoggrEffect_Create(u32 impactVariant, u32 contactHun
     return effect;
 }
 
-void NidhoggrEffect_OnContact(u32 first, u32 second, struct ScenePanelOwnedEffect *slot)
+void NidhoggrEffect_OnContact(u32 first, u32 second, struct NidhoggrOwnedEffect *slot)
 {
-    struct ScenePanelEffect *owner = slot->owner;
+    struct NidhoggrEffect *owner = slot->owner;
     slot->state = 0xff;
     PlayerStats_AddContactHundredths(first, second, owner->contactHundredths);
 }
 
 void NidhoggrEffect_CreatePositionEffect(const struct ContactPosition *position,
-                                           struct ScenePanelEffect *effect)
+                                           struct NidhoggrEffect *effect)
 {
     ExplosionEffect_Create((u32)position, 0x10, effect->impactVariant, 0xa, 0);
 }
 
-void Nidhoggr_UpdateOwnedSeekingEffect(struct ScenePanelOwnedEffect *owner)
+void Nidhoggr_UpdateOwnedSeekingEffect(struct NidhoggrOwnedEffect *owner)
 {
-    struct ScenePanelEffectDelta delta;
+    struct NidhoggrEffectDelta delta;
     s32 dx, dy, dz, angle;
     u8 *stateAddress;
     StepSequence(owner);
@@ -131,7 +131,7 @@ void Nidhoggr_UpdateOwnedSeekingEffect(struct ScenePanelOwnedEffect *owner)
     }
         return;
     impact: {
-        struct ScenePanelEffectDelta impact;
+        struct NidhoggrEffectDelta impact;
         void *boss = owner->owner;
         impact.x = 0;
         impact.y = -96;
@@ -158,7 +158,7 @@ void Nidhoggr_UpdateOwnedSeekingEffect(struct ScenePanelOwnedEffect *owner)
         if (owner->age == 0)
             owner->state++;
         if (owner->state > 1 && owner->age > 88) {
-            struct ScenePanelEffectDelta impact;
+            struct NidhoggrEffectDelta impact;
             void *boss = owner->owner;
             impact.x = 0;
             impact.y = -128;
@@ -180,11 +180,11 @@ void Nidhoggr_UpdateOwnedSeekingEffect(struct ScenePanelOwnedEffect *owner)
     }
 }
 
-void Nidhoggr_CreateOwnedSeekingEffect(struct ScenePanelEffect *owner,
+void Nidhoggr_CreateOwnedSeekingEffect(struct NidhoggrEffect *owner,
                                        struct ContactPosition *anchor,
                                        struct ContactPosition *offset)
 {
-    struct ScenePanelOwnedEffect *effect;
+    struct NidhoggrOwnedEffect *effect;
     u8 *animation, *collider, *shadow;
     struct ContactPosition *position;
     void (*callback)(void *);

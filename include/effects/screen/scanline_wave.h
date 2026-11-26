@@ -18,5 +18,5 @@ u32 ScanlineWave_Destroy(void);
 s32 ScanlineWave_Initialize(struct ScanlineWave *, s32);
 struct ScanlineWave *ScanlineWave_Create(s32);
 void ScanlineEffect_SetSource(s32, s32, void *);
-void sub_082194D4(void);
+void ScanlineEffect_StopTransfer(void);
 #endif

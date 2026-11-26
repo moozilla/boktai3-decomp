@@ -6,14 +6,14 @@ void PauseMenu_SetSpritePalette(void *, u16);
 void SceneHud_PrepareActionTransferToSlot(struct SceneHudState *p, s32 index, s32 action,
                                           s32 target)
 {
-    struct AnimSprite *widget = &p->motionWidgets[index];
+    struct AnimSprite *animSprite = &p->motionWidgets[index];
     void *resource;
     struct ContactPosition *position;
-    widget->flags &= ~1;
+    animSprite->flags &= ~1;
     resource = p->motionResource;
-    Anim_LoadKeyframe(widget, resource, (u16)(Inventory_GetConsumableId(action) + 0x121), 1);
-    SceneHud_GetActionIconPosition(&widget->position, action);
+    Anim_LoadKeyframe(animSprite, resource, (u16)(Inventory_GetConsumableId(action) + 0x121), 1);
+    SceneHud_GetActionIconPosition(&animSprite->position, action);
     position = &p->actionTargets[index];
     SceneHud_GetActionIconPosition(position, target);
-    PauseMenu_SetSpritePalette(widget, p->categoryWidgets[action + 10].paletteBank);
+    PauseMenu_SetSpritePalette(animSprite, p->categoryWidgets[action + 10].paletteBank);
 }

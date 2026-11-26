@@ -24,7 +24,7 @@ u8 Save_WriteAlternateSlotAndSelect(void);
 void Hud_DrawSelectedClock(void *);
 void PauseMenu_SetSpritePosition(void *, s32, s32, s32);
 void PauseMenu_ClearSpriteFlags(void *, s32, u32);
-void sub_08215AC4(u32, u32);
+void Bg_SetCharacterBase(u32, u32);
 void Mosaic_ResetParameters(void);
 void Hud_RefreshActivePanel(void *);
 void MusicSlots_StopAllAndRetainResumable(void);
@@ -200,7 +200,7 @@ void PauseMenu_SaveDisplayState(struct SceneHudState *menu)
     menu->savedBackgroundControl = *(vu16 *)0x0400000A;
     *(vu16 *)0x04000050 = 0;
     gFadeMultiplier = 0x40;
-    sub_08215AC4(1, 2);
+    Bg_SetCharacterBase(1, 2);
     Bg_SetPriority(1, 1);
     menu->savedMosaicHalfword = gMosaicHalfword;
     menu->savedMosaicParameter = gMosaicParam;
@@ -226,7 +226,7 @@ void PauseMenu_RestoreDisplayState(struct SceneHudState *menu)
     flags &= ~0x200;
     gDispCntShadow = flags;
     PauseMenu_HideAllSprites(menu);
-    sub_08215AC4(1, 0);
+    Bg_SetCharacterBase(1, 0);
     map = Video_GetBackgroundMap(1);
     CpuSet(menu->savedBackgroundMap, map, 0x04000200);
     gBgRecords[1] = menu->savedBackground;

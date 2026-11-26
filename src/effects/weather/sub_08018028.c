@@ -1,5 +1,4 @@
 #include "global.h"
-#define Weather_Initialize sub_08018028
 #include "effects/screen/background_controller.h"
 #include "engine/ram.h"
 #include "engine/math/monster_particle_random.h"

@@ -58,7 +58,7 @@ void SceneLink_RemoveNode(void *);
 void TargetRegistry_RegisterSceneActor(void *, int, void *);
 void *ActorAttachment_UpdateFromDescriptor(void *, void *, int, int, void *, int, int, int);
 void Camera_RequestShake(int);
-void AnimatedParticles_EmitBurst(void *, int, int, int, int, int, int, int);
+void ImpactBurst_EmitBurst(void *, int, int, int, int, int, int, int);
 int Div(int, int);
 extern u32 gUnk_02000560;
 

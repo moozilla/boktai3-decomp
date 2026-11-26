@@ -1,6 +1,6 @@
 #include "global.h"
 #include "scene/actor/scene_event_dispatch.h"
-struct ScenePanelCommandState {
+struct VanargandPairCommandState {
     u8 unknown0[0xAC];
     u8 mode, substate, transition, unknownAF, pending;
     u8 unknownB1[0xC4 - 0xB1];
@@ -10,8 +10,8 @@ struct ScenePanelCommandState {
 };
 void SceneActors_ConfigureEffect(void *, s32, s32, s32);
 u32 Trigger_ConsumePending(void *, u32);
-static inline void ScenePanel_RequestTransition(struct ScenePanelCommandState *panel, u32 mode,
-                                                u32 substate, u32 transition)
+static inline void VanargandPair_RequestTransition(struct VanargandPairCommandState *panel,
+                                                   u32 mode, u32 substate, u32 transition)
 {
     panel->mode = mode;
     panel->substate = substate;
@@ -19,7 +19,7 @@ static inline void ScenePanel_RequestTransition(struct ScenePanelCommandState *p
     panel->counter = 0;
     panel->pending = 1;
 }
-void VanargandPair_DispatchTransitionCommands(struct ScenePanelCommandState *panel)
+void VanargandPair_DispatchTransitionCommands(struct VanargandPairCommandState *panel)
 {
     struct SceneEventReceiver *receiver = &panel->receiver;
     s32 i = 0;
@@ -30,28 +30,28 @@ void VanargandPair_DispatchTransitionCommands(struct ScenePanelCommandState *pan
             SceneMessages_SetPendingTrigger(receiver, command);
             switch (command->kind) {
                 case 51:
-                    ScenePanel_RequestTransition(panel, 2, 0, 2);
+                    VanargandPair_RequestTransition(panel, 2, 0, 2);
                     break;
                 case 52:
-                    ScenePanel_RequestTransition(panel, 2, 0, 3);
+                    VanargandPair_RequestTransition(panel, 2, 0, 3);
                     break;
                 case 62:
-                    ScenePanel_RequestTransition(panel, 2, 0, 6);
+                    VanargandPair_RequestTransition(panel, 2, 0, 6);
                     break;
                 case 54:
-                    ScenePanel_RequestTransition(panel, 2, 0, 7);
+                    VanargandPair_RequestTransition(panel, 2, 0, 7);
                     break;
                 case 53:
-                    ScenePanel_RequestTransition(panel, 2, 0, 0);
+                    VanargandPair_RequestTransition(panel, 2, 0, 0);
                     break;
                 case 55:
-                    ScenePanel_RequestTransition(panel, 2, 0, 10);
+                    VanargandPair_RequestTransition(panel, 2, 0, 10);
                     break;
                 case 56:
-                    ScenePanel_RequestTransition(panel, 2, 0, 4);
+                    VanargandPair_RequestTransition(panel, 2, 0, 4);
                     break;
                 case 57:
-                    ScenePanel_RequestTransition(panel, 2, 0, 5);
+                    VanargandPair_RequestTransition(panel, 2, 0, 5);
                     break;
                 case 9:
                     SceneActors_ConfigureEffect(panel, command->value, 0xB4, 0xB4);

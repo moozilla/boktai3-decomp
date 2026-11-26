@@ -5,8 +5,8 @@
 #include "scene/actor/scene_actor_control_phase.h"
 #include "scene/motion/scene_actor_availability.h"
 #include "scene/motion/scene_actor_chase_reaction.h"
-#include "monsters/tentacle_spread.h"
-#include "npc/cutscene_actor/actor_animation_controller.h"
+#include "monsters/centipede_spread.h"
+#include "ui/title/actor_animation_controller.h"
 #include "engine/engine.h"
 #include "link/session/room_actor.h"
 /* Complete allocation used by Centipede_Create; private roles are tentative. */
@@ -14,10 +14,12 @@ struct TentacleBody {
     struct RoomActor base;
     struct TentacleAnimationSegment segments[4];
     u8 unknown874, spin;
-    u8 unknown876[3];
+    u8 unknown876[2];
+    u8 routeHistoryIndex;
     u8 blockedFrameCount;
     u16 returnCell;
-    u8 unknown87C[0x54];
+    u16 routeHistory[6];
+    struct SceneActorBody markedSegmentBody;
     u16 attackFlags;
     u8 unknown8D2[2];
     s8 oscillationDirection;
@@ -28,8 +30,7 @@ struct TentacleBody {
     u8 unknown8DC[8];
     u16 routeMotionTimer;
     u16 releaseFrame;
-    u8 wanderAttempts, wanderDirection, spreadStage;
-    u8 unknown8EB;
+    u8 wanderAttempts, wanderDirection, spreadStage, healthPerSegment;
     s32 pendingImpulse;
     struct TentacleAnimationSegment *impulseSegment;
     u16 unknown8F4;
@@ -38,6 +39,7 @@ struct TentacleBody {
     u8 unknown90C[0x18];
     struct ContactPosition returnCenter, savedPosition;
 };
+typedef char TentacleBodySize[(sizeof(struct TentacleBody) == 0x934) ? 1 : -1];
 void SceneActorBehavior_ApplyContactReaction(struct SceneActorBehaviorContactView *,
                                              struct SceneActorBehaviorContactView *,
                                              struct RoomActor *);
@@ -71,7 +73,7 @@ void CentipedeBody_UpdateAnimationEleven(struct ChaseActor *p);
 void CentipedeBody_UpdateSpreadWindup(struct ChaseActor *actor);
 void CentipedeBody_UpdateSpreadPreparation(struct ChaseActor *actor);
 
-static inline void TentacleBody_SelectAnimation(struct RoomActor *actor, u32 selection, u32 variant,
+static inline void CentipedeBody_SelectAnimation(struct RoomActor *actor, u32 selection, u32 variant,
                                                 u32 flags)
 {
     u32 force;

@@ -79,7 +79,7 @@ u32 PlayerClone_DestroyPool(struct PlayerCloneManager *a);
 s32 PlayerClone_InitializePool(struct PlayerCloneManager *pool);
 void *PlayerClone_CreatePool(void);
 struct PlayerCloneSlot *PlayerClone_FindFreeSlot(struct PlayerCloneManager *a, s32 *out);
-s32 sub_08201160(struct PlayerCloneConfiguration *resource, struct ContactPosition *pos);
+s32 PlayerClone_Spawn(struct PlayerCloneConfiguration *resource, struct ContactPosition *pos);
 void PlayerClone_SetBehaviorCallback(struct PlayerCloneConfiguration *configuration,
                                      CloneUpdateCallback callback);
 void PlayerClone_InitConfig(struct PlayerCloneConfiguration *p);

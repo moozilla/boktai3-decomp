@@ -9,7 +9,7 @@ void Sound_PlaySong(u32);
 s32 ActorVariant_GetTableValue(u32, s32);
 s32 Player_SetAnimation(struct Player *, s32, s32, s32);
 void Player_UpdateFacingSide(struct Player *);
-void ActorBurst_Create(struct Player *, struct SceneVec *, struct SceneVec *, s32, u32);
+void ActionFlashBurst_Create(struct Player *, struct SceneVec *, struct SceneVec *, s32, u32);
 void Player_UpdateEnergyBurst(struct Player *p)
 {
     if (Player_ConsumeStateEntry(p)) {
@@ -48,7 +48,7 @@ void Player_UpdateEnergyBurst(struct Player *p)
                 Sound_PlaySong(0x2E4);
                 p->actionEighteenParameter = 0x16F;
                 p->actionEighteenDuration = 2;
-                ActorBurst_Create(p, &p->position, &p->actionOrigin, 1, p->burstParameter);
+                ActionFlashBurst_Create(p, &p->position, &p->actionOrigin, 1, p->burstParameter);
             }
             ActorSequence_Begin(p, 9, 1);
             break;

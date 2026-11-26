@@ -206,7 +206,7 @@ Floor switch,0810033C,08100A64,,,auto: 11 of 13 functions named FloorSwitch_*
 Named object,08100A64,08103ADC,,,auto: 37 of 47 functions named NamedObject_*
 Named actor,08103ADC,081041DC,,,auto: 7 of 14 functions named NamedActor_*; also NamedObject_*
 Actor group,081041DC,08104F08,,,auto: 6 of 19 functions named ActorGroup_*; also Pool184_*
-Callback pool,08104F08,081055C0,,,auto: 4 of 5 functions named CallbackPool_*
+Callback pool,08104F08,081055C0,field,,auto: 4 of 5 functions named CallbackPool_*
 Proximity actor,081055C0,08105E6C,,,auto: 6 of 9 functions named ProximityActor_*
 Region actor,08105E6C,08106DAC,,,auto: 6 of 11 functions named RegionActor_*; also Pool1B4_*
 Tile trigger,08106DAC,08107E90,,,auto: 10 of 14 functions named TileTrigger_*
@@ -250,7 +250,7 @@ Registry A8CB,0811FAB8,081213B0,,,auto: 13 of 27 functions named RegistryA8CB_*
 Scene collider effect,081213B0,08121B98,,,auto: 8 of 15 functions named SceneColliderEffect_*
 Scene actor 14,08121B98,08122824,,,auto: 7 of 28 functions named SceneActor14_*; also SceneSpriteBurst_*
 Scene scheduled effect,08122824,08123194,,,auto: 10 of 24 functions named SceneScheduledEffect_*; also SceneAnimatedEffect_* SceneTrailEffect_* SpriteNotice_*
-Scene terrain probe,08123194,08125B68,,,auto: 8 of 14 functions named SceneTerrainProbe_*
+Scene terrain probe,08123194,08125B68,effects,,auto: 8 of 14 functions named SceneTerrainProbe_*
 Scene moving particle,08125B68,08126140,,,auto: 10 of 12 functions named SceneMovingParticle_*
 Scripted particle,08126140,08126918,,,auto: 8 of 19 functions named ScriptedParticle_*; also SceneStatusIndicator_*
 Burst spark,08126918,08126D38,,,auto: 7 of 14 functions named BurstSpark_*; also BlinkingEffect_*
@@ -322,10 +322,10 @@ Actor position,0817A0FC,0817A900,,,auto: 4 of 15 functions named ActorPosition_*
 Scene volume,0817A900,0817B5C0,,,auto: 7 of 23 functions named SceneVolume_*; also SceneActors_*
 Actor state,0817B5C0,0817BB54,,,auto: 6 of 8 functions named ActorState_*
 Actor decision,0817BB54,0817C318,,,auto: 9 of 12 functions named ActorDecision_*
-Sabata,0817C318,0817D67C,,,auto: 7 of 10 functions named Sabata_*
+Sabata,0817C318,0817D67C,bosses,,auto: 7 of 10 functions named Sabata_*
 Scene volume,0817D67C,0817E378,,,auto: 4 of 6 functions named SceneVolume_*
 Scene event actor,0817E378,0817F330,,,auto: 7 of 10 functions named SceneEventActor_*
-Sabata,0817F330,08180488,,,auto: 7 of 11 functions named Sabata_*
+Sabata,0817F330,08180488,bosses,,auto: 7 of 11 functions named Sabata_*
 Sprite component,08180488,08180898,,,auto: 8 of 21 functions named SpriteComponent_*; also ProximityVolume_*
 Scene combat actor,08180898,08181134,,,auto: 5 of 11 functions named SceneCombatActor_*
 Actor marker,08181134,08181634,,,auto: 5 of 7 functions named ActorMarker_*
@@ -355,7 +355,7 @@ Vanargand projectile,081B6810,081B7538,,,auto: 13 of 29 functions named Vanargan
 Growth hazard,081B7538,081B817C,,,auto: 16 of 24 functions named GrowthHazard_*
 Scene script object,081B817C,081B89C0,,,auto: 6 of 9 functions named SceneScriptObject_*
 Orbit motion,081B89C0,081B9818,,,auto: 10 of 15 functions named OrbitMotion_*; also PositionMotion_*
-Registry selection,081B9818,081BA62C,,,auto: 26 of 27 functions named RegistrySelection_*
+Registry selection,081B9818,081BA62C,ui,,auto: 26 of 27 functions named RegistrySelection_*
 Registry 3F74,081BA62C,081BACB8,,,auto: 18 of 18 functions named Registry3F74_*
 Menu cursor,081BACB8,081BB248,,,auto: 20 of 20 functions named MenuCursor_*
 Solar bank,081BB248,081BC2BC,,,auto: 15 of 24 functions named SolarBank_*
@@ -388,7 +388,7 @@ Timed effect,081DA048,081DA810,,,auto: 9 of 10 functions named TimedEffect_*
 Projectile,081DA810,081DAF50,,,auto: 15 of 21 functions named Projectile_*; also Task4E01_*
 Explosion,081DAF50,081DB474,,,auto: 12 of 12 functions named Explosion_*
 Options,081DB474,081DBB4C,,,auto: 6 of 6 functions named Options_*
-Solar calibration,081DBB4C,081DC208,,,auto: 5 of 12 functions named SolarCalibration_*; also Menu_*
+Solar calibration,081DBB4C,081DC208,system,,auto: 5 of 12 functions named SolarCalibration_*; also Menu_*
 Screen message,081DC208,081DC6D0,,,auto: 6 of 6 functions named ScreenMessage_*
 Time,081DC6D0,081DCF20,,,auto: 7 of 8 functions named Time_*
 Name entry,081DCF20,081DE5E4,,,auto: 13 of 16 functions named NameEntry_*
@@ -416,7 +416,7 @@ Script combat actor,08201388,0820264C,,,auto: 8 of 11 functions named ScriptComb
 Projectile pool,0820264C,08203200,,,auto: 6 of 25 functions named ProjectilePool_*; also ProjectileConfig_* ProximitySequence_*
 Cannon emitter,08203200,08203660,,,auto: 4 of 5 functions named CannonEmitter_*
 Enemy F426,08203660,08204748,,,auto: 10 of 12 functions named EnemyF426_*
-Axe Armor,08204748,08205944,,,auto: 12 of 12 functions named AxeArmor_*
+Axe Armor,08204748,08205944,monsters,,auto: 12 of 12 functions named AxeArmor_*
 Ooze,08205944,082064B4,,,auto: 8 of 10 functions named Ooze_*
 Vulcan cannon,082064B4,08207FAC,,,auto: 14 of 14 functions named VulcanCannon_*
 Cannon turret,08207FAC,0820901C,,,auto: 8 of 10 functions named CannonTurret_*

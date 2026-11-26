@@ -1,4 +1,4 @@
-# NativeEffect_CreateFromProfile
+# ProjectileEffect_CreateFromProfile
 
 The profile-driven creator matches all 808 bytes. The capacity check packs
 the frame and group into a 16-bit ID. After choosing a free slot, the creator

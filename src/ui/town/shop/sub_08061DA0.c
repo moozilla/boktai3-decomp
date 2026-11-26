@@ -1,5 +1,5 @@
 #include "ui/town/shop_control.h"
-s32 Shop_TickModeMenu(struct SceneInventoryControlView *panel)
+s32 Shop_TickModeMenu(struct ShopControlView *panel)
 {
     SceneInputPanel_PositionModeCursor((void *)panel, panel->mode);
     if (panel->mode == 3)
@@ -7,7 +7,7 @@ s32 Shop_TickModeMenu(struct SceneInventoryControlView *panel)
     else
         SceneInput_SetGlyphPair(&panel->prompt, 0, -1);
     SceneInputPanel_HighlightMode((void *)panel,
-                                  ((struct SceneInventoryHighlightView *)panel)->colors);
+                                  ((struct ShopHighlightView *)panel)->colors);
     if (Shop_HandleClockShortcut(panel))
         goto handled;
     if (Shop_HandlePageKeys(panel))

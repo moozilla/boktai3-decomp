@@ -5,8 +5,8 @@ uses r1 to return and leaves that Thumb return address in r0.
 
 The explicit form changed the ROM bytes. The guarded form passed the unit ROM check.
 
---- a/src/scrolling_dialogue.c
-+++ b/src/scrolling_dialogue.c
+--- a/src/ui/dialogue/scrolling_dialogue/scrolling_dialogue.c
++++ b/src/ui/dialogue/scrolling_dialogue/scrolling_dialogue.c
 @@ -28,4 +28,7 @@
      text->wrap = 2;
      TextState_Reset(text);

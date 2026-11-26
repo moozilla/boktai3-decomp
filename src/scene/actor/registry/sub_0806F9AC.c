@@ -2,17 +2,10 @@
 struct SceneActorRecord *SceneActorRecord_FindEmpty(void)
 {
     s32 i = 0;
-    struct SceneActorRecord *entry = SCENE_ACTOR_RECORDS;
-    struct SceneActorRecord *result;
-    do {
-        if (!entry->id) {
-            result = entry;
-            goto done;
-        }
-        entry++;
-        i++;
-    } while (i <= 19);
-    result = 0;
-done:
-    return result;
+    struct SceneActorRecord *table = SCENE_ACTOR_RECORDS;
+    for (; i < 20; i++) {
+        if (!table[i].id)
+            return &table[i];
+    }
+    return NULL;
 }

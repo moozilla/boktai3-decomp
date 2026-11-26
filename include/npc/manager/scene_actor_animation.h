@@ -26,7 +26,7 @@ struct SceneActorAnimationTileDrawable {
 };
 void SceneActorAnimation_SelectDirectionalEntry(struct RoomActor *, s32);
 void SceneActorAnimation_SelectDirectionalEntryFlags(struct RoomActor *, s32, u32);
-void sub_080762A8(struct RoomActor *, s32, u32);
+void SceneActorAnimation_SelectDirectionalExtraFlags(struct RoomActor *, s32, u32);
 void SceneActorAnimation_SelectEntryFlags(struct RoomActor *, s32, u32);
 void SceneActorAnimation_SelectDirectionFlagsVariant(struct RoomActor *, s32, u32);
 void SceneActorAnimation_SelectExplicitVariant(struct RoomActor *, s32, u32, u32);

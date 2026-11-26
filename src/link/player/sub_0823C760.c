@@ -1,14 +1,14 @@
 #include "global.h"
 #include "scene/areas/area_effect_link.h"
 
-s32 sub_0823C4B4(u8 *);
+s32 Player_GetLinkedSmoothedDirection(u8 *);
 s32 LinkPlayer_HasSlotValueAtLeast(u8 *, s32);
 void Player_PlayLocalSong(s32, u32);
 void Player_SetTetherMode(u8 *, s32, s32);
 s32 Div(s32, s32);
 void Player_SetDirectionalVelocity_08238300(u8 *, s32);
 void Player_PlayActionCueSound(u8 *, u32);
-void sub_08238238(u8 *);
+void Player_UpdateActionFacingSide(u8 *);
 s32 ActorVariant_GetTableValue(u32, s32);
 s32 Player_SetAnimationIndex(u8 *, s32, s32);
 
@@ -56,10 +56,10 @@ void sub_0823C760(u8 *p)
                 *(u16 *)(p + 0xAD8) = 0x20;
             }
             if (*(s16 *)(p + 0x34C) != -1 && *(s16 *)(p + 0x4B6) == 0)
-                p[0x3A4] = sub_0823C4B4(p);
+                p[0x3A4] = Player_GetLinkedSmoothedDirection(p);
             Player_SetDirectionalVelocity_08238300(p, p[0x4F0]);
             Player_PlayActionCueSound(p, 1);
-            sub_08238238(p);
+            Player_UpdateActionFacingSide(p);
             Player_SetAnimationIndex(p, ActorVariant_GetTableValue(p[0x418], 1), 0x20);
             break;
         }

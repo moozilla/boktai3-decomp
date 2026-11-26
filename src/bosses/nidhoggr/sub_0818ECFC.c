@@ -30,8 +30,7 @@ s32 Callback_InvokeActor(void *, void *);
 void Collider_SetPosition(void *, void *, u32);
 void Collider_Refresh(void *);
 // confidence=low: dispatches two effect pools and advances live collision-effect positions.
-#define ScenePanelEffect_UpdatePool sub_0818ECFC
-static inline void ScenePanelEffect_InvokeCallback(void *slot, void *callback)
+static inline void NidhoggrEffect_InvokeCallback(void *slot, void *callback)
 {
     if (callback)
         Callback_InvokeActor(slot, callback);
@@ -61,7 +60,7 @@ static inline struct SceneVec *UpdatePosition(struct PanelCollisionSlot *large,
     position->z += motion->delta.z;
     return &large->position;
 }
-void ScenePanelEffect_UpdatePool(struct PanelEffectPool *pool)
+void NidhoggrEffect_UpdatePool(struct PanelEffectPool *pool)
 {
     struct PanelEffectSlot *small = pool->small;
     u32 mask = 1;
@@ -72,7 +71,7 @@ void ScenePanelEffect_UpdatePool(struct PanelEffectPool *pool)
     struct SceneVec *position;
     u32 stride = sizeof(*large);
     do {
-        ScenePanelEffect_InvokeCallback(small, small->update);
+        NidhoggrEffect_InvokeCallback(small, small->update);
         if (!small->update)
             pool->smallMask &= ~mask;
         remaining--;
@@ -85,7 +84,7 @@ void ScenePanelEffect_UpdatePool(struct PanelEffectPool *pool)
     motion = &large->motion;
     position = &large->position;
     do {
-        ScenePanelEffect_InvokeCallback(large, large->update);
+        NidhoggrEffect_InvokeCallback(large, large->update);
         if (!large->update) {
             s32 word = index >> 5;
             s32 bit = (index & 31);

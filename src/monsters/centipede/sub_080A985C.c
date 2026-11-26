@@ -1,23 +1,5 @@
-#include "global.h"
-struct Entry080A985C {
-    u8 pad0[0x1c];
-    u32 pos[2];
-    u8 pad24[0x105 - 0x24];
-    u8 flags;
-    u8 pad106[0x128 - 0x106];
-};
-struct Group080A985C {
-    u8 pad0[0x3d4];
-    struct Entry080A985C entries[4];
-    u8 pad874[0x888 - 0x874];
-    u8 obj[0x8b4 - 0x888];
-    struct Entry080A985C *target;
-    u8 pad8b8[0x8d0 - 0x8b8];
-    u16 state;
-    u8 pad8d2[0x8da - 0x8d2];
-    s16 count;
-};
-void SceneBody_Init(void *, s32, void *, u32, u32, void *);
+#include "monsters/centipede/centipede_body.h"
+#include "scene/collision/scene_body_api.h"
 void TerrainOverlay_QueueAddActor(void *);
 inline static u8 TestMask(u8 *flags, char mask)
 {
@@ -26,26 +8,24 @@ inline static u8 TestMask(u8 *flags, char mask)
     return 0;
 }
 
-void Centipede_ActivateMarkedSegment(u8 *p)
+void Centipede_ActivateMarkedSegment(struct RoomActor *actor)
 {
-    struct Group080A985C *g = *(struct Group080A985C **)(p + 0x3d0);
+    struct TentacleBody *g = actor->context;
     s32 found = 0xff;
     s32 i;
-    for (i = 0; i < g->count; i++) {
-        if (TestMask(&g->entries[i].flags, 4)) {
+    for (i = 0; i < g->segmentCount; i++) {
+        if (TestMask(&g->segments[i].animation.status, 4)) {
             found = i;
             break;
         }
     }
 
     if (found != 0xff) {
-        void *obj = g->obj;
-        struct Entry080A985C *e; /* unused, but its declaration affects register allocation */
         u16 m;
-        SceneBody_Init(obj, *(s32 *)(p + 0x50) + 1, g->entries[found].pos, 0, 7, g);
-        g->target = &g->entries[found];
-        TerrainOverlay_QueueAddActor(obj);
+        SceneBody_Init(&g->markedSegmentBody, actor->body.id + 1, &g->segments[found].position, 0, 7, g);
+        g->markedSegmentBody.sprite = &g->segments[found];
+        TerrainOverlay_QueueAddActor(&g->markedSegmentBody);
         m = 1;
-        g->state |= m;
+        g->attackFlags |= m;
     }
 }

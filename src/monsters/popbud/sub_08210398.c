@@ -6,23 +6,23 @@
 #include "player/cutscene/player_cue_sequence.h"
 #include "engine/engine_pause.h"
 /* Species identity is tentative. The update callback increments age after animation. */
-extern u32 gUnk_02000560;
+#include "player/player.h"
 void Anim_RestartSequence(void *, void *, u32, u32, u32);
 void ProjectileEmitter_UpdateAttack(void);
 s32 Popbud_UpdateDamageAnimation(struct PinkSpineState *p)
 {
     struct ContactCollider *collider;
 
-    if (Engine_PauseBits(0x400) || Flags_MaskedWord(4, &gUnk_02000560))
+    if (Engine_PauseBits(0x400) || Flags_MaskedWord(4, &gPlayerSlotStatus[0]))
         return 0;
     Callback_InvokeActor(p, p->update);
     p->sprite.flags &= ~1;
     if (!p->f134) {
-        collider = (struct ContactCollider *)&p->collider;
+        collider = &p->collider;
         collider->flags &= ~4;
         Collider_SetPosition(collider, &p->sprite.position, 0);
     } else {
-        collider = (struct ContactCollider *)&p->collider;
+        collider = &p->collider;
         collider->flags |= 4;
     }
     if ((p->f130 > 0) && (!p->f134)) {
@@ -49,7 +49,7 @@ s32 Popbud_UpdateDamageAnimation(struct PinkSpineState *p)
         AnimData_SelectPaletteBank(p->graphics, 0x1BD);
     {
         u32 ended;
-        ended = PinkSpine_StepAnimation(p);
+        ended = Popbud_StepAnimation(p);
         if (ended && (p->update == ProjectileEmitter_UpdateAttack))
             Sound_PlaySong(0x521);
     }

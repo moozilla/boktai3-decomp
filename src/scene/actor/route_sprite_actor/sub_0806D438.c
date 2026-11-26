@@ -1,3 +1,4 @@
+#include "player/player.h"
 #include "global.h"
 
 #include "scene/motion/route_sprite_actor.h"
@@ -8,21 +9,15 @@
 #include "bosses/vanargand/vanargand_parts.h"
 
 extern const s16 gUnk_086149C4[];
-extern void *gUnknown_02000580;
 s32 Mod(s32, s32);
 s32 Div(s32, s32);
 u8 *Path_GetPointData(u8 *);
 
-struct WanderSource {
-    u8 unknown0[0x30];
-    struct ContactPosition position;
-};
-
-static inline struct ContactPosition *PrepareSourceDelta(void **source, struct ContactPosition *out,
+static inline struct ContactPosition *PrepareSourceDelta(struct Player **source, struct ContactPosition *out,
                                                          struct RouteSpriteActor *actor)
 {
-    struct WanderSource *origin = *source;
-    struct ContactPosition *target = &origin->position;
+    struct Player *origin = *source;
+    struct ContactPosition *target = (void *)&origin->position;
     Vanargand_Difference(out, &actor->sprite.position, target);
     return target;
 }
@@ -76,11 +71,13 @@ void RouteSpriteActor_PlanWanderPath(struct RouteSpriteActor *actor)
     }
     route->index = index;
     route->ended = 0;
-    route->current =
-        (const struct RouteSpriteRoutePoint *)((u8 *)Path_GetPointData((u8 *)route->resource) +
-                                               route->index * 8);
+    {
+        const struct RouteSpriteRoutePoint *points =
+            (const void *)Path_GetPointData((u8 *)route->resource);
+        route->current = &points[route->index];
+    }
 
-    target = PrepareSourceDelta(&gUnknown_02000580, &delta, actor);
+    target = PrepareSourceDelta(gPlayers, &delta, actor);
 
     actor->elevatedPosition = *target;
     actor->prepared = 0;
@@ -92,10 +89,7 @@ void RouteSpriteActor_PlanWanderPath(struct RouteSpriteActor *actor)
     actor->elevatedPosition.z = actor->elevatedPosition.z + polar.z;
 
     start = actor->sprite.position;
-    {
-        u32 mask = 0xFFFF;
-        *(u32 *)&start = mask & *(u32 *)&start;
-    }
+    start.y = 0;
     actor->elevatedPosition.y = 0;
 
     step = Div(0x400, 12);

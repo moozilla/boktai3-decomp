@@ -9,7 +9,7 @@ s32 MessageWindow_ShowMessage(s32);
 void SolarBank_SetState(void *, void (*)(void));
 void SolarBank_RefreshAmountDigits(struct SolarBankPanel *);
 void SpriteMenu_HideAll(void *);
-void sub_081BB904(void);
+void SolarBank_UpdateTransferInput(void);
 extern u8 *gGameState;
 #define FIELD(T, off) (*(T *)((u8 *)panel + (off)))
 void SolarBank_BeginAmountEntry(struct SolarBankPanel *panel)
@@ -52,5 +52,5 @@ void SolarBank_BeginAmountEntry(struct SolarBankPanel *panel)
     FIELD(u16, 0x706) = zero;
     FIELD(u16, 0x708) = zero;
     FIELD(u16, 0x700) = zero;
-    SolarBank_SetState(panel, sub_081BB904);
+    SolarBank_SetState(panel, SolarBank_UpdateTransferInput);
 }

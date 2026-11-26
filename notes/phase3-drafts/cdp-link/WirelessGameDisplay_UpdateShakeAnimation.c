@@ -913,7 +913,7 @@ void WirelessGameItems_UpdateTemporaryItem(struct WirelessGameItems *p, struct W
 
 extern const u8 gUnk_0824DE94[];
 
-void Widget_InitLinked(void *, void *, int, int, int, int, int, const void *);
+void AnimSprite_InitLinked(void *, void *, int, int, int, int, int, const void *);
 
 void WirelessGameItems_InitItem(struct WirelessGameItems *owner, struct WirelessGameItem *p,
                                 int index)
@@ -944,7 +944,7 @@ void WirelessGameItems_InitItem(struct WirelessGameItems *owner, struct Wireless
         choice = index & 3;
     {
         int animation = gUnk_0824DE7C[choice];
-        Widget_InitLinked(&p->drawing, &owner->resource, animation, 17, 0, 0, 60, gUnk_0824DE94);
+        AnimSprite_InitLinked(&p->drawing, &owner->resource, animation, 17, 0, 0, 60, gUnk_0824DE94);
     }
     p->drawing.changed = 1;
     p->state = state;
@@ -1585,7 +1585,7 @@ int WirelessGameDisplay_Init(struct WirelessGameDisplay *p)
     p->resource = *resource;
     ResourceHeader_Relocate(&p->resource, resource);
     for (i = 0, drawing = p->drawings; i < 4; i++, drawing++)
-        Widget_InitLinked(drawing, &p->resource, 24, 17, 0, 0, 60, 0);
+        AnimSprite_InitLinked(drawing, &p->resource, 24, 17, 0, 0, 60, 0);
     resource = ScriptProc_Start(0xcb05, 0x5d04);
     if (!resource)
         return -1;
@@ -1602,7 +1602,7 @@ int WirelessGameDisplay_Init(struct WirelessGameDisplay *p)
         }
         position.y = 24;
         position.z = 0;
-        Widget_InitLinked(&p->extra[i], &p->extraResource, animation, 0x10010, 0, 0, 60, &position);
+        AnimSprite_InitLinked(&p->extra[i], &p->extraResource, animation, 0x10010, 0, 0, 60, &position);
     }
     p->state = 0;
     p->entered = 1;

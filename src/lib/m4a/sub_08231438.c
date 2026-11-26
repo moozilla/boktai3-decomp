@@ -2,9 +2,8 @@
 #include "global.h"
 #include "engine/ram.h"
 /* SceneActorEffects_ResetManager: Clears the singleton manager pointer shared by actor effect groups */
-#define SceneActorEffects_ResetManager sub_08231438
 
-void sub_08231438(void)
+void SceneActorEffects_ResetManager(void)
 {
     gSceneActorEffectsManager = 0;
 }

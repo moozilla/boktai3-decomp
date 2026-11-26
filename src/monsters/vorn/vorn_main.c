@@ -84,7 +84,7 @@ void Vorn_QueueDelayedResponse(struct ChaseActor *actor)
     SceneActorControl_TakeStateEntry(actor);
     if ((u8)Callback_InvokeActor(actor, actor->base.contactQuery.opaque))
         return;
-    zero = (u8)sub_0812F3CC(actor);
+    zero = (u8)SceneActorReaction_BeginContactResponse(actor);
     if (zero)
         return;
     if ((s32)actor->base.counter2AC <= 60)
@@ -255,7 +255,7 @@ void Vorn_ClearRouteResumeFlag(struct Vorn *p);
 
 void SceneActorMovement_ResolveRoutePosition(void *);
 
-u8 sub_0812F3CC(struct ChaseActor *);
+u8 SceneActorReaction_BeginContactResponse(struct ChaseActor *);
 
 // confidence=low: restores route control and movement after an action completes.
 
@@ -269,7 +269,7 @@ void Vorn_RestoreRouteMovement(struct ChaseActor *a)
     }
     if ((u8)Callback_InvokeActor(a, a->base.contactQuery.opaque))
         return;
-    if (sub_0812F3CC(a))
+    if (SceneActorReaction_BeginContactResponse(a))
         return;
     if (a->base.stepDone) {
         struct SceneActorRegistryControl *control;
@@ -328,7 +328,7 @@ void Vorn_UpdateRouteApproach(struct ChaseActor *actor)
     SceneActorControl_TakeStateEntry(actor);
     if ((u8)Callback_InvokeActor(actor, actor->base.contactQuery.opaque))
         return;
-    if (sub_0812F3CC(actor))
+    if (SceneActorReaction_BeginContactResponse(actor))
         return;
     SceneActorAnimation_SelectDirectionalEntry(actor, 1);
     speed = Callback_InvokeActor(actor, actor->base.animationQuery.opaque);
@@ -372,7 +372,7 @@ void SceneActorControl_WaitForRouteResult(struct ChaseActor *actor)
     }
     busy = Callback_InvokeActor(actor, actor->base.contactQuery.opaque);
     if (!busy) {
-        zero = sub_0812F3CC(actor);
+        zero = SceneActorReaction_BeginContactResponse(actor);
         if (!zero) {
             if (actor->base.stepDone) {
                 Chase_SetBehavior(actor, 0x13);
@@ -407,7 +407,7 @@ void SceneActorControl_UpdateProbeApproach_080B04F4(struct ChaseActor *actor)
         if ((u8)Callback_InvokeActor(actor, actor->base.contactQuery.opaque)) {
             return;
         }
-        if (sub_0812F3CC(actor)) {
+        if (SceneActorReaction_BeginContactResponse(actor)) {
             return;
         }
     }
@@ -446,7 +446,7 @@ void SceneActorPhase_UpdateConditionalMotion(struct ChaseActor *p)
     if (SceneActor_IsFacingNearbyTarget(p)) {
         if ((u8)Callback_InvokeActor(p, p->base.contactQuery.opaque))
             return;
-        if (sub_0812F3CC(p))
+        if (SceneActorReaction_BeginContactResponse(p))
             return;
     }
     if (p->base.stepDone) {
@@ -471,7 +471,7 @@ void SceneActorPhase_BeginTimedMotion(struct ChaseActor *p)
     if (SceneActor_IsFacingNearbyTarget(p)) {
         if ((u8)Callback_InvokeActor(p, p->base.contactQuery.opaque))
             return;
-        if (sub_0812F3CC(p))
+        if (SceneActorReaction_BeginContactResponse(p))
             return;
     }
     if (PhaseComplete(p)) {

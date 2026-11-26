@@ -1,10 +1,10 @@
-// ScenePanel_WaitInitialTether takes the coffin when its body reaches the
-// panel's center. ScenePanel_UpdateActiveSubjects takes a charging player
+// PileDriver_WaitInitialTether takes the coffin when its body reaches the
+// panel's center. PileDriver_UpdateActiveSubjects takes a charging player
 // at the approach position, after gunfire has activated the generators.
-exports.purificationPanel = () => $.gScenePanel?.initialMode === 0 && !!$.gTetherActor;
+exports.purificationPanel = () => $.gPileDriver?.initialMode === 0 && !!$.gTetherActor;
 
 exports.preparePurification = function* (opts = {}) {
-  const panel = $.gScenePanel;
+  const panel = $.gPileDriver;
   const scene = exports.where().scene, story = exports.story();
   const changed = () => exports.where().scene !== scene || exports.story() > story;
   const trace = opts.trace || (() => {});
@@ -35,7 +35,7 @@ exports.preparePurification = function* (opts = {}) {
       const waiting = subjects().filter((s) => s.state === 2);
       if (waiting.length) {
         // Pile Driver instruction 9265. The generator advances on a contact
-        // with the attack mask in ScenePanelSubject_ApplyContact.
+        // with the attack mask in PileDriverSubject_ApplyContact.
         const weapon = yield* exports.quickChange({ gun: true });
         trace({ weapon });
         for (const subject of waiting) {
@@ -47,7 +47,7 @@ exports.preparePurification = function* (opts = {}) {
           if (!result.done) return { done: false, reason: 'subject did not respond to attack' };
         }
       } else if (phase === 4 && subjects().every((s) => s.state === 4)) {
-        // Text 9278–9279 and ScenePanel_AdvancePlayerArrival require sunlight
+        // Text 9278–9279 and PileDriver_AdvancePlayerArrival require sunlight
         // at the approach point. The sensor's smaller count is brighter.
         exports.session.setSolar(64);
         yield g.until(() => interrupted() || exports.solarStatus().level > 0, 180);

@@ -7,9 +7,8 @@
 
 s32 DisplayAnimation_TestFinished(struct DisplayAnimation *);
 
-#define ParticleGroup_SpawnRadial sub_080148CC
-s32 ParticleGroup_SpawnRadial(s32, s32, struct StateActorPos *, s32, s32, s32, s32, s32, s32, s32,
-                              s32);
+s32 ImpactParticleGroup_SpawnRadial(s32, s32, struct StateActorPos *, s32, s32, s32, s32, s32, s32,
+                                    s32, s32);
 void PlayerCue_BeginModeSeven(struct Player *, s32);
 
 static inline u8 Burst_RollSound(void)
@@ -22,13 +21,13 @@ static inline void Burst_EmitOuter(const u16 *table, u8 variance, s32 angle,
                                    struct StateActorPos *pos)
 {
     s32 spread = ParticleRandom_ReadSample(table) & 63;
-    ParticleGroup_SpawnRadial(4, 0x26, pos, angle, spread, 12, 10, variance, 8, 8, variance);
+    ImpactParticleGroup_SpawnRadial(4, 0x26, pos, angle, spread, 12, 10, variance, 8, 8, variance);
 }
 
 static inline void Burst_EmitInner(const u16 *table, s32 angle, struct StateActorPos *pos)
 {
     s32 spread = ParticleRandom_ReadSample(table) & 63;
-    ParticleGroup_SpawnRadial(2, 0x26, pos, angle, spread, 10, 4, 4, 4, 14, 4);
+    ImpactParticleGroup_SpawnRadial(2, 0x26, pos, angle, spread, 10, 4, 4, 4, 14, 4);
 }
 
 static inline u32 Burst_SelectAnimation(u8 kind, u32 selected)

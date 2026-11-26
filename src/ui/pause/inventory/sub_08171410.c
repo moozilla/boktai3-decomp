@@ -1,5 +1,5 @@
 #include "global.h"
-void sub_08170D78(void *);
+void PauseInventory_RefreshConsumableIcons(void *);
 void sub_08171D5C(void);
 void Hud_SetInteractionCallback(void *, void (*)(void), int);
 void Inventory_InitializeSelectionGrid(void *, int, int);
@@ -11,7 +11,7 @@ void MenuDisplay_UpdateActionPrompt(void *, int);
 void PauseInventory_BeginConsumableDiscardSelection(u8 *p, int flag)
 {
     u8 *q;
-    sub_08170D78(p);
+    PauseInventory_RefreshConsumableIcons(p);
     Hud_SetInteractionCallback(p, sub_08171D5C, 1);
     q = p + 0x4384;
     Inventory_InitializeSelectionGrid(q, 1, 0);

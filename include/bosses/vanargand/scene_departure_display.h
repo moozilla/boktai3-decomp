@@ -98,7 +98,7 @@ void ActorDisplay_UpdateScreenAnchor(struct DepartureActor *);
 void ActorDisplay_UpdateForegroundSprite(struct DepartureActor *);
 void ActorDisplay_UpdateAccentSprite(struct DepartureActor *);
 void ActorDisplay_RefreshScreenLayer(struct DepartureActor *);
-void SceneActors_EmitPeriodicParticles(void *, s32);
+void VanargandHead_EmitPeriodicParticles(void *, s32);
 
 static inline void DepartureActor_StartPhase(struct DepartureActor *actor, u32 state, u32 substate,
                                              u32 phase)

@@ -1,6 +1,6 @@
 #include "scene/actor/modifier_list.h"
 #include "engine/math/scene_vec.h"
-void Widget_InitLinked(void *, void *, u32, u32, u32, u32, u32, void *);
+void AnimSprite_InitLinked(void *, void *, u32, u32, u32, u32, u32, void *);
 void Palette_CopyBank(void *, void *);
 s32 ModifierMenu_InitializeGraphics(struct ModifierMenu *menu)
 {
@@ -21,7 +21,7 @@ s32 ModifierMenu_InitializeGraphics(struct ModifierMenu *menu)
     object = menu->displays;
     i = 17;
     do {
-        Widget_InitLinked(object, &menu->graphicsB, 0, 0x11, 2, 0, 0x3c, originPointer);
+        AnimSprite_InitLinked(object, &menu->graphicsB, 0, 0x11, 2, 0, 0x3c, originPointer);
         i--;
         object++;
     } while (i >= 0);

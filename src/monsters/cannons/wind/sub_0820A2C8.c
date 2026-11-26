@@ -1,32 +1,22 @@
-#include "global.h"
+#include "engine/engine_pause.h"
+#include "monsters/cannons/wind_cannon.h"
 #include "engine/engine.h"
 #include "engine/ram.h"
 
-struct FanCannon {
-    u8 pad00[0xf4];
-    void (*update)(void);
-    u8 padF8[0x180 - 0xf8];
-};
-struct FanCannonManager {
-    u8 pad00[0x18];
-    u32 occupiedSlots;
-    struct FanCannon slots[8];
-};
-extern u32 gUnk_02000560;
+#include "player/player.h"
 void WindCannon_Update(struct FanCannonManager *, struct FanCannon *, s32);
 void WindCannon_UpdateActive(void);
 void Sound_StopSong(u32);
 u32 WindCannonManager_Update(struct FanCannonManager *p)
 {
     u32 active = 0;
-    u32 mask = 0x400;
     struct FanCannon *slot;
     s32 i;
-    if ((gEngineFlags | gScenePauseFlags) & mask)
+    if (Engine_PauseBits(0x400))
         return 0;
     {
         u32 pauseMask = 4;
-        if (gUnk_02000560 & pauseMask)
+        if (gPlayerSlotStatus[0] & pauseMask)
             return 0;
     }
     gPlayerBackgroundState = 0;

@@ -7,8 +7,8 @@ and Background_LoadMapsFromScript returns through r1.
 
 The explicit form changed the ROM bytes. The guarded form passed the unit ROM check.
 
---- a/src/background_controller.c
-+++ b/src/background_controller.c
+--- a/src/effects/screen/background_controller.c
++++ b/src/effects/screen/background_controller.c
 @@ -390,4 +390,7 @@
      u8 *base = sub_08216E54(Script_GetKeywordValue('d', 0));
      s32 target, x, y, n, explicitIndices, i;

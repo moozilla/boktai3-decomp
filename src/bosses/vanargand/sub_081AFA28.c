@@ -9,7 +9,7 @@ static inline u32 masked(u32 *p, u32 mask)
 {
     return *p & mask;
 }
-s32 ActorStatus_BeginTimedState(struct ActorStatusOwner *owner, s32 cancel, s32 duration)
+s32 VanargandCombat_BeginTimedState(struct ActorStatusOwner *owner, s32 cancel, s32 duration)
 {
     struct PairedSceneHalf *status = owner->status;
     if (cancel == 0) {

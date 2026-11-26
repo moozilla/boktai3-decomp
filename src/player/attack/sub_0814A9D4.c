@@ -23,7 +23,7 @@ void Collider_SetPosition(void *, void *, u32);
 void Collider_Refresh(void *);
 
 void Player_SetDirectionalVelocity_08238300(void *, u32);
-void sub_08238238(void *);
+void Player_UpdateActionFacingSide(void *);
 void DirectionalEffect_PlaceSprite(void *, u32, void *);
 static inline s32 scale(s32 v)
 {
@@ -43,7 +43,6 @@ void Player_SpawnSelectedAttackProjectile(void *);
 void ActorSequence_Begin(void *, u32, u32);
 void Sound_PlaySong(u32);
 // confidence=low: charge stages precede the selected weapon's orbiting spin collider.
-#define Player_UpdateSelectedSpinAttack sub_0814A9D4
 void Player_UpdateSelectedSpinAttack(u8 *p)
 {
     if (Player_ConsumeStateEntry(p))

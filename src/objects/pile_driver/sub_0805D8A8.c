@@ -1,7 +1,7 @@
-#include "objects/pile_driver/scene_panel_subject_tail.h"
-void PileDriverSubject_InitCollider(struct ScenePanelSubject *subject, u32 value)
+#include "objects/pile_driver/pile_driver_subject_tail.h"
+void PileDriverSubject_InitCollider(struct PileDriverSubject *subject, u32 value)
 {
-    struct ScenePanelInteractionPackedPosition size, offset;
+    struct PileDriverInteractionPackedPosition size, offset;
     struct ContactCollider *collider = &subject->collider;
     size.x = 100;
     size.y = 200;

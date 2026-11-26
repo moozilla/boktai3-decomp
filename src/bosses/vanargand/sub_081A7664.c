@@ -1,20 +1,20 @@
 #include "global.h"
-/* Tentative ScenePanel family; names describe observed state and sprite operations. */
+/* Paired Vanargand actor. Field names follow observed state and sprite operations. */
 
-struct ScenePanelInput {
+struct VanargandPairInput {
     u8 pad0[0xAA];
     u8 timer;
     u8 padAB[4];
     u8 active;
     u8 pending;
 };
-struct ScenePanelSelection {
+struct VanargandPairSelection {
     u8 pad0[0xF28];
     u32 scripts[3];
     s32 selection;
 };
 void Script_Call(u32, void *);
-static inline u8 ScenePanel_ConsumePending(struct ScenePanelInput *panel)
+static inline u8 VanargandPair_ConsumePending(struct VanargandPairInput *panel)
 {
     if (panel->pending != 0) {
         panel->pending = 0;
@@ -23,10 +23,10 @@ static inline u8 ScenePanel_ConsumePending(struct ScenePanelInput *panel)
     }
     return FALSE;
 }
-void VanargandPair_RunSelectionScript(struct ScenePanelSelection *panel)
+void VanargandPair_RunSelectionScript(struct VanargandPairSelection *panel)
 {
-    struct ScenePanelInput *input = (struct ScenePanelInput *)panel;
-    if (ScenePanel_ConsumePending(input)) {
+    struct VanargandPairInput *input = (struct VanargandPairInput *)panel;
+    if (VanargandPair_ConsumePending(input)) {
         u8 timer = 30;
         input->timer = timer;
     }

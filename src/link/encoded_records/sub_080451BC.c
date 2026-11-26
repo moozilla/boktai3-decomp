@@ -2,14 +2,12 @@
 #include "engine/engine.h"
 #include "engine/runtime.h"
 /* EncodedRecord_EncodeAlternateFields: Packs game state and name into the alternate record format then applies seeded masking and writes its checksum */
-#define EncodedRecord_EncodeAlternateFields sub_080451BC
 struct EncodedRecordSession {
     u8 unknown0[0x18];
     u32 value;
 };
 s32 Div(s32, s32);
 u32 Crc_ComputeCcitt16(const void *, u32, u32);
-#define EncodedRecord_EncodeAlternateFields sub_080451BC
 void EncodedRecord_EncodeAlternateFields(u8 *record)
 {
     u32 bit;

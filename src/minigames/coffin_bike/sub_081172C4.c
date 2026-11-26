@@ -7,54 +7,53 @@
 
 s32 Div(s32, s32);
 s32 Math_Atan2(s32, s32);
-void Terrain_ResolveActorMotion(struct GloveMotion *);
-void Actor_UpdateShadowSpriteParts(struct GloveMotion *, void *);
-void ActorParticles_SpawnImpactBurst(struct GloveMotion *);
+void Terrain_ResolveActorMotion(struct CoffinBikeMotion *);
+void Actor_UpdateShadowSpriteParts(struct CoffinBikeMotion *, void *);
+void ActorParticles_SpawnImpactBurst(struct CoffinBikeMotion *);
 void CharacterModel_UpdateAccessoryAnimations(void *);
-void ScenePool_ClampMotionSpeeds(struct GloveMotion *);
+void ScenePool_ClampMotionSpeeds(struct CoffinBikeMotion *);
 
 void StageIconDisplay_Create(s32, s32, void *, void *);
 void CoffinBike_BeginStopping(void);
 u8 LinkParticipant_IsLocallySelected(void *);
 void Character_UpdateLoopingSound(void *);
-static inline s32 *Motion_GetSpeed(struct GloveMotion *self)
+static inline s32 *Motion_GetSpeed(struct CoffinBikeMotion *self)
 {
     return &self->vy;
 }
-static inline s32 *Motion_GetTerrainSpeed(struct GloveMotion *self)
+static inline s32 *Motion_GetTerrainSpeed(struct CoffinBikeMotion *self)
 {
     return &self->unkC0;
 }
-static inline s32 *Motion_GetVerticalOffset(struct GloveMotion *self)
+static inline s32 *Motion_GetVerticalOffset(struct CoffinBikeMotion *self)
 {
     return &self->y;
 }
-static inline s32 *Motion_GetForwardOffset(struct GloveMotion *self)
+static inline s32 *Motion_GetForwardOffset(struct CoffinBikeMotion *self)
 {
     return &self->x;
 }
-static inline s32 *Motion_GetRecoilY(struct GloveMotion *self)
+static inline s32 *Motion_GetRecoilY(struct CoffinBikeMotion *self)
 {
     return &self->dy;
 }
-static inline s32 *Motion_GetRecoilZ(struct GloveMotion *self)
+static inline s32 *Motion_GetRecoilZ(struct CoffinBikeMotion *self)
 {
     return &self->dz;
 }
 
-static inline s32 *Motion_GetLateralOffset(struct GloveMotion *self)
+static inline s32 *Motion_GetLateralOffset(struct CoffinBikeMotion *self)
 {
     return &self->vz;
 }
-static inline s32 *Motion_GetPreviousZ(struct GloveMotion *self)
+static inline s32 *Motion_GetPreviousZ(struct CoffinBikeMotion *self)
 {
     return &self->previousPosition.z;
 }
 // confidence=low: shows a stopping cue during launch ascent and slowdown.
-#define Glove_UpdateRisingCue sub_081172C4
-void Glove_UpdateRisingCue(struct Glove *p)
+void CoffinBike_UpdateRisingCue(struct CoffinBike *p)
 {
-    struct GloveMotion *self = &p->motion;
+    struct CoffinBikeMotion *self = &p->motion;
     s32 h;
     s32 dx;
     s32 dz;

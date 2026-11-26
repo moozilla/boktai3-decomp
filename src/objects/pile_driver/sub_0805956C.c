@@ -1,5 +1,5 @@
 #include "objects/pile_driver/pile_driver_rig.h"
-void PileDriverRig_ShowSprites(struct ScenePanelRig *rig)
+void PileDriverRig_ShowSprites(struct PileDriverRig *rig)
 {
     s32 i;
     rig->main.flags &= ~1;

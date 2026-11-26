@@ -1,10 +1,10 @@
-// Vampire_Create (08029798) installs Vampire_Init as the update in task
-// list 8. Vampire_UpdateFrame reads the sprite position at 0x54 and
-// Vampire_ApplyPendingDamage keeps signed life at 0x94 and sets flag 2
+// Count_Create (08029798) installs Count_Init as the update in task
+// list 8. Count_UpdateFrame reads the sprite position at 0x54 and
+// Count_ApplyPendingDamage keeps signed life at 0x94 and sets flag 2
 // on defeat. That handler also tests the script's sunlight flag at 0x3ac.
 exports.vampireTargets = () => {
   const out = [];
-  const update = g.addr('Vampire_Init') & ~1;
+  const update = g.addr('Count_Init') & ~1;
   for (let t = $.gTaskLists[8].head, n = 0; t && n < 512; t = t.next, n++) {
     if ((t.flags & 1) || (t.update & ~1) !== update) continue;
     const addr = t.$addr, flags = g.u32(addr + 0x9c), health = g.s16(addr + 0x94);

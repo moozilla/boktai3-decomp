@@ -25,7 +25,7 @@ extern const struct NidhoggrEffectPair gUnk_0824F27C, gUnk_0824F274;
 extern struct NidhoggrEffectPair gUnk_0824F284;
 struct NidhoggrFallingEffect *SceneEffectPool_AllocateSlot(void *);
 void SceneEffect_ResetState(void *);
-void sub_0818FEE4(void *);
+void Nidhoggr_UpdateSeekingAttackEffect(void *);
 void Nidhoggr_DestroyShadowedEffect(void *);
 void Nidhoggr_OnEffectCollision(void *);
 void SceneAnimation_OnEffectContact(void *);
@@ -41,7 +41,6 @@ void Sound_PlaySongChecked(u32);
 void ScaledShadow_InitializeDefaultSmall(void *, void *);
 void ScaledShadow_Disable(void *);
 // confidence=low: allocates a player-seeking effect with two collision channels and a small shadow.
-#define Nidhoggr_CreateSeekingAttackEffect sub_08190274
 void Nidhoggr_CreateSeekingAttackEffect(u8 *owner, struct NidhoggrEffectVector *anchor,
                                         struct NidhoggrEffectVector *offset, u8 *boss)
 {
@@ -58,7 +57,7 @@ void Nidhoggr_CreateSeekingAttackEffect(u8 *owner, struct NidhoggrEffectVector *
         return;
     SceneEffect_ResetState(effect);
     {
-        void (*update)(void *) = sub_0818FEE4;
+        void (*update)(void *) = Nidhoggr_UpdateSeekingAttackEffect;
         void (*destroy)(void *) = Nidhoggr_DestroyShadowedEffect;
         effect->update = update;
         effect->destroy = destroy;

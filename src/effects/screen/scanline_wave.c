@@ -16,7 +16,7 @@ int ScanlineWave_Update(struct ScanlineWave *wave)
 
 u32 ScanlineWave_Destroy(void)
 {
-    sub_082194D4();
+    ScanlineEffect_StopTransfer();
     gScanlineWave = 0;
     return 0;
 }

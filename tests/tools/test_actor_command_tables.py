@@ -11,6 +11,7 @@ for directory in (ROOT / 'tools', ROOT / 'tools' / 'assets', ROOT / 'tools' / 's
     sys.path.insert(0, str(directory))
 import actors
 import atlas
+import codemap
 import datafmt
 
 
@@ -107,6 +108,7 @@ class ActorCommandTableTests(unittest.TestCase):
             'voicegroups': [], 'samples': [], 'songs': [],
         }, titles=lambda: {})
         with patch.object(atlas, 'rom_load', return_value=segments), \
+             patch.object(codemap, 'progress_by_address', return_value={}), \
              patch.object(atlas, 'notes', return_value={}), \
              patch.object(atlas, 'load', return_value={'entities': {}, 'funcs': {}}), \
              patch.object(atlas, 'player_animation_blocks', return_value=[]), \

@@ -185,7 +185,7 @@ void ScriptKeyframe_AddFromScript(void)
             position = &entry->position;
         }
     }
-    Widget_InitLinked(&entry->animation, &entry->resource, (u16)frame, mode, (u8)priority, 0, 60,
+    AnimSprite_InitLinked(&entry->animation, &entry->resource, (u16)frame, mode, (u8)priority, 0, 60,
                       position);
     value = Script_SeekToKeyword('A');
     if (value)

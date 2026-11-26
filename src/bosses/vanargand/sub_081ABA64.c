@@ -20,7 +20,7 @@ void Sprite_ApplyAnimation(void *, void *);
 void ScreenTransition_SendCommand(s32, s32, s32, s32, s32, s32, s32);
 void PlayerContact_ApplySyntheticContact(void *, s32, s32, s32, s32, s32);
 void Sound_PlaySong(u32);
-s32 sub_081A6A08(void *);
+s32 Vanargand_TestProjectedHorizontalRange(void *);
 extern const s16 gUnk_086149C4[];
 
 struct VanargandSprite {
@@ -414,7 +414,7 @@ void Vanargand_UpdateChargeSequence(struct VanargandBoss *arg0)
                 }
             }
             sequenceEnded = Vg_081ABA64_StepFrame(&sub->sprite);
-            if (sub_081A6A08(arg0)) {
+            if (Vanargand_TestProjectedHorizontalRange(arg0)) {
                 if (self->parts.side == 0)
                     PlayerContact_ApplySyntheticContact(arg0->contactActor, self->contactForce, 2,
                                                         0x20, 0, 1);
@@ -435,7 +435,7 @@ void Vanargand_UpdateChargeSequence(struct VanargandBoss *arg0)
                 SceneActors_StartUnmirroredAnimation(arg0, sub, sub->paired, 0xB, 2, 0);
             sequenceEnded = Vg_081ABA64_StepFrame(&sub->sprite);
             if (arg0->timer <= 0x3B) {
-                if (sub_081A6A08(arg0)) {
+                if (Vanargand_TestProjectedHorizontalRange(arg0)) {
                     if (self->parts.side == 0)
                         PlayerContact_ApplySyntheticContact(arg0->contactActor, self->contactForce,
                                                             2, 0x20, 0, 1);

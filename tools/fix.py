@@ -256,7 +256,7 @@ def corpus_helpers(d):
     """(helper, FuncDef, description) for each matched helper in src/ that spells one of D's helpers
     another way (tools/helperswap.py: same globals, callees, constants and arity), parsed in D's
     context. The original's helper is often in the corpus already (the random-table step returning
-    s32: CallbackPool_SpawnHitParticles)."""
+    s32: LootDepositCallbackPool_SpawnHitParticles)."""
     import helperswap
     if not _CORPUS:
         _CORPUS.append(helperswap.corpus())

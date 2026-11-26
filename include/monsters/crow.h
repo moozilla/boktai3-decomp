@@ -20,7 +20,7 @@
 
 #include "scene/motion/scene_actor_route.h"
 
-#include "npc/cutscene_actor/actor_animation_controller.h"
+#include "ui/title/actor_animation_controller.h"
 
 #include "engine/video/display_sequence.h"
 
@@ -46,19 +46,6 @@ struct Crow {
     u8 unknown404[0x18];
     struct ContactPosition vectors[3];
     struct ContactPosition storedPosition;
-};
-
-struct CrowPackedPosition {
-    u32 xy, z;
-};
-
-struct CrowColliderHalfwords {
-    u32 lo : 16;
-    u32 hi : 16;
-};
-
-struct CrowColliderVector {
-    struct CrowColliderHalfwords a, b;
 };
 
 struct CrowSignedFlags {

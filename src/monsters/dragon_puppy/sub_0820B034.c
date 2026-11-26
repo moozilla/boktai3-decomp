@@ -4,13 +4,13 @@
 // confidence=low: a projectile spawn shaped like Statue_SpawnProjectile (sub_08203B54):
 // lifted 224 (direction 1 or 2) or 128, offset 160 along direction * 64 + 192.
 
-struct EnemyF426Position {
+struct DragonPuppyPosition {
     s16 x, y, z, unused;
 };
 
 struct ProjectileActor {
     u8 unk0[0x40];
-    struct EnemyF426Position position;
+    struct DragonPuppyPosition position;
     u8 unk48[0x120 - 0x48];
     s16 collisionArg0;
     s16 collisionArg1;
@@ -29,7 +29,7 @@ void ProjectileConfig_SetCollisionExtents(void *, u32, u32, u32);
 void ProjectileConfig_SetCollisionOffset(void *, s32, s32, s32);
 void ProjectileConfig_SetMovement(void *, u32, u32, u32, s32);
 void ProjectileConfig_SetAnimation(void *, u32, u32, u32);
-s32 Projectile_SpawnFromConfig(void *, struct EnemyF426Position *);
+s32 Projectile_SpawnFromConfig(void *, struct DragonPuppyPosition *);
 void Sound_PlaySong(u32);
 
 static inline s32 truncate12(s32 n)
@@ -37,7 +37,7 @@ static inline s32 truncate12(s32 n)
     return n >= 0 ? n >> 12 : -((-n) >> 12);
 }
 
-static inline void polar(struct EnemyF426Position *v, u8 angle, s32 radius)
+static inline void polar(struct DragonPuppyPosition *v, u8 angle, s32 radius)
 {
     v->x = truncate12(gSineTable[(angle + 64) & 255] * radius);
     v->y = 0;
@@ -47,10 +47,10 @@ static inline void polar(struct EnemyF426Position *v, u8 angle, s32 radius)
 void sub_0820B034(struct ProjectileActor *actor)
 {
     u8 config[0x5c];
-    struct EnemyF426Position delta;
-    struct EnemyF426Position position;
+    struct DragonPuppyPosition delta;
+    struct DragonPuppyPosition position;
     {
-        struct EnemyF426Position *pos = &position;
+        struct DragonPuppyPosition *pos = &position;
         *pos = actor->position;
         if ((u8)(actor->direction - 1) <= 1)
             pos->y += 224;
@@ -59,9 +59,9 @@ void sub_0820B034(struct ProjectileActor *actor)
     }
     polar(&delta, (actor->direction << 6) + 192, 160);
     {
-        struct EnemyF426Position *p = &position;
-        struct EnemyF426Position *d = &delta;
-        const struct EnemyF426Position *first = &delta;
+        struct DragonPuppyPosition *p = &position;
+        struct DragonPuppyPosition *d = &delta;
+        const struct DragonPuppyPosition *first = &delta;
         position.x += first->x;
         p->y += d->y;
         p->z += d->z;

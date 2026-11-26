@@ -1,8 +1,6 @@
-#include "global.h"
+#include "scene/camera/scene_camera_controller.h"
 
-void Trigger_ConsumePending(u8 *, u32);
-
-void Camera_ConsumePendingMessage(u8 *p)
+void Camera_ConsumePendingMessage(struct SceneCameraController *camera)
 {
-    Trigger_ConsumePending(p + 0x20, 1);
+    Trigger_ConsumePending(&camera->receiver.queue, 1);
 }

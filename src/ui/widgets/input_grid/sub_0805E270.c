@@ -3,7 +3,7 @@ void SceneInput_InitGlyphPair(struct SceneInputPair *pair)
 {
     struct ContactPosition position;
     struct AnimSpriteResource *resource = ScriptProc_Start(0xCB05, 0x530D);
-    struct AnimSprite *widget;
+    struct AnimSprite *animSprite;
     s32 i;
     pair->resource = *resource;
     ResourceHeader_Relocate(pair, resource);
@@ -13,8 +13,8 @@ void SceneInput_InitGlyphPair(struct SceneInputPair *pair)
         position.z = 0;
     }
     for (i = 0; i < 2; i++) {
-        widget = &pair->widgets[i];
-        Widget_InitLinked(widget, pair, 0x7F, 0x31, 0, 0, 60, &position);
+        animSprite = &pair->widgets[i];
+        AnimSprite_InitLinked(animSprite, pair, 0x7F, 0x31, 0, 0, 60, &position);
         position.y += 8;
     }
 }

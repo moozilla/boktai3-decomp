@@ -70,7 +70,7 @@ void LinkPanel_UpdateAnimations(struct LinkPanel *panel)
         panel->entries[i].status.animationTimer++;
     step:
         if (panel->selected[i] != panel->previous[i]) {
-            Anim_SelectWidgetGlyph(&panel->animations[i], &panel->entryResource,
+            AnimSprite_SelectGlyph(&panel->animations[i], &panel->entryResource,
                                    panel->selected[i]);
             panel->previous[i] = panel->selected[i];
         }
@@ -85,7 +85,7 @@ void LinkPanel_UpdateLastEntry(struct LinkPanel *panel)
     else
         panel->selected[6] = 0x7F;
     if (panel->selected[6] != panel->previous[6]) {
-        Anim_SelectWidgetGlyph(&panel->animations[6], &panel->lastEntryResource,
+        AnimSprite_SelectGlyph(&panel->animations[6], &panel->lastEntryResource,
                                panel->selected[6]);
         panel->previous[6] = panel->selected[6];
     }

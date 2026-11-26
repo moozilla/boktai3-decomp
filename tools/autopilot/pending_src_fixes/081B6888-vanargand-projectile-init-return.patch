@@ -4,8 +4,8 @@ Collider_SetAttackProperties returns by popping LR into r0.
 
 The explicit form changed the ROM bytes. The guarded form passed the unit ROM check.
 
---- a/src/vanargand_projectiles.c
-+++ b/src/vanargand_projectiles.c
+--- a/src/bosses/vanargand/vanargand_projectiles.c
++++ b/src/bosses/vanargand/vanargand_projectiles.c
 @@ -104,4 +104,7 @@
      Collider_SetCallback(collider, VanargandProjectile_IgnoreContact, projectile);
      Collider_SetAttackProperties(collider, pool->attack, 30, 16, 0, 15);

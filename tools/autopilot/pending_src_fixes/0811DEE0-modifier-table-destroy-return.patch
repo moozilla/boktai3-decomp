@@ -7,8 +7,8 @@ initializer publishes that same owner. ROM probes on checkpoint
 
 The explicit form changed the ROM bytes. The guarded form passed the unit ROM check.
 
---- a/src/script_options.c
-+++ b/src/script_options.c
+--- a/src/script/script_options.c
++++ b/src/script/script_options.c
 @@ -174,5 +174,11 @@
  u32 Modifier_OnTableTaskDestroy(void)
  {

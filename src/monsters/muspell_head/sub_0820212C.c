@@ -1,35 +1,11 @@
-#include "global.h"
+#include "monsters/muspell_head.h"
 #include "engine/math/scene_vec.h"
 #include "engine/engine_globals.h"
 #include "player/cutscene/player_cue_sequence.h"
 #include "scene/terrain/terrain_cell_probe.h"
-struct ScriptActor {
-    u8 unknown0[0x1c];
-    struct SceneVec origin;
-    u8 sprite[0x1c];
-    struct SceneVec position;
-    u8 unknown48[8], animation[0x1c], passiveCollider[0x54], bodyCollider[0x54], body[0x48];
-    void (*action)(void);
-    struct DisplaySequenceState playback;
-    s32 attackDistance;
-    s16 attackA, attackB, attackC;
-    u8 unknown17A[2];
-    s16 health;
-    u8 unknown17E[2];
-    s16 damage;
-    u16 unknown182, timer, dead, unknown188, active, flash, duration;
-    s16 enabled, delayA, delayB, phase, maximumHealth;
-    u16 damageType, damageFlags;
-    s16 hudMode, overlay, hudValue, optionA, optionB, initialDead;
-    u8 unknown1AA[2];
-    void *parent;
-    u32 optionD, previousHit, currentHit, optionG0, optionG1, optionG2, terrain;
-    void *sequence;
-    u8 cell[0x10];
-};
 s32 Script_SeekToKeyword(s32);
 s32 Script_GetValue(void);
-void sub_08201784(void *);
+void MuspellHead_InitializeColliders(void *);
 u32 MuspellHead_TryProjectileAttack(u8 *);
 void MuspellHead_UpdateDefeatEffect(void);
 void TerrainModifiers_RegisterCell(void *, s32, s32, s32, s32, s32);
@@ -37,7 +13,7 @@ void SceneBody_Init(void *, void *, void *, u32, u32, void *);
 void SceneBody_SetSprite(void *, void *);
 void TerrainOverlay_QueueAddActor(void *);
 /* PlayerCue_StepSequence, except that the first flip writes the actor's own sprite. */
-static inline void ScriptActor_StepAnimation(struct ScriptActor *p,
+static inline void ScriptActor_StepAnimation(struct MuspellHead *p,
                                              struct ContactSwarmSprite *sprite,
                                              struct DisplaySequenceState *state)
 {
@@ -56,9 +32,9 @@ static inline void ScriptActor_StepAnimation(struct ScriptActor *p,
         bit = 1;
         first = (u8)(control.raw & bit);
         if (first != (((*command & 0x30) >> 4) & bit))
-            ((struct ContactSwarmSprite *)p->sprite)->flags |= 4;
+            p->sprite.flags |= 4;
         else
-            ((struct ContactSwarmSprite *)p->sprite)->flags &= ~4;
+            p->sprite.flags &= ~4;
     }
     {
         union DisplaySequenceControl control;
@@ -100,8 +76,7 @@ static inline void ScriptActor_StepAnimation(struct ScriptActor *p,
     }
 }
 
-#define ScriptCombatActor_InitializeFromScript sub_0820212C
-s32 ScriptCombatActor_InitializeFromScript(struct ScriptActor *p, void *parent)
+s32 MuspellHead_InitializeFromScript(struct MuspellHead *p, void *parent)
 {
     void *resource;
     void *sprite;
@@ -182,11 +157,11 @@ s32 ScriptCombatActor_InitializeFromScript(struct ScriptActor *p, void *parent)
     } else
         p->hudValue = 0;
     p->parent = parent;
-    AnimData_Load(p->animation, 0x7e7d);
-    earlySprite = p->sprite;
-    Sprite_Init(earlySprite, p->animation, 1);
-    p->position = p->origin;
-    AnimData_SelectPaletteBank(p->animation, 0x1b7);
+    AnimData_Load(&p->graphics, 0x7e7d);
+    earlySprite = &p->sprite;
+    Sprite_Init(earlySprite, &p->graphics, 1);
+    p->sprite.position = *(struct ContactPosition *)&p->origin;
+    AnimData_SelectPaletteBank(&p->graphics, 0x1b7);
     resource = ScriptProc_Start(0x922e, 0x5184);
     slot = &p->sequence;
     *slot = resource;
@@ -207,15 +182,15 @@ s32 ScriptCombatActor_InitializeFromScript(struct ScriptActor *p, void *parent)
     {
         s16 *initialDead = &p->initialDead;
         if (*initialDead == 0)
-            sub_08201784(p);
+            MuspellHead_InitializeColliders(p);
         if (p->terrain && *initialDead == 0) {
-            s32 cell = cellIndexAt((struct Pos16 *)&p->position);
-            TerrainModifiers_RegisterCell(p->cell, cell, 0, p->position.y >> 8, 0, 0x803);
+            s32 cell = cellIndexAt((struct Pos16 *)&p->sprite.position);
+            TerrainModifiers_RegisterCell(p->cell, cell, 0, p->sprite.position.y >> 8, 0, 0x803);
         }
     }
     if (p->overlay) {
         u8 *body = p->body;
-        SceneBody_Init(body, p->parent, &p->position, 0, 4, p);
+        SceneBody_Init(body, p->parent, &p->sprite.position, 0, 4, p);
         SceneBody_SetSprite(body, sprite);
         TerrainOverlay_QueueAddActor(body);
     }

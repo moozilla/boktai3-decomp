@@ -1,5 +1,5 @@
 #include "ui/town/shop_tail.h"
-s32 Shop_TickMoveSelection(struct SceneInventoryTail *p)
+s32 Shop_TickMoveSelection(struct ShopTail *p)
 {
     s32 result;
     SceneInputPanel_HighlightCompare(&p->display, p->highlight.colors);

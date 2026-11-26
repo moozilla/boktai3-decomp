@@ -1,30 +1,9 @@
+#include "scene/motion/scene_actor_terrain_reaction.h"
 #include "scene/actor/scene_actor_state.h"
 #include "scene/motion/scene_actor_route.h"
 #include "script/script_utility.h"
 void SceneActorMovement_ResolveRoutePosition(struct ChaseActor *);
 extern const u8 gUnk_08610814[];
-static inline u8 *SceneActorRoute_BehaviorField(struct ChaseActor *actor)
-{
-    return &actor->base.behavior2AA;
-}
-
-static inline void SceneActorRoute_StartWait(struct ChaseActor *actor)
-{
-    u32 behavior = 2;
-    u8 *field;
-    u32 zero;
-    field = &actor->base.state2A8;
-    zero = 0;
-    *field = zero;
-
-    actor->base.phase2A9 = zero;
-
-    *SceneActorRoute_BehaviorField(actor) = behavior;
-    actor->base.counter2AC = zero;
-
-    actor->base.field2B1 = 1;
-}
-
 void SceneActorRoute_AdvanceActorPoint(struct ChaseActor *actor,
                                        struct SceneActorRouteCursor *cursor)
 {
@@ -47,14 +26,10 @@ void SceneActorRoute_AdvanceActorPoint(struct ChaseActor *actor,
     near = (u8)SceneActorRoute_IsOutsidePointBounds(cursor, &actor->base.body.position, 32, 32);
     if (near) {
         SceneActorMovement_ResolveRoutePosition(actor);
-        SceneActorRoute_StartWait(actor);
+        SceneActorTerrain_EnterState(actor, 0, 0, 2);
         actor->base.field2C2 = 64;
     } else if (gUnk_08610814[mode] == 1) {
-        actor->base.state2A8 = 0;
-        actor->base.phase2A9 = 0;
-        actor->base.behavior2AA = 1;
-        actor->base.counter2AC = 0;
-        actor->base.field2B1 = 1;
+        SceneActorTerrain_EnterState(actor, 0, 0, 1);
         {
             u32 *flags = &actor->base.statusFlags;
             u32 mask = ~0x20;
@@ -64,10 +39,6 @@ void SceneActorRoute_AdvanceActorPoint(struct ChaseActor *actor,
             *flags = value;
         }
     } else {
-        actor->base.state2A8 = 0;
-        actor->base.phase2A9 = 0;
-        actor->base.behavior2AA = 0;
-        actor->base.counter2AC = 0;
-        actor->base.field2B1 = 1;
+        SceneActorTerrain_EnterState(actor, 0, 0, 0);
     }
 }

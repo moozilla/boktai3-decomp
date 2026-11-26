@@ -1,6 +1,6 @@
-#include "objects/pile_driver/scene_panel_rig_setup.h"
+#include "objects/pile_driver/pile_driver_rig_setup.h"
 
-static inline u16 ScenePanelRig_NextRandom(void)
+static inline u16 PileDriverRig_NextRandom(void)
 {
     u32 offset;
     gRandomIndex = (gRandomIndex + 1) & 1023;
@@ -8,7 +8,7 @@ static inline u16 ScenePanelRig_NextRandom(void)
     return *(u16 *)(offset + (u32)gRandomTable);
 }
 
-void PileDriverRig_InitSecondarySprites(struct ScenePanelRig *rig)
+void PileDriverRig_InitSecondarySprites(struct PileDriverRig *rig)
 {
     s32 i;
     for (i = 0; i < 6; i++) {
@@ -26,7 +26,7 @@ void PileDriverRig_InitSecondarySprites(struct ScenePanelRig *rig)
             sprite->renderMode = 1;
         sprite->position = rig->position;
         animated->phase = i << 5;
-        animated->randomPhase = (u8)ScenePanelRig_NextRandom();
+        animated->randomPhase = (u8)PileDriverRig_NextRandom();
         animated->animationResource = ScriptProc_Start(0x922E, (u16)String_Hash(gUnk_0824DEB0));
         Anim_SetSequence(&animated->sequence, animated->animationResource, (u16)(5 - ((i + 1) >> 1)), 0, 0);
         if (i & 1)

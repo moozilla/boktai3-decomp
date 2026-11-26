@@ -1,8 +1,6 @@
 #include "scene/actor/scene_actor_behavior.h"
 #include "scene/motion/scene_actor_chase_shared.h"
-/* SceneActorBehavior_UpdateDefeatState: Records defeat when counter304 is positive and updates actor and gate flags accordingly */
-#define SceneActorBehavior_UpdateDefeatState sub_08078B48
-#define SceneActorBehavior_TestDefeated      sub_08078B48
+/* SceneActorBehavior_TestDefeated: Records defeat when counter304 is positive and updates actor and gate flags accordingly */
 
 void SceneActorBehavior_RecordDefeat(struct RoomActor *);
 

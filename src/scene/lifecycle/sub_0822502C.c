@@ -1,6 +1,6 @@
 #include "global.h"
 #include "engine/video/render.h"
-void sub_082157EC(void);
+void Bg_ResetDisplay(void);
 void Engine_ClearControlFlags(void);
 void Terrain_ResetMap(void);
 void Collider_EnsureManager(void);
@@ -8,7 +8,7 @@ void SceneLifecycle_InitSceneState(void)
 {
     u32 m;
     gSpriteAttrFlags = 0;
-    sub_082157EC();
+    Bg_ResetDisplay();
     Engine_ClearControlFlags();
     Terrain_ResetMap();
     Collider_EnsureManager();

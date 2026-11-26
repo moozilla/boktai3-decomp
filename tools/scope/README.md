@@ -1032,7 +1032,7 @@ Each was read from the compiler source and confirmed on a live draft.
    now prints the lever on each aligned `ands` pair whose tied operand differs (a constant
    in one, the value in the other), also when both read `ands r0, r1` with the registers'
    roles swapped (Vanargand_UpdatePartLeap's terrain mask); the opposite case asks for the
-   value first. The same holds for `orrs` (the hint covers it too): SceneActors_UpdatePeriodicEffectAction's hold
+   value first. The same holds for `orrs` (the hint covers it too): VanargandHead_UpdatePeriodicEffectAction's hold
    flag matched as `u32 value = *flags; u32 mask = 4; mask |= value; *flags = mask;`. Reading
    the value first also matters there: with `mask = 4` declared before the load, the
    `movs` came ahead of the `ldrb` (the ROM loads first, then the constant).
@@ -1094,7 +1094,7 @@ Each was read from the compiler source and confirmed on a live draft.
 
    The same lever works the other way round, when the ROM copies the constant
    (`adds r0, r2, #0; ands r0, r1`, the 15 kept in r2 for a later test) and the draft ties the
-   dying load. In ActorPalette_UpdateReverseFade, `u32 raw = *field; u32 mask = 15;
+   dying load. In TutorialOtenkoPalette_UpdateReverseFade, `u32 raw = *field; u32 mask = 15;
    (mask & raw)` gave cse a variable known to hold 15, which fold_rtx moves to operand 2; regmove
    then tied the and to the load in operand 1. Writing `(*field & 15) | 0xd0` and
    `(*(u8 *)field & 15) == 3` keeps the 15 an HImode pseudo read through a subreg in both ands;
@@ -1175,7 +1175,7 @@ Each was read from the compiler source and confirmed on a live draft.
    again (`reg_set_p (dst, p)`). The backward pass then finds no insn setting `a` in the
    block. Its first operand that is still live afterwards (`copy_src`, here the 255 register,
    needed again for the second and) is copied into the result. In
-   NativeEffect_CreateFromProfile the ROM has `movs r2, #0xff; adds r1, r2, #0; mov r3, sb;
+   ProjectileEffect_CreateFromProfile the ROM has `movs r2, #0xff; adds r1, r2, #0; mov r3, sb;
    ands r1, r3` for the second group id. `id = (group & 255) | ((frame & 255) << 8)` ties the
    and to the dying group (`mov r2, sb; ands r2, r1`). `u32 id = group & 255;
    id |= (frame & 255) << 8;` matched. A `mask & group` operand order cannot do it, because
@@ -1189,7 +1189,7 @@ Each was read from the compiler source and confirmed on a live draft.
    r2, #1`). The ROM's `ldrh r0, [r6, #6]; lsls r2, r0, #1` comes from one `s32 damage;`
    declared before the `if` and assigned in both branches. That pseudo lives in two blocks,
    so global alloc gets it (r2 through the copy), and the load takes the lowest free
-   register. This also moved NativeEffect_CreateFromProfile's case-2 offset from r4 to r3.
+   register. This also moved ProjectileEffect_CreateFromProfile's case-2 offset from r4 to r3.
 
 43. **A constant variable is reloaded from its reload register; a 16-bit literal from its
    home.** A pseudo set once to a constant gets a REG_EQUIV note, and reload replaces every
@@ -1219,7 +1219,7 @@ Each was read from the compiler source and confirmed on a live draft.
    priority doubled (update_equiv_regs), so a short loop's counter is allocated early and
    takes the lowest free register. One function-level `i` used by every loop lives across
    all of them and lands in a callee-saved register, the same one in each loop.
-   CollisionController_UpdateAll's two idle resets and its slot loop all count in r6. Writing
+   StrikeTrap_UpdateAll's two idle resets and its slot loop all count in r6. Writing
    the resets out with the function's `i`, instead of calling a `resetIdle` helper twice,
    matched it. The pin-free helper version gave i r2 and pushed manager from r7 to r6.
    Related: a loop over `&manager->slots[i]` gets its pointers from loop.c (givs, created
@@ -1342,7 +1342,7 @@ Each was read from the compiler source and confirmed on a live draft.
    the address in each arm (in that arm's own variable) and again at the use. gcse's PRE sees
    it available on both paths and makes a new pseudo, copied in each arm; it is ranked with its
    own refs and life. One C variable assigned in both arms is a single pseudo with every mention
-   and the whole life, and can rank below a rival: ScriptCombatActor_UpdateState's collider
+   and the whole life, and can rank below a rival: MuspellHead_UpdateState's collider
    pointer (6 refs over 53 insns, against dp's 2941) needed a pin until the arms took
    `&p->col` separately and the damage-number call named `&p->col` again. `why` prints this
    lever for a pseudo with two or more sets, one a register copy.
@@ -1379,12 +1379,12 @@ Each was read from the compiler source and confirmed on a live draft.
    register alone. The byte load is a subreg there, which regmove does not tie, so the or copies
    `one` (fact 41's backward pass) and the second or ties into it. With the callback stored through
    a local in between (`void (*fn)(void *, void *) = F; q->fn = fn;`, whose literal then loads
-   first), Actor_TryInteraction matched as `u8 one = 1; p->flags |= one; ...; q->flags |= one;`,
-   and so did seven more 0xf5a state changes in src/npc/cutscene_actor/actor_animation_controller.c whose
+   first), TutorialOtenko_TryInteraction matched as `u8 one = 1; p->flags |= one; ...; q->flags |= one;`,
+   and so did seven more 0xf5a state changes in src/ui/title/tutorial_otenko.c whose
    `register s32 mask asm("r0") = 1` flag pins went. The original's inline had the same spelling.
    `why` on such a tie prints this lever when the op's other operand is a small constant that is read
    again later. A related form: `lsls #24; ands #0x07000000; lsrs #24` is a masked u8 local,
-   `u8 d = value; d &= 7;` (Actor_SetFacingAndIdle, where a pin on the shifted value went).
+   `u8 d = value; d &= 7;` (TutorialOtenko_SetFacingAndIdle, where a pin on the shifted value went).
 
 55. **cse does not merge a field address computed in an inline with the same address in the body.**
    The body reaches gcse with `(plus (reg p) (reg K))` for a large offset, but integrate.c folds the
@@ -1393,9 +1393,9 @@ Each was read from the compiler source and confirmed on a live draft.
    the reverse) computes `p + K` twice, as the ROM may show (`ldr r1, =0xF5A; adds r0, r4, r1`, then
    later `ldr r0, =0xF5A; adds r2, r4, r0`). Written out in the body, the second use reads the
    first address, which stays live in a low register between them, so reload takes another spill
-   register and later literal reloads rotate (Actor_UpdateIdleWait: r3 joined the spill set, 24
+   register and later literal reloads rotate (TutorialOtenko_UpdateIdleWait: r3 joined the spill set, 24
    insns). `p->savedPhase = p->phase; Actor_SetPhase(p, 5);` matched. The same inline also
-   reorders global allocation: in Actor_BeginScriptedAnimationPhaseNine the body's address pseudo
+   reorders global allocation: in TutorialOtenko_BeginScriptedAnimationPhaseNine the body's address pseudo
    (7 refs over 26 insns) outranked the controller g for r4, and with `Actor_SetState(g, 3, 9)` it
    did not.
 
@@ -1548,8 +1548,8 @@ Each was read from the compiler source and confirmed on a live draft.
    writes the constant's register (`ands r0, r1; strb r0`). Reading through the union
    (`control.raw = c->control; ... c->control = control.raw & ~mask;`) keeps the result in the
    constant's register, with no other change. Type and operand-order sweeps of the plain local
-   don't. It matched child_take (four callers) and Actor_HideAndResetChildren's
-   `child->flags = reset | control.raw` (src/npc/cutscene_actor/actor_animation_controller.c), both pins removed.
+   don't. It matched child_take (four callers) and TutorialOtenko_HideAndResetChildren's
+   `child->flags = reset | control.raw` (src/ui/title/tutorial_otenko.c), both pins removed.
 
 67. **The reverse of fact 61: a `u16 x[] = {0}` set first keeps the SI zero for a later byte
    store.** With `s32 a = 0, b = 0;`, a halfword store of b and a byte store of a after a call,
@@ -1558,7 +1558,7 @@ Each was read from the compiler source and confirmed on a live draft.
    long-lived zero first (r4) and the halfword's zero second (r2). Declaring
    `u16 initialPhase[] = {0};` first (a one-element u16 array is an HImode register) gives the
    halfword store its own HImode zero, and the byte store keeps the SI one. This matched
-   Actor_UpdateProjectedEntryAnimation and its Silent twin without pins. Declaring the array
+   TutorialOtenko_UpdateProjectedEntryAnimation and its Silent twin without pins. Declaring the array
    second doesn't help, and neither does a u8 array.
 68. **cse's `(set REG0 REG1)` rewrite, and how a Thumb two-operand subtract undoes it.** When an
    insn copies REG1 into REG0 and REG0 is the head of its equivalence class, cse.c (about line
@@ -1575,14 +1575,14 @@ Each was read from the compiler source and confirmed on a live draft.
 70. **`p++` at each `continue` adds refs to a hoisted stride constant.** loop.c's
    combine_movables merges equal hoisted constants, so every increment site counts as a ref of
    the one hoisted register. A REG_EQUIV constant's priority is halved (fact on global.c), and
-   the extra refs bring it back up to the ROM's rank. Scene_StopSelectedObject matched with
+   the extra refs bring it back up to the ROM's rank. PuzzleBlock_StopSelectedObject matched with
    `p++` before each of its three `continue`s and once after the id test.
 71. **A `u32 f:16` bitfield store is an SImode read-modify-write only while the struct is
    ADDRESSOF.** With a struct of `u32 x:16, z:16` in a local, `pt.x = t;` compiles to
    `ldr; and; orr; str` as long as the struct's address is never stored in a pointer variable;
    once `q = &pt` exists the store is a plain `strh`. Writing `pt.x = pt.x op ...` directly also
    narrows to `strh`, while going through a temp (`t = pt.x op ...; pt.x = t;`) keeps the RMW.
-   A struct of u16 fields always gives `strh`. (Probed for Scene_SpawnDirectionalDust.)
+   A struct of u16 fields always gives `strh`. (Probed for PuzzleBlock_SpawnDirectionalDust.)
 72. **Read a pad word fresh at each test to keep regmove from tying it.** `u16 held = gPadState[0];`
    then `held & K` in several tests makes held die in the AND, and regmove's fixup_match_1 ties the
    AND's output to it, so one register holds both. Writing `gPadState[0] & K` at each test gives
@@ -1598,7 +1598,7 @@ Each was read from the compiler source and confirmed on a live draft.
 74. **`*(&value) = f();` keeps a loop invariant inside the loop.** Taking the address makes value an
    ADDRESSOF during cse1; purge_addressof turns it back into a register but leaves extra insns, which
    raise the loop's insn_count past loop.c's `threshold * savings * lifetime` test, so the invariant
-   stays where the ROM computes it. The same spelling matched DirectionalController_ScriptCreate
+   stays where the ROM computes it. The same spelling matched InteractionPrompt_ScriptCreate
    and ChoiceMenu_CreateFromScript.
 
 75. **update_equiv_regs doubles a constant register's live length once per set.** local-alloc.c does
@@ -1611,7 +1611,7 @@ Each was read from the compiler source and confirmed on a live draft.
    hoist).** agbcc has strict aliasing on (c_get_alias_set). Fact 50's gcse PRE moves a load that
    follows a loop above it only when no store in the loop can alias it. A store through a union
    member (alias set 0), a char or a struct element of the load's type may alias it, so the load
-   stays after the loop. SceneObjects_Append matched once its argument words were stored into
+   stays after the loop. SlidingDoors_Append matched once its argument words were stored into
    `union SceneObjArgs { s32 words[4]; u8 bytes[16]; }` instead of a plain `s32[4]` member.
 77. **A value pinned to r1-r3 across a call is often a missing argument.** Actor_InitDrawable
    pinned `p + 0x100` to r1 before `SceneBody_SetKeyframeDisplay(p->motion)`. The callee
@@ -1777,7 +1777,7 @@ Each was read from the compiler source and confirmed on a live draft.
    there are only two. Declaring `UpdateFn *slot;` at function scope and writing
    `slot = &p->update; *slot = callback;` in each arm makes the address a two-set, non-local pseudo
    (fact 42): local-alloc places only the callback (r0), global then gives the slot r1, and
-   reload's 420 lands in r2. That matched SceneObjects_CreateObject. Two more levers in the same
+   reload's 420 lands in r2. That matched PuzzleBlock_CreateObject. Two more levers in the same
    function: `draw->mode = drawMode;` (not `s16 *mode = &draw->mode`, which cse folds to `p + 0xA0`)
    gives draw its fourth ref, and a function-scope `u16 *table = gRandomTable;` is a REG_EQUIV
    pseudo left without a register, so reload loads the table at its use and the reload rotation
@@ -1903,7 +1903,7 @@ Each was read from the compiler source and confirmed on a live draft.
    three pins and two operand barriers with no replacement concessions.
 120. **A byte-returning inline can move a constant on the first loop pass rather than the
    second, fixing both hoist order and allocation without changing the body.** In
-   SceneObjects_ScriptLower (0801E998), the variant's `one = 1; s->variant = one;` has
+   SlidingDoors_ScriptLower (0801E998), the variant's `one = 1; s->variant = one;` has
    first-pass lifetime 2 and moves only on pass 2, after the flag mask. Returning it through
    `static inline u8 GetVariantByte(int value) { return value; }` makes that lifetime 3:
    pass 1 moves the insertion zero, one, then the mask (thresholds 26, 23, 20; loop size 51).
@@ -2196,7 +2196,7 @@ differing insns). Of the 38 searched:
   (`AGBCC_SPILL=5:3`) and Vanargand_UpdateFacingPairAttack (`10:1`).
 * 5 shrink a lot: Sabata_SpawnBobbingFormation 12 -> 2,
   Vanargand_UpdatePartSweepingStrike 33 -> 10, Nidhoggr_UpdateFallingAttackEffect
-  42 -> 10, Vanargand_UpdatePartSidestep 11 -> 5, EffectPool_UpdateEntry 10 -> 6.
+  42 -> 10, Vanargand_UpdatePartSidestep 11 -> 5, HresvelgrEffectPool_UpdateEntry 10 -> 6.
   Rotation is one of their causes; `why all` after applying the shift shows
   the rest.
 * 13 shrink a little (1-15 insns), 18 not at all (rotation is not involved).
@@ -2471,7 +2471,7 @@ which is exactly `10:1`. Not tested.
 
 
 172. **A changed consumer register can be a deleted conversion, not allocation.**
-   ParticleGroup_UpdateFrozen's PRE reaching byte is r3. The ROM converts it through
+   ImpactParticleGroup_UpdateFrozen's PRE reaching byte is r3. The ROM converts it through
    `lsl r0, r3, #24; lsr r0, r0, #24` before comparing r0 with 8. Combine removes
    that pair in the ordinary draft and compares r3 directly. `AGBCC_COMBKEEP=104`
    (the left-shift result in the saved draft) restores an exact match. `why` now
@@ -2503,7 +2503,7 @@ which is exactly `10:1`. Not tested.
    A zero or aggregate table initializer instead restored constant equivalence;
    direct repeated reads of the union prevented the half stores from combining.
 160. **A value-less success return preserves the last call's hard r0 even when failure returns zero.**
-   In `DirectionalController_CheckRemaining`, `return angle` made Math_Atan2's result
+   In `InteractionPrompt_CheckRemaining`, `return angle` made Math_Atan2's result
    a global pseudo, while local-alloc had already assigned later temporaries to r0.
    `u32 direction = (((u16)Math_Atan2(dx, dz) + 112) >> 5) & 7;` followed by
    `if (accepted) return;`, and a failure path that calls SetState and returns 0,
@@ -2517,14 +2517,14 @@ which is exactly `10:1`. Not tested.
    the old cursor dead before each reassignment. With four draws, the cursor
    has four deaths and local-alloc rejects it even though it stays in one block.
    `index += 1; index &= mask;` keeps one continuous life and one death. In
-   ProximityEmitter_EmitParticle (08051A8C), this moves the cursor from global
+   TetherRing_EmitParticle (08051A8C), this moves the cursor from global
    r7 to local r1 and restores the table, pointer and mask allocation: the
    pin-free draft drops from 52/48 differing instructions to one missing copy.
    Nine pins can be removed from the matching partial. `sp_split_masked_update`
    offers the rewrite for unsigned word locals and independent masks.
 
 221. **A literal mask in a halfword field expression can retain a copy from a high register.**
-   In ProximityEmitter_EmitParticle (08051A8C), `sample &= mask; p->position.x = base + sample - 127;`
+   In TetherRing_EmitParticle (08051A8C), `sample &= mask; p->position.x = base + sample - 127;`
    with a word `mask = 255` sets and reads the shared mask in SImode. Reload inherits the low
    register used to set r8 and omits the ROM's `mov r6, r8`. Writing
    `p->position.x = base + ((sample >> 4) & 255) - 127;` makes the constant HImode and uses it
@@ -2539,10 +2539,10 @@ which is exactly `10:1`. Not tested.
    its copy to a second register. Separating the increment, store, return and
    mask through a word-returning helper gives cse a different promoted value;
    the constant copies fold, and reload uses a different spill register. In
-   ProximityEmitter_TickActive (08051BD8), the direct expression recovers both
+   TetherRing_TickActive (08051BD8), the direct expression recovers both
    mask copies and the entry-script address calculation, removing four pins
    and five barriers. The same form removes two pins and three barriers in
-   ProximityEmitter_TickRise (08051CB4). TetherActor_UpdateLockedShake's direct
+   TetherRing_TickRise (08051CB4). TetherActor_UpdateLockedShake's direct
    cadence test was the matched relative that identified the source form.
 
 223. **A halfword-returning arithmetic helper can keep an offset together before a later add.**
@@ -2583,7 +2583,7 @@ which is exactly `10:1`. Not tested.
 
 
 175. **A save/step join can preserve a round-trip pointer copy, but its incoming values
-   must not all be copies of one pseudo.** AnimatedParticles_Create has `saved = a;
+   must not all be copies of one pseudo.** ImpactBurst_Create has `saved = a;
    a = saved` at animation setup: the ROM copies r4 to r8 and immediately back. With
    ordinary locals, jump2's delete_noop_moves removes the second copy (fact 81).
    Giving type 5 its own `saved = first; goto stepAnimation;` path, and letting the
@@ -2601,7 +2601,7 @@ which is exactly `10:1`. Not tested.
    independent call-tail barriers remained after this partial match.
 
 224. **Duplicate command loads across animation arms, but mask their result after the join.**
-   ActorGroup_CreateFromScript's ordinary playback helper first differed by 55/55,
+   LootDeposit_CreateFromScript's ordinary playback helper first differed by 55/55,
    mostly because its command pointer was allocated after the long-lived actor pointer.
    Loading the next command in both the reverse and forward arms raises the command
    pointer's reference count before jump2 merges the copies. Keeping the mask in those
@@ -2831,7 +2831,7 @@ which is exactly `10:1`. Not tested.
    the origin; direct subsequent draws avoid extending it across calls.
 
 238. **A normalized inline result can retain both a byte snapshot copy and its later extension.**
-   ParticleGroup_UpdateFrozen (08014330) needs `ldrb r0; adds r3,r0` at the loop top
+   ImpactParticleGroup_UpdateFrozen (08014330) needs `ldrb r0; adds r3,r0` at the loop top
    and a zero extension of r3 at the later test. Plain field reads get the snapshot
    from PRE but combine removes the extension (`AGBCC_COMBKEEP=104` diagnoses it).
    `s32 type = g->type; if (type < 0) type = -1; return type;` in an inline, assigned
@@ -2895,7 +2895,7 @@ which is exactly `10:1`. Not tested.
    pointer above the slope helper's position pointer. Two separate failed ascent
    tests with identical fallback stores raise the y pointer's references from 15
    to 17. Actual byte-sized attribute/kind locals slightly extend the competitor;
-   jump2 merges the stores back to the exact ROM. NamedObject_RegisterFollowCells
+   jump2 merges the stores back to the exact ROM. MovingPlatform_RegisterFollowCells
    (08101B1C) similarly uses five explicit early-release returns: the object gains
    references 12 to 16, moving above width/index, while a halfword flags snapshot
    increases its live length enough to keep it below the row pointer. Measure both
@@ -2915,7 +2915,7 @@ which is exactly `10:1`. Not tested.
    allocation-only forms; ordinary double negation folds too soon.
 
 245. **Post-call USE counts can either prevent or enable late cross-jumping.**
-   AnimatedParticles_Create (080154EC) needs three whole animation-call tails,
+   ImpactBurst_Create (080154EC) needs three whole animation-call tails,
    while jump2 wants to share their identical final arguments and call. A pointer
    union with byte/halfword views, an impossible signed-negative clamp, and a
    bounded zero-offset read preserves a post-call USE. One arm has one USE and
@@ -3021,7 +3021,7 @@ which is exactly `10:1`. Not tested.
 
 255. **A dead call argument can supply a copy preference without a live value across the call.**
    sub_081A14FC needs sampleY in r3. An impossible negative-side-byte arm passes
-   sampleY as argument four to MotionEntry_CreateWithDelta, then jumps to the
+   sampleY as argument four to HresvelgrMotion_CreateWithDelta, then jumps to the
    existing pulse join after the real call. The argument copy gives the needed
    preference; jump2 deletes the fallback. An explicit return changes PRE and
    does not match. Separately, an unsigned random sample's negative guard keeps

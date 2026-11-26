@@ -38,7 +38,7 @@ static inline u32 testFlags(u16 *flags, u32 mask)
 {
     return *flags & mask;
 }
-void ActorStatus_InitializeContact(struct ContactActor *input, struct ContactActor *other,
+void VanargandCombat_InitializeContact(struct ContactActor *input, struct ContactActor *other,
                                    struct ActorStatus *status)
 {
     u8 *world = (*(u8 **)gPlayers);

@@ -14,7 +14,7 @@ void SceneHud_AnimateActionResult(struct SceneHudState *s)
     short index;
     s32 mode;
     u32 palette;
-    struct AnimSprite *widget;
+    struct AnimSprite *animSprite;
     if (!PauseMenu_UpdateSpriteMotion(s, 0))
         return;
     if (++s->actionTransferDelay <= 7)
@@ -32,9 +32,9 @@ void SceneHud_AnimateActionResult(struct SceneHudState *s)
         mode = 1;
         palette = 0x3A9;
     }
-    widget = &s->motionWidgets[14];
-    Anim_SetKeyframes(widget, s->actionResultResources[s->actionTransferBonus], index, mode, 4);
-    PauseMenu_SetSpritePalette(widget, palette);
+    animSprite = &s->motionWidgets[14];
+    Anim_SetKeyframes(animSprite, s->actionResultResources[s->actionTransferBonus], index, mode, 4);
+    PauseMenu_SetSpritePalette(animSprite, palette);
     Sound_PlaySong(0x10D);
     Hud_SetInteractionCallback(s, SceneHud_TickActionResult, 1);
 }

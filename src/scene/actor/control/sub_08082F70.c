@@ -50,22 +50,7 @@ void SceneActorControl_CompleteScriptedResponse(struct ChaseActor *actor, s32 fr
             SceneActorBehavior_CallTerrainScript((void *)actor);
     }
     actor->base.attachmentTimer = 0;
-    {
-        void *callback = (void *)SceneActorControl_OnIdle;
-        u32 kind;
-        kind = 16;
-        actor->base.field2B2 = 1;
-        actor->base.stepDone = 0;
-        actor->base.controlKind = kind;
-        actor->base.target = callback;
-        actor->base.field2C8 = 0;
-        {
-            u32 *flags = &actor->base.pendingControlFlags;
-            u32 mask = ~1;
-            *flags &= mask;
-        }
-        actor->base.pendingControl = 0;
-    }
+    SceneActorTerrain_InstallControl(actor, SceneActorControl_OnIdle, 16);
     SceneActorTerrain_EnterState(actor, 1, 0, 2);
     ActorShadow_Disable(actor->base.shadow);
 }

@@ -19,7 +19,7 @@ struct Ghoul {
     u8 discKind;
     u8 unknown641[7];
     u16 routeDelay, recoveryDelay;
-    u8 routeBounds[0x24];
+    struct ChaseRouteProbe routeBounds;
     struct ContactPosition routePosition;
 };
 
@@ -27,15 +27,6 @@ static inline struct ContactPosition *Ghoul_InitialDiscTarget(struct Ghoul *cont
 {
     return context->discTargets;
 }
-
-struct GhoulPackedPair {
-    u32 first : 16;
-    u32 second : 16;
-};
-
-struct GhoulCollisionVector {
-    struct GhoulPackedPair xy, zw;
-};
 
 void Ghoul_OnAttackCollision(struct ContactCollider *, struct ContactCollider *,
                              struct ChaseActor *);
@@ -86,7 +77,7 @@ u32 Ghoul_Destroy(struct ChaseActor *actor);
 s32 Ghoul_Init(void *object);
 void Ghoul_Create(void);
 
-u8 sub_0812F3CC(struct ChaseActor *);
+u8 SceneActorReaction_BeginContactResponse(struct ChaseActor *);
 void SceneActorReaction_PlayAnimationBUntilComplete(void);
 
 #endif

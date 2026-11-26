@@ -2,8 +2,6 @@
 #include "engine/ram.h"
 #include "scene/actor/scene_actor_control_step.h"
 /* SceneActorControl_CreateFromScript: Creates an actor slot using script position and flip parameters and initializes its sprite and collider */
-#define SceneActorControl_CreateFromScript sub_08067990
-#define SceneActorControl_CreateFromScript sub_08067990
 struct SceneActorControlManager *SceneActorControl_EnsureSingleton(void);
 struct SceneActorControlSlot *SceneActorControl_AllocateSlot(struct SceneActorControlManager *);
 s32 Region_FindContaining(const struct ContactPosition *);

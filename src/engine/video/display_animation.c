@@ -23,14 +23,14 @@ s32 DisplayAnimation_SetEntry(struct DisplayAnimation *display, u32 index, u32 v
         display->variant = variant;
         display->flags = flags;
         display->index = index + display->variant;
-        Anim_SetKeyframes(&display->resource.keyframes.widget, &body->keyframes.resource,
+        Anim_SetKeyframes(&display->resource.keyframes.sprite, &body->keyframes.resource,
                           (u16)display->index, (u16)mode, (u16)keyframeFlags);
         if (!(keyframeFlags & 1))
             display->finished = 0;
         if (display->flags)
-            body->keyframes.widget.flags |= 4;
+            body->keyframes.sprite.flags |= 4;
         else
-            body->keyframes.widget.flags &= ~4;
+            body->keyframes.sprite.flags &= ~4;
     }
     return 0;
 }
@@ -47,7 +47,7 @@ s32 DisplayAnimation_UpdatePlayback(struct DisplayAnimation *display)
                 kind);
     } else {
         struct AnimSpriteResource *resource = &display->resource.keyframes.resource;
-        display->finished = Anim_Step(&display->resource.keyframes.widget, resource);
+        display->finished = Anim_Step(&display->resource.keyframes.sprite, resource);
     }
     return display->finished;
 }
@@ -57,7 +57,7 @@ s32 DisplayAnimation_TestFinished(struct DisplayAnimation *display)
     if (display->kind == 1)
         return display->finished;
     {
-        struct AnimSprite *state = &display->resource.keyframes.widget;
+        struct AnimSprite *state = &display->resource.keyframes.sprite;
         if (state->status & 2)
             return 1;
         return 0;
@@ -67,7 +67,7 @@ s32 DisplayAnimation_TestFinished(struct DisplayAnimation *display)
 s32 DisplayAnimation_GetFrameBoundary(struct DisplayAnimation *display, u32 *out)
 {
     if (display->kind == 2) {
-        struct AnimSprite *state = &display->resource.keyframes.widget;
+        struct AnimSprite *state = &display->resource.keyframes.sprite;
         if (state->status & 4) {
             *out = state->frameIndex;
             return 1;
@@ -91,7 +91,7 @@ s32 DisplayAnimation_Destroy(struct DisplayAnimation *display)
     if (mode == 1) {
         Sprite_Remove(&display->resource.sequence.sprite);
     } else {
-        Anim_Remove(&display->resource.keyframes.widget);
+        Anim_Remove(&display->resource.keyframes.sprite);
     }
     display->kind = 0;
     return 0;
@@ -128,7 +128,7 @@ setup:
     return 0;
 }
 
-s32 Widget_InitLinked(void *, void *, u32, s32, u32, u32, u32, const struct DisplayPosition *);
+s32 AnimSprite_InitLinked(void *, void *, u32, s32, u32, u32, u32, const struct DisplayPosition *);
 
 s32 DisplayAnimation_InitializeKeyframes(struct DisplayAnimation *display, u32 resourceId,
                                          s32 flags, const struct DisplayPosition *position)
@@ -150,10 +150,10 @@ setup:
     *resource = *source;
     ResourceHeader_Relocate(resource, (void *)source);
     {
-        s32 result = Widget_InitLinked(&display->resource.keyframes.widget, resource, 0, flags, 1,
+        s32 result = AnimSprite_InitLinked(&display->resource.keyframes.sprite, resource, 0, flags, 1,
                                        inactive, 60, position);
-        display->position = (struct DisplayPosition *)&display->resource.keyframes.widget.position;
-        display->displayFlags = &display->resource.keyframes.widget.flags;
+        display->position = (struct DisplayPosition *)&display->resource.keyframes.sprite.position;
+        display->displayFlags = &display->resource.keyframes.sprite.flags;
         return result;
     }
 }
@@ -204,7 +204,7 @@ s32 DisplayAnimation_SetPriority(struct DisplayAnimation *display, u32 priority)
         struct DisplaySequenceSprite *sprite = &display->resource.sequence.sprite;
         sprite->priority = priority;
     } else {
-        struct AnimSprite *state = &display->resource.keyframes.widget;
+        struct AnimSprite *state = &display->resource.keyframes.sprite;
         state->attribute1A = priority;
     }
     return 0;
@@ -220,7 +220,7 @@ s32 DisplayAnimation_SetPalette(struct DisplayAnimation *display, u32 scaleX, u3
         sprite->paletteVariant = scaleY;
         sprite->attribute = angle;
     } else {
-        struct AnimSprite *state = &display->resource.keyframes.widget;
+        struct AnimSprite *state = &display->resource.keyframes.sprite;
         state->scaleX = scaleX;
         state->scaleY = scaleY;
         state->rotation = angle;
@@ -237,7 +237,7 @@ s32 DisplayAnimation_SelectPaletteBank(struct DisplayAnimation *display, u32 ind
     if (display->kind == 1)
         AnimData_SelectPaletteBank(&display->resource.sequence.graphics, index);
     else
-        Anim_SelectPaletteBank(&display->resource.keyframes.widget, index);
+        Anim_SelectPaletteBank(&display->resource.keyframes.sprite, index);
     return 0;
 }
 
@@ -250,7 +250,7 @@ s32 DisplayAnimation_SetTileSource(struct DisplayAnimation *display, u32 palette
     if (mode == 1) {
         display->resource.sequence.graphics.palette = (void *)paletteAddress;
     } else {
-        display->resource.keyframes.widget.palette = (u16 *)paletteAddress;
+        display->resource.keyframes.sprite.palette = (u16 *)paletteAddress;
     }
     return 0;
 }
@@ -265,7 +265,7 @@ u32 DisplayAnimation_GetTileIndex(struct DisplayAnimation *display)
         return display->resource.sequence.graphics.paletteIndex;
     }
     {
-        struct AnimSprite *widget = &display->resource.keyframes.widget;
-        return widget->paletteBank;
+        struct AnimSprite *sprite = &display->resource.keyframes.sprite;
+        return sprite->paletteBank;
     }
 }

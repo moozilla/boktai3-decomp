@@ -13,7 +13,7 @@ extern u8 *gGameState;
 void Palette_SetBrightnessMode(int);
 void Script_Call(void *, int);
 void Weather_EnterPhase(void *, int);
-int sub_080177AC(void *, int, int, int);
+int Weather_SpawnTerrainParticles(void *, int, int, int);
 int Mod(int, int);
 static inline void clearFlag(void)
 {
@@ -36,7 +36,7 @@ int Weather_StormEnd(struct Weather *p)
     if (p->timer <= 9 && !(p->timer & 1))
         gDispCntShadow &= ~mask;
     if (p->timer <= 7)
-        sub_080177AC(p, 3, 10, 10);
+        Weather_SpawnTerrainParticles(p, 3, 10, 10);
     if (p->timer > 29) {
         Weather_EnterPhase(p, 0);
         {

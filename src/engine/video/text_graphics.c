@@ -1,5 +1,3 @@
-#define Text_GetNarrowGlyphCount sub_08218C40
-#define Text_ResetFontResource   sub_08218BC8
 #include "engine/video/text_graphics.h"
 #include "engine/video/render.h"
 #include "engine/video/text.h"

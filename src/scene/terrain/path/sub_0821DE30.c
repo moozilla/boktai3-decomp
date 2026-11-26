@@ -1,16 +1,7 @@
+#include "scene/terrain/terrain_trap_probe.h"
 #include "engine/engine.h"
 #include "engine/runtime.h"
 #include "engine/input.h"
-// fix.py best (sweep after the inlined-insn fix)
-struct TrapPosition {
-    s16 x, y, z;
-};
-struct TrapProbe {
-    u16 kind;
-    u8 unknown2, count;
-    struct TrapPosition *position;
-    u32 serials[10];
-};
 struct TrapRectangle {
     s16 minX, minZ, maxX, maxZ;
     u8 pad8[4];
@@ -24,7 +15,7 @@ static inline u32 Pressed(struct TerrainTrap *trap)
     }
     return 1;
 }
-static inline s32 Contains(struct TrapPosition *position, struct TerrainTrap *trap)
+static inline s32 Contains(struct ContactPosition *position, struct TerrainTrap *trap)
 {
     struct TrapRectangle *rect = trap->f28;
     s32 i = 0;
@@ -77,7 +68,6 @@ static inline s32 Remove(struct TrapProbe *p, s32 count, const u32 *serial, s32 
     return 0;
 }
 // confidence=low: reconciles a probe's ten tracked trap serials and dispatches enter/stay/leave events.
-#define Trap_UpdateProbeContacts sub_0821DE30
 inline static s32 Append_0821DE30(u32 *serials, s32 count, const u32 *serial, s32 *index)
 {
     s32 i;

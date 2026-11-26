@@ -1,18 +1,6 @@
+#include "scene/motion/scene_actor_availability.h"
 #include "scene/actor/scene_actor_control_motion.h"
 #include "bosses/vanargand/vanargand_parts.h"
-static inline u32 ActorFlag(struct ChaseActor *actor, u32 input, u32 offset)
-{
-    u32 mask = input;
-    return offset == 0x2D4 ? *(u16 *)((u8 *)actor + offset) & mask
-                           : *(u32 *)((u8 *)actor + offset) & mask;
-}
-static inline u8 IsUnavailable(struct ChaseActor *actor)
-{
-    if (actor && (ActorFlag(actor, 0x40, 0x2D4) || ActorFlag(actor, 0x20000, 0x2D0) ||
-                  actor->base.health <= 0))
-        return 1;
-    return 0;
-}
 static inline u8 Test(u32 value, u32 mask)
 {
     if (value & mask)
@@ -27,7 +15,7 @@ void SceneActorControl_TickGroundBob(struct ChaseActor *actor)
         struct SceneActorControlMotionState *raw = SceneActorControl_GetMotionState(actor);
         state = raw;
     }
-    if (IsUnavailable(actor)) {
+    if (SceneActor_ActionsBlocked(actor)) {
         return;
     }
     {
@@ -49,7 +37,7 @@ void SceneActorControl_TickGroundBob(struct ChaseActor *actor)
                 u32 mask = 1;
                 if (Test(*stateFlags, mask)) {
                     actor->base.body.position.y =
-                        ((struct SceneActorControlGroundView *)actor)->ground;
+                        actor->base.groundHeight;
                     return;
                 }
             }
@@ -60,7 +48,7 @@ void SceneActorControl_TickGroundBob(struct ChaseActor *actor)
         }
     }
     {
-        s32 currentGround = ((struct SceneActorControlGroundView *)actor)->ground;
+        s32 currentGround = actor->base.groundHeight;
         s32 raisedY = actor->base.body.position.y - 260;
         delta = currentGround - raisedY;
     }
@@ -72,15 +60,15 @@ void SceneActorControl_TickGroundBob(struct ChaseActor *actor)
             actor->base.heightOffset += 2;
         }
     }
-    if (((struct SceneActorControlGroundView *)actor)->ground != state->previousGround) {
+    if (actor->base.groundHeight != state->previousGround) {
         actor->base.heightOffset -=
-            ((struct SceneActorControlGroundView *)actor)->ground - state->previousGround;
+            actor->base.groundHeight - state->previousGround;
     }
     do {
         {
             u32 offset = actor->base.heightOffset;
             {
-                u32 ground = ((struct SceneActorControlGroundView *)actor)->ground;
+                u32 ground = actor->base.groundHeight;
                 actor->base.body.position.y = actor->base.heightOffset + ground;
             }
         }
@@ -94,5 +82,5 @@ void SceneActorControl_TickGroundBob(struct ChaseActor *actor)
     } else {
         state->phase += 8;
     }
-    state->previousGround = ((struct SceneActorControlGroundView *)actor)->ground;
+    state->previousGround = actor->base.groundHeight;
 }

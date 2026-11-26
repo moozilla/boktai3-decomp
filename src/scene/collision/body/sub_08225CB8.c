@@ -20,7 +20,7 @@ void SpriteOam_QueueProjectedSprites(void);
 void Sprite_RenderScaledList(void);
 void sub_08219624(void);
 void SpriteOam_QueueCameraRelativeSprites(void);
-void sub_08214D20(void);
+void Sprite_RenderCameraRelativeList(void);
 void sub_0821964C(void);
 /* Script: loads the stage terrain, either from one HP resource (-p) or from
    separate grid (-h), -t, -r and -z resources; -n is read and ignored. -v 0
@@ -57,8 +57,8 @@ void Terrain_LoadFromScript(void)
             gCamera.offsetX = g->originX >> 4;
             gCamera.offsetY = g->originY >> 4;
         } else {
-            Video_SetRenderCallbacks(mode, SpriteOam_QueueCameraRelativeSprites, sub_08214D20,
-                                     sub_0821964C);
+            Video_SetRenderCallbacks(mode, SpriteOam_QueueCameraRelativeSprites,
+                                     Sprite_RenderCameraRelativeList, sub_0821964C);
             gCamera.offsetX = 0;
             gCamera.offsetY = 0;
         }

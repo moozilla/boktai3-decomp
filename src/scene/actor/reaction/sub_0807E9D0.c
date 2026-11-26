@@ -1,6 +1,6 @@
 #include "debug.h"
 #include "scene/actor/scene_actor_part_burst.h"
-#include "scene/actor/scene_actor_behavior.h"
+#include "scene/collision/collision_response.h"
 #include "scene/actor/scene_actor_placement.h"
 #include "system/game_state/game_state.h"
 #include "scene/motion/scene_actor_chase_types.h"
@@ -9,10 +9,9 @@
 #include "scene/motion/scene_actor_chase_shared.h"
 s32 Math_Atan2(s32, s32);
 s32 Div(s32, s32);
-void Collision_CalculateElementalResponse(void *, void *);
-void Collision_CalculateDamageResponse(void *, void *);
+void Collision_CalculateElementalResponse(struct ContactCollider *, struct ContactCollider *);
 void SceneActor_SetContactReactionDirection(void *, void *, void *);
-void PlayerStats_AddContactHundredths(void *, void *, s32);
+void PlayerStats_AddContactHundredths(struct ContactCollider *, struct ContactCollider *, s32);
 
 static inline u8 Test(u32 value, u32 mask)
 {
@@ -20,7 +19,7 @@ static inline u8 Test(u32 value, u32 mask)
         return 1;
     return 0;
 }
-static inline u32 ReadReactionFlags(u32 inputMask, struct SceneActorBehaviorContactView *source)
+static inline u32 ReadReactionFlags(u32 inputMask, struct ContactCollider *source)
 {
     u32 mask = inputMask;
     return source->reactionFlags & mask;
@@ -29,7 +28,7 @@ static inline void AimAtContactTarget(struct ChaseActor *actor)
 {
     struct SceneActorChaseTarget *target;
     if (SceneActorChase_HasPlacementFlags(actor, 2))
-        actor->base.tracking.target = &((struct SceneActorChasePlayer *)gPlayers[0])->target;
+        SceneActorChase_TrackPlayer(actor);
     else if (actor->base.tracking.target == 0)
         return;
     target = actor->base.tracking.target;
@@ -40,13 +39,13 @@ static inline void AimAtContactTarget(struct ChaseActor *actor)
         actor->base.tracking.distance = dx * dx + dy * dy;
     }
 }
-static inline void SelectContactTarget(struct SceneActorBehaviorContactView *source, void *object)
+static inline void SelectContactTarget(struct ContactCollider *source, void *object)
 {
     struct ChaseActor *actor = object;
     s32 flagged = 0;
-    u16 owners = source->kind;
+    u16 owners = source->contactFlags;
     if (owners & 1) {
-        actor->base.tracking.target = &((struct SceneActorChasePlayer *)gPlayers[0])->target;
+        SceneActorChase_TrackPlayer(actor);
         flagged = 1;
     } else if (owners & 2) {
         actor->base.tracking.target = &((struct SceneActorChasePlayer *)gPlayers[1])->target;
@@ -65,7 +64,7 @@ static inline void SelectContactTarget(struct SceneActorBehaviorContactView *sou
     }
     actor->base.hitOwners = owners;
     {
-        u32 parameter = source->parameter34;
+        u32 parameter = source->statRewardFlags;
         u32 reaction = source->reactionFlags;
         actor->base.hitAttributes = parameter;
         actor->base.hitReactionFlags = reaction;
@@ -94,36 +93,30 @@ static inline u8 IsUnavailable(struct ChaseActor *actor, u16 **motion)
     flags = &actor->base.motionFlags;
     disabled = *flags & mask;
     *motion = flags;
-    if (disabled)
-        goto unavailable;
-    if (SceneActorPlacement_ReadFlags32((void *)actor, 0x20000))
-        goto unavailable;
-    if (actor->base.health > 0)
-        goto available;
-unavailable:
-    return 1;
-available:
+    if (disabled || SceneActorPlacement_ReadFlags32(&actor->base, 0x20000) ||
+        actor->base.health <= 0)
+        return 1;
     return 0;
 }
 static inline void SpawnContactParts(struct ChaseActor *actor)
 {
-    union SceneActorRegistryPackedPosition velocity, bounds, position;
+    struct ContactPosition velocity, bounds, position;
     s32 i;
     for (i = 0; i < 3; i++) {
         union RandomTableView table = {gRandomTable};
         const struct ContactPosition *origin;
-        velocity.packed.x = ((s8)SceneActorEffects_NextSample(table.samples) & 15) - 7;
-        velocity.packed.y = (SceneActorEffects_NextSample(table.samples) & 31) - 16;
-        velocity.packed.z = ((s8)SceneActorEffects_NextSample(table.samples) & 15) - 7;
-        bounds.packed.x = 5;
-        bounds.packed.y = 10;
-        bounds.packed.z = 5;
+        velocity.x = ((s8)SceneActorEffects_NextSample(table.samples) & 15) - 7;
+        velocity.y = (SceneActorEffects_NextSample(table.samples) & 31) - 16;
+        velocity.z = ((s8)SceneActorEffects_NextSample(table.samples) & 15) - 7;
+        bounds.x = 5;
+        bounds.y = 10;
+        bounds.z = 5;
         origin = actor->group.effectOrigin;
-        position.packed.x = origin->x;
-        position.packed.y = origin->y + 128;
-        position.packed.z = origin->z;
-        EffectGroup_SpawnPart((void *)actor->group.effectConfig, 3, &position.position,
-                              &velocity.position, &bounds.position, 40, 40);
+        position.x = origin->x;
+        position.y = origin->y + 128;
+        position.z = origin->z;
+        EffectGroup_SpawnPart((void *)actor->group.effectConfig, 3, &position,
+                              &velocity, &bounds, 40, 40);
     }
     actor->base.attachmentTimer = 0;
     actor->base.hitLockTimer = 0;
@@ -133,8 +126,8 @@ static inline void SetContactResult(struct ChaseActor *actor, u16 value)
 {
     actor->base.reactionSoundVariant = value;
 }
-void SceneActorReaction_HandleColliderContact(struct SceneActorBehaviorContactView *source,
-                                              struct SceneActorBehaviorContactView *destination,
+void SceneActorReaction_HandleColliderContact(struct ContactCollider *source,
+                                              struct ContactCollider *destination,
                                               struct ChaseActor *actor)
 {
     struct ContactCollider *primary;
@@ -152,8 +145,8 @@ void SceneActorReaction_HandleColliderContact(struct SceneActorBehaviorContactVi
     primary = &actor->base.colliderA;
     if (actor->base.colliderA.responseValue) {
         if (actor->base.field2E6) {
-            destination->remaining = unavailable;
-            destination->mode = 0;
+            destination->cost = unavailable;
+            destination->costFlags = 0;
         }
         return;
     }
@@ -169,7 +162,7 @@ void SceneActorReaction_HandleColliderContact(struct SceneActorBehaviorContactVi
             u32 attack;
             {
                 u32 mask = 0x20000;
-                if (!(mask & source->parameter34))
+                if (!(mask & source->statRewardFlags))
                     return;
             }
             if (SceneActorTurn_Flags(motion, 0xA007))
@@ -187,7 +180,7 @@ void SceneActorReaction_HandleColliderContact(struct SceneActorBehaviorContactVi
                     if (d <= 0x20) {
                         actor->base.hitLockTimer = source->unknown3C;
                         actor->base.field2E6 = 1;
-                        *(u16 *)actor->group.unknown5CE = Div(actor->base.hitLockTimer, 3);
+                        actor->group.hitBurstInterval = Div(actor->base.hitLockTimer, 3);
                         {
                             u32 bit = 0x2000;
                             *motion = bit | *motion;
@@ -195,7 +188,7 @@ void SceneActorReaction_HandleColliderContact(struct SceneActorBehaviorContactVi
                         return;
                     }
                 }
-                destination->remaining = 0;
+                destination->cost = 0;
                 SetContactResult(actor, 0);
                 SelectContactTarget(source, actor);
                 if (SceneActorTurn_Flags(motion, 0x80))
@@ -203,7 +196,7 @@ void SceneActorReaction_HandleColliderContact(struct SceneActorBehaviorContactVi
                 actor->base.field2E6 = 1;
                 return;
             } else {
-                destination->remaining = attack;
+                destination->cost = attack;
                 SetContactResult(actor, attack);
                 SelectContactTarget(source, actor);
             }
@@ -217,21 +210,21 @@ void SceneActorReaction_HandleColliderContact(struct SceneActorBehaviorContactVi
         Collision_CalculateElementalResponse(source, destination);
     else
         Collision_CalculateDamageResponse(source, destination);
-    destination->parameter44 = source->parameter44;
-    actor->base.field2E6 = destination->mode;
+    destination->responseValue = source->responseValue;
+    actor->base.field2E6 = destination->costFlags;
     if (ReadReactionFlags(0x40000, source)) {
         u8 *defense = &actor->base.defense;
-        power = source->power;
+        power = source->responseParameter;
         power -= *defense;
         if (power < 0)
             power = 0;
-        destination->power = power;
+        destination->responseParameter = power;
     }
     if (SceneActorTurn_Flags(motion, 6)) {
-        destination->remaining <<= 1;
-        power = destination->power;
+        destination->cost <<= 1;
+        power = destination->responseParameter;
         power = power >= 0 ? power >> 1 : -(-power >> 1);
-        destination->power = power;
+        destination->responseParameter = power;
     }
     SceneActor_SetContactReactionDirection(actor, source, destination);
     SelectContactTarget(source, actor);
@@ -242,14 +235,14 @@ void SceneActorReaction_HandleColliderContact(struct SceneActorBehaviorContactVi
     {
         u32 mask = 0x800;
         if (Test(gGameState->flags868, mask) || ReadReactionFlags(0x40, source)) {
-            destination->remaining = 0;
+            destination->cost = 0;
             SetContactResult(actor, 0);
             actor->base.field2E6 = 1;
         }
     }
     if (SceneActorTurn_Flags(motion, 0x2000))
-        SpawnContactParts((void *)actor);
-    actor->base.reactionSoundVariant = destination->remaining;
+        SpawnContactParts(actor);
+    actor->base.reactionSoundVariant = destination->cost;
     PlayerStats_AddContactHundredths(source, destination, actor->base.contactReward);
     SceneActorChase_SetBehaviorFlags(actor, 0x2000);
 }

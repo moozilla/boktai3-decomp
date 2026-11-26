@@ -5,7 +5,6 @@
 #include "player/effects/player_particle_cloud.h"
 
 // confidence=low: scatters particle anchors horizontally and raises them by sixteen units.
-#define PlayerParticleCloud_ScatterAnchors sub_081D3620
 s32 PlayerParticleCloud_ScatterAnchors(void)
 {
     struct CloudTask *p = gCloudTask;

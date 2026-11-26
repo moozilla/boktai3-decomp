@@ -16,7 +16,7 @@ void Anim_LinkToList(void *, s32);
 
 void Sprite_InitUnlinked(void *, void *, s32);
 
-void Widget_InitCleared(void *, void *, s32, s32, s32, s32, s32, void *);
+void AnimSprite_InitCleared(void *, void *, s32, s32, s32, s32, s32, void *);
 
 void Hud_SetMode(s32);
 
@@ -221,7 +221,7 @@ void GameOver_InitOverlay(struct GameOver *panel)
         position.x = -8;
         position.y = -8;
         position.z = 0;
-        Widget_InitCleared(&panel->overlay, &panel->overlayResource, 0x4B, 0x1091, 0, 0, 60,
+        AnimSprite_InitCleared(&panel->overlay, &panel->overlayResource, 0x4B, 0x1091, 0, 0, 60,
                            &position);
         CpuSet(panel->overlay.palette, panel->overlayPalette, 0x04000008);
         panel->overlay.paletteBank = 0x3AA;

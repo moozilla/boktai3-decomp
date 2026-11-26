@@ -5,8 +5,8 @@ On the active path AnimData_SelectPaletteBank returns through r0.
 
 The explicit form changed the ROM bytes. The guarded form passed the unit ROM check.
 
---- a/src/directional_interaction.c
-+++ b/src/directional_interaction.c
+--- a/src/objects/interaction_prompts.c
++++ b/src/objects/interaction_prompts.c
 @@ -61,6 +61,14 @@
  {
      void *animation = &p->graphics;

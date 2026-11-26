@@ -2,7 +2,7 @@
 
 void SceneActors_RunStateCallback(void *);
 
-void SceneActors_TickStateCallback(void *actor)
+void VanargandHead_TickStateCallback(void *actor)
 {
     SceneActors_RunStateCallback(actor);
 }

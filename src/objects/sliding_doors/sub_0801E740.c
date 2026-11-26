@@ -1,0 +1,11 @@
+#include "global.h"
+void SlidingDoors_UpdateInactiveIdle(void);
+void SlidingDoors_Unlock(u8 *p, u16 id)
+{
+    int i;
+    for (i = 0; i < *(u16 *)(p + 0x1a); i++) {
+        u8 *s = *(u8 **)(p + 0x42c) + 140 * i;
+        if (*(u16 *)(s + 0x34) == id)
+            s[0x36] &= ~1;
+    }
+}

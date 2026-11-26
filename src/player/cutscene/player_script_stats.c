@@ -117,7 +117,7 @@ void ScriptActor_SetEnergyMaxFromScript(void)
 void Player_AddExpFromScript(void)
 {
     if (Script_SeekToKeyword(0x65))
-        sub_08159164(Script_GetValue());
+        Player_AddExperience(Script_GetValue());
 }
 
 static inline u32 ScriptActor_TestFlag(struct Player *actor, u32 flag)

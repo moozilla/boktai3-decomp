@@ -9,7 +9,7 @@
 #include "monsters/skeleton/enemy_defeat_statistics.h"
 
 /* Skeleton defeat state (tentative). On entry: releases attachments, clears the route and,
- * for categories 6/7, emits a bone burst through sub_08127590. Then three outcomes:
+ * for categories 6/7, emits a bone burst through SpriteProjectile_Create. Then three outcomes:
  * flag 0x4000 (no reward) sparks and idles; while the context is not finished it switches to
  * SceneActorReaction_TickHiddenTimeout (revival is disabled for delays above 19999); otherwise the
  * full defeat: script, reward, kill counters per category (saturating at 9999, plus one
@@ -22,11 +22,12 @@ void Bestiary_UnlockEntry(u32);
 void SceneActorBehavior_CallTerrainScript(struct RoomActor *actor);
 void SceneActorPlacement_PlayCategoryEventSound(struct ChaseActor *actor);
 struct Projectile;
-struct Projectile *sub_08127590(struct ContactPosition *position, struct ContactPosition *velocity,
-                                u32 resource, u32 script, u32 sequence, u32 lifetime, u32 flags,
-                                u32 colliderFlags, s32 palette, u32 flip, u32 speed,
-                                s32 colliderKind, s32 sizeX, s32 sizeY, s32 sizeZ);
-void sub_08159164(u32);
+struct Projectile *SpriteProjectile_Create(struct ContactPosition *position,
+                                           struct ContactPosition *velocity, u32 resource,
+                                           u32 script, u32 sequence, u32 lifetime, u32 flags,
+                                           u32 colliderFlags, s32 palette, u32 flip, u32 speed,
+                                           s32 colliderKind, s32 sizeX, s32 sizeY, s32 sizeZ);
+void Player_AddExperience(u32);
 void Player_RefreshLifeState(u32, u32);
 void Skeleton_InitializeCategoryProfile(struct ChaseActor *actor);
 void Skeleton_InitVariantMotion(void *);
@@ -93,7 +94,8 @@ static inline void Polar(struct ContactPosition *v, s32 angle, s32 radius)
         pos = actor->base.body.position;                                                           \
         pos.y += 200;                                                                              \
         vec.y = 54;                                                                                \
-        sub_08127590(&pos, &vec, 0xD45E, 0x1DC3, kind, 0x1A, 2, 0, 0x13C, 0, 0, 0, 0, 0, 0);       \
+        SpriteProjectile_Create(&pos, &vec, 0xD45E, 0x1DC3, kind, 0x1A, 2, 0, 0x13C, 0, 0, 0, 0,   \
+                                0, 0);                                                             \
     } while (0)
 #define FLAG_COUNTS()                                                                              \
     {                                                                                              \
@@ -394,10 +396,10 @@ void Skeleton_UpdateDefeat(struct ChaseActor *actor)
             if (!Masked16(response.flags, 0x4000) && (u32)(actor->base.category - 11) > 2)
                 Bestiary_UnlockEntry(
                     Bestiary_GetEntryForActor(actor->base.category, actor->base.paletteOffset));
-            sub_08159164(state.context->defeatExperience);
+            Player_AddExperience(state.context->defeatExperience);
             Player_RefreshLifeState(actor->base.hitAttributes, actor->base.fieldA1);
         } else {
-            sub_08159164(state.context->downedExperience);
+            Player_AddExperience(state.context->downedExperience);
         }
         {
             u32 m = 0x10;
@@ -426,7 +428,7 @@ void Skeleton_UpdateDefeat(struct ChaseActor *actor)
         }
         if (!Masked16(response.flags, 0x4000) && (u32)(*categoryp - 11) > 2)
             Bestiary_UnlockEntry(Bestiary_GetEntryForActor(*categoryp, actor->base.paletteOffset));
-        sub_08159164(state.context->defeatExperience);
+        Player_AddExperience(state.context->defeatExperience);
         Player_RefreshLifeState(actor->base.hitAttributes, actor->base.fieldA1);
         Count(&((struct EnemyDefeatStatistics *)gGameState)->lifetimeTotal);
         Count(&((struct EnemyDefeatStatistics *)gGameState)->total);

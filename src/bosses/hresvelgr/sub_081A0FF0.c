@@ -24,10 +24,10 @@ typedef struct HresvelgrActor {
     u16 state;
 } HresvelgrActor;
 void Hresvelgr_SetAnimation(HresvelgrActor *, void *, void *, u32, u32, u32);
-void *MotionEntry_CreateWithDelta(u32, MotionDelta *, u32, u32);
+void *HresvelgrMotion_CreateWithDelta(u32, MotionDelta *, u32, u32);
 void Sound_PlaySong(u32);
 s32 Callback_InvokeActor(void *, void *);
-void sub_0819C8F8(void *, s32, s32);
+void Hresvelgr_SetCosineScaledVelocity(void *, s32, s32);
 static inline s32 nextRandom(const u16 *table)
 {
     u32 offset;
@@ -45,11 +45,10 @@ static inline void emitBurst(u32 emitter)
         delta.x = (nextRandom(table.samples) & 15) - 8;
         delta.y = nextRandom(table.samples) & 7;
         delta.z = (nextRandom(table.samples) & 15) - 8;
-        MotionEntry_CreateWithDelta(emitter, &delta, nextRandom(table.samples) % 4, 60);
+        HresvelgrMotion_CreateWithDelta(emitter, &delta, nextRandom(table.samples) % 4, 60);
     }
 }
 // confidence=low: oscillates side-relative velocity during a four-entry burst animation.
-#define Hresvelgr_UpdateOscillatingMotionBurst sub_081A0FF0
 void Hresvelgr_UpdateOscillatingMotionBurst(HresvelgrActor *p, s32 tick)
 {
     HresvelgrActor *saved = p;
@@ -64,7 +63,7 @@ void Hresvelgr_UpdateOscillatingMotionBurst(HresvelgrActor *p, s32 tick)
         u32 mask = 12;
         p->flags |= mask;
     }
-    sub_0819C8F8(saved, 24, tick << 2);
+    Hresvelgr_SetCosineScaledVelocity(saved, 24, tick << 2);
     if (p->phase > 3)
         p->finished = 1;
 }

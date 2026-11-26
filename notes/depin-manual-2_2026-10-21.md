@@ -6,7 +6,7 @@ Method: depin.py --write over all files (only LinkMenu_WaitSelectionMode lost a 
 ## Fully clean (no pins, no asm)
 
 * SceneActorRecord_Tick (0806FA14): Enabled() written as a u8-returning `if (...) return TRUE; return FALSE;` helper replaces the result pin; the r5 pin was replaced (permuter) by holding the address as an int temp, `location = 0x02000710;`, dereferenced as `*(struct GameState **)location` in the loop.
-* SceneNpc_UpdateBlinkPhase (081CF490): permuter; dropped the `phase` local and the volatile read; reads npc->phase everywhere and the compare reads `*((u8 *)npc + 0x18)`.
+* Otenko_UpdateBlinkPhase (081CF490): permuter; dropped the `phase` local and the volatile read; reads npc->phase everywhere and the compare reads `*((u8 *)npc + 0x18)`.
 * LargeEffectPool_AllocateSlot (0812B084): second use of i in the mask shift via `(*(&i))`.
 * SceneActorControl_EnterTimedState (0813042C): permuter; masked value split over u32/u16 temporaries, `if ((bit = zero) == 0) Enter(*(&actor), zero)`.
 * ActorSoundPhase_UpdateConditionalStop (081A8820): `do { Stop(q+..); q->st = v; } while (0);` around the uses of the parameter copy.
@@ -33,7 +33,7 @@ Method: depin.py --write over all files (only LinkMenu_WaitSelectionMode lost a 
 Permuter score 0 is not proof: SceneActorRegistry_CountAvailable scored 0 but differs by one branch offset (unpinned code threads `inactive == 1` past the `cmp r0,#0`; the +r barrier on inactive keeps the compare). Permuter "dummy" mutations (`if (a || b) {} else {...}`, reassigning a parameter) are not usable.
 
 * ContactCollider_GetImpactDirection (08238520): the pin only stops cross-jumping of the two identical `+0xe0` tails; no plain-C form keeps both copies.
-* SceneObject_BeginLowering / AnimateActive / AnimateInactive (0801F3CC, 0801EFDC, 0801EF60): the memory barriers keep two flag read-modify-writes separate and the `*(s+0x2c)` reloaded; without them the |=2 and |=3 merge. Best permuter score 15, only via a semantically wrong mutation.
+* SlidingDoor_BeginLowering / AnimateActive / AnimateInactive (0801F3CC, 0801EFDC, 0801EF60): the memory barriers keep two flag read-modify-writes separate and the `*(s+0x2c)` reloaded; without them the |=2 and |=3 merge. Best permuter score 15, only via a semantically wrong mutation.
 * Interp_Step (08222358): same barrier effect (re-read of len/t); best 55.
 * SceneActors_RunFirstEventScript / Second (08021AE8/B54): only `add r4, sp, #0x20` is scheduled late (7 bytes); a pointer copy of &call costs an extra register.
 * SceneActorRegistry_CountAvailable (0806FE18): see above, 1 halfword.
@@ -45,7 +45,7 @@ Permuter score 0 is not proof: SceneActorRegistry_CountAvailable scored 0 but di
 * Player_TestTetherActionInput (08156F54): g needs to be a copy of the global's address in r3 (permuter 30 only by dummy mutation).
 * Actor_InitDrawable (0802D760): m -> r1 vs r0 only; permuter 10 via long long type games.
 * FloorSwitch_SetOccupant (0810048C), ResultTutorial_AnimateLevel (0801DB5C, 2 bytes of register), SceneActorControl_StartStoredCurve (080849DC, permuter 50), Slime_RollMoveFlag (70), TextWindow_Destroy (75), LevelAdvanceDisplay_UpdateParticle (70), SceneHud_GetActionIconPosition (40): near misses, unsolved in 5 minutes each.
-* Untouched beyond the first 150 s permuter pass (scores in parentheses): AreaEffect_ShowEnabledSprites (320), CallbackSlots_DispatchActive (210), MessageWindow_Clear (200), ProximityEmitter_TickRise (205), SceneActorControl_BeginSavedHeadingPhase (250), SceneActorRegistry_TestCategoryFlags (400), Shop_ClassifyItemAction (205) / ClassifyItemMove, SceneParticlePool_Update (230), SlotPool_UpdateActiveSlots (120), TextState_MeasureTextColumns (220), TransientSpriteEffects_Initialize (100), Wireless_StartChildSearch (245), WirelessGameDisplay_UpdateStatusIcons (395), sub_0822216C (1400), sub_08072204 (200 invalid), PlayerAnimation_SelectSecondaryKeyframes.
+* Untouched beyond the first 150 s permuter pass (scores in parentheses): AreaEffect_ShowEnabledSprites (320), CallbackSlots_DispatchActive (210), MessageWindow_Clear (200), TetherRing_TickRise (205), SceneActorControl_BeginSavedHeadingPhase (250), SceneActorRegistry_TestCategoryFlags (400), Shop_ClassifyItemAction (205) / ClassifyItemMove, SceneParticlePool_Update (230), SlotPool_UpdateActiveSlots (120), TextState_MeasureTextColumns (220), TransientSpriteEffects_Initialize (100), Wireless_StartChildSearch (245), WirelessGameDisplay_UpdateStatusIcons (395), sub_0822216C (1400), sub_08072204 (200 invalid), PlayerAnimation_SelectSecondaryKeyframes.
 
 ## New techniques
 

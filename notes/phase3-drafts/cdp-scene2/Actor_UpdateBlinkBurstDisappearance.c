@@ -1,22 +1,22 @@
 #include "global.h"
 #include "engine/video/display_sequence.h"
-#include "npc/cutscene_actor/actor_animation_controller.h"
+#include "ui/title/actor_animation_controller.h"
 #include "engine/video/display_sprite_playback.h"
 #include "engine/video/render.h"
 #include "engine/input.h"
 #include "engine/ram.h"
 
-// Provisional name: ActorPalette_BeginFade
+// Provisional name: TutorialOtenkoPalette_BeginFade
 
 void AnimData_SelectPaletteBank(void *, s32);
 
-void ActorPalette_UpdateFade(struct ActorAnimController *);
+void TutorialOtenkoPalette_UpdateFade(struct ActorAnimController *);
 
-void ActorPalette_UpdateFadeAndNotify(struct ActorAnimController *);
+void TutorialOtenkoPalette_UpdateFadeAndNotify(struct ActorAnimController *);
 
 // Begin an actor palette transition; mode 2 also completes a waiting request.
 
-void ActorPalette_BeginFade(struct ActorAnimController *p)
+void TutorialOtenkoPalette_BeginFade(struct ActorAnimController *p)
 {
     p->step = 0;
     p->duration = 50;
@@ -25,12 +25,12 @@ void ActorPalette_BeginFade(struct ActorAnimController *p)
     p->palette = p->output;
     /* local adaptation: mode is a bitfield, whose address can't be taken */
     if ((*(u8 *)((u8 *)p + 0xf5a) & 15) == 2)
-        p->previous = ActorPalette_UpdateFadeAndNotify;
+        p->previous = TutorialOtenkoPalette_UpdateFadeAndNotify;
     else
-        p->previous = ActorPalette_UpdateFade;
+        p->previous = TutorialOtenkoPalette_UpdateFade;
 }
 
-// Provisional name: ActorPalette_UpdateFade
+// Provisional name: TutorialOtenkoPalette_UpdateFade
 
 s32 Div(s32, s32);
 
@@ -62,7 +62,7 @@ static inline void Actor_SetState(struct ActorAnimController *g, u32 mode, u32 p
 
 // Interpolate the actor palette over fifty updates, then restore its asset palette.
 
-void ActorPalette_UpdateFade(struct ActorAnimController *p)
+void TutorialOtenkoPalette_UpdateFade(struct ActorAnimController *p)
 {
     s32 i;
     struct RGB {
@@ -87,13 +87,13 @@ void ActorPalette_UpdateFade(struct ActorAnimController *p)
     }
 }
 
-// Provisional name: ActorPalette_UpdateFadeAndNotify
+// Provisional name: TutorialOtenkoPalette_UpdateFadeAndNotify
 
 void Script_Call(void *, s32);
 
 // Interpolate the actor palette over fifty updates, then restore its asset palette.
 
-void ActorPalette_UpdateFadeAndNotify(struct ActorAnimController *p)
+void TutorialOtenkoPalette_UpdateFadeAndNotify(struct ActorAnimController *p)
 {
     s32 i;
     struct RGB {
@@ -123,13 +123,13 @@ void ActorPalette_UpdateFadeAndNotify(struct ActorAnimController *p)
     }
 }
 
-// Provisional name: ActorPalette_BeginReverseFade
+// Provisional name: TutorialOtenkoPalette_BeginReverseFade
 
-void ActorPalette_UpdateReverseFade(struct ActorAnimController *);
+void TutorialOtenkoPalette_UpdateReverseFade(struct ActorAnimController *);
 
 // Begin the reverse palette transition and retain the normal asset palette.
 
-void ActorPalette_BeginReverseFade(struct ActorAnimController *p)
+void TutorialOtenkoPalette_BeginReverseFade(struct ActorAnimController *p)
 {
     const u16 *src;
     u16 *dst;
@@ -147,14 +147,14 @@ void ActorPalette_BeginReverseFade(struct ActorAnimController *p)
         *dst++ = *src++;
     }
     p->palette = p->output;
-    p->previous = ActorPalette_UpdateReverseFade;
+    p->previous = TutorialOtenkoPalette_UpdateReverseFade;
 }
 
-// Provisional name: ActorPalette_UpdateReverseFade
+// Provisional name: TutorialOtenkoPalette_UpdateReverseFade
 
 // Interpolate the actor palette over fifty updates, then restore its asset palette.
 
-void ActorPalette_UpdateReverseFade(struct ActorAnimController *p)
+void TutorialOtenkoPalette_UpdateReverseFade(struct ActorAnimController *p)
 {
     s32 i;
     struct RGB {
@@ -195,7 +195,7 @@ void ActorPalette_UpdateReverseFade(struct ActorAnimController *p)
     }
 }
 
-// Provisional name: Actor_ProjectAndClampToScreen
+// Provisional name: TutorialOtenko_ProjectAndClampToScreen
 
 struct Vec {
     s16 x, y, z;
@@ -223,7 +223,7 @@ static inline void screen(struct Vec *dst, struct Vec *src)
 
 // Project the actor into screen space and clamp it to the visible display.
 
-void Actor_ProjectAndClampToScreen(struct ActorAnimController *p)
+void TutorialOtenko_ProjectAndClampToScreen(struct ActorAnimController *p)
 {
     struct Vec pos;
     p->obj.flags |= 0x30;
@@ -241,23 +241,23 @@ void Actor_ProjectAndClampToScreen(struct ActorAnimController *p)
     p->obj.z = 0;
 }
 
-// Provisional name: Actor_TryInteraction
+// Provisional name: TutorialOtenko_TryInteraction
 
 extern u8 *gGameState;
 
 u8 Math_Atan2(s32, s32);
 
-void Actor_SetInteractionControlFlag(u8 *);
+void TutorialOtenko_SetInteractionControlFlag(u8 *);
 
-void Actor_BeginInteractionSoundSequence(u8 *);
+void TutorialOtenko_BeginInteractionSoundSequence(u8 *);
 
-void Actor_OnInteractionChildRelease(struct ActorAnimController *, struct ActorChildSlot *);
+void TutorialOtenko_OnInteractionChildRelease(struct ActorAnimController *, struct ActorChildSlot *);
 
-void Actor_OnInteractionChildDelay(struct ActorAnimController *, struct ActorChildSlot *);
+void TutorialOtenko_OnInteractionChildDelay(struct ActorAnimController *, struct ActorChildSlot *);
 
 // Tentative: accept a nearby interaction when facing, height and input permit it.
 
-void Actor_TryInteraction(struct ActorAnimController *p, struct InteractionPartner *q)
+void TutorialOtenko_TryInteraction(struct ActorAnimController *p, struct InteractionPartner *q)
 {
     s32 dx, dz, xOffset, height, length;
     s32 zOffset;
@@ -343,12 +343,12 @@ void Actor_TryInteraction(struct ActorAnimController *p, struct InteractionPartn
             u8 one = 1;
             p->flags |= one;
             {
-                void (*fn)(void *, void *) = Actor_OnInteractionChildRelease;
+                void (*fn)(void *, void *) = TutorialOtenko_OnInteractionChildRelease;
                 q->fn = fn;
             }
             q->flags |= one;
         }
-        Actor_SetInteractionControlFlag(p);
+        TutorialOtenko_SetInteractionControlFlag(p);
     } else {
         p->oldMode = p->mode;
         {
@@ -368,20 +368,20 @@ void Actor_TryInteraction(struct ActorAnimController *p, struct InteractionPartn
             u8 one = 1;
             p->flags |= one;
             {
-                void (*fn)(void *, void *) = Actor_OnInteractionChildDelay;
+                void (*fn)(void *, void *) = TutorialOtenko_OnInteractionChildDelay;
                 q->fn = fn;
             }
             q->flags |= one;
         }
-        Actor_BeginInteractionSoundSequence(p);
+        TutorialOtenko_BeginInteractionSoundSequence(p);
     }
 }
 
-// Provisional name: Actor_SelectNearestInteraction
+// Provisional name: TutorialOtenko_SelectNearestInteraction
 
 // Select the closest eligible interaction target and animate its selection marker.
 
-void Actor_SelectNearestInteraction(struct ActorAnimController *p)
+void TutorialOtenko_SelectNearestInteraction(struct ActorAnimController *p)
 {
     s32 i;
     struct InteractionPartner *q;
@@ -476,12 +476,12 @@ void Actor_SelectNearestInteraction(struct ActorAnimController *p)
 
 void ScriptUtility_SetControlFlag(u8);
 
-void Actor_SetInteractionControlFlag(u8 *p)
+void TutorialOtenko_SetInteractionControlFlag(u8 *p)
 {
     ScriptUtility_SetControlFlag(*(u8 *)(p + 0xF6A));
 }
 
-void Actor_RestoreSavedAnimationPlayback(u8 *p)
+void TutorialOtenko_RestoreSavedAnimationPlayback(u8 *p)
 {
     u32 a = *(u8 *)(p + 0xF86);
     u32 b;
@@ -494,16 +494,16 @@ void Actor_RestoreSavedAnimationPlayback(u8 *p)
 
 extern u8 gSunClock[];
 
-/* Provisional name: Actor_UpdateIdleWait */
+/* Provisional name: TutorialOtenko_UpdateIdleWait */
 
-void Actor_UpdateIdleWait(struct ActorAnimController *);
+void TutorialOtenko_UpdateIdleWait(struct ActorAnimController *);
 
 static inline s32 absolute(s32 x)
 {
     return x < 0 ? -x : x;
 }
 
-void Actor_UpdateScaleGrowth(struct ActorAnimController *p)
+void TutorialOtenko_UpdateScaleGrowth(struct ActorAnimController *p)
 {
     s32 x = p->obj.scaleX;
     s32 y = p->obj.scaleY;
@@ -520,29 +520,29 @@ void Actor_UpdateScaleGrowth(struct ActorAnimController *p)
 
 /* Tentative role: arm the idle animation transition at its resting position. */
 
-void Actor_ArmRestIdleTransition(struct ActorAnimController *p)
+void TutorialOtenko_ArmRestIdleTransition(struct ActorAnimController *p)
 {
     if (p->obj.x == 25 && p->obj.z == 0 && absolute(p->obj.y - 102) <= 9) {
         p->timer = 0;
-        p->fn = Actor_UpdateIdleWait;
+        p->fn = TutorialOtenko_UpdateIdleWait;
         if (gSunClock[14] == 5 || gSunClock[14] == 0 || gSunClock[14] == 4)
             p->delay = 1800;
         else
             p->delay = 10800;
         if (p->growFlag && p->obj.scaleX != 127 && (p->obj.flags & 16))
-            p->scaleFn = Actor_UpdateScaleGrowth;
+            p->scaleFn = TutorialOtenko_UpdateScaleGrowth;
     } else
         p->fn = 0;
 }
 
-/* Provisional name: Actor_UpdateIdleWait */
+/* Provisional name: TutorialOtenko_UpdateIdleWait */
 
 /* Gap function (gbadisasm left it as data): counts down an idle delay, then
- * saves the current phase and arms Actor_UpdateIdlePhaseRestoration. */
+ * saves the current phase and arms TutorialOtenko_UpdateIdlePhaseRestoration. */
 
-void Actor_UpdateIdlePhaseRestoration(struct ActorAnimController *);
+void TutorialOtenko_UpdateIdlePhaseRestoration(struct ActorAnimController *);
 
-void Actor_UpdateIdleWait(struct ActorAnimController *p)
+void TutorialOtenko_UpdateIdleWait(struct ActorAnimController *p)
 {
     if (*(s32 *)gPadState) {
         p->timer = 0;
@@ -566,7 +566,7 @@ void Actor_UpdateIdleWait(struct ActorAnimController *p)
                 zero = 0;
                 one |= value;
                 *field = one;
-                p->fn = Actor_UpdateIdlePhaseRestoration;
+                p->fn = TutorialOtenko_UpdateIdlePhaseRestoration;
                 p->count = zero;
                 p->savedY2 = p->obj.y;
             }
@@ -606,7 +606,7 @@ void Sound_PlaySong(s32);
 
 void ActorShadow_Enable(void *);
 
-void Actor_UpdateIdlePhaseRestoration(struct ActorAnimController *p)
+void TutorialOtenko_UpdateIdlePhaseRestoration(struct ActorAnimController *p)
 {
     if (*(s32 *)gPadState) {
         p->interrupted = 1;
@@ -616,7 +616,7 @@ void Actor_UpdateIdlePhaseRestoration(struct ActorAnimController *p)
         u16 phase;
         p->obj.y = p->savedY2 - 1;
         p->timer = 0;
-        p->fn = Actor_UpdateIdleWait;
+        p->fn = TutorialOtenko_UpdateIdleWait;
         phase = p->savedPhase;
         p->oldMode = p->mode;
         {
@@ -637,25 +637,25 @@ void Actor_UpdateIdlePhaseRestoration(struct ActorAnimController *p)
 
 void Sound_PlaySong(s32);
 
-void Actor_BeginInteractionSoundSequence(u8 *p)
+void TutorialOtenko_BeginInteractionSoundSequence(u8 *p)
 {
     Sound_PlaySong(0x11E);
     *(u32 *)(p + 0xF98) = 0x081E44F9;
 }
 
-void Actor_UpdateInteractionSoundDelay(struct ActorAnimController *);
+void TutorialOtenko_UpdateInteractionSoundDelay(struct ActorAnimController *);
 
-void Actor_InitInteractionSoundDelay(u8 *p)
+void TutorialOtenko_InitInteractionSoundDelay(u8 *p)
 {
     *(u8 *)(p + 0xF88) = 0xc;
-    *(void (**)(void))(p + 0xF98) = Actor_UpdateInteractionSoundDelay;
+    *(void (**)(void))(p + 0xF98) = TutorialOtenko_UpdateInteractionSoundDelay;
 }
 
 /* Finish a delayed controller callback, selecting the time-of-day sound. */
 
 void SunClock_GetBaseHour(void);
 
-void Actor_UpdateInteractionSoundDelay(struct ActorAnimController *p)
+void TutorialOtenko_UpdateInteractionSoundDelay(struct ActorAnimController *p)
 {
     if (--p->delayCounter == 0) {
         p->otherFn = 0;
@@ -666,14 +666,14 @@ void Actor_UpdateInteractionSoundDelay(struct ActorAnimController *p)
     }
 }
 
-u8 *Actor_EnsureController(u32, u32);
+u8 *TutorialOtenko_EnsureController(u32, u32);
 
-void Actor_BeginAnimationPhaseOne(void)
+void TutorialOtenko_BeginAnimationPhaseOne(void)
 {
     struct ActorAnimController *g = (struct ActorAnimController *)gScriptedActorController;
     u32 three = 3;
     if (g == 0) {
-        g = (struct ActorAnimController *)Actor_EnsureController(0xBB34, 0);
+        g = (struct ActorAnimController *)TutorialOtenko_EnsureController(0xBB34, 0);
         if (g == 0)
             return;
     }
@@ -690,12 +690,12 @@ void Actor_BeginAnimationPhaseOne(void)
     }
 }
 
-void Actor_BeginAnimationPhaseTwo(void)
+void TutorialOtenko_BeginAnimationPhaseTwo(void)
 {
     struct ActorAnimController *g = (struct ActorAnimController *)gScriptedActorController;
     u32 three = 3;
     if (g == 0) {
-        g = (struct ActorAnimController *)Actor_EnsureController(0xBB34, 0);
+        g = (struct ActorAnimController *)TutorialOtenko_EnsureController(0xBB34, 0);
         if (g == 0)
             return;
     }
@@ -712,12 +712,12 @@ void Actor_BeginAnimationPhaseTwo(void)
     }
 }
 
-void Actor_BeginAnimationPhaseThree(void)
+void TutorialOtenko_BeginAnimationPhaseThree(void)
 {
     struct ActorAnimController *g = (struct ActorAnimController *)gScriptedActorController;
     u32 three = 3;
     if (g == 0) {
-        g = (struct ActorAnimController *)Actor_EnsureController(0xBB34, 0);
+        g = (struct ActorAnimController *)TutorialOtenko_EnsureController(0xBB34, 0);
         if (g == 0)
             return;
     }
@@ -734,12 +734,12 @@ void Actor_BeginAnimationPhaseThree(void)
     }
 }
 
-void Actor_BeginAnimationPhaseFour(void)
+void TutorialOtenko_BeginAnimationPhaseFour(void)
 {
     struct ActorAnimController *g = (struct ActorAnimController *)gScriptedActorController;
     u32 three = 3;
     if (g == 0) {
-        g = (struct ActorAnimController *)Actor_EnsureController(0xBB34, 0);
+        g = (struct ActorAnimController *)TutorialOtenko_EnsureController(0xBB34, 0);
         if (g == 0)
             return;
     }
@@ -756,12 +756,12 @@ void Actor_BeginAnimationPhaseFour(void)
     }
 }
 
-void Actor_BeginAnimationPhaseFive(void)
+void TutorialOtenko_BeginAnimationPhaseFive(void)
 {
     struct ActorAnimController *g = (struct ActorAnimController *)gScriptedActorController;
     u32 three = 3;
     if (g == 0) {
-        g = (struct ActorAnimController *)Actor_EnsureController(0xBB34, 0);
+        g = (struct ActorAnimController *)TutorialOtenko_EnsureController(0xBB34, 0);
         if (g == 0)
             return;
     }
@@ -778,12 +778,12 @@ void Actor_BeginAnimationPhaseFive(void)
     }
 }
 
-void Actor_BeginAnimationPhaseSix(void)
+void TutorialOtenko_BeginAnimationPhaseSix(void)
 {
     struct ActorAnimController *g = (struct ActorAnimController *)gScriptedActorController;
     u32 three = 3;
     if (g == 0) {
-        g = (struct ActorAnimController *)Actor_EnsureController(0xBB34, 0);
+        g = (struct ActorAnimController *)TutorialOtenko_EnsureController(0xBB34, 0);
         if (g == 0)
             return;
     }
@@ -800,12 +800,12 @@ void Actor_BeginAnimationPhaseSix(void)
     }
 }
 
-void Actor_BeginAnimationPhaseSeven(void)
+void TutorialOtenko_BeginAnimationPhaseSeven(void)
 {
     struct ActorAnimController *g = (struct ActorAnimController *)gScriptedActorController;
     u32 three = 3;
     if (g == 0) {
-        g = (struct ActorAnimController *)Actor_EnsureController(0xBB34, 0);
+        g = (struct ActorAnimController *)TutorialOtenko_EnsureController(0xBB34, 0);
         if (g == 0)
             return;
     }
@@ -822,12 +822,12 @@ void Actor_BeginAnimationPhaseSeven(void)
     }
 }
 
-void Actor_BeginAnimationPhaseEight(void)
+void TutorialOtenko_BeginAnimationPhaseEight(void)
 {
     struct ActorAnimController *g = (struct ActorAnimController *)gScriptedActorController;
     u32 three = 3;
     if (g == 0) {
-        g = (struct ActorAnimController *)Actor_EnsureController(0xBB34, 0);
+        g = (struct ActorAnimController *)TutorialOtenko_EnsureController(0xBB34, 0);
         if (g == 0)
             return;
     }
@@ -860,7 +860,7 @@ s32 Script_GetValue(void);
 
 s32 Script_GetKeywordValue(s32, s32);
 
-void Actor_BeginScriptedAnimationPhaseNine(void)
+void TutorialOtenko_BeginScriptedAnimationPhaseNine(void)
 {
     struct ActorAnimController *g = (struct ActorAnimController *)gScriptedActorController;
     if (g == 0)
@@ -899,7 +899,7 @@ void sub_081E4B0C(u32 phase)
     struct G *g = (struct G *)gScriptedActorController;
     u32 three = 3;
     if (g == 0) {
-        g = (struct G *)Actor_EnsureController(0xBB34, 0);
+        g = (struct G *)TutorialOtenko_EnsureController(0xBB34, 0);
         if (g == 0)
             return;
     }
@@ -941,7 +941,7 @@ void sub_081E4BD4(void)
     struct ActorAnimController *g = (struct ActorAnimController *)gScriptedActorController;
     u32 three = 3;
     if (g == 0) {
-        g = (struct ActorAnimController *)Actor_EnsureController(0xBB34, 0);
+        g = (struct ActorAnimController *)TutorialOtenko_EnsureController(0xBB34, 0);
         if (g == 0)
             return;
     }
@@ -967,7 +967,7 @@ void sub_081E4C74(void)
     struct ActorAnimController *g = (struct ActorAnimController *)gScriptedActorController;
     u32 three = 3;
     if (g == 0) {
-        g = (struct ActorAnimController *)Actor_EnsureController(0xBB34, 0);
+        g = (struct ActorAnimController *)TutorialOtenko_EnsureController(0xBB34, 0);
         if (g == 0)
             return;
     }
@@ -993,7 +993,7 @@ void sub_081E4D14(void)
     struct ActorAnimController *g = (struct ActorAnimController *)gScriptedActorController;
     u32 three = 3;
     if (g == 0) {
-        g = (struct ActorAnimController *)Actor_EnsureController(0xBB34, 0);
+        g = (struct ActorAnimController *)TutorialOtenko_EnsureController(0xBB34, 0);
         if (g == 0)
             return;
     }
@@ -1014,11 +1014,11 @@ void sub_081E4D14(void)
 
 #define OWNER_V(o) (*(u16 *)(*(u8 *volatile *)((u8 *)g + 0x18) + (o)))
 
-void Actor_BeginCurveToPosition(void)
+void TutorialOtenko_BeginCurveToPosition(void)
 {
     struct ActorAnimController *g = (struct ActorAnimController *)gScriptedActorController;
     if (g == 0) {
-        g = (struct ActorAnimController *)Actor_EnsureController(0xBB34, 0);
+        g = (struct ActorAnimController *)TutorialOtenko_EnsureController(0xBB34, 0);
         if (g == 0)
             return;
     }
@@ -1051,19 +1051,19 @@ void Actor_BeginCurveToPosition(void)
 
 /* Script command: configure the singleton animation controller. */
 
-void Actor_BeginCurveToRest(void)
+void TutorialOtenko_BeginCurveToRest(void)
 {
     struct ActorAnimController *g = (struct ActorAnimController *)gScriptedActorController;
     u32 three = 2;
     if (g == 0) {
-        g = (struct ActorAnimController *)Actor_EnsureController(0xBB34, 0);
+        g = (struct ActorAnimController *)TutorialOtenko_EnsureController(0xBB34, 0);
         if (g == 0)
             return;
     }
     H(0xf8a) = Script_GetValue();
     B(0xf77) = Script_GetKeywordValue(0x75, 0);
     W(0xf50) = Script_GetKeywordValue(0x70, 0);
-    Actor_ProjectAndClampToScreen(g);
+    TutorialOtenko_ProjectAndClampToScreen(g);
     g->oldMode = g->mode;
     g->mode = three;
     *(u16 *)((u8 *)g + 0xF5A) = (*(u16 *)((u8 *)g + 0xF5A) & 0xF) | 0x80;
@@ -1079,11 +1079,11 @@ void Actor_BeginCurveToRest(void)
 
 /* Script command: configure the singleton animation controller. */
 
-void Actor_BeginScriptedCurve(void)
+void TutorialOtenko_BeginScriptedCurve(void)
 {
     struct ActorAnimController *g = (struct ActorAnimController *)gScriptedActorController;
     if (g == 0) {
-        g = (struct ActorAnimController *)Actor_EnsureController(0xBB34, 0);
+        g = (struct ActorAnimController *)TutorialOtenko_EnsureController(0xBB34, 0);
         if (g == 0)
             return;
     }
@@ -1100,11 +1100,11 @@ void Actor_BeginScriptedCurve(void)
 
 /* Script command: configure the singleton animation controller. */
 
-void Actor_SetFacingAndIdle(void)
+void TutorialOtenko_SetFacingAndIdle(void)
 {
     struct ActorAnimController *g = (struct ActorAnimController *)gScriptedActorController;
     if (g == 0) {
-        g = (struct ActorAnimController *)Actor_EnsureController(0xBB34, 0);
+        g = (struct ActorAnimController *)TutorialOtenko_EnsureController(0xBB34, 0);
         if (g == 0)
             return;
     }
@@ -1125,12 +1125,12 @@ void Actor_SetFacingAndIdle(void)
     Actor_SetState(g, 2, 0);
 }
 
-void Actor_BeginFadeAnimation(void)
+void TutorialOtenko_BeginFadeAnimation(void)
 {
     struct ActorAnimController *g = (struct ActorAnimController *)gScriptedActorController;
     u32 three = 2;
     if (g == 0) {
-        g = (struct ActorAnimController *)Actor_EnsureController(0xBB34, 0);
+        g = (struct ActorAnimController *)TutorialOtenko_EnsureController(0xBB34, 0);
         if (g == 0)
             return;
     }
@@ -1149,12 +1149,12 @@ void Actor_BeginFadeAnimation(void)
     *(u32 *)((u8 *)g + 0xf54) = Script_GetKeywordValue(0x70, 0);
 }
 
-void Actor_BeginReverseFadeAnimation(void)
+void TutorialOtenko_BeginReverseFadeAnimation(void)
 {
     struct ActorAnimController *g = (struct ActorAnimController *)gScriptedActorController;
     u32 three = 2;
     if (g == 0) {
-        g = (struct ActorAnimController *)Actor_EnsureController(0xBB34, 0);
+        g = (struct ActorAnimController *)TutorialOtenko_EnsureController(0xBB34, 0);
         if (g == 0)
             return;
     }
@@ -1173,12 +1173,12 @@ void Actor_BeginReverseFadeAnimation(void)
     *(u32 *)((u8 *)g + 0xf54) = Script_GetKeywordValue(0x70, 0);
 }
 
-void Actor_BeginHide(void)
+void TutorialOtenko_BeginHide(void)
 {
     struct ActorAnimController *g = (struct ActorAnimController *)gScriptedActorController;
     u32 three = 2;
     if (g == 0) {
-        g = (struct ActorAnimController *)Actor_EnsureController(0xBB34, 0);
+        g = (struct ActorAnimController *)TutorialOtenko_EnsureController(0xBB34, 0);
         if (g == 0)
             return;
     }
@@ -1197,11 +1197,11 @@ void Actor_BeginHide(void)
 
 /* Script command: configure the singleton animation controller. */
 
-void Actor_BeginPositionedEffect(void)
+void TutorialOtenko_BeginPositionedEffect(void)
 {
     struct ActorAnimController *g = (struct ActorAnimController *)gScriptedActorController;
     if (g == 0) {
-        g = (struct ActorAnimController *)Actor_EnsureController(0xBB34, 0);
+        g = (struct ActorAnimController *)TutorialOtenko_EnsureController(0xBB34, 0);
         if (g == 0)
             return;
     }
@@ -1226,12 +1226,12 @@ void Actor_BeginPositionedEffect(void)
     Actor_SetState(g, 2, 14);
 }
 
-void Actor_BeginRadialBurst(void)
+void TutorialOtenko_BeginRadialBurst(void)
 {
     struct ActorAnimController *g = (struct ActorAnimController *)gScriptedActorController;
     u32 three = 2;
     if (g == 0) {
-        g = (struct ActorAnimController *)Actor_EnsureController(0xBB34, 0);
+        g = (struct ActorAnimController *)TutorialOtenko_EnsureController(0xBB34, 0);
         if (g == 0)
             return;
     }
@@ -1248,42 +1248,42 @@ void Actor_BeginRadialBurst(void)
     }
 }
 
-u8 *Actor_EnsureController(u32, u32);
+u8 *TutorialOtenko_EnsureController(u32, u32);
 
-u8 Actor_GetFacingDirection(void)
+u8 TutorialOtenko_GetFacingDirection(void)
 {
     u8 *p = gScriptedActorController;
     if (p == 0) {
-        p = Actor_EnsureController(0xBB34, 0);
+        p = TutorialOtenko_EnsureController(0xBB34, 0);
         if (p == 0)
             return 0;
     }
     return p[0xF68];
 }
 
-void Actor_SetSpritePriorityFromScript(void)
+void TutorialOtenko_SetSpritePriorityFromScript(void)
 {
     u8 *p = gScriptedActorController;
     if (p == 0) {
-        p = Actor_EnsureController(0xBB34, 0);
+        p = TutorialOtenko_EnsureController(0xBB34, 0);
         if (p == 0)
             return;
     }
     p[0xDE3] = Script_GetKeywordValue(0x70, 0);
 }
 
-void Actor_SetPreviousAnimationStateFromScript(void)
+void TutorialOtenko_SetPreviousAnimationStateFromScript(void)
 {
     u8 *p = gScriptedActorController;
     if (p == 0) {
-        p = Actor_EnsureController(0xBB34, 0);
+        p = TutorialOtenko_EnsureController(0xBB34, 0);
         if (p == 0)
             return;
     }
     p[0xF6C] = Script_GetKeywordValue(0x72, 0);
 }
 
-void Actor_OnControllerIdle(void *controller, void *child)
+void TutorialOtenko_OnControllerIdle(void *controller, void *child)
 {
 }
 
@@ -1301,18 +1301,18 @@ static inline u8 child_take(struct ActorChildSlot *c)
     return 0;
 }
 
-void Actor_OnInteractionChildUpdate(struct ActorAnimController *input, struct ActorChildSlot *child)
+void TutorialOtenko_OnInteractionChildUpdate(struct ActorAnimController *input, struct ActorChildSlot *child)
 {
     struct ActorChildSlot *c = child;
     struct ActorAnimController *p = input;
     if (child_take(c))
         c->flags &= ~1;
-    Actor_TryInteraction(p, c);
+    TutorialOtenko_TryInteraction(p, c);
 }
 
 /* Tentative role: Wait through a child-triggered delay, then enter mode 2 / phase 4. */
 
-void Actor_OnInteractionChildDelay(struct ActorAnimController *input, struct ActorChildSlot *child)
+void TutorialOtenko_OnInteractionChildDelay(struct ActorAnimController *input, struct ActorChildSlot *child)
 {
     struct ActorChildSlot *c = child;
     struct ActorAnimController *p = input;
@@ -1334,7 +1334,7 @@ void Actor_OnInteractionChildDelay(struct ActorAnimController *input, struct Act
 
 /* Tentative role: Release the owner effect and reset this child callback. */
 
-void Actor_OnInteractionChildRelease(struct ActorAnimController *input,
+void TutorialOtenko_OnInteractionChildRelease(struct ActorAnimController *input,
                                      struct ActorChildSlot *child)
 {
     struct ActorChildSlot *c = child;
@@ -1347,7 +1347,7 @@ void Actor_OnInteractionChildRelease(struct ActorAnimController *input,
             Script_Call(h, 0);
         }
         {
-            void (*fn)(void *, void *) = Actor_OnInteractionChildUpdate;
+            void (*fn)(void *, void *) = TutorialOtenko_OnInteractionChildUpdate;
             s32 mask;
             c->fn = fn;
             mask = 1;
@@ -1359,7 +1359,7 @@ void Actor_OnInteractionChildRelease(struct ActorAnimController *input,
 
 /* Tentative role: Select a child sprite effect and clear its hidden flag. */
 
-void Actor_OnEffectChildPaletteInit(struct ActorAnimController *p, struct ActorChildSlot *c)
+void TutorialOtenko_OnEffectChildPaletteInit(struct ActorAnimController *p, struct ActorChildSlot *c)
 {
     if (child_take(c)) {
         AnimData_SelectPaletteBank(c->sprite, c->effect + 2);
@@ -1431,7 +1431,7 @@ static inline u32 frame_factor(u16 v)
     return mask;
 }
 
-void Actor_UpdateRotatingAnimation(struct ActorAnimController *p)
+void TutorialOtenko_UpdateRotatingAnimation(struct ActorAnimController *p)
 {
     struct ActorSprite *o;
     struct ActorAnim *a;
@@ -1506,7 +1506,7 @@ void Actor_UpdateRotatingAnimation(struct ActorAnimController *p)
 /* Tentative role: initialize and advance an animation with a previous-state callback.
  * Cleanup: local flag, flip-mask, frame-factor and timer register hints. */
 
-void Actor_UpdateAppearanceAnimation(struct ActorAnimController *p)
+void TutorialOtenko_UpdateAppearanceAnimation(struct ActorAnimController *p)
 {
     struct ActorSprite *o;
     struct ActorAnim *a;
@@ -1524,7 +1524,7 @@ void Actor_UpdateAppearanceAnimation(struct ActorAnimController *p)
         (*(u16 *)&p->obj.y) += 160;
         *(u16 *)((u8 *)p + 0xee2) = (*(u16 *)&p->obj.y);
         Sound_PlaySong(286);
-        Actor_SetInteractionControlFlag(p);
+        TutorialOtenko_SetInteractionControlFlag(p);
         AnimData_SelectPaletteBank(p->effect, 343);
     }
     o = &p->obj;
@@ -1613,7 +1613,7 @@ void Actor_UpdateAppearanceAnimation(struct ActorAnimController *p)
 /* Tentative role: initialize and advance an animation with a previous-state callback.
  * Cleanup: local flag, flip-mask, frame-factor and timer register hints. */
 
-void Actor_UpdateCompactEntryAnimation(struct ActorAnimController *p)
+void TutorialOtenko_UpdateCompactEntryAnimation(struct ActorAnimController *p)
 {
     struct ActorSprite *o;
     struct ActorAnim *a;
@@ -1635,7 +1635,7 @@ void Actor_UpdateCompactEntryAnimation(struct ActorAnimController *p)
         p->obj.scaleX = 64;
         ActorShadow_Disable(p->p2);
         Sound_PlaySong(286);
-        Actor_SetInteractionControlFlag(p);
+        TutorialOtenko_SetInteractionControlFlag(p);
         AnimData_SelectPaletteBank(p->effect, 343);
     }
     o = &p->obj;
@@ -1714,7 +1714,7 @@ void Actor_UpdateCompactEntryAnimation(struct ActorAnimController *p)
 /* Tentative role: initialize and advance an animation with a previous-state callback.
  * Cleanup: local flag, flip-mask, frame-factor and timer register hints. */
 
-void Actor_UpdateProjectedEntryAnimation(struct ActorAnimController *p)
+void TutorialOtenko_UpdateProjectedEntryAnimation(struct ActorAnimController *p)
 {
     struct ActorSprite *o;
     struct ActorAnim *a;
@@ -1734,12 +1734,12 @@ void Actor_UpdateProjectedEntryAnimation(struct ActorAnimController *p)
         p->obj.flags &= ~1;
         p->obj.scaleY = 64;
         p->obj.scaleX = 64;
-        Actor_ProjectAndClampToScreen(p);
+        TutorialOtenko_ProjectAndClampToScreen(p);
         (*(u16 *)&p->obj.y) += 8;
         *(u16 *)((u8 *)p + 0xee2) = (*(u16 *)&p->obj.y);
         ActorShadow_Disable(p->p2);
         Sound_PlaySong(286);
-        Actor_SetInteractionControlFlag(p);
+        TutorialOtenko_SetInteractionControlFlag(p);
         AnimData_SelectPaletteBank(p->effect, 343);
     }
     o = &p->obj;
@@ -1819,7 +1819,7 @@ void Actor_UpdateProjectedEntryAnimation(struct ActorAnimController *p)
 /* Tentative role: initialize and advance an animation with a previous-state callback.
  * Cleanup: local flag, flip-mask, frame-factor and timer register hints. */
 
-void Actor_UpdateSilentProjectedEntryAnimation(struct ActorAnimController *p)
+void TutorialOtenko_UpdateSilentProjectedEntryAnimation(struct ActorAnimController *p)
 {
     struct ActorSprite *o;
     struct ActorAnim *a;
@@ -1839,11 +1839,11 @@ void Actor_UpdateSilentProjectedEntryAnimation(struct ActorAnimController *p)
         p->obj.flags &= ~1;
         p->obj.scaleY = 64;
         p->obj.scaleX = 64;
-        Actor_ProjectAndClampToScreen(p);
+        TutorialOtenko_ProjectAndClampToScreen(p);
         (*(u16 *)&p->obj.y) += 8;
         *(u16 *)((u8 *)p + 0xee2) = (*(u16 *)&p->obj.y);
         ActorShadow_Disable(p->p2);
-        Actor_SetInteractionControlFlag(p);
+        TutorialOtenko_SetInteractionControlFlag(p);
         AnimData_SelectPaletteBank(p->effect, 343);
     }
     o = &p->obj;
@@ -1923,7 +1923,7 @@ void Actor_UpdateSilentProjectedEntryAnimation(struct ActorAnimController *p)
 /* Tentative role: initialize and advance an animation with a previous-state callback.
  * Cleanup: local flag, flip-mask, frame-factor and timer register hints. */
 
-void Actor_UpdateShadowedRestAnimation(struct ActorAnimController *p)
+void TutorialOtenko_UpdateShadowedRestAnimation(struct ActorAnimController *p)
 {
     struct ActorSprite *o;
     struct ActorAnim *a;
@@ -1940,7 +1940,7 @@ void Actor_UpdateShadowedRestAnimation(struct ActorAnimController *p)
         (*(u16 *)&p->obj.y) += 160;
         *(u16 *)((u8 *)p + 0xee2) = (*(u16 *)&p->obj.y);
         ActorShadow_Enable(p->p2);
-        Actor_SetInteractionControlFlag(p);
+        TutorialOtenko_SetInteractionControlFlag(p);
         AnimData_SelectPaletteBank(p->effect, 343);
         p->phase = 0;
         if (p->oldMode == 3 && p->mode == 3) {
@@ -2027,7 +2027,7 @@ void Actor_UpdateShadowedRestAnimation(struct ActorAnimController *p)
 /* Tentative role: initialize and advance an animation with a previous-state callback.
  * Cleanup: local flag, flip-mask, frame-factor and timer register hints. */
 
-void Actor_UpdateLargeRestAnimation(struct ActorAnimController *p)
+void TutorialOtenko_UpdateLargeRestAnimation(struct ActorAnimController *p)
 {
     struct ActorSprite *o;
     struct ActorAnim *a;
@@ -2041,7 +2041,7 @@ void Actor_UpdateLargeRestAnimation(struct ActorAnimController *p)
         p->obj.scaleY = 127;
         p->obj.scaleX = 127;
         ActorShadow_Disable(p->p2);
-        Actor_SetInteractionControlFlag(p);
+        TutorialOtenko_SetInteractionControlFlag(p);
         AnimData_SelectPaletteBank(p->effect, 343);
         p->phase = 0;
         if (p->oldMode == 3 && p->mode == 3) {
@@ -2128,7 +2128,7 @@ void Actor_UpdateLargeRestAnimation(struct ActorAnimController *p)
 /* Tentative role: initialize and advance an animation with a previous-state callback.
  * Cleanup: local flag, flip-mask, frame-factor and timer register hints. */
 
-void Actor_HideAndResetChildren(struct ActorAnimController *p)
+void TutorialOtenko_HideAndResetChildren(struct ActorAnimController *p)
 {
     struct ActorSprite *o;
     struct ActorAnim *a;
@@ -2143,7 +2143,7 @@ void Actor_HideAndResetChildren(struct ActorAnimController *p)
         Actor_SetState(p, 1, 2);
         {
             u32 active = 4;
-            void (*fn)(void *, void *) = Actor_OnInteractionChildUpdate;
+            void (*fn)(void *, void *) = TutorialOtenko_OnInteractionChildUpdate;
             u32 reset = 1;
             struct ActorChildCallbackView *child =
                 (struct ActorChildCallbackView *)((u8 *)p + 0xc8);
@@ -2161,7 +2161,7 @@ void Actor_HideAndResetChildren(struct ActorAnimController *p)
     }
 }
 
-// Provisional name: Actor_MoveAlongCurveToRest
+// Provisional name: TutorialOtenko_MoveAlongCurveToRest
 
 /* Tentative role: initialize and advance an animation with a previous-state callback.
  * Cleanup: local flag, flip-mask, frame-factor and timer register hints. */
@@ -2191,7 +2191,7 @@ static inline void set_direction(s16 angle, u8 *directionOut, u8 *flipOut)
     }
 }
 
-void Actor_MoveAlongCurveToRest(struct ActorAnimController *p)
+void TutorialOtenko_MoveAlongCurveToRest(struct ActorAnimController *p)
 {
     struct ActorSprite *o;
     struct ActorAnim *a;
@@ -2206,7 +2206,7 @@ void Actor_MoveAlongCurveToRest(struct ActorAnimController *p)
         p->bend = (p->variant & 1) ? 1 : -1;
         ActorShadow_Disable(p->p2);
         if (*((u8 *)p + 0xf6f) && p->obj.scaleX != 127 && (p->obj.flags & 16))
-            p->scaleFn = Actor_UpdateScaleGrowth;
+            p->scaleFn = TutorialOtenko_UpdateScaleGrowth;
         if (!*((u8 *)p + 0xf77)) {
             p->targetX = 25;
             p->targetY = 102;
@@ -2308,12 +2308,12 @@ void Actor_MoveAlongCurveToRest(struct ActorAnimController *p)
     }
 }
 
-// Provisional name: Actor_MoveAlongScriptedCurve
+// Provisional name: TutorialOtenko_MoveAlongScriptedCurve
 
 /* Tentative role: initialize and advance an animation with a previous-state callback.
  * Cleanup: local flag, flip-mask, frame-factor and timer register hints. */
 
-void Actor_MoveAlongScriptedCurve(struct ActorAnimController *p)
+void TutorialOtenko_MoveAlongScriptedCurve(struct ActorAnimController *p)
 {
     struct ActorSprite *o;
     struct ActorAnim *a;
@@ -2330,7 +2330,7 @@ void Actor_MoveAlongScriptedCurve(struct ActorAnimController *p)
         p->bend = (p->variant & 1) ? 1 : -1;
         ActorShadow_Disable(p->p2);
         if (p->obj.scaleX != 127 && (p->obj.flags & 16))
-            p->scaleFn = Actor_UpdateScaleGrowth;
+            p->scaleFn = TutorialOtenko_UpdateScaleGrowth;
     }
     p->heading = Math_Atan2(p->targetX - p->obj.x, p->targetY - p->obj.y);
     o = &p->obj;
@@ -2464,7 +2464,7 @@ static inline void FinishApproach(struct ActorAnimController *p)
 }
 
 /* Advance the sprite toward its scripted position and settle into its final facing. */
-void Actor_MoveTowardTarget(struct ActorAnimController *p)
+void TutorialOtenko_MoveTowardTarget(struct ActorAnimController *p)
 {
     s32 dx, dz, adx, adz;
 
@@ -2548,7 +2548,7 @@ void Actor_MoveTowardTarget(struct ActorAnimController *p)
 /* Tentative role: initialize and advance an animation with a previous-state callback.
  * Cleanup: local flag, flip-mask, frame-factor and timer register hints. */
 
-void Actor_UpdateFadeAnimation(struct ActorAnimController *p)
+void TutorialOtenko_UpdateFadeAnimation(struct ActorAnimController *p)
 {
     struct ActorSprite *o;
     struct ActorAnim *a;
@@ -2559,7 +2559,7 @@ void Actor_UpdateFadeAnimation(struct ActorAnimController *p)
         p->state = 11;
         Anim_SetSequence(&p->anim, p->arg, 11, 0, 0);
         ActorShadow_Enable(p->p2);
-        p->previous = ActorPalette_BeginFade;
+        p->previous = TutorialOtenkoPalette_BeginFade;
     }
     if (p->previous)
         p->previous(p);
@@ -2631,7 +2631,7 @@ void Actor_UpdateFadeAnimation(struct ActorAnimController *p)
 /* Tentative role: initialize and advance an animation with a previous-state callback.
  * Cleanup: local flag, flip-mask, frame-factor and timer register hints. */
 
-void Actor_UpdateReverseFadeAnimation(struct ActorAnimController *p)
+void TutorialOtenko_UpdateReverseFadeAnimation(struct ActorAnimController *p)
 {
     struct ActorSprite *o;
     struct ActorAnim *a;
@@ -2642,7 +2642,7 @@ void Actor_UpdateReverseFadeAnimation(struct ActorAnimController *p)
         p->state = 19;
         Anim_SetSequence(&p->anim, p->arg, 19, 0, 0);
         ActorShadow_Enable(p->p2);
-        p->previous = ActorPalette_BeginReverseFade;
+        p->previous = TutorialOtenkoPalette_BeginReverseFade;
     }
     if (p->previous)
         p->previous(p);
@@ -2712,7 +2712,7 @@ void Actor_UpdateReverseFadeAnimation(struct ActorAnimController *p)
 /* Tentative role: initialize and advance an animation with a previous-state callback.
  * Cleanup: local flag, flip-mask, frame-factor and timer register hints. */
 
-void Actor_UpdateNotifyingAnimation(struct ActorAnimController *p)
+void TutorialOtenko_UpdateNotifyingAnimation(struct ActorAnimController *p)
 {
     struct ActorSprite *o;
     struct ActorAnim *a;
@@ -2801,7 +2801,7 @@ void Actor_UpdateNotifyingAnimation(struct ActorAnimController *p)
 /* Tentative role: initialize and advance an animation with a previous-state callback.
  * Cleanup: local flag, flip-mask, frame-factor and timer register hints. */
 
-void Actor_InitPaletteEffectPose(struct ActorAnimController *p)
+void TutorialOtenko_InitPaletteEffectPose(struct ActorAnimController *p)
 {
     struct ActorSprite *o;
     struct ActorAnim *a;
@@ -2881,12 +2881,12 @@ void Actor_InitPaletteEffectPose(struct ActorAnimController *p)
 
 s32 Mod(s32, s32);
 
-void AnimatedParticles_EmitBurst(void *, s32, s32, s32, s32, s32, s32, s32);
+void ImpactBurst_EmitBurst(void *, s32, s32, s32, s32, s32, s32, s32);
 
 void sub_080148CC(s32, s32, void *, s32, s32, s32, s32, s32, s32, s32, s32);
 
 // MATCHING_CONCESSION: register-pinning
-void Actor_UpdateBlinkBurstDisappearance(struct ActorAnimController *p)
+void TutorialOtenko_UpdateBlinkBurstDisappearance(struct ActorAnimController *p)
 {
     struct ActorSprite *o;
     struct ActorAnim *a;
@@ -2968,10 +2968,10 @@ void Actor_UpdateBlinkBurstDisappearance(struct ActorAnimController *p)
             p->obj.flags |= 1;
         if (--*(u16 *)((u8 *)p + 0xf82) == 0) {
             s32 duration = 10;
-            AnimatedParticles_EmitBurst((u8 *)p + 0xdf8, 1, 512, 48, 8, 8, 8, 4);
-            AnimatedParticles_EmitBurst((u8 *)p + 0xdf8, 1, 512, 48, 8, 8, 8, 4);
-            AnimatedParticles_EmitBurst((u8 *)p + 0xdf8, 1, 512, 48, 8, 8, 8, 4);
-            AnimatedParticles_EmitBurst((u8 *)p + 0xdf8, 1, 512, 48, 8, 8, 8, 4);
+            ImpactBurst_EmitBurst((u8 *)p + 0xdf8, 1, 512, 48, 8, 8, 8, 4);
+            ImpactBurst_EmitBurst((u8 *)p + 0xdf8, 1, 512, 48, 8, 8, 8, 4);
+            ImpactBurst_EmitBurst((u8 *)p + 0xdf8, 1, 512, 48, 8, 8, 8, 4);
+            ImpactBurst_EmitBurst((u8 *)p + 0xdf8, 1, 512, 48, 8, 8, 8, 4);
             sub_080148CC(1, 3, (u8 *)p + 0xdf8, 32, 60, duration, 3, duration, 5, 60, duration);
             sub_080148CC(1, 3, (u8 *)p + 0xdf8, 64, 60, duration, 3, duration, 5, 60, duration);
             sub_080148CC(1, 3, (u8 *)p + 0xdf8, 96, 60, duration, 3, duration, 5, 60, duration);
@@ -2985,7 +2985,7 @@ void Actor_UpdateBlinkBurstDisappearance(struct ActorAnimController *p)
             Actor_SetState(p, 1, 2);
             {
                 u32 active = 4;
-                register void (*fn)(void *, void *) = Actor_OnInteractionChildUpdate;
+                register void (*fn)(void *, void *) = TutorialOtenko_OnInteractionChildUpdate;
                 u32 reset = 1;
                 struct ActorChildCallbackView *child =
                     (struct ActorChildCallbackView
@@ -3018,7 +3018,7 @@ void sub_081E8370(void)
 /* Tentative role: initialize and advance a rotating animated effect.
  * Cleanup: local flag, flip-mask, frame-factor and timer register hints. */
 
-void Actor_UpdateRotatingAnimation2(struct ActorAnimController *p)
+void TutorialOtenko_UpdateRotatingAnimation2(struct ActorAnimController *p)
 {
     struct ActorSprite *o;
     struct ActorAnim *a;
@@ -3028,9 +3028,9 @@ void Actor_UpdateRotatingAnimation2(struct ActorAnimController *p)
     if (take(p)) {
         p->state = 2;
         Anim_SetSequence(&p->anim, p->arg, 2, 0, p->last);
-        Actor_RestoreSavedAnimationPlayback(p);
+        TutorialOtenko_RestoreSavedAnimationPlayback(p);
         ActorShadow_Disable(p->p2);
-        Actor_ArmRestIdleTransition(p);
+        TutorialOtenko_ArmRestIdleTransition(p);
     }
     if (p->fn)
         p->fn(p);
@@ -3104,7 +3104,7 @@ void Actor_UpdateRotatingAnimation2(struct ActorAnimController *p)
 /* Tentative role: initialize and advance a rotating animated effect.
  * Cleanup: local flag, flip-mask, frame-factor and timer register hints. */
 
-void Actor_UpdateRotatingAnimation3(struct ActorAnimController *p)
+void TutorialOtenko_UpdateRotatingAnimation3(struct ActorAnimController *p)
 {
     struct ActorSprite *o;
     struct ActorAnim *a;
@@ -3114,9 +3114,9 @@ void Actor_UpdateRotatingAnimation3(struct ActorAnimController *p)
     if (take(p)) {
         p->state = 3;
         Anim_SetSequence(&p->anim, p->arg, 3, 0, p->last);
-        Actor_RestoreSavedAnimationPlayback(p);
+        TutorialOtenko_RestoreSavedAnimationPlayback(p);
         ActorShadow_Disable(p->p2);
-        Actor_ArmRestIdleTransition(p);
+        TutorialOtenko_ArmRestIdleTransition(p);
     }
     if (p->fn)
         p->fn(p);
@@ -3190,7 +3190,7 @@ void Actor_UpdateRotatingAnimation3(struct ActorAnimController *p)
 /* Tentative role: initialize and advance a rotating animated effect.
  * Cleanup: local flag, flip-mask, frame-factor and timer register hints. */
 
-void Actor_UpdateRotatingAnimation4(struct ActorAnimController *p)
+void TutorialOtenko_UpdateRotatingAnimation4(struct ActorAnimController *p)
 {
     struct ActorSprite *o;
     struct ActorAnim *a;
@@ -3200,9 +3200,9 @@ void Actor_UpdateRotatingAnimation4(struct ActorAnimController *p)
     if (take(p)) {
         p->state = 4;
         Anim_SetSequence(&p->anim, p->arg, 4, 0, p->last);
-        Actor_RestoreSavedAnimationPlayback(p);
+        TutorialOtenko_RestoreSavedAnimationPlayback(p);
         ActorShadow_Disable(p->p2);
-        Actor_ArmRestIdleTransition(p);
+        TutorialOtenko_ArmRestIdleTransition(p);
     }
     if (p->fn)
         p->fn(p);
@@ -3276,7 +3276,7 @@ void Actor_UpdateRotatingAnimation4(struct ActorAnimController *p)
 /* Tentative role: initialize and advance a rotating animated effect.
  * Cleanup: local flag, flip-mask, frame-factor and timer register hints. */
 
-void Actor_UpdateRotatingAnimation5(struct ActorAnimController *p)
+void TutorialOtenko_UpdateRotatingAnimation5(struct ActorAnimController *p)
 {
     struct ActorSprite *o;
     struct ActorAnim *a;
@@ -3286,9 +3286,9 @@ void Actor_UpdateRotatingAnimation5(struct ActorAnimController *p)
     if (take(p)) {
         p->state = 5;
         Anim_SetSequence(&p->anim, p->arg, 5, 0, p->last);
-        Actor_RestoreSavedAnimationPlayback(p);
+        TutorialOtenko_RestoreSavedAnimationPlayback(p);
         ActorShadow_Disable(p->p2);
-        Actor_ArmRestIdleTransition(p);
+        TutorialOtenko_ArmRestIdleTransition(p);
     }
     if (p->fn)
         p->fn(p);
@@ -3382,7 +3382,7 @@ static inline void rotate_v2(struct ActorAnimController *p)
         (*(u16 *)&p->obj.y) += p->delta;
 }
 
-void Actor_UpdateRotatingAnimation6(struct ActorAnimController *p)
+void TutorialOtenko_UpdateRotatingAnimation6(struct ActorAnimController *p)
 {
     struct ActorSprite *o;
     struct ActorAnim *a;
@@ -3392,7 +3392,7 @@ void Actor_UpdateRotatingAnimation6(struct ActorAnimController *p)
     if (take(p)) {
         p->state = 6;
         Anim_SetSequence(&p->anim, p->arg, 6, 0, p->last);
-        Actor_RestoreSavedAnimationPlayback(p);
+        TutorialOtenko_RestoreSavedAnimationPlayback(p);
         ActorShadow_Disable(p->p2);
     }
     if (p->fn)
@@ -3467,7 +3467,7 @@ void Actor_UpdateRotatingAnimation6(struct ActorAnimController *p)
 /* Tentative role: initialize and advance a rotating animated effect.
  * Cleanup: local flag, flip-mask, frame-factor and timer register hints. */
 
-void Actor_UpdateRotatingAnimation7(struct ActorAnimController *p)
+void TutorialOtenko_UpdateRotatingAnimation7(struct ActorAnimController *p)
 {
     struct ActorSprite *o;
     struct ActorAnim *a;
@@ -3477,9 +3477,9 @@ void Actor_UpdateRotatingAnimation7(struct ActorAnimController *p)
     if (take(p)) {
         p->state = 7;
         Anim_SetSequence(&p->anim, p->arg, 7, 0, p->last);
-        Actor_RestoreSavedAnimationPlayback(p);
+        TutorialOtenko_RestoreSavedAnimationPlayback(p);
         ActorShadow_Disable(p->p2);
-        Actor_ArmRestIdleTransition(p);
+        TutorialOtenko_ArmRestIdleTransition(p);
     }
     if (p->fn)
         p->fn(p);
@@ -3553,7 +3553,7 @@ void Actor_UpdateRotatingAnimation7(struct ActorAnimController *p)
 /* Tentative role: initialize and advance a rotating animated effect.
  * Cleanup: local flag, flip-mask, frame-factor and timer register hints. */
 
-void Actor_UpdateRotatingAnimation8(struct ActorAnimController *p)
+void TutorialOtenko_UpdateRotatingAnimation8(struct ActorAnimController *p)
 {
     struct ActorSprite *o;
     struct ActorAnim *a;
@@ -3563,9 +3563,9 @@ void Actor_UpdateRotatingAnimation8(struct ActorAnimController *p)
     if (take(p)) {
         p->state = 8;
         Anim_SetSequence(&p->anim, p->arg, 8, 0, p->last);
-        Actor_RestoreSavedAnimationPlayback(p);
+        TutorialOtenko_RestoreSavedAnimationPlayback(p);
         ActorShadow_Disable(p->p2);
-        Actor_ArmRestIdleTransition(p);
+        TutorialOtenko_ArmRestIdleTransition(p);
     }
     if (p->fn)
         p->fn(p);
@@ -3639,7 +3639,7 @@ void Actor_UpdateRotatingAnimation8(struct ActorAnimController *p)
 /* Tentative role: initialize and advance a rotating animated effect.
  * Cleanup: local flag, flip-mask, frame-factor and timer register hints. */
 
-void Actor_UpdateRotatingAnimation9(struct ActorAnimController *p)
+void TutorialOtenko_UpdateRotatingAnimation9(struct ActorAnimController *p)
 {
     struct ActorSprite *o;
     struct ActorAnim *a;
@@ -3649,9 +3649,9 @@ void Actor_UpdateRotatingAnimation9(struct ActorAnimController *p)
     if (take(p)) {
         p->state = 9;
         Anim_SetSequence(&p->anim, p->arg, 9, 0, p->last);
-        Actor_RestoreSavedAnimationPlayback(p);
+        TutorialOtenko_RestoreSavedAnimationPlayback(p);
         ActorShadow_Disable(p->p2);
-        Actor_ArmRestIdleTransition(p);
+        TutorialOtenko_ArmRestIdleTransition(p);
     }
     if (p->fn)
         p->fn(p);
@@ -3726,7 +3726,7 @@ void Actor_UpdateRotatingAnimation9(struct ActorAnimController *p)
  * Cleanup: local flag, flip-mask, frame-factor and timer register hints. */
 
 // MATCHING_CONCESSION: register-pinning
-void Actor_UpdateFinishingAnimation(struct ActorAnimController *p)
+void TutorialOtenko_UpdateFinishingAnimation(struct ActorAnimController *p)
 {
     struct ActorSprite *o;
     struct ActorAnim *a;
@@ -3807,7 +3807,7 @@ void Actor_UpdateFinishingAnimation(struct ActorAnimController *p)
         Actor_SetState(p, 1, 2);
         {
             u32 active = 4;
-            register void (*fn)(void *, void *) = Actor_OnInteractionChildUpdate;
+            register void (*fn)(void *, void *) = TutorialOtenko_OnInteractionChildUpdate;
             u32 reset = 1;
             struct ActorChildCallbackView *child =
                 (struct ActorChildCallbackView
@@ -3831,7 +3831,7 @@ void Actor_UpdateFinishingAnimation(struct ActorAnimController *p)
 /* Tentative role: initialize and advance a rotating animated effect.
  * Cleanup: local flag, flip-mask, frame-factor and timer register hints. */
 
-void Actor_UpdateRotatingGrowth(struct ActorAnimController *p)
+void TutorialOtenko_UpdateRotatingGrowth(struct ActorAnimController *p)
 {
     s32 x, y;
     if (take(p))
@@ -3852,7 +3852,7 @@ void Actor_UpdateRotatingGrowth(struct ActorAnimController *p)
 /* Tentative role: initialize and advance a rotating animated effect.
  * Cleanup: local flag, flip-mask, frame-factor and timer register hints. */
 
-void Actor_UpdateRotatingShrink(struct ActorAnimController *p)
+void TutorialOtenko_UpdateRotatingShrink(struct ActorAnimController *p)
 {
     s32 x, y;
     if (take(p))
@@ -3884,7 +3884,7 @@ void sub_081E99EC(struct ActorAnimController *p)
         p->state = 11;
         Anim_SetSequence(&p->anim, p->arg, 11, 0, p->last);
         ActorShadow_Disable(p->p2);
-        p->previous = ActorPalette_BeginFade;
+        p->previous = TutorialOtenkoPalette_BeginFade;
     }
     if (p->previous)
         p->previous(p);
@@ -3993,7 +3993,7 @@ static inline u8 ActorChild_IsCurrentRegion(u32 current, u32 region)
 }
 
 /* Update child visibility for the current region, then tick active visible children. */
-void Actor_UpdateRegionChildren(struct ActorRegionController *p)
+void TutorialOtenko_UpdateRegionChildren(struct ActorRegionController *p)
 {
     s32 i;
     for (i = 0; i < 16; i++) {
@@ -4027,7 +4027,7 @@ void Actor_UpdateRegionChildren(struct ActorRegionController *p)
 
 extern void (*const gUnk_08613CF4[])(void *);
 
-void Actor_UpdateMotionPhase(struct ActorAnimController *p)
+void TutorialOtenko_UpdateMotionPhase(struct ActorAnimController *p)
 {
     p->dx = p->savedX;
     p->dy = p->savedY;
@@ -4039,7 +4039,7 @@ extern const u32 gUnk_08613D34[];
 
 void Callback_InvokeActor(u8 *, u32);
 
-void Actor_DispatchAnimationPhase(u8 *p)
+void TutorialOtenko_DispatchAnimationPhase(u8 *p)
 {
     Callback_InvokeActor(p, gUnk_08613D34[*(u16 *)(p + 0xF5A) >> 4]);
 }
@@ -4048,9 +4048,9 @@ void Actor_DispatchAnimationPhase(u8 *p)
 
 extern void (*const gUnk_08613D70[])(void *);
 
-void Actor_UpdateInteractionMode(struct ActorAnimController *p)
+void TutorialOtenko_UpdateInteractionMode(struct ActorAnimController *p)
 {
-    Actor_SelectNearestInteraction(p);
+    TutorialOtenko_SelectNearestInteraction(p);
     gUnk_08613D70[p->mode](p);
 }
 
@@ -4065,7 +4065,7 @@ s32 MessageQueue_GetMessagesById(u16, struct Entry **);
 
 void Task_Kill(void *);
 
-void Actor_CheckResourceLifetime(struct ActorAnimController *p)
+void TutorialOtenko_CheckResourceLifetime(struct ActorAnimController *p)
 {
     struct Entry *e;
     s32 n = MessageQueue_GetMessagesById(*(u16 *)((u8 *)p + 0xf8a), &e);
@@ -4079,12 +4079,12 @@ void Actor_CheckResourceLifetime(struct ActorAnimController *p)
 
 /* Tentative role: Dispatch the actor mode and auxiliary callbacks, then advance its tick counter. */
 
-s32 Actor_UpdateController(struct ActorAnimController *p)
+s32 TutorialOtenko_UpdateController(struct ActorAnimController *p)
 {
-    Actor_CheckResourceLifetime(p);
+    TutorialOtenko_CheckResourceLifetime(p);
     if (!p->mode)
         return 1;
-    Actor_UpdateInteractionMode(p);
+    TutorialOtenko_UpdateInteractionMode(p);
     if (p->scaleFn)
         p->scaleFn(p);
     if (p->otherFn)
@@ -4102,7 +4102,7 @@ s32 SceneBody_GetById(u16);
 
 void SceneBody_Unregister(void *);
 
-s32 Actor_DestroyController(struct ActorAnimController *p)
+s32 TutorialOtenko_DestroyController(struct ActorAnimController *p)
 {
     s32 i;
     u8 *c;
@@ -4183,7 +4183,7 @@ static inline void InteractionChild_Flip(struct ActorAnimController *const *owne
 }
 
 /* Configure the first available interaction marker using the current script. */
-void Actor_ConfigureInteractionChildFromScript(void)
+void TutorialOtenko_ConfigureInteractionChildFromScript(void)
 {
     struct Vec position;
     s32 byteOffset;
@@ -4200,7 +4200,7 @@ void Actor_ConfigureInteractionChildFromScript(void)
     s32 remaining;
     u32 interactionMode;
     if (!g) {
-        g = (struct ActorAnimController *)Actor_EnsureController(0xbb34, 0);
+        g = (struct ActorAnimController *)TutorialOtenko_EnsureController(0xbb34, 0);
         if (!g)
             return;
     }
@@ -4228,14 +4228,14 @@ void Actor_ConfigureInteractionChildFromScript(void)
                 case 0:
                     handler->effect = 104;
                     InteractionChild_SetMode(g, interactionMode, 1, oldMode);
-                    handler->fn = Actor_OnInteractionChildUpdate;
+                    handler->fn = TutorialOtenko_OnInteractionChildUpdate;
                     handler->control |= 1;
                     break;
                 case 1:
                     handler->control |= 8;
                     handler->effect = 104;
                     InteractionChild_SetMode(g, interactionMode, 4, oldMode);
-                    handler->fn = Actor_OnEffectChildPaletteInit;
+                    handler->fn = TutorialOtenko_OnEffectChildPaletteInit;
                     handler->control |= 1;
                     break;
                 case 2:
@@ -4243,7 +4243,7 @@ void Actor_ConfigureInteractionChildFromScript(void)
                     handler->effect = 107;
                     slot->sprite.frame = 1;
                     InteractionChild_SetMode(g, interactionMode, 1, oldMode);
-                    handler->fn = Actor_OnInteractionChildUpdate;
+                    handler->fn = TutorialOtenko_OnInteractionChildUpdate;
                     handler->control |= 1;
                     break;
             }
@@ -4339,14 +4339,14 @@ void Actor_ConfigureInteractionChildFromScript(void)
 #undef SCRIPT_CHILD_BASE
 #undef CHILD_FIELD_OFFSET
 
-// Provisional name: Actor_ConfigureFromScript
+// Provisional name: TutorialOtenko_ConfigureFromScript
 
-void Actor_ConfigureFromScript(void)
+void TutorialOtenko_ConfigureFromScript(void)
 {
     struct ActorAnimController *g = (struct ActorAnimController *)gScriptedActorController;
     struct ActorSprite *obj;
     if (!g)
-        g = (struct ActorAnimController *)Actor_EnsureController(0xbb34, 0);
+        g = (struct ActorAnimController *)TutorialOtenko_EnsureController(0xbb34, 0);
     obj = (struct ActorSprite *)((u8 *)g + 0xddc);
     AnimData_SelectPaletteBank((u8 *)g + 0xe08, 343);
     g->obj.priority = 0;
@@ -4488,7 +4488,7 @@ static inline void ActorInit_SetChildControl(void (*callback)(void *, void *),
 }
 
 /* Initialize the singleton controller, its palette banks and child sprites. */
-s32 Actor_InitializeController(void *arg0)
+s32 TutorialOtenko_InitializeController(void *arg0)
 {
     struct ActorInitController *p = arg0;
     struct ActorSprite *obj;
@@ -4542,7 +4542,7 @@ s32 Actor_InitializeController(void *arg0)
         Sprite_SetOriginStub(child, -8, -16);
         child->flags = 1;
         child->index = i;
-        ActorInit_SetChildControl(Actor_OnControllerIdle, child);
+        ActorInit_SetChildControl(TutorialOtenko_OnControllerIdle, child);
     }
     p->scaleFn = 0;
     p->otherFn = 0;
@@ -4563,7 +4563,7 @@ s32 Actor_InitializeController(void *arg0)
     return 0;
 }
 
-void Actor_RequestControllerRemoval(void)
+void TutorialOtenko_RequestControllerRemoval(void)
 {
     Task_Kill(gScriptedActorController);
 }
@@ -4574,9 +4574,9 @@ struct ActorAnimController *Task_Create(u32, u32);
 
 void Task_SetCallbacks(void *, void (*)(void *), void (*)(void *));
 
-s32 Actor_InitializeController(void *);
+s32 TutorialOtenko_InitializeController(void *);
 
-u8 *Actor_EnsureController(u32 resource, u32 unused)
+u8 *TutorialOtenko_EnsureController(u32 resource, u32 unused)
 {
     struct ActorAnimController *p;
     if (gScriptedActorController)
@@ -4584,8 +4584,8 @@ u8 *Actor_EnsureController(u32 resource, u32 unused)
     p = Task_Create(11, 0xfa4);
     if (p) {
         p->resource = resource;
-        Task_SetCallbacks(p, Actor_UpdateController, Actor_DestroyController);
-        if (Actor_InitializeController(p) < 0) {
+        Task_SetCallbacks(p, TutorialOtenko_UpdateController, TutorialOtenko_DestroyController);
+        if (TutorialOtenko_InitializeController(p) < 0) {
             Task_Kill(p);
             return 0;
         }
@@ -4663,7 +4663,7 @@ void TimeDisplay_InitBackgrounds(u8 *p)
 
 void ResourceHeader_Relocate(u8 *, void *);
 
-void Widget_InitLinked(u8 *, u8 *, u32, u32, u32, u32, u32, u32);
+void AnimSprite_InitLinked(u8 *, u8 *, u32, u32, u32, u32, u32, u32);
 
 void TimeDisplay_HideAnimatedObjects(u8 *);
 
@@ -4675,15 +4675,15 @@ void TimeDisplay_InitAnimatedObjects(u8 *s)
     u32 two;
     u32 one;
     ResourceHeader_Relocate(obj, p);
-    Widget_InitLinked(s + 0x18, obj, 1, 0x10, zero = 0, 0, 0, 0);
-    Widget_InitLinked(s + 0xA0, obj, 2, 0x10, zero, zero, zero, zero);
-    Widget_InitLinked(s + 0x128, obj, 11, 0x10, two = 2, zero, zero, zero);
-    Widget_InitLinked(s + 0x1B0, obj, 11, 0x10, two, zero, zero, zero);
-    Widget_InitLinked(s + 0x458, obj, 0, 0x10, zero, zero, zero, zero);
-    Widget_InitLinked(s + 0x238, obj, 7, 0x10, zero, zero, zero, zero);
-    Widget_InitLinked(s + 0x2C0, obj, 3, 0x10, zero, zero, zero, zero);
-    Widget_InitLinked(s + 0x348, obj, 7, 0x30, one = 1, zero, zero, zero);
-    Widget_InitLinked(s + 0x3D0, obj, 3, 0x30, one, zero, zero, zero);
+    AnimSprite_InitLinked(s + 0x18, obj, 1, 0x10, zero = 0, 0, 0, 0);
+    AnimSprite_InitLinked(s + 0xA0, obj, 2, 0x10, zero, zero, zero, zero);
+    AnimSprite_InitLinked(s + 0x128, obj, 11, 0x10, two = 2, zero, zero, zero);
+    AnimSprite_InitLinked(s + 0x1B0, obj, 11, 0x10, two, zero, zero, zero);
+    AnimSprite_InitLinked(s + 0x458, obj, 0, 0x10, zero, zero, zero, zero);
+    AnimSprite_InitLinked(s + 0x238, obj, 7, 0x10, zero, zero, zero, zero);
+    AnimSprite_InitLinked(s + 0x2C0, obj, 3, 0x10, zero, zero, zero, zero);
+    AnimSprite_InitLinked(s + 0x348, obj, 7, 0x30, one = 1, zero, zero, zero);
+    AnimSprite_InitLinked(s + 0x3D0, obj, 3, 0x30, one, zero, zero, zero);
     TimeDisplay_HideAnimatedObjects(s);
 }
 
@@ -4735,7 +4735,7 @@ struct Obj {
     u32 a, b, flags;
 };
 
-void Actor_HideAuxiliarySprites(u8 *p)
+void TutorialOtenko_HideAuxiliarySprites(u8 *p)
 {
     ((struct Obj *)(p + 0x238))->flags &= ~1;
     ((struct Obj *)(p + 0x2c0))->flags &= ~1;
@@ -4749,7 +4749,7 @@ extern u8 gUnk_0824FDC8[];
 
 void memcpy(void *, const void *, u32);
 
-void Actor_UpdatePairedSpriteAnimation(u8 *p)
+void TutorialOtenko_UpdatePairedSpriteAnimation(u8 *p)
 {
     u8 frames[4][2];
     if (Mod(++*(s32 *)(p + 0x744), 10) == 0) {

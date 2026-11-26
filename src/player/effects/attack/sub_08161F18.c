@@ -9,7 +9,7 @@ struct Vec {
 extern const s16 gUnk_086149C4[];
 s32 Mod(s32, s32);
 s32 Div(s32, s32);
-void sub_081606C0(u8 *, struct Vec *, s32, void *, s32, s32);
+void PlayerAttackEffect_AllocateParticle(u8 *, struct Vec *, s32, void *, s32, s32);
 #define W(n) (*(u32 *)(p + (n)))
 #define I(n) (*(s32 *)(p + (n)))
 #define P(n) (*(u8 **)(p + (n)))
@@ -57,7 +57,7 @@ s32 PlayerAttackEffect_EmitPaletteFourTrail(u8 *p)
         a.x = D(0x20) + shift12(I(0xC0) * SIN(angle + 64));
         a.y = D(0x22) + 200;
         a.z = D(0x24) + shift12(I(0xC0) * gUnk_086149C4[angle]);
-        sub_081606C0(p, &a, 5, p + 0xA4, 4, 1);
+        PlayerAttackEffect_AllocateParticle(p, &a, 5, p + 0xA4, 4, 1);
         W(0x584)++;
     } else if (state == 2) {
         if (W(0x584) == 0)
@@ -74,7 +74,7 @@ s32 PlayerAttackEffect_EmitPaletteFourTrail(u8 *p)
             distance = shift_distance(I(0xC0) * SIN(pitch + 64));
             b.x = D(0x20) + shift12(distance * SIN(angle + 64)) - 16;
             b.z = D(0x24) + shift12(distance * gUnk_086149C4[angle]) + 16;
-            sub_081606C0(p, &b, 5, p + 0xA4, 4, 1);
+            PlayerAttackEffect_AllocateParticle(p, &b, 5, p + 0xA4, 4, 1);
         }
         W(0x584)++;
     } else if (state == 3) {
@@ -90,7 +90,7 @@ s32 PlayerAttackEffect_EmitPaletteFourTrail(u8 *p)
             c.x = D(0x20) + shift12(I(0xC0) * SIN(angle + 64)) - 16;
             c.y = D(0x22) + 200;
             c.z = D(0x24) + shift12(I(0xC0) * gUnk_086149C4[angle]) + 16;
-            sub_081606C0(p, &c, 5, p + 0xA4, 4, 1);
+            PlayerAttackEffect_AllocateParticle(p, &c, 5, p + 0xA4, 4, 1);
         }
         W(0x584)++;
     } else

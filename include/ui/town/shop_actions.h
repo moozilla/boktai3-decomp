@@ -1,10 +1,10 @@
-#ifndef GUARD_SCENE_INVENTORY_ACTIONS_H
-#define GUARD_SCENE_INVENTORY_ACTIONS_H
+#ifndef GUARD_SHOP_ACTIONS_H
+#define GUARD_SHOP_ACTIONS_H
 #include "ui/widgets/scene_input_panel.h"
 #include "ui/widgets/scene_input_grid.h"
 struct SceneInputPanel;
 #include "ui/widgets/scene_input_compare.h"
-struct SceneInventoryActionView {
+struct ShopActionView {
     struct SceneInputPanel display;
     u8 unknown14E8[0x1AA6 - 0x14E8];
     u8 valueMode;
@@ -14,19 +14,19 @@ struct SceneInventoryActionView {
     s8 catalog[0x134];
     u8 selection, unknown1BE8[2], savedSelection;
 };
-struct SceneInventoryTransitionView {
+struct ShopTransitionView {
     u8 unknown0[0x1AF0];
     struct SceneInputPair pair;
 };
-struct SceneInventoryActionFlags {
+struct ShopActionFlags {
     u32 flags;
     u8 unknown4[0x5C];
 };
-struct SceneInventoryActionFlagsView {
+struct ShopActionFlagsView {
     u8 unknown0[0xB0];
-    struct SceneInventoryActionFlags widgets[54];
+    struct ShopActionFlags widgets[54];
 };
-struct SceneInventoryActionDefinition {
+struct ShopActionDefinition {
     u8 kind; /* 0x0: 0x2F uses level-derived stat value (tentative) */
     u8 unknown1[2];
     u8 statValue; /* 0x3: base action stat, tentative */
@@ -35,7 +35,7 @@ struct SceneInventoryActionDefinition {
 };
 s32 Inventory_GetEquipmentId(u32);
 s32 SceneItemValue_CalculateEquipment(u32);
-struct SceneInventoryActionDefinition *Equipment_GetDefinition(u32);
+struct ShopActionDefinition *Equipment_GetDefinition(u32);
 s32 Inventory_GetItemId(u32);
 s32 SceneItemValue_CalculateItem(u32);
 u32 SceneItemValue_GetItemBaseValue(s32);

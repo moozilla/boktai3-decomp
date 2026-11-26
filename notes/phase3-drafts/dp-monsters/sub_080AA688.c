@@ -24,8 +24,8 @@ static inline u8 isRemoved(struct TrailSegment *segment)
         return 1;
     return 0;
 }
-#define TentacleActor_RemoveSegmentColliders sub_080AA688
-void TentacleActor_RemoveSegmentColliders(struct SceneActorRegistryResetView *actor)
+#define Centipede_RemoveSegmentColliders sub_080AA688
+void Centipede_RemoveSegmentColliders(struct SceneActorRegistryResetView *actor)
 {
     struct ActorTrail *trail = actor->context;
     struct TrailSegment *segments = trail->segments;

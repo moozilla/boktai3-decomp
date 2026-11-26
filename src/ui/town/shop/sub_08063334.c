@@ -1,19 +1,19 @@
 #include "ui/town/shop_lifecycle.h"
-void Shop_BuildUnlockedEquipmentCatalog(struct SceneInventoryLifecycleView *);
-void Shop_BuildConsumableCatalog(struct SceneInventoryLifecycleView *);
-void Shop_BuildUnlockedItemCatalog(struct SceneInventoryLifecycleView *);
-void Shop_ReadScriptCatalog(struct SceneInventoryLifecycleView *);
-void Shop_InitCatalogBackground(struct SceneInventoryLifecycleView *, u32);
-void Shop_InitPanel(struct SceneInventoryLifecycleView *, u32);
-void Shop_InitMessageBox(struct SceneInventoryLifecycleView *);
-void Shop_ReadCompletionScript(struct SceneInventoryLifecycleView *);
+void Shop_BuildUnlockedEquipmentCatalog(struct ShopLifecycleView *);
+void Shop_BuildConsumableCatalog(struct ShopLifecycleView *);
+void Shop_BuildUnlockedItemCatalog(struct ShopLifecycleView *);
+void Shop_ReadScriptCatalog(struct ShopLifecycleView *);
+void Shop_InitCatalogBackground(struct ShopLifecycleView *, u32);
+void Shop_InitPanel(struct ShopLifecycleView *, u32);
+void Shop_InitMessageBox(struct ShopLifecycleView *);
+void Shop_ReadCompletionScript(struct ShopLifecycleView *);
 void ScreenTransition_SendCommand(u32, u32, u32, u32, u32, u32, u32);
-void Shop_RefreshCatalogDisplay(struct SceneInventoryLifecycleView *);
+void Shop_RefreshCatalogDisplay(struct ShopLifecycleView *);
 void Sound_PlaySong(u32);
-void SceneInputPanel_RequestAction(struct SceneInventoryLifecycleView *,
-                                   void (*)(struct SceneInventoryLifecycleView *));
-void Shop_WaitForController(struct SceneInventoryLifecycleView *);
-s32 Shop_InitializeController(struct SceneInventoryLifecycleView *owner)
+void SceneInputPanel_RequestAction(struct ShopLifecycleView *,
+                                   void (*)(struct ShopLifecycleView *));
+void Shop_WaitForController(struct ShopLifecycleView *);
+s32 Shop_InitializeController(struct ShopLifecycleView *owner)
 {
     owner->messageText = 0;
     owner->equipmentText = 0;

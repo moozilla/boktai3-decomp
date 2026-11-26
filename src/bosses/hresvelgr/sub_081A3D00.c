@@ -11,13 +11,13 @@ struct EffectPool {
     u8 unknown0[0x48];
     struct EffectPoolEntry entries[3];
 };
-void EffectPool_UpdateEntry(struct EffectPool *, struct EffectPoolEntry *);
+void HresvelgrEffectPool_UpdateEntry(struct EffectPool *, struct EffectPoolEntry *);
 static inline void Clear(void *dest, u32 *zero)
 {
     *zero = 0;
     CpuSet(zero, dest, 0x05000002);
 }
-void EffectPool_UpdateActiveEntries(struct EffectPool *pool)
+void HresvelgrEffectPool_UpdateActiveEntries(struct EffectPool *pool)
 {
     s32 i;
     struct EffectPoolEntry *entry = pool->entries;
@@ -26,7 +26,7 @@ void EffectPool_UpdateActiveEntries(struct EffectPool *pool)
     i = 2;
     do {
         if (entry->state) {
-            EffectPool_UpdateEntry(pool, entry);
+            HresvelgrEffectPool_UpdateEntry(pool, entry);
             entry->frame++;
         }
         entry++;

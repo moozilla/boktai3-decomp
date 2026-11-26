@@ -88,8 +88,8 @@ proc,name,params,confidence,evidence
 1027,end_event_and_close_message,,medium,"end_event, close_message_window_if_open, HUD mode 7"
 1030,place_directional_controller,"id,x,z,orientation,start_proc",medium,proc_1031 with defaults
 1031,directional_controller,"id,disabled,x,z,orientation,start_proc,end_proc",medium,DirectionalController at the floor height
-1032,release_directional_controller,,medium,DirectionalController_ScriptRelease only
-1033,end_dialogue_release_controller,,medium,"end_dialogue, then proc 1032 (DirectionalController_ScriptRelease); a common message_then/open_message_window callback (130 references)"
+1032,release_directional_controller,,medium,InteractionPrompt_ScriptRelease only
+1033,end_dialogue_release_controller,,medium,"end_dialogue, then proc 1032 (InteractionPrompt_ScriptRelease); a common message_then/open_message_window callback (130 references)"
 1035,place_scene_npc_by_player,,low,actor_name_of(1) placed on a free side of the player (gs[0x30]/gs[0x34]) by comparing floor heights; the third cutscene script in many scripts=[...] lists
 1036,end_event_restore_hud,,low,"sub_081D105C, end_event, then HUD mode 0 (2 in stages 521-525)"
 1048,play_bgm,id,medium,"proc_1051(1, id, 0): music with a fade; r708[0x72] is the current track"
@@ -111,14 +111,14 @@ proc,name,params,confidence,evidence
 1086,on_floor_switch_released,"name,a,b,on_press,on_release,switch_no",high,sets floor_switch_flag[switch_no] = 0 and calls on_release
 1092,place_object_at,"name,type,,x,z,dx,dz",low,proc_1093 at cell centre plus offset
 1093,place_object,"name,type,,x,z",low,sub_081B897C with a size from the type
-1094,spawn_scene_objects_manager,mode,medium,sub_0802091C: the SceneObjects task (destroy callback SceneObjects_Destroy) with the sprite runs 7ACD-7AD6
+1094,spawn_scene_objects_manager,mode,medium,sub_0802091C: the SceneObjects task (destroy callback SlidingDoors_Destroy) with the sprite runs 7ACD-7AD6
 1095,spawn_scene_objects_manager_2,mode,medium,as 1094 with S=7AD2
 1096,box_edge_position,"box,facing",medium,sets r700[0x76]/[0x64]/[0x78] to the point on the box edge for a facing
 1097,place_object_at_box_2,"name,box,facing,",low,proc_1098 with defaults
-1098,place_scene_object_at_box,"id,box,type,facing,value,variant",medium,"box_edge_position, then SceneObjects_ScriptAppend; variant 1 when r708[0x6e.1] and proc_973(box)"
+1098,place_scene_object_at_box,"id,box,type,facing,value,variant",medium,"box_edge_position, then SlidingDoors_ScriptAppend; variant 1 when r708[0x6e.1] and proc_973(box)"
 1100,place_object_at_box,"name,box,facing,",low,copies the box (proc_1096) and creates the object at it (proc_1102)
 1101,place_numbered_object_at_box,"box,facing,variant",low,up to eight objects named 0x6A40+n (r700[0xc5] counts them)
-1102,append_scene_object,"name,x,y,z,,facing,variant",medium,SceneObjects_ScriptAppend
+1102,append_scene_object,"name,x,y,z,,facing,variant",medium,SlidingDoors_ScriptAppend
 1108,place_path_object,"name,kind,path,point",low,place_named_object_on_path with defaults and callback proc 1112
 1109,place_named_object_on_path,"name,kind,path,point,,m,follow",low,"Path_GetPoint(path, point), then NamedObject at that point"
 1113,set_actor_route,"name,route,mode",high,only NamedActor_SetRoute
@@ -145,7 +145,7 @@ proc,name,params,confidence,evidence
 1180,place_collision_controller,"id,type,kind,x,z,attack_a,attack_b,attack_c",low,CollisionController on the floor; type is random 0/1 when r708[0x171] == 2
 1181,scatter_collision_controllers,"type,kind,x,z,spread,count",low,up to 5 place_collision_controller at random offsets; type 3 picks a weighted random type by r700[0x28]
 1184,place_scene_object_at_box_default,"box,facing,,value,,appearance,id",low,append_scene_object_at_box with callback proc 1186
-1185,append_scene_object_at_box,"box,facing,,value,,appearance,id",low,"box_edge_position(box, facing), then SceneObjects_ScriptAppend(id + 1, ...) with variant 1 when entering at appearance"
+1185,append_scene_object_at_box,"box,facing,,value,,appearance,id",low,"box_edge_position(box, facing), then SlidingDoors_ScriptAppend(id + 1, ...) with variant 1 when entering at appearance"
 1191,open_choice_menu_default,"name,script,stringbase_a,stringbase_b",low,"open_choice_menu with layout (1, 13, 28, 6)"
 1192,open_choice_menu,"name,script,x,y,w,h,stringbase,options_w,options_c,a,b",medium,"HUD mode 3, spawns ChoiceMenu, sets gs[0x86c]"
 1200,enemy_count_slot,,low,"index of the first set flag r708[0x6e.2][0..3], else -1 (enemy-count missions)"

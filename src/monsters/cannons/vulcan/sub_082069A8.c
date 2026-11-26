@@ -1,18 +1,5 @@
-#include "global.h"
+#include "monsters/cannons/vulcan_cannon_worker.h"
 #define gSineTable gUnk_086149C4
-struct CannonVector {
-    s16 x, y, z, pad;
-};
-struct VulcanCannon {
-    u8 pad0[0x88];
-    struct CannonVector position;
-    u8 pad90[0x90];
-    s16 attack, element, power;
-    u8 pad126[0xc];
-    s8 facing;
-    u8 pad133[3];
-    s16 speed;
-};
 void ProjectileConfig_Init(void *);
 void ProjectileConfig_SetAppearance(void *, u32, u32, s32);
 void ProjectileConfig_SetCollision(void *, u32, u32, u32, u32, u32);
@@ -24,35 +11,35 @@ static inline s32 scale(s32 n)
 {
     return n >= 0 ? n >> 12 : -((-n) >> 12);
 }
-static inline void polar(struct CannonVector *v, s32 angle, s32 radius)
+static inline void polar(struct ContactPosition *v, s32 angle, s32 radius)
 {
     v->x = scale(gSineTable[angle + 64] * radius);
     v->y = 0;
     v->z = scale(gSineTable[angle] * radius);
 }
-static inline void add(struct CannonVector *a, struct CannonVector *b)
+static inline void add(struct ContactPosition *a, struct ContactPosition *b)
 {
     a->x += b->x;
     a->y += b->y;
     a->z += b->z;
 }
-static inline void copy(struct CannonVector *a, struct CannonVector *b)
+static inline void copy(struct ContactPosition *a, struct ContactPosition *b)
 {
     *a = *b;
 }
-static inline void raise(struct CannonVector *v)
+static inline void raise(struct ContactPosition *v)
 {
     v->y += 128;
 }
 void VulcanCannon_FireProjectile(struct VulcanCannon *p)
 {
     u8 config[0x5c];
-    struct CannonVector position, offset;
+    struct ContactPosition position, offset;
     s32 facing = p->facing;
     s32 angle = 64;
     if (facing == 0)
         angle = 0;
-    copy(&position, &p->position);
+    copy(&position, &p->display.position);
     raise(&position);
     polar(&offset, angle, 160);
     add(&position, &offset);

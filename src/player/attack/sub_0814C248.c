@@ -3,12 +3,11 @@
 #include "engine/engine.h"
 #include "engine/ram.h"
 #include "player/target_registry/target_registry.h"
-#include "objects/scene_objects/scene_object.h"
+#include "objects/scene_object.h"
 #include "scene/collision/contact_collider.h"
 #include "engine/video/render.h"
 
 // confidence=low: chooses the nearest visible list entry within a fixed squared-distance limit.
-#define Player_FindNearestVisibleTarget sub_0814C248
 struct TargetPosition {
     s16 x, y, z;
 };

@@ -96,7 +96,7 @@ void SceneActorControl_WanderAroundPlayer(struct ChaseActor *actor)
             struct ContactPosition target;
             u32 angle;
             angle = (u8)WanderRand();
-            target = *(struct ContactPosition *)(((u8 **)gPlayers)[0] + 0x30);
+            target = *(struct ContactPosition *)&gPlayers[0]->position;
             target.x += Shift(gUnk_086149C4[angle], 4);
             target.z += Shift(gUnk_086149C4[(angle + 64) & 255], 4);
             SceneActorControl_StartPositionCurve(actor, &target);
@@ -111,26 +111,12 @@ void SceneActorControl_UpdateTimedFacing(struct ChaseActor *);
 
 void SceneActorControl_ResetCollisionPhase(struct ChaseActor *);
 
-static inline void SetMotionPhase(struct ChaseActor *actor, u32 behavior)
-{
-    actor->base.state2A8 = 0;
-    actor->base.phase2A9 = 0;
-    actor->base.behavior2AA = behavior;
-    actor->base.counter2AC = 0;
-    actor->base.field2B1 = 1;
-}
-
 static inline u32 MotionRand(void)
 {
     u32 index = (gRandomIndex + 1) & 1023;
     gRandomIndex = index;
     return *(const u16 *)((index << 1) + RANDOM_TABLE_ADDR);
 }
-
-struct PlayerPositionView {
-    u8 unknown0[0x30];
-    struct ContactPosition position;
-};
 
 // confidence=low: waits a timed interval, homes on a stored point, then picks a new point.
 
@@ -146,7 +132,7 @@ void SceneActorControl_UpdateStoredMotion(struct ChaseActor *actor)
             u32 angle;
             struct ContactPosition target;
             angle = (u8)MotionRand();
-            target = ((struct PlayerPositionView *)gPlayers[0])->position;
+            target = *(struct ContactPosition *)&gPlayers[0]->position;
             target.x += Shift(gUnk_086149C4[angle], 3);
             target.z += Shift(gUnk_086149C4[(angle + 64) & 255], 3);
             SceneActorControl_InitPositionCurveEndpoints(actor, &target);
@@ -160,7 +146,7 @@ void SceneActorControl_UpdateStoredMotion(struct ChaseActor *actor)
         body->waitTimer = timer;
         if ((timer << 16) == 0) {
             SceneActorControl_StartPositionCurve(
-                actor, &((struct PlayerPositionView *)gPlayers[0])->position);
+                actor, (const struct ContactPosition *)&gPlayers[0]->position);
             MotionState_SetFlags(body, 8);
         }
     } else {
@@ -171,7 +157,7 @@ void SceneActorControl_UpdateStoredMotion(struct ChaseActor *actor)
                 struct ContactPosition target;
                 u32 angle;
                 angle = (u8)MotionRand();
-                target = ((struct PlayerPositionView *)gPlayers[0])->position;
+                target = *(struct ContactPosition *)&gPlayers[0]->position;
                 target.x += Shift(gUnk_086149C4[angle], 3);
                 target.z += Shift(gUnk_086149C4[(angle + 64) & 255], 3);
                 SceneActorControl_InitPositionCurveEndpoints(actor, &target);
@@ -186,23 +172,28 @@ void SceneActorControl_UpdateStoredMotion(struct ChaseActor *actor)
         }
     }
     if (actor->base.stepDone) {
-        SetMotionPhase(actor, 4);
+        SceneActorTerrain_EnterState(actor, 0, 0, 4);
     } else {
         actor->base.counter2AC++;
     }
 }
 
-extern u8 gUnk_08605C5C[];
+extern void *gUnk_08605C5C[];
 
-void SceneActorControl_SetApproachCallbacks(u8 *p)
+void SceneActorControl_SetApproachCallbacks(struct RoomActor *actor)
 {
-    *(u8 **)(p + 0x28c) = gUnk_08605C5C;
+    actor->behaviorCallbacks = gUnk_08605C5C;
 }
 
-static inline void ShowDrawableAndShadow(struct ChaseActor *actor)
+static inline void SetDrawableAndShadow(struct ChaseActor *actor, u32 visible)
 {
-    ActorStatus_ClearDrawableFlags(actor, 1);
-    ActorShadow_Enable(actor->base.shadow);
+    if (visible) {
+        ActorStatus_ClearDrawableFlags(actor, 1);
+        ActorShadow_Enable(actor->base.shadow);
+    } else {
+        ActorStatus_SetDrawableFlags(actor, 1);
+        ActorShadow_Disable(actor->base.shadow);
+    }
 }
 void SceneActorControl_TickVisibility(struct ChaseActor *actor)
 {
@@ -222,19 +213,9 @@ void SceneActorControl_TickVisibility(struct ChaseActor *actor)
         }
         value = counter >> 16;
         if (value <= 19) {
-            if ((u8)(counter >> 18) & 1)
-                ShowDrawableAndShadow(actor);
-            else {
-                ActorStatus_SetDrawableFlags(actor, 1);
-                ActorShadow_Disable(actor->base.shadow);
-            }
+            SetDrawableAndShadow(actor, (u8)(counter >> 18) & 1);
         } else if (value <= 29) {
-            if ((u8)(counter >> 17) & 1)
-                ShowDrawableAndShadow(actor);
-            else {
-                ActorStatus_SetDrawableFlags(actor, 1);
-                ActorShadow_Disable(actor->base.shadow);
-            }
+            SetDrawableAndShadow(actor, (u8)(counter >> 17) & 1);
         } else if (MotionState_TestFlags(state, 0x20)) {
             ActorStatus_ClearDrawableFlags(actor, 1);
             MotionState_ClearFlags(state, 0x20);
@@ -358,11 +339,6 @@ void SceneActorControl_RequestVisibility(struct ChaseActor *input, const u16 *in
 
 u32 Trigger_ConsumePending(void *, u32);
 
-struct WanderTriggerView {
-    u8 unknown0[0xC];
-    u8 trigger[1];
-};
-
 // confidence=low: homes on a stored point, then consumes a pending trigger and restarts.
 
 void SceneActorControl_UpdateWanderTarget(struct ChaseActor *actor)
@@ -382,7 +358,7 @@ void SceneActorControl_UpdateWanderTarget(struct ChaseActor *actor)
         s32 speed = Callback_InvokeActor(actor, actor->base.animationQuery.opaque);
         if (ApproachStoredPoint(actor, (struct StoredCurve *)body->unknown3F0, speed)) {
             if ((u8)SceneActorControl_AdvancePositionCurve(actor)) {
-                Trigger_ConsumePending(((struct WanderTriggerView *)actor)->trigger, 1);
+                Trigger_ConsumePending(actor->base.receiver, 1);
                 SceneActorTerrain_EnterState(actor, 2, 0, 2);
             }
         } else {
@@ -401,35 +377,31 @@ void SceneActorControl_ConsumePendingEntry(struct ChaseActor *actor)
     actor->base.counter2AC++;
 }
 
-extern u8 gUnk_08605C64[];
+extern void *gUnk_08605C64[];
 
-void SceneActorControl_SetStoredMotionCallbacks(u8 *p)
+void SceneActorControl_SetStoredMotionCallbacks(struct RoomActor *actor)
 {
-    *(u8 **)(p + 0x29c) = gUnk_08605C64;
+    actor->callbacks29C = gUnk_08605C64;
 }
 
 void SceneActorControl_TickHiddenResponse(u8 *);
 
 void SceneActorControl_DispatchControl(u8 *);
 
-u32 Bat_OnUpdate(u8 *p)
+u32 Bat_OnUpdate(struct RoomActor *p)
 {
-    u32 i;
-    u32 *t;
-    SceneActorControl_TickHiddenResponse(p);
-    i = p[0x2a8];
-    t = *(u32 **)(p + 0x27c);
-    Callback_InvokeActor(p, t[i]);
-    SceneActorControl_DispatchControl(p);
+    SceneActorControl_TickHiddenResponse((void *)p);
+    Callback_InvokeActor(p, p->stateCallbacks[p->state2A8]);
+    SceneActorControl_DispatchControl((void *)p);
     return 1;
 }
 
 void SceneActor_UpdateActiveCallbacks(u8 *);
 
-u32 SceneActorControl_BindPrimaryPlayer(u8 *p)
+u32 SceneActorControl_BindPrimaryPlayer(struct RoomActor *p)
 {
-    *(u8 **)(p + 0xdc) = (u8 *)gPlayers[0] + 0x24;
-    SceneActor_UpdateActiveCallbacks(p);
+    p->tracking.target = &((struct SceneActorChasePlayer *)gPlayers[0])->target;
+    SceneActor_UpdateActiveCallbacks((void *)p);
     return 0;
 }
 
@@ -451,41 +423,33 @@ void Collider_Remove(void *);
 
 void SceneActorRegistry_UnlinkActor(void *);
 
-struct S {
-    u8 f0[4];
-    u8 *p4;
-    u8 b8;
-    u8 f1[0x2b7];
-    u16 h2c0;
-};
-
-u32 Bat_Destroy(struct S *s)
+u32 Bat_Destroy(struct RoomActor *s)
 {
-    u8 *p = s->p4;
-    u8 *q;
+    u8 *p = s->drawable;
+    struct SceneActorBody *q;
     u32 m;
     u32 v;
-    if (s->b8 == 0)
+    if (s->drawableKind == 0)
         Sprite_Remove(p);
     else
         Anim_Remove(p + 0x20);
     Heap_Free(p);
     m = 0x100;
-    if (SceneActorChase_TestField(&s->h2c0, m))
-        SceneMessages_UnregisterReceiver((u8 *)s + 0xc);
+    if (SceneActorChase_TestField(&s->placementFlags, m))
+        SceneMessages_UnregisterReceiver(s->receiver);
     {
-        u8 *r = (u8 *)s + 0x320;
+        u8 *r = s->shadow;
         if (*r == 1)
             Shadow_Destroy(r);
     }
     m = 0x2000000;
-    v = ((struct ChaseActor *)s)->base.statusFlags & m;
-    q = (u8 *)s + 0x50;
+    v = s->statusFlags & m;
+    q = &s->body;
     if (v == 0)
         TerrainOverlay_QueueRemoveActor(q);
 
     SceneBody_Unregister(q);
-    Collider_Remove((u8 *)s + 0x134);
+    Collider_Remove(&s->colliderA);
     SceneActorRegistry_UnlinkActor(s);
     return 0;
 }

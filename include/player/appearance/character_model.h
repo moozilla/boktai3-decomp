@@ -11,7 +11,7 @@ struct CharacterPaletteSource {
     u8 unknown0[0x20];
     u16 colors[16];
 };
-s32 Widget_InitLinked(void *, void *, s32, s32, s32, s32, s32, s32);
+s32 AnimSprite_InitLinked(void *, void *, s32, s32, s32, s32, s32, s32);
 s32 ActorResource_SelectElementResource(s32);
 s32 CharacterModel_GetPrimaryPaletteIndex(struct CharacterPreviewModel *);
 void CharacterModel_LoadPrimaryPalette(struct CharacterPreviewModel *);

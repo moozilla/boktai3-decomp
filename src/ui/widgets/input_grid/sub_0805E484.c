@@ -7,14 +7,14 @@ void SceneInput_BeginPairTransition(struct SceneInputPair *pair, const u32 *enab
     s32 i = 0;
     const struct SceneInputPosition *targets = targetsInput;
     const struct SceneInputPosition *starts = startsInput;
-    struct AnimSprite *widget;
+    struct AnimSprite *animSprite;
     const u32 *enabled;
     u32 widgetOffset;
     const u32 *localFrames;
     s32 compare;
     u32 step;
     localFrames = frames;
-    widget = pair->widgets;
+    animSprite = pair->widgets;
     {
         step = 0;
         widgetOffset = step;
@@ -22,12 +22,12 @@ void SceneInput_BeginPairTransition(struct SceneInputPair *pair, const u32 *enab
     enabled = enabledInput;
     do {
         if (!*enabled)
-            widget->flags |= 1;
+            animSprite->flags |= 1;
         else {
             struct SceneInputPosition *position;
             u32 targetOffset;
-            widget->flags &= ~1;
-            Anim_LoadKeyframe(widget, pair, (u16)*localFrames, 1);
+            animSprite->flags &= ~1;
+            Anim_LoadKeyframe(animSprite, pair, (u16)*localFrames, 1);
             position = (struct SceneInputPosition *)&pair->widgets[0].position;
             targetOffset = widgetOffset;
             position = (void *)((u8 *)position + targetOffset);
@@ -48,7 +48,7 @@ void SceneInput_BeginPairTransition(struct SceneInputPair *pair, const u32 *enab
         }
         starts++;
         localFrames++;
-        widget++;
+        animSprite++;
         {
             step = widgetOffset;
             step += 0x60;

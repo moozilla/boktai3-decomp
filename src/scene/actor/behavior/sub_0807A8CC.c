@@ -14,7 +14,7 @@ void Obj_StepPosition(void *);
 struct RepeatedEffectPosition;
 s32 RepeatedEffect_RequestNearby(struct RepeatedEffectPosition *);
 void NavMesh_UpdateProbe(void *, void *);
-void sub_0821DE30(void *);
+void Trap_UpdateProbeContacts(void *);
 
 static inline u32 SceneActorMotion_TestStatus(u32 *flags, u32 bits)
 {
@@ -80,7 +80,7 @@ static inline u16 SceneActorMotion_Elapsed(struct ChaseActor *actor)
 s32 SceneActorMotion_Update(struct ChaseActor *object)
 {
     struct ChaseActor *actor = (void *)object;
-    struct SceneActorRegistryControlGroup *group = &actor->group.common;
+    struct SceneActorChaseGroup *group = &actor->group;
     struct ContactCollider *collider;
     struct ContactPosition *position;
     struct ContactPosition center, delta;
@@ -198,17 +198,17 @@ s32 SceneActorMotion_Update(struct ChaseActor *object)
         }
     }
 done: {
-    void *contact = ((struct SceneActorMotionTerrainGroup *)group)->contact;
+    void *route = group->route;
     if (SceneActorMotion_TestStatus(behavior, 0x400000)) {
         u16 cellFlags = ((struct SceneActorChaseTerrainCell *)SceneActorTerrain_GetCell(
                              actor->base.terrainCell))
                             ->flags;
         if ((cellFlags & 3) != 3 && !(cellFlags & 0x440))
-            NavMesh_UpdateProbe(contact, position);
+            NavMesh_UpdateProbe(route, position);
     }
 }
     actor->base.frameCounter++;
-    sub_0821DE30(group);
+    Trap_UpdateProbeContacts(&group->common);
     actor->base.previousPosition = actor->base.body.position;
     HalfwordFlags_Clear(flags, 0x2000);
     return 1;

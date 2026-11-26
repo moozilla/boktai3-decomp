@@ -5,8 +5,8 @@ The three previous-state stores use r1 and preserve r0.
 
 The explicit form changed the ROM bytes. The guarded form passed the unit ROM check.
 
---- a/src/palette_controller.c
-+++ b/src/palette_controller.c
+--- a/src/effects/palette/palette_controller.c
++++ b/src/effects/palette/palette_controller.c
 @@ -438,4 +438,7 @@
      t->previousBrightness = t->brightness;
      p->previousState = gSunClock.state;

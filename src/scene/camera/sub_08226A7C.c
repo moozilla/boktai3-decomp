@@ -1,21 +1,16 @@
-#include "global.h"
-struct S {
-    u8 a[0x96];
-    u16 h96;
-    u32 w98;
-};
-void Script_RunBlock(u32, u32);
-void Script_Call(u32, u32);
-void Camera_RunCompletionScript(struct S *p)
+#include "scene/camera/scene_camera_controller.h"
+#include "script/script_utility.h"
+
+void Camera_RunCompletionScript(struct SceneCameraController *camera)
 {
-    u32 w = p->w98;
-    if (w != 0) {
-        if (p->h96 == 0) {
-            p->w98 = 0;
-            Script_RunBlock(w, 0);
+    u32 script = camera->rate;
+    if (script != 0) {
+        if (camera->rateIsValue == 0) {
+            camera->rate = 0;
+            Script_RunBlock(script, NULL);
         } else {
-            p->w98 = 0;
-            Script_Call(w, 0);
+            camera->rate = 0;
+            Script_Call(script, NULL);
         }
     }
 }

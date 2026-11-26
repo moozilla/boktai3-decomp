@@ -356,33 +356,33 @@ s32 SoundTest_Initialize(struct SoundTest *p)
     asset = ScriptProc_Start(0xcb05, 0xe2ab);
     ResourceHeader_Relocate(&p->backgroundResource, asset);
     p->digitsResource = p->backgroundResource;
-    Widget_InitLinked(&p->background, &p->backgroundResource, 59, 16, 0, 0, 0, 0);
+    AnimSprite_InitLinked(&p->background, &p->backgroundResource, 59, 16, 0, 0, 0, 0);
     ResourceHeader_Relocate(&p->labelResource, asset);
-    Widget_InitLinked(&p->categoryLabel, &p->labelResource, 47, 16, 0, 0, 0, 0);
+    AnimSprite_InitLinked(&p->categoryLabel, &p->labelResource, 47, 16, 0, 0, 0, 0);
     for (i = 0; i < 3; i++) {
-        Widget_InitLinked(&p->playbackIndicators[i], &p->digitsResource, 43, 48, 1, 0, 60, &pos);
+        AnimSprite_InitLinked(&p->playbackIndicators[i], &p->digitsResource, 43, 48, 1, 0, 60, &pos);
         p->playbackIndicators[i].flags |= 1;
         pos.y += 32;
     }
     pos.x = 184;
     pos.y = 64;
     for (i = 0; i < 3; i++) {
-        Widget_InitLinked(&p->secondCategoryDigits[i], &p->digitsResource, 0, 48, 0, 0, 60, &pos);
+        AnimSprite_InitLinked(&p->secondCategoryDigits[i], &p->digitsResource, 0, 48, 0, 0, 60, &pos);
         p->secondCategoryDigits[i].flags |= 1;
         pos.x += 8;
     }
     pos.x = 184;
     pos.y = 96;
     for (i = 0; i < 3; i++) {
-        Widget_InitLinked(&p->thirdCategoryDigits[i], &p->digitsResource, 0, 48, 0, 0, 60, &pos);
+        AnimSprite_InitLinked(&p->thirdCategoryDigits[i], &p->digitsResource, 0, 48, 0, 0, 60, &pos);
         p->thirdCategoryDigits[i].flags |= 1;
         pos.x += 8;
     }
     asset = ScriptProc_Start(0xcb05, 0x530d);
     ResourceHeader_Relocate(&p->panelResource, asset);
-    Widget_InitLinked(&p->panel, &p->panelResource, 139, 16, 0, 0, 0, 0);
+    AnimSprite_InitLinked(&p->panel, &p->panelResource, 139, 16, 0, 0, 0, 0);
     ResourceHeader_Relocate(&p->cursorResource, asset);
-    Widget_InitLinked(&p->cursor, &p->cursorResource, 71, 16, 0, 0, 0, 0);
+    AnimSprite_InitLinked(&p->cursor, &p->cursorResource, 71, 16, 0, 0, 0, 0);
     p->savedPalette = p->cursor.palette;
     CpuSet(p->savedPalette, p->palette, 16);
     p->cursor.palette = p->palette;

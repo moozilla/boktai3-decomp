@@ -12,7 +12,7 @@ struct PositionMotion {
     u16 duration;
     u32 timer;
 };
-struct RegistrySelectionMenu {
+struct WorldMapMenu {
     struct Task task;
     u32 unknown18;
     u8 *palettes;
@@ -26,37 +26,37 @@ struct RegistrySelectionMenu {
     s16 initialSelection, cancelSelection;
     s32 entryValues[9];
     struct MenuCursor *selectionCursor;
-    void (*update)(struct RegistrySelectionMenu *);
+    void (*update)(struct WorldMapMenu *);
     s32 timer;
 };
 
 void PositionMotion_InitTimedInterpolation(struct PositionMotion *, struct ContactPosition *,
                                            struct ContactPosition *, struct ContactPosition *, u16);
-void WorldMap_SetUpdate(struct RegistrySelectionMenu *,
-                                 void (*)(struct RegistrySelectionMenu *));
-void WorldMap_ShowIndicators(struct RegistrySelectionMenu *);
-void WorldMap_UpdateIndicators(struct RegistrySelectionMenu *);
+void WorldMap_SetUpdate(struct WorldMapMenu *,
+                                 void (*)(struct WorldMapMenu *));
+void WorldMap_ShowIndicators(struct WorldMapMenu *);
+void WorldMap_UpdateIndicators(struct WorldMapMenu *);
 void WorldMap_BlendPaletteBanks(u8 *, u8 *, u8 *, int, int, int);
-void WorldMap_ApplyPalettePhase(struct RegistrySelectionMenu *, u32);
-void WorldMap_BlendTimedPalettes(struct RegistrySelectionMenu *);
-void WorldMap_ProcessConfirm(struct RegistrySelectionMenu *);
+void WorldMap_ApplyPalettePhase(struct WorldMapMenu *, u32);
+void WorldMap_BlendTimedPalettes(struct WorldMapMenu *);
+void WorldMap_ProcessConfirm(struct WorldMapMenu *);
 void WorldMap_OnUnusedTransition(void);
-void WorldMap_InitializeAnimations(struct RegistrySelectionMenu *);
-void WorldMap_InitializeBackground(struct RegistrySelectionMenu *);
+void WorldMap_InitializeAnimations(struct WorldMapMenu *);
+void WorldMap_InitializeBackground(struct WorldMapMenu *);
 void WorldMap_ConfigureDisplay(void);
-void WorldMap_BeginFadeIn(struct RegistrySelectionMenu *);
-void WorldMap_BeginFadeOut(struct RegistrySelectionMenu *);
-void WorldMap_BeginSelection(struct RegistrySelectionMenu *);
-void WorldMap_StartTimedEffect(struct RegistrySelectionMenu *, s32, s32);
-void WorldMap_UpdateTimedEffect(struct RegistrySelectionMenu *);
-void WorldMap_UpdateSelection(struct RegistrySelectionMenu *);
-void WorldMap_UpdateOpeningDelay(struct RegistrySelectionMenu *);
-void WorldMap_UpdateScriptDelay(struct RegistrySelectionMenu *);
-void WorldMap_OnUpdate(struct RegistrySelectionMenu *);
-void WorldMap_Destroy(struct RegistrySelectionMenu *);
-void WorldMap_CreateSelectionCursor(struct RegistrySelectionMenu *, s32);
-s32 WorldMap_InitializeFromScript(struct RegistrySelectionMenu *, void *);
+void WorldMap_BeginFadeIn(struct WorldMapMenu *);
+void WorldMap_BeginFadeOut(struct WorldMapMenu *);
+void WorldMap_BeginSelection(struct WorldMapMenu *);
+void WorldMap_StartTimedEffect(struct WorldMapMenu *, s32, s32);
+void WorldMap_UpdateTimedEffect(struct WorldMapMenu *);
+void WorldMap_UpdateSelection(struct WorldMapMenu *);
+void WorldMap_UpdateOpeningDelay(struct WorldMapMenu *);
+void WorldMap_UpdateScriptDelay(struct WorldMapMenu *);
+void WorldMap_OnUpdate(struct WorldMapMenu *);
+void WorldMap_Destroy(struct WorldMapMenu *);
+void WorldMap_CreateSelectionCursor(struct WorldMapMenu *, s32);
+s32 WorldMap_InitializeFromScript(struct WorldMapMenu *, void *);
 void WorldMap_StartTimedEffectFromScript(void);
 void WorldMap_SetVisibleFromScript(void);
-struct RegistrySelectionMenu *WorldMap_Create(void *);
+struct WorldMapMenu *WorldMap_Create(void *);
 #endif

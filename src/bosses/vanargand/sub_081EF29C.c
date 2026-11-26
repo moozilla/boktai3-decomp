@@ -1,11 +1,11 @@
 #include "bosses/vanargand/vanargand_head_transition.h"
 
-void SceneActors_UpdateHitSensitiveDeparture(void);
+void VanargandHead_UpdateHitSensitiveDeparture(void);
 
-void SceneActors_EnterSequenceTwoActionState(struct Slot7Transition *actor)
+void VanargandHead_EnterSequenceTwoActionState(struct VanargandHeadTransition *actor)
 {
-    if (Slot7_TakeActionEntry(actor) == TRUE) {
-        Slot7_TransitionTo(actor, SceneActors_UpdateHitSensitiveDeparture);
+    if (VanargandHead_TakeActionEntry(actor) == TRUE) {
+        VanargandHead_TransitionTo(actor, VanargandHead_UpdateHitSensitiveDeparture);
     }
     actor->actionTimer++;
 }

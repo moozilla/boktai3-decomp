@@ -69,32 +69,32 @@ void Task_Kill(void *);
 void Script_Call(u32, struct DirectionalScriptArgs *);
 void sub_08249244(struct DirectionalManager *, struct DirectionalController *, s32, void *);
 
-u32 DirectionalController_SetState(struct DirectionalController *, u32);
-u32 DirectionalController_ConsumeEntered(struct DirectionalController *);
-s32 DirectionalController_InitSlot(struct DirectionalManager *, struct DirectionalController *,
+u32 InteractionPrompt_SetState(struct DirectionalController *, u32);
+u32 InteractionPrompt_ConsumeEntered(struct DirectionalController *);
+s32 InteractionPrompt_InitSlot(struct DirectionalManager *, struct DirectionalController *,
                                    s32);
-struct DirectionalController *DirectionalController_FindByScriptId(struct DirectionalManager *, s32,
+struct DirectionalController *InteractionPrompt_FindByScriptId(struct DirectionalManager *, s32,
                                                                    s32 *);
-u32 DirectionalController_SetMarkerFadeLevel(struct DirectionalController *, u32);
-u32 DirectionalController_SetPosition(struct DirectionalManager *, struct DirectionalController *,
+u32 InteractionPrompt_SetMarkerFadeLevel(struct DirectionalController *, u32);
+u32 InteractionPrompt_SetPosition(struct DirectionalManager *, struct DirectionalController *,
                                       const struct SceneVec *);
 void LevelController_Update(struct DirectionalManager *, struct DirectionalController *);
 s32 Actor_CanInteractWithController(struct DirectionalManager *, struct DirectionalController *);
 void LevelController_RunScript(struct DirectionalManager *, struct DirectionalController *, u32);
-u32 DirectionalController_SelectTarget(struct DirectionalManager *, s32);
-u32 DirectionalController_ReleaseTarget(struct DirectionalManager *, s32);
-s32 DirectionalController_CheckApproach(struct DirectionalManager *,
+u32 InteractionPrompt_SelectTarget(struct DirectionalManager *, s32);
+u32 InteractionPrompt_ReleaseTarget(struct DirectionalManager *, s32);
+s32 InteractionPrompt_CheckApproach(struct DirectionalManager *,
                                         struct DirectionalController *);
-s32 DirectionalController_CheckInput(struct DirectionalManager *, struct DirectionalController *,
+s32 InteractionPrompt_CheckInput(struct DirectionalManager *, struct DirectionalController *,
                                      s32);
-s32 DirectionalController_CheckRemaining(struct DirectionalManager *,
+s32 InteractionPrompt_CheckRemaining(struct DirectionalManager *,
                                          struct DirectionalController *);
-s32 DirectionalController_UpdateAll(struct DirectionalManager *);
-s32 DirectionalController_DestroyManager(struct DirectionalManager *);
-s32 DirectionalController_InitManager(struct DirectionalManager *, void *);
-void *DirectionalController_CreateManagerTask(void *);
-s32 DirectionalController_ScriptCreate(void);
-s32 DirectionalController_ScriptRelease(void);
-s32 DirectionalController_ScriptMove(void);
+s32 InteractionPrompt_UpdateAll(struct DirectionalManager *);
+s32 InteractionPrompt_DestroyManager(struct DirectionalManager *);
+s32 InteractionPrompt_InitManager(struct DirectionalManager *, void *);
+void *InteractionPrompt_CreateManagerTask(void *);
+s32 InteractionPrompt_ScriptCreate(void);
+s32 InteractionPrompt_ScriptRelease(void);
+s32 InteractionPrompt_ScriptMove(void);
 
 #endif

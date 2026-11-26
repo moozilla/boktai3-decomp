@@ -1,7 +1,4 @@
-#define Anim_FindGlyphEntryById     sub_082196FC
-#define Anim_RemoveAllInCurrentList sub_082195F8
-#define Blend_Disable               sub_082195AC
-#include "engine/video/animation_widget.h"
+#include "engine/video/anim_sprite_glyph.h"
 #include "engine/video/render.h"
 #include "engine/video/display_resource.h"
 
@@ -31,21 +28,21 @@ u32 Anim_ResetDefaultFlags(void)
 
 void Anim_UnlinkFromList(struct AnimSprite *, u32);
 
-void Anim_Remove(struct AnimSprite *widget)
+void Anim_Remove(struct AnimSprite *animSprite)
 {
-    if (widget->active != 0)
-        Anim_UnlinkFromList(widget, widget->list);
+    if (animSprite->active != 0)
+        Anim_UnlinkFromList(animSprite, animSprite->list);
 }
 
 /* Anim_RemoveAllInCurrentList: Walks the current animation list and removes every entry while preserving the next pointer */
 
 void Anim_RemoveAllInCurrentList(void)
 {
-    struct AnimSprite *widget = gMainSpriteListHeads[gRenderListIndex];
-    while (widget) {
-        struct AnimSprite *next = widget->next;
-        Anim_Remove(widget);
-        widget = next;
+    struct AnimSprite *animSprite = gMainSpriteListHeads[gRenderListIndex];
+    while (animSprite) {
+        struct AnimSprite *next = animSprite->next;
+        Anim_Remove(animSprite);
+        animSprite = next;
     }
 }
 
@@ -77,9 +74,9 @@ s32 ResourceHeader_Relocate(void *destination, void *source)
     return 0;
 }
 
-struct WidgetGlyphEntry *Anim_FindGlyphEntryById(struct AnimSpriteResource *table, u16 id)
+struct AnimSpriteGlyph *Anim_FindGlyphEntryById(struct AnimSpriteResource *table, u16 id)
 {
-    struct WidgetGlyphEntry *entry = table->glyphs;
+    struct AnimSpriteGlyph *entry = table->glyphs;
     s32 i;
     for (i = 0; i < table->glyphCount; i++) {
         if (entry->kind == id)
@@ -89,62 +86,62 @@ struct WidgetGlyphEntry *Anim_FindGlyphEntryById(struct AnimSpriteResource *tabl
     return NULL;
 }
 
-s32 Anim_SelectWidgetGlyph(struct AnimSprite *widget, struct AnimSpriteResource *resource,
+s32 AnimSprite_SelectGlyph(struct AnimSprite *animSprite, struct AnimSpriteResource *resource,
                            u16 index)
 {
-    struct WidgetGlyphEntry *entry = resource->glyphs + index;
+    struct AnimSpriteGlyph *entry = resource->glyphs + index;
     if (entry == 0)
         return -1;
-    widget->glyphKind = entry->kind;
-    widget->width = entry->width;
-    widget->height = entry->height;
-    widget->originX = entry->originX;
-    widget->originY = entry->originY;
-    widget->centerX = entry->centerX;
-    widget->centerY = entry->centerY;
-    widget->scaleX = 0x40;
-    widget->scaleY = 0x40;
-    widget->rotation = 0;
-    if (widget->palette == 0) {
-        widget->paletteBank = resource->paletteIndex;
-        widget->palette = gPaletteBankData + (widget->paletteBank << 5);
+    animSprite->glyphKind = entry->kind;
+    animSprite->width = entry->width;
+    animSprite->height = entry->height;
+    animSprite->originX = entry->originX;
+    animSprite->originY = entry->originY;
+    animSprite->centerX = entry->centerX;
+    animSprite->centerY = entry->centerY;
+    animSprite->scaleX = 0x40;
+    animSprite->scaleY = 0x40;
+    animSprite->rotation = 0;
+    if (animSprite->palette == 0) {
+        animSprite->paletteBank = resource->paletteIndex;
+        animSprite->palette = gPaletteBankData + (animSprite->paletteBank << 5);
     }
-    widget->resourceIndex = entry->resourceIndex;
-    widget->tileData = resource->tileBase + entry->tileOffset;
-    widget->extraData = resource->extraData;
+    animSprite->resourceIndex = entry->resourceIndex;
+    animSprite->tileData = resource->tileBase + entry->tileOffset;
+    animSprite->extraData = resource->extraData;
     return 0;
 }
 
-s32 Anim_InitPositionedWidget(struct AnimSprite *widget, void *resource, u16 glyph, u32 flags,
+s32 AnimSprite_InitAtPosition(struct AnimSprite *animSprite, void *resource, u16 glyph, u32 flags,
                               u8 attributeA, u8 mode, u8 duration,
                               const struct ContactPosition *position)
 {
-    if (Anim_SelectWidgetGlyph(widget, resource, glyph) < 0)
+    if (AnimSprite_SelectGlyph(animSprite, resource, glyph) < 0)
         return -1;
-    widget->stamp = gDefaultAnimFlags;
-    widget->flags |= flags;
-    widget->elapsed = 0;
-    widget->durationScale = 0x40;
-    widget->duration = duration;
-    widget->attribute1A = attributeA;
-    widget->mode = mode;
-    widget->position = *position;
+    animSprite->stamp = gDefaultAnimFlags;
+    animSprite->flags |= flags;
+    animSprite->elapsed = 0;
+    animSprite->durationScale = 0x40;
+    animSprite->duration = duration;
+    animSprite->attribute1A = attributeA;
+    animSprite->mode = mode;
+    animSprite->position = *position;
     return 0;
 }
 
-s32 Anim_LoadKeyframe(struct AnimSprite *widget, struct AnimSpriteResource *resource,
+s32 Anim_LoadKeyframe(struct AnimSprite *animSprite, struct AnimSpriteResource *resource,
                       u16 glyph, u8 mode)
 {
-    if (Anim_SelectWidgetGlyph(widget, resource, glyph) < 0)
+    if (AnimSprite_SelectGlyph(animSprite, resource, glyph) < 0)
         return -1;
-    widget->stamp = gDefaultAnimFlags;
-    widget->mode = mode;
+    animSprite->stamp = gDefaultAnimFlags;
+    animSprite->mode = mode;
     return 0;
 }
 
 void Anim_LinkToList(void *, u32);
 
-s32 Widget_InitLinked(struct AnimSprite *widget, void *resource, u16 glyph, u32 flags,
+s32 AnimSprite_InitLinked(struct AnimSprite *animSprite, void *resource, u16 glyph, u32 flags,
                       u8 attributeA, u8 mode, u8 duration,
                       const struct ContactPosition *position)
 {
@@ -157,81 +154,81 @@ s32 Widget_InitLinked(struct AnimSprite *widget, void *resource, u16 glyph, u32 
         initialPosition.z = 0;
     } else
         initialPosition = *position;
-    zero = widget->active;
+    zero = animSprite->active;
     if (zero == 0) {
-        widget->glyphKind = zero;
-        widget->value6 = zero;
-        widget->sequenceId = zero;
-        widget->frameIndex = zero;
-        widget->frameCount = zero;
-        widget->playbackFlags = zero;
-        widget->status = 0;
-        widget->width = zero;
-        widget->height = zero;
-        widget->originX = zero;
-        widget->originY = zero;
-        widget->centerX = zero;
-        widget->centerY = zero;
-        widget->scaleX = 0;
-        widget->scaleY = 0;
-        widget->rotation = zero;
-        widget->value3C = zero;
-        widget->frames = NULL;
-        widget->palette = zero;
-        widget->tileData = zero;
-        widget->extraData = zero;
-        Anim_InitPositionedWidget(widget, resource, glyph, flags, attributeA, mode,
+        animSprite->glyphKind = zero;
+        animSprite->value6 = zero;
+        animSprite->sequenceId = zero;
+        animSprite->frameIndex = zero;
+        animSprite->frameCount = zero;
+        animSprite->playbackFlags = zero;
+        animSprite->status = 0;
+        animSprite->width = zero;
+        animSprite->height = zero;
+        animSprite->originX = zero;
+        animSprite->originY = zero;
+        animSprite->centerX = zero;
+        animSprite->centerY = zero;
+        animSprite->scaleX = 0;
+        animSprite->scaleY = 0;
+        animSprite->rotation = zero;
+        animSprite->value3C = zero;
+        animSprite->frames = NULL;
+        animSprite->palette = zero;
+        animSprite->tileData = zero;
+        animSprite->extraData = zero;
+        AnimSprite_InitAtPosition(animSprite, resource, glyph, flags, attributeA, mode,
                                   duration, &initialPosition);
         gDefaultAnimFlags++;
         if (gDefaultAnimFlags == 0xFFFF)
             gDefaultAnimFlags = zero;
-        widget->cachedFrame = -1;
-        widget->cachedPalette = -1;
-        widget->previous = zero;
-        widget->next = zero;
-        Anim_LinkToList(widget, (u32) - (flags & 0x80) >> 31);
+        animSprite->cachedFrame = -1;
+        animSprite->cachedPalette = -1;
+        animSprite->previous = zero;
+        animSprite->next = zero;
+        Anim_LinkToList(animSprite, (u32) - (flags & 0x80) >> 31);
         return 0;
     }
     return -1;
 }
 
-s32 Widget_InitCleared(struct AnimSprite *widget, void *resource, u16 glyph, u32 flags,
+s32 AnimSprite_InitCleared(struct AnimSprite *animSprite, void *resource, u16 glyph, u32 flags,
                        u8 attributeA, u8 mode, u8 duration, void *position)
 {
-    u32 zero = widget->active;
+    u32 zero = animSprite->active;
     if (zero != 0)
         return -1;
     else {
-        widget->glyphKind = zero;
-        widget->value6 = zero;
-        widget->sequenceId = zero;
-        widget->frameIndex = zero;
-        widget->frameCount = zero;
-        widget->playbackFlags = zero;
-        widget->status = 0;
-        widget->width = zero;
-        widget->height = zero;
-        widget->originX = zero;
-        widget->originY = zero;
-        widget->centerX = zero;
-        widget->centerY = zero;
-        widget->scaleX = 0;
-        widget->scaleY = 0;
-        widget->rotation = zero;
-        widget->value3C = zero;
-        widget->frames = NULL;
-        widget->palette = zero;
-        widget->tileData = zero;
-        widget->extraData = zero;
-        Anim_InitPositionedWidget(widget, resource, glyph, flags, attributeA, mode,
+        animSprite->glyphKind = zero;
+        animSprite->value6 = zero;
+        animSprite->sequenceId = zero;
+        animSprite->frameIndex = zero;
+        animSprite->frameCount = zero;
+        animSprite->playbackFlags = zero;
+        animSprite->status = 0;
+        animSprite->width = zero;
+        animSprite->height = zero;
+        animSprite->originX = zero;
+        animSprite->originY = zero;
+        animSprite->centerX = zero;
+        animSprite->centerY = zero;
+        animSprite->scaleX = 0;
+        animSprite->scaleY = 0;
+        animSprite->rotation = zero;
+        animSprite->value3C = zero;
+        animSprite->frames = NULL;
+        animSprite->palette = zero;
+        animSprite->tileData = zero;
+        animSprite->extraData = zero;
+        AnimSprite_InitAtPosition(animSprite, resource, glyph, flags, attributeA, mode,
                                   duration, position);
         gDefaultAnimFlags++;
         if (gDefaultAnimFlags == 0xFFFF)
             gDefaultAnimFlags = zero;
-        widget->cachedFrame = -1;
-        widget->cachedPalette = -1;
-        widget->previous = 0;
-        widget->next = 0;
+        animSprite->cachedFrame = -1;
+        animSprite->cachedPalette = -1;
+        animSprite->previous = 0;
+        animSprite->next = 0;
         return 0;
     }
 }

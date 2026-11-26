@@ -85,7 +85,7 @@ extern u32 gUnk_08604A6C[];
 extern void (*gUnk_08604A54[])(void *, u32);
 extern EffectParticleUpdate gUnk_08604A78[][5];
 
-void sub_0800A800(void);
+void EffectManager_ClearGlobal(void);
 u32 EffectManager_RemoveEffect(struct EffectManager *, struct Effect *);
 s32 EffectManager_RemoveActiveEffects(void *);
 u32 GunDelHell_Create(void *);

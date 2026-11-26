@@ -1,6 +1,5 @@
 #include "npc/manager/scene_actor_animation.h"
 /* SceneActorAnimation_SelectDirectionalExtraFlags: Selects a profile animation with variant zero and combines direction-derived mirroring with entry flags and caller-supplied playback flags */
-#define SceneActorAnimation_SelectDirectionalExtraFlags sub_080762A8
 void SceneActorAnimation_SelectDirectionalExtraFlags(struct RoomActor *actor, s32 index,
                                                      u32 extraFlags)
 {
@@ -12,7 +11,6 @@ void SceneActorAnimation_SelectDirectionalExtraFlags(struct RoomActor *actor, s3
     u8 *variantPointer = &directionVariant;
     u32 flags;
     u32 entryFlags;
-    u8 *variantReload;
     u16 variant;
     u32 force;
     u8 *restart;
@@ -28,7 +26,6 @@ void SceneActorAnimation_SelectDirectionalExtraFlags(struct RoomActor *actor, s3
             *variantPointer = quadrant;
         }
     }
-    variantReload = &directionVariant;
     variant = 0;
     flags = *mirrorPointer | extraFlags;
     entryFlags = entry->flags;

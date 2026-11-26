@@ -1,0 +1,5 @@
+#include "effects/particles/scene_particle_pool.h"
+/* SceneParticlePool_NoOp: Empty function following the anchored particle pool singleton reset; retains the existing provisional source alias. */
+void SceneParticlePool_NoOp(void)
+{
+}

@@ -24,7 +24,6 @@ void SceneHud_RebuildTertiaryOptions(u8 *);
 u32 DarkLoan_CreateHiddenDisplay(u32, u32, u32, u32);
 
 // confidence=low: initializes the scene HUD and its script-configured panels.
-#define SceneHud_InitFromScript sub_08178C80
 u32 SceneHud_InitFromScript(u8 *s)
 {
     u32 zero, value;

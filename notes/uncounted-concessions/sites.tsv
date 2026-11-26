@@ -713,7 +713,7 @@ once-loop	src/fn/sub_08173C0C.c	53	equipped = Inventory_IsEquipmentAssigned(slot
 once-loop	src/fn/sub_081A55D4.c	18	x += 0x20;
 once-loop	src/fn/sub_081A8820.c	42	Vanargand_StopActionSequence((u8 *)q + 0x21C);             q->st = v;
 once-loop	src/fn/sub_081D010C.c	78	npc->sub = zero;
-once-loop	src/fn/sub_081D07D8.c	65	update = SceneNpc_UpdateProjectedVisible;         npc->prevState = 0x1
+once-loop	src/fn/sub_081D07D8.c	65	update = Otenko_UpdateProjectedVisible;         npc->prevState = 0x1
 once-loop	src/fn/sub_081E2910.c	13	gRandomIndex = (gRandomIndex + 1) & 1023;
 once-loop	src/fn/sub_081F28C4.c	37	saved = position;
 once-loop	src/fn/sub_081F2A08.c	41	renderOrigin = origin;

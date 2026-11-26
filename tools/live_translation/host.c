@@ -303,7 +303,7 @@ void lt_step(unsigned frames, unsigned keys)
                     cpu->gprs[0] = slot->replacement;
                     break;
                 }
-                case 0x08219728: { /* Anim_SelectWidgetGlyph(widget, header, frame) */
+                case 0x08219728: { /* AnimSprite_SelectGlyph(widget, header, frame) */
                     uint32_t header = cpu->gprs[1], index = (uint16_t)cpu->gprs[2];
                     uint32_t glyphs = core->rawRead32(core, header + 12, -1);
                     struct FrameChoice *slot = &frame_cache[((glyphs >> 3) ^ index) % 2048];

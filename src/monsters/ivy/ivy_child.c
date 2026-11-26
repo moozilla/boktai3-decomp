@@ -1,3 +1,4 @@
+#include "monsters/sword/sword_wave_component.h"
 #include "global.h"
 #include "engine/engine.h"
 #include "script/script_utility.h"
@@ -85,7 +86,7 @@ extern const s16 gUnk_086149C4[];
 
 void TargetMotion_UpdateFlashingExit(void);
 
-void sub_08159164(u32);
+void Player_AddExperience(u32);
 
 void Player_RefreshLifeState(void *, s32);
 
@@ -178,7 +179,7 @@ void Ivy_UpdateDefeatBurst(struct IvyBurstPrefix *actor)
         actor->burstIndex = 0;
         actor->flash = 0;
         actor->bursts = 30;
-        sub_08159164(actor->lifeValue);
+        Player_AddExperience(actor->lifeValue);
         Player_RefreshLifeState(actor->lifeState, actor->lifeParameter);
         actor->done = 1;
     }
@@ -500,182 +501,135 @@ void Ivy_OnChildContact(struct SwordContact *source, struct SwordContact *target
     }
 }
 
-struct S {
-    u8 filler[0x1e];
-    u16 h1e;
-    u8 f2[0xf2 - 0x20];
-    u16 hf2;
-    u8 f3[0xfa - 0xf4];
-    u16 hfa;
-    u8 f4[0x180 - 0xfc];
-    u32 cnt;
+/* The same child runs the blend, neutral approach, and bobbing callbacks. */
+struct IvyChildPulse {
+    u32 flags;
+    u8 unknown4[2];
+    u8 rotation, unknown7;
+    s8 blendLow, blendHigh;
+    u8 unknownA[0x12];
+    s16 x, y, z;
+    u8 unknown22[0x2C];
+    u16 flags4E;
+    u8 unknown50[0x52];
+    u16 flagsA2;
+    u8 unknownA4[0x4E];
+    u16 verticalVelocity;
+    u8 unknownF4[6];
+    u16 verticalAcceleration;
+    u8 unknownFC[0x1D];
+    u8 entryFlags;
+    u8 unknown11A[4];
+    u8 active, phase;
+    u8 unknown120[0x14];
+    u16 endX;
+    s16 endY;
+    u16 endZ, unknown13A;
+    u16 startX, startY, startZ, unknown142;
+    s16 dx, dy, dz;
+    u8 unknown14A[0x12];
+    u8 *parent;
+    u8 unknown160[4];
+    void (*update)(void);
+    u8 unknown168[4];
+    void (*blendUpdate)(struct IvyChildPulse *);
+    void (*orbitUpdate)(void);
+    u8 unknown174[0xC];
+    u32 bobTicks, orbitDelay;
+    u8 unknown188[2];
+    s8 orbitDirection;
+    u8 unknown18B[3];
+    s8 blendLowStep, blendHighStep;
 };
 
-void Ivy_UpdateChildBobbing(struct S *s)
+typedef char IvyChildPulseSizeCheck[sizeof(struct IvyChildPulse) == 0x190 ? 1 : -1];
+
+void Ivy_UpdateChildBobbing(struct IvyChildPulse *s)
 {
-    u32 *c = &s->cnt;
+    u32 *c = &s->bobTicks;
     if ((*c & 3) == 0)
-        s->hf2 += s->hfa;
+        s->verticalVelocity += s->verticalAcceleration;
     *c = *c - 1;
     if (*c == 0) {
-        s->hfa = -s->hfa;
+        s->verticalAcceleration = -s->verticalAcceleration;
         *c = 0x28;
     }
-    s->h1e += s->hf2;
+    s->y += s->verticalVelocity;
 }
-
-struct A {
-    u8 p0[6];
-    u8 b6, b7, b8, b9;
-    u8 pA[0x16c - 0xa];
-    void (*fn)(void);
-    u8 p170[0x18e - 0x170];
-    u8 b18e, b18f;
-};
 
 void Sound_PlaySong(u32 song); /* m4aSongNumStart, remembering the song per track unless muted */
 
-struct Obj;
+void Ivy_ApproachChildBlend(struct IvyChildPulse *p);
 
-void Ivy_ApproachChildBlend(struct Obj *p);
-
-void Ivy_BeginChildPulse(struct A *p)
+void Ivy_BeginChildPulse(struct IvyChildPulse *p)
 {
-    p->b6 = 0x80;
-    p->b8 = 0x7f;
-    p->b9 = 1;
-    p->b18e = 0xf8;
-    p->b18f = 0x10;
-    p->fn = Ivy_ApproachChildBlend;
+    p->rotation = 0x80;
+    p->blendLow = 0x7f;
+    p->blendHigh = 1;
+    p->blendLowStep = -8;
+    p->blendHighStep = 0x10;
+    p->blendUpdate = Ivy_ApproachChildBlend;
     Sound_PlaySong(0x16d);
 }
 
-struct Obj {
-    u32 flags;
-    u8 pad4[0x2];
-    u8 rotation;
-    u8 pad7[0x1];
-    s8 byte8;
-    s8 byte9;
-    u8 padA[0x12];
-    s16 x;
-    s16 y;
-    s16 z;
-    u8 pad22[0x2c];
-    u16 flags4E;
-    u8 pad50[0x52];
-    u16 flagsA2;
-    u8 padA4[0x4e];
-    u16 velocity;
-    u8 padF4[0x40];
-    u16 endX;
-    s16 endY;
-    u16 endZ;
-    u8 pad13A[0x2];
-    u16 startX;
-    u16 startY;
-    u16 startZ;
-    u8 pad142[0x2];
-    s16 dx;
-    s16 dy;
-    s16 dz;
-    u8 pad14A[0x12];
-    u8 *parent;
-    u8 pad160[0xc];
-    void (*callback)(struct Obj *);
-    u8 pad170[0x1e];
-    s8 delta8;
-    s8 delta9;
-};
+void ActorPhase_ApproachNeutral(struct IvyChildPulse *p);
 
-struct PhaseActor;
-
-void ActorPhase_ApproachNeutral(struct PhaseActor *p);
-
-void Ivy_ApproachChildBlend(struct Obj *p)
+void Ivy_ApproachChildBlend(struct IvyChildPulse *p)
 {
-    s32 a = p->byte8, b = p->byte9;
+    s32 a = p->blendLow, b = p->blendHigh;
     if (a > 64) {
-        a += p->delta8;
+        a += p->blendLowStep;
         if (a < 64)
             a = 64;
     }
     if (b < 127) {
-        b += p->delta9;
+        b += p->blendHighStep;
         if (b > 127)
             b = 127;
     }
-    p->byte8 = a;
-    p->byte9 = b;
+    p->blendLow = a;
+    p->blendHigh = b;
     if (b == 127) {
-        p->byte8 = 64;
-        p->delta9 = -16;
-        p->callback = ActorPhase_ApproachNeutral;
+        p->blendLow = 64;
+        p->blendHighStep = -16;
+        p->blendUpdate = ActorPhase_ApproachNeutral;
     }
 }
 
-struct PhaseActor {
-    u8 unknown0[9];
-    s8 phase;
-    u8 unknownA[0x10F];
-    u8 flags119;
-    u8 unknown11A[4];
-    u8 field11E, field11F;
-    u8 unknown120[0x44];
-    void (*update164)(void);
-    u8 unknown168[4];
-    void (*update16C)(void);
-    u8 unknown170[0x1A];
-    s8 direction;
-    u8 unknown18B[4];
-    u8 phaseStep;
-};
-
-void Ivy_BeginChildPulse(struct A *p);
+void Ivy_BeginChildPulse(struct IvyChildPulse *p);
 
 void IvyChild_UpdateAfterBob(void);
 
-void ActorPhase_ApproachNeutral(struct PhaseActor *p)
+void ActorPhase_ApproachNeutral(struct IvyChildPulse *p)
 {
-    s32 phase = p->phase;
+    s32 phase = p->blendHigh;
     if (phase > 64) {
-        phase += (s8)p->phaseStep;
+        phase += p->blendHighStep;
         if (phase < 64)
             phase = 64;
     }
-    p->phase = phase;
+    p->blendHigh = phase;
     if (phase == 64) {
         u32 random;
-        u8 one;
         u32 offset;
-        p->update16C = Ivy_BeginChildPulse;
+        p->blendUpdate = Ivy_BeginChildPulse;
         gRandomIndex = (gRandomIndex + 1) & 1023;
         offset = gRandomIndex * 2;
         random = *(const u16 *)(offset + (u32)gRandomTable);
-        one = 1;
-        random &= one;
-        p->direction = random ? 1 : -1;
-        p->field11E = one;
-        p->field11F = one;
-        p->flags119 = one | p->flags119;
-        p->update164 = IvyChild_UpdateAfterBob;
+        random &= 1;
+        p->orbitDirection = random ? 1 : -1;
+        SwordWaveComponent_SetAction((void *)p, 1, 1);
+        p->update = IvyChild_UpdateAfterBob;
     }
 }
 
-struct PBeginChildRandomDelay {
-    u8 f[0x170];
-    void (*cb)(void);
-    u8 g[0x184 - 0x174];
-    u32 a;
-};
-
 void ActorPhase_OrbitParent(void);
 
-void Ivy_BeginChildRandomDelay(struct PBeginChildRandomDelay *p)
+void Ivy_BeginChildRandomDelay(struct IvyChildPulse *p)
 {
     u32 v;
     gRandomIndex = (gRandomIndex + 1) & 0x3ff;
     v = *(u16 *)(((u8 *)gRandomTable) + gRandomIndex * 2);
-    p->a = (v & 0x40) + 0x1e;
-    p->cb = ActorPhase_OrbitParent;
+    p->orbitDelay = (v & 0x40) + 0x1e;
+    p->orbitUpdate = ActorPhase_OrbitParent;
 }

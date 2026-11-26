@@ -41,7 +41,7 @@ FragmentGroup_SpawnRadial (08014CA4) still has three proved-zero reports. Replac
 
 ## Animated particles
 
-5 → 0 warnings. The slot holds a manager pointer and every one of its 2673 header dependents matches. Both assigned files use the shared particle, sprite and sequence types. AnimatedParticles_Create now retains all four ROM sequence calls with direct state arguments. Passing the particle animation to both DisplaySequence_StepSprite and the later duration setter eliminates the extra join copy. No unions, proved-zero terms or branch labels remain. Stock MATCH for 52 and 1176 bytes. Commits 0020–0022.
+5 → 0 warnings. The slot holds a manager pointer and every one of its 2673 header dependents matches. Both assigned files use the shared particle, sprite and sequence types. ImpactBurst_Create now retains all four ROM sequence calls with direct state arguments. Passing the particle animation to both DisplaySequence_StepSprite and the later duration setter eliminates the extra join copy. No unions, proved-zero terms or branch labels remain. Stock MATCH for 52 and 1176 bytes. Commits 0020–0022.
 
 ## Fading particle groups
 

@@ -1,3 +1,4 @@
+#include "scene/actor/scene_actor_status.h"
 #include "scene/actor/scene_actor_control_begin.h"
 #include "scene/motion/scene_actor_terrain_reaction.h"
 #include "global.h"
@@ -5,7 +6,7 @@
 #include "scene/actor/scene_actor_control_motion.h"
 #include "debug.h"
 #include "scene/collision/scene_actor_contact_response.h"
-u8 sub_0812F3CC(struct ChaseActor *);
+u8 SceneActorReaction_BeginContactResponse(struct ChaseActor *);
 s32 NavMesh_ConsumeProbeEvent(void *);
 u8 SceneActorBehavior_AccelerateTowardDescriptor(void *, void *, u32, u32, u32);
 u8 SceneActorBehavior_RequestDescriptorTurn(void *, void *, u32, u32, u32);
@@ -31,7 +32,7 @@ void SceneActorRoute_UpdateRouteCompletion(struct ChaseActor *actor)
     }
     if ((u8)Callback_InvokeActor(actor, actor->base.contactQuery.opaque))
         return;
-    if ((u8)sub_0812F3CC(actor))
+    if ((u8)SceneActorReaction_BeginContactResponse(actor))
         return;
     SceneActorAnimation_SelectDirectionalEntry(actor, 1);
     speed = Callback_InvokeActor(actor, actor->base.animationQuery.opaque);
@@ -61,11 +62,9 @@ void SceneActorRoute_UpdateRouteCompletion(struct ChaseActor *actor)
         } else if (SceneActorBehavior_AccelerateTowardDescriptor(actor, *descriptor, 32, 32,
                                                                  speed)) {
             struct ContactPosition **destination;
-            u32 destinationOffset;
             u32 zero = event;
             group->common.control.timer = zero;
-            destinationOffset = 0x200;
-            destination = (void *)((u8 *)group + destinationOffset);
+            destination = &group->destination;
             if ((*destination)->pad != 0) {
                 struct SceneActorRegistryControl *control;
                 SceneActorTerrain_EnterState(actor, 0, 0, 2);
@@ -73,17 +72,8 @@ void SceneActorRoute_UpdateRouteCompletion(struct ChaseActor *actor)
                 control = &group->common.control;
                 {
                     u32 mask = 0x200000;
-                    if (actor->base.behaviorFlags & mask) {
-                        {
-                            u32 *flags = &actor->base.statusFlags;
-                            u32 mask = ~0x1000000;
-                            *flags &= mask;
-                        }
-                        *motionFlags &= ~destinationOffset;
-                        control->mode = 0;
-                        control->counter = zero;
-                        control->timer = zero;
-                    }
+                    if (actor->base.behaviorFlags & mask)
+                        ActorStatus_ClearInteraction(actor, control);
                 }
                 {
                     u32 *flags = &actor->base.behaviorFlags;

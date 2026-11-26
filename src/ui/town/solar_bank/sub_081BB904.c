@@ -11,7 +11,6 @@ void SolarBank_BeginClosing(struct SolarBankPanel *);
 void SolarBank_BeginSelection(struct SolarBankPanel *);
 void SolarBank_RefreshAmountDigits(struct SolarBankPanel *);
 
-#define SolarBank_UpdateTransferInput sub_081BB904
 void SolarBank_UpdateTransferInput(struct SolarBankPanel *panel)
 {
     s32 v;

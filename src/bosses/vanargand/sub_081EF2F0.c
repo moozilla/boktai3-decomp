@@ -1,11 +1,11 @@
 #include "bosses/vanargand/vanargand_head_transition.h"
 
-void SceneActors_UpdateDelayedMovement(void);
+void VanargandHead_UpdateDelayedMovement(void);
 
-void SceneActors_EnterDelayedMovementState(struct Slot7Transition *actor)
+void VanargandHead_EnterDelayedMovementState(struct VanargandHeadTransition *actor)
 {
-    if (Slot7_TakeActionEntry(actor) == TRUE) {
-        Slot7_TransitionTo(actor, SceneActors_UpdateDelayedMovement);
+    if (VanargandHead_TakeActionEntry(actor) == TRUE) {
+        VanargandHead_TransitionTo(actor, VanargandHead_UpdateDelayedMovement);
     }
     actor->actionTimer++;
 }

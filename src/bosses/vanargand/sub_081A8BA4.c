@@ -1,6 +1,6 @@
 #include "bosses/vanargand/vanargand_pair_attack.h"
 
-void sub_08159164(s32);
+void Player_AddExperience(s32);
 
 void ActorSoundPhase_EnterPhase21(struct VanargandPairAttack *p)
 {
@@ -8,7 +8,7 @@ void ActorSoundPhase_EnterPhase21(struct VanargandPairAttack *p)
     if (Vanargand_ConsumeActionEntry(p)) {
         if (p->state != 21)
             Vanargand_EnterAction(p, 21);
-        sub_08159164(q->attachment);
+        Player_AddExperience(q->attachment);
     }
     p->actionTimer++;
 }

@@ -32,7 +32,7 @@ struct Manager {
 extern u16 gUnk_08604C42[], gUnk_08604C30[];
 extern s16 gUnk_086149C4[];
 #define RANDOM_TABLE ((u16 *)0x0203B400)
-void *FragmentManager_Create(void *, u32);
+void *ImpactFragmentManager_Create(void *, u32);
 s32 AnimData_Load(void *, s32);
 void AnimData_SelectPaletteBank(void *, s32);
 void Sprite_Init(struct Sprite *, void *, s32);
@@ -71,7 +71,7 @@ s32 FragmentGroup_SpawnRadial(s32 count, s32 type, struct Vec *position, s32 rad
     u8 *lifetimes;
     s32 j;
     u8 *animData;
-    if ((!gFragmentManager) && (!FragmentManager_Create(0, 0)))
+    if ((!gFragmentManager) && (!ImpactFragmentManager_Create(0, 0)))
         return -1;
     m = gFragmentManager;
     if (count > 6)

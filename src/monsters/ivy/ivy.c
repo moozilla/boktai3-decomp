@@ -1,3 +1,4 @@
+#include "scene/motion/scene_actor_terrain_reaction.h"
 #include "global.h"
 #include "scene/actor/scene_actor_reset.h"
 #include "monsters/ivy/ivy_phase.h"
@@ -55,7 +56,7 @@ static inline u8 IsUnavailable(struct ChaseActor *actor)
     return 0;
 }
 
-static inline u32 ContextFlag(struct IvyCaptureState *context, u32 input)
+static inline u32 ContextFlag(struct Ivy *context, u32 input)
 {
     return context->captureFlags & input;
 }
@@ -98,15 +99,7 @@ void SceneActorReaction_PlayHiddenCue(struct ChaseActor *actor)
         u32 zero = 0;
         drawable[7] = 2;
         actor->base.colliderA.responseValue = zero;
-        if (!actor->base.drawableKind) {
-            u32 *flags = actor->base.drawable;
-            u32 clear = ~1;
-            *flags &= clear;
-        } else {
-            u8 *tile = (u8 *)actor->base.drawable + 0x20;
-            u32 clear = ~1;
-            *(u32 *)(tile + 8) &= clear;
-        }
+        ActorStatus_SetBodyBit(actor, 0);
         SceneActorAnimation_SelectDirectionalFlags(actor, 15);
         Sound_PlaySong(475);
     }
@@ -668,7 +661,7 @@ void SceneActorControl_UpdateAnimationTransition(u8 *p, s32 frame)
     struct ChaseActor *actor = (void *)p;
     struct DisplaySequenceState *animation =
         &((struct SceneActorControlMotionDrawable *)actor->base.drawable)->sequence;
-    if (SceneActorControl_TakeFlag(&((struct IvyTransitionActor *)p)->prepared)) {
+    if (SceneActorControl_TakeFlag(&actor->base.field2B2)) {
         SceneActorAnimation_SelectDirectionalFlags((struct RoomActor *)p, 3);
         ((struct IvyTransitionActor *)p)->complete = 0;
         Ivy_SetBlend(p);
@@ -694,17 +687,18 @@ void SceneActorControl_UpdateAnimationTransition(u8 *p, s32 frame)
 
 void Ivy_UpdateRestartFlags(u8 *p)
 {
-    if (SceneActorControl_TakeFlag(p + 0x2B2))
-        SceneActorAnimation_SelectDirectionalFlags(p, 0x10);
-    if (*(u8 *)(p + 0x2B3)) {
-        ActorStatus_SetDrawableFlags((void *)p, 1);
-        *(u8 *)(p + 0x2B0) = 1;
+    struct ChaseActor *actor = (void *)p;
+    if (SceneActorControl_TakeFlag(&actor->base.field2B2))
+        SceneActorAnimation_SelectDirectionalFlags(&actor->base, 0x10);
+    if (actor->base.restart) {
+        ActorStatus_SetDrawableFlags(actor, 1);
+        actor->base.stepDone = 1;
     }
 }
 
 /* Ivy defeat state (tentative), a variant of Skeleton_UpdateDefeat (Skeleton_UpdateDefeat). On entry:
- * hides the actor, launches a particle burst through sub_08127590 and either plays cue 0xE5
- * (context flag 0x10) or runs the context's defeat script. After 20 frames, without flag 0x10
+ * hides the actor, launches a burst through SpriteProjectile_Create, then either plays cue
+ * 0xE5 (context flag 0x10) or runs the context's defeat script. After 20 frames, without flag 0x10
  * it revives (restores health, SceneActorReaction_PlayHiddenCue); otherwise the full defeat:
  * cue or six-spark burst, terrain and position scripts, event flag, kill counters per
  * category (saturating at 9999, plus one counter per collider reaction flag) and the reward.
@@ -735,9 +729,10 @@ static inline const u16 *ReadSparkTable(const union HitSparkTable *r)
     return r->table;
 }
 
-void sub_08127590(void *, void *, u32, u32, u32, u32, u32, u32, u32, u32, u32, u32, u32, u32, u32);
+void SpriteProjectile_Create(void *, void *, u32, u32, u32, u32, u32, u32, u32, u32, u32, u32, u32,
+                             u32, u32);
 
-void sub_08159164(u32);
+void Player_AddExperience(u32);
 
 void Player_RefreshLifeState(u32, u32);
 
@@ -990,8 +985,8 @@ void Ivy_UpdateDefeat(struct ChaseActor *actor, s32 frame)
         ClearPos(&vec, &buf.zero);
         Polar(&vec, actor->base.reactionDirection, Rand() & 0x1F);
         vec.y = (Rand() & 0x1F) + 0x30;
-        sub_08127590(&actor->base.body.position, &vec, 0xD638, 0x99DD, 10, 0x1E, 2, 0, 0x12A, 0, 0,
-                     0, 0, 0, 0);
+        SpriteProjectile_Create(&actor->base.body.position, &vec, 0xD638, 0x99DD, 10, 0x1E, 2, 0,
+                                0x12A, 0, 0, 0, 0, 0, 0);
         hidden = actor->base.hitReactionFlags & 0x10;
         if (hidden)
             Sound_PlaySong(0xE5);
@@ -1082,7 +1077,7 @@ void Ivy_UpdateDefeat(struct ChaseActor *actor, s32 frame)
     COUNT(0x87C);
     COUNT(0x538);
     RecordKill(actor, categoryp);
-    sub_08159164(actor->base.experience);
+    Player_AddExperience(actor->base.experience);
     Player_RefreshLifeState(actor->base.hitAttributes, actor->base.fieldA1);
     if (!SceneActorChase_Test(gEngineFlags, 0x4800) && !Flag(actor, 0x800, 0x2D0))
         SceneActorRecord_RecordPair(gScriptEntryProcedure, (u16)actor->base.body.id);
@@ -1132,14 +1127,6 @@ void SceneActorControl_WaitForTarget(struct ChaseActor *input)
     actor->base.counter2AC++;
 }
 
-/* The collider's flags as a 16-bit bitfield: the read-modify-write leaves the zeros that the
- * SetControl and ResetPhase stores reuse. */
-
-struct IvyColliderBits {
-    u8 unknown0[6];
-    u16 flags : 16;
-};
-
 #define SceneActorControl_UpdateDirectionalIdle Ivy_UpdateActiveState
 
 void SceneActorControl_UpdateTargetApproachPhase(struct ChaseActor *actor)
@@ -1151,7 +1138,7 @@ void SceneActorControl_UpdateTargetApproachPhase(struct ChaseActor *actor)
         state->targetMissFrames = 0;
     }
     if (actor->base.stepDone) {
-        struct IvyColliderBits *collider = (void *)&actor->base.colliderA;
+        struct ContactCollider *collider = &actor->base.colliderA;
         u32 mask = ~4;
         collider->flags &= mask;
         collider->flags |= 8;
@@ -1244,16 +1231,7 @@ void SceneActorControl_HideAndDisableCollision(struct ChaseActor *actor)
 {
     if (SceneActorControl_TakeFlag(&actor->base.field2B1)) {
         ActorStatus_SetDrawableFlags(actor, 1);
-        {
-            u32 state = 3;
-            u8 *field = &actor->base.state2A8;
-            u32 zero = 0;
-            *field = state;
-            actor->base.phase2A9 = zero;
-            actor->base.behavior2AA = zero;
-            actor->base.counter2AC = zero;
-            actor->base.field2B1 = 1;
-        }
+        SceneActorTerrain_EnterState(actor, 3, 0, 0);
         SceneActorTerrain_DisableCollision(actor);
     }
     actor->base.counter2AC++;
@@ -1954,9 +1932,9 @@ s32 Ivy_Init(void *object);
 
 void Ivy_Create(void)
 {
-    u8 *p = Heap_Alloc(0x640);
+    u8 *p = Heap_Alloc(sizeof(struct Ivy));
     if (p != 0) {
-        Memory_Clear(p, 0x640);
+        Memory_Clear(p, sizeof(struct Ivy));
         if (Ivy_Init(p) < 0) {
             Ivy_Destroy(p);
             Heap_Free(p);

@@ -1,5 +1,5 @@
 #include "objects/pile_driver/pile_driver_rig.h"
-void PileDriverRig_TickHideBurst(struct ScenePanelRig *rig)
+void PileDriverRig_TickHideBurst(struct PileDriverRig *rig)
 {
     struct ContactPackedVector extent;
     u16 *counter;
@@ -8,7 +8,7 @@ void PileDriverRig_TickHideBurst(struct ScenePanelRig *rig)
     if (*counter <= 63) {
         if (*counter == 0) {
             PileDriverRig_HideSprites(rig);
-            ((struct SceneRigParentView *)gScenePanel)->activated = 1;
+            ((struct SceneRigParentView *)gPileDriver)->activated = 1;
         }
         {
             u32 frame = *counter;

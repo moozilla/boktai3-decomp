@@ -1,28 +1,16 @@
-#include "global.h"
+#include "monsters/axe_armor/axe_armor.h"
 #include "engine/video/display_animation.h"
-struct SceneCountdownSequence {
-    u8 unknown0[0x108];
-    s32 (*update)(struct SceneCountdownSequence *);
-    struct DisplaySequenceState sequence;
-    u8 unknown11C[0x10];
-    s16 countdown;
-    u8 unknown12E[4];
-    u8 variant;
-    u8 unknown133[0x25];
-    void *resource;
-};
-void AxeArmor_FireProjectile(struct SceneCountdownSequence *);
-s32 AxeArmor_UpdateAttackTiming(struct SceneCountdownSequence *);
+void AxeArmor_FireProjectile(struct AxeArmor *);
+s32 AxeArmor_UpdateAttackTiming(struct AxeArmor *);
 void Anim_RestartSequence(struct DisplaySequenceState *, void *, u32, u32, u32);
-s32 AxeArmor_UpdateCountdown(struct SceneCountdownSequence *p)
+s32 AxeArmor_UpdateCountdown(struct AxeArmor *p)
 {
-    s16 *count = &p->countdown;
-    if (*count > 0) {
-        if (*count == 40)
+    if (p->countdown > 0) {
+        if (p->countdown == 40)
             AxeArmor_FireProjectile(p);
-        --*count;
+        --p->countdown;
     } else {
-        Anim_RestartSequence(&p->sequence, p->resource, 2, p->variant, 0);
+        Anim_RestartSequence(&p->sequence, p->resource, 2, (u8)p->facing, 0);
         p->update = AxeArmor_UpdateAttackTiming;
     }
     return 0;

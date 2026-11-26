@@ -7,77 +7,6 @@ s32 Screamer_InitColliders(struct ScreamerState *);
 void SceneBody_Init(void *, void *, void *, u32, u32, void *);
 void SceneBody_SetSprite(void *, void *);
 void TerrainOverlay_QueueAddActor(void *);
-static inline u32 Screamer_StepSequence(struct ScreamerSprite *owner,
-                                        struct DisplaySequenceState *state)
-{
-    const u16 *command;
-    u32 ended;
-    {
-        u32 offset = DisplaySequence_GetIndex(state) << 1;
-        const u16 *table;
-        table = state->commands;
-        command = (const u16 *)((u32)table + offset);
-    }
-    owner->frame = *command >> 6;
-    {
-        union DisplaySequenceControl control;
-        u32 bit, first;
-        control.raw = state->flags;
-        bit = 1;
-        first = (u8)(control.raw & bit);
-        if (first != (((*command & 0x30) >> 4) & bit))
-            owner->flags |= 4;
-        else
-            owner->flags &= ~4;
-    }
-    {
-        union DisplaySequenceControl control;
-        u32 bit, first;
-        control.raw = state->flags;
-        bit = 2;
-        first = (u8)(control.raw & bit);
-        if (first != (((*command & 0x30) >> 4) & bit))
-            owner->flags |= 8;
-        else
-            owner->flags &= ~8;
-    }
-    if (++state->elapsed >= state->duration) {
-        state->elapsed = 0;
-        if (state->flags & 4) {
-            if (state->index == 0) {
-                if (state->flags & 8)
-                    state->elapsed = state->duration;
-                else
-                    state->index = state->frameCount - 1;
-                ended = 1;
-            } else {
-                state->index--;
-                ended = 0;
-            }
-        } else {
-            if (++state->index >= state->frameCount) {
-                if (state->flags & 8) {
-                    state->elapsed = state->duration;
-                    state->index = state->frameCount - 1;
-                } else {
-                    state->index = 0;
-                }
-                ended = 1;
-            } else {
-                ended = 0;
-            }
-        }
-        command = state->commands + state->index;
-        state->frameWeight = DisplaySequence_MaskCommand(DisplaySequence_ReadCommand(command), 15);
-        state->duration = (state->frameWeight * (s32)state->speed) >> 6;
-        if (state->duration == 0)
-            state->duration = 1;
-    } else {
-        ended = 0;
-    }
-    return ended;
-}
-
 s32 Screamer_InitFromScript(struct ScreamerState *p, void *resource)
 {
     struct ActorPosition position;
@@ -183,7 +112,7 @@ s32 Screamer_InitFromScript(struct ScreamerState *p, void *resource)
         p->f1E0 = 1;
         Anim_SetSequence(&p->sequence, p->f218, 0x1A, (u8)p->f1D8, 8);
     }
-    Screamer_StepSequence(&p->sprite, &p->sequence);
+    Screamer_StepAnimation(p);
     if (!p->f1F6)
         Screamer_InitColliders(p);
     if (!p->f1D8)

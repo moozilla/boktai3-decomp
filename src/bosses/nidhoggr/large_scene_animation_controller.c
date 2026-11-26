@@ -1529,7 +1529,7 @@ extern u8 gUnk_0824F4AC[];
 extern struct ContactPosition gUnk_0824F4B4, gUnk_0824F4BC;
 extern struct ContactPosition gUnk_0824F4C4, gUnk_0824F4CC;
 extern struct ContactPosition gUnk_0824F4D4, gUnk_0824F4DC;
-void Widget_InitLinked(void *, void *, u32, u32, u32, u32, s32, const void *);
+void AnimSprite_InitLinked(void *, void *, u32, u32, u32, u32, s32, const void *);
 void TargetRegistry_RegisterSceneActor(void *, void *, void *);
 void Collider_SetBodyProperties(void *, u32, u32, u32);
 void Collider_SetAttackProperties(void *, s32, s32, u32, u32, s32);
@@ -1567,7 +1567,7 @@ void Nidhoggr_InitParts(void *arg0)
         row = t->rows;
         target = t->partExtra;
         do {
-            Widget_InitLinked(row, &t->animHdr, 0, 1, 2, 2, 60, zeroVector);
+            AnimSprite_InitLinked(row, &t->animHdr, 0, 1, 2, 2, 60, zeroVector);
             SceneAnimation_SetSlotState(t, i, gUnk_0824F490[i]);
             t->rowBlink[i] = 0;
             Collider_Init(&t->attackColliders[i], t->actorId, 0x2005, 0, extent, zeroVector,
@@ -1885,7 +1885,6 @@ void Nidhoggr_UpdateSuspendedObject(struct Nidhoggr *t)
 
 extern const struct ContactPosition gUnk_0824F544, gUnk_0824F54C, gUnk_0824F554, gUnk_0824F55C;
 // confidence=low: restores first-part collider ranges after the completion state.
-#define Nidhoggr_RestoreFirstPartRanges sub_08194858
 void Nidhoggr_RestoreFirstPartRanges(struct Nidhoggr *p)
 {
     struct ContactCollider *collider;
@@ -1921,7 +1920,6 @@ void Nidhoggr_RestoreFirstPartRanges(struct Nidhoggr *p)
 
 extern const struct ContactPosition gUnk_0824F564, gUnk_0824F56C, gUnk_0824F574, gUnk_0824F57C;
 // confidence=low: restores second-part collider ranges after the completion state.
-#define Nidhoggr_RestoreSecondPartRanges sub_0819494C
 void Nidhoggr_RestoreSecondPartRanges(struct Nidhoggr *p)
 {
     struct ContactCollider *collider;
@@ -2080,8 +2078,9 @@ void Nidhoggr_PlayNearbyRandomSound(struct SceneVec *pos)
 /* Tentative: called once per frame from Nidhoggr_Update, drives a death-flash effect while
  * t->flags[1] (0x724D) counts down (Blend_SetAlpha from a fade table gUnk_0824F588, toggling
  * bg blend bits in gDispCntShadow, and refreshing t->timedCollider at 0x5DFC), otherwise
- * sets bits in t->flags[2] (0x724E); also calls sub_08194858/sub_0819494C (part completion)
- * further down. 564 bytes; not attempted byte-for-byte this pass. confidence=low. */
+ * sets bits in t->flags[2] (0x724E). Calls Nidhoggr_RestoreFirstPartRanges and
+ * Nidhoggr_RestoreSecondPartRanges for part completion further down.
+ * 564 bytes; not attempted byte-for-byte this pass. confidence=low. */
 
 extern const u8 gUnk_0824F584[];
 extern const u8 gUnk_0824F588[];
@@ -2115,13 +2114,13 @@ void Nidhoggr_UpdateDamageFlashAndPartAnimations(struct Nidhoggr *t)
         t->flags[2] &= ~1;
         Nidhoggr_StartFirstPartAction(t);
     } else {
-        sub_08194858(t);
+        Nidhoggr_RestoreFirstPartRanges(t);
     }
     if (t->flags[2] & 8) {
         t->flags[2] &= ~2;
         Nidhoggr_StartSecondPartAction(t);
     } else {
-        sub_0819494C(t);
+        Nidhoggr_RestoreSecondPartRanges(t);
     }
     if (t->flags[2] & 0x10) {
         Nidhoggr_SetPart23SpecialAnimation((u32)t);
@@ -3376,7 +3375,7 @@ void Hud_SetMode(u32);
 
 void ScreenTransition_SendCommand(u32, u32, u32, u32, u32, u32, u32);
 
-void sub_08159164(u32);
+void Player_AddExperience(u32);
 
 void Bestiary_UnlockEntry(u32);
 
@@ -3428,7 +3427,7 @@ void Nidhoggr_UpdateDepartureTransition(struct Nidhoggr *t)
             break;
         }
         case 3:
-            sub_08159164(t->optionE);
+            Player_AddExperience(t->optionE);
             Bestiary_UnlockEntry(0x41);
             if (t->script)
                 Script_Call(t->script, 0);
@@ -3518,7 +3517,7 @@ void Nidhoggr_CheckActivationTriggers(struct Nidhoggr *p)
     }
 }
 
-void sub_0818ECFC(void *);
+void NidhoggrEffect_UpdatePool(void *);
 
 void Nidhoggr_InitParts(void *);
 
@@ -3541,7 +3540,7 @@ s32 Nidhoggr_Update(struct Nidhoggr *t)
     Nidhoggr_UpdateSuspendedObject(t);
     Nidhoggr_UpdateBackgroundScroll(t);
     Nidhoggr_UpdatePartMotion(t);
-    sub_0818ECFC(t->effectPool);
+    NidhoggrEffect_UpdatePool(t->effectPool);
     Nidhoggr_ApproachCameraTarget(t);
     if (t->targetMode)
         Camera_SetPosition(&t->cameraPos);

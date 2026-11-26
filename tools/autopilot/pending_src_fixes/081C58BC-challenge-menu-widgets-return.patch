@@ -6,8 +6,8 @@ result or the result of Anim_LoadKeyframe. Widget flag stores preserve it.
 
 The explicit form changed the ROM bytes. The guarded form passed the unit ROM check.
 
---- a/src/challenge_menu.c
-+++ b/src/challenge_menu.c
+--- a/src/ui/results/challenge_menu.c
++++ b/src/ui/results/challenge_menu.c
 @@ -233,4 +233,23 @@
      Palette_UpdateHighlightPulse(menu->highlightPalette, &menu->highlightPhase);
      SceneInputWidget_Show(&menu->widgets[3]);

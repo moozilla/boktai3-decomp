@@ -27,7 +27,7 @@ s32 VulcanCannon_UpdateTargeting(struct VulcanCannon *p)
     SceneVec_Copy(&target, Player_GetEffectivePosition(0));
     if (p->delayScript) {
         if (p->timer > p->delays[p->delayIndex]) {
-            if (p->facing == facingRight)
+            if (!p->facing)
                 Anim_RestartSequence(&p->sequence, p->resource, 0x1c, 0, 8);
             else
                 Anim_RestartSequence(&p->sequence, p->resource, 0x1c, 0, 12);
@@ -39,7 +39,7 @@ s32 VulcanCannon_UpdateTargeting(struct VulcanCannon *p)
         }
     } else {
         if (p->timer > p->turnDelay && p->turnDelay != 0) {
-            if (p->facing == facingRight)
+            if (!p->facing)
                 Anim_RestartSequence(&p->sequence, p->resource, 0x1c, 0, 8);
             else
                 Anim_RestartSequence(&p->sequence, p->resource, 0x1c, 0, 12);

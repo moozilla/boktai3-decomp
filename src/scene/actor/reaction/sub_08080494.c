@@ -1,3 +1,4 @@
+#include "scene/collision/scene_actor_damage_visibility.h"
 #include "global.h"
 // confidence=low: emits a defeat burst, runs the optional script and restores idle control.
 #include "scene/actor/scene_actor_reaction.h"
@@ -95,16 +96,7 @@ void SceneActorReaction_BeginDefeatBurst(struct ChaseActor *actor)
     if (!SceneActorReaction_TakePrepared(actor))
         return;
     {
-        struct SceneActorRegistryControl *control = &group->control;
-
-        u32 *field;
-        u32 mask;
-        field = &actor->base.behaviorFlags;
-        mask = ~0x141C0;
-        *field &= mask;
-        control->counter = 0;
-        control->field14 = 0;
-        control->timer = 0;
+        SceneActorReaction_ResetRouteControl(actor, &group->control);
         {
             struct ContactCollider *collider;
 
@@ -184,7 +176,6 @@ void SceneActorReaction_BeginDefeatBurst(struct ChaseActor *actor)
     InstallIdleControl(actor, SceneActorControl_OnIdle, 16, completedState);
     SelectState(actor, completedState, 0, 2);
     ResetStateEntry(actor, completedState);
-    if (!SceneActorControl_TestFlags(gEngineFlags, 0x4800) && !Flag(actor, 0x800, 0x2D0))
-        SceneActorRecord_RecordPair(gScriptEntryProcedure, (u16)actor->base.body.id);
+    SceneActorRecord_RecordDefeat(actor);
     ActorShadow_Disable(actor->base.shadow);
 }

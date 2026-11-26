@@ -351,7 +351,7 @@ void Skeleton_UpdateRiseRecovery(struct ChaseActor *actor)
         actor->base.counter2AC++;
 }
 
-u8 sub_0812F3CC(void *);
+u8 SceneActorReaction_BeginContactResponse(void *);
 
 static inline void Skeleton_SnapDelayedRoute_UpdateDelayedArrival(struct ContactPosition *position,
                                                       struct SceneActorRegistryRoute *route)
@@ -455,7 +455,7 @@ void Skeleton_UpdateDelayedArrival(struct ChaseActor *actor)
         actor->base.body.direction = actor->base.tracking.heading;
     if ((u8)Callback_InvokeActor(actor, actor->base.contactQuery.opaque))
         return;
-    if (sub_0812F3CC(actor))
+    if (SceneActorReaction_BeginContactResponse(actor))
         return;
     if ((s32)actor->base.counter2AC > 60) {
         if (SceneActorChase_QueryMotionFlags(actor, 0x80)) {

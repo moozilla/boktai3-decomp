@@ -52,7 +52,7 @@ struct FrameBlendState {
     u32 shift : 8;
     s32 resource;
 };
-struct VampireFrame {
+struct CountFrame {
     struct FrameBase base;
     u8 padE8[0x90];
     struct ContactCollider body;
@@ -103,7 +103,7 @@ static inline u8 Frame_ReadBlendAmount(struct FrameBlendState *blend)
 void Count_UpdatePresentation(void *arg0)
 {
     struct FrameBase *base = arg0;
-    struct VampireFrame *p = arg0;
+    struct CountFrame *p = arg0;
     struct FrameSprite *sprite = &base->sprite;
     struct ContactCollider *collider;
     s32 cost;

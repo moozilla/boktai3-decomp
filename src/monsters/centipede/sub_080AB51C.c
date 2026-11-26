@@ -1,26 +1,17 @@
-#include "global.h"
+#include "monsters/centipede/centipede_body.h"
 
-struct Q {
-    u8 f[0x87c];
-    u16 v[6];
-};
-struct P {
-    u8 f[0x3d0];
-    struct Q *q;
-};
-
-s32 Centipede_HasVisitedRoute(struct P *p, u32 x)
+s32 Centipede_HasVisitedRoute(struct RoomActor *actor, u32 cell)
 {
-    struct Q *q = p->q;
+    struct TentacleBody *body = actor->context;
     s32 i = 0;
-    u16 *v = q->v;
+    u16 *entry = body->routeHistory;
     s32 r;
     do {
-        if (*v == x) {
+        if (*entry == cell) {
             r = 1;
             goto done;
         }
-        v++;
+        entry++;
         i++;
     } while (i <= 5);
     r = 0;

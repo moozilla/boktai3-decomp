@@ -2,10 +2,10 @@
 
 Tags: #matching #phase3 #field
 
-## Scene_SpawnDirectionalDust (08004B64)
+## PuzzleBlock_SpawnDirectionalDust (08004B64)
 
 Matched without concessions: function score 74.3% -> 100%, a 25.7 percentage-point gain
-(384 bytes). The complete `src/objects/scene_objects/scene_object.c` unit passes `tools/check.py`.
+(384 bytes). The complete `src/objects/puzzle_blocks.c` unit passes `tools/check.py`.
 
 The old packed-word coordinate updates were retained: x and z are inserted into their
 32-bit position words while retaining the upper half. Ordinary halfword fields narrowed
@@ -33,5 +33,5 @@ The intermediate shared scalar mask draft was 66 ROM / 60 draft instructions off
 167:r3 matched it exactly, establishing the allocation diagnosis before the C rewrite.
 Simple loop reversal, pointer-vs-index arithmetic, signed/narrow helper arguments, local
 actor unions, table half construction and scalar reuse were also tested. The persistent
-search is `build/matchsearch/Scene_SpawnDirectionalDust`; scratch evidence is under
-`build/cx/work/Scene_SpawnDirectionalDust/`.
+search is `build/matchsearch/PuzzleBlock_SpawnDirectionalDust`; scratch evidence is under
+`build/cx/work/PuzzleBlock_SpawnDirectionalDust/`.

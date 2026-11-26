@@ -1,5 +1,5 @@
 #include "scene/motion/scene_steering_actor.h"
-s32 BurstEmitter_Create(const struct ContactPosition *, u32, u32, s32, s32, s32, s32);
+s32 SparkExplosion_Create(const struct ContactPosition *, u32, u32, s32, s32, s32, s32);
 void ScaledShadow_Destroy(void *);
 static inline s32 Dimension(u16 *field)
 {
@@ -23,7 +23,7 @@ void SceneSteeringActor_DestroySlot(struct SceneSteeringActorPool *p,
 
         height = Dimension(field);
 
-        BurstEmitter_Create(&actor->position, 2, 0, width, height, 40, 16);
+        SparkExplosion_Create(&actor->position, 2, 0, width, height, 40, 16);
         {
             u16 *frame = &actor->stateFrame;
             u32 zero = 0;

@@ -9,15 +9,13 @@ s32 RouteSpritePool_Destroy(struct RouteSpritePool *pool)
 {
     s32 i = 0;
     struct RouteSpriteActor *slot = pool->slots;
-    for (; i < 4;) {
+    for (; i < 4; slot++, i++) {
         if (Occupied(&pool->occupiedMask, i)) {
             if (slot->sprite.unknown4[0])
                 Sprite_Remove(&slot->sprite);
             if (slot->shadowAbsent == 0)
                 ScaledShadow_Destroy(slot->shadow);
         }
-        slot++;
-        i++;
     }
     {
         u32 zero = 0;
