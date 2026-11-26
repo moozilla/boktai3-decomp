@@ -426,7 +426,7 @@ void CharacterModel_SetComponentRenderMode(struct ModifierDisplayObject *parts, 
 
 /* ScenePool_ApplyMotionInput: keep the address symbol for the external motion caller. */
 
-s32 sub_0811CD70(struct ScenePoolActor *actor, u32 input)
+s32 ScenePool_ApplyMotionInput(struct ScenePoolActor *actor, u32 input)
 {
     s32 accelerating = 0;
     s32 braking;
@@ -650,7 +650,7 @@ void GameState_EnableAlternateHud(void)
     GameState_SetWorldFlags(0x80);
 }
 
-void GameState_SetRuntimeFlag100(void)
+void GameState_RequestPaletteRefresh(void)
 {
     GameState_SetWorldFlags(0x100);
 }

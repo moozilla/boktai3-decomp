@@ -41,7 +41,7 @@ cutscene and link/player (2 each).
 08237EC8–08243C10 surround the existing `link/link_player` unit
 (08239130–0823AE5C, `LinkPlayer_*` stats, abilities and session data). They
 have their own copies of movement, terrain recovery and camera clamps
-(`Player_ClampCameraOffsets_0823B3C4`, `Player_BeginTerrainRecovery_0823BA78`).
+(`LinkPlayer_ClampCameraOffsets`, `LinkPlayer_BeginTerrainRecovery`).
 Their constructor `sub_08243B0C` creates a 0xCAC task with
 `Player_UpdateLinkCore`, and the identity worker traced five of them to the
 Link Player dispatch tables (08E87A10, 08E87A90). The only gap in the block is
@@ -189,9 +189,9 @@ Status page stays in `ui/pause/status/`.
 
 ## Pass 5 identity corrections
 
-The title emblem runs four units at ROM addresses 081EAB64 through
-081EB724. They and `text_entry_widget.h` belong to `ui/title/`.
-The supplied range ends before the constructor at 081EB7DC.
+The title emblem runs five units at ROM addresses 081EAB64 through
+081EB7DC, including its constructor. They and
+`text_entry_widget.h` belong to `ui/title/`.
 The Bat Curtain owns its debris, and the Strike Crystal has its own file
 under `objects/`. Sabata’s White Forest encounter drives the frost emitter.
 The actor palette fade runs during Repair and belongs with palette effects.

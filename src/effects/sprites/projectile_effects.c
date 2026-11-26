@@ -23,8 +23,9 @@ u32 ActorEffect_SpawnAtActorPos(struct ScenePoolActor *actor, struct ContactPosi
         position->y += offset->y;
         position->z += offset->z;
     }
-    return sub_08113398(position, velocity, resourceId, sequenceResource, sequence, keyframe, row,
-                        variant, palette, timer, motion, visualFlags, priority, restitution);
+    return SceneDebris_Create(position, velocity, resourceId, sequenceResource, sequence, keyframe,
+                              row, variant, palette, timer, motion, visualFlags, priority,
+                              restitution);
 }
 
 u32 ActorParticles_CreateAtOffset(struct ScenePoolActor *actor, struct ContactPosition *offset,
@@ -44,8 +45,9 @@ u32 ActorParticles_CreateAtOffset(struct ScenePoolActor *actor, struct ContactPo
         position->y += offset->y;
         position->z += offset->z;
     }
-    return sub_08113398(position, velocity, resourceId, sequenceResource, sequence, keyframe, row,
-                        variant, palette, timer, motion, visualFlags, priority, restitution);
+    return SceneDebris_Create(position, velocity, resourceId, sequenceResource, sequence, keyframe,
+                              row, variant, palette, timer, motion, visualFlags, priority,
+                              restitution);
 }
 
 u32 SpriteEffect_CreateAtPosition(struct NativeEffectVector *actor, struct ContactPosition *offset,
@@ -64,8 +66,9 @@ u32 SpriteEffect_CreateAtPosition(struct NativeEffectVector *actor, struct Conta
         position->y += offset->y;
         position->z += offset->z;
     }
-    return sub_08113398(position, velocity, resourceId, sequenceResource, sequence, keyframe, row,
-                        variant, palette, timer, motion, visualFlags, priority, restitution);
+    return SceneDebris_Create(position, velocity, resourceId, sequenceResource, sequence, keyframe,
+                              row, variant, palette, timer, motion, visualFlags, priority,
+                              restitution);
 }
 
 /* SceneDebrisPool_ResetSingleton: Clears the debris pool singleton pointer */

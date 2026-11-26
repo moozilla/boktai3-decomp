@@ -3,7 +3,7 @@
 void Player_SetTetherMode(struct Player *, u32, u32);
 void Player_PlayLocalSong(s32, u32);
 void Player_SetSecondaryActionFlags(struct Player *, u32);
-void Player_SetDirectionalVelocity_08238300(struct Player *, s32);
+void LinkPlayer_SetScaledDirectionalVelocity(struct Player *, s32);
 void Player_UpdateActionFacingSide(struct Player *);
 s32 ActorVariant_GetTableValue(u32, s32);
 void Player_SetAnimationIndex(struct Player *, s32, s32);
@@ -28,7 +28,7 @@ void Player_UpdateStumble(struct Player *p)
     p->actionEighteenParameter = 0x174;
     p->actionEighteenDuration = 0x18;
     if (p->movementVelocityLocked == 0)
-        Player_SetDirectionalVelocity_08238300(p, 0x20);
+        LinkPlayer_SetScaledDirectionalVelocity(p, 0x20);
     Player_UpdateActionFacingSide(p);
     Player_SetAnimationIndex(p, ActorVariant_GetTableValue(p->actionMode, 1), 0x40);
 }

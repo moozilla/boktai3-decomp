@@ -290,10 +290,10 @@ void AnimData_SelectPaletteBank(void *, s32);
 // confidence=low: claims a free debris slot, copies position/velocity, builds its panel sprite and picks the motion callback.
 
 /* SceneDebris_Create retains its address symbol for callers outside this unit. */
-s32 sub_08113398(const struct ContactPosition *position, const struct ContactPosition *velocity,
-                 u32 resourceId, u32 sequenceResource, u32 sequence, u32 keyframe, u32 row,
-                 u32 variant, s32 palette, u32 timer, u32 motion, u32 visualFlags, u32 priority,
-                 u32 restitution)
+s32 SceneDebris_Create(const struct ContactPosition *position,
+                       const struct ContactPosition *velocity, u32 resourceId, u32 sequenceResource,
+                       u32 sequence, u32 keyframe, u32 row, u32 variant, s32 palette, u32 timer,
+                       u32 motion, u32 visualFlags, u32 priority, u32 restitution)
 {
     struct DebrisPool *pool;
     s32 i;

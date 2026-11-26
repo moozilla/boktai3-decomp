@@ -1,5 +1,5 @@
 #include "monsters/cannons/vulcan_cannon_worker.h"
-void SpriteParticle_CreateDefaultVariant4384(void *, s32, s32, s32, s32, s32, s32, s32, s32, s32,
+void TrapSpellParticles_CreateDefaultBurst(void *, s32, s32, s32, s32, s32, s32, s32, s32, s32,
                                              s32, s32);
 void VulcanCannon_RecordDefeat(void *);
 s32 VulcanCannon_UpdateDefeatEffects(struct VulcanCannon *p)
@@ -12,7 +12,7 @@ s32 VulcanCannon_UpdateDefeatEffects(struct VulcanCannon *p)
             VulcanCannon_GetEffectPosition(&position, p);
             gRandomIndex = (gRandomIndex + 1) & 1023;
             random = *(const u8 *)((u32)gRandomTable + gRandomIndex * 2);
-            SpriteParticle_CreateDefaultVariant4384(&position, 128, 32, 12, 12, 24, random, 32, 32,
+            TrapSpellParticles_CreateDefaultBurst(&position, 128, 32, 12, 12, 24, random, 32, 32,
                                                     1, 2, 512);
         }
         if (p->timer == 1)

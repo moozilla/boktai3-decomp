@@ -1,7 +1,7 @@
-#include "objects/warp_circle/stacked_actor.h"
+#include "objects/warp_circle/warp_circle.h"
 #include "engine/ram.h"
-void StackedActor_InitFallingParticle(struct StackedActorParticle *particle,
-                                      struct StackedActorPosition *position)
+void WarpCircle_InitFallingParticle(struct WarpCircleParticle *particle,
+                                      struct WarpCirclePosition *position)
 {
     particle->position = *position;
     {

@@ -1,5 +1,5 @@
-#ifndef GUARD_SCENE_MESSAGES_H
-#define GUARD_SCENE_MESSAGES_H
+#ifndef GUARD_SCRIPT_DEMO_MANAGER_H
+#define GUARD_SCRIPT_DEMO_MANAGER_H
 
 #include "engine/engine.h"
 #include "scene/actor/scene_event_dispatch.h"

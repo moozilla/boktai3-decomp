@@ -1,5 +1,5 @@
-#ifndef GROUP_OBJECTS_H
-#define GROUP_OBJECTS_H
+#ifndef GUARD_EFFECTS_BAT_FLOCK_H
+#define GUARD_EFFECTS_BAT_FLOCK_H
 #include "global.h"
 #include "engine/engine.h"
 #include "engine/video/display_sequence.h"

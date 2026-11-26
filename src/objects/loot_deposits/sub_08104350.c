@@ -38,7 +38,7 @@ s32 Script_GetValue(void);
 u8 LootDepositPool_TestStatusFlags(void *, u32);
 s32 ScaledShadow_Initialize(void *, void *, s32, s32, s32, s32, s32, s32, s32, s32, s32);
 void Memory_Clear(void *, u32);
-void sub_08105194(void *, s32, s32, s32);
+void LootDepositCallbackPool_InitializeCollider(void *, s32, s32, s32);
 struct Position {
     s16 x;
     s16 y;
@@ -255,5 +255,5 @@ void LootDeposit_CreateFromScript(void)
     Anim_SetSequence(sequence, pool->resource, 0, 0, p->animationFlags);
 
     LootDeposit_StepAnimation(p, render, sequence);
-    sub_08105194(p, a, b, c);
+    LootDepositCallbackPool_InitializeCollider(p, a, b, c);
 }

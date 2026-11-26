@@ -1,10 +1,10 @@
-#include "objects/warp_circle/stacked_actor.h"
+#include "objects/warp_circle/warp_circle.h"
 #include "player/player.h"
 void PlayerCue_Motion7Turn(u8 *, u32, u32);
-s32 StackedActor_IsTetherNearby(struct StackedActor *);
+s32 WarpCircle_IsTetherNearby(struct WarpCircle *);
 s32 TetherActor_BeginKindFourStateNine(void);
 s32 Script_Call(u32, void *);
-void StackedActor_BeginPlayerInteraction(struct StackedActor *o)
+void WarpCircle_BeginPlayerInteraction(struct WarpCircle *o)
 {
     u8 *pb = &o->lift;
     u32 v = *pb;
@@ -20,14 +20,14 @@ void StackedActor_BeginPlayerInteraction(struct StackedActor *o)
             PlayerCue_Motion7Turn((*(u8 **)gPlayers), 4, 0);
             pf = &o->tetherAccepted;
             *pf = 0;
-            if (StackedActor_IsTetherNearby(o)) {
+            if (WarpCircle_IsTetherNearby(o)) {
                 if (TetherActor_BeginKindFourStateNine())
                     *pf = 1;
             }
             o->sprite.flags &= ~0x200;
             o->sprite.renderMode = 3;
             o->shadow.flags |= 1;
-            StackedActor_SetUpdate(o, StackedActor_ExtendForScript);
+            WarpCircle_SetUpdate(o, WarpCircle_ExtendForScript);
             if (o->pendingScriptId != 0)
                 Script_Call(o->pendingScriptId, 0);
         }

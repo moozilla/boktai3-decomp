@@ -17,7 +17,7 @@ s32 Player_SelectInputMode(struct Player *);
 void sub_0823B728(struct Player *, s32);
 void sub_082424D0(struct Player *);
 void Player_SmoothCameraAnchor(struct Player *);
-void Player_ClampPositionToStoredTerrainCell_0823B938(struct Player *);
+void LinkPlayer_ClampToRecoveryTerrainCell(struct Player *);
 void Player_UpdateModifier08Drift(struct Player *);
 u32 Player_IsFlaggedWithGlobalModifier08(u32);
 void Player_SetSecondaryActionFlags(struct Player *, u32);
@@ -96,7 +96,7 @@ void Player_UpdateLinkKind(struct Player *p)
             sub_082424D0(p);
             if (p->cameraOffsetActive != 0)
                 Player_SmoothCameraAnchor(p);
-            Player_ClampPositionToStoredTerrainCell_0823B938(p);
+            LinkPlayer_ClampToRecoveryTerrainCell(p);
             Player_UpdateModifier08Drift(p);
             if (p != NULL && IsScene5(p))
                 break;

@@ -1,5 +1,5 @@
-#ifndef GUARD_REGISTRY_ACTOR_H
-#define GUARD_REGISTRY_ACTOR_H
+#ifndef GUARD_NPC_SABATA_RIDER_SABATA_RIDER_H
+#define GUARD_NPC_SABATA_RIDER_SABATA_RIDER_H
 #include "engine/engine.h"
 #include "scene/actor/actor_stats.h"
 #include "scene/actor/modifier_list.h"

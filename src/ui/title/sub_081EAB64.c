@@ -2,9 +2,9 @@
 #include "engine/video/render.h"
 #include "ui/menu_parameters.h"
 #include "engine/input.h"
-// confidence=low: menu ownership follows CutsceneDisplay_CreateDisplay.
+// confidence=low: menu ownership follows TitleDisplay_Create.
 
-// confidence=low: menu ownership follows CutsceneDisplay_CreateDisplay; option meanings remain tentative.
+// confidence=low: menu ownership follows TitleDisplay_Create; option meanings remain tentative.
 struct Display {
     u8 task[0x18];
     struct TextEntryWidget widgets[9];
@@ -41,7 +41,7 @@ void Anim_LoadKeyframe(void *, void *, u16, s32);
 void TimeDisplay_HideAnimatedObjects(void *);
 void Script_Call(void *, void *);
 void Task_Kill(void *);
-void CutsceneDisplay_UpdateDisplay(struct Display *p)
+void TitleDisplay_Update(struct Display *p)
 {
     u8 *source_3;
     u8 *source_2;

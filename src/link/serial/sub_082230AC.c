@@ -1,7 +1,7 @@
 #include "global.h"
 #include "engine/ram.h"
 void InterruptsAndVideo_WaitForVBlank(void);
-void Serial_ResetMultiplayer_082230AC(void)
+void Serial_ReinitializeMultiplayerLines(void)
 {
     gSerialTransferStatus = 0;
     gSerialConnectionRole = -1;

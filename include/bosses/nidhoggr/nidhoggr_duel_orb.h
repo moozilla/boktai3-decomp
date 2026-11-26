@@ -1,5 +1,5 @@
-#ifndef GUARD_ORBIT_CONTACT_ACTOR_H
-#define GUARD_ORBIT_CONTACT_ACTOR_H
+#ifndef GUARD_BOSSES_NIDHOGGR_NIDHOGGR_DUEL_ORB_H
+#define GUARD_BOSSES_NIDHOGGR_NIDHOGGR_DUEL_ORB_H
 #include "scene/collision/contact_swarm.h"
 /* Tentative identity: rotating resource-contact sprite, list-8 task size 0xC8. */
 struct OrbitContactActor {

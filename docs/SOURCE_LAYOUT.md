@@ -49,7 +49,7 @@ list the evidence and the names still awaiting confirmation.
 * Function names are `Object_Action` with the object's game name
   (`PileDriver_`, `VanargandHead_`, `Sabata_`, `Shop_`), never a registry key,
   slot or address. Use a function's exact name for a one-function game
-  file, including any disambiguating address suffix on the symbol.
+  file.
   `Hresvelgr_Create.c` is one example.
 * Headers sit beside their object under the mirrored path in `include/`, at
   most two directories deep (`#include "monsters/ghoul.h"`,
@@ -72,12 +72,18 @@ The two tilemap files already reviewed as `fill_tilemap_rectangle.c` and
 keep their upstream naming.
 
 Multi-function files with established descriptive basenames keep them.
-`symbols/source_files.csv` gives an explicit `planned_basename` for 20
-stale names whose whole-unit role is clearer than their first function.
+`symbols/source_files.csv` records 20 explicit `planned_basename` replacements
+for whole-unit roles and the two preserved tilemap names.
 `tools/reorg.py --rename` previews the filename pass. The regular directory
 replay preserves basenames. Pending source-fix patches under both
 `tools/autopilot/pending_src_fixes/` and `tools/testbench/pending_src_fixes/`
 follow recorded source paths in their patch headers.
+
+
+After applying the filename pass, run
+`python3 tools/progress.py --markdown PROGRESS.md` before testing Studio.
+The command also regenerates `PROGRESS.json`, which Studio uses for
+source-file paths.
 
 ## Where is it?
 

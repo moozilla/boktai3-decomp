@@ -415,7 +415,7 @@ s32 ModifierStats_ApplyKind1(struct ScenePoolActor *stats, s32 value)
 
 /* ModifierStats_ApplyKind3: address symbol retained for the external motion caller. */
 
-s32 sub_0811EAB8(struct ScenePoolActor *stats, s32 value)
+s32 ModifierStats_ApplyKind3(struct ScenePoolActor *stats, s32 value)
 {
     struct StatModifier *base = (*&stats)->modifiers;
     s32 i = 0;

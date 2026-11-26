@@ -1,6 +1,6 @@
 /* Reconstructed RFU SDK types from pinned pret/pokeemerald; docs/RFU.md. */
-#ifndef GUARD_LIBRFU_H
-#define GUARD_LIBRFU_H
+#ifndef GUARD_LIB_RFU_RFU_COMPAT_H
+#define GUARD_LIB_RFU_RFU_COMPAT_H
 
 #include "global.h"
 #include "gba/io_reg.h"
@@ -665,4 +665,4 @@ void STWI_send_CPR_EndREQ(void);
 /* 0x03006A90 */
 extern struct RfuSIO32Id gRfuSIO32Id; /* RFU SIO32 ID negotiation state */
 
-#endif // GUARD_LIBRFU_H
+#endif // GUARD_LIB_RFU_RFU_COMPAT_H

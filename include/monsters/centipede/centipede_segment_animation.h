@@ -1,5 +1,5 @@
-#ifndef GUARD_TENTACLE_SEGMENT_ANIMATION_H
-#define GUARD_TENTACLE_SEGMENT_ANIMATION_H
+#ifndef GUARD_MONSTERS_CENTIPEDE_CENTIPEDE_SEGMENT_ANIMATION_H
+#define GUARD_MONSTERS_CENTIPEDE_CENTIPEDE_SEGMENT_ANIMATION_H
 
 #include "engine/video/display_sequence.h"
 #include "scene/collision/contact_collider.h"

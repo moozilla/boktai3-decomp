@@ -8,7 +8,7 @@ static inline u8 IsUsed(u32 *used, s32 index)
     return 0;
 }
 
-struct SpriteParticleSlot *SpriteParticle_AllocateSlot_08121D14(struct SpriteParticlePool *pool)
+struct SpriteParticleSlot *SpriteParticle_ClaimEffectSlot(struct SpriteParticlePool *pool)
 {
     s32 i;
     for (i = 0; i < 8; i++) {

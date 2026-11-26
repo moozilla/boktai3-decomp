@@ -219,7 +219,7 @@ void MovingPlatformActor_SetRangeFromScript(void)
     }
 }
 
-void MovingPlatformActor_ClearFlag1000FromScript(void)
+void MovingPlatformActor_ClearScriptLatch(void)
 {
     s32 r = Script_GetKeywordValue(0x6e, 0);
     if (gNamedActorManager != 0 && r != 0) {

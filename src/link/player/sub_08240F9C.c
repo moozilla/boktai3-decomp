@@ -45,7 +45,7 @@ void Player_SetAnimationIndex(struct PRecover *, s32, s32);
 void AnimData_SelectPaletteBank(void *, s32);
 s32 Player_GetLinkedSmoothedDirection(struct PRecover *);
 s32 Player_GetAdjustedMovementInterval(struct PRecover *);
-void Player_SetDirectionalVelocity_08238300(struct PRecover *, s32);
+void LinkPlayer_SetScaledDirectionalVelocity(struct PRecover *, s32);
 void Player_UpdateActionFacingSide(struct PRecover *);
 void Player_PlayLocalSong(u32, s32);
 void Player_SetTetherMode(struct PRecover *, s32, s32);

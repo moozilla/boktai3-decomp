@@ -15,7 +15,7 @@ void Sprite_Init(void *, void *, s32);
 void Anim_RestartSequence(void *, s32, s32, s32, s32);
 void Nidhoggr_StepPoolAnimation(void);
 void Nidhoggr_DestroySpriteEffect(void);
-void Nidhoggr_CreatePalette426Effect(u8 *p, struct V *q)
+void Nidhoggr_CreateFallingAttackTrail(u8 *p, struct V *q)
 {
     struct O *o = EffectPool_AllocateSlot(p);
     if (o != 0) {

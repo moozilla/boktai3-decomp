@@ -1,11 +1,11 @@
-#include "objects/warp_circle/stacked_actor.h"
+#include "objects/warp_circle/warp_circle.h"
 void Sprite_Remove(void *);
-void Effect_Remove(struct StackedActorParticle *);
+void Effect_Remove(struct WarpCircleParticle *);
 void SceneMessages_UnregisterReceiver(void *);
-s32 StackedActor_Destroy(struct StackedActor *actor)
+s32 WarpCircle_Destroy(struct WarpCircle *actor)
 {
-    struct StackedActorSprite *segment;
-    struct StackedActorParticle *particle;
+    struct WarpCircleSprite *segment;
+    struct WarpCircleParticle *particle;
     s32 i;
     void *trigger;
     Sprite_Remove(&actor->sprite);
@@ -26,7 +26,7 @@ s32 StackedActor_Destroy(struct StackedActor *actor)
         i--;
     } while (i >= 0);
     SceneMessages_UnregisterReceiver(trigger);
-    if (gStackedActor)
-        gStackedActor = 0;
+    if (gWarpCircle)
+        gWarpCircle = 0;
     return 0;
 }

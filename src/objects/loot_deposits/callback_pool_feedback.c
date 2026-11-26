@@ -110,9 +110,10 @@ void LootDepositCallbackPool_SpawnHitParticles(struct CallbackPoolEntry *entry)
 void LootDepositCallbackPool_ApplyDamage(struct ContactCollider *, struct ContactCollider *,
                               struct CallbackPoolEntry *);
 
-/* The earlier constructor refers to LootDepositCallbackPool_InitializeCollider by address. */
+/* Initialize the collider and its occupancy state for the constructor. */
 
-void sub_08105194(struct CallbackPoolEntry *entry, u32 a, u32 b, u32 c)
+void LootDepositCallbackPool_InitializeCollider(struct CallbackPoolEntry *entry, u32 a, u32 b,
+                                                u32 c)
 {
     struct SceneExtent v, w;
     struct ContactCollider *collider = &entry->collider;

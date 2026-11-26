@@ -21,7 +21,7 @@ struct VanargandPairAuxiliarySprite {
 s32 AnimData_Load(void *, u32);
 void Sprite_Init(void *, void *, u32);
 
-void VanargandPair_InitAuxiliarySprite_081A6FF4(u8 *panel,
+void VanargandPair_InitAuxiliarySprite(u8 *panel,
                                                 struct VanargandPairAuxiliarySprite *sprite)
 {
     struct VanargandPairAnimation *animation = &sprite->animation;

@@ -1,15 +1,15 @@
-#include "objects/warp_circle/stacked_actor.h"
+#include "objects/warp_circle/warp_circle.h"
 void Sound_PlaySong(u32);
-void StackedActor_ExtendSegments(struct StackedActor *o)
+void WarpCircle_ExtendSegments(struct WarpCircle *o)
 {
     u16 *t = &o->frame;
     if (*t == 0)
         Sound_PlaySong(0x160);
     if (o->height <= 6) {
         o->height++;
-        StackedActor_UpdateSegments(o);
+        WarpCircle_UpdateSegments(o);
     } else if (*t > 0x26) {
-        StackedActor_SetUpdate(o, StackedActor_WaitForParticles);
+        WarpCircle_SetUpdate(o, WarpCircle_WaitForParticles);
     }
     o->frame++;
 }

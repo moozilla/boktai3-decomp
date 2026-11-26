@@ -18,7 +18,7 @@ struct MotionActor {
     u8 unknown5D0[0x2F4];
     u16 *settings;
 };
-s32 sub_0811CD70(struct MotionActorState *, u32);
+s32 ScenePool_ApplyMotionInput(struct MotionActorState *, u32);
 s32 Callback_InvokeActor(void *, void *);
 s32 ModifierStats_ApplyKind12(struct MotionActorState *, s32);
 u8 LinkParticipant_IsLocallySelected(struct MotionActor *);
@@ -27,7 +27,7 @@ s32 Div(s32, s32);
 void MotionActor_UpdateMovementAudio(struct MotionActor *actor)
 {
     struct MotionActorState *state = &actor->state;
-    s32 status = sub_0811CD70(state, *actor->settings);
+    s32 status = ScenePool_ApplyMotionInput(state, *actor->settings);
     s32 changed = 0;
     if (Callback_InvokeActor(state, state->callback)) {
         if (state->requestedSong == 0x89)

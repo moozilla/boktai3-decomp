@@ -1,5 +1,5 @@
-#ifndef GUARD_REGISTRY_ACTOR_COLLISION_H
-#define GUARD_REGISTRY_ACTOR_COLLISION_H
+#ifndef GUARD_NPC_SABATA_RIDER_SABATA_RIDER_COLLISION_H
+#define GUARD_NPC_SABATA_RIDER_SABATA_RIDER_COLLISION_H
 #include "npc/sabata_rider/sabata_rider.h"
 #include "scene/collision/contact_actor.h"
 #include "engine/input.h"

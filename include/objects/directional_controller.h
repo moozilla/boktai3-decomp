@@ -1,5 +1,5 @@
-#ifndef DIRECTIONAL_INTERACTION_H
-#define DIRECTIONAL_INTERACTION_H
+#ifndef GUARD_OBJECTS_DIRECTIONAL_CONTROLLER_H
+#define GUARD_OBJECTS_DIRECTIONAL_CONTROLLER_H
 #include "global.h"
 #include "scene/directional_script_args.h"
 #include "system/game_state/game_state.h"

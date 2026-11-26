@@ -34,4 +34,4 @@ The broad SceneInputPair type reserves transition-only fields after its two widg
 
 Reviewed extents: C3C108,CA8=84,CFC164,DA0376,F18148,FAC148,62040148. Final checks cover both new and previously exact functions. No new runtime coverage or full worker build was performed.
 
-The callback setter stores function-pointer bits and resets the frame; it does not invoke the handler. Its shared storage boundary uses `SceneInventoryCallback` (`void (*)(void)`) with explicit casts. Concrete handlers retain their observed status return types, and assembly interworking invokes them. The palette consumers pass the highlight color array explicitly.
+The callback setter stores function-pointer bits and resets the frame; it does not invoke the handler. Its shared storage boundary uses `ShopCallback` (`void (*)(void)`) with explicit casts. Concrete handlers retain their observed status return types, and assembly interworking invokes them. The palette consumers pass the highlight color array explicitly.

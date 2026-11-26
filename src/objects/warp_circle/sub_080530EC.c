@@ -1,9 +1,9 @@
-#include "objects/warp_circle/stacked_actor.h"
+#include "objects/warp_circle/warp_circle.h"
 extern u8 *gSceneEventDispatchState;
 u32 SceneMessages_SetPendingTrigger(void *, void *);
-void StackedActor_RaiseLift(struct StackedActor *);
-void StackedActor_LowerLift(struct StackedActor *);
-void StackedActor_ConsumeTriggers(struct StackedActor *actor)
+void WarpCircle_RaiseLift(struct WarpCircle *);
+void WarpCircle_LowerLift(struct WarpCircle *);
+void WarpCircle_ConsumeTriggers(struct WarpCircle *actor)
 {
     u8 *receiver = actor->trigger;
     s32 i = 0;
@@ -29,10 +29,10 @@ void StackedActor_ConsumeTriggers(struct StackedActor *actor)
             SceneMessages_SetPendingTrigger(receiver, message);
             switch (message[6]) {
                 case 5:
-                    StackedActor_SetUpdate(actor, StackedActor_RaiseLift);
+                    WarpCircle_SetUpdate(actor, WarpCircle_RaiseLift);
                     break;
                 case 6:
-                    StackedActor_SetUpdate(actor, StackedActor_LowerLift);
+                    WarpCircle_SetUpdate(actor, WarpCircle_LowerLift);
                     break;
             }
             i++;

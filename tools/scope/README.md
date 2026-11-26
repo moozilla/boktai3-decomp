@@ -2550,10 +2550,10 @@ which is exactly `10:1`. Not tested.
    associate the narrow offset/world addition before adding the product.
    `destination->y = SegmentOffset(limit, height, offset) + worldY`, with
    `static inline u16 SegmentOffset(...)`, preserves the product/offset group
-   through inlining. StackedActor_UpdateSegments (08052418) also needs the
+   through inlining. WarpCircle_UpdateSegments (08052418) also needs the
    world-height pointer computed before the first helper call; that changes
    reload's first choices and recovers every later arm, removing 41 concessions.
-   StackedActor_InitRisingParticle (080521DC) similarly matches with a u16
+   WarpCircle_InitRisingParticle (080521DC) similarly matches with a u16
    helper returning `768 + (u16)particle->position.y` before adding the random
    byte. The u32/s32 return forms lose a constant copy; a direct field expression
    has the correct shape but different local allocation. Helper return width

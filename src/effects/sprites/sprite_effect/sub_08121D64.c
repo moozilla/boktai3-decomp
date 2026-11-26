@@ -30,7 +30,7 @@ struct SpriteParticlePool {
     struct SpriteParticleSlot slots[8];
 };
 struct SpriteParticlePool *SceneSpriteBurst_EnsureSingleton(void);
-struct SpriteParticleSlot *SpriteParticle_AllocateSlot_08121D14(struct SpriteParticlePool *);
+struct SpriteParticleSlot *SpriteParticle_ClaimEffectSlot(struct SpriteParticlePool *);
 void Sprite_Init(void *, void *, u32);
 u32 Anim_SetSequence(void *, void *, u32, u32, u32);
 void AnimData_SelectPaletteBank(void *, u32);
@@ -52,7 +52,7 @@ s32 SpriteParticle_SpawnBatch(struct SpriteParticlePosition *position, s32 count
         pool = gSpriteGroup;
     }
     for (i = 0; i < count; i++) {
-        slot = SpriteParticle_AllocateSlot_08121D14(pool);
+        slot = SpriteParticle_ClaimEffectSlot(pool);
         if (!slot)
             return -1;
         sprite = &pool->sprites[slot->index];

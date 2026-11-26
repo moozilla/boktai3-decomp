@@ -1,5 +1,5 @@
-#ifndef GUARD_CONTACT_BURST_H
-#define GUARD_CONTACT_BURST_H
+#ifndef GUARD_BOSSES_NIDHOGGR_NIDHOGGR_DUEL_BURST_H
+#define GUARD_BOSSES_NIDHOGGR_NIDHOGGR_DUEL_BURST_H
 #include "effects/sprites/transient_sprite_effects.h"
 #include "engine/engine_globals.h"
 /* Tentative contact-triggered aura; source is a caller-owned world position. */

@@ -1,5 +1,5 @@
-#ifndef GUARD_SCENE_ITEM_VALUES_H
-#define GUARD_SCENE_ITEM_VALUES_H
+#ifndef GUARD_UI_TOWN_SHOP_ITEM_VALUES_H
+#define GUARD_UI_TOWN_SHOP_ITEM_VALUES_H
 #include "engine/engine.h"
 #include "ui/town/scene_consumable_definition.h"
 /* Tentative inventory-value family: the callers select equipment/item slots. */

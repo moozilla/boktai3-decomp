@@ -96,7 +96,7 @@ int SceneParticles_SpawnAtPosition(u8 *, void *);
 
 u8 Sprite_BlinkUntilExpired(void *, s32, s32, s32);
 
-void SpriteParticle_CreateDefaultVariant4384(void *, u32, u32, u32, u32, u32, u32, u32, u32, u32,
+void TrapSpellParticles_CreateDefaultBurst(void *, u32, u32, u32, u32, u32, u32, u32, u32, u32,
                                              u32, u32);
 
 static inline s32 Clone_ScaleCoordinate(s32 x)
@@ -217,7 +217,7 @@ s32 PlayerClone_UpdateBehavior(struct PlayerCloneSlot *clone, s32 index)
         case 1: {
             struct AnimSprite *display;
             if (clone->timer & 1)
-                SpriteParticle_CreateDefaultVariant4384(&clone->position, 0x28, 0x20, 0xc, 4, 0x18,
+                TrapSpellParticles_CreateDefaultBurst(&clone->position, 0x28, 0x20, 0xc, 4, 0x18,
                                                         Clone_NextRandomByte(), 0x20, 0x20, 3, 2,
                                                         0x200);
             display = Clone_GetAnimation(clone);
@@ -351,7 +351,7 @@ s32 PlayerClone_UpdateBehavior(struct PlayerCloneSlot *clone, s32 index)
         case 5: {
             s16 *height;
             if (clone->timer & 1)
-                SpriteParticle_CreateDefaultVariant4384(&clone->position, 0x28, 0x20, 0xc, 4, 0x18,
+                TrapSpellParticles_CreateDefaultBurst(&clone->position, 0x28, 0x20, 0xc, 4, 0x18,
                                                         Clone_NextRandomByte(), 0x20, 0x20, 3, 2,
                                                         0x200);
             {

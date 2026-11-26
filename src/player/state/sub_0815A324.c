@@ -1,7 +1,7 @@
 #include "global.h"
 #include "player/player.h"
 
-void Player_ClearFlag740(void)
+void Player_ClearScriptToggle(void)
 {
     u8 *g = (*(u8 **)gPlayers);
 

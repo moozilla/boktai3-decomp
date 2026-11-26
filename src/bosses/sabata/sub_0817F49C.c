@@ -10,7 +10,7 @@ struct Packed {
 extern u8 *gGameState;
 u32 ActorExtension_ResetState(void *);
 s32 SceneActors_GetEffectiveTimeStep(void *);
-void SceneActors_SpawnDestructionParticles_0817ABEC(void *);
+void Sabata_SpawnDestructionParticles(void *);
 void Sound_PlaySong(u32);
 s32 ActorResource_ClampDecrease(void *, s32);
 s32 ActorResource_IsBelowSelectedLimit(void *, s32);
@@ -52,7 +52,7 @@ int Sabata_ApplyPendingDamage(u8 *p)
         if (*hitstun == 0) {
             if (*(u16 *)(q + 0x4ee) == 0 && !off && SceneActors_GetEffectiveTimeStep(q)) {
                 damage = *(s16 *)(gGameState + 0x876) * 5;
-                SceneActors_SpawnDestructionParticles_0817ABEC(q + 0x2ec);
+                Sabata_SpawnDestructionParticles(q + 0x2ec);
                 sound = 0x12a;
                 Sound_PlaySong(0x57a);
                 *hitstun = 60;
@@ -81,7 +81,7 @@ int Sabata_ApplyPendingDamage(u8 *p)
         H(0x4ec) = 10;
         if (special) {
             W(0x314) = (u32)(q + 0xa00);
-            SceneActors_SpawnDestructionParticles_0817ABEC(q + 0x2ec);
+            Sabata_SpawnDestructionParticles(q + 0x2ec);
         } else
             W(0x314) = (u32)(q + 0x800);
         size.x = 16;

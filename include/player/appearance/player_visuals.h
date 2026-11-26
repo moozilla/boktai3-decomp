@@ -1,5 +1,5 @@
-#ifndef GUARD_PLAYER_3_H
-#define GUARD_PLAYER_3_H
+#ifndef GUARD_PLAYER_APPEARANCE_PLAYER_VISUALS_H
+#define GUARD_PLAYER_APPEARANCE_PLAYER_VISUALS_H
 #include "engine/engine.h"
 #include "player/player.h"
 #include "ui/widgets/scene_input_compare.h"

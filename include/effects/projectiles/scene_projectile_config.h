@@ -14,7 +14,7 @@ void Projectile_SetHomingParameters(struct SceneProjectileParams *params, u16 du
 void Projectile_SetCollisionParameters(struct SceneProjectileParams *params, u32 type, u32 flags,
                                        u32 power, u32 element, u32 duration);
 void Projectile_SetCollisionExtents(struct SceneProjectileParams *params, u16 x, u16 y, u16 z);
-void Projectile_SetCollisionOffset_081FD49C(struct SceneProjectileParams *params, u16 x, u16 y,
+void ProjectileConfig_SetLaunchOffset(struct SceneProjectileParams *params, u16 x, u16 y,
                                             u16 z);
 void Projectile_SetSpriteParameters(struct SceneProjectileParams *params, u32 graphicsId, u32 frame,
                                     u32 palette);

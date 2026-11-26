@@ -134,9 +134,9 @@ addr,name,confidence,evidence
 0800BE24,EffectParticle_UpdateHoming,medium,Tentative effect state interpretation; exact source in src/fn/sub_0800BE24.c
 0800C0B4,EffectParticle_UpdateFinish,medium,Tentative effect state interpretation; exact source in src/fn/sub_0800C0B4.c
 0800C210,EffectParticle_UpdateDissipating,medium,Tentative effect state interpretation; exact source in src/fn/sub_0800C210.c
-0800C49C,EffectEmitter_ReceiveHit,medium,Matched contiguous controller callbacks; descriptive interpretation tentative
-0800C520,EffectEmitter_Update,medium,Matched contiguous controller callbacks; descriptive interpretation tentative
-0800C654,EffectEmitter_Initialize,medium,Matched contiguous controller callbacks; descriptive interpretation tentative
+0800C49C,StrikeCrystal_ReceiveHit,medium,Matched contiguous controller callbacks; descriptive interpretation tentative
+0800C520,StrikeCrystal_Update,medium,Matched contiguous controller callbacks; descriptive interpretation tentative
+0800C654,StrikeCrystal_Initialize,medium,Matched contiguous controller callbacks; descriptive interpretation tentative
 0800C7F4,DamageController_AccumulateHit,medium,Matched contiguous controller callbacks; descriptive interpretation tentative
 0800C878,DamageController_Update,medium,Matched contiguous controller callbacks; descriptive interpretation tentative
 0800C964,DamageController_Initialize,medium,Matched contiguous controller callbacks; descriptive interpretation tentative

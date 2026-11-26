@@ -1,5 +1,5 @@
-#ifndef EFFECT_EMITTER_H
-#define EFFECT_EMITTER_H
+#ifndef GUARD_OBJECTS_STRIKE_CRYSTAL_H
+#define GUARD_OBJECTS_STRIKE_CRYSTAL_H
 #include "global.h"
 #include "scene/collision/contact_collider.h"
 #include "objects/scene_object.h"
@@ -21,7 +21,7 @@ struct EmitterSprite {
     u8 tail[8];
 };
 
-struct EffectEmitter {
+struct StrikeCrystal {
     struct Task task;
     u16 id, pad1A;
     u8 pad1C[4];
@@ -40,11 +40,11 @@ struct EffectEmitter {
 
 extern u16 gUnk_08604AB4[];
 
-void EffectEmitter_ReceiveHit(struct ContactCollider *, struct ContactCollider *, struct EffectEmitter *);
-s32 EffectEmitter_Update(struct EffectEmitter *);
-u32 EffectEmitter_Destroy(struct EffectEmitter *);
-s32 EffectEmitter_Initialize(struct EffectEmitter *, u32, u32);
-void *EffectEmitter_Create(u32, u32);
+void StrikeCrystal_ReceiveHit(struct ContactCollider *, struct ContactCollider *, struct StrikeCrystal *);
+s32 StrikeCrystal_Update(struct StrikeCrystal *);
+u32 StrikeCrystal_Destroy(struct StrikeCrystal *);
+s32 StrikeCrystal_Initialize(struct StrikeCrystal *, u32, u32);
+void *StrikeCrystal_Create(u32, u32);
 
 /* Engine helpers. */
 s32 EffectManager_SpawnParticlesAt(s32, u32, s32, struct EmitterVec *, void *, s32, s32);

@@ -2633,9 +2633,9 @@ void Dog_UpdateActionPhase(struct ChaseActor *p)
         ++p->base.counter2AC;
 }
 
-/* SceneActorControl_UpdateEntryRecoveryPhase_080E55AC: same code as SceneActorControl_UpdateEntryRecoveryPhase at another address (ported by relatives.py; provisional name) */
+/* Dog_UpdateEntryRecovery: same code as SceneActorControl_UpdateEntryRecoveryPhase at another address (ported by relatives.py; provisional name) */
 
-static inline void SetState_UpdateEntryRecoveryPhase_080E55AC(struct ChaseActor *actor)
+static inline void Dog_QueueEntryRecoveryState(struct ChaseActor *actor)
 {
     u32 state = 3;
     u32 phase = 1;
@@ -2646,7 +2646,7 @@ static inline void SetState_UpdateEntryRecoveryPhase_080E55AC(struct ChaseActor 
     actor->base.field2B1 = 1;
 }
 
-void SceneActorControl_UpdateEntryRecoveryPhase_080E55AC(struct ChaseActor *actor)
+void Dog_UpdateEntryRecovery(struct ChaseActor *actor)
 {
     if (SceneActorControl_TakeFlag(&actor->base.field2B1)) {
         void *control = actor->base.onEntry;
@@ -2659,7 +2659,7 @@ void SceneActorControl_UpdateEntryRecoveryPhase_080E55AC(struct ChaseActor *acto
             return;
     }
     if (actor->base.stepDone) {
-        SetState_UpdateEntryRecoveryPhase_080E55AC(actor);
+        Dog_QueueEntryRecoveryState(actor);
         SceneActorChase_SetControl(actor, (void *)SceneActorMotion_TestTargetTransition, 43);
     } else
         ++actor->base.counter2AC;

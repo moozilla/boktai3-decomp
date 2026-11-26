@@ -262,7 +262,7 @@ src/field/scene_volume,src/bosses/sabata,"Sabata scene volumes (0817A900 and 081
 src/field/ship_wheel,src/objects/ship_wheel.c,"ship wheel that slides open, plus scripted falling and movement sequences"
 src/field/solar_bomb,src/objects/solar_bomb,solar bomb
 src/field/sprite_drop,src/objects/items/sprite_drop,dropped sprites
-src/field/stacked_actor,src/objects/warp_circle,"the Warp Circle (ワープ魔方陣, StackedActor_CreateFromScript)"
+src/field/stacked_actor,src/objects/warp_circle,"the Warp Circle (ワープ魔方陣, WarpCircle_CreateFromScript)"
 src/field/stored_resource_station,src/objects/solar_stand,"the Solar Stand (太陽スタンド, ResourceStation_CreateFromScript)"
 src/field/sun_orb,src/objects/sun_orb,sun orbs
 src/field/terrain_edge_markers,src/scene/terrain/edge_marker,terrain edge markers
@@ -532,5 +532,5 @@ src/effects/particle_burst/sub_08237280.c,src/player/effects/recoil_puffs,Django
 src/effects/particle_burst/sub_082372F8.c,src/player/effects/recoil_puffs,Django’s ordinary and alternate Player recoil callbacks use the 08237368 puffs. Original spawn and rising update observed in the controlled 3955 replay. This is a separate range from the spiral trail.
 src/effects/particle_burst/sub_0823731C.c,src/player/effects/recoil_puffs,Django’s ordinary and alternate Player recoil callbacks use the 08237368 puffs. Original spawn and rising update observed in the controlled 3955 replay. This is a separate range from the spiral trail.
 src/effects/particle_burst/sub_08237368.c,src/player/effects/recoil_puffs,Django’s ordinary and alternate Player recoil callbacks use the 08237368 puffs. Original spawn and rising update observed in the controlled 3955 replay. This is a separate range from the spiral trail.
-081EAB64-081EB7DC,src/ui/title,The four Params3D0 files build the live title emblem at boot. Keep the tutorial Otenko main file on its own per-file route.
+081EAB64-081EB81C,src/ui/title,"The title emblem update, initialization, script handler and constructor"
 src/effects/pal_fade/actor_palette_fade.c,src/effects/palette/actor_palette_fade.c,0037→6274. Saved Repair equipment and ordinary A hold after collision run the native green recovery palette and the restoration of rows 0378/0379. HP and original colors recover.

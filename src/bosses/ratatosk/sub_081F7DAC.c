@@ -17,8 +17,8 @@ static inline s32 RandomModulo(s32 divisor)
 }
 void PlayerClone_BeginActiveReactions(void);
 u32 PlayerClone_GetActiveCount(void);
-void Player_SetFlag740(void);
-void Player_ClearFlag740(void);
+void Player_SetScriptToggle(void);
+void Player_ClearScriptToggle(void);
 // confidence=low: repeated relocations followed by clone-pool activation; attack label tentative.
 void Ratatosk_UpdateCloneAttack(struct Ratatosk *p)
 {
@@ -88,9 +88,9 @@ void Ratatosk_UpdateCloneAttack(struct Ratatosk *p)
                 if (PlayerClone_GetActiveCount() == 0) {
                     p->sequenceDone = 1;
                     p->flashTimer = 60;
-                    Player_SetFlag740();
+                    Player_SetScriptToggle();
                 } else {
-                    Player_ClearFlag740();
+                    Player_ClearScriptToggle();
                 }
                 p->cloneTimer++;
                 break;

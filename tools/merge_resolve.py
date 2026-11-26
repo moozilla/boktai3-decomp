@@ -17,7 +17,6 @@ parameter types in locals. Each choice must leave every input matching and, with
 merged unit compiling. It prints what it did for the log; UNSETTLED lines need a hand edit.
 """
 import argparse
-import csv
 import os
 import re
 import subprocess
@@ -26,24 +25,14 @@ import sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import merge_unit as mu  # noqa: E402
 
+from source_layout import first_function  # noqa: E402
+
 ROOT = mu.ROOT
 
 
-def names():
-    out = {}
-    with open(os.path.join(ROOT, "symbols/functions.csv")) as f:
-        for row in csv.reader(f):
-            if row and re.fullmatch(r"[0-9A-Fa-f]{8}", row[0]):
-                out[row[0].upper()] = row[1]
-    return out
-
-
-def suffix(path, table):
+def suffix(path):
     """The action part of the file's first function's name (Spider_UpdateDefeat -> UpdateDefeat)."""
-    m = re.search(r"sub_([0-9A-Fa-f]{8})", path)
-    name = table.get(m.group(1).upper(), "") if m else ""
-    if not name:
-        name = os.path.splitext(os.path.basename(path))[0]
+    name = first_function(path, ROOT) or os.path.splitext(os.path.basename(path))[0]
     return name.split("_", 1)[1] if "_" in name else name
 
 
@@ -188,7 +177,6 @@ def adapt_definition(paths, name, variant, users, saved, out):
 
 
 def resolve(paths, dry_run=False):
-    table = names()
     log = []
     tried = set()
     while True:
@@ -211,7 +199,7 @@ def resolve(paths, dry_run=False):
             if matches(later):
                 log.append(f"{later}: {label} now the copy from {first}")
                 continue
-        tail = suffix(later, table)
+        tail = suffix(later)
         if k[0] == "type" and " " in label:
             new = label.split()[1] + tail
         else:

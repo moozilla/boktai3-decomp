@@ -1,5 +1,5 @@
-#ifndef GUARD_CONTACT_SEQUENCE_ACTOR_H
-#define GUARD_CONTACT_SEQUENCE_ACTOR_H
+#ifndef GUARD_BOSSES_NIDHOGGR_NIDHOGGR_DUEL_MINION_H
+#define GUARD_BOSSES_NIDHOGGR_NIDHOGGR_DUEL_MINION_H
 #include "scene/collision/contact_swarm.h"
 #include "engine/task.h"
 /* Tentative family name: eight sequence actors, each with health and resource colliders. */

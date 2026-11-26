@@ -1,9 +1,9 @@
-#include "objects/warp_circle/stacked_actor.h"
+#include "objects/warp_circle/warp_circle.h"
 static inline u16 StackedSegment_GetOffset(u32 limit, u32 height, u32 offset)
 {
     return (limit - height) * 171 + offset;
 }
-void StackedActor_UpdateSegments(struct StackedActor *actor)
+void WarpCircle_UpdateSegments(struct WarpCircle *actor)
 {
     u16 *height = &actor->height;
     if (*height) {
@@ -16,7 +16,7 @@ void StackedActor_UpdateSegments(struct StackedActor *actor)
             actor->segments[2].flags |= 1;
             {
                 u32 frame = actor->baseFrame;
-                struct StackedActorSprite *sprite = &actor->sprite;
+                struct WarpCircleSprite *sprite = &actor->sprite;
                 sprite->frame = frame;
             }
         } else if (*height <= 4) {
@@ -29,7 +29,7 @@ void StackedActor_UpdateSegments(struct StackedActor *actor)
             actor->segments[2].flags |= 1;
             {
                 u32 frame = actor->baseFrame;
-                struct StackedActorSprite *sprite = &actor->sprite;
+                struct WarpCircleSprite *sprite = &actor->sprite;
                 sprite->frame = frame;
             }
         } else if (*height <= 6) {
@@ -43,7 +43,7 @@ void StackedActor_UpdateSegments(struct StackedActor *actor)
             actor->segments[2].position.y = StackedSegment_GetOffset(6, *height, 342) + *worldY;
             {
                 u32 frame = actor->baseFrame;
-                struct StackedActorSprite *sprite = &actor->sprite;
+                struct WarpCircleSprite *sprite = &actor->sprite;
                 sprite->frame = frame;
             }
             actor->sprite.renderMode = 3;
@@ -58,7 +58,7 @@ void StackedActor_UpdateSegments(struct StackedActor *actor)
             actor->segments[2].position.y = 342 + *worldY;
             {
                 u32 frame = actor->baseFrame;
-                struct StackedActorSprite *sprite = &actor->sprite;
+                struct WarpCircleSprite *sprite = &actor->sprite;
                 frame += 8;
                 sprite->frame = frame;
             }

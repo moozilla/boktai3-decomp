@@ -19,7 +19,7 @@ static inline void HresvelgrMotion_AddVelocity(struct ContactPosition *out,
     out->y = out->y + v->y;
     out->z = out->z + v->z;
 }
-void HresvelgrMotion_UpdateFalling_081A4420(struct MotionEntry *input)
+void HresvelgrMotion_UpdateTimedFallingSprite(struct MotionEntry *input)
 {
     struct MotionEntry *p = input;
     HresvelgrMotion_AddVelocity(&p->sprite.position, &p->velocity);

@@ -1,11 +1,11 @@
-#include "objects/warp_circle/stacked_actor.h"
+#include "objects/warp_circle/warp_circle.h"
 #include "engine/ram.h"
-static inline u16 StackedParticle_GetRaisedHeight(const struct StackedActorParticle *particle)
+static inline u16 StackedParticle_GetRaisedHeight(const struct WarpCircleParticle *particle)
 {
     return 768 + (u16)particle->position.y;
 }
-void StackedActor_InitRisingParticle(struct StackedActorParticle *particle,
-                                     struct StackedActorPosition *position)
+void WarpCircle_InitRisingParticle(struct WarpCircleParticle *particle,
+                                     struct WarpCirclePosition *position)
 {
     particle->position = *position;
     {

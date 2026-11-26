@@ -83,7 +83,7 @@ include/effects/color_and_fade_controller/color_fade_controller.h,include/effect
 include/effects/debris_particles/debris_particles.h,include/objects/bat_curtain/debris_particles.h,Moved with its identified source unit,,include/effects/particles/debris_particles.h
 include/effects/directional_particles/directional_particles.h,include/effects/particles/directional_particles.h,beside its unit,,
 include/effects/directional_sprite_effect/directional_sprite_effect.h,include/effects/sprites/directional_sprite_effect.h,beside its unit,,
-include/effects/effect_emitter/effect_emitter.h,include/objects/effect_emitter.h,Moved with its identified source unit,,include/effects/particles/effect_emitter.h
+include/effects/effect_emitter/effect_emitter.h,include/objects/strike_crystal.h,Moved with its identified source unit,,include/effects/particles/effect_emitter.h|include/objects/effect_emitter.h
 include/effects/effect_part/effect_part.h,include/effects/scene/effect_part.h,beside its unit,,
 include/effects/explosion/explosion.h,include/effects/bursts/explosion.h,beside its unit,,
 include/effects/fading_particle_groups/fading_particle_group.h,include/objects/hazards/fading_particle_group.h,Pass 4: beside its documented owner,,include/effects/particles/fading_particle_group.h
@@ -94,7 +94,7 @@ include/effects/floating_item_effects/floating_item_effect.h,include/effects/flo
 include/effects/following_sprite_effect/player_core.h,include/player/core/player_core.h,beside its unit,,
 include/effects/four_effect_center_controller/converging_effects.h,include/effects/orbits/converging_effects.h,beside its unit,,
 include/effects/fragment_groups/fragment_group.h,include/effects/particles/fragment_group.h,beside its unit,,
-include/effects/frost_emitter/frost_emitter.h,include/effects/particles/frost_emitter.h,beside its unit,,
+include/effects/frost_emitter/frost_emitter.h,include/effects/particles/sabata_frost.h,beside its unit,,include/effects/particles/frost_emitter.h
 include/effects/hardware_blend_transitions/blend_transition.h,include/effects/screen/blend_transition.h,beside its unit,,
 include/effects/health_burst_effect/health_burst.h,include/effects/healing/health_burst.h,beside its unit,,
 include/effects/homing_and_orbiting_effects/homing_effect.h,include/effects/orbits/homing_effect.h,beside its unit,,
@@ -410,7 +410,7 @@ include/field/scene_volume/actor_spatial_query.h,include/bosses/sabata/sabata_sp
 include/field/scene_volume/scene_volume.h,include/bosses/sabata/sabata_attack_state.h,Pass 4: beside its documented owner,,include/bosses/sabata/scene_volume.h
 include/field/ship_wheel/shipwheel_presentation.h,include/objects/ship_wheel.h,beside its unit; renamed from shipwheel_presentation.h,,
 include/field/stacked_actor/engine_map.h,include/objects/warp_circle/engine_map.h,beside its unit,,
-include/field/stacked_actor/stacked_actor.h,include/objects/warp_circle/stacked_actor.h,beside its unit,,
+include/field/stacked_actor/stacked_actor.h,include/objects/warp_circle/warp_circle.h,beside its unit,,include/objects/warp_circle/stacked_actor.h
 include/field/stored_resource_station/resource_station.h,include/objects/solar_stand/resource_station.h,beside its unit,,
 include/field/sun_orb/sun_orb_effect.h,include/objects/sun_orb/sun_orb_effect.h,beside its unit,,
 include/field/terrain_modifiers/terrain_modifier.h,include/scene/terrain/terrain_modifier.h,beside its unit,,

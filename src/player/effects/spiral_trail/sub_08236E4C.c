@@ -1,5 +1,5 @@
 #include "global.h"
-/* RadialBurstEffect_BlendSpritePalette_08236E4C: same code as RadialBurstEffect_BlendSpritePalette at another address (ported by relatives.py; provisional name) */
+/* RadialBurstEffect_BlendPaletteTowardWhite: same code as RadialBurstEffect_BlendSpritePalette at another address (ported by relatives.py; provisional name) */
 struct S {
     u8 p0[0x48];
     u16 *src;
@@ -7,7 +7,7 @@ struct S {
     u8 b6c;
     u8 alpha;
 };
-void RadialBurstEffect_BlendSpritePalette_08236E4C(struct S *s)
+void RadialBurstEffect_BlendPaletteTowardWhite(struct S *s)
 {
     u16 *p = s->src;
     int bias = (16 - s->alpha) * 15;
