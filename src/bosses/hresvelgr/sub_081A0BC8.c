@@ -1,37 +1,9 @@
 #include "scene/terrain/terrain_sampling.h"
-#include "global.h"
+#include "bosses/hresvelgr/hresvelgr_travel.h"
 
 #include "bosses/hresvelgr/boss_action_state.h"
 #include "engine/engine.h"
-struct Hresvelgr {
-    u8 pad0[0x51];
-    u8 heading;
-    u8 pad52[2];
-    struct ContactPosition position;
-    u8 pad5C[0x40];
-    u32 flags;
-    u8 padA0[8];
-    u8 direction4, direction8;
-    u8 padAA[5];
-    u8 finished, padB0, pending;
-    u8 padB2[0x1a];
-    u8 targetHeading;
-    u8 padCD[0x43];
-    struct ContactPosition *target;
-    u8 pad114[0x60];
-    u8 animationData[0x20], animation[0x20];
-    u8 pad1B4[0x1a];
-    u16 collisionMask;
-    u8 pad1D0[0xc];
-    void *collisionBounds;
-    u8 pad1E0[0x110];
-    struct BossActionState action;
-    u8 pad300[0x2b];
-    u8 side;
-    u8 pad32C[0xf8];
-    u8 boundsLow[0x2e0];
-    u8 boundsHigh[4];
-};
+#include "bosses/vanargand/vanargand_parts.h"
 void Hresvelgr_SetAnimation(void *, void *, void *, u32, u32, u32);
 void Actor_SetHeadingVelocity(void *, u32);
 void Hresvelgr_SpawnProjectile(void *, u32, u32);
@@ -43,20 +15,20 @@ static inline s32 FacingSector8(s16 angle)
 {
     return (angle + 112) >> 5;
 }
-static inline void SetHeading(struct Hresvelgr *p, s32 heading)
+static inline void SetHeading(struct HresvelgrTravelActor *p, s32 heading)
 {
-    p->heading = heading;
+    p->facing = heading;
     {
-        s32 sector = FacingSector4(p->heading);
+        s32 sector = FacingSector4(p->facing);
         u32 mask = 3;
         mask &= sector;
-        p->direction4 = mask;
+        p->facing4 = mask;
     }
     {
-        s32 sector = FacingSector8(p->heading);
+        s32 sector = FacingSector8(p->facing);
         u32 mask = 7;
         mask &= sector;
-        p->direction8 = mask;
+        p->facing8 = mask;
     }
 }
 static inline s32 RandomValue(const u16 *table)
@@ -66,32 +38,32 @@ static inline s32 RandomValue(const u16 *table)
     offset = gRandomIndex * 2;
     return *(const u16 *)((u32)table + offset);
 }
-static inline void SetVector(struct ContactPosition *p, s32 x, s32 y, s32 z)
+static inline void SetActorPosition(struct SceneVec *p, s32 x, s32 y, s32 z)
 {
     p->x = x;
     p->y = y;
     p->z = z;
 }
-static inline u32 *EnableFlags(struct Hresvelgr *actor, u32 mask)
+static inline u32 *EnableFlags(struct HresvelgrTravelActor *actor, u32 mask)
 {
     u32 *p = &actor->flags;
     *p |= mask;
     return p;
 }
-static inline void SetCollisionMask(struct Hresvelgr *actor, u32 mask)
+static inline void SetPaletteBank(struct HresvelgrTravelActor *actor, u32 mask)
 {
-    actor->collisionMask = mask;
+    actor->animation.paletteBank = mask;
 }
 // confidence=low: traverses a boundary and spawns falling projectiles over valid terrain.
-void Hresvelgr_UpdateBoundaryBarrage(struct Hresvelgr *actor, u32 tick)
+void Hresvelgr_UpdateBoundaryBarrage(struct HresvelgrTravelActor *actor, u32 tick)
 {
-    u32 normalCollisionMask = 0x2f0;
+    u32 normalPaletteBank = 0x2f0;
     struct BossActionState *action = &actor->action;
-    struct ContactPosition *target = actor->target;
+    struct SceneVec *target = actor->origin;
     u32 *flags;
     s32 state;
-    if (actor->pending) {
-        actor->pending = 0;
+    if (actor->changed) {
+        actor->changed = 0;
         ActionState_Reset(action);
         ActionState_SetState(action, 0);
     }
@@ -102,9 +74,9 @@ void Hresvelgr_UpdateBoundaryBarrage(struct Hresvelgr *actor, u32 tick)
             *flags |= 16;
             if (action->frame > 128) {
                 if (!actor->side)
-                    SetVector(&actor->position, 1024, 512, target->z);
+                    SetActorPosition(&actor->position, 1024, 512, target->z);
                 else
-                    SetVector(&actor->position, target->x, 512, 1024);
+                    SetActorPosition(&actor->position, target->x, 512, 1024);
                 ActionState_AdvanceState(action);
             } else
                 action->frame++;
@@ -114,9 +86,9 @@ void Hresvelgr_UpdateBoundaryBarrage(struct Hresvelgr *actor, u32 tick)
             if (!action->frame) {
                 action->frame = state;
                 SetHeading(actor, actor->targetHeading);
-                Hresvelgr_SetAnimation(actor, actor->animation, actor->animationData, 2, state, 0);
-                SetCollisionMask(actor, 0xd000);
-                actor->collisionBounds = actor->boundsHigh;
+                Hresvelgr_SetAnimation(actor, &actor->animation, &actor->animationData, 2, state, 0);
+                SetPaletteBank(actor, 0xd000);
+                actor->animation.palette = actor->flashPalette[0];
                 Sound_PlaySong(0x4d0);
             } else {
                 Actor_SetHeadingVelocity(actor, 32);
@@ -137,14 +109,14 @@ void Hresvelgr_UpdateBoundaryBarrage(struct Hresvelgr *actor, u32 tick)
                     s32 rawZ = RandomValue(table);
                     s32 pz = actor->position.z;
                     u32 height;
-                    SetVector(&pos, px + x - 256, 0x2000, pz + ((rawZ >> 3) % 512) - 256);
+                    Vanargand_SetVector(&pos, px + x - 256, 0x2000, pz + ((rawZ >> 3) % 512) - 256);
                     height = Terrain_SampleHeight(&pos) - 256;
                     if (height <= 0x6ff)
                         Hresvelgr_SpawnProjectile(&pos, 0, 1);
                 }
                 {
                     u32 direction =
-                        (actor->direction4 >> 1) | (normalCollisionMask & (actor->direction4 >> 8));
+                        (actor->facing4 >> 1) | (normalPaletteBank & (actor->facing4 >> 8));
                     if (direction == 0 && actor->position.x > 0x1400)
                         ActionState_AdvanceState(action);
                     else if (direction == 1 && actor->position.z > 0x1400)
@@ -153,8 +125,8 @@ void Hresvelgr_UpdateBoundaryBarrage(struct Hresvelgr *actor, u32 tick)
             }
             break;
         case 2:
-            actor->collisionMask = normalCollisionMask;
-            actor->collisionBounds = actor->boundsLow;
+            actor->animation.paletteBank = normalPaletteBank;
+            actor->animation.palette = actor->normalPalette[0];
             {
                 u32 mask = 16;
                 *flags |= mask;
