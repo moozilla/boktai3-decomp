@@ -645,3 +645,64 @@ Plain register declarations on the registry candidates preserve the
 same allocation. XOR comparisons for Wireless flip flags miss while
 the original dead-guard cleanup remains exact. The corresponding
 trial folders are under `build/hard-sites/`.
+
+## 2026-11-26: Native registry unlink
+
+`SceneLink_RemoveNode` (0815F738) now walks the native `MotionTargets`
+and `MotionTarget` structures and uses the shared `void *` signature.
+The previous local list type disagreed with the type of `gSceneLinkList`.
+`SingletonSlot7_OnDestroy` (081F1BF8) now declares the same signature.
+Both stock units match all 52 bytes and the scoped linter reports no
+concessions in either. The matching unlink keeps the traversal and the
+head and interior splices. The two insertions still have their volatile
+loads. In the ROM, `TriggerManager_InsertTrigger` also reloads its
+manager singleton. Its intervening store is to the old head's previous
+member via the pointer loaded from the list, unlike the new-entry
+store in either target registration.
+
+## 2026-11-26: Vorn defeat spread and idle control
+
+The current-layout port of the round-15 native draft for
+`Vorn_UpdateDefeat` (080AEE08) removes all three proved-zero adjustments
+and emits 988 bytes. At UID 1238 local allocation puts zero pseudo 442
+in r4 while r5 is free. That shifts the subsequent flag address and
+causes a separate 0x2A9 offset to appear in the state selector.
+`AGBCC_FORCE=442:5` restores the exact 984 bytes. Reusing the cleared
+attachment timer, factoring the idle-control reset, and using the
+shared chase control and state helpers all miss under stock agbcc.
+
+Removing only the spread adjustment preserves the 984-byte shape and
+swaps the spread and origin registers in 17 instructions.
+`AGBCC_FORCE=132:5,133:6` is exact in this draft. Initializing the real
+origin pointer at the start of the burst block gets both homes. It
+moves the two instructions that form the origin from after the first
+random draw to before the spread setup. Capturing the origin at the
+call, separating the first count, or setting the spread's coordinates
+through the pointer fails to recover both homes and timing. The native
+draft and the pointer-lifetime trial are in `build/hard-sites/vorn-defeat/`
+and the `build/matchsearch/Vorn_UpdateDefeat` store. Retaining the
+existing route clear keeps the 988-byte miss with either zero width
+or local scope. A combined idle helper passing the cleared phase
+between the actual fields increases the allocation differences.
+The unchanged production unit matches 984 bytes and retains its three
+reports.
+
+## 2026-11-26: SpiralBurst coalescing and remaining named sites
+
+The loop-scoped table pointer in SpiralBurst produces 424 bytes for
+a 428-byte target. PRE introduces a copy from pseudo 23 to 45. Both
+land in r5, so the copy disappears and the frame value takes r6.
+Forcing the copy destination to r6, even with pseudo 23 forced to r5,
+moves both to r6 in the allocation dump. Raising the destination
+priority leaves the same stock miss. The earlier exact diagnostic
+uses the separate first wrapped index and shared mask.
+
+A FragmentGroup helper for its optional bounded direction and height
+draws misses the stock instruction shape by more than the plain draw.
+Suppressing the boundary-barrage mask's equivalence note leaves both
+operand differences. Raising its priority shifts other live values,
+even when paired with a lower priority for the action offset. GameState
+trials with an inline mapping helper taking the save storage and either
+the timer or the typed slot change at least 15 instructions. The direct
+symbolic GameState draft still misses on one operand order. Scratch
+sources for all four are in the corresponding `sixth-review` folders.
