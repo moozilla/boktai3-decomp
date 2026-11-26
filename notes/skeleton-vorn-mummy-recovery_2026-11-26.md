@@ -189,3 +189,35 @@ reports zero errors. Across all three passes, report lines fell from
 All five edited units matched their recorded extents. The scoped
 linter reported zero errors. The pass removed 12 report lines and
 16 steering uses. The original 844 steering uses are now 701.
+
+## Target and class-field follow-up
+
+| Class | Report lines before and after | Steering uses before and after |
+|---|---:|---:|
+| Skeleton | 244 → 243 | 300 → 299 |
+| Vorn | 221 → 220 | 229 → 228 |
+| Mummy | 170 → 170 | 172 → 172 |
+
+- Skeleton reads the real tracked target and uses the shared vector
+  difference when selecting a behavior at 080B6BA8. Merging the
+  angle and distance fallbacks removes one of the ROM calls to
+  Skeleton_SelectDistanceReaction. The reaction gate (080B6CE4)
+  uses the native tracking and class context. The approach capture
+  (080C0900) stores the target position at its class field at 0x710.
+  The hidden defeat outcome uses a direct branch, and the bestiary
+  declarations agree with their definitions.
+- Vorn uses the chase route and actual player position in its
+  callbacks. The class records side-step duration at 0x6BA and retreat
+  requests at 0x6C4. The retreat selector (080B2858) reads the class
+  limits. Patrol restore shares the delayed response operation, and
+  the delayed script uses the existing class bytes.
+- Mummy uses the shared random turn, typed player cell, and native
+  health and collider in the burn handler (080D812C). The ordinary
+  attack-bounds assignment still changes the generated stores. A
+  separate palette-timer assignment and literal motion clear
+  change two ROM instructions to three.
+
+All six edited units matched their recorded extents. All four
+Skeleton header dependents and both Vorn header dependents matched.
+The scoped linter reported zero errors. This pass removed two report
+lines and two steering uses, bringing the original 844 uses to 699.
