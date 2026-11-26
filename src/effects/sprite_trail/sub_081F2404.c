@@ -18,7 +18,7 @@ void SpriteTrail_UpdatePositions(struct SpriteTrail *p)
     /* Record and project a new leading position on even frames. */
     if (!(*flags & 1)) {
         struct TrailVector *position = &p->position;
-        struct ContactPosition *out = &p->head[0].position;
+        struct ContactPosition *out = &head->position;
         out->x = (p->position.x >> 12) - ((struct TilemapPanel *)gSceneCamera)->scroll.x;
         {
             s32 y = position->y;
@@ -41,7 +41,7 @@ void SpriteTrail_UpdatePositions(struct SpriteTrail *p)
     }
     for (; i >= 0; i--, next++) {
         struct ContactPosition *out = &next->position;
-        next->position.x = (position->x >> 12) - ((struct TilemapPanel *)gSceneCamera)->scroll.x;
+        out->x = (position->x >> 12) - ((struct TilemapPanel *)gSceneCamera)->scroll.x;
         {
             s32 y = position->y;
             s32 z = position->z;
