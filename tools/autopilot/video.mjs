@@ -92,7 +92,7 @@ const describe = (e) => {
     case 'fight':
       if (e.threshold !== undefined) return `sunlight: threshold ${e.threshold}, guard ${e.guard}`;
       if (e.equip) return e.equip.gun ? 'equip the solar gun' : 'equip a sword';
-      if (e.trance) return 'enter Dark Trance';
+      if (e.trance) return e.tranceForm === 'solar' ? 'enter Solar Trance' : 'enter Dark Trance';
       if (e.dialogue !== undefined) return `battle dialogue ${e.dialogue}`;
       if (e.hp !== undefined) return `fight: targets ${e.enemies}, health ${e.hp}`;
       return null;

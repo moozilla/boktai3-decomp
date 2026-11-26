@@ -351,6 +351,21 @@ test('Hresvelgr is tracked by the live boss pointer and its own contact state', 
   assert.deepEqual(hresvelgrTargets(), []);
 });
 
+test('Solar Trance activates ability one and waits for form two', () => {
+  const player = { $addr: 8, statHundredths: 1000, actionMode: 0, tetherMode: 0 };
+  const g = { fn: { Player_GetSelectedAbility: () => 1 }, press: (key) => key,
+    until: (ready) => ready };
+  const lib = skill('trance', g, { gPlayers: [player] }, { session: { snapshot: () => ({}) } });
+  assert.equal(lib.solarTranceReady(), true);
+  const entry = lib.enterSolarTrance();
+  assert.equal(entry.next().value, 'l');
+  const ready = entry.next().value;
+  assert.equal(ready(), false);
+  player.actionMode = 2;
+  assert.equal(ready(), true);
+  assert.deepEqual(entry.next(), { done: true, value: true });
+});
+
 test('combat waits while a story script controls the player', () => {
   let scripted = true, scene = 1;
   const g = { frameNo: 1, fn: { ScriptUtility_IsControlFlagSet: () => scripted },

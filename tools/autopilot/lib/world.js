@@ -810,8 +810,9 @@ exports.fight = function* (opts = {}) {
     const target = living().sort((a, b) => Number(Boolean(b.barrier)) - Number(Boolean(a.barrier)) || distance(a) - distance(b))[0];
     const tk = toward(target);
     const weapon = exports.weapon();
-    const darkTrance = p.actionMode === 1;
-    const frame = darkTrance ? null : exports.gunFrame();
+    const darkTrance = p.actionMode === 1, solarTrance = p.actionMode === 2;
+    const transformed = darkTrance || solarTrance;
+    const frame = transformed ? null : exports.gunFrame();
     // Once the last curtain starts breaking, the sensor can settle while
     // the sprite's destruction timer still holds the Count's damage guard.
     if (target.solarReactive && S.solar > 64) {
@@ -827,7 +828,13 @@ exports.fight = function* (opts = {}) {
       if (opts.trace) opts.trace({ trance: changed, target: target.addr });
       if (changed) continue;
     }
-    if (target.boss === 'Hresvelgr' && !pr.triedFreeGun && !darkTrance &&
+    if (target.boss === 'Hresvelgr' && !pr.solarAttempt && exports.solarTranceReady()) {
+      pr.solarAttempt = true;
+      const changed = yield* exports.enterSolarTrance();
+      if (opts.trace) opts.trace({ trance: changed, tranceForm: 'solar', target: target.addr });
+      if (changed) continue;
+    }
+    if (target.boss === 'Hresvelgr' && !pr.triedFreeGun && !transformed &&
         (weapon.energy < (frame?.cost ?? 3) || steps - pr.since >= 8)) {
       pr.triedFreeGun = true;
       const equip = yield* exports.equipEnergyFreeGun();
@@ -839,13 +846,13 @@ exports.fight = function* (opts = {}) {
       const charge = yield* exports.chargeEnergy(frame.cost, { stopIf: () => living().some((e) => distance(e) < 512) });
       if (charge.done) continue;
     }
-    if (!darkTrance && target.barrier && weapon.gun && !pr.triedSword) {
+    if (!transformed && target.barrier && weapon.gun && !pr.triedSword) {
       pr.triedSword = true;
       const equip = yield* exports.quickChange({ gun: false });
       if (opts.trace) opts.trace({ equip, target: target.addr });
       if (equip.done) continue;
     }
-    if (!darkTrance && !target.barrier && !triedOtherWeapon.has(target.addr) && exports.bags().frames.length &&
+    if (!transformed && !target.barrier && !triedOtherWeapon.has(target.addr) && exports.bags().frames.length &&
         ((frame && weapon.energy < frame.cost) || steps - pr.since >= 8)) {
       triedOtherWeapon.add(target.addr);
       const equip = yield* exports.quickChange({ gun: !weapon.gun });
@@ -854,9 +861,11 @@ exports.fight = function* (opts = {}) {
     }
     const tactics = DIRS8.map((k) => [[k, 12]]);
     if (darkTrance) tactics.push(...exports.darkTranceTactics(tk));
+    else if (solarTrance && weapon.energy >= 2) tactics.push(...exports.solarTranceTactics(tk));
+    else if (solarTrance) tactics.push([[0, 18]]);
     else if (weapon.gun) tactics.push(...exports.gunTactics(tk));
     else tactics.push([['b', 2], [0, 10]], ...(tk ? [[[tk, 6], ['b', 2], [0, 4]]] : []));
-    if (!darkTrance && (target.barrier || target.boss) && tk && !weapon.gun) tactics.push([[tk, 4], [tk + '+b', 4], [0, 16]]);
+    if (!transformed && (target.barrier || target.boss) && tk && !weapon.gun) tactics.push([[tk, 4], [tk + '+b', 4], [0, 16]]);
     const wait = exports.combatWait(target);
     if (target.boss || wait) tactics.push([[0, wait || 18]]);
     const root = S.snapshot(), hp0 = hpSum(), life0 = life();
