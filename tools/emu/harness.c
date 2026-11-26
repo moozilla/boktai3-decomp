@@ -30,6 +30,7 @@
 //   watchpc ADDR LO HI  arm a latch: set when ADDR (hex) executes with r0 in
 //                       [LO, HI] (decimal), e.g. Text_LookupString of a string
 //   tick ADDR           the function holdt counts (hex), e.g. the game's input read
+//   (env BOKTAI3_KEY_TICK_PC=hex enables keypad-load counting during untraced frames)
 //   tickdump NAME FROM:TO ADDR:LEN[,...]  append the regions to OUTDIR/NAME.bin at the
 //                       entry of each tick FROM..TO-1 (counted from "tick"; decimal)
 //   holdt KEYS N        hold keys (NONE for none) until ADDR has run N more times:
@@ -171,6 +172,13 @@ static uint32_t cur_pc(void) {
 	return cpu->gprs[15] - (thumb ? 4 : 8);
 }
 
+// holdt normally counts function entries. The keypad load is an equivalent
+// observation point when it runs once in the entry's straight-line prologue.
+static uint32_t tick_pc, key_tick_pc;
+static bool count_key_ticks;
+static int tick_hits;
+static long tick_total;
+
 static inline void note_read(uint32_t addr, int width) {
 	if (!tracing) return;
 	if (addr < 0x08000000 || addr >= 0x0E000000) return;
@@ -205,7 +213,14 @@ static inline void note_word(uint32_t addr, int nwords) {
 		if (!rom_word32[w + i]) rom_word32[w + i] = pc;
 }
 static uint32_t h_load32(struct ARMCore* c, uint32_t a, int* cc) { note_read(a & ~3u, 4); note_word(a & ~3u, 1); return orig.load32(c, a, cc); }
-static uint32_t h_load16(struct ARMCore* c, uint32_t a, int* cc) { note_read(a & ~1u, 2); return orig.load16(c, a, cc); }
+static uint32_t h_load16(struct ARMCore* c, uint32_t a, int* cc) {
+	if (a == 0x04000130 && count_key_ticks && cur_pc() == key_tick_pc) {
+		tick_hits++;
+		tick_total++;
+	}
+	note_read(a & ~1u, 2);
+	return orig.load16(c, a, cc);
+}
 static uint32_t h_load8(struct ARMCore* c, uint32_t a, int* cc) { note_read(a, 1); return orig.load8(c, a, cc); }
 static uint32_t h_loadMultiple(struct ARMCore* c, uint32_t base, int mask, enum LSMDirection dir, int* cc) {
 	int n = __builtin_popcount(mask & 0xFFFF);
@@ -283,12 +298,8 @@ static void poke(uint32_t addr, uint32_t size, uint32_t val) {
 static uint32_t until_pc;
 static int32_t until_lo, until_hi;
 static int until_hit;
-// holdt: calls of tick_pc so far
-static uint32_t tick_pc;
-static int tick_hits;
 // tickdump: absolute tick count since "tick", and regions dumped at the entry of
 // ticks [tickdump_from, tickdump_to) (appended to OUTDIR/NAME.bin, one record per tick)
-static long tick_total;
 static long tickdump_from = -1, tickdump_to = -1;
 static struct { uint32_t addr, len; } tickdump_r[4];
 static int tickdump_n;
@@ -304,7 +315,13 @@ static void tickdump_hit(void) {
 static void run_frames(int n) {
 	for (int f = 0; f < n; ++f) {
 		for (int i = 0; i < nfreeze; ++i) poke(freezes[i].addr, freezes[i].size, freezes[i].val);
-		if (!tracing && !nprobes && !until_pc && !tick_pc && !draw_trace_active() && !tickdump_f) { core->runFrame(core); continue; }
+		if (!tracing && !nprobes && !until_pc && !draw_trace_active() && !tickdump_f &&
+		    (!tick_pc || (key_tick_pc && key_tick_pc == tick_pc + 6))) {
+			count_key_ticks = tick_pc != 0;
+			core->runFrame(core);
+			count_key_ticks = false;
+			continue;
+		}
 		uint32_t frame = core->frameCounter(core);
 		while (core->frameCounter(core) == frame) {
 			// ARMRun processes events before executing an instruction. Drain
@@ -451,6 +468,8 @@ int main(int argc, char** argv) {
 	core->reset(core);
 
 	cpu = core->cpu;
+	const char* key_tick_env = getenv("BOKTAI3_KEY_TICK_PC");
+	if (key_tick_env) key_tick_pc = (uint32_t)strtoul(key_tick_env, NULL, 16);
 	orig = cpu->memory;
 	cpu->memory.load32 = h_load32;
 	cpu->memory.load16 = h_load16;

@@ -578,7 +578,13 @@ function verify(end) {
   const harness = path.join(ROOT, 'tools/emu/harness');
   const env = { ...process.env };
   delete env.BOKTAI3_SAV;
+  delete env.BOKTAI3_KEY_TICK_PC;
   if (battery) env.BOKTAI3_SAV = path.resolve(battery);
+  // Input_UpdatePadStates starts with PUSH and two literal loads. Its first
+  // LDRH reads REG_KEYINPUT once before any branches, which permits untraced
+  // replays to use mGBA's normal frame loop while keeping game-tick input.
+  const input = s.g.addr('Input_UpdatePadStates') & ~1;
+  if (s.g.u16(input + 6) === 0x8802) env.BOKTAI3_KEY_TICK_PC = (input + 6).toString(16);
   const r = spawnSync(harness, [path.join(ROOT, 'baserom.gba'), path.join(out, 'harness.txt'), dir], { env, encoding: 'utf8', maxBuffer: 1 << 26 });
   if (r.error || r.status !== 0) throw new Error(`ROM harness failed: ${r.error || r.stderr || r.signal || r.status}`);
   const warn = (r.stderr || '').split('\n').filter((l) => /ticks$|not reached|times in|error/i.test(l));
