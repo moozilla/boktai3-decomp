@@ -1,0 +1,16 @@
+08045A20 projected-entry-position-return
+
+The projection and the screen-position copy both preserve the incoming display pointer in r0.
+
+The explicit form changed the ROM bytes. The guarded form passed the unit ROM check.
+
+--- a/src/projected_display.c
++++ b/src/projected_display.c
+@@ -25,4 +25,7 @@
+         entry->position = display->screen;
+     entry->position.z += gUnk_0860594C[index];
++#ifdef UBFIX
++    return display; // preserve the inherited GBA return value
++#endif
+ }
+ 
