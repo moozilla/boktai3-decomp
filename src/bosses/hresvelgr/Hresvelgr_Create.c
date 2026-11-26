@@ -1,6 +1,7 @@
 #include "global.h"
 #include "engine/engine.h"
 #include "engine/ram.h"
+#include "bosses/hresvelgr/hresvelgr_travel.h"
 void *SceneActors_GetBySlot(u32);
 void ActorReaction_Tick(void *);
 void Hresvelgr_Destroy(void *);
@@ -12,7 +13,7 @@ void *Hresvelgr_Create(void *arg)
     void *p = SceneActors_GetBySlot(Script_GetKeywordValue('t', 1));
     if (p)
         return p;
-    p = Task_Create(9, 0x7E8);
+    p = Task_Create(9, sizeof(struct HresvelgrTravelActor));
     if (p) {
         Task_SetCallbacks(p, ActorReaction_Tick, Hresvelgr_Destroy);
         if (sub_081A2C80(p, arg) < 0) {
