@@ -1,0 +1,46 @@
+08001EE0 background-script-map-return
+
+The script VM uses the handler result. On non-MP resources, r0 is
+the final Script_GetPc result or zero if neither indices keyword is used.
+For MP resources Bg_SetupLayers returns through r0, leaving 08002015,
+and Background_LoadMapsFromScript returns through r1.
+
+The explicit form changed the ROM bytes. The guarded form passed the unit ROM check.
+
+--- a/src/background_controller.c
++++ b/src/background_controller.c
+@@ -390,4 +390,7 @@
+     u8 *base = sub_08216E54(Script_GetKeywordValue('d', 0));
+     s32 target, x, y, n, explicitIndices, i;
++#ifdef UBFIX
++    s32 result = 0;
++#endif
+     resource = *(struct BgMapResource *)base;
+     resource.maps += (u32)base;
+@@ -416,4 +419,7 @@
+                 indices[i] = (s32)p;
+         }
++#ifdef UBFIX
++        result = (s32)p;
++#endif
+     } else {
+         s32 *out;
+@@ -435,8 +441,17 @@
+             out++;
+         }
++#ifdef UBFIX
++        result = (s32)p;
++#endif
+     }
+     if (base[0] == 'M' && base[1] == 'P') {
+         Bg_SetupLayers(target, 0, base, x, y, n, indices);
+-    }
++#ifdef UBFIX
++        return 0x08002015; // r0 is the Thumb return address from Bg_SetupLayers
++#endif
++    }
++#ifdef UBFIX
++    return result; // r0 retains the final script cursor or zero
++#endif
+ }
+ 
