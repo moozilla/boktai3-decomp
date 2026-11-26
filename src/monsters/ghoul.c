@@ -1,3 +1,4 @@
+#include "scene/motion/scene_actor_terrain_reaction.h"
 #include "scene/collision/contact_actor.h"
 #include "monsters/ghoul.h"
 #include "scene/motion/scene_actor_turn.h"
@@ -288,15 +289,6 @@ u8 SceneActorBehavior_RequestDescriptorTurn(void *, void *, u32, u32, s32);
 
 u8 SceneActorBehavior_AccelerateTowardDescriptor(void *, void *, u32, u32, s32);
 
-static inline void Ghoul_EnterRouteBehavior(struct ChaseActor *actor, u32 behavior)
-{
-    actor->base.state2A8 = 0;
-    actor->base.phase2A9 = 0;
-    actor->base.behavior2AA = behavior;
-    actor->base.counter2AC = 0;
-    actor->base.field2B1 = 1;
-}
-
 static inline void Ghoul_ClearPendingRoute(u16 *flags)
 {
     u32 mask = ~1;
@@ -336,7 +328,7 @@ void Ghoul_UpdateProbeApproach(struct ChaseActor *actor)
     event = NavMesh_ConsumeProbeEvent(group->route);
     if (event) {
         if (SceneActorBehavior_RequestDescriptorTurn(actor, group->route, 0x20, 0x20, speed)) {
-            Ghoul_EnterRouteBehavior(actor, 16);
+            SceneActorTerrain_EnterState(actor, 0, 0, 16);
         }
     } else if (SceneActorBehavior_AccelerateTowardDescriptor(actor, group->route, 0x20, 0x20,
                                                              speed)) {
@@ -367,7 +359,7 @@ void SceneActorControl_RestartOrAdvance(struct ChaseActor *actor)
         }
     }
     if (actor->base.stepDone)
-        Ghoul_EnterRouteBehavior(actor, 15);
+        SceneActorTerrain_EnterState(actor, 0, 0, 15);
     else
         ++actor->base.counter2AC;
 }
@@ -813,7 +805,7 @@ void Ghoul_BeginAlternateRoute(struct ChaseActor *actor)
     Ghoul_SetDiscFlags(context, 1);
     Ghoul_ClearDiscFlags(context, 2);
     MonsterInit_SetStatusFlags(actor, 4);
-    Ghoul_EnterRouteBehavior(actor, 15);
+    SceneActorTerrain_EnterState(actor, 0, 0, 15);
     Ghoul_StartAlternateRoute(&actor->base.body, &actor->group.homeRoute, &actor->group);
     Ghoul_SelectRetreatRoutePoint(actor);
     Ghoul_ClearDiscFlags(context, 2);
@@ -981,7 +973,6 @@ s32 Ghoul_ResumePendingRoute(struct ChaseActor *actor)
     struct SceneActorChaseGroup *group = &actor->group;
     void **routeSlot;
     u16 *pending;
-    u16 *timer;
     struct ChaseRouteProbe *route;
     void *body;
     if (Ghoul_ActionsUnavailable(actor))
@@ -990,9 +981,8 @@ s32 Ghoul_ResumePendingRoute(struct ChaseActor *actor)
         return 1;
     if (SceneActorChase_QueryMotionFlags(actor, 0xA107))
         return 1;
-    timer = &context->routeDelay;
-    if (*timer)
-        (*timer)--;
+    if (context->routeDelay)
+        context->routeDelay--;
     else {
         {
             u32 *p = &actor->base.statusFlags;
