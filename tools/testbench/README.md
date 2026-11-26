@@ -18,6 +18,7 @@ build/venv/bin/python port/agent/gametypes.py -j2
 make -f tools/emu/Makefile build/studio/experiments/harness
 node tools/testbench/run.mjs tools/testbench/examples/ghoul.mjs
 node tools/testbench/run.mjs tools/testbench/examples/menu.mjs --case 'pause/sword'
+node tools/testbench/run.mjs --catalog 'Wooden Crate'
 node --test tools/testbench/test.mjs
 ```
 
@@ -48,7 +49,9 @@ export default scenario({ empty: true, sun: 6, time: '14:00',
 
 The generator runs in a frame callback. `yield` advances the game and
 `yield*` runs a helper that may advance several frames. Calls, spawn, checks
-and typed reads are synchronous.
+and typed reads are synchronous. Direct C calls use the port's word-based
+call adapters. Functions with aggregate signatures need a matching adapter
+before they can be called by name.
 
 | Interface | Purpose |
 | --- | --- |
@@ -98,15 +101,18 @@ attack and forced defeat for discovered live health-bearing objects. The result
 records which actors stayed live, whether health moved after input and whether
 the player took damage. One-shot effects and many menus expire on their own.
 Some creators require their original parent, resource setup or a repeatable
-scene-specific recipe. The current catalog covers the registry and the linked
-scene projectile fixture. Native creators that have no registry key still
+scene-specific recipe. The current catalog covers the registry and native
+scene particle and projectile fixtures. Other C-only creators still
 need individual recipes.
 
 Coverage starts after staging. `coverage.json` lists every function in the
 checked-in progress inventory with the scenarios that entered it.
 `unreached.md` groups unexecuted functions by unit. `sweep.jsonl` and
-`summary.md` keep the per-case results and failure details. The first
-diagnostic run reached **35.48%** (4,190 of 11,810) across 207 cases.
+`summary.md` keep the per-case results and failure details. The verified
+sweep reached **38.39%** (4,534 of 11,810) across 206 passing cases, a gain
+of 2.91 percentage points from the first diagnostic run. All 11 input-only
+cases matched the ROM on the sampled state. The remaining cases recorded
+their port-only setup operations.
 
 ## Original ROM comparison
 

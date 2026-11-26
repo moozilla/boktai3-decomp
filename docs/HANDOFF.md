@@ -117,6 +117,7 @@ Recent (details in [docs/history/](history/README.md) and the notes they link):
 | `tools/relatives.py`, `rasolve.py`, `fix.py`, `hint.py`, `permute.py` | when stuck ([WORKER.md](WORKER.md) "When stuck") |
 | `tools/docindex.py [ADDR / --tag T]` | who wrote about an address or topic |
 | `tools/emu/harness`, `tools/studio/serve.py` | headless mGBA runs; the Studio (text, sprites, maps, actors, scripts) |
+| [tools/testbench](../tools/testbench/README.md) | stage a scene, create actors, drive menus and scripts, and record function coverage and ROM replay results |
 
 ## Running workers
 

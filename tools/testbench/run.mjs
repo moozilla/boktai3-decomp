@@ -2,14 +2,19 @@
 import path from 'node:path';
 import { parseArgs } from 'node:util';
 import { runIsolated, failed, summary } from './runner.mjs';
-import { root } from './support.mjs';
+import { actorEntry, root } from './support.mjs';
 
 const { values, positionals } = parseArgs({ allowPositionals: true, options: {
   out: { type: 'string' }, 'no-rom': { type: 'boolean' }, frames: { type: 'string' }, timeout: { type: 'string' }, case: { type: 'string' },
-  help: { type: 'boolean', short: 'h' },
+  help: { type: 'boolean', short: 'h' }, catalog: { type: 'string' },
 } });
+if (values.catalog && !values.help) {
+  console.log(JSON.stringify(actorEntry(values.catalog), null, 2));
+  process.exit(0);
+}
 if (values.help || positionals.length !== 1) {
   console.log('Usage: node tools/testbench/run.mjs SCENARIO.mjs [--case NAME] [--out DIR] [--no-rom] [--frames COUNT] [--timeout SECONDS]');
+  console.log('       node tools/testbench/run.mjs --catalog NAME');
   process.exit(positionals.length === 1 || values.help ? 0 : 2);
 }
 function positive(value, fallback) {

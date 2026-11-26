@@ -22,6 +22,8 @@ test('catalog names resolve by game name, registry key and C callback', () => {
   assert.equal(actorEntry('Ghoul').key, '05A5');
   assert.equal(actorEntry('ボク').key, '05A5');
   assert.equal(actorEntry(0x05a5).init, 'Ghoul_Init');
+  assert.equal(actorEntry('Wooden Crate').key, 'F04B');
+  assert.equal(actorEntry('Collection Book').key, 'A2DB');
   assert.equal(actorEntry('Projectile_SpawnAtPosition').key, 'native:scene-projectile');
   const entries = new Set(catalog.map(e => e.key));
   assert.equal(entries.size, catalog.length);
@@ -69,9 +71,10 @@ test('stage equipment and flags, damage a typed Ghoul and render it', { skip: !w
   assert.equal(png.readUInt32BE(20), 160);
 });
 
-test('crate and projectile occupy typed slots, projectile expires', { skip: !wasm }, async () => {
+test('crate, projectile and particle occupy typed slots, transient slots expire', { skip: !wasm }, async () => {
   const result = passed(await example('props-and-projectiles'));
   assert(result.coverage.includes(0x081fd01c));
+  assert(result.coverage.includes(0x0812d7d0));
 });
 
 test('warp, script procedure, C call and compiled C snippet', { skip: !wasm }, async () => {

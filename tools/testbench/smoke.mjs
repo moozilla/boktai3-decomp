@@ -27,7 +27,7 @@ export default function smoke({ actor: key, menu }) {
     yield* s.tap('down');
     return { key, callback: entry.stageUpdate };
   });
-  return scenario({ empty: true, equip: { sword: 'Gradius' } }, function* (s) {
+  return scenario({ empty: true, ...entry.smokeStage, equip: { sword: 'Gradius' } }, function* (s) {
     const p = s.player.position;
     const actor = yield* s.atTick(() => {
       if (['30AC', '33FF', '3960'].includes(key)) linkFixture(s);

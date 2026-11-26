@@ -21,6 +21,8 @@ export function actorEntry(name) {
   if (exact) return exact;
   const matches = catalog.filter(e => [e.name, ...e.aliases].some(n => normalize(n) === normalize(name)));
   if (matches.length === 1) return matches[0];
+  const creators = matches.filter(e => e.role === 'spawn');
+  if (creators.length === 1) return creators[0];
   if (matches.length) throw new Error(`Ambiguous actor "${name}": ${matches.map(e => e.key).join(', ')}`);
   throw new Error(`Unknown actor "${name}"`);
 }

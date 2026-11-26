@@ -112,7 +112,7 @@ function runtime(g, host, settings, out, mutations, progress) {
       get hp() { return kind === 'player' ? base.currentStatA : base.health; },
       get maxHp() { return kind === 'player' ? base.maximumStatA : base.defaultHealth ?? base.maxHealth; },
       get position() {
-        const p = kind === 'registry' ? base.body.position : base.position ?? base;
+        const p = kind === 'registry' ? base.body.position : base.position ?? base.body?.position ?? base.sprite?.position ?? base;
         return p && typeof p === 'object' && ['x', 'y', 'z'].every(axis => axis in p) ? p : null;
       },
     };
@@ -169,7 +169,7 @@ function runtime(g, host, settings, out, mutations, progress) {
       return value;
     },
     call(name, ...args) {
-      if (args.length > 12) throw new RangeError('Call supports at most 12 argument words; use a C snippet for other signatures');
+      if (args.length > 12) throw new RangeError('The port call adapter supports at most 12 argument words');
       mark(`C call ${name}`);
       return g.call(name, ...args);
     },
@@ -284,7 +284,7 @@ function runtime(g, host, settings, out, mutations, progress) {
       const mode = opts.mode ?? recipe?.mode ?? 'chara';
       const id = { hash: nextId++ };
       const args = opts.args ?? (mode === 'chara' ? [opts.id ?? recipe?.args?.[0] ?? id, ...(recipe?.args?.slice(1) ?? [])] : recipe?.args ?? []);
-      const options = { ...recipe?.options, ...opts.options };
+      const options = { ...recipe?.options, ...entry.defaults, ...opts.options };
       if (entry.allocation === 'SceneActorRegistry_LinkActor') {
         options.N = opts.options?.N ?? [id];
         if (entry.parameters.A && options.A === undefined) options.A = [80, 0, 0, 2, 1026, 1];
@@ -298,6 +298,7 @@ function runtime(g, host, settings, out, mutations, progress) {
       for (const letter of Object.keys(options)) if (options[letter] === null) delete options[letter];
       mark(`registry ${entry.key} (${entry.name})`);
       progress.phase = `creating ${entry.name} (${entry.key})`;
+      const trackCount = entry.key === '8337' ? $.gDisplayTrackManager?.count : undefined;
       const allocation = observeAllocations(g, entry, () => reg(entry, mode, args, options));
       progress.phase = `running ${entry.name} (${entry.key})`;
       const actors = allocation.registry.map(address => {
@@ -313,6 +314,13 @@ function runtime(g, host, settings, out, mutations, progress) {
         return describe(address, g.types.params[g.name(task.update)] ?? 'struct Task', 'task', entry);
       }));
       actors.push(...allocation.slots.map(a => describe(a.address, a.type, 'slot', entry)));
+      if (trackCount !== undefined && $.gDisplayTrackManager.count > trackCount) {
+        const type = 'struct DisplayTrack';
+        const address = $.gDisplayTrackManager.entries.$addr + trackCount * g.sizeof(type);
+        const track = s.actor(g.at(address, type), 'slot', { position: 'sprite.position' });
+        track.entry = entry;
+        actors.push(track);
+      }
       const actor = actors.find(a => a.kind === 'registry' || a.kind === 'slot') ?? actors[0] ?? null;
       if (actor?.position && (opts.x !== undefined || opts.y !== undefined || opts.z !== undefined)) {
         s.place(actor, Object.fromEntries(['x', 'y', 'z'].filter(k => opts[k] !== undefined).map(k => [k, opts[k]])));
