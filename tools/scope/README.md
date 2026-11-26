@@ -406,8 +406,7 @@ ported here deliberately. Incremental rebuild after editing one file:
 ### The workspace: new, land, rename
 
 `new FUNC` finds where FUNC's C will live: an `INCLUDE_ASM` line in a unit,
-or nowhere yet (a new
-`src/fn/sub_ADDR.c`). It writes `build/scope/work/FUNC.c`: the whole unit with
+or nowhere yet (a new single-function file in the subsystem directory). It writes `build/scope/work/FUNC.c`: the whole unit with
 FUNC's `INCLUDE_ASM` replaced by a stub (signature from the first
 declaration in the unit or its headers), plus `FUNC.base.c`, the unit as it
 was. Outside a unit, the draft is a like twin's file (coverage >= 0.5) with

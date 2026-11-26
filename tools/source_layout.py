@@ -100,15 +100,16 @@ class Manifest:
 
 
 def scan(root=ROOT, source_root=None):
-    from split import c_functions, nonmatching_functions
+    from split import draft_functions, source_functions
 
     root = Path(root)
     names = {name: address for address, name in symbol_names(root).items()}
     files, by_file = {}, defaultdict(list)
     for path in sorted(Path(source_root or root / "src").rglob("*.c")):
         rel = path.relative_to(root).as_posix()
-        aliases = dict(ALIASES.findall(path.read_text()))
-        definitions = c_functions(path) + [name for name, _ in nonmatching_functions(path)]
+        text = path.read_text()
+        aliases = dict(ALIASES.findall(text))
+        definitions = source_functions(text, resolve_aliases=False) + [name for name, _ in draft_functions(text)]
         for definition in dict.fromkeys(definitions):
             address = address_of(aliases.get(definition, definition), names)
             if address is None:

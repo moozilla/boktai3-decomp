@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Check one C file against the ROM without a full build, and show a diff.
 
-  check.py src/fn/sub_08033568.c [--quiet]
+  check.py FILE.c [--quiet]
   check.py sub_08033568              (resolve a ROM address or function name)
 
 Compiles the file exactly as build.py does, links it alone at the address of

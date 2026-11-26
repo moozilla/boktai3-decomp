@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Set up a decomp-permuter run for one function.
 
-  permute.py src/fn/sub_08033568.c [FUNC] [--run N_SECONDS] [-j THREADS]
+  permute.py FILE.c [FUNC] [--run N_SECONDS] [-j THREADS]
              [--focus auto|LINES] [--context N] [--weight PASS=W ...]
 
 Creates build/permute/FUNC/run-*/ with base.c (preprocessed C), target.o (the

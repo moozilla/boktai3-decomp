@@ -152,7 +152,7 @@ def tidy(unit, name, orig):
 
 
 def find_unit(name):
-    r = subprocess.run(["git", "grep", "-l", "-w", "-F", name, "--", "src/*.c"],
+    r = subprocess.run(["git", "grep", "-l", "-w", "-F", name, "--", ":(glob)src/**/*.c"],
                        cwd=ROOT, capture_output=True, text=True)
     for unit in r.stdout.split():
         if name in dict(definitions(open(os.path.join(ROOT, unit)).read())):
