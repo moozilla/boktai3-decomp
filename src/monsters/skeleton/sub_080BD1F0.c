@@ -70,8 +70,7 @@ static inline u32 RandomFrom(const u16 *table, u32 wrap, u32 bits)
     u32 index = (gRandomIndex + 1) & wrap;
     u32 v;
     gRandomIndex = index;
-    index *= 2;
-    v = *(const u16 *)(index + (u32)table);
+    v = table[index];
     v &= bits;
     return v + 1;
 }
