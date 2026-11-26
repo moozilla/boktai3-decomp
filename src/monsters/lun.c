@@ -474,9 +474,8 @@ void Lun_ResumeAfterLiftPenalty(struct ChaseActor *input, s32 elapsed)
             Lun_BeginMoveToPosition(input, &gPlayers[0]->position);
             SceneActorChase_SetPhase(input, 2, 1);
         } else {
-            u32 zero = delay;
             SceneActorChase_SetControl(input, Lun_UpdateWaitingAnimation, 10);
-            SceneActorChase_SetPhase(input, 1, 1);
+            SceneActorChase_SetState(input, zero8, 1, 1);
             input->base.body.direction = input->base.tracking.heading;
             input->base.field2C2 = 64;
         }
