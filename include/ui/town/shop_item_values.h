@@ -27,7 +27,7 @@ u32 Inventory_CanAssignEquipment(u32 slot);
 struct SceneValueEquipment *Inventory_GetEquipmentEntry(u32);
 struct SceneValueEquipmentDefinition *Equipment_GetDefinition(u32);
 struct SceneValueConsumableDefinition *GameState_GetConsumableDescriptor(u32);
-s32 SceneInventory_GetItemConditionFrame(u32);
+s32 PauseDisplay_GetItemConditionFrame(u32);
 s32 Inventory_GetItemId(u32);
 s32 Inventory_GetConsumableId(u32);
 u32 SceneItemValue_GetItemBaseValue(s32);

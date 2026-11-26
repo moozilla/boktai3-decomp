@@ -1,5 +1,5 @@
 #include "objects/pile_driver/scene_panel_subject_tail.h"
-void ScenePanelSubject_InitCollider(struct ScenePanelSubject *subject, u32 value)
+void PileDriverSubject_InitCollider(struct ScenePanelSubject *subject, u32 value)
 {
     struct ScenePanelInteractionPackedPosition size, offset;
     struct ContactCollider *collider = &subject->collider;
@@ -11,5 +11,5 @@ void ScenePanelSubject_InitCollider(struct ScenePanelSubject *subject, u32 value
     Collider_Init(collider, 0, 0x4001, 0, 0x10, &size, &offset);
     Collider_SetBodyProperties(collider, value, 0, 0);
     Collider_SetPosition(collider, &subject->home, 0);
-    Collider_SetCallback(collider, ScenePanelSubject_ApplyContact, subject);
+    Collider_SetCallback(collider, PileDriverSubject_ApplyContact, subject);
 }

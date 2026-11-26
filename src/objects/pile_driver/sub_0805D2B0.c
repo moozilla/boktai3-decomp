@@ -1,5 +1,5 @@
 #include "objects/pile_driver/scene_panel_subject_playback.h"
-void ScenePanelSubject_TickDeparting(struct ScenePanelSubject *owner)
+void PileDriverSubject_TickDeparting(struct ScenePanelSubject *owner)
 {
     if (owner->kind) {
         if (owner->sequence.index == 5 && owner->sequence.elapsed == 0)
@@ -11,7 +11,7 @@ void ScenePanelSubject_TickDeparting(struct ScenePanelSubject *owner)
         if (ScenePanelSubject_StepPlayback(owner)) {
             owner->contactProgress = 0;
             owner->unknownE2 = 90;
-            ScenePanelSubject_SetState((void *)owner, 6);
+            PileDriverSubject_SetState((void *)owner, 6);
         }
     } else {
         if (owner->sequence.index == 5 && owner->sequence.elapsed == 0)
@@ -20,7 +20,7 @@ void ScenePanelSubject_TickDeparting(struct ScenePanelSubject *owner)
                          owner->sequenceVariant);
         if (ScenePanelSubject_StepPlayback(owner)) {
             owner->contactProgress = 0;
-            ScenePanelSubject_SetState((void *)owner, 2);
+            PileDriverSubject_SetState((void *)owner, 2);
         }
     }
 }

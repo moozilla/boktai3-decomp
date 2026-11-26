@@ -22,7 +22,7 @@ static inline void Request(struct Transition *p, u32 mode)
     p->counter = 0;
     p->pending = 1;
 }
-void ScenePanel_ApplyPairTransition(struct Transition *p)
+void VanargandPair_ApplyPairTransition(struct Transition *p)
 {
     struct Transition *q = p;
     switch (q->action - 1) {

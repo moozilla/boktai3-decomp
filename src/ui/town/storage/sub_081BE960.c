@@ -1,5 +1,5 @@
 #include "global.h"
-#include "ui/town/scene_inventory_panel.h"
+#include "ui/town/shop_panel.h"
 struct StoragePanel {
     u8 unknown0[0x1098];
     struct SceneInputWidget banner;
@@ -19,7 +19,7 @@ void Storage_ShowItemDescription(struct StoragePanel *panel)
     s32 item, frame;
     if (panel->selection <= 7) {
         item = Inventory_GetItemId(panel->items[panel->savedSelection]);
-        frame = SceneInventory_GetItemConditionFrame(panel->items[panel->savedSelection]);
+        frame = PauseDisplay_GetItemConditionFrame(panel->items[panel->savedSelection]);
     } else {
         item = -1;
         frame = 0xCF;

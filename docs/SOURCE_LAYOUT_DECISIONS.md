@@ -139,8 +139,7 @@ The main decisions:
 * Identified objects lose their mechanism prefixes:
   * Coffin Bike `Glove_`, `ActorRecoil_`
   * Centipede `TentacleActor_`, `TentacleEnemy_`, `TentacleBody_`. The terrain
-    overlay's `Centipede_Create` (key 0AD8) becomes `CentipedeOverlay_Create`
-    to free the name.
+    overlay has its own constructor `CentipedeOverlay_Create` (key 0AD8).
   * Popbud, Plasma Cannon, Garmr Statue, Wind Cannon (and manager), Pollen
     Flower, Deck Cannon, Solar Root, Muspell Head
   * Count `Vampire_`; his bats `ContactSwarm_` → `CountBats_`

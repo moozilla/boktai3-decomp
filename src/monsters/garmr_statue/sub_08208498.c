@@ -36,7 +36,7 @@ static inline void Polar(struct SceneVec *v, s32 angle, s32 length)
     v->y = 0;
     v->z = Scale(gUnk_086149C4[angle] * length);
 }
-u32 CannonTurret_FireAimedVolley(struct CannonTurret *p)
+u32 GarmrStatue_FireAimedVolley(struct CannonTurret *p)
 {
     struct SceneVec position, velocity;
     struct SceneVec *pos, *vel, *player, *origin;

@@ -1,11 +1,11 @@
 #include "global.h"
 #include "engine/ram.h"
 #include "engine/engine_globals.h"
-#include "minigames/coffin_bike/glove.h"
+#include "minigames/coffin_bike/coffin_bike.h"
 void Hud_SetMode(s32);
 void sub_08116E44(void);
-void Glove_UpdateDefeatEffects(void);
-void Glove_DispatchCommands(struct Glove *);
+void CoffinBike_UpdateDefeatEffects(void);
+void CoffinBike_DispatchCommands(struct Glove *);
 void ActorStats_ApplyPendingIncrement(struct GloveMotion *);
 void StageIconDisplay_Create(u32, u32, void (*)(void), void *);
 static inline u8 TestActorFlags(struct Glove *p, u32 mask)
@@ -69,11 +69,11 @@ void MotionActor_DispatchRequestedState(struct Glove *actor)
             mask &= *flags;
             zero = 0;
             *flags = mask;
-            SetCallback(actor, Glove_UpdateDefeatEffects, zero);
+            SetCallback(actor, CoffinBike_UpdateDefeatEffects, zero);
             return;
         }
     }
-    Glove_DispatchCommands(actor);
+    CoffinBike_DispatchCommands(actor);
     if (!IsUpdated(actor)) {
         ActorStats_ApplyPendingIncrement(state);
     }

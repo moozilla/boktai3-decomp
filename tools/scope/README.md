@@ -262,7 +262,7 @@ reload choice from the first differing insn on, keeping shifts that shrink the
 diff. Each choice tries only the shifts that give it a different register (one
 per free register, from its X record), and the choices next to differing insns
 go first, so the budget is not spent on early choices (Player_GetSmoothedDirection:
-1 compile, was 7; GridAttackActor_OnDamageCollision: 2). A MATCH means the C
+1 compile, was 7; NidhoggrDuel_OnDamageCollision: 2). A MATCH means the C
 has the right shape and pseudos and only reload's rotation state differs.
 Before searching, `spill` names any low register the ROM reloads into that is
 not in the draft's spill list. `finish_spills` builds that list from every
@@ -535,7 +535,7 @@ in the patch.
     `"=r"(x)`; PlayerCue_UpdateRecoilSlide's `scratch`) and says so, instead of offering a
     removal that leaves C reading an unset value.
   * The `-g` compile runs with `-Wuninitialized` (same code on 150 units); scope prints agbcc's
-    "might be used uninitialized" warnings for FUNC (Vampire_ApplyPendingDamage's `t1`).
+    "might be used uninitialized" warnings for FUNC (Count_ApplyPendingDamage's `t1`).
     A pinned register variable gets no such warning (it is not a pseudo).
   * `campaign.py land` formats only the landed file (it ran `make format` over the tree).
   * `why all` analyzes up to `SCOPE_WHY_MAX` hunks (24; was a fixed 8) and takes a range of ROM
@@ -1200,7 +1200,7 @@ Each was read from the compiler source and confirmed on a live draft.
    came from a constant made in another mode: a `& 63` narrowed by a 16-bit store or
    bitfield is an HImode and, its literal becomes an HImode pseudo that cse shares among the
    ands, and find_equiv_reg rejects the SImode copy of an HImode set, so each use reloads sl
-   afresh. ContactSequenceActor_UpdateDying matched once its `u32 xzMask = 63` became
+   afresh. NidhoggrDuelMinion_UpdateDying matched once its `u32 xzMask = 63` became
    literal `& 63`s, each store narrowed (`(u16)(... & 63)` for the u32 temporaries); the
    127 masks stayed in the `u16 mask` helper. `why` names this inheritance when a reload
    register the draft reused held an operand's REG_EQUIV constant.
@@ -1262,7 +1262,7 @@ Each was read from the compiler source and confirmed on a live draft.
    the constant without adding a note. Write the halves directly: storing them through a
    pointer helper keeps the union in memory (the offset-2 store keeps the pointer pseudo), and
    so does `source.table` with the address never taken (u6 in ChargedBurst: 54 / 62). Matched
-   this way: SingletonSlot7_UpdateShakingDeparture (081EEECC), ChargedBurst_EmitSpark
+   this way: VanargandHead_UpdateShakingDeparture (081EEECC), ChargedBurst_EmitSpark
    (082335F0, with fact 49) and HealthRestoreEffect_StartParticleBurst (08234868, where this
    was the only difference). `frame` suggests it when it finds the pattern. It names instead a
    copy of the equivalent pseudo that has no equivalence of its own (an inline's parameter):
@@ -1295,7 +1295,7 @@ Each was read from the compiler source and confirmed on a live draft.
    loop header. An `x += c` after an inner loop that does not set x is anticipatable before
    the loop. Unless the original computation is "isolated", gcse computes it into a new
    pseudo at the end of the block before the loop and turns the original into a copy. Spilled,
-   that pseudo takes another stack slot. In SceneInventory_PopulateConsumableGrid's goto draft,
+   that pseudo takes another stack slot. In Shop_PopulateConsumableGrid's goto draft,
    `saveByteOffset += 8` and `slotBase += 4` at the end of each row moved above the column
    loop (frame 0x1c for 0x18): 67 differing, 37 with `AGBCC_NOPRE=2`, 25 with both kept
    (`AGBCC_NOPRE=1,2`). The computation stays after the loop when:
@@ -1441,7 +1441,7 @@ Each was read from the compiler source and confirmed on a live draft.
 59. **Reload's spill choices come before jump2's cross-jumping, so a merged tail still counts.**
    Reload hands out spill registers round-robin (fact 8) and jump2 cross-jumps identical tails
    only afterwards. A tail the C writes in two branches leaves one copy in the ROM, but reload
-   made the first copy's choices too. In SceneInventory_HandlePageKeys the ROM's R branch takes r2
+   made the first copy's choices too. In Shop_HandlePageKeys the ROM's R branch takes r2
    for `ldr =0x1AB0` where one shared tail after both branches gives r0 (`spill`: one choice
    missing between the L branch and the R branch). `return SceneInventory_TurnPage(panel);` at
    the end of each branch, a static inline for the sound, the 0x40 flag and the catalog update,
@@ -1458,7 +1458,7 @@ Each was read from the compiler source and confirmed on a live draft.
    `gGameState` load, `/f`). So the next `gGameState->...` reuses the pointer and the stored value.
    A store through a pointer (`s16 *funds = &gGameState->unk7B0; *funds += value;`) has neither
    flag and may alias the global, so the next access loads gGameState and the field again. The ROM
-   of SceneInventory_TickSaleTransition loads gGameState again for its 9999 clamp, which the pinned
+   of Shop_TickSaleTransition loads gGameState again for its 9999 clamp, which the pinned
    version forced with a volatile read. Two more things decided its registers. The update is
    written out in each case: in an inline helper, try_constants folds 0x7B0 into both adds
    (fact 31), no pseudo holds it, and gGameState took r2 and value r3. And `funds` is declared per
@@ -1473,10 +1473,10 @@ Each was read from the compiler source and confirmed on a live draft.
    in the wider modes (HI, then SI) and prefers that `src_related` over a same-mode register on a cost
    tie. So `p->state = 0; p->active = 1; p->timer = 0; p->direction = 0;` always compiles to
    `movs r2, #0; strb r2; ...; movs r1, #0; strh r2; strb r1`: state takes the SI zero, direction
-   the timer's own HI pseudo. BoardPiece_Initialize's ROM stores state and direction from one zero and
+   the timer's own HI pseudo. BatFlockBat_Initialize's ROM stores state and direction from one zero and
    the timer (and ZeroFill8's word) from the insertion's mask. Its twin ContactActor_InitializeSlot
    matched with `u16 initialFrame[] = {0}; ... slot->stateFrame = initialFrame[0];`, and so did
-   BoardPiece_Initialize (two barriers out): the element read is an HImode register, found first for
+   BatFlockBat_Initialize (two barriers out): the element read is an HImode register, found first for
    both byte stores. The same pair has `adds r0, r4, #0` before `ldr r1, =0x2D3` for
    AnimData_SelectPaletteBank. expand_call copies each argument into a pseudo in order (r0 then the
    constant), but cse folds the r0 copy into the live r4, so the constant pseudo's set comes first and
@@ -1504,9 +1504,9 @@ Each was read from the compiler source and confirmed on a live draft.
    constant is set in the same block, which is why an s8 member's -1 is `movs #0xff; strb`, never the
    `movs #1; rsbs` of a store through a pointer. In a small loop, loop.c hoists the 0xFF before
    combine runs, so `p->catalog[page * 8 + i] = -1;` stays `ldrb r0, [r1]; orrs r0, r3; strb r0, [r1]`
-   with `movs r3, #0xff` before the loop (SceneInventory_BuildUnlockedEquipmentCatalog and
+   with `movs r3, #0xff` before the loop (Shop_BuildUnlockedEquipmentCatalog and
    BuildUnlockedItemCatalog, whose `u32 value | mask` temporaries this replaced). The extra load and
-   and/or also count in loop.c's giv analysis and insn counts: in SceneInventory_ReadScriptCatalog
+   and/or also count in loop.c's giv analysis and insn counts: in Shop_ReadScriptCatalog
    the member form gave 32 differing instructions, and the script loops lost the pointer giv the ROM
    steps. `*(p->catalog + n) = -1` and `*(p->catalog + n) = Script_GetValue()` are ordinary MEM
    stores, the -1 a QImode pseudo reloaded as in fact 28, and match. spellings.sp_member_index
@@ -1519,7 +1519,7 @@ Each was read from the compiler source and confirmed on a live draft.
    what move_movables put there, and each reduced giv's start (`p + 0x1AEA`) follows it. A counter
    initialized in the C comes before the hoisted invariants instead. So a ROM whose preheader reads
    hoisted constant, count, pointer was written counting up over an index, not with a pointer and a
-   count-down: SceneInventory_ReadScriptCatalog's `for (n = 0; n < 56; n++) *(p->catalog + n) = -1;`
+   count-down: Shop_ReadScriptCatalog's `for (n = 0; n < 56; n++) *(p->catalog + n) = -1;`
    becomes a count-down from 55 with a pointer stepping down from p->catalog + 55, in the ROM's order.
 
 65. **A constant kept in a call-saved register for one use in a merged tail was written in every
@@ -1857,7 +1857,7 @@ Each was read from the compiler source and confirmed on a live draft.
    is marked may_not_optimize: it is never hoisted, however long it lives. A plain
    `T *t = x;` with the same uses is a single set, and when its life is long enough
    (threshold x savings x lifetime >= insns) loop.c moves it to the preheader. In
-   BoardPieces_StartConvergence the ROM loads gRandomTable in the loop and keeps it for two
+   BatFlockBats_StartConvergence the ROM loads gRandomTable in the loop and keeps it for two
    samples; the plain local lived 25 insns and was hoisted at threshold 7, while
    `union RandomTableView table = {gRandomTable};` (the matched sibling sub_08010298's form)
    stayed in place and matched. `scope.py FILE.c FUNC hoist` reports it as `set 2 times in the
@@ -1938,7 +1938,7 @@ Each was read from the compiler source and confirmed on a live draft.
    effect on the whole-function instruction count decides PRE's hash-bucket order.
 
 123. **A duplicated call followed by a duplicated read can stop CSE and still merge.**
-   ContactSwarm_UpdateTracking (08044290) reused an early mask 15 in its final random
+   CountBats_UpdateTracking (08044290) reused an early mask 15 in its final random
    sample, keeping it live across three calls. Put Collider_SetPosition and the following
    `frame = slot->stateFrame` in both phase-test arms. CSE stops at their join, giving
    the final mask a fresh load. The read after each call prevents flow's call-fallthrough
@@ -2097,7 +2097,7 @@ Each was read from the compiler source and confirmed on a live draft.
    `CSE_NOFOLLOW=2` confirms the decision. A second entry edge also blocks it but
    leaves a comparison in the final output. The nonempty do/while/for forms all
    match; placing the timer store and return inside the loop changes the tail.
-   ScenePanelRig_TickRise (08059AC4) uses the same boundary for an if/else: the last
+   PileDriverRig_TickRise (08059AC4) uses the same boundary for an if/else: the last
    arm before the else label, written `do { ...; return; } while (0);`, stops cse
    following into the else arm, which then reloads the field it stored. Keep earlier
    arms that exit (`if (c) { call(); return; }`) outside the loop: loop.c's
@@ -2168,7 +2168,7 @@ Each was read from the compiler source and confirmed on a live draft.
    Compare fact 43 (HImode masks and find_equiv_reg).
 
 236. **A copy that gives the losing pseudo a preference moves a higher-priority one off the
-   register.** In ScenePanel_DrawOverlay (08058BD8) `target` (priority 2376) lost r1 to
+   register.** In PileDriver_DrawOverlay (08058BD8) `target` (priority 2376) lost r1 to
    `&currentLevels[slot]` (13333). `s32 mapIndex = target + 1; entry = entries[mapIndex];`
    in place of `target++` gives target a copy preference for r1; global alloc's first
    pass skips registers another pseudo prefers, so the address took r2 and target r1.
@@ -2182,7 +2182,7 @@ and 37 change, many of which already use a local `table = gUnk_0203B400`,
 so the original was not one universal spelling. Over the drafts: 27 better,
 51 worse, 38 the same, 1 match. Large wins left to look at: sub_080B2EEC
 18 -> 4, sub_081FF454 8 -> 4, sub_08137E28 69 -> 38,
-BossSlot2_SpawnBobbingFormation 10 -> 1. Matches that use the literal:
+Sabata_SpawnBobbingFormation 10 -> 1. Matches that use the literal:
 #642, #643 (SceneHud_SelectUpgradeableStat), #644
 (SceneEffectSchedule_AddFromScript, with a `scaleUnlessFlagged` inline whose
 if/return leaves a label that stops reload's move2add).
@@ -2194,7 +2194,7 @@ differing insns). Of the 38 searched:
 
 * 2 match exactly by rotation alone: Hresvelgr_InitializeShots
   (`AGBCC_SPILL=5:3`) and Vanargand_UpdateFacingPairAttack (`10:1`).
-* 5 shrink a lot: BossSlot2_SpawnBobbingFormation 12 -> 2,
+* 5 shrink a lot: Sabata_SpawnBobbingFormation 12 -> 2,
   Vanargand_UpdatePartSweepingStrike 33 -> 10, Nidhoggr_UpdateFallingAttackEffect
   42 -> 10, Vanargand_UpdatePartSidestep 11 -> 5, EffectPool_UpdateEntry 10 -> 6.
   Rotation is one of their causes; `why all` after applying the shift shows
@@ -2417,7 +2417,7 @@ which is exactly `10:1`. Not tested.
 * Near-miss failures overnight (2026-10-24): of the drafts that started
   within a few insns and failed both rounds, three are reload rotation
   only (`spill` gives MATCH with one shift: Player_GetSmoothedDirection and
-  its twin sub_0823C4B4 `AGBCC_SPILL=6:1`, GridAttackActor_OnDamageCollision
+  its twin sub_0823C4B4 `AGBCC_SPILL=6:1`, NidhoggrDuel_OnDamageCollision
   `3:2`); SceneActorControl_UpdateWanderTarget, TickRandomMotion and
   Skeleton_TickDecayingLunge are not. Workers spend 120-190 compiles on
   rotation cases without finding the C that adds or removes one reload in
@@ -2559,7 +2559,7 @@ which is exactly `10:1`. Not tested.
    has the correct shape but different local allocation. Helper return width
    is a semantic expansion boundary even when the final store truncates too.
 180. **A local duration initializer can stop equal constant sets from hoisting together.**
-   TentacleBody_RefreshDirectionalAnimations has three ones: the status test, the
+   CentipedeBody_RefreshDirectionalAnimations has three ones: the status test, the
    first flip test, and the zero-duration fallback. loop.c combines their
    movables (13 x 3 x 13 >= 254), moves one outside the segment loop, and
    consumes a high register needed by the offset. Writing the fallback as
@@ -2569,7 +2569,7 @@ which is exactly `10:1`. Not tested.
    A zero initializer on the control unions does not have the same effect;
    the initializer must separate the fallback one from the invariant group.
 210. **A locally tied pseudo may be logged only under its quantity head; its G record is not
-   evidence that global allocation chose its register.** In ScenePanelRig_TickApproachSubject
+   evidence that global allocation chose its register.** In PileDriverRig_TickApproachSubject
    (0805A044), `originOffset` (pseudo 30) dies in the address add (pseudo 186), and local-alloc
    puts both in r2. The L trace records only quantity head 186 (`address`), while G also lists
    30 with a hypothetical global priority. Treating that G row as the decision suggested
@@ -2891,7 +2891,7 @@ which is exactly `10:1`. Not tested.
    REG_EQUIV priority tuning. Name the allocation-only zero use in the commit.
 
 243. **Equivalent source tails can tune global priorities before late jump sharing.**
-   TentacleActor_AlignSegmentsToTerrain (080AA8C4) needs its y-store induction
+   Centipede_AlignSegmentsToTerrain (080AA8C4) needs its y-store induction
    pointer above the slope helper's position pointer. Two separate failed ascent
    tests with identical fallback stores raise the y pointer's references from 15
    to 17. Actual byte-sized attribute/kind locals slightly extend the competitor;
@@ -2920,7 +2920,7 @@ which is exactly `10:1`. Not tested.
    union with byte/halfword views, an impossible signed-negative clamp, and a
    bounded zero-offset read preserves a post-call USE. One arm has one USE and
    another has two, so jump2 cannot merge the calls. The narrowed reads themselves
-   emit no instructions. TentacleActor_UpdateRetraction (080AB968) needs the
+   emit no instructions. Centipede_UpdateRetraction (080AB968) needs the
    opposite: four equal Advance paths must merge after allocation. Give all four
    the same post-call USE tail, using one caller-owned pointer union. This prevents
    the second basic-block pass from adding a unique fallthrough USE0, and jump2
@@ -2982,7 +2982,7 @@ which is exactly `10:1`. Not tested.
    and dead read are allocation-only forms; the 948-byte stock result is exact.
 
 251. **A bounded dead arm can admit a low register into reload's spill set.**
-   OrangeSpine_ApplyHitReaction (0820EE34) needs r3 available for the health loads.
+   PlasmaCannon_ApplyHitReaction (0820EE34) needs r3 available for the health loads.
    Reuse the input parameters for the response bits and destination first. After
    loading maximum health, widen the unsigned health halfword into `raw` and use
    `if ((s32)raw < 0)` around two additional signed field reads. Combine removes
@@ -3062,13 +3062,13 @@ which is exactly `10:1`. Not tested.
    view, guards, zero and dead accesses are allocation-only phase 4 forms.
 
 259. **Admitting a scratch register and choosing an argument register are separate decisions.**
-   ScenePanel_TickRig (0805AC3C) first needs r3 in reload's spill set. An impossible
+   PileDriver_TickRig (0805AC3C) first needs r3 in reload's spill set. An impossible
    negative-byte arm with two signed field loads supplies that demand. A separate
    bounded timer fallback passes the timer in argument four and the interval
    pointer in argument two, supplying their r3/r1 preferences. Reusing the timer
    for the second frame sample avoids another fallback. Preserve both timer
    reads, but use an ordinary second halfword load so no extra volatile copy
-   survives. Both arms disappear in jump2; all 220 bytes match. ScenePanel_InitRig
+   survives. Both arms disappear in jump2; all 220 bytes match. PileDriver_InitRig
    (0805B0F0) separately uses the known-zero halfword-state offset from fact 231
    to avoid the random table's REG_EQUIV penalty and retain r4 ahead of mask r5.
    These guards, scalar reuse and table identity are allocation-only forms.

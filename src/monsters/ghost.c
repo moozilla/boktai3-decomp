@@ -605,19 +605,19 @@ static inline void Ghost_MakeRouteMotion(struct ContactPosition *out, u32 angle,
     out->z = Math_ShiftTowardZero(gUnk_086149C4[angle & 255] * speed, 12);
 }
 
-void TentacleActor_ResetOscillation(void *);
+void Centipede_ResetOscillation(void *);
 
 void Anim_SetDurationScale(void *, u32);
 
 void Anim_SetFrameDurationScale(void *, u32);
 
-void TentacleActor_SelectWanderRoute(void *);
+void Centipede_SelectWanderRoute(void *);
 
-void TentacleActor_AdvanceMotionPhase(void *, s32);
+void Centipede_AdvanceMotionPhase(void *, s32);
 
 void sub_080A9DB0(void *, s32, s32);
 
-void TentacleActor_UpdateOscillation(void *, s32, s32);
+void Centipede_UpdateOscillation(void *, s32, s32);
 
 static inline u8 Ghost_ApproachCurvePosition(struct ChaseActor *actor,
                                              struct SceneActorMotionSubject *saved, s32 speed)

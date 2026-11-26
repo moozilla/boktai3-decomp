@@ -462,7 +462,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [notes/round1-luna-a.md](../notes/round1-luna-a.md) | Luna A production round |  | 2 |
 | [notes/round1-luna-b.md](../notes/round1-luna-b.md) | Production matching round 1 — Luna B | *#matching* | 1 |
 | [notes/round1-sol.md](../notes/round1-sol.md) | Production matching round 1 — Sol | *#matching* | 4 |
-| [notes/round10b-fan-cannon.md](../notes/round10b-fan-cannon.md) | FanCannon_UpdateActive (08209704) | #matching #fan-cannon #rng #gcse #register-allocation | 1 |
+| [notes/round10b-fan-cannon.md](../notes/round10b-fan-cannon.md) | WindCannon_UpdateActive (08209704) | #matching #fan-cannon #rng #gcse #register-allocation | 1 |
 | [notes/round10b-skeleton-rise.md](../notes/round10b-skeleton-rise.md) | Skeleton_UpdateRiseRecovery (080BF0E4) | #matching #skeleton #global-alloc #pre #stack-slots | 1 |
 | [notes/round11-c-holdouts.md](../notes/round11-c-holdouts.md) | Round 11-C holdouts |  | 64 |
 | [notes/round11-d-holdouts.md](../notes/round11-d-holdouts.md) | Round 11 package D holdouts |  | 23 |
@@ -573,13 +573,13 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [notes/round9-tracked-contact.md](../notes/round9-tracked-contact.md) | Tracked contact update (0807F81C) | #matching #scene-actors | 0 |
 | [notes/round9-vorn-idle-facing.md](../notes/round9-vorn-idle-facing.md) | round9-vorn-idle-facing.md | *#animation* | 0 |
 | [notes/round9b-081c0ce4.md](../notes/round9b-081c0ce4.md) | PlayStats_UpdateResults | #matching #round9b | 0 |
-| [notes/round9b-081c6780.md](../notes/round9b-081c6780.md) | StateActor_ProcessDirectionMessages | #matching #round9b | 0 |
+| [notes/round9b-081c6780.md](../notes/round9b-081c6780.md) | StoryCharacter_ProcessDirectionMessages | #matching #round9b | 0 |
 | [notes/round9b-081ca490.md](../notes/round9b-081ca490.md) | State actor eight-way burst | #matching #state-actor #particles | 1 |
-| [notes/round9b-081cbe30.md](../notes/round9b-081cbe30.md) | StateActor_UpdateDelayedAttackEffect | #matching #round9b | 0 |
-| [notes/round9b-081d7c68.md](../notes/round9b-081d7c68.md) | Task4E01_StartTerminalAnimation | #matching #round9b | 0 |
-| [notes/round9b-081d8cf0.md](../notes/round9b-081d8cf0.md) | Task4E01_UpdateGrowingImpact | #matching #round9b | 0 |
-| [notes/round9b-081d95f0.md](../notes/round9b-081d95f0.md) | Task4E01_UpdateExpandingImpact | #matching #round9b | 0 |
-| [notes/round9b-081d9904.md](../notes/round9b-081d9904.md) | Task4E01_SpawnImpactChildren | #matching #round9b | 0 |
+| [notes/round9b-081cbe30.md](../notes/round9b-081cbe30.md) | StoryCharacter_UpdateDelayedAttackEffect | #matching #round9b | 0 |
+| [notes/round9b-081d7c68.md](../notes/round9b-081d7c68.md) | ProjectileTask_StartTerminalAnimation | #matching #round9b | 0 |
+| [notes/round9b-081d8cf0.md](../notes/round9b-081d8cf0.md) | ProjectileTask_UpdateGrowingImpact | #matching #round9b | 0 |
+| [notes/round9b-081d95f0.md](../notes/round9b-081d95f0.md) | ProjectileTask_UpdateExpandingImpact | #matching #round9b | 0 |
+| [notes/round9b-081d9904.md](../notes/round9b-081d9904.md) | ProjectileTask_SpawnImpactChildren | #matching #round9b | 0 |
 | [notes/round9b-bg-tilemap.md](../notes/round9b-bg-tilemap.md) | Background tilemap window | #matching #background #tilemap | 1 |
 | [notes/round9b-npc-dispatch.md](../notes/round9b-npc-dispatch.md) | Scene NPC command dispatch | #matching #scene-actor #commands | 0 |
 | [notes/round9b-npc-state-effect.md](../notes/round9b-npc-state-effect.md) | Scene NPC state effect | #matching #scene-actor #particles | 1 |

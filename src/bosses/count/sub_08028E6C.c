@@ -13,7 +13,7 @@ int Script_GetKeywordValue(int, int);
 void SceneActors_StopBackgroundFlash(void *);
 void BackgroundFlash_BeginAlternating(void *);
 void BackgroundFlash_BeginAppearance(void *);
-int Vampire_TryQueueCommand(int value)
+int Count_TryQueueCommand(int value)
 {
     struct Actor *p = SceneActors_GetBySlot(0);
     if (p && p->handle && !p->command && !(gEnginePauseFlags & 7)) {

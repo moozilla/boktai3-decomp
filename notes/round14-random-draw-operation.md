@@ -6,12 +6,12 @@ Date: 2026-11-16. Source baseline: `36880fd91` on `codex/round14-fields`.
 
 The recovered operation advances a cursor through the 1,024-entry random table
 and captures the selected halfword. `PARTICLE_RANDOM_DRAW` contains those two
-operations and is shared by ContactBurst_Update and the presentation shake
+operations and is shared by NidhoggrDuelBurst_Update and the presentation shake
 sampler. It adds no temporary, pointer copy, dummy use, or allocation parameter.
 
 ## Source evidence
 
-* ContactBurst_Update already performs the increment, mask, cursor store, and
+* NidhoggrDuelBurst_Update already performs the increment, mask, cursor store, and
   halfword read together. Its eight-particle burst uses the sample's low four
   bits to perturb each particle's direction. The cursor is reached through the
   existing `randomState` pointer.
@@ -32,7 +32,7 @@ ignore claim and adds no `concession-ok` comment.
 ## Natural alternatives and limits
 
 Plain loop removal and the existing direct sampler were tried first.
-ContactBurst_Update remains 392 bytes but swaps the table and collider addresses
+NidhoggrDuelBurst_Update remains 392 bytes but swaps the table and collider addresses
 between r8 and r9. Its full 1,080-byte unit differs by five bytes. The existing
 pointer-and-mask sampler instead produces a 1,092-byte unit. Removing the
 collider's redundant reader/writer locals or using its field directly does not
@@ -56,7 +56,7 @@ site.
 * Every source unit including `monster_particle_random.h`, directly or
   transitively, independently matches: **84 of 84**.
 * The compiler-inclusive scan of the header and both sources falls from four
-  warnings to two: two reported once-loop sites are removed. ContactBurst_OnContact's
+  warnings to two: two reported once-loop sites are removed. NidhoggrDuelBurst_OnContact's
   separate one-shot loop and the presentation function's local union remain
   visible. There are no errors or new warnings.
 * The shared macro has two source call sites. Its header addition is committed

@@ -7,7 +7,7 @@
 
 /* Clear the singleton sprite drop manager pointer. */
 
-void ActorRecoil_ReturnZero(void)
+void CoffinBike_ReturnZero(void)
 {
     gCompactParticlePool = 0;
 }
@@ -73,7 +73,7 @@ void SceneMotion_PlayKindSound(struct SpatialEntry *);
 
 s32 ModifierStats_ApplyKind15(struct ScenePoolActor *, s32);
 
-void ActorRecoil_ReceiveBodyContact(void *owner, struct SpatialEntry *other)
+void CoffinBike_ReceiveBodyContact(void *owner, struct SpatialEntry *other)
 {
     struct SpatialEntry *msg = other;
     struct ActorStats *obj = owner;
@@ -154,7 +154,7 @@ static inline struct ActorStats *ActorRecoil_GetStats(void *owner)
     return owner;
 }
 
-void ActorRecoil_ApplyDirectionalImpulse(void *owner, struct SpatialEntry *msg)
+void CoffinBike_ApplyDirectionalImpulse(void *owner, struct SpatialEntry *msg)
 {
     struct ScenePoolVec32 src, dst, diff;
     struct ContactPosition vel;
@@ -204,7 +204,7 @@ struct RecoilCollisionActor {
     s8 group;
 };
 
-void ActorRecoil_InitCollisionVolumes(struct RecoilCollisionActor *p)
+void CoffinBike_InitCollisionVolumes(struct RecoilCollisionActor *p)
 {
     struct ContactPackedVector position, extents, relativeOffset;
     void *owner = p->owner;
@@ -221,7 +221,7 @@ void ActorRecoil_InitCollisionVolumes(struct RecoilCollisionActor *p)
     SpatialIndex_InitEntry(&p->bodyVolume, (struct ContactPosition *)&position,
                            (struct ContactPosition *)&extents,
                            (struct ContactPosition *)&relativeOffset, 20, group, 0, 0, 12,
-                           ActorRecoil_ReceiveBodyContact, owner);
+                           CoffinBike_ReceiveBodyContact, owner);
     position.x = p->width;
     position.y = p->height - 96;
     position.z = p->height - 96;
@@ -234,7 +234,7 @@ void ActorRecoil_InitCollisionVolumes(struct RecoilCollisionActor *p)
     SpatialIndex_InitEntry(&p->hitVolume, (struct ContactPosition *)&position,
                            (struct ContactPosition *)&extents,
                            (struct ContactPosition *)&relativeOffset, 44, group, 0, 15, 12,
-                           ActorRecoil_ApplyDirectionalImpulse, owner);
+                           CoffinBike_ApplyDirectionalImpulse, owner);
     SpatialIndex_InsertEntry(&p->bodyVolume);
 }
 
@@ -258,7 +258,7 @@ u8 LinkParticipant_IsLocallySelected(struct RecoilMotionActor *);
 
 void Character_UpdateLoopingSound(struct ScenePoolActor *);
 
-s32 ActorRecoil_UpdateMotion(struct RecoilMotionActor *p)
+s32 CoffinBike_UpdateMotion(struct RecoilMotionActor *p)
 {
     struct ScenePoolActor *body = &p->body;
     s32 result = MotionTween_Advance(body, p->collisionInfo);

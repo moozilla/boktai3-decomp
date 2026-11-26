@@ -1,7 +1,7 @@
 #include "global.h"
 #include "engine/ram.h"
 
-s32 FanCannonManager_IsCreated(void)
+s32 WindCannonManager_IsCreated(void)
 {
     if (gFanCannonManager == NULL) {
         return 0;

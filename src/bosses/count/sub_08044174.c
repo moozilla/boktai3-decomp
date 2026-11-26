@@ -1,5 +1,5 @@
 #include "scene/collision/contact_swarm.h"
-void ContactSwarm_SetDirectionalSequence(struct ContactSwarm *pool, struct ContactSwarmSlot *slot,
+void CountBats_SetDirectionalSequence(struct ContactSwarm *pool, struct ContactSwarmSlot *slot,
                                          u32 index)
 {
     u8 flip[2];

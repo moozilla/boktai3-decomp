@@ -1,17 +1,17 @@
-#include "ui/town/scene_inventory_tail.h"
-void SceneInventory_BeginCatalogTransition(struct SceneInventoryTail *);
-void SceneInventory_BeginAlternateSelection(struct SceneInventoryTail *);
-s32 SceneInventory_TickPurchaseConfirmation(struct SceneInventoryTail *p)
+#include "ui/town/shop_tail.h"
+void Shop_BeginCatalogTransition(struct SceneInventoryTail *);
+void Shop_BeginAlternateSelection(struct SceneInventoryTail *);
+s32 Shop_TickPurchaseConfirmation(struct SceneInventoryTail *p)
 {
     s32 result;
     SceneInputPanel_HighlightPrompt(&p->display, p->highlight.colors);
     result = SceneInput_TickChoice(&p->display.prompt, &p->display.widgetResource, &p->choiceState,
                                    &p->choiceRepeat);
     if (result == 1)
-        SceneInventory_BeginCatalogTransition(p);
+        Shop_BeginCatalogTransition(p);
     else if (result == 0) {
         Sound_PlaySong(0xDE);
-        SceneInventory_BeginAlternateSelection(p);
+        Shop_BeginAlternateSelection(p);
     }
     return 0;
 }

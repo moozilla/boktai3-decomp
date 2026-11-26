@@ -1,9 +1,9 @@
 #include "global.h"
-#include "monsters/popbud/pink_spine_playback.h"
+#include "monsters/popbud/popbud_playback.h"
 #include "engine/video/display_sequence_inline.h"
 // confidence=low: prefix follows the neighboring creator; species identity remains tentative.
 void ProjectileEmitter_WaitForPlayerApproach(void);
-s32 PinkSpine_InitCollider(struct PinkSpineState *);
+s32 Popbud_InitCollider(struct PinkSpineState *);
 void SceneBody_Init(void *, void *, void *, u32, u32, void *);
 void SceneBody_SetSprite(void *, void *);
 void TerrainOverlay_QueueAddActor(void *);
@@ -83,7 +83,7 @@ static inline u32 PinkSpine_StepSequence(u32 *flipFlags, struct PinkSpineState *
     return ended;
 }
 
-s32 PinkSpine_InitFromScript(struct PinkSpineState *p, void *resource)
+s32 Popbud_InitFromScript(struct PinkSpineState *p, void *resource)
 {
     void *graphics;
     void *sprite;
@@ -160,7 +160,7 @@ s32 PinkSpine_InitFromScript(struct PinkSpineState *p, void *resource)
         PinkSpine_StepSequence(flipFlags, p, sprite, &p->sequence);
     }
     if (!p->f13A)
-        PinkSpine_InitCollider(p);
+        Popbud_InitCollider(p);
     if (p->f138) {
         SceneBody_Init(p->body, p->f140, &p->sprite.position, 0, 4, p);
         SceneBody_SetSprite(p->body, sprite);

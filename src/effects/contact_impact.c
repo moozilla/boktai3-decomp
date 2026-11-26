@@ -1,7 +1,7 @@
 #include "effects/contact_impact.h"
 #include "engine/math/fixed8_interpolation.h"
 
-u32 RegistryF3E4_GetStateResult(struct ContactImpactEffect *p)
+u32 PopInSprite_GetStateResult(struct ContactImpactEffect *p)
 {
     u32 r;
     if (p)
@@ -217,7 +217,7 @@ void ContactImpactEffect_BeginTimedPosition(struct ContactImpactEffect *input,
     }
 }
 
-void RegistryF3E4_ClearState(struct ContactImpactEffect *p)
+void PopInSprite_ClearState(struct ContactImpactEffect *p)
 {
     if (p) {
         ContactImpactEffect_EnterUpdate(p, NULL);
@@ -316,7 +316,7 @@ void ContactImpactEffect_UpdateBlinkFrame(struct ContactImpactEffect *effect)
     }
 }
 
-void RegistryF3E4_StartAppearing(struct ContactImpactEffect *p)
+void PopInSprite_StartAppearing(struct ContactImpactEffect *p)
 {
     void (*f)(struct ContactImpactEffect *);
     p->sprite.flags &= ~1;
@@ -326,7 +326,7 @@ void RegistryF3E4_StartAppearing(struct ContactImpactEffect *p)
     p->stateResult = 0;
 }
 
-void RegistryF3E4_StartDisappearing(struct ContactImpactEffect *p)
+void PopInSprite_StartDisappearing(struct ContactImpactEffect *p)
 {
     void (*f)(struct ContactImpactEffect *) = SpriteController_AnimateShrinking;
     p->update = f;
@@ -334,7 +334,7 @@ void RegistryF3E4_StartDisappearing(struct ContactImpactEffect *p)
     p->stateResult = 0;
 }
 
-void RegistryF3E4_SetHidden(struct ContactImpactEffect *p)
+void PopInSprite_SetHidden(struct ContactImpactEffect *p)
 {
     void (*f)(struct ContactImpactEffect *);
     p->sprite.flags |= 1;
@@ -361,7 +361,7 @@ void SpriteController_AnimateGrowing(struct ContactImpactEffect *p)
     duration = 8;
     if ((s32)p->timer >= duration) {
         p->sprite.flags &= -2;
-        ContactImpactEffect_EnterUpdate(p, RegistryF3E4_UpdateVisibleIdle);
+        ContactImpactEffect_EnterUpdate(p, PopInSprite_UpdateVisibleIdle);
     } else {
         p->timer++;
     }
@@ -375,12 +375,12 @@ void SpriteController_AnimateShrinking(struct ContactImpactEffect *p)
     p->sprite.scaleX = value;
     p->sprite.scaleY = value;
     if (p->timer >= duration)
-        RegistryF3E4_SetHidden(p);
+        PopInSprite_SetHidden(p);
     else
         p->timer++;
 }
 
-void RegistryF3E4_UpdateVisibleIdle(struct ContactImpactEffect *p)
+void PopInSprite_UpdateVisibleIdle(struct ContactImpactEffect *p)
 {
     p->timer++;
 }
@@ -558,11 +558,11 @@ void ContactImpactEffect_ProcessMessages(struct ContactImpactEffect *obj)
             SceneMessages_SetPendingTrigger(receiver, command);
             switch (command->kind) {
                 case 9:
-                    RegistryF3E4_StartAppearing(obj);
+                    PopInSprite_StartAppearing(obj);
                     Trigger_ConsumePending(receiver, 1);
                     break;
                 case 10:
-                    RegistryF3E4_StartDisappearing(obj);
+                    PopInSprite_StartDisappearing(obj);
                     Trigger_ConsumePending(receiver, 1);
                     break;
             }
@@ -571,7 +571,7 @@ void ContactImpactEffect_ProcessMessages(struct ContactImpactEffect *obj)
     }
 }
 
-void RegistryF3E4_OnTaskUpdate(void *arg)
+void PopInSprite_OnTaskUpdate(void *arg)
 {
     struct ContactImpactEffect *p = arg;
     ContactImpactEffect_ProcessMessages(p);
@@ -581,18 +581,18 @@ void RegistryF3E4_OnTaskUpdate(void *arg)
     }
 }
 
-void RegistryF3E4_OnTaskDestroy(void *arg)
+void PopInSprite_OnTaskDestroy(void *arg)
 {
     struct ContactImpactEffect *p = arg;
     Sprite_Remove(&p->sprite);
     gRegistryF3E4Actor = 0;
 }
 
-struct ContactImpactEffect *RegistryF3E4_CreateHidden(s32 field3B, s32 mode)
+struct ContactImpactEffect *PopInSprite_CreateHidden(s32 field3B, s32 mode)
 {
     struct ContactImpactEffect *p = Task_Create(0xA, 0xFC);
     if (p)
-        Task_SetCallbacks(p, RegistryF3E4_OnTaskUpdate, RegistryF3E4_OnTaskDestroy);
+        Task_SetCallbacks(p, PopInSprite_OnTaskUpdate, PopInSprite_OnTaskDestroy);
     p->coordinateMode = mode;
     AnimData_Load(p->animation, 0x3641);
     Sprite_Init(&p->sprite, p->animation, 0x12);
@@ -607,33 +607,33 @@ struct ContactImpactEffect *RegistryF3E4_CreateHidden(s32 field3B, s32 mode)
         in->mode = 0;
         in->timer = 0;
     }
-    RegistryF3E4_SetHidden(p);
+    PopInSprite_SetHidden(p);
     return p;
 }
 
-void RegistryF3E4_Show(void)
+void PopInSprite_Show(void)
 {
-    RegistryF3E4_StartAppearing(gRegistryF3E4Actor);
+    PopInSprite_StartAppearing(gRegistryF3E4Actor);
 }
 
-void RegistryF3E4_Hide(void)
+void PopInSprite_Hide(void)
 {
-    RegistryF3E4_StartDisappearing(gRegistryF3E4Actor);
+    PopInSprite_StartDisappearing(gRegistryF3E4Actor);
 }
 
 void SceneMessages_RegisterReceiver(void *, s32, s32);
 
 /* Registry routine F3E4: creates its task (gRegistryF3E4Actor, sprite 0x3641) for
    the given name: -p x y z (default 0), -c palette bank (+0x4B), registers it
-   for scene messages, and -i nonzero starts it via RegistryF3E4_SetHidden, else idles
-   with update RegistryF3E4_UpdateVisibleIdle (tentative). */
+   for scene messages, and -i nonzero starts it via PopInSprite_SetHidden, else idles
+   with update PopInSprite_UpdateVisibleIdle (tentative). */
 
-struct ContactImpactEffect *RegistryF3E4_Create(u32 name)
+struct ContactImpactEffect *PopInSprite_Create(u32 name)
 {
     struct ContactImpactEffect **current = &gRegistryF3E4Actor;
     struct ContactImpactEffect *p = Task_Create(8, 0xFC);
     if (p)
-        Task_SetCallbacks(p, RegistryF3E4_OnTaskUpdate, RegistryF3E4_OnTaskDestroy);
+        Task_SetCallbacks(p, PopInSprite_OnTaskUpdate, PopInSprite_OnTaskDestroy);
     *current = p;
     p->name = name;
     AnimData_Load(p->animation, 0x3641);
@@ -659,9 +659,9 @@ struct ContactImpactEffect *RegistryF3E4_Create(u32 name)
     }
     SceneMessages_RegisterReceiver(&p->receiver, p->name, 10);
     if (Script_SeekToKeyword('i') && Script_GetValue())
-        RegistryF3E4_SetHidden(p);
+        PopInSprite_SetHidden(p);
     else {
-        ContactImpactEffect_EnterUpdate(p, RegistryF3E4_UpdateVisibleIdle);
+        ContactImpactEffect_EnterUpdate(p, PopInSprite_UpdateVisibleIdle);
     }
     return p;
 }

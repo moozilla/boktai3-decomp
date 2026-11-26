@@ -17,12 +17,12 @@ struct SceneMenuPeer {
     u8 pad0[0x18];
     s16 state;
 };
-u8 Registry1745_ConsumeStateEntry(struct SceneMenu *);
-void Registry1745_ClearParticipantCounters(struct SceneMenu *);
+u8 LinkSession_ConsumeStateEntry(struct SceneMenu *);
+void LinkSession_ClearParticipantCounters(struct SceneMenu *);
 void ClockPanel_CaptureTime(struct SceneMenu *);
-s32 Registry1745_CheckSessionReady(struct SceneMenu *);
-void Registry1745_BeginShutdown(struct SceneMenu *, void (*)(void));
-void Registry1745_SetState(struct SceneMenu *, u32, void (*)(void));
+s32 LinkSession_CheckSessionReady(struct SceneMenu *);
+void LinkSession_BeginShutdown(struct SceneMenu *, void (*)(void));
+void LinkSession_SetState(struct SceneMenu *, u32, void (*)(void));
 void ScriptPanel_OpenTextWindow(void);
 void LinkMenu_UpdateSelection(void);
 void LinkMenu_WaitSelectionMode(void);
@@ -44,22 +44,22 @@ s32 SceneMenu_UpdateRecords(struct SceneMenu *object)
     s32 i;
     do {
         record = (u8 *)p->records;
-        if (Registry1745_ConsumeStateEntry(p)) {
-            Registry1745_ClearParticipantCounters(p);
+        if (LinkSession_ConsumeStateEntry(p)) {
+            LinkSession_ClearParticipantCounters(p);
             ClockPanel_CaptureTime(p);
             *(u16 *)(record + 0x3E) = Crc_ComputeCcitt16(record, 0, 0x3E);
         }
     } while (0);
-    if (Registry1745_CheckSessionReady(p) < 0) {
-        Registry1745_BeginShutdown(p, ScriptPanel_OpenTextWindow);
+    if (LinkSession_CheckSessionReady(p) < 0) {
+        LinkSession_BeginShutdown(p, ScriptPanel_OpenTextWindow);
         return -1;
     }
     if (HasRecordInput(p)) {
         if ((*(struct SceneMenuPeer **)&gLinkSession) &&
             ((*(struct SceneMenuPeer **)&gLinkSession)->state == 0)) {
-            Registry1745_SetState(p, 7, LinkMenu_UpdateSelection);
+            LinkSession_SetState(p, 7, LinkMenu_UpdateSelection);
         } else {
-            Registry1745_SetState(p, 8, LinkMenu_WaitSelectionMode);
+            LinkSession_SetState(p, 8, LinkMenu_WaitSelectionMode);
         }
         return 0;
     }

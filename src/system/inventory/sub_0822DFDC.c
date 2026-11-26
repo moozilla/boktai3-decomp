@@ -1,4 +1,4 @@
-#include "ui/town/scene_item_values.h"
+#include "ui/town/shop_item_values.h"
 struct E {
     u8 p[6];
     u16 h;

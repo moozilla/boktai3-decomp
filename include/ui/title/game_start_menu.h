@@ -56,7 +56,7 @@ void Menu_EraseRect(s32, s32, s32, s32);
 void Menu_DrawText(u32, u32, const u8 *);
 void Bg_SetTilemapEntry(s32, s32, s32, s32, s32, s32);
 int Script_ParseStringRef(const void *);
-int SceneSequence_GetSelectedMessage(void);
+int MenuSequence_GetSelectedMessage(void);
 s32 Div(s32, s32);
 s32 Mod(s32, s32);
 s32 Anim_LoadKeyframe(void *, void *, u32, u32);

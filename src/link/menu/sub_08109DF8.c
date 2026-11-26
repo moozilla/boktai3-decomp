@@ -14,8 +14,8 @@ struct PollPanel {
     u16 masks[2];
 };
 
-u8 Registry1745_ConsumeStateEntry(struct PollPanel *);
-void Registry1745_SetState(struct PollPanel *, u32, void *);
+u8 LinkSession_ConsumeStateEntry(struct PollPanel *);
+void LinkSession_SetState(struct PollPanel *, u32, void *);
 void SerialLink_InitMultiplayer(void);
 s32 Serial_DetectRoleAndEnableInterrupt(void);
 void Serial_StopCommunication(void);
@@ -28,7 +28,7 @@ static inline void ScriptPanel_Retry(struct PollPanel *q)
     if (q->retryTimer > 29) {
         u8 *base, *button;
         u32 zero;
-        Registry1745_SetState(q, 2, ScriptPanel_PollSelection);
+        LinkSession_SetState(q, 2, ScriptPanel_PollSelection);
         Serial_StopCommunication();
         base = q->buttons;
         zero = 0;
@@ -44,7 +44,7 @@ s32 ScriptPanel_PollSelection(struct PollPanel *p)
     struct PollPanel *q = p;
     s32 i;
     s32 role;
-    if (Registry1745_ConsumeStateEntry(p)) {
+    if (LinkSession_ConsumeStateEntry(p)) {
         SerialLink_InitMultiplayer();
         i = 0;
         do {
@@ -59,7 +59,7 @@ s32 ScriptPanel_PollSelection(struct PollPanel *p)
         role = Serial_DetectRoleAndEnableInterrupt();
         if (role >= 0) {
             p->role = role;
-            Registry1745_SetState(p, 3, ScriptPanel_WaitForSelectionData);
+            LinkSession_SetState(p, 3, ScriptPanel_WaitForSelectionData);
         } else {
             ScriptPanel_Retry(q);
         }

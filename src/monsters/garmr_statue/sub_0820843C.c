@@ -14,7 +14,7 @@ struct TurretProximity {
     u16 timer;
 };
 struct SceneVec *Player_GetEffectivePosition(s32);
-s32 CannonTurret_FireAimedVolley(struct TurretProximity *);
+s32 GarmrStatue_FireAimedVolley(struct TurretProximity *);
 
 s32 sub_0820843C(struct TurretProximity *s)
 {
@@ -23,7 +23,7 @@ s32 sub_0820843C(struct TurretProximity *s)
     s32 dx = player->x - s->position.x;
     s32 dz = player->z - position->z;
     if (dx * dx + dz * dz < s->triggerDistanceSquared) {
-        s->update = CannonTurret_FireAimedVolley;
+        s->update = GarmrStatue_FireAimedVolley;
         s->timer = 180;
     }
     return 0;

@@ -2,7 +2,7 @@
 #define SceneHud_ClearWidgetFlags           PauseMenu_ClearSpriteFlags
 #include "global.h"
 #include "ui/pause/scene_hud_display.h"
-#include "ui/town/scene_inventory_panel.h"
+#include "ui/town/shop_panel.h"
 s32 GameState_GetUnlockEntry(s32);
 s32 SolarFruit_GetInventorySlot(s32);
 void ScrollingDialogue_RequestShow(void);

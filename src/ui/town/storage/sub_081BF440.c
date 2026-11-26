@@ -25,13 +25,13 @@ void Storage_RefreshCategoryWidgets(struct SceneInventoryCategoryMenu *);
 void Storage_RefreshSelectedItemDetails(struct SceneInventoryCategoryMenu *);
 void Storage_InitSelectionGrid(struct SceneInputGridView *, u32, u32, u32, u32);
 void Storage_UpdateCursorPosition(struct SceneInputGridView *, void *);
-void SceneInventory_BeginCategoryBrowse(struct SceneInventoryCategoryMenu *);
+void Storage_BeginCategoryBrowse(struct SceneInventoryCategoryMenu *);
 void Sound_PlaySong(u32);
 void MenuPanel_ShowDescription(struct SceneInventoryCategoryMenu *, s32, const void *, void *);
-void SceneInventory_ResetCategoryPalette(struct SceneInventoryCategoryMenu *, u16 *);
-void SceneInventory_SetState(struct SceneInventoryCategoryMenu *,
+void Storage_ResetCategoryPalette(struct SceneInventoryCategoryMenu *, u16 *);
+void Storage_SetState(struct SceneInventoryCategoryMenu *,
                              void (*)(struct SceneInventoryCategoryMenu *), u32);
-void SceneInventory_UpdateSortConfirmation(struct SceneInventoryCategoryMenu *);
+void Storage_UpdateSortConfirmation(struct SceneInventoryCategoryMenu *);
 void Storage_BeginCategoryMode(struct SceneInventoryCategoryMenu *p, u32 mode)
 {
     int new_var;
@@ -45,7 +45,7 @@ void Storage_BeginCategoryMode(struct SceneInventoryCategoryMenu *p, u32 mode)
         if (modeIndex <= 1) {
             Storage_InitSelectionGrid(&p->grid, 0, 4, 0, 16);
             Storage_UpdateCursorPosition(&p->grid, p->cursor);
-            SceneInventory_BeginCategoryBrowse(p);
+            Storage_BeginCategoryBrowse(p);
         } else {
             Sound_PlaySong(0xDD);
             {
@@ -57,8 +57,8 @@ void Storage_BeginCategoryMode(struct SceneInventoryCategoryMenu *p, u32 mode)
                 MenuPanel_ShowDescription(panel, 4, description, (void *)none);
             }
             SceneInput_BeginChoice(&p->prompt, p->choiceResource, &p->choiceState, 1, 0);
-            SceneInventory_ResetCategoryPalette(p, p->colors);
-            SceneInventory_SetState(p, SceneInventory_UpdateSortConfirmation, 0);
+            Storage_ResetCategoryPalette(p, p->colors);
+            Storage_SetState(p, Storage_UpdateSortConfirmation, 0);
             Storage_RefreshCategoryWidgets(p);
         }
     }

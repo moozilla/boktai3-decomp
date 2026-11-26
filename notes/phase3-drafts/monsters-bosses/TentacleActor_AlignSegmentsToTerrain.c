@@ -70,7 +70,7 @@ static inline s32 NearHeight(s32 x, s32 z, s32 limit)
         return 0;
     return 1;
 }
-void TentacleActor_AlignSegmentsToTerrain(struct SceneActorRegistryResetView *actor)
+void Centipede_AlignSegmentsToTerrain(struct SceneActorRegistryResetView *actor)
 {
     struct TentacleTrail *trail;
     s32 i;

@@ -6,11 +6,11 @@
 
 void LinkPanel_SelectActiveAnimation(struct LinkPanel *, s32);
 
-void RegistryF246_ShowSlotReadyFrame(struct LinkPanel *, s32);
+void LinkPanelSlots_ShowSlotReadyFrame(struct LinkPanel *, s32);
 
-void RegistryF246_ShowSlotDefaultFrame(struct LinkPanel *, s32);
+void LinkPanelSlots_ShowSlotDefaultFrame(struct LinkPanel *, s32);
 
-s32 Registry1745_GetSessionState(void);
+s32 LinkSession_GetSessionState(void);
 
 static inline u8 valid(s32 index)
 {
@@ -56,14 +56,14 @@ void LinkPanel_UpdateAnimations(struct LinkPanel *panel)
                 if (panel->entries[i].status.currentStatus > 1)
                     LinkPanel_SelectActiveAnimation(panel, i);
                 else if (panel->entries[i].status.currentStatus == 1)
-                    RegistryF246_ShowSlotReadyFrame(panel, i);
+                    LinkPanelSlots_ShowSlotReadyFrame(panel, i);
                 else
                     goto inactive;
             } else
                 goto increment;
         } else {
         inactive:
-            RegistryF246_ShowSlotDefaultFrame(panel, i);
+            LinkPanelSlots_ShowSlotDefaultFrame(panel, i);
         }
         goto step;
     increment:
@@ -104,7 +104,7 @@ s32 LinkPanel_GetConnectionStatus(struct LinkPanel *panel)
     two:
         return 2;
     }
-    state = Registry1745_GetSessionState();
+    state = LinkSession_GetSessionState();
     if ((u32)(state - 5) <= 1)
         return 4;
     if (connected() && state == 8)
@@ -150,7 +150,7 @@ void LinkPanel_UpdateStatusMessage(struct LinkPanel *panel)
         panel->message = 2;
         return;
     }
-    state = Registry1745_GetSessionState();
+    state = LinkSession_GetSessionState();
     if ((u32)(state - 5) <= 1) {
         if ((s8)panel->message == 4)
             return;
@@ -218,17 +218,17 @@ void LinkPanel_UpdateStatusMessage(struct LinkPanel *panel)
     }
 }
 
-void RegistryF246_HideAnimations(struct LinkPanel *);
+void LinkPanelSlots_HideAnimations(struct LinkPanel *);
 
-void RegistryF246_RemoveAnimations(void *);
+void LinkPanelSlots_RemoveAnimations(void *);
 
-void Registry1745_NotifyMenuClosed(void);
+void LinkSession_NotifyMenuClosed(void);
 
 void PaletteFade_CycleMenuColors(void *);
 
 s32 Serial_GetRole(void);
 
-void RegistryF246_InitBackgroundResources(struct LinkPanel *);
+void LinkPanelSlots_InitBackgroundResources(struct LinkPanel *);
 
 void SlotMenu_InitializeEntryValues(struct LinkPanel *);
 
@@ -273,8 +273,8 @@ void LinkPanel_Close(struct LinkPanel *panel)
     Bg_ClearTilemap(1);
     Bg_ClearTilemap(2);
     Bg_ClearTilemap(3);
-    RegistryF246_HideAnimations(panel);
-    Registry1745_NotifyMenuClosed();
+    LinkPanelSlots_HideAnimations(panel);
+    LinkSession_NotifyMenuClosed();
     if (panel->exitScript)
         Script_Call(panel->exitScript, 0);
     Task_Kill(panel);
@@ -314,7 +314,7 @@ void LinkPanel_UpdateConnection(struct LinkPanel *panel)
             panel->entries[i].status.previousStatus = panel->entries[i].status.currentStatus;
             panel->entries[i].status.currentStatus = 0;
             panel->entries[i].status.animationTimer = 0;
-            RegistryF246_ShowSlotDefaultFrame(panel, i);
+            LinkPanelSlots_ShowSlotDefaultFrame(panel, i);
         }
 
         panel->messageDelay = 0;
@@ -356,7 +356,7 @@ void LinkPanel_UpdateConnection(struct LinkPanel *panel)
 
 s32 LinkPanel_Update(struct LinkPanel *panel)
 {
-    if (Registry1745_GetSessionState() == 0) {
+    if (LinkSession_GetSessionState() == 0) {
         ScrollingDialogue_HideImmediately();
         Task_Kill(panel);
         return -1;
@@ -368,7 +368,7 @@ s32 LinkPanel_Update(struct LinkPanel *panel)
 
 s32 LinkPanel_Destroy(void *panel)
 {
-    RegistryF246_RemoveAnimations(panel);
+    LinkPanelSlots_RemoveAnimations(panel);
     gLinkPanel = 0;
     return 1;
 }
@@ -390,7 +390,7 @@ s32 LinkPanel_InitFromScript(struct LinkPanel *panel)
     Bg_ClearTilemap(2);
     Bg_ClearTilemap(1);
     Bg_ClearTilemap(0);
-    RegistryF246_InitBackgroundResources(panel);
+    LinkPanelSlots_InitBackgroundResources(panel);
     SlotMenu_InitializeEntryValues(panel);
     SceneMenu_InitializeDisplay(panel);
     sub_0810C0BC(panel);

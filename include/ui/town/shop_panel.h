@@ -1,7 +1,7 @@
 #ifndef GUARD_SCENE_INVENTORY_PANEL_H
 #define GUARD_SCENE_INVENTORY_PANEL_H
 #include "ui/widgets/scene_input_panel.h"
-#include "ui/town/scene_item_values.h"
+#include "ui/town/shop_item_values.h"
 struct SceneInventoryPanel {
     struct SceneInputPanel display;
     struct SceneInputWidget comparison[5][3];

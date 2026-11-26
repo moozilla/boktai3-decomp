@@ -1,28 +1,28 @@
-#include "ui/town/scene_inventory_tail.h"
-#include "ui/town/scene_inventory_panel.h"
+#include "ui/town/shop_tail.h"
+#include "ui/town/shop_panel.h"
 struct SceneInventoryPageView {
     u8 unknown0[0x1AB0];
     u8 page, pageCount;
 };
 void SceneInputPanel_SetMeterGlyph(struct SceneInputPanel *, u32, u32);
-void SceneInventory_PopulateEquipmentGrid(struct SceneInventoryPanel *);
-void SceneInventory_PopulateItemGrid(struct SceneInventoryPanel *);
-void SceneInventory_PopulateConsumableGrid(struct SceneInventoryPanel *);
-void SceneInventory_RefreshCatalogDisplay(struct SceneInventoryTail *p)
+void Shop_PopulateEquipmentGrid(struct SceneInventoryPanel *);
+void Shop_PopulateItemGrid(struct SceneInventoryPanel *);
+void Shop_PopulateConsumableGrid(struct SceneInventoryPanel *);
+void Shop_RefreshCatalogDisplay(struct SceneInventoryTail *p)
 {
     struct SceneInventoryPanel *display = (struct SceneInventoryPanel *)p;
     struct SceneInventoryPageView *pages = (struct SceneInventoryPageView *)p;
-    SceneInventory_BeginBrowse(p);
+    Shop_BeginBrowse(p);
     SceneInputPanel_SetMeterGlyph(&p->display, pages->page, pages->pageCount);
     switch (p->category) {
         case 0:
-            SceneInventory_PopulateEquipmentGrid(display);
+            Shop_PopulateEquipmentGrid(display);
             break;
         case 1:
-            SceneInventory_PopulateItemGrid(display);
+            Shop_PopulateItemGrid(display);
             break;
         case 2:
-            SceneInventory_PopulateConsumableGrid(display);
+            Shop_PopulateConsumableGrid(display);
             break;
     }
     SceneInputPanel_ShowItemComparison(display->comparison[0], display->comparison[1],

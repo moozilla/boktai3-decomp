@@ -1,12 +1,12 @@
 #include "scene/collision/contact_swarm.h"
-void ContactSwarm_SetDirectionalSequence(struct ContactSwarm *, struct ContactSwarmSlot *, u32);
+void CountBats_SetDirectionalSequence(struct ContactSwarm *, struct ContactSwarmSlot *, u32);
 static inline s32 truncateShift12(s32 value)
 {
     if (value >= 0)
         return value >> 12;
     return -((-value) >> 12);
 }
-void ContactSwarm_UpdateAdvance(struct ContactSwarm *pool, struct ContactSwarmSlot *slot, s32 index)
+void CountBats_UpdateAdvance(struct ContactSwarm *pool, struct ContactSwarmSlot *slot, s32 index)
 {
     struct ContactSwarmSprite *sprite = &slot->display.animation.draw.sprite;
     if (slot->enter) {
@@ -17,7 +17,7 @@ void ContactSwarm_UpdateAdvance(struct ContactSwarm *pool, struct ContactSwarmSl
         slot->enter = 0;
         collider = &slot->display.healthCollider;
         collider->flags |= 4;
-        ContactSwarm_SetDirectionalSequence(pool, slot, 0);
+        CountBats_SetDirectionalSequence(pool, slot, 0);
         velocity = &slot->velocity;
         direction = slot->direction;
         speed = slot->advanceSpeed;

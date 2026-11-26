@@ -4,6 +4,6 @@
 #define ScenePanel_BeginReverseSequence sub_0805822C
 void ScenePanel_BeginReverseSequence(struct ScenePanel *panel)
 {
-    ScenePanel_SetChannelValue(panel, 2, 4);
-    ScenePanel_SetState(panel, ScenePanel_TickReverseFour);
+    PileDriver_SetChannelValue(panel, 2, 4);
+    PileDriver_SetState(panel, PileDriver_TickReverseFour);
 }

@@ -15,8 +15,8 @@ struct TentacleWanderState {
     struct TentacleWanderTarget target;
 };
 s32 SceneActorTerrain_GetNeighborCell(void *, s32);
-u8 TentacleActor_HasVisitedRoute(void *, s32);
-void TentacleActor_RecordVisitedRoute(void *, s32);
+u8 Centipede_HasVisitedRoute(void *, s32);
+void Centipede_RecordVisitedRoute(void *, s32);
 static inline s32 Tentacle_Abs(s32 x)
 {
     return x < 0 ? -x : x;
@@ -47,7 +47,7 @@ static inline void Tentacle_CellCenter(struct ContactPosition *position, s32 cel
     position->z = ((u32)z << 8) + 128;
 }
 
-void TentacleActor_SelectWanderRoute(struct ChaseActor *actor)
+void Centipede_SelectWanderRoute(struct ChaseActor *actor)
 {
     struct TentacleWanderState *state = actor->base.context;
     struct TentacleWanderTarget *route = &state->target;
@@ -100,9 +100,9 @@ void TentacleActor_SelectWanderRoute(struct ChaseActor *actor)
 
     if (count) {
         for (i = 0; i < count; i++) {
-            if (!TentacleActor_HasVisitedRoute(actor, cells[i])) {
+            if (!Centipede_HasVisitedRoute(actor, cells[i])) {
                 Tentacle_CellCenter(&route->position, cells[i]);
-                TentacleActor_RecordVisitedRoute(actor, cells[i]);
+                Centipede_RecordVisitedRoute(actor, cells[i]);
                 state->attempts++;
                 state->time = 40;
                 return;
@@ -111,19 +111,19 @@ void TentacleActor_SelectWanderRoute(struct ChaseActor *actor)
 
         i = Mod(Tentacle_Random(), count);
         Tentacle_CellCenter(&route->position, cells[i]);
-        TentacleActor_RecordVisitedRoute(actor, cells[i]);
+        Centipede_RecordVisitedRoute(actor, cells[i]);
         state->attempts++;
         state->time = 40;
-    } else if ((forward != (-1)) && (!TentacleActor_HasVisitedRoute(actor, forward))) {
+    } else if ((forward != (-1)) && (!Centipede_HasVisitedRoute(actor, forward))) {
         Tentacle_CellCenter(&route->position, forward);
-        TentacleActor_RecordVisitedRoute(actor, forward);
+        Centipede_RecordVisitedRoute(actor, forward);
         state->attempts += 8;
         state->time = 40;
     } else {
         cell = SceneActorTerrain_GetNeighborCell(actor, (state->preferred + 2) & 3);
         if (cell >= 0) {
             Tentacle_CellCenter(&route->position, cell);
-            TentacleActor_RecordVisitedRoute(actor, cell);
+            Centipede_RecordVisitedRoute(actor, cell);
             state->attempts += 2;
             state->time = 40;
         } else

@@ -1,4 +1,4 @@
-#include "npc/sabata_rider/script_puppet.h"
+#include "npc/sabata_rider/sabata_rider.h"
 #include "scene/actor/scene_event_dispatch.h"
 #include "effects/particles/scene_debris_types.h"
 #include "effects/screen/background_controller.h"

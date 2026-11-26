@@ -17,18 +17,18 @@ struct SceneRigParentView {
     u16 warningSounds[4];
 };
 
-u32 ScenePanelRig_IsSubjectState(struct ScenePanelRig *, u32, u32);
-void ScenePanelRig_SetSubjectState(struct ScenePanelRig *, u32, u32);
-void ScenePanelRig_RequestSubject(struct ScenePanelRig *, u32, u32);
-void ScenePanelRig_SetState(struct ScenePanelRig *, u32);
-void ScenePanelRig_RandomizeMovement(struct ScenePanelRig *);
-s32 ScenePanelRig_SelectActiveSubject(struct ScenePanelRig *);
-u32 ScenePanelRig_GetParentMode(struct ScenePanelRig *);
-void ScenePanelRig_HideSprites(struct ScenePanelRig *);
-void ScenePanelRig_ShowSprites(struct ScenePanelRig *);
-void ScenePanelRig_InitMovement(struct ScenePanelRig *);
-u32 ScenePanelRig_GetActiveCount(struct ScenePanelRig *);
-void ScenePanelSubject_SetState(struct ScenePanelSubject *, u32);
+u32 PileDriverRig_IsSubjectState(struct ScenePanelRig *, u32, u32);
+void PileDriverRig_SetSubjectState(struct ScenePanelRig *, u32, u32);
+void PileDriverRig_RequestSubject(struct ScenePanelRig *, u32, u32);
+void PileDriverRig_SetState(struct ScenePanelRig *, u32);
+void PileDriverRig_RandomizeMovement(struct ScenePanelRig *);
+s32 PileDriverRig_SelectActiveSubject(struct ScenePanelRig *);
+u32 PileDriverRig_GetParentMode(struct ScenePanelRig *);
+void PileDriverRig_HideSprites(struct ScenePanelRig *);
+void PileDriverRig_ShowSprites(struct ScenePanelRig *);
+void PileDriverRig_InitMovement(struct ScenePanelRig *);
+u32 PileDriverRig_GetActiveCount(struct ScenePanelRig *);
+void PileDriverSubject_SetState(struct ScenePanelSubject *, u32);
 extern const s16 gUnk_086149C4[];
 void ScreenTransition_SendCommand(s32, s32, s32, s32, s32, s32, s32);
 

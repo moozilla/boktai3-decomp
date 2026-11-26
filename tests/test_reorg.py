@@ -89,6 +89,9 @@ class ReorgTests(unittest.TestCase):
             "include/engine/example.h": "void Old_Thing(void);\n",
             "port/example.c": "void *const target = Old_Thing__addr;\n",
             "docs/example.md": "`Old_Thing` in `src/engine/Old_Thing.c`.\n",
+            "docs/history/example.md": "The unit called `Old_Thing`.\n",
+            "gcl/names/example.csv": "name\nOld_Thing\n",
+            "docs/attempts.tsv": "address\tnote\n08001000\tOld_Thing\n",
             "build/renames.csv": "addr,old_name,new_name\n08001000,Old_Thing,New_Thing\n08001020,New_Thing,Final_Thing\n",
         }
         with fixture(files) as root:
@@ -101,6 +104,9 @@ class ReorgTests(unittest.TestCase):
             self.assertIn("void New_Thing(void);", (root / "include/engine/example.h").read_text())
             self.assertIn("New_Thing__addr", (root / "port/example.c").read_text())
             self.assertEqual((root / "docs/example.md").read_text(), "`New_Thing` in `src/engine/Old_Thing.c`.\n")
+            self.assertEqual((root / "docs/history/example.md").read_text(), files["docs/history/example.md"])
+            self.assertEqual((root / "gcl/names/example.csv").read_text(), "name\nNew_Thing\n")
+            self.assertEqual((root / "docs/attempts.tsv").read_text(), "address\tnote\n08001000\tNew_Thing\n")
 
     def test_prefixes_use_owner_scope_for_every_reference(self):
         files = {

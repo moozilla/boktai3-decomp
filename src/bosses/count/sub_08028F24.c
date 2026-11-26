@@ -1,15 +1,15 @@
 #include "global.h"
 
-void Vampire_UpdateFrame(void *);
+void Count_UpdateFrame(void *);
 void SceneActorState_UpdateActionController(void *);
 void SceneActors_RunUnpausedState(void *);
-void Vampire_UpdatePresentation(void *);
+void Count_UpdatePresentation(void *);
 
-s32 Vampire_Init(void *p)
+s32 Count_Init(void *p)
 {
-    Vampire_UpdateFrame(p);
+    Count_UpdateFrame(p);
     SceneActorState_UpdateActionController(p);
     SceneActors_RunUnpausedState(p);
-    Vampire_UpdatePresentation(p);
+    Count_UpdatePresentation(p);
     return 0;
 }

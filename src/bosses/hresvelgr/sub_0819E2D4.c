@@ -1,7 +1,7 @@
 #include "global.h"
 #include "bosses/hresvelgr/hresvelgr_travel.h"
 
-void ActorState_Hold35(struct HresvelgrTravelActor *p)
+void HresvelgrState_Hold35(struct HresvelgrTravelActor *p)
 {
     struct HresvelgrTravelActor *base = p;
     if (Hresvelgr_ConsumeActionEntry(p))

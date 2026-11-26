@@ -55,7 +55,7 @@ static inline void Tentacle_PrepareRecoil(struct ChaseActor *actor, u16 bits)
     SceneActorChase_ClearFlagComponent(flags, 1);
 }
 
-void TentacleBody_ConvergeReactionMotion(struct ChaseActor *actor)
+void CentipedeBody_ConvergeReactionMotion(struct ChaseActor *actor)
 {
     struct TentacleTrailState *trail = actor->base.context;
     if (SceneActorControl_TakeFlag(&actor->base.field2B2)) {

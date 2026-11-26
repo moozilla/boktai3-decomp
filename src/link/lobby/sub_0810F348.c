@@ -14,7 +14,7 @@ void TextWindow_SetScript(s32, const u8 *);
 void TextWindow_Refresh(u32, u32);
 void TextWindow_StartPlayback(s32);
 s32 Anim_SelectWidgetGlyph(void *, void *, u32);
-void Registry1745_SetSelectionResponse(s32);
+void LinkSession_SetSelectionResponse(s32);
 void Sound_PlaySong(u32);
 void SceneTask_UpdateTextDelay(struct RecordMenu *);
 
@@ -98,7 +98,7 @@ void RecordMenu_UpdateSelection(struct RecordMenu *menu)
     select:
         if (gPadState[1] & 1) {
             view->cursor.flags |= 1;
-            Registry1745_SetSelectionResponse(view->choice);
+            LinkSession_SetSelectionResponse(view->choice);
             RecordMenu_Begin(menu, SceneTask_UpdateTextDelay, 2);
             if (view->choice != 0)
                 Sound_PlaySong(0xDD);
@@ -108,7 +108,7 @@ void RecordMenu_UpdateSelection(struct RecordMenu *menu)
         }
         if (gPadState[1] & 2) {
             view->cursor.flags |= 1;
-            Registry1745_SetSelectionResponse(0);
+            LinkSession_SetSelectionResponse(0);
             RecordMenu_Begin(menu, SceneTask_UpdateTextDelay, 2);
             Sound_PlaySong(0xDE);
         }

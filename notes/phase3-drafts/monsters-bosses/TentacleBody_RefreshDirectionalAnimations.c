@@ -1,11 +1,11 @@
 #include "global.h"
-#include "monsters/centipede/tentacle_segment_animation.h"
+#include "monsters/centipede/centipede_segment_animation.h"
 #include "engine/video/display_sequence_inline.h"
 
 // confidence=low: refreshes segment animations from their direction, keeping frame and timer.
 
 void *SceneActorProfiles_GetEntryAddress(u32, u32, s32);
-void TentacleBody_GetDirectionFrame(u16, s32 *, s32 *);
+void CentipedeBody_GetDirectionFrame(u16, s32 *, s32 *);
 void Anim_SetSequence(void *, void *, u32, u8, u8);
 void Anim_RestartSequence(void *, void *, u32, u8, u8);
 void Anim_SetDurationScale(void *, u32);
@@ -73,7 +73,7 @@ static inline void Step(struct TentacleSegmentAnimation *animation,
             state->duration = 1;
     }
 }
-void TentacleBody_RefreshDirectionalAnimations(struct TentacleBodyAnimationView *input,
+void CentipedeBody_RefreshDirectionalAnimations(struct TentacleBodyAnimationView *input,
                                                s32 inputKind)
 {
     struct TentacleBodyAnimationView *body = input;
@@ -99,12 +99,12 @@ void TentacleBody_RefreshDirectionalAnimations(struct TentacleBodyAnimationView 
     do {
         if (!TestMask(a)) {
             if (TentacleSegment_HasStatus(a, 4)) {
-                TentacleBody_GetDirectionFrame((a->direction + 128) & 255, &frame.row,
+                CentipedeBody_GetDirectionFrame((a->direction + 128) & 255, &frame.row,
                                                &frame.flags);
                 Anim_SetSequence(a, TentacleSegment_ScriptAt(body, offset), 1, frame.row,
                                  frame.flags);
             } else {
-                TentacleBody_GetDirectionFrame(a->direction, &frame.row, &frame.flags);
+                CentipedeBody_GetDirectionFrame(a->direction, &frame.row, &frame.flags);
                 four = 4;
                 frameSave = a->sequence.index;
                 timerSave = a->sequence.elapsed;

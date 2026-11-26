@@ -1,5 +1,5 @@
-#include "ui/town/scene_inventory_control.h"
-u32 SceneInventory_UpdateMixedCatalogCategory(struct SceneInventoryControlView *panel)
+#include "ui/town/shop_control.h"
+u32 Shop_UpdateMixedCatalogCategory(struct SceneInventoryControlView *panel)
 {
     u32 destination = 0;
     if (panel->catalogMode == 3) {
@@ -7,7 +7,7 @@ u32 SceneInventory_UpdateMixedCatalogCategory(struct SceneInventoryControlView *
             panel->category = 1;
         else
             panel->category = 2;
-        destination = SceneInventory_FindActionDestination(panel);
+        destination = Shop_FindActionDestination(panel);
         panel->destination = destination;
     }
 }

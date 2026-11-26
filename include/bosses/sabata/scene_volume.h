@@ -94,8 +94,8 @@ static inline u8 SceneVolume_TakeQueued(struct SceneVolumeActor *actor)
 
 void ActorEffect_InitializeOffset(struct SceneVolumeActor *);
 void ActorEffect_UpdateTimedSequence(struct SceneVolumeActor *);
-void SceneVolume_UpdateRepeatedShot(struct SceneVolumeActor *);
-void SceneVolume_UpdatePursuitSpin(struct SceneVolumeActor *, s32);
-void SceneVolume_UpdateImpactSlide(struct SceneVolumeActor *);
-void SceneVolume_UpdateKnockbackLanding(struct SceneVolumeActor *, s32);
+void SabataVolume_UpdateRepeatedShot(struct SceneVolumeActor *);
+void SabataVolume_UpdatePursuitSpin(struct SceneVolumeActor *, s32);
+void SabataVolume_UpdateImpactSlide(struct SceneVolumeActor *);
+void SabataVolume_UpdateKnockbackLanding(struct SceneVolumeActor *, s32);
 #endif

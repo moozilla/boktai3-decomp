@@ -19,7 +19,7 @@ struct ScriptPanel {
     u8 unkBC[0x1C];
     const u8 *script;
 };
-u8 Registry1745_ConsumeStateEntry(struct ScriptPanel *);
+u8 LinkSession_ConsumeStateEntry(struct ScriptPanel *);
 u8 MessageWindow_IsCreated(void);
 void Sound_FadeOutChannel10(u32);
 void ScrollingDialogue_HideImmediately(void);
@@ -37,7 +37,7 @@ void TextWindow_StartPlayback(s32);
 void SpriteOam_ResetQueue(s32);
 s32 ScriptPanel_OpenTextWindow(struct ScriptPanel *p)
 {
-    if (Registry1745_ConsumeStateEntry(p)) {
+    if (LinkSession_ConsumeStateEntry(p)) {
         gLinkMenuActive = 0;
         Engine_SetPauseFlags(4);
         p->windowReady = 0;

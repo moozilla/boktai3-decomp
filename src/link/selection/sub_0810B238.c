@@ -3,11 +3,11 @@
 #include "scene/areas/area_effect_link.h"
 
 // foundry draft (worker best 96.4%); what differs is mostly register allocation and instruction order
-u8 Registry1745_ConsumeStateEntry(struct AreaEffectLinkState *);
-s32 Registry1745_CheckSessionReady(struct AreaEffectLinkState *);
-void Registry1745_BeginShutdown(struct AreaEffectLinkState *, void (*)(void));
+u8 LinkSession_ConsumeStateEntry(struct AreaEffectLinkState *);
+s32 LinkSession_CheckSessionReady(struct AreaEffectLinkState *);
+void LinkSession_BeginShutdown(struct AreaEffectLinkState *, void (*)(void));
 void ScriptPanel_OpenTextWindow(void);
-void Registry1745_SetState(struct AreaEffectLinkState *, u32, void (*)(void));
+void LinkSession_SetState(struct AreaEffectLinkState *, u32, void (*)(void));
 void SceneMenu_BeginTimedMessage(void);
 void SessionMenu_ShowTimedMessage(void);
 void Sound_StopAllTrackedSongs(void);
@@ -22,14 +22,14 @@ static inline u16 GetSlot(struct AreaEffectLinkState *p, s32 i)
 s32 LinkSelection_WaitForParticipantChoices(struct AreaEffectLinkState *p)
 {
     s32 count, selected, i, length;
-    if (Registry1745_ConsumeStateEntry(p)) {
+    if (LinkSession_ConsumeStateEntry(p)) {
         Sound_StopAllTrackedSongs();
         Hud_SetMode(7);
         Script_Call(p->readyScript, 0);
         p->menuChoice = -1;
     }
-    if (Registry1745_CheckSessionReady(p) < 0) {
-        Registry1745_BeginShutdown(p, ScriptPanel_OpenTextWindow);
+    if (LinkSession_CheckSessionReady(p) < 0) {
+        LinkSession_BeginShutdown(p, ScriptPanel_OpenTextWindow);
         return -1;
     }
     count = 0;
@@ -44,9 +44,9 @@ s32 LinkSelection_WaitForParticipantChoices(struct AreaEffectLinkState *p)
     }
     if (count == length) {
         if (count == selected)
-            Registry1745_SetState(p, 21, SceneMenu_BeginTimedMessage);
+            LinkSession_SetState(p, 21, SceneMenu_BeginTimedMessage);
         else
-            Registry1745_SetState(p, 23, SessionMenu_ShowTimedMessage);
+            LinkSession_SetState(p, 23, SessionMenu_ShowTimedMessage);
     } else if (p->menuChoice >= 0) {
         u32 choice = p->menuChoice;
         u32 shifted = choice << 16;

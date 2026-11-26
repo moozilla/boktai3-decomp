@@ -97,7 +97,7 @@ Encoded records and password payloads,08044C80,080454C0,,,Two six-bit record for
 Parameterized motion pool (tentative),080454C0,08045A20,,,Sixteen configurable moving slots with lifetime tracking contacts and graphics; notes/parameterized-motion-pool_2026-10-14.md
 Five-entry projected display (tentative),08045A20,08045D18,,,Five animations with ground/raised 3D projection resource header and height control; notes/projected-display_2026-10-14.md
 Sequence contact actor pool (tentative),08045D18,08046880,,,Eight-slot state pool; health and resource colliders; terrain-aligned spawning hit jitter palette fade and death script; notes/contact-sequence-actor_2026-10-14.md
-Orbit contact actor (tentative),08046880,08046B28,,,Rotating resource-contact sprite with expanding and contracting states; include/bosses/nidhoggr/orbit_contact_actor.h; notes/orbit-number-display_2026-10-14.md
+Orbit contact actor (tentative),08046880,08046B28,,,Rotating resource-contact sprite with expanding and contracting states; include/bosses/nidhoggr/nidhoggr_duel_orb.h; notes/orbit-number-display_2026-10-14.md
 Floating number display,08046B28,08047338,,,Four-group decimal glyph singleton keyed by collision source; priority reuse world projection bounce and removal; notes/orbit-number-display_2026-10-14.md
 Transient sprite effects,08047338,080476F4,,,Sixteen 0x58 slots; velocity damping animation aging singleton spawning and hidden script wrapper; notes/effects-background-flash_2026-10-14.md
 BG1 flash and scrolling controller (tentative),080476F4,08047BB4,,,Five visibility/page states; camera-relative dual-page scrolling randomized speed and periodic effect forwarding; notes/effects-background-flash_2026-10-14.md

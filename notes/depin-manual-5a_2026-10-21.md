@@ -11,8 +11,8 @@ depin.py --write found nothing on any of the 40 files. Permuter ran (150 s, -j 1
 
 ## Not solved
 * ActorAttachment_TickLandingBounce: unpinned is 2 diffs (`adds r0,r0,r1` vs `adds r1,r1,r0` for height+z); permuter found nothing.
-* ActorDecision_UpdatePulsePhase: unpinned 2 diffs (calls need the `s` copy in r0); permuter found nothing.
-* Permuter best scores: RunAlternateTimedAction/RunTimedAction 70, ConsumeLiftFlag 140, ScriptLower 670, SceneHud_TickWidgetSlides 40, ScenePanel_TickRig 145, RequestScriptState 345, ProximityEmitter_TickActive 470 (not ported/checked).
+* SabataDecision_UpdatePulsePhase: unpinned 2 diffs (calls need the `s` copy in r0); permuter found nothing.
+* Permuter best scores: RunAlternateTimedAction/RunTimedAction 70, ConsumeLiftFlag 140, ScriptLower 670, SceneHud_TickWidgetSlides 40, PileDriver_TickRig 145, RequestScriptState 345, ProximityEmitter_TickActive 470 (not ported/checked).
 * Remaining list entries untouched.
 
 ## New techniques

@@ -6,7 +6,7 @@ struct SceneInventorySlotsView {
 };
 extern struct SceneInventorySlotsView *gGameState;
 
-s32 SceneInventory_FindEmptyConsumableSlot(const void *unusedOwner)
+s32 Shop_FindEmptyConsumableSlot(const void *unusedOwner)
 {
     s32 i = 0;
     s16 *p = gGameState->slots;

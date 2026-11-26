@@ -567,7 +567,7 @@ selected:
     }
 }
 
-/* Message packet, as sent by SceneMessages_Send (see GridAttackActor_NotifyLinkedActorLatePhase). */
+/* Message packet, as sent by SceneMessages_Send (see NidhoggrDuel_NotifyLinkedActorLatePhase). */
 
 /* Two pages of up to eight queued packets; `page` selects the one being filled. */
 

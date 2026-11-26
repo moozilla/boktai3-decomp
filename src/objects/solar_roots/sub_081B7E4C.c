@@ -6,9 +6,9 @@ void SceneBody_Init(void *, u32, void *, u32, u32, void *);
 void TerrainOverlay_QueueAddActor(void *);
 void sub_081B7DC8(void *);
 void AnimatedMarker_RegisterOccupiedCell(void *);
-void GrowthHazard_RegisterCellEffect(void *);
-void GrowthHazard_UpdateCooldown(void *);
-void GrowthHazard_UpdateIdle(void *);
+void SolarRoot_RegisterCellEffect(void *);
+void SolarRoot_UpdateCooldown(void *);
+void SolarRoot_UpdateIdle(void *);
 
 struct Mgr {
     u8 pad[0x18];
@@ -19,7 +19,7 @@ struct Two {
     u32 a, b;
 };
 
-void GrowthHazard_InitEntryFromScript(u8 *input)
+void SolarRoot_InitEntryFromScript(u8 *input)
 {
     struct Mgr *manager = (struct Mgr *)input;
     u8 *entry;
@@ -138,7 +138,7 @@ void GrowthHazard_InitEntryFromScript(u8 *input)
             *(u16 *)(sprite + 0x10) = two;
             sprite[7] = 2;
             {
-                void *fn = GrowthHazard_UpdateCooldown;
+                void *fn = SolarRoot_UpdateCooldown;
                 *(void **)(entry + 0x114) = fn;
             }
             *(u16 *)(entry + 0xF4) = zero;
@@ -148,12 +148,12 @@ void GrowthHazard_InitEntryFromScript(u8 *input)
             }
             value = 0x20;
         } else {
-            GrowthHazard_RegisterCellEffect(entry);
+            SolarRoot_RegisterCellEffect(entry);
             entry[0x103] = flag;
             *(u16 *)(sprite + 0x10) = flag;
             sprite[7] = 3;
             {
-                void *fn = GrowthHazard_UpdateIdle;
+                void *fn = SolarRoot_UpdateIdle;
                 *(void **)(entry + 0x114) = fn;
             }
             *(u16 *)(entry + 0xF4) = flag;

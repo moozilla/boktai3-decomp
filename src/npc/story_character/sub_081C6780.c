@@ -15,7 +15,7 @@ static inline s32 TargetAngle(struct StateActorPos *target, struct StateActorPos
     return Math_Atan2(target->x - position->x, target->z - position->z);
 }
 
-void StateActor_ProcessDirectionMessages(struct StateActor *actor)
+void StoryCharacter_ProcessDirectionMessages(struct StateActor *actor)
 {
     u8 enter = 1;
     struct SceneEventReceiver *receiver = (void *)actor->receiver;

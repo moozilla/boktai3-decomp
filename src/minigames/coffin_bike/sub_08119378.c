@@ -3,7 +3,7 @@
 #include "engine/ram.h"
 #include "engine/engine_globals.h"
 #include "scene/areas/area_effect_link.h"
-#include "minigames/coffin_bike/glove.h"
+#include "minigames/coffin_bike/coffin_bike.h"
 
 // confidence=low: recoil completion returns to the callback at 081198F8.
 
@@ -16,28 +16,28 @@ void ActorParticles_SpawnImpactBurst(struct GloveMotion *);
 void CharacterModel_UpdateAccessoryAnimations(void *);
 void ScenePool_ClampMotionSpeeds(struct GloveMotion *);
 void Actor_ClampMovementSpeed(struct GloveMotion *);
-void Glove_SetAnimationKeyframes(struct Glove *, s32);
-s32 ActorRecoil_UpdateMotion(struct Glove *);
+void CoffinBike_SetAnimationKeyframes(struct Glove *, s32);
+s32 CoffinBike_UpdateMotion(struct Glove *);
 void Actor_UpdateShadowSpriteParts(struct GloveMotion *, void *);
-void Glove_UpdateRestingMotion(void *);
+void CoffinBike_UpdateRestingMotion(void *);
 
 void ActorParticles_UpdateEmitter(void *, void *, u32);
 // Animation zero plays until recoil completes, then returns to its resting callback.
-void Glove_UpdateRecoilReturn(struct Glove *p)
+void CoffinBike_UpdateRecoilReturn(struct Glove *p)
 {
     struct GloveMotion *self = &p->motion;
     u8 complete;
     s32 h, dx, dz;
     u32 a, b;
     if (p->active) {
-        Glove_SetAnimationKeyframes(p, 0);
+        CoffinBike_SetAnimationKeyframes(p, 0);
         p->active = 0;
     }
     {
         u16 bit = 0x10;
         p->flags |= bit;
     }
-    complete = ActorRecoil_UpdateMotion(p) != 0;
+    complete = CoffinBike_UpdateMotion(p) != 0;
     h = self->vy + self->unkC0;
 
     self->y += 0x200;
@@ -102,7 +102,7 @@ void Glove_UpdateRecoilReturn(struct Glove *p)
     if (complete == 1) {
         Trigger_ConsumePending(&p->queue, 1);
         {
-            void (*callback)(void *) = Glove_UpdateRestingMotion;
+            void (*callback)(void *) = CoffinBike_UpdateRestingMotion;
             u8 *active = &p->active;
             u32 zero = 0;
             *active = complete;

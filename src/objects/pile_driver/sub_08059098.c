@@ -1,4 +1,4 @@
-#include "objects/pile_driver/scene_panel_schedule.h"
-void ScenePanel_NoOpAction(struct ScenePanel *panel)
+#include "objects/pile_driver/pile_driver_schedule.h"
+void PileDriver_NoOpAction(struct ScenePanel *panel)
 {
 }

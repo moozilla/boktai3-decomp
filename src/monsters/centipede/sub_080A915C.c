@@ -1,12 +1,12 @@
 #include "global.h"
-#include "monsters/centipede/tentacle_segment_animation.h"
+#include "monsters/centipede/centipede_segment_animation.h"
 #include "engine/video/display_animation.h"
 #include "engine/video/display_sequence_inline.h"
 
 // confidence=low: refreshes segment animations from their direction.
 
 void *SceneActorProfiles_GetEntryAddress(u32, u32, s32);
-void TentacleBody_GetDirectionFrame(u16, s32 *, s32 *);
+void CentipedeBody_GetDirectionFrame(u16, s32 *, s32 *);
 void Anim_RestartSequence(void *, void *, u32, u8, u8);
 void Anim_SetDurationScale(void *, u32);
 static inline u8 TestMask(struct TentacleSegmentAnimation *p, u32 mask)
@@ -16,7 +16,7 @@ static inline u8 TestMask(struct TentacleSegmentAnimation *p, u32 mask)
         return 1;
     return 0;
 }
-void TentacleBody_ResetDirectionalAnimations(struct TentacleBodyAnimationView *body, s32 kind)
+void CentipedeBody_ResetDirectionalAnimations(struct TentacleBodyAnimationView *body, s32 kind)
 {
     s32 row, flags;
     u8 *profile;
@@ -27,12 +27,12 @@ void TentacleBody_ResetDirectionalAnimations(struct TentacleBodyAnimationView *b
     for (i = 0; i < body->segmentCount; i++) {
         if (!TestMask(&body->segments[i].animation, 1)) {
             if (TentacleSegment_HasStatus(&body->segments[i].animation, 4)) {
-                TentacleBody_GetDirectionFrame((body->segments[i].animation.direction + 128) & 255, &row,
+                CentipedeBody_GetDirectionFrame((body->segments[i].animation.direction + 128) & 255, &row,
                                                &flags);
                 Anim_SetSequence(&body->segments[i].animation, body->segments[i].animation.script, 1, (u8)row,
                                  (u8)flags);
             } else {
-                TentacleBody_GetDirectionFrame(body->segments[i].animation.direction, &row, &flags);
+                CentipedeBody_GetDirectionFrame(body->segments[i].animation.direction, &row, &flags);
                 Anim_SetSequence(&body->segments[i].animation, body->segments[i].animation.script,
                                  profile[kind * 4], (u8)row, (u8)flags);
                 Anim_SetDurationScale(&body->segments[i].animation, actor->speed);

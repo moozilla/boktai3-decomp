@@ -16,7 +16,7 @@ struct Q {
     u8 pad[6];
     u16 flags;
 };
-void PinkSpine_InitCollider(u8 *p)
+void Popbud_InitCollider(u8 *p)
 {
     struct Z a, b;
     u8 *q = p + 0x6c;

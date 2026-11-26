@@ -25,12 +25,12 @@ void ScaledShadow_Initialize(void *, void *, s32, s32, s32, s32, s32, s32, s32, 
 void ScaledShadow_SetGraphic(void *, u32, u32);
 void Math_SetMotionPosition(void *, void *);
 void *BackgroundFlash_Create(s16, s16);
-void *ContactSwarm_Create(void);
+void *CountBats_Create(void);
 void *ContactActorPool_Create(u32, u32, u32);
 void CameraFollow_Initialize(void *, void *, void *, u32);
 void SceneActors_SetDamageCallback(void *, void *, void *, u32);
 void CpuSet(const void *, void *, u32);
-void Vampire_ApplyPendingDamage(void);
+void Count_ApplyPendingDamage(void);
 void SceneActors_TryApplyRequestedState(void);
 void SceneActorAnimation_UpdateDirectionalCallback(void);
 void SceneActorAnimation_UpdateEightDirectionCallback(void);
@@ -322,7 +322,7 @@ int sub_08028F78(struct VampireInit *s, u32 id)
         VampireInit_SetState(base, (void *)SceneActorAnimation_UpdateDirectionalCallback, 1);
     }
 
-    VampireInit_SetDamageHandler(base, (void *)Vampire_ApplyPendingDamage);
+    VampireInit_SetDamageHandler(base, (void *)Count_ApplyPendingDamage);
     VampireInit_SetRequestedStateHandler(base, (void *)SceneActors_TryApplyRequestedState);
     SceneActors_SetHealthLimits(base, (u32)health, (u32)health, s->base.colliderExtra);
     SceneActorGraphics_InitializeBody(s);
@@ -424,7 +424,7 @@ int sub_08028F78(struct VampireInit *s, u32 id)
     s->backgroundFlash = BackgroundFlash_Create(s->tuning[10], s->tuning[11]);
     if (!s->backgroundFlash)
         return -1;
-    s->contactSwarm = ContactSwarm_Create();
+    s->contactSwarm = CountBats_Create();
     if (!s->contactSwarm)
         return -1;
     s->contactPool = ContactActorPool_Create(s->base.targetCount, s->tuning[9], 0x64);

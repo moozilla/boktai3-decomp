@@ -1,7 +1,7 @@
 #include "global.h"
 #include "player/player.h"
 #include "system/game_state/game_state.h"
-#include "ui/town/scene_item_values.h"
+#include "ui/town/shop_item_values.h"
 void Player_BeginDescriptorAction(struct Player *, struct SceneValueEquipment *);
 void Player_BeginIndexedAction(struct Player *, s32);
 void Player_SetWeaponMode(struct Player *, s32);

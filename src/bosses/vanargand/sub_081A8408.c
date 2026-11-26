@@ -1,7 +1,7 @@
 #include "bosses/vanargand/vanargand_pair_attack.h"
 
-void ScenePanel_UpdatePairConditions(void *);
-void ScenePanel_ApplyPairTransition(void *);
+void VanargandPair_UpdatePairConditions(void *);
+void VanargandPair_ApplyPairTransition(void *);
 
 void Vanargand_UpdateMode9Transition(void *object)
 {
@@ -17,8 +17,8 @@ void Vanargand_UpdateMode9Transition(void *object)
         if (VanargandPairAttack_TestFlags(p, 0x20000)) {
             Vanargand_EnterActionPhase(p, 16);
         } else {
-            ScenePanel_UpdatePairConditions(object);
-            ScenePanel_ApplyPairTransition(object);
+            VanargandPair_UpdatePairConditions(object);
+            VanargandPair_ApplyPairTransition(object);
         }
     }
     p->actionTimer++;

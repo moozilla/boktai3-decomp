@@ -9,7 +9,7 @@ struct TimerObject {
 };
 /* Script: for the object at 0x020004B4 in state 1 (+0x53), stores -t (clamped
    to 60000) in slot -p (0-2) of the words at +0x24C (tentative). */
-void RegistryC5BD_SetTimeFromScript(void)
+void LinkPanel_SetTimeFromScript(void)
 {
     u32 slot = Script_GetKeywordValue('p', -1);
     s32 t;

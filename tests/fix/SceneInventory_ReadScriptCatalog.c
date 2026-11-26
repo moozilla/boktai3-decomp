@@ -1,7 +1,7 @@
 // draft with the catalog indexed as a member (p->catalog[n]). A byte member store goes through
 // store_bit_field and reads the old value first; the ROM stored through *(p->catalog + n) (README fact 63)
 #include "menus/inventory_transactions_and_catalogs/scene_inventory_catalog.h"
-void SceneInventory_ReadScriptCatalog(struct SceneInventoryScriptCatalog *p)
+void Shop_ReadScriptCatalog(struct SceneInventoryScriptCatalog *p)
 {
     s32 n;
     p->page = 0;

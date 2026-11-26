@@ -23,34 +23,34 @@ struct ContactImpactEffect {
 struct ContactImpactPackedPosition {
     u32 x : 16, y : 16, z : 16, pad : 16;
 };
-u32 RegistryF3E4_GetStateResult(struct ContactImpactEffect *);
+u32 PopInSprite_GetStateResult(struct ContactImpactEffect *);
 void ContactImpactEffect_BeginMotion(struct ContactImpactEffect *, struct ContactPosition *,
                                      struct ContactPosition *, u32, u32, u32, s32, u32);
 void SceneTarget_BeginMove(struct ContactImpactEffect *, struct ContactPosition *,
                            struct ContactPosition *, s32, u32, u32, u32);
 void ContactImpactEffect_BeginTimedPosition(struct ContactImpactEffect *, struct ContactPosition *,
                                             u32);
-void RegistryF3E4_ClearState(struct ContactImpactEffect *);
+void PopInSprite_ClearState(struct ContactImpactEffect *);
 void ContactImpactEffect_BeginInterpolatedPosition(struct ContactImpactEffect *,
                                                    struct ContactPosition *,
                                                    struct ContactPosition *, s32, u32, u32);
 void ContactImpactEffect_UpdateBlinkFrame(struct ContactImpactEffect *);
-void RegistryF3E4_StartAppearing(struct ContactImpactEffect *);
-void RegistryF3E4_StartDisappearing(struct ContactImpactEffect *);
-void RegistryF3E4_SetHidden(struct ContactImpactEffect *);
+void PopInSprite_StartAppearing(struct ContactImpactEffect *);
+void PopInSprite_StartDisappearing(struct ContactImpactEffect *);
+void PopInSprite_SetHidden(struct ContactImpactEffect *);
 void SpriteController_UpdateStopped(struct ContactImpactEffect *);
 void SpriteController_AnimateGrowing(struct ContactImpactEffect *);
 void SpriteController_AnimateShrinking(struct ContactImpactEffect *);
-void RegistryF3E4_UpdateVisibleIdle(struct ContactImpactEffect *);
+void PopInSprite_UpdateVisibleIdle(struct ContactImpactEffect *);
 void ContactImpactEffect_UpdateShakingPosition(struct ContactImpactEffect *);
 void ContactImpactEffect_UpdateInterpolatedPosition(struct ContactImpactEffect *);
 void ContactImpactEffect_UpdateContact(struct ContactImpactEffect *);
 void ContactImpactEffect_OnUnusedHook(void);
 void ContactImpactEffect_ProcessMessages(struct ContactImpactEffect *);
-void RegistryF3E4_OnTaskUpdate(void *);
-void RegistryF3E4_OnTaskDestroy(void *);
-struct ContactImpactEffect *RegistryF3E4_CreateHidden(s32, s32);
-void RegistryF3E4_Show(void);
-void RegistryF3E4_Hide(void);
-struct ContactImpactEffect *RegistryF3E4_Create(u32);
+void PopInSprite_OnTaskUpdate(void *);
+void PopInSprite_OnTaskDestroy(void *);
+struct ContactImpactEffect *PopInSprite_CreateHidden(s32, s32);
+void PopInSprite_Show(void);
+void PopInSprite_Hide(void);
+struct ContactImpactEffect *PopInSprite_Create(u32);
 #endif

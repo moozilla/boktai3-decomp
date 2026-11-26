@@ -1,4 +1,4 @@
-#include "monsters/centipede/tentacle_body.h"
+#include "monsters/centipede/centipede_body.h"
 #include "global.h"
 #include "scene/actor/scene_actor_reset.h"
 #include "scene/motion/scene_actor_terrain.h"
@@ -26,7 +26,7 @@ static inline s32 Height(s32 cell, struct ContactPosition *position)
     }
     return height;
 }
-void TentacleActor_AlignSegmentsToTerrain(struct ChaseActor *actor)
+void Centipede_AlignSegmentsToTerrain(struct ChaseActor *actor)
 {
     struct TentacleBody *trail;
     s32 i;

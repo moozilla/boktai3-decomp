@@ -23,7 +23,7 @@ static inline u8 ScenePanel_ConsumePending(struct ScenePanelInput *panel)
     }
     return FALSE;
 }
-void ScenePanel_RunSelectionScript(struct ScenePanelSelection *panel)
+void VanargandPair_RunSelectionScript(struct ScenePanelSelection *panel)
 {
     struct ScenePanelInput *input = (struct ScenePanelInput *)panel;
     if (ScenePanel_ConsumePending(input)) {

@@ -1,6 +1,6 @@
 #include "objects/pile_driver/scene_panel.h"
 
-void ScenePanel_UpdateBackgroundEffect(struct ScenePanel *panel, s32 tileX, s32 tileY, s32 screenX,
+void PileDriver_UpdateBackgroundEffect(struct ScenePanel *panel, s32 tileX, s32 tileY, s32 screenX,
                                        s32 screenY)
 {
     s32 effectAlpha;
@@ -172,7 +172,7 @@ void ScenePanel_UpdateBackgroundEffect(struct ScenePanel *panel, s32 tileX, s32 
                     u32 life = table[gRandomIndex];
                     life &= 7;
                     life += 8;
-                    ScenePanel_AddParticle(panel, (union ScenePanelPosition *)positionWords,
+                    PileDriver_AddParticle(panel, (union ScenePanelPosition *)positionWords,
                                            (union ScenePanelPosition *)&velocity, life, 1);
                 }
             }
@@ -201,7 +201,7 @@ void ScenePanel_UpdateBackgroundEffect(struct ScenePanel *panel, s32 tileX, s32 
             }
             BgGfx_LoadTilemapSimple(1, tileX, tileY, screenX, screenY + panel->shakeOffset);
             if (--panel->mode == 0)
-                ScenePanel_CallPendingScript(gScenePanel, 9);
+                PileDriver_CallPendingScript(gScenePanel, 9);
         }
     }
     return;

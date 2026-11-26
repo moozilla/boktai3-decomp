@@ -1,16 +1,16 @@
-#include "npc/sabata_rider/script_puppet.h"
+#include "npc/sabata_rider/sabata_rider.h"
 
-void RegistryA8CB_CreateFromScript(void)
+void SabataRider_CreateFromScript(void)
 {
     RegistryActorManager *manager = gActorManager;
     struct RegistryActor *actor;
     void *animation;
     if (!manager) {
-        manager = RegistryA8CB_EnsureManager();
+        manager = SabataRider_EnsureManager();
         if (!manager)
             return;
     }
-    actor = RegistryA8CB_FindAvailableEntry(manager);
+    actor = SabataRider_FindAvailableEntry(manager);
     if (!actor)
         return;
     Memory_Clear(actor->stats.relativeOrigin, 16);
@@ -23,18 +23,18 @@ void RegistryA8CB_CreateFromScript(void)
     SceneSlot_RegisterObject(&actor->stats.position);
     ActorCollision_InitBounds(actor);
     RegistryActor_StartMotion(actor, ActorPhysics_UpdateFallMotion);
-    RegistryA8CB_RegisterMessageReceiver(actor);
+    SabataRider_RegisterMessageReceiver(actor);
     RegistryActor_SetMotionFlags(REGISTRY_ACTOR_MOTION_COMMANDS, &actor->control.motion);
     Modifier_InitDrainState(&actor->stats.drain, &actor->model.view.parts[0].x, 0, 0);
     actor->control.active = 1;
 }
 
-void RegistryA8CB_ResetFromScript(void)
+void SabataRider_ResetFromScript(void)
 {
     RegistryActorManager *manager = gActorManager;
     struct RegistryActor *actor;
     if (manager &&
-        (actor = RegistryA8CB_FindEntryByName(manager, Script_GetKeywordValue('n', 0))) != 0) {
+        (actor = SabataRider_FindEntryByName(manager, Script_GetKeywordValue('n', 0))) != 0) {
         struct RegistryActor *entry = actor;
         struct ModifierDisplayObject *part = actor->model.view.parts;
         s32 index;

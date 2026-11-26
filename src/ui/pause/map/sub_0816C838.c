@@ -34,7 +34,7 @@ void MapMenu_ResetMarkers(struct MapMenu *);
 s32 MessageWindow_SetMessageTable(const void *);
 void MessageWindow_SetPalette(int);
 s32 MessageWindow_SetDisplayMode(s32);
-void SceneSequence_SelectEntryMessage(struct MapMenu *);
+void MenuSequence_SelectEntryMessage(struct MapMenu *);
 void MapMenu_UpdateInput(void);
 void Hud_SetInteractionCallback(void *, void (*)(void), int);
 void MapMenu_InitializeDisplay(struct MapMenu *s)
@@ -70,6 +70,6 @@ void MapMenu_InitializeDisplay(struct MapMenu *s)
     MessageWindow_SetMessageTable(s->panel);
     MessageWindow_SetPalette(0xefda);
     MessageWindow_SetDisplayMode(1);
-    SceneSequence_SelectEntryMessage(s);
+    MenuSequence_SelectEntryMessage(s);
     Hud_SetInteractionCallback(s, MapMenu_UpdateInput, 0);
 }

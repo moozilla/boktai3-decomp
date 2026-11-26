@@ -37,10 +37,10 @@ struct DecisionActor {
     struct DecisionSummons summons;
 };
 s32 SceneActors_ConsumePendingSignal(void *);
-void SceneVolume_BeginPhase(void *, int);
+void SabataVolume_BeginPhase(void *, int);
 void ProximityVolume_ClearLatch(void *);
 void AnimatedHazardManager_RetractAll(void);
-s32 SceneVolume_CanActivate(void *);
+s32 SabataVolume_CanActivate(void *);
 void SceneSteeringActor_RequestRemovalAll(void);
 u8 Callback_InvokeActor(void *, void *);
 extern void *gUnk_08611C6C[];
@@ -104,11 +104,11 @@ static inline u32 *SummonAddress(struct DecisionActor *p, u32 phase)
     return &summons->actors[phase];
 }
 // confidence=low: selects phase-dependent attacks from the preceding choice and event index
-void BossSlot2_SelectCombatAction(struct DecisionActor *p)
+void Sabata_SelectCombatAction(struct DecisionActor *p)
 {
     struct DecisionActor *q = p;
     if (SceneActors_ConsumePendingSignal(p))
-        SceneVolume_BeginPhase(p, 4);
+        SabataVolume_BeginPhase(p, 4);
     if (!(p->control.word & 0xFF0000FF))
         goto callback;
     switch (p->control.bytes.mode) {
@@ -153,7 +153,7 @@ void BossSlot2_SelectCombatAction(struct DecisionActor *p)
                         }
                     } break;
                     case 2: {
-                        s32 result = SceneVolume_CanActivate(q);
+                        s32 result = SabataVolume_CanActivate(q);
                         if (result) {
                             SelectAction(p, 0, 12);
                         } else {
@@ -293,7 +293,7 @@ void BossSlot2_SelectCombatAction(struct DecisionActor *p)
                         }
                     } break;
                     case 2: {
-                        s32 result = SceneVolume_CanActivate(q);
+                        s32 result = SabataVolume_CanActivate(q);
                         if (result) {
                             SelectAction(p, 0, 12);
                         } else {
@@ -384,7 +384,7 @@ void BossSlot2_SelectCombatAction(struct DecisionActor *p)
                     }
                 } break;
                 case 2: {
-                    s32 result = SceneVolume_CanActivate(q);
+                    s32 result = SabataVolume_CanActivate(q);
                     if (result) {
                         SelectAction(p, 0, 12);
                     } else {
@@ -479,7 +479,7 @@ void BossSlot2_SelectCombatAction(struct DecisionActor *p)
                     }
                 } break;
                 case 10: {
-                    if (SceneVolume_CanActivate(q)) {
+                    if (SabataVolume_CanActivate(q)) {
                         SceneSteeringActor_RequestRemovalAll();
                         SelectAction(p, 0, 12);
                     } else {

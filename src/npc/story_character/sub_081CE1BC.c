@@ -94,11 +94,11 @@ void SceneCharacter_OnDestroy(void);
 void Actor_OnIdleUpdate(void);
 void Actor_OnHiddenIdleUpdate(void);
 void Actor_OnConfiguredAnimationUpdate(void);
-void StateActor_SimpleStep(void);
+void StoryCharacter_SimpleStep(void);
 void sub_081CC1B4(void);
-void StateActor_StartAnimStep(void);
-void StateActor_StartKind5Animation9AndAttach(void);
-void StateActor_StartAndMaybeFinishAnim(void);
+void StoryCharacter_StartAnimStep(void);
+void StoryCharacter_StartKind5Animation9AndAttach(void);
+void StoryCharacter_StartAndMaybeFinishAnim(void);
 /* Registry routine 8EA3 (GCL place_character): creates a scene character
    named -n of kind -k (default 9) at -p x y z facing -d. -C gives two
    values for kind 29 (a tag and a sound choice). The model, palette
@@ -352,7 +352,7 @@ void SceneCharacter_PlaceFromScript(void)
             npc->mode = mode;
             npc->field14 = 0;
             npc->field8 = 1;
-            updates[0] = StateActor_SimpleStep;
+            updates[0] = StoryCharacter_SimpleStep;
             npc->state = 0xF;
             npc->update = updates[0];
             npc->field10 = 0;
@@ -376,7 +376,7 @@ void SceneCharacter_PlaceFromScript(void)
                 npc->mode = mode;
                 npc->field14 = 0;
                 npc->field8 = 1;
-                updates[1] = StateActor_StartAnimStep;
+                updates[1] = StoryCharacter_StartAnimStep;
                 npc->state = 0x5D;
                 npc->update = updates[1];
                 npc->field10 = 0;
@@ -389,7 +389,7 @@ void SceneCharacter_PlaceFromScript(void)
                 npc->mode = mode;
                 npc->field14 = 0;
                 npc->field8 = 1;
-                updates[0] = StateActor_SimpleStep;
+                updates[0] = StoryCharacter_SimpleStep;
                 npc->state = 0xF;
                 npc->update = updates[0];
                 npc->field10 = 0;
@@ -405,7 +405,7 @@ void SceneCharacter_PlaceFromScript(void)
                 npc->mode = mode;
                 npc->field14 = 0;
                 npc->field8 = 1;
-                updates[0] = StateActor_StartKind5Animation9AndAttach;
+                updates[0] = StoryCharacter_StartKind5Animation9AndAttach;
                 npc->state = 0x28;
                 npc->update = updates[0];
                 npc->field10 = 0;
@@ -418,7 +418,7 @@ void SceneCharacter_PlaceFromScript(void)
                 npc->mode = mode;
                 npc->field14 = 0;
                 npc->field8 = 1;
-                updates[0] = StateActor_StartAndMaybeFinishAnim;
+                updates[0] = StoryCharacter_StartAndMaybeFinishAnim;
                 npc->state = 0x4A;
                 npc->update = updates[0];
                 npc->field10 = 0;

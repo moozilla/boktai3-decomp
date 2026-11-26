@@ -2,7 +2,7 @@
 #include "engine/video/render.h"
 void *ScriptProc_Start(u32, u32);
 void Bg_SetupLayers(u32, u32, void *, u32, u32, u32, u32 *);
-void RegistryF246_InitBackgroundResources(u8 *s)
+void LinkPanelSlots_InitBackgroundResources(u8 *s)
 {
     u32 value;
     void *p;

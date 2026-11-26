@@ -14,8 +14,8 @@ s32 MenuPanel_FindEmptyOppositeHalf(struct MenuPanel *, u32);
 s32 MenuPanel_IsEntryAvailable(struct MenuPanel *, s32);
 s32 MenuPanel_IsEntryEmpty(struct MenuPanel *, s32);
 u32 SceneInput_NavigateGrid(struct SceneInputGridView *);
-void SceneInventory_BeginCategoryBrowse(struct MenuPanel *);
-void SceneInventory_SetState(struct MenuPanel *, void (*)(struct MenuPanel *), u32);
+void Storage_BeginCategoryBrowse(struct MenuPanel *);
+void Storage_SetState(struct MenuPanel *, void (*)(struct MenuPanel *), u32);
 void Sound_PlaySong(u32);
 void Storage_RefreshSelectedItemDetails(struct MenuPanel *);
 void Storage_UpdateCursorPosition(struct SceneInputGridView *, void *);
@@ -58,7 +58,7 @@ void Storage_UpdateSwapSelection(struct MenuPanel *p)
                      !MenuPanel_IsEntryAvailable(p, destination)) ||
                     distinctInventorySlots(source, destination)) {
                     Storage_BeginSwapTransition(p);
-                    SceneInventory_SetState(p, Storage_UpdateItemTransition, 0);
+                    Storage_SetState(p, Storage_UpdateItemTransition, 0);
                     return;
                 }
             }
@@ -66,7 +66,7 @@ void Storage_UpdateSwapSelection(struct MenuPanel *p)
         Sound_PlaySong(0x192);
     } else if (gPadState[1] & 2) {
         Sound_PlaySong(0xDE);
-        SceneInventory_BeginCategoryBrowse(p);
+        Storage_BeginCategoryBrowse(p);
     } else {
         if (SceneInput_NavigateGrid(&p->grid)) {
             Storage_UpdateCursorPosition(&p->grid, p->cursor);

@@ -42,8 +42,8 @@ struct CallbackPool {
 void CallbackPool_SpawnHitParticles(struct CallbackPoolEntry *);
 void CallbackPool_RefreshHealthDisplay(struct CallbackPoolEntry *);
 void ProximityActor_SetState(struct CallbackPoolEntry *, s32);
-s32 Pool184_TestStatusFlags(void *, u32);
-void Pool184_AddStatusFlags(void *, u16);
+s32 ActorGroupPool_TestStatusFlags(void *, u32);
+void ActorGroupPool_AddStatusFlags(void *, u16);
 static inline void CallbackPool_Subtract(struct ContactPosition *out,
                                          const struct ContactPosition *b, const struct SceneVec *a)
 {

@@ -1,15 +1,15 @@
-#define LinkMenu_ConsumeStateEntry     Registry1745_ConsumeStateEntry
-#define LinkMenu_SetState              Registry1745_SetState
-#define LinkMenu_CheckSession          Registry1745_CheckSessionReady
-#define LinkMenu_ResetSelection        Registry1745_BeginShutdown
-#define LinkMenu_ClearExchangeCounters Registry1745_ClearParticipantCounters
+#define LinkMenu_ConsumeStateEntry     LinkSession_ConsumeStateEntry
+#define LinkMenu_SetState              LinkSession_SetState
+#define LinkMenu_CheckSession          LinkSession_CheckSessionReady
+#define LinkMenu_ResetSelection        LinkSession_BeginShutdown
+#define LinkMenu_ClearExchangeCounters LinkSession_ClearParticipantCounters
 #include "global.h"
 #include "scene/areas/area_effect_link.h"
-u8 Registry1745_ConsumeStateEntry(void *);
-void Registry1745_ClearParticipantCounters(void *);
-s32 Registry1745_CheckSessionReady(void *);
-void Registry1745_BeginShutdown(void *, void (*)(void));
-void Registry1745_SetState(void *, u32, void (*)(void));
+u8 LinkSession_ConsumeStateEntry(void *);
+void LinkSession_ClearParticipantCounters(void *);
+s32 LinkSession_CheckSessionReady(void *);
+void LinkSession_BeginShutdown(void *, void (*)(void));
+void LinkSession_SetState(void *, u32, void (*)(void));
 s32 Crc_ComputeCcitt16(void *, s32, s32);
 u8 ByteSequence_AdvanceEncodedValue(void *, void *, s32);
 u8 LinkSession_ReceiveSelectionByte(void *, void *, s32, s32);
@@ -28,17 +28,17 @@ s32 LinkMenu_ExchangePayload(struct AreaEffectLinkState *p)
     u8 *session = p->sessionData;
     s32 count, i;
     u8 *incoming;
-    if (Registry1745_ConsumeStateEntry(p)) {
+    if (LinkSession_ConsumeStateEntry(p)) {
         u8 *outgoing;
-        Registry1745_ClearParticipantCounters(p);
+        LinkSession_ClearParticipantCounters(p);
         outgoing = p->outgoingPayload;
         SceneActorStyle_InitializeFromGameState(outgoing);
         p->outgoingChecksum = Crc_ComputeCcitt16(outgoing, 0, 0x20);
     }
-    if (Registry1745_CheckSessionReady(p) < 0)
+    if (LinkSession_CheckSessionReady(p) < 0)
         goto fail;
     if (IsPayloadMode(*p->selection)) {
-        Registry1745_SetState(p, 14, LinkSelection_WaitForEmptySlots);
+        LinkSession_SetState(p, 14, LinkSelection_WaitForEmptySlots);
         return 0;
     }
     ByteSequence_AdvanceEncodedValue(p, session + 0xc0, 0x24);
@@ -59,6 +59,6 @@ s32 LinkMenu_ExchangePayload(struct AreaEffectLinkState *p)
     if (p->menuElapsed <= 3600)
         return 0;
 fail:
-    Registry1745_BeginShutdown(p, ScriptPanel_OpenTextWindow);
+    LinkSession_BeginShutdown(p, ScriptPanel_OpenTextWindow);
     return -1;
 }

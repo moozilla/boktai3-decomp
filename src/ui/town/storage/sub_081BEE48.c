@@ -10,16 +10,16 @@ struct SceneInventoryCategoryMenu {
 };
 void Storage_RefreshCategoryWidgets(struct SceneInventoryCategoryMenu *);
 void Storage_RefreshSelectedItemDetails(struct SceneInventoryCategoryMenu *);
-void SceneInventory_SetCategoryPalette(struct SceneInventoryCategoryMenu *, u16 *);
-void SceneInventory_UpdateCategoryBrowse(struct SceneInventoryCategoryMenu *);
-void SceneInventory_SetState(struct SceneInventoryCategoryMenu *,
+void Storage_SetCategoryPalette(struct SceneInventoryCategoryMenu *, u16 *);
+void Storage_UpdateCategoryBrowse(struct SceneInventoryCategoryMenu *);
+void Storage_SetState(struct SceneInventoryCategoryMenu *,
                              void (*)(struct SceneInventoryCategoryMenu *), u32);
-void SceneInventory_BeginCategoryBrowse(struct SceneInventoryCategoryMenu *p)
+void Storage_BeginCategoryBrowse(struct SceneInventoryCategoryMenu *p)
 {
     SceneInputWidget_Hide(&p->categoryWidget);
     SceneInputWidget_Hide(&p->primaryWidget);
     Storage_RefreshCategoryWidgets(p);
     Storage_RefreshSelectedItemDetails(p);
-    SceneInventory_SetCategoryPalette(p, p->paletteTarget);
-    SceneInventory_SetState(p, SceneInventory_UpdateCategoryBrowse, 0);
+    Storage_SetCategoryPalette(p, p->paletteTarget);
+    Storage_SetState(p, Storage_UpdateCategoryBrowse, 0);
 }

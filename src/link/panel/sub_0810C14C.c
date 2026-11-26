@@ -1,7 +1,7 @@
 #include "global.h"
 #include "link/panel/link_panel.h"
 
-void RegistryF246_HideAnimations(struct LinkPanel *panel)
+void LinkPanelSlots_HideAnimations(struct LinkPanel *panel)
 {
     s32 i;
 

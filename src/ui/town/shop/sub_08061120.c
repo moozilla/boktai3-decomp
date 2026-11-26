@@ -1,5 +1,5 @@
-#include "ui/town/scene_inventory_control.h"
-s32 SceneInventory_ClassifyEquipmentAction(struct SceneInventoryControlView *panel)
+#include "ui/town/shop_control.h"
+s32 Shop_ClassifyEquipmentAction(struct SceneInventoryControlView *panel)
 {
     s32 result;
     if (panel->grid.selection > 15) {

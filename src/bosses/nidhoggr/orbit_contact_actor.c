@@ -1,6 +1,6 @@
-#include "bosses/nidhoggr/orbit_contact_actor.h"
+#include "bosses/nidhoggr/nidhoggr_duel_orb.h"
 
-void OrbitContactActor_UpdateInactive(struct OrbitContactActor *actor)
+void NidhoggrDuelOrb_UpdateInactive(struct OrbitContactActor *actor)
 {
     if (actor->stateFlag) {
         actor->sprite.flags |= 1;
@@ -10,7 +10,7 @@ void OrbitContactActor_UpdateInactive(struct OrbitContactActor *actor)
     ++actor->stateFrame;
 }
 
-void OrbitContactActor_UpdateExpanding(struct OrbitContactActor *actor)
+void NidhoggrDuelOrb_UpdateExpanding(struct OrbitContactActor *actor)
 {
     if (actor->stateFlag)
         actor->sprite.flags &= ~1;
@@ -26,7 +26,7 @@ void OrbitContactActor_UpdateExpanding(struct OrbitContactActor *actor)
     ++actor->stateFrame;
 }
 
-void OrbitContactActor_UpdateContracting(struct OrbitContactActor *actor)
+void NidhoggrDuelOrb_UpdateContracting(struct OrbitContactActor *actor)
 {
     actor->angle += 6;
     actor->radius -= 7;
@@ -51,7 +51,7 @@ static inline s32 scaleOrbit(s32 value)
     return -((-value) >> 12);
 }
 
-s32 OrbitContactActor_Update(struct OrbitContactActor *actor)
+s32 NidhoggrDuelOrb_Update(struct OrbitContactActor *actor)
 {
     gUnk_086059B4[actor->state](actor);
     if (actor->state) {
@@ -75,7 +75,7 @@ s32 OrbitContactActor_Update(struct OrbitContactActor *actor)
     return 0;
 }
 
-s32 OrbitContactActor_Destroy(struct OrbitContactActor *actor)
+s32 NidhoggrDuelOrb_Destroy(struct OrbitContactActor *actor)
 {
     Sprite_Remove(&actor->sprite);
     return 0;
@@ -83,7 +83,7 @@ s32 OrbitContactActor_Destroy(struct OrbitContactActor *actor)
 
 void Collider_SetAttackProperties(void *, u32, u32, u32, u32, u32);
 
-s32 OrbitContactActor_Initialize(struct OrbitContactActor *actor,
+s32 NidhoggrDuelOrb_Initialize(struct OrbitContactActor *actor,
                                  const struct ContactPosition *center, u32 resourceValue)
 {
     struct ContactSwarmGraphics *graphics;
@@ -115,20 +115,20 @@ s32 OrbitContactActor_Initialize(struct OrbitContactActor *actor,
     return result;
 }
 
-s32 OrbitContactActor_Initialize(struct OrbitContactActor *, const struct ContactPosition *, u32);
+s32 NidhoggrDuelOrb_Initialize(struct OrbitContactActor *, const struct ContactPosition *, u32);
 
-s32 OrbitContactActor_Update(struct OrbitContactActor *);
+s32 NidhoggrDuelOrb_Update(struct OrbitContactActor *);
 
-s32 OrbitContactActor_Destroy(struct OrbitContactActor *);
+s32 NidhoggrDuelOrb_Destroy(struct OrbitContactActor *);
 
-struct OrbitContactActor *OrbitContactActor_Create(const struct ContactPosition *center,
+struct OrbitContactActor *NidhoggrDuelOrb_Create(const struct ContactPosition *center,
                                                    u32 resourceValue)
 {
     struct OrbitContactActor *actor = Task_Create(8, sizeof(*actor));
     if (actor) {
-        Task_SetCallbacks(actor, (void (*)(void *))OrbitContactActor_Update,
-                          (void (*)(void *))OrbitContactActor_Destroy);
-        if (OrbitContactActor_Initialize(actor, center, resourceValue) < 0) {
+        Task_SetCallbacks(actor, (void (*)(void *))NidhoggrDuelOrb_Update,
+                          (void (*)(void *))NidhoggrDuelOrb_Destroy);
+        if (NidhoggrDuelOrb_Initialize(actor, center, resourceValue) < 0) {
             Task_Kill(actor);
             return NULL;
         }
@@ -136,7 +136,7 @@ struct OrbitContactActor *OrbitContactActor_Create(const struct ContactPosition 
     return actor;
 }
 
-void OrbitContactActor_BeginExpansion(struct OrbitContactActor *actor)
+void NidhoggrDuelOrb_BeginExpansion(struct OrbitContactActor *actor)
 {
     u32 one = 1;
     actor->state = one;

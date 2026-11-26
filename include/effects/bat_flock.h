@@ -7,7 +7,7 @@
 #include "engine/video/sprite.h"
 
 // Tentative: a task managing sixteen small board pieces. Command packets queued by the scene
-// launch them (BoardPieces_StartStraightAdvance and friends), each piece then drifts, animates and bobs.
+// launch them (BatFlockBats_StartStraightAdvance and friends), each piece then drifts, animates and bobs.
 
 struct GroupPiece {
     u8 active, state, done, angle;
@@ -70,23 +70,23 @@ void SceneMessages_SetPendingTrigger(void *, void *);
 struct SceneActorBody *SceneBody_GetById(u16);
 int Mod(int, int);
 
-int BoardPiece_Initialize(struct GroupObjects *, struct GroupPiece *, int);
-u32 BoardPiece_Destroy(struct GroupObjects *, struct GroupPiece *, int);
-void BoardPiece_UpdateAnimation(struct GroupPiece *);
-int BoardPieces_DispatchCommands(struct GroupObjects *);
-void BoardPiece_Launch(struct GroupObjects *, struct GroupPiece *, int);
-void BoardPiece_Deactivate(struct GroupObjects *, struct GroupPiece *);
-int GroupObjects_Update(struct GroupObjects *);
-int GroupObjects_Destroy(struct GroupObjects *);
-int GroupObjects_Initialize(struct GroupObjects *, int);
-void *GroupObjects_CreateTask(void *);
+int BatFlockBat_Initialize(struct GroupObjects *, struct GroupPiece *, int);
+u32 BatFlockBat_Destroy(struct GroupObjects *, struct GroupPiece *, int);
+void BatFlockBat_UpdateAnimation(struct GroupPiece *);
+int BatFlockBats_DispatchCommands(struct GroupObjects *);
+void BatFlockBat_Launch(struct GroupObjects *, struct GroupPiece *, int);
+void BatFlockBat_Deactivate(struct GroupObjects *, struct GroupPiece *);
+int BatFlock_Update(struct GroupObjects *);
+int BatFlock_Destroy(struct GroupObjects *);
+int BatFlock_Initialize(struct GroupObjects *, int);
+void *BatFlock_CreateTask(void *);
 
 void Vec16_Lerp(void *, void *, void *, int, int);
-void BoardPiece_SetFacingAnim(struct GroupObjects *, struct GroupPiece *, int);
-int BoardPieces_StartStraightAdvance(struct GroupObjects *, struct GroupQueue *, struct GroupCommand *);
-int BoardPieces_StartLaunch(struct GroupObjects *, struct GroupQueue *, struct GroupCommand *);
-int BoardPieces_StartConvergence(struct GroupObjects *, struct GroupQueue *, struct GroupCommand *);
-int BoardPieces_StartActorChase(struct GroupObjects *, struct GroupQueue *, struct GroupCommand *);
+void BatFlockBat_SetFacingAnim(struct GroupObjects *, struct GroupPiece *, int);
+int BatFlockBats_StartStraightAdvance(struct GroupObjects *, struct GroupQueue *, struct GroupCommand *);
+int BatFlockBats_StartLaunch(struct GroupObjects *, struct GroupQueue *, struct GroupCommand *);
+int BatFlockBats_StartConvergence(struct GroupObjects *, struct GroupQueue *, struct GroupCommand *);
+int BatFlockBats_StartActorChase(struct GroupObjects *, struct GroupQueue *, struct GroupCommand *);
 
 static inline int randomValue(void)
 {

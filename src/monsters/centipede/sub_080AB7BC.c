@@ -63,7 +63,7 @@ static inline void SetAttack(void *collider, u8 *p, s32 variant)
     Collider_SetAttackProperties(collider, a, b, 0, c, d);
 }
 
-void TentacleActor_UpdateSegmentColliders(struct TentacleActor *actor)
+void Centipede_UpdateSegmentColliders(struct TentacleActor *actor)
 {
     u8 *p = (u8 *)actor;
     u8 *trail = actor->context;

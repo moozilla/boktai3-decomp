@@ -12,18 +12,18 @@ void PlayerCue_Stand(void *, u32);
 
 void ScreenTransition_SendCommand(s32, s32, s32, s32, s32, s32, s32);
 
-void ControlPanel_ClearActivePanel(void)
+void DarkGenerator_ClearActivePanel(void)
 {
     gSegmentDisplay = 0;
 }
 
-void ControlPanel_SetUpdate(struct ControlPanel *panel, void (*v)(struct ControlPanel *))
+void DarkGenerator_SetUpdate(struct ControlPanel *panel, void (*v)(struct ControlPanel *))
 {
     panel->update = v;
     panel->timer = 0;
 }
 
-void ControlPanel_ClearPlayerInputHistory(void)
+void DarkGenerator_ClearPlayerInputHistory(void)
 {
     s32 i;
     for (i = 0; i <= 0x1f; i++) {
@@ -33,7 +33,7 @@ void ControlPanel_ClearPlayerInputHistory(void)
     gPlayers[0]->displaySegmentCount = 0;
 }
 
-void ControlPanel_ResetPlayerForInteractionPrompt(struct ControlPanel *panel)
+void DarkGenerator_ResetPlayerForInteractionPrompt(struct ControlPanel *panel)
 {
     gPlayers[0]->kind = 1;
     gPlayers[0]->tetherMode = 0x25;
@@ -44,7 +44,7 @@ void ControlPanel_ResetPlayerForInteractionPrompt(struct ControlPanel *panel)
     gPlayers[0]->facing = 7;
     gPlayers[0]->heading = 1;
     gPlayers[0]->side = 1;
-    ControlPanel_ClearPlayerInputHistory();
+    DarkGenerator_ClearPlayerInputHistory();
     gPlayers[0]->interactionPromptFlags = 1;
     switch (panel->start) {
         case 0:
@@ -62,7 +62,7 @@ void ControlPanel_ResetPlayerForInteractionPrompt(struct ControlPanel *panel)
     }
 }
 
-void ControlPanel_UpdateAmbientIndicator(struct ControlPanel *panel)
+void DarkGenerator_UpdateAmbientIndicator(struct ControlPanel *panel)
 {
     u32 frame = panel->display[1].phase >> 3;
     struct ContactSwarmSprite *sprite = &panel->display[1].sprite;
@@ -72,7 +72,7 @@ void ControlPanel_UpdateAmbientIndicator(struct ControlPanel *panel)
         panel->display[1].phase = 0;
 }
 
-void ControlPanel_UpdateGaugeIndicator(struct ControlPanel *gauge)
+void DarkGenerator_UpdateGaugeIndicator(struct ControlPanel *gauge)
 {
     s32 increment;
     if (gPlayers[0]->indicatorUpdateRate) {
@@ -102,7 +102,7 @@ void ControlPanel_UpdateGaugeIndicator(struct ControlPanel *gauge)
         gauge->soundTicks = 0;
 }
 
-void ControlPanel_ShowRewardBalanceDigits(struct ControlPanel *panel)
+void DarkGenerator_ShowRewardBalanceDigits(struct ControlPanel *panel)
 {
     s32 value = gGameState->menuRewardBalance;
     s32 digits[4];
@@ -128,21 +128,21 @@ void ControlPanel_ShowRewardBalanceDigits(struct ControlPanel *panel)
     } while (remaining >= 0);
 }
 
-void ControlPanel_ShowValueDisplay(struct ControlPanel *panel)
+void DarkGenerator_ShowValueDisplay(struct ControlPanel *panel)
 {
     s32 i;
     for (i = 0; i < 5; i++)
         panel->widgets[i].flags &= ~1;
 }
 
-void ControlPanel_HideValueDisplay(struct ControlPanel *panel)
+void DarkGenerator_HideValueDisplay(struct ControlPanel *panel)
 {
     s32 i;
     for (i = 0; i < 5; i++)
         panel->widgets[i].flags |= 1;
 }
 
-void ControlPanel_UpdateSustainedInputTimer(struct ControlPanel *panel)
+void DarkGenerator_UpdateSustainedInputTimer(struct ControlPanel *panel)
 {
     if (gPlayers[0]->displaySegmentCount > 3)
         panel->sustainedInput = panel->sustainedInput + 1;
@@ -150,7 +150,7 @@ void ControlPanel_UpdateSustainedInputTimer(struct ControlPanel *panel)
         panel->sustainedInput = 0;
 }
 
-u32 ControlPanel_GetInputMultiplier(struct ControlPanel *panel)
+u32 DarkGenerator_GetInputMultiplier(struct ControlPanel *panel)
 {
     if (panel->sustainedInput > panel->thresholds[2])
         return 10;
@@ -161,7 +161,7 @@ u32 ControlPanel_GetInputMultiplier(struct ControlPanel *panel)
     return 1;
 }
 
-void ControlPanel_ApplyMultiplierMode(struct ControlPanel *panel)
+void DarkGenerator_ApplyMultiplierMode(struct ControlPanel *panel)
 {
     s32 mode = panel->multiplier;
 
@@ -194,7 +194,7 @@ void ControlPanel_ApplyMultiplierMode(struct ControlPanel *panel)
     Sound_PlaySong(0x28B);
 }
 
-void ControlPanel_TickMultiplierTimer(struct ControlPanel *panel)
+void DarkGenerator_TickMultiplierTimer(struct ControlPanel *panel)
 {
     u16 *a374 = &panel->multiplierTimer;
     u32 copy = *a374;
@@ -227,7 +227,7 @@ void ControlPanel_TickMultiplierTimer(struct ControlPanel *panel)
     panel->multiplierTimer -= 1;
 }
 
-void ControlPanel_HideMultiplierSprites(struct ControlPanel *panel)
+void DarkGenerator_HideMultiplierSprites(struct ControlPanel *panel)
 {
     s32 i;
     for (i = 0; i < 6; i++)
@@ -239,7 +239,7 @@ static inline void ControlPanel_SetSegmentFrame(struct ContactSwarmSprite *sprit
     sprite->frame = frame;
 }
 
-void ControlPanel_UpdatePlayerSegments(struct ControlPanel *panel)
+void DarkGenerator_UpdatePlayerSegments(struct ControlPanel *panel)
 {
     s32 count = gPlayers[0]->displaySegmentCount;
     s32 i;
@@ -255,42 +255,42 @@ void ControlPanel_UpdatePlayerSegments(struct ControlPanel *panel)
         ControlPanel_SetSegmentFrame(&panel->segments[i], 0);
 }
 
-void ControlPanel_ShowInputGauge(struct ControlPanel *panel)
+void DarkGenerator_ShowInputGauge(struct ControlPanel *panel)
 {
     s32 i;
     for (i = 0; i < 7; i++)
         panel->segments[i].flags &= ~1;
 }
 
-void ControlPanel_HideInputGauge(struct ControlPanel *panel)
+void DarkGenerator_HideInputGauge(struct ControlPanel *panel)
 {
     s32 i;
     for (i = 0; i < 7; i++)
         panel->segments[i].flags |= 1;
 }
 
-void ControlPanel_ShowInteractionDisplay(struct ControlPanel *panel)
+void DarkGenerator_ShowInteractionDisplay(struct ControlPanel *panel)
 {
-    ControlPanel_ShowValueDisplay(panel);
-    ControlPanel_ShowInputGauge(panel);
+    DarkGenerator_ShowValueDisplay(panel);
+    DarkGenerator_ShowInputGauge(panel);
 }
 
-void ControlPanel_HideInteractionDisplay(struct ControlPanel *panel)
+void DarkGenerator_HideInteractionDisplay(struct ControlPanel *panel)
 {
-    ControlPanel_HideValueDisplay(panel);
-    ControlPanel_HideMultiplierSprites(panel);
-    ControlPanel_HideInputGauge(panel);
+    DarkGenerator_HideValueDisplay(panel);
+    DarkGenerator_HideMultiplierSprites(panel);
+    DarkGenerator_HideInputGauge(panel);
 }
 
-void ControlPanel_OnStartPromptComplete(struct ControlPanel *panel)
+void DarkGenerator_OnStartPromptComplete(struct ControlPanel *panel)
 {
-    ControlPanel_ResetPlayerForInteractionPrompt(panel);
-    ControlPanel_ShowInteractionDisplay(panel);
+    DarkGenerator_ResetPlayerForInteractionPrompt(panel);
+    DarkGenerator_ShowInteractionDisplay(panel);
     panel->cooldown = 0x20;
-    ControlPanel_SetUpdate(panel, ControlPanel_UpdateInteraction);
+    DarkGenerator_SetUpdate(panel, DarkGenerator_UpdateInteraction);
 }
 
-void ControlPanel_CallEndScript(struct ControlPanel *panel)
+void DarkGenerator_CallEndScript(struct ControlPanel *panel)
 {
     if (panel->endScript) {
         s32 value;
@@ -302,7 +302,7 @@ void ControlPanel_CallEndScript(struct ControlPanel *panel)
     }
 }
 
-void ControlPanel_CallLimitScript(struct ControlPanel *panel)
+void DarkGenerator_CallLimitScript(struct ControlPanel *panel)
 {
     u32 script = panel->limitScript;
     if (script) {
@@ -314,11 +314,11 @@ void ControlPanel_CallLimitScript(struct ControlPanel *panel)
     }
 }
 
-void ControlPanel_BeginInteraction(void)
+void DarkGenerator_BeginInteraction(void)
 {
     struct ControlPanel *panel = (void *)gSegmentDisplay;
     if (panel != 0) {
-        StageIconDisplay_Create(0, 0, (void (*)(void *))ControlPanel_OnStartPromptComplete, panel);
+        StageIconDisplay_Create(0, 0, (void (*)(void *))DarkGenerator_OnStartPromptComplete, panel);
         PlayerCue_Stand(gPlayers[0], 7);
         gPlayers[0]->position.x = 0x380;
         gPlayers[0]->position.y = 0x100;
@@ -326,7 +326,7 @@ void ControlPanel_BeginInteraction(void)
     }
 }
 
-s32 ControlPanel_AccumulateInput(struct ControlPanel *panel)
+s32 DarkGenerator_AccumulateInput(struct ControlPanel *panel)
 {
     s32 step;
     u32 multiplier;
@@ -339,7 +339,7 @@ s32 ControlPanel_AccumulateInput(struct ControlPanel *panel)
         step = *level - 2;
         step = ((*level - 3) * step) >> 1;
     }
-    multiplier = ControlPanel_GetInputMultiplier(panel);
+    multiplier = DarkGenerator_GetInputMultiplier(panel);
     if (panel->multiplier != multiplier) {
         u32 script = panel->multiplierScript;
         if (script) {
@@ -351,7 +351,7 @@ s32 ControlPanel_AccumulateInput(struct ControlPanel *panel)
             Script_Call(script, &args);
         }
         panel->multiplier = multiplier;
-        ControlPanel_ApplyMultiplierMode(panel);
+        DarkGenerator_ApplyMultiplierMode(panel);
     }
     {
         u32 sum;
@@ -369,36 +369,36 @@ s32 ControlPanel_AccumulateInput(struct ControlPanel *panel)
     return 0;
 }
 
-void ControlPanel_UpdateIdle(struct ControlPanel *panel)
+void DarkGenerator_UpdateIdle(struct ControlPanel *panel)
 {
 }
 
-void ControlPanel_BeginIdle(struct ControlPanel *panel, u32 flag)
+void DarkGenerator_BeginIdle(struct ControlPanel *panel, u32 flag)
 {
     gGameState->menuRewardBalance = 0;
-    ControlPanel_ClearPlayerInputHistory();
+    DarkGenerator_ClearPlayerInputHistory();
 
     panel->multiplier = 1;
     panel->sustainedInput = 0;
 
     Sound_SetChannel10Tempo(0x100);
     Camera_FollowPlayerWithoutCompletion(8);
-    ControlPanel_HideInteractionDisplay(panel);
+    DarkGenerator_HideInteractionDisplay(panel);
 
     gPlayers[0]->kind = 2;
     gPlayers[0]->tetherMode = 0;
     gPlayers[0]->tetherPhase = 0;
 
     if (flag == 0) {
-        StageIconDisplay_Create(1, 0, (void (*)(void *))ControlPanel_CallEndScript, panel);
+        StageIconDisplay_Create(1, 0, (void (*)(void *))DarkGenerator_CallEndScript, panel);
     } else {
-        StageIconDisplay_Create(1, 0, (void (*)(void *))ControlPanel_CallLimitScript, panel);
+        StageIconDisplay_Create(1, 0, (void (*)(void *))DarkGenerator_CallLimitScript, panel);
     }
 
-    ControlPanel_SetUpdate(panel, ControlPanel_UpdateIdle);
+    DarkGenerator_SetUpdate(panel, DarkGenerator_UpdateIdle);
 }
 
-void ControlPanel_UpdateInteraction(struct ControlPanel *panel)
+void DarkGenerator_UpdateInteraction(struct ControlPanel *panel)
 {
     struct Player *player = gPlayers[0];
     u8 *phase = &player->tetherPhase;
@@ -411,7 +411,7 @@ void ControlPanel_UpdateInteraction(struct ControlPanel *panel)
         struct Player *movingPlayer;
 
         panel->ticks++;
-        ControlPanel_UpdateGaugeIndicator(panel);
+        DarkGenerator_UpdateGaugeIndicator(panel);
         reachedEnd = 0;
         movingPlayer = gPlayers[0];
         movingPlayer->position.x -= movingPlayer->displaySegmentCount - 3;
@@ -437,23 +437,23 @@ void ControlPanel_UpdateInteraction(struct ControlPanel *panel)
             panel->multiplier = 1;
             panel->sustainedInput = 0;
             Sound_SetChannel10Tempo(0x100);
-            ControlPanel_ClearPlayerInputHistory();
+            DarkGenerator_ClearPlayerInputHistory();
         } else {
-            ControlPanel_UpdateSustainedInputTimer(panel);
-            cost = ControlPanel_AccumulateInput(panel);
+            DarkGenerator_UpdateSustainedInputTimer(panel);
+            cost = DarkGenerator_AccumulateInput(panel);
             total = panel->total += cost;
             if (gGameState->menuRewardBalance < cost) {
                 gGameState->menuRewardBalance = reachedEnd;
                 if (panel->cooldown == 0)
-                    ControlPanel_BeginIdle(panel, 0);
+                    DarkGenerator_BeginIdle(panel, 0);
             } else if (panel->ticks >= panel->tickLimit && total >= panel->totalLimit) {
-                ControlPanel_BeginIdle(panel, 1);
+                DarkGenerator_BeginIdle(panel, 1);
             } else {
                 Sound_SetChannel10Tempo(gPlayers[0]->displaySegmentCount * 96);
                 gGameState->menuRewardBalance -= cost;
             }
         }
-        ControlPanel_ShowRewardBalanceDigits(panel);
+        DarkGenerator_ShowRewardBalanceDigits(panel);
         if (panel->multiplier > 1)
             Camera_RequestShake(panel->multiplier * 4);
     } else if ((*(u32 *)phase & 0xFFFF00FF) == 0x10002) {
@@ -479,13 +479,13 @@ void ControlPanel_UpdateInteraction(struct ControlPanel *panel)
             panel->sustainedInput = zero;
         }
     }
-    ControlPanel_UpdatePlayerSegments(panel);
-    ControlPanel_TickMultiplierTimer(panel);
+    DarkGenerator_UpdatePlayerSegments(panel);
+    DarkGenerator_TickMultiplierTimer(panel);
     if (panel->cooldown)
         panel->cooldown--;
 }
 
-void ControlPanel_UpdateScreenBrightness(struct ControlPanel *unused)
+void DarkGenerator_UpdateScreenBrightness(struct ControlPanel *unused)
 {
     u16 *count = &gPlayers[0]->displaySegmentCount;
     if (*count <= 3) {
@@ -498,15 +498,15 @@ void ControlPanel_UpdateScreenBrightness(struct ControlPanel *unused)
     REG_BLDALPHA = 0;
 }
 
-u32 ControlPanel_OnTaskUpdate(struct ControlPanel *panel)
+u32 DarkGenerator_OnTaskUpdate(struct ControlPanel *panel)
 {
     Callback_InvokeActor(panel, panel->update);
-    ControlPanel_UpdateAmbientIndicator(panel);
-    ControlPanel_UpdateScreenBrightness(panel);
+    DarkGenerator_UpdateAmbientIndicator(panel);
+    DarkGenerator_UpdateScreenBrightness(panel);
     return 0;
 }
 
-s32 ControlPanel_Destroy(struct ControlPanel *panel)
+s32 DarkGenerator_Destroy(struct ControlPanel *panel)
 {
     s32 i;
     Sprite_Remove(&panel->display[0].sprite);
@@ -523,7 +523,7 @@ s32 ControlPanel_Destroy(struct ControlPanel *panel)
     return 0;
 }
 
-void ControlPanel_InitializeValueWidgets(struct ControlPanel *panel)
+void DarkGenerator_InitializeValueWidgets(struct ControlPanel *panel)
 {
     struct ContactPosition position;
     s32 i;
@@ -548,7 +548,7 @@ void ControlPanel_InitializeValueWidgets(struct ControlPanel *panel)
     }
 }
 
-void ControlPanel_InitializeMultiplierIcons(struct ControlPanel *panel)
+void DarkGenerator_InitializeMultiplierIcons(struct ControlPanel *panel)
 {
     struct SceneInputPackedPosition dimensions;
     struct ContactSwarmSprite *slot;
@@ -575,7 +575,7 @@ void ControlPanel_InitializeMultiplierIcons(struct ControlPanel *panel)
     }
 }
 
-void ControlPanel_InitializeSegments(struct ControlPanel *panel)
+void DarkGenerator_InitializeSegments(struct ControlPanel *panel)
 {
     struct SceneInputPackedPosition dimensions;
     int i;
@@ -605,7 +605,7 @@ void ControlPanel_InitializeSegments(struct ControlPanel *panel)
     }
 }
 
-s32 ControlPanel_InitializeFromScript(struct ControlPanel *panel)
+s32 DarkGenerator_InitializeFromScript(struct ControlPanel *panel)
 {
     void *anim;
     struct ContactSwarmSprite *sprite;
@@ -658,12 +658,12 @@ s32 ControlPanel_InitializeFromScript(struct ControlPanel *panel)
     lastSprite->frame = 0;
     panel->thirdSprite.position = panel->display[0].sprite.position;
     panel->thirdSprite.position.z += -0x300;
-    ControlPanel_InitializeValueWidgets(panel);
-    ControlPanel_ShowRewardBalanceDigits(panel);
-    ControlPanel_SetUpdate(panel, ControlPanel_UpdateIdle);
-    ControlPanel_InitializeSegments(panel);
-    ControlPanel_InitializeMultiplierIcons(panel);
-    ControlPanel_HideInteractionDisplay(panel);
+    DarkGenerator_InitializeValueWidgets(panel);
+    DarkGenerator_ShowRewardBalanceDigits(panel);
+    DarkGenerator_SetUpdate(panel, DarkGenerator_UpdateIdle);
+    DarkGenerator_InitializeSegments(panel);
+    DarkGenerator_InitializeMultiplierIcons(panel);
+    DarkGenerator_HideInteractionDisplay(panel);
     if (Script_SeekToKeyword('r'))
         panel->duration = Script_GetValue();
     else
@@ -707,16 +707,16 @@ s32 ControlPanel_InitializeFromScript(struct ControlPanel *panel)
     return 0;
 }
 
-struct ControlPanel *ControlPanel_CreateFromScript(void)
+struct ControlPanel *DarkGenerator_CreateFromScript(void)
 {
     struct ControlPanel *panel;
     if (gSegmentDisplay != 0)
         return (void *)gSegmentDisplay;
     panel = Task_Create(8, sizeof(*panel));
     if (panel != 0) {
-        Task_SetCallbacks(panel, (void (*)(void *))ControlPanel_OnTaskUpdate,
-                          (void (*)(void *))ControlPanel_Destroy);
-        if (ControlPanel_InitializeFromScript(panel) < 0) {
+        Task_SetCallbacks(panel, (void (*)(void *))DarkGenerator_OnTaskUpdate,
+                          (void (*)(void *))DarkGenerator_Destroy);
+        if (DarkGenerator_InitializeFromScript(panel) < 0) {
             Task_Kill(panel);
             return 0;
         }

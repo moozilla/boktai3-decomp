@@ -66,7 +66,7 @@ void SceneActorAnimation_UpdateChargeShotRelease(struct StateActor *p, int tick)
             random &= 15;
             direction += random;
         }
-        ContactSwarm_SpawnCharge(*(void **)((u8 *)actor + 0x9d4), &spawn, direction, 20, power, 30,
+        CountBats_SpawnCharge(*(void **)((u8 *)actor + 0x9d4), &spawn, direction, 20, power, 30,
                                  8);
         Sound_PlaySongChecked(234);
     }

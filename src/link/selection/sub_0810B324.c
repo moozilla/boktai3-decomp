@@ -1,6 +1,6 @@
 #include "global.h"
 #include "scene/areas/area_effect_link.h"
-#define SceneMenu_SetState Registry1745_SetState
+#define SceneMenu_SetState LinkSession_SetState
 struct SceneMenu {
     u8 pad0[0x30];
     u32 timer;
@@ -11,10 +11,10 @@ struct SceneMenu {
     u32 field260;
     u32 field264;
 };
-u8 Registry1745_ConsumeStateEntry(struct SceneMenu *);
-s32 Registry1745_CheckSessionReady(struct SceneMenu *);
-void Registry1745_BeginShutdown(struct SceneMenu *, void (*)(void));
-void Registry1745_SetState(struct SceneMenu *, u32, void (*)(void));
+u8 LinkSession_ConsumeStateEntry(struct SceneMenu *);
+s32 LinkSession_CheckSessionReady(struct SceneMenu *);
+void LinkSession_BeginShutdown(struct SceneMenu *, void (*)(void));
+void LinkSession_SetState(struct SceneMenu *, u32, void (*)(void));
 void ScriptPanel_OpenTextWindow(void);
 void SceneMenu_UpdateRecords(void);
 s32 TextWindow_Create(s32, s32, s32, s32);
@@ -23,7 +23,7 @@ s32 TextWindow_Refresh(s32, s32);
 void TextWindow_StartPlayback(s32);
 s32 SceneMenu_BeginTimedMessage(struct SceneMenu *p)
 {
-    if (Registry1745_ConsumeStateEntry(p)) {
+    if (LinkSession_ConsumeStateEntry(p)) {
         p->field260 = 0;
         p->field264 = 0;
         if (((u8 *)gLinkSession))
@@ -33,11 +33,11 @@ s32 SceneMenu_BeginTimedMessage(struct SceneMenu *p)
         TextWindow_Refresh(p->window, 8);
         TextWindow_StartPlayback(p->window);
     }
-    if (Registry1745_CheckSessionReady(p) < 0) {
-        Registry1745_BeginShutdown(p, ScriptPanel_OpenTextWindow);
+    if (LinkSession_CheckSessionReady(p) < 0) {
+        LinkSession_BeginShutdown(p, ScriptPanel_OpenTextWindow);
         return -1;
     }
     if (p->timer <= 59)
-        Registry1745_SetState(p, 0x16, SceneMenu_UpdateRecords);
+        LinkSession_SetState(p, 0x16, SceneMenu_UpdateRecords);
     return 0;
 }

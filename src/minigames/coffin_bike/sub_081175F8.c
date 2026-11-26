@@ -3,7 +3,7 @@
 #include "engine/ram.h"
 #include "engine/engine_globals.h"
 #include "scene/areas/area_effect_link.h"
-#include "minigames/coffin_bike/glove.h"
+#include "minigames/coffin_bike/coffin_bike.h"
 
 s32 Div(s32, s32);
 s32 Math_Atan2(s32, s32);
@@ -13,7 +13,7 @@ void ActorParticles_SpawnImpactBurst(struct GloveMotion *);
 void CharacterModel_UpdateAccessoryAnimations(void *);
 void ScenePool_ClampMotionSpeeds(struct GloveMotion *);
 
-void Glove_UpdateStopping(struct Glove *);
+void CoffinBike_UpdateStopping(struct Glove *);
 u8 LinkParticipant_IsLocallySelected(void *);
 void Character_UpdateLoopingSound(void *);
 static inline s32 *Motion_GetSpeed(struct GloveMotion *self)
@@ -91,7 +91,7 @@ void Glove_UpdateLaunchSlowdown(struct Glove *p)
             break;
 
         case 4:
-            Glove_ChangeUpdate(p, Glove_UpdateStopping);
+            Glove_ChangeUpdate(p, CoffinBike_UpdateStopping);
             p->timer = 0;
             break;
     }

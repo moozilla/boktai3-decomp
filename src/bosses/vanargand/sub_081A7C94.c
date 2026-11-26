@@ -16,9 +16,9 @@ struct ScenePanelPairState {
 extern const u8 gUnk_08611F74[];
 s32 __divsi3(s32, s32);
 s32 ScenePair_CountPositiveCounters(void *);
-void ScenePanel_SelectPairTransition(void *, const u8 table[][3]);
+void VanargandPair_SelectPairTransition(void *, const u8 table[][3]);
 
-s32 ScenePanel_UpdatePairConditions(struct ScenePanelPairState *p)
+s32 VanargandPair_UpdatePairConditions(struct ScenePanelPairState *p)
 {
     struct ScenePanelPairState *q = p;
     s32 d = __divsi3(p->gauge, 43);
@@ -47,6 +47,6 @@ s32 ScenePanel_UpdatePairConditions(struct ScenePanelPairState *p)
     if (p->variant == 0 && q->mode == 3)
         p->transition = 6;
     else
-        ScenePanel_SelectPairTransition(p, (const u8(*)[3])gUnk_08611F74);
+        VanargandPair_SelectPairTransition(p, (const u8(*)[3])gUnk_08611F74);
     return 1;
 }

@@ -1,25 +1,25 @@
 # Slot-seven presentation
 
-Tags: 081F1274 SingletonSlot7_UpdatePresentation
+Tags: 081F1274 VanargandHead_UpdatePresentation
 
-SingletonSlot7_UpdatePresentation matches all 2,208 bytes. The palette restore
+VanargandHead_UpdatePresentation matches all 2,208 bytes. The palette restore
 and four-bank snapshot share the destination pointer. The restore begins at
 background bank 4. The snapshot copies in the opposite direction.
 
-Tags: 081F0734 SingletonSlot7_DispatchPendingCommands
+Tags: 081F0734 VanargandHead_DispatchPendingCommands
 
 The dispatcher matches all 1,776 bytes. Five paths snapshot four palette
 banks, then record the source and destination rows for the transition.
 Command 16 retains both argument tests and repeats the dark transition.
 
-Tags: 081F1C2C SingletonSlot7_InitFromScript
+Tags: 081F1C2C VanargandHead_InitFromScript
 
-SingletonSlot7_InitFromScript matches all 1,032 bytes. Separate indices
+VanargandHead_InitFromScript matches all 1,032 bytes. Separate indices
 fill the white palette and snapshot the four background banks. The
 byte-valued hold flag survives the palette bank setup before both drawable
 modes are set.
 
-Tags: 081EEECC SingletonSlot7_UpdateShakingDeparture
+Tags: 081EEECC VanargandHead_UpdateShakingDeparture
 
 All 608 bytes match. The actor jitters two display coordinates for the
 first 60 frames, then emits a particle on odd frames. The spawn position

@@ -17,7 +17,7 @@ void ScaledShadow_Destroy(void *);
 void Collider_Remove(void *);
 void Anim_Remove(void *);
 void SceneActors_Destroy(void *);
-int Vampire_Destroy(u8 *p)
+int Count_Destroy(u8 *p)
 {
     ScaledShadow_Destroy(p + 0x2a0);
     Collider_Remove(p + 0x1cc);

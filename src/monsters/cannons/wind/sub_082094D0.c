@@ -1,4 +1,4 @@
 #include "global.h"
-void FanCannonManager_InitSlot(void)
+void WindCannonManager_InitSlot(void)
 {
 }

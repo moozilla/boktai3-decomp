@@ -21,15 +21,15 @@ handlers; their callees are found through `bl` calls and Thumb function pointers
 | 3 | `0815A838` | 52 | `ScriptActor_GetField534FromScript` | registry 0E15 |  |
 | 2 | `0810067C` | 700 | `FloorSwitch_Create` | registry AB8E |  |
 | 2 | `08103B94` | 136 | `NamedActor_SetMoveModeFromScript` | registry 7E33 |  |
-| 2 | `081803D8` | 176 | `BossSlot2_AdvanceStepFromScript` | registry 4EC9 |  |
+| 2 | `081803D8` | 176 | `Sabata_AdvanceStepFromScript` | registry 4EC9 |  |
 | 2 | `0820A5CC` | 1392 | `sub_0820A5CC` | registry 056E |  |
 | 1 | `0806F5C0` | 412 | `SceneEffectSchedule_AddFromScript` | registry FD6B |  |
 | 1 | `08072854` | 752 | `sub_08072854` | registry 1E97 |  |
 | 1 | `080FF87C` | 636 | `sub_080FF87C` | registry F04B |  |
 | 1 | `08106870` | 860 | `sub_08106870` | registry 377D |  |
 | 1 | `08107EBC` | 820 | `sub_08107EBC` | registry 2FA5 |  |
-| 1 | `0810B914` | 504 | `Registry1745_Create` | registry 1745 |  |
-| 1 | `0822BFC8` | 72 | `Registry3C8D_RunFromScript` | registry 3C8D |  |
+| 1 | `0810B914` | 504 | `LinkSession_Create` | registry 1745 |  |
+| 1 | `0822BFC8` | 72 | `SavedVariables_RunFromScript` | registry 3C8D |  |
 
 ## Unmatched functions called directly by several entry points
 

@@ -16,8 +16,8 @@ struct OrangeSpine {
 };
 void SpriteParticle_CreateDefaultVariant4384(void *, u32, u32, u32, u32, u32, u32, u32, u32, u32,
                                              u32, u32);
-void OrangeSpine_RecordDefeat(void *);
-u32 OrangeSpine_UpdateDefeatEffect(struct OrangeSpine *p)
+void PlasmaCannon_RecordDefeat(void *);
+u32 PlasmaCannon_UpdateDefeatEffect(struct OrangeSpine *p)
 {
     if (p->defeatDelay == 0) {
         if ((u32)(p->state - 13) <= 10) {
@@ -32,7 +32,7 @@ u32 OrangeSpine_UpdateDefeatEffect(struct OrangeSpine *p)
                                                     1, 2, 512);
         }
         if (p->state == 1)
-            OrangeSpine_RecordDefeat(p);
+            PlasmaCannon_RecordDefeat(p);
     }
     return 0;
 }

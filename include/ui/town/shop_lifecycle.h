@@ -14,10 +14,10 @@ struct SceneInventoryLifecycleView {
     u8 unknown1AF0[0x1CF8 - 0x1AF0];
     void (*action)(struct SceneInventoryLifecycleView *);
 };
-s32 SceneInventory_TickController(struct SceneInventoryLifecycleView *);
-s32 SceneInventory_DestroyController(struct SceneInventoryLifecycleView *);
-s32 SceneInventory_InitializeController(struct SceneInventoryLifecycleView *);
-#include "ui/town/scene_inventory_tail.h"
+s32 Shop_TickController(struct SceneInventoryLifecycleView *);
+s32 Shop_DestroyController(struct SceneInventoryLifecycleView *);
+s32 Shop_InitializeController(struct SceneInventoryLifecycleView *);
+#include "ui/town/shop_tail.h"
 struct SceneInventoryLifecycle {
     u8 unknown0[0x1AAC];
     u8 purchased, sold;

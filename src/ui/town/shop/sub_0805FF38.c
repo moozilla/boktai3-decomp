@@ -1,5 +1,5 @@
-#include "ui/town/scene_inventory_panel.h"
-void SceneInventory_PopulateItemGrid(struct SceneInventoryPanel *panel)
+#include "ui/town/shop_panel.h"
+void Shop_PopulateItemGrid(struct SceneInventoryPanel *panel)
 {
     s32 nextRow;
     struct SceneInventoryWidgetFlags *flagsBase;

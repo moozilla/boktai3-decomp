@@ -30,7 +30,7 @@ void TextWindow_SetBounds(u32, s32, s32, s32, s32);
 void TextWindow_SetScript(u32, u32);
 void TextWindow_Refresh(u32, u32);
 void TextWindow_StartPlayback(u32);
-void Registry1745_RequestHandshakeStart(void);
+void LinkSession_RequestHandshakeStart(void);
 void SaveMenu_UpdateSaveDelay(void);
 static inline void set(struct S *s, void *fp, u8 st)
 {
@@ -54,7 +54,7 @@ void LinkScorePanel_OnWaitSessionReady(struct S *s)
         TextWindow_SetScript(s->h, s->a);
         TextWindow_Refresh(s->h, 8);
         TextWindow_StartPlayback(s->h);
-        Registry1745_RequestHandshakeStart();
+        LinkSession_RequestHandshakeStart();
         s->c24 = 0;
     }
     g = gLinkSession;

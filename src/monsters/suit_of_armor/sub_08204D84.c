@@ -29,9 +29,9 @@ struct EnemyD459 {
 void Anim_RestartSequence(void *, void *, u32, u32, u32);
 void Anim_SetDurationScale(void *, u32);
 s32 Mod(s32, s32);
-u32 SceneSequence_UpdateCountdown(struct EnemyD459 *);
+u32 SuitOfArmor_UpdateCountdown(struct EnemyD459 *);
 
-u32 EnemyD459_UpdateAttackTiming(struct EnemyD459 *enemy)
+u32 SuitOfArmor_UpdateAttackTiming(struct EnemyD459 *enemy)
 {
     if (enemy->useAttackSchedule) {
         s16 *index = &enemy->attackIndex;
@@ -43,7 +43,7 @@ u32 EnemyD459_UpdateAttackTiming(struct EnemyD459 *enemy)
             u32 facing = enemy->facing;
             Anim_RestartSequence(anim, resource, 3, facing, 0);
             Anim_SetDurationScale(anim, 64);
-            enemy->callback = SceneSequence_UpdateCountdown;
+            enemy->callback = SuitOfArmor_UpdateCountdown;
             enemy->attackDuration = 80;
             enemy->timer = 0;
             (*index)++;
@@ -55,7 +55,7 @@ u32 EnemyD459_UpdateAttackTiming(struct EnemyD459 *enemy)
         if (!value) {
             Anim_RestartSequence(enemy->animation, enemy->animationResource, 3, enemy->facing,
                                  value);
-            enemy->callback = SceneSequence_UpdateCountdown;
+            enemy->callback = SuitOfArmor_UpdateCountdown;
         }
     }
     return 0;

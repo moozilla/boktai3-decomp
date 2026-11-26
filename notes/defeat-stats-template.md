@@ -19,7 +19,7 @@ Tags: #matching (cloud task 08132748, 2026-10-19)
 * Finally `RecordPair` unless a mask is set, then `colliderA.flags |= 4`.
 * The case bodies are identical, so agbcc cross-jumps them. Write each case out in full and order the cases by ROM address, not by value.
 
-## Counters (both from the matched `CannonTurret_HandleDefeat`)
+## Counters (both from the matched `GarmrStatue_HandleDefeat`)
 * `STAT_INC(n)`: `H = H < 9999 ? H + 1 : 9999` gives `ldrh; ldrsh; cmp 0x270E; bgt`.
 * `STAT_ADD(n)`: `H = clamp(H + 1)` gives `ldrsh; adds 1; cmp 0x270F; ble/bge 0`.
 

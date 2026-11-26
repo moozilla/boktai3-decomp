@@ -3,7 +3,7 @@
 #include "scene/actor/scene_actor_style.h"
 #include "engine/engine.h"
 #include "engine/ram.h"
-#include "minigames/coffin_bike/glove.h"
+#include "minigames/coffin_bike/coffin_bike.h"
 
 struct LinkStylePayload {
     struct SceneActorStyle style;
@@ -45,7 +45,7 @@ static inline struct AreaEffectLinkState *ReadGloveStyleSession(struct Glove *gl
         return NULL;
     return session;
 }
-void Glove_InitializeStyleModifiers(struct Glove *p)
+void CoffinBike_InitializeStyleModifiers(struct Glove *p)
 {
     struct GloveMotion *self = &p->motion;
     u32 mask = 0x800;

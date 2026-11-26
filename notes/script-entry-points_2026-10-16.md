@@ -77,14 +77,14 @@ Matched (27 functions, 3,448 bytes, +0.143 percentage points):
 | 0815CCF8 | `ScriptActor_TurnFromScript` | 9763 | optional `-p` point, `-d`, `-f`, `-e` for sub_0815B15C |
 | 08225CB8 | `Terrain_LoadFromScript` | 30AD | `-p` HP resource or `-h`/`-t`/`-r`/`-z`; `-v` map callback set |
 | 08179298 | `Hud_Create` | CC28 | picks one of three HUD creators |
-| 081F2034 | `SingletonSlot7_Create` | 5856 | slot 7 of the singleton table at 0x020000B8 |
-| 0820A460 / 0820A4D0 | `Slot600_ActivateFromScript` / `Slot600_DeactivateFromScript` | 2863 / 81C7 | slot `-n` of the eight-slot manager at 0x02000600 |
+| 081F2034 | `VanargandHead_Create` | 5856 | slot 7 of the singleton table at 0x020000B8 |
+| 0820A460 / 0820A4D0 | `WindCannonSlot_ActivateFromScript` / `WindCannonSlot_DeactivateFromScript` | 2863 / 81C7 | slot `-n` of the eight-slot manager at 0x02000600 |
 | 0822E304 | `GameState_AddListEntryFromScript` | 297E | `-a` into the first free table160 entry |
 | 081A3270 | `Hresvelgr_Create` | C077 | |
 | 081BA5D0 | `Registry2388_Create` | 2388 | |
 | 0822E340, 0822E564, 0822E924, 0822DE64, 0822ECC8 | `GameState_Reset*FromScript`, `SolarFruit_Command` | 01AB, 1887, 1606, 65E2, FE88 | reset a game-state list, then refill it from `-n` count and two value options |
 | 0822DB54 | `RecordEntry_AddFromScript` | 3757 | copies a 32-byte record of 08E6092C |
-| 081DC618, 081DE520, 081EB724 | `ScreenParams_SetFromScript`, `ScreenParams328_SetFromScript`, `Params3D0_SetFromScript` | 317B, FE3F, 3578 | parameter blocks for three screens |
+| 081DC618, 081DE520, 081EB724 | `ScreenParams_SetFromScript`, `NameEntryParams_SetFromScript`, `CutsceneDisplay_SetFromScript` | 317B, FE3F, 3578 | parameter blocks for three screens |
 | 0811D358, 0811D1C0 | `GameState_ClearSlots7A8FromScript`, `GameState_SetNameFromScript` | 7245, 98D8 | |
 | 08178564 | `Hud_CloseMessageFromScript` | C8D1 | HUD mode 7 |
 | 0815A5E8 | `ScriptActor_SetLevelFromScript` | 5335 | |
@@ -94,7 +94,7 @@ Matched (27 functions, 3,448 bytes, +0.143 percentage points):
 Guarded drafts (not counted): 081D0C04 `SceneNpc_CreateFromScript` (66.8%),
 081AF4F4 `Vanargand_ResetFromScript` (97.3%, two zero constants in the other order),
 0815A838 (92.0%) and 0815A680 (51%), which both keep a second copy of the actor pointer
-that no tested source form reproduces, and 08119EF0 `Glove_StartFromScript` (58.5%).
+that no tested source form reproduces, and 08119EF0 `CoffinBike_StartFromScript` (58.5%).
 
 ### trap (08225624)
 
@@ -129,7 +129,7 @@ Matched (6 functions, 756 bytes, +0.031 percentage points): 081AF4F4
 (4CDD), and three more parameter blocks: 081DBF98, 081DCD90, 081DBA54
 (`ScreenParams2E8/310/2C0_SetFromScript`).
 
-New guarded drafts: 081803D8 `BossSlot2_AdvanceStepFromScript` (74.7%) and
+New guarded drafts: 081803D8 `Sabata_AdvanceStepFromScript` (74.7%) and
 08103B94 `NamedActor_SetMoveModeFromScript` (47.7%).
 
 081D0C04 `SceneNpc_CreateFromScript` is at 92% in wip (not yet committed):
@@ -173,7 +173,7 @@ Matched (3 functions, 1,108 bytes, +0.046 percentage points):
   last created) and puts it in the scripted state; -p, -d angle, -w face the
   player (Math_Atan2), -s. Its `setAngle` inline is the facing code of
   081D0C04, and needed the same register-pinning concession.
-* 0811B848 `RegistryE7BC_CreateFromScript` (E7BC): three required points
+* 0811B848 `ScriptObjectPool_CreateFromScript` (E7BC): three required points
   -p/-s/-o for sub_0811B278.
 * 08018664 `PaletteBlend_AddFromScript` (3A89): adds one of 16 blend entries
   to the palette blend task (0x02000094). The early returns had to be separate
@@ -206,7 +206,7 @@ Matched 19 small entry points (1,880 bytes, +0.078 percentage points):
 0810BE58 (registries C5BD/1022 on the object at 0x020004B4), 0815CF6C
 (`ScriptActor_StartActionFromScript`), 0816B834 (`GameState_ClearAreaFlagsFromScript`),
 08178008, 08178588 (`Hud_RefreshSpriteFromScript`, `Hud_ShowPanelFromScript`),
-081BA57C, 081D51B0, 081F213C, 0820A540 (`Slot600_ResetFromScript`), 081D105C
+081BA57C, 081D51B0, 081F213C, 0820A540 (`WindCannonSlot_ResetFromScript`), 081D105C
 (`SceneNpc_StopFromScript`), 08227888 (`PlayerName_SetFromScript`, default name
 bytes 80 A2 80 98 80 91 80 9F), 0822E9C8 (`GameState_HasUnlockFromScript`) and
 five more screen parameter blocks (081D7510, 081E1A2C, 081E03F4, 081EC0A8).
@@ -251,9 +251,9 @@ idioms of 081D0C04, with these new ones:
 * The facing math keeps the 081D0C04 pins, plus `angle` pinned to r9.
 
 Guarded drafts (no exact gain): FloorSwitch_Create (0810067C), 0810858C
-`AnimatedTile_CreateFromScript`, 08121268 `RegistryA8CB_CreateFromScript`,
-0822BFC8 `Registry3C8D_RunFromScript`, 0806F5C0
-`SceneEffectSchedule_AddFromScript`, 081C4080 `RegistryF3E4_Create`, 08111A48
+`AnimatedTile_CreateFromScript`, 08121268 `SabataRider_CreateFromScript`,
+0822BFC8 `SavedVariables_RunFromScript`, 0806F5C0
+`SceneEffectSchedule_AddFromScript`, 081C4080 `PopInSprite_Create`, 08111A48
 `PaletteFade_StartFromScript` and 08103110 `NamedObject_CreateFromScript`
 (registry A4FC, 66%; it inlines the packed-command sprite stepper of
 `include/scene/actor/actor_attachment_sprite_playback.h`). FloorSwitch_Create stays near
@@ -293,10 +293,10 @@ Idioms:
 * `x = v = f();` before the zero temporaries are set orders the stores
   (081975C8).
 
-Guarded drafts: Registry1745_Create (0810B914, a singleton task creator),
-Pool1B8_FindByName (081081F0, 4 bytes off), Route_Start (0821E5C4),
+Guarded drafts: LinkSession_Create (0810B914, a singleton task creator),
+TileTriggerPool_FindByName (081081F0, 4 bytes off), Route_Start (0821E5C4),
 Anim_SetSequence (08220C8C, one register) and Math_Atan2 (082215E4); the
-Glove_StartFromScript draft went from 58.5% to 82.9%. The remaining
+CoffinBike_StartFromScript draft went from 58.5% to 82.9%. The remaining
 unmatched entry points are mostly large and inline the packed-command
 sprite stepper.
 
@@ -313,7 +313,7 @@ calls; the original loads it from the pool each time.
 All matched copies of the packed-command sprite stepper (the
 `*_playback.h` headers, sub_08045F48 and others) rely on register pins. Most of
 the remaining script entry points inline it, so a natural form would help.
-Tested in ContactSequenceActor_UpdateAppearing (08045F48), this plain inline
+Tested in NidhoggrDuelMinion_UpdateAppearing (08045F48), this plain inline
 gets within 29 bytes:
 
 ```c
@@ -361,11 +361,11 @@ Four earlier drafts now match (1,016 bytes):
   header's barrier form: `first = bit; asm("" : "+r"(first)); first &= flags;`
   for the first test and the r1-pinned `(u8)` form for the second. `const vu16 *`
   commands keep the halfword weight read. The rest of the stepper is plain C.
-* 08121268 `RegistryA8CB_CreateFromScript` and 08119EF0
-  `Glove_StartFromScript`: in the active/update/timer block, write
+* 08121268 `SabataRider_CreateFromScript` and 08119EF0
+  `CoffinBike_StartFromScript`: in the active/update/timer block, write
   `{ update = fn; u8 *active = &e->active; u32 zero = 0; u16 one = 1; ... }`.
   `one` must be u16 for the later `draw->flags = one | draw->flags` to copy it.
-* 081C4080 `RegistryF3E4_Create`: the state stores past +8 go through a
+* 081C4080 `PopInSprite_Create`: the state stores past +8 go through a
   sub-struct pointer (`struct StateInner *in = &p->state.inner`); the
   original addresses them from that base.
 
@@ -380,13 +380,13 @@ Matched 20 small functions (1,240 bytes), working smallest first through the
 unmatched entry points and their direct callees, including those that no
 script uses yet:
 
-* Entry points: Pool1B8_IsReadyFromScript, GameState_HasEquipmentFromScript,
+* Entry points: TileTriggerPool_IsReadyFromScript, GameState_HasEquipmentFromScript,
   Hud_SetField13F1FromScript, ScriptActor_RequestFromScript,
   ScriptActor_FaceFromScript, SceneNpc_SetSpecialModeFromScript,
   NamedObject_SetPaletteFromScript, ScriptMessage_SetFromScript,
   GameState_ClearAreaFlagFromScript, Inventory_ContainsFromScript,
-  Inventory_SetEntryFromScript and Task4E01_GetOrCreate.
-* Callees: Pool1B8_FindByName (draft promoted), SceneActorContacts_SetOwner,
+  Inventory_SetEntryFromScript and ProjectileTask_GetOrCreate.
+* Callees: TileTriggerPool_FindByName (draft promoted), SceneActorContacts_SetOwner,
   Hud_SaveMode, Hud_RestoreMode, GameState_SetPairFlag,
   GameState_GetUnlockEntry, GameState_ApplySelectedItem and SolarBank_Init.
 
@@ -411,10 +411,10 @@ value comes out sign-extended.
 ## Batch 13
 
 Matched 20 more small and medium functions (88-120 bytes) from the
-smallest-first list. Some are named (Glove_StopFromScript,
+smallest-first list. Some are named (CoffinBike_StopFromScript,
 NamedObject_ReleaseFromScript, Player_SetSlotValueFromScript,
 ScriptActor_SetLifeEnergyFromScript, ScriptPrompt_SetFromScript,
-RegistryA8CB_ResetFromScript, GameState_SetEventFlag, Pool1B8_Allocate,
+SabataRider_ResetFromScript, GameState_SetEventFlag, TileTriggerPool_Allocate,
 Camera_SetBounds, Camera_SetCenteredBounds, Bg_SetLayerMap and
 Terrain_LoadHP). The rest keep `sub_` names where the C doesn't show their
 purpose.

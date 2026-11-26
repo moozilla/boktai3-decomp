@@ -1,23 +1,23 @@
-#include "ui/town/scene_inventory_tail.h"
-#include "ui/town/scene_inventory_panel.h"
-#include "ui/town/scene_inventory_catalog.h"
+#include "ui/town/shop_tail.h"
+#include "ui/town/shop_panel.h"
+#include "ui/town/shop_catalog.h"
 #include "ui/pause/scene_hud_display.h"
 void SceneInput_PositionCursor(struct SceneInputGridView *, struct SceneInputWidget *);
 void SceneHud_HideFourDigits(struct SceneInputPanel *);
 void SceneInputPanel_TickHighlight(struct SceneInputHighlight *);
 void SceneInputPanel_SetMeterGlyph(struct SceneInputPanel *, u32, u32);
-void SceneInventory_PopulateEquipmentGrid(struct SceneInventoryPanel *);
-void SceneInventory_PopulateItemGrid(struct SceneInventoryPanel *);
-void SceneInventory_PopulateConsumableGrid(struct SceneInventoryPanel *);
+void Shop_PopulateEquipmentGrid(struct SceneInventoryPanel *);
+void Shop_PopulateItemGrid(struct SceneInventoryPanel *);
+void Shop_PopulateConsumableGrid(struct SceneInventoryPanel *);
 struct SceneInventoryActionView;
-void SceneInventory_RefreshEquipmentValue(struct SceneInventoryActionView *);
-void SceneInventory_RefreshItemValue(struct SceneInventoryActionView *);
-void SceneInventory_RefreshConsumableValue(struct SceneInventoryActionView *);
+void Shop_RefreshEquipmentValue(struct SceneInventoryActionView *);
+void Shop_RefreshItemValue(struct SceneInventoryActionView *);
+void Shop_RefreshConsumableValue(struct SceneInventoryActionView *);
 void sub_0805F904(struct SceneInventoryTail *);
-void SceneInventory_ShowItemDescription(struct SceneInventoryPanel *);
-void SceneInventory_ShowConsumableDescription(struct SceneInventoryPanel *);
-void SceneInventory_ClearDescription(struct SceneInventoryTail *);
-void SceneInventory_UpdateDisplay(struct SceneInventoryTail *p)
+void Shop_ShowItemDescription(struct SceneInventoryPanel *);
+void Shop_ShowConsumableDescription(struct SceneInventoryPanel *);
+void Shop_ClearDescription(struct SceneInventoryTail *);
+void Shop_UpdateDisplay(struct SceneInventoryTail *p)
 {
     u32 bits = p->interactionFlags & 3;
     if (bits == 1) {
@@ -48,13 +48,13 @@ void SceneInventory_UpdateDisplay(struct SceneInventoryTail *p)
     if (p->interactionFlags & 0x40) {
         switch (p->category) {
             case 0:
-                SceneInventory_PopulateEquipmentGrid((struct SceneInventoryPanel *)p);
+                Shop_PopulateEquipmentGrid((struct SceneInventoryPanel *)p);
                 break;
             case 1:
-                SceneInventory_PopulateItemGrid((struct SceneInventoryPanel *)p);
+                Shop_PopulateItemGrid((struct SceneInventoryPanel *)p);
                 break;
             case 2:
-                SceneInventory_PopulateConsumableGrid((struct SceneInventoryPanel *)p);
+                Shop_PopulateConsumableGrid((struct SceneInventoryPanel *)p);
                 break;
         }
     }
@@ -62,27 +62,27 @@ void SceneInventory_UpdateDisplay(struct SceneInventoryTail *p)
         switch (p->category) {
             case 0:
                 if (p->interactionFlags & 0x10)
-                    SceneInventory_RefreshEquipmentValue((struct SceneInventoryActionView *)p);
+                    Shop_RefreshEquipmentValue((struct SceneInventoryActionView *)p);
                 if (p->interactionFlags & 0x20)
                     sub_0805F904(p);
                 else
-                    SceneInventory_ClearDescription(p);
+                    Shop_ClearDescription(p);
                 break;
             case 1:
                 if (p->interactionFlags & 0x10)
-                    SceneInventory_RefreshItemValue((struct SceneInventoryActionView *)p);
+                    Shop_RefreshItemValue((struct SceneInventoryActionView *)p);
                 if (p->interactionFlags & 0x20)
-                    SceneInventory_ShowItemDescription((struct SceneInventoryPanel *)p);
+                    Shop_ShowItemDescription((struct SceneInventoryPanel *)p);
                 else
-                    SceneInventory_ClearDescription(p);
+                    Shop_ClearDescription(p);
                 break;
             case 2:
                 if (p->interactionFlags & 0x10)
-                    SceneInventory_RefreshConsumableValue((struct SceneInventoryActionView *)p);
+                    Shop_RefreshConsumableValue((struct SceneInventoryActionView *)p);
                 if (p->interactionFlags & 0x20)
-                    SceneInventory_ShowConsumableDescription((struct SceneInventoryPanel *)p);
+                    Shop_ShowConsumableDescription((struct SceneInventoryPanel *)p);
                 else
-                    SceneInventory_ClearDescription(p);
+                    Shop_ClearDescription(p);
                 break;
         }
     }

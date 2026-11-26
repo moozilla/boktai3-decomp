@@ -35,7 +35,7 @@ void sub_08010C10(struct GroupObjects *m, struct GroupPiece *p, int index)
     }
     p->position.x = p->anchor.x + p->offset.x;
     p->position.z = p->anchor.z + p->offset.z;
-    BoardPiece_SetFacingAnim(m, p, 0);
+    BatFlockBat_SetFacingAnim(m, p, 0);
     p->timer++;
 }
 

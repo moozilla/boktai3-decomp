@@ -10,9 +10,9 @@ struct TimedEffectCollision {
 };
 
 void Projectile_SetUpdateCallback(void *, void *);
-void Task4E01_SpawnImpactChildren(void);
+void ProjectileTask_SpawnImpactChildren(void);
 void Boss_FinalExplosions(void);
-void Task4E01_StartTerminalAnimation(void *);
+void ProjectileTask_StartTerminalAnimation(void *);
 
 void TimedEffect_OnContact(struct TimedEffectCollision *self,
                                  struct TimedEffectCollision *other, struct TimedEffect *entry)
@@ -23,7 +23,7 @@ void TimedEffect_OnContact(struct TimedEffectCollision *self,
 
     if (config->type == 3) {
         (*(&entry))->config.flags |= 0x80;
-        Projectile_SetUpdateCallback(config, Task4E01_SpawnImpactChildren);
+        Projectile_SetUpdateCallback(config, ProjectileTask_SpawnImpactChildren);
     } else if (config->type != 8) {
         if (config->type == 9) {
             Projectile_SetUpdateCallback(config, Boss_FinalExplosions);
@@ -33,7 +33,7 @@ void TimedEffect_OnContact(struct TimedEffectCollision *self,
                 o = other;
                 if (!(o->flags & 0x20)) {
                     e->config.flags |= 0x80;
-                    Task4E01_StartTerminalAnimation(e);
+                    ProjectileTask_StartTerminalAnimation(e);
                 }
             }
         }
@@ -91,7 +91,7 @@ void TimedEffect_InitEntry(void *manager, struct TimedEffectInitView *entry, s32
 }
 
 /* sub_081DA178.c */
-void Task4E01_ClearTrailSprites(void *);
+void ProjectileTask_ClearTrailSprites(void *);
 void Sprite_Remove(void *);
 void TimedEffect_RemoveFromManager(struct TimedEffectManager *manager, struct TimedEffect *effect,
                                    s32 slot)
@@ -102,7 +102,7 @@ void TimedEffect_RemoveFromManager(struct TimedEffectManager *manager, struct Ti
     if (!(config->flags & 0x2010))
         manager->categoryCounts[config->category]--;
     manager->totalCounts[config->category]--;
-    Task4E01_ClearTrailSprites(manager);
+    ProjectileTask_ClearTrailSprites(manager);
     sprite = &effect->sprite;
     flags = sprite->flags;
     sprite->flags = flags | 1;
@@ -132,9 +132,9 @@ static inline s32 CellIndex(u16 *a)
 }
 
 void Projectile_SetUpdateCallback(void *, void *);
-void Task4E01_SpawnImpactChildren(void);
+void ProjectileTask_SpawnImpactChildren(void);
 void Sound_PlaySong(u32);
-s32 Task4E01_SelectTerrainTurn(u16 *a, u16 *b, s32 original);
+s32 ProjectileTask_SelectTerrainTurn(u16 *a, u16 *b, s32 original);
 
 static inline s32 trunc12(s32 x)
 {
@@ -158,7 +158,7 @@ s32 TimedEffect_UpdateTerrainTurn(void *ctx, struct TimedEffectTerrainView *e, s
     if ((u32)((*attr & 15) << 8) > (u32)(s16)((u16 *)&sp->position)[1]) {
         type = config->type;
         if (type == 5 && e->frame != 0) {
-            e->turn = Task4E01_SelectTerrainTurn((u16 *)&sp->position, e->previous, e->turn);
+            e->turn = ProjectileTask_SelectTerrainTurn((u16 *)&sp->position, e->previous, e->turn);
             {
                 s32 n = e->turn;
                 config->direction = (n << 5) - 0x60;
@@ -170,7 +170,7 @@ s32 TimedEffect_UpdateTerrainTurn(void *ctx, struct TimedEffectTerrainView *e, s
             s16 a = (((u16)config->direction + 0x70) >> 5) & 7;
             u16 ub = a;
             s16 b = ub;
-            s32 t = Task4E01_SelectTerrainTurn((u16 *)&sp->position, e->previous, e->turn);
+            s32 t = ProjectileTask_SelectTerrainTurn((u16 *)&sp->position, e->previous, e->turn);
             e->turn = t;
             if (!(t & 1)) {
                 if ((s16)t == 0 && a == 6) {
@@ -186,7 +186,7 @@ s32 TimedEffect_UpdateTerrainTurn(void *ctx, struct TimedEffectTerrainView *e, s
                 config->direction = (n << 5) - 0x60;
             }
             config->flags |= 0x20;
-            Projectile_SetUpdateCallback(config, Task4E01_SpawnImpactChildren);
+            Projectile_SetUpdateCallback(config, ProjectileTask_SpawnImpactChildren);
             Sound_PlaySong(0x161);
             return 0;
         } else if (type == 9) {
@@ -204,7 +204,7 @@ s32 TimedEffect_UpdateTerrainTurn(void *ctx, struct TimedEffectTerrainView *e, s
 extern const s16 gUnk_086149C4[];
 void TimedEffect_RemoveFromManager(struct TimedEffectManager *, struct TimedEffect *, s32);
 s32 TimedEffect_UpdateTerrainTurn(void *, struct TimedEffectTerrainView *, s32);
-void Task4E01_BeginImpactAnimation(struct TimedEffect *);
+void ProjectileTask_BeginImpactAnimation(struct TimedEffect *);
 
 static inline s32 Scale(s32 value)
 {
@@ -274,7 +274,7 @@ s32 TimedEffect_UpdateManager(struct TimedEffectManager *manager)
                         if (status <= 0) {
                             if (status == -1) {
                                 config->flags |= 0x20;
-                                Task4E01_BeginImpactAnimation(entry);
+                                ProjectileTask_BeginImpactAnimation(entry);
                             } else if (config->type != 9) {
                                 sprite->position.x -= savedVelocity->x;
                                 rollbackPosition->y -= savedVelocity->y;
@@ -379,7 +379,7 @@ s32 TimedEffect_InitManager(struct TimedEffectManager *manager, s32 count)
 void *ResourceRegistry_GetResource(u32);
 /* The task tagged 0x4E01 (ResourceRegistry_GetResource), or a new one (0x10C bytes) set up
    by TimedEffect_InitManager; NULL when that fails (tentative). */
-u8 *Task4E01_GetOrCreate(void)
+u8 *ProjectileTask_GetOrCreate(void)
 {
     u8 *p = ResourceRegistry_GetResource(0x4E01);
     if (p)

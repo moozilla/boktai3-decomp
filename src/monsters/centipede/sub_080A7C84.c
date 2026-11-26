@@ -53,14 +53,14 @@ struct SavedMotion {
     struct ContactPosition position;
 };
 
-void TentacleActor_ResetOscillation(void *);
+void Centipede_ResetOscillation(void *);
 s32 Callback_InvokeActor(void *, void *);
 void Anim_SetDurationScale(void *, u32);
 void Anim_SetFrameDurationScale(void *, u32);
-void TentacleActor_SelectWanderRoute(void *);
-void TentacleActor_AdvanceMotionPhase(void *, s32);
+void Centipede_SelectWanderRoute(void *);
+void Centipede_AdvanceMotionPhase(void *, s32);
 void sub_080A9DB0(void *, s32, s32);
-void TentacleActor_UpdateOscillation(void *, s32, s32);
+void Centipede_UpdateOscillation(void *, s32, s32);
 static inline u8 Approach(struct ChaseActor *actor, struct SavedMotion *saved, s32 speed)
 {
     u8 *motion = (u8 *)actor + 0x50;
@@ -84,7 +84,7 @@ static inline void Scale(struct ChaseActor *actor)
         Anim_SetFrameDurationScale((u8 *)actor->base.drawable + 0x20, *scale);
 }
 // confidence=low: pursues saved waypoints with an 800-frame transition.
-void TentacleBody_UpdatePursuit(struct ChaseActor *actor)
+void CentipedeBody_UpdatePursuit(struct ChaseActor *actor)
 {
     u8 *body = actor->base.context;
     s32 speed;
@@ -93,13 +93,13 @@ void TentacleBody_UpdatePursuit(struct ChaseActor *actor)
     typeof(o) t1;
     if (Take(&actor->base.field2B1)) {
         SceneActorChase_SetControl(actor, actor->base.onAlternateEntry, 1);
-        TentacleActor_ResetOscillation(actor);
+        Centipede_ResetOscillation(actor);
         {
             u32 direction = (((*(((u8 *)actor) + 0xE9)) + 32) & 255) >> 6;
             body[0x8E9] = direction;
         }
         body[0x8E8] = 0;
-        TentacleActor_SelectWanderRoute(actor);
+        Centipede_SelectWanderRoute(actor);
     }
     o = (t1 = 0x270);
     if ((u8)Callback_InvokeActor(actor, *((void **)(((u8 *)actor) + o)))) {
@@ -111,11 +111,11 @@ void TentacleBody_UpdatePursuit(struct ChaseActor *actor)
     speed = Callback_InvokeActor(actor, *((void **)(((u8 *)actor) + 0x260)));
     Scale(actor);
     if (Approach(actor, (void *)(body + 0x8F8), speed)) {
-        TentacleActor_SelectWanderRoute(actor);
+        Centipede_SelectWanderRoute(actor);
         Chase_Delta(&delta, &actor->base.body.position, (void *)(body + 0x904));
         *(((u8 *)actor) + 0x3CD) = Math_Atan2(delta.x, delta.z);
     }
-    TentacleActor_AdvanceMotionPhase(actor, speed);
+    Centipede_AdvanceMotionPhase(actor, speed);
     {
         u16 *p = (void *)(body + 0x8E4);
         if (*p) {
@@ -124,9 +124,9 @@ void TentacleBody_UpdatePursuit(struct ChaseActor *actor)
         } else
             sub_080A9DB0(actor, 20, 0x6400);
     }
-    TentacleActor_UpdateOscillation(actor, 120, 10);
+    Centipede_UpdateOscillation(actor, 120, 10);
     if (((s32)actor->base.counter2AC) > 800) {
-        TentacleActor_SelectWanderRoute(actor);
+        Centipede_SelectWanderRoute(actor);
         State2(actor);
     } else
         actor->base.counter2AC++;

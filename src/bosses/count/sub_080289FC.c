@@ -100,7 +100,7 @@ static inline u8 Frame_ReadBlendAmount(struct FrameBlendState *blend)
     return blend->amount;
 }
 
-void Vampire_UpdatePresentation(void *arg0)
+void Count_UpdatePresentation(void *arg0)
 {
     struct FrameBase *base = arg0;
     struct VampireFrame *p = arg0;

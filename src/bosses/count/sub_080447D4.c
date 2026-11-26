@@ -1,6 +1,6 @@
 #include "scene/collision/contact_swarm.h"
-u32 ContactSwarm_InitializeSlot(struct ContactSwarm *, struct ContactSwarmSlot *, s32);
-s32 ContactSwarm_Initialize(struct ContactSwarm *pool)
+u32 CountBats_InitializeSlot(struct ContactSwarm *, struct ContactSwarmSlot *, s32);
+s32 CountBats_Initialize(struct ContactSwarm *pool)
 {
     struct ContactSwarmSlot *slot;
     s32 index;
@@ -9,7 +9,7 @@ s32 ContactSwarm_Initialize(struct ContactSwarm *pool)
     slot = &pool->slots[0];
     index = 0;
     do {
-        ContactSwarm_InitializeSlot(pool, slot, index);
+        CountBats_InitializeSlot(pool, slot, index);
         index++;
         slot++;
     } while (index <= 15);

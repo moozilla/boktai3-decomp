@@ -209,7 +209,7 @@ static inline u8 TileTrigger_TestSlot(u32 *m, s32 i)
 /* Takes the first free one of the pool's twelve slots: a cleared 0xC8-byte
    block recorded at +0x38 with its index at +0xBC; NULL when full. */
 
-struct TileTrigger *Pool1B8_Allocate(struct TileTriggerManager *pool)
+struct TileTrigger *TileTriggerPool_Allocate(struct TileTriggerManager *pool)
 {
     s32 i;
     for (i = 0; i < 12; i++) {
@@ -261,9 +261,9 @@ u8 TileTrigger_IsTetherNearby(struct TileTrigger *trigger)
     return 1;
 }
 
-/* Pool1B8_UpdateIdleState: Empty entry near the object state handlers; provisionally an idle state hook */
+/* TileTriggerPool_UpdateIdleState: Empty entry near the object state handlers; provisionally an idle state hook */
 
-void Pool1B8_UpdateIdleState(void)
+void TileTriggerPool_UpdateIdleState(void)
 {
 }
 
@@ -489,7 +489,7 @@ void TileTrigger_StepRelease(struct TileTrigger *trigger)
     trigger->timer++;
 }
 
-void Pool1B8_RunPendingScripts(struct TileTrigger *trigger)
+void TileTriggerPool_RunPendingScripts(struct TileTrigger *trigger)
 {
     ScriptTriggerActor_DispatchPendingScripts(trigger);
 }
@@ -506,7 +506,7 @@ void TileTrigger_RestartHold(struct TileTriggerManager *manager, struct TileTrig
     trigger->triggerFlags = (trigger->triggerFlags & ~0x20) | 2;
 }
 
-void Pool1B8_EnterStateThree(struct TileTriggerManager *unused, struct TileTrigger *trigger)
+void TileTriggerPool_EnterStateThree(struct TileTriggerManager *unused, struct TileTrigger *trigger)
 {
     trigger->sprite.flags |= 1;
     trigger->state = 3;
@@ -531,11 +531,11 @@ void TileTrigger_CreateFromScript(void)
     const vu16 *frame;
     struct ContactSwarmSprite *sprite;
     if (!manager) {
-        manager = Pool1B8_Create();
+        manager = TileTriggerPool_Create();
         if (!manager)
             return;
     }
-    trigger = Pool1B8_Allocate(manager);
+    trigger = TileTriggerPool_Allocate(manager);
     if (!trigger)
         return;
     trigger->state = 1;
@@ -628,7 +628,7 @@ void TileTrigger_CreateFromScript(void)
         trigger->triggerFlags |= 0x10;
         switch (Script_GetKeywordValue('S', 0)) {
             case 0:
-                Pool1B8_EnterStateThree(manager, trigger);
+                TileTriggerPool_EnterStateThree(manager, trigger);
                 break;
             case 1:
                 TileTrigger_RestartHold(manager, trigger);
@@ -648,7 +648,7 @@ void TileTrigger_CreateFromScript(void)
 /* The slot whose key (+0x8C, a name) matches, among the twelve used slots
    of the pool at 0x020001B8; NULL if none. */
 
-struct TileTrigger *Pool1B8_FindByName(u32 key)
+struct TileTrigger *TileTriggerPool_FindByName(u32 key)
 {
     struct TileTriggerManager *manager = gTileTriggerManager;
     struct TileTrigger **tiles = manager->tiles;
@@ -671,7 +671,7 @@ void Tile_SetEnabledFromScript(void)
     struct TileTrigger *tile;
     if (name >= 0) {
         enabled = Script_GetKeywordValue(0x73, 0);
-        tile = Pool1B8_FindByName(name);
+        tile = TileTriggerPool_FindByName(name);
         if (tile) {
             if (enabled == 1) {
                 tile->triggerFlags |= 0x200;
@@ -687,11 +687,11 @@ void Tile_SetEnabledFromScript(void)
 /* Script: 1 when the pool-1B8 slot named -i has both bits 0x180 of +0xC0
    set, else 0. */
 
-u32 Pool1B8_IsReadyFromScript(void)
+u32 TileTriggerPool_IsReadyFromScript(void)
 {
     s32 name = Script_GetKeywordValue('i', -1);
     struct TileTrigger *tile;
-    if (name < 0 || (tile = Pool1B8_FindByName(name)) == 0 || (tile->triggerFlags & 0x180) != 0x180)
+    if (name < 0 || (tile = TileTriggerPool_FindByName(name)) == 0 || (tile->triggerFlags & 0x180) != 0x180)
         return 0;
     return 1;
 }
@@ -699,7 +699,7 @@ u32 Pool1B8_IsReadyFromScript(void)
 void TileTrigger_SetStateFromScript(void)
 {
     s32 mode = Script_GetKeywordValue(0x73, 0);
-    struct TileTrigger *trigger = Pool1B8_FindByName(Script_GetKeywordValue(0x69, 0));
+    struct TileTrigger *trigger = TileTriggerPool_FindByName(Script_GetKeywordValue(0x69, 0));
     if (!trigger)
         return;
     switch (mode) {
@@ -797,7 +797,7 @@ u32 TilePool_Destroy(struct TileTriggerManager *pool)
     return (u32)(gTileTriggerManager = 0);
 }
 
-s32 Pool1B8_Init(struct TileTriggerManager *manager)
+s32 TileTriggerPool_Init(struct TileTriggerManager *manager)
 {
     AnimData_Load(&manager->graphics, 0xA945);
     manager->animationData = ScriptProc_Start(0x922E, 0xAE9);
@@ -805,7 +805,7 @@ s32 Pool1B8_Init(struct TileTriggerManager *manager)
     return manager->used = 0;
 }
 
-struct TileTriggerManager *Pool1B8_Create(void)
+struct TileTriggerManager *TileTriggerPool_Create(void)
 {
     struct TileTriggerManager *manager;
     if (gTileTriggerManager != 0)
@@ -814,7 +814,7 @@ struct TileTriggerManager *Pool1B8_Create(void)
     if (manager != 0) {
         Task_SetCallbacks(manager, (void (*)(void *))TileTrigger_TickManager,
                           (void (*)(void *))TilePool_Destroy);
-        if (Pool1B8_Init(manager) < 0) {
+        if (TileTriggerPool_Init(manager) < 0) {
             Task_Kill(manager);
             return 0;
         }
@@ -822,7 +822,7 @@ struct TileTriggerManager *Pool1B8_Create(void)
     return manager;
 }
 
-void Pool1B8_ResetInstance(void)
+void TileTriggerPool_ResetInstance(void)
 {
     gTileTriggerManager = 0;
 }

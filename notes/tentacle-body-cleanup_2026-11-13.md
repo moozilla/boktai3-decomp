@@ -6,7 +6,7 @@ Consolidated 16 files from 080A5B8C through 080A7188 into `src/monsters/centiped
 The final formatted unit matches all 5628 bytes with the stock compiler.
 
 The header describes the complete 0x934 body allocation, verified against
-TentacleEnemy_Create: four existing TentacleAnimationSegment records, spin,
+Centipede_Create: four existing TentacleAnimationSegment records, spin,
 attack flags, segment count, release frame, and spread stage. Existing actor,
 collider, sprite, tile, sequence, profile entry, and saved-state types replace
 private padded views and raw field offsets. The common actor prefix remains

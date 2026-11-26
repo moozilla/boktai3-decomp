@@ -2,7 +2,7 @@
 #include "debug.h"
 #include "bosses/hresvelgr/hresvelgr_travel.h"
 
-void ActorState_Restart(struct HresvelgrTravelActor *p)
+void HresvelgrState_Restart(struct HresvelgrTravelActor *p)
 {
     struct HresvelgrTravelActor *base = p;
     if (Hresvelgr_ConsumeActionEntry(p)) {

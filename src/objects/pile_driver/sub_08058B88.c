@@ -1,5 +1,5 @@
 #include "objects/pile_driver/scene_panel.h"
-void ScenePanel_CycleOverlayPalette(struct ScenePanel *panel)
+void PileDriver_CycleOverlayPalette(struct ScenePanel *panel)
 {
     if (++panel->overlayFrame & 1) {
         u32 bank = (panel->overlayFrame >> 1) & 3;

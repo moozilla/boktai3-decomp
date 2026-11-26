@@ -52,7 +52,7 @@ list the evidence and the names still awaiting confirmation.
   (`Hresvelgr_Create.c`); an unnamed function keeps `sub_XXXXXXXX.c`.
 * Headers sit beside their object under the mirrored path in `include/`, at
   most two directories deep (`#include "monsters/ghoul.h"`,
-  `#include "objects/pile_driver/scene_panel_rig.h"`); a three-level source
+  `#include "objects/pile_driver/pile_driver_rig.h"`); a three-level source
   directory keeps its headers one level up (`src/ui/pause/map/` →
   `include/ui/pause/`). `global.h` and `debug.h` are at the root. The
   scene-actor framework's shared types are grouped by topic:
@@ -191,3 +191,8 @@ an older worker branch.
 
 Use `--apply` after reviewing a table's preview. These operations are separate
 from the filename pass. Run the stock ROM build after any applied symbol table.
+
+For worker replay, use `tools/reorg.py --function-renames
+symbols/function_renames.csv --apply` after replaying the placement tables.
+The symbol pass preserves source basenames, the reviewed input table, and
+history entries. `--check` with the same table verifies the rename replay.

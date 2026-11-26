@@ -1,4 +1,4 @@
-#include "monsters/centipede/tentacle_segment_animation.h"
+#include "monsters/centipede/centipede_segment_animation.h"
 #include "global.h"
 
 struct Pos080A9988 {
@@ -60,7 +60,7 @@ inline static u8 TestMask(struct Entry080A9988 *e, char mask)
     return 0;
 }
 
-void TentacleActor_ShiftSegmentTrail(struct Body080A9988 *p)
+void Centipede_ShiftSegmentTrail(struct Body080A9988 *p)
 {
     struct Group080A9988 *g;
     struct Pos080A9988 carry;

@@ -1,7 +1,7 @@
 #include "global.h"
 #include "scene/areas/area_effect_link.h"
 
-void Registry1745_NotifyMenuClosed(void)
+void LinkSession_NotifyMenuClosed(void)
 {
     u8 *p = gLinkSession;
     if (p != 0)

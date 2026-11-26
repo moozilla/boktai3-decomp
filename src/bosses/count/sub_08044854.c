@@ -1,8 +1,8 @@
 #include "scene/collision/contact_swarm.h"
-void ContactSwarm_SetDirectionalSequence(struct ContactSwarm *, struct ContactSwarmSlot *, u32);
+void CountBats_SetDirectionalSequence(struct ContactSwarm *, struct ContactSwarmSlot *, u32);
 void Collider_SetAttackProperties(void *, u32, u32, u32, u32, u32);
 
-s32 ContactSwarm_SpawnCharge(struct ContactSwarm *pool, const struct ContactPosition *position,
+s32 CountBats_SpawnCharge(struct ContactSwarm *pool, const struct ContactPosition *position,
                              u32 direction, u32 speed, u32 resourceId, u32 cost, u32 option)
 {
     struct ContactSwarmSlot *slot = pool->slots;
@@ -18,7 +18,7 @@ s32 ContactSwarm_SpawnCharge(struct ContactSwarm *pool, const struct ContactPosi
         slot->display.animation.draw.sprite.position = *position;
         AnimData_SelectPaletteBank(&slot->display.animation.draw.graphics, 0x2D3);
         slot->display.animation.draw.sprite.flags &= ~1;
-        ContactSwarm_SetDirectionalSequence(pool, slot, 0);
+        CountBats_SetDirectionalSequence(pool, slot, 0);
         ActorShadow_Enable(slot->shadow);
         Collider_SetPosition(&slot->resourceCollider, &slot->display.animation.draw.sprite.position,
                              0);

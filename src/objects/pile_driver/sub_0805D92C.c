@@ -1,6 +1,6 @@
 #include "objects/pile_driver/scene_panel_subject_tail.h"
 #include "objects/pile_driver/scene_panel_subject_playback.h"
-s32 ScenePanelSubject_Initialize(struct ScenePanelSubject *subject,
+s32 PileDriverSubject_Initialize(struct ScenePanelSubject *subject,
                                  const struct ContactPosition *home, u32 row, u32 variant,
                                  u32 initialState, u32 kind, u32 contactLimit, u32 colliderSetting,
                                  u32 appearDelay)
@@ -18,8 +18,8 @@ s32 ScenePanelSubject_Initialize(struct ScenePanelSubject *subject,
     Sprite_Init(sprite, subject->graphics, 0);
     sprite->position = subject->home;
     subject->sequenceResource = ScriptProc_Start(0x922E, 0x3449);
-    ScenePanelSubject_InitCollider(subject, colliderSetting);
-    ScenePanelSubject_SetState((void *)subject, initialState);
+    PileDriverSubject_InitCollider(subject, colliderSetting);
+    PileDriverSubject_SetState((void *)subject, initialState);
     switch (subject->state) {
         case 0:
             subject->contactProgress = 0;

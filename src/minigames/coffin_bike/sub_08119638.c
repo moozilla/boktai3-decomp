@@ -3,9 +3,9 @@
 #include "engine/ram.h"
 #include "engine/engine_globals.h"
 #include "scene/areas/area_effect_link.h"
-#include "minigames/coffin_bike/glove.h"
+#include "minigames/coffin_bike/coffin_bike.h"
 
-// confidence=low: animation 0x21 completes into Glove_UpdateStaggerRecoil.
+// confidence=low: animation 0x21 completes into CoffinBike_UpdateStaggerRecoil.
 
 s32 Div(s32, s32);
 s32 Math_Atan2(s32, s32);
@@ -16,28 +16,28 @@ void ActorParticles_SpawnImpactBurst(struct GloveMotion *);
 void CharacterModel_UpdateAccessoryAnimations(void *);
 void ScenePool_ClampMotionSpeeds(struct GloveMotion *);
 void Actor_ClampMovementSpeed(struct GloveMotion *);
-void Glove_SetAnimationKeyframes(struct Glove *, s32);
-s32 ActorRecoil_UpdateMotion(struct Glove *);
+void CoffinBike_SetAnimationKeyframes(struct Glove *, s32);
+s32 CoffinBike_UpdateMotion(struct Glove *);
 void Actor_UpdateShadowSpriteParts(struct GloveMotion *, void *);
-void Glove_UpdateStaggerRecoil(void *);
+void CoffinBike_UpdateStaggerRecoil(void *);
 
 void ActorParticles_UpdateEmitter(void *, void *, u32);
 // Stagger animation plays until recoil completes, then restores stagger motion.
-void Glove_UpdateStaggerReturn(struct Glove *p)
+void CoffinBike_UpdateStaggerReturn(struct Glove *p)
 {
     struct GloveMotion *self = &p->motion;
     u8 complete;
     s32 h, dx, dz;
     u32 a, b;
     if (p->active) {
-        Glove_SetAnimationKeyframes(p, 0x21);
+        CoffinBike_SetAnimationKeyframes(p, 0x21);
         p->active = 0;
     }
     {
         u16 bit = 0x10;
         p->flags |= bit;
     }
-    complete = ActorRecoil_UpdateMotion(p) != 0;
+    complete = CoffinBike_UpdateMotion(p) != 0;
     h = self->vy + self->unkC0;
 
     self->y += 0x200;
@@ -102,7 +102,7 @@ void Glove_UpdateStaggerReturn(struct Glove *p)
     if (complete == 1) {
         Trigger_ConsumePending(&p->queue, 1);
         {
-            void (*callback)(void *) = Glove_UpdateStaggerRecoil;
+            void (*callback)(void *) = CoffinBike_UpdateStaggerRecoil;
             u8 *active = &p->active;
             u32 zero = 0;
             *active = complete;

@@ -1,5 +1,5 @@
-#include "objects/pile_driver/scene_panel_rig.h"
-u32 ScenePanelRig_GetActiveCount(struct ScenePanelRig *rig)
+#include "objects/pile_driver/pile_driver_rig.h"
+u32 PileDriverRig_GetActiveCount(struct ScenePanelRig *rig)
 {
     return ((struct SceneRigParentView *)rig->parent)->activeCount;
 }

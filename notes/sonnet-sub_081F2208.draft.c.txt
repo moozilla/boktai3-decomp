@@ -29,7 +29,7 @@ struct MotionEntry {
     u8 pad23c[4];
 };
 void MotionEffectPool_OnRenderComplete(void *);
-void SingletonSlot7_OnEffectMotionComplete(void *);
+void VanargandHead_OnEffectMotionComplete(void *);
 void SpatialIndex_InsertEntry(void *);
 void SpatialIndex_InitEntry(void *, struct ColliderVector *, struct ColliderVector *,
                             struct ColliderVector *, u32, u32, u32, u32, u32, void (*)(void *),
@@ -97,5 +97,5 @@ s32 MotionEffect_InitEntry(void *unused, struct MotionEntry *e)
     ((s16 *)&offset)[1] = 0;
     ((s16 *)&offset)[2] = 0;
     SpatialIndex_InitEntry(collider, &position, &size, &offset, 12, 5, one, e->collisionArg0,
-                           e->collisionArg1, SingletonSlot7_OnEffectMotionComplete, e);
+                           e->collisionArg1, VanargandHead_OnEffectMotionComplete, e);
 }

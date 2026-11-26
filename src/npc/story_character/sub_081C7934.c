@@ -45,7 +45,7 @@ static inline s32 GetGroundHeight(const struct ContactPosition *pos)
     return height;
 }
 
-void StateActor_UpdateAnimation16State(void *context, struct Npc *p)
+void StoryCharacter_UpdateAnimation16State(void *context, struct Npc *p)
 {
     u32 r;
     struct ContactPosition *pos;

@@ -60,18 +60,18 @@ struct ScenePanelEffectsView {
     u8 unknown1432[0x37A];
     u32 pendingScriptId;
 };
-void ScenePanel_SetEffectState(struct ScenePanel *, u16);
-void ScenePanel_CallPendingScript(struct ScenePanel *, u32);
-void ScenePanel_UpdateParticles(struct ScenePanel *);
-void ScenePanel_AddParticle(struct ScenePanel *, union ScenePanelPosition *,
+void PileDriver_SetEffectState(struct ScenePanel *, u16);
+void PileDriver_CallPendingScript(struct ScenePanel *, u32);
+void PileDriver_UpdateParticles(struct ScenePanel *);
+void PileDriver_AddParticle(struct ScenePanel *, union ScenePanelPosition *,
                             union ScenePanelPosition *, u32, u32);
-void ScenePanel_DestroyParticles(struct ScenePanel *);
-void ScenePanel_InitParticles(struct ScenePanel *);
-void ScenePanel_SelectTimePalette(struct ScenePanel *, s32);
-s32 ScenePanel_IsSpriteVisible(struct ScenePanelMainSprite *);
-s32 ScenePanel_AdvancePaletteFrame(struct ScenePanelMainSprite *);
-void ScenePanel_InitTimePalette(struct ScenePanel *);
-void ScenePanel_UpdateTimePalette(struct ScenePanelEffectsView *);
+void PileDriver_DestroyParticles(struct ScenePanel *);
+void PileDriver_InitParticles(struct ScenePanel *);
+void PileDriver_SelectTimePalette(struct ScenePanel *, s32);
+s32 PileDriver_IsSpriteVisible(struct ScenePanelMainSprite *);
+s32 PileDriver_AdvancePaletteFrame(struct ScenePanelMainSprite *);
+void PileDriver_InitTimePalette(struct ScenePanel *);
+void PileDriver_UpdateTimePalette(struct ScenePanelEffectsView *);
 void ParticleSprite_Initialize(struct ScenePanelParticle *, void *, u32);
 void SpriteDrawable_SelectTileFrame(struct ScenePanelParticle *, void *, u32);
 void Effect_SetOrigin(struct ScenePanelParticle *, s32, s32);

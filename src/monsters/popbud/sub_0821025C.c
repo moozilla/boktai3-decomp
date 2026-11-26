@@ -1,9 +1,9 @@
 #include "scene/collision/contact_actor.h"
-#include "monsters/popbud/pink_spine_playback.h"
+#include "monsters/popbud/popbud_playback.h"
 #include "engine/engine.h"
 #include "engine/math/monster_particle_random.h"
 
-void PinkSpine_RecordDefeat(struct PinkSpineState *);
+void Popbud_RecordDefeat(struct PinkSpineState *);
 struct SpriteEffectController *SpriteEffectController_Create(const struct ContactPosition *,
                                                              const struct ContactPosition *, s32,
                                                              u32, u32, u32, u32, u32, u32, u32, u32,
@@ -33,7 +33,7 @@ u32 ProjectileEmitter_EmitAttackFrame(struct PinkSpineState *p)
                 Combat_SpawnDirectionalProjectile(p, p->age - 1);
         }
         if (p->age == 9)
-            PinkSpine_RecordDefeat(p);
+            Popbud_RecordDefeat(p);
     }
     return 0;
 }

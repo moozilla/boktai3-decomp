@@ -97,9 +97,27 @@ def function_renames(table, prefixes=False, apply=False):
             raise ValueError(f"{table}: function name {name} would collide")
     if settled & replacements.keys():
         raise ValueError(f"{table}: a completed rename overlaps a pending old name")
+    replacements.update({old + "__addr": new + "__addr" for old, new in list(replacements.items())})
+    return rewrite_identifiers(table, replacements, apply)
+
+
+def type_renames(table, apply=False):
+    """Replay whole-identifier type and inline-helper names without changing the symbol map."""
+    replacements = {}
+    for row in table_rows(table, ("old_name", "new_name")):
+        old, new = row["old_name"] or "", row["new_name"] or ""
+        if not all(IDENTIFIER.fullmatch(name) for name in (old, new)) or old in replacements:
+            raise ValueError(f"{table}: invalid or repeated type rename {old!r} -> {new!r}")
+        replacements[old] = new
+    names = set(replacements.values())
+    if len(names) != len(replacements) or names & replacements.keys():
+        raise ValueError(f"{table}: overlapping type renames")
+    return rewrite_identifiers(table, replacements, apply)
+
+
+def rewrite_identifiers(table, replacements, apply):
     if not replacements:
         return 0
-    replacements.update({old + "__addr": new + "__addr" for old, new in list(replacements.items())})
 
     def rewrite(raw):
         def replace(match):
@@ -116,8 +134,10 @@ def function_renames(table, prefixes=False, apply=False):
     changed = []
     input_table = table.resolve()
     for rel in sorted(paths):
-        if (rel.parts[0] == "build" or rel.name in ("PROGRESS.json", "PROGRESS.md") or
-                rel.suffix not in TEXT_SUFFIXES | {".s", ".inc", ".json", ".txt"}):
+        if (rel.parts[0] == "build" or rel.parts[:2] == ("docs", "history") or
+                rel.name in ("PROGRESS.json", "PROGRESS.md") or
+                rel in (Path("symbols/function_renames.csv"), Path("symbols/type_renames.csv")) or
+                rel.suffix not in TEXT_SUFFIXES | {".s", ".inc", ".json", ".txt", ".tsv"}):
             continue
         path = ROOT / rel
         if not path.is_file() or path.resolve() == input_table:
@@ -380,10 +400,13 @@ def main():
     operation.add_argument("--function-renames", type=Path, help="read exact addr,old_name,new_name rows")
     operation.add_argument("--function-prefixes", type=Path, help="read old_prefix,new_prefix[,scope] rows")
     operation.add_argument("--player-moves", type=Path, help="read file,new_path[,note] Player routes")
+    operation.add_argument("--type-renames", type=Path, help="read exact old_name,new_name identifier rows")
     args = parser.parse_args()
     try:
         if table := args.function_renames or args.function_prefixes:
             changes = function_renames(table, prefixes=args.function_prefixes is not None, apply=args.apply)
+        elif args.type_renames:
+            changes = type_renames(args.type_renames, args.apply)
         elif args.player_moves:
             changes = player_moves(args.player_moves, args.apply)
         else:

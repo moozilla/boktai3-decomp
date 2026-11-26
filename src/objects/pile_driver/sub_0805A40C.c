@@ -1,5 +1,5 @@
-#include "objects/pile_driver/scene_panel_rig.h"
-void ScenePanelRig_TickHideBurst(struct ScenePanelRig *rig)
+#include "objects/pile_driver/pile_driver_rig.h"
+void PileDriverRig_TickHideBurst(struct ScenePanelRig *rig)
 {
     struct ContactPackedVector extent;
     u16 *counter;
@@ -7,7 +7,7 @@ void ScenePanelRig_TickHideBurst(struct ScenePanelRig *rig)
     counter = &rig->stateFrame;
     if (*counter <= 63) {
         if (*counter == 0) {
-            ScenePanelRig_HideSprites(rig);
+            PileDriverRig_HideSprites(rig);
             ((struct SceneRigParentView *)gScenePanel)->activated = 1;
         }
         {
@@ -18,7 +18,7 @@ void ScenePanelRig_TickHideBurst(struct ScenePanelRig *rig)
                 extent.z = extent.x;
                 SparkParticle_Spawn(&rig->position, 1, &extent, 0, 0, 0, 2, 2);
                 if (*counter <= 31) {
-                    ScenePanel_SetPresentationMode(rig->parent);
+                    PileDriver_SetPresentationMode(rig->parent);
                     SparkParticle_Spawn(&rig->secondary[Mod(*counter, 5)].position, 1, &extent, 0,
                                         0, 0, 2, 2);
                 }
@@ -26,5 +26,5 @@ void ScenePanelRig_TickHideBurst(struct ScenePanelRig *rig)
         }
         rig->stateFrame++;
     } else
-        ScenePanelRig_SetState(rig, 0);
+        PileDriverRig_SetState(rig, 0);
 }

@@ -1,6 +1,6 @@
-#include "ui/town/scene_inventory_tail.h"
-#include "ui/town/scene_inventory_catalog.h"
-#include "ui/town/scene_item_values.h"
+#include "ui/town/shop_tail.h"
+#include "ui/town/shop_catalog.h"
+#include "ui/town/shop_item_values.h"
 struct SceneInventoryPurchaseDescriptor {
     u32 prefix[3];
     u8 modifierA, unknownD[3], modifierB, unknown11[3], modifierC, unknown15[11];
@@ -18,12 +18,12 @@ struct SceneInventoryFunds {
     s16 funds;
 };
 s32 SceneInput_TickPairTransition(struct SceneInputPair *);
-void SceneInventory_PrepareEquipmentDescriptor(struct SceneInventoryTail *,
+void Shop_PrepareEquipmentDescriptor(struct SceneInventoryTail *,
                                                struct SceneInventoryPurchaseDescriptor *);
 void Inventory_SetEquipmentEntry(u32, struct SceneInventoryPurchaseDescriptor *);
 void Inventory_SetItemId(u32, s32);
 void Inventory_SetConsumableEntry(u32, s32);
-s32 SceneInventory_TickPurchaseTransition(struct SceneInventoryTail *p)
+s32 Shop_TickPurchaseTransition(struct SceneInventoryTail *p)
 {
     struct SceneInventoryPurchaseDescriptor descriptor;
     struct SceneInventoryScriptCatalog *catalog = (struct SceneInventoryScriptCatalog *)p;
@@ -49,7 +49,7 @@ s32 SceneInventory_TickPurchaseTransition(struct SceneInventoryTail *p)
                 descriptor.modifierA = category;
                 descriptor.modifierB = category;
                 descriptor.modifierC = category;
-                SceneInventory_PrepareEquipmentDescriptor(p, &descriptor);
+                Shop_PrepareEquipmentDescriptor(p, &descriptor);
                 Inventory_SetEquipmentEntry(destination, &descriptor);
                 Inventory_GetEquipmentEntry(destination)->condition = 500;
                 ((struct SceneInventoryFunds *)gGameState)->funds -= definition->baseValue;
@@ -90,7 +90,7 @@ s32 SceneInventory_TickPurchaseTransition(struct SceneInventoryTail *p)
         }
         ((struct SceneInventoryPurchaseFlags *)p)->purchased = 1;
         Sound_PlaySong(0x111);
-        SceneInventory_BeginAlternateSelection(p);
+        Shop_BeginAlternateSelection(p);
     }
     return 0;
 }

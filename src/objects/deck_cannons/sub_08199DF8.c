@@ -30,8 +30,8 @@ struct CannonBatteryPool {
     u8 unk1E[0xA];
     struct CannonBatteryCannon cannons[16];
 };
-void CannonBattery_InitCannon(struct CannonBatteryCannon *, s32, s32, s32, s32);
-struct CannonBatteryCannon *CannonBattery_CreateCannon(struct CannonBatteryPool *pool, s32 x, s32 y,
+void DeckCannon_InitCannon(struct CannonBatteryCannon *, s32, s32, s32, s32);
+struct CannonBatteryCannon *DeckCannon_CreateCannon(struct CannonBatteryPool *pool, s32 x, s32 y,
                                                        s32 z, s32 flip)
 {
     struct CannonBatteryCannon *cannon = NULL;
@@ -46,7 +46,7 @@ struct CannonBatteryCannon *CannonBattery_CreateCannon(struct CannonBatteryPool 
     }
     if (cannon) {
         cannon->owner = pool;
-        CannonBattery_InitCannon(cannon, x, y, z, flip);
+        DeckCannon_InitCannon(cannon, x, y, z, flip);
         result = cannon;
     } else {
         result = NULL;

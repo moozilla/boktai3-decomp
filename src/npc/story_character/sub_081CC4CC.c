@@ -14,7 +14,7 @@ struct S {
 s32 Actor_PlayAnimationEntry(void *, s32, s32, s32, s32);
 s32 Callback_InvokeActor(void *, void *);
 s32 sub_081C8FB0(void *, void *, s32);
-void StateActor_SimpleStep(void *a, struct S *p)
+void StoryCharacter_SimpleStep(void *a, struct S *p)
 {
     u8 hit;
     if (p->b9 != 0) {

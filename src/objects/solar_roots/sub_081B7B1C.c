@@ -26,7 +26,7 @@ static inline u32 GrowthHazard_MaskChannel(u32 value, const u32 *mask)
     return value & *mask;
 }
 // Starts 32-tick palette flashes and blends their last 15 ticks.
-void GrowthHazard_UpdateSharedFlash(struct GrowthHazardManager *manager)
+void SolarRoot_UpdateSharedFlash(struct GrowthHazardManager *manager)
 {
     s32 channel;
     if (manager->pending) {

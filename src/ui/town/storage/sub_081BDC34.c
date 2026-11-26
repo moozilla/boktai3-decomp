@@ -1,5 +1,5 @@
 #include "global.h"
-#include "ui/town/scene_inventory_panel.h"
+#include "ui/town/shop_panel.h"
 struct MenuPanel {
     u8 pad0[0x10A0];
     u32 bannerFlags;

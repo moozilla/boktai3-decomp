@@ -20,12 +20,12 @@ void Anim_RestartSequence(void *, void *, u16, u8, u8);
 void Projectile_SetUpdateCallback(void *, void *);
 void Projectile_SetCollisionSize(void *, s32, s32);
 u32 sub_08249498(u32, u32);
-void Task4E01_SpawnImpactChildren(void *);
-void Task4E01_UpdateExpandingImpact(void *);
-void Task4E01_OnDefaultDirectionalAnimation(void *);
-void Task4E01_OnType7DirectionalAnimation(void *);
-void Task4E01_OnType8DirectionalAnimation(void *);
-void Task4E01_OnType4Animation(void *);
+void ProjectileTask_SpawnImpactChildren(void *);
+void ProjectileTask_UpdateExpandingImpact(void *);
+void ProjectileTask_OnDefaultDirectionalAnimation(void *);
+void ProjectileTask_OnType7DirectionalAnimation(void *);
+void ProjectileTask_OnType8DirectionalAnimation(void *);
+void ProjectileTask_OnType4Animation(void *);
 void Projectile_UpdateAnimation(void *);
 void Projectile_SpawnImpactPair(void *);
 // confidence=low: resets projectile time, chooses impact animation, and sets the impact flag.
@@ -41,7 +41,7 @@ struct ImpactHeader {
     u8 pad[16];
     struct ImpactConfig config;
 };
-s32 Task4E01_BeginImpactAnimation(u8 *input)
+s32 ProjectileTask_BeginImpactAnimation(u8 *input)
 {
     u8 *p = input;
     u8 *config = input + 0x18;
@@ -61,22 +61,22 @@ s32 Task4E01_BeginImpactAnimation(u8 *input)
 
         case 10:
             SetFrame((struct Drawable *)(input + 0x8c), 29);
-            Projectile_SetUpdateCallback(config, Task4E01_OnDefaultDirectionalAnimation);
+            Projectile_SetUpdateCallback(config, ProjectileTask_OnDefaultDirectionalAnimation);
             ((struct ImpactHeader *)input)->time = 0;
             break;
 
         case 8:
             ((struct Drawable *)(input + 0x8c))->sprite.frame = 29;
-            Projectile_SetUpdateCallback(config, Task4E01_OnType8DirectionalAnimation);
+            Projectile_SetUpdateCallback(config, ProjectileTask_OnType8DirectionalAnimation);
             break;
 
         case 7:
             ((struct Drawable *)(input + 0x8c))->sprite.frame = 29;
-            Projectile_SetUpdateCallback(config, Task4E01_OnType7DirectionalAnimation);
+            Projectile_SetUpdateCallback(config, ProjectileTask_OnType7DirectionalAnimation);
             break;
 
         case 4:
-            Projectile_SetUpdateCallback(config, Task4E01_OnType4Animation);
+            Projectile_SetUpdateCallback(config, ProjectileTask_OnType4Animation);
             break;
 
         case 3:

@@ -1,7 +1,7 @@
 #include "global.h"
-#include "ui/town/scene_item_values.h"
+#include "ui/town/shop_item_values.h"
 #include "ui/pause/scene_hud_display.h"
-#include "ui/town/scene_inventory_panel.h"
+#include "ui/town/shop_panel.h"
 #include "engine/math/scene_vec.h"
 
 extern const struct SceneValueItemDefinition gUnk_08E61280[];
@@ -10,7 +10,7 @@ u32 Inventory_GetItemStateValue(u32);
 
 s32 Div(s32, s32);
 
-s32 SceneInventory_GetItemConditionFrame(u32 slot)
+s32 PauseDisplay_GetItemConditionFrame(u32 slot)
 {
     s32 item = Inventory_GetItemId(slot);
     u32 condition;
@@ -44,7 +44,7 @@ void SceneHud_ShowActionPreview(struct SceneHudState *s)
     if (s->actionCursor <= 15) {
         action = Inventory_GetQuantityByStorage(s->actionCategory, s->actionCursor);
         if (s->actionCategory == 0)
-            keyframe = SceneInventory_GetItemConditionFrame(s->actionCursor);
+            keyframe = PauseDisplay_GetItemConditionFrame(s->actionCursor);
         else
             keyframe = 394;
     } else {

@@ -1,6 +1,6 @@
 #include "global.h"
 #include "ui/widgets/scene_input.h"
-#include "ui/town/scene_item_values.h"
+#include "ui/town/shop_item_values.h"
 
 struct StorageCategoryWidgets {
     u8 unk_00[0x318];

@@ -3,7 +3,7 @@
 #include "global.h"
 #include "player/player.h"
 #include "system/game_state/game_state.h"
-#include "ui/town/scene_inventory_actions.h"
+#include "ui/town/shop_actions.h"
 #include "engine/engine.h"
 s32 Inventory_CountEquipmentEffectEntries(struct PlayerActionEntry *);
 s32 Div(s32, s32);

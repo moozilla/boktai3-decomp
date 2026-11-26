@@ -1,6 +1,6 @@
 #include "global.h"
 #include "link/wireless/scene_pool.h"
-s32 Glove_GetHorizontalBounds(s32 index, s32 *left, s32 *right)
+s32 CoffinBike_GetHorizontalBounds(s32 index, s32 *left, s32 *right)
 {
     struct ScenePoolPlayer *glove;
     if (index <= 1) {

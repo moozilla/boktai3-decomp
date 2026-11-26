@@ -10,14 +10,14 @@ struct CannonBatteryMuzzleFlash {
     u8 unk48[8], sequence[0x10];
     u8 unk60[0x57], unkB7;
 };
-u32 CannonBattery_LoadAnimation(void);
+u32 DeckCannon_LoadAnimation(void);
 void Anim_RestartSequence(void *, void *, u32, u32, u32);
-void CannonBattery_UpdateMuzzleFlash(void);
-void CannonBattery_DestroyMuzzleFlash(void);
-void CannonBattery_InitMuzzleFlash(void *pool, struct CannonBatteryMuzzleFlash *p,
+void DeckCannon_UpdateMuzzleFlash(void);
+void DeckCannon_DestroyMuzzleFlash(void);
+void DeckCannon_InitMuzzleFlash(void *pool, struct CannonBatteryMuzzleFlash *p,
                                    struct CannonBatteryPosition *origin, s32 horizontal)
 {
-    void *resource = (void *)CannonBattery_LoadAnimation();
+    void *resource = (void *)DeckCannon_LoadAnimation();
     AnimData_Load(p->animation, 0x8D95);
     AnimData_SelectPaletteBank(p->animation, 0x8F);
     Sprite_Init(p->sprite, p->animation, 0);
@@ -37,8 +37,8 @@ void CannonBattery_InitMuzzleFlash(void *pool, struct CannonBatteryMuzzleFlash *
     }
     p->unkB7 = 0;
     {
-        u32 update = (u32)CannonBattery_UpdateMuzzleFlash;
-        u32 destroy = (u32)CannonBattery_DestroyMuzzleFlash;
+        u32 update = (u32)DeckCannon_UpdateMuzzleFlash;
+        u32 destroy = (u32)DeckCannon_DestroyMuzzleFlash;
         p->update = update;
         p->destroy = destroy;
     }

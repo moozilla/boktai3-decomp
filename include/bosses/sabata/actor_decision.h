@@ -4,7 +4,7 @@
 
 #include "bosses/sabata/actor_state_commands.h"
 
-s32 SceneVolume_ConsumePendingEvent(struct ActorState *);
+s32 SabataVolume_ConsumePendingEvent(struct ActorState *);
 
 s32 Mod(s32, s32);
 

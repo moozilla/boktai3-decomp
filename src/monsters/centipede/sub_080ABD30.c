@@ -1,7 +1,7 @@
 #include "scene/actor/scene_actor_state.h"
 #include "global.h"
 #include "scene/motion/scene_actor_chase_shared.h"
-/* TentacleBody_Destroy: Ivy_Destroy shape; removes the tentacle segment sprites first (ported by relatives.py, fixed by hand; provisional name) */
+/* CentipedeBody_Destroy: Ivy_Destroy shape; removes the tentacle segment sprites first (ported by relatives.py, fixed by hand; provisional name) */
 void Sprite_Remove(void *);
 void Anim_Remove(void *);
 void Heap_Free(void *);
@@ -19,15 +19,15 @@ struct S {
     u8 f1[0x2b7];
     u16 h2c0;
 };
-void TentacleBody_RemoveSegmentSprites(struct S *);
+void CentipedeBody_RemoveSegmentSprites(struct S *);
 void SpritePool_ConsumeStateFlag(struct S *);
-u32 TentacleBody_Destroy(struct S *s)
+u32 CentipedeBody_Destroy(struct S *s)
 {
     u8 *p;
     u8 *q;
     u32 m;
     u32 v;
-    TentacleBody_RemoveSegmentSprites(s);
+    CentipedeBody_RemoveSegmentSprites(s);
     SpritePool_ConsumeStateFlag(s);
     p = s->p4;
     if (s->b8 == 0)

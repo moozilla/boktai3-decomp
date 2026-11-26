@@ -12,8 +12,8 @@ void PauseMenu_SetConfirmationIndicator(struct SceneHudState *, s32);
 void PauseMenu_SetSpritePosition(struct SceneHudState *, s32, s32, s32);
 void Hud_SetUpdateCallback(struct SceneHudState *, void (*)(struct SceneHudState *));
 void SelectionMenu_ApplyConfirmedReward(struct SceneHudState *);
-void SceneSequence_UpdateRampDown64(struct SceneHudState *);
-void SceneSequence_BeginAnimation6(struct SceneHudState *);
+void MenuSequence_UpdateRampDown64(struct SceneHudState *);
+void MenuSequence_BeginAnimation6(struct SceneHudState *);
 void SelectionMenu_UpdateConfirmInput(struct SceneHudState *p)
 {
     Anim_Step(&p->accountAnimation, &p->accountResource);
@@ -28,11 +28,11 @@ void SelectionMenu_UpdateConfirmInput(struct SceneHudState *p)
             PauseMenu_SetSpritePosition(p, 7, -8, -104);
             Hud_SetUpdateCallback(p, SelectionMenu_ApplyConfirmedReward);
         } else if (p->loanDisplay) {
-            Hud_SetUpdateCallback(p, SceneSequence_UpdateRampDown64);
+            Hud_SetUpdateCallback(p, MenuSequence_UpdateRampDown64);
         }
     } else if (gPadState[1] & 2) {
         Sound_PlaySong(0xDE);
-        SceneSequence_BeginAnimation6(p);
+        MenuSequence_BeginAnimation6(p);
     } else if (p->actionOwner->actionMode != 6 && (gPadState[1] & 0xC0)) {
         Sound_PlaySong(0xDC);
         p->accountSelection = 1 - p->accountSelection;

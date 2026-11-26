@@ -291,7 +291,7 @@ src/link/link_record_panel,src/link/records,link record panel; merge:src/menus/r
 src/link/link_score_panel,src/link/score_panel,link score panel
 src/link/link_selection,src/link/selection,drop redundant prefix
 src/link/link_session,src/link/session,link session state machine; merge:src/link/registry_1745
-src/link/registry_1745,src/link/session,link session controller and handshake requests (Registry1745_Create); merge:src/link/link_session
+src/link/registry_1745,src/link/session,link session controller and handshake requests (LinkSession_Create); merge:src/link/link_session
 src/link/registry_33_ff,src/link/lobby,"link lobby panel (LinkLobbyPanel_Create, key 33FF); merge:src/menus/record_menu"
 src/link/registry_f246,src/link/panel,drop redundant prefix
 src/link/rfu_manager,src/link/wireless/rfu_manager,RFU manager
@@ -330,7 +330,7 @@ src/menus/hud_tilemaps_and_clock_digits,src/ui/hud/hud_tilemaps.c,HUD tile maps 
 src/menus/input_grid_and_navigation,src/ui/widgets/input_grid,input grid and saved cursor; merge:src/menus/input_marker_widgets
 src/menus/input_marker_widgets,src/ui/widgets/input_grid,input marker widgets; merge:src/menus/input_grid_and_navigation
 src/menus/inventory,src/system/inventory,item and equipment data (Inventory_*FromScript) plus pause-inventory helpers
-src/menus/inventory_action_transitions,src/ui/town/shop,shop screen actions (SceneInventory; Weapon Shop 武器屋 = SceneInventory_CreatePresentation0); merge:src/menus/inventory_transactions_and_catalogs src/menus/inventory_values_and_display
+src/menus/inventory_action_transitions,src/ui/town/shop,shop screen actions (SceneInventory; Weapon Shop 武器屋 = Shop_CreatePresentation0); merge:src/menus/inventory_transactions_and_catalogs src/menus/inventory_values_and_display
 src/menus/inventory_grid,src/ui/pause/inventory_grid.c,pause inventory grid
 src/menus/inventory_panel,src/ui/pause/inventory_panel.c,pause inventory panel
 src/menus/inventory_transactions_and_catalogs,src/ui/town/shop,shop transactions and catalogs; merge:src/menus/inventory_action_transitions src/menus/inventory_values_and_display
@@ -406,7 +406,7 @@ src/monsters/fan_cannon,src/monsters/cannons/wind,GCL 4751 → 1609 spawns the f
 src/monsters/fan_cannon_manager,src/monsters/cannons/wind,Proc 1609 creates shared manager 9CC2 and its cannon instances. The actor callbacks run under the same pool.
 src/monsters/ghost,src/monsters/ghost.c,Ghost (ゴースト)
 src/monsters/ghoul,src/monsters,Ghoul family (ボク/グール) (two files)
-src/monsters/glove,src/minigames/coffin_bike,GCL 6275 calls 1277 to spawn bike key E881. R accelerates and UP steers visibly through Lifeless Town’s ride. The stock non-bike world map (2569) executes none of this unit. A two-core Back Street match also runs Glove_UpdateTask on both bikes. See link-peer/play-3-0.png and play-3-1.png.
+src/monsters/glove,src/minigames/coffin_bike,GCL 6275 calls 1277 to spawn bike key E881. R accelerates and UP steers visibly through Lifeless Town’s ride. The stock non-bike world map (2569) executes none of this unit. A two-core Back Street match also runs CoffinBike_UpdateTask on both bikes. See link-peer/play-3-0.png and play-3-1.png.
 src/monsters/golem,src/monsters/golem,Golem (ゴーレム)
 src/monsters/growth_hazard,src/objects/solar_roots,Hresvelgr setup 3594 and rematch 6397 place key 1FBA. The Earth shot makes the flat vegetation grow after AnimatedMarker_BeginActive at frame 2042. The comparison Sol shots hit without producing growth. Text #1817 and #9052 name Solar Roots.
 src/monsters/ivy,src/monsters/ivy,Ivy; merge:src/actors/child_group src/actors/phase_object

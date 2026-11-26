@@ -1,5 +1,5 @@
 #include "global.h"
-#include "bosses/nidhoggr/large_scene_animation_controller.h"
+#include "bosses/nidhoggr/nidhoggr_animation.h"
 
 // Tentative interpretation: bit 0 hides the part visual; collider bit 2 disables it.
 

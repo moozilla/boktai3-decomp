@@ -390,7 +390,7 @@ function* untilControl(g, L, ready = () => true, quiet = 120, limit = 60000) {
     if (step) { event({ skill: 'menu', ...step }); calm = 0; continue; }
     if (msg.open) { yield* L.advanceText(600); event({ skill: 'dialogue', string: msg.id, scene: L.where().scene }); calm = 0; continue; }
     yield 1;
-    const field = $player(g) || (L.hub() && L.hub().state === 'Registry3F74_UpdateSelection');
+    const field = $player(g) || (L.hub() && L.hub().state === 'TownMap_UpdateSelection');
     calm = field && ready() ? calm + 1 : 0;
     if (calm >= quiet) return true;
     // an unknown menu holds the screen (no player, no message, no known menu): back out
@@ -399,7 +399,7 @@ function* untilControl(g, L, ready = () => true, quiet = 120, limit = 60000) {
     stuck = field ? 0 : stuck + 1;
     // riding the coffin bike (the Glove task; src/npc/sabata_rider/registry_actor_collision.c
     // ActorMotion_ApplyInput: R accelerates, L boosts, up/down steer): ride on with R
-    if (!field && !msg.open && L.tasks().some((t) => !t.dead && t.update === 'Glove_UpdateTask')) {
+    if (!field && !msg.open && L.tasks().some((t) => !t.dead && t.update === 'CoffinBike_UpdateTask')) {
       if (stuck % 600 === 1) event({ skill: 'ride', ...L.where() });
       yield g.press('r', 4);
       continue;

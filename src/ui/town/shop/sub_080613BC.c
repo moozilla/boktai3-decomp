@@ -1,10 +1,10 @@
-#include "ui/town/scene_inventory_control.h"
-void SceneInventory_UpdateModePrompt(struct SceneInventoryControlView *panel, s32 mode)
+#include "ui/town/shop_control.h"
+void Shop_UpdateModePrompt(struct SceneInventoryControlView *panel, s32 mode)
 {
     switch (mode) {
         case 1:
             SceneInputPanel_PositionModeCursor((void *)panel, panel->mode);
-            SceneInventory_UpdateActionPrompt(panel);
+            Shop_UpdateActionPrompt(panel);
             break;
         case 2:
             SceneInputPanel_PositionModeCursor((void *)panel, panel->mode);

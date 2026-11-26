@@ -1,4 +1,4 @@
-#include "bosses/nidhoggr/scene_panel_effect_pool.h"
+#include "bosses/nidhoggr/nidhoggr_effect_pool.h"
 #include "player/player_slot_status.h"
 #include "bosses/nidhoggr/scene_pause.h"
 
@@ -6,7 +6,7 @@ void sub_0818ECFC(struct ScenePanelEffectPool *);
 
 void Nidhoggr_ClearEffectPools(struct ScenePanelEffectPool *);
 
-void ScenePanelEffect_InitPool(struct ScenePanelEffectPool *);
+void NidhoggrEffect_InitPool(struct ScenePanelEffectPool *);
 
 void PlayerStats_AddContactHundredths(u32, u32, s32);
 
@@ -56,39 +56,39 @@ static inline void AddPosition(struct ContactPosition *out, struct ContactPositi
 }
 
 
-u32 ScenePanelEffect_UpdateTask(struct ScenePanelEffect *effect)
+u32 NidhoggrEffect_UpdateTask(struct ScenePanelEffect *effect)
 {
     sub_0818ECFC(&effect->pool);
     return 0;
 }
 
-u32 ScenePanelEffect_DestroyTask(struct ScenePanelEffect *effect)
+u32 NidhoggrEffect_DestroyTask(struct ScenePanelEffect *effect)
 {
     Nidhoggr_ClearEffectPools(&effect->pool);
     return 0;
 }
 
-struct ScenePanelEffect *ScenePanelEffect_Create(u32 impactVariant, u32 contactHundredths)
+struct ScenePanelEffect *NidhoggrEffect_Create(u32 impactVariant, u32 contactHundredths)
 {
     struct ScenePanelEffect *effect = Task_Create(8, sizeof(*effect));
     if (effect != 0) {
-        Task_SetCallbacks(effect, (void (*)(void *))ScenePanelEffect_UpdateTask,
-                          (void (*)(void *))ScenePanelEffect_DestroyTask);
-        ScenePanelEffect_InitPool(&effect->pool);
+        Task_SetCallbacks(effect, (void (*)(void *))NidhoggrEffect_UpdateTask,
+                          (void (*)(void *))NidhoggrEffect_DestroyTask);
+        NidhoggrEffect_InitPool(&effect->pool);
         effect->impactVariant = impactVariant;
         effect->contactHundredths = contactHundredths;
     }
     return effect;
 }
 
-void ScenePanelEffect_OnContact(u32 first, u32 second, struct ScenePanelOwnedEffect *slot)
+void NidhoggrEffect_OnContact(u32 first, u32 second, struct ScenePanelOwnedEffect *slot)
 {
     struct ScenePanelEffect *owner = slot->owner;
     slot->state = 0xff;
     PlayerStats_AddContactHundredths(first, second, owner->contactHundredths);
 }
 
-void ScenePanelEffect_CreatePositionEffect(const struct ContactPosition *position,
+void NidhoggrEffect_CreatePositionEffect(const struct ContactPosition *position,
                                            struct ScenePanelEffect *effect)
 {
     ExplosionEffect_Create((u32)position, 0x10, effect->impactVariant, 0xa, 0);
@@ -137,7 +137,7 @@ void Nidhoggr_UpdateOwnedSeekingEffect(struct ScenePanelOwnedEffect *owner)
         impact.y = -96;
         impact.z = 0;
         AddPosition((struct ContactPosition *)&impact, &owner->sprite.position);
-        ScenePanelEffect_CreatePositionEffect((struct ContactPosition *)&impact, boss);
+        NidhoggrEffect_CreatePositionEffect((struct ContactPosition *)&impact, boss);
         owner->update = 0;
         if (owner->onComplete) {
             Callback_InvokeActor(owner, owner->onComplete);
@@ -164,7 +164,7 @@ void Nidhoggr_UpdateOwnedSeekingEffect(struct ScenePanelOwnedEffect *owner)
             impact.y = -128;
             impact.z = 0;
             AddPosition((struct ContactPosition *)&impact, &owner->sprite.position);
-            ScenePanelEffect_CreatePositionEffect((struct ContactPosition *)&impact, boss);
+            NidhoggrEffect_CreatePositionEffect((struct ContactPosition *)&impact, boss);
             owner->update = 0;
             if (owner->onComplete) {
                 Callback_InvokeActor(owner, owner->onComplete);
@@ -237,7 +237,7 @@ void Nidhoggr_CreateOwnedSeekingEffect(struct ScenePanelEffect *owner,
             Collider_SetBodyProperties(collider, 1, 0x120, 16);
         }
     }
-    Collider_SetCallback(collider, ScenePanelEffect_OnContact, effect);
+    Collider_SetCallback(collider, NidhoggrEffect_OnContact, effect);
     Collider_Refresh(collider);
     shadow = effect->shadow;
     ScaledShadow_InitializeDefaultSmall(shadow, position);

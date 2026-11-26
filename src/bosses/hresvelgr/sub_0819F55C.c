@@ -1,5 +1,5 @@
 #include "global.h"
-#include "objects/pile_driver/scene_panel_schedule.h"
+#include "objects/pile_driver/pile_driver_schedule.h"
 void DirectionBurst_EmitOffset(const struct ContactPosition *origin, s32 index, s32 direction,
                                s32 spacing, u32 kind, u32 parameter)
 {

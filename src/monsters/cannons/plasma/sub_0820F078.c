@@ -47,7 +47,7 @@ static inline void add(struct OrangeSpinePosition *out, struct OrangeSpinePositi
     out->z = a->z + b->z;
 }
 
-void OrangeSpine_FireProjectile(struct OrangeSpine *p)
+void PlasmaCannon_FireProjectile(struct OrangeSpine *p)
 {
     u8 config[0x5c];
     struct OrangeSpinePosition delta;

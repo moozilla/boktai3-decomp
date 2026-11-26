@@ -1,10 +1,10 @@
-#include "objects/pile_driver/scene_panel_rig.h"
+#include "objects/pile_driver/pile_driver_rig.h"
 #include "engine/math/monster_particle_random.h"
 static inline s32 quarter(s32 value)
 {
     return value >= 0 ? value >> 2 : -((-value) >> 2);
 }
-void ScenePanelRig_TickHoverSelection(struct ScenePanelRig *rig)
+void PileDriverRig_TickHoverSelection(struct ScenePanelRig *rig)
 {
     s32 sample;
     u32 origin;
@@ -26,9 +26,9 @@ void ScenePanelRig_TickHoverSelection(struct ScenePanelRig *rig)
                 Mod(ParticleRandom_ReadRelativeSample(origin, (const u16 *)RANDOM_TABLE_ADDR),
                     300) +
                 300;
-            rig->selectedSubject = ScenePanelRig_SelectActiveSubject(rig);
+            rig->selectedSubject = PileDriverRig_SelectActiveSubject(rig);
             if (rig->selectedSubject >= 0) {
-                ScenePanelRig_InitMovement(rig);
+                PileDriverRig_InitMovement(rig);
                 if (rig->selectedSubject == 0)
                     rig->angle = 1920;
                 else if (rig->selectedSubject == 1)
@@ -37,13 +37,13 @@ void ScenePanelRig_TickHoverSelection(struct ScenePanelRig *rig)
                     rig->angle = 3200;
                 else
                     rig->angle = 1152;
-                ScenePanelRig_SetState(rig, 4);
+                PileDriverRig_SetState(rig, 4);
             }
         } else if (rig->stateFrame >= 300) {
-            ScenePanelRig_RandomizeMovement(rig);
+            PileDriverRig_RandomizeMovement(rig);
             rig->speed = 448;
             rig->verticalStep = 96;
-            ScenePanelRig_SetState(rig, 3);
+            PileDriverRig_SetState(rig, 3);
         }
     }
 }

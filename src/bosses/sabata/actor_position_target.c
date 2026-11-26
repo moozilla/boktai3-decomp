@@ -40,7 +40,7 @@ s32 ActorMovement_CanReachTarget(struct ActorState *actor)
     return 1;
 }
 
-s32 ActorPosition_SaveSelectedPoint(struct ActorState *actor)
+s32 SabataPosition_SaveSelectedPoint(struct ActorState *actor)
 {
     s32 result;
     if (!ActorMovement_CanReachTarget(actor))

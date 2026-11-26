@@ -754,16 +754,16 @@ Each function was committed separately through `build/commit.sh`.
   expansions raised similarity substantially; the final two draws retain
   their independent low-register address path. Widening the local graphics
   API declaration avoids an extra, unsupported frame truncation.
-- **08210654 drafted 92.8%**, `PinkSpine_InitFromScript`, reviewed 900 bytes;
-  candidate 904. Prefix follows neighbouring PinkSpine_Create (082109D8) and
-  PinkSpine_OnTaskDestroy (08210648); identity remains tentative because
+- **08210654 drafted 92.8%**, `Popbud_InitFromScript`, reviewed 900 bytes;
+  candidate 904. Prefix follows neighbouring Popbud_Create (082109D8) and
+  Popbud_OnTaskDestroy (08210648); identity remains tentative because
   neighbouring behavior states use ProjectileEmitter names. Parses position,
   two squared radii, l/a/S/D/G/X, initializes graphics0x7E7D/palette0x1BD,
   selects approach sequence0xB or inactive sequence0xD, optionally builds
   the body at +C0, then stores one to field136. Remaining **31 instructions /
   six ignoring registers**: option/animation allocation and explicit success
   return. Preserves the original surprising final health-field overwrite.
-- **08210398 drafted 89.6%**, `PinkSpine_UpdateDamageAnimation`, reviewed
+- **08210398 drafted 89.6%**, `Popbud_UpdateDamageAnimation`, reviewed
   688 bytes; candidate 692. Checks pause, invokes the current behavior,
   positions or disables the collider according to134, subtracts damage130
   from136 and copies148 to144. Defeat selects sequence0xD and0821025C,
@@ -1807,7 +1807,7 @@ correct assembly fallback. Drafts contribute no exact progress. All commits
 were queued through build/commit.sh on the assigned cloud/0817AD7C branch.
 No network, full build, generated-file edits, or shared-doc changes.
 
-- **0817C3F4 — retained draft 83.3%, BossSlot2_SelectCombatAction.** Read
+- **0817C3F4 — retained draft 83.3%, Sabata_SelectCombatAction.** Read
   BIG_FUNCTIONS.md, the existing source, assembly, condensed listing and
   matched relatives. Best retained source remains 530 realigned differences,
   407 ignoring registers. Moving event initialization after the initial
@@ -1817,7 +1817,7 @@ No network, full build, generated-file edits, or shared-doc changes.
   required exact local alias and changed the stringified INCLUDE_ASM argument
   to sub_0817C3F4. Default fallback verified exactly over 4412 bytes. No new
   recovered body for this address.
-- **0817EBB4 — new draft 93.8%, BossSlot2_UpdateSummonSpinSequence
+- **0817EBB4 — new draft 93.8%, Sabata_UpdateSummonSpinSequence
   (tentative).** Nine-state animation sequence: sets facing, starts palette
   fade mode 3, invokes the four-actor formation spawner, rotates effects over
   a 512-unit timer, then restores the callback. Initial reconstruction was
@@ -1834,7 +1834,7 @@ No network, full build, generated-file edits, or shared-doc changes.
   Use an unguarded scratch copy when depinning drafts. Both --nonmatching
   --record and the default assembly fallback were checked.
 - **0817E6E0 — stopped below threshold, best exploratory 73.5%, tentative
-  BossSlot2_UpdateLungeApproach.** Tracks the player/path destination during
+  Sabata_UpdateLungeApproach.** Tracks the player/path destination during
   a sixteen-tick collision window; tests a 32-unit projected terrain height,
   snaps within radius 50 or at an invalid floor, otherwise advances using
   animation F9. The bounds argument is actor+288 (A2 << 2), not actor+428.
@@ -1847,7 +1847,7 @@ No network, full build, generated-file edits, or shared-doc changes.
   regressed. Remaining issues: address and vector lifetimes, cosine-index
   reuse, constant ordering and allocation. Best valid source is retained in
   wip/sub_0817E6E0.c only; no production draft below 80%.
-- **0817B0B4 — matched, BossSlot2_UpdateSequencePalette (tentative), 552
+- **0817B0B4 — matched, Sabata_UpdateSequencePalette (tentative), 552
   bytes.** Mode 1 fades global palette +2E80 to +680 for 24 ticks; modes 2/3
   fade between +680 and +2DE0 for 1 << shift ticks; mode 4 repeatedly pulses
   between them over two half periods. Counter storage is unsigned, reads are
@@ -1859,7 +1859,7 @@ No network, full build, generated-file edits, or shared-doc changes.
   including the fraction scale pin. Four remain: the phase-one base in r0,
   its second bank in r6, and the second banks for modes 2/3 in r7. Marked
   register-pinning, formatted and checked with --target-size 552.
-- **0817F0AC — matched, BossSlot2_UpdateChargePaletteSequence (tentative),
+- **0817F0AC — matched, Sabata_UpdateChargePaletteSequence (tentative),
   368 bytes, no hints.** Sets direction 32 and offset point, plays animations
   F4/12B/12D, waits for completion and 30 ticks, then starts palette pulse
   mode 4, song 239 and converging particles at +5F8. First candidate was
@@ -1867,7 +1867,7 @@ No network, full build, generated-file edits, or shared-doc changes.
   allocation across the entire routine and reproduced every offset register
   and instruction. Offset-specific register helpers regressed and were
   discarded. Formatted and checked over the complete reviewed 368 bytes.
-- **0817AD7C — new draft 81.1%, BossSlot2_SpawnBobbingFormation
+- **0817AD7C — new draft 81.1%, Sabata_SpawnBobbingFormation
   (tentative), no hints.** Starts animation 12D, chooses initial angle 0 or
   32 from RNG bit 8, then spawns four bobbing actors at quarter turns with
   radius 256 and vertical offset 320. Spawn steering starts at base+16 and
@@ -1993,7 +1993,7 @@ Worked solo on the assigned cloud/08117948 branch without network actions,
 full builds, shared-document changes or generated-file edits. Each function
 commit was queued separately through build/commit.sh.
 
-- **08117948 — improved existing draft to 90.0%, Glove_UpdateStopping.**
+- **08117948 — improved existing draft to 90.0%, CoffinBike_UpdateStopping.**
   Reviewed full extent: 1,572 bytes; candidate: 1,568. Added the required
   file-local alias and address-named assembly fallback. The existing draft's
   initial score was 82.3%. Observed fields in the motion object now represent
@@ -2006,13 +2006,13 @@ commit was queued separately through build/commit.sh.
   to 87.3%; retained the readable unpinned candidate. Explicit initialization
   zero-width and additional recovery-zero temporaries did not help. Recorded
   the full-extent NONMATCHING score and verified the default fallback exactly.
-- **081182E4 — drafted 80.7%, Glove_UpdateDefeatEffects (tentative).**
+- **081182E4 — drafted 80.7%, CoffinBike_UpdateDefeatEffects (tentative).**
   Reviewed full extent: 1,452 bytes; candidate: 1,432. Clears five model
   animation flags, hides the marker, resets pending actions and sprite pair,
   restores five graphics pointers and palettes, clears movement, then emits
   bursts every twelve ticks through tick 29 and every six ticks through 59.
   After tick 120, selects blinking recovery for linked mode or game-state
-  flag 100, otherwise Glove_OnActionComplete. A first complete reconstruction
+  flag 100, otherwise CoffinBike_OnActionComplete. A first complete reconstruction
   scored 70.3%. Explicit locals for the action/slot/flag/graphics/style
   addresses retained across the first loop improved to 77.9%. Retaining the
   vertical-velocity and bias pointers, a separate action-motion pointer, and
@@ -2031,7 +2031,7 @@ commit was queued separately through build/commit.sh.
   from its maximum and increases a signed halfword meter by 20 when more than
   100 below maximum, otherwise by five. After tick 120, fills both meters,
   shows the marker, clears the parent flag, restores the low-resource color
-  effect and installs Glove_UpdateStopping. Tested typed meter fields and
+  effect and installs CoffinBike_UpdateStopping. Tested typed meter fields and
   signed/unsigned reads, retained velocity/bias/y/step pointers, height and
   motion-pointer hints, and combinations of those lifetime changes. They
   plateaued below 80%; the best fuzzy candidate has 162 realigned differences,
@@ -2039,15 +2039,15 @@ commit was queued separately through build/commit.sh.
   transfers differ substantially. No below-threshold production source was
   added. Best authored scratch is wip/sub_08117F6C.c; isolated alternatives
   and checker artifacts remain under ignored build/.
-- **08118B8C — matched, Glove_UpdateImpactRecoil (tentative), 676 bytes.**
+- **08118B8C — matched, CoffinBike_UpdateImpactRecoil (tentative), 676 bytes.**
   Message command zero installs this callback. Reuses the exact matched
-  Glove_UpdateRecoil body, starts animation 20 and consumes its pending
+  CoffinBike_UpdateRecoil body, starts animation 20 and consumes its pending
   trigger at parent+870 before the common recoil update. Matched on the first
   check, with no register hints. The impact interpretation is provisional.
-- **08118E30 — matched, Glove_UpdateStaggerRecoil (tentative), 676 bytes.**
+- **08118E30 — matched, CoffinBike_UpdateStaggerRecoil (tentative), 676 bytes.**
   Message command one installs it. Same triggered recoil body with animation
   21. Matched with no hints; the stagger interpretation is provisional.
-- **081190D4 — matched, Glove_UpdateEmitterRecoil (tentative), 676 bytes.**
+- **081190D4 — matched, CoffinBike_UpdateEmitterRecoil (tentative), 676 bytes.**
   Message command three configures the motion object's emitter bytes at
   44/46/47 before installing it. Uses animation zero and consumes the same
   pending trigger, then updates recoil, accessory animation and emitter.
@@ -2207,10 +2207,10 @@ remains with the batch integrator.
   Final formatted source passed `check.py --target-size 544`. No register
   hints or handwritten instructions.
 
-- **081C2570 matched**, `ControlPanel_InitializeFromScript`, 636 bytes.
-  Called by ControlPanel_CreateFromScript (081C27EC). Initializes three
+- **081C2570 matched**, `DarkGenerator_InitializeFromScript`, 636 bytes.
+  Called by DarkGenerator_CreateFromScript (081C27EC). Initializes three
   C046 sprite/animation pairs, the icon rows and reward balance display,
-  installs ControlPanel_UpdateIdle and reads options p/N/r/t/b/e/a. Option t
+  installs DarkGenerator_UpdateIdle and reads options p/N/r/t/b/e/a. Option t
   defaults to 180/300/600; r defaults to 300. Starts song 0x23E and publishes
   the singleton. Explicit panel halfword fields removed redundant constant
   copies; signed halfword arithmetic preserved the -0x300 coordinate delta.
@@ -2641,7 +2641,7 @@ Exact code gain: **+0.0364 percentage points** (880 bytes, unpinned). Five guard
 NONMATCHING drafts earn no exact coverage. No network operations or full builds.
 All six functions have descriptive file-local address aliases.
 
-- **08119B80 — matched, Glove_DispatchCommands.** Reviewed extent 880 bytes;
+- **08119B80 — matched, CoffinBike_DispatchCommands.** Reviewed extent 880 bytes;
   `tools/check.py src/minigames/coffin_bike/sub_08119B80.c --target-size 880` reports zero differing
   bytes. Glove command queue +870, recoil-motion parameters +8C8, attachment
   descriptor +91C, screen position +928 and attachment handle +964. Queue kinds
@@ -2840,7 +2840,7 @@ within those spans: the 532-byte collider initializer already had exact C.
 No global total was regenerated. One retained draft contributes no exact gain.
 
 - **08209AC4 — stopped below threshold, 69.5%**, existing name
-  `FanCannon_Update`. Reviewed extent 2,052 bytes through 0820A2C8; retained
+  `WindCannon_Update`. Reviewed extent 2,052 bytes through 0820A2C8; retained
   candidate 2,068 bytes, 398 realigned differences / 145 ignoring registers.
   Inspected largest first with asmat and condense, then reconstructed the
   complete update: activation/stopping and toggle schedule, callback dispatch,
@@ -2855,7 +2855,7 @@ No global total was regenerated. One retained draft contributes no exact gain.
   only: `wip/codex-high/sub_08209AC4.c`; no below-80% production draft.
 
 - **0820A5CC — matched**, tentative alias
-  `FanCannon_CreateFromScript`, full **1,392 bytes** through 0820AB3C.
+  `WindCannon_CreateFromScript`, full **1,392 bytes** through 0820AB3C.
   Retrieves the manager/free slot, reads p/a/l/d/i/h/r/t/R/n/S/z/g/D/G/X/V,
   initializes sprite/sequence state, optional colliders, terrain override and
   scene body, reads a toggle schedule and publishes the occupied bit. An absent
@@ -2889,7 +2889,7 @@ No global total was regenerated. One retained draft contributes no exact gain.
   accidental testing of the assembly fallback. Marked register-pinning.
 
 - **08209704 — stopped below threshold**, existing name
-  `FanCannon_UpdateActive`. Reviewed extent **820 bytes** through 08209A38.
+  `WindCannon_UpdateActive`. Reviewed extent **820 bytes** through 08209A38.
   Emits a wind particle every 30 ticks, jitters its transverse coordinate,
   derives heading from the axis/reverse flags, chooses a frame in 17..19 and
   an axial offset, randomizes two display flags, and ramps wind to maximum.
@@ -2982,7 +2982,7 @@ git mutation, shared-header edit, or shared documentation/index regeneration.
   actual function ends at 0820602C, before two separate nearby callbacks;
   0820608C is not its end.
 
-- **08208740 — drafted 84.5%, CannonTurret_UpdateCombat**, up from 81.7%.
+- **08208740 — drafted 84.5%, GarmrStatue_UpdateCombat**, up from 81.7%.
   Constrain the final zero return, which restores the ROM's shared pause-return
   block and early literal-pool placement. Give the animation frame store a
   separate r3 sprite view and constrain its flag-store view. Residue improves
@@ -3002,7 +3002,7 @@ git mutation, shared-header edit, or shared documentation/index regeneration.
   and the inherited defined return token. Getter/field-view changes did not
   affect the sequence stores; freeing its animation-mask source regressed.
 
-- **082081F4 — drafted 99.0%, CannonTurret_ApplyHitReaction**, up from 82.6%.
+- **082081F4 — drafted 99.0%, GarmrStatue_ApplyHitReaction**, up from 82.6%.
   Initially improved the inherited draft to 86.5% with typed damage storage,
   reaction-value lifetime, and per-iteration random-table setup. The exact
   Screamer_ApplyHitReaction at 0820BF70 then supplied a much stronger seed.
@@ -3288,7 +3288,7 @@ the unpinned match contributes 772 bytes. The guarded draft adds no exact credit
   Score recorded with `check.py --nonmatching --record`; default INCLUDE_ASM
   path passes. The draft commit title says 88.4%; the recorded score is 89.1%.
 - **0810C420 — matched, LinkPanel_UpdateStatusMessage**, 772 bytes, unpinned.
-  Uses LinkPanel_GetConnectionStatus and Registry1745_GetSessionState to choose
+  Uses LinkPanel_GetConnectionStatus and LinkSession_GetSessionState to choose
   connection/participant dialogue; delays most changes until the byte timer
   exceeds thirty. Message three supplies the numeric argument and refreshes
   immediately when the participant number differs. The matched sibling

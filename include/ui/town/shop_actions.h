@@ -44,5 +44,5 @@ s32 SceneItemValue_CalculateConsumable(u32);
 s32 SceneItemValue_GetConsumableBaseValue(u32);
 void SceneHud_ShowFourDigits(struct SceneInputPanel *, const struct ContactPosition *, s32, u32);
 void SceneHud_HideFourDigits(struct SceneInputPanel *);
-s32 SceneInventory_FindEquippedSlot(s32);
+s32 Shop_FindEquippedSlot(s32);
 #endif

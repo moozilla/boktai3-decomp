@@ -1,5 +1,5 @@
 #include "scene/collision/contact_swarm.h"
-void ContactSwarm_ApplyHealthContact(struct ContactCollider *source, struct ContactCollider *other,
+void CountBats_ApplyHealthContact(struct ContactCollider *source, struct ContactCollider *other,
                                      struct ContactSwarmSlot *slot)
 {
     s16 k2 = 0;

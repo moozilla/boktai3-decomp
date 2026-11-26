@@ -12,13 +12,13 @@ void SceneMessages_UnregisterReceiver(void *);
 s32 SceneMessages_RegisterReceiver(void *, u32, u32);
 void Camera_SetPosition(const void *);
 
-void ScenePanel_DispatchCommands(struct ScenePanel *);
-void ScenePanel_UnregisterReceiver(struct ScenePanel *);
-void ScenePanel_RegisterReceiver(struct ScenePanel *);
-void ScenePanel_ClearGlobal(void);
-u32 ScenePanel_IsPresent(void);
-void ScenePanel_SelectMode(struct ScenePanel *);
-s32 ScenePanel_CountActiveSubjects(struct ScenePanel *);
-void ScenePanel_UpdateApproachSprite(struct ScenePanel *);
-void ScenePanel_SubmitPlayerMidpoint(struct ScenePanel *);
+void PileDriver_DispatchCommands(struct ScenePanel *);
+void PileDriver_UnregisterReceiver(struct ScenePanel *);
+void PileDriver_RegisterReceiver(struct ScenePanel *);
+void PileDriver_ClearGlobal(void);
+u32 PileDriver_IsPresent(void);
+void PileDriver_SelectMode(struct ScenePanel *);
+s32 PileDriver_CountActiveSubjects(struct ScenePanel *);
+void PileDriver_UpdateApproachSprite(struct ScenePanel *);
+void PileDriver_SubmitPlayerMidpoint(struct ScenePanel *);
 #endif

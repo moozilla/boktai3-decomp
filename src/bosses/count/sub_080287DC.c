@@ -41,7 +41,7 @@ void SceneActorGraphics_OscillateScale(void *);
 void SceneActors_UpdateTargetMetrics(void *);
 s32 Math_Atan2(s32, s32);
 
-void Vampire_UpdateFrame(struct VampireTick *p)
+void Count_UpdateFrame(struct VampireTick *p)
 {
     struct VampireTick *actor = p;
     struct VampireTick *owner = p;

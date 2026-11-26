@@ -7,8 +7,8 @@ struct ScriptPanel {
     u8 unk4C[0x18];
     u8 buttons[2];
 };
-u8 Registry1745_ConsumeStateEntry(struct ScriptPanel *);
-void Registry1745_SetState(struct ScriptPanel *, u32, void *);
+u8 LinkSession_ConsumeStateEntry(struct ScriptPanel *);
+void LinkSession_SetState(struct ScriptPanel *, u32, void *);
 s32 Serial_ReadLatestPacket(u16 *);
 void LinkMenu_WaitForReadyPeers(void);
 void ScriptPanel_PollSelection(void);
@@ -17,16 +17,16 @@ s32 ScriptPanel_WaitForSelectionData(struct ScriptPanel *p)
 {
     u16 selections[4];
     s32 result;
-    if (Registry1745_ConsumeStateEntry(p))
+    if (LinkSession_ConsumeStateEntry(p))
         p->retryTimer = 0;
     result = Serial_ReadLatestPacket(selections);
     if (p->selection >= 0 && result >= 0 && selections[p->selection] != 0xFFFF) {
-        Registry1745_SetState(p, 4, LinkMenu_WaitForReadyPeers);
+        LinkSession_SetState(p, 4, LinkMenu_WaitForReadyPeers);
     } else {
         p->retryTimer++;
         if (p->retryTimer > 29) {
             s32 i;
-            Registry1745_SetState(p, 2, ScriptPanel_PollSelection);
+            LinkSession_SetState(p, 2, ScriptPanel_PollSelection);
             Serial_StopCommunication();
             for (i = 0; i < 2; i++)
                 p->buttons[i] = 0;

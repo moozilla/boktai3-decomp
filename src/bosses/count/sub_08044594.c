@@ -65,7 +65,7 @@ static inline void updatePlayback(struct ContactSwarmAnimation *animation,
             state->duration = 1;
     }
 }
-u32 ContactSwarm_Update(struct ContactSwarm *pool)
+u32 CountBats_Update(struct ContactSwarm *pool)
 {
     if (pool->activeMask) {
         if (gPlayers[0])

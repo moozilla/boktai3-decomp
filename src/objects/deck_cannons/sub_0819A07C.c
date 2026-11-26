@@ -1,6 +1,6 @@
 #include "global.h"
-void CannonBattery_InitProjectile(void *, void *, s32, s32);
-void CannonBattery_SpawnProjectile(u8 *p, s32 a, s32 b)
+void DeckCannon_InitProjectile(void *, void *, s32, s32);
+void DeckCannon_SpawnProjectile(u8 *p, s32 a, s32 b)
 {
     u8 *q = 0;
     s32 i = 0;
@@ -14,5 +14,5 @@ void CannonBattery_SpawnProjectile(u8 *p, s32 a, s32 b)
         i++;
     }
     if (q)
-        CannonBattery_InitProjectile(p, q, a, b);
+        DeckCannon_InitProjectile(p, q, a, b);
 }

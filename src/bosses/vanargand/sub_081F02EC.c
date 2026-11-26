@@ -1,4 +1,4 @@
-#include "bosses/vanargand/layered_boss_cooldown.h"
+#include "bosses/vanargand/vanargand_head_cooldown.h"
 #include "system/game_state/game_state.h"
 
 struct Slot7Action {
@@ -11,7 +11,7 @@ struct Slot7Action {
 void Collision_CalculateDamageResponse(void *, void *);
 s32 Div(s32, s32);
 
-void SingletonSlot7_BeginScaledCooldown(void *event, struct Slot7Action *action,
+void VanargandHead_BeginScaledCooldown(void *event, struct Slot7Action *action,
                                         struct Slot7Actor *actor)
 {
     s16 level;

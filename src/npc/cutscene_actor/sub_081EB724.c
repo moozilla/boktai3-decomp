@@ -2,7 +2,7 @@
 #include "engine/engine.h"
 #include "ui/menu_parameters.h"
 /* Parameters at 0x020003D0 (meaning unknown). */
-void Params3D0_SetFromScript(void)
+void CutsceneDisplay_SetFromScript(void)
 {
     struct TimeDisplayParameters *p = &gTimeDisplayParameters;
     p->M = 0;

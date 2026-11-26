@@ -1,5 +1,5 @@
-#include "ui/town/scene_inventory_tail.h"
-#include "ui/town/scene_inventory_panel.h"
+#include "ui/town/shop_tail.h"
+#include "ui/town/shop_panel.h"
 struct SceneInventoryInitTransitions {
     u8 unknown0[0x1AF0];
     struct SceneInputPair transition;
@@ -7,7 +7,7 @@ struct SceneInventoryInitTransitions {
     struct SceneInputPair prompt;
 };
 void SceneInputPanel_InitHighlight(struct SceneInputPanel *, struct SceneInputHighlight *);
-void SceneInventory_InitPanel(struct SceneInventoryTail *p, s32 mode)
+void Shop_InitPanel(struct SceneInventoryTail *p, s32 mode)
 {
     struct SceneInputPackedPosition position;
     struct SceneInputResource *resource;

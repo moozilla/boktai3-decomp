@@ -33,7 +33,7 @@ void ProjectileConfig_SetVerticalMotion(void *, u32, u32);
 void ProjectileConfig_SetAnimation(void *, u32, u32, u32);
 void Projectile_SpawnFromConfig(void *, void *);
 void Anim_RestartSequence(void *, void *, u32, u32, u32);
-u32 ScriptCombatActor_TryProjectileAttack(void *);
+u32 MuspellHead_TryProjectileAttack(void *);
 static inline s32 RandomValue(void)
 {
     gRandomIndex = (gRandomIndex + 1) & 1023;
@@ -52,7 +52,7 @@ static inline void raisePosition(struct Vec *p)
 {
     p->y += 128;
 }
-u32 ScriptCombatActor_UpdateProjectileAttack(struct ScriptCombatActor *p)
+u32 MuspellHead_UpdateProjectileAttack(struct ScriptCombatActor *p)
 {
     u8 config[0x5c];
     struct Vec position;
@@ -121,7 +121,7 @@ u32 ScriptCombatActor_UpdateProjectileAttack(struct ScriptCombatActor *p)
         p->timer--;
     else {
         Anim_RestartSequence(p->animation, p->sequence, 0, 0, 0);
-        p->update = ScriptCombatActor_TryProjectileAttack;
+        p->update = MuspellHead_TryProjectileAttack;
     }
     return 0;
 }

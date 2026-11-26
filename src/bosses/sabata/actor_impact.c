@@ -46,7 +46,7 @@ static inline void SetHitAttributes(struct ActorImpact *boss, u32 value)
     boss->contactAttributes = value;
 }
 
-void ActorImpact_CopyContact(struct ContactCollider *attack, struct ContactCollider *defense,
+void SabataImpact_CopyContact(struct ContactCollider *attack, struct ContactCollider *defense,
                              struct ActorImpact *actor)
 {
     struct ActorImpact *boss = actor;
@@ -79,13 +79,13 @@ void ActorImpact_CopyContact(struct ContactCollider *attack, struct ContactColli
 
 /* Empty function; semantic role is not established. */
 
-void ActorImpact_NoOp(void)
+void SabataImpact_NoOp(void)
 {
 }
 
 void Collider_SetAttackProperties(void *, s32, s32, s32, s32, s32);
 
-void ActorImpact_InitAttackCollider(struct ActorImpact *actor)
+void SabataImpact_InitAttackCollider(struct ActorImpact *actor)
 {
     struct ContactPackedVector size;
     struct ContactPackedVector offset;
@@ -98,13 +98,13 @@ void ActorImpact_InitAttackCollider(struct ActorImpact *actor)
     offset.z = 0;
     Collider_Init(collider, 0, 0x2001, 0, 16, &size, &offset);
     Collider_SetPosition(collider, &actor->colliderPosition, 0);
-    Collider_SetCallback(collider, ActorImpact_NoOp, actor);
+    Collider_SetCallback(collider, SabataImpact_NoOp, actor);
     Collider_SetAttackProperties(collider, 0, 0, 0, 0, 0);
 }
 
 void Collider_SetBodyProperties(void *, s32, s32, s32);
 
-void ActorImpact_InitBodyCollider(struct ActorImpact *actor, s32 resource)
+void SabataImpact_InitBodyCollider(struct ActorImpact *actor, s32 resource)
 {
     struct ContactPackedVector size;
     struct ContactPackedVector offset;
@@ -117,12 +117,12 @@ void ActorImpact_InitBodyCollider(struct ActorImpact *actor, s32 resource)
     offset.z = 0;
     Collider_Init(collider, 0, 0x5101, 0, 16, &size, &offset);
     Collider_SetPosition(collider, &actor->colliderPosition, 0);
-    Collider_SetCallback(collider, ActorImpact_CopyContact, actor);
+    Collider_SetCallback(collider, SabataImpact_CopyContact, actor);
     Collider_SetBodyProperties(collider, resource, 0x802, 1);
     Collider_Refresh(collider);
 }
 
-void ActorImpact_InitCollider(struct ActorImpact *actor)
+void SabataImpact_InitCollider(struct ActorImpact *actor)
 {
     struct ContactPackedVector size;
     struct ContactPackedVector offset;
@@ -195,7 +195,7 @@ static inline s32 ActorImpact_TruncateFixed(s32 components)
     return -((-components) >> 12);
 }
 
-u8 ActorImpact_TestForwardPoint(struct ActorImpact *actor)
+u8 SabataImpact_TestForwardPoint(struct ActorImpact *actor)
 {
     struct ContactPosition point;
     u8 *anglePtr = &actor->body.direction;
@@ -243,7 +243,7 @@ s32 SceneActors_GetEffectiveTimeStep(struct ActorImpact *actor)
     return result;
 }
 
-void ActorImpact_FindNearbyPoint(struct ActorImpact *actor, struct ContactPosition *out, u32 start)
+void SabataImpact_FindNearbyPoint(struct ActorImpact *actor, struct ContactPosition *out, u32 start)
 {
     struct ContactPosition point;
     struct SceneActorBody *body = &actor->body;

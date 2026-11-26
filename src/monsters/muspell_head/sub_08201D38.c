@@ -63,7 +63,7 @@ void TerrainModifiers_UnregisterCell(void *);
 void Anim_RestartSequence(void *, void *, u32, u32, u32);
 s32 Callback_InvokeActor(void *arg, void *function);
 void SceneHud_SetTimedState(void *, int, int, int, int, int);
-u32 ScriptCombatActor_UpdateDefeatEffect(void *);
+u32 MuspellHead_UpdateDefeatEffect(void *);
 
 // confidence=low: runs the actor action, damage response, palette timers and sprite playback.
 #define ScriptCombatActor_UpdateState sub_08201D38
@@ -114,7 +114,7 @@ u32 ScriptCombatActor_UpdateState(struct ScriptCombatActorState *p)
                 p->ptr5c = gPaletteBankData + 0x36e0;
                 p->timer18c = 0;
                 p->timer = 0;
-                p->fn15c = ScriptCombatActor_UpdateDefeatEffect;
+                p->fn15c = MuspellHead_UpdateDefeatEffect;
                 Sound_PlaySong(0x529);
             }
             p->timer18c = 8;

@@ -8,7 +8,7 @@ scalar returned to a C caller needs a genuine return-value contract.
 
 | Function | Bytes | Token usage |
 |---|---:|---|
-| `08059C48 ScenePanelRig_TickHoverSelection` | 432 | R1 token around the selected-subject store |
+| `08059C48 PileDriverRig_TickHoverSelection` | 432 | R1 token around the selected-subject store |
 | `08054EC0 DisplayTrack_Update` | 936 | R2 token around a scale comparison |
 | `08056298 TerrainEdgeMarker_FindTerrainDirection` | 1,448 | R3 token across a signed coordinate load |
 | `080674F0 SceneActorControl_TryActivateNearby` | 360 | R3 token consumed by another empty asm |
@@ -27,7 +27,7 @@ both; never delete the defining output while leaving a later operand read.
   explicitly forward the actual selector call result. Their complete 80- and
   124-byte bodies remain exact and move from register-pinned to ordinary C.
   Creators `55F3C` and `56020` test only the result's sign.
-- `48248 ContactBurst_Initialize` returns -1 on resource-load failure and
+- `48248 NidhoggrDuelBurst_Initialize` returns -1 on resource-load failure and
   forwards the actual `Collider_Refresh` word on success. Creator `48344`
   tests that result. The complete 252-byte body is exact ordinary C.
 - `513B8 DirectionalForce_InitializeFromScript` tracks actual script and random
@@ -67,7 +67,7 @@ The reviewed results of `506B8`, `5173C`, `56DBC` and `5C8D8` are discarded task
 callbacks. The sole callers of `6374C` and `61CA8` overwrite R0 immediately.
 No consumed missing return value was established for these six entries.
 
-`612D0 SceneInventory_ClassifySelectedAction` has an observed category domain
+`612D0 Shop_ClassifySelectedAction` has an observed category domain
 of 0, 1 and 2; those paths return explicitly. Its caller `61328` consumes the
 result, but no reachable unsupported category was established. That input
 domain remains a precondition, rather than a claim that all integer inputs

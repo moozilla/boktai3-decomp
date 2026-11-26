@@ -36,11 +36,11 @@ void GameState_SetResultIndex(s32);
 
 void ScreenTransition_SendCommand(s32, s32, s32, s32, s32, s32, s32);
 
-void Registry1745_SetMenuRequest(u32);
+void LinkSession_SetMenuRequest(u32);
 
-s32 Registry1745_GetSessionState(void);
+s32 LinkSession_GetSessionState(void);
 
-void Registry3C9F_LoadBackground(void *);
+void RecordPanel_LoadBackground(void *);
 
 void sub_0810D760(void *);
 
@@ -365,7 +365,7 @@ void SelectionPanel_Close(struct SelectionPanel *panel)
     Bg_ClearTilemap(2);
     Bg_ClearTilemap(3);
     SelectionPanel_HideDisplayObjects(panel);
-    Registry1745_SetMenuRequest(1);
+    LinkSession_SetMenuRequest(1);
     Task_Kill(panel);
 }
 
@@ -515,7 +515,7 @@ s32 SelectionPanel_Update(struct SelectionPanel *panel)
 {
 
     if (SelectionPanel_GetLinkModeFlag()) {
-        if (Registry1745_GetSessionState() == 0) {
+        if (LinkSession_GetSessionState() == 0) {
             ScrollingDialogue_HideImmediately();
             Task_Kill(panel);
             return -1;
@@ -582,7 +582,7 @@ s32 SelectionPanel_InitializeFromScript(struct SelectionPanel *panel)
     Bg_ClearTilemap(2);
     Bg_ClearTilemap(1);
     Bg_ClearTilemap(0);
-    Registry3C9F_LoadBackground(panel);
+    RecordPanel_LoadBackground(panel);
     SelectionPanel_InitEntryIds(panel);
     SelectionPanel_InitializeWidgets(panel);
     SelectionPanel_InitPreview(panel);

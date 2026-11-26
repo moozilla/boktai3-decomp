@@ -40,7 +40,7 @@ void Collider_SetPosition(void *, void *, u32);
 void SpriteComponent_Resume(void *);
 void SpriteComponent_Suspend(void *);
 void ProximityVolume_DispatchUpdate(void *);
-s32 ActorPosition_SaveSelectedPoint(void *);
+s32 SabataPosition_SaveSelectedPoint(void *);
 void FrostEmitter_StartEmission(void *, void *);
 void FrostEmitter_StopEmission(void *);
 void ActorShadow_Disable(void *);
@@ -49,9 +49,9 @@ void Camera_RequestShake(s32);
 s32 ActorProperty_GetConstant34(void *);
 void Camera_SetOffset(s32, void *);
 void SceneActors_EmitRandomBursts(void *);
-void BossSlot2_UpdateSequencePalette(void *);
+void Sabata_UpdateSequencePalette(void *);
 
-void BossSlot2_UpdatePresentation(u8 *p)
+void Sabata_UpdatePresentation(u8 *p)
 {
     u8 *q = p;
     struct Sprite *sprite = (struct Sprite *)(p + 0x48);
@@ -102,7 +102,7 @@ void BossSlot2_UpdatePresentation(u8 *p)
     else
         SpriteComponent_Suspend(q + 0x32c);
     ProximityVolume_DispatchUpdate(q + 0x428);
-    B(0x477) = ActorPosition_SaveSelectedPoint(q);
+    B(0x477) = SabataPosition_SaveSelectedPoint(q);
     if (WordFlags_Test(flags, 0x200000))
         FrostEmitter_StartEmission(*(void **)(q + 0x41c), p + 0x54);
     else
@@ -162,7 +162,7 @@ void BossSlot2_UpdatePresentation(u8 *p)
             H(0x4ec) = 0;
         }
     } else if (B(0x506))
-        BossSlot2_UpdateSequencePalette(q);
+        Sabata_UpdateSequencePalette(q);
     if (!*grounded) {
         if ((*(u8 *)(p + 0xab)) == 0xb)
             Camera_SetOffset(0xf, q + 0x2ec);

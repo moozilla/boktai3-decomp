@@ -401,7 +401,7 @@ s32 Skeleton_Init(void *object)
     MonsterInit_InstallSequenceCallbacks(
         actor, Skeleton_Update, SceneActorReaction_SelectTileParameter, Skeleton_TurnTowardRouteFacing,
         Skeleton_UpdateInactiveState, Skeleton_UpdateIdleState,
-        TentacleBody_UpdateReactionTransition, Skeleton_ConvergeDisplacedPosition,
+        Skeleton_UpdateReactionTransition, Skeleton_ConvergeDisplacedPosition,
         Skeleton_UpdateDefeat, SceneActorReaction_OnEnemyDefault,
         SceneActorTarget_UpdateTrackedContact, SceneActorTarget_ResolvePendingObjectSkeleton,
         SceneActorReaction_ResolvePlacementDamage, SceneActorPlacement_ResetStateThree);

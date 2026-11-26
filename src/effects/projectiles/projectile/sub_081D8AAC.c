@@ -18,7 +18,7 @@ struct TimedSprite {
     u8 unknownA0[0x1A4 - 0xA0];
     s16 timer;
 };
-s32 Task4E01_UpdateTimedSprite(struct TimedSprite *p)
+s32 ProjectileTask_UpdateTimedSprite(struct TimedSprite *p)
 {
     struct TimedSpriteConfig *config = &p->config;
     struct TimedSpriteSprite *sprite = &p->sprite;

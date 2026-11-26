@@ -172,130 +172,130 @@ static inline u32 GridAttack_TestFlags(struct GridAttackActor *actor, u32 mask)
     return actor->flags & mask;
 }
 
-void GridAttackActor_RemoveSprite(struct GridAttackActor *p);
+void NidhoggrDuel_RemoveSprite(struct GridAttackActor *p);
 
-void GridAttackActor_SetAnimation(struct GridAttackActor *p, int sequence, int start, int speed);
+void NidhoggrDuel_SetAnimation(struct GridAttackActor *p, int sequence, int start, int speed);
 
-void GridAttackActor_OnBodyCollision(void);
+void NidhoggrDuel_OnBodyCollision(void);
 
-void GridAttackActor_InitBodyCollider(struct GridAttackActor *p);
+void NidhoggrDuel_InitBodyCollider(struct GridAttackActor *p);
 
-void GridAttackActor_InitDamageCollider(struct GridAttackActor *p, int mode);
+void NidhoggrDuel_InitDamageCollider(struct GridAttackActor *p, int mode);
 
-void GridAttackActor_GetGridPosition(s16 *p, int x, int z);
+void NidhoggrDuel_GetGridPosition(s16 *p, int x, int z);
 
-void GridAttackActor_SpawnGridContact(struct GridAttackActor *p, int x, int z);
+void NidhoggrDuel_SpawnGridContact(struct GridAttackActor *p, int x, int z);
 
-void GridAttackActor_SpawnGridPattern(struct GridAttackActor *p);
+void NidhoggrDuel_SpawnGridPattern(struct GridAttackActor *p);
 
-int GridAttackActor_OnDamage(struct GridAttackActor *p, int kind, int damage);
+int NidhoggrDuel_OnDamage(struct GridAttackActor *p, int kind, int damage);
 
-void GridAttackActor_ResetAttackAnimationHistory(struct GridAttackActor *p);
+void NidhoggrDuel_ResetAttackAnimationHistory(struct GridAttackActor *p);
 
-int GridAttackActor_SelectAttackAnimation(struct GridAttackActor *p);
+int NidhoggrDuel_SelectAttackAnimation(struct GridAttackActor *p);
 
-void GridAttackActor_EmitSpriteParticles(struct GridAttackActor *p);
+void NidhoggrDuel_EmitSpriteParticles(struct GridAttackActor *p);
 
-void GridAttackActor_RequestLinkedActorState(struct GridAttackActor *p);
+void NidhoggrDuel_RequestLinkedActorState(struct GridAttackActor *p);
 
-void GridAttackActor_NotifyLinkedActorLatePhase(struct GridAttackActor *p);
+void NidhoggrDuel_NotifyLinkedActorLatePhase(struct GridAttackActor *p);
 
-void GridAttackActor_UpdateIdle(struct GridAttackActor *p);
+void NidhoggrDuel_UpdateIdle(struct GridAttackActor *p);
 
-void GridAttackActor_UpdateGridAttack(struct GridAttackActor *p, int tick);
+void NidhoggrDuel_UpdateGridAttack(struct GridAttackActor *p, int tick);
 
-void GridAttackActor_UpdateElevatedGridAttack(struct GridAttackActor *p);
+void NidhoggrDuel_UpdateElevatedGridAttack(struct GridAttackActor *p);
 
-void GridAttackActor_UpdateTargetedAttack(struct GridAttackActor *p, int tick);
+void NidhoggrDuel_UpdateTargetedAttack(struct GridAttackActor *p, int tick);
 
-void GridAttackActor_UpdateDamageHold(struct GridAttackActor *p);
+void NidhoggrDuel_UpdateDamageHold(struct GridAttackActor *p);
 
-void GridAttackActor_UpdateDamageRecovery(struct GridAttackActor *p, int tick);
+void NidhoggrDuel_UpdateDamageRecovery(struct GridAttackActor *p, int tick);
 
-void GridAttack_UpdateStaggerState(struct GridAttackActor *p);
+void NidhoggrDuel_UpdateStaggerState(struct GridAttackActor *p);
 
-void GridAttack_UpdateDeathState(struct GridAttackActor *p);
+void NidhoggrDuel_UpdateDeathState(struct GridAttackActor *p);
 
-void GridAttack_UpdateHiddenState(struct GridAttackActor *p);
+void NidhoggrDuel_UpdateHiddenState(struct GridAttackActor *p);
 
-void GridAttack_UpdateIdleState(struct GridAttackActor *s);
+void NidhoggrDuel_UpdateIdleState(struct GridAttackActor *s);
 
-void GridAttack_UpdateAnimationNineState(struct GridAttackActor *p);
+void NidhoggrDuel_UpdateAnimationNineState(struct GridAttackActor *p);
 
-void GridAttack_UpdateAnimationElevenState(struct GridAttackActor *s);
+void NidhoggrDuel_UpdateAnimationElevenState(struct GridAttackActor *s);
 
-void GridAttack_UpdateAlternateIdleState(struct GridAttackActor *s);
+void NidhoggrDuel_UpdateAlternateIdleState(struct GridAttackActor *s);
 
-void GridAttack_UpdateRandomAnimationState(struct GridAttackActor *p, int tick);
+void NidhoggrDuel_UpdateRandomAnimationState(struct GridAttackActor *p, int tick);
 
-void GridAttack_UpdateAnimationThreeState(struct GridAttackActor *p);
+void NidhoggrDuel_UpdateAnimationThreeState(struct GridAttackActor *p);
 
-void GridAttack_UpdateFastAnimationThreeState(struct GridAttackActor *p);
+void NidhoggrDuel_UpdateFastAnimationThreeState(struct GridAttackActor *p);
 
-void GridAttack_UpdateTimedHideState(struct GridAttackActor *p, int tick);
+void NidhoggrDuel_UpdateTimedHideState(struct GridAttackActor *p, int tick);
 
-void GridAttack_RunStateIfUnpaused(u32 a);
+void NidhoggrDuel_RunStateIfUnpaused(u32 a);
 
-u32 GridAttack_ApplyRequestedState(struct GridAttackActor *p);
+u32 NidhoggrDuel_ApplyRequestedState(struct GridAttackActor *p);
 
-int GridAttack_ApplyPendingDamage(struct GridAttackActor *p);
+int NidhoggrDuel_ApplyPendingDamage(struct GridAttackActor *p);
 
-int GridAttack_SelectNextAction(struct GridAttackActor *p);
+int NidhoggrDuel_SelectNextAction(struct GridAttackActor *p);
 
-void GridAttack_UpdateStateNineAction(struct GridAttackActor *p);
+void NidhoggrDuel_UpdateStateNineAction(struct GridAttackActor *p);
 
-void GridAttack_UpdateIdleAction(struct GridAttackActor *p);
+void NidhoggrDuel_UpdateIdleAction(struct GridAttackActor *p);
 
-void GridAttack_UpdateStateElevenAction(struct GridAttackActor *p);
+void NidhoggrDuel_UpdateStateElevenAction(struct GridAttackActor *p);
 
-void GridAttack_UpdateStateTwelveAction(struct GridAttackActor *p);
+void NidhoggrDuel_UpdateStateTwelveAction(struct GridAttackActor *p);
 
-void GridAttack_UpdateStateThirteenAction(struct GridAttackActor *p);
+void NidhoggrDuel_UpdateStateThirteenAction(struct GridAttackActor *p);
 
-void GridAttack_UpdateAnimationFourteen(struct GridAttackActor *p);
+void NidhoggrDuel_UpdateAnimationFourteen(struct GridAttackActor *p);
 
-void GridAttack_UpdateAnimationFifteen(struct GridAttackActor *p);
+void NidhoggrDuel_UpdateAnimationFifteen(struct GridAttackActor *p);
 
-void GridAttack_UpdateAnimationSixteen(struct GridAttackActor *p);
+void NidhoggrDuel_UpdateAnimationSixteen(struct GridAttackActor *p);
 
-void GridAttack_UpdateAnimationSeventeen(struct GridAttackActor *p);
+void NidhoggrDuel_UpdateAnimationSeventeen(struct GridAttackActor *p);
 
-void GridAttack_DispatchSpecialAnimation(struct GridAttackActor *p);
+void NidhoggrDuel_DispatchSpecialAnimation(struct GridAttackActor *p);
 
-int GridAttack_TryStartDamageReaction(struct GridAttackActor *p);
+int NidhoggrDuel_TryStartDamageReaction(struct GridAttackActor *p);
 
-void GridAttack_UpdateWaitAction(struct GridAttackActor *p);
+void NidhoggrDuel_UpdateWaitAction(struct GridAttackActor *p);
 
-void GridAttack_UpdateActionTwo(struct GridAttackActor *p);
+void NidhoggrDuel_UpdateActionTwo(struct GridAttackActor *p);
 
-void GridAttack_UpdateDeathAction(struct GridAttackActor *p);
+void NidhoggrDuel_UpdateDeathAction(struct GridAttackActor *p);
 
-void GridAttack_UpdateAttackAction(struct GridAttackActor *p);
+void NidhoggrDuel_UpdateAttackAction(struct GridAttackActor *p);
 
-void GridAttack_UpdateAnimationFive(struct GridAttackActor *p);
+void NidhoggrDuel_UpdateAnimationFive(struct GridAttackActor *p);
 
-void GridAttack_UpdateRecoveryAction(struct GridAttackActor *p);
+void NidhoggrDuel_UpdateRecoveryAction(struct GridAttackActor *p);
 
-void GridAttack_UpdateDamageAction(struct GridAttackActor *p);
+void NidhoggrDuel_UpdateDamageAction(struct GridAttackActor *p);
 
-void GridAttack_UpdatePassiveAction(struct GridAttackActor *p);
+void NidhoggrDuel_UpdatePassiveAction(struct GridAttackActor *p);
 
-void GridAttack_DispatchNormalAction(struct GridAttackActor *p);
+void NidhoggrDuel_DispatchNormalAction(struct GridAttackActor *p);
 
-void GridAttack_DispatchReactionAction(struct GridAttackActor *p);
+void NidhoggrDuel_DispatchReactionAction(struct GridAttackActor *p);
 
-void GridAttack_UpdateNormalActions(struct GridAttackActor *p);
+void NidhoggrDuel_UpdateNormalActions(struct GridAttackActor *p);
 
-void GridAttack_UpdateReactionActions(struct GridAttackActor *p);
+void NidhoggrDuel_UpdateReactionActions(struct GridAttackActor *p);
 
-void GridAttack_UpdateSpecialActions(struct GridAttackActor *p);
+void NidhoggrDuel_UpdateSpecialActions(struct GridAttackActor *p);
 
-void GridAttack_UpdateActionController(struct GridAttackActor *p);
+void NidhoggrDuel_UpdateActionController(struct GridAttackActor *p);
 
-int GridAttack_Update(struct GridAttackActor *p);
+int NidhoggrDuel_Update(struct GridAttackActor *p);
 
-u32 GridAttackActor_Destroy(struct GridAttackActor *p);
+u32 NidhoggrDuel_Destroy(struct GridAttackActor *p);
 
-struct GridAttackActor *GridAttackActor_Create(u32 a);
+struct GridAttackActor *NidhoggrDuel_Create(u32 a);
 
 #endif

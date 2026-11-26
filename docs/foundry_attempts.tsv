@@ -1761,7 +1761,7 @@ sub_081C3A20	55	matched	100.0	Two compiler idioms needed isolating: multiplying/
 sub_081C3A98	43	matched	100.0	A local duration and separate multiplication preserve the original comparisons and literal multiply.
 sub_081C3B04	129	attempted	54.5	CORE distance reached 1/97 (only an extra post-call reload of gUnk_03005308 that ROM avoids by keeping the index live in a register across the sub_08249350 call); two attempts to introduce a persisten
 sub_081C3E04	111	draft	80.7	Reached CORE distance 0 (structurally exact): the ramp block needed the address of rampFrom taken once and reused via pointer arithmetic (+0x64) to reach the timer field, matching the ROM's register r
-sub_081C3FBC	63	matched	100.0	Recognized this as a stripped-down sibling of RegistryF3E4_Create (081C4080): same struct layout and zero-fill/SetHidden tail but no script reads or scene-message registration, called as sub_081C3FBC(
+sub_081C3FBC	63	matched	100.0	Recognized this as a stripped-down sibling of PopInSprite_Create (081C4080): same struct layout and zero-fill/SetHidden tail but no script reads or scene-message registration, called as sub_081C3FBC(
 sub_081C4194	124	attempted	72.3	Structure, calls and all constants match the ROM; remaining mismatch is register allocation only (CORE distance 9/84): the compiler hoists the random/sine table base into a persistent hi-register wher
 sub_081C42B0	102	attempted	72.7	Structure, branches, constants and even overall byte length (240 bytes, matching ROM) line up; the one defect found along the way was the drawable-flags ternary having its two branch constants (0x200 
 sub_081C43B0	33	matched	100.0	Separate vector pointers and s32 constant locals reproduce the stack stores.
@@ -1807,7 +1807,7 @@ sub_081CB174	80	matched	100.0	Jump table over p->b1 (4..29, mostly identical res
 sub_081CB3F4	110	matched	100.0	Shares the exact two three-phase structure and offsets (0x10 frame counter, 0x18 substate, 0x68 position, TimedSpriteEffect_Create call) with the NONMATCHING sibling src/fn/sub_081CBE30.c, which was a
 sub_081CB5B0	102	draft	97.4	Structure (two states, two CpuSet/Palette_InterpolateBanks calls, the Actor_OnHiddenIdleUpdate install at +0x2CC) all match; only CORE distance 3 of 90 remains, all inside the single "b[0xE] |= 0x100"
 sub_081CB6AC	108	matched	100.0	Has no persistent sub-state switch like its neighbours; it unconditionally re-evaluates `*(s16*)(actor+0x26)` and replays an animation every call, with the only difference between the b9/not-b9 paths 
-sub_081CC0C8	59	draft	95.6	The entry block (shared with StateActor_UpdateHoverBob) and the whole control-flow shape, calls and constants match exactly (CORE distance 1 of 99). The sole leftover is a single dead `movs r5, #0` in
+sub_081CC0C8	59	draft	95.6	The entry block (shared with StoryCharacter_UpdateHoverBob) and the whole control-flow shape, calls and constants match exactly (CORE distance 1 of 99). The sole leftover is a single dead `movs r5, #0` in
 sub_081CD484	966	attempted		Split prologue head falls through a long-branch BL to 081CDDF4, whose loop body at 081CD4B0 shares its saved registers and epilogue.
 sub_081CDE14	101	matched	100.0	Return type had to be s32 (unused, falls off the end) to get the epilogue's pop{r1};bx r1 convention; once that and a direct (uncached) gUnk_030042E4 reference per branch were used, CORE and byte matc
 sub_081CDEF8	73	attempted	55.5	

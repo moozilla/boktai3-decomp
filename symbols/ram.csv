@@ -97,7 +97,7 @@ addr,name,size,kind,decl,header,confidence,notes
 020001B4,gRegionActorPool,4,object,extern struct RegionSpriteManager *gRegionActorPool;,include/engine/ram.h,low,
 020001B8,gTileTriggerManager,4,object,extern struct TileTriggerManager *gTileTriggerManager;,include/engine/ram.h,low,
 020001BC,gNamedEntryPool,4,object,extern u32 gNamedEntryPool;,include/engine/ram.h,low,
-020001C0,gLinkSessionStep,4,object,extern u32 gLinkSessionStep;,include/engine/ram.h,low,provisional: Registry1745_RunSession diagnostic step marker
+020001C0,gLinkSessionStep,4,object,extern u32 gLinkSessionStep;,include/engine/ram.h,low,provisional: LinkSession_RunSession diagnostic step marker
 020001C4,gLinkPanel,4,object,extern u32 gLinkPanel;,include/engine/ram.h,low,
 020001C8,gPanelSequence,4,object,extern u32 gPanelSequence;,include/engine/ram.h,low,
 020001CC,gConfirmPanel,4,object,extern u8 *gConfirmPanel;,include/engine/ram.h,low,provisional: Registry3C9F confirmation panel singleton

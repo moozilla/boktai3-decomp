@@ -1,4 +1,4 @@
-# FanCannon_UpdateActive (08209704)
+# WindCannon_UpdateActive (08209704)
 
 Tags: #matching #fan-cannon #rng #gcse #register-allocation
 

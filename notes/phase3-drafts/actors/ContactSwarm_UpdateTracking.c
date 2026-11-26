@@ -1,6 +1,6 @@
 #include "scene/collision/contact_swarm.h"
-void ContactSwarm_SetDirectionalSequence(struct ContactSwarm *, struct ContactSwarmSlot *, u32);
-void ContactSwarm_UpdateTracking(struct ContactSwarm *pool, struct ContactSwarmSlot *slot,
+void CountBats_SetDirectionalSequence(struct ContactSwarm *, struct ContactSwarmSlot *, u32);
+void CountBats_UpdateTracking(struct ContactSwarm *pool, struct ContactSwarmSlot *slot,
                                  s32 index)
 {
     struct ContactSwarmSprite *sprite = &slot->display.animation.draw.sprite;
@@ -13,7 +13,7 @@ void ContactSwarm_UpdateTracking(struct ContactSwarm *pool, struct ContactSwarmS
         mask = -5;
         mask &= collider->flags;
         collider->flags = mask;
-        ContactSwarm_SetDirectionalSequence(pool, slot, 0);
+        CountBats_SetDirectionalSequence(pool, slot, 0);
     }
     {
         u32 phase = slot->stateFrame & 15;
@@ -29,7 +29,7 @@ void ContactSwarm_UpdateTracking(struct ContactSwarm *pool, struct ContactSwarmS
             dz = target->z;
             dz -= position->z;
             slot->direction = Math_Atan2(dx, dz);
-            ContactSwarm_SetDirectionalSequence(pool, slot, 0);
+            CountBats_SetDirectionalSequence(pool, slot, 0);
         }
     }
     Collider_SetPosition(&slot->display.healthCollider, position, 0);

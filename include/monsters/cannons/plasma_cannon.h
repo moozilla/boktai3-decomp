@@ -48,7 +48,7 @@ struct OrangeSpineActor {
     void *resource;
 };
 
-void OrangeSpine_ApplyHitReaction(struct ContactCollider *source, struct ContactCollider *hit,
+void PlasmaCannon_ApplyHitReaction(struct ContactCollider *source, struct ContactCollider *hit,
                                   struct OrangeSpineActor *actor);
 
 #endif

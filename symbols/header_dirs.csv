@@ -12,7 +12,7 @@ include/actors/actor_controller/actor_controller.h,include/monsters/armor/actor_
 include/actors/actor_decision/actor_decision.h,include/bosses/sabata/actor_decision.h,beside its unit,,
 include/actors/actor_display/departure_burst.h,include/bosses/vanargand/departure_burst.h,beside its unit,,
 include/actors/actor_glyph_trail/actor_glyph_trail.h,include/effects/sprites/glyph_trail.h,beside its unit; renamed from actor_glyph_trail.h,,
-include/actors/actor_graphics_and_basic_states/actor_graphics_and_basic_states.h,include/bosses/count/actor_graphics_and_basic_states.h,renamed moved with its unit,,include/bosses/vampire/actor_graphics_and_basic_states.h
+include/actors/actor_graphics_and_basic_states/actor_graphics_and_basic_states.h,include/bosses/count/count_graphics.h,renamed moved with its unit,,include/bosses/vampire/actor_graphics_and_basic_states.h|include/bosses/count/actor_graphics_and_basic_states.h
 include/actors/actor_impact/actor_impact.h,include/bosses/sabata/actor_impact.h,beside its unit,,
 include/actors/actor_marker/actor_marker.h,include/monsters/armor/actor_marker.h,beside its unit,,
 include/actors/actor_mode/scene_actor_utilities.h,include/scene/actor/actor_utilities.h,beside its unit; renamed from scene_actor_utilities.h,,
@@ -22,10 +22,10 @@ include/actors/actor_position/actor_position.h,include/bosses/sabata/actor_posit
 include/actors/actor_position/actor_position_effects.h,include/bosses/sabata/actor_position_effects.h,beside its unit,,
 include/actors/actor_state/actor_state_commands.h,include/bosses/sabata/actor_state_commands.h,beside its unit,,
 include/actors/common_scene_actor_controller/scene_actors.h,include/scene/actor/scene_actors.h,beside its unit,,
-include/actors/contact_burst_effects/contact_burst.h,include/bosses/nidhoggr/contact_burst.h,beside its unit,,
+include/actors/contact_burst_effects/contact_burst.h,include/bosses/nidhoggr/nidhoggr_duel_burst.h,renamed,,include/bosses/nidhoggr/contact_burst.h
 include/actors/contact_impact_effect/contact_impact_effect.h,include/effects/contact_impact.h,beside its unit; renamed from contact_impact_effect.h,,
-include/actors/grid_attack_actor/grid_attack_actor.h,include/bosses/nidhoggr/grid_attack_actor.h,beside its unit,,
-include/actors/orbit_contact_actor/orbit_contact_actor.h,include/bosses/nidhoggr/orbit_contact_actor.h,beside its unit,,
+include/actors/grid_attack_actor/grid_attack_actor.h,include/bosses/nidhoggr/nidhoggr_duel.h,renamed,,include/bosses/nidhoggr/grid_attack_actor.h
+include/actors/orbit_contact_actor/orbit_contact_actor.h,include/bosses/nidhoggr/nidhoggr_duel_orb.h,renamed,,include/bosses/nidhoggr/orbit_contact_actor.h
 include/actors/orbit_motion/motion_track.h,include/scene/actor/motion_track.h,beside its unit,,
 include/actors/paired_scene_actor/paired_scene_actor.h,include/bosses/vanargand/paired_scene_actor.h,beside its unit,,
 include/actors/parameterized_motion_pool/pooled_motion.h,include/scene/actor/pooled_motion.h,beside its unit,,
@@ -33,8 +33,8 @@ include/actors/phase_object/phase_object.h,include/monsters/ivy/phase_object.h,b
 include/actors/pooled_actor_controllers/pooled_actor_controller.h,include/scene/actor/pooled_actor_controller.h,beside its unit,,
 include/actors/pooled_actor_manager/actor_pool.h,include/scene/actor/actor_pool.h,beside its unit,,
 include/actors/pursuing_actor/pursuing_actor.h,include/effects/projectiles/pursuing_actor.h,beside its unit,,
-include/actors/registry_a8_cb/registry_actor.h,include/npc/sabata_rider/script_puppet.h,with its reviewed owner; original basename registry_actor.h,include/npc/script_puppet/script_puppet.h,
-include/actors/registry_a8_cb/registry_actor_collision.h,include/npc/sabata_rider/script_puppet_collision.h,with its reviewed owner; original basename registry_actor_collision.h,include/npc/script_puppet/script_puppet_collision.h,
+include/actors/registry_a8_cb/registry_actor.h,include/npc/sabata_rider/sabata_rider.h,renamed moved with its unit,include/npc/script_puppet/script_puppet.h,include/npc/sabata_rider/script_puppet.h
+include/actors/registry_a8_cb/registry_actor_collision.h,include/npc/sabata_rider/sabata_rider_collision.h,renamed moved with its unit,include/npc/script_puppet/script_puppet_collision.h,include/npc/sabata_rider/script_puppet_collision.h
 include/actors/route_sprite_actor_pool/route_sprite_playback.h,include/scene/motion/route_sprite_playback.h,"scene-actor framework header grouped by topic: movement, routes, chase, terrain",,include/scene/actor/route_sprite_playback.h
 include/actors/scene_actor_14/sprite_effect.h,include/effects/sprites/sprite_effect.h,beside its unit,,
 include/actors/scene_actor_14/sprite_particle_pool.h,include/effects/sprites/sprite_particle_pool.h,beside its unit,,
@@ -54,16 +54,16 @@ include/actors/scene_npc/scene_npc_transition_palette.h,include/npc/scripted_npc
 include/actors/scene_object_controller/scene_object_controller.h,include/objects/scene_objects/scene_object_controller.h,beside its unit,,
 include/actors/script_actor/player_script.h,include/player/cutscene/player_script.h,moved with its unit,,include/player/script/player_script.h
 include/actors/script_actor/player_script_cues.h,include/player/cutscene/player_script_cues.h,moved with its unit,,include/player/script/player_script_cues.h
-include/actors/sequence_contact_actor_pool/contact_sequence_actor.h,include/bosses/nidhoggr/contact_sequence_actor.h,beside its unit,,
-include/actors/sequence_contact_actor_pool/contact_sequence_pool.h,include/bosses/nidhoggr/contact_sequence_pool.h,beside its unit,,
-include/actors/singleton_slot_7/slot7_cooldown.h,include/bosses/vanargand/layered_boss_cooldown.h,beside its unit; renamed from slot7_cooldown.h,,
-include/actors/singleton_slot_7/slot7_transition.h,include/bosses/vanargand/layered_boss_transition.h,beside its unit; renamed from slot7_transition.h,,
+include/actors/sequence_contact_actor_pool/contact_sequence_actor.h,include/bosses/nidhoggr/nidhoggr_duel_minion.h,renamed,,include/bosses/nidhoggr/contact_sequence_actor.h
+include/actors/sequence_contact_actor_pool/contact_sequence_pool.h,include/bosses/nidhoggr/nidhoggr_duel_minion_pool.h,renamed,,include/bosses/nidhoggr/contact_sequence_pool.h
+include/actors/singleton_slot_7/slot7_cooldown.h,include/bosses/vanargand/vanargand_head_cooldown.h,renamed,,include/bosses/vanargand/layered_boss_cooldown.h
+include/actors/singleton_slot_7/slot7_transition.h,include/bosses/vanargand/vanargand_head_transition.h,renamed,,include/bosses/vanargand/layered_boss_transition.h
 include/actors/spinning_approach_motion/spinning_approach.h,include/monsters/armor/spinning_approach.h,beside its unit,,
 include/actors/task_4_e01/contact_swarm_sprite.h,include/effects/projectiles/contact_swarm_sprite.h,beside its unit,,
 include/actors/task_4_e01/task4e01_projectile.h,include/effects/projectiles/projectile_task.h,beside its unit; renamed from task4e01_projectile.h,,
 include/bosses/hresvelgr/boss_action_state.h,include/bosses/hresvelgr/boss_action_state.h,beside its unit,,
 include/bosses/hresvelgr/hresvelgr_travel.h,include/bosses/hresvelgr/hresvelgr_travel.h,beside its unit,,
-include/bosses/nidhoggr/scene_panel_effect_pool.h,include/bosses/nidhoggr/scene_panel_effect_pool.h,beside its unit,,
+include/bosses/nidhoggr/scene_panel_effect_pool.h,include/bosses/nidhoggr/nidhoggr_effect_pool.h,renamed,,include/bosses/nidhoggr/scene_panel_effect_pool.h
 include/bosses/nidhoggr/scene_pause.h,include/bosses/nidhoggr/scene_pause.h,beside its unit,,
 include/bosses/ratatosk/ratatosk.h,include/bosses/ratatosk/ratatosk.h,beside its unit,,
 include/bosses/ratatosk/ratatosk_facing.h,include/bosses/ratatosk/ratatosk_facing.h,beside its unit,,
@@ -100,7 +100,7 @@ include/effects/health_burst_effect/health_burst.h,include/effects/healing/healt
 include/effects/homing_and_orbiting_effects/homing_effect.h,include/effects/orbits/homing_effect.h,beside its unit,,
 include/effects/homing_projectile/homing_projectile.h,include/effects/projectiles/homing_projectile.h,beside its unit,,
 include/effects/large_fragment_effect/large_fragment_effect.h,include/effects/bursts/large_fragment_effect.h,beside its unit,,
-include/effects/large_scene_animation_controller/large_scene_animation_controller.h,include/bosses/nidhoggr/large_scene_animation_controller.h,beside its unit,,
+include/effects/large_scene_animation_controller/large_scene_animation_controller.h,include/bosses/nidhoggr/nidhoggr_animation.h,renamed,,include/bosses/nidhoggr/large_scene_animation_controller.h
 include/effects/link_effect/link_effect.h,include/effects/link_effect.h,beside its unit,,
 include/effects/orbit_background_controller/orbit_background.h,include/effects/screen/orbit_background.h,beside its unit,,
 include/effects/orbiting_particles/orbiting_particles.h,include/effects/orbits/orbiting_particles.h,beside its unit,,
@@ -326,17 +326,17 @@ include/engine/shared/scene_input_grid.h,include/ui/widgets/scene_input_grid.h,"
 include/engine/shared/scene_input_navigation.h,include/ui/widgets/scene_input_navigation.h,owned by src/ui/widgets/input_grid; included from ui,,
 include/engine/shared/scene_input_panel.h,include/ui/widgets/scene_input_panel.h,owned by src/ui/widgets/input_grid; included from ui,,
 include/engine/shared/scene_input_widget.h,include/ui/widgets/scene_input_widget.h,"owned by src/ui/widgets/input_grid; included from bosses,engine,link,minigames,monsters,scene,ui",,
-include/engine/shared/scene_inventory_actions.h,include/ui/town/scene_inventory_actions.h,"owned by src/ui/town/shop; included from player,ui",,
-include/engine/shared/scene_inventory_callback.h,include/ui/town/scene_inventory_callback.h,owned by src/ui/town/shop,,
-include/engine/shared/scene_inventory_control.h,include/ui/town/scene_inventory_control.h,owned by src/ui/town/shop; included from ui,,
-include/engine/shared/scene_inventory_panel.h,include/ui/town/scene_inventory_panel.h,owned by src/ui/town/shop; included from ui,,
-include/engine/shared/scene_inventory_states.h,include/ui/town/scene_inventory_states.h,owned by src/ui/town/shop; included from ui,,
-include/engine/shared/scene_item_values.h,include/ui/town/scene_item_values.h,"owned by src/ui/town/shop; included from minigames,player,system,ui",,
+include/engine/shared/scene_inventory_actions.h,include/ui/town/shop_actions.h,renamed,,include/ui/town/scene_inventory_actions.h
+include/engine/shared/scene_inventory_callback.h,include/ui/town/shop_callback.h,renamed,,include/ui/town/scene_inventory_callback.h
+include/engine/shared/scene_inventory_control.h,include/ui/town/shop_control.h,renamed,,include/ui/town/scene_inventory_control.h
+include/engine/shared/scene_inventory_panel.h,include/ui/town/shop_panel.h,renamed,,include/ui/town/scene_inventory_panel.h
+include/engine/shared/scene_inventory_states.h,include/ui/town/shop_states.h,renamed,,include/ui/town/scene_inventory_states.h
+include/engine/shared/scene_item_values.h,include/ui/town/shop_item_values.h,renamed,,include/ui/town/scene_item_values.h
 include/engine/shared/scene_object_slot.h,include/objects/scene_objects/scene_object_slot.h,"owned by src/objects/scene_objects; included from npc,objects",,
-include/engine/shared/scene_panel_commands.h,include/objects/pile_driver/scene_panel_commands.h,owned by src/objects/pile_driver; included from bosses,,
-include/engine/shared/scene_panel_rig.h,include/objects/pile_driver/scene_panel_rig.h,"owned by src/objects/pile_driver; included from bosses,effects",,
-include/engine/shared/scene_panel_schedule.h,include/objects/pile_driver/scene_panel_schedule.h,owned by src/objects/pile_driver; included from bosses,,
-include/engine/shared/scene_panel_subject.h,include/objects/pile_driver/scene_panel_subject.h,owned by src/objects/pile_driver; included from bosses,,
+include/engine/shared/scene_panel_commands.h,include/objects/pile_driver/pile_driver_commands.h,renamed,,include/objects/pile_driver/scene_panel_commands.h
+include/engine/shared/scene_panel_rig.h,include/objects/pile_driver/pile_driver_rig.h,renamed,,include/objects/pile_driver/scene_panel_rig.h
+include/engine/shared/scene_panel_schedule.h,include/objects/pile_driver/pile_driver_schedule.h,renamed,,include/objects/pile_driver/scene_panel_schedule.h
+include/engine/shared/scene_panel_subject.h,include/objects/pile_driver/pile_driver_subject.h,renamed,,include/objects/pile_driver/scene_panel_subject.h
 include/engine/shared/scene_particle_burst.h,include/effects/particles/scene_particle_burst.h,"owned by src/effects/particles; included from effects,scene",,
 include/engine/shared/scene_particle_burst_api.h,include/effects/particles/scene_particle_burst_api.h,"owned by src/effects/particles; included from bosses,monsters,objects,player,scene",,
 include/engine/shared/scene_particle_step.h,include/effects/scene_particle_step.h,includers across effects/,,
@@ -461,9 +461,9 @@ include/menus/hud/hud.h,include/ui/hud/hud.h,beside its unit,,
 include/menus/hud/hud_stat_display.h,include/ui/hud/hud_stat_display.h,beside its unit,,
 include/menus/inventory_grid/inventory_grid.h,include/ui/pause/inventory_grid.h,beside its unit,,
 include/menus/inventory_panel/inventory_panel.h,include/ui/pause/inventory_panel.h,beside its unit,,
-include/menus/inventory_transactions_and_catalogs/scene_inventory_catalog.h,include/ui/town/scene_inventory_catalog.h,beside its unit,,
-include/menus/inventory_transactions_and_catalogs/scene_inventory_lifecycle.h,include/ui/town/scene_inventory_lifecycle.h,beside its unit,,
-include/menus/inventory_transactions_and_catalogs/scene_inventory_tail.h,include/ui/town/scene_inventory_tail.h,beside its unit,,
+include/menus/inventory_transactions_and_catalogs/scene_inventory_catalog.h,include/ui/town/shop_catalog.h,renamed,,include/ui/town/scene_inventory_catalog.h
+include/menus/inventory_transactions_and_catalogs/scene_inventory_lifecycle.h,include/ui/town/shop_lifecycle.h,renamed,,include/ui/town/scene_inventory_lifecycle.h
+include/menus/inventory_transactions_and_catalogs/scene_inventory_tail.h,include/ui/town/shop_tail.h,renamed,,include/ui/town/scene_inventory_tail.h
 include/menus/level_advance_display/level_advance_display.h,include/ui/hud/level_advance_display.h,beside its unit,,
 include/menus/menu_cursor/menu_cursor.h,include/ui/widgets/menu_cursor.h,beside its unit,,
 include/menus/menu_display/menu_display.h,include/ui/pause/menu_display.h,beside its unit,,
@@ -492,7 +492,7 @@ include/menus/scene_panel_control_and_lifecycle/scene_panel_interaction.h,includ
 include/menus/scene_panel_control_and_lifecycle/scene_panel_lifecycle.h,include/objects/pile_driver/scene_panel_lifecycle.h,beside its unit,,
 include/menus/scene_panel_control_and_lifecycle/scene_panel_orchestration.h,include/objects/pile_driver/scene_panel_orchestration.h,beside its unit,,
 include/menus/scene_panel_presentation/scene_panel.h,include/objects/pile_driver/scene_panel.h,beside its unit,,
-include/menus/scene_panel_presentation/scene_panel_effects.h,include/objects/pile_driver/scene_panel_effects.h,beside its unit,,
+include/menus/scene_panel_presentation/scene_panel_effects.h,include/objects/pile_driver/pile_driver_effects.h,renamed,,include/objects/pile_driver/scene_panel_effects.h
 include/menus/scene_panel_presentation/scene_panel_overlay.h,include/objects/pile_driver/scene_panel_overlay.h,beside its unit,,
 include/menus/scene_panel_sprite_rig/scene_panel_rig_setup.h,include/objects/pile_driver/scene_panel_rig_setup.h,beside its unit,,
 include/menus/scene_panel_subjects/scene_panel_subject_playback.h,include/objects/pile_driver/scene_panel_subject_playback.h,beside its unit,,
@@ -527,7 +527,7 @@ include/monsters/dog/dog.h,include/monsters/dog.h,beside its unit,,
 include/monsters/ghost/ghost.h,include/monsters/ghost.h,beside its unit,,
 include/monsters/ghoul/ghoul.h,include/monsters/ghoul.h,beside its unit,,
 include/monsters/ghoul/ghoul_disc.h,include/monsters/ghoul_disc.h,beside its unit,,
-include/monsters/glove/glove.h,include/minigames/coffin_bike/glove.h,with its reviewed owner; original basename glove.h,include/monsters/glove/glove.h,
+include/monsters/glove/glove.h,include/minigames/coffin_bike/coffin_bike.h,renamed moved with its unit,include/monsters/glove/glove.h,include/minigames/coffin_bike/glove.h
 include/monsters/golem/golem.h,include/monsters/golem/golem.h,beside its unit,,
 include/monsters/golem/golem_charge.h,include/monsters/golem/golem_charge.h,beside its unit,,
 include/monsters/ivy/ivy.h,include/monsters/ivy/ivy.h,beside its unit,,
@@ -536,8 +536,8 @@ include/monsters/lun/lun.h,include/monsters/lun.h,beside its unit,,
 include/monsters/mimic/mimic.h,include/monsters/mimic.h,beside its unit,,
 include/monsters/mummy/mummy.h,include/monsters/mummy/mummy.h,beside its unit,,
 include/monsters/octopus/octopus.h,include/monsters/octopus.h,beside its unit,,
-include/monsters/orange_spine/orange_spine.h,include/monsters/cannons/orange_spine.h,with its reviewed owner; original basename orange_spine.h,include/monsters/orange_spine/orange_spine.h,
-include/monsters/pink_spine/pink_spine_playback.h,include/monsters/popbud/pink_spine_playback.h,with its reviewed owner; original basename pink_spine_playback.h,include/monsters/pink_spine/pink_spine_playback.h,
+include/monsters/orange_spine/orange_spine.h,include/monsters/cannons/plasma_cannon.h,renamed moved with its unit,include/monsters/orange_spine/orange_spine.h,include/monsters/cannons/orange_spine.h
+include/monsters/pink_spine/pink_spine_playback.h,include/monsters/popbud/popbud_playback.h,renamed moved with its unit,include/monsters/pink_spine/pink_spine_playback.h,include/monsters/popbud/pink_spine_playback.h
 include/monsters/screamer/screamer_playback.h,include/monsters/screamer/screamer_playback.h,beside its unit,,
 include/monsters/screamer/screamer_state.h,include/monsters/screamer/screamer_state.h,beside its unit,,
 include/monsters/skeleton/enemy_defeat_statistics.h,include/monsters/skeleton/enemy_defeat_statistics.h,beside its unit,,
@@ -548,8 +548,8 @@ include/monsters/slime/tentacle_spread.h,include/monsters/tentacle_spread.h,besi
 include/monsters/spider/spider.h,include/monsters/spider.h,beside its unit,,
 include/monsters/sword/sword_orbit.h,include/monsters/sword/sword_orbit.h,beside its unit,,
 include/monsters/sword/sword_wave_component.h,include/monsters/sword/sword_wave_component.h,beside its unit,,
-include/monsters/tentacle_actor/tentacle_segment_animation.h,include/monsters/centipede/tentacle_segment_animation.h,with its reviewed owner; original basename tentacle_segment_animation.h,include/monsters/tentacle/tentacle_segment_animation.h,
-include/monsters/tentacle_body/tentacle_body.h,include/monsters/centipede/tentacle_body.h,with its reviewed owner; original basename tentacle_body.h,include/monsters/tentacle/tentacle_body.h,
+include/monsters/tentacle_actor/tentacle_segment_animation.h,include/monsters/centipede/centipede_segment_animation.h,renamed moved with its unit,include/monsters/tentacle/tentacle_segment_animation.h,include/monsters/centipede/tentacle_segment_animation.h
+include/monsters/tentacle_body/tentacle_body.h,include/monsters/centipede/centipede_body.h,renamed moved with its unit,include/monsters/tentacle/tentacle_body.h,include/monsters/centipede/tentacle_body.h
 include/monsters/vorn/vorn.h,include/monsters/vorn/vorn.h,beside its unit,,
 include/monsters/vulcan_cannon/vulcan_cannon_worker.h,include/monsters/cannons/vulcan_cannon_worker.h,beside its unit,,
 include/other/callback_pool/callback_pool.h,include/objects/actor_group/callback_pool.h,beside its unit,,

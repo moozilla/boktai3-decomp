@@ -740,7 +740,7 @@ struct SavedMotion {
     struct ContactPosition position;
 };
 
-void TentacleActor_ResetOscillation(void *);
+void Centipede_ResetOscillation(void *);
 
 s32 Callback_InvokeActor(void *, void *);
 
@@ -748,13 +748,13 @@ void Anim_SetDurationScale(void *, u32);
 
 void Anim_SetFrameDurationScale(void *, u32);
 
-void TentacleActor_SelectWanderRoute(void *);
+void Centipede_SelectWanderRoute(void *);
 
-void TentacleActor_AdvanceMotionPhase(void *, s32);
+void Centipede_AdvanceMotionPhase(void *, s32);
 
 void sub_080A9DB0(void *, s32, s32);
 
-void TentacleActor_UpdateOscillation(void *, s32, s32);
+void Centipede_UpdateOscillation(void *, s32, s32);
 
 static inline u8 Approach(struct ChaseActor *actor, struct SavedMotion *saved, s32 speed)
 {

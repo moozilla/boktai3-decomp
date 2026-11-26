@@ -9,7 +9,7 @@
 #include "npc/cutscene_actor/actor_animation_controller.h"
 #include "engine/engine.h"
 #include "link/session/room_actor.h"
-/* Complete allocation used by TentacleEnemy_Create; private roles are tentative. */
+/* Complete allocation used by Centipede_Create; private roles are tentative. */
 struct TentacleBody {
     struct RoomActor base;
     struct TentacleAnimationSegment segments[4];
@@ -41,35 +41,35 @@ struct TentacleBody {
 void SceneActorBehavior_ApplyContactReaction(struct SceneActorBehaviorContactView *,
                                              struct SceneActorBehaviorContactView *,
                                              struct RoomActor *);
-void TentacleActor_EnterHitReaction(struct ChaseActor *);
-void TentacleBody_GetDirectionFrame(u8, u32 *, u32 *);
-void TentacleBody_ResetDirectionalAnimations(void *, s32);
-void TentacleBody_RefreshDirectionalAnimations(void *, s32);
-void TentacleActor_AssignSegmentPhases(void *);
+void Centipede_EnterHitReaction(struct ChaseActor *);
+void CentipedeBody_GetDirectionFrame(u8, u32 *, u32 *);
+void CentipedeBody_ResetDirectionalAnimations(void *, s32);
+void CentipedeBody_RefreshDirectionalAnimations(void *, s32);
+void Centipede_AssignSegmentPhases(void *);
 void ActorTrail_RestoreSavedState(struct ChaseActor *s);
 void ActorTrail_ResetAtSavedPosition(struct ChaseActor *);
 void SceneActorPalette_ClearCompletedTransitions(void);
-void TentacleBody_RestartSegmentAnimations(void *, u32, u32, u32);
-void TentacleBody_UpdateSpreadRelease(struct ChaseActor *actor, s32 frame);
-void TentacleBody_UpdateChargeSpread(struct ChaseActor *actor, s32 frame);
+void CentipedeBody_RestartSegmentAnimations(void *, u32, u32, u32);
+void CentipedeBody_UpdateSpreadRelease(struct ChaseActor *actor, s32 frame);
+void CentipedeBody_UpdateChargeSpread(struct ChaseActor *actor, s32 frame);
 void ActorTrail_ApplyAngularOffsets(void *, s32, s32, s32);
-void TentacleBody_BeginDirectedAttack(struct ChaseActor *actor);
-void TentacleBody_UpdateAttackRecovery(struct ChaseActor *actor, s32 frame);
+void CentipedeBody_BeginDirectedAttack(struct ChaseActor *actor);
+void CentipedeBody_UpdateAttackRecovery(struct ChaseActor *actor, s32 frame);
 void SceneActor_AimArcAtPlayer(void *);
-void TentacleBody_OnAttackCollision(u8 *unused, struct ContactCollider *obj,
+void CentipedeBody_OnAttackCollision(u8 *unused, struct ContactCollider *obj,
                                     struct ChaseActor *ctx);
-void TentacleBody_OnBodyContact(struct SceneActorBehaviorContactView *source,
+void CentipedeBody_OnBodyContact(struct SceneActorBehaviorContactView *source,
                                 struct SceneActorBehaviorContactView *destination,
                                 struct ChaseActor *actor);
-void TentacleBody_UpdateAttackWindup(struct RoomActor *actor);
-void TentacleBody_ResetDirectionalPose(struct RoomActor *actor);
-void TentacleBody_OnIdleState(void);
-void TentacleBody_UpdateInactiveState(void);
-void TentacleBody_UpdateTimedAction(struct ChaseActor *p, s32 time);
-void TentacleBody_UpdateHiddenTransition(struct ChaseActor *s, s32 arg, u32 unused);
-void TentacleBody_UpdateAnimationEleven(struct ChaseActor *p);
-void TentacleBody_UpdateSpreadWindup(struct ChaseActor *actor);
-void TentacleBody_UpdateSpreadPreparation(struct ChaseActor *actor);
+void CentipedeBody_UpdateAttackWindup(struct RoomActor *actor);
+void CentipedeBody_ResetDirectionalPose(struct RoomActor *actor);
+void CentipedeBody_OnIdleState(void);
+void CentipedeBody_UpdateInactiveState(void);
+void CentipedeBody_UpdateTimedAction(struct ChaseActor *p, s32 time);
+void CentipedeBody_UpdateHiddenTransition(struct ChaseActor *s, s32 arg, u32 unused);
+void CentipedeBody_UpdateAnimationEleven(struct ChaseActor *p);
+void CentipedeBody_UpdateSpreadWindup(struct ChaseActor *actor);
+void CentipedeBody_UpdateSpreadPreparation(struct ChaseActor *actor);
 
 static inline void TentacleBody_SelectAnimation(struct RoomActor *actor, u32 selection, u32 variant,
                                                 u32 flags)

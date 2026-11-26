@@ -1,10 +1,10 @@
 #include "global.h"
-#include "monsters/centipede/tentacle_segment_animation.h"
+#include "monsters/centipede/centipede_segment_animation.h"
 #include "engine/video/display_animation.h"
 #include "engine/video/display_sequence_inline.h"
 
 void *SceneActorProfiles_GetEntryAddress(u32, u32, s32);
-void TentacleBody_GetDirectionFrame(u16, s32 *, s32 *);
+void CentipedeBody_GetDirectionFrame(u16, s32 *, s32 *);
 void Anim_RestartSequence(void *, void *, u32, u8, u8);
 void Anim_SetDurationScale(void *, u32);
 static inline void Step(struct SceneActorControlMotionDrawable *drawable,
@@ -30,7 +30,7 @@ static inline void Step(struct SceneActorControlMotionDrawable *drawable,
     }
 }
 
-void TentacleBody_RestartSegmentAnimations(struct TentacleBodyAnimationView *body, s32 kind,
+void CentipedeBody_RestartSegmentAnimations(struct TentacleBodyAnimationView *body, s32 kind,
                                            s32 row, s32 flags)
 {
     struct TentacleBodyAnimationView *actor;

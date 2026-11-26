@@ -160,7 +160,7 @@ struct StateActor {
     u8 unk304[0x343 - 0x304];
     u8 variant;         /* 0x343: SceneActorAnimation_Update{Directional,EightDirection}Callback. */
     u8 groundEffect[1]; /* 0x344: embedded projection object, full extent unknown; see
-                          * include/bosses/count/actor_graphics_and_basic_states.h for what this unit learned. */
+                          * include/bosses/count/count_graphics.h for what this unit learned. */
 };
 
 static inline void SceneActors_SetFacing(struct StateActor *actor, int angle)

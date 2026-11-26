@@ -14,7 +14,7 @@ void Actor_HideAuxiliarySprites(void *);
 void BgGfx_LoadTilemapAtPosition(s32, s32, s32);
 void Menu_StartFadeIn(s32);
 
-s32 Params3D0_InitDisplay(u8 *p)
+s32 CutsceneDisplay_InitDisplay(u8 *p)
 {
     s32 i;
     u16 *q;

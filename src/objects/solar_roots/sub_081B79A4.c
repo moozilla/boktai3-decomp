@@ -10,7 +10,7 @@ struct AnimatedMarker {
 };
 void Sound_PlaySong(u32);
 void OrbitingParticles_Create(void *, s32, s32, s32, s32);
-void GrowthHazard_BeginCooldown(struct AnimatedMarker *);
+void SolarRoot_BeginCooldown(struct AnimatedMarker *);
 // confidence=low: on the first tick plays sound 0x1AA and spawns orbiting particles; after eight
 // ticks starts the cooldown.
 void AnimatedMarker_TickActive(struct AnimatedMarker *p)
@@ -23,5 +23,5 @@ void AnimatedMarker_TickActive(struct AnimatedMarker *p)
     if (++p->timer <= 7)
         p->visible = 1;
     else
-        GrowthHazard_BeginCooldown(p);
+        SolarRoot_BeginCooldown(p);
 }

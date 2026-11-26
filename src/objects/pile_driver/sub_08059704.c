@@ -1,5 +1,5 @@
-#include "objects/pile_driver/scene_panel_rig.h"
-void ScenePanelRig_SetSubjectState(struct ScenePanelRig *rig, u32 index, u32 state)
+#include "objects/pile_driver/pile_driver_rig.h"
+void PileDriverRig_SetSubjectState(struct ScenePanelRig *rig, u32 index, u32 state)
 {
-    ScenePanelSubject_SetState(((struct SceneRigParentView *)rig->parent)->subjects[index], state);
+    PileDriverSubject_SetState(((struct SceneRigParentView *)rig->parent)->subjects[index], state);
 }

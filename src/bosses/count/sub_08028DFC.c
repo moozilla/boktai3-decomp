@@ -1,5 +1,5 @@
 #include "global.h"
-/* Vampire_GetBarrierCount: Getter for the same offset-0x384 counter that Vampire_DecrementBarrierCount decrements */
+/* Vampire_GetBarrierCount: Getter for the same offset-0x384 counter that Count_DecrementBarrierCount decrements */
 #define Vampire_GetBarrierCount sub_08028DFC
 
 u8 *SceneActors_GetBySlot(u32);

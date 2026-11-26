@@ -1,8 +1,8 @@
 // Tentative Vanargand ownership; field roles follow the mode transition accesses.
 #include "bosses/vanargand/vanargand_pair_attack.h"
 
-void ScenePanel_UpdatePairConditions(void *);
-void ScenePanel_ApplyPairTransition(void *);
+void VanargandPair_UpdatePairConditions(void *);
+void VanargandPair_ApplyPairTransition(void *);
 
 void Vanargand_UpdateModeCycle(struct VanargandPairAttack *p)
 {
@@ -22,8 +22,8 @@ void Vanargand_UpdateModeCycle(struct VanargandPairAttack *p)
         } else if (q->state == 8) {
             Vanargand_EnterAction(q, 16);
         } else {
-            ScenePanel_UpdatePairConditions(p);
-            ScenePanel_ApplyPairTransition(p);
+            VanargandPair_UpdatePairConditions(p);
+            VanargandPair_ApplyPairTransition(p);
         }
         q->actionTimer++;
     }

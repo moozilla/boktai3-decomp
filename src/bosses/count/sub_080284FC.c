@@ -61,7 +61,7 @@ struct Packed {
 void DamageNumberDisplay_Show(void *, int, int, void *, void *, int);
 void SceneActors_SpawnDestructionParticles(void *);
 int SceneActorGraphics_GetEffectState(void *);
-void Vampire_UpdateSwayReaction(void *, int);
+void Count_UpdateSwayReaction(void *, int);
 void sub_08027214(void *, int);
 
 /* Health is stored in the signed halfword domain. */
@@ -70,7 +70,7 @@ static inline s16 Vampire_GetHealthFloor(void)
     return 0;
 }
 
-int Vampire_ApplyPendingDamage(struct VampireDamage *p)
+int Count_ApplyPendingDamage(struct VampireDamage *p)
 {
     int special;
     struct VampireDamage *base = p;
@@ -162,7 +162,7 @@ int Vampire_ApplyPendingDamage(struct VampireDamage *p)
             trigger = flaggedBit;
         if (trigger) {
             SceneActorState_SetFlags((struct StateActor *)base, 1);
-            SceneActorState_EnterAction((struct StateActor *)base, Vampire_UpdateSwayReaction, 24);
+            SceneActorState_EnterAction((struct StateActor *)base, Count_UpdateSwayReaction, 24);
             return 1;
         }
         p->shakeAmplitude = 8;

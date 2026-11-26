@@ -3565,7 +3565,7 @@ void SceneActorReaction_TickHiddenTimeout(struct ChaseActor *p, s32 elapsed)
     }
 }
 
-/* TentacleBody_UpdateReactionTransition: plays the hurt entry or, after a long wait, restores the saved snapshot */
+/* Skeleton_UpdateReactionTransition: plays the hurt entry or, after a long wait, restores the saved snapshot */
 
 struct SnapshotActor;
 
@@ -3580,7 +3580,7 @@ static inline u8 take(u8 *s)
     return 0;
 }
 
-void TentacleBody_UpdateReactionTransition(u8 *s, s32 arg)
+void Skeleton_UpdateReactionTransition(u8 *s, s32 arg)
 {
     u32 queued = take(s);
     if (queued || arg == 0x1E || arg == 0x37) {

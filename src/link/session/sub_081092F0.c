@@ -16,7 +16,7 @@ static inline u8 chk(struct P *p)
     return FALSE;
 }
 
-void Registry1745_SetSelectionResponse(u32 v)
+void LinkSession_SetSelectionResponse(u32 v)
 {
     if (gLinkSession != 0) {
         struct P *p = gLinkSession;

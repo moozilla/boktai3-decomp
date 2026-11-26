@@ -110,7 +110,7 @@ void GameStart_DrawSaveInfo(struct GameStart *p)
         *zp = 0;
         CpuSet(zp, text, 0x05000008);
         s = Text_LookupString(Script_ParseStringRef((void *)gListMenuParameters.aBlock) +
-                              SceneSequence_GetSelectedMessage());
+                              MenuSequence_GetSelectedMessage());
         q = text;
         while (*s)
             *q++ = *s++;

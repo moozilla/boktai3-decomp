@@ -1,5 +1,5 @@
-#include "objects/pile_driver/scene_panel_subject.h"
-void ScenePanelSubject_KeepPlayerOutside(struct ScenePanelSubject *subject)
+#include "objects/pile_driver/pile_driver_subject.h"
+void PileDriverSubject_KeepPlayerOutside(struct ScenePanelSubject *subject)
 {
     s32 x = SCENE_PANEL_PLAYER->position.x - subject->home.x;
     s32 z = SCENE_PANEL_PLAYER->position.z - subject->home.z;

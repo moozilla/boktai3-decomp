@@ -204,7 +204,7 @@ void BreakableBarrier_Update(struct BreakableBarrierManager *m, struct Breakable
     }
 }
 
-void Vampire_DecrementBarrierCount(void);
+void Count_DecrementBarrierCount(void);
 void Palette_StartSlide(s32, s32, s32);
 
 void BreakableBarrier_UpdateBroken(struct BreakableBarrierManager *m, struct BreakableBarrier *p)
@@ -247,7 +247,7 @@ void BreakableBarrier_UpdateBroken(struct BreakableBarrierManager *m, struct Bre
         Sound_PlaySongChecked(0x339);
     }
     if (p->timer > 63) {
-        Vampire_DecrementBarrierCount();
+        Count_DecrementBarrierCount();
         if (m->remaining != 0) {
             s32 step;
             m->remaining--;

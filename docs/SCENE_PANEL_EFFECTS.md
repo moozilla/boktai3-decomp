@@ -2,7 +2,7 @@
 
 `08057960–08058130` is an earlier group of consumers of the same large object
 viewed by `scene_panel.h`. The additional layout is in
-`include/objects/pile_driver/scene_panel_effects.h`; its public functions take `struct ScenePanel *`
+`include/objects/pile_driver/pile_driver_effects.h`; its public functions take `struct ScenePanel *`
 and cast to the local effects view. `ScenePanel` remains a tentative identity.
 These are static contracts, without claims of observed gameplay coverage.
 

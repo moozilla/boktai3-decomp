@@ -3,7 +3,7 @@
 #include "ui/widgets/scene_input_panel.h"
 #include "ui/widgets/scene_input_navigation.h"
 #include "system/game_state/game_state.h"
-#include "ui/town/scene_inventory_callback.h"
+#include "ui/town/shop_callback.h"
 /* Catalog and transition/controller storage overlap across UI phases. */
 struct SceneInventoryControlView {
     struct SceneInputPanel display;
@@ -53,32 +53,32 @@ struct SceneInventoryControlDefinition *Equipment_GetDefinition(u32);
 struct SceneInventoryControlConsumable *GameState_GetConsumableDescriptor(u32);
 u32 SceneItemValue_GetItemBaseValue(s32);
 s32 SceneItemValue_GetConsumableBaseValue(u32);
-s32 SceneInventory_ClassifyEquipmentAction(struct SceneInventoryControlView *);
-s32 SceneInventory_ClassifyItemAction(struct SceneInventoryControlView *);
-s32 SceneInventory_ClassifyConsumableAction(struct SceneInventoryControlView *);
-s32 SceneInventory_ClassifySelectedAction(struct SceneInventoryControlView *);
-void SceneInventory_UpdateActionPrompt(struct SceneInventoryControlView *);
-void SceneInventory_UpdateModePrompt(struct SceneInventoryControlView *, s32);
-s32 SceneInventory_FindActionDestination(struct SceneInventoryControlView *);
-void SceneInventory_SelectActionDestination(struct SceneInventoryControlView *);
+s32 Shop_ClassifyEquipmentAction(struct SceneInventoryControlView *);
+s32 Shop_ClassifyItemAction(struct SceneInventoryControlView *);
+s32 Shop_ClassifyConsumableAction(struct SceneInventoryControlView *);
+s32 Shop_ClassifySelectedAction(struct SceneInventoryControlView *);
+void Shop_UpdateActionPrompt(struct SceneInventoryControlView *);
+void Shop_UpdateModePrompt(struct SceneInventoryControlView *, s32);
+s32 Shop_FindActionDestination(struct SceneInventoryControlView *);
+void Shop_SelectActionDestination(struct SceneInventoryControlView *);
 void SceneInputPanel_PositionModeCursor(struct SceneInputPanel *, u32);
 void SceneInput_RestoreSelection(struct SceneInputGridView *);
 void SceneInput_InitGrid(struct SceneInputGridView *, u32, u32, u32, u32);
-s32 SceneInventory_FindEmptyEquipmentSlot(const void *);
-s32 SceneInventory_FindEmptyItemSlot(const void *);
-s32 SceneInventory_FindEmptyConsumableSlot(const void *);
-s32 SceneInventory_TickActionSelection(struct SceneInventoryControlView *);
-s32 SceneInventory_HandleClockShortcut(struct SceneInventoryControlView *);
-u32 SceneInventory_UpdateMixedCatalogCategory(struct SceneInventoryControlView *);
-s32 SceneInventory_HandlePageKeys(struct SceneInventoryControlView *);
-void SceneInventory_BeginMoveSelection(struct SceneInventoryControlView *);
-void SceneInventory_BeginItemSelection(struct SceneInventoryControlView *);
-void SceneInventory_BeginExitConfirmation(struct SceneInventoryControlView *);
-void SceneInventory_BeginConsumableSelection(struct SceneInventoryControlView *);
-void SceneInventory_BeginPurchaseConfirmation(struct SceneInventoryControlView *);
-void SceneInventory_BeginSaleConfirmation(struct SceneInventoryControlView *);
-void SceneInventory_BeginReposition(struct SceneInventoryControlView *);
-void SceneInventory_BeginRemovalConfirmation(struct SceneInventoryControlView *);
+s32 Shop_FindEmptyEquipmentSlot(const void *);
+s32 Shop_FindEmptyItemSlot(const void *);
+s32 Shop_FindEmptyConsumableSlot(const void *);
+s32 Shop_TickActionSelection(struct SceneInventoryControlView *);
+s32 Shop_HandleClockShortcut(struct SceneInventoryControlView *);
+u32 Shop_UpdateMixedCatalogCategory(struct SceneInventoryControlView *);
+s32 Shop_HandlePageKeys(struct SceneInventoryControlView *);
+void Shop_BeginMoveSelection(struct SceneInventoryControlView *);
+void Shop_BeginItemSelection(struct SceneInventoryControlView *);
+void Shop_BeginExitConfirmation(struct SceneInventoryControlView *);
+void Shop_BeginConsumableSelection(struct SceneInventoryControlView *);
+void Shop_BeginPurchaseConfirmation(struct SceneInventoryControlView *);
+void Shop_BeginSaleConfirmation(struct SceneInventoryControlView *);
+void Shop_BeginReposition(struct SceneInventoryControlView *);
+void Shop_BeginRemovalConfirmation(struct SceneInventoryControlView *);
 void SceneInputPanel_HighlightMode(struct SceneInputPanel *, u16 *);
 extern const u8 gUnk_0824DF38[];
 #endif

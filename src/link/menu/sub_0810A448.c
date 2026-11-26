@@ -1,13 +1,13 @@
-#define LinkMenu_ConsumeStateEntry Registry1745_ConsumeStateEntry
-#define LinkMenu_SetState          Registry1745_SetState
-#define LinkMenu_CheckSession      Registry1745_CheckSessionReady
-#define LinkMenu_ResetSelection    Registry1745_BeginShutdown
+#define LinkMenu_ConsumeStateEntry LinkSession_ConsumeStateEntry
+#define LinkMenu_SetState          LinkSession_SetState
+#define LinkMenu_CheckSession      LinkSession_CheckSessionReady
+#define LinkMenu_ResetSelection    LinkSession_BeginShutdown
 #include "global.h"
 #include "scene/areas/area_effect_link.h"
-u8 Registry1745_ConsumeStateEntry(void *);
-s32 Registry1745_CheckSessionReady(void *);
-void Registry1745_BeginShutdown(void *, void (*)(void));
-void Registry1745_SetState(void *, u32, void (*)(void));
+u8 LinkSession_ConsumeStateEntry(void *);
+s32 LinkSession_CheckSessionReady(void *);
+void LinkSession_BeginShutdown(void *, void (*)(void));
+void LinkSession_SetState(void *, u32, void (*)(void));
 void Script_Call(u32, void *);
 void Sound_FadeOutChannel10(u32);
 void ScriptPanel_OpenTextWindow(void);
@@ -31,16 +31,16 @@ static inline u8 IsMode4(u16 *p)
 }
 s32 LinkMenu_UpdateSelection(struct AreaEffectLinkState *p)
 {
-    if (Registry1745_ConsumeStateEntry(p))
+    if (LinkSession_ConsumeStateEntry(p))
         Script_Call(p->selectionScript, 0);
-    if (Registry1745_CheckSessionReady(p) < 0) {
-        Registry1745_BeginShutdown(p, ScriptPanel_OpenTextWindow);
+    if (LinkSession_CheckSessionReady(p) < 0) {
+        LinkSession_BeginShutdown(p, ScriptPanel_OpenTextWindow);
         return -1;
     }
     if (IsMode9(p->selection))
-        Registry1745_SetState(p, 9, LinkMenu_ExchangeChoices);
+        LinkSession_SetState(p, 9, LinkMenu_ExchangeChoices);
     else if (IsMode4(p->selection)) {
-        Registry1745_SetState(p, 4, LinkMenu_WaitForReadyPeers);
+        LinkSession_SetState(p, 4, LinkMenu_WaitForReadyPeers);
         if (gLinkSession && gLinkSession->localPlayer == 0)
             Sound_FadeOutChannel10(1);
     } else if (gLinkSession && gLinkSession->localPlayer == 0) {

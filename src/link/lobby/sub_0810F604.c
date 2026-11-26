@@ -1,5 +1,5 @@
 #include "global.h"
-s32 Registry1745_GetSessionState(void *);
+s32 LinkSession_GetSessionState(void *);
 void ScrollingDialogue_HideImmediately(void);
 void Task_Kill(void *);
 void Callback_InvokeActor(void *, u32);
@@ -9,7 +9,7 @@ struct S {
 };
 s32 LinkLobbyPanel_OnTaskUpdate(struct S *s)
 {
-    if (Registry1745_GetSessionState(s) == 0) {
+    if (LinkSession_GetSessionState(s) == 0) {
         ScrollingDialogue_HideImmediately();
         Task_Kill(s);
         return -1;

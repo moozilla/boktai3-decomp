@@ -10,12 +10,12 @@ struct Packet {
 };
 void SceneMessages_Send(struct Packet *);
 void Sound_PlayTrackedSong(int);
-void Glove_UpdateStopping(void);
+void CoffinBike_UpdateStopping(void);
 static inline void clearDrawFlags(struct ScenePoolPlayerDraw *d, s16 mask)
 {
     d->flags = mask & d->flags;
 }
-void Glove_StopWithMessage(struct ScenePoolPlayer *glove)
+void CoffinBike_StopWithMessage(struct ScenePoolPlayer *glove)
 {
     struct Packet *packet = &gMessagePacket;
     u32 one;
@@ -33,7 +33,7 @@ void Glove_StopWithMessage(struct ScenePoolPlayer *glove)
     }
     Sound_PlayTrackedSong(0x29);
     {
-        void (*update)(void) = Glove_UpdateStopping;
+        void (*update)(void) = CoffinBike_UpdateStopping;
         u8 *active = &glove->gloveActive;
         *active = one;
         glove->gloveUpdate = update;

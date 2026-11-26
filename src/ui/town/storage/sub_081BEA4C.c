@@ -1,5 +1,5 @@
 #include "global.h"
-#include "ui/town/scene_inventory_panel.h"
+#include "ui/town/shop_panel.h"
 void Inventory_GetEquipmentDescriptor(s32, void *);
 void Presentation_ApplyGraphicData(void *, void *);
 void Presentation_ApplyPackedGraphicData(const void *, u32);

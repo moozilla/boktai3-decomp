@@ -1,7 +1,7 @@
-#include "ui/town/scene_item_values.h"
+#include "ui/town/shop_item_values.h"
 s32 SceneItemValue_CalculateItem(u32 slot)
 {
-    s32 state = SceneInventory_GetItemConditionFrame(slot);
+    s32 state = PauseDisplay_GetItemConditionFrame(slot);
     s32 percent = 50;
     s32 result;
     if (state != 394) {

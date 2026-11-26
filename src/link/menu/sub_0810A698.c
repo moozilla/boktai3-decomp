@@ -1,13 +1,13 @@
-#define LinkMenu_ConsumeStateEntry Registry1745_ConsumeStateEntry
-#define LinkMenu_SetState          Registry1745_SetState
-#define LinkMenu_CheckSession      Registry1745_CheckSessionReady
-#define LinkMenu_ResetSelection    Registry1745_BeginShutdown
+#define LinkMenu_ConsumeStateEntry LinkSession_ConsumeStateEntry
+#define LinkMenu_SetState          LinkSession_SetState
+#define LinkMenu_CheckSession      LinkSession_CheckSessionReady
+#define LinkMenu_ResetSelection    LinkSession_BeginShutdown
 #include "global.h"
 #include "scene/areas/area_effect_link.h"
-u8 Registry1745_ConsumeStateEntry(void *);
-s32 Registry1745_CheckSessionReady(void *);
-void Registry1745_BeginShutdown(void *, void (*)(void));
-void Registry1745_SetState(void *, u32, void (*)(void));
+u8 LinkSession_ConsumeStateEntry(void *);
+s32 LinkSession_CheckSessionReady(void *);
+void LinkSession_BeginShutdown(void *, void (*)(void));
+void LinkSession_SetState(void *, u32, void (*)(void));
 void ScriptPanel_OpenTextWindow(void);
 void SessionMenu_RunEventScript(void);
 void Hud_RefreshSpriteFromScript(void);
@@ -36,7 +36,7 @@ s32 LinkMenu_ShowChoiceMessage(struct AreaEffectLinkState *p)
     u8 *session = p->sessionData;
     s32 count, i, limit;
     u32 mask;
-    if (Registry1745_ConsumeStateEntry(p)) {
+    if (LinkSession_ConsumeStateEntry(p)) {
         u8 *values;
         s32 *window;
         Hud_RefreshSpriteFromScript();
@@ -50,8 +50,8 @@ s32 LinkMenu_ShowChoiceMessage(struct AreaEffectLinkState *p)
         TextWindow_SetString(*window, 1, values);
         TextWindow_StartPlayback(*window);
     }
-    if (Registry1745_CheckSessionReady(p) < 0) {
-        Registry1745_BeginShutdown(p, ScriptPanel_OpenTextWindow);
+    if (LinkSession_CheckSessionReady(p) < 0) {
+        LinkSession_BeginShutdown(p, ScriptPanel_OpenTextWindow);
         return -1;
     }
     count = 0;
@@ -66,7 +66,7 @@ s32 LinkMenu_ShowChoiceMessage(struct AreaEffectLinkState *p)
         } while (++i < limit);
     }
     if (count == limit)
-        Registry1745_SetState(p, 11, SessionMenu_RunEventScript);
+        LinkSession_SetState(p, 11, SessionMenu_RunEventScript);
     else if (p->menuElapsed > 120)
         p->requestedMode = 0x108b;
     return 0;

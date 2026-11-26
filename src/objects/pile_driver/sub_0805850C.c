@@ -1,8 +1,8 @@
 #include "objects/pile_driver/scene_panel.h"
-void ScenePanel_TickPulseTwo(struct ScenePanel *panel)
+void PileDriver_TickPulseTwo(struct ScenePanel *panel)
 {
     if (++panel->stateFrame > 7) {
-        ScenePanel_SetChannelValue(panel, 2, 2);
-        ScenePanel_SetState(panel, ScenePanel_TickPulseRest);
+        PileDriver_SetChannelValue(panel, 2, 2);
+        PileDriver_SetState(panel, PileDriver_TickPulseRest);
     }
 }

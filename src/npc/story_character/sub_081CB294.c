@@ -31,7 +31,7 @@ struct StateActorRise {
     struct ContactPosition *shadow;
 };
 
-void StateActor_UpdateRiseToTerrain(void *ctx, struct StateActorRise *a, s32 tick)
+void StoryCharacter_UpdateRiseToTerrain(void *ctx, struct StateActorRise *a, s32 tick)
 {
     struct RiseTag *tag = &a->tag;
     struct Pos16 *pos = &a->position;

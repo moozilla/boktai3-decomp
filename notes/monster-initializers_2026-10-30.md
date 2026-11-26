@@ -18,7 +18,7 @@ are separate from the shared-record and helper migrations.
 | Lun_Init | `0809DD78` | 3,920 |
 | Crow_Init | `080A1440` | 3,024 |
 | Spider_Init | `080A4AFC` | 4,184 |
-| TentacleActor_Init | `080ABDCC` | 3,548 |
+| Centipede_Init | `080ABDCC` | 3,548 |
 | Vorn_Init | `080B43BC` | 4,332 |
 | Skeleton_Init | `080C3260` | 4,684 |
 | Golem_Init | `080CFC14` | 4,072 |

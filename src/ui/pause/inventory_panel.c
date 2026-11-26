@@ -1,5 +1,5 @@
 #include "global.h"
-#include "ui/town/scene_item_values.h"
+#include "ui/town/shop_item_values.h"
 #include "system/game_state/game_state.h"
 #include "player/player.h"
 #include "ui/pause/inventory_panel.h"

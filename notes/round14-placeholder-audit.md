@@ -65,7 +65,7 @@ Using those fields in `081D46B4` removes the need for a loaded-value placeholder
 No shared header was changed.
 
 The trail entry's eight-byte position at `0x18` and signed angle offset at `0x29`
-are established in `Task4E01_UpdateTrailSprites` (`081D75E8`). The existing
+are established in `ProjectileTask_UpdateTrailSprites` (`081D75E8`). The existing
 aligned `ContactPosition` type supplies the position copy directly. The old
 `new_var3 = 0x60` served two unrelated roles: a random modulus and the address
 of the first entry's position. The accepted source uses the literal only as the
@@ -73,7 +73,7 @@ random range and addresses the position through the entry field. The separate
 heading-narrowing placeholder remains unchanged and warned.
 
 `include/effects/projectiles/projectile_config.h` already declares the real `Task4E01Params` and
-`ContactPosition` contracts. `Task4E01_GetEntryPosition` in
+`ContactPosition` contracts. `ProjectileTask_GetEntryPosition` in
 `src/effects/projectiles/projectile/projectile_config.c` returns the entry's `sprite.position`.
 `OrbitEffect_FireProjectileOnContact` (`081FD704`) also gets a source position,
 copies it to an origin or target, then calculates the firing direction. This
@@ -104,7 +104,7 @@ diagnostic knobs were used only to identify mechanisms.
 | `Hresvelgr_UpdateRandomAnimation` (`081A117C`) | `struct ActorReaction **new_var3` | Access the existing actor pointer directly. | 10 / 10; 200 bytes |
 | `Storage_BeginCategoryMode` (`081BF440`) | `int new_var = -1` | Pass the sentinel directly in the description call. | 2 / 2; 220 bytes |
 | `TaggedSceneNpc_UpdateJumpToTarget` (`081D1E78`) | `struct Tagged *new_var` | Use the existing case-local tagged-state pointer. | 7 / 7; 420 bytes |
-| `Task4E01_SpawnTrailSprite` (`081D76F4`) | `unsigned char new_var` | Mask the computed heading directly in the accepted real-field implementation. | 1 / 1; 384 bytes |
+| `ProjectileTask_SpawnTrailSprite` (`081D76F4`) | `unsigned char new_var` | Mask the computed heading directly in the accepted real-field implementation. | 1 / 1; 384 bytes |
 | `SceneActor_FindNearbyActivePlayer` (`src/monsters/mimic.c`, `080E7F54`) | `s16 new_var` | Square `delta->z` directly. | 7 / 7; 160-byte function |
 
 ### What the attempts established

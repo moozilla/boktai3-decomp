@@ -1,6 +1,6 @@
 #include "bosses/sabata/scene_volume.h"
 
-s32 SceneVolume_CanActivate(struct SceneVolumeActor *volume)
+s32 SabataVolume_CanActivate(struct SceneVolumeActor *volume)
 {
     if (!(volume->previousChoice == 2 || volume->previousChoice == 10))
         return 0;

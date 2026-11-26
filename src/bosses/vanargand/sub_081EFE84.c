@@ -33,7 +33,7 @@ static inline u8 ConsumeEntry(u8 *p)
     return FALSE;
 }
 
-void SingletonSlot7_UpdateTransitionDisplay(u8 *p)
+void VanargandHead_UpdateTransitionDisplay(u8 *p)
 {
     u8 *context = p;
     u32 flag = ConsumeEntry(context);

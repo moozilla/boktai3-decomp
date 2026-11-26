@@ -1,13 +1,13 @@
 #include "scene/collision/contact_swarm.h"
-void ContactSwarm_SetDirectionalSequence(struct ContactSwarm *, struct ContactSwarmSlot *, u32);
-u32 ContactSwarm_HideSlot(struct ContactSwarm *, struct ContactSwarmSlot *, s32);
+void CountBats_SetDirectionalSequence(struct ContactSwarm *, struct ContactSwarmSlot *, u32);
+u32 CountBats_HideSlot(struct ContactSwarm *, struct ContactSwarmSlot *, s32);
 static inline s32 truncateShift12(s32 value)
 {
     if (value >= 0)
         return value >> 12;
     return -((-value) >> 12);
 }
-void ContactSwarm_UpdateCharge(struct ContactSwarm *pool, struct ContactSwarmSlot *slot, s32 index)
+void CountBats_UpdateCharge(struct ContactSwarm *pool, struct ContactSwarmSlot *slot, s32 index)
 {
     struct ContactSwarmSprite *sprite = &slot->display.animation.draw.sprite;
     s32 k2 = 255;
@@ -23,7 +23,7 @@ void ContactSwarm_UpdateCharge(struct ContactSwarm *pool, struct ContactSwarmSlo
         mask = -5;
         mask &= collider->flags;
         collider->flags = mask;
-        ContactSwarm_SetDirectionalSequence(pool, slot, 0);
+        CountBats_SetDirectionalSequence(pool, slot, 0);
         velocity = &slot->velocity;
         direction = slot->direction;
         speed = slot->speed;
@@ -57,7 +57,7 @@ void ContactSwarm_UpdateCharge(struct ContactSwarm *pool, struct ContactSwarmSlo
         }
     }
     if (slot->stateFrame > 119) {
-        ContactSwarm_HideSlot(pool, slot, index);
+        CountBats_HideSlot(pool, slot, index);
     } else {
         slot->stateFrame++;
     }

@@ -1,6 +1,6 @@
 #include "global.h"
-void CannonBattery_InitMuzzleFlash(void *, void *, s32, s32);
-void CannonBattery_SpawnMuzzleFlash(u8 *p, s32 a, s32 b)
+void DeckCannon_InitMuzzleFlash(void *, void *, s32, s32);
+void DeckCannon_SpawnMuzzleFlash(u8 *p, s32 a, s32 b)
 {
     u8 *q = 0;
     s32 i = 0;
@@ -14,5 +14,5 @@ void CannonBattery_SpawnMuzzleFlash(u8 *p, s32 a, s32 b)
         i++;
     }
     if (q)
-        CannonBattery_InitMuzzleFlash(p, q, a, b);
+        DeckCannon_InitMuzzleFlash(p, q, a, b);
 }

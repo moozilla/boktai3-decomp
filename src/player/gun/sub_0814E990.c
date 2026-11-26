@@ -26,7 +26,7 @@ s32 Player_GetAttackEffectType(u32);
 
 void Player_OnChargedAttackExit(void *);
 void Player_SetPendingCallback(void *, void (*)(void *));
-s32 Task4E01_GetKind7Value(s32);
+s32 ProjectileTask_GetKind7Value(s32);
 void Player_UpdateAttachedEntryPosition(void *);
 // confidence=low: attached task charge values choose tiers before recoil and buffered restart.
 void Player_UpdateAttachedChargeTiers(u8 *p)
@@ -80,7 +80,7 @@ void Player_UpdateAttachedChargeTiers(u8 *p)
                 goto updateRelease;
             Player_UpdateAttackFacing(p);
             ANIMATE(0x24);
-            if (Task4E01_GetKind7Value(*(s32 *)(p + 0xC74)) > 1) {
+            if (ProjectileTask_GetKind7Value(*(s32 *)(p + 0xC74)) > 1) {
                 HALF(0x4D2) = 30;
                 ((struct Player *)p)->actionEighteenParameter = 0x16E;
                 HALF(0xAD8) = 36;
@@ -93,7 +93,7 @@ void Player_UpdateAttachedChargeTiers(u8 *p)
                 goto updateRelease;
             Player_UpdateAttackFacing(p);
             ANIMATE(0x24);
-            if (Task4E01_GetKind7Value(*(s32 *)(p + 0xC74)) > 2) {
+            if (ProjectileTask_GetKind7Value(*(s32 *)(p + 0xC74)) > 2) {
                 HALF(0x4D2) = 60;
                 ((struct Player *)p)->actionEighteenParameter = 0x16E;
                 HALF(0xAD8) = 36;

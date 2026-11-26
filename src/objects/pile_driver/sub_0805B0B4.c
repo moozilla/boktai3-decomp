@@ -1,5 +1,5 @@
 #include "objects/pile_driver/scene_panel_rig_setup.h"
-void ScenePanelRig_InitPayloadVectors(struct ScenePanelRig *rig)
+void PileDriverRig_InitPayloadVectors(struct ScenePanelRig *rig)
 {
     struct SceneRigPayloadView *view = (void *)rig;
     view->firstX = 160;

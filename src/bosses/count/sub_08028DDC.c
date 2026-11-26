@@ -5,7 +5,7 @@ struct S {
     u8 a;
 };
 struct S *SceneActors_GetBySlot(u32);
-void Vampire_DecrementBarrierCount(void)
+void Count_DecrementBarrierCount(void)
 {
     struct S *p = SceneActors_GetBySlot(0);
     if (p && p->a != 0)

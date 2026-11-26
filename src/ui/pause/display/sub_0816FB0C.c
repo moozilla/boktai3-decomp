@@ -2,7 +2,7 @@
 #include "global.h"
 #include "ui/pause/scene_hud_display.h"
 #include "ui/pause/inventory_grid.h"
-#include "ui/town/scene_item_values.h"
+#include "ui/town/shop_item_values.h"
 extern const struct SceneValueItemDefinition gUnk_08E61280[];
 void Sound_PlaySong(u32);
 s32 Inventory_GetQuantityByStorage(u32, u32);
@@ -10,7 +10,7 @@ void MenuTransition_BeginSelectedWidget(void *);
 void sub_0816E570(void *);
 void PauseMenu_BeginCharacterItemUse(void *, u32);
 void PauseMenu_BeginVitalRatioExchange(void *, u32);
-void ScenePanel_BeginRandomTransition(void *);
+void PauseDisplay_BeginRandomTransition(void *);
 void PauseMenu_BeginTypeThirteenItemUse(void *);
 void PauseMenu_BeginTypeFourteenItemUse(void *);
 void SceneHud_BeginSelectedActionTransfer(void *);
@@ -57,7 +57,7 @@ void SceneHud_DispatchSelectedAction(struct SceneHudState *p)
             PauseMenu_BeginVitalRatioExchange(p, gUnk_08E61280[index].effectValueA);
             break;
         case 11:
-            ScenePanel_BeginRandomTransition(p);
+            PauseDisplay_BeginRandomTransition(p);
             break;
         case 6:
         case 12:

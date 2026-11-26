@@ -4,15 +4,15 @@
 #include "engine/ram.h"
 
 #define gLinkSelectionDisplaySlots gSceneSelectionDisplaySlots
-u8 Registry1745_ConsumeStateEntry(struct AreaEffectLinkState *);
-s32 Registry1745_CheckSessionReady(struct AreaEffectLinkState *);
-void Registry1745_SetMenuRequest(u32);
+u8 LinkSession_ConsumeStateEntry(struct AreaEffectLinkState *);
+s32 LinkSession_CheckSessionReady(struct AreaEffectLinkState *);
+void LinkSession_SetMenuRequest(u32);
 void Script_Call(u32, void *);
-void Registry1745_BeginShutdown(struct AreaEffectLinkState *, void (*)(void));
+void LinkSession_BeginShutdown(struct AreaEffectLinkState *, void (*)(void));
 void ScriptPanel_OpenTextWindow(void);
 void Bg_ClearTilemap(s32);
 void ScriptNotifier_CallWithValue(struct AreaEffectLinkState *);
-void Registry1745_SetState(struct AreaEffectLinkState *, u32, void (*)(void));
+void LinkSession_SetState(struct AreaEffectLinkState *, u32, void (*)(void));
 void SceneSelection_WaitForSlotTransition(void);
 static inline u16 GetSlot(struct AreaEffectLinkState *p, s32 i)
 {
@@ -26,12 +26,12 @@ s32 LinkSelection_WaitForEmptySlots(struct AreaEffectLinkState *p)
     s32 i;
     s32 count;
     s32 length;
-    if (Registry1745_ConsumeStateEntry(p)) {
-        Registry1745_SetMenuRequest(0);
+    if (LinkSession_ConsumeStateEntry(p)) {
+        LinkSession_SetMenuRequest(0);
         Script_Call(p->emptySelectionScript, 0);
     }
-    if (Registry1745_CheckSessionReady(p) < 0) {
-        Registry1745_BeginShutdown(p, ScriptPanel_OpenTextWindow);
+    if (LinkSession_CheckSessionReady(p) < 0) {
+        LinkSession_BeginShutdown(p, ScriptPanel_OpenTextWindow);
         return -1;
     }
     count = 0;
@@ -49,7 +49,7 @@ s32 LinkSelection_WaitForEmptySlots(struct AreaEffectLinkState *p)
         ScriptNotifier_CallWithValue(p);
         for (i = 0; i < 4; i++)
             gSceneSelectionDisplaySlots[i] = 0x3ff;
-        Registry1745_SetState(p, 15, SceneSelection_WaitForSlotTransition);
+        LinkSession_SetState(p, 15, SceneSelection_WaitForSlotTransition);
     } else if (p->menuEvent == 1)
         p->requestedMode = 0x1023;
     return 0;

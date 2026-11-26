@@ -1,5 +1,5 @@
 #include "global.h"
-void Registry1745_InitParticipantOrder(u8 *p)
+void LinkSession_InitParticipantOrder(u8 *p)
 {
     u8 *q = p + 0xe0;
     s32 i = 0;

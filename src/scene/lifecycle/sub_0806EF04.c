@@ -2,7 +2,7 @@
 #include "scene/areas/area_effect_link.h"
 void SceneEffectSchedule_Reset(void);
 void SceneScheduledEffect_ResetSingleton(void);
-void Pool1B8_ResetInstance(void);
+void TileTriggerPool_ResetInstance(void);
 void WoodenCrate_ResetManager(void);
 void SceneActorRegistry_ResetManager(void);
 void ActorAttachment_ClearManagerPointer(void);
@@ -10,7 +10,7 @@ void SceneParticleBurst_ResetSingleton(void);
 void SceneParticlePool_ResetSingleton(void);
 void SceneActorRecord_Clear(void);
 void SceneActorContacts_Reset(void);
-void SceneActor14_ResetSingleton(void);
+void SpriteEffectSet_ResetSingleton(void);
 void SceneTerrainProbe_ResetPool(void);
 void SceneTrailEffect_ResetPool(void);
 void BouncingObject_ResetPool(void);
@@ -30,22 +30,22 @@ void FeatherEffectPool_ResetSingleton(void);
 void SpriteEffectController_ResetPool(void);
 void SunDiscPool_ResetSingleton(void);
 void FragmentProjectilePool_ResetSingleton(void);
-void Pool184_ResetManager(void);
+void ActorGroupPool_ResetManager(void);
 void SlashEffect_ResetManagerReference(void);
-void Pool1B4_ResetInstance(void);
+void RegionActorPool_ResetInstance(void);
 void SceneSteeringActor_ResetPool(void);
 void FragmentEffect_ResetManagerReference(void);
 void FragmentSpritePool_ResetSingleton(void);
 void ParticleEffectPool_ResetSingleton(void);
 void LinkHandshake_ResetInstance(void);
 void ActorMarkerPool_ResetSingleton(void);
-void RegistryE7BC_ResetManager(void);
+void ScriptObjectPool_ResetManager(void);
 void AnimatedTile_ResetManager(void);
 void SceneLifecycle_ResetSubsystems(void)
 {
     SceneEffectSchedule_Reset();
     SceneScheduledEffect_ResetSingleton();
-    Pool1B8_ResetInstance();
+    TileTriggerPool_ResetInstance();
     WoodenCrate_ResetManager();
     SceneActorRegistry_ResetManager();
     ActorAttachment_ClearManagerPointer();
@@ -53,7 +53,7 @@ void SceneLifecycle_ResetSubsystems(void)
     SceneParticlePool_ResetSingleton();
     SceneActorRecord_Clear();
     SceneActorContacts_Reset();
-    SceneActor14_ResetSingleton();
+    SpriteEffectSet_ResetSingleton();
     SceneTerrainProbe_ResetPool();
     SceneTrailEffect_ResetPool();
     BouncingObject_ResetPool();
@@ -73,9 +73,9 @@ void SceneLifecycle_ResetSubsystems(void)
     SpriteEffectController_ResetPool();
     SunDiscPool_ResetSingleton();
     FragmentProjectilePool_ResetSingleton();
-    Pool184_ResetManager();
+    ActorGroupPool_ResetManager();
     SlashEffect_ResetManagerReference();
-    Pool1B4_ResetInstance();
+    RegionActorPool_ResetInstance();
     SceneSteeringActor_ResetPool();
     FragmentEffect_ResetManagerReference();
     FragmentSpritePool_ResetSingleton();
@@ -83,6 +83,6 @@ void SceneLifecycle_ResetSubsystems(void)
     LinkHandshake_ResetInstance();
     gLinkSession = 0;
     ActorMarkerPool_ResetSingleton();
-    RegistryE7BC_ResetManager();
+    ScriptObjectPool_ResetManager();
     AnimatedTile_ResetManager();
 }

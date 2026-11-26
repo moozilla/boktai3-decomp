@@ -6,7 +6,7 @@
 extern const s16 gUnk_086149C4[];
 
 struct ContactSwarm;
-s32 ContactSwarm_SpawnCharge(struct ContactSwarm *pool, const struct ContactPosition *position,
+s32 CountBats_SpawnCharge(struct ContactSwarm *pool, const struct ContactPosition *position,
                              u32 direction, u32 speed, u32 resourceId, u32 cost, u32 option);
 
 static inline s32 SceneActor_ChargeComponent(s32 value)

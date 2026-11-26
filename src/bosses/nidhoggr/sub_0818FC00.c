@@ -1,7 +1,7 @@
 #include "global.h"
 #include "engine/video/display_animation.h"
 #include "player/cutscene/player_cue_sequence.h"
-#include "bosses/nidhoggr/scene_panel_effect_pool.h"
+#include "bosses/nidhoggr/nidhoggr_effect_pool.h"
 static inline u32 Nidhoggr_StepAnimation(struct ScenePanelOwnedEffect *owner)
 {
     return PlayerCue_StepSequenceEnded((void *)&owner->sprite, &owner->sequence);

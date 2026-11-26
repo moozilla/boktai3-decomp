@@ -53,7 +53,7 @@ void SceneActors_UpdateSwarmAttack(struct StateActor *p, int tick)
             random &= 15;
             direction += random;
         }
-        ContactSwarm_SpawnCharge(*(void **)((u8 *)p2 + 0x9d4), &spawn, direction, 20, 0, 0, 0);
+        CountBats_SpawnCharge(*(void **)((u8 *)p2 + 0x9d4), &spawn, direction, 20, 0, 0, 0);
         Sound_PlaySongChecked(234);
     }
     if (((struct SceneGraphicsActor *)p2)->animation.status & 2) {

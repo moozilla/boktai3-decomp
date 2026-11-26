@@ -8,7 +8,7 @@ void StatusPanel_UpdateGaugePosition(void *);
 void PauseMenu_RefreshPriceDigits(void *);
 s32 MessageWindow_ShowMessage(s32);
 void Hud_SetUpdateCallback(struct SceneHudState *, void (*)(struct SceneHudState *));
-void ScenePanel_BeginDetail(struct SceneHudState *p)
+void StatusPanel_BeginDetail(struct SceneHudState *p)
 {
     s32 i;
     PauseMenu_HideAllSprites(p);
@@ -37,5 +37,5 @@ void ScenePanel_BeginDetail(struct SceneHudState *p)
     Anim_LoadKeyframe(&p->accountCursor, &p->accountResource, 0x12, 1);
     AnimData_SelectPaletteBank((u8 *)p + 0xC54, 0x1B4);
     MessageWindow_ShowMessage(4);
-    Hud_SetUpdateCallback(p, ScenePanel_UpdateDetail);
+    Hud_SetUpdateCallback(p, MenuPrompt_UpdateDetail);
 }

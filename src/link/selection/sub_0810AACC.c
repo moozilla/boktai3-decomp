@@ -12,12 +12,12 @@ struct SceneSelection {
     u16 command;
     u16 *slots;
 };
-u8 Registry1745_ConsumeStateEntry(struct SceneSelection *);
-s32 Registry1745_CheckSessionReady(struct SceneSelection *);
-void Registry1745_BeginShutdown(struct SceneSelection *, void (*)(void));
+u8 LinkSession_ConsumeStateEntry(struct SceneSelection *);
+s32 LinkSession_CheckSessionReady(struct SceneSelection *);
+void LinkSession_BeginShutdown(struct SceneSelection *, void (*)(void));
 void ScriptPanel_OpenTextWindow(void);
 void Sound_FadeOutChannel10(u32);
-void Registry1745_SetState(struct SceneSelection *, u32, void (*)(void));
+void LinkSession_SetState(struct SceneSelection *, u32, void (*)(void));
 void SessionMenu_CreateStageIconDisplay(void);
 static inline u16 GetSlot(struct SceneSelection *p, s32 i)
 {
@@ -35,15 +35,15 @@ s32 SceneSelection_WaitForSlotTransition(struct SceneSelection *p)
 {
     s32 count, i, length;
     gLinkMenuActive = 1;
-    if (Registry1745_ConsumeStateEntry(p)) {
+    if (LinkSession_ConsumeStateEntry(p)) {
         gBgFadeLevel = 0x40;
         gObjFadeLevel = 0x40;
         Sound_FadeOutChannel10(1);
     }
     if (p->timer == 1)
         Engine_SetPauseFlags(4);
-    if (Registry1745_CheckSessionReady(p) < 0) {
-        Registry1745_BeginShutdown(p, ScriptPanel_OpenTextWindow);
+    if (LinkSession_CheckSessionReady(p) < 0) {
+        LinkSession_BeginShutdown(p, ScriptPanel_OpenTextWindow);
         return -1;
     }
     count = 0;
@@ -58,7 +58,7 @@ s32 SceneSelection_WaitForSlotTransition(struct SceneSelection *p)
         } while (i < length);
     }
     if (count == length)
-        Registry1745_SetState(p, 16, SessionMenu_CreateStageIconDisplay);
+        LinkSession_SetState(p, 16, SessionMenu_CreateStageIconDisplay);
     else if (p->timer > 9) {
         p->command = 0x2000;
         Engine_ClearPauseFlags(4);

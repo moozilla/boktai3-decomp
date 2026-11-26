@@ -2,7 +2,7 @@
 /* ContactSwarm_SpawnPairedAdvance: Fills free slots in the advance state with alternating paired headings and randomized timing then starts palette fading. */
 #define ContactSwarm_SpawnPairedAdvance sub_08044934
 #define ContactSwarm_SpawnPairedAdvance sub_08044934
-void ContactSwarm_SetDirectionalSequence(struct ContactSwarm *, struct ContactSwarmSlot *, u32);
+void CountBats_SetDirectionalSequence(struct ContactSwarm *, struct ContactSwarmSlot *, u32);
 void Collider_SetAttackProperties(void *, u32, u32, u32, u32, u32);
 void Palette_InterpolateBanks(void *, void *, void *, s32, s32);
 s32 ContactSwarm_SpawnPairedAdvance(struct ContactSwarm *pool,
@@ -55,7 +55,7 @@ s32 ContactSwarm_SpawnPairedAdvance(struct ContactSwarm *pool,
             destination = &slot->display.animation.draw.sprite.position;
             draw->sprite.position = *position;
             draw->sprite.flags &= ~1;
-            ContactSwarm_SetDirectionalSequence(pool, slot, 0);
+            CountBats_SetDirectionalSequence(pool, slot, 0);
             AnimData_SelectPaletteBank(&slot->display.animation.draw.graphics, 0x2D7);
             draw->graphics.paletteData = pool->palette;
             ActorShadow_Enable(slot->shadow);

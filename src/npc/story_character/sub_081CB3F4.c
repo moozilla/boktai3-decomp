@@ -9,7 +9,7 @@ struct VecCB3F4 {
     s16 x, y, z, pad;
 };
 
-void StateActor_UpdateKind29AttackEffect(u32 a, u8 *b, u32 c)
+void StoryCharacter_UpdateKind29AttackEffect(u32 a, u8 *b, u32 c)
 {
     u32 anim;
     if (b[9]) {

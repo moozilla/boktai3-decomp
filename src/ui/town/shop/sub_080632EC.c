@@ -16,7 +16,7 @@ void SceneInput_DestroyMarkerPair(struct SceneInputPair *);
 void SceneInput_DestroyGlyphPair(struct SceneInputPair *);
 void MessageWindow_Clear(void);
 void ScrollingDialogue_ClearScript(void);
-s32 SceneInventory_DestroyController(struct SceneInventoryCleanupView *owner)
+s32 Shop_DestroyController(struct SceneInventoryCleanupView *owner)
 {
     struct SceneInputWidget *widget;
     s32 i;

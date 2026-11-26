@@ -13,10 +13,10 @@ struct FanCannonManager {
     struct FanCannon slots[8];
 };
 extern u32 gUnk_02000560;
-void FanCannon_Update(struct FanCannonManager *, struct FanCannon *, s32);
-void FanCannon_UpdateActive(void);
+void WindCannon_Update(struct FanCannonManager *, struct FanCannon *, s32);
+void WindCannon_UpdateActive(void);
 void Sound_StopSong(u32);
-u32 FanCannonManager_Update(struct FanCannonManager *p)
+u32 WindCannonManager_Update(struct FanCannonManager *p)
 {
     u32 active = 0;
     u32 mask = 0x400;
@@ -36,8 +36,8 @@ u32 FanCannonManager_Update(struct FanCannonManager *p)
     do {
         u32 bit = 1 << i;
         if (p->occupiedSlots & bit) {
-            FanCannon_Update(p, slot, i);
-            if (slot->update == FanCannon_UpdateActive)
+            WindCannon_Update(p, slot, i);
+            if (slot->update == WindCannon_UpdateActive)
                 active |= bit;
         }
         i++;

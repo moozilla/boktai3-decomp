@@ -1,14 +1,14 @@
 #include "global.h"
 #include "scene/areas/area_effect_link.h"
 #include "engine/ram.h"
-u8 Registry1745_ConsumeStateEntry(void *);
-s32 Registry1745_CheckSessionReady(void *);
-void Registry1745_BeginShutdown(void *, void *);
+u8 LinkSession_ConsumeStateEntry(void *);
+s32 LinkSession_CheckSessionReady(void *);
+void LinkSession_BeginShutdown(void *, void *);
 void ScriptPanel_OpenTextWindow(void);
 void StageIconDisplay_Create(s32, s32, void *, void *);
 void LinkSelection_RecordSlotState(void *, u16, s32, u32 *, s32);
 void LinkSelection_AdvanceBitExchange(void *, u32, u16 *);
-void Registry1745_SetState(void *, u32, void *);
+void LinkSession_SetState(void *, u32, void *);
 void LinkSelection_WaitForReadyParticipants(void);
 struct ExchangeCounters {
     u8 pad0[0x184];
@@ -63,10 +63,10 @@ s32 LinkSelection_WaitForInputCompletion(struct AreaEffectLinkState *p)
     u32 flags;
     s32 ready, i;
     gLinkMenuActive = 1;
-    if (Registry1745_ConsumeStateEntry(p)) {
+    if (LinkSession_ConsumeStateEntry(p)) {
         StageIconDisplay_Create(1, 0, 0, p);
     }
-    if (Registry1745_CheckSessionReady(p) < 0) {
+    if (LinkSession_CheckSessionReady(p) < 0) {
         goto shutdown;
     }
     keys = *(vu16 *)0x04000130;
@@ -89,12 +89,12 @@ s32 LinkSelection_WaitForInputCompletion(struct AreaEffectLinkState *p)
         } while (++i < p->participantCount);
     }
     if (p->menuElapsed > 60 && ready >= p->participantCount) {
-        Registry1745_SetState(p, 19, LinkSelection_WaitForReadyParticipants);
+        LinkSession_SetState(p, 19, LinkSelection_WaitForReadyParticipants);
         goto end;
     }
     goto waiting;
 shutdown:
-    Registry1745_BeginShutdown(p, ScriptPanel_OpenTextWindow);
+    LinkSession_BeginShutdown(p, ScriptPanel_OpenTextWindow);
     return -1;
 waiting:
     if (!p->menuElapsed) {

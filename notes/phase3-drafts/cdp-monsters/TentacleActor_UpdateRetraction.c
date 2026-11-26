@@ -5,10 +5,10 @@
 
 // confidence=low: inferred from segment state and collider updates.
 
-void TentacleBody_UpdateChargeSpread(void);
-void TentacleActor_SelectWanderRoute(void *);
+void CentipedeBody_UpdateChargeSpread(void);
+void Centipede_SelectWanderRoute(void *);
 void sub_080A9DB0(void *, s32, s32);
-void TentacleActor_UpdateOscillation(void *, s32, s32);
+void Centipede_UpdateOscillation(void *, s32, s32);
 #define B(o) (*(u8 *)(p + (o)))
 #define H(o) (*(u16 *)(p + (o)))
 #define W(o) (*(u32 *)(p + (o)))
@@ -62,11 +62,11 @@ static inline void Advance(void *p, s32 x, s32 z)
 
     sub_080A9DB0(p, 4, 0x6400);
 }
-void TentacleActor_UpdateRetraction(struct SceneActorRegistryResetView *input)
+void Centipede_UpdateRetraction(struct SceneActorRegistryResetView *input)
 {
     struct SceneActorRegistryResetView *s = input;
     if (TakeEntry((u8 *)s)) {
-        SetControl(s, TentacleBody_UpdateChargeSpread, 0x23);
+        SetControl(s, CentipedeBody_UpdateChargeSpread, 0x23);
         s->field2E8 = 8;
     }
     {
@@ -85,9 +85,9 @@ void TentacleActor_UpdateRetraction(struct SceneActorRegistryResetView *input)
         else
             Advance(s, ax, az);
     }
-    TentacleActor_UpdateOscillation(s, 0x1ae, 0x28);
+    Centipede_UpdateOscillation(s, 0x1ae, 0x28);
     if (s->field2B0) {
-        TentacleActor_SelectWanderRoute(s);
+        Centipede_SelectWanderRoute(s);
         SetControl(s, s->entryTarget228, 1);
         SetState(s, 2);
     } else {

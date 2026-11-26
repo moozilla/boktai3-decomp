@@ -15,7 +15,7 @@ struct S {
 };
 void Actor_PlayAnimationEntry(void *, u32, u32, u32, u32);
 s32 DisplayAnimation_TestFinished(void *);
-void StateActor_RunEntryAnimSequence(u32 a, struct S *p, s32 a2)
+void StoryCharacter_RunEntryAnimSequence(u32 a, struct S *p, s32 a2)
 {
     if (p->b9 != 0) {
         p->b9 = 0;

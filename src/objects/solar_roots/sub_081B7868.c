@@ -1,5 +1,5 @@
-#define AnimatedMarker_RegisterEmptyCell GrowthHazard_RegisterCellEffect
-#define AnimatedMarker_TickReveal        GrowthHazard_UpdateIdle
+#define AnimatedMarker_RegisterEmptyCell SolarRoot_RegisterCellEffect
+#define AnimatedMarker_TickReveal        SolarRoot_UpdateIdle
 #include "global.h"
 /* Tentative proximity-marker family; collider extent interpretation is provisional. */
 struct AnimatedMarkerCollider {
@@ -25,8 +25,8 @@ struct AnimatedMarker {
     void (*update)(struct AnimatedMarker *);
 };
 void TerrainModifiers_UnregisterCell(void *);
-void GrowthHazard_RegisterCellEffect(struct AnimatedMarker *);
-void GrowthHazard_UpdateIdle(struct AnimatedMarker *);
+void SolarRoot_RegisterCellEffect(struct AnimatedMarker *);
+void SolarRoot_UpdateIdle(struct AnimatedMarker *);
 static inline void AnimatedMarker_SetUpdate(struct AnimatedMarker *marker,
                                             void (*update)(struct AnimatedMarker *))
 {
@@ -42,9 +42,9 @@ void AnimatedMarker_BeginReveal(struct AnimatedMarker *marker)
     marker->state = 0;
     marker->mode = 3;
     TerrainModifiers_UnregisterCell(marker->cellRef);
-    GrowthHazard_RegisterCellEffect(marker);
+    SolarRoot_RegisterCellEffect(marker);
     collider = &marker->collider;
     collider->extent = 16;
     marker->timer = 0;
-    AnimatedMarker_SetUpdate(marker, GrowthHazard_UpdateIdle);
+    AnimatedMarker_SetUpdate(marker, SolarRoot_UpdateIdle);
 }

@@ -1,13 +1,13 @@
 #include "scene/collision/contact_swarm.h"
-void ContactSwarm_SetDirectionalSequence(struct ContactSwarm *, struct ContactSwarmSlot *, u32);
-u32 ContactSwarm_HideSlot(struct ContactSwarm *, struct ContactSwarmSlot *, s32);
+void CountBats_SetDirectionalSequence(struct ContactSwarm *, struct ContactSwarmSlot *, u32);
+u32 CountBats_HideSlot(struct ContactSwarm *, struct ContactSwarmSlot *, s32);
 static inline s32 truncateShift12(s32 value)
 {
     if (value >= 0)
         return value >> 12;
     return -((-value) >> 12);
 }
-void ContactSwarm_UpdateReaction(struct ContactSwarm *pool, struct ContactSwarmSlot *slot,
+void CountBats_UpdateReaction(struct ContactSwarm *pool, struct ContactSwarmSlot *slot,
                                  s32 index)
 {
     struct ContactSwarmSprite *sprite = &slot->display.animation.draw.sprite;
@@ -23,7 +23,7 @@ void ContactSwarm_UpdateReaction(struct ContactSwarm *pool, struct ContactSwarmS
         collider = &slot->display.healthCollider;
         collider->flags |= 4;
         AnimData_SelectPaletteBank(&slot->display.animation.draw.graphics, 0x192);
-        ContactSwarm_SetDirectionalSequence(pool, slot, 1);
+        CountBats_SetDirectionalSequence(pool, slot, 1);
         Sound_PlaySong(0xE8);
     }
     rawSpeed = 20 - slot->stateFrame;
@@ -53,7 +53,7 @@ void ContactSwarm_UpdateReaction(struct ContactSwarm *pool, struct ContactSwarmS
         }
     }
     if (slot->stateFrame > 19)
-        ContactSwarm_HideSlot(pool, slot, index);
+        CountBats_HideSlot(pool, slot, index);
     else {
         if (slot->stateFrame == 6)
             AnimData_SelectPaletteBank(&slot->display.animation.draw.graphics, 0x2D3);

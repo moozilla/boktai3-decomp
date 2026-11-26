@@ -855,7 +855,7 @@ s32 SceneEffectQueue_QueueTypeOneEffect(void);
 
 s32 SceneEffectQueue_QueueTypeTwoEffect(void);
 
-s32 Vampire_TryQueueCommand(u32);
+s32 Count_TryQueueCommand(u32);
 
 void WirelessGameItems_PublishPendingEffects(struct WirelessGameItems *p)
 {
@@ -872,7 +872,7 @@ void WirelessGameItems_PublishPendingEffects(struct WirelessGameItems *p)
             p->current[3]--;
     }
     if (p->current[0] != 0) {
-        if (Vampire_TryQueueCommand(0xb4) != 0)
+        if (Count_TryQueueCommand(0xb4) != 0)
             p->current[0]--;
     }
 }

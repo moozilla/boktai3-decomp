@@ -13,12 +13,12 @@ struct ContactBurst {
     struct TransientEffectSprite sprite;
     struct ContactCollider collider;
 };
-struct ContactBurst *ContactBurst_Create(const struct ContactPosition *);
-s32 ContactBurst_Update(struct ContactBurst *);
-s32 ContactBurst_Destroy(struct ContactBurst *);
-s32 ContactBurst_Initialize(struct ContactBurst *, const struct ContactPosition *);
-void ContactBurst_UpdateContactAnimation(struct ContactBurst *);
-u32 ContactBurst_RandomParticleFrame(void);
-void ContactBurst_SetEnabled(struct ContactBurst *, u32);
-u32 ContactBurst_GetEnabled(struct ContactBurst *);
+struct ContactBurst *NidhoggrDuelBurst_Create(const struct ContactPosition *);
+s32 NidhoggrDuelBurst_Update(struct ContactBurst *);
+s32 NidhoggrDuelBurst_Destroy(struct ContactBurst *);
+s32 NidhoggrDuelBurst_Initialize(struct ContactBurst *, const struct ContactPosition *);
+void NidhoggrDuelBurst_UpdateContactAnimation(struct ContactBurst *);
+u32 NidhoggrDuelBurst_RandomParticleFrame(void);
+void NidhoggrDuelBurst_SetEnabled(struct ContactBurst *, u32);
+u32 NidhoggrDuelBurst_GetEnabled(struct ContactBurst *);
 #endif

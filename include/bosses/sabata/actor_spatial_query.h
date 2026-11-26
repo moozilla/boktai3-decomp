@@ -25,6 +25,6 @@ struct SceneVolumeSearch {
 };
 
 s32 ActorMovement_CanReachTarget(struct MovementReachActor *);
-s32 SceneVolume_FindNearbyPosition(struct SceneVolumeSearch *);
+s32 SabataVolume_FindNearbyPosition(struct SceneVolumeSearch *);
 
 #endif

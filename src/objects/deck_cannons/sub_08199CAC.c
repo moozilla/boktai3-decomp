@@ -4,7 +4,7 @@ extern const u8 gUnk_0824F6C8[];
 void Callback_InvokeActor(u8 *, u32);
 void Collider_SetPosition(u8 *, u8 *, u32);
 
-void CannonBattery_UpdateCannon(u8 *p)
+void DeckCannon_UpdateCannon(u8 *p)
 {
     const u32 *tbl = (const u32 *)gUnk_0824F6C8;
     Callback_InvokeActor(p, tbl[*(p + 0xD3)]);

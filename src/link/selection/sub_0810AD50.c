@@ -5,13 +5,13 @@
 #include "engine/engine.h"
 #include "engine/ram.h"
 #include "link/wireless/scene_pool.h"
-u8 Registry1745_ConsumeStateEntry(void *);
-s32 Registry1745_CheckSessionReady(void *);
-void Registry1745_BeginShutdown(void *, void *);
+u8 LinkSession_ConsumeStateEntry(void *);
+s32 LinkSession_CheckSessionReady(void *);
+void LinkSession_BeginShutdown(void *, void *);
 void ScriptPanel_OpenTextWindow(void);
 void LinkSelection_RecordSlotState(void *, u32, s32, u32 *, s32);
 void LinkSelection_AdvanceBitExchange(void *, u32, u16 *);
-void Registry1745_SetState(void *, u32, void *);
+void LinkSession_SetState(void *, u32, void *);
 void LinkSelection_WaitForInputCompletion(void);
 struct ExchangeCounters {
     u8 pad0[0x180];
@@ -64,7 +64,7 @@ s32 LinkSelection_ExchangeParticipantInput(struct AreaEffectLinkState *p)
     u32 flags;
     s32 i;
     gLinkMenuActive = 1;
-    if (Registry1745_ConsumeStateEntry(p)) {
+    if (LinkSession_ConsumeStateEntry(p)) {
         p->receiveBits = (u16)gGameState->unk874 >> 2;
         p->sendBit = 0;
         p->receiveBit = 0;
@@ -73,8 +73,8 @@ s32 LinkSelection_ExchangeParticipantInput(struct AreaEffectLinkState *p)
         c->elapsed = 0;
         c->frames = 0;
     }
-    if (Registry1745_CheckSessionReady(p) < 0) {
-        Registry1745_BeginShutdown(p, ScriptPanel_OpenTextWindow);
+    if (LinkSession_CheckSessionReady(p) < 0) {
+        LinkSession_BeginShutdown(p, ScriptPanel_OpenTextWindow);
         return -1;
     }
     if (Engine_PauseBits(0x800)) {
@@ -101,13 +101,13 @@ s32 LinkSelection_ExchangeParticipantInput(struct AreaEffectLinkState *p)
             LinkSelection_RecordSlotState(p, value, i, &flags, 0);
         else if (!ModeCancel(value)) {
             if (value == 0xffff) {
-                Registry1745_BeginShutdown(p, ScriptPanel_OpenTextWindow);
+                LinkSession_BeginShutdown(p, ScriptPanel_OpenTextWindow);
                 return -1;
             }
         } else {
             LinkSelection_RecordSlotState(p, value, i, &flags, 0);
             if (i == p->localPlayer)
-                Registry1745_SetState(p, 18, LinkSelection_WaitForInputCompletion);
+                LinkSession_SetState(p, 18, LinkSelection_WaitForInputCompletion);
         }
     }
     LinkSelection_AdvanceBitExchange(p, flags, &keys);

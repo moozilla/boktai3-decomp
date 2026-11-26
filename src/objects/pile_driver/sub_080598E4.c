@@ -1,14 +1,14 @@
-#include "objects/pile_driver/scene_panel_rig.h"
-#include "objects/pile_driver/scene_panel_rig.h"
+#include "objects/pile_driver/pile_driver_rig.h"
+#include "objects/pile_driver/pile_driver_rig.h"
 static inline s32 ScenePanelRig_NextRandom(void)
 {
     gRandomIndex = (gRandomIndex + 1) & 1023;
     return ((const u16 *)RANDOM_TABLE_ADDR)[gRandomIndex];
 }
-void ScenePanelRig_TickResourceDrain(struct ScenePanelRig *rig)
+void PileDriverRig_TickResourceDrain(struct ScenePanelRig *rig)
 {
     struct SceneRigParentView *parent = (void *)rig->parent;
-    s32 count = ScenePanelRig_GetActiveCount(rig), mode = ScenePanelRig_GetParentMode(rig);
+    s32 count = PileDriverRig_GetActiveCount(rig), mode = PileDriverRig_GetParentMode(rig);
     if (count > 0 && mode > 0) {
         s32 rate = 0, drain = 0;
         if (rig->state == 2) {
@@ -48,7 +48,7 @@ void ScenePanelRig_TickResourceDrain(struct ScenePanelRig *rig)
                 if (sound)
                     Sound_PlaySong(sound);
                 ScreenTransition_SendCommand(0, 4, 31, 31, 31, 8191, stage);
-                ScenePanel_CallPendingScript((void *)*global, 4);
+                PileDriver_CallPendingScript((void *)*global, 4);
             }
         }
     }

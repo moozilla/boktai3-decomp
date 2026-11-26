@@ -1,7 +1,7 @@
-#include "ui/town/scene_inventory_lifecycle.h"
+#include "ui/town/shop_lifecycle.h"
 s32 SceneInputPanel_AdjustSlidingY(struct SceneInputWidget *, s32, u16);
-void SceneInventory_BeginAlternateSelection(struct SceneInventoryTail *);
-s32 SceneInventory_TickSaleFeedback(struct SceneInventoryTail *p)
+void Shop_BeginAlternateSelection(struct SceneInventoryTail *);
+s32 Shop_TickSaleFeedback(struct SceneInventoryTail *p)
 {
     u16 *frame;
     SceneInputPanel_ResetHighlights(&p->display, &p->highlight);
@@ -9,6 +9,6 @@ s32 SceneInventory_TickSaleFeedback(struct SceneInventoryTail *p)
     if (*frame == 0)
         Sound_PlaySong(630);
     if (SceneInputPanel_AdjustSlidingY(&p->display.buttons[0], 32, *frame))
-        SceneInventory_BeginAlternateSelection(p);
+        Shop_BeginAlternateSelection(p);
     return 0;
 }

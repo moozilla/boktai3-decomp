@@ -9,7 +9,7 @@
 void *Heap_Alloc(u32);
 void Memory_Clear(void *, u32);
 void SceneActorRegistry_SetObjectContext(void *, void *, s32, s32);
-void TentacleActor_InitProfile(void *);
+void Centipede_InitProfile(void *);
 void SceneActorReaction_OnEnemyDefault(void);
 void SceneActorReaction_ResolveDamage(void);
 void SceneActorReaction_SinkAndRemove(void);
@@ -33,31 +33,31 @@ struct TentacleActor {
     u8 unknown8E8[0x44];
     struct ContactPosition savedPosition;
 };
-void TentacleActor_OnUpdate(void *);
-u32 TentacleActor_OnResolveVariantValue(void *);
-void TentacleBody_OnIdleState(void *);
-void TentacleBody_UpdateAttackWindup(void *);
-void TentacleBody_ResetDirectionalPose(void *);
-void TentacleBody_ConvergeReactionMotion(void *);
-void TentacleBody_UpdateDefeat(void *);
-void TentacleBody_UpdateHiddenTransition(void *);
+void Centipede_OnUpdate(void *);
+u32 Centipede_OnResolveVariantValue(void *);
+void CentipedeBody_OnIdleState(void *);
+void CentipedeBody_UpdateAttackWindup(void *);
+void CentipedeBody_ResetDirectionalPose(void *);
+void CentipedeBody_ConvergeReactionMotion(void *);
+void CentipedeBody_UpdateDefeat(void *);
+void CentipedeBody_UpdateHiddenTransition(void *);
 void sub_080ABB18(void *);
 void ActorTrail_ResetAtSavedPosition(void *);
 void SceneActor_ResetQueuedState(void *);
 s32 SceneActor_TryRequestFacingReaction(void *);
 void sub_080AA744(void *);
-void TentacleEnemy_InitPlayerReference(void *);
-void TentacleBody_Destroy(void *);
-void TentacleActor_ResetRouteHistory(void *);
-void TentacleActor_InitCollision(void *);
-void TentacleActor_InitSegmentUpdateState(void *);
-void TentacleActor_SelectWanderRoute(void *);
-void TentacleBody_InitBehaviorTable(void *);
-void TentacleActor_InitStateHandlers(void *);
-void TentacleBody_InitSegmentAnimations(void *, u32, u32, u32);
-void TentacleActor_ResetSegmentPositions(void *, void *);
-void TentacleActor_InitSegmentColliders(void *);
-void TentacleActor_ActivateMarkedSegment(void *);
+void Centipede_InitPlayerReference(void *);
+void CentipedeBody_Destroy(void *);
+void Centipede_ResetRouteHistory(void *);
+void Centipede_InitCollision(void *);
+void Centipede_InitSegmentUpdateState(void *);
+void Centipede_SelectWanderRoute(void *);
+void CentipedeBody_InitBehaviorTable(void *);
+void Centipede_InitStateHandlers(void *);
+void CentipedeBody_InitSegmentAnimations(void *, u32, u32, u32);
+void Centipede_ResetSegmentPositions(void *, void *);
+void Centipede_InitSegmentColliders(void *);
+void Centipede_ActivateMarkedSegment(void *);
 
 static inline void MonsterInit_InitializeBody(struct ChaseActor *arg0, u32 *fill)
 {
@@ -161,8 +161,8 @@ static inline void MonsterInit_InstallPrimary(struct ChaseActor *actor, void *cb
 static inline void Tentacle_InstallCompletionCallbacks(struct ChaseActor *actor)
 {
     actor->base.onMessage = SceneActorScript_OnCommand;
-    actor->base.update = (SceneActorResultCallback)TentacleEnemy_InitPlayerReference;
-    actor->base.destroy = (SceneActorResultCallback)TentacleBody_Destroy;
+    actor->base.update = (SceneActorResultCallback)Centipede_InitPlayerReference;
+    actor->base.destroy = (SceneActorResultCallback)CentipedeBody_Destroy;
 }
 
 static inline void Tentacle_InstallRoutes(struct ChaseActor *actor)
@@ -181,7 +181,7 @@ static inline void Tentacle_EnableInitialFlags(struct ChaseActor *actor)
     MonsterInit_SetStatusFlags(actor, 8);
     MonsterInit_SetMotionFlags(actor, 0x40);
 }
-s32 TentacleActor_Init(void *object)
+s32 Centipede_Init(void *object)
 {
     struct TentacleActor *tentacle = object;
     struct ChaseActor *actor = &tentacle->base;
@@ -191,7 +191,7 @@ s32 TentacleActor_Init(void *object)
     tentacle->flags = 0;
     SceneActorRegistry_SetObjectContext(actor, actor, 0, 0);
     MonsterInit_SetCategory(actor, MONSTER_CATEGORY_TENTACLE);
-    TentacleActor_InitProfile(actor);
+    Centipede_InitProfile(actor);
     if (MonsterInit_GetDrawableKind(actor) == 0) {
         u8 *heap;
         actor->base.drawable = Heap_Alloc(0x5C);
@@ -238,15 +238,15 @@ s32 TentacleActor_Init(void *object)
 
     if (Script_SeekToKeyword(0x50))
         tentacle->interval8E6 = Script_GetPc() ? Script_GetValue() : 300;
-    TentacleActor_ResetRouteHistory(actor);
+    Centipede_ResetRouteHistory(actor);
     Tentacle_ReadPalette(actor, 0x22A, 0x192);
-    TentacleActor_InitCollision(actor);
-    TentacleActor_InitSegmentUpdateState(actor);
+    Centipede_InitCollision(actor);
+    Centipede_InitSegmentUpdateState(actor);
     MonsterInit_InstallPrimary(
-        actor, TentacleActor_OnUpdate, TentacleActor_OnResolveVariantValue,
-        TentacleBody_OnIdleState, TentacleBody_UpdateAttackWindup,
-        TentacleBody_ResetDirectionalPose, TentacleBody_UpdateHiddenTransition,
-        TentacleBody_ConvergeReactionMotion, TentacleBody_UpdateDefeat,
+        actor, Centipede_OnUpdate, Centipede_OnResolveVariantValue,
+        CentipedeBody_OnIdleState, CentipedeBody_UpdateAttackWindup,
+        CentipedeBody_ResetDirectionalPose, CentipedeBody_UpdateHiddenTransition,
+        CentipedeBody_ConvergeReactionMotion, CentipedeBody_UpdateDefeat,
         SceneActorReaction_OnEnemyDefault, 0, SceneActorReaction_ResolveDamage, sub_080ABB18);
     Tentacle_InstallRoutes(actor);
     Tentacle_EnableInitialFlags(actor);
@@ -272,17 +272,17 @@ s32 TentacleActor_Init(void *object)
     else
         Anim_Step(actor->base.drawable + 0x20, actor->base.drawable);
     MonsterInit_ClearReceiver(actor);
-    TentacleActor_SelectWanderRoute(actor);
+    Centipede_SelectWanderRoute(actor);
     MonsterInit_SetState(actor, 0, 0, 2);
     MonsterInit_SetControl(actor, actor->base.onAlternateEntry, 1);
     SceneActorBehavior_InstallCallbackTables(actor);
-    TentacleBody_InitBehaviorTable(actor);
-    TentacleActor_InitStateHandlers(actor);
-    TentacleBody_InitSegmentAnimations(actor, 0xD636, 0xC102, MonsterInit_GetDirection(actor));
-    TentacleActor_ResetSegmentPositions(tentacle, &actor->base.body.position);
-    TentacleActor_InitSegmentColliders(actor);
-    TentacleActor_SelectWanderRoute(actor);
-    TentacleActor_ActivateMarkedSegment(actor);
+    CentipedeBody_InitBehaviorTable(actor);
+    Centipede_InitStateHandlers(actor);
+    CentipedeBody_InitSegmentAnimations(actor, 0xD636, 0xC102, MonsterInit_GetDirection(actor));
+    Centipede_ResetSegmentPositions(tentacle, &actor->base.body.position);
+    Centipede_InitSegmentColliders(actor);
+    Centipede_SelectWanderRoute(actor);
+    Centipede_ActivateMarkedSegment(actor);
     MonsterInit_SaveControl(MonsterInit_SavedControlOf(actor), actor);
     Tentacle_InstallCompletionCallbacks(actor);
     if (!SceneActorRegistry_LinkActor(actor))

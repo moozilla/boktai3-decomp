@@ -18,7 +18,7 @@ inline static u8 TestMask(struct Entry080A8EBC *e, char mask)
         return 1;
     return 0;
 }
-void TentacleActor_AssignSegmentPhases(struct Body080A8EBC *g)
+void Centipede_AssignSegmentPhases(struct Body080A8EBC *g)
 {
     s32 i;
     s32 k = 0;

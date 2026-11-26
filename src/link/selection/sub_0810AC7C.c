@@ -1,8 +1,8 @@
-#define LinkSelection_SwapPages Registry1745_ToggleConnectionRole
+#define LinkSelection_SwapPages LinkSession_ToggleConnectionRole
 #include "global.h"
 #include "scene/areas/area_effect_link.h"
 #include "system/game_state/game_state.h"
-void Registry1745_ToggleConnectionRole(struct AreaEffectLinkState *);
+void LinkSession_ToggleConnectionRole(struct AreaEffectLinkState *);
 void LinkSession_UpdatePlayerValueAverage(struct AreaEffectLinkState *);
 static inline u8 ReceiveBit(void)
 {
@@ -17,7 +17,7 @@ void LinkSelection_AdvanceBitExchange(struct AreaEffectLinkState *p, u32 flags, 
     if (flags & 1)
         p->sendBit++;
     if (flags & 2) {
-        Registry1745_ToggleConnectionRole(p);
+        LinkSession_ToggleConnectionRole(p);
         LinkSession_UpdatePlayerValueAverage(p);
         p->sendBit = 0;
         p->receiveBits = (u16)gGameState->unk874 >> 2;

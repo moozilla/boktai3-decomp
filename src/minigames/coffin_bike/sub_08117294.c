@@ -1,9 +1,9 @@
 #include "global.h"
-#include "minigames/coffin_bike/glove.h"
-void Glove_UpdateStopping(struct Glove *);
-void Glove_BeginStopping(struct Glove *s)
+#include "minigames/coffin_bike/coffin_bike.h"
+void CoffinBike_UpdateStopping(struct Glove *);
+void CoffinBike_BeginStopping(struct Glove *s)
 {
-    void (*f)(void *) = (void (*)(void *))Glove_UpdateStopping;
+    void (*f)(void *) = (void (*)(void *))CoffinBike_UpdateStopping;
     u8 *p = &s->active;
     u32 z = 0;
     *p = 1;

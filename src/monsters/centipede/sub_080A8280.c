@@ -1,4 +1,4 @@
-#include "monsters/centipede/tentacle_body.h"
+#include "monsters/centipede/centipede_body.h"
 #include "scene/motion/scene_actor_chase_reaction.h"
 #include "global.h"
 #include "scene/actor/scene_actor_reset.h"
@@ -72,7 +72,7 @@ static inline s32 Tentacle_HeadingDifference(u8 desired, u8 current)
     return difference;
 }
 
-void TentacleBody_ReturnToCellCenter(struct ChaseActor *actor)
+void CentipedeBody_ReturnToCellCenter(struct ChaseActor *actor)
 {
     struct TentacleBody *body = actor->base.context;
     s32 speed;

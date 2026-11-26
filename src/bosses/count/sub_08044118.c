@@ -1,6 +1,6 @@
 #include "scene/collision/contact_swarm.h"
 void Shadow_Destroy(void *);
-void ContactSwarm_DestroySlot(struct ContactSwarm *pool, struct ContactSwarmSlot *slot, s32 index)
+void CountBats_DestroySlot(struct ContactSwarm *pool, struct ContactSwarmSlot *slot, s32 index)
 {
     Collider_Remove(&slot->display.healthCollider);
     Shadow_Destroy(slot->shadow);

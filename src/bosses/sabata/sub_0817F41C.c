@@ -4,7 +4,7 @@
 
 void SceneActors_RunStateCallback(void *);
 
-void BossSlot2_RunUnpausedStateCallback(struct StateActor *p)
+void Sabata_RunUnpausedStateCallback(struct StateActor *p)
 {
     p->actionFinished = 0;
     if (!PlayerSlot_ReadStatus(0, 4))

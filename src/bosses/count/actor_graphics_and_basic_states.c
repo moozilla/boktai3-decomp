@@ -1,5 +1,5 @@
 #include "global.h"
-#include "bosses/count/actor_graphics_and_basic_states.h"
+#include "bosses/count/count_graphics.h"
 #include "scene/collision/contact_actor.h"
 #include "engine/video/render.h"
 #include "engine/engine_globals.h"

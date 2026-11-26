@@ -29,7 +29,7 @@ extern struct SingletonSlot7Origin *gSceneCamera;
 void *SceneActors_GetBySlot(u32);
 s32 Script_GetKeywordValue(u32, s32);
 
-void SingletonSlot7_SetMotionModeFromScript(void)
+void VanargandHead_SetMotionModeFromScript(void)
 {
     struct SingletonSlot7Actor *p = SceneActors_GetBySlot(7);
     if (p) {

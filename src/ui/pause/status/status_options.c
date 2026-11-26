@@ -60,7 +60,7 @@ static inline void SceneCatalog_QueueDescription(struct SceneHudState *state, u3
     state->allocationDescription = message;
 }
 
-void SceneCatalog_SetDescription(struct SceneHudState *s, s32 selection)
+void StatusOptions_SetDescription(struct SceneHudState *s, s32 selection)
 {
     if (selection < 0) {
         MessageWindow_Clear();
@@ -218,7 +218,7 @@ void Presentation_UpdateAllocationSelection(struct SceneHudState *menu)
     refreshPreview:
         InventoryGrid_UpdateStatPreview(menu);
         if (menu->allocationDescription >= 0) {
-            SceneCatalog_SetDescription(menu, menu->allocationDescription);
+            StatusOptions_SetDescription(menu, menu->allocationDescription);
             menu->allocationDescription = 255;
         }
     } while (0);
@@ -229,7 +229,7 @@ void MenuSelection_ProcessConfirmation(struct SceneHudState *s)
     s32 state = PauseMenu_UpdateBinaryChoice(s);
     if (state == 0) {
         Sound_PlaySong(0xDE);
-        SceneCatalog_SetDescription(s, s->rowIndex + 20);
+        StatusOptions_SetDescription(s, s->rowIndex + 20);
         PauseMenu_SetPairedIcons(s, 1, -1);
         Hud_SetInteractionCallback(s, Presentation_UpdateAllocationSelection, 1);
         MenuDisplay_SetPaletteOverrides(s, 1, 0, 0, 0);
@@ -248,18 +248,18 @@ void MenuSelection_ProcessConfirmation(struct SceneHudState *s)
         count = s->entryCount;
         if (count == 0) {
             s->categoryWidgets[5].flags |= state;
-            SceneCatalog_SetDescription(s, -1);
+            StatusOptions_SetDescription(s, -1);
             Hud_SetInteractionCallback(s, InventoryGrid_UpdateModifierPreview, 0);
             MenuDisplay_SetPaletteOverrides(s, 0, 0, 0, count);
         } else {
-            SceneCatalog_SetDescription(s, s->rowIndex + 20);
+            StatusOptions_SetDescription(s, s->rowIndex + 20);
             MenuDisplay_SetPaletteOverrides(s, 1, 0, 0, 0);
             Hud_SetInteractionCallback(s, Presentation_UpdateAllocationSelection, 0);
         }
     }
 }
 
-s32 SceneCatalog_GetLevelScaledValue(struct SceneHudState *s)
+s32 StatusOptions_GetLevelScaledValue(struct SceneHudState *s)
 {
     const s32 *values = (const s32 *)s->optionEValue;
     values += gGameState->level;
@@ -283,7 +283,7 @@ void MenuSelection_DrawNumericSummary(struct SceneHudState *s)
                 *p++ = 0xF020;
             } while (++i < 6);
         } else {
-            Hud_DrawDecimalDigits(Hud_GetMinimum(SceneCatalog_GetLevelScaledValue(s), max),
+            Hud_DrawDecimalDigits(Hud_GetMinimum(StatusOptions_GetLevelScaledValue(s), max),
                                        divisor, 23, 5, 0);
         }
     } else {
@@ -295,7 +295,7 @@ void MenuSelection_DrawNumericSummary(struct SceneHudState *s)
     }
 }
 
-void SceneCatalog_SetSelection(struct SceneHudState *s, u32 selection)
+void StatusOptions_SetSelection(struct SceneHudState *s, u32 selection)
 {
     struct SceneInputWidget *animation = &s->categoryWidgets[5];
     animation->flags &= ~1;
@@ -304,7 +304,7 @@ void SceneCatalog_SetSelection(struct SceneHudState *s, u32 selection)
     Presentation_UpdateListCursor(s);
 }
 
-void SceneCatalog_ResetTextWindow(struct SceneHudState *s)
+void StatusOptions_ResetTextWindow(struct SceneHudState *s)
 {
     s32 *window = &s->primaryTextWindow;
     TextWindow_SetScript(*window, s->optionUpperEScript);
@@ -358,10 +358,10 @@ void Hud_InitStatusMenu(struct SceneHudState *s)
     PauseMenu_ClearSpriteFlags(s, 0x4E, 1);
     PauseMenu_ShowPromptSprite(s, 8, 0x20);
     Presentation_SetAmountGlyphRows(s);
-    SceneCatalog_SetSelection(s, 0);
+    StatusOptions_SetSelection(s, 0);
     InventoryGrid_LayoutStatMarkers(s);
     InventoryPanel_ShowStatusIcons(s);
-    SceneCatalog_ResetTextWindow(s);
+    StatusOptions_ResetTextWindow(s);
     PauseMenu_SetPromptIconPositions(s, 0, 8);
     PauseMenu_SetPairedIcons(s, 1, -1);
     InventoryPanel_UpdateSelectedUnlock(s, 20, 7, 0, 0);
@@ -369,7 +369,7 @@ void Hud_InitStatusMenu(struct SceneHudState *s)
     if (!s->entryCount) {
         s->categoryWidgets[5].flags |= 1;
         s->allocationDescription = 0xFF;
-        SceneCatalog_SetDescription(s, -1);
+        StatusOptions_SetDescription(s, -1);
         Hud_SetInteractionCallback(s, InventoryGrid_UpdateModifierPreview, 0);
         MenuDisplay_SetPaletteOverrides(s, 0, 0, 0, 0);
     } else {
@@ -380,7 +380,7 @@ void Hud_InitStatusMenu(struct SceneHudState *s)
         s->comparisonIndicators[0].position.y = 8;
         n = s->rowIndex + 20;
         s->allocationDescription = n;
-        SceneCatalog_SetDescription(s, (s8)s->allocationDescription);
+        StatusOptions_SetDescription(s, (s8)s->allocationDescription);
         Hud_SetInteractionCallback(s, Presentation_UpdateAllocationSelection, 0);
         MenuDisplay_SetPaletteOverrides(s, 1, 0, 0, 0);
     }
@@ -392,7 +392,7 @@ void Hud_InitStatusMenu(struct SceneHudState *s)
     }
 }
 
-void SceneCatalog_SelectDescription(s32 selection)
+void StatusOptions_SelectDescription(s32 selection)
 {
     if (selection < 0) {
         MessageWindow_Clear();
@@ -402,7 +402,7 @@ void SceneCatalog_SelectDescription(s32 selection)
     }
 }
 
-s32 SceneCatalog_GetMappedState(void)
+s32 StatusOptions_GetMappedState(void)
 {
     s32 state = (s16)gGameState->unk12;
     if (state == 1)
@@ -412,7 +412,7 @@ s32 SceneCatalog_GetMappedState(void)
     return 0;
 }
 
-s32 SceneCatalog_MapSelectionMask(s32 selection)
+s32 StatusOptions_MapSelectionMask(s32 selection)
 {
     if (selection == 0)
         return 4;
@@ -421,12 +421,12 @@ s32 SceneCatalog_MapSelectionMask(s32 selection)
     return 1;
 }
 
-void SceneCatalog_SaveOptions(struct SceneHudState *s)
+void StatusOptions_SaveOptions(struct SceneHudState *s)
 {
     struct Player *player;
     s32 mapped;
     gGameState->values08[4] = s->savedSettings[0];
-    mapped = SceneCatalog_MapSelectionMask(s->savedSettings[1]);
+    mapped = StatusOptions_MapSelectionMask(s->savedSettings[1]);
     {
         u16 *option = &gGameState->unk12;
         *option = mapped;
@@ -447,6 +447,6 @@ void SelectionPanel_CaptureSettings(struct SceneHudState *p)
 {
     p->settingsRow = 0;
     p->savedSettings[0] = gGameState->values08[4];
-    p->savedSettings[1] = SceneCatalog_GetMappedState();
+    p->savedSettings[1] = StatusOptions_GetMappedState();
     p->savedSettings[2] = gGameState->unk14;
 }

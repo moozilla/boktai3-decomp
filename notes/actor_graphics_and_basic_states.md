@@ -35,7 +35,7 @@ previously left as opaque padding.
     read by `SceneActorGraphics_UpdateVariant` and the two
     `SceneActorAnimation_Update*Callback` concessions, and compared against
     in `SceneActorState_SetValueClampedWhen{Inactive,Active}`.
-* `include/bosses/count/actor_graphics_and_basic_states.h` (new): `struct SceneActorGraphics`
+* `include/bosses/count/count_graphics.h` (new): `struct SceneActorGraphics`
   names `groundEffect`'s contents as far as this unit's evidence goes (0x344
   through the three 0x200-byte palette banks at 0x3C4-0x9C4, to the contact
   pool / background-flash pointers at 0x9D8/0x9DC). Declares the

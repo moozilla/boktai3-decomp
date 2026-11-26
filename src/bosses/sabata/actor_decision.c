@@ -15,7 +15,7 @@ static inline s32 RandomValue(void)
     return *(u16 *)(offset + (u32)values);
 }
 
-void ActorDecision_UpdateTimedPhase(struct ActorState *actor)
+void SabataDecision_UpdateTimedPhase(struct ActorState *actor)
 {
     struct ActorState *stateData = actor;
     if (ActorState_TakeEntryTrigger(actor)) {
@@ -34,12 +34,12 @@ void ActorDecision_UpdateTimedPhase(struct ActorState *actor)
             actor->state = phase;
         }
     } else if (ActorMovement_CanReachTarget(stateData))
-        SceneVolume_BeginPhase(actor, 1);
-    else if (SceneVolume_GetActivityState(actor))
-        SceneVolume_BeginPhase(actor, 2);
-    else if (actor->timer > 60 && SceneVolume_FindNearbyPosition(stateData) == 1)
-        SceneVolume_BeginPhase(actor, 3);
-    else if (actor->timer > 600 || SceneVolume_ConsumePendingEvent(stateData)) {
+        SabataVolume_BeginPhase(actor, 1);
+    else if (SabataVolume_GetActivityState(actor))
+        SabataVolume_BeginPhase(actor, 2);
+    else if (actor->timer > 60 && SabataVolume_FindNearbyPosition(stateData) == 1)
+        SabataVolume_BeginPhase(actor, 3);
+    else if (actor->timer > 600 || SabataVolume_ConsumePendingEvent(stateData)) {
         SceneVolume_RequestRestart(actor);
     } else if (actor->pending) {
         stateData->animationState = 3;
@@ -51,7 +51,7 @@ void ActorDecision_UpdateTimedPhase(struct ActorState *actor)
     actor->timer++;
 }
 
-void ActorDecision_UpdateDelayPhase(struct ActorState *actor)
+void SabataDecision_UpdateDelayPhase(struct ActorState *actor)
 {
     struct ActorState *stateData = actor;
     if (ActorState_TakeEntryTrigger(actor)) {
@@ -65,7 +65,7 @@ void ActorDecision_UpdateDelayPhase(struct ActorState *actor)
     actor->timer++;
 }
 
-void ActorDecision_UpdatePulsePhase(struct ActorStateOwner *input)
+void SabataDecision_UpdatePulsePhase(struct ActorStateOwner *input)
 {
     struct ActorStateOwner *owner = input;
     struct ActorStateOwner *actor;
@@ -78,11 +78,11 @@ void ActorDecision_UpdatePulsePhase(struct ActorStateOwner *input)
         owner->actor.pending = 0;
     }
     if (ActorMovement_CanReachTarget(&actor->actor))
-        SceneVolume_BeginPhase(&owner->actor, 1);
-    else if (SceneVolume_GetActivityState(&owner->actor))
-        SceneVolume_BeginPhase(&owner->actor, 2);
-    else if (owner->actor.timer > 60 && SceneVolume_FindNearbyPosition(&actor->actor) == 1)
-        SceneVolume_BeginPhase(&owner->actor, 3);
+        SabataVolume_BeginPhase(&owner->actor, 1);
+    else if (SabataVolume_GetActivityState(&owner->actor))
+        SabataVolume_BeginPhase(&owner->actor, 2);
+    else if (owner->actor.timer > 60 && SabataVolume_FindNearbyPosition(&actor->actor) == 1)
+        SabataVolume_BeginPhase(&owner->actor, 3);
     else if (owner->actor.timer > 210) {
         SceneVolume_RequestRestart(&owner->actor);
     }
@@ -97,7 +97,7 @@ void ActorDecision_UpdatePulsePhase(struct ActorStateOwner *input)
     owner->actor.timer++;
 }
 
-void ActorDecision_UpdateHazardPath(struct ActorState *actor)
+void SabataDecision_UpdateHazardPath(struct ActorState *actor)
 {
     struct ActorState *path = actor;
     if (ActorState_TakeEntryTrigger(actor)) {
@@ -114,10 +114,10 @@ void ActorDecision_UpdateHazardPath(struct ActorState *actor)
             path->attackFlags |= 2;
         }
     }
-    if (SceneVolume_GetActivityState(actor))
-        SceneVolume_BeginPhase(actor, 2);
+    if (SabataVolume_GetActivityState(actor))
+        SabataVolume_BeginPhase(actor, 2);
     if (actor->pending == 1) {
-        if (SceneVolume_ConsumePendingEvent(path)) {
+        if (SabataVolume_ConsumePendingEvent(path)) {
             path->animationDetail++;
             if (++actor->timer > 3) {
                 SceneVolume_RequestRestart(actor);
@@ -141,7 +141,7 @@ void ActorDecision_UpdateHazardPath(struct ActorState *actor)
     }
 }
 
-void ActorDecision_UpdateFlagPhase(struct ActorState *actor)
+void SabataDecision_UpdateFlagPhase(struct ActorState *actor)
 {
     struct ActorState *stateData = actor;
     s32 result;
@@ -149,9 +149,9 @@ void ActorDecision_UpdateFlagPhase(struct ActorState *actor)
         u32 phase = 8;
         actor->state = phase;
     }
-    result = SceneVolume_GetActivityState(actor);
+    result = SabataVolume_GetActivityState(actor);
     if (result) {
-        SceneVolume_BeginPhase(actor, 2);
+        SabataVolume_BeginPhase(actor, 2);
         stateData->attackFlags |= 1;
     } else if (actor->timer > 600) {
         SceneVolume_RequestRestart(actor);
@@ -172,7 +172,7 @@ void SceneActorState_UpdateAnimationRequest(struct ActorState *actor)
     actor->timer++;
 }
 
-void ActorDecision_UpdatePendingPhase(struct ActorState *actor)
+void SabataDecision_UpdatePendingPhase(struct ActorState *actor)
 {
     struct ActorState *stateData = actor;
     if (ActorState_TakeEntryTrigger(actor)) {
@@ -180,7 +180,7 @@ void ActorDecision_UpdatePendingPhase(struct ActorState *actor)
         actor->state = phase;
     } else if (actor->pending == 1) {
         if (stateData->transitionBlocked)
-            SceneVolume_BeginPhase(actor, 1);
+            SabataVolume_BeginPhase(actor, 1);
         else {
             SceneVolume_RequestRestart(actor);
         }
@@ -188,7 +188,7 @@ void ActorDecision_UpdatePendingPhase(struct ActorState *actor)
     actor->timer++;
 }
 
-void ActorDecision_UpdateThresholdPhase(struct ActorState *actor)
+void SabataDecision_UpdateThresholdPhase(struct ActorState *actor)
 {
     struct ActorState *stateData = actor;
     if (ActorState_TakeEntryTrigger(actor)) {
@@ -221,17 +221,17 @@ void ActorDecision_UpdateThresholdPhase(struct ActorState *actor)
             actor->state = phase;
         }
     }
-    if (SceneVolume_GetActivityState(actor) == 2)
-        SceneVolume_BeginPhase(actor, 2);
+    if (SabataVolume_GetActivityState(actor) == 2)
+        SabataVolume_BeginPhase(actor, 2);
     actor->timer++;
 }
 
-void ActorDecision_ClearTrigger(struct ActorState *actor)
+void SabataDecision_ClearTrigger(struct ActorState *actor)
 {
     ActorState_TakeEntryTrigger(actor);
 }
 
-void ActorDecision_UpdateFlaggedWait(struct ActorState *actor)
+void SabataDecision_UpdateFlaggedWait(struct ActorState *actor)
 {
     u32 mask;
     u32 flags;
@@ -253,7 +253,7 @@ void ActorDecision_UpdateFlaggedWait(struct ActorState *actor)
         actor->timer++;
 }
 
-void ActorState_UpdateTrigger(struct ActorState *actor)
+void SabataState_UpdateTrigger(struct ActorState *actor)
 {
     struct ActorState *actorData = actor;
     if (ActorState_TakeEntryTrigger(actor)) {
@@ -268,14 +268,14 @@ void ActorState_UpdateTrigger(struct ActorState *actor)
     actor->timer++;
 }
 
-void ActorState_UpdateConditionalTrigger(struct ActorState *actor)
+void SabataState_UpdateConditionalTrigger(struct ActorState *actor)
 {
     if (ActorState_TakeEntryTrigger(actor)) {
         u32 state = 10;
         actor->state = state;
     }
-    if (SceneVolume_GetActivityState(actor)) {
-        SceneVolume_BeginPhase(actor, 2);
+    if (SabataVolume_GetActivityState(actor)) {
+        SabataVolume_BeginPhase(actor, 2);
     } else if (actor->pending) {
         SceneVolume_RequestRestart(actor);
     }

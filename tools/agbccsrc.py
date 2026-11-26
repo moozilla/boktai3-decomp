@@ -128,7 +128,7 @@ TOPICS = {
         "tails apart. A copy of a parameter made at entry (`T *self = p;`) is replaced by p only inside the "
         "extended block where cse saw the copy, so uses of self after a label stay on their own pseudo and "
         "register. The ROM's sign: two branch tails identical except for one base register (`adds r1, r4` / "
-        "`adds r1, r7`) and an entry copy `adds r7, r4, #0` (Slot7_UpdateMotionPhase). "
+        "`adds r1, r7`) and an entry copy `adds r7, r4, #0` (VanargandHead_UpdateMotionPhase). "
         "spellings.sp_param_alias.",
         [("jump.c", "/* Compare the instructions before insn E1 with those before E2", 0, 13)]),
     "cse-reuse": (

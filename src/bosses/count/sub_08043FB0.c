@@ -1,8 +1,8 @@
 #include "scene/collision/contact_swarm.h"
 void Shadow_Initialize(void *, void *, s32);
-void ContactSwarm_ApplyHealthContact(struct ContactCollider *, struct ContactCollider *,
+void CountBats_ApplyHealthContact(struct ContactCollider *, struct ContactCollider *,
                                      struct ContactSwarmSlot *);
-void ContactSwarm_IgnoreResourceContact(struct ContactCollider *, struct ContactCollider *,
+void CountBats_IgnoreResourceContact(struct ContactCollider *, struct ContactCollider *,
                                         struct ContactSwarmSlot *);
 void Collider_SetBodyProperties(void *, u32, u32, u32);
 void Collider_SetAttackProperties(void *, u32, u32, u32, u32, u32);
@@ -10,7 +10,7 @@ static inline void selectSwarmSlotPalette(struct ContactSwarmGraphics *graphics)
 {
     AnimData_SelectPaletteBank(graphics, 0x2D3);
 }
-u32 ContactSwarm_InitializeSlot(struct ContactSwarm *pool, struct ContactSwarmSlot *slot)
+u32 CountBats_InitializeSlot(struct ContactSwarm *pool, struct ContactSwarmSlot *slot)
 {
     struct ContactPackedVector bounds;
     struct ContactPackedVector offset;
@@ -44,7 +44,7 @@ u32 ContactSwarm_InitializeSlot(struct ContactSwarm *pool, struct ContactSwarmSl
     offset.z = 0;
     Collider_Init(collider, 0, 0x5005, 0, 16, &bounds, &offset);
     Collider_SetPosition(collider, (void *)position, 0);
-    Collider_SetCallback(collider, ContactSwarm_ApplyHealthContact, slot);
+    Collider_SetCallback(collider, CountBats_ApplyHealthContact, slot);
     Collider_SetBodyProperties(collider, 0, 0x80, 0);
     Collider_Refresh(collider);
     collider = &slot->resourceCollider;
@@ -56,6 +56,6 @@ u32 ContactSwarm_InitializeSlot(struct ContactSwarm *pool, struct ContactSwarmSl
     ((struct ContactPosition *)&offset)->z = 0;
     Collider_Init(collider, 0, 0x2001, 0, 16, &bounds, &offset);
     Collider_SetPosition(collider, (void *)position, 0);
-    Collider_SetCallback(collider, ContactSwarm_IgnoreResourceContact, slot);
+    Collider_SetCallback(collider, CountBats_IgnoreResourceContact, slot);
     Collider_SetAttackProperties(collider, 10, 30, 0x8000, 0, 8);
 }

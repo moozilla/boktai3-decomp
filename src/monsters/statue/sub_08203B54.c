@@ -46,7 +46,7 @@ static inline void polar(struct EnemyF426Position *v, u8 angle, s32 radius)
     v->z = truncate12(gSineTable[angle] * radius);
 }
 
-void EnemyF426_SpawnProjectile(struct EnemyF426 *actor)
+void Statue_SpawnProjectile(struct EnemyF426 *actor)
 {
     u8 config[0x5c];
     struct EnemyF426Position delta;

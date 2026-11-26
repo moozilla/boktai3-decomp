@@ -41,7 +41,7 @@ static inline void addVector(struct EnemyD459Vector *out, struct EnemyD459Vector
     out->y = a->y + b->y;
     out->z = a->z + b->z;
 }
-void EnemyD459_FireProjectile(struct EnemyD459 *enemy)
+void SuitOfArmor_FireProjectile(struct EnemyD459 *enemy)
 {
     u8 config[0x5c];
     struct EnemyD459Vector offset;

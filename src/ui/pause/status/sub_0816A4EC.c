@@ -8,7 +8,7 @@ void PauseMenu_SetConfirmationIndicator(void *, s32);
 void PauseMenu_SetSpritePosition(void *, s32, s32, s32);
 s32 MessageWindow_ShowMessage(s32);
 void Hud_SetUpdateCallback(struct SceneHudState *, void (*)(struct SceneHudState *));
-void ScenePanel_BeginSelection(struct SceneHudState *p)
+void StatusPanel_BeginSelection(struct SceneHudState *p)
 {
     PauseMenu_HideAllSprites(p);
     Bg_SetLayerMap(0, p->accountLayerMap, 3);

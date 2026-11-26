@@ -3,7 +3,7 @@
 
 // Drawable layout shared with ActorDisplay_UpdateForegroundSprite.
 
-void ScenePanelSubject_SlideOpen(struct ShipWheel *owner)
+void ShipWheel_SlideOpen(struct ShipWheel *owner)
 {
     owner->sprite.position.x -= 0xD2;
     owner->sprite.position.z += 0xD2;
@@ -22,7 +22,7 @@ void ShipWheel_ProcessMessages(struct ShipWheel *obj)
             struct SceneEventCommand *command = receiver->pending[globals->phase][i];
             SceneMessages_SetPendingTrigger(receiver, command);
             if (command->kind == 7)
-                ScenePanelSubject_SlideOpen(obj);
+                ShipWheel_SlideOpen(obj);
             i++;
         } while (i < receiver->count[gSceneEventDispatchState->phase]);
     }
@@ -102,7 +102,7 @@ void SceneTransition_Finish(struct SceneFade *fade)
 void SceneTransition_StartFadeOut(struct SceneFade *fade)
 {
     ScreenTransition_SendCommand(1, 6, 4, 4, 4, 0xFFFF, 0);
-    fade->update = RegistryC281_UpdateClosingFade;
+    fade->update = MoveSequence_UpdateClosingFade;
     fade->timer = 0;
 }
 
@@ -111,7 +111,7 @@ void SceneTransition_StartCompletionDelay(struct SceneFade *fade)
     if (fade->wait < 0) {
         SceneTransition_Finish(fade);
     } else {
-        fade->update = RegistryC281_UpdateClosingDelay;
+        fade->update = MoveSequence_UpdateClosingDelay;
         fade->timer = 0;
     }
 }
@@ -130,7 +130,7 @@ void SceneFade_BeginSoundFade(struct SceneFade *fade)
     Camera_SetOffset(0x3c, a);
     ScreenTransition_SendCommand(0, 4, 0x1f, 0x1f, 0x1f, 0xffff, zero);
     Sound_PlaySong(0x47e);
-    fade->update = RegistryC281_UpdateOpeningDelay;
+    fade->update = MoveSequence_UpdateOpeningDelay;
     fade->timer = zero;
 }
 
@@ -158,14 +158,14 @@ void SceneFade_BeginTargetMove(struct SceneFade *fade)
         r[2] = z;
     }
     Camera_SetOffset(0xb4, b);
-    fade->update = RegistryC281_UpdateFirstMovement;
+    fade->update = MoveSequence_UpdateFirstMovement;
     fade->timer = zero;
 }
 
 void SceneTransition_StartChildTransition(struct SceneFade *fade)
 {
     ContactImpactEffect_BeginTimedPosition(fade->target, 0, 0x5a);
-    fade->update = RegistryC281_UpdateRepositioning;
+    fade->update = MoveSequence_UpdateRepositioning;
     fade->timer = 0;
 }
 
@@ -183,7 +183,7 @@ void SceneFade_BeginSecondMove(struct SceneFade *fade)
     q[1] = y;
     q[2] = z;
     SceneTarget_BeginMove(fade->target, 0, q, 0x20, 0xc, fade->secondDuration, 0x3c);
-    fade->update = RegistryC281_UpdateSecondMovement;
+    fade->update = MoveSequence_UpdateSecondMovement;
     fade->timer = zero;
 }
 
@@ -201,64 +201,64 @@ void SceneFade_BeginFinalMove(struct SceneFade *fade)
     q[1] = y;
     q[2] = z;
     SceneTarget_BeginMove(fade->target, 0, q, 0xc, 1, fade->finalDuration, 0x3c);
-    fade->update = RegistryC281_UpdateFinalMovement;
+    fade->update = MoveSequence_UpdateFinalMovement;
     fade->timer = zero;
 }
 
-void RegistryC281_UpdateOpeningDelay(struct SceneFade *fade)
+void MoveSequence_UpdateOpeningDelay(struct SceneFade *fade)
 {
     fade->timer++;
     if (fade->timer > 0x3c)
         SceneFade_BeginTargetMove(fade);
 }
 
-void RegistryC281_UpdateFirstMovement(struct SceneFade *fade)
+void MoveSequence_UpdateFirstMovement(struct SceneFade *fade)
 {
-    if (RegistryF3E4_GetStateResult(fade->target))
+    if (PopInSprite_GetStateResult(fade->target))
         SceneTransition_StartChildTransition(fade);
 }
 
-void RegistryC281_UpdateRepositioning(struct SceneFade *fade)
+void MoveSequence_UpdateRepositioning(struct SceneFade *fade)
 {
-    if (RegistryF3E4_GetStateResult(fade->target))
+    if (PopInSprite_GetStateResult(fade->target))
         SceneFade_BeginSecondMove(fade);
 }
 
-void RegistryC281_UpdateSecondMovement(struct SceneFade *fade)
+void MoveSequence_UpdateSecondMovement(struct SceneFade *fade)
 {
-    if (RegistryF3E4_GetStateResult(fade->target))
+    if (PopInSprite_GetStateResult(fade->target))
         SceneFade_BeginFinalMove(fade);
 }
 
-void RegistryC281_UpdateFinalMovement(struct SceneFade *fade)
+void MoveSequence_UpdateFinalMovement(struct SceneFade *fade)
 {
-    if (RegistryF3E4_GetStateResult(fade->target)) {
-        RegistryF3E4_ClearState(fade->target);
+    if (PopInSprite_GetStateResult(fade->target)) {
+        PopInSprite_ClearState(fade->target);
         SceneTransition_StartCompletionDelay(fade);
     }
 }
 
-void RegistryC281_UpdateClosingDelay(struct SceneFade *fade)
+void MoveSequence_UpdateClosingDelay(struct SceneFade *fade)
 {
     fade->timer++;
     if (fade->timer > fade->wait)
         SceneTransition_StartFadeOut(fade);
 }
 
-void RegistryC281_UpdateClosingFade(struct SceneFade *fade)
+void MoveSequence_UpdateClosingFade(struct SceneFade *fade)
 {
     fade->timer++;
     if (fade->timer > 0x40)
         SceneTransition_Finish(fade);
 }
 
-void RegistryC281_Update(struct SceneFade *fade)
+void MoveSequence_Update(struct SceneFade *fade)
 {
     if (fade->update != 0)
         Callback_InvokeActor(fade, fade->update);
 }
 
-void RegistryC281_Destroy(void *fade)
+void MoveSequence_Destroy(void *fade)
 {
 }
 
@@ -298,7 +298,7 @@ s32 SceneFade_Initialize(struct SceneFade *fade)
             v = Script_GetValue();
         fade->exitScript = v;
     }
-    fade->target = RegistryF3E4_CreateHidden(3, 1);
+    fade->target = PopInSprite_CreateHidden(3, 1);
     fade->from = from;
     fade->to = to;
     fade->firstDuration = 0x80;
@@ -312,11 +312,11 @@ s32 SceneFade_Initialize(struct SceneFade *fade)
 #endif
 }
 
-void *RegistryC281_Create(void)
+void *MoveSequence_Create(void)
 {
     void *fade = Task_Create(0xb, 0x40);
     if (fade != 0) {
-        Task_SetCallbacks(fade, RegistryC281_Update, RegistryC281_Destroy);
+        Task_SetCallbacks(fade, MoveSequence_Update, MoveSequence_Destroy);
         if (SceneFade_Initialize(fade) < 0) {
             Task_Kill(fade);
             return 0;
@@ -325,7 +325,7 @@ void *RegistryC281_Create(void)
     return fade;
 }
 
-s32 Registry1909_UpdateVisibilityFlicker(struct ProjectedDisplayEntry *actor, s32 elapsed,
+s32 SceneMessageSprite_UpdateVisibilityFlicker(struct ProjectedDisplayEntry *actor, s32 elapsed,
                                          s32 intervals)
 {
     s32 interval;
@@ -353,37 +353,37 @@ s32 Registry1909_UpdateVisibilityFlicker(struct ProjectedDisplayEntry *actor, s3
     return 0;
 }
 
-void Registry1909_EnterHiddenState(struct FallingSceneSprite *actor)
+void SceneMessageSprite_EnterHiddenState(struct FallingSceneSprite *actor)
 {
-    void (*f)(struct FallingSceneSprite *) = Registry1909_UpdateHiddenState;
+    void (*f)(struct FallingSceneSprite *) = SceneMessageSprite_UpdateHiddenState;
     actor->update = f;
     actor->timer = 0;
 }
 
-void Registry1909_StartVisibilityFlicker(struct FallingSceneSprite *actor)
+void SceneMessageSprite_StartVisibilityFlicker(struct FallingSceneSprite *actor)
 {
-    void (*f)(struct FallingSceneSprite *) = Registry1909_UpdateFlickerState;
+    void (*f)(struct FallingSceneSprite *) = SceneMessageSprite_UpdateFlickerState;
     actor->update = f;
     actor->timer = 0;
 }
 
-void Registry1909_StartLandingAnimation(struct FallingSceneSprite *actor)
+void SceneMessageSprite_StartLandingAnimation(struct FallingSceneSprite *actor)
 {
     void (*f)(struct FallingSceneSprite *);
     Anim_SetKeyframes((u8 *)&actor->animation, (u8 *)&actor->resource, 0x3b, 2, 0);
-    f = Registry1909_UpdateLandingAnimation;
+    f = SceneMessageSprite_UpdateLandingAnimation;
     actor->update = f;
     actor->timer = 0;
 }
 
-void Registry1909_StartFalling(struct FallingSceneSprite *actor)
+void SceneMessageSprite_StartFalling(struct FallingSceneSprite *actor)
 {
     void (*f)(struct FallingSceneSprite *);
     u32 z;
     actor->animation.flags &= ~1;
     actor->velocityY = (z = 0);
     Anim_SetKeyframes((u8 *)&actor->animation, (u8 *)&actor->resource, 0x3a, 1, z);
-    f = Registry1909_UpdateFalling;
+    f = SceneMessageSprite_UpdateFalling;
     actor->update = f;
     actor->timer = z;
 }
@@ -394,33 +394,33 @@ static inline void SetFallingSpriteUpdate(void (*update)(struct FallingSceneSpri
     *slot = update;
 }
 
-void Registry1909_UpdateHiddenState(struct FallingSceneSprite *actor)
+void SceneMessageSprite_UpdateHiddenState(struct FallingSceneSprite *actor)
 {
     actor->animation.flags |= 1;
-    SetFallingSpriteUpdate(Registry1909_UpdateHiddenState, &actor->update);
+    SetFallingSpriteUpdate(SceneMessageSprite_UpdateHiddenState, &actor->update);
     actor->timer = 0;
 }
 
-void Registry1909_UpdateLandingAnimation(struct FallingSceneSprite *actor)
+void SceneMessageSprite_UpdateLandingAnimation(struct FallingSceneSprite *actor)
 {
     Anim_Step((u8 *)&actor->animation, (u8 *)&actor->resource);
     actor->timer++;
     if (actor->timer > 0x3b)
-        Registry1909_StartVisibilityFlicker(actor);
+        SceneMessageSprite_StartVisibilityFlicker(actor);
 }
 
-void Registry1909_UpdateFlickerState(struct FallingSceneSprite *actor)
+void SceneMessageSprite_UpdateFlickerState(struct FallingSceneSprite *actor)
 {
     u8 *a = (u8 *)&actor->animation;
     s32 *q = &actor->timer;
-    if (Registry1909_UpdateVisibilityFlicker(a, *q, 8)) {
-        Registry1909_EnterHiddenState(actor);
+    if (SceneMessageSprite_UpdateVisibilityFlicker(a, *q, 8)) {
+        SceneMessageSprite_EnterHiddenState(actor);
     } else {
         *q = *q + 1;
     }
 }
 
-void Registry1909_UpdateFalling(struct FallingSceneSprite *actor)
+void SceneMessageSprite_UpdateFalling(struct FallingSceneSprite *actor)
 {
     u8 *q = (u8 *)&actor->animation.position;
     s32 x = actor->animation.position.x >> 8;
@@ -457,7 +457,7 @@ void Registry1909_UpdateFalling(struct FallingSceneSprite *actor)
     if (actor->animation.position.y < height) {
         actor->animation.position.y = height;
         if (actor->velocityY > -2) {
-            Registry1909_StartLandingAnimation(actor);
+            SceneMessageSprite_StartLandingAnimation(actor);
             return;
         } else {
             actor->velocityY = (-actor->velocityY * 3) / 4;
@@ -476,7 +476,7 @@ void FallingSceneSprite_ProcessMessages(struct FallingSceneSprite *actor)
             struct SceneEventCommand *command = receiver->pending[globals->phase][i];
             SceneMessages_SetPendingTrigger(receiver, command);
             if (command->kind == 8) {
-                Registry1909_StartFalling(actor);
+                SceneMessageSprite_StartFalling(actor);
                 Trigger_ConsumePending(&actor->receiver, 1);
             }
             i++;
@@ -484,14 +484,14 @@ void FallingSceneSprite_ProcessMessages(struct FallingSceneSprite *actor)
     }
 }
 
-void Registry1909_Update(struct FallingSceneSprite *actor)
+void SceneMessageSprite_Update(struct FallingSceneSprite *actor)
 {
     FallingSceneSprite_ProcessMessages(actor);
     if (actor->update != 0)
         Callback_InvokeActor(actor, actor->update);
 }
 
-void Registry1909_Destroy(struct FallingSceneSprite *actor)
+void SceneMessageSprite_Destroy(struct FallingSceneSprite *actor)
 {
     Anim_Remove(&actor->animation);
 }
@@ -531,9 +531,9 @@ s32 FallingSceneSprite_Initialize(struct FallingSceneSprite *actor, u32 id)
     Anim_Step(&actor->animation, savedHeader);
     actor->id = id;
     SceneMessages_RegisterReceiver(&actor->receiver, id, 10);
-    Registry1909_EnterHiddenState(actor);
+    SceneMessageSprite_EnterHiddenState(actor);
 #ifdef UBFIX
-    // falls off the end with r0 left over from the Registry1909_EnterHiddenState call; the creator
+    // falls off the end with r0 left over from the SceneMessageSprite_EnterHiddenState call; the creator
     // only tests < 0, and this initializer has no failure path here
     return 0;
 #endif
@@ -543,7 +543,7 @@ void *SceneMessageSprite_Create(void *a)
 {
     void *actor = Task_Create(8, 0xdc);
     if (actor != 0) {
-        Task_SetCallbacks(actor, Registry1909_Update, Registry1909_Destroy);
+        Task_SetCallbacks(actor, SceneMessageSprite_Update, SceneMessageSprite_Destroy);
         if (FallingSceneSprite_Initialize(actor, a) < 0) {
             Task_Kill(actor);
             return 0;

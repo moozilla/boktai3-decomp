@@ -14,7 +14,7 @@ struct SceneInventoryCategoryMenu {
     struct SceneInputWidget targetWidget;
 };
 void Palette_CopyBank(void *, const void *);
-void SceneInventory_InitWidgetPalette(struct SceneInventoryCategoryMenu *p,
+void Storage_InitWidgetPalette(struct SceneInventoryCategoryMenu *p,
                                       struct SceneInventoryWidgetPalette *palette)
 {
     Palette_CopyBank(palette, gPaletteBankData + 0x7540);

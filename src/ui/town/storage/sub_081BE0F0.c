@@ -6,7 +6,7 @@ struct SceneInventoryCategoryMenu {
     struct SceneInputWidget categoryWidget;
     struct SceneInputWidget targetWidget;
 };
-void SceneInventory_ResetCategoryPalette(struct SceneInventoryCategoryMenu *p)
+void Storage_ResetCategoryPalette(struct SceneInventoryCategoryMenu *p)
 {
     u16 *palette = (u16 *)(gPaletteBankData + 0x7540);
     p->categoryWidget.palette = palette;

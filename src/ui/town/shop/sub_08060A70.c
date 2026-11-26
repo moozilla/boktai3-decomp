@@ -1,11 +1,11 @@
-#include "ui/town/scene_inventory_actions.h"
+#include "ui/town/shop_actions.h"
 #include "system/game_state/game_state.h"
 struct SceneInventoryOwnedConsumables {
     u8 unknown0[0x160];
     s16 id;
 };
-s32 SceneInventory_FindConsumableAssignment(u32);
-void SceneInventory_BeginConsumableSwapPair(struct SceneInventoryActionView *panel)
+s32 Shop_FindConsumableAssignment(u32);
+void Shop_BeginConsumableSwapPair(struct SceneInventoryActionView *panel)
 {
     struct SceneInputPosition starts[2], targets[2];
     u32 enabled[2], frames[2], attributes[2];
@@ -26,7 +26,7 @@ void SceneInventory_BeginConsumableSwapPair(struct SceneInventoryActionView *pan
         else
             slot = panel->selection;
         ((struct SceneInventoryActionFlagsView *)panel)->widgets[slot + 5].flags |= 1;
-        assigned = SceneInventory_FindConsumableAssignment(slot);
+        assigned = Shop_FindConsumableAssignment(slot);
         if (assigned >= 0)
             ((struct SceneInventoryActionFlagsView *)panel)->widgets[assigned + 0x29].flags |= 1;
         {

@@ -20,7 +20,7 @@ struct SceneInventoryCategoryMenu {
 };
 void Storage_SetInteractionMode(struct SceneInventoryCategoryMenu *, u8);
 void Sound_PlaySong(u32);
-void SceneInventory_SetCategoryPalette(struct SceneInventoryCategoryMenu *, u16 *);
+void Storage_SetCategoryPalette(struct SceneInventoryCategoryMenu *, u16 *);
 void Storage_BeginCategoryMode(struct SceneInventoryCategoryMenu *, u32);
 u32 SceneInput_NavigateGrid(struct SceneInputGridView *);
 void Storage_RefreshCategoryWidgets(struct SceneInventoryCategoryMenu *);
@@ -30,7 +30,7 @@ void Storage_UpdateModeSelection(struct SceneInventoryCategoryMenu *p)
     Storage_SetInteractionMode(p, 1);
     if (gPadState[1] & 1) {
         Sound_PlaySong(0xDD);
-        SceneInventory_SetCategoryPalette(p, p->colors);
+        Storage_SetCategoryPalette(p, p->colors);
         switch (p->grid.selection) {
             case 0x22:
                 Storage_BeginCategoryMode(p, 1);

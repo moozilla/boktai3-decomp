@@ -1,8 +1,8 @@
-#include "objects/pile_driver/scene_panel_rig.h"
+#include "objects/pile_driver/pile_driver_rig.h"
 #include "player/cutscene/player_cue_sequence.h"
-void ScenePanelRig_TickPrimarySprites(struct ScenePanelRig *, u32);
-void ScenePanelRig_TickSecondarySprites(struct ScenePanelRig *, u32);
-void ScenePanelRig_TickSprites(struct ScenePanelRig *rig, u32 palette)
+void PileDriverRig_TickPrimarySprites(struct ScenePanelRig *, u32);
+void PileDriverRig_TickSecondarySprites(struct ScenePanelRig *, u32);
+void PileDriverRig_TickSprites(struct ScenePanelRig *rig, u32 palette)
 {
     u32 x, z;
     rig->main.position = rig->position;
@@ -25,6 +25,6 @@ void ScenePanelRig_TickSprites(struct ScenePanelRig *rig, u32 palette)
     }
     PlayerCue_StepSequence((struct ContactSwarmSprite *)&rig->main, &rig->main.sequence);
     AnimData_SelectPaletteBank(rig->main.graphics, palette);
-    ScenePanelRig_TickPrimarySprites(rig, palette);
-    ScenePanelRig_TickSecondarySprites(rig, palette);
+    PileDriverRig_TickPrimarySprites(rig, palette);
+    PileDriverRig_TickSecondarySprites(rig, palette);
 }

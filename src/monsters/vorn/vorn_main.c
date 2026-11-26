@@ -833,7 +833,7 @@ s32 Inventory_GetItemPackedState(s32 i);
 
 s32 Inventory_GetItemId(u32);
 
-u8 SceneInventory_FindSlotByValue(s16 *p0, s16 *p1, s16 *p2, s32 p3)
+u8 Vorn_FindSlotByValue(s16 *p0, s16 *p1, s16 *p2, s32 p3)
 {
     s16 i;
     for (i = 0; i <= 15; i++) {
@@ -873,7 +873,7 @@ struct SceneActorItemLaunch {
     u16 flags;
 };
 
-u8 SceneInventory_FindSlotByValue(s16 *, s16 *, s16 *, s32);
+u8 Vorn_FindSlotByValue(s16 *, s16 *, s16 *, s32);
 
 s32 FloatingItemEffect_Spawn(s32, s32, s32, s32, void *, void *, s32, void *);
 
@@ -901,7 +901,7 @@ s32 SceneActor_TryLaunchItem13(struct SceneActorItemLaunch *p)
     pos.y += 200;
     if (occupied(p))
         return -1;
-    if (!SceneInventory_FindSlotByValue(&p->slot, &p->kind, &p->parameter, 13))
+    if (!Vorn_FindSlotByValue(&p->slot, &p->kind, &p->parameter, 13))
         return -1;
     if (FloatingItemEffect_Spawn(0, p->kind, 3, 0, &pos, &q->position, 24, p) < 0) {
         p->slot = 0xffff;

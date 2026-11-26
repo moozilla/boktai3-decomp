@@ -96,9 +96,9 @@ void ProximityActor_InitializeCollider(struct RegionActor *actor, s16 width, s16
     Collider_Refresh(&actor->collider);
 }
 
-/* Pool128_OnStateNoOp: Empty function preceding the 0x128-byte pool allocator; state callback role is tentative */
+/* ProximityActorPool_OnStateNoOp: Empty function preceding the 0x128-byte pool allocator; state callback role is tentative */
 
-void Pool128_OnStateNoOp(void)
+void ProximityActorPool_OnStateNoOp(void)
 {
 }
 
@@ -112,7 +112,7 @@ static inline u8 Tst(u32 *m, s32 i)
 /* Takes the first free one of the pool's 32 slots: a cleared 0x128-byte block
    recorded at +0x20 with its index at +0x104; NULL when full. */
 
-struct RegionActor *Pool128_Allocate(struct RegionSpriteManager *pool)
+struct RegionActor *ProximityActorPool_Allocate(struct RegionSpriteManager *pool)
 {
     s32 i;
     for (i = 0; i < 32; i++) {
@@ -361,7 +361,7 @@ void RegionActor_CreateFromScript(void)
     u32 *flags;
     if (!manager)
         return;
-    p = Pool128_Allocate(manager);
+    p = ProximityActorPool_Allocate(manager);
     if (!p)
         return;
     p->behaviorFlags = 1;
@@ -548,7 +548,7 @@ s32 RegionActorPool_DestroyActors(struct RegionSpriteManager *pool)
     return 0;
 }
 
-s32 Pool128_InitManager(struct RegionSpriteManager *manager)
+s32 ProximityActorPool_InitManager(struct RegionSpriteManager *manager)
 {
     manager->sequenceResource = ScriptProc_Start(0x922e, 0x1003);
     manager->alternateResource = ScriptProc_Start(0x922e, 0x931e);
@@ -558,14 +558,14 @@ s32 Pool128_InitManager(struct RegionSpriteManager *manager)
     return 0;
 }
 
-struct RegionSpriteManager *Pool1B4_Create(void)
+struct RegionSpriteManager *RegionActorPool_Create(void)
 {
     struct RegionSpriteManager *manager;
     manager = Task_Create(10, sizeof(*manager));
     if (manager != 0) {
         Task_SetCallbacks(manager, (void (*)(void *))RegionActorPool_UpdateActors,
                           (void (*)(void *))RegionActorPool_DestroyActors);
-        if (Pool128_InitManager(manager) < 0) {
+        if (ProximityActorPool_InitManager(manager) < 0) {
             Task_Kill(manager);
             return 0;
         }
@@ -573,7 +573,7 @@ struct RegionSpriteManager *Pool1B4_Create(void)
     return manager;
 }
 
-void Pool1B4_ResetInstance(void)
+void RegionActorPool_ResetInstance(void)
 {
     gRegionActorPool = 0;
 }

@@ -1,8 +1,8 @@
-#include "ui/town/scene_inventory_tail.h"
+#include "ui/town/shop_tail.h"
 void Inventory_SortEquipment(u32);
 void Inventory_SortConsumables(u32);
 void GameState_SortConsumableSlots(u32);
-s32 SceneInventory_TickResetConfirmation(struct SceneInventoryTail *p)
+s32 Shop_TickResetConfirmation(struct SceneInventoryTail *p)
 {
     s32 result;
     SceneInputPanel_HighlightPrompt(&p->display, p->highlight.colors);
@@ -21,10 +21,10 @@ s32 SceneInventory_TickResetConfirmation(struct SceneInventoryTail *p)
                 GameState_SortConsumableSlots(0);
                 break;
         }
-        SceneInventory_BeginBrowse(p);
+        Shop_BeginBrowse(p);
     } else if (result == 0) {
         Sound_PlaySong(0xDE);
-        SceneInventory_BeginBrowse(p);
+        Shop_BeginBrowse(p);
     }
     return 0;
 }

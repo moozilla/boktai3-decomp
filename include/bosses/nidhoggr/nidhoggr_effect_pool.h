@@ -42,11 +42,11 @@ struct ScenePanelEffectDelta {
     s32 x : 16, y : 16, z : 16;
 };
 
-u32 ScenePanelEffect_UpdateTask(struct ScenePanelEffect *effect);
-u32 ScenePanelEffect_DestroyTask(struct ScenePanelEffect *effect);
-struct ScenePanelEffect *ScenePanelEffect_Create(u32 impactVariant, u32 contactHundredths);
-void ScenePanelEffect_OnContact(u32 first, u32 second, struct ScenePanelOwnedEffect *slot);
-void ScenePanelEffect_CreatePositionEffect(const struct ContactPosition *position,
+u32 NidhoggrEffect_UpdateTask(struct ScenePanelEffect *effect);
+u32 NidhoggrEffect_DestroyTask(struct ScenePanelEffect *effect);
+struct ScenePanelEffect *NidhoggrEffect_Create(u32 impactVariant, u32 contactHundredths);
+void NidhoggrEffect_OnContact(u32 first, u32 second, struct ScenePanelOwnedEffect *slot);
+void NidhoggrEffect_CreatePositionEffect(const struct ContactPosition *position,
                                            struct ScenePanelEffect *effect);
 void Nidhoggr_UpdateOwnedSeekingEffect(struct ScenePanelOwnedEffect *slot);
 void Nidhoggr_CreateOwnedSeekingEffect(struct ScenePanelEffect *owner,

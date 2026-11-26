@@ -1,11 +1,11 @@
 #include "global.h"
 #include "link/selection/link_selection_mode.h"
 #include "scene/areas/area_effect_link.h"
-u8 Registry1745_ConsumeStateEntry(void *);
-void Registry1745_ClearParticipantCounters(void *);
-s32 Registry1745_CheckSessionReady(void *);
-void Registry1745_BeginShutdown(void *, void (*)(void));
-void Registry1745_SetState(void *, u32, void (*)(void));
+u8 LinkSession_ConsumeStateEntry(void *);
+void LinkSession_ClearParticipantCounters(void *);
+s32 LinkSession_CheckSessionReady(void *);
+void LinkSession_BeginShutdown(void *, void (*)(void));
+void LinkSession_SetState(void *, u32, void (*)(void));
 void ClockPanel_CaptureSnapshot(void *);
 s32 Crc_ComputeCcitt16(void *, s32, s32);
 u8 ByteSequence_AdvanceEncodedValue(void *, void *, s32);
@@ -17,17 +17,17 @@ s32 sub_0810A304(struct AreaEffectLinkState *p)
     u8 *session = p->sessionData;
     s32 count, i;
     u8 *entry;
-    if (Registry1745_ConsumeStateEntry(p)) {
-        Registry1745_ClearParticipantCounters(p);
+    if (LinkSession_ConsumeStateEntry(p)) {
+        LinkSession_ClearParticipantCounters(p);
         ClockPanel_CaptureSnapshot(p);
         *(u16 *)(session + 0x3e) = Crc_ComputeCcitt16(session, 0, 0x3e);
     }
-    if (Registry1745_CheckSessionReady(p) < 0) {
-        Registry1745_BeginShutdown(p, ScriptPanel_OpenTextWindow);
+    if (LinkSession_CheckSessionReady(p) < 0) {
+        LinkSession_BeginShutdown(p, ScriptPanel_OpenTextWindow);
         return -1;
     }
     if (LinkSelection_IsSelected(*p->selection, 0x3c00)) {
-        Registry1745_SetState(p, 6, SessionMenu_WaitForSelection);
+        LinkSession_SetState(p, 6, SessionMenu_WaitForSelection);
         return 0;
     }
     ByteSequence_AdvanceEncodedValue(p, session, 0x40);
@@ -47,7 +47,7 @@ s32 sub_0810A304(struct AreaEffectLinkState *p)
     if (count == p->participantCount && p->exchangeBusy == 0)
         p->requestedMode = 0x1800;
     if (p->menuElapsed > 0xe10) {
-        Registry1745_BeginShutdown(p, ScriptPanel_OpenTextWindow);
+        LinkSession_BeginShutdown(p, ScriptPanel_OpenTextWindow);
         return -1;
     }
     return 0;

@@ -124,7 +124,7 @@ static inline u32 StepPlayback(struct Drawable *owner, struct DisplaySequenceSta
     return ended;
 }
 
-void SingletonSlot7_InitDisplaySprites(u8 *p)
+void VanargandHead_InitDisplaySprites(u8 *p)
 {
     struct Drawable *foreground = (struct Drawable *)(p + 0x2C0);
     struct Drawable *accent = (struct Drawable *)(p + 0x308);

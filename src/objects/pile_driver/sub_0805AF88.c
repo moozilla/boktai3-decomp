@@ -8,7 +8,7 @@ static inline u16 ScenePanelRig_NextRandom(void)
     return *(u16 *)(offset + (u32)gRandomTable);
 }
 
-void ScenePanelRig_InitSecondarySprites(struct ScenePanelRig *rig)
+void PileDriverRig_InitSecondarySprites(struct ScenePanelRig *rig)
 {
     s32 i;
     for (i = 0; i < 6; i++) {

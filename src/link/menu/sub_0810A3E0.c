@@ -1,26 +1,26 @@
 #include "global.h"
-#define SessionMenu_SetState          Registry1745_SetState
-#define SessionMenu_ResetWithCallback Registry1745_BeginShutdown
+#define SessionMenu_SetState          LinkSession_SetState
+#define SessionMenu_ResetWithCallback LinkSession_BeginShutdown
 #include "scene/areas/area_effect_link.h"
-s32 Registry1745_CheckSessionReady(void *);
-void Registry1745_BeginShutdown(void *, void (*)(void));
-void Registry1745_SetState(void *, u32, void (*)(void));
+s32 LinkSession_CheckSessionReady(void *);
+void LinkSession_BeginShutdown(void *, void (*)(void));
+void LinkSession_SetState(void *, u32, void (*)(void));
 void ScriptPanel_OpenTextWindow(void);
 void LinkMenu_UpdateSelection(void);
 void LinkMenu_WaitSelectionMode(void);
-void RegistryF246_Close(void);
+void LinkPanelSlots_Close(void);
 s32 SessionMenu_WaitForSelection(struct AreaEffectLinkState *p)
 {
-    if (Registry1745_CheckSessionReady(p) < 0) {
-        Registry1745_BeginShutdown(p, ScriptPanel_OpenTextWindow);
+    if (LinkSession_CheckSessionReady(p) < 0) {
+        LinkSession_BeginShutdown(p, ScriptPanel_OpenTextWindow);
         return -1;
     }
     if (p->menuElapsed > 120) {
         if (gLinkSession && gLinkSession->localPlayer == 0) {
-            Registry1745_SetState(p, 7, LinkMenu_UpdateSelection);
-            RegistryF246_Close();
+            LinkSession_SetState(p, 7, LinkMenu_UpdateSelection);
+            LinkPanelSlots_Close();
         } else {
-            Registry1745_SetState(p, 8, LinkMenu_WaitSelectionMode);
+            LinkSession_SetState(p, 8, LinkMenu_WaitSelectionMode);
         }
     }
     return 0;

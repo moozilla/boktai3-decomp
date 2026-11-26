@@ -6,11 +6,11 @@
 #include "engine/video/render.h"
 #include "engine/ram.h"
 #include "engine/engine_pause_flags.h"
-u8 Registry1745_ConsumeStateEntry(struct AreaEffectLinkState *);
-s32 Registry1745_CheckSessionReady(struct AreaEffectLinkState *);
-void Registry1745_BeginShutdown(struct AreaEffectLinkState *, void (*)(void));
+u8 LinkSession_ConsumeStateEntry(struct AreaEffectLinkState *);
+s32 LinkSession_CheckSessionReady(struct AreaEffectLinkState *);
+void LinkSession_BeginShutdown(struct AreaEffectLinkState *, void (*)(void));
 void ScriptPanel_OpenTextWindow(void);
-void Registry1745_SetState(struct AreaEffectLinkState *, u32, void (*)(void));
+void LinkSession_SetState(struct AreaEffectLinkState *, u32, void (*)(void));
 void LinkSelection_WaitForParticipantChoices(void);
 void LinkSelection_UpdateParticipantScores(struct AreaEffectLinkState *);
 void PaletteLevels_Reset(void);
@@ -26,7 +26,7 @@ s32 LinkSelection_WaitForReadyParticipants(struct AreaEffectLinkState *p)
 {
     struct AreaEffectLinkState *session = p;
     s32 count, i, length, result;
-    if (Registry1745_ConsumeStateEntry(p)) {
+    if (LinkSession_ConsumeStateEntry(p)) {
         s16 *counter;
         u16 value;
         s32 increment;
@@ -45,9 +45,9 @@ s32 LinkSelection_WaitForReadyParticipants(struct AreaEffectLinkState *p)
             increment = 9999;
         *counter = increment;
     }
-    result = Registry1745_CheckSessionReady(p);
+    result = LinkSession_CheckSessionReady(p);
     if (result < 0) {
-        Registry1745_BeginShutdown(p, ScriptPanel_OpenTextWindow);
+        LinkSession_BeginShutdown(p, ScriptPanel_OpenTextWindow);
         return -1;
     }
     count = 0;
@@ -57,7 +57,7 @@ s32 LinkSelection_WaitForReadyParticipants(struct AreaEffectLinkState *p)
             count++;
     }
     if (count == length) {
-        Registry1745_SetState(p, 20, LinkSelection_WaitForParticipantChoices);
+        LinkSession_SetState(p, 20, LinkSelection_WaitForParticipantChoices);
         p->readyPhase = 0;
         LinkSelection_UpdateParticipantScores(session);
         return 0;

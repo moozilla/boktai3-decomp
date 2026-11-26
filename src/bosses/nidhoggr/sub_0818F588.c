@@ -1,5 +1,5 @@
 #include "global.h"
-#include "bosses/nidhoggr/scene_panel_effect_pool.h"
+#include "bosses/nidhoggr/nidhoggr_effect_pool.h"
 void SceneEffect_ResetState(struct ScenePanelOwnedEffect *effect)
 {
     effect->anchor = NULL;

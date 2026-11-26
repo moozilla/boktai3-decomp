@@ -1,5 +1,5 @@
-#include "ui/town/scene_inventory_control.h"
-void SceneInventory_BeginActionSelection(struct SceneInventoryControlView *panel, s32 mode)
+#include "ui/town/shop_control.h"
+void Shop_BeginActionSelection(struct SceneInventoryControlView *panel, s32 mode)
 {
     panel->interactionFlags = 100;
     switch (mode) {
@@ -13,8 +13,8 @@ void SceneInventory_BeginActionSelection(struct SceneInventoryControlView *panel
             SceneInput_RestoreSelection(&panel->grid);
             break;
     }
-    panel->destination = SceneInventory_FindActionDestination(panel);
-    SceneInventory_UpdateModePrompt(panel, 0);
-    SceneInventory_SetControllerCallback(
-        panel, (SceneInventoryCallback)SceneInventory_TickActionSelection);
+    panel->destination = Shop_FindActionDestination(panel);
+    Shop_UpdateModePrompt(panel, 0);
+    Shop_SetControllerCallback(
+        panel, (SceneInventoryCallback)Shop_TickActionSelection);
 }

@@ -31,10 +31,10 @@ void PreviewActor_ReplaceProjectileTowardPlayer(struct PreviewProjectileContact 
     struct ContactPosition *originPtr, *targetPtr;
     if ((contact->flags & 1) && (contact->contactFlags & 0x210) == 0x10 &&
         !(contact->targetFlags & 0x100)) {
-        source = Task4E01_GetEntryPosition(owner->projectileIndex);
+        source = ProjectileTask_GetEntryPosition(owner->projectileIndex);
         originPtr = &origin;
         *originPtr = *source;
-        if (Task4E01_RemoveEntry(owner->projectileIndex) == 0) {
+        if (ProjectileTask_RemoveEntry(owner->projectileIndex) == 0) {
             source = Player_GetEffectivePosition(0);
             targetPtr = &target;
             *targetPtr = *source;

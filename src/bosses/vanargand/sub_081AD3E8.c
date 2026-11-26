@@ -38,7 +38,7 @@ struct VanargandTargets {
     u16 proximityTimer;
 };
 extern u32 gUnk_02000560;
-void ScenePanel_DispatchTransitionCommands(void *);
+void VanargandPair_DispatchTransitionCommands(void *);
 void Vanargand_UpdatePartAnimation(void *, void *);
 void Obj_StepPosition(void *);
 void SceneActors_UpdateAnimation(void *, void *, void *);
@@ -62,7 +62,7 @@ void Vanargand_UpdateAnimationAndTargets(struct VanargandTargets *p)
     struct VanargandTargets *owner = p;
     struct TargetSprite *sprite = &actor->sprite;
     s32 i;
-    ScenePanel_DispatchTransitionCommands(actor);
+    VanargandPair_DispatchTransitionCommands(actor);
     Vanargand_UpdatePartAnimation(actor, actor->part);
     Obj_StepPosition(sprite);
     if (!TestFlags(actor, 0x4000000))

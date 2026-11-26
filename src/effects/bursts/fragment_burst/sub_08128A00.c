@@ -1,5 +1,5 @@
 #include "global.h"
-// confidence=low: SpritePool12_UpdateActive for a pool of four 0x160-byte sprites.
+// confidence=low: TimedSpritePool_UpdateActive for a pool of four 0x160-byte sprites.
 struct PoolSprite4 {
     u8 unknown[0x156];
     u8 state;

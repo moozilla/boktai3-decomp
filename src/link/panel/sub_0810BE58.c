@@ -17,7 +17,7 @@ done:
 }
 /* Registry routine 1022: stores byte +0x15D of the object at 0x020004B4 in
    the result variable while its +0x53 is 1, else 0 (meaning unknown). */
-void Registry1022_GetValueFromScript(void)
+void LinkPanel_GetValueFromScript(void)
 {
     u32 result[2];
     u8 *block;

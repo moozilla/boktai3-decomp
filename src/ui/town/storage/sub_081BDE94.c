@@ -2,7 +2,7 @@
 #include "ui/widgets/scene_input_grid.h"
 #include "ui/town/storage_screen.h"
 #include "system/game_state/game_state.h"
-#include "ui/town/scene_item_values.h"
+#include "ui/town/shop_item_values.h"
 struct SwapFlagWidget {
     u32 flags;
     u8 unknown4[0x5C];

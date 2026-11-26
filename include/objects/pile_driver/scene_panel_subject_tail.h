@@ -1,16 +1,16 @@
 #ifndef GUARD_SCENE_PANEL_SUBJECT_TAIL_H
 #define GUARD_SCENE_PANEL_SUBJECT_TAIL_H
-#include "objects/pile_driver/scene_panel_subject.h"
+#include "objects/pile_driver/pile_driver_subject.h"
 
 void EffectGroup_Reset(void *);
 void EffectGroup_FadeFirstActive(void *);
 u32 SceneActorEffects_DestroyGroup(void *);
 void Collider_SetBodyProperties(void *, u32, u32, u32);
-void ScenePanelSubject_UpdateTimedEffect(struct ScenePanelSubject *);
-void ScenePanelSubject_UpdatePaletteBank(struct ScenePanelSubject *);
-s32 ScenePanelSubject_Update(struct ScenePanelSubject *);
-s32 ScenePanelSubject_Destroy(struct ScenePanelSubject *);
-void ScenePanelSubject_InitCollider(struct ScenePanelSubject *, u32);
-s32 ScenePanelSubject_Initialize(struct ScenePanelSubject *, const struct ContactPosition *, u32,
+void PileDriverSubject_UpdateTimedEffect(struct ScenePanelSubject *);
+void PileDriverSubject_UpdatePaletteBank(struct ScenePanelSubject *);
+s32 PileDriverSubject_Update(struct ScenePanelSubject *);
+s32 PileDriverSubject_Destroy(struct ScenePanelSubject *);
+void PileDriverSubject_InitCollider(struct ScenePanelSubject *, u32);
+s32 PileDriverSubject_Initialize(struct ScenePanelSubject *, const struct ContactPosition *, u32,
                                  u32, u32, u32, u32, u32, u32);
 #endif

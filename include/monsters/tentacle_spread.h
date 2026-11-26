@@ -2,7 +2,7 @@
 #define GUARD_TENTACLE_SPREAD_H
 
 #include "scene/actor/scene_actor_reaction.h"
-#include "monsters/centipede/tentacle_segment_animation.h"
+#include "monsters/centipede/centipede_segment_animation.h"
 
 extern const s16 gUnk_086149C4[];
 s32 Div(s32, s32);

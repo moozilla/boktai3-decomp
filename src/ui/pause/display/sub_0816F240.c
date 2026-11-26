@@ -20,7 +20,7 @@ static inline s32 Panel_RandomPercent(void)
     gRandomIndex = next & 0x3FF;
     return Mod(*(u16 *)((gRandomIndex << 1) + RANDOM_TABLE_ADDR), 100);
 }
-void ScenePanel_BeginRandomTransition(u8 *s)
+void PauseDisplay_BeginRandomTransition(u8 *s)
 {
     u32 v[2];
     u32 w[2];

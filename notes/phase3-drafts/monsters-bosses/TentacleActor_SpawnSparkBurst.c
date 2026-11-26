@@ -14,7 +14,7 @@ static inline u32 rnd(u8 *tbl, s32 *idx)
 {
     return *(u16 *)(((*idx = (*idx + 1) & 0x3ff) << 1) + (u32)tbl);
 }
-void TentacleActor_SpawnSparkBurst(u8 *p)
+void Centipede_SpawnSparkBurst(u8 *p)
 {
     struct VAB v;
     u8 *tbl;

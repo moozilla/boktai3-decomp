@@ -6,7 +6,7 @@ struct S {
     s16 b;
 };
 void PanelText_DrawDigits(s32, s32, s32, s32, s32);
-void Registry33FF_DrawActorValues(void)
+void LinkLobbyPanel_DrawActorValues(void)
 {
     struct S *s = gLinkSession;
     if (s == 0) {

@@ -6,7 +6,7 @@ static inline void BoardPiece_SelectPalette(void *resource)
 {
     AnimData_SelectPaletteBank(resource, 0x2D3);
 }
-int BoardPiece_Initialize(struct GroupObjects *owner, struct GroupPiece *p, int index)
+int BatFlockBat_Initialize(struct GroupObjects *owner, struct GroupPiece *p, int index)
 {
     struct SpriteRenderResource *resource;
     struct DisplaySequenceSprite *sprite;
@@ -29,7 +29,7 @@ int BoardPiece_Initialize(struct GroupObjects *owner, struct GroupPiece *p, int 
     ActorShadow_Disable(p->transform);
 }
 
-u32 BoardPiece_Destroy(struct GroupObjects *m, struct GroupPiece *p, int index)
+u32 BatFlockBat_Destroy(struct GroupObjects *m, struct GroupPiece *p, int index)
 {
     Shadow_Destroy(p->transform);
     Sprite_Remove(&p->sprite);
@@ -40,7 +40,7 @@ static inline u32 frame_factor(u16 v)
     return DisplaySequence_MaskCommand(v, 15);
 }
 
-void BoardPiece_SetFacingAnim(struct GroupObjects *m, struct GroupPiece *p, int index)
+void BatFlockBat_SetFacingAnim(struct GroupObjects *m, struct GroupPiece *p, int index)
 {
     u8 left;
     u8 right;
@@ -58,7 +58,7 @@ void BoardPiece_SetFacingAnim(struct GroupObjects *m, struct GroupPiece *p, int 
     Anim_SetSequence(&p->anim, m->animation, (u16)index, left, right);
 }
 
-void BoardPiece_UpdateAnimation(struct GroupPiece *p)
+void BatFlockBat_UpdateAnimation(struct GroupPiece *p)
 {
     struct DisplaySequenceSprite *o = &p->sprite;
     struct DisplaySequenceState *a;
@@ -162,7 +162,7 @@ static inline int BoardPieces_RandomValue(void)
     return result;
 }
 
-int BoardPieces_StartStraightAdvance(struct GroupObjects *m, struct GroupQueue *q, struct GroupCommand *cmd)
+int BatFlockBats_StartStraightAdvance(struct GroupObjects *m, struct GroupQueue *q, struct GroupCommand *cmd)
 {
     struct ContactPosition origin;
     int i;
@@ -211,7 +211,7 @@ int BoardPieces_StartStraightAdvance(struct GroupObjects *m, struct GroupQueue *
         p->speed = (BoardPieces_RandomValue() & 7) + 7;
         p->sprite.position = p->position;
         p->sprite.flags &= ~1;
-        BoardPiece_SetFacingAnim(m, r, 0);
+        BatFlockBat_SetFacingAnim(m, r, 0);
         AnimData_SelectPaletteBank(&r->resource, 0x2D3);
         p->resource.palette = m->palette;
         ActorShadow_Enable(r->transform);
@@ -221,7 +221,7 @@ int BoardPieces_StartStraightAdvance(struct GroupObjects *m, struct GroupQueue *
     return 0;
 }
 
-int BoardPieces_StartLaunch(struct GroupObjects *m, struct GroupQueue *q, struct GroupCommand *cmd)
+int BatFlockBats_StartLaunch(struct GroupObjects *m, struct GroupQueue *q, struct GroupCommand *cmd)
 {
     struct ContactPosition origin;
     int i;
@@ -268,7 +268,7 @@ int BoardPieces_StartLaunch(struct GroupObjects *m, struct GroupQueue *q, struct
         p->speed = (BoardPieces_RandomValue() & 7) + 7;
         p->sprite.position = p->position;
         p->sprite.flags &= ~1;
-        BoardPiece_SetFacingAnim(m, r, 0);
+        BatFlockBat_SetFacingAnim(m, r, 0);
         AnimData_SelectPaletteBank(&r->resource, 0x2D3);
         p->resource.palette = m->palette;
         ActorShadow_Enable(r->transform);
@@ -284,7 +284,7 @@ struct PackedVec {
 };
 
 // confidence=low: converges the board pieces on the command origin at a scaled speed.
-int BoardPieces_StartConvergence(struct GroupObjects *m, struct GroupQueue *q,
+int BatFlockBats_StartConvergence(struct GroupObjects *m, struct GroupQueue *q,
                                  struct GroupCommand *cmd)
 {
     struct ContactPosition origin;
@@ -332,7 +332,7 @@ int BoardPieces_StartConvergence(struct GroupObjects *m, struct GroupQueue *q,
         }
         p->sprite.position = p->position;
         p->sprite.flags &= ~1;
-        BoardPiece_SetFacingAnim(m, r, 0);
+        BatFlockBat_SetFacingAnim(m, r, 0);
         AnimData_SelectPaletteBank(&r->resource, 0x2D3);
         p->resource.palette = palette;
         ActorShadow_Enable(r->transform);
@@ -349,7 +349,7 @@ static inline int BoardPieces_NextRandomValue(const u16 *table, u32 *index, u32 
     return *(const u16 *)(offset + (u32)table);
 }
 
-int BoardPieces_StartActorChase(struct GroupObjects *m, struct GroupQueue *q, struct GroupCommand *cmd)
+int BatFlockBats_StartActorChase(struct GroupObjects *m, struct GroupQueue *q, struct GroupCommand *cmd)
 {
     struct SceneActorBody *actor;
     s32 duration;
@@ -395,7 +395,7 @@ static inline int count(struct GroupQueue *q)
     return q->count[*bank];
 }
 
-int BoardPieces_DispatchCommands(struct GroupObjects *manager)
+int BatFlockBats_DispatchCommands(struct GroupObjects *manager)
 {
     struct GroupQueue *queue = &manager->queue;
     int i;
@@ -406,19 +406,19 @@ int BoardPieces_DispatchCommands(struct GroupObjects *manager)
             SceneMessages_SetPendingTrigger(queue, cmd);
             switch (cmd->type) {
                 case 0:
-                    BoardPieces_StartStraightAdvance(manager, queue, cmd);
+                    BatFlockBats_StartStraightAdvance(manager, queue, cmd);
                     Trigger_ConsumePending(&manager->queue, 1);
                     break;
                 case 1:
-                    BoardPieces_StartLaunch(manager, queue, cmd);
+                    BatFlockBats_StartLaunch(manager, queue, cmd);
                     Trigger_ConsumePending(&manager->queue, 1);
                     break;
                 case 2:
-                    BoardPieces_StartActorChase(manager, queue, cmd);
+                    BatFlockBats_StartActorChase(manager, queue, cmd);
                     Trigger_ConsumePending(&manager->queue, 1);
                     break;
                 case 11:
-                    BoardPieces_StartConvergence(manager, queue, cmd);
+                    BatFlockBats_StartConvergence(manager, queue, cmd);
                     Trigger_ConsumePending(&manager->queue, 1);
                     break;
             }
@@ -452,14 +452,14 @@ static inline void BoardPiece_SetState(struct GroupPiece *piece, u32 state)
     piece->timer = 0;
 }
 
-void BoardPiece_Launch(struct GroupObjects *m, struct GroupPiece *p, int delay)
+void BatFlockBat_Launch(struct GroupObjects *m, struct GroupPiece *p, int delay)
 {
     struct ContactPosition delta;
     if (p->active)
         p->active = 0;
     polar(&delta, p->direction, p->duration * 2);
     addPosition(&p->position, &delta);
-    BoardPiece_SetFacingAnim(m, p, 0);
+    BatFlockBat_SetFacingAnim(m, p, 0);
     if (p->timer >= delay + 2) {
         p->state = 1;
         p->active = 1;
@@ -468,7 +468,7 @@ void BoardPiece_Launch(struct GroupObjects *m, struct GroupPiece *p, int delay)
     p->timer++;
 }
 
-void BoardPiece_Wander(struct GroupObjects *m, struct GroupPiece *p, int index)
+void BatFlockBat_Wander(struct GroupObjects *m, struct GroupPiece *p, int index)
 {
     struct ContactPosition delta;
     struct ContactPosition *moved;
@@ -503,13 +503,13 @@ void BoardPiece_Wander(struct GroupObjects *m, struct GroupPiece *p, int index)
         p->direction = Math_Atan2(origin->x - p->position.x, origin->z - moved->z);
         p->speed--;
     }
-    BoardPiece_SetFacingAnim(m, p, 0);
+    BatFlockBat_SetFacingAnim(m, p, 0);
     if (p->timer > 0x5F) {
         BoardPiece_SetState(p, 1);
     }
     p->timer++;
 }
-void BoardPiece_ApproachTarget(struct GroupObjects *m, struct GroupPiece *p, int index)
+void BatFlockBat_ApproachTarget(struct GroupObjects *m, struct GroupPiece *p, int index)
 {
     struct ContactPosition delta;
     struct ContactPosition *position;
@@ -548,11 +548,11 @@ void BoardPiece_ApproachTarget(struct GroupObjects *m, struct GroupPiece *p, int
             struct ContactPosition *origin = &m->origin;
             p->direction = Math_Atan2(origin->x - p->position.x, origin->z - moved->z);
         }
-        BoardPiece_SetFacingAnim(m, p, 0);
+        BatFlockBat_SetFacingAnim(m, p, 0);
         p->timer++;
     }
 }
-void BoardPiece_ConvergeOnTarget(struct GroupObjects *m, struct GroupPiece *p, int index)
+void BatFlockBat_ConvergeOnTarget(struct GroupObjects *m, struct GroupPiece *p, int index)
 {
     struct ContactPosition delta;
     struct ContactPosition *position;
@@ -591,12 +591,12 @@ void BoardPiece_ConvergeOnTarget(struct GroupObjects *m, struct GroupPiece *p, i
             struct ContactPosition *origin = &m->origin;
             p->direction = Math_Atan2(origin->x - p->position.x, origin->z - moved->z);
         }
-        BoardPiece_SetFacingAnim(m, p, 0);
+        BatFlockBat_SetFacingAnim(m, p, 0);
         p->timer++;
     }
 }
 
-void BoardPiece_Deactivate(struct GroupObjects *m, struct GroupPiece *p)
+void BatFlockBat_Deactivate(struct GroupObjects *m, struct GroupPiece *p)
 {
     if (p->active != 0) {
         p->active = 0;
@@ -605,7 +605,7 @@ void BoardPiece_Deactivate(struct GroupObjects *m, struct GroupPiece *p)
     }
 }
 
-void BoardPiece_ChasePlayer(struct GroupObjects *m, struct GroupPiece *p, int index)
+void BatFlockBat_ChasePlayer(struct GroupObjects *m, struct GroupPiece *p, int index)
 {
     struct ContactPosition delta;
     struct ContactPosition *position;
@@ -645,7 +645,7 @@ void BoardPiece_ChasePlayer(struct GroupObjects *m, struct GroupPiece *p, int in
             position->y += src->y;
             position->z += src->z;
         }
-        BoardPiece_SetFacingAnim(m, p, 0);
+        BatFlockBat_SetFacingAnim(m, p, 0);
         p->timer++;
     }
 }
@@ -656,7 +656,7 @@ static inline int GroupObjects_Random(void)
     return ((const u16 *)RANDOM_TABLE_ADDR)[gRandomIndex];
 }
 
-void BoardPiece_AdvanceWithOffset(struct GroupObjects *m, struct GroupPiece *p, int index)
+void BatFlockBat_AdvanceWithOffset(struct GroupObjects *m, struct GroupPiece *p, int index)
 {
     struct ContactPosition delta;
     struct ContactPosition *offset;
@@ -689,17 +689,17 @@ void BoardPiece_AdvanceWithOffset(struct GroupObjects *m, struct GroupPiece *p, 
     }
     p->position.x = p->anchor.x + p->offset.x;
     p->position.z = p->anchor.z + p->offset.z;
-    BoardPiece_SetFacingAnim(m, p, 0);
+    BatFlockBat_SetFacingAnim(m, p, 0);
     p->timer++;
 }
-void BoardPiece_AdvanceStraight(struct GroupObjects *m, struct GroupPiece *p, int delay)
+void BatFlockBat_AdvanceStraight(struct GroupObjects *m, struct GroupPiece *p, int delay)
 {
     struct ContactPosition delta;
     if (p->active)
         p->active = 0;
     polar(&delta, p->direction, p->duration * 2);
     addPosition(&p->position, &delta);
-    BoardPiece_SetFacingAnim(m, p, 0);
+    BatFlockBat_SetFacingAnim(m, p, 0);
     if (p->timer >= delay + 2) {
         p->state = 6;
         p->active = 1;
@@ -707,7 +707,7 @@ void BoardPiece_AdvanceStraight(struct GroupObjects *m, struct GroupPiece *p, in
     }
     p->timer++;
 }
-void BoardPiece_HomeToTarget(struct GroupObjects *m, struct GroupPiece *p, int index)
+void BatFlockBat_HomeToTarget(struct GroupObjects *m, struct GroupPiece *p, int index)
 {
     struct ContactPosition delta;
     struct ContactPosition *position;
@@ -737,16 +737,16 @@ void BoardPiece_HomeToTarget(struct GroupObjects *m, struct GroupPiece *p, int i
             p->speed--;
         polar(&delta, p->direction, p->duration);
         addPositionN(&p->position, &delta);
-        BoardPiece_SetFacingAnim(m, p, 0);
+        BatFlockBat_SetFacingAnim(m, p, 0);
         p->timer++;
     }
 }
 
-int GroupObjects_Update(struct GroupObjects *m)
+int BatFlock_Update(struct GroupObjects *m)
 {
     int i;
     struct GroupPiece *p;
-    BoardPieces_DispatchCommands(m);
+    BatFlockBats_DispatchCommands(m);
     if (m->active) {
         if (m->actorId)
             m->actor = SceneBody_GetById(m->actorId);
@@ -774,24 +774,24 @@ int GroupObjects_Update(struct GroupObjects *m)
         p = m->pieces;
         for (i = 0; i < 16; i++, p++) {
             gUnk_08604B48[p->state](m, p, i);
-            BoardPiece_UpdateAnimation(p);
+            BatFlockBat_UpdateAnimation(p);
         }
         m->timer++;
     }
     return 0;
 }
 
-int GroupObjects_Destroy(struct GroupObjects *m)
+int BatFlock_Destroy(struct GroupObjects *m)
 {
     struct GroupPiece *p = m->pieces;
     int i;
     for (i = 0; i < 16; i++, p++)
-        BoardPiece_Destroy(m, p, i);
+        BatFlockBat_Destroy(m, p, i);
     SceneMessages_UnregisterReceiver(&m->queue);
     return 0;
 }
 
-int GroupObjects_Initialize(struct GroupObjects *m, int id)
+int BatFlock_Initialize(struct GroupObjects *m, int id)
 {
     struct GroupPiece *p;
     int i;
@@ -806,18 +806,18 @@ int GroupObjects_Initialize(struct GroupObjects *m, int id)
     }
     p = m->pieces;
     for (i = 0; i < 16; i++, p++)
-        BoardPiece_Initialize(m, p, i);
+        BatFlockBat_Initialize(m, p, i);
     SceneMessages_RegisterReceiver(&m->queue, id, 10);
     return 0;
 }
 
-void *GroupObjects_CreateTask(void *arg)
+void *BatFlock_CreateTask(void *arg)
 {
     void *obj;
     obj = Task_Create(11, 0xD08);
     if (obj != 0) {
-        Task_SetCallbacks(obj, GroupObjects_Update, GroupObjects_Destroy);
-        if (GroupObjects_Initialize(obj, (int)arg) < 0) {
+        Task_SetCallbacks(obj, BatFlock_Update, BatFlock_Destroy);
+        if (BatFlock_Initialize(obj, (int)arg) < 0) {
             Task_Kill(obj);
             return 0;
         }

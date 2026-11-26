@@ -15,7 +15,7 @@ of them; this worker tested the remaining **59 sites in 52 translation units**.
 The first experiment replaced `*(&local)` with `local`, preserving the surrounding
 expression. Units containing several sites were also tested site by site after
 the combined replacement failed. Only two sites matched this direct deletion:
-`Vanargand_WaitForActionRelease` and `OrangeSpine_FireProjectile`.
+`Vanargand_WaitForActionRelease` and `PlasmaCannon_FireProjectile`.
 
 That left 57 sites requiring investigation, rather than proving 57 unavoidable
 concessions. The next pass examined the operations represented by the expressions:

@@ -1,4 +1,4 @@
-#include "bosses/nidhoggr/contact_burst.h"
+#include "bosses/nidhoggr/nidhoggr_duel_burst.h"
 #include "engine/math/monster_particle_random.h"
 
 #include "effects/sprites/projected_display.h"
@@ -7,7 +7,7 @@
 
 #include "engine/video/render.h"
 
-void ContactBurst_OnContact(struct ContactCollider *self, struct ContactCollider *otherInput,
+void NidhoggrDuelBurst_OnContact(struct ContactCollider *self, struct ContactCollider *otherInput,
                             struct ContactBurst *effectInput)
 {
     struct ContactCollider *other = otherInput;
@@ -34,7 +34,7 @@ static inline s32 nextRandomHighByte(void)
     return sample >> 8;
 }
 
-void ContactBurst_UpdateContactAnimation(struct ContactBurst *effect)
+void NidhoggrDuelBurst_UpdateContactAnimation(struct ContactBurst *effect)
 {
     s32 phase = effect->frame & 7;
     if (effect->contactTimer) {
@@ -73,7 +73,7 @@ void ContactBurst_UpdateContactAnimation(struct ContactBurst *effect)
     ++effect->frame;
 }
 
-u32 ContactBurst_RandomParticleFrame(void)
+u32 NidhoggrDuelBurst_RandomParticleFrame(void)
 {
     return Mod(nextRandomHighByte(), 3) + 29;
 }
@@ -99,7 +99,7 @@ static inline void projectPosition(struct ContactPosition *screen,
     screen->z = depth - gCameraOrigin[2];
 }
 
-s32 ContactBurst_Update(struct ContactBurst *effect)
+s32 NidhoggrDuelBurst_Update(struct ContactBurst *effect)
 {
     if (effect->enabled) {
         struct ContactPosition *screen;
@@ -134,7 +134,7 @@ s32 ContactBurst_Update(struct ContactBurst *effect)
                 effect->sprite.flags |= 2;
             }
         }
-        ContactBurst_UpdateContactAnimation(effect);
+        NidhoggrDuelBurst_UpdateContactAnimation(effect);
     } else {
         u32 previous = effect->previousEnabled;
         struct ContactCollider *collider = &effect->collider;
@@ -149,7 +149,7 @@ s32 ContactBurst_Update(struct ContactBurst *effect)
                 direction = index << 5;
                 sample &= 15;
                 direction += sample;
-                frame = ContactBurst_RandomParticleFrame();
+                frame = NidhoggrDuelBurst_RandomParticleFrame();
                 DirectionalParticle_Spawn((struct DirectionalParticleSource *)effect, direction,
                                           frame);
                 ++index;
@@ -171,19 +171,19 @@ s32 ContactBurst_Update(struct ContactBurst *effect)
     return 0;
 }
 
-s32 ContactBurst_Destroy(struct ContactBurst *effect)
+s32 NidhoggrDuelBurst_Destroy(struct ContactBurst *effect)
 {
     Collider_Remove(&effect->collider);
     Sprite_Remove(&effect->sprite);
     return 0;
 }
 
-void ContactBurst_OnContact(struct ContactCollider *, struct ContactCollider *,
+void NidhoggrDuelBurst_OnContact(struct ContactCollider *, struct ContactCollider *,
                             struct ContactBurst *);
 
 void Collider_SetBodyProperties(void *, u32, u32, u32);
 
-s32 ContactBurst_Initialize(struct ContactBurst *effect, const struct ContactPosition *world)
+s32 NidhoggrDuelBurst_Initialize(struct ContactBurst *effect, const struct ContactPosition *world)
 {
     struct ContactSwarmGraphics *graphics;
     struct TransientEffectSprite *sprite;
@@ -216,7 +216,7 @@ s32 ContactBurst_Initialize(struct ContactBurst *effect, const struct ContactPos
     offset.z = 0;
     collider = &effect->collider;
     Collider_Init(collider, 0, 0x4005, 0, 16, &bounds, &offset);
-    Collider_SetCallback(collider, (void *)ContactBurst_OnContact, effect);
+    Collider_SetCallback(collider, (void *)NidhoggrDuelBurst_OnContact, effect);
     Collider_SetBodyProperties(collider, 0, 0, 0);
     /* The ROM forwards Collider_Refresh's incidental nonnegative return word. */
     status = Collider_Refresh(collider);
@@ -224,13 +224,13 @@ done:
     return status;
 }
 
-struct ContactBurst *ContactBurst_Create(const struct ContactPosition *world)
+struct ContactBurst *NidhoggrDuelBurst_Create(const struct ContactPosition *world)
 {
     struct ContactBurst *effect = Task_Create(8, sizeof(*effect));
     if (effect) {
-        Task_SetCallbacks(effect, (void (*)(void *))ContactBurst_Update,
-                          (void (*)(void *))ContactBurst_Destroy);
-        if (ContactBurst_Initialize(effect, world) < 0) {
+        Task_SetCallbacks(effect, (void (*)(void *))NidhoggrDuelBurst_Update,
+                          (void (*)(void *))NidhoggrDuelBurst_Destroy);
+        if (NidhoggrDuelBurst_Initialize(effect, world) < 0) {
             Task_Kill(effect);
             return NULL;
         }
@@ -238,13 +238,13 @@ struct ContactBurst *ContactBurst_Create(const struct ContactPosition *world)
     return effect;
 }
 
-void ContactBurst_SetEnabled(struct ContactBurst *effect, u32 enabled)
+void NidhoggrDuelBurst_SetEnabled(struct ContactBurst *effect, u32 enabled)
 {
     if (effect)
         effect->enabled = enabled;
 }
 
-u32 ContactBurst_GetEnabled(struct ContactBurst *effect)
+u32 NidhoggrDuelBurst_GetEnabled(struct ContactBurst *effect)
 {
     if (!effect)
         return 0;

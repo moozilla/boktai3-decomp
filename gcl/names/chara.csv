@@ -35,7 +35,7 @@ B3D7,アルバム,Album,low,hash (menu word); no script creates it
 BEF5,ミミック,Mimic,high,loads sprite 3876 (the opening chest)
 C077,フレスベルグ,Hresvelgr,medium,boss name (text#9916); sprite 1C1B shared with Vampire
 C3BC,スライム,Slime,high,loads sprite B96C whose own name hash is 'slime'
-CBB0,パイルドライバー,Pile Driver,medium,hash; callback ScenePanel_Create
+CBB0,パイルドライバー,Pile Driver,medium,hash; callback PileDriver_Create
 CCD3,ゴースト,Ghost,high,loads sprite D637 (the hooded ghost/wraith family)
 D972,ヴァンパイア,Vampire,medium,hash; sprite 1C1B shared with Hresvelgr
 DA0E,ウーズ,Ooze,medium,monster list WALL/FLOOR OOZE (text#9904)

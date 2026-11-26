@@ -1,4 +1,4 @@
-#include "ui/town/scene_item_values.h"
+#include "ui/town/shop_item_values.h"
 
 u32 Inventory_GetEquipmentId(u32 slot)
 {

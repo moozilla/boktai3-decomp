@@ -60,11 +60,11 @@ static inline void Select(struct RoomActor *actor, u32 selection, u32 variant, u
 }
 
 s32 Mod(s32, s32);
-void TentacleBody_GetDirectionFrame(u8, u32 *, u32 *);
-void TentacleBody_ResetDirectionalAnimations(void *, s32);
-void TentacleBody_UpdateSegmentMotion(void *, s32);
+void CentipedeBody_GetDirectionFrame(u8, u32 *, u32 *);
+void CentipedeBody_ResetDirectionalAnimations(void *, s32);
+void CentipedeBody_UpdateSegmentMotion(void *, s32);
 void ActorTrail_RemoveAllSegments(void *);
-void TentacleActor_SpawnSparkBurst(void *);
+void Centipede_SpawnSparkBurst(void *);
 void SparkParticle_Spawn(void *, s32, void *, s32, s32, s32, s32, s32);
 static inline u32 Random4(void)
 {
@@ -74,7 +74,7 @@ static inline u32 Random4(void)
         return (3 & value) + 1;
     }
 }
-void TentacleBody_UpdateDefeat(struct ChaseActor *actor, s32 frame)
+void CentipedeBody_UpdateDefeat(struct ChaseActor *actor, s32 frame)
 {
     s32 values[8];
     u32 variant, flags;
@@ -84,9 +84,9 @@ void TentacleBody_UpdateDefeat(struct ChaseActor *actor, s32 frame)
     if (SceneActorControl_TakeFlag(&actor->base.field2B2)) {
         u8 *entry = (void *)SceneActorProfiles_GetEntryAddress(actor->base.profileId,
                                                                actor->base.profileMode, 0);
-        TentacleBody_GetDirectionFrame(actor->base.body.direction, &variant, &flags);
+        CentipedeBody_GetDirectionFrame(actor->base.body.direction, &variant, &flags);
         Select((void *)actor, entry[0x44], variant, flags);
-        TentacleBody_ResetDirectionalAnimations(actor->base.context, 18);
+        CentipedeBody_ResetDirectionalAnimations(actor->base.context, 18);
         actor->base.restart = 0;
         SceneActorPlacement_PlayCategoryEventSound((void *)actor);
         {
@@ -101,12 +101,12 @@ void TentacleBody_UpdateDefeat(struct ChaseActor *actor, s32 frame)
         SparkParticle_Spawn(&actor->base.body.position, Random4(), &range,
                             actor->base.body.direction + 128, 10, 8, 2, 2);
     }
-    TentacleBody_UpdateSegmentMotion(actor, frame);
+    CentipedeBody_UpdateSegmentMotion(actor, frame);
     if (!Sprite_BlinkUntilExpired(actor->base.drawable, frame, 10, 30))
         return;
     actor->base.stepDone = 1;
     ActorTrail_RemoveAllSegments(actor);
-    TentacleActor_SpawnSparkBurst(&actor->base.body.position);
+    Centipede_SpawnSparkBurst(&actor->base.body.position);
     if (!(Flags_MaskedWord(0x400, &actor->base.behaviorFlags)))
         SceneActorBehavior_CallTerrainScript(&actor->base);
     script = (u16)actor->base.script1F8;

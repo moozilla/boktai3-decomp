@@ -1,5 +1,5 @@
 #include "objects/pile_driver/scene_panel.h"
-void ScenePanel_InitBackground(struct ScenePanel *panel)
+void PileDriver_InitBackground(struct ScenePanel *panel)
 {
     void *map = ScriptProc_Start(0xC091, gUnk_08605A88[panel->resourceIndex]);
     s32 id;

@@ -37,7 +37,7 @@ struct ActorImpact {
 
 void CollisionReaction_RecordImpact(struct ContactCollider *, struct ContactCollider *,
                                     struct ActorImpact *);
-void ActorImpact_CopyContact(struct ContactCollider *, struct ContactCollider *, struct ActorImpact *);
-void ActorImpact_NoOp(void);
+void SabataImpact_CopyContact(struct ContactCollider *, struct ContactCollider *, struct ActorImpact *);
+void SabataImpact_NoOp(void);
 
 #endif

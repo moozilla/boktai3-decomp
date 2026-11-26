@@ -34,7 +34,7 @@ static inline s32 Height(s32 cell, struct ContactPosition *p)
     return height;
 }
 
-void TentacleActor_SelectWanderRoute(void *);
+void Centipede_SelectWanderRoute(void *);
 s32 Math_Atan2(s32, s32);
 static inline void Add(struct ContactPosition *out, const struct ContactPosition *a,
                        const struct ContactPosition *b)
@@ -43,7 +43,7 @@ static inline void Add(struct ContactPosition *out, const struct ContactPosition
     out->y = b->y + a->y;
     out->z = b->z + a->z;
 }
-void TentacleActor_ResolveBlockedMovement(struct ChaseActor *actor)
+void Centipede_ResolveBlockedMovement(struct ChaseActor *actor)
 {
     u8 *trail;
     struct ContactPosition target;
@@ -71,7 +71,7 @@ void TentacleActor_ResolveBlockedMovement(struct ChaseActor *actor)
         if (*count > 30) {
             s32 difference;
             trail[0x8e9] = (trail[0x8e9] + 1) & 3;
-            TentacleActor_SelectWanderRoute(actor);
+            Centipede_SelectWanderRoute(actor);
             Chase_Delta(&target, &actor->base.body.position, (void *)(trail + 0x904));
             actor->base.nextDirection = Math_Atan2(target.x, target.z);
             difference = actor->base.nextDirection - actor->base.body.direction;

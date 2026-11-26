@@ -12,8 +12,8 @@ struct R {
 } __attribute__((packed));
 void SpriteParticle_CreateDefaultVariant4384(void *, s32, s32, s32, s32, s32, s32, s32, s32, s32,
                                              s32, s32);
-void EnemyD459_RecordDefeat(void *);
-s32 EnemyD459_UpdateDeath(u8 *p)
+void SuitOfArmor_RecordDefeat(void *);
+s32 SuitOfArmor_UpdateDeath(u8 *p)
 {
     if (!(*((s16 *)(p + 0x144)))) {
         if ((*((s32 *)(p + 0x18))) <= 11) {
@@ -27,7 +27,7 @@ s32 EnemyD459_UpdateDeath(u8 *p)
             SpriteParticle_CreateDefaultVariant4384(&v, 128, 32, 12, 12, 24, r, 32, 32, 1, 1, 512);
         }
         if ((*((s32 *)(p + 0x18))) == 12) {
-            EnemyD459_RecordDefeat(p);
+            SuitOfArmor_RecordDefeat(p);
         }
     }
     return 0;

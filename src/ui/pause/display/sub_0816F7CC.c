@@ -1,6 +1,6 @@
 #include "global.h"
 #include "ui/pause/scene_hud_display.h"
-#include "ui/town/scene_inventory_panel.h"
+#include "ui/town/shop_panel.h"
 void Hud_SetInteractionCallback(void *, void (*)(void), int);
 void MenuDisplay_SetPaletteOverrides(void *, int, int, int, int);
 void MenuDisplay_UpdateActionPrompt(void *, int);

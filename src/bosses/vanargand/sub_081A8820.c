@@ -13,8 +13,8 @@ struct ActorSoundPhase {
     s16 variant;
 };
 void Vanargand_StopActionSequence(void *);
-void ScenePanel_UpdatePairConditions(void *);
-void ScenePanel_ApplyPairTransition(void *);
+void VanargandPair_UpdatePairConditions(void *);
+void VanargandPair_ApplyPairTransition(void *);
 static inline u8 chk(struct ActorSoundPhase *p)
 {
     u8 *q = &p->b0;
@@ -42,7 +42,7 @@ void ActorSoundPhase_UpdateConditionalStop(struct ActorSoundPhase *p)
         } while (0);
     }
     if (q->af != 0) {
-        ScenePanel_UpdatePairConditions(p);
-        ScenePanel_ApplyPairTransition(p);
+        VanargandPair_UpdatePairConditions(p);
+        VanargandPair_ApplyPairTransition(p);
     }
 }

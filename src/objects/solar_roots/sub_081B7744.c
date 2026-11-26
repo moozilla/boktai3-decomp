@@ -29,7 +29,7 @@ struct GrowthHazardManager {
 };
 u32 Hresvelgr_GetAnimationIdentifier(void);
 
-void GrowthHazard_ApplyAnimationEvent(struct GrowthHazardAnimationEvent *event, u32 unused,
+void SolarRoot_ApplyAnimationEvent(struct GrowthHazardAnimationEvent *event, u32 unused,
                                       struct GrowthHazardEntry *entry)
 {
     u32 identifier = event->identifier;

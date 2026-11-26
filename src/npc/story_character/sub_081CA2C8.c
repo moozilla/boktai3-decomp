@@ -12,7 +12,7 @@ s32 DisplayAnimation_TestFinished(void *);
 void *ActorAttachment_UpdateFromDescriptor(void *, void *, u32, u32, u32, u32, u32, u32);
 s32 sub_081C8FB0(struct Context *, struct StateActor *, s32);
 
-void StateActor_StartKind5Animation9AndAttach(struct Context *ctx, struct StateActor *p, u32 a2)
+void StoryCharacter_StartKind5Animation9AndAttach(struct Context *ctx, struct StateActor *p, u32 a2)
 {
     u32 r;
     u32 mask;
