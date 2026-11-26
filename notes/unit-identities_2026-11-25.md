@@ -511,6 +511,40 @@ and `CannonBattery_UpdateCannon` with the guns visible in
 create the 55E9 battery manager. Otenko calls these the cannons around the
 helm in text #7463. Place the pooled cannon unit at `src/objects/deck_cannons`.
 
+### Poisoner and Perplexer
+
+The former `cannon_emitter` unit draws the pollen flowers. The Monster Book
+names them Poisoner (#9838) and Perplexer (#9839), and #2509–2510 distinguish
+their poisonous and disorienting pollen. Proc 3503 spawns two Poisoners
+through key 98CB, and proc 5180 spawns a Perplexer through the same key.
+
+Warp 0021 to `scene=3504 entrance=9 story=98` and 0054 to
+`scene=5181 entrance=8 story=156`. The replay scripts position Django near
+each plant and allow its original proximity logic to run. In
+`pollen-identities/poisoner.png`, variant 1 fires and applies status kind 0
+for 1800 frames. In `perplexer-live/pollen.png`, variant 0 fires and applies
+status kind 1 for 900 frames. Both captures execute
+`CannonEmitter_UpdateAnimation`, `ProximitySequence_EmitBurst` and
+`SpriteEffectController_Create`. The first status runs the poison palette
+path and the second randomizes the saved action selection. Place the unit
+at `src/monsters/pollen_flowers`.
+
+### Centipede
+
+Warp 0030 to `scene=4076 entrance=7 story=101`. Proc 4075 calls 1574 and
+then 1576, which spawns the moving actor through 0AC7. Hold DOWN+RIGHT for
+40 frames and wait 60. The Centipede is visible beside Django in
+`tentacle-dark-room/encounter.png`. `TentacleEnemy_Create` and
+`TentacleActor_UpdateComponents` run, followed by the body unit's attack and
+spread callbacks. The Health and position staging in the separate
+`centipede-contact` comparison recorded sword contact setup without
+reaching the defeat callback.
+
+Read the running actor's category byte at `RoomActor+0x98` in the dump
+made by `tentacle-dark-room/commands.txt`. It is 9. The defeat path passes
+this category to `Bestiary_GetEntryForActor`, which maps it to entry 13,
+text #9851, Centipede. Merge both units at `src/monsters/centipede`.
+
 The story order is Count → Hresvelgr → Sabata → Nidhoggr → Ratatosk →
 Vanargand after the opening dream. The table records each arena and the
 reached functions. Stock 0023 reloads Hresvelgr in 3588. Move `UP+RIGHT`
