@@ -1018,6 +1018,14 @@ and restores the original hardware state. The resulting
 The controlled render establishes the effect identity. A shipped
 trigger for the linear mote constructor remains open.
 
+The 83-save coverage bank has no entry in 0812D7A8–0812DA60.
+A ROM scan for aligned Thumb BL targets and little-endian pointers
+with either Thumb bit finds no references to either public wrapper
+(0812D7A8 and 0812D7BC). The shared allocator 0812D7D0 has two direct
+calls, 0812D7B0 and 0812D7C4, both in those wrappers. These checks leave
+indirect entry routes open. The layout name describes the observed
+effect, with the controlled spawn recorded in the identity table.
+
 ### Coffin Bike charge sprites
 
 Tags: Coffin Bike, charge, sprite attribution, 409C, 1C1E
@@ -1343,6 +1351,89 @@ build/venv/bin/python build/identify/resume3/cast_named.py coach elefan violet c
 | 24 | Coach | Stock 0000→2201. DAE5 runs display from 0200E434 and submits 0200E534. Proc 2179 opens the named Coach portrait at text #3402. See `resume3-coach/opened.png`. |
 | 43 | Elefan | Same garage. Proc 2200 places BEB1 and binds interaction 2187. Live actor 0200F394 submits 0200F490. Original proc 2187 leads to named text #5043 in `resume3-elefan/opened.png`. |
 
-Kinds 27–29 are covered in the earlier story-cast section. The stock scan
-also finds active callbacks for kinds 9, 17, and 20 without a tied visible
-drawable in the sampled frames. Leave their individual names open.
+Kinds 27–29 are covered in the earlier story-cast section.
+
+### Carmilla in the Moon Tower and the Girl with Braids
+
+Tags: Carmilla, Lifeless Town, NPC, 8EA3, actor ID, renderer
+
+Stock 0069 enters 6138 at story 184. Proc 6140 places kind 9,
+ID 24F3, through 1155. The actor at 0200E434 runs
+`SceneCharacter_UpdateDisplay`. Move the camera to (2944, 1792, 2176)
+with `Camera_SnapToWithoutCompletion` and the same actor submits
+drawable 0200E534 at (113, 28), as shown in
+`resume4-carmilla/actors.png`. On a second copy, invoke the room's
+original trap proc 6071 through `Script_Call` after the camera move.
+It takes the 6048 branch and resolves #7958. At the fourth advance,
+`resume4-carmilla-talk/line4.png` shows Carmilla's name and portrait
+with the red figure still on screen. The camera and interaction were
+staged on the stock actor.
+
+Warp 0009 to 3056, entrance 7, story 32. At frame 1474, proc 3058
+uses 1155 to allocate kind 20, ID DBE0, at 0200F344 and initialize
+model DFFE. The original display callback runs on that actor from
+1477 and during the named dialogue. The scene binds proc 3062 for
+the post-rescue interaction. Trigger that branch with
+`Script_Call 0x0BF6` after moving
+the camera near the doorway. Text #172 resolves to the speaker
+Girl with Braids, shown in `resume4-lifeless-girl/line0.png`.
+This uses a staged warp, camera and dialogue. The stock 0009
+intro independently allocates the same DBE0 kind and model.
+
+For the callback trace, use the captured `commands.txt` in each
+replay directory. A new doorway replay uses the checkpoint battery
+and the stock Continue prefix, then calls the original camera and
+dialogue routines as in the capture. The camera-only Carmilla replay
+adds `drawtrace` to associate the OBJ submissions with their owning
+drawable. The two dialogue captures can be run in place with their
+retained `start.ss` or `start.sav` and the native-call harness.
+
+```sh
+replays=build/identify/replays
+runner=build/identify/resume4/cast_harness
+run="$replays/resume4-carmilla-talk"
+nice -n 19 "$runner" baserom.gba "$run/commands.txt" "$run"
+run="$replays/resume4-lifeless-girl"
+BOKTAI3_SAV="$run/start.sav" nice -n 19 "$runner" baserom.gba "$run/commands.txt" "$run"
+build/venv/bin/python tools/assets/cutscenes.py 15
+```
+
+### The Lifeless Town opening cast
+
+Tags: Lifeless Town, NPC, StoryCharacter, 8EA3, cutscene, renderer
+
+Boot the unmodified 0009 checkpoint battery. Shorten the final
+`wait 300` of the field Continue prefix to `wait 66`, then mark
+the segment and capture one screenshot per ten frames. Scene 2961
+runs cutscene 15 from proc 2886. At frame 1599 the director passes
+17 and 20 to proc 1677 in separate messages at 08E6420C and
+08E64220. They allocate 8303 at 0200E584 with DFCE and DBE0 at
+0200E924 with DFFE. Cutscene step 2 sends each character a walk
+command as the skeleton approaches.
+
+The sprites are visible together in
+`resume4-lifeless-intro/flight06.png`. At frame 1665 the actor
+display callbacks lead to OBJ submissions from 0200E684 for the
+green-clad man on the left and 0200EA24 for the girl on the right.
+The capture keeps the stock camera and uses the normal Continue
+sequence. Loading the bank's later mGBA state skips the entrance
+and leaves the same actors behind the foreground trees.
+
+The girl's father uses kind 18, ID 5744, in the later scene 3068.
+Warp 0009 to entrance 7 at story 32. Proc 3070 allocates him at
+020102E4 at frame 1476 and loads DFCE. With the camera staged near
+him, drawable 020103E4 supplies the blue-clad man. The assigned
+interaction proc 3071 resolves the Young Man speaker label at text
+#126 in `resume4-lifeless-father/line0.png`. The same procedure
+uses #134 when he explains that he is looking for his daughter.
+Kinds 17 and 18 use the same model and resource variant, with
+palette IDs 039B and 039C respectively. The green opening actor's
+individual speaker name remains open.
+
+```sh
+runner=build/identify/pass3/link_harness
+run=build/identify/replays/resume4-lifeless-intro
+BOKTAI3_SAV=build/saves/0009.sav nice -n 19 "$runner" baserom.gba "$run/commands.txt" "$run"
+run=build/identify/replays/resume4-lifeless-father
+BOKTAI3_SAV="$run/start.sav" nice -n 19 "$runner" baserom.gba "$run/commands.txt" "$run"
+```
