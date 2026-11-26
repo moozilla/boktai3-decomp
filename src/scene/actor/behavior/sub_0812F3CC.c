@@ -1,3 +1,4 @@
+#include "scene/motion/scene_actor_terrain_reaction.h"
 #include "scene/actor/scene_actor_behavior.h"
 #include "global.h"
 #include "scene/actor/scene_actor_reset.h"
@@ -15,17 +16,6 @@ static inline u32 SceneActorReaction_ReadFlags(struct ChaseActor *a, u32 mask, u
 static inline void SceneActorReaction_SetBits(u16 *p, u32 mask)
 {
     *p |= mask;
-}
-static inline void SceneActorReaction_SetControl(struct ChaseActor *a, void *p, u32 kind, u32 zero,
-                                                 u8 byteZero)
-{
-    a->base.field2B2 = 1;
-    a->base.stepDone = byteZero;
-    a->base.controlKind = kind;
-    a->base.target = p;
-    a->base.field2C8 = zero;
-    SceneActorChase_AndWordFlags(&a->base.pendingControlFlags, ~1);
-    a->base.pendingControl = zero;
 }
 // confidence=low: begins a contact reaction after filtering actor and contact flags.
 #define SceneActorReaction_BeginContactResponse sub_0812F3CC
@@ -79,7 +69,7 @@ success: {
 }
 
     group->contactNode = contact;
-    SceneActorReaction_SetControl(a, SceneActorControl_OnIdle, 0x10, 0, byteZero);
+    SceneActorTerrain_InstallControl(a, SceneActorControl_OnIdle, 0x10);
     SceneActorBehavior_WriteSelector(3, &a->base.state2A8);
     a->base.phase2A9 = 1;
     a->base.behavior2AA = byteZero;
