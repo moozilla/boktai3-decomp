@@ -5,14 +5,17 @@
 #include "effects/particles/scene_particle_pool.h"
 struct TimedEffectTrail {
     struct SceneParticleEffect sprite;
-    u8 active, unknown29[7];
+    u8 active;
+    s8 angleOffset;
+    u16 radius, timer;
+    u8 unknown2E[2];
 };
 struct TimedEffectManager {
     struct Task task;
     u32 activeMask;
     s32 counts[4], totalCounts[4];
     s32 capacity;
-    u32 trailState;
+    s32 nextTrail;
     void *trailResource;
     struct TimedEffectTrail effects[4];
     struct Task4E01Projectile *entries;
