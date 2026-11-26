@@ -157,3 +157,11 @@ facing update, and reads the native behavior and motion flags during defeat.
 The direct defeat sound test moves the motion mask across the field offset
 setup and gives the mask a different register. The constructor's typed
 alternate drawable step also changes the unit's output.
+
+## Crow terrain entry follow-up
+
+Crow uses the existing terrain transition at five more state entries and
+writes the wander duration from the random result in one expression. The
+full unit matched. The direct behavior clear in displacement recovery and
+the direct context clear in scripted entry each change one ROM instruction.
+The earlier random-table and tracking holdouts still apply.
