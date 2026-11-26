@@ -6,7 +6,7 @@ void SceneBody_StartRoute(void *, void *, u32, u32, u32);
 // confidence=low: restarts the saved route after a timed animation and waits before restoring control.
 void Mummy_ResumeSavedRouteAfterAnimation(struct ChaseActor *actor, s32 frame)
 {
-    void *body;
+    struct SceneActorBody *body;
     struct SceneActorChaseGroup *group = &actor->group;
     struct DisplaySequenceState *sequence;
     body = &actor->base.body;
