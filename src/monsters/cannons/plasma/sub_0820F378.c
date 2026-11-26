@@ -1,3 +1,4 @@
+#include "scene/collision/contact_actor.h"
 #include "monsters/cannons/plasma_cannon.h"
 #include "ui/hud/damage_number_display.h"
 #include "ui/pause/scene_hud_display.h"
@@ -11,7 +12,7 @@
 #include "engine/word_flags.h"
 #include "engine/math/monster_particle_random.h"
 // confidence=low: handles collision damage, defeat effects, palette flashing and animation.
-extern u32 gUnk_02000560;
+#include "player/player.h"
 s32 Callback_InvokeActor(void *, void *);
 void Collider_SetPosition(void *, void *, u32);
 void TerrainModifiers_UnregisterCell(void *);
@@ -20,13 +21,6 @@ void Anim_RestartSequence(void *, void *, u32, u32, u32);
 void AnimData_SelectPaletteBank(void *, s32);
 void PlasmaCannon_UpdateDefeatEffect(u8 *);
 void Explosion_CreateAt(void *, s32, s32, s32, s32, s32, s32, s32);
-struct OrangeSpineEffectPair {
-    s32 lo : 16;
-    u32 hi : 16;
-};
-struct OrangeSpineEffectVector {
-    struct OrangeSpineEffectPair a, b;
-};
 static inline u16 OrangeSpine_RandomBurstCount(const u16 *table)
 {
     return (ParticleRandom_ReadDirectSample(table) & 3) + 4;
@@ -42,29 +36,7 @@ static inline u32 OrangeSpine_StepSequence(struct DisplaySequenceSprite *owner,
         table = state->commands;
         command = (const u16 *)((u32)table + offset);
     }
-    owner->frame = *command >> 6;
-    {
-        union DisplaySequenceControl control;
-        u32 bit, first;
-        control.raw = state->flags;
-        bit = 1;
-        first = (u8)(control.raw & bit);
-        if (first != (((*command & 0x30) >> 4) & bit))
-            owner->flags |= 4;
-        else
-            owner->flags &= ~4;
-    }
-    {
-        union DisplaySequenceControl control;
-        u32 bit, first;
-        control.raw = state->flags;
-        bit = 2;
-        first = (u8)(control.raw & bit);
-        if (first != (((*command & 0x30) >> 4) & bit))
-            owner->flags |= 8;
-        else
-            owner->flags &= ~8;
-    }
+    DisplaySequence_ApplyFrame((struct SceneActorControlMotionDrawable *)owner, state, command);
     if (++state->elapsed >= state->duration) {
         state->elapsed = 0;
         if (state->flags & 4) {
@@ -102,16 +74,10 @@ static inline u32 OrangeSpine_StepSequence(struct DisplaySequenceSprite *owner,
     return ended;
 }
 
-static inline void OrangeSpine_BeginDefeat(s16 *state, u16 *blink)
-{
-    u32 zero = 0;
-    *state = 1;
-    *blink = zero;
-}
 s32 PlasmaCannon_UpdateDamageState(struct OrangeSpineActor *p)
 {
     struct ContactCollider *collider;
-    if (Engine_PauseBits(0x400) || Flags_MaskedWord(4, &gUnk_02000560))
+    if (Engine_PauseBits(0x400) || Flags_MaskedWord(4, &gPlayerSlotStatus[0]))
         return 0;
     Callback_InvokeActor(p, p->update);
     p->sprite.display.flags &= ~1;
@@ -137,21 +103,22 @@ s32 PlasmaCannon_UpdateDamageState(struct OrangeSpineActor *p)
         }
         if (p->health <= 0) {
             struct SceneVec center, smoke;
-            struct OrangeSpineEffectVector velocity, spread;
+            struct ContactPackedVector velocity, spread;
             const u16 *table;
-            OrangeSpine_BeginDefeat(&p->defeated, &p->collider.responseValue);
+            p->defeated = 1;
+            p->collider.responseValue = 0;
             {
                 struct SceneVec *centerPosition = &center;
                 *centerPosition = p->sprite.coordinates.position;
                 centerPosition->y += 128;
             }
-            velocity.a.lo = -4;
+            velocity.x = -4;
             table = gRandomTable;
-            velocity.a.hi = ParticleRandom_ReadDirectSample(table) & 7;
-            velocity.b.lo = -4;
-            spread.a.lo = 24;
-            spread.a.hi = (ParticleRandom_ReadDirectSample(table) & 7) + 3;
-            spread.b.lo = 24;
+            velocity.y = ParticleRandom_ReadDirectSample(table) & 7;
+            velocity.z = -4;
+            spread.x = 24;
+            spread.y = (ParticleRandom_ReadDirectSample(table) & 7) + 3;
+            spread.z = 24;
             sub_08014634(OrangeSpine_RandomBurstCount(table), 13, &center, &velocity, &spread, 15,
                          15);
             {
@@ -178,13 +145,9 @@ s32 PlasmaCannon_UpdateDamageState(struct OrangeSpineActor *p)
             p->age = 0;
             Sound_PlaySong(0x52d);
         }
-        {
-            s16 *flash = &p->flashTimer;
-            s32 zero = 0;
-            *flash = 8;
-            p->hitReaction = 1;
-            p->damage = zero;
-        }
+        p->flashTimer = 8;
+        p->hitReaction = 1;
+        p->damage = 0;
     }
     if (p->flashTimer > 0) {
         AnimData_SelectPaletteBank(p->graphics, 0x192);
