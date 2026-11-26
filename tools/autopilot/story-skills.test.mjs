@@ -71,6 +71,7 @@ test('the vampire model uses signed health and the source sunlight flag', () => 
   assert.equal(combatWait(vampire), 24);
   values[addr + 0x384] = 1;
   assert.equal(vampireTargets()[0].solarWeak, false);
+  assert.equal(vampireTargets()[0].solarReactive, true);
   values[addr + 0x9c] |= 2;
   assert.deepEqual(vampireTargets(), []);
 });

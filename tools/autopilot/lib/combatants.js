@@ -9,11 +9,13 @@ exports.vampireTargets = () => {
     if ((t.flags & 1) || (t.update & ~1) !== update) continue;
     const addr = t.$addr, flags = g.u32(addr + 0x9c), health = g.s16(addr + 0x94);
     if (health <= 0 || (flags & 2)) continue;
+    const solarReactive = Boolean(g.u32(addr + 0x3ac) & 1);
+    const solarGuard = g.u8(addr + 0x384);
     out.push({
       addr, health, alive: true, boss: 'Vampire',
       x: g.s16(addr + 0x54), y: g.s16(addr + 0x56), z: g.s16(addr + 0x58),
       hidden: Boolean(flags & 0x10),
-      solarWeak: Boolean(g.u32(addr + 0x3ac) & 1) && g.u8(addr + 0x384) === 0,
+      solarReactive, solarGuard, solarWeak: solarReactive && solarGuard === 0,
     });
   }
   return out;

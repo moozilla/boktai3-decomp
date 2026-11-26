@@ -775,9 +775,11 @@ exports.fight = function* (opts = {}) {
     const tk = toward(target);
     const weapon = exports.weapon();
     const frame = exports.gunFrame();
-    if (target.solarWeak && S.solar > 64) {
+    // Once the last curtain starts breaking, the sensor can settle while
+    // the sprite's destruction timer still holds the Count's damage guard.
+    if (target.solarReactive && S.solar > 64) {
       S.setSolar(64);
-      if (opts.trace) opts.trace({ boss: target.boss, threshold: 64 });
+      if (opts.trace) opts.trace({ boss: target.boss, threshold: 64, guard: target.solarGuard });
     }
     const pr = progress.get(target.addr) || { hp: target.health, since: steps };
     if (target.health < pr.hp) { pr.hp = target.health; pr.since = steps; }
