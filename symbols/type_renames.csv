@@ -385,3 +385,5 @@ StackedActor,WarpCircle,identifier,,Reviewed in-game owner,include/objects/warp_
 StackedActorParticle,WarpCircleParticle,identifier,,Reviewed in-game owner,include/objects/warp_circle/warp_circle.h
 StackedActorPosition,WarpCirclePosition,identifier,,Reviewed in-game owner,include/objects/warp_circle/warp_circle.h
 StackedActorSprite,WarpCircleSprite,identifier,,Reviewed in-game owner,include/objects/warp_circle/warp_circle.h
+StackedActor,WarpCircle,identifier,,Reviewed in-game owner,symbols/ram.csv
+gStackedActor,gWarpCircle,identifier,,Reviewed in-game owner,all

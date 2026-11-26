@@ -45,7 +45,7 @@ struct WarpCircle {
     void (*update)(struct WarpCircle *);
 };
 /* 0x02000118 */
-extern struct WarpCircle *gStackedActor;
+extern struct WarpCircle *gWarpCircle;
 void WarpCircle_SetUpdate(struct WarpCircle *, void (*)(struct WarpCircle *));
 void WarpCircle_UpdateSegments(struct WarpCircle *);
 void WarpCircle_HoldLift(struct WarpCircle *);

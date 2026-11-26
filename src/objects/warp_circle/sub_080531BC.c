@@ -26,7 +26,7 @@ s32 WarpCircle_Destroy(struct WarpCircle *actor)
         i--;
     } while (i >= 0);
     SceneMessages_UnregisterReceiver(trigger);
-    if (gStackedActor)
-        gStackedActor = 0;
+    if (gWarpCircle)
+        gWarpCircle = 0;
     return 0;
 }

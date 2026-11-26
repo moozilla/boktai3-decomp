@@ -194,6 +194,6 @@ s32 WarpCircle_Initialize(struct WarpCircle *actor, s32 tag, s32 unused)
                 WarpCircle_SetUpdate(actor, WarpCircle_TickIdle);
         }
     }
-    gStackedActor = actor;
+    gWarpCircle = actor;
     return 0;
 }
