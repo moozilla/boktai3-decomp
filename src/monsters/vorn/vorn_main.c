@@ -1160,49 +1160,22 @@ void Vorn_TryUphillRoute(struct ChaseActor *actor)
 
 void SceneActorControl_OnIdle(u8 *);
 
-struct S {
-    u8 pad[0x9C];
-    s16 z;
-    u8 pad2[0xDC - 0x9E];
-    u8 extra[0x10];
-    u8 pad3[0x104 - 0xEC];
-    u32 at104;
-    u8 pad4[0x114 - 0x108];
-    u32 flags114;
-    u8 pad5[0x21C - 0x118];
-    void (*callback)(void);
-    u8 pad6[0x2A8 - 0x220];
-    u8 a, b, c, pad7;
-    u32 count;
-    u8 done, queued, taken;
-    u8 pad8[2];
-    u8 code;
-    u8 pad9[0x2C8 - 0x2B6];
-    u16 timer;
-    u8 pad10[0x2D0 - 0x2CA];
-    u32 flags;
-    u16 hflags;
-    u8 pad11[0x3D0 - 0x2D6];
-    struct S *other;
-    u32 at3D4;
-};
-
-void Vorn_BeginAction16(struct S *s)
+void Vorn_BeginAction16(struct ChaseActor *actor)
 {
-    struct ChaseActor *actor = (void *)s;
     Chase_SetCtl(actor, SceneActorControl_OnIdle, 0x10);
     Chase_SetState(actor, 0, 2, 0);
 }
 
-void Vorn_BeginAction16(struct S *s);
+void Vorn_BeginAction16(struct ChaseActor *actor);
 
 u8 Vorn_BeginPursuitRoute(struct Vorn *actor, u32 reset);
 
 void Vorn_SelectRecoveryAction(u8 *p, const u8 *unused, u32 unused2)
 {
-    if ((*(u8 **)(p + 0x3d0))[0x6c0]) {
+    struct Vorn *context = ((struct ChaseActor *)p)->base.context;
+    if (context->foreignPosition) {
         if (SceneActor_IsFacingNearbyTarget(p))
-            Vorn_BeginAction16(p);
+            Vorn_BeginAction16((struct ChaseActor *)p);
         else
             Vorn_SelectRetreatRoute(p, 1);
     } else
@@ -1488,52 +1461,38 @@ void Vorn_InitActorProfile(struct ChaseActor *p)
 
 extern const u16 gUnk_08606004[];
 
-u16 Vorn_GetAnimationEvent(u8 *p)
+u16 Vorn_GetAnimationEvent(void *object)
 {
-    u8 *anim = *(u8 **)(p + 4) + 0x20;
+    struct RoomActor *actor = object;
+    struct SceneActorAnimationTileDrawable *drawable = actor->drawable;
+    struct AnimSprite *anim = &drawable->tile;
     u16 r;
-    if (*(u16 *)(anim + 0xc)) {
+    if (anim->elapsed) {
         r = 0;
     } else {
         u32 m = 0x10000;
-        *(u32 *)(p + 0x2d0) |= m;
-        r = gUnk_08606004[*(u16 *)(anim + 0x14)];
+        actor->statusFlags |= m;
+        r = gUnk_08606004[anim->frameIndex];
     }
     return r;
 }
 
 /* Vorn_SelectRandomBehavior: Selects a different random eight-byte behavior entry and resets its cursor; behavior interpretation is tentative */
 
-struct S080B1F48 {
-    u8 pad0[2];
-    u8 index;
-    u8 unk3;
-    u8 *data;
-    u8 *entry;
-};
-
-void Vorn_SelectRandomBehavior(u8 *owner)
+void Vorn_SelectRandomBehavior(struct ChaseActor *actor)
 {
-    struct S080B1F48 *p = (struct S080B1F48 *)(owner + 0x448);
-    struct S080B1F48 *q = p;
+    struct SceneActorRouteCursor *p = (void *)&actor->group.homeRoute;
+    struct SceneActorRouteCursor *q = p;
     u8 n;
-    n = Mod(FallingObject_Random(), *p->data);
-    if (n == p->index)
-        n = Mod(n + 1, *p->data);
-    q->index = n;
-    q->unk3 = 0;
-    q->entry = Path_GetPointData(q->data) + q->index * 8;
+    n = Mod(FallingObject_Random(), p->definition->pointCount);
+    if (n == p->pointIndex)
+        n = Mod(n + 1, p->definition->pointCount);
+    q->pointIndex = n;
+    q->unknown3 = 0;
+    q->point = (struct SceneActorRoutePoint *)Path_GetPointData((void *)q->definition) + q->pointIndex;
 }
 
 s32 Math_Atan2(s32, s32);
-
-struct RouteCursor {
-    u8 pad0[2];
-    u8 index;
-    u8 unk3;
-    u8 *data;
-    u16 *entry;
-};
 
 static inline u32 Route_Random(void)
 {
@@ -1543,17 +1502,17 @@ static inline u32 Route_Random(void)
     return *(u16 *)(offset + (u32)RANDOM_TABLE_ADDR);
 }
 
-static inline void Route_SelectRandom(u8 *cursor)
+static inline void Route_SelectRandom(struct SceneActorRouteCursor *cursor)
 {
-    struct RouteCursor *p = (struct RouteCursor *)cursor;
-    struct RouteCursor *q = p;
+    struct SceneActorRouteCursor *p = cursor;
+    struct SceneActorRouteCursor *q = p;
     u8 n;
-    n = Mod(Route_Random(), *p->data);
-    if (n == p->index)
-        n = Mod(n + 1, *p->data);
-    q->index = n;
-    q->unk3 = 0;
-    q->entry = (u16 *)(Path_GetPointData(q->data) + q->index * 8);
+    n = Mod(Route_Random(), p->definition->pointCount);
+    if (n == p->pointIndex)
+        n = Mod(n + 1, p->definition->pointCount);
+    q->pointIndex = n;
+    q->unknown3 = 0;
+    q->point = (struct SceneActorRoutePoint *)Path_GetPointData((void *)q->definition) + q->pointIndex;
 }
 
 static inline s32 Dot(struct ContactPosition *a, struct ContactPosition *b)
@@ -1577,65 +1536,65 @@ static inline u32 Chase_Height_(struct ContactPosition *position)
     return Chase_HeightAt(Chase_CellAt_(position), position);
 }
 
-static inline void Chase_SnapToRoute_(struct ContactPosition *p, u8 *route)
+static inline void Chase_SnapToRoute_(struct ContactPosition *p, struct SceneActorRouteCursor *route)
 {
-    p->x = (*(u16 **)(route + 8))[0];
-    p->z = (*(u16 **)(route + 8))[1];
+    p->x = route->point->x;
+    p->z = route->point->z;
     p->y = Chase_Height_(p);
 }
 
 void Vorn_SelectRouteAwayFromTarget(struct ChaseActor *actor)
 {
-    u8 *group = (u8 *)(&actor->group.common);
-    struct RouteCursor *route = (struct RouteCursor *)(((u8 *)actor) + 0x448);
+    struct SceneActorChaseGroup *group = &actor->group;
+    struct SceneActorRouteCursor *route = (void *)&actor->group.homeRoute;
     u8 selected = 0;
-    struct ChaseTarget *t;
+    struct SceneActorChaseTarget *t;
     struct ContactPosition dir;
     struct ContactPosition delta;
     u8 angle;
-    u16 *entry;
+    struct SceneActorRoutePoint *entry;
     s32 i;
     u8 found;
-    u8 *cursor;
+    struct SceneActorRouteCursor *cursor;
     void *nav;
-    t = *((struct ChaseTarget **)(((u8 *)actor) + 0xDC));
+    t = actor->base.tracking.target;
     angle = Math_Atan2(t->position.x - actor->base.body.position.x,
                        t->position.z - actor->base.body.position.z);
     dir.x = (gUnk_086149C4[(angle + 64) & 255] * 10) >> 12;
     dir.z = (gUnk_086149C4[angle] * 10) >> 12;
-    entry = (u16 *)Path_GetPointData(route->data);
+    entry = (void *)Path_GetPointData((void *)route->definition);
     found = 0;
-    for (i = 0; i < (*route->data); i++) {
-        delta.x = entry[0] - actor->base.body.position.x;
-        delta.z = entry[1] - actor->base.body.position.z;
+    for (i = 0; i < route->definition->pointCount; i++) {
+        delta.x = entry->x - actor->base.body.position.x;
+        delta.z = entry->z - actor->base.body.position.z;
         if (Dot(&dir, &delta) < 0) {
             u32 w = *((u32 *)entry);
-            if (w == (*(*((u32 **)(group + 0x7C)))))
+            if (w == *(u32 *)group->homeRoute.point)
                 continue;
             selected = i;
             found = 1;
             break;
         }
-        entry += 4;
+        entry++;
     }
 
     if (!found) {
-        cursor = group + 0x74;
+        cursor = (void *)&group->homeRoute;
         Route_SelectRandom(cursor);
     } else {
-        route->index = selected;
-        route->unk3 = 0;
-        route->entry = entry;
-        cursor = group + 0x74;
+        route->pointIndex = selected;
+        route->unknown3 = 0;
+        route->point = entry;
+        cursor = (void *)&group->homeRoute;
     }
-    Chase_SnapToRoute_(*((struct ContactPosition **)(group + 0x200)), cursor);
-    nav = *((void **)(group + 0x1FC));
+    Chase_SnapToRoute_(group->destination, cursor);
+    nav = group->route;
     if (!Chase_TryRoute(actor, nav, &actor->base.body.position,
-                        *((struct ContactPosition **)(group + 0x200)))) {
+                        group->destination)) {
         Chase_SetCtl(actor, SceneActorControl_OnIdle, 0);
         Chase_SetState(actor, 3, 0, 0);
     } else {
-        (*((struct ContactPosition **)(group + 0x200)))->pad = 1;
+        (group->destination)->pad = 1;
     }
 }
 
@@ -3007,7 +2966,7 @@ void SceneActor_InitContextColliders(struct ChaseActor *p);
 
 s32 Vorn_OnUpdate(struct ChaseActor *s);
 
-u16 Vorn_GetAnimationEvent(u8 *p);
+u16 Vorn_GetAnimationEvent(void *object);
 
 void Vorn_UpdateIdleFacing(void *);
 
