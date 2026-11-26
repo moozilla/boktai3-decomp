@@ -5,7 +5,7 @@ struct Camera {
     s32 x;
 };
 /* Read the camera pointer separately for each projected position. */
-extern struct Camera *volatile gSceneCamera;
+extern struct Camera *gSceneCamera;
 void Vector3_CopyComponents(struct TrailVector *, struct TrailVector *);
 
 void SpriteTrail_UpdatePositions(struct SpriteTrail *p)
@@ -32,7 +32,8 @@ void SpriteTrail_UpdatePositions(struct SpriteTrail *p)
     index = p->historyIndex - 1;
     if (index < 0)
         index = 3;
-    next = head + 1;
+    next = head;
+    next++;
     savedFlags = flags;
     i = 2;
     {
