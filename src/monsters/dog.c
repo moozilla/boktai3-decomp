@@ -938,9 +938,8 @@ void Dog_SelectRetreatOrChase(struct ChaseActor *a)
 
 void Dog_TickCooldown(struct Dog *dog)
 {
-    u8 *p = &dog->turnDelay;
-    if (*p != 0)
-        *p = *p - 1;
+    if (dog->turnDelay)
+        dog->turnDelay--;
 }
 
 u8 InventorySlot_PickRandom(s16 *, s16 *, s16 *);
@@ -1336,13 +1335,11 @@ void Dog_UpdateArrivalAnimation(struct ChaseActor *a)
     u16 saved;
     u16 *flags;
     u16 *originalScale;
-    unsigned long long originalOffset;
     if (SceneActorReaction_TakePrepared(a)) {
         SceneActorAnimation_SelectDirectionalEntry(a, 11);
         a->base.restart = 0;
     }
-    originalOffset = 0x2C2;
-    originalScale = (u16 *)((u8 *)a + originalOffset);
+    originalScale = &a->base.field2C2;
     saved = *originalScale;
     {
         u32 mask = 0x80;
