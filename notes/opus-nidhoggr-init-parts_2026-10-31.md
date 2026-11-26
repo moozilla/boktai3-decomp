@@ -3,7 +3,7 @@
 Tags: #matching #nidhoggr #compiler #cse #combine #local-alloc #loop #scope-gap
 
 **Not matched; holdout.** `Nidhoggr_InitParts` is 904 bytes. The guarded draft
-in `src/large_scene_animation_controller.c` has been replaced. The new draft
+in `src/effects/large_scene_animation_controller/large_scene_animation_controller.c` has been replaced. The new draft
 differs from the ROM in 12 bytes (`tools/check.py --nonmatching`: fuzzy 99.9%,
 6 differing instructions after realignment). In scope that is 3 ROM / 3 draft
 instructions, one order difference. The previous draft differed in 54 bytes

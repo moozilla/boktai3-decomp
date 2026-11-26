@@ -34,7 +34,7 @@ file-local alias because the generated inventory has no function boundary there.
 
 ## Recovered layout and behavior
 
-`include/contact_sequence_actor.h` recovers the full 0x118 actor and 0x918
+`include/actors/sequence_contact_actor_pool/contact_sequence_actor.h` recovers the full 0x118 actor and 0x918
 list-8 task. Eight actors start at 0x34; owner fade controls are at 0x8F4/0x8F6
 and the 32-byte palette is at 0x8F8. The existing shared contact collider,
 graphics, sprite and packed-sequence layouts fit these consumers directly.

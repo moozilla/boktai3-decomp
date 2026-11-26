@@ -168,8 +168,8 @@ class Allow(unittest.TestCase):
         self.assertTrue(any("unknown" in p for p in c.lint("x; // concession-ok(hack): because it matched better\n")))
 
     def test_library_sources_are_exempt_from_judgment_calls(self):
-        self.assertEqual(kinds("void f(void) { volatile u8 chIdx; }", "src/lib/m4a.c"), [])
-        self.assertEqual(kinds('void f(void) { register int x asm("r4"); }', "src/lib/m4a.c"), ["pin"])
+        self.assertEqual(kinds("void f(void) { volatile u8 chIdx; }", "src/lib/m4a/m4a.c"), [])
+        self.assertEqual(kinds('void f(void) { register int x asm("r4"); }', "src/lib/m4a/m4a.c"), ["pin"])
 
 
 class Score(unittest.TestCase):
@@ -511,7 +511,7 @@ union Local {
     def test_warnings_do_not_score_and_library_is_exempt(self):
         text = "void f(void) {\n    int zero = 0;\n}\n"
         self.assertEqual(kinds(text), [])
-        self.assertEqual(warns(text, "src/lib/m4a.c"), [])
+        self.assertEqual(warns(text, "src/lib/m4a/m4a.c"), [])
 
     def test_a_justification_silences_and_an_admission_does_not(self):
         good = "void f(void) {\n    do {\n        a = 0;\n    } while (0);  // concession-ok(once-loop): expansion of the SDK's DmaClear macro\n}\n"

@@ -2,7 +2,7 @@
 
 A reader's guide for someone who knows C and wants to mod, port or re-implement
 the game. It describes the engine as the matching decompilation shows it. Names
-are provisional (see `include/engine.h`), and every claim that is not directly
+are provisional (see `include/engine/shared/engine.h`), and every claim that is not directly
 visible in code is marked *(guess)*, with the evidence pointed at.
 
 Companion documents:
@@ -51,9 +51,9 @@ Companion documents:
   a small state machine, and a destroy callback.
 * Managers are **singletons** or **fixed pools** owned by one task. A pool slot is
   a struct with an `active` byte, and the manager's update loops over the slots.
-* Coordinates are 16-bit integers (`struct SceneVec`, `include/scene_vec.h`). The
+* Coordinates are 16-bit integers (`struct SceneVec`, `include/engine/shared/scene_vec.h`). The
   units are not established in code *(guess: sub-tile fixed point)*; angles use
-  1/256 of a turn (`Math_Atan2`, `include/engine.h`).
+  1/256 of a turn (`Math_Atan2`, `include/engine/shared/engine.h`).
 
 The codebase follows the same shape: `src/*.c` units hold matched C for
 contiguous ROM ranges, `src/fn/sub_XXXXXXXX.c` hold one function each, and
@@ -64,9 +64,9 @@ the most readable summary of each subsystem.
 
 ## 2. Boot and the frame loop
 
-Entry point: `AgbMain` in [`src/fn/AgbMain.c`](../src/fn/AgbMain.c) (ROM
+Entry point: `AgbMain` in [`src/engine/game_entry_point/AgbMain.c`](../src/engine/game_entry_point/AgbMain.c) (ROM
 `0800145C`, [ENTRY_AND_MENUS.md](ENTRY_AND_MENUS.md)). The ARM crt0 at `080000C0`
-jumps to it; six ARM C functions (agbcc ARM mode, `src/iwram_code.c`) run from IWRAM
+jumps to it; six ARM C functions (agbcc ARM mode, `src/engine/iwram_arm_code/iwram_code.c`) run from IWRAM
 at `03000000` (ROM `08000350`).
 
 `AgbMain` in order:
@@ -103,13 +103,13 @@ Source: `TaskSystem_Initialize` ([`src/fn/sub_08219AAC.c`](../src/fn/sub_08219AA
 `TaskSystem_RunFrame` ([`sub_0821A054.c`](../src/fn/sub_0821A054.c)),
 and the list primitives [`sub_08219F74.c`](../src/fn/sub_08219F74.c) (insert at
 head) and [`sub_08219F94.c`](../src/fn/sub_08219F94.c) (unlink). Declared in
-[`include/engine.h`](../include/engine.h).
+[`include/engine/shared/engine.h`](../include/engine/shared/engine.h).
 
 ### The 0x18-byte task header
 
 Every object struct begins with this header (C declarations in
-`include/engine.h` as `struct Task`; object headers embed it as `u8 task[0x18]`,
-see `include/background_controller.h`, `include/palette_controller.h`):
+`include/engine/shared/engine.h` as `struct Task`; object headers embed it as `u8 task[0x18]`,
+see `include/effects/background_controllers/background_controller.h`, `include/effects/palette_controllers/palette_controller.h`):
 
 | Offset | Size | Field | Meaning |
 |---|---|---|---|
@@ -181,14 +181,14 @@ constructor's `size` argument:
 
 | Object | Header | Size | Embeds | Source |
 |---|---|---|---|---|
-| Scene object (block) | `struct SceneObject`, `SceneObjectManager` pool | `0x74` manager, `0x1A8` per object | `SceneBody` (position, velocity), `SceneAnimation`, `SceneDraw`, two `SceneCollider`s, `SceneCellRef` | [`include/scene_object.h`](../include/scene_object.h), [`src/scene_object.c`](../src/scene_object.c) |
-| Pooled interactable | `PooledInteractableManager` | `0x80` manager, `0xEC` per slot | `PooledRoute`, `PooledDrawable`, collider | [`include/pooled_interactable.h`](../include/pooled_interactable.h) |
-| Collision prop | `CollisionManager` (`Task_Create(10, 0xA2C)`) | 16 slots | `CollisionSprite`, `CollisionAnim`, `SceneCollider` | [`src/collision_controller.c`](../src/collision_controller.c) |
-| Homing or orbiting effect | `EffectManager` | six particle effects of four sprites | `EffectSprite`, packed vectors | [`src/homing_effect.c`](../src/homing_effect.c) |
-| Trigger (drop or container) | `TriggerManager` (`Task_Create(9, 0x5C)`) | linked list of `0xBC`-byte records | `TriggerAnim`, `TriggerGraphics`, shadow | [`include/item_container.h`](../include/item_container.h) |
-| Background / scrolling background | `BackgroundController` (`Task_Create(9, 0x140)`, scrolling `0xF8`) | command queue of 8 entries | `BackgroundCommandQueue` | [`include/background_controller.h`](../include/background_controller.h) |
-| Palette controller | `PaletteController` | `PaletteWave`, `PaletteSlide`, `PaletteTransition` (256-colour output) | | [`include/palette_controller.h`](../include/palette_controller.h) |
-| Color fade | `ColorFadeController` | two `ColorFadeChannel`s, 8-entry command queue | | [`include/color_fade_controller.h`](../include/color_fade_controller.h) |
+| Scene object (block) | `struct SceneObject`, `SceneObjectManager` pool | `0x74` manager, `0x1A8` per object | `SceneBody` (position, velocity), `SceneAnimation`, `SceneDraw`, two `SceneCollider`s, `SceneCellRef` | [`include/field/scene_objects/scene_object.h`](../include/field/scene_objects/scene_object.h), [`src/field/scene_objects/scene_object.c`](../src/field/scene_objects/scene_object.c) |
+| Pooled interactable | `PooledInteractableManager` | `0x80` manager, `0xEC` per slot | `PooledRoute`, `PooledDrawable`, collider | [`include/field/pooled_interactables/pooled_interactable.h`](../include/field/pooled_interactables/pooled_interactable.h) |
+| Collision prop | `CollisionManager` (`Task_Create(10, 0xA2C)`) | 16 slots | `CollisionSprite`, `CollisionAnim`, `SceneCollider` | [`src/field/collision_controllers/collision_controller.c`](../src/field/collision_controllers/collision_controller.c) |
+| Homing or orbiting effect | `EffectManager` | six particle effects of four sprites | `EffectSprite`, packed vectors | [`src/effects/homing_and_orbiting_effects/homing_effect.c`](../src/effects/homing_and_orbiting_effects/homing_effect.c) |
+| Trigger (drop or container) | `TriggerManager` (`Task_Create(9, 0x5C)`) | linked list of `0xBC`-byte records | `TriggerAnim`, `TriggerGraphics`, shadow | [`include/field/items_and_containers/item_container.h`](../include/field/items_and_containers/item_container.h) |
+| Background / scrolling background | `BackgroundController` (`Task_Create(9, 0x140)`, scrolling `0xF8`) | command queue of 8 entries | `BackgroundCommandQueue` | [`include/effects/background_controllers/background_controller.h`](../include/effects/background_controllers/background_controller.h) |
+| Palette controller | `PaletteController` | `PaletteWave`, `PaletteSlide`, `PaletteTransition` (256-colour output) | | [`include/effects/palette_controllers/palette_controller.h`](../include/effects/palette_controllers/palette_controller.h) |
+| Color fade | `ColorFadeController` | two `ColorFadeChannel`s, 8-entry command queue | | [`include/effects/color_and_fade_controller/color_fade_controller.h`](../include/effects/color_and_fade_controller/color_fade_controller.h) |
 
 Each object is a single allocation, so destroying the task frees everything it
 owns, but only if the destroy callback frees or kills its children.
@@ -215,7 +215,7 @@ An **intrusive list** links objects by pointer. The pooled actor manager
 Taking the trigger manager and scene objects as examples:
 
 1. **Script creates it.** The event bytecode calls a native command, for example
-   `SceneObjects_CreateFromScript` ([`src/scene_object.c`](../src/scene_object.c),
+   `SceneObjects_CreateFromScript` ([`src/field/scene_objects/scene_object.c`](../src/field/scene_objects/scene_object.c),
    around line 1536). It reads its parameters with keyword lookups:
 
    ```c
@@ -247,8 +247,8 @@ Taking the trigger manager and scene objects as examples:
 State machines are a `state` (or `kind`) field plus a `counter` or `timer`, and
 an `entered` flag. The first frame of a new state sets `entered`, and the state
 handler clears it on its first run. Examples: `sub_08008A98` and `sub_08008AA4`
-in [`src/pooled_interactable.c`](../src/pooled_interactable.c), and the
-comment on `struct SceneObject.entered` in `include/scene_object.h`.
+in [`src/field/pooled_interactables/pooled_interactable.c`](../src/field/pooled_interactables/pooled_interactable.c), and the
+comment on `struct SceneObject.entered` in `include/field/scene_objects/scene_object.h`.
 
 ---
 
@@ -429,7 +429,7 @@ practical way to find out what a given script command does at runtime.
 
 Source: `sub_08219C20` (init), `sub_08219C40` (`Heap_Alloc`),
 `sub_08219CB4` (second allocator), `sub_08219D38` (`Heap_Free`), in
-[`src/fn/`](../src/fn/). Declared in `include/engine.h`.
+[`src/fn/`](../src/fn/). Declared in `include/engine/shared/engine.h`.
 
 * The heap is the region from `gUnk_02000714` to `0x0201F400`, about 123 KiB of
   EWRAM. Init makes one free block covering it.
@@ -490,7 +490,7 @@ must be read from the globals below. The derived regions are:
 
 ### `struct GameState`
 
-[`include/game_state.h`](../include/game_state.h). Pointer `gUnk_02000710`.
+[`include/system/game_state/game_state.h`](../include/system/game_state/game_state.h). Pointer `gUnk_02000710`.
 The header is built from offsets seen across `src/` and marks each
 field with a confidence. Confirmed or strongly suggested areas:
 
@@ -517,7 +517,7 @@ known offset and not proven. Use the header as the authoritative list.
 
 ### `struct Player`
 
-[`include/player.h`](../include/player.h). `gUnk_02000580[4]` holds four
+[`include/engine/shared/player.h`](../include/engine/shared/player.h). `gUnk_02000580[4]` holds four
 pointers to player-like objects. Slot 0 is the local player. The other slots
 are used by the multiplayer code *(guess)*. Known fields: `statusFlags`
 (`+0x20`, bit `0x100000` = cannot interact, *guess*), `position` (`+0x30`,
@@ -537,9 +537,9 @@ way is the main remaining risk for the matched C (section 17).
 
 `sub_08219B24` polls the buttons each frame from the root task. The results
 are in `gUnk_03005260`, a `u16` array (`[1]` = newly pressed keys, per the
-comments in `include/result_prompt.h` and `include/status_screen.h`). Menus and
+comments in `include/menus/result_prompt/result_prompt.h` and `include/menus/status_screen/status_screen.h`). Menus and
 dialogue read it through their own `*_HandleInput` functions. The
-`ChoiceKeys` struct in `include/choice_menu.h` is another view of it.
+`ChoiceKeys` struct in `include/menus/choice_menu/choice_menu.h` is another view of it.
 
 ### Random numbers
 
@@ -555,7 +555,7 @@ Two sources:
 ### Sine and angle tables
 
 * `gUnk_086149C4`: a sine table in ROM (`s16`), used by the scrolling background's orbit mode
-  (`include/background_controller.h`) *(guess: full cycle indexed by an angle)*.
+  (`include/effects/background_controllers/background_controller.h`) *(guess: full cycle indexed by an angle)*.
 * `Math_Atan2(x, y)` returns an angle in 1/256 of a turn from a table
   (0 = +x, 0x40 = +y; `(0,0)` returns 0).
 
@@ -569,20 +569,20 @@ The current map's collision grid is `gUnk_030052F4` (an `EngineMap`, with
 `gUnk_030052F8`/`gUnk_030052FC` as width and height in cells). Each cell in
 `struct SceneCell` is four bytes: `height` (low nibble = level 0–15; high nibble =
 kind, 0 = solid floor), `tile`, and `flags` (bit 0 = occupied by an object,
-bit 3 = blocks entry; `include/scene_object.h`).
+bit 3 = blocks entry; `include/field/scene_objects/scene_object.h`).
 
 Scene objects move one cell at a time. `Scene_CanEnterNeighborCell` and
-`Scene_CheckNeighborHeight` in `src/scene_object.c` test the neighbour;
+`Scene_CheckNeighborHeight` in `src/field/scene_objects/scene_object.c` test the neighbour;
 `Scene_TryStepDown` and `Scene_DropObjectsAbove` handle falls; terrain
-modifiers (`TerrainModifiers_Change`, `src/terrain_modifier.c`) rewrite cells at
-runtime. The overlays (`src/terrain_overlay.c`) draw terrain-edge sprites for
+modifiers (`TerrainModifiers_Change`, `src/field/terrain_modifiers/terrain_modifier.c`) rewrite cells at
+runtime. The overlays (`src/field/terrain_overlays/terrain_overlay.c`) draw terrain-edge sprites for
 tracked actors.
 
 ### Colliders
 
-A `SceneCollider` (in `include/scene_object.h`) carries a state word (bit 2 =
+A `SceneCollider` (in `include/field/scene_objects/scene_object.h`) carries a state word (bit 2 =
 collision disabled) and contact flags describing the colliding thing, such as
-the attack kind. The engine-wide API is in `include/engine.h`:
+the attack kind. The engine-wide API is in `include/engine/shared/engine.h`:
 
 * `Collider_Init(collider, id, flags, ...)`, `Collider_SetPosition`,
   `Collider_SetCallback(collider, callback, owner)`, `Collider_Refresh`,
@@ -597,7 +597,7 @@ attack kind.
 Actors are the characters and enemies. Their shared code is in the actor
 families listed in [GAME_LAYOUT.md](GAME_LAYOUT.md) (`0802C678` to `0802D9F8`,
 `080213EC` to `08024F2C`, `081E34D0`). Actors use `Actor_PlayAnimationEntry`
-(`include/engine.h`) to start an animation entry by kind, and
+(`include/engine/shared/engine.h`) to start an animation entry by kind, and
 `ActorShadow_Enable`/`ActorShadow_Disable` (`08013424`, `08013440`) to add or
 remove a shadow that follows the terrain (the shadow's update is installed at
 `+0x34`). `Actor_CanInteractWithController` (`080096A0`) and
@@ -616,10 +616,10 @@ Most logic is in the controllers listed in section 4.
   `BgGfx_LoadTilemap` (`08216584`) and `BgGfx_LoadTilemapSimple` load tilemaps.
   Background controllers (section 4) load maps by id (`Background_FindMapId`,
   `08001EB4`), set layer modes, scroll with the camera and blend layers
-  (`include/background_controller.h`; [BACKGROUND_CONTROLLERS.md](BACKGROUND_CONTROLLERS.md)).
+  (`include/effects/background_controllers/background_controller.h`; [BACKGROUND_CONTROLLERS.md](BACKGROUND_CONTROLLERS.md)).
 * **Palettes.** `Palette_*` (`08002AA8`–`080036F8`) blend colour ranges, scale
   brightness, oscillate, run transitions, replace resources and upload to
-  palette RAM (`include/palette_controller.h`). `PaletteSet_*` (`0800E0CC`)
+  palette RAM (`include/effects/palette_controllers/palette_controller.h`). `PaletteSet_*` (`0800E0CC`)
   allocate and blend palette sets. The fade work buffer is at `02036FDC` (ROM_MAP).
   `ColorFade_*` (`080038B4`, `08003960`) run two colour-blend channels that
   interpolate to a target over `1 << shift` frames.
@@ -631,7 +631,7 @@ Most logic is in the controllers listed in section 4.
   `ObjGfx_LoadTiles` (`08215400`) loads OBJ tiles.
 * **Animation.** `Anim_SetSequence`, `Anim_SetKeyframes`, `Anim_Step` (advance
   one tick, nonzero when finished) and `Anim_LoadKeyframe` play frames from an
-  animation resource (`include/engine.h`). Animation resources live in the
+  animation resource (`include/engine/shared/engine.h`). Animation resources live in the
   registry-like header at `gUnk_03004300`, with sub-table bases at
   `gUnk_030042F8`/`gUnk_030042FC` (`sub_082151C0`). `AnimData_FindEntry(id)` and
   `AnimData_Load(anim, id)` find an entry by id. `AnimData_SelectPaletteBank(anim, index)`
@@ -678,16 +678,16 @@ Most logic is in the controllers listed in section 4.
   (`08033C58`). Message boxes are `MessageMenu_*` (`080111EC`).
 * **Choices.** `ChoiceMenu_*` (`08006374`–`08006F00`) handles input, markup
   layout and dispatch of the selected choice into a script
-  (`Script_Call(script, &args)`, `src/choice_menu.c`).
+  (`Script_Call(script, &args)`, `src/menus/choice_menu/choice_menu.c`).
 * **Password.** Text filtering and decoding for the password screen is in
-  `src/password.c` (`include/password.h`).
+  `src/menus/password_decoding/password.c` (`include/menus/password_decoding/password.h`).
 
 ---
 
 ## 12. Sound
 
 The sound driver is **MP2K** (Sappy), matched against pret's `m4a`:
-`src/lib/m4a.c` has 57 of 58 functions in C ([../src/lib/m4a.c](../src/lib/m4a.c);
+`src/lib/m4a/m4a.c` has 57 of 58 functions in C ([../src/lib/m4a/m4a.c](../src/lib/m4a/m4a.c);
 [THIRD_PARTY.md](../THIRD_PARTY.md)). Its mixer `SoundMainRAM` is copied to IWRAM
 at `030035F0`. The data:
 
@@ -706,7 +706,7 @@ The game's wrappers:
 * `Sound_StopSong` (`0822B358`).
 
 Scripts play sounds with song numbers, for example `Sound_PlaySong(402)` on an
-item pickup (`src/item_container.c`). The sound test (`SoundTest_*`,
+item pickup (`src/field/items_and_containers/item_container.c`). The sound test (`SoundTest_*`,
 `081E1AF4`–`081E270C`) browses the table by category.
 
 ---
@@ -745,7 +745,7 @@ The SDK routines `EEPROMRead` (`082486B4`), `EEPROMWrite` (`08248778`),
 (`08248634`) are matched EEPROM_V124 code.
 
 The game's save writer is `sub_0822EE68` (a non-matching draft, in
-`src/fn/sub_0822EE68.c` under `#ifdef NONMATCHING`). Its layout, from the code:
+`src/system/save/sub_0822EE68.c` under `#ifdef NONMATCHING`). Its layout, from the code:
 
 * The data is split into **8-byte blocks**, starting at a block index. All blocks are
   written with `sub_08248764`, then all are compared with `sub_082488D8`. A
@@ -828,9 +828,9 @@ These show up across units. Learn them once and the code reads quickly.
 ### Reading order for a mod
 
 1. [GAME_LAYOUT.md](GAME_LAYOUT.md) for the map of subsystems.
-2. `include/engine.h` for the shared API, then `include/game_state.h` and `include/player.h`.
-3. One example object end to end: `src/item_container.c` (triggers) or
-   `src/scene_object.c` (blocks). Start at its `*_CreateFromScript`.
+2. `include/engine/shared/engine.h` for the shared API, then `include/system/game_state/game_state.h` and `include/engine/shared/player.h`.
+3. One example object end to end: `src/field/items_and_containers/item_container.c` (triggers) or
+   `src/field/scene_objects/scene_object.c` (blocks). Start at its `*_CreateFromScript`.
 4. [SCRIPT_TRACING.md](SCRIPT_TRACING.md) to see what a script command does at runtime.
 
 ### Open questions in the engine
@@ -860,7 +860,7 @@ These show up across units. Learn them once and the code reads quickly.
 
 * The units of positions and the coordinate frame of the terrain map.
 * Which pool each `Sprite_*`, `Anim_*` and `Effect_*` helper uses at runtime
-  (`gUnk_030042C0`, `gUnk_030042C8`, `gUnk_030042D0` are guesses in `include/engine.h`).
+  (`gUnk_030042C0`, `gUnk_030042C8`, `gUnk_030042D0` are guesses in `include/engine/shared/engine.h`).
 * The meaning of `gUnk_03005470` and the song-resume behaviour across scenes.
 * The calibration of the solar reading.
 * Which network packets carry which game state.

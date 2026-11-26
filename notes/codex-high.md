@@ -72,7 +72,7 @@ or direct Git mutations. Commits were queued through `build/commit.sh`.
   Read with `asmat.py`, `condense.py`, and `relatives.py`; the Ghidra export is
   absent in this checkout. Three repeated chase/arrival expansions dominate
   the body, interleaved with sound, reaction flags and Ghoul-specific paths.
-  `include/scene_actor_chase.h` supplies useful `Chase_Arrive`, terrain height,
+  `include/engine/shared/scene_actor_chase.h` supplies useful `Chase_Arrive`, terrain height,
   route and state/control templates; 080E4468 explains 38% of the target's
   instruction runs, with further matches in 080CEDF0 and 080C4A9C. The repeated
   expansions start around the terrain snap sequences at 0808B4B0, 0808BD54
@@ -667,7 +667,7 @@ remain tentative where the precise gameplay role is uncertain.
   improve the score. Needs the original spilled motion pointer, transient r3
   destination and flags2CC lifetime around the terrain call.
 - **080AEE08 drafted 83.4%**, `Vorn_UpdateDefeat`, in
-  `src/fn/sub_080AEE08.c`. Reused Bat_UpdateDefeat's verified spark/script/event
+  `src/monsters/vorn/sub_080AEE08.c`. Reused Bat_UpdateDefeat's verified spark/script/event
   pattern; Vorn adds Vorn_SendMessage, calls 080B0D28 before the burst, and
   always transitions to idle control/state 1/behavior 2 after its completion
   latch. Entry releases attachments, advances effects, clears route counters,
@@ -2642,7 +2642,7 @@ NONMATCHING drafts earn no exact coverage. No network operations or full builds.
 All six functions have descriptive file-local address aliases.
 
 - **08119B80 — matched, Glove_DispatchCommands.** Reviewed extent 880 bytes;
-  `tools/check.py src/fn/sub_08119B80.c --target-size 880` reports zero differing
+  `tools/check.py src/monsters/glove/sub_08119B80.c --target-size 880` reports zero differing
   bytes. Glove command queue +870, recoil-motion parameters +8C8, attachment
   descriptor +91C, screen position +928 and attachment handle +964. Queue kinds
   2/6 populate recoil parameters and select 08119378/08119638; kinds 5/0/1 select

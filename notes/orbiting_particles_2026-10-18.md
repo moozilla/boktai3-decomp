@@ -3,8 +3,8 @@
 Tags: #particles #types #matching
 
 Range: 080187BC–08018D94 (end exclusive). All nine functions were already
-matched; consolidated them into `src/orbiting_particles.c` in ROM order with
-`include/orbiting_particles.h`. No newly matched functions, drafts or gaps.
+matched; consolidated them into `src/effects/orbiting_particles/orbiting_particles.c` in ROM order with
+`include/effects/orbiting_particles/orbiting_particles.h`. No newly matched functions, drafts or gaps.
 Subsystem coverage remains 100% (+0 percentage points), 1496 exact bytes.
 
 Shared layout: `OrbitingParticles` is the 0x1B4-byte task, with time/duration

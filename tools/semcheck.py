@@ -48,6 +48,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import build  # noqa: E402
 import check  # noqa: E402
 from romlib import ROOT, load_rom, rom_data_ranges  # noqa: E402
+from source_layout import resolve
 
 try:
     import unicorn
@@ -577,9 +578,10 @@ def main():
         return
     if not a.src:
         ap.error("give SRC or --all")
-    src = a.src
-    if not src.endswith(".c"):
-        src = os.path.join("src", "fn", src + ".c")
+    try:
+        src = resolve(a.src)
+    except ValueError as error:
+        sys.exit(str(error))
     src = os.path.relpath(os.path.join(ROOT, src), ROOT)
     res = semcheck(src, a.funcs, a.nonmatching, a.trials, a.verbose)
     sys.exit(1 if any(v[0] == "DIFFERENT" for v in res.values()) else 0)

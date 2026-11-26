@@ -38,7 +38,7 @@ tool itself changed. Output goes to `build/layouts/` (ROM-derived, never committ
 
 ## What it collects
 
-For every `src/**/*.c` file and every `include/*.h` (each through a stub that
+For every `src/**/*.c` file and every project header under `include/` (each through a stub that
 includes `global.h` and the header), preprocessed with `-DNONMATCHING` so drafts count:
 
 * **Declarations** of RAM globals (any symbol in `build/boktai3.elf` in EWRAM or

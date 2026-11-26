@@ -10,7 +10,7 @@ import tempfile
 import unittest
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-UNIT = "src/sun_clock.c"
+UNIT = "src/system/clock_and_sun_schedule/sun_clock.c"
 
 
 def runs():

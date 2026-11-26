@@ -1,6 +1,6 @@
 # CgbSound (0x08230AC8)
 
-The stock compiler matches the ROM implementation in `src/lib/m4a.c`. The channel loop keeps its index in a volatile byte and tests the corresponding NR52 bit before choosing the echo or oscillator-off path. The decay and pitch stages share a signed integer. It holds the sustain comparison value during decay, then receives a single-byte read of SOUNDBIAS_H during pitch adjustment. That lifetime reproduces the ROM register copy with ordinary C. The same source pattern appears in the Chain of Memories sound driver (khcom revision `5dc49b75068bfe24e07bdaf365570d64682680c3`, `src/lib/m4a2.c`).
+The stock compiler matches the ROM implementation in `src/lib/m4a/m4a.c`. The channel loop keeps its index in a volatile byte and tests the corresponding NR52 bit before choosing the echo or oscillator-off path. The decay and pitch stages share a signed integer. It holds the sustain comparison value during decay, then receives a single-byte read of SOUNDBIAS_H during pitch adjustment. That lifetime reproduces the ROM register copy with ordinary C. The same source pattern appears in the Chain of Memories sound driver (khcom revision `5dc49b75068bfe24e07bdaf365570d64682680c3`, `src/lib/m4a2.c`).
 
 ## Earlier attempts
 

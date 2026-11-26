@@ -1,0 +1,34 @@
+#include "engine/shared/global.h"
+/* AnimatedParticles_EmitAngledBurst: Builds a particle Config and emits a single burst with vertical/horizontal/pitch angle ranges (matches existing src alias) */
+#define AnimatedParticles_EmitAngledBurst sub_08015C90
+struct Config {
+    u16 v[20];
+};
+void AnimatedParticles_Create(int, void *, struct Config *);
+#define AnimatedParticles_EmitAngledBurst sub_08015C90
+void AnimatedParticles_EmitAngledBurst(void *pos, int type, int flags, int speed, int vertical,
+                                       int verticalRange, int horizontal, int horizontalRange,
+                                       int pitch, int pitchRange)
+{
+    struct Config s;
+    s.v[0] = type;
+    s.v[1] = flags;
+    s.v[3] = speed;
+    s.v[4] = vertical;
+    s.v[5] = verticalRange;
+    s.v[6] = horizontal;
+    s.v[7] = horizontalRange;
+    s.v[8] = pitch;
+    s.v[9] = pitchRange;
+    s.v[10] = 0;
+    s.v[11] = 255;
+    s.v[12] = 255;
+    s.v[13] = 0;
+    s.v[14] = 255;
+    s.v[15] = 0;
+    s.v[16] = 255;
+    s.v[17] = 0;
+    s.v[18] = 255;
+    s.v[19] = 0;
+    AnimatedParticles_Create(1, pos, &s);
+}

@@ -14,7 +14,7 @@ the full ROM build. That result is unchanged.
 
 At the owner's request, this follow-up selected the largest unmatched function
 in the supplied snapshot: `sub_080C9C04`, an 8,764-byte golem reaction dispatcher
-in `src/golem_2.c`. The checked-in progress inventory contained 359 unmatched
+in `src/monsters/golem/golem_2.c`. The checked-in progress inventory contained 359 unmatched
 functions; the next largest was the 6,372-byte `Golem_ReactToContact`
 (`080C12FC`). Size is an objective stress case, not a proof that this function
 is the hardest compiler problem in the project.

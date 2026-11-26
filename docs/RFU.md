@@ -42,7 +42,7 @@ Existing globals are declared, not allocated again. Literal relocations identify
 pointers at `03006A70`, link status at `03006A80`, static state at `03006A84`,
 fixed state at `03006A88`, and serial-ID state at `03006A90`. SDK struct layouts,
 volatile qualifiers, version branches and protocol constants are preserved in
-`include/rfu_compat.h`. Static out-of-line helpers are externally visible to
+`include/lib/rfu/rfu_compat.h`. Static out-of-line helpers are externally visible to
 retain their individual ROM boundaries. No machine instructions or register
 bindings are used to force a match.
 

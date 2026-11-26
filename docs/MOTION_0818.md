@@ -55,7 +55,7 @@ family relationship; it does not establish an exclusive owner or actor name.
 
 ## Shared layout and phase-dependent fields
 
-`include/motion_0818.h` is shared by D754, D8E0 and D960, with unchanged exact
+`include/monsters/armor/motion_0818.h` is shared by D754, D8E0 and D960, with unchanged exact
 objects (396, 128 and 432 bytes). Offsets refer to the 32-bit GBA ABI.
 
 | Offset | Evidence-backed interpretation |

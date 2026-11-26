@@ -8,13 +8,15 @@ from pathlib import Path
 import re
 import subprocess
 
+from source_layout import report_path
+
 ROOT = Path(__file__).resolve().parents[3]
 AGBCC = ROOT / "build/tools/agbcc/agbcc"
 TOKEN = re.compile(r"([A-Za-z_]\w*)((?:\[[0-9]{1,4}\]){0,3})", re.ASCII)
 OPERATOR = re.compile(r"->|\.")
 # The symbol is declared as a byte pointer because different game routines
 # overlay it. Observe named members through its existing persistent-header type.
-TYPED_VIEWS = {"gSessionState": ("session_save.h", "struct SessionSave *")}
+TYPED_VIEWS = {"gSessionState": ("engine/shared/session_save.h", "struct SessionSave *")}
 WORD = re.compile(r"^\s*\.word\s+(-?(?:0x[\da-fA-F]+|\d+))\s*$", re.M)
 
 
@@ -90,7 +92,7 @@ def layout_request(parts, header, typed_view=None):
     guard = f"(((typeof({actual}))0) | 0)"
     signed = f"((typeof({actual}))-1) < ((typeof({actual}))0)"
     exprs = offsets + [width, guard, signed] + [bound for _, bound in indices]
-    source = f'#include "global.h"\n#include "{header}"\n'
+    source = f'#include "engine/shared/global.h"\n#include "{header}"\n'
     if typed_view:
         source += f"extern {typed_view}experiment_typed_root;\n"
     source += "const unsigned experiment_layout[] = {\n"
@@ -159,8 +161,7 @@ class FunctionIndex:
                     start = int(address, 16)
                     if extent <= 0:
                         continue
-                    source = (report["files"][file] if file >= 0
-                              else f"src/fn/sub_{address}.c" if file == -1 else None)
+                    source = report_path(report, address, file, ROOT)
                     self.addresses[start] = {
                         "address": address, "extent": extent, "name": names.get(start, name),
                         "source": source, "defined": aliases[0] if aliases else name, "url": f"/code#{address}",

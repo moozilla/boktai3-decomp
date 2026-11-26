@@ -4,14 +4,13 @@ urvey which translation units change when agbcc gets extra flags.
 
   flagsurvey.py FORK_AGBCC OUT.json
 
-Compiles every src/*.c and src/fn/*.c (and the NONMATCHING branch where present) with the
+Compiles every game C file under src/ (and the NONMATCHING branch where present) with the
 pinned agbcc and with FORK_AGBCC under each flag set, and records whether the assembly
 is identical to the pinned compiler's. A matched unit that changes would stop matching;
 a NONMATCHING one that changes is a candidate to re-check with tools/check.py. Built for
 akatsuki105/agbcc's -fsigned-narrow-modes and -ffix-shift-compare (the official 2003 AGB
 "thumb patch"); edit CONFIGS for other flags. Result for Boktai 3: docs/BOKTAI12_COMPARISON.md.
 """
-import glob
 import json
 import os
 import re
@@ -21,6 +20,7 @@ import tempfile
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import build  # noqa: E402
+from source_layout import is_upstream, source_paths
 from multiprocessing import Pool
 FORK=sys.argv[1]; OUT=sys.argv[2]
 STOCK=build.AGBCC
@@ -51,7 +51,7 @@ def work(src):
     return src,res
 if __name__=="__main__":
     os.chdir(build.ROOT)
-    files=sorted(glob.glob("src/*.c")+glob.glob("src/fn/*.c"))
+    files = [os.path.relpath(p, build.ROOT) for p in source_paths() if not is_upstream(p)]
     out={}
     with Pool(8) as p:
         for i,(s,r) in enumerate(p.imap_unordered(work,files,chunksize=8)):

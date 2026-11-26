@@ -58,7 +58,7 @@ RecordMenu's supposed pulse byte buffer is its existing palette[12], at +0x40C
 inside the palette at +0x3F4. `87ee4edcb` uses that owner directly and removes the
 misleading private byte-array member; all 508 bytes still match. The native
 `Palette_UpdateHighlightPulse(u16 *, u8 *)` declaration now lives in
-`include/palette_pulse.h`, shared by its defining unit and callers. All 303 header
+`include/engine/shared/palette_pulse.h`, shared by its defining unit and callers. All 303 header
 dependents match, and no new compiler diagnostics are introduced.
 
 The Axe follow-up `5cccc3e03` centralizes the auxiliary sprite, 28-byte graphics and

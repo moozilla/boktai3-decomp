@@ -28,11 +28,11 @@ place, emit the quotient as a tile, subtract `digit * divisor`, then divide the
 place by ten. The two panel routines select glyph bases `0x11` or `0x21`; HUD
 selects `0x21` or `0x31` and sets palette bits `0xF000`.
 
-The clean `DrawDecimalDigits` inline helper in `src/hud_tilemaps.c`, used by
+The clean `DrawDecimalDigits` inline helper in `src/menus/hud_tilemaps_and_clock_digits/hud_tilemaps.c`, used by
 `SceneHud_DrawDecimal`, performs the same quotient/store/remainder recurrence
-without a once-loop. `MenuDisplay_LoadDecimalDigits` in `src/menu_display.c`
+without a once-loop. `MenuDisplay_LoadDecimalDigits` in `src/menus/menu_display/menu_display.c`
 uses the recurrence with indexed widget output, and `Hud_DrawStatRatio` in
-`src/hud_stat_display.c` first collects the digits into arrays. Those siblings
+`src/menus/hud/hud_stat_display.c` first collects the digits into arrays. Those siblings
 motivated the structural candidates below.
 
 The `Div` call targets the BIOS wrapper, distinct from the compiler's signed

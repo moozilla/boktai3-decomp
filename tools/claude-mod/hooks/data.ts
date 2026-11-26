@@ -161,7 +161,7 @@ export function treeLevel(tree: DecompTree, path: string[]): DecompNode[] {
         address,
         pct,
         pinned: pinned === 1,
-        file: file === -2 ? null : file === -1 ? `src/fn/sub_${address}.c` : (tree.files[file] ?? null),
+        file: file < 0 ? null : (tree.files[file] ?? null),
         ...(cName ? { cName } : {}),
       },
     }

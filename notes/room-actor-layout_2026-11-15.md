@@ -132,7 +132,7 @@ All three describe the same pointer: it names whatever the actor tracks.
 
 ## Design
 
-* `struct RoomActor` (include/room_actor.h) is ResetView's 0..0x3D4. It keeps ResetView's
+* `struct RoomActor` (include/link/registry_1745/room_actor.h) is ResetView's 0..0x3D4. It keeps ResetView's
   names where the narrower views say nothing better, and takes the narrower names where
   their readers make the meaning clear (the rename map in the migration tool).
 * agbcc accepts no anonymous struct members, so a class written as

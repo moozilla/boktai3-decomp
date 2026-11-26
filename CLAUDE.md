@@ -21,7 +21,7 @@ write `~`). The hooks in `.githooks` run `tools/pii_check.py`.
   hand-written instructions inside `asm()` and no compiler overrides, ever. Register
   pins (`register T x asm("rN")`) and empty `asm("")` barriers (and an empty
   `do { } while (0);` or an `if` with an empty body, which act as one; an `if` whose body
-  the original compiled out holds `DEBUG_PRINT();` from `include/debug.h`) are heavily discouraged: phase 3 is removing them. Land one only for the hardest functions,
+  the original compiled out holds `DEBUG_PRINT();` from `include/engine/shared/debug.h`) are heavily discouraged: phase 3 is removing them. Land one only for the hardest functions,
   after trying without (`land --allow-pins`; see `docs/WORKER.md`).
   The one exception is source the original authors wrote as inline assembly: the SDK's `SystemCall(n)` (`include/gba/syscall.h`, an
   in-place `swi n`, as in Power_EnterSleep and m4a). It counts as a normal match;
@@ -38,8 +38,9 @@ write `~`). The hooks in `.githooks` run `tools/pii_check.py`.
   never defines `UBFIX`, the port does; `UBFIX` is never used to steer matching.
 * No selector macros (a `#define` a file sets before including a shared header
   to change the header's code). Use real struct fields and types from `include/`.
-* One translation unit per change/PR. A unit is a `src/*.c` file covering a
-  **contiguous** run of functions in ROM order.
+* One translation unit per matching change. A unit is a C file under
+  `src/<category>/<unit>/` covering a **contiguous** run of functions in ROM order.
+  See [the source layout](docs/SOURCE_LAYOUT.md) for placement and lookup.
   The user-authorized orchestration exception is a reviewed batch integration
   PR: preserve separate per-function commits, validate the combined ROM,
   then merge once into `main` (see `AGENTS.md`).

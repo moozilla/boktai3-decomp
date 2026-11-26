@@ -46,7 +46,7 @@ SceneVec setter plus a ContactPosition copy reproduces its stack operations.
 08172BD0 processes movement through 0816B59C, A confirmation, and B cancellation;
 HUD byte 0x4388 distinguishes which confirmation routine to invoke.
 
-All layout additions are in `include/scene_hud_display.h`, replacing unknown
+All layout additions are in `include/menus/scene_hud/scene_hud_display.h`, replacing unknown
 padding without moving existing fields. The category widget extent is now 30,
 ending at 0x1F60. Each header edit passed foundry hdrcheck: all seven existing
 matched consumers remained exact. Other pre-existing workspace changes were

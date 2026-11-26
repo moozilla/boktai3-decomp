@@ -28,6 +28,7 @@ import tempfile
 TOOLS = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(TOOLS)
 sys.path.insert(0, TOOLS)
+from source_layout import is_upstream
 FORMAT = os.path.join(ROOT, "build", "venv", "bin", "clang-format")
 WARNING = re.compile(r"^[^:\n]*:\d+: warning: (.*)$", re.M)
 
@@ -48,7 +49,7 @@ def src_files(paths=None, skip=()):
         else:
             out.append(full)
     rels = [os.path.relpath(f, ROOT) for f in out]
-    return [r for r in dict.fromkeys(rels) if not r.startswith("src/lib/") and r not in set(skip)]
+    return [r for r in dict.fromkeys(rels) if not is_upstream(r) and r not in set(skip)]
 
 
 def check(rel):

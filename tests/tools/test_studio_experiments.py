@@ -431,7 +431,7 @@ class HTTPTests(unittest.TestCase):
             self.assertEqual(len(pixel["objects"]), 1)
             draw = pixel["objects"][0]["submissions"][0]
             self.assertEqual(draw["runtime_pc"], "030000E0")
-            self.assertEqual(draw["function"]["source"], "src/iwram_code.c")
+            self.assertEqual(draw["function"]["source"], "src/engine/iwram_arm_code/iwram_code.c")
             self.assertEqual(draw["asset"]["hash"], "DE23")
             self.assertEqual(draw["actor"]["member"], "gPlayers[0]->animation")
             self.assertEqual(draw["actor"]["fields"][1]["value"], 2694)

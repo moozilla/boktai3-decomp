@@ -9,7 +9,7 @@
  *   - IEC branch condition is (flags & IEC) || !((NR52 >> (ch-1)) & 1)
  *   - n4 = 0x80 case is a distinct SImode -128 (movs/rsbs): `int v=-128; n4=v;`
  *   - n4 = (n4 & 0xC0) + ((frequency & 0x3F00) >> 8)
- * Use: replace the INCLUDE_ASM for sub_08230AC8 in src/lib/m4a.c with this.
+ * Use: replace the INCLUDE_ASM for sub_08230AC8 in src/lib/m4a/m4a.c with this.
  */
 void CgbSound(void)
 {

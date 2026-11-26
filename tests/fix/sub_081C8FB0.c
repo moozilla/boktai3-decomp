@@ -1,11 +1,11 @@
-#include "global.h"
+#include "engine/shared/global.h"
 // MATCHING_CONCESSION: register-pinning
-#include "state_actor.h"
+#include "engine/shared/state_actor.h"
 
 // fuzzy: 97.4%
 // fix.py best version (reprinted C)
 // foundry draft (worker best 82.4%); what differs is mostly register allocation and instruction order
-s32 Math_Atan2(s32 x, s32 z); // include/directional_interaction.h
+s32 Math_Atan2(s32 x, s32 z); // include/field/directional_interaction_controllers/directional_interaction.h
 
 struct Context {
     u8 pad[0x434];

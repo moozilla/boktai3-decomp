@@ -406,8 +406,7 @@ ported here deliberately. Incremental rebuild after editing one file:
 ### The workspace: new, land, rename
 
 `new FUNC` finds where FUNC's C will live: an `INCLUDE_ASM` line in a unit,
-or nowhere yet (a new
-`src/fn/sub_ADDR.c`). It writes `build/scope/work/FUNC.c`: the whole unit with
+or nowhere yet (a new single-function file in the subsystem directory). It writes `build/scope/work/FUNC.c`: the whole unit with
 FUNC's `INCLUDE_ASM` replaced by a stub (signature from the first
 declaration in the unit or its headers), plus `FUNC.base.c`, the unit as it
 was. Outside a unit, the draft is a like twin's file (coverage >= 0.5) with
@@ -948,7 +947,7 @@ Each was read from the compiler source and confirmed on a live draft.
    spider recovery tick) needed its random table allocated before the 0x3FF mask (ip and
    sb): 3 refs each, the table's life longer, so the mask won (348 against 300). Reading the
    delay samples through `ParticleRandom_ReadSample`, whose `PARTICLE_RANDOM_READ_SAMPLE`
-   eight matched functions share (include/monster_particle_random.h), counts that read at
+   eight matched functions share (include/engine/shared/monster_particle_random.h), counts that read at
    depth 2: 4 refs, 800, and an exact match with no concession. `why`'s macro lever now
    lists each line that flips the order alone and the shared statement macros in include/
    (two or more src files, directly or through an inline of the same header), preferring
@@ -1381,7 +1380,7 @@ Each was read from the compiler source and confirmed on a live draft.
    `one` (fact 41's backward pass) and the second or ties into it. With the callback stored through
    a local in between (`void (*fn)(void *, void *) = F; q->fn = fn;`, whose literal then loads
    first), Actor_TryInteraction matched as `u8 one = 1; p->flags |= one; ...; q->flags |= one;`,
-   and so did seven more 0xf5a state changes in src/actor_animation_controller.c whose
+   and so did seven more 0xf5a state changes in src/actors/actor_animation_controller/actor_animation_controller.c whose
    `register s32 mask asm("r0") = 1` flag pins went. The original's inline had the same spelling.
    `why` on such a tie prints this lever when the op's other operand is a small constant that is read
    again later. A related form: `lsls #24; ands #0x07000000; lsrs #24` is a masked u8 local,
@@ -1550,7 +1549,7 @@ Each was read from the compiler source and confirmed on a live draft.
    (`control.raw = c->control; ... c->control = control.raw & ~mask;`) keeps the result in the
    constant's register, with no other change. Type and operand-order sweeps of the plain local
    don't. It matched child_take (four callers) and Actor_HideAndResetChildren's
-   `child->flags = reset | control.raw` (src/actor_animation_controller.c), both pins removed.
+   `child->flags = reset | control.raw` (src/actors/actor_animation_controller/actor_animation_controller.c), both pins removed.
 
 67. **The reverse of fact 61: a `u16 x[] = {0}` set first keeps the SI zero for a later byte
    store.** With `s32 a = 0, b = 0;`, a halfword store of b and a byte store of a after a call,
@@ -2292,7 +2291,7 @@ which is exactly `10:1`. Not tested.
   explicit `enter` pointer comes first. Dropping the pointer loses r8 reuse
   entirely (fact 2). Open: what C makes `&p->enter` shared yet copied after
   the gcse insertion.
-* **Vanargand_UpdateRepeatedPairAttack** (src/fn/sub_081AA178.c, 1 insn). ROM
+* **Vanargand_UpdateRepeatedPairAttack** (src/bosses/vanargand/sub_081AA178.c, 1 insn). ROM
   stores `phase` (r5) to `p->timer` in case 0 (line 76); the draft stores the
   call result (r7). `CSE_KEEP=24` (keep `phase` canonical) matches exactly, so
   this is cse canonicity (facts 4, 6, 7). Chain in the draft: at the switch
@@ -2776,7 +2775,7 @@ which is exactly `10:1`. Not tested.
    /* sub_080399F4 (Item_Place): an always-zero term; no stack slot */
    const u16 *table = (const u16 *)(RANDOM_TABLE_ADDR + (p->shakeTicks >> 8));
 
-   /* sub_0801404C: include/monster_particle_random.h; one 4-byte stack slot */
+   /* sub_0801404C: include/engine/shared/monster_particle_random.h; one 4-byte stack slot */
    union ParticleRandomTableSource source;
    const u16 *table;
    source.halves[0] = (u16)RANDOM_TABLE_ADDR;

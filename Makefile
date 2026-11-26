@@ -15,7 +15,7 @@ ROM     := build/boktai3.gba
 SHA1    := 2651c5e6875ac60abff734510d152166d211c87c
 
 .PHONY: all compare setup disasm clean shifttest format format-check mod english port-demo
-# Default: split asm around src/*.c, compile with agbcc, link, verify SHA-1
+# Default: split asm around src/, compile with agbcc, link, verify SHA-1
 all: gen/code_sym.s gen/data.s
 	$(PY) tools/build.py
 	$(PY) tools/check_ram_literals.py
@@ -70,13 +70,12 @@ shifttest: gen/code_sym.s gen/data.s
 	BOKTAI3_SAV=$(SAVE) tools/shift_test.sh tests/save_boot.txt $(or $(SHIFT),0x10000)
 	BOKTAI3_SAV=$(SAVE) tools/shift_test.sh tests/save_menus_field.txt $(or $(SHIFT),0x10000)
 
-# Our C sources (pret/SDK-derived src/lib, include/gba, rfu_compat.h keep upstream layout).
+# Use xargs so deeply nested paths still fit the host's command-line size limit.
 CLANG_FORMAT := $(or $(wildcard build/venv/bin/clang-format),clang-format)
-FORMAT_SRCS = $(filter-out src/lib/% include/gba/% include/rfu_compat.h,$(wildcard src/*.c src/*/*.c include/*.h include/*/*.h))
 format:
-	@$(CLANG_FORMAT) -i $(FORMAT_SRCS)
+	@$(PY) tools/source_layout.py --format-files | xargs $(CLANG_FORMAT) -i
 format-check:
-	@$(CLANG_FORMAT) --dry-run --Werror $(FORMAT_SRCS)
+	@$(PY) tools/source_layout.py --format-files | xargs $(CLANG_FORMAT) --dry-run --Werror
 
 # Play the source port in a browser (builds build/port/game/game.wasm; see port/README.md).
 port-demo:

@@ -1,0 +1,35 @@
+#ifndef GUARD_PASSWORD_H
+#define GUARD_PASSWORD_H
+
+#include "engine/shared/engine.h"
+#include "link/encoded_records_and_password_payloads/encoded_record.h"
+
+/* Working state for decoding a typed password / name string (0x90 bytes, heap allocated). */
+struct PasswordEntry {
+    u8 codes[24];   /* 6 bit symbol indices (output of Password_EncodeSymbols) */
+    u8 text[48];    /* typed characters with tags removed (24 pairs) */
+    struct EncodedAlternateRecordFields decoded; /* 0xF0 in name is the fallback glyph. */
+    u8 *table;  /* glyph pair table (0x40 pairs) */
+    int script; /* string table id used to resolve 0xF0 */
+    int version;
+    int checksum;
+    int key;
+};
+
+#define PASSWORD_REQUIRE(condition, onFailure) \
+    do { \
+        if (!(condition)) \
+            onFailure; \
+    } while (0)
+
+int Text_CopyWithoutTags(u8 *dst, u8 *src, int limit);
+s32 GlyphTable_FindPair(u8 *p, u32 a, u32 b);
+s32 Password_EncodeSymbols(struct PasswordEntry *e);
+int Password_ValidateNameGlyphs(struct PasswordEntry *e);
+int NameEntry_DecodeAndValidate(struct PasswordEntry *e);
+void Password_ApplyDecoded(struct PasswordEntry *e, u8 *output);
+s32 Password_DecodeEntry(u8 *src, s32 tableRef, s32 script, u8 *output);
+
+int Crc_ComputeCcitt16(void *, int, int);
+
+#endif

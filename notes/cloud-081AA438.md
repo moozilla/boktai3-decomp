@@ -25,7 +25,7 @@ made it worse (52-67%).
 
 `cloud-081AA438/sub_081ABA64.c` is the best attempt: 1744 instructions vs 1738, 145
 differing instructions with registers masked. All 11 phases are decoded. The inlined
-animation step is the same as Actor_MoveAlongScriptedCurve's (src/actor_animation_controller.c).
+animation step is the same as Actor_MoveAlongScriptedCurve's (src/actors/actor_animation_controller/actor_animation_controller.c).
 Shapes that mattered:
 
 * The direction helper takes a packed u32 (`*(u32 *)&v = packed` into a local 8-byte

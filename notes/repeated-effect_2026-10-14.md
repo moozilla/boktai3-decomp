@@ -13,7 +13,7 @@ intensity-responsive object, but its gameplay identity is unconfirmed.
 
 ## Layout and interfaces
 
-`include/repeated_effect.h` recovers manager size 0x7FC: task prefix 0x18,
+`include/effects/repeated_effects/repeated_effect.h` recovers manager size 0x7FC: task prefix 0x18,
 count halfword at 0x18, entries at 0x1C, eight entries of 0xFC bytes. InitEntry
 uses `entries[count]` without incrementing count. The adjacent script creator
 owns the capacity check and increment. Its seven arguments are manager, tag,

@@ -1,0 +1,16 @@
+#include "engine/shared/global.h"
+struct S {
+    u8 f[0xB32];
+    u16 fl;
+};
+void sub_081885BC(void *);
+void sub_0818911C(void *);
+void sub_08188B7C(void *);
+void Armor_UpdateFacingDecision(void *);
+void Armor_UpdateSecondaryBehaviorByInverseFlag(struct S *p)
+{
+    if ((p->fl & 0x200) == 0)
+        Armor_UpdateFacingDecision(p);
+    else
+        sub_08188B7C(p);
+}

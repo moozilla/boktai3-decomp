@@ -1,5 +1,5 @@
-#include "global.h"
-#include "scene_actor_control_phase.h"
+#include "engine/shared/global.h"
+#include "engine/shared/scene_actor_control_phase.h"
 
 u8 sub_0812F3CC(void *);
 

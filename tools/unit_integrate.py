@@ -10,7 +10,7 @@ checkout's build/unitize/.
 
 A unit's own changes are taken from its worktree commit (unit/unit-SLUG), limited
 to src/SLUG.c, include/ (its own header and fields it added to shared ones), the
-src/fn/ files it removed, symbols/ and notes/ (shared docs would collide).
+one-function files it removed, symbols/ and notes/ (shared docs would collide).
 They are applied on a fresh branch from origin/main; a unit that no longer
 applies is marked "conflict" for a later re-run. If the combined build fails,
 the batch is split in half and each half is tried on its own. State goes in
@@ -18,7 +18,6 @@ build/unitize/SLUG.json ("integrated": PR number). With --loop the script
 repeats every MINUTES until no verified units are left and unitize.py is idle.
 """
 import argparse
-import glob
 import json
 import os
 import subprocess
@@ -27,6 +26,7 @@ import time
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from romlib import ROOT  # noqa: E402
+from source_layout import scan
 
 OUT = os.path.join(ROOT, "build", "unitize")
 JOBS = 3          # build parallelism: the machine has 10 cores and 16 GB shared with workers
@@ -56,11 +56,11 @@ def save(st):
 def own_patch(st):
     """The unit's own changes, without its src/fn/ deletions (returned separately: main may have
     edited those files since, e.g. renamed callees, and the unit replaces them whatever they hold)."""
-    b, s = st["branch"], st["slug"]
-    status = [l.split("\t") for l in git("diff", "--name-status", f"{b}~1", b).stdout.splitlines()]
-    deleted = [f for k, f, *_ in status if k == "D" and f.startswith("src/fn/")]
-    keep = [f for k, f, *_ in status if f not in deleted and
-            (f == f"src/{s}.c" or f.startswith(("include/", "src/fn/", "symbols/", "notes/")))]
+    b = st["branch"]
+    status = [l.split("\t") for l in git("diff", "--no-renames", "--name-status", f"{b}~1", b).stdout.splitlines()]
+    deleted = [f for k, f in status if k == "D" and f.startswith("src/")]
+    keep = [f for _, f in status if f not in deleted and
+            f.startswith(("include/", "src/", "symbols/", "notes/"))]
     return (git("diff", "--binary", f"{b}~1", b, "--", *keep).stdout if keep else ""), deleted
 
 
@@ -72,28 +72,32 @@ def current_names():
 
 def refresh(st):
     """Bring the unit up to date with main: renamed callees, and functions main has matched since
-    the unit's base (their C moves from src/fn/ into the unit, replacing its INCLUDE_ASM)."""
+    the unit's base (their C moves from separate files into the unit, replacing its INCLUDE_ASM)."""
     import re
     s = st["slug"]
     names = current_names()
-    paths = [os.path.join(ROOT, p) for p in (f"src/{s}.c", f"include/{s}.h") if os.path.exists(os.path.join(ROOT, p))]
+    unit_file = st["unit"] if isinstance(st.get("unit"), str) else f"src/{s}.c"
+    header_file = st.get("header", f"include/{s}.h")
+    paths = [os.path.join(ROOT, p) for p in (unit_file, header_file) if os.path.exists(os.path.join(ROOT, p))]
     for p in paths:
         text = open(p).read()
         text = re.sub(r"\bsub_[0-9A-F]{8}\b", lambda m: names.get(m.group(0), m.group(0)), text)
         open(p, "w").write(text)
-    unit = os.path.join(ROOT, "src", f"{s}.c")
+    unit = os.path.join(ROOT, unit_file)
     if not os.path.exists(unit):
         return
+    sources = scan(ROOT)
     text = open(unit).read()
     for m in list(re.finditer(r'^INCLUDE_ASM\("[^"]*",\s*(\w+)\);\n', text, re.M)):
         fn = m.group(1)
-        hits = [p for p in glob.glob(os.path.join(ROOT, "src", "fn", "*.c"))
-                if re.search(r"^[^\n;]*\b" + re.escape(fn) + r"\s*\([^;]*\)\s*\{", open(p).read(), re.M)]
-        if len(hits) == 1:
-            body = open(hits[0]).read()
+        file = sources.single_file(fn)
+        if file and file != unit_file:
+            body = open(os.path.join(ROOT, file)).read()
+            if "INCLUDE_ASM" in body:
+                continue
             body = "\n".join(l for l in body.split("\n") if not l.startswith("#include"))
             text = text.replace(m.group(0), body.strip() + "\n", 1)
-            git("rm", "-q", os.path.relpath(hits[0], ROOT))
+            git("rm", "-q", file)
     open(unit, "w").write(text)
 
 

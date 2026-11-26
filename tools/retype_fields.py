@@ -36,6 +36,7 @@ import tempfile
 TOOLS = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(TOOLS)
 sys.path.insert(0, TOOLS)
+from source_layout import header_paths, is_upstream
 
 NO_MEMBER = re.compile(r"^(?P<path>[^:\n]+):(?P<line>\d+): (?:structure|union) has no member named `(?P<member>\w+)'", re.M)
 ERROR = re.compile(r"^[^:\n]+:\d+: (?!warning)", re.M)
@@ -166,11 +167,14 @@ def errors_of(stderr, pairs):
     return found, other
 
 
+def project_headers():
+    return [p.relative_to(ROOT).as_posix() for p in header_paths(ROOT) if not is_upstream(p)]
+
+
 def run(files, pairs, jobs, dry_run=False, rounds=8, trials=16):
     """Rewrite until every unit compiles or nothing changes. Returns (touched paths,
     {(path, line): message} left for a hand edit, {unit: other errors})."""
-    header_defs = macro_definitions(sorted(
-        os.path.join("include", n) for n in os.listdir(os.path.join(ROOT, "include")) if n.endswith(".h")))
+    header_defs = macro_definitions(project_headers())
     pending = list(files)
     unsettled, failed = {}, {}
     touched = set()
@@ -524,8 +528,7 @@ def main():
             continue
         if kind in ("types", "text"):
             if not a.dry_run:
-                headers = sorted(os.path.join("include", n) for n in os.listdir(os.path.join(ROOT, "include"))
-                                 if n.endswith(".h")) if kind == "types" else []
+                headers = project_headers() if kind == "types" else []
                 for path in replace_text(files + headers, pairs, regex=kind == "types"):
                     print(f"rewrote {path} ({kind})")
             continue

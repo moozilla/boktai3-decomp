@@ -6,7 +6,7 @@ import sys
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / 'port/core'))
-from prepare import prepare_headers, prepare_source
+from prepare import prepare_headers, prepare_source, source_units
 from link_slice import find_linker
 
 
@@ -18,7 +18,7 @@ def main():
     prepare_headers(ROOT, headers, 'wasm32')
     flags = ['-O2', '-std=gnu89', '-Wno-everything', '-I' + str(headers),
              '-include', str(ROOT / 'port/core/compat.h')]
-    sources = ['src/fn/sub_08163E68.c', 'src/fn/sub_0821A0C0.c', 'port/tests/returns_runtime.c']
+    sources = source_units(ROOT, '08163E68', '0821A0C0') + ['port/tests/returns_runtime.c']
     for target in ('host', 'wasm32'):
         arch = ['--target=wasm32', '-ffreestanding'] if target == 'wasm32' else []
         objects = []

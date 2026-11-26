@@ -29,7 +29,7 @@ exemptions.
 
 A read-only audit of this worker's source snapshot found fourteen newly detected
 lines: thirteen in ten source functions, and one in the shared `ZeroFill8` helper
-in `include/global.h`. The source functions include the Player clone behavior
+in `include/engine/shared/global.h`. The source functions include the Player clone behavior
 update and 08093810, 08248778, 08163C84, 080697C8, 08176F70, 081F2208, 0807D2E0,
 080747B8, and 080FE3B0. The EEPROM function at 08248778 contains four declarations.
 These are existing source sites, not newly added volatile objects. Callers of

@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """Check one C file against the ROM without a full build, and show a diff.
 
-  check.py src/fn/sub_08033568.c [--quiet]
-  check.py sub_08033568              (same; looks in src/fn/)
+  check.py FILE.c [--quiet]
+  check.py sub_08033568              (resolve a ROM address or function name)
 
 Compiles the file exactly as build.py does, links it alone at the address of
 its first function (every other symbol resolved from the last full build's
@@ -28,6 +28,7 @@ import tempfile
 import anchordiff
 import build
 from romlib import ROOT, load_rom, off
+from source_layout import resolve
 
 try:
     import capstone
@@ -274,10 +275,10 @@ def main():
         build.DEFINES.append("-DNONMATCHING")
     if a.context < 0 or (a.target_size is not None and a.target_size <= 0):
         ap.error("context must be nonnegative and target size must be positive")
-    src = a.src
-    if not src.endswith(".c"):
-        src = os.path.join("src", "fn", src + ".c")
-    src = os.path.relpath(os.path.join(ROOT, src), ROOT)
+    try:
+        src = resolve(a.src)
+    except ValueError as error:
+        ap.error(str(error))
     parent = os.path.join(ROOT, "build", "check")
     os.makedirs(parent, exist_ok=True)
     work = os.path.relpath(tempfile.mkdtemp(prefix="run-", dir=parent), ROOT)

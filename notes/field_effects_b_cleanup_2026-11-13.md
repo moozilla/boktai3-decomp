@@ -8,7 +8,7 @@ compiler. This is source cleanup: exact-match coverage has zero percentage-point
 gain. The coordinator must run the combined ROM build at integration.
 
 The final unit, ship-wheel presentation (081C482C–081C542C), combines forty files
-and forty functions into `src/shipwheel_presentation.c`. Its shared header recovers
+and forty functions into `src/field/ship_wheel/shipwheel_presentation.c`. Its shared header recovers
 three tasks: the wheel with embedded palette transition, the scripted movement/fade
 controller, and the message-triggered falling sprite. The unit matches 3,072 bytes.
 `ContactSwarmGraphics.paletteIndex` occupies existing padding at offset 6; the

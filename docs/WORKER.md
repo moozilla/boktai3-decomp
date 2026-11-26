@@ -80,6 +80,8 @@ best draft of the current function and write its note.
   integration. No whole-corpus sweeps either.
 * Use `build/venv/bin/python` for tools that need the venv (scope re-execs itself).
   Scratch files go under `build/` in your worktree, never fixed `/tmp` paths.
+  Use `tools/source_layout.py FUNC` to find an existing C file.
+  [The source layout](SOURCE_LAYOUT.md) describes where new files and headers go.
 
 ## The loop
 
@@ -165,7 +167,7 @@ that is a scope gap: record it (below) so the tool gets better.
   the same statement in every caller of a shared helper. The tools count it and land
   refuses it without `--allow-pins`.
 * An `if` whose body the original compiled out is written with `DEBUG_PRINT()`
-  (`include/debug.h`, expands to nothing): `if (TakeFlag(f)) { DEBUG_PRINT(); }`. Matched
+  (`include/engine/shared/debug.h`, expands to nothing): `if (TakeFlag(f)) { DEBUG_PRINT(); }`. Matched
   code has 13 such sites, nearly all on `Take*` flag calls. Use it only where the original
   plausibly logged something: the condition is a call or a test worth reporting. An `if`
   with a bare empty body (`{ }` or `;`) is a fence; the tools count it as a barrier and

@@ -31,6 +31,7 @@ import sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import regdiag  # noqa: E402
 from romlib import ROOT  # noqa: E402
+from source_layout import resolve
 
 FIRST_PSEUDO = 17
 # config/thumb.h in agbcc
@@ -256,7 +257,10 @@ def main():
     ap.add_argument("--nonmatching", action="store_true")
     ap.add_argument("--depth", type=int, default=2, help="order moves to combine in the search")
     a = ap.parse_args()
-    src = a.src if os.path.exists(a.src) else os.path.join(ROOT, "src/fn", a.src + ".c")
+    try:
+        src = resolve(a.src)
+    except ValueError as error:
+        sys.exit(str(error))
     an = regdiag.analyze(src, a.func, a.nonmatching)
     src_text = open(src).read().splitlines()
     ps, order, ever_live = parse(an)

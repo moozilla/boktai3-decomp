@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Set up a decomp-permuter run for one function.
 
-  permute.py src/fn/sub_08033568.c [FUNC] [--run N_SECONDS] [-j THREADS]
+  permute.py FILE.c [FUNC] [--run N_SECONDS] [-j THREADS]
              [--focus auto|LINES] [--context N] [--weight PASS=W ...]
 
 Creates build/permute/FUNC/run-*/ with base.c (preprocessed C), target.o (the
@@ -38,6 +38,7 @@ import build
 import check
 import split
 from romlib import ROOT
+from source_layout import resolve
 
 def _find_permuter():
     if os.environ.get("PERMUTER"):
@@ -243,7 +244,10 @@ def main():
     a = ap.parse_args()
     if a.run < 0 or a.j < 1:
         ap.error("--run must be nonnegative and -j must be positive")
-    src = a.src if a.src.endswith(".c") else os.path.join("src", "fn", a.src + ".c")
+    try:
+        src = resolve(a.src)
+    except ValueError as error:
+        sys.exit(str(error))
     func = a.func or os.path.basename(src)[:-2]
     import isolate
     src = isolate.ensure(src, func)  # multi-function unit: work on an isolated copy

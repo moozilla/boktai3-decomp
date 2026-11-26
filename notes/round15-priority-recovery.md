@@ -181,12 +181,12 @@ array. The MenuPrompt price renderer and cross-group indexing remain partial.
 There are three cumulative exemptions so far, each grounded independently of
 matching behavior:
 
-1. `src/spread_shot.c`, `SpreadShot_ResolveTerrain`, `08123194`: the existing
+1. `src/other/scene_terrain_probe/spread_shot.c`, `SpreadShot_ResolveTerrain`, `08123194`: the existing
    bidirectional walker is specialized for the left-neighbor call. Its forward
    arm is genuinely used by the right-neighbor and runtime-target calls. The
    direct backward-only alternative misses; the annotation is specialization
    evidence, not a fabricated-source removal. Accepted in `5dbd9f911`.
-2. `include/libgcc_numbers.h`, `SoftDoubleNumber.fraction`: the bundled original
+2. `include/lib/libgcc/libgcc_numbers.h`, `SoftDoubleNumber.fraction`: the bundled original
    FSF `fp-bit-base.c` declares the 64-bit fraction and two 32-bit halves in a union.
 3. The same header, `SoftSingleNumber.fraction`: the FLOAT specialization of that
    original declaration uses a 32-bit fraction and two 16-bit halves.

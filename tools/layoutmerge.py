@@ -61,6 +61,7 @@ import struct as pystruct
 import subprocess
 import sys
 import tempfile
+from source_layout import header_paths, is_upstream, manifest, source_paths
 
 TOOLS = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(TOOLS)
@@ -989,18 +990,12 @@ def ram_symbols():
 
 
 def sources():
-    out = []
-    for d in ("src", "include"):
-        for dp, _, fs in os.walk(os.path.join(ROOT, d)):
-            for f in sorted(fs):
-                if f.endswith(".c"):
-                    out.append(os.path.relpath(os.path.join(dp, f), ROOT))
-    return sorted(out)
+    return [path.relative_to(ROOT).as_posix() for path in source_paths(ROOT)]
 
 
 def headers():
     """Headers no C file includes would go unseen: scan each through a stub."""
-    return sorted(os.path.join("include", f) for f in os.listdir(os.path.join(ROOT, "include")) if f.endswith(".h"))
+    return [path.relative_to(ROOT).as_posix() for path in header_paths(ROOT) if not is_upstream(path)]
 
 
 def scan_all(globals_, jobs):
@@ -1009,8 +1004,9 @@ def scan_all(globals_, jobs):
     stubdir = os.path.join(OUT, "stubs")
     os.makedirs(stubdir, exist_ok=True)
     for h in headers():
-        p = os.path.join(stubdir, os.path.basename(h)[:-2] + ".c")
-        txt = f'#include "global.h"\n#include "{os.path.basename(h)}"\n'
+        p = os.path.join(stubdir, h[:-2] + ".c")
+        os.makedirs(os.path.dirname(p), exist_ok=True)
+        txt = f'#include "engine/shared/global.h"\n#include "{os.path.relpath(h, "include")}"\n'
         if not os.path.exists(p) or open(p).read() != txt:
             open(p, "w").write(txt)
         stubs.append(os.path.relpath(p, ROOT))
@@ -1308,7 +1304,7 @@ def function_files():
                 names |= {a, b}
         for n in names:
             out[n].add(f)
-    return {n: sorted(fs, key=lambda f: (f.startswith("src/fn/"), f)) for n, fs in out.items()}
+    return {n: sorted(fs, key=lambda f: (len(manifest().by_file.get(f, ())) == 1, f)) for n, fs in out.items()}
 
 
 def report(g, addr, entries, syms_sorted, aliases=(), parent=None, funcs=None):

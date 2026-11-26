@@ -16,7 +16,7 @@ hierarchy:
 decomp.dev draws one flat treemap per view and does not nest tiles, so the
 category level is the category menu, not a border inside the treemap. Units are
 listed category by category, so each category occupies one area of the full
-treemap. Source file locations (`src/fn/`, `src/*.c`) do not affect the report.
+treemap. The [source layout](SOURCE_LAYOUT.md) follows these categories and units.
 
 Grouping never changes credit: every function keeps its address, size and
 exact or fuzzy status, and the totals are unchanged (`tests/tools/test_progress.py`).
@@ -56,8 +56,8 @@ original object-file boundaries or in-game identities. Names are provisional.
 * **Never leave code unclassified**: `test_every_game_function_has_a_unit_and_category`
   fails if a unit falls through to *Not yet classified*, is a lone function, or
   if units of one category are not listed together.
-* **Source layout** is independent: put a consolidated subsystem in
-  `src/<subsystem>.c` named after its row (docs/UNIT_WORKER.md, `tools/unitize.py`).
+* **Source layout**: keep a consolidated translation unit in its subsystem
+  directory (see [SOURCE_LAYOUT.md](SOURCE_LAYOUT.md) and [UNIT_WORKER.md](UNIT_WORKER.md)).
 
 ## Current categories
 

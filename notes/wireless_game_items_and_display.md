@@ -7,7 +7,7 @@ Range: `080395D4–0803AC9C` (end exclusive).
 ## Consolidation
 
 Merged the 45 existing matched files into
-`src/wireless_game_items_and_display.c`, in ROM order, including the four
+`src/link/wireless_game_items_and_display/wireless_game_items_and_display.c`, in ROM order, including the four
 unmatched functions at their original positions. No inventory gaps were found.
 No functions newly matched; exact coverage gain is **0.000 percentage points**.
 No existing match or register-pinned category credit was lost.

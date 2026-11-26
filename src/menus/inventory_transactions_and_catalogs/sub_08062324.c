@@ -1,0 +1,28 @@
+#include "menus/inventory_transactions_and_catalogs/scene_inventory_tail.h"
+struct SceneInventorySwapView {
+    u8 unknown0[0x1AF0];
+    struct SceneInputPair pair;
+};
+s32 SceneInput_TickPairTransition(struct SceneInputPair *);
+void Inventory_SwapEquipmentEntries(u32, u32);
+void sub_0822D080(u32, u32);
+void Inventory_SwapSlots(u32, u32);
+s32 SceneInventory_TickSwapTransition(struct SceneInventoryTail *p)
+{
+    SceneInputPanel_ResetHighlights(&p->display, &p->highlight);
+    if (SceneInput_TickPairTransition(&((struct SceneInventorySwapView *)p)->pair)) {
+        switch (p->category) {
+            case 0:
+                Inventory_SwapEquipmentEntries(p->grid.savedSelection, p->grid.selection);
+                break;
+            case 1:
+                sub_0822D080(p->grid.savedSelection, p->grid.selection);
+                break;
+            case 2:
+                Inventory_SwapSlots(p->grid.savedSelection, p->grid.selection);
+                break;
+        }
+        SceneInventory_BeginThirdSelection(p);
+    }
+    return 0;
+}

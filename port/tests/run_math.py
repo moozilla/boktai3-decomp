@@ -16,7 +16,7 @@ def main():
     os.chdir(ROOT)
     cc = os.environ.get('PORT_CC', '/opt/homebrew/opt/llvm/bin/clang')
     addresses = read_addresses(ROOT)
-    units = ['src/lib/libgcc_dp.c', 'src/lib/libgcc_fp.c', 'src/lib/libm_k_sin.c', 'src/lib/libm_e_sqrt.c', 'port/tests/math_test.c']
+    units = ['src/lib/libgcc/libgcc_dp.c', 'src/lib/libgcc/libgcc_fp.c', 'src/lib/libm/libm_k_sin.c', 'src/lib/libm/libm_e_sqrt.c', 'port/tests/math_test.c']
     for target in ('host', 'wasm32'):
         out = ROOT / 'build/port/math' / target
         out.mkdir(parents=True, exist_ok=True)

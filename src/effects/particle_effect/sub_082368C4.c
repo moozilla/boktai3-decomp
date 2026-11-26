@@ -1,0 +1,7 @@
+#include "engine/shared/global.h"
+void Sprite_Remove(void *);
+void ActorBurst_RemovePrimarySprites(u8 *s)
+{
+    Sprite_Remove(s + 0x20);
+    Sprite_Remove(s + 0x68);
+}

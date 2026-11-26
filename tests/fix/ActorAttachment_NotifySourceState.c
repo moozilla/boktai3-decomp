@@ -1,6 +1,6 @@
 // draft with the flag set once after the switch. The ROM keeps the flag test's 1 in r5 for it: the
 // original set the flag in each case, which cse enters knowing the 1 (sp_tail_into_branches, README fact 65)
-#include "actor_attachment_slot.h"
+#include "actors/actor_attachment_manager/actor_attachment_slot.h"
 void SceneActorPlacement_PlayVariantEventSound(struct ActorAttachmentSource *, u32);
 static inline u8 SameOwner(u16 *key)
 {

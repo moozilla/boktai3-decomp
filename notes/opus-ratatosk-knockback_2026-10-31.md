@@ -3,7 +3,7 @@
 Tags: #matching #ratatosk #compiler #cse #combine #basic-blocks
 
 **Exact match in ordinary C.** `Ratatosk_UpdateKnockbackRecovery`, 800 bytes,
-now compiles byte-identically (`tools/check.py src/fn/sub_081F5290.c`: MATCH, 0
+now compiles byte-identically (`tools/check.py src/bosses/ratatosk/sub_081F5290.c`: MATCH, 0
 differing bytes). It has no register pins, barriers, inline assembly or
 compiler overrides. Commit `4fd4db14b` on `codex/opus-ratatosk-defeat`. The
 starting point was GPT-6 Pro's round 8 candidate (83.5%) in
@@ -100,7 +100,7 @@ Found while cleaning the candidate up, each checked by a one-change variant:
   and gcse cannot reuse the address.
 * `p2->phaseTimer = 8; p2->motion = 0;` and the plain zeros match. GPT-6's
   explicit `zero` variable is not needed, and with it 3 instructions differ.
-* Facing through the shared `RATATOSK_SET_FACING` (include/ratatosk_facing.h),
+* Facing through the shared `RATATOSK_SET_FACING` (include/bosses/ratatosk/ratatosk_facing.h),
   as in the sibling `sub_081F5120`. The inline `facing()` helper of
   `sub_081F4CF8` fails here (3 hunks). cse reuses the QImode zero of the byte
   store's read-modify-write expansion as the call's `0` argument. Why the

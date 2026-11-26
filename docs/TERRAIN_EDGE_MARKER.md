@@ -9,7 +9,7 @@ The manager allocates `0x2C8` bytes at task priority 9. Its task header occupies
 `0x18` bytes, followed by mode at `0x18`, an unknown halfword at `0x1A`, count at
 `0x1C`, and blink frame at `0x1E`. Seventeen `0x28` sprite records begin at
 `0x20`. A sprite's render flags are at zero, render-mode byte at `0x0F`, and
-8-byte world position at `0x18`. `include/terrain_edge_marker.h` gives the
+8-byte world position at `0x18`. `include/engine/shared/terrain_edge_marker.h` gives the
 shared view. Position words preserve the unknown final halfword when script
 coordinates do not initialize it.
 

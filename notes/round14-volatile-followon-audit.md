@@ -49,7 +49,7 @@ one translation unit and removes one reported warning line.
 
 | Unit | Source improvement | Whole-unit bytes | Integration commit |
 | --- | --- | ---: | --- |
-| `src/background_controller.c` | Copy the actual queue arguments with the shared source/destination index. | 5,372 | `03ef42221` |
+| `src/effects/background_controllers/background_controller.c` | Copy the actual queue arguments with the shared source/destination index. | 5,372 | `03ef42221` |
 | `0812A7B8` | Use shared playback state for linked-effect removal. | 368 | `afabcb494` |
 | `0812AA0C` | Use shared playback state for rising linked effects. | 676 | `bead12fa8` |
 | `0812ACB0` | Use shared playback state for linked-effect tracking. | 980 | `84822ec4c` |
@@ -75,7 +75,7 @@ length and input pointer into aliases, made the queue count volatile, and
 constructed each destination with byte arithmetic. A comment explicitly
 described the desired reload and operand allocation.
 
-The actual layout already exists in `include/background_controller.h`:
+The actual layout already exists in `include/effects/background_controllers/background_controller.h`:
 `BackgroundCommandQueue` holds a count, eight type tags and eight command
 records; each record contains eight signed-halfword arguments. Both normal
 and scrolling backgrounds use that queue. The queue is populated by normal

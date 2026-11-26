@@ -1,0 +1,388 @@
+#include "menus/scene_indicators/scene_indicator.h"
+#include "engine/shared/contact_actor.h"
+#include "engine/terrain/terrain_sampling.h"
+
+struct SceneIndicators *SceneIndicators_GetInstance(void)
+{
+    return gSceneIndicators;
+}
+
+void SceneIndicator_Initialize(struct SceneIndicators *m, struct SceneIndicator *p)
+{
+    struct ContactPackedVector size, offset;
+    struct DisplaySequenceSprite *sprite = &p->sprite;
+    struct ContactCollider *collider;
+    Sprite_Init(sprite, m->animations, 1);
+    sprite->priority = 3;
+    collider = &p->collider;
+    size.x = 120;
+    size.y = 32;
+    size.z = 120;
+    offset.x = 0;
+    offset.y = 32;
+    offset.z = 0;
+    Collider_Init(collider, 0, 0x2001, 0, 16, &size, &offset);
+    Collider_SetCallback(collider, 0, p);
+    Collider_SetAttackProperties(collider, 10, 1, 0x400000, 0x60000, 30);
+    p->active = 0;
+}
+
+void SceneIndicator_Update(struct SceneIndicators *owner, struct SceneIndicator *p)
+{
+    u8 old;
+    if (p->disabled) {
+        if (p->visible) {
+            p->visible = 0;
+            IndicatorSprite_SetFrame(&p->sprite, p->frame);
+        }
+        return;
+    }
+    old = p->visible;
+    switch (p->mode) {
+        case 0:
+            if (p->timer >= (u32)(s16)p->times[p->index]) {
+                p->index++;
+                if (p->index >= p->count)
+                    p->index = 0;
+                p->visible = 1 - (p->index & 1);
+                if (p->visible)
+                    Sound_PlaySongChecked(0x5AA);
+                p->timer = 0;
+            }
+            break;
+        case 1:
+            if (!old) {
+                if (!p->delay) {
+                    if (p->value == owner->tile)
+                        p->delay = 1;
+                } else {
+                    p->delay++;
+                    if (p->delay >= p->period) {
+                        p->visible = 1;
+                        p->delay = 60;
+                        Sound_PlaySongChecked(0x5AA);
+                    }
+                }
+            } else {
+                if (!p->delay)
+                    p->visible = 0;
+                else
+                    p->delay--;
+            }
+            break;
+        case 2:
+            break;
+    }
+    {
+        int visible = p->visible;
+        if (old != visible)
+            IndicatorSprite_SetFrame(&p->sprite, p->frame + visible);
+    }
+    if (p->visible == 1)
+        Collider_Refresh(&p->collider);
+    p->timer++;
+}
+
+void SceneIndicator_Destroy(struct SceneIndicators *owner, struct SceneIndicator *p)
+{
+    Sprite_Remove(&p->sprite);
+}
+
+int SceneIndicators_Update(struct SceneIndicators *m)
+{
+    int i;
+    struct SceneIndicator *p = m->indicators;
+    for (i = 15; i >= 0; i--, p++)
+        if (p->active)
+            SceneIndicator_Update(m, p);
+    {
+        int x = gPlayers[0]->position.x >> 8, y = gPlayers[0]->position.z >> 8, tile;
+        if (x < 0 || y < 0 || x >= gTerrainWidth || y >= gTerrainHeight)
+            tile = 0;
+        else
+            tile = gTerrainMap->rows[y] + x;
+        m->tile = tile;
+    }
+    return 0;
+}
+
+u32 SceneIndicators_Destroy(struct SceneIndicators *s)
+{
+    struct SceneIndicator *e = s->indicators;
+    s32 i;
+    for (i = 15; i >= 0; i--, e++) {
+        SceneIndicator_Destroy(s, e);
+    }
+    return (u32)(gSceneIndicators = 0);
+}
+
+int SceneIndicators_Initialize(struct SceneIndicators *m)
+{
+    int i;
+    struct SceneIndicator *first;
+    gSceneIndicators = m;
+    m->count = 0;
+    if (Script_SeekToKeyword('t')) {
+        for (i = 0; i < 4; i++) {
+            int value;
+            if (Script_GetPc()) {
+                value = Script_GetValue();
+                m->count++;
+            } else
+                value = 0x4211;
+            if (!AnimData_Load(&m->animations[i], value))
+                return -1;
+        }
+    } else {
+        for (i = 0; i < 4; i++)
+            if (!AnimData_Load(&m->animations[i], 0x4211))
+                return -1;
+        m->count = 4;
+    }
+    {
+        int has = Script_SeekToKeyword('p');
+        first = m->indicators;
+        if (has) {
+            for (i = 0; i < 4; i++) {
+                int value;
+                if (Script_GetPc()) {
+                    value = Script_GetValue();
+                    m->count++;
+                } else
+                    value = 0;
+                AnimData_SelectPaletteBank(&m->animations[i], m->animations[i].paletteKey + value);
+            }
+        }
+    }
+    {
+        struct SceneIndicator *p = first;
+        for (i = 15; i >= 0; i--, p++)
+            SceneIndicator_Initialize(m, p);
+    }
+    if (gPlayers[0]) {
+        int x = gPlayers[0]->position.x >> 8, y = gPlayers[0]->position.z >> 8, tile;
+        if (x < 0 || y < 0 || x >= gTerrainWidth || y >= gTerrainHeight)
+            tile = 0;
+        else
+            tile = gTerrainMap->rows[y] + x;
+        m->tile = tile;
+    }
+    return 0;
+}
+
+struct SceneIndicators *SceneIndicators_Create(void)
+{
+    struct SceneIndicators *p;
+    if (gSceneIndicators != 0)
+        return gSceneIndicators;
+    p = Task_Create(0x8, 0xbd0);
+    if (p != 0) {
+        Task_SetCallbacks(p, SceneIndicators_Update, SceneIndicators_Destroy);
+        if (SceneIndicators_Initialize(p) < 0) {
+            Task_Kill(p);
+            return 0;
+        }
+    }
+    return p;
+}
+
+struct SceneIndicator *SceneIndicators_FindFreeSlot(struct SceneIndicators *p)
+{
+    struct SceneIndicator *q = p->indicators;
+    s32 i = 0;
+    while (i <= 15) {
+        if (q->active == 0) {
+            return q;
+        }
+        i++;
+        q++;
+    }
+    return 0;
+}
+
+struct SceneIndicator *SceneIndicators_FindById(struct SceneIndicators *p, u32 key)
+{
+    struct SceneIndicator *q = p->indicators;
+    s32 i = 0;
+    while (i <= 15) {
+        if (q->active != 0 && q->id == key) {
+            return q;
+        }
+        i++;
+        q++;
+    }
+    return 0;
+}
+
+static inline u8 *cell(int i)
+{
+    u8 *p = TerrainModifiers_FindCellOverride(i, 1);
+    if (p)
+        return p + 4;
+    return gTerrainMap->cells + 12 + i * 4;
+}
+
+int SceneIndicator_CreateFromScript(void)
+{
+    struct SceneIndicators *m = SceneIndicators_GetInstance();
+    struct SceneIndicator *p;
+    struct ContactPosition *position;
+    struct DisplaySequenceSprite *sprite;
+    struct ContactCollider *collider;
+    if (!m)
+        return -1;
+    p = SceneIndicators_FindFreeSlot(m);
+    if (!p)
+        return -1;
+    p->id = Script_GetKeywordValue('n', 0);
+    if (Script_SeekToKeyword('p')) {
+        p->sprite.position.x = Script_GetValue();
+        p->sprite.position.y = Script_GetValue();
+        p->sprite.position.z = Script_GetValue();
+    }
+    if (Script_GetKeywordValue('f', 1)) {
+        u8 *c;
+        int height, slope;
+        p->sprite.position.x = (p->sprite.position.x & ~255) + 128;
+        p->sprite.position.z = (p->sprite.position.z & ~255) + 128;
+        position = &p->sprite.position;
+        c = cell(Terrain_GetCellIndex(position));
+        slope = *c >> 4;
+        height = (*c & 15) << 8;
+        switch (slope) {
+            case 1:
+                height -= (u8)position->z;
+                break;
+            case 2:
+                height -= (u8)position->x;
+                break;
+        }
+        p->sprite.position.y = height;
+    }
+    p->frame = Script_GetKeywordValue('P', -1);
+    if (p->frame < 0) {
+        switch (Terrain_GetHigherNeighborMask(&p->sprite.position) & 14) {
+            case 2:
+                p->frame = 4;
+                break;
+            case 6:
+                p->frame = 4;
+                break;
+            case 12:
+                p->frame = 2;
+                break;
+            case 8:
+                p->frame = 2;
+                break;
+            case 0:
+            case 4:
+            case 10:
+            case 14:
+            default:
+                p->frame = 0;
+                break;
+        }
+    }
+    p->index = 0;
+    p->count = 0;
+    if (Script_SeekToKeyword('t')) {
+        int i;
+        for (i = 0; i < 8; i++) {
+            if (Script_GetPc()) {
+                p->times[i] = Script_GetValue();
+                p->count++;
+            } else
+                p->times[i] = 65535;
+        }
+        if (p->count & 1)
+            return -1;
+        p->mode = 0;
+        position = &p->sprite.position;
+        sprite = &p->sprite;
+        collider = &p->collider;
+    } else {
+        int i;
+        position = &p->sprite.position;
+        sprite = &p->sprite;
+        collider = &p->collider;
+        for (i = 0; i < 8; i++)
+            p->times[i] = 0xFFFF;
+    }
+    p->delay = 0;
+    p->period = Script_GetKeywordValue('T', -1);
+    if (p->period >= 0)
+        p->mode = 1;
+    if (Script_SeekToKeyword('s')) {
+        p->mode = 2;
+        p->visible = Script_GetValue();
+    }
+    p->animation = Script_GetKeywordValue('E', 0);
+    Sprite_ApplyAnimation(sprite, &m->animations[p->animation]);
+    sprite->frame = p->frame + p->visible;
+    Collider_SetPosition(collider, position, 0);
+    if (Script_GetKeywordValue('v', 1))
+        sprite->flags &= ~1;
+    else
+        sprite->flags |= 1;
+    Collider_SetAttackPowerAndForce(collider, (u16)Script_GetKeywordValue('d', 10), 1);
+    {
+        int x = position->x >> 8, z = position->z >> 8;
+        if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
+            p->value = 0;
+        else {
+            int row = gTerrainMap->rows[z];
+            row += x;
+            p->value = row;
+        }
+    }
+    p->active = 1;
+    return 0;
+}
+
+int SceneIndicator_Pause(void)
+{
+    struct SceneIndicators *m = SceneIndicators_GetInstance();
+    int id;
+    struct SceneIndicator *p;
+    if (!m)
+        return -1;
+    id = Script_GetKeywordValue('n', 0);
+    if (!id)
+        return -1;
+    p = SceneIndicators_FindById(m, id);
+    if (!p)
+        return -1;
+    p->disabled = 1;
+    p->visible = 0;
+    IndicatorSprite_SetFrame(&p->sprite, p->frame);
+    return 0;
+}
+
+int SceneIndicator_Resume(void)
+{
+    struct SceneIndicators *m = SceneIndicators_GetInstance();
+    int id;
+    struct SceneIndicator *p;
+    if (!m)
+        return -1;
+    id = Script_GetKeywordValue('n', 0);
+    if (!id)
+        return -1;
+    p = SceneIndicators_FindById(m, id);
+    if (!p || !p->disabled)
+        return -1;
+    p->disabled = 0;
+    switch (p->mode) {
+        case 0:
+            p->index = 0;
+            break;
+        case 1:
+            p->delay = 0;
+            break;
+        case 2:
+            p->visible = 1;
+            IndicatorSprite_SetFrame(&p->sprite, p->frame + 1);
+            break;
+    }
+    return 0;
+}

@@ -30,6 +30,8 @@ import subprocess
 import sys
 from concurrent.futures import ThreadPoolExecutor
 
+from source_layout import is_upstream, source_paths
+
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 AGBCC = os.path.join(ROOT, "build", "scope", "agbcc", "gcc", "agbcc")
 CPP = ["cc", "-E"] if sys.platform == "darwin" else ["cpp"]
@@ -143,13 +145,7 @@ def unit(src: str) -> list[tuple[str, str, int, str, str]]:
 
 
 def units() -> list[str]:
-    out = []
-    for base, _, names in os.walk(os.path.join(ROOT, "src")):
-        for n in names:
-            rel = os.path.relpath(os.path.join(base, n), ROOT)
-            if n.endswith(".c") and not rel.startswith("src/lib/"):
-                out.append(rel)
-    return sorted(out)
+    return [os.path.relpath(path, ROOT) for path in source_paths(ROOT) if not is_upstream(path)]
 
 
 def tree(jobs: int = 8) -> dict[tuple[str, int, str], set[str]]:

@@ -4,7 +4,7 @@ This contiguous subsection contains two 24-byte record encoders and decoders,
 six-bit packing helpers, seeded masking and four-row display formatting.
 Static callers confirm the connection to the message-menu and password systems;
 there are no new emulator execution claims. The alternate decoder is used by
-NameEntry_DecodeAndValidate in src/password.c after version/checksum validation.
+NameEntry_DecodeAndValidate in src/menus/password_decoding/password.c after version/checksum validation.
 The first encoder and row formatter feed MessageMenu_Initialize.
 
 This batch adds six exact functions and **0.088 percentage points** (2,136 bytes):
@@ -54,7 +54,7 @@ matches the game's paired glyph strings; the early zero checks remain explicit.
 The first encoder explicitly clamps most scaled fields using unsigned comparisons,
 so negative results saturate to the field maximum. The alternate encoder delegates
 the bound to WriteBits. Decoders restore the shifts on +538, +520 and +51C.
-Other gameplay meanings remain unnamed; include/game_state.h now records the
+Other gameplay meanings remain unnamed; include/system/game_state/game_state.h now records the
 observed scalar types while preserving the established offsets.
 
 ## Masking, checksums and display

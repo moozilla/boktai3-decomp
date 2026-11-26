@@ -1,0 +1,14 @@
+#include "engine/shared/global.h"
+
+void Effect_Remove(u8 *);
+
+void Player_DestroyConvergingParticles(u8 *p)
+{
+    u8 *q = p + 0x9B0;
+    s32 i;
+
+    for (i = 3; i >= 0; i--) {
+        Effect_Remove(q);
+        q += 0x34;
+    }
+}

@@ -106,7 +106,7 @@ and secondary reloads before suggesting allocation priority or spill rotation.
 
 ## Shared source and recovered behavior
 
-`include/player_cue_sequence.h` supplies ordinary sprite/sequence stepping and
+`include/player/player_cue/player_cue_sequence.h` supplies ordinary sprite/sequence stepping and
 its cycle-completion variant. It reuses `ContactSwarmSprite`,
 `DisplaySequenceState` and `DisplaySequenceControl`. The fade callers keep the
 same stored increment and duration semantics; no command reads require volatile

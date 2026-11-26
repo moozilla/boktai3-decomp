@@ -3,8 +3,8 @@
 Tags: #tether-actor #unit #matching #types
 
 Range: **080485FC–0804D620**, end exclusive. Identity remains tentative.
-The 113 source files are consolidated in ROM order in `src/tether_actor.c`;
-shared layouts remain in `include/tether_actor.h`. No shared documentation,
+The 113 source files are consolidated in ROM order in `src/field/tether_actor/tether_actor.c`;
+shared layouts remain in `include/field/tether_actor/tether_actor.h`. No shared documentation,
 symbol-name table, generated assembly, or git metadata is edited.
 
 ## Types and contracts
@@ -75,7 +75,7 @@ No new gap functions or newly exact functions. Exact coverage is unchanged
   (**+0.000 percentage points**; 17,356 exact C bytes).
 - Guarded draft scores recorded in ROM order: **64.8%, 29.5%, 65.6%, 67.9%,
   82.9%**. Drafts remain excluded from exact credit.
-- `tools/depin.py src/tether_actor.c --write`: **136 → 136 existing hints**.
+- `tools/depin.py src/field/tether_actor/tether_actor.c --write`: **136 → 136 existing hints**.
 - Rough check effort: 113 initial per-file checks, about 45 draft checks,
   26 direct-field trials, 136 hint-removal trials and combined-unit checks.
 - `tools/progress.py`: matching count and bytes unchanged; no coverage loss.

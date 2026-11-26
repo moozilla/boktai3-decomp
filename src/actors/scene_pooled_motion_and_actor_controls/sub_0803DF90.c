@@ -1,0 +1,112 @@
+#include "engine/shared/scene_pool.h"
+
+s32 ScenePool_SelectStateAtPositionLimit(struct ScenePoolEntry *);
+s32 ScenePool_ResumeAfterIdle(void *, struct ScenePoolEntry *);
+void ScenePool_UpdateSpeedPulse(struct ScenePoolActor *, struct ScenePoolEntry *,
+                                const struct ScenePoolSpeedBounds *);
+extern const struct ScenePoolSpeedBounds gUnk_0860588C[];
+static inline void Enter(struct ScenePoolEntry *entry, u32 state, u32 zero)
+{
+    entry->state = state;
+    entry->stateFrame = zero;
+    entry->stateEntered = 1;
+    Memory_Clear(entry->history, 0x100);
+}
+s32 ScenePool_StateTrackAdaptive(void *manager, struct ScenePoolActor *actor,
+                                 struct ScenePoolEntry *entry)
+{
+    u32 *history = entry->history;
+    u32 flag;
+    if (entry->stateEntered) {
+        entry->stateEntered = 0;
+        history[0] = 0;
+        entry->speedControlActive = 0;
+        entry->turnStep = 0x200;
+    }
+    if (ScenePool_SelectStateAtPositionLimit(entry))
+        return 0;
+    if (ScenePool_ResumeAfterIdle(actor, entry))
+        return 0;
+    ScenePoolActor_SetStateFlags(actor, 0x10);
+    ScenePool_UpdateSpeedPulse(actor, entry, gUnk_0860588C);
+    if (entry->speedControlActive) {
+        u32 *controls = &actor->controlFlags;
+        u32 value = *controls;
+        if (!(value & 0x200)) {
+            s32 metric = entry->direction;
+            s32 absolute = metric;
+            if (metric < 0)
+                absolute = -absolute;
+            if (absolute > 0x1e000) {
+                s32 lateral = entry->unknown5c;
+                s32 magnitude = lateral;
+                if (lateral < 0)
+                    magnitude = -magnitude;
+                if (magnitude > 0xa000) {
+                    if (lateral > 0)
+                        *controls = value | 0x80;
+                    else
+                        *controls = value | 0x40;
+                }
+            } else {
+                s32 lateral = entry->unknown5c;
+                s32 magnitude = lateral;
+                if (lateral < 0)
+                    magnitude = -magnitude;
+                if (magnitude <= 0x9fff) {
+                    if (lateral > 0)
+                        *controls = value | 0x40;
+                    else
+                        *controls = value | 0x80;
+                }
+            }
+        }
+        history[0]++;
+    } else
+        history[0] = 0;
+    flag = ScenePool_PlayerHasFlag(2);
+    if (!flag && history[0] > 9) {
+        switch (entry->kind) {
+            case 0:
+            case 1:
+                Enter(entry, 5, flag);
+                break;
+            case 2:
+                if (entry->mode == 0)
+                    Enter(entry, 5, flag);
+                else
+                    Enter(entry, 7, flag);
+                break;
+            case 3:
+                Enter(entry, 7, flag);
+                break;
+        }
+        return 0;
+    }
+    if (entry->stateFrame > 239) {
+        flag = ScenePool_PlayerHasFlag(2);
+        if (flag) {
+            s32 sample;
+            gRandomIndex = (gRandomIndex + 1) & 0x3ff;
+            sample = *((u8 *)RANDOM_TABLE_ADDR + (gRandomIndex << 1));
+            if (sample <= 127) {
+                entry->state = 2;
+                entry->stateFrame = 0;
+                entry->stateEntered = 1;
+                Memory_Clear(entry->history, 0x100);
+            } else {
+                entry->state = 0;
+                entry->stateFrame = 0;
+                entry->stateEntered = 1;
+                Memory_Clear(entry->history, 0x100);
+            }
+        } else if (entry->direction > 0) {
+            Enter(entry, 1, flag);
+        } else {
+            Enter(entry, 2, flag);
+        }
+        return 0;
+    }
+    entry->stateFrame++;
+    return 0;
+}

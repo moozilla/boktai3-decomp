@@ -1,7 +1,7 @@
 # Cloud task 08122DF4
 
 * `08122DF4` (`SequencedSprite_StepAnimation`) and `08126170` (`DriftingSprite_Update`) both inline the
-  display-sequence Step that `SceneParticleBurst_UpdateSlot` and `include/route_sprite_playback.h` also use.
+  display-sequence Step that `SceneParticleBurst_UpdateSlot` and `include/actors/route_sprite_actor_pool/route_sprite_playback.h` also use.
   Start any `ldrh [rS, #8]; lsls #1; ldr [..]; ... ands #0x30; lsrs #4` function from those.
   Two details mattered:
   * the sprite pointer is a separate variable from the object pointer (`adds r5, r7, #0`);
