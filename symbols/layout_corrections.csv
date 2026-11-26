@@ -43,7 +43,7 @@ src/engine/scene_state_and_spatial_queries/sub_0806F1B0.c,src/engine/video/wrapp
 src/engine/scene_state_and_spatial_queries/sub_0806F1D0.c,src/engine/video/fill_tilemap_rectangle.c,"Wrapped BG tilemap fill, using the same cell routine."
 src/engine/scene_state_and_spatial_queries/sub_0806F218.c,src/system/game_state/pile_driver_counters.c,"0016→6195. Pile Driver proc 6192 calls 8954 to increment persistent counters, independently of the room loader."
 src/engine/scene_state_and_spatial_queries/sub_0806F2CC.c,src/system/game_state/new_game_fields.c,New game GCL 541 calls 23F4. It resets persistent challenge flags and record fields.
-src/field/actor_group,src/objects/loot_deposits,0029→3905. F1F9 key loads 9385 and breaks after sword strikes. Its result callback 1133 rolls an item drop. Merge the hit feedback unit.
+src/field/actor_group,src/objects/loot_deposits,0029→3905. Sword hits break the F1F9 asset 9385. The original drop script creates a visible item when the drop roll succeeds. Merge the hit feedback unit.
 src/field/bouncing_object_pool,src/objects/bouncing_bombs,Nidhoggr’s grid attack calls the bomb pool at frame 1921. Dark spheres bounce across active floor tiles and the pool’s removal callback triggers the explosions. The same pool is reached from Mummy and Ratatosk projectile code.
 src/field/breakable_props,src/objects/quest_barriers,0029→3931. 3DB0 E912 and sprite 474D shatter and unlock the Trinity scene when the recorded task is triggered. Other scenes supply different barrier sprites.
 src/field/cell_traversal_gates,src/objects/passage_barriers,0042→4755. GCL 71BA controls edge passage along the Wind Cannon row. Live approach clears the collision boundary and starts traversal.

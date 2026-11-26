@@ -1066,3 +1066,20 @@ The matched screenshots differ only around the bike and rider.
 The early and middle OBJ palette dumps differ in the banks used
 by those draws. At `finished.png` both the palette and the
 screenshot match the no-fade run exactly.
+
+### White Forest deposit item drop
+
+Tags: loot deposits, White Forest, F1F9, item drop
+
+Repeat the 0029 strike tape at 3905 as in
+`resume-quarry-matched-drop/commands.txt`. Immediately after
+`hit05.png` at frame 2051, set script counter `r708[0xE1]`
+to 17. The deposit still takes the original sword damage.
+The counter guarantees the drop branch for this configured
+loot. At frame 2056, the F1F9 slot calls proc 1133.
+At frame 2057, the original 0955 command reaches
+`Trigger_CreateDropFromScript`. The deposit disappears and
+a red drop remains in `hit07.png`. The earlier control used the
+same attack tape and lacked the drop from this slot.
+This verifies the loot-deposit role. The path describes that
+role while its exact in-game label remains unknown.
