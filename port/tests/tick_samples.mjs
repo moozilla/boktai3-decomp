@@ -1,11 +1,23 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { compareSamples } from '../../tools/autopilot/lib/tick-samples.mjs';
+import { compareSamples, readPressedKeys } from '../../tools/autopilot/lib/tick-samples.mjs';
 
 const rom = Buffer.from([9, 12, 10]);
 const portSamples = [...rom].map((byte) => Buffer.of(byte));
 const fields = [{ name: 'scene', size: 1 }];
 const frames = [16, 17, 18];
+
+test('KEYINPUT decodes active-low button bits and ignores the unused bits', () => {
+  const read = (value) => readPressedKeys({
+    getUint16(address, littleEndian) {
+      assert.equal(address, 0x04000130);
+      assert.equal(littleEndian, true);
+      return value;
+    },
+  });
+  assert.equal(read(0x03ff), 0);
+  assert.equal(read(0xfdf6), 0x0209);
+});
 
 test('a shifted controller read fails even with matching RAM and tick counts', () => {
   assert.equal(compareSamples(rom, portSamples, fields, frames, [0, 8, 0], [0, 8, 0]), null);

@@ -68,3 +68,9 @@ total poll count and failed at tick 1690. The ROM script and capture
 agreed byte for byte with the verified replay. The 13 unmodified
 recordings passed in 109.8 seconds using two workers and retained ROM
 samples. A focused seeded run also matched its earlier samples.
+
+The comparison samples the emulated KEYINPUT register at each port poll.
+Recorded fixtures check it against their fixed tick masks, and seeded runs
+check it against the host masks sent to the ROM. All 13 recordings passed
+in 102.6 seconds using the existing ROM samples. The shifted input still
+failed at tick 1690, and checkpoint 0065 seed 1 matched all 4,850 ticks.

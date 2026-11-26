@@ -8,7 +8,7 @@ import { setFlagsFromString } from 'node:v8';
 import { openSession } from '../../port/agent/session.mjs';
 import { root, rom, clock, lux, holdTicks, runRom } from './lib/rom.mjs';
 import { replayAgainstRom } from './lib/rom-reference.mjs';
-import { compareSamples } from './lib/tick-samples.mjs';
+import { compareSamples, readPressedKeys } from './lib/tick-samples.mjs';
 
 // A wasm fault must reach the catch below so we can replay its input prefix.
 // On this host Node's signal-based bounds checks can exit with SIGBUS instead.
@@ -47,7 +47,7 @@ fs.mkdirSync(romOut, { recursive: true });
 const inputs = path.join(out, 'inputs.jsonl');
 fs.writeFileSync(inputs, '');
 
-const readFrames = [], reads = [], samples = [];
+const readFrames = [], requestedReads = [], reads = [], samples = [];
 const boots = [], equipmentDetails = [];
 const missingReturns = new Set();
 const auditPath = path.join(root, 'build/port/game/missing_returns.txt');
@@ -72,9 +72,11 @@ const s = await openSession({
       if (g.types.functions[name]) g.on(name, () => missingReturns.add(name), { once: true });
     }
     g.on('Input_UpdatePadStates', () => {
+      const ram = new DataView(session.memory.buffer);
       readFrames.push(session.frame);
-      reads.push(session.movie[session.frame] ?? 0);
-      samples.push(sample(session.memory.buffer, regions));
+      requestedReads.push(session.movie[session.frame] ?? 0);
+      reads.push(readPressedKeys(ram));
+      samples.push(sample(ram, regions));
     });
   },
 });
@@ -133,7 +135,7 @@ fs.writeFileSync(path.join(out, 'movie.json'), JSON.stringify(run));
 const script = path.join(out, 'harness.txt');
 const spec = regions.map(({ address, offset, size }) =>
   `${address.toString(16)}${offset === undefined ? '' : '+' + offset.toString(16)}:${size.toString(16)}`).join(',');
-const romReads = expectedReads ?? reads;
+const romReads = expectedReads ?? requestedReads;
 const lines = ['trace off', `rtc ${Date.parse(clock) / 1000}`, `lux ${lux}`, `fasttick ${tick.toString(16)}`,
   `tickdump ticks 0:${Math.max(1, romReads.length)} ${spec}`, ...holdTicks(romReads)];
 fs.writeFileSync(script, lines.join('\n') + '\n');
@@ -147,10 +149,10 @@ try {
     expectedBytes: romReads.length * regions.reduce((length, region) => length + region.size, 0),
     run: () => runRom(script, romOut, { save, render: false, timeout: 480_000 }),
   });
-  difference = compareSamples(ticks, samples, regions, readFrames, reads, expectedReads);
+  difference = compareSamples(ticks, samples, regions, readFrames, reads, romReads);
 } catch (error) {
   const partial = fs.existsSync(romSamples) &&
-    compareSamples(fs.readFileSync(romSamples), samples, regions, readFrames, reads, expectedReads);
+    compareSamples(fs.readFileSync(romSamples), samples, regions, readFrames, reads, romReads);
   difference = { ...partial, error: String(error) };
 }
 const result = { save: run.save, seed: run.seed, ticks: reads.length, frames: movie.length, firstCheck, boots,
@@ -186,13 +188,12 @@ function inRam(a, n) {
   return (a >= 0x02000000 && a + n <= 0x02040000) || (a >= 0x03000000 && a + n <= 0x03008000);
 }
 
-function sample(memory, fields) {
-  const ram = new DataView(memory);
+function sample(ram, fields) {
   return Buffer.concat(fields.map(({ address, offset, size }) => {
     const base = offset === undefined ? address : ram.getUint32(address, true);
     const start = base + (offset ?? 0);
     if (!inRam(base, 1) || !inRam(start, size)) return Buffer.alloc(size);
-    return Buffer.from(new Uint8Array(memory, start, size));
+    return Buffer.from(new Uint8Array(ram.buffer, start, size));
   }));
 }
 
