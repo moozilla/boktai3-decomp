@@ -32,5 +32,6 @@ struct Dog {
     struct ContactPosition destination;
     struct ContactPosition leapTarget; /* where the leap lands: the player when it starts */
 };
+typedef char DogSize[(sizeof(struct Dog) == 0x6E0) ? 1 : -1];
 
 #endif // GUARD_DOG_H

@@ -2101,18 +2101,11 @@ void SceneActorControl_CompleteBlinkOut(struct ChaseActor *actor, s32 frame)
 
 /* This class's own copies of the shared chase inlines it compiles differently. */
 
-/* The reaction fields overlap the canonical actor's species storage. */
-
-union DogReactionContext {
-    struct ChaseActor base;
-    struct Dog reaction;
-};
-
 /* React to contact, pursue the target, or select a delayed cardinal turn. */
 
 s32 Dog_ChooseReactionBehavior(struct ChaseActor *a)
 {
-    union DogReactionContext *context = a->base.context;
+    struct Dog *context = a->base.context;
     struct SceneActorChaseGroup *group = &a->group;
     if (a->base.reactionSoundVariant == 0)
         Sound_PlaySong(0x211);
@@ -2126,7 +2119,7 @@ s32 Dog_ChooseReactionBehavior(struct ChaseActor *a)
         SceneActorChase_SetControl(a, a->base.onReaction, 18);
         SceneActorChase_SetState(a, 3, 0, 0);
         SceneActorChase_ClearWordFlags(&a->base.statusFlags, 0x1000000);
-        SceneActorChase_ClearWordFlags(&context->reaction.flags, 8);
+        SceneActorChase_ClearWordFlags(&context->flags, 8);
         return 1;
     }
     SceneActorChase_ClearMotionFlags(a, 0x20);
@@ -2151,7 +2144,7 @@ s32 Dog_ChooseReactionBehavior(struct ChaseActor *a)
             SceneActorChase_SetBehavior(a, 12);
             return 1;
         }
-        if (context->reaction.turnDelay)
+        if (context->turnDelay)
             return 1;
         SceneActorChase_SetControl(a, SceneActorControl_OnIdle, 16);
         SceneActorChase_SetBehavior(a, 18);
@@ -2162,7 +2155,7 @@ s32 Dog_ChooseReactionBehavior(struct ChaseActor *a)
         {
             s32 direction = a->base.body.direction;
             a->base.body.direction = (((direction + 0xA0) & 255) >> 6) << 6;
-            context->reaction.turnDelay = 90;
+            context->turnDelay = 90;
             if ((u8)Dog_SelectRetreatDirection(a, direction))
                 return 1;
             return 0;
@@ -2752,7 +2745,7 @@ s32 Dog_OnAuxiliaryUpdate(void *actor)
 
 void SceneActorEffects_ReleaseResources(void *);
 
-s32 Dog_ReleaseResources(u8 *p)
+s32 Dog_ReleaseResources(void *p)
 {
     SceneActorEffects_ReleaseResources(p);
     return 0;
@@ -2836,7 +2829,7 @@ void Dog_SetSecondaryBehaviorPreset(struct ChaseActor *actor);
 
 s32 Dog_OnAuxiliaryUpdate(void *);
 
-s32 Dog_ReleaseResources(u8 *p);
+s32 Dog_ReleaseResources(void *p);
 
 static inline struct Dog *DogInit_Context(struct ChaseActor *actor)
 {
@@ -2861,7 +2854,7 @@ static inline void DogInit_InstallCompletionCallbacks(struct ChaseActor *actor)
 {
     actor->base.onMessage = SceneActorScript_OnCommand;
     actor->base.update = (SceneActorResultCallback)Dog_OnAuxiliaryUpdate;
-    actor->base.destroy = (SceneActorResultCallback)Dog_ReleaseResources;
+    actor->base.destroy = Dog_ReleaseResources;
 }
 
 s32 Dog_Init(void *object)
@@ -2994,12 +2987,12 @@ void Heap_Free(void *);
 
 void Dog_Create(void)
 {
-    u8 *p = Heap_Alloc(0x6e0);
-    if (p != 0) {
-        Memory_Clear(p, 0x6e0);
-        if (Dog_Init(p) < 0) {
-            Dog_ReleaseResources(p);
-            Heap_Free(p);
+    struct Dog *dog = Heap_Alloc(sizeof(*dog));
+    if (dog != NULL) {
+        Memory_Clear(dog, sizeof(*dog));
+        if (Dog_Init(dog) < 0) {
+            Dog_ReleaseResources(dog);
+            Heap_Free(dog);
         }
     }
 }
