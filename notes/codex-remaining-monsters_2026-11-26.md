@@ -187,3 +187,23 @@ projectile jitter index changes the random cursor load to a halfword.
 
 All seven changed units passed stock checks. The four objects cleared
 three printed warnings and three weighted constant uses.
+
+## Counted cannon and Poison Hand loops
+
+Garmr Statue, Poison Hand, Vulcan Cannon, and Wind Cannon use counted
+loops for their fixed hit-spark bursts. Garmr passes the native volley
+velocity directly and adjusts the defeat effect height in place. Poison
+Hand uses the shared velocity vector and passes the palette and attributes
+directly in its first emergence effect call. The later call still needs the
+matching staged form. The direct occupied-slot gate moves mask generation
+before the pause branch.
+
+Vulcan reads its defeat facing byte and the random table through their
+native members and symbol. The late targeting zero still affects CSE and
+allocation. Wind uses counted loops for the active and free-slot scans.
+The active scan matches when the pointer initialization precedes the slot
+index. Direct array indexing changes address allocation. The free-slot
+scan tests its occupied bit directly.
+
+All eleven changed units matched. These objects cleared one diagnostic
+line and three weighted constant uses.
