@@ -12,7 +12,6 @@ void SceneActorAnimation_SelectDirectionalExtraFlags(struct RoomActor *actor, s3
     u8 *variantPointer = &directionVariant;
     u32 flags;
     u32 entryFlags;
-    u8 *variantReload;
     u16 variant;
     u32 force;
     u8 *restart;
@@ -28,7 +27,6 @@ void SceneActorAnimation_SelectDirectionalExtraFlags(struct RoomActor *actor, s3
             *variantPointer = quadrant;
         }
     }
-    variantReload = &directionVariant;
     variant = 0;
     flags = *mirrorPointer | extraFlags;
     entryFlags = entry->flags;
