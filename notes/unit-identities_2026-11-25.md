@@ -1318,3 +1318,31 @@ selection variables. Their merchant dialogue entry points in the field
 remain outside these captures. Stock paths 1 and 2 reach the original
 constructor and transaction controls after Continue without live-memory
 changes. The updated prefix table records the five constructor names.
+
+## Town cast kind numbers
+
+Tags: NPC, 8EA3, Smith, Violet, Coffin Shopkeeper, Coach, Elefan, renderer
+
+`build/identify/resume3/cast_bank.py` opens each stock snapshot with
+SceneCharacter display coverage, records the live actor and drawable
+addresses, and reads the variant byte at +01 and script ID at +5C.
+This makes it possible to check the role in the current scene even when
+the constructor ran earlier. Named dialogue replays then invoke the
+original interaction procedures on the existing actors.
+
+```sh
+build/venv/bin/python build/identify/resume3/cast_bank.py 0000 0009 0012 0013 0014 0026 0029 0038 0046 0068 0069
+build/venv/bin/python build/identify/resume3/cast_named.py coach elefan violet coffin-shopkeeper smith
+```
+
+| Kind | Actor | Live evidence |
+|---|---|---|
+| 15 | Smith | 0007→2126. Proc 2108 places 6740 and loads DFCE. Original dialogue proc 2115 shows the forge character and portrait in `resume3-smith/opened.png`. The initial label calls him a middle-aged man. Later text #3220 identifies him as Smith. |
+| 19 | Violet | 0006→2537. Proc 2488 calls 8796, places 6773 and loads DFFE. The renderer submits 0200F464 from the actor at 0200F364. Proc 2490 opens the Sumire portrait and names her in `resume3-violet/line1.png`. |
+| 22 | Coffin Shopkeeper | Same room. Proc 2488 places 571D and loads E03E. Drawable 0200E8D4 comes from active actor 0200E7D4. Proc 2502 opens his named portrait and customization menu in `resume3-coffin-shopkeeper/opened.png`. |
+| 24 | Coach | Stock 0000→2201. DAE5 runs display from 0200E434 and submits 0200E534. Proc 2179 opens the named Coach portrait at text #3402. See `resume3-coach/opened.png`. |
+| 43 | Elefan | Same garage. Proc 2200 places BEB1 and binds interaction 2187. Live actor 0200F394 submits 0200F490. Original proc 2187 leads to named text #5043 in `resume3-elefan/opened.png`. |
+
+Kinds 27–29 are covered in the earlier story-cast section. The stock scan
+also finds active callbacks for kinds 9, 17, and 20 without a tied visible
+drawable in the sampled frames. Leave their individual names open.
