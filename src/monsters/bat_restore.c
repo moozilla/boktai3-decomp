@@ -1,3 +1,4 @@
+#include "scene/actor/scene_actor_drawable_flags.h"
 #include "global.h"
 #include "player/player.h"
 #include "scene/actor/scene_actor_reaction.h"
@@ -33,17 +34,7 @@ void Bat_RestoreSavedState(struct ChaseActor *actor)
     s32 health;
     if (SceneActorReaction_TakePrepared(actor)) {
         ActorShadow_Enable(actor->base.shadow);
-        if (!actor->base.drawableKind) {
-            u32 *q =
-                &((struct SceneActorAnimationSequenceDrawable *)actor->base.drawable)->sprite.flags;
-            u32 mask = ~1;
-            *q = mask & *q;
-        } else {
-            struct AnimSprite *q =
-                &((struct SceneActorAnimationTileDrawable *)actor->base.drawable)->tile;
-            u32 mask = ~1;
-            q->flags = mask & q->flags;
-        }
+        ActorStatus_SetBodyBit(actor, 0);
         SceneActorReaction_BeginRevival(&actor->base, 1);
     }
     {
