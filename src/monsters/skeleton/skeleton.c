@@ -1,3 +1,4 @@
+#include "scene/motion/scene_actor_availability.h"
 #include "monsters/skeleton/skeleton.h"
 #include "monsters/golem/golem.h"
 #include "scene/collision/scene_actor_contact_response.h"
@@ -240,15 +241,6 @@ static inline u8 sameRegion(u16 *region)
     return 0;
 }
 
-static inline u8 unavailable(struct ChaseActor *actor)
-{
-    if (actor) {
-        if (SceneActorContact_MotionFlags(actor, 0x40) || SceneActorChase_StatusFlags(actor, 0x20000) || actor->base.health <= 0)
-            return 1;
-    }
-    return 0;
-}
-
 static inline u32 test(u32 mask, u32 flags)
 {
     return mask & flags;
@@ -280,7 +272,7 @@ s32 Skeleton_UpdateBehaviorCallbacks(struct ChaseActor *actor)
             SceneActorPlacement_HideActor(actor, 0);
             return 0;
         }
-        if (!unavailable(actor) && !pending(state)) {
+        if (!SceneActor_ActionsBlocked(actor) && !pending(state)) {
             if (!(u8)Callback_InvokeActor(actor, actor->base.onDamage))
                 Callback_InvokeActor(actor, block->fallback);
         }
