@@ -616,6 +616,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [notes/scene-arc-effects_2026-10-13.md](../notes/scene-arc-effects_2026-10-13.md) | Scene arc slots and projected ground effects (tentative) | *#scene* | 4 |
 | [notes/scene-area-collision-camera-cleanup_2026-11-26.md](../notes/scene-area-collision-camera-cleanup_2026-11-26.md) | Scene area, collision, lifecycle, and camera cleanup | #matching #types #phase3 #scene #camera | 3 |
 | [notes/scene-attachment-palette-pool-cleanup_2026-11-26.md](../notes/scene-attachment-palette-pool-cleanup_2026-11-26.md) | Scene attachment, palette, and pool cleanup | #matching #types #phase3 #scene | 2 |
+| [notes/scene-camera-receiver-and-reaction-owner_2026-11-26.md](../notes/scene-camera-receiver-and-reaction-owner_2026-11-26.md) | Scene camera receiver and registered reaction owner | #matching #types #phase3 #scene #camera | 2 |
 | [notes/scene-contact-pool-start_2026-11-01.md](../notes/scene-contact-pool-start_2026-11-01.md) | scene-contact-pool-start_2026-11-01.md | *#scene #assets* | 0 |
 | [notes/scene-departure-display_2026-11-01.md](../notes/scene-departure-display_2026-11-01.md) | Scene departure display | *#scene* | 1 |
 | [notes/scene-panel-background_2026-10-14.md](../notes/scene-panel-background_2026-10-14.md) | Scene panel background effects and overlay setup | *#scene #panel* | 2 |
