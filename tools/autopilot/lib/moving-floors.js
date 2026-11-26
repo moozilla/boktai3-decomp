@@ -38,17 +38,36 @@ exports.planMovingFloor = (grid, here, goals, gaps, floors) => {
     return CARDINAL.map(([dx, dz]) => grid.at(x + dx, z + dz))
       .filter((cell) => cell?.open && cell.level === (y >> 8) && !gaps.has(`${cell.x},${cell.z}`));
   };
-  let best;
+  const trips = [];
   for (const { floor, points, y } of floors) for (let i = 0; points.length > 1 && i < points.length; i++) {
     const board = points[i], arrival = points[(i + 1) % points.length];
     for (const launch of sides(board, y)) {
-      const approach = exports.findPath(grid, here, new Set([`${launch.x},${launch.z}`]), gaps);
+      for (const leave of sides(arrival, y)) trips.push({ floor, launch, board, arrival, leave });
+    }
+  }
+  const pending = [{ position: here, cost: 0 }], costs = new Map([[here.join(','), 0]]);
+  let best;
+  while (pending.length) {
+    pending.sort((a, b) => a.cost - b.cost);
+    const state = pending.shift();
+    if (state.cost !== costs.get(state.position.join(','))) continue;
+    if (best && state.cost >= best.cost) break;
+    if (state.first) {
+      const finish = exports.findPath(grid, state.position, goals, gaps);
+      const cost = finish && state.cost + finish.length;
+      if (cost && (!best || cost < best.cost)) best = { ...state.first, cost };
+    }
+    const approaches = new Map();
+    for (const trip of trips) {
+      const launch = `${trip.launch.x},${trip.launch.z}`;
+      if (!approaches.has(launch)) approaches.set(launch, exports.findPath(grid, state.position, new Set([launch]), gaps));
+      const approach = approaches.get(launch);
       if (!approach) continue;
-      for (const leave of sides(arrival, y)) {
-        const finish = exports.findPath(grid, [leave.x, leave.z], goals, gaps);
-        const cost = finish && approach.length + finish.length;
-        if (cost && (!best || cost < best.cost)) best = { floor, launch, board, arrival, leave, cost };
-      }
+      const position = [trip.leave.x, trip.leave.z], key = position.join(',');
+      const cost = state.cost + approach.length + Math.ceil(Math.hypot(trip.arrival.x - trip.board.x, trip.arrival.z - trip.board.z) / 256);
+      if (cost >= (costs.get(key) ?? Infinity)) continue;
+      costs.set(key, cost);
+      pending.push({ position, cost, first: state.first ?? trip });
     }
   }
   return best;
@@ -101,4 +120,17 @@ exports.approachMovingFloor = function* (boxName, opts = {}) {
     yield g.press(0, 1);
   }
   return { gaps, done, reason, name: floor.name, board, arrival, leave: [leave.x, leave.z] };
+};
+
+exports.crossMovingFloors = function* (box, opts) {
+  let transit;
+  for (let i = 0; i < 12; i++) {
+    transit = yield* exports.approachMovingFloor(box, opts);
+    if (transit?.name !== undefined) {
+      const { gaps, ...trip } = transit;
+      opts.trace?.(trip);
+    }
+    if (!transit?.done) break;
+  }
+  return transit?.gaps;
 };

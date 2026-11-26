@@ -20,7 +20,7 @@ import { spawnSync } from 'node:child_process';
 import { openSession, png } from '../../port/agent/session.mjs';
 import { tickAt } from './movie-index.mjs';
 import { distanceFromEntrance, routeDistances } from './route-entrances.mjs';
-import { higherReturn } from './higher-landings.mjs';
+import { landingReturn } from './higher-landings.mjs';
 
 const ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname), '../..');
 const args = process.argv.slice(2);
@@ -183,7 +183,7 @@ const GOALS = {
         if (reached()) { rooms--; continue; }
       }
       const here = L.where().scene;
-      if (landingDetour?.room === here && L.where().y >= landingDetour.height) {
+      if (landingDetour?.room === here && (landingDetour.descending ? L.where().y <= landingDetour.height : L.where().y >= landingDetour.height)) {
         UNREACHABLE.delete(`${here}:${landingDetour.box}`);
         landingDetour = undefined;
       }
@@ -408,8 +408,8 @@ const GOALS = {
           }
           const edge = `${here}:${d.box}`;
           const floor = L.where().y;
-          const alternate = !keyGoal && !landingDetour && routeGoal >= 0 && d.y > floor &&
-            higherReturn(STAGES, stageOf(here), d, floor, (scene) => distancesTo(scene, edge));
+          const alternate = !keyGoal && !landingDetour && routeGoal >= 0 && d.y !== floor &&
+            landingReturn(STAGES, stageOf(here), d, floor, (scene) => distancesTo(scene, edge));
           if (yield* throughDoor(g, L, d.box, { alternateLanding: Boolean(alternate) })) { UNREACHABLE.delete(edge); moved = true; break; }
           if (L.where().scene === here) UNREACHABLE.add(edge);
           if (L.where().scene !== here) { moved = true; break; }
@@ -521,11 +521,7 @@ function* throughDoor(g, L, box, { stopIf, alternateLanding } = {}) {
   }
   let fights = 0;
   for (let attempt = 0; attempt < 6; attempt++) {
-    const floor = yield* L.approachMovingFloor(box, { avoid });
-    if (floor?.name !== undefined) {
-      const { gaps, ...trip } = floor;
-      event({ skill: 'moving-floor', box, ...trip });
-    }
+    const floorGaps = yield* L.crossMovingFloors(box, { avoid, trace: (trip) => event({ skill: 'moving-floor', box, ...trip }) });
     const initial = new Set(L.fightTargets().map((t) => t.addr));
     const life = () => g.$.gPlayers[0]?.currentStatA ?? 0;
     const lifeBefore = life();
@@ -535,7 +531,7 @@ function* throughDoor(g, L, box, { stopIf, alternateLanding } = {}) {
       return targets.some((t) => t.boss || t.barrier || !initial.has(t.addr)) ||
         (targets.length && lifeBefore - life() >= lossBudget);
     };
-    const r = yield* L.navigate(box, { avoid, avoidCells: floor?.gaps, stopIf: interrupted, trace: (e) => event({ skill: 'nav', ...e }) });
+    const r = yield* L.navigate(box, { avoid, avoidCells: floorGaps, stopIf: interrupted, trace: (e) => event({ skill: 'nav', ...e }) });
     event({ skill: 'navigate', box, ...r, from: scene });
     if (r.reached) return true;
     if (alternateLanding && r.reason === 'no path') return false;

@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { higherReturn } from './higher-landings.mjs';
+import { landingReturn } from './higher-landings.mjs';
 import fs from 'node:fs';
 import test from 'node:test';
 import { distanceFromEntrance, routeDistances } from './route-entrances.mjs';
@@ -105,7 +105,19 @@ test('a moving floor links reachable solid landings across authored gap cells', 
   const board = { x: 384, z: 128 }, arrival = { x: 640, z: 128 }, floor = {};
   assert.equal(lib.findPath(grid, [0, 0], goals, gaps), null);
   assert.deepEqual(lib.planMovingFloor(grid, [0, 0], goals, gaps, [{ floor, points: [arrival, board], y: 768 }]),
-    { floor, launch: cells[0], board, arrival, leave: cells[3], cost: 3 });
+    { floor, launch: cells[0], board, arrival, leave: cells[3], cost: 4 });
+});
+
+test('moving floor planning selects the first ride when the goal needs two', () => {
+  const lib = skill('moving-floors', {}, {}, skill('world', {}));
+  const cells = Array.from({ length: 8 }, (_, x) => ({ x, z: 0, open: true, level: 3 }));
+  const grid = { at: (x, z) => z === 0 ? cells[x] : undefined };
+  const point = (x) => ({ x: x * 256 + 128, z: 128 });
+  const floors = [{ floor: 'left', points: [point(1), point(2)], y: 768 },
+    { floor: 'right', points: [point(4), point(5)], y: 768 }];
+  const goals = new Set(['7,0']), gaps = new Set(['1,0', '2,0', '4,0', '5,0']);
+  assert.equal(lib.planMovingFloor(grid, [0, 0], goals, gaps, floors).floor, 'left');
+  assert.equal(lib.planMovingFloor(grid, [3, 0], goals, gaps, floors).floor, 'right');
 });
 
 test('a lock tracks its saved bit across the script bank bytes', () => {
@@ -152,8 +164,18 @@ test('a failed high door can be retried from a higher entrance reached through a
   const stages = [room, { scene: 2, doors: [{ box: 'CD22', scene: 1, entrance: 7 }] },
     { scene: 3, doors: [{ box: 'CD23', scene: 1, entrance: 9 }] },
     { scene: 4, doors: [{ box: 'CD22', scene: 1, entrance: 10 }] }];
-  assert.deepEqual(higherReturn(stages, room, highDoor, 512, (scene) => new Map([[1, scene]])),
+  assert.deepEqual(landingReturn(stages, room, highDoor, 512, (scene) => new Map([[1, scene]])),
     { room: 1, box: 'CD25', via: 3, returnBox: 'CD23', entrance: 9, height: 768, distance: 3 });
+});
+
+test('a disconnected low door can be approached from the lower landing', () => {
+  const door = { box: 'CD23', y: 256, scene: 4 };
+  const room = { scene: 1, doors: [{ box: 'CD22', y: 256 }, { box: 'CD24', y: 768 }, door],
+    entrances: [{ id: 7, box: 'CD22' }, { id: 8, box: 'CD23' }, { id: 9, box: 'CD24' }] };
+  const stages = [room, { scene: 2, doors: [{ box: 'CD23', scene: 1, entrance: 7 }] },
+    { scene: 3, doors: [{ box: 'CD24', scene: 1, entrance: 9 }] }];
+  assert.deepEqual(landingReturn(stages, room, door, 768, (scene) => new Map([[1, scene]])),
+    { room: 1, box: 'CD23', via: 2, returnBox: 'CD23', entrance: 7, height: 256, distance: 2, descending: true });
 });
 
 test('goal routing avoids a failed shortcut and learns the longer path', () => {
