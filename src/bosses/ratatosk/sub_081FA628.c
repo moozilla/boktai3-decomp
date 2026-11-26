@@ -1,0 +1,6 @@
+#include "engine/shared/global.h"
+u32 Anim_Remove(void *);
+u32 Ratatosk_RemoveAnimation(u8 *p)
+{
+    return Anim_Remove(p + 0x34c);
+}

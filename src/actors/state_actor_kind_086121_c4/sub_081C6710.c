@@ -1,0 +1,34 @@
+#include "engine/shared/global.h"
+
+extern u32 gUnk_0861218C[];
+struct S {
+    u8 pad[5];
+    u8 b5;
+    u8 b6;
+    u8 pad7[2];
+    u8 b9;
+    u8 pad2[6];
+    u32 f10;
+    u8 pad3[4];
+    u8 b18;
+    u8 pad4[0x2cc - 0x19];
+    u32 f2cc;
+};
+
+s32 StateActor_EnterPendingState(struct S *p)
+{
+    s32 r;
+    if ((u8)(p->b5 - 1) <= 0xd) {
+        u32 t = gUnk_0861218C[p->b5];
+        u8 v = p->b5;
+        p->b6 = v;
+        p->f2cc = t;
+        p->f10 = 0;
+        p->b9 = 1;
+        p->b18 = 0;
+        r = 1;
+    } else {
+        r = 0;
+    }
+    return r;
+}

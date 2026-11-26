@@ -23,7 +23,7 @@ indices 0–7 and target 0 to 8–15; mode 1 selects target 0; other modes selec
 Positions at +14, destination +1C, and burst origin +24 are packed halfwords.
 The height fields at +C/+E are current target height and desired height, while
 byte +7 is the steering countdown. All offsets and the 0x16C slot stride are
-shared in `include/contact_actor.h`.
+shared in `include/engine/shared/contact_actor.h`.
 
 Pool_Update at 08043ACC is new exact C (344 bytes, no hints). After lifetime 599,
 it requests clearing, plays song EA once, and starts fade mode 2. It updates

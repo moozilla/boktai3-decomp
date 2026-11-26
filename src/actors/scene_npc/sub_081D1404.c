@@ -1,0 +1,118 @@
+#include "engine/shared/global.h"
+#include "engine/shared/engine_globals.h"
+#include "engine/shared/ram.h"
+
+struct Pair {
+    u32 a, b;
+};
+s32 Mod(s32, s32);
+void Task_Kill(void *);
+void SceneNpc_SpawnTransitionParticle(void *, s32);
+void SceneNpc_UpdateTransitionParticles(void *);
+
+#define RAND() (gRandomTable[gRandomIndex = (gRandomIndex + 1) & 0x3FF])
+
+s32 SceneNpc_UpdateTransitionEffect(u8 *p)
+{
+    if (*(u32 *)(p + 0x74) == 0)
+        *(u32 *)(p + 0x70) += 1;
+    *(struct Pair *)(p + 0x34) = *(struct Pair *)(p + 0x60);
+    switch (*(u32 *)(p + 0x6c)) {
+        case 0:
+            *(u32 *)(p + 0x74) = 0;
+            if (*(s32 *)(p + 0x70) > 0x37) {
+                *(u32 *)(p + 0x6c) = 1;
+                *(u32 *)(p + 0x70) = 0;
+                *(u32 *)(p + 0x74) = 1;
+            }
+            break;
+        case 1: {
+            u32 t = *(u32 *)(p + 0x74);
+            const u16 *tab;
+            u32 *cur;
+            *(u32 *)(p + 0x74) = 0;
+            if (t != 0)
+                p[0x1f] = 2;
+            tab = gRandomTable;
+            cur = &gRandomIndex;
+            *cur = (*cur + 1) & 0x3FF;
+            {
+                s32 m = Mod(tab[*cur], 0x28);
+                u32 v = *(u16 *)(p + 0x34);
+                v -= 0x14;
+                *(u16 *)(p + 0x34) = v + m;
+            }
+            *cur = (*cur + 1) & 0x3FF;
+            {
+                s32 m = Mod(tab[*cur], 0x28);
+                u32 v = *(u16 *)(p + 0x36);
+                v -= 0x14;
+                *(u16 *)(p + 0x36) = v + m;
+            }
+            *cur = (*cur + 1) & 0x3FF;
+            {
+                s32 m = Mod(tab[*cur], 0x28);
+                u32 v = *(u16 *)(p + 0x38);
+                v -= 0x14;
+                *(u16 *)(p + 0x38) = v + m;
+            }
+            if (*(s32 *)(p + 0x70) > 0x3a) {
+                *(u32 *)(p + 0x6c) = 2;
+                *(u32 *)(p + 0x70) = 0;
+                *(u32 *)(p + 0x74) = 1;
+            }
+            break;
+        }
+        case 2:
+            *(u32 *)(p + 0x74) = 0;
+            *(u16 *)(p + 0x62) -= 0x14;
+            if (*(s8 *)(p + 0x20) > 0x30) {
+                p[0x20] -= 2;
+                p[0x21] -= 2;
+            }
+            if (*(s32 *)(p + 0x70) > 6) {
+                *(u32 *)(p + 0x6c) = 3;
+                *(u32 *)(p + 0x70) = 0;
+                *(u32 *)(p + 0x74) = 1;
+            }
+            break;
+        case 3:
+            *(u32 *)(p + 0x74) = 0;
+            if (*(s8 *)(p + 0x20) <= 0x3f) {
+                p[0x20] += 4;
+                p[0x21] += 4;
+            }
+            *(u16 *)(p + 0x62) += 0x64;
+            if (*(s32 *)(p + 0x70) > 2 && Mod(*(s32 *)(p + 0x70), 3) == 0)
+                SceneNpc_SpawnTransitionParticle(p, -1);
+            if (*(s32 *)(p + 0x70) > 0x1d) {
+                *(u32 *)(p + 0x6c) = 4;
+                *(u32 *)(p + 0x70) = 0;
+                *(u32 *)(p + 0x74) = 1;
+            }
+            break;
+        case 4: {
+            u32 t = *(u32 *)(p + 0x74);
+            *(u32 *)(p + 0x74) = 0;
+            if (t != 0)
+                *(u32 *)(p + 0x18) |= 1;
+            if (*(s32 *)(p + 0x70) > 300)
+                Task_Kill(p);
+            return 0;
+        }
+    }
+    {
+        s32 remainder = Mod(*(s32 *)(p + 0x68), 3);
+        u16 *frame = (u16 *)(p + 0x28);
+        if (remainder <= 1) {
+            if (remainder >= 0)
+                *frame = 1;
+            else
+                *frame = 0;
+        } else
+            *frame = 0;
+    }
+    SceneNpc_UpdateTransitionParticles(p);
+    *(s32 *)(p + 0x68) += 1;
+    return 0;
+}

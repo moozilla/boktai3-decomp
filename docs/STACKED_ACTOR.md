@@ -6,7 +6,7 @@ and eight particles. The descriptive `StackedActor` name does not establish its
 in-game identity. Evidence below is static ROM/C review; no execution coverage
 is claimed.
 
-`include/stacked_actor.h` records the shared layout. Sprite records are `0x2C`
+`include/field/stacked_actor/stacked_actor.h` records the shared layout. Sprite records are `0x2C`
 bytes; particle records are `0x34`. The actor's receiver starts at `0x18`, world
 position at `0x98`, height at `0x1C0`, particles at `0x1C8`, five script resource
 IDs/arguments at `0x36C–0x37C`, frame counter at `0x382`, and update callback at

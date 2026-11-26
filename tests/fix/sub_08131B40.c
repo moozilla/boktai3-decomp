@@ -1,4 +1,4 @@
-#include "global.h"
+#include "engine/shared/global.h"
 
 extern u32 gUnk_030053F4, gUnk_030053F0, gUnk_02000560;
 

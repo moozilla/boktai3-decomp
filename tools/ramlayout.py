@@ -4,8 +4,8 @@
     python3 tools/ramlayout.py check            # inventory + declarations; prints the accounting
     python3 tools/ramlayout.py show 030042A0     # a row, its declarations and consumers
     python3 tools/ramlayout.py unify 030042E4 --decl 'extern u8 *gPaletteBankData;' \\
-        --header include/render.h [--note '...']
-    python3 tools/ramlayout.py unify --batch FILE --header include/render.h   # ADDR | DECL | NOTE lines
+        --header include/engine/shared/render.h [--note '...']
+    python3 tools/ramlayout.py unify --batch FILE --header include/engine/shared/render.h   # ADDR | DECL | NOTE lines
     python3 tools/ramlayout.py seed [--kit DIR]  # (re)build rows from the ELF and layoutmerge
     python3 tools/ramlayout.py annotate [--range LO-HI]   # put /* 0xADDR */ before each shared declaration
     python3 tools/ramlayout.py users 03004290   # which functions access an address (needs layoutmerge output)
@@ -36,11 +36,12 @@ import tempfile
 
 sys.path.insert(0, os.path.dirname(__file__))
 from romlib import ROOT  # noqa: E402
+from source_layout import manifest
 
 CSV = os.path.join(ROOT, "symbols", "ram.csv")
 COLS = ["addr", "name", "size", "kind", "decl", "header", "confidence", "notes"]
 RAM = [(0x02000000, 0x02040000), (0x03000000, 0x03008000)]
-PROTECTED = {"src/iwram_code.c"}    # unify leaves these files alone (their declarations still count)
+PROTECTED = {"src/engine/iwram_arm_code/iwram_code.c"}    # unify leaves these files alone (their declarations still count)
 
 
 def is_ram(v):
@@ -439,7 +440,7 @@ def drop_decl(text, m, decls, idx):
 
 def new_header(header):
     g = "GUARD_" + re.sub(r"\W", "_", os.path.basename(header)).upper()
-    return (f"#ifndef {g}\n#define {g}\n\n#include \"global.h\"\n\n"
+    return (f"#ifndef {g}\n#define {g}\n\n#include \"engine/shared/global.h\"\n\n"
             f"/* RAM objects; each row of symbols/ram.csv with header {header}. */\n\n#endif\n")
 
 
@@ -605,7 +606,7 @@ def cmd_unify(a):
 
     if created:
         write(new, [a.header])      # the probe includes it from disk
-    probe = compile_asm(next(p for p in sorted(new) if p.startswith("src/fn/")), f'#include "{hdr_inc}"\n', False)
+    probe = compile_asm(next(p for p in sorted(new) if len(manifest().by_file.get(p, ())) == 1), f'#include "{hdr_inc}"\n', False)
     if "ERROR" in probe[:9]:
         sys.exit(f"{a.header} does not compile on its own:\n" + probe)
 

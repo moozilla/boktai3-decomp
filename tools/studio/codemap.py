@@ -35,11 +35,13 @@ for p in (os.path.join(ROOT, "tools", "assets"), os.path.join(ROOT, "tools"), HE
     if p not in sys.path:
         sys.path.insert(0, p)
 
+from source_layout import report_path
+
 CACHE = os.path.join(ROOT, "build", "cache", "codemap.json")
 INPUTS = ["symbols/functions.csv", "symbols/ram.csv", "symbols/data.csv", "symbols/progress_functions.csv",
           "symbols/progress_subsystems.csv", "symbols/progress_categories.csv", "symbols/progress_libraries.csv",
           "symbols/rom_data.csv", "data/manifest.csv",
-          "tools/progress.py", "tools/concessions.py", "tools/studio/codemap.py", "gen/code.s"]
+          "tools/progress.py", "tools/source_layout.py", "tools/concessions.py", "tools/studio/codemap.py", "gen/code.s"]
 SOURCE_DIRS = ["src", "include"]
 RAM_RANGES = ((0x02000000, 0x02040000, "EWRAM"), (0x03000000, 0x03008000, "IWRAM"))
 _LIT = re.compile(r"@ =(0x[0-9A-Fa-f]+|[A-Za-z_]\w*)")
@@ -223,7 +225,7 @@ def build():
                 # --list-pinned names a function as its C does (row[6], when that differs)
                 name, addr, size, pct, pinned, file = row[:6]
                 fns[addr] = {"name": name, "addr": addr, "size": size, "pct": pct, "cat": ci, "unit": ui,
-                             "file": f"src/fn/sub_{addr}.c" if file == -1 else None if file == -2 else tree["files"][file],
+                             "file": report_path(tree, addr, file, ROOT),
                              "defined": row[6] if len(row) > 6 else None, "kinds": (kinds.get(name) or kinds.get(row[6] if len(row) > 6 else None)
                                                  or ["concession"]) if pinned else []}
     ram_users, data_users, ptr_users = collections.defaultdict(list), collections.defaultdict(list), collections.defaultdict(list)

@@ -1,0 +1,17 @@
+#include "engine/shared/global.h"
+void Effect_Remove(u8 *);
+u32 Weather_ClearEffects(u8 *p)
+{
+    u8 *e = p + 0x16c;
+    s32 i = 0x1f;
+    u8 *q;
+    do {
+        q = e + 0x14;
+        if (*e != 0) {
+            Effect_Remove(q);
+            *e = 0;
+        }
+        i--;
+        e += 0x3c;
+    } while (i >= 0);
+}

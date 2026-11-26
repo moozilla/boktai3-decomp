@@ -52,7 +52,7 @@ Do not add register pins to force a match.
 
 ## Engine API
 
-`include/engine.h` declares the shared engine functions and globals (tasks, heap,
+`include/engine/shared/engine.h` declares the shared engine functions and globals (tasks, heap,
 script reader, sound, sprites/animation, colliders, text windows). Include it via
 your header and don't redeclare those functions locally. If its prototype is wrong
 for your callers, say so in your report rather than working around it silently.

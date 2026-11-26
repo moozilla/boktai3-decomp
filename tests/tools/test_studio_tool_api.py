@@ -34,7 +34,7 @@ class ToolAPITests(unittest.TestCase):
     def test_session_state_view_uses_original_c_layout(self):
         measured = fields.measure("gSessionState->solarBaseline")
         self.assertEqual((measured.offsets, measured.width, measured.signed), ((0, 4), 4, True))
-        self.assertEqual(measured.header, "include/session_save.h")
+        self.assertEqual(measured.header, "include/engine/shared/session_save.h")
 
     @unittest.skipUnless(runner.ROM.is_file(), "Local ROM unavailable")
     def test_solar_bounds_are_read_from_the_rom(self):

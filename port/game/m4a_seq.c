@@ -4,7 +4,7 @@
  * Written from the documented MP2K engine behavior, not from ROM bytes.
  * Handlers without a ROM symbol are bound to their addresses by
  * port/build_game.py (PORT_CODE), so ROM tables and C reach the same code. */
-#include "global.h"
+#include "engine/shared/global.h"
 #include "gba/m4a_internal.h"
 
 void port_bus_store_i8(volatile void *p, u8 value);

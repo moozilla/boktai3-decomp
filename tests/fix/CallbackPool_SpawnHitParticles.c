@@ -1,6 +1,6 @@
-#include "global.h"
-#include "scene_object.h"
-#include "callback_pool.h"
+#include "engine/shared/global.h"
+#include "field/scene_objects/scene_object.h"
+#include "other/callback_pool/callback_pool.h"
 
 #define gShakeRandomTable gUnk_0203B400
 #define gShakeRandomIndex gUnk_03005308

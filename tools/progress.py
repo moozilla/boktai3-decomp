@@ -20,6 +20,7 @@ import sys
 
 from romlib import ROOT
 from split import c_functions, nonmatching_functions, split_nonmatching
+from source_layout import scan
 
 CODE_END = 0x0824DAFA
 INVENTORY = Path(ROOT) / "symbols/progress_functions.csv"
@@ -704,22 +705,8 @@ def main():
 
 
 def source_files(source_root):
-    """Each function's C unit (repo-relative) and the name it has there, by
-    address, from definitions, INCLUDE_ASM placeholders and NONMATCHING drafts."""
-    with (Path(ROOT) / "symbols/functions.csv").open(newline="") as f:
-        addrs = {row["name"]: int(row["addr"], 16) for row in csv.DictReader(f)}
-    files = {}
-    for p in sorted(Path(source_root).rglob("*.c")):
-        rel = p.relative_to(ROOT).as_posix()
-        raw = p.read_text()
-        alias = dict(re.findall(r"^#define\s+(\w+)\s+(sub_[0-9A-F]{8})\s*$", raw, re.M))
-        for defined in c_functions(p) + [n for n, _ in nonmatching_functions(p)]:
-            n = alias.get(defined, defined)
-            m = re.fullmatch(r"sub_([0-9A-F]{8})", n)
-            a = int(m.group(1), 16) if m else addrs.get(n)
-            if a is not None:
-                files.setdefault(a, (rel, defined))
-    return files
+    """Each function's C unit (repo-relative) and the name it has there, by address."""
+    return scan(ROOT, source_root).files
 
 
 def write_tree(out, report, pinned_addrs, source_root):
@@ -727,10 +714,9 @@ def write_tree(out, report, pinned_addrs, source_root):
     [name, address, bytes, percent, pinned, file], plus the name in the C file
     when that differs. Percent is the decomp.dev score: 100 when the function
     matches with no concession; a match with concessions (pinned = 1) scores the
-    share of its lines without one; otherwise the NONMATCHING draft's fuzzy score or 0. File indexes `files`; -1 means
-    src/fn/sub_<address>.c and -2 that no C unit holds it yet."""
+    share of its lines without one; otherwise the NONMATCHING draft's fuzzy score or 0. File indexes `files`; -2 means no C unit holds it yet."""
     files = source_files(source_root)
-    paths = sorted({p for a, (p, _) in files.items() if p != f"src/fn/sub_{a:08X}.c"})
+    paths = sorted({p for p, _ in files.values()})
     index = {p: i for i, p in enumerate(paths)}
     categories = {}
     for unit in report["units"]:
@@ -742,12 +728,12 @@ def write_tree(out, report, pinned_addrs, source_root):
             a = int(f["metadata"]["virtual_address"])
             path, defined = files.get(a, (None, None))
             fn = [f["name"], f"{a:08X}", int(f["size"]), round(f["fuzzy_match_percent"], 1),
-                  int(a in pinned_addrs), -2 if path is None else index.get(path, -1)]
+                  int(a in pinned_addrs), -2 if path is None else index[path]]
             if defined and defined not in (f["name"], f"sub_{a:08X}"):
                 fn.append(defined)
             fns.append(fn)
         categories.setdefault(top, []).append({"name": name, "functions": fns})
-    tree = {"version": 1, "files": paths,
+    tree = {"version": 2, "files": paths,
             "categories": [{"name": c, "units": us} for c, us in categories.items()]}
     Path(out).write_text(json.dumps(tree, separators=(",", ":")) + "\n")
 

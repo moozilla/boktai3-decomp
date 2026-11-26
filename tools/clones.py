@@ -9,7 +9,7 @@ Two functions are clones when their instructions are identical after symbols
 (callees, data labels, literal-pool addresses) are abstracted away. A matched
 member's C is copied to each unmatched sibling with every referenced symbol and
 address renamed in order of appearance; tools/check.py decides. Candidates are
-written to wip/clones/ and copied to src/fn/ only on MATCH.
+written to wip/clones/ and copied to the source tree only on MATCH.
 
   clones.py --graft [--loose]            the same for siblings that have a NONMATCHING draft:
                                          put the template's function (renamed) into the draft's
@@ -26,6 +26,7 @@ import subprocess
 import sys
 
 from romlib import ROOT
+from source_layout import manifest, new_source
 from worklist import done_names
 
 REGS = {f"r{i}" for i in range(13)} | {"sp", "lr", "pc", "ip", "sl", "sb", "fp"}
@@ -203,10 +204,10 @@ def graft(funcs, done, fams):
                 continue
             a, b = block.start() + span[0], block.start() + span[1]
             for t in tmpl:
-                p = os.path.join(ROOT, "src", "fn", f"sub_{funcs[t][0]:08X}.c")
-                if not os.path.exists(p):
+                file = manifest().single_file(funcs[t][0])
+                if not file:
                     continue
-                ported = port(p, t, n, funcs)
+                ported = port(os.path.join(ROOT, file), t, n, funcs)
                 s = ported and function_span(ported, n)
                 if not s:
                     continue
@@ -257,12 +258,8 @@ def main():
               f"{n_un} unmatched members, {port_ok} in families with a matched member")
         return
     lo, hi = (int(a.range[0], 16), int(a.range[1], 16)) if a.range else (0, 1 << 32)
-    # one-function units are src/fn/sub_ADDR.c whatever the function is called now
-    srcs = {}
-    for n, v in funcs.items():
-        p = os.path.join(ROOT, "src", "fn", f"sub_{v[0]:08X}.c")
-        if os.path.exists(p):
-            srcs[n] = p
+    srcs = {n: os.path.join(ROOT, path) for n, (address, *_) in funcs.items()
+            if (path := manifest().single_file(address))}
     wip = os.path.join(ROOT, "wip", "clones")
     os.makedirs(wip, exist_ok=True)
     ok = 0
@@ -284,9 +281,10 @@ def main():
                 r = subprocess.run([sys.executable, "tools/check.py", out, "--quiet"], cwd=ROOT,
                                    capture_output=True, text=True)
                 if r.returncode == 0:
-                    dst = os.path.join(ROOT, "src", "fn", f"sub_{funcs[n][0]:08X}.c")
+                    file = manifest().single_file(funcs[n][0])
+                    dst = os.path.join(ROOT, file or new_source(funcs[n][0], n))
                     if not os.path.exists(dst):
-                        print(f"MATCH {n} (from {t}) in {out}: its unit is not src/fn/sub_ADDR.c, merge by hand")
+                        print(f"MATCH {n} (from {t}) in {out}: its source needs manual landing")
                         continue
                     shutil.copy(out, dst)
                     ok += 1

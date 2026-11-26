@@ -10,7 +10,7 @@ combined ROM build. No emulator claims.
 helpers). `ResourceStation` is tentative: the object transfers GameState+77C
 stored resource into player+428, capped against+42A. The exact gameplay label
 for that resource remains unconfirmed. Its creator allocates0x268 bytes, matching
-`include/resource_station.h`.
+`include/field/stored_resource_station/resource_station.h`.
 
 Layout: task18 bytes, sprite18 (position34), sprite graphics44, digit resource60,
 four0x60-byte digit animations80, collider200, trigger position254, player25C,

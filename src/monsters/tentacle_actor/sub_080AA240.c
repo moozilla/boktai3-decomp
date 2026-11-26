@@ -1,0 +1,85 @@
+#include "engine/shared/global.h"
+#include "engine/shared/scene_actor_reset.h"
+#include "engine/shared/movement_curve.h"
+extern const s16 gUnk_086149C4[];
+struct TentacleWaveSegment {
+    u8 unknown0[0x1C];
+    struct ContactPosition position;
+    u8 unknown24[0x105 - 0x24];
+    u8 flags;
+    u8 unknown106[3];
+    u8 phase;
+    u8 unknown10A[0x128 - 0x10A];
+};
+struct TentacleWaveTrail {
+    u8 unknown0[0x3D4];
+    struct TentacleWaveSegment segments[4];
+    u8 unknown874[0x8D2 - 0x874];
+    u8 phase;
+    u8 unknown8D3[7];
+    s16 count;
+};
+struct TentacleWaveDrawable {
+    u8 unknown0[0x1C];
+    struct ContactPosition position;
+};
+static inline s32 Tentacle_TruncateFixed12(s32 value)
+{
+    if (value >= 0)
+        return value >> 12;
+    return -((-value) >> 12);
+}
+static inline u8 Tentacle_TestWaveFlags(u8 *flags, u32 mask)
+{
+    if (*flags & mask)
+        return 1;
+    return 0;
+}
+static inline void Tentacle_MaskWaveFlags(u8 *flags, u32 mask)
+{
+    *flags = mask & *flags;
+}
+
+void sub_080AA240(struct ChaseActor *actor)
+{
+    struct TentacleWaveTrail *trail = actor->base.context;
+    struct ContactPosition output, previous;
+    struct TentacleWaveDrawable *xHost, *zHost;
+    s32 sign, i;
+    xHost = actor->base.drawable;
+    xHost->position.x += Tentacle_TruncateFixed12(gUnk_086149C4[(trail->phase + 64) & 255] * 2);
+    zHost = actor->base.drawable;
+    zHost->position.z += Tentacle_TruncateFixed12(gUnk_086149C4[trail->phase] * 16);
+    trail->phase += 8;
+    sign = 1;
+    for (i = 1; i < trail->count - 1; i += 2) {
+        trail->segments[i].position.x +=
+            sign * Tentacle_TruncateFixed12(gUnk_086149C4[trail->segments[i].phase] * 4);
+        trail->segments[i].phase += 8;
+        sign = -sign;
+    }
+    previous = ((struct TentacleWaveDrawable *)actor->base.drawable)->position;
+    for (i = 0; i < trail->count - 1; i += 2) {
+        MovementCurve_InterpolatePosition(&output, &previous, &trail->segments[i + 1].position, 1,
+                                          512, 0, 0);
+        trail->segments[i].position = output;
+        previous = trail->segments[i + 1].position;
+    }
+}
+
+void sub_080AA4B8(struct ChaseActor *actor)
+{
+    struct TentacleWaveTrail *trail = actor->base.context;
+    s32 live = 0;
+    s32 i;
+    for (i = 0; i < trail->count; i++) {
+        if (!Tentacle_TestWaveFlags(&trail->segments[i].flags, 1)) {
+            if (live == 1)
+                live = 0;
+            else {
+                Tentacle_MaskWaveFlags(&trail->segments[i].flags, ~2);
+                live++;
+            }
+        }
+    }
+}

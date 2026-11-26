@@ -1,0 +1,11 @@
+#include "menus/scene_panel_presentation/scene_panel_effects.h"
+void ScenePanel_DestroyParticles(struct ScenePanel *input)
+{
+    struct ScenePanelEffectsView *panel = (void *)input;
+    struct ScenePanelParticle *particle = panel->particleEntries;
+    s32 i;
+    for (i = 31; i >= 0; i--) {
+        Effect_Remove(particle);
+        particle++;
+    }
+}

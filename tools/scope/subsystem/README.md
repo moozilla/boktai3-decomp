@@ -14,7 +14,7 @@ From the main checkout, on an up-to-date `main`:
 
 ```
 sh tools/base.sh                                   # the shared built base new worktrees clone (minutes)
-python3 tools/scope/subsystem/queues.py build/subsystem/q --exclude src/iwram_code.c   # one queue per category
+python3 tools/scope/subsystem/queues.py build/subsystem/q --exclude src/engine/iwram_arm_code/iwram_code.c   # one queue per category
 tools/scope/subsystem/launch.sh sc-bosses build/subsystem/q/bosses.json "Bosses"     # one per subsystem
 nohup tools/scope/subsystem/committer.sh > build/subsystem/committer.log 2>&1 &      # makes the commits
 DEADLINE=2300 tools/scope/subsystem/watch.sh 2 &  # resume failures and early stops; stop all at 2% left or 23:00

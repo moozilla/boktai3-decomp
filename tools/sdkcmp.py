@@ -9,7 +9,6 @@ and compares the .text bytes. Values per unit and branch: same, diff, stockfail,
 asmfail (usually a missing INCLUDE_ASM stub) or skip (units with a COMPILER override).
 Build notes for the SDK cc1 and the result: docs/BOKTAI12_COMPARISON.md 6.2.
 """
-import glob
 import json
 import os
 import re
@@ -21,6 +20,7 @@ from multiprocessing import Pool
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import build  # noqa: E402
+from source_layout import is_upstream, source_paths
 
 SDK, OUT = sys.argv[1], sys.argv[2]
 os.chdir(build.ROOT)
@@ -60,7 +60,7 @@ def work(src):
         res[name]='same' if b0==b1 else 'diff'
     return src,res
 if __name__=='__main__':
-    files=sorted(glob.glob('src/*.c')+glob.glob('src/fn/*.c'))
+    files = [os.path.relpath(p, build.ROOT) for p in source_paths() if not is_upstream(p)]
     if len(sys.argv)>3: files=files[:int(sys.argv[3])]
     out={}
     with Pool(8) as p:

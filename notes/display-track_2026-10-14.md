@@ -6,7 +6,7 @@ bytes / +0.1048 percentage points; seven existing helpers (276 bytes) receive
 no new credit. Identity is provisional and based on static consumers. There
 are no new runtime coverage claims.
 
-`include/display_track.h` records dynamic capacity/count at manager18/19 and
+`include/engine/shared/display_track.h` records dynamic capacity/count at manager18/19 and
 0xB8 entries at1C. The creator uses list9 and allocates1C+capacity*B8, with script
 m capacity default1. Each entry has a tag0, independent track flags2, mirror3,
 run-during-pause byte4, sixteen blended RGB15 colors8, sprite28, graphics54,

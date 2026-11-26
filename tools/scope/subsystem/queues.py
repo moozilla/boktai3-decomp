@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """One queue per report category of every NONMATCHING draft, in ROM order.
 
-  queues.py OUTDIR [--exclude src/iwram_code.c ...]
+  queues.py OUTDIR [--exclude src/engine/iwram_arm_code/iwram_code.c ...]
 
 Reads PROGRESS.json and src/ of the checkout it runs in (run it on an up-to-date main). Writes
 OUTDIR/<category-slug>.json: rows {func, addr, size, fuzzy, src, unit}, the format

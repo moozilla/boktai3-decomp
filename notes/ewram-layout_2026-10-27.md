@@ -88,79 +88,79 @@ validation logs are retained under `build/`.
 
 | Address | Name | Outcome | Header or blocker |
 |---|---|---|---|
-| 02000060 | `gParticleGroupManager` | unified | `include/ram.h` |
-| 02000080 | `gWeatherCooldownBase` | unified | `include/ram.h` |
-| 02000084 | `gWeatherCooldownRange` | unified | `include/ram.h` |
-| 02000088 | `gStormActive` | unified | `include/ram.h` |
-| 0200008C | `gStormTimer` | unified | `include/ram.h` |
-| 020000B8 | `gSceneActorRegistry` | unified | `include/ram.h` |
-| 020000D8 | `gActorPoolManager` | unified | `include/ram.h` |
-| 020000F0 | `gWirelessLastStatus` | unified | `include/ram.h` |
-| 02000124 | `gActorAttachmentManager` | unified | `include/ram.h` |
-| 02000134 | `gSceneParticleEmitterPool` | unified | `include/ram.h` |
-| 020001AC | `gNamedActorManager` | unified | `include/ram.h` |
-| 020001B0 | `gActorGroupPool` | unified | `include/ram.h` |
-| 020001C0 | `gLinkSessionStep` | unified | `include/ram.h` |
-| 020001CC | `gConfirmPanel` | unified | `include/ram.h` |
-| 02000204 | `gRegistryE7BCManager` | unified | `include/ram.h` |
-| 0200021C | `gOffsetActorAnimationRepeats` | unified | `include/ram.h` |
-| 02000220 | `gHresvelgrAttackCount` | unified | `include/ram.h` |
-| 0200022C | `gHresvelgrHazardIndex` | unified | `include/ram.h` |
-| 02000230 | `gHresvelgrVolleyState` | unified | `include/ram.h` |
-| 02000234 | `gHresvelgrVolleyCount` | unified | `include/ram.h` |
-| 02000268 | `gRegistryF3E4Actor` | unified | `include/ram.h` |
-| 02000278 | `gSceneNpcBlendPalette` | unified | `include/ram.h` |
-| 020002A0 | `gOptionMenuParameters` | struct | `include/menu_parameters.h` |
-| 020002C0 | `gChoiceMenuParameters` | struct | `include/menu_parameters.h` |
-| 020002E8 | `gMessageMenuParameters` | struct | `include/menu_parameters.h` |
-| 02000310 | `gRegionMenuParameters` | struct | `include/menu_parameters.h` |
-| 02000340 | `gDateMenuParameters` | struct | `include/menu_parameters.h` |
-| 02000358 | `gSelectionMenuParameters` | struct | `include/menu_parameters.h` |
-| 02000378 | `gScriptMessageParameters` | struct | `include/menu_parameters.h` |
-| 020003A0 | `gListMenuParameters` | struct | `include/menu_parameters.h` |
-| 020003C0 | `gSoundTestParameters` | struct | `include/menu_parameters.h` |
-| 020003C8 | `gScriptedActorController` | unified | `include/ram.h` |
-| 020003D0 | `gTimeDisplayParameters` | struct | `include/menu_parameters.h` |
-| 02000448 | `gScriptSectionBases` | unified | `include/ram.h` |
-| 02000458 | `gScriptCommandTables` | unified | `include/ram.h` |
-| 02000478 | `gWeatherCollisionTimer` | unified | `include/ram.h` |
-| 0200047C | `gUnk_0200047C` | skipped | shared gSceneMessageController declaration conflicts in protected src/large_scene_animation_controller.c; ramlayout rolled back all changes |
-| 02000480 | `gSceneActorListManager` | unified | `include/ram.h` |
-| 02000484 | `gWirelessController` | unified | `include/ram.h` |
-| 02000488 | `gUnk_02000488` | skipped | restored protected src/tether_actor.c needs the old header declaration; renamed header leaves old gUnk references undeclared; full batch restored |
-| 020004B4 | `gUnk_020004B4` | skipped | protected src/fn/sub_08135F70.c uses the old declaration from include/area_effect_link.h; header rename gives compile error after restoring consumer |
-| 020004B8 | `gUnk_020004B8` | skipped | protected src/fn/sub_0803EF4C.c uses the old declaration from include/scene_arc.h; header rename gives compile error after restoring consumer |
-| 020004F0 | `gUnk_020004F0` | skipped | protected src/fn/sub_0803DF90.c uses the old declaration from include/scene_pool.h; header rename gives compile error after restoring consumer |
-| 02000500 | `gPlayerInteractionMode` | unified | `include/ram.h` |
-| 02000504 | `gPlayerSavedMenuOption` | unified | `include/ram.h` |
-| 02000514 | `gPlayerLinkAttackBonus` | unified | `include/ram.h` |
-| 02000520 | `gPlayerScriptState` | unified | `include/ram.h` |
-| 02000528 | `gPlayerActionPending` | unified | `include/ram.h` |
-| 0200052C | `gPlayerDirectionLatch` | unified | `include/ram.h` |
-| 02000534 | `gPlayerPassageState` | unified | `include/ram.h` |
-| 0200053C | `gPlayerBackgroundMode` | unified | `include/ram.h` |
-| 02000548 | `gPlayerInitialSlotValues` | unified | `include/ram.h` |
-| 0200054C | `gPlayerPendingActor` | unified | `include/ram.h` |
-| 02000550 | `gPlayerBackgroundState` | unified | `include/ram.h` |
-| 02000554 | `gPlayerAbilityLatched` | unified | `include/ram.h` |
+| 02000060 | `gParticleGroupManager` | unified | `include/engine/shared/ram.h` |
+| 02000080 | `gWeatherCooldownBase` | unified | `include/engine/shared/ram.h` |
+| 02000084 | `gWeatherCooldownRange` | unified | `include/engine/shared/ram.h` |
+| 02000088 | `gStormActive` | unified | `include/engine/shared/ram.h` |
+| 0200008C | `gStormTimer` | unified | `include/engine/shared/ram.h` |
+| 020000B8 | `gSceneActorRegistry` | unified | `include/engine/shared/ram.h` |
+| 020000D8 | `gActorPoolManager` | unified | `include/engine/shared/ram.h` |
+| 020000F0 | `gWirelessLastStatus` | unified | `include/engine/shared/ram.h` |
+| 02000124 | `gActorAttachmentManager` | unified | `include/engine/shared/ram.h` |
+| 02000134 | `gSceneParticleEmitterPool` | unified | `include/engine/shared/ram.h` |
+| 020001AC | `gNamedActorManager` | unified | `include/engine/shared/ram.h` |
+| 020001B0 | `gActorGroupPool` | unified | `include/engine/shared/ram.h` |
+| 020001C0 | `gLinkSessionStep` | unified | `include/engine/shared/ram.h` |
+| 020001CC | `gConfirmPanel` | unified | `include/engine/shared/ram.h` |
+| 02000204 | `gRegistryE7BCManager` | unified | `include/engine/shared/ram.h` |
+| 0200021C | `gOffsetActorAnimationRepeats` | unified | `include/engine/shared/ram.h` |
+| 02000220 | `gHresvelgrAttackCount` | unified | `include/engine/shared/ram.h` |
+| 0200022C | `gHresvelgrHazardIndex` | unified | `include/engine/shared/ram.h` |
+| 02000230 | `gHresvelgrVolleyState` | unified | `include/engine/shared/ram.h` |
+| 02000234 | `gHresvelgrVolleyCount` | unified | `include/engine/shared/ram.h` |
+| 02000268 | `gRegistryF3E4Actor` | unified | `include/engine/shared/ram.h` |
+| 02000278 | `gSceneNpcBlendPalette` | unified | `include/engine/shared/ram.h` |
+| 020002A0 | `gOptionMenuParameters` | struct | `include/engine/shared/menu_parameters.h` |
+| 020002C0 | `gChoiceMenuParameters` | struct | `include/engine/shared/menu_parameters.h` |
+| 020002E8 | `gMessageMenuParameters` | struct | `include/engine/shared/menu_parameters.h` |
+| 02000310 | `gRegionMenuParameters` | struct | `include/engine/shared/menu_parameters.h` |
+| 02000340 | `gDateMenuParameters` | struct | `include/engine/shared/menu_parameters.h` |
+| 02000358 | `gSelectionMenuParameters` | struct | `include/engine/shared/menu_parameters.h` |
+| 02000378 | `gScriptMessageParameters` | struct | `include/engine/shared/menu_parameters.h` |
+| 020003A0 | `gListMenuParameters` | struct | `include/engine/shared/menu_parameters.h` |
+| 020003C0 | `gSoundTestParameters` | struct | `include/engine/shared/menu_parameters.h` |
+| 020003C8 | `gScriptedActorController` | unified | `include/engine/shared/ram.h` |
+| 020003D0 | `gTimeDisplayParameters` | struct | `include/engine/shared/menu_parameters.h` |
+| 02000448 | `gScriptSectionBases` | unified | `include/engine/shared/ram.h` |
+| 02000458 | `gScriptCommandTables` | unified | `include/engine/shared/ram.h` |
+| 02000478 | `gWeatherCollisionTimer` | unified | `include/engine/shared/ram.h` |
+| 0200047C | `gUnk_0200047C` | skipped | shared gSceneMessageController declaration conflicts in protected src/effects/large_scene_animation_controller/large_scene_animation_controller.c; ramlayout rolled back all changes |
+| 02000480 | `gSceneActorListManager` | unified | `include/engine/shared/ram.h` |
+| 02000484 | `gWirelessController` | unified | `include/engine/shared/ram.h` |
+| 02000488 | `gUnk_02000488` | skipped | restored protected src/field/tether_actor/tether_actor.c needs the old header declaration; renamed header leaves old gUnk references undeclared; full batch restored |
+| 020004B4 | `gUnk_020004B4` | skipped | protected src/actors/scene_actor_reaction/sub_08135F70.c uses the old declaration from include/engine/shared/area_effect_link.h; header rename gives compile error after restoring consumer |
+| 020004B8 | `gUnk_020004B8` | skipped | protected src/fn/sub_0803EF4C.c uses the old declaration from include/effects/scene_arc_slot_effects/scene_arc.h; header rename gives compile error after restoring consumer |
+| 020004F0 | `gUnk_020004F0` | skipped | protected src/actors/scene_pooled_motion_and_actor_controls/sub_0803DF90.c uses the old declaration from include/engine/shared/scene_pool.h; header rename gives compile error after restoring consumer |
+| 02000500 | `gPlayerInteractionMode` | unified | `include/engine/shared/ram.h` |
+| 02000504 | `gPlayerSavedMenuOption` | unified | `include/engine/shared/ram.h` |
+| 02000514 | `gPlayerLinkAttackBonus` | unified | `include/engine/shared/ram.h` |
+| 02000520 | `gPlayerScriptState` | unified | `include/engine/shared/ram.h` |
+| 02000528 | `gPlayerActionPending` | unified | `include/engine/shared/ram.h` |
+| 0200052C | `gPlayerDirectionLatch` | unified | `include/engine/shared/ram.h` |
+| 02000534 | `gPlayerPassageState` | unified | `include/engine/shared/ram.h` |
+| 0200053C | `gPlayerBackgroundMode` | unified | `include/engine/shared/ram.h` |
+| 02000548 | `gPlayerInitialSlotValues` | unified | `include/engine/shared/ram.h` |
+| 0200054C | `gPlayerPendingActor` | unified | `include/engine/shared/ram.h` |
+| 02000550 | `gPlayerBackgroundState` | unified | `include/engine/shared/ram.h` |
+| 02000554 | `gPlayerAbilityLatched` | unified | `include/engine/shared/ram.h` |
 | 02000560 | `gUnk_02000560` | skipped | four-word array declaration conflicts with existing scalar views in shared headers (e.g. area_effect.h); ramlayout rolled back all changes |
-| 02000570 | `gPlayerSolarActionPending` | unified | `include/ram.h` |
-| 02000580 | `gUnk_02000580` | skipped | protected src/fn/sub_080CCD7C.c uses the old declaration from include/player.h; header rename gives compile error after restoring consumer |
-| 02000590 | `gPlayerEffectPendingCount` | unified | `include/ram.h` |
-| 0200059C | `gPlayerAttackEffect` | unified | `include/ram.h` |
-| 020005A8 | `gHudResetFlag` | unified | `include/ram.h` |
-| 020005B4 | `gNameEntrySavedState` | unified | `include/ram.h` |
-| 020005DC | `gScreenTextSavedValue` | unified | `include/ram.h` |
-| 0200060C | `gSaveStateSignature` | unified | `include/ram.h` |
-| 02000610 | `gScriptVm` | struct | `include/script_virtual_machine.h` |
-| 02000700 | `gScriptLocalVariables` | unified | `include/ram.h` |
-| 02000704 | `gBackupGameVariables` | unified | `include/ram.h` |
-| 02000708 | `gGameVariables` | unified | `include/ram.h` |
-| 0200070C | `gBackupGameState` | unified | `include/ram.h` |
-| 02000714 | `gHeapHead` | struct | `include/heap.h` |
-| 0201F400 | `gHeapEndGuard` | unified | `include/ram.h` |
-| 02037000 | `gBgMapWorkBuffer` | unified | `include/ram.h` |
-| 02039000 | `gObjTileUploadRequests` | struct | `include/obj_tile_upload.h` |
-| 0203B000 | `gResourceRegistryEntries` | struct | `include/resource_registry.h` |
-| 0203B400 | `gUnk_0203B400` | skipped | protected src/fn/sub_08025FFC.c relies on old random-table declaration in engine.h; header rename leaves old uses undeclared |
-| 0203C400 | `gGameStateStorage` | unified | `include/ram.h` |
+| 02000570 | `gPlayerSolarActionPending` | unified | `include/engine/shared/ram.h` |
+| 02000580 | `gUnk_02000580` | skipped | protected src/fn/sub_080CCD7C.c uses the old declaration from include/engine/shared/player.h; header rename gives compile error after restoring consumer |
+| 02000590 | `gPlayerEffectPendingCount` | unified | `include/engine/shared/ram.h` |
+| 0200059C | `gPlayerAttackEffect` | unified | `include/engine/shared/ram.h` |
+| 020005A8 | `gHudResetFlag` | unified | `include/engine/shared/ram.h` |
+| 020005B4 | `gNameEntrySavedState` | unified | `include/engine/shared/ram.h` |
+| 020005DC | `gScreenTextSavedValue` | unified | `include/engine/shared/ram.h` |
+| 0200060C | `gSaveStateSignature` | unified | `include/engine/shared/ram.h` |
+| 02000610 | `gScriptVm` | struct | `include/engine/script_virtual_machine/script_virtual_machine.h` |
+| 02000700 | `gScriptLocalVariables` | unified | `include/engine/shared/ram.h` |
+| 02000704 | `gBackupGameVariables` | unified | `include/engine/shared/ram.h` |
+| 02000708 | `gGameVariables` | unified | `include/engine/shared/ram.h` |
+| 0200070C | `gBackupGameState` | unified | `include/engine/shared/ram.h` |
+| 02000714 | `gHeapHead` | struct | `include/engine/shared/heap.h` |
+| 0201F400 | `gHeapEndGuard` | unified | `include/engine/shared/ram.h` |
+| 02037000 | `gBgMapWorkBuffer` | unified | `include/engine/shared/ram.h` |
+| 02039000 | `gObjTileUploadRequests` | struct | `include/engine/interrupts_and_video/obj_tile_upload.h` |
+| 0203B000 | `gResourceRegistryEntries` | struct | `include/engine/resource_registry/resource_registry.h` |
+| 0203B400 | `gUnk_0203B400` | skipped | protected src/actors/actor_animation_and_action_controllers/sub_08025FFC.c relies on old random-table declaration in engine.h; header rename leaves old uses undeclared |
+| 0203C400 | `gGameStateStorage` | unified | `include/engine/shared/ram.h` |

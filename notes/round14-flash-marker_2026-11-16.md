@@ -22,10 +22,10 @@ Both marker updates test whether scene interaction is enabled, then whether the
 player has newly pressed A. The old source copied that key bit through mutable
 `pressed` and `edge` locals and a do-once loop. The direct
 `if (gPadState[1] & 1)` predicate removes those temporaries and matches exactly.
-`StackedActor_TickIdle` in `src/fn/sub_08052A40.c` independently uses the same
+`StackedActor_TickIdle` in `src/field/stacked_actor/sub_08052A40.c` independently uses the same
 scene-enable/new-A-press sequence and the same blocked-player test. The canonical
 input declaration identifies the pressed-key storage as a halfword, and
-`Input_UpdatePadStates` in `src/runtime_input.c` establishes the held/pressed/
+`Input_UpdatePadStates` in `src/engine/runtime_input_and_utilities/runtime_input.c` establishes the held/pressed/
 released layout and the edge calculation.
 
 The disappearing-flash update enables BG1, conditionally hides it on even frames

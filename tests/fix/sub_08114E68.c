@@ -1,4 +1,4 @@
-#include "global.h"
+#include "engine/shared/global.h"
 
 struct ParticleVec {
     s16 x, y, z, pad;

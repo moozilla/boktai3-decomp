@@ -1,4 +1,4 @@
-#include "global.h"
+#include "engine/shared/global.h"
 
 static inline void Ivy_ResetPhase(u8 *p)
 {

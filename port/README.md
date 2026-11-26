@@ -123,7 +123,7 @@ LLVM clang is selected from Homebrew when available; override with `--cc` or
 `PORT_CC`. Four compiler processes run by default (`-j`). Each source retains its
 own object under `build/port/TARGET/src/`, and `compile.json` records every unit,
 its result and diagnostic path. Unchanged inputs are cached by content, compiler
-identity and flags. `--source src/fn/AgbMain.c` limits a diagnostic run.
+identity and flags. `--source src/engine/game_entry_point/AgbMain.c` limits a diagnostic run.
 
 The wasm32 compile sweep currently passes all **10,169 translation units**,
 including `src/lib/`. This proves compilation, not a linked or playable game.

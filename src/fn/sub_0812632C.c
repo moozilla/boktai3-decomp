@@ -1,8 +1,0 @@
-#include "global.h"
-void Sprite_Remove(u8 *);
-void ScriptedParticle_ReleaseSlot(u8 *p)
-{
-    Sprite_Remove(p);
-    p[0x6c] = 0xff;
-    p[0x58] = 0;
-}

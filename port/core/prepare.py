@@ -1,9 +1,17 @@
 """Small, audited source adaptations for clang, confined to generated build files."""
 import re
+import sys
 from pathlib import Path
 from returns import repair_returns, verify_returns
 
-ROOT_SRC = Path(__file__).resolve().parents[2] / 'src'
+ROOT = Path(__file__).resolve().parents[2]
+ROOT_SRC = ROOT / 'src'
+sys.path.insert(0, str(ROOT / 'tools'))
+from source_layout import resolve
+
+
+def source_units(root, *functions):
+    return list(dict.fromkeys(resolve(function, root) for function in functions))
 
 
 def prepare_source(path, target):

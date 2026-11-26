@@ -1,0 +1,23 @@
+#include "engine/shared/global.h"
+void SpinningApproach_InitMotion(void);
+static inline u8 reset(u8 *p)
+{
+    s32 one = 1;
+    struct F {
+        u8 flags;
+    } *flag = (struct F *)(p + 0x119);
+    u8 old = flag->flags;
+    if (old & one) {
+        s32 value = ~1;
+        value &= old;
+        flag->flags = value;
+        p[0x12e] = 0;
+        return 1;
+    }
+    return 0;
+}
+void Armor_StartPartApproachMotion(u8 *p)
+{
+    if (reset(p))
+        *(void (**)(void))(p + 0x1d0) = SpinningApproach_InitMotion;
+}

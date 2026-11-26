@@ -4,12 +4,12 @@ Range **0821A454–0821BAFC**: the GCL bytecode interpreter proper (operand
 decoding, argument/keyword stacks, native-command dispatch, procedure lookup,
 the postfix expression evaluator, and the game-state/script-variable regions
 it reads and writes). All 89 functions in the range are exact; `src/fn/*.c`
-for this range is gone, replaced by `src/script_virtual_machine.c` with shared
-types in `include/script_virtual_machine.h`.
+for this range is gone, replaced by `src/engine/script_virtual_machine/script_virtual_machine.c` with shared
+types in `include/engine/script_virtual_machine/script_virtual_machine.h`.
 
 ## Header
 
-`include/script_virtual_machine.h` adds:
+`include/engine/script_virtual_machine/script_virtual_machine.h` adds:
 
 * `struct ScriptVm` for `gUnk_02000610`: `pc`, `result` (last eval/call result,
   read by callers of blocks), `keywordSp`/`stack[24]`/`argSp` — the keyword
@@ -26,11 +26,11 @@ types in `include/script_virtual_machine.h`.
   for this exact object, declared by other units that call into this one.
   `script_utility.h` also owns the external prototypes for `Script_ReadValue`
   and `Script_RunBlock`, so this header does not redeclare them.
-* `include/engine.h` (included transitively) already declared
+* `include/engine/shared/engine.h` (included transitively) already declared
   `Script_GetValue`, `Script_SeekToKeyword`, `Script_GetPc`,
   `Script_ParseStringRef`, `Text_LookupString`, `Script_GetKeywordValue`,
   `ScriptProc_Start` and `Script_Call` — reused as-is, not redeclared.
-* `include/game_state.h` gained four externs: `gUnk_0200070C`/`08`/`04`/`00`,
+* `include/system/game_state/game_state.h` gained four externs: `gUnk_0200070C`/`08`/`04`/`00`,
   the backup game-state base, the active/backup shared script-variable region
   and the (unbacked) local-variable region, alongside the existing
   `gUnk_02000710`. They're set together by `GameState_SelectRamBase` and used

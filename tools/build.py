@@ -3,7 +3,7 @@
 
   build.py [--shift N] [--out build/boktai3.gba] [--no-compare]
 
-Steps: split.py (cut asm around src/*.c units) -> compile C with agbcc ->
+Steps: split.py (cut asm around src/ units) -> compile C with agbcc ->
 assemble segments + data -> link in ROM order -> objcopy -> SHA-1 check.
 Unchanged inputs are not rebuilt (content hash).
 """
@@ -20,6 +20,7 @@ import tempfile
 import time
 
 from romlib import BASEROM_SHA1, ROOT
+from source_layout import header_paths
 
 TOOLS = os.path.join(ROOT, "build", "tools")
 AGBCC = os.environ.get("AGBCC", os.path.join(TOOLS, "agbcc", "agbcc"))
@@ -119,8 +120,9 @@ def compiler_identity(path):
 @functools.lru_cache(maxsize=None)
 def headers_hash():
     # Every unit depends on every header: hash them once per invocation, not per unit.
-    return file_hash(*[os.path.join(d, f) for d in ("include", "include/gba")
-                       for f in sorted(os.listdir(os.path.join(ROOT, d))) if f.endswith(".h")], "tools/build.py")
+    headers = header_paths(ROOT)
+    return file_hash(*headers, "tools/build.py",
+                     extra="\0".join(str(path.relative_to(ROOT)) for path in headers))
 
 
 def inline_macros(text):

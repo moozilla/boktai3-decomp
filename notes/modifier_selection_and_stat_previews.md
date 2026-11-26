@@ -3,8 +3,8 @@
 Tags: #modifiers #menu #matching #unit-consolidation
 
 Range: 0803F804–080408A4, end exclusive. Consolidated the 44 input files into
-`src/modifier_selection_and_stat_previews.c` in ROM order. Reused
-`include/modifier_list.h`: these are the same ModifierSelection/ModifierMenu
+`src/menus/modifier_selection_and_stat_previews/modifier_selection_and_stat_previews.c` in ROM order. Reused
+`include/engine/shared/modifier_list.h`: these are the same ModifierSelection/ModifierMenu
 objects used by the surrounding menu code. No new separate header is needed.
 
 ## Types and interpretation

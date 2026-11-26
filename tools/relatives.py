@@ -29,6 +29,7 @@ instruction ranges in both functions.
 import argparse
 import collections
 import glob
+from source_layout import locate, manifest, new_source
 import os
 import re
 import sys
@@ -216,16 +217,8 @@ def relatives(name, n=5):
 
 
 def c_file(name):
-    nm = names()
-    p = os.path.join(ROOT, "src", "fn", f"{name}.c")
-    if os.path.exists(p):
-        return p
-    pretty = nm.get(name, name)
-    for f in glob.glob(os.path.join(ROOT, "src", "**", "*.c"), recursive=True):
-        t = open(f).read()
-        if re.search(r"\b(" + re.escape(name) + "|" + re.escape(pretty) + r")\s*\([^;{]*\)\s*\{", t):
-            return f
-    return None
+    entry = locate(name)
+    return os.path.join(ROOT, entry[0]) if entry else None
 
 
 def c_body(name):
@@ -312,15 +305,11 @@ def report(minimum, markdown):
 
 
 def candidate(name, rel):
-    """The relative's C file, renamed to define name; None if the relative
-    does not live alone in src/fn/."""
-    path = os.path.join(ROOT, "src", "fn", f"{rel}.c")
+    """Rename a single-function donor to define NAME."""
+    path = c_file(rel)
+    if not path or not manifest().single_file(rel):
+        return None
     pretty = names().get(rel, rel)
-    if not os.path.exists(path):
-        f = c_file(rel)
-        if not f or not os.path.basename(f).startswith("sub_"):
-            return None
-        path = f
     text = open(path).read()
     if text.count("INCLUDE_ASM") or "#ifdef NONMATCHING" in text:
         return None
@@ -391,8 +380,9 @@ def port(minimum, keep):
             text = res.stdout + res.stderr
             if res.returncode == 0 and f"{name}: MATCH" in text:  # the target, not the relative
                 verdict = "MATCH" + (" (constants renamed)" if attempt == "constants" else "")
-                dest = os.path.join(ROOT, "src", "fn", name + ".c")
-                if keep and not os.path.exists(dest):  # never replace existing C
+                dest = os.path.join(ROOT, new_source(int(name[4:], 16), name))
+                if keep and not locate(name) and not os.path.exists(dest):
+                    os.makedirs(os.path.dirname(dest), exist_ok=True)
                     shutil.copy(out, dest)
                 break
             m = re.search(r"fuzzy ([\d.]+)%", text)
@@ -401,7 +391,7 @@ def port(minimum, keep):
         rows.append((name, rel, verdict))
         print(f"{name}  from {nm.get(rel, rel):40s} {verdict}", flush=True)
     n = sum(1 for r in rows if r[2].startswith("MATCH"))
-    print(f"\n{n} MATCH of {len(rows)} candidates" + (" (copied to src/fn/)" if keep and n else ""))
+    print(f"\n{n} MATCH of {len(rows)} candidates" + (" (copied to src/)" if keep and n else ""))
 
 
 def main():

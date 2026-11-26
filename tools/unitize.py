@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
-"""Consolidate src/fn/ files into subsystem units, one headless worker per subsystem.
+"""Consolidate one-function files into subsystem units, one headless worker per subsystem.
 
-  unitize.py list [--min 8]                subsystems with at least --min src/fn files
+  unitize.py list [--min 8]                subsystems with at least --min one-function files
   unitize.py run [--jobs 4] [--backend codex|claude] [--model M] [--min 8] [--only NAME,...] [--limit K]
                                            a worktree per subsystem (tools/worktree.sh,
                                            branch unit/<slug>), a worker (default codex exec
@@ -30,9 +30,8 @@ from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-import progress  # noqa: E402
 from romlib import ROOT  # noqa: E402
-from split import c_functions  # noqa: E402
+from source_layout import directory_for, manifest
 
 OUT = os.path.join(ROOT, "build", "unitize")
 WT = os.path.join(os.path.dirname(ROOT), "wt")
@@ -52,29 +51,31 @@ def slug(name):
 
 def subsystems(min_files, match_first=False):
     rows = list(csv.DictReader(open(os.path.join(ROOT, "symbols", "progress_subsystems.csv"))))
-    funcs, _ = progress.load_functions()
-    addr = {n: a for n, a in funcs}
-    addr.update({f"sub_{a:08X}": a for n, a in funcs})
-    where = []                                     # (first address, file) for every C file
-    for p in sorted(Path(ROOT, "src").rglob("*.c")):
-        a = [addr[f] for f in c_functions(p) if f in addr]
-        if a:
-            where.append((min(a), max(a), str(p.relative_to(ROOT))))
+    where = sorted((min(addresses), max(addresses), path, len(addresses) == 1)
+                   for path, addresses in manifest().by_file.items())
     import worklist
     done = worklist.done_names()
     unmatched = [f for f in worklist.functions() if f["name"] not in done]
     out = []
     for r in rows:
         lo, hi = int(r["start"], 16), int(r["end"], 16)
-        files = [f for a0, a1, f in sorted(where) if lo <= a0 < hi or lo <= a1 < hi]
-        nfn = sum(1 for f in files if f.startswith("src/fn/"))
+        files = [(path, single) for a0, a1, path, single in where if a0 < hi and a1 >= lo]
+        nfn = sum(single for _, single in files)
+        folder = directory_for(lo)
+        stem = folder.name
+        unit = (Path("src") / folder / (stem + ".c")).as_posix()
+        header = (Path("include") / folder / (stem + ".h")).as_posix()
         if nfn >= min_files or (match_first and any(lo <= f["addr"] < hi for f in unmatched)):
             um = [f for f in unmatched if lo <= f["addr"] < hi]
-            out.append(dict(name=r["name"], start=r["start"], end=r["end"], slug=slug(r["name"]),
+            key = slug(r["name"])
+            if sum(other["name"] == r["name"] for other in rows) > 1:
+                key += "_" + r["start"].lower()
+            out.append(dict(name=r["name"], start=r["start"], end=r["end"], slug=key,
+                            unit=unit, header=header,
                             unmatched_insns=sum(f["insns"] for f in um),
                             unmatched="\n".join(f"  {f['addr']:08X} {f['name']} ({f['insns']})"
                                                  for f in sorted(um, key=lambda f: -f["insns"])) or "  (none)",
-                            files=files, fn=nfn, size=hi - lo))
+                            files=[path for path, _ in files], fn=nfn, size=hi - lo))
     return out
 
 
@@ -89,7 +90,7 @@ decomp progress: byte-identical C for the unmatched functions of one subsystem.
 
   name:  {name}
   range: {start}-{end}  (END exclusive)
-  unit:  src/{slug}.c with shared types in include/{slug}.h (reuse an existing header
+  unit:  {unit} with shared types in {header} (reuse an existing header
          in include/ if this is the same object)
 
 Unmatched functions here, biggest first (address, name, instructions):
@@ -99,15 +100,15 @@ Unmatched functions here, biggest first (address, name, instructions):
    {start} {end}` lists its files) and recover the shared struct types into the header.
    Working from the subsystem's real types is what makes the large functions match.
 2. Match the unmatched functions, biggest payoff first, at their ROM position in the unit
-   (merge the subsystem's src/fn/ files into the unit as docs/UNIT_WORKER.md describes).
-   Check each with `tools/check.py src/{slug}.c` (seconds). Helpers: tools/regions.py
+   (merge the subsystem's one-function files into the unit as docs/UNIT_WORKER.md describes).
+   Check each with `tools/check.py {unit}` (seconds). Helpers: tools/regions.py
    (structure score ignoring registers: get the structure right first), tools/explain.py,
    tools/repair.py (wrong constants and callees), tools/relatives.py ADDR (similar matched
    code), tools/rasolve.py and tools/translate.py (register allocation, last). Spend real
    effort on big functions: they are most of the remaining code. A close miss (fuzzy at
    least 80%) stays as a `#ifdef NONMATCHING` draft; otherwise keep the INCLUDE_ASM.
 3. Byte-identical only; no handwritten asm() instructions, no new register pins.
-   Every function in the unit must still match: `tools/check.py src/{slug}.c` exits 0.
+   Every function in the unit must still match: `tools/check.py {unit}` exits 0.
 Do not run tools/build.py or make (the full ROM build runs at integration). Name functions
 you understand with a file-local `#define NewName sub_XXXXXXXX` alias. Do not run git commit
 (the driver commits after verifying). Don't edit shared docs (docs/HANDOFF.md, INDEX.md,
@@ -122,7 +123,7 @@ def state_path(s):
 
 
 def run_one(s, model, base, backend="codex", effort="medium", recheck=False, fallback=None, floor=QUOTA_FLOOR):
-    st = {"name": s["name"], "slug": s["slug"]}
+    st = {key: s[key] for key in ("name", "slug", "unit", "header")}
     if os.path.exists(state_path(s)):
         st = json.load(open(state_path(s)))
         transient = st.get("state") == "failed" and os.path.exists(os.path.join(OUT, s["slug"] + ".log")) and \
@@ -197,16 +198,16 @@ def verify(s, st, d, before):
     subprocess.run(["make", "format"], cwd=d, capture_output=True)
     # fast check of the unit (seconds): its functions against the ROM. The full ROM build
     # runs once per batch at integration (tools/unit_integrate.py).
-    b = subprocess.run([sys.executable, "tools/check.py", f"src/{s['slug']}.c", "--quiet"], cwd=d,
+    b = subprocess.run([sys.executable, "tools/check.py", s["unit"], "--quiet"], cwd=d,
                        capture_output=True, text=True)
     ok = b.returncode == 0
     after = matched_bytes(d)
-    unit = os.path.exists(os.path.join(d, "src", s["slug"] + ".c"))
+    unit = os.path.exists(os.path.join(d, s["unit"]))
     good = ok and unit and after is not None and before is not None and after >= before
     if good:                      # the worker leaves its changes; commit them here, one per subsystem
         subprocess.run(["git", "add", "-A", "src", "include", "symbols", "notes"], cwd=d, check=True)
         subprocess.run(["git", "checkout", "--", "docs"], cwd=d, capture_output=True)   # shared docs collide
-        subprocess.run(["git", "commit", "-q", "-m", f"Unit {s['slug']}: merge {s['fn']} files into src/{s['slug']}.c\n\n"
+        subprocess.run(["git", "commit", "-q", "-m", f"Unit {s['slug']}: merge {s['fn']} files into {s['unit']}\n\n"
                         f"{s['name']} ({s['start']}-{s['end']}); tools/unitize.py, build OK, "
                         f"matched bytes {before} -> {after}.\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"],
                        cwd=d, capture_output=True)
@@ -214,7 +215,7 @@ def verify(s, st, d, before):
                            capture_output=True, text=True).stdout.strip()
     drop_build(d)
     st.update(state="verified" if good and not dirty else "failed",
-              build_ok=ok, unit=unit, before=before, after=after, uncommitted=bool(dirty),
+              build_ok=ok, unit=s["unit"], header=s["header"], before=before, after=after, uncommitted=bool(dirty),
               branch="unit/unit-" + s["slug"], worktree=d)
     json.dump(st, open(state_path(s), "w"), indent=1)
     return st

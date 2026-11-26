@@ -2,7 +2,7 @@
 
 Tags: Mimic, 080E6E08, 080E7134, 080E7FF4, 080E8158, 080E87C4, phase4
 
-Consolidated 36 files from 080E6E08 through 080E98A4 into `src/mimic.c`.
+Consolidated 36 files from 080E6E08 through 080E98A4 into `src/monsters/mimic/mimic.c`.
 The formatted unit matches all 10908 bytes with the stock compiler.
 
 The complete 0x664 allocation includes a navigation probe, destination, saved

@@ -6,7 +6,7 @@ import unittest
 from tools.matchsearch.evaluator import _load_scope
 
 UI = """# 1 "draft.c"
-# 1 "include/global.h" 1
+# 1 "include/engine/shared/global.h" 1
 int header_line; goto nowhere;
 # 2 "draft.c" 2
 void f(int x)

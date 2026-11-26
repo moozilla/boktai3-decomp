@@ -5,7 +5,7 @@ Tags: #matching #actors #animation
 `PlayerClone_UpdateBehavior`, 082003BC–08200A10, now matches without its volatile
 fill local. Its concession-free line score rises from 99.4% to 100%, a gain of
 0.6 percentage points for this function. All 1620 function bytes match; the
-complete `src/player_clone.c` unit also matches all 4452 bytes.
+complete `src/player/player_clone/player_clone.c` unit also matches all 4452 bytes.
 
 The fill word and the existing 24-byte particle-motion configuration now belong
 to one ordinary local scratch record. Both members are used; no padding, extra
@@ -26,7 +26,7 @@ routine uses the same particle initialization/configuration calls and supports
 this representation. It was read as evidence and was not edited.
 
 Validation used the stock compiler with an isolated function check followed by
-`tools/check.py src/player_clone.c`. The updated concession scanner finds no
+`tools/check.py src/player/player_clone/player_clone.c`. The updated concession scanner finds no
 direct counted sites in the unit, and progress scoring reports no penalty for
 `PlayerClone_UpdateBehavior`. No shared headers or checked-in progress reports
 changed. The coordinator owns the combined ROM build and global progress update.

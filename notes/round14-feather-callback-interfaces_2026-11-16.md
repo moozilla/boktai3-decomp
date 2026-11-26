@@ -36,7 +36,7 @@ The former state-zero source described a module-initialization hook and used
 `void(void)`. Its table membership establishes the two ignored state-callback
 arguments. No symbol or ROM table entry was renamed.
 
-`include/feather_effect_pool.h` now declares all four prototypes and the exact
+`include/effects/feather_effect_pool/feather_effect_pool.h` now declares all four prototypes and the exact
 four-entry table extent. A stock-compiler probe initializes a real
 `FeatherStateCallback[4]` from those four names in ROM order; it produces no
 diagnostics. Each definition includes the same header, so an incompatible
@@ -91,14 +91,14 @@ is preserved as a complete replayable source patch.
 
 ## Creator and scheduler boundary
 
-`src/fn/sub_081297DC.c` now includes the Feather owner and removes its false
+`src/effects/feather_effect_pool/sub_081297DC.c` now includes the Feather owner and removes its false
 `void FeatherEffectPool_UpdateTask(void)` declaration. The creator returns
 `struct FeatherPool *`, using its existing allocation local as an opaque
 object pointer through the pre-existing task APIs. This removes the old
 incompatible return warning without a cast or a new helper.
 
 The sole existing caller, `FeatherEffectPool_CreateDirectional` in
-`src/fn/sub_081294B4.c`, already declares a `FeatherPool *` return. Its complete
+`src/effects/feather_effect_pool/sub_081294B4.c`, already declares a `FeatherPool *` return. Its complete
 540-byte unit was checked. **Only the return tag/address meaning is aligned:**
 that caller still defines private Feather and truncated FeatherPool records.
 This is not a claim that the creator/caller family has fully canonical types.
@@ -109,8 +109,8 @@ false declaration previously concealed:
 > passing arg 2 of `Task_SetCallbacks' from incompatible pointer type
 
 The creator's unchanged private registration prototype accepts `void(void)`
-callbacks. The implementation in `src/task_scheduler.c` instead takes callbacks
-on `RuntimeTask *`; `include/engine.h` has a generic `void *` callback contract,
+callbacks. The implementation in `src/engine/task_scheduler/task_scheduler.c` instead takes callbacks
+on `RuntimeTask *`; `include/engine/shared/engine.h` has a generic `void *` callback contract,
 and the shared `Task` header uses its own task-pointer type. The Feather updater
 actually returns `u32` and takes `FeatherPool *`. The creator also retains its
 pre-existing false `void(void)` destructor declaration, whose implementation
@@ -145,14 +145,14 @@ Remaining private family records are deliberately outside this bounded fix:
 
 | Existing source | Remaining private view |
 |---|---|
-| `src/fn/sub_08128B4C.c` | Allocator's private `S`/`E` pool and slot records |
-| `src/fn/sub_08128D24.c` | Clip-path Feather view |
-| `src/fn/sub_08128F98.c` | Ground-scatter Feather view |
-| `src/fn/sub_081294B4.c` | Directional creator's Feather, pool, and vector views |
-| `src/fn/sub_0812975C.c` | Destructor's private pool/entry records |
-| `src/fn/sub_081297A4.c` | Initializer's private pool prefix |
+| `src/effects/feather_effect_pool/sub_08128B4C.c` | Allocator's private `S`/`E` pool and slot records |
+| `src/effects/feather_effect_pool/sub_08128D24.c` | Clip-path Feather view |
+| `src/effects/feather_effect_pool/sub_08128F98.c` | Ground-scatter Feather view |
+| `src/effects/feather_effect_pool/sub_081294B4.c` | Directional creator's Feather, pool, and vector views |
+| `src/effects/feather_effect_pool/sub_0812975C.c` | Destructor's private pool/entry records |
+| `src/effects/feather_effect_pool/sub_081297A4.c` | Initializer's private pool prefix |
 
-The local types named Feather in `src/large_fragment_effect.c` are a different
+The local types named Feather in `src/effects/large_fragment_effect/large_fragment_effect.c` are a different
 record: their state/slot/enter offsets differ. Name similarity alone is not
 sufficient to migrate them into this state-table family.
 

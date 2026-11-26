@@ -441,7 +441,7 @@ The existing tools/cloud_task.py modification was left untouched.
   concession marker. `depin.py --write` was invoked; it skips a nonexact base.
   Remaining realigned differences: 83 total, 61 ignoring registers, chiefly
   flag insertion, branch layout and address/zero lifetimes. Default build uses
-  INCLUDE_ASM. Final command: tools/check.py src/fn/sub_081A2858.c
+  INCLUDE_ASM. Final command: tools/check.py src/bosses/hresvelgr/sub_081A2858.c
   --nonmatching --record. Candidate emits 860 bytes against an 868-byte extent;
   this is a guarded draft only, not exact progress.
 - **081A39E0 — stopped, candidate 65.2%.** Existing canonical name is
@@ -2983,7 +2983,7 @@ Exact progress gain: 0 percentage points; no byte-identical matches.
 - 080A62DC: stopped at 70.1%; retained locally in wip/sub_080A62DC.c. Response windup sets flags2D0 bit 0x100000, starts segment animation 18, clears secondary motion with CpuSet, and grows field2EA by 10 or 40 depending on counter2AC. Threshold is 200 or 300 based on body[0x8EA] > 3, then transitions to 080A65A8. Otherwise moves backward with speed 1 or 2 and performs the shared segment positioning. Strength-reduced loop and register lifetimes still differ (132 realigned / 87 ignoring registers).
 - 080A4798: stopped at 32.9%; retained locally in wip/sub_080A4798.c. Contact-route selection computes an angle toward fieldDC's position, forms a 160-scaled direction vector, scans route points for a negative dot product while excluding the current point, and otherwise calls Spider_SelectRandomEntry. Packed-vector bitfields and inline output lifetimes need further reconstruction; current candidate does not reproduce the stack/register layout.
 
-Useful seed: src/fn/sub_080A73B4.c has TentacleBody's inline Select implementation. Naming prefix follows TentacleBody_GetDirectionFrame and TentacleBody_UpdateDefeat. Ghidra export gen/ghidra/decomp.c is absent. Only fast per-file checks were run; no full build or network actions.
+Useful seed: src/monsters/tentacle_body/sub_080A73B4.c has TentacleBody's inline Select implementation. Naming prefix follows TentacleBody_GetDirectionFrame and TentacleBody_UpdateDefeat. Ghidra export gen/ghidra/decomp.c is absent. Only fast per-file checks were run; no full build or network actions.
 
 Tool caveat: depin.py --write on guarded NONMATCHING drafts checked the default assembly branch and removed both pins as apparent matches. Restored the pins and explicitly rechecked with check.py --nonmatching --record. Integrators should strip the guard or fix depin's draft checking before using it on these files.
 
@@ -3158,7 +3158,7 @@ Four exact matches and one guarded draft committed separately through build/comm
 
 Tags: #matching #golem #register-pinning
 
-- **080C9848 matched**, named `Golem_UpdateDefeat`, in `src/golem_2.c`.
+- **080C9848 matched**, named `Golem_UpdateDefeat`, in `src/monsters/golem/golem_2.c`.
   The Golem initializer references this callback alongside the default reaction
   callback. It consumes field2B2, selects animation 10, releases attachment slots
   0/1/3, clears group control and collision timers, plays song 0x13E, and marks
@@ -3198,7 +3198,7 @@ Tags: #matching #player #register-pinning
 
 Five exact matches add approximately **0.113 percentage points** of code coverage
 (2,724 bytes). Two new guarded drafts are not exact progress. All changes are
-in `src/player_3.c`; each accepted function has its own driver commit and a
+in `src/player/player_3.c`; each accepted function has its own driver commit and a
 file-local descriptive alias. Interpretations remain tentative.
 
 - **0813D178 matched**, `Player_InitVisualResources`: mode-zero resource selection
@@ -3271,7 +3271,7 @@ file-local descriptive alias. Interpretations remain tentative.
   Ghidra export is present in this worktree.
 
 Validation: formatted directly with build/venv/bin/clang-format. Final default
-`tools/check.py src/player_3.c` reports zero differing bytes over 13,128 bytes.
+`tools/check.py src/player/player_3.c` reports zero differing bytes over 13,128 bytes.
 `--nonmatching --record` confirms both new draft scores and preserves the two
 preexisting draft scores (82.1% and 85.0%). Used local aliases for two external
 attack-charge names absent from the cached ELF symbol table. No full build,

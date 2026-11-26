@@ -30,7 +30,7 @@ How to work, one object at a time, in address order:
    Video_SetRenderCallbacks, Camera_UpdatePositionMode, Background_Update, Sprite_InitSystem,
    Bg_UpdateScrollShadow, Collection_LoadPageBackground.
 4. **Files you must not change**: every file listed in build/draft_units.txt (units with NONMATCHING
-   drafts that matching workers are editing right now, plus src/iwram_code.c). When ramlayout.py or your
+   drafts that matching workers are editing right now, plus src/engine/iwram_arm_code/iwram_code.c). When ramlayout.py or your
    edits change one of them, put it back (`git checkout -- FILE`), then confirm it still compiles and
    matches as before: `tools/check.py FILE` and `tools/check.py FILE --nonmatching`. Their old `gUnk_`
    name keeps linking from its address. If putting a file back breaks it (a `#define NAME gUnk_X` alias

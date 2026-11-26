@@ -13,20 +13,20 @@ The coordinator still needs to validate the combined ROM build.
 
 | Request | Unit | ROM range | Functions | Bytes |
 | --- | --- | --- | ---: | ---: |
-| 0002 | `src/scene_actors.c` | 080213EC–08021EA8 | 27 | 2748 |
-| 0003 | `src/actor_pool.c` | 0802C678–0802C8A0 | 9 | 552 |
-| 0004 | `src/pooled_actor_helpers.c` | 0802C8A0–0802CD04 | 17 | 1124 |
-| 0006 | `src/pooled_actor_controller.c` | 0802CD04–0802D5B4 | 28 | 2224 |
-| 0007 | `src/scene_actor_lifecycle.c` | 0802D5B4–0802D9F8 | 20 | 1092 |
-| 0014 | `src/scene_actor_animation.c` | 0802D9F8–08030710 | 52 | 11544 |
-| 0009 | `src/contact_actor_display.c` | 080427FC–08042E18 | 9 | 1564 |
-| 0010 | `src/pooled_motion.c` | 080454C0–08045A20 | 19 | 1376 |
-| 0015 | `src/contact_sequence_actor.c` | 08045D18–08046880 | 22 | 2920 |
-| 0011 | `src/orbit_contact_actor.c` | 08046880–08046B28 | 8 | 680 |
-| 0012 | `src/contact_burst.c` | 08047F68–080483A0 | 9 | 1080 |
-| 0013 | `src/scene_actor_terrain_reactions.c` | 08072854–08072BA8 | 3 | 852 |
-| 0016 | `src/scene_actor_profiles.c` | 08073C04–0807462C | 6 | 2600 |
-| 0017 | `src/actor_phase.c` | 080F8010–080F85B0 | 6 | 1440 |
+| 0002 | `src/actors/common_scene_actor_controller/scene_actors.c` | 080213EC–08021EA8 | 27 | 2748 |
+| 0003 | `src/actors/pooled_actor_manager/actor_pool.c` | 0802C678–0802C8A0 | 9 | 552 |
+| 0004 | `src/actors/pooled_actor_shared_helpers/pooled_actor_helpers.c` | 0802C8A0–0802CD04 | 17 | 1124 |
+| 0006 | `src/actors/pooled_actor_controllers/pooled_actor_controller.c` | 0802CD04–0802D5B4 | 28 | 2224 |
+| 0007 | `src/actors/scene_actor_resources_and_lifecycle/scene_actor_lifecycle.c` | 0802D5B4–0802D9F8 | 20 | 1092 |
+| 0014 | `src/actors/scene_actor_animation_and_scripted_actions/scene_actor_animation.c` | 0802D9F8–08030710 | 52 | 11544 |
+| 0009 | `src/actors/contact_actor_pool_setup_and_display/contact_actor_display.c` | 080427FC–08042E18 | 9 | 1564 |
+| 0010 | `src/actors/parameterized_motion_pool/pooled_motion.c` | 080454C0–08045A20 | 19 | 1376 |
+| 0015 | `src/actors/sequence_contact_actor_pool/contact_sequence_actor.c` | 08045D18–08046880 | 22 | 2920 |
+| 0011 | `src/actors/orbit_contact_actor/orbit_contact_actor.c` | 08046880–08046B28 | 8 | 680 |
+| 0012 | `src/actors/contact_burst_effects/contact_burst.c` | 08047F68–080483A0 | 9 | 1080 |
+| 0013 | `src/actors/scene_actor_terrain_reactions/scene_actor_terrain_reactions.c` | 08072854–08072BA8 | 3 | 852 |
+| 0016 | `src/actors/scene_actor_profiles/scene_actor_profiles.c` | 08073C04–0807462C | 6 | 2600 |
+| 0017 | `src/actors/actor_phase/actor_phase.c` | 080F8010–080F85B0 | 6 | 1440 |
 
 ## Types and compiler evidence
 

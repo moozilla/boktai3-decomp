@@ -61,6 +61,7 @@ import struct as pystruct
 import subprocess
 import sys
 import tempfile
+from source_layout import manifest
 
 TOOLS = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(TOOLS)
@@ -1010,7 +1011,7 @@ def scan_all(globals_, jobs):
     os.makedirs(stubdir, exist_ok=True)
     for h in headers():
         p = os.path.join(stubdir, os.path.basename(h)[:-2] + ".c")
-        txt = f'#include "global.h"\n#include "{os.path.basename(h)}"\n'
+        txt = f'#include "engine/shared/global.h"\n#include "{os.path.relpath(h, 'include')}"\n'
         if not os.path.exists(p) or open(p).read() != txt:
             open(p, "w").write(txt)
         stubs.append(os.path.relpath(p, ROOT))
@@ -1308,7 +1309,7 @@ def function_files():
                 names |= {a, b}
         for n in names:
             out[n].add(f)
-    return {n: sorted(fs, key=lambda f: (f.startswith("src/fn/"), f)) for n, fs in out.items()}
+    return {n: sorted(fs, key=lambda f: (len(manifest().by_file.get(f, ())) == 1, f)) for n, fs in out.items()}
 
 
 def report(g, addr, entries, syms_sorted, aliases=(), parent=None, funcs=None):

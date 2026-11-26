@@ -60,7 +60,7 @@ Evidence: `build/scope/campaign/resume_08181514/REPORT.md`, `build/scope/campaig
 - `SceneActorReaction_ApplyStaggerDamage` (836 bytes): remove the same pin and its hit-bit value constraint using the signed halfword setter.
 - `SceneActorControl_UpdateCallbackTrigger` (288 bytes): greedy production checks remove one pin and two empty constraints; remove stale mismatch commentary and unused helpers, and use the shared death-control field.
 - Four damage handlers now use shared actor, palette and collider fields. Duplicate damage-property and drawable records were removed from both area-damage handlers.
-- `include/scene_actor_damage_visibility.h` owns the common link ownership/display predicate used by five exact handlers. The remaining resolver can migrate after its allocation decision is solved.
+- `include/engine/shared/scene_actor_damage_visibility.h` owns the common link ownership/display predicate used by five exact handlers. The remaining resolver can migrate after its allocation decision is solved.
 - `damage_number_display.h` now owns the source identity record and actual Show declaration; the incompatible default-scale wrapper declaration was removed. `scene_hud_display.h` owns the actual timed-state declaration. All 118 actual includers match over their full reviewed extents.
 - The shared orbit header has an include guard; all ten source includers still match.
 - Three marker parameter tables now round-trip from editable CSVs: 180 bytes of frame/animation indices and signed XYZ/unknown-halfword offsets. Reviewed nonpointer ranges remove a false code relocation at 0824E6D8. Legacy linker labels remain compatible with existing C.

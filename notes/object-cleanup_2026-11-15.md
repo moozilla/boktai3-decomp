@@ -28,7 +28,7 @@ includes a changed header was checked with `tools/check.py` through the new
 
 ## Item 2: task headers
 
-* `struct Task` moved from `engine.h` to a new `include/task.h` (engine.h includes it), so
+* `struct Task` moved from `engine.h` to a new `include/engine/shared/task.h` (engine.h includes it), so
   object headers can embed it without pulling in all of engine.h and its prototypes.
 * 116 structs began with a 0x18-byte byte array. 94 now begin with `struct Task task;`,
   each verified from its creator in one of three ways: the `Task_Create` result is assigned
@@ -95,12 +95,12 @@ includes a changed header was checked with `tools/check.py` through the new
 
 ## Item 4: Nidhoggr
 
-* `src/fn/sub_08191508.c` (Nidhoggr_HidePartWithExplosion) uses the header's struct.
+* `src/effects/large_scene_animation_controller/sub_08191508.c` (Nidhoggr_HidePartWithExplosion) uses the header's struct.
   `NidhoggrCollider` gains `flags` at +6 (bit 2 disables the collider) and
   `NidhoggrPartExtra` gains `flags` at +4 (bit 0 hides the part). The local `parts` were
   `rows` (flags at row+8), `partPhases` is `rowInitFlag` and `partCompleted` is
   `rowDoneFlag`.
-* Also folded in: `struct BossParts` in `src/fn/sub_08190C98.c`
+* Also folded in: `struct BossParts` in `src/effects/large_scene_animation_controller/sub_08190C98.c`
   (Nidhoggr_ChangeCompletedPartState). Its `state[26]` at 0x71C2 is the header's new
   `partState` (it keys the part animation callback table in Nidhoggr_UpdatePartSequences).
 * The unit's three index-scaled address computations stay as they were; each one
@@ -109,7 +109,7 @@ includes a changed header was checked with `tools/check.py` through the new
 
 ## Doc errors found (fixed in docs/OBJECT_MODEL.md)
 
-* `struct Task` is in `include/task.h` now (was engine.h).
+* `struct Task` is in `include/engine/shared/task.h` now (was engine.h).
 * Item 2 counts: 116 candidates, 94 verified, not "about 80".
 * Item 3: nineteen declarations (six of them with private `struct Player` definitions),
   not twelve with nine types; plus ~200 cast sites the doc did not count.
@@ -121,8 +121,8 @@ includes a changed header was checked with `tools/check.py` through the new
 Evidence: `notes/room-actor-layout_2026-11-15.md` (from the new `tools/struct_views.py`).
 The result is described in `docs/OBJECT_MODEL.md` family 2; this is the log.
 
-* `struct RoomActor` (include/room_actor.h, 0..0x3D4) is the base. `struct ChaseActor`
-  (include/chase_actor.h) is RoomActor plus `struct SceneActorChaseGroup`, 0x624 bytes: the
+* `struct RoomActor` (include/link/registry_1745/room_actor.h, 0..0x3D4) is the base. `struct ChaseActor`
+  (include/engine/shared/chase_actor.h) is RoomActor plus `struct SceneActorChaseGroup`, 0x624 bytes: the
   type the shared chase code takes. Chase classes embed ChaseActor (Skeleton, Ghoul, Mimic,
   Vorn, Golem, Mummy, Dog); the others embed RoomActor (Bee, Crow, Ghost, Slime, Tentacle).
 * The views are gone: ResetView (it was ChaseActor plus family fields, which moved to new
@@ -228,15 +228,15 @@ The result is described in `docs/OBJECT_MODEL.md` family 2; this is the log.
   * Prototypes naming a struct that is defined later in the unit (they get a
     forward declaration).
 * Units so far (each whole unit MATCH):
-  * `src/spider.c`: 45 functions, 15172 bytes.
-  * `src/octopus.c`: 46 functions, 14980 bytes.
-  * `src/lun.c`: 50 functions, 16116 bytes.
-  * `src/ivy.c`: 61 functions, 21464 bytes.
-  * `src/ivy_child.c`: 11 functions, 2424 bytes.
-  * `src/bat.c`: Bat_Init and Bat_Create.
-  * `src/bat_restore.c` and `src/bat_defeat.c`.
-  * `src/axe_contact.c`: 7 functions, 2708 bytes.
-  * `src/axe.c`: 96 functions, 29148 bytes.
+  * `src/monsters/spider/spider.c`: 45 functions, 15172 bytes.
+  * `src/monsters/octopus/octopus.c`: 46 functions, 14980 bytes.
+  * `src/monsters/lun/lun.c`: 50 functions, 16116 bytes.
+  * `src/monsters/ivy/ivy.c`: 61 functions, 21464 bytes.
+  * `src/monsters/ivy/ivy_child.c`: 11 functions, 2424 bytes.
+  * `src/monsters/bat/bat.c`: Bat_Init and Bat_Create.
+  * `src/monsters/bat/bat_restore.c` and `src/bat_defeat.c`.
+  * `src/monsters/axe/axe_contact.c`: 7 functions, 2708 bytes.
+  * `src/monsters/axe/axe.c`: 96 functions, 29148 bytes.
 * More hand fixes, each keeping every file byte-identical:
   * Function-name aliases (`#define OldName Axe_Name`) hid conflicting prototypes.
     They give way to the real name.
@@ -247,13 +247,13 @@ The result is described in `docs/OBJECT_MODEL.md` family 2; this is the log.
     * `SceneActorTerrain_RequestRetreatRoute` takes a ChaseActor.
     * `Collider_SetAttackProperties` takes u32 arguments.
 * More units (each whole unit MATCH):
-  * Dog: `src/dog.c` (10356 bytes), `src/dog_scripted.c` (5028), `src/dog_approach.c` (6940).
-  * Mummy: `src/mummy.c` (2900), `src/mummy_entry.c` (1788), `src/mummy_defeat.c` (7936),
+  * Dog: `src/monsters/dog/dog.c` (10356 bytes), `src/dog_scripted.c` (5028), `src/dog_approach.c` (6940).
+  * Mummy: `src/monsters/mummy/mummy.c` (2900), `src/monsters/mummy/mummy_entry.c` (1788), `src/mummy_defeat.c` (7936),
     `src/mummy_pursuit.c` (1584), `src/mummy_path.c` (15236), `src/mummy_init.c` (4952).
-  * `src/skeleton_rise.c` (5508).
-  * Vorn: `src/vorn.c` (8472), `src/vorn_main.c` (13216), `src/vorn_main_2.c` (11460).
-  * Golem: `src/golem_main.c` (20620), `src/golem_main_2.c` (10964), `src/golem_main_3.c` (4248).
-  * Skeleton: `src/skeleton_main.c` (71 functions, 31956 bytes).
+  * `src/monsters/skeleton/skeleton_rise.c` (5508).
+  * Vorn: `src/monsters/vorn/vorn.c` (8472), `src/monsters/vorn/vorn_main.c` (13216), `src/vorn_main_2.c` (11460).
+  * Golem: `src/monsters/golem/golem_main.c` (20620), `src/monsters/golem/golem_main_2.c` (10964), `src/golem_main_3.c` (4248).
+  * Skeleton: `src/monsters/skeleton/skeleton_main.c` (71 functions, 31956 bytes).
   * `src/dog_reaction.c` (3152).
 * Header prototypes that disagreed with the definitions now state the definitions'
   own signatures. Every dependent matches:

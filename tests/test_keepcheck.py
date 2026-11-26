@@ -44,15 +44,15 @@ class Helpers(unittest.TestCase):
         self.assertNotIn("z", out)
 
     def test_src_files_skips_lib_and_the_skip_list(self):
-        files = keepcheck.src_files(["src"], skip={"src/sun_clock.c"})
-        self.assertNotIn("src/sun_clock.c", files)
-        self.assertFalse(any(f.startswith("src/lib/") for f in files))
+        files = keepcheck.src_files(["src"], skip={"src/system/clock_and_sun_schedule/sun_clock.c"})
+        self.assertNotIn("src/system/clock_and_sun_schedule/sun_clock.c", files)
+        self.assertFalse(any(keepcheck.is_upstream(f) for f in files))
 
 
 @unittest.skipUnless(os.path.exists(os.path.join(ROOT, "build", "boktai3.elf"))
                      and os.path.exists(os.path.join(ROOT, "baserom.gba")), "needs a built tree")
 class Gate(unittest.TestCase):
-    REL = "src/sun_clock.c"
+    REL = "src/system/clock_and_sun_schedule/sun_clock.c"
 
     def setUp(self):
         self.path = os.path.join(ROOT, self.REL)

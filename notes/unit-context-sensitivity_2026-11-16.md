@@ -73,7 +73,7 @@ never does.
 ## What follows
 
 * Replace the chase selectors with real code. Each class that needs a variant gets its
-  own copy of the inline under its own name, as `src/golem_main.c` already does with
+  own copy of the inline under its own name, as `src/monsters/golem/golem_main.c` already does with
   `Golem_CellIndex`; the headers then keep only the default bodies. This is item 1 of
   the object cleanup.
 * Then rerun the consolidation over these functions; they should join their
@@ -93,12 +93,12 @@ never does.
 
 With the selectors gone, 16 of the 17 held-out functions joined units, as predicted:
 
-* Bat: 08087018, 08087A70 and bat_defeat.c into `src/bat_restore.c`.
+* Bat: 08087018, 08087A70 and bat_defeat.c into `src/monsters/bat/bat_restore.c`.
 * Vorn: 080B2580 joins vorn_main.c and vorn_main_2.c.
 * Golem: 080CBF24 into golem_2.c (with golem_3.c); 080CF3E4 into golem_main_2.c (with
   golem_main_3.c).
-* Mummy: all six, and 080D1A98 onward is one unit, `src/mummy_entry.c`.
-* Dog: all five, and the whole class is one unit, `src/dog.c`.
+* Mummy: all six, and 080D1A98 onward is one unit, `src/monsters/mummy/mummy_entry.c`.
+* Dog: all five, and the whole class is one unit, `src/monsters/dog/dog.c`.
 
 The one left out, 080ACBE0, is a different case: its neighbor 080ACCD4 is compiled with
 old_agbcc (`// COMPILER: old_agbcc`), so neither can share a unit with vorn.c. Joining

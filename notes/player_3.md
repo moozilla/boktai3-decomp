@@ -3,7 +3,7 @@
 Tags: #player #matching #types
 
 Range: `0813C8F0–0813FC38` (end exclusive). The 53 original files were
-merged into `src/player_3.c` in ROM order using `tools/merge_unit.py`.
+merged into `src/player/player_3.c` in ROM order using `tools/merge_unit.py`.
 Its `--write` removal step was adapted locally to unlink the inputs instead
 of invoking `git rm`, because the driver owns git metadata and commits.
 No shared documentation, tool source, generated assembly, or function-name
@@ -11,7 +11,7 @@ registry was edited. The changes are uncommitted.
 
 ## Shared types
 
-`include/player_3.h` includes `engine.h`, reuses `player.h`, and provides
+`include/player/player_3.h` includes `engine.h`, reuses `player.h`, and provides
 `PlayerModifierInput` (equipment selector at +0xB0) and
 `PlayerModifierTarget` (target flags at +0x38). These are callback inputs,
 not additional partial views of the owning Player; their exact broader
@@ -116,9 +116,9 @@ including the retained assembly. Two guarded drafts are not exact progress.
 ## Validation
 
 - `make format` and focused clang-format validation passed.
-- Final `tools/check.py src/player_3.c`: zero differing bytes across 13,128 bytes.
+- Final `tools/check.py src/player/player_3.c`: zero differing bytes across 13,128 bytes.
 - All three signed-history consumers passed their individual exact checks.
-- `tools/check.py src/player_3.c --nonmatching --record` recorded the two drafts.
+- `tools/check.py src/player/player_3.c --nonmatching --record` recorded the two drafts.
 - `tools/build.py`: **build/boktai3.gba: OK**.
 - `tools/progress.py`: no loss of matched code; net batch gain is +0.015
   percentage points (360 bytes), with nine newly defined exact callbacks.

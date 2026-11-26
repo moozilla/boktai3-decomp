@@ -18,7 +18,7 @@ sine-table-driven movement mode.
 New matching C covers both initializers, both queued-command processors, both
 script creation commands, map-ID lookup, and the scrolling family's command
 submission/queue. The existing allocators and cleanup helpers already match.
-`include/background_controller.h` records both families' observed layouts, with
+`include/effects/background_controllers/background_controller.h` records both families' observed layouts, with
 shared command-queue and layer types, retaining explicitly unknown fields. Local register hints in
 the normal initializer and map-ID lookup are temporary matching concessions.
 
@@ -26,7 +26,7 @@ Both frame updates, all map-loading helpers, and both command queues are now
 exact C. A separate map-loading wrapper at 080020BC is now counted independently.
 The palette family handles color-table blending, brightness scaling, oscillation,
 script-driven transitions, resource replacement and hardware palette uploads;
-`include/palette_controller.h` records its shared layout. Some register hints use
+`include/effects/palette_controllers/palette_controller.h` records its shared layout. Some register hints use
 empty compiler constraints; these emit no handwritten instructions.
 
 ## Scheduler findings

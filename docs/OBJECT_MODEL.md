@@ -23,15 +23,15 @@ that some task owns.
 
 ## Family 1: tasks
 
-`struct Task` (`include/task.h`, included by `engine.h`) is the base class of everything the scheduler runs:
+`struct Task` (`include/engine/shared/task.h`, included by `engine.h`) is the base class of everything the scheduler runs:
 `prev`, `next`, `update`, `destroy`, `id`, `flags`, `list`. A subclass is any struct whose
 first 0x18 bytes are that header; its size is the `size` argument to `Task_Create`, and its
 "class" is the pair of callbacks given to `Task_SetCallbacks`.
 
-* **The player** is a task. `struct Player` (`include/player.h`) begins with
+* **The player** is a task. `struct Player` (`include/engine/shared/player.h`) begins with
   `struct Task task;` and is created by `Player_Create` (`Task_Create(6, 0xCAC)`).
 * **Each boss** is its own task class with a very large body. `struct Nidhoggr`
-  (`include/large_scene_animation_controller.h`) is `struct Task`, a `SceneEventReceiver`,
+  (`include/effects/large_scene_animation_controller/large_scene_animation_controller.h`) is `struct Task`, a `SceneEventReceiver`,
   then more than 0x66D8 bytes holding 26 parts with their own visuals and colliders. No
   Hresvelgr, Ratatosk or Vanargand unit touches the registry-actor base.
 * **Managers** are tasks that own pools or lists (scene objects, triggers, the registry
@@ -41,14 +41,14 @@ first 0x18 bytes are that header; its size is the `size` argument to `Task_Creat
 
 The room's enemies. Eighteen units link one into the scene-actor registry with
 `SceneActorRegistry_LinkActor`, and they all follow one recipe; `Skeleton_Create` and
-`Skeleton_Init` in `src/skeleton.c` are a readable example.
+`Skeleton_Init` in `src/monsters/skeleton/skeleton.c` are a readable example.
 
 ### The class
 
 ```c
-struct RoomActor { ... };                       /* include/room_actor.h, 0x3D4 bytes */
+struct RoomActor { ... };                       /* include/link/registry_1745/room_actor.h, 0x3D4 bytes */
 
-struct ChaseActor {                              /* include/chase_actor.h, 0x624 bytes */
+struct ChaseActor {                              /* include/engine/shared/chase_actor.h, 0x624 bytes */
     struct RoomActor base;
     struct SceneActorChaseGroup group;           /* route, target placement, pursuit control */
 };
@@ -64,7 +64,7 @@ struct Bee      { struct RoomActor base;   ... };  /* a class without the chase 
   makes it the actor itself in every class read so far).
 * **`struct ChaseActor`** adds the chase group: the home route, the target placement, the
   saved pursuit control and the route and turn callbacks the shared chase code drives
-  (`include/scene_actor_group.h`). The shared monster code (`MonsterInit_*`,
+  (`include/engine/shared/scene_actor_group.h`). The shared monster code (`MonsterInit_*`,
   `SceneActorReaction_*`, `SceneActorMovement_*`, ...) takes a `struct ChaseActor *`.
 * **Classes.** Each class embeds its parent first, so a class pointer is also a parent
   pointer and code passes `&skeleton->chase` where the shared code wants one. agbcc has
@@ -93,7 +93,7 @@ at 0x6F4); shared reaction units read both through one view.
 ### The methods
 
 `X_Init` fills the base and then installs the methods, function pointers stored in the
-base. `MonsterInit_InstallSequenceCallbacks` (`include/scene_actor_init_dispatch.h`)
+base. `MonsterInit_InstallSequenceCallbacks` (`include/engine/shared/scene_actor_init_dispatch.h`)
 writes most of them in one call. Named from the code that calls them:
 
 | Member | Called by | Example (Vorn) |
@@ -109,7 +109,7 @@ writes most of them in one call. Named from the code that calls them:
 | `defaultReaction`, `contactQuery`, `animationQuery` | the shared reaction and animation code | |
 | `behaviorCallbacks`, `alternateBehaviorCallbacks`, `phaseCallbacks` | tables indexed by `behavior2AA` and `phase2A9` | |
 
-The slots are typed with the typedefs in `include/scene_actor_components.h`: `update` and
+The slots are typed with the typedefs in `include/engine/shared/scene_actor_components.h`: `update` and
 `destroy` are `SceneActorResultCallback` (`s32 (*)(void *actor)`), the six state handlers
 `SceneActorAction`, and `onMessage` `SceneActorCommandHandler` (the actor and the script
 command, as `SceneActorScript_OnCommand` takes them). A class whose handler takes its own
@@ -121,7 +121,7 @@ type, since the registry calls every class the same way. Still `void *`: `onUpda
 
 ### The category
 
-`category` (`enum MonsterCategory`, `include/room_actor.h`) says which kind of monster
+`category` (`enum MonsterCategory`, `include/link/registry_1745/room_actor.h`) says which kind of monster
 an actor is. Each class's init sets it with `MonsterInit_SetCategory`. The registry
 uses it to address actors (`SceneActorRegistry_SendToCategory`), to count living ones
 (`SceneActorRegistry_CountLivingByCategory`), and as the key of their animation
@@ -208,7 +208,7 @@ workers are idle, because it touches most gameplay files.
    through a cast (`(*(u8 **)gPlayers)[0x418]`, `(struct SceneActorChasePlayer *)gPlayers[0]`
    and 21 other view types).
 4. *(done 2026-11-15)* **Duplicate boss structs.** `struct Nidhoggr` was defined in its
-   header and again in `src/fn/sub_08191508.c`, and `src/fn/sub_08190C98.c` had a third
+   header and again in `src/effects/large_scene_animation_controller/sub_08191508.c`, and `src/effects/large_scene_animation_controller/sub_08190C98.c` had a third
    view (`struct BossParts`). One definition, in the header.
 5. *(done 2026-11-16)* **The registry-actor base.** It was eleven overlapping views
    (`SceneActorRegistryResetView`, about 2,700 uses; `SceneActorRegistryActor`, about 320;

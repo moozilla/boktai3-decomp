@@ -190,7 +190,7 @@ Decompilation:
 
 | Path | Contents |
 |---|---|
-| `src/`, `include/`, `asm/` | decompiled C, headers, hand-written asm |
+| `src/`, `include/`, `asm/` | decompiled C and headers [by subsystem](docs/SOURCE_LAYOUT.md), and hand-written asm |
 | `symbols/` | function and data names, pointer evidence |
 | `data/` | data tables kept as source (actor registry, charmap, items) |
 | `tools/*.py` | build, split, check, worklist, permuter, progress |

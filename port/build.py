@@ -15,6 +15,8 @@ import time
 ROOT = Path(__file__).resolve().parents[1]
 LLVM = Path('/opt/homebrew/opt/llvm/bin')
 sys.path.insert(0, str(ROOT / 'port/core'))
+sys.path.insert(0, str(ROOT / 'tools'))
+from source_layout import resolve, source_paths
 from prepare import prepare_headers, prepare_source
 from link_slice import build_slice, find_linker
 from addresses import read_addresses, bind_ir
@@ -23,7 +25,8 @@ from audit import audit_link
 
 
 def sources():
-    return sorted(ROOT.glob('src/*.c')) + sorted(ROOT.glob('src/fn/*.c')) + sorted(ROOT.glob('src/lib/*.c'))
+    return source_paths(ROOT)
+
 
 
 def main():
@@ -133,9 +136,8 @@ def main():
     (out / 'compile.json').write_text(json.dumps(report, indent=2) + '\n')
     print(f"{args.target}: {len(results) - len(failed)}/{len(results)} compiled; {len(failed)} failed")
     if args.link_game and not failed and not args.compile_only:
-        excluded = {'src/fn/AgbMain.c', 'src/fn/sub_08213F80.c',
-                    'src/fn/sub_082485EC.c', 'src/fn/sub_082486B4.c', 'src/fn/sub_08248778.c',
-                    'src/fn/sub_082488D8.c', 'src/fn/sub_08248764.c'}
+        excluded = {resolve(function, ROOT) for function in (
+            'AgbMain', '08213F80', '082485EC', '082486B4', '08248778', '082488D8', '08248764')}
         objects = [r['object'] for r in results if r['source'] not in excluded]
         command = [find_linker(), '--no-entry', '--gc-sections', '--export-memory',
                    '--initial-memory=167772160', '--max-memory=167772160',

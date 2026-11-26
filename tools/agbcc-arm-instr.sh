@@ -3,7 +3,7 @@
 # in build/agbcc-arm-instr. It applies tools/patches/agbcc-arm-instr.patch to
 # the gcc_arm source that tools/setup.sh fetched. The knobs are the Thumb
 # patch's (tools/patches/agbcc-instr.patch) plus loop/sched/gcse ones added
-# while matching sub_08000430 (src/iwram_code.c):
+# while matching sub_08000430 (src/engine/iwram_arm_code/iwram_code.c):
 #   AGBCC_PRI, AGBCC_PRI_LABEL, AGBCC_FORCE, AGBCC_FORCE_LABEL, AGBCC_DUMPPRI,
 #   AGBCC_SPILL*, AGBCC_ADDSPILL, AGBCC_NOTIE       register allocation
 #   AGBCC_NOMOVE, AGBCC_NOMOVE1, AGBCC_FORCEMOVE, AGBCC_FORCEMOVE2,

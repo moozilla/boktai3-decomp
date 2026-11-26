@@ -13,7 +13,7 @@ scope"; the Yu-Gi-Oh! EDS catalog is [external/eds/matching-tricks.md](external/
   asm indexes arrays inside an object. Leaf functions that start with
   `mov ip, r0` (369 of them) come from struct/array-of-struct accesses like
   `p->elems[i].flags &= ~1;`. With pointer casts agbcc pushes r4 instead. See
-  `src/fn/sub_0810C1E8.c`. Structs also fixed ordering problems elsewhere
+  `src/link/registry_f246/sub_0810C1E8.c`. Structs also fixed ordering problems elsewhere
   (`sub_081FC61C`).
 * **Switch / jump tables work**: a plain C `switch` reproduces the table.
   Order the case bodies in the source by their order in the original asm,
@@ -44,12 +44,12 @@ scope"; the Yu-Gi-Oh! EDS catalog is [external/eds/matching-tricks.md](external/
 * **Per-file compiler flags**: a line `// CFLAGS: -O2` (replaces the default `-O2 -mthumb-interwork`) — e.g. library code that ends in `pop {r4, pc}` was built without interworking.
 * **Redundant null check** (`bl f; cmp r0,#0; bne; movs r0,#0`): the function
   returns the address of the struct's first field:
-  `if (!p) return NULL; return &p->unk0;` (src/fn/sub_08065C40.c).
+  `if (!p) return NULL; return &p->unk0;` (src/actors/actor_attachment_manager/sub_08065C40.c).
 * **Materialised bools** (`movs r0,#1; b; movs r0,#0; cmp r0,#0`): put the
   test in a `static inline u8` helper (`return TRUE/FALSE`) and call it in the
   `if`. An `int` result gets jump-threaded away (src/fn/sub_080F9374.c). For a
   `bne; movs 0; b; movs 1` return, `if (x & m) return TRUE; return FALSE;`
-  works where the ternary doesn't (src/fn/sub_080FF7AC.c).
+  works where the ternary doesn't (src/field/wooden_crate/sub_080FF7AC.c).
 * **Clone families**: run `build/venv/bin/python tools/clones.py --port --range START END`
   on your range after a few matches; it copies matched C to identical
   siblings and keeps what `check.py` accepts.
@@ -72,7 +72,7 @@ scope"; the Yu-Gi-Oh! EDS catalog is [external/eds/matching-tricks.md](external/
   (`check.py wip/sub_X.c` works); copy into `src/fn/` only on MATCH, so the
   full build never sees a non-matching file.
 * Function pointers work: declare the callee (`void sub_081F05D0(void);`) and
-  pass `sub_081F05D0`. The literal gets the Thumb bit (`src/fn/sub_081F065C.c`).
+  pass `sub_081F05D0`. The literal gets the Thumb bit (`src/actors/singleton_slot_7/sub_081F065C.c`).
 
 * Compiler: `agbcc -O2 -mthumb-interwork`. Leaf functions may end in
   `bx lr` with no push. Functions that call others end in `pop {r0}; bx r0`

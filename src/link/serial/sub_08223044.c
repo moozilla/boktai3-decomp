@@ -1,0 +1,16 @@
+#include "engine/shared/global.h"
+#include "engine/shared/ram.h"
+void InterruptsAndVideo_WaitForVBlank(void);
+void sub_08223044(void)
+{
+    gSerialTransferStatus = 0;
+    gSerialConnectionRole = -1;
+    *(vu16 *)0x04000208 = 0;
+    *(vu16 *)0x04000200 &= 0xFF7F;
+    *(vu16 *)0x04000208 = 1;
+    *(vu16 *)0x04000202 = 0x80;
+    InterruptsAndVideo_WaitForVBlank();
+    *(vu16 *)0x04000134 = 0;
+    *(vu16 *)0x04000128 = 0x2000;
+    *(vu16 *)0x04000128 |= 3;
+}

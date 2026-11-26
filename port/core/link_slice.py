@@ -7,13 +7,12 @@ import subprocess
 import sys
 
 from addresses import bind_ir, read_addresses
-from prepare import prepare_headers, prepare_source
+from prepare import prepare_headers, prepare_source, source_units
 from mmio import instrument_mmio
 from rtc_slice import RTC_SOURCES
 from video_irq_slice import VIDEO_IRQ_SOURCES
 
-GAME = ['src/fn/sub_08248970.c', 'src/fn/sub_08249210.c',
-        'src/fn/sub_082284F4.c', 'src/fn/sub_08219DD8.c', 'src/fn/sub_08224EEC.c']
+GAME = ('08248970', '08249210', '082284F4', '08219DD8', '08224EEC')
 CORE = ['port/core/memory.c', 'port/core/timing.c', 'port/core/boot.c']
 EXPORTS = ['port_memory_init', 'port_memory_reset', 'port_load_rom', 'port_rom_size',
            'port_boot_early', 'port_boot_call_count', 'port_boot_copy_iwram',
@@ -56,11 +55,11 @@ def build_slice(root, args, extra_units=(), extra_exports=(), suffix=""):
     addresses = read_addresses(root)
     objects = []
     bindings = {}
-    units = CORE + GAME + [str(bios)] + list(extra_units)
+    units = CORE + source_units(root, *GAME) + [str(bios)] + list(extra_units)
     exports = list(EXPORTS) + list(extra_exports)
     if args.mmio:
-        units += ['port/core/bus.c', 'port/core/devices.c', 'src/fn/sub_08213D10.c',
-                  'port/core/irq.c', 'src/fn/sub_08243C10.c', 'src/fn/sub_08243D28.c']
+        units += ['port/core/bus.c', 'port/core/devices.c', 'port/core/irq.c']
+        units += source_units(root, '08213D10', '08243C10', '08243D28')
         units += [str(p) for p in sorted((hardware / 'hw').glob('*.c')) if p != bios and p.name != 'rtc_sdk.c']
         exports += ['port_devices_init', 'InterruptsAndVideo_Initialize',
                     'port_solar_irq_init', 'port_solar_irq_calls', 'port_irq_raise', 'port_irq_dispatch',
@@ -71,10 +70,10 @@ def build_slice(root, args, extra_units=(), extra_exports=(), suffix=""):
         units += ['port/core/video.c', str(ppu / 'ppu/ppu.c')]
         exports += ['port_video_init', 'port_video_framebuffer', 'port_video_capture_line', 'port_video_capture_framebuffer']
     if args.rtc:
-        units += RTC_SOURCES
+        units += source_units(root, *RTC_SOURCES)
         exports += ['Clock_CheckRtcDate', 'Clock_ReadValidatedRtcDateTime', 'Clock_CheckRtcStatus']
     if args.video_irqs:
-        units += VIDEO_IRQ_SOURCES + ['port/core/video_irq.c', 'port/core/callback.c']
+        units += source_units(root, *VIDEO_IRQ_SOURCES) + ['port/core/video_irq.c', 'port/core/callback.c']
         exports += ['port_vblank_irq_init', 'port_vblank_irq_calls', 'port_vcount_irq_calls', 'port_run_scanline']
     units = list(dict.fromkeys(units))
     for name in units:

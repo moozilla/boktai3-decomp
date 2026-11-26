@@ -72,8 +72,8 @@ class Text(unittest.TestCase):
 
     def test_unit_edit(self):
         text = '#include "global.h"\nstruct V {\n    u8 unknown0[8];\n};\nvoid f(struct V *v);\n'
-        out = fv.edit_unit(text, "V", "Vorn", "include/vorn.h")
-        self.assertEqual(out, '#include "global.h"\n#include "vorn.h"\nvoid f(struct Vorn *v);\n')
+        out = fv.edit_unit(text, "V", "Vorn", "include/monsters/vorn/vorn.h")
+        self.assertEqual(out, '#include "global.h"\n#include "monsters/vorn/vorn.h"\nvoid f(struct Vorn *v);\n')
 
 
 if __name__ == "__main__":
