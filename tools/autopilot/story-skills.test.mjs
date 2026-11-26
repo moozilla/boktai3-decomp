@@ -399,15 +399,16 @@ test('Solar Trance activates ability one and waits for form two', () => {
   assert.deepEqual(entry.next(), { done: true, value: true });
 });
 
-test('Solar Bomb and movement trials look beyond the fuse at the same frame', () => {
-  const { solarBombLook, solarTranceTactics } = skill('trance', {});
+test('Solar Trance trials include both attack modes and compare at the same frame', () => {
+  const { solarTranceLook, solarTranceTactics } = skill('trance', {});
   const tactics = [[['up', 12]], ...solarTranceTactics('up')];
   const endpoints = tactics.map((tactic) => {
     const elapsed = tactic.reduce((frames, [, hold]) => frames + hold, 0);
-    return elapsed + solarBombLook(elapsed);
+    return elapsed + solarTranceLook(elapsed);
   });
-  assert.deepEqual(endpoints, [180, 180, 180]);
-  assert.deepEqual(solarTranceTactics()[0], [['a', 2], [0, 20]]);
+  assert.deepEqual(endpoints, [105, 105, 105]);
+  assert.deepEqual(tactics[1], [['b', 2], [0, 22], ['b', 2], [0, 12]]);
+  assert.deepEqual(tactics[2], [['up', 4], ['a', 2], [0, 24]]);
 });
 
 test('combat waits while a story script controls the player', () => {

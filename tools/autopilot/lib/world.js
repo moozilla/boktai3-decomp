@@ -867,8 +867,7 @@ exports.fight = function* (opts = {}) {
       if (equip.done) continue;
     }
     const tactics = DIRS8.map((k) => [[k, 12]]);
-    const canPlaceBomb = solarTrance && weapon.energy >= 2;
-    const bombTactics = canPlaceBomb ? exports.solarTranceTactics(tk) : [];
+    const tranceTactics = solarTrance ? exports.solarTranceTactics(tk) : [];
     if (darkTrance) tactics.push(...exports.darkTranceTactics(tk));
     else if (!solarTrance) {
       if (weapon.gun) tactics.push(...exports.gunTactics(tk));
@@ -882,14 +881,14 @@ exports.fight = function* (opts = {}) {
     const hits0 = trinityHits?.();
     // The session clock rewinds immediately when a speculative branch is restored.
     const decisionFrame = S.frame;
-    const searchTactics = function* (choices, throughFuse = false) {
+    const searchTactics = function* (choices, longPreview = false) {
       let best = null;
       for (const t of choices) {
         S.restore(root);
         for (const [k, n] of t) yield g.press(k, n);
         if (exports.where().scene !== scene) continue;  // walked out through a door
         const mid = S.snapshot();
-        const look = opts.look ?? (throughFuse ? exports.solarBombLook(S.frame - decisionFrame) :
+        const look = opts.look ?? (longPreview ? exports.solarTranceLook(S.frame - decisionFrame) :
           target.boss ? 60 : weapon.gun ? 40 : 20);
         if (look > 0) yield g.press(0, look);
         if (exports.where().scene !== scene) continue;
@@ -904,9 +903,9 @@ exports.fight = function* (opts = {}) {
       return best;
     };
     let best = yield* searchTactics(tactics);
-    // Check the best short movement against both placements after the fuse.
-    // Yield only the immediate action so the player can still dodge afterward.
-    if (best && bombTactics.length) best = (yield* searchTactics([best.t, ...bombTactics], true)) ?? best;
+    // Compare the best short move and both trance attacks at the same frame.
+    // Keep only the initial action so the player can still react afterward.
+    if (best && tranceTactics.length) best = (yield* searchTactics([best.t, ...tranceTactics], true)) ?? best;
     if (!best) { S.restore(root); break; }
     S.restore(best.mid);
     steps++;
@@ -919,7 +918,7 @@ exports.fight = function* (opts = {}) {
       const { scene, life, x, y, z } = exports.where();
       opts.trace({ fight: steps, hp, guard, scene, life, x, y, z, form: p.actionMode, enemies: enemies.length,
         ...(trinityHits ? { trinityHits: trinityHits() } : {}),
-        ...(solarTrance ? { energy: p.currentStatB, bombs: p.unk4EF?.[0], solar: exports.solarStatus() } : {}) });
+        ...(solarTrance ? { energy: p.currentStatB, motion: p.tetherMode, solar: exports.solarStatus() } : {}) });
     }
   }
   S.setSolar(initialLight);

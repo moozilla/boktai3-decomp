@@ -38,15 +38,16 @@ exports.darkTranceTactics = (direction) => {
   ];
 };
 
-// In Solar Trance A and B request action 38. The effect uses two energy.
+// Action 38 dispatches Player_UpdateTargetMotion through gUnk_08610B70.
+// B starts the seeking attack. A can start the orbiting strike, depending
+// on direction history. The seeking phase also buffers a follow-up B.
 exports.solarTranceTactics = (direction) => {
   const aim = direction ? [[direction, 4]] : [];
   return [
-    [['a', 2], [0, 20]],
-    ...(aim.length ? [[...aim, ['a', 2], [0, 20]]] : []),
+    [['b', 2], [0, 22], ['b', 2], [0, 12]],
+    [...aim, ['a', 2], [0, 24]],
   ];
 };
 
-// SolarBomb_Init sets a 120-frame primed fuse after the 30-frame assembly.
-// The five explosions start up to 16 frames apart and refresh for eight frames.
-exports.solarBombLook = (elapsed) => Math.max(0, 180 - elapsed);
+// The seeking attack winds up for 11 frames and can approach for 90.
+exports.solarTranceLook = (elapsed) => Math.max(0, 105 - elapsed);
