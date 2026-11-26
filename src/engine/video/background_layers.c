@@ -1,11 +1,3 @@
-#define Bg_GetMapRow            sub_0821607C
-#define Bg_FillTilemapRectangle sub_08215EB4
-#define Bg_CopyTilemapRectangle sub_08215E24
-#define Bg_UploadTileEntries    sub_08215D40
-#define Bg_SetCharacterBase     sub_08215AC4
-#define Bg_UploadMapsAndTiles   sub_08215964
-#define Bg_ResetDisplay         sub_082157EC
-#define Bg_Initialize           sub_082156D8
 #include "engine/video/background_layers.h"
 #include "engine/ram.h"
 #include "engine/video/render.h"

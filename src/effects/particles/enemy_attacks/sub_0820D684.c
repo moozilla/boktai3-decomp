@@ -1,5 +1,5 @@
 #include "engine/math/math_shift.h"
-#include "monsters/enemy_particle.h"
+#include "effects/particles/enemy_particle.h"
 #include "player/cutscene/player_cue_sequence.h"
 #include "engine/ram.h"
 extern const s16 gUnk_086149C4[];

@@ -1,10 +1,9 @@
 #include "global.h"
 /* TextWindow_SetText: Sets the interpreter text pointer and clears script sequencing and entry state */
-#define TextWindow_SetText sub_0803398C
 
 u8 *TextWindow_Find(u32);
 
-s32 sub_0803398C(u32 id, u32 value)
+s32 TextWindow_SetText(u32 id, u32 value)
 {
     u8 *w = TextWindow_Find(id);
     u8 *q;

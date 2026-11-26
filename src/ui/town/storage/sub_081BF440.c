@@ -2,7 +2,7 @@
 #include "global.h"
 #include "ui/widgets/scene_input_navigation.h"
 
-struct SceneInventoryCategoryMenu {
+struct StorageCategoryMenu {
     u8 unknown0[0x258];
     struct AnimSprite prompt;
     u8 unknown2B8[0x1458 - 0x2B8];
@@ -20,19 +20,19 @@ struct SceneInventoryCategoryMenu {
     u8 unknown1790[0x38];
     u16 colors[16];
 };
-void Storage_InitSlotMapping(struct SceneInventoryCategoryMenu *, s32);
-void Storage_RefreshCategoryWidgets(struct SceneInventoryCategoryMenu *);
-void Storage_RefreshSelectedItemDetails(struct SceneInventoryCategoryMenu *);
+void Storage_InitSlotMapping(struct StorageCategoryMenu *, s32);
+void Storage_RefreshCategoryWidgets(struct StorageCategoryMenu *);
+void Storage_RefreshSelectedItemDetails(struct StorageCategoryMenu *);
 void Storage_InitSelectionGrid(struct SceneInputGridView *, u32, u32, u32, u32);
 void Storage_UpdateCursorPosition(struct SceneInputGridView *, void *);
-void Storage_BeginCategoryBrowse(struct SceneInventoryCategoryMenu *);
+void Storage_BeginCategoryBrowse(struct StorageCategoryMenu *);
 void Sound_PlaySong(u32);
-void MenuPanel_ShowDescription(struct SceneInventoryCategoryMenu *, s32, const void *, void *);
-void Storage_ResetCategoryPalette(struct SceneInventoryCategoryMenu *, u16 *);
-void Storage_SetState(struct SceneInventoryCategoryMenu *,
-                             void (*)(struct SceneInventoryCategoryMenu *), u32);
-void Storage_UpdateSortConfirmation(struct SceneInventoryCategoryMenu *);
-void Storage_BeginCategoryMode(struct SceneInventoryCategoryMenu *p, u32 mode)
+void MenuPanel_ShowDescription(struct StorageCategoryMenu *, s32, const void *, void *);
+void Storage_ResetCategoryPalette(struct StorageCategoryMenu *, u16 *);
+void Storage_SetState(struct StorageCategoryMenu *,
+                             void (*)(struct StorageCategoryMenu *), u32);
+void Storage_UpdateSortConfirmation(struct StorageCategoryMenu *);
+void Storage_BeginCategoryMode(struct StorageCategoryMenu *p, u32 mode)
 {
     int new_var;
     Storage_InitSlotMapping(p, (p->categoryKinds[p->category] & 1) << 4);

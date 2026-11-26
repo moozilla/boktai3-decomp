@@ -6,8 +6,8 @@ fastPlayback is written using r1 and r2.
 
 The explicit form changed the ROM bytes. The guarded form passed the unit ROM check.
 
---- a/src/message_window.c
-+++ b/src/message_window.c
+--- a/src/ui/dialogue/message_window/message_window.c
++++ b/src/ui/dialogue/message_window/message_window.c
 @@ -523,4 +523,17 @@
          }
      }

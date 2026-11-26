@@ -2,8 +2,6 @@
 #include "scene/actor/scene_actor_control_helpers.h"
 #include "engine/word_flags.h"
 /* SceneActorPalette_IsTransitionComplete: Reports completion when transitions are disabled or no relevant living actors remain; does not inspect frame counters */
-#define SceneActorPalette_IsTransitionComplete sub_08072124
-#define SceneActorPalette_IsTransitionComplete sub_08072124
 
 u32 SceneActorPalette_IsTransitionComplete(void)
 {

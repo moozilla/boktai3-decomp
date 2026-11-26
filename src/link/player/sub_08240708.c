@@ -24,7 +24,7 @@ void Player_SetTetherMode(struct Player *, s32, s32);
 void Player_PlayLocalSong(s32, s32);
 void Player_SetSecondaryActionFlags(struct Player *, u32);
 void SelectionSlots_ClearValue(void *, s32);
-void sub_0823C280(struct Player *);
+void Player_RestoreLinkedActionState(struct Player *);
 
 void Player_UpdateRecoil(struct Player *p)
 {
@@ -87,7 +87,7 @@ void Player_UpdateRecoil(struct Player *p)
             if ((p->tetherFrame & 7) >= 7 - (p->tetherFrame >> 3))
                 Player_SetSecondaryActionFlags(p, 5);
             if (++p->tetherFrame > 0x37)
-                sub_0823C280(p);
+                Player_RestoreLinkedActionState(p);
             break;
     }
 }

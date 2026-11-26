@@ -1,6 +1,6 @@
 #include "objects/scene_object_slot.h"
 void Camera_RequestShake(int);
-void SlidingDoor_UpdateRaised(struct SceneObjSlot *s)
+void SlidingDoors_UpdateRaised(struct SceneObjSlot *s)
 {
     s16 timer = s->timer;
     if (timer) {

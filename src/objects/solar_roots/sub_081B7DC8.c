@@ -20,7 +20,6 @@ void Collider_SetCallback(u8 *, void *, void *);
 void Collider_SetPosition(u8 *, u8 *, u32);
 s32 Collider_Refresh(u8 *);
 void SolarRoot_ApplyAnimationEvent(void *, void *, void *);
-#define GrowthEffect_InitCollider sub_081B7DC8
 void GrowthEffect_InitCollider(struct GrowthEffect *p)
 {
     struct Z s1, s2;

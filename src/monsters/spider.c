@@ -640,7 +640,7 @@ u8 SceneActor_IsFacingNearbyTarget(struct ChaseActor *);
 
 s32 Callback_InvokeActor(void *, void *);
 
-u8 sub_0812F3CC(struct ChaseActor *);
+u8 SceneActorReaction_BeginContactResponse(struct ChaseActor *);
 
 void SceneActorPhase_SelectLinkedAnimation(void);
 
@@ -1391,7 +1391,7 @@ u8 SceneActorPlacement_BeginContactRoute(struct ChaseActor *p);
 
 s32 Math_Atan2(s32, s32);
 
-u8 sub_0821D4F0(void *, void *, u32, u32);
+u8 Terrain_IsSegmentBelowHeightLimit(void *, void *, u32, u32);
 
 void Spider_UpdateContactWindup(struct ChaseActor *a, s32 n);
 
@@ -1472,7 +1472,8 @@ u8 SceneActorPlacement_SelectPlayerApproach(struct ChaseActor *a)
         angle = -angle;
     if (angle > 32)
         return 0;
-    if (!sub_0821D4F0(transform + 12, &((struct SpiderApproachPlayer *)player)->position, 5, 256))
+    if (!Terrain_IsSegmentBelowHeightLimit(
+            transform + 12, &((struct SpiderApproachPlayer *)player)->position, 5, 256))
         return 0;
     a->base.tracking.target = (u32)((struct SpiderApproachPlayer *)player)->unknown24;
     if (((s32)distance) <= 0x3fff)
@@ -1527,7 +1528,7 @@ u8 SceneActorPlacement_BeginNearbyPlayerContact(struct ChaseActor *a)
         angle = -angle;
     if (angle > 32)
         return 0;
-    if (!sub_0821D4F0(transform + 12, ((u8 **)gPlayers)[0] + 0x30, 5, 256))
+    if (!Terrain_IsSegmentBelowHeightLimit(transform + 12, ((u8 **)gPlayers)[0] + 0x30, 5, 256))
         return 0;
     a->base.tracking.target = (u32)(((u8 **)gPlayers)[0] + 0x24);
     Chase_SetBehavior(a, 12);

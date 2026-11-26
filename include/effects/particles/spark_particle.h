@@ -41,7 +41,7 @@ s32 SparkParticle_UpdatePool(struct SparkParticlePool *);
 s32 SparkParticle_DestroyPool(struct SparkParticlePool *);
 s32 SparkParticle_Spawn(const struct ContactPosition *, u8, const struct ContactPosition *, s32,
                         s32, s32, s32, u32);
-void sub_0806A420(void);
+void SparkParticle_CreateFromScript(void);
 s32 SparkParticle_InitPool(struct SparkParticlePool *);
 struct SparkParticlePool *SparkParticle_CreatePool(void);
 void SparkParticle_ClearPool(void);

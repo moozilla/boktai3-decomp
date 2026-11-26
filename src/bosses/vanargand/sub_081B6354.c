@@ -1,5 +1,5 @@
 #include "global.h"
-void ActorStatus_InitializeCollider(void *, s32, s32, s32);
+void VanargandCombat_InitializeCollider(void *, s32, s32, s32);
 struct Half {
     u8 pad0[0x98];
     u8 collider[0xac];
@@ -48,7 +48,7 @@ void PairedSceneActor_InitHalves(struct Half *base, s32 k, s32 a2, s32 a3, s32 s
             heading->w144 = down;
         heading->w146 = a2;
         config->w20a = s1;
-        ActorStatus_InitializeCollider(collider, s1, s2, s3);
+        VanargandCombat_InitializeCollider(collider, s1, s2, s3);
         config->w220 = s3b;
         config->w20e = a3;
         heading->w148 = s4;

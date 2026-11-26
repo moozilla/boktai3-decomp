@@ -1,7 +1,5 @@
 #include "engine/math/scalar_approach.h"
-/* ScalarApproach_StepHalfArray: Updates signed halfword values toward corresponding targets using half steps */
-#define ScalarApproach_StepHalfArray sub_0819B2A4
-#define ScalarApproach_HalfArray     sub_0819B2A4
+/* ScalarApproach_HalfArray: Updates signed halfword values toward corresponding targets using half steps */
 void ScalarApproach_HalfArray(s16 *values, const s16 *targets, s32 count)
 {
     s32 remaining = count;

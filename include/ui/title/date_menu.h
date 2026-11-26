@@ -2,7 +2,7 @@
 #define GUARD_DATE_ENTRY_MENU_H
 
 #include "engine/video/anim_sprite.h"
-#include "npc/cutscene_actor/text_entry_widget.h"
+#include "ui/title/text_entry_widget.h"
 #include "engine/task.h"
 
 struct DateMenu {

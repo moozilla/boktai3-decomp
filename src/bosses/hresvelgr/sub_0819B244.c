@@ -1,7 +1,6 @@
 #include "global.h"
 #include "objects/dungeon_prop/orbit_motion.h"
 /* Math_BlendAngleWithTableFactor: Wraps the angle near its target then blends using the indexed table factor */
-#define Math_BlendAngleWithTableFactor sub_0819B244
 
 extern const s16 gUnk_08611D24[];
 
@@ -14,7 +13,7 @@ static inline s32 AngleNear(s32 angle, s32 ref)
     return ref + d;
 }
 
-s32 sub_0819B244(s32 angle, s32 target, s32 t)
+s32 Math_BlendAngleWithTableFactor(s32 angle, s32 target, s32 t)
 {
     s32 cur;
     if (t > 15)

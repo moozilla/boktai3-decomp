@@ -173,7 +173,7 @@ addr,name,size,kind,decl,header,confidence,notes
 02000498,gScriptKeyframeManager,4,object,extern struct ScriptKeyframeManager *gScriptKeyframeManager;,include/script/script_keyframe_pool.h,low,
 0200049C,gCountdownTimer,4,object,extern struct CountdownTimer *gCountdownTimer;,include/ui/hud/countdown_timer.h,low,
 020004A0,gRisingSpritePool,4,object,extern u32 gRisingSpritePool;,include/engine/ram.h,low,
-020004A4,gScenePanel,4,object,extern struct ScenePanel *gScenePanel;,include/objects/pile_driver/pile_driver.h,low,
+020004A4,gPileDriver,4,object,extern struct PileDriver *gPileDriver;,include/objects/pile_driver/pile_driver.h,low,
 020004A8,gSceneActorRegistryManager,4,object,extern struct SceneActorRegistryManager *gSceneActorRegistryManager;,include/scene/actor/scene_actor_registry.h,low,
 020004AC,gSceneActorRegistryNode,4,object,extern struct SceneActorRegistryNode *gSceneActorRegistryNode;,include/scene/actor/scene_actor_registry.h,low,
 020004B0,gSlotMonitor,4,object,extern u32 gSlotMonitor;,include/engine/ram.h,low,

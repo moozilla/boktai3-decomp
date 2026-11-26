@@ -35,14 +35,14 @@ void ActorProximity_UpdateSquaredDistances(struct Ratatosk *);
 void Ratatosk_UpdatePointDistancesToPlayer(struct Ratatosk *);
 void SceneDistance_UpdateLinkedDistances(struct Ratatosk *);
 void SceneDistance_UpdateLinkedTargetDistances(struct Ratatosk *);
-void sub_081F6B90(struct Ratatosk *);
+void Ratatosk_DispatchSceneCommands(struct Ratatosk *);
 void Ratatosk_UpdateSunOrbPlayerTransfer(struct Ratatosk *);
 void Ratatosk_UpdateAnimatedPosition(struct Ratatosk *p)
 {
     struct Ratatosk *actor = p;
     struct RatatoskSprite *sprite = &p->sprite;
     p->flagAA = 0;
-    sub_081F6B90(p);
+    Ratatosk_DispatchSceneCommands(p);
     Obj_StepPosition(sprite);
     if (Mod(p->timer, 30) == 0) {
         ActorProximity_UpdateSquaredDistances(p);

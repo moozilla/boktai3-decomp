@@ -65,7 +65,6 @@ u32 Modifier_ReadPackedValue(u32 k, s32 n)
 
 /* Modifier_EnumerateSelection: Fills an output array with selected bit indices in ascending order and returns the count */
 
-#define Modifier_EnumerateSelection sub_0803F8F4
 
 static inline void Fill(s32 *p, s32 v, s32 n)
 {
@@ -551,7 +550,7 @@ s32 ModifierMenu_ApplyPendingSource(struct ModifierMenu *menu)
     return result;
 }
 
-void sub_08215EB4(s32, s32, s32, s32, s32, s32, s32, s32);
+void Bg_FillTilemapRectangle(s32, s32, s32, s32, s32, s32, s32, s32);
 
 void Text_DrawNumber(s32, s32, s32, s32, s32, s32, s32);
 
@@ -590,7 +589,7 @@ void ModifierMenu_DrawStatComparison(s32 a, s32 b, s32 c, s32 d, u32 k)
 chk:
     if (a < 0) {
         if (b < 0) {
-            sub_08215EB4(2, c, d, 3, 1, 0x10, 0, 0);
+            Bg_FillTilemapRectangle(2, c, d, 3, 1, 0x10, 0, 0);
             return;
         }
     }
@@ -598,11 +597,11 @@ B:
     Text_DrawNumber(2, c, d, b, f, 3, 0);
 }
 
-void sub_08215EB4(s32, s32, s32, s32, s32, s32, s32, s32);
+void Bg_FillTilemapRectangle(s32, s32, s32, s32, s32, s32, s32, s32);
 
 void ModifierMenu_DrawUnavailableStat(u32 a, u32 b, u32 c)
 {
-    sub_08215EB4(2, a, b, c, 1, 0x10, 0, 0);
+    Bg_FillTilemapRectangle(2, a, b, c, 1, 0x10, 0, 0);
 }
 
 void Bg_SetTilemapEntry(s32, s32, s32, s32, s32, s32);
@@ -613,7 +612,7 @@ void ModifierMenu_DrawCapacity(s32 a, s32 b, s32 count, s32 y, s32 width)
     s32 color;
     s32 i;
     diff = count - b;
-    sub_08215EB4(2, y, width, 4, 1, 1, 0, 0);
+    Bg_FillTilemapRectangle(2, y, width, 4, 1, 1, 0, 0);
     color = 0x3b;
     if (diff <= 0) {
         color = 0x1b;

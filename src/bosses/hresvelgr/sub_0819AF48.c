@@ -1,6 +1,5 @@
 #include "global.h"
 /* Math_ApproachSixteenth: Moves toward the target by one sixteenth of the difference with a minimum step of one */
-#define Math_ApproachSixteenth sub_0819AF48
 
 static inline s32 Shift4(s32 x)
 {
@@ -9,7 +8,7 @@ static inline s32 Shift4(s32 x)
     return -((-x) >> 4);
 }
 
-s32 sub_0819AF48(s32 cur, s32 target)
+s32 Math_ApproachSixteenth(s32 cur, s32 target)
 {
     s32 d = target - cur;
     if (d == 0)

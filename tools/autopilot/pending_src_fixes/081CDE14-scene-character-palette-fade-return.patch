@@ -5,8 +5,8 @@ argument in r0 and the final counter update uses r1.
 
 The explicit form changed the ROM bytes. The guarded form passed the unit ROM check.
 
---- a/src/fn/sub_081CDE14.c
-+++ b/src/fn/sub_081CDE14.c
+--- a/src/npc/story_character/sub_081CDE14.c
++++ b/src/npc/story_character/sub_081CDE14.c
 @@ -16,4 +16,7 @@
      SceneCharacterPaletteFade *fade = (SceneCharacterPaletteFade *)(b + 0x20);
      s32 counter = fade->counter;

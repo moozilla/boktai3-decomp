@@ -1,6 +1,5 @@
 #include "global.h"
 /* Hresvelgr_ApproachArraySixteenth: Approaches signed array targets by one sixteenth of the remaining difference and snaps near targets */
-#define Hresvelgr_ApproachArraySixteenth sub_0819B86C
 
 static inline s32 Shift(s32 x)
 {
@@ -24,7 +23,7 @@ static inline void SnapArray(s32 snap, s16 *cur, s16 *target, s32 count)
     }
 }
 
-void sub_0819B86C(s16 *cur, s16 *target, s32 snap, s32 count)
+void Hresvelgr_ApproachArraySixteenth(s16 *cur, s16 *target, s32 snap, s32 count)
 {
     SnapArray(snap, cur, target, count);
 }

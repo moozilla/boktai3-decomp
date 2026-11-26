@@ -1,11 +1,11 @@
 #include "bosses/vanargand/scene_departure_display.h"
 
-void SpriteParticle_InitParams(void *);
-void SpriteParticle_SetMotionParams(void *, u32, u32, u32, u32);
-void SpriteParticle_SetSpriteResource(void *, u32, u32, s32);
-void SpriteParticle_SetAnimationTrack(void *, u32, u32);
-void SpriteParticle_SetPlanarVelocity(void *, s32, s32);
-s32 SpriteParticle_Emit(void *, void *);
+void VanargandParticle_InitParams(void *);
+void VanargandParticle_SetMotionParams(void *, u32, u32, u32, u32);
+void VanargandParticle_SetSpriteResource(void *, u32, u32, s32);
+void VanargandParticle_SetAnimationTrack(void *, u32, u32);
+void VanargandParticle_SetPlanarVelocity(void *, s32, s32);
+s32 VanargandParticle_Emit(void *, void *);
 u8 Sprite_BlinkUntilExpired(void *, s32, s32, s32);
 
 static inline u32 NextRandom(const u16 *table)
@@ -56,17 +56,17 @@ void VanargandHead_UpdateShakingDeparture(struct DepartureActor *input, s32 fram
         position.z = 100;
         dx = ((NextRandom(gRandomTable) & 15) - 8) << 10;
         dz = -((NextRandom(gRandomTable) & 7) << 10);
-        SpriteParticle_InitParams(params);
-        SpriteParticle_SetMotionParams(params, 0, 60, 0, 0);
+        VanargandParticle_InitParams(params);
+        VanargandParticle_SetMotionParams(params, 0, 60, 0, 0);
         if ((s32)(NextRandom(gRandomTable) & 255) > 128) {
-            SpriteParticle_SetSpriteResource(params, actor->effectResource, 0, 0x1f5);
-            SpriteParticle_SetAnimationTrack(params, actor->effectGraphics, 5);
+            VanargandParticle_SetSpriteResource(params, actor->effectResource, 0, 0x1f5);
+            VanargandParticle_SetAnimationTrack(params, actor->effectGraphics, 5);
         } else {
-            SpriteParticle_SetSpriteResource(params, actor->effectResource, 0, 0x1f5);
-            SpriteParticle_SetAnimationTrack(params, actor->effectGraphics, 6);
+            VanargandParticle_SetSpriteResource(params, actor->effectResource, 0, 0x1f5);
+            VanargandParticle_SetAnimationTrack(params, actor->effectGraphics, 6);
         }
-        SpriteParticle_SetPlanarVelocity(params, dx, dz);
-        SpriteParticle_Emit(params, &position);
+        VanargandParticle_SetPlanarVelocity(params, dx, dz);
+        VanargandParticle_Emit(params, &position);
     }
     if (actor->dispersalTimer == 58) {
         actor->burstTimer = 90;

@@ -186,7 +186,7 @@ void Collection_LoadPageBackground(struct CollectionMenu *p)
             tile->y = 0;
             count++;
             if (count > max)
-                sub_08215EB4(3, x, y + 3, 4, 4, 1, 0, 2);
+                Bg_FillTilemapRectangle(3, x, y + 3, 4, 4, 1, 0, 2);
             x += 5;
             i--;
         } while (i >= 0);

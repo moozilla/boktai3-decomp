@@ -23,7 +23,7 @@ struct VanargandDamagePart {
     s32 *mode;
 };
 
-void sub_081A7204(struct VanargandDamagePart *);
+void Vanargand_ApplyPartDamage(struct VanargandDamagePart *);
 
 typedef char VanargandDamagePartSizeCheck[sizeof(struct VanargandDamagePart) == 0x138 ? 1 : -1];
 

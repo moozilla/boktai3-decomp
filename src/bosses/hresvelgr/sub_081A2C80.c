@@ -15,7 +15,7 @@ void ResourceHeader_Relocate(void *, void *);
 void SceneActors_Register(void *, s32);
 s32 SceneActors_Initialize(void *, void *, s32, void *, s32);
 void Hresvelgr_CreateShotPool(s32, s32, s32);
-void EffectPool_Create(s32, s32, s32);
+void HresvelgrEffectPool_Create(s32, s32, s32);
 void Hresvelgr_CreateProjectilePool(s32, s32, s32);
 void Hresvelgr_CreateEffectPool(void);
 void AnimSprite_InitLinked(void *, void *, int, int, int, int, int, void *);
@@ -235,7 +235,7 @@ s32 sub_081A2C80(struct HresvelgrInit *self, void *arg1)
     }
 
     Hresvelgr_CreateShotPool(self->shotCount, self->shotRange, self->shotSpeed);
-    EffectPool_Create(self->effectCount, self->effectRange, self->effectLifetime);
+    HresvelgrEffectPool_Create(self->effectCount, self->effectRange, self->effectLifetime);
     Hresvelgr_CreateProjectilePool(self->projectileCount, self->projectileRange,
                                    self->projectileLifetime);
     Hresvelgr_CreateEffectPool();

@@ -21,7 +21,6 @@ static inline void BouncingBomb_ClearVector(struct PackedVec *vector)
 }
 // confidence=low: spawns a bouncing object from script keywords p (position), a (shot,
 // category), v (velocity), l and n, and sets flag 1 at 0x134.
-#define BouncingBomb_SpawnFromScript sub_080697C8
 void BouncingBomb_SpawnFromScript(void)
 {
     struct PackedVec pos;

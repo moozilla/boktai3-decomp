@@ -1,5 +1,5 @@
 #include "bosses/vanargand/departure_burst.h"
-void SceneActors_EmitPeriodicParticles(void *actor, s32 frame)
+void VanargandHead_EmitPeriodicParticles(void *actor, s32 frame)
 {
     u32 b = frame;
     if ((b & 0xf) == 0)

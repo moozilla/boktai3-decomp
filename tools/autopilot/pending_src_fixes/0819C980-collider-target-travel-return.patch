@@ -4,8 +4,8 @@ The division returns the travel time in r0. The clamped halfword store uses r1.
 
 The explicit form changed the ROM bytes. The guarded form passed the unit ROM check.
 
---- a/src/fn/sub_0819C980.c
-+++ b/src/fn/sub_0819C980.c
+--- a/src/bosses/hresvelgr/sub_0819C980.c
++++ b/src/bosses/hresvelgr/sub_0819C980.c
 @@ -28,4 +28,7 @@
      result = __divsi3(distance * 628, 25600);
      SetTravelTime(actor, result);

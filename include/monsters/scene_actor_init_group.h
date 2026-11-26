@@ -11,7 +11,7 @@ void SceneActorReaction_BeginFadedState(struct ChaseActor *);
 void SceneActorReaction_BeginDefeatBurst(struct ChaseActor *);
 void SceneActorRecovery_ResumePursuit(struct ChaseActor *);
 void SceneActorReaction_RestoreAfterTurns(struct ChaseActor *, s32);
-void sub_0807FCA8(struct ChaseActor *, s32);
+void SceneActorControl_UpdateContactRelease(struct ChaseActor *, s32);
 void SceneActorReaction_TurnBackToRoute(struct ChaseActor *);
 s32 SceneActorTarget_TryStimulusRoute(struct ChaseActor *);
 void SceneActorReaction_UpdateAnimationGate(struct ChaseActor *);
@@ -195,7 +195,7 @@ static inline void MonsterInit_InitializeGroup(struct SceneActorChaseGroup *grou
     group->responseCallback = 0;
     group->field620 = 0;
     group->turnControl = SceneActorReaction_RestoreAfterTurns;
-    group->contactArrivalControl = sub_0807FCA8;
+    group->contactArrivalControl = SceneActorControl_UpdateContactRelease;
     group->animateCallback = (u32)animate;
     group->releaseControl = SceneActorReaction_TurnBackToRoute;
     group->routeChoiceControl = 0;

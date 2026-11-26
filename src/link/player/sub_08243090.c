@@ -8,7 +8,8 @@
 struct PlayerSelection;
 
 void Collision_CalculateElementalResponse(struct ContactCollider *, struct ContactCollider *);
-void sub_08238580(struct Player *, struct ContactCollider *, struct ContactCollider *);
+void Player_ApplyLinkedContactResponse(struct Player *, struct ContactCollider *,
+                                       struct ContactCollider *);
 s32 LinkSession_ClearFirstPlayerKind(void *, s32);
 void LinkPlayer_FlushPendingEffects(struct Player *);
 void Player_QueueStatusEffect(struct Player *, s32);
@@ -64,7 +65,7 @@ u32 Player_ApplyContact(struct Player *p, struct ContactCollider *source,
             p->active = 0;
             p->secondaryDrawFlags &= ~0x400;
         }
-        sub_08238580(p, source, target);
+        Player_ApplyLinkedContactResponse(p, source, target);
     }
     if (Player_ReadStatusBits(&source->reactionFlags, 0x10))
         LinkSession_ClearFirstPlayerKind(&p->position, p->slot);

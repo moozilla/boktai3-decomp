@@ -1,7 +1,6 @@
 #include "scene/motion/scene_actor_terrain_reaction.h"
 #include "global.h"
 // confidence=low: contact healing updates health feedback and selects a recovery phase.
-#define SceneActorControl_ApplyRecoveryContact sub_08082648
 #include "scene/actor/scene_actor_control_phase.h"
 #include "scene/actor/scene_actor_reaction.h"
 #include "scene/areas/area_effect_link.h"

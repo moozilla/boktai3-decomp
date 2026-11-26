@@ -1,4 +1,4 @@
-#include "npc/cutscene_actor/text_entry_widget.h"
+#include "ui/title/text_entry_widget.h"
 #include "engine/video/render.h"
 #include "ui/menu_parameters.h"
 #include "engine/input.h"

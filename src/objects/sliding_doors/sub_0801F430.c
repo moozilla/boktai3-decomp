@@ -1,6 +1,6 @@
 #include "objects/scene_object_slot.h"
-void SlidingDoor_UpdateRaised(void);
-void SlidingDoor_UpdateRaising(struct SceneObjSlot *s)
+void SlidingDoors_UpdateRaised(void);
+void SlidingDoors_UpdateRaising(struct SceneObjSlot *s)
 {
     s->lift += 15;
     if ((s16)s->lift > (s16)s->maxLift) {
@@ -13,7 +13,7 @@ void SlidingDoor_UpdateRaising(struct SceneObjSlot *s)
         s->terrain->cell.flags |= 2;
         s->terrain->cell.shapeAndHeight = (s->terrain->cell.shapeAndHeight & 0xf0) | s->cellHeight;
         s->terrain->flags |= 1;
-        s->callback = SlidingDoor_UpdateRaised;
+        s->callback = SlidingDoors_UpdateRaised;
     }
     {
         int offset = s->lift;

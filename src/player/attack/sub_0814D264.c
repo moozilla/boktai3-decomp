@@ -3,7 +3,6 @@
 #include "scene/collision/contact_collider.h"
 
 // confidence=low: selects sweep, vertical-arc or radial reach from the active attack animation.
-#define Player_UpdateAttackColliderMotion sub_0814D264
 extern const s16 gUnk_086149C4[];
 u32 ActorFlags_GetResponseBits(void *);
 s32 ActorFlags_SelectResponse(void *);

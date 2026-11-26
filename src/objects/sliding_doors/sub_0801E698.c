@@ -6,6 +6,6 @@ void SlidingDoors_SetInactive(struct SceneObjPool *pool, u16 id)
     for (i = 0; i < pool->count; i++) {
         struct SceneObjSlot *slot = &pool->slots[i];
         if (slot->id == id)
-            SceneObjSlot_SetAnimation(slot, SCENE_OBJ_INACTIVE, SlidingDoor_UpdateInactiveIdle, 2);
+            SceneObjSlot_SetAnimation(slot, SCENE_OBJ_INACTIVE, SlidingDoors_UpdateInactiveIdle, 2);
     }
 }

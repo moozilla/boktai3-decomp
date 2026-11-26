@@ -800,7 +800,7 @@ u32 PasswordDisplay_Update(struct PasswordDisplay *p)
 
 s32 PasswordDisplay_Destroy(struct PasswordDisplay *p)
 {
-    Anim_Remove(&p->widget);
+    Anim_Remove(&p->animSprite);
 }
 
 s32 PasswordDisplay_Initialize(struct PasswordDisplay *p)
@@ -859,7 +859,7 @@ s32 PasswordDisplay_Initialize(struct PasswordDisplay *p)
     CpuSet(((struct PasswordMenuPalette *)ScriptProc_Start(0x92b3, 0x204))->colors,
            gBgPaletteBuffer, 0x100);
     ResourceHeader_Relocate(&p->resource, ScriptProc_Start(0xcb05, 0xe2ab));
-    AnimSprite_InitLinked(&p->widget, &p->resource, 0x39, 0x10, 0, 0, 0, 0);
+    AnimSprite_InitLinked(&p->animSprite, &p->resource, 0x39, 0x10, 0, 0, 0, 0);
 
     w = &p->windows[0];
     if ((*w = TextWindow_Create(2, 5, 28, 2)) < 0)

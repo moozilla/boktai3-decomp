@@ -281,7 +281,7 @@ void ChallengeMenu_InitBackgrounds(struct ChallengeMenu *menu)
     s32 i;
     void *res;
     Bg_DisableDisplay(DISPCNT_BG0_ON | DISPCNT_BG1_ON | DISPCNT_BG2_ON | DISPCNT_BG3_ON);
-    sub_082157EC();
+    Bg_ResetDisplay();
     Hud_SetMode(7);
     res = ScriptProc_Start(0xC091, 0x3536);
     menu->backgroundResource = res;

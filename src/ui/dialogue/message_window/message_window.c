@@ -174,7 +174,7 @@ int MessageWindow_Clear(void)
         dst = &window->callback;
         *dst = fn;
     }
-    window->widget.flags |= 1;
+    window->animSprite.flags |= 1;
     {
         struct MessagePlaybackState *state = &window->state;
         state->speaker = -1;
@@ -200,7 +200,7 @@ int MessageWindow_SetMessageTable(void *script)
         window->messageCount = 1;
         window->queuedMessage = 0;
         TextState_Reset(state);
-        window->widget.flags |= 1;
+        window->animSprite.flags |= 1;
     }
     return 0;
 }
@@ -221,7 +221,7 @@ s32 MessageWindow_SetTimedMessageTable(void *script, u32 count, u32 frame, u16 *
             window->messageFrames[i] = frames[i];
         window->queuedMessage = window->messageFrames[window->messageFrame];
         TextState_Reset(&window->state);
-        window->widget.flags |= 1;
+        window->animSprite.flags |= 1;
     }
     return 0;
 }
@@ -289,7 +289,7 @@ int MessageWindow_ShowMessage(int index)
     }
     TextState_Reset(state);
     window->queuedMessage = 0xFFFF;
-    window->widget.flags |= 1;
+    window->animSprite.flags |= 1;
     return 0;
 }
 
@@ -311,7 +311,7 @@ s32 MessageWindow_SetTextCursor(u32 value)
         state->pc = (const u8 *)value;
         state->characterTimer = 0;
         state->stream = 0;
-        window->widget.flags |= 1;
+        window->animSprite.flags |= 1;
     }
     return 0;
 }
@@ -584,10 +584,10 @@ void MessageWindow_UpdatePageAdvance(struct MessageWindow *window)
         }
         if (gPadState[1] & 1)
             result = 1;
-        window->widget.flags &= ~1;
+        window->animSprite.flags &= ~1;
     } else {
         window->fastPlayback = result;
-        window->widget.flags |= 1;
+        window->animSprite.flags |= 1;
         window->pageAdvanceTimer++;
     }
     if ((window->fastPlayback || result) && window->messageTable) {
@@ -607,9 +607,9 @@ void MessageWindow_UpdatePageAdvance(struct MessageWindow *window)
         TextWindow_BlankRect(window->x, window->y, window->width, window->height);
         TextState_SetBounds(st, window->x, window->y, window->width, window->height);
         TextState_Reset(&window->state);
-        window->widget.flags |= 1;
+        window->animSprite.flags |= 1;
     } else {
-        Anim_Step(&window->widget, &window->resource);
+        Anim_Step(&window->animSprite, &window->resource);
     }
 }
 
@@ -625,7 +625,7 @@ void MessageWindow_UpdateFastPlayback(struct MessageWindow *window)
             window->pageAdvanceTimer = 0;
             MessageWindow_SetPlayback(window, MessageWindow_UpdatePageAdvance);
             if (!window->autoAdvance && !window->pageAdvanceDelay)
-                window->widget.flags &= ~1;
+                window->animSprite.flags &= ~1;
             goto done;
         } else {
             state->characterTimer = 0;
@@ -654,7 +654,7 @@ void MessageWindow_UpdateNormalPlayback(struct MessageWindow *window)
             window->pageAdvanceTimer = 0;
             MessageWindow_SetPlayback(window, MessageWindow_UpdatePageAdvance);
             if (!window->autoAdvance && !window->pageAdvanceDelay)
-                window->widget.flags &= ~1;
+                window->animSprite.flags &= ~1;
             return;
         }
         if (state->characterTimer++ >= state->characterDelay) {
@@ -734,15 +734,15 @@ s32 MessageWindow_Update(struct MessageWindow *window)
     if (window->callback)
         Callback_InvokeActor(window, window->callback);
     if (window->y + window->height <= 9) {
-        window->widget.position.x = 0;
-        window->widget.position.y = -102;
-        window->widget.position.z = 0;
+        window->animSprite.position.x = 0;
+        window->animSprite.position.y = -102;
+        window->animSprite.position.z = 0;
         window->portrait.position.x = 4;
         window->portrait.position.y = 0x40;
     } else {
-        window->widget.position.x = 0;
-        window->widget.position.y = 0;
-        window->widget.position.z = 0;
+        window->animSprite.position.x = 0;
+        window->animSprite.position.y = 0;
+        window->animSprite.position.z = 0;
         window->portrait.position.x = 4;
         window->portrait.position.y = 0x40;
     }
@@ -760,7 +760,7 @@ s32 MessageWindow_Update(struct MessageWindow *window)
 
 int MessageWindow_OnDestroy(struct MessageWindow *window)
 {
-    Anim_Remove(&window->widget);
+    Anim_Remove(&window->animSprite);
     Sprite_Remove(&window->portrait);
     return (u32)(gMessageWindow = 0);
 }

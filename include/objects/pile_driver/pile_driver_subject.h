@@ -1,5 +1,5 @@
-#ifndef GUARD_SCENE_PANEL_SUBJECT_H
-#define GUARD_SCENE_PANEL_SUBJECT_H
+#ifndef GUARD_PILE_DRIVER_SUBJECT_H
+#define GUARD_PILE_DRIVER_SUBJECT_H
 #include "objects/pile_driver/pile_driver_commands.h"
 #include "scene/collision/contact_swarm.h"
 

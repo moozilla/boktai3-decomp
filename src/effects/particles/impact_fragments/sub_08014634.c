@@ -3,7 +3,6 @@
 #include "engine/engine.h"
 #include "engine/ram.h"
 // confidence=low: fills the first inactive group with randomized bouncing particles.
-#define ImpactParticleGroup_SpawnBouncing sub_08014634
 extern u32 gUnk_08604B90[];
 static inline int CellIndex(struct ContactPosition *p)
 {

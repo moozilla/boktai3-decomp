@@ -1,11 +1,3 @@
-#define Terrain_IsSegmentBelowHeightLimit  sub_0821D4F0
-#define Terrain_StepTowardCellBoundary     sub_0821D178
-#define Terrain_MovePoint                  sub_0821C884
-#define Terrain_AdjustBlockedMovement      sub_0821C254
-#define Terrain_AreCellsConnected          sub_0821BF5C
-#define Terrain_GetHeightDifference        sub_0821BE3C
-#define Terrain_GetCellFlagsAt             sub_0821BDD8
-#define Terrain_GetCardinalDirectionToCell sub_0821BCE4
 #include "scene/terrain/terrain_sampling.h"
 #include "engine/engine_globals.h"
 #include "engine/engine.h"

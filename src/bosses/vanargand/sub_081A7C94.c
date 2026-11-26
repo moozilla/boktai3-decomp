@@ -1,6 +1,6 @@
 #include "global.h"
 
-struct ScenePanelPairState {
+struct VanargandPairState {
     u8 pad0[0xAE];
     u8 mode;
     u8 padAF[0xE1 - 0xAF];
@@ -18,9 +18,9 @@ s32 __divsi3(s32, s32);
 s32 ScenePair_CountPositiveCounters(void *);
 void VanargandPair_SelectPairTransition(void *, const u8 table[][3]);
 
-s32 VanargandPair_UpdatePairConditions(struct ScenePanelPairState *p)
+s32 VanargandPair_UpdatePairConditions(struct VanargandPairState *p)
 {
-    struct ScenePanelPairState *q = p;
+    struct VanargandPairState *q = p;
     s32 d = __divsi3(p->gauge, 43);
     if (3 - d != p->level) {
         p->level = 3 - d;

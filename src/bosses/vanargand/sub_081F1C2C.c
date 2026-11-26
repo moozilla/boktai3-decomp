@@ -11,7 +11,7 @@ void VanargandHead_InitContactCollider(void *, s32);
 void VanargandHead_RegisterRenderCallback(void *);
 void VanargandHead_InitBackgroundAndMotion(void *);
 void VanargandHead_InitDisplaySprites(void *);
-void SceneActors_InitResources(void *);
+void VanargandHead_InitResources(void *);
 void *VanargandHead_CreateEffectPool(void);
 s32 sub_081F0678(void);
 extern u16 gUnk_03005040[4][16];
@@ -92,7 +92,7 @@ s32 VanargandHead_InitFromScript(struct DepartureActor *actor, s32 id)
         for (fillIndex = 0; fillIndex < 16; fillIndex++)
             actor->flashPalette[fillIndex] = 0x7FFF;
     }
-    SceneActors_InitResources(actor);
+    VanargandHead_InitResources(actor);
     {
         u32 mask = 0x10;
         *flags = mask | *flags;

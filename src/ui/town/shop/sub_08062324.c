@@ -1,5 +1,5 @@
 #include "ui/town/shop_tail.h"
-struct SceneInventorySwapView {
+struct ShopSwapView {
     u8 unknown0[0x1AF0];
     struct SceneInputPair pair;
 };
@@ -7,10 +7,10 @@ s32 SceneInput_TickPairTransition(struct SceneInputPair *);
 void Inventory_SwapEquipmentEntries(u32, u32);
 void sub_0822D080(u32, u32);
 void Inventory_SwapSlots(u32, u32);
-s32 Shop_TickSwapTransition(struct SceneInventoryTail *p)
+s32 Shop_TickSwapTransition(struct ShopTail *p)
 {
     SceneInputPanel_ResetHighlights(&p->display, &p->highlight);
-    if (SceneInput_TickPairTransition(&((struct SceneInventorySwapView *)p)->pair)) {
+    if (SceneInput_TickPairTransition(&((struct ShopSwapView *)p)->pair)) {
         switch (p->category) {
             case 0:
                 Inventory_SwapEquipmentEntries(p->grid.savedSelection, p->grid.selection);

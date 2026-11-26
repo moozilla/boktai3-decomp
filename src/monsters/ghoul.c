@@ -240,7 +240,7 @@ void Ghoul_ResumeDelayedChase(struct ChaseActor *actor)
     SceneActorControl_TakeStateEntry(actor);
     if ((u8)Callback_InvokeActor(actor, actor->base.contactQuery.opaque))
         return;
-    if (sub_0812F3CC(actor))
+    if (SceneActorReaction_BeginContactResponse(actor))
         return;
     if ((s32)actor->base.counter2AC <= 60)
         goto waiting;
@@ -311,7 +311,7 @@ void Ghoul_UpdateProbeApproach(struct ChaseActor *actor)
             Ghoul_ClearPendingRoute(&control->discFlags);
             return;
         }
-        if (sub_0812F3CC(actor)) {
+        if (SceneActorReaction_BeginContactResponse(actor)) {
             Ghoul_ClearPendingRoute(&control->discFlags);
             return;
         }
@@ -353,7 +353,7 @@ void SceneActorControl_RestartOrAdvance(struct ChaseActor *actor)
             Ghoul_ClearPendingRoute(&control->discFlags);
             return;
         }
-        if (sub_0812F3CC(actor)) {
+        if (SceneActorReaction_BeginContactResponse(actor)) {
             Ghoul_ClearPendingRoute(&control->discFlags);
             return;
         }
@@ -373,7 +373,7 @@ void Ghoul_WaitForRouteResult(struct ChaseActor *actor)
     }
     busy = Callback_InvokeActor(actor, actor->base.contactQuery.opaque);
     if (!busy) {
-        if (!sub_0812F3CC(actor)) {
+        if (!SceneActorReaction_BeginContactResponse(actor)) {
             if (actor->base.stepDone) {
                 SceneActorChase_SetState(actor, 0, 0, 5);
                 SceneActorChase_SetControl(actor, actor->base.onStanding, 0);

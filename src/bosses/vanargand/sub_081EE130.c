@@ -26,7 +26,7 @@ static inline void Update(struct DepartureActor *p, s32 time)
     ActorDisplay_UpdateScreenAnchor(p);
     ActorDisplay_UpdateForegroundSprite(p);
     ActorDisplay_UpdateAccentSprite(p);
-    SceneActors_EmitPeriodicParticles(p, time);
+    VanargandHead_EmitPeriodicParticles(p, time);
 }
 static inline void SetHeldFlag(u8 *flags)
 {
@@ -38,7 +38,7 @@ static inline void SetHeldFlag(u8 *flags)
 
 void ActorEffect_SpawnOffsetEffect(struct DepartureActor *);
 // confidence=low: sequence-one action periodically spawns offset effects.
-void SceneActors_UpdatePeriodicEffectAction(struct DepartureActor *arg, s32 ticks)
+void VanargandHead_UpdatePeriodicEffectAction(struct DepartureActor *arg, s32 ticks)
 {
     struct DepartureActor *input = arg;
     s32 time = ticks;

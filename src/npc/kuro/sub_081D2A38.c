@@ -100,7 +100,7 @@ void Kuro_OnBehaviorUpdate(void);
 void Kuro_TickStateAndPalette(void);
 void Kuro_OnVisibilityUpdate(void);
 void Kuro_DispatchReceiverCallback(void);
-void sub_081D1A44(void);
+void Kuro_EnterIdleFacing(void);
 void Kuro_UpdateState17AnimationA(void);
 u8 SceneCharacter_GetPathNodeState(struct SceneNpc *);
 
@@ -206,7 +206,7 @@ void Kuro_Create(u32 tag)
             npc->mode = one;
             npc->field14 = 0;
             npc->field8 = 1;
-            updates[1] = sub_081D1A44;
+            updates[1] = Kuro_EnterIdleFacing;
             npc->state = 2;
             npc->update = updates[1];
             npc->field10 = 0;

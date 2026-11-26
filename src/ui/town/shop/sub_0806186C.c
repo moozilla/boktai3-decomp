@@ -1,5 +1,5 @@
 #include "ui/town/shop_states.h"
-void Shop_BeginExitConfirmation(struct SceneInventoryControlView *panel)
+void Shop_BeginExitConfirmation(struct ShopControlView *panel)
 {
     panel->interactionFlags = 0;
     switch (panel->category) {
@@ -17,5 +17,5 @@ void Shop_BeginExitConfirmation(struct SceneInventoryControlView *panel)
     SceneInput_BeginChoice(&panel->display.prompt, &panel->display.widgetResource,
                            &panel->choiceValue, 1, &panel->choiceBlink);
     Shop_SetControllerCallback(
-        panel, (SceneInventoryCallback)Shop_TickResetConfirmation);
+        panel, (ShopCallback)Shop_TickResetConfirmation);
 }

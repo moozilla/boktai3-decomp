@@ -123,7 +123,7 @@ void Skeleton_UpdateProbeApproach(struct Skeleton *actor)
         if ((u8)Callback_InvokeActor(actor, actor->chase.base.contactQuery.opaque)) {
             return;
         }
-        if (sub_0812F3CC(&actor->chase)) {
+        if (SceneActorReaction_BeginContactResponse(&actor->chase)) {
             return;
         }
     }
@@ -180,7 +180,7 @@ void Skeleton_UpdateEntryPhase(struct Skeleton *actor)
     if (SceneActorReaction_IsRangeReady(&actor->chase)) {
         if ((u8)Callback_InvokeActor(actor, actor->chase.base.contactQuery.opaque))
             return;
-        if (sub_0812F3CC(&actor->chase))
+        if (SceneActorReaction_BeginContactResponse(&actor->chase))
             return;
     }
     if (actor->chase.base.stepDone) {
@@ -199,7 +199,7 @@ void Skeleton_UpdateEntryRecoveryPhase(struct Skeleton *actor)
     if (SceneActorReaction_IsRangeReady(&actor->chase)) {
         if ((u8)Callback_InvokeActor(actor, actor->chase.base.contactQuery.opaque))
             return;
-        if (sub_0812F3CC(&actor->chase))
+        if (SceneActorReaction_BeginContactResponse(&actor->chase))
             return;
     }
     if (actor->chase.base.stepDone) {

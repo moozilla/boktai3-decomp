@@ -7,7 +7,7 @@
 #include "scene/actor/scene_actor_attachment.h"
 
 // confidence=low: timed movement recovery restores a route and saves a delayed control.
-u8 sub_0812F3CC(struct ChaseActor *);
+u8 SceneActorReaction_BeginContactResponse(struct ChaseActor *);
 void SceneActorAttachment_ReplaceResponseSlot(void *, u32, u32, u32);
 void SceneActorReaction_UpdateRouteRecovery(struct ChaseActor *actor)
 {
@@ -18,7 +18,7 @@ void SceneActorReaction_UpdateRouteRecovery(struct ChaseActor *actor)
         actor->base.field2B1 = 0;
     if ((u8)Callback_InvokeActor(actor, actor->base.contactQuery.opaque))
         return;
-    result = sub_0812F3CC(actor);
+    result = SceneActorReaction_BeginContactResponse(actor);
     if (result)
         return;
     if ((s32)actor->base.counter2AC > 60) {

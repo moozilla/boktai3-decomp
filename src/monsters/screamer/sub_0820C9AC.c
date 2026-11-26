@@ -1,5 +1,5 @@
 #include "scene/collision/contact_collider.h"
-#include "monsters/enemy_particle.h"
+#include "effects/particles/enemy_particle.h"
 #include "global.h"
 #include "monsters/screamer/screamer_state.h"
 #include "engine/ram.h"

@@ -10,7 +10,7 @@ struct MotionEntry {
     u8 unknown4C[0xD];
     u8 enabled;
 };
-void MotionEntry_UpdatePosition(struct MotionEntry *);
+void HresvelgrMotion_UpdatePosition(struct MotionEntry *);
 static inline void Difference(struct MotionPosition *out, struct MotionPosition *a,
                               struct MotionPosition *b)
 {
@@ -18,7 +18,7 @@ static inline void Difference(struct MotionPosition *out, struct MotionPosition 
     out->y = a->y - b->y;
     out->z = a->z - b->z;
 }
-void MotionEntry_SetEnabled(u8 *raw, u32 enabled)
+void HresvelgrMotion_SetEnabled(u8 *raw, u32 enabled)
 {
     struct MotionPosition previous;
     if (raw) {
@@ -27,7 +27,7 @@ void MotionEntry_SetEnabled(u8 *raw, u32 enabled)
             struct MotionPosition *old = &previous;
             struct MotionPosition *pos = &p->position;
             *old = *pos;
-            MotionEntry_UpdatePosition(p);
+            HresvelgrMotion_UpdatePosition(p);
             Difference(&p->delta, pos, old);
         }
         p->enabled = enabled;

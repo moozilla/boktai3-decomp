@@ -697,8 +697,8 @@ void Ivy_UpdateRestartFlags(u8 *p)
 }
 
 /* Ivy defeat state (tentative), a variant of Skeleton_UpdateDefeat (Skeleton_UpdateDefeat). On entry:
- * hides the actor, launches a particle burst through sub_08127590 and either plays cue 0xE5
- * (context flag 0x10) or runs the context's defeat script. After 20 frames, without flag 0x10
+ * hides the actor, launches a burst through SpriteProjectile_Create, then either plays cue
+ * 0xE5 (context flag 0x10) or runs the context's defeat script. After 20 frames, without flag 0x10
  * it revives (restores health, SceneActorReaction_PlayHiddenCue); otherwise the full defeat:
  * cue or six-spark burst, terrain and position scripts, event flag, kill counters per
  * category (saturating at 9999, plus one counter per collider reaction flag) and the reward.
@@ -729,9 +729,10 @@ static inline const u16 *ReadSparkTable(const union HitSparkTable *r)
     return r->table;
 }
 
-void sub_08127590(void *, void *, u32, u32, u32, u32, u32, u32, u32, u32, u32, u32, u32, u32, u32);
+void SpriteProjectile_Create(void *, void *, u32, u32, u32, u32, u32, u32, u32, u32, u32, u32, u32,
+                             u32, u32);
 
-void sub_08159164(u32);
+void Player_AddExperience(u32);
 
 void Player_RefreshLifeState(u32, u32);
 
@@ -984,8 +985,8 @@ void Ivy_UpdateDefeat(struct ChaseActor *actor, s32 frame)
         ClearPos(&vec, &buf.zero);
         Polar(&vec, actor->base.reactionDirection, Rand() & 0x1F);
         vec.y = (Rand() & 0x1F) + 0x30;
-        sub_08127590(&actor->base.body.position, &vec, 0xD638, 0x99DD, 10, 0x1E, 2, 0, 0x12A, 0, 0,
-                     0, 0, 0, 0);
+        SpriteProjectile_Create(&actor->base.body.position, &vec, 0xD638, 0x99DD, 10, 0x1E, 2, 0,
+                                0x12A, 0, 0, 0, 0, 0, 0);
         hidden = actor->base.hitReactionFlags & 0x10;
         if (hidden)
             Sound_PlaySong(0xE5);
@@ -1076,7 +1077,7 @@ void Ivy_UpdateDefeat(struct ChaseActor *actor, s32 frame)
     COUNT(0x87C);
     COUNT(0x538);
     RecordKill(actor, categoryp);
-    sub_08159164(actor->base.experience);
+    Player_AddExperience(actor->base.experience);
     Player_RefreshLifeState(actor->base.hitAttributes, actor->base.fieldA1);
     if (!SceneActorChase_Test(gEngineFlags, 0x4800) && !Flag(actor, 0x800, 0x2D0))
         SceneActorRecord_RecordPair(gScriptEntryProcedure, (u16)actor->base.body.id);

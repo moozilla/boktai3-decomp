@@ -32,7 +32,6 @@ static inline void SolarBank_SetRate(s16 *rate, s32 level)
     *rate = 0x41 + level;
 }
 
-#define SolarBank_InitWidgets sub_081BBE88
 void SolarBank_InitWidgets(struct SolarBankDisplay *p)
 {
     struct AnimSpritePlayback labelPlayback;
@@ -88,8 +87,8 @@ void SolarBank_InitWidgets(struct SolarBankDisplay *p)
     commonResource = &p->commonResource;
     for (i = 0; i < 4; i++) {
         struct ContactPosition *position = &pos;
-        struct AnimSprite *widget = &p->balanceDigits[i];
-        AnimSprite_InitLinked(widget, commonResource, 0, 0x30, 0, 0, 0x3C, position);
+        struct AnimSprite *animSprite = &p->balanceDigits[i];
+        AnimSprite_InitLinked(animSprite, commonResource, 0, 0x30, 0, 0, 0x3C, position);
         pos.x += 8;
     }
 
@@ -97,8 +96,8 @@ void SolarBank_InitWidgets(struct SolarBankDisplay *p)
     pos.y = 0x28;
     for (i = 0; i < 4; i++) {
         struct ContactPosition *position = &pos;
-        struct AnimSprite *widget = &p->transferDigits[i];
-        AnimSprite_InitLinked(widget, commonResource, 0, 0x30, 0, 0, 0x3C, position);
+        struct AnimSprite *animSprite = &p->transferDigits[i];
+        AnimSprite_InitLinked(animSprite, commonResource, 0, 0x30, 0, 0, 0x3C, position);
         pos.x += 8;
     }
 

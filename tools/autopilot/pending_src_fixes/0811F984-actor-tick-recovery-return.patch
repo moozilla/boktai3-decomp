@@ -5,8 +5,8 @@ PalFade_Start returns through r0, leaving 0811F9E5.
 
 The explicit form changed the ROM bytes. The guarded form passed the unit ROM check.
 
---- a/src/actor_ability.c
-+++ b/src/actor_ability.c
+--- a/src/scene/actor/actor_ability.c
++++ b/src/scene/actor/actor_ability.c
 @@ -267,4 +267,7 @@
  s32 ActorAction_TickRecovery(struct ActorStats *stats, void *context)
  {

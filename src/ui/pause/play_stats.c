@@ -389,7 +389,7 @@ void PlayStats_InitializeWidgets(struct PlayStatsScreen *screen)
     u8 data[8];
     struct SceneInputPackedPosition dims;
     int i;
-    struct AnimSprite *widget;
+    struct AnimSprite *animSprite;
 
     memcpy(data, gUnk_0824F999, 8);
     dims.y = 0x38;
@@ -403,9 +403,9 @@ void PlayStats_InitializeWidgets(struct PlayStatsScreen *screen)
 
     AnimSprite_InitLinked(&screen->entries[8], &screen->resources[0], 0x3c, 0x30, 0, 0, 0x3c, NULL);
 
-    widget = &screen->entries[9];
-    AnimSprite_InitLinked(widget, &screen->resources[1], 0x80, 0x30, 0, 0, 0x3c, NULL);
-    widget->flags |= 1;
+    animSprite = &screen->entries[9];
+    AnimSprite_InitLinked(animSprite, &screen->resources[1], 0x80, 0x30, 0, 0, 0x3c, NULL);
+    animSprite->flags |= 1;
 }
 
 void PlayStats_LoadResources(struct PlayStatsScreen *screen)

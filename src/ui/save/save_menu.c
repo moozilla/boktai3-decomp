@@ -37,7 +37,7 @@ void LinkScorePanel_RemoveSprites(void *);
 
 void LinkScorePanel_LoadBackground(struct SaveMenu *);
 
-void sub_081100A0(struct SaveMenu *);
+void LinkScorePanel_UpdateDisplayedScore(struct SaveMenu *);
 
 void LinkScorePanel_InitGlyphFrames(struct SaveMenu *);
 
@@ -301,7 +301,7 @@ s32 SaveMenu_InitializeFromScript(struct SaveMenu *menu)
     Bg_ClearTilemap(1);
     Bg_ClearTilemap(0);
     LinkScorePanel_LoadBackground(menu);
-    sub_081100A0(menu);
+    LinkScorePanel_UpdateDisplayedScore(menu);
     LinkScorePanel_InitGlyphFrames(menu);
     RecordList_InitializeSprites(menu);
     LinkMenu_LoadSelectionSprite(menu);

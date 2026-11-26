@@ -1,11 +1,9 @@
 #include "global.h"
 /* ImpactBurst_EmitAngledBurst: Builds a particle Config and emits a single burst with vertical/horizontal/pitch angle ranges (matches existing src alias) */
-#define ImpactBurst_EmitAngledBurst sub_08015C90
 struct Config {
     u16 v[20];
 };
 void ImpactBurst_Create(int, void *, struct Config *);
-#define ImpactBurst_EmitAngledBurst sub_08015C90
 void ImpactBurst_EmitAngledBurst(void *pos, int type, int flags, int speed, int vertical,
                                        int verticalRange, int horizontal, int horizontalRange,
                                        int pitch, int pitchRange)

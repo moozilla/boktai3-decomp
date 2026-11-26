@@ -364,7 +364,7 @@ void FallingObject_UpdateLanding(struct FallingObject *object)
     }
 }
 
-void sub_08014634(u32, u32, void *, void *, void *, u32, u32);
+void ImpactParticleGroup_SpawnBouncing(u32, u32, void *, void *, void *, u32, u32);
 
 void Camera_RequestShake(u32);
 
@@ -381,7 +381,7 @@ void FallingObject_UpdateShatter(struct FallingObject *object)
             high.x = 30;
             high.y = 22;
             high.z = 30;
-            sub_08014634(8, 3, &object->position, &low, &high, 60, 60);
+            ImpactParticleGroup_SpawnBouncing(8, 3, &object->position, &low, &high, 60, 60);
         }
         object->parameter = 30;
     }
@@ -419,7 +419,7 @@ void FallingObject_UpdateBounceAway(struct FallingObject *object)
             high.x = 30;
             high.y = 22;
             high.z = 30;
-            sub_08014634(8, 3, &object->position, &low, &high, 60, 60);
+            ImpactParticleGroup_SpawnBouncing(8, 3, &object->position, &low, &high, 60, 60);
         }
         object->parameter = 25;
     }

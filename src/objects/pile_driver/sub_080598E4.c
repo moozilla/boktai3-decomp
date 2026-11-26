@@ -39,7 +39,7 @@ void PileDriverRig_TickResourceDrain(struct PileDriverRig *rig)
                 *remaining -= drain;
         }
         {
-            struct SceneRigParentView **global = (void *)&gScenePanel;
+            struct SceneRigParentView **global = (void *)&gPileDriver;
             u32 stage = (*global)->warningStage;
             if (stage == 0 && gGameState->unk618 <= gGameState->unk61C >> 2) {
                 u16 sound;

@@ -6,7 +6,7 @@
 #include "scene/actor/scene_actor_control_motion.h"
 #include "debug.h"
 #include "scene/collision/scene_actor_contact_response.h"
-u8 sub_0812F3CC(struct ChaseActor *);
+u8 SceneActorReaction_BeginContactResponse(struct ChaseActor *);
 s32 NavMesh_ConsumeProbeEvent(void *);
 u8 SceneActorBehavior_AccelerateTowardDescriptor(void *, void *, u32, u32, u32);
 u8 SceneActorBehavior_RequestDescriptorTurn(void *, void *, u32, u32, u32);
@@ -32,7 +32,7 @@ void SceneActorRoute_UpdateRouteCompletion(struct ChaseActor *actor)
     }
     if ((u8)Callback_InvokeActor(actor, actor->base.contactQuery.opaque))
         return;
-    if ((u8)sub_0812F3CC(actor))
+    if ((u8)SceneActorReaction_BeginContactResponse(actor))
         return;
     SceneActorAnimation_SelectDirectionalEntry(actor, 1);
     speed = Callback_InvokeActor(actor, actor->base.animationQuery.opaque);

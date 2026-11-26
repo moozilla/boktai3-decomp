@@ -1,5 +1,5 @@
 #include "ui/town/shop_states.h"
-void Shop_BeginMoveSelection(struct SceneInventoryControlView *panel)
+void Shop_BeginMoveSelection(struct ShopControlView *panel)
 {
     Shop_BeginActionSelection(panel, 0);
     panel->interactionFlags |= 16;

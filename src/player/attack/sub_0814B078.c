@@ -8,7 +8,6 @@
 #include "engine/video/render.h"
 
 // confidence=low: chooses the closest visible list entry and derives its travel duration.
-#define Player_SelectNearestMotionTarget sub_0814B078
 struct TargetPosition {
     s16 x, y, z;
 };

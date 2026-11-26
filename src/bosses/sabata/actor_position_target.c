@@ -35,7 +35,7 @@ s32 ActorMovement_CanReachTarget(struct SabataActorState *actor)
         return 0;
     if (actor->threshold > 0x90000)
         return 0;
-    if (!sub_0821D4F0(position, actor->selectedPoint, 10, 256))
+    if (!Terrain_IsSegmentBelowHeightLimit(position, actor->selectedPoint, 10, 256))
         return 0;
     return 1;
 }

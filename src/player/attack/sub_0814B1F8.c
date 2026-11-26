@@ -52,7 +52,7 @@ static inline void PlayerMotion_SetTarget(void *target)
 }
 u32 Player_ConsumeStateEntry(void *);
 void *ParticlePool_Create(void);
-void *sub_0814B078(void *, s32, s32);
+void *Player_SelectNearestMotionTarget(void *, s32, s32);
 void Player_OnTargetMotionExit(struct Player *);
 void Player_SetPendingCallback(void *, void *);
 void WirelessGame_ResetCyclingItemLatch(void);
@@ -189,7 +189,7 @@ void Player_UpdateTargetMotion(struct Player *p)
         if (MOTION->particles == 0)
             MOTION->particles = ParticlePool_Create();
         p->cueSpeed = 50;
-        PlayerMotion_SetTarget(sub_0814B078(p, 1000000, 0));
+        PlayerMotion_SetTarget(Player_SelectNearestMotionTarget(p, 1000000, 0));
         gUnk_0200051C = 0;
         gUnk_02000524 = 0;
         p->movementStart = p->position;
@@ -396,7 +396,7 @@ void Player_UpdateTargetMotion(struct Player *p)
             p->tetherFrame++;
             if (p->tetherFrame > 0x19) {
                 if (gUnk_0200051C != 0 && gUnk_02000524 == 0 && p->statusValue != 0) {
-                    PlayerMotion_SetTarget(sub_0814B078(p, 1000000, 0));
+                    PlayerMotion_SetTarget(Player_SelectNearestMotionTarget(p, 1000000, 0));
                     if (gUnk_02000538 != 0) {
                         MOTION->speed += 0x32;
                         if (MOTION->speed > 0xC8)

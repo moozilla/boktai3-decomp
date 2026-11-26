@@ -1,6 +1,6 @@
 #include "global.h"
 #include "bosses/nidhoggr/nidhoggr_effect_pool.h"
-void SceneEffect_ResetState(struct ScenePanelOwnedEffect *effect)
+void SceneEffect_ResetState(struct NidhoggrOwnedEffect *effect)
 {
     effect->anchor = NULL;
     ZeroFill8(&effect->motion);

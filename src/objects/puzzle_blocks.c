@@ -447,10 +447,11 @@ s32 PuzzleBlock_DestroyObjectsByScriptId(void)
     return 0;
 }
 
-void sub_08014CA4(u32, u32, struct SceneVec *, u32, u32, u32, u32, u32, u32, u32, u32, u32);
+void ImpactFragmentGroup_SpawnRadial(u32, u32, struct SceneVec *, u32, u32, u32, u32, u32, u32, u32,
+                                     u32, u32);
 
-void sub_08014634(u32, u32, struct SceneExtent *, struct SceneExtent *, struct SceneExtent *, u32,
-                  u32);
+void ImpactParticleGroup_SpawnBouncing(u32, u32, struct SceneExtent *, struct SceneExtent *,
+                                       struct SceneExtent *, u32, u32);
 
 void PuzzleBlock_PlayObjectBreakEffect(struct SceneObject *p)
 {
@@ -460,8 +461,8 @@ void PuzzleBlock_PlayObjectBreakEffect(struct SceneObject *p)
     struct SceneVec *q;
     Sound_PlaySong(0x15B);
     q = &p->body.position;
-    sub_08014CA4(3, 2, q, 0x3c, 0x1e, 0x10, 8, 8, 0, 0x100, 0x18, 0x10);
-    sub_08014CA4(8, 6, q, 0x3c, 0x1e, 0x16, 8, 8, 0, 0x100, 0x18, 0x10);
+    ImpactFragmentGroup_SpawnRadial(3, 2, q, 0x3c, 0x1e, 0x10, 8, 8, 0, 0x100, 0x18, 0x10);
+    ImpactFragmentGroup_SpawnRadial(8, 6, q, 0x3c, 0x1e, 0x16, 8, 8, 0, 0x100, 0x18, 0x10);
     a.x = p->body.position.x;
     a.y = p->body.position.y + 0x80;
     a.z = p->body.position.z;
@@ -471,7 +472,7 @@ void PuzzleBlock_PlayObjectBreakEffect(struct SceneObject *p)
     c.x = 0x1e;
     c.y = 0x16;
     c.z = 0x1e;
-    sub_08014634(8, 3, &a, &b, &c, 0x3c, 0x3c);
+    ImpactParticleGroup_SpawnBouncing(8, 3, &a, &b, &c, 0x3c, 0x3c);
 }
 
 void PuzzleBlock_PlayObjectSplashEffect(struct SceneObject *p)
@@ -482,7 +483,7 @@ void PuzzleBlock_PlayObjectSplashEffect(struct SceneObject *p)
     struct SceneVec *q;
     Sound_PlaySong(0x135);
     q = &p->body.position;
-    sub_08014CA4(4, 0, q, 0x3c, 0x1e, 0x14, 8, 8, 0, 0x100, 0x18, 0x10);
+    ImpactFragmentGroup_SpawnRadial(4, 0, q, 0x3c, 0x1e, 0x14, 8, 8, 0, 0x100, 0x18, 0x10);
     a.x = p->body.position.x;
     a.y = p->body.position.y + 0x80;
     a.z = p->body.position.z;
@@ -492,7 +493,7 @@ void PuzzleBlock_PlayObjectSplashEffect(struct SceneObject *p)
     c.x = 0x1e;
     c.y = 0x16;
     c.z = 0x1e;
-    sub_08014634(8, 2, &a, &b, &c, 0x3c, 0x3c);
+    ImpactParticleGroup_SpawnBouncing(8, 2, &a, &b, &c, 0x3c, 0x3c);
 }
 
 void PuzzleBlock_PlayObjectImpactEffect(struct SceneObject *object)
@@ -500,8 +501,8 @@ void PuzzleBlock_PlayObjectImpactEffect(struct SceneObject *object)
     struct SceneVec *p;
     Sound_PlaySong(0x150);
     p = &object->body.position;
-    sub_08014CA4(3, 1, p, 0x3c, 0x1e, 0x10, 8, 8, 0, 0x100, 0x18, 0x10);
-    sub_08014CA4(8, 5, p, 0x3c, 0x1e, 0x16, 8, 8, 0, 0x100, 0x18, 0x10);
+    ImpactFragmentGroup_SpawnRadial(3, 1, p, 0x3c, 0x1e, 0x10, 8, 8, 0, 0x100, 0x18, 0x10);
+    ImpactFragmentGroup_SpawnRadial(8, 5, p, 0x3c, 0x1e, 0x16, 8, 8, 0, 0x100, 0x18, 0x10);
 }
 
 static inline u32 dustScatter(const u8 *random, const s16 *coordinate)
@@ -1082,7 +1083,7 @@ extern void (*const gUnk_086049B4[])(struct SceneObject *);
 
 void Obj_StepPosition(void *);
 
-void sub_0821DE30(void *);
+void Trap_UpdateProbeContacts(void *);
 
 void Palette_InterpolateBanks(void *, u32, u32, s32, s32);
 
@@ -1134,11 +1135,11 @@ s32 PuzzleBlock_Update(struct SceneObjectManager *manager)
         if (p->flags & 0x20) {
             if (!p->kind) {
                 p->body.flags &= ~2;
-                sub_0821DE30(&p->link);
+                Trap_UpdateProbeContacts(&p->link);
             } else
                 p->body.flags |= 2;
         } else
-            sub_0821DE30(&p->link);
+            Trap_UpdateProbeContacts(&p->link);
         if (p->cooldown)
             p->cooldown--;
         if (!p->owner || ownerIsCurrent(p->owner))

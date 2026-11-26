@@ -22,12 +22,11 @@ struct P {
     void (*fn)(struct P *);
 };
 void Player_SetTetherMode(struct P *, s32, s32);
-void sub_08238238(struct P *);
+void Player_UpdateActionFacingSide(struct P *);
 #define B(o) (*(u8 *)((u8 *)p + (o)))
 #define H(o) (*(u16 *)((u8 *)p + (o)))
 #define S(o) (*(s16 *)((u8 *)p + (o)))
 // confidence=low: input-facing pose sequence exits when the action status becomes negative.
-#define PlayerCue_UpdateFacingPose sub_08241714
 void PlayerCue_UpdateFacingPose(struct P *p)
 {
     if (B(0x457) != 0x17)
@@ -50,7 +49,7 @@ void PlayerCue_UpdateFacingPose(struct P *p)
     Anim_SetSequence(&p->seq, (void *)p->resource, 2, p->facing, p->flip);
     PlayerCue_StepSequence(&p->sprite, &p->seq);
     if ((s8)B(0x4F3) < 0) {
-        sub_08238238(p);
+        Player_UpdateActionFacingSide(p);
         Player_SetTetherMode(p, 0, 0);
     }
 }

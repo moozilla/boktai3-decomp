@@ -4,8 +4,8 @@ The failure branch preserves the null Task_Create result in r0.
 
 The explicit form changed the ROM bytes. The guarded form passed the unit ROM check.
 
---- a/src/fn/sub_08208FD8.c
-+++ b/src/fn/sub_08208FD8.c
+--- a/src/monsters/garmr_statue/sub_08208FD8.c
++++ b/src/monsters/garmr_statue/sub_08208FD8.c
 @@ -17,3 +17,6 @@
          return r;
      }

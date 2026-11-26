@@ -12,7 +12,7 @@ void Collider_SetPosition(void *, void *, u32);
 void Collider_SetCallback(void *, void *, void *);
 void Collider_SetBodyProperties(void *, s32, s32, s32);
 s32 Collider_Refresh(void *);
-void sub_081F9BEC(void);
+void Ratatosk_OnDamageCollision(void);
 void Ratatosk_InitHurtCollider(struct Ratatosk *p, s32 resource)
 {
     struct ColliderVector size, offset;
@@ -25,7 +25,7 @@ void Ratatosk_InitHurtCollider(struct Ratatosk *p, s32 resource)
     offset.z = 0;
     Collider_Init(collider, 0, 0x5101, 0, 16, &size, &offset);
     Collider_SetPosition(collider, p->position, 0);
-    Collider_SetCallback(collider, sub_081F9BEC, p);
+    Collider_SetCallback(collider, Ratatosk_OnDamageCollision, p);
     Collider_SetBodyProperties(collider, resource, 0x804, 8);
     Collider_Refresh(collider);
 }

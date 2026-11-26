@@ -91,6 +91,6 @@ s32 OrbitEffect_FireVolley(struct OrbitEffect *, s32);
 s32 OrbitEffect_UpdateExpansion(struct OrbitEffect *, s32);
 s32 OrbitEffect_UpdateContraction(struct OrbitEffect *, s32);
 
-void sub_081FDCB0(struct OrbitTrailSprite *, void *resource);
+void OrbitEffect_UpdateHomingTrail(struct OrbitTrailSprite *, void *resource);
 
 #endif

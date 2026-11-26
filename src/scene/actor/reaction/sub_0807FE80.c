@@ -1,7 +1,6 @@
 #include "scene/motion/scene_actor_terrain_reaction.h"
 #include "scene/collision/scene_actor_restoration.h"
 /* Clears restart while the delayed reaction is in progress. */
-#define SceneActorReaction_RestoreAndClearRestart sub_0807FE80
 void SceneActorReaction_RestoreAndClearRestart(struct ChaseActor *actor, s32 frame)
 {
     actor->base.restart = 0;

@@ -12,7 +12,6 @@ s32 Math_Atan2(s32, s32);
 s32 ContactCollider_GetImpactDirection(struct ContactCollider *, struct ContactCollider *);
 
 // confidence=low: linked action contact handler mirrors the standard player response.
-#define Player_ApplyLinkedContactResponse sub_08238580
 void Player_ApplyLinkedContactResponse(struct Player *p, struct ContactCollider *source,
                                        struct ContactCollider *target)
 {

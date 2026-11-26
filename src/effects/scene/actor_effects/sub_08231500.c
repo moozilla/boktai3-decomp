@@ -30,7 +30,8 @@ s32 EffectGroup_SpawnPart(struct EffectGroup *group, s32 count,
             entry->fadeTimer = 10;
             entry->frame = zero;
             spawned = 1;
-            sub_08014634(count, group->mode, position, velocity, spread, lifetime, lifetimeMask);
+            ImpactParticleGroup_SpawnBouncing(count, group->mode, position, velocity, spread,
+                                              lifetime, lifetimeMask);
             break;
         }
     }

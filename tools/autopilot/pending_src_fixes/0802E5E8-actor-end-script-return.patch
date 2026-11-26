@@ -5,8 +5,8 @@ rewrite actor flags through r1 and r2, preserving r0 for the script VM.
 
 The explicit form changed the ROM bytes. The guarded form passed the unit ROM check.
 
---- a/src/scene_actor_animation.c
-+++ b/src/scene_actor_animation.c
+--- a/src/npc/manager/scene_actor_animation.c
++++ b/src/npc/manager/scene_actor_animation.c
 @@ -704,8 +704,13 @@
                      (*alias)->commandEntered = command;
                      break;

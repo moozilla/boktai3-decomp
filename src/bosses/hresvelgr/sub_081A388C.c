@@ -42,7 +42,7 @@ s32 Hresvelgr_GetHomingShotTargetAngle(void *, void *);
 void Collider_SetPosition(void *, void *, s32);
 void Collider_Refresh(void *);
 s32 Mod(s32, s32);
-void *MotionEntry_CreateConfigured(void *, s32, s32, s32, u32, s32);
+void *HresvelgrMotion_CreateConfigured(void *, s32, s32, s32, u32, s32);
 void EffectEntry_Release(void *);
 
 struct Pool {
@@ -51,7 +51,7 @@ struct Pool {
     u8 unknown38[4];
     u32 allocated;
 };
-struct Entry *EffectPool_FindIdleActiveEntry(void);
+struct Entry *HresvelgrEffectPool_FindIdleActiveEntry(void);
 void Anim_SetSequence(void *, void *, s32, s32, s32);
 void ScaledShadow_Enable(void *);
 static inline s32 scale(s32 n)
@@ -64,10 +64,10 @@ static inline void polar(struct Vec *v, s32 angle, s32 radius)
     v->y = 0;
     v->z = scale(gUnk_086149C4[angle & 255] * radius);
 }
-void EffectPool_AllocateEntry(struct Vec *position, s32 angle, s32 speed, s32 interval)
+void HresvelgrEffectPool_AllocateEntry(struct Vec *position, s32 angle, s32 speed, s32 interval)
 {
     struct Pool *pool = gEffectPoolManager;
-    struct Entry *entry = EffectPool_FindIdleActiveEntry();
+    struct Entry *entry = HresvelgrEffectPool_FindIdleActiveEntry();
     if (entry) {
         pool->allocated++;
         entry->position = *position;

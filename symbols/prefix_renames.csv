@@ -93,7 +93,7 @@ TaggedSceneNpc_,Kuro_,,Observed identity of the defining unit (Pass 4),src/npc/k
 SceneNpc_,Kuro_,,Observed identity of the defining unit (Pass 4),src/npc/kuro/
 Actor_,TutorialOtenko_,,Observed identity of the defining unit (Pass 4),src/ui/title/tutorial_otenko.c
 ActorPalette_,TutorialOtenkoPalette_,,Observed identity of the defining unit (Pass 4),src/ui/title/tutorial_otenko.c
-SceneObject_,SlidingDoor_,,Observed identity of the defining unit (Pass 4),src/objects/sliding_doors/
+SceneObject_,SlidingDoors_,,Observed identity of the defining unit (Pass 4),src/objects/sliding_doors/
 SceneObjects_,SlidingDoors_,,Observed identity of the defining unit (Pass 4),src/objects/sliding_doors/
 SceneObjects_,PuzzleBlock_,,Observed identity of the defining unit (Pass 4),src/objects/puzzle_blocks.c
 Scene_,PuzzleBlock_,,Observed identity of the defining unit (Pass 4),src/objects/puzzle_blocks.c
@@ -168,7 +168,7 @@ TentacleBody_,CentipedeBody_,,Centipede body and attacks,include/monsters/centip
 SceneNpc_,Otenko_,,Observed identity of the defining unit (Pass 4),include/npc/otenko/
 TaggedSceneNpc_,Kuro_,,Observed identity of the defining unit (Pass 4),include/npc/kuro/
 SceneNpc_,Kuro_,,Observed identity of the defining unit (Pass 4),include/npc/kuro/
-SceneObject_,SlidingDoor_,,Observed identity of the defining unit (Pass 4),include/objects/sliding_doors/
+SceneObject_,SlidingDoors_,,Observed identity of the defining unit (Pass 4),include/objects/sliding_doors/
 SceneObjects_,SlidingDoors_,,Observed identity of the defining unit (Pass 4),include/objects/sliding_doors/
 ActorGroup_,LootDeposit_,,Observed identity of the defining unit (Pass 4),include/objects/loot_deposits/
 ActorGroupPool_,LootDepositPool_,,Observed identity of the defining unit (Pass 4),include/objects/loot_deposits/

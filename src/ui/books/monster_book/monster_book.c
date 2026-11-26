@@ -437,7 +437,7 @@ u32 MonsterBook_SetupPageBackgrounds(struct MonsterBook *book, u32 value)
     fields->x = zero;
     fields->y = zero;
     Bg_SetPriority(3, 3);
-    sub_08215EB4(3, 4, 6, 8, 9, 1, zero, 4);
+    Bg_FillTilemapRectangle(3, 4, 6, 8, 9, 1, zero, 4);
     return 0;
 }
 

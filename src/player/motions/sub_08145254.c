@@ -4,7 +4,6 @@
 #include "objects/dungeon_prop/orbit_motion.h"
 
 // confidence=low: interpolates from the saved origin to a scripted endpoint.
-#define Player_UpdateInterpolatedMotion sub_08145254
 s32 Player_ConsumeStateEntry(void *);
 void Player_AddControlFlags(void *, u32);
 s32 Div(s32, s32);

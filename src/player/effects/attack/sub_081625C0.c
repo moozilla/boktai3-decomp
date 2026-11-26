@@ -1,7 +1,6 @@
 #include "player/effects/player_attack_particles.h"
 #include "engine/engine.h"
 
-#define PlayerAttackEffect_Initialize sub_081625C0
 s32 PlayerAttackEffect_Initialize(struct AttackParticleEffect *effect,
                                   struct AttackParticleOwner *source, u8 *facing, u8 *side)
 {

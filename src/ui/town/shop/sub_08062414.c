@@ -1,35 +1,35 @@
 #include "ui/town/shop_tail.h"
 #include "ui/town/shop_catalog.h"
 #include "ui/town/shop_item_values.h"
-struct SceneInventoryPurchaseDescriptor {
+struct ShopPurchaseDescriptor {
     u32 prefix[3];
     u8 modifierA, unknownD[3], modifierB, unknown11[3], modifierC, unknown15[11];
 };
-struct SceneInventorySwapView {
+struct ShopSwapView {
     u8 unknown0[0x1AF0];
     struct SceneInputPair pair;
 };
-struct SceneInventoryPurchaseFlags {
+struct ShopPurchaseFlags {
     u8 unknown0[0x1AAC];
     u8 purchased;
 };
-struct SceneInventoryFunds {
+struct ShopFunds {
     u8 unknown0[0x7B0];
     s16 funds;
 };
 s32 SceneInput_TickPairTransition(struct SceneInputPair *);
-void Shop_PrepareEquipmentDescriptor(struct SceneInventoryTail *,
-                                               struct SceneInventoryPurchaseDescriptor *);
-void Inventory_SetEquipmentEntry(u32, struct SceneInventoryPurchaseDescriptor *);
+void Shop_PrepareEquipmentDescriptor(struct ShopTail *,
+                                               struct ShopPurchaseDescriptor *);
+void Inventory_SetEquipmentEntry(u32, struct ShopPurchaseDescriptor *);
 void Inventory_SetItemId(u32, s32);
 void Inventory_SetConsumableEntry(u32, s32);
-s32 Shop_TickPurchaseTransition(struct SceneInventoryTail *p)
+s32 Shop_TickPurchaseTransition(struct ShopTail *p)
 {
-    struct SceneInventoryPurchaseDescriptor descriptor;
-    struct SceneInventoryScriptCatalog *catalog = (struct SceneInventoryScriptCatalog *)p;
+    struct ShopPurchaseDescriptor descriptor;
+    struct ShopScriptCatalog *catalog = (struct ShopScriptCatalog *)p;
     s32 category;
     SceneInputPanel_ResetHighlights(&p->display, &p->highlight);
-    if (SceneInput_TickPairTransition(&((struct SceneInventorySwapView *)p)->pair)) {
+    if (SceneInput_TickPairTransition(&((struct ShopSwapView *)p)->pair)) {
         category = p->category;
         switch (category) {
             case 0: {
@@ -45,14 +45,14 @@ s32 Shop_TickPurchaseTransition(struct SceneInventoryTail *p)
                     offset = *(s8 *)offset;
                     definition = Equipment_GetDefinition(offset);
                 }
-                descriptor = *(struct SceneInventoryPurchaseDescriptor *)definition;
+                descriptor = *(struct ShopPurchaseDescriptor *)definition;
                 descriptor.modifierA = category;
                 descriptor.modifierB = category;
                 descriptor.modifierC = category;
                 Shop_PrepareEquipmentDescriptor(p, &descriptor);
                 Inventory_SetEquipmentEntry(destination, &descriptor);
                 Inventory_GetEquipmentEntry(destination)->condition = 500;
-                ((struct SceneInventoryFunds *)gGameState)->funds -= definition->baseValue;
+                ((struct ShopFunds *)gGameState)->funds -= definition->baseValue;
                 break;
             }
             case 1: {
@@ -64,7 +64,7 @@ s32 Shop_TickPurchaseTransition(struct SceneInventoryTail *p)
                 s32 value;
                 entries = catalog->catalog;
                 value = SceneItemValue_GetItemBaseValue(entries[offset]);
-                ((struct SceneInventoryFunds *)gGameState)->funds -= value;
+                ((struct ShopFunds *)gGameState)->funds -= value;
                 index += *page * 8;
                 entries += index;
                 Inventory_SetItemId(destination, *entries);
@@ -84,11 +84,11 @@ s32 Shop_TickPurchaseTransition(struct SceneInventoryTail *p)
                 index += *page * 8;
                 entries += index;
                 value = SceneItemValue_GetConsumableBaseValue(*entries);
-                ((struct SceneInventoryFunds *)gGameState)->funds -= value;
+                ((struct ShopFunds *)gGameState)->funds -= value;
                 break;
             }
         }
-        ((struct SceneInventoryPurchaseFlags *)p)->purchased = 1;
+        ((struct ShopPurchaseFlags *)p)->purchased = 1;
         Sound_PlaySong(0x111);
         Shop_BeginAlternateSelection(p);
     }

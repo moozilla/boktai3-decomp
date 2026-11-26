@@ -1,5 +1,5 @@
 #include "global.h"
-void sub_08170D78(void *);
+void PauseInventory_RefreshConsumableIcons(void *);
 void Hud_RestoreSecondaryGridSelection(void *);
 void SceneInput_BuildActionGrid(void *, int);
 void PauseMenu_ClearSpriteFlags(void *, int, int);
@@ -18,7 +18,7 @@ void MenuDisplay_UpdateActionPrompt(void *, int);
 void PauseInventory_ReturnToConsumableActions(u8 *p)
 {
     u8 *q;
-    sub_08170D78(p);
+    PauseInventory_RefreshConsumableIcons(p);
     q = p + 0x4384;
     Hud_RestoreSecondaryGridSelection(q);
     SceneInput_BuildActionGrid(q, 0xe1);

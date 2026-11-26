@@ -75,7 +75,7 @@ struct RoomActor {
     s16 attachmentLimit;   /* +0xA6: signed attachment restart threshold. */
     s16 attachmentRestart; /* keyword 'l'; copied into attachmentTimer when it restarts */
     u16 attachmentTimer;
-    u32 experience; /* keyword 'X'; awarded on defeat (sub_08159164) */
+    u32 experience; /* keyword 'X'; awarded on defeat (Player_AddExperience) */
     s16 defaultHealth;
     u16 hudKind; /* keyword 'K' (default 2); the HUD's type (low) */
     struct SceneActorAttackParameters attacks;

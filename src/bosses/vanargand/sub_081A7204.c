@@ -1,6 +1,5 @@
 #include "bosses/vanargand/vanargand_damage_part.h"
 
-#define Vanargand_ApplyPartDamage sub_081A7204
 
 void SceneAnimation_SelectSequence(void *, s32, s32, s32);
 void AnimData_SelectPaletteBank(void *, s32);

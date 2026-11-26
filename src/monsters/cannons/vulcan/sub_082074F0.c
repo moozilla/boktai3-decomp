@@ -11,7 +11,7 @@ void VulcanCannon_UpdateDefeatEffects(void);
 void DamageNumberDisplay_Show(void *, s32, s32, void *, void *, s32);
 void SceneHud_SetTimedState(void *, s32, s32, s32, s32, s32);
 void TerrainModifiers_UnregisterCell(void *);
-void sub_08014634(s32, s32, void *, void *, void *, s32, s32);
+void ImpactParticleGroup_SpawnBouncing(s32, s32, void *, void *, void *, s32, s32);
 u8 *Explosion_CreateAt(void *, u32, s32, s32, s32, s32, s32, u32);
 u32 Anim_RestartSequence(struct DisplaySequenceState *, void *, u16, u8, u8);
 void *ActorAttachment_UpdateFromDescriptor(void *, void *, s32, s32, s32, s32, s32, s32);
@@ -43,11 +43,10 @@ s32 VulcanCannon_UpdateDamageState(struct VulcanCannon *p)
         p->hitFlags = p->colliderHitFlags;
         Sound_PlaySong(0x13e);
         if (p->damage > 0) {
-            DamageNumberDisplay_Show(collider, p->damage, 0, &p->collider.position, &p->collider.offset,
-                                     1);
+            DamageNumberDisplay_Show(collider, p->damage, 0, &p->collider.position,
+                                     &p->collider.offset, 1);
             SceneHud_SetTimedState(p->owner, p->hp, p->maxHp, p->hudStyle,
-                                   p->collider.costFlags == 4,
-                                   p->hudDuration);
+                                   p->collider.costFlags == 4, p->hudDuration);
         }
         if (p->state == VulcanCannon_UpdateTargeting)
             p->aimTimer = 120;
@@ -67,7 +66,8 @@ s32 VulcanCannon_UpdateDamageState(struct VulcanCannon *p)
             spread.x = 24;
             spread.y = (CannonRandom(table) & 7) + 3;
             spread.z = 24;
-            sub_08014634((CannonRandom(table) & 3) + 4, 13, &center, &velocity, &spread, 15, 15);
+            ImpactParticleGroup_SpawnBouncing((CannonRandom(table) & 3) + 4, 13, &center, &velocity,
+                                              &spread, 15, 15);
             VulcanCannon_GetEffectPosition(&smoke, p);
             Explosion_CreateAt(&smoke, 16, 0, 0, 0, 60, 0, 0);
             smoke.x += 128;

@@ -21,7 +21,6 @@ extern u8 gUnk_0824FC5D[];
 void PaletteTransition_CopyBanks(struct PaletteTransitionBanks *, u8 *, u32, u32);
 // confidence=low: picks the palette source for id (0x64-0x67 remap to 0x36-0x39), fills the banks
 // and points the object at the destination palette.
-#define PaletteTransition_LoadSource sub_081D409C
 void PaletteTransition_LoadSource(u8 *p, s32 id)
 {
     struct PaletteTransitionObject *object = (void *)(p + 0x54);

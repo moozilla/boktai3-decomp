@@ -14,7 +14,7 @@ void Obj_StepPosition(void *);
 struct RepeatedEffectPosition;
 s32 RepeatedEffect_RequestNearby(struct RepeatedEffectPosition *);
 void NavMesh_UpdateProbe(void *, void *);
-void sub_0821DE30(void *);
+void Trap_UpdateProbeContacts(void *);
 
 static inline u32 SceneActorMotion_TestStatus(u32 *flags, u32 bits)
 {
@@ -208,7 +208,7 @@ done: {
     }
 }
     actor->base.frameCounter++;
-    sub_0821DE30(&group->common);
+    Trap_UpdateProbeContacts(&group->common);
     actor->base.previousPosition = actor->base.body.position;
     HalfwordFlags_Clear(flags, 0x2000);
     return 1;

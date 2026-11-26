@@ -18,7 +18,6 @@ static inline void facing(struct StateActor *npc, short angle)
 }
 void Kuro_PlayTaggedAnimation(void *, s32, s32, s32, s32);
 // confidence=low: aligns facing to the target angle and starts tagged animation zero on entry.
-#define Kuro_EnterIdleFacing sub_081D1A44
 void Kuro_EnterIdleFacing(void *context, struct StateActor *p)
 {
     if (p->enter) {

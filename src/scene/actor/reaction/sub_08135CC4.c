@@ -2,7 +2,6 @@
 #include "scene/actor/scene_actor_reset.h"
 
 // confidence=low: resets reaction state when damage flag 0x4000 is set.
-#define SceneActorReaction_ResetFlaggedState sub_08135CC4
 
 void SceneActorMovement_ProjectProbe(void *, u32, u32);
 void SceneActorTerrain_ClearCollisionTimers(void *);

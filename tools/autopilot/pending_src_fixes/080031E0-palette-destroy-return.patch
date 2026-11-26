@@ -5,8 +5,8 @@ The callback clears its global through r1 and r2, preserving r0.
 
 The explicit form passed the unit ROM check.
 
---- a/src/palette_controller.c
-+++ b/src/palette_controller.c
+--- a/src/effects/palette/palette_controller.c
++++ b/src/effects/palette/palette_controller.c
 @@ -440,7 +440,8 @@
  }
  

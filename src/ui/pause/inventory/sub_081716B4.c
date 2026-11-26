@@ -24,7 +24,7 @@ void GameState_UnequipConsumableSlot(u32);
 void Player_RefreshEquipmentWithOptions(void *, const void *, s32);
 void MenuDisplay_SnapshotValues(void *);
 void MenuDisplay_DrawStatComparison(void *, s32, s32);
-void sub_08170D78(void *);
+void PauseInventory_RefreshConsumableIcons(void *);
 void SceneHud_PrepareActionTransfer(void *, int, int);
 void SceneHud_TickStatTransfer(void);
 void Hud_SetInteractionCallback(void *, void (*)(void), int);
@@ -67,7 +67,7 @@ void SceneHud_UpdateStatComparison(struct SceneHudState *p)
                 p->actionOwner, &gUnk_08E60F80[p->comparisonProfiles[gGameState->party[0]]], none);
             MenuDisplay_SnapshotValues(p);
             MenuDisplay_DrawStatComparison(p, 10, 6);
-            sub_08170D78(p);
+            PauseInventory_RefreshConsumableIcons(p);
             for (i = 0; i < 3; i++) {
                 s32 value =
                     Player_GetCandidateAttribute(i, Inventory_GetConsumableId(p->actionCursor));

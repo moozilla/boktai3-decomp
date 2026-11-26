@@ -1,6 +1,6 @@
 #include "global.h"
 #include "ui/widgets/scene_input.h"
-struct SceneInventoryCategoryMenu {
+struct StorageCategoryMenu {
     u8 unknown0[0x258];
     struct AnimSprite prompt;
     u8 unknown2B8[0x1260];
@@ -9,13 +9,13 @@ struct SceneInventoryCategoryMenu {
     u8 unknown174E[0x76];
     u8 choiceRepeat;
 };
-void Storage_HideItemDetails(struct SceneInventoryCategoryMenu *);
-void Storage_BeginSelectedItemTransition(struct SceneInventoryCategoryMenu *);
-void Storage_BeginCategoryBrowse(struct SceneInventoryCategoryMenu *);
-void Storage_CompleteCategoryRemoval(struct SceneInventoryCategoryMenu *);
-void Storage_SetState(struct SceneInventoryCategoryMenu *,
-                             void (*)(struct SceneInventoryCategoryMenu *), u32);
-void Storage_UpdateCategoryConfirmation(struct SceneInventoryCategoryMenu *p)
+void Storage_HideItemDetails(struct StorageCategoryMenu *);
+void Storage_BeginSelectedItemTransition(struct StorageCategoryMenu *);
+void Storage_BeginCategoryBrowse(struct StorageCategoryMenu *);
+void Storage_CompleteCategoryRemoval(struct StorageCategoryMenu *);
+void Storage_SetState(struct StorageCategoryMenu *,
+                             void (*)(struct StorageCategoryMenu *), u32);
+void Storage_UpdateCategoryConfirmation(struct StorageCategoryMenu *p)
 {
     s32 result =
         SceneInput_TickChoice(&p->prompt, p->choiceResource, &p->choiceState, &p->choiceRepeat);

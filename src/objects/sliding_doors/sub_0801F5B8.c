@@ -2,7 +2,7 @@
 
 void Camera_RequestShake(int);
 
-void SlidingDoor_UpdateLowered(struct SceneObjSlot *slot)
+void SlidingDoors_UpdateLowered(struct SceneObjSlot *slot)
 {
     s16 timer = slot->timer;
     if (timer) {

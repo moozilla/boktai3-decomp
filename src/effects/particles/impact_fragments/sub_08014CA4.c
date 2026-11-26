@@ -1,7 +1,6 @@
 #include "effects/particles/fragment_group.h"
 #include "engine/math/scene_vec_polar.h"
 // confidence=low: allocates a fragment group with randomized direction and lifetime.
-#define ImpactFragmentGroup_SpawnRadial sub_08014CA4
 extern u16 gUnk_08604C42[], gUnk_08604C30[];
 s32 Mod(s32, s32);
 static inline s32 Random(const u16 *table, u32 *rng)

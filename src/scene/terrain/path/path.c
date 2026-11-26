@@ -1,12 +1,4 @@
 #include "scene/terrain/terrain_sampling.h"
-#define Path_SelectPoint                    sub_0821F0C4
-#define Path_GetPointNodeIdById             sub_0821E840
-#define Path_GetPointFacingById             sub_0821E820
-#define Route_GetCurrentPointXZ             sub_0821E7D0
-#define Path_GetPointActionKind             sub_0821E7C4
-#define Path_GetPointHeightOffset           sub_0821E7B4
-#define Route_GetMovementTowardCurrentPoint sub_0821E67C
-#define Route_GetNextPoint                  sub_0821E654
 #include "scene/terrain/path.h"
 #include "scene/motion/scene_actor_route.h"
 #include "engine/engine.h"

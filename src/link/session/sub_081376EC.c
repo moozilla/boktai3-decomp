@@ -67,7 +67,6 @@ static inline u8 MoveTo(struct ChaseActor *actor, struct SceneActorChaseGroup *g
 }
 
 // confidence=low: scene actor picks the closest reachable overlapping stimulus (8 slots), arms its control timer and walks there.
-#define SceneActorTarget_ApproachNearestStimulus sub_081376EC
 u32 SceneActorTarget_ApproachNearestStimulus(struct ChaseActor *actor)
 {
     struct SceneActorChaseGroup *group;

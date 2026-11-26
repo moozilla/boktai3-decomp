@@ -1,17 +1,17 @@
 #include "ui/town/shop_tail.h"
-struct SceneInventorySwapView {
+struct ShopSwapView {
     u8 unknown0[0x1AF0];
     struct SceneInputPair pair;
 };
 s32 SceneInput_TickPairTransition(struct SceneInputPair *);
 void Inventory_RemoveEquipmentEntry(u32);
-s32 Shop_TickDiscardFeedback(struct SceneInventoryTail *);
+s32 Shop_TickDiscardFeedback(struct ShopTail *);
 void Inventory_ClearItemSlot(u32);
 void GameState_ClearConsumableSlot(u32);
-s32 Shop_TickDiscardTransition(struct SceneInventoryTail *p)
+s32 Shop_TickDiscardTransition(struct ShopTail *p)
 {
     SceneInputPanel_ResetHighlights(&p->display, &p->highlight);
-    if (SceneInput_TickPairTransition(&((struct SceneInventorySwapView *)p)->pair)) {
+    if (SceneInput_TickPairTransition(&((struct ShopSwapView *)p)->pair)) {
         u32 selection = p->grid.savedSelection;
         switch (p->category) {
             case 0:
@@ -25,7 +25,7 @@ s32 Shop_TickDiscardTransition(struct SceneInventoryTail *p)
                 break;
         }
         Shop_SetControllerCallback(
-            p, (SceneInventoryCallback)Shop_TickDiscardFeedback);
+            p, (ShopCallback)Shop_TickDiscardFeedback);
     }
     return 0;
 }

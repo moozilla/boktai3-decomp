@@ -69,7 +69,7 @@ function observeAllocations(g, entry, act) {
   for (const [name, type] of [
     ['WoodenCrate_AllocateSlot', 'struct WoodenCrate'],
     ['FloorSwitch_AllocateSlot', 'struct FloorSwitch'],
-    ['Pool128_Allocate', 'struct RegionActor'],
+    ['IceBoulderPool_Allocate', 'struct RegionActor'],
     ['StrikeTrap_FindFreeSlot', 'struct CollisionSlot'],
     ['SceneIndicators_FindFreeSlot', 'struct SceneIndicator'],
     ['MovingPlatform_AllocateSlot', 'struct NamedObject'],

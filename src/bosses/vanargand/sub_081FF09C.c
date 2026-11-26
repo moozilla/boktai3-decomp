@@ -55,10 +55,10 @@ struct Pool {
     struct Entry e[32];
 };
 extern const s16 gUnk_086149C4[];
-void SpriteParticle_CreateManager(void);
-struct Entry *SpriteParticle_FindFreeSlot(struct Pool *, s32 *);
-void SpriteParticle_SetUpdateCallback(void *, void *);
-void SpriteParticle_OnDefaultUpdate(void);
+void VanargandParticle_CreateManager(void);
+struct Entry *VanargandParticle_FindFreeSlot(struct Pool *, s32 *);
+void VanargandParticle_SetUpdateCallback(void *, void *);
+void VanargandParticle_OnDefaultUpdate(void);
 void Memory_Copy(void *, const void *, s32);
 s32 Mod(s32, s32);
 void Sprite_LinkToList(void *, u32);
@@ -69,7 +69,7 @@ static inline s32 Truncate(s32 v)
         return v >> 12;
     return -((-v) >> 12);
 }
-s32 SpriteParticle_Emit(struct Params *params, struct Pos *pos)
+s32 VanargandParticle_Emit(struct Params *params, struct Pos *pos)
 {
     struct Pool *pool = gSpriteParticleManager;
     struct Entry *e;
@@ -81,13 +81,13 @@ s32 SpriteParticle_Emit(struct Params *params, struct Pos *pos)
     s32 angle;
     u32 one;
     if (!pool) {
-        SpriteParticle_CreateManager();
+        VanargandParticle_CreateManager();
         return -1;
     }
-    e = SpriteParticle_FindFreeSlot(pool, &slot);
+    e = VanargandParticle_FindFreeSlot(pool, &slot);
     if (!e)
         return -1;
-    SpriteParticle_SetUpdateCallback(params, SpriteParticle_OnDefaultUpdate);
+    VanargandParticle_SetUpdateCallback(params, VanargandParticle_OnDefaultUpdate);
     Memory_Copy(&e->params, params, 0x34);
     e->timer = 0;
     v = (struct Pos *)&e->vx;

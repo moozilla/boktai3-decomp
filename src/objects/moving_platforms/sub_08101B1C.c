@@ -3,7 +3,7 @@
 #include "scene/terrain/terrain_cell_probe.h"
 #include "engine/ram.h"
 #include "objects/moving_platforms/named_object.h"
-void ActorGroup_ReleaseMember(struct NamedObject *);
+void MovingPlatform_ReleaseMember(struct NamedObject *);
 void TerrainModifiers_RegisterCell(void *, s32, s32, s32, s32, s32);
 s32 Div(s32, s32);
 s32 Mod(s32, s32);
@@ -40,23 +40,23 @@ void MovingPlatform_RegisterFollowCells(struct NamedObject *objectArg)
     u16 *flags;
     u8 *registration;
     if (!manager) {
-        ActorGroup_ReleaseMember(object);
+        MovingPlatform_ReleaseMember(object);
         return;
     }
     if (object->name != manager->followName) {
-        ActorGroup_ReleaseMember(object);
+        MovingPlatform_ReleaseMember(object);
         return;
     }
     if (object->kind == 2) {
-        ActorGroup_ReleaseMember(object);
+        MovingPlatform_ReleaseMember(object);
         return;
     }
     if (gPlayers[0]->tetherMode != 6) {
-        ActorGroup_ReleaseMember(object);
+        MovingPlatform_ReleaseMember(object);
         return;
     }
     if ((s16)object->state != 3) {
-        ActorGroup_ReleaseMember(object);
+        MovingPlatform_ReleaseMember(object);
         return;
     }
     {

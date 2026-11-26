@@ -2,9 +2,8 @@
 #include "global.h"
 #include "engine/runtime.h"
 /* Solar_GetInterruptCounter: Returns the counter incremented on each active sensor interrupt */
-#define Solar_GetInterruptCounter sub_08243EF0
 
-u32 sub_08243EF0(void)
+u32 Solar_GetInterruptCounter(void)
 {
     return gSolarInterruptCounter;
 }

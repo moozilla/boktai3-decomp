@@ -1,4 +1,4 @@
-#include "monsters/enemy_particle.h"
+#include "effects/particles/enemy_particle.h"
 #include "engine/ram.h"
 void SceneOverlayEntry_Init(struct EnemyParticlePool *, struct EnemyParticle *, s32);
 u32 EnemyAttackParticle_InitPool(struct EnemyParticlePool *a)

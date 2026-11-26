@@ -28,7 +28,6 @@ static inline void facing(struct SceneNpc *npc, u32 angle)
         npc->facing4 = m;
     }
 }
-#define Otenko_UpdateTurnInPlace sub_081CFB54
 void Otenko_UpdateTurnInPlace(void *ctx, struct SceneNpc *npc)
 {
     u8 facing8;

@@ -175,7 +175,7 @@ void PileDriver_UpdateBackgroundEffect(struct PileDriver *panel, s32 tileX, s32 
             }
             BgGfx_LoadTilemapSimple(1, tileX, tileY, screenX, screenY + panel->shakeOffset);
             if (--panel->mode == 0)
-                PileDriver_CallPendingScript(gScenePanel, 9);
+                PileDriver_CallPendingScript(gPileDriver, 9);
         }
     }
     return;

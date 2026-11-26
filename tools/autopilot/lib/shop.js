@@ -1,8 +1,8 @@
-// The shop's SceneInventory_TickController invokes the active callback in
+// The shop's Shop_TickController invokes the active callback in
 // SceneInventoryLifecycleView.action. Its purchase phase reads category and
-// the saved grid selection (SceneInventory_TickPurchaseTransition, 08062414).
+// the saved grid selection (Shop_TickPurchaseTransition, 08062414).
 exports.shopState = () => {
-  const t = exports.tasks().find((task) => !task.dead && task.update === 'SceneInventory_TickController');
+  const t = exports.tasks().find((task) => !task.dead && task.update === 'Shop_TickController');
   if (!t) return null;
   const address = Number(t.task);
   const panel = g.at(address, 'struct SceneInventoryTail');
@@ -32,7 +32,7 @@ exports.buyHealing = function* ({ max = 180 } = {}) {
       yield* play(key);
       const now = exports.shopState();
       if (!now) continue;
-      if (now.callback === 'SceneInventory_TickPurchaseTransition') yield g.press(0, 80);
+      if (now.callback === 'Shop_TickPurchaseTransition') yield g.press(0, 80);
       if (healing(exports.bags().items) > before && $.gGameState.unk7B0 < funds) {
         found = [...path, key];
         break search;

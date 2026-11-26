@@ -5,13 +5,13 @@ const direction = (dx, dz) => {
   return DIRECTION[`${Math.round(dx / major)},${Math.round(dz / major)}`];
 };
 
-exports.purificationBattle = () => $.gScenePanel?.initialMode === 1;
+exports.purificationBattle = () => $.gPileDriver?.initialMode === 1;
 
-// ScenePanelRig_TickResourceDrain drains darkness four times as fast with
+// PileDriverRig_TickResourceDrain drains darkness four times as fast with
 // the rig over the coffin (state 2). When it wanders or approaches a
 // generator, try gunfire from the outside of its route to push it back.
 exports.fightPurification = function* (opts = {}) {
-  const panel = $.gScenePanel, rig = panel.rig, S = exports.session;
+  const panel = $.gPileDriver, rig = panel.rig, S = exports.session;
   const start = g.frameNo, story = exports.story(), scene = exports.where().scene;
   const changed = () => exports.where().scene !== scene || exports.story() > story;
   const darkness = () => $.gGameState.unk618;

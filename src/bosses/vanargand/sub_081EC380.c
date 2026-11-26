@@ -1,6 +1,6 @@
 #include "global.h"
 
-u32 SceneActors_InitResources(void)
+u32 VanargandHead_InitResources(void)
 {
     return 1;
 }

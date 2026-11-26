@@ -20,7 +20,6 @@ static inline s32 LocalPlayer(void)
 }
 
 // confidence=low: initializes a link player actor: shadow, effects and state bytes.
-#define LinkPlayer_InitializeActor sub_0823A3CC
 void LinkPlayer_InitializeActor(struct Player *p)
 {
     s32 local;

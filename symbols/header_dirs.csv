@@ -1,7 +1,7 @@
 current_path,new_path,note,pass2_path,prior_paths
 include/actors/actor_ability/actor_ability.h,include/scene/actor/actor_ability.h,beside its unit,,
 include/actors/actor_animation_controller/actor_animation_controller.h,include/ui/title/actor_animation_controller.h,Pass 4: beside its documented owner,,include/npc/cutscene_actor/actor_animation_controller.h
-include/actors/actor_animation_controller/text_entry_widget.h,include/npc/cutscene_actor/text_entry_widget.h,beside its unit,,
+include/actors/actor_animation_controller/text_entry_widget.h,include/ui/title/text_entry_widget.h,Moved with its identified source unit,,include/npc/cutscene_actor/text_entry_widget.h
 include/actors/actor_attachment_manager/actor_attachment.h,include/scene/actor/actor_attachment.h,beside its unit,,
 include/actors/actor_attachment_manager/actor_attachment_manager.h,include/scene/actor/actor_attachment_manager.h,beside its unit,,
 include/actors/actor_attachment_manager/actor_attachment_orbit_playback.h,include/scene/actor/actor_attachment_orbit_playback.h,beside its unit,,
@@ -80,10 +80,10 @@ include/effects/ballistic_sprite_effect/ballistic_sprite_effect.h,include/effect
 include/effects/bg1_flash_and_scrolling_controller/background_flash.h,include/effects/screen/background_flash.h,beside its unit,,
 include/effects/buffered_animation_task/palette_effect.h,include/effects/palette/palette_effect.h,beside its unit,,
 include/effects/color_and_fade_controller/color_fade_controller.h,include/effects/palette/color_fade_controller.h,beside its unit,,
-include/effects/debris_particles/debris_particles.h,include/effects/particles/debris_particles.h,beside its unit,,
+include/effects/debris_particles/debris_particles.h,include/objects/bat_curtain/debris_particles.h,Moved with its identified source unit,,include/effects/particles/debris_particles.h
 include/effects/directional_particles/directional_particles.h,include/effects/particles/directional_particles.h,beside its unit,,
 include/effects/directional_sprite_effect/directional_sprite_effect.h,include/effects/sprites/directional_sprite_effect.h,beside its unit,,
-include/effects/effect_emitter/effect_emitter.h,include/effects/particles/effect_emitter.h,beside its unit,,
+include/effects/effect_emitter/effect_emitter.h,include/objects/effect_emitter.h,Moved with its identified source unit,,include/effects/particles/effect_emitter.h
 include/effects/effect_part/effect_part.h,include/effects/scene/effect_part.h,beside its unit,,
 include/effects/explosion/explosion.h,include/effects/bursts/explosion.h,beside its unit,,
 include/effects/fading_particle_groups/fading_particle_group.h,include/objects/hazards/fading_particle_group.h,Pass 4: beside its documented owner,,include/effects/particles/fading_particle_group.h
@@ -104,7 +104,7 @@ include/effects/large_scene_animation_controller/large_scene_animation_controlle
 include/effects/link_effect/link_effect.h,include/effects/link_effect.h,beside its unit,,
 include/effects/orbit_background_controller/orbit_background.h,include/effects/screen/orbit_background.h,beside its unit,,
 include/effects/orbiting_particles/orbiting_particles.h,include/effects/orbits/orbiting_particles.h,beside its unit,,
-include/effects/pal_fade/actor_palette_fade.h,include/system/game_state/actor_palette_fade.h,beside its unit,,
+include/effects/pal_fade/actor_palette_fade.h,include/effects/palette/actor_palette_fade.h,Moved with its identified source unit,,include/system/game_state/actor_palette_fade.h
 include/effects/palette_controllers/palette_controller.h,include/effects/palette/palette_controller.h,beside its unit,,
 include/effects/palette_cycling/palette_cycle.h,include/effects/palette/palette_cycle.h,beside its unit,,
 include/effects/palette_fade/palette_fade.h,include/effects/palette/palette_fade.h,beside its unit,,
@@ -579,3 +579,4 @@ include/system/game_state/game_state.h,include/system/game_state/game_state.h,be
 include/system/save_data/script_reference.h,include/system/save/script_reference.h,beside its unit,,
 include/system/time/region_menu.h,include/system/clock/region_menu.h,beside its unit,,
 include/system/time_palette_transitions/time_palette.h,include/system/clock/time_palette.h,beside its unit,,
+include/monsters/enemy_particle.h,include/effects/particles/enemy_particle.h,Shared enemy attack particle pool,,

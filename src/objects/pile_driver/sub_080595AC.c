@@ -7,7 +7,7 @@ void PileDriverRig_SetState(struct PileDriverRig *rig, u32 state)
     }
     if (state == 2 && rig->state != 2) {
         PileDriver_SetPresentationMode(rig->parent);
-        ((struct SceneRigParentView *)gScenePanel)->activated = 1;
+        ((struct SceneRigParentView *)gPileDriver)->activated = 1;
     }
     rig->state = state;
     rig->stateFrame = 0;

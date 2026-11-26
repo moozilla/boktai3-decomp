@@ -1,5 +1,5 @@
 #include "ui/town/shop_control.h"
-s32 Shop_ClassifySelectedAction(struct SceneInventoryControlView *panel)
+s32 Shop_ClassifySelectedAction(struct ShopControlView *panel)
 {
     switch (panel->category) {
         case 0:

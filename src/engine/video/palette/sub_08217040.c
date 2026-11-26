@@ -2,9 +2,8 @@
 #include "global.h"
 #include "engine/video/render.h"
 /* Video_SaveDisplayControl: Saves the DISPCNT register for later restoration */
-#define Video_SaveDisplayControl sub_08217040
 
-void sub_08217040(void)
+void Video_SaveDisplayControl(void)
 {
     gSavedDispCnt = *(vu16 *)0x04000000;
 }

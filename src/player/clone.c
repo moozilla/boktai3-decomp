@@ -766,7 +766,6 @@ static inline void PlayerClone_ClearVelocity(const u32 *zero, struct ContactPosi
     CpuSet(zero, velocity, 0x05000002);
 }
 
-#define PlayerClone_Spawn sub_08201160
 
 s32 PlayerClone_Spawn(struct PlayerCloneConfiguration *resource, struct ContactPosition *pos)
 {

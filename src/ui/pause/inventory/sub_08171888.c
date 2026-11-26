@@ -12,7 +12,7 @@ void Player_RefreshEquipmentWithOptions(void *, const void *, s32);
 void SceneHud_UpdateStatComparison(void);
 void Hud_SetInteractionCallback(void *, void (*)(void), int);
 void sub_08171258(void *);
-void sub_08170D78(void *);
+void PauseInventory_RefreshConsumableIcons(void *);
 s32 Player_GetCandidateAttribute(s32, s32);
 s32 Player_GetCurrentAttribute(s32);
 s32 Inventory_GetConsumableId(u32);
@@ -36,7 +36,7 @@ void SceneHud_TickStatTransfer(struct SceneHudState *p)
             p->actionOwner, &gUnk_08E60F80[p->comparisonProfiles[gGameState->party[0]]], -1);
         Hud_SetInteractionCallback(p, SceneHud_UpdateStatComparison, 1);
         sub_08171258(p);
-        sub_08170D78(p);
+        PauseInventory_RefreshConsumableIcons(p);
         for (i = 0; i < 3; i++) {
             s32 value = Player_GetCandidateAttribute(i, Inventory_GetConsumableId(p->actionCursor));
             differences[i] = value - Player_GetCurrentAttribute(i);

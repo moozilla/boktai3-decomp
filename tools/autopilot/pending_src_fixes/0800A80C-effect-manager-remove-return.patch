@@ -4,8 +4,8 @@ The final Effect_Remove returns via r0. The active flag store uses r1.
 
 The explicit form changed the ROM bytes. The guarded form passed the unit ROM check.
 
---- a/src/homing_effect.c
-+++ b/src/homing_effect.c
+--- a/src/effects/orbits/homing_effect.c
++++ b/src/effects/orbits/homing_effect.c
 @@ -25,4 +25,7 @@
      }
      effect->active = 0;

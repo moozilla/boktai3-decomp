@@ -2,12 +2,12 @@
 #include "engine/engine.h"
 #include "npc/story_character/state_actor.h"
 #include "ui/hud/scene_indicator.h"
-// confidence=low: Vampire per-frame update: animation, scale wobble, shake, cached target bearings.
+// confidence=low: Count per-frame update: animation, scale wobble, shake, cached target bearings.
 struct Sprite {
     u8 pad0[12];
     struct Vec position;
 };
-struct VampireTick {
+struct CountTick {
     u8 pad0[0x48];
     struct Sprite sprite;
     u8 pad5C[0x40];
@@ -41,10 +41,10 @@ void SceneActorGraphics_OscillateScale(void *);
 void SceneActors_UpdateTargetMetrics(void *);
 s32 Math_Atan2(s32, s32);
 
-void Count_UpdateFrame(struct VampireTick *p)
+void Count_UpdateFrame(struct CountTick *p)
 {
-    struct VampireTick *actor = p;
-    struct VampireTick *owner = p;
+    struct CountTick *actor = p;
+    struct CountTick *owner = p;
     struct Sprite *sprite = &p->sprite;
     s32 i;
     SceneActors_DispatchCommands(actor);

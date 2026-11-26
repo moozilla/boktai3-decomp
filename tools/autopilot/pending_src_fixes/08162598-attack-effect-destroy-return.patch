@@ -5,8 +5,8 @@ the return address of that final removal in r0.
 
 The explicit form changed the ROM bytes. The guarded form passed the unit ROM check.
 
---- a/src/fn/sub_08162598.c
-+++ b/src/fn/sub_08162598.c
+--- a/src/player/effects/attack/sub_08162598.c
++++ b/src/player/effects/attack/sub_08162598.c
 @@ -16,3 +16,6 @@
      z = 0;
      gPlayerAttackEffect = z;

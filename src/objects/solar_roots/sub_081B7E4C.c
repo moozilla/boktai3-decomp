@@ -4,7 +4,7 @@
 
 void SceneBody_Init(void *, u32, void *, u32, u32, void *);
 void TerrainOverlay_QueueAddActor(void *);
-void sub_081B7DC8(void *);
+void GrowthEffect_InitCollider(void *);
 void AnimatedMarker_RegisterOccupiedCell(void *);
 void SolarRoot_RegisterCellEffect(void *);
 void SolarRoot_UpdateCooldown(void *);
@@ -95,7 +95,7 @@ void SolarRoot_InitEntryFromScript(u8 *input)
         *(u16 *)(entry + 0xFE) = Script_GetValue();
     else
         *(u16 *)(entry + 0xFE) = 3;
-    sub_081B7DC8(entry);
+    GrowthEffect_InitCollider(entry);
     {
         u32 off = 0x100;
         u8 *p;

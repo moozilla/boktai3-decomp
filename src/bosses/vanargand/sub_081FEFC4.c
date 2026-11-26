@@ -10,7 +10,7 @@ struct A {
     struct E e[24];
 };
 void sub_081FEDE8(struct A *, struct E *, s32);
-u32 SpriteParticle_DestroyManager(struct A *a)
+u32 VanargandParticle_DestroyManager(struct A *a)
 {
     struct E *e = a->e;
     s32 i = 0;

@@ -1,7 +1,5 @@
 #include "scene/actor/scene_actor_registry.h"
-/* SceneActorRegistry_FindAvailableCategoryActorAfterId: Finds the next actor after an ID with flag 2CC bit 0 clear and category in a fixed whitelist; zero starts at the head */
-#define SceneActorRegistry_FindAvailableCategoryActorAfterId sub_08070E44
-#define SceneActorRegistry_FindAvailableFilteredAfterId      sub_08070E44
+/* SceneActorRegistry_FindAvailableFilteredAfterId: Finds the next actor after an ID with flag 2CC bit 0 clear and category in a fixed whitelist; zero starts at the head */
 /* The observed category whitelist is preserved without guessing game roles. */
 struct ChaseActor *SceneActorRegistry_FindAvailableFilteredAfterId(u32 inputId)
 {

@@ -1,5 +1,5 @@
 #include "global.h"
-void SlidingDoor_UpdateInactiveIdle(void);
+void SlidingDoors_UpdateInactiveIdle(void);
 void SlidingDoors_Unlock(u8 *p, u16 id)
 {
     int i;

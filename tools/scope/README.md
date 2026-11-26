@@ -1032,7 +1032,7 @@ Each was read from the compiler source and confirmed on a live draft.
    now prints the lever on each aligned `ands` pair whose tied operand differs (a constant
    in one, the value in the other), also when both read `ands r0, r1` with the registers'
    roles swapped (Vanargand_UpdatePartLeap's terrain mask); the opposite case asks for the
-   value first. The same holds for `orrs` (the hint covers it too): SceneActors_UpdatePeriodicEffectAction's hold
+   value first. The same holds for `orrs` (the hint covers it too): VanargandHead_UpdatePeriodicEffectAction's hold
    flag matched as `u32 value = *flags; u32 mask = 4; mask |= value; *flags = mask;`. Reading
    the value first also matters there: with `mask = 4` declared before the load, the
    `movs` came ahead of the `ldrb` (the ROM loads first, then the constant).
@@ -2196,7 +2196,7 @@ differing insns). Of the 38 searched:
   (`AGBCC_SPILL=5:3`) and Vanargand_UpdateFacingPairAttack (`10:1`).
 * 5 shrink a lot: Sabata_SpawnBobbingFormation 12 -> 2,
   Vanargand_UpdatePartSweepingStrike 33 -> 10, Nidhoggr_UpdateFallingAttackEffect
-  42 -> 10, Vanargand_UpdatePartSidestep 11 -> 5, EffectPool_UpdateEntry 10 -> 6.
+  42 -> 10, Vanargand_UpdatePartSidestep 11 -> 5, HresvelgrEffectPool_UpdateEntry 10 -> 6.
   Rotation is one of their causes; `why all` after applying the shift shows
   the rest.
 * 13 shrink a little (1-15 insns), 18 not at all (rotation is not involved).
@@ -3021,7 +3021,7 @@ which is exactly `10:1`. Not tested.
 
 255. **A dead call argument can supply a copy preference without a live value across the call.**
    sub_081A14FC needs sampleY in r3. An impossible negative-side-byte arm passes
-   sampleY as argument four to MotionEntry_CreateWithDelta, then jumps to the
+   sampleY as argument four to HresvelgrMotion_CreateWithDelta, then jumps to the
    existing pulse join after the real call. The argument copy gives the needed
    preference; jump2 deletes the fallback. An explicit return changes PRE and
    does not match. Separately, an unsigned random sample's negative guard keeps

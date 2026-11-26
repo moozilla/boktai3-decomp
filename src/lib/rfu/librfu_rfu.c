@@ -1,14 +1,6 @@
 /* Adapted from pret/pokeemerald 731ad5bfd6e6f265508d0efcca0ba42f9dcf5881, LIBRFU_VERSION 1024.
  * Reconstructed SDK source retains upstream licensing status; see THIRD_PARTY.md and docs/RFU.md. */
 // CFLAGS: -O2 -mthumb-interwork
-#define STWI_send_ConfigStatusREQ sub_08244250
-#define STWI_send_DataReadyAndChangeREQ sub_08244534
-#define STWI_send_DisconnectedAndChangeREQ sub_08244584
-#define STWI_send_VersionStatusREQ sub_082441E4
-#define STWI_set_MS_mode sub_082440C4
-#define rfu_MBOOT_CHILD_inheritanceLinkStatus sub_08245744
-#define rfu_REQ_noise sub_0824826C
-#define IntrSIO32 sub_08244A38
 #define llsf_struct gUnk_08602CD0
 #define str_checkMbootLL gUnk_08602CFC
 #define Sio32ConnectionData gUnk_08602D08

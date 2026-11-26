@@ -4,8 +4,8 @@ The base minute call leaves the minute in r0. Later reads and writes use r1 thro
 
 The explicit form changed the ROM bytes. The guarded form passed the unit ROM check.
 
---- a/src/fn/sub_0822CAA0.c
-+++ b/src/fn/sub_0822CAA0.c
+--- a/src/system/solar/sub_0822CAA0.c
++++ b/src/system/solar/sub_0822CAA0.c
 @@ -21,3 +21,6 @@
          flag = 1;
      *(u32 *)(gGameState + 0x4ec) = flag;

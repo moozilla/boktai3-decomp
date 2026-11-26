@@ -1,7 +1,5 @@
 #include "objects/warp_circle/stacked_actor.h"
 /* StackedActor_RetractSegments: Retracts stacked segments then selects disappearance or idle; preserves the existing provisional source alias */
-#define StackedActor_RetractSegments sub_08052E04
-#define StackedActor_RetractSegments sub_08052E04
 void StackedActor_RetractSegments(struct StackedActor *actor)
 {
     actor->sprite.flags &= ~1;

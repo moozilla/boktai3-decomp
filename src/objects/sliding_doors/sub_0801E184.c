@@ -1,8 +1,8 @@
 #include "objects/sliding_doors/scene_object_controller.h"
 int Region_FindContaining(void *);
-void SlidingDoor_InitLiftPlacement(struct SceneObjPool *, struct SceneObjSlot *);
-void SlidingDoor_InitSlotPlacement(struct SceneObjPool *, struct SceneObjSlot *);
-void SlidingDoor_InitPlacement(struct SceneObjPool *, struct SceneObjSlot *);
+void SlidingDoors_InitLiftPlacement(struct SceneObjPool *, struct SceneObjSlot *);
+void SlidingDoors_InitSlotPlacement(struct SceneObjPool *, struct SceneObjSlot *);
+void SlidingDoors_InitPlacement(struct SceneObjPool *, struct SceneObjSlot *);
 int SlidingDoors_Append(struct SceneObjPool *p, u16 id, struct Pair *position, int animationIndex,
                         u8 activationFlags, u8 variant, u8 orientation, int type, int maxLift,
                         int interactionScript, int autoActivate, s32 *args, u8 hideOutsideRegion,
@@ -34,39 +34,39 @@ int SlidingDoors_Append(struct SceneObjPool *p, u16 id, struct Pair *position, i
     Memory_Clear(slot->terrain, sizeof(*slot->terrain));
     switch (slot->type) {
         case 1:
-            SlidingDoor_InitLiftPlacement(p, slot);
+            SlidingDoors_InitLiftPlacement(p, slot);
             break;
         case 2:
             slot->paletteBank = paletteBank;
-            SlidingDoor_InitSlotPlacement(p, slot);
+            SlidingDoors_InitSlotPlacement(p, slot);
             break;
         case 8:
             slot->paletteBank = 1;
-            SlidingDoor_InitSlotPlacement(p, slot);
+            SlidingDoors_InitSlotPlacement(p, slot);
             break;
         case 9:
             slot->paletteBank = 2;
-            SlidingDoor_InitSlotPlacement(p, slot);
+            SlidingDoors_InitSlotPlacement(p, slot);
             break;
         case 10:
             slot->paletteBank = 3;
-            SlidingDoor_InitSlotPlacement(p, slot);
+            SlidingDoors_InitSlotPlacement(p, slot);
             break;
         case 11:
             slot->paletteBank = 4;
-            SlidingDoor_InitSlotPlacement(p, slot);
+            SlidingDoors_InitSlotPlacement(p, slot);
             break;
         case 12:
             slot->paletteBank = 5;
-            SlidingDoor_InitSlotPlacement(p, slot);
+            SlidingDoors_InitSlotPlacement(p, slot);
             break;
         case 13:
             slot->paletteBank = 6;
-            SlidingDoor_InitSlotPlacement(p, slot);
+            SlidingDoors_InitSlotPlacement(p, slot);
             break;
         case 14:
             slot->paletteBank = 7;
-            SlidingDoor_InitSlotPlacement(p, slot);
+            SlidingDoors_InitSlotPlacement(p, slot);
             break;
         case 0:
         case 3:
@@ -75,10 +75,10 @@ int SlidingDoors_Append(struct SceneObjPool *p, u16 id, struct Pair *position, i
         case 6:
         case 7:
         case 15:
-            SlidingDoor_InitPlacement(p, slot);
+            SlidingDoors_InitPlacement(p, slot);
             break;
         case 16:
-            SlidingDoor_InitSlotPlacement(p, slot);
+            SlidingDoors_InitSlotPlacement(p, slot);
             break;
     }
     if (slot->interactionScript) {

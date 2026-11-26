@@ -125,7 +125,8 @@ increment:
     object->counter++;
 }
 
-void sub_08127590(void *, void *, u32, u32, s32, s32, s32, s32, s32, s32, s32, s32, s32, s32, s32);
+void SpriteProjectile_Create(void *, void *, u32, u32, s32, s32, s32, s32, s32, s32, s32, s32, s32,
+                             s32, s32);
 
 static inline s32 Sample(u32 table, u32 index)
 {
@@ -178,9 +179,9 @@ void DungeonScenery_UpdateBurst(struct SceneScriptObject *object)
             index = (index + 1) & mask;
             gRandomIndex = index;
             threshold = ((AdvanceAndSample(&table, index) >> 4) & 0x7f) + 0x20;
-            sub_08127590(position, &velocity, 0x83A6, 0x99CB, *statePtr, threshold, kind, 0,
-                         PaletteIndex(*statePtr, *parameterPtr), 0, i & 1, 0, 0, 0,
-                         0);
+            SpriteProjectile_Create(position, &velocity, 0x83A6, 0x99CB, *statePtr, threshold, kind,
+                                    0, PaletteIndex(*statePtr, *parameterPtr), 0, i & 1, 0, 0, 0,
+                                    0);
             i++;
         } while (i <= 3);
     }

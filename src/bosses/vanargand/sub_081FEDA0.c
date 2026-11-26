@@ -1,6 +1,6 @@
 #include "global.h"
 #include "scene/terrain/terrain_overlay.h"
-#define SpritePoolControl_Init SpriteParticle_InitParams
+#define SpritePoolControl_Init VanargandParticle_InitParams
 struct SpritePoolControl {
     u8 unknown0[0x20];
     u32 resource;
@@ -15,7 +15,7 @@ struct SpritePoolEntry {
     u8 animation[28];
     struct TerrainOverlayDrawable drawable;
 };
-void SpriteParticle_InitParams(struct SpritePoolControl *);
+void VanargandParticle_InitParams(struct SpritePoolControl *);
 void Sprite_InitUnlinked(struct TerrainOverlayDrawable *, void *, s32);
 static inline void ClearEntryFields(void *dest)
 {
@@ -25,7 +25,7 @@ static inline void ClearEntryFields(void *dest)
 void SpritePool_InitEntry(void *pool, struct SpritePoolEntry *entry, s32 index)
 {
     struct SpritePoolControl *control = &entry->control;
-    SpriteParticle_InitParams(control);
+    VanargandParticle_InitParams(control);
     entry->flags = 0;
     ClearEntryFields(entry->cleared);
     AnimData_Load(entry->animation, control->resource);

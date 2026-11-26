@@ -1,6 +1,5 @@
 #include "npc/manager/scene_actor_animation.h"
 /* SceneActorAnimation_SelectDirectionalExtraFlags: Selects a profile animation with variant zero and combines direction-derived mirroring with entry flags and caller-supplied playback flags */
-#define SceneActorAnimation_SelectDirectionalExtraFlags sub_080762A8
 void SceneActorAnimation_SelectDirectionalExtraFlags(struct RoomActor *actor, s32 index,
                                                      u32 extraFlags)
 {

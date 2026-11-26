@@ -32,7 +32,7 @@ void ScaledShadow_Initialize(void *, void *, s32, s32, s32, s32, s32, s32, s32, 
 void ScaledShadow_SetGraphic(void *, s32, s32);
 void ScaledShadow_Disable(void *);
 s32 Hresvelgr_InitHomingShotCollider(void *, s32, s32, s32);
-s32 EffectPool_CreateEntries(struct EffectPool *pool)
+s32 HresvelgrEffectPool_CreateEntries(struct EffectPool *pool)
 {
     struct EffectEntry *entry = pool->entries;
     s32 i, result;

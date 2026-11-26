@@ -1,7 +1,7 @@
 #include "ui/town/shop_control.h"
-void Shop_SetControllerCallback(void *owner, SceneInventoryCallback callback)
+void Shop_SetControllerCallback(void *owner, ShopCallback callback)
 {
-    struct SceneInventoryCallbackView *view = owner;
+    struct ShopCallbackView *view = owner;
     view->callback = callback;
     view->frame = 0xFFFF;
 }

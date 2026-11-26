@@ -1,6 +1,5 @@
 #include "global.h"
 
-#define Vanargand_OnDamage sub_081ADBF8
 struct VanargandDamage {
     u8 pad0[0x90];
     u32 timer;

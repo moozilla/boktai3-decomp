@@ -16,7 +16,7 @@ void TerrainModifiers_UnregisterCell(void *);
 void Anim_RestartSequence(void *, void *, u32, u32, u32);
 s32 Callback_InvokeActor(void *arg, void *function);
 void SceneHud_SetTimedState(void *, int, int, int, int, int);
-void sub_08014634(s32, s32, void *, void *, void *, s32, s32);
+void ImpactParticleGroup_SpawnBouncing(s32, s32, void *, void *, void *, s32, s32);
 void Statue_UpdateDeath(void);
 
 u32 Statue_UpdateDamageState(struct Statue *p)
@@ -42,9 +42,10 @@ u32 Statue_UpdateDamageState(struct Statue *p)
             p->hitFlags = p->colliderHitFlags;
             Sound_PlaySong(0x13e);
             if (p->damage > 0) {
-                DamageNumberDisplay_Show(collider, p->damage, 0, &p->collider.position, &p->collider.offset, 1);
-                SceneHud_SetTimedState(p->owner, p->hp, p->maxHp, p->hudStyle, p->collider.costFlags == 4,
-                                       p->hudTime);
+                DamageNumberDisplay_Show(collider, p->damage, 0, &p->collider.position,
+                                         &p->collider.offset, 1);
+                SceneHud_SetTimedState(p->owner, p->hp, p->maxHp, p->hudStyle,
+                                       p->collider.costFlags == 4, p->hudTime);
             }
             if (p->hp <= 0) {
                 struct ContactPackedVector spread, velocity;
@@ -69,7 +70,8 @@ u32 Statue_UpdateDamageState(struct Statue *p)
                 spread.y = (sample & 7) + 3;
                 spread.z = 0x18;
                 sample = ParticleRandom_ReadDirectSample(table);
-                sub_08014634((sample & 3) + 4, 3, &center, &velocity, &spread, 15, 15);
+                ImpactParticleGroup_SpawnBouncing((sample & 3) + 4, 3, &center, &velocity, &spread,
+                                                  15, 15);
                 Anim_RestartSequence(&p->sequence, p->resource, 1, p->facing, 0);
                 AnimData_SelectPaletteBank(&p->graphics, 0x1b7);
                 p->graphics.paletteData = gPaletteBankData + 0x44a0;

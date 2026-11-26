@@ -13,7 +13,7 @@ struct EffectPool {
     u8 unknown40[8];
     struct EffectPoolEntry entries[3];
 };
-struct EffectPoolEntry *EffectPool_FindIdleActiveEntry(void)
+struct EffectPoolEntry *HresvelgrEffectPool_FindIdleActiveEntry(void)
 {
     struct EffectPoolEntry *entry = ((struct EffectPool *)gEffectPoolManager)->entries;
     s32 i;

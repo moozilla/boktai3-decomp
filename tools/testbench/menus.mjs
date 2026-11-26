@@ -2,9 +2,9 @@ import { scenario } from './scenario.mjs';
 
 export const pausePages = ['map', 'items', 'valuables', 'solar gun', 'sword', 'accessory', 'status', 'config', 'sleep', 'save'];
 const menus = {
-  'weapon shop': { key: '744F', update: 'SceneInventory_TickController' },
-  'item shop': { key: '3019', update: 'SceneInventory_TickController' },
-  'accessory shop': { key: '7300', update: 'SceneInventory_TickController' },
+  'weapon shop': { key: '744F', update: 'Shop_TickController' },
+  'item shop': { key: '3019', update: 'Shop_TickController' },
+  'accessory shop': { key: '7300', update: 'Shop_TickController' },
   'link lobby': { key: '33FF', update: 'LinkLobbyPanel_OnTaskUpdate', link: true },
   'link save': { key: '3960', update: 'SaveMenu_Update', link: true },
   'monster book': { key: '34EA', update: 'MonsterBook_UpdateNavigation' },

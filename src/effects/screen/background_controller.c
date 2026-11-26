@@ -516,7 +516,7 @@ done:
         resource = *loaded;
         startTile = resource.tileCount;
     }
-    sub_08215D40(layer, base, count, entries, startTile);
+    Bg_UploadTileEntries(layer, base, count, entries, startTile);
     return 0;
 }
 

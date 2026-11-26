@@ -871,7 +871,6 @@ void TutorialOtenko_BeginScriptedAnimationPhaseNine(void)
 
 /* TutorialOtenko_SetAnimationPhase: Requests and saves the supplied phase with special cases for playing sound and clearing control */
 
-#define TutorialOtenko_SetAnimationPhase sub_081E4B0C
 
 struct G {
     u8 f0[0xE2C];
@@ -892,7 +891,7 @@ struct G {
 
 void ScriptUtility_ClearControlFlag(void);
 
-void sub_081E4B0C(u32 phase)
+void TutorialOtenko_SetAnimationPhase(u32 phase)
 {
     struct ActorAnimController *g = (struct ActorAnimController *)gScriptedActorController;
     if (g == 0) {
@@ -918,9 +917,8 @@ void sub_081E4B0C(u32 phase)
 
 /* TutorialOtenko_BeginAnimationPhaseTen: Ensures the controller exists and requests mode three phase ten with playback preservation */
 
-#define TutorialOtenko_BeginAnimationPhaseTen sub_081E4BD4
 
-void sub_081E4BD4(void)
+void TutorialOtenko_BeginAnimationPhaseTen(void)
 {
     struct ActorAnimController *g = (struct ActorAnimController *)gScriptedActorController;
     u32 three = 3;
@@ -944,9 +942,8 @@ void sub_081E4BD4(void)
 
 /* TutorialOtenko_BeginAnimationPhaseEleven: Ensures the controller exists and requests mode three phase eleven with playback preservation */
 
-#define TutorialOtenko_BeginAnimationPhaseEleven sub_081E4C74
 
-void sub_081E4C74(void)
+void TutorialOtenko_BeginAnimationPhaseEleven(void)
 {
     struct ActorAnimController *g = (struct ActorAnimController *)gScriptedActorController;
     u32 three = 3;
@@ -970,9 +967,8 @@ void sub_081E4C74(void)
 
 /* TutorialOtenko_BeginCompletionAnimation: Selects mode 3 phase 13 whose handler plays sequence 18 and invokes the completion script */
 
-#define TutorialOtenko_BeginCompletionAnimation sub_081E4D14
 
-void sub_081E4D14(void)
+void TutorialOtenko_BeginCompletionAnimation(void)
 {
     struct ActorAnimController *g = (struct ActorAnimController *)gScriptedActorController;
     u32 three = 3;
@@ -2859,7 +2855,7 @@ s32 Mod(s32, s32);
 
 void ImpactBurst_EmitBurst(void *, s32, s32, s32, s32, s32, s32, s32);
 
-void sub_080148CC(s32, s32, void *, s32, s32, s32, s32, s32, s32, s32, s32);
+void ImpactParticleGroup_SpawnRadial(s32, s32, void *, s32, s32, s32, s32, s32, s32, s32, s32);
 
 void TutorialOtenko_UpdateBlinkBurstDisappearance(struct ActorAnimController *p)
 {
@@ -2947,14 +2943,22 @@ void TutorialOtenko_UpdateBlinkBurstDisappearance(struct ActorAnimController *p)
             ImpactBurst_EmitBurst(&p->obj.x, 1, 512, 48, 8, 8, 8, 4);
             ImpactBurst_EmitBurst(&p->obj.x, 1, 512, 48, 8, 8, 8, 4);
             ImpactBurst_EmitBurst(&p->obj.x, 1, 512, 48, 8, 8, 8, 4);
-            sub_080148CC(1, 3, &p->obj.x, 32, 60, duration, 3, duration, 5, 60, duration);
-            sub_080148CC(1, 3, &p->obj.x, 64, 60, duration, 3, duration, 5, 60, duration);
-            sub_080148CC(1, 3, &p->obj.x, 96, 60, duration, 3, duration, 5, 60, duration);
-            sub_080148CC(1, 3, &p->obj.x, 128, 60, duration, 3, duration, 5, 60, duration);
-            sub_080148CC(1, 3, &p->obj.x, 160, 60, duration, 3, duration, 5, 60, duration);
-            sub_080148CC(1, 3, &p->obj.x, 192, 60, duration, 3, duration, 5, 60, duration);
-            sub_080148CC(1, 3, &p->obj.x, 224, 60, duration, 3, duration, 5, 60, duration);
-            sub_080148CC(1, 3, &p->obj.x, 256, 60, duration, 3, duration, 5, 60, duration);
+            ImpactParticleGroup_SpawnRadial(1, 3, &p->obj.x, 32, 60, duration, 3, duration, 5, 60,
+                                            duration);
+            ImpactParticleGroup_SpawnRadial(1, 3, &p->obj.x, 64, 60, duration, 3, duration, 5, 60,
+                                            duration);
+            ImpactParticleGroup_SpawnRadial(1, 3, &p->obj.x, 96, 60, duration, 3, duration, 5, 60,
+                                            duration);
+            ImpactParticleGroup_SpawnRadial(1, 3, &p->obj.x, 128, 60, duration, 3, duration, 5, 60,
+                                            duration);
+            ImpactParticleGroup_SpawnRadial(1, 3, &p->obj.x, 160, 60, duration, 3, duration, 5, 60,
+                                            duration);
+            ImpactParticleGroup_SpawnRadial(1, 3, &p->obj.x, 192, 60, duration, 3, duration, 5, 60,
+                                            duration);
+            ImpactParticleGroup_SpawnRadial(1, 3, &p->obj.x, 224, 60, duration, 3, duration, 5, 60,
+                                            duration);
+            ImpactParticleGroup_SpawnRadial(1, 3, &p->obj.x, 256, 60, duration, 3, duration, 5, 60,
+                                            duration);
             ActorShadow_Disable(p->p2);
             p->obj.flags |= 1;
             TutorialOtenko_SetState(p, 1, 2);
@@ -2982,9 +2986,8 @@ void TutorialOtenko_UpdateBlinkBurstDisappearance(struct ActorAnimController *p)
 
 /* TutorialOtenko_OnAnimationNoOp: Empty function in the animation state block; tentative no-op animation callback */
 
-#define TutorialOtenko_OnAnimationNoOp sub_081E8370
 
-void sub_081E8370(void)
+void TutorialOtenko_OnAnimationNoOp(void)
 {
 }
 
@@ -3925,9 +3928,8 @@ void sub_081E99EC(struct ActorAnimController *p)
 
 /* TutorialOtenko_UpdateInactiveAnimation: Empty handler provisionally interpreted as an inactive animation callback */
 
-#define TutorialOtenko_UpdateInactiveAnimation sub_081E9BA0
 
-void sub_081E9BA0(void)
+void TutorialOtenko_UpdateInactiveAnimation(void)
 {
 }
 

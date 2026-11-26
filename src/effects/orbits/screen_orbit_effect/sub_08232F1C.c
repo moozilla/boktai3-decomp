@@ -1,7 +1,6 @@
 #include "global.h"
 #include "engine/ram.h"
 /* ScreenOrbitEffect_EnsureSingleton: Returns the existing effect manager or creates and initializes its task */
-#define ScreenOrbitEffect_EnsureSingleton sub_08232F1C
 u8 *Task_Create(s32, u32);
 void Task_SetCallbacks(u8 *, void (*)(u8 *), void (*)(u8 *));
 void EffectQuad_UpdateEntries(u8 *);
@@ -9,7 +8,7 @@ void ScreenOrbitEffect_Destroy(u8 *);
 s32 ScreenOrbitEffect_Init(u8 *);
 void Task_Kill(u8 *);
 
-u8 *sub_08232F1C(void)
+u8 *ScreenOrbitEffect_EnsureSingleton(void)
 {
     u8 *p;
     if (gEffectQuad != NULL)

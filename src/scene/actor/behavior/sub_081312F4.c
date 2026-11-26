@@ -3,7 +3,7 @@
 #include "scene/collision/scene_actor_contact_response.h"
 #include "global.h"
 #include "scene/actor/scene_actor_control_phase.h"
-u8 sub_0812F3CC(struct ChaseActor *);
+u8 SceneActorReaction_BeginContactResponse(struct ChaseActor *);
 // confidence=low: selects a route return phase from motion and route flags.
 
 void SceneActorRoute_UpdateReturnEntry(struct ChaseActor *actor)
@@ -14,7 +14,7 @@ void SceneActorRoute_UpdateReturnEntry(struct ChaseActor *actor)
         SceneActorTerrain_InstallControl(actor, actor->base.onEntry, 2);
     if ((u8)Callback_InvokeActor(actor, actor->base.contactQuery.opaque))
         return;
-    result = sub_0812F3CC(actor);
+    result = SceneActorReaction_BeginContactResponse(actor);
     if (result)
         return;
     {

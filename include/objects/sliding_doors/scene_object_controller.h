@@ -21,10 +21,10 @@ struct SceneObjPool {
 
 typedef char SceneObjPoolSizeCheck[sizeof(struct SceneObjPool) == 0x434 ? 1 : -1];
 
-void SlidingDoor_AnimateActive(struct SceneObjSlot *);
-void SlidingDoor_AnimateInactive(struct SceneObjSlot *);
-void SlidingDoor_UpdateActiveIdle(struct SceneObjSlot *);
-void SlidingDoor_UpdateInactiveIdle(struct SceneObjSlot *);
+void SlidingDoors_AnimateActive(struct SceneObjSlot *);
+void SlidingDoors_AnimateInactive(struct SceneObjSlot *);
+void SlidingDoors_UpdateActiveIdle(struct SceneObjSlot *);
+void SlidingDoors_UpdateInactiveIdle(struct SceneObjSlot *);
 
 static inline void SceneObjSlot_ResetPose(struct SceneObjSlot *slot, u8 pose)
 {
@@ -37,7 +37,7 @@ static inline void SceneObjSlot_EnterIdle(struct SceneObjSlot *slot,
 {
     slot->variant = state;
     slot->callback =
-        state == SCENE_OBJ_ACTIVE ? SlidingDoor_UpdateActiveIdle : SlidingDoor_UpdateInactiveIdle;
+        state == SCENE_OBJ_ACTIVE ? SlidingDoors_UpdateActiveIdle : SlidingDoors_UpdateInactiveIdle;
 }
 
 /* Active animations start at the first pose and inactive animations start at the last. */
@@ -48,8 +48,8 @@ static inline void SceneObjSlot_ApplyActivation(struct SceneObjSlot *slot,
         SceneObjSlot_EnterIdle(slot, state);
     } else {
         slot->variant = state;
-        slot->callback =
-            state == SCENE_OBJ_ACTIVATING ? SlidingDoor_AnimateActive : SlidingDoor_AnimateInactive;
+        slot->callback = state == SCENE_OBJ_ACTIVATING ? SlidingDoors_AnimateActive
+                                                       : SlidingDoors_AnimateInactive;
     }
     SceneObjSlot_ResetPose(
         slot, (state == SCENE_OBJ_INACTIVE || state == SCENE_OBJ_DEACTIVATING) ? 2 : 0);

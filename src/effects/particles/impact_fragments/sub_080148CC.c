@@ -3,7 +3,6 @@
 #include "effects/particles/particle_group.h"
 #include "engine/ram.h"
 // confidence=medium: fills a particle group with randomized polar velocities.
-#define ImpactParticleGroup_SpawnRadial sub_080148CC
 extern u32 gUnk_08604B90[];
 static inline int CellIndex(struct ContactPosition *p)
 {

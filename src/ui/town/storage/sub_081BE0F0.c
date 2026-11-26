@@ -1,12 +1,12 @@
 #include "global.h"
 #include "ui/widgets/scene_input.h"
 #define gScenePaletteBanks gPaletteBankData
-struct SceneInventoryCategoryMenu {
+struct StorageCategoryMenu {
     u8 unknown0[0x13F8];
     struct AnimSprite categoryWidget;
     struct AnimSprite targetWidget;
 };
-void Storage_ResetCategoryPalette(struct SceneInventoryCategoryMenu *p)
+void Storage_ResetCategoryPalette(struct StorageCategoryMenu *p)
 {
     u16 *palette = (u16 *)(gPaletteBankData + 0x7540);
     p->categoryWidget.palette = palette;

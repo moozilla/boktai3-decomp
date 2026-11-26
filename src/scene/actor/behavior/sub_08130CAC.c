@@ -3,7 +3,7 @@
 #include "global.h"
 #include "scene/actor/scene_actor_control_phase.h"
 #include "scene/actor/scene_actor_control_motion.h"
-u8 sub_0812F3CC(struct ChaseActor *);
+u8 SceneActorReaction_BeginContactResponse(struct ChaseActor *);
 s32 NavMesh_ConsumeProbeEvent(void *);
 u8 SceneActorBehavior_AccelerateTowardDescriptor(void *, void *, u32, u32, u32);
 u8 SceneActorBehavior_RequestDescriptorTurn(void *, void *, u32, u32, u32);
@@ -19,7 +19,7 @@ void SceneActorRoute_UpdateAdvancePhase(struct ChaseActor *actor)
         SceneActorTerrain_InstallControl(actor, actor->base.onAlternateEntry, 1);
     if ((u8)Callback_InvokeActor(actor, actor->base.contactQuery.opaque))
         return;
-    if ((u8)sub_0812F3CC(actor))
+    if ((u8)SceneActorReaction_BeginContactResponse(actor))
         return;
     SceneActorAnimation_SelectDirectionalEntry(actor, 1);
     speed = Callback_InvokeActor(actor, actor->base.animationQuery.opaque);
