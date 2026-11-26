@@ -9,8 +9,9 @@ ROOT = Path(__file__).resolve().parents[2]
 OUT = ROOT / 'build/emu/tick-test'
 
 
-def run(command):
-    directory = OUT / command
+def run(command, headless=False):
+    name = command + ('-headless' if headless else '')
+    directory = OUT / name
     directory.mkdir(parents=True, exist_ok=True)
     script = directory / 'harness.txt'
     script.write_text(f'''trace off
@@ -24,6 +25,9 @@ holdt NONE 10
 ''')
     env = {**os.environ, 'BOKTAI3_NO_COVERAGE': '1'}
     env.pop('BOKTAI3_SAV', None)
+    env.pop('BOKTAI3_HEADLESS', None)
+    if headless:
+        env['BOKTAI3_HEADLESS'] = '1'
     start = time.monotonic()
     result = subprocess.run([ROOT / 'build/emu/harness', ROOT / 'baserom.gba', script, directory],
                             capture_output=True, text=True, env=env, timeout=120, check=True)
@@ -31,13 +35,14 @@ holdt NONE 10
     assert not (directory / 'total.exec').exists()
     data = (directory / 'samples.bin').read_bytes()
     assert len(data) == 240, result.stderr
-    print(f'{command}: {time.monotonic() - start:.2f}s for {len(data) // 10} ticks', flush=True)
+    print(f'{name}: {time.monotonic() - start:.2f}s for {len(data) // 10} ticks', flush=True)
     return data
 
 
 if __name__ == '__main__':
     slow = run('tick')
     fast = run('fasttick')
-    assert fast == slow, 'Input tick observations differ'
+    headless = run('fasttick', headless=True)
+    assert fast == slow == headless, 'Input tick observations differ'
     assert any(fast[(i * 10) + 4] & 0x10 for i in range(12, 16)), 'Right press was not observed'
     print('MATCH')

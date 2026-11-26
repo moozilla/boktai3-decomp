@@ -17,6 +17,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { openSession, png } from '../../port/agent/session.mjs';
+import { runRom } from './lib/rom.mjs';
 
 const ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname), '../..');
 const args = process.argv.slice(2);
@@ -486,9 +487,14 @@ function harnessScript(reads, saves, title) {
 function verify(end) {
   const dir = path.join(out, 'rom');
   fs.mkdirSync(dir, { recursive: true });
-  const harness = path.join(ROOT, 'tools/emu/harness');
-  const r = spawnSync(harness, [path.join(ROOT, 'baserom.gba'), path.join(out, 'harness.txt'), dir], { encoding: 'utf8', maxBuffer: 1 << 26 });
-  const warn = (r.stderr || '').split('\n').filter((l) => /ticks$|not reached|times in|error/i.test(l));
+  try {
+    runRom(path.join(out, 'harness.txt'), dir, {
+      save: opt('--save') || from?.save, coverage: args.includes('--coverage'), timeout: 900_000,
+    });
+  } catch (error) {
+    console.error(`verify on ROM: ${error.message} (${path.relative(ROOT, dir)}/harness.log)`);
+    return false;
+  }
   const ew = fs.readFileSync(path.join(dir, 'ewram.bin')), iw = fs.readFileSync(path.join(dir, 'iwram.bin'));
   const rd = (addr, n) => { const b = addr >= 0x03000000 ? iw : ew, o = addr - (addr >= 0x03000000 ? 0x03000000 : 0x02000000); return n === 2 ? b.readInt16LE(o) : b.readUInt32LE(o); };
   const gs = rd(0x02000710, 4), scene = rd(gs + 0x5a4, 4);
@@ -496,7 +502,7 @@ function verify(end) {
   const pos = p ? { x: rd(p + 0x30, 2), y: rd(p + 0x32, 2), z: rd(p + 0x34, 2) } : {};
   const rom = { scene, ...pos };
   const same = rom.scene === end.scene && rom.x === end.x && rom.z === end.z;
-  console.log(`verify on ROM: ${same ? 'MATCH' : 'DIFFER'} rom ${JSON.stringify(rom)} port ${JSON.stringify(end)}${warn.length ? ' ' + warn.join('; ') : ''}`);
+  console.log(`verify on ROM: ${same ? 'MATCH' : 'DIFFER'} rom ${JSON.stringify(rom)} port ${JSON.stringify(end)}`);
   if (args.includes('--coverage')) coverage(path.join(dir, 'total.exec'));
   for (const f of fs.readdirSync(dir)) if (/^total\./.test(f)) fs.rmSync(path.join(dir, f));
   return same;

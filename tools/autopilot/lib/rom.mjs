@@ -20,14 +20,16 @@ export function holdTicks(reads) {
   return lines;
 }
 
-export function runRom(script, out, { save, coverage = false, timeout = 90_000 } = {}) {
+export function runRom(script, out, { save, coverage = false, render = true, timeout = 90_000 } = {}) {
   const local = path.join(root, 'build/emu/harness');
   const harness = process.env.BOKTAI3_HARNESS || (fs.existsSync(local) ? local : path.join(root, 'tools/emu/harness'));
   const env = { ...process.env };
   delete env.BOKTAI3_SAV;
   delete env.BOKTAI3_NO_COVERAGE;
+  delete env.BOKTAI3_HEADLESS;
   if (save) env.BOKTAI3_SAV = path.resolve(save);
   if (!coverage) env.BOKTAI3_NO_COVERAGE = '1';
+  if (!render) env.BOKTAI3_HEADLESS = '1';
   const run = spawnSync(harness, [path.join(root, 'baserom.gba'), script, out], {
     env, timeout, encoding: 'utf8', maxBuffer: 1 << 25,
   });

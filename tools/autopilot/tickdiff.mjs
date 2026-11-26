@@ -18,6 +18,8 @@ import { runRom } from './lib/rom.mjs';
 const ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname), '../..');
 const [dirArg, fromArg, toArg] = process.argv.slice(2);
 const dir = path.resolve(dirArg), FROM = +fromArg, TO = +toArg;
+if (!Number.isSafeInteger(FROM) || !Number.isSafeInteger(TO) || FROM < 0 || TO <= FROM)
+  throw new Error('Expected a nonempty tick range FROM TO');
 const opt = (k, d) => { const i = process.argv.indexOf(k); return i < 0 ? d : process.argv[i + 1]; };
 const out = path.resolve(opt('--out', path.join(ROOT, 'build/autopilot/tickdiff')));
 fs.mkdirSync(out, { recursive: true });
@@ -27,11 +29,25 @@ const REC = REG.reduce((a, [, n]) => a + n, 0);
 const run = JSON.parse(fs.readFileSync(path.join(dir, 'movie.json'), 'utf8'));
 
 // ROM side: the run's harness script with a tickdump after "tick"
-const script = fs.readFileSync(path.join(dir, 'harness.txt'), 'utf8').split('\n')
+const lines = fs.readFileSync(path.join(dir, 'harness.txt'), 'utf8').split('\n')
   .filter((l) => !/^(save |dump |shot |trace |tickdump )/.test(l))
   .flatMap((l) => (/^(fast)?tick /.test(l) ? ['trace off', l.replace(/^fast/, ''), `tickdump rom ${FROM}:${TO} ${REG.map(([a, n]) => `${a.toString(16)}:${n.toString(16)}`).join(',')}`] : [l]));
-fs.writeFileSync(path.join(out, 'harness.txt'), script.join('\n'));
-runRom(path.join(out, 'harness.txt'), out, { save: run.save, timeout: 600_000 });
+// Once the window has been captured, no later inputs can affect the comparison.
+const script = [];
+let left = TO;
+for (const line of lines) {
+  const hold = /^holdt (\S+) (\d+)$/.exec(line);
+  if (!hold) {
+    script.push(line);
+    continue;
+  }
+  const n = Math.min(left, Number(hold[2]));
+  script.push(`holdt ${hold[1]} ${n}`);
+  left -= n;
+  if (!left) break;
+}
+fs.writeFileSync(path.join(out, 'harness.txt'), script.join('\n') + '\n');
+runRom(path.join(out, 'harness.txt'), out, { save: run.save, render: false, timeout: 600_000 });
 
 // Port side: hooks installed at boot see the replayed movie
 const fd = fs.openSync(path.join(out, 'port.bin'), 'w');

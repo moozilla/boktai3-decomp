@@ -474,8 +474,10 @@ int main(int argc, char** argv) {
 	if (!core || !core->init(core)) { fprintf(stderr, "core init failed\n"); return 1; }
 	mCoreInitConfig(core, NULL);
 	core->desiredVideoDimensions(core, &W, &H);
-	fb = calloc(W * H, sizeof(color_t));
-	core->setVideoBuffer(core, fb, W);
+	if (!getenv("BOKTAI3_HEADLESS")) {
+		fb = calloc(W * H, sizeof(color_t));
+		core->setVideoBuffer(core, fb, W);
+	}
 	if (!mCoreLoadFile(core, argv[1])) { fprintf(stderr, "load failed\n"); return 1; }
 	core->setPeripheral(core, mPERIPH_GBA_LUMINANCE, &luxsrc);
 	// Optional battery save: BOKTAI3_SAV=path (copied, never modified)
@@ -583,7 +585,10 @@ int main(int argc, char** argv) {
 			if (tick_hits < want) fprintf(stderr, "holdt: %d of %d ticks\n", tick_hits, want);
 		}
 		else if (!strcmp(cmd, "tap")) { core->setKeys(core, parse_keys(a1)); run_frames(2); core->setKeys(core, 0); run_frames(8); }
-		else if (!strcmp(cmd, "shot")) shot(a1);
+		else if (!strcmp(cmd, "shot")) {
+			if (!fb) { fprintf(stderr, "shot needs a video buffer\n"); return 1; }
+			shot(a1);
+		}
 		else if (!strcmp(cmd, "save")) savestate(a1, 0);
 		else if (!strcmp(cmd, "load")) savestate(a1, 1);
 		else if (!strcmp(cmd, "loadstate")) loadstate(a1);
