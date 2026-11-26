@@ -977,3 +977,33 @@ Narrowing the state without changing the test adds differences.
 Changing the GameState timer into its byte offset in place changes
 15 rows on each side for either timer width. The direct GameState
 add remains the nearest case.
+
+## 2026-11-26: Trail position pointers and unused wireless animation status
+
+`SpriteTrail_UpdatePositions` uses its existing sprite and coordinate
+pointers consistently when projecting X. The split first advance
+still retains the camera reads, and both substitutions match together
+at 304 bytes. `WirelessResultPanel_Init` drops the local animation
+status that was assigned but never read. The timing and frame updates
+remain, and the full 684-byte unit matches with the same four
+literal-local reports. Both functions have zero priority findings.
+
+Passing the singleton slot to an inline registration helper misses
+in both routines. Passing the initial manager snapshot as a second
+parameter gives the same misses. The helper still loses one of the
+required singleton reads. The ordinary typed volatile insertions
+remain the matching versions.
+
+In FragmentGroup, inverting the flip branch or assigning its bit in
+one expression worsens the frame-table reuse draft's instruction
+shape. In SpiralBurst, factoring the sine read into an indexed,
+advanced, or captured-address inline leaves 29 differing rows on
+each side. The direct pointer advance with two differences remains
+the closer union-free trial.
+
+Expressing the barrage boundary tests directly in the byte direction
+range changes at least ten instructions on each side. The GameState
+helper that returns the selected region pointer from the timer leaves
+15 differing rows for both timer widths. The established two-mask
+barrage and one-operand GameState drafts are still closer. The seven
+named units report two volatile errors and five proved-zero warnings.
