@@ -9,9 +9,7 @@ s32 AxeArmor_UpdateAttackTiming(struct AxeArmor *enemy)
 {
     if (enemy->attackSchedule) {
         s16 *index = &enemy->attackIndex;
-        s32 selected = *index * 2;
-        s16 *table = enemy->attackTimes;
-        if (enemy->timer > *(s16 *)((u8 *)table + selected)) {
+        if (enemy->timer > enemy->attackTimes[*index]) {
             void *anim = &enemy->sequence;
             void *resource = enemy->resource;
             u32 facing = (u8)enemy->facing;
