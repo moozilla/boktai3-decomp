@@ -3,9 +3,7 @@
 extern const s16 gUnk_086149C4[];
 void Centipede_ApplyPendingRadialVelocity(struct TentacleBody *body)
 {
-    s32 *state = &body->pendingImpulse;
-    u32 stored = *state;
-    if (stored != 0x7FFFFFFF) {
+    if (body->pendingImpulse != 0x7FFFFFFF) {
         struct TentacleAnimationSegment *segment = body->impulseSegment;
         u8 *anglep;
         u16 *radiusp;
@@ -15,7 +13,7 @@ void Centipede_ApplyPendingRadialVelocity(struct TentacleBody *body)
         s32 value;
         s32 x;
         u32 zero;
-        *state = 0x7FFFFFFF;
+        body->pendingImpulse = 0x7FFFFFFF;
         anglep = &segment->impulseHeading;
         radiusp = &segment->bodyCollider.responseParameter;
         v = &segment->offset.x;
