@@ -176,6 +176,29 @@ test('the vampire model uses signed health and the source sunlight flag', () => 
   assert.deepEqual(vampireTargets(), []);
 });
 
+test('combat waits while a story script controls the player', () => {
+  let scripted = true, scene = 1;
+  const g = { frameNo: 1, fn: { ScriptUtility_IsControlFlagSet: () => scripted },
+    until: (ready, timeout) => ({ ready, timeout }) };
+  const lib = skill('world', g, { gPlayers: [{ currentStatA: 70 }] });
+  Object.assign(lib, {
+    session: { solar: 232, setSolar: () => {} },
+    where: () => ({ scene }), message: () => ({ open: false }),
+    weapon: () => ({ gun: false }), fightTargets: () => [{ life: 10 }],
+    clearInterruptions: function* () { return false; },
+  });
+  const fight = lib.fight();
+  const wait = fight.next().value;
+  assert.equal(wait.ready(), false);
+  assert.equal(wait.timeout, 120);
+  scripted = false;
+  assert.equal(wait.ready(), true);
+  scene = 2;
+  const result = fight.next();
+  assert.equal(result.done, true);
+  assert.equal(result.value.steps, 0);
+});
+
 test('armor targets model damage to the guard and the contact cooldown', () => {
   const fields = { 0xb1c: 240, 0xb20: 65, 0xb2c: 9, 0xb32: 2 };
   const read = (addr) => fields[addr - 0x02010000] ?? 0;

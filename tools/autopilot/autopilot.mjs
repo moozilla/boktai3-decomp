@@ -80,7 +80,7 @@ const event = (what) => {
   console.log(JSON.stringify(e));
   if (e.skill === 'entry' || e.skill === 'room' || e.skill === 'goal')
     writeMovie('checkpoint.json', { scene: e.scene, x: e.x, y: e.y, z: e.z });
-  if (e.skill === 'fight' && (e.dialogue !== undefined || e.trance))
+  if (e.skill === 'fight' && (e.dialogue !== undefined || e.trance || e.fight !== undefined))
     writeMovie('checkpoint.json', s.g.lib.where());
   if (shots) fs.writeFileSync(path.join(out, 'shots', `${String(s.frame).padStart(6, '0')}.png`), png(s.pixels()));
 };

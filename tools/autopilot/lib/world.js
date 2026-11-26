@@ -765,6 +765,7 @@ exports.fight = function* (opts = {}) {
   const progress = new Map(), living = exports.fightTargets, triedOtherWeapon = new Set();
   const initialGun = exports.weapon().gun;
   const initialLight = S.solar;
+  const scriptControlsPlayer = () => Boolean(g.fn.ScriptUtility_IsControlFlagSet());
   const hpSum = () => living().reduce((s, e) => s + Math.max(0, e.health) * (e.barrier ? 20 : 1) + (e.guard ?? 0) / 2, 0);
   const toward = (e) => {
     const dx = e.x - p.position.x, dz = e.z - p.position.z;
@@ -776,6 +777,12 @@ exports.fight = function* (opts = {}) {
   while (exports.where().scene === scene && p && life() > 0 && living().length && g.frameNo - start < (opts.frames ?? 6000)) {
     if (yield* exports.clearInterruptions(opts)) {
       interruptions++;
+      continue;
+    }
+    // Intro and defeat scripts can expose a live target before input returns.
+    // Wait for the next message or transition while the VM owns player control.
+    if (scriptControlsPlayer()) {
+      yield g.until(() => !scriptControlsPlayer() || exports.message().open || exports.where().scene !== scene, 120);
       continue;
     }
     const distance = (e) => Math.hypot(e.x - p.position.x, e.z - p.position.z, 2 * (e.y - p.position.y));
