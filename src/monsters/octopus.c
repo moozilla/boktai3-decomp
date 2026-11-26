@@ -76,7 +76,7 @@ void SceneActor_BeginReactionAnimation(struct ChaseActor *actor)
         u32 zero = 0;
         drawable[7] = 2;
         actor->base.colliderA.responseValue = zero;
-        ActorStatus_ClearDrawableFlags(actor, 1);
+        ActorStatus_SetBodyBit(actor, 0);
         actor->base.colliderA.flags = (actor->base.colliderA.flags & 0xFFFB) | 8;
         clearColliderFlag(&actor->base.placementFlags);
         SceneActorAnimation_SelectDirectionalFlags((void *)actor, 15);
@@ -595,7 +595,7 @@ void Octopus_ThrowCapturedTarget(struct ChaseActor *actor)
     if (actor->base.restart) {
         actor->base.stepDone = 1;
         ((struct OctopusDrawable *)actor->base.drawable)->mode = 2;
-        ActorStatus_SetDrawableFlags(actor, 1);
+        ActorStatus_SetBodyBit(actor, 1);
         Sound_PlaySong(0x1E0);
         if (target->mode & 4) {
             who = SceneActorRegistry_FindById(*(u32 *)target);
@@ -706,13 +706,13 @@ void Octopus_ReleaseCapturedTarget(struct ChaseActor *actor, s32 frame)
             SceneActorBehavior_PlayReactionSound(victim);
         }
     } else
-        ActorStatus_SetDrawableFlags(actor, 1);
+        ActorStatus_SetBodyBit(actor, 1);
     if ((u32)(frame - 51) <= 8)
         Camera_RequestShake(20);
     if ((u32)(frame - 81) <= 8)
         Camera_RequestShake(40);
     if (frame > 120) {
-        ActorStatus_SetDrawableFlags(actor, 1);
+        ActorStatus_SetBodyBit(actor, 1);
         if (target->mode & 4) {
             victim = target->owner;
             SceneActorReaction_ApplyHitResponse(victim, 2, &position, 0, 0x40, 0);
@@ -756,7 +756,7 @@ void Octopus_ReturnToRoutePoint(struct ChaseActor *actor)
             else
                 *(u8 **)((u8 *)actor->base.drawable + 0x68) = gPaletteBankData + v * 32;
         }
-        ActorStatus_SetDrawableFlags(actor, 1);
+        ActorStatus_SetBodyBit(actor, 1);
         ((struct OctopusDrawable *)actor->base.drawable)->mode = 3;
         SpriteParticle_SpawnBatch(&actor->base.body.position, 1, 2, 1, 0x154);
         Sound_PlaySong(0x1D9);
@@ -1026,21 +1026,13 @@ void SceneActor_BeginReactionAnimation(struct ChaseActor *actor);
 void SceneActorReaction_WaitHiddenForAdjacentTarget(struct ChaseActor *a)
 {
     if (SceneActorControl_TakeFlag(&a->base.field2B1)) {
-        u32 flag;
         {
             struct ContactCollider *c = &a->base.colliderA;
             u16 v = 4 | c->flags;
             c->flags = v & 0xfff7;
         }
         HalfwordFlags_Set(0x800, &a->base.placementFlags);
-        flag = 1;
-        if (a->base.drawableKind == 0) {
-            u32 *flags = a->base.drawable;
-            *flags |= flag;
-        } else {
-            u32 *flags = (u32 *)((u8 *)a->base.drawable + 0x20);
-            flags[2] |= flag;
-        }
+        ActorStatus_SetBodyBit(a, 1);
     }
     if (SceneActorReaction_FindAdjacentTarget(a, 1) == 0) {
         if ((s32)a->base.counter2AC > 60)
@@ -1242,7 +1234,7 @@ struct RoomActor;
 void SceneActorReaction_BeginHiddenCollisionless(struct ChaseActor *actor)
 {
     if (TakeReset(actor)) {
-        ActorStatus_SetDrawableFlags(actor, 1);
+        ActorStatus_SetBodyBit(actor, 1);
         ResetState(actor, 3);
         SceneActorTerrain_DisableCollision((void *)actor);
     }
@@ -1388,13 +1380,13 @@ void Octopus_BeginReturnToRoutePoint(struct ChaseActor *actor)
     }
     SceneActorChase_SetControl(actor, SceneActorReaction_RestoreAlternateAfterDelay, 14);
     SceneActorTerrain_ResumeDrawable(actor);
-    ActorStatus_SetDrawableFlags(actor, 1);
+    ActorStatus_SetBodyBit(actor, 1);
 }
 
 void Octopus_BeginIdleAnimation(struct ChaseActor *actor)
 {
     SceneActorAnimation_SelectDirectionalFlags(actor, 0x10);
-    ActorStatus_SetDrawableFlags(actor, 1);
+    ActorStatus_SetBodyBit(actor, 1);
     SceneActorTerrain_EnterState(actor, 0, 0, 1);
     SceneActorChase_SetControl(actor, SceneActorControl_OnIdle, 0x10);
 }
