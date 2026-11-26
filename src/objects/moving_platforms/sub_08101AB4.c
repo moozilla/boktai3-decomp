@@ -11,7 +11,7 @@ void MovingPlatform_ReleaseMember(struct NamedObject *o)
         flags = &o->flags;
         for (; i < 4; i++) {
             if (o->cellRegistered[i]) {
-                TerrainModifiers_UnregisterCell(o->cellRegistrations[i]);
+                TerrainModifiers_UnregisterCell(&o->cellRegistrations[i]);
                 o->cellRegistered[i] = 0;
             }
         }
