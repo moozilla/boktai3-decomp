@@ -910,3 +910,29 @@ its Pile Driver counters and new-game field initialization to game
 state, and its wrapped tilemap helpers to background video code.
 The separation follows the floor trap, Pile Driver, title boot
 and room-load witnesses and their direct callers.
+
+### Renderer verification of Kuro and the floor trap
+
+Tags: renderer, sprite attribution, Kuro, floor trap
+
+For a direct sprite check, replay the two staged scripts through the
+mGBA Studio sprite observer. The local supplement
+`build/identify/renderer-check.py` enables the observer just before
+the invocation and keeps the original `sprite-sources.tsv`.
+Build the local `witness_draw_harness` from `witness_harness.c`,
+`tools/studio/experiments/observe.c` and
+`tools/studio/experiments/draw_trace.c`, with
+`-DSTUDIO_EXPERIMENTS` and the normal harness compiler flags.
+The drawtrace declaration can be derived with
+`studio.experiments.graphics.trace_command()`.
+
+In `review-render-tagged-live` at frame 1867, the drawable inside
+the E00E actor submits two pieces at (205, 40) and (221, 45) using
+ROM tiles 08CF44E8. The native initializer earlier records that
+actor at 0200ED24 and the drawable is at 0200EE24.
+In `review-render-pressure-exact` at frame 1860, the 2FA5 slot's
+drawable 0200E064 submits four pieces along the right-hand side
+of the trap room. This links the visible trap to the same slot
+whose press and contact handlers ran in the trace. The independent
+particle and collision draws in the other two renderer samples did
+not yield comparable slot-local addresses.
