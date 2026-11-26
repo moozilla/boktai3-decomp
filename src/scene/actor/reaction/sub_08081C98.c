@@ -33,7 +33,7 @@ static inline void Reaction_ClearWord(u32 *field, s32 mask)
 {
     *field &= mask;
 }
-static inline void Reaction_ClearMotion(struct SceneActorReactionMotion *motion, s32 mask)
+static inline void Reaction_ClearMotion(struct SceneActorChaseTracking *motion, s32 mask)
 {
     motion->flags &= mask;
 }
@@ -44,7 +44,7 @@ static inline void Reaction_ClearRoute(u32 *flags, struct SceneActorRegistryCont
     control->field14 = 0;
     control->timer = 0;
 }
-static inline void Reaction_SpawnPart(u8 *group)
+static inline void Reaction_SpawnPart(struct SceneActorChaseGroup *group)
 {
     struct ContactPosition velocity, scale, position;
     const struct ContactPosition *source;
@@ -55,11 +55,11 @@ static inline void Reaction_SpawnPart(u8 *group)
     scale.x = 5;
     scale.y = 10;
     scale.z = 5;
-    source = *(const struct ContactPosition **)(group + 0xB0);
+    source = group->effectOrigin;
     position.x = source->x;
     position.y = source->y + 128;
     position.z = source->z;
-    EffectGroup_SpawnPart((void *)(group + 0xA8), 3, &position, &velocity, &scale, 40, 40);
+    EffectGroup_SpawnPart(group->effectConfig, 3, &position, &velocity, &scale, 40, 40);
 }
 static inline s32 Reaction_ThirtySecond(s32 value)
 {
@@ -69,10 +69,10 @@ static inline s32 Reaction_ThirtySecond(s32 value)
 }
 void SceneActorReaction_UpdateTimedBurst(struct ChaseActor *actor)
 {
-    u8 *group = (u8 *)&actor->group.common;
+    struct SceneActorChaseGroup *group = &actor->group;
     u32 duration;
     if (SceneActorReaction_TakePrepared(actor)) {
-        struct SceneActorReactionMotion *reaction;
+        struct SceneActorChaseTracking *reaction;
         struct SceneActorRegistryControl *control;
         u32 *flags;
         u32 *word;
@@ -81,7 +81,7 @@ void SceneActorReaction_UpdateTimedBurst(struct ChaseActor *actor)
         actor->base.body.direction = (((MonsterInit_GetDirection(actor) + 32) >> 6) & 3) << 6;
         SceneActorAnimation_SelectDirectionalEntry((void *)actor, 3);
         actor->base.field2C2 = 64;
-        reaction = (void *)&actor->base.tracking.target;
+        reaction = &actor->base.tracking;
         Reaction_ClearMotion(reaction, ~0x18);
         word = &actor->base.statusFlags;
         Reaction_ClearWord(word, ~0x1000000);
@@ -103,8 +103,8 @@ void SceneActorReaction_UpdateTimedBurst(struct ChaseActor *actor)
         }
         HalfwordFlags_And(motion, ~0x400);
         actor->group.turn.turnsRemaining = -1;
-        Reaction_ClearRoute(flags, (void *)(group + 0x4C));
-        EffectGroup_Reset(group + 0xA8);
+        Reaction_ClearRoute(flags, &group->common.control);
+        EffectGroup_Reset(group->effectConfig);
         SceneActorEffects_EmitRandomOffsets(actor, 3, 2, 10, 20, 3600);
         Reaction_SetWord(flags, 0x2000000);
         {
@@ -116,7 +116,7 @@ void SceneActorReaction_UpdateTimedBurst(struct ChaseActor *actor)
                 Reaction_Palette(actor, actor->base.alternateOffset);
         }
     }
-    duration = *(u16 *)(group + 0x1FA);
+    duration = group->hitBurstInterval;
     if (duration * 2 == actor->base.hitLockTimer || duration == actor->base.hitLockTimer) {
         Reaction_SpawnPart(group);
         SceneActorChase_OrReactionFlags(actor, 0x20);
@@ -135,7 +135,7 @@ void SceneActorReaction_UpdateTimedBurst(struct ChaseActor *actor)
             SceneActorEffects_SpawnContactParts((void *)actor);
         SceneActorChase_AndMotionFlags(actor, ~0x2000);
         Chase_SetState(actor, 3, 1, 0);
-        Chase_SetCtl(actor, *(void **)(group + 0x210), 15);
+        Chase_SetCtl(actor, group->routeResumeControl, 15);
         actor->base.reactionDirection =
             (Reaction_ThirtySecond((MonsterInit_GetDirection(actor) + 128) & 255) + 7) & 7;
     } else {
