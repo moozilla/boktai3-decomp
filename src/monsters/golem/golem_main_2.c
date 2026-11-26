@@ -26,7 +26,7 @@ void Golem_UpdateRouteMotion(void);
 
 void Golem_CenterPositionInCell(struct ContactPosition *);
 
-void Golem_AlignChargeTarget(void *);
+s32 Golem_AlignChargeTarget(void *);
 
 s32 Math_Atan2(s32, s32);
 
@@ -442,13 +442,13 @@ static inline s32 CanCharge(void *ctx)
     u8 *body = ctx;
     u8 *pos = body + 0x50;
     u8 ready;
-    if (!*(void **)(body + 0xDC))
+    if (!((struct Golem *)body)->chase.base.tracking.target)
         return 0;
     ready = 0;
-    if (*(u16 *)(body + 0x1E6) == 0) {
-        if (*(u16 *)(body + 0x688) > 399)
+    if (((struct Golem *)body)->chase.base.paletteOffset == 0) {
+        if (((struct Golem *)body)->charge688 > 399)
             ready = 1;
-    } else if (*(u16 *)(body + 0x688) > 199)
+    } else if (((struct Golem *)body)->charge688 > 199)
         ready = 1;
     if (ready && *(u32 *)(body + 0xF0) < *(u32 *)(body + 0xF8) &&
         sub_0821D4F0(pos + 0xC, *(u8 **)(body + 0xDC) + 0xC, 10, 256))
@@ -982,7 +982,7 @@ static inline void GolemInit_InitializeBody(void *object, u32 *fill)
     group->common.bodyPosition = &arg0->chase.base.body.position;
 }
 
-void Golem_InitAnimationProfile(void *);
+void Golem_InitAnimationProfile(struct RoomActor *);
 
 void Golem_InitColliders(void *);
 
@@ -1072,7 +1072,7 @@ s32 Golem_Init(void *object)
     GolemInit_ResetFlags(arg0);
     SceneActorRegistry_SetObjectContext(actor, actor, 0, 1);
     MonsterInit_SetCategory(actor, MONSTER_CATEGORY_GOLEM);
-    Golem_InitAnimationProfile(actor);
+    Golem_InitAnimationProfile(&actor->chase.base);
     if (MonsterInit_GetDrawableKind(&actor->chase) == 0) {
         u8 *heap;
         actor->chase.base.drawable = Heap_Alloc(0x5C);
