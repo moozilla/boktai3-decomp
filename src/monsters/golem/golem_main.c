@@ -230,31 +230,18 @@ static inline u8 Test(u32 value, u32 mask)
     return 0;
 }
 
-struct SkeletonLink {
-    u8 filler[0x628];
-    u32 h628;
-};
-
-struct SkeletonActor {
-    u8 filler0[0xDC];
-    u32 h0DC;
-    u8 filler1[0x2D4 - 0xE0];
-    u16 flags;
-    u8 filler2[0x3D0 - 0x2D6];
-    struct SkeletonLink *t;
-};
-
-void Skeleton_TryTriggerAction(struct SkeletonActor *s)
+void Skeleton_TryTriggerAction(void *object)
 {
-    struct SkeletonLink *t = s->t;
+    struct ChaseActor *actor = object;
+    struct SceneActorRouteContext *context = actor->base.context;
     u32 mask;
 
     mask = 0x80000;
-    if (Test(t->h628, mask))
+    if (Test(context->flags628, mask))
         return;
 
     mask = 0x180;
-    if (!(mask & s->flags))
+    if (!(mask & actor->base.motionFlags))
         return;
 
     {
@@ -264,10 +251,10 @@ void Skeleton_TryTriggerAction(struct SkeletonActor *s)
             return;
     }
 
-    if (s->h0DC == 0)
+    if (!actor->base.tracking.target)
         return;
 
-    SceneActorRoute_CommitReachableDestination(s);
+    SceneActorRoute_CommitReachableDestination(actor);
 }
 
 extern const u8 gUnk_0824E274[];
