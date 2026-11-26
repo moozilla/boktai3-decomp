@@ -114,3 +114,17 @@ mask separately across nine hit-spark handlers. Each isolated fold still
 changed the ROM sequence, so those expressions remain in place.
 
 The coordinator validates the combined ROM during batch integration.
+
+
+## Resumed refinement
+
+The follow-up retained two direct field operations. Ghost's visibility
+transition (0809852C) reads the timer directly, and Spider's wander routine
+(080A4018) decrements its timer in place. Folding one retreat scale in
+Ghost (08096D38) and two individual reads in Lun (0809AE0C and 0809D2A8)
+removes three weighted constant uses. Folding the second Lun terrain clear
+still changes the zero pseudo's allocation. Spider's constructor (080A4AFC)
+keeps the addressable word consumed by the BIOS fixed-source fill in its
+widget and pursuit initialization. Separate and combined SDK wrapper
+substitutions change code generation. The linter annotation records that
+source operand. All three changed units passed their stock checks.
