@@ -61,6 +61,7 @@ static inline void Vorn_ResetStateEntry(struct ChaseActor *actor, u32 prepared)
 }
 union VornSpreadVector {
     struct ContactPackedVector bits;
+    struct ContactPosition position;
     u32 words[2];
 };
 /* Completes the defeat sequence, dispatches its script, and enters idle control. */
@@ -115,21 +116,21 @@ void Vorn_UpdateDefeat(struct ChaseActor *actor)
             SparkParticle_Spawn(
                 (origin = (const struct ContactPosition *)&actor->base.body.position),
                 Vorn_RandomSparkCount((const u16 *)workValue, cursor),
-                (const struct ContactPosition *)spread, 0x20, 4, 20, (sparkKind = 2), 1);
+                &spread->position, 0x20, 4, 20, (sparkKind = 2), 1);
             /* Keep the three shared spark values distinct through CSE. */
             sparkKind |= ((u32)actor & 255) >> 8;
             spread = (union VornSpreadVector *)((u32)spread + (((u32)actor & 31) >> 5));
             origin = (const struct ContactPosition *)((u32)origin + (((u32)actor & 127) >> 7));
             SparkParticle_Spawn(origin, Vorn_RandomSparkCount((const u16 *)workValue, cursor),
-                                (const struct ContactPosition *)spread, 0x40, 4, 20, sparkKind, 1);
+                                &spread->position, 0x40, 4, 20, sparkKind, 1);
             SparkParticle_Spawn(origin, Vorn_RandomSparkCount((const u16 *)workValue, cursor),
-                                (const struct ContactPosition *)spread, 0x5E, 4, 20, sparkKind, 1);
+                                &spread->position, 0x5E, 4, 20, sparkKind, 1);
             SparkParticle_Spawn(origin, Vorn_RandomSparkCount((const u16 *)workValue, cursor),
-                                (const struct ContactPosition *)spread, 0x80, 4, 20, sparkKind, 1);
+                                &spread->position, 0x80, 4, 20, sparkKind, 1);
             SparkParticle_Spawn(origin, Vorn_RandomSparkCount((const u16 *)workValue, cursor),
-                                (const struct ContactPosition *)spread, 0xC4, 4, 20, sparkKind, 1);
+                                &spread->position, 0xC4, 4, 20, sparkKind, 1);
             SparkParticle_Spawn(origin, Vorn_RandomSparkCount((const u16 *)workValue, cursor),
-                                (const struct ContactPosition *)spread, 0xF0, 4, 20, sparkKind, 1);
+                                &spread->position, 0xF0, 4, 20, sparkKind, 1);
         }
         category = actor->base.category;
         if (category == 4 || category == 1 || category == 5 || category == 7 || category == 6 ||
