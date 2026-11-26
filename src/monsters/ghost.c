@@ -898,7 +898,7 @@ static inline void Ghost_MakeRetreatOffset(struct ContactPosition *out, u32 angl
     s32 x, z;
     s32 speed = 728;
     u32 zero;
-    x = SceneRoute_ScaleComponent(gUnk_086149C4[(angle + 64) & 255] * speed);
+    x = SceneRoute_ScaleComponent(gUnk_086149C4[(angle + 64) & 255] * 728);
     zero = 0;
     GHOST_WRITE_COMPONENT(out, x, x);
     GHOST_SET_VERTICAL(out, zero);
@@ -1703,12 +1703,7 @@ void Ghost_TickVisibilityTransition(struct ChaseActor *input)
         u8 ignored = SceneActorControl_TestFlags(gEngineFlags, 0x4800);
         u32 counter;
         u32 value;
-        {
-
-            u16 *field;
-            field = &state->visibilityTimer;
-            counter = (u32)*field << 16;
-        }
+        counter = (u32)state->visibilityTimer << 16;
         value = counter >> 16;
         if (value <= 19) {
             if ((u8)(counter >> 18) & 1)
