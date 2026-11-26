@@ -127,6 +127,23 @@ void F(struct Owner *p, int n) {
         self.assertFalse(families.extension_of(shared | {(0, halfword, True)}, shared))
         self.assertFalse(families.extension_of(shared | {(1, halfword, False)}, shared))
 
+    def test_shared_probe_scope_defaults_to_all_records_and_accepts_named_headers(self):
+        headers = {
+            "include/a.h": "struct A { int value; };",
+            "include/b.h": "union B { int value; };",
+            "include/alias.h": "typedef int Alias;",
+            "src/internal.h": "struct Local { int value; };",
+        }
+        self.assertEqual([path for path, _ in families.shared_scan_inputs(headers, None)],
+                         ["include/a.h", "include/b.h"])
+        requested = [Path("include/alias.h"), ROOT / "include/alias.h", Path("include/b.h")]
+        self.assertEqual(families.shared_scan_inputs(headers, requested),
+                         [(path, headers[path]) for path in ("include/alias.h", "include/b.h")])
+        with self.assertRaisesRegex(ValueError, "below include/"):
+            families.shared_scan_inputs(headers, [Path("src/internal.h")])
+        with self.assertRaisesRegex(ValueError, "shared header not found"):
+            families.shared_scan_inputs(headers, [Path("include/missing.h")])
+
 
 @unittest.skipUnless(Path(lm.AGBCC).is_file(), "agbcc required for layout probes")
 class CompilerTests(unittest.TestCase):

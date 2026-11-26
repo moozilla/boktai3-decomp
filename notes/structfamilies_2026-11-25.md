@@ -66,3 +66,8 @@ On `src/grid_attack_actor.c`, three direct Clang preprocessing invocations took 
 versus 10.161 through `cc`, with identical output. The final whole-tree refresh with cached
 probes took 1 minute 42 seconds at two jobs. The nested-evidence refresh took 3 minutes
 1 second and ranked the newly discovered families as well.
+
+A focused two-unit SceneDistance scan took 55.59 seconds with all 444 shared headers in scope
+and 30.75 seconds with `--shared-header include/scene_vec.h`. Both runs found the same two
+private family IDs. The focused report records the selected header because it limits which
+shared layouts and embedded-type findings can appear.

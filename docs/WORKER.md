@@ -293,6 +293,10 @@ evidence before applying a family with only report-unit or shared-parameter supp
 Two supported parent declarations can provide evidence for a child family when both embed
 compatible private types in the same named member slot. Merge the child first if the parent
 preview reports a private type dependency, then rescan the parent units for their new layouts.
+For a focused rescan, pass the parent source paths and repeat `--shared-header include/PATH.h`
+for the known shared types. Write the focused catalog with `--out build/structfamilies/focus`
+and give its `families.json` to `structmerge.py --catalog`. The report identifies the restricted
+header scope.
 
 `build/venv/bin/python tools/structmerge.py FAMILY` previews the shared type and source
 proposals. Distinct ROM functions that load an offset vote on its width and extension. The type

@@ -158,18 +158,36 @@ def scan_header_batch(jobs):
     return [cached[job[0]] for job in jobs]
 
 
-def scan_tree(paths, jobs):
+def shared_scan_inputs(headers, requested):
+    if not requested:
+        return [(rel, text) for rel, text in sorted(headers.items())
+                if rel.startswith("include/") and inline_twins.RECORD.search(text)]
+    paths = set()
+    root = ROOT.resolve()
+    for name in requested:
+        path = (root / name).resolve()
+        if not path.is_relative_to(root / "include") or path.suffix != ".h":
+            raise ValueError(f"--shared-header must name a file below include/: {name}")
+        rel = path.relative_to(root).as_posix()
+        if rel not in headers:
+            raise ValueError(f"shared header not found: {rel}")
+        paths.add(rel)
+    return [(rel, headers[rel]) for rel in sorted(paths)]
+
+
+def scan_tree(paths, jobs, shared_headers=None):
     root = ROOT
     headers = {str(path.relative_to(root)): path.read_text(errors="replace")
                for area in ("include", "src") for path in (root / area).rglob("*.h")}
+    shared = shared_scan_inputs(headers, shared_headers)
     candidates = []
     for rel in keepcheck.src_files(paths):
         src = (root / rel).read_text(errors="replace")
         if inline_twins.RECORD.search(src) or ADDRESS_CANDIDATE.search(keepcheck.blank_comments(src)):
             candidates.append((rel, src))
-    shared = [(rel, text) for rel, text in sorted(headers.items())
-              if rel.startswith("include/") and inline_twins.RECORD.search(text)]
-    print(f"Scanning {len(candidates)} source units and {len(shared)} headers", file=sys.stderr, flush=True)
+    units = "unit" if len(candidates) == 1 else "units"
+    header = "header" if len(shared) == 1 else "headers"
+    print(f"Scanning {len(candidates)} source {units} and {len(shared)} shared {header}", file=sys.stderr, flush=True)
     stat = Path(lm.AGBCC).stat()
     key = hashlib.sha256(f"{stat.st_mtime_ns}:{stat.st_size}".encode())
     key.update(inspect.getsource(scan_file).encode())
@@ -643,6 +661,12 @@ def report_lines(catalog, limit):
            + ("Includes compiler-reported warnings." if catalog["compiler_warnings"] else
               "Compiler-reported warnings were disabled for this scan."))
     yield ""
+    if catalog.get("shared_headers"):
+        yield "The scan uses the selected shared headers for layout comparisons and embedded-type findings."
+        yield ""
+        for header in catalog["shared_headers"]:
+            yield f"- `{header}`"
+        yield ""
     yield "## Top families"
     yield ""
     yield "| Family | Copies | Bytes | Warnings | Priority |"
@@ -680,6 +704,7 @@ def select_family(catalog, query):
 def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("paths", nargs="*", help="source paths or directories; default all game units")
+    ap.add_argument("--shared-header", type=Path, action="append", help="limit shared probes to this header, repeatable")
     ap.add_argument("--out", type=Path, default=OUT)
     ap.add_argument("--limit", type=int, default=50)
     ap.add_argument("-j", type=int, default=2)
@@ -696,8 +721,13 @@ def main(argv=None):
         except (OSError, ValueError) as exc:
             ap.error(str(exc))
         return
-    scans = scan_tree(args.paths, args.j)
+    try:
+        scans = scan_tree(args.paths, args.j, args.shared_header)
+    except ValueError as exc:
+        ap.error(str(exc))
     catalog = make_catalog(scans, jobs=args.j, compiler=not args.no_compiler, rom=not args.no_rom)
+    if args.shared_header:
+        catalog["shared_headers"] = sorted({s["file"] for s in scans if s["file"].startswith("include/")})
     json_write(args.out / "families.json", catalog)
     report = args.out / "REPORT.md"
     report.write_text("\n".join(report_lines(catalog, args.limit)) + "\n")
