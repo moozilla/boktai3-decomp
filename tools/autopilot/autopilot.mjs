@@ -176,6 +176,7 @@ const GOALS = {
         const f = yield* L.fight({ trace: (e) => event({ skill: 'fight', ...e }) });
         event({ skill: 'fought', ...f, scene: L.where().scene });
         if (!(yield* untilControl(g, L, ready, 60, 30000))) { event({ skill: 'stop', why: 'no control after the fight', ...L.where() }); return !endpoint && rooms > 0; }
+        if (reached()) { rooms--; continue; }
       }
       const here = L.where().scene;
       if (L.purificationBattle()) {
@@ -296,6 +297,7 @@ const GOALS = {
         // on the second talk in 2370), again when the story counter moved
         const tkey = (t) => `${here}:talk:${t.key}:${L.story()}`;
         for (const t0 of targets.filter((t) => !TRIED.has(tkey(t)))) for (let round = 0; round < 2; round++) {
+          if (reached()) break;
           const t = t0;
           const story0 = L.story(), now = t.addr ? L.people().find((q) => q.addr === t.addr) : null;
           const r = yield* L.interact(now ? now.x : t.x, now ? now.z : t.z, { avoid: stageOf(here).doors.map((d) => d.box), trace: (e) => event({ skill: 'nav', ...e }) });
@@ -313,6 +315,7 @@ const GOALS = {
           if (L.where().scene !== here || !r.done || companion(t.key)) break;
         }
       }
+      if (reached()) { rooms--; continue; }
       // A key detour has a specific pickup. Other items can wait until the
       // detour ends, since the approach can consume life or change floors.
       if (keyGoal && L.hasItem(keyGoal.item)) keyGoal = undefined;
@@ -328,7 +331,7 @@ const GOALS = {
         if (c.reason === 'no path' || (c.reason === 'stopped' && !tooCostly())) TRIED.delete(`${here}:${it.x},${it.z}`);
         if (L.where().scene !== here || c.reason === 'stopped' || tooCostly()) break;
       }
-      if (L.where().scene !== here) { rooms--; continue; }
+      if (reached() || L.where().scene !== here) { rooms--; continue; }
       visited.add(here);
       if (prev !== undefined) visited.add(prev);
       if (keyGoal && L.hasItem(keyGoal.item)) keyGoal = undefined;
