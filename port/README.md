@@ -609,11 +609,13 @@ random index.
 Run one recording with `build/venv/bin/python port/tests/verify.py --case NAME`.
 For randomized input across the entire bank, run
 `build/venv/bin/python port/tests/verify.py --all --seed 1 --seed 2 --seed 3 --resume`.
-Use `--jobs 2` for two simultaneous comparisons. Add `--case CHECKPOINT` to
-select one save or use a fresh `--out-root` after
-rebuilding the wasm to keep the old comparisons. Results, movies and action logs
-are under `build/autopilot/`. Run `node tools/autopilot/tickdiff.mjs DIR FROM TO`
-to compare RAM around a failing tick.
+Use `--jobs 2` for two simultaneous comparisons or `--case CHECKPOINT` for one
+save. `--resume` skips successful cases when the result and its recorded inputs
+still match, including the wasm, ROM, saves and verifier files. It reruns failures
+and older results that lack this record. Use a fresh `--out-root` to keep results
+from multiple builds. Results, movies and action logs are under
+`build/autopilot/`. Run `node tools/autopilot/tickdiff.mjs DIR FROM TO` to compare
+RAM around a failing tick.
 
 To rerun the port against previously captured ROM ticks, pass the earlier output
 root to `--rom-reference` and select a separate `--out-root`. The verifier hashes

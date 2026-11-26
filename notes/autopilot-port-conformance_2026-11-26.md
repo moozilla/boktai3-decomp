@@ -47,3 +47,8 @@ full harness script and tick dump agree with the reference hashes. It invokes
 the emulator when any input changes or a capture is incomplete. Sealed Prison
 produced identical tick dumps in both modes, with the comparison taking
 18.4 seconds directly and 6.4 seconds with a reference on the worker.
+
+Bank sweeps record a checksum for each successful comparison. The runner
+checks the result, save, wasm, ROM and verifier inputs before skipping a
+case under `--resume`. Checkpoint 0022 seed 1 took 15.6 seconds with a saved
+ROM reference and 0.1 seconds when resuming the same comparison.

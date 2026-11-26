@@ -12,9 +12,11 @@ movie.json, harness.txt and named tick differences under build/autopilot.
 """
 import argparse
 from concurrent.futures import ThreadPoolExecutor
+import hashlib
 import json
 import os
 from pathlib import Path
+import shutil
 import signal
 import subprocess
 import sys
@@ -24,9 +26,54 @@ ROOT = Path(__file__).resolve().parents[2]
 FIXTURES = Path(__file__).with_name('verify-movies.json')
 
 
+def fingerprint(paths, *parameters):
+    key = hashlib.sha256(json.dumps(parameters).encode())
+    for path in paths:
+        key.update(os.fsencode(path) + b'\0')
+        try:
+            key.update(b'\1' + hashlib.sha256(path.read_bytes()).digest())
+        except FileNotFoundError:
+            key.update(b'\0')
+    return key.hexdigest()
+
+
+def sweep_fingerprint(harness, node):
+    paths = [
+        Path(__file__), ROOT / 'baserom.gba', harness,
+        ROOT / 'build/port/game/game.wasm',
+        ROOT / 'build/port/game/missing_returns.txt',
+        ROOT / 'build/port/agent/types.json',
+        ROOT / 'port/agent/gameapi.mjs', ROOT / 'port/agent/session.mjs',
+        ROOT / 'port/web/run-game.mjs', ROOT / 'tools/autopilot/stress.mjs',
+        *sorted((ROOT / 'port/agent/lib').glob('*.js')),
+        *sorted((ROOT / 'tools/autopilot/lib').glob('*.js')),
+        *sorted((ROOT / 'tools/autopilot/lib').glob('*.mjs')),
+    ]
+    node_stat = node.stat()
+    return fingerprint(paths, str(node), node_stat.st_mtime_ns, node_stat.st_size,
+                       os.environ.get('NODE_OPTIONS'), os.environ.get('NODE_PATH'))
+
+
+def result_stamp(identity, data):
+    return hashlib.sha256(identity.encode() + data).hexdigest() + '\n'
+
+
+def read_case_result(out, identity=None):
+    try:
+        data = (out / 'result.json').read_bytes()
+        if identity and (out / 'result.sha256').read_text() != result_stamp(identity, data):
+            return None
+        result = json.loads(data)
+    except (FileNotFoundError, ValueError):
+        return None
+    if isinstance(result, dict) and {'ticks', 'difference', 'fault'} <= result.keys():
+        return data, result
+
+
 def run_case(save, out, frames, seed, recording, rom_reference):
     out.mkdir(parents=True, exist_ok=True)
     (out / 'result.json').unlink(missing_ok=True)
+    (out / 'result.sha256').unlink(missing_ok=True)
     cmd = ['node', 'tools/autopilot/stress.mjs', '--save', str(save), '--out', str(out),
            '--frames', str(frames), '--seed', str(seed)]
     if recording:
@@ -55,7 +102,8 @@ def main():
     parser.add_argument('--rom-reference', type=Path,
                         help='reuse matching ROM samples from a previous output root')
     parser.add_argument('--all', action='store_true', help='fuzz every checkpoint for 2800 frames')
-    parser.add_argument('--resume', action='store_true', help='keep completed results from a bank sweep')
+    parser.add_argument('--resume', action='store_true',
+                        help='reuse matching sweep results with unchanged inputs')
     parser.add_argument('--case', help='run one named regression or checkpoint ID')
     parser.add_argument('--frames', type=int, default=2800)
     parser.add_argument('--seed', type=int, action='append',
@@ -78,8 +126,12 @@ def main():
         parser.error('build/port/game/game.wasm is missing. Run port/build_game.py first')
     if not (ROOT / 'build/port/agent/types.json').is_file():
         parser.error('build/port/agent/types.json is missing. Run port/agent/gametypes.py first')
-    if not os.environ.get('BOKTAI3_HARNESS') and not (ROOT / 'build/emu/harness').is_file():
+    harness = shutil.which(os.environ.get('BOKTAI3_HARNESS') or str(ROOT / 'build/emu/harness'))
+    if not harness:
         parser.error('build/emu/harness is missing. Run make -f tools/emu/Makefile build/emu/harness')
+    node = shutil.which('node')
+    if not node:
+        parser.error('node is required to run the port')
     bank = args.bank.resolve()
     if args.all:
         cases = [(p.stem, p.stem, None) for p in sorted(bank.glob('*.sav'))]
@@ -101,6 +153,7 @@ def main():
     if reference == base:
         parser.error('--rom-reference requires a separate --out-root')
     started = time.monotonic()
+    sweep = sweep_fingerprint(Path(harness).resolve(), Path(node).resolve()) if args.all else None
 
     def compare_case(item):
         seed, (name, checkpoint, recording) = item
@@ -109,14 +162,26 @@ def main():
         save = bank / f'{checkpoint}.sav'
         case_dir = Path(f'fuzz-{seed}-{args.frames}' if args.all else 'verify') / name
         out = base / case_dir
+        oracle = reference / case_dir if reference else None
         label = f'{name} seed {seed}' if args.all else name
-        result_path = out / 'result.json'
+        identity = None
+        if sweep:
+            paths = [save]
+            if oracle:
+                paths.extend(oracle / 'rom' / f for f in ('reference.json', 'ticks.bin'))
+            identity = fingerprint(paths, sweep, seed, args.frames)
         status = 0
-        if not args.resume or not result_path.is_file():
-            status = run_case(save, out, args.frames, seed, recording, reference and reference / case_dir)
-        if not result_path.is_file() and status == 0:
-            status = 1
-        result = json.loads(result_path.read_text()) if result_path.is_file() else {}
+        completed = read_case_result(out, identity) if args.resume else None
+        if completed is None:
+            status = run_case(save, out, args.frames, seed, recording, oracle)
+            completed = read_case_result(out)
+            if completed is None:
+                status = status or 1
+            elif identity and status == 0:
+                data, result = completed
+                if not result['difference'] and not result['fault']:
+                    (out / 'result.sha256').write_text(result_stamp(identity, data))
+        result = completed[1] if completed else {}
         difference = result.get('difference')
         fault = result.get('fault')
         if difference and 'tick' in difference:
