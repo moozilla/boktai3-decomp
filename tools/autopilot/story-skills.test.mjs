@@ -56,6 +56,19 @@ test('the best assigned gun frame uses Quick Change', () => {
     value: { kind: 'frame', id: 0, power: 10, cost: 3, done: true, method: 'quick change' } });
 });
 
+test('gun inventory navigation wraps past empty cells and honors the vertical option menu', () => {
+  const { gunGridRoute } = skill('gun', {});
+  const cells = Array(36).fill(0xff);
+  cells[0] = 0;
+  cells[3] = 6;
+  cells[19] = 19;
+  cells[32] = 32;
+  cells[34] = 39;
+  assert.deepEqual(gunGridRoute(cells, 0, 0, 19), ['up', 'left']);
+  assert.deepEqual(gunGridRoute(cells, 8, 2, 32, true), ['up']);
+  assert.equal(gunGridRoute(cells, 8, 2, 19, true), null);
+});
+
 test('game over waits for the continue choice and selects its left entry', () => {
   const { gameOverMenu } = skill('recovery', {});
   assert.equal(gameOverMenu.active({ closeState: 0 }), false);

@@ -51,6 +51,63 @@ exports.gunLoadout = () => {
   return frames;
 };
 
+// Hud_MoveGridUp/Down/Left/Right wraps each axis and skips empty cells.
+exports.gunGridRoute = (cells, x, y, target, verticalOnly = false) => {
+  const steps = [['up', 0, -1], ['down', 0, 1], ['left', -1, 0], ['right', 1, 0]];
+  const queue = [[x, y, []]], seen = new Set([x * 4 + y]);
+  for (const [x, y, path] of queue) {
+    const current = cells[x * 4 + y];
+    if (current === target) return path;
+    for (const [key, dx, dy] of verticalOnly ? steps.slice(0, 2) : steps) {
+      for (let n = 1; n < (dx ? 9 : 4); n++) {
+        const nx = (x + dx * n + 9) % 9, ny = (y + dy * n + 4) % 4;
+        const index = nx * 4 + ny, value = cells[index];
+        if (value === 0xff || value === current) continue;
+        if (!seen.has(index)) {
+          seen.add(index);
+          queue.push([nx, ny, [...path, key]]);
+        }
+        break;
+      }
+    }
+  }
+  return null;
+};
+
+function* setGunLoadout(best, worst) {
+  const field = exports.menuState()?.callback;
+  if (!field) return false;
+  const secondary = 'SceneHud_UpdateSecondaryActionSelection';
+  const action = 'SceneHud_UpdateActionGridInput';
+  const pulse = function* (key, delay = 14) { yield g.press(key, 2); yield g.press(0, delay); };
+  const select = function* (target, verticalOnly) {
+    // SceneInputGridView at SceneHudState.actionInput, followed by 36 cells.
+    const grid = exports.hudTask() + 0x4384;
+    const path = exports.gunGridRoute(g.bytes(grid + 12, 36), g.u8(grid + 1), g.u8(grid + 2), target, verticalOnly);
+    if (!path) return false;
+    for (const key of path) yield* pulse(key);
+    if (g.u8(grid + 3) !== target) return false;
+    yield* pulse('a');
+    return true;
+  };
+  const slotOf = (id) => {
+    const state = g.u32(g.types.globals.gGameState.addr);
+    for (let i = 0; i < 12; i++) if (g.u16(state + 0x4c0 + i * 2) === id + 1) return i;
+    return -1;
+  };
+  const bestSlot = slotOf(best), worstSlot = worst === undefined ? null : slotOf(worst);
+  if (bestSlot < 0 || worstSlot === -1) return false;
+  yield* pulse('start', 60);
+  for (let i = 0; i < 8 && exports.menuState()?.sub !== secondary; i++) yield* pulse('r', 40);
+  if (exports.menuState()?.sub !== secondary || !(yield* select(32, true))) return false;
+  if (exports.menuState()?.sub !== action) return false;
+  // The frame grid's cells 8–19 map to the twelve unlock inventory slots.
+  if (worstSlot !== null && (!(yield* select(8 + worstSlot, false)) || exports.gunLoadout().includes(worst))) return false;
+  if (!(yield* select(8 + bestSlot, false)) || exports.weapon().frame !== best) return false;
+  for (let i = 0; i < 3 && exports.menuState()?.callback !== field; i++) yield* pulse('b', 35);
+  return exports.menuState()?.callback === field;
+}
+
 exports.equipBestFrame = function* () {
   const active = exports.weapon(), owned = exports.bags().frames;
   if (owned.length < 2 || !active.gun) return null;
@@ -62,16 +119,12 @@ exports.equipBestFrame = function* () {
     const result = yield* exports.quickChange({ gun: true, frame: best.id });
     return { ...details, ...result, method: 'quick change' };
   }
-  const session = exports.session, root = session.snapshot(), options = { page: 3, max: 120 };
-  let result = { done: true };
-  if (assigned.length === 8) {
-    const worst = exports.rankGunFrames(assigned, active.lens).at(-1);
-    result = yield* exports.menuSearch(() => !exports.gunLoadout().includes(worst.id), options);
-  }
-  if (result.done) result = yield* exports.menuSearch(() => exports.weapon().frame === best.id, options);
-  if (!result.done) {
+  const session = exports.session, root = session.snapshot(), start = g.frameNo;
+  const worst = assigned.length === 8 ? exports.rankGunFrames(assigned, active.lens).at(-1)?.id : undefined;
+  const done = yield* setGunLoadout(best.id, worst);
+  if (!done) {
     session.restore(root);
     yield g.press(0, 1);
   }
-  return { ...details, ...result, method: 'pause menu' };
+  return { ...details, done, frames: g.frameNo - start, method: 'pause menu' };
 };
