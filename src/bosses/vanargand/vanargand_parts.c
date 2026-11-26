@@ -1541,37 +1541,17 @@ void PairedSceneActor_UpdateHalves(struct VanargandAttackPair *actor)
 
 void Vanargand_DestroyPartController(struct VanargandAttackPair *controller)
 {
-    struct PairedHalfTarget *node;
-    u8 *shadow;
-    struct ContactCollider *collider;
-    struct ContactSwarmSprite *sprite;
     s32 i;
     Anim_Remove(&controller->animSprite);
-    node = &controller->halves[0].target;
-    shadow = controller->halves[0].shadow;
-    collider = &controller->halves[0].damageCollider;
-    sprite = &controller->halves[0].sprite;
-    i = 1;
-    do {
-        Collider_Remove(collider);
-        if (sprite->unknown4[0])
-            Sprite_Remove(sprite);
-        ScaledShadow_Destroy(shadow);
-        SceneLink_RemoveNode(node);
-        {
-            union VanargandPartStride {
-                u32 bytes;
-            } stride = {sizeof(struct PairedSceneHalf)};
-            node = (struct PairedHalfTarget *)((u8 *)node + stride.bytes);
-            shadow += stride.bytes;
-            collider = (struct ContactCollider *)((u8 *)collider + stride.bytes);
-            sprite = (struct ContactSwarmSprite *)((u8 *)sprite + stride.bytes);
-        }
-    } while (--i >= 0);
-    {
-        u32 zero = 0;
-        gVanargandPartController = (void *)zero;
+    for (i = 0; i < 2; i++) {
+        struct PairedSceneHalf *half = &controller->halves[i];
+        Collider_Remove(&half->damageCollider);
+        if (half->sprite.unknown4[0])
+            Sprite_Remove(&half->sprite);
+        ScaledShadow_Destroy(half->shadow);
+        SceneLink_RemoveNode(&half->target);
     }
+    gVanargandPartController = NULL;
 }
 
 void *ScriptProc_Start(u16, u16);
