@@ -7,6 +7,7 @@
 #include "monsters/skeleton/skeleton.h"
 #include "scene/actor/scene_actor_reaction.h"
 #include "scene/motion/scene_actor_terrain.h"
+#include "scene/motion/scene_actor_route.h"
 #include "player/player.h"
 #include "scene/actor/scene_actor_visibility.h"
 #include "scene/actor/scene_actor_control_helpers.h"
@@ -464,7 +465,6 @@ void SceneActorReaction_ResetResponseState(void *, const void *, u32);
 
 void SceneActorMovement_ResolveRoutePosition(void *);
 
-u8 SceneActorRoute_IsOutsidePointBounds(void *, void *, u32, u32);
 
 static inline void clearRouteFlag(u32 *flags)
 {
@@ -513,7 +513,7 @@ void Skeleton_ResetRouteReaction(struct ChaseActor *actor)
     actor->group.turn.turnsRemaining = 255;
     SceneActorMovement_ResolveRoutePosition(actor);
     SceneActorAnimation_SelectDirectionalEntry(actor, 0);
-    if (SceneActorRoute_IsOutsidePointBounds(&actor->group.homeRoute, &actor->base.body.position,
+    if ((u8)SceneActorRoute_IsOutsidePointBounds((struct SceneActorRouteCursor *)&actor->group.homeRoute, &actor->base.body.position,
                                              32, 32))
         Chase_SetBehavior(actor, 2);
     else
@@ -1715,25 +1715,17 @@ void Skeleton_SelectDistanceReaction(struct Skeleton *actor)
 
 u8 *Path_GetPointData(u8 *);
 
-struct S080B8A58 {
-    u8 pad0[2];
-    u8 index;
-    u8 unk3;
-    u8 *data;
-    u8 *entry;
-};
-
-void Skeleton_SelectRandomBehavior(u8 *owner)
+void Skeleton_SelectRandomBehavior(struct ChaseActor *actor)
 {
-    struct S080B8A58 *p = (struct S080B8A58 *)(owner + 0x448);
+    struct SceneActorRouteCursor *p = (void *)&actor->group.homeRoute;
 
     u8 n;
-    n = Mod(FallingObject_Random(), *p->data);
-    if (n == p->index)
-        n = Mod(n + 1, *p->data);
-    p->index = n;
-    p->unk3 = 0;
-    p->entry = Path_GetPointData(p->data) + p->index * 8;
+    n = Mod(FallingObject_Random(), p->definition->pointCount);
+    if (n == p->pointIndex)
+        n = Mod(n + 1, p->definition->pointCount);
+    p->pointIndex = n;
+    p->unknown3 = 0;
+    p->point = (struct SceneActorRoutePoint *)Path_GetPointData((void *)p->definition) + p->pointIndex;
 }
 
 void SceneActorScript_ReadCallScriptConfig(struct ChaseActor *actor)
@@ -2018,11 +2010,8 @@ void SceneActor_TryForward(void *a, void *b, struct ChaseActor *actor)
     struct SceneActorScriptPropertiesView *state = actor->base.context;
     if (SceneActor_ActionsBlocked(actor))
         return;
-    if (Test(StateFlag(state, 0x10), ~0)) {
-        actor->base.context++;
-        actor->base.context--;
+    if (Test(StateFlag(state, 0x10), ~0))
         return;
-    }
     if (state->active6D0)
         return;
     SceneActorReaction_HandleColliderContact(a, b, actor);
