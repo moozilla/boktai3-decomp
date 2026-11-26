@@ -121,6 +121,7 @@ export async function openSession(opts = {}) {
   Object.defineProperties(session, {
     g: { get: () => g }, frame: { get: () => frameNo }, movie: { get: () => movie },
     exports: { get: () => ex }, memory: { get: () => memory },
+    solar: { get: () => solar },
     solarLog: { get: () => [...solarAt].sort((a, b) => a[0] - b[0]).filter(([f]) => f < movie.length) },
   });
   Object.assign(session, {
@@ -149,7 +150,7 @@ export async function openSession(opts = {}) {
       const parts = [[s, new Uint8Array(memory.buffer.slice(s, STACK_TOP))], [d0, new Uint8Array(memory.buffer.slice(d0, d1))]];
       for (const [a, n] of REGIONS) parts.push([a, new Uint8Array(memory.buffer.slice(a, a + n))]);
       // the movie itself, not just its length: another branch may have overwritten it
-      return { frame: frameNo, sp: s, parts, movie: movie.length, keys: movie.slice(), solar };
+      return { frame: frameNo, sp: s, parts, movie: movie.length, keys: movie.slice(), solar, solarAt: new Map(solarAt) };
     },
     restore(snap) {
       if (snap.sp !== sp()) throw new Error(`restore at a different stack depth (sp ${sp()} vs ${snap.sp})`);
@@ -158,12 +159,19 @@ export async function openSession(opts = {}) {
       movie.length = 0;
       for (let i = 0; i < snap.movie; i++) movie.push(snap.keys[i]);
       frameNo = snap.frame;
-      for (const f of [...solarAt.keys()]) if (f > snap.frame) solarAt.delete(f);
-      if (snap.solar !== solar) session.setSolar(snap.solar);
+      solar = snap.solar;
+      solarAt.clear();
+      for (const [f, v] of snap.solarAt) solarAt.set(f, v);
       g.refresh();  // hooks set since the snapshot
     },
     setRender(on) { render = !!on; if (ex && ex.port_video_set_enabled) ex.port_video_set_enabled(render ? 1 : 0); },
-    setSolar(v) { solar = v; ex.port_game_set_solar(v); solarAt.set(frameNo, v); },
+    setSolar(v) {
+      if (!Number.isInteger(v) || v < 0 || v > 255) throw new RangeError('solar threshold must be an integer from 0 to 255');
+      if (v === solar) return;
+      solar = v;
+      ex.port_game_set_solar(v);
+      solarAt.set(frameNo, v);
+    },
     pixels() { return new Uint16Array(memory.buffer, lastPixels, 240 * 160).slice(); },
     keyMask,
   });

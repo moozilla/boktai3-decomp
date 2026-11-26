@@ -168,7 +168,7 @@ const GOALS = {
             event({ skill: 'menu', goal: `lens ${way.name}`, ...m });
             qc = yield* L.quickChange({ gun: true, lens: way.id });
           }
-          const ch = yield* L.chargeEnergy(6, { lux: 0, restore: 232 });
+          const ch = yield* L.chargeEnergy(6);
           event({ skill: 'equip', ...way, quickChange: qc, charge: ch });
           const changed = () => { const b = L.breakables().find((x) => x.id === live.id); return !b || b.state !== live.state; };
           let r = { done: false };
@@ -267,13 +267,14 @@ const GOALS = {
   // With --from: nothing more (to verify, cover and save states for an earlier run).
   *replay(g) { yield 1; return true; },
 
-  // With --from: hold --keys (default none) for --frames frames, logging scene changes
-  // and life every 300 frames (to see what a section does on its own).
+  // With --from: hold --keys (default none) for --frames frames, optionally
+  // changing the raw solar threshold with --lux, and log live state.
   *hold(g, L) {
     const keys = opt('--keys', '') || 0, n = +opt('--frames', 3000);
+    if (opt('--lux') !== undefined) s.setSolar(+opt('--lux'));
     for (let i = 0; i < n; i += 300) {
-      yield g.press(keys, 300);
-      event({ skill: 'hold', keys, ...L.where(), story: L.story() });
+      yield g.press(keys, Math.min(300, n - i));
+      event({ skill: 'hold', keys, ...L.where(), story: L.story(), solar: L.solarStatus() });
     }
     return true;
   },
@@ -435,7 +436,10 @@ const ok = s.run(function* (g) {
   return reached;
 });
 const secs = (performance.now() - t0) / 1000;
-const end = s.run(function* (g) { const w = g.lib.where(); return { scene: w.scene, x: w.x, y: w.y, z: w.z }; });
+const end = s.run(function* (g) {
+  const w = g.lib.where();
+  return { scene: w.scene, x: w.x, y: w.y, z: w.z, ...(s.solarLog.length ? { solar: g.lib.solarStatus() } : {}) };
+});
 
 const movie = s.movie.map((k) => k | 0);
 const readFrames = [];
@@ -495,7 +499,10 @@ function verify(end) {
   const players = s.types.globals.gPlayers.addr, p = rd(players, 4);
   const pos = p ? { x: rd(p + 0x30, 2), y: rd(p + 0x32, 2), z: rd(p + 0x34, 2) } : {};
   const rom = { scene, ...pos };
-  const same = rom.scene === end.scene && rom.x === end.x && rom.z === end.z;
+  if (end.solar) rom.solar = { measurement: rd(s.types.globals.gSolarMeasurement.addr, 4) | 0,
+    intensity: gs ? rd(gs + 0x874, 2) : 0, level: gs ? rd(gs + 0x876, 2) : 0 };
+  const same = rom.scene === end.scene && rom.x === end.x && rom.z === end.z &&
+    (!end.solar || (rom.solar.intensity === end.solar.intensity && rom.solar.level === end.solar.level));
   console.log(`verify on ROM: ${same ? 'MATCH' : 'DIFFER'} rom ${JSON.stringify(rom)} port ${JSON.stringify(end)}${warn.length ? ' ' + warn.join('; ') : ''}`);
   if (args.includes('--coverage')) coverage(path.join(dir, 'total.exec'));
   for (const f of fs.readdirSync(dir)) if (/^total\./.test(f)) fs.rmSync(path.join(dir, f));

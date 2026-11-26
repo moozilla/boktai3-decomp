@@ -465,19 +465,6 @@ exports.quickChange = function* (want) {
   return { done: false, ...exports.weapon() };
 };
 
-// Wait for energy in sunlight (src/fn/sub_0804E618.c: the area effect adds gGameState->unk876,
-// the sun level, per frame; 120 make one energy). The light is the solar sensor (session
-// setSolar: 0 bright .. 255 dark), written into the ROM script as `lux` lines.
-exports.chargeEnergy = function* (need, opts = {}) {
-  const session = exports.session, before = exports.weapon().energy;
-  if (before >= need) return { done: true, energy: before };
-  if (session && opts.lux !== undefined) session.setSolar(opts.lux);
-  let t = 0;
-  for (; t < (opts.frames ?? 3600) && exports.weapon().energy < need; t += 30) yield g.press(0, 30);
-  if (session && opts.restore !== undefined) session.setSolar(opts.restore);
-  return { done: exports.weapon().energy >= need, energy: exports.weapon().energy, before, frames: t };
-};
-
 // The pause menu (START) lives in the field HUD task (Hud_UpdateWithCallback,
 // src/fn/sub_08178B98.c): its state is the callback at +0xA50 (SceneHud_UpdatePageInput,
 // PauseMenu_UpdateItemActions, ...), the page at +0x1414 (1 items, 2 valuables, ...), the
