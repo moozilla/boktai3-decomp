@@ -80,7 +80,7 @@ const TRIED = new Set(from && from.tried ? from.tried : []);  // floor items alr
 const VISITED = new Set(from ? [...(from.visited || []), ...(from.rooms || []).map((r) => r.scene)] : []);
 let landingDetour;
 const event = (what) => {
-  const e = { frame: s.frame, ...what };
+  const e = { ...what, frame: s.frame };
   log.push(e);
   console.log(JSON.stringify(e));
   if (e.skill === 'entry' || e.skill === 'room' || e.skill === 'goal')
@@ -170,7 +170,9 @@ const GOALS = {
         return resolve ? L.doorBranches(portals, (d) => d.box) : portals;
       };
       const ready = () => reached() || L.purificationPanel() || L.purificationBattle() || doorsHere(false).length > 0 || L.fightTargets().length > 0;
-      if (!(yield* untilControl(g, L, ready, 120, 30000))) { event({ skill: 'stop', why: 'no control with a door or enemy in 30000 frames', ...L.where() }); return !endpoint && rooms > 0; }
+      const resumeBattle = rooms === 0 && from?.end?.scene === L.where().scene && L.where().life > 0 &&
+        !L.message().open && !L.activeMenu() && !g.fn.ScriptUtility_IsControlFlagSet() && bossActive();
+      if (!resumeBattle && !(yield* untilControl(g, L, ready, 120, 30000))) { event({ skill: 'stop', why: 'no control with a door or enemy in 30000 frames', ...L.where() }); return !endpoint && rooms > 0; }
       event({ skill: 'entry', ...L.where(), story: L.story() });
       if (reached()) {
         event({ skill: 'goal', reached: reachedScene() ? `scene ${destination}` : `story ${storyGoal}`, ...L.where(), story: L.story() });

@@ -781,7 +781,7 @@ exports.fightTargets = () => {
 };
 
 exports.fight = function* (opts = {}) {
-  const S = exports.session, p = $.gPlayers[0], start = g.frameNo, scene = exports.where().scene;
+  const S = exports.session, p = $.gPlayers[0], start = S.frame, scene = exports.where().scene;
   const DIRS8 = ['up', 'down', 'left', 'right', 'up+left', 'up+right', 'down+left', 'down+right'];
   const progress = new Map(), living = exports.fightTargets, triedOtherWeapon = new Set();
   const initialGun = exports.weapon().gun;
@@ -795,7 +795,7 @@ exports.fight = function* (opts = {}) {
   };
   const life = () => $.gPlayers[0]?.currentStatA ?? 0;
   let steps = 0, interruptions = 0;
-  while (exports.where().scene === scene && p && life() > 0 && living().length && g.frameNo - start < (opts.frames ?? 6000)) {
+  while (exports.where().scene === scene && p && life() > 0 && living().length && S.frame - start < (opts.frames ?? 6000)) {
     if (yield* exports.clearInterruptions(opts)) {
       interruptions++;
       continue;
@@ -841,8 +841,7 @@ exports.fight = function* (opts = {}) {
         if (changed) continue;
       }
     }
-    if (target.boss === 'Hresvelgr' && !pr.triedFreeGun && !transformed &&
-        (weapon.energy < (frame?.cost ?? 3) || steps - pr.since >= 8)) {
+    if (target.boss === 'Hresvelgr' && !pr.triedFreeGun && !transformed && weapon.energy < (frame?.cost ?? 3)) {
       pr.triedFreeGun = true;
       const equip = yield* exports.equipEnergyFreeGun();
       if (equip && opts.trace) opts.trace({ equip, target: target.addr });
@@ -924,5 +923,5 @@ exports.fight = function* (opts = {}) {
   S.setSolar(initialLight);
   if (exports.where().scene === scene && life() > 0 && exports.weapon().gun !== initialGun)
     yield* exports.quickChange({ gun: initialGun });
-  return { won: exports.where().scene === scene && life() > 0 && !living().length, life: life(), frames: g.frameNo - start, steps };
+  return { won: exports.where().scene === scene && life() > 0 && !living().length, life: life(), frames: S.frame - start, steps };
 };
