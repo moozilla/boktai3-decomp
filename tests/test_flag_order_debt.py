@@ -79,3 +79,15 @@ class FlagDebt(unittest.TestCase):
             self.assertEqual(len(c.literal_argument_sites("src/b.c", call, self.root, headers=headers)), 1)
         (self.root / "include/flags.h").write_text("static inline int Test(unsigned *p, unsigned m) { return *p + m; }")
         self.assertEqual(c.literal_argument_sites("src/b.c", call, self.root), [])
+
+    def test_filtered_cli_skips_global_macro_inventory(self):
+        import contextlib
+        import io
+        from unittest.mock import patch
+        source = self.root / "src/a.c"
+        source.write_text("int f(int x) { int m = 4; return x & m; }")
+        stderr = io.StringIO()
+        with contextlib.redirect_stderr(stderr), patch("statement_macros.single_use_names",
+                                                      side_effect=AssertionError("unrelated corpus scan")):
+            self.assertEqual(c.main(["--no-compiler", "--kind", "literal-local", "--summary", str(source)]), 0)
+        self.assertIn("1 warnings in 1 files", stderr.getvalue())

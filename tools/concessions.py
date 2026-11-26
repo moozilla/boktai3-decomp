@@ -542,7 +542,7 @@ def cflags(text: str, path=None) -> Site | None:
     return Site(line, "cflags", is_library(path) or "cflags" in allows(text).get(line, {}))
 
 
-def compiler_sites(path, text=None) -> list[Site]:
+def compiler_sites(path, text=None, *, events=None) -> list[Site]:
     """The dead-code and proved-zero sites on PATH's own lines (a unit under src/), from the
     instrumented compiler. Empty for headers and when the compiler isn't built.
 
@@ -556,7 +556,9 @@ def compiler_sites(path, text=None) -> list[Site]:
     if text is None:
         text = open(os.path.join(deadcode.ROOT, rel), errors="replace").read()
     ok = allows(text)
-    seen = {(line, kind) for kind, file, line, _, _ in deadcode.unit(rel) if file == rel}
+    if events is None:
+        events = deadcode.unit(rel)
+    seen = {(line, kind) for kind, file, line, _, _ in events if file == rel}
     code = strip(text)
     for guard in _NARROW_NEGATIVE_ASSIGNMENT.finditer(code):
         seen.add((_line(code, guard.start("assignment")), "dead-code"))
@@ -1012,31 +1014,38 @@ def main(argv=None) -> int:
     ap.add_argument("--no-compiler", action="store_true", help="skip dead-code and proved-zero (no compiles)")
     args = ap.parse_args(argv)
     from statement_macros import single_use_names
-    once = frozenset(single_use_names(root))
+    once = None if args.kind and "single-use-macro" not in args.kind else single_use_names(root)
     files = []
     for p in args.paths or [root / "src", root / "include"]:
         p = Path(p)
         files += sorted([*p.rglob("*.c"), *p.rglob("*.h")]) if p.is_dir() else [p]
+    paths = {}
+    for path in files:
+        absolute = path.resolve()
+        paths[path] = absolute.relative_to(root) if absolute.is_relative_to(root) else absolute
+    events = {}
     import deadcode
     use_compiler = not args.no_compiler
     if use_compiler and not deadcode.available():
         sys.exit("dead-code and proved-zero need scope's compiler: sh tools/scope/build_agbcc.sh (or pass --no-compiler)")
     if use_compiler:  # compile in parallel up front; the loop below reads the cache
         from concurrent.futures import ThreadPoolExecutor
-        units = [str(f.resolve().relative_to(root)) for f in files
-                 if f.suffix == ".c" and f.resolve().is_relative_to(root) and not is_library(f.resolve().relative_to(root))]
+        units = [str(rel) for f, rel in paths.items()
+                 if f.suffix == ".c" and not rel.is_absolute() and not is_library(rel)]
         with ThreadPoolExecutor(args.jobs) as pool:
-            list(pool.map(deadcode.unit, units))
+            events = dict(zip(units, pool.map(deadcode.unit, units)))
     use_tree = not args.errors_only and (not args.kind or any(k in TREE for k in args.kind))
     headers = {}
     totals: dict[str, int] = {}
     for f in files:
         text = f.read_text(errors="replace")
-        rel = f.resolve().relative_to(root) if f.resolve().is_relative_to(root) else f
+        rel = paths[f]
+        if once is None and "single-use-macro" in text and "concession-ok" in text:
+            once = single_use_names(root)
         lines = text.splitlines()
-        found = sites(text, rel, single_use=once)
+        found = sites(text, rel, single_use=once or frozenset())
         flags = cflags(text, rel)
-        compiled = compiler_sites(rel, text) if use_compiler else None
+        compiled = compiler_sites(rel, text, events=events.get(str(rel), ())) if use_compiler else None
         params = literal_argument_sites(rel, text, root, headers=headers) if use_tree else None
         for s in sorted(found + (compiled or []) + (params or []), key=lambda s: (s.line, s.kind)) \
                 + ([flags] if flags else []):
@@ -1051,7 +1060,7 @@ def main(argv=None) -> int:
                       f"{lines[s.line - 1].strip()[:100] if 0 < s.line <= len(lines) else ''}"
                       + (f"  ({s.note})" if s.note else "")
                       + (f"  ({s.weight} uses)" if s.weight > 1 else ""))
-        for problem in lint(text, rel, single_use=once, compiler=compiled if f.suffix == ".c" else None, tree=_annotation_sites(rel, text, params)):
+        for problem in lint(text, rel, single_use=once or frozenset(), compiler=compiled if f.suffix == ".c" else None, tree=_annotation_sites(rel, text, params)):
             totals["bad-ignore"] = totals.get("bad-ignore", 0) + 1
             if not args.summary:
                 print(f"{problem.split(': ', 1)[0]}: error [bad-ignore] {problem.split(': ', 1)[1]}")
