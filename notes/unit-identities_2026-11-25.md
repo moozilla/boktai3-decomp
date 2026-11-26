@@ -499,6 +499,17 @@ Earth advances this root to `AnimatedMarker_BeginActive` at frame 2042.
 Compare the flat root in `shot5.png` with the full-grown one in
 `earth4.png`. Place the unit at `src/objects/solar_roots`.
 
+### Pirate Island deck cannons
+
+The `cannon_battery` unit places and updates banks of deck guns. Stock
+0045/4906 renders the cannons while `CannonBattery_UpdateCannon` runs.
+See `build/identify/replays/nidhoggr-ship/fire.png`. The 0051 warp to
+4859 also records `CannonBattery_CreateCannon`, `CannonBattery_InitCannon`,
+and `CannonBattery_UpdateCannon` with the guns visible in
+`build/identify/targets/grid-magic-cannon/action.png`. Procs 4860 and 4905
+create the 55E9 battery manager. Otenko calls these the cannons around the
+helm in text #7463. Place the pooled cannon unit at `src/objects/deck_cannons`.
+
 The story order is Count → Hresvelgr → Sabata → Nidhoggr → Ratatosk →
 Vanargand after the opening dream. The table records each arena and the
 reached functions. Stock 0023 reloads Hresvelgr in 3588. Move `UP+RIGHT`
