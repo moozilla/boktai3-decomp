@@ -93,15 +93,19 @@ exports.MENUS = MENUS;
 // The known menu whose task is alive: { name, task, view } or null.
 exports.activeMenu = () => {
   for (const t of exports.tasks()) {
-    if (t.dead || !MENUS[t.update]) continue;
-    const spec = MENUS[t.update], a = Number(t.task);
-    return { name: t.update, task: a, id: t.id, view: spec.struct ? g.at(a, spec.struct) : spec.view(a) };
+    if (t.dead) continue;
+    const spec = t.update === 'GameOver_OnUpdate' ? exports.gameOverMenu : MENUS[t.update];
+    if (!spec) continue;
+    const task = Number(t.task), view = spec.struct ? g.at(task, spec.struct) : spec.view(task);
+    if (spec.active && !spec.active(view)) continue;
+    return { name: t.update, task, id: t.id, view, spec };
   }
   return null;
 };
 
 function alive(m) {
-  return exports.tasks().some((t) => !t.dead && Number(t.task) === m.task && t.id === m.id && t.update === m.name);
+  return exports.tasks().some((t) => !t.dead && Number(t.task) === m.task && t.id === m.id && t.update === m.name) &&
+    (!m.spec.active || m.spec.active(m.view));
 }
 
 // Drive the active menu until its task ends. Presses one key for one frame, then
@@ -114,7 +118,7 @@ function alive(m) {
 exports.menuStep = function* (policy = {}, max = 1800, slack = 2) {
   const m = exports.activeMenu();
   if (!m) return null;
-  const spec = MENUS[m.name], start = g.frameNo, keys = [];
+  const spec = m.spec, start = g.frameNo, keys = [];
   let calls = 0, readyFor = 0;
   const hook = g.on(m.name, (args) => { if ((args[0] >>> 0) === m.task) calls++; });
   try {
