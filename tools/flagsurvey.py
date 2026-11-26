@@ -4,7 +4,7 @@ urvey which translation units change when agbcc gets extra flags.
 
   flagsurvey.py FORK_AGBCC OUT.json
 
-Compiles every src/*.c and src/fn/*.c (and the NONMATCHING branch where present) with the
+Compiles every game C file under src/ (and the NONMATCHING branch where present) with the
 pinned agbcc and with FORK_AGBCC under each flag set, and records whether the assembly
 is identical to the pinned compiler's. A matched unit that changes would stop matching;
 a NONMATCHING one that changes is a candidate to re-check with tools/check.py. Built for

@@ -29,7 +29,7 @@ registers and immediates abstracted, i.e. what a C change has to fix.
 import argparse
 import difflib
 import glob
-from source_layout import manifest, new_source
+from source_layout import manifest, new_source, source_paths
 import json
 import os
 import random
@@ -739,7 +739,7 @@ def parse_result(func):
 
 
 def unit_with_placeholder(func):
-    for p in glob.glob(os.path.join(ROOT, "src", "*.c")):
+    for p in source_paths(ROOT):
         if re.search(rf'INCLUDE_ASM\("asm/nonmatching", {func}\);', open(p).read()):
             return p
     return None

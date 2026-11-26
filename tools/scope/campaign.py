@@ -149,7 +149,7 @@ puts the result in the tree. Other agents are using it right now on other functi
 Read tools/scope/README.md, tools/scope/WORKER.md and `python3 tools/scope/scope.py --help`, then the code
 (tools/scope/scope.py, land.py, structure.py, fast.py, campaign.py, agbcc.patch). Use it yourself on real
 functions: pick two from `python3 tools/scope/scope.py todo 300` near the end of the list and one existing
-draft (grep -l NONMATCHING src/*.c), work them in build/scope/campaign/review/ with SCOPE_RUN=review, and
+draft (rg -l NONMATCHING src -g "*.c"), work them in build/scope/campaign/review/ with SCOPE_RUN=review, and
 note every point where the tool slowed you down, misled you, or left you guessing.
 
 Write build/scope/campaign/review/REVIEW.md, kept current as you go (rewrite it, do not only append):

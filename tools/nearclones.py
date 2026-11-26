@@ -11,7 +11,7 @@ whose instruction-trigram overlap is at least 0.5; they are ranked by
 difflib's ratio. Interior labels (disassembler starts the inventory does not list) are skipped.
 
 Each row shows where the unmatched function lives: "asm" (no C yet), "unit
-FILE" (an INCLUDE_ASM in a src/*.c unit), or "draft N%" (a NONMATCHING draft
+FILE" (an INCLUDE_ASM in a C unit), or "draft N%" (a NONMATCHING draft
 and its recorded fuzzy score). Rows are sorted by the gap between the best
 sibling's ratio and the draft's score: an old draft written without the
 sibling often scores well below what porting the sibling's C reaches, so the
@@ -22,12 +22,11 @@ spelling, structs with the new offsets) and fixing what check.py reports;
 import argparse
 import collections
 import difflib
-import glob
-import os
 import re
 
 import clones
 from romlib import ROOT
+from source_layout import source_paths
 from split import function_nonentries
 from worklist import done_names
 
@@ -39,9 +38,9 @@ FUZZY = re.compile(r"fuzzy:\s*([\d.]+)%")
 def locations():
     """function name -> "draft N%" / "unit FILE" for every INCLUDE_ASM placeholder"""
     where = {}
-    for path in glob.glob(os.path.join(ROOT, "src", "**", "*.c"), recursive=True):
-        text = open(path).read()
-        rel = os.path.relpath(path, ROOT)
+    for path in source_paths(ROOT):
+        text = path.read_text()
+        rel = path.relative_to(ROOT).as_posix()
         for m in INCLUDE.finditer(text):
             name = m.group(1)
             block = text.rfind("#ifdef NONMATCHING", 0, m.start())
@@ -50,7 +49,7 @@ def locations():
             fuzzy = FUZZY.search(text, block, m.start()) if block >= 0 else None
             if fuzzy:
                 where[name] = f"draft {float(fuzzy.group(1)):.1f}%"
-            elif rel.startswith(os.path.join("src", "fn")):
+            elif block >= 0:
                 where[name] = "draft ?"
             else:
                 where[name] = f"unit {rel}"

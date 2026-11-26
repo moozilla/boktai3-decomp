@@ -3,7 +3,7 @@
 
   flagprobe.py LIST.tsv OUT.tsv [JOBS]
 
-LIST.tsv is `progress.py --list-pinned` output (one-function src/fn files).
+LIST.tsv is `progress.py --list-pinned` output (one-function C files).
 For each function and each variant in VARIANTS, the hints are stripped
 (tools/unpin.py), a `// COMPILER:` / `// CFLAGS:` header is set, and
 tools/check.py scores it. OUT.tsv gets NAME, VARIANT, differing bytes

@@ -43,7 +43,7 @@ not by the percentage. Keep going on one function until it matches.
 * Work in the scope checkout (the directory holding `tools/scope/scope.py`).
   Run every command from its root.
 * Copy the draft to a scratch file and edit only that copy:
-  `cp src/fn/sub_XXXXXXXX.c build/scope/drafts/NAME.c`
+  `cp "$(build/venv/bin/python tools/source_layout.py NAME)" build/scope/drafts/NAME.c`
   Do not edit `src/`, do not commit, do not run `make`.
 * The function name is found from the file. If scope asks for it, append it
   (`... FILE.c FUNC`).
