@@ -1,22 +1,11 @@
 // COMPILER: old_agbcc
 #include "global.h"
+#include "monsters/centipede/centipede_segment_animation.h"
+
 /* TentacleEnemy_SetSegmentPosition: Copies a position into an indexed segment entry used by the position trail */
 #define TentacleEnemy_SetSegmentPosition sub_080ACCD4
 
-struct Pos080ACCD4 {
-    u32 a, b;
-};
-struct Entry080ACCD4 {
-    u8 pad0[0x1c];
-    struct Pos080ACCD4 pos;
-    u8 pad24[0x128 - 0x24];
-};
-struct Group080ACCD4 {
-    u8 pad0[0x3d4];
-    struct Entry080ACCD4 entries[4];
-};
-
-void sub_080ACCD4(struct Group080ACCD4 *g, s32 i, struct Pos080ACCD4 *pos)
+void sub_080ACCD4(struct TentacleBodyAnimationView *g, s32 i, struct ContactPosition *pos)
 {
-    g->entries[i].pos = *pos;
+    g->segments[i].position = *pos;
 }
