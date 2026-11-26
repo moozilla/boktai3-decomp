@@ -47,40 +47,22 @@ u8 Skeleton_RerouteToTarget(void *obj)
     struct ContactPosition target;
     struct ChaseActor *actor = obj;
     struct ChaseActor *alt = obj;
-    u8 *group = (u8 *)&actor->group.common;
-    struct ChaseTarget **slot = (struct ChaseTarget **)((u8 *)actor + 0xDC);
+    struct SceneActorChaseGroup *group = &actor->group;
+    struct SceneActorChaseTarget **slot = &actor->base.tracking.target;
     s32 cell;
-    Chase_SnapToRoute(actor->group.destination, (u8 *)actor + 0x448);
+    SceneActorChase_SnapToRoute(actor->group.destination, &actor->group.homeRoute);
     {
-        struct ChaseTarget *t = *slot;
+        struct SceneActorChaseTarget *t = *slot;
         cell = Chase_CellIndex(t->position.x >> 8, t->position.z >> 8);
     }
     if (cell == actor->base.terrainCell || Chase_Bits32(&gPlayers[0]->statusFlags, 0x20000)) {
         SceneActor_DispatchContextAction(actor->base.context, 0);
         goto done;
     }
-    {
-        struct ContactPosition *targetPointer = &target;
-        s32 x;
-        s32 z;
-        u8 *data;
-        x = Mod(cell, *(s16 *)(gTerrainMap->cells + 4));
-        z = Div(cell, *(s16 *)(gTerrainMap->cells + 4));
-        target.x = (x << 8) + 0x80;
-        data = TerrainModifiers_FindCellOverride(cell, 1);
-        if (data)
-            data += 4;
-        else
-            data = gTerrainMap->cells + (cell * 4 + 12);
-        {
-            u32 h = (*data & 15) << 8;
-            targetPointer->y = h;
-        }
-        targetPointer->z = (z << 8) + 0x80;
-    }
-    if (Chase_TryRoute(alt, *(void **)(group + 0x1FC), &actor->base.body.position, &target))
+    SceneActorTerrain_GetCenter(cell, &target);
+    if (Chase_TryRoute(alt, group->route, &actor->base.body.position, &target))
         return 1;
-    Callback_InvokeActor(actor, *(void **)(group + 0x224));
+    Callback_InvokeActor(actor, group->fallback);
 done:
     return 0;
 }
@@ -1550,9 +1532,7 @@ s32 SceneActorTarget_ResolvePendingObjectSkeleton(struct ChaseActor *actor)
     struct SceneActorChaseTracking *state;
     s32 *pendingId = &owner->base.counter304;
     if (*pendingId > 0) {
-        struct Delta {
-            s16 x, y, z, pad;
-        } delta;
+        struct ContactPosition delta;
         struct ContactPosition *target;
         s32 x, z;
         u32 cell;
@@ -1589,12 +1569,12 @@ s32 SceneActorTarget_ResolvePendingObjectSkeleton(struct ChaseActor *actor)
         }
         SceneActorContact_SaveTargetCell(owner, cell);
         {
-            struct Delta *out = &delta;
+            struct ContactPosition *out = &delta;
             struct ContactPosition *source = &owner->base.body.position;
             target = &state->target->position;
             {
                 u32 xDelta = (u16)target->x;
-                struct Delta *first;
+                struct ContactPosition *first;
                 xDelta -= (u16)source->x;
                 first = &delta;
                 first->x = xDelta;
@@ -1602,7 +1582,7 @@ s32 SceneActorTarget_ResolvePendingObjectSkeleton(struct ChaseActor *actor)
             out->y = (u16)target->y - (u16)source->y;
             out->z = (u16)target->z - (u16)source->z;
             {
-                struct Delta *first = &delta;
+                struct ContactPosition *first = &delta;
                 u32 direction;
                 u8 *field;
                 direction = Math_Atan2(first->x, out->z);
