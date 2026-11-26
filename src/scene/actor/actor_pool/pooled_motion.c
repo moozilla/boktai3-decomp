@@ -1,6 +1,5 @@
 #include "scene/actor/pooled_motion.h"
 #include "scene/actor/scene_actor_components.h"
-#include "engine/word_flags.h"
 
 void MotionPool_FinishOnResourceContact(void *a, void *b, struct MotionPoolSlot *slot)
 {
@@ -162,18 +161,13 @@ struct MotionPool *MotionPool_Create(void)
 struct MotionPoolSlot *MotionPool_FindFreeSlot(struct MotionPool *pool, s32 *out)
 {
     struct MotionPoolSlot *slot = pool->slots;
-    s32 index = 0;
-    u32 one = 1;
-    u32 active = pool->activeMask;
-    do {
-        if ((one << index & active) != 0) {
-            index++;
-            slot++;
-            continue;
+    s32 index;
+    for (index = 0; index < 16; index++, slot++) {
+        if (!((1 << index) & pool->activeMask)) {
+            *out = index;
+            return slot;
         }
-        *out = index;
-        return slot;
-    } while (index <= 15);
+    }
     return 0;
 }
 
@@ -345,7 +339,8 @@ s32 MotionPool_UpdateUntilDeadline(struct MotionPoolSlot *slot, s32 index)
     struct MotionPoolParams *params = &slot->params;
     MotionPool_AdjustHeading(slot);
     {
-        WordFlags_Set(2, &slot->flags);
+        u32 flag = 2;
+        slot->flags |= flag;
     }
     if (slot->frame >= params->endFrame)
         return 1;
