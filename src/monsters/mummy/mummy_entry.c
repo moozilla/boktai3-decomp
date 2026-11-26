@@ -938,72 +938,54 @@ static inline u32 PickTurn(u32 dir, const u16 *randomSamples)
     return dir;
 }
 
-struct MummyTurnBytes {
-    u8 direction : 8;
-    u8 saved : 8;
-    u8 remaining : 8;
-};
-
-struct MummySavedControl {
-    void *target;
-    u8 state, phase, behavior, kind;
-};
-
 static inline void Turn(u8 saved, void *ctx, const u16 *randomSamples)
 {
     struct ChaseActor *actor = ctx;
-    u8 *group = (u8 *)&actor->group.common;
+    struct SceneActorChaseGroup *group = &actor->group;
     {
         u32 mask = 0x400;
-        if (((struct ChaseActor *)ctx)->base.motionFlags & mask)
+        if (actor->base.motionFlags & mask)
             return;
     }
-    if (SceneActorChase_TestField((u16 *)((u8 *)ctx + 0x414), 4))
+    if (SceneActorChase_TestField((u16 *)&group->common.gate.flags, 4))
         return;
-    ((struct MummyTurnBytes *)(group + 0x204))->direction =
+    group->turn.direction =
         PickTurn(actor->base.body.direction, randomSamples);
     {
-        struct MummySavedControl *save = (struct MummySavedControl *)(group + 0x8C);
-        save->target = actor->base.target;
+        struct SceneActorChaseSavedControl *save = &group->saved;
+        save->control = actor->base.target;
         save->kind = actor->base.controlKind;
         save->state = actor->base.state2A8;
         save->phase = actor->base.phase2A9;
         save->behavior = actor->base.behavior2AA;
     }
-    group[0x205] = saved;
-    Chase_SetCtl(actor, *(void **)(group + 0x21C), 0x1B);
+    group->turn.savedDirection = saved;
+    Chase_SetCtl(actor, group->turnControl, 0x1B);
     Chase_SetState(actor, 3, 1, 0);
-    group[0x206] = 6;
-}
-
-static inline s32 PlayerSlot(u8 *target)
-{
-    if (target[8] <= 3)
-        return target[8];
-    return -1;
+    group->turn.turnsRemaining = 6;
 }
 
 static inline u8 Arrive(void *obj)
 {
     struct ContactPosition target;
     struct ChaseActor *actor = obj;
-    u8 *group = (u8 *)&actor->group.common;
-    struct ChaseTarget **slot = (struct ChaseTarget **)((u8 *)actor + 0xDC);
+    struct SceneActorChaseGroup *group = &actor->group;
+    struct SceneActorChaseTarget **slot = &actor->base.tracking.target;
     s32 cell;
     s32 player;
     const u16 *randomSamples = gRandomTable;
-    Chase_SnapToRoute(actor->group.destination, (u8 *)actor + 0x448);
+    Chase_SnapToRoute(actor->group.destination, (u8 *)&group->homeRoute);
     if (Chase_Test(gEngineFlags, 0x4800)) {
-        struct ChaseTarget *t = *slot;
+        struct SceneActorChaseTarget *t = *slot;
         if (!t)
             goto invoke;
-        player = PlayerSlot((u8 *)t);
+        player = SceneActorChase_PlayerSlot(t);
         if (player < 0) {
             goto invoke;
         }
         cell = ((u16 *)gPlayers[player]->followTarget)[3];
     } else {
-        struct ChaseTarget *t = *slot;
+        struct SceneActorChaseTarget *t = *slot;
         cell = Chase_CellIndex(t->position.x >> 8, t->position.z >> 8);
         player = 0;
     }
@@ -1012,21 +994,21 @@ static inline u8 Arrive(void *obj)
     if (MotionFlags(actor, 0x400))
         return 0;
     {
-        struct ChaseFlags40 *flags = (void *)(group + 0x40);
+        struct ChaseFlags40 *flags = (void *)&group->common.gate.flags;
         s32 mask = ~4;
         flags->bits = mask & flags->bits;
     }
     if (MotionFlags(actor, 0x80)) {
-        Chase_SetCtl(actor, *(void **)(group + 0x48), 0x1A);
+        Chase_SetCtl(actor, group->common.gate.control, 0x1A);
         Chase_SetBehavior(actor, 12);
     } else {
         Chase_SetCtl(actor, actor->base.onAlternateEntry, 1);
         Chase_SetBehavior(actor, 5);
-        Chase_SnapToRoute(*(struct ContactPosition **)(group + 0x200), group + 0x74);
-        (*(struct ContactPosition **)(group + 0x200))->y =
-            Chase_HeightAt(Chase_CellAt(*(struct ContactPosition **)(group + 0x200)),
-                           *(struct ContactPosition **)(group + 0x200));
-        (*(struct ContactPosition **)(group + 0x200))->pad = 0;
+        Chase_SnapToRoute(group->destination, (u8 *)&group->homeRoute);
+        (group->destination)->y =
+            Chase_HeightAt(Chase_CellAt(group->destination),
+                           group->destination);
+        (group->destination)->pad = 0;
     }
     {
         u8 saved = actor->base.body.direction;
@@ -1048,12 +1030,12 @@ reroute: {
         data = gTerrainMap->cells + (cell * 4 + 12);
     targetPointer->y = (*data & 15) << 8;
     targetPointer->z = (z << 8) + 0x80;
-    if (Chase_TryRoute(obj, *(void **)(group + 0x1FC), &actor->base.body.position, &target))
+    if (Chase_TryRoute(obj, group->route, &actor->base.body.position, &target))
         goto moved;
     goto invoke;
 }
 invoke:
-    Callback_InvokeActor(actor, *(void **)(group + 0x224));
+    Callback_InvokeActor(actor, group->fallback);
     return 0;
 moved:
     return 1;
@@ -1613,8 +1595,11 @@ void Mummy_SetControlPreset(struct ChaseActor *s)
 
 s32 Div(s32, s32);
 
-void BouncingObject_Spawn(struct ContactPackedVector *, struct ContactPosition *,
-                          struct ContactPosition *, u32, u32, u32, u32);
+struct BouncingObject;
+struct BouncingObject *BouncingObject_Spawn(struct ContactPosition *source,
+                                           struct ContactPosition *delta,
+                                           struct ContactPosition *target, u32 shot,
+                                           u32 category, u32 strength, u32 id);
 
 extern const s16 gUnk_086149C4[];
 
@@ -1632,8 +1617,8 @@ static inline s32 Abs(s32 value)
 
 void Mummy_FireAcceleratingVolley(struct ChaseActor *actor)
 {
-    u8 *body = actor->base.context;
-    struct ContactPackedVector source = *(struct ContactPackedVector *)&actor->base.body.position;
+    struct Mummy *body = actor->base.context;
+    struct ContactPosition source = actor->base.body.position;
     struct ContactPosition delta;
     struct ContactPosition *velocity;
     s32 divisor, facing, difference;
@@ -1668,8 +1653,8 @@ void Mummy_FireAcceleratingVolley(struct ChaseActor *actor)
     }
     if (speed <= 10)
         speed = 10;
-    if (speed > *(u16 *)(body + 0x6cc))
-        speed = *(u16 *)(body + 0x6cc);
+    if (speed > body->field6CC)
+        speed = body->field6CC;
     switch (actor->base.paletteOffset) {
         case 0:
             count = 1;
@@ -1693,7 +1678,7 @@ void Mummy_FireAcceleratingVolley(struct ChaseActor *actor)
     else
         direction = actor->base.tracking.heading;
     i = count;
-    strength = *(u16 *)(body + 0x6ce);
+    strength = body->currentTick;
     for (; i != 0; i--) {
         velocity = &delta;
         velocity->x = Scale(gUnk_086149C4[(direction + 64) & 255] * speed);
@@ -1702,7 +1687,7 @@ void Mummy_FireAcceleratingVolley(struct ChaseActor *actor)
         {
             u32 shot = actor->base.attacks.first[2];
             u32 category = actor->base.attacks.second[2];
-            void *target = &actor->base.tracking.target->position;
+            struct ContactPosition *target = &actor->base.tracking.target->position;
             BouncingObject_Spawn(&source, &delta, target, shot, category, strength,
                                  actor->base.body.id);
         }
@@ -2933,14 +2918,13 @@ static inline void ClearHalf(u16 *p, u32 mask)
     *p = *p & mask;
 }
 
-static inline u32 WordFlag(u8 *p, u32 mask, u32 off)
+static inline u32 WordFlag(struct ChaseActor *actor, u32 mask)
 {
-    return *(u32 *)(p + off) & mask;
+    return actor->base.behaviorFlags & mask;
 }
 
 void Mummy_ResetResponseState(struct ChaseActor *actor)
 {
-    u8 *p = (u8 *)actor;
     struct SceneActorChaseTracking *body = &actor->base.tracking;
     u32 mask = ~0x18;
     u32 *flags;
@@ -2956,7 +2940,7 @@ void Mummy_ResetResponseState(struct ChaseActor *actor)
     ClearHalf(motion, 0xFFFFFC7F);
     body->flags &= mask;
     response = &actor->group.common.control;
-    if (WordFlag(p, 0x200000, 0x2CC)) {
+    if (WordFlag(actor, 0x200000)) {
         SceneActorChase_ClearWordFlags(flags, ROOM_ACTOR_STATUS_INTERACTING);
         ClearHalf(motion, 0xFFFFFDFF);
         response->mode = 0;
@@ -3030,9 +3014,9 @@ u8 *ExplosionEffect_CreateDelayed(void *, u32, s32, s32, s32, u32);
 
 void SceneEffect_EmitPositionPattern(struct ChaseActor *emitter)
 {
-    struct ContactPackedVector position;
+    struct ContactPosition position;
     s32 i;
-    position = *(struct ContactPackedVector *)&emitter->base.body.position;
+    position = emitter->base.body.position;
     position.y += 0x40;
     switch (emitter->base.paletteOffset) {
         case 0:
@@ -3041,22 +3025,20 @@ void SceneEffect_EmitPositionPattern(struct ChaseActor *emitter)
             break;
         case 1:
             for (i = 0; i < 2; i++) {
-                struct ContactPosition *p = (struct ContactPosition *)&position;
-                position = *(struct ContactPackedVector *)&emitter->base.body.position;
-                p->y += 0x40;
-                p->x += gUnk_086061D4[i];
-                p->z += gUnk_086061D8[i];
+                position = emitter->base.body.position;
+                position.y += 0x40;
+                position.x += gUnk_086061D4[i];
+                position.z += gUnk_086061D8[i];
                 ExplosionEffect_CreateDelayed(&position, 0, emitter->base.attacks.first[2],
                                               emitter->base.attacks.second[2], 0, gUnk_086061C0[i]);
             }
             break;
         case 2:
             for (i = 0; i < 4; i++) {
-                struct ContactPosition *p = (struct ContactPosition *)&position;
-                position = *(struct ContactPackedVector *)&emitter->base.body.position;
-                p->y += 0x40;
-                p->x += gUnk_086061C4[i];
-                p->z += gUnk_086061CC[i];
+                position = emitter->base.body.position;
+                position.y += 0x40;
+                position.x += gUnk_086061C4[i];
+                position.z += gUnk_086061CC[i];
                 ExplosionEffect_CreateDelayed(&position, 0, emitter->base.attacks.first[2],
                                               emitter->base.attacks.second[2], 0, gUnk_086061C0[i]);
             }
