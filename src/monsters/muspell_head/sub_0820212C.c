@@ -82,7 +82,6 @@ s32 ScriptCombatActor_InitializeFromScript(struct MuspellHead *p, void *parent)
     void *resource;
     void *sprite;
     void *earlySprite;
-    void **slot;
     s32 found;
     s32 dead;
     if (Script_SeekToKeyword('p')) {
@@ -164,8 +163,7 @@ s32 ScriptCombatActor_InitializeFromScript(struct MuspellHead *p, void *parent)
     p->sprite.position = *(struct ContactPosition *)&p->origin;
     AnimData_SelectPaletteBank(&p->graphics, 0x1b7);
     resource = ScriptProc_Start(0x922e, 0x5184);
-    slot = &p->sequence;
-    *slot = resource;
+    p->sequence = resource;
     dead = p->initialDead;
     sprite = earlySprite;
     if (dead == 0) {
