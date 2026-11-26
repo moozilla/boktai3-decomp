@@ -51,7 +51,7 @@ struct Axe {
     u8 auxiliaryShadow[0x40];
     struct ContactCollider extraAttack[2]; /* the axe actor's own pairs (Axe_InitColliders) */
     struct ContactCollider extraBody[2];
-    u8 unknownE3C[2];
+    u8 trailAngleDecay, returningTrailSpeed; /* keyword 'O' */
     u8 delay;
     u8 turnStep;
     u8 relocationDelay;
