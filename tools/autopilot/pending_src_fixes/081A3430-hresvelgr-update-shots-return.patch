@@ -1,0 +1,33 @@
+081A3430 hresvelgr-update-shots-return
+
+When every shot is inactive the original input pointer remains in r0.
+Otherwise the last Hresvelgr_TickShot exits through r0, leaving 081A3455.
+
+The explicit form changed the ROM bytes. The guarded form passed the unit ROM check.
+
+--- a/src/fn/sub_081A3430.c
++++ b/src/fn/sub_081A3430.c
+@@ -16,10 +16,23 @@
+     struct E *e = p->e;
+     s32 i = 0;
++#ifdef UBFIX
++    s32 result = (s32)p;
++#endif
+     do {
++#ifdef UBFIX
++        if (e->h != 0) {
++            Hresvelgr_TickShot(p, e, (p->n + i) & 3);
++            result = 0x081A3455;
++        }
++#else
+         if (e->h != 0)
+             Hresvelgr_TickShot(p, e, (p->n + i) & 3);
++#endif
+         e++;
+         i++;
+     } while (i <= 0x1f);
+     p->n++;
++#ifdef UBFIX
++    return result; // r0 retains the owner or the final return address
++#endif
+ }
