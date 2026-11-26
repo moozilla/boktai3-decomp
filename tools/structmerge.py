@@ -18,6 +18,7 @@ import layoutmerge as lm
 import ramlayout
 import struct_evidence as evidence
 import structfamilies as families
+from pycparser.c_parser import ParseError
 
 
 RULE = ("Choose the type whose width and extension have the most support from distinct ROM functions "
@@ -180,7 +181,10 @@ def probe_header(text, spell, expected, size, align):
         pre = lm.preprocess(file.name, nonmatching=False)
         if pre is None:
             raise Holdout("generated header failed preprocessing")
-        body, _, tu, _ = evidence.parse(pre, file.name)
+        try:
+            body, _, tu, _ = evidence.parse(pre, file.name)
+        except ParseError as exc:
+            raise Holdout(f"generated header failed parsing: {exc}") from exc
         kind, tag = spell.split()
         node = tu.tags.get((kind, tag))
         measured = lm.probe_records(body, tu, {spell: (spell, node)}) if node else {}
@@ -289,7 +293,10 @@ def rewrite_unit(text, old, new, header, spell):
         pre = lm.preprocess(old["file"])
         if pre is None:
             raise Holdout("preprocessing failed")
-        _, ast, tu, error = evidence.parse(pre, old["file"])
+        try:
+            _, ast, tu, error = evidence.parse(pre, old["file"])
+        except ParseError as exc:
+            raise Holdout(f"source parse failed: {exc}") from exc
         if error:
             raise Holdout(f"body parse failed: {error}")
         if not same_sequence and has_initializers(ast, tu, old["id"], old["file"]):
