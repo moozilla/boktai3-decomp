@@ -121,7 +121,7 @@ void SceneActorReaction_SettleDisplacement(struct ChaseActor *actor)
         Recovery_ClearRoute(actor, &group->common.control);
     }
     if (!actor->base.drawableKind) {
-        struct DisplaySequenceState *status = (void *)((u8 *)actor->base.drawable + 0x48);
+        struct DisplaySequenceState *status = &((struct SceneActorAnimationSequenceDrawable *)actor->base.drawable)->sequence;
         if (((status->index == 2) && (status->elapsed == (status->duration != 0))) &&
             (status->duration != 1))
             status->elapsed = 0;
