@@ -1,14 +1,11 @@
 #include "engine/terrain/terrain_sampling.h"
 #include "engine/shared/global.h"
 
+#include "bosses/hresvelgr/boss_action_state.h"
 #include "engine/shared/engine.h"
 struct Vec {
     s16 x, y, z, pad;
 } __attribute__((aligned(4)));
-struct Action {
-    u8 state, pad[3];
-    u32 frame;
-};
 struct Hresvelgr {
     u8 pad0[0x51];
     u8 heading;
@@ -31,16 +28,13 @@ struct Hresvelgr {
     u8 pad1D0[0xc];
     void *collisionBounds;
     u8 pad1E0[0x110];
-    struct Action action;
-    u8 pad2F8[0x33];
+    struct BossActionState action;
+    u8 pad300[0x2b];
     u8 side;
     u8 pad32C[0xf8];
     u8 boundsLow[0x2e0];
     u8 boundsHigh[4];
 };
-void ActionState_Reset(void *);
-void ActionState_SetState(void *, u32);
-void ActionState_AdvanceState(void *);
 void Hresvelgr_SetAnimation(void *, void *, void *, u32, u32, u32);
 void Actor_SetHeadingVelocity(void *, u32);
 void Hresvelgr_SpawnProjectile(void *, u32, u32);
@@ -118,7 +112,7 @@ static inline void SetCollisionMask(struct Hresvelgr *actor, u32 mask)
 void Hresvelgr_UpdateBoundaryBarrage(struct Hresvelgr *actor, u32 tick)
 {
     u32 normalCollisionMask = 0x2f0;
-    struct Action *action = &actor->action;
+    struct BossActionState *action = &actor->action;
     struct Vec *target = actor->target;
     u32 *flags;
     s32 state;
