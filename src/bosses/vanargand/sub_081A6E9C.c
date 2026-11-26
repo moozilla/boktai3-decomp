@@ -1,15 +1,8 @@
-#include "global.h"
+#include "bosses/vanargand/vanargand_pair_attack.h"
 
-struct A {
-    u8 f[0x9c];
-    u32 fl;
-    u8 g[0xe9e];
-    u16 h;
-};
-
-void Vanargand_SetPendingCue(struct A *p, u16 v)
+void Vanargand_SetPendingCue(struct VanargandPairAttack *boss, u16 cue)
 {
-    u32 m = 0x200000;
-    p->fl |= m;
-    p->h = v;
+    u32 mask = 0x200000;
+    boss->flags |= mask;
+    boss->pendingCue = cue;
 }
