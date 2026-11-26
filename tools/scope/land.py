@@ -251,9 +251,9 @@ def added_warnings(before, after, path=None):
         text = without_drafts(text)
         found = kinds.sites(text, rel, kinds=kinds.WARN)
         if rel:  # literal-param reads its calls from the tree, with this text in the file's place
-            found += kinds.literal_param_sites(rel, text, candidate=True)
+            found += kinds.literal_argument_sites(rel, text)
         for s in kinds.warnings(found):
-            out[s.kind] = out.get(s.kind, 0) + 1
+            out[s.kind] = out.get(s.kind, 0) + s.weight
         return out
     old, new = count(before), count(after)
     compiler_failure = None
@@ -281,7 +281,12 @@ def added_warnings(before, after, path=None):
         if compiler_failure is None:
             old.update(compiler_counts[0])
             new.update(compiler_counts[1])
-    return {k: n - old.get(k, 0) for k, n in new.items() if n > old.get(k, 0)}, compiler_failure
+    added = {k: n - old.get(k, 0) for k, n in new.items() if n > old.get(k, 0)}
+    moved = new.get("literal-param", 0) - old.get("literal-param", 0)
+    parked = sum(new.get(k, 0) - old.get(k, 0) for k in ("literal-local", "const-local"))
+    if moved * parked < 0:
+        added["possible local/argument transfers"] = min(abs(moved), abs(parked))
+    return added, compiler_failure
 
 
 def warning_note(func, added):

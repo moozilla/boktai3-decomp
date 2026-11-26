@@ -35,6 +35,16 @@ class LandWarnings(unittest.TestCase):
                              ({"literal-param": 1}, None))
             self.assertEqual(land.added_warnings(helper, helper, self.path), ({}, None))
 
+    def test_existing_header_cannot_hide_a_transfer_in_either_direction(self):
+        head = '#include "word_flags.h"\nu32 f(u32 *p) {\n'
+        local = head + "    u32 mask = 4;\n    return *p & mask;\n}\n"
+        call = head + "    return WordFlags_Test(p, 4);\n}\n"
+        with patch.object(deadcode, "available", return_value=False):
+            for before, after in ((local, call), (call, local)):
+                added, error = land.added_warnings(before, after, self.path)
+                self.assertEqual(added["possible local/argument transfers"], 1)
+                self.assertIsNone(error)
+
     def test_compiler_warning_delta_uses_both_successful_compiles(self):
         with tempfile.TemporaryDirectory() as cache, patch.object(deadcode, "CACHE", cache), \
                 patch.object(deadcode, "available", return_value=True), \
