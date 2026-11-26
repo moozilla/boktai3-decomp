@@ -104,8 +104,7 @@ void Statue_ApplyHitReaction(struct Source *sourceInput, struct Hit *input,
             u32 *index = &gRandomIndex;
             u32 limit = 0x3ff;
             u32 mask = 0x7f;
-            i = 2;
-            do {
+            for (i = 2; i >= 0; i--) {
                 u32 random;
                 u32 value;
                 u32 sample;
@@ -132,8 +131,7 @@ void Statue_ApplyHitReaction(struct Source *sourceInput, struct Hit *input,
                 }
                 value = 0;
                 SparkParticle_Spawn(&frame.position, 1, vel, value, 3, 8, 2, 2);
-                i--;
-            } while (i >= 0);
+            }
         }
     }
 }
