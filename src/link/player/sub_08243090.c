@@ -8,7 +8,8 @@
 struct PlayerSelection;
 
 void Collision_CalculateElementalResponse(struct ContactCollider *, struct ContactCollider *);
-void Player_ApplyLinkedContactResponse(struct Player *, struct ContactCollider *, struct ContactCollider *);
+void Player_ApplyLinkedContactResponse(struct Player *, struct ContactCollider *,
+                                       struct ContactCollider *);
 s32 LinkSession_ClearFirstPlayerKind(void *, s32);
 void LinkPlayer_FlushPendingEffects(struct Player *);
 void Player_QueueStatusEffect(struct Player *, s32);

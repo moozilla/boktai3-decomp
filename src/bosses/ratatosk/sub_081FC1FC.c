@@ -7,7 +7,8 @@ struct RatatoskParticlePool *Ratatosk_CreateAnimatedParticlePool(void)
 {
     void *r = Task_Create(8, sizeof(struct RatatoskParticlePool));
     if (r) {
-        Task_SetCallbacks(r, Ratatosk_UpdateAnimatedParticlePool, Ratatosk_OnAnimatedParticlePoolDestroy);
+        Task_SetCallbacks(r, Ratatosk_UpdateAnimatedParticlePool,
+                          Ratatosk_OnAnimatedParticlePoolDestroy);
         if (Ratatosk_InitAnimatedParticlePool(r) < 0) {
             Task_Kill(r);
             return 0;

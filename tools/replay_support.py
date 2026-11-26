@@ -56,13 +56,17 @@ def snapshot_csv(data, keys):
     if not data:
         return [], {}
     reader = csv.DictReader(io.StringIO(data.decode("utf-8"), newline=""))
-    fields = reader.fieldnames
+    fields = reader.fieldnames or []
+    absent = set(keys) - set(fields) - {"scope"}
+    if absent:
+        raise ValueError(f"missing table key columns: {', '.join(sorted(absent))}")
     rows = {}
     for row in reader:
         if extra := row.pop(None, ()):
             row[fields[-1]] = ",".join([row[fields[-1]], *extra])
         values = {field: row[field] or "" for field in fields}
-        key = tuple(values[column].rstrip("/") if column == "scope" else values[column] for column in keys)
+        key = tuple((values.get(column) or "all").rstrip("/") if column == "scope"
+                    else values[column] for column in keys)
         if key in rows:
             raise ValueError(f"duplicate table key: {key}")
         rows[key] = values
@@ -161,8 +165,7 @@ def prepare(args):
     review = revision(reviewed, "HEAD")
     branch = revision(reviewed if exported else ".", args.branch_ref or "HEAD")
     fork = revision(reviewed, args.fork) if args.fork else git(reviewed, "merge-base", branch, review).decode().strip()
-    for ref in (branch, review):
-        git(reviewed, "merge-base", "--is-ancestor", fork, ref)
+    git(reviewed, "merge-base", "--is-ancestor", fork, branch)
     protected = lane_paths(reviewed, fork, branch, exported)
     base = tree(reviewed, fork)
     reviewed_tree = tree(reviewed, review)
@@ -261,6 +264,9 @@ def sync(args):
     paths = original_tree.keys() | branch_tree.keys() | reviewed_tree.keys()
     paths.update(path.relative_to(Path.cwd()) for path in reorg.source_paths() + reorg.header_paths())
     protected = protect_destinations(set(map(Path, state["protected"])), reorg.recorded_moves())
+    if os.environ.get("BOKTAI3_REPLAY_PATHS"):
+        archive_paths = sorted(paths | protected | reorg.tracked_paths())
+        (args.state / "tracked-paths").write_bytes(b"".join(os.fsencode(path) + b"\0" for path in archive_paths))
     paths -= protected | TABLES.keys() | LOCAL_FILES | {FUNCTIONS}
     paths = {path for path in paths if path.parts[0] not in ("build", "gen")}
     changed = sync_files(reviewed, paths, reviewed_tree)

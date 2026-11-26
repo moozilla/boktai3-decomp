@@ -36,7 +36,8 @@ void PauseInventory_RefreshConsumableIcons(struct PauseInventory *p)
             if (GameState_IsConsumableSlotEquipped(consumableSlot)) {
                 s32 marker = markers + 30;
                 PauseMenu_ClearSpriteFlags(p, marker, 1);
-                PauseMenu_SetSpritePosition(p, marker, animSprite->position.x, animSprite->position.y);
+                PauseMenu_SetSpritePosition(p, marker, animSprite->position.x,
+                                            animSprite->position.y);
                 p->equippedConsumableSlots[markers] = consumableSlot;
                 markers++;
             }

@@ -12,7 +12,8 @@ struct MotionEntry {
     u16 angularStep;
 };
 void Hresvelgr_ReleaseEffect(void *);
-static inline void HresvelgrMotion_AddVelocity(struct ContactPosition *out, struct ContactPosition *v)
+static inline void HresvelgrMotion_AddVelocity(struct ContactPosition *out,
+                                               struct ContactPosition *v)
 {
     out->x = out->x + v->x;
     out->y = out->y + v->y;

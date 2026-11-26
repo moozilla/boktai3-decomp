@@ -25,6 +25,12 @@ class ReplaySupportTest(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "include/lane.h"):
             replay.with_lane_additions(empty, lane, reviewed, ("current_path",))
 
+    def test_unscoped_legacy_tables_match_the_reviewed_global_rows(self):
+        base = b"old_prefix,new_prefix\nOld_,New_\n"
+        reviewed = b"old_prefix,new_prefix,scope\nOld_,Final_,all\n"
+        result = replay.with_lane_additions(base, base, reviewed, ("old_prefix", "scope"))
+        self.assertEqual(result, (reviewed, 0))
+
     def test_branch_edits_follow_a_planned_source_move(self):
         old = Path("src/monsters/enemy_particle/new.c")
         new = Path("src/effects/particles/enemy_attacks/new.c")

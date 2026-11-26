@@ -10,8 +10,8 @@ struct VanargandPairCommandState {
 };
 void SceneActors_ConfigureEffect(void *, s32, s32, s32);
 u32 Trigger_ConsumePending(void *, u32);
-static inline void VanargandPair_RequestTransition(struct VanargandPairCommandState *panel, u32 mode,
-                                                u32 substate, u32 transition)
+static inline void VanargandPair_RequestTransition(struct VanargandPairCommandState *panel,
+                                                   u32 mode, u32 substate, u32 transition)
 {
     panel->mode = mode;
     panel->substate = substate;

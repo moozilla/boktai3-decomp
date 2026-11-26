@@ -11,7 +11,8 @@ u8 *TimedSpriteEffect_Create(u8 *pos, u32 flag, s32 duration, s32 arg3, s32 arg4
     u8 *obj = Task_Create(8, 196);
     if (obj) {
         Task_SetCallbacks(obj, PlayerOrbitEffect_UpdateMovingParticle, TimedSpriteEffect_Destroy);
-        if (PlayerOrbitEffect_InitMovingParticle(obj, pos, flag, duration, arg3, arg4, arg5, arg6, arg7, arg8) < 0) {
+        if (PlayerOrbitEffect_InitMovingParticle(obj, pos, flag, duration, arg3, arg4, arg5, arg6,
+                                                 arg7, arg8) < 0) {
             Task_Kill(obj);
             return 0;
         }

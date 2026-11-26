@@ -55,14 +55,14 @@ void PositionMotion_InitTimedInterpolation(struct PositionMotion *motion,
     motion->active = 1;
 }
 
-void WorldMap_SetUpdate(struct RegistrySelectionMenu *menu,
-                                 void (*update)(struct RegistrySelectionMenu *))
+void WorldMap_SetUpdate(struct WorldMapMenu *menu,
+                                 void (*update)(struct WorldMapMenu *))
 {
     menu->update = update;
     menu->timer = 0;
 }
 
-void WorldMap_ShowIndicators(struct RegistrySelectionMenu *menu)
+void WorldMap_ShowIndicators(struct WorldMapMenu *menu)
 {
     menu->animations[1].flags &= ~1;
     AnimSprite_Show(&menu->animations[2]);
@@ -76,7 +76,7 @@ void WorldMap_ShowIndicators(struct RegistrySelectionMenu *menu)
     AnimSprite_Show(&menu->animations[11]);
 }
 
-void WorldMap_UpdateIndicators(struct RegistrySelectionMenu *menu)
+void WorldMap_UpdateIndicators(struct WorldMapMenu *menu)
 {
     u32 available = menu->availableEntries;
     struct AnimSpriteResource *resource = &menu->resource;
@@ -175,7 +175,7 @@ void WorldMap_BlendPaletteBanks(u8 *output, u8 *from, u8 *to, int amount, int sh
     }
 }
 
-void WorldMap_ApplyPalettePhase(struct RegistrySelectionMenu *menu, u32 phase)
+void WorldMap_ApplyPalettePhase(struct WorldMapMenu *menu, u32 phase)
 {
     u8 *base = menu->palettes;
     u8 *extra;
@@ -221,7 +221,7 @@ void WorldMap_ApplyPalettePhase(struct RegistrySelectionMenu *menu, u32 phase)
     }
 }
 
-void WorldMap_BlendTimedPalettes(struct RegistrySelectionMenu *menu)
+void WorldMap_BlendTimedPalettes(struct WorldMapMenu *menu)
 {
     u8 *base = menu->palettes;
     u8 *extra;
@@ -252,7 +252,7 @@ void WorldMap_BlendTimedPalettes(struct RegistrySelectionMenu *menu)
     }
 }
 
-void WorldMap_ProcessConfirm(struct RegistrySelectionMenu *menu)
+void WorldMap_ProcessConfirm(struct WorldMapMenu *menu)
 {
     if (gPadState[1] & 1) {
         struct MenuCursor *list = menu->selectionCursor;
@@ -272,7 +272,7 @@ void WorldMap_OnUnusedTransition(void)
 {
 }
 
-void WorldMap_InitializeAnimations(struct RegistrySelectionMenu *menu)
+void WorldMap_InitializeAnimations(struct WorldMapMenu *menu)
 {
     struct AnimSpriteResource *resource = ScriptProc_Start(0xcb05, 0xa2db);
     if (resource) {
@@ -303,7 +303,7 @@ void WorldMap_InitializeAnimations(struct RegistrySelectionMenu *menu)
     }
 }
 
-void WorldMap_InitializeBackground(struct RegistrySelectionMenu *menu)
+void WorldMap_InitializeBackground(struct WorldMapMenu *menu)
 {
     u8 *background;
     s32 config[2];
@@ -334,26 +334,26 @@ void WorldMap_ConfigureDisplay(void)
     Hud_SetMode(7);
 }
 
-void WorldMap_BeginFadeIn(struct RegistrySelectionMenu *menu)
+void WorldMap_BeginFadeIn(struct WorldMapMenu *menu)
 {
     ScreenTransition_SendCommand(2, 5, 4, 4, 4, 0xFFFF, 0);
     WorldMap_SetUpdate(menu, WorldMap_UpdateOpeningDelay);
 }
 
-void WorldMap_BeginFadeOut(struct RegistrySelectionMenu *menu)
+void WorldMap_BeginFadeOut(struct WorldMapMenu *menu)
 {
     ScreenTransition_SendCommand(3, 5, 4, 4, 4, 0xFFFF, 0xFFFF);
     WorldMap_SetUpdate(menu, WorldMap_UpdateScriptDelay);
 }
 
-void WorldMap_BeginSelection(struct RegistrySelectionMenu *menu)
+void WorldMap_BeginSelection(struct WorldMapMenu *menu)
 {
     if (menu->inputDisabled == 0)
         MenuCursor_EnableInput(menu->selectionCursor);
     WorldMap_SetUpdate(menu, WorldMap_UpdateSelection);
 }
 
-void WorldMap_StartTimedEffect(struct RegistrySelectionMenu *menu, s32 shift, s32 mode)
+void WorldMap_StartTimedEffect(struct WorldMapMenu *menu, s32 shift, s32 mode)
 {
     u32 one;
     if (shift > 0)
@@ -369,7 +369,7 @@ void WorldMap_StartTimedEffect(struct RegistrySelectionMenu *menu, s32 shift, s3
     WorldMap_SetUpdate(menu, WorldMap_UpdateTimedEffect);
 }
 
-void WorldMap_UpdateTimedEffect(struct RegistrySelectionMenu *menu)
+void WorldMap_UpdateTimedEffect(struct WorldMapMenu *menu)
 {
     WorldMap_BlendTimedPalettes(menu);
     menu->elapsed++;
@@ -377,7 +377,7 @@ void WorldMap_UpdateTimedEffect(struct RegistrySelectionMenu *menu)
         WorldMap_SetUpdate(menu, 0);
 }
 
-void WorldMap_UpdateSelection(struct RegistrySelectionMenu *menu)
+void WorldMap_UpdateSelection(struct WorldMapMenu *menu)
 {
     s32 v;
     if (menu->selectionCursor == 0)
@@ -388,7 +388,7 @@ void WorldMap_UpdateSelection(struct RegistrySelectionMenu *menu)
     WorldMap_ProcessConfirm(menu);
 }
 
-void WorldMap_UpdateOpeningDelay(struct RegistrySelectionMenu *menu)
+void WorldMap_UpdateOpeningDelay(struct WorldMapMenu *menu)
 {
     s32 v;
     if (menu->selectionCursor == 0)
@@ -401,14 +401,14 @@ void WorldMap_UpdateOpeningDelay(struct RegistrySelectionMenu *menu)
         WorldMap_BeginSelection(menu);
 }
 
-void WorldMap_UpdateScriptDelay(struct RegistrySelectionMenu *menu)
+void WorldMap_UpdateScriptDelay(struct WorldMapMenu *menu)
 {
     menu->timer++;
     if (menu->timer > 0x3c)
         Script_Call(menu->entryValues[menu->selection], 0);
 }
 
-void WorldMap_OnUpdate(struct RegistrySelectionMenu *menu)
+void WorldMap_OnUpdate(struct WorldMapMenu *menu)
 {
     WorldMap_ConfigureDisplay();
     WorldMap_UpdateIndicators(menu);
@@ -416,7 +416,7 @@ void WorldMap_OnUpdate(struct RegistrySelectionMenu *menu)
         Callback_InvokeActor(menu, menu->update);
 }
 
-void WorldMap_Destroy(struct RegistrySelectionMenu *menu)
+void WorldMap_Destroy(struct WorldMapMenu *menu)
 {
     struct AnimSprite *animation = menu->animations;
     s32 i = 12;
@@ -430,7 +430,7 @@ void WorldMap_Destroy(struct RegistrySelectionMenu *menu)
     gSelectionPanel = 0;
 }
 
-void WorldMap_CreateSelectionCursor(struct RegistrySelectionMenu *menu, s32 selection)
+void WorldMap_CreateSelectionCursor(struct WorldMapMenu *menu, s32 selection)
 {
     struct MenuCursorEntry entries[9];
     s32 i;
@@ -471,7 +471,7 @@ void WorldMap_CreateSelectionCursor(struct RegistrySelectionMenu *menu, s32 sele
     menu->selectionCursor = MenuCursor_Create(1, selection, 9, entries);
 }
 
-s32 WorldMap_InitializeFromScript(struct RegistrySelectionMenu *menu, void *arg)
+s32 WorldMap_InitializeFromScript(struct WorldMapMenu *menu, void *arg)
 {
     s32 i;
     s32 *value;
@@ -523,7 +523,7 @@ s32 WorldMap_InitializeFromScript(struct RegistrySelectionMenu *menu, void *arg)
 
 void WorldMap_StartTimedEffectFromScript(void)
 {
-    struct RegistrySelectionMenu *menu = (void *)gSelectionPanel;
+    struct WorldMapMenu *menu = (void *)gSelectionPanel;
     if (menu) {
         if (Script_SeekToKeyword(0x66)) {
             s32 mode = Script_GetValue();
@@ -534,7 +534,7 @@ void WorldMap_StartTimedEffectFromScript(void)
 
 void WorldMap_SetVisibleFromScript(void)
 {
-    struct RegistrySelectionMenu *menu = (void *)gSelectionPanel;
+    struct WorldMapMenu *menu = (void *)gSelectionPanel;
     struct MenuCursor **child;
     if (!menu)
         return;
@@ -550,9 +550,9 @@ void WorldMap_SetVisibleFromScript(void)
     }
 }
 
-struct RegistrySelectionMenu *WorldMap_Create(void *arg)
+struct WorldMapMenu *WorldMap_Create(void *arg)
 {
-    struct RegistrySelectionMenu *menu;
+    struct WorldMapMenu *menu;
     if (gSelectionPanel)
         return 0;
     menu = Task_Create(8, sizeof(*menu));

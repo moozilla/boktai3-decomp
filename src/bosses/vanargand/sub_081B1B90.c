@@ -24,7 +24,8 @@ static inline u8 MotionEnded(struct PairedSceneHalf *p)
         result = 1;
     return result;
 }
-void VanargandCombat_UpdateFlankingStrike(struct VanargandAttackPair *boss, struct PairedSceneHalf *p)
+void VanargandCombat_UpdateFlankingStrike(struct VanargandAttackPair *boss,
+                                          struct PairedSceneHalf *p)
 {
     struct SceneVec target;
     u8 *enter;

@@ -154,7 +154,8 @@ void sub_081A14FC(struct Hresvelgr *saved, u32 tick)
                             u32 side = actor->side;
                             /* Allocation-only: this bounded fallback retains the argument copy. */
                             if ((s32)side < 0) {
-                                HresvelgrMotion_CreateWithDelta(&saved->position, &delta, 0, sampleY);
+                                HresvelgrMotion_CreateWithDelta(&saved->position, &delta, 0,
+                                                                sampleY);
                                 goto sprayDone;
                             }
                         }

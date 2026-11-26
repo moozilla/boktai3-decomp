@@ -7,8 +7,8 @@
 
 s32 DisplayAnimation_TestFinished(struct DisplayAnimation *);
 
-s32 ImpactParticleGroup_SpawnRadial(s32, s32, struct StateActorPos *, s32, s32, s32, s32, s32, s32, s32,
-                              s32);
+s32 ImpactParticleGroup_SpawnRadial(s32, s32, struct StateActorPos *, s32, s32, s32, s32, s32, s32,
+                                    s32, s32);
 void PlayerCue_BeginModeSeven(struct Player *, s32);
 
 static inline u8 Burst_RollSound(void)

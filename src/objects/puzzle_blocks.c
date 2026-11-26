@@ -447,10 +447,11 @@ s32 PuzzleBlock_DestroyObjectsByScriptId(void)
     return 0;
 }
 
-void ImpactFragmentGroup_SpawnRadial(u32, u32, struct SceneVec *, u32, u32, u32, u32, u32, u32, u32, u32, u32);
+void ImpactFragmentGroup_SpawnRadial(u32, u32, struct SceneVec *, u32, u32, u32, u32, u32, u32, u32,
+                                     u32, u32);
 
-void ImpactParticleGroup_SpawnBouncing(u32, u32, struct SceneExtent *, struct SceneExtent *, struct SceneExtent *, u32,
-                  u32);
+void ImpactParticleGroup_SpawnBouncing(u32, u32, struct SceneExtent *, struct SceneExtent *,
+                                       struct SceneExtent *, u32, u32);
 
 void PuzzleBlock_PlayObjectBreakEffect(struct SceneObject *p)
 {

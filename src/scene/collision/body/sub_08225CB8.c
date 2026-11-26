@@ -57,8 +57,8 @@ void Terrain_LoadFromScript(void)
             gCamera.offsetX = g->originX >> 4;
             gCamera.offsetY = g->originY >> 4;
         } else {
-            Video_SetRenderCallbacks(mode, SpriteOam_QueueCameraRelativeSprites, Sprite_RenderCameraRelativeList,
-                                     sub_0821964C);
+            Video_SetRenderCallbacks(mode, SpriteOam_QueueCameraRelativeSprites,
+                                     Sprite_RenderCameraRelativeList, sub_0821964C);
             gCamera.offsetX = 0;
             gCamera.offsetY = 0;
         }
