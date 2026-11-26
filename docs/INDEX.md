@@ -242,7 +242,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [docs/history/2026-11-17.md](../docs/history/2026-11-17.md) | 2026-11-17 | #compiler #depin #matching #phase3 #round13 #round15 #structs | 3 |
 | [docs/history/2026-11-20.md](../docs/history/2026-11-20.md) | 2026-11-20 | #actors #compiler #matching #monsters #phase3 #scene #scene-actors #tooling #wireless | 2 |
 | [docs/history/2026-11-25.md](../docs/history/2026-11-25.md) | Work log, 2026-11-25 | #actors #assets #compiler #hardware #matching #menu #phase3 #process #scene #tooling | 5 |
-| [docs/history/2026-11-26.md](../docs/history/2026-11-26.md) | Work log, 2026-11-26 | #actors #autopilot #camera #compiler #matching #menu #monster #monsters #phase3 #port #scene #scripts #terrain #tooling #tools #types #verification | 21 |
+| [docs/history/2026-11-26.md](../docs/history/2026-11-26.md) | Work log, 2026-11-26 | #actors #autopilot #bosses #camera #compiler #matching #menu #monster #monsters #phase3 #port #scene #scripts #terrain #tooling #tools #types #verification | 21 |
 | [docs/history/HANDOFF_2026-10-23.md](../docs/history/HANDOFF_2026-10-23.md) | Handoff: current state and how to continue | #process | 14 |
 | [docs/history/MANAGER_HANDOFF_2026-10-19.md](../docs/history/MANAGER_HANDOFF_2026-10-19.md) | Manager handoff (2026-10-19) | #process #tooling | 6 |
 | [docs/history/README.md](../docs/history/README.md) | Handoff history |  | 17 |
@@ -291,6 +291,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [notes/cloud-081AA438.md](../notes/cloud-081AA438.md) | Cloud task 081AA438 (Vanargand phase scripts) | *#scripts* | 3 |
 | [notes/cloud-08228DB8.md](../notes/cloud-08228DB8.md) | Cloud task 08228DB8: SunClock_GetPhase (and Camera_SetPosition) |  | 3 |
 | [notes/cloud-08231A0C.md](../notes/cloud-08231A0C.md) | Cloud task 08231A0C | *#animation #assets* | 1 |
+| [notes/codex-bosses_2026-11-26.md](../notes/codex-bosses_2026-11-26.md) | Boss actor layouts and state transitions | #bosses #types #matching #phase3 | 3 |
 | [notes/codex-centipede-armor-cleanup_2026-11-26.md](../notes/codex-centipede-armor-cleanup_2026-11-26.md) | Centipede and Armor actor cleanup | #monsters #types #phase3 #matching | 3 |
 | [notes/codex-high.md](../notes/codex-high.md) | Codex high: task 0808AF38 | #matching #ghoul #slime #register-pinning | 244 |
 | [notes/codex-low.md](../notes/codex-low.md) | Task 080D812C — 2026-10-20 | #matching #dog | 376 |
