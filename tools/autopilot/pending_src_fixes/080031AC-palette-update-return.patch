@@ -1,0 +1,17 @@
+080031AC palette-update-return
+
+Palette_ApplyFrame exits through r0, leaving 080031C9.
+The three previous-state stores use r1 and preserve r0.
+
+The explicit form changed the ROM bytes. The guarded form passed the unit ROM check.
+
+--- a/src/palette_controller.c
++++ b/src/palette_controller.c
+@@ -438,4 +438,7 @@
+     t->previousBrightness = t->brightness;
+     p->previousState = gSunClock.state;
++#ifdef UBFIX
++    return 0x080031C9; // preserve the inherited GBA return value
++#endif
+ }
+ 
