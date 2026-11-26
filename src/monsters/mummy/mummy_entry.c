@@ -68,7 +68,7 @@ void Mummy_ResumeSavedTarget(struct ChaseActor *actor, s32 frame)
     struct DisplaySequenceState *anim =
         &((struct SceneActorAnimationSequenceDrawable *)actor->base.drawable)->sequence;
     if (SceneActorReaction_TakePrepared(actor)) {
-        SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0);
+        SceneActorAnimation_SelectDirectionalEntry(&actor->base, 0);
         actor->base.restart = 0;
     }
     if (frame > 42) {
@@ -81,7 +81,7 @@ void Mummy_ResumeSavedTarget(struct ChaseActor *actor, s32 frame)
         SceneActor_SetPositionXZ(&actor->base.body.id,
                                  ((struct ChaseRouteProbe *)group->route)->destination.x,
                                  ((struct ChaseRouteProbe *)group->route)->destination.z);
-        SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0);
+        SceneActorAnimation_SelectDirectionalEntry(&actor->base, 0);
         blocked = SceneActorChase_QueryMotionFlags(actor, 0x80);
         if (blocked) {
             void *target = group->common.gate.control;
@@ -118,7 +118,7 @@ void Mummy_ResumeSavedTarget(struct ChaseActor *actor, s32 frame)
 
 static inline void Mummy_GetDirectionVariant(struct ChaseActor *actor, u8 *variant, u8 *mirror)
 {
-    s32 quadrant = ((actor->base.body.direction + 0x60) >> 6) & 3;
+    s32 quadrant = SceneActorTurn_Cardinal(actor->base.body.direction);
     if (quadrant > 1) {
         *mirror = 1;
         *variant = 3 - quadrant;
@@ -263,7 +263,7 @@ void Mummy_UpdateDeath(struct ChaseActor *actor, s32 frame);
 
 void Mummy_UpdateDying(struct ChaseActor *actor, s32 frame)
 {
-    struct SceneActorControlMotionDrawable *drawable = actor->base.drawable;
+    struct SceneActorAnimationSequenceDrawable *drawable = actor->base.drawable;
     struct DisplaySequenceState *sequence = &drawable->sequence;
     struct SceneActorChaseGroup *group = &actor->group;
     u32 mask;
