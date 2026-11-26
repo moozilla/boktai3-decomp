@@ -114,6 +114,29 @@ Ghoul, Bee, Slime and the actor dispatchers. The pre-run header at 50126e814 alr
 has SceneActorChase_TrackingFlags. This supports a shared typed flag operation with
 moderate confidence. The declaration syntax and spelling of its name are unrecoverable.
 
+Three stock-compiler controls test whether the same typed tracking accessor works
+in whole game functions. In scratch copies, replace only the selected test with
+`SceneActorChase_TrackingFlags(gate, 8)` or, for the facing reaction,
+`SceneActorChase_TrackingFlags(&s->base.tracking, 2)`. First verify that adding the
+accessor's header where needed preserves the original function. Each header control
+and each accessor call matches the full ROM extent.
+
+| Function | Mask | Exact extent |
+|---|---:|---:|
+| SceneActorBehavior_RecordDefeat (080789EC) | 8 | 348 bytes |
+| SceneActorTarget_ResetContactResponse (0807F4B8) | 8 | 600 bytes |
+| SceneActor_TryRequestFacingReaction (080AB604) | 2 | 240 bytes |
+
+The direct field expressions all miss. A tighter control keeps the boolean return,
+helper declaration, call and mask argument identical. Copy the typed helper into the
+scratch unit immediately before the function. In its body change only
+`if (gate->flags & mask)` to `if (gate->flags & 8)` (or 2). Reading the parameter
+matches all three functions. Reading the literal changes four bytes in each, preserving
+each function's length. Scope traces the difference to the LDRB preceding the mask
+MOV and the mask receiving r0 instead of r1. These sites support using one typed
+predicate for both masks. Their existing parked-mask forms reproduce the same ROM,
+so the original spelling remains uncertain.
+
 The combined pause query occurs across 77 units, with two independently addressed
 globals and multiple masks. The ordinary combined-expression branch builds 0x400
 after both loads and the OR. Passing 0x400 into the inline builds it before either
