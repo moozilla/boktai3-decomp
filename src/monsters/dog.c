@@ -304,11 +304,11 @@ void Dog_ResetActionState(struct ChaseActor *actor)
     struct Dog *context = actor->base.context;
     context->flags = 0;
     context->actionTimer = 0;
-    context->stolenSlot = 0xFFFF;
+    context->stolenSlot = -1;
     context->stolenParameter = 0;
     context->turnClockwise = 0;
     context->retreatCount = 0;
-    Memory_Clear(&context->leapTarget, 8);
+    Memory_Clear(&context->leapTarget, sizeof(context->leapTarget));
     SceneActorMovement_ResolveRoutePosition(actor);
     SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0);
     {
@@ -552,20 +552,17 @@ void Dog_UpdateCollisionBounds(struct ChaseActor *a)
 void Dog_UpdateActionTimers(struct ChaseActor *actor)
 {
     struct Dog *context = actor->base.context;
-    u16 *p = &context->nearTimer;
-    if (*p != 0)
-        *p = *p - 1;
-    p = &context->farTimer;
-    if (*p != 0)
-        *p = *p - 1;
+    if (context->nearTimer)
+        context->nearTimer--;
+    if (context->farTimer)
+        context->farTimer--;
 }
 
 void Dog_UpdateActionCooldown(struct ChaseActor *actor)
 {
     struct Dog *context = actor->base.context;
-    u16 *p = &context->actionCooldown;
-    if (*p != 0)
-        *p = *p - 1;
+    if (context->actionCooldown)
+        context->actionCooldown--;
 }
 
 static inline u8 HasPending(void **slot)
@@ -690,27 +687,6 @@ static inline u32 CellShape(struct EngineMap **terrain, u32 cell)
     return *data >> 4;
 }
 
-static inline u8 TryRoute(struct ChaseActor *actor, void *route, struct ContactPosition *position,
-                          struct ContactPosition *destination)
-{
-    s32 result;
-    if (Nav_IsPositionInMesh(route, position, destination)) {
-        result = Terrain_ApplyBlocked(route, position, destination);
-        if (result) {
-            if (result != 2)
-                Memory_Clear(&actor->base.body.motion, 8);
-            return 1;
-        }
-    }
-    {
-        u16 *flags = &actor->base.motionFlags;
-        u32 mask = ~0x200;
-        mask &= *flags;
-        *flags = mask;
-    }
-    return 0;
-}
-
 static inline void Dog_CaptureRoutePosition(struct ContactPosition **out, struct ChaseActor *actor)
 {
     *out = &actor->base.body.position;
@@ -820,7 +796,7 @@ selected: {
     actor->base.body.direction = priorDirection;
     SceneActorChase_CellCenter(chosen, &center);
     {
-        if (TryRoute(actor, GroupRoute(group), routePosition, &center)) {
+        if (Chase_TryRoute(actor, GroupRoute(group), routePosition, &center)) {
             context->retreatCount++;
             return 1;
         }
@@ -2904,7 +2880,7 @@ s32 Dog_Init(void *object)
     dog->itemDamagePercent = Script_GetKeywordValue('d', 50);
     if (!dog->itemDamagePercent)
         dog->itemDamagePercent = 50;
-    dog->stolenSlot = 0xFFFF;
+    dog->stolenSlot = -1;
     dog->stolenParameter = 0;
 
     MonsterInit_ReadPalette(actor, 0x273, 0x192);
@@ -3006,7 +2982,7 @@ static inline void clearRouteFlag(u32 *flags)
 void Dog_ResetIdleControl(struct ChaseActor *actor)
 {
     if (Chase_TakeArrived(actor)) {
-        struct SceneActorReactionMotion *motion;
+        struct SceneActorChaseTracking *tracking;
         struct SceneActorRegistryControl *control;
         u16 *flags;
         actor->base.field2C2 = 0x40;
@@ -3018,11 +2994,11 @@ void Dog_ResetIdleControl(struct ChaseActor *actor)
             mask &= *flags;
             *flags = mask;
         }
-        motion = (void *)&actor->base.tracking.target;
+        tracking = &actor->base.tracking;
         {
             s32 mask = ~0x18;
-            mask &= motion->flags;
-            motion->flags = mask;
+            mask &= tracking->flags;
+            tracking->flags = mask;
         }
         control = &actor->group.common.control;
         if (SceneActorTurn_ActorFlags(actor, 0x200000)) {
@@ -3043,7 +3019,7 @@ void Dog_ResetIdleControl(struct ChaseActor *actor)
         }
         actor->group.turn.turnsRemaining = 0xFF;
 
-        motion->fieldDC = 0;
+        tracking->target = NULL;
         SceneActorChase_SetControl(actor, actor->base.onStanding, 0);
     }
     Callback_InvokeActor(actor, actor->base.contactQuery.opaque);
