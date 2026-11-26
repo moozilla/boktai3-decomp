@@ -1,9 +1,9 @@
-#include "scene/actor/scene_actor_availability.h"
+#include "scene/motion/scene_actor_availability.h"
 #include "global.h"
 #include "engine/math/monster_particle_random.h"
-#include "scene/actor/scene_actor_chase_reaction.h"
+#include "scene/motion/scene_actor_chase_reaction.h"
 #include "scene/actor/scene_actor_control_phase.h"
-#include "scene/actor/scene_actor_turn.h"
+#include "scene/motion/scene_actor_turn.h"
 #include "debug.h"
 u8 sub_0812F3CC(struct ChaseActor *);
 s32 NavMesh_ConsumeProbeEvent(void *);

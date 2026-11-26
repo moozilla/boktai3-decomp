@@ -1,10 +1,10 @@
 #include "global.h"
 #include "effects/particles/scene_particle_burst_api.h"
-#include "scene/actor/scene_actor_chase.h"
+#include "scene/motion/scene_actor_chase.h"
 #include "scene/actor/scene_actor_reset.h"
 #include "monsters/skeleton/skeleton.h"
 #include "scene/actor/scene_actor_reaction.h"
-#include "scene/actor/scene_actor_terrain.h"
+#include "scene/motion/scene_actor_terrain.h"
 #include "player/player.h"
 #include "scene/actor/scene_actor_visibility.h"
 #include "scene/actor/scene_actor_control_helpers.h"
@@ -16,23 +16,23 @@
 #include "scene/actor/scene_actor_profile.h"
 #include "engine/math/rotation_phase.h"
 #include "scene/actor/scene_actor_script.h"
-#include "scene/actor/scene_actor_contact_response.h"
-#include "scene/actor/scene_actor_contact_list.h"
+#include "scene/collision/scene_actor_contact_response.h"
+#include "scene/collision/scene_actor_contact_list.h"
 #include "scene/actor/scene_actor_behavior.h"
-#include "scene/actor/scene_actor_chase_reaction.h"
+#include "scene/motion/scene_actor_chase_reaction.h"
 #include "scene/actor/scene_actor_init_actor.h"
 #include "engine/engine_globals.h"
 #include "engine/ram.h"
 #include "npc/manager/scene_actor_animation.h"
 #include "scene/actor/scene_actor_control_phase.h"
-#include "scene/actor/scene_actor_chase_shared.h"
+#include "scene/motion/scene_actor_chase_shared.h"
 #include "engine/engine.h"
-#include "scene/actor/scene_actor_turn.h"
+#include "scene/motion/scene_actor_turn.h"
 #include "engine/math/monster_particle_random.h"
-#include "scene/actor/scene_actor_displacement.h"
+#include "scene/motion/scene_actor_displacement.h"
 #include "engine/word_flags.h"
 #include "scene/actor/scene_actor_placement.h"
-#include "scene/actor/scene_actor_terrain_reaction.h"
+#include "scene/motion/scene_actor_terrain_reaction.h"
 #include "bosses/vanargand/vanargand_projectiles.h"
 #include "monsters/ghoul_disc.h"
 #include "objects/hazards/falling_objects.h"
@@ -2208,7 +2208,7 @@ s32 SceneActorReaction_TickHiddenResponse(struct ChaseActor *actor)
                 u32 *field = saved->base.drawable;
                 *field |= one;
             } else {
-                struct SceneInputWidget *tile = (void *)((u8 *)saved->base.drawable + 0x20);
+                struct AnimSprite *tile = (void *)((u8 *)saved->base.drawable + 0x20);
                 tile->flags |= one;
             }
             {
@@ -3297,7 +3297,7 @@ void Skeleton_TurnTowardRouteFacing(struct ChaseActor *a)
     u8 prepared = SceneActorReaction_TakePrepared(a);
     s32 direction, target, delta;
     const u8 *entry;
-    struct SceneInputWidget *tile;
+    struct AnimSprite *tile;
 
     motionFlags = &a->base.motionFlags;
     if (prepared) {
@@ -3565,7 +3565,7 @@ void SceneActorReaction_TickHiddenTimeout(struct ChaseActor *p, s32 elapsed)
     }
 }
 
-/* TentacleBody_UpdateReactionTransition: plays the hurt entry or, after a long wait, restores the saved snapshot */
+/* Skeleton_UpdateReactionTransition: plays the hurt entry or, after a long wait, restores the saved snapshot */
 
 struct SnapshotActor;
 
@@ -3580,7 +3580,7 @@ static inline u8 take(u8 *s)
     return 0;
 }
 
-void TentacleBody_UpdateReactionTransition(u8 *s, s32 arg)
+void Skeleton_UpdateReactionTransition(u8 *s, s32 arg)
 {
     u32 queued = take(s);
     if (queued || arg == 0x1E || arg == 0x37) {
@@ -4231,7 +4231,7 @@ static inline void Show_SinkThenDefeat(struct ChaseActor *a)
         u32 mask = ~1;
         *flags &= mask;
     } else {
-        struct SceneInputWidget *tile = (void *)((u8 *)a->base.drawable + 0x20);
+        struct AnimSprite *tile = (void *)((u8 *)a->base.drawable + 0x20);
         u32 mask = ~1;
         tile->flags &= mask;
     }

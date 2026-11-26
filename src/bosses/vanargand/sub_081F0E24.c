@@ -4,7 +4,7 @@ void *ScriptProc_Start(u32, u32);
 void Bg_SetupLayers(u32, u32, void *, u32, u32, u32, u32 *);
 void BgGfx_LoadTilemapSimple(u32, u32, u32, u32, u32);
 void Bg_SetPriority(u32, u32);
-void SingletonSlot7_InitBackgroundAndMotion(u8 *s)
+void VanargandHead_InitBackgroundAndMotion(u8 *s)
 {
     s32 kind = *(s16 *)(s + 0x5EE);
     struct Scratch {

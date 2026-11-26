@@ -1,6 +1,6 @@
 #ifndef GUARD_ORBIT_BACKGROUND_H
 #define GUARD_ORBIT_BACKGROUND_H
-#include "scene/actor/contact_swarm.h"
+#include "scene/collision/contact_swarm.h"
 #include "system/game_state/game_state.h"
 #include "engine/video/render.h"
 #include "engine/ram.h"

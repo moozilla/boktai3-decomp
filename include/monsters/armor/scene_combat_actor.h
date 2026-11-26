@@ -1,6 +1,6 @@
 #ifndef GUARD_SCENE_COMBAT_ACTOR_H
 #define GUARD_SCENE_COMBAT_ACTOR_H
-#include "scene/actor/contact_collider.h"
+#include "scene/collision/contact_collider.h"
 #include "monsters/armor/armor_palette_controller.h"
 
 struct ParticleVector {

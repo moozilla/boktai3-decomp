@@ -53,7 +53,7 @@ unit is exact with the indexed loop.
 modifier gates can lose its first one-shot wrapper exactly. Removing both wrappers
 in any of them swaps the modifier and input registers (7 / 7 differing
 instructions). The accepted source leaves the second wrapper visible.
-Modifier_InitDrainState and BoardPieces_StartConvergence use direct zero stores.
+Modifier_InitDrainState and BatFlockBats_StartConvergence use direct zero stores.
 The palette transition pointer is a direct address of the real member.
 
 ## Remaining decisions and bounded attempts
@@ -62,7 +62,7 @@ The palette transition pointer is a direct address of the real member.
   input/modifier allocation order. Direct parameters, plain early-return gates,
   literal masks and the existing shared amount helpers were tried. None removes
   both wrappers while matching. No extra wrapper was introduced.
-* BoardPiece_Wander's four nested one-shot loops still influence table/cursor/mask
+* BatFlockBat_Wander's four nested one-shot loops still influence table/cursor/mask
   allocation. Direct table initialization produces 13 / 13 register differences
   in the same 376-byte body; the existing direct global random sampler produces
   16 / 18 differences. The four loops were retained, not replaced by another

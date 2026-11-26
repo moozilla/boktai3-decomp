@@ -26,7 +26,7 @@ static inline const u16 *ReadSparkTable(const union HitSparkTable *r)
     return r->table;
 }
 
-void TentacleActor_SpawnSparkBurst(u8 *p)
+void Centipede_SpawnSparkBurst(u8 *p)
 {
     struct VAB v;
     u8 *tbl;

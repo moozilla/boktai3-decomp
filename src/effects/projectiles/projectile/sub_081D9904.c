@@ -7,8 +7,8 @@ void Projectile_SetDamageParams(void *, u32, u32, u32, u32, u32);
 void Projectile_SetTypeAndElement(void *, u32, u32);
 void Projectile_SetSpriteParams(void *, u32, u32, u32);
 s32 Projectile_Spawn(void *, void *);
-void Task4E01_BeginImpactAnimation(void *);
-s32 Task4E01_SpawnImpactChildren(struct Task4E01Projectile *p)
+void ProjectileTask_BeginImpactAnimation(void *);
+s32 ProjectileTask_SpawnImpactChildren(struct Task4E01Projectile *p)
 {
     struct Task4E01Params storage;
     struct Task4E01Params *params;
@@ -73,6 +73,6 @@ s32 Task4E01_SpawnImpactChildren(struct Task4E01Projectile *p)
         } while (i <= 2);
     }
     PlayerCue_StepSequenceEnded(&p->sprite, &p->runtime.sequence);
-    Task4E01_BeginImpactAnimation(p);
+    ProjectileTask_BeginImpactAnimation(p);
     return 0;
 }

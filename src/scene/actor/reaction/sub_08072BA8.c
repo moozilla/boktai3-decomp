@@ -1,4 +1,4 @@
-#include "scene/actor/scene_actor_contact_list.h"
+#include "scene/collision/scene_actor_contact_list.h"
 void SceneActorContacts_ResetList(void)
 {
     struct SceneActorContactManager *manager = gSceneActorContactManager;

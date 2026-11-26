@@ -48,7 +48,7 @@ static inline s32 Truncate(s32 product)
 }
 
 // Tentative: shrink the four radial trail sprites, hiding each after its fifteenth tick.
-void Task4E01_UpdateTrailSprites(struct TrailGroup *group, struct TrailSource *source)
+void ProjectileTask_UpdateTrailSprites(struct TrailGroup *group, struct TrailSource *source)
 {
     s32 direction;
     u8 facing;

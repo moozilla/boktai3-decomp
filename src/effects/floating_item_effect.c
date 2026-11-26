@@ -58,7 +58,7 @@ static inline void FloatingEffect_ProjectVec(struct ContactPosition *out, struct
 
 void FloatingEffect_Project(struct FloatingEffect *effect)
 {
-    struct SceneInputWidget *sprite = &effect->sprite;
+    struct AnimSprite *sprite = &effect->sprite;
     FloatingEffect_ProjectVec(&sprite->position, &effect->position);
     sprite->position.x -= 8;
     sprite->position.y -= 8;
@@ -110,7 +110,7 @@ void FloatingEffect_Wait(struct LinkedWidgetSet *manager, struct FloatingEffect 
 void FloatingEffect_ShrinkAway(struct LinkedWidgetSet *manager, struct FloatingEffect *effect,
                                int index)
 {
-    struct SceneInputWidget *sprite = &effect->sprite;
+    struct AnimSprite *sprite = &effect->sprite;
     u8 *scale;
     if (effect->entered) {
         effect->entered = 0;
@@ -189,7 +189,7 @@ increment:
 void FloatingEffect_RiseAndShrink(struct LinkedWidgetSet *manager, struct FloatingEffect *effect,
                                   int index)
 {
-    struct SceneInputWidget *sprite = &effect->sprite;
+    struct AnimSprite *sprite = &effect->sprite;
     u8 *scale;
     if (effect->entered) {
         effect->entered = 0;
@@ -220,7 +220,7 @@ static inline int FloatingEffect_Scale4(int v)
 void FloatingItemEffect_UpdateFlight(struct LinkedWidgetSet *manager, struct FloatingEffect *effect,
                                      int index)
 {
-    struct SceneInputWidget *sprite = &effect->sprite;
+    struct AnimSprite *sprite = &effect->sprite;
     struct ContactPosition to, from;
     u32 t, inv;
     u8 *scale;
@@ -289,7 +289,7 @@ s32 FloatingEffectManager_Update(struct LinkedWidgetSet *manager)
 u32 FloatingEffectManager_Destroy(struct LinkedWidgetSet *manager)
 {
     s32 i;
-    struct SceneInputWidget *sprite = &manager->effects[0].sprite;
+    struct AnimSprite *sprite = &manager->effects[0].sprite;
     for (i = 7; i >= 0; i--) {
         Anim_Remove(sprite);
         sprite = (void *)((u8 *)sprite + sizeof(struct FloatingEffect));

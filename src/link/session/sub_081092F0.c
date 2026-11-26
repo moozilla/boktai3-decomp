@@ -1,5 +1,5 @@
 #include "global.h"
-#include "scene/area_effect/area_effect_link.h"
+#include "scene/areas/area_effect_link.h"
 
 struct P {
     u8 f[0x1c];
@@ -16,7 +16,7 @@ static inline u8 chk(struct P *p)
     return FALSE;
 }
 
-void Registry1745_SetSelectionResponse(u32 v)
+void LinkSession_SetSelectionResponse(u32 v)
 {
     if (gLinkSession != 0) {
         struct P *p = gLinkSession;

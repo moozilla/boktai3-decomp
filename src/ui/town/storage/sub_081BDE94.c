@@ -2,7 +2,7 @@
 #include "ui/widgets/scene_input_grid.h"
 #include "ui/town/storage_screen.h"
 #include "system/game_state/game_state.h"
-#include "ui/town/scene_item_values.h"
+#include "ui/town/shop_item_values.h"
 struct SwapFlagWidget {
     u32 flags;
     u8 unknown4[0x5C];
@@ -63,7 +63,7 @@ void Storage_BeginSwapTransition(u8 *p)
             case 1: {
                 s32 slot = Storage_FindEquippedItemSlot(p, slots[selected]);
                 if (slot >= 0)
-                    ((struct SceneInputWidget *)(p + slot * sizeof(struct SceneInputWidget) +
+                    ((struct AnimSprite *)(p + slot * sizeof(struct AnimSprite) +
                                                  SWAP_OFFSET(categorySlots)))
                         ->flags |= mode;
                 item = Inventory_GetEquipmentId(slots[selected]);

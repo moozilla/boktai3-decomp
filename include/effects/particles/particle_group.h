@@ -1,7 +1,7 @@
 #ifndef GUARD_PARTICLE_GROUP_H
 #define GUARD_PARTICLE_GROUP_H
 
-#include "scene/actor/contact_position.h"
+#include "scene/collision/contact_position.h"
 #include "engine/task.h"
 
 /* The six-group pool created by ParticleManager_Create. */

@@ -1,9 +1,9 @@
 #include "global.h"
 #include "engine/engine.h"
 #include "engine/ram.h"
-#include "minigames/coffin_bike/glove.h"
+#include "minigames/coffin_bike/coffin_bike.h"
 void SceneMessages_RegisterReceiver(void *, u32, u32);
-void Glove_RegisterMessageReceiver(struct Glove *s)
+void CoffinBike_RegisterMessageReceiver(struct Glove *s)
 {
     u32 m = 0x800;
     if (((gEngineFlags | gScenePauseFlags) & m) == 0) {

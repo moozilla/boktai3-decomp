@@ -113,9 +113,9 @@ void ChallengeMenu_HideWidgets(struct ChallengeMenu *menu)
 {
     s32 i;
     for (i = 0; i < 4; i++)
-        SceneInputWidget_Hide(&menu->widgets[i]);
-    SceneInputWidget_Hide(&menu->widgets[4]);
-    SceneInputWidget_Hide(&menu->widgets[5]);
+        AnimSprite_Hide(&menu->widgets[i]);
+    AnimSprite_Hide(&menu->widgets[4]);
+    AnimSprite_Hide(&menu->widgets[5]);
 }
 
 void ChallengeMenu_HandleInput(struct ChallengeMenu *menu)
@@ -231,17 +231,17 @@ s32 ChallengeMenu_UpdateWidgets(struct ChallengeMenu *menu)
         position->y = (*selection - 1) << 4;
     }
     Palette_UpdateHighlightPulse(menu->highlightPalette, &menu->highlightPhase);
-    SceneInputWidget_Show(&menu->widgets[3]);
+    AnimSprite_Show(&menu->widgets[3]);
     if (menu->selection == 0) {
-        SceneInputWidget_Hide(&menu->widgets[2]);
+        AnimSprite_Hide(&menu->widgets[2]);
     } else if (menu->selection <= 3) {
         rank = ChallengeMenu_GetRankKeyframe(
             ChallengeMenu_GetStoredRank(menu->group, menu->selection - 1));
         if (rank >= 0) {
             Anim_LoadKeyframe(&menu->widgets[2], &menu->resources[1], (u16)rank, 0);
-            SceneInputWidget_Show(&menu->widgets[2]);
+            AnimSprite_Show(&menu->widgets[2]);
         } else {
-            SceneInputWidget_Hide(&menu->widgets[2]);
+            AnimSprite_Hide(&menu->widgets[2]);
         }
     }
 }
@@ -262,7 +262,7 @@ void ChallengeMenu_Update(struct ChallengeMenu *menu)
 void ChallengeMenu_Destroy(struct ChallengeMenu *menu)
 {
     s32 i;
-    struct SceneInputWidget *e = menu->widgets;
+    struct AnimSprite *e = menu->widgets;
     for (i = 3; i >= 0; i--) {
         Anim_Remove(e);
         e++;
@@ -343,7 +343,7 @@ void ChallengeMenu_InitializeKeyframes(struct ChallengeMenu *menu)
 
 void ChallengeMenu_InitAnimations(struct ChallengeMenu *menu)
 {
-    struct SceneInputResource *resource = ScriptProc_Start(0xCB05, 0xA2DB);
+    struct AnimSpriteResource *resource = ScriptProc_Start(0xCB05, 0xA2DB);
     s32 i;
     menu->resources[2] = *resource;
     ResourceHeader_Relocate(&menu->resources[2], resource);

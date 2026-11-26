@@ -1,6 +1,6 @@
 #ifndef GUARD_MENU_DISPLAY_H
 #define GUARD_MENU_DISPLAY_H
-#include "ui/pause/pause_menu.h"
+#include "ui/pause/menu.h"
 
 struct MenuDisplay {
     struct SceneHudState hud;

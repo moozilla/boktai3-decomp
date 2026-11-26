@@ -1,11 +1,11 @@
-#include "ui/town/scene_inventory_actions.h"
+#include "ui/town/shop_actions.h"
 struct SceneInventoryRestoreView {
     u8 unknown0[0x1AEC];
     u16 fallbackSelection;
     u8 unknown1AEE[0x1BE5 - 0x1AEE];
     u8 cursorX, cursorY, selection;
 };
-s32 SceneInventory_ClassifyEquipmentMove(struct SceneInventoryActionView *panel)
+s32 Shop_ClassifyEquipmentMove(struct SceneInventoryActionView *panel)
 {
     u8 saved = panel->savedSelection;
     u32 current;

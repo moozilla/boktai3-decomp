@@ -13,7 +13,7 @@ struct SceneSequenceSelection {
 };
 extern const struct SceneSequenceEntry *const gUnk_08611BA8[];
 extern const struct SceneSequenceSelection *const gUnk_08611BC0[];
-s32 SceneSequence_GetSelectedMessage(void)
+s32 MenuSequence_GetSelectedMessage(void)
 {
     struct GameState *state = gGameState;
     s32 result;

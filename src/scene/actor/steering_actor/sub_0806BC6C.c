@@ -1,4 +1,4 @@
-#include "scene/actor/scene_steering_actor.h"
+#include "scene/motion/scene_steering_actor.h"
 void SceneSteeringActor_RefreshCollider(struct SceneSteeringActor *p)
 {
     struct ContactCollider *collider = &p->collider;

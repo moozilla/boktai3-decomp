@@ -13,7 +13,7 @@ u32 TextWindow_Create(s32, s32, s32, s32);
 void TextWindow_SetScript(u32, u32);
 void TextWindow_Refresh(u32, u32);
 void TextWindow_StartPlayback(u32);
-void Registry33FF_CreateTextWindows(struct S *s)
+void LinkLobbyPanel_CreateTextWindows(struct S *s)
 {
     s->f = TextWindow_Create(1, 3, 0x1c, 2);
     s->d = TextWindow_Create(1, 6, 0xa, 2);

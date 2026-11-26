@@ -25,17 +25,17 @@ void Power_EnterSleep(void);
 void SelectionPanel_UpdateCursor(struct SceneHudState *menu, s32 visible)
 {
     if (visible == 0) {
-        SceneInputWidget_Hide(&menu->categoryWidgets[5]);
-        SceneInputWidget_Hide(&menu->settingsArrows[0]);
-        SceneInputWidget_Hide(&menu->settingsArrows[1]);
+        AnimSprite_Hide(&menu->categoryWidgets[5]);
+        AnimSprite_Hide(&menu->settingsArrows[0]);
+        AnimSprite_Hide(&menu->settingsArrows[1]);
     } else {
         u8 *row;
         menu->categoryWidgets[5].flags &= ~1;
         menu->categoryWidgets[5].position.x = 0;
         row = &menu->settingsRow;
         menu->categoryWidgets[5].position.y = *row * 16 + 0x18;
-        SceneInputWidget_Show(&menu->settingsArrows[0]);
-        SceneInputWidget_Show(&menu->settingsArrows[1]);
+        AnimSprite_Show(&menu->settingsArrows[0]);
+        AnimSprite_Show(&menu->settingsArrows[1]);
         menu->settingsArrows[0].position.x = 0x80;
         menu->settingsArrows[1].position.x = 0xd8;
         {
@@ -196,7 +196,7 @@ void SelectionPanel_ConfirmSettings(struct SceneHudState *menu)
     if (gPadState[1] & 1) {
         Sound_PlaySong(0xDD);
         SelectionPanel_UpdateCursor(menu, 1);
-        SceneCatalog_SelectDescription(6);
+        StatusOptions_SelectDescription(6);
         PauseMenu_HidePromptIcons(menu);
         Hud_SetInteractionCallback(menu, PauseMenu_UpdateConfigChoice, 1);
     }
@@ -206,15 +206,15 @@ void PauseMenu_UpdateConfigChoice(struct SceneHudState *menu)
 {
     if (gPadState[1] & 1) {
         Sound_PlaySong(0xDD);
-        SceneCatalog_SaveOptions(menu);
+        StatusOptions_SaveOptions(menu);
         SelectionPanel_UpdateCursor(menu, 0);
-        SceneCatalog_SelectDescription(7);
+        StatusOptions_SelectDescription(7);
         Hud_SetInteractionCallback(menu, SelectionPanel_WaitConfirmDelay, 1);
     } else if (gPadState[1] & 2) {
         Sound_PlaySong(0xDE);
         SelectionPanel_CaptureSettings(menu);
         SelectionPanel_UpdateCursor(menu, 0);
-        SceneCatalog_SelectDescription(5);
+        StatusOptions_SelectDescription(5);
         PauseMenu_SetPairedIcons(menu, 1, -1);
         MenuSelection_RefreshAllOptionText(menu);
         Hud_SetInteractionCallback(menu, SelectionPanel_ConfirmSettings, 0);
@@ -228,7 +228,7 @@ void PauseMenu_UpdateConfigChoice(struct SceneHudState *menu)
 void SelectionPanel_WaitConfirmDelay(struct SceneHudState *menu)
 {
     if (++menu->actionTransferDelay > 59) {
-        SceneCatalog_SelectDescription(5);
+        StatusOptions_SelectDescription(5);
         PauseMenu_SetPairedIcons(menu, 1, -1);
         Hud_SetInteractionCallback(menu, SelectionPanel_ConfirmSettings, 0);
     }
@@ -284,7 +284,7 @@ void Hud_InitConfigMenu(struct SceneHudState *menu)
     MenuSelection_RefreshAllOptionText(menu);
     MessageWindow_SetMessageTable(menu->optionUpperEScript);
     MessageWindow_SetPalette(0xEFDA);
-    SceneCatalog_SelectDescription(5);
+    StatusOptions_SelectDescription(5);
     PauseMenu_SetPromptIconPositions(menu, 0, -12);
     PauseMenu_SetPairedIcons(menu, 1, -1);
     Hud_SetInteractionCallback(menu, SelectionPanel_ConfirmSettings, 0);
@@ -296,7 +296,7 @@ void PauseMenu_BeginSleepPrompt(struct SceneHudState *menu)
     if (gPadState[1] & 1) {
         Sound_PlaySong(0xDD);
         PauseMenu_SetConfirmationIndicator(menu, 0);
-        SceneCatalog_SelectDescription(0x12);
+        StatusOptions_SelectDescription(0x12);
         PauseMenu_HidePromptIcons(menu);
         Hud_SetInteractionCallback(menu, SelectionPanel_ProcessChoice, 1);
         MenuDisplay_SetPaletteOverrides(menu, 0, 0, 1, 0);
@@ -313,13 +313,13 @@ void SelectionPanel_ProcessChoice(struct SceneHudState *menu)
     int choice = PauseMenu_UpdateBinaryChoice(menu);
     if (choice == 0) {
         Sound_PlaySong(0xDE);
-        SceneCatalog_SelectDescription(0x11);
+        StatusOptions_SelectDescription(0x11);
         TextWindow_Clear(menu->timedMessageWindow);
         PauseMenu_SetPairedIcons(menu, 1, -1);
         Hud_SetInteractionCallback(menu, PauseMenu_BeginSleepPrompt, 0);
     } else if (choice == 1) {
         Sound_PlaySong(0xDD);
-        SceneCatalog_SelectDescription(0x13);
+        StatusOptions_SelectDescription(0x13);
         Hud_SetInteractionCallback(menu, SelectionPanel_WaitThenSleep, 1);
     }
 }
@@ -328,7 +328,7 @@ void SelectionPanel_WaitThenSleep(struct SceneHudState *menu)
 {
     gSceneDialogActive = 1;
     if (++menu->actionTransferDelay > 119) {
-        SceneCatalog_SelectDescription(0x11);
+        StatusOptions_SelectDescription(0x11);
         TextWindow_Clear(menu->timedMessageWindow);
         PauseMenu_SetPairedIcons(menu, 1, -1);
         Hud_SetInteractionCallback(menu, PauseMenu_BeginSleepPrompt, 0);

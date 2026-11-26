@@ -46,10 +46,10 @@ struct ScenePanel {
 void PauseMenu_HideAllSprites(void *);
 void Anim_SetKeyframes(void *, void *, u32, u32, u32);
 s32 MessageWindow_ShowMessage(s32);
-void SceneSequence_CallCompletionScript(void);
+void MenuSequence_CallCompletionScript(void);
 void Hud_SetUpdateCallback(void *, void (*)(void));
 void Sound_PlaySong(u32);
-void ScenePanel_BeginAccountExit(struct ScenePanel *p)
+void MenuSequence_BeginAccountExit(struct ScenePanel *p)
 {
     u32 zero;
     u16 *coord;
@@ -69,5 +69,5 @@ void ScenePanel_BeginAccountExit(struct ScenePanel *p)
     p->detailSprite.flags &= ~1;
     Sound_PlaySong(0x2C1);
     MessageWindow_ShowMessage(3);
-    Hud_SetUpdateCallback(p, SceneSequence_CallCompletionScript);
+    Hud_SetUpdateCallback(p, MenuSequence_CallCompletionScript);
 }

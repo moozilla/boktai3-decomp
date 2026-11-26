@@ -1,6 +1,6 @@
-#include "scene/actor/scene_actor_position_search.h"
+#include "scene/motion/scene_actor_position_search.h"
 #include "scene/actor/scene_actor_attachment.h"
-#include "scene/actor/scene_actor_terrain.h"
+#include "scene/motion/scene_actor_terrain.h"
 
 struct NeighborTerrainCell {
     u8 heightAndShape;

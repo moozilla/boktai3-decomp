@@ -2,7 +2,7 @@ Tags: #actors #animation
 
 # Actor graphics and basic states (08021EA8-08024F2C)
 
-Merged into `src/bosses/vampire/actor_graphics_and_basic_states.c` (82 functions: 70 matched,
+Merged into `src/bosses/count/actor_graphics_and_basic_states.c` (82 functions: 70 matched,
 12 `INCLUDE_ASM`). Reuses `struct StateActor` (`include/npc/story_character/state_actor.h`), the
 same object as `081D...`'s state-table actors (confirmed: `SceneNpc_*` and
 `SceneCharacter_*`/`MessageActor_*` in `src/npc/story_character/message_actor_08612344.c` still
@@ -35,7 +35,7 @@ previously left as opaque padding.
     read by `SceneActorGraphics_UpdateVariant` and the two
     `SceneActorAnimation_Update*Callback` concessions, and compared against
     in `SceneActorState_SetValueClampedWhen{Inactive,Active}`.
-* `include/bosses/vampire/actor_graphics_and_basic_states.h` (new): `struct SceneActorGraphics`
+* `include/bosses/count/count_graphics.h` (new): `struct SceneActorGraphics`
   names `groundEffect`'s contents as far as this unit's evidence goes (0x344
   through the three 0x200-byte palette banks at 0x3C4-0x9C4, to the contact
   pool / background-flash pointers at 0x9D8/0x9DC). Declares the
@@ -124,7 +124,7 @@ Matched: none closely enough to keep as a draft. All 12 are
   object's start - strong evidence `StateActor` really is one shared actor
   object across many 0802xxxx/081Dxxxx ranges, just incompletely merged so
   far.
-* `include/scene/actor/scene_actor_collision.h` (from the immediately preceding
+* `include/scene/collision/scene_actor_collision.h` (from the immediately preceding
   subsystem, 080213EC-08021EA8) already reads bytes 0x9E/0xA2/0xA4 - which
   fall inside this unit's new `actionFlags`/`unkA0` span - through a
   *different* named type, `struct SceneActorRegistryActor`. That struct and

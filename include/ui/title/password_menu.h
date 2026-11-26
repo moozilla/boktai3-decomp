@@ -3,8 +3,8 @@
 #include "ui/widgets/scene_input.h"
 #include "ui/menu_parameters.h"
 struct PasswordWidget {
-    struct SceneInputWidget sprite;
-    struct SceneInputResource resource;
+    struct AnimSprite sprite;
+    struct AnimSpriteResource resource;
     u32 unknown80[2];
 };
 struct PasswordRows {
@@ -28,8 +28,8 @@ struct PasswordMenu {
 };
 struct PasswordDisplay {
     struct Task task;
-    struct SceneInputWidget widget;
-    struct SceneInputResource resource;
+    struct AnimSprite widget;
+    struct AnimSpriteResource resource;
     s16 state, frame;
     void *background;
     s32 fadeTimer, fadeShift;

@@ -1,5 +1,5 @@
 #include "objects/pile_driver/scene_panel.h"
-void ScenePanel_BeginBackgroundBurst(void)
+void PileDriver_BeginBackgroundBurst(void)
 {
     if (gScenePanel) {
         gScenePanel->mode = 64;

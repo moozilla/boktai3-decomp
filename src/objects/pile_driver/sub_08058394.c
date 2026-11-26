@@ -1,8 +1,8 @@
 #include "objects/pile_driver/scene_panel.h"
-void ScenePanel_TickLongNine(struct ScenePanel *panel)
+void PileDriver_TickLongNine(struct ScenePanel *panel)
 {
     if (++panel->stateFrame > 5) {
-        ScenePanel_SetChannelValue(panel, 2, 10);
-        ScenePanel_SetState(panel, ScenePanel_TickLongTen);
+        PileDriver_SetChannelValue(panel, 2, 10);
+        PileDriver_SetState(panel, PileDriver_TickLongTen);
     }
 }

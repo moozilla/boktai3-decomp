@@ -1,5 +1,5 @@
 #include "link/records/link_record_panel.h"
-#include "scene/area_effect/area_effect_link.h"
+#include "scene/areas/area_effect_link.h"
 #include "ui/dialogue/scrolling_dialogue.h"
 #include "engine/video/palette_resource.h"
 
@@ -37,9 +37,9 @@ void Bg_SetLayerMap(u32, void *, u16);
 
 void PaletteFade_CycleMenuColors(void *);
 
-s32 Registry1745_GetSessionState(void);
+s32 LinkSession_GetSessionState(void);
 
-void Registry1745_SetMenuRequest(u32);
+void LinkSession_SetMenuRequest(u32);
 
 void ModifierMenu_InitSelectionSnapshot(void *, void *);
 
@@ -313,7 +313,7 @@ void LinkRecordPanel_HideDisplay(struct LinkRecordPanel *owner)
 
 void LinkRecordPanel_RemoveWidgets(struct LinkRecordPanel *owner)
 {
-    struct SceneInputWidget *q = owner->widgets;
+    struct AnimSprite *q = owner->widgets;
     s32 i;
 
     for (i = 6; i >= 0; i--) {
@@ -341,7 +341,7 @@ void LinkRecordPanel_RunExitScript(struct LinkRecordPanel *self)
     Bg_ClearTilemap(2);
     Bg_ClearTilemap(3);
     LinkRecordPanel_HideDisplay(self);
-    Registry1745_SetMenuRequest(2);
+    LinkSession_SetMenuRequest(2);
     if (self->exitScript != 0) {
         Script_Call(self->exitScript, 0);
         Task_Kill(self);
@@ -364,7 +364,7 @@ void LinkRecordPanel_UpdateExit(struct LinkRecordPanel *owner)
         owner->entering = 0;
     }
     if (owner->timer > 15) {
-        Registry1745_SetMenuRequest(1);
+        LinkSession_SetMenuRequest(1);
         Task_Kill(owner);
     } else {
         owner->timer++;
@@ -399,7 +399,7 @@ void LinkRecordPanel_UpdateDelay(struct LinkRecordPanel *owner)
 
 s32 LinkRecordPanel_Update(struct LinkRecordPanel *owner)
 {
-    if (Registry1745_GetSessionState() == 0) {
+    if (LinkSession_GetSessionState() == 0) {
         ScrollingDialogue_HideImmediately();
         Task_Kill(owner);
         return -1;

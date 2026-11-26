@@ -18,7 +18,7 @@ struct GrowthHazardManager {
     struct GrowthHazardEntry entries[1];
 };
 
-s32 GrowthHazard_FindNearestEntryDistance(void *object, struct GrowthHazardPosition *position,
+s32 SolarRoot_FindNearestEntryDistance(void *object, struct GrowthHazardPosition *position,
                  struct GrowthHazardPosition *out)
 {
     struct GrowthHazardManager *collection = object;

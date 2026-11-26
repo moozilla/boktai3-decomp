@@ -2,7 +2,7 @@
 #include "scene/actor/scene_actor_placement.h"
 void Collision_CalculateDamageResponse(struct SceneActorBehaviorContactView *,
                                        struct SceneActorBehaviorContactView *);
-void TentacleActor_EnterHitReaction(void *);
+void Centipede_EnterHitReaction(void *);
 s32 Math_Atan2(s32, s32);
 static inline u32 Unavailable(struct RoomActor *actor)
 {
@@ -20,7 +20,7 @@ struct TentacleContactTarget {
     void *closestSegment;
 };
 
-void TentacleActor_ReactToContact(struct SceneActorBehaviorContactView *source,
+void Centipede_ReactToContact(struct SceneActorBehaviorContactView *source,
                                   struct SceneActorBehaviorContactView *destination, void *input)
 {
     struct TentacleContactSegment *actor = input;
@@ -54,6 +54,6 @@ void TentacleActor_ReactToContact(struct SceneActorBehaviorContactView *source,
             target->closestDistance = distance;
             target->closestSegment = actor;
         }
-        TentacleActor_EnterHitReaction(target);
+        Centipede_EnterHitReaction(target);
     }
 }

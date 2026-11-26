@@ -1,4 +1,4 @@
-#include "objects/pile_driver/scene_panel_rig.h"
+#include "objects/pile_driver/pile_driver_rig.h"
 static inline s32 randomValue(void)
 {
     u32 offset;
@@ -6,10 +6,10 @@ static inline s32 randomValue(void)
     offset = gRandomIndex * 2;
     return *(const u16 *)(offset + (u32)gRandomTable);
 }
-s32 ScenePanelRig_SelectActiveSubject(struct ScenePanelRig *rig)
+s32 PileDriverRig_SelectActiveSubject(struct ScenePanelRig *rig)
 {
     struct SceneRigParentView *parent = (void *)rig->parent;
-    s32 count = ScenePanelRig_GetActiveCount(rig);
+    s32 count = PileDriverRig_GetActiveCount(rig);
     s32 i, selected;
     if (count == 0)
         return -1;

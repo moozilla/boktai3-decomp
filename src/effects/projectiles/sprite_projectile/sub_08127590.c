@@ -9,7 +9,7 @@
 // confidence=low: creates a pooled projectile with optional spin and collider.
 #define SpriteProjectile_Create sub_08127590
 void *SpriteProjectile_EnsurePool(void);
-struct Projectile *SpritePool10_AllocateSlot(void *);
+struct Projectile *SpriteProjectilePool_AllocateSlot(void *);
 extern u32 gUnk_02000560;
 void AnimData_Load(void *, u32);
 void *ScriptProc_Start(u32, u16);
@@ -124,7 +124,7 @@ struct Projectile *SpriteProjectile_Create(struct ContactPosition *position,
         return 0;
     if (Flags_MaskedWord(4, &gUnk_02000560))
         return 0;
-    p = SpritePool10_AllocateSlot(pool);
+    p = SpriteProjectilePool_AllocateSlot(pool);
     if (!p)
         return 0;
     p->state = 0;

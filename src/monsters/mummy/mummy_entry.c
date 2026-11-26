@@ -1,34 +1,34 @@
 #include "global.h"
 #include "scene/actor/scene_actor_drawable_flags.h"
 #include "scene/actor/scene_actor_reaction.h"
-#include "scene/actor/scene_actor_availability.h"
+#include "scene/motion/scene_actor_availability.h"
 #include "npc/manager/scene_actor_animation.h"
-#include "scene/actor/scene_actor_chase_reaction.h"
-#include "scene/actor/scene_actor_delayed_response.h"
+#include "scene/motion/scene_actor_chase_reaction.h"
+#include "scene/collision/scene_actor_delayed_response.h"
 #include "engine/video/display_sequence.h"
-#include "scene/actor/scene_actor_displacement.h"
+#include "scene/motion/scene_actor_displacement.h"
 #include "effects/particles/spark_particle.h"
 #include "script/script_utility.h"
 #include "engine/engine.h"
 #include "scene/actor/scene_actor_part_burst.h"
-#include "scene/actor/scene_actor_chase.h"
-#include "scene/actor/scene_actor_stimulus.h"
+#include "scene/motion/scene_actor_chase.h"
+#include "scene/collision/scene_actor_stimulus.h"
 #include "scene/actor/scene_actor_control_phase.h"
 #include "debug.h"
 #include "monsters/mummy/mummy.h"
-#include "scene/actor/scene_actor_turn.h"
+#include "scene/motion/scene_actor_turn.h"
 #include "scene/actor/scene_actor_reset.h"
-#include "scene/actor/scene_actor_chase_direct_arrival.h"
-#include "scene/actor/scene_actor_cardinal_path.h"
-#include "scene/actor/scene_actor_terrain.h"
+#include "scene/motion/scene_actor_chase_direct_arrival.h"
+#include "scene/motion/scene_actor_cardinal_path.h"
+#include "scene/motion/scene_actor_terrain.h"
 #include "player/player.h"
-#include "scene/actor/scene_actor_straight_route.h"
-#include "scene/actor/scene_actor_contacts.h"
-#include "scene/actor/scene_actor_chase_shared.h"
-#include "scene/area_effect/area_effect_link.h"
+#include "scene/motion/scene_actor_straight_route.h"
+#include "scene/collision/scene_actor_contacts.h"
+#include "scene/motion/scene_actor_chase_shared.h"
+#include "scene/areas/area_effect_link.h"
 #include "engine/video/render.h"
 #include "engine/runtime.h"
-#include "scene/actor/scene_actor_adjacent_cell.h"
+#include "scene/motion/scene_actor_adjacent_cell.h"
 #include "engine/ram.h"
 #include "scene/actor/scene_actor_control_motion.h"
 #include "engine/video/display_sequence_inline.h"
@@ -39,10 +39,10 @@
 #include "scene/actor/scene_actor_init_dispatch.h"
 #include "monsters/scene_actor_init_graphics.h"
 #include "monsters/scene_actor_init_body.h"
-#include "scene/actor/scene_actor_contact_response.h"
+#include "scene/collision/scene_actor_contact_response.h"
 #include "engine/word_flags.h"
 #include "engine/math/movement_curve.h"
-#include "scene/actor/scene_actor_damage_visibility.h"
+#include "scene/collision/scene_actor_damage_visibility.h"
 #include "bosses/vanargand/vanargand_parts.h"
 
 void SceneActorAnimation_SelectDirectionalEntry(struct RoomActor *, s32);
@@ -154,7 +154,7 @@ static inline void Mummy_SelectAnimation(struct ChaseActor *actor, u32 selection
                          (u8)variant, (u8)flags);
         restart = &actor->base.restart;
     } else {
-        struct SceneInputWidget *tile =
+        struct AnimSprite *tile =
             &((struct SceneActorAnimationTileDrawable *)actor->base.drawable)->tile;
         u8 *savedSelection;
         selection += variant;
@@ -230,7 +230,7 @@ void Mummy_UpdateRevival(void *object)
             *flags = mask & *flags;
         } else {
             struct SceneActorAnimationTileDrawable *drawable = actor->base.drawable;
-            struct SceneInputWidget *tile = &drawable->tile;
+            struct AnimSprite *tile = &drawable->tile;
             u32 mask = ~1;
             tile->flags = mask & tile->flags;
         }
@@ -799,7 +799,7 @@ static inline u32 Mummy_DisplayFlags(struct ChaseActor *actor, u32 maskInput)
     return actor->base.statusFlags & mask;
 }
 
-static inline void HideTile(struct SceneInputWidget *tile)
+static inline void HideTile(struct AnimSprite *tile)
 {
     u32 mask = ~1;
     tile->flags = mask & tile->flags;

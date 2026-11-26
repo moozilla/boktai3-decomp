@@ -4,11 +4,11 @@
 #include "scene/actor/scene_actor_reset.h"
 #include "npc/manager/scene_actor_animation.h"
 #include "scene/actor/scene_actor_control_phase.h"
-#include "scene/actor/scene_actor_chase_reaction.h"
-#include "scene/actor/scene_actor_terrain.h"
-#include "scene/actor/scene_actor_availability.h"
+#include "scene/motion/scene_actor_chase_reaction.h"
+#include "scene/motion/scene_actor_terrain.h"
+#include "scene/motion/scene_actor_availability.h"
 #include "engine/video/display_sequence.h"
-#include "scene/actor/scene_actor_motion.h"
+#include "scene/motion/scene_actor_motion.h"
 #include "link/session/room_actor.h"
 
 /* Species allocation; the roles of the private flags remain tentative. */

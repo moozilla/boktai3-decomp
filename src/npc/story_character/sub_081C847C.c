@@ -16,7 +16,7 @@ struct P {
 void SunOrb_GetOrCreateManager(void);
 u32 SunOrb_CreatePlayerTargeted(void *);
 void Sound_PlaySong(u32);
-void StateActor_SpawnRaisedEffect(u32 a, struct S *p)
+void StoryCharacter_SpawnRaisedEffect(u32 a, struct S *p)
 {
     u8 *e = (u8 *)p + 0x20;
     if (p->b9 != 0) {

@@ -1,7 +1,7 @@
 #include "global.h"
 #include "engine/video/display_animation.h"
 #include "engine/video/display_sprite_playback.h"
-#include "scene/actor/contact_actor.h"
+#include "scene/collision/contact_actor.h"
 #include "engine/ram.h"
 struct WoodenCrate {
     struct ContactSwarmSprite sprite;

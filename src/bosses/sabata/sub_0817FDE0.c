@@ -27,12 +27,12 @@ void SpriteComponent_Init(void *);
 void SpriteComponent_ConfigureCollider(void *, s32, s32, s32);
 void *FrostEmitter_Create(void);
 void ActorAnimation_UpdateDirectional(void);
-void BossSlot2_ApplyPendingDamage(void);
-void BossSlot2_InitStateDispatch(void);
+void Sabata_ApplyPendingDamage(void);
+void Sabata_InitStateDispatch(void);
 void SceneActors_SetHealthLimits(u8 *, s32, s32, s32);
-void ActorImpact_InitAttackCollider(u8 *);
-void ActorImpact_InitBodyCollider(u8 *, s32);
-void ActorImpact_InitCollider(u8 *);
+void SabataImpact_InitAttackCollider(u8 *);
+void SabataImpact_InitBodyCollider(u8 *, s32);
+void SabataImpact_InitCollider(u8 *);
 void SceneActors_SetEventScripts(u8 *, s32, s32);
 void SceneActors_InitConvergingParticles(u8 *);
 void Shadow_Initialize(void *, void *, s32);
@@ -40,9 +40,9 @@ void ProximityVolume_InitializeCallbacks(void *);
 void ProximityVolume_SetParameter(void *, s32);
 void CameraFollow_Initialize(void *, u32, void *, s32);
 void SceneActors_SetDamageCallback(u8 *, void *, void *, s32);
-void ActorPosition_BeginReaction(void);
+void SabataPosition_BeginReaction(void);
 void ProximityVolume_TranslateBounds(void *, void *);
-void Task4E01_Destroy(void);
+void ProjectileTask_Destroy(void);
 void *TimedEffect_GetOrCreateManager(s32);
 
 struct BossBody {
@@ -272,13 +272,13 @@ s32 sub_0817FDE0(struct BossInit *boss, u32 arg1)
     actor->restart = 1;
     actor->impactState = 0;
     actor->impactTimer = 0;
-    SetDamageCallback(actor, BossSlot2_ApplyPendingDamage);
-    SetStateCallback(actor, BossSlot2_InitStateDispatch);
+    SetDamageCallback(actor, Sabata_ApplyPendingDamage);
+    SetStateCallback(actor, Sabata_InitStateDispatch);
 
     SceneActors_SetHealthLimits((u8 *)actor, initialHealth, initialHealth, 0);
-    ActorImpact_InitAttackCollider((u8 *)boss);
-    ActorImpact_InitBodyCollider((u8 *)boss, 0);
-    ActorImpact_InitCollider((u8 *)boss);
+    SabataImpact_InitAttackCollider((u8 *)boss);
+    SabataImpact_InitBodyCollider((u8 *)boss, 0);
+    SabataImpact_InitCollider((u8 *)boss);
 
     if (Script_SeekToKeyword(0x65)) {
         u32 *p;
@@ -359,9 +359,9 @@ s32 sub_0817FDE0(struct BossInit *boss, u32 arg1)
     boss->effectEnabled = 1;
     CameraFollow_Initialize(&boss->camera, *cameraTarget, boss->widget.shadowPart, 1);
     CameraTracking_SetRange(&boss->camera, zero, 0x8C);
-    SceneActors_SetDamageCallback((u8 *)actor, boss->attackCollider, ActorPosition_BeginReaction, boss->damage);
+    SceneActors_SetDamageCallback((u8 *)actor, boss->attackCollider, SabataPosition_BeginReaction, boss->damage);
     ProximityVolume_TranslateBounds(boss->bounds, volumePosition);
-    Task4E01_Destroy();
+    ProjectileTask_Destroy();
     TimedEffect_GetOrCreateManager(0x11);
     boss->signalPending = zero;
     boss->signalTimer = zero;

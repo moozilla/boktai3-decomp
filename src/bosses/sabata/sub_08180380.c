@@ -7,7 +7,7 @@ s32 sub_0817FDE0(u8 *, u32);
 void Task_Kill(u8 *);
 void SceneActor_UpdateUnlessPaused(void);
 void SceneActor_DestroyComponents(void);
-u8 *BossSlot2_CreateFromScript(u32 a)
+u8 *Sabata_CreateFromScript(u32 a)
 {
     u8 *p;
     p = SceneActors_GetBySlot(Script_GetKeywordValue(0x74, 2));

@@ -1,4 +1,4 @@
-#include "scene/actor/route_sprite_playback.h"
+#include "scene/motion/route_sprite_playback.h"
 void RouteSpriteActor_FinishAnimation(struct RouteSpritePool *pool, struct RouteSpriteActor *actor)
 {
     if (actor->entered) {

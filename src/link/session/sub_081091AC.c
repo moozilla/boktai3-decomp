@@ -1,5 +1,5 @@
 #include "global.h"
-#include "scene/area_effect/area_effect_link.h"
+#include "scene/areas/area_effect_link.h"
 struct S {
     u8 pad[0x18];
     s16 x18;

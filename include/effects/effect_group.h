@@ -1,7 +1,7 @@
 #ifndef GUARD_EFFECT_GROUP_H
 #define GUARD_EFFECT_GROUP_H
 
-#include "scene/actor/contact_position.h"
+#include "scene/collision/contact_position.h"
 
 struct EffectGroup;
 s32 sub_08014634(s32 count, s32 options, const struct ContactPosition *position,

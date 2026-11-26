@@ -14,7 +14,7 @@ Some callers copy it once or twice before overwriting it. The value can reach
 a call to `Player_SetDirectionalVelocity` in r3, but that function's player
 and speed arguments occupy r0 and r1.
 
-| FanCannon_UpdateActive | First direction | Second direction |
+| WindCannon_UpdateActive | First direction | Second direction |
 |---|---|---|
 | Load into r3 | 08209744 | 08209798 |
 | Copy r3 into r6 | 08209772 | 082097C8 |

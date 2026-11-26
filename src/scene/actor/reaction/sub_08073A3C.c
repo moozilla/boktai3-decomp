@@ -1,4 +1,4 @@
-#include "scene/actor/scene_actor_contacts.h"
+#include "scene/collision/scene_actor_contacts.h"
 static inline u8 SceneActorContacts_AreDisabled(void)
 {
     u32 mask = 0x40;

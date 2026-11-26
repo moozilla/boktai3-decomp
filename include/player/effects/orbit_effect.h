@@ -2,7 +2,7 @@
 #define GUARD_PLAYER_ORBIT_EFFECT_H
 #include "player/player.h"
 #include "engine/engine.h"
-#include "scene/actor/contact_collider.h"
+#include "scene/collision/contact_collider.h"
 
 struct PlayerOrbitResource {
     u32 words[8];

@@ -18,7 +18,7 @@ struct PathPlayer {
 s32 Nav_IsPositionInMesh(void *, struct ActorPathPosition *, struct ActorPathPosition *);
 void ProximityVolume_TranslateBounds(void *, struct ActorPathPosition *);
 s32 Mod(s32, s32);
-s32 ActorPosition_TestPath(struct ActorPathState *p, struct ActorPathPosition *destination);
+s32 SabataPosition_TestPath(struct ActorPathState *p, struct ActorPathPosition *destination);
 static inline u32 Random(void)
 {
     u32 offset;
@@ -62,5 +62,5 @@ s32 sub_0817A918(struct ActorPathState *p)
     if (n <= 0)
         return 0;
     i = Mod(Random(), n);
-    return ActorPosition_TestPath(p, &candidates[i]);
+    return SabataPosition_TestPath(p, &candidates[i]);
 }

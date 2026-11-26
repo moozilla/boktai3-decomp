@@ -1,4 +1,4 @@
-#include "scene/actor/scene_actor_terrain_reaction.h"
+#include "scene/motion/scene_actor_terrain_reaction.h"
 #include "scene/actor/scene_actor_placement.h"
 
 // confidence=low: resumes the actor drawable and shadow, then restores its reset control.

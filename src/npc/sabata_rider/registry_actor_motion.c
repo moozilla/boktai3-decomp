@@ -1,4 +1,4 @@
-#include "npc/sabata_rider/script_puppet.h"
+#include "npc/sabata_rider/sabata_rider.h"
 
 enum {
     REGISTRY_ACTOR_UPDATE_FALL = 0x10,
@@ -34,7 +34,7 @@ void ActorMotion_UpdateFallFrame(struct RegistryActor *actor)
     s32 *previousOffset, *currentOffset, *verticalPosition, *lateralPosition, *previousZ;
 
     if (actor->resetKeys) {
-        RegistryA8CB_SetKeyframes(actor, 1);
+        SabataRider_SetKeyframes(actor, 1);
         actor->resetKeys = 0;
     }
     RegistryActor_SetUpdateFlags(REGISTRY_ACTOR_UPDATE_FALL, actor);
@@ -110,7 +110,7 @@ void SceneActor_UpdateFallState(struct RegistryActor *actor)
     s32 *prevX, *curX, *posY, *posZ, *prevZ;
 
     if (actor->resetKeys) {
-        RegistryA8CB_SetKeyframes(actor, 1);
+        SabataRider_SetKeyframes(actor, 1);
         Trigger_ConsumePending(actor->control.messages, 1);
         actor->resetKeys = 0;
     }
@@ -188,7 +188,7 @@ void SceneActor_UpdateKnockbackFall(struct RegistryActor *actor)
     s32 *prev, *cur, *py, *pz, *prevZ;
 
     if (actor->resetKeys) {
-        RegistryA8CB_SetKeyframes(actor, 1);
+        SabataRider_SetKeyframes(actor, 1);
         actor->resetKeys = 0;
     }
     RegistryActor_SetUpdateFlags(REGISTRY_ACTOR_UPDATE_FALL, actor);
@@ -266,7 +266,7 @@ void ActorPhysics_UpdateFallMotion(struct RegistryActor *actor)
     u32 verticalNonnegative, horizontalNonnegative;
 
     if (actor->resetKeys) {
-        RegistryA8CB_SetKeyframes(actor, 1);
+        SabataRider_SetKeyframes(actor, 1);
         actor->resetKeys = 0;
     }
     RegistryActor_SetUpdateFlags(REGISTRY_ACTOR_UPDATE_FALL, actor);

@@ -1,7 +1,7 @@
 #include "global.h"
 #include "engine/engine.h"
 #include "engine/math/scene_vec.h"
-#include "scene/area_effect/area_effect_link.h"
+#include "scene/areas/area_effect_link.h"
 struct SolarBombOwner {
     u8 pad0[0x18];
     s32 player;

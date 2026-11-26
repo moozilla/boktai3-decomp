@@ -1,7 +1,7 @@
 #include "global.h"
 #include "engine/video/display_animation.h"
-#include "player/cues/player_cue_sequence.h"
-#include "scene/actor/contact_actor.h"
+#include "player/cutscene/player_cue_sequence.h"
+#include "scene/collision/contact_actor.h"
 
 struct SunDiscEffectPool {
     u8 unk0[0x34];

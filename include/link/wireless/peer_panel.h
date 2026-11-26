@@ -19,7 +19,7 @@ struct WirelessPeerPanel {
     u32 flags;
     struct ContactSwarmSprite sprite;
     u8 graphics[0x1C];
-    struct SceneInputWidget digits[5];
+    struct AnimSprite digits[5];
     u8 name[16];
     u8 unknown240[4];
     u8 confirmationName[24];
@@ -35,8 +35,8 @@ struct WirelessPeerMenu {
     s32 windows[3];
     u32 completionProcedure;
     u8 scratch[0x100];
-    struct SceneInputResource digitResource, iconResource;
-    struct SceneInputWidget icon;
+    struct AnimSpriteResource digitResource, iconResource;
+    struct AnimSprite icon;
 };
 
 extern const struct WirelessPeerStyle gUnk_0824DE64[];

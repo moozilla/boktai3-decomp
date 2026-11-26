@@ -1,4 +1,4 @@
-#include "scene/actor/scene_actor_terrain_reaction.h"
+#include "scene/motion/scene_actor_terrain_reaction.h"
 #include "scene/actor/scene_actor_status.h"
 #define SceneActorRoute_GetStepDuration Route_GetCurrentPointNodeId
 #include "global.h"

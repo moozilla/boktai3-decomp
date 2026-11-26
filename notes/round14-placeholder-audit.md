@@ -44,15 +44,15 @@ pointer were independent removals.
 | Unit | Source change | Placeholder sites | Whole-unit bytes | Worker commit |
 | --- | --- | ---: | ---: | --- |
 | `src/objects/items/sprite_drop/sub_08115F74.c` | Advance the actual callback pointer without assigning an unused second array-base alias. | 1 to 0 | 56 | `428cee113` |
-| `src/player/damage/sub_08149A14.c` | Remove the unused `dummy` declaration. | 1 to 0 | 988 | `64bd7f0ee` |
+| `src/player/motions/sub_08149A14.c` | Remove the unused `dummy` declaration. | 1 to 0 | 988 | `64bd7f0ee` |
 | `src/bosses/hresvelgr/sub_081A117C.c` | Store the motion zero directly and use the existing actor view. The pointer-to-pointer alias remains open. | 3 to 1 | 200 | `a21e52f43`, `a083a0423` |
 | `src/bosses/vanargand/sub_081ACAC4.c` | Write the two declared delay fields directly, retaining their existing common halfword delay value. | 1 to 0 | 156 | `6dc3d96d1` |
 | `src/ui/books/monster_book/sub_081D46B4.c` | Recover origin and direction fields from matched relatives; remove the cached direction and destination pointer. | 1 to 0 | 152 | `a747f40c3` |
 | `src/effects/projectiles/projectile/sub_081D76F4.c` | Use `ContactPosition` and the actual entry fields; remove the position alias and the literal shared between random range and address arithmetic. | 3 to 1 | 384 | `11bfe1fe4` |
 | `src/bosses/ratatosk/sub_081F9E20.c` | Use the shared projectile parameter/position contracts, actual position pointers, and direct aggregate copies. | 3 to 0 | 240 | `77aa80ad3` |
 | `src/system/inventory/sub_0822D080.c` | Use the existing slot parameter in the packed-state exchange. | 1 to 0 | 72 | `60def4a42` |
-| `src/player/cues/sub_08241BC4.c` | Remove the unused `dummy` declaration. | 1 to 0 | 756 | `b67684658` |
-| `src/player/core/sub_08242EA4.c` | Store the computed flags without the assignment-only field pointer. | 1 to 0 | 216 | `1b631516e` |
+| `src/link/player/sub_08241BC4.c` | Remove the unused `dummy` declaration. | 1 to 0 | 756 | `b67684658` |
+| `src/link/player/sub_08242EA4.c` | Store the computed flags without the assignment-only field pointer. | 1 to 0 | 216 | `1b631516e` |
 | `src/monsters/lun.c` | Read the typed participant position directly; remove both the placeholder alias and the separate unused `players` local. | 1 to 0 | 16,116 | `5a30e5054` |
 | `src/scene/terrain/nav_mesh.c` | Reuse the existing `GetMesh` accessor and remove assignment-result base aliases from both the caller and accessor. | 1 to 0 | 3,180 | `63d034219` |
 
@@ -65,7 +65,7 @@ Using those fields in `081D46B4` removes the need for a loaded-value placeholder
 No shared header was changed.
 
 The trail entry's eight-byte position at `0x18` and signed angle offset at `0x29`
-are established in `Task4E01_UpdateTrailSprites` (`081D75E8`). The existing
+are established in `ProjectileTask_UpdateTrailSprites` (`081D75E8`). The existing
 aligned `ContactPosition` type supplies the position copy directly. The old
 `new_var3 = 0x60` served two unrelated roles: a random modulus and the address
 of the first entry's position. The accepted source uses the literal only as the
@@ -73,7 +73,7 @@ random range and addresses the position through the entry field. The separate
 heading-narrowing placeholder remains unchanged and warned.
 
 `include/effects/projectiles/projectile_config.h` already declares the real `Task4E01Params` and
-`ContactPosition` contracts. `Task4E01_GetEntryPosition` in
+`ContactPosition` contracts. `ProjectileTask_GetEntryPosition` in
 `src/effects/projectiles/projectile/projectile_config.c` returns the entry's `sprite.position`.
 `OrbitEffect_FireProjectileOnContact` (`081FD704`) also gets a source position,
 copies it to an origin or target, then calculates the firing direction. This
@@ -104,7 +104,7 @@ diagnostic knobs were used only to identify mechanisms.
 | `Hresvelgr_UpdateRandomAnimation` (`081A117C`) | `struct ActorReaction **new_var3` | Access the existing actor pointer directly. | 10 / 10; 200 bytes |
 | `Storage_BeginCategoryMode` (`081BF440`) | `int new_var = -1` | Pass the sentinel directly in the description call. | 2 / 2; 220 bytes |
 | `TaggedSceneNpc_UpdateJumpToTarget` (`081D1E78`) | `struct Tagged *new_var` | Use the existing case-local tagged-state pointer. | 7 / 7; 420 bytes |
-| `Task4E01_SpawnTrailSprite` (`081D76F4`) | `unsigned char new_var` | Mask the computed heading directly in the accepted real-field implementation. | 1 / 1; 384 bytes |
+| `ProjectileTask_SpawnTrailSprite` (`081D76F4`) | `unsigned char new_var` | Mask the computed heading directly in the accepted real-field implementation. | 1 / 1; 384 bytes |
 | `SceneActor_FindNearbyActivePlayer` (`src/monsters/mimic.c`, `080E7F54`) | `s16 new_var` | Square `delta->z` directly. | 7 / 7; 160-byte function |
 
 ### What the attempts established

@@ -2,9 +2,9 @@
 #include "ui/widgets/scene_input_navigation.h"
 struct StorageBrowse {
     u8 unknown0[0x258];
-    struct SceneInputWidget prompt;
+    struct AnimSprite prompt;
     u8 unknown2B8[0x11A0];
-    struct SceneInputWidget cursor, savedCursor;
+    struct AnimSprite cursor, savedCursor;
     u8 resource[0x21C];
     void *description;
     u8 unknown1738[0x15];
@@ -24,7 +24,7 @@ struct StorageBrowse {
 s32 Anim_LoadKeyframe(void *, void *, u32, u32);
 void Sound_PlaySong(u32);
 void Storage_SetGridFlags(void *, u32);
-void SceneInventory_SetState(void *, void (*)(void *), u32);
+void Storage_SetState(void *, void (*)(void *), u32);
 void Storage_UpdateSwapSelection(void *);
 void Storage_RefreshCategoryWidgets(void *);
 void Storage_BeginModeSelection(void *, u32);
@@ -33,12 +33,12 @@ s32 Inventory_GetEquipmentId(u32);
 s32 Inventory_CanAssignEquipment(u32);
 s32 GameState_IsConsumableSlotEquipped(u32);
 void MenuPanel_ShowDescription(void *, s32, void *, s32);
-void SceneInventory_ResetCategoryPalette(void *, void *);
-void SceneInventory_UpdateCategoryConfirmation(void *);
-void SceneInventory_BeginCategoryBrowse(void *);
+void Storage_ResetCategoryPalette(void *, void *);
+void Storage_UpdateCategoryConfirmation(void *);
+void Storage_BeginCategoryBrowse(void *);
 void Storage_UpdateCursorPosition(void *, void *);
 void Storage_RefreshSelectedItemDetails(void *);
-void SceneInventory_UpdateCategoryBrowse(struct StorageBrowse *p)
+void Storage_UpdateCategoryBrowse(struct StorageBrowse *p)
 {
     if (gPadState[0] & 4) {
         Anim_LoadKeyframe(&p->cursor, p->resource, 0x4D, 1);
@@ -50,12 +50,12 @@ void SceneInventory_UpdateCategoryBrowse(struct StorageBrowse *p)
     } else if (gPadState[1] & 1) {
         SceneInput_SaveSelection(&p->grid);
         if (p->mode == 1) {
-            struct SceneInputWidget *saved = &p->savedCursor;
+            struct AnimSprite *saved = &p->savedCursor;
             saved->flags &= ~1;
             p->savedCursor.position = p->cursor.position;
             Storage_SetGridFlags(&p->grid, 0x10);
             Sound_PlaySong(0xDD);
-            SceneInventory_SetState(p, Storage_UpdateSwapSelection, 0);
+            Storage_SetState(p, Storage_UpdateSwapSelection, 0);
             Storage_RefreshCategoryWidgets(p);
         } else if (p->mode == 2) {
             s32 slot = p->slots[p->grid.savedSelection];
@@ -88,12 +88,12 @@ void SceneInventory_UpdateCategoryBrowse(struct StorageBrowse *p)
                 MenuPanel_ShowDescription(p, 2, p->description, -1);
                 SceneInput_BeginChoice(&p->prompt, p->resource, &p->choiceState, 0,
                                        &p->choiceRepeat);
-                SceneInventory_ResetCategoryPalette(p, p->colors);
-                SceneInventory_SetState(p, SceneInventory_UpdateCategoryConfirmation, 0);
+                Storage_ResetCategoryPalette(p, p->colors);
+                Storage_SetState(p, Storage_UpdateCategoryConfirmation, 0);
             } else {
             error:
                 Sound_PlaySong(0x192);
-                SceneInventory_BeginCategoryBrowse(p);
+                Storage_BeginCategoryBrowse(p);
             }
         }
     } else if (gPadState[1] & 2) {

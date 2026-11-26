@@ -1,5 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
-#include "scene/actor/scene_actor_chase_reaction.h"
+#include "scene/motion/scene_actor_chase_reaction.h"
 #include "scene/actor/scene_actor_reaction.h"
 #include "scene/actor/scene_actor_behavior.h"
 #include "script/script_utility.h"

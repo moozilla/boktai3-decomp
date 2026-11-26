@@ -1,18 +1,18 @@
 #ifndef GUARD_SCENE_PANEL_LIFECYCLE_H
 #define GUARD_SCENE_PANEL_LIFECYCLE_H
-#include "objects/pile_driver/scene_panel_commands.h"
+#include "objects/pile_driver/pile_driver_commands.h"
 
 extern void (*const gUnk_08605ABC[])(struct ScenePanel *);
-void ScenePanel_ReadInitialMode(struct ScenePanel *);
-void ScenePanel_InitAnchorPositions(struct ScenePanel *);
-void ScenePanel_CreateSubjects(struct ScenePanel *);
-void ScenePanel_InitScriptProperty(struct ScenePanel *);
-void ScenePanel_UpdateParticles(struct ScenePanel *);
-void ScenePanel_DestroyParticles(struct ScenePanel *);
-void ScenePanel_InitParticles(struct ScenePanel *);
-void ScenePanel_InitTimePalette(struct ScenePanel *);
-void ScenePanel_UpdatePaletteState(struct ScenePanel *);
-void ScenePanel_DrawBackgroundLayers(struct ScenePanel *);
-void ScenePanel_NoOpAction(struct ScenePanel *);
-void ScenePanel_InitializeInteraction(struct ScenePanel *);
+void PileDriver_ReadInitialMode(struct ScenePanel *);
+void PileDriver_InitAnchorPositions(struct ScenePanel *);
+void PileDriver_CreateSubjects(struct ScenePanel *);
+void PileDriver_InitScriptProperty(struct ScenePanel *);
+void PileDriver_UpdateParticles(struct ScenePanel *);
+void PileDriver_DestroyParticles(struct ScenePanel *);
+void PileDriver_InitParticles(struct ScenePanel *);
+void PileDriver_InitTimePalette(struct ScenePanel *);
+void PileDriver_UpdatePaletteState(struct ScenePanel *);
+void PileDriver_DrawBackgroundLayers(struct ScenePanel *);
+void PileDriver_NoOpAction(struct ScenePanel *);
+void PileDriver_InitializeInteraction(struct ScenePanel *);
 #endif

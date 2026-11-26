@@ -1,4 +1,4 @@
-# StateActor_UpdateDelayedAttackEffect
+# StoryCharacter_UpdateDelayedAttackEffect
 
 Tags: #matching #round9b
 

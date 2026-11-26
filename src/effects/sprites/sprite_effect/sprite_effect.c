@@ -4,7 +4,7 @@ void SceneSpriteBurst_Shutdown(void)
 {
 }
 
-void SceneActor14_OnColliderContact(void)
+void SpriteEffectSet_OnColliderContact(void)
 {
 }
 
@@ -23,7 +23,7 @@ void SpriteEffect_InitCollider(struct SpriteEffect *effect, s32 damage, s32 knoc
     Collider_Init(c, 0, 0x2001, 0, 16, &size, &offset);
     Collider_SetAttackProperties(c, damage, knockback, 0, element, extra);
     Collider_SetPosition(c, &effect->position, 0);
-    Collider_SetCallback(c, SceneActor14_OnColliderContact, effect);
+    Collider_SetCallback(c, SpriteEffectSet_OnColliderContact, effect);
 }
 
 static inline u8 IsUsed(struct SpriteEffectPool *pool, u32 index)
@@ -147,7 +147,7 @@ void SpriteEffect_UpdateBlinkAndExpire(struct SpriteEffectPool *owner, struct Sp
     }
 }
 
-void SceneActor14_GetFacingAndFlip(struct SpriteEffectSource *source, u8 *variant, u8 *flip)
+void SpriteEffectSet_GetFacingAndFlip(struct SpriteEffectSource *source, u8 *variant, u8 *flip)
 {
     u32 quadrant = ((source->facing + 0x60) >> 6) & 3;
     if (quadrant > 1) {
@@ -215,7 +215,7 @@ s32 SpriteEffect_SpawnWithMotion(struct SpriteEffectSource *source,
     u8 variant, flip;
     pool = gSpriteEffectPool;
     if (!pool) {
-        pool = SceneActor14_EnsureSingleton();
+        pool = SpriteEffectSet_EnsureSingleton();
         if (!pool)
             return -1;
     }
@@ -223,7 +223,7 @@ s32 SpriteEffect_SpawnWithMotion(struct SpriteEffectSource *source,
     if (!effect)
         return -1;
     effect->active = 1;
-    SceneActor14_GetFacingAndFlip(source, &variant, &flip);
+    SpriteEffectSet_GetFacingAndFlip(source, &variant, &flip);
     effect->position = source->position;
     effect->state = 0;
     effect->motion = *motion;
@@ -266,7 +266,7 @@ s32 SpriteEffectPool_RemoveSlots(struct SpriteEffectPool *pool)
     return (s32)(gSpriteEffectPool = 0);
 }
 
-s32 SceneActor14_InitManager(struct SpriteEffectPool *pool)
+s32 SpriteEffectSet_InitManager(struct SpriteEffectPool *pool)
 {
     pool->used = 0;
     gSpriteEffectPool = pool;
@@ -274,7 +274,7 @@ s32 SceneActor14_InitManager(struct SpriteEffectPool *pool)
     return 0;
 }
 
-struct SpriteEffectPool *SceneActor14_EnsureSingleton(void)
+struct SpriteEffectPool *SpriteEffectSet_EnsureSingleton(void)
 {
     struct SpriteEffectPool *pool;
     if (gSpriteEffectPool != 0)
@@ -283,7 +283,7 @@ struct SpriteEffectPool *SceneActor14_EnsureSingleton(void)
     if (pool != 0) {
         Task_SetCallbacks(pool, (void (*)(void *))SpriteEffectPool_Update,
                           (void (*)(void *))SpriteEffectPool_RemoveSlots);
-        if (SceneActor14_InitManager(pool) < 0) {
+        if (SpriteEffectSet_InitManager(pool) < 0) {
             Task_Kill(pool);
             return 0;
         }
@@ -291,16 +291,16 @@ struct SpriteEffectPool *SceneActor14_EnsureSingleton(void)
     return pool;
 }
 
-void SceneActor14_ResetSingleton(void)
+void SpriteEffectSet_ResetSingleton(void)
 {
     gSpriteEffectPool = 0;
 }
 
-void SceneActor14_Shutdown(void)
+void SpriteEffectSet_Shutdown(void)
 {
 }
 
-s32 SceneActor14_UpdateAnimState(struct SceneActor14 *actor)
+s32 SpriteEffectSet_UpdateAnimState(struct SceneActor14 *actor)
 {
     struct SceneActor14Manager *manager;
     void *animation;

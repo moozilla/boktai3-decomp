@@ -1,0 +1,6 @@
+old_name,new_name,kind,uses,evidence
+SceneInputWidget,AnimSprite,struct,561 references in 219 files,"The animated sprite every system draws with: sequence/frame/keyframe playback, position, scale, rotation, palette bank, tile data, and an intrusive animation-list link (previous/next). Anim_* and AnimData_* functions operate on it; Player embeds two. Nothing about it is input or a widget."
+SceneInputWidget_Hide,AnimSprite_Hide,inline function,25,"sets flags bit 0 (hidden)"
+SceneInputWidget_Show,AnimSprite_Show,inline function,34,"clears flags bit 0"
+SceneInputResource,AnimSpriteResource,struct,160,"the relocatable 32-byte glyph/keyframe resource header the sprite plays from"
+SceneWidgetPlayback,AnimSpritePlayback,struct,5,"priority and mode pair of the sprite's playback"

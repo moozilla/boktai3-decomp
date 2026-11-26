@@ -13,7 +13,7 @@ scope"; the Yu-Gi-Oh! EDS catalog is [external/eds/matching-tricks.md](external/
   asm indexes arrays inside an object. Leaf functions that start with
   `mov ip, r0` (369 of them) come from struct/array-of-struct accesses like
   `p->elems[i].flags &= ~1;`. With pointer casts agbcc pushes r4 instead. See
-  `src/link/link_panel/sub_0810C1E8.c`. Structs also fixed ordering problems elsewhere
+  `src/link/panel/sub_0810C1E8.c`. Structs also fixed ordering problems elsewhere
   (`sub_081FC61C`).
 * **Switch / jump tables work**: a plain C `switch` reproduces the table.
   Order the case bodies in the source by their order in the original asm,

@@ -1,10 +1,10 @@
 #include "npc/manager/scene_actor_animation.h"
-#include "ui/widgets/scene_input_widget.h"
+#include "engine/video/anim_sprite.h"
 #include "global.h"
 #include "scene/actor/scene_actor_placement.h"
-#include "scene/actor/scene_actor_chase_shared.h"
+#include "scene/motion/scene_actor_chase_shared.h"
 void ActorShadow_Disable(void *);
-static inline void ClearTile(struct SceneInputWidget *p, u32 mask)
+static inline void ClearTile(struct AnimSprite *p, u32 mask)
 {
     p->flags &= mask;
 }
@@ -25,7 +25,7 @@ void SceneActorPlacement_HideActor(struct RoomActor *s)
                 SceneActorChase_AndWordFlags(p, ~2);
                 drawable = p;
             } else {
-                struct SceneInputWidget *p;
+                struct AnimSprite *p;
                 drawable = s->drawable;
                 p = &((struct SceneActorAnimationTileDrawable *)drawable)->tile;
                 ClearTile(p, ~2);
@@ -35,7 +35,7 @@ void SceneActorPlacement_HideActor(struct RoomActor *s)
                 if (s->drawableKind == 0) {
                     *(u32 *)drawable |= one;
                 } else {
-                    struct SceneInputWidget *p =
+                    struct AnimSprite *p =
                         &((struct SceneActorAnimationTileDrawable *)drawable)->tile;
                     p->flags |= one;
                 }

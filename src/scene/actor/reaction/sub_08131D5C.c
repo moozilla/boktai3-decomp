@@ -1,11 +1,11 @@
-#include "scene/actor/scene_actor_terrain_reaction.h"
+#include "scene/motion/scene_actor_terrain_reaction.h"
 #include "global.h"
-#include "scene/actor/scene_actor_damage_visibility.h"
+#include "scene/collision/scene_actor_damage_visibility.h"
 #include "scene/actor/scene_actor_damage_flash.h"
 #include "scene/actor/scene_actor_drawable_flags.h"
 #include "scene/actor/scene_actor_reaction.h"
 #include "scene/actor/scene_actor_palette.h"
-#include "scene/area_effect/area_effect_link.h"
+#include "scene/areas/area_effect_link.h"
 /* Clears hit timers; at zero health hands control to the defeat target and records the defeat. */
 void SceneActorRecord_RecordPair(u16, u16);
 static inline u32 Flag2D0(struct ChaseActor *actor, u32 maskInput)

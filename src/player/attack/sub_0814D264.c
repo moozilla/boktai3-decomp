@@ -1,6 +1,6 @@
 #include "global.h"
 #include "player/player.h"
-#include "scene/actor/contact_collider.h"
+#include "scene/collision/contact_collider.h"
 
 // confidence=low: selects sweep, vertical-arc or radial reach from the active attack animation.
 #define Player_UpdateAttackColliderMotion sub_0814D264

@@ -14,7 +14,7 @@ static inline s32 shift12(s32 x)
     return -((-x) >> 12);
 }
 
-void StateActor_UpdateHoverBob(u32 a, void *p, u32 flags)
+void StoryCharacter_UpdateHoverBob(u32 a, void *p, u32 flags)
 {
     u32 r;
     if (B(9) != 0) {

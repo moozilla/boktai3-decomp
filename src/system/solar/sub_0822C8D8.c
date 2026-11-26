@@ -2,7 +2,7 @@
 #include "engine/engine.h"
 #include "engine/runtime.h"
 #include "engine/input.h"
-#include "scene/area_effect/area_effect_link.h"
+#include "scene/areas/area_effect_link.h"
 
 u16 sub_0822C8D8(u8 *p)
 {

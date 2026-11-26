@@ -1,6 +1,6 @@
 #ifndef GUARD_TRANSIENT_SPRITE_EFFECTS_H
 #define GUARD_TRANSIENT_SPRITE_EFFECTS_H
-#include "scene/actor/contact_swarm.h"
+#include "scene/collision/contact_swarm.h"
 #include "engine/task.h"
 /* Sixteen 0x58 transient sprite slots in a 0x598 list-10 singleton. */
 struct TransientEffectSprite {

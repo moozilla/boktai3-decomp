@@ -33,7 +33,7 @@ u32 ProximityIcon_Destroy(struct ProximityIcon *icon)
 
 s32 ProximityIcon_InitFromScript(struct ProximityIcon *icon)
 {
-    struct SceneInputResource resource, *original = ScriptProc_Start(0xCB05, 0x82F1);
+    struct AnimSpriteResource resource, *original = ScriptProc_Start(0xCB05, 0x82F1);
     struct ContactPackedVector offset, position;
     u32 priority, frame;
     resource = *original;

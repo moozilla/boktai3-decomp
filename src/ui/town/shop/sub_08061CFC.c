@@ -1,12 +1,12 @@
-#include "ui/town/scene_inventory_control.h"
+#include "ui/town/shop_control.h"
 static inline s32 SceneInventory_TurnPage(struct SceneInventoryControlView *panel)
 {
     Sound_PlaySong(0x10A);
     panel->interactionFlags |= 0x40;
-    SceneInventory_UpdateMixedCatalogCategory(panel);
+    Shop_UpdateMixedCatalogCategory(panel);
     return 1;
 }
-s32 SceneInventory_HandlePageKeys(struct SceneInventoryControlView *panel)
+s32 Shop_HandlePageKeys(struct SceneInventoryControlView *panel)
 {
     if (panel->interactionFlags & 1) {
         if (gPadState[1] & 0x200) {

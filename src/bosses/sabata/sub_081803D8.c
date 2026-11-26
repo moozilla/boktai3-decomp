@@ -17,7 +17,7 @@ static inline void BossTask_SetStep(struct BossTask *p, u32 step)
 
 /* Registry routine 4EC9: cycles the singleton in slot 2 through steps 0-2
    (+0x4EA), entering state 8, 10 or 3, then clears +0xB3, +0x4EB, +0x4E8. */
-void BossSlot2_AdvanceStepFromScript(void)
+void Sabata_AdvanceStepFromScript(void)
 {
     struct StateActor *actor = SceneActors_GetBySlot(2);
     struct BossTask *p = (struct BossTask *)actor;

@@ -1,4 +1,4 @@
-#include "scene/actor/scene_actor_terrain_reaction.h"
+#include "scene/motion/scene_actor_terrain_reaction.h"
 #include "scene/actor/scene_actor_reset.h"
 #define ACTOR_OFFSET(member) ((u32) & ((struct SceneActorRegistryResetView *)0)->member)
 /* Offset temporaries preserve pointer lifetimes required by the original allocator. */

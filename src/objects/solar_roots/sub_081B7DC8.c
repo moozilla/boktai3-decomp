@@ -1,7 +1,7 @@
 #include "global.h"
 
 // confidence=low: RepeatedEffect_InitCollider for an effect with its collider at 0x48 and its
-// position at 0xE4: a 0x80 by 0x100 attack box calling GrowthHazard_ApplyAnimationEvent.
+// position at 0xE4: a 0x80 by 0x100 attack box calling SolarRoot_ApplyAnimationEvent.
 struct H {
     u32 lo : 16;
     u32 hi : 16;
@@ -19,7 +19,7 @@ void Collider_Init(u8 *, u32, u32, u32, u32, struct Z *, struct Z *);
 void Collider_SetCallback(u8 *, void *, void *);
 void Collider_SetPosition(u8 *, u8 *, u32);
 s32 Collider_Refresh(u8 *);
-void GrowthHazard_ApplyAnimationEvent(void *, void *, void *);
+void SolarRoot_ApplyAnimationEvent(void *, void *, void *);
 #define GrowthEffect_InitCollider sub_081B7DC8
 void GrowthEffect_InitCollider(struct GrowthEffect *p)
 {
@@ -31,7 +31,7 @@ void GrowthEffect_InitCollider(struct GrowthEffect *p)
     *(u32 *)&s2.a = 0;
     *(u32 *)&s2.b &= 0xFFFF0000;
     Collider_Init(q, p->tag, 0x4001, 0, 0x20, &s1, &s2);
-    Collider_SetCallback(q, GrowthHazard_ApplyAnimationEvent, p);
+    Collider_SetCallback(q, SolarRoot_ApplyAnimationEvent, p);
     Collider_SetPosition(q, p->position, 0);
     Collider_Refresh(q);
 }

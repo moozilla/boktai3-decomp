@@ -1,5 +1,5 @@
-#include "ui/town/scene_inventory_catalog.h"
-void SceneInventory_ReadScriptCatalog(struct SceneInventoryScriptCatalog *p)
+#include "ui/town/shop_catalog.h"
+void Shop_ReadScriptCatalog(struct SceneInventoryScriptCatalog *p)
 {
     s32 n;
     p->page = 0;

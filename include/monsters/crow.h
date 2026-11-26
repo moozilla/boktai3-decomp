@@ -8,17 +8,17 @@
 
 #include "scene/actor/scene_actor_control_phase.h"
 
-#include "scene/actor/scene_actor_chase_reaction.h"
+#include "scene/motion/scene_actor_chase_reaction.h"
 
 #include "scene/actor/scene_actor_control_motion.h"
 
-#include "scene/actor/scene_actor_terrain.h"
+#include "scene/motion/scene_actor_terrain.h"
 
-#include "scene/actor/scene_actor_availability.h"
+#include "scene/motion/scene_actor_availability.h"
 
-#include "scene/actor/scene_actor_motion.h"
+#include "scene/motion/scene_actor_motion.h"
 
-#include "scene/actor/scene_actor_route.h"
+#include "scene/motion/scene_actor_route.h"
 
 #include "npc/cutscene_actor/actor_animation_controller.h"
 

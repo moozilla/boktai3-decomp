@@ -9,7 +9,7 @@ struct SceneInventoryCategoryMenu {
     u8 categories[0x48];
     u8 sortMode;
 };
-void SceneInventory_SortSelectedCategory(struct SceneInventoryCategoryMenu *p)
+void Storage_SortSelectedCategory(struct SceneInventoryCategoryMenu *p)
 {
     switch (p->categories[p->selectedCategory] >> 1) {
         case 0:

@@ -5,8 +5,8 @@ struct SceneInventoryCategoryMenu {
     u8 unknownF3C[0x812];
     u16 introFrame;
 };
-void SceneInventory_BeginCategoryBrowse(struct SceneInventoryCategoryMenu *);
-void SceneInventory_UpdateBrowseIntro(struct SceneInventoryCategoryMenu *p)
+void Storage_BeginCategoryBrowse(struct SceneInventoryCategoryMenu *);
+void Storage_UpdateBrowseIntro(struct SceneInventoryCategoryMenu *p)
 {
     p->introFrame++;
     if (p->introFrame <= 11) {
@@ -17,6 +17,6 @@ void SceneInventory_UpdateBrowseIntro(struct SceneInventoryCategoryMenu *p)
     } else if (p->introFrame <= 15) {
         p->introY = 104;
     } else {
-        SceneInventory_BeginCategoryBrowse(p);
+        Storage_BeginCategoryBrowse(p);
     }
 }

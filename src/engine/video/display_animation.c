@@ -46,7 +46,7 @@ s32 DisplayAnimation_UpdatePlayback(struct DisplayAnimation *display)
                 (void *)&display->resource.sequence.sprite, &display->resource.sequence.playback,
                 kind);
     } else {
-        struct SceneInputResource *resource = &display->resource.keyframes.resource;
+        struct AnimSpriteResource *resource = &display->resource.keyframes.resource;
         display->finished = Anim_Step(&display->resource.keyframes.widget, resource);
     }
     return display->finished;
@@ -57,7 +57,7 @@ s32 DisplayAnimation_TestFinished(struct DisplayAnimation *display)
     if (display->kind == 1)
         return display->finished;
     {
-        struct SceneInputWidget *state = &display->resource.keyframes.widget;
+        struct AnimSprite *state = &display->resource.keyframes.widget;
         if (state->status & 2)
             return 1;
         return 0;
@@ -67,7 +67,7 @@ s32 DisplayAnimation_TestFinished(struct DisplayAnimation *display)
 s32 DisplayAnimation_GetFrameBoundary(struct DisplayAnimation *display, u32 *out)
 {
     if (display->kind == 2) {
-        struct SceneInputWidget *state = &display->resource.keyframes.widget;
+        struct AnimSprite *state = &display->resource.keyframes.widget;
         if (state->status & 4) {
             *out = state->frameIndex;
             return 1;
@@ -133,8 +133,8 @@ s32 Widget_InitLinked(void *, void *, u32, s32, u32, u32, u32, const struct Disp
 s32 DisplayAnimation_InitializeKeyframes(struct DisplayAnimation *display, u32 resourceId,
                                          s32 flags, const struct DisplayPosition *position)
 {
-    struct SceneInputResource *resource;
-    const struct SceneInputResource *source;
+    struct AnimSpriteResource *resource;
+    const struct AnimSpriteResource *source;
     u32 inactive = display->kind;
     if (inactive)
         goto failed;
@@ -204,7 +204,7 @@ s32 DisplayAnimation_SetPriority(struct DisplayAnimation *display, u32 priority)
         struct DisplaySequenceSprite *sprite = &display->resource.sequence.sprite;
         sprite->priority = priority;
     } else {
-        struct SceneInputWidget *state = &display->resource.keyframes.widget;
+        struct AnimSprite *state = &display->resource.keyframes.widget;
         state->attribute1A = priority;
     }
     return 0;
@@ -220,7 +220,7 @@ s32 DisplayAnimation_SetPalette(struct DisplayAnimation *display, u32 scaleX, u3
         sprite->paletteVariant = scaleY;
         sprite->attribute = angle;
     } else {
-        struct SceneInputWidget *state = &display->resource.keyframes.widget;
+        struct AnimSprite *state = &display->resource.keyframes.widget;
         state->scaleX = scaleX;
         state->scaleY = scaleY;
         state->rotation = angle;
@@ -265,7 +265,7 @@ u32 DisplayAnimation_GetTileIndex(struct DisplayAnimation *display)
         return display->resource.sequence.graphics.paletteIndex;
     }
     {
-        struct SceneInputWidget *widget = &display->resource.keyframes.widget;
+        struct AnimSprite *widget = &display->resource.keyframes.widget;
         return widget->paletteBank;
     }
 }

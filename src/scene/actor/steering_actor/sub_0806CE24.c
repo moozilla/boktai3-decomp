@@ -1,4 +1,4 @@
-#include "scene/actor/scene_steering_actor.h"
+#include "scene/motion/scene_steering_actor.h"
 void ScaledShadow_Destroy(void *);
 static inline u8 Used(struct SceneSteeringActorPool *pool, u32 bit)
 {

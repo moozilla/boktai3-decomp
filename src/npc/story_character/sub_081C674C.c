@@ -8,7 +8,7 @@ struct S {
     u8 gap2[0x2cc - 0x14];
     void (*fn)(void *, void *, u32);
 };
-u32 StateActor_OnUpdateState(void *a, struct S *p)
+u32 StoryCharacter_OnUpdateState(void *a, struct S *p)
 {
     u32 n;
     void (*fn)(void *, void *, u32);

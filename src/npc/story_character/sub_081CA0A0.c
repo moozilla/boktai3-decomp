@@ -4,7 +4,7 @@
 void Actor_PlayAnimationEntry(void *, u32, u32, u32, u32);
 s32 DisplayAnimation_TestFinished(void *);
 
-void StateActor_StartKind5Animation6Then7(u32 ctx, struct StateActor *p)
+void StoryCharacter_StartKind5Animation6Then7(u32 ctx, struct StateActor *p)
 {
     u32 r;
     u32 phase;

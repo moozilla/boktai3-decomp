@@ -1,4 +1,4 @@
-void Presentation_SetItemGraphic(struct SelectionMenu *p, struct SceneInputWidget *q, u32 item)
+void Presentation_SetItemGraphic(struct SelectionMenu *p, struct AnimSprite *q, u32 item)
 {
     int index = Inventory_GetConsumableId(item);
     if (index >= 0) {

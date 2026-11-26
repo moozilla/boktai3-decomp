@@ -1,18 +1,18 @@
-#include "ui/town/scene_inventory_states.h"
-void SceneInventory_BeginSwapTransition(struct SceneInventoryControlView *panel)
+#include "ui/town/shop_states.h"
+void Shop_BeginSwapTransition(struct SceneInventoryControlView *panel)
 {
     panel->interactionFlags = 0x80;
     switch (panel->category) {
         case 0:
-            SceneInventory_BeginEquipmentSwapPair((void *)panel);
+            Shop_BeginEquipmentSwapPair((void *)panel);
             break;
         case 1:
-            SceneInventory_BeginItemSwapPair((void *)panel);
+            Shop_BeginItemSwapPair((void *)panel);
             break;
         case 2:
-            SceneInventory_BeginConsumableSwapPair((void *)panel);
+            Shop_BeginConsumableSwapPair((void *)panel);
             break;
     }
-    SceneInventory_SetControllerCallback(panel,
-                                         (SceneInventoryCallback)SceneInventory_TickSwapTransition);
+    Shop_SetControllerCallback(panel,
+                                         (SceneInventoryCallback)Shop_TickSwapTransition);
 }

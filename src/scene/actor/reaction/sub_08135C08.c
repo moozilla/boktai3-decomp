@@ -1,7 +1,7 @@
-#include "scene/actor/scene_actor_chase.h"
+#include "scene/motion/scene_actor_chase.h"
 #include "global.h"
 #include "scene/actor/scene_actor_placement.h"
-#include "scene/actor/scene_actor_chase.h"
+#include "scene/motion/scene_actor_chase.h"
 s32 Math_Atan2(s32, s32);
 void ActorParticles_SpawnBurst(struct RoomActor *);
 s32 SceneActorPlacement_BeginDestinationJump(struct RoomActor *actor)

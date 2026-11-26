@@ -123,7 +123,7 @@ s32 SolarCalibration_Initialize(struct SolarCalibrationMenu *s)
 {
     u32 zero, one, value;
     void *a, *p, *resource;
-    struct SceneInputResource *obj, *obj2, *obj3;
+    struct AnimSpriteResource *obj, *obj2, *obj3;
     struct MessageMenuParameters *global;
     Bg_ClearTilemap(0);
     zero = 0;
@@ -270,7 +270,7 @@ void Menu_DrawStringRef(s32 column, s32 row, const void *source, s32 index)
     Menu_DrawText(column, row, Text_LookupString(Script_ParseStringRef(source) + index));
 }
 
-void Menu_SetTextRect(struct SceneInputWidget *widget, const struct ContactPosition *position)
+void Menu_SetTextRect(struct AnimSprite *widget, const struct ContactPosition *position)
 {
     widget->position.x = position->x;
     widget->position.y = position->y;

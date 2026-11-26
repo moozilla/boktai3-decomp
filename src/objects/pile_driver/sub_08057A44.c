@@ -1,5 +1,5 @@
-#include "objects/pile_driver/scene_panel_effects.h"
-void ScenePanel_AddParticle(struct ScenePanel *input, union ScenePanelPosition *position,
+#include "objects/pile_driver/pile_driver_effects.h"
+void PileDriver_AddParticle(struct ScenePanel *input, union ScenePanelPosition *position,
                             union ScenePanelPosition *velocity, u32 lifetime, u32 renderMode)
 {
     struct ScenePanelEffectsView *panel = (void *)input;

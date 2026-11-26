@@ -31,7 +31,7 @@ through the word-flag helpers" (12 files). `docs/WORKER.md` "Mechanical cleanups
 
 * **Type recovery before the warned line.** Every large drop came from it: `struct Ratatosk`
   (0xF30 bytes, from about 45 private copies), Hresvelgr's and Vanargand's body types, `struct
-  Player`'s two embedded `struct SceneInputWidget` animation channels and its full `ContactCollider`,
+  Player`'s two embedded `struct AnimSprite` animation channels and its full `ContactCollider`,
   `SceneVolumeActor`, `struct Dog`, `struct Axe`, `struct LinkPanel`, raw `actor + 0x2D0` offsets
   moved onto `RoomActor`/`ChaseActor` fields. Parked constants then often match written plainly.
 * **Plain loops.** Many parked `mask`/`zero`/`one` locals in the menus were steering for loops
@@ -75,7 +75,7 @@ that fall off the end and return a leftover register (28 fixed; `port/missing_re
 
 ## Leads not taken
 
-* Rename `struct SceneInputWidget`: it is a general animated-sprite type (213 files).
+* Rename `struct AnimSprite`: it is a general animated-sprite type (213 files).
 * `SceneVec` and `ContactPosition` have the same layout; 366 casts between them tree-wide.
 * Player bytes 0x14C to 0x178 look like a `DisplaySequenceSprite`.
 * Duplicate helpers among the headers (`Chase_SetCtl` / `SceneActorChase_SetControl`,

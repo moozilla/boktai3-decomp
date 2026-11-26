@@ -1,15 +1,15 @@
 #ifndef GUARD_DATE_ENTRY_MENU_H
 #define GUARD_DATE_ENTRY_MENU_H
 
-#include "ui/widgets/scene_input_widget.h"
+#include "engine/video/anim_sprite.h"
 #include "npc/cutscene_actor/text_entry_widget.h"
 #include "engine/task.h"
 
 struct DateMenu {
     struct Task task;
     struct TextEntryWidget widgets[4];
-    struct SceneInputWidget digits[12];
-    struct SceneInputResource digitResource;
+    struct AnimSprite digits[12];
+    struct AnimSpriteResource digitResource;
     s32 selection, timer, fadeShift, state, result;
     s32 year, month, day, hour, minute;
     s32 oldYear, oldMonth, oldDay, oldHour, oldMinute;

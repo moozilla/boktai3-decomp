@@ -1,4 +1,4 @@
 #include "global.h"
-void ScriptCombatActor_OnPassiveColliderContact(void)
+void MuspellHead_OnPassiveColliderContact(void)
 {
 }

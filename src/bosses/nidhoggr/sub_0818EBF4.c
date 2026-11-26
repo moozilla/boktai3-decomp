@@ -26,7 +26,7 @@ extern u8 gScenePanelEffectColliderShape[];
 void Collider_Init(void *, u16, u32, u32, u32, void *, void *);
 void *ScriptProc_Start(u16, u16);
 
-void ScenePanelEffect_InitPool(struct ScenePanelEffectPool *pool)
+void NidhoggrEffect_InitPool(struct ScenePanelEffectPool *pool)
 {
     s32 i;
     u32 *word;

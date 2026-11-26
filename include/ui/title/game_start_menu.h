@@ -1,25 +1,25 @@
 #ifndef GUARD_GAME_START_MENU_H
 #define GUARD_GAME_START_MENU_H
 
-#include "scene/actor/contact_swarm.h"
+#include "scene/collision/contact_swarm.h"
 #include "engine/video/display_sequence.h"
 #include "ui/widgets/scene_input.h"
 
 struct GameStart {
     struct Task task;
     u32 unknown18;
-    struct SceneInputWidget background;
-    struct SceneInputResource backgroundResource;
+    struct AnimSprite background;
+    struct AnimSpriteResource backgroundResource;
     u8 unk09C[8];
-    struct SceneInputWidget decoration;
-    struct SceneInputResource decorationResource;
+    struct AnimSprite decoration;
+    struct AnimSpriteResource decorationResource;
     u8 unk124[8];
-    struct SceneInputWidget title;
-    struct SceneInputResource titleResource;
+    struct AnimSprite title;
+    struct AnimSpriteResource titleResource;
     u8 unk1AC[8];
-    struct SceneInputResource itemResource;
-    struct SceneInputWidget timeDigits[5];
-    struct SceneInputWidget levelDigits[2];
+    struct AnimSpriteResource itemResource;
+    struct AnimSprite timeDigits[5];
+    struct AnimSprite levelDigits[2];
     struct ContactSwarmSprite cursor;
     struct ContactSwarmGraphics cursorGraphics;
     struct DisplaySequenceState cursorSequence;
@@ -56,7 +56,7 @@ void Menu_EraseRect(s32, s32, s32, s32);
 void Menu_DrawText(u32, u32, const u8 *);
 void Bg_SetTilemapEntry(s32, s32, s32, s32, s32, s32);
 int Script_ParseStringRef(const void *);
-int SceneSequence_GetSelectedMessage(void);
+int MenuSequence_GetSelectedMessage(void);
 s32 Div(s32, s32);
 s32 Mod(s32, s32);
 s32 Anim_LoadKeyframe(void *, void *, u32, u32);

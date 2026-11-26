@@ -11,7 +11,7 @@ struct Registry1745TransferState {
     u32 counters98[2];
 };
 
-void Registry1745_ResetTransferCounters(struct Registry1745TransferState *transfer)
+void LinkSession_ResetTransferCounters(struct Registry1745TransferState *transfer)
 {
     s32 i;
     for (i = 0; i < 2; i++) {

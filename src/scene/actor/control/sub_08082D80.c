@@ -2,9 +2,9 @@
 #include "scene/actor/scene_actor_control_phase.h"
 #include "player/player.h"
 #include "scene/actor/scene_actor_reaction.h"
-#include "scene/actor/scene_actor_chase_shared.h"
+#include "scene/motion/scene_actor_chase_shared.h"
 #include "engine/word_flags.h"
-#include "scene/actor/scene_actor_displacement.h"
+#include "scene/motion/scene_actor_displacement.h"
 void SceneActorControl_ResetCollisionPhase(struct ChaseActor *);
 static inline s32 Clamp(s32 v)
 {

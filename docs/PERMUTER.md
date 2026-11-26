@@ -53,7 +53,7 @@ focused fork improved only one function each beyond the first match:
 | SceneActorControl_TickRandomMotion | 20 | 20 | 20 | 20 |
 | sub_081CC64C | 10 | 10 | 10 | 10 |
 | sub_0802D44C | 25 | 25 | 25 | 25 |
-| ContactSequenceActor_UpdateDying | 30 | 30 | 30 | 30 |
+| NidhoggrDuelMinion_UpdateDying | 30 | 30 | 30 | 30 |
 | Anim_SetSequence | 30 | 20 | 20 | 20 |
 | sub_08010514 | 65 | 65 | 65 | 65 |
 
@@ -363,7 +363,7 @@ halfwords away. What is left there:
 
 * Scratch and reload registers that rotation cannot reach: in the ROM a
   register was free that ours holds (often a call argument loaded too early,
-  `sub_08010C10`, `ContactSequenceActor_UpdateDying`). `perm_call_order`
+  `sub_08010C10`, `NidhoggrDuelMinion_UpdateDying`). `perm_call_order`
   fixed the argument order in `sub_08010C10` (8 -> 2 bytes); its last
   scratch register needs one more reload before the function's first one,
   which no meaning-preserving edit found produces.

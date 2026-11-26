@@ -27,8 +27,8 @@ and deletions differently from its register-aware instruction pairing.
 | `sub_080154EC` / AnimatedParticles_Create | 5 / 1 | Correct external prototype produces the same result | Jump2 merges two sequence-setting call tails which the ROM keeps separate. |
 | `sub_08016118` / FadingParticleGroup_Update | 43 / 43 | Removing the additional impossible lifetime guard: 48 / 46 | The clean expression reuses the earlier vertical-velocity load; pointer allocation also changes. |
 | `sub_0804373C` / ContactActor_UpdateRetreat | 13 / 8 | Removing the associated origin, union and once-loops: 85 / 86 | A high-register spill choice and the dead symbolic-origin lifetime. |
-| `sub_0805B0F0` / ScenePanel_InitRig | 12 / 12 | Typed samples, indices, mask and lookup helper all preserve that result | Constant-equivalent table loses r4 to mask. |
-| `sub_080AB968` / TentacleActor_UpdateRetraction | 3 / 12 | A single advance call removes 18 ROM instructions | Four equal call tails do not all merge late enough to preserve both absolute-value calculations. |
+| `sub_0805B0F0` / PileDriver_InitRig | 12 / 12 | Typed samples, indices, mask and lookup helper all preserve that result | Constant-equivalent table loses r4 to mask. |
+| `sub_080AB968` / Centipede_UpdateRetraction | 3 / 12 | A single advance call removes 18 ROM instructions | Four equal call tails do not all merge late enough to preserve both absolute-value calculations. |
 | `sub_080AEE08` / Vorn_UpdateDefeat | 115 / 118 | Shared six-spoke burst helper: 133 / 130 | Local order of kind/spread/origin, global table eviction and reload rematerialization. |
 | `sub_080BD1F0` / Skeleton_UpdateDefeat | 28 / 28 | Removing the two unrelated unions too: 178 / 168 | Shared origin takes sl, displacing the later table and removing its stack slot. |
 | `sub_08234540` / SpiralBurst_InitParticles | 48 / 44 | Direct global sampler: 25 / 25 | The retained table copy, table/frame allocation, and two cursor stores. |
@@ -141,7 +141,7 @@ existing unrelated sine-pointer/sample union is not resolved by this review.
 
 There is concrete repeated source evidence for an index advance followed by a
 table sample: `contact_burst.c` contains both statements in one do/while block;
-`ScenePanelRig_TickWandering`, `ScenePanelRig_RandomizeMovement`, projectile
+`PileDriverRig_TickWandering`, `PileDriverRig_RandomizeMovement`, projectile
 impact and the particle groups repeat the same operation. Accordingly, trials
 used a conventional statement macro with two real operations:
 

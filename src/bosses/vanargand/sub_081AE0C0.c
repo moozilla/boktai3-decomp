@@ -3,7 +3,7 @@
 #include "player/player.h"
 #include "scene/actor/motion_track.h"
 #include "bosses/vanargand/positioned_effect_coordinates.h"
-#include "ui/widgets/scene_input_widget.h"
+#include "engine/video/anim_sprite.h"
 #include "bosses/vanargand/vanargand_stage_colors.h"
 
 typedef void (*VanargandStateCallback)(void *);
@@ -46,8 +46,8 @@ struct Vanargand {
     struct SceneVec *targetPosition;        /* 0x110 */
     u8 unknown114[0x60];
     struct PositionedEffectCoordinates coordinates; /* 0x174 */
-    struct SceneInputWidget animation;              /* 0x18C */
-    struct SceneInputResource drawable;             /* 0x1EC */
+    struct AnimSprite animation;              /* 0x18C */
+    struct AnimSpriteResource drawable;             /* 0x1EC */
     struct ContactPosition effectOrigin;            /* 0x20C */
     u8 spriteParameter[8];                          /* 0x214 */
     u8 actionSequence[0xb4];                        /* 0x21C */

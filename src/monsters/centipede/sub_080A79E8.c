@@ -1,11 +1,11 @@
-#include "scene/actor/scene_actor_chase_reaction.h"
+#include "scene/motion/scene_actor_chase_reaction.h"
 #include "global.h"
 #include "scene/actor/scene_actor_reaction.h"
-#include "scene/actor/scene_actor_terrain.h"
+#include "scene/motion/scene_actor_terrain.h"
 #include "engine/engine.h"
 #include "player/player.h"
 #include "engine/ram.h"
-#include "scene/actor/scene_actor_chase.h"
+#include "scene/motion/scene_actor_chase.h"
 extern const s16 gUnk_086149C4[];
 s32 Math_Atan2(s32, s32);
 s32 Div(s32, s32);
@@ -68,14 +68,14 @@ struct SavedMotion {
     struct ContactPosition position;
 };
 
-void TentacleActor_ResetOscillation(void *);
+void Centipede_ResetOscillation(void *);
 s32 Callback_InvokeActor(void *, void *);
 void Anim_SetDurationScale(void *, u32);
 void Anim_SetFrameDurationScale(void *, u32);
-void TentacleActor_SelectWanderRoute(void *);
-void TentacleActor_AdvanceMotionPhase(void *, s32);
+void Centipede_SelectWanderRoute(void *);
+void Centipede_AdvanceMotionPhase(void *, s32);
 void sub_080A9DB0(void *, s32, s32);
-void TentacleActor_UpdateOscillation(void *, s32, s32);
+void Centipede_UpdateOscillation(void *, s32, s32);
 static inline u8 Approach(struct ChaseActor *actor, struct SavedMotion *saved, s32 speed)
 {
     u8 *motion = (u8 *)actor + 0x50;
@@ -99,20 +99,20 @@ static inline void Scale(struct ChaseActor *actor)
         Anim_SetFrameDurationScale((u8 *)actor->base.drawable + 0x20, *scale);
 }
 // confidence=low: moves toward a saved waypoint using the facing quadrant behind the actor.
-void TentacleBody_UpdateRetreat(struct ChaseActor *actor)
+void CentipedeBody_UpdateRetreat(struct ChaseActor *actor)
 {
     u8 *body = actor->base.context;
     s32 speed;
     struct ContactPosition delta;
     if (Take(&actor->base.field2B1)) {
         SceneActorChase_SetControl(actor, actor->base.onAlternateEntry, 1);
-        TentacleActor_ResetOscillation(actor);
+        Centipede_ResetOscillation(actor);
         {
             u32 direction = (((actor->base.tracking.heading) + 128) & 255) >> 6;
             body[0x8E9] = direction;
         }
         body[0x8E8] = 0;
-        TentacleActor_SelectWanderRoute(actor);
+        Centipede_SelectWanderRoute(actor);
     }
 
     if (*(s16 *)(body + 0x8D6) <= 0)
@@ -120,11 +120,11 @@ void TentacleBody_UpdateRetreat(struct ChaseActor *actor)
     speed = Callback_InvokeActor(actor, actor->base.animationQuery.opaque);
     Scale(actor);
     if (Approach(actor, (void *)(body + 0x8F8), speed)) {
-        TentacleActor_SelectWanderRoute(actor);
+        Centipede_SelectWanderRoute(actor);
         Chase_Delta(&delta, &actor->base.body.position, (void *)(body + 0x904));
         actor->base.nextDirection = Math_Atan2(delta.x, delta.z);
     }
-    TentacleActor_AdvanceMotionPhase(actor, speed);
+    Centipede_AdvanceMotionPhase(actor, speed);
     {
         u16 *p = (void *)(body + 0x8E4);
         if (*p) {
@@ -133,7 +133,7 @@ void TentacleBody_UpdateRetreat(struct ChaseActor *actor)
         } else
             sub_080A9DB0(actor, 20, 0x6400);
     }
-    TentacleActor_UpdateOscillation(actor, 120, 10);
+    Centipede_UpdateOscillation(actor, 120, 10);
     if ((s32)actor->base.counter2AC > 80) {
         State(actor);
     } else

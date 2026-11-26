@@ -12,7 +12,7 @@ struct SceneSequence {
     u8 selection;
 };
 s32 MessageWindow_ShowMessage(s32);
-void SceneSequence_SelectEntryMessage(struct SceneSequence *s)
+void MenuSequence_SelectEntryMessage(struct SceneSequence *s)
 {
     if ((s16)gGameState->savedX > 5)
         MessageWindow_ShowMessage((s16)gGameState->savedX + 56);

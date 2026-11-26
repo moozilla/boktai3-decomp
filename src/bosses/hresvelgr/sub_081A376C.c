@@ -1,5 +1,5 @@
 #include "global.h"
-#include "objects/pile_driver/scene_panel_schedule.h"
+#include "objects/pile_driver/pile_driver_schedule.h"
 #include "engine/ram.h"
 #define DirectionBurst_CreateSharedEmitter Hresvelgr_CreateShotPool
 void DirectionBurst_EmitConfigured(const void *, u32, u32, u32, u32, u32, u32, u32);

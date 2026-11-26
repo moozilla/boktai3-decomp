@@ -1,5 +1,5 @@
 #include "global.h"
-#include "ui/town/scene_inventory_states.h"
+#include "ui/town/shop_states.h"
 struct MenuPanel {
     u8 pad0[0x1754];
     u8 page;

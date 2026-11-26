@@ -2,9 +2,9 @@
 #define GUARD_SCENE_PANEL_H
 #include "engine/engine.h"
 #include "effects/screen/background_controller.h"
-#include "scene/actor/contact_actor.h"
+#include "scene/collision/contact_actor.h"
 #include "objects/scene_objects/scene_object.h"
-#include "scene/actor/contact_swarm.h"
+#include "scene/collision/contact_swarm.h"
 #include "engine/video/render.h"
 struct ScenePanel;
 struct ScenePanelInteractionPlayer;
@@ -174,36 +174,36 @@ struct ScenePanel {
     u8 unknown17D8[0xC];
 };
 extern const u16 gUnk_08605A88[];
-void ScenePanel_SetChannelValue(struct ScenePanel *, s32, u16);
-void ScenePanel_SetState(struct ScenePanel *, void (*)(struct ScenePanel *));
-s32 ScenePanel_GetPaletteOffset(struct ScenePanel *);
+void PileDriver_SetChannelValue(struct ScenePanel *, s32, u16);
+void PileDriver_SetState(struct ScenePanel *, void (*)(struct ScenePanel *));
+s32 PileDriver_GetPaletteOffset(struct ScenePanel *);
 void sub_08058168(struct ScenePanel *);
 void sub_08058184(struct ScenePanel *);
-void ScenePanel_BeginForwardSequence(struct ScenePanel *);
+void PileDriver_BeginForwardSequence(struct ScenePanel *);
 void sub_0805822C(struct ScenePanel *);
-void ScenePanel_BeginLongSequence(struct ScenePanel *);
-void ScenePanel_BeginPulseSequence(struct ScenePanel *);
-void ScenePanel_LoadModePalette(struct ScenePanel *);
-void ScenePanel_SetPresentationMode(struct ScenePanel *);
-void ScenePanel_TickForwardThree(struct ScenePanel *);
-void ScenePanel_TickForwardFour(struct ScenePanel *);
-void ScenePanel_TickReverseFour(struct ScenePanel *);
-void ScenePanel_TickReverseThree(struct ScenePanel *);
-void ScenePanel_TickLongSix(struct ScenePanel *);
-void ScenePanel_TickLongSeven(struct ScenePanel *);
-void ScenePanel_TickLongEight(struct ScenePanel *);
-void ScenePanel_TickLongNine(struct ScenePanel *);
-void ScenePanel_TickLongTen(struct ScenePanel *);
-void ScenePanel_TickLongEleven(struct ScenePanel *);
-void ScenePanel_TickPulseRest(struct ScenePanel *);
-void ScenePanel_TickPulseTwelve(struct ScenePanel *);
-void ScenePanel_TickPulseThirteen(struct ScenePanel *);
-void ScenePanel_TickPulseTwo(struct ScenePanel *);
+void PileDriver_BeginLongSequence(struct ScenePanel *);
+void PileDriver_BeginPulseSequence(struct ScenePanel *);
+void PileDriver_LoadModePalette(struct ScenePanel *);
+void PileDriver_SetPresentationMode(struct ScenePanel *);
+void PileDriver_TickForwardThree(struct ScenePanel *);
+void PileDriver_TickForwardFour(struct ScenePanel *);
+void PileDriver_TickReverseFour(struct ScenePanel *);
+void PileDriver_TickReverseThree(struct ScenePanel *);
+void PileDriver_TickLongSix(struct ScenePanel *);
+void PileDriver_TickLongSeven(struct ScenePanel *);
+void PileDriver_TickLongEight(struct ScenePanel *);
+void PileDriver_TickLongNine(struct ScenePanel *);
+void PileDriver_TickLongTen(struct ScenePanel *);
+void PileDriver_TickLongEleven(struct ScenePanel *);
+void PileDriver_TickPulseRest(struct ScenePanel *);
+void PileDriver_TickPulseTwelve(struct ScenePanel *);
+void PileDriver_TickPulseThirteen(struct ScenePanel *);
+void PileDriver_TickPulseTwo(struct ScenePanel *);
 /* 0x020004A4 */
 extern struct ScenePanel *gScenePanel;
-void ScenePanel_CallPendingScript(struct ScenePanel *, u32);
+void PileDriver_CallPendingScript(struct ScenePanel *, u32);
 union ScenePanelPosition;
-void ScenePanel_AddParticle(struct ScenePanel *, union ScenePanelPosition *,
+void PileDriver_AddParticle(struct ScenePanel *, union ScenePanelPosition *,
                             union ScenePanelPosition *, u32, u32);
 void SparkParticle_Spawn(const void *, s32, const void *, s32, s32, s32, s32, s32);
 #endif

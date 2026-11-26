@@ -7,7 +7,7 @@ void TimeResult_SetState(struct ChallengeTimeResult *result,
     result->timer = 0;
 }
 
-void TimeResult_LoadDigit(struct SceneInputWidget *digit, struct SceneInputResource *graphics,
+void TimeResult_LoadDigit(struct AnimSprite *digit, struct AnimSpriteResource *graphics,
                           u32 value)
 {
     if (value <= 9)
@@ -70,9 +70,9 @@ void TimeResult_UpdateDigitReveal(struct ChallengeTimeResult *result)
         TimeResult_SetElapsedDigits(result);
         TimeResult_SetState(result, TimeResult_UpdateResultHold);
     } else {
-        struct SceneInputResource *resource = &result->digitGraphics;
+        struct AnimSpriteResource *resource = &result->digitGraphics;
         const u16 *table = gRandomTable;
-        struct SceneInputWidget *digit = result->digits;
+        struct AnimSprite *digit = result->digits;
         s32 i;
         for (i = 0; i < 6; i++) {
             s32 r;
@@ -115,7 +115,7 @@ void TimeResult_UpdateInput(struct ChallengeTimeResult *result)
 
 s32 TimeResult_ShowLabel(struct ChallengeTimeResult *result)
 {
-    struct SceneInputWidget *label = &result->label;
+    struct AnimSprite *label = &result->label;
     label->flags &= ~1;
 }
 
@@ -135,7 +135,7 @@ void TimeResult_Update(struct ChallengeTimeResult *result)
 void TimeResult_Destroy(struct ChallengeTimeResult *result)
 {
     s32 i;
-    struct SceneInputWidget *e = result->digits;
+    struct AnimSprite *e = result->digits;
     for (i = 5; i >= 0; i--) {
         Anim_Remove(e);
         e++;
@@ -221,9 +221,9 @@ void TimeResult_SetElapsedDigits(struct ChallengeTimeResult *result)
             *destinationX = *sourceX + 0x90;
             ((struct ChallengeTimeResult *)widgetOffset)->digits[0].position.y = 0x38 + *sourceY;
             sourceY += 2;
-            destinationX += sizeof(struct SceneInputWidget) / sizeof(*destinationX);
+            destinationX += sizeof(struct AnimSprite) / sizeof(*destinationX);
             sourceX += 2;
-            widgetOffset += sizeof(struct SceneInputWidget);
+            widgetOffset += sizeof(struct AnimSprite);
         }
     }
 }
@@ -241,7 +241,7 @@ void TimeResult_InitCategoryDisplay(struct ChallengeTimeResult *result)
 
 void TimeResult_InitAnimations(struct ChallengeTimeResult *result)
 {
-    struct SceneInputResource *resource = ScriptProc_Start(0xCB05, 0x1289);
+    struct AnimSpriteResource *resource = ScriptProc_Start(0xCB05, 0x1289);
     s32 i;
     result->categoryGraphics = *resource;
     ResourceHeader_Relocate(&result->categoryGraphics, resource);

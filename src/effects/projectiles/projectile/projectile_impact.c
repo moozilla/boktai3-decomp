@@ -47,7 +47,7 @@ s32 Projectile_UpdateResetDelay(struct Task4E01Projectile *projectile)
     projectile->flags |= two;
     if (projectile->frame >= projectile->params.lifetime) {
         projectile->params.flags |= 0x40;
-        Task4E01_BeginImpactAnimation(projectile);
+        ProjectileTask_BeginImpactAnimation(projectile);
     }
     return 0;
 }
@@ -64,7 +64,7 @@ void Projectile_SetSpriteParams(struct Task4E01Params *, u32, u32, s32);
 
 s32 Projectile_Spawn(struct Task4E01Params *, struct ContactPosition *);
 
-s32 Task4E01_SelectTerrainTurn(struct ContactPosition *, struct ContactPosition *, s32);
+s32 ProjectileTask_SelectTerrainTurn(struct ContactPosition *, struct ContactPosition *, s32);
 
 void SceneStimulus_AddUntagged(s32, s32, s32, s32, s32);
 
@@ -131,7 +131,7 @@ s32 Projectile_SpawnImpactPair(struct Task4E01Projectile *entry)
                 s32 turn;
                 s32 random = (ReadSample(table, rng, mask) & jitterMask) - 0x80;
                 first = (u8)source->direction + random - 0x20;
-                turn = Task4E01_SelectTerrainTurn(childPosition, &entry->runtime.previousPosition,
+                turn = ProjectileTask_SelectTerrainTurn(childPosition, &entry->runtime.previousPosition,
                                                   DirectionSector(source->direction, sectorMask));
                 {
                     s32 random = ReadSample(table, rng, mask);

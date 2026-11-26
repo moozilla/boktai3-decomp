@@ -1,4 +1,4 @@
-#include "scene/actor/scene_steering_actor.h"
+#include "scene/motion/scene_steering_actor.h"
 void SceneSteeringActor_RequestDeparture(u32, u32, struct SceneSteeringActor *);
 void SceneSteeringActor_InitializeCollider(struct SceneSteeringActor *p, u32 a, u32 b, u32 c, u32 d,
                                            u32 unusedE, u32 unusedF, u32 unusedG)

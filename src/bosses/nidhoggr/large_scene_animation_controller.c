@@ -1,5 +1,5 @@
 #include "global.h"
-#include "bosses/nidhoggr/large_scene_animation_controller.h"
+#include "bosses/nidhoggr/nidhoggr_animation.h"
 #include "system/game_state/game_state.h"
 #include "engine/engine.h"
 #include "engine/video/render.h"
@@ -1548,9 +1548,9 @@ static inline void Nidhoggr_AddTargetFlags(u32 *p, u32 mask)
 void Nidhoggr_InitParts(void *arg0)
 {
     struct Nidhoggr *t = arg0;
-    struct SceneInputResource *src;
+    struct AnimSpriteResource *src;
     s32 i;
-    struct SceneInputWidget *row;
+    struct AnimSprite *row;
     struct NidhoggrPartExtra *target;
     struct ContactCollider *collider;
     u32 damage;
@@ -3638,7 +3638,7 @@ void Nidhoggr_ReadOptions(struct Nidhoggr *p)
     }
 }
 
-void ScenePanelEffect_InitPool(void *);
+void NidhoggrEffect_InitPool(void *);
 
 static inline void Fill32(void *dst, u32 *tmp, u32 size)
 {
@@ -3662,7 +3662,7 @@ s32 Nidhoggr_Init(struct Nidhoggr *t, s32 unusedA, s32 unusedB)
         for (i = 8, p = &t->dead[8]; i >= 0; p--, i--)
             *p = z;
     }
-    ScenePanelEffect_InitPool(t->effectPool);
+    NidhoggrEffect_InitPool(t->effectPool);
     Nidhoggr_InitBackgrounds(t);
     Nidhoggr_InitParts(t);
     Nidhoggr_InitSuspendedObject(t);

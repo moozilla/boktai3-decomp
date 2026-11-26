@@ -1,5 +1,5 @@
 #include "global.h"
-#include "scene/actor/contact_collider.h"
+#include "scene/collision/contact_collider.h"
 #include "engine/ram.h"
 #include "engine/engine_globals.h"
 #include "player/player_slot_status.h"

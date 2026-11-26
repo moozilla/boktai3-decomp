@@ -16,8 +16,8 @@ void PauseInventory_RefreshConsumableIcons(struct PauseInventory *p)
 {
     s32 i;
     s32 markers;
-    struct SceneInputWidget *widget;
-    struct SceneInputWidget *equippedWidget;
+    struct AnimSprite *widget;
+    struct AnimSprite *equippedWidget;
     s32 consumableSlot;
     for (i = 0; i < 4; i++)
         p->equippedConsumableSlots[i] |= 255;

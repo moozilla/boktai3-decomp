@@ -1,4 +1,4 @@
-#include "objects/pile_driver/scene_panel_rig.h"
+#include "objects/pile_driver/pile_driver_rig.h"
 
 static inline s32 scale12(s32 v)
 {
@@ -18,7 +18,7 @@ static inline s32 scale5(s32 v)
 // Places the six secondary sprites on a line from the rig's origin to its position (each
 // a fixed blend of the two, lifted by the rig's height), circling it with a radius that
 // grows along the chain, then steps each sprite's sequence.
-void ScenePanelRig_TickSecondarySprites(struct ScenePanelRig *rig, u32 palette)
+void PileDriverRig_TickSecondarySprites(struct ScenePanelRig *rig, u32 palette)
 {
     s32 i = 0;
     for (;;) {

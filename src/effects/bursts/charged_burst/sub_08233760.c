@@ -1,7 +1,7 @@
 #include "global.h"
 #include "engine/math/monster_particle_random.h"
 #include "engine/engine.h"
-#include "scene/actor/contact_actor.h"
+#include "scene/collision/contact_actor.h"
 
 struct DebrisVelocity {
     s32 x : 16, y : 16, z : 16, pad : 16;

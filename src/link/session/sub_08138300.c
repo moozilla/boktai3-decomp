@@ -1,5 +1,5 @@
 #include "global.h"
-#include "scene/area_effect/area_effect_link.h"
+#include "scene/areas/area_effect_link.h"
 static inline u8 IsByte(u16 word)
 {
     if ((word & 0x3C00) == 0x800)

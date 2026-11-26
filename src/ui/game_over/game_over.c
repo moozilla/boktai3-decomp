@@ -4,7 +4,7 @@
 #include "player/player.h"
 #include "ui/dialogue/message_window.h"
 #include "engine/runtime.h"
-#include "scene/actor/scene_actor_chase_shared.h"
+#include "scene/motion/scene_actor_chase_shared.h"
 
 void Sound_StopAllTrackedSongs(void);
 
@@ -213,7 +213,7 @@ void GameOver_InitSprites(struct GameOver *panel)
 
 void GameOver_InitOverlay(struct GameOver *panel)
 {
-    struct SceneInputResource *resource = ScriptProc_Start(0xCB05, 0x530D);
+    struct AnimSpriteResource *resource = ScriptProc_Start(0xCB05, 0x530D);
     if (resource) {
         struct SceneInputPackedPosition position;
         panel->overlayResource = *resource;

@@ -1,7 +1,7 @@
 #include "global.h"
 #include "monsters/cannons/vulcan_cannon_worker.h"
 #include "engine/ram.h"
-#include "scene/actor/contact_collider.h"
+#include "scene/collision/contact_collider.h"
 #include "engine/engine_pause.h"
 #include "engine/word_flags.h"
 extern u32 gUnk_02000560;

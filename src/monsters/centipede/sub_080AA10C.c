@@ -1,13 +1,13 @@
-#include "monsters/centipede/tentacle_body.h"
+#include "monsters/centipede/centipede_body.h"
 #include "global.h"
 #include "scene/actor/scene_actor_reset.h"
 #include "engine/engine.h"
 #include "engine/ram.h"
-#define ActorTrail_ResetPositions     TentacleActor_ResetSegmentPositions
-#define ActorTrail_CopyTerrainSamples TentacleActor_ResetRouteHistory
-void TentacleActor_ResetRouteHistory(void *);
-void TentacleActor_ResetSegmentPositions(void *, struct ContactPosition *);
-void TentacleActor_SelectWanderRoute(void *);
+#define ActorTrail_ResetPositions     Centipede_ResetSegmentPositions
+#define ActorTrail_CopyTerrainSamples Centipede_ResetRouteHistory
+void Centipede_ResetRouteHistory(void *);
+void Centipede_ResetSegmentPositions(void *, struct ContactPosition *);
+void Centipede_SelectWanderRoute(void *);
 void ActorTrail_ResetAtSavedPosition(struct ChaseActor *actor)
 {
     struct TentacleBody *trail = actor->base.context;
@@ -32,9 +32,9 @@ void ActorTrail_ResetAtSavedPosition(struct ChaseActor *actor)
     else
         *(struct ContactPosition *)((u8 *)actor->base.drawable + 0x40) = *saved;
     actor->base.body.position = trail->savedPosition;
-    TentacleActor_ResetRouteHistory(actor);
-    TentacleActor_ResetSegmentPositions(trail, &actor->base.body.position);
-    TentacleActor_SelectWanderRoute(actor);
+    Centipede_ResetRouteHistory(actor);
+    Centipede_ResetSegmentPositions(trail, &actor->base.body.position);
+    Centipede_SelectWanderRoute(actor);
     {
         u32 state = 2;
         actor->base.state2A8 = 0;

@@ -1,5 +1,5 @@
 #include "global.h"
-#include "scene/actor/contact_actor.h"
+#include "scene/collision/contact_actor.h"
 #include "engine/video/display_sprite_playback.h"
 // confidence=low: advances falling motion entries and releases them at ground or expiry.
 #define MotionEntry_UpdateFalling sub_081A4420

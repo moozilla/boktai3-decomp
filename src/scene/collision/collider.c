@@ -1,10 +1,10 @@
 #include "global.h"
 #include "engine/ram.h"
-#include "scene/actor/contact_collider.h"
-#include "scene/actor/collision_response.h"
+#include "scene/collision/contact_collider.h"
+#include "scene/collision/collision_response.h"
 #include "system/game_state/game_state.h"
 #include "engine/video/render.h"
-#include "scene/actor/contact_collider_manager.h"
+#include "scene/collision/contact_collider_manager.h"
 
 
 

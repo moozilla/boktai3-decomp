@@ -6,7 +6,7 @@ void SceneHud_GetActionIconPosition(void *, int);
 void PauseMenu_SetSpritePalette(void *, u16);
 void SceneHud_PrepareActionTransfer(struct SceneHudState *p, s32 index, s32 action)
 {
-    struct SceneInputWidget *widget = &p->motionWidgets[index];
+    struct AnimSprite *widget = &p->motionWidgets[index];
     void *resource;
     s32 column;
     widget->flags &= ~1;

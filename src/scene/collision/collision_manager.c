@@ -135,17 +135,17 @@ struct SpatialIndex *Collider_CreateManager(void)
     return manager;
 }
 
-void RegistryE7BC_SetFlags(u32 *flags, u32 bits)
+void ScriptObjectPool_SetFlags(u32 *flags, u32 bits)
 {
     *flags |= bits;
 }
 
-void RegistryE7BC_ClearFlags(u32 *flags, u32 bits)
+void ScriptObjectPool_ClearFlags(u32 *flags, u32 bits)
 {
     *flags &= ~bits;
 }
 
-void RegistryE7BC_OnObjectComplete(void *context, struct SpatialEntry *other)
+void ScriptObjectPool_OnObjectComplete(void *context, struct SpatialEntry *other)
 {
     struct RegistryE7BCObject *object = context;
     if (object) {
@@ -154,7 +154,7 @@ void RegistryE7BC_OnObjectComplete(void *context, struct SpatialEntry *other)
     }
 }
 
-s32 RegistryE7BC_QueueActiveObjects(struct RegistryE7BCManager *manager)
+s32 ScriptObjectPool_QueueActiveObjects(struct RegistryE7BCManager *manager)
 {
     struct RegistryE7BCObject *object = manager->objects;
     s32 index;
@@ -166,24 +166,24 @@ s32 RegistryE7BC_QueueActiveObjects(struct RegistryE7BCManager *manager)
     return 0;
 }
 
-void RegistryE7BC_OnManagerDestroy(void)
+void ScriptObjectPool_OnManagerDestroy(void)
 {
     gRegistryE7BCManager = 0;
 }
 
-s32 RegistryE7BC_InitManager(struct RegistryE7BCManager *manager)
+s32 ScriptObjectPool_InitManager(struct RegistryE7BCManager *manager)
 {
     gRegistryE7BCManager = manager;
     return 0;
 }
 
-struct RegistryE7BCManager *RegistryE7BC_CreateManager(void)
+struct RegistryE7BCManager *ScriptObjectPool_CreateManager(void)
 {
     struct RegistryE7BCManager *manager = Task_Create(0x8, sizeof(struct RegistryE7BCManager));
     if (manager != 0) {
-        Task_SetCallbacks(manager, (void (*)(void *))RegistryE7BC_QueueActiveObjects,
-                          (void (*)(void *))RegistryE7BC_OnManagerDestroy);
-        if (RegistryE7BC_InitManager(manager) < 0) {
+        Task_SetCallbacks(manager, (void (*)(void *))ScriptObjectPool_QueueActiveObjects,
+                          (void (*)(void *))ScriptObjectPool_OnManagerDestroy);
+        if (ScriptObjectPool_InitManager(manager) < 0) {
             Task_Kill(manager);
             return 0;
         }
@@ -191,7 +191,7 @@ struct RegistryE7BCManager *RegistryE7BC_CreateManager(void)
     return manager;
 }
 
-struct RegistryE7BCObject *RegistryE7BC_FindFreeObject(struct RegistryE7BCManager *manager)
+struct RegistryE7BCObject *ScriptObjectPool_FindFreeObject(struct RegistryE7BCManager *manager)
 {
     s32 index = 0;
     struct RegistryE7BCObject *object = manager->objects;
@@ -220,7 +220,7 @@ static inline s32 RegistryE7BC_ReadOptionalValue(void)
     return value;
 }
 
-void RegistryE7BC_CreateFromScript(void)
+void ScriptObjectPool_CreateFromScript(void)
 {
     struct RegistryE7BCManager *manager = gRegistryE7BCManager;
     struct RegistryE7BCObject *object;
@@ -228,11 +228,11 @@ void RegistryE7BC_CreateFromScript(void)
     union RegistryE7BCPosition extents;
     union RegistryE7BCPosition offset;
     if (!manager) {
-        manager = RegistryE7BC_CreateManager();
+        manager = ScriptObjectPool_CreateManager();
         if (!manager)
             return;
     }
-    object = RegistryE7BC_FindFreeObject(manager);
+    object = ScriptObjectPool_FindFreeObject(manager);
     if (!object)
         return;
     object->procedure = Script_GetKeywordValue('P', 0);
@@ -252,13 +252,13 @@ void RegistryE7BC_CreateFromScript(void)
     offset.packed.y = RegistryE7BC_ReadOptionalValue();
     offset.packed.z = RegistryE7BC_ReadOptionalValue();
     SpatialIndex_InitEntry(&object->collider, &position.coordinates, &extents.coordinates,
-                           &offset.coordinates, 12, 7, 0, 6, 12, RegistryE7BC_OnObjectComplete,
+                           &offset.coordinates, 12, 7, 0, 6, 12, ScriptObjectPool_OnObjectComplete,
                            object);
     SpatialIndex_InsertEntry(&object->collider);
     object->active = 1;
 }
 
-void RegistryE7BC_ResetManager(void)
+void ScriptObjectPool_ResetManager(void)
 {
     gRegistryE7BCManager = 0;
 }

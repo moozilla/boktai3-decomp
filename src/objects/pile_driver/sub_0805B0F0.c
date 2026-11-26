@@ -1,7 +1,7 @@
 #include "engine/math/monster_particle_random.h"
 #include "objects/pile_driver/scene_panel_rig_setup.h"
 
-void ScenePanel_InitRig(struct ScenePanel *input)
+void PileDriver_InitRig(struct ScenePanel *input)
 {
     struct ScenePanel *panel = input;
     struct ScenePanelRig *rig = &panel->rig;
@@ -15,13 +15,13 @@ void ScenePanel_InitRig(struct ScenePanel *input)
     gRandomIndex = (gRandomIndex + 1) & 1023;
     Mod(*(u16 *)(RANDOM_TABLE_ADDR + gRandomIndex * 2), 600);
     gRandomIndex = (gRandomIndex + 1) & 1023;
-    ScenePanelRig_InitSprites(rig);
+    PileDriverRig_InitSprites(rig);
     if (Script_SeekToKeyword('L'))
         power = Script_GetValue();
     else
         power = 5;
-    ScenePanelRig_InitCollider(rig, power);
-    ScenePanelRig_SetState(rig, 0);
+    PileDriverRig_InitCollider(rig, power);
+    PileDriverRig_SetState(rig, 0);
     rig->angle = 160;
     rig->turnStep = 0;
     {
@@ -73,6 +73,6 @@ void ScenePanel_InitRig(struct ScenePanel *input)
         }
     }
     rig->selectionTimer = 600;
-    ScenePanelRig_InitPayloadVectors(rig);
+    PileDriverRig_InitPayloadVectors(rig);
     rig->parent = input;
 }

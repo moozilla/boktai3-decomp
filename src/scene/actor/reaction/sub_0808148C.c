@@ -1,7 +1,7 @@
 #include "scene/actor/scene_actor_registry.h"
 #include "scene/actor/scene_actor_reaction.h"
 #include "engine/engine.h"
-#include "scene/actor/scene_actor_terrain_reaction.h"
+#include "scene/motion/scene_actor_terrain_reaction.h"
 void SparkParticle_Spawn(const void *, s32, const void *, s32, s32, s32, s32, s32);
 static inline u8 IsControlled(struct ChaseActor *a)
 {
@@ -41,7 +41,7 @@ void SceneActorReaction_PlayStaggerBurst(struct ChaseActor *actor, s32 frame)
             u32 mask = ~1;
             *flags &= mask;
         } else {
-            struct SceneInputWidget *tile = (void *)((u8 *)actor->base.drawable + 0x20);
+            struct AnimSprite *tile = (void *)((u8 *)actor->base.drawable + 0x20);
             u32 mask = ~1;
             tile->flags &= mask;
         }

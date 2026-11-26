@@ -1,5 +1,5 @@
 #include "scene/actor/scene_actor_control_phase.h"
-#include "scene/actor/scene_actor_chase_shared.h"
+#include "scene/motion/scene_actor_chase_shared.h"
 #include "global.h"
 #include "scene/actor/scene_actor_reset.h"
 void SceneActorControl_UpdateSavedControlPhase(struct ChaseActor *actor)

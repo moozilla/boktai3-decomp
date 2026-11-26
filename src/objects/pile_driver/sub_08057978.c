@@ -1,9 +1,9 @@
-#include "objects/pile_driver/scene_panel_effects.h"
+#include "objects/pile_driver/pile_driver_effects.h"
 struct ScenePanelScriptArguments {
     u32 count;
     s32 *values;
 };
-void ScenePanel_CallPendingScript(struct ScenePanel *input, u32 value)
+void PileDriver_CallPendingScript(struct ScenePanel *input, u32 value)
 {
     struct ScenePanelEffectsView *panel = (void *)input;
     u32 scriptId = panel->pendingScriptId;

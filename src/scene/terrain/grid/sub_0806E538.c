@@ -1,5 +1,5 @@
 #include "global.h"
-#include "scene/actor/scene_actor_terrain.h"
+#include "scene/motion/scene_actor_terrain.h"
 
 /* A negative cell is a blocked candidate's encoding; its magnitude is the cell. */
 static inline void SceneGrid_GetEndpointCenter(s32 cell, struct ContactPosition *position)

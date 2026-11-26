@@ -1,4 +1,4 @@
-#include "objects/pile_driver/scene_panel_rig.h"
+#include "objects/pile_driver/pile_driver_rig.h"
 #include "player/player.h"
 #include "engine/math/monster_particle_random.h"
 static inline s32 randomGlobal(void)
@@ -8,7 +8,7 @@ static inline s32 randomGlobal(void)
     offset = gRandomIndex * 2;
     return *(const u16 *)(offset + (u32)gRandomTable);
 }
-void ScenePanelRig_RandomizeMovement(struct ScenePanelRig *input)
+void PileDriverRig_RandomizeMovement(struct ScenePanelRig *input)
 {
     struct ScenePanelRig *rig = input;
     s32 angle, difference;
@@ -16,7 +16,7 @@ void ScenePanelRig_RandomizeMovement(struct ScenePanelRig *input)
     u32 *seed;
     u32 mask;
     s32 facing;
-    ScenePanelRig_InitMovement(rig);
+    PileDriverRig_InitMovement(rig);
     {
         union ParticleRandomTableSource source;
         source.halves[0] = (u16)RANDOM_TABLE_ADDR;

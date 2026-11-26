@@ -1,5 +1,5 @@
 #include "objects/breakable_prop/breakable_prop.h"
-#include "scene/actor/scene_actor_terrain.h"
+#include "scene/motion/scene_actor_terrain.h"
 s32 BreakableProp_InitializeFromScript(struct BreakableProp *prop, u32 id, u32 unused)
 {
     struct ContactPackedVector packet;

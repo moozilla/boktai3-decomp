@@ -2,7 +2,7 @@
 #define GUARD_PROJECTILE_POOL_H
 
 #include "engine/video/display_animation.h"
-#include "scene/actor/contact_collider.h"
+#include "scene/collision/contact_collider.h"
 #include "engine/task.h"
 
 struct ProjectileSlot;

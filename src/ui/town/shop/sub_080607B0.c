@@ -1,5 +1,5 @@
-#include "ui/town/scene_inventory_actions.h"
-void SceneInventory_BeginEquipmentCatalogMove(struct SceneInventoryActionView *panel)
+#include "ui/town/shop_actions.h"
+void Shop_BeginEquipmentCatalogMove(struct SceneInventoryActionView *panel)
 {
     struct SceneInputPosition starts[2], targets[2];
     u32 enabled[2], frames[2], attributes[2];

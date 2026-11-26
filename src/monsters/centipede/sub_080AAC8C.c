@@ -1,3 +1,3 @@
-void TentacleActor_OnSegmentAttackCollision(void)
+void Centipede_OnSegmentAttackCollision(void)
 {
 }

@@ -438,7 +438,7 @@ exports.hitAt = function* (tx, tz, opts = {}) {
   return { done: done(), hits, lines };
 };
 
-// The weapon in hand (src/player/stats/sub_081401A0.c Player_RefreshActionEquipment): GameState+0x50
+// The weapon in hand (src/player/core/sub_081401A0.c Player_RefreshActionEquipment): GameState+0x50
 // is the selected slot of the equip list at +0x68 (0-7 swords, 8-15 the Gun Del Sol with a
 // frame); the gun's lens is lenses[slots88[4 + actionAuxiliarySlot]] (+0x828, +0x90, +0x54),
 // whose id is the element mode Player_GetAttackAttributeFlags maps to reaction flags.
@@ -465,7 +465,7 @@ exports.quickChange = function* (want) {
   return { done: false, ...exports.weapon() };
 };
 
-// Wait for energy in sunlight (src/scene/area_effect/sub_0804E618.c: the area effect adds gGameState->unk876,
+// Wait for energy in sunlight (src/scene/areas/sub_0804E618.c: the area effect adds gGameState->unk876,
 // the sun level, per frame; 120 make one energy). The light is the solar sensor (session
 // setSolar: 0 bright .. 255 dark), written into the ROM script as `lux` lines.
 exports.chargeEnergy = function* (need, opts = {}) {
@@ -563,15 +563,15 @@ exports.breakBlock = function* (block, opts = {}) {
 exports.hub = () => {
   // a town map (Registry3F74, 11 entries) or San Miguel's gate (RegistrySelection,
   // src/ui/world_map.c, 9 entries with enabled flags)
-  const t = exports.tasks().find((x) => !x.dead && (x.update === 'Registry3F74_OnUpdate' || x.update === 'RegistrySelection_OnUpdate'));
+  const t = exports.tasks().find((x) => !x.dead && (x.update === 'TownMap_OnUpdate' || x.update === 'WorldMap_OnUpdate'));
   if (!t) return null;
-  const sel = t.update === 'RegistrySelection_OnUpdate';
+  const sel = t.update === 'WorldMap_OnUpdate';
   const menu = g.at(Number(t.task), sel ? 'struct RegistrySelectionMenu' : 'struct RegistryChoiceMenu');
   const ptr = sel ? menu.selectionCursor : menu.cursor;
   const cursor = ptr ? g.at(Number(ptr.$addr ?? ptr), 'struct MenuCursor') : null;
   // ready: the cursor reads input (src/ui/widgets/menu_cursor.c MenuCursor_UpdateInput)
   const ready = !!cursor && !!cursor.callback && g.name(cursor.callback) === 'MenuCursor_UpdateInput';
-  return { menu, cursor, kind: sel ? '2388' : '3F74', ready, state: ready ? 'Registry3F74_UpdateSelection' : (menu.update ? g.name(menu.update) : '-') };
+  return { menu, cursor, kind: sel ? '2388' : '3F74', ready, state: ready ? 'TownMap_UpdateSelection' : (menu.update ? g.name(menu.update) : '-') };
 };
 
 exports.chooseHub = function* (index, opts = {}) {
@@ -580,13 +580,13 @@ exports.chooseHub = function* (index, opts = {}) {
   for (let t = 0; t < (opts.frames ?? 1200); t++) {
     const h = exports.hub();
     if (!h || exports.where().scene !== scene) return { done: true, frames: g.frameNo - start };
-    if (h.state !== 'Registry3F74_UpdateSelection' || !h.cursor) { yield 1; continue; }
+    if (h.state !== 'TownMap_UpdateSelection' || !h.cursor) { yield 1; continue; }
     const c = h.cursor, e = c.entries[index], b = e.bounds;
     if (c.selectedIndex === index) {
       if (++presses > 3) return { done: false, reason: 'entry does not open' };
       yield g.press('a', 2);
       yield g.press(0, 4);
-      yield g.until(() => !exports.hub() || exports.hub().state !== 'Registry3F74_UpdateSelection', 120);
+      yield g.until(() => !exports.hub() || exports.hub().state !== 'TownMap_UpdateSelection', 120);
       continue;
     }
     const tx = (b.left + b.right) >> 1, ty = (b.top + b.bottom) >> 1;

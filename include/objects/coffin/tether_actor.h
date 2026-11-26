@@ -1,6 +1,6 @@
 #ifndef GUARD_TETHER_ACTOR_H
 #define GUARD_TETHER_ACTOR_H
-#include "scene/actor/contact_swarm.h"
+#include "scene/collision/contact_swarm.h"
 #include "engine/engine.h"
 #include "player/player.h"
 #include "engine/video/sprite_oam.h"

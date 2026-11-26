@@ -316,14 +316,14 @@ the large decision routine; the third includes the movement/effect callbacks.
 0817F444 also installs 0817E040 as an actor callback after an impact response.
 Names are explicitly tentative: the actor's species is not established.
 
-- **0817DA1C — matched, SceneVolume_UpdatePursuitSpin.** Starts animation 0x134,
+- **0817DA1C — matched, SabataVolume_UpdatePursuitSpin.** Starts animation 0x134,
   tests the path/player movement mode, pursues destination halfwords at
   0x2A4/0x2A8 with speed five, and rotates an effect by 16 angle units each tick.
   Collision status at the 0x32C effect gates sound 0x2E7. After elapsed time 96
   it requests phase two and restores the requested facing. Exact 940-byte check.
   Local masks declared before flag accesses reproduce the original instruction
   order; incrementing the initially zero impact flag avoids reusing phase one.
-- **0817E040 — matched, SceneVolume_UpdateKnockbackLanding.** Reverses facing
+- **0817E040 — matched, SabataVolume_UpdateKnockbackLanding.** Reverses facing
   relative to impact angle 0x471, decays speed 0x472 by three quarters, adds
   height 0x468 to the terrain floor, and plays landing/recovery animations.
   The terrain lookup handles cell overrides and sloped shapes one/two.
@@ -331,23 +331,23 @@ Names are explicitly tentative: the actor's species is not established.
   the velocity stores reproduces the zero load before the first store. A
   local mask for the terrain nibble fixes its operand tie; ordered phase/zero
   locals fix the phase-two transition stores.
-- **0817D7AC — matched, SceneVolume_UpdateRepeatedShot.** Alternates aiming,
+- **0817D7AC — matched, SabataVolume_UpdateRepeatedShot.** Alternates aiming,
   conditional projectile creation through 0817D67C, and impact-count states;
   the byte at 0x473 is capped at three. Exact 624-byte check. The explicit
   timer-zero jump to the increment path retains the original separate zero
   and >10 tests; the equivalent combined expression was optimized differently.
-- **0817DDC8 — matched, SceneVolume_UpdateImpactSlide.** Initializes effects
+- **0817DDC8 — matched, SabataVolume_UpdateImpactSlide.** Initializes effects
   through 0817AEC8 and the attack collider, then decays impact velocity by
   three quarters or three eighths according to byte 0x470. Once stopped,
   animation 0x116 completes before requesting the next phase. Exact 428-byte
   check on the first candidate.
-- **0817BDB0 — matched, ActorDecision_UpdateHazardPath.** Chooses a random path
+- **0817BDB0 — matched, SabataDecision_UpdateHazardPath.** Chooses a random path
   and point, advances after pending events, spawns proximity hazards on the
   first three advances and requests a transition afterward. Exact 352-byte
   check. Materializing the RNG table pointer before advancing its index fixes
   the table literal's lifetime; duplicated movement/state stores in the two
   event branches reproduce the compiler's shared tail and literal-pool layout.
-- **0817C3F4 — drafted 83.3%, BossSlot2_SelectCombatAction.** Complete three-mode
+- **0817C3F4 — drafted 83.3%, Sabata_SelectCombatAction.** Complete three-mode
   selector with vitality thresholds at 0x274/0x276, summon tests at 0xC60/0xC64,
   prior choice 0x4E9, event index 0x4EB and distance threshold 0x23FFF. Chooses
   attacks in each explicit switch case, clears the latch at 0x428/retracts
@@ -486,8 +486,8 @@ across Div and model updates; copying the sibling body alone does not match
 those lifetimes. Tentative names below use the neighbouring MotionActor prefix.
 
 - **08117948 — stopped below threshold; MotionActor_UpdateStopping.**
-  Glove_BeginStopping (08117294), Glove_StopFromScript (08119F44) and
-  Glove_StopWithMessage (08119F9C) install it. Clears initialization byte
+  CoffinBike_BeginStopping (08117294), CoffinBike_StopFromScript (08119F44) and
+  CoffinBike_StopWithMessage (08119F9C) install it. Clears initialization byte
   0x868, sets halfwords 0x53C/0x53E to 0x88/zero, updates movement audio,
   clamps speeds, integrates damped motion, then handles action callbacks,
   animation resets and damage recovery. Candidate wip/sub_08117948.c:
@@ -504,7 +504,7 @@ those lifetimes. Tentative names below use the neighbouring MotionActor prefix.
   releases marker/action effects and sprite-pair resources, restores model
   palettes, zeros horizontal motion, and emits bursts every 12 then 6 frames.
   After timer >120 chooses 08117F6C for link/continuation modes or
-  Glove_OnActionComplete otherwise. Candidate wip/sub_081182E4.c: 60.5%,
+  CoffinBike_OnActionComplete otherwise. Candidate wip/sub_081182E4.c: 60.5%,
   344 / 180. Best intermediate structure was 333 / 171 at 60.6%; the retained
   version corrects the palette-data loop to reload the graphics base on every
   iteration, as the ROM does. Explicit address locals before the animation
@@ -535,7 +535,7 @@ those lifetimes. Tentative names below use the neighbouring MotionActor prefix.
   flag-pointer caching and the shared motion core remain.
 - **081172C4 — stopped below threshold; MotionActor_UpdateRisingCue.**
   Entry clears phase +0x918 and speed +0x914, creates StageIconDisplay with
-  Glove_BeginStopping as callback, and sets actor flag 0x10. Phase zero adds
+  CoffinBike_BeginStopping as callback, and sets actor flag 0x10. Phase zero adds
   0x20 acceleration to the horizontal offset until it exceeds 0x40000;
   phase three subtracts 0x100 from positive speed and advances to phase four
   when nonpositive. Runs shared motion and the locally selected looping
@@ -789,7 +789,7 @@ first. Used only per-file check.py acceptance checks; no full build or network.
 All new matches/drafts have file-local descriptive aliases. Existing unrelated
 changes in tools/cloud_task.py were left alone.
 
-- **081EAB64 — drafted 88.5%, Params3D0_UpdateDisplay.** The creator at
+- **081EAB64 — drafted 88.5%, CutsceneDisplay_UpdateDisplay.** The creator at
   081EB7DC installs this as the display task callback. It selects seasonal
   music using month/light phase, handles the title/menu reveal and palette
   interpolation, animates option changes, and calls the configured script on
@@ -931,7 +931,7 @@ commit driver. The pre-existing `tools/cloud_task.py` change remains untouched.
   a literal, and allocate different registers. Small copy/raise inlines prevent
   packed stack-vector scalar replacement. Exact check after formatting: 468 bytes.
   No register-pinning concession required.
-- **08203204 matched — CannonEmitter_UpdateAnimation.** Pause-gated callback
+- **08203204 matched — PollenFlower_UpdateAnimation.** Pause-gated callback
   dispatch, sprite visibility-bit clearing, temporary palette assignment while
   +0xF2 counts down, then packed sequence playback. Preserves the callback's
   return value in r0; treating it as a void callback changes the entire stepper's
@@ -942,7 +942,7 @@ commit driver. The pre-existing `tools/cloud_task.py` change remains untouched.
   flag-result and read/store pointer locals reproduce the second flip update.
   Register-pinning concession; `depin.py --write` reduced 29 hints to 21. Exact
   check after formatting: 364 bytes.
-- **0820337C drafted 87.6% — CannonEmitter_InitializeFromScript.** Reads script
+- **0820337C drafted 87.6% — PollenFlower_InitializeFromScript.** Reads script
   options p/r/a/t/s/S, squares the trigger range (default 0x40000), loads sprite
   resource 0x7E7D, selects palette `variant + 0x1BA`, fills sixteen flash colours
   with 0x7FFF, starts sequence 6 and optionally registers a scene body. Installs
@@ -955,7 +955,7 @@ commit driver. The pre-existing `tools/cloud_task.py` change remains untouched.
   play sound 0x523; repeat/hold until +0x13C reaches +0x13A; finish and restore
   `Ooze_UpdateAttackDelay`, resetting phase/timer/repeat counters. Collider +0x68
   is refreshed during phase 1. The stepper shares long runs with
-  `ContactSequenceActor_UpdateAppearing` and the roaming-object playback helper.
+  `NidhoggrDuelMinion_UpdateAppearing` and the roaming-object playback helper.
   Passing sprite and sequence separately fixes their address-materialization
   order. Remaining: 77 realigned instructions, 17 ignoring registers, mainly
   transition-field address reuse and allocation. The draft's address alias also
@@ -1223,12 +1223,12 @@ went through build/commit.sh. New exact gain: **+0.0225 percentage points** of
 code (544 bytes), in the Register-pinned category because its one empty
 register barrier is necessary. No total progress report was regenerated.
 
-- **08208498 matched**, CannonTurret_FireAimedVolley. Fires every ten ticks
+- **08208498 matched**, GarmrStatue_FireAimedVolley. Fires every ten ticks
   while the countdown exceeds 45, aims toward the effective player position,
   adds random angular spread, selects speed between half and full configured
   speed, and alternates effect variants on the twenty-tick cadence. Returns
   to sub_0820843C after the countdown. Static evidence: neighbouring
-  CannonTurret_InitCollider/Create, the update callback comparison at
+  GarmrStatue_InitCollider/Create, the update callback comparison at
   08208740, Math_Atan2 and SpriteEffectController_Create calls. Exact check:
   544 bytes, fuzzy 100%, after formatting and depin.py. The sole retained
   concession is an empty barrier on the random-table pointer; no fixed
@@ -1238,7 +1238,7 @@ register barrier is necessary. No total progress report was regenerated.
   with &velocity and assigning the caller's velocity pointer afterwards
   removed the final three differing instructions. A low r7 table pin was
   rejected: agbcc reused r7 and turned table accesses into stack accesses.
-- **08208740 drafted 81.7%**, CannonTurret_UpdateCombat. New complete candidate
+- **08208740 drafted 81.7%**, GarmrStatue_UpdateCombat. New complete candidate
   handles pause flags, callback dispatch, collider visibility, damage/HUD,
   defeat debris and animation, periodic animation selection, palette flash,
   blink and packed sequence playback. Last full-size nonmatching check:
@@ -1247,7 +1247,7 @@ register barrier is necessary. No total progress report was regenerated.
   The callback's incidental ROM result is replaced with defined zero; a
   defined r0 allocation token keeps playback from freely using r0. Uses a
   local Subsystem_VerbNoun alias and the required concession marker.
-- **08208BE4 drafted 93.3%**, CannonTurret_InitializeFromScript. New complete
+- **08208BE4 drafted 93.3%**, GarmrStatue_InitializeFromScript. New complete
   candidate parses p/r/a/l/s/S/z/g/D/G/X/V, loads graphics resource 7E7D,
   uses palette 1BC, looks up animation resource (922E,5184), starts live/dead
   animation, steps packed playback, and initializes collider/terrain overlay.
@@ -1259,7 +1259,7 @@ register barrier is necessary. No total progress report was regenerated.
   option writes must remain in ROM order: +136 then +132; test the narrowed
   local value to avoid an extra reload. Position +1C, sprite +24, display
   position +40, graphics +50, sequence +10C, resource pointer +164.
-- **08209254 retained draft 80.7%**, FanCannon_ApplyHitReaction. Added the
+- **08209254 retained draft 80.7%**, WindCannon_ApplyHitReaction. Added the
   required file-local descriptive alias and re-recorded its unchanged score.
   Reviewed source/callees/assembly and tested removal of HUD/health pins and
   an explicit critical-hit mask lifetime. All worsened the existing draft
@@ -1480,7 +1480,7 @@ The remaining target is a guarded draft. Only check.py was used for acceptance;
 no full build, make, network, or direct git mutation. Separate commits were
 queued through build/commit.sh and observed in git log.
 
-- **081EAB64 — drafted 90.7%, Params3D0_UpdateDisplay**, improved from
+- **081EAB64 — drafted 90.7%, CutsceneDisplay_UpdateDisplay**, improved from
   88.5%. Existing creator 081EB7DC and TimeDisplay callees establish the menu
   family. Seasonal table bases must be captured before the light-phase call,
   then offset afterwards; this preserves the unadjusted ROM label in the pool.
@@ -1882,14 +1882,14 @@ header change, generated-assembly commit or direct git mutation was used.
   r0 return constraint regressed and was rejected. Effect masks/constants,
   zero reuse across the smoke calls and allocation remain. Candidate 1296,
   reviewed target 1284 bytes.
-- **08208740 — retained draft 81.7%, CannonTurret_UpdateCombat.** Initialize
+- **08208740 — retained draft 81.7%, GarmrStatue_UpdateCombat.** Initialize
   the collider separately in the live/dead branches and use the same position
   copy inline. Realigned differences improve from 119/38 to 115/30 even though
   the fuzzy score stays unchanged. A combined pause guard gave no improvement.
   Pause/return layout, animation register copies, effect constants and allocation
   remain. Candidate 1180, reviewed target 1176 bytes.
 - **08208BE4 — improved draft 93.3% to 95.5%,
-  CannonTurret_InitializeFromScript.** A memory constraint after setting the
+  GarmrStatue_InitializeFromScript.** A memory constraint after setting the
   inert/dead field reproduces the resource reload before the inert animation
   setup. Differences fall from 37/6 to 23/5. A resource value constraint was
   weaker; forcing the body pointer lifetime was worse. Return-zero, constant
@@ -1906,7 +1906,7 @@ header change, generated-assembly commit or direct git mutation was used.
   test in r1 removes the last five differing instructions. depin reduced 18
   direct hints to 12; the final unguarded source matches the entire reviewed
   416-byte extent exactly after clang-format. No shared helper was edited.
-- **082081F4 — new draft 82.6%, CannonTurret_ApplyHitReaction (tentative).**
+- **082081F4 — new draft 82.6%, GarmrStatue_ApplyHitReaction (tentative).**
   Read its collider-registration caller at 082083A0, complete assembly, and
   matched Combat_ApplyHitReaction (0820FEA8). The callback clears blocked
   hits, records damage/type/reaction, updates damage display and HUD for flag
@@ -2032,7 +2032,7 @@ and all retained functions have file-local semantic aliases.
   pins introduced additional spills, so that experiment is not a trusted ABI
   reconstruction. No exact claim or durable draft for this address.
 - **0820337C — improved draft 87.6% to 99.0%,
-  CannonEmitter_InitializeFromScript.** Separate r4 pins for the two animation
+  PollenFlower_InitializeFromScript.** Separate r4 pins for the two animation
   flip masks prevent their premature hoisting. Explicit frame-store r3 and
   first-flip-mask r2 views resolve the remaining stepper allocation differences.
   A descending signed palette index reproduces all code after the palette loop
@@ -2041,14 +2041,14 @@ and all retained functions have file-local semantic aliases.
   an index. Direct signed-pointer, callback-end-pointer and inline-fill variants
   worsened address materialization/order; retain the 99.0% index candidate.
 - **08201A78 — retained draft 80.2%,
-  ScriptCombatActor_UpdateProjectileAttack.** Added semantic alias and a local
+  MuspellHead_UpdateProjectileAttack.** Added semantic alias and a local
   address alias for the projectile-attack callback, which the cached ELF still
   calls sub_08201898. Explicit signed-angle liveness, a later position pointer
   and a volatile RNG-table parameter failed to improve 71 realigned / 33
   structural differences. RNG table load placement, stack-vector lifetime and
   allocation remain.
-- **082015D4 — new draft 82.4%, ScriptCombatActor_ApplyHitReaction
-  (tentative).** Ported the closely related CannonTurret_ApplyHitReaction after
+- **082015D4 — new draft 82.4%, MuspellHead_ApplyHitReaction
+  (tentative).** Ported the closely related GarmrStatue_ApplyHitReaction after
   reading its registration at 08201784 and the target assembly. Records damage
   +180, type +1B8 and reaction +104; flag 0x40 starts the display/HUD response;
   selected flags emit three sparks using gUnk_0824FE44. Target-specific member
@@ -2110,7 +2110,7 @@ callers, named neighbors and matched relatives.
   experiment reached 96.1%, but added an address copy and retained less useful
   constraints; kept the readable unpinned draft.
 - **0817FDE0 — stopped below draft threshold (best exploratory 57.3%).**
-  BossSlot2_CreateFromScript calls this initializer. Recovered script options
+  Sabata_CreateFromScript calls this initializer. Recovered script options
   t/B/i/P/p/s/a/e/c/A, actor registration, resource 0xCB05:0xDE23, packed
   position, health and collider configuration, frost emitter, shadow,
   proximity volume, camera, and palette buffer initialization. Needs the
@@ -2120,7 +2120,7 @@ callers, named neighbors and matched relatives.
   ignoring registers; hints reduced that to 90 but did not produce a viable
   retained draft. Scratch: wip/sub_0817FDE0.c and build/fde0-*.c.
 - **0817F9C0 — stopped below threshold (best 72.3%).** Tentative role:
-  BossSlot2_UpdatePresentation. Called after the state callbacks by
+  Sabata_UpdatePresentation. Called after the state callbacks by
   SceneActor_UpdateUnlessPaused. Updates effects and particles, collision
   visibility, frost emission, shadow visibility, palette countdown, shake and
   camera tracking; clears per-frame flags and increments the frame counter.
@@ -2764,7 +2764,7 @@ in the Register-pinned category. Resumed existing guarded candidates, largest
 first, using BIG_FUNCTIONS, anchored comparisons and hypothesis-driven variant
 batches. No full build, make, network or direct git mutations.
 
-- **081EAB64 — matched, Params3D0_UpdateDisplay**, from inherited 91.0%.
+- **081EAB64 — matched, CutsceneDisplay_UpdateDisplay**, from inherited 91.0%.
   Creator 081EB7DC installs this menu callback and TimeDisplay callees establish
   the display family. Expanding the two palette-helper call sites into their
   case bodies preserves the shift-field address across interpolation and its
@@ -2961,7 +2961,7 @@ Individual source commits and this note use build/commit.sh.
   allocation. depin.py reduced sixteen hints to eleven. Formatted source
   rechecked exact, 356 bytes, build/check/run-34bsumsj. Marked register-pinning
   concession. No handwritten instruction bodies.
-- **082015D4 drafted 82.4% — ScriptCombatActor_ApplyHitReaction (tentative).**
+- **082015D4 drafted 82.4% — MuspellHead_ApplyHitReaction (tentative).**
   Resumed the existing medium-worker scratch candidate after reviewing assembly
   and Combat_ApplyHitReaction. Stores damage/type/reaction, drives the HUD and
   damage display for flag 0x40, and emits three randomized sparks for selected
@@ -3066,7 +3066,7 @@ assembly, initializer caller, Armor proximity/position callees and matched
 relatives. The Ghidra export is absent.
 
 - **0817FDE0 — stopped below threshold.** BossSlot2_InitializeFromScript
-  (tentative); called by BossSlot2_CreateFromScript. Revisited the retained
+  (tentative); called by Sabata_CreateFromScript. Revisited the retained
   initializer, separating the early actor fields and writing the player-list
   initialization as incrementing source/destination pointers. This reduced
   this session's realigned residue from 388/125 to 336/90 differing instructions
@@ -3542,7 +3542,7 @@ Worked offline on the already-claimed `cloud/080A8750` branch, using per-file
 `tools/check.py` only. No make, complete build, network operation or direct git
 mutation was run. Each match/draft was queued separately through build/commit.sh.
 
-- **080A8750 matched — TentacleActor_UpdateKnockback.** On state entry,
+- **080A8750 matched — Centipede_UpdateKnockback.** On state entry,
   installs actor+0x22C control, derives horizontal velocity from facing and the
   sine table with scale four, clears vertical velocity and sets movement mode
   two. Advances movement with arguments six and 0x1000; flag 0x10 requests a new
@@ -3553,7 +3553,7 @@ mutation was run. Each match/draft was queued separately through build/commit.sh
   pointer hints. Exact 380-byte body including pool/padding; depin reduced nine
   hints to six, and the formatted production file passed the exact check.
   Register-pinning concession retained.
-- **080A8904 drafted 87.6% — TentacleActor_SelectWanderRoute.** Reads terrain
+- **080A8904 drafted 87.6% — Centipede_SelectWanderRoute.** Reads terrain
   surface and the context's route-choice count, enumerates adjacent cells while
   rejecting opposite headings, prefers an unvisited side route, then a random
   side route, then unvisited forward travel, then reverse travel. Writes the
@@ -3564,19 +3564,19 @@ mutation was run. Each match/draft was queued separately through build/commit.sh
   surface test improved the initial draft. Remaining: 64 realigned instructions,
   37 ignoring registers; facing/count/forward lifetimes, first destination
   pointer lifetime, and store/address order. No register hints retained.
-- **080A8F38 drafted 85.0% — TentacleBody_RefreshDirectionalAnimations.** Iterates
+- **080A8F38 drafted 85.0% — CentipedeBody_RefreshDirectionalAnimations.** Iterates
   0x128-byte segments, skips status bit one, selects tail sequence one for status
   bit four and reverses its direction, otherwise uses the actor-profile sequence
   and preserves the current frame/timer around the sequence update. Advances the
   packed animation and updates sprite frame/flips. Remaining: 41 realigned
   instructions, eight ignoring registers; stack-slot order, sprite/command
   pointer lifetimes and register choices. Register/barrier hints retained.
-- **080A915C drafted 87.0% — TentacleBody_ResetDirectionalAnimations.** Same
+- **080A915C drafted 87.0% — CentipedeBody_ResetDirectionalAnimations.** Same
   directional animation update, without preserving the frame/timer. A local
   frame record reproduces the stack layout more closely. Remaining: 36 realigned
   instructions, ten ignoring registers; first frame/flip accesses, branch/store
   layout, and loop-tail registers. Register/barrier hints retained.
-- **080A93F4 drafted 87.0% — TentacleBody_RestartSegmentAnimations.** Takes
+- **080A93F4 drafted 87.0% — CentipedeBody_RestartSegmentAnimations.** Takes
   explicit row/flags rather than deriving direction, calls Anim_RestartSequence,
   applies speed to non-tail segments, then advances the same packed animation.
   Remaining: 38 realigned instructions, 16 ignoring registers; parameter/frame
@@ -3753,7 +3753,7 @@ matched; no NONMATCHING drafts remain from this task.
   resources into +0x1538/+0x1518, initializes Storage's widgets (including the
   two sixteen-slot grids and eight equipped markers), then initializes the input
   marker/glyph pairs at +0x1558/+0x164C. Uses the shared `ContactPackedVector`
-  and `SceneInputResource` types. Taking the clear-fill value's address early
+  and `AnimSpriteResource` types. Taking the clear-fill value's address early
   (`zeroPtr`) gives the original stack layout; otherwise the position starts
   four bytes too early and creates extensive allocation differences. Initially
   committed as a recorded 95.9% draft, then superseded by an exact match.
@@ -3772,7 +3772,7 @@ matched; no NONMATCHING drafts remain from this task.
   A named mask initialized before the final flags pointer reproduces the hide
   loop. Two hints remain after depinning: column r9 and second-grid row slot
   r8. Reviewed extent: 372 bytes.
-- **081BF1AC matched**, `SceneInventory_UpdateCategoryBrowse`. Select+A cycles
+- **081BF1AC matched**, `Storage_UpdateCategoryBrowse`. Select+A cycles
   clock mode; ordinary A saves the grid selection and either starts swap
   selection (mode 1) or checks whether the selected item can be removed (mode
   2), opens its confirmation and updates the palette/state. B returns to mode
@@ -5123,8 +5123,8 @@ Exact results:
   Armor_InitPartOrbitTimer, then calls Armor_UpdatePartBobbing. Ported the
   adjacent matched Armor_StartPartSpinMotion entry-reset inline, preserving
   its materialized byte boolean. Caller/motion context establishes Armor parts.
-- **0818E98C — matched, existing Armor6_DestroySpriteColliders, 44 bytes.**
-  Armor6_Destroy passes its componentB58. Three parts at stride 0x1E4 each
+- **0818E98C — matched, existing Armor_DestroySpriteColliders, 44 bytes.**
+  Armor_Destroy passes its componentB58. Three parts at stride 0x1E4 each
   release a Sprite at the part base and Collider at +0x9C. Ordinary pointer
   iteration merged the two cursors and hoisted the stride. An initialized r0
   stride local restores rematerialization after the calls. depin reduced five
@@ -5529,7 +5529,7 @@ full body/pool extents. The exact code was formatted with venv clang-format.
   correctly declined this non-exact base. Score recorded with --nonmatching
   --record against884 bytes; default assembly fallback checked exact. Final
   draft artifacts: build/check/run-hkxhzauc. Guarded source committed separately.
-- **080A62DC matched — TentacleBody_UpdateSpreadWindup, 716 bytes.** Entry
+- **080A62DC matched — CentipedeBody_UpdateSpreadWindup, 716 bytes.** Entry
   sets motion flag100000, restarts segment animation18 and sets body8D0 bit2.
   Clears secondary motion, increases signed field2EA toward200/300 (body8EA
   selects threshold), backs away at speed1/2 and arranges active segments at
@@ -5607,7 +5607,7 @@ separate PROGRESS row was outside this round's body-family assignment.
   for the later heading adjustment. depin removed three of four hints; no hard
   register binding remains. Register-pinned category. Formatted exact check:
   build/check/run-xo4xdwse.
-- **080A6F50 matched — TentacleBody_UpdateAttackRecovery, 568 bytes.** Selects
+- **080A6F50 matched — CentipedeBody_UpdateAttackRecovery, 568 bytes.** Selects
   profile entry44, resets segment animations18 and updates their movement;
   after40 frames selects entry38, refreshes animations15 and marks completion.
   Removing both restart and saved-selection pointer locals from the inlined
@@ -5615,7 +5615,7 @@ separate PROGRESS row was outside this round's body-family assignment.
   redundant PRE copies, taking92.4% to99.3% to exact. depin removed the existing
   entry-table r10 pin. No concession remains. Formatted exact check:
   build/check/run-gw9ntut9.
-- **080A65A8 matched — TentacleBody_UpdateSpreadRelease, 776 bytes.** Shared
+- **080A65A8 matched — CentipedeBody_UpdateSpreadRelease, 776 bytes.** Shared
   spin/velocity calculation places enabled segments54/20/0 behind the actor;
   after the body8E6 duration marks completion, switches movement mode to2 and
   clears body flag2; otherwise updates segment movement. Keep the direction
@@ -5630,7 +5630,7 @@ separate PROGRESS row was outside this round's body-family assignment.
   080A68B0. Its old80.5% recorded draft was96.9% against the reviewed776 bytes.
   No generated assembly or function boundaries were changed. The integrator
   should preserve/review the independent080A68B0 tail; it is not exact C credit.
-- **080A69F0 matched — TentacleBody_UpdateChargeSpread, 808 bytes.** Same
+- **080A69F0 matched — CentipedeBody_UpdateChargeSpread, 808 bytes.** Same
   segment spreading, then after60 frames installs directed-attack control kind36.
   The direction-pointer lifetime change from080A65A8 fixes selection and
   scheduling. A single empty r8 clobber before the prepared-flag test selects
@@ -5715,7 +5715,7 @@ recorded production scores were not changed.
   declaration order did not repair them.
 - **08090724 retained draft80.4% — Slime_EmitScatteredReactionBurst.** 39/95;
   RNG/argument stack residency and polar temporaries remain.
-- **080A6D18 retained draft89.0% — TentacleBody_BeginDirectedAttack.**
+- **080A6D18 retained draft89.0% — CentipedeBody_BeginDirectedAttack.**
   21/41; tried the exact recovery selector's direct restart/selection accesses
   and flags-test spelling as well as declaration order. They did not improve
   this single-selector case. Body/flags/control-reset allocation remains.
@@ -6284,7 +6284,7 @@ as useful drafts; no byte-exact or fuzzy progress is claimed for them.
   callbacks, then snapshots registry state and registers the actor. No complete
   initializer candidate was constructed.
 - **080F67AC — tentative Sword_InitializeBodyAndColliders, 846 instructions /
-  2,020 bytes.** Best relative covers 25% (SingletonSlot7_InitDisplaySprites,
+  2,020 bytes.** Best relative covers 25% (VanargandHead_InitDisplaySprites,
   shared animation playback). The body sets up parent-target state, animation
   and palette buffers, shadow, A/T/p/K/V script options, four child collider
   pairs, and optional TargetRegistry event registration. The already-drafted
@@ -6317,12 +6317,12 @@ register pinning. Four guarded drafts provide no exact credit.
   control 0x25, saves player position, derives dive velocity and height step,
   approaches the saved target, then enters phase/behavior 2 with doubled
   secondary motion on arrival or terrain blockage. Starts song 0xF7.
-  Crow_UpdateKnockback and TentacleBody_UpdateRetreat supplied control,
+  Crow_UpdateKnockback and CentipedeBody_UpdateRetreat supplied control,
   animation scaling and approach idioms. Memory barriers preserve the two
   denominator reloads. Remaining: 11 realigned instructions, ten ignoring
   registers, concentrated in CpuSet argument ordering, zero-store ordering,
   approach arguments and bit-test constant scheduling.
-- **080A8280 — drafted 89.5%, TentacleBody_ReturnToCellCenter.** Saves current
+- **080A8280 — drafted 89.5%, CentipedeBody_ReturnToCellCenter.** Saves current
   terrain cell and its center, turns toward saved heading +0x3CD, corrects
   motion toward the original cell center if projected movement leaves it,
   advances the chain, and returns to behavior 2 when aligned in that cell.
@@ -6351,7 +6351,7 @@ register pinning. Four guarded drafts provide no exact credit.
   writes magnitude-12 segment impulses, and consumes context flag 4 with song
   0x3D4. A Polar helper preserved multiplication rather than constant shift/add
   expansion, but segment-base induction and register allocation still differ.
-- **080AA8C4 — drafted 82.9%, TentacleActor_AlignSegmentsToTerrain.** Skips
+- **080AA8C4 — drafted 82.9%, Centipede_AlignSegmentsToTerrain.** Skips
   inactive actors and flag 0x100000; adjusts active, nonremoved segment Y to
   terrain. Large steps snap to actor height; small downward steps use Div by
   ten. Final reviewed score: 47 realigned instructions, 26 ignoring registers.
@@ -6362,8 +6362,8 @@ register pinning. Four guarded drafts provide no exact credit.
   each signed impulse toward zero. Typed access was too compact; raw offsets
   recovered stores but hoisted flags and X-velocity pointers unlike ROM.
   Helper and decay variants did not improve the retained structure.
-- **080AB04C — matched, TentacleActor_ResolveBlockedMovement.** Called by
-  TentacleActor_UpdateComponents. Probes position + secondaryMotion; cancels
+- **080AB04C — matched, Centipede_ResolveBlockedMovement.** Called by
+  Centipede_UpdateComponents. Probes position + secondaryMotion; cancels
   X/Z motion for raised terrain or cell flags 0x43. Tracks blockage from the
   movement probe, rotates the wander variant after 30 frames, recomputes the
   desired heading and returns to behavior 1 if the angle gap exceeds 32.
@@ -6402,7 +6402,7 @@ Shared progress/index/history files were left to the integrator.
 
 Exact matches:
 
-- **080A93F4 — matched, TentacleBody_RestartSegmentAnimations, 516 bytes.**
+- **080A93F4 — matched, CentipedeBody_RestartSegmentAnimations, 516 bytes.**
   Existing functions.csv name reused, with the required local alias. The
   inherited 99.6% candidate differed only in when the row argument moved
   from r2 into r4. A sourceRow local pinned to r2, with a barrier consuming
@@ -6410,8 +6410,8 @@ Exact matches:
   the body move and kind spill. Removed the NONMATCHING guard. Unguarded
   depin reduced 51 hints to 27; formatted source passes the reviewed-extent
   exact check. Remaining hints include helpers as well as the function.
-- **081198F8 — matched, Glove_UpdateRestingMotion, 648 bytes, no hints.**
-  Ported the exact Glove_UpdateRecoilReturn (08119378) movement body.
+- **081198F8 — matched, CoffinBike_UpdateRestingMotion, 648 bytes, no hints.**
+  Ported the exact CoffinBike_UpdateRecoilReturn (08119378) movement body.
   This callback clamps height to 0xF000, calls Actor_ClampMovementSpeed,
   updates shadow/accessory/particle work, and increments its timer rather
   than returning through a recoil-completion transition. The caller at
@@ -6427,25 +6427,25 @@ Exact matches:
 
 Guarded drafts committed separately, with aliases and recorded full extents:
 
-- **080A7C84 — improved 95.2% to 98.0%, TentacleBody_UpdatePursuit.**
+- **080A7C84 — improved 95.2% to 98.0%, CentipedeBody_UpdatePursuit.**
   Replaced the hand-written shared exit with the already-present State0
   and State2 helpers. Remaining: 10 realigned differing instructions,
   three ignoring registers, concentrated in the early callback-offset
   lifetime and zero-state address scheduling. Candidate is exactly 732
   bytes long. Attempts to carry the earlier offset through State0 or pin
   the shared zero globally worsened allocation; retained the 98.0% form.
-- **080A8280 — improved 89.5% to 90.3%, TentacleBody_ReturnToCellCenter.**
+- **080A8280 — improved 89.5% to 90.3%, CentipedeBody_ReturnToCellCenter.**
   Recompute &actor->motion at AddVectors instead of passing the persistent
   motion local. Structural residue fell from 12 to six instructions;
   total residue is 45. Candidate 824 bytes, reviewed extent 828. Reversing
   vector operands and angle-wrap branch order did not help.
-- **08117948 — improved 90.0% to 90.4%, Glove_UpdateStopping.**
+- **08117948 — improved 90.0% to 90.4%, CoffinBike_UpdateStopping.**
   An entry-byte pointer pinned to r4 recovers three register choices;
   action/flag pointer lifetimes, zero scheduling and the later action code
   remain different (82 realigned instructions, 42 structural). Candidate
   1,568 bytes, reviewed extent 1,572. Deferring the action-flag address and
   independently preserving clear widths did not improve structure.
-- **0811A6C4 — new 91.5% draft, Glove_InitFromScript.**
+- **0811A6C4 — new 91.5% draft, CoffinBike_InitFromScript.**
   Reads participant/options, initializes primary/secondary appearance,
   registers drawings, advances initial motion, configures HUD widgets,
   chooses launch/stopping callbacks, registers the receiver and input slot.
@@ -6512,7 +6512,7 @@ Other attempts and stopping points (no below-80% C was promoted):
   Explicit pointer lifetimes restore the 0x10 frame and reduce structural
   residue, while broad register pins worsen it. Extent 820.
 - **081175F8 — skipped, local 67.1%.** Launch descent adds phase-four
-  transition to Glove_UpdateStopping. Same pointer/decay-loop allocation
+  transition to CoffinBike_UpdateStopping. Same pointer/decay-loop allocation
   residue as ascent; candidate is eight bytes short of the 848-byte extent.
 - **08117F6C — skipped, best local 61.7%.** Recovery callback blinks model
   flag 1, replenishes resource toward its cap, then returns to stopping after
@@ -6666,12 +6666,12 @@ combined ROM build.
 
 New exact functions:
 
-- **0820FF54 matched — PinkSpine_InitCollider**, 144 bytes. Called by
-  PinkSpine_InitFromScript unless the script's disabled/dead option is set.
+- **0820FF54 matched — Popbud_InitCollider**, 144 bytes. Called by
+  Popbud_InitFromScript unless the script's disabled/dead option is set.
   Ported PoisonHand_InitCollider: same packed bounds (100,120,100), position
   offset, collider kind 5009 and disable flag; callback is the common
   Combat_ApplyHitReaction and all body-property arguments are zero. No hints.
-- **0820FD54 matched — PinkSpine_RecordDefeat**, 340 bytes. Called by
+- **0820FD54 matched — Popbud_RecordDefeat**, 340 bytes. Called by
   ProjectileEmitter_EmitAttackFrame at frame nine. Ported PoisonHand_RecordDefeat,
   using the Pink spine script/value offsets, event flag 2, family counter 56E
   and the single 58A category counter. Script arguments retain signed position
@@ -6740,7 +6740,7 @@ with default assembly fallbacks checked separately):
   high-register save instead of rematerializing it. Ten realigned differences,
   nine ignoring registers. Removing the constraint entirely shares the earlier
   counter pointer and falls to 86.1%; a volatile destination does not fix it.
-- **08210398 improved 89.9% -> 90.7% — PinkSpine_UpdateDamageAnimation**,
+- **08210398 improved 89.9% -> 90.7% — Popbud_UpdateDamageAnimation**,
   688-byte target and candidate. A scoped collider-base view keeps flags at
   base+6 and passes the same base to Collider_SetPosition. Remaining pause
   branch/flags scheduling, animation pointers and explicit defined callback
@@ -6762,7 +6762,7 @@ were retained/refreshed where needed:
   constraints and counter/zero bindings did not improve it. Avoid hard-pinning
   an induction variable used in stride arithmetic: exploratory outputs changed
   unrelated register lifetimes and were discarded.
-- **08210654 retained 94.0% — PinkSpine_InitFromScript**, target 900 bytes,
+- **08210654 retained 94.0% — Popbud_InitFromScript**, target 900 bytes,
   candidate 908 (old comment was 93.5%). Sprite-address barrier removal/movement
   yields 93.8% and does not fix the redundant derived sprite address. Remaining
   23 realigned instructions, six ignoring registers, including explicit defined
@@ -6789,7 +6789,7 @@ Stopped fresh work:
 
 - **0820E2A4 stopped below threshold — Poison hand damage/animation update**,
   1,140-byte target, 514 instructions. Read full assembly and BIG_FUNCTIONS;
-  EnemyD459_Update supplies the outer damage/collider/HUD/flash/blink pattern,
+  AxeArmor_Update supplies the outer damage/collider/HUD/flash/blink pattern,
   while Screamer_UpdateDamageParticles supplies the eight-particle defeat loop.
   Candidate handles health at 136, damage at 134, dead at 132, flash at 12A,
   resource 168, defeat callback E128 and palette 1C5. Initial 47.5%; removing

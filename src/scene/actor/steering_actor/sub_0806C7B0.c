@@ -1,5 +1,5 @@
-#include "scene/actor/scene_steering_actor.h"
-#include "player/cues/player_cue_sequence.h"
+#include "scene/motion/scene_steering_actor.h"
+#include "player/cutscene/player_cue_sequence.h"
 struct SceneSteeringActorPool *SceneSteeringActor_EnsurePool(void);
 struct SceneSteeringActor *SceneSteeringActor_Allocate(struct SceneSteeringActorPool *);
 void SceneSteeringActor_InitializeCollider(struct SceneSteeringActor *, s32, s32, s32, s32, s32,

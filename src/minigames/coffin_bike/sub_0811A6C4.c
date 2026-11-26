@@ -5,10 +5,10 @@
 #include "system/game_state/game_state.h"
 #include "engine/ram.h"
 #include "engine/engine_globals.h"
-#include "scene/area_effect/area_effect_link.h"
+#include "scene/areas/area_effect_link.h"
 #include "engine/engine_pause.h"
-#include "scene/actor/scene_actor_damage_visibility.h"
-#include "minigames/coffin_bike/glove.h"
+#include "scene/collision/scene_actor_damage_visibility.h"
+#include "minigames/coffin_bike/coffin_bike.h"
 
 s32 Div(s32, s32);
 s32 Math_Atan2(s32, s32);
@@ -19,16 +19,16 @@ extern u32 gUnk_020004E0[];
 void MotionActor_ParsePosition(void *);
 void CharacterModel_SetPrimaryAppearance(void *, void *);
 void CharacterModel_SetSecondaryAppearance(void *, void *, void *);
-void Glove_InitializeStyleModifiers(void *);
+void CoffinBike_InitializeStyleModifiers(void *);
 void ActorSprite_InitPartDrawings(void *, void *, u32);
 void FieldHud_InitializeWidgets(void *, void *, void *, u32, void *);
 void sub_081175F8(void *);
 void sub_081172C4(void *);
-void Glove_UpdateStopping(void *);
+void CoffinBike_UpdateStopping(void *);
 void CharacterPreview_InitializePalette(void *, void *, u32);
-void ActorRecoil_InitCollisionVolumes(void *);
+void CoffinBike_InitCollisionVolumes(void *);
 void SceneTilemap_SetScrollSource(void *);
-void Glove_RegisterMessageReceiver(void *);
+void CoffinBike_RegisterMessageReceiver(void *);
 static inline void Glove_SetCallback(struct Glove *p, void (*fn)(void *), s32 zero)
 {
     p->active = 1;
@@ -47,7 +47,7 @@ static inline void Glove_ReadMode(u32 *result, u32 mask)
     *result = (gEngineFlags | gScenePauseFlags) & mask;
 }
 
-s32 Glove_InitFromScript(struct Glove *p)
+s32 CoffinBike_InitFromScript(struct Glove *p)
 {
     struct GloveMotion *self = &p->motion;
     s32 h;
@@ -71,7 +71,7 @@ s32 Glove_InitFromScript(struct Glove *p)
     p->nextScript = Script_GetKeywordValue('n', 0);
     if (!Engine_PauseBits(0x800))
         p->localScript = Script_GetKeywordValue('g', 0);
-    Glove_InitializeStyleModifiers(p);
+    CoffinBike_InitializeStyleModifiers(p);
     ActorSprite_InitPartDrawings(self, &p->model, 0x3d99);
     if ((p->motion.x) == 0x20000)
         self->x = -0x40000;
@@ -150,15 +150,15 @@ s32 Glove_InitFromScript(struct Glove *p)
                                    &p->activeFrames);
         ready = Script_GetKeywordValue('R', 0);
         if (ready)
-            Glove_SetCallback(p, (void (*)(void *))Glove_UpdateStopping, 0);
+            Glove_SetCallback(p, (void (*)(void *))CoffinBike_UpdateStopping, 0);
         else
             Glove_SetCallback(p, sub_081172C4, ready);
     }
     CharacterPreview_InitializePalette(&self->pendingDamage, &p->model, self->style.parameterD);
-    ActorRecoil_InitCollisionVolumes(p);
+    CoffinBike_InitCollisionVolumes(p);
     SceneTilemap_SetScrollSource(gUnk_020004E0);
     gParticipantActors[p->participant] = (struct ScenePoolPlayer *)p;
-    Glove_RegisterMessageReceiver(p);
+    CoffinBike_RegisterMessageReceiver(p);
     p->input = gPadState + p->participant * 4;
     p->attachmentDesc.resource = p->participant;
     Memory_Clear(&p->offsetX, 8);

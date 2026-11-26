@@ -1,7 +1,7 @@
 #include "ui/pause/menu_prompt.h"
 #include "player/player.h"
 void Hud_InitSelectionBounds(u32, u32);
-void SceneSequence_UpdateRampDown64(struct SceneHudState *s)
+void MenuSequence_UpdateRampDown64(struct SceneHudState *s)
 {
     if (s->pageFadeTimer <= 15)
         Hud_InitSelectionBounds((16 - s->pageFadeTimer) * 4, 0);

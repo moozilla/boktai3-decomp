@@ -1,5 +1,5 @@
 #include "global.h"
-#include "scene/area_effect/area_effect_link.h"
+#include "scene/areas/area_effect_link.h"
 u16 *Hud_GetTilemapCell(int, int, int);
 struct SlotOwner {
     u8 unknown0[0x53];

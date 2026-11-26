@@ -3,7 +3,7 @@
 #include "engine/video/display_animation.h"
 #include "engine/math/scene_vec.h"
 #include "player/player.h"
-#include "player/cues/player_cue_sequence.h"
+#include "player/cutscene/player_cue_sequence.h"
 void MotionTrack_Update(void *);
 void Player_BeginPositionRequest(void *, const void *, u32, u32, u32, u32, u32, u32, u32);
 static inline void SetAnimation(struct PairedSceneHalf *p, struct VanargandAttackPair *boss, u32 id,

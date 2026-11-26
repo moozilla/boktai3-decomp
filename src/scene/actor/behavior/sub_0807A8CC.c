@@ -1,12 +1,12 @@
 #include "global.h"
-#include "scene/actor/scene_actor_motion.h"
-#include "scene/actor/scene_actor_terrain_reaction.h"
+#include "scene/motion/scene_actor_motion.h"
+#include "scene/motion/scene_actor_terrain_reaction.h"
 #include "scene/actor/scene_actor_init_dispatch.h"
-#include "scene/actor/scene_actor_chase_types.h"
-#include "player/cues/player_cue_sequence.h"
-#include "scene/actor/scene_actor_turn.h"
+#include "scene/motion/scene_actor_chase_types.h"
+#include "player/cutscene/player_cue_sequence.h"
+#include "scene/motion/scene_actor_turn.h"
 #include "scene/actor/scene_actor_status.h"
-#include "scene/actor/scene_actor_chase_shared.h"
+#include "scene/motion/scene_actor_chase_shared.h"
 #include "engine/word_flags.h"
 void SceneActorMovement_UpdateAirborne(struct SceneActorMotionView *);
 void SceneActorMovement_UpdateHeight(struct ChaseActor *);

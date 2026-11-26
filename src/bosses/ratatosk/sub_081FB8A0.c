@@ -1,6 +1,6 @@
 #include "global.h"
-#include "scene/actor/contact_swarm.h"
-#include "player/cues/player_cue_sequence.h"
+#include "scene/collision/contact_swarm.h"
+#include "player/cutscene/player_cue_sequence.h"
 struct Particle {
     u32 age;
     u8 pad4[8];

@@ -1,11 +1,11 @@
 #include "global.h"
-#include "ui/town/scene_inventory_panel.h"
+#include "ui/town/shop_panel.h"
 struct EquipmentDescriptor {
     u32 prefix[3];
     u8 modifierA, unknownD[3], modifierB, unknown11[3], modifierC, unknown15[11];
 };
 void Inventory_GetEquipmentDescriptor(s32, void *);
-void SceneInventory_PrepareEquipmentDescriptor(struct SceneInventoryPanel *,
+void Shop_PrepareEquipmentDescriptor(struct SceneInventoryPanel *,
                                                struct EquipmentDescriptor *);
 void Presentation_ApplyGraphicData(void *, void *);
 void Presentation_ApplyGraphicSettings(void *, const void *);
@@ -40,7 +40,7 @@ void sub_0805F904(struct SceneInventoryPanel *panel)
         descriptor.modifierA = (u32)entry;
         descriptor.modifierB = (u32)entry;
         descriptor.modifierC = (u32)entry;
-        SceneInventory_PrepareEquipmentDescriptor(panel, data);
+        Shop_PrepareEquipmentDescriptor(panel, data);
     } else {
         data = 0;
         entry = 0;

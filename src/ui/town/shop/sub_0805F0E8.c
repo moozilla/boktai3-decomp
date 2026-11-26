@@ -7,7 +7,7 @@ void SceneInputPanel_PositionModeCursor(struct SceneInputPanel *owner, u32 mode)
     switch (mode) {
         case 4:
         case 5: {
-            struct SceneInputWidget *cursor = &base->modeCursor;
+            struct AnimSprite *cursor = &base->modeCursor;
             cursor->flags &= ~1;
         }
             base->modeCursor.position.x = 216;
@@ -15,7 +15,7 @@ void SceneInputPanel_PositionModeCursor(struct SceneInputPanel *owner, u32 mode)
             break;
         case 1: {
             u32 offset = (u32) & ((struct SceneInputPanel *)0)->modeCursor;
-            struct SceneInputWidget *cursor;
+            struct AnimSprite *cursor;
             cursor = (void *)((u8 *)base + offset);
             cursor->flags &= ~1;
         }
@@ -24,7 +24,7 @@ void SceneInputPanel_PositionModeCursor(struct SceneInputPanel *owner, u32 mode)
             break;
         case 3: {
             u32 offset = (u32) & ((struct SceneInputPanel *)0)->modeCursor;
-            struct SceneInputWidget *cursor;
+            struct AnimSprite *cursor;
             cursor = (void *)((u8 *)base + offset);
             cursor->flags &= ~1;
         }
@@ -33,7 +33,7 @@ void SceneInputPanel_PositionModeCursor(struct SceneInputPanel *owner, u32 mode)
             break;
         case 2: {
             u32 offset = (u32) & ((struct SceneInputPanel *)0)->modeCursor;
-            struct SceneInputWidget *cursor;
+            struct AnimSprite *cursor;
             cursor = (void *)((u8 *)base + offset);
             cursor->flags &= ~1;
         }
@@ -41,7 +41,7 @@ void SceneInputPanel_PositionModeCursor(struct SceneInputPanel *owner, u32 mode)
             base->modeCursor.position.y = 104;
             break;
         default: {
-            struct SceneInputWidget *cursor = &panel->modeCursor;
+            struct AnimSprite *cursor = &panel->modeCursor;
             cursor->flags |= 1;
         } break;
     }

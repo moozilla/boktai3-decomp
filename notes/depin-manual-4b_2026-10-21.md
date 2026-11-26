@@ -9,7 +9,7 @@ Branch cloud/depin-manual-4b. List: wip/depin_list4.tsv (40 functions). Method: 
 * BouncingObject_UpdatePool (08069510): permuter. Reuse the `offset` local as the return value: `offset = 0;` after computing guard, `return offset;`.
 * SceneHud_AnimateActionResult (0816F340): permuter. `short index;` and the mode constant 1 via `u16 k2 = 1; mode = k2;`.
 * ActorAttachment_UpdateValueFrame (08065904): permuter. `s16 new_var; new_var = *value; current = new_var;`.
-* SceneInventory_BeginConsumableRemoveMove / SpecialMove (0806097C, 08060B94): permuter. `start[1].x` through the local pointer but `starts[1].y/.z` through the array.
+* Shop_BeginConsumableRemoveMove / SpecialMove (0806097C, 08060B94): permuter. `start[1].x` through the local pointer but `starts[1].y/.z` through the array.
 * Vanargand_UpdatePartFadeOut (081B5CCC): permuter. `(u8 *)p - (-offset)` / `- (-off)` address forms and a `u32 k2 = 0x194` local for the 0x194 load.
 * LevelAdvanceDisplay_StartParticle (08056F88): permuter. `index = ((*(&index)) + 1) & mask;` for the fourth increment.
 * Lun_EnterIdleOrCopyCell (0809D424): permuter. `zero_2 = s->hflags; zero = zero_2 & mask;` (separate u16 temp).
@@ -19,8 +19,8 @@ Branch cloud/depin-manual-4b. List: wip/depin_list4.tsv (40 functions). Method: 
 ## Not solved
 
 Everything else in the list (28 functions). 300 s of permuter found nothing for them; notable near misses:
-* ScenePanelRig_CheckContactTransition: only dz lands in r1 instead of r0.
+* PileDriverRig_CheckContactTransition: only dz lands in r1 instead of r0.
 * SceneHud_TickActionResult: commutative operand order (`adds r2,r1,#0; ands r2,r0` vs the reverse), the known unsolved pattern.
 * TransientSpriteEffects_Update: unpinned stripped copy is the right size; `sprite` is derived from the view (r1+0x44) instead of from `slot` (r2+0x2c) and one temp lands in r1 instead of r0.
 * Wireless_SelectParentFromInput: stripped is 4 bytes over; pressed/old swap r5/r6.
-* sub_081D0864, ActorImpact_CopyContact: single barrier kept, nothing tried (deref, do-while, copy removal) gave a match.
+* sub_081D0864, SabataImpact_CopyContact: single barrier kept, nothing tried (deref, do-while, copy removal) gave a match.

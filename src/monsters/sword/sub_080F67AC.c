@@ -1,4 +1,4 @@
-#include "scene/actor/contact_swarm.h"
+#include "scene/collision/contact_swarm.h"
 #include "player/player.h"
 #include "engine/video/display_sequence_inline.h"
 

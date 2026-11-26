@@ -1,5 +1,5 @@
 #include "global.h"
-#include "player/cues/player_cue_sequence.h"
+#include "player/cutscene/player_cue_sequence.h"
 #include "scene/actor/actor_attachment_state.h"
 #include "effects/screen/background_controller.h"
 #include "effects/particles/native_effect.h"

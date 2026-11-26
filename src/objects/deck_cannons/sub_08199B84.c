@@ -14,14 +14,14 @@ struct CallbackSlot {
 };
 void AnimData_SelectPaletteBank(void *, u32);
 void Sound_PlaySongChecked(u32);
-void CannonBattery_SpawnProjectile(void *, void *, s32);
-void CannonBattery_SpawnMuzzleFlash(void *, void *, s32);
+void DeckCannon_SpawnProjectile(void *, void *, s32);
+void DeckCannon_SpawnMuzzleFlash(void *, void *, s32);
 void CallbackSlot_BeginPaletteTransition(struct CallbackSlot *slot)
 {
     void *owner = slot->owner;
     AnimData_SelectPaletteBank(slot->animation, 0x8f);
-    CannonBattery_SpawnProjectile(owner, slot->position, slot->flags & 4);
-    CannonBattery_SpawnMuzzleFlash(owner, slot->position, slot->flags & 4);
+    DeckCannon_SpawnProjectile(owner, slot->position, slot->flags & 4);
+    DeckCannon_SpawnMuzzleFlash(owner, slot->position, slot->flags & 4);
     {
         u32 state = 2;
         slot->state = state;

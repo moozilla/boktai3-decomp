@@ -1,7 +1,7 @@
 #ifndef GUARD_SCENE_ACTOR_PLACEMENT_H
 #define GUARD_SCENE_ACTOR_PLACEMENT_H
 #include "scene/actor/scene_actor_reset.h"
-#include "scene/actor/scene_actor_terrain.h"
+#include "scene/motion/scene_actor_terrain.h"
 #include "link/session/room_actor.h"
 /* Tile drawable flags relative to its embedded block at drawable +0x20. */
 struct SceneActorPlacementTileFlags {

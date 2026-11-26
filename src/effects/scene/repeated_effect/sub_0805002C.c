@@ -1,5 +1,5 @@
 #include "effects/scene/repeated_effect.h"
-#include "scene/actor/contact_actor.h"
+#include "scene/collision/contact_actor.h"
 void RepeatedEffect_AddFromScript(void)
 {
     struct RepeatedEffectManager *manager = gRepeatedEffectManager;

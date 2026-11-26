@@ -1,8 +1,8 @@
-#include "ui/town/scene_inventory_states.h"
-void SceneInventory_BeginAlternateConsumableSelection(struct SceneInventoryControlView *panel)
+#include "ui/town/shop_states.h"
+void Shop_BeginAlternateConsumableSelection(struct SceneInventoryControlView *panel)
 {
-    SceneInventory_BeginActionSelection(panel, 2);
+    Shop_BeginActionSelection(panel, 2);
     panel->interactionFlags |= 0x80;
     SceneInput_SetGridFlags(&panel->grid, 0x1E);
-    SceneInventory_UpdateModePrompt(panel, 1);
+    Shop_UpdateModePrompt(panel, 1);
 }

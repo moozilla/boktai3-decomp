@@ -11,7 +11,7 @@ struct Owner080A9 {
 };
 void Sprite_Remove(void *);
 
-void TentacleBody_RemoveSegmentSprites(struct Owner080A9 *p)
+void CentipedeBody_RemoveSegmentSprites(struct Owner080A9 *p)
 {
     s32 i;
     for (i = 0; i < p->count; i++)

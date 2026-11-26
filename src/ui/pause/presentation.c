@@ -182,7 +182,7 @@ void SceneHud_RefreshEquipmentValues(struct SceneHudState *p)
     s32 difference;
     s32 changed;
     u16 *cell;
-    struct SceneInputWidget *widget;
+    struct AnimSprite *widget;
     struct SceneInputItemDescriptor *equippedDescriptor;
 
     /* categoryWidgets[62 + i] and motionWidgets[2 + i] are overlapping HUD views. */
@@ -246,8 +246,8 @@ void SceneHud_RefreshEquipmentValues(struct SceneHudState *p)
                 widget = &p->motionWidgets[2];
                 for (j = 0; j < 3; display += sizeof(*widget) / sizeof(*display), widget++, j++) {
                     *display &= ~1;
-                    ((struct SceneInputWidget *)((u8 *)display - (u32) &
-                                                 ((struct SceneInputWidget *)0)->flags))
+                    ((struct AnimSprite *)((u8 *)display - (u32) &
+                                                 ((struct AnimSprite *)0)->flags))
                         ->position = position;
                     Anim_LoadKeyframe(widget, resource, (u16)(*digit++ + frameBase), 1);
                     position.x += 8;
@@ -287,7 +287,7 @@ void InventoryGrid_GetSlotPosition(void *output, s32 slot)
     }
 }
 
-void PauseMenu_SetSpritePalette(struct SceneInputWidget *, u16);
+void PauseMenu_SetSpritePalette(struct AnimSprite *, u16);
 
 void InventoryGrid_GetSlotPosition(void *, s32);
 
@@ -302,7 +302,7 @@ void SceneHud_RefreshEquipmentAvailability(struct SceneHudState *owner)
     u32 mask;
 
     if (owner->actionOwner->actionMode == 6) {
-        struct SceneInputWidget *widget;
+        struct AnimSprite *widget;
         owner->categoryWidgets[10].flags &= ~1;
         widget = &owner->categoryWidgets[10];
         Anim_LoadKeyframe(widget, owner->motionResource, 0x2F, 1);
@@ -315,7 +315,7 @@ void SceneHud_RefreshEquipmentAvailability(struct SceneHudState *owner)
             flags += sizeof(*widget) / sizeof(*flags);
         } while (--i >= 0);
     } else {
-        struct SceneInputWidget *widget;
+        struct AnimSprite *widget;
         i = 0;
         widget = &owner->categoryWidgets[10];
         do {
@@ -341,7 +341,7 @@ void SceneHud_RefreshEquipmentAvailability(struct SceneHudState *owner)
 
 void SceneHud_ConfigureEquipmentTransfer(struct SceneHudState *owner, s32 index, s32 from, s32 to)
 {
-    struct SceneInputWidget *widget = &owner->motionWidgets[index];
+    struct AnimSprite *widget = &owner->motionWidgets[index];
     void *motion;
     widget->flags &= ~1;
     motion = owner->motionResource;
@@ -466,23 +466,23 @@ void InventoryGrid_LayoutStatMarkers(struct SceneHudState *p)
 {
     s32 i;
     for (i = 0; i < 3; i++) {
-        u32 address = (u32)p + i * sizeof(struct SceneInputWidget);
-        struct SceneInputWidget *w = (void *)(address + STAT_MARKER_OFFSET(0));
+        u32 address = (u32)p + i * sizeof(struct AnimSprite);
+        struct AnimSprite *w = (void *)(address + STAT_MARKER_OFFSET(0));
         w->flags &= ~1;
         p->categoryWidgets[i + 85].position.x = p->comparisonValues[i] - 100;
         p->categoryWidgets[i + 85].position.y = i * 8;
     }
     for (i = 0; i < 3; i++) {
-        u32 address = (u32)p + i * sizeof(struct SceneInputWidget);
-        struct SceneInputWidget *w = (void *)(address + STAT_MARKER_OFFSET(1));
+        u32 address = (u32)p + i * sizeof(struct AnimSprite);
+        struct AnimSprite *w = (void *)(address + STAT_MARKER_OFFSET(1));
         w->flags &= ~1;
         p->categoryWidgets[i + 88].position.x =
             p->categoryWidgets[i + 85].position.x + p->comparisonOffsets[i];
         p->categoryWidgets[i + 88].position.y = i * 8;
     }
     for (i = 0; i < 3; i++) {
-        u32 address = (u32)p + i * sizeof(struct SceneInputWidget);
-        struct SceneInputWidget *w = (void *)(address + STAT_MARKER_OFFSET(2));
+        u32 address = (u32)p + i * sizeof(struct AnimSprite);
+        struct AnimSprite *w = (void *)(address + STAT_MARKER_OFFSET(2));
         w->flags &= ~1;
         p->categoryWidgets[i + 91].position.x =
             p->categoryWidgets[i + 88].position.x + p->comparisonDeltas[i];

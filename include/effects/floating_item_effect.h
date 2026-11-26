@@ -1,7 +1,7 @@
 #ifndef GUARD_FLOATING_ITEM_EFFECT_H
 #define GUARD_FLOATING_ITEM_EFFECT_H
 #include "ui/dialogue/choice_menu.h"
-#include "ui/widgets/scene_input_widget.h"
+#include "engine/video/anim_sprite.h"
 #include "player/player.h"
 
 /* Eight item icons can bob, wait, spin away, or fly toward a player/target. */
@@ -13,7 +13,7 @@ struct FloatingEffect {
     u8 index, unknown13[5];
     struct ContactPosition position;
     struct ContactPosition *target;
-    struct SceneInputWidget sprite;
+    struct AnimSprite sprite;
 };
 struct LinkedWidgetSet {
     struct Task task;

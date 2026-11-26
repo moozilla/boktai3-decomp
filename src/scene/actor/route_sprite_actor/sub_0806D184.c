@@ -1,4 +1,4 @@
-#include "scene/actor/route_sprite_playback.h"
+#include "scene/motion/route_sprite_playback.h"
 #include "engine/engine.h"
 s32 Div(s32, s32);
 static inline s32 Truncate12(s32 value)

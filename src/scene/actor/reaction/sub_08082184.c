@@ -1,7 +1,7 @@
 #include "global.h"
 #include "scene/actor/scene_actor_reaction.h"
 #include "scene/actor/scene_actor_init_actor.h"
-#include "scene/actor/scene_actor_chase_shared.h"
+#include "scene/motion/scene_actor_chase_shared.h"
 void SceneActorAttachment_ReplaceResponseSlot(void *, u32, u32, u32);
 struct RouteResponseGroup {
     u8 unknown0[0x74];

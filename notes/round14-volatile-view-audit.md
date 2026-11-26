@@ -92,7 +92,7 @@ their copied duration arithmetic. Their wider copied playback blocks remain;
 the full common-step candidates did not match.
 
 `FeatherEffectPool_CreateDirectional` (`081294B4`) matches with the complete
-`PlayerCue_StepSequence` helper from `include/player/cues/player_cue_sequence.h`, the
+`PlayerCue_StepSequence` helper from `include/player/cutscene/player_cue_sequence.h`, the
 shared `DisplaySequenceState`, and the existing graphics API declarations.
 Adjacent effect functions including `081299F8` and `08129B04` already use that
 helper. This removes the private sequence layout and the entire duplicated
@@ -170,7 +170,7 @@ mask copy/register lifetime. No private replacement volatile type was added.
 
 For actor animation, `Anim_Step` (`08220F70`) writes the status byte at
 animation offset `0x1D`, corresponding to controller offset `0xD1`. The
-existing `SceneInputWidget` view exposes this byte. Ordinary access folds the
+existing `AnimSprite` view exposes this byte. Ordinary access folds the
 mask test into the loaded register and drops the ROM's separate copy. The
 tested single regmove prohibition did not recover it; no new constant local
 or packed union was substituted.

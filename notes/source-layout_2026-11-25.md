@@ -22,3 +22,8 @@ units, the overworld maps, the Dark Generator, and 19 Player files placed by
 observed role. The rule tables retain prior path aliases so a branch using
 pass 1 or pass 2 paths can replay the final placement. The replay reports
 uncovered ROM addresses and headers with uncertain ownership.
+
+Pass 3 records the reviewed Player and Link Player ROM ranges and preserves
+the recorded translation units at their boundaries. The layout moves also
+group the scene framework headers by topic and collect the Count, the pause
+Status page, and the stationary suit of armor in their own directories.

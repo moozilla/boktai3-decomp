@@ -1,7 +1,7 @@
 #ifndef GUARD_SCENE_EFFECT_PROJECTION_H
 #define GUARD_SCENE_EFFECT_PROJECTION_H
 
-#include "scene/actor/contact_position.h"
+#include "scene/collision/contact_position.h"
 #include "engine/video/render.h"
 
 static inline s32 SceneEffect_ScaleProjection(s32 v)

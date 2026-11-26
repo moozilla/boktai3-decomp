@@ -124,12 +124,12 @@ void Options_Destroy(struct OptionsScreen *p)
 
 s32 Options_InitScreen(struct OptionsScreen *screen)
 {
-    struct SceneInputResource *backgroundGraphics;
-    struct SceneInputResource *cursorGraphics;
-    struct SceneInputResource *leftArrowGraphics;
-    struct SceneInputResource *menuGraphics;
-    struct SceneInputWidget *leftArrow;
-    struct SceneInputWidget *rightArrow;
+    struct AnimSpriteResource *backgroundGraphics;
+    struct AnimSpriteResource *cursorGraphics;
+    struct AnimSpriteResource *leftArrowGraphics;
+    struct AnimSpriteResource *menuGraphics;
+    struct AnimSprite *leftArrow;
+    struct AnimSprite *rightArrow;
     u16 *highlightPalette;
     u16 *originalPalette;
     s32 layer;

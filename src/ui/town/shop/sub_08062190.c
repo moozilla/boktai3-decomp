@@ -1,5 +1,5 @@
-#include "ui/town/scene_inventory_tail.h"
-s32 SceneInventory_TickMoveSelection(struct SceneInventoryTail *p)
+#include "ui/town/shop_tail.h"
+s32 Shop_TickMoveSelection(struct SceneInventoryTail *p)
 {
     s32 result;
     SceneInputPanel_HighlightCompare(&p->display, p->highlight.colors);
@@ -7,37 +7,37 @@ s32 SceneInventory_TickMoveSelection(struct SceneInventoryTail *p)
         Sound_PlaySong(0xDE);
         switch (p->mode) {
             case 1:
-                SceneInventory_BeginAlternateItemSelection(p);
+                Shop_BeginAlternateItemSelection(p);
                 break;
             case 4:
             case 5:
-                SceneInventory_BeginAlternateSelection(p);
+                Shop_BeginAlternateSelection(p);
                 break;
         }
     } else if (gPadState[1] & 1) {
         result = 0;
         switch (p->category) {
             case 0:
-                result = SceneInventory_ClassifyEquipmentMove(p);
+                result = Shop_ClassifyEquipmentMove(p);
                 break;
             case 1:
-                result = SceneInventory_ClassifyItemMove(p);
+                result = Shop_ClassifyItemMove(p);
                 break;
             case 2:
-                result = SceneInventory_ClassifyConsumableMove(p);
+                result = Shop_ClassifyConsumableMove(p);
                 break;
         }
         switch (result) {
             case 1:
-                SceneInventory_BeginSwapTransition(p);
+                Shop_BeginSwapTransition(p);
                 break;
             case 4:
                 Sound_PlaySong(0x107);
-                SceneInventory_BeginPurchaseConfirmation(p);
+                Shop_BeginPurchaseConfirmation(p);
                 break;
             case 5:
                 Sound_PlaySong(0x107);
-                SceneInventory_BeginSaleConfirmation(p);
+                Shop_BeginSaleConfirmation(p);
                 break;
             default:
                 Sound_PlaySong(0x192);

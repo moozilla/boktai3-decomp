@@ -1,8 +1,8 @@
 #include "global.h"
-#include "scene/actor/scene_actor_chase.h"
-#include "scene/actor/scene_actor_straight_route.h"
+#include "scene/motion/scene_actor_chase.h"
+#include "scene/motion/scene_actor_straight_route.h"
 #include "scene/actor/scene_actor_attachment.h"
-#include "scene/actor/scene_actor_terrain_reaction.h"
+#include "scene/motion/scene_actor_terrain_reaction.h"
 u8 SceneActorAttachment_TestPositionWindow(struct ChaseActor *, const struct ContactPosition *, u32,
                                            u32);
 /* The local player's position, as gPlayers[0] holds it. */

@@ -32,7 +32,7 @@ static inline void DrawListNumbers(struct MonsterBook *p)
     for (i = 0; i < count; i++) {
         Anim_DrawDecimalDigits(p->entryDigits[i], &p->resource, first + i, 2, 0, 0x18,
                                i * 16 + 0x28, 8, 0);
-        SceneInputWidget_Show(&p->rowMarkers[i]);
+        AnimSprite_Show(&p->rowMarkers[i]);
         p->rowMarkers[i].position.x = 0x28;
         p->rowMarkers[i].position.y = i * 16 + 0x28;
     }
@@ -52,7 +52,7 @@ static inline void MonsterBook_HideGroupDigits(struct MonsterBook *p)
         (&p->unlockedDigits[0])[j].flags |= 1;
         (&p->totalDigits[0])[j].flags |= 1;
     }
-    SceneInputWidget_Hide(&p->countSeparator);
+    AnimSprite_Hide(&p->countSeparator);
 }
 
 static inline void DrawGroupCounts(struct MonsterBook *p)
@@ -63,7 +63,7 @@ static inline void DrawGroupCounts(struct MonsterBook *p)
     group = Bestiary_GetEntryGroup(p->entry);
     Anim_DrawDecimalDigits(p->unlockedDigits, &p->resource,
                            Bestiary_CountUnlockedGroupEntries(group), 2, 0, 0x98, 0x16, 8, 0);
-    SceneInputWidget_Show(&p->countSeparator);
+    AnimSprite_Show(&p->countSeparator);
     p->countSeparator.position.x = 0xA8;
     p->countSeparator.position.y = 0x16;
     Anim_DrawDecimalDigits(p->totalDigits, &p->resource, Bestiary_GetGroupEntryCount(group), 2, 0,
@@ -72,8 +72,8 @@ static inline void DrawGroupCounts(struct MonsterBook *p)
 
 static inline void MonsterBook_HideCategoryBadge(struct MonsterBook *p)
 {
-    SceneInputWidget_Hide(&p->categoryBadge);
-    SceneInputWidget_Hide(&p->categoryNumber);
+    AnimSprite_Hide(&p->categoryBadge);
+    AnimSprite_Hide(&p->categoryNumber);
 }
 
 static inline void DrawCategoryBadge(struct MonsterBook *p)
@@ -128,10 +128,10 @@ static inline void DrawCategoryBadge(struct MonsterBook *p)
             break;
     }
     Anim_LoadKeyframe(&p->categoryBadge, &p->resource, (u16)(frame + 0x41), 2);
-    SceneInputWidget_Show(&p->categoryBadge);
+    AnimSprite_Show(&p->categoryBadge);
     if (value >= 0) {
         Anim_LoadKeyframe(&p->categoryNumber, &p->resource, (u16)(value + 1), 2);
-        SceneInputWidget_Show(&p->categoryNumber);
+        AnimSprite_Show(&p->categoryNumber);
         p->categoryNumber.position.x = x;
         p->categoryNumber.position.y = y;
     }
@@ -356,9 +356,9 @@ void MonsterBook_UpdateHighlightPulse(struct MonsterBook *arg)
 u32 MonsterBook_InitWidgets(struct MonsterBook *book)
 {
     struct ContactPosition position;
-    struct SceneInputResource *resource;
+    struct AnimSpriteResource *resource;
     s32 i, j;
-    struct SceneInputWidget *badge;
+    struct AnimSprite *badge;
 
     resource = ScriptProc_Start(0xCB05, 0xE2AB);
     book->resource = *resource;
@@ -459,7 +459,7 @@ void MonsterBook_RefreshPage(struct MonsterBook *book)
             book->selectionCursor.flags |= 1;
             book->tabCursor.flags &= ~1;
             book->detailMarker.flags &= ~1;
-            SceneInputWidget_Show(&book->titleIcon);
+            AnimSprite_Show(&book->titleIcon);
             MonsterBook_ClearWindows(book);
             MonsterBook_HideCategoryBadge(book);
             MonsterBook_DrawEntryDetails(book);
@@ -642,7 +642,7 @@ u32 MonsterBook_UpdateNavigation(struct MonsterBook *book)
     return 0;
 }
 
-void MonsterBook_RemoveActiveAnimation(struct SceneInputWidget *p)
+void MonsterBook_RemoveActiveAnimation(struct AnimSprite *p)
 {
     if (p->active != 0) {
         Anim_Remove(p);
@@ -790,7 +790,7 @@ void MonsterBook_DrawListNumbers(struct MonsterBook *p)
     for (i = 0; i < count; i++) {
         Anim_DrawDecimalDigits(p->entryDigits[i], &p->resource, first + i, 2, 0, 0x18,
                                i * 16 + 0x28, 8, 0);
-        SceneInputWidget_Show(&p->rowMarkers[i]);
+        AnimSprite_Show(&p->rowMarkers[i]);
         p->rowMarkers[i].position.x = 0x28;
         p->rowMarkers[i].position.y = i * 16 + 0x28;
     }
@@ -810,7 +810,7 @@ void MonsterBook_HideCompletionCounts(struct MonsterBook *p)
         p->unlockedDigits[j].flags |= 1;
         p->totalDigits[j].flags |= 1;
     }
-    SceneInputWidget_Hide(&p->countSeparator);
+    AnimSprite_Hide(&p->countSeparator);
 }
 
 void MonsterBook_UpdateSelectionCursor(struct MonsterBook *book)
@@ -826,7 +826,7 @@ void MonsterBook_DrawCompletionCounts(struct MonsterBook *p)
     group = Bestiary_GetEntryGroup(p->entry);
     Anim_DrawDecimalDigits(p->unlockedDigits, &p->resource,
                            Bestiary_CountUnlockedGroupEntries(group), 2, 0, 0x98, 0x16, 8, 0);
-    SceneInputWidget_Show(&p->countSeparator);
+    AnimSprite_Show(&p->countSeparator);
     p->countSeparator.position.x = 0xA8;
     p->countSeparator.position.y = 0x16;
     Anim_DrawDecimalDigits(p->totalDigits, &p->resource, Bestiary_GetGroupEntryCount(group), 2, 0,
@@ -856,8 +856,8 @@ void MonsterBook_DrawListWindows(struct MonsterBook *p)
 
 void MonsterBook_HideCategoryWidgets(struct MonsterBook *p)
 {
-    SceneInputWidget_Hide(&p->categoryBadge);
-    SceneInputWidget_Hide(&p->categoryNumber);
+    AnimSprite_Hide(&p->categoryBadge);
+    AnimSprite_Hide(&p->categoryNumber);
 }
 
 void MonsterBook_DrawCategoryWidgets(struct MonsterBook *p)
@@ -912,10 +912,10 @@ void MonsterBook_DrawCategoryWidgets(struct MonsterBook *p)
             break;
     }
     Anim_LoadKeyframe(&p->categoryBadge, &p->resource, (u16)(frame + 0x41), 2);
-    SceneInputWidget_Show(&p->categoryBadge);
+    AnimSprite_Show(&p->categoryBadge);
     if (value >= 0) {
         Anim_LoadKeyframe(&p->categoryNumber, &p->resource, (u16)(value + 1), 2);
-        SceneInputWidget_Show(&p->categoryNumber);
+        AnimSprite_Show(&p->categoryNumber);
         p->categoryNumber.position.x = x;
         p->categoryNumber.position.y = y;
     }

@@ -38,7 +38,7 @@ class ArgOrder(unittest.TestCase):
         self.assertEqual(self.scope.arg_order_hints(rows), [])
 
     def test_constant_loaded_early_is_named(self):
-        # BoardPiece_Initialize: the ROM copies r0 then loads the literal; the draft's constant
+        # BatFlockBat_Initialize: the ROM copies r0 then loads the literal; the draft's constant
         # pseudo took r1 at its set, ahead of the copy.
         rows = [row("bl #0x82151e4", "bl #0x82151e4"),
                 row(None, "ldr r1, =0x2D3"),

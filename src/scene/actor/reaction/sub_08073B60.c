@@ -1,4 +1,4 @@
-#include "scene/actor/scene_actor_contacts.h"
+#include "scene/collision/scene_actor_contacts.h"
 u32 SceneActorContacts_Update(struct SceneActorContactManager *manager)
 {
     SceneActorContacts_ReleaseInvalidOwners();

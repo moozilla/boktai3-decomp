@@ -130,7 +130,7 @@ failed while assembling the macro include. Check/variants remain usable.
   local register pins and declaration sweeps reached 14 / 13 structural
   differences, but broad register allocation remained off and fuzzy scores
   were below existing drafts. No production change retained.
-- 0801010C BoardPieces_StartConvergence: matched, 396 bytes. A table argument
+- 0801010C BatFlockBats_StartConvergence: matched, 396 bytes. A table argument
   assigned to r2 establishes random-table load order. Move the piece alias
   inside the loop; swap delta/origin pointer declarations to order invariant
   hoists. Separate state/zero locals recover loop-head order. Depin removes
@@ -153,10 +153,10 @@ failed while assembling the macro include. Check/variants remain usable.
   but did not beat prior documented candidates (best fresh full-extent scores
   56.7% / 53.2%). No production draft retained. The compiler collapses the
   original's independent row/marker inductions and spills different counters.
-- 0820F078 OrangeSpine_FireProjectile: improved 85.3% to 86.7% by changing
+- 0820F078 PlasmaCannon_FireProjectile: improved 85.3% to 86.7% by changing
   x-addition operand order. Shared position aliases and vector helpers worsened
   allocation; retained the single improvement.
-- 0820F378 OrangeSpine_UpdateDamageState (tentative): new full guarded draft
+- 0820F378 PlasmaCannon_UpdateDamageState (tentative): new full guarded draft
   83.6%, covering damage, defeat feedback, palette blinking and animation.
   Cached palette/blink aliases and declaration order did not improve it.
 - 08067E3C / 08068500: new complete scene-particle constructor drafts, 61.6%

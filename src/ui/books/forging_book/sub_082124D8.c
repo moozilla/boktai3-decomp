@@ -1,6 +1,6 @@
 #include "engine/engine.h"
 #include "engine/video/render.h"
-#include "ui/widgets/scene_input_widget.h"
+#include "engine/video/anim_sprite.h"
 
 struct IbHalfword {
     u16 value;
@@ -21,7 +21,7 @@ void *ActorDebris_Create(void *, void *, void *);
 void *PlayerAttackEffect_Create(void *, void *, void *);
 u32 ForgingBook_InitSprites(u8 *p)
 {
-    struct SceneInputResource *res;
+    struct AnimSpriteResource *res;
     struct ContactPosition pos;
     s32 i;
     struct IbSprite *sprite;
@@ -29,7 +29,7 @@ u32 ForgingBook_InitSprites(u8 *p)
     u16 coordinate;
 
     res = ScriptProc_Start(0xcb05, 0xe2ab);
-    *((struct SceneInputResource *)(p + 0x24)) = *res;
+    *((struct AnimSpriteResource *)(p + 0x24)) = *res;
     ResourceHeader_Relocate(p + 0x24, res);
     Widget_InitLinked(p + 0x64, p + 0x24, 0x49, 0x10, 0, 0, 0, 0);
     Widget_InitLinked(p + 0x124, p + 0x24, 0x3e, 0x10, 0, 0, 0, 0);
@@ -39,7 +39,7 @@ u32 ForgingBook_InitSprites(u8 *p)
     pos.y = 0x68;
     pos.z = 0;
     for (i = 0; i < 4; i++) {
-        Widget_InitLinked((u8 *)((struct SceneInputWidget *)(p + 0x1e4) + i), p + 0x24, 0, 0x10, 0,
+        Widget_InitLinked((u8 *)((struct AnimSprite *)(p + 0x1e4) + i), p + 0x24, 0, 0x10, 0,
                           0, 0, &pos);
         pos.x += 8;
         if (i == 1)
@@ -48,19 +48,19 @@ u32 ForgingBook_InitSprites(u8 *p)
 
     Widget_InitLinked(p + 0x184, p + 0x24, 0x4c, 0x10, 0, 0, 0, 0);
     res = ScriptProc_Start(0xcb05, 0x530d);
-    *((struct SceneInputResource *)(p + 0x44)) = *res;
+    *((struct AnimSpriteResource *)(p + 0x44)) = *res;
     ResourceHeader_Relocate(p + 0x44, res);
     pos.x = 0x58;
     pos.y = 0x18;
     pos.z = 0;
     Widget_InitLinked(p + 0xc4, p + 0x44, 0x4d, 0x10, 0, 0, 0, &pos);
     res = ScriptProc_Start(0xcb05, 0x5d04);
-    *((struct SceneInputResource *)(p + 0x388)) = *res;
+    *((struct AnimSpriteResource *)(p + 0x388)) = *res;
     ResourceHeader_Relocate(p + 0x388, res);
     pos.x = 0x58;
     pos.y = 0x18;
     {
-        struct SceneInputWidget *cells = (void *)(p + 0x3a8);
+        struct AnimSprite *cells = (void *)(p + 0x3a8);
         for (i = 0; i < 18; i++) {
             struct ContactPosition *cellPosition = &cells[i].position;
             Widget_InitLinked((u8 *)&cells[i], p + 0x388, (u16)(0xf0 + i), 0x10, 0, 0, 0, 0);
@@ -82,7 +82,7 @@ u32 ForgingBook_InitSprites(u8 *p)
         ((struct IbHalfword *)(p + 0xfe))->value = 0xe010;
     }
     {
-        struct SceneInputResource *objectRes = ScriptProc_Start(0xcb05, 0xde23);
+        struct AnimSpriteResource *objectRes = ScriptProc_Start(0xcb05, 0xde23);
         ResourceHeader_Relocate(p + 0xa68, objectRes);
     }
     Widget_InitLinked(p + 0xa88, p + 0xa68, 0, 0, 0, 1, 0, 0);

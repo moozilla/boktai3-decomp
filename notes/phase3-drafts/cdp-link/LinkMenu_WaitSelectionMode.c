@@ -1,14 +1,14 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
-#include "scene/area_effect/area_effect_link.h"
+#include "scene/areas/area_effect_link.h"
 
-#define LinkMenu_SetState       Registry1745_SetState
-#define LinkMenu_CheckSelection Registry1745_CheckSessionReady
-#define LinkMenu_ResetSelection Registry1745_BeginShutdown
-u8 Registry1745_ConsumeStateEntry(void *);
-s32 Registry1745_CheckSessionReady(void *);
-void Registry1745_BeginShutdown(void *, void (*)(void));
-void Registry1745_SetState(void *, u32, void (*)(void));
+#define LinkMenu_SetState       LinkSession_SetState
+#define LinkMenu_CheckSelection LinkSession_CheckSessionReady
+#define LinkMenu_ResetSelection LinkSession_BeginShutdown
+u8 LinkSession_ConsumeStateEntry(void *);
+s32 LinkSession_CheckSessionReady(void *);
+void LinkSession_BeginShutdown(void *, void (*)(void));
+void LinkSession_SetState(void *, u32, void (*)(void));
 void Script_Call(u32, void *);
 void Sound_FadeOutChannel10(u32);
 void ScriptPanel_OpenTextWindow(void);
@@ -28,18 +28,18 @@ static inline u8 IsMode4(u16 value)
         return 1;
     return 0;
 }
-void RegistryF246_Close(void);
+void LinkPanelSlots_Close(void);
 s32 LinkMenu_WaitSelectionMode(struct AreaEffectLinkState *p)
 {
     void (*next)(void);
     u32 mode;
     struct AreaEffectLinkState *pp;
-    if (Registry1745_CheckSessionReady(p) < 0) {
-        Registry1745_BeginShutdown(p, ScriptPanel_OpenTextWindow);
+    if (LinkSession_CheckSessionReady(p) < 0) {
+        LinkSession_BeginShutdown(p, ScriptPanel_OpenTextWindow);
         return -1;
     }
     if (IsMode9(*p->selection)) {
-        RegistryF246_Close();
+        LinkPanelSlots_Close();
         next = LinkMenu_ExchangeChoices;
         pp = p;
         mode = 9;
@@ -50,7 +50,7 @@ s32 LinkMenu_WaitSelectionMode(struct AreaEffectLinkState *p)
         pp = p;
         mode = 4;
     call:
-        Registry1745_SetState(pp, mode, next);
+        LinkSession_SetState(pp, mode, next);
     }
     return 0;
 }

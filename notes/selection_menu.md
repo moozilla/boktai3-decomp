@@ -6,7 +6,7 @@ Range: 08019E58–0801B49C (end exclusive). Consolidated the 45 input files
 into `src/ui/widgets/selection_menu.c`, with every function and remaining assembly body in
 ROM order. `include/ui/widgets/selection_menu.h` holds the shared owner, script-call
 arguments, packed-copy position, and the observed actor/item table layouts.
-The owner reuses `Task`, `SceneInputResource`, `SceneInputWidget`,
+The owner reuses `Task`, `AnimSpriteResource`, `AnimSprite`,
 `SceneInputPanelDrawable`, and `ContactPosition` from existing headers.
 The `0xDB4` allocation includes two resource headers, the panel drawable and
 its graphics, two panel widgets, three cursors, eight markers, a highlight,

@@ -1,6 +1,6 @@
 #include "objects/pile_driver/scene_panel_rig_setup.h"
 
-void ScenePanelRig_InitSecondarySprites(struct ScenePanelRig *rig)
+void PileDriverRig_InitSecondarySprites(struct ScenePanelRig *rig)
 {
     struct ScenePanelRig *owner = rig;
     s32 i = 0;

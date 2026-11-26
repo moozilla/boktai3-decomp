@@ -8,13 +8,13 @@ struct SceneInventoryWidgetPalette {
 };
 struct SceneInventoryCategoryMenu {
     u8 unknown0[0x258];
-    struct SceneInputWidget prompt;
+    struct AnimSprite prompt;
     u8 unknown2B8[0x1140];
-    struct SceneInputWidget categoryWidget;
-    struct SceneInputWidget targetWidget;
+    struct AnimSprite categoryWidget;
+    struct AnimSprite targetWidget;
 };
 void Palette_CopyBank(void *, const void *);
-void SceneInventory_InitWidgetPalette(struct SceneInventoryCategoryMenu *p,
+void Storage_InitWidgetPalette(struct SceneInventoryCategoryMenu *p,
                                       struct SceneInventoryWidgetPalette *palette)
 {
     Palette_CopyBank(palette, gPaletteBankData + 0x7540);

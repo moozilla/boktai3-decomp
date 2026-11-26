@@ -1,11 +1,11 @@
 #include "effects/projectiles/projectile_task.h"
-void Task4E01_OnDefaultDirectionalAnimation(void *);
-void Task4E01_OnType7DirectionalAnimation(void *);
-void Task4E01_OnType4Animation(void *);
+void ProjectileTask_OnDefaultDirectionalAnimation(void *);
+void ProjectileTask_OnType7DirectionalAnimation(void *);
+void ProjectileTask_OnType4Animation(void *);
 void Projectile_UpdateAnimation(void *);
 void Projectile_SpawnImpactPair(void *);
 
-s32 Task4E01_StartTerminalAnimation(struct Task4E01Projectile *p)
+s32 ProjectileTask_StartTerminalAnimation(struct Task4E01Projectile *p)
 {
     struct Task4E01Params *config = &p->params;
     config->flags |= 0x1000;
@@ -22,7 +22,7 @@ s32 Task4E01_StartTerminalAnimation(struct Task4E01Projectile *p)
             u8 frame = 29;
             sprite->frame = frame;
         }
-            Projectile_SetUpdateCallback(config, Task4E01_OnDefaultDirectionalAnimation);
+            Projectile_SetUpdateCallback(config, ProjectileTask_OnDefaultDirectionalAnimation);
             p->frame = 0;
             break;
         case 7: {
@@ -30,10 +30,10 @@ s32 Task4E01_StartTerminalAnimation(struct Task4E01Projectile *p)
             u8 frame = 29;
             sprite->frame = frame;
         }
-            Projectile_SetUpdateCallback(config, Task4E01_OnType7DirectionalAnimation);
+            Projectile_SetUpdateCallback(config, ProjectileTask_OnType7DirectionalAnimation);
             break;
         case 4:
-            Projectile_SetUpdateCallback(config, Task4E01_OnType4Animation);
+            Projectile_SetUpdateCallback(config, ProjectileTask_OnType4Animation);
             break;
         case 3:
             if (config->flags & 0x10) {

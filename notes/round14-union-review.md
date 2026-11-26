@@ -9,8 +9,8 @@ unchanged stock output:
 
 | Function | Independent values | Complete unit | Commit |
 |---|---|---:|---|
-| BossSlot2_ApplyPendingDamage, 0817F49C | Pending damage flags and the health-field pointer | 664 bytes | `31c9fa43e` |
-| SceneActor14_UpdateAnimState | Sprite-pool manager and selected animation resource | 2,216 bytes | `09cd4fbf8` |
+| Sabata_ApplyPendingDamage, 0817F49C | Pending damage flags and the health-field pointer | 664 bytes | `31c9fa43e` |
+| SpriteEffectSet_UpdateAnimState | Sprite-pool manager and selected animation resource | 2,216 bytes | `09cd4fbf8` |
 
 These are not alternate representations of a common value. In the damage
 handler, the flags are consumed before the health pointer is assigned, and all

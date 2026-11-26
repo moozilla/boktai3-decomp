@@ -2,7 +2,7 @@
 #define GUARD_HIT_SWITCH_H
 #include "objects/scene_objects/scene_object.h"
 #include "engine/video/display_animation.h"
-#include "scene/actor/contact_collider.h"
+#include "scene/collision/contact_collider.h"
 #include "scene/actor/scene_actor_components.h"
 #include "scene/terrain/terrain_collision.h"
 #include "engine/video/sprite.h"

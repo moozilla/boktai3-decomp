@@ -28,7 +28,7 @@ struct SingletonSlot7Origin {
 };
 s32 Player_GetHorizontalVelocity(s32);
 
-void SingletonSlot7_SetMotionMode(struct SingletonSlot7Actor *p, u32 mode)
+void VanargandHead_SetMotionMode(struct SingletonSlot7Actor *p, u32 mode)
 {
     if (p->motionMode == 1)
         p->worldX = (p->localX + ((struct SingletonSlot7Origin *)gSceneCamera)->x) << 12;

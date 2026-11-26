@@ -3,10 +3,10 @@
 #include "system/game_state/game_state.h"
 #include "engine/ram.h"
 #include "engine/engine_globals.h"
-#include "scene/area_effect/area_effect_link.h"
+#include "scene/areas/area_effect_link.h"
 #include "engine/engine_pause.h"
 #include "bosses/vanargand/vanargand_projectiles.h"
-#include "minigames/coffin_bike/glove.h"
+#include "minigames/coffin_bike/coffin_bike.h"
 
 struct Vec16 {
     s16 x, y, z;
@@ -100,7 +100,7 @@ static inline s16 Glove_SignedHeading(u16 raw)
     return (s16)raw;
 }
 // confidence=low: updates spatial entries, local presentation and resource recovery.
-void Glove_UpdatePostState(struct Glove *p)
+void CoffinBike_UpdatePostState(struct Glove *p)
 {
     struct GloveMotion *self = &p->motion;
     if (!Inactive(p)) {

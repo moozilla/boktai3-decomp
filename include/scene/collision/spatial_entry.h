@@ -1,7 +1,7 @@
 #ifndef GUARD_SPATIAL_ENTRY_H
 #define GUARD_SPATIAL_ENTRY_H
 
-#include "scene/actor/contact_position.h"
+#include "scene/collision/contact_position.h"
 
 struct SpatialEntry;
 typedef void (*SpatialContactCallback)(void *owner, struct SpatialEntry *other);

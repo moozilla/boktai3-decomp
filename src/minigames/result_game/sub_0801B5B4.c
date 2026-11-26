@@ -1,4 +1,4 @@
-#include "ui/town/scene_item_values.h"
+#include "ui/town/shop_item_values.h"
 
 void TransformMarker_SetTypeFromTable(u8 *result, u8 *table, u32 grade)
 {

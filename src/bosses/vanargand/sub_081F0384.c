@@ -17,7 +17,7 @@ void SpatialIndex_InitEntry(void *, struct Slot7PackedVector *, struct Slot7Pack
                             struct Slot7PackedVector *, s32, s32, s32, s32, s32, void (*)(void),
                             void *);
 void SpatialIndex_InsertEntry(void *);
-void SingletonSlot7_InitCollider(struct Slot7Actor *actor)
+void VanargandHead_InitCollider(struct Slot7Actor *actor)
 {
     void *collider = &actor->colliderFlags;
     s32 category = 5;

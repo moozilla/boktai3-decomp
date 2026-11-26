@@ -1,13 +1,13 @@
 #include "global.h"
 #include "effects/bursts/large_fragment_effect.h"
 #include "engine/ram.h"
-#include "scene/actor/scene_steering_actor.h"
+#include "scene/motion/scene_steering_actor.h"
 #include "engine/engine.h"
 #include "engine/heap.h"
 #include "engine/resource_registry.h"
 #include "engine/math/monster_particle_random.h"
 #include "ui/hud/scene_indicator.h"
-#include "player/cues/player_cue_sequence.h"
+#include "player/cutscene/player_cue_sequence.h"
 #include "engine/math/scene_vec.h"
 
 u32 LargeFragmentEffect_IsActive(void)

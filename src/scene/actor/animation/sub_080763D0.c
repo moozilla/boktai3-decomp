@@ -22,7 +22,7 @@ void SceneActorAnimation_SelectEntryFlags(struct RoomActor *actor, s32 index, u3
                          (u8)variant, (u8)flags);
         restart = &actor->restart;
     } else {
-        struct SceneInputWidget *tile =
+        struct AnimSprite *tile =
             &((struct SceneActorAnimationTileDrawable *)actor->drawable)->tile;
         u8 *savedSelection;
 

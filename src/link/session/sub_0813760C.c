@@ -1,7 +1,7 @@
-#include "scene/actor/scene_actor_terrain.h"
+#include "scene/motion/scene_actor_terrain.h"
 #include "global.h"
 #include "scene/actor/scene_actor_registry.h"
-#include "scene/actor/scene_actor_position_search.h"
+#include "scene/motion/scene_actor_position_search.h"
 s32 SceneActorTarget_CanReplaceByDistance(struct ChaseActor *actor,
                                           const struct ContactPosition *position, void *identity)
 {

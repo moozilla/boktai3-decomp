@@ -2,7 +2,7 @@
 #define GUARD_CHOICE_MENU_H
 
 #include "engine/engine.h"
-#include "ui/widgets/scene_input_widget.h"
+#include "engine/video/anim_sprite.h"
 
 /* One selectable entry; x/y are pixel positions, width in characters. */
 struct Choice {
@@ -28,9 +28,9 @@ struct ChoiceMenu {
     u32 stringBase;
     struct Choice choices[16];
     u8 scratch[64];
-    struct SceneInputResource resource;
-    struct SceneInputWidget leftCursor;
-    struct SceneInputWidget rightCursor;
+    struct AnimSpriteResource resource;
+    struct AnimSprite leftCursor;
+    struct AnimSprite rightCursor;
     u32 colorIndex;
     u16 palette[16];
 };

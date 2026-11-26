@@ -45,7 +45,7 @@ void SceneActorAnimation_SelectDirectionalFlags(struct RoomActor *actor, s32 ind
         }
         restart = &actor->restart;
     } else {
-        struct SceneInputWidget *tile =
+        struct AnimSprite *tile =
             &((struct SceneActorAnimationTileDrawable *)actor->drawable)->tile;
         u8 *savedSelection;
 

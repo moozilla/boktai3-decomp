@@ -1,7 +1,7 @@
 #ifndef GUARD_CONTACT_SWARM_SPRITE_H
 #define GUARD_CONTACT_SWARM_SPRITE_H
 
-#include "scene/actor/contact_position.h"
+#include "scene/collision/contact_position.h"
 
 struct ContactSwarmSprite {
     u32 flags;

@@ -25,7 +25,7 @@ struct AnimatedMarker {
     u8 animation[0x10];
     void (*update)(struct AnimatedMarker *);
 };
-void GrowthHazard_RevealWhenCellVacant(struct AnimatedMarker *);
+void SolarRoot_RevealWhenCellVacant(struct AnimatedMarker *);
 static inline void AnimatedMarker_SetStateThree(struct AnimatedMarker *marker,
                                                 void (*update)(struct AnimatedMarker *), u32 offset)
 {
@@ -46,5 +46,5 @@ static inline void AnimatedMarker_SetStateThree_1(struct AnimatedMarker *marker,
 
 void AnimatedMarker_BeginStateThree(struct AnimatedMarker *marker)
 {
-    AnimatedMarker_SetStateThree_1(marker, GrowthHazard_RevealWhenCellVacant);
+    AnimatedMarker_SetStateThree_1(marker, SolarRoot_RevealWhenCellVacant);
 }

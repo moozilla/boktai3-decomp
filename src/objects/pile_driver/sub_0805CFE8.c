@@ -1,5 +1,5 @@
 #include "objects/pile_driver/scene_panel_subject_playback.h"
-void ScenePanelSubject_TickActivating(struct ScenePanelSubject *owner)
+void PileDriverSubject_TickActivating(struct ScenePanelSubject *owner)
 {
     union {
         u32 first;
@@ -32,6 +32,6 @@ void ScenePanelSubject_TickActivating(struct ScenePanelSubject *owner)
     }
     if (ScenePanelSubject_StepPlayback(owner)) {
         owner->changed = 1;
-        ScenePanelSubject_SetState((void *)owner, 4);
+        PileDriverSubject_SetState((void *)owner, 4);
     }
 }

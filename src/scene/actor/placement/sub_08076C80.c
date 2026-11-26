@@ -1,4 +1,4 @@
-#include "scene/actor/scene_actor_terrain.h"
+#include "scene/motion/scene_actor_terrain.h"
 static inline u16 ReadParameter(s32 keyword)
 {
     return Script_GetKeywordValue(keyword, 0);

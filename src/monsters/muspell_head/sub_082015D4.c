@@ -57,7 +57,7 @@ void DamageNumberDisplay_Show(void *, s32, s32, void *, void *, s32);
 void SceneHud_SetTimedState(void *, s32, s32, s32, s32, s32);
 void PlayerStats_AddContactHundredths(void *, void *, u32);
 void SparkParticle_Spawn(void *, s32, void *, s32, s32, s32, s32, s32);
-void ScriptCombatActor_ApplyHitReaction(struct HitSource *source, struct HitResult *hit,
+void MuspellHead_ApplyHitReaction(struct HitSource *source, struct HitResult *hit,
                                         struct HitActor *p)
 {
     Collision_CalculateDamageResponse(source, hit);

@@ -1,10 +1,10 @@
-#include "ui/town/scene_inventory_control.h"
-void SceneInventory_UpdateActionPrompt(struct SceneInventoryControlView *panel)
+#include "ui/town/shop_control.h"
+void Shop_UpdateActionPrompt(struct SceneInventoryControlView *panel)
 {
     switch (panel->mode) {
         case 4:
         case 5: {
-            s32 action = SceneInventory_ClassifySelectedAction(panel);
+            s32 action = Shop_ClassifySelectedAction(panel);
             if (action) {
                 switch (action) {
                     case 0:

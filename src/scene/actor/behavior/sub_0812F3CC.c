@@ -1,7 +1,7 @@
 #include "scene/actor/scene_actor_behavior.h"
 #include "global.h"
 #include "scene/actor/scene_actor_reset.h"
-#include "scene/actor/scene_actor_chase_shared.h"
+#include "scene/motion/scene_actor_chase_shared.h"
 
 void *SceneActorContacts_SelectForActor(void *, u32);
 void SceneActorControl_OnIdle(void);

@@ -1,8 +1,8 @@
 #include "monsters/mimic.h"
 #include "engine/math/math_shift.h"
 #include "scene/actor/scene_actor_visibility.h"
-#include "scene/actor/scene_actor_turn.h"
-#include "scene/actor/scene_actor_terrain.h"
+#include "scene/motion/scene_actor_turn.h"
+#include "scene/motion/scene_actor_terrain.h"
 #include "engine/math/movement_curve.h"
 
 static inline void SaveControl(struct MimicDeferredResponse *packet, void *control, u8 behavior)

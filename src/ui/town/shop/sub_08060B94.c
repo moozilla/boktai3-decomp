@@ -1,10 +1,10 @@
-#include "ui/town/scene_inventory_actions.h"
+#include "ui/town/shop_actions.h"
 #include "system/game_state/game_state.h"
 struct SceneInventoryOwnedConsumables {
     u8 unknown0[0x160];
     s16 id;
 };
-void SceneInventory_BeginConsumableSpecialMove(struct SceneInventoryActionView *panel)
+void Shop_BeginConsumableSpecialMove(struct SceneInventoryActionView *panel)
 {
     struct SceneInputPosition starts[2], targets[2];
     u32 enabled[2], frames[2], attributes[2];

@@ -12,7 +12,7 @@ struct R {
 } __attribute__((packed));
 void SpriteParticle_CreateDefaultVariant4384(void *, s32, s32, s32, s32, s32, s32, s32, s32, s32,
                                              s32, s32);
-void CannonTurret_HandleDefeat(void *);
+void GarmrStatue_HandleDefeat(void *);
 s32 sub_082086B8(u8 *p)
 {
     s16 h = *((s16 *)(p + 0x146));
@@ -28,7 +28,7 @@ s32 sub_082086B8(u8 *p)
             SpriteParticle_CreateDefaultVariant4384(&v, 128, 32, 12, 12, 24, r, 32, 32, 1, h, 512);
         }
         if ((*((s32 *)(p + 0x18))) == 12) {
-            CannonTurret_HandleDefeat(p);
+            GarmrStatue_HandleDefeat(p);
         }
     }
     return 0;

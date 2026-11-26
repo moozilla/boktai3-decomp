@@ -1,7 +1,7 @@
 #define SceneHud_SetWidgetPalette PauseMenu_SetSpritePalette
 #include "global.h"
 #include "ui/pause/scene_hud_display.h"
-void SceneHud_SetWidgetPalette(struct SceneInputWidget *, u16);
+void SceneHud_SetWidgetPalette(struct AnimSprite *, u16);
 void sub_08170D78(void *);
 void SceneHud_LayoutAlternateActionGrid(struct SceneHudState *s)
 {
@@ -22,16 +22,16 @@ void SceneHud_LayoutAlternateActionGrid(struct SceneHudState *s)
         s->categoryWidgets[i + 10].position.y += (i >> 2) * 24;
     }
     sub_08170D78(s);
-    ((struct SceneInputWidget *)((u8 *)s + 0x2560))->flags &= ~1;
-    ((struct SceneInputWidget *)((u8 *)s + 0x25c0))->flags &= ~1;
+    ((struct AnimSprite *)((u8 *)s + 0x2560))->flags &= ~1;
+    ((struct AnimSprite *)((u8 *)s + 0x25c0))->flags &= ~1;
     {
-        struct SceneInputWidget *w;
+        struct AnimSprite *w;
         w = (void *)((u8 *)s + 0x2680);
         w->flags &= ~1;
         SceneHud_SetWidgetPalette(w, 0x373);
     }
     {
-        struct SceneInputWidget *w = &s->actionPanelWidgets[2];
+        struct AnimSprite *w = &s->actionPanelWidgets[2];
         w->flags &= ~1;
         if (s->actionInput[0] & 0x40)
             SceneHud_SetWidgetPalette(w, 0x373);

@@ -11,7 +11,7 @@ struct O {
 };
 void TerrainModifiers_RegisterCell(void *, u16, s32, s32, s32, s32);
 
-void GrowthHazard_RegisterCellEffect(u8 *p)
+void SolarRoot_RegisterCellEffect(u8 *p)
 {
     s32 v = *(s16 *)(p + 0xe6);
     s32 t;

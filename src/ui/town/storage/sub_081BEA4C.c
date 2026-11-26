@@ -1,14 +1,14 @@
 #include "global.h"
-#include "ui/town/scene_inventory_panel.h"
+#include "ui/town/shop_panel.h"
 void Inventory_GetEquipmentDescriptor(s32, void *);
 void Presentation_ApplyGraphicData(void *, void *);
 void Presentation_ApplyPackedGraphicData(const void *, u32);
 u32 Presentation_SelectGraphicResource(void *);
 struct StoragePanel {
     u8 unknown0[0x1098];
-    struct SceneInputWidget banner;
+    struct AnimSprite banner;
     u8 unknown10F8[0x1538 - 0x10F8];
-    struct SceneInputResource gridResource;
+    struct AnimSpriteResource gridResource;
     u8 unknown1558[0x1738 - 0x1558];
     u32 equipmentText;
     u8 unknown173C[8];
@@ -38,10 +38,10 @@ void Storage_ShowEquipmentDescription(struct StoragePanel *panel)
     hide:
         Storage_HideItemDetails(panel);
     } else {
-        struct SceneInputWidget *banner = &panel->banner;
+        struct AnimSprite *banner = &panel->banner;
         banner->flags &= ~1;
         if (entry) {
-            struct SceneInputResource *resource = &panel->gridResource;
+            struct AnimSpriteResource *resource = &panel->gridResource;
             Anim_LoadKeyframe(banner, resource, (u16)Presentation_SelectGraphicResource(entry), 1);
         }
         MessageWindow_SetMessageTable((void *)panel->equipmentText);

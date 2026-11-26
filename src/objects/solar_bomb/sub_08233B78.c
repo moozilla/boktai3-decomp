@@ -1,5 +1,5 @@
 #include "global.h"
-#include "effects/scene/bat_flock.h"
+#include "effects/bat_flock.h"
 
 struct E {
     u32 flags;

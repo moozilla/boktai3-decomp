@@ -1,10 +1,10 @@
 #include "scene/actor/scene_actor_control_begin.h"
-#include "scene/actor/scene_actor_terrain_reaction.h"
+#include "scene/motion/scene_actor_terrain_reaction.h"
 #include "global.h"
 #include "scene/actor/scene_actor_control_phase.h"
 #include "scene/actor/scene_actor_control_motion.h"
 #include "debug.h"
-#include "scene/actor/scene_actor_contact_response.h"
+#include "scene/collision/scene_actor_contact_response.h"
 u8 sub_0812F3CC(struct ChaseActor *);
 s32 NavMesh_ConsumeProbeEvent(void *);
 u8 SceneActorBehavior_AccelerateTowardDescriptor(void *, void *, u32, u32, u32);

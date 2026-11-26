@@ -1,13 +1,13 @@
-#include "ui/town/scene_inventory_control.h"
-s32 SceneInventory_FindActionDestination(struct SceneInventoryControlView *panel)
+#include "ui/town/shop_control.h"
+s32 Shop_FindActionDestination(struct SceneInventoryControlView *panel)
 {
     switch (panel->category) {
         case 0:
-            return SceneInventory_FindEmptyEquipmentSlot(panel);
+            return Shop_FindEmptyEquipmentSlot(panel);
         case 1:
-            return SceneInventory_FindEmptyItemSlot(panel);
+            return Shop_FindEmptyItemSlot(panel);
         case 2:
-            return SceneInventory_FindEmptyConsumableSlot(panel);
+            return Shop_FindEmptyConsumableSlot(panel);
     }
     return 0;
 }

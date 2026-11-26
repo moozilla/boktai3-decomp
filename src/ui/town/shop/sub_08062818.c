@@ -1,14 +1,14 @@
-#include "ui/town/scene_inventory_tail.h"
+#include "ui/town/shop_tail.h"
 struct SceneInventorySwapView {
     u8 unknown0[0x1AF0];
     struct SceneInputPair pair;
 };
 s32 SceneInput_TickPairTransition(struct SceneInputPair *);
 void Inventory_RemoveEquipmentEntry(u32);
-s32 SceneInventory_TickDiscardFeedback(struct SceneInventoryTail *);
+s32 Shop_TickDiscardFeedback(struct SceneInventoryTail *);
 void Inventory_ClearItemSlot(u32);
 void GameState_ClearConsumableSlot(u32);
-s32 SceneInventory_TickDiscardTransition(struct SceneInventoryTail *p)
+s32 Shop_TickDiscardTransition(struct SceneInventoryTail *p)
 {
     SceneInputPanel_ResetHighlights(&p->display, &p->highlight);
     if (SceneInput_TickPairTransition(&((struct SceneInventorySwapView *)p)->pair)) {
@@ -24,8 +24,8 @@ s32 SceneInventory_TickDiscardTransition(struct SceneInventoryTail *p)
                 GameState_ClearConsumableSlot(selection);
                 break;
         }
-        SceneInventory_SetControllerCallback(
-            p, (SceneInventoryCallback)SceneInventory_TickDiscardFeedback);
+        Shop_SetControllerCallback(
+            p, (SceneInventoryCallback)Shop_TickDiscardFeedback);
     }
     return 0;
 }

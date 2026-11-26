@@ -10,7 +10,7 @@ struct S {
     u8 b18;
 };
 void Actor_PlayAnimationEntry(void *, u32, u32, u32, u32);
-void StateActor_StartAndMaybeFinishAnim(u32 a, struct S *p, s32 a2)
+void StoryCharacter_StartAndMaybeFinishAnim(u32 a, struct S *p, s32 a2)
 {
     u8 *base20 = (u8 *)p + 0x20;
     if (p->b9 != 0) {

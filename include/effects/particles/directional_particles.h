@@ -1,6 +1,6 @@
 #ifndef GUARD_DIRECTIONAL_PARTICLES_H
 #define GUARD_DIRECTIONAL_PARTICLES_H
-#include "scene/actor/contact_actor.h"
+#include "scene/collision/contact_actor.h"
 struct DirectionalParticleMotion {
     struct ContactPosition velocity;
     u32 lifetime;

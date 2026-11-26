@@ -1,7 +1,7 @@
 #include "global.h"
 #include "engine/ram.h"
 #include "engine/engine_globals.h"
-#include "player/cues/player_cue_sequence.h"
+#include "player/cutscene/player_cue_sequence.h"
 struct ParticleVector {
     u16 x, y, z, unused;
 };

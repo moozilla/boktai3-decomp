@@ -1,6 +1,6 @@
 #include "global.h"
 #include "engine/input.h"
-#include "scene/area_effect/area_effect_link.h"
+#include "scene/areas/area_effect_link.h"
 
 // MATCHING_CONCESSION: register-pinning
 struct LinkReadySessionFlags {
@@ -34,10 +34,10 @@ struct LinkReadyState {
     u8 missed[2];
 };
 s32 Serial_ReadLatestPacket(u16 *);
-u8 Registry1745_ConsumeStateEntry(void *);
-u8 Registry1745_HasParticipantCount(void *, s32);
-void Registry1745_SetState(void *, u32, void (*)(void));
-void Registry1745_ClearParticipantCounters(void *);
+u8 LinkSession_ConsumeStateEntry(void *);
+u8 LinkSession_HasParticipantCount(void *, s32);
+void LinkSession_SetState(void *, u32, void (*)(void));
+void LinkSession_ClearParticipantCounters(void *);
 void Serial_StopCommunication(void);
 void SerialLink_InitMultiplayer(void);
 void Sound_PlaySong(u32);
@@ -88,7 +88,7 @@ s32 LinkMenu_WaitForReadyPeers(struct LinkReadyState *p)
     s32 i;
     u8 *event;
     Serial_ReadLatestPacket(packets);
-    if (Registry1745_ConsumeStateEntry(p)) {
+    if (LinkSession_ConsumeStateEntry(p)) {
         p->timer = 0;
         p->requested = 0;
         {
@@ -99,7 +99,7 @@ s32 LinkMenu_WaitForReadyPeers(struct LinkReadyState *p)
             ((struct LinkReadySessionFlags *)gLinkSession)->startRequested = 0;
         LinkReady_ClearReady(p);
     }
-    if (!Registry1745_HasParticipantCount(p, 2)) {
+    if (!LinkSession_HasParticipantCount(p, 2)) {
         p->requested = 0;
         if (gLinkSession)
             ((struct LinkReadySessionFlags *)gLinkSession)->startRequested = 0;
@@ -109,14 +109,14 @@ s32 LinkMenu_WaitForReadyPeers(struct LinkReadyState *p)
         }
 
         if ((++p->timer) > 119) {
-            Registry1745_SetState(p, 2, ScriptPanel_PollSelection);
+            LinkSession_SetState(p, 2, ScriptPanel_PollSelection);
             Serial_StopCommunication();
         }
         return 0;
     }
     if (p->status < 0) {
         if (LinkReady_AdvanceTimer(&p->timer) > 59) {
-            Registry1745_SetState(p, 2, ScriptPanel_PollSelection);
+            LinkSession_SetState(p, 2, ScriptPanel_PollSelection);
             Serial_StopCommunication();
             return 0;
         }
@@ -153,7 +153,7 @@ s32 LinkMenu_WaitForReadyPeers(struct LinkReadyState *p)
 
         p->timer = 0;
         if (packets[p->status] == 0xffff) {
-            Registry1745_SetState(p, 2, ScriptPanel_PollSelection);
+            LinkSession_SetState(p, 2, ScriptPanel_PollSelection);
             Serial_StopCommunication();
             return 0;
         }
@@ -209,8 +209,8 @@ s32 LinkMenu_WaitForReadyPeers(struct LinkReadyState *p)
                 if (!p->busy)
                     p->presence[0] = 3;
             } else if (p->count == 2 && p->count == readyCount && !other) {
-                Registry1745_SetState(p, 5, sub_0810A304);
-                Registry1745_ClearParticipantCounters(p);
+                LinkSession_SetState(p, 5, sub_0810A304);
+                LinkSession_ClearParticipantCounters(p);
                 Sound_PlaySong(0xdd);
                 return 0;
             } else
@@ -235,7 +235,7 @@ s32 LinkMenu_WaitForReadyPeers(struct LinkReadyState *p)
     event = &p->event;
     if ((*event) == 2) {
         SerialLink_InitMultiplayer();
-        Registry1745_SetState(p, 1, ScriptPanel_ConfirmSelection);
+        LinkSession_SetState(p, 1, ScriptPanel_ConfirmSelection);
     }
     return 0;
 }

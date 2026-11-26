@@ -1,7 +1,7 @@
 #include "global.h"
 #include "ui/pause/scene_hud_display.h"
 #define SceneHud_SetWidgetPaletteBank PauseMenu_SetSpritePalette
-void SceneHud_SetWidgetPaletteBank(struct SceneInputWidget *, u16);
+void SceneHud_SetWidgetPaletteBank(struct AnimSprite *, u16);
 void SceneHud_InitActionIcons(struct SceneHudState *hud)
 {
     struct SceneInputPackedPosition pos;

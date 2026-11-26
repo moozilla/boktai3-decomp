@@ -4,7 +4,7 @@
 #include "scene/scene_animation.h"
 #include "scene/actor/scene_actor_components.h"
 #include "effects/projectiles/contact_swarm_sprite.h"
-#include "scene/actor/contact_collider.h"
+#include "scene/collision/contact_collider.h"
 #include "engine/video/display_sequence.h"
 #include "scene/terrain/terrain_cell_override.h"
 struct RegionActor {
@@ -42,13 +42,13 @@ struct RegionActorColliderVector {
 };
 void ProximityActor_UpdateDamageAnimation(struct RegionActor *);
 void RegionActor_UnregisterTerrain(struct RegionActor *);
-struct RegionActor *Pool128_Allocate(struct RegionSpriteManager *);
+struct RegionActor *ProximityActorPool_Allocate(struct RegionSpriteManager *);
 void ProximityActor_InitializeCollider(struct RegionActor *, s16, s16);
 void ProximityActor_ApplyContactDamage(struct ContactCollider *, struct ContactCollider *,
                                        struct RegionActor *);
 s32 RegionActorPool_UpdateActors(struct RegionSpriteManager *);
 s32 RegionActorPool_DestroyActors(struct RegionSpriteManager *);
-s32 Pool128_InitManager(struct RegionSpriteManager *);
+s32 ProximityActorPool_InitManager(struct RegionSpriteManager *);
 void TerrainModifiers_UnregisterCell(void *);
 void TerrainModifiers_RegisterCell(void *, s32, s32, s32, s32, s32);
 void SceneBody_Init(void *, s32, void *, s32, s32, void *);

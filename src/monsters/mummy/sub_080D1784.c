@@ -1,7 +1,7 @@
 #include "scene/actor/scene_actor_reaction.h"
-#include "scene/actor/scene_actor_chase_shared.h"
+#include "scene/motion/scene_actor_chase_shared.h"
 #include "monsters/scene_actor_chase_step.h"
-#include "scene/actor/scene_actor_delayed_response.h"
+#include "scene/collision/scene_actor_delayed_response.h"
 void SceneBody_StartRoute(void *, void *, u32, u32, u32);
 // confidence=low: restarts the saved route after a timed animation and waits before restoring control.
 void Mummy_ResumeSavedRouteAfterAnimation(struct ChaseActor *actor, s32 frame)

@@ -1,10 +1,10 @@
 #include "global.h"
 /* SceneActorReaction_ApplyEscalatingHit: for category-1 actors flagged 4 at +0x2DC, applies a hit whose damage doubles per stored hit count (+0x47E), shows HUD/damage numbers, restarts the route and flashes the palette; returns 1 when applied (provisional) */
 #include "scene/actor/scene_actor_reset.h"
-#include "scene/actor/scene_actor_chase_types.h"
-#include "scene/area_effect/area_effect_link.h"
+#include "scene/motion/scene_actor_chase_types.h"
+#include "scene/areas/area_effect_link.h"
 #include "engine/video/render.h"
-#include "scene/actor/scene_actor_damage_visibility.h"
+#include "scene/collision/scene_actor_damage_visibility.h"
 void SceneActorEffects_EmitRandomOffsets(void *, s32, u32, u32, s32, s32);
 void SceneHud_SetTimedState(u32, s32, s32, s32, s32, s32);
 void CpuSet(const void *, void *, u32);

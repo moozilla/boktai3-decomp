@@ -1,7 +1,7 @@
 #ifndef GUARD_SAVE_MENU_H
 #define GUARD_SAVE_MENU_H
 #include "engine/engine.h"
-#include "ui/widgets/scene_input_widget.h"
+#include "engine/video/anim_sprite.h"
 #include "player/appearance/character_preview_actor.h"
 struct SaveMenuPaletteCycle {
     u16 colors[16], frame;
@@ -10,8 +10,8 @@ struct SaveMenuPaletteCycle {
 struct SaveMenu {
     struct Task task;
     void *backgroundResource, *alternateBackgroundResource, *paletteResource;
-    struct SceneInputWidget widgets[18];
-    struct SceneInputResource auxiliaryResource, widgetResource;
+    struct AnimSprite widgets[18];
+    struct AnimSpriteResource auxiliaryResource, widgetResource;
     u16 glyphs[18], cachedGlyphs[18];
     void *widgetScript;
     struct SaveMenuPaletteCycle paletteCycle;

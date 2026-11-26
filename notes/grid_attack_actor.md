@@ -13,7 +13,7 @@ Git metadata. The tool itself was not changed.
 
 ## Layout
 
-`include/bosses/nidhoggr/grid_attack_actor.h` defines the shared 0x924-byte actor, its transform,
+`include/bosses/nidhoggr/nidhoggr_duel.h` defines the shared 0x924-byte actor, its transform,
 word-copy position, packed vector, outgoing message packet, animation resource
 header, and drawable. It reuses `ContactCollider`, `SceneEventReceiver`,
 `DisplaySequenceState`, and `SceneVec` from existing headers; engine declarations

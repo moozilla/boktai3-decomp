@@ -1,5 +1,5 @@
 #include "global.h"
-#include "scene/area_effect/area_effect_link.h"
+#include "scene/areas/area_effect_link.h"
 struct RecSlotOrigin {
     u32 x : 16, y : 16, z : 16, padding : 16;
 };

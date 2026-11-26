@@ -1,11 +1,11 @@
-#include "scene/actor/scene_actor_turn.h"
+#include "scene/motion/scene_actor_turn.h"
 #include "scene/terrain/terrain_sampling.h"
-#include "scene/actor/scene_actor_chase_shared.h"
+#include "scene/motion/scene_actor_chase_shared.h"
 #include "global.h"
-#include "scene/actor/scene_actor_chase.h"
-#include "scene/actor/scene_actor_chase_reaction.h"
+#include "scene/motion/scene_actor_chase.h"
+#include "scene/motion/scene_actor_chase_reaction.h"
 #include "scene/actor/scene_actor_reaction.h"
-#include "scene/actor/scene_actor_delayed_response.h"
+#include "scene/collision/scene_actor_delayed_response.h"
 #include "scene/actor/scene_actor_control_phase.h"
 #include "debug.h"
 #include "scene/actor/scene_actor_reset.h"
@@ -17,14 +17,14 @@
 #include "script/script_utility.h"
 #include "player/player.h"
 #include "engine/ram.h"
-#include "scene/actor/route_sprite_actor.h"
-#include "scene/actor/scene_actor_route.h"
-#include "scene/actor/scene_actor_terrain.h"
-#include "scene/actor/scene_actor_collision.h"
+#include "scene/motion/route_sprite_actor.h"
+#include "scene/motion/scene_actor_route.h"
+#include "scene/motion/scene_actor_terrain.h"
+#include "scene/collision/scene_actor_collision.h"
 #include "engine/engine_globals.h"
 #include "engine/math/rotation_phase.h"
 #include "engine/math/scene_vec.h"
-#include "scene/actor/scene_actor_contact_response.h"
+#include "scene/collision/scene_actor_contact_response.h"
 #include "scene/actor/scene_actor_placement.h"
 #include "scene/collision/scene_body_api.h"
 #include "engine/video/render.h"
@@ -33,8 +33,8 @@
 #include "monsters/scene_actor_init_group.h"
 #include "scene/actor/scene_actor_init_dispatch.h"
 #include "monsters/scene_actor_init_graphics.h"
-#include "scene/actor/scene_actor_turn.h"
-#include "scene/actor/scene_actor_chase_shared.h"
+#include "scene/motion/scene_actor_turn.h"
+#include "scene/motion/scene_actor_chase_shared.h"
 #include "objects/hazards/falling_objects.h"
 #include "monsters/ghoul_disc.h"
 
@@ -833,7 +833,7 @@ s32 Inventory_GetItemPackedState(s32 i);
 
 s32 Inventory_GetItemId(u32);
 
-u8 SceneInventory_FindSlotByValue(s16 *p0, s16 *p1, s16 *p2, s32 p3)
+u8 Vorn_FindSlotByValue(s16 *p0, s16 *p1, s16 *p2, s32 p3)
 {
     s16 i;
     for (i = 0; i <= 15; i++) {
@@ -873,7 +873,7 @@ struct SceneActorItemLaunch {
     u16 flags;
 };
 
-u8 SceneInventory_FindSlotByValue(s16 *, s16 *, s16 *, s32);
+u8 Vorn_FindSlotByValue(s16 *, s16 *, s16 *, s32);
 
 s32 FloatingItemEffect_Spawn(s32, s32, s32, s32, void *, void *, s32, void *);
 
@@ -901,7 +901,7 @@ s32 SceneActor_TryLaunchItem13(struct SceneActorItemLaunch *p)
     pos.y += 200;
     if (occupied(p))
         return -1;
-    if (!SceneInventory_FindSlotByValue(&p->slot, &p->kind, &p->parameter, 13))
+    if (!Vorn_FindSlotByValue(&p->slot, &p->kind, &p->parameter, 13))
         return -1;
     if (FloatingItemEffect_Spawn(0, p->kind, 3, 0, &pos, &q->position, 24, p) < 0) {
         p->slot = 0xffff;

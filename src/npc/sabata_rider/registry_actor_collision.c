@@ -1,4 +1,4 @@
-#include "npc/sabata_rider/script_puppet_collision.h"
+#include "npc/sabata_rider/sabata_rider_collision.h"
 
 static inline s32 RegistryActor_ScaleVelocity(s32 value)
 {

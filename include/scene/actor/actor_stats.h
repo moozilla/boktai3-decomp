@@ -2,7 +2,7 @@
 #define GUARD_ACTOR_STATS_H
 #include "global.h"
 #include "system/game_state/actor_palette_fade.h"
-#include "scene/actor/contact_position.h"
+#include "scene/collision/contact_position.h"
 #include "scene/actor/actor_ability_types.h"
 struct ModifierDrainState {
     void (*update)(void);

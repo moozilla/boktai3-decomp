@@ -1,14 +1,14 @@
 #include "objects/pile_driver/scene_panel_subject_tail.h"
-s32 ScenePanelSubject_Update(struct ScenePanelSubject *subject)
+s32 PileDriverSubject_Update(struct ScenePanelSubject *subject)
 {
     if (subject->state)
-        ScenePanelSubject_KeepPlayerOutside((void *)subject);
+        PileDriverSubject_KeepPlayerOutside((void *)subject);
     if (subject->timer)
         subject->timer--;
     if (subject->contactCooldown)
         subject->contactCooldown--;
     subject->update(subject);
-    ScenePanelSubject_UpdatePaletteBank(subject);
+    PileDriverSubject_UpdatePaletteBank(subject);
     {
         u16 *hold = &subject->hold;
         if (*hold) {

@@ -3,8 +3,8 @@
 // (row/column scans), writing the next waypoint to *out.
 // The `goto done` on the from==to path (not `return 1`) lets cross-jumping merge
 // the `*out = center` store into it, as in the ROM.
-#include "scene/actor/contact_actor.h"
-#include "scene/actor/scene_actor_terrain.h"
+#include "scene/collision/contact_actor.h"
+#include "scene/motion/scene_actor_terrain.h"
 s32 Div(s32, s32);
 s32 Mod(s32, s32);
 u8 *TerrainModifiers_FindCellOverride(s32, s32);

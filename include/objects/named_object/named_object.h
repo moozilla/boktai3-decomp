@@ -3,9 +3,9 @@
 #include "global.h"
 #include "engine/engine.h"
 #include "engine/ram.h"
-#include "scene/actor/contact_swarm.h"
+#include "scene/collision/contact_swarm.h"
 #include "scene/actor/scene_actor_components.h"
-#include "scene/actor/scene_actor_route.h"
+#include "scene/motion/scene_actor_route.h"
 
 /* Tentative: a scripted scene object (kinds 0-3) from the 12-slot pool owned by
  * gNamedActorManager. Slots are 0x19C bytes. */

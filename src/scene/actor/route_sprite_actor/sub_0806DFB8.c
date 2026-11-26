@@ -1,4 +1,4 @@
-#include "scene/actor/route_sprite_actor.h"
+#include "scene/motion/route_sprite_actor.h"
 struct RouteSpriteActor *RouteSpritePool_TryAllocateSlot(struct RouteSpritePool *pool)
 {
     struct RouteSpriteActor *slot = RouteSpritePool_AllocateSlot(pool);

@@ -1,10 +1,10 @@
 #include "global.h"
 #include "scene/actor/scene_actor_reset.h"
-#include "scene/actor/scene_actor_contact_response.h"
+#include "scene/collision/scene_actor_contact_response.h"
 #include "scene/actor/scene_actor_palette.h"
-#include "scene/area_effect/area_effect_link.h"
+#include "scene/areas/area_effect_link.h"
 #include "engine/video/render.h"
-#include "scene/actor/scene_actor_damage_visibility.h"
+#include "scene/collision/scene_actor_damage_visibility.h"
 #include "scene/actor/scene_actor_damage_flash.h"
 u8 SceneActorReaction_ApplyAreaDamage(void *);
 void SceneActor_ClearReactionFlags(void *);

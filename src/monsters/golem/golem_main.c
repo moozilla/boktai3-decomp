@@ -1,30 +1,30 @@
 #include "global.h"
 #include "effects/particles/scene_particle_burst_api.h"
 #include "engine/engine.h"
-#include "scene/actor/contact_actor.h"
+#include "scene/collision/contact_actor.h"
 #include "scene/actor/scene_actor_reset.h"
-#include "scene/actor/scene_actor_chase.h"
-#include "scene/actor/scene_actor_route.h"
-#include "scene/actor/scene_actor_terrain.h"
+#include "scene/motion/scene_actor_chase.h"
+#include "scene/motion/scene_actor_route.h"
+#include "scene/motion/scene_actor_terrain.h"
 #include "scene/actor/scene_actor_status.h"
-#include "scene/actor/scene_actor_adjacent_cell.h"
+#include "scene/motion/scene_actor_adjacent_cell.h"
 #include "player/player.h"
-#include "scene/actor/scene_actor_restoration.h"
+#include "scene/collision/scene_actor_restoration.h"
 #include "scene/actor/scene_actor_control_motion.h"
-#include "scene/actor/scene_actor_contact_response.h"
+#include "scene/collision/scene_actor_contact_response.h"
 #include "engine/video/display_sequence_inline.h"
-#include "scene/actor/scene_actor_chase_reaction.h"
+#include "scene/motion/scene_actor_chase_reaction.h"
 #include "scene/actor/scene_actor_reaction.h"
-#include "scene/actor/scene_actor_turn.h"
+#include "scene/motion/scene_actor_turn.h"
 #include "engine/video/display_sequence.h"
 #include "npc/manager/scene_actor_animation.h"
 #include "objects/scene_objects/scene_object.h"
 #include "monsters/golem/golem.h"
 #include "monsters/golem/golem_charge.h"
 #include "engine/math/monster_particle_random.h"
-#include "scene/actor/scene_actor_delayed_response.h"
+#include "scene/collision/scene_actor_delayed_response.h"
 #include "scene/actor/scene_actor_init_actor.h"
-#include "scene/actor/scene_actor_chase_shared.h"
+#include "scene/motion/scene_actor_chase_shared.h"
 
 void Golem_CenterPositionInCell(void *ptr)
 {
@@ -1553,7 +1553,7 @@ void SceneActorReaction_SlideBack(struct ChaseActor *actor)
                              (u8)variant, (u8)flags);
             restart = &actor->base.restart;
         } else {
-            struct SceneInputWidget *tile =
+            struct AnimSprite *tile =
                 &((struct SceneActorAnimationTileDrawable *)actor->base.drawable)->tile;
             u8 *savedSelection;
 

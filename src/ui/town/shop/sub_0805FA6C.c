@@ -1,11 +1,11 @@
-#include "ui/town/scene_inventory_panel.h"
-void SceneInventory_ShowItemDescription(struct SceneInventoryPanel *panel)
+#include "ui/town/shop_panel.h"
+void Shop_ShowItemDescription(struct SceneInventoryPanel *panel)
 {
     s32 item;
     s32 frame;
     if (panel->selection <= 15) {
         item = Inventory_GetItemId(panel->selection);
-        frame = SceneInventory_GetItemConditionFrame(panel->selection);
+        frame = PauseDisplay_GetItemConditionFrame(panel->selection);
     } else if (panel->selection <= 23) {
         {
             s32 offset = panel->page * 8;

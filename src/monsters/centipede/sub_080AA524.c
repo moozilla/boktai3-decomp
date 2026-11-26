@@ -1,7 +1,7 @@
-#include "monsters/centipede/tentacle_body.h"
+#include "monsters/centipede/centipede_body.h"
 #include "global.h"
 #include "scene/actor/scene_actor_reset.h"
-void TentacleActor_SpawnSparkBurst(struct ContactPosition *);
+void Centipede_SpawnSparkBurst(struct ContactPosition *);
 static inline u8 isUnavailable(struct TentacleAnimationSegment *segment)
 {
     u32 value = segment->animation.status;
@@ -26,7 +26,7 @@ removeSegment: {
     Collider_Remove(&segment->bodyCollider);
     setFlag(segment, 1);
     trail->spreadStage--;
-    TentacleActor_SpawnSparkBurst(&segment->position);
+    Centipede_SpawnSparkBurst(&segment->position);
     return 1;
 }
 scan:

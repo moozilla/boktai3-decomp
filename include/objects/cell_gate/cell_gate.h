@@ -1,6 +1,6 @@
 #ifndef GUARD_CELL_GATE_H
 #define GUARD_CELL_GATE_H
-#include "scene/actor/contact_swarm.h"
+#include "scene/collision/contact_swarm.h"
 #include "system/game_state/game_state.h"
 #include "engine/ram.h"
 #include "engine/task.h"

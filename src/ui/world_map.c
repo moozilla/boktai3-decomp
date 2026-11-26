@@ -55,33 +55,33 @@ void PositionMotion_InitTimedInterpolation(struct PositionMotion *motion,
     motion->active = 1;
 }
 
-void RegistrySelection_SetUpdate(struct RegistrySelectionMenu *menu,
+void WorldMap_SetUpdate(struct RegistrySelectionMenu *menu,
                                  void (*update)(struct RegistrySelectionMenu *))
 {
     menu->update = update;
     menu->timer = 0;
 }
 
-void RegistrySelection_ShowIndicators(struct RegistrySelectionMenu *menu)
+void WorldMap_ShowIndicators(struct RegistrySelectionMenu *menu)
 {
     menu->animations[1].flags &= ~1;
-    SceneInputWidget_Show(&menu->animations[2]);
-    SceneInputWidget_Show(&menu->animations[3]);
-    SceneInputWidget_Show(&menu->animations[4]);
-    SceneInputWidget_Show(&menu->animations[5]);
-    SceneInputWidget_Show(&menu->animations[8]);
+    AnimSprite_Show(&menu->animations[2]);
+    AnimSprite_Show(&menu->animations[3]);
+    AnimSprite_Show(&menu->animations[4]);
+    AnimSprite_Show(&menu->animations[5]);
+    AnimSprite_Show(&menu->animations[8]);
     menu->animations[0].flags &= ~1;
-    SceneInputWidget_Show(&menu->animations[10]);
-    SceneInputWidget_Show(&menu->animations[9]);
-    SceneInputWidget_Show(&menu->animations[11]);
+    AnimSprite_Show(&menu->animations[10]);
+    AnimSprite_Show(&menu->animations[9]);
+    AnimSprite_Show(&menu->animations[11]);
 }
 
-void RegistrySelection_UpdateIndicators(struct RegistrySelectionMenu *menu)
+void WorldMap_UpdateIndicators(struct RegistrySelectionMenu *menu)
 {
     u32 available = menu->availableEntries;
-    struct SceneInputResource *resource = &menu->resource;
-    struct SceneInputWidget *widgets = menu->animations;
-    struct SceneInputWidget *widget;
+    struct AnimSpriteResource *resource = &menu->resource;
+    struct AnimSprite *widgets = menu->animations;
+    struct AnimSprite *widget;
     struct MenuCursorEntry *entry;
     if (available & 2)
         Anim_LoadKeyframe(widgets + 1, resource, 14, 0);
@@ -130,7 +130,7 @@ void RegistrySelection_UpdateIndicators(struct RegistrySelectionMenu *menu)
         Anim_LoadKeyframe(widgets + 9, resource, (u16)(menu->selection + 29), 0);
     } else
         (widgets + 9)->flags |= 1;
-    if (menu->update == RegistrySelection_UpdateTimedEffect || !menu->update) {
+    if (menu->update == WorldMap_UpdateTimedEffect || !menu->update) {
         (&menu->animations[11])->flags |= 1;
         (&menu->animations[12])->flags |= 1;
     } else {
@@ -162,7 +162,7 @@ void RegistrySelection_UpdateIndicators(struct RegistrySelectionMenu *menu)
     }
 }
 
-void RegistrySelection_BlendPaletteBanks(u8 *output, u8 *from, u8 *to, int amount, int shift,
+void WorldMap_BlendPaletteBanks(u8 *output, u8 *from, u8 *to, int amount, int shift,
                                          int bankCount)
 {
     u16(*outputBank)[16] = (u16(*)[16])output;
@@ -175,7 +175,7 @@ void RegistrySelection_BlendPaletteBanks(u8 *output, u8 *from, u8 *to, int amoun
     }
 }
 
-void RegistrySelection_ApplyPalettePhase(struct RegistrySelectionMenu *menu, u32 phase)
+void WorldMap_ApplyPalettePhase(struct RegistrySelectionMenu *menu, u32 phase)
 {
     u8 *base = menu->palettes;
     u8 *extra;
@@ -186,31 +186,31 @@ void RegistrySelection_ApplyPalettePhase(struct RegistrySelectionMenu *menu, u32
         extra = 0;
     switch (phase) {
         case 0:
-            RegistrySelection_BlendPaletteBanks(((u8 *)gBgPaletteBuffer), base, base + 0xc0, 0x30,
+            WorldMap_BlendPaletteBanks(((u8 *)gBgPaletteBuffer), base, base + 0xc0, 0x30,
                                                 6, 3);
             if (extra)
-                RegistrySelection_BlendPaletteBanks(((u8 *)gBgPaletteBuffer) + 0x40, base + 0x40,
+                WorldMap_BlendPaletteBanks(((u8 *)gBgPaletteBuffer) + 0x40, base + 0x40,
                                                     extra, 0x30, 6, 1);
             break;
         case 1:
-            RegistrySelection_BlendPaletteBanks(((u8 *)gBgPaletteBuffer), base, base + 0xc0, 0x10,
+            WorldMap_BlendPaletteBanks(((u8 *)gBgPaletteBuffer), base, base + 0xc0, 0x10,
                                                 6, 3);
             if (extra)
-                RegistrySelection_BlendPaletteBanks(((u8 *)gBgPaletteBuffer) + 0x40, base + 0x40,
+                WorldMap_BlendPaletteBanks(((u8 *)gBgPaletteBuffer) + 0x40, base + 0x40,
                                                     extra, 0x10, 6, 1);
             break;
         case 2:
             CpuSet(base, ((u8 *)gBgPaletteBuffer), 0x04000018);
             break;
         case 3:
-            RegistrySelection_BlendPaletteBanks(((u8 *)gBgPaletteBuffer), base, base + 0x60, 0x10,
+            WorldMap_BlendPaletteBanks(((u8 *)gBgPaletteBuffer), base, base + 0x60, 0x10,
                                                 6, 3);
             break;
         case 4:
-            RegistrySelection_BlendPaletteBanks(((u8 *)gBgPaletteBuffer), base + 0x60, base + 0xc0,
+            WorldMap_BlendPaletteBanks(((u8 *)gBgPaletteBuffer), base + 0x60, base + 0xc0,
                                                 0x30, 6, 3);
             if (extra)
-                RegistrySelection_BlendPaletteBanks(((u8 *)gBgPaletteBuffer) + 0x40, base + 0xa0,
+                WorldMap_BlendPaletteBanks(((u8 *)gBgPaletteBuffer) + 0x40, base + 0xa0,
                                                     extra, 0x30, 6, 1);
             break;
         case 5:
@@ -221,7 +221,7 @@ void RegistrySelection_ApplyPalettePhase(struct RegistrySelectionMenu *menu, u32
     }
 }
 
-void RegistrySelection_BlendTimedPalettes(struct RegistrySelectionMenu *menu)
+void WorldMap_BlendTimedPalettes(struct RegistrySelectionMenu *menu)
 {
     u8 *base = menu->palettes;
     u8 *extra;
@@ -235,24 +235,24 @@ void RegistrySelection_BlendTimedPalettes(struct RegistrySelectionMenu *menu)
         case 2:
             if (!extra)
                 extra = base + 0x100;
-            RegistrySelection_BlendPaletteBanks(((u8 *)gBgPaletteBuffer), base + 0x60, base + 0xc0,
+            WorldMap_BlendPaletteBanks(((u8 *)gBgPaletteBuffer), base + 0x60, base + 0xc0,
                                                 menu->elapsed, menu->shift, 2);
-            RegistrySelection_BlendPaletteBanks(((u8 *)gBgPaletteBuffer) + 0x40, base + 0xa0, extra,
+            WorldMap_BlendPaletteBanks(((u8 *)gBgPaletteBuffer) + 0x40, base + 0xa0, extra,
                                                 menu->elapsed, menu->shift, 1);
             break;
         case 1:
         case 3:
             if (!extra)
                 extra = base + 0x100;
-            RegistrySelection_BlendPaletteBanks(((u8 *)gBgPaletteBuffer), base + 0xc0, base,
+            WorldMap_BlendPaletteBanks(((u8 *)gBgPaletteBuffer), base + 0xc0, base,
                                                 menu->elapsed, menu->shift, 2);
-            RegistrySelection_BlendPaletteBanks(((u8 *)gBgPaletteBuffer) + 0x40, extra, base + 0x40,
+            WorldMap_BlendPaletteBanks(((u8 *)gBgPaletteBuffer) + 0x40, extra, base + 0x40,
                                                 menu->elapsed, menu->shift, 1);
             break;
     }
 }
 
-void RegistrySelection_ProcessConfirm(struct RegistrySelectionMenu *menu)
+void WorldMap_ProcessConfirm(struct RegistrySelectionMenu *menu)
 {
     if (gPadState[1] & 1) {
         struct MenuCursor *list = menu->selectionCursor;
@@ -262,21 +262,21 @@ void RegistrySelection_ProcessConfirm(struct RegistrySelectionMenu *menu)
             Sound_PlaySong(0x192);
         else if ((flags & 2) && menu->selection >= 0) {
             if (menu->entryValues[menu->selection])
-                RegistrySelection_BeginFadeOut(menu);
+                WorldMap_BeginFadeOut(menu);
             MenuCursor_SetSelectionFlag(menu->selectionCursor);
         }
     }
 }
 
-void RegistrySelection_OnUnusedTransition(void)
+void WorldMap_OnUnusedTransition(void)
 {
 }
 
-void RegistrySelection_InitializeAnimations(struct RegistrySelectionMenu *menu)
+void WorldMap_InitializeAnimations(struct RegistrySelectionMenu *menu)
 {
-    struct SceneInputResource *resource = ScriptProc_Start(0xcb05, 0xa2db);
+    struct AnimSpriteResource *resource = ScriptProc_Start(0xcb05, 0xa2db);
     if (resource) {
-        struct SceneInputWidget *anim;
+        struct AnimSprite *anim;
         void *palette;
         s32 count;
         u32 zero;
@@ -303,7 +303,7 @@ void RegistrySelection_InitializeAnimations(struct RegistrySelectionMenu *menu)
     }
 }
 
-void RegistrySelection_InitializeBackground(struct RegistrySelectionMenu *menu)
+void WorldMap_InitializeBackground(struct RegistrySelectionMenu *menu)
 {
     u8 *background;
     s32 config[2];
@@ -326,7 +326,7 @@ void RegistrySelection_InitializeBackground(struct RegistrySelectionMenu *menu)
     CpuSet(menu->palettes, gBgPaletteBuffer, 0x04000080);
 }
 
-void RegistrySelection_ConfigureDisplay(void)
+void WorldMap_ConfigureDisplay(void)
 {
     BgGfx_LoadTilemapAtPosition(3, 8, 0x48);
     BgGfx_LoadTilemapAtPosition(2, 0, 0);
@@ -334,26 +334,26 @@ void RegistrySelection_ConfigureDisplay(void)
     Hud_SetMode(7);
 }
 
-void RegistrySelection_BeginFadeIn(struct RegistrySelectionMenu *menu)
+void WorldMap_BeginFadeIn(struct RegistrySelectionMenu *menu)
 {
     ScreenTransition_SendCommand(2, 5, 4, 4, 4, 0xFFFF, 0);
-    RegistrySelection_SetUpdate(menu, RegistrySelection_UpdateOpeningDelay);
+    WorldMap_SetUpdate(menu, WorldMap_UpdateOpeningDelay);
 }
 
-void RegistrySelection_BeginFadeOut(struct RegistrySelectionMenu *menu)
+void WorldMap_BeginFadeOut(struct RegistrySelectionMenu *menu)
 {
     ScreenTransition_SendCommand(3, 5, 4, 4, 4, 0xFFFF, 0xFFFF);
-    RegistrySelection_SetUpdate(menu, RegistrySelection_UpdateScriptDelay);
+    WorldMap_SetUpdate(menu, WorldMap_UpdateScriptDelay);
 }
 
-void RegistrySelection_BeginSelection(struct RegistrySelectionMenu *menu)
+void WorldMap_BeginSelection(struct RegistrySelectionMenu *menu)
 {
     if (menu->inputDisabled == 0)
         MenuCursor_EnableInput(menu->selectionCursor);
-    RegistrySelection_SetUpdate(menu, RegistrySelection_UpdateSelection);
+    WorldMap_SetUpdate(menu, WorldMap_UpdateSelection);
 }
 
-void RegistrySelection_StartTimedEffect(struct RegistrySelectionMenu *menu, s32 shift, s32 mode)
+void WorldMap_StartTimedEffect(struct RegistrySelectionMenu *menu, s32 shift, s32 mode)
 {
     u32 one;
     if (shift > 0)
@@ -364,20 +364,20 @@ void RegistrySelection_StartTimedEffect(struct RegistrySelectionMenu *menu, s32 
     menu->mode = mode;
     menu->inputDisabled = one = 1;
     MenuCursor_Hide(menu->selectionCursor);
-    SceneInputWidget_Hide(&menu->animations[11]);
-    SceneInputWidget_Hide(&menu->animations[12]);
-    RegistrySelection_SetUpdate(menu, RegistrySelection_UpdateTimedEffect);
+    AnimSprite_Hide(&menu->animations[11]);
+    AnimSprite_Hide(&menu->animations[12]);
+    WorldMap_SetUpdate(menu, WorldMap_UpdateTimedEffect);
 }
 
-void RegistrySelection_UpdateTimedEffect(struct RegistrySelectionMenu *menu)
+void WorldMap_UpdateTimedEffect(struct RegistrySelectionMenu *menu)
 {
-    RegistrySelection_BlendTimedPalettes(menu);
+    WorldMap_BlendTimedPalettes(menu);
     menu->elapsed++;
     if (menu->elapsed > (1 << menu->shift))
-        RegistrySelection_SetUpdate(menu, 0);
+        WorldMap_SetUpdate(menu, 0);
 }
 
-void RegistrySelection_UpdateSelection(struct RegistrySelectionMenu *menu)
+void WorldMap_UpdateSelection(struct RegistrySelectionMenu *menu)
 {
     s32 v;
     if (menu->selectionCursor == 0)
@@ -385,10 +385,10 @@ void RegistrySelection_UpdateSelection(struct RegistrySelectionMenu *menu)
     else
         v = menu->selectionCursor->selectedIndex;
     menu->selection = v;
-    RegistrySelection_ProcessConfirm(menu);
+    WorldMap_ProcessConfirm(menu);
 }
 
-void RegistrySelection_UpdateOpeningDelay(struct RegistrySelectionMenu *menu)
+void WorldMap_UpdateOpeningDelay(struct RegistrySelectionMenu *menu)
 {
     s32 v;
     if (menu->selectionCursor == 0)
@@ -398,27 +398,27 @@ void RegistrySelection_UpdateOpeningDelay(struct RegistrySelectionMenu *menu)
     menu->selection = v;
     menu->timer++;
     if (menu->timer > 0x3c)
-        RegistrySelection_BeginSelection(menu);
+        WorldMap_BeginSelection(menu);
 }
 
-void RegistrySelection_UpdateScriptDelay(struct RegistrySelectionMenu *menu)
+void WorldMap_UpdateScriptDelay(struct RegistrySelectionMenu *menu)
 {
     menu->timer++;
     if (menu->timer > 0x3c)
         Script_Call(menu->entryValues[menu->selection], 0);
 }
 
-void RegistrySelection_OnUpdate(struct RegistrySelectionMenu *menu)
+void WorldMap_OnUpdate(struct RegistrySelectionMenu *menu)
 {
-    RegistrySelection_ConfigureDisplay();
-    RegistrySelection_UpdateIndicators(menu);
+    WorldMap_ConfigureDisplay();
+    WorldMap_UpdateIndicators(menu);
     if (menu->update)
         Callback_InvokeActor(menu, menu->update);
 }
 
-void RegistrySelection_Destroy(struct RegistrySelectionMenu *menu)
+void WorldMap_Destroy(struct RegistrySelectionMenu *menu)
 {
-    struct SceneInputWidget *animation = menu->animations;
+    struct AnimSprite *animation = menu->animations;
     s32 i = 12;
     do {
         if (animation->active)
@@ -430,7 +430,7 @@ void RegistrySelection_Destroy(struct RegistrySelectionMenu *menu)
     gSelectionPanel = 0;
 }
 
-void RegistrySelection_CreateSelectionCursor(struct RegistrySelectionMenu *menu, s32 selection)
+void WorldMap_CreateSelectionCursor(struct RegistrySelectionMenu *menu, s32 selection)
 {
     struct MenuCursorEntry entries[9];
     s32 i;
@@ -471,14 +471,14 @@ void RegistrySelection_CreateSelectionCursor(struct RegistrySelectionMenu *menu,
     menu->selectionCursor = MenuCursor_Create(1, selection, 9, entries);
 }
 
-s32 RegistrySelection_InitializeFromScript(struct RegistrySelectionMenu *menu, void *arg)
+s32 WorldMap_InitializeFromScript(struct RegistrySelectionMenu *menu, void *arg)
 {
     s32 i;
     s32 *value;
     Video_SetRenderCallbacks(0, SpriteOam_QueueProjectedSprites, Sprite_RenderScaledList,
                              sub_08219624);
-    RegistrySelection_InitializeBackground(menu);
-    RegistrySelection_InitializeAnimations(menu);
+    WorldMap_InitializeBackground(menu);
+    WorldMap_InitializeAnimations(menu);
     if (Script_SeekToKeyword(0x70)) {
         value = menu->entryValues;
         i = 8;
@@ -512,27 +512,27 @@ s32 RegistrySelection_InitializeFromScript(struct RegistrySelectionMenu *menu, v
     menu->selection = menu->initialSelection;
     menu->unknown524 = 0;
     if (Script_SeekToKeyword(0x62))
-        RegistrySelection_ApplyPalettePhase(menu, Script_GetValue());
+        WorldMap_ApplyPalettePhase(menu, Script_GetValue());
     else
-        RegistrySelection_ApplyPalettePhase(menu, SunClock_GetPhase());
-    RegistrySelection_CreateSelectionCursor(menu, menu->initialSelection);
+        WorldMap_ApplyPalettePhase(menu, SunClock_GetPhase());
+    WorldMap_CreateSelectionCursor(menu, menu->initialSelection);
     MenuCursor_Hide(menu->selectionCursor);
-    RegistrySelection_BeginFadeIn(menu);
+    WorldMap_BeginFadeIn(menu);
     return 0;
 }
 
-void RegistrySelection_StartTimedEffectFromScript(void)
+void WorldMap_StartTimedEffectFromScript(void)
 {
     struct RegistrySelectionMenu *menu = (void *)gSelectionPanel;
     if (menu) {
         if (Script_SeekToKeyword(0x66)) {
             s32 mode = Script_GetValue();
-            RegistrySelection_StartTimedEffect(menu, Script_GetKeywordValue(0x74, 7), mode);
+            WorldMap_StartTimedEffect(menu, Script_GetKeywordValue(0x74, 7), mode);
         }
     }
 }
 
-void RegistrySelection_SetVisibleFromScript(void)
+void WorldMap_SetVisibleFromScript(void)
 {
     struct RegistrySelectionMenu *menu = (void *)gSelectionPanel;
     struct MenuCursor **child;
@@ -550,16 +550,16 @@ void RegistrySelection_SetVisibleFromScript(void)
     }
 }
 
-struct RegistrySelectionMenu *RegistrySelection_Create(void *arg)
+struct RegistrySelectionMenu *WorldMap_Create(void *arg)
 {
     struct RegistrySelectionMenu *menu;
     if (gSelectionPanel)
         return 0;
     menu = Task_Create(8, sizeof(*menu));
     if (menu) {
-        Task_SetCallbacks(menu, (void (*)(void *))RegistrySelection_OnUpdate,
-                          (void (*)(void *))RegistrySelection_Destroy);
-        if (RegistrySelection_InitializeFromScript(menu, arg) < 0) {
+        Task_SetCallbacks(menu, (void (*)(void *))WorldMap_OnUpdate,
+                          (void (*)(void *))WorldMap_Destroy);
+        if (WorldMap_InitializeFromScript(menu, arg) < 0) {
             Task_Kill(menu);
             return 0;
         }

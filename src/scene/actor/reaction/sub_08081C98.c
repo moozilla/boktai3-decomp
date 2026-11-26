@@ -1,12 +1,12 @@
 #include "global.h"
 // confidence=low: runs a timed reaction burst and restores actor control on expiry.
-#include "scene/actor/scene_actor_chase.h"
+#include "scene/motion/scene_actor_chase.h"
 #include "scene/actor/scene_actor_reaction.h"
 #include "engine/engine.h"
 #include "scene/actor/scene_actor_part_burst.h"
-#include "scene/actor/scene_actor_contact_response.h"
+#include "scene/collision/scene_actor_contact_response.h"
 #include "engine/word_flags.h"
-#include "scene/actor/scene_actor_chase_shared.h"
+#include "scene/motion/scene_actor_chase_shared.h"
 #include "scene/actor/scene_actor_init_actor.h"
 void EffectGroup_Reset(void *);
 void SceneActorEffects_EmitRandomOffsets(void *, s32, u32, s32, s32, u32);

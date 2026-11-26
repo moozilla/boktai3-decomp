@@ -40,17 +40,17 @@ void Actor_InitShadow(struct SceneNpc *, u32, s32, s32, s32);
 void SceneMessages_RegisterReceiver(void *, void *, s32);
 void Actor_InitResources(void *, struct SceneNpc *, s32, s32);
 void Actor_LinkToManager(void *, struct SceneNpc *);
-void StateActor_EnterPendingState(void);
-void StateActor_OnUpdateDisplay(void);
-void StateActor_OnCommand(void);
-void StateActor_OnUpdateState(void);
-void StateActor_OnRender(void);
-void StateActor_OnUnregisterReceiver(void);
+void StoryCharacter_EnterPendingState(void);
+void StoryCharacter_OnUpdateDisplay(void);
+void StoryCharacter_OnCommand(void);
+void StoryCharacter_OnUpdateState(void);
+void StoryCharacter_OnRender(void);
+void StoryCharacter_OnUnregisterReceiver(void);
 void Actor_OnHiddenIdleUpdate(void);
 void Actor_UpdateTargetFacing(void);
 
 // confidence=low: creates a state actor from script keywords (k variant, p position, d angle, b, i behavior).
-s32 StateActor_CreateFromScriptEntry(void *manager, void *name)
+s32 StoryCharacter_CreateFromScriptEntry(void *manager, void *name)
 {
     s32 model;
     s32 fail;
@@ -100,12 +100,12 @@ s32 StateActor_CreateFromScriptEntry(void *manager, void *name)
             npc->facing4 = m;
         }
     }
-    setHandler(StateActor_EnterPendingState, &npc->callbacks[5]);
-    setHandler(StateActor_OnUpdateDisplay, &npc->callbacks[0]);
-    setHandler(StateActor_OnCommand, &npc->callbacks[1]);
-    setHandler(StateActor_OnUpdateState, &npc->callbacks[2]);
-    setHandler(StateActor_OnRender, &npc->callbacks[3]);
-    setHandler(StateActor_OnUnregisterReceiver, &npc->callbacks[4]);
+    setHandler(StoryCharacter_EnterPendingState, &npc->callbacks[5]);
+    setHandler(StoryCharacter_OnUpdateDisplay, &npc->callbacks[0]);
+    setHandler(StoryCharacter_OnCommand, &npc->callbacks[1]);
+    setHandler(StoryCharacter_OnUpdateState, &npc->callbacks[2]);
+    setHandler(StoryCharacter_OnRender, &npc->callbacks[3]);
+    setHandler(StoryCharacter_OnUnregisterReceiver, &npc->callbacks[4]);
     if (Script_SeekToKeyword('b')) {
         npc->behavior = Script_GetValue();
         npc->enabled = Script_GetValue();

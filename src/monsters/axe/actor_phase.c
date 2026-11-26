@@ -4,7 +4,7 @@
 #include "monsters/axe/directional_sprite_state.h"
 #include "engine/engine.h"
 #include "scene/actor/scene_actor_reaction.h"
-#include "scene/actor/scene_actor_terrain_reaction.h"
+#include "scene/motion/scene_actor_terrain_reaction.h"
 
 static inline struct DirectionalSprite *ActorPhase_GetDrawable(struct ChaseActor *actor)
 {

@@ -5,20 +5,20 @@
 struct SoundTest {
     struct Task task;
     u32 unknown18[2];
-    struct SceneInputWidget background;
-    struct SceneInputResource backgroundResource;
+    struct AnimSprite background;
+    struct AnimSpriteResource backgroundResource;
     u32 unknownA0[2];
-    struct SceneInputWidget panel;
-    struct SceneInputResource panelResource;
+    struct AnimSprite panel;
+    struct AnimSpriteResource panelResource;
     u32 unknown128[2];
-    struct SceneInputWidget cursor;
-    struct SceneInputResource cursorResource;
+    struct AnimSprite cursor;
+    struct AnimSpriteResource cursorResource;
     u32 unknown1B0[2];
-    struct SceneInputWidget categoryLabel;
-    struct SceneInputResource labelResource;
+    struct AnimSprite categoryLabel;
+    struct AnimSpriteResource labelResource;
     u32 unknown238[2];
-    struct SceneInputResource digitsResource;
-    struct SceneInputWidget secondCategoryDigits[3], thirdCategoryDigits[3], playbackIndicators[3];
+    struct AnimSpriteResource digitsResource;
+    struct AnimSprite secondCategoryDigits[3], thirdCategoryDigits[3], playbackIndicators[3];
     s32 state, exitFlag, exitTimer, fadeShift, selection, firstCategoryCount, secondCategoryCount,
         thirdCategoryCount, firstCategoryIndex, secondCategoryIndex, thirdCategoryIndex,
         lastFirstIndex, lastSecondIndex, lastThirdIndex, repeatTimer;

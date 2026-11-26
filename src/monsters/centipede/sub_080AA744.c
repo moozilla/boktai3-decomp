@@ -1,4 +1,4 @@
-#include "monsters/centipede/tentacle_body.h"
+#include "monsters/centipede/centipede_body.h"
 #include "global.h"
 #include "scene/actor/scene_actor_reset.h"
 #include "engine/engine.h"

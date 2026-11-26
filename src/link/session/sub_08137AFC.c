@@ -1,9 +1,9 @@
 #include "scene/actor/scene_actor_placement.h"
-#include "scene/actor/scene_actor_chase_shared.h"
+#include "scene/motion/scene_actor_chase_shared.h"
 #define gPlayerSlotFlags gUnk_02000560
 #include "global.h"
-#include "scene/area_effect/area_effect_link.h"
-#include "scene/actor/scene_actor_terrain.h"
+#include "scene/areas/area_effect_link.h"
+#include "scene/motion/scene_actor_terrain.h"
 #include "scene/actor/scene_actor_reset.h"
 
 static inline u32 TestSlot(s32 i)

@@ -7,7 +7,7 @@ Draft: `DirectionalForce_InitializeFromScript.c` (no concessions; put the origin
   (update_equiv_regs, fact 20), which doubles its live length: priority 625 vs mask 882.
   `AGBCC_NOEQUIV=table` -> MATCH; `AGBCC_PRI=table:+258` also matches.
 * The mask is loaded inside the first sample (`index = *seed + 1; mask = 0x3FF;
-  index &= mask;`) as in ScenePanelRig_RandomizeMovement; this fixed the ldr order.
+  index &= mask;`) as in PileDriverRig_RandomizeMovement; this fixed the ldr order.
 * Tried against the equivalence: slim-1's halves union (ParticleRandomTableSource)
   in case 1 does not fold here. Its pseudo reads its own uninitialized value, so it is
   live from function entry across four calls, and cse makes it canonical over table

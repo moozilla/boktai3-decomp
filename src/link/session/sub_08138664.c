@@ -21,7 +21,7 @@ struct S {
     u8 pad98[0xe0 - 0x98];
     struct Q q;
 };
-void Registry1745_InitParticipantOrder(struct S *p);
+void LinkSession_InitParticipantOrder(struct S *p);
 void sub_08138630(struct S *p, struct Q *q);
 
 void sub_08138664(struct S *p)
@@ -30,7 +30,7 @@ void sub_08138664(struct S *p)
     s32 i;
     q->b = q->a;
     p->x30 = 0;
-    Registry1745_InitParticipantOrder(p);
+    LinkSession_InitParticipantOrder(p);
     for (i = 0; i <= 3; i++) {
         q->x8c[i] = 0;
         q->x94[i] = 0;

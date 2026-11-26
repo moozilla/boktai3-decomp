@@ -4,7 +4,7 @@ void Collider_SetPosition(void *, void *, u32);
 void Collider_SetAttackProperties(void *, s32, s32, s32, s32, s32);
 s32 Collider_Refresh(void *);
 
-void SceneVolume_ConfigureAttackCollider(struct SceneVolumeActor *volume, s32 radius, s32 attack,
+void SabataVolume_ConfigureAttackCollider(struct SceneVolumeActor *volume, s32 radius, s32 attack,
                                          s32 height)
 {
     struct ContactCollider *collider = &volume->collider;

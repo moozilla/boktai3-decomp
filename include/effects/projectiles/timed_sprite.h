@@ -1,7 +1,7 @@
 #ifndef GUARD_TIMED_SPRITE_H
 #define GUARD_TIMED_SPRITE_H
 
-#include "scene/actor/contact_collider.h"
+#include "scene/collision/contact_collider.h"
 #include "engine/video/display_sequence.h"
 #include "engine/video/sprite.h"
 #include "engine/task.h"

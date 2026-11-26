@@ -1,5 +1,5 @@
-#include "objects/pile_driver/scene_panel_subject.h"
-void ScenePanelSubject_SetState(struct ScenePanelSubject *owner, u32 state)
+#include "objects/pile_driver/pile_driver_subject.h"
+void PileDriverSubject_SetState(struct ScenePanelSubject *owner, u32 state)
 {
     struct ScenePanelSubject *subject = (void *)owner;
     subject->state = state;

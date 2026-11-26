@@ -44,7 +44,7 @@ const MENUS = {
   // States 1 and 5 skip the logo animation with A (after 10 frames / once), state 6
   // is PRESS START (A or START once timer > 1 << fadeShift), state 8 the menu
   // (left/right, A or START picks selection; 0 = start the game).
-  Params3D0_UpdateDisplay: {
+  CutsceneDisplay_UpdateDisplay: {
     struct: null,
     view: (a) => ({ get selection() { return g.u32(a + 0x724) | 0; }, get count() { return g.u32(a + 0x728) | 0; },
       get state() { return g.u32(a + 0x72c); }, get fadeShift() { return g.u32(a + 0x738) | 0; },

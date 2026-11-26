@@ -1,6 +1,6 @@
 #include "global.h"
 #include "ui/pause/scene_hud_display.h"
-#include "ui/town/scene_item_values.h"
+#include "ui/town/shop_item_values.h"
 void sub_08173450(void *);
 u32 Inventory_GetEquipmentId(u32);
 void ActionRecord_CopyFromEntry(void *, void *);

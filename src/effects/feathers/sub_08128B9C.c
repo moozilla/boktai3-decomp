@@ -1,6 +1,6 @@
 #include "effects/feathers/feather_effect_pool.h"
 #include "engine/ram.h"
-#include "player/cues/player_cue_sequence.h"
+#include "player/cutscene/player_cue_sequence.h"
 static inline void SelectDirection(u8 *angle, u8 *row, u8 *flip)
 {
     u32 quadrant = ((*angle + 0x60) >> 6) & 3;

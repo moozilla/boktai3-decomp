@@ -7,7 +7,7 @@ s32 DisplayAnimation_TestFinished(void *);
 void TimedSpriteEffect_Create(struct Vec081CBE30 *, s32, s32, s32, s32, s32, s32, s32, s32);
 /* Three-phase attack: play the wind-up, spawn an effect above the actor on
  * frame 15, then the follow-through after 0x56 frames. */
-void StateActor_UpdateDelayedAttackEffect(u8 *a, u8 *b, s32 inputFrame)
+void StoryCharacter_UpdateDelayedAttackEffect(u8 *a, u8 *b, s32 inputFrame)
 {
     s32 frame = inputFrame;
     u32 anim;

@@ -1,6 +1,6 @@
 # ScenePanel subject initializer
 
-Reviewed range: **0805D92C–0805DCAC**, one new **896-byte exact function (+0.0371 percentage points)**. `ScenePanelSubject_Initialize` retains thirteen locally minimized hints: eleven in the shared playback expressions and two for a scoped R2 limit pointer. It is marked as a register-pinning concession. No explicit R7 binding or instruction body is used. The DCAC creator starts the next function and is excluded.
+Reviewed range: **0805D92C–0805DCAC**, one new **896-byte exact function (+0.0371 percentage points)**. `PileDriverSubject_Initialize` retains thirteen locally minimized hints: eleven in the shared playback expressions and two for a scoped R2 limit pointer. It is marked as a register-pinning concession. No explicit R7 binding or instruction body is used. The DCAC creator starts the next function and is excluded.
 
 Arguments are subject, home position, sequence row, sequence variant, initial state, kind, contact limit, additional collider setting, and appearance delay. The first four arrive in registers; the final five are stack arguments. Home is copied as eight bytes. Row, variant and kind narrow to bytes; contact limit and delay narrow to halfwords. The halfword atDC receives the narrowed contact limit divided by6.
 

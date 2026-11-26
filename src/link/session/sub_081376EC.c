@@ -1,11 +1,11 @@
 #include "scene/actor/scene_actor_control_begin.h"
 #include "scene/terrain/terrain_sampling.h"
-#include "scene/actor/scene_actor_terrain_reaction.h"
+#include "scene/motion/scene_actor_terrain_reaction.h"
 #include "scene/actor/scene_actor_behavior.h"
-#include "scene/actor/scene_actor_chase_shared.h"
+#include "scene/motion/scene_actor_chase_shared.h"
 #include "global.h"
-#include "scene/actor/scene_actor_terrain.h"
-#include "scene/actor/scene_actor_stimulus.h"
+#include "scene/motion/scene_actor_terrain.h"
+#include "scene/collision/scene_actor_stimulus.h"
 
 s32 Callback_InvokeActor(void *, void *);
 void SceneActorAttachment_ReplaceResponseSlot(void *, u32, u32, u32);

@@ -1,6 +1,6 @@
 #ifndef GUARD_DAMAGE_NUMBER_DISPLAY_H
 #define GUARD_DAMAGE_NUMBER_DISPLAY_H
-#include "scene/actor/contact_actor.h"
+#include "scene/collision/contact_actor.h"
 #include "engine/video/render.h"
 #include "ui/hud/damage_number_source.h"
 /* Tentative floating-number family: four groups, each with four 0x28 glyphs. */

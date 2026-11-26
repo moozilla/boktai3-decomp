@@ -1,7 +1,7 @@
 #include "global.h"
 #include "engine/engine_globals.h"
 #include "engine/ram.h"
-#include "scene/actor/contact_position.h"
+#include "scene/collision/contact_position.h"
 /* SceneActors_SpawnDestructionParticles_0817ABEC: same as SceneActors_SpawnDestructionParticles but spawns the sparks on the object itself (provisional name) */
 void SparkParticle_Spawn(void *, int, void *, int, int, int, int, int);
 void SceneActors_SpawnDestructionParticles_0817ABEC(u8 *p)

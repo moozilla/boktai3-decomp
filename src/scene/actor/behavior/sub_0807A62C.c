@@ -1,5 +1,5 @@
 #include "scene/actor/scene_actor_update.h"
-#include "scene/actor/scene_actor_availability.h"
+#include "scene/motion/scene_actor_availability.h"
 #include "engine/word_flags.h"
 void SceneActorBehavior_UpdateColliders(struct RoomActor *);
 static inline u8 Inactive(struct RoomActor *actor)

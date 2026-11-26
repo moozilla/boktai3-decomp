@@ -52,7 +52,7 @@ void PlayStats_SetState(struct PlayStatsScreen *screen, u32 screenId)
 void PlayStats_RemoveAnimations(struct PlayStatsScreen *screen)
 {
     s32 i;
-    struct SceneInputWidget *animation = screen->entries;
+    struct AnimSprite *animation = screen->entries;
     for (i = 7; i >= 0; i--) {
         Anim_Remove(animation);
         animation++;
@@ -226,7 +226,7 @@ void PlayStats_UpdateResults(struct PlayStatsScreen *task)
             if (task->timer <= 0x3b) {
                 void *frames = task->resources;
                 const u16 *table = gRandomTable;
-                struct SceneInputWidget *entry = task->entries;
+                struct AnimSprite *entry = task->entries;
                 u32 *cursor = &gRandomIndex;
                 for (i = 7; i >= 0; i--) {
                     u32 random;
@@ -308,7 +308,7 @@ void PlayStats_UpdateResults(struct PlayStatsScreen *task)
             PlayStats_TakeFlag(task, 2);
             if (task->timer > 0x3c) {
                 {
-                    struct SceneInputWidget *entry = &task->entries[9];
+                    struct AnimSprite *entry = &task->entries[9];
                     entry->flags &= ~1;
                 }
                 PlayStats_Enter(task, 6);
@@ -389,7 +389,7 @@ void PlayStats_InitializeWidgets(struct PlayStatsScreen *screen)
     u8 data[8];
     struct SceneInputPackedPosition dims;
     int i;
-    struct SceneInputWidget *widget;
+    struct AnimSprite *widget;
 
     memcpy(data, gUnk_0824F999, 8);
     dims.y = 0x38;
@@ -398,7 +398,7 @@ void PlayStats_InitializeWidgets(struct PlayStatsScreen *screen)
     for (i = 0; i <= 7; i++) {
         dims.x = data[i];
         Widget_InitLinked(&screen->entries[i], &screen->resources[0], 0, 0x30, 0, 0, 0x3c, &dims);
-        SceneInputWidget_Hide(&screen->entries[i]);
+        AnimSprite_Hide(&screen->entries[i]);
     }
 
     Widget_InitLinked(&screen->entries[8], &screen->resources[0], 0x3c, 0x30, 0, 0, 0x3c, NULL);
@@ -410,7 +410,7 @@ void PlayStats_InitializeWidgets(struct PlayStatsScreen *screen)
 
 void PlayStats_LoadResources(struct PlayStatsScreen *screen)
 {
-    struct SceneInputResource *r;
+    struct AnimSpriteResource *r;
     r = ScriptProc_Start(0xCB05, 0xE2AB);
     screen->resources[0] = *r;
     ResourceHeader_Relocate(&screen->resources[0], r);

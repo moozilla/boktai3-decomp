@@ -1,7 +1,7 @@
 #include "monsters/skeleton/skeleton.h"
 #include "monsters/golem/golem.h"
-#include "scene/actor/scene_actor_contact_response.h"
-#include "scene/actor/scene_actor_chase_shared.h"
+#include "scene/collision/scene_actor_contact_response.h"
+#include "scene/motion/scene_actor_chase_shared.h"
 #include "engine/word_flags.h"
 
 /* Resolve contact flags, animation, and pursuit routing. The normal chase
@@ -401,7 +401,7 @@ s32 Skeleton_Init(void *object)
     MonsterInit_InstallSequenceCallbacks(
         actor, Skeleton_Update, SceneActorReaction_SelectTileParameter, Skeleton_TurnTowardRouteFacing,
         Skeleton_UpdateInactiveState, Skeleton_UpdateIdleState,
-        TentacleBody_UpdateReactionTransition, Skeleton_ConvergeDisplacedPosition,
+        Skeleton_UpdateReactionTransition, Skeleton_ConvergeDisplacedPosition,
         Skeleton_UpdateDefeat, SceneActorReaction_OnEnemyDefault,
         SceneActorTarget_UpdateTrackedContact, SceneActorTarget_ResolvePendingObjectSkeleton,
         SceneActorReaction_ResolvePlacementDamage, SceneActorPlacement_ResetStateThree);

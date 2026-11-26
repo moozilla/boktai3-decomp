@@ -1,7 +1,7 @@
 #include "global.h"
 
 #include "effects/screen/background_controller.h"
-#include "scene/actor/contact_position.h"
+#include "scene/collision/contact_position.h"
 #include "engine/math/monster_particle_random.h"
 
 struct Camera {

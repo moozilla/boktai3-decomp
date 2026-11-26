@@ -1,5 +1,5 @@
 #include "global.h"
-/* TentacleActor_InitSegmentColliders: Sets up body and attack colliders for every tentacle segment */
+/* Centipede_InitSegmentColliders: Sets up body and attack colliders for every tentacle segment */
 
 struct TentaclePacked {
     s32 x : 16, y : 16, z : 16, pad : 16;
@@ -10,8 +10,8 @@ void Collider_SetBodyProperties(void *, u32, u32, u32);
 void Collider_SetPosition(void *, void *, s32);
 void Collider_SetCallback(void *, void *, void *);
 void Collider_SetAttackProperties(void *, s32, s32, s32, s32, s32);
-void TentacleActor_ReactToContact(void);
-void TentacleActor_OnSegmentAttackCollision(void);
+void Centipede_ReactToContact(void);
+void Centipede_OnSegmentAttackCollision(void);
 
 struct Body080AAE64 {
     u8 pad0[0x3d4];
@@ -36,7 +36,7 @@ static inline void SetAttack(void *collider, u8 *p, s32 variant)
     Collider_SetAttackProperties(collider, a, b, 0, c, d);
 }
 
-void TentacleActor_InitSegmentColliders(u8 *p)
+void Centipede_InitSegmentColliders(u8 *p)
 {
     struct Body080AAE64 *g = *(struct Body080AAE64 **)(p + 0x3d0);
     struct TentaclePacked size, offset;
@@ -55,7 +55,7 @@ void TentacleActor_InitSegmentColliders(u8 *p)
         Collider_Init(collider, *(u32 *)(p + 0x50), 0x4109, 0, 16, &size, &offset);
         Collider_SetBodyProperties(collider, *(u8 *)(p + 0x9e), 0, 0);
         Collider_SetPosition(collider, position, 0);
-        Collider_SetCallback(collider, TentacleActor_ReactToContact, owner);
+        Collider_SetCallback(collider, Centipede_ReactToContact, owner);
     }
     {
         u32 zero = 0;
@@ -75,6 +75,6 @@ void TentacleActor_InitSegmentColliders(u8 *p)
         Collider_Init(collider, *(u32 *)(p + 0x50), 0x2401, 0, 16, &size, &offset);
         SetAttack(collider, p, 0);
         Collider_SetPosition(collider, position, 0);
-        Collider_SetCallback(collider, TentacleActor_OnSegmentAttackCollision, owner);
+        Collider_SetCallback(collider, Centipede_OnSegmentAttackCollision, owner);
     }
 }

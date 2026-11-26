@@ -1,11 +1,11 @@
 #include "global.h"
-#include "monsters/centipede/tentacle_segment_animation.h"
+#include "monsters/centipede/centipede_segment_animation.h"
 #include "engine/video/display_animation.h"
 #include "engine/video/display_sequence_inline.h"
 // MATCHING_CONCESSION: register-pinning
 
 void *SceneActorProfiles_GetEntryAddress(u32, u32, s32);
-void TentacleBody_GetDirectionFrame(u16, s32 *, s32 *);
+void CentipedeBody_GetDirectionFrame(u16, s32 *, s32 *);
 void Anim_RestartSequence(void *, void *, u32, u8, u8);
 void Anim_SetDurationScale(void *, u32);
 static inline u8 TestMask4(struct TentacleSegmentAnimation *p, u32 mask)
@@ -24,7 +24,7 @@ static inline u8 TestMask(struct TentacleSegmentAnimation *p, u32 mask)
         return 1;
     return 0;
 }
-void TentacleBody_RestartSegmentAnimations(struct TentacleBodyAnimationView *input, s32 kindIn,
+void CentipedeBody_RestartSegmentAnimations(struct TentacleBodyAnimationView *input, s32 kindIn,
                                            s32 rowIn, s32 flagsIn)
 {
     struct TentacleBodyAnimationView *body = input;

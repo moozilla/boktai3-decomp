@@ -1,5 +1,5 @@
-#include "ui/town/scene_inventory_actions.h"
-void SceneInventory_RefreshEquipmentValue(struct SceneInventoryActionView *panel)
+#include "ui/town/shop_actions.h"
+void Shop_RefreshEquipmentValue(struct SceneInventoryActionView *panel)
 {
     struct SceneInputPosition position;
     s32 kind, value, label;

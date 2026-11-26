@@ -4,7 +4,7 @@ struct ScenePanelPairSequence {
     u8 state, cursor, transition;
 };
 void Vanargand_UpdateModeEffect(struct ScenePanelPairSequence *);
-void ScenePanel_SelectPairTransition(struct ScenePanelPairSequence *panel, const u8 table[][3])
+void VanargandPair_SelectPairTransition(struct ScenePanelPairSequence *panel, const u8 table[][3])
 {
     do {
         panel->transition = table[panel->state][panel->cursor];

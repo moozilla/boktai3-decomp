@@ -1,6 +1,6 @@
-#include "npc/sabata_rider/script_puppet.h"
+#include "npc/sabata_rider/sabata_rider.h"
 
-struct RegistryActor *RegistryA8CB_FindOwnedEntry(void *owner)
+struct RegistryActor *SabataRider_FindOwnedEntry(void *owner)
 {
     RegistryActorManager *manager;
     s32 index;
@@ -15,13 +15,13 @@ struct RegistryActor *RegistryA8CB_FindOwnedEntry(void *owner)
     return NULL;
 }
 
-void RegistryA8CB_StartFallFromScript(void)
+void SabataRider_StartFallFromScript(void)
 {
     struct RegistryActor *object;
     s32 id = Script_GetKeywordValue('n', -1);
     if (id < 0)
         return;
-    object = RegistryA8CB_FindOwnedEntry((void *)id);
+    object = SabataRider_FindOwnedEntry((void *)id);
     if (object) {
         RegistryActor_StartMotion(object, ActorMotion_UpdateFallFrame);
         RegistryActor_SetMotionFlags(REGISTRY_ACTOR_MOTION_COMMANDS, &object->control.motion);
@@ -33,7 +33,7 @@ static inline void ClearDrawFlags(struct RegistryActorMotion *draw, s32 mask)
     draw->flags &= mask;
 }
 
-void RegistryA8CB_DisableCommandsFromScript(void)
+void SabataRider_DisableCommandsFromScript(void)
 {
     s32 name;
     struct RegistryActor *object;
@@ -41,19 +41,19 @@ void RegistryA8CB_DisableCommandsFromScript(void)
     name = Script_GetKeywordValue('n', -1);
     if (name < 0)
         return;
-    object = RegistryA8CB_FindOwnedEntry((void *)name);
+    object = SabataRider_FindOwnedEntry((void *)name);
     if (object == NULL)
         return;
     ClearDrawFlags(&object->control.motion, ~REGISTRY_ACTOR_MOTION_COMMANDS);
 }
 
-void RegistryA8CB_ResetUpdateState(struct RegistryActor *actor)
+void SabataRider_ResetUpdateState(struct RegistryActor *actor)
 {
     actor->control.updateFlags = 0;
     SceneActor_DispatchCommands(actor);
 }
 
-void RegistryA8CB_UpdateAnimation(struct RegistryActor *actor)
+void SabataRider_UpdateAnimation(struct RegistryActor *actor)
 {
     u32 flags;
     Character_UpdateTimedEffect(&actor->stats.pendingDamage);
@@ -68,9 +68,9 @@ s32 ActorAction_RunActiveCallbacks(RegistryActorManager *manager)
     for (i = 0; i < REGISTRY_ACTOR_SLOT_COUNT; i++) {
         struct RegistryActor *actor = &manager->actors[i];
         if (actor->control.active == 1) {
-            RegistryA8CB_ResetUpdateState(actor);
+            SabataRider_ResetUpdateState(actor);
             Callback_InvokeActor(actor, actor->control.update);
-            RegistryA8CB_UpdateAnimation(actor);
+            SabataRider_UpdateAnimation(actor);
         }
     }
     return 0;
@@ -108,13 +108,13 @@ u8 ActorManager_Destroy(RegistryActorManager *manager)
     return 0;
 }
 
-s32 RegistryA8CB_InitManager(RegistryActorManager *manager)
+s32 SabataRider_InitManager(RegistryActorManager *manager)
 {
     gActorManager = manager;
     return 0;
 }
 
-RegistryActorManager *RegistryA8CB_EnsureManager(void)
+RegistryActorManager *SabataRider_EnsureManager(void)
 {
     RegistryActorManager *manager;
     if (gActorManager != 0)
@@ -123,7 +123,7 @@ RegistryActorManager *RegistryA8CB_EnsureManager(void)
     if (manager != 0) {
         Task_SetCallbacks(manager, (void (*)(void *))ActorAction_RunActiveCallbacks,
                           (void (*)(void *))ActorManager_Destroy);
-        if (RegistryA8CB_InitManager(manager) < 0) {
+        if (SabataRider_InitManager(manager) < 0) {
             Task_Kill(manager);
             return 0;
         }

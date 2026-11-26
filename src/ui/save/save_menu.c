@@ -1,5 +1,5 @@
 #include "ui/save/save_menu.h"
-#include "scene/area_effect/area_effect_link.h"
+#include "scene/areas/area_effect_link.h"
 #include "engine/input.h"
 #include "ui/dialogue/scrolling_dialogue.h"
 
@@ -9,9 +9,9 @@ u8 Save_CopySelectedStateToAlternateSlot(void);
 
 u8 Save_ToggleSelectedSlot(void);
 
-void Registry1745_RequestHandshakeContinue(void);
+void LinkSession_RequestHandshakeContinue(void);
 
-void Registry1745_RequestHandshakeFinish(void);
+void LinkSession_RequestHandshakeFinish(void);
 
 void ScreenTransition_SendCommand(s32, s32, s32, s32, s32, s32, s32);
 
@@ -55,7 +55,7 @@ void LinkScorePanel_CreateTextWindows(struct SaveMenu *);
 
 void LinkScorePanel_RefreshPlayerName(struct SaveMenu *);
 
-s32 Registry1745_GetSessionState(void *);
+s32 LinkSession_GetSessionState(void *);
 
 static inline void SetUpdate(struct SaveMenu *menu, void (*update)(struct SaveMenu *), u8 state)
 {
@@ -97,7 +97,7 @@ void SaveMenu_UpdateSaveDelay(struct SaveMenu *menu)
         if (!(u8)Save_CopySelectedStateToAlternateSlot()) {
             SetUpdate(menu, SaveMenu_UpdateSaveFailure, 8);
         } else {
-            Registry1745_RequestHandshakeContinue();
+            LinkSession_RequestHandshakeContinue();
             SetUpdate(menu, SaveMenu_WaitForSaveTransition, 5);
         }
     } else {
@@ -136,7 +136,7 @@ void SaveMenu_UpdateExitDelay(struct SaveMenu *menu)
     if (menu->timer == 120) {
         ScreenTransition_SendCommand(3, 4, 4, 4, 4, 0xFFFF, 0);
     } else if (menu->timer > 140) {
-        Registry1745_RequestHandshakeFinish();
+        LinkSession_RequestHandshakeFinish();
         return;
     }
     menu->timer++;
@@ -258,7 +258,7 @@ void SaveMenu_UpdateScoreReveal(struct SaveMenu *menu)
 
 s32 SaveMenu_Update(struct SaveMenu *menu)
 {
-    if (Registry1745_GetSessionState(menu) == 0) {
+    if (LinkSession_GetSessionState(menu) == 0) {
         ScrollingDialogue_HideImmediately();
         Task_Kill(menu);
         return -1;

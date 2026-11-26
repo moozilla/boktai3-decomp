@@ -158,8 +158,8 @@ Weather_IsInterrupted helper binds 1024 to a local. Giving it an integer mask
 parameter and passing 1024 from the caller matches all 496 bytes. Both spellings
 therefore carry the same evidence for the pause operation.
 
-There is direct ABI evidence for both styles of interface. ContactSequenceActor_SetFlags
-and ClearFlags (08045D18, 08045D20) operate on an actor. RegistryE7BC_SetFlags and
+There is direct ABI evidence for both styles of interface. NidhoggrDuelMinion_SetFlags
+and ClearFlags (08045D18, 08045D20) operate on an actor. ScriptObjectPool_SetFlags and
 ClearFlags (0811B774, 0811B77C) operate on a pointer. Weather_TestFlags at 08017468
 takes two values. These distinct entry points justify their respective APIs. They
 cannot identify an inlined call at an unrelated site.

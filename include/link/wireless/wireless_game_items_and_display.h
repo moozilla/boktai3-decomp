@@ -1,7 +1,7 @@
 #ifndef GUARD_WIRELESS_GAME_ITEMS_AND_DISPLAY_H
 #define GUARD_WIRELESS_GAME_ITEMS_AND_DISPLAY_H
 #include "engine/engine.h"
-#include "ui/widgets/scene_input_widget.h"
+#include "engine/video/anim_sprite.h"
 #include "link/wireless/wireless_trade_menu.h"
 
 /* Layouts recovered from the item state handlers and display lifecycle.
@@ -66,16 +66,16 @@ struct WirelessGameItems {
     struct Task task;
     u8 current[4], pending[4];
     u8 sprite[0x1c]; /* animation-data descriptor, not a sprite instance */
-    struct SceneInputResource resource;
+    struct AnimSpriteResource resource;
     struct WirelessGameItem items[16];
 };
 struct WirelessGameDisplay {
     struct Task task;
     u32 timer;
     u8 state, entered, finished, unk1F;
-    struct SceneInputResource resource;
+    struct AnimSpriteResource resource;
     struct WirelessGameDrawing drawings[4];
-    struct SceneInputResource extraResource;
+    struct AnimSpriteResource extraResource;
     struct WirelessGameDrawing extra[2];
 };
 /* 0x02000100 */

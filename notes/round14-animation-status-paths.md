@@ -46,7 +46,7 @@ bytes instead of 228. The actual owning type already exists in
 | `0xB43` | `animationComplete` |
 
 The accepted source takes a `SceneCombatActor *`, uses those members, and
-uses the existing `SceneInputWidget` for the animation at `+0xB4`. The status
+uses the existing `AnimSprite` for the animation at `+0xB4`. The status
 member is an ordinary `u8`. This removes the volatile read, its temporary
 byte pointer/value, the unused private status bitfield, the private
 three-word animation view, the unused `TestFlag` helper, and an obsolete

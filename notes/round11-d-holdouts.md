@@ -185,7 +185,7 @@ The list below contains only functions still open at this checkpoint, in ROM ord
   The foreground drawable now uses the verified departure actor layout. A prior trial narrowed the shake-field offsets 0x5E0, 0x5E6 and 0x5E8 to bytes and addressed the wrong members. It has been excluded. The correctly typed ordinary draft differs in 27 assembly rows. The checked-in function has one original horizontal-sum binding.
   The foreground and accent share their 0x48-byte drawable type. The foreground, accent and background test three different halfwords at 0x5E4, 0x5EC and 0x5EE. The background uses a signed load, and the common screen origin at 0x5E0 is preserved at its full offset.
 
-- **081EF914 · SingletonSlot7_UpdateEndingScene**
+- **081EF914 · VanargandHead_UpdateEndingScene**
   Removing 7 local constraints changes 122 normalized assembly rows across 86 regions.
   Separate field-address and payload lifetimes through typed owner accessors (closest owner_sprite_1). The retained draft differs in 122 aligned assembly rows.
   The shared slot-7 entry helper removes the entry-result pin. The ending-scene foreground and sequence flags now use the departure display types, with four prior bindings remaining.
@@ -230,7 +230,7 @@ The list below contains only functions still open at this checkpoint, in ROM ord
   Both flip axes now use the shared command reader. Two operand constraints remain in the sprite and velocity paths.
   The live projectile slot is 0x128 bytes and the copied configuration is 0x5C. The updater, spawner and allocation routines now use the same slot, signed motion and collider layout.
 
-- **0820EE34 · OrangeSpine_ApplyHitReaction**
+- **0820EE34 · PlasmaCannon_ApplyHitReaction**
   The damage handler’s empty outputs are consumed only by empty operands.
   Tested direct reaction and HUD member stores, a separately evaluated spark guard, and named RNG storage through the Orange Spine damage and spark paths. The retained draft differs in 74 aligned assembly rows.
 

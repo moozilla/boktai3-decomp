@@ -1,7 +1,7 @@
-#include "ui/town/scene_inventory_states.h"
-void SceneInventory_BeginItemSelection(struct SceneInventoryControlView *panel)
+#include "ui/town/shop_states.h"
+void Shop_BeginItemSelection(struct SceneInventoryControlView *panel)
 {
-    SceneInventory_BeginActionSelection(panel, 1);
+    Shop_BeginActionSelection(panel, 1);
     SceneInput_SetGridFlags(&panel->grid, 0x1E);
-    SceneInventory_UpdateModePrompt(panel, 1);
+    Shop_UpdateModePrompt(panel, 1);
 }

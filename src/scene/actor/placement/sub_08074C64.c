@@ -1,4 +1,4 @@
-#include "scene/actor/scene_actor_collision.h"
+#include "scene/collision/scene_actor_collision.h"
 void SceneActorCollision_InitBodyWithFlags(struct ChaseActor *actor, void *inputSize,
                                            void *inputOffset, void *inputCallback, void *owner,
                                            u32 flags)

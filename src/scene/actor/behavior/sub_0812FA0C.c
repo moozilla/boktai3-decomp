@@ -1,8 +1,8 @@
 #include "global.h"
 #include "player/player.h"
-#include "scene/actor/scene_actor_chase_reaction.h"
+#include "scene/motion/scene_actor_chase_reaction.h"
 #include "scene/actor/scene_actor_reaction.h"
-#include "scene/actor/scene_actor_delayed_response.h"
+#include "scene/collision/scene_actor_delayed_response.h"
 #include "scene/actor/scene_actor_control_phase.h"
 
 /* This class's own copies of the shared chase inlines it compiles differently. */

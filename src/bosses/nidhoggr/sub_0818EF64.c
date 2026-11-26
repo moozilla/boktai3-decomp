@@ -1,5 +1,5 @@
 #include "global.h"
-#include "player/cues/player_cue_sequence.h"
+#include "player/cutscene/player_cue_sequence.h"
 
 struct NidhoggrEffectMotion {
     u16 x, y, z, unknown6;

@@ -1,6 +1,6 @@
 #include "objects/pile_driver/scene_panel.h"
-void ScenePanel_BeginForwardSequence(struct ScenePanel *panel)
+void PileDriver_BeginForwardSequence(struct ScenePanel *panel)
 {
-    ScenePanel_SetChannelValue(panel, 2, 3);
-    ScenePanel_SetState(panel, ScenePanel_TickForwardThree);
+    PileDriver_SetChannelValue(panel, 2, 3);
+    PileDriver_SetState(panel, PileDriver_TickForwardThree);
 }

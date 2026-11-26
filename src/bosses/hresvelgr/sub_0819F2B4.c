@@ -6,7 +6,7 @@
 
 #include "bosses/hresvelgr/hresvelgr_travel.h"
 #include "engine/math/scene_vec_polar.h"
-#include "effects/scene/bat_flock.h"
+#include "effects/bat_flock.h"
 
 struct ReactionIds {
     u32 a, b;

@@ -1,5 +1,5 @@
 #include "objects/pile_driver/scene_panel.h"
-s32 ScenePanel_GetPaletteOffset(struct ScenePanel *panel)
+s32 PileDriver_GetPaletteOffset(struct ScenePanel *panel)
 {
     s32 result;
     switch (panel->paletteMode) {

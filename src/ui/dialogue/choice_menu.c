@@ -357,7 +357,7 @@ s32 MessageWindow_GetSoundMode(void);
 
 s32 ChoiceMenu_Initialize(struct ChoiceMenu *p, void *window, s32 stringBase, s32 *options)
 {
-    struct SceneInputResource *resource;
+    struct AnimSpriteResource *resource;
     struct SceneInputPackedPosition position;
     s32 initial;
     u16 *palette;

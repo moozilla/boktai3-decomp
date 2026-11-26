@@ -1,4 +1,4 @@
-#include "scene/actor/scene_actor_terrain_reaction.h"
+#include "scene/motion/scene_actor_terrain_reaction.h"
 #include "global.h"
 #include "scene/actor/scene_actor_reaction.h"
 /* When flags2D0 bit 27 and flags2D4 bit 13 are set and field2B8 is live, switch to control kind 29 (SceneActorReaction_UpdateTimedBurst) and reset hit state. */

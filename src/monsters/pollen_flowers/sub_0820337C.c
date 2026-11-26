@@ -1,5 +1,5 @@
 #include "global.h"
-#include "player/cues/player_cue_sequence.h"
+#include "player/cutscene/player_cue_sequence.h"
 #include "engine/video/display_animation.h"
 #include "engine/math/scene_vec.h"
 
@@ -27,7 +27,7 @@ void SceneBody_Init(void *, void *, void *, u32, u32, void *);
 void SceneBody_SetSprite(void *, void *);
 s32 TerrainOverlay_QueueAddActor(void *);
 void ProximitySequence_TestPlayerDistance(void);
-s32 CannonEmitter_InitializeFromScript(struct CannonEmitter *p, void *parent)
+s32 PollenFlower_InitializeFromScript(struct CannonEmitter *p, void *parent)
 {
     if (Script_SeekToKeyword('p')) {
         p->initialPosition.x = Script_GetValue();

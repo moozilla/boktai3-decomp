@@ -1,6 +1,6 @@
 #include "monsters/chase_actor.h"
 #include "global.h"
-#include "scene/actor/scene_actor_chase_shared.h"
+#include "scene/motion/scene_actor_chase_shared.h"
 struct Pos080A97AC {
     u32 v[2];
 };
@@ -30,7 +30,7 @@ inline static u8 TestMask(struct Entry080A97AC *e, char mask)
     return 0;
 }
 
-void TentacleActor_TargetMarkedSegment(struct ChaseActor *actor)
+void Centipede_TargetMarkedSegment(struct ChaseActor *actor)
 {
     struct Group080A97AC *g = actor->base.context;
     s32 found = 0xff;

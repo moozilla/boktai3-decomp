@@ -1,6 +1,6 @@
-#include "scene/actor/scene_actor_contact_response.h"
+#include "scene/collision/scene_actor_contact_response.h"
 #include "scene/actor/scene_actor_reset.h"
-#include "scene/actor/scene_actor_contact_list.h"
+#include "scene/collision/scene_actor_contact_list.h"
 #include "scene/actor/scene_actor_behavior.h"
 struct SceneActorTargetLink {
     u8 *target;

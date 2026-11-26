@@ -4,10 +4,10 @@
 /* Tentative role names; the offsets are established by palette consumers. */
 struct SceneInventoryCategoryMenu {
     u8 unknown0[0x13F8];
-    struct SceneInputWidget categoryWidget;
-    struct SceneInputWidget targetWidget;
+    struct AnimSprite categoryWidget;
+    struct AnimSprite targetWidget;
 };
-void SceneInventory_SetCategoryPalette(struct SceneInventoryCategoryMenu *p, u16 *colors)
+void Storage_SetCategoryPalette(struct SceneInventoryCategoryMenu *p, u16 *colors)
 {
     u16 *palette = (u16 *)(gPaletteBankData + 0x7540);
     p->categoryWidget.palette = palette;

@@ -4,7 +4,7 @@
 #include "effects/particles/scene_callback_pool.h"
 #include "scene/actor/actor_attachment_state.h"
 #include "effects/screen/background_controller.h"
-#include "player/cues/player_cue_sequence.h"
+#include "player/cutscene/player_cue_sequence.h"
 
 u32 ActorEffect_SpawnAtActorPos(struct ScenePoolActor *actor, struct ContactPosition *offset,
                                 const struct ContactPosition *velocity, u32 resourceId,

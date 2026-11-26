@@ -2,7 +2,7 @@
 
 u32 Trigger_ConsumePending(void *, u32);
 
-void ScenePanel_UpdateTimedExit(struct VanargandPairAttack *panel)
+void VanargandPair_UpdateTimedExit(struct VanargandPairAttack *panel)
 {
     if (Vanargand_ConsumeActionEntry(panel))
         Vanargand_EnterAction(panel, 3);

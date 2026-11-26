@@ -10,7 +10,7 @@ enum ResultMarkerFeedbackPhase {
 void ResultMenu_UpdateMarkers(struct ResultMenu *p)
 {
     struct ResultMarkerFeedback *s = p->markerFeedback;
-    struct SceneInputWidget *g = &p->widgets[6];
+    struct AnimSprite *g = &p->widgets[6];
     int i;
     for (i = 0; i < 5; i++, s++, g++) {
         switch (s->phase) {

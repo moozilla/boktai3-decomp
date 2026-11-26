@@ -1,6 +1,6 @@
 #ifndef GUARD_SPARK_PARTICLE_H
 #define GUARD_SPARK_PARTICLE_H
-#include "scene/actor/contact_swarm.h"
+#include "scene/collision/contact_swarm.h"
 #include "engine/task.h"
 /* Tentative identity: forty-eight independent moving tile-animation particles. */
 struct SparkParticleResource {

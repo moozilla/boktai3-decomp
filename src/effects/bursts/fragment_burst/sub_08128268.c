@@ -1,6 +1,6 @@
 #include "global.h"
 #include "engine/video/display_sequence.h"
-#include "scene/actor/contact_position.h"
+#include "scene/collision/contact_position.h"
 
 struct FragmentSprite {
     u32 flags;

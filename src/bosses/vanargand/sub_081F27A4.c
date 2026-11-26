@@ -1,7 +1,7 @@
 #include "bosses/vanargand/sprite_trail.h"
 #include "scene/collision/spatial_index.h"
 
-void SingletonSlot7_OnEffectMotionComplete(void *, struct SpatialEntry *);
+void VanargandHead_OnEffectMotionComplete(void *, struct SpatialEntry *);
 void SpriteTrail_InitCollider(struct SpriteTrail *p)
 {
     struct ContactPosition position, size, offset;
@@ -17,5 +17,5 @@ void SpriteTrail_InitCollider(struct SpriteTrail *p)
     offset.y = 0;
     offset.z = 0;
     SpatialIndex_InitEntry(collider, &position, &size, &offset, 12, mask, 1, p->collisionArg0,
-                           p->collisionArg1, SingletonSlot7_OnEffectMotionComplete, p);
+                           p->collisionArg1, VanargandHead_OnEffectMotionComplete, p);
 }

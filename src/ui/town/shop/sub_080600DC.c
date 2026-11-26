@@ -1,5 +1,5 @@
-#include "ui/town/scene_inventory_panel.h"
-void SceneInventory_PopulateConsumableGrid(struct SceneInventoryPanel *panel)
+#include "ui/town/shop_panel.h"
+void Shop_PopulateConsumableGrid(struct SceneInventoryPanel *panel)
 {
     s32 row;
     struct SceneInventoryWidgetFlags *flagsBase;
@@ -15,7 +15,7 @@ void SceneInventory_PopulateConsumableGrid(struct SceneInventoryPanel *panel)
     for (; row <= 3; row++) {
         rowSlot = row * 4;
         for (column = 0; column <= 3; column++) {
-            struct SceneInputWidget *widget;
+            struct AnimSprite *widget;
             s32 flagIndex;
             slot = rowSlot + column;
             flagIndex = slot + 5;
@@ -33,7 +33,7 @@ void SceneInventory_PopulateConsumableGrid(struct SceneInventoryPanel *panel)
         }
     }
     for (row = 0; row <= 1;) {
-        struct SceneInputWidget *widget;
+        struct AnimSprite *widget;
         struct SceneInventoryWidgetFlags *entry;
         u32 flagIndex;
         u32 offset;
@@ -43,7 +43,7 @@ void SceneInventory_PopulateConsumableGrid(struct SceneInventoryPanel *panel)
         flagIndex = cursor + 21;
         offset = ((row << 3) + cursor) << 5;
         {
-            struct SceneInputWidget *base = panel->display.secondary;
+            struct AnimSprite *base = panel->display.secondary;
             widget = (void *)(offset + (u32)base);
         }
         entry = (void *)(flagIndex * 0x60 + (u32)flagsBase);

@@ -168,7 +168,7 @@ every warning.
   cursor, pool, state-update, heap, and registry sites. Their results are in the
   evidence catalogue. The newly assigned SpriteEffectController/RouteSprite/
   Feather pool investigations continue separately for checkpoint four.
-* **Previously deep-reviewed families.** The four BoardPiece_Wander wrappers,
+* **Previously deep-reviewed families.** The four BatFlockBat_Wander wrappers,
   three palette-controller wrappers, three modifier-result wrappers, and three
   retreat/random wrappers in `0804373C` remain covered by the earlier wrapper
   and proved-zero reviews. Their status stays open; this pass does not recast

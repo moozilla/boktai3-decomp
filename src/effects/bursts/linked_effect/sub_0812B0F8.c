@@ -1,6 +1,6 @@
 #include "global.h"
 /* Tentative family name; visual identity is not yet established. */
-#include "scene/actor/contact_actor.h"
+#include "scene/collision/contact_actor.h"
 #include "engine/ram.h"
 #define ActorEffect_CreateManager FragmentProjectilePool_GetOrCreate
 #define ActorEffect_Allocate      FragmentProjectilePool_AllocSprite

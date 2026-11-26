@@ -1,5 +1,5 @@
 #include "global.h"
-#include "objects/pile_driver/scene_panel_rig.h"
+#include "objects/pile_driver/pile_driver_rig.h"
 
 struct GlowOwner {
     u8 pad0[0x1A];

@@ -1,5 +1,5 @@
 #include "ui/widgets/scene_input.h"
-void SceneInput_BeginChoice(struct SceneInputWidget *widget, void *resource, u8 *selection,
+void SceneInput_BeginChoice(struct AnimSprite *widget, void *resource, u8 *selection,
                             u32 initial, u8 *blink)
 {
     widget->flags &= ~1;

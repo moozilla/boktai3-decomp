@@ -1,5 +1,5 @@
-#include "objects/pile_driver/scene_panel_effects.h"
-void ScenePanel_UpdateParticles(struct ScenePanel *input)
+#include "objects/pile_driver/pile_driver_effects.h"
+void PileDriver_UpdateParticles(struct ScenePanel *input)
 {
     struct ScenePanelEffectsView *panel = (void *)input;
     struct ScenePanelParticles *particles = (void *)&panel->particleResource;

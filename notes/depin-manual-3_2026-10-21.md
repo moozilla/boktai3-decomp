@@ -32,7 +32,7 @@ Near misses (instruction diff counts are for the fully unpinned code):
 * Mummy_WaitReplaceResponse: permuter score 0 only with `actor++; actor--;` (dummy), not committed. `group = actor + 0x3D4` is folded into the load offset unless pinned.
 * SpriteEffectController_UpdatePool: score 40 with a dummy `if (slot) return 0; else return 0;` that keeps slot live to the end.
 * Wireless_TryStartParentNiSend needed an empty-ish `do { } while (0)` before the wrapped form; solved with the wrapped statement.
-* SingletonSlot7_OnTargetContact / BeginScaledCooldown (2 / 3 diffs): the middle (`level <= 5`) branch allocates its 0x5F2 offset constant to r4 / r2 instead of r1; every source form of the three branches tried (about 100 combinations) gives the same.
+* VanargandHead_OnTargetContact / BeginScaledCooldown (2 / 3 diffs): the middle (`level <= 5`) branch allocates its 0x5F2 offset constant to r4 / r2 instead of r1; every source form of the three branches tried (about 100 combinations) gives the same.
 * SceneInput_TickChoice (2 diffs): original copies `confirm` (r2) into r0 and ands with keys; unpinned code copies keys and ands with r2 (commutative operand order). 300 s of permuter found nothing.
 * TemporaryAnimationPool_CreateEntry (2): `lifetime` must go through r1 (`mov r1, sb`), not r0.
 * ActorAttachment_NotifySourceState (2): bits in r1 vs r0 (best permuter score 10, `s32 k2 = 1; one = k2;` helps but is not enough).
@@ -42,7 +42,7 @@ Near misses (instruction diff counts are for the fully unpinned code):
 * StagedEffect_ShakeAndReveal / PlayShakeSequence: the random-read part is fixed with the BlendAndShake technique; the remaining pin is `state` (needs r1 while nextFrame keeps r0).
 * SceneObject_UpdateRaising: barriers keep two RMWs separate; no plain form.
 * SceneEffect_InitParticleRing: `z = 0` set in the loop must not be hoisted but must stay in r0 after the loop; a dead pre-loop set did not help here.
-* Untouched beyond the first permuter pass (scores > 200): the remaining 5+ hint functions (SceneActorRegistry_SetMovementModesFromScript, SceneInventory_BuildConsumableCatalog, SceneActorControl_ConsumePendingEntry, ActorAttachment_ReleasePartsResource, SceneInventory_ClassifyConsumableMove / EquipmentMove, SpriteEffectController_QueueColliders, SceneCommands_FadePalette, ResultGame_UpdatePlayerMarker, StageIconDisplay_TickShake, ScenePool_SelectDirectionOrRepeat, SceneActorControl_TickJitter, SceneActorPlacement_ConsumeCallbackFlag, sub_081C4708, RecordList_InitializeSprites, Nidhoggr_UpdateDistanceLimitedEffect (constant 0x180 derived from 0x182 via `subs r3,#2` unless r3 is clobbered), StatusPanel_DrawDecimalValue (mask must be a copy of the const in r1)).
+* Untouched beyond the first permuter pass (scores > 200): the remaining 5+ hint functions (SceneActorRegistry_SetMovementModesFromScript, Shop_BuildConsumableCatalog, SceneActorControl_ConsumePendingEntry, ActorAttachment_ReleasePartsResource, Shop_ClassifyConsumableMove / EquipmentMove, SpriteEffectController_QueueColliders, SceneCommands_FadePalette, ResultGame_UpdatePlayerMarker, StageIconDisplay_TickShake, ScenePool_SelectDirectionOrRepeat, SceneActorControl_TickJitter, SceneActorPlacement_ConsumeCallbackFlag, sub_081C4708, RecordList_InitializeSprites, Nidhoggr_UpdateDistanceLimitedEffect (constant 0x180 derived from 0x182 via `subs r3,#2` unless r3 is clobbered), StatusPanel_DrawDecimalValue (mask must be a copy of the const in r1)).
 
 ## New techniques
 

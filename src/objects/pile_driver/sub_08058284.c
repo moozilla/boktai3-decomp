@@ -1,8 +1,8 @@
 #include "objects/pile_driver/scene_panel.h"
-void ScenePanel_TickReverseThree(struct ScenePanel *panel)
+void PileDriver_TickReverseThree(struct ScenePanel *panel)
 {
     if (++panel->stateFrame > 7) {
-        ScenePanel_SetChannelValue(panel, 2, 2);
-        ScenePanel_SetState(panel, 0);
+        PileDriver_SetChannelValue(panel, 2, 2);
+        PileDriver_SetState(panel, 0);
     }
 }

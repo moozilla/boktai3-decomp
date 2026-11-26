@@ -27,8 +27,8 @@ struct LinkRecordPaletteCycle {
 struct LinkRecordPanel {
     struct Task task;
     void *backgroundResource, *paletteResource;
-    struct SceneInputWidget widgets[7];
-    struct SceneInputResource unknownResource, widgetResource;
+    struct AnimSprite widgets[7];
+    struct AnimSpriteResource unknownResource, widgetResource;
     u16 entryValues[7], previousValues[7];
     void *widgetScript;
     u8 unknown320[4];

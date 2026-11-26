@@ -6,7 +6,7 @@
 struct ProximityIcon {
     struct Task task;
     u16 type, radius;
-    struct SceneInputWidget animation;
+    struct AnimSprite animation;
     struct ContactPosition origin;
 };
 s32 ProximityIcon_IsPlayerNearby(struct ProximityIcon *);

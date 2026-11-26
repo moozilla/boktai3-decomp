@@ -8,7 +8,7 @@
 #define Route_GetMovementTowardCurrentPoint sub_0821E67C
 #define Route_GetNextPoint                  sub_0821E654
 #include "scene/terrain/path.h"
-#include "scene/actor/scene_actor_route.h"
+#include "scene/motion/scene_actor_route.h"
 #include "engine/engine.h"
 #include "scene/terrain/terrain_cell_probe.h"
 #include "engine/ram.h"

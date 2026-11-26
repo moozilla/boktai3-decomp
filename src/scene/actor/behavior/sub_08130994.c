@@ -1,5 +1,5 @@
 #include "scene/actor/scene_actor_control_begin.h"
-#include "scene/actor/scene_actor_terrain_reaction.h"
+#include "scene/motion/scene_actor_terrain_reaction.h"
 #include "global.h"
 #include "scene/actor/scene_actor_control_phase.h"
 void SceneActorControl_OnIdle(void);

@@ -1,7 +1,7 @@
 #include "global.h"
 
 #include "engine/video/display_animation.h"
-#include "player/cues/player_cue_sequence.h"
+#include "player/cutscene/player_cue_sequence.h"
 
 struct Ooze {
     u8 pad0[0x20];

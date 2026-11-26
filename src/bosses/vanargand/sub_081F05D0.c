@@ -1,4 +1,4 @@
-#include "bosses/vanargand/layered_boss_cooldown.h"
+#include "bosses/vanargand/vanargand_head_cooldown.h"
 #include "system/game_state/game_state.h"
 
 struct Slot7Target {
@@ -6,7 +6,7 @@ struct Slot7Target {
     struct Slot7Actor *owner;
 };
 void Sound_PlaySong(u32);
-s32 SingletonSlot7_OnTargetContact(struct Slot7Target *target, s32 event, s32 amount)
+s32 VanargandHead_OnTargetContact(struct Slot7Target *target, s32 event, s32 amount)
 {
     struct Slot7Actor *actor = target->owner;
     s32 level;

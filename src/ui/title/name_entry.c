@@ -803,7 +803,7 @@ struct ScreenParams328 {
     s32 o, c, p, f;
 };
 
-void ScreenParams328_SetFromScript(void)
+void NameEntryParams_SetFromScript(void)
 {
     if (Script_SeekToKeyword('h'))
         (*(struct ScreenParams328 *)gNamePlaceholderScript).hBlock = Script_GetPc();

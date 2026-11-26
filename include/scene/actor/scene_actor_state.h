@@ -1,7 +1,7 @@
 #ifndef GUARD_SCENE_ACTOR_STATE_H
 #define GUARD_SCENE_ACTOR_STATE_H
 
-#include "scene/actor/contact_collider.h"
+#include "scene/collision/contact_collider.h"
 #include "scene/actor/scene_actor_components.h"
 #include "scene/actor/scene_actor_group.h"
 #include "monsters/chase_actor.h"

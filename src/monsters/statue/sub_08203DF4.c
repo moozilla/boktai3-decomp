@@ -77,7 +77,7 @@ void Anim_RestartSequence(void *, void *, u32, u32, u32);
 s32 Callback_InvokeActor(void *arg, void *function);
 void SceneHud_SetTimedState(void *, int, int, int, int, int);
 void sub_08014634(s32, s32, void *, void *, void *, s32, s32);
-void EnemyF426_UpdateDeath(void);
+void Statue_UpdateDeath(void);
 
 static inline u32 EnemyF426_StepSequence(struct EnemyF426Sprite *owner,
                                          struct DisplaySequenceState *state)
@@ -150,7 +150,7 @@ static inline u32 EnemyF426_StepSequence(struct EnemyF426Sprite *owner,
     return ended;
 }
 
-u32 EnemyF426_UpdateDamageState(struct EnemyF426Actor *p)
+u32 Statue_UpdateDamageState(struct EnemyF426Actor *p)
 {
     struct EnemyF426Collider *collider;
     if (Engine_PauseBits(0x400) || Flags_MaskedWord(4, &gUnk_02000560))
@@ -209,7 +209,7 @@ u32 EnemyF426_UpdateDamageState(struct EnemyF426Actor *p)
                 AnimData_SelectPaletteBank(p->anim, 0x1b7);
                 p->ptr5c = gPaletteBankData + 0x44a0;
                 p->flash = 0;
-                p->fn = EnemyF426_UpdateDeath;
+                p->fn = Statue_UpdateDeath;
                 p->timer = 0;
                 Sound_PlaySong(0x52a);
             }

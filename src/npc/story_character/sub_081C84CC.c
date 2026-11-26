@@ -21,7 +21,7 @@ struct S {
 };
 void Actor_PlayAnimationEntry(void *, u32, u32, u32, u32);
 s32 ScalarApproach_StepSixteenth(s32, s32);
-void StateActor_ApproachTargetPose(u32 a, struct S *p)
+void StoryCharacter_ApproachTargetPose(u32 a, struct S *p)
 {
     {
         u16 mask = 0x400;

@@ -1,6 +1,6 @@
 #include "global.h"
 #include "engine/video/display_sequence_sprite.h"
-#include "scene/actor/contact_actor.h"
+#include "scene/collision/contact_actor.h"
 #include "engine/ram.h"
 #include "objects/wooden_crate/wooden_crate.h"
 struct WoodenCrateManager {

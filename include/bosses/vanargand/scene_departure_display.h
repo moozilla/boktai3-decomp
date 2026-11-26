@@ -1,7 +1,7 @@
 #ifndef GUARD_SCENE_DEPARTURE_DISPLAY_H
 #define GUARD_SCENE_DEPARTURE_DISPLAY_H
 
-#include "player/cues/player_cue_sequence.h"
+#include "player/cutscene/player_cue_sequence.h"
 #include "link/wireless/scene_pool.h"
 #include "engine/math/scene_vec.h"
 #include "scene/actor/scene_event_dispatch.h"

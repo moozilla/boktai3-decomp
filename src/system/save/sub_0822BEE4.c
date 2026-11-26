@@ -4,7 +4,7 @@ void Script_ReadReference(u8 *);
 u32 Script_ReadReferenceValue(u8 *, s32);
 /* Read variable descriptors (8 bytes each, element count at +4) from the
  * script and save up to 512 of their values after the count word. */
-s32 Registry3C8D_CaptureVariableValues(u32 *save)
+s32 SavedVariables_CaptureVariableValues(u32 *save)
 {
     u8 *desc = (u8 *)(save + 1);
     u32 *value = (u32 *)((u8 *)save + 0x1004);

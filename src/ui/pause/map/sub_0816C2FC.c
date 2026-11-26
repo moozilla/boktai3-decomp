@@ -22,7 +22,7 @@ extern struct {
 } gPadState;
 u32 MapMenu_SelectDirection(struct MapMenu *);
 void Sound_PlaySong(u32);
-void SceneSequence_SelectEntryMessage(struct MapMenu *);
+void MenuSequence_SelectEntryMessage(struct MapMenu *);
 void MapMenu_ClampScrollAndUpdateArrows(struct MapMenu *);
 void BgGfx_LoadTilemapSimple(u32, u32, u32, u32, u32);
 void MapMenu_DrawActiveMarkers(struct MapMenu *, s32, s32);
@@ -42,7 +42,7 @@ void MapMenu_UpdateInput(struct MapMenu *s)
                 s->flagsB &= ~1;
             else
                 s->flagsB |= 1;
-            SceneSequence_SelectEntryMessage(s);
+            MenuSequence_SelectEntryMessage(s);
         }
     } else if (s->unlocked) {
         if (gPadState.held & 0x20) {

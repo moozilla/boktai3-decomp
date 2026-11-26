@@ -14,8 +14,8 @@ struct GameOverSprite {
 struct GameOver {
     struct Task task;
     struct GameOverSprite sprites[8];
-    struct SceneInputResource overlayResource;
-    struct SceneInputWidget overlay;
+    struct AnimSpriteResource overlayResource;
+    struct AnimSprite overlay;
     u16 overlayPalette[16];
     void *text;
     s16 extentX, extentY;

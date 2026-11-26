@@ -48,7 +48,7 @@ palette index at 0x3A and palette-data pointer at 0x48; its 0x60 size is unchang
 
 ## Contact-burst controller and particles
 
-`include/bosses/nidhoggr/contact_burst.h` describes a **0xC4 task on list 8**. The name and exact
+`include/bosses/nidhoggr/nidhoggr_duel_burst.h` describes a **0xC4 task on list 8**. The name and exact
 actor identity remain tentative. A static owner constructor near **0802C5xx**
 passes its position at owner offset 0x8A4 and stores this task at **0x90C**, next
 to the contact-sequence pool and orbiting contact actor. The controller holds

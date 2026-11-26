@@ -1,8 +1,8 @@
 #include "global.h"
 void Task_Kill(void *);
 s32 TextWindow_Refresh(s32, s32);
-void Registry1745_SetCancelRequest(u32);
-s32 Registry1745_GetSessionState(void);
+void LinkSession_SetCancelRequest(u32);
+s32 LinkSession_GetSessionState(void);
 void LinkLobbyPanel_HideSprites(void *);
 struct SceneTextTask {
     u8 unknown0[0x14F0];
@@ -16,7 +16,7 @@ void SceneTask_UpdateTextDelay(struct SceneTextTask *s)
 {
     u32 state;
     if (s->reset) {
-        Registry1745_SetCancelRequest(1);
+        LinkSession_SetCancelRequest(1);
         s->timer = 0;
         s->reset = 0;
     }
@@ -26,7 +26,7 @@ void SceneTask_UpdateTextDelay(struct SceneTextTask *s)
         TextWindow_Refresh(s->window, 8);
         s->timer++;
     }
-    state = Registry1745_GetSessionState();
+    state = LinkSession_GetSessionState();
     if (state == 0x15 || state == 0x17) {
         LinkLobbyPanel_HideSprites(s);
         Task_Kill(s);

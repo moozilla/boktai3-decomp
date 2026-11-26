@@ -1,7 +1,7 @@
 #ifndef GUARD_EXPLOSION_H
 #define GUARD_EXPLOSION_H
 #include "engine/engine.h"
-#include "scene/actor/contact_swarm.h"
+#include "scene/collision/contact_swarm.h"
 struct Explosion {
     struct Task task;
     struct ContactSwarmSprite sprite;

@@ -97,8 +97,8 @@ are low confidence unless the handler is named; the rest print as
 | 6 | camera `FF40` | Camera_Initialize | Camera_DispatchCommands | 4 | all matched: 0 reset, 1 snap_to(x, y, z), 2 pan_to(x, y, z, frames), 3 `sub_08226474`(frames), 4 sway(a, b, mode) (guess), 5 follow_player(frames) |
 | 7 | screen `730A` | sub_08021394 | SceneCommands_Dispatch | 8 | all matched: 0 particles_at, 1 particles_stop, 2 particles_on, 3 fade(out, speed, r, g, b, bg, obj, other, 0), 4 fade_palette, 5 blend_palette, 6 quake(strength, frames), 7 quake_stop, 8 flash, 9 done |
 | 8 | audio `D3A9` | SceneAudioEvent_Register | SceneAudioEvent_DispatchPending | 9 | all (named handlers): 0 play_sound, 2 start_bgm, 4 fade_out_bgm, 6/9 channel 12 |
-| 9 | scene panel | ScenePanel_RegisterReceiver | ScenePanel_DispatchCommands | | |
-| 10 | group objects, staged effects, stacked actors | GroupObjects_Initialize and others | | 7 | |
+| 9 | scene panel | PileDriver_RegisterReceiver | PileDriver_DispatchCommands | | |
+| 10 | group objects, staged effects, stacked actors | BatFlock_Initialize and others | | 7 | |
 | 11, 12 | | sub_08118890, sub_081202CC | | 7, 4 | |
 
 Character instance names come from `actor_name_of` (proc 1154), a table from

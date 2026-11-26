@@ -1,23 +1,23 @@
 #include "monsters/lun.h"
 #include "scene/actor/scene_actor_reset.h"
-#include "scene/actor/scene_actor_availability.h"
+#include "scene/motion/scene_actor_availability.h"
 #include "player/player.h"
 #include "engine/ram.h"
 #include "global.h"
 #include "scene/actor/scene_actor_reaction.h"
 #include "npc/manager/scene_actor_animation.h"
-#include "scene/actor/scene_actor_terrain.h"
+#include "scene/motion/scene_actor_terrain.h"
 #include "engine/engine.h"
 #include "scene/actor/scene_actor_behavior.h"
 #include "script/script_utility.h"
-#include "scene/actor/scene_actor_route.h"
-#include "scene/actor/scene_actor_chase.h"
+#include "scene/motion/scene_actor_route.h"
+#include "scene/motion/scene_actor_chase.h"
 #include "scene/actor/scene_actor_control_phase.h"
 #include "scene/actor/scene_actor_control_motion.h"
 #include "scene/actor/scene_actor_placement.h"
 #include "engine/engine_globals.h"
 #include "monsters/chase_actor.h"
-#include "scene/actor/contact_actor.h"
+#include "scene/collision/contact_actor.h"
 #include "engine/math/movement_curve.h"
 #include "engine/video/display_sequence_inline.h"
 #include "scene/actor/scene_actor_control_helpers.h"
@@ -26,14 +26,14 @@
 #include "engine/video/render.h"
 #include "monsters/scene_actor_init_group.h"
 #include "monsters/scene_actor_init_graphics.h"
-#include "scene/actor/scene_actor_chase_reaction.h"
-#include "scene/actor/scene_actor_contact_response.h"
-#include "scene/actor/scene_actor_chase_shared.h"
-#include "scene/actor/scene_actor_turn.h"
+#include "scene/motion/scene_actor_chase_reaction.h"
+#include "scene/collision/scene_actor_contact_response.h"
+#include "scene/motion/scene_actor_chase_shared.h"
+#include "scene/motion/scene_actor_turn.h"
 #include "engine/math/math_shift.h"
 #include "monsters/ghoul_disc.h"
 #include "bosses/vanargand/vanargand_projectiles.h"
-#include "scene/actor/scene_actor_terrain_reaction.h"
+#include "scene/motion/scene_actor_terrain_reaction.h"
 #include "bosses/vanargand/vanargand_parts.h"
 
 void SceneActorControl_OnIdle(u8 *);
@@ -270,7 +270,7 @@ static inline void Lun_SelectDirectionalAnimation(struct RoomActor *actor, u32 s
                          (u8)variant, (u8)flags);
         restart = &actor->restart;
     } else {
-        struct SceneInputWidget *tile =
+        struct AnimSprite *tile =
             &((struct SceneActorAnimationTileDrawable *)actor->drawable)->tile;
         u8 *savedSelection;
         selection += variant;
@@ -740,7 +740,7 @@ struct SavedMotion {
     struct ContactPosition position;
 };
 
-void TentacleActor_ResetOscillation(void *);
+void Centipede_ResetOscillation(void *);
 
 s32 Callback_InvokeActor(void *, void *);
 
@@ -748,13 +748,13 @@ void Anim_SetDurationScale(void *, u32);
 
 void Anim_SetFrameDurationScale(void *, u32);
 
-void TentacleActor_SelectWanderRoute(void *);
+void Centipede_SelectWanderRoute(void *);
 
-void TentacleActor_AdvanceMotionPhase(void *, s32);
+void Centipede_AdvanceMotionPhase(void *, s32);
 
 void sub_080A9DB0(void *, s32, s32);
 
-void TentacleActor_UpdateOscillation(void *, s32, s32);
+void Centipede_UpdateOscillation(void *, s32, s32);
 
 static inline u8 Approach(struct ChaseActor *actor, struct SavedMotion *saved, s32 speed)
 {

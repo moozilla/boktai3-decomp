@@ -1,7 +1,7 @@
 #include "global.h"
 
-#include "scene/actor/contact_swarm.h"
-#include "player/cues/player_cue_sequence.h"
+#include "scene/collision/contact_swarm.h"
+#include "player/cutscene/player_cue_sequence.h"
 
 // Drawable layout shared with ActorDisplay_UpdateForegroundSprite.
 struct Drawable {
@@ -26,9 +26,9 @@ struct Sub {
 void Anim_RestartSequence(void *, void *, u16, u8, u8);
 void Projectile_SetUpdateCallback(void *, void *);
 void Projectile_SetCollisionSize(void *, s32, s32, s32);
-void Task4E01_UpdateGrowingImpact(void);
+void ProjectileTask_UpdateGrowingImpact(void);
 // confidence=low: initializes a small collision, starts its script and first animation frame.
-s32 Task4E01_StartTimedImpact(u8 *p)
+s32 ProjectileTask_StartTimedImpact(u8 *p)
 {
     u8 *config = p + 0x18;
     void *resource;
@@ -41,6 +41,6 @@ s32 Task4E01_StartTimedImpact(u8 *p)
     frames = p + 0x180;
     Anim_RestartSequence(frames, resource, 3, 0, 0);
     StepPlayback((void *)(p + 0x8c), (void *)frames);
-    Projectile_SetUpdateCallback(config, Task4E01_UpdateGrowingImpact);
+    Projectile_SetUpdateCallback(config, ProjectileTask_UpdateGrowingImpact);
     return 0;
 }

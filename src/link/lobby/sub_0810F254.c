@@ -5,7 +5,7 @@ void ScrollingDialogue_RequestShow(void);
 void ScrollingDialogue_HideImmediately(void);
 void Bg_ClearTilemap(s32 bg);
 void LinkLobbyPanel_HideSprites(u8 *self);
-void Registry1745_SetMenuRequest(u32 request);
+void LinkSession_SetMenuRequest(u32 request);
 void Script_Call(u32 script, void *args);
 void Task_Kill(void *task);
 
@@ -28,7 +28,7 @@ void sub_0810F268(u8 *self)
     Bg_ClearTilemap(2);
     Bg_ClearTilemap(3);
     LinkLobbyPanel_HideSprites(self);
-    Registry1745_SetMenuRequest(2);
+    LinkSession_SetMenuRequest(2);
     if (*(u16 *)(self + 0x1502) != 0) {
         Script_Call(*(u16 *)(self + 0x1502), 0);
         Task_Kill(self);

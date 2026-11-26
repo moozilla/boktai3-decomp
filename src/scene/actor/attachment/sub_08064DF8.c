@@ -1,5 +1,5 @@
 #include "scene/actor/actor_attachment_orbit_playback.h"
-#include "scene/actor/contact_actor.h"
+#include "scene/collision/contact_actor.h"
 #include "engine/engine.h"
 
 static inline const struct ActorAttachmentPartResource *

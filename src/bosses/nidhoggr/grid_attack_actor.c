@@ -1,13 +1,13 @@
 #include "engine/math/hit_spark_random.h"
-#include "bosses/nidhoggr/grid_attack_actor.h"
-#include "player/cues/player_cue_sequence.h"
+#include "bosses/nidhoggr/nidhoggr_duel.h"
+#include "player/cutscene/player_cue_sequence.h"
 #include "player/player.h"
 #include "player/player_slot_status.h"
 #include "script/demo_manager.h"
-#include "bosses/nidhoggr/contact_burst.h"
+#include "bosses/nidhoggr/nidhoggr_duel_burst.h"
 #include "effects/sprites/projected_display.h"
 
-void GridAttackActor_RemoveSprite(struct GridAttackActor *p)
+void NidhoggrDuel_RemoveSprite(struct GridAttackActor *p)
 {
     Sprite_Remove(&p->drawable);
 }
@@ -18,10 +18,10 @@ void Collider_SetAttackProperties(void *, int, int, int, int, int);
 
 void Collider_SetBodyProperties(void *, int, int, int);
 
-void GridAttackActor_OnDamageCollision(struct ContactCollider *, struct ContactCollider *,
+void NidhoggrDuel_OnDamageCollision(struct ContactCollider *, struct ContactCollider *,
                                        struct GridAttackActor *);
 
-void ContactSequencePool_SpawnActor(void *, void *, int);
+void NidhoggrDuelMinionPool_SpawnActor(void *, void *, int);
 
 int sub_08249350(int, int);
 
@@ -29,12 +29,12 @@ void DamageNumberDisplay_Show(void *, int, int, void *, void *, int);
 
 void SparkParticle_Spawn(void *, int, void *, int, int, int, int, int);
 
-void OrbitContactActor_BeginExpansion(void *);
+void NidhoggrDuelOrb_BeginExpansion(void *);
 
-void GridAttackActor_SpawnTargetedProjectile(struct GridAttackActor *, struct ContactPosition *,
+void NidhoggrDuel_SpawnTargetedProjectile(struct GridAttackActor *, struct ContactPosition *,
                                              int);
 
-void ContactSequencePool_BeginAllDeaths(void *);
+void NidhoggrDuelMinionPool_BeginAllDeaths(void *);
 
 void SceneActors_RunFirstEventScript(void *, void *);
 
@@ -46,20 +46,20 @@ u8 Sprite_BlinkUntilExpired(int *, int, int, int);
 
 void SceneActors_RunStateCallback(u32);
 
-int ContactSequencePool_GetActiveCount(void *);
+int NidhoggrDuelMinionPool_GetActiveCount(void *);
 
-void GridAttack_ProcessMessages(struct GridAttackActor *p);
-void GridAttack_UpdateAnimationAndTargets(struct GridAttackActor *p);
+void NidhoggrDuel_ProcessMessages(struct GridAttackActor *p);
+void NidhoggrDuel_UpdateAnimationAndTargets(struct GridAttackActor *p);
 
-void GridAttack_UpdateCollidersAndPalette(struct GridAttackActor *p);
+void NidhoggrDuel_UpdateCollidersAndPalette(struct GridAttackActor *p);
 
 void SceneActors_Destroy(struct GridAttackActor *);
 
 struct GridAttackActor *SceneActors_GetBySlot(u32);
 
-s32 GridAttackActor_Initialize(struct GridAttackActor *, u32);
+s32 NidhoggrDuel_Initialize(struct GridAttackActor *, u32);
 
-void GridAttackActor_SetAnimation(struct GridAttackActor *p, int sequence, int start, int speed)
+void NidhoggrDuel_SetAnimation(struct GridAttackActor *p, int sequence, int start, int speed)
 {
     p->animationMode = 0;
     p->animationSpeed = speed;
@@ -75,7 +75,7 @@ void GridAttackActor_SetAnimation(struct GridAttackActor *p, int sequence, int s
 void Collision_CalculateDamageResponse(void *, void *);
 void PlayerStats_AddContactHundredths(struct ContactCollider *, struct ContactCollider *, s32);
 
-void GridAttackActor_OnDamageCollision(struct ContactCollider *source,
+void NidhoggrDuel_OnDamageCollision(struct ContactCollider *source,
                                        struct ContactCollider *other, struct GridAttackActor *p)
 {
     struct GridAttackActor *base = p;
@@ -97,11 +97,11 @@ void GridAttackActor_OnDamageCollision(struct ContactCollider *source,
         p->special = 1;
 }
 
-void GridAttackActor_OnBodyCollision(void)
+void NidhoggrDuel_OnBodyCollision(void)
 {
 }
 
-void GridAttackActor_InitBodyCollider(struct GridAttackActor *p)
+void NidhoggrDuel_InitBodyCollider(struct GridAttackActor *p)
 {
     void *collider = &p->bodyCollider;
     struct GridAttackPacked size, offset;
@@ -113,11 +113,11 @@ void GridAttackActor_InitBodyCollider(struct GridAttackActor *p)
     offset.z = 0;
     Collider_Init(collider, 0, 0x2401, 0, 16, &size, &offset);
     Collider_SetPosition(collider, &p->drawable.position, 0);
-    Collider_SetCallback(collider, GridAttackActor_OnBodyCollision, p);
+    Collider_SetCallback(collider, NidhoggrDuel_OnBodyCollision, p);
     Collider_SetAttackProperties(collider, p->attackPower, p->attackKind, 0, 0, p->attackParameter);
 }
 
-void GridAttackActor_InitDamageCollider(struct GridAttackActor *p, int mode)
+void NidhoggrDuel_InitDamageCollider(struct GridAttackActor *p, int mode)
 {
     void *collider = &p->damageCollider;
     struct GridAttackPacked size, offset;
@@ -129,12 +129,12 @@ void GridAttackActor_InitDamageCollider(struct GridAttackActor *p, int mode)
     offset.z = 0;
     Collider_Init(collider, 0, 0x5101, 0, 16, &size, &offset);
     Collider_SetPosition(collider, &p->drawable.position, 0);
-    Collider_SetCallback(collider, GridAttackActor_OnDamageCollision, p);
+    Collider_SetCallback(collider, NidhoggrDuel_OnDamageCollision, p);
     Collider_SetBodyProperties(collider, mode, 0x808, 4);
     Collider_Refresh(collider);
 }
 
-void GridAttackActor_GetGridPosition(s16 *p, int x, int z)
+void NidhoggrDuel_GetGridPosition(s16 *p, int x, int z)
 {
     struct SceneVec *position = (struct SceneVec *)p;
     if (x != 1 || z) {
@@ -146,11 +146,11 @@ void GridAttackActor_GetGridPosition(s16 *p, int x, int z)
     }
 }
 
-void GridAttackActor_SpawnGridContact(struct GridAttackActor *p, int x, int z)
+void NidhoggrDuel_SpawnGridContact(struct GridAttackActor *p, int x, int z)
 {
     struct SceneVec pos;
-    GridAttackActor_GetGridPosition((s16 *)&pos, x, z);
-    ContactSequencePool_SpawnActor(p->contactPool, &pos, x + z * 3);
+    NidhoggrDuel_GetGridPosition((s16 *)&pos, x, z);
+    NidhoggrDuelMinionPool_SpawnActor(p->contactPool, &pos, x + z * 3);
 }
 
 static inline int GridAttack_RandomColumn(u16 *table)
@@ -159,29 +159,29 @@ static inline int GridAttack_RandomColumn(u16 *table)
     return sub_08249350(table[gRandomIndex], 3);
 }
 
-void GridAttackActor_SpawnGridPattern(struct GridAttackActor *p)
+void NidhoggrDuel_SpawnGridPattern(struct GridAttackActor *p)
 {
     if (p->targetPositions[0]->z < 0xc00) {
-        GridAttackActor_SpawnGridContact(p, 0, 0);
-        GridAttackActor_SpawnGridContact(p, 2, 0);
-        GridAttackActor_SpawnGridContact(p, 0, 1);
-        GridAttackActor_SpawnGridContact(p, 1, 1);
-        GridAttackActor_SpawnGridContact(p, 2, 1);
+        NidhoggrDuel_SpawnGridContact(p, 0, 0);
+        NidhoggrDuel_SpawnGridContact(p, 2, 0);
+        NidhoggrDuel_SpawnGridContact(p, 0, 1);
+        NidhoggrDuel_SpawnGridContact(p, 1, 1);
+        NidhoggrDuel_SpawnGridContact(p, 2, 1);
         {
             u16 *table = gRandomTable;
-            GridAttackActor_SpawnGridContact(p, GridAttack_RandomColumn(table), 2);
-            GridAttackActor_SpawnGridContact(p, GridAttack_RandomColumn(table), 3);
-            GridAttackActor_SpawnGridContact(p, GridAttack_RandomColumn(table), 4);
+            NidhoggrDuel_SpawnGridContact(p, GridAttack_RandomColumn(table), 2);
+            NidhoggrDuel_SpawnGridContact(p, GridAttack_RandomColumn(table), 3);
+            NidhoggrDuel_SpawnGridContact(p, GridAttack_RandomColumn(table), 4);
         }
     } else {
-        GridAttackActor_SpawnGridContact(p, 0, 1);
-        GridAttackActor_SpawnGridContact(p, 1, 1);
-        GridAttackActor_SpawnGridContact(p, 2, 1);
+        NidhoggrDuel_SpawnGridContact(p, 0, 1);
+        NidhoggrDuel_SpawnGridContact(p, 1, 1);
+        NidhoggrDuel_SpawnGridContact(p, 2, 1);
         {
             u16 *table = gRandomTable;
-            GridAttackActor_SpawnGridContact(p, GridAttack_RandomColumn(table), 2);
-            GridAttackActor_SpawnGridContact(p, GridAttack_RandomColumn(table), 3);
-            GridAttackActor_SpawnGridContact(p, GridAttack_RandomColumn(table), 4);
+            NidhoggrDuel_SpawnGridContact(p, GridAttack_RandomColumn(table), 2);
+            NidhoggrDuel_SpawnGridContact(p, GridAttack_RandomColumn(table), 3);
+            NidhoggrDuel_SpawnGridContact(p, GridAttack_RandomColumn(table), 4);
         }
     }
 }
@@ -220,7 +220,7 @@ static inline void GridAttack_OffsetCoordinate(volatile s16 *coordinate, u32 ran
     u8 center = 128;
     *coordinate = (rounded + ((random & 63) + center)) - 32;
 }
-void GridAttackActor_SpawnTargetedProjectile(struct GridAttackActor *actor,
+void NidhoggrDuel_SpawnTargetedProjectile(struct GridAttackActor *actor,
                                              struct ContactPosition *point, int kind)
 {
     struct ContactPosition velocity;
@@ -243,7 +243,7 @@ void GridAttackActor_SpawnTargetedProjectile(struct GridAttackActor *actor,
     }
 }
 
-int GridAttackActor_OnDamage(struct GridAttackActor *p, int kind, int damage)
+int NidhoggrDuel_OnDamage(struct GridAttackActor *p, int kind, int damage)
 {
     /* Keep the transform base live: direct actor fields change register allocation. */
     struct GridAttackTransform *position = &p->transform;
@@ -258,11 +258,11 @@ int GridAttackActor_OnDamage(struct GridAttackActor *p, int kind, int damage)
                                          &size, 1);
             }
             GridAttack_StartActionMode(p, 1, 0, 0);
-            GridAttack_SetState(p, GridAttackActor_UpdateDamageHold, 5);
+            GridAttack_SetState(p, NidhoggrDuel_UpdateDamageHold, 5);
             break;
         case 2:
             GridAttack_StartActionMode(p, 1, 0, 1);
-            GridAttack_SetState(p, GridAttackActor_UpdateDamageRecovery, 6);
+            GridAttack_SetState(p, NidhoggrDuel_UpdateDamageRecovery, 6);
             {
                 int angle = position->angle;
                 p->damageAngle = angle;
@@ -275,18 +275,18 @@ int GridAttackActor_OnDamage(struct GridAttackActor *p, int kind, int damage)
             *dst = angle;
             GridAttack_AddFlags(p, 2);
             GridAttack_StartActionMode(p, 1, zero, 3);
-            GridAttack_SetState(p, GridAttack_UpdateDeathState, 8);
+            GridAttack_SetState(p, NidhoggrDuel_UpdateDeathState, 8);
         } break;
     }
     return 1;
 }
 
-void GridAttackActor_ResetAttackAnimationHistory(struct GridAttackActor *p)
+void NidhoggrDuel_ResetAttackAnimationHistory(struct GridAttackActor *p)
 {
     p->attackAnimationHistory = 0;
 }
 
-int GridAttackActor_SelectAttackAnimation(struct GridAttackActor *p)
+int NidhoggrDuel_SelectAttackAnimation(struct GridAttackActor *p)
 {
     int start, i, index;
     gRandomIndex = (gRandomIndex + 1) & 1023;
@@ -314,7 +314,7 @@ done:
     return index + 4;
 }
 
-void GridAttackActor_EmitSpriteParticles(struct GridAttackActor *p)
+void NidhoggrDuel_EmitSpriteParticles(struct GridAttackActor *p)
 {
     struct ContactSwarmSprite *graphics = &p->drawable;
     struct GridAttackPacked size;
@@ -342,7 +342,7 @@ void GridAttackActor_EmitSpriteParticles(struct GridAttackActor *p)
     }
 }
 
-void GridAttackActor_RequestLinkedActorState(struct GridAttackActor *p)
+void NidhoggrDuel_RequestLinkedActorState(struct GridAttackActor *p)
 {
     struct SceneEventCommand *packet = &p->packet;
     if (p->linkedActorId && p->linkedActorPhase != 0) {
@@ -358,7 +358,7 @@ void GridAttackActor_RequestLinkedActorState(struct GridAttackActor *p)
     }
 }
 
-void GridAttackActor_NotifyLinkedActorLatePhase(struct GridAttackActor *p)
+void NidhoggrDuel_NotifyLinkedActorLatePhase(struct GridAttackActor *p)
 {
     struct SceneEventCommand *packet = &p->packet;
     if (p->linkedActorId && p->linkedActorPhase != 1) {
@@ -388,7 +388,7 @@ static inline void GridAttack_SetFacing(struct GridAttackActor *p, int angle)
     p->facing8 = value;
 }
 
-void GridAttackActor_UpdateIdle(struct GridAttackActor *p)
+void NidhoggrDuel_UpdateIdle(struct GridAttackActor *p)
 {
     if (!p->locked)
         GridAttack_SetFacing(p, p->requestedAngles[0]);
@@ -396,7 +396,7 @@ void GridAttackActor_UpdateIdle(struct GridAttackActor *p)
         p->changed = 0;
         if (p->locked)
             GridAttack_SetFacing(p, p->savedAngle);
-        GridAttackActor_SetAnimation(p, 2, 1, 0);
+        NidhoggrDuel_SetAnimation(p, 2, 1, 0);
     }
     if (!p->tryUpdate(p)) {
         GridAttack_AddFlags(p, 64);
@@ -404,13 +404,13 @@ void GridAttackActor_UpdateIdle(struct GridAttackActor *p)
     }
 }
 
-void GridAttackActor_UpdateGridAttack(struct GridAttackActor *p, int tick)
+void NidhoggrDuel_UpdateGridAttack(struct GridAttackActor *p, int tick)
 {
     if (p->changed) {
         p->changed = 0;
         GridAttack_SetFacing(p, p->requestedAngles[0]);
-        GridAttackActor_ResetAttackAnimationHistory(p);
-        GridAttackActor_SetAnimation(p, GridAttackActor_SelectAttackAnimation(p), 1, 8);
+        NidhoggrDuel_ResetAttackAnimationHistory(p);
+        NidhoggrDuel_SetAnimation(p, NidhoggrDuel_SelectAttackAnimation(p), 1, 8);
         Sound_PlaySongChecked(1355);
     }
     if (p->tryUpdate(p))
@@ -419,24 +419,24 @@ void GridAttackActor_UpdateGridAttack(struct GridAttackActor *p, int tick)
     if (p->reset(p))
         return;
     if (tick == 8)
-        GridAttackActor_SpawnGridPattern(p);
+        NidhoggrDuel_SpawnGridPattern(p);
     if (p->animationEnded) {
-        GridAttackActor_SetAnimation(p, GridAttackActor_SelectAttackAnimation(p), 1, 8);
+        NidhoggrDuel_SetAnimation(p, NidhoggrDuel_SelectAttackAnimation(p), 1, 8);
         if (tick > 31)
             p->finished = 1;
     }
 }
 
-void GridAttackActor_UpdateElevatedGridAttack(struct GridAttackActor *p)
+void NidhoggrDuel_UpdateElevatedGridAttack(struct GridAttackActor *p)
 {
     struct GridAttackActor *base = p;
     if (p->changed) {
         p->changed = 0;
         GridAttack_SetFacing(p, p->requestedAngles[0]);
-        GridAttackActor_SetAnimation(p, 3, 1, 8);
+        NidhoggrDuel_SetAnimation(p, 3, 1, 8);
         p->stage = 0;
         p->counter = 0;
-        GridAttackActor_ResetAttackAnimationHistory(p);
+        NidhoggrDuel_ResetAttackAnimationHistory(p);
         Sound_PlaySongChecked(955);
     }
     p->phaseTimer = 240;
@@ -452,7 +452,7 @@ void GridAttackActor_UpdateElevatedGridAttack(struct GridAttackActor *p)
             if (p->counter > 31) {
                 p->stage++;
                 p->counter = 0;
-                OrbitContactActor_BeginExpansion(p->orbitContact);
+                NidhoggrDuelOrb_BeginExpansion(p->orbitContact);
             }
             break;
         case 1:
@@ -468,19 +468,19 @@ void GridAttackActor_UpdateElevatedGridAttack(struct GridAttackActor *p)
             if (p->counter > 129) {
                 p->stage++;
                 p->counter = 0;
-                GridAttackActor_SetAnimation(p, 3, 1, 12);
+                NidhoggrDuel_SetAnimation(p, 3, 1, 12);
             }
             break;
         case 3:
             if (p->counter == 6)
-                GridAttackActor_SpawnGridPattern(p);
+                NidhoggrDuel_SpawnGridPattern(p);
         case 4:
         case 5:
         case 6:
             if (p->counter > 5) {
                 p->stage++;
                 p->counter = 0;
-                GridAttackActor_SetAnimation(p, GridAttackActor_SelectAttackAnimation(p), 1, 8);
+                NidhoggrDuel_SetAnimation(p, NidhoggrDuel_SelectAttackAnimation(p), 1, 8);
             }
             break;
         case 7:
@@ -511,14 +511,14 @@ void GridAttackActor_UpdateElevatedGridAttack(struct GridAttackActor *p)
 
 extern u16 gUnk_086141BC[];
 
-void GridAttackActor_UpdateTargetedAttack(struct GridAttackActor *p, int tick)
+void NidhoggrDuel_UpdateTargetedAttack(struct GridAttackActor *p, int tick)
 {
     struct GridAttackActor *base = p;
     if (p->changed) {
         p->changed = 0;
         GridAttack_SetFacing(p, p->requestedAngles[0]);
-        GridAttackActor_ResetAttackAnimationHistory(p);
-        GridAttackActor_SetAnimation(p, GridAttackActor_SelectAttackAnimation(p), 1, 8);
+        NidhoggrDuel_ResetAttackAnimationHistory(p);
+        NidhoggrDuel_SetAnimation(p, NidhoggrDuel_SelectAttackAnimation(p), 1, 8);
         gEffectRandomTableIndex = (gEffectRandomTableIndex + 1) & 1023;
         {
             int random = gUnk_086141BC[gEffectRandomTableIndex];
@@ -532,17 +532,17 @@ void GridAttackActor_UpdateTargetedAttack(struct GridAttackActor *p, int tick)
     if (p->reset(p))
         return;
     if (tick == 8)
-        GridAttackActor_SpawnTargetedProjectile(
+        NidhoggrDuel_SpawnTargetedProjectile(
             base, (struct ContactPosition *)p->targetPositions[0], base->targetAttackParameter);
     if (p->animationEnded)
         p->finished = 1;
 }
 
-void GridAttackActor_UpdateDamageHold(struct GridAttackActor *p)
+void NidhoggrDuel_UpdateDamageHold(struct GridAttackActor *p)
 {
     if (p->changed) {
         p->changed = 0;
-        GridAttackActor_SetAnimation(p, 8, 1, 8);
+        NidhoggrDuel_SetAnimation(p, 8, 1, 8);
     }
     p->damage = 0;
     p->special = 0;
@@ -550,11 +550,11 @@ void GridAttackActor_UpdateDamageHold(struct GridAttackActor *p)
     GridAttack_AddFlags(p, 64);
 }
 
-void GridAttackActor_UpdateDamageRecovery(struct GridAttackActor *p, int tick)
+void NidhoggrDuel_UpdateDamageRecovery(struct GridAttackActor *p, int tick)
 {
     if (p->changed) {
         p->changed = 0;
-        GridAttackActor_SetAnimation(p, 8, 1, 8);
+        NidhoggrDuel_SetAnimation(p, 8, 1, 8);
     }
     p->damage = 0;
     p->special = 0;
@@ -563,12 +563,12 @@ void GridAttackActor_UpdateDamageRecovery(struct GridAttackActor *p, int tick)
         p->finished = 1;
 }
 
-void GridAttack_UpdateStaggerState(struct GridAttackActor *p)
+void NidhoggrDuel_UpdateStaggerState(struct GridAttackActor *p)
 {
     if (p->changed) {
         p->changed = 0;
-        GridAttackActor_SetAnimation(p, 8, 1, 8);
-        ContactSequencePool_BeginAllDeaths(p->contactPool);
+        NidhoggrDuel_SetAnimation(p, 8, 1, 8);
+        NidhoggrDuelMinionPool_BeginAllDeaths(p->contactPool);
         Sound_PlaySongChecked(1359);
     }
     p->reactionCooldown = 6;
@@ -576,7 +576,7 @@ void GridAttack_UpdateStaggerState(struct GridAttackActor *p)
     p->special = 0;
     GridAttack_AddFlags(p, 12);
     if (p->animationEnded)
-        GridAttack_SetState((void *)p, GridAttackActor_UpdateIdle, 1);
+        GridAttack_SetState((void *)p, NidhoggrDuel_UpdateIdle, 1);
     else
         p->flags |= 1;
 }
@@ -594,14 +594,14 @@ static inline void GridAttack_SetDeathEffect(struct GridAttackActor *p, int mode
         p->effectVariant = 0;
 }
 
-void GridAttack_UpdateDeathState(struct GridAttackActor *p)
+void NidhoggrDuel_UpdateDeathState(struct GridAttackActor *p)
 {
     struct GridAttackActor *base = p;
     if (p->changed) {
         p->changed = 0;
-        GridAttackActor_SetAnimation(p, 10, 1, 8);
+        NidhoggrDuel_SetAnimation(p, 10, 1, 8);
         SceneActors_RunFirstEventScript(p, &p->drawable.position);
-        ContactSequencePool_BeginAllDeaths(p->contactPool);
+        NidhoggrDuelMinionPool_BeginAllDeaths(p->contactPool);
         GridAttack_SetDeathEffect(p, 2, 349, 1);
         base->stage = 0;
         base->counter = 0;
@@ -615,7 +615,7 @@ void GridAttack_UpdateDeathState(struct GridAttackActor *p)
     GridAttack_AddFlags(p, 13);
 }
 
-void GridAttack_UpdateHiddenState(struct GridAttackActor *p)
+void NidhoggrDuel_UpdateHiddenState(struct GridAttackActor *p)
 {
     if (p->changed)
         p->changed = 0;
@@ -625,11 +625,11 @@ void GridAttack_UpdateHiddenState(struct GridAttackActor *p)
     p->reset(p);
 }
 
-void GridAttack_UpdateIdleState(struct GridAttackActor *s)
+void NidhoggrDuel_UpdateIdleState(struct GridAttackActor *s)
 {
     if (s->changed) {
         s->changed = 0;
-        GridAttackActor_SetAnimation(s, 2, 1, 0);
+        NidhoggrDuel_SetAnimation(s, 2, 1, 0);
     }
     {
         u32 *p = (u32 *)&s->damage;
@@ -640,13 +640,13 @@ void GridAttack_UpdateIdleState(struct GridAttackActor *s)
     Callback_InvokeActor(s, (void *)s->reset);
 }
 
-void GridAttack_UpdateAnimationNineState(struct GridAttackActor *p)
+void NidhoggrDuel_UpdateAnimationNineState(struct GridAttackActor *p)
 {
     /* Keep the transform base live: direct actor fields change register allocation. */
     struct GridAttackTransform *position = &p->transform;
     if (p->changed) {
         p->changed = 0;
-        GridAttackActor_SetAnimation(p, 9, 1, 8);
+        NidhoggrDuel_SetAnimation(p, 9, 1, 8);
         p->savedPosition = position->coordinates;
     }
     p->damage = 0;
@@ -659,11 +659,11 @@ void GridAttack_UpdateAnimationNineState(struct GridAttackActor *p)
     }
 }
 
-void GridAttack_UpdateAnimationElevenState(struct GridAttackActor *s)
+void NidhoggrDuel_UpdateAnimationElevenState(struct GridAttackActor *s)
 {
     if (s->changed) {
         s->changed = 0;
-        GridAttackActor_SetAnimation(s, 11, 1, 8);
+        NidhoggrDuel_SetAnimation(s, 11, 1, 8);
     }
     {
         u32 *p = (u32 *)&s->damage;
@@ -674,11 +674,11 @@ void GridAttack_UpdateAnimationElevenState(struct GridAttackActor *s)
     Callback_InvokeActor(s, (void *)s->reset);
 }
 
-void GridAttack_UpdateAlternateIdleState(struct GridAttackActor *s)
+void NidhoggrDuel_UpdateAlternateIdleState(struct GridAttackActor *s)
 {
     if (s->changed) {
         s->changed = 0;
-        GridAttackActor_SetAnimation(s, 2, 1, 0);
+        NidhoggrDuel_SetAnimation(s, 2, 1, 0);
     }
     {
         u32 *p = (u32 *)&s->damage;
@@ -689,28 +689,28 @@ void GridAttack_UpdateAlternateIdleState(struct GridAttackActor *s)
     Callback_InvokeActor(s, (void *)s->reset);
 }
 
-void GridAttack_UpdateRandomAnimationState(struct GridAttackActor *p, int tick)
+void NidhoggrDuel_UpdateRandomAnimationState(struct GridAttackActor *p, int tick)
 {
     if (p->changed) {
         p->changed = 0;
-        GridAttackActor_ResetAttackAnimationHistory(p);
-        GridAttackActor_SetAnimation(p, GridAttackActor_SelectAttackAnimation(p), 1, 8);
+        NidhoggrDuel_ResetAttackAnimationHistory(p);
+        NidhoggrDuel_SetAnimation(p, NidhoggrDuel_SelectAttackAnimation(p), 1, 8);
     }
     p->damage = 0;
     p->special = 0;
     GridAttack_AddFlags(p, 12);
     if (!p->reset(p) && p->animationEnded) {
-        GridAttackActor_SetAnimation(p, GridAttackActor_SelectAttackAnimation(p), 1, 8);
+        NidhoggrDuel_SetAnimation(p, NidhoggrDuel_SelectAttackAnimation(p), 1, 8);
         if (tick > 31)
             p->finished = 1;
     }
 }
 
-void GridAttack_UpdateAnimationThreeState(struct GridAttackActor *p)
+void NidhoggrDuel_UpdateAnimationThreeState(struct GridAttackActor *p)
 {
     if (p->changed) {
         p->changed = 0;
-        GridAttackActor_SetAnimation(p, 3, 1, 8);
+        NidhoggrDuel_SetAnimation(p, 3, 1, 8);
     }
     p->damage = 0;
     p->special = 0;
@@ -719,11 +719,11 @@ void GridAttack_UpdateAnimationThreeState(struct GridAttackActor *p)
         p->finished = 1;
 }
 
-void GridAttack_UpdateFastAnimationThreeState(struct GridAttackActor *p)
+void NidhoggrDuel_UpdateFastAnimationThreeState(struct GridAttackActor *p)
 {
     if (p->changed) {
         p->changed = 0;
-        GridAttackActor_SetAnimation(p, 3, 1, 12);
+        NidhoggrDuel_SetAnimation(p, 3, 1, 12);
     }
     p->damage = 0;
     p->special = 0;
@@ -732,7 +732,7 @@ void GridAttack_UpdateFastAnimationThreeState(struct GridAttackActor *p)
         p->finished = 1;
 }
 
-void GridAttack_UpdateTimedHideState(struct GridAttackActor *p, int tick)
+void NidhoggrDuel_UpdateTimedHideState(struct GridAttackActor *p, int tick)
 {
     struct GridAttackActor *base = p;
     /* Keep the transform base live: direct actor fields change register allocation. */
@@ -740,7 +740,7 @@ void GridAttack_UpdateTimedHideState(struct GridAttackActor *p, int tick)
     int done;
     if (p->changed) {
         p->changed = 0;
-        GridAttackActor_SetAnimation(p, 11, 1, 8);
+        NidhoggrDuel_SetAnimation(p, 11, 1, 8);
         p->savedPosition = position->coordinates;
     }
     done = 0;
@@ -758,7 +758,7 @@ void GridAttack_UpdateTimedHideState(struct GridAttackActor *p, int tick)
 
 extern u32 gUnk_02000560;
 
-void GridAttack_RunStateIfUnpaused(u32 a)
+void NidhoggrDuel_RunStateIfUnpaused(u32 a)
 {
     if (!PlayerSlot_ReadStatus(0, 4))
         SceneActors_RunStateCallback(a);
@@ -766,7 +766,7 @@ void GridAttack_RunStateIfUnpaused(u32 a)
 
 extern const u32 gUnk_08604FA8[];
 
-u32 GridAttack_ApplyRequestedState(struct GridAttackActor *p)
+u32 NidhoggrDuel_ApplyRequestedState(struct GridAttackActor *p)
 {
     if ((u8)(p->requested - 1) > 0x11)
         return 0;
@@ -782,7 +782,7 @@ u32 GridAttack_ApplyRequestedState(struct GridAttackActor *p)
     }
 }
 
-int GridAttack_ApplyPendingDamage(struct GridAttackActor *p)
+int NidhoggrDuel_ApplyPendingDamage(struct GridAttackActor *p)
 {
     struct GridAttackActor *base = (void *)p;
     /* Keep the transform base live: direct actor fields change register allocation. */
@@ -835,7 +835,7 @@ int GridAttack_ApplyPendingDamage(struct GridAttackActor *p)
         if (base->health <= 0) {
             base->health = 0;
             GridAttack_AddFlags(base, 2);
-            GridAttack_SetState(base, GridAttack_UpdateDeathState, 8);
+            GridAttack_SetState(base, NidhoggrDuel_UpdateDeathState, 8);
             return 1;
         }
         if (special) {
@@ -845,7 +845,7 @@ int GridAttack_ApplyPendingDamage(struct GridAttackActor *p)
             {
                 base->flags |= 1;
             }
-            GridAttack_SetState(base, GridAttack_UpdateStaggerState, 7);
+            GridAttack_SetState(base, NidhoggrDuel_UpdateStaggerState, 7);
             return 1;
         }
         p->shake = 3;
@@ -868,7 +868,7 @@ static inline void GridAttack_SelectAction(struct GridAttackActor *p, int id, in
     p->entered = 1;
 }
 
-int GridAttack_SelectNextAction(struct GridAttackActor *p)
+int NidhoggrDuel_SelectNextAction(struct GridAttackActor *p)
 {
     struct GridAttackActor *base = p;
     int trigger = p->forceAction;
@@ -877,12 +877,12 @@ int GridAttack_SelectNextAction(struct GridAttackActor *p)
         GridAttack_SelectAction(p, 2, 0);
         return 1;
     } else {
-        int active = ContactBurst_GetEnabled(p->contactBurst);
+        int active = NidhoggrDuelBurst_GetEnabled(p->contactBurst);
         if (active) {
             GridAttack_SelectAction(p, 3, 0);
         } else if (p->attackCount >= p->attackLimit) {
-            if (ContactSequencePool_GetActiveCount(p->contactPool) > 0)
-                ContactSequencePool_BeginAllDeaths(p->contactPool);
+            if (NidhoggrDuelMinionPool_GetActiveCount(p->contactPool) > 0)
+                NidhoggrDuelMinionPool_BeginAllDeaths(p->contactPool);
             GridAttack_SelectAction(p, 1, 0);
         } else {
             GridAttack_SelectAction(base, 3, 0);
@@ -962,7 +962,7 @@ static inline void GridAttack_SetDrawableZ(struct GridAttackActor *p, u16 value)
     ((struct GridAttackMessageActor *)p)->drawZ = value;
 }
 
-void GridAttack_ProcessMessages(struct GridAttackActor *p)
+void NidhoggrDuel_ProcessMessages(struct GridAttackActor *p)
 {
     struct GridAttackActor *base = p;
     struct SceneEventReceiver *receiver = &p->receiver;
@@ -1037,7 +1037,7 @@ void GridAttack_ProcessMessages(struct GridAttackActor *p)
     }
 }
 
-void GridAttack_UpdateStateNineAction(struct GridAttackActor *p)
+void NidhoggrDuel_UpdateStateNineAction(struct GridAttackActor *p)
 {
     if (GridAttack_TakeActionEntry(p)) {
         GridAttack_RequestAnimation(p, 9);
@@ -1058,7 +1058,7 @@ static inline u8 GridAttack_TakeActionEntryViaPointer(struct GridAttackActor *p)
     return 0;
 }
 
-void GridAttack_UpdateIdleAction(struct GridAttackActor *p)
+void NidhoggrDuel_UpdateIdleAction(struct GridAttackActor *p)
 {
     u8 r = GridAttack_TakeActionEntryViaPointer(p);
     if (r == 1) {
@@ -1078,7 +1078,7 @@ static inline u8 GridAttack_TakeActionEntryBool(struct GridAttackActor *p)
     return 0;
 }
 
-void GridAttack_UpdateStateElevenAction(struct GridAttackActor *p)
+void NidhoggrDuel_UpdateStateElevenAction(struct GridAttackActor *p)
 {
     if (GridAttack_TakeActionEntryBool(p)) {
         GridAttack_RequestAnimation(p, 11);
@@ -1090,7 +1090,7 @@ void GridAttack_UpdateStateElevenAction(struct GridAttackActor *p)
         p->actionTimer++;
 }
 
-void GridAttack_UpdateStateTwelveAction(struct GridAttackActor *p)
+void NidhoggrDuel_UpdateStateTwelveAction(struct GridAttackActor *p)
 {
     if (GridAttack_TakeActionEntryBool(p)) {
         GridAttack_RequestAnimation(p, 0xC);
@@ -1101,7 +1101,7 @@ void GridAttack_UpdateStateTwelveAction(struct GridAttackActor *p)
         p->actionTimer++;
 }
 
-void GridAttack_UpdateStateThirteenAction(struct GridAttackActor *p)
+void NidhoggrDuel_UpdateStateThirteenAction(struct GridAttackActor *p)
 {
     if (GridAttack_TakeActionEntryBool(p)) {
         GridAttack_RequestAnimation(p, 0xD);
@@ -1112,7 +1112,7 @@ void GridAttack_UpdateStateThirteenAction(struct GridAttackActor *p)
         p->actionTimer++;
 }
 
-void GridAttack_UpdateAnimationFourteen(struct GridAttackActor *p)
+void NidhoggrDuel_UpdateAnimationFourteen(struct GridAttackActor *p)
 {
     if (GridAttack_TakeActionEntryBool(p)) {
         GridAttack_RequestAnimation(p, 14);
@@ -1124,7 +1124,7 @@ void GridAttack_UpdateAnimationFourteen(struct GridAttackActor *p)
         p->actionTimer++;
 }
 
-void GridAttack_UpdateAnimationFifteen(struct GridAttackActor *p)
+void NidhoggrDuel_UpdateAnimationFifteen(struct GridAttackActor *p)
 {
     if (GridAttack_TakeActionEntryBool(p)) {
         GridAttack_RequestAnimation(p, 0xF);
@@ -1135,7 +1135,7 @@ void GridAttack_UpdateAnimationFifteen(struct GridAttackActor *p)
         p->actionTimer++;
 }
 
-void GridAttack_UpdateAnimationSixteen(struct GridAttackActor *p)
+void NidhoggrDuel_UpdateAnimationSixteen(struct GridAttackActor *p)
 {
     if (GridAttack_TakeActionEntryBool(p)) {
         GridAttack_RequestAnimation(p, 16);
@@ -1147,7 +1147,7 @@ void GridAttack_UpdateAnimationSixteen(struct GridAttackActor *p)
         p->actionTimer++;
 }
 
-void GridAttack_UpdateAnimationSeventeen(struct GridAttackActor *p)
+void NidhoggrDuel_UpdateAnimationSeventeen(struct GridAttackActor *p)
 {
     if (GridAttack_TakeActionEntryBool(p)) {
         GridAttack_RequestAnimation(p, 0x11);
@@ -1161,7 +1161,7 @@ void GridAttack_UpdateAnimationSeventeen(struct GridAttackActor *p)
 
 extern const u32 gUnk_08604FF0[];
 
-void GridAttack_DispatchSpecialAnimation(struct GridAttackActor *p)
+void NidhoggrDuel_DispatchSpecialAnimation(struct GridAttackActor *p)
 {
     Callback_InvokeActor(p, (void *)gUnk_08604FF0[p->action]);
 }
@@ -1175,11 +1175,11 @@ static inline void GridAttack_StartReaction(struct GridAttackActor *p, int one, 
     p->entered = one;
 }
 
-int GridAttack_TryStartDamageReaction(struct GridAttackActor *p)
+int NidhoggrDuel_TryStartDamageReaction(struct GridAttackActor *p)
 {
     if (p->health <= 0 && p->healthCheck) {
         GridAttack_AddFlags(p, 2);
-        GridAttack_SetState(p, GridAttack_UpdateDeathState, 8);
+        GridAttack_SetState(p, NidhoggrDuel_UpdateDeathState, 8);
     }
     p->healthCheck = 0;
     {
@@ -1194,20 +1194,20 @@ int GridAttack_TryStartDamageReaction(struct GridAttackActor *p)
     return 0;
 }
 
-void GridAttack_UpdateWaitAction(struct GridAttackActor *p)
+void NidhoggrDuel_UpdateWaitAction(struct GridAttackActor *p)
 {
     struct GridAttackActor *base = p;
     p->healthCheck = 1;
     if (GridAttack_TakeActionEntryBool(p) == 1)
         base->requested = 1;
     if (base->actionTimer > p->actionDuration) {
-        if (GridAttack_SelectNextAction(p))
+        if (NidhoggrDuel_SelectNextAction(p))
             return;
     }
     base->actionTimer++;
 }
 
-void GridAttack_UpdateActionTwo(struct GridAttackActor *p)
+void NidhoggrDuel_UpdateActionTwo(struct GridAttackActor *p)
 {
     struct GridAttackActor *base = p;
     p->healthCheck = 1;
@@ -1220,7 +1220,7 @@ void GridAttack_UpdateActionTwo(struct GridAttackActor *p)
         p->actionTimer++;
 }
 
-void GridAttack_UpdateDeathAction(struct GridAttackActor *p)
+void NidhoggrDuel_UpdateDeathAction(struct GridAttackActor *p)
 {
     struct GridAttackActor *base = p;
     p->healthCheck = 1;
@@ -1233,7 +1233,7 @@ void GridAttack_UpdateDeathAction(struct GridAttackActor *p)
         p->actionTimer++;
 }
 
-void GridAttack_UpdateAttackAction(struct GridAttackActor *p)
+void NidhoggrDuel_UpdateAttackAction(struct GridAttackActor *p)
 {
     struct GridAttackActor *base = p;
     p->healthCheck = 1;
@@ -1252,7 +1252,7 @@ void GridAttack_UpdateAttackAction(struct GridAttackActor *p)
         p->actionTimer++;
 }
 
-void GridAttack_UpdateAnimationFive(struct GridAttackActor *p)
+void NidhoggrDuel_UpdateAnimationFive(struct GridAttackActor *p)
 {
     if (GridAttack_TakeActionEntry(p)) {
         GridAttack_RequestAnimation(p, 5);
@@ -1260,7 +1260,7 @@ void GridAttack_UpdateAnimationFive(struct GridAttackActor *p)
     p->actionTimer++;
 }
 
-void GridAttack_UpdateRecoveryAction(struct GridAttackActor *p)
+void NidhoggrDuel_UpdateRecoveryAction(struct GridAttackActor *p)
 {
     struct GridAttackActor *base = p;
     if (GridAttack_TakeActionEntryBool(p)) {
@@ -1272,7 +1272,7 @@ void GridAttack_UpdateRecoveryAction(struct GridAttackActor *p)
     p->actionTimer++;
 }
 
-void GridAttack_UpdateDamageAction(struct GridAttackActor *p)
+void NidhoggrDuel_UpdateDamageAction(struct GridAttackActor *p)
 {
     struct GridAttackActor *base = p;
     if (GridAttack_TakeActionEntryBool(p) == 1) {
@@ -1287,7 +1287,7 @@ void GridAttack_UpdateDamageAction(struct GridAttackActor *p)
     }
 }
 
-void GridAttack_UpdatePassiveAction(struct GridAttackActor *p)
+void NidhoggrDuel_UpdatePassiveAction(struct GridAttackActor *p)
 {
     u8 *q = &p->entered;
     if (*q) {
@@ -1300,24 +1300,24 @@ void GridAttack_UpdatePassiveAction(struct GridAttackActor *p)
 
 extern const u32 gUnk_08605014[];
 
-void GridAttack_DispatchNormalAction(struct GridAttackActor *p)
+void NidhoggrDuel_DispatchNormalAction(struct GridAttackActor *p)
 {
     Callback_InvokeActor(p, (void *)gUnk_08605014[p->action]);
 }
 
 extern const u32 gUnk_08605024[];
 
-void GridAttack_DispatchReactionAction(struct GridAttackActor *p)
+void NidhoggrDuel_DispatchReactionAction(struct GridAttackActor *p)
 {
     Callback_InvokeActor(p, (void *)gUnk_08605024[p->action]);
 }
 
 extern const u32 gUnk_08605034[];
 
-void GridAttack_UpdateNormalActions(struct GridAttackActor *p)
+void NidhoggrDuel_UpdateNormalActions(struct GridAttackActor *p)
 {
     if (!PlayerSlot_ReadStatus(0, 4)) {
-        if (GridAttack_TryStartDamageReaction(p) == 0) {
+        if (NidhoggrDuel_TryStartDamageReaction(p) == 0) {
             Callback_InvokeActor(p, (void *)gUnk_08605034[p->actionReset]);
         }
     }
@@ -1325,21 +1325,21 @@ void GridAttack_UpdateNormalActions(struct GridAttackActor *p)
 
 extern const u32 gUnk_08605038[];
 
-void GridAttack_UpdateReactionActions(struct GridAttackActor *p)
+void NidhoggrDuel_UpdateReactionActions(struct GridAttackActor *p)
 {
     Callback_InvokeActor(p, (void *)gUnk_08605038[p->actionReset]);
 }
 
 extern const u32 gUnk_0860503C[];
 
-void GridAttack_UpdateSpecialActions(struct GridAttackActor *p)
+void NidhoggrDuel_UpdateSpecialActions(struct GridAttackActor *p)
 {
     Callback_InvokeActor(p, (void *)gUnk_0860503C[p->actionReset]);
 }
 
 extern u32 gUnk_08605040[];
 
-void GridAttack_UpdateActionController(struct GridAttackActor *p)
+void NidhoggrDuel_UpdateActionController(struct GridAttackActor *p)
 {
     p->controllerReset = 0;
     Callback_InvokeActor(p, (void *)gUnk_08605040[p->active]);
@@ -1351,14 +1351,14 @@ static inline s32 GridAttack_Truncate12(s32 value)
     return value >= 0 ? value >> 12 : -((-value) >> 12);
 }
 
-void GridAttack_UpdateAnimationAndTargets(struct GridAttackActor *p)
+void NidhoggrDuel_UpdateAnimationAndTargets(struct GridAttackActor *p)
 {
     struct GridAttackActor *actor = p;
     struct GridAttackActor *owner = p;
     struct GridAttackTransform *body = &actor->transform;
     s32 height;
     u32 i;
-    GridAttack_ProcessMessages(actor);
+    NidhoggrDuel_ProcessMessages(actor);
     Obj_StepPosition(body);
     owner->animationEnded = PlayerCue_StepSequenceEnded(&actor->drawable, &actor->animation);
     if (actor->projectedDisplay)
@@ -1402,36 +1402,36 @@ void GridAttack_UpdateAnimationAndTargets(struct GridAttackActor *p)
     }
 }
 
-s32 ContactSequencePool_GetActiveCount(void *);
+s32 NidhoggrDuelMinionPool_GetActiveCount(void *);
 void SceneActors_ConfigureEffect(void *, s32, s32, s32);
 void SceneActors_UpdateEffects(void *);
 
-void GridAttackActor_EmitSpriteParticles(struct GridAttackActor *);
+void NidhoggrDuel_EmitSpriteParticles(struct GridAttackActor *);
 void Palette_InterpolateBanks(void *, const void *, const void *, s32, s32);
 
 static inline void GridAttack_CopyPalette(const void *source, void *dest)
 {
     CpuSet(source, dest, 0x04000008);
 }
-void GridAttack_UpdateCollidersAndPalette(struct GridAttackActor *p)
+void NidhoggrDuel_UpdateCollidersAndPalette(struct GridAttackActor *p)
 {
     struct GridAttackActor *base = p;
     struct GridAttackTransform *transform = &p->transform;
     struct ContactCollider *collider;
-    if (ContactSequencePool_GetActiveCount(p->contactPool) > p->contactCountLimit) {
-        ContactBurst_SetEnabled(p->contactBurst, 1);
+    if (NidhoggrDuelMinionPool_GetActiveCount(p->contactPool) > p->contactCountLimit) {
+        NidhoggrDuelBurst_SetEnabled(p->contactBurst, 1);
         GridAttack_AddFlags(p, 4);
         p->attackCount = 0;
     } else {
-        if ((!p->attackCount) && ContactBurst_GetEnabled(p->contactBurst)) {
+        if ((!p->attackCount) && NidhoggrDuelBurst_GetEnabled(p->contactBurst)) {
             SceneActors_ConfigureEffect(p, 1, 0, 0);
             Sound_PlaySongChecked(0x54D);
         }
-        ContactBurst_SetEnabled(base->contactBurst, 0);
+        NidhoggrDuelBurst_SetEnabled(base->contactBurst, 0);
         if (base->attackCount < base->attackLimit)
             base->attackCount++;
     }
-    if (ContactBurst_GetEnabled(base->contactBurst))
+    if (NidhoggrDuelBurst_GetEnabled(base->contactBurst))
         GridAttack_ClearFlags(p, 0x40);
     SceneActors_UpdateEffects(p);
     if (base->stun) {
@@ -1543,23 +1543,23 @@ void GridAttack_UpdateCollidersAndPalette(struct GridAttackActor *p)
     if (!p->locked)
         CameraTracking_Update(&base->camera);
     if ((p->locked && base->messageParameter) && (!(p->effectTimer & 15)))
-        GridAttackActor_EmitSpriteParticles(base);
+        NidhoggrDuel_EmitSpriteParticles(base);
     p->contactSource = 0;
     p->contactFlags = 0;
     p->effectTimer++;
 }
 
-int GridAttack_Update(struct GridAttackActor *p)
+int NidhoggrDuel_Update(struct GridAttackActor *p)
 {
     u16 *t;
-    GridAttack_UpdateAnimationAndTargets(p);
-    GridAttack_UpdateActionController(p);
-    GridAttack_RunStateIfUnpaused((u32)p);
-    GridAttack_UpdateCollidersAndPalette(p);
+    NidhoggrDuel_UpdateAnimationAndTargets(p);
+    NidhoggrDuel_UpdateActionController(p);
+    NidhoggrDuel_RunStateIfUnpaused((u32)p);
+    NidhoggrDuel_UpdateCollidersAndPalette(p);
     if (p->phaseTimer <= 0xef)
-        GridAttackActor_RequestLinkedActorState(p);
+        NidhoggrDuel_RequestLinkedActorState(p);
     else
-        GridAttackActor_NotifyLinkedActorLatePhase(p);
+        NidhoggrDuel_NotifyLinkedActorLatePhase(p);
     t = (u16 *)&p->phaseTimer;
     (*t)++;
     if (*t > 0x12b)
@@ -1567,10 +1567,10 @@ int GridAttack_Update(struct GridAttackActor *p)
     return 0;
 }
 
-u32 GridAttackActor_Destroy(struct GridAttackActor *p)
+u32 NidhoggrDuel_Destroy(struct GridAttackActor *p)
 {
     Collider_Remove(&p->damageCollider);
-    GridAttackActor_RemoveSprite(p);
+    NidhoggrDuel_RemoveSprite(p);
     SceneActors_Destroy(p);
     return 0;
 }
@@ -1581,10 +1581,10 @@ void SceneActors_SetHealthLimits(void *, s32, s32, s32);
 void SceneActors_SetEventScripts(void *, s32, s32);
 void SceneActors_SetDamageCallback(void *, void *, void *, s32);
 void CameraFollow_Initialize(void *, void *, void *, u32);
-void *ContactSequencePool_Create(s32, u32, s32, u32, u32);
-void *OrbitContactActor_Create(const struct ContactPosition *, u32);
+void *NidhoggrDuelMinionPool_Create(s32, u32, s32, u32, u32);
+void *NidhoggrDuelOrb_Create(const struct ContactPosition *, u32);
 
-s32 GridAttackActor_Initialize(struct GridAttackActor *p, u32 ctx)
+s32 NidhoggrDuel_Initialize(struct GridAttackActor *p, u32 ctx)
 {
     struct GridAttackActor *actor = p;
     struct GridAttackPacked pk;
@@ -1701,31 +1701,31 @@ s32 GridAttackActor_Initialize(struct GridAttackActor *p, u32 ctx)
         switch (Script_GetKeywordValue(0x44, 0)) {
             case 0:
                 GridAttack_StartActionMode(actor, 2, 0, 1);
-                GridAttack_SetState(actor, (void *)GridAttack_UpdateIdleState, 10);
+                GridAttack_SetState(actor, (void *)NidhoggrDuel_UpdateIdleState, 10);
                 break;
             case 1:
                 GridAttack_StartActionMode(actor, 2, 0, 0);
-                GridAttack_SetState(actor, (void *)GridAttack_UpdateHiddenState, 9);
+                GridAttack_SetState(actor, (void *)NidhoggrDuel_UpdateHiddenState, 9);
                 break;
             case 2:
                 GridAttack_StartActionMode(actor, 2, 0, 4);
-                GridAttack_SetState(actor, (void *)GridAttack_UpdateAlternateIdleState, 13);
+                GridAttack_SetState(actor, (void *)NidhoggrDuel_UpdateAlternateIdleState, 13);
                 break;
             case 3:
                 GridAttack_StartActionMode(actor, 2, 0, 3);
-                GridAttack_SetState(actor, (void *)GridAttack_UpdateAnimationElevenState, 12);
+                GridAttack_SetState(actor, (void *)NidhoggrDuel_UpdateAnimationElevenState, 12);
                 break;
         }
     } else {
         GridAttack_BeginIdleWait(p, 90);
-        GridAttack_SetState(actor, (void *)GridAttackActor_UpdateIdle, 1);
+        GridAttack_SetState(actor, (void *)NidhoggrDuel_UpdateIdle, 1);
     }
 
-    *tryUpdate = (void *)GridAttack_ApplyPendingDamage;
-    *reset = (void *)GridAttack_ApplyRequestedState;
+    *tryUpdate = (void *)NidhoggrDuel_ApplyPendingDamage;
+    *reset = (void *)NidhoggrDuel_ApplyRequestedState;
     SceneActors_SetHealthLimits(actor, health, health, p->bodyMode);
-    GridAttackActor_InitBodyCollider(p);
-    GridAttackActor_InitDamageCollider(p, p->bodyMode);
+    NidhoggrDuel_InitBodyCollider(p);
+    NidhoggrDuel_InitDamageCollider(p, p->bodyMode);
 
     if (Script_SeekToKeyword(0x63)) {
         s32 first = Script_GetValue();
@@ -1786,23 +1786,23 @@ s32 GridAttackActor_Initialize(struct GridAttackActor *p, u32 ctx)
     CameraFollow_Initialize(&p->camera, positions[0], &p->shadowPosition, 1);
     CameraTracking_SetRange(&p->camera, 0, 0x8C);
 
-    SceneActors_SetDamageCallback(actor, &p->damageCollider, (void *)GridAttackActor_OnDamage, 0);
+    SceneActors_SetDamageCallback(actor, &p->damageCollider, (void *)NidhoggrDuel_OnDamage, 0);
     if (Script_GetKeywordValue(0x43, 1) != 0)
         p->projectedDisplay = ProjectedDisplay_Create(position);
     else
         p->projectedDisplay = 0;
 
     p->contactPool =
-        ContactSequencePool_Create(poolHealth, poolValue, poolResource, ctx, (s16)p->contactReward);
-    p->orbitContact = OrbitContactActor_Create(position, orbitValue);
-    p->contactBurst = ContactBurst_Create(&p->drawable.position);
+        NidhoggrDuelMinionPool_Create(poolHealth, poolValue, poolResource, ctx, (s16)p->contactReward);
+    p->orbitContact = NidhoggrDuelOrb_Create(position, orbitValue);
+    p->contactBurst = NidhoggrDuelBurst_Create(&p->drawable.position);
     p->linkedActorId = Script_GetKeywordValue(0x54, 0);
     p->linkedActorPhase = 0;
     p->phaseTimer = 0;
     return 0;
 }
 
-struct GridAttackActor *GridAttackActor_Create(u32 a)
+struct GridAttackActor *NidhoggrDuel_Create(u32 a)
 {
     struct GridAttackActor *p;
     p = SceneActors_GetBySlot(Script_GetKeywordValue(0x74, 3));
@@ -1810,9 +1810,9 @@ struct GridAttackActor *GridAttackActor_Create(u32 a)
         return p;
     p = Task_Create(8, 0x924);
     if (p != 0) {
-        Task_SetCallbacks(p, (void (*)(void *))GridAttack_Update,
-                          (void (*)(void *))GridAttackActor_Destroy);
-        if (GridAttackActor_Initialize(p, a) < 0) {
+        Task_SetCallbacks(p, (void (*)(void *))NidhoggrDuel_Update,
+                          (void (*)(void *))NidhoggrDuel_Destroy);
+        if (NidhoggrDuel_Initialize(p, a) < 0) {
             Task_Kill(p);
             return 0;
         }

@@ -1,4 +1,4 @@
-// Pin-free draft of sub_08010C10 (src/effects/scene/bat_flock.c): 2 ROM / 2 draft; AGBCC_SPILL=0:1 matches.
+// Pin-free draft of sub_08010C10 (src/effects/bat_flock.c): 2 ROM / 2 draft; AGBCC_SPILL=0:1 matches.
 void sub_08010C10(struct GroupObjects *m, struct GroupPiece *p, int index)
 {
     struct GroupVec delta;
@@ -32,6 +32,6 @@ void sub_08010C10(struct GroupObjects *m, struct GroupPiece *p, int index)
     }
     p->position.x = p->anchor.x + p->offset.x;
     p->position.z = p->anchor.z + p->offset.z;
-    BoardPiece_SetFacingAnim(m, p, 0);
+    BatFlockBat_SetFacingAnim(m, p, 0);
     p->timer++;
 }

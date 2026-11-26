@@ -1,7 +1,7 @@
 #include "scene/actor/scene_actor_reaction.h"
 #include "engine/engine.h"
-#include "scene/actor/scene_actor_position_search.h"
-#include "scene/actor/scene_actor_chase_shared.h"
+#include "scene/motion/scene_actor_position_search.h"
+#include "scene/motion/scene_actor_chase_shared.h"
 
 u8 *TerrainModifiers_FindCellOverride(s32, s32);
 void SceneActorAttachment_ReplaceResponseSlot(void *, u32, u32, u32);

@@ -1,4 +1,4 @@
-#include "monsters/centipede/tentacle_body.h"
+#include "monsters/centipede/centipede_body.h"
 #include "global.h"
 
 static inline u8 TestMask(u8 flags, u32 mask)

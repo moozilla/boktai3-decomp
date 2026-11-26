@@ -1,4 +1,4 @@
-#include "scene/actor/scene_actor_position_search.h"
+#include "scene/motion/scene_actor_position_search.h"
 
 // confidence=low: resolves a tagged stimulus position and, for tag 0xB546, snaps it to a reachable neighbour.
 u32 sub_081376B4(u8 *actor, u16 *position, s32 index)

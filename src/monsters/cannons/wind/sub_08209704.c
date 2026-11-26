@@ -64,7 +64,7 @@ static inline void FanCannon_AddPosition(struct SceneVec *out, const struct Scen
     out->z = a->z + b->z;
 }
 
-u32 FanCannon_UpdateActive(struct FanCannon *p)
+u32 WindCannon_UpdateActive(struct FanCannon *p)
 {
     struct ParticleParameters parameters;
     struct SceneVec position, velocity, offset;

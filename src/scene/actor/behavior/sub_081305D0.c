@@ -1,5 +1,5 @@
 #include "global.h"
-#include "scene/actor/scene_actor_terrain_reaction.h"
+#include "scene/motion/scene_actor_terrain_reaction.h"
 
 void SceneActorControl_AdvancePhase(struct ChaseActor *actor)
 {

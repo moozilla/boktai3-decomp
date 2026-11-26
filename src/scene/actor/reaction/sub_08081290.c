@@ -1,4 +1,4 @@
-#include "scene/actor/scene_actor_terrain_reaction.h"
+#include "scene/motion/scene_actor_terrain_reaction.h"
 #include "scene/actor/scene_actor_reaction.h"
 void SceneActorAttachment_ReplaceResponseSlot(struct ChaseActor *, u32, u32, u32);
 void SceneActorEffects_AdvanceSteps(void *, u32);
@@ -28,7 +28,7 @@ static inline void Show(struct ChaseActor *a)
         u32 mask = ~1;
         *flags &= mask;
     } else {
-        struct SceneInputWidget *tile = (void *)((u8 *)a->base.drawable + 0x20);
+        struct AnimSprite *tile = (void *)((u8 *)a->base.drawable + 0x20);
         u32 mask = ~1;
         tile->flags &= mask;
     }
@@ -111,7 +111,7 @@ void SceneActorReaction_SinkAndRemove(struct ChaseActor *actor, s32 frame)
             if (!actor->base.drawableKind)
                 *(u32 *)actor->base.drawable |= 1;
             else {
-                struct SceneInputWidget *tile = (void *)((u8 *)actor->base.drawable + 0x20);
+                struct AnimSprite *tile = (void *)((u8 *)actor->base.drawable + 0x20);
                 tile->flags |= 1;
             }
         }

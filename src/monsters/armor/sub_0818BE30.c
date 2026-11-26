@@ -1,5 +1,5 @@
 #include "global.h"
-#include "scene/actor/contact_collider.h"
+#include "scene/collision/contact_collider.h"
 struct ArmorColliderOwner {
     u8 pad0[0xD4];
     u8 position[8];

@@ -4,7 +4,7 @@
 #include "link/wireless/scene_pool.h"
 #include "scene/actor/actor_stats.h"
 #include "scene/actor/scene_actor_style.h"
-#include "scene/area_effect/area_effect_link.h"
+#include "scene/areas/area_effect_link.h"
 #include "ui/tilemap_panel.h"
 #include "effects/screen/background_controller.h"
 struct CharacterPaletteSource {

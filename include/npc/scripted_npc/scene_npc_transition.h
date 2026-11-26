@@ -1,7 +1,7 @@
 #ifndef GUARD_SCENE_NPC_TRANSITION_H
 #define GUARD_SCENE_NPC_TRANSITION_H
 
-#include "scene/actor/contact_position.h"
+#include "scene/collision/contact_position.h"
 
 struct TransitionMotion {
     struct ContactPosition position;

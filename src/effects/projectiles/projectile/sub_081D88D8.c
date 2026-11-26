@@ -1,5 +1,5 @@
 #define SpriteSequence_SetCallback  Projectile_SetUpdateCallback
-#define SpriteGroup_SelectAnimation Task4E01_SetTrailSpriteResources
+#define SpriteGroup_SelectAnimation ProjectileTask_SetTrailSpriteResources
 #include "global.h"
 struct SpriteSequenceState {
     u8 unknown[0x4C];
@@ -20,8 +20,8 @@ struct SpriteSequence {
 };
 void *ResourceRegistry_GetResource(u16);
 void Projectile_SetUpdateCallback(void *, void *);
-void Task4E01_SetTrailSpriteResources(void *, u32);
-void Task4E01_UpdateTrailImpact(void);
+void ProjectileTask_SetTrailSpriteResources(void *, u32);
+void ProjectileTask_UpdateTrailImpact(void);
 extern const u32 gUnk_08613684[];
 s32 SpriteSequence_BeginStageAnimation(struct SpriteSequence *p)
 {
@@ -34,8 +34,8 @@ s32 SpriteSequence_BeginStageAnimation(struct SpriteSequence *p)
             struct SpriteSequenceSprite *sprite = &p->sprite;
             sprite->frame = 0x1A;
         }
-        Projectile_SetUpdateCallback(state, Task4E01_UpdateTrailImpact);
-        Task4E01_SetTrailSpriteResources(group, gUnk_08613684[state->stage]);
+        Projectile_SetUpdateCallback(state, ProjectileTask_UpdateTrailImpact);
+        ProjectileTask_SetTrailSpriteResources(group, gUnk_08613684[state->stage]);
         result = 0;
     } else {
         result = -1;

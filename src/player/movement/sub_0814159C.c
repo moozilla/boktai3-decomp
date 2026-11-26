@@ -1,5 +1,5 @@
 #include "global.h"
-#include "scene/actor/scene_facing.h"
+#include "scene/motion/scene_facing.h"
 #include "engine/video/render.h"
 #include "player/player.h"
 

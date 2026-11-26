@@ -1,8 +1,8 @@
 #include "objects/pile_driver/scene_panel.h"
-void ScenePanel_BeginLongSequence(struct ScenePanel *panel)
+void PileDriver_BeginLongSequence(struct ScenePanel *panel)
 {
-    ScenePanel_SetChannelValue(panel, 2, 6);
-    ScenePanel_SetState(panel, ScenePanel_TickLongSix);
+    PileDriver_SetChannelValue(panel, 2, 6);
+    PileDriver_SetState(panel, PileDriver_TickLongSix);
     panel->transitionComplete = 0;
     panel->stateFrame = 0;
 }

@@ -2,8 +2,8 @@
 #define GUARD_GHOUL_DISC_H
 
 #include "monsters/ghoul.h"
-#include "scene/actor/scene_actor_chase_reaction.h"
-#include "scene/actor/scene_actor_terrain.h"
+#include "scene/motion/scene_actor_chase_reaction.h"
+#include "scene/motion/scene_actor_terrain.h"
 #include "monsters/scene_actor_init_primitives.h"
 
 u8 SceneActorTerrain_CanTraverseCell(u32, u32, u32, u32);

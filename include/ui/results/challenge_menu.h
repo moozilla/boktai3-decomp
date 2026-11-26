@@ -5,8 +5,8 @@
 #include "engine/video/render.h"
 struct ChallengeMenu {
     struct Task task;
-    struct SceneInputResource resources[3];
-    struct SceneInputWidget widgets[6];
+    struct AnimSpriteResource resources[3];
+    struct AnimSprite widgets[6];
     void *backgroundResource;
     u16 *paletteSource;
     u16 palette[12];

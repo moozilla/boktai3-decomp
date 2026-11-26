@@ -1,6 +1,6 @@
 #include "objects/pile_driver/scene_panel_rig_setup.h"
 
-void ScenePanel_InitRig(struct ScenePanel *input)
+void PileDriver_InitRig(struct ScenePanel *input)
 {
     struct SceneRigSetupParentView *panel = (void *)input;
     struct ScenePanelRig *rig = &panel->rig;
@@ -18,13 +18,13 @@ void ScenePanel_InitRig(struct ScenePanel *input)
     gRandomIndex = (gRandomIndex + 1) & 1023;
     Mod(*(u16 *)(RANDOM_TABLE_ADDR + gRandomIndex * 2), 600);
     gRandomIndex = (gRandomIndex + 1) & 1023;
-    ScenePanelRig_InitSprites(rig);
+    PileDriverRig_InitSprites(rig);
     if (Script_SeekToKeyword('L'))
         work.power = Script_GetValue();
     else
         work.power = 5;
-    ScenePanelRig_InitCollider(rig, work.power);
-    ScenePanelRig_SetState(rig, 0);
+    PileDriverRig_InitCollider(rig, work.power);
+    PileDriverRig_SetState(rig, 0);
     {
         u16 *angle = &rig->angle;
         u32 initialZero = 0;
@@ -98,6 +98,6 @@ void ScenePanel_InitRig(struct ScenePanel *input)
         value = 600;
         *duration = value;
     }
-    ScenePanelRig_InitPayloadVectors(rig);
+    PileDriverRig_InitPayloadVectors(rig);
     rig->parent = input;
 }

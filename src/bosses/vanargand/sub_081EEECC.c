@@ -23,7 +23,7 @@ static inline u32 ReadDepartureJitter(const union DepartureJitterSource *source)
 {
     return NextRandom(source->table);
 }
-void SingletonSlot7_UpdateShakingDeparture(struct DepartureActor *input, s32 frame)
+void VanargandHead_UpdateShakingDeparture(struct DepartureActor *input, s32 frame)
 {
     struct DepartureActor *actor = input;
     if (input->entered) {

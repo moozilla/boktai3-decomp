@@ -2,7 +2,7 @@
 #define GUARD_PLAYER_CORE_H
 #include "engine/engine.h"
 #include "player/player.h"
-#include "scene/actor/contact_actor.h"
+#include "scene/collision/contact_actor.h"
 #include "objects/scene_objects/scene_object.h"
 /* Script argument header is a packed count word; upper bits are preserved. */
 struct PlayerEventArguments {

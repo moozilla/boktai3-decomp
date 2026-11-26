@@ -1,5 +1,5 @@
 // COMPILER: old_agbcc
-#include "scene/actor/route_sprite_actor.h"
+#include "scene/motion/route_sprite_actor.h"
 /* RouteSpritePool_ResetSingleton: Clears the route sprite pool singleton pointer */
 #define RouteSpritePool_ResetSingleton sub_0806E29C
 #define RouteSpritePool_ResetSingleton sub_0806E29C

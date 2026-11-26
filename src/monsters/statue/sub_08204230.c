@@ -3,7 +3,7 @@
 // graphics and the first animation frame, and installs the idle callback.
 #include "engine/math/scene_vec.h"
 #include "engine/engine_globals.h"
-#include "player/cues/player_cue_sequence.h"
+#include "player/cutscene/player_cue_sequence.h"
 struct PHVec {
     s16 x, y, z, pad;
 };
@@ -11,10 +11,10 @@ struct PHTerrain {
     u8 pad[0x24];
     u16 rows[1];
 };
-void EnemyF426_InitCollider(void *);
+void Statue_InitCollider(void *);
 void sub_08203CA0(void);
 s32 Script_GetValueSafe(void);
-void EnemyF426_ReadScriptValueList(void *);
+void Statue_ReadScriptValueList(void *);
 void TerrainModifiers_RegisterCell(void *, s32, s32, s32, s32, s32);
 void SceneBody_Init(void *, void *, void *, u32, u32, void *);
 void SceneBody_SetSprite(void *, void *);
@@ -42,7 +42,7 @@ struct EnemyF426Tail {
     u8 pad146[0xe];
     void *resource;
 };
-s32 EnemyF426_InitializeFromScript(u8 *p, void *parent)
+s32 Statue_InitializeFromScript(u8 *p, void *parent)
 {
     void *resource;
     s32 found;
@@ -135,7 +135,7 @@ s32 EnemyF426_InitializeFromScript(u8 *p, void *parent)
     PlayerCue_StepSequence((struct ContactSwarmSprite *)(p + 0x24),
                            (struct DisplaySequenceState *)(p + 0x10c));
     if (!((struct EnemyF426Tail *)p)->dead)
-        EnemyF426_InitCollider(p);
+        Statue_InitCollider(p);
     if (W(0x150) && !((struct EnemyF426Tail *)p)->dead) {
         s32 cell = EnemyF426_CellIndex((struct PHVec *)(p + 0x40));
         TerrainModifiers_RegisterCell(p + 0x174, cell, 0, H(0x42) >> 8, 0, 1);
@@ -147,7 +147,7 @@ s32 EnemyF426_InitializeFromScript(u8 *p, void *parent)
         TerrainOverlay_QueueAddActor(body);
     }
     if (W(0x148))
-        EnemyF426_ReadScriptValueList(p);
+        Statue_ReadScriptValueList(p);
     *(void (**)(void))(p + 0x108) = sub_08203CA0;
 #ifdef UBFIX
     // falls off the end with r0 left over from its last statement; the creator only tests

@@ -1,7 +1,7 @@
 #include "global.h"
 // confidence=low: copies the local link result and clamps its displayed score.
 #define LinkScorePanel_UpdateDisplayedScore sub_081100A0
-#include "scene/area_effect/area_effect_link.h"
+#include "scene/areas/area_effect_link.h"
 
 struct LinkScorePanel {
     u8 unknown0[0x102E];

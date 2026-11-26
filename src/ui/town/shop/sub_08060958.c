@@ -1,6 +1,6 @@
-#include "ui/town/scene_inventory_actions.h"
+#include "ui/town/shop_actions.h"
 
-s32 SceneInventory_FindEmptyItemSlot(const void *unusedOwner)
+s32 Shop_FindEmptyItemSlot(const void *unusedOwner)
 {
     s32 i;
     for (i = 0; i < 16; i++) {

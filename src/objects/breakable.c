@@ -1,5 +1,5 @@
 #include "objects/breakable.h"
-#include "scene/actor/scene_actor_terrain.h"
+#include "scene/motion/scene_actor_terrain.h"
 /* Breakable_NullCallback: Empty no-op function used as a placeholder/gap callback entry. */
 
 struct PooledInteractable *Breakable_FindFreeSlot(struct PooledInteractableManager *manager)
@@ -263,7 +263,7 @@ s32 Breakable_InitManager(struct PooledInteractableManager *manager)
     struct PooledInteractable *slot;
     gPooledInteractableManager = manager;
     for (i = 0; i < 3; i++) {
-        struct SceneInputResource *resource = ScriptProc_Start(0xcb05, gUnk_086049C8[i]);
+        struct AnimSpriteResource *resource = ScriptProc_Start(0xcb05, gUnk_086049C8[i]);
         if (!resource)
             return -1;
         manager->resources[i] = *resource;

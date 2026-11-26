@@ -1,5 +1,5 @@
 #include "scene/actor/scene_actor_effects.h"
-#include "scene/actor/scene_actor_route.h"
+#include "scene/motion/scene_actor_route.h"
 struct SceneActorRouteTargetPosition {
     s16 x, y, z, pad;
 };

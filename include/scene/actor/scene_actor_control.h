@@ -1,7 +1,7 @@
 #ifndef GUARD_SCENE_ACTOR_CONTROL_H
 #define GUARD_SCENE_ACTOR_CONTROL_H
 #include "engine/engine.h"
-#include "scene/actor/contact_actor.h"
+#include "scene/collision/contact_actor.h"
 /* Tentative owner: an eight-slot scene controller that applies player/tether
  * parameters. These names describe observed consumers, not screen identity. */
 struct SceneActorControlSprite {

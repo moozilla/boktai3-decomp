@@ -1,7 +1,7 @@
 #include "global.h"
 #include "engine/engine.h"
 #include "engine/ram.h"
-#include "scene/area_effect/area_effect_link.h"
+#include "scene/areas/area_effect_link.h"
 struct Registry1745Settings {
     u8 pad0[0x15C];
     u32 field15C;
@@ -49,18 +49,18 @@ struct Registry1745 {
 };
 void Task_LinkToPriorityList(void *);
 void sub_08223180(void);
-void Registry1745_ResetTransferCounters(void *);
-void Registry1745_InitSessionSettings(void *);
-void Registry1745_SetState(void *, s32, void (*)(void));
+void LinkSession_ResetTransferCounters(void *);
+void LinkSession_InitSessionSettings(void *);
+void LinkSession_SetState(void *, s32, void (*)(void));
 u8 *Script_GetTextSourcePc(void);
 void Hud_SetMode(s32);
 void SessionMenu_Destroy(void *);
 void ScriptPanel_ConfirmSelection(void);
-void Registry1745_RunSession(void);
+void LinkSession_RunSession(void);
 /* Registry routine 1745: creates the singleton at gLinkSession (0x268
    bytes) from the script options; returns the existing one if there is one,
    or 0 when a required option is missing. */
-struct Registry1745 *Registry1745_Create(void)
+struct Registry1745 *LinkSession_Create(void)
 {
     struct Registry1745 *existing = gLinkSession;
     void *m;
@@ -104,9 +104,9 @@ struct Registry1745 *Registry1745_Create(void)
         p->field64[i] = 0;
         entry++;
     }
-    Registry1745_ResetTransferCounters(m);
-    Registry1745_InitSessionSettings(m);
-    Registry1745_SetState(p, 1, ScriptPanel_ConfirmSelection);
+    LinkSession_ResetTransferCounters(m);
+    LinkSession_InitSessionSettings(m);
+    LinkSession_SetState(p, 1, ScriptPanel_ConfirmSelection);
     p->field20 = 3;
     p->fieldD4 = Script_GetKeywordValue('U', 0);
     p->fieldD0 = Script_GetKeywordValue('Y', 0);
@@ -129,6 +129,6 @@ struct Registry1745 *Registry1745_Create(void)
     if (!Script_SeekToKeyword('e') || !(settings->field17C = Script_GetTextSourcePc()))
         goto fail;
     Hud_SetMode(7);
-    p->fieldB4 = Registry1745_RunSession;
+    p->fieldB4 = LinkSession_RunSession;
     p->field53 = 1;
 }

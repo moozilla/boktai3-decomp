@@ -31,7 +31,7 @@ first 0x18 bytes are that header; its size is the `size` argument to `Task_Creat
 * **The player** is a task. `struct Player` (`include/player/player.h`) begins with
   `struct Task task;` and is created by `Player_Create` (`Task_Create(6, 0xCAC)`).
 * **Each boss** is its own task class with a very large body. `struct Nidhoggr`
-  (`include/bosses/nidhoggr/large_scene_animation_controller.h`) is `struct Task`, a `SceneEventReceiver`,
+  (`include/bosses/nidhoggr/nidhoggr_animation.h`) is `struct Task`, a `SceneEventReceiver`,
   then more than 0x66D8 bytes holding 26 parts with their own visuals and colliders. No
   Hresvelgr, Ratatosk or Vanargand unit touches the registry-actor base.
 * **Managers** are tasks that own pools or lists (scene objects, triggers, the registry
@@ -137,7 +137,7 @@ profiles (`SceneActorProfiles_FindOrAdd(category, count)`).
 | 6 | Skeleton, guard variant | `-k 6`: Skeleton_TryBeginGuardedAttack, a 60-frame hop timer |
 | 7 | Skeleton, armed variant | `-k 7`: Skeleton_TryBeginArmedAttack; also set by Skeleton_UpdateDefeat |
 | 8 | Skeleton, further variant | a profile case only. One script computes `-k (local2 & 255)`, so it may pick 8 (low confidence) |
-| 9 | Tentacle | TentacleActor_Init |
+| 9 | Tentacle | Centipede_Init |
 | 10 | Mimic | Mimic init |
 | 12, 13 | Axe: variant 0, and any other variant (keyword `-t`) | Axe init |
 | 14 | Octopus | Octopus init |

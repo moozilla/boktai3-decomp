@@ -31,14 +31,14 @@ struct SingletonSlot7Scroll {
 s32 Player_GetHorizontalVelocity(s32);
 void Player_GetWorldPosition(s32, s32 *);
 void SceneTilemap_CopyScrollSourceState(struct SingletonSlot7Scroll *);
-void SingletonSlot7_ResetDisplayState(struct SingletonSlot7Actor *);
-void SingletonSlot7_DispatchUpdateCallback(struct SingletonSlot7Actor *);
+void VanargandHead_ResetDisplayState(struct SingletonSlot7Actor *);
+void VanargandHead_DispatchUpdateCallback(struct SingletonSlot7Actor *);
 void SceneActors_TickStateCallback(struct SingletonSlot7Actor *);
 void SceneActors_UpdateTargetMetrics(struct SingletonSlot7Actor *);
 void SceneActors_UpdateEffects(struct SingletonSlot7Actor *);
 void Sound_StopSong(u32);
 void SceneActors_UpdateIdleDisplay(void);
-void SingletonSlot7_UpdatePresentation(struct SingletonSlot7Actor *);
+void VanargandHead_UpdatePresentation(struct SingletonSlot7Actor *);
 
 static inline u8 PlayerHasFlag(void)
 {
@@ -55,7 +55,7 @@ static inline void (*SingletonSlot7_GetCallback(struct SingletonSlot7Actor *owne
 {
     return owner->callback;
 }
-s32 SingletonSlot7_Update(void *arg)
+s32 VanargandHead_Update(void *arg)
 {
     struct SingletonSlot7Actor *actor = arg;
     struct SingletonSlot7Actor *p = actor;
@@ -79,8 +79,8 @@ s32 SingletonSlot7_Update(void *arg)
         actor->scrollX = scroll[1].a;
     }
     SceneActors_UpdateTargetMetrics(p);
-    SingletonSlot7_ResetDisplayState(actor);
-    SingletonSlot7_DispatchUpdateCallback(actor);
+    VanargandHead_ResetDisplayState(actor);
+    VanargandHead_DispatchUpdateCallback(actor);
     SceneActors_TickStateCallback(actor);
     if (p->motionMode != 0) {
         u32 mask = 0x40;
@@ -88,6 +88,6 @@ s32 SingletonSlot7_Update(void *arg)
         *fp |= mask;
     }
     SceneActors_UpdateEffects(p);
-    SingletonSlot7_UpdatePresentation(actor);
+    VanargandHead_UpdatePresentation(actor);
     return 0;
 }

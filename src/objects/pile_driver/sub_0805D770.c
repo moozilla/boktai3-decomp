@@ -1,5 +1,5 @@
 #include "objects/pile_driver/scene_panel_subject_tail.h"
-void ScenePanelSubject_UpdatePaletteBank(struct ScenePanelSubject *subject)
+void PileDriverSubject_UpdatePaletteBank(struct ScenePanelSubject *subject)
 {
     if (subject->requested) {
         if (subject->requestLevel <= 11)

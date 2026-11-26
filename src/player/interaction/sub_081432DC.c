@@ -1,7 +1,7 @@
 #include "global.h"
 #include "player/player_status_flags.h"
 #include "system/game_state/game_state.h"
-#include "scene/actor/scene_facing.h"
+#include "scene/motion/scene_facing.h"
 
 // confidence=low: approaches the saved interaction position, then holds an energy-consuming action.
 extern const s16 gUnk_086149C4[];

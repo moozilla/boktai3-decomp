@@ -1,11 +1,11 @@
-#include "ui/widgets/scene_input_widget.h"
+#include "engine/video/anim_sprite.h"
 static inline s32 Scale6(s32 v)
 {
     if (v >= 0)
         return v >> 6;
     return -((-v) >> 6);
 }
-s32 Anim_SetFrameDurationScale(struct SceneInputWidget *anim, u16 scale)
+s32 Anim_SetFrameDurationScale(struct AnimSprite *anim, u16 scale)
 {
     struct AnimationKeyframe *frame = &anim->frames[anim->frameIndex];
     anim->durationScale = scale;

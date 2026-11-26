@@ -5,7 +5,7 @@
 #include "objects/scene_objects/scene_object.h"
 #include "system/game_state/game_state.h"
 #include "scene/actor/actor_stats.h"
-#include "scene/actor/contact_actor.h"
+#include "scene/collision/contact_actor.h"
 #include "scene/actor/modifier_list.h"
 #include "effects/particles/scene_debris_types.h"
 

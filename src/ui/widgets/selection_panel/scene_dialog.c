@@ -47,7 +47,7 @@ void PauseMenu_InitSleepTab(struct SceneHudState *menu)
     PauseMenu_LoadSpriteKeyframe(menu, 0, 0x59);
     MessageWindow_SetMessageTable(menu->optionUpperEScript);
     MessageWindow_SetPalette(0xEFDA);
-    SceneCatalog_SelectDescription(0x11);
+    StatusOptions_SelectDescription(0x11);
     menu->pageInputCooldown = 0;
     PauseMenu_SetPromptIconPositions(menu, 0, -12);
     PauseMenu_SetPairedIcons(menu, 1, -1);
@@ -59,7 +59,7 @@ void SelectionPanel_ConfirmTransition(struct SceneHudState *menu)
     if (gPadState[1] & 1) {
         Sound_PlaySong(0xDD);
         PauseMenu_SetConfirmationIndicator(menu, 1);
-        SceneCatalog_SelectDescription(9);
+        StatusOptions_SelectDescription(9);
         PauseMenu_HidePromptIcons(menu);
         Hud_SetInteractionCallback(menu, SelectionPanel_ProcessFlaggedChoice, 1);
         MenuDisplay_SetPaletteOverrides(menu, 0, 0, 1, 0);
@@ -71,7 +71,7 @@ void SelectionPanel_ProcessFlaggedChoice(struct SceneHudState *menu)
     int choice = PauseMenu_UpdateBinaryChoice(menu);
     if (choice == 0) {
         Sound_PlaySong(0xDE);
-        SceneCatalog_SelectDescription(8);
+        StatusOptions_SelectDescription(8);
         PauseMenu_SetPairedIcons(menu, 1, -1);
         Hud_SetInteractionCallback(menu, SelectionPanel_ConfirmTransition, 0);
     } else if (choice == 1) {
@@ -80,7 +80,7 @@ void SelectionPanel_ProcessFlaggedChoice(struct SceneHudState *menu)
             Hud_SetInteractionCallback(menu, SceneDialog_BeginTimedMessage, 1);
         } else {
             PauseMenu_SetConfirmationIndicator(menu, 0);
-            SceneCatalog_SelectDescription(10);
+            StatusOptions_SelectDescription(10);
             Hud_SetInteractionCallback(menu, SelectionPanel_ProcessSecondChoice, 1);
         }
     }
@@ -91,7 +91,7 @@ void SelectionPanel_ProcessSecondChoice(struct SceneHudState *menu)
     int choice = PauseMenu_UpdateBinaryChoice(menu);
     if (choice == 0) {
         Sound_PlaySong(0xDE);
-        SceneCatalog_SelectDescription(8);
+        StatusOptions_SelectDescription(8);
         PauseMenu_SetPairedIcons(menu, 1, -1);
         Hud_SetInteractionCallback(menu, SelectionPanel_ConfirmTransition, 0);
     } else if (choice == 1) {
@@ -108,7 +108,7 @@ void SceneDialog_BeginTimedMessage(struct SceneHudState *menu)
         TextWindow_SetScript(menu->timedMessageWindow, menu->optionUpperEScript);
         TextWindow_Refresh(menu->timedMessageWindow, 13);
         TextWindow_StartPlayback(menu->timedMessageWindow);
-        SceneCatalog_SelectDescription(12);
+        StatusOptions_SelectDescription(12);
     }
     if (++menu->actionTransferDelay > 59)
         Hud_SetInteractionCallback(menu, SceneDialog_SelectResultPhase, 1);
@@ -129,10 +129,10 @@ void SceneDialog_FinishSuccessfulResult(struct SceneHudState *menu)
     if (!menu->actionTransferDelay) {
         Sound_PlaySong(0x2AE);
         TextWindow_Clear(menu->timedMessageWindow);
-        SceneCatalog_SelectDescription(14);
+        StatusOptions_SelectDescription(14);
     }
     if (++menu->actionTransferDelay > 119) {
-        SceneCatalog_SelectDescription(8);
+        StatusOptions_SelectDescription(8);
         PauseMenu_SetPairedIcons(menu, 1, -1);
         Hud_SetInteractionCallback(menu, SelectionPanel_ConfirmTransition, 0);
     }
@@ -143,10 +143,10 @@ void SceneDialog_FinishFailedResult(struct SceneHudState *menu)
     if (!menu->actionTransferDelay) {
         Sound_PlaySong(0x192);
         TextWindow_Clear(menu->timedMessageWindow);
-        SceneCatalog_SelectDescription(15);
+        StatusOptions_SelectDescription(15);
     }
     if (++menu->actionTransferDelay > 119) {
-        SceneCatalog_SelectDescription(8);
+        StatusOptions_SelectDescription(8);
         PauseMenu_SetPairedIcons(menu, 1, -1);
         Hud_SetInteractionCallback(menu, SelectionPanel_ConfirmTransition, 0);
     }
@@ -166,7 +166,7 @@ void PauseMenu_EnterPrompt(struct SceneHudState *menu)
     PauseMenu_LoadSpriteKeyframe(menu, 0, 0x5A);
     MessageWindow_SetMessageTable(menu->optionUpperEScript);
     MessageWindow_SetPalette(0xEFDA);
-    SceneCatalog_SelectDescription(8);
+    StatusOptions_SelectDescription(8);
     PauseMenu_SetPromptIconPositions(menu, 0, -12);
     PauseMenu_SetPairedIcons(menu, 1, -1);
     Hud_SetInteractionCallback(menu, SelectionPanel_ConfirmTransition, 0);

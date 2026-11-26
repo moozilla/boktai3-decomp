@@ -1,7 +1,7 @@
 #ifndef FOUNDRY_SCENE_CALLBACK_POOL_H
 #define FOUNDRY_SCENE_CALLBACK_POOL_H
 
-#include "scene/actor/contact_swarm.h"
+#include "scene/collision/contact_swarm.h"
 #include "scene/scene_animation.h"
 #include "engine/engine.h"
 

@@ -1,5 +1,5 @@
 #include "global.h"
-#include "scene/actor/scene_facing.h"
+#include "scene/motion/scene_facing.h"
 #include "engine/engine.h"
 
 struct SceneNpc081CEE50 {

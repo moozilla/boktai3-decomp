@@ -1,5 +1,5 @@
-#include "scene/actor/scene_actor_turn.h"
-#include "scene/actor/scene_actor_chase_reaction.h"
+#include "scene/motion/scene_actor_turn.h"
+#include "scene/motion/scene_actor_chase_reaction.h"
 #include "scene/actor/scene_actor_reaction.h"
 #include "scene/actor/scene_actor_behavior.h"
 #include "script/script_utility.h"
@@ -40,7 +40,7 @@ static inline void Vorn_ClearRoute(struct ChaseActor *actor,
     control->timer = cleared;
 }
 
-static inline void Vorn_SetTileFlags(struct SceneInputWidget *tile, u32 bits)
+static inline void Vorn_SetTileFlags(struct AnimSprite *tile, u32 bits)
 {
     tile->flags |= bits;
 }

@@ -1,6 +1,6 @@
 #ifndef GUARD_POOLED_MOTION_H
 #define GUARD_POOLED_MOTION_H
-#include "scene/actor/contact_swarm.h"
+#include "scene/collision/contact_swarm.h"
 #include "engine/task.h"
 struct MotionPoolSlot;
 /* Tentative configurable motion pool, 080454C0–08045A20. */

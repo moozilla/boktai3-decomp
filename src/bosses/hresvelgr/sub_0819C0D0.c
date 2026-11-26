@@ -1,6 +1,6 @@
 #include "global.h"
-#include "scene/actor/contact_actor.h"
-#include "scene/actor/scene_actor_turn.h"
+#include "scene/collision/contact_actor.h"
+#include "scene/motion/scene_actor_turn.h"
 struct Hresvelgr {
     u8 unknown0[0xBC];
     u32 contactMask, contactFlags;

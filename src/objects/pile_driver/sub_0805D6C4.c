@@ -1,5 +1,5 @@
 #include "objects/pile_driver/scene_panel_subject_tail.h"
-void ScenePanelSubject_UpdateTimedEffect(struct ScenePanelSubject *subject)
+void PileDriverSubject_UpdateTimedEffect(struct ScenePanelSubject *subject)
 {
     if (subject->byteTimer)
         subject->byteTimer--;
@@ -10,7 +10,7 @@ void ScenePanelSubject_UpdateTimedEffect(struct ScenePanelSubject *subject)
         if (subject->stateFrame > 15) {
             subject->drawable.position = subject->home;
             subject->paletteBank = 0x24E;
-            ScenePanelSubject_SetState((void *)subject, 4);
+            PileDriverSubject_SetState((void *)subject, 4);
             subject->collider.cost = 0;
             subject->stateFrame = 0;
         } else

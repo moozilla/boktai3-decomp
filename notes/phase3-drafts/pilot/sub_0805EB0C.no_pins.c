@@ -6,7 +6,7 @@ void SceneInputPanel_InitWidgets(struct SceneInputPanel *owner, s32 mode)
     struct SceneInputPanel *panel;
     struct SceneInputPackedPosition position;
     struct DisplaySequenceState sequence;
-    struct SceneInputResource *source;
+    struct AnimSpriteResource *source;
     void *sequenceResource;
     register const volatile u16 *command;
     register struct DisplaySequenceState *state;
@@ -146,9 +146,9 @@ void SceneInputPanel_InitWidgets(struct SceneInputPanel *owner, s32 mode)
     panel->drawable.position.x = 8;
     panel->drawable.position.y = 80;
     {
-        register struct SceneInputResource *widgets;
+        register struct AnimSpriteResource *widgets;
         {
-            struct SceneInputWidget *modeWidget = &panel->mode;
+            struct AnimSprite *modeWidget = &panel->mode;
             widgets = &panel->widgetResource;
             Widget_InitLinked(modeWidget, widgets, gUnk_0824DEF4[mode], 0x30, 0, 0, 60, &position);
         }
@@ -157,8 +157,8 @@ void SceneInputPanel_InitWidgets(struct SceneInputPanel *owner, s32 mode)
         Widget_InitLinked(&panel->valueB, widgets, 0x42, 0x31, 0, 0, 60, &position);
         {
             u32 cachedMode;
-            struct SceneInputResource *lateResource;
-            register struct SceneInputResource *grid;
+            struct AnimSpriteResource *lateResource;
+            register struct AnimSpriteResource *grid;
             {
                 register u32 offset = (u32) & ((struct SceneInputPanel *)0)->gridResource;
                 offset += (u32)panel;
@@ -219,7 +219,7 @@ void SceneInputPanel_InitWidgets(struct SceneInputPanel *owner, s32 mode)
                 u32 cachedPriority;
                 {
                     u32 zero = 0;
-                    struct SceneInputWidget *widget = panel->digits;
+                    struct AnimSprite *widget = panel->digits;
                     for (i = 7; i >= 0; i--) {
                         Widget_InitLinked(widget, lateResource, 0x50, 0x30, zero, zero, ({
                                               register u32 priority = 60;
@@ -260,7 +260,7 @@ void SceneInputPanel_InitWidgets(struct SceneInputPanel *owner, s32 mode)
                     cachedPosition = work;
                 }
                 {
-                    register struct SceneInputWidget *widget;
+                    register struct AnimSprite *widget;
                     register u32 zero;
                     {
                         register u32 offset =

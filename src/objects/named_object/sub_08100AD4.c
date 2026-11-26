@@ -1,7 +1,7 @@
-#include "scene/actor/scene_actor_terrain.h"
+#include "scene/motion/scene_actor_terrain.h"
 #define gNamedObjectContactBounds gUnk_086064B4
 #include "global.h"
-#include "scene/actor/contact_actor.h"
+#include "scene/collision/contact_actor.h"
 #include "engine/ram.h"
 struct NamedObjectContactSlot {
     u8 unknown00[0x10C];

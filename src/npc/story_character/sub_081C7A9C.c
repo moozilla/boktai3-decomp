@@ -12,7 +12,7 @@ struct S {
 #define B(o) (*(u8 *)((u8 *)p + (o)))
 void Actor_PlayAnimationEntry(void *, u32, u32, u32, u32);
 s32 DisplayAnimation_TestFinished(void *);
-void StateActor_UpdateAnimation17State(u32 a, struct S *p)
+void StoryCharacter_UpdateAnimation17State(u32 a, struct S *p)
 {
     u32 r;
     s32 state;

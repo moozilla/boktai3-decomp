@@ -2,7 +2,7 @@
 #define GUARD_WOODEN_CRATE_H
 
 #include "engine/video/display_sequence.h"
-#include "scene/actor/contact_position.h"
+#include "scene/collision/contact_position.h"
 
 struct WoodenCrate {
     u32 flags;

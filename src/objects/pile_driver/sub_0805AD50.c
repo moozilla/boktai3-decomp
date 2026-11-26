@@ -4,7 +4,7 @@ struct SceneRigColliderVector {
     u32 y : 16;
     u32 z : 16;
 };
-void ScenePanelRig_InitCollider(struct ScenePanelRig *rig, u32 power)
+void PileDriverRig_InitCollider(struct ScenePanelRig *rig, u32 power)
 {
     struct SceneRigColliderVector size, offset;
     void *collider = &rig->collider;
@@ -16,6 +16,6 @@ void ScenePanelRig_InitCollider(struct ScenePanelRig *rig, u32 power)
     Collider_Init(collider, 0, 0x4001, 0, 0x10, &size, &offset);
     Collider_SetBodyProperties(collider, power, 0, 0);
     Collider_SetPosition(collider, &rig->position, 0);
-    Collider_SetCallback(collider, ScenePanelRig_ApplyContact, rig);
+    Collider_SetCallback(collider, PileDriverRig_ApplyContact, rig);
     Collider_Refresh(collider);
 }

@@ -9,7 +9,7 @@ struct ScenePanelPairState {
     u8 state;
 };
 s32 ScenePair_CountPositiveCounters(void *);
-void ScenePanel_AdvanceConditionalPairState(struct ScenePanelPairState *panel)
+void VanargandPair_AdvanceConditionalPairState(struct ScenePanelPairState *panel)
 {
     s32 count;
     switch (panel->state) {

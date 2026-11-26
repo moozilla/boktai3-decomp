@@ -1,6 +1,6 @@
 #include "global.h"
 #include "player/player.h"
-#include "scene/actor/scene_actor_terrain_reaction.h"
+#include "scene/motion/scene_actor_terrain_reaction.h"
 s32 SceneActorTarget_FindNearestEligiblePlayer(void *);
 s32 Callback_InvokeActor(void *, void *);
 

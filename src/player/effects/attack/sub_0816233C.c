@@ -3,7 +3,7 @@
 
 // confidence=low: updates attack particles and advances their animation or lifetime.
 #define PlayerAttackEffect_UpdateParticles sub_0816233C
-#include "scene/actor/contact_swarm.h"
+#include "scene/collision/contact_swarm.h"
 #include "player/effects/player_attack_particles.h"
 extern void (*const gUnk_08610E2C[])(u8 *);
 extern const s16 gUnk_086149C4[];

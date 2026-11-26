@@ -8,7 +8,7 @@ use the containing actor type. All three complete units remain byte-identical:
 
 | Initializer | Bytes | Species fields |
 |---|---:|---|
-| TentacleActor_Init (080ABDCC) | 3,548 | first field at 0x8D0 |
+| Centipede_Init (080ABDCC) | 3,548 | first field at 0x8D0 |
 | Mummy_Init (080DCC98) | 4,188 | existing base.field6E8; private field at 0x6F2 |
 | Axe_Init (080FE68C) | 4,296 | first field at 0xE48 |
 

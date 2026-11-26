@@ -154,7 +154,7 @@ struct GameState {
     s16 unk85E;
     u8 unk860[0x8];
     u32 flags868; /* (guess) bit 1: feature enabled */
-    u16 unk86C;   /* also read as a u32 by Glove_UpdateTask */
+    u16 unk86C;   /* also read as a u32 by CoffinBike_UpdateTask */
     u16 flag86E;
     s16 timeDisplaySelection;
     u8 unk872[2];

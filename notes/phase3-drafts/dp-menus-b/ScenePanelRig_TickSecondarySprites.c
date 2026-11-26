@@ -1,4 +1,4 @@
-#include "objects/pile_driver/scene_panel_rig.h"
+#include "objects/pile_driver/pile_driver_rig.h"
 static inline void stepSecondarySprite(struct SceneRigSprite *sprite, u32 byteMask)
 {
     struct DisplaySequenceState *state = &sprite->sequence;
@@ -77,7 +77,7 @@ static inline s32 scale5(s32 v)
 {
     return v >= 0 ? v >> 5 : -((-v) >> 5);
 }
-void ScenePanelRig_TickSecondarySprites(struct ScenePanelRig *rig, u32 palette)
+void PileDriverRig_TickSecondarySprites(struct ScenePanelRig *rig, u32 palette)
 {
     s32 i = 0;
     u32 byteMask = 255;

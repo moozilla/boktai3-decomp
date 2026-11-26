@@ -1,7 +1,7 @@
 #include "bosses/vanargand/vanargand_pair_attack.h"
 
-void ScenePanel_UpdatePairConditions(void *);
-void ScenePanel_ApplyPairTransition(void *);
+void VanargandPair_UpdatePairConditions(void *);
+void VanargandPair_ApplyPairTransition(void *);
 
 void Vanargand_UpdateVariantEntry(struct VanargandPairAttack *p)
 {
@@ -14,8 +14,8 @@ void Vanargand_UpdateVariantEntry(struct VanargandPairAttack *p)
     }
     if (p->finished) {
         if (p->state == 12) {
-            ScenePanel_UpdatePairConditions(q);
-            ScenePanel_ApplyPairTransition(q);
+            VanargandPair_UpdatePairConditions(q);
+            VanargandPair_ApplyPairTransition(q);
         } else {
             Vanargand_EnterAction(p, 12);
         }

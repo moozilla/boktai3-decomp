@@ -2,7 +2,7 @@
 #include "global.h"
 #include "scene/actor/actor_attachment_state.h"
 #include "effects/screen/background_controller.h"
-#include "player/cues/player_cue_sequence.h"
+#include "player/cutscene/player_cue_sequence.h"
 #include "engine/ram.h"
 #include "effects/particles/scene_debris.h"
 #include "engine/video/render.h"
@@ -42,7 +42,7 @@ s32 PanelKeyframeSprite_Create(struct SceneDebris *owner, u32 key, u32 index, u3
         s32 position[2];
     } local;
     void *position;
-    struct SceneInputWidget *widget;
+    struct AnimSprite *widget;
     u32 spriteFlags;
     u32 frame;
     owner->visual = Heap_Alloc(0x80);

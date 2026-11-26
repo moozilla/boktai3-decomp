@@ -2,7 +2,7 @@
 
 void SpriteTrail_InitializeEntry(u8 *, u8 *, s32);
 
-u32 SingletonSlot7_InitEffectPool(u8 *p)
+u32 VanargandHead_InitEffectPool(u8 *p)
 {
     u8 *q = p + 0x20;
     s32 i = 0;

@@ -1,7 +1,7 @@
-#include "scene/actor/scene_actor_damage_visibility.h"
+#include "scene/collision/scene_actor_damage_visibility.h"
 #define MenuSprite_LoadPalettePair CharacterModel_InitPalettes
 #include "global.h"
-#include "scene/area_effect/area_effect_link.h"
+#include "scene/areas/area_effect_link.h"
 struct LinkMenu {
     u8 unknown0[0x794];
     u8 sprite[0x48];

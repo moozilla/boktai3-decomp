@@ -1,7 +1,7 @@
 #ifndef GUARD_INVENTORY_GRID_H
 #define GUARD_INVENTORY_GRID_H
 
-#include "scene/actor/contact_position.h"
+#include "scene/collision/contact_position.h"
 
 struct SceneHudState;
 

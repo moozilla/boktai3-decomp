@@ -42,7 +42,7 @@ static inline void projectSceneOverlay(struct ContactPosition *out,
             result = -((-value) >> 1);                                                             \
         result;                                                                                    \
     })
-void ScenePanel_DrawOverlay(struct ScenePanel *panel, s32 tileX, s32 tileY, s32 screenX,
+void PileDriver_DrawOverlay(struct ScenePanel *panel, s32 tileX, s32 tileY, s32 screenX,
                             s32 screenY)
 {
     struct SceneOverlayResource resource;
@@ -58,7 +58,7 @@ void ScenePanel_DrawOverlay(struct ScenePanel *panel, s32 tileX, s32 tileY, s32 
     s32 slot, x, y, minX, minY, maxX, maxY, target;
     s32 dx, dy;
 
-    ScenePanel_CycleOverlayPalette(panel);
+    PileDriver_CycleOverlayPalette(panel);
     bg->scaleX = tileX;
     bg->scaleY = tileY;
     bg->x = screenX;

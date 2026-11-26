@@ -1,4 +1,4 @@
-#include "ui/town/scene_item_values.h"
+#include "ui/town/shop_item_values.h"
 s32 SceneItemValue_GetConsumableBaseValue(u32 index)
 {
     return GameState_GetConsumableDescriptor(index)->baseValue;

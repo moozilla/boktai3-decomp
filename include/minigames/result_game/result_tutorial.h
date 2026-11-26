@@ -2,7 +2,7 @@
 #define RESULT_TUTORIAL_H
 
 #include "engine/engine.h"
-#include "ui/widgets/scene_input_widget.h"
+#include "engine/video/anim_sprite.h"
 #include "scene/scene_value_equipment.h"
 #include "engine/math/scene_vec.h"
 #include "engine/video/sprite_oam.h"
@@ -45,8 +45,8 @@ struct ResultMenu {
     u8 unknownC5[0x13];
     s32 preciseCount, closeCount, missedCount;
     u16 meterPalette[16];
-    struct SceneInputResource primaryResource, secondaryResource;
-    struct SceneInputWidget widgets[15];
+    struct AnimSpriteResource primaryResource, secondaryResource;
+    struct AnimSprite widgets[15];
     struct SpriteDrawable markers[4];
     u8 callbackPending;
     u8 unknown785[3];

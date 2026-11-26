@@ -3,7 +3,7 @@
 #include "engine/engine.h"
 #include "engine/ram.h"
 #include "scene/actor/scene_actor_components.h"
-#include "scene/actor/contact_collider.h"
+#include "scene/collision/contact_collider.h"
 #include "monsters/armor/armor_decision_ops.h"
 
 struct ArmorDecisionActor {
