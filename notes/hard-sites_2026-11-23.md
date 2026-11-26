@@ -358,3 +358,21 @@ first cursor advance still survives alias analysis. The stock unit
 matches all 304 bytes and reports no concessions. A native indexed
 history expression still reverses one operand, so the previously
 matched history calculation remains.
+
+## 2026-11-26: Tether bounce frame address and table reload
+
+In `TetherActor_UpdateBounceReturn` (0804CB4C), the symbolic table draft
+still emits 344 bytes. Insn 353 assigns pseudo 182 the table symbol and
+carries `REG_EQUIV` into global allocation. `AGBCC_NOEQUIV=182` matches
+all 356 bytes. This restores the frame-field address in r8 and the r6
+literal load into ip, and changes which scratch registers are available
+for the later shake stores. Declaring the frame-field pointer across the
+three tests gives the same mismatch as the symbolic draft, as does
+passing `gRandomTable` directly to both draw calls. Explicit shake-field
+pointers, a shared index, and a sample pointer reassigned for the two
+indices all change additional instructions. The shared-index and sample
+pointer comparisons from this checkout have the same scope score, so
+reassigning the sample pointer alone does not recover the late table
+load. The source and results are under `build/hard-sites/tether-bounce/`
+and `build/matchsearch/TetherActor_UpdateBounceReturn`. The existing
+proved-zero site is still present.
