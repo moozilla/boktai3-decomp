@@ -11,7 +11,9 @@ src/actors/singleton_slot_7,src/bosses/vanargand,"GCL 6325 calls 6314, which cre
 src/effects/registry_6_a37,src/effects/screen/magic_cannon_departure.c,Warp to 4924 at entrance 57. Proc 4928 hides the ship sprites and creates 6A37 before the space flight. The scrolling sky is visible during its update.
 src/effects/sprite_trail,src/bosses/vanargand,"GCL 6325 calls 6314, which creates registry 5856 with actor ID 7C56 (Vanargand). The head is on the left during Django’s bike chase."
 src/field/bouncing_object_pool,src/objects/bouncing_bombs,Nidhoggr’s grid attack calls the bomb pool at frame 1921. Dark spheres bounce across active floor tiles and the pool’s removal callback triggers the explosions. The same pool is reached from Mummy and Ratatosk projectile code.
+src/field/cell_traversal_gates,src/objects/passage_barriers,0042→4755. GCL 71BA controls edge passage along the Wind Cannon row. Live approach clears the collision boundary and starts traversal.
 src/field/group_objects,src/effects/scene/bat_flock.c,"The stock ROM draws a purple bat flock after a debugger call to the registered constructor and launch handler. Sprite package DA6D. The only constructor pointer is registry entry E534, absent from the GCX body. No shipped kind 10 cutscene packet sends any of its four commands."
+src/field/named_object,src/objects/moving_platforms,"0042→4808. A4FC ID 085F loads B019, updates its route and is released by a floor switch. Text #7181 calls it a moving platform."
 src/menus/control_panel,src/minigames/dark_generator.c,The overdue-debt path starts proc 1001. Proc 1003 creates key B3D1 and explains the Dark Generator. The work gauge and treadmill move during input.
 src/menus/registry_3_f74,src/ui/town/town_map.c,GCL 2554 creates 3F74 with the 11 town service callbacks. SAN MIGUEL appears on the map in frame 1940.
 src/menus/scene_catalog,src/ui/pause/status_options.c,Pause Status is visible. This ROM interval runs while opening that page and updating its numbers and descriptions.
@@ -23,7 +25,7 @@ src/menus/scene_sequence,src/ui/pause/menu_sequences,Stock Dark Card from Valuab
 src/monsters/cannon_battery,src/objects/deck_cannons,"Stock 4906 and a warp to 4859 show banks of ship deck cannons as their update, slot constructor and initializer run. Procs 4860 and 4905 create the 55E9 manager. Text #7463 names the ship cannons around the helm."
 src/monsters/cannon_emitter,src/monsters/pollen_flowers,Key 98CB draws both flowers. Variant 1 in Ancient Tree 3504 applies status 0 for 1800 frames. Variant 0 in 5181 applies status 1 for 900 frames. The Monster Book identifies the poisonous and disorienting pollen as Poisoner and Perplexer.
 src/monsters/cannon_turret,src/monsters/garmr_statue,GCL 3884 → 1601 → 1603 creates 4CD8. The replay runs the actor update in view. Bestiary index 30 is text #9868.
-src/monsters/enemy_d459,src/monsters/armor,"GCL 2996 → 1591 → 1593 spawns D459. Shared sprite package 7E82, palette 0227. Bestiary index 29 is string #9867, ARMOR."
+src/monsters/enemy_d459,src/monsters/axe_armor,"D459 is the axe shockwave Armor in 2993 (#9867). Preserve src/monsters/armor for the separate E043 elemental family, verified at 6472 and 6265."
 src/monsters/enemy_f426,src/monsters/statue,"GCL 3184 → 1589 → 1590 spawns F426. Shared sprite package 7E82, palette 0225. Bestiary index 28 is string #9866, STATUE."
 src/monsters/fan_cannon,src/monsters/cannons/wind,GCL 4751 → 1609 spawns the fan cannon manager 9CC2 and two color variants. The replay runs the actor update in view. Bestiary index 34 is text #9872.
 src/monsters/fan_cannon_manager,src/monsters/cannons/wind,Proc 1609 creates shared manager 9CC2 and its cannon instances. The actor callbacks run under the same pool.

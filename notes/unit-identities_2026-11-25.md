@@ -626,3 +626,34 @@ sale. A opens the purchase prompt. The comparison, action selection and
 purchase confirmation callbacks run in the three planned shop units.
 The capture is `review-shop/menu.png`. The scoped `SceneInventory_`
 prefix batch covers 97 symbols in these three units.
+
+### Moving platforms, passage barriers, and the two Armor families
+
+Tags: objects, moving platform, A4FC, passage barrier, 71BA, Armor, Black Knight, E043, D459
+
+Warp 0042 to scene 4808, entrance 8, story 131. In
+`replays/review-named-platform`, proc 4804 calls 4807, which creates A4FC
+ID 085F with kind 1 and its route. The constructor loads B019. The fixed
+stage point in the saved slot was (2432, 512, 2432). Load `arrived.ss` and
+stage the Player at (2480, 512, 2500) as in
+`replays/review-platform-ride/commands.txt`. The camera frames the blue and
+orange platforms while the route and entry trigger update. The switch's
+proc 4805 and the route callback 4806 release 085F, and text #7181 names the
+moving platform. The capture establishes the platform's update and sprite.
+
+Warp 0042 to 4755, entrance 7, story 131. Proc 4752 calls 1071 with a line of
+71BA objects at z=1280. Use `replays/review-cell-gate/arrived.ss` and
+`replays/review-passage/commands.txt` to stage (1664, 512, 1460) and approach
+the Wind Cannon row. At frame 1878 the passage test, removal of the terrain
+modifier, and Player terrain interaction run together. The screenshot
+locates the edge. The barrier operates through the terrain modifier and has
+no independent graphics.
+
+D459 and E043 warrant separate destinations. In the 0009 replay
+`axe-armor-attack`, wait for `EnemyD459_FireProjectile` beside the axe
+Armor at 2993. `wave.png` catches the shockwave described by text #2538.
+For E043, warp 0010 to 6472, entrance 47, story 43, or 0070 to 6265,
+entrance 47. Use the `iron-armor-rematch` and `black-knight-dialogue`
+command files. GCL 1629 and 1639 give E043 type 1 and type 11 respectively.
+The Monster Book indexes resolve to #9891 (Iron Armor) and #9902 (Black
+Knight). `Armor_Create` and 0818A820 run for both.

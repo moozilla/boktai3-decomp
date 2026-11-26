@@ -16,3 +16,5 @@ TentacleActor_,CentipedeActor_,src/monsters/tentacle_actor,The 0AC7 component up
 TentacleBody_,CentipedeBody_,src/monsters/tentacle_actor / src/monsters/tentacle_body,Windup and spread callbacks run while the 0AC7 Centipede attacks in 4076.
 BouncingObject_,BouncingBomb_,src/field/bouncing_object_pool,Nidhoggr’s grid attack calls the bomb pool at frame 1921. Dark spheres bounce across active floor tiles and the pool’s removal callback triggers the explosions. The same pool is reached from Mummy and Ratatosk projectile code.
 SceneInventory_,Shop_,src/menus/inventory_action_transitions / src/menus/inventory_transactions_and_catalogs / src/menus/inventory_values_and_display,The 744F weapons shop in 1929 runs all three ranges. Scope covers 97 symbols and excludes the same legacy prefix in other units.
+NamedObject_,MovingPlatform_,src/field/named_object,"0042→4808, A4FC ID 085F, B019 moving platform. Scoped to the route-platform unit."
+CellGate_,PassageBarrier_,src/field/cell_traversal_gates,"0042→4755, GCL 71BA. CellGate_TestPassage then TerrainModifiers_UnregisterCell on approach."
