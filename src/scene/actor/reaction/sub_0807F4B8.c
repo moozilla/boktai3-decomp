@@ -6,10 +6,6 @@ void SceneActorReaction_ResetResponseState(void *, const void *, u32);
 void SceneActorControl_OnIdle(u8 *);
 #include "scene/collision/scene_actor_contact_list.h"
 #include "scene/motion/scene_actor_chase_shared.h"
-struct SceneActorBehaviorPlayerSlot {
-    u8 unknown0[8];
-    u8 slot;
-};
 static inline u16 *CounterAddress(u32 inputOffset)
 {
     u8 *base = (void *)gGameState;
@@ -38,15 +34,14 @@ static inline void SetControl(struct ChaseActor *a, void *p, u32 kind, u32 zero,
 void SceneActorTarget_ResetContactResponse(struct RoomActor *inputActor)
 {
     struct ChaseActor *a = (void *)inputActor;
-    struct SceneActorRegistryControlGroup *group = &a->group.common;
+    struct SceneActorChaseGroup *group = &a->group;
     struct RoomActor *actor;
     u32 slot;
     u32 zero;
     u8 byteZero;
     {
         struct SceneActorChaseTracking *gate = &a->base.tracking;
-        u32 mask = 8;
-        zero = SceneActorChase_Test(gate->flags, mask);
+        zero = SceneActorChase_TrackingFlags(gate, 8);
         if (zero)
             return;
     }
@@ -61,14 +56,14 @@ void SceneActorTarget_ResetContactResponse(struct RoomActor *inputActor)
         }
     }
     {
-        struct SceneActorRegistryControl *control = &group->control;
+        struct SceneActorRegistryControl *control = &group->common.control;
         SceneActorChase_AndWordFlags(&a->base.behaviorFlags, 0xFFFEBE3F);
         control->counter = zero;
         byteZero = 0;
         control->field14 = zero;
         control->timer = zero;
     }
-    SceneActorReaction_ResetResponseState((u8 *)group + 0x8C, gUnk_0824E114, 0x60D);
+    SceneActorReaction_ResetResponseState(&group->saved, gUnk_0824E114, 0x60D);
     {
         void *control = SceneActorControl_OnIdle;
         u32 kind = 16;
@@ -108,7 +103,7 @@ void SceneActorTarget_ResetContactResponse(struct RoomActor *inputActor)
             a->base.motionFlags &= mask;
         }
     }
-    *((u8 *)group + 0x206) = 255;
+    group->turn.turnsRemaining = -1;
     actor = (void *)a;
     SceneActorAttachment_ReplaceResponseSlot(actor, 0, 0, actor->category);
     if (SceneActorChase_Test(gEngineFlags, 0x4800))
@@ -120,7 +115,7 @@ void SceneActorTarget_ResetContactResponse(struct RoomActor *inputActor)
     }
     {
         struct SceneActorChaseTracking *gate = &actor->tracking;
-        slot = ((struct SceneActorBehaviorPlayerSlot *)gate->target)->slot;
+        slot = gate->target->playerIndex;
     }
     {
         u16 *counter;
