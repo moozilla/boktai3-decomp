@@ -148,7 +148,11 @@ exports.safeStep = function* (cx, cz, opts = {}) {
   if (S && (narrow(to) || narrow(here))) return yield* exports.searchTo(cx, cz, opts);
   const snap = S ? S.snapshot() : null;
   const r = yield* exports.stepTo(cx, cz, opts);
-  if (snap && p.position.y < y0 - 64 && !(to && to.level < here.level)) {
+  // Player_TestTetherTarget computes the surface of a slope by subtracting
+  // the fractional cell coordinate along the slope's axis from its height.
+  const slopeOffset = to?.kind === 1 ? p.position.z & 255 : to?.kind === 2 ? p.position.x & 255 : null;
+  const reachedSlope = r.reached && slopeOffset !== null && p.position.y >= to.level * CELL - slopeOffset - 64;
+  if (snap && p.position.y < y0 - 64 && !(to && to.level < here.level) && !reachedSlope) {
     S.restore(snap);
     if (opts.trace) opts.trace({ fell: [cx, cz], searching: true });
     return yield* exports.searchTo(cx, cz, opts);

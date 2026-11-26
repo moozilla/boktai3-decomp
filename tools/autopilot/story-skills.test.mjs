@@ -97,6 +97,29 @@ test('an exhausted terrain search rolls back a lethal final trial', () => {
   assert.equal(player.currentStatA, 240);
 });
 
+test('the fall guard accepts the surface of a downhill slope', () => {
+  const player = { position: { x: 128, y: 512, z: 128 } };
+  const lib = skill('world', {}, { gPlayers: [player] });
+  const start = { flags: 0, kind: 0, level: 2 }, slope = { flags: 0, kind: 2, level: 2 };
+  lib.grid = () => ({ at: (x) => x === 0 ? start : slope });
+  lib.session = {
+    snapshot: () => ({ ...player.position }),
+    restore: (position) => { player.position = position; },
+  };
+  let height = 384, searched = 0;
+  lib.stepTo = function* () {
+    player.position = { x: 384, y: height, z: 128 };
+    return { reached: true };
+  };
+  lib.searchTo = function* () { searched++; return { reached: false }; };
+  assert.deepEqual(lib.safeStep(1, 0).next().value, { reached: true });
+  assert.equal(searched, 0);
+  player.position = { x: 128, y: 512, z: 128 };
+  height = 250;
+  assert.deepEqual(lib.safeStep(1, 0).next().value, { reached: false });
+  assert.equal(searched, 1);
+});
+
 test('a moving floor links reachable solid landings across authored gap cells', () => {
   const lib = skill('moving-floors', {}, {}, skill('world', {}));
   const cells = Array.from({ length: 5 }, (_, x) => ({ x, z: 0, open: true, level: 3 }));

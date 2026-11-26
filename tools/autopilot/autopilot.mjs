@@ -88,7 +88,7 @@ const event = (what) => {
     writeMovie('checkpoint.json', s.g.lib.where());
   if ((e.skill === 'purification' && e.phase !== undefined) || (e.skill === 'drive' && e.steps !== undefined))
     writeMovie('checkpoint.json', s.g.lib.where());
-  if (e.skill === 'ride' && e.key)
+  if ((e.skill === 'ride' && e.key) || (e.skill === 'moving-floor' && e.done))
     writeMovie('checkpoint.json', s.g.lib.where());
   if (shots) fs.writeFileSync(path.join(out, 'shots', `${String(s.frame).padStart(6, '0')}.png`), png(s.pixels()));
 };
