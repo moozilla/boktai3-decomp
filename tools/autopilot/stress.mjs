@@ -29,7 +29,7 @@ const inputs = path.join(out, 'inputs.jsonl');
 fs.writeFileSync(inputs, '');
 
 const readFrames = [], reads = [], samples = [];
-const boots = [];
+const boots = [], equipmentDetails = [];
 const missingReturns = new Set();
 const auditPath = path.join(root, 'build/port/game/missing_returns.txt');
 const auditNames = mode === 'fuzz' && fs.existsSync(auditPath)
@@ -45,6 +45,8 @@ const s = await openSession({
     tick = g.addr('Input_UpdatePadStates') & ~1;
     regions = sampleRegions(g.types);
     g.on('AgbMain', () => boots.push(session.frame));
+    if (mode === 'swords')
+      g.on('SceneHud_ShowEquipmentDetails', () => equipmentDetails.push(session.frame));
     for (const name of new Set(auditNames)) {
       if (g.types.functions[name]) g.on(name, () => missingReturns.add(name), { once: true });
     }
@@ -115,7 +117,7 @@ try {
   difference = { ...partial, error: String(error) };
 }
 const result = { save: run.save, ticks: reads.length, frames: movie.length, firstCheck, boots,
-  missingReturns: [...missingReturns].sort(), difference, fault };
+  equipmentDetails, missingReturns: [...missingReturns].sort(), difference, fault };
 fs.writeFileSync(path.join(out, 'result.json'), JSON.stringify(result, null, 2) + '\n');
 console.log(`${difference || fault ? 'DIFFER' : 'MATCH'} ${JSON.stringify(result)}`);
 process.exitCode = difference || fault ? 1 : 0;
@@ -184,10 +186,19 @@ function* tap(g, key, rest) {
 
 function* swords(g) {
   const menu = g.lib.menuState;
-  const field = menu()?.callback;
-  if (!field) return false;
-  yield* tap(g, 'start', 60);
-  if (menu()?.callback === field) return false;
+  let field;
+  for (let attempt = 0; attempt < 4; attempt++) {
+    // Armor and story checkpoints can resume with a message covering the HUD.
+    // Dismiss its pages and give the field time to accept Start.
+    for (let page = 0; page < 40 && g.lib.message().open; page++) yield* tap(g, 'a', 8);
+    field = menu()?.callback;
+    if (field) {
+      yield* tap(g, 'start', 60);
+      if (menu() && menu().callback !== field) break;
+    }
+    yield g.press(0, 90);
+  }
+  if (!field || !menu() || menu().callback === field) return false;
   for (let i = 0; i < 8 && menu() && menu().page !== 4; i++) {
     yield* tap(g, menu().page > 4 ? 'l' : 'r', 40);
   }

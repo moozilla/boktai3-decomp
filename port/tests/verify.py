@@ -23,6 +23,7 @@ CASES = [
     ('sealed-prison', '0002', 'smoke'),
     ('san-miguel', '0007', 'smoke'),
     ('lifeless-town-swords', '0010', 'swords'),
+    ('lifeless-town-after-armor', '0011', 'swords'),
     ('lifeless-town-reset', '0010', 'reset'),
     ('ancient-tree', '0019', 'smoke'),
     ('white-forest', '0028', 'smoke'),
