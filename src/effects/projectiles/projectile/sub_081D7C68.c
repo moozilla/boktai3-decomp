@@ -27,8 +27,7 @@ s32 ProjectileTask_StartTerminalAnimation(struct Task4E01Projectile *p)
             break;
         case 7: {
             struct ContactSwarmSprite *sprite = &p->sprite;
-            u8 frame = 29;
-            sprite->frame = frame;
+            sprite->frame = 29;
         }
             Projectile_SetUpdateCallback(config, ProjectileTask_OnType7DirectionalAnimation);
             break;
@@ -50,8 +49,7 @@ s32 ProjectileTask_StartTerminalAnimation(struct Task4E01Projectile *p)
         case 11:
             if (!(config->flags & 0x2000)) {
                 struct ContactSwarmSprite *sprite = &p->sprite;
-                u8 frame = 29;
-                sprite->frame = frame;
+                sprite->frame = 29;
             }
             Projectile_SetUpdateCallback(config, Projectile_SpawnImpactPair);
             break;
