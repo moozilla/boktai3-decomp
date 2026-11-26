@@ -137,13 +137,14 @@ void Ghost_BeginContactReaction(void *unused, struct ContactCollider *contact,
 
 void SceneActorBehavior_ApplyContactReaction(void *, void *, struct ChaseActor *);
 
-void SceneActorBehavior_OnContactForward(u16 *source, void *destination, struct ChaseActor *actor)
+void SceneActorBehavior_OnContactForward(struct ContactCollider *source, void *destination,
+                                        struct ChaseActor *actor)
 {
     if (SceneActor_ActionsBlocked(actor))
         return;
     if (SceneActorChase_QueryMotionFlagComponent(actor, 0x4000))
         return;
-    if (SceneActor_MaskedHalfword(0x800, &source[3]))
+    if (SceneActor_MaskedHalfword(0x800, &source->flags))
         return;
     SceneActorBehavior_ApplyContactReaction(source, destination, actor);
 }
@@ -683,7 +684,7 @@ void Ghost_FollowRoute(struct ChaseActor *actor)
         u32 kind;
         u16 attr;
         Ghost_MakeRouteMotion((void *)(&body->motion), actor->base.body.direction, speed);
-        route = (void *)&body->route;
+        route = &body->route.cursor;
         if (!Ghost_SelectRandomRouteEntry(route))
             goto done;
         p = &target;
@@ -758,7 +759,7 @@ void Ghost_ChooseRouteDestination(struct ChaseActor *actor)
     if ((s32)actor->base.counter2AC > 60) {
         struct SceneActorRouteCursor *route;
 
-        route = (void *)&state->route;
+        route = &state->route.cursor;
         Ghost_SelectRandomRouteEntry(route);
         target = &destination;
         target->x = route->point->x;
@@ -789,9 +790,9 @@ void Ghost_ChooseRouteDestination(struct ChaseActor *actor)
 static inline void Ghost_GetRouteEndpoint(struct GhostRouteCursor *path,
                                           struct ContactPosition *pos)
 {
-    struct SceneActorRoutePoint *point = path->point;
+    struct SceneActorRoutePoint *point = path->cursor.point;
     pos->x = point->x;
-    pos->z = path->point->z;
+    pos->z = path->cursor.point->z;
     pos->y = SceneActorTerrain_GetHeight(SceneActorTerrain_GetCellIndex(pos), pos);
 }
 
@@ -822,7 +823,7 @@ void Ghost_RecoilTowardEndpoint(struct ChaseActor *actor)
         SceneActorChase_SetControl(actor, SceneActorControl_OnIdle, 16);
         {
             struct GhostRouteCursor *path = &context->route;
-            Ghost_SelectRandomRouteEntry(path);
+            Ghost_SelectRandomRouteEntry(&path->cursor);
             Ghost_GetRouteEndpoint(path, &pos);
         }
         Ghost_StartMovementToPosition(actor, &pos);
@@ -1326,7 +1327,7 @@ void Ghost_UpdateRandomDestination(struct ChaseActor *actor)
         } else {
             struct ContactPosition target;
             struct ContactPosition *p;
-            struct SceneActorRouteCursor *route = &state->route;
+            struct SceneActorRouteCursor *route = &state->route.cursor;
             s32 cell;
             u16 attr;
             u32 kind;
@@ -2219,7 +2220,7 @@ void Ghost_ChooseMovementDestination(struct ChaseActor *actor)
     if ((s32)actor->base.counter2AC > 60) {
         struct SceneActorRouteCursor *route;
 
-        route = (void *)&state->route;
+        route = &state->route.cursor;
         Ghost_SelectRandomRouteEntry(route);
         target = &destination;
         target->x = route->point->x;
@@ -2680,7 +2681,7 @@ s32 Ghost_Init(void *object)
     Ghost_InitActorProfile(a);
     Ghost_InitializeDrawable(a);
     Ghost_InitializeScriptFields(a);
-    route = &arg0->route;
+    route = (struct SceneActorRegistryRoute *)&arg0->route;
     if (Ghost_ReadRoute(a, route)) {
         {
             struct ContactPosition *dest = &a->base.body.position;
