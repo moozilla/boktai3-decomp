@@ -171,18 +171,14 @@ void Mummy_UpdateIdle(struct ChaseActor *actor)
 
 u32 Route_GetCurrentPointFacing(void *);
 
-static inline u16 MummyTurn_Elapsed(void *sequence)
-{
-    return ((struct DisplaySequenceState *)sequence)->elapsed;
-}
-
 /* Turn toward the route-facing octant, then restore the waiting controller. */
 
 void Mummy_TurnTowardRoute(struct ChaseActor *a)
 {
     struct SceneActorChaseGroup *group;
     struct SceneActorBody *motion = &a->base.body;
-    void *sequence = &((struct SceneActorAnimationSequenceDrawable *)a->base.drawable)->sequence;
+    struct DisplaySequenceState *sequence =
+        &((struct SceneActorAnimationSequenceDrawable *)a->base.drawable)->sequence;
     u16 *motionFlags;
     u8 prepared;
     s32 direction, target, delta;
@@ -251,7 +247,7 @@ void Mummy_TurnTowardRoute(struct ChaseActor *a)
         }
         a->base.restart = 0;
     }
-    if (MummyTurn_Elapsed(sequence) == 0) {
+    if (sequence->elapsed == 0) {
         s32 targetDirection = SceneActorTurn_OctantDirection(a->base.nextDirection);
         s32 difference = motion->direction - targetDirection;
         if (difference < 0)
