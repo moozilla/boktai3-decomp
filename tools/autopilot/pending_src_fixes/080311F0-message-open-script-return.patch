@@ -1,0 +1,34 @@
+080311F0 message-open-script-return
+
+The final a keyword test at 0803133A leaves zero in r0 when the
+keyword is absent. When present, Script_GetValue replaces r0 and
+fastPlayback is written using r1 and r2.
+
+The explicit form changed the ROM bytes. The guarded form passed the unit ROM check.
+
+--- a/src/message_window.c
++++ b/src/message_window.c
+@@ -523,4 +523,17 @@
+         }
+     }
++#ifdef UBFIX
++    {
++        int result = Script_SeekToKeyword('a');
++        if (result) {
++            result = Script_GetValue();
++            if (result)
++                window->fastPlayback = 0;
++        } else {
++            window->fastPlayback = 0;
++        }
++        return result;
++    }
++#else
+     if (Script_SeekToKeyword('a')) {
+         if (Script_GetValue())
+@@ -528,4 +541,5 @@
+     } else
+         window->fastPlayback = 0;
++#endif
+ }
+ 
