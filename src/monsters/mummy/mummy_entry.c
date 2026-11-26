@@ -789,7 +789,7 @@ void Mummy_UpdateDefeat(struct ChaseActor *actor, s32 frame)
     u16 script;
     u16 *motionFlags;
     struct ContactCollider *collider;
-    if (SceneActorReaction_TakePrepared((void *)actor)) {
+    if (SceneActorReaction_TakePrepared(actor)) {
         struct SceneActorChaseGroup *group = &actor->group;
         if (!Mummy_DisplayFlags(actor, 0x20000))
             ActorStatus_ClearDrawableFlags(actor, 1);
@@ -800,7 +800,7 @@ void Mummy_UpdateDefeat(struct ChaseActor *actor, s32 frame)
             control->field14 = 0;
             control->timer = 0;
         }
-        SceneActorAnimation_SelectDirectionalEntry((void *)actor, 10);
+        SceneActorAnimation_SelectDirectionalEntry(&actor->base, 10);
         actor->base.restart = 0;
         StoreSpeed(actor, 0x20);
         SceneActorAttachment_ReplaceResponseSlot(actor, 0, 127, 0);
@@ -2679,8 +2679,6 @@ s32 SceneActor_FindDirectionalCell(struct ChaseActor *actor, s32 direction)
     return result;
 }
 
-#define gCurrentTerrainMap gTerrainMap
-
 s32 Nav_IsPositionInMesh(void *, struct ContactPosition *, struct ContactPosition *);
 
 s32 Terrain_ApplyBlocked(void *, struct ContactPosition *, struct ContactPosition *);
@@ -2691,36 +2689,22 @@ s32 SceneActor_StartAdjacentCellRoute(struct Mummy *actor)
 {
     struct ContactPosition target;
     struct Mummy *parent = actor->chase.base.context;
-    u8 *group = (void *)&actor->chase.group.common;
+    struct SceneActorChaseGroup *group = &actor->chase.group;
     s32 direction = (((actor->chase.base.body.direction + 0x20) >> 6) + 2) & 3;
     s32 cell = 0;
     s32 count = 0;
-    struct ContactPosition *targetPointer;
-    s32 cellX, cellZ;
-    u8 *terrain;
     void *route;
     struct ContactPosition *position;
     s32 result;
-    u16 *flagsPointer;
     for (; count <= 3; count++) {
         cell = SceneActor_FindDirectionalCell(&actor->chase, direction);
         direction = (direction + 1) & 3;
         if (cell != actor->chase.base.terrainCell)
             break;
     }
-    targetPointer = &target;
-    cellX = Mod(cell, *(s16 *)(gCurrentTerrainMap->cells + 4));
-    cellZ = Div(cell, *(s16 *)(gCurrentTerrainMap->cells + 4));
-    target.x = (cellX << 8) + 0x80;
-    terrain = TerrainModifiers_FindCellOverride(cell, 1);
-    if (terrain)
-        terrain += 4;
-    else
-        terrain = gCurrentTerrainMap->cells + (cell * 4 + 12);
-    targetPointer->y = (*terrain & 15) << 8;
-    targetPointer->z = (cellZ << 8) + 0x80;
+    SceneActorTerrain_GetCenter(cell, &target);
     target.y = actor->chase.base.body.position.y;
-    route = *(void **)(group + 0x1FC);
+    route = group->route;
     position = &actor->chase.base.body.position;
     result = Nav_IsPositionInMesh(route, position, &target);
     if (!result) {
@@ -2931,7 +2915,7 @@ void Mummy_ResetRevivalMotion(struct ChaseActor *actor)
     actor->group.field5C4 = 0;
     body->counter6EE = 0;
     Mummy_ResetMotionState(actor);
-    SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0);
+    SceneActorAnimation_SelectDirectionalEntry(&actor->base, 0);
     SceneActorMovement_ResolveRoutePosition(actor);
     {
         struct SceneActorControlMotionDrawable *drawable = actor->base.drawable;
