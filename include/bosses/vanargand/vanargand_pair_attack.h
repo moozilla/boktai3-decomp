@@ -75,7 +75,8 @@ struct VanargandPairAttack {
     u16 parameter;
     u16 parameter588;
     u16 drainDamage;
-    u8 pad58C[0x59E - 0x58C];
+    u8 pad58C[0x598 - 0x58C];
+    u16 partThresholds[3];
     u16 thresholds[3];
     u32 hitFlags;
     s16 damage;
@@ -103,9 +104,12 @@ struct VanargandPairAttack {
     s32 transition;
     s32 attachment; /* 0xF38: passed to Player_AddExperience on entering state 21. */
     u16 flash;
-    u8 unknownF3E[6];
+    u16 pendingCue;
+    u8 unknownF40[4];
     void *afterimages;
 };
+
+typedef char VanargandPairAttackSizeCheck[sizeof(struct VanargandPairAttack) == 0xF48 ? 1 : -1];
 
 static inline u32 VanargandPairAttack_TestFlags(const struct VanargandPairAttack *owner, u32 mask)
 {

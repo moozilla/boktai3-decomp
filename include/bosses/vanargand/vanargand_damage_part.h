@@ -19,7 +19,7 @@ struct VanargandDamagePart {
     u16 animation, breaks;
     u8 unknown108[8];
     struct MotionTarget target;
-    u16 targetActive;
+    s16 targetActive;
     u8 unknown122[2];
     u32 pendingFlags;
     u16 pendingDamage, accumulatedDamage, flashTimer;
