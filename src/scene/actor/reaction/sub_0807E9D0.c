@@ -1,6 +1,6 @@
 #include "debug.h"
 #include "scene/actor/scene_actor_part_burst.h"
-#include "scene/actor/scene_actor_behavior.h"
+#include "scene/collision/collision_response.h"
 #include "scene/actor/scene_actor_placement.h"
 #include "system/game_state/game_state.h"
 #include "scene/motion/scene_actor_chase_types.h"
@@ -10,7 +10,6 @@
 s32 Math_Atan2(s32, s32);
 s32 Div(s32, s32);
 void Collision_CalculateElementalResponse(void *, void *);
-void Collision_CalculateDamageResponse(void *, void *);
 void SceneActor_SetContactReactionDirection(void *, void *, void *);
 void PlayerStats_AddContactHundredths(void *, void *, s32);
 
@@ -20,7 +19,7 @@ static inline u8 Test(u32 value, u32 mask)
         return 1;
     return 0;
 }
-static inline u32 ReadReactionFlags(u32 inputMask, struct SceneActorBehaviorContactView *source)
+static inline u32 ReadReactionFlags(u32 inputMask, struct ContactCollider *source)
 {
     u32 mask = inputMask;
     return source->reactionFlags & mask;
@@ -40,11 +39,11 @@ static inline void AimAtContactTarget(struct ChaseActor *actor)
         actor->base.tracking.distance = dx * dx + dy * dy;
     }
 }
-static inline void SelectContactTarget(struct SceneActorBehaviorContactView *source, void *object)
+static inline void SelectContactTarget(struct ContactCollider *source, void *object)
 {
     struct ChaseActor *actor = object;
     s32 flagged = 0;
-    u16 owners = source->kind;
+    u16 owners = source->contactFlags;
     if (owners & 1) {
         actor->base.tracking.target = &((struct SceneActorChasePlayer *)gPlayers[0])->target;
         flagged = 1;
@@ -65,7 +64,7 @@ static inline void SelectContactTarget(struct SceneActorBehaviorContactView *sou
     }
     actor->base.hitOwners = owners;
     {
-        u32 parameter = source->parameter34;
+        u32 parameter = source->statRewardFlags;
         u32 reaction = source->reactionFlags;
         actor->base.hitAttributes = parameter;
         actor->base.hitReactionFlags = reaction;
@@ -133,8 +132,8 @@ static inline void SetContactResult(struct ChaseActor *actor, u16 value)
 {
     actor->base.reactionSoundVariant = value;
 }
-void SceneActorReaction_HandleColliderContact(struct SceneActorBehaviorContactView *source,
-                                              struct SceneActorBehaviorContactView *destination,
+void SceneActorReaction_HandleColliderContact(struct ContactCollider *source,
+                                              struct ContactCollider *destination,
                                               struct ChaseActor *actor)
 {
     struct ContactCollider *primary;
@@ -152,8 +151,8 @@ void SceneActorReaction_HandleColliderContact(struct SceneActorBehaviorContactVi
     primary = &actor->base.colliderA;
     if (actor->base.colliderA.responseValue) {
         if (actor->base.field2E6) {
-            destination->remaining = unavailable;
-            destination->mode = 0;
+            destination->cost = unavailable;
+            destination->costFlags = 0;
         }
         return;
     }
@@ -169,7 +168,7 @@ void SceneActorReaction_HandleColliderContact(struct SceneActorBehaviorContactVi
             u32 attack;
             {
                 u32 mask = 0x20000;
-                if (!(mask & source->parameter34))
+                if (!(mask & source->statRewardFlags))
                     return;
             }
             if (SceneActorTurn_Flags(motion, 0xA007))
@@ -195,7 +194,7 @@ void SceneActorReaction_HandleColliderContact(struct SceneActorBehaviorContactVi
                         return;
                     }
                 }
-                destination->remaining = 0;
+                destination->cost = 0;
                 SetContactResult(actor, 0);
                 SelectContactTarget(source, actor);
                 if (SceneActorTurn_Flags(motion, 0x80))
@@ -203,7 +202,7 @@ void SceneActorReaction_HandleColliderContact(struct SceneActorBehaviorContactVi
                 actor->base.field2E6 = 1;
                 return;
             } else {
-                destination->remaining = attack;
+                destination->cost = attack;
                 SetContactResult(actor, attack);
                 SelectContactTarget(source, actor);
             }
@@ -217,21 +216,21 @@ void SceneActorReaction_HandleColliderContact(struct SceneActorBehaviorContactVi
         Collision_CalculateElementalResponse(source, destination);
     else
         Collision_CalculateDamageResponse(source, destination);
-    destination->parameter44 = source->parameter44;
-    actor->base.field2E6 = destination->mode;
+    destination->responseValue = source->responseValue;
+    actor->base.field2E6 = destination->costFlags;
     if (ReadReactionFlags(0x40000, source)) {
         u8 *defense = &actor->base.defense;
-        power = source->power;
+        power = source->responseParameter;
         power -= *defense;
         if (power < 0)
             power = 0;
-        destination->power = power;
+        destination->responseParameter = power;
     }
     if (SceneActorTurn_Flags(motion, 6)) {
-        destination->remaining <<= 1;
-        power = destination->power;
+        destination->cost <<= 1;
+        power = destination->responseParameter;
         power = power >= 0 ? power >> 1 : -(-power >> 1);
-        destination->power = power;
+        destination->responseParameter = power;
     }
     SceneActor_SetContactReactionDirection(actor, source, destination);
     SelectContactTarget(source, actor);
@@ -242,14 +241,14 @@ void SceneActorReaction_HandleColliderContact(struct SceneActorBehaviorContactVi
     {
         u32 mask = 0x800;
         if (Test(gGameState->flags868, mask) || ReadReactionFlags(0x40, source)) {
-            destination->remaining = 0;
+            destination->cost = 0;
             SetContactResult(actor, 0);
             actor->base.field2E6 = 1;
         }
     }
     if (SceneActorTurn_Flags(motion, 0x2000))
         SpawnContactParts((void *)actor);
-    actor->base.reactionSoundVariant = destination->remaining;
+    actor->base.reactionSoundVariant = destination->cost;
     PlayerStats_AddContactHundredths(source, destination, actor->base.contactReward);
     SceneActorChase_SetBehaviorFlags(actor, 0x2000);
 }
