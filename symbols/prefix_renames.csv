@@ -15,7 +15,12 @@ TentacleEnemy_,Centipede_,src/monsters/tentacle_actor,"Live 0AC7 actor in 4076 h
 TentacleActor_,CentipedeActor_,src/monsters/tentacle_actor,The 0AC7 component update runs around the visible Centipede in 4076.
 TentacleBody_,CentipedeBody_,src/monsters/tentacle_actor / src/monsters/tentacle_body,Windup and spread callbacks run while the 0AC7 Centipede attacks in 4076.
 BouncingObject_,BouncingBomb_,src/field/bouncing_object_pool,Nidhoggr’s grid attack calls the bomb pool at frame 1921. Dark spheres bounce across active floor tiles and the pool’s removal callback triggers the explosions. The same pool is reached from Mummy and Ratatosk projectile code.
-SceneInventory_,Shop_,src/menus/inventory_action_transitions / src/menus/inventory_transactions_and_catalogs / src/menus/inventory_values_and_display,The 744F weapons shop in 1929 runs all three ranges. Scope covers 97 symbols and excludes the same legacy prefix in other units.
+SceneInventory_CreatePresentation0,Shop_OpenWeaponShop,src/menus/inventory_transactions_and_catalogs/sub_0806347C.c,0007→1929. Key 744F opens the visible Weapon Shop catalog.
+SceneInventory_CreatePresentation1,Shop_OpenItemShop,src/menus/inventory_transactions_and_catalogs/sub_080634D4.c,0007→1996. Key 3019 opens the visible Item Shop catalog.
+SceneInventory_CreatePresentation2,Shop_OpenAccessoryShop,src/menus/inventory_transactions_and_catalogs/sub_0806352C.c,0007→2053. Key 7300 opens the visible Accessory Shop catalog.
+SceneInventory_CreatePresentation3,Shop_OpenTravelingMerchant,src/menus/inventory_transactions_and_catalogs/sub_08063584.c,0032→4217 (staged proc 1811). Key 3050 opens the visible Unnamed traveling merchant catalog.
+SceneInventory_CreatePresentation4,Shop_OpenGariGariStall,src/menus/inventory_transactions_and_catalogs/sub_080635DC.c,0032→4217 (staged proc 1811). Key 661E opens the visible GariGari-kun’s ice candy stall catalog.
+SceneInventory_,Shop_,src/menus/inventory_action_transitions / src/menus/inventory_transactions_and_catalogs / src/menus/inventory_values_and_display,"The five shop presentations are witnessed at 1929, 1996, 2053 and controlled proc 1811. Apply the five more specific constructor proposals first. Scope the general rule to the three shop units."
 NamedObject_,MovingPlatform_,src/field/named_object,"0042→4808, A4FC ID 085F, B019 moving platform. Scoped to the route-platform unit."
 CellGate_,PassageBarrier_,src/field/cell_traversal_gates,"0042→4755, GCL 71BA. CellGate_TestPassage then TerrainModifiers_UnregisterCell on approach."
 ActorGroup_,LootDeposit_,src/field/actor_group,"0029→3905, F1F9 ID 5639; slot breaks and calls item-drop proc 1133."

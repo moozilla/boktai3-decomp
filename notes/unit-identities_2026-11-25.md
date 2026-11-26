@@ -1292,3 +1292,29 @@ the bike returns to its base colors. Compare
 `resume2-bike-repair/{recover-before,recover-active,recovered,restored}.png`.
 This verifies the same restoration branch as the earlier timer-staged
 experiment, now reached by ordinary inputs.
+
+## The five shop presentations
+
+Tags: shop, Cheyenne, Lita, Kid, GariGari-kun, traveling merchant
+
+The five registry keys in the shop unit create distinct stock and portrait
+presentations. Keep the three source ranges together as Shop. Apply the
+constructor-specific names before the shared prefix rule.
+
+| Presentation | Key and constructor | Witness |
+|---|---|---|
+| 0 | 744F, 0806347C | 0007→1929 entrance 7, story 30. Proc 1926 opens Cheyenne's Weapon Shop and the sword catalog. See `review-shop/menu.png`. |
+| 1 | 3019, 080634D4 | 0007→1996 entrance 7, story 30. Proc 1993 opens catalog 8FDA. The title 道具屋 and LITA portrait identify the Item Shop in `resume3-shop-1/menu.png`. Proc 2297 reuses this presentation with catalog CFDB. |
+| 2 | 7300, 0806352C | 0007→2053 entrance 7, story 30. Proc 2050 opens catalog D13C. The title アクセサリー屋, Kid portrait, and accessory stock are visible in `resume3-shop-2/menu.png`. |
+| 3 | 3050, 08063584 | On stock 0032 in 4217, stage proc 1811 with merchant selector 23 and stage 117. The constructor opens catalog EBE1 and the original script reader supplies the stock. The portrait reads ??? in `resume3-shop-3/menu.png`. The script debug print describes him as the mysterious man. |
+| 4 | 661E, 080635DC | Use the same snapshot and proc with selector 43. The original stock reader fills eight slots with GariGari Soda. The portrait reads GARIGARIKUN in `resume3-shop-4/menu.png`. |
+
+```sh
+build/venv/bin/python build/identify/resume3/replay_shops.py 1 2 3 4
+```
+
+The last two runs preserve the original shop procedure and stage its
+selection variables. Their merchant dialogue entry points in the field
+remain outside these captures. Stock paths 1 and 2 reach the original
+constructor and transaction controls after Continue without live-memory
+changes. The updated prefix table records the five constructor names.
