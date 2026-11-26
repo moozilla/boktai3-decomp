@@ -66,3 +66,51 @@ flags through plain fields changes allocation across the switch (08086400).
 
 The working branch retains matching expressions at those sites. The batch
 reports zero linter errors.
+
+
+## Task and component layouts
+
+The continuation reviewed the rest of the warning queue. Stock checks matched
+all 101 changed translation units across the pass. All changed headers passed
+their full dependent checks. Code matching remains at 100%, a gain of 0
+percentage points. The pass removed 86 printed warning lines and 133 weighted
+constant uses with zero linter errors in the owned lane.
+
+- Slime, Mimic, Bat, Crow, and Bee reuse native position, collider, tracking,
+  and state transition records. Slime and Crow keep addressable source words
+  for their BIOS fixed-source fills. Bee's three blocked-action checks and
+  terrain transitions now use the shared operations.
+- Sword creation (080F752C), component dispatch (080F63C4), script setup
+  (080F7458), and both initialization passes use one size-checked task with
+  four embedded 0x194-byte attack components. Attack initialization
+  (080F6F90) reuses the native packed vector and sequence playback. The
+  damage routine (080F645C) uses typed reaction and bonus fields. With plain
+  blocks, the reaction flags outrank the score-counter address and take
+  its ROM register. The instrumented allocator confirms that reversing
+  their priority reproduces the remaining instructions.
+- Enemy particle creation (0820D614) and update (0820D2C4) establish a
+  16-slot task with 0xB0-byte slots. The emitter passes its embedded
+  `DisplaySequenceState` directly. The pause check and position fill use the
+  existing engine and SDK operations. Direct animation addressing in the
+  updater changes CSE and the competing parameter and velocity registers.
+- Plasma Cannon (0820F378), Garmr Statue (08208740), Poison Hand (0820E2A4),
+  Statue (08203DF4), and Screamer setup (0820CD00) use existing frame or
+  playback operations. With recovered records, Plasma and Dragon Puppy
+  initializers (0820F830 and 0820B7E0) accept their direct script defaults.
+  Wind Cannon's collider setup (082093F8) matches with native vector
+  component stores. Vulcan targeting and damage (08206C00 and 082074F0)
+  match with direct expressions at two facing tests and four explosion
+  calls. The final use in each routine still affects reload allocation.
+- Ooze's script reader (08205A6C) caps the delay table at eight entries.
+  Its dispatcher (08206030) and attack callback (08205B70) increment
+  different timers. Popbud and Pollen Flower now share their task layouts
+  across setup and the callbacks that passed the stock checks.
+
+The direct player-slot gate repeatedly materializes bit 4 before the pause
+branch. The ROM materializes it after that branch and before loading the
+slot word. The remaining gates use the matching expression with the
+symbolic player-slot status. A second pass tried each draw-limit and jitter
+mask separately across nine hit-spark handlers. Each isolated fold still
+changed the ROM sequence, so those expressions remain in place.
+
+The coordinator validates the combined ROM during batch integration.
