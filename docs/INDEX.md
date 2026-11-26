@@ -122,7 +122,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [docs/FOUNDRY.md](../docs/FOUNDRY.md) | The foundry: asm to a committed match, measured as a funnel | #matching #tooling | 12 |
 | [docs/GAME_LAYOUT.md](../docs/GAME_LAYOUT.md) | Boktai 3 game layout: from ROM to gameplay | *#assets* | 34 |
 | [docs/GHOUL_CONTACT_RESPONSE.md](../docs/GHOUL_CONTACT_RESPONSE.md) | Ghoul contact response: 0808B3EC | #matching #ghoul #scene-actor #regalloc #0808B3EC | 3 |
-| [docs/HANDOFF.md](../docs/HANDOFF.md) | Handoff: current state and how to continue | #process | 16 |
+| [docs/HANDOFF.md](../docs/HANDOFF.md) | Handoff: current state and how to continue | #process | 14 |
 | [docs/HIT_SWITCH.md](../docs/HIT_SWITCH.md) | Hit-counted switch pool (tentative identity) |  | 5 |
 | [docs/KNIDL_PROCESS_REVIEW_2026-10-09.md](../docs/KNIDL_PROCESS_REVIEW_2026-10-09.md) | KNIDL workflow review and implications for Boktai 3 | *#process* | 13 |
 | [docs/LAYOUTS.md](../docs/LAYOUTS.md) | RAM object layouts merged across files | #tooling #matching | 12 |
@@ -240,7 +240,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [docs/history/2026-11-16.md](../docs/history/2026-11-16.md) | 2026-11-16 | #cleanup #compiler #concessions #depin #matching #object-model #round13 #round14 #tooling | 18 |
 | [docs/history/2026-11-17.md](../docs/history/2026-11-17.md) | 2026-11-17 | #compiler #depin #matching #phase3 #round13 #round15 #structs | 3 |
 | [docs/history/2026-11-20.md](../docs/history/2026-11-20.md) | 2026-11-20 | #actors #compiler #matching #monsters #phase3 #scene #scene-actors #tooling #wireless | 2 |
-| [docs/history/2026-11-25.md](../docs/history/2026-11-25.md) | Work log, 2026-11-25 | #compiler #phase3 #process #tooling | 1 |
+| [docs/history/2026-11-25.md](../docs/history/2026-11-25.md) | Work log, 2026-11-25 | #actors #assets #compiler #phase3 #process #scene #tooling | 1 |
 | [docs/history/HANDOFF_2026-10-23.md](../docs/history/HANDOFF_2026-10-23.md) | Handoff: current state and how to continue | #process | 14 |
 | [docs/history/MANAGER_HANDOFF_2026-10-19.md](../docs/history/MANAGER_HANDOFF_2026-10-19.md) | Manager handoff (2026-10-19) | #process #tooling | 6 |
 | [docs/history/README.md](../docs/history/README.md) | Handoff history |  | 17 |
@@ -663,6 +663,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [notes/tilemap-stream-columns-round9.md](../notes/tilemap-stream-columns-round9.md) | TilemapPanel_StreamColumns |  | 0 |
 | [notes/uncounted-concessions_2026-11-16.md](../notes/uncounted-concessions_2026-11-16.md) | Steering C the concession scanner does not count (first sweep) | #concessions #phase3 #phase4 #tooling | 4 |
 | [notes/unit-context-sensitivity_2026-11-16.md](../notes/unit-context-sensitivity_2026-11-16.md) | Functions that match alone but not inside a unit | #units #selector-macros #scene-actors | 7 |
+| [notes/unit-identities_2026-11-25.md](../notes/unit-identities_2026-11-25.md) | Unit identities from checkpoint replays | #actors #scene #assets #tooling | 9 |
 | [notes/volatile-typedef-scanner_2026-11-13.md](../notes/volatile-typedef-scanner_2026-11-13.md) | Volatile typedef detection in the concession scanner | #tooling #matching #progress | 2 |
 | [notes/w0.md](../notes/w0.md) | w0 notes | *#tooling* | 5 |
 | [notes/w1.md](../notes/w1.md) | w1 notes (range 0803CC90-0806FC64) |  | 2 |
