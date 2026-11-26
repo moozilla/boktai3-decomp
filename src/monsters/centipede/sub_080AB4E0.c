@@ -1,13 +1,14 @@
-#include "global.h"
-void Centipede_ResetRouteHistory(u8 *base)
+#include "monsters/centipede/centipede_body.h"
+
+void Centipede_ResetRouteHistory(struct RoomActor *actor)
 {
-    u8 *ctx = *(u8 **)(base + 0x3D0);
-    u16 *src = (u16 *)(base + 0x2F4);
-    u16 *dst = (u16 *)(ctx + 0x87C);
+    struct TentacleBody *body = actor->context;
+    u16 *cell = &actor->terrainCell;
+    u16 *dst = body->routeHistory;
     s32 i = 5;
     do {
-        *dst++ = *src;
+        *dst++ = *cell;
         i--;
     } while (i >= 0);
-    ctx[0x878] = 0;
+    body->routeHistoryIndex = 0;
 }
