@@ -22,8 +22,12 @@ to those in this directory. The scene stimulus destroy patch at `0822B8E0`
 also needed its include context updated.
 
 The port overlay loader accepts the relocated directory once it is combined
-with the reorganized source discovery. The integration build can then point
-`--source-patches` at the extracted `mapped/` directory.
+with the reorganized source discovery. A cold build against the archived
+revision pointed `--source-patches` at the extracted `mapped/` directory
+and linked with zero undefined symbols and zero signature mismatches.
+The resulting port matched all 13 short recordings and seed 1 at
+checkpoints 0022 and 0065. The logs and artifact hashes are under
+`build/return-layout-integration/`.
 
 ## Other reported direct uses
 

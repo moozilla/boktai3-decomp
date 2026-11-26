@@ -41,6 +41,17 @@ and wasm32 syntax checks after applying the patches together. The relocation
 preserves every added and removed C line. The source address and check
 records accompany the patches in the worker archive.
 
+A cold port build combined the worker changes with that source layout and
+all 85 relocated patches. It linked with zero undefined symbols and zero
+signature mismatches. The type generator preserved the full include paths
+for nested headers and emitted the same set of 559 typed globals as before.
+The one header diagnostic carried over from the previous layout.
+The short suite matched 25,955 ticks across 13 recordings in 76.2 seconds
+using two workers and validated ROM captures. Seed 1 at checkpoints 0022
+and 0065 matched another 4,850 ticks each against the earlier ROM scripts
+and captures. The artifact hashes are in the worker's
+`build/return-layout-integration/verification.json`.
+
 The worktree report retains the complete save/seed table, baseline trap
 ticks, reached functions and overlay verification results.
 
