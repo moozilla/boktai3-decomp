@@ -31,3 +31,10 @@ flags pointer whose lifetime spans effect setup. Trials that combine
 its gate reset or simplify its heading or palette selection change
 instruction shape or allocation. Both callbacks keep their exact forms
 for those paths.
+
+At 0807E9D0 the collider contact readiness check matches as a single
+short-circuit guard for the motion flags, status flags and health.
+The declaration updates and guard match all 1,888 bytes. The scoped
+linter retains 19 diagnostic lines and 19 charged uses. A positive
+condition reverses where the zero and one are materialized. Returning
+the boolean directly changes the reload register for offset 0x2D0.
