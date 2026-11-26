@@ -2,7 +2,7 @@
 #define GUARD_MESSAGE_WINDOW_H
 
 #include "engine/engine.h"
-#include "ui/widgets/scene_input_widget.h"
+#include "engine/video/anim_sprite.h"
 #include "effects/projectiles/contact_swarm_sprite.h"
 #include "engine/video/display_sequence.h"
 #include "engine/video/palette_resource.h"
@@ -50,8 +50,8 @@ struct MessageWindow {
     u16 messageFrame, messageCount;
     u16 messageFrames[32];
     struct PaletteResource *paletteData;
-    struct SceneInputResource resource;
-    struct SceneInputWidget widget;
+    struct AnimSpriteResource resource;
+    struct AnimSprite widget;
     u8 portraitGraphics[0x1C];
     struct ContactSwarmSprite portrait;
     struct DisplaySequenceState portraitSequence;

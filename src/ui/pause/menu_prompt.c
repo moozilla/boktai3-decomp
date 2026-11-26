@@ -44,7 +44,7 @@ int PauseMenu_UpdateBinaryChoice(struct SceneHudState *);
 
 void Sound_PlaySong(u32);
 
-void ScenePanel_BeginDetail(struct SceneHudState *);
+void StatusPanel_BeginDetail(struct SceneHudState *);
 
 void MenuPrompt_UpdateChoice(struct SceneHudState *p)
 {
@@ -56,7 +56,7 @@ void MenuPrompt_UpdateChoice(struct SceneHudState *p)
         Hud_SetUpdateCallback(p, MenuPrompt_FadeChoice);
     } else if (choice == 1) {
         Sound_PlaySong(0xDD);
-        ScenePanel_BeginDetail(p);
+        StatusPanel_BeginDetail(p);
     }
 }
 
@@ -68,16 +68,16 @@ void MenuPrompt_FadeChoice(struct SceneHudState *p)
         Hud_InitSelectionBounds(0, 0);
     Anim_Step(&p->accountAnimation, &p->accountResource);
     if (p->pageFadeTimer++ > 15)
-        ScenePanel_BeginAccountMenu(p);
+        MenuPrompt_BeginAccountMenu(p);
 }
 
 void StatusPanel_BeginAnimatedTransition(void *);
 
-void ScenePanel_BeginSelection(void *);
+void StatusPanel_BeginSelection(void *);
 
 void PauseMenu_UpdateQuantityInput(void *);
 
-void ScenePanel_UpdateDetail(struct SceneHudState *p)
+void MenuPrompt_UpdateDetail(struct SceneHudState *p)
 {
     Anim_Step(&p->accountAnimation, &p->accountResource);
     if (gPadState[1] & 1) {
@@ -101,7 +101,7 @@ void ScenePanel_UpdateDetail(struct SceneHudState *p)
         StatusPanel_BeginAnimatedTransition(p);
     } else if (gPadState[1] & 2) {
         Sound_PlaySong(0xDE);
-        ScenePanel_BeginSelection(p);
+        StatusPanel_BeginSelection(p);
     } else
         PauseMenu_UpdateQuantityInput(p);
 }
@@ -161,7 +161,7 @@ void MenuPrompt_WaitForChildPhase(struct SceneHudState *p)
 {
     if (ScriptPanel_IsCallbackActive(p->loanDisplay)) {
         ScreenTransition_SendCommand(2, 4, 4, 4, 4, 65535, 0);
-        ScenePanel_BeginAccountMenu(p);
+        MenuPrompt_BeginAccountMenu(p);
     }
 }
 
@@ -183,7 +183,7 @@ void MenuPrompt_PulseDisplay(struct SceneHudState *p)
     else
         Hud_InitSelectionBounds((150 - p->pageFadeTimer) * 4, 0);
     if (p->pageFadeTimer++ > 149)
-        ScenePanel_BeginAccountMenu(p);
+        MenuPrompt_BeginAccountMenu(p);
 }
 
 s32 Hud_GetScaledRetryCount(void)
@@ -227,7 +227,7 @@ void MenuPrompt_UpdateSelectionSprites(struct SceneHudState *p)
     p->accountCursor.position.y = p->accountSelection << 5;
 }
 
-void ScenePanel_UpdateAccountIntro(void);
+void MenuSequence_UpdateAccountIntro(void);
 
 void Hud_InitRetryPanel(u8 *s)
 {
@@ -258,7 +258,7 @@ void Hud_InitRetryPanel(u8 *s)
     Anim_LoadKeyframe(a, b, 0x1D, 1);
     Anim_SetKeyframes(a, b, 10, 1, zero);
     MessageWindow_ShowMessage(0);
-    Hud_SetUpdateCallback(s, ScenePanel_UpdateAccountIntro);
+    Hud_SetUpdateCallback(s, MenuSequence_UpdateAccountIntro);
 }
 
 s32 MessageWindow_SetBounds(s32, s32, s32, s32);
@@ -267,13 +267,13 @@ s32 MessageWindow_SetMessageTable(const void *);
 
 s32 MessageWindow_SetDisplayMode(s32);
 
-void SceneSequence_UpdateRamp64(void);
+void MenuSequence_UpdateRamp64(void);
 
-void ScenePanel_BeginAccountMenu(struct SceneHudState *p)
+void MenuPrompt_BeginAccountMenu(struct SceneHudState *p)
 {
     u32 zero;
     s16 *coord;
-    struct SceneInputWidget *anim;
+    struct AnimSprite *anim;
     MessageWindow_Clear();
     ScrollingDialogue_ClearScript();
     ScrollingDialogue_RequestHide();
@@ -300,5 +300,5 @@ void ScenePanel_BeginAccountMenu(struct SceneHudState *p)
     Anim_SetKeyframes(anim, &p->accountResource, 10, 1, zero);
     MenuPrompt_UpdateSelectionSprites(p);
     MessageWindow_ShowMessage(7);
-    Hud_SetUpdateCallback(p, SceneSequence_UpdateRamp64);
+    Hud_SetUpdateCallback(p, MenuSequence_UpdateRamp64);
 }

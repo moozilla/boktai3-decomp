@@ -1,11 +1,11 @@
 #include "global.h"
 // confidence=low: settles reaction displacement and restores normal actor control.
-#include "scene/actor/scene_actor_chase_reaction.h"
+#include "scene/motion/scene_actor_chase_reaction.h"
 #include "scene/actor/scene_actor_reaction.h"
-#include "scene/actor/scene_actor_displacement.h"
+#include "scene/motion/scene_actor_displacement.h"
 #include "engine/video/display_sequence.h"
-#include "scene/actor/scene_actor_turn.h"
-#include "scene/actor/scene_actor_chase_shared.h"
+#include "scene/motion/scene_actor_turn.h"
+#include "scene/motion/scene_actor_chase_shared.h"
 
 void SceneActorAttachment_ReplaceResponseSlot(void *, u8, u8, u8);
 

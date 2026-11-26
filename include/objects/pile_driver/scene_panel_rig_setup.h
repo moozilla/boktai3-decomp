@@ -1,7 +1,7 @@
 #ifndef GUARD_SCENE_PANEL_RIG_SETUP_H
 #define GUARD_SCENE_PANEL_RIG_SETUP_H
 
-#include "objects/pile_driver/scene_panel_rig.h"
+#include "objects/pile_driver/pile_driver_rig.h"
 
 struct SceneRigPayloadView {
     u8 unknown0[0x6A0];
@@ -19,14 +19,14 @@ struct SceneRigSetupParentView {
 extern const char gUnk_0824DEAC[], gUnk_0824DEB0[];
 u32 String_Hash(const char *);
 void Collider_SetBodyProperties(void *, u32, u32, u32);
-void ScenePanelRig_ApplyContact(struct ContactCollider *, struct ContactCollider *,
+void PileDriverRig_ApplyContact(struct ContactCollider *, struct ContactCollider *,
                                 struct ScenePanelRig *);
-void ScenePanelRig_SetState(struct ScenePanelRig *, u32);
-void ScenePanelRig_InitCollider(struct ScenePanelRig *, u32);
-void ScenePanelRig_InitMainSprite(struct ScenePanelRig *);
-void ScenePanelRig_InitPrimarySprites(struct ScenePanelRig *);
-void ScenePanelRig_InitSecondarySprites(struct ScenePanelRig *);
-void ScenePanelRig_InitSprites(struct ScenePanelRig *);
-void ScenePanelRig_InitPayloadVectors(struct ScenePanelRig *);
+void PileDriverRig_SetState(struct ScenePanelRig *, u32);
+void PileDriverRig_InitCollider(struct ScenePanelRig *, u32);
+void PileDriverRig_InitMainSprite(struct ScenePanelRig *);
+void PileDriverRig_InitPrimarySprites(struct ScenePanelRig *);
+void PileDriverRig_InitSecondarySprites(struct ScenePanelRig *);
+void PileDriverRig_InitSprites(struct ScenePanelRig *);
+void PileDriverRig_InitPayloadVectors(struct ScenePanelRig *);
 
 #endif

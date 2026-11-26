@@ -1,9 +1,9 @@
 #include "global.h"
 #include "engine/ram.h"
 #include "engine/engine_globals.h"
-#include "scene/area_effect/area_effect_link.h"
+#include "scene/areas/area_effect_link.h"
 #include "engine/engine_pause.h"
-#include "minigames/coffin_bike/glove.h"
+#include "minigames/coffin_bike/coffin_bike.h"
 
 struct LinkMenu {
     u8 unk_00[0x18];
@@ -18,7 +18,7 @@ struct ScriptArgs {
     u32 : 16;
     s32 *values;
 };
-void Registry1745_SetMenuRequest(u32);
+void LinkSession_SetMenuRequest(u32);
 s32 GameState_GetResultIndex(void);
 u8 LinkParticipant_IsLocallySelected(struct Glove *);
 void Sound_StopSong(u32);
@@ -77,7 +77,7 @@ void sub_08116E44(struct Glove *p)
             values[0] = Glove_Participant(p);
             values[1] = *LinkResult();
             if (Glove_Participant(p) == LinkParticipant())
-                Registry1745_SetMenuRequest(4);
+                LinkSession_SetMenuRequest(4);
         } else {
             values[0] = GameState_GetResultIndex();
             values[1] = p->activeFrames;

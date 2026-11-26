@@ -7,8 +7,8 @@ struct OptionsTextRect {
     u16 x, y, width, height;
 };
 struct OptionsWidget {
-    struct SceneInputWidget sprite;
-    struct SceneInputResource graphics;
+    struct AnimSprite sprite;
+    struct AnimSpriteResource graphics;
     u32 unknown80[2];
 };
 struct OptionsScreen {

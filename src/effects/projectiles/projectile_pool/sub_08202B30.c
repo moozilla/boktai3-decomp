@@ -1,5 +1,5 @@
 #include "effects/projectiles/projectile_pool.h"
-#include "player/cues/player_cue_sequence.h"
+#include "player/cutscene/player_cue_sequence.h"
 #include "engine/ram.h"
 #include "engine/engine.h"
 extern const s16 gUnk_086149C4[];

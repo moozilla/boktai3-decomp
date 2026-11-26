@@ -15,7 +15,7 @@ static inline u8 IsActive(u32 *mask, s32 slot)
         return TRUE;
     return FALSE;
 }
-struct PoolSprite *SpritePool10_AllocateSlot(struct SpritePool *pool)
+struct PoolSprite *SpriteProjectilePool_AllocateSlot(struct SpritePool *pool)
 {
     s32 i = 0;
     for (; i < 10; i++) {

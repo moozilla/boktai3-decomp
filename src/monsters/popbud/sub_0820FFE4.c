@@ -1,4 +1,4 @@
-#include "monsters/popbud/pink_spine_playback.h"
+#include "monsters/popbud/popbud_playback.h"
 #include "effects/projectiles/projectile_pool.h"
 extern const s16 gUnk_086149C4[];
 void ProjectileConfig_Init(void *);

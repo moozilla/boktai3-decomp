@@ -1,7 +1,7 @@
 #ifndef GUARD_ACTOR_SPATIAL_QUERY_H
 #define GUARD_ACTOR_SPATIAL_QUERY_H
 
-#include "scene/actor/contact_position.h"
+#include "scene/collision/contact_position.h"
 
 struct MovementReachActor {
     u8 unknown0[0x51];
@@ -25,6 +25,6 @@ struct SceneVolumeSearch {
 };
 
 s32 ActorMovement_CanReachTarget(struct MovementReachActor *);
-s32 SceneVolume_FindNearbyPosition(struct SceneVolumeSearch *);
+s32 SabataVolume_FindNearbyPosition(struct SceneVolumeSearch *);
 
 #endif

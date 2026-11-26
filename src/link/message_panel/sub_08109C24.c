@@ -1,6 +1,6 @@
 #include "global.h"
 #include "system/clock/sun_clock.h"
-#include "scene/area_effect/area_effect_link.h"
+#include "scene/areas/area_effect_link.h"
 struct ClockPanelSnapshot {
     u8 unk0[0x20];
     u16 time;

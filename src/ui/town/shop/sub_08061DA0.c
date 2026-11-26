@@ -1,5 +1,5 @@
-#include "ui/town/scene_inventory_control.h"
-s32 SceneInventory_TickModeMenu(struct SceneInventoryControlView *panel)
+#include "ui/town/shop_control.h"
+s32 Shop_TickModeMenu(struct SceneInventoryControlView *panel)
 {
     SceneInputPanel_PositionModeCursor((void *)panel, panel->mode);
     if (panel->mode == 3)
@@ -8,9 +8,9 @@ s32 SceneInventory_TickModeMenu(struct SceneInventoryControlView *panel)
         SceneInput_SetGlyphPair(&panel->prompt, 0, -1);
     SceneInputPanel_HighlightMode((void *)panel,
                                   ((struct SceneInventoryHighlightView *)panel)->colors);
-    if (SceneInventory_HandleClockShortcut(panel))
+    if (Shop_HandleClockShortcut(panel))
         goto handled;
-    if (SceneInventory_HandlePageKeys(panel))
+    if (Shop_HandlePageKeys(panel))
         goto handled;
     if (gPadState[1] & 2)
         return 1;
@@ -18,19 +18,19 @@ s32 SceneInventory_TickModeMenu(struct SceneInventoryControlView *panel)
         switch (panel->mode) {
             case 4:
                 Sound_PlaySong(0x107);
-                SceneInventory_BeginMoveSelection(panel);
+                Shop_BeginMoveSelection(panel);
                 goto handled;
             case 1:
                 Sound_PlaySong(0x107);
-                SceneInventory_BeginItemSelection(panel);
+                Shop_BeginItemSelection(panel);
                 goto handled;
             case 3:
                 Sound_PlaySong(0x107);
-                SceneInventory_BeginExitConfirmation(panel);
+                Shop_BeginExitConfirmation(panel);
                 goto handled;
             case 2:
                 Sound_PlaySong(0x107);
-                SceneInventory_BeginConsumableSelection(panel);
+                Shop_BeginConsumableSelection(panel);
                 goto handled;
         }
     }

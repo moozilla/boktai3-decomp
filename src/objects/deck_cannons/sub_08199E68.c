@@ -9,7 +9,7 @@ struct CannonBatteryProjectile {
     u16 startCoordinate;
     u8 direction;
 };
-void CannonBattery_UpdateProjectile(struct CannonBatteryProjectile *p)
+void DeckCannon_UpdateProjectile(struct CannonBatteryProjectile *p)
 {
     s16 *position;
     switch (p->direction) {

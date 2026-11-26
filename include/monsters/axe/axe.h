@@ -4,7 +4,7 @@
 #include "monsters/chase_actor.h"
 #include "engine/video/sprite.h"
 #include "engine/video/display_sequence.h"
-#include "scene/actor/contact_swarm.h"
+#include "scene/collision/contact_swarm.h"
 
 /* One of the four afterimage sprites the axe leaves along its path (struct Axe + 0x708). */
 struct AxeTrailSlot {

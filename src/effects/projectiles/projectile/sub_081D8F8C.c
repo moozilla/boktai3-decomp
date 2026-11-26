@@ -6,7 +6,7 @@ struct Q {
 };
 void Projectile_SetUpdateCallback(void *, void *);
 void Projectile_UpdateTimedRemoval(void);
-s32 Task4E01_StartType4TimedAnimation(struct Q *p)
+s32 ProjectileTask_StartType4TimedAnimation(struct Q *p)
 {
     Projectile_SetUpdateCallback((u8 *)p + 0x18, Projectile_UpdateTimedRemoval);
     (p + 5)->v = 0x19;

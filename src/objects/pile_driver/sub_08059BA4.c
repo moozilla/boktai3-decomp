@@ -1,9 +1,9 @@
-#include "objects/pile_driver/scene_panel_rig.h"
-void ScenePanelRig_TickReturn(struct ScenePanelRig *rig)
+#include "objects/pile_driver/pile_driver_rig.h"
+void PileDriverRig_TickReturn(struct ScenePanelRig *rig)
 {
     rig->colliderHold = 16;
     if (++rig->stateFrame > 15)
-        ScenePanelRig_SetState(rig, 0);
+        PileDriverRig_SetState(rig, 0);
     else {
         s32 weight = 16 - rig->stateFrame, divisor = weight + 1;
         rig->position.x = Div(rig->position.x * weight + rig->origin.x, divisor);

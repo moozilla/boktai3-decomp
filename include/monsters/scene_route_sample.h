@@ -1,7 +1,7 @@
 #ifndef GUARD_SCENE_ROUTE_SAMPLE_H
 #define GUARD_SCENE_ROUTE_SAMPLE_H
 
-#include "scene/actor/contact_position.h"
+#include "scene/collision/contact_position.h"
 #include "engine/math/monster_particle_random.h"
 
 extern const s16 gUnk_086149C4[];

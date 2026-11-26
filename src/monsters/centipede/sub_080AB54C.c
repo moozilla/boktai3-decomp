@@ -12,7 +12,7 @@ struct P {
     struct Q *q;
 };
 
-void TentacleActor_RecordVisitedRoute(struct P *p, u16 x)
+void Centipede_RecordVisitedRoute(struct P *p, u16 x)
 {
     struct Q *q = p->q;
     q->v[q->n] = x;

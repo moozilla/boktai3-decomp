@@ -1,6 +1,6 @@
 #include "scene/actor/scene_actor_reaction.h"
 #include "engine/engine.h"
-#include "scene/actor/scene_actor_chase_shared.h"
+#include "scene/motion/scene_actor_chase_shared.h"
 static inline void Turn_ResetState(struct ChaseActor *actor, u32 state, u32 phase)
 {
     actor->base.state2A8 = state;

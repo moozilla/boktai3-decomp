@@ -1,5 +1,5 @@
-#include "ui/town/scene_inventory_control.h"
-s32 SceneInventory_ClassifyConsumableMove(struct SceneInventoryControlView *panel)
+#include "ui/town/shop_control.h"
+s32 Shop_ClassifyConsumableMove(struct SceneInventoryControlView *panel)
 {
     s32 second;
     if (panel->grid.savedSelection <= 15) {
@@ -14,7 +14,7 @@ s32 SceneInventory_ClassifyConsumableMove(struct SceneInventoryControlView *pane
             return 1;
     } else {
         if (panel->grid.selection == panel->grid.savedSelection) {
-            SceneInventory_SelectActionDestination(panel);
+            Shop_SelectActionDestination(panel);
             return 4;
         }
         if (panel->grid.selection <= 15) {

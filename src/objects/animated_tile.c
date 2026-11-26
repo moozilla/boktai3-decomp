@@ -36,7 +36,7 @@ static inline u8 AnimatedTile_IsUsed(u32 mask, s32 index, s32 one)
     return 0;
 }
 
-struct AnimatedTile *Pool1BC_FindByName(u32 name)
+struct AnimatedTile *AnimatedTilePool_FindByName(u32 name)
 {
     struct AnimatedTileManager *pool = (void *)gNamedEntryPool;
     struct AnimatedTile *entry;
@@ -128,7 +128,7 @@ void AnimatedTile_TickAlternateAnimation(struct AnimatedTileManager *manager,
 
 /* Provisional names and field interpretations; confidence low. */
 
-void Pool1BC_UpdateDelay(void *unused, struct AnimatedTile *entry)
+void AnimatedTilePool_UpdateDelay(void *unused, struct AnimatedTile *entry)
 {
     if (entry->entered) {
         entry->timer = 0;
@@ -258,7 +258,7 @@ void AnimatedTile_StartAlternateAnimationFromScript(void)
 {
     u32 name = Script_GetKeywordValue('n', 0);
     if (name != 0) {
-        struct AnimatedTile *tile = Pool1BC_FindByName(name);
+        struct AnimatedTile *tile = AnimatedTilePool_FindByName(name);
         if (tile != 0) {
             tile->state = 2;
             tile->entered = 1;

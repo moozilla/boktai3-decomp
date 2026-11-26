@@ -123,7 +123,7 @@ void SceneHud_DrawNumericStatus(u32 mode)
     }
 }
 
-void SceneHud_SetKeyframePaletteBank(struct SceneInputWidget *target, u32 bank)
+void SceneHud_SetKeyframePaletteBank(struct AnimSprite *target, u32 bank)
 {
     target->paletteBank = bank;
     target->palette = (u16 *)(gPaletteBankData + (target->paletteBank << 5));
@@ -131,8 +131,8 @@ void SceneHud_SetKeyframePaletteBank(struct SceneInputWidget *target, u32 bank)
 
 /* SceneHud_UpdateFeaturePalettes: Sets up to three widget palette banks to 0x374 or 0x373 according to owner flag masks 4/8/16; preserves the existing provisional alias */
 
-void SceneHud_UpdateFeaturePalettes(const void *owner, struct SceneInputWidget *first,
-                                    struct SceneInputWidget *second, struct SceneInputWidget *third)
+void SceneHud_UpdateFeaturePalettes(const void *owner, struct AnimSprite *first,
+                                    struct AnimSprite *second, struct AnimSprite *third)
 {
     if (first) {
         if (SceneInput_TestGridFlags(owner, 4))
@@ -158,7 +158,7 @@ void SceneHud_ShowFourDigits(struct SceneInputPanel *parent, const struct Contac
                              s32 value, u32 label)
 {
     void *resource = &parent->widgetResource;
-    struct SceneInputWidget *widget = &parent->numericLabel;
+    struct AnimSprite *widget = &parent->numericLabel;
     s32 digits[4];
     s32 offset, remaining;
     s32 *digit;
@@ -193,7 +193,7 @@ void SceneHud_HideFourDigits(struct SceneInputPanel *parent)
     u8 *entry = body + ((u8 *)&parent->numericLabel - body);
     s32 i = 0;
     do {
-        struct SceneInputWidget *widget = (void *)entry;
+        struct AnimSprite *widget = (void *)entry;
         widget->flags |= 1;
         entry += sizeof(*widget);
     } while (++i < 5);

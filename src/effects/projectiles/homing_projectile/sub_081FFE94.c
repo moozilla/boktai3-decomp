@@ -1,6 +1,6 @@
 #include "effects/projectiles/homing_projectile.h"
 #include "engine/ram.h"
-#include "player/cues/player_cue_sequence.h"
+#include "player/cutscene/player_cue_sequence.h"
 struct HomingManager {
     u8 task[0x18];
     u32 activeMask;

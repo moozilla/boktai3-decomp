@@ -1,6 +1,6 @@
 #include "global.h"
-#include "minigames/coffin_bike/glove.h"
-void Glove_OnActionComplete(struct Glove *s)
+#include "minigames/coffin_bike/coffin_bike.h"
+void CoffinBike_OnActionComplete(struct Glove *s)
 {
     u8 *p = &s->active;
     u16 *h;

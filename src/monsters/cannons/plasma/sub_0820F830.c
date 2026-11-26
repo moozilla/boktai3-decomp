@@ -1,5 +1,5 @@
 #include "global.h"
-#include "player/cues/player_cue_sequence.h"
+#include "player/cutscene/player_cue_sequence.h"
 #include "engine/math/scene_vec.h"
 #include "engine/engine_globals.h"
 struct PHVec {
@@ -13,9 +13,9 @@ s32 Script_SeekToKeyword(s32);
 s32 Script_GetValue(void);
 void Sprite_Init(void *, void *, s32);
 void AnimData_SelectPaletteBank(void *, s32);
-void OrangeSpine_InitCollider(void *);
-void OrangeSpine_TryFireAtPlayer(void);
-void OrangeSpine_UpdateDefeatEffect(void);
+void PlasmaCannon_InitCollider(void *);
+void PlasmaCannon_TryFireAtPlayer(void);
+void PlasmaCannon_UpdateDefeatEffect(void);
 void TerrainModifiers_RegisterCell(void *, s32, s32, s32, s32, s32);
 void SceneBody_Init(void *, void *, void *, u32, u32, void *);
 void SceneBody_SetSprite(void *, void *);
@@ -43,7 +43,7 @@ static inline s32 OrangeSpine_CellIndex(struct PHVec *v)
         return 0;
     return ((struct PHTerrain *)gTerrainMap)->rows[z] + x;
 }
-s32 OrangeSpine_InitializeFromScript(u8 *p, void *parent)
+s32 PlasmaCannon_InitializeFromScript(u8 *p, void *parent)
 {
     void *resource;
     if (Script_SeekToKeyword('p')) {
@@ -135,10 +135,10 @@ s32 OrangeSpine_InitializeFromScript(u8 *p, void *parent)
     resource = ScriptProc_Start(0x922e, 0x5184);
     ((struct OrangeSpineTail *)p)->resource = resource;
     if (!((struct OrangeSpineTail *)p)->dead) {
-        ((struct OrangeSpineTail *)p)->update = OrangeSpine_TryFireAtPlayer;
+        ((struct OrangeSpineTail *)p)->update = PlasmaCannon_TryFireAtPlayer;
         Anim_SetSequence(p + 0x10c, resource, 0xe, ((struct OrangeSpineTail *)p)->direction, 0);
     } else {
-        ((struct OrangeSpineTail *)p)->update = OrangeSpine_UpdateDefeatEffect;
+        ((struct OrangeSpineTail *)p)->update = PlasmaCannon_UpdateDefeatEffect;
         ((struct OrangeSpineTail *)p)->hit = 1;
         Anim_SetSequence(p + 0x10c, ((struct OrangeSpineTail *)p)->resource, 0x10,
                          ((struct OrangeSpineTail *)p)->direction, 0);
@@ -146,7 +146,7 @@ s32 OrangeSpine_InitializeFromScript(u8 *p, void *parent)
     PlayerCue_StepSequence((struct ContactSwarmSprite *)(p + 0x24),
                            (struct DisplaySequenceState *)(p + 0x10c));
     if (!((struct OrangeSpineTail *)p)->dead)
-        OrangeSpine_InitCollider(p);
+        PlasmaCannon_InitCollider(p);
     if (W(0x16c) && !((struct OrangeSpineTail *)p)->dead) {
         s32 cell = OrangeSpine_CellIndex((struct PHVec *)(p + 0x40));
         TerrainModifiers_RegisterCell(p + 0x174, cell, 0, H(0x42) >> 8, 0, 1);

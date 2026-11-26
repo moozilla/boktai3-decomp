@@ -105,7 +105,7 @@ void SceneActors_SpawnConvergingParticle(struct ActorState *actor, struct Conver
     }
 }
 
-void ActorPosition_SetOffsetPoint(struct ActorState *actor)
+void SabataPosition_SetOffsetPoint(struct ActorState *actor)
 {
     actor->offsetPoint = actor->body.position;
     actor->offsetPoint.x -= 20;
@@ -144,7 +144,7 @@ static inline void ActorPosition_StartReaction(struct ActorState *actor, int id,
     actor->triggered = one;
 }
 
-int ActorPosition_BeginReaction(struct ActorState *actor, int kind, int damage)
+int SabataPosition_BeginReaction(struct ActorState *actor, int kind, int damage)
 {
     struct SceneActorBody *body = &actor->body;
     int initialPhase;
@@ -155,10 +155,10 @@ int ActorPosition_BeginReaction(struct ActorState *actor, int kind, int damage)
             int state;
             actor->vitality += damage;
             actor->lastDamage = damage;
-            SceneVolume_BeginPhase(actor, 2);
+            SabataVolume_BeginPhase(actor, 2);
             initialPhase = 0;
             ActorPosition_StartReaction(actor, initialPhase, 0);
-            callback = SceneEventActor_UpdateJitter;
+            callback = SabataEvent_UpdateJitter;
             state = 0xb;
             actor->controlPhase = state;
             actor->stateCallback = callback;
@@ -197,7 +197,7 @@ int ActorPosition_BeginReaction(struct ActorState *actor, int kind, int damage)
     return 1;
 }
 
-s32 ActorPosition_TestPath(struct ActorState *actor, struct ContactPosition *destination)
+s32 SabataPosition_TestPath(struct ActorState *actor, struct ContactPosition *destination)
 {
     if (Nav_IsPositionInMesh(actor->bounds, &actor->body.position, destination) &&
         NavMesh_FindRoute(actor->bounds, &actor->body.position, destination))

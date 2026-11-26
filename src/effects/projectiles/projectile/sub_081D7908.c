@@ -1,7 +1,7 @@
 #include "global.h"
 void SpriteDrawable_SelectTileFrame(u8 *, u32, u32);
 void Effect_SetPalette(u8 *, u32);
-void Task4E01_SetTrailSpriteResources(u8 *p, u32 b)
+void ProjectileTask_SetTrailSpriteResources(u8 *p, u32 b)
 {
     u8 *q = p + 0x48;
     s32 i = 3;

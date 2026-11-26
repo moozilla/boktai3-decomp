@@ -1,6 +1,6 @@
 #include "global.h"
 #include "engine/video/render.h"
-#include "scene/actor/scene_actor_chase_shared.h"
+#include "scene/motion/scene_actor_chase_shared.h"
 struct Elem {
     u32 flags;
     u8 pad[40];

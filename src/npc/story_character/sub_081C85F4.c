@@ -39,7 +39,7 @@ static inline s32 Interpolate(s32 start, s32 end, s32 tick, s32 duration)
         delta = -(-delta >> 8);
     return start + delta;
 }
-void StateActor_RunPaletteFlashSequence(u32 a, struct S *p, s32 a2)
+void StoryCharacter_RunPaletteFlashSequence(u32 a, struct S *p, s32 a2)
 {
     s32 *base20 = (s32 *)((u8 *)p + 0x20);
     {

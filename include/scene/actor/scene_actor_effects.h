@@ -1,7 +1,7 @@
 #ifndef GUARD_SCENE_ACTOR_EFFECTS_H
 #define GUARD_SCENE_ACTOR_EFFECTS_H
 #include "scene/actor/scene_actor_registry.h"
-#include "scene/actor/scene_actor_terrain.h"
+#include "scene/motion/scene_actor_terrain.h"
 /* Packed stack offset: each member is initialized before the effect call. */
 struct SceneActorEffectsOffset {
     s32 x : 16;

@@ -9,7 +9,7 @@ struct A {
 };
 void Callback_InvokeActor(void *, u32);
 
-void SingletonSlot7_DispatchUpdateCallback(struct A *p)
+void VanargandHead_DispatchUpdateCallback(struct A *p)
 {
     p->a = 0;
     Callback_InvokeActor(p, gUnk_08613E00[p->i]);

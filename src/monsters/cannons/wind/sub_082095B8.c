@@ -40,7 +40,7 @@ static inline s32 FanCannon_GetCellIndex(struct SceneVec *position)
     return gTerrainMap->rows[z] + x;
 }
 
-s32 FanCannon_IsPathToPlayerClear(struct FanCannon *cannon)
+s32 WindCannon_IsPathToPlayerClear(struct FanCannon *cannon)
 {
     struct SceneVec delta;
     union FanCannonSample sample;

@@ -1,5 +1,5 @@
 #include "global.h"
-#include "scene/actor/scene_actor_terrain.h"
+#include "scene/motion/scene_actor_terrain.h"
 /* The original falls through without setting its result on an unobstructed path. */
 struct Feather {
     u32 flags;

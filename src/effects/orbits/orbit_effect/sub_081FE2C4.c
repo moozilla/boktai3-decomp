@@ -5,7 +5,7 @@
 
 #include "objects/sun_orb/sun_orb_effect.h"
 #include "engine/engine_pause.h"
-#include "scene/actor/scene_actor_chase_shared.h"
+#include "scene/motion/scene_actor_chase_shared.h"
 
 extern u32 gUnk_02000560;
 extern const s16 gUnk_086149C4[];

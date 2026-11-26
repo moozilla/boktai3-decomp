@@ -3,7 +3,7 @@
 #include "objects/named_object/named_object.h"
 #include "player/player.h"
 #include "effects/shadows/terrain_shadow.h"
-#include "scene/actor/scene_actor_terrain.h"
+#include "scene/motion/scene_actor_terrain.h"
 struct NamedObject *NamedObject_FindByName(s32);
 struct NamedObject *NamedObject_GetFollowTarget(void);
 u32 TetherActor_TestStatusFlags(u32);

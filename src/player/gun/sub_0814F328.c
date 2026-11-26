@@ -1,7 +1,7 @@
 #include "player/player.h"
 #include "global.h"
-#include "scene/actor/contact_actor.h"
-#include "effects/scene/bat_flock.h"
+#include "scene/collision/contact_actor.h"
+#include "effects/bat_flock.h"
 extern const s16 gUnk_086149C4[];
 void SceneParticleBurst_CreateWhilePaused(void *, void *, void *, u32, u32, u32);
 u32 Player_ConsumeStateEntry(void *);
@@ -34,7 +34,7 @@ static inline void FaceCharge(struct Player *p)
 void Player_ReleaseActionEffectOnExit(void *);
 void Player_SetPendingCallback(void *, void (*)(void *));
 void Player_UpdateAttachedEntryPosition(void *);
-s32 Task4E01_GetKind7Value(s32);
+s32 ProjectileTask_GetKind7Value(s32);
 static inline u32 bonus(struct Player *p, u32 mask)
 {
     u32 *field;
@@ -101,7 +101,7 @@ void Player_UpdateAttachedAttackCharge(struct Player *p)
             if (!HELD)
                 FireCharge(p);
             else {
-                if (Task4E01_GetKind7Value(p->statModifierContext.attachedEntry) > 1) {
+                if (ProjectileTask_GetKind7Value(p->statModifierContext.attachedEntry) > 1) {
                     {
                         u8 *chargeTier = &p->statModifierContext.chargeTier;
                         *chargeTier = 1;
@@ -119,7 +119,7 @@ void Player_UpdateAttachedAttackCharge(struct Player *p)
             if (!HELD)
                 FireCharge(p);
             else {
-                if (Task4E01_GetKind7Value(p->statModifierContext.attachedEntry) > 2) {
+                if (ProjectileTask_GetKind7Value(p->statModifierContext.attachedEntry) > 2) {
                     {
                         u8 *chargeTier = &p->statModifierContext.chargeTier;
                         *chargeTier = 1;

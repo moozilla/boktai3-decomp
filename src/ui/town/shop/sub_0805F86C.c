@@ -1,4 +1,4 @@
-#include "ui/town/scene_item_values.h"
+#include "ui/town/shop_item_values.h"
 extern const struct SceneValueItemDefinition gUnk_08E61280[];
 u32 SceneItemValue_GetItemBaseValue(s32 index)
 {

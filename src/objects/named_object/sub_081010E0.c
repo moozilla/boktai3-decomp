@@ -1,5 +1,5 @@
 #include "global.h"
-#include "scene/actor/contact_actor.h"
+#include "scene/collision/contact_actor.h"
 #include "player/player.h"
 #include "objects/named_object/named_object_flags.h"
 #include "objects/named_object/named_object.h"

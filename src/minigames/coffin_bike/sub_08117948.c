@@ -2,8 +2,8 @@
 #include "system/game_state/game_state.h"
 #include "engine/ram.h"
 #include "engine/engine_globals.h"
-#include "scene/area_effect/area_effect_link.h"
-#include "minigames/coffin_bike/glove.h"
+#include "scene/areas/area_effect_link.h"
+#include "minigames/coffin_bike/coffin_bike.h"
 
 s32 Div(s32, s32);
 s32 Math_Atan2(s32, s32);
@@ -20,7 +20,7 @@ void PalFade_Start(void *, s32, u16, s32, s32, s32, s32, s32);
 s32 CharacterModel_GetPrimaryPaletteIndex(void *);
 void ChargeMarker_TickHold(void *, void *, u32);
 
-static inline void Glove_BeginStopping(union GloveAnimationKey *animation, struct Glove *p,
+static inline void CoffinBike_BeginStopping(union GloveAnimationKey *animation, struct Glove *p,
                                        u8 *entry)
 {
     u16 elapsedReset[] = {0};
@@ -162,7 +162,7 @@ static inline void Glove_UpdateDamageAndAccessories(struct Glove *p,
     object = p;
     CharacterModel_UpdateAccessoryAnimations(Glove_ModelFromWorkOwner(&object));
 }
-void Glove_UpdateStopping(struct Glove *p)
+void CoffinBike_UpdateStopping(struct Glove *p)
 {
     struct GloveMotion *self = &p->motion;
     s32 h;
@@ -177,7 +177,7 @@ void Glove_UpdateStopping(struct Glove *p)
         u8 *entry = &p->active;
         if (*entry) {
             {
-                Glove_BeginStopping(&p->motion.animation, p, entry);
+                CoffinBike_BeginStopping(&p->motion.animation, p, entry);
             }
         }
     }

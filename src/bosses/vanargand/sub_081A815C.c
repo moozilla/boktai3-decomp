@@ -1,7 +1,7 @@
 #include "bosses/vanargand/vanargand_pair_attack.h"
 
-void ScenePanel_UpdatePairConditions(void *);
-void ScenePanel_ApplyPairTransition(void *);
+void VanargandPair_UpdatePairConditions(void *);
+void VanargandPair_ApplyPairTransition(void *);
 
 void Vanargand_UpdateTimedMode5(struct VanargandPairAttack *p)
 {
@@ -9,8 +9,8 @@ void Vanargand_UpdateTimedMode5(struct VanargandPairAttack *p)
     if (Vanargand_ConsumeActionEntry(p) == 1)
         Vanargand_EnterAction(p, 5);
     if (p->finished) {
-        ScenePanel_UpdatePairConditions(q);
-        ScenePanel_ApplyPairTransition(q);
+        VanargandPair_UpdatePairConditions(q);
+        VanargandPair_ApplyPairTransition(q);
     }
     p->actionTimer++;
 }

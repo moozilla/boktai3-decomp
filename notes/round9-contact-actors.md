@@ -9,7 +9,7 @@ address is evaluated before the BIOS fill's stack zero.
 
 Tags: 08044AD4 #contact-swarm #matching
 
-`ContactSwarm_SpawnPairedAdvanceCount` matches all 428 bytes. One table
+`CountBats_SpawnPairedAdvanceCount` matches all 428 bytes. One table
 pointer serves the random samples and then the alternating headings.
 Computing the slot stride before the loop keeps the incremented slot index
 live until the count comparison and fixes the draft's uninitialized stride.

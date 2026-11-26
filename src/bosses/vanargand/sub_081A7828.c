@@ -19,7 +19,7 @@ static inline void ScenePanel_RequestTransition(struct ScenePanelCommandState *p
     panel->counter = 0;
     panel->pending = 1;
 }
-void ScenePanel_DispatchTransitionCommands(struct ScenePanelCommandState *panel)
+void VanargandPair_DispatchTransitionCommands(struct ScenePanelCommandState *panel)
 {
     struct SceneEventReceiver *receiver = &panel->receiver;
     s32 i = 0;

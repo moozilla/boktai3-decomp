@@ -33,11 +33,11 @@ halfword at 0x134A. Unknown regions and tentative semantics remain explicit.
 
 ## Matching adaptations and observations
 
-- `ScenePanel_UpdateActiveSubjects` retains its indexed slot calculation using
+- `PileDriver_UpdateActiveSubjects` retains its indexed slot calculation using
   a byte offset from the typed subject-pointer array. Direct array indexing
   changes agbcc's induction loop and register allocation. The slot reload
   after callbacks is retained.
-- `ScenePanel_CreateSubjects` retains the packed unsigned bitfield position
+- `PileDriver_CreateSubjects` retains the packed unsigned bitfield position
   temporary: its component additions truncate to 16 bits. Other packed
   position temporaries also retain their observed widths and signedness.
 - Existing presentation consumer `08058700` needs signed packed-vector copies
@@ -49,8 +49,8 @@ halfword at 0x134A. Unknown regions and tentative semantics remain explicit.
   and B8B4 (one, three and one respectively). No new pins/barriers were added.
 - C754's old_agbcc override was unnecessary: ordinary agbcc produces the exact
   function, allowing one compiler for the merged unit. Retained the local
-  `ScenePanel_ClearGlobal` alias and the empty-state
-  `ScenePanel_HoldInteraction` alias; removed duplicate alias definitions.
+  `PileDriver_ClearGlobal` alias and the empty-state
+  `PileDriver_HoldInteraction` alias; removed duplicate alias definitions.
 - agbcc does not support anonymous union members here. Shared fields use one
   canonical name instead: effectState/effectFrame for interaction state,
   paletteMode for the mode byte, and state for the presentation callback.

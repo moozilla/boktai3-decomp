@@ -1,4 +1,4 @@
-#include "scene/actor/scene_steering_actor.h"
+#include "scene/motion/scene_steering_actor.h"
 static inline u8 Tst(u32 *m, s32 i)
 {
     if (*m & (1 << i))

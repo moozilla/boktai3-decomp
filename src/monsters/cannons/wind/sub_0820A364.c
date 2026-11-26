@@ -1,6 +1,6 @@
 #include "global.h"
 #include "engine/ram.h"
-#define FanCannonManager_RemoveCannon FanCannonManager_DestroySlot
+#define FanCannonManager_RemoveCannon WindCannonManager_DestroySlot
 struct FanCannon {
     u8 unknown0[0x180];
 };
@@ -10,8 +10,8 @@ struct FanCannonManager {
     struct FanCannon cannons[8];
 };
 void Sound_StopSong(u32);
-void FanCannonManager_DestroySlot(struct FanCannonManager *, struct FanCannon *, u32);
-u32 FanCannonManager_Destroy(struct FanCannonManager *p)
+void WindCannonManager_DestroySlot(struct FanCannonManager *, struct FanCannon *, u32);
+u32 WindCannonManager_Destroy(struct FanCannonManager *p)
 {
     struct FanCannon *cannon;
     s32 i;
@@ -20,7 +20,7 @@ u32 FanCannonManager_Destroy(struct FanCannonManager *p)
     i = 0;
     do {
         if (p->active & (1 << i))
-            FanCannonManager_DestroySlot(p, cannon, i);
+            WindCannonManager_DestroySlot(p, cannon, i);
         i++;
         cannon++;
     } while (i <= 7);

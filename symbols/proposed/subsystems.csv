@@ -172,13 +172,13 @@ addr,name,confidence,evidence
 0800F1BC,StatusScreen_Destroy,medium,Tentative behavior name from exact C implementation; scanline and status-screen callback family
 0800F220,StatusScreen_Initialize,medium,Tentative descriptive name from exact C in src/fn/sub_0800F220.c
 0800F850,ResultPrompt_Update,medium,Tentative descriptive name from exact C in src/fn/sub_0800F850.c
-0800F9C4,BoardPiece_Initialize,medium,Tentative descriptive name from exact C in src/fn/sub_0800F9C4.c
-0800FAB8,BoardPiece_UpdateAnimation,medium,Tentative descriptive name from exact C in src/fn/sub_0800FAB8.c
-0801037C,BoardPieces_DispatchCommands,medium,Tentative descriptive name from exact C in src/fn/sub_0801037C.c
-08010454,BoardPiece_Launch,medium,Tentative descriptive name from exact C in src/fn/sub_08010454.c
-08010FD4,GroupObjects_Update,medium,Tentative descriptive name from exact C in src/fn/sub_08010FD4.c
-080110E8,GroupObjects_Destroy,medium,Tentative descriptive name from exact C in src/fn/sub_080110E8.c
-08011118,GroupObjects_Initialize,medium,Tentative descriptive name from exact C in src/fn/sub_08011118.c
+0800F9C4,BatFlockBat_Initialize,medium,Tentative descriptive name from exact C in src/fn/sub_0800F9C4.c
+0800FAB8,BatFlockBat_UpdateAnimation,medium,Tentative descriptive name from exact C in src/fn/sub_0800FAB8.c
+0801037C,BatFlockBats_DispatchCommands,medium,Tentative descriptive name from exact C in src/fn/sub_0801037C.c
+08010454,BatFlockBat_Launch,medium,Tentative descriptive name from exact C in src/fn/sub_08010454.c
+08010FD4,BatFlock_Update,medium,Tentative descriptive name from exact C in src/fn/sub_08010FD4.c
+080110E8,BatFlock_Destroy,medium,Tentative descriptive name from exact C in src/fn/sub_080110E8.c
+08011118,BatFlock_Initialize,medium,Tentative descriptive name from exact C in src/fn/sub_08011118.c
 080111EC,MessageMenu_LoadBackground,medium,Tentative descriptive name from exact C in src/fn/sub_080111EC.c
 08011264,MessageMenu_CreateTextWindows,medium,Tentative descriptive name from exact C in src/fn/sub_08011264.c
 08011350,MessageMenu_InitializeTransition,medium,Tentative descriptive name from exact C in src/fn/sub_08011350.c
@@ -457,45 +457,45 @@ addr,name,confidence,evidence
 08024B60,SceneActorState_WaitForFlagClear,low,Tentative role from matched actor layout and control flow in src/fn/sub_08024B60.c
 08024CE0,SceneActorAnimation_StartDirectional,low,Tentative role from matched actor layout and control flow in src/fn/sub_08024CE0.c
 08024E18,SceneActorAnimation_StartEightDirection,low,Tentative role from matched actor layout and control flow in src/fn/sub_08024E18.c
-08024F2C,SceneActorAnimation_TransitionVariant,medium,Tentative descriptive role from exact C control flow; src/bosses/vampire/sub_08024F2C.c
-080251C4,SceneActorAnimation_FollowMotionPath,medium,Tentative descriptive role from exact C control flow; src/bosses/vampire/sub_080251C4.c
-0802533C,SceneActorAnimation_Recoil,medium,Tentative descriptive role from exact C control flow; src/bosses/vampire/sub_0802533C.c
-08025550,SceneActorAnimation_ApproachTarget,medium,Tentative descriptive role from exact C control flow; src/bosses/vampire/sub_08025550.c
-08025714,SceneActorAnimation_Decelerate,medium,Tentative descriptive role from exact C control flow; src/bosses/vampire/sub_08025714.c
-080257D0,SceneActorAnimation_RecoverMovement,medium,Tentative descriptive role from exact C control flow; src/bosses/vampire/sub_080257D0.c
-08025CD4,SceneActorAnimation_WaitForCompletion,medium,Tentative descriptive role from exact C control flow; src/bosses/vampire/sub_08025CD4.c
-08025D60,SceneActorAnimation_WaitForAlternateCompletion,medium,Tentative descriptive role from exact C control flow; src/bosses/vampire/sub_08025D60.c
-08025DEC,SceneActor_FireRandomizedProjectile,low,Tentative descriptive role from exact C control flow; src/bosses/vampire/sub_08025DEC.c
-08026248,SceneActorAnimation_TimedEffectReset,medium,Tentative descriptive role from exact C control flow; src/bosses/vampire/sub_08026248.c
-0802634C,SceneActorAnimation_LockedReset,medium,Tentative descriptive role from exact C control flow; src/bosses/vampire/sub_0802634C.c
-08026398,SceneActorAnimation_AlternateEffectReset,medium,Tentative descriptive role from exact C control flow; src/bosses/vampire/sub_08026398.c
-08026488,SceneActorAnimation_TimedAction,medium,Tentative descriptive role from exact C control flow; src/bosses/vampire/sub_08026488.c
-0802667C,SceneActorAnimation_HoldFrame,medium,Tentative descriptive role from exact C control flow; src/bosses/vampire/sub_0802667C.c
-08026780,SceneActorAnimation_ReleaseHeldFrame,medium,Tentative descriptive role from exact C control flow; src/bosses/vampire/sub_08026780.c
-08026908,SceneActorAnimation_ReleaseSavedAction,medium,Tentative descriptive role from exact C control flow; src/bosses/vampire/sub_08026908.c
-08026AA4,SceneActor_PeriodicProjectileBurst,low,Tentative descriptive role from exact C control flow; src/bosses/vampire/sub_08026AA4.c
-08026C38,SceneActor_FireDirectedProjectile,low,Tentative descriptive role from exact C control flow; src/bosses/vampire/sub_08026C38.c
-08026DE0,SceneActor_DecayScale,low,Tentative descriptive role from exact C control flow; src/bosses/vampire/sub_08026DE0.c
-08026EB4,SceneActor_DecayScaleAndMove,low,Tentative descriptive role from exact C control flow; src/bosses/vampire/sub_08026EB4.c
-080277B8,SceneActor_ResetWhenBlocked,low,Tentative descriptive role from exact C control flow; src/bosses/vampire/sub_080277B8.c
-08027824,SceneActor_TurnFourDirections,low,Tentative descriptive role from exact C control flow; src/bosses/vampire/sub_08027824.c
-0802797C,SceneActor_TurnEightDirections,low,Tentative descriptive role from exact C control flow; src/bosses/vampire/sub_0802797C.c
-08027AD4,SceneActor_ContractAnchoredShake,low,Tentative descriptive role from exact C control flow; src/bosses/vampire/sub_08027AD4.c
-08027BF0,SceneActor_ExpandAnchoredShake,low,Tentative descriptive role from exact C control flow; src/bosses/vampire/sub_08027BF0.c
-08027CF8,SceneActor_TimedCommandAnimation,low,Tentative descriptive role from exact C control flow; src/bosses/vampire/sub_08027CF8.c
-08027DAC,SceneActor_HoldSavedFacing,low,Tentative descriptive role from exact C control flow; src/bosses/vampire/sub_08027DAC.c
-08027E44,SceneActor_CompleteTriggeredAnimation,low,Tentative descriptive role from exact C control flow; src/bosses/vampire/sub_08027E44.c
-08027F08,SceneActor_HoldAlternateSavedFacing,low,Tentative descriptive role from exact C control flow; src/bosses/vampire/sub_08027F08.c
-08027FA0,SceneActor_AnchorAnimation,low,Tentative descriptive role from exact C control flow; src/bosses/vampire/sub_08027FA0.c
-08028040,SceneActor_HoldUnmirroredAnimation,low,Tentative descriptive role from exact C control flow; src/bosses/vampire/sub_08028040.c
-080280CC,SceneActor_RepeatDirectedProjectiles,low,Tentative descriptive role from exact C control flow; src/bosses/vampire/sub_080280CC.c
-080282BC,SceneActor_TimedAnchoredReaction,low,Tentative descriptive role from exact C control flow; src/bosses/vampire/sub_080282BC.c
-08028414,SceneActor_EmitDestructionParticles,low,Tentative descriptive role from exact C control flow; src/bosses/vampire/sub_08028414.c
-08028E18,SceneActor_DispatchCompanionCommand,low,Tentative actor/grid-effect role from exact C control flow; src/bosses/vampire/sub_08028E18.c
-08028E6C,SceneActor_QueueCompanionCommand,low,Tentative actor/grid-effect role from exact C control flow; src/bosses/vampire/sub_08028E6C.c
-08028EC0,SceneActor_QueueDefaultCompanionCommand,low,Tentative actor/grid-effect role from exact C control flow; src/bosses/vampire/sub_08028EC0.c
-08028F48,SceneActor_DestroyController,low,Tentative actor/grid-effect role from exact C control flow; src/bosses/vampire/sub_08028F48.c
-08029798,SceneActor_CreateController,low,Tentative actor/grid-effect role from exact C control flow; src/bosses/vampire/sub_08029798.c
+08024F2C,SceneActorAnimation_TransitionVariant,medium,Tentative descriptive role from exact C control flow; src/bosses/count/sub_08024F2C.c
+080251C4,SceneActorAnimation_FollowMotionPath,medium,Tentative descriptive role from exact C control flow; src/bosses/count/sub_080251C4.c
+0802533C,SceneActorAnimation_Recoil,medium,Tentative descriptive role from exact C control flow; src/bosses/count/sub_0802533C.c
+08025550,SceneActorAnimation_ApproachTarget,medium,Tentative descriptive role from exact C control flow; src/bosses/count/sub_08025550.c
+08025714,SceneActorAnimation_Decelerate,medium,Tentative descriptive role from exact C control flow; src/bosses/count/sub_08025714.c
+080257D0,SceneActorAnimation_RecoverMovement,medium,Tentative descriptive role from exact C control flow; src/bosses/count/sub_080257D0.c
+08025CD4,SceneActorAnimation_WaitForCompletion,medium,Tentative descriptive role from exact C control flow; src/bosses/count/sub_08025CD4.c
+08025D60,SceneActorAnimation_WaitForAlternateCompletion,medium,Tentative descriptive role from exact C control flow; src/bosses/count/sub_08025D60.c
+08025DEC,SceneActor_FireRandomizedProjectile,low,Tentative descriptive role from exact C control flow; src/bosses/count/sub_08025DEC.c
+08026248,SceneActorAnimation_TimedEffectReset,medium,Tentative descriptive role from exact C control flow; src/bosses/count/sub_08026248.c
+0802634C,SceneActorAnimation_LockedReset,medium,Tentative descriptive role from exact C control flow; src/bosses/count/sub_0802634C.c
+08026398,SceneActorAnimation_AlternateEffectReset,medium,Tentative descriptive role from exact C control flow; src/bosses/count/sub_08026398.c
+08026488,SceneActorAnimation_TimedAction,medium,Tentative descriptive role from exact C control flow; src/bosses/count/sub_08026488.c
+0802667C,SceneActorAnimation_HoldFrame,medium,Tentative descriptive role from exact C control flow; src/bosses/count/sub_0802667C.c
+08026780,SceneActorAnimation_ReleaseHeldFrame,medium,Tentative descriptive role from exact C control flow; src/bosses/count/sub_08026780.c
+08026908,SceneActorAnimation_ReleaseSavedAction,medium,Tentative descriptive role from exact C control flow; src/bosses/count/sub_08026908.c
+08026AA4,SceneActor_PeriodicProjectileBurst,low,Tentative descriptive role from exact C control flow; src/bosses/count/sub_08026AA4.c
+08026C38,SceneActor_FireDirectedProjectile,low,Tentative descriptive role from exact C control flow; src/bosses/count/sub_08026C38.c
+08026DE0,SceneActor_DecayScale,low,Tentative descriptive role from exact C control flow; src/bosses/count/sub_08026DE0.c
+08026EB4,SceneActor_DecayScaleAndMove,low,Tentative descriptive role from exact C control flow; src/bosses/count/sub_08026EB4.c
+080277B8,SceneActor_ResetWhenBlocked,low,Tentative descriptive role from exact C control flow; src/bosses/count/sub_080277B8.c
+08027824,SceneActor_TurnFourDirections,low,Tentative descriptive role from exact C control flow; src/bosses/count/sub_08027824.c
+0802797C,SceneActor_TurnEightDirections,low,Tentative descriptive role from exact C control flow; src/bosses/count/sub_0802797C.c
+08027AD4,SceneActor_ContractAnchoredShake,low,Tentative descriptive role from exact C control flow; src/bosses/count/sub_08027AD4.c
+08027BF0,SceneActor_ExpandAnchoredShake,low,Tentative descriptive role from exact C control flow; src/bosses/count/sub_08027BF0.c
+08027CF8,SceneActor_TimedCommandAnimation,low,Tentative descriptive role from exact C control flow; src/bosses/count/sub_08027CF8.c
+08027DAC,SceneActor_HoldSavedFacing,low,Tentative descriptive role from exact C control flow; src/bosses/count/sub_08027DAC.c
+08027E44,SceneActor_CompleteTriggeredAnimation,low,Tentative descriptive role from exact C control flow; src/bosses/count/sub_08027E44.c
+08027F08,SceneActor_HoldAlternateSavedFacing,low,Tentative descriptive role from exact C control flow; src/bosses/count/sub_08027F08.c
+08027FA0,SceneActor_AnchorAnimation,low,Tentative descriptive role from exact C control flow; src/bosses/count/sub_08027FA0.c
+08028040,SceneActor_HoldUnmirroredAnimation,low,Tentative descriptive role from exact C control flow; src/bosses/count/sub_08028040.c
+080280CC,SceneActor_RepeatDirectedProjectiles,low,Tentative descriptive role from exact C control flow; src/bosses/count/sub_080280CC.c
+080282BC,SceneActor_TimedAnchoredReaction,low,Tentative descriptive role from exact C control flow; src/bosses/count/sub_080282BC.c
+08028414,SceneActor_EmitDestructionParticles,low,Tentative descriptive role from exact C control flow; src/bosses/count/sub_08028414.c
+08028E18,SceneActor_DispatchCompanionCommand,low,Tentative actor/grid-effect role from exact C control flow; src/bosses/count/sub_08028E18.c
+08028E6C,SceneActor_QueueCompanionCommand,low,Tentative actor/grid-effect role from exact C control flow; src/bosses/count/sub_08028E6C.c
+08028EC0,SceneActor_QueueDefaultCompanionCommand,low,Tentative actor/grid-effect role from exact C control flow; src/bosses/count/sub_08028EC0.c
+08028F48,SceneActor_DestroyController,low,Tentative actor/grid-effect role from exact C control flow; src/bosses/count/sub_08028F48.c
+08029798,SceneActor_CreateController,low,Tentative actor/grid-effect role from exact C control flow; src/bosses/count/sub_08029798.c
 080297FC,GridActor_SetAnimation,low,Tentative actor/grid-effect role from exact C control flow; src/fn/sub_080297FC.c
 08029908,GridActor_InitializeBodyCollider,low,Tentative actor/grid-effect role from exact C control flow; src/fn/sub_08029908.c
 080299B4,GridActor_InitializeAttackCollider,low,Tentative actor/grid-effect role from exact C control flow; src/fn/sub_080299B4.c

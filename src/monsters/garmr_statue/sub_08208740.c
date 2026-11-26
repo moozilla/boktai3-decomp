@@ -14,7 +14,7 @@ void DamageNumberDisplay_Show(void *, s32, u32, void *, void *, u32);
 void SceneHud_SetTimedState(void *, s32, s32, s32, u32, s32);
 void sub_08014634(s32, s32, void *, void *, void *, s32, s32);
 void sub_082086B8(void);
-void CannonTurret_FireAimedVolley(void);
+void GarmrStatue_FireAimedVolley(void);
 void Anim_SetDurationScale(void *, u16);
 struct ColliderView {
     u8 pad[6];
@@ -152,7 +152,7 @@ static inline u32 CannonTurret_StepSequence(struct DisplaySequenceSprite *owner,
     return ended;
 }
 
-s32 CannonTurret_UpdateCombat(struct CannonTurretCombat *p)
+s32 GarmrStatue_UpdateCombat(struct CannonTurretCombat *p)
 {
     struct SceneVec position;
     struct EffectVector velocity;
@@ -221,7 +221,7 @@ s32 CannonTurret_UpdateCombat(struct CannonTurretCombat *p)
         CannonTurret_FinishDamage(p);
     }
     if (((Mod(p->age, 240) == 0) && (p->defeated == 0)) &&
-        (p->update != CannonTurret_FireAimedVolley)) {
+        (p->update != GarmrStatue_FireAimedVolley)) {
         Anim_SetSequence(&p->sequence, p->resource, 9, 0, 8);
         Anim_SetDurationScale(&p->sequence, 32);
         p->activeAnimation = 1;

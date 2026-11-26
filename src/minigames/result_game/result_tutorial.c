@@ -64,7 +64,7 @@ int ResultTutorial_ShowPrompt(struct ResultMenu *tutorial)
         case 1:
             if (ResultTutorial_FadeIn(tutorial)) {
                 {
-                    struct SceneInputWidget *promptWidget = &tutorial->widgets[14];
+                    struct AnimSprite *promptWidget = &tutorial->widgets[14];
                     promptWidget->flags &= ~1;
                 }
                 return 1;
@@ -78,7 +78,7 @@ int ResultTutorial_HidePrompt(struct ResultMenu *tutorial)
 {
     switch (tutorial->phase) {
         case 0: {
-            struct SceneInputWidget *promptWidget;
+            struct AnimSprite *promptWidget;
             tutorial->phase = 1;
             tutorial->timer = 0;
             promptWidget = &tutorial->widgets[14];
@@ -134,12 +134,12 @@ int ResultTutorial_BlinkPlayer(struct ResultMenu *tutorial)
                 visible = 0;
             if (visible)
             show: {
-                struct SceneInputWidget *playerWidget = &tutorial->widgets[4];
+                struct AnimSprite *playerWidget = &tutorial->widgets[4];
                 playerWidget->flags &= ~1;
             }
                 else
                 {
-                    struct SceneInputWidget *playerWidget = &tutorial->widgets[4];
+                    struct AnimSprite *playerWidget = &tutorial->widgets[4];
                     playerWidget->flags |= state;
                 }
             if ((tutorial->timer >> 5) > 2)
@@ -400,12 +400,12 @@ int ResultTutorial_BlinkPressMarker(struct ResultMenu *tutorial)
                 visible = 0;
             if (visible)
             show: {
-                struct SceneInputWidget *playerWidget = &tutorial->widgets[4];
+                struct AnimSprite *playerWidget = &tutorial->widgets[4];
                 playerWidget->flags &= ~1;
             }
                 else
                 {
-                    struct SceneInputWidget *playerWidget = &tutorial->widgets[4];
+                    struct AnimSprite *playerWidget = &tutorial->widgets[4];
                     playerWidget->flags |= state;
                 }
             if ((tutorial->timer >> 5) > 2)
@@ -716,7 +716,7 @@ void ResultTutorial_Open(struct ResultMenu *tutorial)
         case 1:
             if (++tutorial->timer > 31) {
                 {
-                    struct SceneInputWidget *promptWidget = &tutorial->widgets[14];
+                    struct AnimSprite *promptWidget = &tutorial->widgets[14];
                     promptWidget->flags &= ~1;
                 }
                 tutorial->alpha = 16;
@@ -801,7 +801,7 @@ int ResultTutorial_ReadScript(struct ResultMenu *tutorial)
 
 int ResultTutorial_Initialize(struct ResultMenu *tutorial, void *owner, void *unused)
 {
-    struct SceneInputResource *r;
+    struct AnimSpriteResource *r;
     tutorial->owner = owner;
     r = ScriptProc_Start(0xcb05, 0x530d);
     if (!r) {

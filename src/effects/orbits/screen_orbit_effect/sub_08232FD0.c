@@ -1,5 +1,5 @@
 #include "global.h"
-#include "scene/area_effect/area_effect_link.h"
+#include "scene/areas/area_effect_link.h"
 extern struct Manager *gEffectQuad;
 void SpriteDrawable_SelectTileFrame(void *, u32, s32);
 

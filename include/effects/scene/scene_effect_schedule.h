@@ -1,7 +1,7 @@
 #ifndef GUARD_SCENE_EFFECT_SCHEDULE_H
 #define GUARD_SCENE_EFFECT_SCHEDULE_H
 #include "engine/engine.h"
-#include "scene/actor/contact_actor.h"
+#include "scene/collision/contact_actor.h"
 #include "engine/ram.h"
 #include "effects/scene/scene_scheduled_effect.h"
 struct SceneEffectScheduleEntry {

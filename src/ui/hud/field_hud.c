@@ -1,6 +1,6 @@
 #include "engine/engine_pause.h"
 #include "ui/hud/field_hud.h"
-#include "scene/actor/scene_actor_damage_visibility.h"
+#include "scene/collision/scene_actor_damage_visibility.h"
 
 s32 Div(s32, s32);
 void CpuSet(const void *, void *, u32);
@@ -280,7 +280,7 @@ void MeterDisplay_InitializeWidgets(struct FieldHudWidgets *widgets)
     s32 i, result;
     u32 zero;
     u32 *flags;
-    struct SceneInputWidget *widget;
+    struct AnimSprite *widget;
     void *script;
     script = ScriptProc_Start(0xCB05, 0x1289);
     widgets->meterScript = script;

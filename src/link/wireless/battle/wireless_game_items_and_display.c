@@ -1,7 +1,7 @@
 #include "engine/math/monster_particle_random.h"
 #include "link/wireless/wireless_game_items_and_display.h"
 #include "engine/video/render.h"
-#include "effects/scene/bat_flock.h"
+#include "effects/bat_flock.h"
 
 void WirelessGame_AddItem(void *p, int index)
 {
@@ -349,7 +349,7 @@ static inline void Item_LoadFrame(struct WirelessGameItems *owner, struct Wirele
     p->sprite.flags &= ~1;
     {
         struct WirelessGameDrawing *d = drawing = &p->drawing;
-        struct SceneInputResource *res = &owner->resource;
+        struct AnimSpriteResource *res = &owner->resource;
         if (index > 7)
             choice = (index & 3) + 4;
         else
@@ -735,7 +735,7 @@ void WirelessGameItems_UpdateScatteredItem(struct WirelessGameItems *owner, stru
         p->sprite.flags &= ~1;
         {
             struct WirelessGameDrawing *d = drawing;
-            struct SceneInputResource *res = &owner->resource;
+            struct AnimSpriteResource *res = &owner->resource;
             if (index > 7)
                 choice = (index & 3) + 4;
             else
@@ -855,7 +855,7 @@ s32 SceneEffectQueue_QueueTypeOneEffect(void);
 
 s32 SceneEffectQueue_QueueTypeTwoEffect(void);
 
-s32 Vampire_TryQueueCommand(u32);
+s32 Count_TryQueueCommand(u32);
 
 void WirelessGameItems_PublishPendingEffects(struct WirelessGameItems *p)
 {
@@ -872,7 +872,7 @@ void WirelessGameItems_PublishPendingEffects(struct WirelessGameItems *p)
             p->current[3]--;
     }
     if (p->current[0] != 0) {
-        if (Vampire_TryQueueCommand(0xb4) != 0)
+        if (Count_TryQueueCommand(0xb4) != 0)
             p->current[0]--;
     }
 }
@@ -912,7 +912,7 @@ int WirelessGameItems_Destroy(struct WirelessGameItems *p)
 
 int WirelessGameItems_Init(struct WirelessGameItems *p)
 {
-    struct SceneInputResource *resource;
+    struct AnimSpriteResource *resource;
     struct WirelessGameItem *item;
     int i;
     gWirelessGameItems = p;
@@ -1355,7 +1355,7 @@ int WirelessGameDisplay_Destroy(struct WirelessGameDisplay *p)
 
 int WirelessGameDisplay_Init(struct WirelessGameDisplay *p)
 {
-    struct SceneInputResource *resource;
+    struct AnimSpriteResource *resource;
     struct WirelessGameDrawing *drawing;
     int i;
     struct ContactPosition position;

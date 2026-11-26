@@ -1,4 +1,4 @@
-#include "objects/pile_driver/scene_panel_rig.h"
+#include "objects/pile_driver/pile_driver_rig.h"
 static inline s32 scale12(s32 v)
 {
     return v >= 0 ? v >> 12 : -((-v) >> 12);
@@ -7,7 +7,7 @@ static inline s32 absolute(s32 v)
 {
     return v < 0 ? -v : v;
 }
-void ScenePanelRig_TickPrimarySprites(struct ScenePanelRig *rig, u32 palette)
+void PileDriverRig_TickPrimarySprites(struct ScenePanelRig *rig, u32 palette)
 {
     s32 i;
     for (i = 0; i < 8; i++) {

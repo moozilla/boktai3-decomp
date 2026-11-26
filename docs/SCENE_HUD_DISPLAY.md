@@ -36,7 +36,7 @@ or digit keyframesAA+value, narrowing keyframe IDs to16 bits. Divisions1000,
 by6, with Y/Z/padding preserved. E170 hides all five widgets. These functions
 and both palette functions are ordinary C.
 
-SceneInputWidget is shared with the neighboring input subsection: flags8,
+AnimSprite is shared with the neighboring input subsection: flags8,
 position20, palette bank3A, palette pointer48 and stride60. These added fields
 replace opaque padding while preserving all prior consumers' exact extents.
 No final screen identity or runtime coverage is claimed.

@@ -1,4 +1,4 @@
-#include "ui/town/scene_item_values.h"
+#include "ui/town/shop_item_values.h"
 #include "debug.h"
 s32 SceneItemValue_CalculateEquipment(u32 slot)
 {

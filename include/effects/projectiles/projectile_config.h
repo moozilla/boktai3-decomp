@@ -16,11 +16,11 @@ void Projectile_SetCollisionMask(struct Task4E01Params *, u16);
 void Projectile_SetSpriteParams(struct Task4E01Params *, u32, u32, s32);
 void Projectile_SetTypeAndElement(struct Task4E01Params *, u32, u32);
 void Projectile_SetVariant(struct Task4E01Params *, u16);
-s32 Task4E01_RemoveEntry(s32);
+s32 ProjectileTask_RemoveEntry(s32);
 s32 Projectile_SetEntryDirection(u8, s32);
-struct ContactPosition *Task4E01_GetEntryPosition(s32);
-s32 Task4E01_GetKind7Value(s32);
+struct ContactPosition *ProjectileTask_GetEntryPosition(s32);
+s32 ProjectileTask_GetKind7Value(s32);
 s32 SceneEntry_SetPosition(s32, struct ContactPosition *);
-s32 Task4E01_Destroy(void);
-void Task4E01_OnDefaultTimedAnimation(void);
+s32 ProjectileTask_Destroy(void);
+void ProjectileTask_OnDefaultTimedAnimation(void);
 #endif

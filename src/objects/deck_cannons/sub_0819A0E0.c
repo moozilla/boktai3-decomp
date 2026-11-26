@@ -2,7 +2,7 @@
 
 void Callback_InvokeActor(u8 *, u32);
 
-void CannonBattery_UpdateMuzzleFlash(u8 *p)
+void DeckCannon_UpdateMuzzleFlash(u8 *p)
 {
     if (*(p + 0xB7)) {
         u32 q;

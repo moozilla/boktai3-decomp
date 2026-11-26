@@ -1,5 +1,5 @@
 #include "global.h"
-#include "scene/actor/scene_actor_terrain_reaction.h"
+#include "scene/motion/scene_actor_terrain_reaction.h"
 #include "scene/actor/scene_actor_control_phase.h"
 
 // confidence=low: scene actor wait state: on entry retargets the saved target; after 60 idle frames switches to behaviour 2.

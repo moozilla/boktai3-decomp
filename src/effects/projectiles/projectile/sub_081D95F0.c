@@ -1,10 +1,10 @@
 #include "effects/projectiles/projectile_task.h"
 
 u32 sub_08249498(u32, u32);
-void Task4E01_BeginImpactAnimation(void *);
-void Task4E01_SpawnImpactChildren(void *);
+void ProjectileTask_BeginImpactAnimation(void *);
+void ProjectileTask_SpawnImpactChildren(void *);
 
-s32 Task4E01_UpdateExpandingImpact(struct Task4E01Projectile *p)
+s32 ProjectileTask_UpdateExpandingImpact(struct Task4E01Projectile *p)
 {
     struct Task4E01Params *params = &p->params;
     struct DisplaySequenceState *state;
@@ -41,10 +41,10 @@ s32 Task4E01_UpdateExpandingImpact(struct Task4E01Projectile *p)
     }
     if (p->frame >= params->lifetime) {
         if (params->flags & 0x10) {
-            Task4E01_BeginImpactAnimation(p);
+            ProjectileTask_BeginImpactAnimation(p);
         } else {
             params->flags |= 0x40;
-            Projectile_SetUpdateCallback(params, Task4E01_SpawnImpactChildren);
+            Projectile_SetUpdateCallback(params, ProjectileTask_SpawnImpactChildren);
         }
     }
     return 0;

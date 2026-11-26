@@ -1,6 +1,6 @@
 #ifndef GUARD_SCENE_PROJECTILE_PARAMS_H
 #define GUARD_SCENE_PROJECTILE_PARAMS_H
-#include "scene/actor/contact_position.h"
+#include "scene/collision/contact_position.h"
 /* Parameters copied by the scene-projectile pool; setter interpretations tentative. */
 struct SceneProjectileParams {
     u16 movement, lifetime, trackingFrames;

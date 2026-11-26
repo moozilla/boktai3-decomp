@@ -84,12 +84,12 @@ Matched here means without concessions, as on decomp.dev.
 
 | Section / category | Functions | Bytes matched | |
 |---|---:|---:|---|
-| **Gameplay** | 6099/6099 | 100.0% | `████████████████████` |
+| **Gameplay** | 6066/6066 | 100.0% | `████████████████████` |
 | &nbsp;&nbsp;Player | 736/736 | 100.0% | `████████████████████` |
-| &nbsp;&nbsp;Monsters | 1551/1551 | 100.0% | `████████████████████` |
-| &nbsp;&nbsp;Bosses | 662/662 | 100.0% | `████████████████████` |
+| &nbsp;&nbsp;Monsters | 1539/1539 | 100.0% | `████████████████████` |
+| &nbsp;&nbsp;Bosses | 696/696 | 100.0% | `████████████████████` |
 | &nbsp;&nbsp;Field objects and hazards | 1041/1041 | 100.0% | `████████████████████` |
-| &nbsp;&nbsp;Scene actors and NPCs | 2037/2037 | 100.0% | `████████████████████` |
+| &nbsp;&nbsp;Scene actors and NPCs | 1982/1982 | 100.0% | `████████████████████` |
 | &nbsp;&nbsp;Minigames | 72/72 | 100.0% | `████████████████████` |
 | **Presentation and UI** | 3533/3533 | 100.0% | `████████████████████` |
 | &nbsp;&nbsp;Effects and presentation | 1544/1544 | 100.0% | `████████████████████` |
@@ -100,8 +100,8 @@ Matched here means without concessions, as on decomp.dev.
 | &nbsp;&nbsp;Link and wireless | 622/622 | 100.0% | `████████████████████` |
 | **Libraries** | 298/298 | 100.0% | `████████████████████` |
 | &nbsp;&nbsp;Libraries | 298/298 | 100.0% | `████████████████████` |
-| **Other** | 58/58 | 100.0% | `████████████████████` |
-| &nbsp;&nbsp;Not yet classified | 58/58 | 100.0% | `████████████████████` |
+| **Other** | 91/91 | 100.0% | `████████████████████` |
+| &nbsp;&nbsp;Not yet classified | 91/91 | 100.0% | `████████████████████` |
 | *Intentional assembly (not counted)* | 59 functions | 4,916 bytes | |
 
 ### Gameplay
@@ -124,7 +124,7 @@ Matched here means without concessions, as on decomp.dev.
 
 </details>
 
-<details><summary><b>Monsters</b>: 1551/1551 functions, 100.0% of bytes</summary>
+<details><summary><b>Monsters</b>: 1539/1539 functions, 100.0% of bytes</summary>
 
 | Family / unit | Functions | Bytes matched | |
 |---|---:|---:|---|
@@ -150,10 +150,6 @@ Matched here means without concessions, as on decomp.dev.
 | Bat | 9/9 | 100.0% | `████████████████████` |
 | Crow | 40/40 | 100.0% | `████████████████████` |
 | Mimic | 36/36 | 100.0% | `████████████████████` |
-| **Enemy** | 41/41 | 100.0% | `████████████████████` |
-| &nbsp;&nbsp;Enemy F426 | 12/12 | 100.0% | `████████████████████` |
-| &nbsp;&nbsp;Enemy D459 | 12/12 | 100.0% | `████████████████████` |
-| &nbsp;&nbsp;Enemy particle | 17/17 | 100.0% | `████████████████████` |
 | Sword | 39/39 | 100.0% | `████████████████████` |
 | **Cannon** | 43/43 | 100.0% | `████████████████████` |
 | &nbsp;&nbsp;Cannon battery | 28/28 | 100.0% | `████████████████████` |
@@ -163,6 +159,9 @@ Matched here means without concessions, as on decomp.dev.
 | &nbsp;&nbsp;Fan cannon | 13/13 | 100.0% | `████████████████████` |
 | &nbsp;&nbsp;Fan cannon manager | 10/10 | 100.0% | `████████████████████` |
 | Vulcan cannon | 14/14 | 100.0% | `████████████████████` |
+| **Enemy** | 29/29 | 100.0% | `████████████████████` |
+| &nbsp;&nbsp;Enemy F426 | 12/12 | 100.0% | `████████████████████` |
+| &nbsp;&nbsp;Enemy particle | 17/17 | 100.0% | `████████████████████` |
 | Screamer | 11/11 | 100.0% | `████████████████████` |
 | Poison hand | 10/10 | 100.0% | `████████████████████` |
 | Dragon puppy | 12/12 | 100.0% | `████████████████████` |
@@ -173,16 +172,16 @@ Matched here means without concessions, as on decomp.dev.
 
 </details>
 
-<details><summary><b>Bosses</b>: 662/662 functions, 100.0% of bytes</summary>
+<details><summary><b>Bosses</b>: 696/696 functions, 100.0% of bytes</summary>
 
 | Family / unit | Functions | Bytes matched | |
 |---|---:|---:|---|
-| **Vanargand** | 192/192 | 100.0% | `████████████████████` |
+| **Vanargand** | 247/247 | 100.0% | `████████████████████` |
 | &nbsp;&nbsp;Vanargand | 163/163 | 100.0% | `████████████████████` |
 | &nbsp;&nbsp;Vanargand projectile | 29/29 | 100.0% | `████████████████████` |
+| &nbsp;&nbsp;Vanargand head | 55/55 | 100.0% | `████████████████████` |
 | Hresvelgr | 238/238 | 100.0% | `████████████████████` |
 | Ratatosk | 172/172 | 100.0% | `████████████████████` |
-| Boss slot 2 | 21/21 | 100.0% | `████████████████████` |
 | Nidhoggr | 39/39 | 100.0% | `████████████████████` |
 
 </details>
@@ -255,7 +254,7 @@ Matched here means without concessions, as on decomp.dev.
 
 </details>
 
-<details><summary><b>Scene actors and NPCs</b>: 2037/2037 functions, 100.0% of bytes</summary>
+<details><summary><b>Scene actors and NPCs</b>: 1982/1982 functions, 100.0% of bytes</summary>
 
 | Family / unit | Functions | Bytes matched | |
 |---|---:|---:|---|
@@ -325,7 +324,6 @@ Matched here means without concessions, as on decomp.dev.
 | &nbsp;&nbsp;Contact swarm states and spawning (tentative) | 18/18 | 100.0% | `████████████████████` |
 | &nbsp;&nbsp;Contact burst effects | 9/9 | 100.0% | `████████████████████` |
 | &nbsp;&nbsp;Contact impact effect | 25/25 | 100.0% | `████████████████████` |
-| Singleton slot 7 | 55/55 | 100.0% | `████████████████████` |
 | Grid attack actor (tentative) | 69/69 | 100.0% | `████████████████████` |
 | **Script** | 92/92 | 100.0% | `████████████████████` |
 | &nbsp;&nbsp;Script actor | 81/81 | 100.0% | `████████████████████` |
@@ -722,11 +720,13 @@ Matched here means without concessions, as on decomp.dev.
 
 ### Other
 
-<details><summary><b>Not yet classified</b>: 58/58 functions, 100.0% of bytes</summary>
+<details><summary><b>Not yet classified</b>: 91/91 functions, 100.0% of bytes</summary>
 
 | Family / unit | Functions | Bytes matched | |
 |---|---:|---:|---|
 | Scene terrain probe | 14/14 | 100.0% | `████████████████████` |
+| Sabata | 21/21 | 100.0% | `████████████████████` |
+| Axe Armor | 12/12 | 100.0% | `████████████████████` |
 | Registry selection | 27/27 | 100.0% | `████████████████████` |
 | Solar calibration | 12/12 | 100.0% | `████████████████████` |
 | Callback pool | 5/5 | 100.0% | `████████████████████` |

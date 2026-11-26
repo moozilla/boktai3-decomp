@@ -34,8 +34,8 @@ s32 TemporaryAnimationPool_Destroy(struct TemporaryAnimationPool *pool)
 
 s32 Widget_InitCleared(void *, void *, u32, u32, u32, u32, u32, void *);
 
-static inline s32 initializeAnimation(struct SceneInputWidget *animation,
-                                      struct SceneInputResource *resource,
+static inline s32 initializeAnimation(struct AnimSprite *animation,
+                                      struct AnimSpriteResource *resource,
                                       struct ContactPosition *position)
 {
     s32 value = Widget_InitCleared(animation, resource, 0, 0, 2, 0, 60, position);
@@ -47,13 +47,13 @@ static inline s32 initializeAnimation(struct SceneInputWidget *animation,
 
 s32 TemporaryAnimationPool_Initialize(struct TemporaryAnimationPool *pool)
 {
-    const struct SceneInputResource *resource;
+    const struct AnimSpriteResource *resource;
     struct TemporaryAnimationSlot *slot;
-    struct SceneInputResource *relocated;
+    struct AnimSpriteResource *relocated;
     struct ContactPosition position;
     s32 index;
     s32 result;
-    struct SceneInputResource *savedResource;
+    struct AnimSpriteResource *savedResource;
     gTemporaryAnimationPool = pool;
     resource = ScriptProc_Start(0xCB05, 0xDE23);
     if (!resource) {
@@ -131,7 +131,7 @@ struct TemporaryAnimationSlot *TemporaryAnimationPool_CreateEntry(u32 sequence, 
 {
     struct TemporaryAnimationPool *pool = gTemporaryAnimationPool;
     struct TemporaryAnimationSlot *slot;
-    struct SceneInputWidget *animation;
+    struct AnimSprite *animation;
     if (!pool) {
         pool = TemporaryAnimationPool_Create();
         if (!pool)

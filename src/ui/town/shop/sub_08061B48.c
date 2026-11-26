@@ -1,10 +1,10 @@
-#include "ui/town/scene_inventory_states.h"
-void SceneInventory_BeginAlternateSelection(struct SceneInventoryControlView *panel)
+#include "ui/town/shop_states.h"
+void Shop_BeginAlternateSelection(struct SceneInventoryControlView *panel)
 {
-    SceneInventory_BeginActionSelection(panel, 2);
+    Shop_BeginActionSelection(panel, 2);
     panel->interactionFlags |= 144;
     if (panel->pageCount > 1)
         panel->interactionFlags |= 1;
     SceneInput_SetGridFlags(&panel->grid, 0x1C);
-    SceneInventory_UpdateModePrompt(panel, 1);
+    Shop_UpdateModePrompt(panel, 1);
 }

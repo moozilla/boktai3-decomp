@@ -1,6 +1,6 @@
 #include "global.h"
 
-u32 Task4E01_OnType4Animation(void)
+u32 ProjectileTask_OnType4Animation(void)
 {
     return 2;
 }

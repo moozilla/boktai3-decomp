@@ -4,9 +4,9 @@
 #include "engine/ram.h"
 #include "scene/actor/scene_actor_placement.h"
 #include "system/game_state/game_state.h"
-#include "scene/actor/scene_actor_turn.h"
+#include "scene/motion/scene_actor_turn.h"
 #include "scene/actor/scene_actor_init_actor.h"
-#include "scene/actor/scene_actor_chase_shared.h"
+#include "scene/motion/scene_actor_chase_shared.h"
 void Heap_Free(void *);
 
 static inline u8 RemovalRequested(struct ChaseActor *p)

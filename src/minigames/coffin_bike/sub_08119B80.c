@@ -1,5 +1,5 @@
 #include "global.h"
-#include "minigames/coffin_bike/glove.h"
+#include "minigames/coffin_bike/coffin_bike.h"
 extern struct GloveCamera {
     u8 unknown0[0x44];
     s32 x;
@@ -7,12 +7,12 @@ extern struct GloveCamera {
 extern struct GloveGlobals {
     u8 unknown0[0x24], bank;
 } *gSceneEventDispatchState;
-void Glove_UpdateRecoil(void *);
-void Glove_UpdateImpactRecoil(void *);
-void Glove_UpdateStaggerRecoil(void *);
-void Glove_UpdateEmitterRecoil(void *);
-void Glove_UpdateRecoilReturn(void *);
-void Glove_UpdateStaggerReturn(void *);
+void CoffinBike_UpdateRecoil(void *);
+void CoffinBike_UpdateImpactRecoil(void *);
+void CoffinBike_UpdateStaggerRecoil(void *);
+void CoffinBike_UpdateEmitterRecoil(void *);
+void CoffinBike_UpdateRecoilReturn(void *);
+void CoffinBike_UpdateStaggerReturn(void *);
 void Sound_PlaySong(u32);
 void *ActorAttachment_UpdateFromDescriptor(void *, void *, s32, s32, s32, s32, s32, s32);
 void *ActorAttachment_ReleaseResource(void *, s32, u32);
@@ -42,7 +42,7 @@ static inline void ReadMotion(struct GloveDraw *motion, struct GloveCommand *cmd
     motion->d = cmd->f;
 }
 // confidence=low: message kinds select glove recoil states and attachment effects.
-s32 Glove_DispatchCommands(struct Glove *p)
+s32 CoffinBike_DispatchCommands(struct Glove *p)
 {
     struct GloveMotion *state = &p->motion;
     struct GloveDraw *motion = &p->draw;
@@ -74,26 +74,26 @@ s32 Glove_DispatchCommands(struct Glove *p)
             switch (cmd->type) {
                 case 2:
                     ReadMotion(motion, cmd);
-                    SetState(p, Glove_UpdateRecoilReturn);
+                    SetState(p, CoffinBike_UpdateRecoilReturn);
                     break;
                 case 6:
                     ReadMotion(motion, cmd);
-                    SetState(p, Glove_UpdateStaggerReturn);
+                    SetState(p, CoffinBike_UpdateStaggerReturn);
                     break;
                 case 5:
-                    SetState(p, Glove_UpdateRecoil);
+                    SetState(p, CoffinBike_UpdateRecoil);
                     break;
                 case 0:
-                    SetState(p, Glove_UpdateImpactRecoil);
+                    SetState(p, CoffinBike_UpdateImpactRecoil);
                     break;
                 case 1:
-                    SetState(p, Glove_UpdateStaggerRecoil);
+                    SetState(p, CoffinBike_UpdateStaggerRecoil);
                     break;
                 case 3:
                     state->emitter.kind = cmd->x;
                     state->emitter.type = cmd->y;
                     state->emitter.enter = 1;
-                    SetState(p, Glove_UpdateEmitterRecoil);
+                    SetState(p, CoffinBike_UpdateEmitterRecoil);
                     break;
                 case 4:
                     switch ((u32)cmd->x) {

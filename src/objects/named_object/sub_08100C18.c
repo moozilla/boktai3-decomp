@@ -1,5 +1,5 @@
 #include "global.h"
-#include "scene/actor/contact_actor.h"
+#include "scene/collision/contact_actor.h"
 struct NamedObjectTrail {
     u8 pad0[0xBC];
     s16 timer;

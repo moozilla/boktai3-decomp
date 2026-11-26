@@ -13,7 +13,7 @@
 
 #include "script/script_utility.h"
 
-#include "scene/actor/scene_actor_terrain.h"
+#include "scene/motion/scene_actor_terrain.h"
 
 #include "engine/engine.h"
 
@@ -23,7 +23,7 @@
 
 #include "engine/video/display_sequence_inline.h"
 
-#include "scene/actor/contact_actor.h"
+#include "scene/collision/contact_actor.h"
 
 #include "engine/math/movement_curve.h"
 
@@ -33,7 +33,7 @@
 
 #include "scene/actor/scene_actor_state.h"
 
-#include "scene/actor/scene_actor_collision.h"
+#include "scene/collision/scene_actor_collision.h"
 
 #include "scene/collision/scene_body_api.h"
 
@@ -44,10 +44,10 @@
 #include "monsters/scene_actor_init_group.h"
 
 #include "monsters/scene_actor_init_graphics.h"
-#include "scene/actor/scene_actor_chase_shared.h"
-#include "scene/actor/scene_actor_displacement.h"
-#include "scene/actor/scene_actor_terrain_reaction.h"
-#include "scene/actor/scene_actor_chase.h"
+#include "scene/motion/scene_actor_chase_shared.h"
+#include "scene/motion/scene_actor_displacement.h"
+#include "scene/motion/scene_actor_terrain_reaction.h"
+#include "scene/motion/scene_actor_chase.h"
 #include "bosses/vanargand/vanargand_parts.h"
 
 void Bee_OnAttackCollision(void)
@@ -103,7 +103,7 @@ static inline void Bee_SelectAnimation(struct RoomActor *actor, u32 selection, u
                          (u8)variant, (u8)flags);
         restart = &actor->restart;
     } else {
-        struct SceneInputWidget *tile =
+        struct AnimSprite *tile =
             &((struct SceneActorAnimationTileDrawable *)actor->drawable)->tile;
         u8 *savedSelection;
         selection += variant;

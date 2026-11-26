@@ -1,4 +1,4 @@
-#include "scene/actor/scene_actor_contacts.h"
+#include "scene/collision/scene_actor_contacts.h"
 struct SceneActorContactManager *
 SceneActorContacts_Destroy(struct SceneActorContactManager *unusedManager)
 {

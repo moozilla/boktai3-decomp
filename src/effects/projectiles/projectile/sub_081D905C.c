@@ -1,4 +1,4 @@
-#include "scene/actor/contact_collider_manager.h"
+#include "scene/collision/contact_collider_manager.h"
 #include "effects/projectiles/projectile_task.h"
 
 s32 Mod(s32, s32);

@@ -4,7 +4,7 @@
 #include "engine/engine.h"
 #include "npc/story_character/state_actor.h"
 #include "scene/collision/scene_body_api.h"
-#include "scene/actor/contact_collider.h"
+#include "scene/collision/contact_collider.h"
 #include "npc/manager/scene_actor_animation.h"
 #include "script/script_utility.h"
 
@@ -26,17 +26,17 @@ int SceneActors_SetHealth(struct StateActor *actor, int health);
 void SceneActors_SetDamageCallback(struct StateActor *actor, int kind,
                                    int (*callback)(void *, int, int), int defense);
 int SceneActors_SetShake(struct StateActor *actor, int frames, int strength);
-void SceneActors_StartAnimation(struct StateActor *actor, struct SceneInputWidget *animation,
+void SceneActors_StartAnimation(struct StateActor *actor, struct AnimSprite *animation,
                                 int resource, int sequence, int speed, int flags);
 void SceneActors_StartDirectionalAnimation(struct StateActor *actor,
-                                           struct SceneInputWidget *animation, int resource,
+                                           struct AnimSprite *animation, int resource,
                                            int sequence, int speed, int offset, int flags);
 void SceneActors_StartEightDirectionAnimation(struct StateActor *actor,
-                                              struct SceneInputWidget *animation,
+                                              struct AnimSprite *animation,
                                               int resource, int sequence, int speed, int offset,
                                               int flags);
 void SceneActors_StartUnmirroredAnimation(struct StateActor *actor,
-                                          struct SceneInputWidget *animation, int resource,
+                                          struct AnimSprite *animation, int resource,
                                           int sequence, int speed, int flags);
 int SceneActors_UpdateAnimation(struct StateActor *actor, void *animation, int delta);
 void SceneActors_UpdateTargetMetrics(struct StateActor *actor);

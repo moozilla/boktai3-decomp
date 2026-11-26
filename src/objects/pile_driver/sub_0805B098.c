@@ -1,7 +1,7 @@
 #include "objects/pile_driver/scene_panel_rig_setup.h"
-void ScenePanelRig_InitSprites(struct ScenePanelRig *rig)
+void PileDriverRig_InitSprites(struct ScenePanelRig *rig)
 {
-    ScenePanelRig_InitMainSprite(rig);
-    ScenePanelRig_InitPrimarySprites(rig);
-    ScenePanelRig_InitSecondarySprites(rig);
+    PileDriverRig_InitMainSprite(rig);
+    PileDriverRig_InitPrimarySprites(rig);
+    PileDriverRig_InitSecondarySprites(rig);
 }

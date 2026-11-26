@@ -1,6 +1,6 @@
 #include "global.h"
 #include "player/player.h"
-#include "scene/actor/contact_actor.h"
+#include "scene/collision/contact_actor.h"
 #include "player/player_slot_status.h"
 #define Player_CheckContactReduction Player_IsActionBlocked
 void Collision_CalculateDamageResponse(void *, void *);

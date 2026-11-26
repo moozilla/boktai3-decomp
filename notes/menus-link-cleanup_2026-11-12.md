@@ -6,7 +6,7 @@ Tags: #cleanup #menus #wireless #types
 
 Consolidated 30 single-function files into `src/minigames/result_game/result_tutorial.c`. The shared
 `ResultMenu` task now exposes tutorial phases, timers, fixed-point player and target
-positions, input state, prompt state, resources, fifteen existing `SceneInputWidget`
+positions, input state, prompt state, resources, fifteen existing `AnimSprite`
 objects, and four marker sprites. Unknown regions remain explicitly unknown.
 All functions already carried descriptive ResultTutorial names.
 
@@ -23,7 +23,7 @@ source organization and type recovery. The coordinator runs the combined ROM bui
 ## Message window: 080308BC–0803198C
 
 Consolidated 41 files into `src/ui/dialogue/message_window/message_window.c`. One shared MessageWindow task
-uses the full text playback state, shared SceneInputWidget, ContactSwarmSprite
+uses the full text playback state, shared AnimSprite, ContactSwarmSprite
 and DisplaySequenceState layouts, a bounded message-frame table, and typed
 palette banks. Seven unnamed functions gained provisional MessageWindow names.
 The sole external live callback reference in MessageWindow_Create was updated
@@ -70,7 +70,7 @@ which retain the original return-width check. Exact MATCH: 1,068 bytes.
 
 ## Wireless text: 08036CA4–08036E08
 
-Consolidated six functions into `src/link/wireless/wireless_text.c`. The API consistently uses
+Consolidated six functions into `src/link/wireless/character_table.c`. The API consistently uses
 u16 character codes and u8 encoded indices. GetCharacterCode replaces the misleading
 GetCharacterTableByte name. Named progress fields replace the initializer's two
 anonymous counters; its indexed table address keeps the original byte-address
@@ -109,7 +109,7 @@ row; continue in ROM order per the cleanup brief's resistant-type rule.
 
 ## Wireless exit task: 080394D4–080395D4
 
-Four functions now share `src/link/wireless/wireless_exit.c` and a WirelessExit task containing
+Four functions now share `src/link/wireless/exit.c` and a WirelessExit task containing
 a completion script key and shutdown state. The old generic Task and listener
 pointer views are gone. Creation uses the shared engine task API; all 256 bytes
 match. Existing function names retained.
@@ -195,7 +195,7 @@ Selection panel 0810DA38–0810E91C: 24 files unified with a complete 0xD38 layo
 
 Save menu 0811024C–08110A8C: eleven files unified with a real 0x1034 Task, eighteen widgets/resources, palette cycle and CharacterPreviewActor. Save/commit/failure states share one typed callback transition helper; score transfer and reveal use named GameState.clockDisplayValue instead of raw offset macro. Typed model/palette pointers and direct callback invocation match. All internal function names use SaveMenu.
 
-Game-over panel 08162E00–0816381C: 24 files consolidated into src/game_over.c. Full 0x354 Task layout replaces PlayerBurstEffect, GameOver, TransitionPanel and SceneTransition partial views. Eight extended letter sprites, canonical SceneInputWidget/SceneInputResource overlay, real 16-color palette, text/cost/script/timing fields. Both state tables use direct typed function calls; all letter and prompt state functions now use GameOver names.
+Game-over panel 08162E00–0816381C: 24 files consolidated into src/game_over.c. Full 0x354 Task layout replaces PlayerBurstEffect, GameOver, TransitionPanel and SceneTransition partial views. Eight extended letter sprites, canonical AnimSprite/AnimSpriteResource overlay, real 16-color palette, text/cost/script/timing fields. Both state tables use direct typed function calls; all letter and prompt state functions now use GameOver names.
 
 Stat display: 11 files consolidated (1068 bytes). All functions use the Hud prefix and canonical player counters. Bg_SetLayerMap takes a 32-bit index; its old u16 declaration inserted narrowing instructions. Correcting it preserves all 284 affected units. Four renamed external callers also MATCH. The ratio routine keeps dynamic arrays: fixed arrays alter the stack frame, matching the ROM evidence for variable-length allocation.
 
@@ -215,7 +215,7 @@ Menu entry checks: three files into a 232-byte unit. The preceding empty-slot pr
 
 Menu display digits: two files into a 164-byte unit. This reaches the coordinator boundary at 08166D74; Inventory panel and later assigned rows were not consolidated. Continue by revisiting deferred work and improving tools.
 
-Wireless peer panel revisit: all 18 functions now match as one 2296-byte unit. The full panel layout replaces the old shifted partial Row types; visibility loops advance a panel view by sizeof(SceneInputWidget), keeping digits[0].flags at its proven field. Direct widget pointers used a different address anchor and spilled an extra word; canonical panel-relative cursors restore the original allocation. First-connected-slot early returns and break loops changed branches, so its original shared-exit control flow remains.
+Wireless peer panel revisit: all 18 functions now match as one 2296-byte unit. The full panel layout replaces the old shifted partial Row types; visibility loops advance a panel view by sizeof(AnimSprite), keeping digits[0].flags at its proven field. Direct widget pointers used a different address anchor and spilled an extra word; canonical panel-relative cursors restore the original allocation. First-connected-slot early returns and break loops changed branches, so its original shared-exit control flow remains.
 
 Unit-file guard: tools/unit_files.py now warns when a selected merged source contains functions outside the requested ROM range. --strict exits 1 with no mergeable stdout. Five new tests cover ordering, exclusive bounds, aliases, assembly fallbacks and strict rejection; all five existing merge tests also pass. Real menu-range listing succeeds; a query ending inside menu_display.c is rejected.
 
@@ -261,7 +261,7 @@ Final menu-display validation: all 14 functions MATCH (2516 bytes); all 106 tran
 
 Link panel revisit after the run was reopened: 0810C238–0810C724 now matches as a five-function unit (1260 bytes). The earlier mismatch came from placing two whole 0x5FC slots at their status-byte offset 0x940. The tentative full slots begin at 0x348, with their last four-byte records at 0x940/F3C; the second slot ends at the callback at 0xF40, preserving allocation size 0xF78. Earlier slot contents remain unknown. Canonical task/widget/resource/palette types replace partial local views. Both renamed callers MATCH. Structured connection-status returns changed branch placement; retain the matched shared exits. The existing session-payload pointer guard still affects generated code and now refers to the canonical sessionData field.
 
-Link-panel controller revisit: 0810C724–0810CB7C now joins the preceding five helpers in src/link/link_panel/link_panel.c, giving thirteen contiguous functions and 2372 matching bytes. A four-byte LinkPanelStatus sits at the end of each tentative 0x5FC slot; advancing its cursor by sizeof(LinkPanelEntry) preserves the original register allocation. The message initializer retains its unused incoming panel parameter because its caller explicitly passes it. Direct state-callback dispatch matches. Scripts, text-window handles, selection bytes and task state use the complete layout; the session's exit-input-lock byte is named without changing any offsets. All 121 transitive header consumers MATCH; no scored concession sites. The following old_agbcc reset remains separate.
+Link-panel controller revisit: 0810C724–0810CB7C now joins the preceding five helpers in src/link/panel/link_panel.c, giving thirteen contiguous functions and 2372 matching bytes. A four-byte LinkPanelStatus sits at the end of each tentative 0x5FC slot; advancing its cursor by sizeof(LinkPanelEntry) preserves the original register allocation. The message initializer retains its unused incoming panel parameter because its caller explicitly passes it. Direct state-callback dispatch matches. Scripts, text-window handles, selection bytes and task state use the complete layout; the session's exit-input-lock byte is named without changing any offsets. All 121 transitive header consumers MATCH; no scored concession sites. The following old_agbcc reset remains separate.
 
 
 ## Reopened-run handoff

@@ -1,6 +1,6 @@
 #include "global.h"
-#include "bosses/vampire/actor_graphics_and_basic_states.h"
-#include "scene/actor/contact_actor.h"
+#include "bosses/count/count_graphics.h"
+#include "scene/collision/contact_actor.h"
 #include "engine/engine.h"
 #include "engine/ram.h"
 #include "player/player.h"
@@ -100,7 +100,7 @@ static inline s32 ReadPositionReference(u32 *entry, struct ContactPosition **out
 }
 
 // Finds the first tracked position inside the inclusive x/z bounds.
-s32 ActorPosition_FindTrackedPointInBounds(void *actor, s32 count, struct ContactPosition *min, struct ContactPosition *max)
+s32 SabataPosition_FindTrackedPointInBounds(void *actor, s32 count, struct ContactPosition *min, struct ContactPosition *max)
 {
     u8 *bytes = actor;
     s32 i;
@@ -426,7 +426,7 @@ static inline void state(struct Common *p, void (*fn)(void *), int id)
     p->pending = 0;
 }
 
-int GridAttack_SelectNextAction(void *);
+int NidhoggrDuel_SelectNextAction(void *);
 
 void sub_08027214(void *);
 

@@ -1,5 +1,5 @@
 #include "global.h"
-#include "ui/town/scene_item_values.h"
+#include "ui/town/shop_item_values.h"
 extern u8 gUnk_08E6092C[][0x20];
 extern u8 gUnk_08E60F80[][16];
 extern u8 gUnk_0824DB28[];

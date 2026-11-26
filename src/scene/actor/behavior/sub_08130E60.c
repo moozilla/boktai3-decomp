@@ -1,5 +1,5 @@
-#include "scene/actor/scene_actor_route.h"
-#include "scene/actor/scene_actor_chase_shared.h"
+#include "scene/motion/scene_actor_route.h"
+#include "scene/motion/scene_actor_chase_shared.h"
 #define SceneActorRoute_GetStepDuration Route_GetCurrentPointNodeId
 #include "global.h"
 #include "scene/actor/scene_actor_control_phase.h"

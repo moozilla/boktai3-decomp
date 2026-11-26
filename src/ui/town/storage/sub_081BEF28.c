@@ -15,10 +15,10 @@ struct SceneInventoryCategoryMenu {
 void Inventory_ClearItemSlot(u32);
 void Inventory_RemoveEquipmentEntry(s32);
 void Sound_PlaySong(u32);
-void SceneInventory_UpdateBrowseIntro(struct SceneInventoryCategoryMenu *);
-void SceneInventory_SetState(struct SceneInventoryCategoryMenu *,
+void Storage_UpdateBrowseIntro(struct SceneInventoryCategoryMenu *);
+void Storage_SetState(struct SceneInventoryCategoryMenu *,
                              void (*)(struct SceneInventoryCategoryMenu *), u32);
-void SceneInventory_CompleteCategoryRemoval(struct SceneInventoryCategoryMenu *p)
+void Storage_CompleteCategoryRemoval(struct SceneInventoryCategoryMenu *p)
 {
     if (SceneInput_TickPairTransition(&p->transition)) {
         u8 *kinds = p->categoryKinds;
@@ -42,6 +42,6 @@ void SceneInventory_CompleteCategoryRemoval(struct SceneInventoryCategoryMenu *p
             } break;
         }
         Sound_PlaySong(0x10E);
-        SceneInventory_SetState(p, SceneInventory_UpdateBrowseIntro, 0);
+        Storage_SetState(p, Storage_UpdateBrowseIntro, 0);
     }
 }

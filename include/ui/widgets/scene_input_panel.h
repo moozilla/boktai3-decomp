@@ -17,13 +17,13 @@ struct SceneInputPanel {
     u8 unknown0[0x18];
     void *backgroundResource;
     const u8 *labelResource;
-    struct SceneInputResource widgetResource, gridResource;
+    struct AnimSpriteResource widgetResource, gridResource;
     struct SceneInputPanelDrawable drawable;
-    struct SceneInputWidget indicator, valueA, valueB, prompt, mode;
-    struct SceneInputWidget primary[16], secondary[8], buttons[4];
-    struct SceneInputWidget banner, compareA, category, modeCursor;
-    struct SceneInputWidget heading, valueLabel, glyph, meterGlyph;
-    struct SceneInputWidget digits[8], numericLabel, smallDigits[4];
+    struct AnimSprite indicator, valueA, valueB, prompt, mode;
+    struct AnimSprite primary[16], secondary[8], buttons[4];
+    struct AnimSprite banner, compareA, category, modeCursor;
+    struct AnimSprite heading, valueLabel, glyph, meterGlyph;
+    struct AnimSprite digits[8], numericLabel, smallDigits[4];
 };
 struct SceneInputHighlight {
     u16 colors[16];

@@ -2,7 +2,7 @@
 #include "engine/engine.h"
 #include "script/script_utility.h"
 #include "engine/math/scene_vec.h"
-#include "scene/actor/contact_collider.h"
+#include "scene/collision/contact_collider.h"
 #include "engine/ram.h"
 #include "engine/engine_globals.h"
 

@@ -64,7 +64,7 @@ the search that used to live only in your head and the current best file.
   `(same code as nK)` says a spelling changed nothing the compiler sees.
 * `twins N`: for each differing block, matched functions whose ROM has the same run of insns, with
   the C lines that produced it there. Usually the fastest route: the project has often matched the
-  same idiom elsewhere (GridAttackActor_OnDamageCollision matched from its twins' spelling).
+  same idiom elsewhere (NidhoggrDuel_OnDamageCollision matched from its twins' spelling).
 * `run --block B`: work on block B of the map alone: moves only on the C lines behind it, ranked by
   that block's cost first, so the rest of the function stays fixed and does not mask progress.
 * `[rotation: AGBCC_SPILL=K:D matches]` on a node: the code is right except reload's round-robin

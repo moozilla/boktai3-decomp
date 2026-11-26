@@ -43,7 +43,7 @@ The assigned files are `sub_08038448.c`, `sub_0803B40C.c`, `sub_0805AC3C.c`,
 Both snapshots have zero errors. No ignore comments or detector changes were
 added. These are counts for the six assigned units, not the entire repository.
 
-### ScenePanel_TickRig: fixed
+### PileDriver_TickRig: fixed
 
 Commit `ba319f43c` removes the two fabricated negative-value arms, two volatile
 views, and the interval temporary reused for a different sample. Direct

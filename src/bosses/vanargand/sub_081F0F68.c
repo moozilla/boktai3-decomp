@@ -9,7 +9,7 @@ static inline u32 StepPlayback(struct DepartureDrawable *owner, struct DisplaySe
     return PlayerCue_StepSequenceEndedWithFirstFlipMask(&owner->sprite, state, one);
 }
 
-void SingletonSlot7_InitDisplaySprites(struct DepartureActor *p)
+void VanargandHead_InitDisplaySprites(struct DepartureActor *p)
 {
     struct DepartureDrawable *foreground = &p->foreground;
     struct DepartureDrawable *accent = &p->accent;

@@ -1,8 +1,8 @@
-#include "scene/actor/scene_actor_terrain_reaction.h"
+#include "scene/motion/scene_actor_terrain_reaction.h"
 #include "global.h"
 #include "scene/actor/scene_actor_reaction.h"
 #include "engine/runtime.h"
-#include "scene/actor/scene_actor_chase_shared.h"
+#include "scene/motion/scene_actor_chase_shared.h"
 /* At zero health: hand control to the defeat target (kind 17), then bump the saturating defeat counters in the game-state block by category and weapon kind. */
 void SceneActorRecord_RecordPair(u16, u16);
 void SceneActorContacts_ReleaseNode(void *);

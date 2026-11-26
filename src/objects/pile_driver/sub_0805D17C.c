@@ -1,5 +1,5 @@
 #include "objects/pile_driver/scene_panel_subject_playback.h"
-void ScenePanelSubject_TickActive(struct ScenePanelSubject *owner)
+void PileDriverSubject_TickActive(struct ScenePanelSubject *owner)
 {
     Anim_SetSequence(&owner->sequence, owner->sequenceResource, 3, owner->sequenceRow,
                      owner->sequenceVariant);

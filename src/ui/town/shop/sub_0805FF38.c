@@ -1,5 +1,5 @@
-#include "ui/town/scene_inventory_panel.h"
-void SceneInventory_PopulateItemGrid(struct SceneInventoryPanel *panel)
+#include "ui/town/shop_panel.h"
+void Shop_PopulateItemGrid(struct SceneInventoryPanel *panel)
 {
     s32 nextRow;
     struct SceneInventoryWidgetFlags *flagsBase;
@@ -14,13 +14,13 @@ void SceneInventory_PopulateItemGrid(struct SceneInventoryPanel *panel)
     flagsBase = ((struct SceneInventoryFlagsView *)(void *)panel)->widgets;
     rowBytes = 0;
     {
-        struct SceneInputWidget *widget;
+        struct AnimSprite *widget;
         struct SceneInventoryWidgetFlags *entry;
     primaryRow:
         column = 0;
         rowSlot = row * 4;
         {
-            struct SceneInputWidget *base = panel->display.primary;
+            struct AnimSprite *base = panel->display.primary;
             widget = (void *)(rowBytes + (u32)base);
         }
         entry = (void *)((rowSlot + 5) * 0x60 + (u32)flagsBase);
@@ -44,7 +44,7 @@ void SceneInventory_PopulateItemGrid(struct SceneInventoryPanel *panel)
     }
     for (row = 0; row <= 1; row = nextRow) {
         s32 column2;
-        struct SceneInputWidget *widget;
+        struct AnimSprite *widget;
         struct SceneInventoryWidgetFlags *entry;
         u32 flagIndex;
         u32 offset;
@@ -54,7 +54,7 @@ void SceneInventory_PopulateItemGrid(struct SceneInventoryPanel *panel)
         flagIndex = rowSlot + 21;
         offset = ((row << 3) + rowSlot) << 5;
         {
-            struct SceneInputWidget *base = panel->display.secondary;
+            struct AnimSprite *base = panel->display.secondary;
             widget = (void *)(offset + (u32)base);
         }
         entry = (void *)(flagIndex * 0x60 + (u32)flagsBase);

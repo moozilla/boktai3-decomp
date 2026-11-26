@@ -122,7 +122,7 @@ s32 Clock_DaysInMonth(s32 year, s32 month);
 void DateMenu_UpdateDigits(struct DateMenu *p)
 {
     s32 v, i;
-    struct SceneInputWidget *digits;
+    struct AnimSprite *digits;
 
     if (p->year != p->oldYear) {
         digits = p->digits;
@@ -360,7 +360,7 @@ void Anim_Remove(void *);
 
 void DateMenu_Destroy(struct DateMenu *p)
 {
-    struct SceneInputWidget *entry = p->digits;
+    struct AnimSprite *entry = p->digits;
     s32 i = 11;
     do {
         Anim_Remove(entry);
@@ -416,7 +416,7 @@ s32 DateMenu_Initialize(struct DateMenu *menu)
 
     resource = ScriptProc_Start(0xCB05, 0xE2AB);
     ResourceHeader_Relocate(menu->widgets[0].resource, resource);
-    menu->digitResource = *(struct SceneInputResource *)menu->widgets[0].resource;
+    menu->digitResource = *(struct AnimSpriteResource *)menu->widgets[0].resource;
     Widget_InitLinked((u8 *)&menu->widgets[0], menu->widgets[0].resource, 0x34, 0x10, 0, 0, 0,
                       NULL);
     ResourceHeader_Relocate(menu->widgets[1].resource, resource);

@@ -1,6 +1,6 @@
 #include "global.h"
 /* Provisional names and field interpretations; confidence low. */
-#include "scene/area_effect/area_effect_link.h"
+#include "scene/areas/area_effect_link.h"
 struct LinkSessionData {
     u8 unknown0[0x84];
     s8 playerKinds[5];

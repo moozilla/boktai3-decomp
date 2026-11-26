@@ -22,7 +22,7 @@ static inline void ScenePanel_RequestReaction(struct ScenePanelPairReaction *pan
     panel->counter = 0;
     panel->pending = 1;
 }
-s32 ScenePanel_RequestPairReaction(struct ScenePanelPairReaction *panel)
+s32 VanargandPair_RequestPairReaction(struct ScenePanelPairReaction *panel)
 {
     u32 two = 2;
     if (panel->flags & two) {

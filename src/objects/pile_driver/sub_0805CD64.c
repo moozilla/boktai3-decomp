@@ -1,5 +1,5 @@
 #include "objects/pile_driver/scene_panel_subject_playback.h"
-void ScenePanelSubject_TickAppearing(struct ScenePanelSubject *owner)
+void PileDriverSubject_TickAppearing(struct ScenePanelSubject *owner)
 {
     if (owner->appearDelay)
         owner->appearDelay--;
@@ -11,7 +11,7 @@ void ScenePanelSubject_TickAppearing(struct ScenePanelSubject *owner)
                          owner->sequenceVariant);
         if (ScenePanelSubject_StepPlayback(owner)) {
             Collider_Refresh(&owner->collider);
-            ScenePanelSubject_SetState((void *)owner, 2);
+            PileDriverSubject_SetState((void *)owner, 2);
         }
     }
 }

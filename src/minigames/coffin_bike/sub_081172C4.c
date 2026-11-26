@@ -2,8 +2,8 @@
 #include "system/game_state/game_state.h"
 #include "engine/ram.h"
 #include "engine/engine_globals.h"
-#include "scene/area_effect/area_effect_link.h"
-#include "minigames/coffin_bike/glove.h"
+#include "scene/areas/area_effect_link.h"
+#include "minigames/coffin_bike/coffin_bike.h"
 
 s32 Div(s32, s32);
 s32 Math_Atan2(s32, s32);
@@ -14,7 +14,7 @@ void CharacterModel_UpdateAccessoryAnimations(void *);
 void ScenePool_ClampMotionSpeeds(struct GloveMotion *);
 
 void StageIconDisplay_Create(s32, s32, void *, void *);
-void Glove_BeginStopping(void);
+void CoffinBike_BeginStopping(void);
 u8 LinkParticipant_IsLocallySelected(void *);
 void Character_UpdateLoopingSound(void *);
 static inline s32 *Motion_GetSpeed(struct GloveMotion *self)
@@ -64,7 +64,7 @@ void Glove_UpdateRisingCue(struct Glove *p)
         p->active = 0;
         p->launchPhase = 0;
         p->launchSpeed = 0;
-        StageIconDisplay_Create(0, 0, Glove_BeginStopping, p);
+        StageIconDisplay_Create(0, 0, CoffinBike_BeginStopping, p);
         self->animation.half[1] = 0;
     }
     {

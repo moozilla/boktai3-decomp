@@ -119,7 +119,7 @@ s32 Projectile_Spawn(struct Task4E01Params *params, void *arg)
     s32 result;
     task = ResourceRegistry_GetResource(0x4E01);
     if (!task) {
-        Task4E01_GetOrCreate();
+        ProjectileTask_GetOrCreate();
         return -1;
     }
     {
@@ -188,7 +188,7 @@ void Projectile_InitializeParams(struct Task4E01Params *params)
     Projectile_SetCollisionOffset(params, 0, -0x6C, 0);
     Projectile_SetCollisionMask(params, 1);
     Projectile_SetSpriteParams(params, 0x848F, 0, -1);
-    Projectile_SetUpdateCallback(params, Task4E01_OnDefaultTimedAnimation);
+    Projectile_SetUpdateCallback(params, ProjectileTask_OnDefaultTimedAnimation);
     params->flags = 0;
     params->variant = 0;
     params->unknown3A = 0;
@@ -279,7 +279,7 @@ void Projectile_SetVariant(struct Task4E01Params *params, u16 variant)
     params->unknown3A = variant;
 }
 
-s32 Task4E01_RemoveEntry(s32 index)
+s32 ProjectileTask_RemoveEntry(s32 index)
 {
     struct TimedEffectManager *manager = ResourceRegistry_GetResource(0x4e01);
     struct Task4E01Projectile *entry;
@@ -336,7 +336,7 @@ s32 Projectile_SetEntryDirection(u8 direction, s32 index)
     return 0;
 }
 
-struct ContactPosition *Task4E01_GetEntryPosition(s32 index)
+struct ContactPosition *ProjectileTask_GetEntryPosition(s32 index)
 {
     struct TimedEffectManager *manager = ResourceRegistry_GetResource(0x4E01);
     if (manager == 0 || index < 0 || index >= manager->capacity)
@@ -344,7 +344,7 @@ struct ContactPosition *Task4E01_GetEntryPosition(s32 index)
     return &manager->entries[index].sprite.position;
 }
 
-s32 Task4E01_GetKind7Value(s32 index)
+s32 ProjectileTask_GetKind7Value(s32 index)
 {
     struct TimedEffectManager *manager = ResourceRegistry_GetResource(0x4e01);
     struct Task4E01Projectile *entry;
@@ -371,7 +371,7 @@ s32 SceneEntry_SetPosition(s32 index, struct ContactPosition *position)
     return 0;
 }
 
-s32 Task4E01_Destroy(void)
+s32 ProjectileTask_Destroy(void)
 {
     s32 r;
     struct TimedEffectManager *manager = ResourceRegistry_GetResource(0x4E01);

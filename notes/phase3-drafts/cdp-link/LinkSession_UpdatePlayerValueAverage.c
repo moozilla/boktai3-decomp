@@ -1,6 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
-#include "scene/area_effect/area_effect_link.h"
+#include "scene/areas/area_effect_link.h"
 
 // foundry draft (worker best 96.7%); what differs is mostly register allocation and instruction order
 #define PlayerValue_GetBand Solar_GetLevelForIntensity

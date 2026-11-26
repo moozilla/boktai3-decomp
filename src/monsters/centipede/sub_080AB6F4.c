@@ -1,6 +1,6 @@
 #include "scene/actor/scene_actor_state.h"
 #include "global.h"
-#include "scene/actor/scene_actor_collision.h"
+#include "scene/collision/scene_actor_collision.h"
 
 void Collider_SetAttackProperties(void *, u32, u32, u32, u32, u32);
 

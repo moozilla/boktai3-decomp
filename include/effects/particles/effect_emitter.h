@@ -1,7 +1,7 @@
 #ifndef EFFECT_EMITTER_H
 #define EFFECT_EMITTER_H
 #include "global.h"
-#include "scene/actor/contact_collider.h"
+#include "scene/collision/contact_collider.h"
 #include "objects/scene_objects/scene_object.h"
 #include "engine/task.h"
 

@@ -13,16 +13,16 @@ struct Slot600Manager {
     u32 used;
     struct Slot600 slots[8];
 };
-void *FanCannonManager_Create(void);
+void *WindCannonManager_Create(void);
 /* Script: in the eight-slot manager at 0x02000600 (created if missing, which
    fails the call), the used slot named -n clears both +0x124 and +0x125. */
-s32 Slot600_ResetFromScript(void)
+s32 WindCannonSlot_ResetFromScript(void)
 {
     struct Slot600Manager *manager = gFanCannonManager;
     struct Slot600 *slot;
     s32 name, i;
     if (!manager) {
-        FanCannonManager_Create();
+        WindCannonManager_Create();
         return -1;
     }
     if (!Script_SeekToKeyword('n'))

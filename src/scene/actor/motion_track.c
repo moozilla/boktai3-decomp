@@ -1,4 +1,4 @@
-#include "objects/orbit_motion.h"
+#include "objects/dungeon_prop/orbit_motion.h"
 #include "scene/actor/motion_track.h"
 
 void MotionTrack_Initialize(struct MotionTrack *track, const void *data,

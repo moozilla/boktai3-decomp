@@ -1,12 +1,12 @@
 #include "global.h"
-void Registry1745_ConsumeStateEntry(u8 *);
-void Registry1745_SetState(u8 *, u32, void (*)(void));
-void Registry1745_EnterCompletedState(void);
-u32 Registry1745_WaitForCompletionFlag(u8 *p)
+void LinkSession_ConsumeStateEntry(u8 *);
+void LinkSession_SetState(u8 *, u32, void (*)(void));
+void LinkSession_EnterCompletedState(void);
+u32 LinkSession_WaitForCompletionFlag(u8 *p)
 {
     u32 v;
-    Registry1745_ConsumeStateEntry(p);
+    LinkSession_ConsumeStateEntry(p);
     v = p[0x2B];
     if (v != 0)
-        Registry1745_SetState(p, 0x1C, Registry1745_EnterCompletedState);
+        LinkSession_SetState(p, 0x1C, LinkSession_EnterCompletedState);
 }

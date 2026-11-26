@@ -15,7 +15,7 @@ struct StorageWidgetFlags {
     u8 unknown4[0x5c];
 };
 struct StorageFlagsView {
-    struct SceneInputWidget widgets[1];
+    struct AnimSprite widgets[1];
 };
 void Storage_BeginEquipmentSpecialMove(struct StoragePanel *panel)
 {
@@ -25,7 +25,7 @@ void Storage_BeginEquipmentSpecialMove(struct StoragePanel *panel)
     u32 savedAttribute;
     struct SceneInputPosition *target;
     enabled[0] = 1;
-    ((struct SceneInputWidget *)((u8 *)&display->widgets[panel->selection] + 0x318))->flags |= 1;
+    ((struct AnimSprite *)((u8 *)&display->widgets[panel->selection] + 0x318))->flags |= 1;
     frames[0] = Inventory_GetEquipmentId(panel->items[panel->selection]) + 0xF0;
     {
         savedAttribute = 0x373;

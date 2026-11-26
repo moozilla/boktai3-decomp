@@ -1,12 +1,12 @@
 #include "global.h"
-#include "player/cues/player_cue_sequence.h"
+#include "player/cutscene/player_cue_sequence.h"
 #include "engine/video/display_animation.h"
 #include "engine/math/scene_vec.h"
 s32 Script_SeekToKeyword(s32);
 s32 Script_GetValue(void);
 void sub_0820843C(void);
 void sub_082086B8(void);
-void CannonTurret_InitCollider(void *);
+void GarmrStatue_InitCollider(void *);
 void SceneBody_Init(void *, void *, void *, u32, u32, void *);
 void SceneBody_SetSprite(void *, void *);
 void TerrainOverlay_QueueAddActor(void *);
@@ -22,7 +22,7 @@ struct CannonTurretTail {
     u8 pad132[0x32];
     void *resource;
 };
-s32 CannonTurret_InitializeFromScript(u8 *p, void *parent)
+s32 GarmrStatue_InitializeFromScript(u8 *p, void *parent)
 {
     void *resource;
     u32 sequenceResult;
@@ -108,7 +108,7 @@ s32 CannonTurret_InitializeFromScript(u8 *p, void *parent)
     }
     PlayerCue_StepSequenceEnded((struct ContactSwarmSprite *)(p + 0x24), (void *)(p + 0x10c));
     if (H(0x146) == 0)
-        CannonTurret_InitCollider(p);
+        GarmrStatue_InitCollider(p);
     if (H(0x13e) != 0) {
         u8 *body = p + 0xc0;
         SceneBody_Init(body, *(void **)(p + 0x148), p + 0x40, 0, 4, p);

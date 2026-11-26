@@ -1,5 +1,5 @@
 #include "effects/sprites/sprite_effect_playback.h"
-#include "scene/actor/scene_actor_terrain.h"
+#include "scene/motion/scene_actor_terrain.h"
 
 // confidence=low: animation controller with terrain bounce and intermittent gravity.
 #define SpriteEffectController_UpdateBouncing sub_0806AB1C

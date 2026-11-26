@@ -1,6 +1,6 @@
 #include "scene/actor/scene_actor_control_begin.h"
-#include "scene/actor/scene_actor_terrain_reaction.h"
-#include "scene/actor/scene_actor_contact_response.h"
+#include "scene/motion/scene_actor_terrain_reaction.h"
+#include "scene/collision/scene_actor_contact_response.h"
 #include "global.h"
 #include "scene/actor/scene_actor_control_phase.h"
 u8 sub_0812F3CC(struct ChaseActor *);

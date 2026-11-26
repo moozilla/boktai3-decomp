@@ -151,8 +151,8 @@ int WirelessStatusMenu_Destroy(struct WirelessStatusMenu *menu)
 
 int WirelessStatusMenu_InitFromScript(struct WirelessStatusMenu *menu)
 {
-    struct SceneInputResource *resource;
-    struct SceneInputResource *blob;
+    struct AnimSpriteResource *resource;
+    struct AnimSpriteResource *blob;
     gLinkMenu = (void *)menu;
     PaletteLevels_Reset();
     if (!Script_SeekToKeyword('s'))

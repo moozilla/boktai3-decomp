@@ -1,4 +1,4 @@
-#include "scene/actor/scene_actor_position_search.h"
+#include "scene/motion/scene_actor_position_search.h"
 /* The signed byte index must address valid storage in the active 16-byte table. */
 void SceneActorPosition_ResolveTaggedPosition(struct SceneActorTaggedPosition *target,
                                               const struct SceneActorPositionSource *source,

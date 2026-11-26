@@ -1,6 +1,6 @@
 #ifndef GUARD_DISPLAY_TRACK_H
 #define GUARD_DISPLAY_TRACK_H
-#include "scene/actor/contact_swarm.h"
+#include "scene/collision/contact_swarm.h"
 #include "engine/video/display_sequence_inline.h"
 #include "engine/task.h"
 struct DisplayTrackGraphics {

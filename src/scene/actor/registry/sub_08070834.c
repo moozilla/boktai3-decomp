@@ -1,4 +1,4 @@
-#include "scene/actor/scene_actor_terrain_reaction.h"
+#include "scene/motion/scene_actor_terrain_reaction.h"
 #include "scene/actor/scene_actor_registry.h"
 struct ChaseActor *SceneActorRegistry_FindById(u32);
 static inline u8 HasMovementFlag(struct ChaseActor *actor)

@@ -1,5 +1,5 @@
-#include "objects/pile_driver/scene_panel_effects.h"
-void ScenePanel_SelectTimePalette(struct ScenePanel *input, s32 phase)
+#include "objects/pile_driver/pile_driver_effects.h"
+void PileDriver_SelectTimePalette(struct ScenePanel *input, s32 phase)
 {
     struct ScenePanelEffectsView *panel = (void *)input;
     switch (panel->timePhase) {

@@ -1,4 +1,4 @@
-#include "scene/actor/scene_steering_actor.h"
+#include "scene/motion/scene_steering_actor.h"
 extern void *gUnk_08605B98[];
 static inline u8 Used(struct SceneSteeringActorPool *pool, u32 bit)
 {

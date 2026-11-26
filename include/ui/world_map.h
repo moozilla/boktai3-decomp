@@ -16,8 +16,8 @@ struct RegistrySelectionMenu {
     struct Task task;
     u32 unknown18;
     u8 *palettes;
-    struct SceneInputWidget animations[13];
-    struct SceneInputResource resource;
+    struct AnimSprite animations[13];
+    struct AnimSpriteResource resource;
     s16 elapsed;
     u8 shift, mode;
     u32 unknown524;
@@ -32,31 +32,31 @@ struct RegistrySelectionMenu {
 
 void PositionMotion_InitTimedInterpolation(struct PositionMotion *, struct ContactPosition *,
                                            struct ContactPosition *, struct ContactPosition *, u16);
-void RegistrySelection_SetUpdate(struct RegistrySelectionMenu *,
+void WorldMap_SetUpdate(struct RegistrySelectionMenu *,
                                  void (*)(struct RegistrySelectionMenu *));
-void RegistrySelection_ShowIndicators(struct RegistrySelectionMenu *);
-void RegistrySelection_UpdateIndicators(struct RegistrySelectionMenu *);
-void RegistrySelection_BlendPaletteBanks(u8 *, u8 *, u8 *, int, int, int);
-void RegistrySelection_ApplyPalettePhase(struct RegistrySelectionMenu *, u32);
-void RegistrySelection_BlendTimedPalettes(struct RegistrySelectionMenu *);
-void RegistrySelection_ProcessConfirm(struct RegistrySelectionMenu *);
-void RegistrySelection_OnUnusedTransition(void);
-void RegistrySelection_InitializeAnimations(struct RegistrySelectionMenu *);
-void RegistrySelection_InitializeBackground(struct RegistrySelectionMenu *);
-void RegistrySelection_ConfigureDisplay(void);
-void RegistrySelection_BeginFadeIn(struct RegistrySelectionMenu *);
-void RegistrySelection_BeginFadeOut(struct RegistrySelectionMenu *);
-void RegistrySelection_BeginSelection(struct RegistrySelectionMenu *);
-void RegistrySelection_StartTimedEffect(struct RegistrySelectionMenu *, s32, s32);
-void RegistrySelection_UpdateTimedEffect(struct RegistrySelectionMenu *);
-void RegistrySelection_UpdateSelection(struct RegistrySelectionMenu *);
-void RegistrySelection_UpdateOpeningDelay(struct RegistrySelectionMenu *);
-void RegistrySelection_UpdateScriptDelay(struct RegistrySelectionMenu *);
-void RegistrySelection_OnUpdate(struct RegistrySelectionMenu *);
-void RegistrySelection_Destroy(struct RegistrySelectionMenu *);
-void RegistrySelection_CreateSelectionCursor(struct RegistrySelectionMenu *, s32);
-s32 RegistrySelection_InitializeFromScript(struct RegistrySelectionMenu *, void *);
-void RegistrySelection_StartTimedEffectFromScript(void);
-void RegistrySelection_SetVisibleFromScript(void);
-struct RegistrySelectionMenu *RegistrySelection_Create(void *);
+void WorldMap_ShowIndicators(struct RegistrySelectionMenu *);
+void WorldMap_UpdateIndicators(struct RegistrySelectionMenu *);
+void WorldMap_BlendPaletteBanks(u8 *, u8 *, u8 *, int, int, int);
+void WorldMap_ApplyPalettePhase(struct RegistrySelectionMenu *, u32);
+void WorldMap_BlendTimedPalettes(struct RegistrySelectionMenu *);
+void WorldMap_ProcessConfirm(struct RegistrySelectionMenu *);
+void WorldMap_OnUnusedTransition(void);
+void WorldMap_InitializeAnimations(struct RegistrySelectionMenu *);
+void WorldMap_InitializeBackground(struct RegistrySelectionMenu *);
+void WorldMap_ConfigureDisplay(void);
+void WorldMap_BeginFadeIn(struct RegistrySelectionMenu *);
+void WorldMap_BeginFadeOut(struct RegistrySelectionMenu *);
+void WorldMap_BeginSelection(struct RegistrySelectionMenu *);
+void WorldMap_StartTimedEffect(struct RegistrySelectionMenu *, s32, s32);
+void WorldMap_UpdateTimedEffect(struct RegistrySelectionMenu *);
+void WorldMap_UpdateSelection(struct RegistrySelectionMenu *);
+void WorldMap_UpdateOpeningDelay(struct RegistrySelectionMenu *);
+void WorldMap_UpdateScriptDelay(struct RegistrySelectionMenu *);
+void WorldMap_OnUpdate(struct RegistrySelectionMenu *);
+void WorldMap_Destroy(struct RegistrySelectionMenu *);
+void WorldMap_CreateSelectionCursor(struct RegistrySelectionMenu *, s32);
+s32 WorldMap_InitializeFromScript(struct RegistrySelectionMenu *, void *);
+void WorldMap_StartTimedEffectFromScript(void);
+void WorldMap_SetVisibleFromScript(void);
+struct RegistrySelectionMenu *WorldMap_Create(void *);
 #endif

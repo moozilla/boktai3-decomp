@@ -3,7 +3,7 @@
 
 void Actor_PlayAnimationEntry(void *, u32, u32, u32, u32);
 
-void StateActor_StartKind9Or10Animation4(u32 ctx, struct StateActor *p)
+void StoryCharacter_StartKind9Or10Animation4(u32 ctx, struct StateActor *p)
 {
     u32 r;
     if (p->enter == 0)

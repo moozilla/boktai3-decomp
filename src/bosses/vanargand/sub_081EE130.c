@@ -1,4 +1,4 @@
-#include "scene/actor/contact_swarm.h"
+#include "scene/collision/contact_swarm.h"
 // confidence=low: approaches screen X and periodically emits offset effects.
 #include "engine/math/scene_vec.h"
 #include "engine/ram.h"

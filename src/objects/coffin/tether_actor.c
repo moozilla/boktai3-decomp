@@ -246,7 +246,7 @@ void CellObject_Init(void *, void *);
 
 s32 Inventory_AddItem(u32, u32);
 
-u32 ScenePanel_IsPresent(void *);
+u32 PileDriver_IsPresent(void *);
 
 void Script_ReadReference(void *);
 
@@ -1672,7 +1672,7 @@ u32 TetherActor_BeginKindFourStateTen(void)
 u32 TetherActor_RequestKindNineAction(u32 a, u32 b)
 {
     if (gTetherActor) {
-        if (!ScenePanel_IsPresent(gTetherActor)) {
+        if (!PileDriver_IsPresent(gTetherActor)) {
             if (gTetherActor->kind == 9) {
                 gTetherActor->actionRequested = 1;
                 gTetherActor->actionAngle = b;

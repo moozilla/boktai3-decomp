@@ -1,5 +1,5 @@
-#include "ui/town/scene_inventory_control.h"
-s32 SceneInventory_HandleClockShortcut(struct SceneInventoryControlView *panel)
+#include "ui/town/shop_control.h"
+s32 Shop_HandleClockShortcut(struct SceneInventoryControlView *panel)
 {
     if (gPadState[0] & 4) {
         panel->interactionFlags |= 2;

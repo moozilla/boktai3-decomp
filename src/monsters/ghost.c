@@ -1,9 +1,9 @@
 #include "monsters/ghost.h"
 #include "engine/math/math_shift.h"
-#include "scene/actor/scene_actor_stimulus.h"
+#include "scene/collision/scene_actor_stimulus.h"
 #include "system/game_state/game_state_flags.h"
 #include "scene/actor/scene_actor_reaction.h"
-#include "scene/actor/scene_actor_turn.h"
+#include "scene/motion/scene_actor_turn.h"
 #include "engine/word_flags.h"
 
 #include "global.h"
@@ -14,9 +14,9 @@
 
 #include "scene/actor/scene_actor_state.h"
 
-#include "scene/actor/scene_actor_chase_reaction.h"
+#include "scene/motion/scene_actor_chase_reaction.h"
 
-#include "scene/actor/scene_actor_terrain.h"
+#include "scene/motion/scene_actor_terrain.h"
 
 #include "npc/manager/scene_actor_animation.h"
 
@@ -26,11 +26,11 @@
 
 #include "scene/actor/scene_actor_control_phase.h"
 
-#include "scene/actor/scene_actor_chase_shared.h"
+#include "scene/motion/scene_actor_chase_shared.h"
 
 #include "script/script_utility.h"
 
-#include "scene/actor/scene_actor_route.h"
+#include "scene/motion/scene_actor_route.h"
 
 #include "scene/actor/scene_actor_visibility.h"
 
@@ -38,7 +38,7 @@
 
 #include "engine/engine_globals.h"
 
-#include "scene/actor/contact_actor.h"
+#include "scene/collision/contact_actor.h"
 
 #include "engine/math/movement_curve.h"
 
@@ -69,11 +69,11 @@
 #include "monsters/scene_actor_init_group.h"
 
 #include "monsters/scene_actor_init_graphics.h"
-#include "scene/actor/scene_actor_contact_response.h"
+#include "scene/collision/scene_actor_contact_response.h"
 #include "bosses/vanargand/vanargand_projectiles.h"
-#include "scene/actor/scene_actor_displacement.h"
-#include "scene/actor/scene_actor_terrain_reaction.h"
-#include "scene/actor/scene_actor_chase.h"
+#include "scene/motion/scene_actor_displacement.h"
+#include "scene/motion/scene_actor_terrain_reaction.h"
+#include "scene/motion/scene_actor_chase.h"
 #include "objects/hazards/falling_objects.h"
 #include "bosses/vanargand/vanargand_parts.h"
 
@@ -184,7 +184,7 @@ static inline void Ghost_SelectDirectionalAnimation(struct RoomActor *actor, u32
                          (u8)variant, (u8)flags);
         restart = &actor->restart;
     } else {
-        struct SceneInputWidget *tile =
+        struct AnimSprite *tile =
             &((struct SceneActorAnimationTileDrawable *)actor->drawable)->tile;
         u8 *savedSelection;
         selection += variant;
@@ -605,19 +605,19 @@ static inline void Ghost_MakeRouteMotion(struct ContactPosition *out, u32 angle,
     out->z = Math_ShiftTowardZero(gUnk_086149C4[angle & 255] * speed, 12);
 }
 
-void TentacleActor_ResetOscillation(void *);
+void Centipede_ResetOscillation(void *);
 
 void Anim_SetDurationScale(void *, u32);
 
 void Anim_SetFrameDurationScale(void *, u32);
 
-void TentacleActor_SelectWanderRoute(void *);
+void Centipede_SelectWanderRoute(void *);
 
-void TentacleActor_AdvanceMotionPhase(void *, s32);
+void Centipede_AdvanceMotionPhase(void *, s32);
 
 void sub_080A9DB0(void *, s32, s32);
 
-void TentacleActor_UpdateOscillation(void *, s32, s32);
+void Centipede_UpdateOscillation(void *, s32, s32);
 
 static inline u8 Ghost_ApproachCurvePosition(struct ChaseActor *actor,
                                              struct SceneActorMotionSubject *saved, s32 speed)
@@ -2576,7 +2576,7 @@ static inline void Ghost_SelectAnimation(struct ChaseActor *actor, u32 selection
         Anim_SetSequence(&drawable->sequence, (void *)drawable->resource, (u16)selection,
                          (u8)variant, (u8)flags);
     } else {
-        struct SceneInputWidget *tile =
+        struct AnimSprite *tile =
             &((struct SceneActorAnimationTileDrawable *)actor->base.drawable)->tile;
         selection += variant;
         if (!force && Ghost_GetAnimationIndex(actor) == selection &&

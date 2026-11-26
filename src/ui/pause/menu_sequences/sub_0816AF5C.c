@@ -6,7 +6,7 @@ s32 Anim_Step(void *, void *);
 s32 MessageWindow_ShowMessage(s32);
 void SelectionMenu_UpdateConfirmInput(struct SceneHudState *);
 void Hud_SetUpdateCallback(struct SceneHudState *, void (*)(struct SceneHudState *));
-void ScenePanel_UpdateAccountIntro(struct SceneHudState *p)
+void MenuSequence_UpdateAccountIntro(struct SceneHudState *p)
 {
     if (p->pageFadeTimer <= 15)
         Hud_InitSelectionBounds(p->pageFadeTimer * 4, 0);

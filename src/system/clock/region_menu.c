@@ -287,7 +287,7 @@ s32 Script_GetValueSafe(void);
 /* Script: -n block, -d (read with Script_GetValueSafe), -o, -c and -f
    (default 0). */
 
-void ScreenParams310_SetFromScript(void)
+void RegionMenuParams_SetFromScript(void)
 {
     struct RegionMenuParameters *p = &gRegionMenuParameters;
     p->flag = 0;

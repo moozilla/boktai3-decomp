@@ -42,7 +42,7 @@ halfword at8 in the consumable definition, with no corresponding clamp.
 
 ## Description panes
 
-`SceneInventory_ShowItemDescription` (`5FA6C`, 388 bytes) obtains an owned item
+`Shop_ShowItemDescription` (`5FA6C`, 388 bytes) obtains an owned item
 and slot-state frame, or a catalog item and frame394/395 selected by the
 definition field at4. Missing selections use item-1/frame393. A missing item
 hides the banner and clears text. Otherwise it shows the banner, sets the
@@ -51,26 +51,26 @@ offset depends on `GameState.form` at5A8: form6 with item13 uses234; form0/6
 uses55+item; other forms use110+item. It refreshes both value and attribute
 comparison groups.
 
-`SceneInventory_ShowConsumableDescription` (`5FBF0`, 304 bytes) reads owned IDs
+`Shop_ShowConsumableDescription` (`5FBF0`, 304 bytes) reads owned IDs
 from the signed table at `GameState+160`, or the catalog. It uses frame394,
 the same text window, two counters set to999, and string offset48+item, then
 updates both comparison groups.
 
 ## Grid rendering
 
-`SceneInventory_PopulateEquipmentGrid` (`5FD20`, 536 bytes) uses heading65 and
+`Shop_PopulateEquipmentGrid` (`5FD20`, 536 bytes) uses heading65 and
 kind+240 keyframes. Owned kindFF hides a widget; an equipment query selects
 palette373 or374. Catalog entries compare signed currency at `GameState+7B0`
 against the definition's unsigned halfword at6. Eight packed halfwords at
 `GameState+68` position digit widgets at `((packed & 3)*24+112,
 (signedPacked >> 2)*24+32)`; negative entries hide them.
 
-`SceneInventory_PopulateItemGrid` (`5FF38`, 420 bytes) uses heading63 and the
+`Shop_PopulateItemGrid` (`5FF38`, 420 bytes) uses heading63 and the
 item-keyframe lookup. Owned entries use palette373. Catalog entries compare
 signed currency against the full-word definition value using the observed
 signed comparison. All eight auxiliary digit widgets are hidden.
 
-`SceneInventory_PopulateConsumableGrid` (`600DC`, 616 bytes) uses heading66 and
+`Shop_PopulateConsumableGrid` (`600DC`, 616 bytes) uses heading66 and
 ID+289 keyframes. Owned negative IDs hide their widgets, but the subsequent
 palette path still reads the definition record, including the preceding record
 for ID-1. C preserves the observed address calculation with unsigned integer

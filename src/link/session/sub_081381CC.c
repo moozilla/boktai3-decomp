@@ -1,5 +1,5 @@
 #include "global.h"
-#include "scene/area_effect/area_effect_link.h"
+#include "scene/areas/area_effect_link.h"
 
 #define PlayerValue_GetBand Solar_GetLevelForIntensity
 s32 PlayerValue_GetBand(s32);

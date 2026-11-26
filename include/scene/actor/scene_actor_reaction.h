@@ -1,7 +1,7 @@
 #ifndef GUARD_SCENE_ACTOR_REACTION_H
 #define GUARD_SCENE_ACTOR_REACTION_H
 #include "scene/actor/scene_actor_reset.h"
-#include "scene/actor/scene_actor_restoration.h"
+#include "scene/collision/scene_actor_restoration.h"
 #include "npc/manager/scene_actor_animation.h"
 #include "scene/actor/scene_actor_placement.h"
 /* Tentative reaction callbacks. This overlays only fields directly used by the

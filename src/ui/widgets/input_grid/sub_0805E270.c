@@ -2,8 +2,8 @@
 void SceneInput_InitGlyphPair(struct SceneInputPair *pair)
 {
     struct ContactPosition position;
-    struct SceneInputResource *resource = ScriptProc_Start(0xCB05, 0x530D);
-    struct SceneInputWidget *widget;
+    struct AnimSpriteResource *resource = ScriptProc_Start(0xCB05, 0x530D);
+    struct AnimSprite *widget;
     s32 i;
     pair->resource = *resource;
     ResourceHeader_Relocate(pair, resource);

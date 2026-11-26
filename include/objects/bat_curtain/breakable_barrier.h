@@ -1,7 +1,7 @@
 #ifndef BREAKABLE_BARRIER_H
 #define BREAKABLE_BARRIER_H
 #include "engine/engine.h"
-#include "scene/actor/contact_collider.h"
+#include "scene/collision/contact_collider.h"
 #include "engine/video/sprite.h"
 #include "objects/scene_objects/scene_object.h"
 #include "engine/video/render.h"

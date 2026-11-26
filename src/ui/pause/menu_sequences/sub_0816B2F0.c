@@ -14,7 +14,7 @@ void Script_Call(u32, void *);
 int MessageWindow_SetNumberArgument(int, int);
 void Hud_SetUpdateCallback(void *, void (*)(void));
 void Hud_UpdateSecondPostScriptWait(void);
-void SceneSequence_CallCompletionScript(struct SceneSequence *s)
+void MenuSequence_CallCompletionScript(struct SceneSequence *s)
 {
     Anim_Step(s->animation, s->animationData);
     if (++s->phaseTimer > 149) {

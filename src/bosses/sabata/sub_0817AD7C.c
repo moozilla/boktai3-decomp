@@ -1,7 +1,7 @@
 #include "global.h"
 #include "engine/engine_globals.h"
 #include "engine/ram.h"
-#include "scene/actor/contact_position.h"
+#include "scene/collision/contact_position.h"
 #include "bosses/vanargand/vanargand_projectiles.h"
 
 struct FormationActor {
@@ -39,7 +39,7 @@ static inline s32 FormationRandomValue(void)
     return *(const u16 *)(offset + RANDOM_TABLE_ADDR);
 }
 
-void BossSlot2_SpawnBobbingFormation(struct FormationActor *p)
+void Sabata_SpawnBobbingFormation(struct FormationActor *p)
 {
     struct FormationActor *q = p;
     u32 base;

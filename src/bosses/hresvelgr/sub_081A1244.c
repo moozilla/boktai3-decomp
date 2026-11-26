@@ -1,6 +1,6 @@
 #include "global.h"
 #include "bosses/hresvelgr/hresvelgr_travel.h"
-#include "scene/actor/scene_facing.h"
+#include "scene/motion/scene_facing.h"
 
 void Hresvelgr_SetAnimation(struct HresvelgrTravelActor *, void *, void *, u32, u32, u32);
 

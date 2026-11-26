@@ -2,7 +2,7 @@
 #define GUARD_FROST_EMITTER_H
 
 #include "engine/engine.h"
-#include "scene/actor/contact_swarm.h"
+#include "scene/collision/contact_swarm.h"
 #include "engine/video/display_sequence.h"
 
 struct FrostParticle {

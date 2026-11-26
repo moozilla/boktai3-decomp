@@ -2,7 +2,7 @@
 #define GUARD_WIRELESS_STATUS_MENU_H
 
 #include "engine/engine.h"
-#include "ui/widgets/scene_input_widget.h"
+#include "engine/video/anim_sprite.h"
 #include "engine/video/palette_resource.h"
 
 struct WirelessStatusMenu {
@@ -13,8 +13,8 @@ struct WirelessStatusMenu {
     s32 window;
     void *background, *messageTable;
     u32 completionProcedure;
-    struct SceneInputResource resource;
-    struct SceneInputWidget widget;
+    struct AnimSpriteResource resource;
+    struct AnimSprite widget;
 };
 
 void TextWindowManager_DestroyAllWindows(void);

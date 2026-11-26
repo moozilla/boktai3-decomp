@@ -2,8 +2,8 @@
 #include "player/player.h"
 #include "scene/actor/scene_actor_reaction.h"
 #include "scene/actor/scene_actor_control_phase.h"
-#include "scene/actor/scene_actor_chase_reaction.h"
-#include "scene/actor/scene_actor_terrain.h"
+#include "scene/motion/scene_actor_chase_reaction.h"
+#include "scene/motion/scene_actor_terrain.h"
 
 struct SceneActorApproachCategoryContext {
     u8 unknown0[0x6F0];

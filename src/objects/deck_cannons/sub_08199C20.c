@@ -1,5 +1,5 @@
 #include "global.h"
-#include "scene/actor/contact_position.h"
+#include "scene/collision/contact_position.h"
 struct CallbackSlot {
     u8 unknown0[0x24];
     u32 flags;

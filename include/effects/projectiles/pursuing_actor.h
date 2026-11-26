@@ -2,8 +2,8 @@
 #define GUARD_PURSUING_ACTOR_H
 #include "engine/engine.h"
 #include "engine/math/scene_vec.h"
-#include "scene/actor/contact_collider.h"
-#include "player/cues/player_cue_sequence.h"
+#include "scene/collision/contact_collider.h"
+#include "player/cutscene/player_cue_sequence.h"
 /* Tentative family: resource 8DC7, paired colliders and two short-lived trail sprites. */
 struct PursuingActorSprite {
     u32 flags;

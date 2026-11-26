@@ -9,7 +9,7 @@ struct P {
     struct Q *q;
 };
 
-s32 TentacleActor_HasVisitedRoute(struct P *p, u32 x)
+s32 Centipede_HasVisitedRoute(struct P *p, u32 x)
 {
     struct Q *q = p->q;
     s32 i = 0;

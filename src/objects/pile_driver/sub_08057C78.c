@@ -1,5 +1,5 @@
-#include "objects/pile_driver/scene_panel_effects.h"
-s32 ScenePanel_AdvancePaletteFrame(struct ScenePanelMainSprite *sprite)
+#include "objects/pile_driver/pile_driver_effects.h"
+s32 PileDriver_AdvancePaletteFrame(struct ScenePanelMainSprite *sprite)
 {
     u16 *counter = &sprite->phaseCounter;
     u32 frame;

@@ -1,12 +1,12 @@
-#include "scene/actor/scene_actor_contact_entry.h"
+#include "scene/collision/scene_actor_contact_entry.h"
 #include "scene/actor/scene_actor_control_begin.h"
-#include "scene/actor/scene_actor_terrain_reaction.h"
-#include "scene/actor/scene_actor_chase_shared.h"
+#include "scene/motion/scene_actor_terrain_reaction.h"
+#include "scene/motion/scene_actor_chase_shared.h"
 #include "global.h"
 #include "scene/actor/scene_actor_control_phase.h"
 u8 sub_0812F3CC(struct ChaseActor *);
 // confidence=low: selects a route return phase from motion and route flags.
-#include "scene/actor/scene_actor_chase.h"
+#include "scene/motion/scene_actor_chase.h"
 #include "scene/actor/scene_actor_attachment.h"
 static inline u32 FlagsSave(struct ChaseActor *a, u32 mask, u16 **out)
 {

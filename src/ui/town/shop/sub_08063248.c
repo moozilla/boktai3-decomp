@@ -1,5 +1,5 @@
-#include "ui/town/scene_inventory_lifecycle.h"
-s32 SceneInventory_FinishAndCallScript(struct SceneInventoryLifecycle *p)
+#include "ui/town/shop_lifecycle.h"
+s32 Shop_FinishAndCallScript(struct SceneInventoryLifecycle *p)
 {
     if (p->frame > 31) {
         u32 script = p->completionScript;

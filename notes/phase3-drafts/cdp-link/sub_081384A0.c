@@ -21,7 +21,7 @@ struct SessionScores {
 };
 s32 LinkSession_CountPlayerKind(s32 kind);
 
-void Registry1745_UpdateParticipantScores(struct SessionScores *session)
+void LinkSession_UpdateParticipantScores(struct SessionScores *session)
 {
     struct SessionResults *results = &session->results;
     s32 i = 0;

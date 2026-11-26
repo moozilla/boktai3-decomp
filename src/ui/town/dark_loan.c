@@ -44,7 +44,7 @@ void DarkLoan_EnableAlternateRenderMode(struct DarkLoanScreen *panel)
     struct DarkLoanScreen *current = panel;
     for (i = 21; i >= 0; i--) {
         current->widgets[DARK_LOAN_BACKGROUND].flags |= bit;
-        current = (void *)((u8 *)current + sizeof(struct SceneInputWidget));
+        current = (void *)((u8 *)current + sizeof(struct AnimSprite));
     }
     panel->sprite.flags |= 0x80;
 }
@@ -72,7 +72,7 @@ void DarkLoan_UpdateBalanceDigits(struct DarkLoanScreen *panel)
     s32 value;
     s32 *p;
     struct DisplayResourceHeader *resource;
-    struct SceneInputWidget *anim;
+    struct AnimSprite *anim;
     s32 i;
 
     value = gGameState->menuRewardBalance + panel->adjustment * panel->rate;
@@ -105,7 +105,7 @@ void DarkLoan_UpdateAdjustmentDigits(struct DarkLoanScreen *display)
     s32 *digit, *quantityDigit;
     void *data;
     u32 *base;
-    struct SceneInputWidget *anim;
+    struct AnimSprite *anim;
     u32 *flags;
 
     value = display->adjustment;
@@ -126,13 +126,13 @@ void DarkLoan_UpdateAdjustmentDigits(struct DarkLoanScreen *display)
     }
     digit = digits;
     anim = display->widgets + DARK_LOAN_ADJUSTMENT_DIGITS;
-    flags = base + 10 * (sizeof(struct SceneInputWidget) / sizeof(*base));
+    flags = base + 10 * (sizeof(struct AnimSprite) / sizeof(*base));
     i = 3;
     do {
         *flags &= ~1;
         Anim_LoadKeyframe(anim, data, (u16)(*digit++ + 8), 1);
         anim++;
-        flags = (void *)((u8 *)flags + sizeof(struct SceneInputWidget));
+        flags = (void *)((u8 *)flags + sizeof(struct AnimSprite));
     } while (--i >= 0);
     display->widgets[DARK_LOAN_LOWER_RATE].flags &= ~1;
     value = display->adjustment * display->rate;
@@ -149,13 +149,13 @@ void DarkLoan_UpdateAdjustmentDigits(struct DarkLoanScreen *display)
     }
     quantityDigit = digits;
     anim = display->widgets + DARK_LOAN_AMOUNT_DIGITS;
-    flags = base + 15 * (sizeof(struct SceneInputWidget) / sizeof(*base));
+    flags = base + 15 * (sizeof(struct AnimSprite) / sizeof(*base));
     i = 3;
     do {
         *flags &= ~1;
         Anim_LoadKeyframe(anim, data, (u16)(*quantityDigit++ + 8), 1);
         anim++;
-        flags = (void *)((u8 *)flags + sizeof(struct SceneInputWidget));
+        flags = (void *)((u8 *)flags + sizeof(struct AnimSprite));
     } while (--i >= 0);
 }
 
@@ -248,11 +248,11 @@ void DarkLoan_BeginAdjustment(struct DarkLoanScreen *panel)
     DarkLoan_UpdateAdjustmentDigits(panel);
     panel->warningTimer = 0;
     panel->warningShowing = 0;
-    SceneInputWidget_Show(&panel->widgets[DARK_LOAN_LABEL]);
+    AnimSprite_Show(&panel->widgets[DARK_LOAN_LABEL]);
     panel->sprite.flags &= ~1;
     AnimData_SelectPaletteBank(panel->animation, 0x1B4);
-    SceneInputWidget_Show(&panel->widgets[DARK_LOAN_DECORATIONS]);
-    SceneInputWidget_Show(&panel->widgets[21]);
+    AnimSprite_Show(&panel->widgets[DARK_LOAN_DECORATIONS]);
+    AnimSprite_Show(&panel->widgets[21]);
     MessageWindow_ShowMessage(4);
     panel->adjustmentState[1] = 0;
     panel->adjustmentState[2] = 0;
@@ -599,7 +599,7 @@ void DarkLoan_BuildDisplay(struct DarkLoanScreen *panel, s32 alternate)
     struct DisplayResourceHeader *secondary;
     struct ContactPosition pos;
     s32 flags;
-    struct SceneWidgetPlayback backgroundPlayback;
+    struct AnimSpritePlayback backgroundPlayback;
     u8 backgroundDefault;
     s32 i;
 
@@ -642,7 +642,7 @@ void DarkLoan_BuildDisplay(struct DarkLoanScreen *panel, s32 alternate)
     secondary = savedSecondary;
     for (i = 0; i < 4; i++) {
         struct ContactPosition *position = &pos;
-        struct SceneInputWidget *widget = &panel->widgets[DARK_LOAN_BALANCE_DIGITS + i];
+        struct AnimSprite *widget = &panel->widgets[DARK_LOAN_BALANCE_DIGITS + i];
         Widget_InitLinked(widget, secondary, 0x14, flags, 0, 0, 0x3C, position);
         pos.x += 8;
     }
@@ -650,7 +650,7 @@ void DarkLoan_BuildDisplay(struct DarkLoanScreen *panel, s32 alternate)
     pos.y = 0x38;
     for (i = 0; i < 4; i++) {
         struct ContactPosition *position = &pos;
-        struct SceneInputWidget *widget = &panel->widgets[DARK_LOAN_ADJUSTMENT_DIGITS + i];
+        struct AnimSprite *widget = &panel->widgets[DARK_LOAN_ADJUSTMENT_DIGITS + i];
         Widget_InitLinked(widget, primary, 8, flags, 0, 0, 0x3C, position);
         pos.x += 8;
     }
@@ -667,7 +667,7 @@ void DarkLoan_BuildDisplay(struct DarkLoanScreen *panel, s32 alternate)
     pos.y = 0x48;
     for (i = 0; i < 4; i++) {
         struct ContactPosition *position = &pos;
-        struct SceneInputWidget *widget = &panel->widgets[DARK_LOAN_AMOUNT_DIGITS + i];
+        struct AnimSprite *widget = &panel->widgets[DARK_LOAN_AMOUNT_DIGITS + i];
         Widget_InitLinked(widget, primary, 8, flags, 0, 0, 0x3C, position);
         pos.x += 8;
     }

@@ -2,7 +2,7 @@
 #include "engine/video/render.h"
 #include "engine/engine.h"
 #include "engine/ram.h"
-#include "effects/scene/bat_flock.h"
+#include "effects/bat_flock.h"
 #define gRandomTableIndex gRandomIndex
 
 struct ScreenPaletteTransition {

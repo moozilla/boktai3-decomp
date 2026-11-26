@@ -25,7 +25,7 @@ s32 TimedEffect_UpdateTerrainTurn(struct TimedEffectManager *, struct Task4E01Pr
 s32 TimedEffect_UpdateManager(struct TimedEffectManager *);
 s32 TimedEffect_DestroyManager(struct TimedEffectManager *);
 s32 TimedEffect_InitManager(struct TimedEffectManager *, s32);
-struct TimedEffectManager *Task4E01_GetOrCreate(void);
+struct TimedEffectManager *ProjectileTask_GetOrCreate(void);
 struct TimedEffectManager *TimedEffect_GetOrCreateManager(s32);
 struct Task4E01Projectile *TimedEffect_FindFreeEntry(struct TimedEffectManager *, s32 *);
 #endif

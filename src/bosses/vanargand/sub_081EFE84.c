@@ -1,7 +1,7 @@
 #include "global.h"
 
-#include "scene/actor/contact_swarm.h"
-#include "player/cues/player_cue_sequence.h"
+#include "scene/collision/contact_swarm.h"
+#include "player/cutscene/player_cue_sequence.h"
 
 // Drawable layout shared with ActorDisplay_UpdateForegroundSprite.
 struct Drawable {
@@ -33,7 +33,7 @@ static inline u8 ConsumeEntry(u8 *p)
     return FALSE;
 }
 
-void SingletonSlot7_UpdateTransitionDisplay(u8 *p)
+void VanargandHead_UpdateTransitionDisplay(u8 *p)
 {
     u8 *context = p;
     u32 flag = ConsumeEntry(context);

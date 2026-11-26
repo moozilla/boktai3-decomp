@@ -1,5 +1,5 @@
 #include "scene/actor/modifier_list.h"
-#include "scene/area_effect/area_effect_link.h"
+#include "scene/areas/area_effect_link.h"
 extern void (*const gUnk_086058EC[])(struct ModifierMenu *);
 void ModifierMenu_CloseScript(struct ModifierMenu *);
 void ModifierMenu_ClearDisplay(struct ModifierMenu *);

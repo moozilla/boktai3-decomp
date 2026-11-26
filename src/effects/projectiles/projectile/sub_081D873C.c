@@ -1,4 +1,4 @@
-#include "player/cues/player_cue_sequence.h"
+#include "player/cutscene/player_cue_sequence.h"
 struct TaskSequenceConfig {
     u16 flags, duration;
 };
@@ -11,7 +11,7 @@ struct Actor {
     u8 unknownB8[0x180 - 0xB8];
     struct DisplaySequenceState frames;
 };
-s32 Task4E01_StepTimedSequence(struct Actor *p)
+s32 ProjectileTask_StepTimedSequence(struct Actor *p)
 {
     struct TaskSequenceConfig *config = &p->config;
     u32 bit = 2;

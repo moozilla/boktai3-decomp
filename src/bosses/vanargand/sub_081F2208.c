@@ -15,7 +15,7 @@ void SpatialIndex_InitEntry(void *, struct PackedVector *, struct PackedVector *
                             void *);
 void SpatialIndex_InsertEntry(void *);
 void MotionEffectPool_OnRenderComplete(void *);
-void SingletonSlot7_OnEffectMotionComplete(void *);
+void VanargandHead_OnEffectMotionComplete(void *);
 
 s32 SpriteTrail_InitializeEntry(void *pool, struct SpriteTrail *p, s32 index)
 {
@@ -62,5 +62,5 @@ s32 SpriteTrail_InitializeEntry(void *pool, struct SpriteTrail *p, s32 index)
     offset.xy.hi = 0;
     offset.z.lo = 0;
     SpatialIndex_InitEntry(collider, &position, &size, &offset, 12, 5, 1, p->collisionArg0,
-                           p->collisionArg1, SingletonSlot7_OnEffectMotionComplete, p);
+                           p->collisionArg1, VanargandHead_OnEffectMotionComplete, p);
 }

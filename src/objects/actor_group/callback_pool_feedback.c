@@ -227,7 +227,7 @@ void CallbackPool_RefreshHealthDisplay(struct CallbackPoolEntry *entry)
     u8 *level;
     if (entry->spawnTarget > *(level = &entry->spawnIndex)) {
         s32 diff = entry->maxHealth - entry->health;
-        if (!(u8)Pool184_TestStatusFlags(entry, 1))
+        if (!(u8)ActorGroupPool_TestStatusFlags(entry, 1))
             ProximityActor_SetState(entry, 2);
         if (diff >= entry->damageThreshold * (*level - 1))
             ProximityActor_SetState(entry, 1);
@@ -238,13 +238,13 @@ void ProximityActor_CheckPlayerRange(struct CallbackPoolEntry *actor)
 {
     struct ContactPosition delta;
     s32 distance;
-    if (!(u8)Pool184_TestStatusFlags(actor, 1)) {
+    if (!(u8)ActorGroupPool_TestStatusFlags(actor, 1)) {
         CallbackPool_Subtract(&delta, &actor->sprite.position, &gPlayers[0]->position);
         distance = delta.x * delta.x + delta.z * delta.z;
         actor->distanceSquared = distance;
         if (actor->distanceSquared < actor->triggerDistanceSquared) {
             ProximityActor_SetState(actor, 2);
-            Pool184_AddStatusFlags(actor, 1);
+            ActorGroupPool_AddStatusFlags(actor, 1);
             Sound_PlaySong(0x3C7);
         }
     }

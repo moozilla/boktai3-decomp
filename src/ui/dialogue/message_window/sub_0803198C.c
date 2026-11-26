@@ -1,5 +1,5 @@
 #include "ui/dialogue/message_window.h"
-#include "player/cues/player_cue_sequence.h"
+#include "player/cutscene/player_cue_sequence.h"
 #include "ui/widgets/scene_input.h"
 
 void TextWindow_InitializeGraphics(void);
@@ -12,7 +12,7 @@ int sub_0803198C(void *arg0, void *arg1)
     struct MessageWindow *p = arg0;
     struct MessagePlaybackState *st;
     u32 buf[2];
-    struct SceneInputResource *proc;
+    struct AnimSpriteResource *proc;
     s32 palette;
     u32 bufferMask;
     void **fnSlot;

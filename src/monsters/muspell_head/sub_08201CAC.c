@@ -16,8 +16,8 @@ struct S {
 };
 void SpriteParticle_CreateDefaultVariant4384(void *, u32, u32, u32, u32, u32, u32, u32, u32, u32,
                                              u32, u32);
-void ScriptCombatActor_RecordDefeat(void *);
-u32 ScriptCombatActor_UpdateDefeatEffect(struct S *p)
+void MuspellHead_RecordDefeat(void *);
+u32 MuspellHead_UpdateDefeatEffect(struct S *p)
 {
     if (p->h1a8 == 0) {
         if (p->w18 <= 0x23) {
@@ -33,7 +33,7 @@ u32 ScriptCombatActor_UpdateDefeatEffect(struct S *p)
                                                     1, 2, 0x200);
         }
         if (p->w18 == 1)
-            ScriptCombatActor_RecordDefeat(p);
+            MuspellHead_RecordDefeat(p);
     }
     return 0;
 }

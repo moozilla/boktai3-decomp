@@ -33,7 +33,7 @@ static inline void VecSub(struct Vec080A9688 *d, struct Vec080A9688 *a, struct V
     d->z = a->z - b->z;
 }
 
-void TentacleActor_UpdateSegmentHeadings(u8 *p)
+void Centipede_UpdateSegmentHeadings(u8 *p)
 {
     struct Group080A9688 *g = *(struct Group080A9688 **)(p + 0x3d0);
     struct Vec080A9688 d;

@@ -1,6 +1,6 @@
 #include "effects/feathers/feather_effect_pool.h"
 #include "engine/ram.h"
-#include "player/cues/player_cue_sequence.h"
+#include "player/cutscene/player_cue_sequence.h"
 void Sprite_Remove(void *);
 static inline void SelectDirection(u8 *angle, u8 *row, u8 *flip)
 {

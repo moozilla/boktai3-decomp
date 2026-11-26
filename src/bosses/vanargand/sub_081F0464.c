@@ -20,7 +20,7 @@ void SpatialIndex_InitEntry(void *, struct Slot7PackedVector *, struct Slot7Pack
                             struct Slot7PackedVector *, s32, s32, s32, s32, s32, void (*)(void),
                             void *);
 void SpatialIndex_InsertEntry(void *);
-void SingletonSlot7_InitSecondaryCollider(struct Slot7Actor *actor)
+void VanargandHead_InitSecondaryCollider(struct Slot7Actor *actor)
 {
     void *collider = &actor->secondaryColliderFlags;
     struct Slot7PackedVector position, size, offset;

@@ -17,7 +17,7 @@ Stopped on `build/STOP` during Tentacle actor. The assigned queue went from 604 
 
 - Both Spider wander priority reports remain open. Three draws advance one cursor across the navigation call. With a plain table and cursor, the stock compiler rematerializes the table and keeps the radius in sb. Forcing the observed input, body, table, cursor and mask placements with table/cursor equivalence disabled is diagnostic-exact. The shared sampler, paired cursor/table state, and native radius, mesh, and route-result forms did not reproduce that allocation in stock C. Candidates and result summaries are under `build/cx/work/spider_wander/`.
 
-- `TentacleActor_SpawnSparkBurst` (080AB294) is diagnostic-exact with a plain table pointer and `AGBCC_NOEQUIV=tbl`. Stock preserves the wrap mask in sl and rematerializes the table, while the ROM keeps the table in r7 and reloads the mask. The 43 typed pointer, packed vector, and shared sampler trials did not remove the union. See `build/cx/work/tentacle_sparks/trials.result`.
+- `Centipede_SpawnSparkBurst` (080AB294) is diagnostic-exact with a plain table pointer and `AGBCC_NOEQUIV=tbl`. Stock preserves the wrap mask in sl and rematerializes the table, while the ROM keeps the table in r7 and reloads the mask. The 43 typed pointer, packed vector, and shared sampler trials did not remove the union. See `build/cx/work/tentacle_sparks/trials.result`.
 
 ## Tool changes
 - Scope `why` reads actual K/E records to explain earlier ownership of a local register and the density comparison behind its eviction. On the Bat sampler candidate, the new diagnostic suggests the exact confirming intervention. The 230 scope tests pass.

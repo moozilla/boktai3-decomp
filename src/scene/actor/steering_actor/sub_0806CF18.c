@@ -1,4 +1,4 @@
-#include "scene/actor/scene_steering_actor.h"
+#include "scene/motion/scene_steering_actor.h"
 /* SceneSteeringActor_RequestTravelDepartureAll: Changes all state-four travel actors to departure state five without modifying entry latches */
 #define SceneSteeringActor_RequestTravelDepartureAll sub_0806CF18
 #define SceneSteeringActor_FinishSettledAll          sub_0806CF18

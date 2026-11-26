@@ -1,5 +1,5 @@
 #include "minigames/result_game/result_tutorial.h"
-#include "scene/actor/contact_actor.h"
+#include "scene/collision/contact_actor.h"
 #include "player/player.h"
 int ResultMenu_IsPhaseStart(void *);
 void sub_0801B700(void *);

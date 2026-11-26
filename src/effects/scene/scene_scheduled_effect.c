@@ -3,10 +3,10 @@
 #include "engine/ram.h"
 #include "engine/engine.h"
 #include "player/player.h"
-#include "scene/actor/contact_actor.h"
+#include "scene/collision/contact_actor.h"
 #include "engine/engine_pause.h"
 
-u8 SceneActor14_UpdateAnimState(struct SceneScheduledEffect *);
+u8 SpriteEffectSet_UpdateAnimState(struct SceneScheduledEffect *);
 
 void Collider_SetPosition(void *, void *, u32);
 
@@ -14,7 +14,7 @@ s32 Collider_Refresh(void *);
 
 void SceneScheduledEffect_UpdateEntry(struct SceneScheduledEffect *s)
 {
-    if (SceneActor14_UpdateAnimState(s) == 0) {
+    if (SpriteEffectSet_UpdateAnimState(s) == 0) {
         if ((s16)s->variant == 1) {
             struct ContactCollider *p = &s->collider;
             Collider_SetPosition(p, &s->position, 0);
@@ -211,7 +211,7 @@ void StateSprite_InitAnimation(struct SceneScheduledEffect *sprite, s32 type, s3
                                s32 variant)
 {
     struct SceneScheduledEffectPool *pool = gAnimatedBodyPool;
-    struct SceneInputResource *data;
+    struct AnimSpriteResource *data;
     s32 index = direction * 3 + type * 9;
     sprite->animationIndex = index;
     sprite->variant = variant;

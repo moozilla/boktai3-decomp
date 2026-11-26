@@ -1,9 +1,9 @@
-#include "objects/pile_driver/scene_panel_rig.h"
+#include "objects/pile_driver/pile_driver_rig.h"
 static inline s32 scale(s32 value)
 {
     return value >= 0 ? value >> 12 : -((-value) >> 12);
 }
-void ScenePanelRig_TickKnockback(struct ScenePanelRig *input)
+void PileDriverRig_TickKnockback(struct ScenePanelRig *input)
 {
     struct ScenePanelRig *rig = input;
     s32 dx, dz;
@@ -42,5 +42,5 @@ void ScenePanelRig_TickKnockback(struct ScenePanelRig *input)
         *force = *force * 3 >> 2;
     }
     if (rig->contactForce == 0)
-        ScenePanelRig_SetState(rig, 8);
+        PileDriverRig_SetState(rig, 8);
 }

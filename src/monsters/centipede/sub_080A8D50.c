@@ -1,12 +1,12 @@
 #include "global.h"
-/* TentacleBody_InitSegmentAnimations: Loads animation data and scripts for each tentacle segment */
+/* CentipedeBody_InitSegmentAnimations: Loads animation data and scripts for each tentacle segment */
 
 s32 Div(s32, s32);
 s32 AnimData_Load(void *, s32);
 void Sprite_Init(void *, void *, s32);
 void *ScriptProc_Start(u16, u16);
 u32 Anim_SetSequence(void *, void *, u32, u32, u32);
-void TentacleBody_GetDirectionFrame(s32, s32 *, s32 *);
+void CentipedeBody_GetDirectionFrame(s32, s32 *, s32 *);
 
 struct Anim080A8D50 {
     u8 pad0[0x8];
@@ -37,7 +37,7 @@ struct Body080A8D50 {
     s32 limit;
 };
 
-void TentacleBody_InitSegmentAnimations(u8 *p, s32 animId, u32 scriptKey, u32 direction)
+void CentipedeBody_InitSegmentAnimations(u8 *p, s32 animId, u32 scriptKey, u32 direction)
 {
     struct Body080A8D50 *g = *(struct Body080A8D50 **)(p + 0x3d0);
     s32 first, i, phase;
@@ -57,7 +57,7 @@ void TentacleBody_InitSegmentAnimations(u8 *p, s32 animId, u32 scriptKey, u32 di
         segment->anim.direction = direction;
         segment->anim.script = ScriptProc_Start(0x922e, scriptKey);
         if (i == g->count - 1) {
-            TentacleBody_GetDirectionFrame((segment->anim.direction + 0x80) & 0xff, &row, &frame);
+            CentipedeBody_GetDirectionFrame((segment->anim.direction + 0x80) & 0xff, &row, &frame);
             Anim_SetSequence(&segment->anim, segment->anim.script, 1, (u8)row, (u8)frame);
             {
                 u32 t = 4;
@@ -65,7 +65,7 @@ void TentacleBody_InitSegmentAnimations(u8 *p, s32 animId, u32 scriptKey, u32 di
                 segment->anim.flags = t;
             }
         } else {
-            TentacleBody_GetDirectionFrame(segment->anim.direction, &row, &frame);
+            CentipedeBody_GetDirectionFrame(segment->anim.direction, &row, &frame);
             Anim_SetSequence(&segment->anim, segment->anim.script, 2, (u8)row, (u8)frame);
             segment->anim.phase = phase;
             if (++phase > 3)

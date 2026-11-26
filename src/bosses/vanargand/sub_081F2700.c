@@ -3,7 +3,7 @@
 void SpriteGroup_RemoveSlot(u8 *, u8 *, s32);
 void SpatialIndex_RemoveEntry(u8 *);
 
-u32 SingletonSlot7_DestroyEffectPool(u8 *p)
+u32 VanargandHead_DestroyEffectPool(u8 *p)
 {
     u8 *q = p + 0x20;
     s32 i = 0;

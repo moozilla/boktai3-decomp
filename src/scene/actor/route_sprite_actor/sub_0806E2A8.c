@@ -1,4 +1,4 @@
-#include "scene/actor/route_sprite_actor.h"
+#include "scene/motion/route_sprite_actor.h"
 static inline u8 Occupied(u32 *mask, s32 index, u32 one)
 {
     if (*mask & (one << index))

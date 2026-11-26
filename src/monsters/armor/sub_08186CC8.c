@@ -1,6 +1,6 @@
 #include "global.h"
 #include "system/game_state/game_state.h"
-#include "scene/actor/contact_position.h"
+#include "scene/collision/contact_position.h"
 #include "scene/actor/scene_actor_components.h"
 #include "monsters/armor/armor_decision_ops.h"
 struct ArmorSelection {

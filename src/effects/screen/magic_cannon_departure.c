@@ -98,7 +98,7 @@ void SceneTransition_SpawnFlyingParticle(s32 x, s32 y, u32 flags)
 
 void BgGfx_LoadTilemapAtPosition(u32, s32, s32);
 
-void Registry6A37_UpdateBackgroundScroll(struct SceneTransition *transition)
+void MagicCannonDeparture_UpdateBackgroundScroll(struct SceneTransition *transition)
 {
     BgGfx_LoadTilemapAtPosition(3, transition->scroll.x, transition->scroll.y);
 }
@@ -125,7 +125,7 @@ void SceneTransition_BeginOffsetMove(struct SceneTransition *transition)
     }
     ContactImpactEffect_BeginInterpolatedPosition(transition->target, (s16 *)&a, (s16 *)&b, 0x18, 1,
                                                   0x78);
-    transition->update = Registry6A37_UpdateDisplayHold;
+    transition->update = MagicCannonDeparture_UpdateDisplayHold;
     transition->timer = zero;
 }
 
@@ -151,7 +151,7 @@ void SceneTransition_BeginVectorTween(struct SceneTransition *transition)
     }
     PositionMotion_InitTimedInterpolation((u8 *)&transition->motion, &transition->scroll, a, b,
                                           0x5a);
-    transition->update = Registry6A37_UpdateSecondScrollTransition;
+    transition->update = MagicCannonDeparture_UpdateSecondScrollTransition;
     transition->timer = zero;
 }
 
@@ -182,21 +182,21 @@ void SceneTransition_BeginFirstScroll(struct SceneTransition *transition)
     {
         s32 zero;
         ScreenTransition_SendCommand(0, 4, 0x1f, 0x1f, 0x1f, 0xFFFF, zero = 0);
-        transition->update = Registry6A37_UpdateFirstScrollTransition;
+        transition->update = MagicCannonDeparture_UpdateFirstScrollTransition;
         transition->timer = zero;
     }
 }
 
 void Sound_PlaySong(u32);
 
-void Registry6A37_StartSoundPhase(struct SceneTransition *transition)
+void MagicCannonDeparture_StartSoundPhase(struct SceneTransition *transition)
 {
     Sound_PlaySong(0x50F);
     transition->update = SceneTransition_UpdateShakingBackground;
     transition->timer = 0;
 }
 
-void Registry6A37_StartFadeIn(struct SceneTransition *transition)
+void MagicCannonDeparture_StartFadeIn(struct SceneTransition *transition)
 {
     s16 *v = (&transition->scroll.x);
     s16 a = 0x15e, b = 0xc4;
@@ -205,32 +205,32 @@ void Registry6A37_StartFadeIn(struct SceneTransition *transition)
     v[1] = b;
     v[2] = z;
     ScreenTransition_SendCommand(0, 6, 4, 4, 4, 0xFFFF, z);
-    transition->update = Registry6A37_UpdateFadeIn;
+    transition->update = MagicCannonDeparture_UpdateFadeIn;
     transition->timer = z;
 }
 
-void Registry6A37_StartFadeOut(struct SceneTransition *transition)
+void MagicCannonDeparture_StartFadeOut(struct SceneTransition *transition)
 {
     ScreenTransition_SendCommand(1, 6, 4, 4, 4, 0xFFFF, 0);
-    transition->update = Registry6A37_UpdateFadeOut;
+    transition->update = MagicCannonDeparture_UpdateFadeOut;
     transition->timer = 0;
 }
 
-void Registry6A37_UpdateDisplayHold(struct SceneTransition *transition)
+void MagicCannonDeparture_UpdateDisplayHold(struct SceneTransition *transition)
 {
-    Registry6A37_UpdateBackgroundScroll(transition);
+    MagicCannonDeparture_UpdateBackgroundScroll(transition);
     if (transition->timer > 0xb3) {
-        Registry6A37_StartFadeOut(transition);
+        MagicCannonDeparture_StartFadeOut(transition);
     }
     transition->timer++;
 }
 
 void MotionTrack_Update(u8 *);
 
-void Registry6A37_UpdateSecondScrollTransition(struct SceneTransition *transition)
+void MagicCannonDeparture_UpdateSecondScrollTransition(struct SceneTransition *transition)
 {
     s32 r;
-    Registry6A37_UpdateBackgroundScroll(transition);
+    MagicCannonDeparture_UpdateBackgroundScroll(transition);
     MotionTrack_Update((u8 *)&transition->motion);
     r = 0;
     if (transition->motion.state == 2)
@@ -240,10 +240,10 @@ void Registry6A37_UpdateSecondScrollTransition(struct SceneTransition *transitio
     transition->timer++;
 }
 
-void Registry6A37_UpdateFirstScrollTransition(struct SceneTransition *transition)
+void MagicCannonDeparture_UpdateFirstScrollTransition(struct SceneTransition *transition)
 {
     s32 r;
-    Registry6A37_UpdateBackgroundScroll(transition);
+    MagicCannonDeparture_UpdateBackgroundScroll(transition);
     MotionTrack_Update((u8 *)&transition->motion);
     r = 0;
     if (transition->motion.state == 2)
@@ -265,7 +265,7 @@ void SceneTransition_UpdateShakingBackground(struct SceneTransition *transition)
     u32 *seed;
     u16 index;
     s32 timer, range, random;
-    Registry6A37_UpdateBackgroundScroll(transition);
+    MagicCannonDeparture_UpdateBackgroundScroll(transition);
     table = gRandomTable;
     seed = &gRandomIndex;
     index = *seed + 1;
@@ -286,9 +286,9 @@ void SceneTransition_UpdateShakingBackground(struct SceneTransition *transition)
     transition->timer++;
 }
 
-void Registry6A37_UpdateFadeOut(struct SceneTransition *transition)
+void MagicCannonDeparture_UpdateFadeOut(struct SceneTransition *transition)
 {
-    Registry6A37_UpdateBackgroundScroll(transition);
+    MagicCannonDeparture_UpdateBackgroundScroll(transition);
     transition->timer++;
     if (transition->timer > 0x3f) {
         if (transition->exitScript) {
@@ -296,27 +296,27 @@ void Registry6A37_UpdateFadeOut(struct SceneTransition *transition)
             Task_Kill(transition->target);
             Task_Kill(transition);
         } else {
-            Registry6A37_StartFadeIn(transition);
+            MagicCannonDeparture_StartFadeIn(transition);
         }
     }
 }
 
-void Registry6A37_UpdateFadeIn(struct SceneTransition *transition)
+void MagicCannonDeparture_UpdateFadeIn(struct SceneTransition *transition)
 {
-    Registry6A37_UpdateBackgroundScroll(transition);
+    MagicCannonDeparture_UpdateBackgroundScroll(transition);
     transition->timer++;
     if (transition->timer > 0x3f) {
-        Registry6A37_StartSoundPhase(transition);
+        MagicCannonDeparture_StartSoundPhase(transition);
     }
 }
 
-void Registry6A37_Update(struct SceneTransition *transition)
+void MagicCannonDeparture_Update(struct SceneTransition *transition)
 {
     if (transition->update != 0)
         Callback_InvokeActor(transition, transition->update);
 }
 
-void Registry6A37_OnDestroy(void *transition)
+void MagicCannonDeparture_OnDestroy(void *transition)
 {
 }
 
@@ -381,7 +381,7 @@ void SceneTransition_LoadBackground(struct SceneTransition *screen)
     CpuSet(palette->colors, gBgPaletteBuffer, 0x04000080);
 }
 
-void *RegistryF3E4_CreateHidden(s32, s32);
+void *PopInSprite_CreateHidden(s32, s32);
 
 // confidence=low: sets up the layers, reads keyword 'e' as the script, starts the fade-in and
 
@@ -397,28 +397,28 @@ s32 SceneTransition_Initialize(struct SceneTransition *transition, void *scriptA
         transition->exitScript = Script_GetValue();
     else
         transition->exitScript = value;
-    Registry6A37_StartFadeIn(transition);
+    MagicCannonDeparture_StartFadeIn(transition);
     {
         transition->motion.position = 0;
         transition->motion.state = 0;
         transition->motion.mode = 0;
         transition->motion.timer = 0;
     }
-    transition->target = RegistryF3E4_CreateHidden(2, 0);
+    transition->target = PopInSprite_CreateHidden(2, 0);
     transition->particleFlags = 1;
 #ifdef UBFIX
-    // falls off the end; r0 still holds the RegistryF3E4_CreateHidden result (a heap pointer)
+    // falls off the end; r0 still holds the PopInSprite_CreateHidden result (a heap pointer)
     return (s32)transition->target;
 #endif
 }
 
 void *Task_Create(u32, u32);
 
-void *Registry6A37_Create(void *a)
+void *MagicCannonDeparture_Create(void *a)
 {
     void *transition = Task_Create(0xb, 0x70);
     if (transition != 0) {
-        Task_SetCallbacks(transition, Registry6A37_Update, Registry6A37_OnDestroy);
+        Task_SetCallbacks(transition, MagicCannonDeparture_Update, MagicCannonDeparture_OnDestroy);
         if (SceneTransition_Initialize(transition, a) < 0) {
             Task_Kill(transition);
             return 0;

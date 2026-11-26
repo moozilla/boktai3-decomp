@@ -6,8 +6,8 @@ void SceneHud_SetKeyframePaletteBank(void *, u32);
 void Storage_InitWidgets(struct StorageScreen *p)
 {
     struct SceneInputPosition pos;
-    struct SceneInputResource *r;
-    struct SceneWidgetPlayback labelPlayback;
+    struct AnimSpriteResource *r;
+    struct AnimSpritePlayback labelPlayback;
     u8 labelPriority;
     s32 i;
     r = ScriptProc_Start(0xCB05, 0x5D04);

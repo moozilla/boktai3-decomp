@@ -6,7 +6,7 @@ struct StorageWidget {
 void Storage_SetInteractionMode(u8 *, u32);
 void Storage_GetSlotPosition(void *, s32);
 
-void SceneInventory_SetState(u8 *p, u32 state, u32 mode)
+void Storage_SetState(u8 *p, u32 state, u32 mode)
 {
     *(u32 *)(p + 0x17F4) = state;
     Storage_SetInteractionMode(p, mode);

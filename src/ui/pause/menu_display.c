@@ -75,7 +75,7 @@ static inline void SetPos(struct ContactPosition *position, s32 x, s32 y)
     position->z = 0;
 }
 
-static inline void Show(struct SceneInputWidget *widget, s32 *mask)
+static inline void Show(struct AnimSprite *widget, s32 *mask)
 {
     u32 flags = widget->flags;
     *mask = ~1;
@@ -108,7 +108,7 @@ void MenuDisplay_DrawStatComparison(struct MenuDisplay *hud, s32 col, s32 row)
         {
             /* Advance one row of three widget slots in the shared HUD layout. */
             struct MenuDisplay *rowLayout =
-                (struct MenuDisplay *)(i * 3 * sizeof(struct SceneInputWidget) + (u32)hud);
+                (struct MenuDisplay *)(i * 3 * sizeof(struct AnimSprite) + (u32)hud);
             Show(&rowLayout->hud.motionWidgets[2], &showMask);
             Show(&rowLayout->hud.motionWidgets[3], &showMask);
             Show(&rowLayout->hud.motionWidgets[4], &showMask);

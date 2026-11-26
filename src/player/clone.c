@@ -131,17 +131,17 @@ static inline u16 Clone_NextRandomAngle(void)
     return gUnk_086141BC[gEffectRandomTableIndex];
 }
 
-static inline void Clone_EnableRiseFlag(struct SceneInputWidget *animation)
+static inline void Clone_EnableRiseFlag(struct AnimSprite *animation)
 {
     animation->flags |= 0x400;
 }
 
-static inline void Clone_DisableRiseFlag(struct SceneInputWidget *animation)
+static inline void Clone_DisableRiseFlag(struct AnimSprite *animation)
 {
     animation->flags &= ~0x400;
 }
 
-static inline struct SceneInputWidget *Clone_GetAnimation(struct PlayerCloneSlot *clone)
+static inline struct AnimSprite *Clone_GetAnimation(struct PlayerCloneSlot *clone)
 {
     return &clone->animation;
 }
@@ -192,7 +192,7 @@ s32 PlayerClone_UpdateBehavior(struct PlayerCloneSlot *clone, s32 index)
             struct ContactPosition *initialPosition;
             CLONE_DISABLE_COLLIDER(body);
             ScaledShadow_Enable(clone->shadow);
-            SceneInputWidget_Hide(&clone->animation);
+            AnimSprite_Hide(&clone->animation);
             direction = params->angle;
             Clone_CreateAngleVector(&offset, direction + 0x80, Div(clone->timer << 9, 30));
             {
@@ -201,7 +201,7 @@ s32 PlayerClone_UpdateBehavior(struct PlayerCloneSlot *clone, s32 index)
                 Clone_AddVectors(destination, &offset, initialPosition);
             }
             if (clone->timer > 30) {
-                SceneInputWidget_Show(&clone->animation);
+                AnimSprite_Show(&clone->animation);
                 Clone_MaskColliderFlags(~4, body);
                 clone->behaviorPhase = 1;
                 clone->flags &= ~1;
@@ -215,7 +215,7 @@ s32 PlayerClone_UpdateBehavior(struct PlayerCloneSlot *clone, s32 index)
         }
 
         case 1: {
-            struct SceneInputWidget *display;
+            struct AnimSprite *display;
             if (clone->timer & 1)
                 SpriteParticle_CreateDefaultVariant4384(&clone->position, 0x28, 0x20, 0xc, 4, 0x18,
                                                         Clone_NextRandomByte(), 0x20, 0x20, 3, 2,
@@ -271,8 +271,8 @@ s32 PlayerClone_UpdateBehavior(struct PlayerCloneSlot *clone, s32 index)
                 s32 dx = playerPosition->x - pos->x;
                 s32 dz = playerPosition->z - pos->z;
                 if (((dx * dx) + (dz * dz)) <= 0xffff) {
-                    struct SceneInputWidget *animation;
-                    struct SceneInputResource *resource;
+                    struct AnimSprite *animation;
+                    struct AnimSpriteResource *resource;
                     struct PlayerCloneManager *pool;
                     s16 *timer = &clone->attackTimer;
                     s32 z = 0;
@@ -397,10 +397,10 @@ void PlayerClone_InitSlot(void *unused, struct PlayerCloneSlot *s, u32 arg)
     }
     res = ScriptProc_Start(0xcb05, 0xde23);
     {
-        struct SceneInputResource *obj = &s->resource;
+        struct AnimSpriteResource *obj = &s->resource;
         ResourceHeader_Relocate(obj, res);
         {
-            struct SceneInputWidget *p = &s->animation;
+            struct AnimSprite *p = &s->animation;
             Widget_InitLinked(p, obj, 0, 0, 2, 1, zero, zero);
             s->animation.flags |= 1;
             value = ActorDebris_Create(p, &s->foldedFacing, &s->mirrored);
@@ -464,7 +464,7 @@ void ActorDebris_Hide(u32);
 void PlayerClone_ReleaseSlot(struct PlayerCloneManager *a, struct PlayerCloneSlot *b, u32 n)
 {
     struct ContactCollider *s;
-    struct SceneInputWidget *w;
+    struct AnimSprite *w;
     u32 m;
     a->count--;
     ScaledShadow_Disable(b->shadow);
@@ -555,12 +555,12 @@ static inline u8 Clone_ColliderHasFlags(struct CloneColliderHeader header, s16 m
     return mask != 0;
 }
 
-static inline void CloneAnim_SetPaletteFlags(struct SceneInputWidget *anim, u16 flags)
+static inline void CloneAnim_SetPaletteFlags(struct AnimSprite *anim, u16 flags)
 {
     anim->paletteBank = flags;
 }
 
-static inline void CloneAnim_SetPalette(struct SceneInputWidget *anim, void *palette)
+static inline void CloneAnim_SetPalette(struct AnimSprite *anim, void *palette)
 {
     anim->palette = palette;
 }
@@ -576,7 +576,7 @@ s32 PlayerClone_UpdatePool(struct PlayerCloneManager *pool)
     u32 stride = sizeof(*slot);
     u32 stateOffset = CloneMemberOffset_Value((u32) & ((struct PlayerCloneSlot *)0)->flags);
     do {
-        struct SceneInputWidget *walkAnim = &slot->animation;
+        struct AnimSprite *walkAnim = &slot->animation;
         struct ContactCollider *area;
         u8 *facing;
         struct CloneAreaWork areaWork;
@@ -584,10 +584,10 @@ s32 PlayerClone_UpdatePool(struct PlayerCloneManager *pool)
         active = pool->activeSlots & (1 << i);
         area = &slot->area;
         if (active) {
-            struct SceneInputWidget *anim = walkAnim;
+            struct AnimSprite *anim = walkAnim;
             struct PlayerCloneConfiguration *params = &slot->configuration;
             struct ContactCollider *collider;
-            struct SceneInputWidget *metadata;
+            struct AnimSprite *metadata;
             u32 paused;
             s32 callbackResult;
 
@@ -783,7 +783,7 @@ s32 PlayerClone_Spawn(struct PlayerCloneConfiguration *resource, struct ContactP
         slot = PlayerClone_FindFreeSlot(pool, &scratch.index);
         if (slot) {
             struct PlayerCloneConfiguration *handler = &slot->configuration;
-            struct SceneInputWidget *display;
+            struct AnimSprite *display;
             struct ContactPosition *tmp;
             Memory_Copy(handler, resource, sizeof(*resource));
             slot->timer = 0;

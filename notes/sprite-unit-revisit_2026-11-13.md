@@ -17,8 +17,8 @@ holds rotation, `unknown4` stores linked/visible, and `unknownA[0]` selects the
 list. The renderer casts the scale bytes to their signed interpretation.
 
 The effect list helpers reuse `SpriteDrawable` from `include/engine/video/sprite_oam.h`.
-The animation list helpers reuse `SceneInputWidget` from
-`include/ui/widgets/scene_input_widget.h`. Private padded list views were removed.
+The animation list helpers reuse `AnimSprite` from
+`include/engine/video/anim_sprite.h`. Private padded list views were removed.
 
 `SpriteRenderResource` unifies the resource views into a 28-byte record with
 palette key, bounds, palette/tile/frame pointers, and the trailing word copied

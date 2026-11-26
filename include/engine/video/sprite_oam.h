@@ -1,7 +1,7 @@
 #ifndef GUARD_SPRITE_OAM_H
 #define GUARD_SPRITE_OAM_H
 #include "engine/video/render.h"
-#include "scene/actor/contact_position.h"
+#include "scene/collision/contact_position.h"
 /* Drawable render-list object; list links are shared by the Effect API. */
 struct SpriteDrawable {
     u32 flags;

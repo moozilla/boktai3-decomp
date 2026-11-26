@@ -16,7 +16,7 @@ s32 MessageWindow_ShowMessage(s32);
 s32 PauseMenu_UpdateBinaryChoice(struct SelectionMenu *);
 void Hud_SetUpdateCallback(struct SelectionMenu *, void (*)(struct SelectionMenu *));
 void SelectionMenu_UpdateConfirmInput(struct SelectionMenu *);
-void ScenePanel_BeginAccountExit(struct SelectionMenu *);
+void MenuSequence_BeginAccountExit(struct SelectionMenu *);
 void SelectionMenu_ApplyConfirmedReward(struct SelectionMenu *p)
 {
     s32 result;
@@ -36,6 +36,6 @@ void SelectionMenu_ApplyConfirmedReward(struct SelectionMenu *p)
         }
         p->confirmed = result;
         p->resultMode = 2;
-        ScenePanel_BeginAccountExit(p);
+        MenuSequence_BeginAccountExit(p);
     }
 }

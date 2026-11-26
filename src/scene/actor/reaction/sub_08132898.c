@@ -1,4 +1,4 @@
-#include "scene/actor/scene_actor_turn.h"
+#include "scene/motion/scene_actor_turn.h"
 #include "global.h"
 #include "scene/actor/scene_actor_reset.h"
 void SceneActorReaction_ApplyStaggerDamage(struct ChaseActor *);

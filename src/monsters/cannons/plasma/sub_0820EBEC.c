@@ -22,7 +22,7 @@ static inline s32 clamp(s32 v)
     return v;
 }
 #define INC(n) H(gGameState, n) = clamp(H(gGameState, n) + 1)
-void OrangeSpine_RecordDefeat(u8 *p)
+void PlasmaCannon_RecordDefeat(u8 *p)
 {
     struct Args a;
     struct Message m;

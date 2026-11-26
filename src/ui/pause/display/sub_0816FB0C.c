@@ -1,0 +1,91 @@
+#define gSceneHudActionDefinitions gUnk_08E61280
+#include "global.h"
+#include "ui/pause/scene_hud_display.h"
+#include "ui/pause/inventory_grid.h"
+#include "ui/town/shop_item_values.h"
+extern const struct SceneValueItemDefinition gUnk_08E61280[];
+void Sound_PlaySong(u32);
+s32 Inventory_GetQuantityByStorage(u32, u32);
+void MenuTransition_BeginSelectedWidget(void *);
+void sub_0816E570(void *);
+void PauseMenu_BeginCharacterItemUse(void *, u32);
+void PauseMenu_BeginVitalRatioExchange(void *, u32);
+void PauseDisplay_BeginRandomTransition(void *);
+void PauseMenu_BeginTypeThirteenItemUse(void *);
+void PauseMenu_BeginTypeFourteenItemUse(void *);
+void SceneHud_BeginSelectedActionTransfer(void *);
+void PauseMenu_ApplyItemSlot(void *, u32);
+void SceneHud_RefreshActionIcons(void *);
+void SceneHud_UpdateActionSelection(void);
+void Hud_SetInteractionCallback(void *, void (*)(void), int);
+void Inventory_InitializeSelectionGrid(void *, int, int);
+void SceneHud_GetActionIconPosition(void *, int);
+void SceneHud_ShowActionPreview(void *);
+void Hud_SaveGridSelection(void *);
+void InventoryPanel_ShowStatusIcons(void *);
+void MenuDisplay_UpdateActionPrompt(void *, int);
+void InventoryPanel_DrawStatComparison(void *, int, int, int, int, int);
+void MenuDisplay_SetPaletteOverrides(void *, int, int, int, int);
+void SceneHud_DispatchSelectedAction(struct SceneHudState *p)
+{
+    int index = Inventory_GetQuantityByStorage(p->actionCategory, p->actionSelection);
+    void *q;
+    switch (gUnk_08E61280[index].actionKind) {
+        case 1:
+        case 2:
+        case 3:
+        case 5:
+        case 9:
+            InventoryGrid_BeginIconTransfer(p);
+            break;
+        case 4:
+            Sound_PlaySong(0x38A);
+            MenuTransition_BeginSelectedWidget(p);
+            break;
+        case 7:
+            Sound_PlaySong(0x10D);
+            if (index == 26)
+                Sound_PlaySong(0x182);
+            goto apply;
+        case 8:
+            if (gUnk_08E61280[index].effectValueA == 2)
+                sub_0816E570(p);
+            else
+                PauseMenu_BeginCharacterItemUse(p, gUnk_08E61280[index].effectValueA);
+            break;
+        case 10:
+            PauseMenu_BeginVitalRatioExchange(p, gUnk_08E61280[index].effectValueA);
+            break;
+        case 11:
+            PauseDisplay_BeginRandomTransition(p);
+            break;
+        case 6:
+        case 12:
+            Sound_PlaySong(0x10D);
+        apply:
+            PauseMenu_ApplyItemSlot(p, p->actionSelection);
+            SceneHud_RefreshActionIcons(p);
+            Hud_SetInteractionCallback(p, SceneHud_UpdateActionSelection, 1);
+            q = p->actionInput;
+            Inventory_InitializeSelectionGrid(q, 1, 0);
+            SceneHud_GetActionIconPosition(&p->categoryWidgets[5].position, p->actionCursor);
+            SceneHud_ShowActionPreview(p);
+            Hud_SaveGridSelection(q);
+            InventoryPanel_ShowStatusIcons(p);
+            MenuDisplay_UpdateActionPrompt(p, 4);
+            InventoryPanel_DrawStatComparison(p, 0, 0, 0, 1, 0);
+            MenuDisplay_SetPaletteOverrides(p, 1, 0, 0, 0);
+            break;
+        case 13:
+            Sound_PlaySong(0x38A);
+            PauseMenu_BeginTypeThirteenItemUse(p);
+            break;
+        case 14:
+            Sound_PlaySong(0x38A);
+            PauseMenu_BeginTypeFourteenItemUse(p);
+            break;
+        case 16:
+            SceneHud_BeginSelectedActionTransfer(p);
+            break;
+    }
+}

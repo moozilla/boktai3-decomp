@@ -3,7 +3,7 @@
 #include "engine/engine.h"
 #include "scene/scene_animation.h"
 #include "effects/projectiles/contact_swarm_sprite.h"
-#include "scene/actor/contact_collider.h"
+#include "scene/collision/contact_collider.h"
 #include "engine/video/display_sequence.h"
 #include "effects/shadows/scaled_shadow_types.h"
 #include "player/player.h"
@@ -42,8 +42,8 @@ struct CallbackPool {
 void CallbackPool_SpawnHitParticles(struct CallbackPoolEntry *);
 void CallbackPool_RefreshHealthDisplay(struct CallbackPoolEntry *);
 void ProximityActor_SetState(struct CallbackPoolEntry *, s32);
-s32 Pool184_TestStatusFlags(void *, u32);
-void Pool184_AddStatusFlags(void *, u16);
+s32 ActorGroupPool_TestStatusFlags(void *, u32);
+void ActorGroupPool_AddStatusFlags(void *, u16);
 static inline void CallbackPool_Subtract(struct ContactPosition *out,
                                          const struct ContactPosition *b, const struct SceneVec *a)
 {

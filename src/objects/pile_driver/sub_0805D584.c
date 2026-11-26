@@ -1,5 +1,5 @@
 #include "objects/pile_driver/scene_panel_subject_playback.h"
-void ScenePanelSubject_TickResetDelay(struct ScenePanelSubject *owner)
+void PileDriverSubject_TickResetDelay(struct ScenePanelSubject *owner)
 {
     Anim_SetSequence(&owner->sequence, owner->sequenceResource, 1, owner->sequenceRow,
                      owner->sequenceVariant);
@@ -8,7 +8,7 @@ void ScenePanelSubject_TickResetDelay(struct ScenePanelSubject *owner)
     if (!owner->unknownE2) {
         owner->positionReset = 0;
         owner->drawable.position = owner->home;
-        ScenePanelSubject_SetState((void *)owner, 2);
+        PileDriverSubject_SetState((void *)owner, 2);
     } else
-        ScenePanelSubject_ResetPosition(owner);
+        PileDriverSubject_ResetPosition(owner);
 }

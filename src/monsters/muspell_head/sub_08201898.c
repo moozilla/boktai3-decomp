@@ -17,7 +17,7 @@ struct ScriptCombatActor {
     u8 pad198[0x1cc - 0x198];
     void *sequence;
 };
-u32 ScriptCombatActor_UpdateProjectileAttack(void *);
+u32 MuspellHead_UpdateProjectileAttack(void *);
 void Anim_RestartSequence(void *, void *, u32, u32, u32);
 void Sound_PlaySong(u32);
 struct CannonSample {
@@ -50,7 +50,7 @@ static inline s32 distanceSquared(struct SceneVec *a, struct SceneVec *b)
     s32 z = a->z - b->z;
     return x * x + z * z;
 }
-u32 ScriptCombatActor_TryProjectileAttack(struct ScriptCombatActor *p)
+u32 MuspellHead_TryProjectileAttack(struct ScriptCombatActor *p)
 {
     struct SceneVec delta;
     struct CannonSample sample;
@@ -69,7 +69,7 @@ u32 ScriptCombatActor_TryProjectileAttack(struct ScriptCombatActor *p)
                 if (((cell[0] & 15u) << 8) > p->position.y + 128)
                     break;
                 if (i == 4) {
-                    p->update = ScriptCombatActor_UpdateProjectileAttack;
+                    p->update = MuspellHead_UpdateProjectileAttack;
                     Anim_RestartSequence(p->animation, p->sequence, 1, 0, 0);
                     p->timer = p->duration;
                     p->phase = 0;

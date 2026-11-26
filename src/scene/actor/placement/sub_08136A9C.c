@@ -1,4 +1,4 @@
-#include "scene/actor/scene_actor_chase_shared.h"
+#include "scene/motion/scene_actor_chase_shared.h"
 #include "global.h"
 #include "scene/actor/scene_actor_placement.h"
 void SceneActorAttachment_ReplaceResponseSlot(void *, u32, u32, u32);

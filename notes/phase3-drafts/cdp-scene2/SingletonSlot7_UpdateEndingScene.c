@@ -1,6 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "bosses/vanargand/scene_departure_display.h"
-#include "bosses/vanargand/layered_boss_transition.h"
+#include "bosses/vanargand/vanargand_head_transition.h"
 
 static inline u32 StepPlayback(struct DepartureDrawable *owner, struct DisplaySequenceState *state)
 {
@@ -25,7 +25,7 @@ static inline void ReverseEndingPose(struct DepartureDrawable *drawable)
 {
     drawable->sequence.flags |= 4;
 }
-void SingletonSlot7_UpdateEndingScene(struct DepartureActor *input)
+void VanargandHead_UpdateEndingScene(struct DepartureActor *input)
 {
     struct DepartureActor *screen = input;
     struct Slot7Transition *motion = (struct Slot7Transition *)input;

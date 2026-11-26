@@ -1,6 +1,6 @@
 #ifndef GUARD_SCENE_ACTOR_STATUS_H
 #define GUARD_SCENE_ACTOR_STATUS_H
-#include "scene/actor/scene_actor_chase_reaction.h"
+#include "scene/motion/scene_actor_chase_reaction.h"
 #include "scene/actor/scene_actor_drawable_flags.h"
 #include "player/player.h"
 #include "global.h"
@@ -8,7 +8,7 @@
 #include "engine/ram.h"
 #include "engine/runtime.h"
 #include "engine/engine_globals.h"
-#include "scene/actor/scene_actor_contact_list.h"
+#include "scene/collision/scene_actor_contact_list.h"
 
 extern u32 gLinkSession;
 void SceneActorPalette_BeginTransition(u32, u32, u32, s32, u32);

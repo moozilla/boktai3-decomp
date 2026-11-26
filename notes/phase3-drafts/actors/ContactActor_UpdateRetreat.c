@@ -1,4 +1,4 @@
-#include "scene/actor/contact_actor.h"
+#include "scene/collision/contact_actor.h"
 #include "engine/math/monster_particle_random.h"
 void ContactActor_SetDirectionalSequence(struct ContactActorPool *, struct ContactActor *, u32);
 u8 *TerrainModifiers_FindCellOverride(s32, s32);

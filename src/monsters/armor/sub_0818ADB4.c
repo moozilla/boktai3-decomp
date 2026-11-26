@@ -28,7 +28,7 @@ struct Armor6 {
 };
 
 s32 Callback_InvokeActor(void *, void *);
-void Armor6_DestroySpriteColliders(void *);
+void Armor_DestroySpriteColliders(void *);
 void ScaledShadow_Destroy(void *);
 void Collider_Remove(void *);
 void SceneLink_RemoveNode(void *);
@@ -45,7 +45,7 @@ static inline void Armor6_ClearCallback(struct Armor6CallbackSlot *slot)
     }
 }
 
-s32 Armor6_Destroy(struct Armor6 *actor)
+s32 Armor_Destroy(struct Armor6 *actor)
 {
     s32 i;
     Armor6_ClearCallback(&actor->slot650);
@@ -55,7 +55,7 @@ s32 Armor6_Destroy(struct Armor6 *actor)
     for (i = 0; i < 9; i++) {
         Armor6_ClearCallback(&actor->slots410[i]);
     }
-    Armor6_DestroySpriteColliders(actor->componentB58);
+    Armor_DestroySpriteColliders(actor->componentB58);
     ScaledShadow_Destroy(actor->shadow);
     Collider_Remove(actor->collider1E4);
     Collider_Remove(actor->collider238);

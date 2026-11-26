@@ -1,12 +1,12 @@
 #include "global.h"
 #include "player/player.h"
 #include "scene/actor/scene_actor_reaction.h"
-#include "scene/actor/scene_actor_chase_reaction.h"
-#include "scene/actor/scene_actor_delayed_response.h"
+#include "scene/motion/scene_actor_chase_reaction.h"
+#include "scene/collision/scene_actor_delayed_response.h"
 #include "engine/video/display_sequence.h"
-#include "scene/actor/scene_actor_displacement.h"
+#include "scene/motion/scene_actor_displacement.h"
 #include "effects/particles/spark_particle.h"
-#include "scene/actor/scene_actor_chase.h"
+#include "scene/motion/scene_actor_chase.h"
 #include "scene/actor/scene_actor_behavior.h"
 #include "script/script_utility.h"
 #include "engine/engine.h"
@@ -39,7 +39,7 @@ void Bat_RestoreSavedState(struct ChaseActor *actor)
             u32 mask = ~1;
             *q = mask & *q;
         } else {
-            struct SceneInputWidget *q =
+            struct AnimSprite *q =
                 &((struct SceneActorAnimationTileDrawable *)actor->base.drawable)->tile;
             u32 mask = ~1;
             q->flags = mask & q->flags;

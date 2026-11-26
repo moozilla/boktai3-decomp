@@ -485,7 +485,7 @@ s32 ModifierMenu_CommitSecondarySource(struct ModifierMenu *p)
     return 0;
 }
 
-void Registry1745_SetMenuRequest(u32);
+void LinkSession_SetMenuRequest(u32);
 
 
 void ModifierMenu_CloseScript(struct ModifierMenu *menu)
@@ -496,7 +496,7 @@ void ModifierMenu_CloseScript(struct ModifierMenu *menu)
         *script = 0;
     }
     if (Engine_PauseBits(0x800))
-        Registry1745_SetMenuRequest(1);
+        LinkSession_SetMenuRequest(1);
 }
 
 extern const u8 gUnk_086058E8[];

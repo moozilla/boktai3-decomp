@@ -1,9 +1,9 @@
-#include "scene/actor/scene_actor_chase_reaction.h"
-#include "scene/actor/scene_actor_availability.h"
+#include "scene/motion/scene_actor_chase_reaction.h"
+#include "scene/motion/scene_actor_availability.h"
 #include "scene/actor/scene_actor_reset.h"
 extern const s16 gUnk_086149C4[];
 void sub_080A9DB0(void *, s32, s32);
-void TentacleActor_SelectWanderRoute(void *);
+void Centipede_SelectWanderRoute(void *);
 static inline u8 TakeEntry(struct ChaseActor *p)
 {
     if (p->base.field2B1) {
@@ -18,7 +18,7 @@ static inline s32 Scale(s32 x)
         return x >> 12;
     return -((-x) >> 12);
 }
-void TentacleActor_UpdateKnockback(struct ChaseActor *p)
+void Centipede_UpdateKnockback(struct ChaseActor *p)
 {
     if (TakeEntry(p)) {
         struct ContactPosition *velocity;
@@ -38,7 +38,7 @@ void TentacleActor_UpdateKnockback(struct ChaseActor *p)
     sub_080A9DB0(p, 6, 0x1000);
     {
         if (Flags_MaskedWord(16, &p->base.statusFlags)) {
-            TentacleActor_SelectWanderRoute(p);
+            Centipede_SelectWanderRoute(p);
             SceneActorChase_SetControl(p, p->base.onAlternateEntry, 1);
             SceneActorChase_SetState(p, 0, 0, 2);
         } else {

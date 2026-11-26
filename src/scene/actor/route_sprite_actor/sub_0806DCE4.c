@@ -1,4 +1,4 @@
-#include "scene/actor/route_sprite_playback.h"
+#include "scene/motion/route_sprite_playback.h"
 #include "engine/video/display_animation.h"
 void RouteSpriteActor_RunEventScript(struct RouteSpriteActor *);
 void FragmentBurst_Create(struct ContactPosition *, u32, u32, u32, u32, u32, void *);

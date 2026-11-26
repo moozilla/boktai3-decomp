@@ -1,8 +1,8 @@
-#include "scene/actor/scene_actor_displacement.h"
-#include "scene/actor/scene_actor_chase.h"
+#include "scene/motion/scene_actor_displacement.h"
+#include "scene/motion/scene_actor_chase.h"
 #include "monsters/tentacle_spread.h"
 #include "monsters/slime.h"
-#include "scene/actor/scene_actor_turn.h"
+#include "scene/motion/scene_actor_turn.h"
 #include "scene/actor/scene_actor_visibility.h"
 #include "engine/engine.h"
 #include "engine/ram.h"
@@ -14,18 +14,18 @@
 #include "scene/actor/scene_actor_control_motion.h"
 #include "npc/manager/scene_actor_animation.h"
 #include "engine/video/display_sequence_inline.h"
-#include "scene/actor/scene_actor_chase_reaction.h"
-#include "scene/actor/scene_actor_contact_response.h"
-#include "scene/actor/scene_actor_terrain.h"
+#include "scene/motion/scene_actor_chase_reaction.h"
+#include "scene/collision/scene_actor_contact_response.h"
+#include "scene/motion/scene_actor_terrain.h"
 #include "engine/engine_globals.h"
-#include "scene/actor/scene_actor_motion.h"
+#include "scene/motion/scene_actor_motion.h"
 #include "player/player.h"
 #include "scene/actor/scene_actor_state.h"
 #include "scene/collision/scene_body_api.h"
 #include "engine/video/render.h"
 #include "monsters/scene_actor_init_group.h"
 #include "monsters/scene_actor_init_graphics.h"
-#include "scene/actor/scene_actor_terrain_reaction.h"
+#include "scene/motion/scene_actor_terrain_reaction.h"
 #include "monsters/ghoul_disc.h"
 
 void Slime_ApplyBodyHit(struct ContactCollider *target, struct ContactCollider *info,
@@ -256,7 +256,7 @@ static inline void Slime_SelectWaitAnimation(struct RoomActor *actor, s32 index,
                          flags);
         restart = &actor->restart;
     } else {
-        struct SceneInputWidget *tile =
+        struct AnimSprite *tile =
             &((struct SceneActorAnimationTileDrawable *)actor->drawable)->tile;
         u8 *selectionAddress;
         u32 previous;

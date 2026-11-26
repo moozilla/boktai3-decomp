@@ -2,7 +2,7 @@
 #define GUARD_VANARGAND_PROJECTILES_H
 
 #include "engine/engine.h"
-#include "scene/actor/contact_swarm.h"
+#include "scene/collision/contact_swarm.h"
 #include "effects/orbits/transient_sprite_pool.h"
 #include "engine/math/monster_particle_random.h"
 

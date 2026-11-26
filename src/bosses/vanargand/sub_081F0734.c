@@ -1,7 +1,7 @@
 #include "bosses/vanargand/scene_departure_display.h"
 
 extern u16 gUnk_03005040[4][16];
-void SingletonSlot7_SetMotionMode(void *, u32);
+void VanargandHead_SetMotionMode(void *, u32);
 
 struct PendingCommand {
     u8 unknown0[6];
@@ -36,7 +36,7 @@ struct PendingCommand {
         }                                                                                          \
     }
 
-void SingletonSlot7_DispatchPendingCommands(struct DepartureActor *owner)
+void VanargandHead_DispatchPendingCommands(struct DepartureActor *owner)
 {
     struct DepartureActor *actor = owner;
     struct SceneEventReceiver *receiver = &owner->messages;
@@ -130,7 +130,7 @@ void SingletonSlot7_DispatchPendingCommands(struct DepartureActor *owner)
                     Trigger_ConsumePending(&owner->messages, 1);
                     break;
                 case 65:
-                    SingletonSlot7_SetMotionMode(actor, 0);
+                    VanargandHead_SetMotionMode(actor, 0);
                     Trigger_ConsumePending(&owner->messages, 1);
                     break;
             }

@@ -1,7 +1,7 @@
 #include "gba/io_reg.h"
 #include "ui/widgets/scene_input.h"
 #include "engine/video/palette_pulse.h"
-s32 SceneInput_TickChoice(struct SceneInputWidget *widget, void *resource, u8 *selection, u8 *blink)
+s32 SceneInput_TickChoice(struct AnimSprite *widget, void *resource, u8 *selection, u8 *blink)
 {
     u32 change;
     if (gPadState[1] & A_BUTTON) {

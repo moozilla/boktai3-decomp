@@ -2,7 +2,7 @@
 #define GUARD_SPRITE_EFFECT_H
 #include "engine/engine.h"
 #include "engine/math/scene_vec.h"
-#include "scene/actor/contact_collider.h"
+#include "scene/collision/contact_collider.h"
 #include "engine/math/hit_spark_random.h"
 /* Word copies and signed halfword motion share the same eight-byte vector. */
 union SpriteEffectVector {
@@ -69,12 +69,12 @@ s32 Mod(s32, s32);
 s32 Div(s32, s32);
 void TerrainOverlay_QueueRemoveActor(void *);
 void SceneBody_Unregister(void *);
-void SceneActor14_OnColliderContact(void);
-struct SpriteEffectPool *SceneActor14_EnsureSingleton(void);
+void SpriteEffectSet_OnColliderContact(void);
+struct SpriteEffectPool *SpriteEffectSet_EnsureSingleton(void);
 struct SpriteEffect *SpriteEffectPool_AllocateSlot(struct SpriteEffectPool *);
 s32 SpriteEffectPool_Update(struct SpriteEffectPool *);
 s32 SpriteEffectPool_RemoveSlots(struct SpriteEffectPool *);
-s32 SceneActor14_InitManager(struct SpriteEffectPool *);
+s32 SpriteEffectSet_InitManager(struct SpriteEffectPool *);
 s32 SpriteEffect_SpawnWithMotion(struct SpriteEffectSource *, struct SpriteEffectSource *,
                                  union SpriteEffectVector *, u32, u32, u32, u32);
 #endif

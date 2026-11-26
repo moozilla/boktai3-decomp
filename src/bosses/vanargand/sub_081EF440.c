@@ -21,7 +21,7 @@ static inline void BeginPhase(struct Slot7Motion *p, s32 phase)
     p->timer = 0;
     p->entered = 1;
 }
-void Slot7_UpdateMotionPhase(struct Slot7Motion *p)
+void VanargandHead_UpdateMotionPhase(struct Slot7Motion *p)
 {
     struct Slot7Motion *self = p;
     if (p->reset)

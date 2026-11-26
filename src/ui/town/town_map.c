@@ -35,14 +35,14 @@ static inline u32 TestFlags(struct MenuCursor *cursor, u32 mask)
     return cursor->stateFlags & mask;
 }
 
-void Registry3F74_SetState(struct RegistryChoiceMenu *menu,
+void TownMap_SetState(struct RegistryChoiceMenu *menu,
                            void (*update)(struct RegistryChoiceMenu *))
 {
     menu->update = update;
     menu->timer = 0;
 }
 
-void Registry3F74_ApplyPaletteStep(struct RegistryChoiceMenu *transition, u32 step)
+void TownMap_ApplyPaletteStep(struct RegistryChoiceMenu *transition, u32 step)
 {
     u16 *palettes = transition->palettes;
     switch (step) {
@@ -67,10 +67,10 @@ void Registry3F74_ApplyPaletteStep(struct RegistryChoiceMenu *transition, u32 st
     }
 }
 
-void Registry3F74_UpdateAnimations(struct RegistryChoiceMenu *menu)
+void TownMap_UpdateAnimations(struct RegistryChoiceMenu *menu)
 {
     void *data = &menu->resource;
-    struct SceneInputWidget *anim = &menu->animations[1];
+    struct AnimSprite *anim = &menu->animations[1];
     struct MenuCursorEntry *offset;
     if (menu->selection >= 0 && TestFlags(menu->cursor, 2)) {
         anim->flags &= ~1;
@@ -92,25 +92,25 @@ void Registry3F74_UpdateAnimations(struct RegistryChoiceMenu *menu)
         Anim_Step(anim, data);
 }
 
-void Registry3F74_ConfirmSelection(struct RegistryChoiceMenu *menu)
+void TownMap_ConfirmSelection(struct RegistryChoiceMenu *menu)
 {
     if (gPadState[1] & 1) {
         if (TestFlags(menu->cursor, 2) && menu->selection >= 0) {
             if (menu->selection == 1 && menu->alternateScript) {
                 Script_Call(menu->alternateScript, 0);
             } else if (menu->entryScripts[menu->selection]) {
-                Registry3F74_StartClosingFade(menu);
+                TownMap_StartClosingFade(menu);
                 MenuCursor_SetSelectionFlag(menu->cursor);
             }
         }
     }
 }
 
-void Registry3F74_InitAnimations(struct RegistryChoiceMenu *menu)
+void TownMap_InitAnimations(struct RegistryChoiceMenu *menu)
 {
-    struct SceneInputResource *resource = ScriptProc_Start(0xcb05, 0xa2db);
+    struct AnimSpriteResource *resource = ScriptProc_Start(0xcb05, 0xa2db);
     if (resource) {
-        struct SceneInputWidget *anim;
+        struct AnimSprite *anim;
         s32 count;
         menu->resource = *resource;
         ResourceHeader_Relocate(&menu->resource, resource);
@@ -132,7 +132,7 @@ void Registry3F74_InitAnimations(struct RegistryChoiceMenu *menu)
     }
 }
 
-void Registry3F74_InitBackground(struct RegistryChoiceMenu *menu)
+void TownMap_InitBackground(struct RegistryChoiceMenu *menu)
 {
     u8 *resource;
     s32 layers[2];
@@ -159,11 +159,11 @@ void Registry3F74_InitBackground(struct RegistryChoiceMenu *menu)
     Bg_SetPriority(2, 2);
     resource = ScriptProc_Start(0x92B3, 0x771E);
     menu->palettes = (u16 *)(resource + 0x14);
-    Registry3F74_ApplyPaletteStep(menu, SunClock_GetPhase());
+    TownMap_ApplyPaletteStep(menu, SunClock_GetPhase());
     CpuSet(resource + 0x74, gBgPaletteBank3, 0x04000008);
 }
 
-void Registry3F74_ConfigureDisplay(void)
+void TownMap_ConfigureDisplay(void)
 {
     BgGfx_LoadTilemapAtPosition(3, 8, 0x20);
     BgGfx_LoadTilemapAtPosition(2, 0, 0);
@@ -171,7 +171,7 @@ void Registry3F74_ConfigureDisplay(void)
     Hud_SetMode(7);
 }
 
-void Registry3F74_UpdateSelection(struct RegistryChoiceMenu *menu)
+void TownMap_UpdateSelection(struct RegistryChoiceMenu *menu)
 {
     s32 selection;
     if (menu->cursor == 0)
@@ -179,10 +179,10 @@ void Registry3F74_UpdateSelection(struct RegistryChoiceMenu *menu)
     else
         selection = menu->cursor->selectedIndex;
     menu->selection = selection;
-    Registry3F74_ConfirmSelection(menu);
+    TownMap_ConfirmSelection(menu);
 }
 
-void Registry3F74_UpdateOpeningDelay(struct RegistryChoiceMenu *menu)
+void TownMap_UpdateOpeningDelay(struct RegistryChoiceMenu *menu)
 {
     s32 selection;
     if (menu->cursor == 0)
@@ -192,44 +192,44 @@ void Registry3F74_UpdateOpeningDelay(struct RegistryChoiceMenu *menu)
     menu->selection = selection;
     menu->timer++;
     if (menu->timer > 0x3c)
-        Registry3F74_StartSelection(menu);
+        TownMap_StartSelection(menu);
 }
 
-void Registry3F74_UpdateScriptDelay(struct RegistryChoiceMenu *menu)
+void TownMap_UpdateScriptDelay(struct RegistryChoiceMenu *menu)
 {
     menu->timer++;
     if (menu->timer > 0x3c)
         Script_Call(menu->entryScripts[menu->selection], 0);
 }
 
-void Registry3F74_StartSelection(struct RegistryChoiceMenu *menu)
+void TownMap_StartSelection(struct RegistryChoiceMenu *menu)
 {
-    Registry3F74_SetState(menu, Registry3F74_UpdateSelection);
+    TownMap_SetState(menu, TownMap_UpdateSelection);
 }
 
-void Registry3F74_StartOpeningFade(struct RegistryChoiceMenu *menu)
+void TownMap_StartOpeningFade(struct RegistryChoiceMenu *menu)
 {
     ScreenTransition_SendCommand(2, 5, 4, 4, 4, 0xFFFF, 0);
-    Registry3F74_SetState(menu, Registry3F74_UpdateOpeningDelay);
+    TownMap_SetState(menu, TownMap_UpdateOpeningDelay);
 }
 
-void Registry3F74_StartClosingFade(struct RegistryChoiceMenu *menu)
+void TownMap_StartClosingFade(struct RegistryChoiceMenu *menu)
 {
     ScreenTransition_SendCommand(3, 5, 4, 4, 4, 0xFFFF, 0);
-    Registry3F74_SetState(menu, Registry3F74_UpdateScriptDelay);
+    TownMap_SetState(menu, TownMap_UpdateScriptDelay);
 }
 
-void Registry3F74_OnUpdate(struct RegistryChoiceMenu *menu)
+void TownMap_OnUpdate(struct RegistryChoiceMenu *menu)
 {
-    Registry3F74_ConfigureDisplay();
-    Registry3F74_UpdateAnimations(menu);
+    TownMap_ConfigureDisplay();
+    TownMap_UpdateAnimations(menu);
     if (menu->update)
         Callback_InvokeActor(menu, menu->update);
 }
 
-void Registry3F74_OnDestroy(struct RegistryChoiceMenu *menu)
+void TownMap_OnDestroy(struct RegistryChoiceMenu *menu)
 {
-    struct SceneInputWidget *animation = menu->animations;
+    struct AnimSprite *animation = menu->animations;
     s32 i = 4;
     do {
         if (animation->active)
@@ -244,21 +244,21 @@ void Registry3F74_OnDestroy(struct RegistryChoiceMenu *menu)
     }
 }
 
-void Registry3F74_CreateSelectionCursor(struct RegistryChoiceMenu *menu, s32 selection)
+void TownMap_CreateSelectionCursor(struct RegistryChoiceMenu *menu, s32 selection)
 {
     struct MenuCursorEntry entries[11];
     memcpy(entries, gUnk_0824F878, 0xb0);
     menu->cursor = MenuCursor_Create(1, selection, 0xb, entries);
 }
 
-s32 Registry3F74_InitFromScript(struct RegistryChoiceMenu *menu, void *arg)
+s32 TownMap_InitFromScript(struct RegistryChoiceMenu *menu, void *arg)
 {
     s32 i;
     s32 *entry;
     Video_SetRenderCallbacks(0, SpriteOam_QueueProjectedSprites, Sprite_RenderScaledList,
                              sub_08219624);
-    Registry3F74_InitBackground(menu);
-    Registry3F74_InitAnimations(menu);
+    TownMap_InitBackground(menu);
+    TownMap_InitAnimations(menu);
     if (Script_SeekToKeyword('p')) {
         entry = menu->entryScripts;
         i = 10;
@@ -278,18 +278,18 @@ s32 Registry3F74_InitFromScript(struct RegistryChoiceMenu *menu, void *arg)
     else
         menu->alternateScript = 0;
     menu->selection = menu->initialSelection;
-    Registry3F74_CreateSelectionCursor(menu, menu->initialSelection);
-    Registry3F74_StartOpeningFade(menu);
+    TownMap_CreateSelectionCursor(menu, menu->initialSelection);
+    TownMap_StartOpeningFade(menu);
     return 0;
 }
 
-struct RegistryChoiceMenu *Registry3F74_Create(void *arg)
+struct RegistryChoiceMenu *TownMap_Create(void *arg)
 {
     struct RegistryChoiceMenu *menu = Task_Create(8, sizeof(*menu));
     if (menu) {
-        Task_SetCallbacks(menu, (void (*)(void *))Registry3F74_OnUpdate,
-                          (void (*)(void *))Registry3F74_OnDestroy);
-        if (Registry3F74_InitFromScript(menu, arg) < 0) {
+        Task_SetCallbacks(menu, (void (*)(void *))TownMap_OnUpdate,
+                          (void (*)(void *))TownMap_OnDestroy);
+        if (TownMap_InitFromScript(menu, arg) < 0) {
             Task_Kill(menu);
             return 0;
         }

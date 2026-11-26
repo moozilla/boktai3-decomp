@@ -1,5 +1,5 @@
 #include "global.h"
-#include "player/cues/player_cue_sequence.h"
+#include "player/cutscene/player_cue_sequence.h"
 #include "engine/video/display_animation.h"
 #include "engine/engine.h"
 struct NidhoggrVector {

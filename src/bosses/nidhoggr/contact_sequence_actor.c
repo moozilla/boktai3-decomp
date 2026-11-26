@@ -1,35 +1,35 @@
-#include "bosses/nidhoggr/contact_sequence_pool.h"
-#include "bosses/nidhoggr/contact_sequence_actor.h"
+#include "bosses/nidhoggr/nidhoggr_duel_minion_pool.h"
+#include "bosses/nidhoggr/nidhoggr_duel_minion.h"
 #include "engine/video/display_sprite_playback.h"
-#include "player/cues/player_cue_sequence.h"
+#include "player/cutscene/player_cue_sequence.h"
 #include "engine/video/render.h"
 #include "scene/actor/scene_actor_part_burst.h"
 
-void ContactSequenceActor_SetFlags(struct ContactSequenceActor *actor, u32 flags)
+void NidhoggrDuelMinion_SetFlags(struct ContactSequenceActor *actor, u32 flags)
 {
     actor->flags |= flags;
 }
 
-/* ContactSequenceActor_ClearFlags: Clears the specified mask bits from the actor flags. */
+/* NidhoggrDuelMinion_ClearFlags: Clears the specified mask bits from the actor flags. */
 
-void ContactSequenceActor_ClearFlags(struct ContactSequenceActor *actor, u32 mask)
+void NidhoggrDuelMinion_ClearFlags(struct ContactSequenceActor *actor, u32 mask)
 {
     actor->flags &= ~mask;
 }
 
-u32 ContactSequenceActor_GetFlags(struct ContactSequenceActor *actor, u32 mask)
+u32 NidhoggrDuelMinion_GetFlags(struct ContactSequenceActor *actor, u32 mask)
 {
     return actor->flags & mask;
 }
 
-void ContactSequenceActor_SetState(struct ContactSequenceActor *actor, u32 state)
+void NidhoggrDuelMinion_SetState(struct ContactSequenceActor *actor, u32 state)
 {
     actor->state = state;
     actor->stateFrame = 0;
     actor->enter = 1;
 }
 
-u32 ContactSequenceActor_TakeEntryFlag(struct ContactSequenceActor *actor)
+u32 NidhoggrDuelMinion_TakeEntryFlag(struct ContactSequenceActor *actor)
 {
     u32 result;
     if (!actor->enter) {
@@ -49,7 +49,7 @@ void sub_080148CC(u32, u32, void *, u32, u32, u32, u32, u32, u32, u32, u32);
 
 void DamageNumberDisplay_Show(void *, u32, s32, void *, const struct ContactPackedVector *, u32);
 
-void ContactSequenceActor_ApplyHealthContact(struct ContactCollider *source,
+void NidhoggrDuelMinion_ApplyHealthContact(struct ContactCollider *source,
                                              struct ContactCollider *other,
                                              struct ContactSequenceActor *actor)
 {
@@ -65,7 +65,7 @@ void ContactSequenceActor_ApplyHealthContact(struct ContactCollider *source,
         actor->flash = 8;
         if (actor->health <= 0) {
             actor->health = 0;
-            ContactSequenceActor_SetState(actor, 3);
+            NidhoggrDuelMinion_SetState(actor, 3);
         }
         position = &saved->position;
         sub_080148CC(2, 14, position, 64, 256, 12, 8, 8, 8, 30, 30);
@@ -81,7 +81,7 @@ void Collider_SetBodyProperties(void *, u32, u32, u32);
 
 void Collider_SetAttackProperties(void *, u32, u32, u32, u32, u32);
 
-void ContactSequenceActor_Initialize(struct ContactSequenceOwner *owner,
+void NidhoggrDuelMinion_Initialize(struct ContactSequenceOwner *owner,
                                      struct ContactSequenceActor *actor)
 {
     struct ContactSwarmGraphics *graphics = &actor->graphics;
@@ -101,7 +101,7 @@ void ContactSequenceActor_Initialize(struct ContactSequenceOwner *owner,
         offset.z = 0;
         collider = &actor->healthCollider;
         Collider_Init(collider, 0, 0x4005, 0, 16, &bounds, &offset);
-        Collider_SetCallback(collider, ContactSequenceActor_ApplyHealthContact, actor);
+        Collider_SetCallback(collider, NidhoggrDuelMinion_ApplyHealthContact, actor);
         Collider_SetBodyProperties(collider, owner->contactValue, 0, 0);
         Collider_Refresh(collider);
         collider = &actor->resourceCollider;
@@ -113,11 +113,11 @@ void ContactSequenceActor_Initialize(struct ContactSequenceOwner *owner,
     }
 }
 
-void ContactSequenceActor_Deactivate(struct ContactSequenceOwner *owner,
+void NidhoggrDuelMinion_Deactivate(struct ContactSequenceOwner *owner,
                                      struct ContactSequenceActor *actor)
 {
     actor->sprite.flags |= 1;
-    ContactSequenceActor_SetState(actor, 0);
+    NidhoggrDuelMinion_SetState(actor, 0);
     {
         struct ContactCollider *collider = &actor->healthCollider;
         collider->flags |= 4;
@@ -125,9 +125,9 @@ void ContactSequenceActor_Deactivate(struct ContactSequenceOwner *owner,
     actor->active = 0;
 }
 
-/* ContactSequenceActor_UpdateInactive: Empty update callback for the contact sequence actor inactive state. */
+/* NidhoggrDuelMinion_UpdateInactive: Empty update callback for the contact sequence actor inactive state. */
 
-void ContactSequenceActor_UpdateInactive(struct ContactSequenceOwner *owner,
+void NidhoggrDuelMinion_UpdateInactive(struct ContactSequenceOwner *owner,
                                          struct ContactSequenceActor *actor)
 {
 }
@@ -136,25 +136,25 @@ void Anim_RestartSequence(void *, const void *, u32, u32, u32);
 
 extern const struct ContactSequenceFrame gUnk_08605974[];
 
-void ContactSequenceActor_UpdateAppearing(struct ContactSequenceOwner *parent,
+void NidhoggrDuelMinion_UpdateAppearing(struct ContactSequenceOwner *parent,
                                           struct ContactSequenceActor *owner)
 {
-    if (ContactSequenceActor_TakeEntryFlag(owner)) {
+    if (NidhoggrDuelMinion_TakeEntryFlag(owner)) {
         owner->sprite.flags &= ~1;
         Anim_RestartSequence(&owner->sequence, parent->sequenceResource,
                              gUnk_08605974[owner->variant & 1].frame, 0, 8);
     }
     if (owner->sequence.index == 3 && owner->sequence.elapsed == 0)
         Sound_PlaySongChecked(0x3B8);
-    ContactSequenceActor_SetFlags(owner, 1);
+    NidhoggrDuelMinion_SetFlags(owner, 1);
     if (PlayerCue_StepSequenceEnded(&owner->sprite, &owner->sequence))
-        ContactSequenceActor_SetState(owner, 2);
+        NidhoggrDuelMinion_SetState(owner, 2);
 }
 
-void ContactSequenceActor_UpdateActive(struct ContactSequenceOwner *parent,
+void NidhoggrDuelMinion_UpdateActive(struct ContactSequenceOwner *parent,
                                        struct ContactSequenceActor *owner)
 {
-    ContactSequenceActor_TakeEntryFlag(owner);
+    NidhoggrDuelMinion_TakeEntryFlag(owner);
     PlayerCue_StepSequence(&owner->sprite, &owner->sequence);
     Collider_Refresh(&owner->resourceCollider);
 }
@@ -173,7 +173,7 @@ static inline u32 RandomBits(const u16 *table, u16 mask)
     return table[index] & mask;
 }
 
-void ContactSequenceActor_UpdateDying(struct ContactSequenceOwner *parent,
+void NidhoggrDuelMinion_UpdateDying(struct ContactSequenceOwner *parent,
                                       struct ContactSequenceActor *actor)
 {
     union {
@@ -186,7 +186,7 @@ void ContactSequenceActor_UpdateDying(struct ContactSequenceOwner *parent,
     struct ContactSequenceScriptArgs args;
     const u16 *table;
 
-    if (ContactSequenceActor_TakeEntryFlag(actor)) {
+    if (NidhoggrDuelMinion_TakeEntryFlag(actor)) {
         table = (const u16 *)RANDOM_TABLE_ADDR;
         scatter.bits.x = SceneActorEffects_NextSample(table) & 63;
         scatter.bits.y = RandomBits(table, 127);
@@ -223,8 +223,8 @@ void ContactSequenceActor_UpdateDying(struct ContactSequenceOwner *parent,
         }
         Sound_PlaySongChecked(0x3BA);
     }
-    ContactSequenceActor_SetFlags(actor, 1);
-    ContactSequenceActor_Deactivate(parent, actor);
+    NidhoggrDuelMinion_SetFlags(actor, 1);
+    NidhoggrDuelMinion_Deactivate(parent, actor);
 }
 
 extern void (*const gUnk_086059A4[])(struct ContactSequenceOwner *, struct ContactSequenceActor *);
@@ -238,7 +238,7 @@ static inline s32 scaleOffset(s32 value)
 
 extern const u32 gUnk_0860597C[];
 
-void ContactSequenceActor_Update(struct ContactSequenceOwner *parent,
+void NidhoggrDuelMinion_Update(struct ContactSequenceOwner *parent,
                                  struct ContactSequenceActor *actor)
 {
     struct ContactPosition jitter;
@@ -246,7 +246,7 @@ void ContactSequenceActor_Update(struct ContactSequenceOwner *parent,
     gUnk_086059A4[actor->state](parent, actor);
     if (actor->cooldown) {
         AnimData_SelectPaletteBank(&actor->graphics, 0x192);
-        ContactSequenceActor_SetFlags(actor, 1);
+        NidhoggrDuelMinion_SetFlags(actor, 1);
         --actor->cooldown;
     } else {
         u32 tile = gUnk_0860597C[actor->sequence.index];
@@ -258,7 +258,7 @@ void ContactSequenceActor_Update(struct ContactSequenceOwner *parent,
         actor->sprite.priority = 3;
     else
         actor->sprite.priority = 2;
-    if (ContactSequenceActor_GetFlags(actor, 1)) {
+    if (NidhoggrDuelMinion_GetFlags(actor, 1)) {
         struct ContactCollider *collider = &actor->healthCollider;
         collider->flags |= 4;
     } else {
@@ -302,7 +302,7 @@ void ContactSequenceActor_Update(struct ContactSequenceOwner *parent,
     ++actor->stateFrame;
 }
 
-void ContactSequenceActor_Destroy(struct ContactSequenceOwner *owner,
+void NidhoggrDuelMinion_Destroy(struct ContactSequenceOwner *owner,
                                   struct ContactSequenceActor *actor)
 {
     Collider_Remove(&actor->healthCollider);
@@ -311,7 +311,7 @@ void ContactSequenceActor_Destroy(struct ContactSequenceOwner *owner,
 
 void Palette_InterpolateBanks(void *, void *, void *, u32, u32);
 
-s32 ContactSequencePool_Update(struct ContactSequenceOwner *owner)
+s32 NidhoggrDuelMinionPool_Update(struct ContactSequenceOwner *owner)
 {
     struct ContactSequenceActor *actor;
     s32 remaining;
@@ -320,7 +320,7 @@ s32 ContactSequencePool_Update(struct ContactSequenceOwner *owner)
     remaining = 7;
     do {
         if (actor->active) {
-            ContactSequenceActor_Update(owner, actor);
+            NidhoggrDuelMinion_Update(owner, actor);
             if (actor->state == 2)
                 ++owner->activeCount;
         }
@@ -352,19 +352,19 @@ s32 ContactSequencePool_Update(struct ContactSequenceOwner *owner)
     return 0;
 }
 
-s32 ContactSequencePool_Destroy(struct ContactSequenceOwner *owner)
+s32 NidhoggrDuelMinionPool_Destroy(struct ContactSequenceOwner *owner)
 {
     struct ContactSequenceActor *actor = owner->actors;
     s32 remaining = 7;
     do {
-        ContactSequenceActor_Destroy(owner, actor);
+        NidhoggrDuelMinion_Destroy(owner, actor);
         --remaining;
         ++actor;
     } while (remaining >= 0);
     return 0;
 }
 
-s32 ContactSequencePool_Initialize(struct ContactSequenceOwner *owner, s32 initialHealth,
+s32 NidhoggrDuelMinionPool_Initialize(struct ContactSequenceOwner *owner, s32 initialHealth,
                                    u32 contactValue, s32 resourceValue, u32 script,
                                    u32 reactionValue)
 {
@@ -379,7 +379,7 @@ s32 ContactSequencePool_Initialize(struct ContactSequenceOwner *owner, s32 initi
     actor = owner->actors;
     remaining = 7;
     do {
-        ContactSequenceActor_Initialize(owner, actor);
+        NidhoggrDuelMinion_Initialize(owner, actor);
         --remaining;
         ++actor;
     } while (remaining >= 0);
@@ -387,15 +387,15 @@ s32 ContactSequencePool_Initialize(struct ContactSequenceOwner *owner, s32 initi
     return 0;
 }
 
-struct ContactSequenceOwner *ContactSequencePool_Create(s32 initialHealth, u32 contactValue,
+struct ContactSequenceOwner *NidhoggrDuelMinionPool_Create(s32 initialHealth, u32 contactValue,
                                                         s32 resourceValue, u32 script,
                                                         u32 reactionValue)
 {
     struct ContactSequenceOwner *owner = Task_Create(8, sizeof(*owner));
     if (owner) {
-        Task_SetCallbacks(owner, (void (*)(void *))ContactSequencePool_Update,
-                          (void (*)(void *))ContactSequencePool_Destroy);
-        if (ContactSequencePool_Initialize(owner, initialHealth, contactValue, resourceValue,
+        Task_SetCallbacks(owner, (void (*)(void *))NidhoggrDuelMinionPool_Update,
+                          (void (*)(void *))NidhoggrDuelMinionPool_Destroy);
+        if (NidhoggrDuelMinionPool_Initialize(owner, initialHealth, contactValue, resourceValue,
                                            script, reactionValue) < 0) {
             Task_Kill(owner);
             return NULL;
@@ -405,7 +405,7 @@ struct ContactSequenceOwner *ContactSequencePool_Create(s32 initialHealth, u32 c
 }
 
 struct ContactSequenceActor *
-ContactSequencePool_FindInactiveActor(struct ContactSequenceOwner *owner)
+NidhoggrDuelMinionPool_FindInactiveActor(struct ContactSequenceOwner *owner)
 {
     struct ContactSequenceActor *actor = owner->actors;
     s32 index = 0;
@@ -423,13 +423,13 @@ done:
     return result;
 }
 
-struct ContactSequenceActor *ContactSequencePool_FindInactiveActor(struct ContactSequenceOwner *);
+struct ContactSequenceActor *NidhoggrDuelMinionPool_FindInactiveActor(struct ContactSequenceOwner *);
 
 void *TerrainModifiers_FindCellOverride(u32, u32);
 
 void Collider_SetAttackPowerAndForce(void *, u32, u32);
 
-s32 ContactSequencePool_SpawnActor(struct ContactSequenceOwner *pool,
+s32 NidhoggrDuelMinionPool_SpawnActor(struct ContactSequenceOwner *pool,
                                    const struct ContactPosition *position, u32 variant)
 {
     u32 savedVariant;
@@ -446,7 +446,7 @@ s32 ContactSequencePool_SpawnActor(struct ContactSequenceOwner *pool,
     owner = pool;
     if (!owner)
         return -1;
-    actor = ContactSequencePool_FindInactiveActor(owner);
+    actor = NidhoggrDuelMinionPool_FindInactiveActor(owner);
     if (!actor)
         return -1;
     actor->position = *position;
@@ -484,7 +484,7 @@ s32 ContactSequencePool_SpawnActor(struct ContactSequenceOwner *pool,
     Collider_SetPosition(resourceCollider, savedPosition, 0);
     Collider_SetAttackPowerAndForce(resourceCollider, (u16)owner->resourceValue, 50);
     Collider_SetBodyProperties(healthCollider, owner->contactValue, 0, 0);
-    ContactSequenceActor_SetState(actor, 1);
+    NidhoggrDuelMinion_SetState(actor, 1);
     actor->stateFrame = 0;
     actor->flash = 0;
     actor->health = owner->initialHealth;
@@ -500,7 +500,7 @@ s32 ContactSequencePool_SpawnActor(struct ContactSequenceOwner *pool,
     return 0;
 }
 
-s32 ContactSequencePool_BeginAllDeaths(struct ContactSequenceOwner *owner)
+s32 NidhoggrDuelMinionPool_BeginAllDeaths(struct ContactSequenceOwner *owner)
 {
     struct ContactSequenceActor *actor;
     s32 remaining;
@@ -510,14 +510,14 @@ s32 ContactSequencePool_BeginAllDeaths(struct ContactSequenceOwner *owner)
     remaining = 7;
     do {
         if (actor->active && actor->state <= 2)
-            ContactSequenceActor_SetState(actor, 3);
+            NidhoggrDuelMinion_SetState(actor, 3);
         --remaining;
         ++actor;
     } while (remaining >= 0);
     return 0;
 }
 
-u32 ContactSequencePool_GetActiveCount(struct ContactSequenceOwner *owner)
+u32 NidhoggrDuelMinionPool_GetActiveCount(struct ContactSequenceOwner *owner)
 {
     if (!owner)
         return 0;

@@ -1,7 +1,7 @@
 #ifndef GUARD_PARTICLE_EFFECT_STATE_H
 #define GUARD_PARTICLE_EFFECT_STATE_H
 
-#include "scene/actor/contact_swarm.h"
+#include "scene/collision/contact_swarm.h"
 
 struct BurstPos {
     s32 x, y, z, w;

@@ -1,5 +1,5 @@
 #include "global.h"
-#include "objects/orbit_motion.h"
+#include "objects/dungeon_prop/orbit_motion.h"
 /* Math_BlendAngleWithTableFactor: Wraps the angle near its target then blends using the indexed table factor */
 #define Math_BlendAngleWithTableFactor sub_0819B244
 

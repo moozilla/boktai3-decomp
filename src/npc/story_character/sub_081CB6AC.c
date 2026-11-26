@@ -3,7 +3,7 @@
 void Actor_PlayAnimationEntry(void *, u32, u32, u32, u32);
 s32 DisplayAnimation_TestFinished(void *);
 
-void StateActor_UpdateFacingAnimation(u32 a, u8 *b, u32 c)
+void StoryCharacter_UpdateFacingAnimation(u32 a, u8 *b, u32 c)
 {
     u32 anim;
     s16 *p = (s16 *)(b + 0x20);

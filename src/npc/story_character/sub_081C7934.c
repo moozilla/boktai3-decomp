@@ -1,5 +1,5 @@
-#include "scene/actor/scene_actor_terrain.h"
-#include "scene/actor/scene_actor_chase_types.h"
+#include "scene/motion/scene_actor_terrain.h"
+#include "scene/motion/scene_actor_chase_types.h"
 struct NpcTag {
     u8 pad[2];
     s16 height;
@@ -45,7 +45,7 @@ static inline s32 GetGroundHeight(const struct ContactPosition *pos)
     return height;
 }
 
-void StateActor_UpdateAnimation16State(void *context, struct Npc *p)
+void StoryCharacter_UpdateAnimation16State(void *context, struct Npc *p)
 {
     u32 r;
     struct ContactPosition *pos;

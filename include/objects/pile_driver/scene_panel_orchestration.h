@@ -5,7 +5,7 @@
 #include "objects/pile_driver/scene_panel_config.h"
 
 #define SCENE_PANEL_GLOBAL ((struct ScenePanel *)gScenePanel)
-void ScenePanel_InitRig(struct ScenePanel *);
-void ScenePanel_InitBackground(struct ScenePanel *);
-void ScenePanel_InitOverlay(struct ScenePanel *);
+void PileDriver_InitRig(struct ScenePanel *);
+void PileDriver_InitBackground(struct ScenePanel *);
+void PileDriver_InitOverlay(struct ScenePanel *);
 #endif

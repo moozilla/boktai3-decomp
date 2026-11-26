@@ -56,8 +56,8 @@ KINDS = {
     6: ("camera", "Camera_Initialize", "Camera_DispatchCommands"),
     7: ("screen", "sub_08021394", "SceneCommands_Dispatch"),
     8: ("audio", "SceneAudioEvent_Register", "SceneAudioEvent_DispatchPending"),
-    9: ("panel", "ScenePanel_RegisterReceiver", "ScenePanel_DispatchCommands"),
-    10: ("object", "GroupObjects_Initialize", None),
+    9: ("panel", "PileDriver_RegisterReceiver", "PileDriver_DispatchCommands"),
+    10: ("object", "BatFlock_Initialize", None),
     11: ("kind 11", "sub_08118890", None),
     12: ("kind 12", "sub_081202CC", None),
 }

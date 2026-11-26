@@ -1,4 +1,4 @@
-#include "scene/actor/scene_actor_contact_list.h"
+#include "scene/collision/scene_actor_contact_list.h"
 static inline u8 Unavailable(struct SceneActorRegistryActor *actor, u16 *state, u32 disabled,
                              u32 excluded)
 {

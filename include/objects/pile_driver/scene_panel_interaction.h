@@ -1,7 +1,7 @@
 #ifndef GUARD_SCENE_PANEL_INTERACTION_H
 #define GUARD_SCENE_PANEL_INTERACTION_H
 
-#include "objects/pile_driver/scene_panel_rig.h"
+#include "objects/pile_driver/pile_driver_rig.h"
 #include "objects/coffin/tether_actor.h"
 
 /* Tentative views for the adjoining player/subject interaction state machine. */
@@ -22,19 +22,19 @@ struct ScenePanelInteractionPackedPosition {
 };
 
 #define SCENE_PANEL_PLAYER ((struct ScenePanelInteractionPlayer *)gPlayers[0])
-s32 ScenePanel_IsWithinHorizontalRadius(const struct ContactPosition *,
+s32 PileDriver_IsWithinHorizontalRadius(const struct ContactPosition *,
                                         const struct ContactPosition *, s32);
-s32 ScenePanel_CanAcquireTether(struct ScenePanel *);
-s32 ScenePanel_AreSubjectsSettled(struct ScenePanel *);
-s32 ScenePanel_CanAcceptPlayer(struct ScenePanel *);
-s32 ScenePanel_IsTetherDistant(struct ScenePanel *);
-void ScenePanel_SetEffectState(struct ScenePanel *, u16);
-void ScenePanel_SetState(struct ScenePanel *, void (*)(struct ScenePanel *));
-void ScenePanel_BeginForwardSequence(struct ScenePanel *);
-void ScenePanel_BeginLongSequence(struct ScenePanel *);
-void ScenePanel_BeginPulseSequence(struct ScenePanel *);
-void ScenePanel_RunScheduledAction(struct ScenePanel *);
-void ScenePanelRig_SetState(struct ScenePanelRig *, u32);
+s32 PileDriver_CanAcquireTether(struct ScenePanel *);
+s32 PileDriver_AreSubjectsSettled(struct ScenePanel *);
+s32 PileDriver_CanAcceptPlayer(struct ScenePanel *);
+s32 PileDriver_IsTetherDistant(struct ScenePanel *);
+void PileDriver_SetEffectState(struct ScenePanel *, u16);
+void PileDriver_SetState(struct ScenePanel *, void (*)(struct ScenePanel *));
+void PileDriver_BeginForwardSequence(struct ScenePanel *);
+void PileDriver_BeginLongSequence(struct ScenePanel *);
+void PileDriver_BeginPulseSequence(struct ScenePanel *);
+void PileDriver_RunScheduledAction(struct ScenePanel *);
+void PileDriverRig_SetState(struct ScenePanelRig *, u32);
 void PlayerCue_MoveTo(struct ScenePanelInteractionPlayer *, const struct ContactPosition *, s32,
                       u32, u32);
 void PlayerCue_Stand(struct ScenePanelInteractionPlayer *, s32);

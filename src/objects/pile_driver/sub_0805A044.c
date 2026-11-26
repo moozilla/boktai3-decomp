@@ -1,4 +1,4 @@
-#include "objects/pile_driver/scene_panel_rig.h"
+#include "objects/pile_driver/pile_driver_rig.h"
 
 static inline s32 scale12(s32 value)
 {
@@ -13,7 +13,7 @@ static inline s32 scale24(s32 value)
 // Turns the rig toward the selected subject's angle and eases its distance,
 // then places it on that circle with a small sway; arriving plays a sound and
 // moves on to state 5.
-void ScenePanelRig_TickApproachSubject(struct ScenePanelRig *rig)
+void PileDriverRig_TickApproachSubject(struct ScenePanelRig *rig)
 {
     s32 targetAngle;
     // The target distance and then the sine table share one register.
@@ -114,7 +114,7 @@ void ScenePanelRig_TickApproachSubject(struct ScenePanelRig *rig)
             absolute = -absolute;
         if (absolute <= 31) {
             Sound_PlaySong(244);
-            ScenePanelRig_SetState(rig, 5);
+            PileDriverRig_SetState(rig, 5);
         }
     }
 }

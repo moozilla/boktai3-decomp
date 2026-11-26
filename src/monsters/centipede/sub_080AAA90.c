@@ -1,7 +1,7 @@
 #include "global.h"
 
 #include "scene/actor/scene_actor_reset.h"
-#include "scene/actor/scene_actor_chase_shared.h"
+#include "scene/motion/scene_actor_chase_shared.h"
 struct TentacleImpulseSegment {
     u8 unknown0[0x1C];
     struct ContactPosition position;

@@ -10,7 +10,7 @@ void Collider_Init(u8 *, u16, u32, u32, u32, struct Z *, struct Z *);
 void Collider_SetCallback(u8 *, void (*)(void), u8 *);
 void Collider_SetPosition(u8 *, u8 *, u32);
 s32 Collider_Refresh(u8 *);
-void FanCannon_ApplyHitReaction(void);
+void WindCannon_ApplyHitReaction(void);
 void Collider_SetBodyProperties(void *, u32, u32, u32);
 struct Q {
     u8 pad[6];
@@ -38,7 +38,7 @@ void sub_082093F8(u8 *p)
     }
     Collider_Init(q, 0, 0x5009, 0, 0x10, &a, &b);
     Collider_SetPosition(q, p + 0x2c, 0);
-    Collider_SetCallback(q, FanCannon_ApplyHitReaction, p);
+    Collider_SetCallback(q, WindCannon_ApplyHitReaction, p);
     Collider_SetBodyProperties(q, 0, *(u16 *)(p + 0x12e), *(u16 *)(p + 0x12c));
     Collider_Refresh(q);
     ((struct Q *)q)->flags |= 4;

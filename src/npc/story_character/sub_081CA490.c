@@ -75,7 +75,7 @@ static inline u32 Burst_SelectAnimation(u8 kind, u32 selected)
     return animation;
 }
 
-void StateActor_UpdateEightWayBurst(u32 context, struct StateActor *p, s32 tick)
+void StoryCharacter_UpdateEightWayBurst(u32 context, struct StateActor *p, s32 tick)
 {
     u8 variance = 5;
     u32 animation;

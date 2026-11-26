@@ -1,6 +1,6 @@
-#include "npc/sabata_rider/script_puppet.h"
+#include "npc/sabata_rider/sabata_rider.h"
 
-struct RegistryActor *RegistryA8CB_FindAvailableEntry(RegistryActorManager *manager)
+struct RegistryActor *SabataRider_FindAvailableEntry(RegistryActorManager *manager)
 {
     s32 index;
     for (index = 0; index < REGISTRY_ACTOR_SLOT_COUNT; index++) {
@@ -10,7 +10,7 @@ struct RegistryActor *RegistryA8CB_FindAvailableEntry(RegistryActorManager *mana
     return 0;
 }
 
-struct RegistryActor *RegistryA8CB_FindEntryByName(RegistryActorManager *manager, u32 name)
+struct RegistryActor *SabataRider_FindEntryByName(RegistryActorManager *manager, u32 name)
 {
     s32 index;
     for (index = 0; index < REGISTRY_ACTOR_SLOT_COUNT; index++) {
@@ -21,13 +21,13 @@ struct RegistryActor *RegistryA8CB_FindEntryByName(RegistryActorManager *manager
     return 0;
 }
 
-void RegistryA8CB_RegisterMessageReceiver(struct RegistryActor *actor)
+void SabataRider_RegisterMessageReceiver(struct RegistryActor *actor)
 {
     if (RegistryActor_MessagePauseBits(REGISTRY_ACTOR_MESSAGES_PAUSED) == 0)
         SceneMessages_RegisterReceiver(actor->control.messages, (u32)actor->control.owner, 0xc);
 }
 
-void RegistryA8CB_SetKeyframes(struct RegistryActor *actor, u32 frame)
+void SabataRider_SetKeyframes(struct RegistryActor *actor, u32 frame)
 {
     Anim_SetKeyframes(&actor->model.view.parts[2], (u8 *)&actor->model.resource, (u16)frame, 1, 0);
 }

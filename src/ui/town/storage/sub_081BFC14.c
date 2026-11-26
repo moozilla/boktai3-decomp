@@ -2,7 +2,7 @@
 #include "ui/widgets/scene_input_navigation.h"
 struct SceneInventoryCategoryMenu {
     u8 unknown0[0x258];
-    struct SceneInputWidget prompt;
+    struct AnimSprite prompt;
     u8 unknown2B8[0x1458 - 0x2B8];
     u8 cursor[0xC0];
     u8 choiceResource[0x1734 - 0x1518];
@@ -18,8 +18,8 @@ struct SceneInventoryCategoryMenu {
     u8 unknown1790[0x38];
     u16 colors[16];
 };
-void SceneInventory_SetCategoryPalette(struct SceneInventoryCategoryMenu *, u16 *);
-void SceneInventory_SetState(struct SceneInventoryCategoryMenu *,
+void Storage_SetCategoryPalette(struct SceneInventoryCategoryMenu *, u16 *);
+void Storage_SetState(struct SceneInventoryCategoryMenu *,
                              void (*)(struct SceneInventoryCategoryMenu *), u32);
 void Storage_HideItemDetails(struct SceneInventoryCategoryMenu *);
 void Storage_InitSelectionGrid(struct SceneInputGridView *, u32, u32, u32, u32);
@@ -43,7 +43,7 @@ void Storage_BeginModeSelection(struct SceneInventoryCategoryMenu *p, s32 mode)
             break;
     }
     Storage_UpdateCursorPosition(&p->grid, p->cursor);
-    SceneInventory_SetState(p, Storage_UpdateModeSelection, 1);
-    SceneInventory_SetCategoryPalette(p, p->colors);
+    Storage_SetState(p, Storage_UpdateModeSelection, 1);
+    Storage_SetCategoryPalette(p, p->colors);
     Storage_RefreshCategoryWidgets(p);
 }

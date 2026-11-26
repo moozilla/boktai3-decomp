@@ -21,7 +21,7 @@ Tags: #matching #vanargand
 - 081A77B0 matched: `Vanargand_UpdateActiveExitTransition` (tentative).
   These reuse the existing pending-entry helper returning u8 and local state
   held over the action-sequence call.
-- 081A7D80 matched: `ScenePanel_ApplyPairTransition`. Inline state-request
+- 081A7D80 matched: `VanargandPair_ApplyPairTransition`. Inline state-request
   helpers at each branch reproduce shared tails; a single selected-state
   variable produced different conditional materialization and switch layout.
 - 081A84B0 matched: `Vanargand_UpdateMode3Transition`. The same helper technique
@@ -206,7 +206,7 @@ Tags: #matching #vanargand #animation #effects
 - 0818ECFC drafted 73.5%, `ScenePanelEffect_UpdatePool` (tentative).
   Full new C dispatches 24 simple and 48 collision effects, clears occupancy
   bits, applies anchored/delta motion and staggers collider updates by parity.
-  Based on ScenePanelEffect_InitPool's observed layout. Separate motion/position
+  Based on NidhoggrEffect_InitPool's observed layout. Separate motion/position
   cursors and pool/remaining bindings regress. Reviewed 316-byte extent through
   0818EE38.
 - 0818EE38 matched, `Nidhoggr_StepPoolAnimation`, 288 bytes. Applying the
@@ -271,7 +271,7 @@ Tags: #matching #nidhoggr #effects #script-combat-actor
   without const prevents word caching across calls, recovers its saved pointer
   and makes the constructor exact. Two register hints remain after depin.
 - 082015D4 drafted 96.7% (was 82.4%),
-  `ScriptCombatActor_ApplyHitReaction`. Typed recipient fields reproduce the
+  `MuspellHead_ApplyHitReaction`. Typed recipient fields reproduce the
   first half exactly apart from argument-copy order. Batched cursor updates,
   explicit index/count lifetimes, preserving the blocked recipient pointer,
   reversed flag intersection and HUD argument bindings reduce the residue to
@@ -299,7 +299,7 @@ Batch 4 combined validation after rebase: `build/boktai3.gba: OK`.
 
 Tags: #matching #script-combat-actor #scene-npc #palette
 
-- 08201A78 matched, `ScriptCombatActor_UpdateProjectileAttack`, full 564-byte
+- 08201A78 matched, `MuspellHead_UpdateProjectileAttack`, full 564-byte
   extent, without hints. Reused the attack-start handler layout and a matched
   orbit-particle RNG sequence. An explicit signed-byte aim temporary retains
   the target sign extension; an inline vector copy emits the destination
@@ -318,7 +318,7 @@ Tags: #matching #script-combat-actor #scene-npc #palette
   and retained initial-death field offset close the remaining bytes. Nineteen
   hints remain after depin. All script, collision, terrain and scene-body paths
   are retained; no extra split boundary is required.
-- 082015D4 matched, `ScriptCombatActor_ApplyHitReaction`, full 432-byte extent.
+- 082015D4 matched, `MuspellHead_ApplyHitReaction`, full 432-byte extent.
   Required revisit closes the prior 96.7% draft. A forward-counting three-pass
   loop produces the reversed count initialization after invariant hoisting.
   Explicit index increments, a table binding after vector copies and separate

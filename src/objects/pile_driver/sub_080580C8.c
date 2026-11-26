@@ -1,10 +1,10 @@
-#include "objects/pile_driver/scene_panel_effects.h"
-void ScenePanel_UpdatePaletteState(struct ScenePanel *input)
+#include "objects/pile_driver/pile_driver_effects.h"
+void PileDriver_UpdatePaletteState(struct ScenePanel *input)
 {
     struct ScenePanelEffectsView *panel = (void *)input;
     if (panel->state)
         panel->state(input);
-    ScenePanel_UpdateTimePalette(panel);
+    PileDriver_UpdateTimePalette(panel);
     if (panel->channelsDirty) {
         s32 i;
         for (i = 0; i < 3; i++)

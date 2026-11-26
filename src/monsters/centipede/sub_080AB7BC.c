@@ -1,7 +1,7 @@
 #include "global.h"
 #include "player/player.h"
-#include "scene/actor/contact_position.h"
-#include "scene/actor/contact_collider.h"
+#include "scene/collision/contact_position.h"
+#include "scene/collision/contact_collider.h"
 
 // confidence=low: inferred from segment state and collider updates.
 
@@ -63,7 +63,7 @@ static inline void SetAttack(void *collider, u8 *p, s32 variant)
     Collider_SetAttackProperties(collider, a, b, 0, c, d);
 }
 
-void TentacleActor_UpdateSegmentColliders(struct TentacleActor *actor)
+void Centipede_UpdateSegmentColliders(struct TentacleActor *actor)
 {
     u8 *p = (u8 *)actor;
     u8 *trail = actor->context;

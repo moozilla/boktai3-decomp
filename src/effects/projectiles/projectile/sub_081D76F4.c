@@ -1,5 +1,5 @@
 #include "global.h"
-#include "scene/actor/contact_position.h"
+#include "scene/collision/contact_position.h"
 #include "engine/engine.h"
 #include "engine/ram.h"
 extern const s16 gUnk_086149C4[];
@@ -33,7 +33,7 @@ static inline s32 Rand2(s32 i)
     return gRandomTable[(i + 1) & 1023];
 }
 // confidence=low: starts the next trail sprite slot at a random offset around the owner direction.
-void Task4E01_SpawnTrailSprite(struct TrailOwner *p, u8 *src)
+void ProjectileTask_SpawnTrailSprite(struct TrailOwner *p, u8 *src)
 {
     u16 mul;
     s32 dir;

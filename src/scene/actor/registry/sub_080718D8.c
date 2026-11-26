@@ -1,4 +1,4 @@
-#include "scene/actor/scene_actor_terrain_reaction.h"
+#include "scene/motion/scene_actor_terrain_reaction.h"
 #include "scene/actor/scene_actor_reset.h"
 void SceneActorControl_OnIdle(u8 *);
 void SceneActorPalette_ClearCompletedTransitions(void);

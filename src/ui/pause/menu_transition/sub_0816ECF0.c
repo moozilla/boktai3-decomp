@@ -31,7 +31,7 @@ void PauseMenu_BeginVitalRatioExchange(u8 *s, u32 mode)
     kind = s + 0x438a;
     index = *kind + 10;
     {
-        u32 off = index * sizeof(struct SceneInputWidget);
+        u32 off = index * sizeof(struct AnimSprite);
         u8 *base = s + 0x1428;
         flags = (u32 *)(base + off);
     }

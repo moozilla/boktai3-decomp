@@ -77,7 +77,7 @@ the row on every row. As C this is `entry = (void *)((rowSlot + 5) * 0x60 +
 ## Smaller properties found on the item grid
 
 * Compute the member base before adding the row offset:
-  `struct SceneInputWidget *base = panel->display.primary; widget = (void *)(rowBytes + (u32)base);`.
+  `struct AnimSprite *base = panel->display.primary; widget = (void *)(rowBytes + (u32)base);`.
   Folded into one expression, it becomes `(rowBytes + 0x288) + panel`.
   The same holds for `display.secondary` in the second section.
 * Both a per-section `column` and a per-section `rowSlot` give rowSlot sb and

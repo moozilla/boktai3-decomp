@@ -6,7 +6,7 @@ struct ArmorSpriteColliderPart {
     u8 collider[0x1E4 - 0x9C];
 };
 
-void Armor6_DestroySpriteColliders(struct ArmorSpriteColliderPart *parts)
+void Armor_DestroySpriteColliders(struct ArmorSpriteColliderPart *parts)
 {
     s32 i;
 

@@ -1,5 +1,5 @@
 #include "scene/actor/scene_actor_status.h"
-#include "scene/actor/scene_actor_delayed_response.h"
+#include "scene/collision/scene_actor_delayed_response.h"
 #include "scene/actor/scene_actor_reaction.h"
 
 static inline void SceneActorRecovery_ClearGate(struct SceneActorControlGate *gate, u16 bits)

@@ -1,6 +1,6 @@
 #ifndef GUARD_ACTOR_ATTACHMENT_SLOT_H
 #define GUARD_ACTOR_ATTACHMENT_SLOT_H
-#include "scene/actor/contact_swarm.h"
+#include "scene/collision/contact_swarm.h"
 /* Narrow shared slot prefix used from 6466C onward. Attachment identity is tentative. */
 struct ActorAttachmentSource {
     u8 unknown0[0x98];

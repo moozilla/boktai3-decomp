@@ -7,8 +7,8 @@ struct ScreenParams {
     u32 confirmScript, alternateScript, cancelScript;
 };
 struct ScreenMessageWidget {
-    struct SceneInputWidget sprite;
-    struct SceneInputResource graphics;
+    struct AnimSprite sprite;
+    struct AnimSpriteResource graphics;
     u32 unknown80[2];
 };
 struct ScreenMessage {

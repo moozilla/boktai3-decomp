@@ -1,9 +1,9 @@
-#include "scene/actor/scene_actor_terrain_reaction.h"
+#include "scene/motion/scene_actor_terrain_reaction.h"
 #include "global.h"
 // confidence=low: follows the route probe, then selects a new route point outside link mode.
 
 #include "scene/actor/scene_actor_control_phase.h"
-#include "scene/actor/scene_actor_chase_shared.h"
+#include "scene/motion/scene_actor_chase_shared.h"
 #include "engine/engine.h"
 #include "engine/ram.h"
 u8 SceneActor_IsFacingNearbyTarget(struct ChaseActor *);

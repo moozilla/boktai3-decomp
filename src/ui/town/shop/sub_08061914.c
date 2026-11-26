@@ -1,5 +1,5 @@
-#include "ui/town/scene_inventory_states.h"
-void SceneInventory_BeginRemovalConfirmation(struct SceneInventoryControlView *panel)
+#include "ui/town/shop_states.h"
+void Shop_BeginRemovalConfirmation(struct SceneInventoryControlView *panel)
 {
     SceneInput_SaveSelection(&panel->grid);
     panel->interactionFlags = 4;
@@ -14,9 +14,9 @@ void SceneInventory_BeginRemovalConfirmation(struct SceneInventoryControlView *p
             SceneInputPanel_ShowDescription(panel, 2, panel->itemText, -1);
             break;
     }
-    SceneInventory_UpdateModePrompt(panel, 2);
+    Shop_UpdateModePrompt(panel, 2);
     SceneInput_BeginChoice(&panel->display.prompt, &panel->display.widgetResource,
                            &panel->choiceValue, 0, &panel->choiceBlink);
-    SceneInventory_SetControllerCallback(
-        panel, (SceneInventoryCallback)SceneInventory_TickDiscardConfirmation);
+    Shop_SetControllerCallback(
+        panel, (SceneInventoryCallback)Shop_TickDiscardConfirmation);
 }

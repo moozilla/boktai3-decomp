@@ -1,6 +1,6 @@
 #include "bosses/sabata/scene_volume.h"
 
-s32 SceneVolume_GetActivityState(struct SceneVolumeActor *volume)
+s32 SabataVolume_GetActivityState(struct SceneVolumeActor *volume)
 {
     s32 result;
     if (volume->activityTimer > 0) {

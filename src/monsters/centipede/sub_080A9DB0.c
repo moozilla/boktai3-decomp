@@ -34,8 +34,8 @@ struct Actor {
     struct Group *group;
 };
 s32 Div(s32, s32);
-void TentacleActor_TargetMarkedSegment(void *);
-void TentacleActor_UpdateSegmentHeadings(void *);
+void Centipede_TargetMarkedSegment(void *);
+void Centipede_UpdateSegmentHeadings(void *);
 void sub_080A9BD8(void *, void *, void *, s32, s32);
 static inline u8 test(struct Segment *p, u32 mask)
 {
@@ -100,7 +100,7 @@ void TentacleActor_UpdateSegmentPositions(struct Actor *p, s32 divisor, s32 thre
         }
     }
 
-    TentacleActor_TargetMarkedSegment(p);
+    Centipede_TargetMarkedSegment(p);
     head = p->drawable->position;
     first = 255;
     run = 0;
@@ -132,5 +132,5 @@ void TentacleActor_UpdateSegmentPositions(struct Actor *p, s32 divisor, s32 thre
         }
     }
 
-    TentacleActor_UpdateSegmentHeadings(p);
+    Centipede_UpdateSegmentHeadings(p);
 }

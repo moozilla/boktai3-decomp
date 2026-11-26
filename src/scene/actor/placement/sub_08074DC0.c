@@ -1,4 +1,4 @@
-#include "scene/actor/scene_actor_collision.h"
+#include "scene/collision/scene_actor_collision.h"
 void SceneActorCollision_InitExternalAttack(struct ChaseActor *actor,
                                             struct ContactCollider *collider, void *size,
                                             void *offset, void *callback, u32 index, void *owner)

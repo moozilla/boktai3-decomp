@@ -1,5 +1,5 @@
 #include "global.h"
-#include "scene/area_effect/area_effect_link.h"
+#include "scene/areas/area_effect_link.h"
 
 struct LinkScriptArgs {
     u32 count : 16, unused : 16;

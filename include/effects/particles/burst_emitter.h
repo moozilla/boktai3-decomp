@@ -1,6 +1,6 @@
 #ifndef GUARD_BURST_EMITTER_H
 #define GUARD_BURST_EMITTER_H
-#include "scene/actor/contact_swarm.h"
+#include "scene/collision/contact_swarm.h"
 #include "engine/engine_globals.h"
 #include "engine/task.h"
 /* Tentative five-slot burst family; kind/ownership identities are unconfirmed. */

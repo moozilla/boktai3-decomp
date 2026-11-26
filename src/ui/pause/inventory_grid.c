@@ -72,7 +72,7 @@ void InventoryGrid_BeginIconTransfer(struct SceneHudState *s)
     kind = &s->actionSelection;
     index = *kind + 10;
     {
-        u32 off = index * sizeof(struct SceneInputWidget);
+        u32 off = index * sizeof(struct AnimSprite);
         u8 *base = (u8 *)&s->categoryWidgets[0].flags;
         flags = (u32 *)(base + off);
     }

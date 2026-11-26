@@ -95,23 +95,23 @@
 
 - LevelAdvanceDisplay_StartParticle (08056F88), fourth sample cursor address/dereference. Direct cursor access shortens the function from 196 to 184 bytes and changes the table, cursor and mask homes. Shared direct, indexed and draw operations use the same wrong homes. The exact source retains the address/dereference.
 
-- ScenePanelRig_ApplyContact (08059428), reaction mask. Direct forms load the flag word before forming 127. The ROM forms 127 first. The subject callback uses the same reaction mask.
-- ScenePanelRig_TickRise (08059AC4), rise-to-wander wrapper. Its loop note prevents CSE from making the later arm reuse the pre-branch frame information. Suppressing only that CSE follow matches the native-parent draft. Direct counter and branch forms still combine the loads.
-- ScenePanelRig_TickWandering (08059DF8), turn step/table union. Splitting the values changes homes for the table, cursor, mask and step and loses four bytes. The shared sample forms change the allocation but have no stock match.
-- ScenePanelRig_TickApproachSubject (0805A044), target distance/table union. Separate values give the table r3 where ROM has r6. Direct signed sine and distance fields preserve this exchange, and hoisting the table changes instruction order.
-- ScenePanelRig_TickSecondarySprites (0805A7E4), three weight/phase unions. Separating all values keeps the size and instruction shapes. A diagnostic allocation of table, random phase pointer, phase pointer and radius gives exact bytes. Native bounded loops and explicit phase fields still choose different homes.
-- ScenePanelRig_InitPrimarySprites (0805AE58), graphics/table union. A separate constant table is rematerialized at each draw, and suppressing that equivalence hoists the table to the loop entry. The ROM loads it once after the phase store. The standard shared draw operations miss.
+- PileDriverRig_ApplyContact (08059428), reaction mask. Direct forms load the flag word before forming 127. The ROM forms 127 first. The subject callback uses the same reaction mask.
+- PileDriverRig_TickRise (08059AC4), rise-to-wander wrapper. Its loop note prevents CSE from making the later arm reuse the pre-branch frame information. Suppressing only that CSE follow matches the native-parent draft. Direct counter and branch forms still combine the loads.
+- PileDriverRig_TickWandering (08059DF8), turn step/table union. Splitting the values changes homes for the table, cursor, mask and step and loses four bytes. The shared sample forms change the allocation but have no stock match.
+- PileDriverRig_TickApproachSubject (0805A044), target distance/table union. Separate values give the table r3 where ROM has r6. Direct signed sine and distance fields preserve this exchange, and hoisting the table changes instruction order.
+- PileDriverRig_TickSecondarySprites (0805A7E4), three weight/phase unions. Separating all values keeps the size and instruction shapes. A diagnostic allocation of table, random phase pointer, phase pointer and radius gives exact bytes. Native bounded loops and explicit phase fields still choose different homes.
+- PileDriverRig_InitPrimarySprites (0805AE58), graphics/table union. A separate constant table is rematerialized at each draw, and suppressing that equivalence hoists the table to the loop entry. The ROM loads it once after the phase store. The standard shared draw operations miss.
 
-- ScenePanelSubject_ApplyContact (0805CCF0), reaction mask. The direct form exchanges the flag-word load and the 127 materialization. This is the same code shape as the rig callback.
-- ScenePanelSubject_TickActivating (0805CFE8), index/resource union. The native combined condition removes the ROM’s second index load. Keeping two reads and using a scalar index recovers the reload, but uses r1 for its compare instead of r0.
+- PileDriverSubject_ApplyContact (0805CCF0), reaction mask. The direct form exchanges the flag-word load and the 127 materialization. This is the same code shape as the rig callback.
+- PileDriverSubject_TickActivating (0805CFE8), index/resource union. The native combined condition removes the ROM’s second index load. Keeping two reads and using a scalar index recovers the reload, but uses r1 for its compare instead of r0.
 
 - SceneInput_TickChoice (0805E1D0), proved-zero confirm mask. The closest native draft keeps all 160 bytes and differs in the two instructions feeding the confirm AND. CSE commutes the known-one operand and regmove copies the key word rather than the mask. Named SDK keys and native argument uses still choose that operand order.
 
 - SceneInput_BeginPairTransition (0805E484), frame reset. Direct field stores place zero after address formation, and PRE uses the first field address for the adjacent duration address. The ROM materializes zero first and forms both addresses independently. Typed and indexed loop variants also change other instructions.
 
-- SceneInventory_PopulateConsumableGrid (080600DC), trailing digit visibility bit. Direct flag writes exchange early reload and induction slots across the grid. Indexed flag and digit arrays still change the loop shape or homes, unlike the corresponding item grid.
+- Shop_PopulateConsumableGrid (080600DC), trailing digit visibility bit. Direct flag writes exchange early reload and induction slots across the grid. Indexed flag and digit arrays still change the loop shape or homes, unlike the corresponding item grid.
 
-- SceneInventory_BuildConsumableCatalog (080630FC), empty catalog fill. A direct OR literal moves the immediate after catalog address formation. A direct signed sentinel removes the ROM’s read-modify-write and changes loop allocation.
+- Shop_BuildConsumableCatalog (080630FC), empty catalog fill. A direct OR literal moves the immediate after catalog address formation. A direct signed sentinel removes the ROM’s read-modify-write and changes loop allocation.
 
 - ClockPanel_CaptureSnapshot (08109AEC), second saved-name offset. Using the literal or a separate bike-name array exchanges the two initial address homes. The local now identifies the actual record field and remains a warning.
 
@@ -126,7 +126,7 @@
 
 ## RANDOM TABLE
 
-- ScenePanel_InitRig (0805B0F0) now matches all 412 bytes without the proved-zero adjustment. Set table directly to gRandomTable and use the existing PARTICLE_RANDOM_READ_SAMPLE(sample, table, first) for the first halfword sample, immediately before masking with 15 to compute the turn rate. Existing sampling sites after that remain ordinary table reads. The same macro on the byte-width speed sample (capture into u8) or final vertical-step sample also independently matches. The conditional sign and duration reads change code when captured this way. Start with one real sample when applying this to another effect.
+- PileDriver_InitRig (0805B0F0) now matches all 412 bytes without the proved-zero adjustment. Set table directly to gRandomTable and use the existing PARTICLE_RANDOM_READ_SAMPLE(sample, table, first) for the first halfword sample, immediately before masking with 15 to compute the turn rate. Existing sampling sites after that remain ordinary table reads. The same macro on the byte-width speed sample (capture into u8) or final vertical-step sample also independently matches. The conditional sign and duration reads change code when captured this way. Start with one real sample when applying this to another effect.
 - Direct gRandomTable alone exchanges the table and mask registers. The existing statement macro supplies a sample boundary and changes the table reference weight before allocation. It is already shared across the particle and scene code. No new macro, inline or literal parameter was introduced.
 
 ## PARAMETER HELPERS

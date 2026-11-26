@@ -3,8 +3,8 @@
 struct E {
     u8 p[0x180];
 };
-void FanCannonManager_InitSlot(u8 *, struct E *, s32);
-u32 FanCannonManager_Init(u8 *a)
+void WindCannonManager_InitSlot(u8 *, struct E *, s32);
+u32 WindCannonManager_Init(u8 *a)
 {
     struct E *e;
     s32 i;
@@ -13,7 +13,7 @@ u32 FanCannonManager_Init(u8 *a)
     e = (struct E *)(a + 0x1c);
     i = 0;
     do {
-        FanCannonManager_InitSlot(a, e, i);
+        WindCannonManager_InitSlot(a, e, i);
         i++;
         e++;
     } while (i <= 7);

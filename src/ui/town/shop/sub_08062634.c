@@ -1,5 +1,5 @@
-#include "ui/town/scene_inventory_tail.h"
-#include "ui/town/scene_item_values.h"
+#include "ui/town/shop_tail.h"
+#include "ui/town/shop_item_values.h"
 struct SceneInventorySaleView {
     u8 unknown0[0x1AF0];
     struct SceneInputPair pair;
@@ -11,8 +11,8 @@ s32 SceneItemValue_CalculateConsumable(u32);
 void Inventory_RemoveEquipmentEntry(u32);
 void Inventory_ClearItemSlot(u32);
 void GameState_ClearConsumableSlot(u32);
-s32 SceneInventory_TickSaleFeedback(struct SceneInventoryTail *);
-s32 SceneInventory_TickSaleTransition(struct SceneInventoryTail *p)
+s32 Shop_TickSaleFeedback(struct SceneInventoryTail *);
+s32 Shop_TickSaleTransition(struct SceneInventoryTail *p)
 {
     SceneInputPanel_ResetHighlights(&p->display, &p->highlight);
     if (SceneInput_TickPairTransition(&((struct SceneInventorySaleView *)p)->pair)) {
@@ -58,8 +58,8 @@ s32 SceneInventory_TickSaleTransition(struct SceneInventoryTail *p)
             }
         }
         p->sold = 1;
-        SceneInventory_SetControllerCallback(
-            p, (SceneInventoryCallback)SceneInventory_TickSaleFeedback);
+        Shop_SetControllerCallback(
+            p, (SceneInventoryCallback)Shop_TickSaleFeedback);
     }
     return 0;
 }

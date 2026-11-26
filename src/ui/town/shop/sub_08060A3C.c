@@ -6,7 +6,7 @@ struct SceneInventorySlotsView {
 };
 extern struct SceneInventorySlotsView *gGameState;
 
-s32 SceneInventory_FindConsumableAssignment(s32 slot)
+s32 Shop_FindConsumableAssignment(s32 slot)
 {
     s32 i = 0;
     s16 *p = gGameState->slots;

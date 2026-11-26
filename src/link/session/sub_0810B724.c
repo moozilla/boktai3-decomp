@@ -3,7 +3,7 @@
 #include "engine/video/render.h"
 #include "engine/ram.h"
 #include "engine/runtime.h"
-#include "scene/area_effect/area_effect_link.h"
+#include "scene/areas/area_effect_link.h"
 #include "engine/engine_pause_flags.h"
 
 struct Reg1745Run {
@@ -32,7 +32,7 @@ struct Reg1745Hdr {
 s32 Serial_ReceivePacket(u32);
 s32 SerialLink_QueueSendWord(u32);
 void SerialLink_StartTransferIfIdle(void);
-void Registry1745_BeginShutdown(void *, void (*)(void));
+void LinkSession_BeginShutdown(void *, void (*)(void));
 void ScriptPanel_OpenTextWindow(void);
 void System_ShutdownAndSoftReset(void);
 
@@ -60,7 +60,7 @@ static inline u8 Registry1745_FinishIfRequested(struct Reg1745Run *p)
     return 0;
 }
 
-u32 Registry1745_RunSession(struct Reg1745Run *p)
+u32 LinkSession_RunSession(struct Reg1745Run *p)
 {
     struct Reg1745Run *q = p;
     gLinkSessionStep = 0;
@@ -94,7 +94,7 @@ u32 Registry1745_RunSession(struct Reg1745Run *p)
                 if (q->field1F <= 0xfe) {
                     q->field1F++;
                     if (st > 4 && q->field1F > 0xe && gSceneTransitionActive == 0)
-                        Registry1745_BeginShutdown(q, ScriptPanel_OpenTextWindow);
+                        LinkSession_BeginShutdown(q, ScriptPanel_OpenTextWindow);
                 }
                 gLinkSessionStep = 9;
                 return 0;

@@ -11,7 +11,7 @@ struct SceneSequence {
 s32 Anim_Step(void *, void *);
 void Hud_SetUpdateCallback(void *, void (*)(void));
 void SceneHud_FadeOutPage(void);
-void SceneSequence_SlideAnimationLeft(struct SceneSequence *s)
+void MenuSequence_SlideAnimationLeft(struct SceneSequence *s)
 {
     Anim_Step(s->animation, s->animationData);
     if (s->animationX > -88)

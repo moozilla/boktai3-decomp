@@ -1,4 +1,4 @@
-#include "scene/actor/scene_actor_contact_list.h"
+#include "scene/collision/scene_actor_contact_list.h"
 static inline u8 TestGate(struct SceneActorContactGateView *gate, u32 mask)
 {
     if (gate->flags & mask)

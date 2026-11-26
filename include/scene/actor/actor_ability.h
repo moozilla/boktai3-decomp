@@ -1,7 +1,7 @@
 #ifndef GUARD_ACTOR_ABILITY_H
 #define GUARD_ACTOR_ABILITY_H
 #include "engine/engine.h"
-#include "npc/sabata_rider/script_puppet.h"
+#include "npc/sabata_rider/sabata_rider.h"
 #include "scene/actor/modifier_list.h"
 enum ActorAbilitySourceIndex {
     ACTOR_ABILITY_BYTE_SOURCE = 5,

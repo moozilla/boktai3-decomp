@@ -1,7 +1,7 @@
 #ifndef GUARD_SCENE_ACTOR_UPDATE_H
 #define GUARD_SCENE_ACTOR_UPDATE_H
 #include "scene/actor/scene_actor_behavior.h"
-#include "scene/actor/scene_actor_contact_list.h"
+#include "scene/collision/scene_actor_contact_list.h"
 struct SceneActorUpdateStatePair {
     u8 unknown0[0xA8];
     s16 values[2];

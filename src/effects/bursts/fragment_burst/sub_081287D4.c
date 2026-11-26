@@ -1,5 +1,5 @@
 #include "global.h"
-#include "scene/actor/contact_actor.h"
+#include "scene/collision/contact_actor.h"
 #include "engine/engine.h"
 #include "engine/ram.h"
 #include "engine/video/render.h"

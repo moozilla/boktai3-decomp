@@ -1,19 +1,19 @@
-#include "ui/town/scene_inventory_lifecycle.h"
-void SceneInventory_BuildUnlockedEquipmentCatalog(struct SceneInventoryLifecycleView *);
-void SceneInventory_BuildConsumableCatalog(struct SceneInventoryLifecycleView *);
-void SceneInventory_BuildUnlockedItemCatalog(struct SceneInventoryLifecycleView *);
-void SceneInventory_ReadScriptCatalog(struct SceneInventoryLifecycleView *);
-void SceneInventory_InitCatalogBackground(struct SceneInventoryLifecycleView *, u32);
-void SceneInventory_InitPanel(struct SceneInventoryLifecycleView *, u32);
-void SceneInventory_InitMessageBox(struct SceneInventoryLifecycleView *);
-void SceneInventory_ReadCompletionScript(struct SceneInventoryLifecycleView *);
+#include "ui/town/shop_lifecycle.h"
+void Shop_BuildUnlockedEquipmentCatalog(struct SceneInventoryLifecycleView *);
+void Shop_BuildConsumableCatalog(struct SceneInventoryLifecycleView *);
+void Shop_BuildUnlockedItemCatalog(struct SceneInventoryLifecycleView *);
+void Shop_ReadScriptCatalog(struct SceneInventoryLifecycleView *);
+void Shop_InitCatalogBackground(struct SceneInventoryLifecycleView *, u32);
+void Shop_InitPanel(struct SceneInventoryLifecycleView *, u32);
+void Shop_InitMessageBox(struct SceneInventoryLifecycleView *);
+void Shop_ReadCompletionScript(struct SceneInventoryLifecycleView *);
 void ScreenTransition_SendCommand(u32, u32, u32, u32, u32, u32, u32);
-void SceneInventory_RefreshCatalogDisplay(struct SceneInventoryLifecycleView *);
+void Shop_RefreshCatalogDisplay(struct SceneInventoryLifecycleView *);
 void Sound_PlaySong(u32);
 void SceneInputPanel_RequestAction(struct SceneInventoryLifecycleView *,
                                    void (*)(struct SceneInventoryLifecycleView *));
-void SceneInventory_WaitForController(struct SceneInventoryLifecycleView *);
-s32 SceneInventory_InitializeController(struct SceneInventoryLifecycleView *owner)
+void Shop_WaitForController(struct SceneInventoryLifecycleView *);
+s32 Shop_InitializeController(struct SceneInventoryLifecycleView *owner)
 {
     owner->messageText = 0;
     owner->equipmentText = 0;
@@ -30,30 +30,30 @@ s32 SceneInventory_InitializeController(struct SceneInventoryLifecycleView *owne
     owner->itemPageCount = 0;
     switch (owner->presentation) {
         case 0:
-            SceneInventory_BuildUnlockedEquipmentCatalog(owner);
+            Shop_BuildUnlockedEquipmentCatalog(owner);
             owner->itemPageCount = owner->pageCount;
             break;
         case 2:
-            SceneInventory_BuildConsumableCatalog(owner);
+            Shop_BuildConsumableCatalog(owner);
             owner->itemPageCount = owner->pageCount;
             break;
         case 1:
         default:
-            SceneInventory_BuildUnlockedItemCatalog(owner);
+            Shop_BuildUnlockedItemCatalog(owner);
             owner->itemPageCount = owner->pageCount;
             break;
         case 3:
         case 4:
-            SceneInventory_ReadScriptCatalog(owner);
+            Shop_ReadScriptCatalog(owner);
             break;
     }
-    SceneInventory_InitCatalogBackground(owner, owner->presentation);
-    SceneInventory_InitPanel(owner, owner->presentation);
-    SceneInventory_InitMessageBox(owner);
-    SceneInventory_ReadCompletionScript(owner);
+    Shop_InitCatalogBackground(owner, owner->presentation);
+    Shop_InitPanel(owner, owner->presentation);
+    Shop_InitMessageBox(owner);
+    Shop_ReadCompletionScript(owner);
     ScreenTransition_SendCommand(2, 5, 4, 4, 4, 0xffff, 0);
-    SceneInventory_RefreshCatalogDisplay(owner);
+    Shop_RefreshCatalogDisplay(owner);
     Sound_PlaySong(0x118);
-    SceneInputPanel_RequestAction(owner, SceneInventory_WaitForController);
+    SceneInputPanel_RequestAction(owner, Shop_WaitForController);
     return 0;
 }

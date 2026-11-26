@@ -1,5 +1,5 @@
 #include "global.h"
-#include "player/cues/player_cue_sequence.h"
+#include "player/cutscene/player_cue_sequence.h"
 #include "engine/ram.h"
 #include "engine/engine_globals.h"
 struct FanVec {
@@ -45,21 +45,21 @@ struct FanTerrain {
     u8 pad[0x24];
     u16 rows[1];
 };
-void *FanCannonManager_Create(void);
-struct FanCannon *FanCannonManager_FindFreeSlot(struct FanManager *, s32 *);
+void *WindCannonManager_Create(void);
+struct FanCannon *WindCannonManager_FindFreeSlot(struct FanManager *, s32 *);
 s32 Script_SeekToKeyword(s32);
 s32 Script_GetValue(void);
 void *Script_GetValueSafe(void);
 void Sprite_Init(void *, void *, s32);
 void AnimData_SelectPaletteBank(void *, s32);
-void FanCannon_UpdateInactive(void);
+void WindCannon_UpdateInactive(void);
 void CombatActor_UpdateDefeatEffect(void);
 void sub_082093F8(void *);
 void TerrainModifiers_RegisterCell(void *, s32, s32, s32, s32, s32);
 void SceneBody_Init(void *, s32, void *, u32, s32, void *);
 void SceneBody_SetSprite(void *, void *);
 void TerrainOverlay_QueueAddActor(void *);
-void FanCannon_ReadToggleSchedule(struct FanCannon *);
+void WindCannon_ReadToggleSchedule(struct FanCannon *);
 static inline s32 Fan_Cell(struct FanVec *v)
 {
     s32 x = (s16)v->x >> 8, z = (s16)v->z >> 8;
@@ -68,17 +68,17 @@ static inline s32 Fan_Cell(struct FanVec *v)
     return ((struct FanTerrain *)gTerrainMap)->rows[z] + x;
 }
 // confidence=low: script options initialize an eight-slot fan cannon and publish its occupied bit.
-s32 FanCannon_CreateFromScript(void)
+s32 WindCannon_CreateFromScript(void)
 {
     struct FanManager *manager = gFanCannonManager;
     struct FanCannon *p;
     s32 slot;
     void *resource;
     if (!manager) {
-        FanCannonManager_Create();
+        WindCannonManager_Create();
         return -1;
     }
-    p = FanCannonManager_FindFreeSlot(manager, &slot);
+    p = WindCannonManager_FindFreeSlot(manager, &slot);
     if (!p)
         return -1;
     if (Script_SeekToKeyword('p')) {
@@ -170,7 +170,7 @@ s32 FanCannon_CreateFromScript(void)
     resource = ScriptProc_Start(0x922e, 0x5184);
     p->resource = resource;
     if (!p->initialDead) {
-        p->update = FanCannon_UpdateInactive;
+        p->update = WindCannon_UpdateInactive;
         Anim_SetSequence(&p->sequence, resource, 0x15, (u8)p->direction, (u8)p->variant);
     } else {
         p->update = CombatActor_UpdateDefeatEffect;
@@ -193,7 +193,7 @@ s32 FanCannon_CreateFromScript(void)
         TerrainOverlay_QueueAddActor(body);
     }
     if (p->schedule)
-        FanCannon_ReadToggleSchedule(p);
+        WindCannon_ReadToggleSchedule(p);
     manager->used |= 1 << slot;
     return slot;
 }

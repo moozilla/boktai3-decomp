@@ -1,11 +1,11 @@
 #include "effects/projectiles/projectile_task.h"
 #include "engine/input.h"
 void *ResourceRegistry_GetResource(u16);
-void Task4E01_ClearTrailSprites(void *);
-void Task4E01_SpawnTrailSprite(void *, void *);
+void ProjectileTask_ClearTrailSprites(void *);
+void ProjectileTask_SpawnTrailSprite(void *, void *);
 void Collider_SetAttackProperties(void *, s32, s32, s32, s32, s32);
-void Task4E01_UpdateTrailSprites(void *, void *);
-void Task4E01_UpdateTimedSprite(void);
+void ProjectileTask_UpdateTrailSprites(void *, void *);
+void ProjectileTask_UpdateTimedSprite(void);
 
 struct ImpactConfig {
     u8 pad0[6];
@@ -23,7 +23,7 @@ struct TrailImpact {
     struct Task4E01Projectile projectile;
     s16 timer;
 };
-s32 Task4E01_UpdateTrailImpact(struct TrailImpact *impact)
+s32 ProjectileTask_UpdateTrailImpact(struct TrailImpact *impact)
 {
     u8 *p = (u8 *)impact;
     struct ImpactConfig *config = (struct ImpactConfig *)&impact->projectile.params;
@@ -37,7 +37,7 @@ s32 Task4E01_UpdateTrailImpact(struct TrailImpact *impact)
         *timer += 1;
         if (*timer > 3) {
             *timer = 3;
-            Task4E01_ClearTrailSprites(group);
+            ProjectileTask_ClearTrailSprites(group);
         }
     }
     {
@@ -59,7 +59,7 @@ s32 Task4E01_UpdateTrailImpact(struct TrailImpact *impact)
         }
     }
     if ((*(u32 *)p & 1) && *(s16 *)(p + 0x1a4) <= 2)
-        Task4E01_SpawnTrailSprite(group, p);
+        ProjectileTask_SpawnTrailSprite(group, p);
     {
         u32 clr = ~2;
         u32 f = *(u32 *)(p + 4);
@@ -87,12 +87,12 @@ s32 Task4E01_UpdateTrailImpact(struct TrailImpact *impact)
             config->f1c = *timer * config->f1c;
         Collider_SetAttackProperties(collider, config->f1c, config->f20, config->f14, config->f18,
                                      config->f24);
-        config->callback = Task4E01_UpdateTimedSprite;
+        config->callback = ProjectileTask_UpdateTimedSprite;
         *(u32 *)p = mask;
-        Task4E01_ClearTrailSprites(group);
+        ProjectileTask_ClearTrailSprites(group);
         if (config->f3a == 0)
             Sound_PlaySong(0xCD);
     }
-    Task4E01_UpdateTrailSprites(group, p);
+    ProjectileTask_UpdateTrailSprites(group, p);
     return 1;
 }

@@ -47,7 +47,7 @@ void ActorMovement_FindQuarterTurnPoint(struct ActorState *actor, struct Contact
             coordinates->y = (u16)coordinates->y + (u16)center->y;
             coordinates->z += center->z;
         }
-        if (ActorPosition_TestPath(actor, &point)) {
+        if (SabataPosition_TestPath(actor, &point)) {
             *out = point;
             return;
         }

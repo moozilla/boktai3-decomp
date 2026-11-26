@@ -26,17 +26,17 @@ struct CannonBatteryPool {
     u8 unk0[0x20];
     u16 attack, attackFlags;
 };
-u32 CannonBattery_LoadAnimation(void);
+u32 DeckCannon_LoadAnimation(void);
 void Anim_RestartSequence(void *, void *, u32, u32, u32);
 void Collider_SetAttackProperties(void *, s32, s32, s32, s32, s32);
-void CannonBattery_OnProjectileCollision(void);
-void CannonBattery_DestroyProjectile(void);
-void CannonBattery_UpdateProjectile(void);
+void DeckCannon_OnProjectileCollision(void);
+void DeckCannon_DestroyProjectile(void);
+void DeckCannon_UpdateProjectile(void);
 extern struct CannonBatteryPosition gUnk_0824F6E8, gUnk_0824F6F0;
-void CannonBattery_InitProjectile(struct CannonBatteryPool *pool, struct CannonBatteryProjectile *p,
+void DeckCannon_InitProjectile(struct CannonBatteryPool *pool, struct CannonBatteryProjectile *p,
                                   struct CannonBatteryPosition *origin, s32 horizontal)
 {
-    void *resource = (void *)CannonBattery_LoadAnimation();
+    void *resource = (void *)DeckCannon_LoadAnimation();
     struct CannonBatteryCollider *collider;
     AnimData_Load(p->animation, 0x8D95);
     AnimData_SelectPaletteBank(p->animation, 0x8F);
@@ -72,10 +72,10 @@ void CannonBattery_InitProjectile(struct CannonBatteryPool *pool, struct CannonB
         }
         p->startCoordinate = p->position.z;
     }
-    Collider_SetCallback(&p->collider, CannonBattery_OnProjectileCollision, p);
+    Collider_SetCallback(&p->collider, DeckCannon_OnProjectileCollision, p);
     {
-        u32 update = (u32)CannonBattery_UpdateProjectile;
-        u32 destroy = (u32)CannonBattery_DestroyProjectile;
+        u32 update = (u32)DeckCannon_UpdateProjectile;
+        u32 destroy = (u32)DeckCannon_DestroyProjectile;
         p->update = update;
         p->destroy = destroy;
     }

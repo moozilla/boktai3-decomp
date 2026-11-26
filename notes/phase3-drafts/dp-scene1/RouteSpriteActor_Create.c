@@ -1,4 +1,4 @@
-#include "scene/actor/route_sprite_actor.h"
+#include "scene/motion/route_sprite_actor.h"
 #include "engine/video/display_animation.h"
 u8 Route_Start(void *, s32, s32, s32);
 s32 ScaledShadow_Initialize(u8 *, void *, s32, s32, s32, s32, s32, s32, s32, s32, s32);

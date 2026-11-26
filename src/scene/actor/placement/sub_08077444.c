@@ -1,6 +1,6 @@
 #include "scene/actor/scene_actor_placement.h"
 #include "scene/actor/scene_actor_status.h"
-#include "scene/actor/scene_actor_terrain_reaction.h"
+#include "scene/motion/scene_actor_terrain_reaction.h"
 static inline void SceneActorPlacement_ResetControl(struct ChaseActor *actor,
                                                     struct SceneActorRegistryControl *control)
 {

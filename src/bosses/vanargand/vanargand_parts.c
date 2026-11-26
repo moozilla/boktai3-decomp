@@ -1306,8 +1306,8 @@ void Vanargand_UpdatePartEmergence(struct VanargandAttackPair *boss, struct Pair
 {
     struct ContactPosition projected;
     u8 *enter;
-    struct SceneInputResource *keyframes;
-    struct SceneInputWidget *animation;
+    struct AnimSpriteResource *keyframes;
+    struct AnimSprite *animation;
     u32 entering;
     u32 state;
     u32 mask = 12;
@@ -1583,8 +1583,8 @@ s32 Widget_InitLinked(void *, void *, u16, u32, u8, u8, u8, const void *);
 s32 Vanargand_InitializePartController(struct VanargandAttackPair *boss, void *origin,
                                        u16 (*palettes)[16], s32 mode)
 {
-    struct SceneInputResource *resource;
-    struct SceneInputWidget *animation;
+    struct AnimSpriteResource *resource;
+    struct AnimSprite *animation;
     const void *source;
     s32 i;
     void *data = ScriptProc_Start(0xcb05, 0xb3de);

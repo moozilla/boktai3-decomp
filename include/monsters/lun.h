@@ -3,7 +3,7 @@
 
 #include "link/session/room_actor.h"
 #include "scene/actor/scene_actor_group.h"
-#include "scene/actor/scene_actor_motion.h"
+#include "scene/motion/scene_actor_motion.h"
 
 /* Lun's class fields past the room actor (Lun_Create allocates 0x44C bytes; provisional). */
 struct Lun {

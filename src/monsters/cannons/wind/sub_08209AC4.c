@@ -1,5 +1,5 @@
 #include "global.h"
-#include "player/cues/player_cue_sequence.h"
+#include "player/cutscene/player_cue_sequence.h"
 #include "engine/ram.h"
 #include "engine/engine_globals.h"
 #include "engine/math/monster_particle_random.h"
@@ -58,11 +58,11 @@ struct FanTerrain {
 };
 s32 Mod(s32, s32);
 s32 Div(s32, s32);
-void FanCannon_Activate(struct FanCannon *);
-void FanCannon_ToggleActiveState(struct FanCannon *);
-void FanCannon_UpdateInactive(void);
+void WindCannon_Activate(struct FanCannon *);
+void WindCannon_ToggleActiveState(struct FanCannon *);
+void WindCannon_UpdateInactive(void);
 void CombatActor_UpdateDefeatEffect(void);
-s32 FanCannon_IsPathToPlayerClear(struct FanCannon *);
+s32 WindCannon_IsPathToPlayerClear(struct FanCannon *);
 s32 Callback_InvokeActor(void *, void *);
 void Collider_SetPosition(void *, void *, u32);
 void Sound_PlaySong(u32);
@@ -92,31 +92,31 @@ static inline s32 Fan_Distance(struct FanCannon *p)
     return dx * dx + dz * dz;
 }
 
-s32 FanCannon_Update(void *manager, struct FanCannon *p, s32 slot)
+s32 WindCannon_Update(void *manager, struct FanCannon *p, s32 slot)
 {
     struct FanCollider *collider;
     if (p->activated && p->dead == 0) {
         p->wind = p->maximumWind;
-        FanCannon_Activate(p);
+        WindCannon_Activate(p);
     }
     if (p->stopped) {
         if (p->dead)
             goto invoke;
         p->wind = 0;
-        p->update = FanCannon_UpdateInactive;
+        p->update = WindCannon_UpdateInactive;
     }
     if (p->dead == 0 && *(u16 *)&p->activated == 0) {
         if (p->schedule) {
             s16 *index = &p->scheduleIndex;
             if (p->age > p->times[*index]) {
-                FanCannon_ToggleActiveState(p);
+                WindCannon_ToggleActiveState(p);
                 p->age = 0;
                 (*index)++;
                 if (*index > p->scheduleCount - 1)
                     *index = 0;
             }
         } else if (Mod(p->age, p->period) == 0)
-            FanCannon_ToggleActiveState(p);
+            WindCannon_ToggleActiveState(p);
     }
 invoke:
     Callback_InvokeActor(p, p->update);
@@ -202,7 +202,7 @@ invoke:
             p->damage = zero;
         }
     }
-    if (p->dead == 0 && p->update != FanCannon_UpdateInactive && !p->stopped) {
+    if (p->dead == 0 && p->update != WindCannon_UpdateInactive && !p->stopped) {
         struct FanVec playerCopy;
         struct FanVec *pl;
         s32 direction;
@@ -214,7 +214,7 @@ invoke:
         if (direction == 0) {
             if (p->position.z - 0x80 < pl->z && p->position.z + 0x80 > pl->z &&
                 p->position.x < pl->x && Fan_Distance(p) < p->range * p->range &&
-                FanCannon_IsPathToPlayerClear(p)) {
+                WindCannon_IsPathToPlayerClear(p)) {
                 gPlayerBackgroundState = p->wind;
                 if (!p->reverse)
                     gPlayerBackgroundMode = 0x80;
@@ -224,7 +224,7 @@ invoke:
         } else {
             if (p->position.x - 0x80 < pl->x && p->position.x + 0x80 > pl->x &&
                 p->position.z < pl->z && Fan_Distance(p) < p->range * p->range &&
-                FanCannon_IsPathToPlayerClear(p)) {
+                WindCannon_IsPathToPlayerClear(p)) {
                 gPlayerBackgroundState = p->wind;
                 if (!p->reverse)
                     gPlayerBackgroundMode = 0xc0;

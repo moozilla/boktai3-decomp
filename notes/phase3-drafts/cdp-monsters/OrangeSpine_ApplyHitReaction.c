@@ -1,5 +1,5 @@
-#include "monsters/cannons/orange_spine.h"
-#include "scene/actor/collision_response.h"
+#include "monsters/cannons/plasma_cannon.h"
+#include "scene/collision/collision_response.h"
 #include "ui/hud/damage_number_display.h"
 #include "engine/ram.h"
 #include "ui/pause/scene_hud_display.h"
@@ -10,7 +10,7 @@ void Sound_PlaySong(u32);
 void PlayerStats_AddContactHundredths(void *, void *, s32);
 void SparkParticle_Spawn(void *, s32, void *, s32, s32, s32, s32, s32);
 
-void OrangeSpine_ApplyHitReaction(struct ContactCollider *sourceInput,
+void PlasmaCannon_ApplyHitReaction(struct ContactCollider *sourceInput,
                                   struct ContactCollider *input,
                                   struct OrangeSpineActor *targetInput)
 {

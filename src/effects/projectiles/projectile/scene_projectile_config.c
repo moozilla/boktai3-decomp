@@ -1,5 +1,5 @@
 #include "effects/projectiles/scene_projectile_config.h"
-#include "player/cues/player_cue_sequence.h"
+#include "player/cutscene/player_cue_sequence.h"
 
 struct SceneProjectile *Projectile_FindFreeSlot(struct SceneProjectilePool *pool, s32 *out)
 {

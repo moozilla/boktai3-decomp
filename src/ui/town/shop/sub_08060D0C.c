@@ -1,6 +1,6 @@
-#include "ui/town/scene_inventory_actions.h"
+#include "ui/town/shop_actions.h"
 u32 Selection_GetDisplayFrame(s32);
-void SceneInventory_BeginItemRemoveMove(struct SceneInventoryActionView *panel)
+void Shop_BeginItemRemoveMove(struct SceneInventoryActionView *panel)
 {
     struct SceneInputPosition starts[2], targets[2];
     u32 enabled[2], frames[2], attributes[2];

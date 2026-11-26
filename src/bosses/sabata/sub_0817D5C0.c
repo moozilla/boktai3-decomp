@@ -9,7 +9,7 @@ struct A {
 };
 void Callback_InvokeActor(void *, u32);
 
-void BossSlot2_ResetAndRunPhaseCallback(struct A *p)
+void Sabata_ResetAndRunPhaseCallback(struct A *p)
 {
     p->a = 0;
     Callback_InvokeActor(p, gUnk_08611CC4[p->i]);

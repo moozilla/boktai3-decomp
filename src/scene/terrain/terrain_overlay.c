@@ -324,7 +324,7 @@ void *TerrainOverlay_CreateFromScript(u16 x, u16 y)
     return s;
 }
 
-s32 Centipede_Create(void)
+s32 CentipedeOverlay_Create(void)
 {
     s32 a = Script_GetKeywordValue(0x6d, 0);
     s32 b = Script_GetKeywordValue(0x6e, 0);

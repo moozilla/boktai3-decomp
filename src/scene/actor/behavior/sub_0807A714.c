@@ -1,8 +1,8 @@
-#include "scene/actor/scene_actor_availability.h"
+#include "scene/motion/scene_actor_availability.h"
 #include "scene/actor/scene_actor_placement.h"
 #include "scene/actor/scene_actor_init_actor.h"
-#include "scene/actor/scene_actor_chase_shared.h"
-#include "scene/actor/scene_actor_terrain_reaction.h"
+#include "scene/motion/scene_actor_chase_shared.h"
+#include "scene/motion/scene_actor_terrain_reaction.h"
 void SceneActorAttachment_BeginReturnResponse(struct ChaseActor *);
 static inline void SetControl(struct ChaseActor *actor, void *control, u32 kind)
 {

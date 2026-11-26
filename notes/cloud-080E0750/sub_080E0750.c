@@ -1,7 +1,7 @@
 #include "global.h"
 /* Dog_ChaseAfterKnockback: decays the knockback push (a quarter of the remaining offset, clamped to 200) into the motion; once settled, either chases player 0 (flags2D4 & 0x80, kind 0x1A) or routes back toward it with the entry target (kind 1), arriving or rerouting through the route point (provisional name) */
 #define Dog_ChaseAfterKnockback sub_080E0750
-#include "scene/actor/scene_actor_chase.h"
+#include "scene/motion/scene_actor_chase.h"
 
 static inline u8 TakeFlag(u8 *flag)
 {

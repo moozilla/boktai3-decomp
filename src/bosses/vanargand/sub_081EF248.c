@@ -1,4 +1,4 @@
-#include "bosses/vanargand/layered_boss_transition.h"
+#include "bosses/vanargand/vanargand_head_transition.h"
 
 void SceneActors_UpdatePeriodicEffectAction(void);
 

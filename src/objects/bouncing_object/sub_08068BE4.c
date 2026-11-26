@@ -1,7 +1,7 @@
 #include "global.h"
 #include "engine/engine.h"
-#include "player/cues/player_cue_sequence.h"
-#include "scene/actor/scene_actor_terrain.h"
+#include "player/cutscene/player_cue_sequence.h"
+#include "scene/motion/scene_actor_terrain.h"
 #include "objects/bouncing_object/bouncing_object.h"
 
 void Sound_PlaySong(u32 song);

@@ -1,5 +1,5 @@
 #include "global.h"
-#include "player/cues/player_cue_sequence.h"
+#include "player/cutscene/player_cue_sequence.h"
 #include "engine/math/scene_vec.h"
 #include "engine/engine_globals.h"
 struct PHVec {

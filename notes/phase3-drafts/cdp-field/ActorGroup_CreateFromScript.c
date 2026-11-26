@@ -27,16 +27,16 @@ struct Context {
     u8 pad[0x18];
     void *resource;
 };
-struct Context *Pool184_CreateManager(void);
+struct Context *ActorGroupPool_CreateManager(void);
 struct Member;
-struct Member *Pool184_Allocate(struct Context *);
+struct Member *ActorGroupPool_Allocate(struct Context *);
 void AnimData_Load(void *, u32);
 void Sprite_Init(void *, void *, s32);
 u32 Script_GetKeywordValue(u32, u32);
 u32 Script_SeekToKeyword(u32);
 void *Script_GetPc(void);
 s32 Script_GetValue(void);
-u8 Pool184_TestStatusFlags(void *, u32);
+u8 ActorGroupPool_TestStatusFlags(void *, u32);
 s32 ScaledShadow_Initialize(void *, void *, s32, s32, s32, s32, s32, s32, s32, s32, s32);
 void Memory_Clear(void *, u32);
 void sub_08105194(void *, s32, s32, s32);
@@ -201,11 +201,11 @@ void ActorGroup_CreateFromScript(void)
     s32 i;
     s32 value;
     if (!pool) {
-        pool = Pool184_CreateManager();
+        pool = ActorGroupPool_CreateManager();
         if (!pool)
             return;
     }
-    p = Pool184_Allocate(pool);
+    p = ActorGroupPool_Allocate(pool);
     if (!p)
         return;
     render = &p->render;
@@ -223,7 +223,7 @@ void ActorGroup_CreateFromScript(void)
     }
     p->damageIndex = zero;
     p->scriptM = Script_GetKeywordValue('m', 0);
-    if (Pool184_TestStatusFlags(p, 2))
+    if (ActorGroupPool_TestStatusFlags(p, 2))
         p->state = 2;
     else
         p->state = one;
@@ -260,7 +260,7 @@ void ActorGroup_CreateFromScript(void)
         *dest = ReadOptional();
     }
     {
-        u32 flag = Pool184_TestStatusFlags(p, 2);
+        u32 flag = ActorGroupPool_TestStatusFlags(p, 2);
         if (flag)
             p->shadowId = ScaledShadow_Initialize((u8 *)&p->shadow, &p->render.x, 64, 16, 96, 100,
                                                   2560, 1, 5, 1, 0);

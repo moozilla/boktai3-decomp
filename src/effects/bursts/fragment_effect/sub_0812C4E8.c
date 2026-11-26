@@ -1,7 +1,7 @@
-#include "scene/actor/contact_swarm.h"
+#include "scene/collision/contact_swarm.h"
 #include "engine/engine.h"
 #include "engine/ram.h"
-#include "player/cues/player_cue_sequence.h"
+#include "player/cutscene/player_cue_sequence.h"
 struct Fragment {
     u32 flags;
     u8 active, unknown5[3];

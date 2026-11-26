@@ -3,13 +3,13 @@ void *Task_Create(s32, s32);
 void Task_SetCallbacks(void *, void *, void *);
 void Task_Kill(void *);
 void sub_08201D38(void);
-void ScriptCombatActor_Destroy(void);
+void MuspellHead_Destroy(void);
 s32 sub_0820212C(void *, void *);
-void *ScriptCombatActor_CreateFromScript(void *p)
+void *MuspellHead_CreateFromScript(void *p)
 {
     void *r = Task_Create(8, 0x1e0);
     if (r) {
-        Task_SetCallbacks(r, sub_08201D38, ScriptCombatActor_Destroy);
+        Task_SetCallbacks(r, sub_08201D38, MuspellHead_Destroy);
         if (sub_0820212C(r, p) < 0) {
             Task_Kill(r);
             return 0;

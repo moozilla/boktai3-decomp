@@ -122,7 +122,7 @@ Next idea: C in which amplitude's address and the loop's `p->amplitude` don't sh
 equivalence at the preheader (a separate EBB, or a constant cse can't merge), so the hoisted
 add survives.
 
-### sub_08010C10 (src/effects/scene/bat_flock.c, 08010C10): deferred, reload rotation only
+### sub_08010C10 (src/effects/bat_flock.c, 08010C10): deferred, reload rotation only
 
 Draft: `notes/phase3-drafts/field-effects/sub_08010C10.c` (2 ROM / 2 draft), the pinned
 source without the `d` pin and barrier. The only difference is the scratch for the first
@@ -473,10 +473,10 @@ The coordinator said to leave the scoring alone for now. These are the ones in s
 * `src/fn/sub_080427FC.c`: ContactActor_ApplyHealthContact:33
 * `src/effects/screen/background_flash/sub_080478A4.c`: BackgroundFlash_UpdateAppearing:18
 * `src/effects/screen/background_flash/sub_080479B0.c`: BackgroundFlash_UpdateDisappearing:10, BackgroundFlash_UpdateDisappearing:17
-* `src/fn/sub_08047F68.c`: ContactBurst_OnContact:16
-* `src/fn/sub_080480A4.c`: ContactBurst_Update:70
-* `src/objects/markers/interaction_marker/sub_0805386C.c`: InteractionMarker_TickIdle:27
-* `src/objects/markers/saved_position_marker/sub_08053DF8.c`: SavedPositionMarker_TickIdle:27
+* `src/fn/sub_08047F68.c`: NidhoggrDuelBurst_OnContact:16
+* `src/fn/sub_080480A4.c`: NidhoggrDuelBurst_Update:70
+* `src/objects/markers/interaction/sub_0805386C.c`: InteractionMarker_TickIdle:27
+* `src/objects/markers/saved_position/sub_08053DF8.c`: SavedPositionMarker_TickIdle:27
 * `src/effects/sprites/display_track/sub_08054DC4.c`: DisplayTrack_SetSequenceFromScript:16
 * `src/ui/hud/stage_icon/sub_08055C04.c`: StageIconDisplay_TickReveal:4
 * `src/ui/hud/stage_icon/sub_08055DD4.c`: StageIconDisplay_InitAnimations:26, StageIconDisplay_InitAnimations:31
@@ -485,7 +485,7 @@ The coordinator said to leave the scoring alone for now. These are the ones in s
 * `src/ui/widgets/input_grid/sub_0805E270.c`: SceneInput_InitGlyphPair:26
 * `src/ui/widgets/input_grid/sub_0805E394.c`: SceneInput_GetGridPosition:17
 * `src/ui/widgets/input_grid/sub_0805E7D8.c`: SceneInput_GetNavigationKeys:14
-* `src/ui/town/shop/sub_08060A70.c`: SceneInventory_BeginConsumableSwapPair:39
+* `src/ui/town/shop/sub_08060A70.c`: Shop_BeginConsumableSwapPair:39
 * `src/effects/sprites/sprite_effect_controller/sub_0806B8DC.c`: SpriteEffectController_UpdatePool:17, SpriteEffectController_UpdatePool:18
 * `src/scene/actor/route_sprite_actor/sub_0806E130.c`: RouteSpritePool_Tick:33
 * `src/scene/actor/registry/sub_08070FA8.c`: RegistryCurrentGame:25
@@ -498,7 +498,7 @@ The coordinator said to leave the scoring alone for now. These are the ones in s
 * `src/fn/sub_0808CF54.c`: Ghoul_UpdateAnimationElevenControl:61, Ghoul_UpdateAnimationElevenControl:63
 * `src/fn/sub_0808D058.c`: Ghoul_UpdateAttackControl:61, Ghoul_UpdateAttackControl:63
 * `src/monsters/centipede/sub_080A8144.c`: SceneActorPlacement_UpdateFlaggedResponse:27, SceneActorPlacement_UpdateFlaggedResponse:29
-* `src/monsters/centipede/sub_080AA8C4.c`: TentacleActor_AlignSegmentsToTerrain:81
+* `src/monsters/centipede/sub_080AA8C4.c`: Centipede_AlignSegmentsToTerrain:81
 * `src/fn/sub_080B713C.c`: SceneActorTerrain_FindOpenNeighborDirection:11
 * `src/fn/sub_080BB4DC.c`: Skeleton_UpdateDownedState:57
 * `src/fn/sub_080C61AC.c`: Golem_UpdateDying:57
@@ -517,7 +517,7 @@ The coordinator said to leave the scoring alone for now. These are the ones in s
 * `src/objects/named_object/sub_081029F8.c`: NamedObject_UpdatePlayerAttachment:73
 * `src/objects/named_object/sub_08103110.c`: NamedObject_CreateFromScript:209
 * `src/link/session/sub_08109040.c`: SelectionSlots_ClearValue:23
-* `src/link/link_selection/sub_0810B3BC.c`: SceneMenu_UpdateRecords:45
+* `src/link/selection/sub_0810B3BC.c`: SceneMenu_UpdateRecords:45
 * `src/link/records/sub_0810D60C.c`: PanelText_DrawDecimal:17
 * `src/minigames/coffin_bike/sub_0811A030.c`: MotionActor_DispatchRequestedState:72
 * `src/fn/sub_0811B094.c`: Collider_ScheduleUpdates:49
@@ -536,9 +536,9 @@ The coordinator said to leave the scoring alone for now. These are the ones in s
 * `src/player/movement/sub_08140F40.c`: Player_GetForceDirection:93, Player_GetForceDirection:94
 * `src/fn/sub_081559A4.c`: Player_UpdateTimedChargeAction:95
 * `src/fn/sub_08165488.c`: SceneHud_DrawDecimalDigits:16
-* `src/ui/pause/pause_display/sub_0816F6B4.c`: PauseMenu_BeginTypeThirteenItemUse:33
-* `src/ui/pause/pause_display/sub_0816F8AC.c`: PauseMenu_BeginTypeFourteenItemUse:33
-* `src/ui/pause/pause_display/sub_08173C0C.c`: SceneHud_TickEquipmentToggle:37
+* `src/ui/pause/display/sub_0816F6B4.c`: PauseMenu_BeginTypeThirteenItemUse:33
+* `src/ui/pause/display/sub_0816F8AC.c`: PauseMenu_BeginTypeFourteenItemUse:33
+* `src/ui/pause/display/sub_08173C0C.c`: SceneHud_TickEquipmentToggle:37
 * `src/fn/sub_08175008.c`: Presentation_UpdateAllocationSelection:150
 * `src/fn/sub_0817A57C.c`: SceneActors_SpawnConvergingParticle:57
 * `src/fn/sub_0817B5E4.c`: update_facing:13
@@ -565,12 +565,12 @@ The coordinator said to leave the scoring alone for now. These are the ones in s
 * `src/engine/math/sub_08221D40.c`: ScalarApproach_ApplyProfileArray:13
 * `src/link/wireless/rfu_manager/sub_082237A0.c`: RfuManager_StartChildConnect:46
 * `src/system/clock/sub_08228DB8.c`: SunClock_GetPhase:52, SunClock_GetPhase:62, SunClock_GetPhase:99, SunClock_GetPhase:109
-* `src/link/link_player/sub_082392E8.c`: sub_082392E8:70, sub_082392E8:73
-* `src/link/link_player/sub_08239480.c`: Player_EmitConvergingParticle:57
-* `src/link/link_player/sub_0823A028.c`: ActorEffect_SelectFlashingValue:15
+* `src/link/player/sub_082392E8.c`: sub_082392E8:70, sub_082392E8:73
+* `src/link/player/sub_08239480.c`: Player_EmitConvergingParticle:57
+* `src/link/player/sub_0823A028.c`: ActorEffect_SelectFlashingValue:15
 * `src/lib/libgcc/sub_0824AC74.c`: Libgcc_MultiplyInt64:61
 * `src/monsters/golem/golem_2.c`: Golem_UpdateScriptedAction:393, Golem_UpdateScriptedAction:395
-* `src/effects/scene/bat_flock.c`: BoardPiece_Wander:493, BoardPiece_Wander:494, BoardPiece_Wander:495, BoardPiece_Wander:496
+* `src/effects/bat_flock.c`: BatFlockBat_Wander:493, BatFlockBat_Wander:494, BatFlockBat_Wander:495, BatFlockBat_Wander:496
 * `src/ui/modifier_menu/modifier_selection_and_stat_previews.c`: ModifierMenu_DrawSecondSourceStats:697, ModifierMenu_DrawSecondSourceStats:716, ModifierMenu_DrawBackground:863
 * `src/effects/palette/palette_controller.c`: Palette_BlendRange:69, Palette_InitializeFromScript:461, Palette_SetBrightnessFromScript:709
 * `src/ui/title/password.c`: Text_CopyWithoutTags:9, Password_DecodeEntry:174
@@ -647,7 +647,7 @@ Not drafted separately: its kind switch ends in the same shared Memory_Clear tai
 (cases 0, 1 and case 2's state 1 jump to case 3 state 2's `movs r1, #0x80`; case 3's state 1
 keeps `adds r1, #0xff`). The front half (the bursts) is ordinary. Do it after LaunchArc.
 
-### ContactActor_UpdateRetreat (src/bosses/vampire/sub_0804373C.c, 0804373C): deferred
+### ContactActor_UpdateRetreat (src/bosses/count/sub_0804373C.c, 0804373C): deferred
 
 Draft: `notes/phase3-drafts/actors/ContactActor_UpdateRetreat.c` (95 / 95, no pins). The ROM's
 dead `ldr r3, =0x0403B714; mov r8, r3` before the enter block's first random draw is the
@@ -660,7 +660,7 @@ with center (r8), and keeps a spill slot (sp #0xc against #8). `AGBCC_PRI=positi
 gets to 55 / 55. Next: find which draws use the relative read (it decides origin's live
 range), then the position/slot order.
 
-### ContactSwarm_UpdateTracking (src/bosses/vampire/sub_08044290.c, 08044290): deferred
+### CountBats_UpdateTracking (src/bosses/count/sub_08044290.c, 08044290): deferred
 
 Draft: `notes/phase3-drafts/actors/ContactSwarm_UpdateTracking.c` (25 / 27, the pinned file
 with plain `jitter = *(const u16 *)(RANDOM_TABLE_ADDR + i * 2) & 15`). The pinned file's
@@ -721,7 +721,7 @@ Tried: `!steps`, a limit variable, gridRow per arm, 1D indexing, parameter types
 four or five more insns of life without changing the code (fact 17's `s16` conversion trick), or
 reorder the parameter's first use.
 
-### sub_0806F06C (src/scene/state/sub_0806F06C.c): deferred
+### sub_0806F06C (src/scene/room_queries/sub_0806F06C.c): deferred
 
 Draft without the DEBUG_NOP: `notes/phase3-drafts/monsters-bosses/sub_0806F06C.c`, 23/23 differ.
 `AGBCC_PRI=i:+920` matches. cse puts REG_EQUAL (const 0) on i's first set, which doubles its life.
@@ -775,7 +775,7 @@ shape 16, and the rest is the order of input, transform, table and heading. The 
 help here either: the target packing reuses 0xFFFF0000. Next: a general way to set a constant pointer
 without a REG_EQUAL note at function entry; this is the same blocker as Bat.
 
-### TentacleActor_SelectWanderRoute (src/monsters/centipede/sub_080A8904.c, 080A8904): deferred
+### Centipede_SelectWanderRoute (src/monsters/centipede/sub_080A8904.c, 080A8904): deferred
 
 Draft: `TentacleActor_SelectWanderRoute.c`, every do/while(0) macro written out (46/48 differ, all
 allocation). The macros put their statements one loop level deeper, and flow weights REG_N_REFS by
@@ -785,7 +785,7 @@ The draft gives facing r6 and count r8. Next: C that really nests those statemen
 original had, for example the neighbor scan as an inner loop) or other refs that raise the mask
 and n by the same amount.
 
-### TentacleBody_RefreshDirectionalAnimations (src/monsters/centipede/sub_080A8F38.c, 080A8F38): deferred
+### CentipedeBody_RefreshDirectionalAnimations (src/monsters/centipede/sub_080A8F38.c, 080A8F38): deferred
 
 Draft: `TentacleBody_RefreshDirectionalAnimations.c` (41/37 differ, against 83/79 for the plain
 no-pin draft). Step is written as the shared DisplaySequenceState playback, with the flip tests
@@ -797,12 +797,12 @@ sb, offset in sl and the segment pointer in r8 (seven saved registers); the draf
 Next: find what holds r7 in the ROM (another long-lived value the draft lacks, maybe a kept
 `&body->speed` or a `four` constant), then split the 1s.
 
-### TentacleBody_ResetDirectionalAnimations (080A915C) and TentacleBody_RestartSegmentAnimations (080A93F4): deferred with Refresh
+### CentipedeBody_ResetDirectionalAnimations (080A915C) and CentipedeBody_RestartSegmentAnimations (080A93F4): deferred with Refresh
 
-Same family as TentacleBody_RefreshDirectionalAnimations: the same Step helper and the same
+Same family as CentipedeBody_RefreshDirectionalAnimations: the same Step helper and the same
 `frame` stack struct and segment loop. With Refresh's draft Step and ordinary body C, Reset scores
 54/52 (`TentacleBody_ResetDirectionalAnimations.c`); Restart is not tried yet. Solve Refresh first,
-then move the shared Step into `include/monsters/centipede/tentacle_segment_animation.h` and port it to all three.
+then move the shared Step into `include/monsters/centipede/centipede_segment_animation.h` and port it to all three.
 
 ### TentacleActor_RemoveSegmentColliders (src/monsters/centipede/sub_080AA688.c, 080AA688): deferred
 
@@ -812,7 +812,7 @@ the loop; the draft hoists it. `hoist`: in loop pass 2 the address (insn 148) mo
 `activeCount--`, a pointer local and `= activeCount - 1`; all are hoisted. Next: a form whose pass-2
 threshold or lifetime fails, or a count address that is not invariant (derived from the segment).
 
-### TentacleActor_AlignSegmentsToTerrain (src/monsters/centipede/sub_080AA8C4.c, 080AA8C4): deferred
+### Centipede_AlignSegmentsToTerrain (src/monsters/centipede/sub_080AA8C4.c, 080AA8C4): deferred
 
 Draft: `TentacleActor_AlignSegmentsToTerrain.c`, 36/38 differ, all of it allocation. It passes
 `&segment->position` to Height (the landed code passes `&trail->segments[i].position`, which costs
@@ -821,7 +821,7 @@ keeps Height's `p` in r6 copied from r7 before the override call. The draft coal
 and strength-reduces the copy (insn 703, tagged loop). `why all`: 234 vs p allocation order
 (`AGBCC_PRI=234:+1636` gives 28/30).
 
-### Six-spark burst family: Bat_UpdateDefeat, TentacleActor_SpawnSparkBurst (080AB294), Vorn_UpdateDefeat
+### Six-spark burst family: Bat_UpdateDefeat, Centipede_SpawnSparkBurst (080AB294), Vorn_UpdateDefeat
 
 All three spawn six sparks from `gRandomTable` kept in a callee-saved register. The ROM's table
 pseudo has no REG_EQUIV; the C pins it or uses an asm barrier. In SpawnSparkBurst the halves union
@@ -834,7 +834,7 @@ records REG_EQUIV (const (plus sym k)) and the result is worse, and halves place
 writes. Next: a table source that cse does not see as constant and combine folds, with no mask
 constant in common with a bitfield write in the same block.
 
-### TentacleActor_UpdateRetraction (src/monsters/centipede/sub_080AB968.c, 080AB968): deferred
+### Centipede_UpdateRetraction (src/monsters/centipede/sub_080AB968.c, 080AB968): deferred
 
 The ROM computes |secondaryMotion.x| and |secondaryMotion.z| (`adds r3, r1, #0; ...; rsbs r3, r1, #0`)
 and never uses them. The landed C keeps them with a volatile asm. So in the original they fed
@@ -1216,7 +1216,7 @@ A single `base` pointer, a per-iteration `cursor = base` copy, and `&pool->e[i]`
 Next: work out whether r8 is a cursor biv or loop's reduced giv (try `hoist`), then the C that puts sprite/state on the base side
 while the reads stay on r8.
 
-### OrangeSpine_ApplyHitReaction (src/monsters/cannons/plasma/sub_0820EE34.c, 0820EE34): deferred
+### PlasmaCannon_ApplyHitReaction (src/monsters/cannons/plasma/sub_0820EE34.c, 0820EE34): deferred
 
 Landed: 2 pins and 4 barriers (r0 and r1 dummies around two statements).
 Draft: `notes/phase3-drafts/monsters-bosses/OrangeSpine_ApplyHitReaction.c` (36 ROM / 34 draft).
@@ -2045,7 +2045,7 @@ arm label topology with both multiplies retained. Kind/frame pins should be
 retested together once the left/right scalar lifetimes are ordinary.
 
 
-### ScenePanel_UpdateTimePalette (08057E04): spill layout and reload rotation
+### PileDriver_UpdateTimePalette (08057E04): spill layout and reload rotation
 
 Tags: #menus #palette #matching #compiler
 
@@ -2084,7 +2084,7 @@ frame slot records; the next useful task is recovering the original loop value
 layout before chasing individual masks. Keep indexed output as an alternative,
 but retain the original depinned baseline in the persistent store too.
 
-Persistent store: `build/matchsearch/ScenePanel_UpdateTimePalette`, including the
+Persistent store: `build/matchsearch/PileDriver_UpdateTimePalette`, including the
 exact isolated reload-rotation counterfactual. Next: remove the input/panel copy
 class-head lifetime inflation in ordinary C, then eliminate the second target
 spill while preserving the six intended scratch slots.
@@ -2512,7 +2512,7 @@ monsters-bosses pass where those were closer, otherwise the newly regenerated al
 form. The detailed compiler investigations remain in the earlier function sections in this file;
 this index records the complete queue and the current blocking decision after rechecking it.
 
-* `TentacleActor_UpdateRetraction` — 20 differing rows after both barriers are removed. The unused
+* `Centipede_UpdateRetraction` — 20 differing rows after both barriers are removed. The unused
   absolute-value branch still needs identical post-reload arms so jump2 can delete the comparison.
 * `sub_080ABB18` — 116 rows after seven concessions are removed. Loop-invariant field addresses
   still need to be produced by loop hoisting rather than manually pinned pointer temporaries.
@@ -2545,7 +2545,7 @@ this index records the complete queue and the current blocking decision after re
   three draft rows. An equality test must not let CSE reuse `allowTurn` as the later zero argument.
 * `EnemyParticle_UpdatePool` — the closest shared-step draft differs by 12 ROM rows versus 16 draft
   rows. The step needs r8 as the loop cursor while sprite/state remain derived from the base side.
-* `OrangeSpine_ApplyHitReaction` — the relative-based ordinary draft differs by 36 ROM rows versus
+* `PlasmaCannon_ApplyHitReaction` — the relative-based ordinary draft differs by 36 ROM rows versus
   34 draft rows. A natural value live across the response copy must occupy r0/r1 and add r3 to the
   later reload spill set.
 
@@ -2620,7 +2620,7 @@ one isolated instruction. Next: split the horizontal and vertical sums into narr
 and compare reference density and copy preferences against the sibling foreground/accent display
 updates.
 
-### SingletonSlot7_UpdateEndingScene: deferred
+### VanargandHead_UpdateEndingScene: deferred
 
 Draft: `notes/phase3-drafts/cdp-scene2/SingletonSlot7_UpdateEndingScene.c` (81 differing rows:
 73 ROM / 71 draft, with seven moved branches). Its four pins are two occurrences each of a constant
@@ -2629,7 +2629,7 @@ Grouping equal-named locals does not recover allocation. Next: use a union/array
 the byte zero and repeat each constant-one operation within the branch arms so cse and jump2 see
 the same lifetimes as the ROM.
 
-### SingletonSlot7_InitDisplaySprites: deferred
+### VanargandHead_InitDisplaySprites: deferred
 
 Draft: `notes/phase3-drafts/cdp-scene2/SingletonSlot7_InitDisplaySprites.c` (95 differing rows:
 88 ROM / 80 draft, with two moved branches). Thirteen concessions remain: eight pins and five
@@ -3181,7 +3181,7 @@ Tool gap found: why attributed the sample-mask change to an unrelated later tie
 sharing only the mask. The scope fix now requires both changed registers in a
 fallback tie, avoiding the ineffective NOTIE suggestion.
 
-### TentacleActor_SelectWanderRoute (080A8904): priority diagnosis confirmed
+### Centipede_SelectWanderRoute (080A8904): priority diagnosis confirmed
 
 The saved ordinary-C draft remains 46/48, shape 46, 988 bytes versus 984.
 `AGBCC_PRI=157:+2100,42:+1757,43:+423,45:+10000` matches exactly. These
@@ -3203,7 +3203,7 @@ longer lives and extra control flow remain. Returning from a while around the
 unvisited-cell path makes loop.c hoist the cell-center addresses and is much
 worse. Pointer post-increment changes the memory accesses and also fails.
 
-Persistent sources and hypotheses: `build/matchsearch/TentacleActor_SelectWanderRoute`.
+Persistent sources and hypotheses: `build/matchsearch/Centipede_SelectWanderRoute`.
 The complete ordinary draft is `notes/phase3-drafts/dp-monsters/TentacleActor_SelectWanderRoute.c`.
 Next: find a natural candidate-iteration structure whose cursor has at least
 21 weighted references over this lifetime, or shorten that lifetime without
@@ -3286,7 +3286,7 @@ count during invariant analysis while still reducing to the same final loop,
 or prevents this address from being recognized as invariant without changing
 its eventual instructions.
 
-### TentacleActor_AlignSegmentsToTerrain (080AA8C4): PRE copy removed
+### Centipede_AlignSegmentsToTerrain (080AA8C4): PRE copy removed
 
 The saved draft declares the segment position pointer before the flag tests.
 This eliminates PRE's extra reaching-value copy, improving the old draft from
@@ -3315,7 +3315,7 @@ base and the pointer-first improvement. Next: change the height copy's class
 membership independently of the upper-delta Abs class, then use giv ordering
 to allocate the independent y-output pointer before the saved position.
 
-### TentacleActor_UpdateRetraction (080AB968): threshold barrier removed
+### Centipede_UpdateRetraction (080AB968): threshold barrier removed
 
 The local `u16 threshold[] = {0x6400}` initializer prepares the third argument
 before actor/divisor, matching without the threshold barrier. Unit MATCH in
@@ -3341,7 +3341,7 @@ completion-field address before oscillation, returning the actor from Advance,
 and a returning while completion branch did not coalesce the views.
 
 The saved draft preserves the successful post-call assignment and nested
-sign tests. Persistent search: build/matchsearch/TentacleActor_UpdateRetraction.
+sign tests. Persistent search: build/matchsearch/Centipede_UpdateRetraction.
 Next: stop CSE from extending the original actor through the join while keeping
 the post-call assignment until flow; that should make its allocation disjoint
 from next and eliminate the final copy after allocation.
@@ -4257,7 +4257,7 @@ without preventing CSE using a barrier. Do not repeat sampler/type/layout experi
 Scratch/evidence: `build/cx/work/WirelessResultPanel_UpdateOutcomeReveal/`.
 ## dp-menus-b (Codex)
 
-### ScenePanelRig_TickApproachSubject (0805A044): two modulation pairs remain
+### PileDriverRig_TickApproachSubject (0805A044): two modulation pairs remain
 
 Partial landed: X pin and origin-offset barrier removed, and origin/distance reads use
 members. The target-distance/table work union prevents the table's constant-equivalence
@@ -4285,7 +4285,7 @@ back to the ROM. Keep the work union: its table allocation is independently diag
 Next: find a C shape that changes the X return's preference to r2 and removes the Z return's
 r2 preference, possibly through the rounding helper's class head or a later matched sibling.
 
-### ScenePanelRig_TickSecondarySprites (0805A7E4): nine pins and three barriers remain
+### PileDriverRig_TickSecondarySprites (0805A7E4): nine pins and three barriers remain
 
 Landed five pins and two barriers removed (19 original concessions, 12 remain). The ordinary
 sequence-advance helper form removes the duration/mask pins and barriers. Reusing the near
@@ -4320,7 +4320,7 @@ use an s32 coordinate local before storing it if revisiting this form.
 Next: solve the sample/result dying-operand tie, then retry the remaining pointer pins and
 loop increments; the fully unpinned draft also needs output's sb allocation.
 
-### ScenePanel_TickRig (0805AC3C): no removal landed
+### PileDriver_TickRig (0805AC3C): no removal landed
 
 Saved named-field draft: `notes/phase3-drafts/dp-menus-b/ScenePanel_TickRig.c`.
 It has no pins/barriers and preserves the original volatile timer member reads. 18 ROM /
@@ -4347,7 +4347,7 @@ the original tail plus ordinary head still misses seven reload-register instruct
 Next: get the halfword load and widened frame into one ordinary-C allocation quantity,
 and make reload reserve r3 without a pin. The C mask is worth retaining for that search.
 
-### ScenePanelRig_InitSecondarySprites (0805AF88)
+### PileDriverRig_InitSecondarySprites (0805AF88)
 
 Two matching partials remove the render-mode barrier (repeat the store in both
 arms) and zero pin (copy initial i after the existing initialization barrier).
@@ -4371,7 +4371,7 @@ load a pool object; the one-bit control is hoisted and introduces a shift in mod
 selection. Narrow parity retains a shift after the AND. The best remaining lever
 is a redundant expression that blocks PRE yet folds at combine without adding
 a mask; the current draft documents the exact target. Scratch: build/cx/work/
-ScenePanelRig_InitSecondarySprites/.
+PileDriverRig_InitSecondarySprites/.
 ## dp-scene2 (Codex)
 
 ### Actor_UpdateBlinkBurstDisappearance (081E7F80): one pin removed, unused zero open
@@ -4411,7 +4411,7 @@ After the singleton matches, splitting only the address/result temporaries while
 Final foreground follow-up: an initialized coordinate union leaves the retained draft's 35/38-row, shape-7 difference unchanged. Passing the horizontal accumulator by address to an inline addition helper also leaves it unchanged; applying that helper to the vertical additions increases the difference to 41/40 rows (shape 7). A geometry helper taking actor and drawable parameters is likewise unchanged. Passing the initial horizontal coordinate as a helper argument does recover its r1 allocation, but moves the origin load ahead of the screen address and leaves the origin/vertical allocation conflict: 28/32 rows, shape 8, 420 bytes. This does not justify replacing the retained draft. The complete sources and hypotheses are now preserved in `build/matchsearch/ActorDisplay_UpdateForegroundSprite` (use `propose --local` in this sandbox). Next investigation should preserve the ROM's early screen address while changing the sum's local allocation quantity; simply wrapping the arithmetic in an inline helper does not do that.
 
 
-### SingletonSlot7_UpdateEndingScene (081EF914): resolved without concessions
+### VanargandHead_UpdateEndingScene (081EF914): resolved without concessions
 
 Resolved in the resumed run: a local `u16 phaseReset[1] = {0}` at each transition keeps the separate halfword zero until its byte use. Both remaining pins are removed; stock scope and the complete unit check MATCH at 1392 bytes. The same byte array or byte struct initializer folds into the existing word zero and does not match; changing the phase field to a full-width byte bitfield or array also has no effect. This is the existing halfword-initializer lever (facts 61/67), applied at the two transition sites. The obsolete pin-free draft was removed; the checked implementation is `src/bosses/vanargand/sub_081EF914.c`.
 
@@ -4685,7 +4685,7 @@ then preserve the load's HI identity through both comparisons and the mask.
 Scratch and compiler evidence: `build/cx/work/sub_08108C94/`.
 
 
-### ScenePanel_UpdateBackgroundEffect (08058700): resolved
+### PileDriver_UpdateBackgroundEffect (08058700): resolved
 
 Tags: #menus #hud #matching #compiler
 
@@ -4709,14 +4709,14 @@ C forms decided it:
   the remaining five pins and both barriers together.
 
 The previous best draft is replaced with the matching ordinary C. Persistent
-store: `build/matchsearch/ScenePanel_UpdateBackgroundEffect`, final node
+store: `build/matchsearch/PileDriver_UpdateBackgroundEffect`, final node
 `packed-field-reads`; intermediate exact partials are also retained. Scratch
 variants cover narrow/word frame types, explicit truncations, union/array alpha
 views, reused frame/alpha tests and shared alpha lifetimes. The misleading first
 copy's cse trace was not the decisive mechanism; changing the frame type exposed
 the useful mask-preference difference. Queue item 20 is next.
 
-### ScenePanel_InitRig (0805B0F0)
+### PileDriver_InitRig (0805B0F0)
 
 Weekly run ended during this item. Source remains unchanged with one next-index
 pin and one table barrier; no ordinary-C partial matched. Pin-free draft saved
@@ -4747,7 +4747,7 @@ and literal advance masks. None matched. Halfword power was only a probe and
 was rejected as a landing direction because it narrows the script value.
 Next idea: preserve the power-to-r1 argument path while obtaining the union's
 table priority, then address next's local-versus-global lifetime independently.
-Scratch candidates and probe logs remain under build/cx/work/ScenePanel_InitRig/.
+Scratch candidates and probe logs remain under build/cx/work/PileDriver_InitRig/.
 
 ### SceneInput_TickChoice (0805E1D0)
 

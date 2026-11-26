@@ -2,7 +2,7 @@
 #include "engine/ram.h"
 #include "player/target_registry/target_registry.h"
 #include "objects/scene_objects/scene_object.h"
-#include "scene/actor/contact_collider.h"
+#include "scene/collision/contact_collider.h"
 
 s32 Math_Atan2(s32, s32);
 

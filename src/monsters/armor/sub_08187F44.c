@@ -1,5 +1,5 @@
 #include "global.h"
-#include "scene/actor/contact_collider.h"
+#include "scene/collision/contact_collider.h"
 
 #include "engine/engine.h"
 #include "system/game_state/game_state.h"

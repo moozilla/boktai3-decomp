@@ -1,6 +1,6 @@
 #include "effects/projectiles/projectile_task.h"
 
-s32 Task4E01_UpdateGrowingImpact(struct Task4E01Projectile *p)
+s32 ProjectileTask_UpdateGrowingImpact(struct Task4E01Projectile *p)
 {
     struct Task4E01Params *params = &p->params;
     u8 ended;

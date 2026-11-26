@@ -1,5 +1,5 @@
 #include "global.h"
-#include "ui/town/scene_item_values.h"
+#include "ui/town/shop_item_values.h"
 #include "system/game_state/game_state.h"
 #include "player/player.h"
 #include "ui/pause/inventory_panel.h"
@@ -251,7 +251,7 @@ static inline u32 Offset(u32 base, u32 off)
 static inline void PlaceStatusIcon(struct SceneHudState *p, s32 n,
                                    struct SceneInputPackedPosition pos)
 {
-    u32 off = (n + STATUS_WIDGET) * sizeof(struct SceneInputWidget);
+    u32 off = (n + STATUS_WIDGET) * sizeof(struct AnimSprite);
     *(u32 *)Offset((u32)&p->categoryWidgets[0].flags, off) &= ~1;
     *(struct SceneInputPackedPosition *)Offset((u32)&p->categoryWidgets[0].position, off) = pos;
 }

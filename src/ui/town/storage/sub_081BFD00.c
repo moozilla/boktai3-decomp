@@ -8,7 +8,7 @@ struct StorageMenu {
     u8 unknown0[0x80];
     u32 primaryFlags;
     u8 unknown84[0x54];
-    struct SceneInputWidget blinkWidget;
+    struct AnimSprite blinkWidget;
     u8 unknown138[0x60];
     u8 categoryAnimation[0x60];
     u8 groupAnimation[0x1320];
@@ -44,10 +44,10 @@ void Storage_UpdateBrowse(struct StorageMenu *p)
         p->blinkCounter++;
         if ((p->blinkCounter >> 5) & 1) {
             p->primaryFlags |= 1;
-            SceneInputWidget_Hide(&p->blinkWidget);
+            AnimSprite_Hide(&p->blinkWidget);
         } else {
             p->primaryFlags &= ~1;
-            SceneInputWidget_Show(&p->blinkWidget);
+            AnimSprite_Show(&p->blinkWidget);
         }
         if (Storage_TickCategorySelection(p)) {
             s32 category;
@@ -71,7 +71,7 @@ void Storage_UpdateBrowse(struct StorageMenu *p)
         }
     } else {
         p->primaryFlags |= 1;
-        SceneInputWidget_Hide(&p->blinkWidget);
+        AnimSprite_Hide(&p->blinkWidget);
         p->blinkCounter = 0;
     }
     SceneInputPanel_TickHighlight(p->highlight);

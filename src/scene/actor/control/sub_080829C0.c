@@ -1,4 +1,4 @@
-#include "scene/actor/scene_actor_availability.h"
+#include "scene/motion/scene_actor_availability.h"
 #include "scene/actor/scene_actor_control_motion.h"
 void SceneActorBehavior_ApplyContactReaction(struct SceneActorBehaviorContactView *,
                                              struct SceneActorBehaviorContactView *,

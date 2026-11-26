@@ -3,9 +3,9 @@
 #include "system/game_state/game_state.h"
 #include "engine/ram.h"
 #include "engine/engine_globals.h"
-#include "scene/area_effect/area_effect_link.h"
+#include "scene/areas/area_effect_link.h"
 #include "engine/engine_pause.h"
-#include "minigames/coffin_bike/glove.h"
+#include "minigames/coffin_bike/coffin_bike.h"
 
 s32 Div(s32, s32);
 s32 Math_Atan2(s32, s32);
@@ -21,7 +21,7 @@ u8 LinkParticipant_IsLocallySelected(struct Glove *);
 void PalFade_Start(void *, s32, u16, s32, s32, s32, s32, s32);
 s32 CharacterModel_GetPrimaryPaletteIndex(void *);
 void ChargeMarker_TickHold(void *, void *, u32);
-void Glove_UpdateStopping(struct Glove *);
+void CoffinBike_UpdateStopping(struct Glove *);
 
 void GameState_AddActionCount894(s32);
 void CharacterModel_ClearAnimationFlags(void *, s32);
@@ -171,7 +171,7 @@ void Glove_UpdateRecoveryFlash(struct Glove *p)
             self->style.initialWord = self->style.currentWord;
             current->bits = target->bits;
             CharacterModel_ClearAnimationFlags(&p->model, 1);
-            Glove_ChangeUpdate(p, (void (*)(void *))Glove_UpdateStopping);
+            Glove_ChangeUpdate(p, (void (*)(void *))CoffinBike_UpdateStopping);
             ActorMarkerPool_ShowMarker(p->marker);
             {
                 s32 mask = ~1;

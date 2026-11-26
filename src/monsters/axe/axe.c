@@ -1,8 +1,8 @@
-#include "scene/actor/scene_actor_chase.h"
+#include "scene/motion/scene_actor_chase.h"
 #include "effects/particles/scene_particle_burst_api.h"
 #include "global.h"
 #include "scene/actor/scene_actor_drawable_flags.h"
-#include "scene/actor/scene_actor_chase_shared.h"
+#include "scene/motion/scene_actor_chase_shared.h"
 #include "player/player.h"
 #include "scene/actor/scene_actor_control_phase.h"
 #include "engine/math/rotation_phase.h"
@@ -17,18 +17,18 @@
 #include "script/script_utility.h"
 #include "engine/engine_globals.h"
 #include "engine/ram.h"
-#include "scene/actor/scene_actor_collision.h"
-#include "scene/actor/contact_actor.h"
-#include "scene/actor/scene_actor_terrain.h"
+#include "scene/collision/scene_actor_collision.h"
+#include "scene/collision/contact_actor.h"
+#include "scene/motion/scene_actor_terrain.h"
 #include "engine/engine.h"
 #include "engine/video/display_track.h"
 #include "engine/video/render.h"
 #include "scene/actor/scene_actor_palette.h"
 #include "scene/actor/scene_actor_placement.h"
 #include "scene/actor/scene_actor_registry.h"
-#include "player/cues/player_cue_sequence.h"
+#include "player/cutscene/player_cue_sequence.h"
 #include "engine/video/display_animation.h"
-#include "scene/actor/contact_swarm.h"
+#include "scene/collision/contact_swarm.h"
 #include "engine/video/display_sprite_playback.h"
 #include "engine/video/display_sequence_inline.h"
 #include "monsters/scene_route_sample.h"
@@ -36,10 +36,10 @@
 #include "monsters/scene_actor_init_primitives.h"
 #include "monsters/scene_actor_init_graphics.h"
 #include "monsters/scene_actor_init_body.h"
-#include "scene/actor/scene_actor_turn.h"
+#include "scene/motion/scene_actor_turn.h"
 #include "engine/math/movement_curve.h"
-#include "scene/actor/scene_actor_displacement.h"
-#include "scene/actor/scene_actor_terrain_reaction.h"
+#include "scene/motion/scene_actor_displacement.h"
+#include "scene/motion/scene_actor_terrain_reaction.h"
 #include "bosses/vanargand/vanargand_parts.h"
 
 struct AxeTrailSprite {
@@ -624,7 +624,7 @@ static inline void Select(struct RoomActor *actor, u32 selection, u32 variant, u
                          (u8)variant, (u8)flags);
         restart = &actor->restart;
     } else {
-        struct SceneInputWidget *tile =
+        struct AnimSprite *tile =
             &((struct SceneActorAnimationTileDrawable *)actor->drawable)->tile;
         u8 *savedSelection;
         selection += variant;

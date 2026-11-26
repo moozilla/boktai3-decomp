@@ -1,5 +1,5 @@
 #include "scene/actor/scene_actor_effects.h"
-#include "scene/actor/scene_actor_chase_shared.h"
+#include "scene/motion/scene_actor_chase_shared.h"
 void SceneMessages_UnregisterReceiver(void *);
 void Shadow_Destroy(void *);
 void SceneActorEffects_DestroyGroup(void *);

@@ -1,6 +1,6 @@
 #define gNamedObjectSineTable gUnk_086149C4
 #include "global.h"
-#include "scene/actor/contact_actor.h"
+#include "scene/collision/contact_actor.h"
 struct NamedObjectMotion {
     u8 unknown00[9];
     u8 direction;

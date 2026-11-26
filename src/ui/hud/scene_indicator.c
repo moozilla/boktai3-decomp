@@ -1,5 +1,5 @@
 #include "ui/hud/scene_indicator.h"
-#include "scene/actor/contact_actor.h"
+#include "scene/collision/contact_actor.h"
 #include "scene/terrain/terrain_sampling.h"
 
 struct SceneIndicators *SceneIndicators_GetInstance(void)

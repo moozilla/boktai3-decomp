@@ -163,7 +163,7 @@ first ([ENGINE.md](ENGINE.md), sections 4 and 9).
 | `08009500`–`08009E30` | Directional interaction controllers (tentative) | [`src/objects/directional_controller.c`](../src/objects/directional_controller.c) | Interaction prompts gated by actor distance, facing and input. |
 | `08009E30`–`0800A800` | Collision controllers (tentative) | [`src/objects/collision_controller.c`](../src/objects/collision_controller.c) | Pool of 16 hit-detecting props with idle and hit animation and an effect burst. |
 | `0800CBA0`–`0800D874` | Falling objects (tentative) | [`src/objects/hazards/falling_objects.c`](../src/objects/hazards/falling_objects.c) | Objects that fall onto the terrain, with allocation, update and cleanup. |
-| `0800F9C4`–`080111EC` | Group objects (tentative) | [`src/effects/scene/bat_flock.c`](../src/effects/scene/bat_flock.c) | Manager for sixteen objects with animation and movement; several movement callbacks are unmatched. |
+| `0800F9C4`–`080111EC` | Group objects (tentative) | [`src/effects/bat_flock.c`](../src/effects/bat_flock.c) | Manager for sixteen objects with animation and movement; several movement callbacks are unmatched. |
 | `08011884`–`08012040` | Scene indicators (tentative) | [`src/ui/hud/scene_indicator.c`](../src/ui/hud/scene_indicator.c) | Scene indicators: lifecycle, timing, visibility, terrain placement, script pause and resume. |
 | `08012D08`–`080133CC` | Breakable barriers | [`src/objects/bat_curtain/breakable_barrier.c`](../src/objects/bat_curtain/breakable_barrier.c), [`src/objects/bat_curtain/sub_080133C0.c`](../src/objects/bat_curtain/sub_080133C0.c) | Breakable barriers: manager and callbacks (tentative grouping). |
 | `0801E000`–`08020964` | Scene object controller (tentative) | [`src/objects/scene_objects/`](../src/objects/scene_objects/) (43 files) | Scene object controller: shared object slots (140 bytes), script handlers and callbacks. |
@@ -182,10 +182,10 @@ descriptive, not confirmed roles.
 |---|---|---|---|
 | `08012040`–`08012AD0` | Animated hazards (tentative) | [`src/objects/hazards/animated_hazard.c`](../src/objects/hazards/animated_hazard.c) | Animated hazards: sprite and collision hazards with warning, attack, hold and retraction states. |
 | `080213EC`–`08021EA8` | Common scene actor controller | [`src/scene/actor/scene_actors.c`](../src/scene/actor/scene_actors.c) | Common scene actor controller: registration, health, damage, animation setup, event scripts and effect dispatch. |
-| `08021EA8`–`08024F2C` | Actor graphics and basic states (tentative) | [`src/bosses/vampire/actor_graphics_and_basic_states.c`](../src/bosses/vampire/actor_graphics_and_basic_states.c) | Actor graphics and basic states: drawable setup, targeting, resource costs and animation state handlers. |
-| `08024F2C`–`08026AA4` | Actor animation and action controllers (tentative) | [`src/bosses/vampire/`](../src/bosses/vampire/) (18 files) | Actor animation and action controllers: variant transitions, motion, recoil, frame holds and timed effects. |
-| `08026AA4`–`080284FC` | Actor projectile and reaction controllers (tentative) | [`src/bosses/vampire/`](../src/bosses/vampire/) (22 files) | Actor projectile and reaction controllers: projectiles, turning, anchored reactions, destruction effects. |
-| `080284FC`–`080297E8` | Actor damage and lifecycle (tentative) | [`src/bosses/vampire/`](../src/bosses/vampire/) (12 files) | Actor damage visuals and lifecycle callbacks. |
+| `08021EA8`–`08024F2C` | Actor graphics and basic states (tentative) | [`src/bosses/count/actor_graphics_and_basic_states.c`](../src/bosses/count/actor_graphics_and_basic_states.c) | Actor graphics and basic states: drawable setup, targeting, resource costs and animation state handlers. |
+| `08024F2C`–`08026AA4` | Actor animation and action controllers (tentative) | [`src/bosses/count/`](../src/bosses/count/) (18 files) | Actor animation and action controllers: variant transitions, motion, recoil, frame holds and timed effects. |
+| `08026AA4`–`080284FC` | Actor projectile and reaction controllers (tentative) | [`src/bosses/count/`](../src/bosses/count/) (22 files) | Actor projectile and reaction controllers: projectiles, turning, anchored reactions, destruction effects. |
+| `080284FC`–`080297E8` | Actor damage and lifecycle (tentative) | [`src/bosses/count/`](../src/bosses/count/) (12 files) | Actor damage visuals and lifecycle callbacks. |
 | `080297E8`–`0802C678` | Grid attack actor (tentative) | [`src/bosses/nidhoggr/grid_attack_actor.c`](../src/bosses/nidhoggr/grid_attack_actor.c) | Grid attack actor: attack animation states, damage reactions and command dispatch. |
 | `0802C678`–`0802C8A0` | Pooled actor manager | [`src/scene/actor/actor_pool/actor_pool.c`](../src/scene/actor/actor_pool/actor_pool.c) | Pooled actor manager: intrusive actor list, update dispatch, party target cache and allocation. |
 | `0802C8A0`–`0802CD04` | Pooled actor shared helpers (tentative) | [`src/scene/actor/actor_pool/pooled_actor_helpers.c`](../src/scene/actor/actor_pool/pooled_actor_helpers.c) | Shared helpers for pooled actors: facing, health, hit capture, target selection and turning. |
@@ -312,12 +312,12 @@ describes it. The notes for the link menus are in
 | Range | Subsystem (from progress_subsystems.csv) | C location | What it does |
 |---|---|---|---|
 | `08034084`–`08036CA4` | Wireless connection controller | [`src/link/wireless/connection/`](../src/link/wireless/connection/) (104 files) | Wireless connection controller: link status, peer packet builder, send and acknowledgement, event dispatch. |
-| `08036CA4`–`08036E08` | Wireless text encoding | [`src/link/wireless/wireless_text.c`](../src/link/wireless/wireless_text.c) | Wireless menu text encoding and shared offsets (notes/link-menus_2026-10-12.md). |
+| `08036CA4`–`08036E08` | Wireless text encoding | [`src/link/wireless/character_table.c`](../src/link/wireless/character_table.c) | Wireless menu text encoding and shared offsets (notes/link-menus_2026-10-12.md). |
 | `08036E08`–`08037228` | Wireless status menu | [`src/link/wireless/status_menu.c`](../src/link/wireless/status_menu.c) | Wireless status menu callbacks. |
 | `08037228`–`08037B20` | Wireless peer panel | [`src/link/wireless/peer_panel.c`](../src/link/wireless/peer_panel.c) | Wireless peer panel callbacks. |
 | `08037B20`–`080380C4` | Wireless packet exchange | [`src/link/wireless/packet_exchange/`](../src/link/wireless/packet_exchange/) (8 files) | Wireless packet exchange in the menus. |
 | `080380C4`–`080394D4` | Wireless trade and selection menu (tentative) | [`src/link/wireless/trade_menu/`](../src/link/wireless/trade_menu/) (26 files) | Wireless trade and selection menu. |
-| `080394D4`–`080395D4` | Wireless exit task | [`src/link/wireless/wireless_exit.c`](../src/link/wireless/wireless_exit.c) | Wireless exit task. |
+| `080394D4`–`080395D4` | Wireless exit task | [`src/link/wireless/exit.c`](../src/link/wireless/exit.c) | Wireless exit task. |
 | `080395D4`–`0803AC9C` | Wireless game items and display (tentative) | [`src/link/wireless/battle/wireless_game_items_and_display.c`](../src/link/wireless/battle/wireless_game_items_and_display.c) | Wireless game items and display for linked play. |
 | `0803AC9C`–`0803BAA0` | Wireless result panel (tentative) | [`src/link/wireless/result_panel/`](../src/link/wireless/result_panel/) (18 files) | Wireless result panel. |
 | `0803BAA0`–`0803CDF0` | Wireless scene objects (tentative) | [`src/link/wireless/battle/`](../src/link/wireless/battle/) (16 files) | Four wireless scene slots with actor resource lifetime, position and proximity callbacks. |

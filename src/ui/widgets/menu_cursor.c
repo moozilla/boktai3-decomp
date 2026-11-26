@@ -220,7 +220,7 @@ void MenuCursor_CopyEntries(struct MenuCursor *cursor, u32 count, struct MenuCur
 
 void MenuCursor_Initialize(struct MenuCursor *cursor, u32 palette)
 {
-    struct SceneInputResource *resource = ScriptProc_Start(0xCB05, 0xA2DB);
+    struct AnimSpriteResource *resource = ScriptProc_Start(0xCB05, 0xA2DB);
     if (resource) {
         cursor->resource = *resource;
         ResourceHeader_Relocate(&cursor->resource, resource);

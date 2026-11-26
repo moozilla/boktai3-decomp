@@ -3,9 +3,9 @@
 
 #include "engine/engine.h"
 #include "bosses/vanargand/paired_scene_actor.h"
-#include "player/cues/player_cue_sequence.h"
+#include "player/cutscene/player_cue_sequence.h"
 #include "bosses/vanargand/vanargand_effect.h"
-#include "scene/actor/scene_actor_terrain.h"
+#include "scene/motion/scene_actor_terrain.h"
 
 struct ContactPosition *Player_GetEffectivePosition(u32);
 void MotionTrack_Update(void *);

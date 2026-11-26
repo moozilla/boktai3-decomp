@@ -17,8 +17,8 @@ struct OrbitEffectContact {
 };
 s32 Math_Atan2(s32, s32);
 struct OrbitEffectPosition *Player_GetEffectivePosition(s32);
-struct OrbitEffectPosition *Task4E01_GetEntryPosition(s32);
-void Task4E01_RemoveEntry(s32);
+struct OrbitEffectPosition *ProjectileTask_GetEntryPosition(s32);
+void ProjectileTask_RemoveEntry(s32);
 void Projectile_InitializeParams(u8 *);
 void Projectile_SetFlightParams(u8 *, u16, u16, u8, u32);
 void Projectile_SetTypeAndElement(u8 *, u32, u32);
@@ -32,10 +32,10 @@ void OrbitEffect_FireProjectileOnContact(struct OrbitEffectContact *p)
     u32 direction;
     if ((p->flags & 1) && (p->type & 0x210) == 0x10 && !(p->status & 0x100)) {
         s32 *entry = &owner->entry;
-        source = Task4E01_GetEntryPosition(*entry);
+        source = ProjectileTask_GetEntryPosition(*entry);
         originPtr = &origin;
         *(struct OrbitEffectWords *)originPtr = *(struct OrbitEffectWords *)source;
-        Task4E01_RemoveEntry(*entry);
+        ProjectileTask_RemoveEntry(*entry);
         source = Player_GetEffectivePosition(0);
         targetPtr = &target;
         *(struct OrbitEffectWords *)targetPtr = *(struct OrbitEffectWords *)source;

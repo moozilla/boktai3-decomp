@@ -1,10 +1,10 @@
 #include "global.h"
-#include "ui/town/scene_inventory_panel.h"
+#include "ui/town/shop_panel.h"
 struct StoragePanel {
     u8 unknown0[0x1098];
-    struct SceneInputWidget banner;
+    struct AnimSprite banner;
     u8 unknown10F8[0x1538 - 0x10F8];
-    struct SceneInputResource gridResource;
+    struct AnimSpriteResource gridResource;
     u8 unknown1558[0x173C - 0x1558];
     const void *consumableText;
     u8 unknown1740[0x21];

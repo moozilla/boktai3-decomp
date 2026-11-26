@@ -1,8 +1,8 @@
 #ifndef GUARD_SKELETON_H
 #define GUARD_SKELETON_H
-#include "scene/actor/scene_actor_chase_reaction.h"
+#include "scene/motion/scene_actor_chase_reaction.h"
 #include "scene/actor/scene_actor_control_phase.h"
-#include "scene/actor/scene_actor_terrain.h"
+#include "scene/motion/scene_actor_terrain.h"
 #include "npc/cutscene_actor/actor_animation_controller.h"
 #include "monsters/scene_actor_init_primitives.h"
 #include "monsters/scene_actor_init_group.h"
@@ -90,7 +90,7 @@ void Skeleton_UpdateIdleState(u8 *p);
 void Skeleton_ConvergeDisplacedPosition(struct ChaseActor *actor);
 void Skeleton_UpdateDefeat(struct ChaseActor *);
 u8 SceneActorTarget_UpdateTrackedContact(void *);
-void TentacleBody_UpdateReactionTransition(u8 *s, s32 arg);
+void Skeleton_UpdateReactionTransition(u8 *s, s32 arg);
 s32 SceneActorTarget_ResolvePendingObjectSkeleton(struct ChaseActor *actor);
 void SceneActorPlacement_ResetStateThree(void);
 void Skeleton_UpdateDownedState(struct ChaseActor *, s32);

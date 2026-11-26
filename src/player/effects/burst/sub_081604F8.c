@@ -2,7 +2,7 @@
 #include "player/effects/frame_display.h"
 void AnimData_Load(void *, s32);
 void Sprite_Init(void *, void *, s32);
-s32 ActorDebris_Init(struct FrameDisplay *display, struct SceneInputWidget *animation, u8 *heading,
+s32 ActorDebris_Init(struct FrameDisplay *display, struct AnimSprite *animation, u8 *heading,
                      u8 *flip)
 {
     u8 *data = display->animationData;

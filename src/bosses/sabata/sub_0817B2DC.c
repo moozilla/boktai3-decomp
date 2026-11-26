@@ -1,5 +1,5 @@
 #include "bosses/sabata/scene_volume.h"
-#include "objects/pile_driver/scene_panel_commands.h"
+#include "objects/pile_driver/pile_driver_commands.h"
 void sub_0817B2DC(struct SceneVolumeActor *p)
 {
     s32 i;

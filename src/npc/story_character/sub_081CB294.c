@@ -1,5 +1,5 @@
 #include "scene/terrain/terrain_cell_probe.h"
-#include "scene/actor/contact_position.h"
+#include "scene/collision/contact_position.h"
 
 extern const s16 gUnk_086149C4[];
 
@@ -31,7 +31,7 @@ struct StateActorRise {
     struct ContactPosition *shadow;
 };
 
-void StateActor_UpdateRiseToTerrain(void *ctx, struct StateActorRise *a, s32 tick)
+void StoryCharacter_UpdateRiseToTerrain(void *ctx, struct StateActorRise *a, s32 tick)
 {
     struct RiseTag *tag = &a->tag;
     struct Pos16 *pos = &a->position;

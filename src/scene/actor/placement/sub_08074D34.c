@@ -1,4 +1,4 @@
-#include "scene/actor/scene_actor_collision.h"
+#include "scene/collision/scene_actor_collision.h"
 void SceneActorCollision_InitAttack(struct ChaseActor *actor, void *inputSize, void *inputOffset,
                                     void *inputCallback, u32 inputIndex, void *owner)
 {

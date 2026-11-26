@@ -1,16 +1,16 @@
-#include "objects/pile_driver/scene_panel_effects.h"
+#include "objects/pile_driver/pile_driver_effects.h"
 
 // Blends the panel palette (16 rows) and the sprite palette from the previous time-of-day
 // palette toward the target one over 64 frames. Each channel is read through the u16 pointer
 // (README fact 37), which keeps the 31 masks spilled as in the ROM. In the sprite loop the target
 // and destination are indexed, so loop.c creates their pointers after the hoisted masks and both
 // outrank them.
-void ScenePanel_UpdateTimePalette(struct ScenePanelEffectsView *panel)
+void PileDriver_UpdateTimePalette(struct ScenePanelEffectsView *panel)
 {
     u32 phase = SunClock_GetPhase();
     if (panel->timePhase != phase) {
         panel->timePhase = phase;
-        ScenePanel_SelectTimePalette((struct ScenePanel *)panel, panel->timePhase);
+        PileDriver_SelectTimePalette((struct ScenePanel *)panel, panel->timePhase);
     }
     if (panel->paletteBlendActive) {
         panel->channelsDirty = 1;
@@ -31,8 +31,8 @@ void ScenePanel_UpdateTimePalette(struct ScenePanelEffectsView *panel)
             panel->paletteBlendActive = 0;
             {
                 struct ScenePanelMainSprite *sprite = &panel->mainSprite;
-                if (ScenePanel_IsSpriteVisible(sprite)) {
-                    sprite->paletteFrame = ScenePanel_AdvancePaletteFrame(sprite);
+                if (PileDriver_IsSpriteVisible(sprite)) {
+                    sprite->paletteFrame = PileDriver_AdvancePaletteFrame(sprite);
                     {
                         struct ScenePanelGraphics *graphics = &sprite->graphics;
                         u32 bank;
@@ -68,8 +68,8 @@ void ScenePanel_UpdateTimePalette(struct ScenePanelEffectsView *panel)
                     to++;
                 }
             }
-            if (ScenePanel_IsSpriteVisible(&panel->mainSprite)) {
-                s32 frame = ScenePanel_AdvancePaletteFrame(&panel->mainSprite);
+            if (PileDriver_IsSpriteVisible(&panel->mainSprite)) {
+                s32 frame = PileDriver_AdvancePaletteFrame(&panel->mainSprite);
                 u32 offset;
                 const u16 *previous, *target;
                 u8 **banks = &gPaletteBankData;
@@ -107,8 +107,8 @@ void ScenePanel_UpdateTimePalette(struct ScenePanelEffectsView *panel)
         }
     } else {
         struct ScenePanelMainSprite *sprite = &panel->mainSprite;
-        if (ScenePanel_IsSpriteVisible(sprite)) {
-            s32 frame = ScenePanel_AdvancePaletteFrame(sprite);
+        if (PileDriver_IsSpriteVisible(sprite)) {
+            s32 frame = PileDriver_AdvancePaletteFrame(sprite);
             if (frame != sprite->paletteFrame) {
                 sprite->paletteFrame = frame;
                 {

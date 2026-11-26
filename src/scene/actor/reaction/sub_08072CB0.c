@@ -1,4 +1,4 @@
-#include "scene/actor/scene_actor_contact_list.h"
+#include "scene/collision/scene_actor_contact_list.h"
 u8 SceneActorContacts_ContainsActiveNode(struct SceneActorContactNode *input)
 {
     struct SceneActorContactManager *manager = gSceneActorContactManager;

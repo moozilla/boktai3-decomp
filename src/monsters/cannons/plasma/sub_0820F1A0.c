@@ -20,9 +20,9 @@ struct OrangeSpine {
 };
 struct OrangeSpinePosition *Player_GetEffectivePosition(s32);
 u32 Anim_SetSequence(void *, void *, u32, u32, u32);
-void OrangeSpine_FireProjectile(struct OrangeSpine *);
-void OrangeSpine_UpdateRecoveryDelay(void *);
-u32 OrangeSpine_TryFireAtPlayer(struct OrangeSpine *p)
+void PlasmaCannon_FireProjectile(struct OrangeSpine *);
+void PlasmaCannon_UpdateRecoveryDelay(void *);
+u32 PlasmaCannon_TryFireAtPlayer(struct OrangeSpine *p)
 {
     struct OrangeSpinePosition position;
     struct OrangeSpinePosition *pos;
@@ -32,20 +32,20 @@ u32 OrangeSpine_TryFireAtPlayer(struct OrangeSpine *p)
     if (!p->facing) {
         if (p->position.z - 128 < pos->z && p->position.z + 128 > pos->z &&
             p->position.x < position.x) {
-            OrangeSpine_FireProjectile(p);
+            PlasmaCannon_FireProjectile(p);
             Anim_SetSequence(p->animation, p->animationData, 15, (u8)p->facing, 0);
             p->timer = p->recoveryDelay;
             p->state = 0;
-            p->update = OrangeSpine_UpdateRecoveryDelay;
+            p->update = PlasmaCannon_UpdateRecoveryDelay;
         }
     } else {
         if (p->position.x - 128 < position.x && p->position.x + 128 > position.x &&
             p->position.z < pos->z) {
-            OrangeSpine_FireProjectile(p);
+            PlasmaCannon_FireProjectile(p);
             Anim_SetSequence(p->animation, p->animationData, 15, (u8)p->facing, 0);
             p->timer = p->recoveryDelay;
             p->state = 0;
-            p->update = OrangeSpine_UpdateRecoveryDelay;
+            p->update = PlasmaCannon_UpdateRecoveryDelay;
         }
     }
 }

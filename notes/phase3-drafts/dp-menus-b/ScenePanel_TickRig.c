@@ -1,4 +1,4 @@
-#include "objects/pile_driver/scene_panel_rig.h"
+#include "objects/pile_driver/pile_driver_rig.h"
 struct SceneRigDriverView {
     u8 unknown0[0xC0F];
     u8 suppressDrain;
@@ -10,15 +10,15 @@ struct SceneRigDriverView {
     void *action;
 };
 extern void *gUnk_08605A94[];
-void ScenePanelRig_CheckContactTransition(struct ScenePanelRig *);
-void ScenePanelRig_TickResourceDrain(struct ScenePanelRig *);
-void ScenePanelRig_TickSprites(struct ScenePanelRig *, u32);
-void ScenePanel_TickRig(struct ScenePanel *input)
+void PileDriverRig_CheckContactTransition(struct ScenePanelRig *);
+void PileDriverRig_TickResourceDrain(struct ScenePanelRig *);
+void PileDriverRig_TickSprites(struct ScenePanelRig *, u32);
+void PileDriver_TickRig(struct ScenePanel *input)
 {
     struct SceneRigDriverView *parent = (void *)input;
     struct ScenePanelRig *rig = &parent->rig;
     u32 palette;
-    ScenePanelRig_CheckContactTransition(rig);
+    PileDriverRig_CheckContactTransition(rig);
     Callback_InvokeActor(rig, gUnk_08605A94[parent->rig.state]);
     if (parent->rig.colliderHold) {
         u16 *flags = &parent->rig.collider.flags;
@@ -36,7 +36,7 @@ void ScenePanel_TickRig(struct ScenePanel *input)
         Collider_SetPosition(&parent->rig.collider, &parent->rig.position, 0);
     }
     if (!parent->suppressDrain)
-        ScenePanelRig_TickResourceDrain(rig);
+        PileDriverRig_TickResourceDrain(rig);
     palette = 91;
     if (parent->action) {
         volatile u16 *framePtr = &parent->frame;
@@ -52,5 +52,5 @@ void ScenePanel_TickRig(struct ScenePanel *input)
                 palette = 92;
         }
     }
-    ScenePanelRig_TickSprites(rig, palette);
+    PileDriverRig_TickSprites(rig, palette);
 }

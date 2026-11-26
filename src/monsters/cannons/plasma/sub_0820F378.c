@@ -1,4 +1,4 @@
-#include "monsters/cannons/orange_spine.h"
+#include "monsters/cannons/plasma_cannon.h"
 #include "ui/hud/damage_number_display.h"
 #include "ui/pause/scene_hud_display.h"
 #include "engine/video/display_sequence_inline.h"
@@ -18,7 +18,7 @@ void TerrainModifiers_UnregisterCell(void *);
 void sub_08014634(s32, s32, void *, void *, void *, s32, s32);
 void Anim_RestartSequence(void *, void *, u32, u32, u32);
 void AnimData_SelectPaletteBank(void *, s32);
-void OrangeSpine_UpdateDefeatEffect(u8 *);
+void PlasmaCannon_UpdateDefeatEffect(u8 *);
 void Explosion_CreateAt(void *, s32, s32, s32, s32, s32, s32, s32);
 struct OrangeSpineEffectPair {
     s32 lo : 16;
@@ -108,7 +108,7 @@ static inline void OrangeSpine_BeginDefeat(s16 *state, u16 *blink)
     *state = 1;
     *blink = zero;
 }
-s32 OrangeSpine_UpdateDamageState(struct OrangeSpineActor *p)
+s32 PlasmaCannon_UpdateDamageState(struct OrangeSpineActor *p)
 {
     struct ContactCollider *collider;
     if (Engine_PauseBits(0x400) || Flags_MaskedWord(4, &gUnk_02000560))
@@ -174,7 +174,7 @@ s32 OrangeSpine_UpdateDamageState(struct OrangeSpineActor *p)
             Anim_RestartSequence(&p->sequence, p->resource, 16, p->facing, 0);
             AnimData_SelectPaletteBank(p->graphics, 0x1c1);
             p->flashTimer = 0;
-            p->update = OrangeSpine_UpdateDefeatEffect;
+            p->update = PlasmaCannon_UpdateDefeatEffect;
             p->age = 0;
             Sound_PlaySong(0x52d);
         }

@@ -2,7 +2,7 @@
 
 u32 Sprite_Remove(u8 *);
 
-void CannonBattery_DestroyMuzzleFlash(u8 *p)
+void DeckCannon_DestroyMuzzleFlash(u8 *p)
 {
     Sprite_Remove(p + 0x24);
 }

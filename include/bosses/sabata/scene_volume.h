@@ -4,7 +4,7 @@
 #include "engine/engine.h"
 #include "effects/projectiles/projectile_task.h"
 #include "player/player.h"
-#include "scene/actor/contact_collider.h"
+#include "scene/collision/contact_collider.h"
 #include "objects/pile_driver/scene_panel.h"
 
 /* Shared attack, pursuit, impact, and landing state. Behavior names are tentative. */
@@ -94,8 +94,8 @@ static inline u8 SceneVolume_TakeQueued(struct SceneVolumeActor *actor)
 
 void ActorEffect_InitializeOffset(struct SceneVolumeActor *);
 void ActorEffect_UpdateTimedSequence(struct SceneVolumeActor *);
-void SceneVolume_UpdateRepeatedShot(struct SceneVolumeActor *);
-void SceneVolume_UpdatePursuitSpin(struct SceneVolumeActor *, s32);
-void SceneVolume_UpdateImpactSlide(struct SceneVolumeActor *);
-void SceneVolume_UpdateKnockbackLanding(struct SceneVolumeActor *, s32);
+void SabataVolume_UpdateRepeatedShot(struct SceneVolumeActor *);
+void SabataVolume_UpdatePursuitSpin(struct SceneVolumeActor *, s32);
+void SabataVolume_UpdateImpactSlide(struct SceneVolumeActor *);
+void SabataVolume_UpdateKnockbackLanding(struct SceneVolumeActor *, s32);
 #endif

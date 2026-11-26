@@ -1,4 +1,4 @@
-#include "objects/pile_driver/scene_panel_rig.h"
+#include "objects/pile_driver/pile_driver_rig.h"
 static inline s32 scale12(s32 value)
 {
     return value >= 0 ? value >> 12 : -((-value) >> 12);
@@ -15,7 +15,7 @@ static inline u32 readWord(const u16 *table, u32 index)
     do {                                                                                           \
         (out) = scale12(n);                                                                        \
     } while (0)
-void ScenePanelRig_TickWandering(struct ScenePanelRig *rig)
+void PileDriverRig_TickWandering(struct ScenePanelRig *rig)
 {
     u32 angle;
     union {
@@ -86,9 +86,9 @@ void ScenePanelRig_TickWandering(struct ScenePanelRig *rig)
     rig->position.z = rig->origin.z + z + scale24(value);
     if (rig->selectionTimer <= 2) {
         rig->selectionTimer = 600;
-        rig->selectedSubject = ScenePanelRig_SelectActiveSubject(rig);
+        rig->selectedSubject = PileDriverRig_SelectActiveSubject(rig);
         if (rig->selectedSubject >= 0)
-            ScenePanelRig_SetState(rig, 4);
+            PileDriverRig_SetState(rig, 4);
     } else
         rig->selectionTimer -= 2;
 }

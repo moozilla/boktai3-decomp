@@ -1,6 +1,6 @@
-#include "scene/actor/scene_actor_route.h"
-#include "scene/actor/scene_actor_chase_shared.h"
-#include "scene/actor/scene_actor_terrain_reaction.h"
+#include "scene/motion/scene_actor_route.h"
+#include "scene/motion/scene_actor_chase_shared.h"
+#include "scene/motion/scene_actor_terrain_reaction.h"
 #include "scene/actor/scene_actor_control_phase.h"
 s32 Callback_InvokeActor(void *arg, void *function);
 s32 Route_GetCurrentPointNodeId(void *);

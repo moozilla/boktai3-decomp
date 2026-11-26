@@ -49,7 +49,7 @@ void SceneActors_UpdateAnimation(void *, void *, void *);
 void SceneActors_UpdateTargetMetrics(void *);
 s32 Math_Atan2(s32, s32);
 
-void BossSlot2_UpdateFrame(struct BossSlot2Tick *p)
+void Sabata_UpdateFrame(struct BossSlot2Tick *p)
 {
     struct BossSlot2Tick *actor = p;
     struct BossSlot2Tick *owner = p;

@@ -12,7 +12,7 @@ void Hud_InitSelectionBounds(u32, u32);
 s32 Anim_Step(void *, void *);
 void Hud_SetUpdateCallback(void *, void (*)(void));
 void SelectionMenu_UpdateConfirmInput(void);
-void SceneSequence_UpdateRamp64(struct SceneSequence *s)
+void MenuSequence_UpdateRamp64(struct SceneSequence *s)
 {
     void *data, *initial;
     if (s->phaseTimer <= 15)

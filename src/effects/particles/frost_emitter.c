@@ -1,7 +1,7 @@
 #include "effects/particles/frost_emitter.h"
 #include "npc/scripted_npc/scene_npc_transition_palette.h"
 #include "engine/math/monster_particle_random.h"
-#include "player/cues/player_cue_sequence.h"
+#include "player/cutscene/player_cue_sequence.h"
 
 struct SceneNpcTransitionActor *Actor_FindById(void *, s32);
 

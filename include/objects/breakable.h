@@ -1,6 +1,6 @@
 #ifndef POOLED_INTERACTABLE_H
 #define POOLED_INTERACTABLE_H
-#include "ui/widgets/scene_input_widget.h"
+#include "engine/video/anim_sprite.h"
 #include "objects/scene_objects/scene_object.h"
 #include "engine/task.h"
 
@@ -36,16 +36,16 @@ struct PooledInteractable {
     struct ContactPosition *target;
     u16 speed, range;
     struct PooledRoute route;
-    struct SceneInputWidget drawable;
+    struct AnimSprite drawable;
     struct SceneCollider collider;
-    struct SceneInputResource *resource;
+    struct AnimSpriteResource *resource;
 };
 
 struct PooledInteractableManager {
     struct Task task;
     u32 count;
     struct PooledInteractable *slots;
-    struct SceneInputResource resources[3];
+    struct AnimSpriteResource resources[3];
 };
 
 /* 0x02000034 */

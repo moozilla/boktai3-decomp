@@ -2,7 +2,7 @@
 #include "scene/actor/scene_actor_registry.h"
 #include "system/game_state/game_state.h"
 #include "engine/ram.h"
-#include "scene/actor/scene_actor_availability.h"
+#include "scene/motion/scene_actor_availability.h"
 #include "scene/actor/scene_actor_behavior.h"
 extern u32 gUnk_02000560;
 void SceneActorPlacement_HideActor(struct ChaseActor *, s32);

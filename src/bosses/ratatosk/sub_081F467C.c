@@ -1,6 +1,6 @@
 #include "global.h"
 #include "player/player.h"
-#include "scene/actor/scene_facing.h"
+#include "scene/motion/scene_facing.h"
 struct Vec {
     s16 x, y, z, pad;
 };

@@ -1,7 +1,7 @@
 #ifndef GUARD_FIELD_HUD_WIDGETS_H
 #define GUARD_FIELD_HUD_WIDGETS_H
 #include "global.h"
-#include "ui/widgets/scene_input_widget.h"
+#include "engine/video/anim_sprite.h"
 /* Field HUD block at SceneHudState + 0x492C. */
 struct FieldHudWidgets {
     s32 *source;
@@ -16,11 +16,11 @@ struct FieldHudWidgets {
     const u16 *paletteResource; /* 0x4C */
     s32 fill, displayedIndex;
     s32 *gaugeSource;
-    struct SceneInputWidget meterWidgets[2]; /* 0x5C: participants' viewport positions */
+    struct AnimSprite meterWidgets[2]; /* 0x5C: participants' viewport positions */
     u8 meterResource[0x20];                  /* 0x11C */
     void *meterScript;
     s32 meterScale;
-    struct SceneInputWidget timeDigits[6]; /* 0x144 */
+    struct AnimSprite timeDigits[6]; /* 0x144 */
     u8 timeResource[0x20];                 /* 0x384 */
     void *timeScript;
     s32 *timeSource; /* 0x3A8: elapsed frames */

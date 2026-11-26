@@ -20,14 +20,14 @@ struct CannonBatteryEffect {
     u8 finished;
 };
 s32 MessageQueue_GetMessagesById(u32, struct CannonBatteryMessage **);
-void CannonBattery_CreateCannon(void *, u32, u32, u32, u32);
+void DeckCannon_CreateCannon(void *, u32, u32, u32, u32);
 
 static inline void RunCallback(struct CannonBatteryEffect *e, void *callback)
 {
     if (callback)
         Callback_InvokeActor(e, callback);
 }
-s32 CannonBattery_Update(u8 *p)
+s32 DeckCannon_Update(u8 *p)
 {
     struct CannonBatteryMessage *m;
     s32 n = MessageQueue_GetMessagesById(*(u32 *)(p + 0x18), &m);
@@ -37,7 +37,7 @@ s32 CannonBattery_Update(u8 *p)
     for (; n > 0; n--, m++) {
         u16 *d = m->data;
         if (d[0] == 0)
-            CannonBattery_CreateCannon(p, d[1], d[2], d[3], d[4]);
+            DeckCannon_CreateCannon(p, d[1], d[2], d[3], d[4]);
     }
     c = (void *)(p + 0x28);
     for (bit = 1, i = 16; i > 0; i--, c = (void *)((u8 *)c + 0xd4), bit <<= 1) {

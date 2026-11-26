@@ -1,10 +1,10 @@
-#include "monsters/centipede/tentacle_body.h"
-#include "scene/actor/scene_actor_chase_reaction.h"
+#include "monsters/centipede/centipede_body.h"
+#include "scene/motion/scene_actor_chase_reaction.h"
 #include "global.h"
 #include "scene/actor/scene_actor_reset.h"
-#include "scene/actor/scene_actor_terrain.h"
+#include "scene/motion/scene_actor_terrain.h"
 #include "npc/manager/scene_actor_animation.h"
-#include "scene/actor/scene_actor_chase.h"
+#include "scene/motion/scene_actor_chase.h"
 
 extern const s16 gUnk_086149C4[];
 s32 Callback_InvokeActor(void *, void *);
@@ -72,7 +72,7 @@ static inline s32 Tentacle_HeadingDifference(u8 desired, u8 current)
     return difference;
 }
 
-void TentacleBody_ReturnToCellCenter(struct ChaseActor *actor)
+void CentipedeBody_ReturnToCellCenter(struct ChaseActor *actor)
 {
     struct TentacleBody *body = actor->base.context;
     s32 speed;

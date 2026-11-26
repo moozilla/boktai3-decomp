@@ -28,6 +28,22 @@ class SourceLayoutTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, r"Example\.c.*source_dirs\.csv.*source_files\.csv"):
                 source_layout.new_source(0x0822FDB4, "Example", root)
 
+    def test_player_range_places_new_sources_without_reassigning_an_existing_unit(self):
+        with tempfile.TemporaryDirectory() as scratch:
+            root = Path(scratch)
+            (root / "symbols").mkdir()
+            (root / source_layout.SOURCE_DIRS).write_text(
+                "current_path,new_path,note\n"
+                "0815F5B4-0815F7F4,src/player/target_registry,reviewed range\n"
+                "src/player/player_orbit_effect,src/player/effects,existing orbit unit\n")
+            (root / source_layout.SOURCE_FILES).write_text(
+                "original_path,current_path,rule,filename,start,end\n"
+                "src/player_orbit_effect.c,src/player/player_orbit_effect/player_orbit_effect.c,"
+                "src/player/player_orbit_effect,orbit_effect.c,0815F7E0,0815FEB0\n")
+            self.assertEqual(source_layout.new_source(0x0815F5B4, "Player_FindTarget", root),
+                             "src/player/target_registry/Player_FindTarget.c")
+            self.assertEqual(source_layout.directory_for(0x0815F7E0, root), Path("player/effects"))
+
     def test_resolves_names_addresses_aliases_and_drafts(self):
         with tempfile.TemporaryDirectory() as scratch:
             root = Path(scratch)

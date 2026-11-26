@@ -1,7 +1,7 @@
 #ifndef GUARD_ACTOR_ATTACHMENT_STATE_H
 #define GUARD_ACTOR_ATTACHMENT_STATE_H
 #include "scene/actor/actor_attachment.h"
-#include "scene/actor/contact_swarm.h"
+#include "scene/collision/contact_swarm.h"
 #include "engine/ram.h"
 struct ActorAttachmentPartResource {
     u32 unknown0;

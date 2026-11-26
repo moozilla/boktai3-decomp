@@ -1,5 +1,5 @@
 #include "global.h"
-#include "bosses/nidhoggr/large_scene_animation_controller.h"
+#include "bosses/nidhoggr/nidhoggr_animation.h"
 
 s32 Nidhoggr_ChangeCompletedPartState(void *object, s32 index, s32 state)
 {

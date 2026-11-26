@@ -1,7 +1,7 @@
 #include "global.h"
 
-#include "scene/actor/contact_swarm.h"
-#include "player/cues/player_cue_sequence.h"
+#include "scene/collision/contact_swarm.h"
+#include "player/cutscene/player_cue_sequence.h"
 
 // Drawable layout shared with ActorDisplay_UpdateForegroundSprite.
 struct Drawable {
@@ -18,8 +18,8 @@ static inline u32 StepPlayback(struct Drawable *owner, struct DisplaySequenceSta
 
 void Anim_RestartSequence(void *, void *, u16, u8, u8);
 void Projectile_SetUpdateCallback(void *, void *);
-void Task4E01_StepTimedSequence(void);
-s32 Task4E01_StartDirectionalAnimation(u8 *p)
+void ProjectileTask_StepTimedSequence(void);
+s32 ProjectileTask_StartDirectionalAnimation(u8 *p)
 {
     u8 *config = p + 0x18;
     void *resource = ScriptProc_Start(0x922e, 0x32d7);
@@ -30,6 +30,6 @@ s32 Task4E01_StartDirectionalAnimation(u8 *p)
     frames = p + 0x180;
     Anim_RestartSequence(frames, resource, 7, direction, 0);
     StepPlayback((void *)(p + 0x8c), (void *)frames);
-    Projectile_SetUpdateCallback(config, Task4E01_StepTimedSequence);
+    Projectile_SetUpdateCallback(config, ProjectileTask_StepTimedSequence);
     return 0;
 }

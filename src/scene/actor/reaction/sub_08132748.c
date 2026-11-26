@@ -1,9 +1,9 @@
 #include "scene/actor/scene_actor_drawable_flags.h"
-#include "scene/actor/scene_actor_terrain_reaction.h"
+#include "scene/motion/scene_actor_terrain_reaction.h"
 #include "global.h"
 #include "scene/actor/scene_actor_reaction.h"
 #include "engine/runtime.h"
-#include "scene/actor/scene_actor_chase_shared.h"
+#include "scene/motion/scene_actor_chase_shared.h"
 #include "scene/actor/scene_actor_damage_flash.h"
 /* Clears hit timers; at zero health hands control to the defeat target and records the defeat. */
 void SceneActorRecord_RecordPair(u16, u16);

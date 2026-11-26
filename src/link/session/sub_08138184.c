@@ -1,5 +1,5 @@
 #include "global.h"
-void Registry1745_ClearParticipantCounters(u8 *p)
+void LinkSession_ClearParticipantCounters(u8 *p)
 {
     u16 *h;
     s32 n;

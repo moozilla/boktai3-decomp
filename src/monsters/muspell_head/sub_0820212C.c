@@ -1,7 +1,7 @@
 #include "global.h"
 #include "engine/math/scene_vec.h"
 #include "engine/engine_globals.h"
-#include "player/cues/player_cue_sequence.h"
+#include "player/cutscene/player_cue_sequence.h"
 #include "scene/terrain/terrain_cell_probe.h"
 struct ScriptActor {
     u8 unknown0[0x1c];
@@ -30,8 +30,8 @@ struct ScriptActor {
 s32 Script_SeekToKeyword(s32);
 s32 Script_GetValue(void);
 void sub_08201784(void *);
-u32 ScriptCombatActor_TryProjectileAttack(u8 *);
-void ScriptCombatActor_UpdateDefeatEffect(void);
+u32 MuspellHead_TryProjectileAttack(u8 *);
+void MuspellHead_UpdateDefeatEffect(void);
 void TerrainModifiers_RegisterCell(void *, s32, s32, s32, s32, s32);
 void SceneBody_Init(void *, void *, void *, u32, u32, void *);
 void SceneBody_SetSprite(void *, void *);
@@ -193,10 +193,10 @@ s32 ScriptCombatActor_InitializeFromScript(struct ScriptActor *p, void *parent)
     dead = p->initialDead;
     sprite = earlySprite;
     if (dead == 0) {
-        p->action = (void (*)(void))ScriptCombatActor_TryProjectileAttack;
+        p->action = (void (*)(void))MuspellHead_TryProjectileAttack;
         Anim_SetSequence(&p->playback, resource, 0, 0, dead);
     } else {
-        p->action = ScriptCombatActor_UpdateDefeatEffect;
+        p->action = MuspellHead_UpdateDefeatEffect;
         p->dead = 1;
         Anim_SetSequence(&p->playback, p->sequence, 2, 0, 0);
     }

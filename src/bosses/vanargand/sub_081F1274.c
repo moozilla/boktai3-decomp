@@ -76,7 +76,7 @@ static inline u8 IsSceneHidden(void)
     return 0;
 }
 
-void SingletonSlot7_UpdatePresentation(struct DepartureActor *actor)
+void VanargandHead_UpdatePresentation(struct DepartureActor *actor)
 {
     struct DepartureActor *base = actor;
     s32 dx, dz;

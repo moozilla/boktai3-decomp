@@ -24,16 +24,16 @@ struct CannonBatteryCannon {
     u8 unkD2;
     u8 state;
 };
-u32 CannonBattery_LoadAnimation(void);
+u32 DeckCannon_LoadAnimation(void);
 void Collider_SetBodyProperties(void *, s32, s32, s32);
 void CallbackSlot_StartWhenTimerReady(void);
-void CannonBattery_UpdateCannon(void *);
-void CannonBattery_DestroyCannon(void *);
+void DeckCannon_UpdateCannon(void *);
+void DeckCannon_DestroyCannon(void *);
 extern u8 gUnk_0824F6D8[], gUnk_0824F6E0[];
-void CannonBattery_InitCannon(struct CannonBatteryCannon *p, s32 x, s32 y, s32 z, s32 flip)
+void DeckCannon_InitCannon(struct CannonBatteryCannon *p, s32 x, s32 y, s32 z, s32 flip)
 {
     struct CannonBatterySprite *sprite;
-    CannonBattery_LoadAnimation();
+    DeckCannon_LoadAnimation();
     AnimData_Load(p->animation, 0x8D95);
     AnimData_SelectPaletteBank(p->animation, 0x8F);
     sprite = &p->sprite;
@@ -57,8 +57,8 @@ void CannonBattery_InitCannon(struct CannonBatteryCannon *p, s32 x, s32 y, s32 z
     Collider_SetCallback(p->collider, CallbackSlot_StartWhenTimerReady, p);
     Collider_Refresh(p->collider);
     {
-        u32 update = (u32)CannonBattery_UpdateCannon;
-        u32 destroy = (u32)CannonBattery_DestroyCannon;
+        u32 update = (u32)DeckCannon_UpdateCannon;
+        u32 destroy = (u32)DeckCannon_DestroyCannon;
         p->update = update;
         p->destroy = destroy;
     }

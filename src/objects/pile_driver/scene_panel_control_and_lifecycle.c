@@ -1,12 +1,12 @@
 #include "objects/pile_driver/scene_panel_interaction.h"
 #include "objects/pile_driver/scene_panel_config.h"
 #include "objects/pile_driver/scene_panel_orchestration.h"
-#include "objects/pile_driver/scene_panel_commands.h"
+#include "objects/pile_driver/pile_driver_commands.h"
 #include "system/game_state/game_state.h"
 #include "objects/pile_driver/scene_panel_lifecycle.h"
-#include "objects/pile_driver/scene_panel_subject.h"
+#include "objects/pile_driver/pile_driver_subject.h"
 
-s32 ScenePanel_IsWithinHorizontalRadius(const struct ContactPosition *first,
+s32 PileDriver_IsWithinHorizontalRadius(const struct ContactPosition *first,
                                         const struct ContactPosition *second, s32 radius)
 {
     s32 x = first->x - second->x;
@@ -17,21 +17,21 @@ s32 ScenePanel_IsWithinHorizontalRadius(const struct ContactPosition *first,
         return 1;
 }
 
-s32 ScenePanel_CanAcquireTether(struct ScenePanel *input)
+s32 PileDriver_CanAcquireTether(struct ScenePanel *input)
 {
     struct ScenePanel *panel = (void *)input;
     struct TetherActor *tether = gTetherActor;
     if (tether) {
         struct ScenePanelInteractionPlayer *player = SCENE_PANEL_PLAYER;
         if (player->kindValue == 1 && player->tetherMode == 6) {
-            if (ScenePanel_IsWithinHorizontalRadius(&tether->position, &panel->center, 70))
+            if (PileDriver_IsWithinHorizontalRadius(&tether->position, &panel->center, 70))
                 return 1;
         }
     }
     return 0;
 }
 
-s32 ScenePanel_AreSubjectsSettled(struct ScenePanel *input)
+s32 PileDriver_AreSubjectsSettled(struct ScenePanel *input)
 {
     struct ScenePanel *panel = (void *)input;
     s32 i = 0;
@@ -49,7 +49,7 @@ s32 ScenePanel_AreSubjectsSettled(struct ScenePanel *input)
     return 1;
 }
 
-s32 ScenePanel_CanAcceptPlayer(struct ScenePanel *input)
+s32 PileDriver_CanAcceptPlayer(struct ScenePanel *input)
 {
     struct ScenePanel *panel = (void *)input;
     struct ScenePanelInteractionPlayer *player = SCENE_PANEL_PLAYER;
@@ -58,31 +58,31 @@ s32 ScenePanel_CanAcceptPlayer(struct ScenePanel *input)
     if ((u8)(player->actionMode - 3) <= 2)
         return 0;
     if (player->tetherMode == 7) {
-        if (ScenePanel_IsWithinHorizontalRadius(&player->position, &panel->approachPosition, 100))
+        if (PileDriver_IsWithinHorizontalRadius(&player->position, &panel->approachPosition, 100))
             return 1;
         return 0;
     }
     return 0;
 }
 
-s32 ScenePanel_IsTetherDistant(struct ScenePanel *input)
+s32 PileDriver_IsTetherDistant(struct ScenePanel *input)
 {
     struct ScenePanel *panel = (void *)input;
-    if (ScenePanel_IsWithinHorizontalRadius(&gTetherActor->position, &panel->center, 800) != 0)
+    if (PileDriver_IsWithinHorizontalRadius(&gTetherActor->position, &panel->center, 800) != 0)
         return 0;
     return 1;
 }
 
-void ScenePanel_WaitInitialTether(struct ScenePanel *panel)
+void PileDriver_WaitInitialTether(struct ScenePanel *panel)
 {
-    if (!ScenePanel_CanAcquireTether(panel))
+    if (!PileDriver_CanAcquireTether(panel))
         return;
     PlayerCue_MoveTo(SCENE_PANEL_PLAYER, 0, -1, 0, 0);
     panel->variant = 0;
-    ScenePanel_SetEffectState(panel, 1);
+    PileDriver_SetEffectState(panel, 1);
 }
 
-void ScenePanel_AdvanceTetherAcquisition(struct ScenePanel *panel)
+void PileDriver_AdvanceTetherAcquisition(struct ScenePanel *panel)
 {
     u16 *framePointer = &panel->effectFrame;
     u32 frame;
@@ -132,7 +132,7 @@ void ScenePanel_AdvanceTetherAcquisition(struct ScenePanel *panel)
         Sound_PlaySong(249);
     } else if (frame <= 69) {
         if (panel->variant != 2 && frame == 20) {
-            ScenePanel_SetState((void *)panel, ScenePanel_BeginLongSequence);
+            PileDriver_SetState((void *)panel, PileDriver_BeginLongSequence);
             Sound_PlaySong(294);
         }
         Camera_RequestShake((70 - panel->effectFrame) >> 1);
@@ -141,13 +141,13 @@ void ScenePanel_AdvanceTetherAcquisition(struct ScenePanel *panel)
         if (i < panel->subjectCount) {
             struct ScenePanelSubject **subject = panel->subjects;
             do {
-                ScenePanelSubject_SetState((void *)*subject++, 1);
+                PileDriverSubject_SetState((void *)*subject++, 1);
                 i++;
             } while (i < panel->subjectCount);
         }
         PlayerCue_Stand(SCENE_PANEL_PLAYER, -1);
         Sound_PlaySong(250);
-        ScenePanel_SetEffectState((void *)panel, 2);
+        PileDriver_SetEffectState((void *)panel, 2);
     } else if (panel->variant == 1) {
         s32 anyActive;
         u32 count;
@@ -166,48 +166,48 @@ void ScenePanel_AdvanceTetherAcquisition(struct ScenePanel *panel)
             } while (remaining != 0);
         }
         if (anyActive)
-            ScenePanel_SetEffectState((void *)panel, 4);
+            PileDriver_SetEffectState((void *)panel, 4);
         else
-            ScenePanel_SetEffectState((void *)panel, 3);
+            PileDriver_SetEffectState((void *)panel, 3);
     } else {
         PlayerCue_Stand(SCENE_PANEL_PLAYER, -1);
         PlayerCue_ReleaseControl(SCENE_PANEL_PLAYER);
         Sound_PlaySong(490);
         gTetherActor->state = 14;
-        ScenePanelRig_SetState(&panel->rig, 1);
-        ScenePanel_SetEffectState((void *)panel, 10);
+        PileDriverRig_SetState(&panel->rig, 1);
+        PileDriver_SetEffectState((void *)panel, 10);
     }
 }
 
-void ScenePanel_WaitSettledSubjects(struct ScenePanel *input)
+void PileDriver_WaitSettledSubjects(struct ScenePanel *input)
 {
-    if (ScenePanel_AreSubjectsSettled(input) != 0) {
+    if (PileDriver_AreSubjectsSettled(input) != 0) {
         PlayerCue_ReleaseControl(SCENE_PANEL_PLAYER);
-        ScenePanel_SetEffectState(input, 3);
-        ScenePanel_CallPendingScript(input, 0);
+        PileDriver_SetEffectState(input, 3);
+        PileDriver_CallPendingScript(input, 0);
     }
 }
 
-void ScenePanel_WaitTetherOrActiveSubject(struct ScenePanel *input)
+void PileDriver_WaitTetherOrActiveSubject(struct ScenePanel *input)
 {
     struct ScenePanel *panel = (void *)input;
     s32 i, count;
-    if (gTetherActor->state != 12 && ScenePanel_CanAcquireTether((void *)panel)) {
+    if (gTetherActor->state != 12 && PileDriver_CanAcquireTether((void *)panel)) {
         PlayerCue_MoveTo(SCENE_PANEL_PLAYER, 0, -1, 0, 0);
         panel->variant = 1;
-        ScenePanel_SetEffectState((void *)panel, 1);
+        PileDriver_SetEffectState((void *)panel, 1);
     }
     i = 0;
     count = panel->subjectCount;
     for (; i < count; i++) {
         if (panel->subjects[i]->state == 4) {
-            ScenePanel_SetEffectState((void *)panel, 4);
+            PileDriver_SetEffectState((void *)panel, 4);
             break;
         }
     }
 }
 
-void ScenePanel_UpdateActiveSubjects(struct ScenePanel *input)
+void PileDriver_UpdateActiveSubjects(struct ScenePanel *input)
 {
     struct ScenePanel *panel = (void *)input;
     s32 active = 0;
@@ -225,24 +225,24 @@ void ScenePanel_UpdateActiveSubjects(struct ScenePanel *input)
             active++;
             if ((*subject)->changed) {
                 Sound_PlaySong(294);
-                ScenePanel_SetState((void *)panel, ScenePanel_BeginLongSequence);
+                PileDriver_SetState((void *)panel, PileDriver_BeginLongSequence);
                 (*subject)->changed = 0;
             }
         }
     }
     if (!panel->allSubjectsNotified && active >= panel->subjectCount) {
         panel->allSubjectsNotified = 1;
-        ScenePanel_CallPendingScript((void *)panel, 1);
+        PileDriver_CallPendingScript((void *)panel, 1);
     }
     if (!panel->state)
-        ScenePanel_SetState((void *)panel, ScenePanel_BeginPulseSequence);
-    if (ScenePanel_CanAcceptPlayer((void *)panel)) {
+        PileDriver_SetState((void *)panel, PileDriver_BeginPulseSequence);
+    if (PileDriver_CanAcceptPlayer((void *)panel)) {
         PlayerCue_WalkTo(SCENE_PANEL_PLAYER, &panel->approachPosition, 0, 4);
-        ScenePanel_SetEffectState((void *)panel, 5);
+        PileDriver_SetEffectState((void *)panel, 5);
     }
 }
 
-void ScenePanel_AdvancePlayerArrival(struct ScenePanel *input)
+void PileDriver_AdvancePlayerArrival(struct ScenePanel *input)
 {
     struct ScenePanel *panel = (void *)input;
     struct ScenePanelInteractionPlayer *player = SCENE_PANEL_PLAYER;
@@ -255,17 +255,17 @@ void ScenePanel_AdvancePlayerArrival(struct ScenePanel *input)
         if (panel->paletteMode) {
             PlayerCue_Motion7Front(SCENE_PANEL_PLAYER, 1, 0);
             Sound_PlaySong(5);
-            ScenePanel_SetState(input, ScenePanel_BeginForwardSequence);
-            ScenePanel_SetEffectState(input, 7);
+            PileDriver_SetState(input, PileDriver_BeginForwardSequence);
+            PileDriver_SetEffectState(input, 7);
         } else {
             PlayerCue_Motion7Front(SCENE_PANEL_PLAYER, 0, 0);
             Sound_PlaySong(407);
-            ScenePanel_SetEffectState(input, 6);
+            PileDriver_SetEffectState(input, 6);
         }
     }
 }
 
-void ScenePanel_AdvanceSubjectDeparture(struct ScenePanel *panel)
+void PileDriver_AdvanceSubjectDeparture(struct ScenePanel *panel)
 {
     u32 frame;
     frame = (u16)(++panel->effectFrame);
@@ -274,10 +274,10 @@ void ScenePanel_AdvanceSubjectDeparture(struct ScenePanel *panel)
         for (; i < panel->subjectCount; i++) {
             struct ScenePanelSubject *subject = panel->subjects[i];
             if (subject->state == 4) {
-                ScenePanelSubject_SetState((void *)subject, 5);
+                PileDriverSubject_SetState((void *)subject, 5);
             }
         }
-        ScenePanel_SetState((void *)panel, ScenePanel_BeginLongSequence);
+        PileDriver_SetState((void *)panel, PileDriver_BeginLongSequence);
         Sound_FadeOutChannel10(4);
     } else if (frame == 90) {
         Camera_FollowPlayerWithoutCompletion(16);
@@ -286,21 +286,21 @@ void ScenePanel_AdvanceSubjectDeparture(struct ScenePanel *panel)
         struct ScenePanelInteractionPlayer *player = SCENE_PANEL_PLAYER;
         if (!player->tetherMode) {
             PlayerCue_ReleaseControl(player);
-            ScenePanel_SetEffectState((void *)panel, 3);
+            PileDriver_SetEffectState((void *)panel, 3);
             panel->allSubjectsNotified = 0;
-            ScenePanel_CallPendingScript((void *)panel, 2);
+            PileDriver_CallPendingScript((void *)panel, 2);
         }
     }
 }
 
-void ScenePanel_AdvanceArrivalRamp(struct ScenePanel *input)
+void PileDriver_AdvanceArrivalRamp(struct ScenePanel *input)
 {
     struct ScenePanel *panel = (void *)input;
     u16 *frame = &panel->effectFrame;
     if (*frame <= 69) {
         *frame += 1;
         if (*frame == 70)
-            ScenePanel_CallPendingScript(input, 3);
+            PileDriver_CallPendingScript(input, 3);
     }
     if (panel->arrivalRampEnabled) {
         u16 *fade = &panel->arrivalRampFrame;
@@ -310,7 +310,7 @@ void ScenePanel_AdvanceArrivalRamp(struct ScenePanel *input)
     }
 }
 
-void ScenePanel_WaitTransitionGate(struct ScenePanel *input)
+void PileDriver_WaitTransitionGate(struct ScenePanel *input)
 {
     struct ScenePanel *panel = (void *)input;
     u16 *frame = &panel->effectFrame;
@@ -319,20 +319,20 @@ void ScenePanel_WaitTransitionGate(struct ScenePanel *input)
     else if (!panel->gateC12) {
         Sound_PlaySong(490);
         gTetherActor->state = 14;
-        ScenePanel_SetEffectState(input, 9);
+        PileDriver_SetEffectState(input, 9);
     }
 }
 
-void ScenePanel_WaitTetherDirectedState(struct ScenePanel *input)
+void PileDriver_WaitTetherDirectedState(struct ScenePanel *input)
 {
     struct ScenePanel *panel = (void *)input;
     if (gTetherActor->state == 13) {
-        ScenePanelRig_SetState(&panel->rig, 1);
-        ScenePanel_SetEffectState(input, 10);
+        PileDriverRig_SetState(&panel->rig, 1);
+        PileDriver_SetEffectState(input, 10);
     }
 }
 
-void ScenePanel_WaitRigRelease(struct ScenePanel *input)
+void PileDriver_WaitRigRelease(struct ScenePanel *input)
 {
     struct ScenePanel *panel = (void *)input;
     s32 anyActive = 0;
@@ -350,34 +350,34 @@ void ScenePanel_WaitRigRelease(struct ScenePanel *input)
         }
     }
     if (gGameState->unk618 > 0)
-        ScenePanel_RunScheduledAction((void *)panel);
+        PileDriver_RunScheduledAction((void *)panel);
     if (anyActive)
         panel->effectFrame = 0;
     else if (++panel->effectFrame > 119) {
-        ScenePanelRig_SetState(&panel->rig, 6);
-        ScenePanel_SetEffectState((void *)panel, 11);
+        PileDriverRig_SetState(&panel->rig, 6);
+        PileDriver_SetEffectState((void *)panel, 11);
     }
 }
 
-void ScenePanel_WaitRigIdle(struct ScenePanel *input)
+void PileDriver_WaitRigIdle(struct ScenePanel *input)
 {
     struct ScenePanel *panel = (void *)input;
     if (panel->rig.state == 0) {
         Sound_PlaySong(491);
         TetherActor_BeginDirectedState(&panel->center);
-        ScenePanel_SetEffectState(input, 12);
-        ScenePanel_CallPendingScript(input, 5);
+        PileDriver_SetEffectState(input, 12);
+        PileDriver_CallPendingScript(input, 5);
     }
 }
 
-void ScenePanel_WaitTetherReturn(struct ScenePanel *input)
+void PileDriver_WaitTetherReturn(struct ScenePanel *input)
 {
     struct ScenePanel *panel = (void *)input;
-    if (ScenePanel_CanAcquireTether(input)) {
+    if (PileDriver_CanAcquireTether(input)) {
         PlayerCue_MoveTo(SCENE_PANEL_PLAYER, 0, -1, 0, 0);
         panel->variant = 2;
-        ScenePanel_SetEffectState(input, 1);
-    } else if (ScenePanel_IsTetherDistant(input)) {
+        PileDriver_SetEffectState(input, 1);
+    } else if (PileDriver_IsTetherDistant(input)) {
         struct TetherActor *tether = gTetherActor;
         s32 sourceX = tether->position.x;
         struct ScenePanelInteractionPlayer *player = SCENE_PANEL_PLAYER;
@@ -394,12 +394,12 @@ void ScenePanel_WaitTetherReturn(struct ScenePanel *input)
         }
         TetherActor_BeginAuxiliaryState(gTetherActor);
         sub_08226380(16, &gTetherActor->position);
-        ScenePanel_SetEffectState(input, 13);
-        ScenePanel_CallPendingScript(input, 6);
+        PileDriver_SetEffectState(input, 13);
+        PileDriver_CallPendingScript(input, 6);
     }
 }
 
-void ScenePanel_AdvanceTetherReturn(struct ScenePanel *input)
+void PileDriver_AdvanceTetherReturn(struct ScenePanel *input)
 {
     struct ScenePanel *panel = (void *)input;
     panel->effectFrame++;
@@ -426,19 +426,19 @@ void ScenePanel_AdvanceTetherReturn(struct ScenePanel *input)
             PlayerCue_Kneel(SCENE_PANEL_PLAYER, -1, 0);
             break;
         case 360:
-            ScenePanel_CallPendingScript(input, 7);
+            PileDriver_CallPendingScript(input, 7);
             break;
     }
 }
 
-/* ScenePanel_HoldInteraction: Empty callback for interaction state 14 that leaves the panel state unchanged */
+/* PileDriver_HoldInteraction: Empty callback for interaction state 14 that leaves the panel state unchanged */
 
 
-void ScenePanel_HoldInteraction(struct ScenePanel *input)
+void PileDriver_HoldInteraction(struct ScenePanel *input)
 {
 }
 
-void ScenePanel_InitPaletteSprite(struct ScenePanel *input)
+void PileDriver_InitPaletteSprite(struct ScenePanel *input)
 {
     struct ScenePanel *parent = (void *)input;
     if (!parent->skipMainSprite) {
@@ -480,7 +480,7 @@ void ScenePanel_InitPaletteSprite(struct ScenePanel *input)
     }
 }
 
-void ScenePanel_InitAuxiliarySprite(struct ScenePanel *input)
+void PileDriver_InitAuxiliarySprite(struct ScenePanel *input)
 {
     struct ScenePanel *parent = (void *)input;
     struct ScenePanelAuxSprite *sprite = &parent->auxiliary;
@@ -496,7 +496,7 @@ void ScenePanel_InitAuxiliarySprite(struct ScenePanel *input)
     sprite->position.y += 72;
 }
 
-void ScenePanel_CreateSubjects(struct ScenePanel *parent)
+void PileDriver_CreateSubjects(struct ScenePanel *parent)
 {
     u32 initialStates[4];
     struct ContactPosition position;
@@ -563,14 +563,14 @@ void ScenePanel_CreateSubjects(struct ScenePanel *parent)
                     variant = 0;
                     appearDelay = 0;
             }
-            parent->subjects[i] = (struct ScenePanelSubject *)ScenePanelSubject_Create(
+            parent->subjects[i] = (struct ScenePanelSubject *)PileDriverSubject_Create(
                 &position, row, variant, initialStates[i], kind, contactLimit, colliderSetting,
                 appearDelay);
         }
     }
 }
 
-void ScenePanel_InitAnchorPositions(struct ScenePanel *parent)
+void PileDriver_InitAnchorPositions(struct ScenePanel *parent)
 {
     if (Script_SeekToKeyword('c')) {
         parent->origin.x = Script_GetValue();
@@ -585,7 +585,7 @@ void ScenePanel_InitAnchorPositions(struct ScenePanel *parent)
     parent->center.z -= 20;
 }
 
-void ScenePanel_InitScriptProperty(struct ScenePanel *input)
+void PileDriver_InitScriptProperty(struct ScenePanel *input)
 {
     struct ScenePanel *parent = (void *)input;
     s32 value = Script_SeekToKeyword('p');
@@ -595,7 +595,7 @@ void ScenePanel_InitScriptProperty(struct ScenePanel *input)
         parent->property = value;
 }
 
-void ScenePanel_InitResourceConfiguration(struct ScenePanel *parent)
+void PileDriver_InitResourceConfiguration(struct ScenePanel *parent)
 {
     s32 found = Script_SeekToKeyword('b');
     if (found) {
@@ -654,10 +654,10 @@ void ScenePanel_InitResourceConfiguration(struct ScenePanel *parent)
         parent->resourceId = Script_GetValue();
     else
         parent->resourceId = 10;
-    ScenePanel_InitScheduledAction((void *)parent);
+    PileDriver_InitScheduledAction((void *)parent);
 }
 
-s32 ScenePanel_AreSubjectsIdle(struct ScenePanel *input)
+s32 PileDriver_AreSubjectsIdle(struct ScenePanel *input)
 {
     struct ScenePanel *parent = (void *)input;
     s32 i = 0, count = parent->subjectCount;
@@ -674,16 +674,16 @@ s32 ScenePanel_AreSubjectsIdle(struct ScenePanel *input)
     return 1;
 }
 
-void ScenePanel_InitializeInteraction(struct ScenePanel *input)
+void PileDriver_InitializeInteraction(struct ScenePanel *input)
 {
     struct ScenePanel *panel = (void *)input;
     u32 mode = panel->initialMode;
     switch (mode) {
         case 0: {
             s32 option;
-            if (ScenePanel_AreSubjectsIdle((void *)panel)) {
-                ScenePanel_InitPaletteSprite((void *)panel);
-                ScenePanel_SetEffectState((void *)panel, 0);
+            if (PileDriver_AreSubjectsIdle((void *)panel)) {
+                PileDriver_InitPaletteSprite((void *)panel);
+                PileDriver_SetEffectState((void *)panel, 0);
                 return;
             }
             if (Script_SeekToKeyword('O'))
@@ -710,17 +710,17 @@ void ScenePanel_InitializeInteraction(struct ScenePanel *input)
                     } while (remaining != 0);
                 }
                 if (active) {
-                    ScenePanel_SetEffectState((void *)panel, 4);
+                    PileDriver_SetEffectState((void *)panel, 4);
                     return;
                 }
             } else
-                ScenePanel_InitPaletteSprite((void *)panel);
-            ScenePanel_SetEffectState((void *)panel, 3);
+                PileDriver_InitPaletteSprite((void *)panel);
+            PileDriver_SetEffectState((void *)panel, 3);
             break;
         }
         case 1: {
-            ScenePanel_InitRig((void *)panel);
-            ScenePanel_InitResourceConfiguration((void *)panel);
+            PileDriver_InitRig((void *)panel);
+            PileDriver_InitResourceConfiguration((void *)panel);
             gTetherActor->state = 12;
             gTetherActor->position = panel->center;
             gTetherActor->heading = 0;
@@ -731,15 +731,15 @@ void ScenePanel_InitializeInteraction(struct ScenePanel *input)
                 panel->resourceScale = 120;
             else
                 panel->resourceScale = 100;
-            ScenePanel_InitBackground((void *)panel);
-            ScenePanel_InitOverlay((void *)panel);
-            ScenePanel_InitAuxiliarySprite((void *)panel);
-            ScenePanel_SetEffectState((void *)panel, 8);
+            PileDriver_InitBackground((void *)panel);
+            PileDriver_InitOverlay((void *)panel);
+            PileDriver_InitAuxiliarySprite((void *)panel);
+            PileDriver_SetEffectState((void *)panel, 8);
         }
     }
 }
 
-void ScenePanel_ReadInitialMode(struct ScenePanel *input)
+void PileDriver_ReadInitialMode(struct ScenePanel *input)
 {
     struct ScenePanel *panel = (void *)input;
     s32 mode = Script_SeekToKeyword('m');
@@ -748,7 +748,7 @@ void ScenePanel_ReadInitialMode(struct ScenePanel *input)
     panel->initialMode = mode;
 }
 
-void ScenePanel_SuppressMainPresentation(void)
+void PileDriver_SuppressMainPresentation(void)
 {
     if (gScenePanel) {
         struct ScenePanel *panel;
@@ -760,7 +760,7 @@ void ScenePanel_SuppressMainPresentation(void)
     }
 }
 
-void ScenePanel_WriteFullScriptStatus(void)
+void PileDriver_WriteFullScriptStatus(void)
 {
     if (gScenePanel) {
         struct ScriptUtilityReference reference;
@@ -791,7 +791,7 @@ void ScenePanel_WriteFullScriptStatus(void)
     }
 }
 
-void ScenePanel_WriteScriptStatus(void)
+void PileDriver_WriteScriptStatus(void)
 {
     if (gScenePanel) {
         struct ScriptUtilityReference reference;
@@ -820,7 +820,7 @@ void ScenePanel_WriteScriptStatus(void)
     }
 }
 
-void ScenePanel_BeginArrivalRamp(void)
+void PileDriver_BeginArrivalRamp(void)
 {
     struct ScenePanel *panel = SCENE_PANEL_GLOBAL;
     if (panel) {
@@ -829,21 +829,21 @@ void ScenePanel_BeginArrivalRamp(void)
     }
 }
 
-void ScenePanel_SetTransitionGate(void)
+void PileDriver_SetTransitionGate(void)
 {
     struct ScenePanel *panel = SCENE_PANEL_GLOBAL;
     if (panel)
         panel->gateC12 = 1;
 }
 
-void ScenePanel_ClearTransitionGate(void)
+void PileDriver_ClearTransitionGate(void)
 {
     struct ScenePanel *panel = SCENE_PANEL_GLOBAL;
     if (panel)
         panel->gateC12 = 0;
 }
 
-void ScenePanel_DispatchCommands(struct ScenePanel *owner)
+void PileDriver_DispatchCommands(struct ScenePanel *owner)
 {
     struct ScenePanel *panel = (void *)owner;
     struct ScenePanelReceiver *receiver = &((struct ScenePanel *)owner)->receiver;
@@ -859,7 +859,7 @@ void ScenePanel_DispatchCommands(struct ScenePanel *owner)
                     Trigger_ConsumePending(receiver, 1);
                     break;
                 case 1:
-                    ScenePanel_SetState((void *)panel, ScenePanel_BeginForwardSequence);
+                    PileDriver_SetState((void *)panel, PileDriver_BeginForwardSequence);
                     Trigger_ConsumePending(receiver, 1);
                     break;
             }
@@ -868,25 +868,25 @@ void ScenePanel_DispatchCommands(struct ScenePanel *owner)
     }
 }
 
-void ScenePanel_UnregisterReceiver(struct ScenePanel *panel)
+void PileDriver_UnregisterReceiver(struct ScenePanel *panel)
 {
     SceneMessages_UnregisterReceiver(&panel->receiver);
 }
 
-void ScenePanel_RegisterReceiver(struct ScenePanel *panel)
+void PileDriver_RegisterReceiver(struct ScenePanel *panel)
 {
     SceneMessages_RegisterReceiver(&panel->receiver, panel->actorId, 9);
 }
 
-/* ScenePanel_ClearGlobal: Clears the global panel pointer used by ScenePanel_IsPresent */
+/* PileDriver_ClearGlobal: Clears the global panel pointer used by PileDriver_IsPresent */
 
 
-void ScenePanel_ClearGlobal(void)
+void PileDriver_ClearGlobal(void)
 {
     gScenePanel = NULL;
 }
 
-u32 ScenePanel_IsPresent(void)
+u32 PileDriver_IsPresent(void)
 {
     u32 present = (u32)gScenePanel;
     if (present != 0)
@@ -894,7 +894,7 @@ u32 ScenePanel_IsPresent(void)
     return present;
 }
 
-void ScenePanel_SelectMode(struct ScenePanel *panel)
+void PileDriver_SelectMode(struct ScenePanel *panel)
 {
     s32 mode;
     if (panel->skipMainSprite == 0)
@@ -904,7 +904,7 @@ void ScenePanel_SelectMode(struct ScenePanel *panel)
     panel->paletteMode = mode;
 }
 
-s32 ScenePanel_CountActiveSubjects(struct ScenePanel *panel)
+s32 PileDriver_CountActiveSubjects(struct ScenePanel *panel)
 {
     s32 active = 0;
     s32 remaining = panel->subjectCount;
@@ -920,7 +920,7 @@ s32 ScenePanel_CountActiveSubjects(struct ScenePanel *panel)
     return active;
 }
 
-void ScenePanel_UpdateApproachSprite(struct ScenePanel *panel)
+void PileDriver_UpdateApproachSprite(struct ScenePanel *panel)
 {
     if (panel->paletteMode && panel->activeCount &&
         (panel->effectState == 10 || panel->effectState == 14)) {
@@ -939,7 +939,7 @@ void ScenePanel_UpdateApproachSprite(struct ScenePanel *panel)
         panel->auxiliary.flags |= 1;
 }
 
-void ScenePanel_SubmitPlayerMidpoint(struct ScenePanel *panel)
+void PileDriver_SubmitPlayerMidpoint(struct ScenePanel *panel)
 {
     struct ScenePanelInteractionPackedPosition position;
     struct ScenePanelInteractionPlayer *player = SCENE_PANEL_PLAYER;
@@ -949,31 +949,31 @@ void ScenePanel_SubmitPlayerMidpoint(struct ScenePanel *panel)
     Camera_SetPosition(&position);
 }
 
-s32 ScenePanel_TickLifecycle(struct ScenePanel *parent)
+s32 PileDriver_TickLifecycle(struct ScenePanel *parent)
 {
     u32 playerKind;
-    ScenePanel_DispatchCommands((void *)parent);
-    ScenePanel_SelectMode((void *)parent);
-    parent->activeCount = ScenePanel_CountActiveSubjects((void *)parent);
+    PileDriver_DispatchCommands((void *)parent);
+    PileDriver_SelectMode((void *)parent);
+    parent->activeCount = PileDriver_CountActiveSubjects((void *)parent);
     playerKind = SCENE_PANEL_PLAYER->kindValue;
     if (playerKind == 4)
         return 0;
     if (parent->initialMode == 1 && parent->effectState != 14 && playerKind == 1 &&
         !gGameState->unk618) {
-        ScenePanel_SetEffectState((void *)parent, 14);
-        ScenePanelRig_SetState(&parent->rig, 9);
-        ScenePanel_NoOpAction((void *)parent);
-        ScenePanel_CallPendingScript((void *)parent, 8);
+        PileDriver_SetEffectState((void *)parent, 14);
+        PileDriverRig_SetState(&parent->rig, 9);
+        PileDriver_NoOpAction((void *)parent);
+        PileDriver_CallPendingScript((void *)parent, 8);
     }
     gUnk_08605ABC[parent->effectState]((void *)parent);
     if (parent->initialMode == 0)
-        ScenePanel_UpdatePaletteState((void *)parent);
+        PileDriver_UpdatePaletteState((void *)parent);
     else {
-        ScenePanel_TickRig((void *)parent);
-        ScenePanel_SubmitPlayerMidpoint((void *)parent);
-        ScenePanel_DrawBackgroundLayers((void *)parent);
-        ScenePanel_LoadModePalette((void *)parent);
-        ScenePanel_UpdateApproachSprite((void *)parent);
+        PileDriver_TickRig((void *)parent);
+        PileDriver_SubmitPlayerMidpoint((void *)parent);
+        PileDriver_DrawBackgroundLayers((void *)parent);
+        PileDriver_LoadModePalette((void *)parent);
+        PileDriver_UpdateApproachSprite((void *)parent);
         if (parent->activated) {
             if (!parent->skipMainSprite) {
                 if (gGameState->unk618 == 0) {
@@ -989,26 +989,26 @@ s32 ScenePanel_TickLifecycle(struct ScenePanel *parent)
         }
     }
     /* The non-void callback preserves the original fall-through return ABI. */
-    ScenePanel_UpdateParticles((void *)parent);
+    PileDriver_UpdateParticles((void *)parent);
 }
 
-s32 ScenePanel_DestroyLifecycle(struct ScenePanel *parent)
+s32 PileDriver_DestroyLifecycle(struct ScenePanel *parent)
 {
     if (parent->initialMode == 0) {
         if (parent->paletteSprite.active)
             Sprite_Remove(&parent->paletteSprite);
     } else {
-        ScenePanelRig_RemoveSprites(&parent->rig);
+        PileDriverRig_RemoveSprites(&parent->rig);
         Sprite_Remove(&parent->auxiliary);
         Bg_SetPriority(1, 1);
     }
-    ScenePanel_DestroyParticles((void *)parent);
-    ScenePanel_UnregisterReceiver((void *)parent);
+    PileDriver_DestroyParticles((void *)parent);
+    PileDriver_UnregisterReceiver((void *)parent);
     gScenePanel = 0;
     return 0;
 }
 
-s32 ScenePanel_InitializeLifecycle(struct ScenePanel *parent)
+s32 PileDriver_InitializeLifecycle(struct ScenePanel *parent)
 {
     s32 found = Script_SeekToKeyword('d');
     if (found)
@@ -1020,18 +1020,18 @@ s32 ScenePanel_InitializeLifecycle(struct ScenePanel *parent)
         parent->savedPlayer = player;
     }
     parent->savedTether = gTetherActor;
-    ScenePanel_InitAnchorPositions((void *)parent);
-    ScenePanel_ReadInitialMode((void *)parent);
+    PileDriver_InitAnchorPositions((void *)parent);
+    PileDriver_ReadInitialMode((void *)parent);
     if (Script_SeekToKeyword('n'))
         parent->subjectCount = Script_GetValue();
     else
         parent->subjectCount = 4;
-    ScenePanel_CreateSubjects((void *)parent);
-    ScenePanel_InitializeInteraction((void *)parent);
-    ScenePanel_InitParticles((void *)parent);
-    ScenePanel_InitTimePalette((void *)parent);
-    ScenePanel_InitScriptProperty((void *)parent);
-    ScenePanel_RegisterReceiver((void *)parent);
+    PileDriver_CreateSubjects((void *)parent);
+    PileDriver_InitializeInteraction((void *)parent);
+    PileDriver_InitParticles((void *)parent);
+    PileDriver_InitTimePalette((void *)parent);
+    PileDriver_InitScriptProperty((void *)parent);
+    PileDriver_RegisterReceiver((void *)parent);
     {
         s32 mode = gGameState->unk876;
         parent->paletteMode = mode;
@@ -1040,17 +1040,17 @@ s32 ScenePanel_InitializeLifecycle(struct ScenePanel *parent)
     return 0;
 }
 
-struct ScenePanel *ScenePanel_Create(u32 actorId)
+struct ScenePanel *PileDriver_Create(u32 actorId)
 {
     struct ScenePanel *panel;
     if (gScenePanel)
         return gScenePanel;
     panel = Task_Create(9, 0x17E4);
     if (panel) {
-        Task_SetCallbacks(panel, (void (*)(void *))ScenePanel_TickLifecycle,
-                          (void (*)(void *))ScenePanel_DestroyLifecycle);
+        Task_SetCallbacks(panel, (void (*)(void *))PileDriver_TickLifecycle,
+                          (void (*)(void *))PileDriver_DestroyLifecycle);
         panel->actorId = actorId;
-        if (ScenePanel_InitializeLifecycle((void *)panel) < 0) {
+        if (PileDriver_InitializeLifecycle((void *)panel) < 0) {
             Task_Kill(panel);
             return NULL;
         }

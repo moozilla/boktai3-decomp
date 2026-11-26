@@ -1,5 +1,5 @@
-#include "scene/actor/scene_steering_actor.h"
-#include "player/cues/player_cue_sequence.h"
+#include "scene/motion/scene_steering_actor.h"
+#include "player/cutscene/player_cue_sequence.h"
 s32 Mod(s32, s32);
 s32 Div(s32, s32);
 void SceneSteeringActor_EmitRandomParticle(struct ContactPosition *);

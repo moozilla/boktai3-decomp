@@ -1,7 +1,7 @@
 #include "global.h"
-void TentacleActor_ApplyPendingRadialVelocity(u8 *);
-u32 TentacleActor_UpdatePendingVelocity(u8 *actor)
+void Centipede_ApplyPendingRadialVelocity(u8 *);
+u32 Centipede_UpdatePendingVelocity(u8 *actor)
 {
-    TentacleActor_ApplyPendingRadialVelocity(actor);
+    Centipede_ApplyPendingRadialVelocity(actor);
     return 1;
 }

@@ -1,8 +1,8 @@
 #include "scene/actor/scene_actor_init_actor.h"
-#include "scene/actor/scene_actor_contact_list.h"
-#include "scene/actor/scene_actor_adjacent_cell.h"
+#include "scene/collision/scene_actor_contact_list.h"
+#include "scene/motion/scene_actor_adjacent_cell.h"
 #include "scene/actor/scene_actor_control_helpers.h"
-#include "scene/actor/scene_actor_chase_shared.h"
+#include "scene/motion/scene_actor_chase_shared.h"
 struct SceneActorContactSample {
     u8 unknown0[8];
     u8 playerSlot, unknown9[3];

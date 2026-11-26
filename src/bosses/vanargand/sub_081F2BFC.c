@@ -2,7 +2,7 @@
 
 void Sprite_Remove(u8 *);
 
-u32 SingletonSlot7_DestroyImpactSprite(u8 *p)
+u32 VanargandHead_DestroyImpactSprite(u8 *p)
 {
     Sprite_Remove(p + 0x18);
     return 0;

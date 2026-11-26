@@ -5,14 +5,14 @@
 s32 SceneActors_Initialize(void *, s32, s32, void *, s32);
 void SceneActors_Register(void *, u32);
 s32 SceneActors_SetHealthLimits(void *, s32, s32, s32);
-void SingletonSlot7_InitSecondaryCollider(void *, s32);
-void SingletonSlot7_InitCollider(void *);
-void SingletonSlot7_InitContactCollider(void *, s32);
-void SingletonSlot7_RegisterRenderCallback(void *);
-void SingletonSlot7_InitBackgroundAndMotion(void *);
-void SingletonSlot7_InitDisplaySprites(void *);
+void VanargandHead_InitSecondaryCollider(void *, s32);
+void VanargandHead_InitCollider(void *);
+void VanargandHead_InitContactCollider(void *, s32);
+void VanargandHead_RegisterRenderCallback(void *);
+void VanargandHead_InitBackgroundAndMotion(void *);
+void VanargandHead_InitDisplaySprites(void *);
 void SceneActors_InitResources(void *);
-void *SingletonSlot7_CreateEffectPool(void);
+void *VanargandHead_CreateEffectPool(void);
 s32 sub_081F0678(void);
 extern u16 gUnk_03005040[4][16];
 
@@ -21,7 +21,7 @@ static inline void SetResponse(s32 (*fn)(void), s32 (**slot)(void))
     *slot = fn;
 }
 
-s32 SingletonSlot7_InitFromScript(struct DepartureActor *actor, s32 id)
+s32 VanargandHead_InitFromScript(struct DepartureActor *actor, s32 id)
 {
     s32 health = 2000;
     s32 extra = 100;
@@ -75,15 +75,15 @@ s32 SingletonSlot7_InitFromScript(struct DepartureActor *actor, s32 id)
     SceneActors_SetHealthLimits(owner, health, health, extra);
     actor->healthSeventh = Div(health, 7);
     actor->healthTenth = Div(health, 10);
-    SingletonSlot7_InitSecondaryCollider(actor, extra);
-    SingletonSlot7_InitCollider(actor);
-    SingletonSlot7_InitContactCollider(actor, extra);
-    SingletonSlot7_RegisterRenderCallback(actor);
-    SingletonSlot7_InitBackgroundAndMotion(actor);
+    VanargandHead_InitSecondaryCollider(actor, extra);
+    VanargandHead_InitCollider(actor);
+    VanargandHead_InitContactCollider(actor, extra);
+    VanargandHead_RegisterRenderCallback(actor);
+    VanargandHead_InitBackgroundAndMotion(actor);
     actor->effectGraphics = 0xEBF6;
     actor->sequenceResource = ScriptProc_Start(0x922E, 0xEBF6);
     actor->effectResource = 0x2E90;
-    SingletonSlot7_InitDisplaySprites(actor);
+    VanargandHead_InitDisplaySprites(actor);
     modeField = modePtr;
     /* The motion mode is 0x17 bytes above the actor flags. */
     flags = (u32 *)(modePtr - 0x17);
@@ -113,7 +113,7 @@ s32 SingletonSlot7_InitFromScript(struct DepartureActor *actor, s32 id)
             Sound_PlaySong(0x586);
     }
     actor->invincibilityTimer = 0;
-    actor->effectPool = SingletonSlot7_CreateEffectPool();
+    actor->effectPool = VanargandHead_CreateEffectPool();
     actor->fadeShift = 7;
     actor->fadeFrame = 0x80;
     if (*modeField && mode > 0) {

@@ -2,15 +2,15 @@
 
 #define GUARD_MIMIC_H
 
-#include "scene/actor/scene_actor_chase_reaction.h"
+#include "scene/motion/scene_actor_chase_reaction.h"
 
 #include "scene/actor/scene_actor_attachment.h"
 
-#include "scene/actor/scene_actor_availability.h"
+#include "scene/motion/scene_actor_availability.h"
 
 #include "scene/actor/scene_actor_control_phase.h"
 
-#include "scene/actor/scene_actor_restoration.h"
+#include "scene/collision/scene_actor_restoration.h"
 
 #include "scene/actor/scene_actor_placement.h"
 
@@ -30,7 +30,7 @@
 
 #include "scene/actor/scene_actor_control_motion.h"
 
-#include "scene/actor/scene_actor_displacement.h"
+#include "scene/motion/scene_actor_displacement.h"
 
 #include "player/player.h"
 

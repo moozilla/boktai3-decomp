@@ -1,6 +1,6 @@
 #include "effects/particles/scene_moving_particle.h"
 #include "engine/ram.h"
-#include "scene/actor/scene_actor_chase_types.h"
+#include "scene/motion/scene_actor_chase_types.h"
 #include "scene/terrain/terrain_sampling.h"
 
 /* SceneTerrainProbe_NoopHook: Empty function at the end of the tentative terrain probe subsystem */

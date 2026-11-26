@@ -1,7 +1,7 @@
 #include "global.h"
 
-#include "scene/actor/contact_swarm.h"
-#include "player/cues/player_cue_sequence.h"
+#include "scene/collision/contact_swarm.h"
+#include "player/cutscene/player_cue_sequence.h"
 
 // Drawable layout shared with ActorDisplay_UpdateForegroundSprite.
 struct Drawable {
@@ -20,11 +20,11 @@ void Anim_RestartSequence(void *, void *, u16, u8, u8);
 void Projectile_SetUpdateCallback(void *, void *);
 void Projectile_SetCollisionSize(void *, s32, s32);
 u32 sub_08249498(u32, u32);
-void Task4E01_BeginImpactAnimation(void *);
-void Task4E01_SpawnImpactChildren(void *);
-void Task4E01_UpdateExpandingImpact(void *);
+void ProjectileTask_BeginImpactAnimation(void *);
+void ProjectileTask_SpawnImpactChildren(void *);
+void ProjectileTask_UpdateExpandingImpact(void *);
 // confidence=low: selects the initial impact sequence according to projectile flags.
-s32 Task4E01_StartImpactAnimation(u8 *p)
+s32 ProjectileTask_StartImpactAnimation(u8 *p)
 {
     u8 *config = p + 0x18;
     void *resource = ScriptProc_Start(0x922e, 0x32d7);
@@ -37,6 +37,6 @@ s32 Task4E01_StartImpactAnimation(u8 *p)
     }
     StepPlayback((void *)(p + 0x8c), (void *)(p + 0x180));
     *(u32 *)(p + 0x1a0) = 8;
-    Projectile_SetUpdateCallback(config, Task4E01_UpdateExpandingImpact);
+    Projectile_SetUpdateCallback(config, ProjectileTask_UpdateExpandingImpact);
     return 0;
 }

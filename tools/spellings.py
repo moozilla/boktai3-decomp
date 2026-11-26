@@ -668,7 +668,7 @@ def _countdown(items, i):
 
 def sp_count_up(fn):
     """v = K; do { body } while (--v >= 0);  ->  for (v = 0; v < K + 1; v++) body   (body not reading v;
-    harvested from Registry3F74_InitAnimations and ResultPanel_ClearFiveTiles)."""
+    harvested from TownMap_InitAnimations and ResultPanel_ClearFiveTiles)."""
     for bi, b in enumerate(blocks(fn)):
         for i in range(len(b.block_items)):
             m = _countdown(b.block_items, i)
@@ -957,7 +957,7 @@ def sp_narrow_mask(fn):
 def sp_copy_uses(fn):
     """T *v = E; ... E ... v ...  ->  move single uses between the copy v and its source E
     (which of the two pseudos gets the higher allocation priority, and so the callee-saved register,
-    follows their use counts; Slot7_UpdateMotionPhase's copy turned out to be sp_param_alias). Sound
+    follows their use counts; VanargandHead_UpdateMotionPhase's copy turned out to be sp_param_alias). Sound
     while neither v nor what E reads is reassigned. The C-level replacement for a `do { } while (0)`
     loop-weight wrapper around one use."""
     decls = [d for d in fn.body.block_items if isinstance(d, ca.Decl) and d.init is not None
@@ -987,7 +987,7 @@ def sp_copy_uses(fn):
 
 def sp_param_alias(fn):
     """T *p (a parameter)  ->  T *self = p; at entry, and self for p in one arm of an if
-    (Slot7_UpdateMotionPhase: `BeginPhase(self, 4); self->previousPhase = 4;` in the else arm). cse
+    (VanargandHead_UpdateMotionPhase: `BeginPhase(self, 4); self->previousPhase = 4;` in the else arm). cse
     puts p back for the copy only inside the extended block where it saw `self = p` (cse.c
     make_regs_eqv; the block ends at the arm's label), so the arm's uses keep a pseudo of their own
     and it gets another register. The two arms then differ, and jump.c's cross-jumping
@@ -1140,7 +1140,7 @@ def _own_names(fn):
 
 def sp_store_via_ptr(fn):
     """G->f op= E;  ->  { T *q = &G->f; *q op= E; }  for a global pointer G, at one site or at every
-    site (SceneInventory_TickSaleTransition: `funds = &gGameState->unk7B0; *funds += value;`, then
+    site (Shop_TickSaleTransition: `funds = &gGameState->unk7B0; *funds += value;`, then
     `if (gGameState->unk7B0 > 9999)` reads gGameState again). cse keeps a loaded global across a
     field store: alias.c's fixed_scalar_and_varying_struct_p rules out an in-struct MEM at a varying
     address against a scalar at a fixed address. A store through a pointer has neither flag and

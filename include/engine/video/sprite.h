@@ -1,6 +1,6 @@
 #ifndef GUARD_SPRITE_H
 #define GUARD_SPRITE_H
-#include "scene/actor/contact_position.h"
+#include "scene/collision/contact_position.h"
 /* Legacy palette/paletteVariant names hold signed X/Y scales in the renderer.
  * unknown4 stores linked/visible; unknownA[0] selects the owning list. */
 struct DisplaySequenceSprite {

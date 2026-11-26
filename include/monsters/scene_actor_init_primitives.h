@@ -4,7 +4,7 @@
 #include "global.h"
 #include "engine/engine_globals.h"
 #include "objects/warp_circle/engine_map.h"
-#include "scene/actor/contact_position.h"
+#include "scene/collision/contact_position.h"
 
 s32 Script_GetValue(void);
 u8 *Script_GetPc(void);

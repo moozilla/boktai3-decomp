@@ -1,11 +1,11 @@
-#include "ui/town/scene_inventory_states.h"
-void SceneInventory_BeginBrowse(struct SceneInventoryControlView *panel)
+#include "ui/town/shop_states.h"
+void Shop_BeginBrowse(struct SceneInventoryControlView *panel)
 {
     panel->interactionFlags = 0x40;
     if (panel->pageCount > 1)
         panel->interactionFlags = 0x41;
-    panel->destination = SceneInventory_FindActionDestination(panel);
-    SceneInventory_UpdateModePrompt(panel, 0);
-    SceneInventory_SetControllerCallback(panel,
-                                         (SceneInventoryCallback)SceneInventory_TickModeMenu);
+    panel->destination = Shop_FindActionDestination(panel);
+    Shop_UpdateModePrompt(panel, 0);
+    Shop_SetControllerCallback(panel,
+                                         (SceneInventoryCallback)Shop_TickModeMenu);
 }

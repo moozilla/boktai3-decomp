@@ -26,7 +26,7 @@ inline static u8 TestMask(u8 *flags, char mask)
     return 0;
 }
 
-void TentacleActor_ActivateMarkedSegment(u8 *p)
+void Centipede_ActivateMarkedSegment(u8 *p)
 {
     struct Group080A985C *g = *(struct Group080A985C **)(p + 0x3d0);
     s32 found = 0xff;

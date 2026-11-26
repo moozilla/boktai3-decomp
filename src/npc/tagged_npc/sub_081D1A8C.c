@@ -1,7 +1,7 @@
 // confidence=low: Actor_UpdateWalkToPosition (Actor_UpdateWalkToPosition) at a fixed speed of 5,
 // stopping within 10 units, for a tagged scene NPC.
 #include "global.h"
-#include "scene/actor/scene_facing.h"
+#include "scene/motion/scene_facing.h"
 #include "engine/engine_globals.h"
 
 struct Vec {

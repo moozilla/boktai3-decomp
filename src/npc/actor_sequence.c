@@ -61,7 +61,7 @@ void SceneActorSequence_BeginDownwardMotion(struct SceneActorSequence *p)
     p->timer = zero;
 }
 
-s32 RegistryF3E4_GetStateResult(void *);
+s32 PopInSprite_GetStateResult(void *);
 
 void SceneActorSequence_BeginCenterMotion(struct SceneActorSequence *p);
 
@@ -75,7 +75,7 @@ void SceneActorSequence_UpdateFadeInHold(struct SceneActorSequence *p)
         p->timer = n;
     }
 
-    if (RegistryF3E4_GetStateResult(p->actor)) {
+    if (PopInSprite_GetStateResult(p->actor)) {
         if (p->timer > 63)
             SceneActorSequence_BeginCenterMotion(p);
     }
@@ -92,14 +92,14 @@ void SceneActorSequence_BeginCenterMotion(struct SceneActorSequence *p)
     p->timer = 0;
 }
 
-s32 RegistryF3E4_GetStateResult(void *);
+s32 PopInSprite_GetStateResult(void *);
 
 void SceneActorSequence_BeginCornerMotion(struct SceneActorSequence *);
 
 void SceneActorSequence_UpdateCenterMotion(struct SceneActorSequence *p)
 {
     p->timer = p->timer + 1;
-    if (RegistryF3E4_GetStateResult(p->actor) != 0)
+    if (PopInSprite_GetStateResult(p->actor) != 0)
         SceneActorSequence_BeginCornerMotion(p);
 }
 
@@ -124,7 +124,7 @@ void SceneActorSequence_BeginSecondWaypointMotion(struct SceneActorSequence *);
 
 void SceneActorSequence_UpdateFirstWaypointMotion(struct SceneActorSequence *p)
 {
-    if (RegistryF3E4_GetStateResult(p->actor) != 0)
+    if (PopInSprite_GetStateResult(p->actor) != 0)
         SceneActorSequence_BeginSecondWaypointMotion(p);
 }
 
@@ -147,7 +147,7 @@ void SceneActorSequence_BeginFinalWaypointMotion(struct SceneActorSequence *);
 
 void SceneActorSequence_UpdateSecondWaypointMotion(struct SceneActorSequence *p)
 {
-    if (RegistryF3E4_GetStateResult(p->actor) != 0)
+    if (PopInSprite_GetStateResult(p->actor) != 0)
         SceneActorSequence_BeginFinalWaypointMotion(p);
 }
 
@@ -170,17 +170,17 @@ void SceneActorSequence_BeginFadeOut(struct SceneActorSequence *);
 
 void SceneActorSequence_UpdateFinalWaypointMotion(struct SceneActorSequence *p)
 {
-    if (RegistryF3E4_GetStateResult(p->actor) != 0)
+    if (PopInSprite_GetStateResult(p->actor) != 0)
         SceneActorSequence_BeginFadeOut(p);
 }
 
-void RegistryF3E4_ClearState(void *);
+void PopInSprite_ClearState(void *);
 
 void SceneActorSequence_UpdateCompletionDelay(struct SceneActorSequence *);
 
 void SceneActorSequence_BeginFadeOut(struct SceneActorSequence *p)
 {
-    RegistryF3E4_ClearState(p->actor);
+    PopInSprite_ClearState(p->actor);
     ScreenTransition_SendCommand(1, 6, 4, 4, 4, 0xFFFF, 0);
     p->updateState = SceneActorSequence_UpdateCompletionDelay;
     p->timer = 0;
@@ -281,7 +281,7 @@ void SceneActorSequence_InitDisplayResources(struct SceneActorSequence *p)
 
 void SceneActorSequence_InitDisplayResources(struct SceneActorSequence *);
 
-u32 RegistryF3E4_CreateHidden(s32, s32);
+u32 PopInSprite_CreateHidden(s32, s32);
 
 void SceneActorSequence_BeginFadeIn(struct SceneActorSequence *);
 
@@ -289,7 +289,7 @@ s32 SceneActorSequence_InitFromScript(struct SceneActorSequence *p, void *script
 {
     u32 e;
     SceneActorSequence_InitDisplayResources(p);
-    p->actor = RegistryF3E4_CreateHidden(2, 0);
+    p->actor = PopInSprite_CreateHidden(2, 0);
     ZeroFill8(&p->layer3X);
     ZeroFill8(&p->layer1X);
     p->layer1X = 0xE0;

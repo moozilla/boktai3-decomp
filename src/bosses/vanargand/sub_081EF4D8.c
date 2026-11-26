@@ -49,7 +49,7 @@ static inline void StartCallback(struct S7Trans *p, void (*callback)(void))
     p->progress = 0;
 }
 
-void SingletonSlot7_UpdateEndingTransition(struct S7Trans *p)
+void VanargandHead_UpdateEndingTransition(struct S7Trans *p)
 {
     struct S7Trans *q = p;
     u32 f = ConsumeEntry(p);

@@ -10,7 +10,7 @@ class EquivInherit(unittest.TestCase):
     def setUpClass(cls):
         cls.scope, _ = _load_scope(Path(__file__).resolve().parents[1])
 
-    # ContactSequenceActor_UpdateDying's draft: xzMask (29) = 63 lives in sl; the and reuses r3.
+    # NidhoggrDuelMinion_UpdateDying's draft: xzMask (29) = 63 lives in sl; the and reuses r3.
     greg = [(647, "insn", "(set (reg:SI 3 r3) (const_int 63))"),
             (53, "insn", "(set (reg/v:SI 10 sl) (reg:SI 3 r3))"),
             (65, "insn", "(set (reg:SI 0 r0) (and:SI (reg:SI 0 r0) (reg:SI 3 r3)))")]

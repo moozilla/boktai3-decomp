@@ -1,5 +1,5 @@
-#include "ui/town/scene_inventory_states.h"
-void SceneInventory_BeginPurchaseConfirmation(struct SceneInventoryControlView *panel)
+#include "ui/town/shop_states.h"
+void Shop_BeginPurchaseConfirmation(struct SceneInventoryControlView *panel)
 {
     SceneInput_SaveSelection(&panel->grid);
     panel->interactionFlags = 0x14;
@@ -26,9 +26,9 @@ void SceneInventory_BeginPurchaseConfirmation(struct SceneInventoryControlView *
             break;
         }
     }
-    SceneInventory_UpdateModePrompt(panel, 2);
+    Shop_UpdateModePrompt(panel, 2);
     SceneInput_BeginChoice(&panel->display.prompt, &panel->display.widgetResource,
                            &panel->choiceValue, 1, &panel->choiceBlink);
-    SceneInventory_SetControllerCallback(
-        panel, (SceneInventoryCallback)SceneInventory_TickPurchaseConfirmation);
+    Shop_SetControllerCallback(
+        panel, (SceneInventoryCallback)Shop_TickPurchaseConfirmation);
 }

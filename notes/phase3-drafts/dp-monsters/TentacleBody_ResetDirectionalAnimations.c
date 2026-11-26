@@ -1,5 +1,5 @@
 #include "global.h"
-#include "monsters/centipede/tentacle_segment_animation.h"
+#include "monsters/centipede/centipede_segment_animation.h"
 #include "engine/video/display_animation.h"
 #include "engine/video/display_sequence_inline.h"
 // MATCHING_CONCESSION: register-pinning
@@ -7,7 +7,7 @@
 // confidence=low: refreshes segment animations from their direction.
 
 void *SceneActorProfiles_GetEntryAddress(u32, u32, s32);
-void TentacleBody_GetDirectionFrame(u16, s32 *, s32 *);
+void CentipedeBody_GetDirectionFrame(u16, s32 *, s32 *);
 void Anim_RestartSequence(void *, void *, u32, u8, u8);
 void Anim_SetDurationScale(void *, u32);
 static inline u8 TestMask(struct TentacleSegmentAnimation *p, u32 mask)
@@ -17,7 +17,7 @@ static inline u8 TestMask(struct TentacleSegmentAnimation *p, u32 mask)
         return 1;
     return 0;
 }
-void TentacleBody_ResetDirectionalAnimations(struct TentacleBodyAnimationView *input, s32 inputKind)
+void CentipedeBody_ResetDirectionalAnimations(struct TentacleBodyAnimationView *input, s32 inputKind)
 {
     struct TentacleBodyAnimationView *body = input;
     struct {
@@ -41,12 +41,12 @@ void TentacleBody_ResetDirectionalAnimations(struct TentacleBodyAnimationView *i
     do {
         if (!TestMask(a, 1)) {
             if (TentacleSegment_HasStatus(a, 4)) {
-                TentacleBody_GetDirectionFrame((a->direction + 128) & 255, &frame.row,
+                CentipedeBody_GetDirectionFrame((a->direction + 128) & 255, &frame.row,
                                                &frame.flags);
                 Anim_SetSequence(a, TentacleSegment_ScriptAt(body, offset), 1, (u8)frame.row,
                                  (u8)frame.flags);
             } else {
-                TentacleBody_GetDirectionFrame(a->direction, &frame.row, &frame.flags);
+                CentipedeBody_GetDirectionFrame(a->direction, &frame.row, &frame.flags);
                 four = 4;
                 Anim_SetSequence(a, TentacleSegment_ScriptAt(body, offset),
                                  *(u8 *)(({

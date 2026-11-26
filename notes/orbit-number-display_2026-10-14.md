@@ -23,7 +23,7 @@ and leaving update (nine). Every hinted exact candidate was minimized with
 
 ## Rotating contact actor
 
-`include/bosses/nidhoggr/orbit_contact_actor.h` recovers a **0xC8 list-8 task**, with signed
+`include/bosses/nidhoggr/nidhoggr_duel_orb.h` recovers a **0xC8 list-8 task**, with signed
 radius at 0x18, angle/state/state flag at 0x1A/0x1B/0x1C, frame counter at 0x20,
 center at 0x24, collider at 0x2C, graphics at 0x80 and sprite at 0x9C. The state
 table gUnk_086059B4 selects inactive, expanding and contracting handlers.

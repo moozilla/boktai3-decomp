@@ -13,7 +13,7 @@
 #include "system/game_state/game_state.h"
 #include "scene/terrain/terrain_cell_probe.h"
 #include "scene/terrain/terrain_probe.h"
-#include "scene/actor/contact_position.h"
+#include "scene/collision/contact_position.h"
 
 void ResourceRegistry_RegisterResource(u32, void *, u32);
 

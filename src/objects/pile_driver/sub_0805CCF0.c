@@ -1,5 +1,5 @@
-#include "objects/pile_driver/scene_panel_subject.h"
-void ScenePanelSubject_ApplyContact(struct ContactCollider *contact, struct ContactCollider *other,
+#include "objects/pile_driver/pile_driver_subject.h"
+void PileDriverSubject_ApplyContact(struct ContactCollider *contact, struct ContactCollider *other,
                                     void *owner)
 {
     u32 mask = 127;
@@ -13,7 +13,7 @@ void ScenePanelSubject_ApplyContact(struct ContactCollider *contact, struct Cont
             subject->contactProgress += amount;
             if (subject->contactProgress >= subject->contactLimit) {
                 subject->contactProgress = subject->contactLimit;
-                ScenePanelSubject_SetState((void *)subject, 3);
+                PileDriverSubject_SetState((void *)subject, 3);
             } else {
                 subject->contactCooldown = 12;
                 Sound_PlaySong(0x127);

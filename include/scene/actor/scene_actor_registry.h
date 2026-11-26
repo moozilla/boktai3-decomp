@@ -1,7 +1,7 @@
 #ifndef GUARD_SCENE_ACTOR_REGISTRY_H
 #define GUARD_SCENE_ACTOR_REGISTRY_H
 #include "engine/engine.h"
-#include "scene/actor/contact_actor.h"
+#include "scene/collision/contact_actor.h"
 #include "monsters/chase_actor.h"
 /* Tentative actor-registry manager. Narrow views cover only reviewed fields. */
 /* Identity lookup view begins at actor +0x3D4 (0813760C). */

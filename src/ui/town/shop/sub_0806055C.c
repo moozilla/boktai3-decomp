@@ -1,5 +1,5 @@
-#include "ui/town/scene_inventory_actions.h"
-void SceneInventory_BeginEquipmentSwapPair(struct SceneInventoryActionView *panel)
+#include "ui/town/shop_actions.h"
+void Shop_BeginEquipmentSwapPair(struct SceneInventoryActionView *panel)
 {
     struct SceneInputPosition starts[2], targets[2];
     u32 enabled[2], frames[2], attributes[2];
@@ -24,7 +24,7 @@ void SceneInventory_BeginEquipmentSwapPair(struct SceneInventoryActionView *pane
         else
             slot = panel->selection;
         ((struct SceneInventoryActionFlagsView *)panel)->widgets[slot + 5].flags |= 1;
-        equipped = SceneInventory_FindEquippedSlot(slot);
+        equipped = Shop_FindEquippedSlot(slot);
         if (equipped >= 0)
             ((struct SceneInventoryActionFlagsView *)panel)->widgets[equipped + 0x29].flags |= 1;
         id = Inventory_GetEquipmentId(slot);

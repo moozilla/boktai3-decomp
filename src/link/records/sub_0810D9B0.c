@@ -3,7 +3,7 @@
 #include "system/game_state/game_state.h"
 #include "engine/engine.h"
 #include "engine/ram.h"
-#include "scene/area_effect/area_effect_link.h"
+#include "scene/areas/area_effect_link.h"
 #define TextWindow_Show TextWindow_StartPlayback
 struct RecordPanel {
     u8 pad0[0xCF4];

@@ -1,4 +1,4 @@
-#include "scene/actor/scene_actor_terrain.h"
+#include "scene/motion/scene_actor_terrain.h"
 // confidence=low: state actor kind 28 dash with decreasing speed and height above terrain.
 struct NpcTag {
     u8 pad[2];
@@ -36,7 +36,7 @@ static inline void polar(struct ContactPosition *v, u32 angle, s32 speed)
     v->y = 0;
     v->z = trunc12(gUnk_086149C4[angle] * speed);
 }
-void StateActor_UpdateDashAnimation13(void *ctx, struct Npc *npc, s32 tick)
+void StoryCharacter_UpdateDashAnimation13(void *ctx, struct Npc *npc, s32 tick)
 {
     struct NpcTag *tag = &npc->tag;
     u32 anim;

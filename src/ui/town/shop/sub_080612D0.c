@@ -1,12 +1,12 @@
-#include "ui/town/scene_inventory_control.h"
-s32 SceneInventory_ClassifySelectedAction(struct SceneInventoryControlView *panel)
+#include "ui/town/shop_control.h"
+s32 Shop_ClassifySelectedAction(struct SceneInventoryControlView *panel)
 {
     switch (panel->category) {
         case 0:
-            return SceneInventory_ClassifyEquipmentAction(panel);
+            return Shop_ClassifyEquipmentAction(panel);
         case 1:
-            return SceneInventory_ClassifyItemAction(panel);
+            return Shop_ClassifyItemAction(panel);
         case 2:
-            return SceneInventory_ClassifyConsumableAction(panel);
+            return Shop_ClassifyConsumableAction(panel);
     }
 }

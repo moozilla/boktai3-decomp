@@ -2,7 +2,7 @@
 #define GUARD_TETHER_PRESENTATION_H
 #include "engine/engine.h"
 #include "effects/sprites/projected_display.h"
-#include "bosses/vampire/actor_graphics_and_basic_states.h"
+#include "bosses/count/count_graphics.h"
 struct TetherIndicatorResource {
     u32 words[8];
 };

@@ -3,10 +3,10 @@
 #include "scene/actor/scene_actor_behavior.h"
 #include "scene/actor/scene_actor_placement.h"
 #include "system/game_state/game_state.h"
-#include "scene/actor/scene_actor_chase_types.h"
+#include "scene/motion/scene_actor_chase_types.h"
 #include "player/player.h"
-#include "scene/actor/scene_actor_turn.h"
-#include "scene/actor/scene_actor_chase_shared.h"
+#include "scene/motion/scene_actor_turn.h"
+#include "scene/motion/scene_actor_chase_shared.h"
 s32 Math_Atan2(s32, s32);
 s32 Div(s32, s32);
 void Collision_CalculateElementalResponse(void *, void *);

@@ -13,8 +13,8 @@ struct MenuCursorEntry {
 } __attribute__((aligned(4)));
 struct MenuCursor {
     struct Task task;
-    struct SceneInputWidget sprite;
-    struct SceneInputResource resource;
+    struct AnimSprite sprite;
+    struct AnimSpriteResource resource;
     struct ContactPosition position;
     s16 selectedIndex, entryCount;
     struct MenuCursorEntry entries[16];

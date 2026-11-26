@@ -1,7 +1,7 @@
 #include "engine/engine_pause.h"
 #include "scene/actor/modifier_list.h"
 #include "engine/ram.h"
-#include "scene/area_effect/area_effect_link.h"
+#include "scene/areas/area_effect_link.h"
 void ActorSprite_InitPartDrawings(u8 *, u8 *, u32);
 void ModifierMenu_RefreshPreviewModel(struct ModifierMenu *);
 void CharacterPreview_PositionParts(u8 *, u8 *, struct ModifierPreviewOrigin *, u32);

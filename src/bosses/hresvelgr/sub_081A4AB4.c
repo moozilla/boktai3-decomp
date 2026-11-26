@@ -1,7 +1,7 @@
 #include "global.h"
 #include "engine/engine.h"
 #include "engine/ram.h"
-#include "scene/actor/contact_position.h"
+#include "scene/collision/contact_position.h"
 #include "engine/math/monster_particle_random.h"
 
 // confidence=low: emits one centered explosion and seven offset explosions.

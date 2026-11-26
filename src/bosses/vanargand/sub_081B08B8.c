@@ -3,7 +3,7 @@
 
 #include "engine/video/display_animation.h"
 #include "bosses/vanargand/paired_scene_actor.h"
-#include "player/cues/player_cue_sequence.h"
+#include "player/cutscene/player_cue_sequence.h"
 struct OrbitMotion;
 s32 MotionTrack_Update(struct OrbitMotion *);
 s32 Vanargand_GetComponentWithFlag10(u8 *);

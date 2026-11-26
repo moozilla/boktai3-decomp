@@ -1,4 +1,4 @@
-#include "scene/actor/scene_actor_availability.h"
+#include "scene/motion/scene_actor_availability.h"
 #include "scene/actor/scene_actor_state.h"
 #include "scene/actor/scene_actor_registry.h"
 void SceneActorBehavior_UpdateColliders(struct ChaseActor *);

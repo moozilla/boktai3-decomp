@@ -7,17 +7,17 @@ struct BankAnim {
 };
 struct SolarBankDisplay {
     u8 pad0[0x18];
-    struct SceneInputResource bankResource;
-    struct SceneInputResource commonResource;
-    struct SceneInputWidget label;
-    struct SceneInputWidget prompt;
-    struct SceneInputWidget rateDigits[2];
-    struct SceneInputWidget percentSign;
-    struct SceneInputWidget balanceDigits[4];
-    struct SceneInputWidget transferDigits[4];
-    struct SceneInputWidget transferLabel;
-    struct SceneInputWidget firstMarker;
-    struct SceneInputWidget secondMarker;
+    struct AnimSpriteResource bankResource;
+    struct AnimSpriteResource commonResource;
+    struct AnimSprite label;
+    struct AnimSprite prompt;
+    struct AnimSprite rateDigits[2];
+    struct AnimSprite percentSign;
+    struct AnimSprite balanceDigits[4];
+    struct AnimSprite transferDigits[4];
+    struct AnimSprite transferLabel;
+    struct AnimSprite firstMarker;
+    struct AnimSprite secondMarker;
     struct DisplaySequenceSprite sprites[2];
     struct BankAnim anims[2];
     u8 unknown6E8[0x28];
@@ -35,11 +35,11 @@ static inline void SolarBank_SetRate(s16 *rate, s32 level)
 #define SolarBank_InitWidgets sub_081BBE88
 void SolarBank_InitWidgets(struct SolarBankDisplay *p)
 {
-    struct SceneWidgetPlayback labelPlayback;
+    struct AnimSpritePlayback labelPlayback;
     u8 labelPriority;
-    struct SceneInputResource *source;
-    struct SceneInputResource *commonResource;
-    struct SceneInputResource *bankResource;
+    struct AnimSpriteResource *source;
+    struct AnimSpriteResource *commonResource;
+    struct AnimSpriteResource *bankResource;
     struct ContactPosition pos;
     s32 percent;
     s32 tens;
@@ -88,7 +88,7 @@ void SolarBank_InitWidgets(struct SolarBankDisplay *p)
     commonResource = &p->commonResource;
     for (i = 0; i < 4; i++) {
         struct ContactPosition *position = &pos;
-        struct SceneInputWidget *widget = &p->balanceDigits[i];
+        struct AnimSprite *widget = &p->balanceDigits[i];
         Widget_InitLinked(widget, commonResource, 0, 0x30, 0, 0, 0x3C, position);
         pos.x += 8;
     }
@@ -97,7 +97,7 @@ void SolarBank_InitWidgets(struct SolarBankDisplay *p)
     pos.y = 0x28;
     for (i = 0; i < 4; i++) {
         struct ContactPosition *position = &pos;
-        struct SceneInputWidget *widget = &p->transferDigits[i];
+        struct AnimSprite *widget = &p->transferDigits[i];
         Widget_InitLinked(widget, commonResource, 0, 0x30, 0, 0, 0x3C, position);
         pos.x += 8;
     }

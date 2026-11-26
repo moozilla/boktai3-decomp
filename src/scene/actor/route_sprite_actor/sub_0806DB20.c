@@ -1,4 +1,4 @@
-#include "scene/actor/route_sprite_playback.h"
+#include "scene/motion/route_sprite_playback.h"
 static inline s32 Truncate12(s32 value)
 {
     return value >= 0 ? value >> 12 : -((-value) >> 12);

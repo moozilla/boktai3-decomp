@@ -1,7 +1,7 @@
 #ifndef GUARD_PROJECTED_DISPLAY_H
 #define GUARD_PROJECTED_DISPLAY_H
-#include "scene/actor/contact_actor.h"
-#include "ui/widgets/scene_input_widget.h"
+#include "scene/collision/contact_actor.h"
+#include "engine/video/anim_sprite.h"
 struct ProjectedDisplayResource {
     u32 words[8];
 };
@@ -25,8 +25,8 @@ struct ProjectedDisplay {
     s32 height;
     u32 unknown1C;
     struct ContactPosition world, raised, screen;
-    struct SceneInputResource resource;
-    struct SceneInputWidget entries[5];
+    struct AnimSpriteResource resource;
+    struct AnimSprite entries[5];
 };
 extern const s32 gUnk_0860594C[];
 static inline s32 projectScale(s32 value)

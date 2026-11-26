@@ -7,7 +7,7 @@ struct A {
     u32 w18;
     struct E e[8];
 };
-struct E *FanCannonManager_FindFreeSlot(struct A *a, s32 *out)
+struct E *WindCannonManager_FindFreeSlot(struct A *a, s32 *out)
 {
     struct E *e = a->e;
     s32 i = 0;

@@ -8,7 +8,7 @@ struct RecordPanel {
 s32 SelectionPanel_GetSelection(struct RecordPanel *);
 s32 GameState_GetChallengeBestScore(u32);
 void Video_DrawBackgroundRowMarkers(u32, u32);
-void Registry3C9F_SetSelectedDisplayResource(struct RecordPanel *);
+void RecordPanel_SetSelectedDisplayResource(struct RecordPanel *);
 s32 Div(s32, s32);
 void PanelText_DrawDecimal(s32, s32, s32, s32, s32);
 u16 *Bg_GetWrappedTilemapEntry(u32, u32, u32);
@@ -36,7 +36,7 @@ void RecordPanel_DrawTime(struct RecordPanel *p)
         return;
     }
 available:
-    Registry3C9F_SetSelectedDisplayResource(p);
+    RecordPanel_SetSelectedDisplayResource(p);
     p->spriteFlags &= ~1;
     if (time > 59999) {
         seconds = 999;

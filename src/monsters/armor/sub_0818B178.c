@@ -1,5 +1,5 @@
 #include "global.h"
-#include "scene/actor/contact_collider.h"
+#include "scene/collision/contact_collider.h"
 
 struct ArmorActor {
     u8 pad0[0x190];

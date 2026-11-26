@@ -14,7 +14,7 @@ struct GrowthHazard {
 };
 void AnimatedMarker_BeginStateThree(void *);
 
-void GrowthHazard_UpdateCooldown(struct GrowthHazard *p)
+void SolarRoot_UpdateCooldown(struct GrowthHazard *p)
 {
     struct S *s = &p->s;
     s32 m = ~4;

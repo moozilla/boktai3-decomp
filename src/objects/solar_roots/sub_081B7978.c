@@ -13,7 +13,7 @@ struct O {
 };
 void AnimatedMarker_BeginActive(void *);
 
-void GrowthHazard_UpdateIdle(struct O *p)
+void SolarRoot_UpdateIdle(struct O *p)
 {
     struct S *s = &p->s;
     s32 m = ~4;

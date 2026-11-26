@@ -1,8 +1,8 @@
 #include "scene/actor/scene_actor_control_phase.h"
-#include "scene/actor/scene_actor_terrain_reaction.h"
+#include "scene/motion/scene_actor_terrain_reaction.h"
 #include "global.h"
 #include "scene/actor/scene_actor_reaction.h"
-#include "scene/actor/scene_actor_terrain.h"
+#include "scene/motion/scene_actor_terrain.h"
 // confidence=low: hides the drawable and moves the actor above the active field.
 static inline void SetFlags(struct ChaseActor *actor, u32 mask)
 {
@@ -17,7 +17,7 @@ static inline void SceneActorControl_SetDrawableFlags(u32 bits, struct ChaseActo
         sprite->flags |= bits;
     } else {
         struct SceneActorAnimationTileDrawable *drawable = actor->base.drawable;
-        struct SceneInputWidget *tile = &drawable->tile;
+        struct AnimSprite *tile = &drawable->tile;
         tile->flags |= bits;
     }
 }

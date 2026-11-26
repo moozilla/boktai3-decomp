@@ -1,8 +1,8 @@
 #include "global.h"
-#include "scene/actor/scene_actor_chase.h"
+#include "scene/motion/scene_actor_chase.h"
 #include "engine/engine.h"
-#include "scene/actor/scene_actor_delayed_response.h"
-#include "scene/actor/scene_actor_chase_shared.h"
+#include "scene/collision/scene_actor_delayed_response.h"
+#include "scene/motion/scene_actor_chase_shared.h"
 
 static inline void Reaction_ClearHalf(struct ChaseFlags40 *field, u32 bits)
 {
@@ -16,7 +16,7 @@ static inline void Reaction_Show(struct ChaseActor *actor)
         s32 mask = ~1;
         *flags = mask & *flags;
     } else {
-        struct SceneInputWidget *tile =
+        struct AnimSprite *tile =
             &((struct SceneActorAnimationTileDrawable *)actor->base.drawable)->tile;
         s32 mask = ~1;
         tile->flags = mask & tile->flags;

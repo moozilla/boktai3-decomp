@@ -1,5 +1,5 @@
-#include "objects/pile_driver/scene_panel_rig.h"
-void ScenePanelRig_ApplyContact(struct ContactCollider *source, struct ContactCollider *target,
+#include "objects/pile_driver/pile_driver_rig.h"
+void PileDriverRig_ApplyContact(struct ContactCollider *source, struct ContactCollider *target,
                                 struct ScenePanelRig *input)
 {
     u32 reactionMask = 0x7F;

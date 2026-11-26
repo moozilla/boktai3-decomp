@@ -19,7 +19,7 @@ struct AnimatedTileManager {
     u32 used;
 };
 struct AnimatedTile *AnimatedTile_Allocate(struct AnimatedTileManager *);
-struct AnimatedTile *Pool1BC_FindByName(u32);
+struct AnimatedTile *AnimatedTilePool_FindByName(u32);
 struct AnimatedTileManager *AnimatedTile_CreateManager(void);
 s32 AnimatedTile_InitManager(struct AnimatedTileManager *);
 s32 CallbackSlots_DispatchActive(struct AnimatedTileManager *);

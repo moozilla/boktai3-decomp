@@ -22,7 +22,7 @@ static inline s32 shift12(s32 x)
         return x >> 12;
     return -((-x) >> 12);
 }
-void StateActor_UpdateAnimation13State(u32 a, struct S *p)
+void StoryCharacter_UpdateAnimation13State(u32 a, struct S *p)
 {
     u32 r;
     u32 speed;

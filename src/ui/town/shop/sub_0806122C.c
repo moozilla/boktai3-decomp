@@ -1,5 +1,5 @@
-#include "ui/town/scene_inventory_control.h"
-s32 SceneInventory_ClassifyConsumableAction(struct SceneInventoryControlView *panel)
+#include "ui/town/shop_control.h"
+s32 Shop_ClassifyConsumableAction(struct SceneInventoryControlView *panel)
 {
     s32 result;
     s32 item;

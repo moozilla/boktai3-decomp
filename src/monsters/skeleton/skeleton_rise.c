@@ -1,12 +1,12 @@
 #include "global.h"
 #include "player/player.h"
-#include "scene/actor/scene_actor_chase_reaction.h"
+#include "scene/motion/scene_actor_chase_reaction.h"
 #include "scene/actor/scene_actor_reaction.h"
 #include "scene/actor/scene_actor_control_phase.h"
-#include "scene/actor/scene_actor_terrain.h"
-#include "scene/actor/scene_actor_turn.h"
+#include "scene/motion/scene_actor_terrain.h"
+#include "scene/motion/scene_actor_turn.h"
 #include "monsters/scene_actor_init_primitives.h"
-#include "scene/actor/scene_actor_delayed_response.h"
+#include "scene/collision/scene_actor_delayed_response.h"
 
 void SceneActorReaction_PlayAnimationBUntilComplete(void);
 
@@ -35,12 +35,12 @@ static inline void *Skeleton_Sequence(struct SceneActorAnimationSequenceDrawable
     return &d->sequence;
 }
 
-static inline struct SceneInputWidget *Skeleton_TileOf(struct ChaseActor *a)
+static inline struct AnimSprite *Skeleton_TileOf(struct ChaseActor *a)
 {
     return &((struct SceneActorAnimationTileDrawable *)a->base.drawable)->tile;
 }
 
-static inline u32 Skeleton_TileMirror(struct SceneInputWidget *tile)
+static inline u32 Skeleton_TileMirror(struct AnimSprite *tile)
 {
     return tile->flags & 4;
 }
@@ -50,7 +50,7 @@ static inline struct RoomActor *Skeleton_Playback(struct ChaseActor *a)
     return (void *)a;
 }
 
-static inline u32 *Skeleton_SpriteBits(struct SceneInputWidget *t)
+static inline u32 *Skeleton_SpriteBits(struct AnimSprite *t)
 {
     return &t->flags;
 }
@@ -78,7 +78,7 @@ static inline void Skeleton_LaunchSequence(void *object, u32 selection, u8 varia
     *restartOut = &Skeleton_Playback(actor)->restart;
 }
 
-static inline void Skeleton_CommitTile(void *obj, struct SceneInputWidget *tile,
+static inline void Skeleton_CommitTile(void *obj, struct AnimSprite *tile,
                                        u8 *savedSelection, u32 selection, u32 flags)
 {
     struct ChaseActor *actor = obj;
@@ -147,7 +147,7 @@ static inline u32 Skeleton_ReadFrame(u32 value, u32 *selectedFrame, u8 *variantR
                                                                                                    \
         } else {                                                                                   \
                                                                                                    \
-            struct SceneInputWidget *tile = Skeleton_TileOf(actor);                         \
+            struct AnimSprite *tile = Skeleton_TileOf(actor);                         \
                                                                                                    \
             selection = selection + variant;                                                       \
             savedSelection = &actor->base.animationIndex;                                          \

@@ -2,7 +2,7 @@
 #include "engine/video/display_animation.h"
 #include "engine/math/scene_vec.h"
 #include "engine/ram.h"
-#include "player/cues/player_cue_sequence.h"
+#include "player/cutscene/player_cue_sequence.h"
 #include "engine/engine_pause.h"
 #include "engine/word_flags.h"
 struct CannonEmitter {
@@ -26,7 +26,7 @@ void SceneBody_SetSprite(void *, void *);
 void TerrainOverlay_QueueAddActor(void *);
 void ProximitySequence_TestPlayerDistance(void);
 extern u32 gUnk_02000560;
-s32 CannonEmitter_UpdateAnimation(struct CannonEmitter *p)
+s32 PollenFlower_UpdateAnimation(struct CannonEmitter *p)
 {
     if (Engine_PauseBits(0x400) || Flags_MaskedWord(4, &gUnk_02000560))
         return 0;

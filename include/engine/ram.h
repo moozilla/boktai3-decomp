@@ -327,7 +327,7 @@ extern struct NamedObjectManager
 /* 0x020001B0 */
 extern void *gActorGroupPool; /* four-slot actor group and callback pool singleton */
 /* 0x020001C0 */
-extern u32 gLinkSessionStep; /* provisional: Registry1745_RunSession diagnostic step marker */
+extern u32 gLinkSessionStep; /* provisional: LinkSession_RunSession diagnostic step marker */
 /* 0x020001CC */
 extern u8 *gConfirmPanel; /* provisional: Registry3C9F confirmation panel singleton */
 /* 0x02000204 */

@@ -2,7 +2,7 @@
 
 Tags: #matching #monsters #tentacle #080A8904
 
-`TentacleActor_SelectWanderRoute` matches all 984 bytes in ordinary C.
+`Centipede_SelectWanderRoute` matches all 984 bytes in ordinary C.
 Typed wander state replaces the raw field accesses. The cardinal mask and
 route cursor share one scan owner, and named operations retain the route-cell
 reads and candidate advancement. A signed-halfword wrapper around the shared

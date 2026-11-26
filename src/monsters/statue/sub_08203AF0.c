@@ -10,7 +10,7 @@ struct S {
 void Script_SetPc(u8 *);
 u8 *Script_GetPc(void);
 s32 Script_GetValue(void);
-void EnemyF426_ReadScriptValueList(struct S *p)
+void Statue_ReadScriptValueList(struct S *p)
 {
     s32 i;
     s16 *d;

@@ -35,7 +35,7 @@ sub_08012B34, FadingParticleGroup_Spawn, FadingParticleGroup_Update, sub_08014CA
 Global-alloc order off by a few priority points between two registers
 (refs/life near tie): Collectible_UpdateEntry, ProximityEmitter_InitializeFromScript,
 NamedObject_RegisterFollowCells, Hresvelgr_UpdateBoundaryBarrage,
-SceneActorContacts_ReleaseInvalidOwners, TentacleActor_AlignSegmentsToTerrain.
+SceneActorContacts_ReleaseInvalidOwners, Centipede_AlignSegmentsToTerrain.
 
 local-alloc choice inside one block (which value takes r0): sub_081D3620,
 sub_0803198C, sub_08217430.
@@ -45,9 +45,9 @@ GameState_SelectRamBase, SceneInput_TickChoice, TetherActor_BlendPalette,
 TetherActor_UpdateBounceReturn. The folded-test lever above is untried on these.
 
 jump2 cross-jumping of identical tails: AnimatedParticles_Create,
-TentacleActor_UpdateRetraction.
+Centipede_UpdateRetraction.
 
-Reload spill or rotation order: ScenePanel_TickRig, Mummy_ResumeSavedRouteAfterAnimation.
+Reload spill or rotation order: PileDriver_TickRig, Mummy_ResumeSavedRouteAfterAnimation.
 
 In progress when this was written: sub_08014634 (ParticleGroup_SpawnBouncing). The
 committed source uses a local struct, unions and pins. A plain rewrite with seven

@@ -1,5 +1,5 @@
 #include "global.h"
-#include "scene/actor/contact_actor.h"
+#include "scene/collision/contact_actor.h"
 struct ActorEffect {
     u32 flags;
     u8 unknown4[3], priority;

@@ -1,15 +1,15 @@
 #ifndef GUARD_COLLECTION_H
 #define GUARD_COLLECTION_H
 #include "ui/widgets/scene_input.h"
-#include "scene/actor/contact_swarm.h"
+#include "scene/collision/contact_swarm.h"
 #include "engine/video/display_sequence.h"
 struct CollectionMenu {
     struct Task task;
     void *backgroundMap;
     u32 unknown1C, unknown20;
-    struct SceneInputResource resource;
-    struct SceneInputWidget background, cursor, completionBadge, pageIndicator;
-    struct SceneInputWidget countDigits[4];
+    struct AnimSpriteResource resource;
+    struct AnimSprite background, cursor, completionBadge, pageIndicator;
+    struct AnimSprite countDigits[4];
     u16 cursorColors[16];
     s16 pulseFrame;
     u16 unknown366;
