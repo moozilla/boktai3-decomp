@@ -1,11 +1,11 @@
 #include "scene/motion/scene_actor_availability.h"
 #include "scene/actor/scene_actor_control_motion.h"
-void SceneActorBehavior_ApplyContactReaction(struct SceneActorBehaviorContactView *,
-                                             struct SceneActorBehaviorContactView *,
+void SceneActorBehavior_ApplyContactReaction(struct ContactCollider *,
+                                             struct ContactCollider *,
                                              struct RoomActor *);
 
-void SceneActorControl_ApplyContactPowerFloor(struct SceneActorBehaviorContactView *source,
-                                              struct SceneActorBehaviorContactView *destination,
+void SceneActorControl_ApplyContactPowerFloor(struct ContactCollider *source,
+                                              struct ContactCollider *destination,
                                               struct ChaseActor *actor)
 {
     s32 power;
@@ -26,11 +26,11 @@ void SceneActorControl_ApplyContactPowerFloor(struct SceneActorBehaviorContactVi
         sample = table.samples[*cursor];
     }
     {
-        s32 old = destination->power;
+        s32 old = destination->responseParameter;
         power = old - (sample & 15);
     }
     power = power < 20 ? 20 : power;
-    destination->power = power;
+    destination->responseParameter = power;
     {
         struct SceneActorControlMotionState *control = SceneActorControl_GetMotionState(actor);
         u32 *flags = &control->flags3D4;
