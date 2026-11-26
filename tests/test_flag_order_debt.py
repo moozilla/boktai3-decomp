@@ -91,3 +91,11 @@ class FlagDebt(unittest.TestCase):
                                                       side_effect=AssertionError("unrelated corpus scan")):
             self.assertEqual(c.main(["--no-compiler", "--kind", "literal-local", "--summary", str(source)]), 0)
         self.assertIn("1 warnings in 1 files", stderr.getvalue())
+
+    def test_macro_temporary_and_plain_flag_macro(self):
+        use = "\nint f(int *p) { return Test(p, 4); }"
+        self.assertEqual(self.debt("#define Test(p,k) ((*(p)) & (k))" + use), 0)
+        temp = "#define Test(p,k) ({ unsigned m = (k); \\\n (*(p)) & m; })"
+        self.assertEqual(self.debt(temp + use), 1)
+        self.assertEqual(self.debt(temp.replace("k", "K") + use), 1)
+        self.assertEqual(self.debt(temp.replace("& m", "+ m") + use), 0)

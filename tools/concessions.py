@@ -75,7 +75,8 @@ its spelling, so each one is a question, not a verdict:
 * `local-union`: a union defined inside a function (not a union member of a file-scope struct).
   Two views of one value are ordinary C; two unrelated values sharing storage are not.
 * `literal-param`: one constant argument at a call to a small inline bit operation, including
-  calls to helpers that also receive runtime masks. See notes/flag-accessors_2026-11-25.md
+  calls to helpers that also receive runtime masks. Macro arguments bound to mask temporaries
+  are charged likewise. Expression-only flag macros do not bind the mask. See notes/flag-accessors_2026-11-25.md
   for the measured exception for the combined pause operation. Parked constants are charged
   by source uses (at least one per binding). The steering-debt subtotal sums both spellings.
   literal_params() retains the legacy definition inventory for historical comparisons.
@@ -837,6 +838,31 @@ def _recovered_operand(params, body, operand):
                     f"{field}|={operand};", f"{field}&=~{operand};"}
 
 
+_FUNCTION_DEFINE = re.compile(r"\s*#\s*define\s+(\w+)\(([^()]*)\)\s*(.*)", re.S)
+_MASK_TEMP = re.compile(r"\b(?:const\s+)?(?:" + _SCALAR_TYPE + ")" +
+                        r"\s+(\w+)\s*=\s*\(*\s*(\w+)\s*\)*\s*;")
+
+
+def _staged_macros(code):
+    """A function macro only stages an argument if its expansion binds the mask."""
+    for m in _MACRO_DEF.finditer(code):
+        macro = _FUNCTION_DEFINE.fullmatch(m[0].replace("\\\n", " "))
+        if not macro:
+            continue
+        formals = [p.strip() for p in macro[2].split(",")]
+        body = _MEMBER_ACCESS.sub("@", macro[3])
+        params = {}
+        for tmp in _MASK_TEMP.finditer(body):
+            local, actual = tmp.groups()
+            if actual not in formals:
+                continue
+            uses = list(re.finditer(rf"\b{local}\b", body[tmp.end():]))
+            if uses and all(_operand_use(body, tmp.end() + u.start(), tmp.end() + u.end()) for u in uses):
+                params[formals.index(actual)] = actual
+        if params:
+            yield macro[1], m.start(), params
+
+
 def _argument_facts(text):
     code = strip(text)
     ok = allows(text)
@@ -849,6 +875,8 @@ def _argument_facts(text):
         recovered = any(_recovered_operand(m["params"], body, param)
                         for param in params.values())
         definitions[m["name"]] = ({} if recovered else params, "literal-param" in ok.get(line, {}))
+    for name, pos, params in _staged_macros(code):
+        definitions[name] = params, "literal-param" in ok.get(_line(code, pos), {})
     return definitions, _INCLUDE.findall(code)
 
 
@@ -904,6 +932,9 @@ def literal_argument_sites(path, text, root=None, *, headers=None):
         if name not in definitions:
             continue
         params, excused = definitions[name]
+        start = code.rfind("\n", 0, call.start()) + 1
+        if re.fullmatch(r"\s*#\s*define\s+", code[start:call.start()]):
+            continue
         if not params:
             continue
         args, end = _arguments(code, call.end())
@@ -928,7 +959,7 @@ def _annotation_sites(rel, text, params):
         # when a different caller starts passing a runtime mask.
         code = strip(text)
         return params + [Site(_line(code, offset), "literal-param", True)
-                         for _, offset, _ in _inline_definitions(code)]
+                         for _, offset, _ in (*_inline_definitions(code), *_staged_macros(code))]
     return params
 
 
