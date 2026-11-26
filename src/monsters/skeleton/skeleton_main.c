@@ -1,3 +1,4 @@
+#include "scene/motion/scene_actor_availability.h"
 #include "global.h"
 #include "effects/particles/scene_particle_burst_api.h"
 #include "scene/motion/scene_actor_chase.h"
@@ -89,42 +90,10 @@ done:
 
 void SceneActorPlacement_ResetActorState(struct ChaseActor *, const u16 *);
 
-static inline u8 Unavailable(struct ChaseActor *actor)
-{
-    if (!actor)
-        goto zero;
-    {
-        u32 mask;
-        u32 offset;
-        u32 *field;
-        u32 value;
-        mask = 0x40;
-        offset = 0x2d4;
-        field = (void *)((u8 *)actor + offset);
-        value = *(u16 *)field;
-        value &= mask;
-        if (value)
-            goto one;
-        mask = 0x20000;
-        offset -= 4;
-        field = (void *)((u8 *)actor + offset);
-        value = *field;
-        value &= mask;
-        if (value)
-            goto one;
-    }
-    if (actor->base.health > 0)
-        goto zero;
-one:
-    return 1;
-zero:
-    return 0;
-}
-
 void SceneActorControl_RestartBehavior57(struct ChaseActor *actor)
 {
     u16 mode;
-    if (Unavailable(actor))
+    if (SceneActor_ActionsBlocked(actor))
         return;
     {
         if (SceneActorContact_MotionFlags(actor, 0x800))
@@ -151,8 +120,8 @@ static inline u8 Chase(struct ChaseActor *actor, struct SceneActorChaseGroup *gr
 {
     void *route = group->route;
     struct ContactPosition *position = &actor->base.body.position;
-    u8 *target = *(u8 **)&actor->base.tracking.target;
-    struct ContactPosition *destination = (void *)(target + 12);
+    struct SceneActorChaseTarget *target = actor->base.tracking.target;
+    struct ContactPosition *destination = &target->position;
     s32 result;
     if (!Nav_IsPositionInMesh(route, position, destination)) {
         {
@@ -214,7 +183,7 @@ void Skeleton_BeginStationaryPursuit(struct ChaseActor *a)
 {
     struct Skeleton *context;
     struct SceneActorChaseGroup *group;
-    if (Unavailable(a))
+    if (SceneActor_ActionsBlocked(a))
         return;
     context = a->base.context;
     group = &a->group;
@@ -257,32 +226,6 @@ void Skeleton_BeginStationaryPursuit(struct ChaseActor *a)
     }
 }
 
-static inline u32 ReadFlags16(struct ChaseActor *actor, u32 inputMask)
-{
-    u32 mask = inputMask;
-    u16 *flags;
-    flags = &actor->base.motionFlags;
-    return *flags & mask;
-}
-
-static inline u32 ReadFlags32(struct ChaseActor *actor, u32 inputMask)
-{
-    u32 mask = inputMask;
-    u32 *flags;
-    flags = &actor->base.statusFlags;
-    return *flags & mask;
-}
-
-static inline u8 IsUnavailable(struct ChaseActor *input)
-{
-    struct ChaseActor *actor = input;
-    if (actor) {
-        if (ReadFlags16(actor, 0x40) || ReadFlags32(actor, 0x20000) || actor->base.health <= 0)
-            return 1;
-    }
-    return 0;
-}
-
 /* actor must be nonnull: its control context is loaded before the availability gate. */
 
 void Skeleton_HandleVisibilityRequest(struct ChaseActor *input, const u16 *inputRequest)
@@ -290,7 +233,7 @@ void Skeleton_HandleVisibilityRequest(struct ChaseActor *input, const u16 *input
     struct ChaseActor *actor = input;
     const u16 *request = inputRequest;
     struct SceneActorControlMotionState *state = SceneActorControl_GetMotionState(actor);
-    u32 unavailable = IsUnavailable(actor);
+    u32 unavailable = SceneActor_ActionsBlocked(actor);
     if (unavailable)
         return;
     {
@@ -405,7 +348,7 @@ static inline void Show(struct ChaseActor *actor)
 void Skeleton_UpdateVisibilityFlicker(struct ChaseActor *actor)
 {
     struct SceneActorControlMotionState *state;
-    u32 unavailable = IsUnavailable(actor);
+    u32 unavailable = SceneActor_ActionsBlocked(actor);
     if (unavailable)
         return;
     {
@@ -768,14 +711,6 @@ static inline u32 ActorFlag(struct ChaseActor *actor, u32 input, u32 offset)
                            : *(u32 *)((u8 *)actor + offset) & mask;
 }
 
-static inline u8 unavailable(struct ChaseActor *actor)
-{
-    if (actor && (ActorFlag(actor, 0x40, 0x2D4) || ActorFlag(actor, 0x20000, 0x2D0) ||
-                  actor->base.health <= 0))
-        return 1;
-    return 0;
-}
-
 // confidence=low: updates Skeleton body and facing attack bounds while its control is active
 
 static inline void SetBounds(struct ContactCollider *collider,
@@ -789,7 +724,7 @@ void Skeleton_UpdateFacingColliders(struct ChaseActor *p)
     struct Skeleton *context = p->base.context;
     union SceneActorRegistryPackedPosition pos, bounds;
     u32 mask;
-    if (unavailable(p))
+    if (SceneActor_ActionsBlocked(p))
         return;
     mask = 0x800;
     if (p->base.motionFlags & mask)
@@ -1152,8 +1087,6 @@ static inline void Or16(u16 *p, u32 mask)
     *p = value;
 }
 
-
-
 static inline void OrMotion(struct SceneActorReactionMotion *p, u32 mask)
 {
     u32 v = mask;
@@ -1249,10 +1182,10 @@ done:
 static inline u8 Chase_RestorePursuitRoute(struct ChaseActor *actor, struct SceneActorChaseGroup *group,
                                            u32 bits)
 {
-    u8 *target = *(u8 **)&actor->base.tracking.target;
+    struct SceneActorChaseTarget *target = actor->base.tracking.target;
     void *route = group->route;
     struct ContactPosition *position = &actor->base.body.position;
-    struct ContactPosition *destination = (void *)(target + 12);
+    struct ContactPosition *destination = &target->position;
     s32 result;
     if (!Nav_IsPositionInMesh(route, position, destination)) {
         {
@@ -2315,14 +2248,6 @@ void Skeleton_OnContactEvent(u8 *unused, u8 *obj, u8 *ctx)
 
 void SceneActorReaction_HandleColliderContact(void *, void *, struct ChaseActor *);
 
-static inline u8 IsUnavailable_TryForward(struct ChaseActor *actor)
-{
-    if (actor && (ActorFlag(actor, 0x40, 0x2D4) || ActorFlag(actor, 0x20000, 0x2D0) ||
-                  actor->base.health <= 0))
-        return 1;
-    return 0;
-}
-
 static inline u32 StateFlag(struct SceneActorScriptPropertiesView *p, u32 mask)
 {
     return p->flags6DC & mask;
@@ -2331,7 +2256,7 @@ static inline u32 StateFlag(struct SceneActorScriptPropertiesView *p, u32 mask)
 void SceneActor_TryForward(void *a, void *b, struct ChaseActor *actor)
 {
     struct SceneActorScriptPropertiesView *state = actor->base.context;
-    if (IsUnavailable_TryForward(actor))
+    if (SceneActor_ActionsBlocked(actor))
         return;
     if (Test(StateFlag(state, 0x10), ~0)) {
         actor->base.context++;
@@ -2350,20 +2275,10 @@ void SceneActorControl_BeginTimedBehavior56(struct ChaseActor *s,
 
 u8 SceneActorControl_CanTurnTowardTarget(struct ChaseActor *);
 
-static inline u8 IsUnavailable_TryStartContact(struct ChaseActor *actor)
-{
-    if (actor && (ActorFlag(actor, 0x40, 0x2D4) || ActorFlag(actor, 0x20000, 0x2D0) ||
-                  actor->base.health <= 0))
-        return 1;
-    return 0;
-}
-
-
-
 void SceneActorReaction_TryStartContact(u8 *source, u16 *contact, struct ChaseActor *actor)
 {
     struct SceneActorScriptPropertiesView *state = actor->base.context;
-    if (IsUnavailable_TryStartContact(actor))
+    if (SceneActor_ActionsBlocked(actor))
         return;
     if (SceneActorTurn_Flags(&contact[3], 4))
         return;
@@ -2610,9 +2525,7 @@ void SceneActorReaction_ApplyThreshold(struct ChaseActor *actor, s32 value)
 
 void Skeleton_ShedBones(struct ChaseActor *actor);
 
-struct S;
-
-void Skeleton_UpdateAttackRecovery(struct S *p);
+void Skeleton_UpdateAttackRecovery(struct ChaseActor *p);
 
 void SceneActorReaction_TickQueuedContact(struct ChaseActor *p)
 {
@@ -2783,72 +2696,22 @@ void Skeleton_ShedBones(struct ChaseActor *actor)
         SceneActorChase_SetControl(actor, SceneActorReaction_ApplyThreshold, 0x3E);
 }
 
-struct S {
-    u8 f1[0x104];
-    u32 w104;
-    u8 f2[0xc];
-    u32 w114;
-    u8 f3[0x104];
-    void (*fn)(void);
-    u8 f4[0x90];
-    u8 b2b0;
-    u8 f5;
-    u8 b2b2;
-    u8 b2b3;
-    u8 f6;
-    u8 b2b5;
-    u8 f7[0x12];
-    u16 h2c8;
-};
-
-void Skeleton_UpdateAttackRecovery(struct S *p)
+void Skeleton_UpdateAttackRecovery(struct ChaseActor *p)
 {
-    if (SceneActorControl_TakeFlag(&p->b2b2))
-        SceneActorAnimation_SelectDirectionalEntry(p, 0x17);
-    if (p->b2b3) {
-        void (*f)(void) = SceneActorReaction_ApplyThreshold;
-        u32 k = 0x3e;
-        u32 z;
-        u8 *a = &p->b2b2;
-        u32 *w;
-        s32 m;
-        z = 0;
-        *a = 1;
-        p->b2b0 = z;
-        p->b2b5 = k;
-        p->fn = f;
-        p->h2c8 = z;
-        w = &p->w114;
-        m = -2;
-        *w = m & *w;
-        p->w104 = z;
-    }
+    if (SceneActorControl_TakeFlag(&p->base.field2B2))
+        SceneActorAnimation_SelectDirectionalEntry(&p->base, 0x17);
+    if (p->base.restart)
+        SceneActorChase_SetControl(p, SceneActorReaction_ApplyThreshold, 0x3E);
 }
 
 void SceneActorReaction_TickForwardBurst(struct ChaseActor *p_);
 
-void Skeleton_UpdateAttackWindup(struct S *p)
+void Skeleton_UpdateAttackWindup(struct ChaseActor *p)
 {
-    if (SceneActorControl_TakeFlag(&p->b2b2))
-        SceneActorAnimation_SelectDirectionalEntry(p, 0x13);
-    if (p->b2b3) {
-        void (*f)(void) = SceneActorReaction_TickForwardBurst;
-        u32 k = 0x28;
-        u32 z;
-        u8 *a = &p->b2b2;
-        u32 *w;
-        s32 m;
-        z = 0;
-        *a = 1;
-        p->b2b0 = z;
-        p->b2b5 = k;
-        p->fn = f;
-        p->h2c8 = z;
-        w = &p->w114;
-        m = -2;
-        *w = m & *w;
-        p->w104 = z;
-    }
+    if (SceneActorControl_TakeFlag(&p->base.field2B2))
+        SceneActorAnimation_SelectDirectionalEntry(&p->base, 0x13);
+    if (p->base.restart)
+        SceneActorChase_SetControl(p, SceneActorReaction_TickForwardBurst, 0x28);
 }
 
 void Skeleton_TickDecayingLunge(struct ChaseActor *p, s32 tick_);
@@ -2915,24 +2778,11 @@ void SceneActorReaction_TickForwardBurst(struct ChaseActor *p_)
     jitter.y = 0;
     jitter.z = 0x52;
     SceneParticleBurst_CreateWithPause(&p->base.body.position, step, &jitter, 1, 2, 4);
-    if (p->base.restart) {
-        void (*f)(void) = Skeleton_TickDecayingLunge;
-        u32 k = 0x29;
-        u32 *w;
-        s32 m;
-        p->base.field2B2 = 1;
-        p->base.stepDone = 0;
-        p->base.controlKind = k;
-        p->base.target = f;
-        p->base.field2C8 = 0;
-        w = &p->base.pendingControlFlags;
-        m = -2;
-        *w = m & *w;
-        p->base.pendingControl = 0;
-    }
+    if (p->base.restart)
+        SceneActorChase_SetControl(p, Skeleton_TickDecayingLunge, 0x29);
 }
 
-void Skeleton_UpdateAlternateAttackRecovery(struct S *p);
+void Skeleton_UpdateAlternateAttackRecovery(struct ChaseActor *p);
 
 s32 Collider_Refresh(void *);
 
@@ -2998,45 +2848,16 @@ void Skeleton_TickDecayingLunge(struct ChaseActor *p, s32 tick_)
         SceneParticleBurst_CreateWithPause(&p->base.body.position, np, &jitter, 1, 2, 4);
     }
     Collider_Refresh(context + 0x678);
-    if (p->base.restart && context[0x6D1] == 0) {
-        void (*f)(void) = Skeleton_UpdateAlternateAttackRecovery;
-        u32 k = 0x2A;
-        u32 *w;
-        s32 m;
-        p->base.field2B2 = 1;
-        p->base.stepDone = 0;
-        p->base.controlKind = k;
-        p->base.target = f;
-        p->base.field2C8 = 0;
-        w = &p->base.pendingControlFlags;
-        m = -2;
-        *w = m & *w;
-        p->base.pendingControl = 0;
-    }
+    if (p->base.restart && context[0x6D1] == 0)
+        SceneActorChase_SetControl(p, Skeleton_UpdateAlternateAttackRecovery, 0x2A);
 }
 
-void Skeleton_UpdateAlternateAttackRecovery(struct S *p)
+void Skeleton_UpdateAlternateAttackRecovery(struct ChaseActor *p)
 {
-    if (SceneActorControl_TakeFlag(&p->b2b2))
-        SceneActorAnimation_SelectDirectionalEntry(p, 0x16);
-    if (p->b2b3) {
-        void (*f)(void) = SceneActorReaction_ApplyThreshold;
-        u32 k = 0x3e;
-        u32 z;
-        u8 *a = &p->b2b2;
-        u32 *w;
-        s32 m;
-        z = 0;
-        *a = 1;
-        p->b2b0 = z;
-        p->b2b5 = k;
-        p->fn = f;
-        p->h2c8 = z;
-        w = &p->w114;
-        m = -2;
-        *w = m & *w;
-        p->w104 = z;
-    }
+    if (SceneActorControl_TakeFlag(&p->base.field2B2))
+        SceneActorAnimation_SelectDirectionalEntry(&p->base, 0x16);
+    if (p->base.restart)
+        SceneActorChase_SetControl(p, SceneActorReaction_ApplyThreshold, 0x3E);
 }
 
 /* Tentative reaction name, based on the observed fields and calls. */
@@ -3053,53 +2874,21 @@ void SceneActorReaction_TickMultiHitAnimation(struct ChaseActor *p)
         Collider_Refresh(state + 0x678);
     if ((animation[10] == 4 || animation[10] == 7) && animation[6] == 0)
         Sound_PlaySong(0x3AA);
-    if (p->base.restart) {
-        void (*f)(void) = SceneActorReaction_ApplyThreshold;
-        u32 k = 0x3e;
-        u32 z;
-        u8 *a = &p->base.field2B2;
-        u32 *w;
-        s32 m;
-        z = 0;
-        *a = 1;
-        p->base.stepDone = z;
-        p->base.controlKind = k;
-        p->base.target = f;
-        p->base.field2C8 = z;
-        w = &p->base.pendingControlFlags;
-        m = -2;
-        *w = m & *w;
-        p->base.pendingControl = z;
-    }
+    if (p->base.restart)
+        SceneActorChase_SetControl(p, SceneActorReaction_ApplyThreshold, 0x3E);
 }
 
 void Skeleton_UpdateHomingBurst(struct ChaseActor *p, s32 tick);
 
-void Skeleton_BeginHomingBurst(struct S *p, s32 n)
+void Skeleton_BeginHomingBurst(struct ChaseActor *p, s32 n)
 {
-    if (SceneActorControl_TakeFlag(&p->b2b2))
-        SceneActorAnimation_SelectDirectionalEntry(p, 0x13);
-    if (n > 0x14 && p->b2b3) {
-        void (*f)(void) = Skeleton_UpdateHomingBurst;
-        u32 k = 0x2D;
-        u32 z;
-        u8 *a = &p->b2b2;
-        u32 *w;
-        s32 m;
-        z = 0;
-        *a = 1;
-        p->b2b0 = z;
-        p->b2b5 = k;
-        p->fn = f;
-        p->h2c8 = z;
-        w = &p->w114;
-        m = -2;
-        *w = m & *w;
-        p->w104 = z;
-    }
+    if (SceneActorControl_TakeFlag(&p->base.field2B2))
+        SceneActorAnimation_SelectDirectionalEntry(&p->base, 0x13);
+    if (n > 0x14 && p->base.restart)
+        SceneActorChase_SetControl(p, Skeleton_UpdateHomingBurst, 0x2D);
 }
 
-void Skeleton_UpdateHeavyAttackRecovery(struct S *p);
+void Skeleton_UpdateHeavyAttackRecovery(struct ChaseActor *p);
 
 void MovingSprite_Create(struct ContactPackedVector *, u32, u32, u32, u32, u32, s32);
 
@@ -3173,48 +2962,16 @@ void Skeleton_UpdateHomingBurst(struct ChaseActor *p, s32 tick)
         Sound_PlaySong(0x3A8);
     }
     SceneActorAnimation_SelectDirectionalEntry(&p->base, 0x14);
-    if (tick > 0x18) {
-        void (*f)(void) = Skeleton_UpdateHeavyAttackRecovery;
-        u32 k = 0x2E;
-        u32 z;
-        u8 *a = &p->base.field2B2;
-        u32 *w;
-        s32 m;
-        z = 0;
-        *a = 1;
-        p->base.stepDone = z;
-        p->base.controlKind = k;
-        p->base.target = f;
-        p->base.field2C8 = z;
-        w = &p->base.pendingControlFlags;
-        m = -2;
-        *w = m & *w;
-        p->base.pendingControl = z;
-    }
+    if (tick > 0x18)
+        SceneActorChase_SetControl(p, Skeleton_UpdateHeavyAttackRecovery, 0x2E);
 }
 
-void Skeleton_UpdateHeavyAttackRecovery(struct S *p)
+void Skeleton_UpdateHeavyAttackRecovery(struct ChaseActor *p)
 {
-    if (SceneActorControl_TakeFlag(&p->b2b2))
-        SceneActorAnimation_SelectDirectionalEntry(p, 0x15);
-    if (p->b2b3) {
-        void (*f)(void) = SceneActorReaction_ApplyThreshold;
-        u32 k = 0x3e;
-        u32 z;
-        u8 *a = &p->b2b2;
-        u32 *w;
-        s32 m;
-        z = 0;
-        *a = 1;
-        p->b2b0 = z;
-        p->b2b5 = k;
-        p->fn = f;
-        p->h2c8 = z;
-        w = &p->w114;
-        m = -2;
-        *w = m & *w;
-        p->w104 = z;
-    }
+    if (SceneActorControl_TakeFlag(&p->base.field2B2))
+        SceneActorAnimation_SelectDirectionalEntry(&p->base, 0x15);
+    if (p->base.restart)
+        SceneActorChase_SetControl(p, SceneActorReaction_ApplyThreshold, 0x3E);
 }
 
 u32 Route_GetCurrentPointFacing(void *);
@@ -3978,7 +3735,7 @@ static inline void Skeleton_Settle(struct ChaseActor *actor, struct SceneActorCh
         return;
     }
     if (SceneActorChase_QueryMotionFlagComponent(actor, 0x80)) {
-        SceneActorChase_SetActorFlags(actor, 0x80);
+        actor->base.behaviorFlags |= 0x80;
         SceneActorChase_SetFlagComponent((struct SceneActorChaseFlags16 *)&group->common.gate.flags,
                                          4);
         SceneActorChase_TrackPlayer(actor);
@@ -3993,7 +3750,7 @@ static inline void Skeleton_Settle(struct ChaseActor *actor, struct SceneActorCh
         SceneActorChase_SetState(actor, 0, 0, 12);
     } else {
         SceneActorChase_TrackPlayer(actor);
-        SceneActorChase_SetActorFlags(actor, 0x10);
+        actor->base.behaviorFlags |= 0x10;
         group->destination->pad = 0;
         if (!Skeleton_ArriveAfterRecovery(actor)) {
             context->pursuitTimer = 0;
