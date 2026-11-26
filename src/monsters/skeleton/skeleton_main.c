@@ -460,33 +460,8 @@ void SceneActorControl_BeginTimedBehavior56(struct ChaseActor *s,
             return;
     }
     {
-        void (*fn)(void) = Skeleton_UpdateHopToOpenCell;
-        u8 code = 0x38;
-        u32 zero;
-        u8 one;
-        u32 *flags;
-        u8 *taken;
-        u32 three;
-        taken = &s->base.field2B2;
-        zero = 0;
-        one = 1;
-        *taken = one;
-        s->base.stepDone = zero;
-        s->base.controlKind = code;
-        s->base.target = fn;
-        s->base.field2C8 = zero;
-        flags = &s->base.pendingControlFlags;
-        {
-            u32 mask = -2;
-            *flags &= mask;
-        }
-        s->base.pendingControl = zero;
-        three = 3;
-        s->base.state2A8 = three;
-        s->base.phase2A9 = 0;
-        s->base.behavior2AA = 0;
-        s->base.counter2AC = zero;
-        s->base.field2B1 = one;
+        SceneActorChase_SetControl(s, Skeleton_UpdateHopToOpenCell, 0x38);
+        SceneActorTerrain_EnterState(s, 3, 0, 0);
         {
             u16 *flags = &s->base.reactionFlags;
             u32 mask = 0xFFFFF636;
@@ -495,13 +470,7 @@ void SceneActorControl_BeginTimedBehavior56(struct ChaseActor *s,
     }
 }
 
-static inline u8 HasTargetFlag(struct SceneActorReactionMotion *s)
-{
-    u32 mask = 0x10;
-    if (s->flags & mask)
-        return 1;
-    return 0;
-}
+
 
 u8 SceneActorControl_CanTurnTowardTarget(struct ChaseActor *sIn)
 {
@@ -512,7 +481,7 @@ u8 SceneActorControl_CanTurnTowardTarget(struct ChaseActor *sIn)
         return 0;
     if (context->timer704)
         return 0;
-    if (!HasTargetFlag((void *)&s->chase.base.tracking.target))
+    if (!SceneActorChase_TrackingFlags(&s->chase.base.tracking, 0x10))
         return 0;
     {
         struct ContactPosition *v = &s->chase.base.secondaryMotion;
@@ -3257,9 +3226,7 @@ void SceneActorReaction_TickHiddenTimeout(struct ChaseActor *p, s32 elapsed)
 
 /* Skeleton_UpdateReactionTransition: plays the hurt entry or, after a long wait, restores the saved snapshot */
 
-struct SnapshotActor;
-
-void Actor_RestoreSnapshot(struct SnapshotActor *s);
+void Actor_RestoreSnapshot(struct ChaseActor *s);
 
 static inline u8 take(u8 *s)
 {
@@ -3296,83 +3263,6 @@ void Skeleton_UpdateReactionTransition(u8 *s, s32 arg)
 
 /* Re-enable the shadow, then restore the actor's live control fields from its saved snapshot (+0x118..) and reset its state; goes idle when flag 0x4000 is set (tentative) */
 
-typedef struct Ctx {
-    u8 pad0[0x62A];
-    u16 unk62A;
-    u8 pad62C[0x52];
-    u16 unk67E;
-} Ctx;
-
-typedef struct SnapshotActor {
-    u8 pad0[0xC];
-    u8 unkC[0x4D];
-    u8 unk59;
-    u8 pad5A[0x42];
-    u16 unk9C;
-    u8 pad9E[0x12];
-    s16 unkB0;
-    u8 padB2[0x2A];
-    u32 unkDC;
-    u8 padE0[0x24];
-    u32 unk104;
-    u8 pad108[0xC];
-    u32 unk114;
-    u32 unk118;
-    u32 unk11C;
-    u8 unk120;
-    u8 unk121;
-    u8 unk122;
-    u8 unk123;
-    u32 unk124;
-    u8 unk128;
-    u8 pad129[0x3];
-    u16 unk12C;
-    u16 unk12E;
-    u8 pad130[0xA];
-    u16 unk13A;
-    u8 pad13C[0x52];
-    u16 unk18E;
-    u8 pad190[0x8C];
-    void *unk21C;
-    u8 pad220[0x88];
-    u8 unk2A8;
-    u8 unk2A9;
-    u8 unk2AA;
-    u8 pad2AB[0x1];
-    u32 unk2AC;
-    u8 unk2B0;
-    u8 unk2B1;
-    u8 unk2B2;
-    u8 unk2B3;
-    u8 pad2B4[0x1];
-    u8 unk2B5;
-    u8 unk2B6;
-    u8 pad2B7[0x9];
-    u16 unk2C0;
-    u16 unk2C2;
-    u8 pad2C4[0x4];
-    u16 unk2C8;
-    u8 pad2CA[0x2];
-    u32 unk2CC;
-    u32 unk2D0;
-    u16 unk2D4;
-    u16 unk2D6;
-    u32 unk2D8;
-    u32 unk2DC;
-    u32 unk2E0;
-    u8 pad2E4[0x2];
-    u16 unk2E6;
-    u8 pad2E8[0x2];
-    u16 unk2EA;
-    u8 pad2EC[0x18];
-    u32 unk304;
-    u8 pad308[0x18];
-    u8 unk320[0xac];
-    u8 unk3CC;
-    u8 pad3CD[0x3];
-    Ctx *unk3D0;
-} Obj;
-
 void ActorShadow_Enable(void *);
 
 void SceneActorPalette_ClearCompletedTransitions(void);
@@ -3381,104 +3271,104 @@ void Skeleton_ResetRouteReaction(struct ChaseActor *actor);
 
 u32 Trigger_ConsumePending(void *receiver, u32 count);
 
-static inline u8 take_flag(Obj *s)
+static inline u8 take_flag(struct ChaseActor *s)
 {
-    if (s->unk2B2) {
-        s->unk2B2 = 0;
+    if (s->base.field2B2) {
+        s->base.field2B2 = 0;
         return 1;
     }
     return 0;
 }
 
-static inline u8 peek_flag(Obj *s)
+static inline u8 peek_flag(struct ChaseActor *s)
 {
-    return s->unk2B3;
+    return s->base.restart;
 }
 
-void Actor_RestoreSnapshot(struct SnapshotActor *s)
+void Actor_RestoreSnapshot(struct ChaseActor *s)
 {
-    Ctx *ctx = s->unk3D0;
+    struct Skeleton *ctx = s->base.context;
     s32 angle;
     s32 n;
     u8 saved;
     u32 keep;
     if (take_flag(s)) {
-        ActorShadow_Enable(s->unk320);
-        SceneActorAnimation_SelectDirectionalEntry(s, 13);
+        ActorShadow_Enable(s->base.shadow);
+        SceneActorAnimation_SelectDirectionalEntry(&s->base, 13);
         Sound_PlaySong(0x3AE);
     }
     if (!peek_flag(s))
         return;
-    s->unk13A &= ~4;
-    s->unk18E &= ~4;
-    ctx->unk62A &= ~4;
-    ctx->unk67E &= ~4;
+    s->base.colliderA.flags &= ~4;
+    s->base.colliderB.flags &= ~4;
+    ctx->bodyCollider.flags &= ~4;
+    ctx->attackCollider.flags &= ~4;
     {
-        u16 *f = &s->unk2D4;
+        u16 *f = &s->base.motionFlags;
         u32 mask = ~0x800;
         *f &= mask;
     }
-    angle = s->unk59; /* read as an int first: puts the flags pointer in r6 as in the ROM */
+    angle = s->base.body.direction; /* read as an int first: puts the flags pointer in r6 as in the ROM */
     saved = angle;
-    keep = (s->unk2D4 & 0x4000) ? 0x4000 : 0;
-    s->unk2CC = s->unk118;
-    s->unk2D0 = s->unk11C;
-    s->unk59 = s->unk120;
-    s->unk2A8 = s->unk121;
-    s->unk2A9 = s->unk122;
-    s->unk2AA = s->unk123;
-    s->unk21C = (void *)s->unk124;
-    s->unk2B5 = s->unk128;
-    s->unk2C0 = s->unk12E;
-    s->unk2EA = s->unk12C;
-    n = s->unkB0;
+    keep = (s->base.motionFlags & 0x4000) ? 0x4000 : 0;
+    s->base.behaviorFlags = s->base.saved.behaviorFlags;
+    s->base.statusFlags = s->base.saved.statusFlags;
+    s->base.body.direction = s->base.saved.direction;
+    s->base.state2A8 = s->base.saved.state;
+    s->base.phase2A9 = s->base.saved.phase;
+    s->base.behavior2AA = s->base.saved.behavior;
+    s->base.target = (void *)s->base.saved.control;
+    s->base.controlKind = s->base.saved.kind;
+    s->base.placementFlags = s->base.saved.motionFlags;
+    s->base.heightOffset = s->base.saved.heightOffset;
+    n = s->base.defaultHealth;
     if (n <= 0)
         n = 0;
-    s->unk9C = n;
-    s->unk2D6 = 0;
-    s->unk2D4 = 0;
-    s->unk2B0 = 0;
-    s->unk2B1 = 1;
-    s->unk2B2 = 1;
-    s->unk2B3 = 0;
-    s->unk304 = 0;
-    s->unk2B6 = 0;
-    s->unk2C2 = 64;
-    s->unk2D8 = 0;
-    s->unk2DC = 0;
-    s->unk2E0 = 0;
-    s->unk2E6 = 0;
-    s->unk3CC = 0;
-    s->unkDC = 0;
+    s->base.health = n;
+    s->base.reactionFlags = 0;
+    s->base.motionFlags = 0;
+    s->base.stepDone = 0;
+    s->base.field2B1 = 1;
+    s->base.field2B2 = 1;
+    s->base.restart = 0;
+    s->base.counter304 = 0;
+    s->base.reactionDirection = 0;
+    s->base.field2C2 = 64;
+    s->base.hitAttributes = 0;
+    s->base.hitReactionFlags = 0;
+    s->base.hitOwners = 0;
+    s->base.field2E6 = 0;
+    s->base.field3CC = 0;
+    s->base.tracking.target = 0;
     SceneActorPalette_ClearCompletedTransitions();
-    s->unk2D4 |= keep;
-    s->unk59 = saved;
+    s->base.motionFlags |= keep;
+    s->base.body.direction = saved;
     Skeleton_ResetRouteReaction(s);
     {
         u32 mask = 0x4000;
-        if (s->unk2D4 & mask) {
-            s->unk2A8 = 2;
-            s->unk2A9 = 0;
-            s->unk2AA = 2;
-            s->unk2AC = 0;
-            s->unk2B1 = 1;
+        if (s->base.motionFlags & mask) {
+            s->base.state2A8 = 2;
+            s->base.phase2A9 = 0;
+            s->base.behavior2AA = 2;
+            s->base.counter2AC = 0;
+            s->base.field2B1 = 1;
             {
                 long long mask1 = ~1;
                 void *control = SceneActorControl_OnIdle;
                 u32 kind = 16;
-                s->unk2B2 = 1;
-                s->unk2B0 = 0;
-                s->unk2B5 = kind;
-                s->unk21C = control;
-                s->unk2C8 = 0;
+                s->base.field2B2 = 1;
+                s->base.stepDone = 0;
+                s->base.controlKind = kind;
+                s->base.target = control;
+                s->base.field2C8 = 0;
                 {
-                    u32 *f = &s->unk114;
+                    u32 *f = &s->base.pendingControlFlags;
                     s32 m = mask1;
                     *f &= m;
                 }
-                s->unk104 = 0;
+                s->base.pendingControl = 0;
             }
-            Trigger_ConsumePending(s->unkC, 1);
+            Trigger_ConsumePending(s->base.receiver, 1);
         }
     }
 }
