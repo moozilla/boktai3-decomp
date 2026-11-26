@@ -1,22 +1,12 @@
-#include "global.h"
-struct TimedEffectConfig {
-    u16 flags;
-    u16 duration;
-};
-struct TimedEffect {
-    u32 tick;
-    u32 flags;
-    u8 unk08[16];
-    struct TimedEffectConfig config;
-};
-s32 TimedEffect_TestDuration(struct TimedEffect *effect)
+#include "effects/projectiles/projectile_task.h"
+s32 TimedEffect_TestDuration(struct Task4E01Projectile *effect)
 {
-    struct TimedEffectConfig *config = &effect->config;
-    if ((effect->tick & 1) + 1 == ((config->flags & 0xF00) >> 8)) {
+    struct Task4E01Params *config = &effect->params;
+    if ((effect->frame & 1) + 1 == ((config->flags & 0xF00) >> 8)) {
         u32 mask = 2;
         effect->flags |= mask;
     }
-    if (effect->tick >= config->duration)
+    if (effect->frame >= config->lifetime)
         return 2;
     return 0;
 }
