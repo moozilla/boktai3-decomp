@@ -285,6 +285,8 @@ def transform(path, raw, moves, includes):
 
     raw = INCLUDE.sub(include, raw)
     raw = HEADER_LITERAL.sub(literal, raw)
+    if "src/" not in raw and "include/" not in raw:
+        return raw
 
     def reference(match):
         old = Path(match["path"])

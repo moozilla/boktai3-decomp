@@ -85,6 +85,8 @@ def split_nonmatching(raw):
     branch kept) and a list of (draft_text, fallback_text) pairs. Draft C never
     counts as matched code; its #else branch must INCLUDE_ASM the function.
     """
+    if "NONMATCHING" not in raw:
+        return raw, []
     out, drafts = [], []
     lines = raw.split("\n")
     i = 0
