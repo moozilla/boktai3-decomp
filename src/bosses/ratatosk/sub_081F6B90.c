@@ -1,4 +1,4 @@
-#include "scene/collision/contact_position.h"
+#include "bosses/ratatosk/ratatosk.h"
 #include "engine/video/render.h"
 
 struct Vec {
@@ -38,14 +38,6 @@ void Ratatosk_PlayAttachmentEffect(void *, s32, s32, s32, s32, s32);
 void Ratatosk_FireTrackingShot(void *, void *, s32);
 void SceneActors_FireTrackingProjectileSpread(void *, void *, s32);
 
-static inline void setState(struct Actor *q, u32 state, u32 zero, u32 kind)
-{
-    q->state = state;
-    q->phase = zero;
-    q->active = kind;
-    q->stateCounter = zero;
-    q->commandPending = 1;
-}
 struct Extension {
     u8 pad0[0xe50];
     u16 anchorLift;
@@ -117,61 +109,61 @@ void Ratatosk_DispatchSceneCommands(u8 *p)
             SceneMessages_SetPendingTrigger(entry, message);
             switch (((u8 *)message)[6]) {
                 case 0:
-                    setState(q, 2, 0, 0);
+                    Ratatosk_StartAction((struct Ratatosk *)q, 2, 0, 0);
                     break;
                 case 1:
                     q->savedAngle = (((u8 *)message)[8] + 5) << 5;
-                    setState(q, 2, 0, 1);
+                    Ratatosk_StartAction((struct Ratatosk *)q, 2, 0, 1);
                     break;
                 case 3:
                     q->savedAngle = (((u8 *)message)[8] + 5) << 5;
-                    setState(q, 2, 0, 2);
+                    Ratatosk_StartAction((struct Ratatosk *)q, 2, 0, 2);
                     break;
                 case 4:
                     q->savedAngle = (((u8 *)message)[8] + 5) << 5;
-                    setState(q, 2, 0, 3);
+                    Ratatosk_StartAction((struct Ratatosk *)q, 2, 0, 3);
                     break;
                 case 10:
-                    setState(q, 2, 0, 5);
+                    Ratatosk_StartAction((struct Ratatosk *)q, 2, 0, 5);
                     break;
                 case 11:
-                    setState(q, 2, 0, 6);
+                    Ratatosk_StartAction((struct Ratatosk *)q, 2, 0, 6);
                     break;
                 case 12:
                     ((struct Extension *)p)->destination.x = message[4];
                     ((struct Extension *)p)->destination.y = message[5];
                     ((struct Extension *)p)->destination.z = message[6];
-                    setState(q, 2, 0, 4);
+                    Ratatosk_StartAction((struct Ratatosk *)q, 2, 0, 4);
                     break;
                 case 19:
-                    setState(q, 2, 0, 7);
+                    Ratatosk_StartAction((struct Ratatosk *)q, 2, 0, 7);
                     break;
                 case 37:
                     ((struct Extension *)p)->paletteToggle = 0;
-                    setState(q, 2, 0, 9);
+                    Ratatosk_StartAction((struct Ratatosk *)q, 2, 0, 9);
                     break;
                 case 38:
-                    setState(q, 2, 0, 8);
+                    Ratatosk_StartAction((struct Ratatosk *)q, 2, 0, 8);
                     break;
                 case 39:
                     ((struct Extension *)p)->paletteToggle = 1;
-                    setState(q, 2, 0, 9);
+                    Ratatosk_StartAction((struct Ratatosk *)q, 2, 0, 9);
                     break;
                 case 40:
-                    setState(q, 2, 0, 10);
+                    Ratatosk_StartAction((struct Ratatosk *)q, 2, 0, 10);
                     break;
                 case 41:
                     ((struct Extension *)p)->stateParam = message[4];
-                    setState(q, 2, 0, 11);
+                    Ratatosk_StartAction((struct Ratatosk *)q, 2, 0, 11);
                     break;
                 case 42:
-                    setState(q, 2, 0, 12);
+                    Ratatosk_StartAction((struct Ratatosk *)q, 2, 0, 12);
                     break;
                 case 43:
                     if (message[4] == 0)
-                        setState(q, 2, 0, 13);
+                        Ratatosk_StartAction((struct Ratatosk *)q, 2, 0, 13);
                     else
-                        setState(q, 2, 0, 14);
+                        Ratatosk_StartAction((struct Ratatosk *)q, 2, 0, 14);
                     break;
                 case 15: {
                     s32 paletteValue;
@@ -224,22 +216,22 @@ void Ratatosk_DispatchSceneCommands(u8 *p)
                     break;
                 case 5:
                     q->savedAngle = (((u8 *)message)[8] + 5) << 5;
-                    setState(q, 2, 0, 22);
+                    Ratatosk_StartAction((struct Ratatosk *)q, 2, 0, 22);
                     break;
                 case 7:
-                    setState(q, 2, 0, 16);
+                    Ratatosk_StartAction((struct Ratatosk *)q, 2, 0, 16);
                     break;
                 case 8:
-                    setState(q, 2, 0, 17);
+                    Ratatosk_StartAction((struct Ratatosk *)q, 2, 0, 17);
                     break;
                 case 44:
-                    setState(q, 2, 0, 18);
+                    Ratatosk_StartAction((struct Ratatosk *)q, 2, 0, 18);
                     break;
                 case 45:
-                    setState(q, 2, 0, 20);
+                    Ratatosk_StartAction((struct Ratatosk *)q, 2, 0, 20);
                     break;
                 case 46:
-                    setState(q, 2, 0, 19);
+                    Ratatosk_StartAction((struct Ratatosk *)q, 2, 0, 19);
                     break;
                 case 47:
                     position.x = q->position.x;
@@ -262,7 +254,7 @@ void Ratatosk_DispatchSceneCommands(u8 *p)
                     Trigger_ConsumePending(&q->entry, 1);
                     break;
                 case 50:
-                    setState(q, 2, 0, 21);
+                    Ratatosk_StartAction((struct Ratatosk *)q, 2, 0, 21);
                     break;
             }
             PaletteEffect_RefreshPalette(p);
