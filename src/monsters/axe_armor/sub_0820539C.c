@@ -111,7 +111,7 @@ s32 AxeArmor_InitializeFromScript(struct AxeArmor *p, void *parent)
     struct SpawnOffsets offsets = gUnk_0824FE5C;
     void *resource;
     void **slot;
-    void *sprite;
+    struct DisplaySequenceSprite *sprite;
     s16 *position;
     s16 *zp;
     s32 dead;
@@ -190,7 +190,7 @@ s32 AxeArmor_InitializeFromScript(struct AxeArmor *p, void *parent)
     p->parent = parent;
     {
         struct ContactSwarmGraphics *graphics = &p->graphics;
-        void *earlySprite;
+        struct DisplaySequenceSprite *earlySprite;
         s16 *x;
         s16 *z;
         s8 *h;
