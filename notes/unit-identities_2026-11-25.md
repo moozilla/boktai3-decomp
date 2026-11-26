@@ -435,9 +435,9 @@ in the control segment. Use `player/damage` for both files.
 The ordinary Warp Leaf from stock 0032 triggers motion 7 before returning
 to the world map. Its probe file in `build/identify/replays/warp-leaf-departure/`
 separates that path from the motion 27 fade. The native tile trigger calls
-`Player_BeginDirectionalCue`, which can start mode 27 with a separate
-`PlayerCue_UpdateDeparture` callback. The exact 08144F40 update still has a
-controlled capture only.
+`Player_BeginDirectionalCue` and starts motion 27 through the separate
+`PlayerCue_UpdateDeparture` callback in the input-only trapdoor replay
+below. The exact 08144F40 update still has a controlled capture only.
 
 Five late files go in `player/link_actions`. `Player_AccumulateActionCharge`
 (0823C02C) gets its charge from the link-session update paths. The other
@@ -977,6 +977,23 @@ idle handler enters the countdown at frame 1841. The slot starts
 the press animation at frame 1852 and runs contact effects at 1858.
 `trap.png` shows the active tile. The earlier renderer trace provides
 the matching A945 screen pieces.
+
+An input-only replay from the same 0013 room state reaches the trap
+without a position write. In 3161, hold RIGHT for 38 frames and
+DOWN+RIGHT for 15. At frame 1892, 2FA5 slot zero at 0200E064 runs
+`TileTrigger_ApplyContactEffects`, calls
+`Player_BeginDirectionalCue` 08158F04 and enters motion 27 through
+`PlayerCue_BeginMode27` 0815B404. The ordinary scene updates then run
+`PlayerCue_UpdateDeparture` 0815093C from frame 1893 through 1927.
+`resume4-floor-cue/cue05.png` shows Django falling as the room fades.
+`back.png` shows the landing scene 3154. The motion-number match
+connects the two departure implementations. The table-dispatched
+08144F40 has zero hits in this replay.
+
+```sh
+run=build/identify/replays/resume4-floor-cue
+nice -n 19 tools/emu/harness baserom.gba "$run/commands.txt" "$run"
+```
 
 Warp 0014 to the Count rematch, scene 6401, entrance 47, story 55.
 `resume-count-curtain` logs native creation of the 5734 Bat Curtain
