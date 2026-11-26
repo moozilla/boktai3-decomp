@@ -828,11 +828,18 @@ exports.fight = function* (opts = {}) {
       if (opts.trace) opts.trace({ trance: changed, target: target.addr });
       if (changed) continue;
     }
-    if (target.boss === 'Hresvelgr' && !pr.solarAttempt && exports.solarTranceReady()) {
-      pr.solarAttempt = true;
-      const changed = yield* exports.enterSolarTrance();
-      if (opts.trace) opts.trace({ trance: changed, tranceForm: 'solar', target: target.addr });
-      if (changed) continue;
+    if (target.boss === 'Hresvelgr') {
+      const flight = yield* exports.waitForHresvelgr(target);
+      if (flight) {
+        if (opts.trace) opts.trace({ flight, boss: target.boss, ...exports.where() });
+        continue;
+      }
+      if (!pr.solarAttempt && exports.solarTranceReady()) {
+        pr.solarAttempt = true;
+        const changed = yield* exports.enterSolarTrance();
+        if (opts.trace) opts.trace({ trance: changed, tranceForm: 'solar', target: target.addr });
+        if (changed) continue;
+      }
     }
     if (target.boss === 'Hresvelgr' && !pr.triedFreeGun && !transformed &&
         (weapon.energy < (frame?.cost ?? 3) || steps - pr.since >= 8)) {
@@ -871,6 +878,8 @@ exports.fight = function* (opts = {}) {
     const wait = exports.combatWait(target);
     if (solarTrance || target.boss || wait) tactics.push([[0, wait || 18]]);
     const root = S.snapshot(), hp0 = hpSum(), life0 = life();
+    const trinityHits = target.boss === 'Hresvelgr' ? exports.hresvelgrTrinityHits : null;
+    const hits0 = trinityHits?.();
     // The session clock rewinds immediately when a speculative branch is restored.
     const decisionFrame = S.frame;
     const searchTactics = function* (choices, throughFuse = false) {
@@ -888,7 +897,8 @@ exports.fight = function* (opts = {}) {
         const dealt = target.barrier ? 20 * (target.health - (e?.health ?? 0)) : hp0 - hpSum();
         const lost = life0 - life();
         const spent = Math.max(0, weapon.energy - exports.weapon().energy);
-        const score = dealt - (opts.lifeCost ?? 3) * lost - spent / 8 - dist / 400 - (life() > 0 ? 0 : 10000);
+        const trinityCost = trinityHits ? exports.hresvelgrTrinityCost(hits0, trinityHits(), target.health) : 0;
+        const score = dealt - (opts.lifeCost ?? 3) * lost - trinityCost - spent / 8 - dist / 400 - (life() > 0 ? 0 : 10000);
         if (!best || score > best.score) best = { score, t, mid };
       }
       return best;
@@ -908,6 +918,7 @@ exports.fight = function* (opts = {}) {
       const guard = enemies.reduce((sum, enemy) => sum + (enemy.guard ?? 0), 0);
       const { scene, life, x, y, z } = exports.where();
       opts.trace({ fight: steps, hp, guard, scene, life, x, y, z, form: p.actionMode, enemies: enemies.length,
+        ...(trinityHits ? { trinityHits: trinityHits() } : {}),
         ...(solarTrance ? { energy: p.currentStatB, bombs: p.unk4EF?.[0], solar: exports.solarStatus() } : {}) });
     }
   }

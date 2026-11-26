@@ -346,9 +346,42 @@ test('Hresvelgr is tracked by the live boss pointer and its own contact state', 
     at: () => actor, fn: { AreaEffect_IsPositionCovered: (position) => Number(position === addr + 0x54) } };
   const { hresvelgrTargets } = skill('hresvelgr', g);
   assert.deepEqual(hresvelgrTargets(), [{ addr, boss: 'Hresvelgr', health: 730, alive: true,
-    x: 640, y: 512, z: 1920, hitLock: 17, solarReactive: true }]);
+    x: 640, y: 512, z: 1920, hitLock: 17, solarReactive: true, collisionDisabled: false }]);
+  actor.flags = 0xc;
+  assert.equal(hresvelgrTargets()[0].collisionDisabled, true);
   actor.flags = 2;
   assert.deepEqual(hresvelgrTargets(), []);
+});
+
+test('Hresvelgr tactics account for the script limit on hits to Trinity', () => {
+  const base = 0x02002000;
+  const g = { types: { globals: { gScriptLocalVariables: { addr: 0x02000700 } } },
+    u32: (address) => address === 0x02000700 ? base : 0,
+    u8: (address) => address === base + 0x89 ? 2 : 0 };
+  const { hresvelgrTrinityHits, hresvelgrTrinityCost } = skill('hresvelgr', g);
+  const hits = hresvelgrTrinityHits();
+  assert.equal(hits, 2);
+  assert.equal(hresvelgrTrinityCost(hits, 2, 1200), 0);
+  assert.equal(hresvelgrTrinityCost(hits, 3, 1200), 400);
+  assert.equal(hresvelgrTrinityCost(4, 5, 1200), 10000);
+});
+
+test('Hresvelgr flight waits rewind when a captive takes a hit', () => {
+  const boss = { position: { y: 4000 } };
+  const g = { at: () => boss, until: (stop, frames) => ({ stop, frames }) };
+  const session = { frame: 100, snapshot: () => session.frame, restore: (frame) => { session.frame = frame; } };
+  let hits = 1;
+  const lib = skill('hresvelgr', g, {}, { session, where: () => ({ scene: 1, life: 487, y: 512 }), message: () => ({}) });
+  lib.hresvelgrTrinityHits = () => hits;
+  const wait = lib.waitForHresvelgr({ addr: 8, y: boss.position.y });
+  const { stop, frames } = wait.next().value;
+  assert.equal(stop(), false);
+  assert.equal(frames, 120);
+  hits++;
+  session.frame += 54;
+  assert.equal(stop(), true);
+  assert.deepEqual(wait.next(), { value: null, done: true });
+  assert.equal(session.frame, 100);
 });
 
 test('Solar Trance activates ability one and waits for form two', () => {

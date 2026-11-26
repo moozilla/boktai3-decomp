@@ -85,7 +85,7 @@ const event = (what) => {
   console.log(JSON.stringify(e));
   if (e.skill === 'entry' || e.skill === 'room' || e.skill === 'goal')
     writeMovie('checkpoint.json', { scene: e.scene, x: e.x, y: e.y, z: e.z });
-  if (e.skill === 'fight' && (e.dialogue !== undefined || e.trance || e.fight !== undefined))
+  if (e.skill === 'fight' && (e.dialogue !== undefined || e.trance || e.flight || e.fight !== undefined))
     writeMovie('checkpoint.json', s.g.lib.where());
   if ((e.skill === 'purification' && e.phase !== undefined) || (e.skill === 'drive' && e.steps !== undefined))
     writeMovie('checkpoint.json', s.g.lib.where());
