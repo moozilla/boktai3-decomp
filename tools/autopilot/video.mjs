@@ -65,7 +65,9 @@ const describe = (e) => {
     case 'entry': return `scene ${e.scene}, story ${e.story}`;
     case 'room': return `room ${e.scene}: doors ${(e.doors || []).join(' ')}`;
     case 'navigate': return `door ${e.box}: ${e.reason}`;
-    case 'coffin': return e.grabbed ? `carry coffin through ${e.box}` : null;
+    case 'coffin':
+      if (e.reached) return `carried coffin through ${e.box}`;
+      return e.reason === 'lost grip' ? 'lost grip - return to the coffin' : null;
     case 'key': return `find key ${e.item} in scene ${e.toward}`;
     case 'unlock': return e.done ? `opened ${e.box} with key ${e.item}` : null;
     case 'interact': return `open ${e.item || 'object'}`;

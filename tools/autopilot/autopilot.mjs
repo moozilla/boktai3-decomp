@@ -434,14 +434,16 @@ function* throughDoor(g, L, box) {
   const scene = L.where().scene, tried = new Set();
   const avoid = stageOf(scene).doors.map((d) => d.box).filter((b) => b !== box);
   if (L.coffinAvailable()) {
-    yield* untilControl(g, L, () => !g.fn.ScriptUtility_IsControlFlagSet(), 30, 2400);
-    if (L.where().scene !== scene) return true;
-    if (L.coffinAvailable() && g.$.gPlayers[0]) {
+    for (let attempt = 0; attempt < 3 && L.coffinAvailable(); attempt++) {
+      yield* untilControl(g, L, () => !g.fn.ScriptUtility_IsControlFlagSet(), 30, 2400);
+      if (L.where().scene !== scene) return true;
+      if (!L.coffinAvailable() || !g.$.gPlayers[0]) break;
       const r = yield* L.carryCoffin(box, { avoid, trace: (e) => event({ skill: 'nav', ...e }) });
-      event({ skill: 'coffin', box, ...r });
+      event({ skill: 'coffin', box, ...L.where(), ...r });
       if (r.reached || L.where().scene !== scene) return true;
-      if (L.coffinAvailable()) return false;
+      if (r.reason !== 'lost grip') break;
     }
+    if (L.coffinAvailable()) return false;
   }
   const lock = L.closedLock(LOCKS[scene] || [], box);
   if (lock && L.hasItem(lock.item)) {

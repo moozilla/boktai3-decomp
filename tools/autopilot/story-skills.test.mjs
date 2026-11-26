@@ -219,7 +219,9 @@ test('combat waits while a story script controls the player', () => {
 
 test('coffin navigation holds A until the exit text opens', () => {
   const player = { $addr: 0x02010000, tetherMode: 0 };
-  const g = { keys: 0, keyMask: () => 1, fn: { Player_TestNearbyInteraction: () => true },
+  const g = { keys: 0, keyMask: () => 1, fn: {
+    Player_TestNearbyInteraction: () => true, ScriptUtility_IsControlFlagSet: () => false,
+  },
     press: (key, frames) => ({ key, frames }) };
   const game = { gPlayers: [player], gTetherActor: { interactionScriptId: 841, position: { x: 128, z: 128 } } };
   const lib = skill('coffin', g, game, {
@@ -227,8 +229,12 @@ test('coffin navigation holds A until the exit text opens', () => {
     navigate: function* (target, opts) {
       assert.equal(target, 'CD22');
       assert.equal(g.keys, 1);
+      assert.equal(opts.stopIf(), false);
+      player.tetherMode = 1;
+      assert.equal(opts.stopIf(), true);
       opts.beforeText();
       assert.equal(g.keys, 0);
+      assert.ok(!opts.stopIf());
       return { reached: true };
     },
   });

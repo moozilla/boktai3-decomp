@@ -31,9 +31,14 @@ exports.carryCoffin = function* (door, opts) {
     }
   }
   const keys = g.keys;
+  let reading = false;
+  const lostGrip = () => !reading && !attached() && !g.fn.ScriptUtility_IsControlFlagSet();
   g.keys = keys | g.keyMask('a');
   try {
-    const route = yield* exports.navigate(door, { ...opts, beforeText: () => { g.keys = keys; } });
+    const route = yield* exports.navigate(door, { ...opts,
+      stopIf: () => lostGrip() || opts.stopIf?.(),
+      beforeText: () => { reading = true; g.keys = keys; } });
+    if (!route.reached && lostGrip()) return { grabbed: true, ...route, reason: 'lost grip' };
     return { grabbed: true, ...route };
   } finally {
     g.keys = keys;
