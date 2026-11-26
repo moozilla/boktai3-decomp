@@ -59,12 +59,7 @@ void Mummy_OnAttackCollision(u8 *unused, struct ContactCollider *obj, u8 *input)
         }
         base->base.tracking.target =
             SceneActorContacts_FindObjectById(*(u16 *)&base->base.counter304);
-        {
-            u32 value = obj->responseFlags;
-            u32 mask = 1;
-            mask |= value;
-            obj->responseFlags = mask;
-        }
+        obj->responseFlags |= 1;
         if ((!(*((u16 *)Mummy_ResponseAddress(
                 (u32) & ((struct ChaseActor *)0)->base.colliderA.responseValue, base)))) &&
             SceneActorChase_Bits32(&((struct Player *)obj->owner)->statusFlags, 0x200)) {
@@ -97,21 +92,12 @@ void Mummy_OnBodyCollision(void *source, void *destination, void *actor)
 
 void Mummy_FireAcceleratingVolley(struct ChaseActor *);
 
-static inline u8 TakeFlag(u8 *flag)
-{
-    if (*flag) {
-        *flag = 0;
-        return 1;
-    }
-    return 0;
-}
-
 void SceneActor_UpdateAnimationCheckpoint(struct ChaseActor *actor)
 {
     struct Mummy *state = actor->base.context;
     struct SceneActorControlMotionDrawable *drawable = actor->base.drawable;
     struct DisplaySequenceState *sequence = &drawable->sequence;
-    if (TakeFlag(&actor->base.field2B2)) {
+    if (SceneActorReaction_TakePrepared(actor)) {
         u32 mask;
         SceneActorAnimation_SelectDirectionalEntry((void *)actor, 5);
         mask = 0x100;
@@ -141,7 +127,7 @@ void SceneActor_UpdateDirectionalAnimation(struct ChaseActor *actor)
     struct SceneActorBody *body = &actor->base.body;
     struct SceneActorControlMotionDrawable *drawable = actor->base.drawable;
     struct DisplaySequenceState *sequence = &drawable->sequence;
-    if (TakeFlag(&actor->base.field2B2)) {
+    if (SceneActorReaction_TakePrepared(actor)) {
         u32 mask;
         Actor_InitLaunchVelocity(actor);
         body->direction = Math_Atan2(actor->base.secondaryMotion.x, actor->base.secondaryMotion.z);
