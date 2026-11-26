@@ -16,10 +16,7 @@ void ArmorActor_UpdateFixedSpeedMotion(struct SceneCombatActor *p)
         *s = 0xFF;
         p->actionReady = 1;
         p->flags |= 2;
-        ActorController_ClearColliderFlags(&p->colliderGroup.colliders[2], 4);
-        ActorController_ClearColliderFlags(&p->colliderGroup.colliders[1], 4);
-        ActorController_ClearColliderFlags(&p->colliderGroup.colliders[3], 4);
-        ActorController_SetColliderFlags(&p->colliderGroup.colliders[0], 4);
+        ActorController_SelectDefenseColliders(p);
         ActorController_ClearMotionFlags(&p->colliderGroup.motion, 1);
         *(u16 *)(s - 14) &= ~0x20;
     }
