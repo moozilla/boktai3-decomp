@@ -386,7 +386,7 @@ one mark per motion. The command script is
 | 9 | 08143604 draws the full-body gold energy effect | `player/special_actions` |
 | 13, 14 | 08147CF0 and 08147FB8 play the red spiral and transition to a form cue | `player/cues` |
 | 16, 17 | 08144408 and 08144624 run the special burst callbacks. The 16 image shows the blue effect | `player/special_actions` |
-| 21 | 08144D64 runs the attachment and position-reset pose, with 08144D60 as its exit callback | `player/cues` |
+| 21 | 08144D64 runs the incapacitated pose after a Plasma Cannon shot, with 08144D60 as its exit callback | `player/damage` |
 | 27 | 08144F40 fades the screen and removes the actor in the departure pose | `player/cues` |
 
 0814692C is the alternate motion table's mode 9. 081481E4, 08148B64,
@@ -395,6 +395,29 @@ tables, so they go with the cues. Those assignments use dispatch and
 source evidence. The ordinary gun and sword actions both take motion 3,
 and none of the controlled motion captures establishes a regular input
 sequence for the other modes.
+
+### Plasma Cannon contact and the timed reaction
+
+Load 0060 with `scene=5875 entrance=7 story=166`. The cannon's native update
+reports the position (3456, 512, 2688) and faces increasing Z. The control
+waits at the room entrance. Place only Django at (3456, 512, 2944) so he is
+in its firing lane. Use 16-bit `poke` commands at 0200B3A4, 0200B3A6 and
+0200B3A8 in the setup savestate. The command file and all register snapshots
+are in `build/identify/replays/plasma-contact/`.
+
+`OrangeSpine_FireProjectile` runs at frame 1880. The projectile hits at
+1885 and `PlayerContact_ApplyResponse` calls `Player_RequestTimedReset`
+with a duration of 70. Motion 21 starts at 1900, and `Player_UpdateChargeMotion`
+begins at 1901. `status.png` shows stars circling Django. The contact segment
+also runs the exit function `Player_OnChargeMotionExit`. Neither entry runs
+in the control segment. Use `player/damage` for both files.
+
+The ordinary Warp Leaf from stock 0032 triggers motion 7 before returning
+to the world map. Its probe file in `build/identify/replays/warp-leaf-departure/`
+separates that path from the motion 27 fade. The native tile trigger calls
+`Player_BeginDirectionalCue`, which can start mode 27 with a separate
+`PlayerCue_UpdateDeparture` callback. The exact 08144F40 update still has a
+controlled capture only.
 
 Five late files go in `player/link_actions`. `Player_AccumulateActionCharge`
 (0823C02C) gets its charge from the link-session update paths. The other
