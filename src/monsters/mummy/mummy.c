@@ -6,6 +6,7 @@
 #include "scene/motion/scene_actor_chase_reaction.h"
 #include "scene/actor/scene_actor_reaction.h"
 #include "scene/motion/scene_actor_turn.h"
+#include "scene/motion/scene_actor_route.h"
 #include "engine/video/display_sequence.h"
 #include "scene/motion/scene_actor_chase.h"
 #include "scene/motion/scene_actor_chase_shared.h"
@@ -32,7 +33,7 @@ static inline u32 Mummy_ResponseAddress(u32 k_, void *base)
 void Mummy_OnAttackCollision(u8 *unused, struct ContactCollider *obj, u8 *input)
 {
     struct ChaseActor *base = (void *)input;
-    struct Mummy *state = ((struct ChaseActor *)input)->base.context;
+    struct Mummy *state = base->base.context;
     u16 responseCost;
     u16 contactFlags;
     u32 rawKind;
@@ -57,8 +58,7 @@ void Mummy_OnAttackCollision(u8 *unused, struct ContactCollider *obj, u8 *input)
             SceneActorChase_ClearWordFlags(&((struct ChaseActor *)input)->base.statusFlags,
                                            ROOM_ACTOR_STATUS_INTERACTING);
         }
-        base->base.tracking.target =
-            SceneActorContacts_FindObjectById(*(u16 *)&base->base.counter304);
+        base->base.tracking.target = SceneActorContacts_FindObjectById((u16)base->base.counter304);
         obj->responseFlags |= 1;
         if ((!(*((u16 *)Mummy_ResponseAddress(
                 (u32) & ((struct ChaseActor *)0)->base.colliderA.responseValue, base)))) &&
@@ -95,11 +95,11 @@ void Mummy_FireAcceleratingVolley(struct ChaseActor *);
 void SceneActor_UpdateAnimationCheckpoint(struct ChaseActor *actor)
 {
     struct Mummy *state = actor->base.context;
-    struct SceneActorControlMotionDrawable *drawable = actor->base.drawable;
+    struct SceneActorAnimationSequenceDrawable *drawable = actor->base.drawable;
     struct DisplaySequenceState *sequence = &drawable->sequence;
     if (SceneActorReaction_TakePrepared(actor)) {
         u32 mask;
-        SceneActorAnimation_SelectDirectionalEntry((void *)actor, 5);
+        SceneActorAnimation_SelectDirectionalEntry(&actor->base, 5);
         mask = 0x100;
         actor->base.motionFlags |= mask;
     }
@@ -125,13 +125,13 @@ s32 Math_Atan2(s32, s32);
 void SceneActor_UpdateDirectionalAnimation(struct ChaseActor *actor)
 {
     struct SceneActorBody *body = &actor->base.body;
-    struct SceneActorControlMotionDrawable *drawable = actor->base.drawable;
+    struct SceneActorAnimationSequenceDrawable *drawable = actor->base.drawable;
     struct DisplaySequenceState *sequence = &drawable->sequence;
     if (SceneActorReaction_TakePrepared(actor)) {
         u32 mask;
         Actor_InitLaunchVelocity(actor);
         body->direction = Math_Atan2(actor->base.secondaryMotion.x, actor->base.secondaryMotion.z);
-        SceneActorAnimation_SelectDirectionalEntry((void *)actor, 5);
+        SceneActorAnimation_SelectDirectionalEntry(&actor->base, 5);
         mask = 0x100;
         actor->base.motionFlags |= mask;
     }
@@ -145,7 +145,7 @@ void SceneActor_UpdateDirectionalAnimation(struct ChaseActor *actor)
         mask &= *flags;
         *flags = mask;
         actor->base.stepDone = 1;
-        SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0);
+        SceneActorAnimation_SelectDirectionalEntry(&actor->base, 0);
     } else {
         SceneActorChase_SetActorFlags(actor, 0x2000);
     }
@@ -169,7 +169,7 @@ void Mummy_UpdateIdle(struct ChaseActor *actor)
     SceneActorAnimation_SelectDirectionalEntry(&actor->base, 0);
 }
 
-u32 Route_GetCurrentPointFacing(void *);
+u32 Route_GetCurrentPointFacing(struct SceneActorRouteCursor *cursor);
 
 /* Turn toward the route-facing octant, then restore the waiting controller. */
 
@@ -198,11 +198,11 @@ void Mummy_TurnTowardRoute(struct ChaseActor *a)
         if (direction == (target >> 1)) {
             a->base.stepDone = 1;
             if (SceneActorTurn_Flags(motionFlags, 0x400)) {
-                SceneActorAnimation_SelectDirectionalEntry((void *)a, 0);
+                SceneActorAnimation_SelectDirectionalEntry(&a->base, 0);
                 SceneActorChase_SetState(a, 3, 1, 0);
                 SceneActorChase_SetControl(a, group->turnControl, 0x1B);
             } else {
-                SceneActorAnimation_SelectDirectionalEntry((void *)a, 0);
+                SceneActorAnimation_SelectDirectionalEntry(&a->base, 0);
             }
             return;
         }
@@ -268,7 +268,7 @@ void Mummy_TurnTowardRoute(struct ChaseActor *a)
         if (delta <= 0) {
             a->base.stepDone = 1;
             a->base.body.direction = (SceneActorTurn_Cardinal(a->base.body.direction) << 6) - 0x40;
-            SceneActorAnimation_SelectDirectionalEntry((void *)a, 0);
+            SceneActorAnimation_SelectDirectionalEntry(&a->base, 0);
             if (SceneActorTurn_Flags(motionFlags, 0x400)) {
                 SceneActorChase_SetState(a, 3, 1, 0);
                 SceneActorChase_SetControl(a, group->turnControl, 0x1B);
@@ -294,7 +294,6 @@ static inline void StoreHalf(struct ChaseActor *a, u32 v)
 void Mummy_UpdateRecoveryWait(struct ChaseActor *a)
 {
     struct SceneActorChaseGroup *group = &a->group;
-    u16 *speed;
     if (SceneActorReaction_TakePrepared(a)) {
         SceneActorAttachment_ReplaceResponseSlot(a, 0, 127, 0);
         SceneActorAttachment_ReplaceResponseSlot(a, 1, 127, 0);
@@ -303,7 +302,6 @@ void Mummy_UpdateRecoveryWait(struct ChaseActor *a)
     }
     SceneActorAnimation_SelectDirectionalEntry((void *)a, 1);
     a->base.field2C2 = Div(64, 6);
-    speed = &a->base.field2C2;
     if (!group->field5C4) {
         a->base.stepDone = 1;
         SceneActorAnimation_SelectDirectionalEntry((void *)a, 6);
@@ -317,6 +315,6 @@ void Mummy_UpdateRecoveryWait(struct ChaseActor *a)
             *p &= mask;
         }
         SceneActorChase_SetActorFlags(a, 16);
-        *speed = 64;
+        a->base.field2C2 = 64;
     }
 }
