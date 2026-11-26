@@ -3,7 +3,7 @@
 // current skill and goal along the bottom, the planned route as dots.
 //
 //   node tools/autopilot/video.mjs RUN_DIR/movie.json OUT.mp4 [--logs DIR,DIR...] [--seconds 60]
-//        [--clips A-B:S,C-D:T,...]
+//        [--clips A-B:S,C-D:T,...] [--label TEXT] [--trail]
 //
 // The movie is replayed on the port with the PPU on; every Nth frame (N chosen so
 // the run fits --seconds at 30 fps) is piped as raw RGB into ffmpeg, so no frame
@@ -21,6 +21,7 @@ const args = process.argv.slice(2);
 const opt = (n, d) => { const i = args.indexOf(n); return i < 0 ? d : args[i + 1]; };
 const moviePath = args[0], outPath = args[1];
 const run = JSON.parse(fs.readFileSync(moviePath, 'utf8'));
+const label = opt('--label', ''), showTrail = args.includes('--trail');
 const logDirs = opt('--logs', path.dirname(moviePath)).split(',');
 const events = logDirs.flatMap((d) => { try { return JSON.parse(fs.readFileSync(path.join(d, 'log.json'), 'utf8')); } catch { return []; } })
   .sort((a, b) => a.frame - b.frame);
@@ -69,6 +70,11 @@ const describe = (e) => {
     case 'collect': return e.done ? 'picked up an item' : null;
     case 'heal': return `heal: life ${e.from} > ${e.to}`;
     case 'talk': return 'talk';
+    case 'fight':
+      if (e.threshold !== undefined) return `sunlight: threshold ${e.threshold}, guard ${e.guard}`;
+      if (e.equip) return e.equip.gun ? 'equip the solar gun' : 'equip a sword';
+      if (e.hp !== undefined) return `fight: targets ${e.enemies}, health ${e.hp}`;
+      return null;
     case 'fought': return `fight ${e.won ? 'won' : 'left'} life ${e.life}`;
     case 'nav':
       if (e.push) return `push crate ${e.push.x},${e.push.z}`;
@@ -81,11 +87,16 @@ const describe = (e) => {
   }
 };
 
-const ff = spawn('ffmpeg', ['-y', '-loglevel', 'error', '-f', 'rawvideo', '-pix_fmt', 'rgb24', '-s', '240x160', '-r', String(fps), '-i', '-',
-  '-vf', 'scale=720:480:flags=neighbor', '-c:v', 'libx264', '-pix_fmt', 'yuv420p', '-crf', '20', outPath], { stdio: ['pipe', 'inherit', 'inherit'] });
+const ff = spawn('ffmpeg', ['-y', '-loglevel', 'error', '-filter_threads', '1', '-f', 'rawvideo', '-pix_fmt', 'rgb24', '-s', '240x160', '-r', String(fps), '-i', '-',
+  '-vf', 'scale=720:480:flags=neighbor', '-c:v', 'libx264', '-threads', '1', '-pix_fmt', 'yuv420p', '-crf', '20', outPath], { stdio: ['pipe', 'inherit', 'inherit'] });
+const encoded = new Promise((resolve, reject) => {
+  ff.once('error', reject);
+  ff.once('close', (code) => code === 0 ? resolve() : reject(new Error(`ffmpeg exited with status ${code}`)));
+});
 const s = await openSession({ save: run.save || undefined, solarLog: run.solar, render: true, print: () => {}, lib: [path.join(ROOT, 'port/agent/lib')] });
 const end = Math.min(run.movie.length, Math.max(...clips.map((c) => c.b)));
 let ei = 0, caption = 'power on', route = null, routeScene = null;
+let trail = [], trailScene;
 const pending = [];
 s.run(function* (g) {
   for (let n = 0; n < end; n++) {
@@ -107,14 +118,25 @@ s.run(function* (g) {
       px[3 * i] = (r << 3) | (r >> 2); px[3 * i + 1] = (gg << 3) | (gg >> 2); px[3 * i + 2] = (b << 3) | (b >> 2);
     }
     const p = g.$.gPlayers[0];
-    if (route && p && g.lib.where().scene === routeScene) {
-      for (const [cx, cz] of route) {
+    if (p) {
+      const scene = g.lib.where().scene;
+      if (showTrail) {
+        if (scene !== trailScene) { trail = []; trailScene = scene; }
+        const cx = p.position.x >> 8, cz = p.position.z >> 8;
+        if (trail.at(-1)?.[0] !== cx || trail.at(-1)?.[1] !== cz) {
+          trail.push([cx, cz]);
+          if (trail.length > 12) trail.shift();
+        }
+      }
+      const overlay = route && scene === routeScene ? route : trail;
+      for (const [cx, cz] of overlay) {
         const q = g.lib.project(cx * 256 + 128, p.position.y, cz * 256 + 128);
         for (const [dx, dy] of [[0, 0], [1, 0], [0, 1], [1, 1]]) dot(px, q.x + dx, q.y + dy, [255, 230, 40]);
       }
     }
     for (let y = 151; y < 160; y++) for (let x = 0; x < 240; x++) dot(px, x, y, [0, 0, 0]);
     text(px, 2, 153, caption.slice(0, 58), [255, 255, 255]);
+    if (label) text(px, 2, 2, label.slice(0, 45), [255, 255, 160]);
     text(px, 200, 2, `F${n}`, [255, 255, 160]);
     pending.push(px);
     if (pending.length >= 16) { ff.stdin.write(Buffer.concat(pending)); pending.length = 0; }
@@ -122,5 +144,5 @@ s.run(function* (g) {
   if (pending.length) ff.stdin.write(Buffer.concat(pending));
 });
 ff.stdin.end();
-await new Promise((res) => ff.on('close', res));
+await encoded;
 console.log(`${outPath}: ${Math.round(written / fps)} s, ${clips.map((c) => `${c.a}-${c.b} every ${c.step}`).join(', ')}`);
