@@ -184,8 +184,29 @@ Status transition calls `Hud_InitStatusMenu` (0817565C),
 The four equipment and valuables pages call the 0816B3C0–0816B66C navigation
 routines, including `SceneInput_NavigateGridKeys`. Move the catalog to
 `src/ui/pause/status_options.c` and the broader sequence unit to
-`src/ui/pause/menu_sequences`. The latter also has account/retry animations
-at 0816AE38–0816B390, and the grid navigation range begins at 0816B3C0.
+`src/ui/pause/menu_sequences`. The Dark Card runs the first half of the
+same unit at 0816AE38–0816B390. Grid navigation begins at 0816B3C0.
+
+### Dark Card Replay and loan services
+
+Stock 0032/4217 already has the Dark Card. Press START, R for Valuables, A
+to enter the grid, Right to the card in slot 1, and A twice to select and
+use it. `PauseMenu_ApplyItemSlot` dispatches item 39, which has action kind
+9 in ROM table 08E61280. That kind calls `PauseMenu_RequestRecoveryRefresh`
+(0816D3E8), followed by `Hud_BeginRetryPanel` (0816B390) and
+`ScenePanel_UpdateAccountIntro` (0816AF5C). The original screen shows
+Doomy with Replay (やり直し) and Dark Loans (暗黒ローン). Text #5163–5171
+describes both services.
+
+In the Replay branch, A opens the 400 Soll confirmation, and Left, A
+accepts it. `SelectionMenu_ApplyConfirmedReward`, `ScenePanel_BeginAccountExit`
+and `SceneSequence_CallCompletionScript` execute before the game returns
+to the room. In the other branch, Down, A selects Dark Loans and calls
+`DarkLoan_OpenDisplay`, which opens the loan screen. See `options.png` and
+`loan-offer.png` in `build/identify/replays/dark-card-services/`, and
+`confirm.png`, `thanks.png`, and `room.png` in
+`build/identify/replays/dark-card-replay/`. Each directory has its original
+`commands.txt` and named `probes.tsv`.
 
 ## Magic Cannon, Dark Generator, and Muspell Head
 
@@ -412,6 +433,6 @@ The compact index has all 83 stock checkpoint captures, with focused
 branches under `build/identify/replays/` and `targets/`. Function-entry
 coverage for a mark is a lower bound on the callbacks the scene can reach.
 The isolated E534 test establishes the bat assets and the launch behavior.
-The natural story placement, the account/retry part of the mixed menu
-sequence unit, and the usual controls for the forced Player motions remain
-open. Their records distinguish those limitations from the witnessed scenes.
+The flock's natural story placement and the usual controls for the forced
+Player motions remain open. Their records distinguish those limitations
+from the witnessed scenes.
