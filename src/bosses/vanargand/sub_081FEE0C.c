@@ -25,7 +25,7 @@ struct Pool {
 };
 void sub_081FEDE8(struct Pool *, struct Entry *, s32);
 s32 sub_08249240(struct Entry *, s32, u32);
-s32 SpriteParticle_UpdateManager(struct Pool *pool)
+s32 VanargandParticle_UpdateManager(struct Pool *pool)
 {
     struct Entry *base = pool->e, *cursor;
     s32 i;

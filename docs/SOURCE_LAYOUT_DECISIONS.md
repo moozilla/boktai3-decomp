@@ -187,6 +187,33 @@ actions inside the motions range use `PileTrap_` symbols. The scenery
 files use their confirmed names under `objects/dungeon_prop/`, and the
 Status page stays in `ui/pause/status/`.
 
+## Pass 5 identity corrections
+
+The title emblem runs four units at ROM addresses 081EAB64 through
+081EB724. They and `text_entry_widget.h` belong to `ui/title/`.
+The supplied range ends before the constructor at 081EB7DC.
+The Bat Curtain owns its debris, and the Strike Crystal has its own file
+under `objects/`. Sabata’s White Forest encounter drives the frost emitter.
+The actor palette fade runs during Repair and belongs with palette effects.
+
+Identity correction row 27 traces the flying sprite to `PlayerCue_Shoot` in
+a cutscene. Its unit at 082373C8 stays in
+`src/player/effects/spiral_trail/moving_glyph.c`. Moving it into the cutscene
+directory would introduce a separate ROM range there. The unit stays intact
+within the reviewed Player range map.
+
+The function prefixes follow each defining unit and its callers. Loot
+deposit, moving platform, sliding door, Vanargand, and Hresvelgr helpers
+owned by their units adopt those names. Shared SceneActors services keep
+their names. Vanargand also calls the two shared Debug position helpers.
+The static Coffin Bike helper initializes its braking animation and names
+that action independently of the public stopping callback.
+
+The filename plan records twenty explicit basenames. Four names beyond the
+Sabata, rider, Pile Driver, Nidhoggr effect-pool, and animated sprite units
+describe the main Nidhoggr duel, its minions, its orbs, and its bursts.
+The tilemap units keep their two reviewed descriptive names.
+
 ## Counts
 
 | | Baseline (pass 2 + corrections) | Pass 3 |

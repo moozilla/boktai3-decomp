@@ -1,5 +1,5 @@
 #include "ui/town/shop_control.h"
-s32 Shop_FindActionDestination(struct SceneInventoryControlView *panel)
+s32 Shop_FindActionDestination(struct ShopControlView *panel)
 {
     switch (panel->category) {
         case 0:

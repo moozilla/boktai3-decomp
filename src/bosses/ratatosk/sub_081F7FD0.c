@@ -52,7 +52,6 @@ static inline void ClearVector(struct SceneVec *vector, u32 *zero)
     CpuSet(zero, vector, 0x05000002);
 }
 // confidence=low: draws the player into a midpoint orbit before releasing movement.
-#define Ratatosk_UpdatePlayerOrbitAttack sub_081F7FD0
 inline static void sum_081F7FD0(struct SceneVec *d, struct SceneVec *a, struct SceneVec *b)
 {
     d->x = b->x + a->x;

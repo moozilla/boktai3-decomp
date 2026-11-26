@@ -59,8 +59,8 @@ s32 RouteSpritePool_Destroy(struct RouteSpritePool *);
 s32 RouteSpritePool_Initialize(struct RouteSpritePool *);
 struct RouteSpritePool *RouteSpritePool_Create(void);
 void RouteSpriteActor_RunEventScript(struct RouteSpriteActor *);
-void sub_0806CFFC(struct RouteSpritePool *, struct RouteSpriteActor *);
-u8 sub_0806E308(void);
+void RouteSpriteActor_TickInactive(struct RouteSpritePool *, struct RouteSpriteActor *);
+u8 RouteSpritePool_IsFull(void);
 void ScaledShadow_Destroy(void *);
 void RouteSpriteActor_Create(struct ContactPosition *, void *, s32, s32, s32, u32, u32, u32, u32,
                              u32, void *, s32);

@@ -2,7 +2,7 @@
 u8 *ResourceRegistry_GetResource(int);
 int Script_SeekToKeyword(int);
 int Script_GetValue(void);
-void SlidingDoor_BeginLowering(void);
+void SlidingDoors_BeginLowering(void);
 int SlidingDoors_ScriptDeactivate(void)
 {
     u8 *p = ResourceRegistry_GetResource(0x85e6);
@@ -20,7 +20,7 @@ int SlidingDoors_ScriptDeactivate(void)
                 *(int *)(s + 0x64) = Script_GetValue();
             if (s[0x37] == 0 || s[0x37] == 2) {
                 s[0x37] = 3;
-                *(void **)(s + 0x30) = SlidingDoor_BeginLowering;
+                *(void **)(s + 0x30) = SlidingDoors_BeginLowering;
             }
             found = 1;
         }

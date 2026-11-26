@@ -1,5 +1,5 @@
 #include "ui/town/shop_control.h"
-u32 Shop_UpdateMixedCatalogCategory(struct SceneInventoryControlView *panel)
+u32 Shop_UpdateMixedCatalogCategory(struct ShopControlView *panel)
 {
     u32 destination = 0;
     if (panel->catalogMode == 3) {

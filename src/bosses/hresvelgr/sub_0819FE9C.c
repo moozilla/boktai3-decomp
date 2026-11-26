@@ -41,7 +41,7 @@ void Player_BeginPositionRequest(void *, void *, u32, u32, u32, u32, u32, u32, u
 void Player_ApplyPositionRequest(void *, void *, u32, u32, u32, u32, s32, u32);
 void Hresvelgr_SelectPlayerAnimation(void *, u32);
 void Hresvelgr_SetAnimation(void *, void *, void *, u32, u32, u32);
-void *MotionEntry_CreateWithDelta(void *, void *, u32, u32);
+void *HresvelgrMotion_CreateWithDelta(void *, void *, u32, u32);
 s32 Math_ApproachEighth(s32, s32);
 void Camera_RequestShake(u32);
 u8 *TerrainModifiers_FindCellOverride(s32, s32);
@@ -205,7 +205,7 @@ void Hresvelgr_UpdatePlayerRelease(struct Hresvelgr *actor, u32 tick)
                 actor->velocity = saved->step;
                 saved->step.y--;
                 if (tick & 1)
-                    MotionEntry_CreateWithDelta(&saved->renderPosition, &delta,
+                    HresvelgrMotion_CreateWithDelta(&saved->renderPosition, &delta,
                                                 ((s32)ParticleRandom_ReadSample(table) >> 5) % 4,
                                                 64);
                 actor->velocity.x =
@@ -233,7 +233,7 @@ void Hresvelgr_UpdatePlayerRelease(struct Hresvelgr *actor, u32 tick)
                 s32 z = ((s32)ParticleRandom_ReadDirectSample(table) >> 3) & 31;
                 SetVector(&delta, x - 16, 0, z - 16);
                 if (tick & 1)
-                    MotionEntry_CreateWithDelta(&saved->renderPosition, &delta,
+                    HresvelgrMotion_CreateWithDelta(&saved->renderPosition, &delta,
                                                 ((s32)ParticleRandom_ReadSample(table) >> 5) % 4,
                                                 64);
                 actor->velocity = saved->step;

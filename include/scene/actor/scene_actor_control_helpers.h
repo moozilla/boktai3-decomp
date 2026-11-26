@@ -18,5 +18,5 @@ static inline u8 SceneActorControl_TestFlags(u32 flags, u32 mask)
 }
 void SceneActorControl_SetCollisionResponse(struct ChaseActor *);
 void SceneActorControl_RestartPositionCurve(struct ChaseActor *);
-void sub_08083F5C(struct ChaseActor *);
+void SceneActorControl_ReflectTerrainProbe(struct ChaseActor *);
 #endif

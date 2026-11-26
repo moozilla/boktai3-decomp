@@ -1,6 +1,6 @@
 #include "global.h"
 #include "ui/widgets/scene_input_navigation.h"
-struct SceneInventoryCategoryMenu {
+struct StorageCategoryMenu {
     u8 unknown0[0x258];
     struct AnimSprite prompt;
     u8 unknown2B8[0x1458 - 0x2B8];
@@ -18,14 +18,14 @@ struct SceneInventoryCategoryMenu {
     u8 unknown1790[0x38];
     u16 colors[16];
 };
-void Storage_SetInteractionMode(struct SceneInventoryCategoryMenu *, u8);
+void Storage_SetInteractionMode(struct StorageCategoryMenu *, u8);
 void Sound_PlaySong(u32);
-void Storage_SetCategoryPalette(struct SceneInventoryCategoryMenu *, u16 *);
-void Storage_BeginCategoryMode(struct SceneInventoryCategoryMenu *, u32);
+void Storage_SetCategoryPalette(struct StorageCategoryMenu *, u16 *);
+void Storage_BeginCategoryMode(struct StorageCategoryMenu *, u32);
 u32 SceneInput_NavigateGrid(struct SceneInputGridView *);
-void Storage_RefreshCategoryWidgets(struct SceneInventoryCategoryMenu *);
+void Storage_RefreshCategoryWidgets(struct StorageCategoryMenu *);
 void Storage_UpdateCursorPosition(struct SceneInputGridView *, void *);
-void Storage_UpdateModeSelection(struct SceneInventoryCategoryMenu *p)
+void Storage_UpdateModeSelection(struct StorageCategoryMenu *p)
 {
     Storage_SetInteractionMode(p, 1);
     if (gPadState[1] & 1) {

@@ -18,7 +18,7 @@ s32 SceneActorRegistry_CountLivingByCategory(s32);
 u32 SceneActorRegistry_TestCategoryFlags(s32, u32);
 void SceneActorPalette_BeginTransition(u32, u32, u32, s32, u32);
 u32 SceneActorPalette_ApplyTransition(struct SceneActorRegistryManager *, struct ChaseActor *);
-u32 sub_08072124(void);
+u32 SceneActorPalette_IsTransitionComplete(void);
 void SceneActorPalette_ClearCompletedTransitions(void);
-void sub_08072204(struct ChaseActor *);
+void SceneActorPalette_BindActiveTransition(struct ChaseActor *);
 #endif

@@ -19,7 +19,7 @@ struct ActorGroupRemovalPool {
     u32 active;
 };
 void LootDeposit_EmitRemovalDebris(struct ActorGroupMember *);
-void ProximityActor_SetState(struct ActorGroupMember *, s32);
+void LootDepositFeedback_SetState(struct ActorGroupMember *, s32);
 void ScaledShadow_Destroy(void *);
 void LootDeposit_CallMemberScript(struct ActorGroupMember *);
 void Sound_PlaySong(u32);
@@ -32,7 +32,7 @@ void LootDeposit_UpdateMemberRemoval(struct ActorGroupRemovalPool *group,
         LootDeposit_EmitRemovalDebris(member);
         if (member->value147 - member->value146 >= 0)
             Sound_PlaySong(0x3C7);
-        ProximityActor_SetState(member, member->value147 - member->value146);
+        LootDepositFeedback_SetState(member, member->value147 - member->value146);
         if (member->markerId != -1) {
             ScaledShadow_Destroy(member->marker);
             member->markerId = -1;

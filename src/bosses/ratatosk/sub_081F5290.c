@@ -29,7 +29,6 @@ static inline void polar(struct ContactPosition *v, s32 angle, s32 radius)
 void Ratatosk_UpdateDirectionalAnimation(void);
 void Ratatosk_UpdateDefeatSequence(void);
 // confidence=low: recovers from knockback, choosing defeat when health is depleted.
-#define Ratatosk_UpdateKnockbackRecovery sub_081F5290
 void Ratatosk_UpdateKnockbackRecovery(struct Ratatosk *p, s32 tick)
 {
     struct RatatoskParticleConfig params;
@@ -118,7 +117,7 @@ void Ratatosk_UpdateKnockbackRecovery(struct Ratatosk *p, s32 tick)
             Ratatosk_InitAnimatedParticleParams(&params);
             Ratatosk_ConfigureAnimatedParticle(&params, (randomA() & 31) + 52, speed, angle, 1,
                                                variant, drift);
-            sub_081FC26C(&params, &spawn);
+            Ratatosk_SpawnAnimatedParticle(&params, &spawn);
         }
         {
             Ratatosk_SetFlags(p, 1);

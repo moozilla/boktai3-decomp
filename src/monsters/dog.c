@@ -2170,7 +2170,7 @@ void Dog_UpdateDelayedPursuit(struct ChaseActor *actor)
     SceneActorControl_TakeStateEntry(actor);
     if ((u8)Callback_InvokeActor(actor, actor->base.contactQuery.opaque))
         return;
-    if ((u8)sub_0812F3CC(actor))
+    if ((u8)SceneActorReaction_BeginContactResponse(actor))
         return;
     if ((s32)actor->base.counter2AC <= 60)
         goto waiting;
@@ -2318,7 +2318,7 @@ void Dog_SetSecondaryBehaviorPreset(struct ChaseActor *actor)
 
 void Dog_UpdateAnimationFourteenReaction(struct ChaseActor *actor);
 
-u8 sub_0812F3CC(struct ChaseActor *);
+u8 SceneActorReaction_BeginContactResponse(struct ChaseActor *);
 
 void Dog_ChasePlayer(struct ChaseActor *actor)
 {
@@ -2329,7 +2329,7 @@ void Dog_ChasePlayer(struct ChaseActor *actor)
         Chase_SetCtl(actor, Dog_UpdateAnimationFourteenReaction, 0x28);
     if ((u8)Callback_InvokeActor(actor, actor->base.contactQuery.opaque))
         return;
-    if (sub_0812F3CC(actor))
+    if (SceneActorReaction_BeginContactResponse(actor))
         return;
     {
         struct DisplaySequenceState *anim;
@@ -2391,7 +2391,7 @@ void Dog_ResumeRoute(struct ChaseActor *a)
         Chase_SetCtl(a, Dog_UpdateArrivalAnimation, 10);
     if ((u8)Callback_InvokeActor(a, a->base.contactQuery.opaque))
         return;
-    if (sub_0812F3CC(a))
+    if (SceneActorReaction_BeginContactResponse(a))
         return;
     if (a->base.stepDone) {
         if (!Chase_TryRoute(a, group->route, &a->base.body.position, &context->leapTarget)) {
@@ -2535,7 +2535,7 @@ void Dog_BeginDelayedRouteRecovery(struct ChaseActor *actor)
     }
     if ((u8)Callback_InvokeActor(actor, actor->base.contactQuery.opaque))
         return;
-    if ((u8)sub_0812F3CC(actor))
+    if ((u8)SceneActorReaction_BeginContactResponse(actor))
         return;
     if ((s32)actor->base.counter2AC <= 20)
         goto waiting;
@@ -2606,7 +2606,7 @@ void Dog_UpdateProbeApproach(struct ChaseActor *actor)
         if ((u8)Callback_InvokeActor(actor, actor->base.contactQuery.opaque)) {
             return;
         }
-        if (sub_0812F3CC(actor)) {
+        if (SceneActorReaction_BeginContactResponse(actor)) {
             return;
         }
     }
@@ -2624,7 +2624,7 @@ void Dog_UpdateActionPhase(struct ChaseActor *p)
     if (Dog_IsActionTimerExpired(p)) {
         if ((u8)Callback_InvokeActor(p, p->base.contactQuery.opaque))
             return;
-        if (sub_0812F3CC(p))
+        if (SceneActorReaction_BeginContactResponse(p))
             return;
     }
     if (p->base.stepDone)
@@ -2655,7 +2655,7 @@ void SceneActorControl_UpdateEntryRecoveryPhase_080E55AC(struct ChaseActor *acto
     if (Dog_IsActionTimerExpired(actor)) {
         if ((u8)Callback_InvokeActor(actor, actor->base.contactQuery.opaque))
             return;
-        if (sub_0812F3CC(actor))
+        if (SceneActorReaction_BeginContactResponse(actor))
             return;
     }
     if (actor->base.stepDone) {

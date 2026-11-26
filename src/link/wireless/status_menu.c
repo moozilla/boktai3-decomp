@@ -65,7 +65,7 @@ void WirelessStatusMenu_UpdateDisconnectState(struct WirelessStatusMenu *menu)
         Sound_FadeOutChannel10(1);
         WirelessStatusMenu_InitDisplay(menu);
         WirelessStatusMenu_LoadStatusBackground(menu, 2);
-        menu->widget.flags &= ~1;
+        menu->animSprite.flags &= ~1;
         menu->window = TextWindow_Create(1, 14, 28, 6);
         if (menu->window >= 0) {
             TextWindow_SetScript(menu->window, menu->messageTable);
@@ -93,7 +93,7 @@ void WirelessStatusMenu_UpdateDismissibleMessageState(struct WirelessStatusMenu 
         WirelessStatusMenu_InitDisplay(menu);
         Wireless_RequestDisconnectMode();
         WirelessStatusMenu_LoadStatusBackground(menu, 2);
-        menu->widget.flags &= ~1;
+        menu->animSprite.flags &= ~1;
         menu->window = TextWindow_Create(1, 14, 28, 6);
         if (menu->window >= 0) {
             TextWindow_SetScript(menu->window, menu->messageTable);
@@ -144,7 +144,7 @@ int WirelessStatusMenu_Destroy(struct WirelessStatusMenu *menu)
     TextWindow_Destroy(menu->window);
     Bg_ClearTilemap(0);
     Bg_ClearTilemap(2);
-    Anim_Remove(&menu->widget);
+    Anim_Remove(&menu->animSprite);
     gLinkMenu = NULL;
     return 0;
 }
@@ -167,7 +167,7 @@ int WirelessStatusMenu_InitFromScript(struct WirelessStatusMenu *menu)
     blob = &menu->resource;
     ResourceHeader_Relocate(blob, resource);
     {
-        void *drawable = &menu->widget;
+        void *drawable = &menu->animSprite;
         AnimSprite_InitLinked(drawable, blob, 3, 0x2011, 0, 0, 60, 0);
     }
     menu->completionProcedure = Script_GetKeywordValue('r', 0);

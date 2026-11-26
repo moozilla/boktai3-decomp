@@ -1,5 +1,5 @@
-#ifndef GUARD_SCENE_PANEL_COMMANDS_H
-#define GUARD_SCENE_PANEL_COMMANDS_H
+#ifndef GUARD_PILE_DRIVER_COMMANDS_H
+#define GUARD_PILE_DRIVER_COMMANDS_H
 #include "objects/pile_driver/pile_driver_orchestration.h"
 
 struct PileDriverCommandGlobals {

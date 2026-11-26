@@ -37,7 +37,7 @@ typedef struct {
 
 void SceneActorGraphics_InitBodyNoOp(void);
 
-void sub_08021F4C(u8 *, u8 *, u8 *);
+void SceneActorGraphics_OnDamageContact(u8 *, u8 *, u8 *);
 
 /* Raw offsets throughout: routing any of this through struct StateActor /
  * SceneActorGraphics changes register allocation enough to break the match
@@ -487,7 +487,7 @@ static inline u8 enter_08023E24(State_08023E24 *p)
     return 0;
 }
 
-void sub_08022EA4(u8 *, struct SnapVector *);
+void SceneActorState_SnapReactionPosition(u8 *, struct SnapVector *);
 
 typedef struct State_08023EC0 {
     u8 pad0[0x90];
@@ -524,7 +524,7 @@ static inline u8 enter_08023EC0(State_08023EC0 *p)
     return 0;
 }
 
-void sub_08022DBC(u8 *);
+void SceneActorState_SelectReactionPhase(u8 *);
 
 typedef struct State_08023F34 {
     u8 pad0[0x90];

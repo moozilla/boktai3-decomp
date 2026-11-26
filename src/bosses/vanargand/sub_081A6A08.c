@@ -1,7 +1,6 @@
 #include "global.h"
 
 // confidence=low: compares projected horizontal positions within a fixed margin.
-#define Vanargand_TestProjectedHorizontalRange sub_081A6A08
 
 struct VanargandProjectionSource {
     u8 pad0[0x54];

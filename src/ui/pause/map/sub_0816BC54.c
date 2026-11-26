@@ -1,7 +1,6 @@
 #include "ui/pause/scene_hud_display.h"
 
 // Refresh the four map navigation arrows and record their destination pages.
-#define MapMenu_RefreshNavigationArrows sub_0816BC54
 u32 GameState_GetMapRevealFlag(u32);
 void MapMenu_RefreshNavigationArrows(struct SceneHudState *menu)
 {

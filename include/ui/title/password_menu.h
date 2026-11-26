@@ -28,7 +28,7 @@ struct PasswordMenu {
 };
 struct PasswordDisplay {
     struct Task task;
-    struct AnimSprite widget;
+    struct AnimSprite animSprite;
     struct AnimSpriteResource resource;
     s16 state, frame;
     void *background;

@@ -142,7 +142,6 @@ static inline void RestartState(u8 *item, u32 state, u32 zero)
 
 // confidence=low: per-frame update of one occupied scene-pool actor slot: state dispatch, motion integration,
 // spatial-index placement, proximity/damage effects and marker visibility.
-#define ScenePool_UpdateOccupiedActor sub_0803C114
 void ScenePool_UpdateOccupiedActor(u8 *pool, u8 *slot, u8 *item, u32 index)
 {
     struct WirelessSceneActor *actor = (struct WirelessSceneActor *)slot;

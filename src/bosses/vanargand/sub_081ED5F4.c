@@ -17,10 +17,10 @@ void ActorDisplay_UpdateScreenAnchor(void *);
 void ActorDisplay_UpdateForegroundSprite(void *);
 void ActorDisplay_UpdateAccentSprite(void *);
 void ActorMotion_AdvanceTowardScreenTarget(void *, s32);
-void SceneActors_EmitPeriodicParticles(void *, void *);
+void VanargandHead_EmitPeriodicParticles(void *, void *);
 extern const u16 gUnk_086141BC[];
-// confidence=low: called by SceneActors_EnterMovementState.
-void SceneActors_UpdateMovingDisplay(u8 *input, void *particles)
+// confidence=low: called by VanargandHead_EnterMovementState.
+void VanargandHead_UpdateMovingDisplay(u8 *input, void *particles)
 {
     u8 *p = input;
     void *savedParticles;
@@ -58,5 +58,5 @@ void SceneActors_UpdateMovingDisplay(u8 *input, void *particles)
     ActorDisplay_UpdateScreenAnchor(p);
     ActorDisplay_UpdateForegroundSprite(p);
     ActorDisplay_UpdateAccentSprite(p);
-    SceneActors_EmitPeriodicParticles(p, savedParticles);
+    VanargandHead_EmitPeriodicParticles(p, savedParticles);
 }

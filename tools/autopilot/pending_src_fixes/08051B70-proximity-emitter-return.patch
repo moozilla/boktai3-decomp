@@ -4,8 +4,8 @@ On the diagonal branch r0 retains the tether position
 
 The explicit form changed the ROM bytes. The guarded form passed the unit ROM check.
 
---- a/src/fn/sub_08051B70.c
-+++ b/src/fn/sub_08051B70.c
+--- a/src/effects/particles/tether_rings/sub_08051B70.c
++++ b/src/effects/particles/tether_rings/sub_08051B70.c
 @@ -33,3 +33,6 @@
          }
      }

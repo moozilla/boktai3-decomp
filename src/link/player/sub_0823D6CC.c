@@ -8,16 +8,16 @@ struct P0814A4B0 {
     u8 f3A5[0x4B6 - 0x3A5];
     s16 f4B6;
 };
-u8 sub_0823C4B4(void *);
-void sub_08238238(void *);
+u8 Player_GetLinkedSmoothedDirection(void *);
+void Player_UpdateActionFacingSide(void *);
 
 s32 Player_UpdateFacingFromInputHistory(struct P0814A4B0 *p)
 {
     s32 r = 0;
     if (p->f34C != -1 && p->f4B6 == 0) {
-        p->f3A4 = sub_0823C4B4(p);
+        p->f3A4 = Player_GetLinkedSmoothedDirection(p);
         r = 1;
     }
-    sub_08238238(p);
+    Player_UpdateActionFacingSide(p);
     return r;
 }

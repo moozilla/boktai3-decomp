@@ -1,5 +1,5 @@
 #include "ui/town/shop_control.h"
-void Shop_ConfirmEquipmentAction(struct SceneInventoryControlView *s)
+void Shop_ConfirmEquipmentAction(struct ShopControlView *s)
 {
     switch (s->mode) {
         case 4:

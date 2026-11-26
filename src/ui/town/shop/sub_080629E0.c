@@ -6,18 +6,18 @@ void SceneInput_PositionCursor(struct SceneInputGridView *, struct AnimSprite *)
 void SceneHud_HideFourDigits(struct SceneInputPanel *);
 void SceneInputPanel_TickHighlight(struct SceneInputHighlight *);
 void SceneInputPanel_SetMeterGlyph(struct SceneInputPanel *, u32, u32);
-void Shop_PopulateEquipmentGrid(struct SceneInventoryPanel *);
-void Shop_PopulateItemGrid(struct SceneInventoryPanel *);
-void Shop_PopulateConsumableGrid(struct SceneInventoryPanel *);
-struct SceneInventoryActionView;
-void Shop_RefreshEquipmentValue(struct SceneInventoryActionView *);
-void Shop_RefreshItemValue(struct SceneInventoryActionView *);
-void Shop_RefreshConsumableValue(struct SceneInventoryActionView *);
-void sub_0805F904(struct SceneInventoryTail *);
-void Shop_ShowItemDescription(struct SceneInventoryPanel *);
-void Shop_ShowConsumableDescription(struct SceneInventoryPanel *);
-void Shop_ClearDescription(struct SceneInventoryTail *);
-void Shop_UpdateDisplay(struct SceneInventoryTail *p)
+void Shop_PopulateEquipmentGrid(struct ShopPanel *);
+void Shop_PopulateItemGrid(struct ShopPanel *);
+void Shop_PopulateConsumableGrid(struct ShopPanel *);
+struct ShopActionView;
+void Shop_RefreshEquipmentValue(struct ShopActionView *);
+void Shop_RefreshItemValue(struct ShopActionView *);
+void Shop_RefreshConsumableValue(struct ShopActionView *);
+void sub_0805F904(struct ShopTail *);
+void Shop_ShowItemDescription(struct ShopPanel *);
+void Shop_ShowConsumableDescription(struct ShopPanel *);
+void Shop_ClearDescription(struct ShopTail *);
+void Shop_UpdateDisplay(struct ShopTail *p)
 {
     u32 bits = p->interactionFlags & 3;
     if (bits == 1) {
@@ -48,13 +48,13 @@ void Shop_UpdateDisplay(struct SceneInventoryTail *p)
     if (p->interactionFlags & 0x40) {
         switch (p->category) {
             case 0:
-                Shop_PopulateEquipmentGrid((struct SceneInventoryPanel *)p);
+                Shop_PopulateEquipmentGrid((struct ShopPanel *)p);
                 break;
             case 1:
-                Shop_PopulateItemGrid((struct SceneInventoryPanel *)p);
+                Shop_PopulateItemGrid((struct ShopPanel *)p);
                 break;
             case 2:
-                Shop_PopulateConsumableGrid((struct SceneInventoryPanel *)p);
+                Shop_PopulateConsumableGrid((struct ShopPanel *)p);
                 break;
         }
     }
@@ -62,7 +62,7 @@ void Shop_UpdateDisplay(struct SceneInventoryTail *p)
         switch (p->category) {
             case 0:
                 if (p->interactionFlags & 0x10)
-                    Shop_RefreshEquipmentValue((struct SceneInventoryActionView *)p);
+                    Shop_RefreshEquipmentValue((struct ShopActionView *)p);
                 if (p->interactionFlags & 0x20)
                     sub_0805F904(p);
                 else
@@ -70,17 +70,17 @@ void Shop_UpdateDisplay(struct SceneInventoryTail *p)
                 break;
             case 1:
                 if (p->interactionFlags & 0x10)
-                    Shop_RefreshItemValue((struct SceneInventoryActionView *)p);
+                    Shop_RefreshItemValue((struct ShopActionView *)p);
                 if (p->interactionFlags & 0x20)
-                    Shop_ShowItemDescription((struct SceneInventoryPanel *)p);
+                    Shop_ShowItemDescription((struct ShopPanel *)p);
                 else
                     Shop_ClearDescription(p);
                 break;
             case 2:
                 if (p->interactionFlags & 0x10)
-                    Shop_RefreshConsumableValue((struct SceneInventoryActionView *)p);
+                    Shop_RefreshConsumableValue((struct ShopActionView *)p);
                 if (p->interactionFlags & 0x20)
-                    Shop_ShowConsumableDescription((struct SceneInventoryPanel *)p);
+                    Shop_ShowConsumableDescription((struct ShopPanel *)p);
                 else
                     Shop_ClearDescription(p);
                 break;
@@ -88,6 +88,6 @@ void Shop_UpdateDisplay(struct SceneInventoryTail *p)
     }
     p->interactionFlags &= 0x3F;
     SceneInputPanel_SetMeterGlyph(&p->display, p->page,
-                                  ((struct SceneInventoryScriptCatalog *)p)->pageCount);
+                                  ((struct ShopScriptCatalog *)p)->pageCount);
     SceneInputPanel_TickHighlight(&p->highlight);
 }

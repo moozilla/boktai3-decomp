@@ -11,7 +11,7 @@ import subprocess
 import sys
 
 from source_layout import (
-    HEADER_DIRS, SOURCE_DIRS, SOURCE_FILES, directory_for, groups, header_paths, is_upstream,
+    ADDRESS, HEADER_DIRS, SOURCE_DIRS, SOURCE_FILES, directory_for, groups, header_paths, is_upstream,
     layout_path, manifest, new_filename, scan, source_paths, source_placements, source_rules, symbol_names,
 )
 
@@ -19,6 +19,8 @@ ROOT = Path(__file__).resolve().parents[1]
 INCLUDE = re.compile(r'(?P<begin>#[ \t]*include[ \t]+\\?")(?P<name>[^"\\\n]+)(?P<end>\\?")')
 HEADER_LITERAL = re.compile(r'''(?P<quote>["'])(?P<name>[\w.-]+/[\w/.-]+\.h)(?P=quote)''')
 PATH = re.compile(r'(?<![\w/])((?:\.\./)*)(?P<path>(?:src|include)/[\w./-]+\.[ch])(?![\w.-])')
+PATCH_HEAD = re.compile(r'^(diff --git |--- |\+\+\+ |rename (?:from|to) )([^\n]*)', re.M)
+PATCH_PATH = re.compile(r'(?<!\S)(?P<side>[ab]/)?(?P<path>(?:src|include)/[\w./-]+\.[ch])(?=$|\s)')
 TEXT_SUFFIXES = {".c", ".h", ".csv", ".ld", ".md", ".py", ".js", ".mjs", ".html", ".sh", ".ts", ".tsx", ".yml"}
 IDENTIFIER = re.compile(r"[A-Za-z_][A-Za-z_0-9]*")
 SYMBOL = re.compile(r"\b[A-Za-z_][A-Za-z_0-9]*\b")
@@ -27,6 +29,11 @@ TYPE_TAG = re.compile(r"\b(?:struct|union|enum)\s+([A-Za-z_]\w*)")
 # Layout audit records: their old paths and names are the record, so replay leaves them alone.
 LAYOUT_RECORDS = (Path("symbols/identity_corrections.csv"), Path("symbols/identity_prefix_evidence.csv"))
 IDENTITY_RECORDS = {Path("symbols/identities.csv"), *LAYOUT_RECORDS}
+PENDING_PATCH_DIRS = {("tools", "autopilot", "pending_src_fixes"), ("tools", "testbench", "pending_src_fixes")}
+
+
+def pending_patch(path):
+    return path.suffix == ".patch" and path.parts[:3] in PENDING_PATCH_DIRS
 
 
 def tracked_paths():
@@ -283,6 +290,8 @@ def header_destination(old, recorded, folders, owners, rules):
 
 def plan_files(recorded, rename, manifest):
     names = symbol_names(ROOT)
+    plans = {record.start: record.planned_basename for record in source_placements(ROOT)
+             if record.planned_basename} if rename else {}
     spellings = {}
     for old, target in recorded.items():
         casefolded = old.as_posix().casefold()
@@ -300,8 +309,13 @@ def plan_files(recorded, rename, manifest):
         new = spellings.get(old.as_posix().casefold(), directory / old.name)
         if new.parent != directory:
             raise ValueError(f"{old}: first function {first:08X} belongs under {directory}")
-        if rename and len(addresses) == 1 and not is_upstream(old):
-            new = new.with_name(new_filename(names.get(first, f"sub_{first:08X}"), first))
+        if rename and not is_upstream(old):
+            if first in plans:
+                new = new.with_name(plans[first])
+            elif len(addresses) == 1 or ADDRESS.fullmatch(old.stem):
+                name = names.get(first, f"sub_{first:08X}")
+                if not ADDRESS.fullmatch(name) or ADDRESS.fullmatch(new.stem):
+                    new = new.with_name(new_filename(name, first))
         moves[old] = new
         folder = Path("include", *new.parent.parts[1:3])
         owners[old.stem].add(folder)
@@ -330,6 +344,13 @@ def transform(path, raw, moves, includes):
     raw = HEADER_LITERAL.sub(literal, raw)
     if "src/" not in raw and "include/" not in raw:
         return raw
+
+    if pending_patch(path):
+        def patch_path(match):
+            old = Path(match["path"])
+            return (match["side"] or "") + moves.get(old, old).as_posix()
+
+        raw = PATCH_HEAD.sub(lambda match: match[1] + PATCH_PATH.sub(patch_path, match[2]), raw)
 
     def reference(match):
         old = Path(match["path"])
@@ -375,7 +396,8 @@ def rewrite_moves(recorded, moves, apply, *, input_table=None):
                 for old, new in references.items() if old.parts[0] == "include"}
     paths = set(moves)
     for path in tracked_paths():
-        if (path.parts[0] not in ("src", "include", "tests", "build") and path.suffix in TEXT_SUFFIXES
+        if (path.parts[0] not in ("src", "include", "tests", "build")
+                and (path.suffix in TEXT_SUFFIXES or pending_patch(path))
                 and path not in (SOURCE_DIRS, SOURCE_FILES, HEADER_DIRS, *LAYOUT_RECORDS)
                 and path not in (Path("PROGRESS.md"), Path("docs/SOURCE_LAYOUT_DECISIONS.md"))
                 and path.parts[:2] != ("docs", "history")):
@@ -491,7 +513,7 @@ def main():
     action.add_argument("--apply", action="store_true", help="perform the printed plan")
     action.add_argument("--check", action="store_true", help="fail if the tree disagrees with the reviewed layout")
     operation = parser.add_mutually_exclusive_group()
-    operation.add_argument("--rename", action="store_true", help="also name one-function files from the symbol map")
+    operation.add_argument("--rename", action="store_true", help="also plan source basenames from ROM order and the naming table")
     operation.add_argument("--function-renames", type=Path, help="read exact addr,old_name,new_name rows")
     operation.add_argument("--function-prefixes", type=Path, help="read old_prefix,new_prefix[,scope] rows")
     operation.add_argument("--player-moves", type=Path, help="read file,new_path[,note] Player routes")

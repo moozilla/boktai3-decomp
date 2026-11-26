@@ -16,7 +16,7 @@ union EmitTableSource {
     const u16 *table;
     u8 bytes[4];
 };
-s32 sub_080148CC(s32, s32, void *, u32, s32, s32, s32, s32, s32, s32, s32);
+s32 ImpactParticleGroup_SpawnRadial(s32, s32, void *, u32, s32, s32, s32, s32, s32, s32, s32);
 static inline const u16 *EmitReadTable(const union EmitTableSource *source)
 {
     return source->table;
@@ -42,18 +42,18 @@ static inline void EmitBurst(struct RoomActor *actor, const struct EmitPosition 
     {
         s32 count = (ParticleRandom_ReadDirectSample(table) & 3) + 2;
         s32 duration = (ParticleRandom_ReadDirectSample(table) & 3) + 6;
-        sub_080148CC(count, kind, &position, angle, 8, duration, 4, 10, 8, 5, 10);
+        ImpactParticleGroup_SpawnRadial(count, kind, &position, angle, 8, duration, 4, 10, 8, 5, 10);
     }
     {
         u32 direction = (angle + (ParticleRandom_ReadDirectSample(table) & 7)) & 255;
         s32 duration = (ParticleRandom_ReadDirectSample(table) & 7) + 6;
-        sub_080148CC(3, kind, &position, direction, 8, duration, 4, 14, 4, 6, 10);
+        ImpactParticleGroup_SpawnRadial(3, kind, &position, direction, 8, duration, 4, 14, 4, 6, 10);
     }
     {
         u32 direction = (angle + (ParticleRandom_ReadDirectSample(table) & 15)) & 255;
         s32 count = (ParticleRandom_ReadDirectSample(table) & 3) + 1;
         s32 duration = (ParticleRandom_ReadDirectSample(table) & 7) + 4;
-        sub_080148CC(count, kind, &position, direction, 8, duration, 2, 6, 3, 5, 10);
+        ImpactParticleGroup_SpawnRadial(count, kind, &position, direction, 8, duration, 2, 6, 3, 5, 10);
     }
 }
 void SceneActorPlacement_EmitTimedParticles(struct RoomActor *actor)

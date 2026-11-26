@@ -362,13 +362,13 @@ addr,name,confidence,evidence
 0801DD40,ResultTutorial_UpdateSequence,tentative,Exact C; result-game and tutorial state transitions and demonstration sequence
 0801DEBC,ResultTutorial_ReadScript,tentative,Exact C; result-game and tutorial state transitions and demonstration sequence
 0801DEF4,ResultTutorial_Initialize,tentative,Exact C; result-game and tutorial state transitions and demonstration sequence
-0801E000,SlidingDoor_UpdatePoseA,low,Tentative scene-object controller role; exact C in src/objects/sliding_doors/sub_0801E000.c
-0801E090,SlidingDoor_UpdatePoseB,low,Tentative scene-object controller role; exact C in src/objects/sliding_doors/sub_0801E090.c
-0801E0F4,SlidingDoor_UpdatePoseC,low,Tentative scene-object controller role; exact C in src/objects/sliding_doors/sub_0801E0F4.c
+0801E000,SlidingDoors_UpdatePoseA,low,Tentative scene-object controller role; exact C in src/objects/sliding_doors/sub_0801E000.c
+0801E090,SlidingDoors_UpdatePoseB,low,Tentative scene-object controller role; exact C in src/objects/sliding_doors/sub_0801E090.c
+0801E0F4,SlidingDoors_UpdatePoseC,low,Tentative scene-object controller role; exact C in src/objects/sliding_doors/sub_0801E0F4.c
 0801E184,SlidingDoors_Append,low,Tentative scene-object controller role; exact C in src/objects/sliding_doors/sub_0801E184.c
 0801E344,SlidingDoors_HasPrimaryId,low,Tentative scene-object controller role; exact C in src/objects/sliding_doors/sub_0801E344.c
 0801E374,SlidingDoors_HasSecondaryId,low,Tentative scene-object controller role; exact C in src/objects/sliding_doors/sub_0801E374.c
-0801E3A4,SlidingDoor_CheckActorCompatibility,low,Tentative scene-object controller role; exact C in src/objects/sliding_doors/sub_0801E3A4.c
+0801E3A4,SlidingDoors_CheckActorCompatibility,low,Tentative scene-object controller role; exact C in src/objects/sliding_doors/sub_0801E3A4.c
 0801E3E4,SlidingDoors_ScriptAppend,low,Tentative scene-object controller role; exact C in src/objects/sliding_doors/sub_0801E3E4.c
 0801E530,SlidingDoors_BeginActivation,low,Tentative scene-object controller role; exact C in src/objects/sliding_doors/sub_0801E530.c
 0801E5B8,SlidingDoors_BeginDeactivation,low,Tentative scene-object controller role; exact C in src/objects/sliding_doors/sub_0801E5B8.c
@@ -385,14 +385,14 @@ addr,name,confidence,evidence
 0801EBBC,SlidingDoors_ScriptSetSelection,low,Tentative scene-object controller role; exact C in src/objects/sliding_doors/sub_0801EBBC.c
 0801EBE4,SlidingDoors_ClearSelection,low,Tentative scene-object controller role; exact C in src/objects/sliding_doors/sub_0801EBE4.c
 0801EC00,SlidingDoors_HasTypeTwoResource,low,Tentative scene-object controller role; exact C in src/objects/sliding_doors/sub_0801EC00.c
-0801EF60,SlidingDoor_AnimateInactive,low,Tentative scene-object controller role; exact C in src/objects/sliding_doors/sub_0801EF60.c
-0801EFDC,SlidingDoor_AnimateActive,low,Tentative scene-object controller role; exact C in src/objects/sliding_doors/sub_0801EFDC.c
-0801F3A0,SlidingDoor_BeginRaising,low,Tentative scene-object controller role; exact C in src/objects/sliding_doors/sub_0801F3A0.c
-0801F3CC,SlidingDoor_BeginLowering,low,Tentative scene-object controller role; exact C in src/objects/sliding_doors/sub_0801F3CC.c
-0801F430,SlidingDoor_UpdateRaising,low,Tentative scene-object controller role; exact C in src/objects/sliding_doors/sub_0801F430.c
-0801F4C4,SlidingDoor_UpdateLowering,low,Tentative scene-object controller role; exact C in src/objects/sliding_doors/sub_0801F4C4.c
-0801F580,SlidingDoor_UpdateRaised,low,Tentative scene-object controller role; exact C in src/objects/sliding_doors/sub_0801F580.c
-0801F5B8,SlidingDoor_UpdateLowered,low,Tentative scene-object controller role; exact C in src/objects/sliding_doors/sub_0801F5B8.c
+0801EF60,SlidingDoors_AnimateInactive,low,Tentative scene-object controller role; exact C in src/objects/sliding_doors/sub_0801EF60.c
+0801EFDC,SlidingDoors_AnimateActive,low,Tentative scene-object controller role; exact C in src/objects/sliding_doors/sub_0801EFDC.c
+0801F3A0,SlidingDoors_BeginRaising,low,Tentative scene-object controller role; exact C in src/objects/sliding_doors/sub_0801F3A0.c
+0801F3CC,SlidingDoors_BeginLowering,low,Tentative scene-object controller role; exact C in src/objects/sliding_doors/sub_0801F3CC.c
+0801F430,SlidingDoors_UpdateRaising,low,Tentative scene-object controller role; exact C in src/objects/sliding_doors/sub_0801F430.c
+0801F4C4,SlidingDoors_UpdateLowering,low,Tentative scene-object controller role; exact C in src/objects/sliding_doors/sub_0801F4C4.c
+0801F580,SlidingDoors_UpdateRaised,low,Tentative scene-object controller role; exact C in src/objects/sliding_doors/sub_0801F580.c
+0801F5B8,SlidingDoors_UpdateLowered,low,Tentative scene-object controller role; exact C in src/objects/sliding_doors/sub_0801F5B8.c
 080203D4,SlidingDoors_Destroy,low,Tentative lifecycle or scene-message role; exact C in src/objects/sliding_doors/sub_080203D4.c
 080209D0,SceneMessages_Enqueue,low,Tentative lifecycle or scene-message role; exact C in src/fn/sub_080209D0.c
 08020A14,SceneMessages_SwapBuffers,low,Tentative lifecycle or scene-message role; exact C in src/fn/sub_08020A14.c

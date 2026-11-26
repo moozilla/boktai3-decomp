@@ -15,7 +15,7 @@ void MenuDisplay_DrawStatComparison(void *, s32, s32);
 void InventoryPanel_ShowStatusIcons(void *);
 void PauseInventory_InitConsumableCursors(void *);
 void SceneHud_LayoutAlternateActionGrid(void *);
-void sub_08170D78(void *);
+void PauseInventory_RefreshConsumableIcons(void *);
 void PauseMenu_SetPromptIconPositions(u8 *, u32, s32);
 void MenuDisplay_UpdateActionPrompt(void *, int);
 void Hud_SetInteractionCallback(void *, void (*)(void), int);
@@ -48,7 +48,7 @@ void sub_08171F7C(u8 *p)
     Anim_LoadKeyframe(p + 0x1780, p + 0x64, 0x70, 0);
     PauseInventory_InitConsumableCursors(p);
     SceneHud_LayoutAlternateActionGrid(p);
-    sub_08170D78(p);
+    PauseInventory_RefreshConsumableIcons(p);
     PauseMenu_SetPromptIconPositions(p, 0, 0);
     MenuDisplay_UpdateActionPrompt(p, 3);
     Hud_SetInteractionCallback(p, PauseInventory_UpdateConsumableActions, 0);

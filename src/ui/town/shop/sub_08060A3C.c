@@ -1,10 +1,10 @@
 #include "global.h"
 
-struct SceneInventorySlotsView {
+struct ShopSlotsView {
     u8 unknown0[0x58];
     s16 slots[4];
 };
-extern struct SceneInventorySlotsView *gGameState;
+extern struct ShopSlotsView *gGameState;
 
 s32 Shop_FindConsumableAssignment(s32 slot)
 {

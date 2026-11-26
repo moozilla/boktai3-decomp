@@ -15,7 +15,7 @@ void Player_InitActionCallback(struct Player *);
 void Player_PlayLocalSong(s32, u32);
 s32 Callback_InvokeActor(void *, void *);
 void sub_0823A2E4(struct Player *);
-void sub_0821DE30(void *);
+void Trap_UpdateProbeContacts(void *);
 static inline s32 LocalPlayer(void)
 {
     if (!gLinkSession)
@@ -47,7 +47,7 @@ s32 Player_UpdateLinkCore(struct Player *p)
     p->lastContactRewardFlags = 0;
     if (p->kind != 8) {
         F(u32, 0x298) = (u32)p + 0x30;
-        sub_0821DE30(&F(u8, 0x294));
+        Trap_UpdateProbeContacts(&F(u8, 0x294));
     }
     return 0;
 }

@@ -13,7 +13,7 @@ refers to (globals, callees, constants other than 0 and 1); each matched
 helper in src/ with the same key and the same number of parameters is put in
 its place under the draft's name, compiled and scored against the ROM like
 tools/fix.py does. Example: the random step returning s32 instead of u16
-(sub_08239D38) matched CallbackPool_SpawnHitParticles (agbccsrc.py
+(sub_08239D38) matched LootDepositCallbackPool_SpawnHitParticles (agbccsrc.py
 reload-mode).
 
 Results go to --out (jsonl: start, best, helper, the corpus helper used);

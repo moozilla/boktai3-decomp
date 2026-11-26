@@ -294,7 +294,7 @@ s32 DisplayAnimation_SetPalette(struct DisplayAnimation *, u32, u32, u32);
 
 void Player_EnterKindFour(struct Player *);
 
-void sub_0821DE30(void *);
+void Trap_UpdateProbeContacts(void *);
 
 void SceneBody_Unregister(void *);
 
@@ -3544,7 +3544,7 @@ s32 TetherActor_Tick(struct TetherActor *actor)
     TetherActor_UpdateEffects(actor);
     TetherActor_UpdateSecondaryColliderValues(actor);
     actor->interactionProbe.position = &actor->position;
-    sub_0821DE30(&actor->interactionProbe.bodyId);
+    Trap_UpdateProbeContacts(&actor->interactionProbe.bodyId);
     if (actor->destroyRequested)
         Task_Kill(actor);
     return 0;

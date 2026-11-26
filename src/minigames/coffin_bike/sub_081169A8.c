@@ -34,7 +34,7 @@ valid:
     return 1;
 }
 
-static inline struct AreaEffectLinkState *ReadGloveStyleSession(struct CoffinBike *glove,
+static inline struct AreaEffectLinkState *CoffinBike_ReadStyleSession(struct CoffinBike *glove,
                                                                 s32 *participant)
 {
     s32 index = glove->participant;
@@ -54,7 +54,7 @@ void CoffinBike_InitializeStyleModifiers(struct CoffinBike *p)
         struct AreaEffectLinkState *link;
         struct LinkStylePayload *payload;
         s32 i;
-        link = ReadGloveStyleSession(p, &player);
+        link = CoffinBike_ReadStyleSession(p, &player);
         if (!link || !ValidParticipant(player))
             return;
         payload = (struct LinkStylePayload *)(link->incomingPayload +

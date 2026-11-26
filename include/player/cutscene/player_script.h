@@ -17,7 +17,7 @@ void CellObject_Init(void *, void *);
 void ActorSequence_Begin(struct Player *, s32, s32);
 void Player_StopActionSounds(struct Player *);
 s32 Player_IsActiveInLocomotionState(struct Player *);
-void sub_08159164(s32);
+void Player_AddExperience(s32);
 s32 Div(s32, s32);
 void DamageNumberDisplay_Show(void *, s32, s32, void *, void *, s32);
 void sub_0813B3AC(struct Player *, s32);

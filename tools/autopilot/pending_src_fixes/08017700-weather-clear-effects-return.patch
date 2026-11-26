@@ -5,8 +5,8 @@ Effect_Remove returns through r0, leaving its Thumb return address.
 
 The explicit form changed the ROM bytes. The guarded form passed the unit ROM check.
 
---- a/src/fn/sub_08017700.c
-+++ b/src/fn/sub_08017700.c
+--- a/src/effects/weather/sub_08017700.c
++++ b/src/effects/weather/sub_08017700.c
 @@ -6,4 +6,7 @@
      s32 i = 0x1f;
      u8 *q;

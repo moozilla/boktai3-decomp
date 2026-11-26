@@ -108,7 +108,7 @@ void DarkGenerator_ShowRewardBalanceDigits(struct ControlPanel *panel)
     s32 digits[4];
     s32 *digit;
     s32 remaining;
-    struct AnimSprite *widget;
+    struct AnimSprite *animSprite;
 
     digits[0] = Div(value, 1000);
     value -= digits[0] * 1000;
@@ -119,11 +119,11 @@ void DarkGenerator_ShowRewardBalanceDigits(struct ControlPanel *panel)
     digits[3] = value;
 
     digit = digits;
-    widget = panel->widgets + 1;
+    animSprite = panel->widgets + 1;
     remaining = 3;
     do {
-        Anim_LoadKeyframe(widget, &panel->resource, (u16)(*digit++ + 0x1E), 1);
-        widget++;
+        Anim_LoadKeyframe(animSprite, &panel->resource, (u16)(*digit++ + 0x1E), 1);
+        animSprite++;
         remaining--;
     } while (remaining >= 0);
 }

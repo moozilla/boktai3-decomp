@@ -1,7 +1,5 @@
 #include "scene/actor/scene_actor_registry.h"
-/* SceneActorBehavior_UpdateDrawableBlink: Toggles drawable visibility at age-dependent intervals and restores visibility after age 60 */
-#define SceneActorBehavior_UpdateDrawableBlink sub_0807836C
-#define SceneActorBehavior_TickDrawableBlink   sub_0807836C
+/* SceneActorBehavior_TickDrawableBlink: Toggles drawable visibility at age-dependent intervals and restores visibility after age 60 */
 extern const s16 gUnk_08605C20[3];
 static inline u8 TestNonzero(u32 value)
 {

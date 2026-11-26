@@ -45,7 +45,7 @@ void Collision_CalculateDamageResponse(void *, void *);
 
 void PlayerStats_AddContactHundredths(void *, void *, u32);
 
-void sub_080148CC(u32, u32, void *, u32, u32, u32, u32, u32, u32, u32, u32);
+void ImpactParticleGroup_SpawnRadial(u32, u32, void *, u32, u32, u32, u32, u32, u32, u32, u32);
 
 void DamageNumberDisplay_Show(void *, u32, s32, void *, const struct ContactPackedVector *, u32);
 
@@ -68,7 +68,7 @@ void NidhoggrDuelMinion_ApplyHealthContact(struct ContactCollider *source,
             NidhoggrDuelMinion_SetState(actor, 3);
         }
         position = &saved->position;
-        sub_080148CC(2, 14, position, 64, 256, 12, 8, 8, 8, 30, 30);
+        ImpactParticleGroup_SpawnRadial(2, 14, position, 64, 256, 12, 8, 8, 8, 30, 30);
         size.x = 16;
         size.y = 0;
         size.z = 16;
@@ -209,7 +209,7 @@ void NidhoggrDuelMinion_UpdateDying(struct ContactSequenceOwner *parent,
             scatterPosition->z = (u16)position->z + sz;
         }
         TransientSpriteEffects_Spawn(0, 0x1004, scatterPosition, 0, 256, 256);
-        sub_080148CC(4, 14, position, 64, 256, 12, 8, 8, 8, 30, 30);
+        ImpactParticleGroup_SpawnRadial(4, 14, position, 64, 256, 12, 8, 8, 8, 30, 30);
         {
             s32 health = actor->health;
             if ((health <= 0) && parent->script) {

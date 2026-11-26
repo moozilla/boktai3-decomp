@@ -12,11 +12,11 @@ void SlidingDoors_Unlock(u8 *, u16);
 int SlidingDoors_HasPrimaryId(u8 *, u16);
 int SlidingDoors_HasSecondaryId(u8 *, u16);
 void SlidingDoors_AddPrimaryId(u8 *, u8 *);
-void SlidingDoor_UpdatePoseA(u8 *);
-void SlidingDoor_UpdatePoseB(u8 *);
-void SlidingDoor_UpdatePoseC(u8 *);
+void SlidingDoors_UpdatePoseA(u8 *);
+void SlidingDoors_UpdatePoseB(u8 *);
+void SlidingDoors_UpdatePoseC(u8 *);
 u32 TetherActor_CopyPosition(void *);
-int SlidingDoor_CheckActorCompatibility(u8 *, u8 *);
+int SlidingDoors_CheckActorCompatibility(u8 *, u8 *);
 
 struct Obj1FPos {
     s16 x, y, z;
@@ -100,7 +100,7 @@ s32 SlidingDoors_UpdateController(struct SceneObjPool *self)
                 struct Obj1FPos tether;
                 if (o->activationFlags & 1)
                     break;
-                SlidingDoor_UpdatePoseA((u8 *)o);
+                SlidingDoors_UpdatePoseA((u8 *)o);
                 delta = *(struct Obj1FPos *)&o->pos;
                 delta.x -= gGameState->positionX;
                 delta.y -= gGameState->positionY;
@@ -127,7 +127,7 @@ s32 SlidingDoors_UpdateController(struct SceneObjPool *self)
                 break;
             }
             case 1:
-                SlidingDoor_UpdatePoseB((u8 *)o);
+                SlidingDoors_UpdatePoseB((u8 *)o);
                 break;
             case 2:
             case 8:
@@ -142,7 +142,7 @@ s32 SlidingDoors_UpdateController(struct SceneObjPool *self)
                 struct Obj1FPos tether;
                 if (o->activationFlags & 1)
                     break;
-                SlidingDoor_UpdatePoseC((u8 *)o);
+                SlidingDoors_UpdatePoseC((u8 *)o);
                 delta = *(struct Obj1FPos *)&o->pos;
                 delta.x -= gGameState->positionX;
                 delta.y -= gGameState->positionY;
@@ -151,7 +151,7 @@ s32 SlidingDoors_UpdateController(struct SceneObjPool *self)
                     Obj1F_Abs(delta.y) <= 0xFE && !SlidingDoors_HasPrimaryId((u8 *)self, o->id)) {
                     if (!o->autoActivate) {
                         if ((gPadState[1] & 1) &&
-                            !SlidingDoor_CheckActorCompatibility((u8 *)self, (u8 *)o) &&
+                            !SlidingDoors_CheckActorCompatibility((u8 *)self, (u8 *)o) &&
                             o->interactionScript) {
                             args.kind = 4;
                             args.data = (u8 *)&o->args;
@@ -182,7 +182,7 @@ s32 SlidingDoors_UpdateController(struct SceneObjPool *self)
                 struct Obj1FPos tether;
                 if (o->activationFlags & 1)
                     break;
-                SlidingDoor_UpdatePoseA((u8 *)o);
+                SlidingDoors_UpdatePoseA((u8 *)o);
                 delta = *(struct Obj1FPos *)&o->pos;
                 delta.x -= gGameState->positionX;
                 delta.y -= gGameState->positionY;
@@ -213,7 +213,7 @@ s32 SlidingDoors_UpdateController(struct SceneObjPool *self)
                 struct Obj1FPos tether;
                 if (o->activationFlags & 1)
                     break;
-                SlidingDoor_UpdatePoseA((u8 *)o);
+                SlidingDoors_UpdatePoseA((u8 *)o);
                 delta = *(struct Obj1FPos *)&o->pos;
                 delta.x -= gGameState->positionX;
                 delta.y -= gGameState->positionY;
@@ -244,7 +244,7 @@ s32 SlidingDoors_UpdateController(struct SceneObjPool *self)
                 struct Obj1FPos tether;
                 if (o->activationFlags & 1)
                     break;
-                SlidingDoor_UpdatePoseA((u8 *)o);
+                SlidingDoors_UpdatePoseA((u8 *)o);
                 delta = *(struct Obj1FPos *)&o->pos;
                 delta.x -= gGameState->positionX;
                 delta.y -= gGameState->positionY;
@@ -272,11 +272,11 @@ s32 SlidingDoors_UpdateController(struct SceneObjPool *self)
             case 3:
             case 7:
                 if (!(o->activationFlags & 1))
-                    SlidingDoor_UpdatePoseA((u8 *)o);
+                    SlidingDoors_UpdatePoseA((u8 *)o);
                 break;
             case 15: {
                 struct Obj1FPos delta;
-                SlidingDoor_UpdatePoseA((u8 *)o);
+                SlidingDoors_UpdatePoseA((u8 *)o);
                 if (gGameState->unk876 <= 2)
                     break;
                 delta = *(struct Obj1FPos *)&o->pos;
@@ -296,7 +296,7 @@ s32 SlidingDoors_UpdateController(struct SceneObjPool *self)
                 struct Obj1FPos tether;
                 if (o->activationFlags & 1)
                     break;
-                SlidingDoor_UpdatePoseC((u8 *)o);
+                SlidingDoors_UpdatePoseC((u8 *)o);
                 delta = *(struct Obj1FPos *)&o->pos;
                 delta.x -= gGameState->positionX;
                 delta.y -= gGameState->positionY;
@@ -305,7 +305,7 @@ s32 SlidingDoors_UpdateController(struct SceneObjPool *self)
                     Obj1F_Abs(delta.y) <= 0xFE && !SlidingDoors_HasPrimaryId((u8 *)self, o->id)) {
                     if (!o->autoActivate) {
                         if ((gPadState[1] & 1) &&
-                            !SlidingDoor_CheckActorCompatibility((u8 *)self, (u8 *)o) &&
+                            !SlidingDoors_CheckActorCompatibility((u8 *)self, (u8 *)o) &&
                             o->interactionScript) {
                             args.kind = 4;
                             args.data = (u8 *)&o->args;

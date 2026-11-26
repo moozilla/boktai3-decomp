@@ -7,8 +7,8 @@ struct PoolActor {
     u8 started;
 };
 void sub_08104748(struct PoolActor *);
-void CallbackPool_UpdateShake(struct PoolActor *);
-void ProximityActor_CheckPlayerRange(struct PoolActor *);
+void LootDepositCallbackPool_UpdateShake(struct PoolActor *);
+void LootDepositFeedback_CheckPlayerRange(struct PoolActor *);
 
 void sub_081047B4(void *unused, struct PoolActor *o)
 {
@@ -18,8 +18,8 @@ void sub_081047B4(void *unused, struct PoolActor *o)
         o->started = 0;
     }
     sub_08104748(o);
-    CallbackPool_UpdateShake(o);
+    LootDepositCallbackPool_UpdateShake(o);
     if (o->frame & 1)
-        ProximityActor_CheckPlayerRange(o);
+        LootDepositFeedback_CheckPlayerRange(o);
     o->frame++;
 }

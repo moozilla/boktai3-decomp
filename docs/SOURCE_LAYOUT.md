@@ -16,7 +16,7 @@ list the evidence and the names still awaiting confirmation.
 | `src/monsters/` | Every Monster Book entry that is not a boss: one file or directory per monster |
 | `src/bosses/` | The Immortals and their forms: Hresvelgr, Nidhoggr (ship and duel), Ratatosk, Vanargand (arena, head in the bike chase), Sabata, and the Count |
 | `src/npc/` | Townspeople, story characters, cutscene actors, Sabata's rider in the ending |
-| `src/objects/` | Things placed in the world: coffin, Pile Driver, Warp Circle, Solar Stand, deck cannons, Solar Roots, crates, switches, items, hazards, markers |
+| `src/objects/` | Things placed in the world: coffin, Pile Driver, Warp Circle, Solar Stand, deck cannons, Solar Roots, the Strike Crystal, crates, switches, items, hazards, markers |
 | `src/minigames/` | The Coffin Bike, the Dark Generator, the result game |
 | `src/effects/` | Visual effects: palette, particles, screen effects, projectiles, bursts, orbits, sprite effects, shadows, weather |
 | `src/ui/` | HUD, dialogue, pause menu, town services and the town map, the world map, the books, title screens, results |
@@ -48,10 +48,9 @@ list the evidence and the names still awaiting confirmation.
   become one unit file.
 * Function names are `Object_Action` with the object's game name
   (`PileDriver_`, `VanargandHead_`, `Sabata_`, `Shop_`), never a registry key,
-  slot or address. One-function files are named after their function
-  (`Hresvelgr_Create.c`); an unnamed function keeps `sub_XXXXXXXX.c`.
-  If the symbol ends in a disambiguating address, preserve that suffix in
-  the filename too.
+  slot or address. Use a function's exact name for a one-function game
+  file, including any disambiguating address suffix on the symbol.
+  `Hresvelgr_Create.c` is one example.
 * Headers sit beside their object under the mirrored path in `include/`, at
   most two directories deep (`#include "monsters/ghoul.h"`,
   `#include "objects/pile_driver/pile_driver_rig.h"`); a three-level source
@@ -63,6 +62,22 @@ list the evidence and the names still awaiting confirmation.
   `include/scene/motion/` (routes, chase, turning, terrain movement). Engine-wide
   headers: `include/engine/` (memory, tasks, input, RAM), `include/engine/video/`
   (display sequences, palettes, render, `anim_sprite.h`), `include/engine/math/`.
+
+### Source filenames
+
+A `sub_XXXXXXXX.c` file with several functions takes the name of its first
+function in ROM order. An unnamed first function keeps the address basename.
+The two tilemap files already reviewed as `fill_tilemap_rectangle.c` and
+`wrapped_tilemap_cells.c` keep their descriptive names. Imported SDK files
+keep their upstream naming.
+
+Multi-function files with established descriptive basenames keep them.
+`symbols/source_files.csv` gives an explicit `planned_basename` for 20
+stale names whose whole-unit role is clearer than their first function.
+`tools/reorg.py --rename` previews the filename pass. The regular directory
+replay preserves basenames. Pending source-fix patches under both
+`tools/autopilot/pending_src_fixes/` and `tools/testbench/pending_src_fixes/`
+follow recorded source paths in their patch headers.
 
 ## Where is it?
 
@@ -97,13 +112,15 @@ list the evidence and the names still awaiting confirmation.
 | The coffin | `src/objects/coffin/` |
 | The Coffin Bike (Vector Coffin), the bike battle | `src/minigames/coffin_bike/` |
 | The Dark Generator (Dark Loan work) | `src/minigames/dark_generator.c` |
-| Warp Circle, Solar Stand, deck cannons, wooden crate, switches, Bat Curtain | `src/objects/<name>/` |
+| Warp Circle, Solar Stand, deck cannons, wooden crate, switches | `src/objects/<name>/` |
+| Bat Curtain and its debris, Strike Crystal | `src/objects/bat_curtain/`, `src/objects/strike_crystal.c` |
 | Treasure chests and dropped items | `src/objects/items/` |
 | Townspeople, story characters, cutscene actors | `src/npc/` |
 | Otenko field dialogue, Kuro, and Otenko's tutorial | `src/npc/otenko/`, `src/npc/kuro/`, `src/ui/title/tutorial_otenko.c` |
 | Route platforms, passage barriers, and breakable loot deposits | `src/objects/moving_platforms/`, `src/objects/passage_barriers/`, `src/objects/loot_deposits/` |
 | Puzzle blocks, sliding doors, lanterns, ice boulders, and quest barriers | `src/objects/puzzle_blocks.c`, `src/objects/sliding_doors/`, `src/objects/light_fixtures.c`, `src/objects/ice_boulders.c`, `src/objects/quest_barriers/` |
 | Floor traps, strike traps, Pile Traps, and bouncing bombs | `src/objects/floor_traps.c`, `src/objects/strike_traps.c`, `src/player/pile_trap/`, `src/objects/bouncing_bombs/` |
+| Sabata’s frost emitter and the actor palette fade | `src/effects/particles/sabata_frost.c`, `src/effects/palette/actor_palette_fade.c` |
 | Timed sprites created by story characters | `src/effects/sprites/timed_character_effects/` |
 | The solar sensor, solar level, calibration | `src/system/solar/` |
 | Clock, sunrise and sunset, region setting | `src/system/clock/` (RTC driver `src/lib/rtc/`) |
@@ -118,7 +135,7 @@ list the evidence and the names still awaiting confirmation.
 | Shops, Solar Bank, Dark Loan, Storage, the San Miguel map | `src/ui/town/` (`shop/`, `solar_bank/`, `dark_loan.c`, `storage/`, `town_map.c`) |
 | The world map | `src/ui/world_map.c` |
 | Monster Book, Forging Book, collection | `src/ui/books/` |
-| Title, Game Start, Options, Name Entry, Password, sound test | `src/ui/title/` |
+| Title emblem, Game Start, Options, Name Entry, Password, sound test | `src/ui/title/` |
 | Stage results, time result, challenges | `src/ui/results/` |
 | Cable link, wireless adapter, link menus, alternate Django | `src/link/serial/`, `src/link/wireless/`, `src/link/{menu,panel,selection,lobby,records}/`, `src/link/player/` |
 | Magic Cannon departure, bat flock, weather | `src/effects/screen/magic_cannon_departure.c`, `src/effects/bat_flock.c`, `src/effects/weather/` |

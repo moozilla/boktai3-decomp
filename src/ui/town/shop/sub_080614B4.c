@@ -1,5 +1,5 @@
 #include "ui/town/shop_control.h"
-void Shop_BeginActionSelection(struct SceneInventoryControlView *panel, s32 mode)
+void Shop_BeginActionSelection(struct ShopControlView *panel, s32 mode)
 {
     panel->interactionFlags = 100;
     switch (mode) {
@@ -16,5 +16,5 @@ void Shop_BeginActionSelection(struct SceneInventoryControlView *panel, s32 mode
     panel->destination = Shop_FindActionDestination(panel);
     Shop_UpdateModePrompt(panel, 0);
     Shop_SetControllerCallback(
-        panel, (SceneInventoryCallback)Shop_TickActionSelection);
+        panel, (ShopCallback)Shop_TickActionSelection);
 }

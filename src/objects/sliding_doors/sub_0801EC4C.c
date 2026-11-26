@@ -3,7 +3,7 @@
 void TerrainModifiers_RegisterCell(void *, u32, u32, u32, u32, u32);
 
 // confidence=low: places a newly appended scene object on its terrain cell and starts its idle state.
-void SlidingDoor_InitPlacement(struct SceneObjPool *mgr, struct SceneObjSlot *obj)
+void SlidingDoors_InitPlacement(struct SceneObjPool *mgr, struct SceneObjSlot *obj)
 {
     s32 cell = cellIndexAt(&obj->pos.position);
     u8 *dir;
@@ -78,13 +78,13 @@ void SlidingDoor_InitPlacement(struct SceneObjPool *mgr, struct SceneObjSlot *ob
         obj->q0.signedPosition = sprite->sprite.position;
         t = obj->variant;
         if (t == 0) {
-            obj->callback = SlidingDoor_UpdateInactiveIdle;
+            obj->callback = SlidingDoors_UpdateInactiveIdle;
             SceneObjSlot_ResetPose(obj, 0);
         } else if (t == 1) {
-            obj->callback = SlidingDoor_UpdateActiveIdle;
+            obj->callback = SlidingDoors_UpdateActiveIdle;
             SceneObjSlot_ResetPose(obj, 2);
         } else {
-            obj->callback = SlidingDoor_UpdateInactiveIdle;
+            obj->callback = SlidingDoors_UpdateInactiveIdle;
             SceneObjSlot_ResetPose(obj, 0);
         }
         if (obj->variant == 0) {

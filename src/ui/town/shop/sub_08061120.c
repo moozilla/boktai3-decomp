@@ -1,5 +1,5 @@
 #include "ui/town/shop_control.h"
-s32 Shop_ClassifyEquipmentAction(struct SceneInventoryControlView *panel)
+s32 Shop_ClassifyEquipmentAction(struct ShopControlView *panel)
 {
     s32 result;
     if (panel->grid.selection > 15) {
@@ -8,7 +8,7 @@ s32 Shop_ClassifyEquipmentAction(struct SceneInventoryControlView *panel)
         {
             s32 pageIndex = (panel->page << 3) - 16;
             u8 raw;
-            raw = ((struct SceneInventoryCatalogView *)panel)
+            raw = ((struct ShopCatalogView *)panel)
                       ->entries[pageIndex + panel->grid.selection];
             entry = (s8)raw;
         }

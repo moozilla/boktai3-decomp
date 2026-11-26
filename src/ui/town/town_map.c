@@ -10,7 +10,7 @@ void Hud_SetMode(s32);
 
 u32 SunClock_GetPhase(void);
 
-void sub_082157EC(void);
+void Bg_ResetDisplay(void);
 
 u8 *sub_08216E54(u16);
 
@@ -143,7 +143,7 @@ void TownMap_InitBackground(struct RegistryChoiceMenu *menu)
         mask &= flags;
         *control = mask;
     }
-    sub_082157EC();
+    Bg_ResetDisplay();
     Hud_SetMode(7);
     {
         u32 flags = 0xC00;

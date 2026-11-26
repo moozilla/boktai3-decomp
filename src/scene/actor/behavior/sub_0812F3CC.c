@@ -18,7 +18,6 @@ static inline void SceneActorReaction_SetBits(u16 *p, u32 mask)
     *p |= mask;
 }
 // confidence=low: begins a contact reaction after filtering actor and contact flags.
-#define SceneActorReaction_BeginContactResponse sub_0812F3CC
 u8 SceneActorReaction_BeginContactResponse(struct ChaseActor *a)
 {
     struct SceneActorChaseGroup *group = &a->group;

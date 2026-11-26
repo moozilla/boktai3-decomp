@@ -200,7 +200,7 @@ void PileDriver_TickPulseTwelve(struct PileDriver *);
 void PileDriver_TickPulseThirteen(struct PileDriver *);
 void PileDriver_TickPulseTwo(struct PileDriver *);
 /* 0x020004A4 */
-extern struct PileDriver *gScenePanel;
+extern struct PileDriver *gPileDriver;
 void PileDriver_CallPendingScript(struct PileDriver *, u32);
 union PileDriverPosition;
 void PileDriver_AddParticle(struct PileDriver *, union PileDriverPosition *,

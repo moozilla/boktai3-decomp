@@ -2,7 +2,7 @@
 void Inventory_SortEquipment(u32);
 void Inventory_SortConsumables(u32);
 void GameState_SortConsumableSlots(u32);
-s32 Shop_TickResetConfirmation(struct SceneInventoryTail *p)
+s32 Shop_TickResetConfirmation(struct ShopTail *p)
 {
     s32 result;
     SceneInputPanel_HighlightPrompt(&p->display, p->highlight.colors);

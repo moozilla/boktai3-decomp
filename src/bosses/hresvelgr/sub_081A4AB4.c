@@ -5,7 +5,6 @@
 #include "engine/math/monster_particle_random.h"
 
 // confidence=low: emits one centered explosion and seven offset explosions.
-#define Hresvelgr_EmitImpactExplosions sub_081A4AB4
 struct HresvelgrImpactProjectile {
     u8 unknown0[0x60];
     struct ContactPosition position;

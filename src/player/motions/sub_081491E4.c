@@ -18,7 +18,6 @@ struct ReleaseAnimation {
     const void *resource;
 };
 // confidence=low: emits a rear-offset cue when the spiral action begins.
-#define Player_UpdateRearSpiralCue sub_081491E4
 extern const s16 gUnk_086149C4[];
 struct PackedPosition {
     s32 x : 16, y : 16, z : 16, pad : 16;

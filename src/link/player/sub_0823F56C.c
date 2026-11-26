@@ -21,7 +21,7 @@ void Collider_SetPosition(void *, void *, u32);
 void Collider_Refresh(void *);
 
 void Player_SetDirectionalVelocity_08238300(void *, u32);
-void sub_08238238(void *);
+void Player_UpdateActionFacingSide(void *);
 void DirectionalEffect_PlaceSprite(void *, u32, void *);
 void SceneParticleBurst_CreateWhilePaused(void *, void *, void *, u32, u32, u32);
 static inline s32 scale(s32 v)

@@ -1,13 +1,13 @@
 #include "global.h"
-/* Tentative ScenePanel family; names describe observed state and sprite operations. */
-struct ScenePanelPairState {
+/* Paired Vanargand actor. Field names follow observed state and sprite operations. */
+struct VanargandPairState {
     u8 pad0[0x56C];
     void *pair;
     u8 pad570[0x5C4 - 0x570];
     u8 state;
 };
 s32 ScenePair_CountPositiveCounters(void *);
-void VanargandPair_AdvancePairState(struct ScenePanelPairState *panel)
+void VanargandPair_AdvancePairState(struct VanargandPairState *panel)
 {
     s32 count;
     switch (panel->state) {

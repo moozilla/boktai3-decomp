@@ -2,12 +2,12 @@
 #include "ui/widgets/scene_input.h"
 #define gScenePaletteBanks gPaletteBankData
 /* Tentative role names; the offsets are established by palette consumers. */
-struct SceneInventoryCategoryMenu {
+struct StorageCategoryMenu {
     u8 unknown0[0x13F8];
     struct AnimSprite categoryWidget;
     struct AnimSprite targetWidget;
 };
-void Storage_SetCategoryPalette(struct SceneInventoryCategoryMenu *p, u16 *colors)
+void Storage_SetCategoryPalette(struct StorageCategoryMenu *p, u16 *colors)
 {
     u16 *palette = (u16 *)(gPaletteBankData + 0x7540);
     p->categoryWidget.palette = palette;

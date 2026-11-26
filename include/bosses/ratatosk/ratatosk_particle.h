@@ -59,7 +59,7 @@ struct RatatoskParticlePool *Ratatosk_CreateAnimatedParticlePool(void);
 struct RatatoskParticle *Ratatosk_FindFreeAnimatedParticle(struct RatatoskParticlePool *,
                                                            s32 *slot);
 u32 Ratatosk_OnAnimatedParticlePoolDestroy(struct RatatoskParticlePool *);
-s32 sub_081FBF2C(struct RatatoskParticlePool *);
-s32 sub_081FC26C(struct RatatoskParticleConfig *, struct ContactPosition *);
+s32 Ratatosk_UpdateAnimatedParticlePool(struct RatatoskParticlePool *);
+s32 Ratatosk_SpawnAnimatedParticle(struct RatatoskParticleConfig *, struct ContactPosition *);
 
 #endif

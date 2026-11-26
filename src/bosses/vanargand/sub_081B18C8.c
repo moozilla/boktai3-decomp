@@ -103,7 +103,7 @@ static inline u8 MotionEnded(struct PairedSceneHalf *p)
         result = 1;
     return result;
 }
-void ActorStatus_UpdateRisingStrike(struct VanargandAttackPair *boss, struct PairedSceneHalf *p)
+void VanargandCombat_UpdateRisingStrike(struct VanargandAttackPair *boss, struct PairedSceneHalf *p)
 {
     struct MotionTrackVector *targetPosition;
     struct MotionTrackVector rise;

@@ -1,7 +1,5 @@
 #include "scene/actor/scene_actor_registry.h"
-/* SceneActorRegistry_CountLivingByCategoryAndField1E6: Counts living actors matching category and halfword 1E6 while excluding status flag 0x20000; field meaning remains tentative */
-#define SceneActorRegistry_CountLivingByCategoryAndField1E6 sub_08070444
-#define SceneActorRegistry_CountLivingByCategoryAndField    sub_08070444
+/* SceneActorRegistry_CountLivingByCategoryAndField: Counts living actors matching category and halfword 1E6 while excluding status flag 0x20000; field meaning remains tentative */
 struct SceneActorRegistryManager *SceneActorRegistry_GetManager(void);
 /* Byte98 and halfword1E6 are caller-supplied classification filters; the
  * field1E6 interpretation remains tentative. The registry has a NULL-actor

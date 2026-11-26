@@ -1,8 +1,8 @@
-#ifndef GUARD_SCENE_INVENTORY_PANEL_H
-#define GUARD_SCENE_INVENTORY_PANEL_H
+#ifndef GUARD_SHOP_PANEL_H
+#define GUARD_SHOP_PANEL_H
 #include "ui/widgets/scene_input_panel.h"
 #include "ui/town/shop_item_values.h"
-struct SceneInventoryPanel {
+struct ShopPanel {
     struct SceneInputPanel display;
     struct AnimSprite comparison[5][3];
     u32 unknown1A88;
@@ -32,13 +32,13 @@ void SceneInputPanel_ShowItemComparison(struct AnimSprite *, struct AnimSprite *
 void SceneInputPanel_ShowAttributeComparison(struct AnimSprite *, struct AnimSprite *,
                                              struct AnimSprite *, struct AnimSpriteResource *,
                                              s32);
-struct SceneInventoryWidgetFlags {
+struct ShopWidgetFlags {
     u32 flags;
     u8 unknown4[0x5C];
 };
-struct SceneInventoryFlagsView {
+struct ShopFlagsView {
     u8 unknown0[0xB0];
-    struct SceneInventoryWidgetFlags widgets[54];
+    struct ShopWidgetFlags widgets[54];
 };
 u32 Selection_GetDisplayFrame(s32);
 s32 GameState_IsConsumableSlotEquipped(u32);

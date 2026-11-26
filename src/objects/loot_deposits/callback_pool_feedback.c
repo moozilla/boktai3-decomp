@@ -7,20 +7,20 @@
 
 s32 Mod(s32, s32);
 
-static inline u16 CallbackPool_NextRandom(void)
+static inline u16 LootDepositCallbackPool_NextRandom(void)
 {
     u16 *table = gRandomTable;
     gRandomIndex = (gRandomIndex + 1) & 0x3ff;
     return table[gRandomIndex];
 }
 
-void CallbackPool_UpdateShake(struct CallbackPoolEntry *entry)
+void LootDepositCallbackPool_UpdateShake(struct CallbackPoolEntry *entry)
 {
     if (entry->shakeTimer == 0) {
         entry->sprite.position = entry->savedPosition;
     } else {
-        entry->sprite.position.x = entry->savedPosition.x + Mod(CallbackPool_NextRandom(), 20) - 10;
-        entry->sprite.position.z = entry->savedPosition.z + Mod(CallbackPool_NextRandom(), 20) - 10;
+        entry->sprite.position.x = entry->savedPosition.x + Mod(LootDepositCallbackPool_NextRandom(), 20) - 10;
+        entry->sprite.position.z = entry->savedPosition.z + Mod(LootDepositCallbackPool_NextRandom(), 20) - 10;
         entry->shakeTimer--;
     }
 }
@@ -39,7 +39,7 @@ static inline void ClearVector(void *dest, u32 *zero)
     CpuSet(zero, dest, 0x05000002);
 }
 
-void CallbackPool_ApplyDamage(struct ContactCollider *source, struct ContactCollider *target,
+void LootDepositCallbackPool_ApplyDamage(struct ContactCollider *source, struct ContactCollider *target,
                               struct CallbackPoolEntry *entry)
 {
 
@@ -65,8 +65,8 @@ void CallbackPool_ApplyDamage(struct ContactCollider *source, struct ContactColl
     DamageNumberDisplay_Show(target, damage, 0, &entry->sprite.position, vector, 1);
     entry->hitTimer = 3;
     entry->shakeTimer = 10;
-    CallbackPool_SpawnHitParticles(entry);
-    CallbackPool_RefreshHealthDisplay(entry);
+    LootDepositCallbackPool_SpawnHitParticles(entry);
+    LootDepositCallbackPool_RefreshHealthDisplay(entry);
     if (entry->collider.cost)
         Sound_PlaySong(0x13e);
     else
@@ -77,7 +77,7 @@ void CallbackPool_ApplyDamage(struct ContactCollider *source, struct ContactColl
     }
 }
 
-void sub_08014634(u32, u32, struct SceneExtent *, struct SceneExtent *, struct SceneExtent *, u32,
+void ImpactParticleGroup_SpawnBouncing(u32, u32, struct SceneExtent *, struct SceneExtent *, struct SceneExtent *, u32,
                   u32);
 
 static inline s32 NextRandom(void)
@@ -89,7 +89,7 @@ static inline s32 NextRandom(void)
 
 // confidence=low: spawns a small burst of hit particles at the entry's position.
 
-void CallbackPool_SpawnHitParticles(struct CallbackPoolEntry *entry)
+void LootDepositCallbackPool_SpawnHitParticles(struct CallbackPoolEntry *entry)
 {
     u32 stack[3];
     struct SceneExtent spread;
@@ -99,14 +99,14 @@ void CallbackPool_SpawnHitParticles(struct CallbackPoolEntry *entry)
     spread.x = (NextRandom() & 3U) + 15U;
     spread.y = (NextRandom() & 7U) + 15U;
     spread.z = (NextRandom() & 3U) + 15U;
-    sub_08014634((NextRandom() & 3) + 2, 17, (struct SceneExtent *)&entry->sprite.position,
+    ImpactParticleGroup_SpawnBouncing((NextRandom() & 3) + 2, 17, (struct SceneExtent *)&entry->sprite.position,
                  velocity, &spread, 12, 15);
 }
 
-void CallbackPool_ApplyDamage(struct ContactCollider *, struct ContactCollider *,
+void LootDepositCallbackPool_ApplyDamage(struct ContactCollider *, struct ContactCollider *,
                               struct CallbackPoolEntry *);
 
-/* CallbackPool_InitializeCollider: retain the address symbol used by the earlier constructor. */
+/* LootDepositCallbackPool_InitializeCollider: retain the address symbol used by the earlier constructor. */
 
 void sub_08105194(struct CallbackPoolEntry *entry, u32 a, u32 b, u32 c)
 {
@@ -122,13 +122,13 @@ void sub_08105194(struct CallbackPoolEntry *entry, u32 a, u32 b, u32 c)
     Collider_Init(collider, 0, 0x5001, 0, 0x10, &v, &w);
     Collider_SetBodyProperties(collider, a, b, c);
     Collider_SetPosition(collider, &entry->sprite.position, 0);
-    Collider_SetCallback(collider, CallbackPool_ApplyDamage, entry);
+    Collider_SetCallback(collider, LootDepositCallbackPool_ApplyDamage, entry);
     Collider_Refresh(collider);
 }
 
 extern const s16 gUnk_086149C4[];
 
-void sub_08127590(void *, void *, u32, u32, s32, s32, s32, s32, s32, s32, s32, s32, s32, s32, s32);
+void SpriteProjectile_Create(void *, void *, u32, u32, s32, s32, s32, s32, s32, s32, s32, s32, s32, s32, s32);
 
 static inline s32 Scale(s32 x)
 {
@@ -165,29 +165,29 @@ void LootDeposit_EmitRemovalDebris(struct CallbackPoolEntry *entry)
         Polar(direction, selected, 10);
     }
     v.y = 64;
-    sub_08127590(&entry->sprite.position, &v, 0x9385, 0x74C9, 1, 30, 2, 0, 490, 0, 0, 0, 0, 0, 0);
+    SpriteProjectile_Create(&entry->sprite.position, &v, 0x9385, 0x74C9, 1, 30, 2, 0, 490, 0, 0, 0, 0, 0, 0);
     Polar(Rand() & 255, &v, 10);
     v.y = 34;
-    sub_08127590(&entry->sprite.position, &v, 0x9385, 0x74C9, 1, 30, 2, 0, 490, 0, 0, 0, 0, 0, 0);
+    SpriteProjectile_Create(&entry->sprite.position, &v, 0x9385, 0x74C9, 1, 30, 2, 0, 490, 0, 0, 0, 0, 0, 0);
     Polar(Rand() & 255, &v, 10);
     v.y = 34;
-    sub_08127590(&entry->sprite.position, &v, 0x9385, 0x74C9, 1, 30, 2, 0, 490, 0, 1, 0, 0, 0, 0);
+    SpriteProjectile_Create(&entry->sprite.position, &v, 0x9385, 0x74C9, 1, 30, 2, 0, 490, 0, 1, 0, 0, 0, 0);
     Polar(Rand() & 255, &v, 10);
     v.y = 34;
-    sub_08127590(&entry->sprite.position, &v, 0x9385, 0x74C9, 1, 30, 2, 0, 490, 1, 0, 0, 0, 0, 0);
+    SpriteProjectile_Create(&entry->sprite.position, &v, 0x9385, 0x74C9, 1, 30, 2, 0, 490, 1, 0, 0, 0, 0, 0);
     Polar(Rand() & 255, &v, 10);
     v.y = 34;
-    sub_08127590(&entry->sprite.position, &v, 0x9385, 0x74C9, 1, 30, 2, 0, 490, 2, 0, 0, 0, 0, 0);
-    CallbackPool_SpawnHitParticles(entry);
+    SpriteProjectile_Create(&entry->sprite.position, &v, 0x9385, 0x74C9, 1, 30, 2, 0, 490, 2, 0, 0, 0, 0, 0);
+    LootDepositCallbackPool_SpawnHitParticles(entry);
 }
 
-static inline u32 ProximityActor_NextSpawnSample(const u16 *table)
+static inline u32 LootDepositFeedback_NextSpawnSample(const u16 *table)
 {
     gRandomIndex = (gRandomIndex + 1) & 0x3ff;
     return *(u16 *)((gRandomIndex << 1) + (u32)table);
 }
 
-void ProximityActor_SetState(struct CallbackPoolEntry *entry, s32 count)
+void LootDepositFeedback_SetState(struct CallbackPoolEntry *entry, s32 count)
 {
     s32 values[4];
     struct CallbackPoolScriptArgs args;
@@ -198,19 +198,19 @@ void ProximityActor_SetState(struct CallbackPoolEntry *entry, s32 count)
         for (i = 0; i < count; i++) {
             union RandomTableView table = {gRandomTable};
             {
-                u32 random = ProximityActor_NextSpawnSample(table.samples);
+                u32 random = LootDepositFeedback_NextSpawnSample(table.samples);
                 s32 position = entry->sprite.position.x - 64;
                 random &= 127;
                 values[0] = position + random;
             }
             {
-                u32 random = ProximityActor_NextSpawnSample(table.samples);
+                u32 random = LootDepositFeedback_NextSpawnSample(table.samples);
                 s32 position = entry->sprite.position.y - 64;
                 random &= 127;
                 values[1] = position + random;
             }
             {
-                u32 random = ProximityActor_NextSpawnSample(table.samples);
+                u32 random = LootDepositFeedback_NextSpawnSample(table.samples);
                 s32 position = entry->sprite.position.z - 64;
                 random &= 127;
                 values[2] = position + random;
@@ -222,38 +222,38 @@ void ProximityActor_SetState(struct CallbackPoolEntry *entry, s32 count)
     }
 }
 
-void CallbackPool_RefreshHealthDisplay(struct CallbackPoolEntry *entry)
+void LootDepositCallbackPool_RefreshHealthDisplay(struct CallbackPoolEntry *entry)
 {
     u8 *level;
     if (entry->spawnTarget > *(level = &entry->spawnIndex)) {
         s32 diff = entry->maxHealth - entry->health;
         if (!(u8)LootDepositPool_TestStatusFlags(entry, 1))
-            ProximityActor_SetState(entry, 2);
+            LootDepositFeedback_SetState(entry, 2);
         if (diff >= entry->damageThreshold * (*level - 1))
-            ProximityActor_SetState(entry, 1);
+            LootDepositFeedback_SetState(entry, 1);
     }
 }
 
-void ProximityActor_CheckPlayerRange(struct CallbackPoolEntry *actor)
+void LootDepositFeedback_CheckPlayerRange(struct CallbackPoolEntry *actor)
 {
     struct ContactPosition delta;
     s32 distance;
     if (!(u8)LootDepositPool_TestStatusFlags(actor, 1)) {
-        CallbackPool_Subtract(&delta, &actor->sprite.position, &gPlayers[0]->position);
+        LootDepositCallbackPool_Subtract(&delta, &actor->sprite.position, &gPlayers[0]->position);
         distance = delta.x * delta.x + delta.z * delta.z;
         actor->distanceSquared = distance;
         if (actor->distanceSquared < actor->triggerDistanceSquared) {
-            ProximityActor_SetState(actor, 2);
+            LootDepositFeedback_SetState(actor, 2);
             LootDepositPool_AddStatusFlags(actor, 1);
             Sound_PlaySong(0x3C7);
         }
     }
 }
 
-s32 ProximityActor_IsPlayerInsideOriginRange(struct CallbackPoolEntry *actor)
+s32 LootDepositFeedback_IsPlayerInsideOriginRange(struct CallbackPoolEntry *actor)
 {
     struct ContactPosition delta;
-    CallbackPool_Subtract(&delta, &actor->savedPosition, &gPlayers[0]->position);
+    LootDepositCallbackPool_Subtract(&delta, &actor->savedPosition, &gPlayers[0]->position);
     actor->previousDistanceSquared = actor->distanceSquared;
     actor->distanceSquared = delta.x * delta.x + delta.z * delta.z;
     if (actor->distanceSquared < actor->triggerDistanceSquared)

@@ -4,7 +4,7 @@
 #include "scene/actor/scene_actor_control_phase.h"
 s32 Callback_InvokeActor(void *arg, void *function);
 s32 Route_GetCurrentPointNodeId(void *);
-u8 sub_0812F3CC(void *);
+u8 SceneActorReaction_BeginContactResponse(void *);
 void SceneActorRoute_AdvanceActorPoint(void *, void *);
 void SceneActorRoute_UpdateTriggeredWaitPhase(struct ChaseActor *actor)
 {
@@ -14,7 +14,7 @@ void SceneActorRoute_UpdateTriggeredWaitPhase(struct ChaseActor *actor)
         SceneActorTerrain_InstallControl(actor, actor->base.onEntry, 2);
     }
     if (!(u8)Callback_InvokeActor(actor, actor->base.contactQuery.opaque)) {
-        if (!sub_0812F3CC(actor)) {
+        if (!SceneActorReaction_BeginContactResponse(actor)) {
             u8 finished = actor->base.stepDone;
             u32 *flags = &actor->base.statusFlags;
             if (finished)

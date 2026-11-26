@@ -3,7 +3,6 @@
 #include "engine/ram.h"
 
 // confidence=low: projects a sine-scaled speed opposite the actor side.
-#define Hresvelgr_SetSineScaledVelocity sub_0819C870
 struct BurstVector {
     s16 x, y, z, pad;
 };
@@ -21,7 +20,7 @@ struct BurstActor {
     struct BurstVector travelTarget;
 };
 extern const s16 gUnk_086149C4[];
-void MotionEntry_CreateWithDelta(void *, void *, s32, s32);
+void HresvelgrMotion_CreateWithDelta(void *, void *, s32, s32);
 static inline s32 scale(s32 n)
 {
     return n >= 0 ? n >> 12 : -((-n) >> 12);

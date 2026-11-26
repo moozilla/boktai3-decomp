@@ -2,9 +2,8 @@
 #include "global.h"
 #include "engine/ram.h"
 /* TextWindow_ClearSingleton: Clears the global pointer to the scrolling text window */
-#define TextWindow_ClearSingleton sub_08032ED0
 
-void sub_08032ED0(void)
+void TextWindow_ClearSingleton(void)
 {
     gScrollingDialogue = 0;
 }

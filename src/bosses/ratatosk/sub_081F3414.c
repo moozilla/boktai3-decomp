@@ -5,7 +5,6 @@ struct PointDistance {
 };
 void *SceneActors_GetBySlot(u32);
 // confidence=low: chooses the smallest cached distance while excluding one point index.
-#define Ratatosk_FindNearestPointExcept sub_081F3414
 s32 Ratatosk_FindNearestPointExcept(void *unused, s32 excluded)
 {
     s32 best = -1;

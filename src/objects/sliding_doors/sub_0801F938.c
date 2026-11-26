@@ -1,5 +1,5 @@
 #include "global.h"
 
-void SlidingDoor_UpdateIdleB(void)
+void SlidingDoors_UpdateIdleB(void)
 {
 }

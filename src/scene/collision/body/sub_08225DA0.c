@@ -16,7 +16,7 @@ void SpriteOam_QueueProjectedSprites(void);
 void Sprite_RenderScaledList(void);
 void sub_08219624(void);
 void SpriteOam_QueueCameraRelativeSprites(void);
-void sub_08214D20(void);
+void Sprite_RenderCameraRelativeList(void);
 void sub_0821964C(void);
 void Terrain_SetRenderModeFromScript(void)
 {
@@ -32,7 +32,7 @@ void Terrain_SetRenderModeFromScript(void)
             return;
         }
     } else {
-        Video_SetRenderCallbacks(r, SpriteOam_QueueCameraRelativeSprites, sub_08214D20,
+        Video_SetRenderCallbacks(r, SpriteOam_QueueCameraRelativeSprites, Sprite_RenderCameraRelativeList,
                                  sub_0821964C);
     }
     gCamera.offsetX = 0;

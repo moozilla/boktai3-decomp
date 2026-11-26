@@ -6,8 +6,8 @@ it with zero. The move path preserves the manager pointer in r0.
 
 The explicit form changed the ROM bytes. The guarded form passed the unit ROM check.
 
---- a/src/item_container.c
-+++ b/src/item_container.c
+--- a/src/objects/items/item_container.c
++++ b/src/objects/items/item_container.c
 @@ -973,4 +973,7 @@
      struct TriggerManager *s = TriggerManager_GetOrCreate();
      struct Trigger *n;

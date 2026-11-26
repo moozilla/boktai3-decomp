@@ -5,8 +5,8 @@ store in CollisionController_InitSlot uses r1, preserving the sprite pointer.
 
 The explicit form changed the ROM bytes. The guarded form passed the unit ROM check.
 
---- a/src/collision_controller.c
-+++ b/src/collision_controller.c
+--- a/src/objects/strike_traps.c
++++ b/src/objects/strike_traps.c
 @@ -68,4 +68,7 @@
      Effect_SetOrigin(sprite, -8, -8);
      slot->active = 1;

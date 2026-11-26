@@ -17,7 +17,7 @@ void SceneHud_UpdateActionSwap(struct SceneHudState *p)
 {
     u8 *input = p->actionInput;
     u8 *cursor, *selection, *category;
-    struct AnimSprite *widget;
+    struct AnimSprite *animSprite;
     if (SceneInput_NavigateGridKeys(input, 240)) {
         SceneHud_GetActionIconPosition(&p->categoryWidgets[5].position, p->actionCursor);
         SceneHud_ShowActionPreview(p);
@@ -43,8 +43,8 @@ void SceneHud_UpdateActionSwap(struct SceneHudState *p)
         Hud_RestoreGridSelection(input);
         Hud_SetGridPosition(input, p->actionInput[1], p->actionInput[2]);
         SceneHud_GetActionIconPosition(&p->categoryWidgets[5].position, p->actionCursor);
-        widget = &p->categoryWidgets[6];
-        widget->flags |= 1;
+        animSprite = &p->categoryWidgets[6];
+        animSprite->flags |= 1;
         SceneHud_ShowActionPreview(p);
         Sound_PlaySong(222);
     }

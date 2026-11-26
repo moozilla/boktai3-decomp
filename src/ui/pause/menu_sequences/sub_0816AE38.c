@@ -12,7 +12,7 @@ struct PanelSprite {
     u16 x, y;
     u8 unk24[0x3C];
 };
-struct ScenePanel {
+struct MenuSequenceAccountExit {
     u8 unk0[0x18];
     u32 resource;
     u8 unk1C[8];
@@ -49,7 +49,7 @@ s32 MessageWindow_ShowMessage(s32);
 void MenuSequence_CallCompletionScript(void);
 void Hud_SetUpdateCallback(void *, void (*)(void));
 void Sound_PlaySong(u32);
-void MenuSequence_BeginAccountExit(struct ScenePanel *p)
+void MenuSequence_BeginAccountExit(struct MenuSequenceAccountExit *p)
 {
     u32 zero;
     u16 *coord;

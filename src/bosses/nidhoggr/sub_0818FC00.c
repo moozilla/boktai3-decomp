@@ -2,12 +2,12 @@
 #include "engine/video/display_animation.h"
 #include "player/cutscene/player_cue_sequence.h"
 #include "bosses/nidhoggr/nidhoggr_effect_pool.h"
-static inline u32 Nidhoggr_StepAnimation(struct ScenePanelOwnedEffect *owner)
+static inline u32 Nidhoggr_StepAnimation(struct NidhoggrOwnedEffect *owner)
 {
     return PlayerCue_StepSequenceEnded((void *)&owner->sprite, &owner->sequence);
 }
 
-void Nidhoggr_UpdateDetachedAttackEffect(struct ScenePanelOwnedEffect *p)
+void Nidhoggr_UpdateDetachedAttackEffect(struct NidhoggrOwnedEffect *p)
 {
     u32 ended = Nidhoggr_StepAnimation(p);
     switch (p->state) {

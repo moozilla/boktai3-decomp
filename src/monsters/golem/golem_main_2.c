@@ -383,7 +383,7 @@ advance:
 
 /* Golem: build up charge while the target player is not dazzled; charge at the partner when ready and in reach (kind 0x28), else approach (kind 0x23) (tentative) */
 
-u8 sub_0821D4F0(void *, void *, u32, u32);
+u8 Terrain_IsSegmentBelowHeightLimit(void *, void *, u32, u32);
 
 void Golem_UpdateChargeWindup(void);
 
@@ -446,7 +446,8 @@ static inline s32 CanCharge(void *ctx)
     } else if (body->charge688 > 199)
         ready = 1;
     if (ready && body->chase.base.tracking.distance < body->chase.base.tracking.limit &&
-        sub_0821D4F0(pos + 0xC, &body->chase.base.tracking.target->position, 10, 256))
+        Terrain_IsSegmentBelowHeightLimit(pos + 0xC, &body->chase.base.tracking.target->position,
+                                          10, 256))
         return 1;
     return 0;
 }

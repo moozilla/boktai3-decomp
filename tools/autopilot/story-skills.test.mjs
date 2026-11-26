@@ -390,7 +390,7 @@ test('coffin navigation holds A until the exit text opens', () => {
 test('purification brings the trailing coffin across the live panel center', () => {
   let story = 59;
   const panel = { initialMode: 0, effectState: 0, subjectCount: 0, subjects: [], center: { x: 100, z: 100 } };
-  const game = { gScenePanel: panel, gTetherActor: { position: { x: 100, z: 0 } },
+  const game = { gPileDriver: panel, gTetherActor: { position: { x: 100, z: 0 } },
     gPlayers: [{ position: { x: 100, z: 90 } }] };
   const lib = skill('purification', { fn: { ScriptUtility_IsControlFlagSet: () => false } }, game, {
     where: () => ({ scene: 1 }), story: () => story, coffinAvailable: () => true,
@@ -411,7 +411,7 @@ test('Battle Drive waits while the rig is trapped above the coffin', () => {
   let scene = 1, threshold;
   const g = { frameNo: 0, fn: { ScriptUtility_IsControlFlagSet: () => false },
     press: (key, frames) => ({ key, frames }) };
-  const game = { gScenePanel: { initialMode: 1, effectState: 10, rig: { state: 2 } },
+  const game = { gPileDriver: { initialMode: 1, effectState: 10, rig: { state: 2 } },
     gGameState: { unk618: 100 }, gPlayers: [{ currentStatA: 80 }] };
   const lib = skill('purification-battle', g, game, {
     session: { setSolar: (value) => { threshold = value; } },

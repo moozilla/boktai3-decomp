@@ -17,7 +17,7 @@ struct P {
 };
 int ScenePool_IsEntryOutsidePlayerBounds(struct P *, struct Slot *, struct Item *);
 void ScenePool_ReleaseActorSlot(struct P *, struct Slot *, struct Item *, u32);
-void sub_0803C114(struct P *, struct Slot *, struct Item *, u32);
+void ScenePool_UpdateOccupiedActor(struct P *, struct Slot *, struct Item *, u32);
 void ScenePool_UpdateOccupiedActorSlots(struct P *p)
 {
     struct Slot *slot;
@@ -31,7 +31,7 @@ void ScenePool_UpdateOccupiedActorSlots(struct P *p)
             if (ScenePool_IsEntryOutsidePlayerBounds(p, slot, item))
                 ScenePool_ReleaseActorSlot(p, slot, item, i);
             else
-                sub_0803C114(p, slot, item, i);
+                ScenePool_UpdateOccupiedActor(p, slot, item, i);
             p->active++;
         }
         i++;

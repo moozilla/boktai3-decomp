@@ -2,7 +2,7 @@
 #include "objects/moving_platforms/named_object_flags.h"
 #include "objects/moving_platforms/named_object.h"
 
-void ActorGroup_ReleaseMember(struct NamedObject *o)
+void MovingPlatform_ReleaseMember(struct NamedObject *o)
 {
     s16 *flags;
     s32 i;

@@ -3,7 +3,7 @@ typedef struct {
     u32 words[2];
 } Vec;
 extern u32 gUnk_08604D24[][3];
-void SlidingDoor_UpdatePoseC(u8 *p)
+void SlidingDoors_UpdatePoseC(u8 *p)
 {
     p[7] = gUnk_08604D24[p[0x38]][p[0x39]];
     if (p[0x39] == 2) {

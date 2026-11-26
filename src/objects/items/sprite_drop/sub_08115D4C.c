@@ -2,9 +2,8 @@
 #include "global.h"
 #include "engine/ram.h"
 /* Collectible_ClearManager: Clears the singleton collectible manager pointer */
-#define Collectible_ClearManager sub_08115D4C
 
-void sub_08115D4C(void)
+void Collectible_ClearManager(void)
 {
     gActorParticlePool = 0;
 }

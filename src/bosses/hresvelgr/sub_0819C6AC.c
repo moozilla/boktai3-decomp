@@ -3,7 +3,6 @@
 #include "engine/ram.h"
 
 // confidence=low: stores a randomized elevated travel point in the actor.
-#define Hresvelgr_SetRandomTravelTarget sub_0819C6AC
 struct BurstVector {
     s16 x, y, z, pad;
 };
@@ -20,7 +19,7 @@ struct BurstActor {
     struct BurstVector travelTarget;
 };
 extern const s16 gUnk_086149C4[];
-void MotionEntry_CreateWithDelta(void *, void *, s32, s32);
+void HresvelgrMotion_CreateWithDelta(void *, void *, s32, s32);
 static inline s32 scale(s32 n)
 {
     return n >= 0 ? n >> 12 : -((-n) >> 12);

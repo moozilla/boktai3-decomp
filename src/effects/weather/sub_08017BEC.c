@@ -4,7 +4,7 @@
 #include "system/game_state/game_state.h"
 #include "gba/io_reg.h"
 void Script_Call(void *, int);
-int sub_080177AC(void *, int, int, int);
+int Weather_SpawnTerrainParticles(void *, int, int, int);
 static inline void Weather_SetStormActiveFlag(void)
 {
     u32 mask = 4096;
@@ -31,7 +31,7 @@ int Weather_StormOnset(struct WeatherState *p)
         if (!(p->phaseTimer & 3))
             gDispCntShadow &= ~mask;
     }
-    sub_080177AC(p, 3, 10, 10);
+    Weather_SpawnTerrainParticles(p, 3, 10, 10);
     if (p->phaseTimer > 44) {
         Weather_EnterPhase(p, 3);
         return 1;

@@ -8,7 +8,6 @@
 #include "engine/video/render.h"
 
 // confidence=low: chooses the nearest visible list entry within a fixed squared-distance limit.
-#define Player_FindNearestVisibleTarget sub_0814C248
 struct TargetPosition {
     s16 x, y, z;
 };

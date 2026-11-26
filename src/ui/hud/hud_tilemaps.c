@@ -129,7 +129,7 @@ void SceneHud_SetKeyframePaletteBank(struct AnimSprite *target, u32 bank)
     target->palette = (u16 *)(gPaletteBankData + (target->paletteBank << 5));
 }
 
-/* SceneHud_UpdateFeaturePalettes: Sets up to three widget palette banks to 0x374 or 0x373 according to owner flag masks 4/8/16; preserves the existing provisional alias */
+/* SceneHud_UpdateFeaturePalettes: Sets up to three animSprite palette banks to 0x374 or 0x373 according to owner flag masks 4/8/16; preserves the existing provisional alias */
 
 void SceneHud_UpdateFeaturePalettes(const void *owner, struct AnimSprite *first,
                                     struct AnimSprite *second, struct AnimSprite *third)
@@ -158,14 +158,14 @@ void SceneHud_ShowFourDigits(struct SceneInputPanel *parent, const struct Contac
                              s32 value, u32 label)
 {
     void *resource = &parent->widgetResource;
-    struct AnimSprite *widget = &parent->numericLabel;
+    struct AnimSprite *animSprite = &parent->numericLabel;
     s32 digits[4];
     s32 offset, remaining;
     s32 *digit;
-    widget->flags &= ~1;
-    widget->position = *position;
-    Anim_LoadKeyframe(widget, resource, (u16)(label + 0xA8), 1);
-    widget = parent->smallDigits;
+    animSprite->flags &= ~1;
+    animSprite->position = *position;
+    Anim_LoadKeyframe(animSprite, resource, (u16)(label + 0xA8), 1);
+    animSprite = parent->smallDigits;
     digits[0] = Div(value, 1000);
     value -= digits[0] * 1000;
     digits[1] = Div(value, 100);
@@ -177,11 +177,11 @@ void SceneHud_ShowFourDigits(struct SceneInputPanel *parent, const struct Contac
     digit = digits;
     remaining = 3;
     do {
-        widget->flags &= ~1;
-        Anim_LoadKeyframe(widget, resource, (u16)(*digit++ + 0xAA), 1);
-        widget->position = *position;
-        widget->position.x += offset;
-        widget++;
+        animSprite->flags &= ~1;
+        Anim_LoadKeyframe(animSprite, resource, (u16)(*digit++ + 0xAA), 1);
+        animSprite->position = *position;
+        animSprite->position.x += offset;
+        animSprite++;
         offset += 6;
         remaining--;
     } while (remaining >= 0);
@@ -193,8 +193,8 @@ void SceneHud_HideFourDigits(struct SceneInputPanel *parent)
     u8 *entry = body + ((u8 *)&parent->numericLabel - body);
     s32 i = 0;
     do {
-        struct AnimSprite *widget = (void *)entry;
-        widget->flags |= 1;
-        entry += sizeof(*widget);
+        struct AnimSprite *animSprite = (void *)entry;
+        animSprite->flags |= 1;
+        entry += sizeof(*animSprite);
     } while (++i < 5);
 }

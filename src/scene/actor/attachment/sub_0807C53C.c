@@ -1,7 +1,5 @@
 #include "scene/actor/scene_actor_attachment.h"
 /* SceneActorAttachment_SelectAlternateCategory21Offsets: Selects attachment Y/Z offsets by kind; duplicates the category 21 selector with no observed callers */
-#define SceneActorAttachment_SelectAlternateCategory21Offsets sub_0807C53C
-#define SceneActorAttachment_SelectAlternateCategory21Offsets sub_0807C53C
 
 void SceneActorAttachment_SelectAlternateCategory21Offsets(u8 kind, s32 *yOffset, s32 *zOffset)
 {

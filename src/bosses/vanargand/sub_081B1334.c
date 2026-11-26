@@ -71,7 +71,7 @@ static inline void SetState(struct PairedSceneHalf *p, u32 state)
     p->actionCounters[0] = state;
     p->actionCounters[1] = 0;
 }
-void ActorStatus_UpdateGuardedApproach(struct VanargandAttackPair *boss,
+void VanargandCombat_UpdateGuardedApproach(struct VanargandAttackPair *boss,
                                        struct PairedSceneHalf *part)
 {
     struct VanargandAttackPair *owner = boss;

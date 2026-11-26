@@ -12,7 +12,7 @@ void PauseMenu_AddSpriteFlags(void *, int, int);
 s32 MessageWindow_Clear(void);
 void SceneHud_PrepareActionTransferToSlot(void *, int, u32, int);
 void GameState_ClearConsumableSlot(u32);
-void sub_08170D78(void *);
+void PauseInventory_RefreshConsumableIcons(void *);
 void Hud_SetInteractionCallback(void *, void (*)(void), int);
 void PauseInventory_UpdateConsumableDiscardAnimation(void);
 void MotionSequence_ResolveSelection(struct MotionSequence *p)
@@ -26,7 +26,7 @@ void MotionSequence_ResolveSelection(struct MotionSequence *p)
         MessageWindow_Clear();
         SceneHud_PrepareActionTransferToSlot(p, 0, p->selection, 0x24);
         GameState_ClearConsumableSlot(p->selection);
-        sub_08170D78(p);
+        PauseInventory_RefreshConsumableIcons(p);
         Hud_SetInteractionCallback(p, PauseInventory_UpdateConsumableDiscardAnimation, 1);
     }
 }

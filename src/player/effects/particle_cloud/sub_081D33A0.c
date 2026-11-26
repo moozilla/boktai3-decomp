@@ -37,7 +37,6 @@ static inline void SetPosition(struct CloudSprite *sprite, s32 angle, s32 radius
     sprite->position.z = Truncate(gUnk_086149C4[angle] * radius);
 }
 // confidence=low: initializes forty particles around the player, with one of two sheets.
-#define PlayerParticleCloud_Initialize sub_081D33A0
 s32 PlayerParticleCloud_Initialize(struct CloudTask *p, const union CloudPackedPosition *input,
                                    s32 mode)
 {

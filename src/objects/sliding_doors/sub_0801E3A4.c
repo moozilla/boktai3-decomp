@@ -1,7 +1,7 @@
 #include "global.h"
 #include "player/player.h"
 extern int gUnk_08604D54[][3];
-int SlidingDoor_CheckActorCompatibility(void *unused, u8 *p)
+int SlidingDoors_CheckActorCompatibility(void *unused, u8 *p)
 {
     int i = 0, result;
     int actor = (*(u8 **)gPlayers)[0x3a4];

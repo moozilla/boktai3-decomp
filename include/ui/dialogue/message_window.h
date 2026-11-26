@@ -51,7 +51,7 @@ struct MessageWindow {
     u16 messageFrames[32];
     struct PaletteResource *paletteData;
     struct AnimSpriteResource resource;
-    struct AnimSprite widget;
+    struct AnimSprite animSprite;
     u8 portraitGraphics[0x1C];
     struct ContactSwarmSprite portrait;
     struct DisplaySequenceState portraitSequence;

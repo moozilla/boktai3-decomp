@@ -4,7 +4,7 @@ static inline u32 tst(volatile u16 *a, u32 m)
 {
     return *a & m;
 }
-void Debug_NudgeScreenPositionWithA(u16 *p)
+void HresvelgrDebug_NudgeScreenPositionWithA(u16 *p)
 {
     if ((*(u16 *)gPadState) & 1) {
         if ((*(u16 *)gPadState) & 0x10)

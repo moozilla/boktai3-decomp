@@ -11,8 +11,8 @@ struct EffectPool {
 s32 AnimData_Load(void *, u32);
 void AnimData_SelectPaletteBank(void *, u32);
 void *ScriptProc_Start(u16, u16);
-s32 EffectPool_CreateEntries(struct EffectPool *);
-s32 EffectPool_Initialize(struct EffectPool *controller, s32 a, s32 b, s32 c)
+s32 HresvelgrEffectPool_CreateEntries(struct EffectPool *);
+s32 HresvelgrEffectPool_Initialize(struct EffectPool *controller, s32 a, s32 b, s32 c)
 {
     controller->count = 0;
     AnimData_Load(controller->animation, 0x306e);
@@ -21,7 +21,7 @@ s32 EffectPool_Initialize(struct EffectPool *controller, s32 a, s32 b, s32 c)
     controller->parameters[0] = a;
     controller->parameters[1] = b;
     controller->parameters[2] = c;
-    if (EffectPool_CreateEntries(controller) < 0)
+    if (HresvelgrEffectPool_CreateEntries(controller) < 0)
         return -1;
     return 0;
 }

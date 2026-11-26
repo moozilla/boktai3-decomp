@@ -1,6 +1,6 @@
 #include "global.h"
 #include "ui/widgets/scene_input_navigation.h"
-struct SceneInventoryCategoryMenu {
+struct StorageCategoryMenu {
     u8 unknown0[0x258];
     struct AnimSprite prompt;
     u8 unknown2B8[0x1458 - 0x2B8];
@@ -18,16 +18,16 @@ struct SceneInventoryCategoryMenu {
     u8 unknown1790[0x38];
     u16 colors[16];
 };
-void Storage_SetCategoryPalette(struct SceneInventoryCategoryMenu *, u16 *);
-void Storage_SetState(struct SceneInventoryCategoryMenu *,
-                             void (*)(struct SceneInventoryCategoryMenu *), u32);
-void Storage_HideItemDetails(struct SceneInventoryCategoryMenu *);
+void Storage_SetCategoryPalette(struct StorageCategoryMenu *, u16 *);
+void Storage_SetState(struct StorageCategoryMenu *,
+                             void (*)(struct StorageCategoryMenu *), u32);
+void Storage_HideItemDetails(struct StorageCategoryMenu *);
 void Storage_InitSelectionGrid(struct SceneInputGridView *, u32, u32, u32, u32);
-void Storage_InitSlotMapping(struct SceneInventoryCategoryMenu *, s32);
+void Storage_InitSlotMapping(struct StorageCategoryMenu *, s32);
 void Storage_UpdateCursorPosition(struct SceneInputGridView *, void *);
-void Storage_RefreshCategoryWidgets(struct SceneInventoryCategoryMenu *);
-void Storage_UpdateModeSelection(struct SceneInventoryCategoryMenu *);
-void Storage_BeginModeSelection(struct SceneInventoryCategoryMenu *p, s32 mode)
+void Storage_RefreshCategoryWidgets(struct StorageCategoryMenu *);
+void Storage_UpdateModeSelection(struct StorageCategoryMenu *);
+void Storage_BeginModeSelection(struct StorageCategoryMenu *p, s32 mode)
 {
     Storage_InitSlotMapping(p, (p->categoryKinds[p->category] & 1) << 4);
     Storage_HideItemDetails(p);

@@ -1,7 +1,7 @@
 #include "global.h"
 #include "ui/widgets/scene_input_grid.h"
 #include "system/game_state/game_state.h"
-struct SceneInventoryCategoryMenu {
+struct StorageCategoryMenu {
     u8 unknown0[0x1558];
     struct SceneInputPair transition;
     u8 unknown164C[0x1754 - 0x164C];
@@ -15,10 +15,10 @@ struct SceneInventoryCategoryMenu {
 void Inventory_ClearItemSlot(u32);
 void Inventory_RemoveEquipmentEntry(s32);
 void Sound_PlaySong(u32);
-void Storage_UpdateBrowseIntro(struct SceneInventoryCategoryMenu *);
-void Storage_SetState(struct SceneInventoryCategoryMenu *,
-                             void (*)(struct SceneInventoryCategoryMenu *), u32);
-void Storage_CompleteCategoryRemoval(struct SceneInventoryCategoryMenu *p)
+void Storage_UpdateBrowseIntro(struct StorageCategoryMenu *);
+void Storage_SetState(struct StorageCategoryMenu *,
+                             void (*)(struct StorageCategoryMenu *), u32);
+void Storage_CompleteCategoryRemoval(struct StorageCategoryMenu *p)
 {
     if (SceneInput_TickPairTransition(&p->transition)) {
         u8 *kinds = p->categoryKinds;

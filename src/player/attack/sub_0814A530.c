@@ -18,7 +18,7 @@ static inline s32 ScaleActionStat(s32 product)
 }
 s32 Player_CalculateActionStat(struct Player *p, struct PlayerStatModifierContext *ctx, s32 bonus)
 {
-    struct SceneInventoryActionDefinition *def;
+    struct ShopActionDefinition *def;
     s32 count, value, i;
     if (!p) {
         def = Equipment_GetDefinition(ctx->actionEntry->kind);

@@ -477,7 +477,7 @@ void NavMesh_UpdateProbe(struct NavSteeringProbe *probe, struct NavSteeringPosit
 
 extern const s16 gUnk_086149C4[];
 
-s32 sub_0821BF5C(s16 *, s16 *, s32);
+s32 Terrain_AreCellsConnected(s16 *, s16 *, s32);
 
 static inline s32 Mul12(s32 a, s32 b)
 {
@@ -499,7 +499,7 @@ s32 Actor_MoveAlongAngle(struct NavSteeringPosition *pos, u32 angle, s32 dist)
     d.x = d.x + pos->x;
     q->y = pos->y + q->y;
     q->z = q->z + pos->z;
-    return sub_0821BF5C((s16 *)pos, (s16 *)&d, 4);
+    return Terrain_AreCellsConnected((s16 *)pos, (s16 *)&d, 4);
 }
 
 // Steers a nav probe: when the probe lies to the side of `angle` (relative to `target`),

@@ -20,10 +20,10 @@ struct PRecover {
     u8 pad4[0x46A - 0x458];
     u8 stepSoundFlag;
 };
-s32 sub_0823C4B4(struct PRecover *);
+s32 Player_GetLinkedSmoothedDirection(struct PRecover *);
 s32 Player_GetAdjustedMovementInterval(struct PRecover *);
 void Player_SetDirectionalVelocity_08238300(struct PRecover *, s32);
-void sub_08238238(struct PRecover *);
+void Player_UpdateActionFacingSide(struct PRecover *);
 void Player_PlayLocalSong(u32, s32);
 void Player_SetTetherMode(struct PRecover *, s32, s32);
 void Player_BeginWalk(struct PRecover *p)
@@ -33,9 +33,9 @@ void Player_BeginWalk(struct PRecover *p)
         Player_SetTetherMode(p, 1, 0);
     }
     p->flags20 &= ~1;
-    p->dir = sub_0823C4B4(p);
+    p->dir = Player_GetLinkedSmoothedDirection(p);
     Player_SetDirectionalVelocity_08238300(p, Player_GetAdjustedMovementInterval(p));
-    sub_08238238(p);
+    Player_UpdateActionFacingSide(p);
     Anim_SetSequence(&p->seq, p->resource, 1, p->facing, p->flip);
     PlayerCue_StepSequence(&p->sprite, &p->seq);
     if (p->seq.index == 2 && p->seq.elapsed == 0) {

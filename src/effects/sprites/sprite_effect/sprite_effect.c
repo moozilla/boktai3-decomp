@@ -111,7 +111,7 @@ void SpriteEffect_UpdateFallingShard(struct SpriteEffectPool *manager, struct Sp
             high.y = (HitSpark_Sample(table, index) & 7) + 3;
             high.z = 24;
         }
-        sub_08014634(6, 3, &effect->position, &low, &high, 32, 31);
+        ImpactParticleGroup_SpawnBouncing(6, 3, &effect->position, &low, &high, 32, 31);
     } else {
         Collider_SetPosition(&effect->collider, &effect->position, 0);
         Collider_Refresh(&effect->collider);

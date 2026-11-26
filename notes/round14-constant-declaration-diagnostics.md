@@ -12,7 +12,7 @@ for ordinary control flow rather than a declaration. Three concrete examples:
 |---|---|---|
 | `src/monsters/axe/axe.c:2248` | `goto zero;` | Branch to the helper's false-result label. |
 | `src/monsters/spider.c:40` | `goto one;` | Branch to the helper's true-result label. |
-| `src/effects/particles/frost_emitter.c:186` | `return zero;` | Read an existing local; its declaration is reported separately. |
+| `src/effects/particles/sabata_frost.c:186` | `return zero;` | Read an existing local; its declaration is reported separately. |
 
 Exclude only those two reserved control-flow keywords from the type position.
 Arbitrary typedef names remain recognized. A real `zero`/`one` declaration

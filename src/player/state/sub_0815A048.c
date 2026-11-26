@@ -4,7 +4,6 @@
 void Player_AddControlFlags(void *, u32);
 void Sound_PlaySong(u32);
 // confidence=low: forced variant clears movement state before starting or refreshing stun.
-#define Player_TryStartStun sub_0815A048
 s32 Player_TryStartStun(struct Player *p, s32 duration, s32 force)
 {
     if (force == 1) {

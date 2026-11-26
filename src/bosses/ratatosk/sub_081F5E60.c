@@ -8,7 +8,6 @@ static inline int trunc12(int x)
     return x >= 0 ? x >> 12 : -(-x >> 12);
 }
 // confidence=low: restores the saved position while applying a decreasing shake.
-#define Ratatosk_UpdateDecayingShake sub_081F5E60
 void Ratatosk_UpdateDecayingShake(struct Ratatosk *p, int tick)
 {
     struct Ratatosk *p2 = p;

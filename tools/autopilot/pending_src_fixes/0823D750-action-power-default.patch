@@ -4,8 +4,8 @@ Unsupported modes branch around all writes to r0
 
 The explicit form changed the ROM bytes. The guarded form passed the unit ROM check.
 
---- a/src/fn/sub_0823D750.c
-+++ b/src/fn/sub_0823D750.c
+--- a/src/link/player/sub_0823D750.c
++++ b/src/link/player/sub_0823D750.c
 @@ -26,3 +26,6 @@
              return r;
      }

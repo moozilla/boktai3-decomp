@@ -2,7 +2,6 @@
 #include "engine/engine.h"
 #include "engine/ram.h"
 // confidence=low: spawns pooled particles with optional velocity ranges and position jitter.
-#define SceneParticle_CreateAnchoredRanges sub_08068500
 struct SceneParticleSlot *SceneParticle_AllocateSlot(struct SceneParticlePool *);
 s32 Mod(s32, s32);
 void ParticleSprite_Initialize(void *, const void *, u32);

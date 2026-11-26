@@ -1,6 +1,6 @@
-diff --git a/src/link/registry_1745/sub_0810B914.c b/src/link/registry_1745/sub_0810B914.c
---- a/src/link/registry_1745/sub_0810B914.c
-+++ b/src/link/registry_1745/sub_0810B914.c
+diff --git a/src/link/session/sub_0810B914.c b/src/link/session/sub_0810B914.c
+--- a/src/link/session/sub_0810B914.c
++++ b/src/link/session/sub_0810B914.c
 @@ -131,4 +131,9 @@
      Hud_SetMode(7);
      p->fieldB4 = Registry1745_RunSession;

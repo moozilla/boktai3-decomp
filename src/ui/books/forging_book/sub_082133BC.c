@@ -5,7 +5,7 @@ void BgGfx_LoadTilemapSimple(u32, u32, u32, u32, u32);
 u8 *ScriptProc_Start(u32, u32);
 void Bg_SetupLayers(u32, u32, void *, u32, u32, u32, u32 *);
 s32 CollectionBook_GetPageEntryCount(s32);
-void sub_08215EB4(s32, s32, s32, s32, s32, s32, s32, s32);
+void Bg_FillTilemapRectangle(s32, s32, s32, s32, s32, s32, s32, s32);
 void ForgingBook_SetupPageBackground(u8 *p)
 {
     u32 size = 16;
@@ -38,7 +38,7 @@ void ForgingBook_SetupPageBackground(u8 *p)
             tile->y = 0;
             count++;
             if (count > max)
-                sub_08215EB4(3, x, y + 3, 4, 4, 1, 0, 2);
+                Bg_FillTilemapRectangle(3, x, y + 3, 4, 4, 1, 0, 2);
             x += 5;
             i--;
         } while (i >= 0);
@@ -46,7 +46,7 @@ void ForgingBook_SetupPageBackground(u8 *p)
     } while (row <= 1);
     {
         s32 zero = 0;
-        sub_08215EB4(3, 0, 0, 2, 2, 2, zero, zero);
-        sub_08215EB4(3, 28, 0, 2, 2, 2, zero, zero);
+        Bg_FillTilemapRectangle(3, 0, 0, 2, 2, 2, zero, zero);
+        Bg_FillTilemapRectangle(3, 28, 0, 2, 2, 2, zero, zero);
     }
 }

@@ -2,9 +2,8 @@
 #include "global.h"
 #include "engine/ram.h"
 /* DialogueTransition_Init: Clears the scripted dialogue transition singleton pointer to initialize its global state */
-#define DialogueTransition_Init sub_08033C4C
 
-void sub_08033C4C(void)
+void DialogueTransition_Init(void)
 {
     gTransition = 0;
 }

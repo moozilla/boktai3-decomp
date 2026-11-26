@@ -2,7 +2,7 @@
 #include "script/script_utility.h"
 #include "system/game_state/game_state.h"
 void Bestiary_UnlockEntry(s32);
-void sub_08159164(s32);
+void Player_AddExperience(s32);
 #define H(p, n) (*(s16 *)((u8 *)(p) + (n)))
 static inline s32 clamp(s32 v)
 {
@@ -33,7 +33,7 @@ void AxeArmor_RecordDefeat(struct AxeArmor *p)
     Bestiary_UnlockEntry(29);
     if (p->displayedDamageType & 1) {
         u16 flags;
-        sub_08159164(p->unknown148);
+        Player_AddExperience(p->unknown148);
         H(gGameState, 0x87C) = H(gGameState, 0x87C) < 9999 ? H(gGameState, 0x87C) + 1 : 9999;
         H(gGameState, 0x538) = H(gGameState, 0x538) < 9999 ? H(gGameState, 0x538) + 1 : 9999;
         flags = p->rangeA;

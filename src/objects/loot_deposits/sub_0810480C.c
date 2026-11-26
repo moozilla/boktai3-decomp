@@ -31,7 +31,7 @@ static inline s32 Scale(s32 x)
         return x >> 12;
     return -((-x) >> 12);
 }
-u8 ProximityActor_IsPlayerInsideOriginRange(void *);
+u8 LootDepositFeedback_IsPlayerInsideOriginRange(void *);
 void LootDeposit_UpdateMemberSway(struct ActorGroupMember *);
 void Sound_PlaySong(u32);
 static inline void Clear(void *p)
@@ -73,7 +73,7 @@ void LootDeposit_UpdateMemberProximity(void *unused, struct ActorGroupMember *p)
         p->z = z + p->originZ;
     }
     if (p->frame & 1) {
-        if (ProximityActor_IsPlayerInsideOriginRange(p)) {
+        if (LootDepositFeedback_IsPlayerInsideOriginRange(p)) {
             if (!LootDeposit_TestPlayerFlag(gPlayers[0], 8)) {
                 s32 active;
                 if (gPlayerPassageState && !gPlayerInteractionMode)

@@ -140,7 +140,7 @@ Next idea: find C before line 679 whose RTL needs one reload choice and still em
 code (a copy that jump2 merges after reload, fact 59), or that keeps a value live in r1 across
 the first ldrsh.
 
-### sub_08012B34 (src/effects/particles/debris_particles.c, 08012B34): deferred, the dead 0x0403B714 load
+### sub_08012B34 (src/objects/bat_curtain/debris_particles.c, 08012B34): deferred, the dead 0x0403B714 load
 
 Draft: `notes/phase3-drafts/field-effects/sub_08012B34.c` (20 ROM / 20 draft). The ROM loads
 0x0403B714 (PARTICLE_RANDOM_SAMPLE_ORIGIN) into r3 in both arms and never uses it. The same dead
@@ -1509,7 +1509,7 @@ The single original base pin remains. Read fold_rtx in gcc/cse.c: after obtainin
 
 Tags: #matching #phase3 #effects
 
-### sub_08012B34 (08012B34, src/effects/particles/debris_particles.c): partial, origin pin remains
+### sub_08012B34 (08012B34, src/objects/bat_curtain/debris_particles.c): partial, origin pin remains
 
 Removed the operand barrier using `ParticleRandom_ReadRelativeSample(setup, gRandomTable)`
 for subsequent draws. The complete unit still matches; only the existing r3 origin pin

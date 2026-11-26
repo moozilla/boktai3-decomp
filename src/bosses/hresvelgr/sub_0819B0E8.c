@@ -1,6 +1,5 @@
 #include "global.h"
 /* Math_ApproachAngleByEighth: Approaches the target by one eighth of the shortest angular difference with a minimum unit step */
-#define Math_ApproachAngleByEighth sub_0819B0E8
 
 static inline s32 AngleNear(s32 angle, s32 ref)
 {
@@ -28,7 +27,7 @@ static inline s32 Approach(s32 cur, s32 target)
     return cur + Shift(d);
 }
 
-s32 sub_0819B0E8(s32 angle, s32 target)
+s32 Math_ApproachAngleByEighth(s32 angle, s32 target)
 {
     return Approach(AngleNear(angle, target), target);
 }

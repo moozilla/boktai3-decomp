@@ -1,6 +1,3 @@
-#define Anim_FindGlyphEntryById     sub_082196FC
-#define Anim_RemoveAllInCurrentList sub_082195F8
-#define Blend_Disable               sub_082195AC
 #include "engine/video/anim_sprite_glyph.h"
 #include "engine/video/render.h"
 #include "engine/video/display_resource.h"
@@ -41,11 +38,11 @@ void Anim_Remove(struct AnimSprite *animSprite)
 
 void Anim_RemoveAllInCurrentList(void)
 {
-    struct AnimSprite *widget = gMainSpriteListHeads[gRenderListIndex];
-    while (widget) {
-        struct AnimSprite *next = widget->next;
-        Anim_Remove(widget);
-        widget = next;
+    struct AnimSprite *animSprite = gMainSpriteListHeads[gRenderListIndex];
+    while (animSprite) {
+        struct AnimSprite *next = animSprite->next;
+        Anim_Remove(animSprite);
+        animSprite = next;
     }
 }
 

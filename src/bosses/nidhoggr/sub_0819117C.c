@@ -20,7 +20,7 @@ struct SceneAnimationEffectPair {
 extern const struct SceneAnimationEffectPair gUnk_0824F354;
 void Anim_SetKeyframes(void *, void *, u32, u32, u32);
 s32 Anim_Step(void *, void *);
-void sub_08190274(void *, void *, void *, void *);
+void Nidhoggr_CreateSeekingAttackEffect(void *, void *, void *, void *);
 
 void SceneAnimation_UpdateSlotSequenceSevenEffect(u8 *p, int i)
 {
@@ -44,7 +44,7 @@ void SceneAnimation_UpdateSlotSequenceSevenEffect(u8 *p, int i)
                 struct SceneAnimationEffectPair v;
                 *q = 2;
                 v = gUnk_0824F354;
-                sub_08190274(p + 0x54, (void *)(i * 0x60 + (u32)p + 0x545c), &v, p);
+                Nidhoggr_CreateSeekingAttackEffect(p + 0x54, (void *)(i * 0x60 + (u32)p + 0x545c), &v, p);
             }
             break;
     }

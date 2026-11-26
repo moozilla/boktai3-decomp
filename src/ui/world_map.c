@@ -2,7 +2,7 @@
 
 void Palette_InterpolateBanks(void *, void *, void *, int, int);
 
-void sub_082157EC(void);
+void Bg_ResetDisplay(void);
 
 void Hud_SetMode(s32);
 
@@ -81,7 +81,7 @@ void WorldMap_UpdateIndicators(struct RegistrySelectionMenu *menu)
     u32 available = menu->availableEntries;
     struct AnimSpriteResource *resource = &menu->resource;
     struct AnimSprite *widgets = menu->animations;
-    struct AnimSprite *widget;
+    struct AnimSprite *animSprite;
     struct MenuCursorEntry *entry;
     if (available & 2)
         Anim_LoadKeyframe(widgets + 1, resource, 14, 0);
@@ -104,21 +104,21 @@ void WorldMap_UpdateIndicators(struct RegistrySelectionMenu *menu)
     else
         Anim_LoadKeyframe(widgets + 5, resource, 21, 0);
     if (available & 64) {
-        widget = widgets + 6;
-        Anim_LoadKeyframe(widget, resource, 23, 0);
-        widget->flags &= ~1;
+        animSprite = widgets + 6;
+        Anim_LoadKeyframe(animSprite, resource, 23, 0);
+        animSprite->flags &= ~1;
     } else
         (widgets + 6)->flags |= 1;
     if (available & 128) {
-        widget = widgets + 7;
-        Anim_LoadKeyframe(widget, resource, 24, 0);
-        widget->flags &= ~1;
+        animSprite = widgets + 7;
+        Anim_LoadKeyframe(animSprite, resource, 24, 0);
+        animSprite->flags &= ~1;
     } else
         (widgets + 7)->flags |= 1;
     if (available & 256) {
-        widget = widgets + 8;
-        Anim_LoadKeyframe(widget, resource, 26, 0);
-        widget->flags &= ~1;
+        animSprite = widgets + 8;
+        Anim_LoadKeyframe(animSprite, resource, 26, 0);
+        animSprite->flags &= ~1;
     } else
         (widgets + 8)->flags |= 1;
     if (available & 1)
@@ -310,7 +310,7 @@ void WorldMap_InitializeBackground(struct RegistrySelectionMenu *menu)
     u16 *display = &gDispCntShadow;
     s32 clearMask = ~0xf00;
     *display = clearMask & *display;
-    sub_082157EC();
+    Bg_ResetDisplay();
     Hud_SetMode(7);
     {
         u32 enabledLayers = 0xd00;

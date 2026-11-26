@@ -1,4 +1,3 @@
-#define EffectGroup_UpdateDisabled sub_08231444
 #include "global.h"
 struct EffectGroupEntry {
     u8 state, fadeTimer;
@@ -13,7 +12,7 @@ struct EffectGroup {
     struct EffectGroupEntry entries[4];
     void (*update)(struct EffectGroup *);
 };
-void sub_08231444(struct EffectGroup *);
+void SceneActorEffects_OnInactiveSlot(struct EffectGroup *);
 s32 EffectGroup_Reset(struct EffectGroup *group)
 {
     struct EffectGroupEntry *entry;
@@ -21,7 +20,7 @@ s32 EffectGroup_Reset(struct EffectGroup *group)
     group->cursor = 0;
     group->count = 0;
     group->mode = 0;
-    group->update = sub_08231444;
+    group->update = SceneActorEffects_OnInactiveSlot;
     {
         u32 zero = 0;
         u32 timer = 10;

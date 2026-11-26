@@ -1,5 +1,5 @@
 #include "ui/town/shop_tail.h"
-s32 Shop_TickActionSelection(struct SceneInventoryTail *p)
+s32 Shop_TickActionSelection(struct ShopTail *p)
 {
     SceneInputPanel_HighlightCompare(&p->display, p->highlight.colors);
     if (Shop_HandleClockShortcut(p))

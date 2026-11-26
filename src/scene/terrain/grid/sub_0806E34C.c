@@ -1,7 +1,6 @@
 #include "global.h"
 #include "scene/motion/scene_actor_terrain.h"
 /* SceneGrid_TryRandomNearbyPosition: Samples one nearby grid position and writes its cell center only if the board entry matches the source terrain height */
-#define SceneGrid_TryRandomNearbyPosition sub_0806E34C
 extern const s8 gUnk_08605BC8[];
 
 s32 SceneGrid_TryRandomNearbyPosition(struct ContactPosition *output, void *unused,

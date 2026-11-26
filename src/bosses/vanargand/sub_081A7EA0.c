@@ -1,5 +1,5 @@
 #include "global.h"
-struct ScenePanelPairReaction {
+struct VanargandPairReaction {
     u8 unknown0[0x9C];
     u32 flags;
     u8 unknownA0[0xAC - 0xA0];
@@ -13,7 +13,7 @@ struct ScenePanelPairReaction {
 };
 s32 ScenePair_CountPositiveCounters(void *);
 u32 Vanargand_IsEitherComponentFlag40Set(void *);
-static inline void VanargandPair_RequestReaction(struct ScenePanelPairReaction *panel, u32 mode,
+static inline void VanargandPair_RequestReaction(struct VanargandPairReaction *panel, u32 mode,
                                               u32 substate, u32 transition)
 {
     panel->mode = mode;
@@ -22,7 +22,7 @@ static inline void VanargandPair_RequestReaction(struct ScenePanelPairReaction *
     panel->counter = 0;
     panel->pending = 1;
 }
-s32 VanargandPair_RequestPairReaction(struct ScenePanelPairReaction *panel)
+s32 VanargandPair_RequestPairReaction(struct VanargandPairReaction *panel)
 {
     u32 two = 2;
     if (panel->flags & two) {

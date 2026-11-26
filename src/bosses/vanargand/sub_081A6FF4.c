@@ -1,14 +1,14 @@
 #include "global.h"
-/* Tentative ScenePanel family; names describe observed state and sprite operations. */
+/* Paired Vanargand actor. Field names follow observed state and sprite operations. */
 
-struct ScenePanelAnimation {
+struct VanargandPairAnimation {
     u8 pad0[6];
     u16 tile;
     u8 pad8[4];
     void *tiles;
     u8 pad10[12];
 };
-struct ScenePanelAuxiliarySprite {
+struct VanargandPairAuxiliarySprite {
     u8 pad0[7];
     u8 mode;
     u8 pad8[8];
@@ -16,14 +16,14 @@ struct ScenePanelAuxiliarySprite {
     u8 pad12[10];
     u16 scale[3];
     u8 pad22[10];
-    struct ScenePanelAnimation animation;
+    struct VanargandPairAnimation animation;
 };
 s32 AnimData_Load(void *, u32);
 void Sprite_Init(void *, void *, u32);
 
-void VanargandPair_InitAuxiliarySprite_081A6FF4(u8 *panel, struct ScenePanelAuxiliarySprite *sprite)
+void VanargandPair_InitAuxiliarySprite_081A6FF4(u8 *panel, struct VanargandPairAuxiliarySprite *sprite)
 {
-    struct ScenePanelAnimation *animation = &sprite->animation;
+    struct VanargandPairAnimation *animation = &sprite->animation;
     u16 *scale;
     u32 width, height;
     AnimData_Load(animation, 0x89CC);

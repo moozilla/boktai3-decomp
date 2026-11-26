@@ -1,13 +1,12 @@
 #include "global.h"
 #include "engine/runtime.h"
 /* Rtc_WriteTime: Writes hours minutes and seconds from record offsets four through six */
-#define Rtc_WriteTime sub_08248E70
 // concession-ok(cflags): SDK RTC driver (SIIRTC), built unoptimized as the SDK built siirtc.c
 // CFLAGS: -O0 -mthumb-interwork
 u32 Rtc_WriteCommandByte(u8);
 u32 Rtc_WriteDataByte(u8);
 u8 Rtc_ReadDataByte(void);
-u8 sub_08248E70(u8 *p)
+u8 Rtc_WriteTime(u8 *p)
 {
     u8 i;
     if (gRtcProtected == 1)

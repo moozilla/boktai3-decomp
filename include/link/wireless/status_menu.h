@@ -14,7 +14,7 @@ struct WirelessStatusMenu {
     void *background, *messageTable;
     u32 completionProcedure;
     struct AnimSpriteResource resource;
-    struct AnimSprite widget;
+    struct AnimSprite animSprite;
 };
 
 void TextWindowManager_DestroyAllWindows(void);

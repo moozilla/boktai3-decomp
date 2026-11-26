@@ -15,7 +15,7 @@ void Player_InitBodyCollider(struct Player *);
 void LinkPlayer_InitAbilityState(struct Player *);
 void Player_InitConfiguredAction(struct Player *);
 void Player_InitOptionalComponents(struct Player *);
-void sub_0823A3CC(struct Player *);
+void LinkPlayer_InitializeActor(struct Player *);
 static inline s32 LocalPlayer(void)
 {
     if (!gLinkSession)
@@ -31,7 +31,7 @@ s32 Player_OnCreate(struct Player *p, void *script)
     LinkPlayer_InitAbilityState(p);
     Player_InitConfiguredAction(p);
     Player_InitOptionalComponents(p);
-    sub_0823A3CC(p);
+    LinkPlayer_InitializeActor(p);
     gPlayerSlotStatus[p->slot] = p->kind;
     if (p->slot == LocalPlayer()) {
         Player_SavePositionAndFacing(p);

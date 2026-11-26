@@ -77,7 +77,7 @@ u32 Ghoul_Destroy(struct ChaseActor *actor);
 s32 Ghoul_Init(void *object);
 void Ghoul_Create(void);
 
-u8 sub_0812F3CC(struct ChaseActor *);
+u8 SceneActorReaction_BeginContactResponse(struct ChaseActor *);
 void SceneActorReaction_PlayAnimationBUntilComplete(void);
 
 #endif

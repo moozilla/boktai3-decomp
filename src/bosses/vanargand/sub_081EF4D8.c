@@ -21,7 +21,7 @@ struct S7Trans {
     s32 counter;
 };
 void SceneMover_InterpolateScreenX(void);
-void SceneActors_UpdatePaletteDispersal(void);
+void VanargandHead_UpdatePaletteDispersal(void);
 void sub_081EEE30(void);
 void ScreenTransition_SendCommand(u32, u32, u32, u32, u32, u32, u32);
 
@@ -75,7 +75,7 @@ void VanargandHead_UpdateEndingTransition(struct S7Trans *p)
             break;
         case 1:
             if (p->hp <= 0) {
-                StartCallback(p, SceneActors_UpdatePaletteDispersal);
+                StartCallback(p, VanargandHead_UpdatePaletteDispersal);
                 {
                     u32 *sp = &q->state;
                     *sp = *sp + 1;

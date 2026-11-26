@@ -39,7 +39,6 @@ void PursuingActor_RetireAll(void)
 }
 
 /* Enter the recoil state for all chasing slashes. */
-#define PursuingActor_RecoilAll sub_0812C158
 void PursuingActor_RecoilAll(void)
 {
     struct PursuingActorManager *manager = gPursuingActorManager;
@@ -66,7 +65,6 @@ void PursuingActor_RecoilAll(void)
 }
 
 /* Script keywords: p position, d heading, s speed, a phase, h homing, P collider. */
-#define PursuingActor_CreateHomingSlashFromScript sub_0812C198
 void PursuingActor_CreateHomingSlashFromScript(void)
 {
     struct PackedPosition position;

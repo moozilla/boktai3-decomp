@@ -9,7 +9,7 @@
 void Palette_SetBrightnessMode(int);
 int Weather_TestFlags(int, int);
 void Weather_SetRandomDuration(void *);
-int sub_080177AC(void *, int, int, int);
+int Weather_SpawnTerrainParticles(void *, int, int, int);
 int Mod(int, int);
 void Sound_PlaySong(int);
 void ScreenTransition_SendCommand(int, int, int, int, int, int, int);
@@ -85,7 +85,7 @@ int Weather_ActiveStorm(struct WeatherState *p)
         } else
             gStormTimer--;
     }
-    sub_080177AC(p, (Weather_DrawRandomSample() & 3) + 4, 1, 0);
+    Weather_SpawnTerrainParticles(p, (Weather_DrawRandomSample() & 3) + 4, 1, 0);
     p->tilemapLayer = 1 - p->tilemapLayer;
     p->phaseTimer++;
     return 0;

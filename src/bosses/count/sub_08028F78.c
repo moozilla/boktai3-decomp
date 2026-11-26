@@ -2,7 +2,7 @@
 #include "player/player.h"
 #include "engine/video/render.h"
 
-/* confidence=low: Initialize the Vampire actor from script options and create its visual and contact objects. */
+/* confidence=low: Initialize the Count actor from script options and create its visual and contact objects. */
 
 extern void *gGameState;
 extern const u8 gUnk_0824DC78[];
@@ -37,21 +37,21 @@ void SceneActorAnimation_UpdateEightDirectionCallback(void);
 void SceneActors_UpdateStationaryReaction(void);
 void sub_08022B18(void);
 
-struct VampireInitPosition {
+struct CountInitPosition {
     s32 x : 16, y : 16, z : 16, pad : 16;
 };
 
-struct VampireResourceHeader {
+struct CountResourceHeader {
     u32 words[8];
 };
 
-struct VampireInitCamera {
+struct CountInitCamera {
     u8 pad0[0x10];
     u32 angle;
     u32 distance;
     u8 pad18[0xc];
 };
-struct VampireInitBase {
+struct CountInitBase {
     u8 pad0[0x48];
     u8 sprite[0x48];
     u32 timer;
@@ -82,9 +82,9 @@ struct VampireInitBase {
     u16 colliderExtra;
     u8 body[0x54];
     u8 overlay[0x54];
-    struct VampireResourceHeader resource;
+    struct CountResourceHeader resource;
     u8 animation[0x20];
-    struct VampireInitPosition position;
+    struct CountInitPosition position;
     u8 pad268[0x20];
     void *palette;
     u8 pad28C[0x14];
@@ -94,8 +94,8 @@ struct VampireInitBase {
     u8 pad354[4];
     s32 kind;
 };
-struct VampireInit {
-    struct VampireInitBase base;
+struct CountInit {
+    struct CountInitBase base;
     s16 tuning[12];
     u16 reactionLength;
     s16 hitThreshold;
@@ -126,18 +126,18 @@ struct VampireInit {
     void *contactSwarm;
     void *contactPool;
     void *backgroundFlash;
-    struct VampireInitCamera camera;
+    struct CountInitCamera camera;
 };
-struct VampireInitGameState {
+struct CountInitGameState {
     u8 pad0[0x30];
     s16 x, y, z;
 };
 
-static inline void VampireInit_SetHeight(struct VampireInit *p, s16 height)
+static inline void CountInit_SetHeight(struct CountInit *p, s16 height)
 {
     p->base.initialHeight = height;
 }
-static inline void VampireInit_ConfigureAnimation(struct VampireInitBase *p, u8 mode, u8 entry)
+static inline void CountInit_ConfigureAnimation(struct CountInitBase *p, u8 mode, u8 entry)
 {
     p->animationMode = mode;
     p->animationPhase = 0;
@@ -145,7 +145,7 @@ static inline void VampireInit_ConfigureAnimation(struct VampireInitBase *p, u8 
     p->animationTimer = 0;
     p->animationChanged = 1;
 }
-static inline void VampireInit_SetState(struct VampireInitBase *p, void *callback, int state)
+static inline void CountInit_SetState(struct CountInitBase *p, void *callback, int state)
 {
     p->state = state;
     p->callback = callback;
@@ -155,37 +155,37 @@ static inline void VampireInit_SetState(struct VampireInitBase *p, void *callbac
     p->pending = 0;
 }
 
-static inline void VampireInit_SetDamageHandler(struct VampireInitBase *p, void *callback)
+static inline void CountInit_SetDamageHandler(struct CountInitBase *p, void *callback)
 {
     p->damageCallback = callback;
 }
-static inline void VampireInit_SetRequestedStateHandler(struct VampireInitBase *p, void *callback)
+static inline void CountInit_SetRequestedStateHandler(struct CountInitBase *p, void *callback)
 {
     p->requestedStateCallback = callback;
 }
 
-static inline void VampireInit_SetCameraOrbit(struct VampireInitCamera *camera, u32 angle,
+static inline void CountInit_SetCameraOrbit(struct CountInitCamera *camera, u32 angle,
                                               u32 distance)
 {
     camera->angle = angle;
     camera->distance = distance;
 }
 
-static inline u32 VampireInit_ForcedDamageFlag(u32 flags)
+static inline u32 CountInit_ForcedDamageFlag(u32 flags)
 {
     return flags & 1;
 }
 
-int sub_08028F78(struct VampireInit *s, u32 id)
+int sub_08028F78(struct CountInit *s, u32 id)
 {
-    struct VampireInitBase *base = &s->base;
+    struct CountInitBase *base = &s->base;
     u32 actorType;
     s32 i, n;
-    struct VampireResourceHeader *resource;
+    struct CountResourceHeader *resource;
     u32 *dst;
     const u8 *palette;
-    struct VampireInitPosition pos;
-    struct VampireInitPosition pos2;
+    struct CountInitPosition pos;
+    struct CountInitPosition pos2;
     s32 mode;
     u32 health;
     u32 facing;
@@ -231,13 +231,13 @@ int sub_08028F78(struct VampireInit *s, u32 id)
         pos.z = Script_GetValue();
         facing = ((Script_GetValue() << 29) + 0xA0000000) >> 24;
     } else {
-        struct VampireInitGameState *cfg = gGameState;
+        struct CountInitGameState *cfg = gGameState;
         pos.x = (u16)cfg->x;
         pos.y = (u16)cfg->y;
         pos.z = (u16)cfg->z;
         facing = 0x40;
     }
-    VampireInit_SetHeight(s, pos.y);
+    CountInit_SetHeight(s, pos.y);
 
     if (Script_SeekToKeyword(0x72)) {
         pos2.x = Script_GetValue();
@@ -301,29 +301,29 @@ int sub_08028F78(struct VampireInit *s, u32 id)
         mode = Script_GetKeywordValue(0x44, 0);
         switch (mode) {
             case 0:
-                VampireInit_ConfigureAnimation(base, 2, 1);
-                VampireInit_SetState(base, (void *)SceneActorAnimation_UpdateDirectionalCallback,
+                CountInit_ConfigureAnimation(base, 2, 1);
+                CountInit_SetState(base, (void *)SceneActorAnimation_UpdateDirectionalCallback,
                                      1);
                 break;
             case 1:
-                VampireInit_ConfigureAnimation(base, 2, 2);
-                VampireInit_SetState(base, (void *)SceneActorAnimation_UpdateEightDirectionCallback,
+                CountInit_ConfigureAnimation(base, 2, 2);
+                CountInit_SetState(base, (void *)SceneActorAnimation_UpdateEightDirectionCallback,
                                      2);
                 break;
             case 2:
-                VampireInit_ConfigureAnimation(base, 2, 0);
-                VampireInit_SetState(base, (void *)SceneActors_UpdateStationaryReaction, 26);
+                CountInit_ConfigureAnimation(base, 2, 0);
+                CountInit_SetState(base, (void *)SceneActors_UpdateStationaryReaction, 26);
                 break;
             default:
                 break;
         }
     } else {
-        VampireInit_ConfigureAnimation(base, 0, 0);
-        VampireInit_SetState(base, (void *)SceneActorAnimation_UpdateDirectionalCallback, 1);
+        CountInit_ConfigureAnimation(base, 0, 0);
+        CountInit_SetState(base, (void *)SceneActorAnimation_UpdateDirectionalCallback, 1);
     }
 
-    VampireInit_SetDamageHandler(base, (void *)Count_ApplyPendingDamage);
-    VampireInit_SetRequestedStateHandler(base, (void *)SceneActors_TryApplyRequestedState);
+    CountInit_SetDamageHandler(base, (void *)Count_ApplyPendingDamage);
+    CountInit_SetRequestedStateHandler(base, (void *)SceneActors_TryApplyRequestedState);
     SceneActors_SetHealthLimits(base, (u32)health, (u32)health, s->base.colliderExtra);
     SceneActorGraphics_InitializeBody(s);
     SceneActorGraphics_InitializeOverlay(s, s->base.colliderExtra);
@@ -370,7 +370,7 @@ int sub_08028F78(struct VampireInit *s, u32 id)
         u8 initialDamageFlag = Script_GetKeywordValue(0x4D, 1) != 0;
         u32 enabledFlags;
         s->damageFlags = initialDamageFlag;
-        enabledFlags = VampireInit_ForcedDamageFlag(s->damageFlags);
+        enabledFlags = CountInit_ForcedDamageFlag(s->damageFlags);
         s->damageFlags = Script_GetKeywordValue(0x54, 1) ? (2 | enabledFlags) : initialDamageFlag;
     }
     {
@@ -434,7 +434,7 @@ int sub_08028F78(struct VampireInit *s, u32 id)
     s->trackingEnabled = 1;
     s->damageGuard = 4;
     CameraFollow_Initialize(&s->camera, base->targetWords[1], &s->base.position, 1);
-    VampireInit_SetCameraOrbit(&s->camera, 0, 0x8C);
+    CountInit_SetCameraOrbit(&s->camera, 0, 0x8C);
     SceneActors_SetDamageCallback(base, s->base.overlay, (void *)sub_08022B18, 0);
     return 0;
 }

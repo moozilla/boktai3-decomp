@@ -6,8 +6,8 @@ is applied, the final vertical remainder replaces r0 before centering.
 
 The explicit form changed the ROM bytes. The guarded form passed the unit ROM check.
 
---- a/src/fn/sub_0822725C.c
-+++ b/src/fn/sub_0822725C.c
+--- a/src/scene/camera/sub_0822725C.c
++++ b/src/scene/camera/sub_0822725C.c
 @@ -21,7 +21,15 @@
  u32 Camera_UpdateShake(struct Camera0822725C *c)
  {

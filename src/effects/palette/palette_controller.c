@@ -3,11 +3,8 @@
 #include "engine/video/palette_resource.h"
 #include "engine/video/render.h"
 /* Palette_ClearActiveController: zeroes gPaletteController (the active controller pointer); identical body to the task's destroy callback Palette_Destroy */
-#define Palette_ClearActiveController sub_08002AD4
 /* Palette_NoOpCallback: empty stub with no identified caller or callee; placeholder callback body */
-#define Palette_NoOpCallback sub_08002E7C
 /* Palette_SetBlendFromScript: reads the 'r' script keyword and forwards it to Palette_SetBlend */
-#define Palette_SetBlendFromScript sub_08003494
 
 void Palette_SetPendingFlags(struct PaletteController *p, u32 x)
 {
@@ -29,7 +26,7 @@ u16 *Palette_GetColorSet(struct PaletteController *p, u32 set, u32 slot)
     return p->colorSets[set][slot];
 }
 
-void sub_08002AD4(void)
+void Palette_ClearActiveController(void)
 {
     gPaletteController = 0;
 }
@@ -255,7 +252,7 @@ void Palette_ResetTransition(struct PaletteController *p)
     Palette_BlendTransitionColors(p, t);
 }
 
-void sub_08002E7C(void)
+void Palette_NoOpCallback(void)
 {
 }
 
@@ -576,7 +573,7 @@ void Palette_SetBlend(u32 v)
     }
 }
 
-void sub_08003494(void)
+void Palette_SetBlendFromScript(void)
 {
     Palette_SetBlend(Script_GetKeywordValue('r', 0));
 }

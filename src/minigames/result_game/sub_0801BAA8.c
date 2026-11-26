@@ -9,7 +9,7 @@ void OrbitingParticles_Create(void *, int, int, int, int);
 void FloatingItemEffect_Spawn(int, int, int, int, void *, void *, int, void *);
 void PlayerCue_Motion7Front(void *, int, int);
 void ScreenTransition_SendCommand(int, int, int, int, int, int, int);
-void sub_080148CC(int, int, void *, int, int, int, int, int, int, int, int);
+void ImpactParticleGroup_SpawnRadial(int, int, void *, int, int, int, int, int, int, int, int);
 void ResultMenu_SetPhase(void *, void (*)(void));
 void Transformation_Finish(void);
 void Transformation_Reveal(struct ResultMenu *p)
@@ -56,7 +56,7 @@ void Transformation_Reveal(struct ResultMenu *p)
 
             for (i = 0; i < 3; i++) {
                 angle = i * REVEAL_BURST_SPACING;
-                sub_080148CC(4, 0x218, origin, angle, REVEAL_BURST_SPACING, 8, 8, 8, 1, 12, 8);
+                ImpactParticleGroup_SpawnRadial(4, 0x218, origin, angle, REVEAL_BURST_SPACING, 8, 8, 8, 1, 12, 8);
             }
         }
     }

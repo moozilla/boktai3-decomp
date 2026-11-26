@@ -2268,7 +2268,7 @@ void Player_NotifyFirstSelectedSlot(u32, u32);
 
 void Player_RefreshLifeState(u32, u32);
 
-void sub_08159164(u32);
+void Player_AddExperience(u32);
 
 void Sound_PlaySong(u32);
 
@@ -2594,7 +2594,7 @@ void Mummy_UpdateBurnDamage(struct ChaseActor *actor)
                 }
             }
         }
-        sub_08159164(actor->base.experience);
+        Player_AddExperience(actor->base.experience);
         Player_RefreshLifeState(actor->base.hitAttributes, actor->base.fieldA1);
     }
 

@@ -19,7 +19,7 @@ s32 Callback_InvokeActor(void *, void *);
 void SceneActor_UpdateVisualEffects(void *);
 void Player_RefreshVitalsAndCollision(void *);
 void Player_SaveStateSnapshot(void *);
-void sub_0821DE30(void *);
+void Trap_UpdateProbeContacts(void *);
 s32 Player_Update(struct Player *p)
 {
     PlayerCue_Dispatch(p);
@@ -69,7 +69,7 @@ s32 Player_Update(struct Player *p)
         Player_SaveStateSnapshot(p);
     if (p->kind != 4) {
         p->trackedPosition = &p->position;
-        sub_0821DE30(p->positionTracker);
+        Trap_UpdateProbeContacts(p->positionTracker);
     }
     return 0;
 }

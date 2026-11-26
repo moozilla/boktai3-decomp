@@ -1,5 +1,5 @@
 #include "bosses/sabata/sabata_spatial_query.h"
-// Tentative SceneVolume family: ownership and field semantics remain provisional.
+// Sabata attack helper. Field meanings remain tentative.
 #define PositionSearch_GetCoordinates SceneStimulus_GetTaggedPosition
 #define PositionSearch_FindNearby     SceneStimulus_FindOverlap
 u32 SceneStimulus_GetTaggedPosition(u16 *, u32);

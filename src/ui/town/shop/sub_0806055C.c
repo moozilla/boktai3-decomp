@@ -1,5 +1,5 @@
 #include "ui/town/shop_actions.h"
-void Shop_BeginEquipmentSwapPair(struct SceneInventoryActionView *panel)
+void Shop_BeginEquipmentSwapPair(struct ShopActionView *panel)
 {
     struct SceneInputPosition starts[2], targets[2];
     u32 enabled[2], frames[2], attributes[2];
@@ -23,10 +23,10 @@ void Shop_BeginEquipmentSwapPair(struct SceneInventoryActionView *panel)
             slot = panel->savedSelection;
         else
             slot = panel->selection;
-        ((struct SceneInventoryActionFlagsView *)panel)->widgets[slot + 5].flags |= 1;
+        ((struct ShopActionFlagsView *)panel)->widgets[slot + 5].flags |= 1;
         equipped = Shop_FindEquippedSlot(slot);
         if (equipped >= 0)
-            ((struct SceneInventoryActionFlagsView *)panel)->widgets[equipped + 0x29].flags |= 1;
+            ((struct ShopActionFlagsView *)panel)->widgets[equipped + 0x29].flags |= 1;
         id = Inventory_GetEquipmentId(slot);
         if (id != 0xFF) {
             *enabledOut = 1;
@@ -40,7 +40,7 @@ void Shop_BeginEquipmentSwapPair(struct SceneInventoryActionView *panel)
     }
     for (i = 0; i < 2; i++)
         targetBase[i] = starts[1 - i];
-    SceneInput_BeginPairTransition(&((struct SceneInventoryTransitionView *)panel)->pair,
+    SceneInput_BeginPairTransition(&((struct ShopTransitionView *)panel)->pair,
                                    enabledBase, starts, targetBase, frameBase, attributeBase, 12);
     Sound_PlaySong(0x38A);
 }

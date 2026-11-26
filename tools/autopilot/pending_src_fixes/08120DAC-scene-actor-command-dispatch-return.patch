@@ -5,8 +5,8 @@ Otherwise the final SceneMessages_SetPendingTrigger provides the result.
 
 The explicit form changed the ROM bytes. The guarded form passed the unit ROM check.
 
---- a/src/fn/sub_08120DAC.c
-+++ b/src/fn/sub_08120DAC.c
+--- a/src/npc/sabata_rider/sub_08120DAC.c
++++ b/src/npc/sabata_rider/sub_08120DAC.c
 @@ -48,4 +48,7 @@
      s32 i;
      struct RegistryActorCommand *cmd;

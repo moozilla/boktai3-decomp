@@ -1,4 +1,4 @@
-#include "effects/particles/debris_particles.h"
+#include "objects/bat_curtain/debris_particles.h"
 #include "engine/engine.h"
 #include "engine/heap.h"
 #include "engine/resource_registry.h"

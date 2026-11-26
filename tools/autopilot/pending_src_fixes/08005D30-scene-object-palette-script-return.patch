@@ -6,8 +6,8 @@ address is left in r0 by its final call.
 
 The explicit form changed the ROM bytes. The guarded form passed the unit ROM check.
 
---- a/src/scene_object.c
-+++ b/src/scene_object.c
+--- a/src/objects/puzzle_blocks.c
++++ b/src/objects/puzzle_blocks.c
 @@ -1493,7 +1493,13 @@
              p->basePalette = 4;
              AnimData_SelectPaletteBank(&p->animationData, 4);

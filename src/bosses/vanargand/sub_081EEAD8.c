@@ -14,7 +14,7 @@ static inline u32 RandomValue(void)
     return gUnk_086141BC[index];
 }
 
-void SceneActors_UpdatePaletteDispersal(struct DepartureActor *input)
+void VanargandHead_UpdatePaletteDispersal(struct DepartureActor *input)
 {
     struct DepartureActor *actor = input;
     s32 i;

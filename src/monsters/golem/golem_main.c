@@ -1239,7 +1239,7 @@ void Golem_UpdateChargeWindup(struct ChaseActor *actor, u32 frame)
 
 u32 ActorMode_SelectOddStateVariant(struct ChaseActor *);
 
-void sub_08014634(u32, u32, struct SceneExtent *, struct SceneExtent *, struct SceneExtent *, u32,
+void ImpactParticleGroup_SpawnBouncing(u32, u32, struct SceneExtent *, struct SceneExtent *, struct SceneExtent *, u32,
                   u32);
 
 static inline s32 GolemSlide_Quarter(s16 value)
@@ -1299,7 +1299,7 @@ void Golem_UpdateSlideImpact(struct ChaseActor *actor, u32 frame)
         spread.y = (ParticleRandom_ReadRelativeSample(randomOrigin, gRandomTable) & 7) + 15;
         spread.z = (ParticleRandom_ReadRelativeSample(randomOrigin, gRandomTable) & 3) + 15;
         count = (ParticleRandom_ReadRelativeSample(randomOrigin, gRandomTable) & 3) + 4;
-        sub_08014634(count, ActorMode_SelectOddStateVariant(actor), (void *)&body->position,
+        ImpactParticleGroup_SpawnBouncing(count, ActorMode_SelectOddStateVariant(actor), (void *)&body->position,
                      &velocity, &spread, 45, 31);
         SceneActorPlacement_PlayVariantEventSound((void *)actor, 5);
         if (context->pendingEvent) {

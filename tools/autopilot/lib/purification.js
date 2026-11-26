@@ -1,10 +1,10 @@
 // ScenePanel_WaitInitialTether takes the coffin when its body reaches the
 // panel's center. ScenePanel_UpdateActiveSubjects takes a charging player
 // at the approach position, after gunfire has activated the generators.
-exports.purificationPanel = () => $.gScenePanel?.initialMode === 0 && !!$.gTetherActor;
+exports.purificationPanel = () => $.gPileDriver?.initialMode === 0 && !!$.gTetherActor;
 
 exports.preparePurification = function* (opts = {}) {
-  const panel = $.gScenePanel;
+  const panel = $.gPileDriver;
   const scene = exports.where().scene, story = exports.story();
   const changed = () => exports.where().scene !== scene || exports.story() > story;
   const trace = opts.trace || (() => {});

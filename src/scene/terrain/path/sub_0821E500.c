@@ -1,11 +1,10 @@
 #include "global.h"
 #include "engine/engine.h"
 /* Terrain_GetBoxMaxPosition: Copies a named box's upper corner into an output vector with vertical scaling */
-#define Terrain_GetBoxMaxPosition sub_0821E500
 
 u8 *Terrain_FindBoxesById(u16, void *);
 
-void sub_0821E500(u16 id, u16 *out)
+void Terrain_GetBoxMaxPosition(u16 id, u16 *out)
 {
     u32 tmp;
     u8 *e = Terrain_FindBoxesById(id, &tmp);

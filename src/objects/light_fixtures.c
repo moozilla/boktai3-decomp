@@ -188,7 +188,7 @@ void LightFixture_UpdateRouteMotion(struct PooledInteractable *s)
             struct SceneExtent o;
         } m;
         op = &m.o;
-        if ((u8)sub_0821E67C(q, r, op, &m.w, s->range, s->range, s->speed)) {
+        if ((u8)Route_GetMovementTowardCurrentPoint(q, r, op, &m.w, s->range, s->range, s->speed)) {
             Route_AdvancePoint(q);
             s->delay = Route_GetCurrentPointNodeId(q);
         }

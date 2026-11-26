@@ -31,7 +31,6 @@ static inline s32 scale(s32 v)
     return v >= 0 ? v >> 12 : -((-v) >> 12);
 }
 // confidence=low: held input sustains the rotating attack collider while consuming energy.
-#define Player_UpdateSustainedSpinAttack sub_0814EEE0
 void Player_UpdateSustainedSpinAttack(u8 *p)
 {
     struct AttackVec pos;

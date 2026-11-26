@@ -1,5 +1,5 @@
-#ifndef GUARD_SCENE_PANEL_EFFECTS_H
-#define GUARD_SCENE_PANEL_EFFECTS_H
+#ifndef GUARD_PILE_DRIVER_EFFECTS_H
+#define GUARD_PILE_DRIVER_EFFECTS_H
 #include "engine/engine.h"
 #include "engine/math/scene_vec.h"
 #include "engine/video/render.h"

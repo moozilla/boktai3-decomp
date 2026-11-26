@@ -16,7 +16,7 @@ struct Obj {
     u8 dir;
 };
 
-s32 sub_0823BB48(struct Obj *obj, struct Vec16 *v);
+s32 Player_IsTerrainStepBlocked(struct Obj *obj, struct Vec16 *v);
 
 s32 Actor_ProbeDiagonalTurnDir(struct Obj *obj)
 {
@@ -28,15 +28,15 @@ s32 Actor_ProbeDiagonalTurnDir(struct Obj *obj)
             v.x -= 30;
             v.z -= 30;
             v.x -= 100;
-            if (sub_0823BB48(obj, &v))
+            if (Player_IsTerrainStepBlocked(obj, &v))
                 return 1;
             v.x += 100;
             v.z -= 100;
-            if (sub_0823BB48(obj, &v))
+            if (Player_IsTerrainStepBlocked(obj, &v))
                 return 7;
             v = obj->pos;
             v.x -= 100;
-            if (sub_0823BB48(obj, &v))
+            if (Player_IsTerrainStepBlocked(obj, &v))
                 return 1;
             return 7;
         case 2:
@@ -44,15 +44,15 @@ s32 Actor_ProbeDiagonalTurnDir(struct Obj *obj)
             v.x += 30;
             v.z -= 30;
             v.x += 100;
-            if (sub_0823BB48(obj, &v))
+            if (Player_IsTerrainStepBlocked(obj, &v))
                 return 1;
             v.x -= 100;
             v.z -= 100;
-            if (sub_0823BB48(obj, &v))
+            if (Player_IsTerrainStepBlocked(obj, &v))
                 return 3;
             v = obj->pos;
             v.x += 100;
-            if (sub_0823BB48(obj, &v))
+            if (Player_IsTerrainStepBlocked(obj, &v))
                 return 1;
             return 3;
         case 4:
@@ -60,15 +60,15 @@ s32 Actor_ProbeDiagonalTurnDir(struct Obj *obj)
             v.x += 30;
             v.z += 30;
             v.x += 100;
-            if (sub_0823BB48(obj, &v))
+            if (Player_IsTerrainStepBlocked(obj, &v))
                 return 5;
             v.x -= 100;
             v.z += 100;
-            if (sub_0823BB48(obj, &v))
+            if (Player_IsTerrainStepBlocked(obj, &v))
                 return 3;
             v = obj->pos;
             v.x += 100;
-            if (sub_0823BB48(obj, &v))
+            if (Player_IsTerrainStepBlocked(obj, &v))
                 return 5;
             return 3;
         case 6:
@@ -76,15 +76,15 @@ s32 Actor_ProbeDiagonalTurnDir(struct Obj *obj)
             v.x -= 30;
             v.z += 30;
             v.x -= 100;
-            if (sub_0823BB48(obj, &v))
+            if (Player_IsTerrainStepBlocked(obj, &v))
                 return 5;
             v.x += 100;
             v.z += 100;
-            if (sub_0823BB48(obj, &v))
+            if (Player_IsTerrainStepBlocked(obj, &v))
                 return 7;
             v = obj->pos;
             v.x -= 100;
-            if (sub_0823BB48(obj, &v))
+            if (Player_IsTerrainStepBlocked(obj, &v))
                 return 5;
             return 7;
     }

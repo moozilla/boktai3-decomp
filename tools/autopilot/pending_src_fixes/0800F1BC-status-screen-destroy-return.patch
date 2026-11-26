@@ -7,8 +7,8 @@ address in the port address space.
 
 The explicit form changed the ROM bytes. The guarded form passed the unit ROM check.
 
---- a/src/status_screen_fade.c
-+++ b/src/status_screen_fade.c
+--- a/src/ui/status_screen/status_screen_fade.c
++++ b/src/ui/status_screen/status_screen_fade.c
 @@ -194,5 +194,10 @@
  int StatusScreen_Destroy(struct StatusScreen *p)
  {

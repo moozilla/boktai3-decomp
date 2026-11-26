@@ -2,7 +2,7 @@
 #include "ui/widgets/scene_input_panel.h"
 #include "ui/widgets/scene_input_grid.h"
 /* The cleanup span contains 54 panel widgets and 15 comparison widgets. */
-struct SceneInventoryCleanupView {
+struct ShopCleanupView {
     u8 task[0x60];
     struct ContactSwarmSprite sprite;
     u8 graphics[0x1C];
@@ -16,16 +16,16 @@ void SceneInput_DestroyMarkerPair(struct SceneInputPair *);
 void SceneInput_DestroyGlyphPair(struct SceneInputPair *);
 void MessageWindow_Clear(void);
 void ScrollingDialogue_ClearScript(void);
-s32 Shop_DestroyController(struct SceneInventoryCleanupView *owner)
+s32 Shop_DestroyController(struct ShopCleanupView *owner)
 {
-    struct AnimSprite *widget;
+    struct AnimSprite *animSprite;
     s32 i;
     Sprite_Remove(&owner->sprite);
-    widget = owner->widgets;
+    animSprite = owner->widgets;
     i = 68;
     do {
-        Anim_Remove(widget);
-        widget++;
+        Anim_Remove(animSprite);
+        animSprite++;
         i--;
     } while (i >= 0);
     SceneInput_DestroyMarkerPair(&owner->transition);

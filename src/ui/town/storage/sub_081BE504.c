@@ -60,16 +60,16 @@ void Storage_RefreshEquipmentSlots(struct StorageCategoryWidgets *p)
             s32 index = rowSlot + col;
             id = Inventory_GetEquipmentId(p->slots[index]);
             if (id != 255) {
-                struct AnimSprite *widget;
+                struct AnimSprite *animSprite;
                 AnimSprite_Show(&cellBase->carried[0][0]);
                 {
                     u32 offset = widgetOffset + STORAGE_MEMBER_OFFSET(carried);
-                    widget = (void *)((u32)p + offset);
+                    animSprite = (void *)((u32)p + offset);
                 }
-                Anim_LoadKeyframe(widget, &p->resource, (u16)(id + 240), 0);
+                Anim_LoadKeyframe(animSprite, &p->resource, (u16)(id + 240), 0);
                 if (Storage_FindEquippedItemSlot(p, p->slots[index]) >= 0) {
                     struct AnimSprite *mark;
-                    SceneHud_SetKeyframePaletteBank(widget, 0x374);
+                    SceneHud_SetKeyframePaletteBank(animSprite, 0x374);
                     AnimSprite_Show(&markerBase->markers[0]);
                     {
                         u32 offset = STORAGE_MEMBER_OFFSET(markers) + markerOffset;
@@ -81,9 +81,9 @@ void Storage_RefreshEquipmentSlots(struct StorageCategoryWidgets *p)
                     markerBytes += sizeof(struct AnimSprite);
                     marker++;
                 } else if (!Inventory_CanAssignEquipment(p->slots[index])) {
-                    SceneHud_SetKeyframePaletteBank(widget, 0x374);
+                    SceneHud_SetKeyframePaletteBank(animSprite, 0x374);
                 } else {
-                    SceneHud_SetKeyframePaletteBank(widget, 0x373);
+                    SceneHud_SetKeyframePaletteBank(animSprite, 0x373);
                 }
             } else {
                 if ((s8)p->emptyCarried < 0)
@@ -106,7 +106,7 @@ void Storage_RefreshEquipmentSlots(struct StorageCategoryWidgets *p)
     } while (1);
 carriedDone:
     for (row = 0; row < 4;) {
-        struct AnimSprite *widget;
+        struct AnimSprite *animSprite;
         s32 slot;
         s32 index;
         s32 nextRow;
@@ -117,19 +117,19 @@ carriedDone:
         nextRow = row + 1;
         offset = ((row << 3) + slot) << 5;
         base = &p->stored[0][0];
-        widget = (void *)(offset + (u32)base);
+        animSprite = (void *)(offset + (u32)base);
         index = slot + 16;
         do {
             id = Inventory_GetEquipmentId(p->slots[index]);
             if (id != 255) {
-                widget->flags &= ~1;
-                Anim_LoadKeyframe(widget, &p->resource, (u16)(id + 240), 1);
+                animSprite->flags &= ~1;
+                Anim_LoadKeyframe(animSprite, &p->resource, (u16)(id + 240), 1);
             } else {
                 if (p->emptyStored < 0)
                     p->emptyStored = index;
-                widget->flags |= 1;
+                animSprite->flags |= 1;
             }
-            widget++;
+            animSprite++;
             index++;
             col++;
             if (col > 3)

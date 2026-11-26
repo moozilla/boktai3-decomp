@@ -17,14 +17,14 @@ void Sound_StopSong(u32);
 void TerrainModifiers_UnregisterCell(void *);
 void SceneBody_Unregister(void *);
 void Sprite_Remove(void *);
-void ActorGroup_ReleaseMember(void *);
+void MovingPlatform_ReleaseMember(void *);
 static inline u8 HasBit(u32 value, u32 mask)
 {
     if (value & mask)
         return 1;
     return 0;
 }
-u32 ActorGroup_Destroy(struct ActorGroup *group)
+u32 MovingPlatform_Destroy(struct ActorGroup *group)
 {
     s32 i;
     u32 *active;
@@ -40,7 +40,7 @@ u32 ActorGroup_Destroy(struct ActorGroup *group)
             struct ActorGroupMember *member = &group->members[i];
             if (HasBit(member->flags, 1))
                 TerrainModifiers_UnregisterCell(member->effect);
-            ActorGroup_ReleaseMember(member);
+            MovingPlatform_ReleaseMember(member);
             SceneBody_Unregister(member->resource);
             Sprite_Remove(member);
         }

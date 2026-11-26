@@ -27,7 +27,7 @@ static inline u8 HasBit(u32 value, u32 mask)
     return 0;
 }
 
-s32 ActorGroup_GetSelectedMemberId(void)
+s32 MovingPlatform_GetSelectedMemberId(void)
 {
     struct NamedObjectManager *group;
     struct NamedObject *member;
@@ -98,7 +98,7 @@ static inline u8 MemberHasBit(struct NamedObject *m, u32 mask)
     return 0;
 }
 
-void ActorGroup_RemoveFromScript(void)
+void MovingPlatform_RemoveFromScript(void)
 {
     s32 name = Script_GetKeywordValue('n', 0);
     struct NamedObject *member;
@@ -110,7 +110,7 @@ void ActorGroup_RemoveFromScript(void)
             TerrainModifiers_UnregisterCell(member->registration);
             MovingPlatform_DisableFlags(1, member);
         }
-        ActorGroup_ReleaseMember(member);
+        MovingPlatform_ReleaseMember(member);
         SceneBody_Unregister(&member->body);
         member->name = 0;
         member->state = 6;

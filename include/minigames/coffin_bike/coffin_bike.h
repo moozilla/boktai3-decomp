@@ -1,5 +1,5 @@
-#ifndef GUARD_GLOVE_H
-#define GUARD_GLOVE_H
+#ifndef GUARD_COFFIN_BIKE_H
+#define GUARD_COFFIN_BIKE_H
 #include "global.h"
 #include "link/wireless/scene_pool.h"
 #include "scene/actor/scene_actor_style.h"
@@ -189,8 +189,8 @@ struct CoffinBike {
     void *attachment; /* 0x964 */
 };
 
-typedef char GloveMotionSizeCheck[sizeof(struct CoffinBikeMotion) == 0x5F8 ? 1 : -1];
-typedef char GloveModelSizeCheck[sizeof(struct CoffinBikeModel) == 0x250 ? 1 : -1];
-typedef char GloveSizeCheck[sizeof(struct CoffinBike) == 0x968 ? 1 : -1];
+typedef char CoffinBikeMotionSizeCheck[sizeof(struct CoffinBikeMotion) == 0x5F8 ? 1 : -1];
+typedef char CoffinBikeModelSizeCheck[sizeof(struct CoffinBikeModel) == 0x250 ? 1 : -1];
+typedef char CoffinBikeSizeCheck[sizeof(struct CoffinBike) == 0x968 ? 1 : -1];
 
 #endif

@@ -1,7 +1,6 @@
 #include "global.h"
 
 // confidence=low: loads the projectile resource and initializes sixteen linked widgets.
-#define Hresvelgr_InitializeProjectilePool sub_081A4DF0
 struct ProjectileResource {
     u32 words[8];
 };

@@ -6,8 +6,8 @@ no slot is dispatched.
 
 The explicit form changed the ROM bytes. The guarded form passed the unit ROM check.
 
---- a/src/floating_item_effect.c
-+++ b/src/floating_item_effect.c
+--- a/src/effects/floating_item_effect.c
++++ b/src/effects/floating_item_effect.c
 @@ -277,12 +277,25 @@
      u8 *state;
      struct FloatingEffect *effect;

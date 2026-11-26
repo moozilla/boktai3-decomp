@@ -372,7 +372,7 @@ void ActorParticles_SpawnDirectionalBurst(struct ChaseActor *actor, s32 amount)
         spread.y = (ActorParticles_NextRandom() & 7) + 3;
         spread.z = (ActorParticles_NextRandom() & 7) + 3;
         count = (ActorParticles_NextRandom() & 1) + 2;
-        sub_08014634(count, ActorMode_SelectOddStateVariant(actor),
+        ImpactParticleGroup_SpawnBouncing(count, ActorMode_SelectOddStateVariant(actor),
                      (struct SceneExtent *)&actor->base.body.position, &velocity, &spread, 45, 31);
     }
 }
@@ -404,7 +404,7 @@ void ActorParticles_SpawnBurst(struct ChaseActor *actor)
     spread.y = (ParticleRandom_ReadRelativeSample(sampleOrigin, gRandomTable) & 7) + 15;
     spread.z = (ParticleRandom_ReadRelativeSample(sampleOrigin, gRandomTable) & 3) + 15;
     count = (ParticleRandom_ReadRelativeSample(sampleOrigin, gRandomTable) & 3) + 4;
-    sub_08014634(count, ActorMode_SelectOddStateVariant(actor),
+    ImpactParticleGroup_SpawnBouncing(count, ActorMode_SelectOddStateVariant(actor),
                  (struct SceneExtent *)&actor->base.body.position, &velocity, &spread, 45, 31);
 }
 
@@ -436,6 +436,6 @@ void ActorParticles_SpawnWideBurst(struct ChaseActor *actor)
     spread.y = (ActorParticles_NextRandom() & 7) + 3;
     spread.z = 24;
     count = (ActorParticles_NextRandom() & 3) + 4;
-    sub_08014634(count, ActorMode_SelectOddStateVariant(actor),
+    ImpactParticleGroup_SpawnBouncing(count, ActorMode_SelectOddStateVariant(actor),
                  (struct SceneExtent *)&actor->base.body.position, &velocity, &spread, 60, 63);
 }

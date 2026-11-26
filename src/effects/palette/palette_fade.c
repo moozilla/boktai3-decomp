@@ -74,12 +74,12 @@ u32 PaletteFade_OnTaskUpdate(struct PaletteFade *fade)
     return 0;
 }
 
-void sub_082194D4(void);
+void ScanlineEffect_StopTransfer(void);
 
 u32 PaletteFade_OnTaskDestroy(struct PaletteFade *fade)
 {
     if (fade->mode & 1)
-        sub_082194D4();
+        ScanlineEffect_StopTransfer();
     return gPaletteFade = 0;
 }
 

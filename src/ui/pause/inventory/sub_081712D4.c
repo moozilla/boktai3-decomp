@@ -1,6 +1,6 @@
 #include "global.h"
 #include "ui/pause/scene_hud_display.h"
-void sub_08170D78(void *);
+void PauseInventory_RefreshConsumableIcons(void *);
 void SceneHud_UpdateStatComparison(void);
 void Hud_SetInteractionCallback(void *, void (*)(void), int);
 void Inventory_InitializeSelectionGrid(void *, int, int);
@@ -25,7 +25,7 @@ void SceneHud_OpenStatComparison(struct SceneHudState *p, s32 reset)
     do {
         *end-- = zero;
     } while ((s32)end >= (s32)differences);
-    sub_08170D78(p);
+    PauseInventory_RefreshConsumableIcons(p);
     Hud_SetInteractionCallback(p, SceneHud_UpdateStatComparison, 1);
     input = p->actionInput;
     Inventory_InitializeSelectionGrid(input, 1, 0);

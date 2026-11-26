@@ -1,11 +1,10 @@
 #include "global.h"
 #include "objects/dungeon_prop/orbit_motion.h"
 /* Math_BlendWithTableFactor: Blends endpoints using a capped table index and returns the target for a zero table entry */
-#define Math_BlendWithTableFactor sub_0819B010
 
 extern const s16 gUnk_08611D24[];
 
-s32 sub_0819B010(s32 from, s32 to, s32 t)
+s32 Math_BlendWithTableFactor(s32 from, s32 to, s32 t)
 {
     if (t > 15)
         t = 15;

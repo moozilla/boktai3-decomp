@@ -1,11 +1,3 @@
-#define ObjGfx_UploadQueuedTiles        sub_0821537C
-#define ObjGfx_AllocateTileSlot         sub_082152E4
-#define Sprite_RenderCameraRelativeList sub_08214D20
-#define Sprite_QueueFramePieces         sub_08214600
-#define Sprite_SetAnimDataIfPresent     sub_082145F4
-#define Anim_SetCurrentListHead         sub_0821435C
-#define Effect_SetCurrentListHead       sub_08214344
-#define Sprite_SetCurrentListHead       sub_0821432C
 #include "engine/video/sprite.h"
 #include "engine/video/sprite_oam.h"
 #include "engine/video/anim_sprite.h"

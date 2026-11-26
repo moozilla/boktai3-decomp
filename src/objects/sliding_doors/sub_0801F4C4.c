@@ -1,13 +1,13 @@
 #include "scene/collision/contact_actor.h"
 #include "objects/sliding_doors/scene_object_controller.h"
 
-void SlidingDoor_UpdateLowered(struct SceneObjSlot *);
+void SlidingDoors_UpdateLowered(struct SceneObjSlot *);
 s32 SceneParticleBurst_CreateWhilePaused(const struct ContactPosition *position,
                                          const struct ContactPosition *range,
                                          const struct ContactPosition *jitter, s32 count,
                                          u32 priority, u32 flip);
 
-void SlidingDoor_UpdateLowering(struct SceneObjSlot *slot)
+void SlidingDoors_UpdateLowering(struct SceneObjSlot *slot)
 {
     slot->lift -= 15;
     if ((s16)slot->lift < 0) {
@@ -18,7 +18,7 @@ void SlidingDoor_UpdateLowering(struct SceneObjSlot *slot)
         slot->timer = 30;
         slot->variant = SceneObjSlot_LiftVariant(SCENE_OBJ_LIFT_LOWERED);
         SceneObjSlot_ResetPose(slot, *(u8 *)&slot->loweredPose);
-        slot->callback = SlidingDoor_UpdateLowered;
+        slot->callback = SlidingDoors_UpdateLowered;
 
         jitter.x = jitter.y = jitter.z = 0;
         if (slot->dir & 1) {

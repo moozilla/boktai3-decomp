@@ -1,11 +1,11 @@
 #include "objects/sliding_doors/scene_object_controller.h"
 #include "scene/motion/scene_actor_terrain.h"
 void TerrainModifiers_RegisterCell(void *, u32, u32, u32, u32, u32);
-void SlidingDoor_UpdateRaised(struct SceneObjSlot *);
-void SlidingDoor_UpdateLowered(struct SceneObjSlot *);
+void SlidingDoors_UpdateRaised(struct SceneObjSlot *);
+void SlidingDoors_UpdateLowered(struct SceneObjSlot *);
 void *SceneParticleBurst_EnsureSingleton(u32, u32);
 // confidence=low: places a raisable scene object (blocks/gates with 10 facings) on its terrain cell.
-void SlidingDoor_InitLiftPlacement(struct SceneObjPool *mgr, struct SceneObjSlot *obj)
+void SlidingDoors_InitLiftPlacement(struct SceneObjPool *mgr, struct SceneObjSlot *obj)
 {
     s32 cell = cellIndexAt(&obj->pos.position);
     u8 *dir;
@@ -90,15 +90,15 @@ void SlidingDoor_InitLiftPlacement(struct SceneObjPool *mgr, struct SceneObjSlot
     }
     obj->q0.signedPosition = sprite->sprite.position;
     if (obj->variant == 0)
-        obj->callback = SlidingDoor_UpdateLowered;
+        obj->callback = SlidingDoors_UpdateLowered;
     else if (obj->variant == 1)
-        obj->callback = SlidingDoor_UpdateRaised;
+        obj->callback = SlidingDoors_UpdateRaised;
     else
-        obj->callback = SlidingDoor_UpdateLowered;
+        obj->callback = SlidingDoors_UpdateLowered;
     if (obj->variant == 0) {
         obj->timer = 0;
         obj->variant = 1;
-        obj->callback = SlidingDoor_UpdateLowered;
+        obj->callback = SlidingDoors_UpdateLowered;
         obj->pose = *(u8 *)&obj->loweredPose;
         obj->poseFrame = 0;
         obj->terrain->cell.flags &= 0xfffd;
@@ -114,7 +114,7 @@ void SlidingDoor_InitLiftPlacement(struct SceneObjPool *mgr, struct SceneObjSlot
     } else if (obj->variant == 1) {
         obj->timer = 0;
         obj->variant = 0;
-        obj->callback = SlidingDoor_UpdateRaised;
+        obj->callback = SlidingDoors_UpdateRaised;
         obj->pose = 0;
         obj->poseFrame = 0;
         obj->terrain->cell.flags &= 0xfffc;
