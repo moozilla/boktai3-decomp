@@ -1,0 +1,15 @@
+08206470 ooze-create-return
+
+The failure branch preserves the null Task_Create result in r0.
+
+The explicit form changed the ROM bytes. The guarded form passed the unit ROM check.
+
+--- a/src/fn/sub_08206470.c
++++ b/src/fn/sub_08206470.c
+@@ -17,3 +17,6 @@
+         return r;
+     }
++#ifdef UBFIX
++    return r; // preserve the inherited GBA return value
++#endif
+ }
