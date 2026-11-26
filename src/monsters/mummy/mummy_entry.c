@@ -916,28 +916,6 @@ static inline u16 MotionFlags(struct ChaseActor *actor, u32 mask)
     return value & mask;
 }
 
-struct MummyRandomTable {
-    const u16 *samples;
-};
-
-static inline u32 PickTurn(u32 dir, const u16 *randomSamples)
-{
-    s32 i;
-    struct MummyRandomTable table = {randomSamples};
-    for (i = 0; i < 4; i++) {
-        const u16 *samples = (&table)->samples;
-        u32 index = (gRandomIndex + 1) & 1023;
-        u32 d;
-        gRandomIndex = index;
-        d = samples[index];
-        d &= 3;
-        d <<= 6;
-        if (d != dir)
-            return d;
-    }
-    return dir;
-}
-
 static inline void Turn(u8 saved, void *ctx, const u16 *randomSamples)
 {
     struct ChaseActor *actor = ctx;
@@ -950,7 +928,7 @@ static inline void Turn(u8 saved, void *ctx, const u16 *randomSamples)
     if (SceneActorChase_TestField((u16 *)&group->common.gate.flags, 4))
         return;
     group->turn.direction =
-        PickTurn(actor->base.body.direction, randomSamples);
+        SceneActorChase_RandomDirectionExcept(actor->base.body.direction, randomSamples);
     {
         struct SceneActorChaseSavedControl *save = &group->saved;
         save->control = actor->base.target;
@@ -983,7 +961,7 @@ static inline u8 Arrive(void *obj)
         if (player < 0) {
             goto invoke;
         }
-        cell = ((u16 *)gPlayers[player]->followTarget)[3];
+        cell = ((struct SceneActorChasePlayerCell *)gPlayers[player]->followTarget)->index;
     } else {
         struct SceneActorChaseTarget *t = *slot;
         cell = Chase_CellIndex(t->position.x >> 8, t->position.z >> 8);
@@ -2427,12 +2405,6 @@ static inline void Fill(u32 *zero, void *dst)
     CpuSet(zero, dst, 0x05000002);
 }
 
-static inline s32 CurrentHealth(struct ChaseActor *actor)
-{
-    s16 *health = (void *)&actor->base.health;
-    return *health;
-}
-
 // confidence=low: timer-driven damage and defeat recording; the status is tentatively burn.
 
 void Mummy_UpdateBurnDamage(struct ChaseActor *actor)
@@ -2440,7 +2412,7 @@ void Mummy_UpdateBurnDamage(struct ChaseActor *actor)
     struct BurnState *burn = (void *)&actor->group.common;
     u16 *flags2C0;
     u8 *category;
-    u8 *collider;
+    struct ContactCollider *collider;
     struct ContactCollider *hit;
     u32 kind;
     s32 i;
@@ -2505,7 +2477,7 @@ void Mummy_UpdateBurnDamage(struct ChaseActor *actor)
             }
             flags = &actor->base.hitAttributes;
             masked = *flags & 0x20000;
-            collider = (u8 *)initial;
+            collider = initial;
             damageFlags = flags;
             if (!masked) {
                 SceneActorDamage_Flash(actor);
@@ -2514,14 +2486,14 @@ void Mummy_UpdateBurnDamage(struct ChaseActor *actor)
                     // concession-ok(const-local): CpuSet reads this fixed word twice to clear the damage buffer.
                     u32 zero;
                     u32 buffer[2];
-                    s32 health = CurrentHealth(actor);
+                    s32 health = actor->base.health;
                     u32 max = (u16)actor->base.defaultHealth;
                     s32 type = (s16)actor->base.hudKind;
                     s32 param = (s16)actor->base.hudLabel;
                     SceneHud_SetTimedState(actor->base.body.id, health, max, type, 0, param);
                     Fill(&zero, buffer);
                     if (actor->base.reactionSoundVariant || !(*damageFlags & 0x20000))
-                        DamageNumberDisplay_Show((struct ContactCollider *)collider,
+                        DamageNumberDisplay_Show(collider,
                                                  actor->base.reactionSoundVariant, 0,
                                                  &actor->base.body.position, buffer, 1);
                 }
@@ -2548,7 +2520,7 @@ void Mummy_UpdateBurnDamage(struct ChaseActor *actor)
         u32 owner;
         kind = *address;
         owner = actor->base.hitOwners & 1;
-        collider = (u8 *)&actor->base.colliderA;
+        collider = &actor->base.colliderA;
         category = address;
         flags2C0 = &actor->base.placementFlags;
         if (!owner)
@@ -2556,7 +2528,7 @@ void Mummy_UpdateBurnDamage(struct ChaseActor *actor)
     }
     {
         u8 blocked = Test(Mask(flags2C0, 0x80), ~0);
-        collider = (u8 *)&actor->base.colliderA;
+        collider = &actor->base.colliderA;
         if (blocked)
             goto record;
     }
@@ -2567,7 +2539,7 @@ void Mummy_UpdateBurnDamage(struct ChaseActor *actor)
             hit = &actor->base.colliderA;
             {
                 u32 index = *category - 1; /* category 1..25 */
-                collider = (u8 *)hit;
+                collider = hit;
                 switch (index) {
                     case 3:
                         CASE_BODY(category4);
@@ -2636,7 +2608,7 @@ void Mummy_UpdateBurnDamage(struct ChaseActor *actor)
 record:
     if (!Test(Mask(flags2C0, 0x80), ~0) && !Test(gEngineFlags, 0x4800) && !Flag2D0(actor, 0x800))
         SceneActorRecord_RecordPair(gScriptEntryProcedure, actor->base.body.id);
-    ((struct ContactCollider *)collider)->flags |= 4;
+    (collider)->flags |= 4;
 done:
     burn->timer = 0;
     actor->base.hitLockTimer = 0;
