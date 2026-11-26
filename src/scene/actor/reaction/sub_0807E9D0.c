@@ -9,9 +9,9 @@
 #include "scene/motion/scene_actor_chase_shared.h"
 s32 Math_Atan2(s32, s32);
 s32 Div(s32, s32);
-void Collision_CalculateElementalResponse(void *, void *);
+void Collision_CalculateElementalResponse(struct ContactCollider *, struct ContactCollider *);
 void SceneActor_SetContactReactionDirection(void *, void *, void *);
-void PlayerStats_AddContactHundredths(void *, void *, s32);
+void PlayerStats_AddContactHundredths(struct ContactCollider *, struct ContactCollider *, s32);
 
 static inline u8 Test(u32 value, u32 mask)
 {
@@ -93,15 +93,9 @@ static inline u8 IsUnavailable(struct ChaseActor *actor, u16 **motion)
     flags = &actor->base.motionFlags;
     disabled = *flags & mask;
     *motion = flags;
-    if (disabled)
-        goto unavailable;
-    if (SceneActorPlacement_ReadFlags32((void *)actor, 0x20000))
-        goto unavailable;
-    if (actor->base.health > 0)
-        goto available;
-unavailable:
-    return 1;
-available:
+    if (disabled || SceneActorPlacement_ReadFlags32(&actor->base, 0x20000) ||
+        actor->base.health <= 0)
+        return 1;
     return 0;
 }
 static inline void SpawnContactParts(struct ChaseActor *actor)
@@ -247,7 +241,7 @@ void SceneActorReaction_HandleColliderContact(struct ContactCollider *source,
         }
     }
     if (SceneActorTurn_Flags(motion, 0x2000))
-        SpawnContactParts((void *)actor);
+        SpawnContactParts(actor);
     actor->base.reactionSoundVariant = destination->cost;
     PlayerStats_AddContactHundredths(source, destination, actor->base.contactReward);
     SceneActorChase_SetBehaviorFlags(actor, 0x2000);
