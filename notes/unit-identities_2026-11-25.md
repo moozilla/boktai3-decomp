@@ -862,3 +862,51 @@ motion pools. Their moving dots have low visibility against the
 pedestal. The `review-native-spread-shot` type 2 sweep has clear
 orange flashes and a separate moving collider. Its production
 trigger remains unknown.
+
+### Strike traps, tether rings, and flying sprite effects
+
+Tags: strike traps, 0866, tether rings, F156, Vanargand, projectile, debris, title
+
+Load the 0029 state at 3955 and use the `review-native-collision-blast`
+command file. Original proc 1180 creates 0866 slot E811. Deliver the
+registered hit callback to the live slot and wait through its delay.
+The resulting marker and sparks appear in `created.png` and `after.png`.
+`EffectManager_SpawnParticles` runs at frame 1932.
+
+The same room provides a controlled backdrop for smaller effects.
+`review-native-tether-marker` invokes proc 852, creating F156 and
+drawing a ring with 0BA8 and the original sparkles. Checkpoint 0024
+also runs the ring updater at 3472. `review-native-directional-debris`
+calls the regular 4147 fragment drawer with the 29–31 frames selected
+by ContactBurst. The producer is the contact burst linked to Nidhoggr.
+`review-native-departure-motes` loads 2E90, palette 1F5 and EBF6
+animation 5, as set up in Vanargand's departure callback.
+
+`review-native-ballistic` invokes 081394B4 and steps the launch,
+flight, and scatter phases. Native trail motes use 1C1A and sequence
+D1B8. The separate projectile profile run invokes 08114928 and
+exercises its type 0 409C linear flight. The
+`review-native-scatter-ability` slot instead creates a falling visual
+and an independent scatter effect. Keep all three paths distinct
+in the layout. For the shared debris drawer, replay 0008's bike
+impact at 6274 or 0072's ending at 6323. Both execute the scene
+debris callbacks.
+
+### Title logo and scene-state file placement
+
+Tags: title, title emblem, Params3D0, room queries, layout
+
+Boot stock 0000 with `review-title-display/commands.txt`. At frame
+711 the original 1432 script sets Params3D0 and creates 4A25 FBD8.
+`late.png` shows the animated flaming emblem while the display
+callback runs. The 8AAB tutorial sprite and the adjacent title
+display are separate features.
+
+The layout corrections for mixed source groups include explicit
+file overrides. Apply unit destinations first and then file
+overrides. The former scene-state group keeps the three actor
+queries together. Its subsystem reset goes to scene lifecycle,
+its Pile Driver counters and new-game field initialization to game
+state, and its wrapped tilemap helpers to background video code.
+The separation follows the floor trap, Pile Driver, title boot
+and room-load witnesses and their direct callers.

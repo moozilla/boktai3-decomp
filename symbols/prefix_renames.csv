@@ -36,3 +36,10 @@ EffectEmitter_,StrikeCrystal_,src/effects/effect_emitter,Proc 1179→95A8 loads 
 TaggedSceneNpc_,Kuro_,src/actors/tagged_scene_npc,"D774 loads E00E, actor ID 51E2. Procs 2235/2266 and text #3515 tie this actor to Kuro."
 TileTrigger_,FloorTrap_,src/field/tile_trigger,"0013→3161, original 2FA5 slots are floor traps. The staged contact branch plays the press and particle callbacks."
 FrostEmitter_,SabataFrost_,src/effects/frost_emitter,0033/4233. EC71 attaches its 4384 cloud emitter. Staged constructor and draw confirm the effect in the battle.
+CollisionController_,StrikeTrap_,src/field/collision_controllers,0866 ID E811. Original collision callback and delayed spark blast verified in 3955.
+DirectionalController_,InteractionPrompt_,src/field/directional_interaction_controllers,883A delegates to contextual hint and interaction scripts. At 3955 proc 3954 displays fireball tip #1690.
+ProximityEmitter_,TetherRing_,src/field/proximity_particle_emitter,F156 / graphics 0BA8. Staged proc 852 draws ring sparks in 3955.
+Params3D0_,TitleDisplay_,src/actors/actor_animation_controller/sub_081EAB64.c / sub_081EB598.c / sub_081EB5A8.c / sub_081EB724.c / sub_081EB7DC.c,0000 cold boot dispatches 3578 + 4A25 FBD8; the phoenix title emblem animates under these callbacks.
+SceneObjects_Script,SlidingDoors_Script,src/actors/scene_object_controller,"0054/5297 6D69 and D4E3 update the separate sliding-door task, sprites 7ACD and 7AD3."
+SceneProcSprites_,BallisticSprite_,src/effects/ballistic_sprite_effect,"Controlled original 081394B4 uses 409C launch, flight and the scatter trail."
+ParticleEmitter_,BallisticTrail_,src/effects/particle_emitter,Controlled original 081394B4 reaches ParticleEmitter_UpdateFlight and the 8639 scatter trail.
