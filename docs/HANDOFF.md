@@ -37,6 +37,8 @@ not by fuzzy scores. Blind spelling sweeps don't count.
 Source and headers use the reviewed placement tables in `symbols/`.
 [SOURCE_LAYOUT.md](SOURCE_LAYOUT.md) maps the directories and explains where
 new files belong and how to find a function.
+The [runtime layout audit](../notes/unit-identities_2026-11-25.md) ties the
+revised names to checkpoint replays and the Monster Book.
 
 Numbers live only in [PROGRESS.md](../PROGRESS.md) (regenerated at batch integration) and
 the README badges. Use `python3 tools/progress.py` for the current figures and
