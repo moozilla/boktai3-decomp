@@ -1,23 +1,12 @@
-#include "global.h"
-struct S {
-    u8 f[1];
-    u8 b1;
-    u8 f2[5];
-    u8 b7;
-    u8 b8;
-    u8 b9;
-    u8 g[0xd4 - 0xa];
-    u8 d4[1];
-};
-void Actor_PlayAnimationEntry(void *, u32, u32, u32, u32);
-s32 DisplayAnimation_TestFinished(void *);
-void StoryCharacter_UpdateAnimation21State(u32 a, struct S *p, s32 n)
+#include "npc/manager/scene_actor_lifecycle.h"
+s32 DisplayAnimation_TestFinished(struct DisplayAnimation *);
+void StoryCharacter_UpdateAnimation21State(u32 a, struct SceneActor *p, s32 n)
 {
     u32 r;
-    if (p->b9 != 0) {
-        p->b9 = 0;
-        p->b7 = 0;
-        switch (p->b1) {
+    if (p->animationEntered != 0) {
+        p->animationEntered = 0;
+        p->finished = 0;
+        switch (p->variant) {
             case 4:
             case 5:
             case 6:
@@ -55,5 +44,5 @@ void StoryCharacter_UpdateAnimation21State(u32 a, struct S *p, s32 n)
         Actor_PlayAnimationEntry(p, r, 2, 0, 4);
     }
     if (n > 10)
-        p->b7 = 1;
+        p->finished = 1;
 }
