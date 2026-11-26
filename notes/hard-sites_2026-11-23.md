@@ -346,3 +346,15 @@ in both resource calls. The full unit matches at 684 bytes and the two
 dead-code reports disappear. The scratch trials and graph are in
 `build/hard-sites/wireless/` and
 `build/matchsearch/WirelessResultPanel_Init`.
+
+## 2026-11-26: SpriteTrail native camera layout
+
+`scene_tilemap.c` publishes its `TilemapPanel` through `gSceneCamera`
+and recovers the panel for its own scroll queries. Using the same
+cast and the native `scroll.x` field in `SpriteTrail_UpdatePositions`
+keeps both camera reads exact. Use the shared declaration and place
+the count and leading-cursor updates in the `for` clause. The split
+first cursor advance still survives alias analysis. The stock unit
+matches all 304 bytes and reports no concessions. A native indexed
+history expression still reverses one operand, so the previously
+matched history calculation remains.

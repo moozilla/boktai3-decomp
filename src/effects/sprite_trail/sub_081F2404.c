@@ -1,11 +1,8 @@
 #include "effects/sprite_trail/sprite_trail.h"
 
-struct Camera {
-    u8 unk_00[0x44];
-    s32 x;
-};
-/* Read the camera pointer separately for each projected position. */
-extern struct Camera *gSceneCamera;
+#include "effects/background_controllers/background_controller.h"
+#include "engine/shared/tilemap_panel.h"
+
 void Vector3_CopyComponents(struct TrailVector *, struct TrailVector *);
 
 void SpriteTrail_UpdatePositions(struct SpriteTrail *p)
@@ -21,7 +18,7 @@ void SpriteTrail_UpdatePositions(struct SpriteTrail *p)
     if (!(*flags & 1)) {
         struct TrailVector *position = &p->position;
         struct ContactPosition *out = &p->head[0].position;
-        out->x = (p->position.x >> 12) - gSceneCamera->x;
+        out->x = (p->position.x >> 12) - ((struct TilemapPanel *)gSceneCamera)->scroll.x;
         {
             s32 y = position->y;
             s32 z = position->z;
@@ -41,9 +38,9 @@ void SpriteTrail_UpdatePositions(struct SpriteTrail *p)
             index * sizeof(struct TrailVector) + (u32) & ((struct SpriteTrail *)0)->history;
         position = (struct TrailVector *)(offset + (u32)p);
     }
-    for (; i >= 0;) {
+    for (; i >= 0; i--, next++) {
         struct ContactPosition *out = &next->position;
-        next->position.x = (position->x >> 12) - gSceneCamera->x;
+        next->position.x = (position->x >> 12) - ((struct TilemapPanel *)gSceneCamera)->scroll.x;
         {
             s32 y = position->y;
             s32 z = position->z;
@@ -61,8 +58,6 @@ void SpriteTrail_UpdatePositions(struct SpriteTrail *p)
         tail->position.z = (next->position.z + head->position.z) >> 1;
         head++;
         tail++;
-        i--;
-        next++;
     }
     if (!(*savedFlags & 1)) {
         Vector3_CopyComponents(&p->history[p->historyIndex], &p->position);
