@@ -1,0 +1,16 @@
+08180654 sprite-suspend-return
+
+The already-suspended path leaves the component pointer in r0.
+On the other path Sound_StopSong returns through r0, leaving 08180669.
+
+The explicit form changed the ROM bytes. The guarded form passed the unit ROM check.
+
+--- a/src/fn/sub_08180654.c
++++ b/src/fn/sub_08180654.c
+@@ -14,3 +14,6 @@
+     component->flags |= 1;
+     /* Callers ignore the unspecified ABI result. */
++#ifdef UBFIX
++    return active ? (u32)component : 0x08180669; // preserve the inherited GBA return value
++#endif
+ }
