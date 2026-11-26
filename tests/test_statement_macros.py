@@ -85,6 +85,29 @@ class StatementMacros(unittest.TestCase):
         self.assertEqual(sm.single_use_in(ONCE, exclude=path, root=self.root), ["BUMP"])
         self.assertEqual(sm.single_use_in('void c(void) { DELTAS(x, y); }\n', root=self.root), [])
 
+    def test_disk_counts_subtract_the_replaced_file_only(self):
+        (self.root / "build").mkdir()
+        duplicate = self.root / "src/fn/a.c"
+        duplicate.write_text(SHARED_DEF + "void a(void) { DELTAS(x, y); }")
+        (self.root / "src/fn/b.c").unlink()
+        self.assertIn("DELTAS", sm.single_use_names(self.root))
+
+        with patch.object(sm, "_counts", side_effect=AssertionError("unexpected rescan")):
+            self.assertEqual(sm.single_use_in("void a(void) { DELTAS(x, y); }", duplicate, self.root),
+                             ["DELTAS"])
+            once = self.root / "src/fn/once.c"
+            self.assertEqual(sm.single_use_in("void a(void) { BUMP(x); }", once, self.root), [])
+
+    def test_disk_counts_exclude_symlinks_to_the_replaced_file(self):
+        (self.root / "build").mkdir()
+        path = self.root / "src/fn/once.c"
+        (self.root / "src/fn/alias.c").symlink_to(path)
+        self.assertNotIn("BUMP", sm.single_use_names(self.root))
+        with patch.object(sm, "_counts", side_effect=AssertionError("unexpected rescan")):
+            self.assertEqual(sm.single_use_in(ONCE, path, self.root), ["BUMP"])
+        path.unlink()
+        self.assertEqual(sm.single_use_in(ONCE, path, self.root), ["BUMP"])
+
     def test_only_do_while_macros_are_statement_macros(self):
         defs, _ = sm.scan("#define SQ(x) ((x) * (x))\n#define LOOP() do { } while (0)\n")
         self.assertEqual(defs, {"LOOP"})
