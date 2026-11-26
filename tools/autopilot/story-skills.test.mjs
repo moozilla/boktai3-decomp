@@ -78,6 +78,25 @@ test('game over waits for the continue choice and selects its left entry', () =>
   assert.equal(gameOverMenu.decide({ choice: 0 }), 'a');
 });
 
+test('an exhausted terrain search rolls back a lethal final trial', () => {
+  const player = { position: { x: 128, y: 512, z: 128 }, currentStatA: 240 };
+  const lib = skill('world', { press: (key) => key }, { gPlayers: [player] });
+  lib.where = () => ({ scene: 1, life: player.currentStatA });
+  lib.session = {
+    snapshot: () => [player.position.y, player.currentStatA],
+    restore: (state) => { [player.position.y, player.currentStatA] = state; },
+  };
+  const search = lib.searchTo(1, 0);
+  let result;
+  while (!(result = search.next()).done) {
+    player.position.y = 256;
+    player.currentStatA = 0;
+  }
+  assert.deepEqual(result.value, { reached: false, reason: 'search failed' });
+  assert.equal(player.position.y, 512);
+  assert.equal(player.currentStatA, 240);
+});
+
 test('a lock tracks its saved bit across the script bank bytes', () => {
   let value = 0;
   const g = {

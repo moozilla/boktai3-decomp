@@ -166,7 +166,8 @@ exports.searchTo = function* (cx, cz, opts = {}) {
   const KEYS = ['up', 'down', 'left', 'right', 'up+left', 'up+right', 'down+left', 'down+right'];
   // distance to the cell (0 inside it): clinging to a wall keeps the player off the middle
   const dist = () => Math.max(Math.max(0, Math.abs(tx - p.position.x) - 127), Math.max(0, Math.abs(tz - p.position.z) - 127));
-  let beam = [{ snap: S.snapshot(), d: dist(), keys: [] }];
+  const root = S.snapshot();
+  let beam = [{ snap: root, d: dist(), keys: [] }];
   const seen = new Set();
   for (let depth = 0; depth < (opts.depth ?? 24); depth++) {
     const next = [];
@@ -197,7 +198,7 @@ exports.searchTo = function* (cx, cz, opts = {}) {
     if (!beam.length) break;
   }
   // no route: go back to where the search started
-  S.restore(beam.length ? beam[0].snap : S.snapshot());
+  S.restore(root);
   return { reached: false, reason: 'search failed' };
 };
 
