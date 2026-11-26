@@ -351,6 +351,44 @@ def flow(scans, records, groups):
     return private, buckets, edges, embeds, rom_params
 
 
+def strong_pair(a, b, proof):
+    return any(kind in {"RAM", "flow", "formal type"} for kind, _ in proof) or (
+        short(a) == short(b) and meaningful(a))
+
+
+def add_member_edges(private, records, edges):
+    """Use corresponding by-value members of a supported parent pair as evidence."""
+    slots = {}
+
+    def members(key):
+        if key not in slots:
+            slots[key] = {(m["name"], m["off"], m["size"], m["array"], m.get("esize")): m["record"]
+                          for m in records[key].get("members", ())
+                          if m.get("base") == "aggregate" and m.get("record") in private
+                          and m.get("off") is not None and m.get("size")
+                          and not lm.OPAQUE.match(m["name"])}
+        return slots[key]
+
+    pending = list(sorted(edges))
+    seen = set(pending)
+    while pending:
+        a, b = pending.pop()
+        left, right = members(a), members(b)
+        if not left or not right or not compatible(records[a], records[b],
+                                                   strong=strong_pair(records[a], records[b], edges[a, b])):
+            continue
+        for slot in sorted(left.keys() & right.keys()):
+            x, y = sorted((left[slot], right[slot]))
+            if x == y or records[x]["file"] == records[y]["file"] or not compatible(records[x], records[y]):
+                continue
+            name, off, *_ = slot
+            pair = (x, y)
+            edges[pair].add(("member", f"{a} and {b} both embed {name} at {off:#x}"))
+            if pair not in seen:
+                seen.add(pair)
+                pending.append(pair)
+
+
 def family_components(private, records, buckets, edges):
     """Merge supported pairs, keeping every pair in a component layout-compatible."""
     for anchor, keys in buckets.items():
@@ -374,9 +412,11 @@ def family_components(private, records, buckets, edges):
                     label += f" argument {context[-1] + 1}"
                 edges[a, b].add((kind, label))
 
+    add_member_edges(private, records, edges)
+
     def weight(item):
         pair, proof = item
-        priorities = {"flow": 16, "RAM": 12, "formal type": 6, "parameter": 3, "unit": 1}
+        priorities = {"flow": 16, "RAM": 12, "formal type": 6, "parameter": 3, "member": 2, "unit": 1}
         strength = sum(priorities[k] for k in {k for k, _ in proof})
         named = int(short(records[pair[0]]) == short(records[pair[1]]))
         return -strength, -named, pair
@@ -391,9 +431,8 @@ def family_components(private, records, buckets, edges):
         for left in components[x]:
             for right in components[y]:
                 pair = tuple(sorted((left, right)))
-                strong = any(kind in {"RAM", "flow", "formal type"} for kind, _ in edges.get(pair, ()))
-                strong |= short(records[left]) == short(records[right]) and meaningful(records[left])
-                if not compatible(records[left], records[right], strong=strong):
+                if not compatible(records[left], records[right],
+                                  strong=strong_pair(records[left], records[right], edges.get(pair, ()))):
                     viable = False
                     break
             if not viable:

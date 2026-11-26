@@ -1,5 +1,6 @@
 """Small source fixtures for compiler layouts, call evidence and gated merges."""
 from pathlib import Path
+from collections import defaultdict
 import sys
 import subprocess
 import tempfile
@@ -101,7 +102,6 @@ void F(struct Owner *p, int n) {
         view = {"size": 16, "kind": "struct", "spell": "struct PlayerWork", "known": [
             {"off": 0, "size": 4, "base": "int", "bits": None, "name": "state"}]}
         views = {a: view, b: view}
-        from collections import defaultdict
         self.assertEqual(families.family_components({a, b}, views, {}, defaultdict(set)), [])
         self.assertEqual(families.family_components({a, b}, views, {("unit", "Player"): {a, b}},
                                                     defaultdict(set)), [[a, b]])
@@ -130,6 +130,24 @@ void F(struct Owner *p, int n) {
 
 @unittest.skipUnless(Path(lm.AGBCC).is_file(), "agbcc required for layout probes")
 class CompilerTests(unittest.TestCase):
+    def test_embedded_members_inherit_evidence_only_at_the_same_slot(self):
+        def host(path, child_fields, member):
+            return measure(TYPES + f"""
+struct Link {{ {child_fields} }};
+struct Host {{ unsigned state; struct Link {member}[2]; }};
+""", path)
+
+        views = (host("src/a.c", "u16 phase; u8 pad2[2];", "linked") |
+                 host("src/b.c", "u16 phase; u16 target;", "linked") |
+                 host("src/c.c", "u16 phase; u16 target;", "other"))
+        parents = {f"src/{name}.c:struct Host" for name in "abc"}
+        children = ["src/a.c:struct Link", "src/b.c:struct Link"]
+        self.assertEqual(families.family_components(set(views), views, {}, defaultdict(set)), [])
+        edges = defaultdict(set)
+        groups = families.family_components(set(views), views, {("unit", "Host"): parents}, edges)
+        self.assertEqual(groups, [sorted(parents), children])
+        self.assertEqual({kind for kind, _ in edges[tuple(children)]}, {"member"})
+
     def test_probe_compatible_headers_once_and_reuse_the_results(self):
         one = "struct A { u16 flags; };\n"
         two = "struct B { struct A a; u16 next; };\n"

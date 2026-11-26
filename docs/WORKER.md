@@ -290,6 +290,10 @@ directory. Pass source paths or directories for a smaller scan. Inspect any fami
 compiler-measured storage plus evidence from calls, a RAM object, or a report unit. Check the
 evidence before applying a family with only report-unit or shared-parameter support.
 
+Two supported parent declarations can provide evidence for a child family when both embed
+compatible private types in the same named member slot. Merge the child first if the parent
+preview reports a private type dependency, then rescan the parent units for their new layouts.
+
 `build/venv/bin/python tools/structmerge.py FAMILY` previews the shared type and source
 proposals. Distinct ROM functions that load an offset vote on its width and extension. The type
 used by the most copies breaks ties, and the name comes from the most specific copy. The header
