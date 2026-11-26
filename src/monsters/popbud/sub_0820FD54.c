@@ -1,18 +1,9 @@
+#include "script/script_utility.h"
+#include "monsters/popbud/popbud_playback.h"
 #include "global.h"
-struct Args {
-    s32 x, y, z, a, b, c, d, e;
-};
-struct Message {
-    u32 type : 16;
-    u32 reserved : 16;
-    struct Args *args;
-};
-extern u8 *gGameState;
-void Script_Call(u32, struct Message *);
 void Bestiary_UnlockEntry(s32);
 void sub_08159164(s32);
-#define H(p, n) (*(s16 *)((p) + (n)))
-#define W(p, n) (*(u32 *)((p) + (n)))
+#define H(p, n) (*(s16 *)((u8 *)(p) + (n)))
 static inline s32 clamp(s32 v)
 {
     if (v > 9999)
@@ -21,31 +12,30 @@ static inline s32 clamp(s32 v)
         v = 0;
     return v;
 }
-#define INC(n) H(gGameState, n) = clamp(H(gGameState, n) + 1)
-void Popbud_RecordDefeat(u8 *p)
+void Popbud_RecordDefeat(struct PinkSpineState *p)
 {
-    struct Args a;
-    struct Message m;
-    u32 q = W(p, 0x158);
+    s32 values[8];
+    struct ScriptUtilityArguments m;
+    u32 q = p->f158;
     if (q) {
-        a.x = H(p, 0x40);
-        a.y = H(p, 0x42);
-        a.z = H(p, 0x44);
-        a.a = W(p, 0x14C);
-        a.b = W(p, 0x150);
-        a.c = W(p, 0x154);
-        a.d = W(p, 0x144);
-        a.e = W(p, 0x140);
-        m.type = 8;
-        m.args = &a;
+        values[0] = p->sprite.position.x;
+        values[1] = p->sprite.position.y;
+        values[2] = p->sprite.position.z;
+        values[3] = p->f14C;
+        values[4] = p->f150;
+        values[5] = p->f154;
+        values[6] = p->f144;
+        values[7] = (s32)p->f140;
+        m.count = 8;
+        m.values = values;
         Script_Call(q, &m);
     }
     Bestiary_UnlockEntry(2);
-    if (W(p, 0x144) & 1) {
-        sub_08159164(H(p, 0x13C));
+    if (p->f144 & 1) {
+        sub_08159164(p->f13C);
         H(gGameState, 0x87C) = H(gGameState, 0x87C) < 9999 ? H(gGameState, 0x87C) + 1 : 9999;
         H(gGameState, 0x538) = H(gGameState, 0x538) < 9999 ? H(gGameState, 0x538) + 1 : 9999;
         H(gGameState, 0x56E) = H(gGameState, 0x56E) < 9999 ? H(gGameState, 0x56E) + 1 : 9999;
-        INC(0x58A);
+        gGameState->targetFlagBonuses[0] = clamp(gGameState->targetFlagBonuses[0] + 1);
     }
 }
