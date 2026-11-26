@@ -461,6 +461,9 @@ function exploreDistances(here, visited) {
 function* throughDoor(g, L, box, stopIf) {
   const scene = L.where().scene, tried = new Set();
   const avoid = stageOf(scene).doors.map((d) => d.box).filter((b) => b !== box);
+  const landing = yield* L.approachLift(box, { avoid, trace: (e) => event({ skill: 'nav', ...e }) });
+  if (landing) event({ skill: 'lift', box, ...landing });
+  if (L.where().scene !== scene) return true;
   if (L.coffinAvailable()) {
     let foughtPatrol = false;
     for (let attempt = 0; attempt < 3 && L.coffinAvailable(); attempt++) {

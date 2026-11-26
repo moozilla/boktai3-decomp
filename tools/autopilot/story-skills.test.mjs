@@ -309,6 +309,32 @@ test('bike search keeps steering that avoids damage on the same stretch', () => 
   assert.deepEqual(step.value, { key: 'r+up', frames: 24, x: 32, lane: -12, life: 80 });
 });
 
+test('a lift door first approaches a reachable landing at the platform height', () => {
+  const player = { position: { x: 128, y: 256, z: 640 } };
+  const lift = { kind: 2, state: 4, name: 7, lowerHeight: 512, upperHeight: 1280,
+    body: { position: { x: 384, y: 512, z: 384 } } };
+  const box = { name: 'CD42', x0: 256, x1: 512, z0: 256, z1: 512 };
+  const g = { types: { globals: { gNamedActorManager: { addr: 1 } } }, u32: () => 2,
+    at: () => ({ used: 1, slots: [lift] }), press: (key, frames) => ({ key, frames }) };
+  const lib = skill('lifts', g, { gPlayers: [player] }, {
+    boxes: () => [box], cellOf: (x, z) => [x >> 8, z >> 8], coffinAvailable: () => false,
+    grid: () => ({ at: (x, z) => ({ x, z, level: x === 1 && z === 2 ? 2 : 1, open: true }) }),
+    findPath: (grid, here, goals) => {
+      assert.deepEqual([...goals], ['1,2']);
+      return [here, [1, 2]];
+    },
+    navigate: function* (position) {
+      assert.deepEqual(position, [384, 640]);
+      player.position.y = 512;
+      return { reached: true };
+    },
+  });
+  assert.equal(lib.liftAt(box), lift);
+  const approach = lib.approachLift('CD42');
+  assert.deepEqual(approach.next().value, { key: 0, frames: 1 });
+  assert.deepEqual(approach.next(), { done: true, value: { name: 7, height: 512, target: [384, 640], reached: true } });
+});
+
 test('armor targets model damage to the guard and the contact cooldown', () => {
   const fields = { 0xb1c: 240, 0xb20: 65, 0xb2c: 9, 0xb32: 2 };
   const read = (addr) => fields[addr - 0x02010000] ?? 0;
