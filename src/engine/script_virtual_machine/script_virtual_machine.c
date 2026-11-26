@@ -798,6 +798,15 @@ void Script_ResetLocalVariables(void)
     Script_ClearLocalVariables();
 }
 
+struct GameStateRamRegions {
+    struct GameState active;
+    u8 activePadding[0xb00 - sizeof(struct GameState)];
+    u8 backup[0xb00];
+    u8 variables[0x400];
+    u8 backupVariables[0x400];
+    u8 localVariables[0x400];
+};
+
 // Provisional name: GameState_SelectRamBase
 
 /* Select timer-jittered storage for the game-state regions. */
@@ -806,12 +815,14 @@ void GameState_SelectRamBase(void)
 {
     u32 timer = *(vu16 *)REG_ADDR_TM3CNT_L;
     u8 *base = (u8 *)((u32)gGameStateStorage & ~(timer >> 16));
+    struct GameStateRamRegions *regions;
     base += (timer & 127) * 8;
-    gGameState = (struct GameState *)base;
-    gBackupGameState = base + 0xb00;
-    gGameVariables = base + 0x1600;
-    gBackupGameVariables = base + 0x1a00;
-    gScriptLocalVariables = base + 0x1e00;
+    regions = (struct GameStateRamRegions *)base;
+    gGameState = &regions->active;
+    gBackupGameState = regions->backup;
+    gGameVariables = regions->variables;
+    gBackupGameVariables = regions->backupVariables;
+    gScriptLocalVariables = regions->localVariables;
 }
 
 void GameState_ClearActiveRegions(void)
