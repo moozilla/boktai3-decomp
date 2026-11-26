@@ -1,4 +1,5 @@
 #include "global.h"
+#include "monsters/armor/armor_part_queue.h"
 #include "scene/collision/contact_collider.h"
 
 #include "engine/engine.h"
@@ -21,7 +22,7 @@ struct ArmorChaseActor {
     u8 behavior;
     u8 phase;
     u8 unkB3E[0xB58 - 0xB3E];
-    u8 armorData[0x1120 - 0xB58];
+    struct ArmorLaunchGroup armorData;
     u8 decision;
     u8 fastMode;
     u16 attackCooldown;
@@ -206,7 +207,7 @@ void sub_081879A8(struct ArmorChaseActor *actor)
                         ActorController_SetBehavior(actor, 32);
                     actor->decision = 1;
                     actor->attackCooldown = 180;
-                } else if (Armor_IsSequenceIncomplete(actor->armorData))
+                } else if (Armor_IsSequenceIncomplete(&actor->armorData))
                     ActorController_SetBehavior(actor, 8);
                 else if (actor->fastMode)
                     ActorController_SetBehavior(actor, 33);
