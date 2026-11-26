@@ -730,3 +730,57 @@ pointer across setup or using a shared draw moves more instructions.
 The unchanged unit matches 412 bytes with zero lint findings. The
 stock near match is in `build/hard-sites/scene-panel-rig/symbolic-pointer.c`
 and the persistent store is `build/matchsearch/ScenePanel_InitRig`.
+
+## 2026-11-26: Registry head slot and FragmentGroup motion outputs
+
+A pointer-to-pointer scan that reacquires the head slot before the
+splice matches both registry search loops. The actor draft is 72 bytes.
+It keeps the singleton read that supplies the old head, but CSE reuses
+that value across `entry->next` and drops the second read. Caching the
+head slot through the scan retains the second read but replaces the
+first with a read through the cached pointer and extra address setup.
+Both stock insertions retain their volatile declarations. The first
+and second reads still need to survive together without an extra node
+copy. See `build/hard-sites/registry/seventh-review/`.
+
+Factoring the FragmentGroup lifetime and motion setup into an inline
+that takes the group and index preserves the plain symbolic mismatch.
+Passing pointers to the real output fields moves the stock shape score
+from 110 to 102 but still leaves 96 ROM and 74 draft instruction rows.
+The earlier exact table-priority diagnostic remains the closest basis.
+See `build/hard-sites/fragment/seventh-review/`.
+
+## 2026-11-26: Fading particle lifetime copies
+
+The matching `FadingParticleGroup_Update` (08016118) now avoids the
+old pointer adjustment by capturing the vertical speed before updating
+it. Its lifetime code still uses a signed test of an unsigned-byte
+load. The scoped priority linter reports zero because the narrow value
+comes through the lifetime pointer.
+
+Using one widened lifetime for the animation reset and decrement emits
+536 bytes for the 540-byte target. The ROM loads the byte into r0 and
+copies it to r1 for the reset test and r2 for the decrement. The clean
+draft loads directly into r1 and reuses it for both. In the stock source
+those copies are UIDs 760 and 770. The signed guard is present through
+local allocation and the branch is gone by jump2, after the separate
+registers have been allocated. Moving the typed decrement, using a
+switch, and changing the order of the reset tests all miss. The best
+scratch draft is `build/hard-sites/fading-update/lifetime-result-in-place.c`.
+Its stock bytes and diff are in `build/matchsearch/FadingParticleGroup_Update`.
+
+## 2026-11-26: Shared barrage action and Timer 3 address
+
+`Hresvelgr_UpdateBoundaryBarrage` (081A0BC8) now uses `BossActionState`
+and its existing function declarations. Adjusting the following padding
+preserves the later members and the full 732-byte match. The scoped lint
+reports the same six findings. The single priority site still turns on
+the mask's register during the two reloads.
+
+`GameState_SelectRamBase` (0821B084) uses `REG_ADDR_TM3CNT_L` for its
+16-bit hardware read. The `REG_TM3CNT_L` lvalue macro was flagged as a
+constant local, so the matching source uses the named address and
+explicit load. The one proved-zero report remains. Deriving the mapped
+regions from the backup or variable pointer and walking between regions
+also miss. The direct zero-free draft still differs on the operand order
+of the storage base and timer offset.
