@@ -18,18 +18,20 @@ Without concessions: **100.000%**. With concessions (register pins, asm barriers
 | `proved-zero` | 17 |
 | `once-loop` | 77 (+1 excused) |
 | `stmt-expr` | 1 |
-| `const-local` | 708 (+9 excused) |
-| `literal-local` | 2,133 |
+| `const-local` | 1,199 (+9 excused) |
+| `literal-local` | 2,967 |
 | `addr-deref` | 21 |
 | `subtract-negative` | 13 |
 | `duplicate-branches` | 18 (+6 excused) |
 | `placeholder-name` | 5 |
 | `volatile-view` | 2 |
 | `local-union` | 71 (+2 excused) |
-| `literal-param` | 528 (+3 excused) |
-| total | 3,607 |
+| `literal-param` | 2,871 (+79 excused) |
+| total | 7,275 |
 
-Source files with no warning: **4,801** of 6,041.
+Steering debt (parked constant uses and unresolved inline constant arguments): **7,037**.
+
+Source files with no warning: **4,497** of 6,041.
 
 Nonmatching drafts (`#ifdef NONMATCHING`, not counted above): **0 functions**, 0.000% of code, mean fuzzy match 0.0%.
 
