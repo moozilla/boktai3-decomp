@@ -59,3 +59,38 @@ steering uses from 717 to 705. Centipede accounts for nine removed uses
 and Axe Armor for three. The six objects report zero linter errors.
 All three dependents of the Axe header pass.
 The stock compiler matches all 20 changed units across their recorded ROM extents.
+
+## Third pass
+
+Armor_ApplySceneCommands (0818A500) now reads SceneEventReceiver and
+SceneEventCommand fields. Armor_InitFromScript (0818C0BC) clears the nine
+fragment callback pairs with an indexed loop. Direct elemental reaction
+tests change reload choice 23 in Armor_ReceiveColliderContact (0818B7AC).
+Changing the reload choice in scope leaves 17 instruction differences.
+
+Centipede_ShiftSegmentTrail (080A9988) reads the sprite's position
+directly. The bridge pass at 080A9DB0 indexes its segment positions.
+Direct trail flag expressions shorten the 280-byte routine to 224 bytes
+and change the allocation of the loop base.
+
+Golem's charge check reads the tracking target, distance and limit from
+the owning actor. The recovery path reads the route probe's destination.
+Dog's arrival animation reuses the standard duration operation and
+Dog_Init steps the tile drawable using its animation member.
+
+The Axe cooldown tick, auxiliary sprite removal and collider cleanup now
+index their arrays. The direct sprite-expiry loop keeps a single slot
+cursor and loses the separately held lifetime offset at 080FBEEE. Scope
+also identifies the conflict between allocation candidates 70 and 72.
+
+AxeArmor_UpdateCountdown (08204E5C) updates the countdown field
+directly. AxeArmor_RecordDefeat (08204748) writes the five existing
+game-state reaction counters while preserving saturation. Direct
+sequence flips still change the build. Combining the position stores
+for the already-dead state shortens that initializer by twelve bytes.
+
+The third pass reduces the six-object reports from 646 to 644 rows
+and the steering subtotal from 705 to 702 uses. The six object reports
+contain zero errors and the comparison found no new diagnostics.
+
+All nine changed source units match their recorded ROM extents.
