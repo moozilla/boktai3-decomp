@@ -264,7 +264,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [notes/area-effect-link_2026-10-14.md](../notes/area-effect-link_2026-10-14.md) | Link variant of area effects (Sol, 2026-10-14) |  | 2 |
 | [notes/area-effect_2026-10-14.md](../notes/area-effect_2026-10-14.md) | Rectangular area effect manager (Sol, 2026-10-14) | *#tooling* | 4 |
 | [notes/arm-08000430.md](../notes/arm-08000430.md) | sub_08000430: unpinned exact match, and how it works | #matching #compiler #register-pinning #arm | 6 |
-| [notes/autopilot-port-conformance_2026-11-26.md](../notes/autopilot-port-conformance_2026-11-26.md) | Autopilot checkpoint conformance, 2026-11-26 | #port #autopilot #verification | 3 |
+| [notes/autopilot-port-conformance_2026-11-26.md](../notes/autopilot-port-conformance_2026-11-26.md) | Autopilot checkpoint conformance, 2026-11-26 | #port #autopilot #verification | 4 |
 | [notes/autopilot-port-stress_2026-11-25.md](../notes/autopilot-port-stress_2026-11-25.md) | Autopilot port stress run, 2026-11-25 | #hardware #tooling #menu #scene | 2 |
 | [notes/axe-trail-playback.md](../notes/axe-trail-playback.md) | Axe trail playback | #monsters #matching | 0 |
 | [notes/background-palette-fade_2026-11-01.md](../notes/background-palette-fade_2026-11-01.md) | Background palette fade | *#assets* | 0 |

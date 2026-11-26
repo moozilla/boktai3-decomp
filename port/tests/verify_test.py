@@ -59,3 +59,37 @@ class TestResume(unittest.TestCase):
                 difference = None
                 self.assertEqual(verify.main(), 0)
                 self.assertEqual(len(calls), 7, 'a failed comparison is retried')
+
+    def test_parallel_regressions_stop_before_launching_another_pair(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            bank = root / 'build/saves'
+            for file in (bank / '0001.sav', root / 'build/port/game/game.wasm',
+                         root / 'build/port/agent/types.json'):
+                file.parent.mkdir(parents=True, exist_ok=True)
+                file.write_bytes(b'input')
+            fixtures = root / 'movies.json'
+            fixtures.write_text(json.dumps({
+                'movies': {'smoke': {}},
+                'cases': {name: {'checkpoint': '0001', 'scene': 1, 'movie': 'smoke'}
+                          for name in ('first', 'second', 'third')},
+            }))
+            calls = []
+
+            def run_case(save, out, frames, seed, recording, rom_reference):
+                calls.append(out.name)
+                out.mkdir(parents=True)
+                difference = {'tick': 3, 'changes': {'hudPage': {}}} if out.name == 'first' else None
+                (out / 'result.json').write_text(
+                    json.dumps({'ticks': 10, 'difference': difference, 'fault': None}))
+                return int(bool(difference))
+
+            with (patch.object(verify, 'ROOT', root),
+                  patch.object(verify, 'FIXTURES', fixtures),
+                  patch.object(verify, 'run_case', side_effect=run_case),
+                  patch.object(verify.shutil, 'which', return_value=sys.executable),
+                  patch.object(sys, 'argv', ['verify.py', '--jobs', '2']),
+                  redirect_stdout(io.StringIO()) as output):
+                self.assertEqual(verify.main(), 1)
+                self.assertCountEqual(calls, ['first', 'second'])
+                self.assertIn('first DIFFER at tick 3 (hudPage)', output.getvalue())

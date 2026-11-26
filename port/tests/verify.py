@@ -109,15 +109,13 @@ def main():
     parser.add_argument('--seed', type=int, action='append',
                         help='fuzz seed (repeat for multiple seeds, defaults to 1)')
     parser.add_argument('--jobs', type=int, choices=(1, 2), default=1,
-                        help='number of simultaneous checkpoint comparisons for a bank sweep')
+                        help='number of simultaneous checkpoint comparisons')
     args = parser.parse_args()
     seeds = list(dict.fromkeys(args.seed or [1]))
     if any(not 1 <= seed <= 0xffffffff for seed in seeds):
         parser.error('--seed must be between 1 and 4294967295')
     if args.seed and not args.all:
         parser.error('--seed requires --all')
-    if args.jobs != 1 and not args.all:
-        parser.error('--jobs requires --all')
     if not 1 <= args.frames <= 20000:
         parser.error('--frames must be between 1 and 20000')
     if args.resume and not args.all:
@@ -206,7 +204,14 @@ def main():
     else:
         with ThreadPoolExecutor(args.jobs) as pool:
             try:
-                outcomes = list(pool.map(compare_case, work))
+                outcomes = []
+                # A fixture failure stops the suite after the in-flight pair.
+                batch_size = len(work) if args.all else args.jobs
+                for offset in range(0, len(work), batch_size):
+                    batch = list(pool.map(compare_case, work[offset:offset + batch_size]))
+                    outcomes.extend(batch)
+                    if not args.all and any(batch):
+                        break
             except KeyboardInterrupt:
                 pool.shutdown(cancel_futures=True)
                 raise

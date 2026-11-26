@@ -610,6 +610,8 @@ callbacks and game state are still checked. Use
 for a standalone replay.
 
 Run one recording with `build/venv/bin/python port/tests/verify.py --case NAME`.
+Pass `--jobs 2` to run the regression recordings in pairs. On a failure, the
+runner reports the first differing tick and finishes the in-flight pair.
 For randomized input across the entire bank, run
 `build/venv/bin/python port/tests/verify.py --all --seed 1 --seed 2 --seed 3 --resume`.
 Use `--jobs 2` for two simultaneous comparisons or `--case CHECKPOINT` for one
@@ -626,6 +628,14 @@ the ROM, checkpoint save and complete harness script, including the input sequen
 RTC and sampled addresses. It uses the original ticks when these inputs and the
 full tick dump agree with the reference record. It runs the emulator for new
 inputs, incomplete captures or older runs without a reference record.
+
+After a direct `make port-verify` run, replay a later build with two workers and
+the captured ROM samples.
+
+```sh
+build/venv/bin/python port/tests/verify.py --jobs 2 \
+  --rom-reference build/autopilot --out-root build/autopilot/verify-follow-up
+```
 
 ## Undefined behavior the GBA forgives (UBFIX)
 

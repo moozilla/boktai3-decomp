@@ -57,3 +57,6 @@ Recorded replays skip pixel rendering. The three equipment cases took
 98.0 seconds with rendering enabled and 28.4 seconds headless on the
 loaded worker. All 25,955 sampled ticks in the suite were identical.
 The inventory recording still trapped before tick 1709 on the old wasm.
+With reused ROM samples, the full headless suite took 145.9 seconds on
+one worker and 80.1 seconds on two. The two-worker suite finishes the
+in-flight pair after a failure, then exits before launching another pair.
