@@ -178,11 +178,11 @@ void SceneActorControl_UpdateStoredMotion(struct ChaseActor *actor)
     }
 }
 
-extern u8 gUnk_08605C5C[];
+extern void *gUnk_08605C5C[];
 
-void SceneActorControl_SetApproachCallbacks(u8 *p)
+void SceneActorControl_SetApproachCallbacks(struct RoomActor *actor)
 {
-    *(u8 **)(p + 0x28c) = gUnk_08605C5C;
+    actor->behaviorCallbacks = gUnk_08605C5C;
 }
 
 static inline void SetDrawableAndShadow(struct ChaseActor *actor, u32 visible)
@@ -377,11 +377,11 @@ void SceneActorControl_ConsumePendingEntry(struct ChaseActor *actor)
     actor->base.counter2AC++;
 }
 
-extern u8 gUnk_08605C64[];
+extern void *gUnk_08605C64[];
 
-void SceneActorControl_SetStoredMotionCallbacks(u8 *p)
+void SceneActorControl_SetStoredMotionCallbacks(struct RoomActor *actor)
 {
-    *(u8 **)(p + 0x29c) = gUnk_08605C64;
+    actor->callbacks29C = gUnk_08605C64;
 }
 
 void SceneActorControl_TickHiddenResponse(u8 *);
