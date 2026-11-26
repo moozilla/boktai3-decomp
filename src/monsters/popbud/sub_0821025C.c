@@ -15,7 +15,7 @@ u32 ProjectileEmitter_EmitAttackFrame(struct PinkSpineState *p)
     if (!p->f13A) {
         s32 frame = (s32)p->age;
         if (frame <= 8) {
-            PinkSpine_ProjectileOrigin(&position, p);
+            Popbud_ProjectileOrigin(&position, p);
             {
                 u32 sample = (u32)gRandomTable;
                 sample = ParticleRandom_ReadDirectSample((const u16 *)sample);

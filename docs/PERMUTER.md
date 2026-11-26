@@ -346,7 +346,7 @@ Matched in this work (1,892 bytes):
 | `ScenePool_StateLaunchShortArc` (0803E7B4, 484 B) | 99.1% | the fork's `perm_literal_address` in 9 s; `litsweep.py` finds it deterministically |
 | `sub_0802D44C` (292 B) | 96.5% | `rasolve.py` said "one reload of rotation"; the draft matched with its pin and barrier removed |
 | `sub_08010514` (376 B) | 93.0% | `rasolve.py` + `translate.py`: four empty loops around the table load (above) |
-| `TaggedSceneNpc_Create` (081D2A38, 740 B) | 96.0% | `autosolve.py`, unattended: the model id in one local (`perm_const_var`) |
+| `Kuro_Create` (081D2A38, 740 B) | 96.0% | `autosolve.py`, unattended: the model id in one local (`perm_const_var`) |
 
 `autosolve.py` over the drafts, best first (first 18 functions of 98; the
 run continues in `build/autosolve/results.tsv`):
@@ -371,7 +371,7 @@ halfwords away. What is left there:
   store uses the other zero's register; `sub_08125B68`: a shift merged
   across an inlined test, 1 halfword).
 
-A4FC (`NamedObject_CreateFromScript`, 66%): in the compiler, lowering the
+A4FC (`MovingPlatform_CreateFromScript`, 66%): in the compiler, lowering the
 object pointer's priority just below one pseudo (0.518 -> 0.510; ties go by
 definition order) and raising one zero constant halves the distance
 (477 -> 240). The C search's best result (84.6%) read an uninitialized

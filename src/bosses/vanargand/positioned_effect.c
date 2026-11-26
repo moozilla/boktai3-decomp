@@ -1,5 +1,5 @@
 #include "bosses/vanargand/positioned_effect.h"
-#include "objects/scene_objects/scene_object.h"
+#include "objects/scene_object.h"
 #include "engine/input.h"
 #include "scene/actor/scene_actor_init_actor.h"
 #include "bosses/vanargand/vanargand_parts.h"

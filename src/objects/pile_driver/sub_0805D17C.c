@@ -1,9 +1,9 @@
-#include "objects/pile_driver/scene_panel_subject_playback.h"
-void PileDriverSubject_TickActive(struct ScenePanelSubject *owner)
+#include "objects/pile_driver/pile_driver_subject_playback.h"
+void PileDriverSubject_TickActive(struct PileDriverSubject *owner)
 {
     Anim_SetSequence(&owner->sequence, owner->sequenceResource, 3, owner->sequenceRow,
                      owner->sequenceVariant);
-    ScenePanelSubject_StepPlayback(owner);
+    PileDriverSubject_StepPlayback(owner);
     if (owner->unknownEE)
         owner->paletteBank = 0x24E;
     else

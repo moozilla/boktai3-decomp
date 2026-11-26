@@ -165,7 +165,7 @@ are family 3. Of the eighteen classes that link into the registry, none is a pro
 ## Family 3: pool slots
 
 A pool is `struct Slot slots[N]` inside a task, with a linear scan for a free slot
-(`Breakable_FindFreeSlot`, `SpritePool_*`). Vanargand owns three such pool tasks:
+(`LightFixture_FindFreeSlot`, `SpritePool_*`). Vanargand owns three such pool tasks:
 `VanargandProjectilePool`, `VanargandAfterimagePool` and `VanargandAttackPair`, each made
 with `Task_Create(9, ...)`. Slots have no header in common across pools.
 

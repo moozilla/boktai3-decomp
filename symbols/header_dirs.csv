@@ -1,6 +1,6 @@
 current_path,new_path,note,pass2_path,prior_paths
 include/actors/actor_ability/actor_ability.h,include/scene/actor/actor_ability.h,beside its unit,,
-include/actors/actor_animation_controller/actor_animation_controller.h,include/npc/cutscene_actor/actor_animation_controller.h,beside its unit,,
+include/actors/actor_animation_controller/actor_animation_controller.h,include/ui/title/actor_animation_controller.h,Pass 4: beside its documented owner,,include/npc/cutscene_actor/actor_animation_controller.h
 include/actors/actor_animation_controller/text_entry_widget.h,include/npc/cutscene_actor/text_entry_widget.h,beside its unit,,
 include/actors/actor_attachment_manager/actor_attachment.h,include/scene/actor/actor_attachment.h,beside its unit,,
 include/actors/actor_attachment_manager/actor_attachment_manager.h,include/scene/actor/actor_attachment_manager.h,beside its unit,,
@@ -9,18 +9,18 @@ include/actors/actor_attachment_manager/actor_attachment_rising_playback.h,inclu
 include/actors/actor_attachment_manager/actor_attachment_slot.h,include/scene/actor/actor_attachment_slot.h,beside its unit,,
 include/actors/actor_attachment_manager/actor_attachment_sprite_playback.h,include/scene/actor/actor_attachment_sprite_playback.h,beside its unit,,
 include/actors/actor_controller/actor_controller.h,include/monsters/armor/actor_controller.h,beside its unit,,
-include/actors/actor_decision/actor_decision.h,include/bosses/sabata/actor_decision.h,beside its unit,,
+include/actors/actor_decision/actor_decision.h,include/bosses/sabata/sabata_combat_states.h,Pass 4: beside its documented owner,,include/bosses/sabata/actor_decision.h
 include/actors/actor_display/departure_burst.h,include/bosses/vanargand/departure_burst.h,beside its unit,,
 include/actors/actor_glyph_trail/actor_glyph_trail.h,include/effects/sprites/glyph_trail.h,beside its unit; renamed from actor_glyph_trail.h,,
 include/actors/actor_graphics_and_basic_states/actor_graphics_and_basic_states.h,include/bosses/count/count_graphics.h,renamed moved with its unit,,include/bosses/vampire/actor_graphics_and_basic_states.h|include/bosses/count/actor_graphics_and_basic_states.h
-include/actors/actor_impact/actor_impact.h,include/bosses/sabata/actor_impact.h,beside its unit,,
+include/actors/actor_impact/actor_impact.h,include/bosses/sabata/sabata_impact.h,Pass 4: beside its documented owner,,include/bosses/sabata/actor_impact.h
 include/actors/actor_marker/actor_marker.h,include/monsters/armor/actor_marker.h,beside its unit,,
 include/actors/actor_mode/scene_actor_utilities.h,include/scene/actor/actor_utilities.h,beside its unit; renamed from scene_actor_utilities.h,,
 include/actors/actor_palette/actor_palette.h,include/monsters/armor/actor_palette.h,beside its unit,,
 include/actors/actor_phase/directional_sprite_state.h,include/monsters/axe/directional_sprite_state.h,beside its unit,,
-include/actors/actor_position/actor_position.h,include/bosses/sabata/actor_position.h,beside its unit,,
-include/actors/actor_position/actor_position_effects.h,include/bosses/sabata/actor_position_effects.h,beside its unit,,
-include/actors/actor_state/actor_state_commands.h,include/bosses/sabata/actor_state_commands.h,beside its unit,,
+include/actors/actor_position/actor_position.h,include/bosses/sabata/sabata_position.h,Pass 4: beside its documented owner,,include/bosses/sabata/actor_position.h
+include/actors/actor_position/actor_position_effects.h,include/bosses/sabata/sabata_position_effects.h,Pass 4: beside its documented owner,,include/bosses/sabata/actor_position_effects.h
+include/actors/actor_state/actor_state_commands.h,include/bosses/sabata/sabata_state_commands.h,Pass 4: beside its documented owner,,include/bosses/sabata/actor_state_commands.h
 include/actors/common_scene_actor_controller/scene_actors.h,include/scene/actor/scene_actors.h,beside its unit,,
 include/actors/contact_burst_effects/contact_burst.h,include/bosses/nidhoggr/nidhoggr_duel_burst.h,renamed,,include/bosses/nidhoggr/contact_burst.h
 include/actors/contact_impact_effect/contact_impact_effect.h,include/effects/contact_impact.h,beside its unit; renamed from contact_impact_effect.h,,
@@ -48,10 +48,10 @@ include/actors/scene_actor_resources_and_lifecycle/scene_actor_lifecycle.h,inclu
 include/actors/scene_actor_sequence/scene_actor_sequence.h,include/npc/actor_sequence.h,beside its unit; renamed from scene_actor_sequence.h,,
 include/actors/scene_actor_slot_controller/scene_actor_control_step.h,include/scene/actor/scene_actor_control_step.h,beside its unit,,
 include/actors/scene_combat_actor/scene_combat_actor.h,include/monsters/armor/scene_combat_actor.h,beside its unit,,
-include/actors/scene_event_actor/scene_event_actor.h,include/bosses/sabata/scene_event_actor.h,beside its unit,,
-include/actors/scene_npc/scene_npc_transition.h,include/npc/scripted_npc/scene_npc_transition.h,beside its unit,,
-include/actors/scene_npc/scene_npc_transition_palette.h,include/npc/scripted_npc/scene_npc_transition_palette.h,beside its unit,,
-include/actors/scene_object_controller/scene_object_controller.h,include/objects/scene_objects/scene_object_controller.h,beside its unit,,
+include/actors/scene_event_actor/scene_event_actor.h,include/bosses/sabata/sabata_reactions.h,Pass 4: beside its documented owner,,include/bosses/sabata/scene_event_actor.h
+include/actors/scene_npc/scene_npc_transition.h,include/npc/otenko/scene_npc_transition.h,Pass 4: beside its documented owner,,include/npc/scripted_npc/scene_npc_transition.h
+include/actors/scene_npc/scene_npc_transition_palette.h,include/npc/otenko/scene_npc_transition_palette.h,Pass 4: beside its documented owner,,include/npc/scripted_npc/scene_npc_transition_palette.h
+include/actors/scene_object_controller/scene_object_controller.h,include/objects/sliding_doors/scene_object_controller.h,Pass 4: beside its documented owner,,include/objects/scene_objects/scene_object_controller.h
 include/actors/script_actor/player_script.h,include/player/cutscene/player_script.h,moved with its unit,,include/player/script/player_script.h
 include/actors/script_actor/player_script_cues.h,include/player/cutscene/player_script_cues.h,moved with its unit,,include/player/script/player_script_cues.h
 include/actors/sequence_contact_actor_pool/contact_sequence_actor.h,include/bosses/nidhoggr/nidhoggr_duel_minion.h,renamed,,include/bosses/nidhoggr/contact_sequence_actor.h
@@ -86,7 +86,7 @@ include/effects/directional_sprite_effect/directional_sprite_effect.h,include/ef
 include/effects/effect_emitter/effect_emitter.h,include/effects/particles/effect_emitter.h,beside its unit,,
 include/effects/effect_part/effect_part.h,include/effects/scene/effect_part.h,beside its unit,,
 include/effects/explosion/explosion.h,include/effects/bursts/explosion.h,beside its unit,,
-include/effects/fading_particle_groups/fading_particle_group.h,include/effects/particles/fading_particle_group.h,beside its unit,,
+include/effects/fading_particle_groups/fading_particle_group.h,include/objects/hazards/fading_particle_group.h,Pass 4: beside its documented owner,,include/effects/particles/fading_particle_group.h
 include/effects/feather_effect_pool/feather_effect_pool.h,include/effects/feathers/feather_effect_pool.h,beside its unit,,
 include/effects/five_entry_projected_display/projected_display.h,include/effects/sprites/projected_display.h,beside its unit,,
 include/effects/five_slot_burst_emitter/burst_emitter.h,include/effects/particles/burst_emitter.h,beside its unit,,
@@ -111,10 +111,10 @@ include/effects/palette_fade/palette_fade.h,include/effects/palette/palette_fade
 include/effects/palette_frame_cycling/palette_frames.h,include/effects/palette/palette_frames.h,beside its unit,,
 include/effects/palette_level_transitions/palette_level_transitions.h,include/effects/palette/palette_level_transitions.h,beside its unit,,
 include/effects/palette_sets/palette_set.h,include/effects/palette/palette_set.h,beside its unit,,
-include/effects/particle_burst/moving_glyph.h,include/effects/particles/moving_glyph.h,beside its unit,,
-include/effects/particle_burst_effect/following_sprite_effect.h,include/effects/particles/following_sprite_effect.h,beside its unit,,
-include/effects/particle_burst_effect/particle_burst_effect.h,include/effects/particles/particle_burst_effect.h,beside its unit,,
-include/effects/particle_emitter/particle_emitter.h,include/effects/particles/particle_emitter.h,beside its unit,,
+include/effects/particle_burst/moving_glyph.h,include/player/effects/moving_glyph.h,Pass 4: beside its documented owner,,include/effects/particles/moving_glyph.h
+include/effects/particle_burst_effect/following_sprite_effect.h,include/effects/sprites/following_sprite_effect.h,Pass 4: beside its documented owner,,include/effects/particles/following_sprite_effect.h
+include/effects/particle_burst_effect/particle_burst_effect.h,include/effects/sprites/particle_burst_effect.h,Pass 4: beside its documented owner,,include/effects/particles/particle_burst_effect.h
+include/effects/particle_emitter/particle_emitter.h,include/effects/sprites/particle_emitter.h,Pass 4: beside its documented owner,,include/effects/particles/particle_emitter.h
 include/effects/particle_groups/particle_group.h,include/effects/particles/particle_group.h,beside its unit,,
 include/effects/positioned_effect/positioned_effect.h,include/bosses/vanargand/positioned_effect.h,beside its unit,,
 include/effects/presentation/presentation.h,include/ui/pause/presentation.h,beside its unit,,
@@ -171,7 +171,7 @@ include/engine/nav_mesh/nav_steering.h,include/scene/terrain/nav_steering.h,besi
 include/engine/registry_e7_bc/registry_e7bc.h,include/scene/collision/collision_manager.h,beside its unit; renamed from registry_e7bc.h,,
 include/engine/resource_registry/resource_registry.h,include/engine/resource_registry.h,beside its unit,,
 include/engine/runtime_input_and_utilities/runtime_input.h,include/engine/runtime_input.h,beside its unit,,
-include/engine/scanline_effect/animation_widget.h,include/engine/video/animation_widget.h,beside its unit,,
+include/engine/scanline_effect/animation_widget.h,include/engine/video/anim_sprite_glyph.h,Pass 4: beside its documented owner,,include/engine/video/animation_widget.h
 include/engine/scene_audio_events/scene_audio_events.h,include/engine/sound/scene_audio_events.h,beside its unit,,
 include/engine/scene_body/scene_body_api.h,include/scene/collision/scene_body_api.h,beside its unit,,
 include/engine/scene_body/scene_body_registry.h,include/scene/collision/scene_body_registry.h,beside its unit,,
@@ -186,13 +186,13 @@ include/engine/script_utility_references/script_utility.h,include/script/script_
 include/engine/script_virtual_machine/script_virtual_machine.h,include/script/script_virtual_machine.h,beside its unit,,
 include/engine/shared/actor_ability_types.h,include/scene/actor/actor_ability_types.h,included only by headers in scene/actor,,
 include/engine/shared/actor_attachment_state.h,include/scene/actor/actor_attachment_state.h,"shared: effects,scene,ui",,
-include/engine/shared/actor_state.h,include/bosses/sabata/actor_state.h,included only by headers in bosses/sabata,,
+include/engine/shared/actor_state.h,include/bosses/sabata/sabata_actor_state.h,Pass 4: beside its documented owner,,include/bosses/sabata/actor_state.h
 include/engine/shared/actor_stats.h,include/scene/actor/actor_stats.h,"shared: monsters,scene,system",,
 include/engine/shared/area_effect_link.h,include/scene/areas/area_effect_link.h,moved with its unit,,include/scene/area_effect/area_effect_link.h
 include/engine/shared/armor_palette.h,include/monsters/armor/armor_palette.h,included only by headers in monsters/armor,,
 include/engine/shared/armor_palette_controller.h,include/monsters/armor/armor_palette_controller.h,included only by headers in monsters/armor,,
 include/engine/shared/array_fill.h,include/effects/array_fill.h,includers across effects/,,
-include/engine/shared/breakable_prop.h,include/objects/breakable_prop/breakable_prop.h,"owned by src/objects/breakable_prop; included from effects,objects",,
+include/engine/shared/breakable_prop.h,include/objects/quest_barriers/quest_barrier.h,Pass 4: beside its documented owner,,include/objects/breakable_prop/breakable_prop.h
 include/engine/shared/character_preview_actor.h,include/player/appearance/character_preview_actor.h,owned by src/player/appearance,,
 include/engine/shared/character_preview_model.h,include/player/appearance/character_preview_model.h,owned by src/player/appearance,,
 include/engine/shared/chase_actor.h,include/monsters/chase_actor.h,includers across monsters/,,
@@ -325,14 +325,14 @@ include/engine/shared/scene_input_compare.h,include/ui/widgets/scene_input_compa
 include/engine/shared/scene_input_grid.h,include/ui/widgets/scene_input_grid.h,"owned by src/ui/widgets/input_grid; included from system,ui",,
 include/engine/shared/scene_input_navigation.h,include/ui/widgets/scene_input_navigation.h,owned by src/ui/widgets/input_grid; included from ui,,
 include/engine/shared/scene_input_panel.h,include/ui/widgets/scene_input_panel.h,owned by src/ui/widgets/input_grid; included from ui,,
-include/engine/shared/scene_input_widget.h,include/engine/video/anim_sprite.h,"struct SceneInputWidget becomes struct AnimSprite (type_renames.csv), owned by engine/video/anim",,include/ui/widgets/scene_input_widget.h
+include/engine/shared/scene_input_widget.h,include/engine/video/anim_sprite.h,"struct AnimSprite becomes struct AnimSprite (type_renames.csv), owned by engine/video/anim",,include/ui/widgets/scene_input_widget.h
 include/engine/shared/scene_inventory_actions.h,include/ui/town/shop_actions.h,renamed,,include/ui/town/scene_inventory_actions.h
 include/engine/shared/scene_inventory_callback.h,include/ui/town/shop_callback.h,renamed,,include/ui/town/scene_inventory_callback.h
 include/engine/shared/scene_inventory_control.h,include/ui/town/shop_control.h,renamed,,include/ui/town/scene_inventory_control.h
 include/engine/shared/scene_inventory_panel.h,include/ui/town/shop_panel.h,renamed,,include/ui/town/scene_inventory_panel.h
 include/engine/shared/scene_inventory_states.h,include/ui/town/shop_states.h,renamed,,include/ui/town/scene_inventory_states.h
 include/engine/shared/scene_item_values.h,include/ui/town/shop_item_values.h,renamed,,include/ui/town/scene_item_values.h
-include/engine/shared/scene_object_slot.h,include/objects/scene_objects/scene_object_slot.h,"owned by src/objects/scene_objects; included from npc,objects",,
+include/engine/shared/scene_object_slot.h,include/objects/scene_object_slot.h,Pass 4: beside its documented owner,,include/objects/scene_objects/scene_object_slot.h
 include/engine/shared/scene_panel_commands.h,include/objects/pile_driver/pile_driver_commands.h,renamed,,include/objects/pile_driver/scene_panel_commands.h
 include/engine/shared/scene_panel_rig.h,include/objects/pile_driver/pile_driver_rig.h,renamed,,include/objects/pile_driver/scene_panel_rig.h
 include/engine/shared/scene_panel_schedule.h,include/objects/pile_driver/pile_driver_schedule.h,renamed,,include/objects/pile_driver/scene_panel_schedule.h
@@ -377,9 +377,9 @@ include/engine/text/text_graphics.h,include/engine/video/text_graphics.h,beside 
 include/engine/tile_animation/tile_animation.h,include/engine/video/tile_animation.h,beside its unit,,
 include/field/animated_hazards/animated_hazard.h,include/objects/hazards/animated_hazard.h,beside its unit,,
 include/field/animated_tile/animated_tile.h,include/objects/animated_tile.h,beside its unit,,
-include/field/bouncing_object_pool/bouncing_object.h,include/objects/bouncing_object/bouncing_object.h,beside its unit,,
+include/field/bouncing_object_pool/bouncing_object.h,include/objects/bouncing_bombs/bouncing_object.h,Pass 4: beside its documented owner,,include/objects/bouncing_object/bouncing_object.h
 include/field/breakable_barriers/breakable_barrier.h,include/objects/bat_curtain/breakable_barrier.h,beside its unit,,
-include/field/cell_traversal_gates/cell_gate.h,include/objects/cell_gate/cell_gate.h,beside its unit,,
+include/field/cell_traversal_gates/cell_gate.h,include/objects/passage_barriers/cell_gate.h,Pass 4: beside its documented owner,,include/objects/cell_gate/cell_gate.h
 include/field/collision_controllers/collision_controller.h,include/objects/collision_controller.h,beside its unit,,
 include/field/damage_controller/damage_controller.h,include/objects/hazards/damage_controller.h,beside its unit,,
 include/field/directional_interaction_controllers/directional_interaction.h,include/objects/directional_controller.h,beside its unit; renamed from directional_interaction.h,,
@@ -388,9 +388,9 @@ include/field/group_objects/group_objects.h,include/effects/bat_flock.h,renamed 
 include/field/hit_switch/hit_switch.h,include/objects/hit_switch.h,beside its unit,,
 include/field/interaction_marker/interaction_marker.h,include/objects/markers/interaction_marker.h,beside its unit,,
 include/field/items_and_containers/item_container.h,include/objects/items/item_container.h,beside its unit,,
-include/field/named_object/named_actor_commands.h,include/objects/named_object/named_actor_commands.h,beside its unit,,
-include/field/named_object/named_object.h,include/objects/named_object/named_object.h,beside its unit,,
-include/field/named_object/named_object_flags.h,include/objects/named_object/named_object_flags.h,beside its unit,,
+include/field/named_object/named_actor_commands.h,include/objects/moving_platforms/named_actor_commands.h,Pass 4: beside its documented owner,,include/objects/named_object/named_actor_commands.h
+include/field/named_object/named_object.h,include/objects/moving_platforms/named_object.h,Pass 4: beside its documented owner,,include/objects/named_object/named_object.h
+include/field/named_object/named_object_flags.h,include/objects/moving_platforms/named_object_flags.h,Pass 4: beside its documented owner,,include/objects/named_object/named_object_flags.h
 include/field/native_effect/native_particle.h,include/effects/particles/native_particle.h,beside its unit,,
 include/field/pooled_interactables/pooled_interactable.h,include/objects/breakable.h,beside its unit; renamed from pooled_interactable.h,,
 include/field/proximity_actor/region_actor.h,include/objects/region_actor.h,beside its unit,,
@@ -399,15 +399,15 @@ include/field/rectangular_area_effects/area_effect.h,include/scene/areas/area_ef
 include/field/roaming_objects/roaming_object.h,include/objects/roaming_object.h,beside its unit,,
 include/field/roaming_objects/roaming_object_playback.h,include/objects/roaming_object_playback.h,beside its unit,,
 include/field/saved_position_marker/saved_position_marker.h,include/objects/markers/saved_position_marker.h,beside its unit,,
-include/field/scene_debris/native_effect.h,include/effects/particles/native_effect.h,beside its unit,,
+include/field/scene_debris/native_effect.h,include/effects/sprites/native_effect.h,Pass 4: beside its documented owner,,include/effects/particles/native_effect.h
 include/field/scene_debris/scene_callback_pool.h,include/effects/particles/scene_callback_pool.h,beside its unit,,
 include/field/scene_debris/scene_debris.h,include/effects/particles/scene_debris.h,beside its unit,,
 include/field/scene_debris/scene_debris_types.h,include/effects/particles/scene_debris_types.h,beside its unit,,
-include/field/scene_objects/scene_object.h,include/objects/scene_objects/scene_object.h,beside its unit,,
+include/field/scene_objects/scene_object.h,include/objects/scene_object.h,Pass 4: beside its documented owner,,include/objects/scene_objects/scene_object.h
 include/field/scene_script_object/orbit_motion.h,include/objects/dungeon_prop/orbit_motion.h,moved with its unit,,include/objects/orbit_motion.h
 include/field/scene_script_object/scene_script_object.h,include/objects/dungeon_prop/scene_script_object.h,moved with its unit,,include/objects/scene_script_object.h
-include/field/scene_volume/actor_spatial_query.h,include/bosses/sabata/actor_spatial_query.h,beside its unit,,
-include/field/scene_volume/scene_volume.h,include/bosses/sabata/scene_volume.h,beside its unit,,
+include/field/scene_volume/actor_spatial_query.h,include/bosses/sabata/sabata_spatial_query.h,Pass 4: beside its documented owner,,include/bosses/sabata/actor_spatial_query.h
+include/field/scene_volume/scene_volume.h,include/bosses/sabata/sabata_attack_state.h,Pass 4: beside its documented owner,,include/bosses/sabata/scene_volume.h
 include/field/ship_wheel/shipwheel_presentation.h,include/objects/ship_wheel.h,beside its unit; renamed from shipwheel_presentation.h,,
 include/field/stacked_actor/engine_map.h,include/objects/warp_circle/engine_map.h,beside its unit,,
 include/field/stacked_actor/stacked_actor.h,include/objects/warp_circle/stacked_actor.h,beside its unit,,
@@ -487,16 +487,16 @@ include/menus/save_menu/scene_tilemap.h,include/ui/save/scene_tilemap.h,beside i
 include/menus/scene_catalog/scene_catalog.h,include/ui/pause/status_options.h,with its reviewed owner; original basename scene_catalog.h,include/ui/pause/catalog.h,
 include/menus/scene_hud/scene_hud_display.h,include/ui/pause/scene_hud_display.h,beside its unit,,
 include/menus/scene_indicators/scene_indicator.h,include/ui/hud/scene_indicator.h,beside its unit,,
-include/menus/scene_panel_control_and_lifecycle/scene_panel_config.h,include/objects/pile_driver/scene_panel_config.h,beside its unit,,
-include/menus/scene_panel_control_and_lifecycle/scene_panel_interaction.h,include/objects/pile_driver/scene_panel_interaction.h,beside its unit,,
-include/menus/scene_panel_control_and_lifecycle/scene_panel_lifecycle.h,include/objects/pile_driver/scene_panel_lifecycle.h,beside its unit,,
-include/menus/scene_panel_control_and_lifecycle/scene_panel_orchestration.h,include/objects/pile_driver/scene_panel_orchestration.h,beside its unit,,
-include/menus/scene_panel_presentation/scene_panel.h,include/objects/pile_driver/scene_panel.h,beside its unit,,
+include/menus/scene_panel_control_and_lifecycle/scene_panel_config.h,include/objects/pile_driver/pile_driver_config.h,Pass 4: beside its documented owner,,include/objects/pile_driver/scene_panel_config.h
+include/menus/scene_panel_control_and_lifecycle/scene_panel_interaction.h,include/objects/pile_driver/pile_driver_interaction.h,Pass 4: beside its documented owner,,include/objects/pile_driver/scene_panel_interaction.h
+include/menus/scene_panel_control_and_lifecycle/scene_panel_lifecycle.h,include/objects/pile_driver/pile_driver_lifecycle.h,Pass 4: beside its documented owner,,include/objects/pile_driver/scene_panel_lifecycle.h
+include/menus/scene_panel_control_and_lifecycle/scene_panel_orchestration.h,include/objects/pile_driver/pile_driver_orchestration.h,Pass 4: beside its documented owner,,include/objects/pile_driver/scene_panel_orchestration.h
+include/menus/scene_panel_presentation/scene_panel.h,include/objects/pile_driver/pile_driver.h,Pass 4: beside its documented owner,,include/objects/pile_driver/scene_panel.h
 include/menus/scene_panel_presentation/scene_panel_effects.h,include/objects/pile_driver/pile_driver_effects.h,renamed,,include/objects/pile_driver/scene_panel_effects.h
-include/menus/scene_panel_presentation/scene_panel_overlay.h,include/objects/pile_driver/scene_panel_overlay.h,beside its unit,,
-include/menus/scene_panel_sprite_rig/scene_panel_rig_setup.h,include/objects/pile_driver/scene_panel_rig_setup.h,beside its unit,,
-include/menus/scene_panel_subjects/scene_panel_subject_playback.h,include/objects/pile_driver/scene_panel_subject_playback.h,beside its unit,,
-include/menus/scene_panel_subjects/scene_panel_subject_tail.h,include/objects/pile_driver/scene_panel_subject_tail.h,beside its unit,,
+include/menus/scene_panel_presentation/scene_panel_overlay.h,include/objects/pile_driver/pile_driver_overlay.h,Pass 4: beside its documented owner,,include/objects/pile_driver/scene_panel_overlay.h
+include/menus/scene_panel_sprite_rig/scene_panel_rig_setup.h,include/objects/pile_driver/pile_driver_rig_setup.h,Pass 4: beside its documented owner,,include/objects/pile_driver/scene_panel_rig_setup.h
+include/menus/scene_panel_subjects/scene_panel_subject_playback.h,include/objects/pile_driver/pile_driver_subject_playback.h,Pass 4: beside its documented owner,,include/objects/pile_driver/scene_panel_subject_playback.h
+include/menus/scene_panel_subjects/scene_panel_subject_tail.h,include/objects/pile_driver/pile_driver_subject_tail.h,Pass 4: beside its documented owner,,include/objects/pile_driver/scene_panel_subject_tail.h
 include/menus/screen_message/screen_message.h,include/ui/dialogue/screen_message.h,beside its unit,,
 include/menus/script_prompt/script_prompt.h,include/ui/dialogue/script_prompt.h,beside its unit,,
 include/menus/scripted_dialogue_transitions/dialogue_transition.h,include/ui/dialogue/dialogue_transition.h,beside its unit,,
@@ -544,7 +544,7 @@ include/monsters/skeleton/enemy_defeat_statistics.h,include/monsters/skeleton/en
 include/monsters/skeleton/scene_actor_timed_behavior.h,include/monsters/skeleton/scene_actor_timed_behavior.h,beside its unit,,
 include/monsters/skeleton/skeleton.h,include/monsters/skeleton/skeleton.h,beside its unit,,
 include/monsters/slime/slime.h,include/monsters/slime.h,beside its unit,,
-include/monsters/slime/tentacle_spread.h,include/monsters/tentacle_spread.h,beside its unit,,
+include/monsters/slime/tentacle_spread.h,include/monsters/centipede_spread.h,Pass 4: beside its documented owner,,include/monsters/tentacle_spread.h
 include/monsters/spider/spider.h,include/monsters/spider.h,beside its unit,,
 include/monsters/sword/sword_orbit.h,include/monsters/sword/sword_orbit.h,beside its unit,,
 include/monsters/sword/sword_wave_component.h,include/monsters/sword/sword_wave_component.h,beside its unit,,
@@ -552,14 +552,14 @@ include/monsters/tentacle_actor/tentacle_segment_animation.h,include/monsters/ce
 include/monsters/tentacle_body/tentacle_body.h,include/monsters/centipede/centipede_body.h,renamed moved with its unit,include/monsters/tentacle/tentacle_body.h,include/monsters/centipede/tentacle_body.h
 include/monsters/vorn/vorn.h,include/monsters/vorn/vorn.h,beside its unit,,
 include/monsters/vulcan_cannon/vulcan_cannon_worker.h,include/monsters/cannons/vulcan_cannon_worker.h,beside its unit,,
-include/other/callback_pool/callback_pool.h,include/objects/actor_group/callback_pool.h,beside its unit,,
+include/other/callback_pool/callback_pool.h,include/objects/loot_deposits/callback_pool.h,Pass 4: beside its documented owner,,include/objects/actor_group/callback_pool.h
 include/other/registry_selection/registry_selection_menu.h,include/ui/world_map.h,with its reviewed owner; original basename registry_selection_menu.h,include/ui/widgets/indicator_selection.h,
 include/other/scene_terrain_probe/scene_moving_particle.h,include/effects/particles/scene_moving_particle.h,beside its unit,,
 include/other/scene_terrain_probe/spread_shot.h,include/effects/particles/spread_shot.h,beside its unit,,
 include/other/solar_calibration/solar_calibration_menu.h,include/system/solar/solar_calibration_menu.h,beside its unit,,
 include/player/player_3.h,include/player/appearance/player_visuals.h,owned by src/player/appearance; included from player,,
 include/player/player_attack_effect/player_attack_particles.h,include/player/effects/player_attack_particles.h,beside its unit,,
-include/player/player_barrier/scene_marker.h,include/player/effects/scene_marker.h,beside its unit,,
+include/player/player_barrier/scene_marker.h,include/player/pile_trap/scene_marker.h,Pass 4: beside its documented owner,,include/player/effects/scene_marker.h
 include/player/player_burst/frame_display.h,include/player/effects/frame_display.h,beside its unit,,
 include/player/player_clone/player_clone.h,include/player/clone.h,beside its unit; renamed from player_clone.h,,
 include/player/player_cue.h,include/player/cues/player_cue.h,owned by src/player/cues; included from player,,

@@ -119,8 +119,7 @@ static inline u32 walkAnimation(struct Actor *p)
 }
 // confidence=low: turns toward a target and stops inside its squared-distance threshold;
 // Actor_UpdateRunToPosition without the callback test, choosing animation 9 for kind 27.
-#define StateActor_UpdateTargetApproach sub_081C7024
-void StateActor_UpdateTargetApproach(void *unused, struct Actor *arg)
+void StoryCharacter_UpdateTargetApproach(void *unused, struct Actor *arg)
 {
     struct Actor *p = arg;
     if (p->entered) {

@@ -76,18 +76,18 @@ void TerrainModifiers_RegisterCell(void *, s32, s32, s32, s32, s32);
 void SceneBody_Init(void *, void *, void *, u32, u32, void *);
 void SceneBody_SetSprite(void *, void *);
 void TerrainOverlay_QueueAddActor(void *);
-static inline s32 EnemyD459_CellIndex(struct SceneVec *v)
+static inline s32 AxeArmor_CellIndex(struct SceneVec *v)
 {
     s32 x = (s16)v->x >> 8, z = (s16)v->z >> 8;
     if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
         return 0;
     return ((struct PHTerrain *)gTerrainMap)->rows[z] + x;
 }
-static inline void EnemyD459_GetFlags(u32 **out, struct DisplaySequenceSprite *sprite)
+static inline void AxeArmor_GetFlags(u32 **out, struct DisplaySequenceSprite *sprite)
 {
     *out = &sprite->flags;
 }
-static inline u32 EnemyD459_StepSequence(u32 *flipFlags, struct EnemyD459Actor *actor,
+static inline u32 AxeArmor_StepSequence(u32 *flipFlags, struct EnemyD459Actor *actor,
                                          struct DisplaySequenceSprite *owner,
                                          struct DisplaySequenceState *state)
 {
@@ -295,13 +295,13 @@ s32 AxeArmor_InitializeFromScript(struct EnemyD459Actor *p, void *parent)
     }
     {
         u32 *flipFlags;
-        EnemyD459_GetFlags(&flipFlags, sprite);
-        EnemyD459_StepSequence(flipFlags, p, sprite, (struct DisplaySequenceState *)(&p->sequence));
+        AxeArmor_GetFlags(&flipFlags, sprite);
+        AxeArmor_StepSequence(flipFlags, p, sprite, (struct DisplaySequenceState *)(&p->sequence));
     }
     if ((*((s16 *)&p->initialDead)) == 0)
         AxeArmor_InitCollider(p);
     if (p->terrainEnabled && p->initialDead == 0) {
-        s32 cell = EnemyD459_CellIndex((struct SceneVec *)position);
+        s32 cell = AxeArmor_CellIndex((struct SceneVec *)position);
         TerrainModifiers_RegisterCell(&p->terrain, cell, 0, (p->sprite.coordinates.position.y) >> 8,
                                       0, 1);
     }

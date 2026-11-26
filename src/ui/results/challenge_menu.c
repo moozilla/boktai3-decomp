@@ -353,11 +353,11 @@ void ChallengeMenu_InitAnimations(struct ChallengeMenu *menu)
     resource = ScriptProc_Start(0xCB05, 0x530D);
     menu->resources[0] = *resource;
     ResourceHeader_Relocate(&menu->resources[0], resource);
-    Widget_InitLinked(&menu->widgets[5], &menu->resources[0], 0x8A, 0x10, 0, 0, 0x3C, 0);
+    AnimSprite_InitLinked(&menu->widgets[5], &menu->resources[0], 0x8A, 0x10, 0, 0, 0x3C, 0);
     menu->widgets[5].position.y = -24;
-    Widget_InitLinked(&menu->widgets[4], &menu->resources[2], 0, 0x10, 3, 0, 0x3C, 0);
+    AnimSprite_InitLinked(&menu->widgets[4], &menu->resources[2], 0, 0x10, 3, 0, 0x3C, 0);
     for (i = 0; i < 4; i++)
-        Widget_InitLinked(&menu->widgets[i], &menu->resources[1], 0, 0x10, 0, 0, 0x3C, 0);
+        AnimSprite_InitLinked(&menu->widgets[i], &menu->resources[1], 0, 0x10, 0, 0, 0x3C, 0);
     ChallengeMenu_SetGroupIcon(menu);
     ChallengeMenu_InitializeKeyframes(menu);
 }

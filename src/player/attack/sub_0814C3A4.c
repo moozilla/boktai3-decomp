@@ -2,7 +2,7 @@
 #include "engine/ram.h"
 #include "engine/engine_globals.h"
 #include "player/player.h"
-#include "objects/scene_objects/scene_object.h"
+#include "objects/scene_object.h"
 #include "player/player_status_flags.h"
 #include "player/player_slot_status.h"
 #include "engine/video/display_sequence_inline.h"

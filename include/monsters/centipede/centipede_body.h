@@ -5,8 +5,8 @@
 #include "scene/actor/scene_actor_control_phase.h"
 #include "scene/motion/scene_actor_availability.h"
 #include "scene/motion/scene_actor_chase_reaction.h"
-#include "monsters/tentacle_spread.h"
-#include "npc/cutscene_actor/actor_animation_controller.h"
+#include "monsters/centipede_spread.h"
+#include "ui/title/actor_animation_controller.h"
 #include "engine/engine.h"
 #include "link/session/room_actor.h"
 /* Complete allocation used by Centipede_Create; private roles are tentative. */
@@ -71,7 +71,7 @@ void CentipedeBody_UpdateAnimationEleven(struct ChaseActor *p);
 void CentipedeBody_UpdateSpreadWindup(struct ChaseActor *actor);
 void CentipedeBody_UpdateSpreadPreparation(struct ChaseActor *actor);
 
-static inline void TentacleBody_SelectAnimation(struct RoomActor *actor, u32 selection, u32 variant,
+static inline void CentipedeBody_SelectAnimation(struct RoomActor *actor, u32 selection, u32 variant,
                                                 u32 flags)
 {
     u32 force;

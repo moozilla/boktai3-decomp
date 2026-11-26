@@ -21,19 +21,19 @@ struct ParticleParameters {
 };
 extern const s16 gUnk_086149C4[];
 s32 Mod(s32, s32);
-void EnemyParticle_InitParameters(void *);
-void EnemyParticle_SetGraphicsParameters(void *, u32, u32, s32);
-void EnemyParticle_SetMotionParameters(void *, u16, u16, u8, u32);
-void EnemyParticle_AddFlags(void *, u32);
-s32 EnemyParticle_Emit(void *, void *);
+void EnemyAttackParticle_InitParameters(void *);
+void EnemyAttackParticle_SetGraphicsParameters(void *, u32, u32, s32);
+void EnemyAttackParticle_SetMotionParameters(void *, u16, u16, u8, u32);
+void EnemyAttackParticle_AddFlags(void *, u32);
+s32 EnemyAttackParticle_Emit(void *, void *);
 
 /* The same origin is used for the jitter and the particle-frame draw. */
-static inline u32 FanCannon_SampleOrigin(void)
+static inline u32 WindCannon_SampleOrigin(void)
 {
     return (u32)gRandomTable + (PARTICLE_RANDOM_SAMPLE_ORIGIN - RANDOM_TABLE_ADDR);
 }
 
-static inline s32 FanCannon_RandomRange(s32 range, const u16 *samples)
+static inline s32 WindCannon_RandomRange(s32 range, const u16 *samples)
 {
     s32 result = 0;
     if (range)
@@ -41,22 +41,22 @@ static inline s32 FanCannon_RandomRange(s32 range, const u16 *samples)
     return result;
 }
 
-static inline s32 FanCannon_Scale(s32 value)
+static inline s32 WindCannon_Scale(s32 value)
 {
     return value >= 0 ? value >> 12 : -((-value) >> 12);
 }
 
-static inline void FanCannon_Polar(struct SceneVec *out, u8 angle, s32 radius)
+static inline void WindCannon_Polar(struct SceneVec *out, u8 angle, s32 radius)
 {
     s16 cosine, sine;
     cosine = gUnk_086149C4[(angle + 64) & 255];
-    out->x = FanCannon_Scale(radius * cosine);
+    out->x = WindCannon_Scale(radius * cosine);
     out->y = 0;
     sine = gUnk_086149C4[angle];
-    out->z = FanCannon_Scale(sine * radius);
+    out->z = WindCannon_Scale(sine * radius);
 }
 
-static inline void FanCannon_AddPosition(struct SceneVec *out, const struct SceneVec *a,
+static inline void WindCannon_AddPosition(struct SceneVec *out, const struct SceneVec *a,
                                          const struct SceneVec *b)
 {
     out->x = a->x + b->x;
@@ -80,7 +80,7 @@ u32 WindCannon_UpdateActive(struct FanCannon *p)
             s16 sample;
             s32 value;
             baseAngle = 0;
-            sample = ParticleRandom_ReadRelativeSample(FanCannon_SampleOrigin(),
+            sample = ParticleRandom_ReadRelativeSample(WindCannon_SampleOrigin(),
                                                        (const u16 *)RANDOM_TABLE_ADDR);
             value = (u16)pos->z - 128;
             sample = (u8)sample;
@@ -94,7 +94,7 @@ u32 WindCannon_UpdateActive(struct FanCannon *p)
             s16 sample;
             s32 value;
             baseAngle = 64;
-            sample = ParticleRandom_ReadRelativeSample(FanCannon_SampleOrigin(),
+            sample = ParticleRandom_ReadRelativeSample(WindCannon_SampleOrigin(),
                                                        (const u16 *)RANDOM_TABLE_ADDR);
             value = (u16)pos->x - 128;
             sample = (u8)sample;
@@ -105,10 +105,10 @@ u32 WindCannon_UpdateActive(struct FanCannon *p)
             else
                 angle = 64;
         }
-        FanCannon_Polar(&velocity, angle, p->wind);
+        WindCannon_Polar(&velocity, angle, p->wind);
         velocity.y = 0;
         source = (const u16 *)RANDOM_TABLE_ADDR;
-        frame = ParticleRandom_ReadRelativeSample(FanCannon_SampleOrigin(), source) & 3;
+        frame = ParticleRandom_ReadRelativeSample(WindCannon_SampleOrigin(), source) & 3;
         if (frame == 3)
             frame = 2;
         frame += 17;
@@ -118,24 +118,24 @@ u32 WindCannon_UpdateActive(struct FanCannon *p)
             distance = half;
             if (span)
                 distance += Mod(ParticleRandom_ReadDirectSample(source), span);
-            FanCannon_Polar(&offset, baseAngle, distance);
+            WindCannon_Polar(&offset, baseAngle, distance);
         } else {
-            s32 radius = FanCannon_RandomRange(p->range >> 1, source);
+            s32 radius = WindCannon_RandomRange(p->range >> 1, source);
             struct SceneVec *out = &offset;
             distance = radius;
-            FanCannon_Polar(out, baseAngle, distance);
+            WindCannon_Polar(out, baseAngle, distance);
         }
         source = &offset;
-        FanCannon_AddPosition(&position, &position, source);
-        EnemyParticle_InitParameters(&parameters);
-        EnemyParticle_SetGraphicsParameters(&parameters, 0x7e7c, frame, 0x1bf);
-        EnemyParticle_SetMotionParameters(&parameters, 0, 30, angle, p->maximumWind);
+        WindCannon_AddPosition(&position, &position, source);
+        EnemyAttackParticle_InitParameters(&parameters);
+        EnemyAttackParticle_SetGraphicsParameters(&parameters, 0x7e7c, frame, 0x1bf);
+        EnemyAttackParticle_SetMotionParameters(&parameters, 0, 30, angle, p->maximumWind);
         source = gRandomTable;
         if (ParticleRandom_ReadDirectSample(source) & 1)
-            EnemyParticle_AddFlags(&parameters, 4);
+            EnemyAttackParticle_AddFlags(&parameters, 4);
         if (ParticleRandom_ReadDirectSample(source) & 1)
-            EnemyParticle_AddFlags(&parameters, 8);
-        EnemyParticle_Emit(&parameters, &position);
+            EnemyAttackParticle_AddFlags(&parameters, 8);
+        EnemyAttackParticle_Emit(&parameters, &position);
     }
     p->wind++;
     if (p->wind > p->maximumWind)

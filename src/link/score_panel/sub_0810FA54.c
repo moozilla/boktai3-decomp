@@ -11,7 +11,7 @@ struct RecordList {
 };
 void *ScriptProc_Start(u16, u16);
 #include "engine/video/display_resource.h"
-void Widget_InitLinked(void *, void *, int, int, int, int, int, void *);
+void AnimSprite_InitLinked(void *, void *, int, int, int, int, int, void *);
 void RecordList_InitializeSprites(struct RecordList *list)
 {
     s32 i;
@@ -20,7 +20,7 @@ void RecordList_InitializeSprites(struct RecordList *list)
     list->spriteProc = proc;
     ResourceHeader_Relocate(list->resource, proc);
     for (i = 0; i < 18; i++) {
-        Widget_InitLinked(&list->sprites[i], list->resource, list->spriteIds[i], 16, 0, 0, 0, 0);
+        AnimSprite_InitLinked(&list->sprites[i], list->resource, list->spriteIds[i], 16, 0, 0, 0, 0);
         list->states[i] = -1;
     }
 }

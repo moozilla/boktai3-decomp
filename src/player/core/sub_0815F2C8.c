@@ -20,7 +20,7 @@ void Player_RegisterSceneMessageReceiver(struct Player *);
 void Player_InitEventProcedureFromScript(struct Player *);
 void Player_SaveStateSnapshot(struct Player *);
 void SceneHud_RefreshControls(void);
-void *PlayerBarrier_Create(s32, s32);
+void *PileTrap_Create(s32, s32);
 void PlayerAttackEffect_Create(void *, void *, void *);
 static inline void StepPlayback(struct ContactSwarmSprite *sprite,
                                 struct DisplaySequenceState *state)
@@ -63,7 +63,7 @@ s32 Player_InitializeFromScript(struct Player *p, s32 slot)
         Player_SaveStateSnapshot(p);
         SceneHud_RefreshControls();
     }
-    p->actionRequestEffect = PlayerBarrier_Create(slot + 1, 0);
+    p->actionRequestEffect = PileTrap_Create(slot + 1, 0);
     PlayerAttackEffect_Create(&p->animation, &p->facing, &p->side);
     *(u32 *)p->unkA88 = 0;
     return 0;

@@ -1,5 +1,5 @@
 #include "objects/pile_driver/pile_driver_rig.h"
-void PileDriverRig_TickReturn(struct ScenePanelRig *rig)
+void PileDriverRig_TickReturn(struct PileDriverRig *rig)
 {
     rig->colliderHold = 16;
     if (++rig->stateFrame > 15)

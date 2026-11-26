@@ -12,8 +12,8 @@
 
 s32 Div(s32, s32);
 s32 Math_Atan2(s32, s32);
-void Terrain_ResolveActorMotion(struct GloveMotion *);
-void Actor_UpdateShadowSpriteParts(struct GloveMotion *, void *);
+void Terrain_ResolveActorMotion(struct CoffinBikeMotion *);
+void Actor_UpdateShadowSpriteParts(struct CoffinBikeMotion *, void *);
 
 extern u32 gUnk_020004E0[];
 void MotionActor_ParsePosition(void *);
@@ -22,34 +22,34 @@ void CharacterModel_SetSecondaryAppearance(void *, void *, void *);
 void CoffinBike_InitializeStyleModifiers(void *);
 void ActorSprite_InitPartDrawings(void *, void *, u32);
 void FieldHud_InitializeWidgets(void *, void *, void *, u32, void *);
-void sub_081175F8(void *);
-void sub_081172C4(void *);
+void CoffinBike_UpdateLaunchSlowdown(void *);
+void CoffinBike_UpdateRisingCue(void *);
 void CoffinBike_UpdateStopping(void *);
 void CharacterPreview_InitializePalette(void *, void *, u32);
 void CoffinBike_InitCollisionVolumes(void *);
 void SceneTilemap_SetScrollSource(void *);
 void CoffinBike_RegisterMessageReceiver(void *);
-static inline void Glove_SetCallback(struct Glove *p, void (*fn)(void *), s32 zero)
+static inline void CoffinBike_SetCallback(struct CoffinBike *p, void (*fn)(void *), s32 zero)
 {
     p->active = 1;
     p->update = fn;
     p->timer = zero;
 }
-inline static void Glove_SetInitialCallback(struct Glove *p, void (*fn)(void *))
+inline static void CoffinBike_SetInitialCallback(struct CoffinBike *p, void (*fn)(void *))
 {
     p->active = 1;
     p->update = fn;
     p->timer = 0;
 }
 
-static inline void Glove_ReadMode(u32 *result, u32 mask)
+static inline void CoffinBike_ReadMode(u32 *result, u32 mask)
 {
     *result = (gEngineFlags | gScenePauseFlags) & mask;
 }
 
-s32 CoffinBike_InitFromScript(struct Glove *p)
+s32 CoffinBike_InitFromScript(struct CoffinBike *p)
 {
-    struct GloveMotion *self = &p->motion;
+    struct CoffinBikeMotion *self = &p->motion;
     s32 h;
     s32 dx;
     s32 dz;
@@ -126,7 +126,7 @@ s32 CoffinBike_InitFromScript(struct Glove *p)
         }
         Actor_UpdateShadowSpriteParts(self, &p->model);
     }
-    Glove_ReadMode(&mode, 0x800);
+    CoffinBike_ReadMode(&mode, 0x800);
     if (mode) {
         if (p->participant == SceneActorDamage_LocalPlayer()) {
             struct AreaEffectLinkState *ref = gLinkSession;
@@ -142,7 +142,7 @@ s32 CoffinBike_InitFromScript(struct Glove *p)
                                        &self->style.initialHalfword,
                                        (u16)self->style.currentHalfword, optional);
         }
-        Glove_SetInitialCallback(p, sub_081175F8);
+        CoffinBike_SetInitialCallback(p, CoffinBike_UpdateLaunchSlowdown);
     } else {
         s32 ready;
         FieldHud_InitializeWidgets(&self->style.initialWord, &p->height,
@@ -150,9 +150,9 @@ s32 CoffinBike_InitFromScript(struct Glove *p)
                                    &p->activeFrames);
         ready = Script_GetKeywordValue('R', 0);
         if (ready)
-            Glove_SetCallback(p, (void (*)(void *))CoffinBike_UpdateStopping, 0);
+            CoffinBike_SetCallback(p, (void (*)(void *))CoffinBike_UpdateStopping, 0);
         else
-            Glove_SetCallback(p, sub_081172C4, ready);
+            CoffinBike_SetCallback(p, CoffinBike_UpdateRisingCue, ready);
     }
     CharacterPreview_InitializePalette(&self->pendingDamage, &p->model, self->style.parameterD);
     CoffinBike_InitCollisionVolumes(p);

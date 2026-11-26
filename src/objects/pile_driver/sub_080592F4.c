@@ -1,7 +1,7 @@
 #include "objects/pile_driver/pile_driver_schedule.h"
-void PileDriver_InitScheduledAction(struct ScenePanel *input)
+void PileDriver_InitScheduledAction(struct PileDriver *input)
 {
-    struct ScenePanelScheduleView *panel = (void *)input;
+    struct PileDriverScheduleView *panel = (void *)input;
     switch (panel->resourceIndex) {
         case 0:
             panel->handle = 0;

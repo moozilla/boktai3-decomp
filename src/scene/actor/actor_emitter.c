@@ -80,7 +80,7 @@ struct ActorEmitter {
 u8 Modifier_IsFirstSourceReady();
 
 
-s32 NativeEffect_CreateFromProfile(struct EmitterVector *, s32, struct EmitterVector *, void *, s32,
+s32 ProjectileEffect_CreateFromProfile(struct EmitterVector *, s32, struct EmitterVector *, void *, s32,
                                    s32, s32, s32);
 
 void CallbackList_SubtractClampedValue();
@@ -103,7 +103,7 @@ s32 ActorEmitter_TryEmit(struct ActorEmitter *emitter)
     velocity.y = 0;
     velocity.z = 0;
     height = actor->height - 0x16000;
-    if (NativeEffect_CreateFromProfile(&owner->position, height, &velocity, owner->profile,
+    if (ProjectileEffect_CreateFromProfile(&owner->position, height, &velocity, owner->profile,
                                        owner->kind + 1, 0, 1, 0) >= 0)
         goto success;
 fail:
@@ -163,7 +163,7 @@ s32 ActorEmitter_TryEmitLow(struct LowActorEmitter *emitter)
     velocity.y = 0;
     velocity.z = 0;
     height = actor->height - 0x12000;
-    if (NativeEffect_CreateFromProfile(&owner->position, height, &velocity, owner->profile,
+    if (ProjectileEffect_CreateFromProfile(&owner->position, height, &velocity, owner->profile,
                                        owner->kind + 1, 0, 1, 0) >= 0)
         goto success;
 fail:
@@ -288,13 +288,13 @@ s32 ActorEmitter_TryEmitPair(struct PairEmitter *emitter)
         height = actor->height - 0x8000;
     else
         height = actor->height - 0x16000;
-    if (NativeEffect_CreateFromProfile(&actor->position, height, &velocity, actor->profile,
+    if (ProjectileEffect_CreateFromProfile(&actor->position, height, &velocity, actor->profile,
                                        owner->kind + 1, 1, 2, 0) >= 0)
         goto success;
 fail:
     return 0;
 success:
-    NativeEffect_CreateFromProfile(&actor->position, height, &velocity, actor->profile,
+    ProjectileEffect_CreateFromProfile(&actor->position, height, &velocity, actor->profile,
                                    owner->kind + 1, 0, 1, 1);
     CallbackList_SubtractClampedValue(actor, emitter, cost);
     emitter->timer = emitter->duration;
@@ -346,13 +346,13 @@ s32 ActorEmitter_TryEmitAnimatedPair(struct AnimatedPairEmitter *emitter)
     velocity.y = 0;
     velocity.z = 0;
     height = actor->height - 0x8000;
-    if (NativeEffect_CreateFromProfile(&owner->position, height, &velocity, owner->profile,
+    if (ProjectileEffect_CreateFromProfile(&owner->position, height, &velocity, owner->profile,
                                        owner->kind + 1, 1, 2, 0) >= 0)
         goto success;
 fail:
     return 0;
 success:
-    NativeEffect_CreateFromProfile(&owner->position, height, &velocity, owner->profile,
+    ProjectileEffect_CreateFromProfile(&owner->position, height, &velocity, owner->profile,
                                    owner->kind + 1, 0, 1, 1);
     Anim_SetKeyframes((u8 *)owner + 0x670, (u8 *)owner + 0x7F0, emitter->animation, 2, 0);
     CallbackList_SubtractClampedValue(actor, emitter, cost);

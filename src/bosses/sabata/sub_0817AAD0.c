@@ -1,10 +1,10 @@
-#include "bosses/sabata/scene_volume.h"
+#include "bosses/sabata/sabata_attack_state.h"
 
 void Collider_SetPosition(void *, void *, u32);
 void Collider_SetAttackProperties(void *, s32, s32, s32, s32, s32);
 s32 Collider_Refresh(void *);
 
-void SabataVolume_ConfigureAttackCollider(struct SceneVolumeActor *volume, s32 radius, s32 attack,
+void Sabata_ConfigureAttackCollider(struct SabataAttackActor *volume, s32 radius, s32 attack,
                                          s32 height)
 {
     struct ContactCollider *collider = &volume->collider;

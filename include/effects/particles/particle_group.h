@@ -4,7 +4,7 @@
 #include "scene/collision/contact_position.h"
 #include "engine/task.h"
 
-/* The six-group pool created by ParticleManager_Create. */
+/* The six-group pool created by ImpactParticleManager_Create. */
 struct ParticleGroupParticle {
     u8 active, unknown1, timer, lifetime;
     u16 cell;

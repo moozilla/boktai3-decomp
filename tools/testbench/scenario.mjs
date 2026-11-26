@@ -70,10 +70,10 @@ function observeAllocations(g, entry, act) {
     ['WoodenCrate_AllocateSlot', 'struct WoodenCrate'],
     ['FloorSwitch_AllocateSlot', 'struct FloorSwitch'],
     ['Pool128_Allocate', 'struct RegionActor'],
-    ['CollisionController_FindFreeSlot', 'struct CollisionSlot'],
+    ['StrikeTrap_FindFreeSlot', 'struct CollisionSlot'],
     ['SceneIndicators_FindFreeSlot', 'struct SceneIndicator'],
-    ['NamedObject_AllocateSlot', 'struct NamedObject'],
-    ['SceneObjects_FindFreeSlot', 'struct SceneObject'],
+    ['MovingPlatform_AllocateSlot', 'struct NamedObject'],
+    ['PuzzleBlock_FindFreeSlot', 'struct SceneObject'],
   ]) {
     if (!(name in g.fn)) continue;
     hooks.push(g.on(name, ([address]) => {

@@ -1,8 +1,8 @@
-#include "bosses/sabata/scene_volume.h"
+#include "bosses/sabata/sabata_attack_state.h"
 
-void SceneActors_UpdateTransitionToState15(struct SceneVolumeActor *actor)
+void SceneActors_UpdateTransitionToState15(struct SabataAttackActor *actor)
 {
-    if (SceneVolume_TakeQueued(actor)) {
+    if (Sabata_TakeQueued(actor)) {
         u32 state = 0xF;
         actor->state = state;
     }

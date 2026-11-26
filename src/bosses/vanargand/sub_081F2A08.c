@@ -1,6 +1,6 @@
 #include "bosses/vanargand/sprite_trail.h"
 #include "effects/screen/background_controller.h"
-#include "effects/particles/native_effect.h"
+#include "effects/sprites/native_effect.h"
 void Vector3_CopyComponents(struct TrailVector *, struct TrailVector *);
 s32 Sprite_LinkToList(void *, u32);
 void AnimData_SelectPaletteBank(void *, int);

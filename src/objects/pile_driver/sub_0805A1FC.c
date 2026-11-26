@@ -6,7 +6,7 @@ static inline s32 randomValue(void)
     offset = gRandomIndex * 2;
     return *(const u16 *)(offset + (u32)gRandomTable);
 }
-void PileDriverRig_TickSubjectAction(struct ScenePanelRig *rig)
+void PileDriverRig_TickSubjectAction(struct PileDriverRig *rig)
 {
     s8 *selected = &rig->selectedSubject;
     if (PileDriverRig_IsSubjectState(rig, *selected, 4)) {

@@ -79,7 +79,7 @@ void SceneHud_SetTimedState(void *, int, int, int, int, int);
 void sub_08014634(s32, s32, void *, void *, void *, s32, s32);
 void Statue_UpdateDeath(void);
 
-static inline u32 EnemyF426_StepSequence(struct EnemyF426Sprite *owner,
+static inline u32 Statue_StepSequence(struct EnemyF426Sprite *owner,
                                          struct DisplaySequenceState *state)
 {
     const u16 *command;
@@ -231,7 +231,7 @@ u32 Statue_UpdateDamageState(struct EnemyF426Actor *p)
         else
             p->spr.flags &= ~1;
     }
-    EnemyF426_StepSequence((void *)&p->spr, &p->seq);
+    Statue_StepSequence((void *)&p->spr, &p->seq);
     p->timer++;
     /* The callback has no explicit return-value assignment on this path in the ROM. */
 }

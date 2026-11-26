@@ -1569,7 +1569,7 @@ void Mummy_SetControlPreset(struct ChaseActor *s)
 s32 Div(s32, s32);
 
 struct BouncingObject;
-struct BouncingObject *BouncingObject_Spawn(struct ContactPosition *source,
+struct BouncingObject *BouncingBomb_Spawn(struct ContactPosition *source,
                                            struct ContactPosition *delta,
                                            struct ContactPosition *target, u32 shot,
                                            u32 category, u32 strength, u32 id);
@@ -1661,7 +1661,7 @@ void Mummy_FireAcceleratingVolley(struct ChaseActor *actor)
             u32 shot = actor->base.attacks.first[2];
             u32 category = actor->base.attacks.second[2];
             struct ContactPosition *target = &actor->base.tracking.target->position;
-            BouncingObject_Spawn(&source, &delta, target, shot, category, strength,
+            BouncingBomb_Spawn(&source, &delta, target, shot, category, strength,
                                  actor->base.body.id);
         }
         strength = Div(strength << 3, 10);
@@ -2748,7 +2748,7 @@ s32 SceneActor_StartAdjacentCellRoute(struct Mummy *actor)
 
 // confidence=low: refreshes the nearby route heading after the context cooldown expires.
 
-s32 BouncingObject_GetNearbyHeading(const struct ContactPosition *);
+s32 BouncingBomb_GetNearbyHeading(const struct ContactPosition *);
 
 s32 SceneActor_StartAdjacentCellRoute(struct Mummy *actor);
 
@@ -2760,7 +2760,7 @@ u8 BouncingObject_RefreshNearbyHeading(struct ChaseActor *arg)
         context->flags6D4--;
         return 0;
     }
-    if (BouncingObject_GetNearbyHeading(&actor->base.body.position) < 0) {
+    if (BouncingBomb_GetNearbyHeading(&actor->base.body.position) < 0) {
         struct Mummy *control = actor->base.context;
         u16 *flags = &control->flags6F2;
         u32 mask = ~0x400;

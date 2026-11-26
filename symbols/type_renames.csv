@@ -1,6 +1,132 @@
-old_name,new_name,kind,uses,evidence
-SceneInputWidget,AnimSprite,struct,561 references in 219 files,"The animated sprite every system draws with: sequence/frame/keyframe playback, position, scale, rotation, palette bank, tile data, and an intrusive animation-list link (previous/next). Anim_* and AnimData_* functions operate on it; Player embeds two. Nothing about it is input or a widget."
-SceneInputWidget_Hide,AnimSprite_Hide,inline function,25,"sets flags bit 0 (hidden)"
-SceneInputWidget_Show,AnimSprite_Show,inline function,34,"clears flags bit 0"
-SceneInputResource,AnimSpriteResource,struct,160,"the relocatable 32-byte glyph/keyframe resource header the sprite plays from"
-SceneWidgetPlayback,AnimSpritePlayback,struct,5,"priority and mode pair of the sprite's playback"
+old_name,new_name,kind,uses,evidence,scope
+SceneInputWidget,AnimSprite,struct,561 references in 219 files,"The animated sprite every system draws with: sequence/frame/keyframe playback, position, scale, rotation, palette bank, tile data, and an intrusive animation-list link (previous/next). Anim_* and AnimData_* functions operate on it; Player embeds two. Nothing about it is input or a widget.",
+SceneInputWidget_Hide,AnimSprite_Hide,inline function,25,sets flags bit 0 (hidden),
+SceneInputWidget_Show,AnimSprite_Show,inline function,34,clears flags bit 0,
+SceneInputResource,AnimSpriteResource,struct,160,the relocatable 32-byte glyph/keyframe resource header the sprite plays from,
+SceneWidgetPlayback,AnimSpritePlayback,struct,5,priority and mode pair of the sprite's playback,
+ScenePanel,PileDriver,struct,,Owning unit and its mirrored headers,src/objects/pile_driver/
+ScenePanel,PileDriver,struct,,Owning unit and its mirrored headers,include/objects/pile_driver/
+ScenePanelAuxSprite,PileDriverAuxSprite,struct,,Owning unit and its mirrored headers,src/objects/pile_driver/
+ScenePanelAuxSprite,PileDriverAuxSprite,struct,,Owning unit and its mirrored headers,include/objects/pile_driver/
+ScenePanelCommand,PileDriverCommand,struct,,Owning unit and its mirrored headers,src/objects/pile_driver/
+ScenePanelCommand,PileDriverCommand,struct,,Owning unit and its mirrored headers,include/objects/pile_driver/
+ScenePanelCommandGlobals,PileDriverCommandGlobals,struct,,Owning unit and its mirrored headers,src/objects/pile_driver/
+ScenePanelCommandGlobals,PileDriverCommandGlobals,struct,,Owning unit and its mirrored headers,include/objects/pile_driver/
+ScenePanelEffectsView,PileDriverEffectsView,struct,,Owning unit and its mirrored headers,src/objects/pile_driver/
+ScenePanelEffectsView,PileDriverEffectsView,struct,,Owning unit and its mirrored headers,include/objects/pile_driver/
+ScenePanelGraphics,PileDriverGraphics,struct,,Owning unit and its mirrored headers,src/objects/pile_driver/
+ScenePanelGraphics,PileDriverGraphics,struct,,Owning unit and its mirrored headers,include/objects/pile_driver/
+ScenePanelInteractionPackedPosition,PileDriverInteractionPackedPosition,struct,,Owning unit and its mirrored headers,src/objects/pile_driver/
+ScenePanelInteractionPackedPosition,PileDriverInteractionPackedPosition,struct,,Owning unit and its mirrored headers,include/objects/pile_driver/
+ScenePanelInteractionPlayer,PileDriverInteractionPlayer,struct,,Owning unit and its mirrored headers,src/objects/pile_driver/
+ScenePanelInteractionPlayer,PileDriverInteractionPlayer,struct,,Owning unit and its mirrored headers,include/objects/pile_driver/
+ScenePanelMainSprite,PileDriverMainSprite,struct,,Owning unit and its mirrored headers,src/objects/pile_driver/
+ScenePanelMainSprite,PileDriverMainSprite,struct,,Owning unit and its mirrored headers,include/objects/pile_driver/
+ScenePanelPaletteGraphics,PileDriverPaletteGraphics,struct,,Owning unit and its mirrored headers,src/objects/pile_driver/
+ScenePanelPaletteGraphics,PileDriverPaletteGraphics,struct,,Owning unit and its mirrored headers,include/objects/pile_driver/
+ScenePanelPaletteSprite,PileDriverPaletteSprite,struct,,Owning unit and its mirrored headers,src/objects/pile_driver/
+ScenePanelPaletteSprite,PileDriverPaletteSprite,struct,,Owning unit and its mirrored headers,include/objects/pile_driver/
+ScenePanelParticle,PileDriverParticle,struct,,Owning unit and its mirrored headers,src/objects/pile_driver/
+ScenePanelParticle,PileDriverParticle,struct,,Owning unit and its mirrored headers,include/objects/pile_driver/
+ScenePanelParticles,PileDriverParticles,struct,,Owning unit and its mirrored headers,src/objects/pile_driver/
+ScenePanelParticles,PileDriverParticles,struct,,Owning unit and its mirrored headers,include/objects/pile_driver/
+ScenePanelReceiver,PileDriverReceiver,struct,,Owning unit and its mirrored headers,src/objects/pile_driver/
+ScenePanelReceiver,PileDriverReceiver,struct,,Owning unit and its mirrored headers,include/objects/pile_driver/
+ScenePanelRig,PileDriverRig,struct,,Owning unit and its mirrored headers,src/objects/pile_driver/
+ScenePanelRig,PileDriverRig,struct,,Owning unit and its mirrored headers,include/objects/pile_driver/
+ScenePanelScheduleView,PileDriverScheduleView,struct,,Owning unit and its mirrored headers,src/objects/pile_driver/
+ScenePanelScheduleView,PileDriverScheduleView,struct,,Owning unit and its mirrored headers,include/objects/pile_driver/
+ScenePanelScriptArguments,PileDriverScriptArguments,struct,,Owning unit and its mirrored headers,src/objects/pile_driver/
+ScenePanelScriptArguments,PileDriverScriptArguments,struct,,Owning unit and its mirrored headers,include/objects/pile_driver/
+ScenePanelSubject,PileDriverSubject,struct,,Owning unit and its mirrored headers,src/objects/pile_driver/
+ScenePanelSubject,PileDriverSubject,struct,,Owning unit and its mirrored headers,include/objects/pile_driver/
+ScenePanelPosition,PileDriverPosition,union,,Owning unit and its mirrored headers,src/objects/pile_driver/
+ScenePanelPosition,PileDriverPosition,union,,Owning unit and its mirrored headers,include/objects/pile_driver/
+Glove,CoffinBike,struct,,Owning unit and its mirrored headers,src/minigames/coffin_bike/
+Glove,CoffinBike,struct,,Owning unit and its mirrored headers,include/minigames/coffin_bike/
+GloveAttachment,CoffinBikeAttachment,struct,,Owning unit and its mirrored headers,src/minigames/coffin_bike/
+GloveAttachment,CoffinBikeAttachment,struct,,Owning unit and its mirrored headers,include/minigames/coffin_bike/
+GloveCamera,CoffinBikeCamera,struct,,Owning unit and its mirrored headers,src/minigames/coffin_bike/
+GloveCamera,CoffinBikeCamera,struct,,Owning unit and its mirrored headers,include/minigames/coffin_bike/
+GloveCommand,CoffinBikeCommand,struct,,Owning unit and its mirrored headers,src/minigames/coffin_bike/
+GloveCommand,CoffinBikeCommand,struct,,Owning unit and its mirrored headers,include/minigames/coffin_bike/
+GloveDraw,CoffinBikeDraw,struct,,Owning unit and its mirrored headers,src/minigames/coffin_bike/
+GloveDraw,CoffinBikeDraw,struct,,Owning unit and its mirrored headers,include/minigames/coffin_bike/
+GloveEmitter,CoffinBikeEmitter,struct,,Owning unit and its mirrored headers,src/minigames/coffin_bike/
+GloveEmitter,CoffinBikeEmitter,struct,,Owning unit and its mirrored headers,include/minigames/coffin_bike/
+GloveFlagBinding,CoffinBikeFlagBinding,struct,,Owning unit and its mirrored headers,src/minigames/coffin_bike/
+GloveFlagBinding,CoffinBikeFlagBinding,struct,,Owning unit and its mirrored headers,include/minigames/coffin_bike/
+GloveGlobals,CoffinBikeGlobals,struct,,Owning unit and its mirrored headers,src/minigames/coffin_bike/
+GloveGlobals,CoffinBikeGlobals,struct,,Owning unit and its mirrored headers,include/minigames/coffin_bike/
+GloveModel,CoffinBikeModel,struct,,Owning unit and its mirrored headers,src/minigames/coffin_bike/
+GloveModel,CoffinBikeModel,struct,,Owning unit and its mirrored headers,include/minigames/coffin_bike/
+GloveModelPart,CoffinBikeModelPart,struct,,Owning unit and its mirrored headers,src/minigames/coffin_bike/
+GloveModelPart,CoffinBikeModelPart,struct,,Owning unit and its mirrored headers,include/minigames/coffin_bike/
+GloveModelSlotView,CoffinBikeModelSlotView,struct,,Owning unit and its mirrored headers,src/minigames/coffin_bike/
+GloveModelSlotView,CoffinBikeModelSlotView,struct,,Owning unit and its mirrored headers,include/minigames/coffin_bike/
+GloveMotion,CoffinBikeMotion,struct,,Owning unit and its mirrored headers,src/minigames/coffin_bike/
+GloveMotion,CoffinBikeMotion,struct,,Owning unit and its mirrored headers,include/minigames/coffin_bike/
+GloveMotionBinding,CoffinBikeMotionBinding,struct,,Owning unit and its mirrored headers,src/minigames/coffin_bike/
+GloveMotionBinding,CoffinBikeMotionBinding,struct,,Owning unit and its mirrored headers,include/minigames/coffin_bike/
+GlovePosition,CoffinBikePosition,struct,,Owning unit and its mirrored headers,src/minigames/coffin_bike/
+GlovePosition,CoffinBikePosition,struct,,Owning unit and its mirrored headers,include/minigames/coffin_bike/
+GloveQueue,CoffinBikeQueue,struct,,Owning unit and its mirrored headers,src/minigames/coffin_bike/
+GloveQueue,CoffinBikeQueue,struct,,Owning unit and its mirrored headers,include/minigames/coffin_bike/
+GloveAnimationKey,CoffinBikeAnimationKey,union,,Owning unit and its mirrored headers,src/minigames/coffin_bike/
+GloveAnimationKey,CoffinBikeAnimationKey,union,,Owning unit and its mirrored headers,include/minigames/coffin_bike/
+GloveResourceHalfword,CoffinBikeResourceHalfword,union,,Owning unit and its mirrored headers,src/minigames/coffin_bike/
+GloveResourceHalfword,CoffinBikeResourceHalfword,union,,Owning unit and its mirrored headers,include/minigames/coffin_bike/
+SingletonSlot7Actor,VanargandHeadActor,struct,,Owning unit and its mirrored headers,src/bosses/vanargand/
+SingletonSlot7Actor,VanargandHeadActor,struct,,Owning unit and its mirrored headers,include/bosses/vanargand/
+Slot7Action,VanargandHeadAction,struct,,Owning unit and its mirrored headers,src/bosses/vanargand/
+Slot7Action,VanargandHeadAction,struct,,Owning unit and its mirrored headers,include/bosses/vanargand/
+Slot7Actor,VanargandHeadActorView,struct,,Owning unit and its mirrored headers,src/bosses/vanargand/
+Slot7Actor,VanargandHeadActorView,struct,,Owning unit and its mirrored headers,include/bosses/vanargand/
+Slot7Advance,VanargandHeadAdvance,struct,,Owning unit and its mirrored headers,src/bosses/vanargand/
+Slot7Advance,VanargandHeadAdvance,struct,,Owning unit and its mirrored headers,include/bosses/vanargand/
+Slot7Motion,VanargandHeadMotion,struct,,Owning unit and its mirrored headers,src/bosses/vanargand/
+Slot7Motion,VanargandHeadMotion,struct,,Owning unit and its mirrored headers,include/bosses/vanargand/
+Slot7PackedVector,VanargandHeadPackedVector,struct,,Owning unit and its mirrored headers,src/bosses/vanargand/
+Slot7PackedVector,VanargandHeadPackedVector,struct,,Owning unit and its mirrored headers,include/bosses/vanargand/
+Slot7Target,VanargandHeadTarget,struct,,Owning unit and its mirrored headers,src/bosses/vanargand/
+Slot7Target,VanargandHeadTarget,struct,,Owning unit and its mirrored headers,include/bosses/vanargand/
+Slot7Transition,VanargandHeadTransition,struct,,Owning unit and its mirrored headers,src/bosses/vanargand/
+Slot7Transition,VanargandHeadTransition,struct,,Owning unit and its mirrored headers,include/bosses/vanargand/
+ActorAnimationResource,SabataActorAnimationResource,struct,,Owning unit and its mirrored headers,src/bosses/sabata/
+ActorAnimationResource,SabataActorAnimationResource,struct,,Owning unit and its mirrored headers,include/bosses/sabata/
+ActorImpact,SabataActorImpact,struct,,Owning unit and its mirrored headers,src/bosses/sabata/
+ActorImpact,SabataActorImpact,struct,,Owning unit and its mirrored headers,include/bosses/sabata/
+ActorState,SabataActorState,struct,,Owning unit and its mirrored headers,src/bosses/sabata/
+ActorState,SabataActorState,struct,,Owning unit and its mirrored headers,include/bosses/sabata/
+ActorStateOwner,SabataActorStateOwner,struct,,Owning unit and its mirrored headers,src/bosses/sabata/
+ActorStateOwner,SabataActorStateOwner,struct,,Owning unit and its mirrored headers,include/bosses/sabata/
+SceneVolumeActor,SabataAttackActor,struct,,Owning unit and its mirrored headers,src/bosses/sabata/
+SceneVolumeActor,SabataAttackActor,struct,,Owning unit and its mirrored headers,include/bosses/sabata/
+SceneVolumeSearch,SabataAttackPositionSearch,struct,,Owning unit and its mirrored headers,src/bosses/sabata/
+SceneVolumeSearch,SabataAttackPositionSearch,struct,,Owning unit and its mirrored headers,include/bosses/sabata/
+WidgetGlyphEntry,AnimSpriteGlyph,struct,,Per-glyph entry in the AnimSprite resource table,
+GUARD_ACTOR_DECISION_H,GUARD_SABATA_COMBAT_STATES_H,include guard,,Guard of the renamed header,include/bosses/sabata/sabata_combat_states.h
+GUARD_ACTOR_IMPACT_H,GUARD_SABATA_IMPACT_H,include guard,,Guard of the renamed header,include/bosses/sabata/sabata_impact.h
+GUARD_ACTOR_POSITION_H,GUARD_SABATA_POSITION_H,include guard,,Guard of the renamed header,include/bosses/sabata/sabata_position.h
+GUARD_ACTOR_POSITION_EFFECTS_H,GUARD_SABATA_POSITION_EFFECTS_H,include guard,,Guard of the renamed header,include/bosses/sabata/sabata_position_effects.h
+GUARD_ACTOR_SPATIAL_QUERY_H,GUARD_SABATA_SPATIAL_QUERY_H,include guard,,Guard of the renamed header,include/bosses/sabata/sabata_spatial_query.h
+GUARD_ACTOR_STATE_COMMANDS_H,GUARD_SABATA_STATE_COMMANDS_H,include guard,,Guard of the renamed header,include/bosses/sabata/sabata_state_commands.h
+GUARD_SCENE_EVENT_ACTOR_H,GUARD_SABATA_REACTIONS_H,include guard,,Guard of the renamed header,include/bosses/sabata/sabata_reactions.h
+GUARD_SCENE_VOLUME_H,GUARD_SABATA_ATTACK_STATE_H,include guard,,Guard of the renamed header,include/bosses/sabata/sabata_attack_state.h
+GUARD_ANIMATION_WIDGET_H,GUARD_ANIM_SPRITE_GLYPH_H,include guard,,Guard of the renamed header,include/engine/video/anim_sprite_glyph.h
+GUARD_TENTACLE_SPREAD_H,GUARD_CENTIPEDE_SPREAD_H,include guard,,Guard of the renamed header,include/monsters/centipede_spread.h
+GUARD_BREAKABLE_PROP_H,GUARD_QUEST_BARRIER_H,include guard,,Guard of the renamed header,include/objects/quest_barriers/quest_barrier.h
+GUARD_SCENE_PANEL_H,GUARD_PILE_DRIVER_H,include guard,,Guard of the renamed header,include/objects/pile_driver/pile_driver.h
+GUARD_SCENE_PANEL_CONFIG_H,GUARD_PILE_DRIVER_CONFIG_H,include guard,,Guard of the renamed header,include/objects/pile_driver/pile_driver_config.h
+GUARD_SCENE_PANEL_INTERACTION_H,GUARD_PILE_DRIVER_INTERACTION_H,include guard,,Guard of the renamed header,include/objects/pile_driver/pile_driver_interaction.h
+GUARD_SCENE_PANEL_LIFECYCLE_H,GUARD_PILE_DRIVER_LIFECYCLE_H,include guard,,Guard of the renamed header,include/objects/pile_driver/pile_driver_lifecycle.h
+GUARD_SCENE_PANEL_ORCHESTRATION_H,GUARD_PILE_DRIVER_ORCHESTRATION_H,include guard,,Guard of the renamed header,include/objects/pile_driver/pile_driver_orchestration.h
+GUARD_SCENE_PANEL_OVERLAY_H,GUARD_PILE_DRIVER_OVERLAY_H,include guard,,Guard of the renamed header,include/objects/pile_driver/pile_driver_overlay.h
+GUARD_SCENE_PANEL_RIG_SETUP_H,GUARD_PILE_DRIVER_RIG_SETUP_H,include guard,,Guard of the renamed header,include/objects/pile_driver/pile_driver_rig_setup.h
+GUARD_SCENE_PANEL_SUBJECT_PLAYBACK_H,GUARD_PILE_DRIVER_SUBJECT_PLAYBACK_H,include guard,,Guard of the renamed header,include/objects/pile_driver/pile_driver_subject_playback.h
+GUARD_SCENE_PANEL_SUBJECT_TAIL_H,GUARD_PILE_DRIVER_SUBJECT_TAIL_H,include guard,,Guard of the renamed header,include/objects/pile_driver/pile_driver_subject_tail.h
+TENTACLE_SPREAD_SET_OFFSET,CENTIPEDE_SPREAD_SET_OFFSET,macro,,Centipede spread offset function header,
+ScenePanelReceiver,PileDriverReceiver,struct,,Sabata attack state embeds the type from the Pile Driver header,include/bosses/sabata/sabata_attack_state.h
+ScenePanelReceiver,PileDriverReceiver,struct,,Sabata dispatch uses the receiver embedded from the Pile Driver header,src/bosses/sabata/sub_0817B2DC.c
+ScenePanelCommandGlobals,PileDriverCommandGlobals,struct,,Sabata uses the dispatch view declared in the Pile Driver header,src/bosses/sabata/sub_0817B2DC.c
+ScenePanelCommand,PileDriverCommand,struct,,Sabata uses the command slots declared in the Pile Driver header,src/bosses/sabata/sub_0817B2DC.c

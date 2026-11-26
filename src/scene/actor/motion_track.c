@@ -69,7 +69,7 @@ void OrbitMotion_BeginDistanceWave(struct OrbitMotion *motion, struct OrbitVecto
     }
 }
 
-s32 OrbitMotion_CalculateArcCenter(struct OrbitVector *, struct OrbitVector *, struct OrbitVector *,
+s32 SceneryMotion_CalculateArcCenter(struct OrbitVector *, struct OrbitVector *, struct OrbitVector *,
                                    s32);
 
 s32 Math_Atan2(s32, s32);
@@ -83,7 +83,7 @@ void OrbitMotion_BeginArc(struct OrbitMotion *motion, struct OrbitVector *positi
         motion->position = position;
         target = &motion->base;
         *target = *end;
-        motion->radius = OrbitMotion_CalculateArcCenter(&motion->center, position, target, sweep);
+        motion->radius = SceneryMotion_CalculateArcCenter(&motion->center, position, target, sweep);
         {
             s32 cx = motion->center.x;
             s32 cz = motion->center.z;
@@ -173,17 +173,17 @@ s32 ScalarApproach_StepSixteenth(s32, s32);
 
 s32 Math_StepTowardTarget(s32, s32, s32);
 
-s32 SceneMover_SteerXZ(struct OrbitMotion *);
+s32 SceneryMotion_SteerXZ(struct OrbitMotion *);
 
-s32 SceneMover_SteerXY(struct OrbitMotion *);
+s32 SceneryMotion_SteerXY(struct OrbitMotion *);
 
-s32 OrbitMotion_UpdateAngle(struct OrbitMotion *);
+s32 SceneryMotion_UpdateAngle(struct OrbitMotion *);
 
-s32 OrbitMotion_UpdateCrossedSines(struct OrbitMotion *);
+s32 SceneryMotion_UpdateCrossedSines(struct OrbitMotion *);
 
-void OrbitMotion_UpdateAbsoluteSines(struct OrbitMotion *);
+void SceneryMotion_UpdateAbsoluteSines(struct OrbitMotion *);
 
-s32 OrbitMotion_InterpolatePosition(struct OrbitMotion *);
+s32 SceneryMotion_InterpolatePosition(struct OrbitMotion *);
 
 
 
@@ -240,16 +240,16 @@ s32 MotionTrack_Update(struct OrbitMotion *motion)
             s32 current;
             current = out->y;
             out->y = ScalarApproach_StepEighth(current, target->y);
-            return SceneMover_SteerXZ(motion);
+            return SceneryMotion_SteerXZ(motion);
         }
         case ORBIT_MOTION_STEER_XY:
-            return SceneMover_SteerXY(motion);
+            return SceneryMotion_SteerXY(motion);
         case ORBIT_MOTION_ARC:
-            return OrbitMotion_UpdateAngle(motion);
+            return SceneryMotion_UpdateAngle(motion);
         case ORBIT_MOTION_CROSSED_SINES:
-            return OrbitMotion_UpdateCrossedSines(motion);
+            return SceneryMotion_UpdateCrossedSines(motion);
         case ORBIT_MOTION_WAVE_APPROACH:
-            OrbitMotion_UpdateAbsoluteSines(motion);
+            SceneryMotion_UpdateAbsoluteSines(motion);
             {
                 s16 value;
                 out->x = Math_StepTowardTarget(out->x, target->x, step->x);
@@ -259,7 +259,7 @@ s32 MotionTrack_Update(struct OrbitMotion *motion)
                 break;
             }
         case ORBIT_MOTION_INTERPOLATE:
-            return OrbitMotion_InterpolatePosition(motion);
+            return SceneryMotion_InterpolatePosition(motion);
     }
     if (target) {
         stepDistanceSquared = square(motion->offset.x) + square(savedStep->z);

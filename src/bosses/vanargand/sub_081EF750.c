@@ -23,8 +23,7 @@ static inline u8 TakeEntry(struct ScreenSelectionPhase *screen)
     return 0;
 }
 // confidence=low: starts a screen-selection transition from coordinate minus one hundred.
-#define SingletonSlot7_BeginOffscreenSelection sub_081EF750
-void SingletonSlot7_BeginOffscreenSelection(struct ScreenSelectionPhase *screen)
+void VanargandHead_BeginOffscreenSelection(struct ScreenSelectionPhase *screen)
 {
     struct ScreenSelectionPhase *state = screen;
     if (TakeEntry(screen)) {

@@ -53,14 +53,14 @@ struct Map {
 };
 extern const s16 gUnk_086149C4[];
 void Sound_PlaySong(u32 song);
-s32 SceneObjects_TryPushNeighborByIndex(void *position, u32 index);
+s32 PuzzleBlock_TryPushNeighborByIndex(void *position, u32 index);
 s32 Player_SetAnimation(void *, s32, s32, s32);
 void ActorSequence_Begin(void *, s32, s32);
 void Player_SetActionPhase(void *p, u8 v);
 u32 Player_IsStatusBit3ActionActive(u32 x);
 s32 ActorVariant_GetTableValue(u32, s32);
 void Player_PlayPositionEffect(void *, void *, u32, u32, void *, u32, u32);
-s32 SceneObjects_HasTypeTwoResource(s32);
+s32 SlidingDoors_HasTypeTwoResource(s32);
 u8 *TerrainModifiers_FindCellOverride(s32, s32);
 s32 Player_IsWithinCoordinateBand(void *);
 s32 sub_08156DAC(void *);
@@ -167,7 +167,7 @@ void Player_UpdateObjectPush(struct PlayerPushState *p)
             p->a7c8 = state;
             if ((t != previousDirection) && (t != nextDirection)) {
                 if (Player_IsWithinCoordinateBand(p)) {
-                    if (SceneObjects_TryPushNeighborByIndex(&p->pos, p->a3a4) > 0) {
+                    if (PuzzleBlock_TryPushNeighborByIndex(&p->pos, p->a3a4) > 0) {
                         if ((p != 0) && isTwo(p)) {
                             ActorSequence_Begin(p, 0, 0);
                         } else {
@@ -277,7 +277,7 @@ void Player_UpdateObjectPush(struct PlayerPushState *p)
                 Player_PlayPositionEffect(p, &p->pos, 0x100, 1, &a, 1, 0xeb);
             else
                 Player_PlayPositionEffect(p, &p->pos, 0x100, 1, &a, 0, 0xec);
-            if (SceneObjects_HasTypeTwoResource(tileIndex(&b)))
+            if (SlidingDoors_HasTypeTwoResource(tileIndex(&b)))
                 Sound_PlaySong(0x184);
             Player_SetActionPhase(p, 1);
             return;

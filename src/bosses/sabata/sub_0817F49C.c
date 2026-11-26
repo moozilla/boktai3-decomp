@@ -15,8 +15,8 @@ void Sound_PlaySong(u32);
 s32 ActorResource_ClampDecrease(void *, s32);
 s32 ActorResource_IsBelowSelectedLimit(void *, s32);
 void DamageNumberDisplay_Show(void *, int, int, void *, void *, int);
-void SabataEvent_UpdateRemovalSequence(void *);
-void SabataVolume_UpdateKnockbackLanding(void *, int);
+void Sabata_UpdateRemovalSequence(void *);
+void Sabata_UpdateKnockbackLanding(void *, int);
 
 int Sabata_ApplyPendingDamage(u8 *p)
 {
@@ -97,7 +97,7 @@ int Sabata_ApplyPendingDamage(u8 *p)
             zero = 0;
             *health = clearedHealth[0];
             SceneActorState_SetFlags(base, 2);
-            callback = (u32)SabataEvent_UpdateRemovalSequence;
+            callback = (u32)Sabata_UpdateRemovalSequence;
             state = 0xd;
             base->actionState = state;
             base->actionCallback = (void *)callback;
@@ -110,7 +110,7 @@ int Sabata_ApplyPendingDamage(u8 *p)
         if (knockback) {
             SceneActorState_SetFlags(base, 1);
             SceneActorState_StartAction(base, 1, 0, 2);
-            SceneActorState_EnterAction(base, SabataVolume_UpdateKnockbackLanding, 0xc);
+            SceneActorState_EnterAction(base, Sabata_UpdateKnockbackLanding, 0xc);
             return 1;
         }
     }

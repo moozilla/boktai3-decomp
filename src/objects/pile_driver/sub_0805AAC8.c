@@ -1,8 +1,8 @@
 #include "objects/pile_driver/pile_driver_rig.h"
 #include "player/cutscene/player_cue_sequence.h"
-void PileDriverRig_TickPrimarySprites(struct ScenePanelRig *, u32);
-void PileDriverRig_TickSecondarySprites(struct ScenePanelRig *, u32);
-void PileDriverRig_TickSprites(struct ScenePanelRig *rig, u32 palette)
+void PileDriverRig_TickPrimarySprites(struct PileDriverRig *, u32);
+void PileDriverRig_TickSecondarySprites(struct PileDriverRig *, u32);
+void PileDriverRig_TickSprites(struct PileDriverRig *rig, u32 palette)
 {
     u32 x, z;
     rig->main.position = rig->position;

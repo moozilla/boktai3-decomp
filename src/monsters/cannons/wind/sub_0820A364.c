@@ -1,6 +1,6 @@
 #include "global.h"
 #include "engine/ram.h"
-#define FanCannonManager_RemoveCannon WindCannonManager_DestroySlot
+#define WindCannonManager_RemoveCannon WindCannonManager_DestroySlot
 struct FanCannon {
     u8 unknown0[0x180];
 };

@@ -33,7 +33,7 @@ checkpoints 0022 and 0065. The logs and artifact hashes are under
 
 | Function | ROM or caller evidence |
 | --- | --- |
-| DirectionalController_SetState | r0 still holds the controller pointer. Both reported uses are calls after labels with discarded results. |
+| InteractionPrompt_SetState | r0 still holds the controller pointer. Both reported uses are calls after labels with discarded results. |
 | SceneActor_GetDirectionFlags | The mask and shift restrict the switch value to 0 through 3. Every possible value returns explicitly. |
 | ProximityVolume_TranslateBounds | Both reported callers use the filled probe and discard the return in a comma expression. |
 | ResultTutorial_MovePlayer | r0 still holds the tutorial pointer. Both reported uses are calls after switch labels. |

@@ -24,9 +24,9 @@ s32 SceneInput_TickChoice(struct AnimSprite *widget, void *resource, u8 *selecti
         Sound_PlaySong(0xDC);
         *selection = 1 - *selection;
         if (*selection)
-            Anim_SelectWidgetGlyph(widget, resource, 0x4B);
+            AnimSprite_SelectGlyph(widget, resource, 0x4B);
         else
-            Anim_SelectWidgetGlyph(widget, resource, 0x4C);
+            AnimSprite_SelectGlyph(widget, resource, 0x4C);
     }
     if (blink)
         Palette_UpdateHighlightPulse(widget->palette + 12, blink);

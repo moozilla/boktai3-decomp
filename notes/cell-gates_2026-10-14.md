@@ -6,7 +6,7 @@ Eleven existing functions have provisional names; ten use the recovered
 view directly. The initializer retains one minimized callback register hint;
 the two new behavior callbacks need none. No new runtime coverage is claimed.
 
-`include/objects/cell_gate/cell_gate.h` describes the observed 0x3C-byte task. Fields:
+`include/objects/passage_barriers/cell_gate.h` describes the observed 0x3C-byte task. Fields:
 ID18, flags1C, terrain-registration flag1D, cell1E, height20, player-inside
 counter flag22, sixteen-byte terrain registration24, script resource ID34,
 and selected callback38. The player view distinguishes position30/32/34,

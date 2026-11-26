@@ -2,9 +2,9 @@
 
 ## End state
 
-One unit: `src/npc/cutscene_actor/actor_animation_controller.c`, 98 functions, `tools/check.py
-src/npc/cutscene_actor/actor_animation_controller.c` exits 0 (30356 bytes, exact). Shared types in
-`include/npc/cutscene_actor/actor_animation_controller.h`: `ActorAnimController` (the 0xFA4-byte
+One unit: `src/ui/title/tutorial_otenko.c`, 98 functions, `tools/check.py
+src/ui/title/tutorial_otenko.c` exits 0 (30356 bytes, exact). Shared types in
+`include/ui/title/actor_animation_controller.h`: `ActorAnimController` (the 0xFA4-byte
 controller), `ActorChildSlot`/`ActorChildCallbackView` (the 16-entry child
 array, viewed from its own start and from each slot's callback field),
 `ActorSprite`, `ActorAnim`, and `InteractionPartner`.

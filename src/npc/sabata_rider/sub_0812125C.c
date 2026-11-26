@@ -1,10 +1,9 @@
 // COMPILER: old_agbcc
 #include "global.h"
 #include "engine/ram.h"
-/* RegistryA8CB_ClearManager: Clears the singleton manager pointer. */
-#define RegistryA8CB_ClearManager sub_0812125C
+/* SabataRider_ClearManager: Clears the singleton manager pointer. */
 
-void sub_0812125C(void)
+void SabataRider_ClearManager(void)
 {
     gActorManager = 0;
 }

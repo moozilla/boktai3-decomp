@@ -75,8 +75,8 @@ static inline void add(struct OrbitVector *out, struct OrbitVector *a, struct Or
     out->z = b->z + a->z;
 }
 
-s32 SceneScriptObject_Initialize(void *, u32);
-void SceneScriptTask_Update(void *);
+s32 DungeonScenery_Initialize(void *, u32);
+void DungeonScenery_Update(void *);
 void DungeonProp_Destroy(void *);
 u16 Sqrt(u32);
 s32 Div(s32, s32);

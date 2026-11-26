@@ -326,9 +326,9 @@ u8 SpreadShot_ResolveTerrain(struct SpreadShot *shot, s32 angle, u32 next)
     return 0;
 }
 
-/* SceneTerrainProbe_NoopCollisionHook: Empty hook beside terrain collision checks; subsystem and hook role are tentative */
+/* SpreadShot_NoopCollisionHook: Empty hook beside terrain collision checks; subsystem and hook role are tentative */
 
-void SceneTerrainProbe_NoopCollisionHook(void)
+void SpreadShot_NoopCollisionHook(void)
 {
 }
 
@@ -357,9 +357,9 @@ fail:
     return 0;
 }
 
-/* SceneTerrainProbe_NoopTrailHook: Empty hook following a helper that emits an effect between positions; role is tentative */
+/* SpreadShot_NoopTrailHook: Empty hook following a helper that emits an effect between positions; role is tentative */
 
-void SceneTerrainProbe_NoopTrailHook(void)
+void SpreadShot_NoopTrailHook(void)
 {
 }
 
@@ -495,7 +495,7 @@ void TerrainOverlay_QueueRemoveActor(void *);
 
 void SceneBody_Unregister(void *);
 
-void SceneTerrainProbe_DestroyEntry(struct PairSlotPool *pool, struct SpreadShot *shot)
+void SpreadShot_DestroyEntry(struct PairSlotPool *pool, struct SpreadShot *shot)
 {
     u8 *slotIndex;
     s32 index;
@@ -562,7 +562,7 @@ s32 SpreadShot_Create(struct ContactPosition *position, struct ContactPosition *
         return -1;
     pool = gPairSlotPool;
     if (!pool) {
-        pool = SceneTerrainProbe_EnsurePool();
+        pool = SpreadShot_EnsurePool();
         if (!pool)
             return -1;
     }
@@ -591,7 +591,7 @@ s32 SpreadShot_Create(struct ContactPosition *position, struct ContactPosition *
     }
     collider->collisionId = shot->body.id;
     Collider_SetPosition(collider, &shot->position, 0);
-    Collider_SetCallback(collider, SceneTerrainProbe_NoopCollisionHook, shot);
+    Collider_SetCallback(collider, SpreadShot_NoopCollisionHook, shot);
     SceneBody_Init(shot, shot->index + 0x309, &shot->position, 0, 7, shot);
     SceneBody_SetSprite(shot, &shot->sprite);
     TerrainOverlay_QueueAddActor(shot);
@@ -614,18 +614,18 @@ s32 PairSlotPool_Update(struct PairSlotPool *pool)
     return 0;
 }
 
-void SceneTerrainProbe_OnPoolDestroy(void)
+void SpreadShot_OnPoolDestroy(void)
 {
     gPairSlotPool = 0;
 }
 
-s32 SceneTerrainProbe_InitPool(struct PairSlotPool *pool)
+s32 SpreadShot_InitPool(struct PairSlotPool *pool)
 {
     gPairSlotPool = pool;
     return 0;
 }
 
-struct PairSlotPool *SceneTerrainProbe_EnsurePool(void)
+struct PairSlotPool *SpreadShot_EnsurePool(void)
 {
     struct PairSlotPool *pool;
     if (gPairSlotPool != 0)
@@ -633,8 +633,8 @@ struct PairSlotPool *SceneTerrainProbe_EnsurePool(void)
     pool = Task_Create(10, sizeof(*pool));
     if (pool != 0) {
         Task_SetCallbacks(pool, (void (*)(void *))PairSlotPool_Update,
-                          (void (*)(void *))SceneTerrainProbe_OnPoolDestroy);
-        if (SceneTerrainProbe_InitPool(pool) < 0) {
+                          (void (*)(void *))SpreadShot_OnPoolDestroy);
+        if (SpreadShot_InitPool(pool) < 0) {
             Task_Kill(pool);
             return 0;
         }
@@ -642,7 +642,7 @@ struct PairSlotPool *SceneTerrainProbe_EnsurePool(void)
     return pool;
 }
 
-void SceneTerrainProbe_ResetPool(void)
+void SpreadShot_ResetPool(void)
 {
     gPairSlotPool = 0;
 }

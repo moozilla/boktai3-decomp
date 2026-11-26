@@ -20,7 +20,7 @@ those units passed independent stock checks with the original complete extents.
 | `src/link/wireless/trade_menu/sub_08038928.c` | 1 | `bdfcdbbc8` |
 | `src/link/wireless/battle/sub_0803E998.c` | 2 | `9610d6c9f` |
 | `src/link/wireless/battle/sub_0803ED84.c` | 1 | `8e4bd9025` |
-| `src/effects/particles/proximity_emitter/sub_08051A8C.c` | 2 | `48b466289` |
+| `src/effects/particles/tether_rings/sub_08051A8C.c` | 2 | `48b466289` |
 | `src/objects/pile_driver/sub_0805AE58.c` | 2 | `b967776fb` |
 | `src/scene/actor/registry/sub_080714E4.c` | 1 | `c0e5a4f91` |
 | `src/scene/actor/reaction/sub_08080868.c` | 1 | `098c7c036` |

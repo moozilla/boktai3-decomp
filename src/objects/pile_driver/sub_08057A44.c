@@ -1,10 +1,10 @@
 #include "objects/pile_driver/pile_driver_effects.h"
-void PileDriver_AddParticle(struct ScenePanel *input, union ScenePanelPosition *position,
-                            union ScenePanelPosition *velocity, u32 lifetime, u32 renderMode)
+void PileDriver_AddParticle(struct PileDriver *input, union PileDriverPosition *position,
+                            union PileDriverPosition *velocity, u32 lifetime, u32 renderMode)
 {
-    struct ScenePanelEffectsView *panel = (void *)input;
-    struct ScenePanelParticles *particles = (void *)&panel->particleResource;
-    struct ScenePanelParticle *particle = &particles->entries[particles->cursor];
+    struct PileDriverEffectsView *panel = (void *)input;
+    struct PileDriverParticles *particles = (void *)&panel->particleResource;
+    struct PileDriverParticle *particle = &particles->entries[particles->cursor];
     particle->flags &= ~1;
     particle->position = *position;
     particle->renderMode = renderMode;

@@ -23,7 +23,7 @@ s32 Div(s32, s32);
 struct SceneVec *Player_GetEffectivePosition(s32);
 u8 *TerrainModifiers_FindCellOverride(s32, s32);
 
-static inline void FanCannon_SubtractPositions(struct SceneVec *out, const struct SceneVec *a,
+static inline void WindCannon_SubtractPositions(struct SceneVec *out, const struct SceneVec *a,
                                                const struct SceneVec *b)
 {
     out->x = a->x - b->x;
@@ -31,7 +31,7 @@ static inline void FanCannon_SubtractPositions(struct SceneVec *out, const struc
     out->z = a->z - b->z;
 }
 
-static inline s32 FanCannon_GetCellIndex(struct SceneVec *position)
+static inline s32 WindCannon_GetCellIndex(struct SceneVec *position)
 {
     s32 x = position->x >> 8;
     s32 z = position->z >> 8;
@@ -48,14 +48,14 @@ s32 WindCannon_IsPathToPlayerClear(struct FanCannon *cannon)
     s32 steps, i;
     steps = Div(cannon->distance, 0x100);
     player = Player_GetEffectivePosition(0);
-    FanCannon_SubtractPositions(&delta, player, &cannon->position);
+    WindCannon_SubtractPositions(&delta, player, &cannon->position);
     for (i = 1; i < steps; i++) {
         s32 cell;
         u8 *data;
         sample.packed.x = cannon->position.x + Div(i * delta.x, steps);
         sample.packed.y = cannon->position.y + 0x80;
         sample.packed.z = cannon->position.z + Div(i * delta.z, steps);
-        cell = FanCannon_GetCellIndex(&sample.position);
+        cell = WindCannon_GetCellIndex(&sample.position);
         data = TerrainModifiers_FindCellOverride(cell, 1);
         if (data)
             data += 4;

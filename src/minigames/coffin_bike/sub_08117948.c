@@ -7,20 +7,20 @@
 
 s32 Div(s32, s32);
 s32 Math_Atan2(s32, s32);
-void Terrain_ResolveActorMotion(struct GloveMotion *);
-void PalFade_Update(struct GloveMotion *);
-void Actor_UpdateShadowSpriteParts(struct GloveMotion *, void *);
-void ActorParticles_SpawnImpactBurst(struct GloveMotion *);
+void Terrain_ResolveActorMotion(struct CoffinBikeMotion *);
+void PalFade_Update(struct CoffinBikeMotion *);
+void Actor_UpdateShadowSpriteParts(struct CoffinBikeMotion *, void *);
+void ActorParticles_SpawnImpactBurst(struct CoffinBikeMotion *);
 void CharacterModel_UpdateAccessoryAnimations(void *);
-void ScenePool_ClampMotionSpeeds(struct GloveMotion *);
-void Actor_ClampMovementSpeed(struct GloveMotion *);
-void MotionActor_UpdateMovementAudio(struct Glove *);
-u8 LinkParticipant_IsLocallySelected(struct Glove *);
+void ScenePool_ClampMotionSpeeds(struct CoffinBikeMotion *);
+void Actor_ClampMovementSpeed(struct CoffinBikeMotion *);
+void MotionActor_UpdateMovementAudio(struct CoffinBike *);
+u8 LinkParticipant_IsLocallySelected(struct CoffinBike *);
 void PalFade_Start(void *, s32, u16, s32, s32, s32, s32, s32);
 s32 CharacterModel_GetPrimaryPaletteIndex(void *);
 void ChargeMarker_TickHold(void *, void *, u32);
 
-static inline void CoffinBike_BeginStopping(union GloveAnimationKey *animation, struct Glove *p,
+static inline void CoffinBike_BeginStopping(union CoffinBikeAnimationKey *animation, struct CoffinBike *p,
                                        u8 *entry)
 {
     u16 elapsedReset[] = {0};
@@ -28,29 +28,29 @@ static inline void CoffinBike_BeginStopping(union GloveAnimationKey *animation, 
     p->motion.animation.half[1] = elapsedReset[0];
     *entry = 0;
 }
-static inline s32 Glove_ReadHeightLimit(const s32 *limit)
+static inline s32 CoffinBike_ReadHeightLimit(const s32 *limit)
 {
     return *limit;
 }
-struct GloveFlagBinding {
+struct CoffinBikeFlagBinding {
     u16 *field;
 };
-static inline u16 *Glove_FlagsFromBinding(const struct GloveFlagBinding *binding)
+static inline u16 *CoffinBike_FlagsFromBinding(const struct CoffinBikeFlagBinding *binding)
 {
     return binding->field;
 }
-struct GloveMotionBinding {
-    struct GloveMotion *field;
+struct CoffinBikeMotionBinding {
+    struct CoffinBikeMotion *field;
 };
-static inline struct GloveMotion *Glove_MotionFromBinding(struct GloveMotionBinding binding)
+static inline struct CoffinBikeMotion *CoffinBike_MotionFromBinding(struct CoffinBikeMotionBinding binding)
 {
     return binding.field;
 }
-static inline void Glove_ClearDamageFlag(u8 *p, s32 mask)
+static inline void CoffinBike_ClearDamageFlag(u8 *p, s32 mask)
 {
     *p &= mask;
 }
-static inline void Glove_UpdateSecondaryAction(struct Glove *p, struct GloveMotion *self,
+static inline void CoffinBike_UpdateSecondaryAction(struct CoffinBike *p, struct CoffinBikeMotion *self,
                                                u16 *flags)
 {
     s32 palette;
@@ -79,7 +79,7 @@ static inline void Glove_UpdateSecondaryAction(struct Glove *p, struct GloveMoti
             }
         } else if ((self->actionKind == 1) && self->recoveryTimer) {
             self->recoveryTimer--;
-            Glove_ClearDamageFlag(&self->damageFlags, ~1);
+            CoffinBike_ClearDamageFlag(&self->damageFlags, ~1);
             self->damageTimer = 0;
             self->pendingDamage = 0;
             if (!self->recoveryTimer) {
@@ -92,7 +92,7 @@ static inline void Glove_UpdateSecondaryAction(struct Glove *p, struct GloveMoti
     }
 }
 
-static inline void Glove_UpdatePrimaryAction(struct Glove *p, struct GloveMotion *self, u32 kind)
+static inline void CoffinBike_UpdatePrimaryAction(struct CoffinBike *p, struct CoffinBikeMotion *self, u32 kind)
 {
     if (kind == 2) {
         ChargeMarker_TickHold(self, &p->model, (u32)p->input);
@@ -138,40 +138,40 @@ static inline void Glove_UpdatePrimaryAction(struct Glove *p, struct GloveMotion
     if (self->actionCooldown)
         self->actionCooldown--;
 }
-static inline struct GloveMotion *Glove_BorrowMotion(const struct GloveMotionBinding *binding)
+static inline struct CoffinBikeMotion *CoffinBike_BorrowMotion(const struct CoffinBikeMotionBinding *binding)
 {
     return binding->field;
 }
-static inline u16 Glove_DamageFlagWord(const u16 *field)
+static inline u16 CoffinBike_DamageFlagWord(const u16 *field)
 {
     return *field;
 }
-static inline struct GloveModel *Glove_ModelFromWorkOwner(void *const *object)
+static inline struct CoffinBikeModel *CoffinBike_ModelFromWorkOwner(void *const *object)
 {
-    return &((struct Glove *)*object)->model;
+    return &((struct CoffinBike *)*object)->model;
 }
-static inline void Glove_UpdateDamageAndAccessories(struct Glove *p,
-                                                    struct GloveMotionBinding binding, u16 *flags)
+static inline void CoffinBike_UpdateDamageAndAccessories(struct CoffinBike *p,
+                                                    struct CoffinBikeMotionBinding binding, u16 *flags)
 {
-    void *object = Glove_BorrowMotion(&binding);
-    if ((!p || !(Glove_DamageFlagWord(flags) & 4)) &&
-        (((struct GloveMotion *)object)->boundsFlags & 0x800)) {
+    void *object = CoffinBike_BorrowMotion(&binding);
+    if ((!p || !(CoffinBike_DamageFlagWord(flags) & 4)) &&
+        (((struct CoffinBikeMotion *)object)->boundsFlags & 0x800)) {
         u8 bit = 4;
-        ((struct GloveMotion *)object)->damageFlags |= bit;
+        ((struct CoffinBikeMotion *)object)->damageFlags |= bit;
     }
     object = p;
-    CharacterModel_UpdateAccessoryAnimations(Glove_ModelFromWorkOwner(&object));
+    CharacterModel_UpdateAccessoryAnimations(CoffinBike_ModelFromWorkOwner(&object));
 }
-void CoffinBike_UpdateStopping(struct Glove *p)
+void CoffinBike_UpdateStopping(struct CoffinBike *p)
 {
-    struct GloveMotion *self = &p->motion;
+    struct CoffinBikeMotion *self = &p->motion;
     s32 h;
     s32 dx;
     s32 dz;
     u32 a;
     u32 b;
-    struct GloveMotion *actionMotion;
-    struct GloveMotionBinding secondaryBinding;
+    struct CoffinBikeMotion *actionMotion;
+    struct CoffinBikeMotionBinding secondaryBinding;
     u32 primaryKind;
     {
         u8 *entry = &p->active;
@@ -184,15 +184,15 @@ void CoffinBike_UpdateStopping(struct Glove *p)
     {
         s32 heightLimit;
         u16 *flags;
-        struct GloveFlagBinding movementFlags;
+        struct CoffinBikeFlagBinding movementFlags;
         movementFlags.field = &p->flags;
         MotionActor_UpdateMovementAudio(p);
         ScenePool_ClampMotionSpeeds(self);
         h = self->vy + self->unkC0;
         heightLimit = 0xF000;
-        flags = Glove_FlagsFromBinding(&movementFlags);
-        if (h > Glove_ReadHeightLimit(&heightLimit))
-            h = Glove_ReadHeightLimit(&heightLimit);
+        flags = CoffinBike_FlagsFromBinding(&movementFlags);
+        if (h > CoffinBike_ReadHeightLimit(&heightLimit))
+            h = CoffinBike_ReadHeightLimit(&heightLimit);
         self->y += 0x200;
         if (self->steps > 0) {
             self->x += self->dx;
@@ -258,9 +258,9 @@ void CoffinBike_UpdateStopping(struct Glove *p)
         actionMotion = &p->motion;
         primaryKind = p->motion.primaryKind;
         secondaryBinding.field = actionMotion;
-        Glove_UpdatePrimaryAction(p, actionMotion, primaryKind);
-        Glove_UpdateSecondaryAction(p, Glove_MotionFromBinding(secondaryBinding), flags);
-        Glove_UpdateDamageAndAccessories(p, secondaryBinding, flags);
+        CoffinBike_UpdatePrimaryAction(p, actionMotion, primaryKind);
+        CoffinBike_UpdateSecondaryAction(p, CoffinBike_MotionFromBinding(secondaryBinding), flags);
+        CoffinBike_UpdateDamageAndAccessories(p, secondaryBinding, flags);
     }
     p->timer++;
 }

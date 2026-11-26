@@ -36,7 +36,7 @@ struct OrangeSpineTail {
     u8 pad14c[0x24];
     void *resource;
 };
-static inline s32 OrangeSpine_CellIndex(struct PHVec *v)
+static inline s32 PlasmaCannon_CellIndex(struct PHVec *v)
 {
     s32 x = (s16)v->x >> 8, z = (s16)v->z >> 8;
     if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
@@ -148,7 +148,7 @@ s32 PlasmaCannon_InitializeFromScript(u8 *p, void *parent)
     if (!((struct OrangeSpineTail *)p)->dead)
         PlasmaCannon_InitCollider(p);
     if (W(0x16c) && !((struct OrangeSpineTail *)p)->dead) {
-        s32 cell = OrangeSpine_CellIndex((struct PHVec *)(p + 0x40));
+        s32 cell = PlasmaCannon_CellIndex((struct PHVec *)(p + 0x40));
         TerrainModifiers_RegisterCell(p + 0x174, cell, 0, H(0x42) >> 8, 0, 1);
     }
     if (H(0x142)) {
