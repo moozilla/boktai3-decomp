@@ -2133,17 +2133,15 @@ restore:
     return 0;
 }
 
-void SceneActorCollision_InitBody(u8 *, struct ContactPosition *, struct ContactPosition *,
-                                  void (*)(void), u8 *);
+void SceneActorCollision_InitBody(struct ChaseActor *, void *, void *, void *, void *);
 
-void SceneActorCollision_InitAttack(u8 *, struct ContactPosition *, struct ContactPosition *,
-                                    void (*)(void), u32, u8 *);
+void SceneActorCollision_InitAttack(struct ChaseActor *, void *, void *, void *, u32, void *);
 
 void Mummy_OnBodyCollision(void *, void *, void *);
 
-void Mummy_OnAttackCollision(void);
+void Mummy_OnAttackCollision(u8 *, struct ContactCollider *, u8 *);
 
-void Mummy_InitCollision(u8 *p)
+void Mummy_InitCollision(struct ChaseActor *actor)
 {
     struct ContactPosition bodySize, bodyOffset, attackSize, attackOffset;
     bodySize.x = 0x20;
@@ -2152,14 +2150,14 @@ void Mummy_InitCollision(u8 *p)
     bodyOffset.x = 0;
     bodyOffset.y = 0x80;
     bodyOffset.z = 0;
-    SceneActorCollision_InitBody(p, &bodySize, &bodyOffset, Mummy_OnBodyCollision, p);
+    SceneActorCollision_InitBody(actor, &bodySize, &bodyOffset, Mummy_OnBodyCollision, actor);
     attackSize.x = 0x20;
     attackSize.y = 0x64;
     attackSize.z = 0x20;
     attackOffset.x = 0;
     attackOffset.y = 0x80;
     attackOffset.z = 0;
-    SceneActorCollision_InitAttack(p, &attackSize, &attackOffset, Mummy_OnAttackCollision, 0, p);
+    SceneActorCollision_InitAttack(actor, &attackSize, &attackOffset, Mummy_OnAttackCollision, 0, actor);
 }
 
 s32 SceneActorProfiles_FindOrAdd(u32, u32);
@@ -3332,13 +3330,6 @@ void Mummy_ResumePlayerPursuit(struct ChaseActor *actor)
 
 void SceneActor_UpdateAnimationCheckpoint(void);
 
-static inline void Mummy_ClearMotion(struct ChaseActor *actor, u32 bits)
-{
-    struct ChaseFlags40 *field = (void *)&actor->base.motionFlags;
-    s32 mask = ~bits;
-    field->bits &= mask;
-}
-
 static inline void Mummy_ClearCheckpointFlags(struct ChaseFlags40 *flags, s32 mask)
 {
     flags->bits &= mask;
@@ -3354,7 +3345,7 @@ void Mummy_ResumeRouteAfterCheckpoint(struct ChaseActor *actor)
     }
     if (actor->base.stepDone) {
         s32 contextBits = 0x800;
-        Mummy_ClearMotion(actor, 0x100);
+        SceneActorChase_ClearMotionFlagComponent(actor, 0x100);
         body->flags6F2 &= ~contextBits;
         SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0);
         Mummy_ClearCheckpointFlags((void *)&group->common.gate.flags, ~6);
@@ -3364,7 +3355,7 @@ void Mummy_ResumeRouteAfterCheckpoint(struct ChaseActor *actor)
         }
         SceneActorChase_SetControl(actor, Mummy_UpdatePlayerRoute, 0x27);
         SceneActorChase_SetBehavior(actor, 0x10);
-        if (!Chase_TryRoute(actor, group->route, &actor->base.body.position,
+        if (!SceneActorChase_TryRoute(actor, group->route, &actor->base.body.position,
                             &actor->base.body.position)) {
             SceneActorChase_SetControl(actor, SceneActorControl_OnIdle, 0);
             SceneActorChase_SetState(actor, 3, 0, 0);
@@ -3450,7 +3441,7 @@ static inline void MummyInit_ResetFlags(void *object)
 
 void Mummy_InitProfile(struct ChaseActor *actor);
 
-void Mummy_InitCollision(u8 *p);
+void Mummy_InitCollision(struct ChaseActor *actor);
 
 void Mummy_InitActionHandlers(struct ChaseActor *s);
 
@@ -3554,7 +3545,7 @@ s32 Mummy_Init(void *object)
     MonsterInit_InitializePursuitBody(arg0, &zero);
     MonsterInit_ReadPalette(&actor->chase, 0x23, 0x192);
     MummyInit_InitializePaletteRange(actor, MonsterInit_GetPaletteBase(&actor->chase) + 3, 4, 0);
-    Mummy_InitCollision(actor);
+    Mummy_InitCollision(&actor->chase);
     MonsterInit_InstallSequenceCallbacks(
         &actor->chase, Mummy_OnUpdate, Mummy_GetAnimationStepOffset, Mummy_TurnTowardRoute,
         Mummy_UpdateWalking, Mummy_UpdateIdle, Mummy_UpdateHiddenRecovery,
@@ -3593,11 +3584,13 @@ s32 Mummy_Init(void *object)
         MonsterInit_MaskColliderFlags(&actor->chase.base.colliderA, ~0x100);
     if (Script_GetKeywordValue(0x53, 0) != 0 || !MonsterInit_IsInCurrentRegion(&actor->chase))
         SceneActorPlacement_HideActor(actor, 0);
-    SceneActorAnimation_SelectDirectionalEntry(actor, 0);
+    SceneActorAnimation_SelectDirectionalEntry(&actor->chase.base, 0);
     if (MonsterInit_GetDrawableKind(&actor->chase) == 0)
         DisplaySequence_Step(actor->chase.base.drawable);
-    else
-        Anim_Step(actor->chase.base.drawable + 0x20, actor->chase.base.drawable);
+    else {
+        struct SceneActorAnimationTileDrawable *drawable = actor->chase.base.drawable;
+        Anim_Step(&drawable->tile, drawable);
+    }
     MonsterInit_ClearReceiver(&actor->chase);
     SceneActorBehavior_InstallCallbackTables(actor);
     Mummy_SetControlPreset(&actor->chase);
