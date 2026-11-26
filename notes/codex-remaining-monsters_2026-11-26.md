@@ -165,3 +165,25 @@ writes the wander duration from the random result in one expression. The
 full unit matched. The direct behavior clear in displacement recovery and
 the direct context clear in scripted entry each change one ROM instruction.
 The earlier random-table and tracking holdouts still apply.
+
+## Bee, Sword, enemy particle, and Muspell Head follow-up
+
+Bee uses the shared terrain transition at three entries and reads the
+flight context and pending-target counter directly. The plain contact
+clear loads the word before building the mask. The ROM builds the mask
+first.
+
+Sword uses the table address directly during a lunge, clears its damage
+fields with literal zeros, and accesses two counters through the existing
+defeat statistics view. A typed lifetime counter changes allocation of
+the 9999 cap. The shared child playback operation still changes 18
+instructions.
+
+Enemy particles scan occupied slots with a counted loop and link the
+native sprite when emitting. The direct lifetime flag puts mask creation
+after the load. Muspell Head's spark burst uses a counted loop, and its
+script initializer writes the sequence field directly. Narrowing the
+projectile jitter index changes the random cursor load to a halfword.
+
+All seven changed units passed stock checks. The four objects cleared
+three printed warnings and three weighted constant uses.
