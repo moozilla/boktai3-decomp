@@ -17,6 +17,7 @@ import zlib from 'node:zlib';
 import { Worker, isMainThread, parentPort, workerData, receiveMessageOnPort, MessageChannel } from 'node:worker_threads';
 import { execFileSync } from 'node:child_process';
 import { createGame } from './gameapi.mjs';
+import { runGame } from '../web/run-game.mjs';
 
 const ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname), '../..');
 const STATE_DIR = path.join(ROOT, 'build/port/agent');
@@ -815,7 +816,7 @@ function gameWorker() {
   for (;;) {
     try {
       const saveSize = boot();
-      ex.port_game_run(saveSize);
+      runGame(ex, saveSize);
       throw new Error('port_game_run returned');
     } catch (e) {
       if (!(e instanceof Restart)) {

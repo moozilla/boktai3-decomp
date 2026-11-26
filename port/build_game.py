@@ -54,6 +54,7 @@ PORT_CODE = {
 # is not game memory), the picture processor (reads game memory, writes only its own).
 RECORD_SKIP = {'tools/recorder/rec_rt.c', 'port/hw/psg.c', 'port/game/hooks.c', 'port/ppu/ppu.c', 'port/game/code_table'}
 EXPORTS = ['port_trace_map', 'port_memory_init', 'port_load_rom', 'port_game_run', 'port_game_set_solar',
+           'port_game_reset_pending', 'port_game_resume',
            'port_game_set_time', 'port_frame_count', 'port_game_save_stage', 'port_game_save_dirty',
            'port_game_save_data', 'port_game_save_size', 'port_video_set_enabled',
            # agent harness (port/agent/): hooks, calls into the game, C snippets

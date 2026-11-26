@@ -55,6 +55,13 @@ struct HookState *port_hook_state(void) { return &state; }
 uint8_t *port_hook_flags(void) { return flags; }
 uint32_t port_hook_ring(void) { return RING_BASE; }
 
+void port_hook_unwind(void)
+{
+    state.depth = 0;
+    state.inside = 0;
+    state.suspend = 0;
+}
+
 static uint32_t index_of(uint32_t address)
 {
     if (address - IWRAM_CODE < IWRAM_CODE_SIZE)

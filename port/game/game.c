@@ -11,8 +11,11 @@ int port_video_init(void);
 const uint16_t *port_video_framebuffer(void);
 int port_code_invoke(uint32_t address);
 void port_bus_enable_spin(int enabled);
+void port_timing_unwind(void);
+void port_hook_unwind(void);
 
 static uint32_t frames;
+static int reset_pending;
 static uint32_t solar_level = 232; /* the hardware model's default: no sunlight */
 static uint8_t save_stage[HW_SAVE_MAX];
 
@@ -46,6 +49,28 @@ static void frame(void)
 
 
 void port_system_call(unsigned number) { hw_system_call(number); }
+
+/* Stop the live C call stack at SWI 0. The host restores the shadow stack
+ * pointer and enters the restart export in the same wasm instance. */
+static void soft_reset(void *context)
+{
+    (void)context;
+    reset_pending = 1;
+    __builtin_trap();
+}
+
+int port_game_reset_pending(void) { return reset_pending; }
+
+int port_game_resume(void)
+{
+    if (!reset_pending) return -1;
+    reset_pending = 0;
+    port_timing_unwind();
+    port_hook_unwind();
+    port_bus_enable_spin(1);
+    AgbMain();
+    return 0;
+}
 
 /* agbcc's soft-float doubles keep the high word first (the FPA layout). The
  * newlib tables the game reads from ROM are converted once after loading.
@@ -105,6 +130,7 @@ int port_game_run(uint32_t save_size)
     swap_rom_doubles();
     port_devices_init(NULL, NULL);
     port_devices_set_game(invoke, frame, NULL);
+    port_devices_hardware()->host.reset = soft_reset;
     hw_set_solar(port_devices_hardware(), solar_level);
     /* AgbMain's Eeprom_SetCapacity(64) keeps a save already configured. */
     hw_save_configure(port_devices_hardware(), HW_SAVE_EEPROM_8K);

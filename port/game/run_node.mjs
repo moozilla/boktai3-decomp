@@ -7,6 +7,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import zlib from 'node:zlib';
+import { runGame } from '../web/run-game.mjs';
 
 const args = Object.fromEntries(process.argv.slice(2).reduce((acc, a, i, all) => {
   if (a.startsWith('--')) acc.push([a.slice(2), all[i + 1] && !all[i + 1].startsWith('--') ? all[i + 1] : '1']);
@@ -111,7 +112,7 @@ if (args.save) {
   saveSize = save.length;
 }
 try {
-  const r = ex.port_game_run(saveSize);
+  const r = runGame(ex, saveSize);
   console.log('port_game_run returned', r);
 } catch (e) {
   if (!(e instanceof Stop)) {
