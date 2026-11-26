@@ -76,12 +76,11 @@ def _sources(root: Path, skip: str | None = None):
                 yield identity, target, not is_upstream(path)
 
 
-@functools.lru_cache(maxsize=2)
-def _counts(sources):
+def _sum_counts(sources, scan_file):
     defs: dict[str, int] = {}
     uses: dict[str, int] = {}
     for identity, _, count_defs in sources:
-        defined, calls = _scan_file(*identity)
+        defined, calls = scan_file(*identity)
         if count_defs:
             for name in defined:
                 defs[name] = defs.get(name, 0) + 1
@@ -90,40 +89,78 @@ def _counts(sources):
     return defs, uses
 
 
+@functools.lru_cache(maxsize=2)
+def _counts(sources):
+    return _sum_counts(sources, _scan_file)
+
+
+def _write_cache(cache, document):
+    temporary = None
+    try:
+        with NamedTemporaryFile("w", dir=cache.parent, delete=False) as stream:
+            temporary = Path(stream.name)
+            json.dump(document, stream, separators=(",", ":"))
+        temporary.replace(cache)
+        temporary = None
+    except OSError:
+        pass
+    finally:
+        if temporary is not None:
+            with suppress(OSError):
+                temporary.unlink()
+
+
+def _file_counts(cache, sources, version):
+    """Reuse scans for unchanged files when the aggregate census misses."""
+    previous = {}
+    try:
+        saved = json.loads(cache.read_text())
+        if saved["version"] == version and isinstance(saved["files"], dict):
+            previous = saved["files"]
+    except (OSError, ValueError, KeyError, TypeError):
+        pass
+    files = {}
+
+    def scan_file(path, *identity):
+        record = previous.get(path)
+        if (isinstance(record, dict) and record.get("identity") == list(identity)
+                and isinstance(record.get("defined"), list)
+                and all(isinstance(name, str) for name in record["defined"])
+                and _valid_counts(record.get("calls"))):
+            files[path] = record
+            return record["defined"], record["calls"].items()
+        defined, calls = _scan_file(path, *identity)
+        files[path] = {"identity": identity, "defined": sorted(defined), "calls": dict(calls)}
+        return defined, calls
+
+    counts = _sum_counts(sources, scan_file)
+    _write_cache(cache, {"version": version, "files": files})
+    return counts
+
+
+def _valid_counts(counts):
+    return isinstance(counts, dict) and all(type(n) is int and n > 0 for n in counts.values())
+
+
 def _census(root, sources):
     cache = root / "build" / "statement-macros.json"
-    cache_enabled = cache.parent.is_dir()
-    if cache_enabled:
-        fingerprint = hashlib.sha256(Path(__file__).read_bytes())
-        for source in sources:
-            fingerprint.update(repr(source).encode())
-        key = fingerprint.hexdigest()
-        try:
-            saved = json.loads(cache.read_text())
-            defs, uses = saved["definitions"], saved["uses"]
-            if saved["fingerprint"] == key and all(
-                isinstance(counts, dict) and all(type(n) is int and n > 0 for n in counts.values())
-                for counts in (defs, uses)
-            ):
-                return defs, uses
-        except (OSError, ValueError, KeyError, TypeError):
-            pass
+    if not cache.parent.is_dir():
+        return _counts(sources)
+    fingerprint = hashlib.sha256(Path(__file__).read_bytes())
+    version = fingerprint.hexdigest()
+    for source in sources:
+        fingerprint.update(repr(source).encode())
+    key = fingerprint.hexdigest()
+    try:
+        saved = json.loads(cache.read_text())
+        defs, uses = saved["definitions"], saved["uses"]
+        if saved["fingerprint"] == key and _valid_counts(defs) and _valid_counts(uses):
+            return defs, uses
+    except (OSError, ValueError, KeyError, TypeError):
+        pass
 
-    defs, uses = _counts(sources)
-    if cache_enabled:
-        temporary = None
-        try:
-            with NamedTemporaryFile("w", dir=cache.parent, delete=False) as stream:
-                temporary = Path(stream.name)
-                json.dump({"fingerprint": key, "definitions": defs, "uses": uses}, stream)
-            temporary.replace(cache)
-            temporary = None
-        except OSError:
-            pass
-        finally:
-            if temporary is not None:
-                with suppress(OSError):
-                    temporary.unlink()
+    defs, uses = _file_counts(cache.with_name("statement-macros-files.json"), sources, version)
+    _write_cache(cache, {"fingerprint": key, "definitions": defs, "uses": uses})
     return defs, uses
 
 

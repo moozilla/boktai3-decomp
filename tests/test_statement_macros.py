@@ -63,7 +63,7 @@ class StatementMacros(unittest.TestCase):
         path = self.root / "src/fn/extra.c"
         path.write_text("void t(void) { CALL(x); }")
         self.assertIn("BUMP", sm.single_use_names(self.root))
-        with patch.object(sm, "_counts", side_effect=AssertionError("unexpected rescan")):
+        with patch.object(sm, "_file_counts", side_effect=AssertionError("unexpected rescan")):
             self.assertIn("BUMP", sm.single_use_names(self.root))
 
         path.write_text("void t(void) { BUMP(x); }")
@@ -71,13 +71,26 @@ class StatementMacros(unittest.TestCase):
         path.unlink()
         self.assertIn("BUMP", sm.single_use_names(self.root))
 
+    def test_disk_file_cache_scans_only_changed_sources(self):
+        (self.root / "build").mkdir()
+        path = self.root / "src/fn/a.c"
+        self.assertIn("BUMP", sm.single_use_names(self.root))
+        self.assertNotIn("DELTAS", sm.single_use_names(self.root))
+        path.write_text(path.read_text().replace("DELTAS", "BUMP"))
+        sm._scan_file.cache_clear()
+        with patch.object(sm, "_scan_file", wraps=sm._scan_file) as scan:
+            names = sm.single_use_names(self.root)
+        self.assertNotIn("BUMP", names)
+        self.assertIn("DELTAS", names)
+        self.assertEqual([Path(call.args[0]) for call in scan.call_args_list], [path.resolve()])
+
     def test_corrupt_disk_counts_are_rebuilt(self):
         build = self.root / "build"
         build.mkdir()
         cache = build / "statement-macros.json"
         cache.write_text("{")
         self.assertIn("BUMP", sm.single_use_names(self.root))
-        with patch.object(sm, "_counts", side_effect=AssertionError("unexpected rescan")):
+        with patch.object(sm, "_file_counts", side_effect=AssertionError("unexpected rescan")):
             self.assertIn("BUMP", sm.single_use_names(self.root))
 
     def test_draft_replacing_its_own_file(self):
@@ -92,7 +105,7 @@ class StatementMacros(unittest.TestCase):
         (self.root / "src/fn/b.c").unlink()
         self.assertIn("DELTAS", sm.single_use_names(self.root))
 
-        with patch.object(sm, "_counts", side_effect=AssertionError("unexpected rescan")):
+        with patch.object(sm, "_file_counts", side_effect=AssertionError("unexpected rescan")):
             self.assertEqual(sm.single_use_in("void a(void) { DELTAS(x, y); }", duplicate, self.root),
                              ["DELTAS"])
             once = self.root / "src/fn/once.c"
@@ -103,7 +116,7 @@ class StatementMacros(unittest.TestCase):
         path = self.root / "src/fn/once.c"
         (self.root / "src/fn/alias.c").symlink_to(path)
         self.assertNotIn("BUMP", sm.single_use_names(self.root))
-        with patch.object(sm, "_counts", side_effect=AssertionError("unexpected rescan")):
+        with patch.object(sm, "_file_counts", side_effect=AssertionError("unexpected rescan")):
             self.assertEqual(sm.single_use_in(ONCE, path, self.root), ["BUMP"])
         path.unlink()
         self.assertEqual(sm.single_use_in(ONCE, path, self.root), ["BUMP"])
