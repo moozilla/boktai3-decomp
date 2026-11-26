@@ -1,0 +1,42 @@
+{
+  "0AD8": {
+    "role": "command",
+    "note": "Queues a command on the terrain overlay's existing actor"
+  },
+  "377D": {
+    "requires": [{"global": "gRegionActorPool", "creator": "C60F"}]
+  },
+  "4631": {
+    "role": "command",
+    "note": "Removes active effects from a supplied manager"
+  },
+  "4E69": {
+    "existing": "gSceneEventDispatchState"
+  },
+  "62C5": {
+    "requires": [{"global": "gSceneIndicators", "creator": "BCD2"}]
+  },
+  "7BBC": {
+    "existing": "gTileAnimation"
+  },
+  "7F5E": {
+    "stageFixture": {"scene": 2147, "entrance": 1, "story": 185, "field": false, "coverageFrom": "SolarBank_Create"},
+    "stageUpdate": "SolarBank_OnUpdate"
+  },
+  "820B": {
+    "role": "command",
+    "note": "Looks up and toggles an existing WoodenCrate slot"
+  },
+  "8EA3": {
+    "requires": [{"global": "gSceneActorListManager", "creator": "286F"}]
+  },
+  "A4FC": {
+    "requires": [{"global": "gNamedActorManager", "creator": "A16F"}]
+  },
+  "BB34": {
+    "requires": [{"global": "gSceneActorListManager", "creator": "286F"}]
+  },
+  "BD3D": {
+    "requires": [{"global": "gSceneActorListManager", "creator": "286F"}]
+  }
+}

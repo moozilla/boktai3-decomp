@@ -2,7 +2,6 @@
 """Generate the testbench registry catalog from the same evidence as Studio."""
 import argparse
 from collections import defaultdict
-import csv
 from functools import lru_cache
 import json
 from pathlib import Path
@@ -77,7 +76,7 @@ def allocation(symbol, depth):
     if symbol not in names:
         return None
     for callee in actors.calls(names[symbol]):
-        if callee in code[names[symbol]]["name"]:
+        if callee == code[names[symbol]]["name"]:
             continue
         found = allocation(callee, depth - 1)
         if found:
@@ -88,6 +87,7 @@ def allocation(symbol, depth):
 def build():
     calls = collect_calls()
     schemas = gcloptions.registry_schemas()
+    contexts = json.loads((HERE / "contexts.json").read_text())
     entries = []
     for a in actors.actors():
         key = a["key"]
@@ -117,10 +117,11 @@ def build():
             if signature not in variants:
                 variants[signature] = recipe
         recipes = sorted(variants.values(), key=lambda r: (len(r["unresolved"]), r["scene"] is None, -len(r["options"]), r["proc"]))
-        entries.append(dict(key=key, name=names[0], aliases=names[1:], callback=fn, address=a["callback"],
+        entry = dict(key=key, name=names[0], aliases=names[1:], callback=fn, address=a["callback"],
                             init=a["loader_name"] or fn, role=role, allocation=allocator,
                             parameters=parameters, scenes=sorted({s for _, ss in observations for s in ss}),
-                            procedures=sorted({r["proc"] for r, _ in observations}), recipes=recipes[:3]))
+                            procedures=sorted({r["proc"] for r, _ in observations}), recipes=recipes[:3])
+        entries.append(entry | contexts.get(key, {}))
     entries.extend(json.loads((HERE / "native.json").read_text()))
     return {"version": 1, "entries": entries}
 
@@ -138,7 +139,7 @@ def main():
             sys.exit("catalog.json is stale. Regenerate with tools/testbench/catalog.py")
     else:
         output.write_text(new)
-    print(f'{sum(e["role"] == "spawn" for e in data["entries"])} candidate creators and {len(data["entries"])} registry entries')
+    print(f'{sum(e["role"] == "spawn" for e in data["entries"])} candidate creators across {len(data["entries"])} catalog entries')
 
 
 if __name__ == "__main__":

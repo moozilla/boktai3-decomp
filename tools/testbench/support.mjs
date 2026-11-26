@@ -27,7 +27,8 @@ export function actorEntry(name) {
 
 const items = readCsv(path.join(root, 'data/items.csv')).slice(1);
 export function itemId(category, name) {
-  const label = normalize(name === 'Solar Nut' ? 'Solar Fruit' : name);
+  const value = normalize(name);
+  const label = value === 'solarnut' ? 'solarfruit' : value;
   const item = items.find(([kind, id, , jp, en]) => kind === category &&
     (typeof name === 'number' ? parseInt(id, 16) === name : [jp, en].some(value => normalize(value) === label)));
   if (!item) throw new Error(`Unknown ${category} "${name}"`);

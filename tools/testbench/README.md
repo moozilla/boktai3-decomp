@@ -36,7 +36,7 @@ export default scenario({ empty: true, sun: 6, time: '14:00',
   equip: { sword: 'Gradius', lens: 'Flame' }, items: { 'Solar Fruit': 3 },
 }, function* (s) {
   const { x, y, z } = s.player.position;
-  const ghoul = s.spawn('Ghoul', { x: x + 95, y, z });
+  const ghoul = s.spawn('Ghoul', { x: x + 96, y, z });
   s.expect(ghoul.hp).equals(ghoul.maxHp);
   yield s.press('b', 4);
   yield s.run(60);
@@ -55,20 +55,24 @@ and typed reads are synchronous.
 | `scenario({ save, scene, entrance, story, flags }, body)` | Use a battery save or checkpoint `.sgm` and write the requested scene, entrance and saved flags into a checksummed copy. The game still runs that scene's startup script. |
 | `empty: true` | Use Sealed Prison scene 2776, entrance 7, story 25. The fixture starts with no ambient registry enemies. It retains native geometry, exits and the field managers. |
 | `stage: 'warp'` | Continue the base save, set persistent variables, call the game's door transition, then apply local overrides. |
+| `field: false`, `coverageFrom` | Permit a scene with no player, such as a standalone panel, and optionally start coverage at a named function during scene setup. |
 | `time`, `solar`, `sun` | Fixed RTC (UTC), raw cartridge sensor (0 bright through 255 dark), or forced gauge level (0–10). `s.setSolar(raw)` records sensor changes in the replay. |
 | `equip`, `items` | Assign a sword and lens by name or ID, and add inventory items through the native inventory API. The lens is selected for the gun even when the sword is in hand. |
-| `s.spawn(name, { x, y, z, options, args, recipe })` | Create by game name, registry key or callback. `options` uses exact GCL keyword letters. Set a keyword to `null` to omit it. Provide `args` for the positional list after the registry key. |
+| `s.spawn(name, { x, y, z, options, args, recipe, id })` | Create by game name, registry key or callback. `options` uses exact GCL keyword letters. Set a keyword to `null` to omit it. Supply `args` to override the positional list after the registry key, or `id` to change the first `chara` argument. |
 | `actor.view`, `actor.base`, `actor.hp`, `actor.position` | Typed views of the concrete object and its shared base when identified. If a creator allocates several things, `actor.created` lists the observed allocations. |
 | `s.place(actor, position)`, `s.state(actor, fields)`, `s.damage(actor, amount)` | Move, write typed fields, or exercise the forced damage path. The normal attacks are available via input. |
 | `s.variable(key, index)`, `s.setVariable(key, value, index)` | Read or write a GCL storage descriptor such as `r708:0x3c:t1` or `r700:0x6e.1:t4`. |
 | `s.callproc(id, ...args)`, `s.call(symbol, ...words)`, `s.c(source, headers)` | Run a GCL procedure, call a compiled game function, or compile a C snippet with the game's prepared headers. |
+| `s.command(name, options, args)`, `yield* s.atTick(() => action())` | Run a registry command on existing game state, and schedule synchronous work at the next scheduler entry. Use the scheduler entry for creators that read EEPROM or initialize serial hardware. |
 | `s.$`, `s.typed(address, type)`, `s.allocate(type, fields)` | Access typed globals, inspect a known address and supply temporary typed argument objects. |
 | `yield* openMenu(s, name)` | Open a named pause page or instantiate a native shop, book or link display. Pause pages use controller input. The link displays use a synthetic local session. |
 | `s.expect(value, label)`, `yield* s.waitFor(test, frames, label)`, `yield* s.screenshot(name)` | Assertions, bounded waits and rendered 240 × 160 PNGs. |
 
 See [ghoul](examples/ghoul.mjs), [props and projectiles](examples/props-and-projectiles.mjs),
 [procedure and C](examples/script-and-c.mjs), [menus](examples/menu.mjs) and
-[ROM replay](examples/replay.mjs) for complete cases.
+[ROM replay](examples/replay.mjs) and [Solar Bank](examples/solar-bank.mjs)
+for complete cases. The Ghoul example checks both a normal sword hit and a
+normal hit back before forcing damage.
 
 ## Catalog and sweep
 
@@ -76,7 +80,8 @@ See [ghoul](examples/ghoul.mjs), [props and projectiles](examples/props-and-proj
 scene associations, the Studio's parameter schema, and a small set of
 observed argument recipes per key. A recipe's `unresolved` fields depend on
 the original procedure's arguments, expressions or locals. Supply those
-fields explicitly when the fixture requires them. Registry commands that
+fields explicitly when the fixture requires them. Reviewed manager and scene
+requirements come from `contexts.json`. Registry commands that
 only operate on an existing object are indexed for lookup. The sweep selects
 the candidate creators and the native pool entries with authored fixtures.
 GCL names are used where recovered. Key and function aliases cover unnamed

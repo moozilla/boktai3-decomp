@@ -58,7 +58,9 @@ test('coverage uses a per-function denominator and groups misses by unit', () =>
 test('stage equipment and flags, damage a typed Ghoul and render it', { skip: !wasm }, async () => {
   const result = passed(await example('ghoul', { rom: true }));
   assert.equal(result.value.maxHp, 80);
-  assert(result.value.after < result.value.maxHp);
+  assert(result.value.afterInput < result.value.maxHp);
+  assert(result.value.afterPlayer < result.value.playerHp);
+  assert(result.value.after < result.value.afterInput);
   assert(result.coverage.includes(0x0808e1d4));
   assert.equal(result.rom.status, 'unreproducible');
   const png = fs.readFileSync(result.artifacts[0]);
@@ -89,6 +91,12 @@ test('every menu fixture has a live update callback', { skip: !wasm }, async () 
 
 test('save and input replay agrees with the original ROM', { skip: !wasm || !harness }, async () => {
   const result = passed(await example('replay', { rom: true }));
+  assert.equal(result.rom.status, 'match', JSON.stringify(result.rom));
+});
+
+test('Solar Bank runs in its own scene and agrees with the original ROM', { skip: !wasm || !harness }, async () => {
+  const result = passed(await example('solar-bank', { rom: true }));
+  assert(result.coverage.includes(0x081bc27c));
   assert.equal(result.rom.status, 'match', JSON.stringify(result.rom));
 });
 

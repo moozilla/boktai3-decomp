@@ -36,7 +36,7 @@ function prepare(options, out) {
   if (!['save', 'warp'].includes(stage)) throw new Error('stage must be "save" or "warp"');
   const fields = Object.fromEntries(['story', 'scene', 'entrance'].filter(k => settings[k] !== undefined).map(k => [k, settings[k]]));
   const flags = Object.entries(settings.flags ?? {}).map(([key, value]) => ({ ...scriptVariable(key), value }));
-  const saveFlags = stage === 'save' ? flags.filter(f => f.bank !== 'r700') : [];
+  const saveFlags = stage === 'save' ? flags.filter(f => f.bank === 'r708' || f.bank === 'gs' && f.offset + f.size <= 0x858) : [];
   const pokes = flags.filter(f => !saveFlags.includes(f));
   let save = source;
   if (source.endsWith('.sgm') || stage === 'save' && (Object.keys(fields).length || saveFlags.length)) {
@@ -49,14 +49,17 @@ function prepare(options, out) {
   return { ...settings, save, stage, pokes, time: clock(settings.time), solar: settings.solar ?? 232 };
 }
 
-function observeAllocations(g, act) {
+function observeAllocations(g, entry, act) {
   const tasks = [], registry = [], slots = [];
+  let returned = 0;
   const pending = [];
   function allocation(result, list) {
     if (result >>> 0) list.push(result >>> 0);
   }
   const hooks = [
+    g.on(parseInt(entry.address, 16), ([result]) => { returned = result; }, { exit: true }),
     g.on('Task_Create', ([result]) => allocation(result, tasks), { exit: true }),
+    g.on('Task_LinkToPriorityList', ([address]) => allocation(address, tasks)),
     g.on('SceneActorRegistry_LinkActor', ([address]) => pending.push(address)),
     g.on('SceneActorRegistry_LinkActor', ([result]) => {
       const address = pending.pop();
@@ -66,13 +69,27 @@ function observeAllocations(g, act) {
   for (const [name, type] of [
     ['WoodenCrate_AllocateSlot', 'struct WoodenCrate'],
     ['FloorSwitch_AllocateSlot', 'struct FloorSwitch'],
+    ['Pool128_Allocate', 'struct RegionActor'],
+    ['CollisionController_FindFreeSlot', 'struct CollisionSlot'],
+    ['SceneIndicators_FindFreeSlot', 'struct SceneIndicator'],
+    ['NamedObject_AllocateSlot', 'struct NamedObject'],
+    ['SceneObjects_FindFreeSlot', 'struct SceneObject'],
   ]) {
     if (!(name in g.fn)) continue;
     hooks.push(g.on(name, ([address]) => {
-      if (address) slots.push({ address, type });
+      if (address) slots.push({ address, type: type in g.types.types ? type : 'u8[1]' });
     }, { exit: true }));
   }
-  try { return { result: act(), tasks, registry, slots }; }
+  if (['Actor_Allocate', 'Actor_LinkToManager'].every(fn => fn in g.fn)) {
+    const objects = new Set();
+    hooks.push(g.on('Actor_Allocate', ([address]) => { if (address) objects.add(address); }, { exit: true }));
+    hooks.push(g.on('Actor_LinkToManager', ([, address]) => {
+      if (!objects.has(address)) return;
+      const type = { BB34: 'struct SceneNpc', '8EA3': 'struct SceneCharacter' }[entry.key] ?? 'struct Actor';
+      slots.push({ address, type: type in g.types.types ? type : 'u8[1]' });
+    }));
+  }
+  try { return { result: act(), returned, tasks, registry, slots }; }
   finally { for (const id of hooks) g.off(id); }
 }
 
@@ -138,6 +155,19 @@ function runtime(g, host, settings, out, mutations, progress) {
     *waitFor(test, frames, description) {
       if (!(yield s.until(test, frames))) throw new FrameLimit(`Timed out waiting for ${description}`);
     },
+    *atTick(fn, frames = 90) {
+      let running = false, done = false, value, failure;
+      const id = g.on('TaskSystem_RunFrame', () => {
+        if (running || done) return;
+        running = true;
+        try { value = fn(); } catch (error) { failure = error; }
+        done = true;
+      });
+      try { yield* s.waitFor(() => done, frames, 'scheduler entry'); }
+      finally { g.off(id); }
+      if (failure) throw failure;
+      return value;
+    },
     call(name, ...args) {
       if (args.length > 12) throw new RangeError('Call supports at most 12 argument words; use a C snippet for other signatures');
       mark(`C call ${name}`);
@@ -167,9 +197,9 @@ function runtime(g, host, settings, out, mutations, progress) {
     },
     *warp(scene, entrance, frames = 600) {
       const before = s.where().scene;
-      s.callproc(945, scene, entrance, 0);
+      yield* s.atTick(() => s.callproc(945, scene, entrance, 0));
       yield s.run(40);
-      yield* s.waitFor(() => s.where().scene === scene && s.player !== null, frames,
+      yield* s.waitFor(() => s.where().scene === scene && (settings.field === false || s.player !== null), frames,
         `scene ${scene} from scene ${before}`);
       yield s.run(30);
     },
@@ -219,7 +249,7 @@ function runtime(g, host, settings, out, mutations, progress) {
       if (actor.kind === 'player') {
         g.fn.Player_SubtractLifeNonlethal(actor.view, amount);
       } else if (actor.kind === 'registry') {
-        actor.base.reactionSoundVariant = Math.min(amount, 65535);
+        actor.base.reactionSoundVariant = amount;
         g.fn.SceneActorReaction_ApplyCategoryDamage(actor.view);
       } else {
         actor.base.health = Math.max(0, actor.hp - amount);
@@ -233,6 +263,11 @@ function runtime(g, host, settings, out, mutations, progress) {
         actor.base[name] = value;
       }
     },
+    command(name, options = {}, args = []) {
+      const entry = actorEntry(name);
+      mark(`registry command ${entry.key} (${entry.name})`);
+      return reg(entry, 'command', args, options);
+    },
     spawn(name, opts = {}) {
       const entry = actorEntry(name);
       if (entry.key in nativeActors) {
@@ -242,10 +277,13 @@ function runtime(g, host, settings, out, mutations, progress) {
         progress.phase = `running ${entry.name} (${entry.key})`;
         return actor;
       }
+      for (const { global, creator } of entry.requires ?? []) {
+        if (!$[global]) s.spawn(creator);
+      }
       const recipe = opts.recipe === false ? null : entry.recipes[opts.recipe ?? 0];
       const mode = opts.mode ?? recipe?.mode ?? 'chara';
       const id = { hash: nextId++ };
-      const args = opts.args ?? (mode === 'chara' ? [id, ...(recipe?.args?.slice(1) ?? [])] : recipe?.args ?? []);
+      const args = opts.args ?? (mode === 'chara' ? [opts.id ?? recipe?.args?.[0] ?? id, ...(recipe?.args?.slice(1) ?? [])] : recipe?.args ?? []);
       const options = { ...recipe?.options, ...opts.options };
       if (entry.allocation === 'SceneActorRegistry_LinkActor') {
         options.N = opts.options?.N ?? [id];
@@ -260,7 +298,7 @@ function runtime(g, host, settings, out, mutations, progress) {
       for (const letter of Object.keys(options)) if (options[letter] === null) delete options[letter];
       mark(`registry ${entry.key} (${entry.name})`);
       progress.phase = `creating ${entry.name} (${entry.key})`;
-      const allocation = observeAllocations(g, () => reg(entry, mode, args, options));
+      const allocation = observeAllocations(g, entry, () => reg(entry, mode, args, options));
       progress.phase = `running ${entry.name} (${entry.key})`;
       const actors = allocation.registry.map(address => {
         const concrete = `struct ${entry.callback.split('_')[0]}`;
@@ -268,16 +306,19 @@ function runtime(g, host, settings, out, mutations, progress) {
         return describe(address, type, 'registry', entry);
       });
       const live = new Set(g.lib.tasks().filter(t => !t.dead).map(t => Number(t.task)));
-      actors.push(...allocation.tasks.filter(a => live.has(a)).map(address => {
+      const fallback = entry.existing && $[entry.existing];
+      const taskAddresses = [...new Set([...allocation.tasks, allocation.returned, fallback?.$addr ?? fallback])];
+      actors.push(...taskAddresses.filter(a => live.has(a)).map(address => {
         const task = g.at(address, 'struct Task');
         return describe(address, g.types.params[g.name(task.update)] ?? 'struct Task', 'task', entry);
       }));
-      actors.push(...allocation.slots.filter(a => a.type in g.types.types).map(a => describe(a.address, a.type, 'slot', entry)));
+      actors.push(...allocation.slots.map(a => describe(a.address, a.type, 'slot', entry)));
       const actor = actors.find(a => a.kind === 'registry' || a.kind === 'slot') ?? actors[0] ?? null;
       if (actor?.position && (opts.x !== undefined || opts.y !== undefined || opts.z !== undefined)) {
         s.place(actor, Object.fromEntries(['x', 'y', 'z'].filter(k => opts[k] !== undefined).map(k => [k, opts[k]])));
       }
-      if (actor) Object.assign(actor, { created: actors, allocation, recipe: recipe?.proc });
+      if (actor) Object.assign(actor, { created: actors, allocation, recipe: recipe?.proc,
+        adopted: !allocation.tasks.includes(actor.address) && actor.kind === 'task' });
       return actor;
     },
     expect(actual, label = 'value') {
@@ -321,7 +362,7 @@ function equip(s, equipment) {
     gs.unk50 = Math.max(0, assigned);
   }
   if (equipment.lens !== undefined) {
-    const id = typeof equipment.lens === 'number' ? equipment.lens : LENSES[equipment.lens.toLowerCase()];
+    const id = typeof equipment.lens === 'number' ? equipment.lens : LENSES[equipment.lens.toLowerCase().replace(/ lens$/, '')];
     if (!Number.isInteger(id) || id < 0 || id > 10) throw new Error(`Unknown lens "${equipment.lens}"`);
     let index = Array.from(gs.unk828).indexOf(id);
     if (index < 0) index = Array.from(gs.unk828).indexOf(-1);
@@ -343,7 +384,7 @@ export async function execute(definition, { out = path.join(root, 'build/testben
   const progress = { get phase() { return phase; }, set phase(value) { phase = value; onProgress({ phase, frame: session?.frame ?? 0 }); } };
   const logs = [];
   const ticks = [];
-  let session, s, value, failure, start, lastTick;
+  let session, s, value, failure, start, lastTick, startedCoverage = false;
   try {
     session = await openSession({ ...settings, name: 'testbench', print: line => {
       logs.push(line);
@@ -357,6 +398,11 @@ export async function execute(definition, { out = path.join(root, 'build/testben
     }, onBoot(g) {
       const read = stateReader(g.types);
       const memory = new DataView(session.memory.buffer);
+      if (settings.coverageFrom) g.on(settings.coverageFrom, (_args, info) => {
+        session.setCoverage(true, { clear: true });
+        session.coverageMap()[(info.addr - 0x08000000) >> 1] = 1;
+        startedCoverage = true;
+      }, { once: true });
       g.on('Input_UpdatePadStates', () => {
         ticks.push(session.frame);
         lastTick = read(memory, 0);
@@ -366,14 +412,14 @@ export async function execute(definition, { out = path.join(root, 'build/testben
     value = session.run(function* (g, host) {
       s = runtime(g, host, settings, out, mutations, progress);
       yield* g.lib.continueSave();
-      if (!s.player) throw new FrameLimit('Battery Continue did not reach a playable field');
+      if (!s.player && settings.field !== false) throw new FrameLimit('Battery Continue did not reach a playable field');
       progress.phase = 'stage';
       if (settings.stage === 'warp') {
         if (settings.story !== undefined) s.setVariable('r708:0x3c:t1', settings.story);
         for (const f of settings.pokes.filter(f => f.bank !== 'r700')) s.setStageVariable(f);
         if (settings.scene !== undefined) yield* s.warp(settings.scene, settings.entrance ?? 1);
       }
-      for (const f of settings.pokes.filter(f => f.bank === 'r700')) s.setStageVariable(f);
+      for (const f of settings.pokes.filter(f => settings.stage === 'save' || f.bank === 'r700')) s.setStageVariable(f);
       if (settings.scene !== undefined && s.where().scene !== settings.scene)
         throw new Error(`Expected scene ${settings.scene}, game reached ${s.where().scene}`);
       if (settings.sun !== undefined) {
@@ -392,7 +438,7 @@ export async function execute(definition, { out = path.join(root, 'build/testben
         for (let i = 0; i < count; i++) if (!s.call('Inventory_AddItem', id, 0)) throw new Error(`Could not add ${name}`);
       }
       start = s.where();
-      host.setCoverage(true, { clear: true });
+      if (!startedCoverage) host.setCoverage(true, { clear: true });
       progress.phase = 'scenario';
       const result = definition.body(s);
       if (!result || typeof result.next !== 'function') throw new Error('Scenario body must be a synchronous generator (function*)');

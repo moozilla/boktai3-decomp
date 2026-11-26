@@ -402,7 +402,12 @@ export function createGame(env) {
     const entry = { id: hookId++, cb, once: !!opts.once, where: typeof where === 'string' ? where : name(a) };
     h[opts.exit ? 'exit' : 'enter'].push(entry);
     hooks.set(a, h);
-    refresh();
+    if (env.refresh) env.refresh();
+    else {
+      mem();
+      bytes[flagBase + flagIndex(a)] |= opts.exit ? 2 : 1;
+      hs('active', 1);
+    }
     return entry.id;
   }
   function off(id) {

@@ -18,7 +18,7 @@ function hud(s) {
   return task && s.typed(Number(task.task), 'struct SceneHudState');
 }
 
-function linkFixture(s) {
+export function linkFixture(s) {
   // The local record/save screens need an active session and a selected record.
   // A zeroed peer count exercises the display without wireless negotiation.
   s.$.gLinkSession = s.allocate('struct AreaEffectLinkState', {
@@ -44,7 +44,7 @@ export function* openMenu(s, name) {
   const fixture = menus[name];
   if (!fixture) throw new Error(`Unknown menu ${name}`);
   if (fixture.link) linkFixture(s);
-  const actor = s.spawn(fixture.key);
+  const actor = yield* s.atTick(() => s.spawn(fixture.key));
   s.expect(actor, `${name} creator returned a live object`).truthy();
   yield s.run(10);
   const task = s.g.lib.tasks().find(t => !t.dead && t.update === fixture.update);
