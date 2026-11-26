@@ -215,7 +215,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [docs/STACKED_ACTOR.md](../docs/STACKED_ACTOR.md) | Stacked display actor (tentative identity) | *#actors #particles #assets* | 5 |
 | [docs/TERRAIN_EDGE_MARKER.md](../docs/TERRAIN_EDGE_MARKER.md) | Terrain edge marker manager (tentative identity) | *#scripts* | 4 |
 | [docs/UNIT_WORKER.md](../docs/UNIT_WORKER.md) | Subsystem unit worker | *#text* | 5 |
-| [docs/WORKER.md](../docs/WORKER.md) | Worker playbook: matching with scope | #matching #process | 18 |
+| [docs/WORKER.md](../docs/WORKER.md) | Worker playbook: matching with scope | #matching #process | 19 |
 | [docs/tasks/m4a.md](../docs/tasks/m4a.md) | Task: lift the MP2K (m4a) sound library from pokeemerald | *#sound #library* | 3 |
 | [docs/tasks/relatives.md](../docs/tasks/relatives.md) | Unmatched functions with matched relatives | *#tooling* | 35 |
 | [docs/tasks/script_targets.md](../docs/tasks/script_targets.md) | Decomp targets: the code the scripts call | *#scripts #assets #tooling* | 2 |
@@ -239,6 +239,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [docs/history/2026-11-16.md](../docs/history/2026-11-16.md) | 2026-11-16 | #cleanup #compiler #concessions #depin #matching #object-model #round13 #round14 #tooling | 18 |
 | [docs/history/2026-11-17.md](../docs/history/2026-11-17.md) | 2026-11-17 | #compiler #depin #matching #phase3 #round13 #round15 #structs | 3 |
 | [docs/history/2026-11-20.md](../docs/history/2026-11-20.md) | 2026-11-20 | #actors #compiler #matching #monsters #phase3 #scene #scene-actors #tooling #wireless | 2 |
+| [docs/history/2026-11-25.md](../docs/history/2026-11-25.md) | 2026-11-25 | #compiler #phase3 #tooling | 0 |
 | [docs/history/HANDOFF_2026-10-23.md](../docs/history/HANDOFF_2026-10-23.md) | Handoff: current state and how to continue | #process | 14 |
 | [docs/history/MANAGER_HANDOFF_2026-10-19.md](../docs/history/MANAGER_HANDOFF_2026-10-19.md) | Manager handoff (2026-10-19) | #process #tooling | 6 |
 | [docs/history/README.md](../docs/history/README.md) | Handoff history |  | 17 |
@@ -344,6 +345,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [notes/finish-player-cue_2026-10-30.md](../notes/finish-player-cue_2026-10-30.md) | Player cue worker batch — 2026-10-30 | #matching #player #cue #compiler | 11 |
 | [notes/finish-player_2026-10-30.md](../notes/finish-player_2026-10-30.md) | Finish-player worker batch | #matching #player #compiler #structs #cleanup #data #studio | 12 |
 | [notes/finish-scene-actors-3_2026-10-30.md](../notes/finish-scene-actors-3_2026-10-30.md) | Finish scene actors, part 3 | #matching #scene-actors #compiler #scope-gap #register-pinning #structs #data #studio | 13 |
+| [notes/flag-accessors_2026-11-25.md](../notes/flag-accessors_2026-11-25.md) | Where Boktai 3 puts the mask in a flag operation | #compiler #phase3 #tooling | 14 |
 | [notes/foundry-actor-route-behavior_2026-10-18.md](../notes/foundry-actor-route-behavior_2026-10-18.md) | Actor route and behavior foundry pass | #matching #foundry #scene-actor #route | 2 |
 | [notes/foundry-actor-stats-style_2026-10-18.md](../notes/foundry-actor-stats-style_2026-10-18.md) | Actor stats, preview palette and style foundry pass | #matching #foundry #actor-stats #scene-actor | 2 |
 | [notes/foundry-display-resources_2026-10-18.md](../notes/foundry-display-resources_2026-10-18.md) | Foundry display resource functions, 2026-10-18 | #matching #assets | 2 |
@@ -363,7 +365,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [notes/grid_attack_animation_and_targets.md](../notes/grid_attack_animation_and_targets.md) | Grid attack animation and targets | #matching #bosses | 1 |
 | [notes/grid_attack_colliders_and_palette.md](../notes/grid_attack_colliders_and_palette.md) | Grid attack colliders and palette | #matching #bosses | 0 |
 | [notes/grid_attack_initialize.md](../notes/grid_attack_initialize.md) | Grid attack initialization | #matching #bosses | 1 |
-| [notes/hard-sites_2026-11-23.md](../notes/hard-sites_2026-11-23.md) | Hard sites, 2026-11-23 | #matching #compiler #phase3 #linter | 8 |
+| [notes/hard-sites_2026-11-23.md](../notes/hard-sites_2026-11-23.md) | Hard sites, 2026-11-23 | #matching #compiler #phase3 #linter | 11 |
 | [notes/initializer-actor-embedding_2026-10-30.md](../notes/initializer-actor-embedding_2026-10-30.md) | Initializer actor containment | #matching #monster #structs | 1 |
 | [notes/interaction-marker_2026-10-14.md](../notes/interaction-marker_2026-10-14.md) | Interaction marker, 080537D0–08053D8C |  | 3 |
 | [notes/ivy-matching.md](../notes/ivy-matching.md) | Ivy (080ED914..080F0B8C): matching notes | #matching | 2 |
