@@ -17,18 +17,13 @@ struct SceneOverlayEntry {
 };
 void EnemyParticle_InitParameters(struct SceneOverlayConfig *);
 void Sprite_InitUnlinked(struct TerrainOverlayDrawable *, void *, s32);
-static inline void ClearPosition(void *dest)
-{
-    u32 zero = 0;
-    CpuSet(&zero, dest, 0x05000002);
-}
 void SceneOverlayEntry_Init(void *owner, struct SceneOverlayEntry *entry, s32 index)
 {
     struct SceneOverlayConfig *config = &entry->config;
     void *animation;
     EnemyParticle_InitParameters(config);
     entry->flags = 0;
-    ClearPosition(entry->position);
+    ZeroFill8(entry->position);
     animation = entry->animation;
     AnimData_Load(animation, config->resource);
     Sprite_InitUnlinked(&entry->drawable, animation, 1);
