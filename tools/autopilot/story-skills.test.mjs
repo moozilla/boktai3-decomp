@@ -322,6 +322,19 @@ test('the vampire model uses signed health and the source sunlight flag', () => 
   assert.deepEqual(vampireTargets(), []);
 });
 
+test('Hresvelgr is tracked by the live boss pointer and its own contact state', () => {
+  const addr = 0x02010000;
+  const actor = { health: 730, flags: 0, position: { x: 640, y: 512, z: 1920 } };
+  const g = { types: { globals: { gHresvelgr: { addr: 0x02000008 } } },
+    u32: () => addr, u16: (offset) => offset === addr + 0x318 ? 17 : 0,
+    at: () => actor, fn: { AreaEffect_IsPositionCovered: (position) => Number(position === addr + 0x54) } };
+  const { hresvelgrTargets } = skill('hresvelgr', g);
+  assert.deepEqual(hresvelgrTargets(), [{ addr, boss: 'Hresvelgr', health: 730, alive: true,
+    x: 640, y: 512, z: 1920, hitLock: 17, solarReactive: true }]);
+  actor.flags = 2;
+  assert.deepEqual(hresvelgrTargets(), []);
+});
+
 test('combat waits while a story script controls the player', () => {
   let scripted = true, scene = 1;
   const g = { frameNo: 1, fn: { ScriptUtility_IsControlFlagSet: () => scripted },

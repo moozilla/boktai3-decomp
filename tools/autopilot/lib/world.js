@@ -767,7 +767,7 @@ exports.fightTargets = () => {
     ignored = new Set();
   }
   // The scene heap can give a later enemy the same address.
-  const scripted = exports.barrierTargets().concat(exports.vampireTargets());
+  const scripted = exports.barrierTargets().concat(exports.vampireTargets(), exports.hresvelgrTargets());
   const reg = scripted.concat(exports.enemies().filter((e) => e.alive && !ignored.has(e.addr) &&
     !scripted.some((actor) => actor.addr === e.addr)));
   const owners = new Set(reg.map((e) => e.addr));
