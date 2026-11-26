@@ -126,11 +126,6 @@ void Golem_UpdateChargeStop(void);
 
 void Golem_UpdateChargeRecovery(void);
 
-struct GolemChargeBounds {
-    u8 unknown0[0x1C];
-    struct ContactPosition home;
-};
-
 static inline u8 Golem_HasRouteFlag(const struct Golem *body, u32 flag)
 {
     return SceneActorChase_Test(body->flags628, flag);
@@ -173,7 +168,7 @@ static inline void Golem_TurnAway(struct Golem *body)
         Golem_SetBehavior(body, 3);
         return;
     }
-    body->target69C = ((struct GolemChargeBounds *)((struct ChaseActor *)body)->group.route)->home;
+    body->target69C = ((struct ChaseRouteProbe *)body->chase.group.route)->destination;
     {
         void *target = Golem_UpdateChargeRecovery;
         SceneActorChase_SetControl(body, target, 0x26);
@@ -439,19 +434,19 @@ charge: {
 
 static inline s32 CanCharge(void *ctx)
 {
-    u8 *body = ctx;
-    u8 *pos = body + 0x50;
+    struct Golem *body = ctx;
+    u8 *pos = (u8 *)body + 0x50;
     u8 ready;
-    if (!((struct Golem *)body)->chase.base.tracking.target)
+    if (!body->chase.base.tracking.target)
         return 0;
     ready = 0;
-    if (((struct Golem *)body)->chase.base.paletteOffset == 0) {
-        if (((struct Golem *)body)->charge688 > 399)
+    if (body->chase.base.paletteOffset == 0) {
+        if (body->charge688 > 399)
             ready = 1;
-    } else if (((struct Golem *)body)->charge688 > 199)
+    } else if (body->charge688 > 199)
         ready = 1;
-    if (ready && *(u32 *)(body + 0xF0) < *(u32 *)(body + 0xF8) &&
-        sub_0821D4F0(pos + 0xC, *(u8 **)(body + 0xDC) + 0xC, 10, 256))
+    if (ready && body->chase.base.tracking.distance < body->chase.base.tracking.limit &&
+        sub_0821D4F0(pos + 0xC, &body->chase.base.tracking.target->position, 10, 256))
         return 1;
     return 0;
 }
