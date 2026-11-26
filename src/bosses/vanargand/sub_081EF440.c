@@ -3,7 +3,7 @@
 // `self`, a copy of p made at entry, keeps its own register in the phase checks
 // (spellings.sp_param_alias). With p alone the two phase branches end alike and
 // are cross-jumped into one tail.
-struct Slot7Motion {
+struct VanargandHeadMotion {
     u8 pad0[0xAE];
     u8 phase, reset, entered;
     u8 padB1[0xC4 - 0xB1];
@@ -15,15 +15,15 @@ struct Slot7Motion {
 };
 extern void *gUnk_08613DA8[];
 s32 Callback_InvokeActor(void *, void *);
-static inline void BeginPhase(struct Slot7Motion *p, s32 phase)
+static inline void BeginPhase(struct VanargandHeadMotion *p, s32 phase)
 {
     p->phase = phase;
     p->timer = 0;
     p->entered = 1;
 }
-void VanargandHead_UpdateMotionPhase(struct Slot7Motion *p)
+void VanargandHead_UpdateMotionPhase(struct VanargandHeadMotion *p)
 {
-    struct Slot7Motion *self = p;
+    struct VanargandHeadMotion *self = p;
     if (p->reset)
         BeginPhase(p, 1);
     Callback_InvokeActor(p, gUnk_08613DA8[p->phase]);

@@ -529,7 +529,7 @@ typedef struct BurstVec {
 extern const BurstVec gUnk_08604D84[];
 u16 Sqrt(u32);
 s32 Div(s32, s32);
-void AnimatedParticles_EmitBurst(void *, s32, s32, s32, s32, s32, s32, s32);
+void ImpactBurst_EmitBurst(void *, s32, s32, s32, s32, s32, s32, s32);
 void TransientSpriteEffects_Spawn(int, int, void *, void *, int, int);
 
 /* Emit particles away from a point above the center of the burst. */
@@ -563,7 +563,7 @@ void sub_08022878(BurstVec *p)
         pos.y = (s16)(p->y + gUnk_08604D84[i].y - 16) + (BurstRandom(data) & 0x1f);
         pos.z = (s16)(p->z + gUnk_08604D84[i].z - 16) + (BurstRandom(data) & 0x1f);
         data = &pos;
-        AnimatedParticles_EmitBurst(data, 1, 0, 0x40, 0xc, 0xc, 4, 4);
+        ImpactBurst_EmitBurst(data, 1, 0, 0x40, 0xc, 0xc, 4, 4);
         vel.x = pos.x - center.x;
         vel.y = pos.y - center.y;
         vel.z = pos.z - center.z;

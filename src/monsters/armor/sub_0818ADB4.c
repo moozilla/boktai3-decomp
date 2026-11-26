@@ -36,7 +36,7 @@ void SceneBody_Unregister(void *);
 void Anim_Remove(void *);
 void SceneMessages_UnregisterReceiver(void *);
 
-static inline void Armor6_ClearCallback(struct Armor6CallbackSlot *slot)
+static inline void Armor_ClearCallback(struct Armor6CallbackSlot *slot)
 {
     slot->active = 0;
     if (slot->destroy) {
@@ -48,12 +48,12 @@ static inline void Armor6_ClearCallback(struct Armor6CallbackSlot *slot)
 s32 Armor_Destroy(struct Armor6 *actor)
 {
     s32 i;
-    Armor6_ClearCallback(&actor->slot650);
-    Armor6_ClearCallback(&actor->slots350[0]);
-    Armor6_ClearCallback(&actor->slots350[1]);
-    Armor6_ClearCallback(&actor->slots350[2]);
+    Armor_ClearCallback(&actor->slot650);
+    Armor_ClearCallback(&actor->slots350[0]);
+    Armor_ClearCallback(&actor->slots350[1]);
+    Armor_ClearCallback(&actor->slots350[2]);
     for (i = 0; i < 9; i++) {
-        Armor6_ClearCallback(&actor->slots410[i]);
+        Armor_ClearCallback(&actor->slots410[i]);
     }
     Armor_DestroySpriteColliders(actor->componentB58);
     ScaledShadow_Destroy(actor->shadow);

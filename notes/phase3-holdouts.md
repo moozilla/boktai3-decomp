@@ -8,7 +8,7 @@ what was tried, and the next idea.
 
 ## field-effects
 
-### Scene_SpawnDirectionalDust (src/objects/scene_objects/scene_object.c, 08004B64): resolved
+### Scene_SpawnDirectionalDust (src/objects/puzzle_blocks.c, 08004B64): resolved
 
 Resolved without concessions by the dp-field Codex pass; see
 [cx-dp-field_2026-11-13.md](cx-dp-field_2026-11-13.md). The earlier investigation follows.
@@ -25,7 +25,7 @@ The pinned version gets z's RMW from a union of words plus FIRST/LAST macros. Ne
 the struct the particle really has at that offset (a packed `u32` position word written whole by
 its siblings) and recover it in `include/`.
 
-### Scene_TryStepDown (src/objects/scene_objects/scene_object.c, 08004CE4): deferred
+### Scene_TryStepDown (src/objects/puzzle_blocks.c, 08004CE4): deferred
 
 Draft: `notes/phase3-drafts/field-effects/Scene_TryStepDown.c` (42 ROM / 40 draft insns differ,
 allocation only). Fixed so far: parameters used directly (no `actor = input` copy) and the
@@ -61,7 +61,7 @@ the copy): an early `savedActor = 0`/`-1` or `index = 0` at the top, `savedActor
 extended block starts at function entry, so no mention can come before it; the copy needs a last
 use past the block end (the loop label at `active`), and that use would merge the r5 copy instead.
 
-### DirectionalController_CheckRemaining (src/objects/directional_controller.c, 080098CC): resolved
+### DirectionalController_CheckRemaining (src/objects/interaction_prompts.c, 080098CC): resolved
 
 Resolved by the dp-field Codex pass: the accepted branch returns without a value (fact 160), preserving the call result in hard r0. Both concessions are removed.
 
@@ -162,7 +162,7 @@ Next idea: the original probably had the constant inside the "first sample" rand
 form where the constant isn't a REG_EQUIV (so the live length isn't multiplied), or where angle's
 priority drops below setup's.
 
-### sub_0801404C (ParticleGroup_UpdateBouncing, src/effects/particles/groups/sub_0801404C.c): deferred
+### sub_0801404C (ParticleGroup_UpdateBouncing, src/effects/particles/impact_fragments/sub_0801404C.c): deferred
 
 Draft: `notes/phase3-drafts/field-effects/sub_0801404C.c` (38 ROM / 40 draft; with the four
 barriers simply removed it is 45 / 51). `ParticleRandom_ReadSample(table)` in place of
@@ -175,7 +175,7 @@ REG_EQUIV table unallocated and rematerialized). Still open, in order:
   `sprite` (g + 20) is a stack slot in the draft and sb in the ROM; gRandomIndex's address is
   sb in the draft and r8 in the ROM (`AGBCC_PRI=144:+517` helps).
 
-### ParticleGroup_UpdateFrozen (src/effects/particles/groups/sub_08014330.c, 08014330): deferred, one zero-extend
+### ParticleGroup_UpdateFrozen (src/effects/particles/impact_fragments/sub_08014330.c, 08014330): deferred, one zero-extend
 
 Draft: `notes/phase3-drafts/field-effects/ParticleGroup_UpdateFrozen.c` (3 ROM / 1 draft). There
 is no `type` variable: plain `g->type` reads at the top and in the late test. gcse PRE then
@@ -188,7 +188,7 @@ lowpart subreg of an SImode value counts, since ARM has WORD_REGISTER_OPERATIONS
 local at the top is worse (it changes the expression, so PRE stops), and so are casts on either
 test.
 
-### sub_08014634 (ParticleGroup_SpawnBouncing, src/effects/particles/groups/sub_08014634.c): deferred, rewrite started
+### sub_08014634 (ParticleGroup_SpawnBouncing, src/effects/particles/impact_fragments/sub_08014634.c): deferred, rewrite started
 
 The pinned source imitates register pressure: a `struct SpawnArgs` copy of count, options and
 position with an `asm("" : "+m")`, plus 15 pins. In the ROM those three arguments are simply
@@ -201,7 +201,7 @@ mostly register shifts). The inner loop counts down in the ROM (loop.c reversed 
 pass); the ROM keeps both `pool` (spilled, sp+0x10) and `g` (r6) and holds velocity in r8;
 `rng` is caller-saved r3 around sub_08217E40.
 
-### AnimatedParticleManager_Update (src/effects/particles/groups/sub_08015160.c, 08015160): resolved by dp-effects
+### AnimatedParticleManager_Update (src/effects/particles/impact_bursts/sub_08015160.c, 08015160): resolved by dp-effects
 
 The shared DisplaySequence_StepSprite draft now matches without concessions.
 Writing p->timer++ in each playback-result branch gives p the extra references
@@ -210,7 +210,7 @@ the ROM's single tail; no user label is needed. Stock whole-unit check: MATCH,
 540 bytes. The former diagnosis p:+206 was correct; the ordinary branch-tail form
 supplies its effect. The earlier field-effects draft remains as historical evidence.
 
-### AnimatedParticle_PriorityFromFlags (src/effects/particles/groups/sub_080154D0.c, 080154D0): deferred, DEBUG_NOP
+### AnimatedParticle_PriorityFromFlags (src/effects/particles/impact_bursts/sub_080154D0.c, 080154D0): deferred, DEBUG_NOP
 
 Without the `DEBUG_NOP()` it is 7 ROM / 5 draft. regmove ties `flags & 0xf000` to the
 constant's register instead of to `flags` (`AGBCC_NOTIE=13` matches). The empty loop's notes
@@ -221,7 +221,7 @@ and `result = 2` before or after.
 The dp-effects follow-up below preserves a narrow-view draft and further source hypotheses.
 No evidence was found to excuse the DEBUG_NOP concession.
 
-### AnimatedParticles_Create (src/effects/particles/groups/sub_080154EC.c, 080154EC): partial, dp-effects follow-up below
+### AnimatedParticles_Create (src/effects/particles/impact_bursts/sub_080154EC.c, 080154EC): partial, dp-effects follow-up below
 
 Draft: `notes/phase3-drafts/field-effects/AnimatedParticles_Create.c` (6 ROM / 2 draft, all four
 concessions removed). Two separate problems:
@@ -237,7 +237,7 @@ concessions removed). Two separate problems:
   gives 7 / 3 but still no copy back. Without a separate `saved` it is 101 / 124 again, so
   the second pointer is real.
 
-### FadingParticleGroup_Spawn (src/effects/particles/groups/sub_08015F60.c, 08015F60): deferred
+### FadingParticleGroup_Spawn (src/objects/hazards/falling_object_effects/sub_08015F60.c, 08015F60): deferred
 
 Draft: `notes/phase3-drafts/field-effects/FadingParticleGroup_Spawn.c` (57 ROM / 59 draft; with
 the two pins simply removed it is 64 / 66). The random read goes through
@@ -247,7 +247,7 @@ lengths; `AGBCC_PRI=table:+427` gives 43 / 45), and the sine table pointer wants
 (`AGBCC_FORCE=sine:2` gives 43 / 43). Moving the `rng` set, or dropping `rng` for the header's
 ReadSample/ReadDirectSample, is no better.
 
-### FadingParticleGroup_Update (src/effects/particles/groups/sub_08016118.c, 08016118): deferred
+### FadingParticleGroup_Update (src/objects/hazards/falling_object_effects/sub_08016118.c, 08016118): deferred
 
 Draft: `notes/phase3-drafts/field-effects/FadingParticleGroup_Update.c` (the memory barrier
 removed: 43 ROM / 43 draft; the `raw` pin is still in it). Without the barrier, cse2 reuses the
@@ -456,11 +456,11 @@ inline `do { ... } while (0)` with a body. Its loop notes still stop regmove's f
 The coordinator said to leave the scoring alone for now. These are the ones in src/ on
 2026-11-09, 161 blocks in 122 files (`function:line`):
 
-* `src/npc/cutscene_actor/actor_animation_controller.c`: Actor_ConfigureInteractionChildFromScript:4331
+* `src/ui/title/tutorial_otenko.c`: Actor_ConfigureInteractionChildFromScript:4331
 * `src/effects/screen/background_controller.c`: Background_FindMapId:385
 * `src/fn/sub_080192FC.c`: ClockEvents_Update:37
-* `src/objects/scene_objects/sub_0801F4C4.c`: SceneObject_UpdateLowering:51
-* `src/objects/scene_objects/sub_0801F5B8.c`: SceneObject_UpdateLowered:9, SceneObject_UpdateLowered:13
+* `src/objects/sliding_doors/sub_0801F4C4.c`: SceneObject_UpdateLowering:51
+* `src/objects/sliding_doors/sub_0801F5B8.c`: SceneObject_UpdateLowered:9, SceneObject_UpdateLowered:13
 * `src/fn/sub_08020A60.c`: SceneMessages_RunScript:24
 * `src/fn/sub_0802141C.c`: SceneActors_FindAvailable:21, SceneActors_FindAvailable:22
 * `src/fn/sub_0802FCA8.c`: Actor_SelectPathNodeAction:93
@@ -514,8 +514,8 @@ The coordinator said to leave the scoring alone for now. These are the ones in s
 * `src/monsters/sword/sub_080F645C.c`: Sword_UpdateDamage:56, Sword_UpdateDamage:74
 * `src/fn/sub_080FC894.c`: Axe_CopyAuxiliaryVector:15
 * `src/objects/floor_switch/sub_081004F8.c`: FloorSwitch_Release:43
-* `src/objects/named_object/sub_081029F8.c`: NamedObject_UpdatePlayerAttachment:73
-* `src/objects/named_object/sub_08103110.c`: NamedObject_CreateFromScript:209
+* `src/objects/moving_platforms/sub_081029F8.c`: NamedObject_UpdatePlayerAttachment:73
+* `src/objects/moving_platforms/sub_08103110.c`: NamedObject_CreateFromScript:209
 * `src/link/session/sub_08109040.c`: SelectionSlots_ClearValue:23
 * `src/link/selection/sub_0810B3BC.c`: SceneMenu_UpdateRecords:45
 * `src/link/records/sub_0810D60C.c`: PanelText_DrawDecimal:17
@@ -548,8 +548,8 @@ The coordinator said to leave the scoring alone for now. These are the ones in s
 * `src/fn/sub_081BD854.c`: DarkLoan_CreateHiddenDisplay:19
 * `src/fn/sub_081C0478.c`: ScenePaletteFade_BlendPaletteBanks:16
 * `src/fn/sub_081C6094.c`: sub_081C6094:24
-* `src/npc/scripted_npc/sub_081D010C.c`: sub_081D010C:76
-* `src/npc/scripted_npc/sub_081D07D8.c`: SceneNpc_EnterProjectedIdle:59
+* `src/npc/otenko/sub_081D010C.c`: sub_081D010C:76
+* `src/npc/otenko/sub_081D07D8.c`: SceneNpc_EnterProjectedIdle:59
 * `src/fn/sub_081D58B4.c`: MonsterBook_UpdateHighlightPulse:7
 * `src/fn/sub_081D71CC.c`: ScreenTransition_FadeBlendOut:26
 * `src/fn/sub_081EB8E0.c`: sub_081EB8E0:180
@@ -581,7 +581,7 @@ The coordinator said to leave the scoring alone for now. These are the ones in s
 
 ## actors
 
-### SceneObjects_ScriptLower (src/objects/scene_objects/sub_0801E998.c, 0801E998): deferred
+### SceneObjects_ScriptLower (src/objects/sliding_doors/sub_0801E998.c, 0801E998): deferred
 
 Draft: `notes/phase3-drafts/actors/SceneObjects_ScriptLower.c` (3 ROM / 3 draft insns differ,
 allocation only; a whole-file unit copy). Shape: a do-while inside `if (found < count)`, with
@@ -1187,7 +1187,7 @@ Tried:
 - a restart inline helper, and a result variable
 Next: an EQ test whose operand cse cannot record, or a label in front of the not-allowed block (it starts a new EBB).
 
-### EnemyParticle_UpdatePool (src/monsters/enemy_particle/sub_0820D2C4.c, 0820D2C4): deferred, StepSprite draft 12/16
+### EnemyParticle_UpdatePool (src/effects/particles/enemy_attacks/sub_0820D2C4.c, 0820D2C4): deferred, StepSprite draft 12/16
 
 Resolved by dp-monsters: retain the distinct sprite/state/cursor accesses while
 writing the shared stepper's ordinary C directly in the caller. This matches
@@ -1543,7 +1543,7 @@ and reload rotation. Next idea: recover a first-sample helper whose short-lived 
 use survives until combine, allowing local allocation to reserve r3 before the angle.
 No new concession or compiler override was landed.
 
-### sub_0801404C (0801404C, src/effects/particles/groups/sub_0801404C.c): partial, table barrier remains
+### sub_0801404C (0801404C, src/effects/particles/impact_fragments/sub_0801404C.c): partial, table barrier remains
 
 Removed three of four barriers. Reading coordinates through `CoordinateBits` keeps
 PRE from sharing the early signed x load with the later motion load. A local graphics
@@ -1577,7 +1577,7 @@ Persistent evidence: `build/matchsearch/sub_0801404C`; all source experiments in
 flow, or reduce table density slightly while keeping the -256 mask below it. A
 sampler or cursor helper with a useful late-eliminated copy may supply that effect.
 
-### ParticleGroup_UpdateFrozen (08014330, src/effects/particles/groups/sub_08014330.c): deferred, combine removes byte extension
+### ParticleGroup_UpdateFrozen (08014330, src/effects/particles/impact_fragments/sub_08014330.c): deferred, combine removes byte extension
 
 Best complete ordinary unit: `notes/phase3-drafts/dp-effects/ParticleGroup_UpdateFrozen.c`,
 3 ROM / 1 draft, shape 2. It preserves the earlier field-effects result: PRE creates
@@ -1605,7 +1605,7 @@ Scratch: `build/cx/work/ParticleGroup_UpdateFrozen`. Next: a genuine header/cach
 representation that makes an SI-to-QI copy with unknown upper bits before combine,
 but whose wide producer becomes the same byte load after combine. No source changed.
 
-### sub_08014634 (08014634, src/effects/particles/groups/sub_08014634.c): partial, 11 pins and one barrier removed
+### sub_08014634 (08014634, src/effects/particles/impact_fragments/sub_08014634.c): partial, 11 pins and one barrier removed
 
 The stock compiler matches the complete 664-byte unit after removing eleven of
 fifteen pins and the entry-offset barrier. Reusing an ordinary option scalar for
@@ -1651,7 +1651,7 @@ traces: `build/cx/work/sub_08014634`. Next: shorten the counter lifetime without
 extra early set, or recover the resource helper whose separate branch destinations
 survive CSE2. Then solve table equivalence and the options/count reload boundaries.
 
-### sub_08014CA4 (08014CA4, src/effects/particles/groups/sub_08014CA4.c): partial, output pin and initialization barrier removed
+### sub_08014CA4 (08014CA4, src/effects/particles/impact_fragments/sub_08014CA4.c): partial, output pin and initialization barrier removed
 
 The complete 704-byte unit matches after removing the lifetime-output pointer pin
 and the three-operand initialization barrier. A shared output pointer in the fixed
@@ -2586,7 +2586,7 @@ Additional pass-2 allocation attempts:
 
 Queue audit on 2026-11-13 found that 21 of the 26 assigned functions no longer contain a
 concession on the current branch. Their queue scores predate the cleanup already present in
-`src/npc/cutscene_actor/actor_animation_controller.c`. The five remaining functions are retained below as ordinary-C,
+`src/ui/title/tutorial_otenko.c`. The five remaining functions are retained below as ordinary-C,
 pin-free drafts; `scope.py ... pins FUNC` verified the checked-in forms match and measured each
 removal independently.
 
@@ -2646,7 +2646,7 @@ Tags: #phase3 #field #matching #compiler
 
 The matching partial moves the type calculation after the existing mask barrier.
 This removes the height-byte input barrier without changing any instruction.
-Stock `tools/check.py src/objects/scene_objects/scene_object.c` matches all 37 functions (7,236 bytes).
+Stock `tools/check.py src/objects/puzzle_blocks.c` matches all 37 functions (7,236 bytes).
 
 Best pin-free draft: `notes/phase3-drafts/dp-field/Scene_TryStepDown.c`
 (18 ROM / 20 draft differing instructions, shape 6). It reads the cell byte into
@@ -4423,7 +4423,7 @@ Tried: byte masks, longer-lived mask uses, byte-union masks, wrapper-local state
 
 Next: derive the separate narrow zero from the transition's original representation, without extending its life out of the case. The first timer pointer's displacement is a consequence of the missing local byte-zero allocation, not an independent pin requirement.
 
-### AnimatedParticle_PriorityFromFlags (080154D0, src/effects/particles/groups/sub_080154D0.c): stopped at run end, DEBUG_NOP remains
+### AnimatedParticle_PriorityFromFlags (080154D0, src/effects/particles/impact_bursts/sub_080154D0.c): stopped at run end, DEBUG_NOP remains
 
 The production source is unchanged and still passes the stock 28-byte unit check.
 Removing DEBUG_NOP gives 7 ROM / 5 draft differences: regmove ties the AND result
@@ -4462,7 +4462,7 @@ flags-side AND destination. The owner's end-of-run instruction stopped this
 item; later queue entries were not started.
 
 
-### AnimatedParticles_Create (080154EC, src/effects/particles/groups/sub_080154EC.c): partial, saved-state pin and barrier removed
+### AnimatedParticles_Create (080154EC, src/effects/particles/impact_bursts/sub_080154EC.c): partial, saved-state pin and barrier removed
 
 The complete 1176-byte unit matches after removing the saved-state operand
 barrier and register pin. Type 5 saves a branch-local `first` pointer and jumps

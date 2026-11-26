@@ -151,23 +151,23 @@ struct GridAttackActor {
 };
 
 /* The action flags at 0x9C, as the common scene actor controller keeps them. */
-static inline void GridAttack_AddFlags(struct GridAttackActor *p, u32 mask)
+static inline void NidhoggrDuel_AddFlags(struct GridAttackActor *p, u32 mask)
 {
     p->flags |= mask;
 }
 
-static inline void GridAttack_ClearFlags(struct GridAttackActor *p, u32 mask)
+static inline void NidhoggrDuel_ClearFlags(struct GridAttackActor *p, u32 mask)
 {
     p->flags &= ~mask;
 }
 
 /* Request the action animation (0xAA) the recovery pipeline plays next. */
-static inline void GridAttack_RequestAnimation(struct GridAttackActor *p, u32 animation)
+static inline void NidhoggrDuel_RequestAnimation(struct GridAttackActor *p, u32 animation)
 {
     p->requested = animation;
 }
 
-static inline u32 GridAttack_TestFlags(struct GridAttackActor *actor, u32 mask)
+static inline u32 NidhoggrDuel_TestFlags(struct GridAttackActor *actor, u32 mask)
 {
     return actor->flags & mask;
 }

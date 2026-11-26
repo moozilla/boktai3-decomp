@@ -2,10 +2,10 @@
 
 void SceneActors_DestroyTask(void);
 
-void VanargandHead_UpdateSecondaryDestroyTransition(struct Slot7Transition *actor)
+void VanargandHead_UpdateSecondaryDestroyTransition(struct VanargandHeadTransition *actor)
 {
-    if (Slot7_TakeActionEntry(actor) == TRUE) {
-        Slot7_TransitionTo(actor, SceneActors_DestroyTask);
+    if (VanargandHead_TakeActionEntry(actor) == TRUE) {
+        VanargandHead_TransitionTo(actor, SceneActors_DestroyTask);
     }
     actor->actionTimer++;
 }

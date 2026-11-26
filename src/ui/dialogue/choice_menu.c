@@ -391,8 +391,8 @@ s32 ChoiceMenu_Initialize(struct ChoiceMenu *p, void *window, s32 stringBase, s3
     position.x = 1;
     position.y = 0;
     position.z = 0;
-    Widget_InitLinked(&p->leftCursor, &p->resource, 73, 17, 0, 0, 60, &position);
-    Widget_InitLinked(&p->rightCursor, &p->resource, 74, 17, 0, 0, 60, &position);
+    AnimSprite_InitLinked(&p->leftCursor, &p->resource, 73, 17, 0, 0, 60, &position);
+    AnimSprite_InitLinked(&p->rightCursor, &p->resource, 74, 17, 0, 0, 60, &position);
     palette = p->palette;
     Memory_Copy(palette, p->leftCursor.palette, 32);
     p->leftCursor.palette = palette;

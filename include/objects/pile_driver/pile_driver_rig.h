@@ -1,6 +1,6 @@
 #ifndef GUARD_SCENE_PANEL_RIG_H
 #define GUARD_SCENE_PANEL_RIG_H
-#include "objects/pile_driver/scene_panel.h"
+#include "objects/pile_driver/pile_driver.h"
 #include "scene/collision/contact_actor.h"
 #include "engine/video/display_sequence_inline.h"
 
@@ -8,7 +8,7 @@ struct SceneRigParentView {
     u8 unknown0[0x1E];
     u8 subjectCount, activeCount;
     u8 unknown20[0xBC8];
-    struct ScenePanelSubject *subjects[4];
+    struct PileDriverSubject *subjects[4];
     u16 resourceScale;
     u8 unknownBFA[0x16];
     u8 mode;
@@ -17,24 +17,24 @@ struct SceneRigParentView {
     u16 warningSounds[4];
 };
 
-u32 PileDriverRig_IsSubjectState(struct ScenePanelRig *, u32, u32);
-void PileDriverRig_SetSubjectState(struct ScenePanelRig *, u32, u32);
-void PileDriverRig_RequestSubject(struct ScenePanelRig *, u32, u32);
-void PileDriverRig_SetState(struct ScenePanelRig *, u32);
-void PileDriverRig_RandomizeMovement(struct ScenePanelRig *);
-s32 PileDriverRig_SelectActiveSubject(struct ScenePanelRig *);
-u32 PileDriverRig_GetParentMode(struct ScenePanelRig *);
-void PileDriverRig_HideSprites(struct ScenePanelRig *);
-void PileDriverRig_ShowSprites(struct ScenePanelRig *);
-void PileDriverRig_InitMovement(struct ScenePanelRig *);
-u32 PileDriverRig_GetActiveCount(struct ScenePanelRig *);
-void PileDriverSubject_SetState(struct ScenePanelSubject *, u32);
+u32 PileDriverRig_IsSubjectState(struct PileDriverRig *, u32, u32);
+void PileDriverRig_SetSubjectState(struct PileDriverRig *, u32, u32);
+void PileDriverRig_RequestSubject(struct PileDriverRig *, u32, u32);
+void PileDriverRig_SetState(struct PileDriverRig *, u32);
+void PileDriverRig_RandomizeMovement(struct PileDriverRig *);
+s32 PileDriverRig_SelectActiveSubject(struct PileDriverRig *);
+u32 PileDriverRig_GetParentMode(struct PileDriverRig *);
+void PileDriverRig_HideSprites(struct PileDriverRig *);
+void PileDriverRig_ShowSprites(struct PileDriverRig *);
+void PileDriverRig_InitMovement(struct PileDriverRig *);
+u32 PileDriverRig_GetActiveCount(struct PileDriverRig *);
+void PileDriverSubject_SetState(struct PileDriverSubject *, u32);
 extern const s16 gUnk_086149C4[];
 void ScreenTransition_SendCommand(s32, s32, s32, s32, s32, s32, s32);
 
 /* The rig sprites' sequence step: as PlayerCue_StepSequence, but the zero-delay test masks the
  * computed delay with 255 (a constant the sprite loops hoist) instead of testing the stored byte. */
-static inline void ScenePanelRig_StepSprite(struct SceneRigSprite *sprite)
+static inline void PileDriverRig_StepSprite(struct SceneRigSprite *sprite)
 {
     struct DisplaySequenceState *state = &sprite->sequence;
     const u16 *command;

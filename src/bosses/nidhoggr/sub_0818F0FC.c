@@ -28,8 +28,7 @@ static inline void StepSequence(struct NidhoggrAnimatedSlot *owner)
     PlayerCue_StepSequence(&owner->sprite, &owner->sequence);
 }
 
-#define ScenePanelEffect_TickSpriteLifetime sub_0818F0FC
-void ScenePanelEffect_TickSpriteLifetime(struct NidhoggrAnimatedSlot *ownerArg)
+void NidhoggrEffect_TickSpriteLifetime(struct NidhoggrAnimatedSlot *ownerArg)
 {
     struct NidhoggrAnimatedSlot *owner = ownerArg;
     StepSequence(owner);

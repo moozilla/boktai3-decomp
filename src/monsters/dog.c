@@ -1052,7 +1052,7 @@ void Dog_OnItemContact(void *unused, struct ContactCollider *contact, struct Cha
     }
 }
 
-u32 SceneMovingParticle_CreateWithOptions(void *, void *, s32, s32, s32);
+u32 DebrisMote_CreateWithOptions(void *, void *, s32, s32, s32);
 
 void SceneActorAnimation_SpawnTrailAtPosition(void *position, u32 palette)
 {
@@ -1092,9 +1092,9 @@ void SceneActorAnimation_SpawnTrailAtPosition(void *position, u32 palette)
     result = &velocity;
     result->y = vertical;
     if (palette == 3)
-        SceneMovingParticle_CreateWithOptions(position, result, 60, 3, 3);
+        DebrisMote_CreateWithOptions(position, result, 60, 3, 3);
     else
-        SceneMovingParticle_CreateWithOptions(position, result, 60, 4, 3);
+        DebrisMote_CreateWithOptions(position, result, 60, 4, 3);
 }
 
 void Dog_OnSensorContact(struct ContactCollider *unused, struct ContactCollider *other,

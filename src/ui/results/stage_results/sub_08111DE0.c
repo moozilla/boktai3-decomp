@@ -17,14 +17,14 @@ struct MessagePanel {
 };
 void *ScriptProc_Start(u16, u16);
 s32 ResourceHeader_Relocate(void *, void *);
-void Widget_InitLinked(void *, void *, int, int, int, int, int, void *);
+void AnimSprite_InitLinked(void *, void *, int, int, int, int, int, void *);
 void MessagePanel_InitSprites(struct MessagePanel *p)
 {
     s32 i;
     p->proc = ScriptProc_Start(0xCB05, 0x1289);
     ResourceHeader_Relocate(p->resources, p->proc);
     for (i = 0; i < 23; i++) {
-        Widget_InitLinked(&p->sprites[i], p->resources, p->spriteIds[i], 0x10, 1, 0, 0, 0);
+        AnimSprite_InitLinked(&p->sprites[i], p->resources, p->spriteIds[i], 0x10, 1, 0, 0, 0);
         p->selections[i] = 0xFFFF;
         if (i == 5)
             p->sprites[5].visible = 0;

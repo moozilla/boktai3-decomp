@@ -39,7 +39,7 @@ void Centipede_AlignSegmentsToTerrain(struct ChaseActor *actor)
     for (i = 0; i < trail->segmentCount; i++) {
         struct TentacleAnimationSegment *segment = &trail->segments[i];
         struct ContactPosition *position = &segment->position;
-        if (TentacleSpread_Test(segment, 2) && (!TentacleSpread_Test(segment, 1))) {
+        if (CentipedeSpread_Test(segment, 2) && (!CentipedeSpread_Test(segment, 1))) {
             s32 rawHeight = Height(SceneActorTerrain_GetCellIndex(position), position);
             s32 height = rawHeight;
             s16 y;

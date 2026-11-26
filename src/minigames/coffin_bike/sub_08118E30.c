@@ -7,21 +7,21 @@
 
 s32 Div(s32, s32);
 s32 Math_Atan2(s32, s32);
-void Terrain_ResolveActorMotion(struct GloveMotion *);
-void PalFade_Update(struct GloveMotion *);
-void Actor_UpdateShadowSpriteParts(struct GloveMotion *, void *);
-void ActorParticles_SpawnImpactBurst(struct GloveMotion *);
+void Terrain_ResolveActorMotion(struct CoffinBikeMotion *);
+void PalFade_Update(struct CoffinBikeMotion *);
+void Actor_UpdateShadowSpriteParts(struct CoffinBikeMotion *, void *);
+void ActorParticles_SpawnImpactBurst(struct CoffinBikeMotion *);
 void CharacterModel_UpdateAccessoryAnimations(void *);
-void ScenePool_ClampMotionSpeeds(struct GloveMotion *);
-void Actor_ClampMovementSpeed(struct GloveMotion *);
-void CoffinBike_SetAnimationKeyframes(struct Glove *, s32);
-void CoffinBike_UpdateMotion(struct Glove *);
+void ScenePool_ClampMotionSpeeds(struct CoffinBikeMotion *);
+void Actor_ClampMovementSpeed(struct CoffinBikeMotion *);
+void CoffinBike_SetAnimationKeyframes(struct CoffinBike *, s32);
+void CoffinBike_UpdateMotion(struct CoffinBike *);
 
 void ActorParticles_UpdateEmitter(void *, void *, u32);
 // confidence=low: message command one selects this recoil animation; stagger role is tentative.
-void CoffinBike_UpdateStaggerRecoil(struct Glove *p)
+void CoffinBike_UpdateStaggerRecoil(struct CoffinBike *p)
 {
-    struct GloveMotion *self = &p->motion;
+    struct CoffinBikeMotion *self = &p->motion;
     s32 h, dx, dz;
     u32 a, b;
     if (p->active) {

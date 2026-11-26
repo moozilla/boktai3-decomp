@@ -3,7 +3,7 @@ void ScenePool_UpdateSpeedPulse(struct ScenePoolActor *, struct ScenePoolEntry *
                                 const struct ScenePoolSpeedBounds *);
 extern const struct ScenePoolSpeedBounds gUnk_086058B4[];
 s32 Player_GetHorizontalVelocity(s32);
-void NativeEffect_CreateFromProfile(struct ScenePoolVec32 *, s32, struct ScenePoolVec32 *, void *,
+void ProjectileEffect_CreateFromProfile(struct ScenePoolVec32 *, s32, struct ScenePoolVec32 *, void *,
                                     s32, s32, s32, s32);
 s32 ScenePool_StateEmitBursts(void *manager, struct ScenePoolActor *actor,
                               struct ScenePoolEntry *entry)
@@ -60,7 +60,7 @@ s32 ScenePool_StateEmitBursts(void *manager, struct ScenePoolActor *actor,
                 velocity.y = 0;
                 velocity.z = 0;
                 level = actor->restrictionMetric - 0x16000;
-                NativeEffect_CreateFromProfile(&actor->position, level, &velocity,
+                ProjectileEffect_CreateFromProfile(&actor->position, level, &velocity,
                                                actor->emissionProfile, 5, 0, 3, 0);
                 break;
             }
@@ -73,11 +73,11 @@ s32 ScenePool_StateEmitBursts(void *manager, struct ScenePoolActor *actor,
                 level = actor->restrictionMetric - 0x8000;
                 position = &actor->position;
                 profile = actor->emissionProfile;
-                NativeEffect_CreateFromProfile(position, level, &velocity, profile, 5, 1, 4, 0);
+                ProjectileEffect_CreateFromProfile(position, level, &velocity, profile, 5, 1, 4, 0);
                 velocity.x = Player_GetHorizontalVelocity(entry->motionPhase) + 1;
                 velocity.y = 0;
                 velocity.z = 0;
-                NativeEffect_CreateFromProfile(position, level, &velocity, profile, 5, 0, 4, 1);
+                ProjectileEffect_CreateFromProfile(position, level, &velocity, profile, 5, 0, 4, 1);
                 Anim_SetKeyframes((u8 *)actor + 0x660, (u8 *)actor + 0x7e0, 30, 2, 0);
                 actor->unknown308 = 60;
                 break;

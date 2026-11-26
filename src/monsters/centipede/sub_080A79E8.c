@@ -70,7 +70,7 @@ void Anim_SetDurationScale(void *, u32);
 void Anim_SetFrameDurationScale(void *, u32);
 void Centipede_SelectWanderRoute(void *);
 void Centipede_AdvanceMotionPhase(void *, s32);
-void sub_080A9DB0(void *, s32, s32);
+void Centipede_UpdateSegmentPositions(void *, s32, s32);
 void Centipede_UpdateOscillation(void *, s32, s32);
 static inline u8 Approach(struct ChaseActor *actor, struct SavedMotion *saved, s32 speed)
 {
@@ -125,10 +125,10 @@ void CentipedeBody_UpdateRetreat(struct ChaseActor *actor)
     {
         u16 *p = &body->routeMotionTimer;
         if (*p) {
-            sub_080A9DB0(actor, 18, 0x1000);
+            Centipede_UpdateSegmentPositions(actor, 18, 0x1000);
             --*p;
         } else
-            sub_080A9DB0(actor, 20, 0x6400);
+            Centipede_UpdateSegmentPositions(actor, 20, 0x6400);
     }
     Centipede_UpdateOscillation(actor, 120, 10);
     if ((s32)actor->base.counter2AC > 80) {

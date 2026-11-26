@@ -3,7 +3,7 @@
 #include "engine/engine.h"
 #include "player/player.h"
 #include "scene/collision/contact_actor.h"
-#include "objects/scene_objects/scene_object.h"
+#include "objects/scene_object.h"
 /* Script argument header is a packed count word; upper bits are preserved. */
 struct PlayerEventArguments {
     u32 header;

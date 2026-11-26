@@ -5,9 +5,9 @@ void SceneInput_BeginChoice(struct AnimSprite *widget, void *resource, u8 *selec
     widget->flags &= ~1;
     *selection = initial;
     if ((u8)initial)
-        Anim_SelectWidgetGlyph(widget, resource, 0x4B);
+        AnimSprite_SelectGlyph(widget, resource, 0x4B);
     else
-        Anim_SelectWidgetGlyph(widget, resource, 0x4C);
+        AnimSprite_SelectGlyph(widget, resource, 0x4C);
     if (blink)
         *blink = 0;
 }

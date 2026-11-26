@@ -210,7 +210,7 @@ end:
     return result;
 }
 
-static inline s32 RegistryE7BC_ReadOptionalValue(void)
+static inline s32 ScriptObjectPool_ReadOptionalValue(void)
 {
     s32 value;
     if (Script_GetPc())
@@ -238,19 +238,19 @@ void ScriptObjectPool_CreateFromScript(void)
     object->procedure = Script_GetKeywordValue('P', 0);
     if (!Script_SeekToKeyword('p'))
         return;
-    position.packed.x = RegistryE7BC_ReadOptionalValue();
-    position.packed.y = RegistryE7BC_ReadOptionalValue();
-    position.packed.z = RegistryE7BC_ReadOptionalValue();
+    position.packed.x = ScriptObjectPool_ReadOptionalValue();
+    position.packed.y = ScriptObjectPool_ReadOptionalValue();
+    position.packed.z = ScriptObjectPool_ReadOptionalValue();
     if (!Script_SeekToKeyword('s'))
         return;
-    extents.packed.x = RegistryE7BC_ReadOptionalValue();
-    extents.packed.y = RegistryE7BC_ReadOptionalValue();
-    extents.packed.z = RegistryE7BC_ReadOptionalValue();
+    extents.packed.x = ScriptObjectPool_ReadOptionalValue();
+    extents.packed.y = ScriptObjectPool_ReadOptionalValue();
+    extents.packed.z = ScriptObjectPool_ReadOptionalValue();
     if (!Script_SeekToKeyword('o'))
         return;
-    offset.packed.x = RegistryE7BC_ReadOptionalValue();
-    offset.packed.y = RegistryE7BC_ReadOptionalValue();
-    offset.packed.z = RegistryE7BC_ReadOptionalValue();
+    offset.packed.x = ScriptObjectPool_ReadOptionalValue();
+    offset.packed.y = ScriptObjectPool_ReadOptionalValue();
+    offset.packed.z = ScriptObjectPool_ReadOptionalValue();
     SpatialIndex_InitEntry(&object->collider, &position.coordinates, &extents.coordinates,
                            &offset.coordinates, 12, 7, 0, 6, 12, ScriptObjectPool_OnObjectComplete,
                            object);

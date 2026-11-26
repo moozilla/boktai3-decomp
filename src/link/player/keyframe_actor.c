@@ -11,7 +11,7 @@ struct BlobAE {
 
 
 
-void Widget_InitLinked(u8 *, struct BlobAE *, u32, u32, u32, u32, u32, void *);
+void AnimSprite_InitLinked(u8 *, struct BlobAE *, u32, u32, u32, u32, u32, void *);
 
 
 s32 Script_GetValue(void);
@@ -32,7 +32,7 @@ void KeyframeActor_InitKeyframeDisplay(u8 *p)
         copy = (struct BlobAE *)(p + 0x6c);
         ResourceHeader_Relocate((struct BlobAE *)(p + 0x6c), data);
         object = p + 0x8c;
-        Widget_InitLinked(p + 0x8c, (struct BlobAE *)(p + 0x6c), 0, 0x9000, 2, 0, 60, p + 0x30);
+        AnimSprite_InitLinked(p + 0x8c, (struct BlobAE *)(p + 0x6c), 0, 0x9000, 2, 0, 60, p + 0x30);
         found = Script_SeekToKeyword(0x64);
         if (found)
             p[0x548] = Script_GetValue();

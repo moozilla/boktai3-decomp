@@ -222,7 +222,7 @@ void LinkRecordPanel_InitializeWidgets(struct LinkRecordPanel *owner)
     owner->widgetScript = script;
     ResourceHeader_Relocate(&owner->widgetResource, script);
     for (i = 0; i < 7; i++) {
-        Widget_InitLinked(&owner->widgets[i], &owner->widgetResource, owner->entryValues[i], 0x10, 0, 0,
+        AnimSprite_InitLinked(&owner->widgets[i], &owner->widgetResource, owner->entryValues[i], 0x10, 0, 0,
                           0, 0);
         owner->previousValues[i] = 0xFFFF;
     }

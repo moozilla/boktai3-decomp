@@ -1,6 +1,6 @@
-#include "bosses/sabata/actor_position_effects.h"
+#include "bosses/sabata/sabata_position_effects.h"
 
-void SceneActors_InitConvergingParticles(struct ActorState *actor)
+void SceneActors_InitConvergingParticles(struct SabataActorState *actor)
 {
     struct ConvergingParticleGroup *group = &actor->convergingParticles;
     s32 index;
@@ -16,7 +16,7 @@ void SceneActors_InitConvergingParticles(struct ActorState *actor)
     group->ticks = 0;
 }
 
-void SceneActors_RemoveConvergingParticles(struct ActorState *actor)
+void SceneActors_RemoveConvergingParticles(struct SabataActorState *actor)
 {
     s32 index;
     struct ConvergingParticle *particle = actor->convergingParticles.particles;
@@ -40,7 +40,7 @@ static inline s32 scale(s32 v)
     return -((-v) >> 12);
 }
 
-void SceneActors_UpdateConvergingParticles(struct ActorState *actor)
+void SceneActors_UpdateConvergingParticles(struct SabataActorState *actor)
 {
     s32 count, index;
     if (!actor->convergingParticles.active)
@@ -76,7 +76,7 @@ static inline s32 random_value(void)
 }
 
 
-void SceneActors_SpawnConvergingParticle(struct ActorState *actor, struct ConvergingParticlePoint *pos)
+void SceneActors_SpawnConvergingParticle(struct SabataActorState *actor, struct ConvergingParticlePoint *pos)
 {
     if ((++actor->convergingParticles.ticks & 3) == 0) {
         struct ConvergingParticle *particle = &actor->convergingParticles.particles[actor->convergingParticles.next];
@@ -105,7 +105,7 @@ void SceneActors_SpawnConvergingParticle(struct ActorState *actor, struct Conver
     }
 }
 
-void SabataPosition_SetOffsetPoint(struct ActorState *actor)
+void SabataPosition_SetOffsetPoint(struct SabataActorState *actor)
 {
     actor->offsetPoint = actor->body.position;
     actor->offsetPoint.x -= 20;
@@ -113,9 +113,9 @@ void SabataPosition_SetOffsetPoint(struct ActorState *actor)
     actor->offsetPoint.z += 60;
 }
 
-void SceneActors_EmitRandomBursts(struct ActorState *actor)
+void SceneActors_EmitRandomBursts(struct SabataActorState *actor)
 {
-    struct ActorAnimationResource *graphics = &actor->graphics;
+    struct SabataActorAnimationResource *graphics = &actor->graphics;
     struct ContactPackedVector size;
     int index;
     for (index = 0; index < 2; index++) {
@@ -134,7 +134,7 @@ void SceneActors_EmitRandomBursts(struct ActorState *actor)
     }
 }
 
-static inline void ActorPosition_StartReaction(struct ActorState *actor, int id, int zero)
+static inline void SabataPosition_StartReaction(struct SabataActorState *actor, int id, int zero)
 {
     int one = 1;
     actor->active = one;
@@ -144,7 +144,7 @@ static inline void ActorPosition_StartReaction(struct ActorState *actor, int id,
     actor->triggered = one;
 }
 
-int SabataPosition_BeginReaction(struct ActorState *actor, int kind, int damage)
+int SabataPosition_BeginReaction(struct SabataActorState *actor, int kind, int damage)
 {
     struct SceneActorBody *body = &actor->body;
     int initialPhase;
@@ -155,10 +155,10 @@ int SabataPosition_BeginReaction(struct ActorState *actor, int kind, int damage)
             int state;
             actor->vitality += damage;
             actor->lastDamage = damage;
-            SabataVolume_BeginPhase(actor, 2);
+            Sabata_BeginCombatPhase(actor, 2);
             initialPhase = 0;
-            ActorPosition_StartReaction(actor, initialPhase, 0);
-            callback = SabataEvent_UpdateJitter;
+            SabataPosition_StartReaction(actor, initialPhase, 0);
+            callback = Sabata_UpdateHitJitter;
             state = 0xb;
             actor->controlPhase = state;
             actor->stateCallback = callback;
@@ -170,7 +170,7 @@ int SabataPosition_BeginReaction(struct ActorState *actor, int kind, int damage)
             break;
         }
         case 2:
-            ActorPosition_StartReaction(actor, 1, 0);
+            SabataPosition_StartReaction(actor, 1, 0);
             {
                 int rq = 0xc;
                 actor->state = rq;
@@ -189,7 +189,7 @@ int SabataPosition_BeginReaction(struct ActorState *actor, int kind, int damage)
                 u32 mask = 2;
                 actor->flags |= mask;
             }
-            ActorPosition_StartReaction(actor, 3, zero);
+            SabataPosition_StartReaction(actor, 3, zero);
             requestedState = 0xd;
             actor->state = requestedState;
         } break;
@@ -197,7 +197,7 @@ int SabataPosition_BeginReaction(struct ActorState *actor, int kind, int damage)
     return 1;
 }
 
-s32 SabataPosition_TestPath(struct ActorState *actor, struct ContactPosition *destination)
+s32 SabataPosition_TestPath(struct SabataActorState *actor, struct ContactPosition *destination)
 {
     if (Nav_IsPositionInMesh(actor->bounds, &actor->body.position, destination) &&
         NavMesh_FindRoute(actor->bounds, &actor->body.position, destination))

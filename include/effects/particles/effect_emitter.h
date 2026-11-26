@@ -2,7 +2,7 @@
 #define EFFECT_EMITTER_H
 #include "global.h"
 #include "scene/collision/contact_collider.h"
-#include "objects/scene_objects/scene_object.h"
+#include "objects/scene_object.h"
 #include "engine/task.h"
 
 // Tentative: a hovering, bobbing prop with a shadow that can be hit; when its health runs out it

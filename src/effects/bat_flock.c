@@ -2,7 +2,7 @@
 #include "engine/video/display_sequence_inline.h"
 #include "engine/math/monster_particle_random.h"
 
-static inline void BoardPiece_SelectPalette(void *resource)
+static inline void BatFlockBat_SelectPalette(void *resource)
 {
     AnimData_SelectPaletteBank(resource, 0x2D3);
 }
@@ -18,7 +18,7 @@ int BatFlockBat_Initialize(struct GroupObjects *owner, struct GroupPiece *p, int
     p->direction = 0;
     resource = &p->resource;
     AnimData_Load(resource, 0xDA6D);
-    BoardPiece_SelectPalette(resource);
+    BatFlockBat_SelectPalette(resource);
     resource->palette = owner->palette;
     sprite = &p->sprite;
     Sprite_Init(sprite, resource, 1);
@@ -152,7 +152,7 @@ static inline void addPositionAt(struct ContactPosition *d, struct ContactPositi
     dst->z += src->z;
 }
 
-static inline int BoardPieces_RandomValue(void)
+static inline int BatFlockBats_RandomValue(void)
 {
     int result;
     const u16 *table;
@@ -200,15 +200,15 @@ int BatFlockBats_StartStraightAdvance(struct GroupObjects *m, struct GroupQueue 
         p->timer = 0;
         p->direction = direction;
         if (spread != 0)
-            p->direction += Mod(BoardPieces_RandomValue(), spread);
+            p->direction += Mod(BatFlockBats_RandomValue(), spread);
         p->duration = radius0;
         polar(&r->position, p->direction, radius1);
         addPositionAt(&p->position, &r->position, &origin);
         polar(&r->target, p->direction, radius2);
         addPositionAt(&p->target, &r->target, &origin);
-        p->angle = BoardPieces_RandomValue();
+        p->angle = BatFlockBats_RandomValue();
         p->targetY = (i << 4) + p->position.y;
-        p->speed = (BoardPieces_RandomValue() & 7) + 7;
+        p->speed = (BatFlockBats_RandomValue() & 7) + 7;
         p->sprite.position = p->position;
         p->sprite.flags &= ~1;
         BatFlockBat_SetFacingAnim(m, r, 0);
@@ -263,9 +263,9 @@ int BatFlockBats_StartLaunch(struct GroupObjects *m, struct GroupQueue *q, struc
         addPositionAt(&p->position, &r->position, &origin);
         polar(&r->target, p->direction, radius2);
         addPositionAt(&p->target, &r->target, &origin);
-        p->angle = BoardPieces_RandomValue();
+        p->angle = BatFlockBats_RandomValue();
         p->targetY = (i << 4) + p->position.y;
-        p->speed = (BoardPieces_RandomValue() & 7) + 7;
+        p->speed = (BatFlockBats_RandomValue() & 7) + 7;
         p->sprite.position = p->position;
         p->sprite.flags &= ~1;
         BatFlockBat_SetFacingAnim(m, r, 0);
@@ -341,7 +341,7 @@ int BatFlockBats_StartConvergence(struct GroupObjects *m, struct GroupQueue *q,
     return 0;
 }
 
-static inline int BoardPieces_NextRandomValue(const u16 *table, u32 *index, u32 mask)
+static inline int BatFlockBats_NextRandomValue(const u16 *table, u32 *index, u32 mask)
 {
     u32 offset;
     *index = (*index + 1) & mask;
@@ -378,11 +378,11 @@ int BatFlockBats_StartActorChase(struct GroupObjects *m, struct GroupQueue *q, s
         p->direction = angle;
         {
             union RandomTableView table = {gRandomTable};
-            random = BoardPieces_NextRandomValue(table.samples, index, mask);
+            random = BatFlockBats_NextRandomValue(table.samples, index, mask);
             angle -= 16;
             p->direction = angle + (random & 31);
             p->duration = duration;
-            p->speed = (BoardPieces_NextRandomValue(table.samples, index, mask) & 7) + 7;
+            p->speed = (BatFlockBats_NextRandomValue(table.samples, index, mask) & 7) + 7;
         }
     }
     m->active = 1;
@@ -445,7 +445,7 @@ static inline struct ContactPosition *addPositionN(struct ContactPosition *d,
     return dst;
 }
 
-static inline void BoardPiece_SetState(struct GroupPiece *piece, u32 state)
+static inline void BatFlockBat_SetState(struct GroupPiece *piece, u32 state)
 {
     piece->state = state;
     piece->active = 1;
@@ -505,7 +505,7 @@ void BatFlockBat_Wander(struct GroupObjects *m, struct GroupPiece *p, int index)
     }
     BatFlockBat_SetFacingAnim(m, p, 0);
     if (p->timer > 0x5F) {
-        BoardPiece_SetState(p, 1);
+        BatFlockBat_SetState(p, 1);
     }
     p->timer++;
 }
@@ -532,7 +532,7 @@ void BatFlockBat_ApproachTarget(struct GroupObjects *m, struct GroupPiece *p, in
     dx = p->target.x - p->position.x;
     dz = p->target.z - position->z;
     if (dx * dx + dz * dz <= 0x9C3F) {
-        BoardPiece_SetState(p, 2);
+        BatFlockBat_SetState(p, 2);
     } else {
         if (p->speed == 0) {
             const u16 *table;
@@ -575,7 +575,7 @@ void BatFlockBat_ConvergeOnTarget(struct GroupObjects *m, struct GroupPiece *p, 
     dx = p->target.x - p->position.x;
     dz = p->target.z - position->z;
     if (dx * dx + dz * dz <= 0x9C3F) {
-        BoardPiece_SetState(p, 8);
+        BatFlockBat_SetState(p, 8);
     } else {
         if (p->speed == 0) {
             const u16 *table;
@@ -636,7 +636,7 @@ void BatFlockBat_ChasePlayer(struct GroupObjects *m, struct GroupPiece *p, int i
     dx = p->target.x - p->position.x;
     dz = target->z - position->z;
     if (dx * dx + dz * dz <= 0xFFF) {
-        BoardPiece_SetState(p, 4);
+        BatFlockBat_SetState(p, 4);
     } else {
         polar(&delta, p->direction, p->duration);
         {
@@ -650,7 +650,7 @@ void BatFlockBat_ChasePlayer(struct GroupObjects *m, struct GroupPiece *p, int i
     }
 }
 
-static inline int GroupObjects_Random(void)
+static inline int BatFlock_Random(void)
 {
     gRandomIndex = (gRandomIndex + 1) & 1023;
     return ((const u16 *)RANDOM_TABLE_ADDR)[gRandomIndex];
@@ -668,7 +668,7 @@ void BatFlockBat_AdvanceWithOffset(struct GroupObjects *m, struct GroupPiece *p,
     if (active) {
         p->active = 0;
         p->anchor = p->position;
-        p->direction = GroupObjects_Random();
+        p->direction = BatFlock_Random();
         ZeroFill8(offset);
     }
     Vec16_Lerp(&p->anchor, &p->anchor, &p->target, index + 8, 5);
@@ -725,7 +725,7 @@ void BatFlockBat_HomeToTarget(struct GroupObjects *m, struct GroupPiece *p, int 
     dx = p->target.x - p->position.x;
     dz = p->target.z - position->z;
     if (dx * dx + dz * dz <= 0x9C3F) {
-        BoardPiece_SetState(p, 2);
+        BatFlockBat_SetState(p, 2);
     } else {
         if (p->speed == 0) {
             const u16 *table;

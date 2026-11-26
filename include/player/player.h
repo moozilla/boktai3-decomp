@@ -289,7 +289,7 @@ struct Player {
     struct SceneVec
         resourceStationPosition; /* 0x498: copied by Player_BeginResourceStationInteraction */
     u16 resourceStationFacing;   /* 0x4A0 */
-    u16 burstParameter;          /* 0x4A2: passed to ActorBurst_Create. */
+    u16 burstParameter;          /* 0x4A2: passed to ActionFlashBurst_Create. */
     u8 actionFourEnabled;        /* 0x4A4: permits action 4 in modes 0, 1 and 6 (tentative) */
     u8 coordinateAxis;           /* 0x4A5: 1/5 select X, other values select Z (tentative) */
     u8 unk4A6[2];

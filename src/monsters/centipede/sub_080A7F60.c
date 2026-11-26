@@ -36,7 +36,7 @@ void Anim_SetDurationScale(void *, u32);
 void Anim_SetFrameDurationScale(void *, u32);
 void Centipede_SelectWanderRoute(void *);
 void Centipede_AdvanceMotionPhase(void *, s32);
-void sub_080A9DB0(void *, s32, s32);
+void Centipede_UpdateSegmentPositions(void *, s32, s32);
 void Centipede_UpdateOscillation(void *, s32, s32);
 
 s32 Mod(s32, s32);
@@ -93,6 +93,6 @@ void CentipedeBody_UpdateSpiral(struct ChaseActor *actor)
     actor->base.body.direction += turn;
     actor->base.body.motion.x += dx;
     actor->base.body.motion.z += dz;
-    sub_080A9DB0(actor, amplitude, rate);
+    Centipede_UpdateSegmentPositions(actor, amplitude, rate);
     actor->base.counter2AC++;
 }

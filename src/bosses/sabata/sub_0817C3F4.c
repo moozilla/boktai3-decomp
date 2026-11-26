@@ -37,10 +37,10 @@ struct DecisionActor {
     struct DecisionSummons summons;
 };
 s32 SceneActors_ConsumePendingSignal(void *);
-void SabataVolume_BeginPhase(void *, int);
+void Sabata_BeginCombatPhase(void *, int);
 void ProximityVolume_ClearLatch(void *);
 void AnimatedHazardManager_RetractAll(void);
-s32 SabataVolume_CanActivate(void *);
+s32 Sabata_CanStartAttack(void *);
 void SceneSteeringActor_RequestRemovalAll(void);
 u8 Callback_InvokeActor(void *, void *);
 extern void *gUnk_08611C6C[];
@@ -108,7 +108,7 @@ void Sabata_SelectCombatAction(struct DecisionActor *p)
 {
     struct DecisionActor *q = p;
     if (SceneActors_ConsumePendingSignal(p))
-        SabataVolume_BeginPhase(p, 4);
+        Sabata_BeginCombatPhase(p, 4);
     if (!(p->control.word & 0xFF0000FF))
         goto callback;
     switch (p->control.bytes.mode) {
@@ -153,7 +153,7 @@ void Sabata_SelectCombatAction(struct DecisionActor *p)
                         }
                     } break;
                     case 2: {
-                        s32 result = SabataVolume_CanActivate(q);
+                        s32 result = Sabata_CanStartAttack(q);
                         if (result) {
                             SelectAction(p, 0, 12);
                         } else {
@@ -293,7 +293,7 @@ void Sabata_SelectCombatAction(struct DecisionActor *p)
                         }
                     } break;
                     case 2: {
-                        s32 result = SabataVolume_CanActivate(q);
+                        s32 result = Sabata_CanStartAttack(q);
                         if (result) {
                             SelectAction(p, 0, 12);
                         } else {
@@ -384,7 +384,7 @@ void Sabata_SelectCombatAction(struct DecisionActor *p)
                     }
                 } break;
                 case 2: {
-                    s32 result = SabataVolume_CanActivate(q);
+                    s32 result = Sabata_CanStartAttack(q);
                     if (result) {
                         SelectAction(p, 0, 12);
                     } else {
@@ -479,7 +479,7 @@ void Sabata_SelectCombatAction(struct DecisionActor *p)
                     }
                 } break;
                 case 10: {
-                    if (SabataVolume_CanActivate(q)) {
+                    if (Sabata_CanStartAttack(q)) {
                         SceneSteeringActor_RequestRemovalAll();
                         SelectAction(p, 0, 12);
                     } else {

@@ -17,7 +17,7 @@ void CentipedeBody_OnAttackCollision(u8 *unused, struct ContactCollider *collide
     }
 }
 
-static inline u8 TentacleBody_IsUnavailable(struct ChaseActor *actor)
+static inline u8 CentipedeBody_IsUnavailable(struct ChaseActor *actor)
 {
     return SceneActorPlacement_IsUnavailable(&actor->base);
 }
@@ -26,7 +26,7 @@ void CentipedeBody_OnBodyContact(struct SceneActorBehaviorContactView *source,
                                 struct SceneActorBehaviorContactView *destination,
                                 struct ChaseActor *actor)
 {
-    if (TentacleBody_IsUnavailable(actor))
+    if (CentipedeBody_IsUnavailable(actor))
         return;
     SceneActorBehavior_ApplyContactReaction(source, destination, (void *)actor);
     Centipede_EnterHitReaction(actor);
@@ -37,14 +37,14 @@ void CentipedeBody_UpdateAttackWindup(struct RoomActor *actor)
     struct SceneActorProfileEntry *entry =
         (void *)SceneActorProfiles_GetEntryAddress(actor->profileId, actor->profileMode, 0);
     u32 variant, flags;
-    if (TentacleSpread_Take(&actor->field2B2)) {
+    if (CentipedeSpread_Take(&actor->field2B2)) {
         CentipedeBody_GetDirectionFrame(actor->body.direction, &variant, &flags);
-        TentacleBody_SelectAnimation(actor, entry[14].value, variant, flags);
+        CentipedeBody_SelectAnimation(actor, entry[14].value, variant, flags);
         CentipedeBody_RefreshDirectionalAnimations(((struct ChaseActor *)actor)->base.context, 15);
         Centipede_AssignSegmentPhases(((struct ChaseActor *)actor)->base.context);
     } else {
         CentipedeBody_GetDirectionFrame(actor->body.direction, &variant, &flags);
-        TentacleBody_SelectAnimation(actor, entry[14].value, variant, flags);
+        CentipedeBody_SelectAnimation(actor, entry[14].value, variant, flags);
         CentipedeBody_RefreshDirectionalAnimations(((struct ChaseActor *)actor)->base.context, 15);
     }
 }
@@ -57,7 +57,7 @@ void CentipedeBody_ResetDirectionalPose(struct RoomActor *actor)
     if (actor->field2B2)
         actor->field2B2 = 0;
     CentipedeBody_GetDirectionFrame(actor->body.direction, &variant, &flags);
-    TentacleBody_SelectAnimation(actor, entry[17].value, variant, flags);
+    CentipedeBody_SelectAnimation(actor, entry[17].value, variant, flags);
     CentipedeBody_ResetDirectionalAnimations(((struct ChaseActor *)actor)->base.context, 18);
 }
 
@@ -75,7 +75,7 @@ void CentipedeBody_UpdateInactiveState(void)
 
 void CentipedeBody_UpdateTimedAction(struct ChaseActor *actor, s32 frame)
 {
-    if (TentacleSpread_Take(&actor->base.field2B2)) {
+    if (CentipedeSpread_Take(&actor->base.field2B2)) {
         SceneActorAnimation_SelectDirectionalEntry(actor, 7);
         HalfwordFlags_And(&actor->base.motionFlags, ~1);
     }
@@ -87,7 +87,7 @@ void CentipedeBody_UpdateTimedAction(struct ChaseActor *actor, s32 frame)
 
 void CentipedeBody_UpdateHiddenTransition(struct ChaseActor *actor, s32 frame, u32 unused)
 {
-    u32 queued = TentacleSpread_Take(&actor->base.field2B2);
+    u32 queued = CentipedeSpread_Take(&actor->base.field2B2);
     if (queued) {
         u32 mask = 1;
         if (actor->base.drawableKind == 0) {
@@ -114,7 +114,7 @@ void CentipedeBody_UpdateHiddenTransition(struct ChaseActor *actor, s32 frame, u
 
 /* The accessor preserves the saved-state reset code generation with agbcc. */
 
-static inline u8 TentacleBody_IsAnimationReady(struct ChaseActor *actor)
+static inline u8 CentipedeBody_IsAnimationReady(struct ChaseActor *actor)
 {
     return actor->base.restart;
 }
@@ -122,7 +122,7 @@ static inline u8 TentacleBody_IsAnimationReady(struct ChaseActor *actor)
 void ActorTrail_RestoreSavedState(struct ChaseActor *actor)
 {
     s32 health;
-    if (TentacleSpread_Take(&actor->base.field2B2)) {
+    if (CentipedeSpread_Take(&actor->base.field2B2)) {
         ActorShadow_Enable(actor->base.shadow);
         if (!actor->base.drawableKind) {
             u32 *q = &((struct ActorSprite *)actor->base.drawable)->flags;
@@ -146,7 +146,7 @@ void ActorTrail_RestoreSavedState(struct ChaseActor *actor)
         if (sequence->index == 3 && sequence->elapsed == 4)
             Sound_PlaySong(0xEE);
     }
-    if (!TentacleBody_IsAnimationReady(actor))
+    if (!CentipedeBody_IsAnimationReady(actor))
         return;
     {
         ActorTrail_ResetAtSavedPosition(actor);
@@ -187,13 +187,13 @@ void ActorTrail_RestoreSavedState(struct ChaseActor *actor)
 
 void CentipedeBody_UpdateAnimationEleven(struct ChaseActor *actor)
 {
-    if (TentacleSpread_Take(&actor->base.field2B2))
+    if (CentipedeSpread_Take(&actor->base.field2B2))
         SceneActorAnimation_SelectDirectionalEntry(actor, 11);
     if (actor->base.restart)
         actor->base.stepDone = 1;
 }
 
-static inline void TentacleBody_SetAttackFlag(struct TentacleBody *body, u32 input)
+static inline void CentipedeBody_SetAttackFlag(struct TentacleBody *body, u32 input)
 {
     u32 mask = input;
     u16 *f = &body->attackFlags;
@@ -208,11 +208,11 @@ void CentipedeBody_UpdateSpreadWindup(struct ChaseActor *actor)
     struct TentacleBody *body = actor->base.context;
     s32 activeSegment, segmentIndex, threshold, speed;
     u32 variant, flags;
-    if (TentacleSpread_Take(&actor->base.field2B2)) {
+    if (CentipedeSpread_Take(&actor->base.field2B2)) {
         MonsterInit_SetStatusFlags(actor, 0x100000);
         CentipedeBody_GetDirectionFrame(actor->base.body.direction, &variant, &flags);
         CentipedeBody_RestartSegmentAnimations(body, 18, variant, flags);
-        TentacleBody_SetAttackFlag(body, 2);
+        CentipedeBody_SetAttackFlag(body, 2);
     }
     ZeroFill8(&actor->base.secondaryMotion);
     {
@@ -236,11 +236,11 @@ void CentipedeBody_UpdateSpreadWindup(struct ChaseActor *actor)
         actor->base.body.motion.x +=
             SceneRoute_ScaleComponent(gUnk_086149C4[(angle + 64) & 255] * speed);
         actor->base.body.motion.z += SceneRoute_ScaleComponent(gUnk_086149C4[angle] * speed);
-        sub_080A9DB0(actor, 14, 12000);
+        Centipede_UpdateSegmentPositions(actor, 14, 12000);
         activeSegment = 0;
         for (segmentIndex = 0; segmentIndex < body->segmentCount; segmentIndex++) {
-            if (TentacleSpread_Test(&body->segments[segmentIndex], 2) &&
-                !TentacleSpread_Test(&body->segments[segmentIndex], 5)) {
+            if (CentipedeSpread_Test(&body->segments[segmentIndex], 2) &&
+                !CentipedeSpread_Test(&body->segments[segmentIndex], 5)) {
                 switch (activeSegment) {
                     case 0:
                         body->segments[segmentIndex].position.x =
@@ -277,7 +277,7 @@ void CentipedeBody_UpdateSpreadRelease(struct ChaseActor *actor, s32 frame)
     s32 activeSegment, segmentIndex;
     u32 angle, scale;
     u8 *direction;
-    if (TentacleSpread_Take(&actor->base.field2B2))
+    if (CentipedeSpread_Take(&actor->base.field2B2))
         body->spin = 0;
     {
         u16 raw = body->spin;
@@ -289,7 +289,7 @@ void CentipedeBody_UpdateSpreadRelease(struct ChaseActor *actor, s32 frame)
             field = &actor->base.body.direction;
             angle = (*field + 128) & 255;
         }
-        scale = TentacleSpread_Scale(raw);
+        scale = CentipedeSpread_Scale(raw);
         direction = field;
     }
     actor->base.body.motion.x +=
@@ -298,9 +298,9 @@ void CentipedeBody_UpdateSpreadRelease(struct ChaseActor *actor, s32 frame)
     body->spin += 12;
     activeSegment = 0;
     for (segmentIndex = 0; segmentIndex < body->segmentCount; segmentIndex++) {
-        if (TentacleSpread_Test(&body->segments[segmentIndex], 2) &&
-            !TentacleSpread_Test(&body->segments[segmentIndex], 5)) {
-            TENTACLE_SPREAD_SET_OFFSET(body->segments[segmentIndex].offset, actor->base.body.motion,
+        if (CentipedeSpread_Test(&body->segments[segmentIndex], 2) &&
+            !CentipedeSpread_Test(&body->segments[segmentIndex], 5)) {
+            CENTIPEDE_SPREAD_SET_OFFSET(body->segments[segmentIndex].offset, actor->base.body.motion,
                                        segmentIndex + 1);
             switch (activeSegment) {
                 case 0:
@@ -332,7 +332,7 @@ void CentipedeBody_UpdateSpreadRelease(struct ChaseActor *actor, s32 frame)
         actor->base.field2E8 = 2;
         SceneActorChase_ClearFlagComponent((void *)&body->attackFlags, 2);
     } else
-        sub_080A9DB0(actor, 64, 0xFFFF);
+        Centipede_UpdateSegmentPositions(actor, 64, 0xFFFF);
 }
 
 /* Tentative: winds up a segment-spread attack while backing away from the target. */
@@ -344,7 +344,7 @@ void CentipedeBody_UpdateSpreadPreparation(struct ChaseActor *actor)
     s32 speed;
     s32 angle;
 
-    if (TentacleSpread_Take(&actor->base.field2B2)) {
+    if (CentipedeSpread_Take(&actor->base.field2B2)) {
         MonsterInit_SetStatusFlags(actor, 0x100000);
     }
     ZeroFill8(&actor->base.secondaryMotion);
@@ -363,7 +363,7 @@ void CentipedeBody_UpdateSpreadPreparation(struct ChaseActor *actor)
     actor->base.body.motion.x +=
         SceneRoute_ScaleComponent(gUnk_086149C4[(angle + 64) & 255] * speed);
     actor->base.body.motion.z += SceneRoute_ScaleComponent(gUnk_086149C4[angle] * speed);
-    sub_080A9DB0(actor, 10, 0x1000);
+    Centipede_UpdateSegmentPositions(actor, 10, 0x1000);
     ActorTrail_ApplyAngularOffsets(actor, 20, 24, 0);
 }
 
@@ -375,7 +375,7 @@ void CentipedeBody_UpdateChargeSpread(struct ChaseActor *actor, s32 frame)
     s32 activeSegment, segmentIndex;
     u32 angle, scale;
     u8 *direction;
-    if (TentacleSpread_Take(&actor->base.field2B2))
+    if (CentipedeSpread_Take(&actor->base.field2B2))
         body->spin = 0;
     {
         u8 raw = body->spin;
@@ -387,7 +387,7 @@ void CentipedeBody_UpdateChargeSpread(struct ChaseActor *actor, s32 frame)
             field = &actor->base.body.direction;
             angle = (*field + 128) & 255;
         }
-        scale = TentacleSpread_Scale(raw);
+        scale = CentipedeSpread_Scale(raw);
         direction = field;
     }
     actor->base.body.motion.x +=
@@ -396,9 +396,9 @@ void CentipedeBody_UpdateChargeSpread(struct ChaseActor *actor, s32 frame)
     body->spin += 12;
     activeSegment = 0;
     for (segmentIndex = 0; segmentIndex < body->segmentCount; segmentIndex++) {
-        if (TentacleSpread_Test(&body->segments[segmentIndex], 2) &&
-            !TentacleSpread_Test(&body->segments[segmentIndex], 5)) {
-            TENTACLE_SPREAD_SET_OFFSET(body->segments[segmentIndex].offset, actor->base.body.motion,
+        if (CentipedeSpread_Test(&body->segments[segmentIndex], 2) &&
+            !CentipedeSpread_Test(&body->segments[segmentIndex], 5)) {
+            CENTIPEDE_SPREAD_SET_OFFSET(body->segments[segmentIndex].offset, actor->base.body.motion,
                                        segmentIndex + 1);
             switch (activeSegment) {
                 case 0:
@@ -425,7 +425,7 @@ void CentipedeBody_UpdateChargeSpread(struct ChaseActor *actor, s32 frame)
             activeSegment++;
         }
     }
-    sub_080A9DB0(actor, 64, 0xFFFF);
+    Centipede_UpdateSegmentPositions(actor, 64, 0xFFFF);
     if (frame > 60)
         SceneActorChase_SetControl(actor, (void *)CentipedeBody_BeginDirectedAttack, 36);
 }
@@ -437,7 +437,7 @@ void CentipedeBody_BeginDirectedAttack(struct ChaseActor *actor)
     struct TentacleBody *body = actor->base.context;
     u32 variant;
     u32 flags;
-    u32 entered = TentacleSpread_Take(&actor->base.field2B2);
+    u32 entered = CentipedeSpread_Take(&actor->base.field2B2);
     u8 *direction = &actor->base.body.direction;
     u32 *attackFlags = &actor->base.statusFlags;
     if (entered) {
@@ -459,7 +459,7 @@ void CentipedeBody_BeginDirectedAttack(struct ChaseActor *actor)
         Sound_PlaySong(982);
     }
     CentipedeBody_GetDirectionFrame(*direction, &variant, &flags);
-    TentacleBody_SelectAnimation((void *)actor, entry[14].value, variant, flags);
+    CentipedeBody_SelectAnimation((void *)actor, entry[14].value, variant, flags);
     ActorTrail_ApplyAngularOffsets(actor, 18, 6, 0);
     CentipedeBody_RefreshDirectionalAnimations(actor->base.context, 15);
     {
@@ -485,12 +485,12 @@ void CentipedeBody_UpdateAttackRecovery(struct ChaseActor *actor, s32 frame)
     if (actor->base.field2B2)
         actor->base.field2B2 = 0;
     CentipedeBody_GetDirectionFrame(actor->base.body.direction, &variant, &flags);
-    TentacleBody_SelectAnimation((void *)actor, entry[17].value, variant, flags);
+    CentipedeBody_SelectAnimation((void *)actor, entry[17].value, variant, flags);
     CentipedeBody_ResetDirectionalAnimations(actor->base.context, 18);
-    sub_080A9DB0(actor, 20, 25600);
+    Centipede_UpdateSegmentPositions(actor, 20, 25600);
     if (frame > 40) {
         CentipedeBody_GetDirectionFrame(actor->base.body.direction, &variant, &flags);
-        TentacleBody_SelectAnimation((void *)actor, entry[14].value, variant, flags);
+        CentipedeBody_SelectAnimation((void *)actor, entry[14].value, variant, flags);
         CentipedeBody_RefreshDirectionalAnimations(actor->base.context, 15);
         actor->base.stepDone = 1;
     }

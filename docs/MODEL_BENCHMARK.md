@@ -11,7 +11,7 @@ the per-line report from `tools/explain.py` (with idioms from
 * **Functions.** 15 unmatched near misses from the 118-draft shape survey
   (permuter-research drafts, isolated one per file), chosen for 1–10
   instructions of structural difference after register and constant
-  abstraction, 17–81 instructions long. One survey row (TileTriggerPool_FindByName) had
+  abstraction, 17–81 instructions long. One survey row (FloorTrapPool_FindByName) had
   been matched since; sub_0816AC64 replaced it.
 * **Conditions.** Each function × {Haiku, Sonnet} × {explain, plain}: 60 runs,
   one fresh subagent each, same task text apart from the tool paragraph. Each

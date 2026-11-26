@@ -1,6 +1,6 @@
 #include "global.h"
 #include "engine/engine.h"
-#include "objects/scene_objects/scene_object_slot.h"
+#include "objects/scene_object_slot.h"
 void SolarBomb_InitSprite(u8 *);
 void sub_08234138(u8 *);
 s32 Div(s32, s32);

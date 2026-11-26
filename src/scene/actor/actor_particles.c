@@ -2,7 +2,7 @@
 #include "system/game_state/game_state_flags.h"
 #include "engine/ram.h"
 #include "effects/screen/background_controller.h"
-#include "objects/scene_objects/scene_object.h"
+#include "objects/scene_object.h"
 #include "system/game_state/game_state.h"
 #include "scene/actor/actor_stats.h"
 #include "scene/collision/contact_actor.h"

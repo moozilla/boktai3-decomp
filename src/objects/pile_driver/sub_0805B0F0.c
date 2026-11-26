@@ -1,10 +1,10 @@
 #include "engine/math/monster_particle_random.h"
-#include "objects/pile_driver/scene_panel_rig_setup.h"
+#include "objects/pile_driver/pile_driver_rig_setup.h"
 
-void PileDriver_InitRig(struct ScenePanel *input)
+void PileDriver_InitRig(struct PileDriver *input)
 {
-    struct ScenePanel *panel = input;
-    struct ScenePanelRig *rig = &panel->rig;
+    struct PileDriver *panel = input;
+    struct PileDriverRig *rig = &panel->rig;
     s32 rate;
     s32 power;
     rig->origin = panel->center;

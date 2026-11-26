@@ -3,7 +3,7 @@
 
 /* Tentative actor and motion-field interpretations, based on static accesses. */
 
-struct SingletonSlot7Actor {
+struct VanargandHeadActor {
     u8 pad0[0xAC];
     u8 state, stateFrame, stateEntered, padAF;
     u8 active, padB1[2], motionMode;
@@ -28,7 +28,7 @@ struct SingletonSlot7Origin {
 };
 s32 Player_GetHorizontalVelocity(s32);
 
-void VanargandHead_SetMotionMode(struct SingletonSlot7Actor *p, u32 mode)
+void VanargandHead_SetMotionMode(struct VanargandHeadActor *p, u32 mode)
 {
     if (p->motionMode == 1)
         p->worldX = (p->localX + ((struct SingletonSlot7Origin *)gSceneCamera)->x) << 12;

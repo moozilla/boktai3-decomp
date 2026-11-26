@@ -32,13 +32,13 @@ s32 TemporaryAnimationPool_Destroy(struct TemporaryAnimationPool *pool)
     return 0;
 }
 
-s32 Widget_InitCleared(void *, void *, u32, u32, u32, u32, u32, void *);
+s32 AnimSprite_InitCleared(void *, void *, u32, u32, u32, u32, u32, void *);
 
 static inline s32 initializeAnimation(struct AnimSprite *animation,
                                       struct AnimSpriteResource *resource,
                                       struct ContactPosition *position)
 {
-    s32 value = Widget_InitCleared(animation, resource, 0, 0, 2, 0, 60, position);
+    s32 value = AnimSprite_InitCleared(animation, resource, 0, 0, 2, 0, 60, position);
     s32 result = 0;
     if (value < 0)
         result = -1;

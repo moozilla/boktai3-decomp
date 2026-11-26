@@ -1,7 +1,7 @@
 #ifndef COLLISION_CONTROLLER_H
 #define COLLISION_CONTROLLER_H
 #include "global.h"
-#include "objects/scene_objects/scene_object.h"
+#include "objects/scene_object.h"
 #include "player/player.h"
 #include "engine/ram.h"
 #include "engine/task.h"
@@ -51,23 +51,23 @@ struct CollisionOther {
 extern struct CollisionManager *gCollisionManager;
 extern void *gUnk_08604A00[2][3];
 
-void CollisionController_ClearGlobal(void);
-struct CollisionSlot *CollisionController_FindFreeSlot(struct CollisionManager *);
-s32 CollisionController_InitSlot(struct CollisionManager *, struct CollisionSlot *);
-u32 CollisionController_RemoveSlot(struct CollisionManager *, struct CollisionSlot *);
-void CollisionController_ReceiveHit(struct SceneCollider *, struct CollisionOther *,
+void StrikeTrap_ClearGlobal(void);
+struct CollisionSlot *StrikeTrap_FindFreeSlot(struct CollisionManager *);
+s32 StrikeTrap_InitSlot(struct CollisionManager *, struct CollisionSlot *);
+u32 StrikeTrap_RemoveSlot(struct CollisionManager *, struct CollisionSlot *);
+void StrikeTrap_ReceiveHit(struct SceneCollider *, struct CollisionOther *,
                                     struct CollisionSlot *);
-void CollisionController_UpdateIdleAnimationPaused(u32, struct CollisionSlot *);
-void CollisionController_UpdateIdleAnimation(struct CollisionManager *, struct CollisionSlot *);
-void CollisionController_UpdateHitDelayAnimation(u32, struct CollisionSlot *);
-void CollisionController_UpdateHitAnimation(struct CollisionManager *, struct CollisionSlot *);
-s32 CollisionController_UpdateAll(struct CollisionManager *);
-s32 CollisionController_DestroyManager(struct CollisionManager *);
-s32 CollisionController_InitManager(struct CollisionManager *, void *owner);
-struct CollisionManager *CollisionController_CreateManager(void *owner, u32);
-s32 CollisionController_ScriptCreate(void);
-s32 CollisionController_ScriptGetActiveCount(void);
-void CollisionController_ScriptRemoveAll(void);
+void StrikeTrap_UpdateIdleAnimationPaused(u32, struct CollisionSlot *);
+void StrikeTrap_UpdateIdleAnimation(struct CollisionManager *, struct CollisionSlot *);
+void StrikeTrap_UpdateHitDelayAnimation(u32, struct CollisionSlot *);
+void StrikeTrap_UpdateHitAnimation(struct CollisionManager *, struct CollisionSlot *);
+s32 StrikeTrap_UpdateAll(struct CollisionManager *);
+s32 StrikeTrap_DestroyManager(struct CollisionManager *);
+s32 StrikeTrap_InitManager(struct CollisionManager *, void *owner);
+struct CollisionManager *StrikeTrap_CreateManager(void *owner, u32);
+s32 StrikeTrap_ScriptCreate(void);
+s32 StrikeTrap_ScriptGetActiveCount(void);
+void StrikeTrap_ScriptRemoveAll(void);
 
 /* Engine helpers. */
 void Script_ReadReference(void *);

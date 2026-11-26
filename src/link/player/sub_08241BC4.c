@@ -28,7 +28,7 @@ struct P {
 void Player_SetTetherMode(struct P *, s32, s32);
 void Player_PlayLocalSong(s32, u32);
 void Camera_RequestShake(u32);
-void RisingSprite_Spawn(void *);
+void RecoilPuff_Spawn(void *);
 void sub_08238238(struct P *);
 extern const s16 gUnk_086149C4[];
 struct PackedVec {
@@ -77,7 +77,7 @@ void PlayerCue_UpdateTerrainSlide(struct P *p)
                     if (*t <= 5) {
                         if ((*t & 1) == 0) {
                             Player_PlayLocalSong(W(0x18), 0x191);
-                            RisingSprite_Spawn(&p->position);
+                            RecoilPuff_Spawn(&p->position);
                         }
                         (*t)++;
                     }

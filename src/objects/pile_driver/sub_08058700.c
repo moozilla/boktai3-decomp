@@ -1,9 +1,9 @@
-#include "objects/pile_driver/scene_panel.h"
+#include "objects/pile_driver/pile_driver.h"
 #include "objects/pile_driver/pile_driver_effects.h"
 #include "gba/io_reg.h"
 #include "gba/syscall.h"
 
-void PileDriver_UpdateBackgroundEffect(struct ScenePanel *panel, s32 tileX, s32 tileY, s32 screenX,
+void PileDriver_UpdateBackgroundEffect(struct PileDriver *panel, s32 tileX, s32 tileY, s32 screenX,
                                        s32 screenY)
 {
     s32 effectAlpha;
@@ -84,10 +84,10 @@ void PileDriver_UpdateBackgroundEffect(struct ScenePanel *panel, s32 tileX, s32 
             if (*frame == 0)
                 goto hide;
             {
-                union ScenePanelPosition position, velocity;
+                union PileDriverPosition position, velocity;
                 const u16 *table;
                 u32 highMask;
-                union ScenePanelPosition *positionWords;
+                union PileDriverPosition *positionWords;
                 u32 next;
                 position.world = *(struct SceneVec *)&panel->center;
                 table = gRandomTable;
@@ -96,7 +96,7 @@ void PileDriver_UpdateBackgroundEffect(struct ScenePanel *panel, s32 tileX, s32 
                     s32 offset = Mod(table[gRandomIndex], 500);
                     s32 coordinate;
                     {
-                        union ScenePanelPosition *lowPosition = &position;
+                        union PileDriverPosition *lowPosition = &position;
                         positionWords = lowPosition;
                         coordinate = (u16)lowPosition->world.x - 250;
                     }
@@ -124,7 +124,7 @@ void PileDriver_UpdateBackgroundEffect(struct ScenePanel *panel, s32 tileX, s32 
                 gRandomIndex = (gRandomIndex + 1) & 1023;
                 {
                     s32 offset = Mod(table[gRandomIndex], 500);
-                    union ScenePanelPosition *lowPosition = positionWords;
+                    union PileDriverPosition *lowPosition = positionWords;
                     s32 coordinate;
                     coordinate = (u16)lowPosition->world.z - 250;
                     coordinate += offset;

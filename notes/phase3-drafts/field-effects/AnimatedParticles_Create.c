@@ -1,4 +1,4 @@
-// Pin-free draft of AnimatedParticles_Create (src/effects/particles/groups/sub_080154EC.c): 6 ROM / 2 draft (scope's no_pins draft).
+// Pin-free draft of AnimatedParticles_Create (src/effects/particles/impact_bursts/sub_080154EC.c): 6 ROM / 2 draft (scope's no_pins draft).
 #include "global.h"
 #include "engine/engine_globals.h"
 #include "engine/ram.h"

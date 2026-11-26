@@ -19,7 +19,7 @@
 #include "scene/motion/scene_actor_turn.h"
 #include "engine/video/display_sequence.h"
 #include "npc/manager/scene_actor_animation.h"
-#include "objects/scene_objects/scene_object.h"
+#include "objects/scene_object.h"
 #include "monsters/golem/golem.h"
 #include "monsters/golem/golem_charge.h"
 #include "engine/math/monster_particle_random.h"

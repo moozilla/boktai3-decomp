@@ -224,7 +224,7 @@ void MenuCursor_Initialize(struct MenuCursor *cursor, u32 palette)
     if (resource) {
         cursor->resource = *resource;
         ResourceHeader_Relocate(&cursor->resource, resource);
-        Widget_InitLinked(&cursor->sprite, &cursor->resource, 2, 0x30, (u8)palette, 0, 0x3C, 0);
+        AnimSprite_InitLinked(&cursor->sprite, &cursor->resource, 2, 0x30, (u8)palette, 0, 0x3C, 0);
         cursor->entryCount = 0;
         cursor->selectedIndex = 0xFFFF;
     }

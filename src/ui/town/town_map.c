@@ -116,7 +116,7 @@ void TownMap_InitAnimations(struct RegistryChoiceMenu *menu)
         ResourceHeader_Relocate(&menu->resource, resource);
         anim = menu->animations;
         for (count = 0; count < 5; count++) {
-            Widget_InitLinked(anim, &menu->resource, 0, 0x10, 2, 0, 0x3c, 0);
+            AnimSprite_InitLinked(anim, &menu->resource, 0, 0x10, 2, 0, 0x3c, 0);
             anim->attribute1A = 3;
             anim++;
         }
