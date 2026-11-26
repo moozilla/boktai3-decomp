@@ -1,3 +1,4 @@
+#include "scene/motion/scene_actor_terrain_reaction.h"
 #include "scene/collision/scene_body_api.h"
 #include "global.h"
 #include "monsters/bat.h"
@@ -286,7 +287,7 @@ s32 Bat_Init(void *object)
         flag = 1;
     }
     if (flag != 1) {
-        MonsterInit_SetState(actor, 0, 0, 0);
+        SceneActorTerrain_EnterState(actor, 0, 0, 0);
         MonsterInit_SetControl(actor, MonsterInit_GetStandingControl(actor), 0);
     }
     MonsterInit_InitializeRegion(actor);
