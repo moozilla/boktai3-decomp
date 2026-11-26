@@ -1,23 +1,11 @@
-#include "global.h"
+#include "objects/moving_platforms/named_object.h"
 #include "scene/collision/contact_actor.h"
-struct NamedObjectTrail {
-    u8 pad0[0xBC];
-    s16 timer;
-    u8 padBE[0x14];
-    u16 alternate;
-    u8 padD4[0x1F];
-    u8 kind;
-    u8 padF4[0x15];
-    u8 direction;
-    u8 pad10A[2];
-    struct ContactPosition position;
-};
 void TrapSpellParticles_CreateDefaultBurst(void *, s32, s32, s32, s32, s32, s32, s32, s32, s32,
                                              s32, s32);
 void SpriteParticle_ForwardCreate(void *, s32, s32, s32, s32, s32, s32, s32, s32, s32, s32, s32,
                                   s32, s32, s32, s32, s32, s32);
 // confidence=low: emits alternating particles at direction-dependent offsets while moving.
-void MovingPlatform_EmitMovementTrail(struct NamedObjectTrail *object)
+void MovingPlatform_EmitMovementTrail(struct NamedObject *object)
 {
     struct ContactPosition offsets[2], position;
     s32 direction, width, height, depth;
@@ -26,7 +14,7 @@ void MovingPlatform_EmitMovementTrail(struct NamedObjectTrail *object)
         --object->timer;
         return;
     }
-    direction = object->direction >> 6;
+    direction = object->body.direction >> 6;
     switch (direction) {
         case 0:
             offsets[0].x = -192;
@@ -78,37 +66,37 @@ void MovingPlatform_EmitMovementTrail(struct NamedObjectTrail *object)
     kind = object->kind;
     switch (kind) {
         case 0:
-            if (object->alternate == 0) {
-                position.x = object->position.x + offsets[0].x;
-                position.y = object->position.y + offsets[0].y;
-                position.z = object->position.z + offsets[0].z;
+            if (object->trailPhase == 0) {
+                position.x = object->body.position.x + offsets[0].x;
+                position.y = object->body.position.y + offsets[0].y;
+                position.z = object->body.position.z + offsets[0].z;
                 TrapSpellParticles_CreateDefaultBurst(&position, 22, 8, width, 4, 24, direction,
                                                         height, depth, 3, 2, 512);
-                object->alternate = 1;
+                object->trailPhase = 1;
             } else {
-                position.x = object->position.x + offsets[1].x;
-                position.y = object->position.y + offsets[1].y;
-                position.z = object->position.z + offsets[1].z;
+                position.x = object->body.position.x + offsets[1].x;
+                position.y = object->body.position.y + offsets[1].y;
+                position.z = object->body.position.z + offsets[1].z;
                 TrapSpellParticles_CreateDefaultBurst(&position, 22, 8, width, 4, 24, direction,
                                                         height, depth, 3, 2, 512);
-                object->alternate = 0;
+                object->trailPhase = 0;
             }
             break;
         case 3:
-            if (object->alternate == 0) {
-                position.x = object->position.x + offsets[0].x;
-                position.y = object->position.y + offsets[0].y;
-                position.z = object->position.z + offsets[0].z;
+            if (object->trailPhase == 0) {
+                position.x = object->body.position.x + offsets[0].x;
+                position.y = object->body.position.y + offsets[0].y;
+                position.z = object->body.position.z + offsets[0].z;
                 SpriteParticle_ForwardCreate(&position, 22, 8, width, 4, 24, direction, height,
                                              depth, kind, 2, 512, 0, 0xF422, 0x121B, 0, 0, 0x128);
-                object->alternate = 1;
+                object->trailPhase = 1;
             } else {
-                position.x = object->position.x + offsets[1].x;
-                position.y = object->position.y + offsets[1].y;
-                position.z = object->position.z + offsets[1].z;
+                position.x = object->body.position.x + offsets[1].x;
+                position.y = object->body.position.y + offsets[1].y;
+                position.z = object->body.position.z + offsets[1].z;
                 SpriteParticle_ForwardCreate(&position, 22, 8, width, 4, 24, direction, height,
                                              depth, kind, 2, 512, 0, 0xF422, 0x121B, 0, 0, 0x128);
-                object->alternate = 0;
+                object->trailPhase = 0;
             }
             break;
         default:
