@@ -94,3 +94,35 @@ and the steering subtotal from 705 to 702 uses. The six object reports
 contain zero errors and the comparison found no new diagnostics.
 
 All nine changed source units match their recorded ROM extents.
+
+## Fourth pass
+
+Armor sets the completed attack collider's disable bit directly. The
+falling-part queue candidate with one cursor moves the loop index from r3
+to r6 and grows the stack frame by eight bytes. The typed table-index
+and run-motion variants also change the emitted instructions.
+
+Centipede's advance step updates the segment Y and Z fields directly.
+Centipede_ApplyPendingRadialVelocity (080AADE4) uses the shared sine
+projection. The direct vertical store grows the routine by twelve bytes.
+The literal write through the original pointer changes instructions within
+the original extent.
+
+Skeleton_TryTriggerAction reads the Golem route context through the
+shared chase and route structures. Dog's cooldown and arrival animation
+use the turn delay and duration fields. The direct retreat-origin and
+arrival motion tests still differ.
+
+Axe's typed trail sprite argument, angle and scale writes, and direct
+expiry-flag store all change the generated unit. The matching trail
+implementation remains the reference for those trials.
+
+AxeArmor_InitCollider (08204B3C) uses the shared packed collision
+vectors for its bounds and offset. AxeArmor_UpdateAttackTiming
+(08204D84) reads the schedule by index. Simplifying the wrap comparison
+changes bytes within the original 216-byte extent.
+
+The per-object comparison gives 644 diagnostic rows and 702 steering
+uses in each scan. All six scans report zero errors.
+
+All seven changed source units match their recorded ROM extents.
