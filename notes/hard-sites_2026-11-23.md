@@ -376,3 +376,29 @@ reassigning the sample pointer alone does not recover the late table
 load. The source and results are under `build/hard-sites/tether-bounce/`
 and `build/matchsearch/TetherActor_UpdateBounceReturn`. The existing
 proved-zero site is still present.
+
+## 2026-11-26: Registry next-slot classification and coalescing
+
+The typed next-slot draft keeps both singleton reloads. In the first CSE
+dump, the lowered next store is `mem:SI [node + 12]` through the slot
+local. Changing only that store to `node->next` gives
+`mem/s:SI [node + 12]` and CSE removes the second global read. Both
+stores have alias set 5, and the singleton MEM has set 0. In these typed
+drafts the member versus scalar classification matters independently of
+the alias set. A slot local built directly from the incoming entry also
+misses because the second load disappears.
+
+Using the reassigned node for the comparison, the head update, and the
+flags gives disjoint input and node lifetimes at the copy.
+`AGBCC_FORCE=22:3,28:3` makes both 72-byte functions exact on that draft.
+With ordinary allocation the copy survives and the new node takes r2.
+The draft that still uses the old entry after the copy puts the two
+live pseudos in conflict. Forcing only the copied node there displaces
+the incoming argument and does not match.
+
+Caching the head across the scan, checking for membership in the loop
+condition, gating a single insertion on the cursor being null, moving
+the node copy after the scan, and changing local scope did not match.
+Both stock units keep their previously verified typed volatile
+implementation. See `build/hard-sites/registry/second-review/` and the
+two `build/matchsearch/TargetRegistry_*-second-review` stores.
