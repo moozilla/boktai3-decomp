@@ -80,7 +80,6 @@ int WirelessResultPanel_Init(struct ResultMenu *arg)
     {
         struct DisplaySequenceState *state = &animation;
         const u16 *command;
-        u32 ended;
         command = state->commands + state->index;
         sprite->frame = *command >> 6;
         {
@@ -113,28 +112,22 @@ int WirelessResultPanel_Init(struct ResultMenu *arg)
                         state->elapsed = state->duration;
                     else
                         state->index = state->frameCount - 1;
-                    ended = 1;
                 } else {
                     state->index--;
-                    ended = 0;
                 }
             } else if (++state->index >= state->frameCount) {
                 if ((u8)(state->flags & 8)) {
                     state->elapsed = state->duration;
                     state->index = state->frameCount - 1;
-                    ended = 1;
                 } else {
                     state->index = 0;
-                    ended = 1;
                 }
-            } else
-                ended = 0;
+            }
             command = state->commands + state->index;
             DisplaySequence_UpdateWeight(state, command);
             if (!state->duration)
                 state->duration = 1;
-        } else
-            ended = 0;
+        }
     }
     p->sprite.priority = 0;
     Memory_Copy(p->left, WirelessExchange_GetPeerEntry(0), sizeof(p->left));
