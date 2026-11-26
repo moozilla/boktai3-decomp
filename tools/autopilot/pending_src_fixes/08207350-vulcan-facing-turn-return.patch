@@ -1,0 +1,16 @@
+08207350 vulcan-facing-turn-return
+
+On the unfinished animation path the inlined step uses r1 through r7.
+The incoming p remains in r0 through 082074A0.
+
+The explicit form changed the ROM bytes. The guarded form passed the unit ROM check.
+
+--- a/src/fn/sub_08207350.c
++++ b/src/fn/sub_08207350.c
+@@ -21,3 +21,6 @@
+         return Anim_RestartSequence(&p->sequence, p->resource, 0x11, (u8)p->facing, loop = 0);
+     }
++#ifdef UBFIX
++    return (s32)p; // preserve the inherited GBA return value
++#endif
+ }
