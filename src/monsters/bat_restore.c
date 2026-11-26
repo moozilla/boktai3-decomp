@@ -121,10 +121,10 @@ void Bat_ResumeSavedTarget(struct ChaseActor *actor, s32 frame)
         blocked = SceneActorChase_QueryMotionFlags(actor, 0x80);
         if (blocked) {
             void *target;
-            SceneActor_SetPositionXZ(&actor->base.body.id,
+            SceneActor_SetPositionXZ(&actor->base.body,
                                      ((struct ChaseRouteProbe *)group->route)->destination.x,
                                      ((struct ChaseRouteProbe *)group->route)->destination.z);
-            SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0);
+            SceneActorAnimation_SelectDirectionalEntry(&actor->base, 0);
             target = group->common.gate.control;
             SceneActorChase_SetControl(actor, target, 0x1A);
             SceneActorChase_SetState(actor, 0, 0, 12);
@@ -132,10 +132,10 @@ void Bat_ResumeSavedTarget(struct ChaseActor *actor, s32 frame)
                 (struct SceneActorChaseFlags16 *)&group->common.gate.flags, 4);
         } else {
             void *target;
-            SceneActor_SetPositionXZ(&actor->base.body.id,
+            SceneActor_SetPositionXZ(&actor->base.body,
                                      ((struct ChaseRouteProbe *)group->route)->destination.x,
                                      ((struct ChaseRouteProbe *)group->route)->destination.z);
-            SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0);
+            SceneActorAnimation_SelectDirectionalEntry(&actor->base, 0);
             target = actor->base.onAlternateEntry;
             SceneActorChase_SetControl(actor, target, 1);
             SceneActorChase_SetState(actor, 0, 0, 7);
@@ -602,7 +602,7 @@ void SceneActorPlacement_PlayCategoryEventSound(void *);
 static inline u32 Flag(struct ChaseActor *actor, u32 maskInput, u32 off)
 {
     u32 mask = maskInput;
-    return off == 0x2D4 ? *(u16 *)((u8 *)actor + off) & mask : *(u32 *)((u8 *)actor + off) & mask;
+    return off == 0x2D4 ? actor->base.motionFlags & mask : actor->base.behaviorFlags & mask;
 }
 
 static inline u32 Random4(void)
