@@ -1,4 +1,5 @@
 #include "scene/motion/scene_actor_chase_reaction.h"
+#include "monsters/scene_route_sample.h"
 #include "global.h"
 #include "scene/actor/scene_actor_reaction.h"
 #include "scene/motion/scene_actor_terrain.h"
@@ -27,12 +28,6 @@ static inline u8 Test(u32 v, u32 m)
         return 1;
     return 0;
 }
-static inline s32 Shift(s32 n, u32 bits)
-{
-    if (n >= 0)
-        return n >> bits;
-    return -((-n) >> bits);
-}
 static inline u32 Rand(void)
 {
     gRandomIndex = (gRandomIndex + 1) & 1023;
@@ -40,9 +35,9 @@ static inline u32 Rand(void)
 }
 static inline void Polar(struct ContactPosition *out, u32 angle, s32 speed)
 {
-    out->x = Shift(gUnk_086149C4[(angle + 64) & 255] * speed, 12);
+    out->x = SceneRoute_ScaleComponent(gUnk_086149C4[(angle + 64) & 255] * speed);
     out->y = 0;
-    out->z = Shift(gUnk_086149C4[angle & 255] * speed, 12);
+    out->z = SceneRoute_ScaleComponent(gUnk_086149C4[angle & 255] * speed);
 }
 static inline void Add(struct ContactPosition *out, const struct ContactPosition *from)
 {
@@ -78,15 +73,16 @@ void sub_080A9DB0(void *, s32, s32);
 void Centipede_UpdateOscillation(void *, s32, s32);
 static inline u8 Approach(struct ChaseActor *actor, struct SavedMotion *saved, s32 speed)
 {
-    u8 *motion = (u8 *)actor + 0x50;
-    s16 dx = saved->position.x - *(u16 *)(motion + 12);
-    s16 dz = saved->position.z - *(u16 *)(motion + 16);
+    struct SceneActorBody *body = &actor->base.body;
+    s16 dx = saved->position.x - body->position.x;
+    s16 dz = saved->position.z - body->position.z;
     if ((dx < 0 ? -dx : dx) <= 32 && (dz < 0 ? -dz : dz) <= 32)
         return 1;
     if (dx || dz) {
-        motion[9] = Math_Atan2(dx, dz);
-        *(u16 *)(motion + 20) += Shift(gUnk_086149C4[(motion[9] + 64) & 255] * speed, 12);
-        *(u16 *)(motion + 24) += Shift(gUnk_086149C4[motion[9]] * speed, 12);
+        body->direction = Math_Atan2(dx, dz);
+        body->motion.x +=
+            SceneRoute_ScaleComponent(gUnk_086149C4[(body->direction + 64) & 255] * speed);
+        body->motion.z += SceneRoute_ScaleComponent(gUnk_086149C4[body->direction] * speed);
     }
     return 0;
 }
@@ -94,9 +90,9 @@ static inline void Scale(struct ChaseActor *actor)
 {
     u16 *scale = SceneActorChase_PrepareAnimationScale(actor, 0xA02F);
     if (actor->base.drawableKind == 0)
-        Anim_SetDurationScale((u8 *)actor->base.drawable + 0x48, *scale);
+        Anim_SetDurationScale(&((struct SceneActorAnimationSequenceDrawable *)actor->base.drawable)->sequence, *scale);
     else
-        Anim_SetFrameDurationScale((u8 *)actor->base.drawable + 0x20, *scale);
+        Anim_SetFrameDurationScale(&((struct SceneActorAnimationTileDrawable *)actor->base.drawable)->tile, *scale);
 }
 // confidence=low: moves toward a saved waypoint using the facing quadrant behind the actor.
 void CentipedeBody_UpdateRetreat(struct ChaseActor *actor)
