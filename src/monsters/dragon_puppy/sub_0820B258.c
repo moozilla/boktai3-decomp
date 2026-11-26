@@ -1,13 +1,12 @@
-#include "global.h"
-void Anim_SetSequence(void *, u32, u32, u32, u32);
+#include "monsters/dragon_puppy.h"
+#include "engine/engine.h"
 void DragonPuppy_UpdateAttackTiming(void);
-u32 DragonPuppy_UpdateAttackRecovery(u8 *p)
+u32 DragonPuppy_UpdateAttackRecovery(struct DragonPuppy *p)
 {
-    u16 n = *(u16 *)(p + 0x12c);
-    if (*(s16 *)(p + 0x12c) > 0) {
-        *(u16 *)(p + 0x12c) = n - 1;
+    if (p->unknown12C > 0) {
+        p->unknown12C--;
     } else {
-        Anim_SetSequence(p + 0x10c, *(u32 *)(p + 0x170), 3, p[0x132], 0);
-        *(void (**)(void))(p + 0x108) = DragonPuppy_UpdateAttackTiming;
+        Anim_SetSequence(&p->animation, p->deathAnimation, 3, p->deathVariant, 0);
+        p->update = DragonPuppy_UpdateAttackTiming;
     }
 }

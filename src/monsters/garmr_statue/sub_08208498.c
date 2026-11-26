@@ -23,7 +23,7 @@ static inline void Polar(struct SceneVec *v, s32 angle, s32 length)
 u32 GarmrStatue_FireAimedVolley(struct GarmrStatue *p)
 {
     struct SceneVec position, velocity;
-    struct SceneVec *pos, *vel, *player, *origin;
+    struct SceneVec *pos, *player, *origin;
     u8 angle;
     s32 half, speed, range;
     const u16 *sampleOrigin;
@@ -46,13 +46,12 @@ u32 GarmrStatue_FireAimedVolley(struct GarmrStatue *p)
                 speed += Mod(ParticleRandom_ReadDirectSample(gRandomTable), range);
         }
         Polar(&velocity, angle, speed);
-        vel = &velocity;
         if (Mod(p->fireTimer, 20) == 0) {
-            SpriteEffectController_Create(&position, vel, 0x4384, 0xf62b, 0, 0x200, 9, effectKind,
+            SpriteEffectController_Create(&position, &velocity, 0x4384, 0xf62b, 0, 0x200, 9, effectKind,
                                           2, 0, 0, 0, p->effectA, p->effectB, effectMask,
                                           p->effectC, 0, 0);
         } else {
-            SpriteEffectController_Create(&position, vel, 0x4384, 0xf62b, 0, 0x400, 9, effectKind,
+            SpriteEffectController_Create(&position, &velocity, 0x4384, 0xf62b, 0, 0x400, 9, effectKind,
                                           2, 0, 0, 0, p->effectA, p->effectB, effectMask,
                                           p->effectC, 0, 0);
         }

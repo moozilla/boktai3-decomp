@@ -64,8 +64,7 @@ void PlasmaCannon_ApplyHitReaction(struct ContactCollider *sourceInput,
             u32 *index = &gRandomIndex;
             u32 limit = 0x3ff;
             u32 mask = 0x7f;
-            i = 2;
-            do {
+            for (i = 2; i >= 0; i--) {
                 u32 random;
                 u32 value;
                 u32 sample;
@@ -92,8 +91,7 @@ void PlasmaCannon_ApplyHitReaction(struct ContactCollider *sourceInput,
                 }
                 value = 0;
                 SparkParticle_Spawn(&frame.position, 1, vel, value, 3, 8, 2, 2);
-                i--;
-            } while (i >= 0);
+            }
         }
     }
 }

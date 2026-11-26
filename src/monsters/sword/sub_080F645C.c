@@ -1,3 +1,4 @@
+#include "monsters/skeleton/enemy_defeat_statistics.h"
 #include "monsters/ivy/phase_object.h"
 #include "monsters/sword/sword_task.h"
 
@@ -20,23 +21,21 @@ static inline s32 SubtractDamage(u16 *health, u16 *damage)
 }
 void Sword_UpdateDamage(struct SwordTask *p)
 {
-    u32 zero;
     if (p->body.responseValue)
         p->body.responseValue--;
     Sword_UpdateBodyPaletteRestore(p);
     if (p->damageKind) {
         {
             s32 health = SubtractDamage((u16 *)&p->health, &p->damage);
-            zero = 0;
             p->health = health;
         }
         if (p->health < 0) {
             p->damage += p->health;
-            p->health = zero;
+            p->health = 0;
         }
         ChildGroup_ShowDamageNumber(p, (u16)p->damageKind, 0);
-        p->damageKind = zero;
-        p->damage = zero;
+        p->damageKind = 0;
+        p->damage = 0;
         if (p->health <= 0) {
             do {
                 u32 flags;
@@ -48,13 +47,13 @@ void Sword_UpdateDamage(struct SwordTask *p)
                     u8 *g = (u8 *)gGameState;
                     s16 *q;
                     u32 v;
-                    q = (s16 *)(g + 0x538);
+                    q = &((struct EnemyDefeatStatistics *)g)->total;
                     v = *(u16 *)q;
                     *q = *q < 9999 ? v + 1 : 9999;
                 }
                 flags = p->body.reactionFlags;
                 do {
-                    s16 *counter = (s16 *)((u8 *)gGameState + 0x548);
+                    s16 *counter = &((struct EnemyDefeatStatistics *)gGameState)->unknown548;
                     *counter = *counter < 9999 ? *counter + 1 : 9999;
                     if (flags & 0x80) {
                         gGameState->targetFlagBonuses[0] =

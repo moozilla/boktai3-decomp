@@ -35,10 +35,7 @@ void PoisonHand_WaitForPlayerApproach(void);
 struct SceneVec *Player_GetEffectivePosition(s32);
 
 // confidence=low: maintains the approach-triggered emergence animation and particle emission.
-struct Velocity {
-    s16 x, y, z, pad;
-};
-static inline void Polar(struct Velocity *v, u8 angle, s32 magnitude)
+static inline void Polar(struct SceneVec *v, u8 angle, s32 magnitude)
 {
     v->x = Math_ShiftTowardZero(gUnk_086149C4[(angle + 64) & 255] * magnitude, 12);
     v->y = 0;
@@ -53,7 +50,7 @@ s32 PoisonHand_UpdateEmergence(struct PoisonHand *input)
 {
     struct PoisonHand *p = input;
     struct SceneVec position;
-    struct Velocity velocity;
+    struct SceneVec velocity;
     s32 angle;
     s32 magnitude;
     s32 jitter;
@@ -71,7 +68,7 @@ s32 PoisonHand_UpdateEmergence(struct PoisonHand *input)
     if (Mod(p->countdown, 10) == 0 && p->countdown > 90) {
         if (Mod(p->countdown, 20) == 0)
             SpriteEffectController_Create(&position, &velocity, 0x61f9, 0x31f4, 8, 0x200, 9,
-                                          palette, 2, 0, 0, 0, p->effectX, p->effectY, attributes,
+                                          0x1c5, 2, 0, 0, 0, p->effectX, p->effectY, 0x8000,
                                           p->effectZ, 0, 0);
         else
             SpriteEffectController_Create(&position, &velocity, 0x61f9, 0x31f4, 8, 0x400, 9,
