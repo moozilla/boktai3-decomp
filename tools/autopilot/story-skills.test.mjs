@@ -335,6 +335,26 @@ test('a lift door first approaches a reachable landing at the platform height', 
   assert.deepEqual(approach.next(), { done: true, value: { name: 7, height: 512, target: [384, 640], reached: true } });
 });
 
+test('simultaneous plates require a block on each goal cell', () => {
+  const w = 5, h = 3, blocks = [{ x: 1, z: 1, kind: 0 }, { x: 3, z: 1, kind: 0 }];
+  const cells = Array.from({ length: w * h }, (_, i) => ({
+    level: blocks.some((b) => i === b.z * w + b.x) ? 2 : 1, slope: false, open: true, flags: 0,
+  }));
+  const { planPushes } = skill('world', {});
+  const goals = new Set(['0,1', '4,1']);
+  assert.deepEqual(planPushes({ w, h, cells }, [2, 2], goals, blocks), []);
+  const plan = planPushes({ w, h, cells }, [2, 2], goals, blocks, 100, { occupy: true });
+  assert.deepEqual(plan.map((move) => [move.x, move.z, move.dir]), [[1, 1, 3], [3, 1, 1]]);
+});
+
+test('a block that survives a drop occupies the lower pressure plate', () => {
+  const cells = [1, 3, 2].map((level) => ({ level, slope: false, open: true, flags: 0 }));
+  const { planPushes } = skill('world', {});
+  const result = planPushes({ w: 3, h: 1, cells }, [2, 0], new Set(['0,0']),
+    [{ x: 1, z: 0, kind: 0, pushes: Infinity, survivesFall: true }], 100, { occupy: true });
+  assert.deepEqual(result, [{ x: 1, z: 0, dir: 3, from: [2, 0] }]);
+});
+
 test('armor targets model damage to the guard and the contact cooldown', () => {
   const fields = { 0xb1c: 240, 0xb20: 65, 0xb2c: 9, 0xb32: 2 };
   const read = (addr) => fields[addr - 0x02010000] ?? 0;

@@ -43,7 +43,7 @@ exports.blocks = () => {
     if (!o.active || o.mode === 2 || o.mode === 3) continue;
     const idx = o.cellRef.index;
     out.push({ slot: i, type: o.type, kind: o.kind, x: idx % w, z: Math.floor(idx / w), top: o.cellRef.cell.height & 15,
-      health: o.health, pushes: o.pushLimited ? o.pushesLeft : Infinity, view: o });
+      health: o.health, pushes: o.pushLimited ? o.pushesLeft : Infinity, survivesFall: !(o.flags & 8), view: o });
   }
   return out;
 };
@@ -636,7 +636,7 @@ exports.people = () => {
 // [{x, z, dir, from: [px, pz]}] after which a goal cell is reachable, or null.
 const DIRS = [[0, -1], [1, 0], [0, 1], [-1, 0]];  // the game's 0 north (-z), 1 east (+x), 2 south, 3 west
 exports.DIR_KEYS = ['up+right', 'down+right', 'down+left', 'up+left'];
-exports.planPushes = (grid, start, goals, blocks, maxStates = 20000) => {
+exports.planPushes = (grid, start, goals, blocks, maxStates = 20000, opts = {}) => {
   const W = grid.w, H = grid.h;
   const lvl0 = grid.cells.map((c) => c.level), slope = grid.cells.map((c) => c.slope), open = grid.cells.map((c) => c.open);
   const flag8 = grid.cells.map((c) => !!(c.flags & 8));
@@ -657,12 +657,14 @@ exports.planPushes = (grid, start, goals, blocks, maxStates = 20000) => {
     return seen;
   };
   const goalIdx = [...goals].map((k) => { const [x, z] = k.split(',').map(Number); return ix(x, z); });
-  const s0 = { lvl: lvl0.slice(), blocks: blocks.filter((b) => b.kind === 0).map((b) => ({ c: ix(b.x, b.z), pushes: b.pushes })), player: ix(...start), path: [] };
+  const s0 = { lvl: lvl0.slice(), blocks: blocks.filter((b) => b.kind === 0).map((b) => ({
+    c: ix(b.x, b.z), pushes: b.pushes, survivesFall: b.survivesFall,
+  })), player: ix(...start), path: [] };
   const key = (st, region) => st.blocks.map((b) => b.c).sort((a, b) => a - b).join(',') + '|' + Math.min(...region) + '|' + st.lvl.join('');
   const q = [s0], seen = new Set();
   while (q.length && seen.size < maxStates) {
     const st = q.shift(), bset = new Set(st.blocks.map((b) => b.c)), region = reach(st.lvl, bset, st.player);
-    if (goalIdx.some((c) => region.has(c))) return st.path;
+    if (opts.occupy ? goalIdx.every((c) => bset.has(c)) : goalIdx.some((c) => region.has(c))) return st.path;
     const k = key(st, region);
     if (seen.has(k)) continue;
     seen.add(k);
@@ -677,8 +679,11 @@ exports.planPushes = (grid, start, goals, blocks, maxStates = 20000) => {
         if (slope[T] || flag8[T] || bset.has(T) || !(st.lvl[T] < top)) return;
         const lvl = st.lvl.slice(), nb = st.blocks.map((x) => ({ ...x }));
         lvl[b.c] = top - 1;
-        if (top - lvl[T] === 1) { lvl[T] = top; nb[bi].c = T; nb[bi].pushes--; }
-        else { lvl[T] += 1; nb.splice(bi, 1); }  // fell in: now floor
+        lvl[T] += 1;
+        // Scene_UpdateFallingObject leaves an unbroken block on the lower
+        // floor, where its body continues to occupy a pressure plate.
+        if (lvl[T] === top || (opts.occupy && b.survivesFall)) { nb[bi].c = T; nb[bi].pushes--; }
+        else nb.splice(bi, 1);
         q.push({ lvl, blocks: nb, player: P, path: [...st.path, { x: bx, z: bz, dir: d, from: [px, pz] }] });
       });
     });

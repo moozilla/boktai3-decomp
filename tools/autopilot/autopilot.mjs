@@ -51,6 +51,7 @@ function stageData(file, generator, args, fallback) {
 }
 const STAGES = stageData('build/assets/stages.json', 'tools/assets/stages.py', ['json'], []);
 const LOCKS = stageData('build/autopilot/locks.json', 'tools/autopilot/locks.py', [], {});
+const PLATE_PUZZLES = stageData('build/autopilot/plate-puzzles.json', 'tools/autopilot/plate-puzzles.py', [], {});
 const ESCORT_TARGETS = stageData('build/autopilot/escort-targets.json', 'tools/autopilot/escort-targets.py', [], {});
 // What carries which reaction flag (tools/autopilot/breakers.py: Breakable_OnHit, the gun's
 // lens table, weapon modifiers, read from the source and the ROM's weapon records).
@@ -215,6 +216,16 @@ const GOALS = {
       }
       // Both HP traps and live pressure plates can run scripts on contact.
       let prioritizeExit = L.coffinAvailable();
+      for (const puzzle of PLATE_PUZZLES[here] || []) {
+        if (!L.conditionsAllow(puzzle.cond)) continue;
+        const solved = yield* L.solvePlatePuzzle(puzzle, { avoid: stageOf(here).doors.map((d) => d.box),
+          trace: (e) => event({ skill: 'nav', ...e }) });
+        event({ skill: 'plate-puzzle', ...solved, scene: here });
+        if (solved.done) {
+          prioritizeExit = true;
+          yield* untilControl(g, L, () => !g.fn.ScriptUtility_IsControlFlagSet(), 30, 1800);
+        }
+      }
       const switches = (stageOf(here).switches || []).concat(L.floorSwitches().filter((sw) => !sw.pressed));
       for (const sw of switches) {
         const key = `${here}:switch:${sw.box ?? sw.name}`;
