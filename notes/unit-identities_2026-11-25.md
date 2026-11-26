@@ -1206,3 +1206,55 @@ Tags: Otenko, Kuro, Trinity, Sabata projection, BB34, D774, 8EA3, 5B01
 
 Use `build/identify/pass3/npc_gcl.py` and `npc_calls.py` to list keyed
 placements and callers. `replay_cast.py` holds the kind 28 and 29 tapes.
+
+## Pass 3 particle paths, rows 16–20
+
+Tags: player spiral trail, recoil puff, scripted shot, Vanargand, coffin ring, Wind Cannon
+
+1. `effects/particles/particle_burst` spans three uses. At 0016→6201,
+   staged Django motion 13 starts the orbiting trail through
+   `SpiralTrail_CreateWithParticles`. The action runs its original
+   `ParticleBurst_*` callbacks in `player-motion/action13.png`. The
+   082371E4–082373C8 range is a different pool. In `pass3-rising-puff`,
+   original 08237368 creates a 1C1A frame-12 puff on a 3955 ground
+   position. Compare `puff.png` and `rising.png` with `before.png`.
+   Its ordinary and alternate Player callers are recoil and recovery
+   callbacks. Use `player/effects/spiral_trail` and
+   `player/effects/recoil_puffs`. The remaining `moving_glyph.c` is the
+   cutscene shot. At 0016→6201 `pass3-cutscene-shot-field` invokes
+   original `PlayerCue_Shoot` 0815BCBC on Django. It calls 082375FC and
+   loads 210E with palette 4B. Drawable 0201007C submits from frames
+   1928 onward with diagonally changing screen coordinates. The glowing
+   shot separates from Django in `shot.png`. The same update runs at
+   the stock 0009 Lifeless Town checkpoint. Use
+   `player/cutscene/shot_effect.c`.
+2. `effects/particles/particle_effect` is the gold energy flash. The
+   0016 staged motion-9 capture enters `ActorBurst_Create`, draws the
+   gold effect around Django, and runs its attached sprite and orbit
+   update. The two shipped callers are the held and alternate energy
+   burst handlers. Use `player/effects/action_flash`.
+3. `effects/particles/sprite_particle` at 081FED9C is Vanargand's pool.
+   In 0072→6323 attach the original burst to the live boss at 0200BEA4
+   by staging its burst timer, origin and presentation mode. Native
+   `SingletonSlot7_UpdatePresentation` calls 081FF09C from 081F196C
+   (Thumb return 081F196D), starting at frame 1925. The original manager
+   loads 61F9 and 2E90 and the motes are visible in
+   `pass3-vanargand-motes/burst.png`. The unstaged segment has zero
+   entries in this exact pool. Its two callers at 081EEECC and 081F1274
+   both belong to Vanargand. Other particle pools in the project use
+   the SpriteParticle prefix too, so scope the rename to this unit.
+4. `effects/particles/proximity_emitter` is the coffin proximity ring.
+   Stock 0024 at 3472 reaches F156 via 3475→851→852. Task 0200E964
+   emits every four frames while its ring at 0200E9C4 submits in the
+   upper right. `pass3-coffin-ring/particles.png` shows the checkpoint.
+   The controlled 3955 constructor run identifies the 0BA8 resource.
+   Lifeless Town 3107, White Forest 4025 and Pirate Island 4587 run
+   the same callback at their coffin checkpoints.
+5. `monsters/enemy_particle` is shared by enemy attacks. 0042→4755
+   renders the gale in `wind-cannon-west/gale.png` and ties its entries
+   to the Wind Cannon caller. 0054→5297 runs the same pool around
+   Screamer, and Poison Hand uses the same emitter in 0820E2A4.
+   Keep the shared destination `effects/particles/enemy_attacks`.
+
+The new effects tapes are in `build/identify/pass3/replay_effects.py`.
+They preserve the original ROM and stage only the specified entry state.

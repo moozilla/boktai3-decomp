@@ -38,7 +38,7 @@ TileTrigger_,FloorTrap_,src/field/tile_trigger,"0013→3161, original 2FA5 slots
 FrostEmitter_,SabataFrost_,src/effects/frost_emitter,0033/4233. EC71 attaches its 4384 cloud emitter. Staged constructor and draw confirm the effect in the battle.
 CollisionController_,StrikeTrap_,src/field/collision_controllers,0866 ID E811. Original collision callback and delayed spark blast verified in 3955.
 DirectionalController_,InteractionPrompt_,src/field/directional_interaction_controllers,0029→3955. A at 883A/E6CC selects the slot and opens the Fireball hint #1690 through the original input handler.
-ProximityEmitter_,TetherRing_,src/field/proximity_particle_emitter,F156 / graphics 0BA8. Staged proc 852 draws ring sparks in 3955.
+ProximityEmitter_,TetherRing_,src/field/proximity_particle_emitter,F156 / 0BA8. Stock 0024 Ancient Tree checkpoint at 3472 renders and emits from the coffin ring. Proc 3475 invokes 851→852.
 Params3D0_,TitleDisplay_,src/actors/actor_animation_controller/sub_081EAB64.c / sub_081EB598.c / sub_081EB5A8.c / sub_081EB724.c / sub_081EB7DC.c,0000 cold boot dispatches 3578 + 4A25 FBD8; the phoenix title emblem animates under these callbacks.
 SceneObjects_Script,SlidingDoors_Script,src/actors/scene_object_controller,"0054/5297 6D69 and D4E3 update the separate sliding-door task, sprites 7ACD and 7AD3."
 SceneProcSprites_,BallisticSprite_,src/effects/ballistic_sprite_effect,"Controlled original 081394B4 uses 409C launch, flight and the scatter trail."
@@ -48,3 +48,6 @@ ActorMarker_,BikeChargeMarker_,src/effects/particle_burst_effect/following_sprit
 Player_UpdateLink,LinkPlayer_Update,0824261C / 082438F4,Controlled 3955 alternate Django runs both entry points on the task returned by the original constructor. The ordinary Player task keeps its existing update name.
 sub_08243B0C,LinkPlayer_Create,08243B0C,Original constructor creates the 0xCAC task. The 3955 controlled run shows a second blue Django and traces the task owner into LinkPlayer update.
 SceneObjects_,PuzzleBlocks_,src/field/scene_objects,0029→3955. D9AE initializes the E02A stone-block task. The 9D41 pair and removal are tied to each original slot by renderer submissions. The same prefix in the separate door pool is outside scope.
+MovingGlyph_,CutsceneShot_,src/effects/particle_burst/moving_glyph.c,PlayerCue_Shoot loads 210E and the original task moves the shot across the 6201 screen. The 2961 stock run hits the same unit.
+SpriteParticle_,VanargandMotes_,src/effects/sprite_particle,The live Vanargand presentation callback uses the original 081FF09C pool in the controlled 6323 burst. Scope to 081FED9C–081FF38C.
+ParticleEffect_,PlayerActionFlash_,src/effects/particle_effect,"Original Player motion 9 runs the gold flash, orbit effect and terminal update at 6201."
