@@ -17,7 +17,7 @@ src/pooled_interactable.c,src/field/pooled_interactables/pooled_interactable.c,s
 src/directional_interaction.c,src/field/directional_interaction_controllers/directional_interaction.c,src/field/directional_interaction_controllers,directional_interaction.c,08009500,08009E30,,src/objects/directional_controller.c
 src/collision_controller.c,src/field/collision_controllers/collision_controller.c,src/field/collision_controllers,collision_controller.c,08009E30,0800A800,,src/objects/collision_controller.c
 src/homing_effect.c,src/effects/homing_and_orbiting_effects/homing_effect.c,src/effects/homing_and_orbiting_effects,homing_effect.c,0800A800,0800C49C,,
-src/effect_emitter.c,src/effects/effect_emitter/effect_emitter.c,src/effects/effect_emitter,effect_emitter.c,0800C49C,0800C7F4,,
+src/effect_emitter.c,src/effects/effect_emitter/effect_emitter.c,src/effects/effect_emitter,effect_emitter.c,0800C49C,0800C7F4,,src/effects/particles/effect_emitter.c
 src/damage_controller.c,src/field/damage_controller/damage_controller.c,src/field/damage_controller,damage_controller.c,0800C7F4,0800CBA0,,
 src/falling_objects.c,src/field/falling_objects/falling_objects.c,src/field/falling_objects,falling_objects.c,0800CBA0,0800D874,,
 src/scanline_presentation.c,src/effects/scanline_presentation/scanline_presentation.c,src/effects/scanline_presentation,scanline_presentation.c,0800D874,0800E0CC,,
@@ -33,7 +33,7 @@ src/message_menu.c,src/menus/message_menu/message_menu.c,src/menus/message_menu,
 src/password.c,src/menus/password_decoding/password.c,src/menus/password_decoding,password.c,0801150C,08011884,,
 src/scene_indicator.c,src/menus/scene_indicators/scene_indicator.c,src/menus/scene_indicators,scene_indicator.c,08011884,08012040,,
 src/animated_hazard.c,src/field/animated_hazards/animated_hazard.c,src/field/animated_hazards,animated_hazard.c,08012040,08012AD0,,
-src/debris_particles.c,src/effects/debris_particles/debris_particles.c,src/effects/debris_particles,debris_particles.c,08012AD0,08012D08,,
+src/debris_particles.c,src/effects/debris_particles/debris_particles.c,src/effects/debris_particles,debris_particles.c,08012AD0,08012D08,,src/effects/particles/debris_particles.c
 src/breakable_barrier.c,src/field/breakable_barriers/breakable_barrier.c,src/field/breakable_barriers,breakable_barrier.c,08012D08,080133C0,,
 src/fn/sub_080133C0.c,src/field/breakable_barriers/sub_080133C0.c,src/field/breakable_barriers,sub_080133C0.c,080133C0,080133CC,,
 src/terrain_shadow.c,src/field/terrain_shadows/terrain_shadow.c,src/field/terrain_shadows,terrain_shadow.c,080133CC,080136B4,,
@@ -2175,7 +2175,7 @@ src/fn/sub_0811D600.c,src/effects/pal_fade/sub_0811D600.c,src/effects/pal_fade,s
 src/fn/sub_0811D63C.c,src/effects/pal_fade/sub_0811D63C.c,src/effects/pal_fade,sub_0811D63C.c,0811D63C,0811D66C,,
 src/fn/sub_0811D66C.c,src/effects/pal_fade/sub_0811D66C.c,src/effects/pal_fade,sub_0811D66C.c,0811D66C,0811D6A0,,
 src/fn/sub_0811D6A0.c,src/effects/pal_fade/sub_0811D6A0.c,src/effects/pal_fade,sub_0811D6A0.c,0811D6A0,0811D6C8,,
-src/actor_palette_fade.c,src/effects/pal_fade/actor_palette_fade.c,src/effects/pal_fade,actor_palette_fade.c,0811D6C8,0811DAD4,,
+src/actor_palette_fade.c,src/effects/pal_fade/actor_palette_fade.c,src/effects/pal_fade/actor_palette_fade.c,actor_palette_fade.c,0811D6C8,0811DAD4,,src/system/game_state/actor_palette_fade.c
 src/script_options.c,src/engine/script_options/script_options.c,src/engine/script_options,script_options.c,0811DAD4,0811E37C,,
 src/script_record.c,src/engine/script_record/script_record.c,src/engine/script_record,script_record.c,0811E37C,0811EE3C,,
 src/actor_emitter.c,src/actors/actor_emitter/actor_emitter.c,src/actors/actor_emitter,actor_emitter.c,0811EE3C,0811F474,,
@@ -4113,7 +4113,7 @@ src/fn/sub_081D2A28.c,src/actors/tagged_scene_npc/sub_081D2A28.c,src/actors/tagg
 src/fn/sub_081D2A38.c,src/actors/tagged_scene_npc/sub_081D2A38.c,src/actors/tagged_scene_npc,sub_081D2A38.c,081D2A38,081D2D1C,,src/npc/tagged_npc/sub_081D2A38.c
 src/fn/sub_081D2D1C.c,src/actors/tagged_scene_npc/sub_081D2D1C.c,src/actors/tagged_scene_npc,sub_081D2D1C.c,081D2D1C,081D2D28,,src/npc/tagged_npc/sub_081D2D1C.c
 src/fn/sub_081D2D28.c,src/actors/tagged_scene_npc/sub_081D2D28.c,src/actors/tagged_scene_npc,sub_081D2D28.c,081D2D28,081D2D34,,src/npc/tagged_npc/sub_081D2D28.c
-src/frost_emitter.c,src/effects/frost_emitter/frost_emitter.c,src/effects/frost_emitter,frost_emitter.c,081D2D34,081D31D8,,
+src/frost_emitter.c,src/effects/frost_emitter/frost_emitter.c,src/effects/frost_emitter,frost_emitter.c,081D2D34,081D31D8,,src/effects/particles/frost_emitter.c
 src/fn/sub_081D31D8.c,src/player/player_particle_cloud/sub_081D31D8.c,src/player/player_particle_cloud,sub_081D31D8.c,081D31D8,081D31DC,,
 src/fn/sub_081D31DC.c,src/player/player_particle_cloud/sub_081D31DC.c,src/player/player_particle_cloud,sub_081D31DC.c,081D31DC,081D31E0,,
 src/fn/sub_081D31E0.c,src/player/player_particle_cloud/sub_081D31E0.c,src/player/player_particle_cloud,sub_081D31E0.c,081D31E0,081D31EC,,
@@ -4236,10 +4236,10 @@ src/fn/sub_081E3400.c,src/effects/scripted_presentation/sub_081E3400.c,src/effec
 src/fn/sub_081E3484.c,src/effects/scripted_presentation/sub_081E3484.c,src/effects/scripted_presentation,sub_081E3484.c,081E3484,081E34C4,,
 src/fn/sub_081E34C4.c,src/effects/scripted_presentation/sub_081E34C4.c,src/effects/scripted_presentation,sub_081E34C4.c,081E34C4,081E34D0,,
 src/actor_animation_controller.c,src/actors/actor_animation_controller/actor_animation_controller.c,src/actors/actor_animation_controller/actor_animation_controller.c,actor_animation_controller.c,081E34D0,081EAB64,,src/npc/cutscene_actor/actor_animation_controller.c
-src/fn/sub_081EAB64.c,src/actors/actor_animation_controller/sub_081EAB64.c,src/actors/actor_animation_controller,sub_081EAB64.c,081EAB64,081EB598,,
-src/fn/sub_081EB598.c,src/actors/actor_animation_controller/sub_081EB598.c,src/actors/actor_animation_controller,sub_081EB598.c,081EB598,081EB5A8,,
-src/fn/sub_081EB5A8.c,src/actors/actor_animation_controller/sub_081EB5A8.c,src/actors/actor_animation_controller,sub_081EB5A8.c,081EB5A8,081EB724,,
-src/fn/sub_081EB724.c,src/actors/actor_animation_controller/sub_081EB724.c,src/actors/actor_animation_controller,sub_081EB724.c,081EB724,081EB7DC,,
+src/fn/sub_081EAB64.c,src/actors/actor_animation_controller/sub_081EAB64.c,081EAB64-081EB7DC,sub_081EAB64.c,081EAB64,081EB598,,src/npc/cutscene_actor/sub_081EAB64.c
+src/fn/sub_081EB598.c,src/actors/actor_animation_controller/sub_081EB598.c,081EAB64-081EB7DC,sub_081EB598.c,081EB598,081EB5A8,,src/npc/cutscene_actor/sub_081EB598.c
+src/fn/sub_081EB5A8.c,src/actors/actor_animation_controller/sub_081EB5A8.c,081EAB64-081EB7DC,sub_081EB5A8.c,081EB5A8,081EB724,,src/npc/cutscene_actor/sub_081EB5A8.c
+src/fn/sub_081EB724.c,src/actors/actor_animation_controller/sub_081EB724.c,081EAB64-081EB7DC,sub_081EB724.c,081EB724,081EB7DC,,src/npc/cutscene_actor/sub_081EB724.c
 src/fn/sub_081EB7DC.c,src/actors/actor_animation_controller/sub_081EB7DC.c,src/actors/actor_animation_controller,sub_081EB7DC.c,081EB7DC,081EB81C,,
 src/mode_menu.c,src/menus/mode_menu/mode_menu.c,src/menus/mode_menu,mode_menu.c,081EB81C,081EC380,,
 src/fn/sub_081EC380.c,src/actors/actor_display/sub_081EC380.c,src/actors/actor_display,sub_081EC380.c,081EC380,081EC384,,

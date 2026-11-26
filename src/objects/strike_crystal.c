@@ -1,4 +1,4 @@
-#include "effects/particles/effect_emitter.h"
+#include "objects/effect_emitter.h"
 #include "engine/word_flags.h"
 
 void EffectEmitter_ReceiveHit(struct ContactCollider *attack, struct ContactCollider *unused,

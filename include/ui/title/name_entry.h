@@ -1,7 +1,7 @@
 #ifndef GUARD_NAME_ENTRY_H
 #define GUARD_NAME_ENTRY_H
 
-#include "npc/cutscene_actor/text_entry_widget.h"
+#include "ui/title/text_entry_widget.h"
 #include "engine/task.h"
 
 struct NameEntryTask {

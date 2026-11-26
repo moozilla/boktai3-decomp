@@ -100,11 +100,11 @@ src/effects/buffered_animation_task,src/effects/palette/palette_effect.c,buffere
 src/effects/charged_burst,src/effects/bursts/charged_burst,charged burst
 src/effects/circular_scanline_window,src/effects/screen/circle_window,circular window drawn with scanlines (CircleWindow)
 src/effects/color_and_fade_controller,src/effects/palette/color_fade_controller.c,color interpolation and fade queue
-src/effects/debris_particles,src/effects/particles/debris_particles.c,debris particles
+src/effects/debris_particles,src/objects/bat_curtain,0014→6401 5734 Count rematch. A staged hit on the live curtain calls 08012B34 and draws DA6D debris while the curtain flashes.
 src/effects/directional_effect,src/effects/directional_effect,directional effect around the player
 src/effects/directional_particles,src/effects/particles/impact_fragments,0046→4915. Nidhoggr’s native ContactBurst release creates eight 4147 fragments. Keep its two files with the other impact fragment primitives.
 src/effects/directional_sprite_effect,src/effects/sprites/directional_sprite_effect.c,directional sprite effect
-src/effects/effect_emitter,src/effects/particles/effect_emitter.c,generic effect emitter
+src/effects/effect_emitter,src/objects/strike_crystal.c,Green 066A strike crystal drawn by original 95A8 and proc 1179. The same crystal actor runs in Pirate Island.
 src/effects/effect_part,src/effects/scene/actor_effects,EffectPart/EffectGroup parts spawned on actors (SceneActorEffects)
 src/effects/explosion,src/effects/bursts/explosion.c,explosion
 src/effects/fading_particle_groups,src/objects/hazards/falling_object_effects,Original FallingObject burst calls this group; recorded standalone red-orange flame motes in 3955. Keep with falling hazards.
@@ -117,7 +117,7 @@ src/effects/four_effect_center_controller,src/effects/orbits/converging_effects.
 src/effects/fragment_burst,src/effects/bursts/fragment_burst,fragment burst
 src/effects/fragment_effect,src/effects/bursts/fragment_effect,fragment effect
 src/effects/fragment_groups,src/effects/particles/impact_fragments,Staged type 0 uses 84EE and creates a radial spread of white-blue fragments. The implementation accepts several debris sprite types.
-src/effects/frost_emitter,src/effects/particles/frost_emitter.c,frost particle emitter
+src/effects/frost_emitter,src/effects/particles/sabata_frost.c,EC71 boss creates the emitter. Controlled start during White Forest fight draws 4384 frost. The source also contains one Otenko script mode entry.
 src/effects/hardware_blend_transitions,src/effects/screen/blend_transition.c,hardware alpha-blend transitions
 src/effects/health_burst_effect,src/effects/healing,health burst effect; merge:src/effects/health_restore_effect
 src/effects/health_restore_effect,src/effects/healing,health restore effect; merge:src/effects/health_burst_effect
@@ -532,3 +532,5 @@ src/effects/particle_burst/sub_08237280.c,src/player/effects/recoil_puffs,Django
 src/effects/particle_burst/sub_082372F8.c,src/player/effects/recoil_puffs,Django’s ordinary and alternate Player recoil callbacks use the 08237368 puffs. Original spawn and rising update observed in the controlled 3955 replay. This is a separate range from the spiral trail.
 src/effects/particle_burst/sub_0823731C.c,src/player/effects/recoil_puffs,Django’s ordinary and alternate Player recoil callbacks use the 08237368 puffs. Original spawn and rising update observed in the controlled 3955 replay. This is a separate range from the spiral trail.
 src/effects/particle_burst/sub_08237368.c,src/player/effects/recoil_puffs,Django’s ordinary and alternate Player recoil callbacks use the 08237368 puffs. Original spawn and rising update observed in the controlled 3955 replay. This is a separate range from the spiral trail.
+081EAB64-081EB7DC,src/ui/title,The four Params3D0 files build the live title emblem at boot. Keep the tutorial Otenko main file on its own per-file route.
+src/effects/pal_fade/actor_palette_fade.c,src/effects/palette/actor_palette_fade.c,0037→6274. Saved Repair equipment and ordinary A hold after collision run the native green recovery palette and the restoration of rows 0378/0379. HP and original colors recover.
