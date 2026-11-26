@@ -1046,8 +1046,8 @@ void Vorn_TryUphillRoute(struct ChaseActor *actor)
     SceneActor_SelectDistantRoutePoint((struct Vorn *)context, point, &actor->base.body.position, 0x400000);
     if (!Vorn_SelectUphillTurn(context, point))
         return;
-    if (!Chase_TryRoute(actor, *((void **)(context + 0x5D0)), &actor->base.body.position, point)) {
-        Callback_InvokeActor(actor, *((void **)(context + 0x5F8)));
+    if (!Chase_TryRoute(actor, ((struct Vorn *)context)->chase.group.route, &actor->base.body.position, point)) {
+        Callback_InvokeActor(actor, ((struct Vorn *)context)->chase.group.fallback);
         return;
     }
     SceneActorAnimation_SelectDirectionalEntry(actor, 0);
@@ -1262,16 +1262,7 @@ void Vorn_BeginTargetPursuit(struct Vorn *actor)
         *p = value;
     }
     actor->chase.base.field2C2 = 32;
-    {
-        struct SceneActorReactionCommand *command = (void *)((u8 *)group + 0x8c);
-        void *payload = actor->chase.base.onAlternateEntry;
-        u32 kind = 7;
-        command->duration = 60;
-        command->payload = payload;
-        command->first = 0;
-        command->second = 0;
-        command->kind = kind;
-    }
+    SceneActorDelay_Prepare((void *)&group->saved, actor->chase.base.onAlternateEntry, 7, 60);
     dest = group->destination;
     point = &group->homeRoute;
     dest->x = point->point->x;
@@ -1586,17 +1577,17 @@ static inline void SetFlags(u16 bit, u16 *field)
     p->bits |= bit;
 }
 
-static inline void StartRoute(void *body, void *path, u8 *group)
+static inline void StartRoute(void *body, void *path, struct SceneActorChaseGroup *group)
 {
-    u32 index = group[0x83] ^ 1;
-    u8 *routes = group + 0x81;
+    u32 index = group->homeRoute.activeBranch ^ 1;
+    u8 *routes = group->homeRoute.branches;
     SceneBody_StartRoute(body, path, routes[index], 0, 0);
 }
 
 u8 Vorn_BeginPursuitRoute(struct Vorn *actor, u32 reset)
 {
     struct Vorn *context = actor->chase.base.context;
-    u8 *group = (void *)&context->chase.group.common;
+    struct SceneActorChaseGroup *group = &context->chase.group;
     struct VornResponseFlags *flags;
     if (context->pursuitCooldown)
         return 0;
@@ -1610,7 +1601,7 @@ u8 Vorn_BeginPursuitRoute(struct Vorn *actor, u32 reset)
     }
     context->field6EC = 60;
     if (reset == 1)
-        StartRoute(&actor->chase.base.body.id, group + 0x74, group);
+        StartRoute(&actor->chase.base.body.id, &group->homeRoute, group);
     Vorn_SelectRouteAwayFromTarget(&actor->chase);
     {
         u32 *field = &actor->chase.base.behaviorFlags;
@@ -2264,19 +2255,10 @@ static inline void Vorn_Resume(struct Vorn *input, struct SceneActorChaseGroup *
     Chase_ClearBits(&actor->chase.base.motionFlags, 0x400);
     actor->chase.group.turn.turnsRemaining = 255;
     SceneActorAttachment_ReplaceResponseSlot(actor, 0, 2, 0x19);
-    SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0);
+    SceneActorAnimation_SelectDirectionalEntry(&actor->chase.base, 0);
     Chase_SetCtl(&actor->chase, SceneActorReaction_RestoreAfterDelay, 14);
     SceneActorChase_SetState(&actor->chase, 3, 1, 0);
-    {
-        struct SceneActorDelayedResponse *command = (void *)&group->saved;
-        u32 target = (u32)actor->chase.base.onAlternateEntry;
-        u32 kind = 7;
-        command->delay = 60;
-        command->control = (void *)target;
-        command->state = 0;
-        command->phase = 0;
-        command->behavior = kind;
-    }
+    SceneActorDelay_Prepare((void *)&group->saved, actor->chase.base.onAlternateEntry, 7, 60);
     {
         u32 mask = 16;
         u32 *field = &actor->chase.base.behaviorFlags;
@@ -2395,12 +2377,8 @@ u8 SceneActor_DispatchContextAction(struct Vorn *q, u32 reset)
 
 u8 Vorn_BeginContactAnimation(struct ChaseActor *actor)
 {
-    if (actor->group.hitReactionLatch == 0 && (actor->base.field2E6 & 8)) {
-        actor->base.hitLockTimer = 45;
-        actor->group.hitReactionLatch = 65;
-        SceneActorAnimation_SelectDirectionalEntry(actor, 3);
-    }
-    return SceneActor_DispatchContextAction(actor, 0);
+    SceneActorChase_BeginContactAnimation(actor);
+    return SceneActor_DispatchContextAction((struct Vorn *)actor, 0);
 }
 
 void SceneActorTarget_ResetContactResponse(void *);
