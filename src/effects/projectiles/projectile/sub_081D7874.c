@@ -1,17 +1,10 @@
-#include "global.h"
+#include "effects/projectiles/timed_effect_manager.h"
 
-void ProjectileTask_ClearTrailSprites(u8 *p)
+void ProjectileTask_ClearTrailSprites(struct TimedEffectManager *manager)
 {
-    u8 z = 0;
-    u32 one = 1;
-    u8 *a = p + 0x70;
-    u8 *b = p;
-    s32 i = 3;
-    do {
-        *a = z;
-        *(u32 *)(b + 0x48) |= one;
-        a += 0x30;
-        b += 0x30;
-        i--;
-    } while (i >= 0);
+    s32 i;
+    for (i = 0; i < 4; i++) {
+        manager->effects[i].active = 0;
+        manager->effects[i].sprite.flags |= 1;
+    }
 }
