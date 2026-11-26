@@ -1,4 +1,5 @@
 #include "global.h"
+#include "monsters/armor/armor_part_queue.h"
 #include "monsters/armor/armor_decision_ops.h"
 #include "engine/engine_globals.h"
 
@@ -20,7 +21,7 @@ struct ArmorDecisionActor {
     u8 padb3a[2];
     u8 behavior, phase;
     u8 padb3e[0xb58 - 0xb3e];
-    u8 sequence[0x1120 - 0xb58];
+    struct ArmorLaunchGroup sequence;
     u8 decision, fastMode;
     s16 attackCooldown, secondaryCooldown, sequenceTimer, modeTimer, timer112a;
     u16 savedB26, savedB28;
@@ -76,7 +77,7 @@ void Armor_UpdateAlignedStrikeDecision(struct ArmorDecisionActor *actor)
                 }
             approach:
                 if (((++actor->sequenceTimer) > 300) &&
-                    Armor_IsSequenceIncomplete(actor->sequence)) {
+                    Armor_IsSequenceIncomplete(&actor->sequence)) {
                     ActorController_SetBehavior(actor, 31);
                     actor->sequenceTimer = 0;
                     break;
