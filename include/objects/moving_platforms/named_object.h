@@ -30,7 +30,7 @@ struct NamedObject {
     s16 verticalImpulse;
     u32 enterScript, script, exitScript;
     u16 row;
-    u8 unknownD2[2];
+    u16 trailPhase;
     s32 lowerHeight, upperHeight;
     u32 name, field_E0;
     NamedObjectHandler handlers[3];
