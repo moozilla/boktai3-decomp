@@ -275,7 +275,7 @@ void Crow_RecoverFromDisplacement(struct ChaseActor *actor, s32 elapsed)
         Crow_DisableAttackCollision(actor);
         actor->base.body.direction = actor->base.tracking.heading;
         SceneActorChase_SetControl(actor, SceneActorControl_OnIdle, 16);
-        SceneActorChase_SetState(actor, 0, 0, 1);
+        SceneActorTerrain_EnterState(actor, 0, 0, 1);
         actor->base.body.direction = actor->base.tracking.heading;
         actor->base.field2C2 = 64;
     }
@@ -588,10 +588,8 @@ void Crow_UpdateWanderTimer(struct ChaseActor *actor)
 {
     struct Crow *context = actor->base.context;
     if (SceneActorControl_TakeStateEntry(actor)) {
-        u32 value;
         SceneActorChase_SetControl(actor, actor->base.onStanding, 0);
-        value = Crow_NextWanderRandom();
-        context->wanderTicks = (0x7F & value) + 0x14;
+        context->wanderTicks = (Crow_NextWanderRandom() & 0x7F) + 0x14;
     }
     {
         if (!SceneActorPlacement_TestValue(4, context->flags)) {
@@ -662,7 +660,7 @@ void Crow_BeginScriptedAction(struct ChaseActor *actor)
     if (!SceneActor_ActionsBlocked(actor) && gPlayers[0]) {
         struct Crow *p = actor->base.context;
         SceneActorChase_SetControl(actor, SceneActorControl_OnIdle, 0x10);
-        SceneActorChase_SetState(actor, 0, 0, 3);
+        SceneActorTerrain_EnterState(actor, 0, 0, 3);
         SceneActorChase_ClearWordFlags(&p->flags, 4);
         {
             struct SceneActorChaseTracking *extra = &actor->base.tracking;
@@ -978,7 +976,7 @@ void Crow_BeginReaction(struct ChaseActor *actor)
         return;
     if (!Crow_GetReactionTracking(actor, &extra)) {
         SceneActorChase_SetControl(actor, SceneActorControl_OnIdle, 0x10);
-        SceneActorChase_SetState(actor, 0, 0, 3);
+        SceneActorTerrain_EnterState(actor, 0, 0, 3);
         {
             u32 bit = 8;
             bit |= extra->flags;
@@ -1271,7 +1269,7 @@ void Crow_ApproachPlayerThenRecoil(struct ChaseActor *actor)
             Crow_TestResponseFlags(body, 2)) {
             Crow_MakeRecoilVelocity(&actor->base.secondaryMotion, actor->base.body.direction,
                                     body->distance * 2);
-            MonsterInit_SetState(actor, 0, 2, 2);
+            SceneActorTerrain_EnterState(actor, 0, 2, 2);
         } else {
             actor->base.counter2AC++;
         }
@@ -1564,7 +1562,7 @@ s32 Crow_Init(void *object)
         flag = 1;
     }
     if (flag != 1) {
-        MonsterInit_SetState(actor, 0, 0, 0);
+        SceneActorTerrain_EnterState(actor, 0, 0, 0);
         MonsterInit_SetControl(actor, MonsterInit_GetStandingControl(actor), 0);
     }
     MonsterInit_InitializeRegion(actor);
