@@ -60,7 +60,7 @@ static inline u32 PlayerNear(struct PairedSceneHalf *p)
 }
 
 // confidence=low: part approaches the player and chooses contact or timeout animation
-void ActorStatus_UpdatePlayerApproach(struct VanargandAttackPair *boss,
+void VanargandCombat_UpdatePlayerApproach(struct VanargandAttackPair *boss,
                                       struct PairedSceneHalf *part)
 {
     struct VanargandAttackPair *owner = boss;

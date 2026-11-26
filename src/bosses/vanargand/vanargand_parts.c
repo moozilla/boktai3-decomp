@@ -775,7 +775,7 @@ void Vanargand_UpdatePartLunge(void *unused, struct PairedSceneHalf *p)
 
 void CpuSet(const void *, void *, u32);
 
-void ActorStatus_Deactivate(void *, void *);
+void VanargandCombat_Deactivate(void *, void *);
 
 void Vanargand_ReleaseRadialEffects(struct VanargandAttackPair *boss, struct PairedSceneHalf *p)
 {
@@ -816,7 +816,7 @@ void Vanargand_ReleaseRadialEffects(struct VanargandAttackPair *boss, struct Pai
 
         case 1:
             p->finished = 1;
-            ActorStatus_Deactivate(boss, p);
+            VanargandCombat_Deactivate(boss, p);
             break;
     }
 }
@@ -877,7 +877,7 @@ void Vanargand_EmitRadialPartEffects(struct VanargandAttackPair *boss, struct Pa
 
         case 2:
             p->finished = 1;
-            ActorStatus_Deactivate(boss, p);
+            VanargandCombat_Deactivate(boss, p);
             break;
     }
 }
@@ -1479,7 +1479,7 @@ void Vanargand_UpdatePartFadeOut(struct VanargandAttackPair *boss, struct Paired
                     u8 *ptr = &p->finished;
                     *ptr = 1;
                 }
-                ActorStatus_Deactivate(boss, p);
+                VanargandCombat_Deactivate(boss, p);
             } break;
         }
     }

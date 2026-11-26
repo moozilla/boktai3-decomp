@@ -33,11 +33,11 @@ void Player_GetWorldPosition(s32, s32 *);
 void SceneTilemap_CopyScrollSourceState(struct VanargandHeadScroll *);
 void VanargandHead_ResetDisplayState(struct VanargandHeadActor *);
 void VanargandHead_DispatchUpdateCallback(struct VanargandHeadActor *);
-void SceneActors_TickStateCallback(struct VanargandHeadActor *);
+void VanargandHead_TickStateCallback(struct VanargandHeadActor *);
 void SceneActors_UpdateTargetMetrics(struct VanargandHeadActor *);
 void SceneActors_UpdateEffects(struct VanargandHeadActor *);
 void Sound_StopSong(u32);
-void SceneActors_UpdateIdleDisplay(void);
+void VanargandHead_UpdateIdleDisplay(void);
 void VanargandHead_UpdatePresentation(struct VanargandHeadActor *);
 
 static inline u8 PlayerHasFlag(void)
@@ -62,8 +62,8 @@ s32 VanargandHead_Update(void *arg)
     struct VanargandHeadScroll scroll[2];
     if (actor->motionMode == 0) {
         u32 flagged = PlayerHasFlag();
-        if (flagged == 1 && VanargandHead_GetCallback(p) != SceneActors_UpdateIdleDisplay) {
-            p->callback = SceneActors_UpdateIdleDisplay;
+        if (flagged == 1 && VanargandHead_GetCallback(p) != VanargandHead_UpdateIdleDisplay) {
+            p->callback = VanargandHead_UpdateIdleDisplay;
             p->callbackTimer = 0;
             p->callbackEntered = flagged;
             p->flagA2 = 0;
@@ -81,7 +81,7 @@ s32 VanargandHead_Update(void *arg)
     SceneActors_UpdateTargetMetrics(p);
     VanargandHead_ResetDisplayState(actor);
     VanargandHead_DispatchUpdateCallback(actor);
-    SceneActors_TickStateCallback(actor);
+    VanargandHead_TickStateCallback(actor);
     if (p->motionMode != 0) {
         u32 mask = 0x40;
         u32 *fp = &p->effectFlags;

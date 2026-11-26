@@ -1,6 +1,6 @@
 #include "objects/scene_object_slot.h"
-void SlidingDoor_UpdateLowering(void);
-void SlidingDoor_BeginLowering(struct SceneObjSlot *s)
+void SlidingDoors_UpdateLowering(void);
+void SlidingDoors_BeginLowering(struct SceneObjSlot *s)
 {
     Sound_PlaySong(0x152);
     s->pose = 0;
@@ -10,5 +10,5 @@ void SlidingDoor_BeginLowering(struct SceneObjSlot *s)
     s->variant = SceneObjSlot_LiftMotionVariant(SCENE_OBJ_LIFT_LOWERED);
     s->terrain->cell.shapeAndHeight = (s->terrain->cell.shapeAndHeight & 0xf0) | (s->cellHeight + 1);
     s->terrain->flags &= ~1;
-    s->callback = SlidingDoor_UpdateLowering;
+    s->callback = SlidingDoors_UpdateLowering;
 }

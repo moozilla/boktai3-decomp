@@ -758,13 +758,13 @@ addr,name,mode,confidence,source,notes
 0801DEBC,ResultTutorial_ReadScript,thumb,low,src-alias,
 0801DEF4,ResultTutorial_Initialize,thumb,low,src-alias,
 0801DFB8,ResultTutorial_CreateTask,thumb,low,src-alias,"Allocates the tutorial's Task_Create object, wires its update/finish callbacks, and calls ResultTutorial_Initialize, killing the task on init failure "
-0801E000,SlidingDoor_UpdatePoseA,thumb,low,src-alias,
-0801E090,SlidingDoor_UpdatePoseB,thumb,low,src-alias,
-0801E0F4,SlidingDoor_UpdatePoseC,thumb,low,src-alias,
+0801E000,SlidingDoors_UpdatePoseA,thumb,low,src-alias,
+0801E090,SlidingDoors_UpdatePoseB,thumb,low,src-alias,
+0801E0F4,SlidingDoors_UpdatePoseC,thumb,low,src-alias,
 0801E184,SlidingDoors_Append,thumb,low,src-alias,
 0801E344,SlidingDoors_HasPrimaryId,thumb,low,src-alias,
 0801E374,SlidingDoors_HasSecondaryId,thumb,low,src-alias,
-0801E3A4,SlidingDoor_CheckActorCompatibility,thumb,low,src-alias,
+0801E3A4,SlidingDoors_CheckActorCompatibility,thumb,low,src-alias,
 0801E3E4,SlidingDoors_ScriptAppend,thumb,low,src-alias,
 0801E530,SlidingDoors_BeginActivation,thumb,low,src-alias,
 0801E5B8,SlidingDoors_BeginDeactivation,thumb,low,src-alias,
@@ -781,22 +781,22 @@ addr,name,mode,confidence,source,notes
 0801EBBC,SlidingDoors_ScriptSetSelection,thumb,low,src-alias,Reads a script id and stores it as the controller selection.
 0801EBE4,SlidingDoors_ClearSelection,thumb,low,src-alias,Clears the controller selection.
 0801EC00,SlidingDoors_HasTypeTwoResource,thumb,low,src-alias,
-0801EC4C,SlidingDoor_InitPlacement,thumb,low,src-alias,
+0801EC4C,SlidingDoors_InitPlacement,thumb,low,src-alias,
 0801EF28,SlidingDoors_AddPrimaryId,thumb,low,src-alias,
-0801EF58,SlidingDoor_UpdateInactiveIdle,thumb,low,src-alias,Empty per-object animate callback installed by SlidingDoors_SetInactive/AnimateInactive once the inactive blink sequence finishes; terminal no-op stat
-0801EF5C,SlidingDoor_UpdateActiveIdle,thumb,low,src-alias,"Empty per-object animate callback installed by SlidingDoors_SetActive/AnimateActive once the active blink sequence finishes; terminal no-op state, sym"
-0801EF60,SlidingDoor_AnimateInactive,thumb,low,src-alias,
-0801EFDC,SlidingDoor_AnimateActive,thumb,low,src-alias,
-0801F058,SlidingDoor_InitLiftPlacement,thumb,low,src-alias,Places a lift on its terrain cells and initializes the raised or lowered pose.
-0801F3A0,SlidingDoor_BeginRaising,thumb,low,src-alias,
-0801F3CC,SlidingDoor_BeginLowering,thumb,low,src-alias,
-0801F430,SlidingDoor_UpdateRaising,thumb,low,src-alias,
-0801F4C4,SlidingDoor_UpdateLowering,thumb,low,src-alias,
-0801F580,SlidingDoor_UpdateRaised,thumb,low,src-alias,
-0801F5B8,SlidingDoor_UpdateLowered,thumb,low,src-alias,
-0801F5EC,SlidingDoor_InitSlotPlacement,thumb,low,src-alias,
-0801F934,SlidingDoor_UpdateIdleA,thumb,low,src-alias,Empty animate-update callback assigned via the unnamed sub_0801F5EC during SlidingDoors_Append for several object kinds; distinct from EF58/EF5C's idl
-0801F938,SlidingDoor_UpdateIdleB,thumb,low,src-alias,Second empty animate-update callback assigned via sub_0801F5EC alongside UpdateIdleA; counterpart no-op state for a different object kind/variant
+0801EF58,SlidingDoors_UpdateInactiveIdle,thumb,low,src-alias,Empty per-object animate callback installed by SlidingDoors_SetInactive/AnimateInactive once the inactive blink sequence finishes; terminal no-op stat
+0801EF5C,SlidingDoors_UpdateActiveIdle,thumb,low,src-alias,"Empty per-object animate callback installed by SlidingDoors_SetActive/AnimateActive once the active blink sequence finishes; terminal no-op state, sym"
+0801EF60,SlidingDoors_AnimateInactive,thumb,low,src-alias,
+0801EFDC,SlidingDoors_AnimateActive,thumb,low,src-alias,
+0801F058,SlidingDoors_InitLiftPlacement,thumb,low,src-alias,Places a lift on its terrain cells and initializes the raised or lowered pose.
+0801F3A0,SlidingDoors_BeginRaising,thumb,low,src-alias,
+0801F3CC,SlidingDoors_BeginLowering,thumb,low,src-alias,
+0801F430,SlidingDoors_UpdateRaising,thumb,low,src-alias,
+0801F4C4,SlidingDoors_UpdateLowering,thumb,low,src-alias,
+0801F580,SlidingDoors_UpdateRaised,thumb,low,src-alias,
+0801F5B8,SlidingDoors_UpdateLowered,thumb,low,src-alias,
+0801F5EC,SlidingDoors_InitSlotPlacement,thumb,low,src-alias,
+0801F934,SlidingDoors_UpdateIdleA,thumb,low,src-alias,Empty animate-update callback assigned via the unnamed sub_0801F5EC during SlidingDoors_Append for several object kinds; distinct from EF58/EF5C's idl
+0801F938,SlidingDoors_UpdateIdleB,thumb,low,src-alias,Second empty animate-update callback assigned via sub_0801F5EC alongside UpdateIdleA; counterpart no-op state for a different object kind/variant
 0801F93C,SlidingDoors_UpdateController,thumb,low,src-alias,Processes activation messages and updates proximity ids and per-slot callbacks.
 080203D4,SlidingDoors_Destroy,thumb,low,src-alias,
 0802048C,SlidingDoors_Init,thumb,low,src-alias,
@@ -4422,7 +4422,7 @@ addr,name,mode,confidence,source,notes
 08101A38,MovingPlatform_InitFollowHooks,thumb,low,src-alias,
 08101A3C,MovingPlatform_FindByName,thumb,low,src-alias,Searches twelve object entries for a matching name key
 08101A74,MovingPlatform_GetFollowTarget,thumb,low,src-alias,Finds the object matching the manager follow target key used by release-from-script
-08101AB4,ActorGroup_ReleaseMember,thumb,low,src-alias,
+08101AB4,MovingPlatform_ReleaseMember,thumb,low,src-alias,
 08101B1C,MovingPlatform_RegisterFollowCells,thumb,low,src-alias,
 08101D2C,MovingPlatform_UpdateTerrainRegistration,thumb,low,src-alias,
 08101E20,MovingPlatform_IsMapCellOccupied,thumb,low,src-alias,Tests whether an entry with flag 1 at B8 records the supplied map cell index
@@ -4444,15 +4444,15 @@ addr,name,mode,confidence,source,notes
 08103060,MovingPlatform_SnapTetherToPlatform,thumb,low,src-alias,
 08103110,MovingPlatform_CreateFromScript,thumb,low,src-alias,
 08103850,MovingPlatform_UpdatePool,thumb,low,src-alias,
-0810399C,ActorGroup_Destroy,thumb,low,src-alias,
+0810399C,MovingPlatform_Destroy,thumb,low,src-alias,
 08103A54,MovingPlatform_InitManager,thumb,low,src-alias,Starts the manager's script procedure and initializes its allocation mask
 08103A84,MovingPlatform_CreateManager,thumb,low,src-alias,Creates the singleton named object task and installs its callbacks
 08103AD0,MovingPlatform_ResetManager,thumb,low,cleanup,Tentative named actor helper recovered from manager and body fields
 08103ADC,MovingPlatformActor_SetFlag20FromScript,thumb,low,src-alias,
-08103B14,ActorGroup_GetSelectedMemberId,thumb,low,src-alias,
+08103B14,MovingPlatform_GetSelectedMemberId,thumb,low,src-alias,
 08103B94,MovingPlatformActor_SetMoveModeFromScript,thumb,low,src-alias,
 08103C1C,MovingPlatformActor_SetModeFromScript,thumb,low,src-alias,Sets the named actor's field at offset E0 from option m; mode interpretation is tentative
-08103C54,ActorGroup_RemoveFromScript,thumb,low,src-alias,
+08103C54,MovingPlatform_RemoveFromScript,thumb,low,src-alias,
 08103CF8,MovingPlatformActor_SetRouteFromScript,thumb,low,src-alias,
 08103D84,MovingPlatform_SetPaletteFromScript,thumb,low,src-alias,
 08103DCC,MovingPlatformActor_SetSpeedFromScript,thumb,low,src-alias,
@@ -4473,20 +4473,20 @@ addr,name,mode,confidence,source,notes
 081049F0,LootDeposit_UpdateMemberSway,thumb,low,src-alias,
 08104B64,LootDeposit_UpdateMemberFall,thumb,low,src-alias,
 08104C9C,LootDeposit_UpdateMemberRemoval,thumb,low,src-alias,
-08104D6C,CallbackPool_UpdateEntries,thumb,low,src-alias,
-08104DE8,CallbackPool_DestroyEntries,thumb,low,src-alias,
+08104D6C,LootDepositCallbackPool_UpdateEntries,thumb,low,src-alias,
+08104DE8,LootDepositCallbackPool_DestroyEntries,thumb,low,src-alias,
 08104E80,LootDepositPool_InitManager,thumb,low,src-alias,Starts the pool's script procedure and clears its allocation mask
 08104EB0,LootDepositPool_CreateManager,thumb,low,src-alias,Creates the singleton four-slot pool task and installs its callbacks
 08104EFC,LootDepositPool_ResetManager,thumb,low,src-alias,Clears the singleton pool manager pointer during scene subsystem reset
-08104F08,CallbackPool_UpdateShake,thumb,low,src-alias,
-08104F98,CallbackPool_ApplyDamage,thumb,low,src-alias,
-081050BC,CallbackPool_SpawnHitParticles,thumb,low,src-alias,
-08105194,CallbackPool_InitializeCollider,thumb,low,cleanup,Initializes the four-slot health actor collider
+08104F08,LootDepositCallbackPool_UpdateShake,thumb,low,src-alias,
+08104F98,LootDepositCallbackPool_ApplyDamage,thumb,low,src-alias,
+081050BC,LootDepositCallbackPool_SpawnHitParticles,thumb,low,src-alias,
+08105194,LootDepositCallbackPool_InitializeCollider,thumb,low,cleanup,Initializes the four-slot health actor collider
 0810523C,LootDeposit_EmitRemovalDebris,thumb,low,src-alias,
-081055C0,ProximityActor_SetState,thumb,low,src-alias,
-081056A0,CallbackPool_RefreshHealthDisplay,thumb,low,src-alias,
-08105704,ProximityActor_CheckPlayerRange,thumb,low,src-alias,
-08105790,ProximityActor_IsPlayerInsideOriginRange,thumb,low,src-alias,
+081055C0,LootDepositFeedback_SetState,thumb,low,src-alias,
+081056A0,LootDepositCallbackPool_RefreshHealthDisplay,thumb,low,src-alias,
+08105704,LootDepositFeedback_CheckPlayerRange,thumb,low,src-alias,
+08105790,LootDepositFeedback_IsPlayerInsideOriginRange,thumb,low,src-alias,
 08105808,IceBoulder_ApplyContactDamage,thumb,low,src-alias,
 08105998,IceBoulder_InitializeCollider,thumb,low,src-alias,
 08105A40,IceBoulderPool_OnStateNoOp,thumb,low,cleanup,Tentative region actor lifecycle helper
@@ -7625,33 +7625,33 @@ addr,name,mode,confidence,source,notes
 081A3710,Hresvelgr_CreateShotPool,thumb,low,src-alias,Creates or returns the singleton projectile pool and installs its task callbacks
 081A376C,DirectionBurst_Emit,thumb,low,src-alias,
 081A37BC,Hresvelgr_GetHomingShotTargetAngle,thumb,low,src-alias,Computes the horizontal angle from a homing projectile to a target position
-081A37E0,EffectPool_FindIdleActiveEntry,thumb,low,src-alias,
+081A37E0,HresvelgrEffectPool_FindIdleActiveEntry,thumb,low,src-alias,
 081A3828,EffectEntry_Release,thumb,low,src-alias,
-081A388C,EffectPool_AllocateEntry,thumb,low,src-alias,
-081A39E0,EffectPool_UpdateEntry,thumb,low,src-alias,
-081A3D00,EffectPool_UpdateActiveEntries,thumb,low,src-alias,
+081A388C,HresvelgrEffectPool_AllocateEntry,thumb,low,src-alias,
+081A39E0,HresvelgrEffectPool_UpdateEntry,thumb,low,src-alias,
+081A3D00,HresvelgrEffectPool_UpdateActiveEntries,thumb,low,src-alias,
 081A3D50,Hresvelgr_DestroyHomingShotPool,thumb,low,src-alias,Task destruction callback removes sprites and shadows and colliders from three homing shots
 081A3D90,Hresvelgr_OnHomingShotCollision,thumb,low,src-alias,Collider callback releases an active homing shot and detaches its associated effects
 081A3DA8,Hresvelgr_InitHomingShotCollider,thumb,low,src-alias,
-081A3E48,EffectPool_CreateEntries,thumb,low,src-alias,
-081A3F04,EffectPool_Initialize,thumb,low,src-alias,
-081A3F84,EffectPool_Create,thumb,low,src-alias,
-081A3FDC,EffectPool_CreateEntry,thumb,low,src-alias,
+081A3E48,HresvelgrEffectPool_CreateEntries,thumb,low,src-alias,
+081A3F04,HresvelgrEffectPool_Initialize,thumb,low,src-alias,
+081A3F84,HresvelgrEffectPool_Create,thumb,low,src-alias,
+081A3FDC,HresvelgrEffectPool_CreateEntry,thumb,low,src-alias,
 081A4020,Hresvelgr_FindInactiveEffect,thumb,low,src-alias,Finds an unused entry in the thirty-two-slot sprite effect pool
-081A4064,MotionEntry_UpdatePosition,thumb,low,src-alias,
-081A4100,MotionEntry_Create,thumb,low,src-alias,
+081A4064,HresvelgrMotion_UpdatePosition,thumb,low,src-alias,
+081A4100,HresvelgrMotion_Create,thumb,low,src-alias,
 081A427C,Hresvelgr_ReleaseEffect,thumb,low,src-alias,Decrements the active effect count and marks the entry inactive
-081A42AC,MotionEntry_UpdateFalling,thumb,low,src-alias,
-081A4420,MotionEntry_UpdateFalling_081A4420,thumb,low,src-alias,
+081A42AC,HresvelgrMotion_UpdateFalling,thumb,low,src-alias,
+081A4420,HresvelgrMotion_UpdateFalling_081A4420,thumb,low,src-alias,
 081A4594,Hresvelgr_UpdateMotionEntry,thumb,low,src-alias,
 081A46B0,Hresvelgr_UpdateEffects,thumb,low,src-alias,Task update callback dispatches each active effect by type and increments its age
 081A46EC,Hresvelgr_DestroyEffectPool,thumb,low,src-alias,Task destruction callback removes effect sprites and clears the pool singleton
 081A4718,EffectSpritePool_InitializeEntries,thumb,low,src-alias,
 081A4760,EffectSpritePool_Initialize,thumb,low,src-alias,
 081A47E4,Hresvelgr_CreateEffectPool,thumb,low,src-alias,Creates or returns the singleton sprite effect pool and installs its callbacks
-081A4834,MotionEntry_SetEnabled,thumb,low,src-alias,
-081A488C,MotionEntry_CreateConfigured,thumb,low,src-alias,
-081A48E0,MotionEntry_CreateWithDelta,thumb,low,src-alias,
+081A4834,HresvelgrMotion_SetEnabled,thumb,low,src-alias,
+081A488C,HresvelgrMotion_CreateConfigured,thumb,low,src-alias,
+081A48E0,HresvelgrMotion_CreateWithDelta,thumb,low,src-alias,
 081A492C,Hresvelgr_SetFallingAttackState,thumb,low,src-alias,Sets a pooled falling attack state and resets its two phase counters; attack identity is tentative
 081A4940,Hresvelgr_FindFreeProjectileSlot,thumb,low,src-alias,Finds an inactive reusable entry in the sixteen-slot projectile pool
 081A4984,Hresvelgr_InitializeProjectile,thumb,low,src-alias,
@@ -7674,8 +7674,8 @@ addr,name,mode,confidence,source,notes
 081A522C,Hresvelgr_InitializeFallingActor,thumb,low,src-alias,
 081A5314,Hresvelgr_CreateMovingProjectile,thumb,low,src-alias,Creates a projectile task initialized with position movement data and a display flag
 081A5360,DamageNumberDisplay_ShowWithDefaultScale,thumb,low,src-alias,
-081A5394,Debug_NudgeScreenPositionWithA,thumb,low,src-alias,Moves a two-dimensional position by two units using the directional pad while A is held
-081A53E8,Debug_NudgeScreenPositionWithB,thumb,low,src-alias,Moves a two-dimensional position by two units using the directional pad while B is held
+081A5394,HresvelgrDebug_NudgeScreenPositionWithA,thumb,low,src-alias,Moves a two-dimensional position by two units using the directional pad while A is held
+081A53E8,HresvelgrDebug_NudgeScreenPositionWithB,thumb,low,src-alias,Moves a two-dimensional position by two units using the directional pad while B is held
 081A543C,Debug_NudgeWorldPositionWithA,thumb,low,src-alias,Projects a world position to screen coordinates and applies the A-held directional adjustment
 081A54F0,Debug_NudgeWorldPositionWithB,thumb,low,src-alias,Projects a world position to screen coordinates and applies the B-held directional adjustment
 081A55A4,Vanargand_ResetPaletteTransition,thumb,low,src-alias,Tentatively resets an active palette transition and restores its default palette selector
@@ -7826,23 +7826,23 @@ addr,name,mode,confidence,source,notes
 081AF6F4,Vanargand_CreateTransientEffect,thumb,low,src-alias,Creates a short-lived sprite effect task with update and destruction callbacks
 081AF76C,Vanargand_ResetState,thumb,low,src-alias,
 081AF9E8,Vanargand_EmitPartTrail,thumb,low,src-alias,Tentatively emits a sprite trail from an active part while execution is enabled
-081AFA28,ActorStatus_BeginTimedState,thumb,low,src-alias,
-081AFAC0,ActorStatus_InitializeContact,thumb,low,src-alias,
-081AFB94,ActorStatus_InitializeCollider,thumb,low,src-alias,
-081AFC50,ActorStatus_InitializeBodyCollider,thumb,low,src-alias,
+081AFA28,VanargandCombat_BeginTimedState,thumb,low,src-alias,
+081AFAC0,VanargandCombat_InitializeContact,thumb,low,src-alias,
+081AFB94,VanargandCombat_InitializeCollider,thumb,low,src-alias,
+081AFC50,VanargandCombat_InitializeBodyCollider,thumb,low,src-alias,
 081AFD04,Vanargand_ClearPartContact,thumb,low,src-alias,Clears the per-frame part contact word beside its collider
 081AFD10,PairedSceneActor_UpdateHalfPresentation,thumb,low,src-alias,
 081B0018,PairedSceneActor_InitializeHalf,thumb,low,src-alias,
-081B019C,ActorStatus_Deactivate,thumb,low,src-alias,
+081B019C,VanargandCombat_Deactivate,thumb,low,src-alias,
 081B0244,Vanargand_OnPartIdle,thumb,low,src-alias,
 081B0248,Vanargand_SpawnPartEmergenceEffects,thumb,low,src-alias,Emits four radial effects above a part's base position with randomized outward velocities and the opposite variant.
 081B03C0,PairedSceneActor_UpdatePlayerCapture,thumb,low,src-alias,
-081B08B8,ActorStatus_UpdatePlayerApproach,thumb,low,src-alias,
-081B0F34,ActorStatus_UpdatePlayerCapture,thumb,low,src-alias,
-081B118C,ActorStatus_BeginPlayerRelease,thumb,low,src-alias,
-081B1334,ActorStatus_UpdateGuardedApproach,thumb,low,src-alias,
-081B18C8,ActorStatus_UpdateRisingStrike,thumb,low,src-alias,
-081B1B90,ActorStatus_UpdateFlankingStrike,thumb,low,src-alias,
+081B08B8,VanargandCombat_UpdatePlayerApproach,thumb,low,src-alias,
+081B0F34,VanargandCombat_UpdatePlayerCapture,thumb,low,src-alias,
+081B118C,VanargandCombat_BeginPlayerRelease,thumb,low,src-alias,
+081B1334,VanargandCombat_UpdateGuardedApproach,thumb,low,src-alias,
+081B18C8,VanargandCombat_UpdateRisingStrike,thumb,low,src-alias,
+081B1B90,VanargandCombat_UpdateFlankingStrike,thumb,low,src-alias,
 081B1E24,Vanargand_UpdatePartTracking,thumb,low,src-alias,
 081B1F74,Vanargand_UpdatePartPairedStrike,thumb,low,src-alias,
 081B2550,SceneBurstActor_UpdateTimedBurst,thumb,low,src-alias,
@@ -9124,11 +9124,11 @@ addr,name,mode,confidence,source,notes
 081EC204,ResultScreen_Initialize,thumb,low,src-alias,Mode selection screen with saved choice; description; timed unlock-key history and save validation; trailing result-delay screen.
 081EC310,ResultScreen_SetParametersFromScript,thumb,low,src-alias,Mode selection screen with saved choice; description; timed unlock-key history and save validation; trailing result-delay screen.
 081EC340,ResultScreen_Create,thumb,medium,gcl-name,Mode selection screen with saved choice; description; timed unlock-key history and save validation; trailing result-delay screen.
-081EC380,SceneActors_InitResources,thumb,low,src-alias,Actor initialization hook currently returns success without performing work
-081EC384,SceneActors_IsReady,thumb,low,src-alias,
+081EC380,VanargandHead_InitResources,thumb,low,src-alias,Actor initialization hook currently returns success without performing work
+081EC384,VanargandHead_IsReady,thumb,low,src-alias,
 081EC388,ActorEffect_SpawnRandomizedBurst,thumb,low,src-alias,
 081EC4AC,ActorEffect_SpawnBurstAtAnchor,thumb,low,src-alias,
-081EC5C8,SceneActors_EmitPeriodicParticles,thumb,low,src-alias,Emits particle variants at phases zero and thirteen of a sixteen tick cycle
+081EC5C8,VanargandHead_EmitPeriodicParticles,thumb,low,src-alias,Emits particle variants at phases zero and thirteen of a sixteen tick cycle
 081EC628,ScreenLayers_ShowPair,thumb,low,src-alias,
 081EC670,ScreenLayers_HidePair,thumb,low,src-alias,
 081EC6BC,ActorDisplay_UpdateScreenAnchor,thumb,low,src-alias,
@@ -9140,27 +9140,27 @@ addr,name,mode,confidence,source,notes
 081ECC70,ActorMotion_AdvanceTowardScreenTarget,thumb,low,src-alias,
 081ECD44,SceneMover_ApproachScreenX,thumb,low,src-alias,
 081ECE80,SceneMover_StepPastScreenX,thumb,low,src-alias,
-081ECF18,SceneActors_UpdateIdleDisplay,thumb,low,src-alias,
-081ED1A4,SceneActors_UpdatePlayerFollowingDisplay,thumb,low,src-alias,Tracks the first participant and updates the two display layers
-081ED5F4,SceneActors_UpdateMovingDisplay,thumb,low,src-alias,
-081ED89C,SceneActors_UpdateUnusedState,thumb,low,src-alias,
-081ED8A0,SceneActors_UpdateDelayedMovement,thumb,low,src-alias,
-081EDB74,SceneActors_UpdateLeftDeparture,thumb,low,src-alias,
-081EDE4C,SceneActors_UpdatePastEdgeDeparture,thumb,low,src-alias,
-081EE130,SceneActors_UpdatePeriodicEffectAction,thumb,low,src-alias,
-081EE518,SceneActors_UpdateHitSensitiveDeparture,thumb,low,src-alias,
-081EEAC4,SceneActors_DestroyTask,thumb,low,src-alias,Termination callback disables actor displays and clears occupancy before killing the task
-081EEAD8,SceneActors_UpdatePaletteDispersal,thumb,low,src-alias,
+081ECF18,VanargandHead_UpdateIdleDisplay,thumb,low,src-alias,
+081ED1A4,VanargandHead_UpdatePlayerFollowingDisplay,thumb,low,src-alias,Tracks the first participant and updates the two display layers
+081ED5F4,VanargandHead_UpdateMovingDisplay,thumb,low,src-alias,
+081ED89C,VanargandHead_UpdateUnusedState,thumb,low,src-alias,
+081ED8A0,VanargandHead_UpdateDelayedMovement,thumb,low,src-alias,
+081EDB74,VanargandHead_UpdateLeftDeparture,thumb,low,src-alias,
+081EDE4C,VanargandHead_UpdatePastEdgeDeparture,thumb,low,src-alias,
+081EE130,VanargandHead_UpdatePeriodicEffectAction,thumb,low,src-alias,
+081EE518,VanargandHead_UpdateHitSensitiveDeparture,thumb,low,src-alias,
+081EEAC4,VanargandHead_DestroyTask,thumb,low,src-alias,Termination callback disables actor displays and clears occupancy before killing the task
+081EEAD8,VanargandHead_UpdatePaletteDispersal,thumb,low,src-alias,
 081EEDDC,VanargandHead_UpdateCoordinateAdvance,thumb,low,src-alias,
 081EEE34,SceneMover_InterpolateScreenX,thumb,low,src-alias,
 081EEECC,VanargandHead_UpdateShakingDeparture,thumb,low,src-alias,Shakes the two drawable layers and emits particles during their departure
-081EF140,SceneActors_TickStateCallback,thumb,low,src-alias,Actor update helper forwards execution to SceneActors_RunStateCallback
-081EF14C,SceneActors_EnterIdleState,thumb,low,src-alias,State table callback installs the baseline animation handler and resets transition fields
-081EF1A0,SceneActors_EnterMovementState,thumb,low,src-alias,State table callback installs the movement handler and resets transition fields
-081EF1F4,SceneActors_EnterAlternateMovementState,thumb,low,src-alias,Alternate state table entry installs the same movement handler as the preceding entry
-081EF248,SceneActors_EnterRandomizedActionState,thumb,low,src-alias,Tentatively enters the action handler that randomizes a direction field and runs timed phases
-081EF29C,SceneActors_EnterSequenceTwoActionState,thumb,low,src-alias,Enters the phased action handler that starts animation sequence two
-081EF2F0,SceneActors_EnterDelayedMovementState,thumb,low,src-alias,Tentatively enters the movement handler that waits until tick 120 before applying motion
+081EF140,VanargandHead_TickStateCallback,thumb,low,src-alias,Actor update helper forwards execution to SceneActors_RunStateCallback
+081EF14C,VanargandHead_EnterIdleState,thumb,low,src-alias,State table callback installs the baseline animation handler and resets transition fields
+081EF1A0,VanargandHead_EnterMovementState,thumb,low,src-alias,State table callback installs the movement handler and resets transition fields
+081EF1F4,VanargandHead_EnterAlternateMovementState,thumb,low,src-alias,Alternate state table entry installs the same movement handler as the preceding entry
+081EF248,VanargandHead_EnterRandomizedActionState,thumb,low,src-alias,Tentatively enters the action handler that randomizes a direction field and runs timed phases
+081EF29C,VanargandHead_EnterSequenceTwoActionState,thumb,low,src-alias,Enters the phased action handler that starts animation sequence two
+081EF2F0,VanargandHead_EnterDelayedMovementState,thumb,low,src-alias,Tentatively enters the movement handler that waits until tick 120 before applying motion
 081EF344,VanargandHead_UpdateMainStateTransition,thumb,low,src-alias,Consumes the pending transition flag and installs the main state callback; tentative state identity
 081EF398,VanargandHead_UpdateAlternateStateTransition,thumb,low,src-alias,Consumes the pending transition flag and installs the alternate state callback; tentative state identity
 081EF3EC,VanargandHead_UpdateDestroyTransition,thumb,low,src-alias,Consumes the pending transition flag and installs the cleanup and task destruction callback
@@ -9169,12 +9169,12 @@ addr,name,mode,confidence,source,notes
 081EF6FC,VanargandHead_UpdateSecondaryDestroyTransition,thumb,low,src-alias,Second transition handler that installs the same cleanup and task destruction callback
 081EF750,VanargandHead_BeginOffscreenSelection,thumb,low,src-alias,
 081EF7A8,ScreenPhase_BeginSelection,thumb,low,src-alias,
-081EF804,SceneActors_EnterHorizontalTweenState,thumb,low,src-alias,
+081EF804,VanargandHead_EnterHorizontalTweenState,thumb,low,src-alias,
 081EF880,VanargandHead_BeginFinalTransition,thumb,low,src-alias,
 081EF8F0,VanargandHead_UpdatePrimaryTransitionWait,thumb,low,src-alias,Clears pending transition flags and advances the frame counter in the primary wait handler
 081EF914,VanargandHead_UpdateEndingScene,thumb,low,src-alias,
 081EFE84,VanargandHead_UpdateTransitionDisplay,thumb,low,src-alias,
-081F00FC,SceneActors_AdvanceToHorizontalTween,thumb,low,src-alias,
+081F00FC,VanargandHead_AdvanceToHorizontalTween,thumb,low,src-alias,
 081F0190,VanargandHead_UpdateSecondaryTransitionWait,thumb,low,src-alias,Clears pending transition flags and advances the frame counter in the secondary wait handler
 081F01B4,VanargandHead_DispatchPhaseCallback,thumb,low,src-alias,Invokes the callback selected by the phase byte at offset 0xAE
 081F01D0,VanargandHead_DispatchPrimaryModeCallback,thumb,low,src-alias,Invokes the callback from the primary table indexed by the mode byte at offset 0xAD
@@ -9453,19 +9453,19 @@ addr,name,mode,confidence,source,notes
 081FEC80,SunOrb_FadeOutAll,thumb,low,src-alias,Requests the fade-out behavior for all four orb slots
 081FEC9C,SunOrb_CreatePlayerTargeted,thumb,low,src-alias,Creates a stationary orb configured to use the player position source
 081FECD8,SunOrb_CreateSceneTargeted,thumb,low,src-alias,Creates a stationary orb configured to use the scene position source
-081FED9C,SpriteParticle_OnDefaultUpdate,thumb,low,src-alias,Default particle behavior callback that returns zero without changing the particle
+081FED9C,VanargandParticle_OnDefaultUpdate,thumb,low,src-alias,Default particle behavior callback that returns zero without changing the particle
 081FEDA0,SpritePool_InitEntry,thumb,low,src-alias,
-081FEE0C,SpriteParticle_UpdateManager,thumb,low,src-alias,
-081FEFC4,SpriteParticle_DestroyManager,thumb,low,src-alias,Task destruction callback that releases active particles and clears the singleton
-081FF02C,SpriteParticle_CreateManager,thumb,low,src-alias,Creates the particle manager task and installs its update and destruction callbacks
-081FF06C,SpriteParticle_FindFreeSlot,thumb,low,src-alias,Scans the 32-slot occupancy mask and returns the first unused particle with its index
-081FF09C,SpriteParticle_Emit,thumb,low,src-alias,
-081FF30C,SpriteParticle_InitParams,thumb,low,src-alias,Initializes particle parameters with default lifetime and motion and sprite settings
-081FF354,SpriteParticle_SetMotionParams,thumb,low,src-alias,Sets initial flags and lifetime together with movement direction and speed
-081FF368,SpriteParticle_SetSpriteResource,thumb,low,src-alias,Sets the animation resource identifier and sequence and palette selection
-081FF370,SpriteParticle_SetUpdateCallback,thumb,low,src-alias,Stores the callback invoked to update an active particle
-081FF374,SpriteParticle_SetAnimationTrack,thumb,low,src-alias,Stores an optional packed animation track and its timing parameter
-081FF37C,SpriteParticle_SetPlanarVelocity,thumb,low,src-alias,Sets the two planar velocity components and clears vertical velocity
+081FEE0C,VanargandParticle_UpdateManager,thumb,low,src-alias,
+081FEFC4,VanargandParticle_DestroyManager,thumb,low,src-alias,Task destruction callback that releases active particles and clears the singleton
+081FF02C,VanargandParticle_CreateManager,thumb,low,src-alias,Creates the particle manager task and installs its update and destruction callbacks
+081FF06C,VanargandParticle_FindFreeSlot,thumb,low,src-alias,Scans the 32-slot occupancy mask and returns the first unused particle with its index
+081FF09C,VanargandParticle_Emit,thumb,low,src-alias,
+081FF30C,VanargandParticle_InitParams,thumb,low,src-alias,Initializes particle parameters with default lifetime and motion and sprite settings
+081FF354,VanargandParticle_SetMotionParams,thumb,low,src-alias,Sets initial flags and lifetime together with movement direction and speed
+081FF368,VanargandParticle_SetSpriteResource,thumb,low,src-alias,Sets the animation resource identifier and sequence and palette selection
+081FF370,VanargandParticle_SetUpdateCallback,thumb,low,src-alias,Stores the callback invoked to update an active particle
+081FF374,VanargandParticle_SetAnimationTrack,thumb,low,src-alias,Stores an optional packed animation track and its timing parameter
+081FF37C,VanargandParticle_SetPlanarVelocity,thumb,low,src-alias,Sets the two planar velocity components and clears vertical velocity
 081FF388,HomingProjectile_GetActiveCount,thumb,low,src-alias,Returns the active count from the three-slot projectile manager; identity tentative
 081FF39C,HomingProjectile_BeginImpact,thumb,low,src-alias,
 081FF450,HomingProjectile_OnSecondaryCollision,thumb,low,src-alias,Empty collision callback installed on each projectile's secondary collider

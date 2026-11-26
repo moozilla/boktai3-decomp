@@ -1,6 +1,6 @@
 #include "objects/sliding_doors/scene_object_controller.h"
 
-void SlidingDoor_AnimateActive(struct SceneObjSlot *s)
+void SlidingDoors_AnimateActive(struct SceneObjSlot *s)
 {
     if ((*(u32 *)&s->dir & 0xffff00) == 0) {
         Sound_PlaySongChecked(0xce);

@@ -1,6 +1,6 @@
 #include "objects/sliding_doors/scene_object_controller.h"
 
-void SlidingDoor_UpdateLowered(struct SceneObjSlot *);
+void SlidingDoors_UpdateLowered(struct SceneObjSlot *);
 
 int SlidingDoors_ScriptLower(void)
 {
@@ -8,7 +8,7 @@ int SlidingDoors_ScriptLower(void)
     int found;
     int i;
     int id;
-    void (*fn)(struct SceneObjSlot *) = SlidingDoor_UpdateLowered;
+    void (*fn)(struct SceneObjSlot *) = SlidingDoors_UpdateLowered;
     if (!p)
         return -1;
     found = 0;

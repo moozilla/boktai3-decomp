@@ -36,7 +36,7 @@ struct MotionEntry *Hresvelgr_FindInactiveEffect(void);
 void Sprite_ApplyAnimation(void *, void *);
 s32 Mod(s32, s32);
 void Anim_SetSequence(void *, void *, s32, s32, s32);
-void MotionEntry_UpdatePosition(void *);
+void HresvelgrMotion_UpdatePosition(void *);
 static inline s32 randomValue(void)
 {
     u32 offset;
@@ -44,7 +44,7 @@ static inline s32 randomValue(void)
     offset = gRandomIndex * 2;
     return *(const u16 *)(offset + RANDOM_TABLE_ADDR);
 }
-struct MotionEntry *MotionEntry_Create(struct MotionVector *origin, u32 type, u32 mode,
+struct MotionEntry *HresvelgrMotion_Create(struct MotionVector *origin, u32 type, u32 mode,
                                        u32 lifetime)
 {
     struct MotionCounts counts = gUnk_0824F770;
@@ -67,7 +67,7 @@ struct MotionEntry *MotionEntry_Create(struct MotionVector *origin, u32 type, u3
     entry->lifetime = lifetime;
     if (!entry->mode) {
         entry->origin = origin;
-        MotionEntry_UpdatePosition(entry);
+        HresvelgrMotion_UpdatePosition(entry);
     } else {
         entry->origin = NULL;
         entry->savedPosition = *origin;

@@ -180,7 +180,7 @@ key,callback,name
 3DF7,08034031,DialogueTransition_CreateFromScript
 3E17,081E49C1,TutorialOtenko_BeginAnimationPhaseEight
 3E1F,08006185,TerrainModifiers_DestroyFromScript
-3E91,08103C55,ActorGroup_RemoveFromScript
+3E91,08103C55,MovingPlatform_RemoveFromScript
 3E93,08227F59,SaveData_GetUnusedStatus
 3EA2,0822B169,Sound_FadeInChannel12FromScript
 3ED0,0822B299,Sound_SetPlayer10VolumeFromScript
@@ -354,7 +354,7 @@ key,callback,name
 7A0A,0804A401,TetherActor_GetSavedKind
 7A25,0815CFBD,ScriptActor_PlayMotion29FromScript
 7A27,08001EE1,Background_LoadMapsFromScript
-7A75,08103B15,ActorGroup_GetSelectedMemberId
+7A75,08103B15,MovingPlatform_GetSelectedMemberId
 7A77,081BB3A1,SolarBank_SetBalanceFromScript
 7A82,0801842D,Weather_GetTypeFromScript
 7BBC,0801973D,TileAnimation_Create

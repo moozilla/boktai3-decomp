@@ -69,7 +69,7 @@ s32 Hresvelgr_GetEnvironmentalLevel(void *);
 void Hresvelgr_EmitRandomMotionBurst(void *);
 void SparkParticle_Spawn(void *, s32, void *, s32, s32, s32, s32, s32);
 void DamageNumberDisplay_Show(void *, s32, s32, void *, void *, s32);
-void MotionEntry_CreateWithDelta(void *, void *, s32, s32);
+void HresvelgrMotion_CreateWithDelta(void *, void *, s32, s32);
 void Sound_PlaySong(s32);
 void Sound_PlaySongChecked(s32);
 
@@ -132,7 +132,7 @@ static inline void emitDebris(void *emitter)
         delta.x = (nextRandom(table) & 15) - 8;
         delta.y = nextRandom(table) & 7;
         delta.z = (nextRandom(table) & 15) - 8;
-        MotionEntry_CreateWithDelta(emitter, &delta, nextRandom(table) % 4, 60);
+        HresvelgrMotion_CreateWithDelta(emitter, &delta, nextRandom(table) % 4, 60);
         /* Keep the table lookup local to each entry. */
         table = 0;
     }

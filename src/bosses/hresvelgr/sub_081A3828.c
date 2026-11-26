@@ -14,7 +14,7 @@ struct EffectEntry {
     u8 pad[0x8];
     void *motions[1];
 };
-void MotionEntry_SetEnabled(void *, u32);
+void HresvelgrMotion_SetEnabled(void *, u32);
 void ScaledShadow_Disable(void *);
 void EffectEntry_Release(struct EffectEntry *e)
 {
@@ -23,7 +23,7 @@ void EffectEntry_Release(struct EffectEntry *e)
         s32 i;
         m->activeCount--;
         for (i = 0; i < e->motionCount; i++)
-            MotionEntry_SetEnabled(e->motions[i], 1);
+            HresvelgrMotion_SetEnabled(e->motions[i], 1);
         e->delay = 0;
         e->flags |= 1;
         ScaledShadow_Disable(e->shadow);

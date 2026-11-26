@@ -23,7 +23,7 @@ struct BurstActor {
     struct BurstVector *target;
 };
 extern const s16 gUnk_086149C4[];
-void MotionEntry_CreateWithDelta(void *, void *, s32, s32);
+void HresvelgrMotion_CreateWithDelta(void *, void *, s32, s32);
 static inline s32 scale(s32 n)
 {
     return n >= 0 ? n >> 12 : -((-n) >> 12);
@@ -90,6 +90,6 @@ void Hresvelgr_EmitFacingMotionBurst(struct BurstActor *actor)
         type = randomValue(table) >> 3;
         type %= 4;
         vertical = 32 - ((randomValue(table) >> 3) % 64);
-        MotionEntry_CreateWithDelta(&actor->position, &delta, type, vertical);
+        HresvelgrMotion_CreateWithDelta(&actor->position, &delta, type, vertical);
     }
 }

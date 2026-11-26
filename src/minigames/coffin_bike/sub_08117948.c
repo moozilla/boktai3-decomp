@@ -20,7 +20,7 @@ void PalFade_Start(void *, s32, u16, s32, s32, s32, s32, s32);
 s32 CharacterModel_GetPrimaryPaletteIndex(void *);
 void ChargeMarker_TickHold(void *, void *, u32);
 
-static inline void CoffinBike_BeginStopping(union CoffinBikeAnimationKey *animation, struct CoffinBike *p,
+static inline void CoffinBike_InitBrakingAnimation(union CoffinBikeAnimationKey *animation, struct CoffinBike *p,
                                        u8 *entry)
 {
     u16 elapsedReset[] = {0};
@@ -177,7 +177,7 @@ void CoffinBike_UpdateStopping(struct CoffinBike *p)
         u8 *entry = &p->active;
         if (*entry) {
             {
-                CoffinBike_BeginStopping(&p->motion.animation, p, entry);
+                CoffinBike_InitBrakingAnimation(&p->motion.animation, p, entry);
             }
         }
     }

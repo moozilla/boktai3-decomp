@@ -1,5 +1,5 @@
 #include "objects/sliding_doors/scene_object_controller.h"
-void SlidingDoor_UpdateRaised(struct SceneObjSlot *);
+void SlidingDoors_UpdateRaised(struct SceneObjSlot *);
 int SlidingDoors_ScriptRaise(void)
 {
     struct SceneObjPool *p = ResourceRegistry_GetResource(0x85e6);
@@ -17,7 +17,7 @@ int SlidingDoors_ScriptRaise(void)
         if (s->id == id) {
             s->timer = 0;
             s->variant = SceneObjSlot_LiftVariant(SCENE_OBJ_LIFT_RAISED);
-            s->callback = SlidingDoor_UpdateRaised;
+            s->callback = SlidingDoors_UpdateRaised;
             s->pose = 0;
             s->poseFrame = 0;
             s->terrain->cell.flags &= ~3;

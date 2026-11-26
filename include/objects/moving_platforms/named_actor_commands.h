@@ -7,7 +7,7 @@
 struct NamedObject *MovingPlatform_FindByName(s32);
 struct NamedObject *MovingPlatform_GetFollowTarget(void);
 u32 TetherActor_TestStatusFlags(u32);
-void ActorGroup_ReleaseMember(void *);
+void MovingPlatform_ReleaseMember(void *);
 void SceneBody_Unregister(void *);
 void Route_Start(void *, u32, u32, u32);
 void Player_ClearAttachmentFlags(void *, s32);

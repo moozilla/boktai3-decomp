@@ -9,12 +9,12 @@ void Collider_SetFixedPositionWithYOffset(void *, void *, s32);
 void SpatialIndex_InsertEntry(void *);
 void Anim_SetDurationScale(void *, u32);
 void ScreenLayers_SelectRandomVariant(void *);
-void SpriteParticle_InitParams(void *);
-void SpriteParticle_SetMotionParams(void *, u32, u32, u32, u32);
-void SpriteParticle_SetSpriteResource(void *, u32, u32, s32);
-void SpriteParticle_SetAnimationTrack(void *, u32, u32);
-void SpriteParticle_SetPlanarVelocity(void *, s32, s32);
-s32 SpriteParticle_Emit(void *, void *);
+void VanargandParticle_InitParams(void *);
+void VanargandParticle_SetMotionParams(void *, u32, u32, u32, u32);
+void VanargandParticle_SetSpriteResource(void *, u32, u32, s32);
+void VanargandParticle_SetAnimationTrack(void *, u32, u32);
+void VanargandParticle_SetPlanarVelocity(void *, s32, s32);
+s32 VanargandParticle_Emit(void *, void *);
 u8 Sprite_BlinkUntilExpired(void *, s32, s32, s32);
 
 #define RESTORE_BACKGROUND_PALETTES(actor, i, writeRow)                                            \
@@ -50,11 +50,11 @@ u8 Sprite_BlinkUntilExpired(void *, s32, s32, s32);
 #define SET_RANDOM_EFFECT_TRACK(actor, params, paletteBank)                                        \
     {                                                                                              \
         if ((s32)(ParticleRandom_ReadSample(gRandomTable) & 255) > 128) {                          \
-            SpriteParticle_SetSpriteResource(params, (actor)->effectResource, 0, (paletteBank));   \
-            SpriteParticle_SetAnimationTrack(params, (actor)->effectGraphics, 5);                  \
+            VanargandParticle_SetSpriteResource(params, (actor)->effectResource, 0, (paletteBank));   \
+            VanargandParticle_SetAnimationTrack(params, (actor)->effectGraphics, 5);                  \
         } else {                                                                                   \
-            SpriteParticle_SetSpriteResource(params, (actor)->effectResource, 0, (paletteBank));   \
-            SpriteParticle_SetAnimationTrack(params, (actor)->effectGraphics, 6);                  \
+            VanargandParticle_SetSpriteResource(params, (actor)->effectResource, 0, (paletteBank));   \
+            VanargandParticle_SetAnimationTrack(params, (actor)->effectGraphics, 6);                  \
         }                                                                                          \
     }
 
@@ -180,22 +180,22 @@ void VanargandHead_UpdatePresentation(struct DepartureActor *actor)
                 position.z = 100;
                 dx = ((ParticleRandom_ReadSample(gRandomTable) & 15) - 8) << 10;
                 dz = -(s32)((ParticleRandom_ReadSample(gRandomTable) & 7) << 10);
-                SpriteParticle_InitParams(params);
-                SpriteParticle_SetMotionParams(
+                VanargandParticle_InitParams(params);
+                VanargandParticle_SetMotionParams(
                     params, 0, (ParticleRandom_ReadSample(gRandomTable) & 15) + 0x34, 0, remainder);
                 if (actor->effectStyle == 0) {
-                    SpriteParticle_SetSpriteResource(params, 0x4384, 0, 0x2A7);
-                    SpriteParticle_SetAnimationTrack(params, 0xF62B, 0);
+                    VanargandParticle_SetSpriteResource(params, 0x4384, 0, 0x2A7);
+                    VanargandParticle_SetAnimationTrack(params, 0xF62B, 0);
                 } else if (actor->effectStyle == 1) {
-                    SpriteParticle_SetSpriteResource(params, 0x61F9, 0, 0x2A6);
-                    SpriteParticle_SetAnimationTrack(params, 0x31F4, 8);
+                    VanargandParticle_SetSpriteResource(params, 0x61F9, 0, 0x2A6);
+                    VanargandParticle_SetAnimationTrack(params, 0x31F4, 8);
                 } else if (actor->effectStyle == 2) {
                     if ((s32)(ParticleRandom_ReadSample(gRandomTable) & 255) > 128) {
-                        SpriteParticle_SetMotionParams(params, 0, 42, 0, remainder);
+                        VanargandParticle_SetMotionParams(params, 0, 42, 0, remainder);
                         SET_RANDOM_EFFECT_TRACK(actor, params, 0x1F5);
                     } else {
-                        SpriteParticle_SetSpriteResource(params, 0x61F9, 0, 0x1F5);
-                        SpriteParticle_SetAnimationTrack(params, 0x31F4, 8);
+                        VanargandParticle_SetSpriteResource(params, 0x61F9, 0, 0x1F5);
+                        VanargandParticle_SetAnimationTrack(params, 0x31F4, 8);
                     }
                 } else {
                     position.x = (ParticleRandom_ReadSample(gRandomTable) & 15) +
@@ -203,11 +203,11 @@ void VanargandHead_UpdatePresentation(struct DepartureActor *actor)
                     position.y = (ParticleRandom_ReadSample(gRandomTable) & 7) +
                                  actor->accent.sprite.position.y;
                     position.z = 100;
-                    SpriteParticle_SetMotionParams(params, 0, 42, 0, remainder);
+                    VanargandParticle_SetMotionParams(params, 0, 42, 0, remainder);
                     SET_RANDOM_EFFECT_TRACK(actor, params, 2);
                 }
-                SpriteParticle_SetPlanarVelocity(params, dx, dz);
-                SpriteParticle_Emit(params, &position);
+                VanargandParticle_SetPlanarVelocity(params, dx, dz);
+                VanargandParticle_Emit(params, &position);
             }
             actor->burstTimer--;
         }

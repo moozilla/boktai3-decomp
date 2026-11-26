@@ -427,7 +427,7 @@ src/monsters/tentacle_actor,src/monsters/centipede,"Proc 4075 calls 1574 and 157
 src/monsters/tentacle_body,src/monsters/centipede,"Proc 4075 calls 1574 and 1576 to create 0AC7. The visible category-9 actor maps to Monster Book entry 13, text #9851, Centipede. The replay executes its constructor, component update and the shared body windup and spread callbacks."
 src/monsters/vorn,src/monsters/vorn,Vorn (ヴォーン)
 src/monsters/vulcan_cannon,src/monsters/cannons/vulcan,Vulcan Cannon (バルカン砲)
-src/other/callback_pool,src/objects/loot_deposits,0029→3905. CallbackPool_ApplyDamage receives the F1F9 slot and creates its visible impact particles. Merge src/field/actor_group.
+src/other/callback_pool,src/objects/loot_deposits,0029→3905. LootDepositCallbackPool_ApplyDamage receives the F1F9 slot and creates its visible impact particles. Merge src/field/actor_group.
 src/other/registry_selection,src/ui/world_map.c,GCL 2570 creates key 2388 for the nine world destinations. WORLD is visible in the stock save. Confirm selects San Miguel in this replay.
 src/other/scene_terrain_probe,src/effects/particles,"terrain probe, moving particle and spread shot (two files)"
 src/other/solar_calibration,src/system/solar,solar sensor calibration screen; merge:src/system/cartridge_solar_sensor src/system/solar

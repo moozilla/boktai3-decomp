@@ -22,7 +22,7 @@ struct ActorReaction {
     u8 side;
 };
 extern const s16 gUnk_086149C4[];
-void MotionEntry_CreateWithDelta(struct BurstVector *, struct BurstVector *, s32, s32);
+void HresvelgrMotion_CreateWithDelta(struct BurstVector *, struct BurstVector *, s32, s32);
 static inline s32 Scale(s32 value)
 {
     if (value >= 0)
@@ -124,7 +124,7 @@ void Hresvelgr_EmitFacingMotion(struct ActorReaction *input)
     Add(&position, &saved->position, &position);
     Polar(&velocity, actor->side << 6, 128);
 
-    MotionEntry_CreateWithDelta(
+    HresvelgrMotion_CreateWithDelta(
         &position, &velocity,
         ((s32)ParticleRandom_ReadRelativeSample(savedOrigin, (const u16 *)RANDOM_TABLE_ADDR) >> 3) %
             4,

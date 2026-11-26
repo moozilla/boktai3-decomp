@@ -360,3 +360,10 @@ widget,animSprite,identifier,,Reviewed game owner,src/link/wireless/status_menu.
 widget,animSprite,identifier,,Reviewed game owner,src/ui/dialogue/message_window/message_window.c
 widget,animSprite,identifier,,Reviewed game owner,src/ui/dialogue/message_window/sub_0803198C.c
 widget,animSprite,identifier,,Reviewed game owner,src/ui/title/password_menu.c
+CoffinBike_BeginStopping,CoffinBike_InitBrakingAnimation,helper,2,The static helper sets the animation key and clears the entry,src/minigames/coffin_bike/sub_08117948.c
+CallbackPool_IsActive,LootDepositCallbackPool_IsActive,helper,,Inline helper used by this owner,src/objects/loot_deposits/
+CallbackPool_NextRandom,LootDepositCallbackPool_NextRandom,helper,,Inline helper used by this owner,src/objects/loot_deposits/
+CallbackPool_Subtract,LootDepositCallbackPool_Subtract,helper,,Inline helper used by this owner,src/objects/loot_deposits/
+CallbackPool_Subtract,LootDepositCallbackPool_Subtract,helper,,Inline helper used by this owner,include/objects/loot_deposits/callback_pool.h
+ProximityActor_NextSpawnSample,LootDepositFeedback_NextSpawnSample,helper,,Inline helper used by this owner,src/objects/loot_deposits/
+MotionEntry_AddVelocity,HresvelgrMotion_AddVelocity,helper,,Inline helper used by this owner,src/bosses/hresvelgr/

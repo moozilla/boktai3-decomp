@@ -24,7 +24,7 @@ typedef struct HresvelgrActor {
     u16 state;
 } HresvelgrActor;
 void Hresvelgr_SetAnimation(HresvelgrActor *, void *, void *, u32, u32, u32);
-void *MotionEntry_CreateWithDelta(u32, MotionDelta *, u32, u32);
+void *HresvelgrMotion_CreateWithDelta(u32, MotionDelta *, u32, u32);
 void Sound_PlaySong(u32);
 s32 Callback_InvokeActor(void *, void *);
 void Hresvelgr_SetCosineScaledVelocity(void *, s32, s32);
@@ -45,7 +45,7 @@ static inline void emitBurst(u32 emitter)
         delta.x = (nextRandom(table.samples) & 15) - 8;
         delta.y = nextRandom(table.samples) & 7;
         delta.z = (nextRandom(table.samples) & 15) - 8;
-        MotionEntry_CreateWithDelta(emitter, &delta, nextRandom(table.samples) % 4, 60);
+        HresvelgrMotion_CreateWithDelta(emitter, &delta, nextRandom(table.samples) % 4, 60);
     }
 }
 // confidence=low: oscillates side-relative velocity during a four-entry burst animation.

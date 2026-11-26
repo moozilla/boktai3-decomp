@@ -42,7 +42,7 @@ void Anim_SetFrameDurationScale(void *, u16);
 void Anim_SetKeyframes(void *, void *, u32, u32, u32);
 void Bestiary_UnlockEntry(u32);
 void ImpactBurst_EmitBurst(void *, u32, u32, u32, u32, u32, u32, u32);
-void MotionEntry_CreateWithDelta(void *, void *, s32, u32);
+void HresvelgrMotion_CreateWithDelta(void *, void *, s32, u32);
 s32 sub_08249420(u32, u32);
 s32 sub_08249498(u32, u32);
 s32 ScalarApproach_StepQuarter(s32, s32);
@@ -154,7 +154,7 @@ void sub_081A14FC(struct Hresvelgr *saved, u32 tick)
                             u32 side = actor->side;
                             /* Allocation-only: this bounded fallback retains the argument copy. */
                             if ((s32)side < 0) {
-                                MotionEntry_CreateWithDelta(&saved->position, &delta, 0, sampleY);
+                                HresvelgrMotion_CreateWithDelta(&saved->position, &delta, 0, sampleY);
                                 goto sprayDone;
                             }
                         }
@@ -164,7 +164,7 @@ void sub_081A14FC(struct Hresvelgr *saved, u32 tick)
                         oz = sampleZ - (sampleZ / 256) * 256;
                         pz = actor->animation.position.z;
                         SetVector(&position, px + ox - 128, py + oy, pz + oz - 128);
-                        MotionEntry_CreateWithDelta(&position, &delta,
+                        HresvelgrMotion_CreateWithDelta(&position, &delta,
                                                     (RandomValue(table) >> 3) % 4, 64);
                     }
                 }

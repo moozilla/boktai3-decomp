@@ -19,7 +19,7 @@ static inline u16 NextRandom(void)
     gUnk_03005308 = (gUnk_03005308 + 1) & 0x3ff;
     return table[gUnk_03005308];
 }
-void CallbackPool_SpawnHitParticles(struct CallbackPoolEntry *entry)
+void LootDepositCallbackPool_SpawnHitParticles(struct CallbackPoolEntry *entry)
 {
     u32 stack[3];
     struct SceneExtent spread;

@@ -17,8 +17,8 @@ void ActorDisplay_UpdateScreenAnchor(void *);
 void ActorDisplay_UpdateForegroundSprite(void *);
 void ActorDisplay_UpdateAccentSprite(void *);
 extern const u16 gUnk_086141BC[];
-// confidence=low: called by SceneActors_EnterIdleState.
-void SceneActors_UpdateIdleDisplay(u8 *input)
+// confidence=low: called by VanargandHead_EnterIdleState.
+void VanargandHead_UpdateIdleDisplay(u8 *input)
 {
     u8 *p = input;
     u8 *context = p;

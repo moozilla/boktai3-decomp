@@ -12,7 +12,7 @@ struct ActorStatus {
     u8 collider[0xA8];
     u32 mode;
 };
-void ActorStatus_InitializeCollider(struct ActorStatus *status, s32 power, s32 force, s32 value)
+void VanargandCombat_InitializeCollider(struct ActorStatus *status, s32 power, s32 force, s32 value)
 {
     void *collider = status->collider;
     struct ActorStatusExtent size, offset;

@@ -8,7 +8,7 @@ void Hresvelgr_SetAnimation(void *, void *, void *, s32, s32, s32);
 void Sound_PlaySong(u32);
 s32 Callback_InvokeActor(void *, void *);
 void Hresvelgr_SetCosineScaledVelocity(void *, u32, u32);
-void EffectPool_CreateEntry(void *, u32, u32, u32, u32);
+void HresvelgrEffectPool_CreateEntry(void *, u32, u32, u32, u32);
 static inline void SetVector(struct SceneVec *v, s32 x, s32 y, s32 z)
 {
     v->x = x;
@@ -55,7 +55,7 @@ void Hresvelgr_UpdateGroundSlam(struct HresvelgrTravelActor *p)
                 s32 x = p->position.x;
                 s32 z = p->position.z;
                 SetVector(&pos, x, 0x200, z);
-                EffectPool_CreateEntry(&pos, p->side << 6, 10, 4, 0x20);
+                HresvelgrEffectPool_CreateEntry(&pos, p->side << 6, 10, 4, 0x20);
                 Sound_PlaySong(0x3DA);
                 ActionState_SetState(action, 3);
             } else

@@ -18,7 +18,7 @@ static inline void GetPlayerCoords(struct ScenePoolPlayer *p, struct ScenePoolVe
         out->z = p->position[2];
     }
 }
-void SceneActors_UpdatePlayerFollowingDisplay(struct DepartureActor *input, s32 time)
+void VanargandHead_UpdatePlayerFollowingDisplay(struct DepartureActor *input, s32 time)
 {
     struct DepartureActor *actor = input;
     struct ScenePoolVec32 player;
@@ -98,5 +98,5 @@ void SceneActors_UpdatePlayerFollowingDisplay(struct DepartureActor *input, s32 
     ActorDisplay_UpdateScreenAnchor(input);
     ActorDisplay_UpdateForegroundSprite(input);
     ActorDisplay_UpdateAccentSprite(input);
-    SceneActors_EmitPeriodicParticles(input, time);
+    VanargandHead_EmitPeriodicParticles(input, time);
 }

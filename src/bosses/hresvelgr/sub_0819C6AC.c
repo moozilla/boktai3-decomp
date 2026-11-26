@@ -19,7 +19,7 @@ struct BurstActor {
     struct BurstVector travelTarget;
 };
 extern const s16 gUnk_086149C4[];
-void MotionEntry_CreateWithDelta(void *, void *, s32, s32);
+void HresvelgrMotion_CreateWithDelta(void *, void *, s32, s32);
 static inline s32 scale(s32 n)
 {
     return n >= 0 ? n >> 12 : -((-n) >> 12);

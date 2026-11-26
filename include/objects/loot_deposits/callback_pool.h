@@ -39,12 +39,12 @@ struct CallbackPool {
     struct CallbackPoolEntry entries[4];
     u32 activeMask;
 };
-void CallbackPool_SpawnHitParticles(struct CallbackPoolEntry *);
-void CallbackPool_RefreshHealthDisplay(struct CallbackPoolEntry *);
-void ProximityActor_SetState(struct CallbackPoolEntry *, s32);
+void LootDepositCallbackPool_SpawnHitParticles(struct CallbackPoolEntry *);
+void LootDepositCallbackPool_RefreshHealthDisplay(struct CallbackPoolEntry *);
+void LootDepositFeedback_SetState(struct CallbackPoolEntry *, s32);
 s32 LootDepositPool_TestStatusFlags(void *, u32);
 void LootDepositPool_AddStatusFlags(void *, u16);
-static inline void CallbackPool_Subtract(struct ContactPosition *out,
+static inline void LootDepositCallbackPool_Subtract(struct ContactPosition *out,
                                          const struct ContactPosition *b, const struct SceneVec *a)
 {
     out->x = a->x - b->x;
