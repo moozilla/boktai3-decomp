@@ -1,14 +1,8 @@
-#include "global.h"
+#include "monsters/centipede/centipede_body.h"
 #include "scene/actor/scene_actor_control_helpers.h"
 
 u32 TerrainOverlay_QueueRemoveActor(u32 *p);
 void SceneBody_Unregister(void *);
-
-struct State080A9 {
-    u8 pad0[0x888];
-    u8 obj[0x8d0 - 0x888];
-    u16 state;
-};
 
 static inline u8 TestMask(u16 *flags, u32 mask)
 {
@@ -20,14 +14,14 @@ static inline u8 TestMask(u16 *flags, u32 mask)
 void SpritePool_ConsumeStateFlag(struct ChaseActor *input)
 {
     struct ChaseActor *actor = input;
-    struct State080A9 *state = (void *)SceneActorControl_GetState(actor);
+    struct TentacleBody *state = (void *)SceneActorControl_GetState(actor);
     u32 mask = 1;
-    if (TestMask(&state->state, mask)) {
-        u16 *flagsPtr = &state->state;
+    if (TestMask(&state->attackFlags, mask)) {
+        u16 *flagsPtr = &state->attackFlags;
         u32 clearMask = ~1;
         *flagsPtr &= clearMask;
         {
-            void *obj = state->obj;
+            void *obj = &state->markedSegmentBody;
             TerrainOverlay_QueueRemoveActor(obj);
             SceneBody_Unregister(obj);
         }
