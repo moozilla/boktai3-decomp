@@ -1,5 +1,6 @@
 #ifndef GUARD_SCENE_ACTOR_BEHAVIOR_H
 #define GUARD_SCENE_ACTOR_BEHAVIOR_H
+#include "engine/engine_pause.h"
 #include "scene/actor/scene_actor_registry.h"
 #include "link/session/room_actor.h"
 /* Tentative view shared by the behavior helpers beginning at08078078. */
@@ -28,10 +29,8 @@ struct SceneActorBehaviorDestination {
     struct ContactPosition destination;
 };
 
-static inline u32 SceneActorBehavior_GlobalPauseBits(u32 mask)
-{
-    return (gEngineFlags | gScenePauseFlags) & mask;
-}
+/* Keep the spelling still used by the Skeleton unit. */
+#define SceneActorBehavior_GlobalPauseBits Engine_PauseBits
 
 static inline u32 SceneActorBehavior_OverrideBits(u32 mask, const u32 *flags)
 {
