@@ -1319,10 +1319,7 @@ void Spider_UpdateWanderGoal(struct ChaseActor *input)
         }
     } else if (ctx->wanderTimer > 0) {
     decrement: {
-        s16 *timer = &ctx->wanderTimer;
-        u16 value = *timer;
-        --value;
-        *timer = value;
+        ctx->wanderTimer--;
     }
     }
 }
@@ -1841,7 +1838,7 @@ s32 Spider_Init(void *object)
     struct Spider *arg0 = object;
     struct ChaseActor *actor = object;
     struct SceneActorChaseGroup *group = &arg0->chase.group;
-    u32 zero;
+    u32 zero; // concession-ok(const-local): CpuSet reads this source word for a fixed position fill.
     struct ContactPosition tmp;
     u32 flag;
     s32 extra;
