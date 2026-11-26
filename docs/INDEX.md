@@ -605,6 +605,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [notes/scene-actor-position-curve.md](../notes/scene-actor-position-curve.md) | Scene actor position curve | #scene-actors #matching | 0 |
 | [notes/scene-actor-pursuit-recovery.md](../notes/scene-actor-pursuit-recovery.md) | Pursuit after contact release | #scene-actors #matching | 0 |
 | [notes/scene-actor-recovery-route.md](../notes/scene-actor-recovery-route.md) | SceneActorRoute_TryRecoveryDetour | *#actors* | 1 |
+| [notes/scene-actor-registry-cleanup_2026-11-26.md](../notes/scene-actor-registry-cleanup_2026-11-26.md) | Scene actor registry cleanup | #matching #types #phase3 #scene | 2 |
 | [notes/scene-actor-retreat-route.md](../notes/scene-actor-retreat-route.md) | Scene actor retreat route | #scene-actors #terrain #matching | 0 |
 | [notes/scene-actor-timed-burst_2026-11-01.md](../notes/scene-actor-timed-burst_2026-11-01.md) | Timed reaction burst | #scene-actor #matching #compiler | 1 |
 | [notes/scene-actor-twenty_2026-10-12.md](../notes/scene-actor-twenty_2026-10-12.md) | Scene actors and dialogue: reaching 20% | *#actors #scene* | 3 |
