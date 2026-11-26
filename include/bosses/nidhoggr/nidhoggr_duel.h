@@ -5,6 +5,8 @@
 #include "engine/engine.h"
 
 #include "engine/math/scene_vec.h"
+#include "engine/video/sprite.h"
+#include "scene/actor/scene_actor_components.h"
 #include "scene/camera/camera_tracking.h"
 #include "scene/collision/contact_swarm.h"
 #include "scene/collision/contact_actor.h"
@@ -17,24 +19,9 @@ struct GridAttackPacked {
     s32 x : 16, y : 16, z : 16, pad : 16;
 };
 
-struct GridAttackTransform {
-    u8 unknown0[9];
-    u8 angle;
-    u8 unknownA[2];
-    struct ContactPosition coordinates;
-};
-
-struct GridAttackAnimData {
-    u8 unknown0[0xC];
-    void *palette;
-    u8 unknown10[0xC];
-};
-
 struct GridAttackActor {
     u8 unknown0[0x48];
-    struct GridAttackTransform transform; /* 0x48 */
-
-    u8 unknown5C[0x34];
+    struct SceneActorBody transform; /* 0x48 */
     u32 timer;     /* 0x90 */
     s16 health;    /* 0x94 */
     s16 maxHealth; /* 0x96 */
@@ -134,7 +121,7 @@ struct GridAttackActor {
     u8 specialDamageGraphics[0x200];     /* 0x5C4 */
     struct ContactCollider bodyCollider; /* 0x7C4 */
     struct ContactCollider damageCollider;
-    struct GridAttackAnimData animData; /* 0x86C */
+    struct SpriteRenderResource animData; /* 0x86C */
 
     struct ContactSwarmSprite drawable;    /* 0x888 */
     struct DisplaySequenceState animation; /* 0x8B4 */
@@ -149,6 +136,8 @@ struct GridAttackActor {
     struct SceneEventCommand packet; /* 0x914 */
     u8 unknown920[0x4];
 };
+
+typedef char GridAttackActorSizeCheck[sizeof(struct GridAttackActor) == 0x924 ? 1 : -1];
 
 /* The action flags at 0x9C, as the common scene actor controller keeps them. */
 static inline void NidhoggrDuel_AddFlags(struct GridAttackActor *p, u32 mask)

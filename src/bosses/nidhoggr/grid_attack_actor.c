@@ -246,7 +246,7 @@ void NidhoggrDuel_SpawnTargetedProjectile(struct GridAttackActor *actor,
 int NidhoggrDuel_OnDamage(struct GridAttackActor *p, int kind, int damage)
 {
     /* Keep the transform base live: direct actor fields change register allocation. */
-    struct GridAttackTransform *position = &p->transform;
+    struct SceneActorBody *position = &p->transform;
     struct GridAttackPacked size;
     switch (kind) {
         case 0:
@@ -254,7 +254,7 @@ int NidhoggrDuel_OnDamage(struct GridAttackActor *p, int kind, int damage)
                 size.x = 32;
                 size.y = 0;
                 size.z = 32;
-                DamageNumberDisplay_Show(&p->damageCollider, damage, 0, &position->coordinates,
+                DamageNumberDisplay_Show(&p->damageCollider, damage, 0, &position->position,
                                          &size, 1);
             }
             NidhoggrDuel_StartActionMode(p, 1, 0, 0);
@@ -264,7 +264,7 @@ int NidhoggrDuel_OnDamage(struct GridAttackActor *p, int kind, int damage)
             NidhoggrDuel_StartActionMode(p, 1, 0, 1);
             NidhoggrDuel_SetState(p, NidhoggrDuel_UpdateDamageRecovery, 6);
             {
-                int angle = position->angle;
+                int angle = position->direction;
                 p->damageAngle = angle;
             }
             break;
@@ -377,12 +377,12 @@ static inline void NidhoggrDuel_SetFacing(struct GridAttackActor *p, int angle)
 {
     u32 value;
     s32 shifted;
-    p->transform.angle = angle;
-    shifted = (p->transform.angle + 96) >> 6;
+    p->transform.direction = angle;
+    shifted = (p->transform.direction + 96) >> 6;
     value = 3;
     value &= shifted;
     p->facing = value;
-    shifted = (p->transform.angle + 112) >> 5;
+    shifted = (p->transform.direction + 112) >> 5;
     value = 7;
     value &= shifted;
     p->facing8 = value;
@@ -643,11 +643,11 @@ void NidhoggrDuel_UpdateIdleState(struct GridAttackActor *s)
 void NidhoggrDuel_UpdateAnimationNineState(struct GridAttackActor *p)
 {
     /* Keep the transform base live: direct actor fields change register allocation. */
-    struct GridAttackTransform *position = &p->transform;
+    struct SceneActorBody *position = &p->transform;
     if (p->changed) {
         p->changed = 0;
         NidhoggrDuel_SetAnimation(p, 9, 1, 8);
-        p->savedPosition = position->coordinates;
+        p->savedPosition = position->position;
     }
     p->damage = 0;
     p->special = 0;
@@ -736,12 +736,12 @@ void NidhoggrDuel_UpdateTimedHideState(struct GridAttackActor *p, int tick)
 {
     struct GridAttackActor *base = p;
     /* Keep the transform base live: direct actor fields change register allocation. */
-    struct GridAttackTransform *position = &p->transform;
+    struct SceneActorBody *position = &p->transform;
     int done;
     if (p->changed) {
         p->changed = 0;
         NidhoggrDuel_SetAnimation(p, 11, 1, 8);
-        p->savedPosition = position->coordinates;
+        p->savedPosition = position->position;
     }
     done = 0;
     if (Sprite_BlinkUntilExpired(&done, tick, 10, 30)) {
@@ -786,7 +786,7 @@ int NidhoggrDuel_ApplyPendingDamage(struct GridAttackActor *p)
 {
     struct GridAttackActor *base = (void *)p;
     /* Keep the transform base live: direct actor fields change register allocation. */
-    struct GridAttackTransform *position = &p->transform;
+    struct SceneActorBody *position = &p->transform;
     void *collider = &p->damageCollider;
     int damage, special;
     struct GridAttackPacked size;
@@ -831,7 +831,7 @@ int NidhoggrDuel_ApplyPendingDamage(struct GridAttackActor *p)
         size.x = 16;
         size.y = 0;
         size.z = 16;
-        DamageNumberDisplay_Show(collider, damage, 0, &position->coordinates, &size, 1);
+        DamageNumberDisplay_Show(collider, damage, 0, &position->position, &size, 1);
         if (base->health <= 0) {
             base->health = 0;
             NidhoggrDuel_AddFlags(base, 2);
@@ -1355,7 +1355,7 @@ void NidhoggrDuel_UpdateAnimationAndTargets(struct GridAttackActor *p)
 {
     struct GridAttackActor *actor = p;
     struct GridAttackActor *owner = p;
-    struct GridAttackTransform *body = &actor->transform;
+    struct SceneActorBody *body = &actor->transform;
     s32 height;
     u32 i;
     NidhoggrDuel_ProcessMessages(actor);
@@ -1365,9 +1365,9 @@ void NidhoggrDuel_UpdateAnimationAndTargets(struct GridAttackActor *p)
         height = ProjectedDisplay_GetHeight(actor->projectedDisplay);
     else
         height = 0;
-    actor->drawable.position.x = body->coordinates.x;
-    actor->drawable.position.y = body->coordinates.y + height + 128;
-    actor->drawable.position.z = body->coordinates.z;
+    actor->drawable.position.x = body->position.x;
+    actor->drawable.position.y = body->position.y + height + 128;
+    actor->drawable.position.z = body->position.z;
     actor->shadowPosition = actor->drawable.position;
     if (NidhoggrDuel_TestFlags(owner, 0x20000)) {
         actor->drawable.position.x += NidhoggrDuel_Truncate12(
@@ -1388,12 +1388,12 @@ void NidhoggrDuel_UpdateAnimationAndTargets(struct GridAttackActor *p)
     SceneActors_UpdateTargetMetrics(owner);
     i = 0;
     if (i < actor->targetCount) {
-        struct GridAttackTransform *base = &owner->transform;
+        struct SceneActorBody *base = &owner->transform;
         do {
             struct SceneVec *target = owner->targetPositions[i];
             if (target) {
-                s32 x = target->x - base->coordinates.x;
-                s32 z = target->z - base->coordinates.z;
+                s32 x = target->x - base->position.x;
+                s32 z = target->z - base->position.z;
                 owner->requestedAngles[i] = Math_Atan2(x, z);
                 owner->targetDistances[i] = x * x + z * z;
             }
@@ -1416,7 +1416,7 @@ static inline void NidhoggrDuel_CopyPalette(const void *source, void *dest)
 void NidhoggrDuel_UpdateCollidersAndPalette(struct GridAttackActor *p)
 {
     struct GridAttackActor *base = p;
-    struct GridAttackTransform *transform = &p->transform;
+    struct SceneActorBody *transform = &p->transform;
     struct ContactCollider *collider;
     if (NidhoggrDuelMinionPool_GetActiveCount(p->contactPool) > p->contactCountLimit) {
         NidhoggrDuelBurst_SetEnabled(p->contactBurst, 1);
@@ -1444,12 +1444,12 @@ void NidhoggrDuel_UpdateCollidersAndPalette(struct GridAttackActor *p)
     else {
         ContactCollider_ClearFlags(collider, 4);
         Collider_SetPosition(collider, &base->drawable.position, 0);
-        collider->direction = transform->angle;
+        collider->direction = transform->direction;
     }
     collider = &base->bodyCollider;
     if (!(NidhoggrDuel_TestFlags(p, 8))) {
         Collider_SetPosition(collider, &base->drawable.position, 0);
-        collider->direction = transform->angle;
+        collider->direction = transform->direction;
         Collider_Refresh(collider);
     }
     if (NidhoggrDuel_TestFlags(p, 16)) {
@@ -1619,7 +1619,7 @@ s32 NidhoggrDuel_Initialize(struct GridAttackActor *p, u32 ctx)
     locked = &p->locked;
     tryUpdate = &p->tryUpdate;
     reset = &p->reset;
-    position = &p->transform.coordinates;
+    position = &p->transform.position;
     if (targetIndex < count) {
         u32 targetCount = count;
         do {
