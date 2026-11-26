@@ -8,8 +8,6 @@ import source_layout
 
 
 class SourceLayoutTests(unittest.TestCase):
-<<<<<<< HEAD
-=======
     def test_slug_keeps_hex_and_acronyms_together(self):
         self.assertEqual(source_layout.slug("M4A_Init"), "m4a_init")
         self.assertEqual(source_layout.slug("Registry A8CB"), "registry_a8cb")
@@ -30,7 +28,6 @@ class SourceLayoutTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, r"Example\.c.*source_dirs\.csv.*source_files\.csv"):
                 source_layout.new_source(0x0822FDB4, "Example", root)
 
->>>>>>> 38c9b5978
     def test_resolves_names_addresses_aliases_and_drafts(self):
         with tempfile.TemporaryDirectory() as scratch:
             root = Path(scratch)

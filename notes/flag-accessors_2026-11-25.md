@@ -263,9 +263,5 @@ build/scope/agbcc/gcc/agbcc -O2 -mthumb-interwork -fhex-asm -da -dumpbase build/
 
 Compare the functions in the .rtl, .cse, .gcse, .flow and .lreg dumps. For the
 real-site control, keep the original filename in a scratch directory, replace the
-<<<<<<< HEAD
 first WordFlags_Test in src/player/effects/burst/sub_081604C0.c with `(display->flags & 1)` in the
-=======
-first WordFlags_Test in src/player/effects/burst/sub_081604C0.c with `(display->flags & 1)` in the
->>>>>>> 38c9b5978
 copy, and run scope on that copy with `ActorDebris_Update why all`.
