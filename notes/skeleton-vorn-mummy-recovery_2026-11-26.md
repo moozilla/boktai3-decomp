@@ -221,3 +221,31 @@ All six edited units matched their recorded extents. All four
 Skeleton header dependents and both Vorn header dependents matched.
 The scoped linter reported zero errors. This pass removed two report
 lines and two steering uses, bringing the original 844 uses to 699.
+
+## Collision, timers, and route follow-up
+
+| Class | Report lines before and after | Steering uses before and after |
+|---|---:|---:|
+| Skeleton | 243 → 241 | 299 → 297 |
+| Vorn | 220 → 219 | 228 → 227 |
+| Mummy | 170 → 169 | 172 → 171 |
+
+- Skeleton's action update and attack collision use the native class
+  state. The script config applies explicit defaults and sink defeat
+  shares the drawable show. Removing the defeat response union still
+  changes spark allocation. The contact availability replacement
+  differs in two register assignments.
+- Vorn's uphill path initializes and uses the class position, route ID,
+  countdown and period. The room actor provides the floor height and
+  message identity. The patrol request uses the shared delayed response,
+  and the segment copy at 080ACCD4 uses the existing tentacle layout.
+  Changing the uphill context and group bases together still changes
+  the route callback's allocation.
+- Mummy reads elapsed turn frames from the display sequence and uses
+  the canonical collider initialization declarations and tile type.
+  Checkpoint completion shares the motion clear and route query.
+  The direct gate flag clear still differs by one instruction.
+
+All five edited units and six header dependents matched. The scoped
+linter reported zero errors. The pass removed four report lines and
+four steering uses, bringing the original 844 uses to 695.
