@@ -21,10 +21,19 @@ exports.floorSwitches = () => {
 const offsets = [[0, -1], [1, 0], [0, 1], [-1, 0]];
 const delayedScripts = () => exports.tasks().filter((t) => !t.dead && t.update === 'DelayedScript_Update');
 
+// FallingObjectManager_AddObject puts a new object at the head. Only an
+// object with an attack collider landing on this plate makes it unsafe.
+function fallingAttack(plate) {
+  const head = $.gFallingObjectManager?.head;
+  if (!head?.attack) return 0;
+  const { x, z } = head.position;
+  return Math.abs(x - plate.x) <= 128 && Math.abs(z - plate.z) <= 128 ? Number(head.$addr) : 0;
+}
+
 // A delayed press script can open the gate after the release script has run.
 // Reverse at the first occupied tick, before the delayed task takes control.
-exports.tapFloorSwitch = function* (plate, opts) {
-  if (!plate.release) return;
+exports.probeFloorSwitch = function* (plate, opts) {
+  if (!plate.addr) return;
   const { x, y, z, scene } = exports.where();
   const grid = exports.grid();
   if (!grid || y !== plate.y) return;
@@ -45,12 +54,21 @@ exports.tapFloorSwitch = function* (plate, opts) {
     const r = yield* exports.navigate(target, { ...opts, noPush: true, noBreak: true, stopIf: pressed });
     if (!r.reached || pressed() || exports.where().scene !== scene) continue;
     const existing = new Set(delayedScripts().map((t) => t.task));
+    const fallBefore = fallingAttack(plate);
     const toward = exports.DIR_KEYS[(dir + 2) % offsets.length];
     for (let i = 0; i < 32 && !pressed(); i++) yield g.press(toward, 1);
+    if (!pressed()) continue;
+    const fall = fallingAttack(plate);
+    if (fall && fall !== fallBefore) {
+      session.restore(root);
+      yield g.press(0, 1);
+      return { hazard: true };
+    }
     const pending = delayedScripts().find((t) => !existing.has(t.task));
-    if (!pressed() || !pending) continue;
+    if (!plate.release || !pending) return { pressed: true };
     for (let i = 0; i < 8 && pressed(); i++) yield g.press(exports.DIR_KEYS[dir], 1);
-    if (!pressed()) return () => !delayedScripts().some((t) => t.task === pending.task);
+    if (!pressed()) return { ready: () => !delayedScripts().some((t) => t.task === pending.task) };
   }
   session.restore(root);
+  yield g.press(0, 1);
 };

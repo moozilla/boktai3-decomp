@@ -185,20 +185,27 @@ const GOALS = {
         }
       }
       // Both HP traps and live pressure plates can run scripts on contact.
-      let timedSwitch = false;
+      let prioritizeExit = false;
       const switches = (stageOf(here).switches || []).concat(L.floorSwitches().filter((sw) => !sw.pressed));
       for (const sw of switches) {
         const key = `${here}:switch:${sw.box ?? sw.name}`;
         if (TRIED.has(key)) continue;
         const pressed = sw.addr ? () => L.floorSwitches().some((plate) => plate.addr === sw.addr && plate.pressed) : undefined;
         const opts = { avoid: stageOf(here).doors.map((d) => d.box) };
-        const delayed = yield* L.tapFloorSwitch(sw, opts);
+        const probe = yield* L.probeFloorSwitch(sw, opts);
+        if (probe?.hazard) {
+          prioritizeExit = true;
+          event({ skill: 'switch', name: sw.name, reached: false, reason: 'falling object at the switch' });
+          continue;
+        }
+        const delayed = probe?.ready;
         const r = delayed ? { reason: 'released before delayed script' } :
+          probe?.pressed ? { reason: 'pressed' } :
           yield* L.navigate([sw.x, sw.z], { ...opts, stopIf: pressed, trace: (e) => event({ skill: 'nav', ...e }) });
         const clear = () => !g.fn.ScriptUtility_IsControlFlagSet();
         const completed = delayed ? (yield* untilControl(g, L, () => delayed() && clear(), 24, 900)) :
           pressed ? pressed() || L.where().scene !== here : r.reached;
-        timedSwitch ||= Boolean(delayed && completed);
+        prioritizeExit ||= Boolean(delayed && completed);
         if (!pressed || completed) TRIED.add(key);
         if (pressed && completed && !delayed) yield* untilControl(g, L, clear, 24, 900);
         else yield* L.clearInterruptions({});
@@ -248,9 +255,9 @@ const GOALS = {
       // people: talk to each once (towns count who was heard before the story goes on).
       // The live actors (world.js people(): SceneActorManager) where they stand now, else
       // the characters the script placed (stages.json talk).
-      // A scripted opening can reset at room exit. Cross it before detouring
-      // to a character or pickup near another door.
-      if (!timedSwitch && !opt('--no-talk')) {
+      // Cross a scripted opening before it resets. Defer detours when a plate
+      // preview has shown an attack on the route to an optional reward.
+      if (!prioritizeExit && !opt('--no-talk')) {
         const live = L.people();
         // someone met in three or more rooms travels with the player (Otenko): talk once
         for (const q of live) { const k = q.id.toString(16); SEEN.set(k, (SEEN.get(k) || new Set()).add(here)); }
@@ -281,15 +288,17 @@ const GOALS = {
       // A key detour has a specific pickup. Other items can wait until the
       // detour ends, since the approach can consume life or change floors.
       if (keyGoal && L.hasItem(keyGoal.item)) keyGoal = undefined;
-      const pickups = timedSwitch ? [] : stageOf(here).items.filter((it) => !keyGoal || (it.category === 0 && it.item === keyGoal.item));
+      const pickups = prioritizeExit ? [] : stageOf(here).items.filter((it) => !keyGoal || (it.category === 0 && it.item === keyGoal.item));
       for (const it of pickups.filter((it) => !TRIED.has(`${here}:${it.x},${it.z}`))) {
         if (bossActive()) break;
         TRIED.add(`${here}:${it.x},${it.z}`);
-        const c = yield* L.collect(it.x, it.z, { avoid: stageOf(here).doors.map((d) => d.box), stopIf: bossActive,
+        const life = L.where().life;
+        const tooCostly = () => L.where().life < life - Math.max(4, Math.floor(life / 10));
+        const c = yield* L.collect(it.x, it.z, { avoid: stageOf(here).doors.map((d) => d.box), stopIf: () => bossActive() || tooCostly(),
           trace: (e) => event({ skill: 'nav', ...e }) });
         event({ skill: 'collect', item: it.name || `${it.category}:${it.item}`, x: it.x, z: it.z, ...c });
-        if (c.reason === 'no path' || c.reason === 'stopped') TRIED.delete(`${here}:${it.x},${it.z}`);
-        if (L.where().scene !== here || c.reason === 'stopped') break;
+        if (c.reason === 'no path' || (c.reason === 'stopped' && !tooCostly())) TRIED.delete(`${here}:${it.x},${it.z}`);
+        if (L.where().scene !== here || c.reason === 'stopped' || tooCostly()) break;
       }
       if (L.where().scene !== here) { rooms--; continue; }
       visited.add(here);

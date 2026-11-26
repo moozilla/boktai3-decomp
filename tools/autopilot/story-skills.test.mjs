@@ -111,12 +111,13 @@ test('live pressure plates use the center of the occupied square', () => {
   assert.deepEqual(floorSwitches(), []);
 });
 
-test('a delayed floor switch retreats on its first occupied tick', () => {
+function switchProbe() {
   const plate = { addr: 0x02010018, x: 128, y: 256, z: 128, release: true };
   const cells = [{ x: 0, z: 0, open: true, level: 1 }, { x: 0, z: 1, open: true, level: 1 }];
   const task = { task: 4, update: 'DelayedScript_Update' };
-  let pressed = false, scheduled = false;
-  const lib = skill('floor-switches', { press: (key) => key }, {}, {
+  const state = { pressed: false, scheduled: false, restores: 0 };
+  const game = {};
+  const lib = skill('floor-switches', { press: (key) => key }, game, {
     where: () => ({ x: 128, y: 256, z: 384, scene: 2 }),
     grid: () => ({ at: (x, z) => x === 0 ? cells[z] : undefined }),
     cellOf: (x, z) => [x >> 8, z >> 8],
@@ -125,21 +126,35 @@ test('a delayed floor switch retreats on its first occupied tick', () => {
       assert.deepEqual(target, [128, 384]);
       return { reached: true };
     },
-    tasks: () => scheduled ? [task] : [],
-    session: { snapshot: () => null, restore: () => {} },
+    tasks: () => state.scheduled ? [task] : [],
+    session: { snapshot: () => null, restore: () => state.restores++ },
     DIR_KEYS: ['up+right', 'down+right', 'down+left', 'up+left'],
   });
-  lib.floorSwitches = () => [{ ...plate, pressed }];
-  const trial = lib.tapFloorSwitch(plate, {});
+  lib.floorSwitches = () => [{ ...plate, pressed: state.pressed }];
+  return { trial: lib.probeFloorSwitch(plate, {}), state, game };
+}
+
+test('a delayed floor switch retreats on its first occupied tick', () => {
+  const { trial, state } = switchProbe();
   assert.equal(trial.next().value, 'up+right');
-  pressed = scheduled = true;
+  state.pressed = state.scheduled = true;
   assert.equal(trial.next().value, 'down+left');
-  pressed = false;
+  state.pressed = false;
   const result = trial.next();
   assert.equal(result.done, true);
-  assert.equal(result.value(), false);
-  scheduled = false;
-  assert.equal(result.value(), true);
+  assert.equal(result.value.ready(), false);
+  state.scheduled = false;
+  assert.equal(result.value.ready(), true);
+});
+
+test('a pressure-plate preview rolls back a falling attack', () => {
+  const { trial, state, game } = switchProbe();
+  assert.equal(trial.next().value, 'up+right');
+  state.pressed = true;
+  game.gFallingObjectManager = { head: { $addr: 0x02014000, attack: 0x02002000, position: { x: 128, z: 128 } } };
+  assert.equal(trial.next().value, 0);
+  assert.deepEqual(trial.next(), { done: true, value: { hazard: true } });
+  assert.equal(state.restores, 2);
 });
 
 test('the vampire model uses signed health and the source sunlight flag', () => {
