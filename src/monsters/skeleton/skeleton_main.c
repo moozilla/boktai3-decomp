@@ -753,36 +753,11 @@ void SceneActorControl_OnIdle(u8 *);
 
 u32 Skeleton_TryEnterIdleRange(struct ChaseActor *s)
 {
-    u8 *context = s->base.context;
-    if (s->base.tracking.distance > *(u32 *)(context + 0x708) &&
-        s->base.tracking.distance < *(u32 *)(context + 0x70C)) {
-        void (*fn)(void) = SceneActorControl_OnIdle;
-        u8 code = 0x10;
-        u32 zero;
-        u8 one;
-        u32 *flags;
-        u8 *taken;
-        u32 two;
-        taken = &s->base.field2B2;
-        zero = 0;
-        one = 1;
-        *taken = one;
-        s->base.stepDone = zero;
-        s->base.controlKind = code;
-        s->base.target = fn;
-        s->base.field2C8 = zero;
-        flags = &s->base.pendingControlFlags;
-        {
-            u32 mask = -2;
-            *flags &= mask;
-        }
-        s->base.pendingControl = zero;
-        two = 2;
-        s->base.state2A8 = 0;
-        s->base.phase2A9 = two;
-        s->base.behavior2AA = 0;
-        s->base.counter2AC = zero;
-        s->base.field2B1 = one;
+    struct Skeleton *context = s->base.context;
+    if (s->base.tracking.distance > context->nearDistance &&
+        s->base.tracking.distance < context->farDistance) {
+        SceneActorChase_SetControl(s, SceneActorControl_OnIdle, 0x10);
+        SceneActorChase_SetState(s, 0, 2, 0);
         return 1;
     }
     return 0;
@@ -811,33 +786,8 @@ u8 SceneActorControl_TryBeginNearbyBehavior16(struct ChaseActor *s,
         return 1;
     }
     if (angle <= 24 && s->base.tracking.distance < context->distanceThresholds[0]) {
-        void (*fn)(void) = SceneActorControl_OnIdle;
-        u8 code = 0x10;
-        u32 zero;
-        u8 one;
-        u32 *flags;
-        u8 *taken;
-        u32 two;
-        taken = &s->base.field2B2;
-        zero = 0;
-        one = 1;
-        *taken = one;
-        s->base.stepDone = zero;
-        s->base.controlKind = code;
-        s->base.target = fn;
-        s->base.field2C8 = zero;
-        flags = &s->base.pendingControlFlags;
-        {
-            u32 mask = -2;
-            *flags &= mask;
-        }
-        s->base.pendingControl = zero;
-        two = 2;
-        s->base.state2A8 = 0;
-        s->base.phase2A9 = two;
-        s->base.behavior2AA = 0;
-        s->base.counter2AC = zero;
-        s->base.field2B1 = one;
+        SceneActorChase_SetControl(s, SceneActorControl_OnIdle, 0x10);
+        SceneActorChase_SetState(s, 0, 2, 0);
         context->attempts = 0;
         return 1;
     }
@@ -1071,23 +1021,8 @@ void SceneActorReaction_UpdateGate(struct ChaseActor *p)
             SceneActorControl_SelectBehaviorByTargetAngle(p);
         }
     } else {
-        u32 one = 1;
-        void (*callback)(void);
-        u32 kind;
-        p->base.state2A8 = active;
-        p->base.phase2A9 = one;
-        p->base.behavior2AA = active;
-        p->base.counter2AC = active;
-        p->base.field2B1 = one;
-        callback = SceneActorControl_OnIdle;
-        kind = 0x10;
-        p->base.field2B2 = one;
-        p->base.stepDone = active;
-        p->base.controlKind = kind;
-        p->base.target = callback;
-        p->base.field2C8 = active;
-        SceneActorChase_AndWordFlags(&p->base.pendingControlFlags, ~1);
-        p->base.pendingControl = active;
+        SceneActorChase_SetState(p, 0, 1, 0);
+        SceneActorChase_SetControl(p, SceneActorControl_OnIdle, 0x10);
         OrMotion((struct SceneActorReactionMotion *)&p->base.tracking.target, 8);
     }
 }
@@ -2027,7 +1962,7 @@ s32 SceneActorReaction_TickHiddenResponse(struct ChaseActor *actor)
         u32 *input;
         u32 *flags;
         u32 enabled;
-        input = &((struct SceneActorScriptPropertiesView *)actor)->flags6DC;
+        input = &((struct Skeleton *)actor)->actionFlags;
         enabled = *input & mask;
         actor = (void *)input;
         flags = (void *)actor;
@@ -2048,7 +1983,7 @@ s32 SceneActorReaction_TickHiddenResponse(struct ChaseActor *actor)
             Skeleton_UpdateVisibilityFlicker(saved);
         }
     } else {
-        struct SceneActorScriptPropertiesView *context = (void *)actor;
+        struct Skeleton *context = (void *)actor;
         u16 *timer;
         SceneActorReaction_SetProfileEntries(actor);
         Skeleton_TickActionCooldowns(actor);
@@ -3694,30 +3629,13 @@ void SceneActorApproach_UpdateRange(struct ChaseActor *actor)
         if (!TryMove(actor, group))
             Callback_InvokeActor(actor, *(void **)(group + 0x224));
         else {
-            u32 next;
             SceneActorChase_AndWordFlags(&context->flags, ~0x100);
-            next = 15;
-            actor->base.state2A8 = 0;
-            actor->base.phase2A9 = 0;
-            actor->base.behavior2AA = next;
-            actor->base.counter2AC = 0;
-            actor->base.field2B1 = 1;
+            Skeleton_ReturnToBehavior(actor, 15);
         }
     }
 }
 
 /* Skeleton_UpdateTargetTransition: skeleton variant of the target-motion transition */
-
-static inline void SetPhase(struct ChaseActor *a, u32 phase)
-{
-    u8 *state = &a->base.state2A8;
-    u32 zero = 0;
-    *state = zero;
-    a->base.phase2A9 = zero;
-    a->base.behavior2AA = phase;
-    a->base.counter2AC = zero;
-    a->base.field2B1 = 1;
-}
 
 void Skeleton_UpdateTargetTransition(struct ChaseActor *a)
 {
@@ -3729,7 +3647,7 @@ void Skeleton_UpdateTargetTransition(struct ChaseActor *a)
         u32 *flags = address;
         if (IsActive(value)) {
             if (a->base.tracking.distance > c->farDistance) {
-                SetPhase(a, 17);
+                Skeleton_ReturnToBehavior(a, 17);
                 {
                     s32 angle = a->base.tracking.heading;
                     if (angle >= 0)
@@ -3834,10 +3752,10 @@ void SceneActorReaction_SinkThenDefeat(struct ChaseActor *actor, s32 frame)
     if (frame > 6) {
         actor->base.body.position.y -= (u32)(frame - 6) * 30;
         if (!actor->base.drawableKind)
-            *(struct ContactPosition *)((u8 *)actor->base.drawable + 0x1C) =
+            ((struct SceneActorRegistrySequenceDrawable *)actor->base.drawable)->position =
                 actor->base.body.position;
         else
-            *(struct ContactPosition *)((u8 *)actor->base.drawable + 0x40) =
+            ((struct SceneActorRegistryTileDrawable *)actor->base.drawable)->position =
                 actor->base.body.position;
         if (frame > 8) {
             u32 zeroWord = 0;
@@ -3860,21 +3778,7 @@ void SceneActorReaction_SinkThenDefeat(struct ChaseActor *actor, s32 frame)
             SceneActorAttachment_ReplaceResponseSlot(actor, 1, 127, 0);
             SceneActorAttachment_ReplaceResponseSlot(actor, 3, 127, 0);
             SceneActorEffects_AdvanceSteps(actor, 4);
-            {
-                void *control = SceneActorReaction_BeginHiddenDefeat;
-                u32 kind = 23;
-                actor->base.field2B2 = 1;
-                actor->base.stepDone = 0;
-                actor->base.controlKind = kind;
-                actor->base.target = control;
-                actor->base.field2C8 = zeroWord;
-                {
-                    u32 *flags = &actor->base.pendingControlFlags;
-                    u32 mask = ~1;
-                    *flags &= mask;
-                }
-                actor->base.pendingControl = zeroWord;
-            }
+            SceneActorChase_SetControl(actor, SceneActorReaction_BeginHiddenDefeat, 23);
         }
     }
 }
