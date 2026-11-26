@@ -30,3 +30,6 @@ SceneNpc_,Otenko_,src/actors/scene_npc,0000/2201 visible field companion. BB34 a
 Actor_BeginAnimationPhase,OtenkoTutorial_BeginAnimationPhase,src/actors/actor_animation_controller/actor_animation_controller.c,GCL tutorial procs 1474→1482 create 8AAB. 1484 uses animation phase commands in the tutorial.
 StateActor_,StoryCharacter_,src/actors/state_actor_kind_086121_c4,51 scoped functions. Kind 27 Trinity runs dash/animation after breaking the White Forest barrier at 3931. The 4915 kind 28 action uses the same family.
 SceneCatalog_,PauseStatus_,"src/menus/scene_catalog, addresses 08174F14–08175854","0032→4217, Status tab. Scope to SetDescription, GetLevelScaledValue, SetSelection, ResetTextWindow and SelectDescription. The three settings functions are outside this scope."
+BurstEmitter_,SparkExplosion_,src/effects/five_slot_burst_emitter,Staged GCL 1043→1488/8639 shows a spark blast and smoke tail.
+SparkleEmitter_,CutsceneSparkles_,src/effects/sparkle_emitter,"Trinity release proc 3845 uses 3D64, instance A3E7 and CC88 green sparkle."
+EffectEmitter_,StrikeCrystal_,src/effects/effect_emitter,Proc 1179→95A8 loads 066A. A floating green crystal appears in the original renderer.

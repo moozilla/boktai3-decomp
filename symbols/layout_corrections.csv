@@ -11,7 +11,17 @@ src/actors/scene_object_controller,src/objects/sliding_doors,0054→5297. 6D69 c
 src/actors/script_combat_actor,src/monsters/muspell_head,GCL 3991 → 1604 → 1606 creates key 5153. Book index 31 (#9869). The head in package 7E7D is visible next to Django after moving the player onto the neighboring tile.
 src/actors/sequence_contact_actor_pool,src/bosses/nidhoggr,GCL key 917F. Dialogue in scene 4915 identifies the visible opponent as Nidhoggr (#7368). His defeat unlocks Book index 80 (#9918). Scene 6425 replays the fight.
 src/actors/singleton_slot_7,src/bosses/vanargand,"GCL 6325 calls 6314, which creates registry 5856 with actor ID 7C56 (Vanargand). The head is on the left during Django’s bike chase."
+src/effects/debris_particles,src/objects/bat_curtain,DA6D fragment update is visible in a staged barrier run. All callers are in the Bat Curtain unit.
+src/effects/effect_emitter,src/objects/strike_crystal.c,Green 066A strike crystal drawn by original 95A8 and proc 1179. The same crystal actor runs in Pirate Island.
+src/effects/effect_part,src/effects/actor_attachments,"Live attack effects attach to the Player through 0E10, with the shared manager in other actor encounters."
+src/effects/fading_particle_groups,src/objects/hazards/falling_object_effects,Original FallingObject burst calls this group; recorded standalone red-orange flame motes in 3955. Keep with falling hazards.
+src/effects/five_slot_burst_emitter,src/effects/particles/spark_explosions,"Original registry 1488 through proc 1043. Native emitter draws sparks, then smoke."
+src/effects/fragment_groups,src/effects/particles/impact_fragments,Staged type 0 uses 84EE and creates a radial spread of white-blue fragments. The implementation accepts several debris sprite types.
+src/effects/particle_effect,src/effects/particles/action_flashes,Staged Player action 9 at 6201 draws attached gold flash and sparks.
+src/effects/particle_groups,src/effects/particles/impact_fragments,Staged bouncing chunks at 3955 and active during timed attack at 6165. Shared debris motion and fragment constructor; merge src/effects/fragment_groups.
 src/effects/registry_6_a37,src/effects/screen/magic_cannon_departure.c,Warp to 4924 at entrance 57. Proc 4928 hides the ship sprites and creates 6A37 before the space flight. The scrolling sky is visible during its update.
+src/effects/scene_particle_pools,src/effects/particles/hit_effects,"Shared actor hit bursts at Centipede 4076 and Black Knight 6265, distinct from the anchored attachment group."
+src/effects/sparkle_emitter,src/effects/particles/cutscene_sparkles.c,3D64 in Trinity release proc 3845. Green CC88 sparkles observed during the isolated script replay.
 src/effects/sprite_trail,src/bosses/vanargand,"GCL 6325 calls 6314, which creates registry 5856 with actor ID 7C56 (Vanargand). The head is on the left during Django’s bike chase."
 src/engine/scene_state_and_spatial_queries/sub_0806F218.c,src/system/game_state/sub_0806F218.c,"0016→6195. Pile Driver proc 6192 calls 8954 to increment persistent counters, independently of the scene loader."
 src/field/actor_group,src/objects/loot_deposits,0029→3905. F1F9 key loads 9385 and breaks after sword strikes. Its result callback 1133 rolls an item drop. Merge the hit feedback unit.
@@ -37,6 +47,7 @@ src/monsters/cannon_emitter,src/monsters/pollen_flowers,Key 98CB draws both flow
 src/monsters/cannon_turret,src/monsters/garmr_statue,GCL 3884 → 1601 → 1603 creates 4CD8. The replay runs the actor update in view. Bestiary index 30 is text #9868.
 src/monsters/enemy_d459,src/monsters/axe_armor,"D459 is the axe shockwave Armor in 2993 (#9867). Preserve src/monsters/armor for the separate E043 elemental family, verified at 6472 and 6265."
 src/monsters/enemy_f426,src/monsters/statue,"GCL 3184 → 1589 → 1590 spawns F426. Shared sprite package 7E82, palette 0225. Bestiary index 28 is string #9866, STATUE."
+src/monsters/enemy_particle,src/effects/particles/enemy_attacks,Wind Cannon provenance comes from the original caller 082099F1 at 4755. Screamer and Poison Hand use the same pool.
 src/monsters/fan_cannon,src/monsters/cannons/wind,GCL 4751 → 1609 spawns the fan cannon manager 9CC2 and two color variants. The replay runs the actor update in view. Bestiary index 34 is text #9872.
 src/monsters/fan_cannon_manager,src/monsters/cannons/wind,Proc 1609 creates shared manager 9CC2 and its cannon instances. The actor callbacks run under the same pool.
 src/monsters/glove,src/minigames/coffin_bike,GCL 6275 calls 1277 to spawn bike key E881. R accelerates and UP steers visibly through Lifeless Town’s ride. The stock non-bike world map (2569) executes none of this unit. A two-core Back Street match also runs Glove_UpdateTask on both bikes. See link-peer/play-3-0.png and play-3-1.png.

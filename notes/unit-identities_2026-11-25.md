@@ -767,3 +767,41 @@ In stock 0016's Pile Driver tutorial, proc 6192 calls registry command
 8954. Its 0806F218 callback increments the four persistent counters
 directly. Record the per-file move to game state so the mixed former
 scene state directory does not move it with the spatial queries.
+
+### Effects with source and on-screen witnesses
+
+Tags: particles, Bat Curtain, falling objects, Wind Cannon, action effects, Trinity
+
+The controlled effect runs load the 0029 room snapshot from 3955.
+`review-native-*/commands.txt` contains the original routine called,
+argument memory writes and screenshot timing. The local harness at
+`build/identify/witness_harness.c` adds a `native` command to the stock
+mGBA harness. It interrupts `Player_Update`, passes the original
+Thumb function its arguments, and resumes the interrupted registers.
+The room and display remain active. The ROM bytes are unchanged.
+The before/created/after shots give a control against environmental
+effects already visible in the room.
+
+| Run | Witness |
+| --- | --- |
+| `review-native-fading` | Native 08015F60 produces orange flame motes. The FallingObject burst calls this routine. |
+| `review-native-fragments` | Native 08014CA4 loads 84EE for a type 0 radial spread. White-blue fragments are visible in `after.png`. |
+| `review-native-bouncing` | Native 08014634 creates a dark fragment group with original physics. 6165 also runs the same manager. |
+| `review-native-burst-sparks` | Proc 1043 calls registry 1488. The initial spark explosion uses graphics 8639 and ends with smoke. |
+| `review-native-trinity-sparkles` | Proc 3845 calls 3D64, loads CC88 and draws green dots. The same constructor and update run in the 3931 Trinity release. |
+| `review-native-debris` | Native 08012B34 loads fragment DA6D. The Bat Curtain unit contains the production callers. |
+| `review-native-hit-orb` | Proc 1179 selects 95A8, which loads sprite 066A and draws a bobbing green crystal. The Pirate Island room at 4859 also runs the constructor. |
+
+For the action flash, load the 0016 Pile Driver field control and
+stage motion 9 as recorded in `player-motion/commands.txt`.
+`action9.png` shows the effect around Django. The Vanargand attack
+pairing at 6165 uses the separate actor attachment group.
+Centipede's strike at 4076 uses the shared hit-burst pool, which also
+runs during the Black Knight battle.
+
+Load 0042 at 4755 to trace the Wind Cannon. The
+`review-wind-particle` probe records return address 082099F1 for
+`EnemyParticle_Emit`. This locates the call in the Wind Cannon update.
+`wind-cannon-west/gale.png` shows the room activity. The same emitter
+pool has live coverage in the Black Castle Screamer room and a
+separate Poison Hand caller.
