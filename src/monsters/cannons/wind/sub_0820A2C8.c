@@ -21,18 +21,14 @@ u32 WindCannonManager_Update(struct FanCannonManager *p)
     }
     gPlayerBackgroundState = 0;
     gPlayerBackgroundMode = 0;
-    slot = p->slots;
-    i = 0;
-    do {
+    for (slot = p->slots, i = 0; i < 8; i++, slot++) {
         u32 bit = 1 << i;
         if (p->occupiedSlots & bit) {
             WindCannon_Update(p, slot, i);
             if (slot->update == WindCannon_UpdateActive)
                 active |= bit;
         }
-        i++;
-        slot++;
-    } while (i <= 7);
+    }
     if (active == 0)
         Sound_StopSong(0x519);
     return 0;

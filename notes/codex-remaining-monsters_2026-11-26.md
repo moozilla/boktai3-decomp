@@ -165,3 +165,79 @@ writes the wander duration from the random result in one expression. The
 full unit matched. The direct behavior clear in displacement recovery and
 the direct context clear in scripted entry each change one ROM instruction.
 The earlier random-table and tracking holdouts still apply.
+
+## Bee, Sword, enemy particle, and Muspell Head follow-up
+
+Bee uses the shared terrain transition at three entries and reads the
+flight context and pending-target counter directly. The plain contact
+clear loads the word before building the mask. The ROM builds the mask
+first.
+
+Sword uses the table address directly during a lunge, clears its damage
+fields with literal zeros, and accesses two counters through the existing
+defeat statistics view. A typed lifetime counter changes allocation of
+the 9999 cap. The shared child playback operation still changes 18
+instructions.
+
+Enemy particles scan occupied slots with a counted loop and link the
+native sprite when emitting. The direct lifetime flag puts mask creation
+after the load. Muspell Head's spark burst uses a counted loop, and its
+script initializer writes the sequence field directly. Narrowing the
+projectile jitter index changes the random cursor load to a halfword.
+
+All seven changed units passed stock checks. The four objects cleared
+three printed warnings and three weighted constant uses.
+
+## Counted cannon and Poison Hand loops
+
+Garmr Statue, Poison Hand, Vulcan Cannon, and Wind Cannon use counted
+loops for their fixed hit-spark bursts. Garmr passes the native volley
+velocity directly and adjusts the defeat effect height in place. Poison
+Hand uses the shared velocity vector and passes the palette and attributes
+directly in its first emergence effect call. The later call still needs the
+matching staged form. The direct occupied-slot gate moves mask generation
+before the pause branch.
+
+Vulcan reads its defeat facing byte and the random table through their
+native members and symbol. The late targeting zero still affects CSE and
+allocation. Wind uses counted loops for the active and free-slot scans.
+The active scan matches when the pointer initialization precedes the slot
+index. Direct array indexing changes address allocation. The free-slot
+scan tests its occupied bit directly.
+
+All eleven changed units matched. These objects cleared one diagnostic
+line and three weighted constant uses.
+
+## Native defeat script arguments
+
+Plasma Cannon, Statue, Dragon Puppy, and Screamer now read their defeat
+script values through the recovered actor fields. Their callbacks fill the
+existing `ScriptUtilityArguments` record and write the five reaction
+counters through the game-state array. Plasma's typed total and lifetime
+counters still change branch layout. The prior signed offset accesses
+remain for those totals.
+
+The four hit-spark bursts use counted loops. Plasma and Dragon Puppy
+decrement their native recovery counters. Dragon Puppy uses the shared
+position record in its windup. Statue copies the native position and
+reads the low random-sample byte. Screamer counts defeat particles and
+writes their position offsets directly.
+
+All thirteen changed units matched with the stock compiler. The printed
+warning and weighted-use totals are unchanged.
+
+## Popbud, Pollen Flower, and Ooze follow-up
+
+Popbud uses its native defeat fields, the shared script argument record,
+and a direct animation-completion test. The direct sprite flag pointer
+changes the initializer's allocation. Pollen Flower passes its typed
+playback state directly. A plain reverse palette loop introduces a
+separate loop-index initialization and decrement in the ROM comparison.
+
+Ooze indexes its eight-delay array and uses the existing playback
+operation for all three attack phases. The indexed read keeps the original
+count guard. Collapsing the guard into a single positive test changes
+the emitted branches.
+
+All five changed units matched. Printed warnings and weighted uses are
+unchanged across these objects.

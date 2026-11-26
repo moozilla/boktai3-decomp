@@ -3,6 +3,7 @@
 #include "monsters/golem/golem.h"
 #include "scene/collision/scene_actor_contact_response.h"
 #include "scene/motion/scene_actor_chase_shared.h"
+#include "scene/motion/scene_actor_turn.h"
 #include "engine/word_flags.h"
 #include "engine/engine_pause.h"
 
@@ -109,7 +110,6 @@ void Skeleton_UpdateProbeApproach(struct Skeleton *actor)
     struct Skeleton *control = actor->chase.base.context;
     s32 speed;
     u32 event;
-    u16 *scale;
 
     if (SceneActorControl_TakeFlag(&actor->chase.base.field2B1)) {
         SceneActorChase_SetControl(actor, Skeleton_UpdateTargetTransition, 0x3B);
@@ -127,30 +127,9 @@ void Skeleton_UpdateProbeApproach(struct Skeleton *actor)
             return;
         }
     }
-    speed = Callback_InvokeActor(*(&actor), actor->chase.base.animationQuery.opaque);
+    speed = Callback_InvokeActor(actor, actor->chase.base.animationQuery.opaque);
     actor->chase.base.field2C2 = 0x20;
-    {
-        u32 mask = 0xA02F;
-        if (actor->chase.base.motionFlags & mask) {
-            u16 *p = &actor->chase.base.field2C2;
-            *p = 0x40;
-            scale = p;
-        } else {
-            u16 *q = &actor->chase.base.field2C2;
-            u16 v = *q;
-            scale = q;
-            if (v == 0) {
-                *scale = 0x40;
-            }
-        }
-    }
-    if (actor->chase.base.drawableKind == 0)
-        Anim_SetDurationScale(
-            &((struct SceneActorAnimationSequenceDrawable *)actor->chase.base.drawable)->sequence,
-            *scale);
-    else
-        Anim_SetFrameDurationScale(
-            &((struct SceneActorAnimationTileDrawable *)actor->chase.base.drawable)->tile, *scale);
+    SceneActorTurn_ApplyActorDuration(&actor->chase);
     event = NavMesh_ConsumeProbeEvent(nav->route);
     if (event) {
         if (SceneActorBehavior_RequestDescriptorTurn(actor, nav->route, 0x20, 0x20, speed)) {
@@ -365,18 +344,18 @@ s32 Skeleton_Init(void *object)
     SceneActor_UpdateProfileForCategory(actor);
 
     if (MonsterInit_GetDrawableKind(actor) == 0) {
-        u8 *heap;
-        actor->base.drawable = Heap_Alloc(0x5C);
-        Memory_Clear(actor->base.drawable, 0x5C);
-        heap = MonsterInit_Drawable(actor);
-        MonsterInit_InitializeSprite(heap, 0xAE52, 0);
+        struct SceneActorAnimationSequenceDrawable *drawable;
+        actor->base.drawable = Heap_Alloc(sizeof(*drawable));
+        Memory_Clear(actor->base.drawable, sizeof(*drawable));
+        drawable = (void *)MonsterInit_Drawable(actor);
+        MonsterInit_InitializeSprite((u8 *)drawable, 0xAE52, 0);
         if (MonsterInit_GetCategory(actor) == 0x11 || MonsterInit_GetCategory(actor) == 0x17)
-            ((struct ActorSprite *)heap)->priority = 1;
+            drawable->sprite.priority = 1;
         actor->base.body.direction = 0;
     } else {
         u8 *heap;
-        actor->base.drawable = Heap_Alloc(0x80);
-        Memory_Clear(actor->base.drawable, 0x80);
+        actor->base.drawable = Heap_Alloc(sizeof(struct SceneActorAnimationTileDrawable));
+        Memory_Clear(actor->base.drawable, sizeof(struct SceneActorAnimationTileDrawable));
         heap = MonsterInit_Drawable(actor);
         MonsterInit_ClearPosition(&zero, &tmp);
         MonsterInit_InitializeWidget(heap, 0xCB05, 0xAE52, &tmp);
@@ -431,7 +410,7 @@ s32 Skeleton_Init(void *object)
     if (Script_GetKeywordValue(0x53, 0) != 0 || !MonsterInit_IsInCurrentRegion(actor))
         SceneActorPlacement_HideActor(actor, 0);
 
-    SceneActorAnimation_SelectDirectionalEntry(actor, 0);
+    SceneActorAnimation_SelectDirectionalEntry(&actor->base, 0);
     if (MonsterInit_GetDrawableKind(actor) == 0)
         DisplaySequence_Step(actor->base.drawable);
     else

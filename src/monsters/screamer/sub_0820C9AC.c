@@ -52,9 +52,7 @@ s32 Screamer_UpdateDamageParticles(struct ScreamerState *p)
             p->f1E0 = 1;
             p->blinkTimer = 0;
 
-            emitted = 0;
-
-            for (; emitted <= 7; emitted++) {
+            for (emitted = 0; emitted < 8; emitted++) {
                 dataOwner = gUnk_0203B000;
                 randomTable = (const u16 *)dataOwner + 512;
                 {
@@ -77,9 +75,9 @@ s32 Screamer_UpdateDamageParticles(struct ScreamerState *p)
                         EnemyAttackParticle_AddFlags(&parameters, 8);
                     Screamer_CopyPosition(&position, &p->sprite.position);
                     if (!p->f1D8)
-                        (&position)->x += 16;
+                        position.x += 16;
                     else
-                        (&position)->z += 16;
+                        position.z += 16;
                     EnemyAttackParticle_Emit(&parameters, &position);
                 }
             }

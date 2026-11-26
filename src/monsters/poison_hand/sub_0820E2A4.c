@@ -67,8 +67,7 @@ s32 PoisonHand_Update(struct PoisonHand *p)
                 s32 i;
                 p->defeated = 1;
                 p->collider.responseValue = 0;
-                i = 0;
-                for (; i <= 7; i++) {
+                for (i = 0; i < 8; i++) {
                     dataOwner = gUnk_0203B000;
                     randomTable = (const u16 *)dataOwner + 512;
                     {
@@ -76,7 +75,8 @@ s32 PoisonHand_Update(struct PoisonHand *p)
                         u8 direction;
                         EnemyAttackParticle_InitParameters(&parameters);
                         direction = ParticleRandom_ReadSample(randomTable);
-                        EnemyAttackParticle_SetGraphicsParameters(&parameters, 0x7e7c, frame, 0x1c5);
+                        EnemyAttackParticle_SetGraphicsParameters(&parameters, 0x7e7c, frame,
+                                                                  0x1c5);
                         EnemyAttackParticle_SetMotionParameters(&parameters, 0, 60, direction,
                                                           ParticleRandom_ReadSample(randomTable) &
                                                               15);

@@ -509,7 +509,7 @@ void Bee_StartMoveToBody(struct ChaseActor *actor, u16 *args)
     Bee_BuildMovementCurve(actor, &offset);
     Bee_SubVector(actor, &actor->base.body.position, &offset);
     Bee_ClearAnchorMotion(&work.fill, &body->motion);
-    MonsterInit_SetState(actor, 2, 0, 10);
+    SceneActorTerrain_EnterState(actor, 2, 0, 10);
     SceneActorChase_SetControl(actor, actor->base.onAlternateEntry, 1);
 }
 
@@ -599,11 +599,7 @@ void Bee_UpdateFlightHeight(struct ChaseActor *actor)
 {
     s32 delta, absolute;
     u16 *g;
-    struct Bee *state;
-    {
-        struct Bee *raw = (void *)SceneActorControl_GetState(actor);
-        state = raw;
-    }
+    struct Bee *state = actor->base.context;
 
     if (SceneActor_ActionsBlocked(actor))
         return;
@@ -1102,15 +1098,12 @@ void SceneActorControl_TickPendingTarget(struct ChaseActor *actor)
         actor->base.body.direction = actor->base.tracking.heading;
         SceneActorChase_SetControl(actor, actor->base.onAlternateEntry, 1);
     }
-    {
-        u32 *counter = &actor->base.counter2AC;
-        if ((s32)*counter > 30) {
-            SceneActorTerrain_EnterState(actor, 0, 2, 0);
-            Bee_SetRouteFlags(context, 8);
-            context->routeCooldown = 60;
-        } else {
-            *counter = *counter + 1;
-        }
+    if ((s32)actor->base.counter2AC > 30) {
+        SceneActorTerrain_EnterState(actor, 0, 2, 0);
+        Bee_SetRouteFlags(context, 8);
+        context->routeCooldown = 60;
+    } else {
+        actor->base.counter2AC++;
     }
 }
 
@@ -1566,8 +1559,8 @@ s32 Bee_Init(void *object)
         res = ScriptProc_Start(0xCB05, 0x9506);
         *(struct DisplayResourceHeader *)heap = *(struct DisplayResourceHeader *)res;
         ResourceHeader_Relocate(heap, res);
-        AnimSprite_InitLinked((void *)&((struct SceneActorAnimationTileDrawable *)heap)->tile, heap, 0,
-                          0, 2, 2, 0x3C, &tmp);
+        AnimSprite_InitLinked((void *)&((struct SceneActorAnimationTileDrawable *)heap)->tile, heap,
+                              0, 0, 2, 2, 0x3C, &tmp);
         actor->base.animationIndex = 0xFF;
     }
     MonsterInit_InitializeBody(actor);
@@ -1622,7 +1615,7 @@ s32 Bee_Init(void *object)
         flag = 1;
     }
     if (flag != 1) {
-        MonsterInit_SetState(actor, 0, 0, 0);
+        SceneActorTerrain_EnterState(actor, 0, 0, 0);
         MonsterInit_SetControl(actor, MonsterInit_GetStandingControl(actor), 0);
     }
     MonsterInit_InitializeRegion(actor);
@@ -1637,7 +1630,7 @@ s32 Bee_Init(void *object)
         Anim_Step(&((struct SceneActorAnimationTileDrawable *)actor->base.drawable)->tile,
                   actor->base.drawable);
     MonsterInit_ClearReceiver(actor);
-    MonsterInit_SetState(actor, 0, 2, 0);
+    SceneActorTerrain_EnterState(actor, 0, 2, 0);
     MonsterInit_SetControl(actor, actor->base.onAlternateEntry, 1);
     SceneActorBehavior_InstallCallbackTables(actor);
     Bee_InitActionPreset(actor);

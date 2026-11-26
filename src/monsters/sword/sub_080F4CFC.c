@@ -63,10 +63,7 @@ void ActorPhase_BeginLunge(struct PhaseActor *p)
         p->timer = 0;
         gRandomIndex = (gRandomIndex + 1) & 1023;
         offset = gRandomIndex * 2;
-        {
-            u32 table = RANDOM_TABLE_ADDR;
-            random = *((const u16 *)(offset + table));
-        }
+        random = *(const u16 *)(offset + RANDOM_TABLE_ADDR);
         random &= 1;
         p->direction = random ? -1 : 1;
         x = p->delta[0];

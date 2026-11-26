@@ -43,10 +43,11 @@ s32 VulcanCannon_UpdateDamageState(struct VulcanCannon *p)
         p->hitFlags = p->colliderHitFlags;
         Sound_PlaySong(0x13e);
         if (p->damage > 0) {
-            DamageNumberDisplay_Show(collider, p->damage, 0, &p->collider.position,
-                                     &p->collider.offset, 1);
+            DamageNumberDisplay_Show(collider, p->damage, 0, &p->collider.position, &p->collider.offset,
+                                     1);
             SceneHud_SetTimedState(p->owner, p->hp, p->maxHp, p->hudStyle,
-                                   p->collider.costFlags == 4, p->hudDuration);
+                                   p->collider.costFlags == 4,
+                                   p->hudDuration);
         }
         if (p->state == VulcanCannon_UpdateTargeting)
             p->aimTimer = 120;
@@ -60,7 +61,7 @@ s32 VulcanCannon_UpdateDamageState(struct VulcanCannon *p)
                 TerrainModifiers_UnregisterCell(p->terrain);
             VulcanCannon_GetEffectPosition(&center, p);
             velocity.x = -4;
-            table = (const u16 *)RANDOM_TABLE_ADDR;
+            table = gRandomTable;
             velocity.y = (CannonRandom(table) & 7);
             velocity.z = -4;
             spread.x = 24;
@@ -87,10 +88,7 @@ s32 VulcanCannon_UpdateDamageState(struct VulcanCannon *p)
                 u32 facing;
                 seq = &p->sequence;
                 res = p->resource;
-                {
-                    const u8 *direction = (const u8 *)&p->facing;
-                    facing = *direction;
-                }
+                facing = (u8)p->facing;
                 Anim_RestartSequence(seq, res, 0x13, facing, 0);
             }
             AnimData_SelectPaletteBank(&p->graphics, 0x1be);

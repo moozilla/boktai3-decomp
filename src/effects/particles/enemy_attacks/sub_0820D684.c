@@ -15,7 +15,6 @@ s32 EnemyAttackParticle_Emit(struct EnemyParticleParams *params, struct ContactP
     struct EnemyParticlePool *pool = gEnemyParticlePool;
     struct EnemyParticle *e;
     s32 slot;
-    struct ContactSwarmSprite *o;
     void *ad;
     struct ContactPosition *v;
     s32 magnitude;
@@ -49,15 +48,14 @@ s32 EnemyAttackParticle_Emit(struct EnemyParticleParams *params, struct ContactP
         s32 bank;
         s->frame = params->frame;
         bank = params->bank;
-        o = s;
         if (bank >= 0)
             AnimData_SelectPaletteBank(ad, bank);
     }
     e->sprite.flags &= ~1;
     e->sprite.flags |= params->spriteFlags;
-    Sprite_LinkToList(o, 0);
+    Sprite_LinkToList(&e->sprite, 0);
     if (e->params.script) {
-        e->scriptProc = ScriptProc_Start(0x922E, (u16)e->params.script);
+        e->scriptProc = ScriptProc_Start(0x922E, e->params.script);
         if (e->params.mode == 0)
             Anim_SetSequence(&e->animation, (void *)e->scriptProc, (u16)e->params.sequence, 0, 0);
         else if (e->params.mode == 4) {

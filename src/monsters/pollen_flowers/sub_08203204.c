@@ -20,6 +20,5 @@ s32 PollenFlower_UpdateAnimation(struct PollenFlower *p)
         p->graphics.paletteData = p->flashPalette;
         p->flashTimer--;
     }
-    PlayerCue_StepSequence((struct ContactSwarmSprite *)&p->sprite,
-                           (struct DisplaySequenceState *)&p->sequence);
+    PlayerCue_StepSequence((struct ContactSwarmSprite *)&p->sprite, &p->sequence);
 }

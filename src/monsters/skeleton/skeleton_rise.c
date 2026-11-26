@@ -12,7 +12,7 @@ void SceneActorReaction_PlayAnimationBUntilComplete(void);
 
 void SceneActorAttachment_ReplaceResponseSlot(void *, u32, u32, u32);
 
-void SceneActorBehavior_CallActionScript(void *);
+void SceneActorBehavior_CallActionScript(struct RoomActor *actor);
 
 static inline u32 Skeleton_ProfileId(const struct ChaseActor *a)
 {
@@ -336,7 +336,7 @@ void Skeleton_UpdateRiseRecovery(struct ChaseActor *actor)
             }
         }
         SceneActorAttachment_ReplaceResponseSlot(actor, 0, 0, actor->base.category);
-        SceneActorBehavior_CallActionScript(actor);
+        SceneActorBehavior_CallActionScript(&actor->base);
         Skeleton_EnableFlags(&SceneActorChase_GroupOf(actor)->common.gate.flags, 4);
         SceneActorChase_SetFlagComponent((struct SceneActorChaseFlags16 *)flags, 0x80);
         SceneActorChase_GroupOf(actor)->common.gate.counter =

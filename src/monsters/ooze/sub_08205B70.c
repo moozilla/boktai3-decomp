@@ -12,8 +12,7 @@ s32 Ooze_BeginAttack(struct Ooze *p)
     s32 phase = p->phase;
     switch (phase) {
         case 0:
-            PlayerCue_StepSequenceEndedWithFirstFlipMask((struct ContactSwarmSprite *)&p->sprite,
-                                                         &p->sequence, 1);
+            PlayerCue_StepSequenceEnded((struct ContactSwarmSprite *)&p->sprite, &p->sequence);
             if (p->attackTimer > p->attackDelay) {
                 if (p->repeatAttack)
                     Anim_RestartSequence(&p->sequence, p->resource, p->startSequence, (u8)p->facing, 0);
@@ -25,9 +24,8 @@ s32 Ooze_BeginAttack(struct Ooze *p)
             break;
 
         case 1: {
-            void *collider = &p->collider;
-            if (PlayerCue_StepSequenceEndedWithFirstFlipMask(
-                    (struct ContactSwarmSprite *)&p->sprite, &p->sequence, phase)) {
+            struct ContactCollider *collider = &p->collider;
+            if (PlayerCue_StepSequenceEnded((struct ContactSwarmSprite *)&p->sprite, &p->sequence)) {
                 if (p->repeatAttack) {
                     if ((++p->repeatCount) >= p->repeatLimit) {
                         Anim_RestartSequence(&p->sequence, p->resource, p->endSequence, (u8)p->facing,
@@ -44,8 +42,7 @@ s32 Ooze_BeginAttack(struct Ooze *p)
         } break;
 
         case 2:
-            if (PlayerCue_StepSequenceEndedWithFirstFlipMask(
-                    (struct ContactSwarmSprite *)&p->sprite, &p->sequence, 1)) {
+            if (PlayerCue_StepSequenceEnded((struct ContactSwarmSprite *)&p->sprite, &p->sequence)) {
                 Anim_RestartSequence(&p->sequence, p->resource, p->idleSequence, (u8)p->facing, 8);
                 p->state = Ooze_UpdateAttackDelay;
                 p->phase = 0;
