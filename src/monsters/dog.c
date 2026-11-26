@@ -1335,7 +1335,6 @@ void Dog_UpdateArrivalAnimation(struct ChaseActor *a)
 {
     u16 saved;
     u16 *flags;
-    u16 *scale;
     u16 *originalScale;
     unsigned long long originalOffset;
     if (SceneActorReaction_TakePrepared(a)) {
@@ -1353,24 +1352,7 @@ void Dog_UpdateArrivalAnimation(struct ChaseActor *a)
         }
     }
 
-    if (SceneActorTurn_Flags(flags, 0xA02F)) {
-        u16 *p = &a->base.field2C2;
-        *p = 0x40;
-        scale = p;
-    } else {
-        u16 *p = &a->base.field2C2;
-        u16 value = *p;
-        scale = p;
-        if (!value) {
-            *scale = 0x40;
-        }
-    }
-    if (!a->base.drawableKind)
-        Anim_SetDurationScale(
-            &((struct SceneActorAnimationSequenceDrawable *)a->base.drawable)->sequence, *scale);
-    else
-        Anim_SetFrameDurationScale(
-            &((struct SceneActorAnimationTileDrawable *)a->base.drawable)->tile, *scale);
+    SceneActorTurn_ApplyDuration(a, flags);
     a->base.field2C2 = saved;
     if (a->base.restart) {
         a->base.stepDone = 1;
@@ -2925,8 +2907,10 @@ s32 Dog_Init(void *object)
     SceneActorAnimation_SelectDirectionalEntry(actor, 0);
     if (MonsterInit_GetDrawableKind(actor) == 0)
         DisplaySequence_Step(actor->base.drawable);
-    else
-        Anim_Step(actor->base.drawable + 0x20, actor->base.drawable);
+    else {
+        struct SceneActorAnimationTileDrawable *drawable = actor->base.drawable;
+        Anim_Step(&drawable->tile, drawable);
+    }
     MonsterInit_ClearReceiver(actor);
 
     {
