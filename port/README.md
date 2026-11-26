@@ -594,20 +594,25 @@ is a tested integration boundary, not the full game's callback registry.
 ```sh
 make -f tools/emu/Makefile build/emu/harness
 build/venv/bin/python port/agent/gametypes.py
-build/venv/bin/python port/tests/verify.py --bank build/saves
+build/venv/bin/python tools/assets/saves.py bank --make
+make port-verify
 ```
 
-Build the full-game wasm and generate the checkpoint bank first. The short
-suite replays field and menu input in each area, including a swords-page
-navigation case and a soft reset followed by Continue. It compares live state
-at input ticks, which keeps the movies aligned when the ROM has lag frames.
-The first difference names the scene, position, player stats, HUD state,
-previous input or random index that changed.
+Build the full-game wasm first. The suite replays the controller recordings in
+`port/tests/verify-movies.json` across the checkpoint areas, including the swords
+page, equipment details after receiving iron armor, and a soft reset followed by
+Continue. The runner checks that the port reaches each expected scene, then aligns
+the comparison by input tick. It stops at the first failing recording and reports
+the first differing scene, position, player stat, HUD state, previous input or
+random index.
 
-`--all --resume` runs seedable field and menu fuzzing from the entire bank.
-Use `--case CHECKPOINT` to rerun a specific save and `--seed N` to change the
-inputs. Movies, action logs and ROM samples are under `build/autopilot/`.
-`tools/autopilot/tickdiff.mjs DIR FROM TO` compares RAM around a failing tick.
+Run one recording with `build/venv/bin/python port/tests/verify.py --case NAME`.
+For randomized input across the entire bank, run
+`build/venv/bin/python port/tests/verify.py --all --seed 1 --seed 2 --seed 3 --resume`.
+Add `--case CHECKPOINT` to select one save or use a fresh `--out-root` after
+rebuilding the wasm to keep the old comparisons. Results, movies and action logs
+are under `build/autopilot/`. Run `node tools/autopilot/tickdiff.mjs DIR FROM TO`
+to compare RAM around a failing tick.
 
 ## Undefined behavior the GBA forgives (UBFIX)
 

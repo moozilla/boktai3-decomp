@@ -23,6 +23,8 @@ if (!['fuzz', 'smoke', 'swords', 'reset'].includes(opts.mode)) throw new Error('
 const replay = opts.from ? JSON.parse(fs.readFileSync(opts.from, 'utf8')) : null;
 const mode = replay?.mode ?? opts.mode;
 const save = opts.save || replay?.save;
+const replayKeys = replay?.movie ?? replay?.keyRuns?.flatMap(([keys, count]) => Array(count).fill(keys));
+if (replay && !replayKeys?.length) throw new Error('Replay contains no controller input');
 const frames = Number(opts.frames);
 let seed = Number(opts.seed);
 if (!Number.isSafeInteger(frames) || frames < 1 || frames > 20000 ||
@@ -46,7 +48,7 @@ let faultAt = null;
 let tick, regions;
 const s = await openSession({
   save, lib: ['port/agent/lib', 'tools/autopilot/lib'].map((p) => path.join(root, p)),
-  wasm: opts.wasm, movie: replay?.movie, solar: lux, time: clock, render: mode === 'swords',
+  wasm: opts.wasm, movie: replayKeys, solar: lux, time: clock, render: mode === 'swords',
   onBoot(g, session) {
     tick = g.addr('Input_UpdatePadStates') & ~1;
     regions = sampleRegions(g.types);
@@ -66,7 +68,16 @@ const s = await openSession({
 
 try {
   s.run(function* (g) {
-    if (replay) return;
+    if (replay) {
+      if (replay.scene !== undefined && samples[firstCheck]?.readUInt32LE(0) !== replay.scene)
+        throw new Error(`Expected replay checkpoint scene ${replay.scene} at tick ${firstCheck}`);
+      for (const [name, count] of Object.entries({ ticks: reads.length, boots: boots.length,
+        equipmentDetails: equipmentDetails.length })) {
+        if (typeof replay[name] === 'number' && count !== replay[name])
+          throw new Error(`Expected replay ${name}=${replay[name]}, observed ${count}`);
+      }
+      return;
+    }
     const press = g.press;
     g.press = (keys, frames) => {
       // Record the requested input before running it so a hang also leaves
@@ -102,7 +113,7 @@ try {
   fault = String(error?.stack || error);
   faultAt = { tick: reads.length, frame: s.frame };
 }
-const movie = replay?.movie || s.movie;
+const movie = replayKeys || s.movie;
 const run = { save: save ? path.relative(root, path.resolve(save)) : null, movie, readFrames, firstCheck, seed: Number(opts.seed),
   mode, boots, fault };
 fs.writeFileSync(path.join(out, 'movie.json'), JSON.stringify(run));
