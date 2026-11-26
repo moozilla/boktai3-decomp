@@ -947,3 +947,33 @@ field is farther away. The direct draft is in
 
 SpriteTrail and Wireless rechecked at 304 and 684 bytes. The seven
 named units report two volatile errors and five proved-zero warnings.
+
+## 2026-11-26: SpiralBurst sine address and full-array sample views
+
+`SpiralBurst_InitParticles` (08234540) uses the shared fixed-point
+truncation helper and matches all 428 bytes. Its proved-zero and
+local-union findings remain. Replacing the sine union with a direct
+indexed read changes 29 instruction rows. Advancing a typed sine
+pointer before reading the signed halfword leaves just two register
+operands at 428 bytes. At UID 340, CSE orders the index before the
+known base, but the add still writes pseudo 165, the same pseudo that
+holds the sine-table address. It takes r2. The ROM puts the computed
+address and the signed-halfword load base in r0. Giving the X sample
+address its own pointer, saving the index in a separate local, or
+reusing the advanced pointer for Z changes more instructions. The
+closest stock draft is in
+`build/matchsearch/SpiralBurst_InitParticles-sine-advance`.
+
+Passing a pointer to the entire 1,024-entry array into the fragment
+sample readers gives the same mismatch as the direct symbolic
+FragmentGroup draft. Moving the array assignment immediately before
+the particle loop keeps the same result. Using one cursor for the
+registry node's initial writes, the scan, and the final splice also
+misses in both registrations.
+
+The zero-free barrage still differs at the two mask operands when
+its state is byte-sized and the parity test reads `tick` directly.
+Narrowing the state without changing the test adds differences.
+Changing the GameState timer into its byte offset in place changes
+15 rows on each side for either timer width. The direct GameState
+add remains the nearest case.
