@@ -1579,13 +1579,12 @@ void Axe_InitAttackCooldowns(struct ChaseActor *actor)
 
 void Axe_TickCooldowns(struct ChaseActor *actor)
 {
-    u16 *p = ((struct Axe *)actor->base.context)->attackCooldowns;
-    s32 i = 3;
-    do {
-        if (*p)
-            (*p)--;
-        p++;
-    } while (--i >= 0);
+    struct Axe *axe = actor->base.context;
+    s32 i;
+    for (i = 0; i < 4; i++) {
+        if (axe->attackCooldowns[i])
+            axe->attackCooldowns[i]--;
+    }
 }
 
 u8 Axe_PickAttack(void *actorIn)
@@ -2377,13 +2376,12 @@ void Sprite_Remove(void *);
 
 void Axe_RemoveAuxiliarySprites(struct ChaseActor *actor)
 {
-    struct AxeTrailSlot *p = ((struct Axe *)actor->base.context)->trail;
-    s32 i = 3;
-    do {
-        if (p->sprite.unknown4[0])
-            Sprite_Remove(&p->sprite);
-        p++;
-    } while (--i >= 0);
+    struct Axe *axe = actor->base.context;
+    s32 i;
+    for (i = 0; i < 4; i++) {
+        if (axe->trail[i].sprite.unknown4[0])
+            Sprite_Remove(&axe->trail[i].sprite);
+    }
 }
 
 // Remaining: route index byte uses r3 instead of r2.
@@ -2753,12 +2751,9 @@ void Axe_ReleaseAuxiliarySprite(struct ChaseActor *actor)
 {
     struct Axe *q = actor->base.context;
     if (q->auxiliarySprite.unknown4[0]) {
-        struct ContactCollider *p = q->body;
-        s32 i = 2;
-        do {
-            Collider_Remove(p);
-            p++;
-        } while (--i >= 0);
+        s32 i;
+        for (i = 0; i < 3; i++)
+            Collider_Remove(&q->body[i]);
         Shadow_Destroy(q->auxiliaryShadow);
         Sprite_Remove(&q->auxiliarySprite);
     }
