@@ -1,4 +1,4 @@
-# ScenePanel subject initializer
+# PileDriver subject initializer
 
 Reviewed range: **0805D92C–0805DCAC**, one new **896-byte exact function (+0.0371 percentage points)**. `PileDriverSubject_Initialize` retains thirteen locally minimized hints: eleven in the shared playback expressions and two for a scoped R2 limit pointer. It is marked as a register-pinning concession. No explicit R7 binding or instruction body is used. The DCAC creator starts the next function and is excluded.
 
@@ -17,7 +17,7 @@ All paths select the resulting palette bank, clear timerDE and changedF0, initia
 
 The playback expressions preserve separate command reads for frame and flip bits, sequence direction/hold flags, u16 frame-index wrapping, command-halfword masking for frame weight and signed delay scaling by64. A narrowed zero duration is raised to1. The helper's completion result is unused here. Its separate volatile command reads and matching hints reproduce the reviewed decoder accesses; no broader concurrency claim is made.
 
-Integration uses the consolidated ScenePanelSubjectView and the shared playback
+Integration uses the consolidated PileDriverSubjectView and the shared playback
 helper. Palette fields and the selector follow main's verified palette-bank
 names. The final initializer ABI uses const ContactPosition* and u32 values.
 

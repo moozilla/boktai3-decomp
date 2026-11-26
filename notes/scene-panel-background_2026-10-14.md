@@ -12,7 +12,7 @@ between a countdown alpha/shake path and two palette/particle paths. The object
 has effect frame1328, signed shake displacement132A, center510 and phase1378.
 The countdown and terminal burst clear display-shadow bit200 when exhausted;
 active effects set it and write BLDALPHA. Full timings, RGB palette selection
-and RNG store ordering are documented in docs/SCENE_PANEL_EFFECTS.md. Starting
+and RNG store ordering are documented in docs/PILE_DRIVER_EFFECTS.md. Starting
 a burst sets frame64, displacement0 and phase1, then plays sound297.
 
 Overlay initialization58AF4 stores raw C091/AD57 at4DC, copies its24-byte header

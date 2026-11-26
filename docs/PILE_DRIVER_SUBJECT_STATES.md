@@ -1,9 +1,9 @@
-# Scene panel subject animation states
+# Pile Driver subject animation states
 
 The reviewed `0805CD64–0805D6C4` span has six new exact functions, 2,400 bytes
 (+0.0994 percentage points). They occupy states one through six in the eight
 entry table at 08605AF8. State zero is the existing no-op; state seven and the
-subject driver are described in SCENE_PANEL_SUBJECT_TAIL.md.
+subject driver are described in PILE_DRIVER_SUBJECT_TAIL.md.
 
 The integrated subject layout is in scene_panel_subject.h. Drawable18 contains
 frame28 and position34; graphics44 precede home60, collider68, sequenceBC and

@@ -138,6 +138,17 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [docs/OBJECT_MODEL.md](../docs/OBJECT_MODEL.md) | The object model: how the game builds its things | #engine #structs #cleanup #actors | 15 |
 | [docs/PERMUTER.md](../docs/PERMUTER.md) | Solving register allocation in the compiler, then in C | #matching #tooling | 22 |
 | [docs/PERMUTER_HANDOFF_2026-10-15.md](../docs/PERMUTER_HANDOFF_2026-10-15.md) | October 15 matching residue and frozen searches | *#matching* | 5 |
+| [docs/PILE_DRIVER_COMMANDS.md](../docs/PILE_DRIVER_COMMANDS.md) | PileDriver message and display helpers |  | 3 |
+| [docs/PILE_DRIVER_CONFIGURATION.md](../docs/PILE_DRIVER_CONFIGURATION.md) | Pile Driver script configuration and subject creation | *#scripts #scene* | 3 |
+| [docs/PILE_DRIVER_EFFECTS.md](../docs/PILE_DRIVER_EFFECTS.md) | Pile Driver particles and time palettes | *#particles #assets* | 10 |
+| [docs/PILE_DRIVER_INTERACTION.md](../docs/PILE_DRIVER_INTERACTION.md) | Pile Driver interaction states | *#scene #panel #assets* | 7 |
+| [docs/PILE_DRIVER_LIFECYCLE.md](../docs/PILE_DRIVER_LIFECYCLE.md) | Pile Driver lifecycle |  | 2 |
+| [docs/PILE_DRIVER_ORCHESTRATION.md](../docs/PILE_DRIVER_ORCHESTRATION.md) | Pile Driver initialization and script controls | *#scripts #panel #assets* | 3 |
+| [docs/PILE_DRIVER_RIG_SETUP.md](../docs/PILE_DRIVER_RIG_SETUP.md) | Pile Driver rig setup | *#assets* | 4 |
+| [docs/PILE_DRIVER_SUBJECT.md](../docs/PILE_DRIVER_SUBJECT.md) | PileDriver constructor and subject helpers |  | 4 |
+| [docs/PILE_DRIVER_SUBJECT_INITIALIZER.md](../docs/PILE_DRIVER_SUBJECT_INITIALIZER.md) | PileDriver subject initializer |  | 3 |
+| [docs/PILE_DRIVER_SUBJECT_STATES.md](../docs/PILE_DRIVER_SUBJECT_STATES.md) | Pile Driver subject animation states | *#animation* | 3 |
+| [docs/PILE_DRIVER_SUBJECT_TAIL.md](../docs/PILE_DRIVER_SUBJECT_TAIL.md) | PileDriver subject final state and driver |  | 4 |
 | [docs/PROCESS_REVIEW.md](../docs/PROCESS_REVIEW.md) | External research review and next experiments | *#scripts #process* | 13 |
 | [docs/PROGRESS_CI.md](../docs/PROGRESS_CI.md) | ROM-free progress reports | *#progress* | 13 |
 | [docs/PUSH20_2026-10-08.md](../docs/PUSH20_2026-10-08.md) | Matching push toward 20% code | *#matching* | 11 |
@@ -184,23 +195,6 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [docs/SCENE_INPUT_GRID.md](../docs/SCENE_INPUT_GRID.md) | Scene input grid and pair transition | *#scene* | 4 |
 | [docs/SCENE_INPUT_NAVIGATION.md](../docs/SCENE_INPUT_NAVIGATION.md) | Scene input navigation | *#scene* | 2 |
 | [docs/SCENE_INPUT_PANEL.md](../docs/SCENE_INPUT_PANEL.md) | Scene input panel display and comparison | *#scene #inventory #panel* | 5 |
-| [docs/SCENE_INVENTORY_ACTIONS.md](../docs/SCENE_INVENTORY_ACTIONS.md) | Scene inventory action display and transition control | *#scene #inventory* | 2 |
-| [docs/SCENE_INVENTORY_CONTROL.md](../docs/SCENE_INVENTORY_CONTROL.md) | Inventory action controller | *#inventory* | 7 |
-| [docs/SCENE_INVENTORY_LIFECYCLE.md](../docs/SCENE_INVENTORY_LIFECYCLE.md) | Inventory lifecycle and neighboring controllers | *#scene #inventory* | 9 |
-| [docs/SCENE_INVENTORY_PANEL.md](../docs/SCENE_INVENTORY_PANEL.md) | Scene inventory panel: values, descriptions and grids | *#scene #inventory #panel* | 6 |
-| [docs/SCENE_INVENTORY_STATES.md](../docs/SCENE_INVENTORY_STATES.md) | Inventory transitions and confirmation states | *#inventory* | 4 |
-| [docs/SCENE_INVENTORY_TAIL.md](../docs/SCENE_INVENTORY_TAIL.md) | Inventory controller tail, catalogs and completion | *#inventory #sound #tooling* | 8 |
-| [docs/SCENE_PANEL_COMMANDS.md](../docs/SCENE_PANEL_COMMANDS.md) | ScenePanel message and display helpers |  | 3 |
-| [docs/SCENE_PANEL_CONFIGURATION.md](../docs/SCENE_PANEL_CONFIGURATION.md) | Scene panel script configuration and subject creation | *#scripts #scene #panel* | 3 |
-| [docs/SCENE_PANEL_EFFECTS.md](../docs/SCENE_PANEL_EFFECTS.md) | Scene panel particles and time palettes | *#scene #panel #particles #assets* | 10 |
-| [docs/SCENE_PANEL_INTERACTION.md](../docs/SCENE_PANEL_INTERACTION.md) | Scene panel interaction states | *#scene #panel #assets* | 7 |
-| [docs/SCENE_PANEL_LIFECYCLE.md](../docs/SCENE_PANEL_LIFECYCLE.md) | Scene panel lifecycle | *#scene #panel* | 2 |
-| [docs/SCENE_PANEL_ORCHESTRATION.md](../docs/SCENE_PANEL_ORCHESTRATION.md) | Scene panel initialization and script controls | *#scripts #scene #panel #assets* | 3 |
-| [docs/SCENE_PANEL_RIG_SETUP.md](../docs/SCENE_PANEL_RIG_SETUP.md) | Scene panel rig setup | *#scene #panel #assets* | 4 |
-| [docs/SCENE_PANEL_SUBJECT.md](../docs/SCENE_PANEL_SUBJECT.md) | ScenePanel constructor and subject helpers |  | 4 |
-| [docs/SCENE_PANEL_SUBJECT_INITIALIZER.md](../docs/SCENE_PANEL_SUBJECT_INITIALIZER.md) | ScenePanel subject initializer |  | 3 |
-| [docs/SCENE_PANEL_SUBJECT_STATES.md](../docs/SCENE_PANEL_SUBJECT_STATES.md) | Scene panel subject animation states | *#scene #panel #animation* | 3 |
-| [docs/SCENE_PANEL_SUBJECT_TAIL.md](../docs/SCENE_PANEL_SUBJECT_TAIL.md) | ScenePanel subject final state and driver |  | 4 |
 | [docs/SCENE_RANGE_WATCH.md](../docs/SCENE_RANGE_WATCH.md) | Scene range watcher (tentative) | *#scripts #scene* | 2 |
 | [docs/SCENE_STATE_QUERIES.md](../docs/SCENE_STATE_QUERIES.md) | Scene state, spatial queries and pair records (tentative) | *#actors #scene* | 4 |
 | [docs/SCRIPT_TRACING.md](../docs/SCRIPT_TRACING.md) | Script calls in a running game | *#scripts #actors #tooling* | 7 |
@@ -208,9 +202,15 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [docs/SEARCH_SPEC.md](../docs/SEARCH_SPEC.md) | A matching search engine: spec and brief (2026-10-28) | #tooling #matching #compiler #process | 24 |
 | [docs/SHARED_MONSTER_REACTIONS.md](../docs/SHARED_MONSTER_REACTIONS.md) | Shared monster pursuit and contact operations | #matching #scene-actor #golem #skeleton #ghoul #mummy #regalloc #080C9C04 #080C12FC #0808B3EC #080DA97C #080D2584 #08078EE8 | 9 |
 | [docs/SHIFTABILITY.md](../docs/SHIFTABILITY.md) | Shiftable data: how it was proven | #tooling #assets | 1 |
+| [docs/SHOP_ACTIONS.md](../docs/SHOP_ACTIONS.md) | Shop action display and transition control |  | 2 |
+| [docs/SHOP_CONTROL.md](../docs/SHOP_CONTROL.md) | Inventory action controller | *#inventory* | 7 |
+| [docs/SHOP_LIFECYCLE.md](../docs/SHOP_LIFECYCLE.md) | Inventory lifecycle and neighboring controllers | *#scene #inventory* | 9 |
+| [docs/SHOP_PANEL.md](../docs/SHOP_PANEL.md) | Shop panel: values, descriptions and grids | *#inventory #panel* | 6 |
+| [docs/SHOP_STATES.md](../docs/SHOP_STATES.md) | Inventory transitions and confirmation states | *#inventory* | 4 |
+| [docs/SHOP_TAIL.md](../docs/SHOP_TAIL.md) | Inventory controller tail, catalogs and completion | *#inventory #sound #tooling* | 8 |
 | [docs/SOLAR_SENSOR.md](../docs/SOLAR_SENSOR.md) | Cartridge solar sensor: code and runtime evidence | *#hardware* | 5 |
-| [docs/SOURCE_LAYOUT.md](../docs/SOURCE_LAYOUT.md) | Source layout | #tooling #process | 13 |
-| [docs/SOURCE_LAYOUT_DECISIONS.md](../docs/SOURCE_LAYOUT_DECISIONS.md) | Source layout pass 3: decisions | #tooling #process | 12 |
+| [docs/SOURCE_LAYOUT.md](../docs/SOURCE_LAYOUT.md) | Source layout | #tooling #process | 17 |
+| [docs/SOURCE_LAYOUT_DECISIONS.md](../docs/SOURCE_LAYOUT_DECISIONS.md) | Source layout pass 3: decisions | #tooling #process | 15 |
 | [docs/SPARK_PARTICLE.md](../docs/SPARK_PARTICLE.md) | Moving tile particles (tentative identity) | *#particles #assets* | 3 |
 | [docs/SPRITE_EFFECT_CONTROLLER.md](../docs/SPRITE_EFFECT_CONTROLLER.md) | Sprite effect controllers (tentative) | *#assets* | 2 |
 | [docs/SPRITE_EFFECT_STEERING_ACTORS.md](../docs/SPRITE_EFFECT_STEERING_ACTORS.md) | Sprite/effect controllers and steering actors (0806B2C4–0806CA3C) | *#actors #assets* | 13 |
@@ -621,7 +621,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [notes/scene_actor_contact_candidates.md](../notes/scene_actor_contact_candidates.md) | Scene actor contact candidates | #matching #scene-actors | 1 |
 | [notes/scene_body_owner_validation_2026-10-30.md](../notes/scene_body_owner_validation_2026-10-30.md) | SceneBody owner validation | #matching #compiler #structs #ram | 4 |
 | [notes/scene_panel_control_and_lifecycle.md](../notes/scene_panel_control_and_lifecycle.md) | Scene panel control and lifecycle unit | #scene #panel #matching #types | 5 |
-| [notes/script-entry-points_2026-10-16.md](../notes/script-entry-points_2026-10-16.md) | Script entry points, batches 1-9 (2026-10-16) | #scripts #text #actors #tooling | 23 |
+| [notes/script-entry-points_2026-10-16.md](../notes/script-entry-points_2026-10-16.md) | Script entry points, batches 1-9 (2026-10-16) | #scripts #text #actors #tooling | 24 |
 | [notes/script-keyframe-pool_2026-10-14.md](../notes/script-keyframe-pool_2026-10-14.md) | Script keyframe pool | *#scripts* | 2 |
 | [notes/script-selector-display_2026-10-14.md](../notes/script-selector-display_2026-10-14.md) | Script selector and shared display animation | *#scripts #animation* | 7 |
 | [notes/script-utility_2026-10-14.md](../notes/script-utility_2026-10-14.md) | Script utility commands and reference ABI | *#scripts #inventory* | 3 |
