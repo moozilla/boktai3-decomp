@@ -2,6 +2,7 @@
 // The Autopilot: plays Boktai 3 on the source port from typed game state.
 //
 //   node tools/autopilot/autopilot.mjs m1 [--save F] [--out DIR] [--shots]
+//   node tools/autopilot/autopilot.mjs story [--from MOVIE] [--until-scene SCENE] [--verify]
 //
 // Runs headless in-process (port/agent/session.mjs) with the agent library plus
 // tools/autopilot/lib/*.js. Each milestone is a goal; the run writes the input
@@ -131,6 +132,7 @@ const GOALS = {
   *story(g, L) {
     if (!from && !(yield* GOALS.m1(g, L))) return false;
     const visited = VISITED, limit = +(opt('--scenes', 8));
+    const destination = +opt('--until-scene', -1), routeGoal = +opt('--goal', destination);
     let prev, keyGoal;
     const failedKeyRooms = new Set();
     for (let rooms = 0; rooms < limit; rooms++) {
@@ -144,14 +146,18 @@ const GOALS = {
         const portals = doors.filter((d) => boxes.has(d.box));
         return resolve ? L.doorBranches(portals, (d) => d.box) : portals;
       };
-      const ready = () => doorsHere(false).length > 0 || L.fightTargets().length > 0;
-      if (!(yield* untilControl(g, L, ready, 120, 30000))) { event({ skill: 'stop', why: 'no control with a door or enemy in 30000 frames', ...L.where() }); return rooms > 0; }
+      const ready = () => L.where().scene === destination || doorsHere(false).length > 0 || L.fightTargets().length > 0;
+      if (!(yield* untilControl(g, L, ready, 120, 30000))) { event({ skill: 'stop', why: 'no control with a door or enemy in 30000 frames', ...L.where() }); return destination < 0 && rooms > 0; }
       event({ skill: 'entry', ...L.where(), story: L.story() });
+      if (L.where().scene === destination) {
+        event({ skill: 'goal', reached: `scene ${destination}`, ...L.where(), story: L.story() });
+        return true;
+      }
       // enemies in the room: fight them first (the "defeat all" rooms lock the doors)
       if (L.fightTargets().length) {
         const f = yield* L.fight({ trace: (e) => event({ skill: 'fight', ...e }) });
         event({ skill: 'fought', ...f, scene: L.where().scene });
-        if (!(yield* untilControl(g, L, ready, 60, 30000))) { event({ skill: 'stop', why: 'no control after the fight', ...L.where() }); return rooms > 0; }
+        if (!(yield* untilControl(g, L, ready, 60, 30000))) { event({ skill: 'stop', why: 'no control after the fight', ...L.where() }); return destination < 0 && rooms > 0; }
       }
       const here = L.where().scene;
       // healing: below a third of the life bar with something in the item bag, find the
@@ -269,7 +275,7 @@ const GOALS = {
       // with no --goal: explore, the door on the shortest route (over doors not known to
       // be unreachable) to the nearest scene not visited yet
       const dist = keyGoal ? routeDistances(keyGoal.scene, keyGoal.blocked)
-        : +opt('--goal', -1) >= 0 ? routeDistances(+opt('--goal', -1)) : exploreDistances(here, visited);
+        : routeGoal >= 0 ? routeDistances(routeGoal) : exploreDistances(here, visited);
       VISITS.set(here, (VISITS.get(here) || 0) + 1);
       const doors = doorsHere().sort((a, b) => (b.scene === toward) - (a.scene === toward) ||
         (dist.get(a.scene) ?? 1e9) - (dist.get(b.scene) ?? 1e9) || visited.has(a.scene) - visited.has(b.scene) ||
@@ -314,9 +320,9 @@ const GOALS = {
           if (L.where().scene !== here) { moved = true; break; }
         }
       }
-      if (!moved) { event({ skill: 'stop', why: 'no door worked', ...L.where() }); return rooms > 0; }
+      if (!moved) { event({ skill: 'stop', why: 'no door worked', ...L.where() }); return destination < 0 && rooms > 0; }
     }
-    return true;
+    return destination < 0;
   },
 
   // With --from: nothing more (to verify, cover and save states for an earlier run).
@@ -488,7 +494,7 @@ let rooms = from?.rooms?.slice() ?? [];
 const snapshot = s.snapshot, restore = s.restore;
 s.snapshot = () => ({ ...snapshot(), readFrames: readFrames.slice(), rooms: rooms.slice() });
 s.restore = (snap) => { restore(snap); readFrames = snap.readFrames.slice(); rooms = snap.rooms.slice(); };
-const ok = s.run(function* (g) {
+const { ok, end } = s.run(function* (g) {
   g.lib.session = s;
   const gameState = g.types.globals.gGameState.addr;
   g.on('Input_UpdatePadStates', () => {
@@ -501,14 +507,11 @@ const ok = s.run(function* (g) {
   if (opt('--life') && g.$.gPlayers[0]) g.$.gPlayers[0].currentStatA = +opt('--life');
   const reached = yield* GOALS[goal](g, g.lib);
   yield* settle(g);
-  return reached;
+  const w = g.lib.where();
+  return { ok: reached, end: { scene: w.scene, story: g.lib.story(), x: w.x, y: w.y, z: w.z,
+    ...(s.solarLog.length ? { solar: g.lib.solarStatus() } : {}) } };
 });
 const secs = (performance.now() - t0) / 1000;
-const end = s.run(function* (g) {
-  const w = g.lib.where();
-  return { scene: w.scene, story: g.lib.story(), x: w.x, y: w.y, z: w.z,
-    ...(s.solarLog.length ? { solar: g.lib.solarStatus() } : {}) };
-});
 
 const movie = s.movie.map((k) => k | 0);
 readFrames = readFrames.filter((n) => n < movie.length);
