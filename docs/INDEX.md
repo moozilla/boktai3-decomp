@@ -655,6 +655,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [notes/sword-script-kind.md](../notes/sword-script-kind.md) | Sword script kind | #monsters #matching | 0 |
 | [notes/tentacle-body-cleanup_2026-11-13.md](../notes/tentacle-body-cleanup_2026-11-13.md) | Tentacle body unit cleanup |  | 2 |
 | [notes/terrain-footprint-round9.md](../notes/terrain-footprint-round9.md) | Terrain_MoveFootprint |  | 1 |
+| [notes/testbench_2026-11-26.md](../notes/testbench_2026-11-26.md) | Source-port testbench and fixture findings | #tooling #scripts #actors #menu | 3 |
 | [notes/tether-emission-palette_2026-10-14.md](../notes/tether-emission-palette_2026-10-14.md) | Tether actor emissions, palette and movement effects, October 14 | *#actors #tether #assets* | 8 |
 | [notes/tether-initialization_2026-10-14.md](../notes/tether-initialization_2026-10-14.md) | Tether initialization, charge and flagged terrain | *#actors #tether* | 7 |
 | [notes/tether-interaction_2026-10-14.md](../notes/tether-interaction_2026-10-14.md) | Tether actor entry, interaction and script controls | *#scripts #actors #tether* | 5 |

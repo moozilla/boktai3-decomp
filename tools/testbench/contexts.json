@@ -1,0 +1,81 @@
+{
+  "0AD8": {
+    "role": "command",
+    "note": "Queues a command on the terrain overlay's existing actor"
+  },
+  "3019": {
+    "name": "Item Shop"
+  },
+  "33FF": {
+    "name": "Link Lobby"
+  },
+  "377D": {
+    "requires": [{"global": "gRegionActorPool", "creator": "C60F"}]
+  },
+  "4631": {
+    "role": "command",
+    "note": "Removes active effects from a supplied manager"
+  },
+  "4E69": {
+    "existing": "gSceneEventDispatchState"
+  },
+  "62C5": {
+    "requires": [{"global": "gSceneIndicators", "creator": "BCD2"}]
+  },
+  "7300": {
+    "name": "Accessory Shop"
+  },
+  "7BBC": {
+    "existing": "gTileAnimation",
+    "defaults": {"s": 13, "p": 36402, "m": 52922},
+    "note": "Tile resource and mode from procedure 2737's call to 886"
+  },
+  "7F5E": {
+    "stageFixture": {"scene": 2147, "entrance": 1, "story": 185, "field": false, "coverageFrom": "SolarBank_Create"},
+    "stageUpdate": "SolarBank_OnUpdate"
+  },
+  "820B": {
+    "role": "command",
+    "note": "Looks up and toggles an existing WoodenCrate slot"
+  },
+  "8337": {
+    "requires": [{"global": "gDisplayTrackManager", "creator": "3117"}],
+    "smokeStage": {"scene": 2803, "entrance": 57, "story": 24},
+    "note": "The default arena's existing track manager has no free slots"
+  },
+  "8EA3": {
+    "requires": [{"global": "gSceneActorListManager", "creator": "286F"}]
+  },
+  "95F8": {
+    "defaults": {"p": 2075},
+    "note": "Use the title palette for this overlay's standalone fixture"
+  },
+  "A16F": {
+    "name": "Named Object Manager"
+  },
+  "A2DB": {
+    "name": "Collection Book"
+  },
+  "A4FC": {
+    "requires": [{"global": "gNamedActorManager", "creator": "A16F"}]
+  },
+  "BB34": {
+    "requires": [{"global": "gSceneActorListManager", "creator": "286F"}]
+  },
+  "BD3D": {
+    "requires": [{"global": "gSceneActorListManager", "creator": "286F"}]
+  },
+  "D9AE": {
+    "name": "Scene Object Manager"
+  },
+  "E02A": {
+    "name": "Scene Object",
+    "requires": [{"global": "gSceneObjectManager", "creator": "D9AE"}],
+    "defaults": {"n": 28655, "M": null, "b": null, "f": 0, "l": 128, "t": 0},
+    "note": "Use the standalone pushable box. Other types require their own terrain and scenario options."
+  },
+  "E28B": {
+    "defaults": {"n": 8, "m": 34244},
+    "note": "Terrain overlay sprite and count used by procedure 2775"
+  }
+}

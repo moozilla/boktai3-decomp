@@ -1,0 +1,46 @@
+[
+  {
+    "key": "native:scene-particle",
+    "name": "Scene Particle",
+    "aliases": ["SceneParticle_Create"],
+    "role": "spawn",
+    "allocation": "SceneMovingParticle_AllocateEntry_0812D670",
+    "callback": "SceneParticle_Create",
+    "address": "0812D7D0",
+    "init": "SceneParticle_Create",
+    "parameters": {
+      "screenX": {"kind": "u16", "default": 120},
+      "screenY": {"kind": "u16", "default": 80},
+      "velocityX": {"kind": "s16", "default": 2},
+      "velocityY": {"kind": "s16", "default": -1},
+      "lifetime": {"kind": "u16", "default": 30},
+      "kind": {"kind": "u8", "default": 0},
+      "mode": {"kind": "u8", "default": 1}
+    },
+    "scenes": [],
+    "procedures": [],
+    "recipes": []
+  },
+  {
+    "key": "native:scene-projectile",
+    "name": "Scene Projectile",
+    "aliases": ["Projectile_SpawnAtPosition"],
+    "role": "spawn",
+    "allocation": "Projectile_FindFreeSlot",
+    "callback": "Projectile_SpawnAtPosition",
+    "address": "081FD01C",
+    "init": "Projectile_InitParameters",
+    "parameters": {
+      "x": {"kind": "world coordinate"},
+      "y": {"kind": "world coordinate"},
+      "z": {"kind": "world coordinate"},
+      "movement": {"kind": "u16", "default": 0},
+      "lifetime": {"kind": "u16", "default": 60},
+      "direction": {"kind": "u8", "default": 0},
+      "speed": {"kind": "s32", "default": 8}
+    },
+    "scenes": [],
+    "procedures": [],
+    "recipes": []
+  }
+]

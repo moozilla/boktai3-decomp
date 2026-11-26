@@ -149,6 +149,7 @@ export function createGame(env) {
     if (size === 1) d.setUint8(a, v & 0xff);
     else if (size === 2) d.setUint16(a, v & 0xffff, true);
     else d.setUint32(a, v >>> 0, true);
+    env.onWrite?.(a, size);
   }
   function read(a, t) {
     const r = resolve(t);
@@ -172,6 +173,7 @@ export function createGame(env) {
     if (v && v[VIEW]) {
       if (r.k === 'ptr') return writeInt(a, 4, v[VIEW].addr);
       bytes.copyWithin(a, v[VIEW].addr, v[VIEW].addr + sizeof(t));
+      env.onWrite?.(a, sizeof(t));
       return;
     }
     if (r.k === 'struct' || r.k === 'union' || r.k === 'array') {
@@ -181,7 +183,12 @@ export function createGame(env) {
       return;
     }
     if (r.k === 'enum' && typeof v === 'string') v = r.values[v];
-    if (r.k === 'float') return r.size === 4 ? mem().setFloat32(a, v, true) : mem().setFloat64(a, v, true);
+    if (r.k === 'float') {
+      if (r.size === 4) mem().setFloat32(a, v, true);
+      else mem().setFloat64(a, v, true);
+      env.onWrite?.(a, r.size);
+      return;
+    }
     writeInt(a, r.k === 'ptr' ? 4 : r.size || 4, v == null ? 0 : v);
   }
   function readField(a, f) {
@@ -395,7 +402,12 @@ export function createGame(env) {
     const entry = { id: hookId++, cb, once: !!opts.once, where: typeof where === 'string' ? where : name(a) };
     h[opts.exit ? 'exit' : 'enter'].push(entry);
     hooks.set(a, h);
-    refresh();
+    if (env.refresh) env.refresh();
+    else {
+      mem();
+      bytes[flagBase + flagIndex(a)] |= opts.exit ? 2 : 1;
+      hs('active', 1);
+    }
     return entry.id;
   }
   function off(id) {
