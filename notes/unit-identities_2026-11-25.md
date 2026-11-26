@@ -17,6 +17,7 @@ worktree. Substitute `../boktai3trans/saves` from the main checkout.
 build/venv/bin/python tools/whoruns.py --scan-bank ../../boktai3trans/saves
 build/venv/bin/python tools/whoruns.py BossSlot2_UpdateFrame
 build/venv/bin/python tools/whoruns.py 081EC380-081F2CD4 --functions
+build/venv/bin/python tools/whoruns.py cannon_battery growth_hazard cannon_emitter tentacle_actor
 ```
 
 The first command converts the VBA checkpoints to batteries, boots each one

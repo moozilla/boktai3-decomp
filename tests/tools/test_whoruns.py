@@ -1,4 +1,6 @@
 """Coverage uses ROM halfword entry indexes and keeps replay segments separate."""
+from contextlib import redirect_stdout
+from io import StringIO
 import json
 from pathlib import Path
 import sys
@@ -43,3 +45,21 @@ class WhoRunsTest(unittest.TestCase):
             entries = [0x08000002, 0x08000004]
             self.assertEqual(whoruns.resolve("book", entries), set(entries))
             self.assertEqual(whoruns.resolve("book.c", entries), {entries[0]})
+
+    def test_multiple_queries_report_each_unit_separately(self):
+        with TemporaryDirectory() as directory:
+            index = Path(directory)
+            record = {"save": "0001", "scene": 123, "label": "Example",
+                      "segments": {"idle": ["08000002"], "action": ["08000004"]}}
+            (index / "coverage.json").write_text(json.dumps(record))
+            stdout = StringIO()
+            argv = ["whoruns.py", "--coverage", directory, "08000002", "08000004"]
+            with patch.object(sys, "argv", argv), \
+                patch.object(whoruns, "rom_entries", return_value=[0x08000002, 0x08000004]), \
+                redirect_stdout(stdout):
+                whoruns.main()
+            idle, action = stdout.getvalue().strip().split("\n\n")
+            self.assertTrue(idle.startswith("08000002\n"))
+            self.assertIn("\tidle\t", idle)
+            self.assertTrue(action.startswith("08000004\n"))
+            self.assertIn("\taction\t", action)

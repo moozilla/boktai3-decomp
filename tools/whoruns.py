@@ -4,6 +4,7 @@
 Examples:
   python3 tools/whoruns.py BossSlot2_UpdateFrame
   python3 tools/whoruns.py src/bosses/boss_slot_2 --functions
+  python3 tools/whoruns.py cannon_battery growth_hazard
   python3 tools/whoruns.py 08179B9C-08180488
 
 Index a marked harness replay with --record, or use --scan-bank DIR with the
@@ -154,7 +155,8 @@ def scene_override(value):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     target = parser.add_mutually_exclusive_group(required=True)
-    target.add_argument("unit", nargs="?", help="function name, unit path, entry address, or half-open ROM range")
+    target.add_argument("units", metavar="unit", nargs="*",
+                        help="function names, unit paths, entry addresses, or half-open ROM ranges")
     target.add_argument("--record", type=Path, metavar="RUN", help="index a harness run in place")
     target.add_argument("--scan-bank", type=Path, metavar="DIR", help="capture idle coverage for a VBA checkpoint bank")
     parser.add_argument("--coverage", type=Path, default=ROOT / "build/identify", help="coverage index root")
@@ -176,23 +178,28 @@ def main():
         if args.scan_bank:
             scan_bank(args.scan_bank, args.coverage / "bank", entries)
             return
-        addresses = resolve(args.unit, entries)
-        if not addresses:
-            parser.error(f"no function entries for {args.unit}")
+        queries = [(unit, resolve(unit, entries)) for unit in args.units]
+        for unit, addresses in queries:
+            if not addresses:
+                parser.error(f"no function entries for {unit}")
         records = sorted(args.coverage.rglob("coverage.json"))
         if not records:
             parser.error(f"no coverage records under {args.coverage}")
         names = symbol_names()
-        print("save\tscene\tsegment\thits\tlabel\trun")
-        any_hits = False
-        for save, scene, segment, label, run, matched in sightings(args.coverage, addresses, records):
-            any_hits = True
-            print(f"{save}\t{scene}\t{segment}\t{len(matched)}\t{label}\t{run}")
-            if args.functions:
-                for address in matched:
-                    print(f"\t{address}\t{names.get(int(address, 16), 'sub_' + address)}")
-        if not any_hits:
-            print(f"No hits in {len(records)} recorded replays.")
+        for index, (unit, addresses) in enumerate(queries):
+            if len(queries) > 1:
+                if index:
+                    print()
+                print(unit)
+            print("save\tscene\tsegment\thits\tlabel\trun")
+            matched_rows = list(sightings(args.coverage, addresses, records))
+            for save, scene, segment, label, run, matched in matched_rows:
+                print(f"{save}\t{scene}\t{segment}\t{len(matched)}\t{label}\t{run}")
+                if args.functions:
+                    for address in matched:
+                        print(f"\t{address}\t{names.get(int(address, 16), 'sub_' + address)}")
+            if not matched_rows:
+                print(f"No hits in {len(records)} recorded replays.")
     except (OSError, ValueError, RuntimeError, subprocess.SubprocessError) as error:
         parser.exit(2, f"{parser.prog}: {error}\n")
 
