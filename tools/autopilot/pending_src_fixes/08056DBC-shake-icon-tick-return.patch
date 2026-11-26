@@ -1,0 +1,21 @@
+08056DBC shake-icon-tick-return
+
+The sole installed update callback, ShakeIconDisplay_TickShake, returns
+through r0 to 08056DCB. The expired path calls Task_Kill, which returns zero.
+
+The explicit form changed the ROM bytes. The guarded form passed the unit ROM check.
+
+--- a/src/shake_icon_display.c
++++ b/src/shake_icon_display.c
+@@ -28,5 +28,11 @@
+             Script_Call(display->completionScriptId, 0);
+         Task_Kill(display);
++#ifdef UBFIX
++        return 0;
++#endif
+     }
++#ifdef UBFIX
++    return 0x08056DCB;
++#endif
+ }
+ 
