@@ -1070,24 +1070,26 @@ extern const u16 gUnk_08606058[2][8];
 
 u16 SceneActorReaction_SelectTileParameter(struct ChaseActor *actor)
 {
-    struct SceneActorRegistryTileDrawable *drawable = actor->base.drawable;
-    u16 *tile = (u16 *)((u8 *)drawable + 0x20);
-    u16 *second = tile;
+    struct SceneActorAnimationTileDrawable *drawable = actor->base.drawable;
+    struct AnimSprite *tile = &drawable->tile;
+    struct AnimSprite *defaultTile = tile;
     u32 variant;
-    if (tile[6] == 0) {
+    if (tile->elapsed == 0) {
         u16 mask = 0x80;
         variant = (u16)(actor->base.motionFlags & mask) != 0;
         MonsterInit_SetStatusFlags(actor, 0x10000);
         if (actor->base.category == MONSTER_CATEGORY_SKELETON_ARMED) {
-            return gUnk_08606078[variant][tile[10] & 7];
+            return gSceneActorReactionCategory7TileParameters[variant][tile->frameIndex & 7];
         } else {
-            return gUnk_08606058[variant][second[10] & 7];
+            return gSceneActorReactionDefaultTileParameters[variant][defaultTile->frameIndex & 7];
         }
     }
     return 0;
 }
 
-s32 SceneActorTerrain_FindOpenNeighborDirection(struct SceneActorTerrainView *actor, s32 angle)
+s32 SceneActorTerrain_GetNeighborCell(struct SceneActorTerrainView *actor, s32 direction);
+
+s32 SceneActorTerrain_FindOpenNeighborDirection(struct ChaseActor *actor, s32 angle)
 {
     s32 direction = ((angle + 0x10) & 0xff) >> 6;
     s32 opposite = (direction + 2) & 3;
@@ -1099,7 +1101,7 @@ s32 SceneActorTerrain_FindOpenNeighborDirection(struct SceneActorTerrainView *ac
     } while (0);
     for (; i <= 3; i++) {
         if (direction != opposite) {
-            if (SceneActorTerrain_GetNeighborCell(actor, direction) >= 0)
+            if (SceneActorTerrain_GetNeighborCell((struct SceneActorTerrainView *)&actor->base, direction) >= 0)
                 return direction;
         }
         direction = (direction + 1) & mask;
@@ -2066,8 +2068,6 @@ void Skeleton_UpdateIdleState(u8 *p)
         p[0x2b2] = 0;
     SceneActorAnimation_SelectDirectionalEntry(p, 0);
 }
-
-s32 SceneActorTerrain_FindOpenNeighborDirection(struct SceneActorTerrainView *actor, s32 angle);
 
 static inline s32 Skeleton_ScaleMotion(s32 value)
 {
