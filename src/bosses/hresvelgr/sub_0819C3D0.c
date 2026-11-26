@@ -14,8 +14,9 @@ static inline void SetVector(struct SceneVec *v, s32 x, s32 y, s32 z)
 
 void ColliderActor_InitBodyCollider(struct HresvelgrTravelActor *actor, s32 mode)
 {
-    void *collider = actor->bodyCollider;
-    struct SceneVec size, offset;
+    struct ContactCollider *collider = &actor->bodyColliders[0];
+    struct SceneVec size;
+    struct ContactPosition offset;
     size.x = 256;
     size.y = 256;
     size.z = 256;
