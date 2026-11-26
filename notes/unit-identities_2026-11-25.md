@@ -482,6 +482,23 @@ The Player task pointer comes from the `Player_Update` probe or gPlayers
 at 02000580. Spawners 1598, 1603, 1609 and 1619 give the actor keys, and the
 replay captures the individual actor updates.
 
+### Solar Roots in Hresvelgr's arena
+
+Stock 0023 reloads scene 3588. Proc 3594 places four 1FBA plants, and the
+rematch places the same four in proc 6397. Text #1817 describes using Earth
+elemental attacks on the Solar Roots and #9052–9054 names the vegetation
+and describes the shape it grows into. The root south of Django's entry
+is at (2432, 512, 2432).
+
+Use `build/identify/replays/solar-roots/commands.txt` with the setup state
+from `solar-roots-setup/`. Both branches face `UP+LEFT`, set Django at
+(2688, 512, 2432), and fire the equipped Gun Del Sol frame. For the Earth
+branch, set the weapon configuration byte at `Player+0xC18` to 5. The two
+branches run `GrowthHazard_ApplyAnimationEvent` when the shots hit. Only
+Earth advances this root to `AnimatedMarker_BeginActive` at frame 2042.
+Compare the flat root in `shot5.png` with the full-grown one in
+`earth4.png`. Place the unit at `src/objects/solar_roots`.
+
 The story order is Count → Hresvelgr → Sabata → Nidhoggr → Ratatosk →
 Vanargand after the opening dream. The table records each arena and the
 reached functions. Stock 0023 reloads Hresvelgr in 3588. Move `UP+RIGHT`
