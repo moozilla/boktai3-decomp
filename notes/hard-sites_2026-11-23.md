@@ -544,3 +544,46 @@ directly increases the miss. Removing the jump to the timer decrement
 preserves the stock mismatch.
 See `build/hard-sites/spider-wander/` and
 `build/matchsearch/Spider_UpdateWanderGoal`.
+
+## 2026-11-26: Registry transfer and FragmentGroup search
+
+Copying the head through a named pointer, using a generic link-transfer
+inline, and using a copy call all miss in both registry routines. The
+generic inline leaves the same miss as the typed scalar copy. Reusing
+the return expression to publish the head also changes the control flow.
+There is still no stock match with both singleton reads.
+
+Returning immediately after filling a FragmentGroup produces the same
+code as breaking out of the search loop. Splitting the free-group search
+from the fill, either in the main function or in a small inline, changes
+both the shape and the allocations. See the `fourth-review` trial folders.
+The shared RNG helper in the boundary barrage also leaves its two
+mask-register differences.
+
+## 2026-11-26: Hresvelgr defeat fallback removal
+
+Removing the bounded motion fallback in sub_081A14FC yields the expected
+1,764 bytes and 22 differing instructions. UID 795 writes shifted Y
+sample pseudo 255 to r1. Pseudo 353, the cursor needed by the following
+draw, then starts in r2. The ROM uses r3 for the sample and r1 for the
+cursor. `AGBCC_FORCE=255:3` is exact. Raising the cursor's priority
+(`AGBCC_PRI=353:+1559`) reduces the miss to four register substitutions.
+
+Reusing a sample local, exposing the quotient or cursor, and using the
+existing shared samplers all miss. Deleting the other negative-sample
+arm as well changes more instructions. The source and persistent store
+are `build/hard-sites/hresvelgr-defeat/` and `build/matchsearch/sub_081A14FC`.
+
+## 2026-11-26: Impact scatter sine reload
+
+The native polar helper for sub_0817AEC8 emits 296 bytes. UID 241 uses
+the second sine-base pseudo created by PRE and hoisted by loop. Its
+three weighted references and doubled lifetime (92 to 184) leave
+global allocation unable to assign a register. Reload rematerializes
+it in r3 at the Z lookup. `AGBCC_FORCE=161:2` is exact at 288 bytes.
+The earlier 159 identifier refers to a different draft context.
+
+Splitting the wave samples, keeping a single typed base in the helper,
+and changing the heading width or cursor all worsen the stock match.
+The original units retain their reported constructs. See
+`build/hard-sites/impact-scatter/` and `build/matchsearch/sub_0817AEC8`.
