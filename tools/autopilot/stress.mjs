@@ -17,7 +17,7 @@ const { values: opts } = parseArgs({ options: {
   save: { type: 'string' }, out: { type: 'string' }, scene: { type: 'string' },
   frames: { type: 'string', default: '2800' }, seed: { type: 'string', default: '1' },
   mode: { type: 'string', default: 'fuzz' }, from: { type: 'string' }, wasm: { type: 'string' },
-  'rom-reference': { type: 'string' },
+  'rom-reference': { type: 'string' }, render: { type: 'boolean' },
 }});
 
 if (!opts.save && !opts.from) throw new Error('Supply --save FILE or --from DIR/movie.json');
@@ -55,7 +55,8 @@ let faultAt = null;
 let tick, regions;
 const s = await openSession({
   save, lib: ['port/agent/lib', 'tools/autopilot/lib'].map((p) => path.join(root, p)),
-  wasm: opts.wasm, movie: replayKeys, solar: lux, time: clock, render: mode === 'swords',
+  wasm: opts.wasm, movie: replayKeys, solar: lux, time: clock,
+  render: opts.render || (mode === 'swords' && !replay),
   onBoot(g, session) {
     tick = g.addr('Input_UpdatePadStates') & ~1;
     regions = sampleRegions(g.types);

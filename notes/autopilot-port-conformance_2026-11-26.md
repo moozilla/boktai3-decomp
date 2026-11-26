@@ -52,3 +52,8 @@ Bank sweeps record a checksum for each successful comparison. The runner
 checks the result, save, wasm, ROM and verifier inputs before skipping a
 case under `--resume`. Checkpoint 0022 seed 1 took 15.6 seconds with a saved
 ROM reference and 0.1 seconds when resuming the same comparison.
+
+Recorded replays skip pixel rendering. The three equipment cases took
+98.0 seconds with rendering enabled and 28.4 seconds headless on the
+loaded worker. All 25,955 sampled ticks in the suite were identical.
+The inventory recording still trapped before tick 1709 on the old wasm.

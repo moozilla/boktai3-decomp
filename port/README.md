@@ -604,7 +604,10 @@ page, equipment details after receiving iron armor, and a soft reset followed by
 Continue. The runner checks that the port reaches each expected scene, then aligns
 the comparison by input tick. It stops at the first failing recording and reports
 the first differing scene, position, player stat, HUD state, previous input or
-random index.
+random index. Recorded movies run with pixel rendering disabled. Equipment
+callbacks and game state are still checked. Use
+`node tools/autopilot/stress.mjs --from FILE --render` to enable the port renderer
+for a standalone replay.
 
 Run one recording with `build/venv/bin/python port/tests/verify.py --case NAME`.
 For randomized input across the entire bank, run
