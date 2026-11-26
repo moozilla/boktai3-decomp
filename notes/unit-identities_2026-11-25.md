@@ -185,7 +185,7 @@ The four equipment and valuables pages call the 0816B3C0–0816B66C navigation
 routines, including `SceneInput_NavigateGridKeys`. Move the catalog to
 `src/ui/pause/status_options.c` and the broader sequence unit to
 `src/ui/pause/menu_sequences`. The latter also has account/retry animations
-at 0816AE38–0816B390, and the range divisions are recorded below.
+at 0816AE38–0816B390, and the grid navigation range begins at 0816B3C0.
 
 ## Magic Cannon, Dark Generator, and Muspell Head
 
@@ -325,9 +325,93 @@ right for two frames. Press and release B. Frame 1 uses
 and `Player_OnChargedAttackExit`. Hold B for 90 frames and release for the
 charged shot in `build/identify/replays/gun-8/charge-flight.png`.
 
-Neutral A, quick-selected Sol Trance followed by A/B, the five standard
-swords, and the gun frames sampled above did not enter the burst or spiral
-callbacks at 08143604–08149DF0. The ROM stores those callbacks in player
-motion tables at 08610B94 and following. Their placement in the gun list
-still needs specific gameplay triggers. The six measured projectile and
-charge files are supported by these traces.
+Frame 11 takes the dedicated 0814EEE0 callback while B is held. Its indexed
+frame is Tempest, the rotating spread described by text #967. Move that
+file from core to gun. The Rockbuster is weapon descriptor 48 and goes
+through `Player_BeginDescriptorAction`, then fires via
+`Player_UpdateAttachedAttackCharge` (0814F328). The seven original gun-list
+files retained by the audit are 0814DE0C, 0814DFDC, 0814E3A0, 0814E3D8,
+0814E978, 0814E990, and 0814F328.
+
+### Motion and Link callbacks
+
+Neutral A, Sol Trance with A/B, five swords and the sampled gun frames
+leave the disputed burst and spiral PCs untouched. A controlled command in
+`build/identify/state_harness.c` calls `ActorSequence_Begin` (0813AFEC)
+with the live Player pointer and a chosen motion ID. The original task then
+runs the normal motion dispatch. Use the 0016 outdoor checkpoint and record
+one mark per motion. The command script is
+`build/identify/replays/player-motion/commands.txt`. No ROM bytes changed.
+
+| Motion | Observed result | Destination |
+|---:|---|---|
+| 9 | 08143604 draws the full-body gold energy effect | `player/special_actions` |
+| 13, 14 | 08147CF0 and 08147FB8 play the red spiral and transition to a form cue | `player/cues` |
+| 16, 17 | 08144408 and 08144624 run the special burst callbacks. The 16 image shows the blue effect | `player/special_actions` |
+| 21 | 08144D64 runs the attachment and position-reset pose, with 08144D60 as its exit callback | `player/cues` |
+| 27 | 08144F40 fades the screen and removes the actor in the departure pose | `player/cues` |
+
+0814692C is the alternate motion table's mode 9. 081481E4, 08148B64,
+08148E4C and 08149DF0 are sprite and spiral states in additional motion
+tables, so they go with the cues. Those assignments use dispatch and
+source evidence. The ordinary gun and sword actions both take motion 3,
+and none of the controlled motion captures establishes a regular input
+sequence for the other modes.
+
+Five late files go in `player/link_actions`. `Player_AccumulateActionCharge`
+(0823C02C) gets its charge from the link-session update paths. The other
+four are indexed by 08E87A10 or 08E87A90 from `Player_UpdateLinkKind` and
+`Player_UpdateHalfChargeLinkKind`. These moves follow the Link dispatch.
+The capture set has no connected peer replay.
+
+The extra `src/player/sub_*.c` rows in `corrections.csv` override the
+corresponding `player_files_*.txt` membership. Apply them by removing each
+file from its original list and using the corrected destination directory.
+
+
+## Book and story cross-checks
+
+The Monster Book starts at text #9838. For each named defeat handler with
+an immediate `Bestiary_UnlockEntry`, the index gives the in-game label
+independently of the tentative sprite description. This also exposed four
+names outside the original guess list.
+
+| Actor | Warp from the save bank | Proof frame and Book name |
+|---|---|---|
+| Popbud, F639 | 0019 → 3400, entrance 7, story 66. In the close replay the player position is (2304, 512, 2432) | `popbud-close/exposed.png`, #9840 |
+| Garmr Statue, 4CD8 | 0029 → 3885, entrance 7, story 95. Wait 30 frames after Continue | `garmr-statue/entry.png`, #9868 |
+| Wind Cannon, with manager 9CC2 | 0042 → 4755, entrance 7, story 131. Wait 20 frames then hold `UP+RIGHT` for 50 | `wind-cannon-west/near.png`, #9872 |
+| Plasma Cannon, 01A2 | 0060 → 5875, entrance 7, story 166. The close replay sets the player position to (3488, 512, 2400) | `plasma-close/exposed.png`, #9874 |
+
+The paths in the last column are under `build/identify/replays/`. For the
+two camera tests, wait 30 frames, set the live Player's world-position
+halfwords at `Player+30`, `+32`, and `+34`, and wait another 30 frames.
+The Player task pointer comes from the `Player_Update` probe or gPlayers
+at 02000580. Spawners 1598, 1603, 1609 and 1619 give the actor keys, and the
+replay captures the individual actor updates.
+
+The story order is Count → Hresvelgr → Sabata → Nidhoggr → Ratatosk →
+Vanargand after the opening dream. The table records each arena and the
+reached functions. Stock 0023 reloads Hresvelgr in 3588. Move `UP+RIGHT`
+48 frames for `hresvelgr/nearby.png`. Stock 0065 reloads Ratatosk in 5965.
+Move `UP+RIGHT` 45 frames, `UP+LEFT` 22 frames, then wait 120 for
+`ratatosk-close/attack.png`. The Vanargand arena is 6165 in stock 0070.
+Nidhoggr's ship fight in 4906 and named interior form in 4915 use separate
+controllers with the same identity. The 6323 chase is also distinct from
+the Vanargand arena. These distinctions account for the extra boss groups.
+
+The Pile Driver's live timer is visible in `pile-active-hp/ready.png`.
+That 0016/6195 comparison used the same entrance with the tutorial flags
+set and a staged subject gauge of 750/1000. The approach and named captive
+captures are the story evidence. A separate controlled run with the saved
+subject gauge at zero reaches the PURIFICATION COMPLETED screen.
+
+## Scope of the evidence
+
+The compact index has all 83 stock checkpoint captures, with focused
+branches under `build/identify/replays/` and `targets/`. Function-entry
+coverage for a mark is a lower bound on the callbacks the scene can reach.
+The isolated E534 test establishes the bat assets and the launch behavior.
+The natural story placement, the account/retry part of the mixed menu
+sequence unit, and the usual controls for the forced Player motions remain
+open. Their records distinguish those limitations from the witnessed scenes.

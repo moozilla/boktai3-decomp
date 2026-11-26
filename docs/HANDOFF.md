@@ -34,7 +34,7 @@ not by fuzzy scores. Blind spelling sweeps don't count.
 
 ## Where things stand (2026-11-25)
 
-Source and headers are grouped by subsystem. [SOURCE_LAYOUT.md](SOURCE_LAYOUT.md)
+Source and headers are grouped by subsystem. The [runtime layout audit](../notes/unit-identities_2026-11-25.md) ties the revised names to checkpoint replays and the Monster Book. [SOURCE_LAYOUT.md](SOURCE_LAYOUT.md)
 explains where new files belong and how to find a function by name or ROM address.
 
 Numbers live only in [PROGRESS.md](../PROGRESS.md) (regenerated at batch integration) and
