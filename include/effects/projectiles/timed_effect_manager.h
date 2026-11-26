@@ -20,8 +20,7 @@ struct TimedEffectManager {
     struct TimedEffectTrail effects[4];
     struct Task4E01Projectile *entries;
 };
-void TimedEffect_OnContact(struct ContactCollider *, struct ContactCollider *,
-                           struct Task4E01Projectile *);
+void TimedEffect_OnContact(struct ContactCollider *, struct ContactCollider *, void *owner);
 void TimedEffect_InitEntry(struct TimedEffectManager *, struct Task4E01Projectile *, s32);
 void TimedEffect_RemoveFromManager(struct TimedEffectManager *, struct Task4E01Projectile *, u32);
 s32 TimedEffect_UpdateTerrainTurn(struct TimedEffectManager *, struct Task4E01Projectile *, s32);
