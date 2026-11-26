@@ -706,3 +706,27 @@ trials with an inline mapping helper taking the save storage and either
 the timer or the typed slot change at least 15 instructions. The direct
 symbolic GameState draft still misses on one operand order. Scratch
 sources for all four are in the corresponding `sixth-review` folders.
+
+## 2026-11-26: Scene rig initial sample reload
+
+The current `ScenePanel_InitRig` (0805B0F0) already uses `gRandomTable`
+for the later draws and has no lint findings. Its first draw still
+uses `RANDOM_TABLE_ADDR`. A direct symbolic subscript shifts the first
+table load and swaps the registers in five instructions after the
+state setter. Naming the selected halfword pointer fixes the load
+order and leaves the five register differences at 412 bytes.
+
+In this draft local allocation puts the first table base pseudo 101
+in r1. The numeric-address baseline instead reloads the table into
+r1 at choice six. `AGBCC_NOREG=101` restores the missing reload with
+the symbolic pointer and matches. `AGBCC_SPILL=6:1` independently
+matches by advancing the angle-offset register selection. The latter
+preserves the stock table allocation. Either probe leaves the later
+symbolic table read alone.
+
+Separating the index, reusing a cursor, and writing the collider
+choice as a conditional leave the same gap. Holding one table
+pointer across setup or using a shared draw moves more instructions.
+The unchanged unit matches 412 bytes with zero lint findings. The
+stock near match is in `build/hard-sites/scene-panel-rig/symbolic-pointer.c`
+and the persistent store is `build/matchsearch/ScenePanel_InitRig`.
