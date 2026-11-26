@@ -44,7 +44,8 @@ struct StateActorDamageEffect {
 };
 
 struct StateActorOverlay {
-    u8 unknown0[0x24];
+    u16 palette[16]; /* Palette pulse states use this storage as a work bank. */
+    u8 unknown20[4];
     u8 animationStarted; /* 081CC1B4, 081D2318. */
     u8 unknown25[0x59 - 0x25];
     u8 savedAngle;
