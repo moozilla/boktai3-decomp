@@ -1,17 +1,10 @@
+#include "scene/motion/scene_actor_terrain_reaction.h"
 #include "scene/actor/scene_actor_control_begin.h"
 #include "global.h"
 #include "scene/actor/scene_actor_control_phase.h"
 u8 sub_0812F3CC(struct ChaseActor *);
 // confidence=low: restores saved control, then enters route behavior two after sixty ticks.
 #define SceneActorRoute_UpdateDelayedEntry sub_08131A2C
-static inline void State(struct ChaseActor *a, u32 behavior, u32 zero)
-{
-    a->base.state2A8 = zero;
-    a->base.phase2A9 = zero;
-    a->base.behavior2AA = behavior;
-    a->base.counter2AC = zero;
-    a->base.field2B1 = 1;
-}
 void SceneActorRoute_UpdateDelayedEntry(struct ChaseActor *actor)
 {
     u8 result;
@@ -23,7 +16,7 @@ void SceneActorRoute_UpdateDelayedEntry(struct ChaseActor *actor)
     if (result)
         return;
     if ((s32)actor->base.counter2AC > 59)
-        State(actor, 2, result);
+        SceneActorTerrain_EnterState(actor, 0, 0, 2);
     else
         actor->base.counter2AC++;
 }
