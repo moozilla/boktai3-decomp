@@ -6,8 +6,8 @@ from returns import repair_returns, verify_returns
 ROOT_SRC = Path(__file__).resolve().parents[2] / 'src'
 
 
-def prepare_source(path, target):
-    text = repair_returns(path.read_text())
+def prepare_source(path, target, text=None):
+    text = repair_returns(path.read_text() if text is None else text)
     text = text.replace('asm("swi 0x2A")', 'port_system_call(0x2a)')
     if path.name == 'devices.c' and path.parent.name == 'hw':
         # Leave callers at the public boundary so core can observe every IO

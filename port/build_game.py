@@ -179,19 +179,25 @@ def main():
         ll = OUT / 'ir' / (name + '.ll')
         stamp = ll.with_suffix('.key')
         patches = overlays.get(name, [])
-        key = hashlib.sha256(context + src.read_bytes() + b''.join(patches)).hexdigest()
+        source = src.read_bytes()
+        key = hashlib.sha256(context + source + b''.join(patches)).hexdigest()
         if not args.force and ll.exists() and stamp.exists() and stamp.read_text() == key:
             return name, None
         ll.parent.mkdir(parents=True, exist_ok=True)
         prepared = OUT / 'prepared' / name
         prepared.parent.mkdir(parents=True, exist_ok=True)
-        prepared.write_text('#line 1 "' + name + '"\n' + prepare_source(src, 'wasm32'))
+        # Pending diffs are against the tracked source. Apply them before
+        # prepare_source rewrites declarations or lifts prototypes.
         for patch in patches:
-            result = subprocess.run(['patch', '-s', '-t', '-N', '-F', '0', '-o', '-', str(prepared)],
+            prepared.write_bytes(source)
+            result = subprocess.run(['patch', '-s', '-t', '-N', '-F', '0',
+                                     '-r', '-', '-o', '-', str(prepared)],
                                     input=patch, capture_output=True)
             if result.returncode:
-                raise RuntimeError(f'{name}: generated source patch failed\n{result.stderr.decode()}')
-            prepared.write_bytes(result.stdout)
+                raise RuntimeError(f'{name}: source patch failed\n{result.stderr.decode()}'
+                                   f'{result.stdout.decode()}')
+            source = result.stdout
+        prepared.write_text('#line 1 "' + name + '"\n' + prepare_source(src, 'wasm32', source.decode()))
         r = run([args.cc, *flags, '-S', '-emit-llvm', str(prepared), '-o', str(ll)])
         if r.returncode:
             return name, r.stderr[-2000:]
