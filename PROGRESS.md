@@ -37,7 +37,7 @@ Nonmatching drafts (`#ifdef NONMATCHING`, not counted above): **0 functions**, 0
 
 Intentional assembly (GBA header, crt0, SDK assembly; not counted above): 4,916 bytes.
 
-RAM objects with one shared declaration (`symbols/ram.csv`, tracked here only): **99.9%** (29,456 / 29,473 bytes); no other declaration left: 88.6%.
+RAM objects with one shared declaration (`symbols/ram.csv`, tracked here only): **99.9%** (29,452 / 29,473 bytes); no other declaration left: 88.5%.
 
 ```
 ██████████████████████████████████████████████████ 100.00%
@@ -84,24 +84,22 @@ Matched here means without concessions, as on decomp.dev.
 
 | Section / category | Functions | Bytes matched | |
 |---|---:|---:|---|
-| **Gameplay** | 6066/6066 | 100.0% | `████████████████████` |
+| **Gameplay** | 6104/6104 | 100.0% | `████████████████████` |
 | &nbsp;&nbsp;Player | 736/736 | 100.0% | `████████████████████` |
-| &nbsp;&nbsp;Monsters | 1539/1539 | 100.0% | `████████████████████` |
-| &nbsp;&nbsp;Bosses | 696/696 | 100.0% | `████████████████████` |
-| &nbsp;&nbsp;Field objects and hazards | 1041/1041 | 100.0% | `████████████████████` |
+| &nbsp;&nbsp;Monsters | 1551/1551 | 100.0% | `████████████████████` |
+| &nbsp;&nbsp;Bosses | 717/717 | 100.0% | `████████████████████` |
+| &nbsp;&nbsp;Field objects and hazards | 1046/1046 | 100.0% | `████████████████████` |
 | &nbsp;&nbsp;Scene actors and NPCs | 1982/1982 | 100.0% | `████████████████████` |
 | &nbsp;&nbsp;Minigames | 72/72 | 100.0% | `████████████████████` |
-| **Presentation and UI** | 3533/3533 | 100.0% | `████████████████████` |
-| &nbsp;&nbsp;Effects and presentation | 1544/1544 | 100.0% | `████████████████████` |
-| &nbsp;&nbsp;Menus, HUD and dialogue | 1989/1989 | 100.0% | `████████████████████` |
-| **Engine and system** | 1822/1822 | 100.0% | `████████████████████` |
+| **Presentation and UI** | 3574/3574 | 100.0% | `████████████████████` |
+| &nbsp;&nbsp;Effects and presentation | 1558/1558 | 100.0% | `████████████████████` |
+| &nbsp;&nbsp;Menus, HUD and dialogue | 2016/2016 | 100.0% | `████████████████████` |
+| **Engine and system** | 1834/1834 | 100.0% | `████████████████████` |
 | &nbsp;&nbsp;Engine core | 968/968 | 100.0% | `████████████████████` |
-| &nbsp;&nbsp;Hardware, time and save | 232/232 | 100.0% | `████████████████████` |
+| &nbsp;&nbsp;Hardware, time and save | 244/244 | 100.0% | `████████████████████` |
 | &nbsp;&nbsp;Link and wireless | 622/622 | 100.0% | `████████████████████` |
 | **Libraries** | 298/298 | 100.0% | `████████████████████` |
 | &nbsp;&nbsp;Libraries | 298/298 | 100.0% | `████████████████████` |
-| **Other** | 91/91 | 100.0% | `████████████████████` |
-| &nbsp;&nbsp;Not yet classified | 91/91 | 100.0% | `████████████████████` |
 | *Intentional assembly (not counted)* | 59 functions | 4,916 bytes | |
 
 ### Gameplay
@@ -124,7 +122,7 @@ Matched here means without concessions, as on decomp.dev.
 
 </details>
 
-<details><summary><b>Monsters</b>: 1539/1539 functions, 100.0% of bytes</summary>
+<details><summary><b>Monsters</b>: 1551/1551 functions, 100.0% of bytes</summary>
 
 | Family / unit | Functions | Bytes matched | |
 |---|---:|---:|---|
@@ -133,8 +131,10 @@ Matched here means without concessions, as on decomp.dev.
 | Golem | 63/63 | 100.0% | `████████████████████` |
 | Armor | 153/153 | 100.0% | `████████████████████` |
 | Dog | 73/73 | 100.0% | `████████████████████` |
+| **Axe** | 116/116 | 100.0% | `████████████████████` |
+| &nbsp;&nbsp;Axe | 104/104 | 100.0% | `████████████████████` |
+| &nbsp;&nbsp;Axe Armor | 12/12 | 100.0% | `████████████████████` |
 | Vorn | 105/105 | 100.0% | `████████████████████` |
-| Axe | 104/104 | 100.0% | `████████████████████` |
 | **Tentacle** | 89/89 | 100.0% | `████████████████████` |
 | &nbsp;&nbsp;Tentacle body | 19/19 | 100.0% | `████████████████████` |
 | &nbsp;&nbsp;Tentacle actor | 70/70 | 100.0% | `████████████████████` |
@@ -172,7 +172,7 @@ Matched here means without concessions, as on decomp.dev.
 
 </details>
 
-<details><summary><b>Bosses</b>: 696/696 functions, 100.0% of bytes</summary>
+<details><summary><b>Bosses</b>: 717/717 functions, 100.0% of bytes</summary>
 
 | Family / unit | Functions | Bytes matched | |
 |---|---:|---:|---|
@@ -182,11 +182,12 @@ Matched here means without concessions, as on decomp.dev.
 | &nbsp;&nbsp;Vanargand head | 55/55 | 100.0% | `████████████████████` |
 | Hresvelgr | 238/238 | 100.0% | `████████████████████` |
 | Ratatosk | 172/172 | 100.0% | `████████████████████` |
+| Sabata | 21/21 | 100.0% | `████████████████████` |
 | Nidhoggr | 39/39 | 100.0% | `████████████████████` |
 
 </details>
 
-<details><summary><b>Field objects and hazards</b>: 1041/1041 functions, 100.0% of bytes</summary>
+<details><summary><b>Field objects and hazards</b>: 1046/1046 functions, 100.0% of bytes</summary>
 
 | Family / unit | Functions | Bytes matched | |
 |---|---:|---:|---|
@@ -245,6 +246,7 @@ Matched here means without concessions, as on decomp.dev.
 | Stored-resource station (tentative) | 13/13 | 100.0% | `████████████████████` |
 | Sun orb | 27/27 | 100.0% | `████████████████████` |
 | Cell traversal gates | 14/14 | 100.0% | `████████████████████` |
+| Callback pool | 5/5 | 100.0% | `████████████████████` |
 | Timed hazard | 14/14 | 100.0% | `████████████████████` |
 | Pool 1B8 | 11/11 | 100.0% | `████████████████████` |
 | Interaction marker | 9/9 | 100.0% | `████████████████████` |
@@ -364,24 +366,25 @@ Matched here means without concessions, as on decomp.dev.
 
 ### Presentation and UI
 
-<details><summary><b>Effects and presentation</b>: 1544/1544 functions, 100.0% of bytes</summary>
+<details><summary><b>Effects and presentation</b>: 1558/1558 functions, 100.0% of bytes</summary>
 
 | Family / unit | Functions | Bytes matched | |
 |---|---:|---:|---|
-| **Large** | 163/163 | 100.0% | `████████████████████` |
-| &nbsp;&nbsp;Large fragment effect | 18/18 | 100.0% | `████████████████████` |
-| &nbsp;&nbsp;Large scene animation controller (tentative) | 145/145 | 100.0% | `████████████████████` |
-| **Scene** | 158/158 | 100.0% | `████████████████████` |
+| **Scene** | 172/172 | 100.0% | `████████████████████` |
 | &nbsp;&nbsp;Scene presentation commands | 14/14 | 100.0% | `████████████████████` |
 | &nbsp;&nbsp;Scene arc slot effects (tentative) | 11/11 | 100.0% | `████████████████████` |
 | &nbsp;&nbsp;Scene particle pools | 26/26 | 100.0% | `████████████████████` |
 | &nbsp;&nbsp;Scene collider effect | 15/15 | 100.0% | `████████████████████` |
 | &nbsp;&nbsp;Scene scheduled effect | 24/24 | 100.0% | `████████████████████` |
+| &nbsp;&nbsp;Scene terrain probe | 14/14 | 100.0% | `████████████████████` |
 | &nbsp;&nbsp;Scene moving particle | 12/12 | 100.0% | `████████████████████` |
 | &nbsp;&nbsp;Scene particle | 16/16 | 100.0% | `████████████████████` |
 | &nbsp;&nbsp;Scene effect | 17/17 | 100.0% | `████████████████████` |
 | &nbsp;&nbsp;Scene effect queue | 10/10 | 100.0% | `████████████████████` |
 | &nbsp;&nbsp;Scene projectile | 13/13 | 100.0% | `████████████████████` |
+| **Large** | 163/163 | 100.0% | `████████████████████` |
+| &nbsp;&nbsp;Large fragment effect | 18/18 | 100.0% | `████████████████████` |
+| &nbsp;&nbsp;Large scene animation controller (tentative) | 145/145 | 100.0% | `████████████████████` |
 | **Palette** | 127/127 | 100.0% | `████████████████████` |
 | &nbsp;&nbsp;Palette controllers | 42/42 | 100.0% | `████████████████████` |
 | &nbsp;&nbsp;Palette sets | 7/7 | 100.0% | `████████████████████` |
@@ -481,7 +484,7 @@ Matched here means without concessions, as on decomp.dev.
 
 </details>
 
-<details><summary><b>Menus, HUD and dialogue</b>: 1989/1989 functions, 100.0% of bytes</summary>
+<details><summary><b>Menus, HUD and dialogue</b>: 2016/2016 functions, 100.0% of bytes</summary>
 
 | Family / unit | Functions | Bytes matched | |
 |---|---:|---:|---|
@@ -544,6 +547,9 @@ Matched here means without concessions, as on decomp.dev.
 | **Stage** | 47/47 | 100.0% | `████████████████████` |
 | &nbsp;&nbsp;Stage icon display (tentative) | 16/16 | 100.0% | `████████████████████` |
 | &nbsp;&nbsp;Stage results | 31/31 | 100.0% | `████████████████████` |
+| **Registry** | 45/45 | 100.0% | `████████████████████` |
+| &nbsp;&nbsp;Registry selection | 27/27 | 100.0% | `████████████████████` |
+| &nbsp;&nbsp;Registry 3F74 | 18/18 | 100.0% | `████████████████████` |
 | Solar bank | 24/24 | 100.0% | `████████████████████` |
 | Control panel | 35/35 | 100.0% | `████████████████████` |
 | **Record** | 29/29 | 100.0% | `████████████████████` |
@@ -573,7 +579,6 @@ Matched here means without concessions, as on decomp.dev.
 | Time result | 26/26 | 100.0% | `████████████████████` |
 | Scrolling dialogue controller | 22/22 | 100.0% | `████████████████████` |
 | Options | 6/6 | 100.0% | `████████████████████` |
-| Registry 3F74 | 18/18 | 100.0% | `████████████████████` |
 | Bestiary | 18/18 | 100.0% | `████████████████████` |
 | Level advance display (tentative) | 14/14 | 100.0% | `████████████████████` |
 | Script prompt | 8/8 | 100.0% | `████████████████████` |
@@ -650,7 +655,7 @@ Matched here means without concessions, as on decomp.dev.
 
 </details>
 
-<details><summary><b>Hardware, time and save</b>: 232/232 functions, 100.0% of bytes</summary>
+<details><summary><b>Hardware, time and save</b>: 244/244 functions, 100.0% of bytes</summary>
 
 | Family / unit | Functions | Bytes matched | |
 |---|---:|---:|---|
@@ -658,7 +663,9 @@ Matched here means without concessions, as on decomp.dev.
 | **Save** | 92/92 | 100.0% | `████████████████████` |
 | &nbsp;&nbsp;Save data | 52/52 | 100.0% | `████████████████████` |
 | &nbsp;&nbsp;Save | 40/40 | 100.0% | `████████████████████` |
-| Solar | 27/27 | 100.0% | `████████████████████` |
+| **Solar** | 39/39 | 100.0% | `████████████████████` |
+| &nbsp;&nbsp;Solar calibration | 12/12 | 100.0% | `████████████████████` |
+| &nbsp;&nbsp;Solar | 27/27 | 100.0% | `████████████████████` |
 | Game state | 39/39 | 100.0% | `████████████████████` |
 | **Time** | 11/11 | 100.0% | `████████████████████` |
 | &nbsp;&nbsp;Time palette transitions (tentative) | 3/3 | 100.0% | `████████████████████` |
@@ -715,21 +722,6 @@ Matched here means without concessions, as on decomp.dev.
 | SIIRTC | 16/16 | 100.0% | `████████████████████` |
 | EEPROM SDK V124 | 7/7 | 100.0% | `████████████████████` |
 | libc (newlib) | 3/3 | 100.0% | `████████████████████` |
-
-</details>
-
-### Other
-
-<details><summary><b>Not yet classified</b>: 91/91 functions, 100.0% of bytes</summary>
-
-| Family / unit | Functions | Bytes matched | |
-|---|---:|---:|---|
-| Scene terrain probe | 14/14 | 100.0% | `████████████████████` |
-| Sabata | 21/21 | 100.0% | `████████████████████` |
-| Axe Armor | 12/12 | 100.0% | `████████████████████` |
-| Registry selection | 27/27 | 100.0% | `████████████████████` |
-| Solar calibration | 12/12 | 100.0% | `████████████████████` |
-| Callback pool | 5/5 | 100.0% | `████████████████████` |
 
 </details>
 
