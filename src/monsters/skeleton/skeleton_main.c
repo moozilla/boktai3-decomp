@@ -841,31 +841,20 @@ u8 Skeleton_TryBeginGuardedAttack(struct ChaseActor *, struct Skeleton *, s32);
 
 u8 Skeleton_TryBeginArmedAttack(struct ChaseActor *, struct Skeleton *, s32);
 
-struct SceneActorTargetDelta {
-    s16 x, y, z;
-};
-
-struct SceneActorTargetPosition {
-    u8 unknown0[0xC];
-    struct ContactPosition position;
-};
-
 void SceneActorControl_SelectBehaviorByTargetAngle(struct ChaseActor *s)
 {
     struct Skeleton *context;
-    struct SceneActorTargetDelta delta;
+    struct ContactPosition delta;
     s32 angle;
 
     if (!(SceneActorContact_MotionFlags(s, 0x100))) {
         context = s->base.context;
         if (s->base.tracking.distance < s->base.tracking.range) {
-            struct SceneActorTargetDelta *difference = &delta;
+            struct ContactPosition *difference = &delta;
             struct ContactPosition *from = &s->base.body.position;
             struct ContactPosition *to =
-                &((struct SceneActorTargetPosition *)s->base.tracking.target)->position;
-            difference->x = to->x - from->x;
-            difference->y = to->y - from->y;
-            difference->z = to->z - from->z;
+                &s->base.tracking.target->position;
+            SceneActorTerrain_Subtract(difference, to, from);
             angle = RotationPhase_HeadingDistance(Math_Atan2(delta.x, difference->z),
                                                   s->base.body.direction);
             if (angle < s->base.tracking.heading) {
@@ -896,28 +885,12 @@ void SceneActorControl_SelectBehaviorByTargetAngle(struct ChaseActor *s)
 
 // foundry draft (worker best 93.0%); what differs is mostly register allocation and instruction order
 
-struct SceneActorReactionContext {
-    u8 unknown0[0x6D0];
-    u8 active;
-    u8 unknown6D1[0xB];
-    u32 flags6DC;
-};
-
 void SceneActorControl_SelectBehaviorByTargetAngle(struct ChaseActor *);
 
-static inline u8 HasReaction(struct ChaseActor *p)
-{
-    struct SceneActorReactionMotion *motion = (void *)&p->base.tracking.target;
-    u32 mask = 8;
-    if (mask & motion->flags)
-        return 1;
-    return 0;
-}
-
-static inline u8 ContextBlocked(struct SceneActorReactionContext *p)
+static inline u8 ContextBlocked(struct Skeleton *p)
 {
     u32 mask = 0x200;
-    if (p->flags6DC & mask)
+    if (p->actionFlags & mask)
         return 1;
     return 0;
 }
@@ -929,7 +902,7 @@ static inline void Or16(u16 *p, u32 mask)
     *p = value;
 }
 
-static inline void OrMotion(struct SceneActorReactionMotion *p, u32 mask)
+static inline void OrMotion(struct SceneActorChaseTracking *p, u32 mask)
 {
     u32 v = mask;
     v |= p->flags;
@@ -945,8 +918,8 @@ static inline void SetFlags(struct ChaseActor *p, u32 mask)
 
 void SceneActorReaction_UpdateGate(struct ChaseActor *p)
 {
-    struct SceneActorReactionContext *context = p->base.context;
-    u8 active = HasReaction(p);
+    struct Skeleton *context = p->base.context;
+    u8 active = SceneActorChase_TrackingFlags(&p->base.tracking, 8);
     u32 v;
     u16 *f;
     if (active) {
@@ -956,7 +929,7 @@ void SceneActorReaction_UpdateGate(struct ChaseActor *p)
         v |= *f;
         *f = v;
         p->group.common.gate.counter = p->group.common.gate.duration;
-        if (SceneActorTurn_Flags(f, 0x100) || !SceneActorReaction_IsRangeReady(p) || context->active) {
+        if (SceneActorTurn_Flags(f, 0x100) || !SceneActorReaction_IsRangeReady(p) || context->collisionDelay) {
             if (!ContextBlocked(context))
                 Skeleton_SelectDistanceReaction(p);
         } else {
@@ -965,7 +938,7 @@ void SceneActorReaction_UpdateGate(struct ChaseActor *p)
     } else {
         SceneActorChase_SetState(p, 0, 1, 0);
         SceneActorChase_SetControl(p, SceneActorControl_OnIdle, 0x10);
-        OrMotion((struct SceneActorReactionMotion *)&p->base.tracking.target, 8);
+        OrMotion(&p->base.tracking, 8);
     }
 }
 
