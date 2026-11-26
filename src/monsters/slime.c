@@ -30,6 +30,8 @@
 #include "scene/motion/scene_actor_terrain_reaction.h"
 #include "monsters/ghoul_disc.h"
 
+typedef char SlimeSizeCheck[sizeof(struct Slime) == 0x40C ? 1 : -1];
+
 void Slime_ApplyBodyHit(struct ContactCollider *target, struct ContactCollider *info,
                         struct ChaseActor *actor)
 {
@@ -1514,11 +1516,6 @@ static inline u32 Slime_MaskedDamage(struct ChaseActor *actor, u32 flags, u32 ma
     return actor->base.hitReactionFlags & flags & mask;
 }
 
-static inline u32 Slime_DamageFlags(u32 *flags)
-{
-    return *flags;
-}
-
 // confidence=low: reaction callback chooses split/idle/recovery states after damage.
 
 u32 Slime_ResolveDamageReaction(struct ChaseActor *actor)
@@ -1549,7 +1546,7 @@ u32 Slime_ResolveDamageReaction(struct ChaseActor *actor)
             }
         }
     }
-    if ((Slime_DamageFlags(&actor->base.hitReactionFlags) & 0x40000)) {
+    if (actor->base.hitReactionFlags & 0x40000) {
         Slime_ClearReactionBits(&actor->base.reactionFlags, ~0x980);
         Chase_SetCtl(actor, actor->base.onReaction, 0x12);
         Chase_SetState(actor, 3, 0, 0);
@@ -1950,9 +1947,9 @@ s32 Slime_Init(void *object)
 
 void Slime_Create(void)
 {
-    void *m = Heap_Alloc(0x40c);
+    void *m = Heap_Alloc(sizeof(struct Slime));
     if (m != 0) {
-        Memory_Clear(m, 0x40c);
+        Memory_Clear(m, sizeof(struct Slime));
         if (Slime_Init(m) < 0) {
             Slime_Destroy(m);
             Heap_Free(m);
