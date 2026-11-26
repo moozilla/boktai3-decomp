@@ -174,15 +174,6 @@ void Lun_OnBodyContact(void *source, void *destination, void *actor)
     SceneActorBehavior_ApplyContactReaction(source, destination, actor);
 }
 
-struct ActorParticipantProgress {
-    u8 unknown0[0x3D8];
-    u8 interval;
-    u8 limit;
-    u16 accumulated;
-    u8 unknown3DC[0xA];
-    u8 elapsed, start;
-};
-
 s32 Mod(s32, s32);
 
 void SceneActorAnimation_SelectProfileEntry(struct RoomActor *, s32);
@@ -196,15 +187,15 @@ static inline s32 WrapCounter(s32 n)
 
 void ActorBehavior_TickParticipantProgress(struct ChaseActor *a)
 {
-    struct ActorParticipantProgress *s = a->base.context;
+    struct Lun *s = a->base.context;
     s32 delta;
     u8 *elapsed;
     if (SceneActorReaction_TakePrepared(a)) {
-        s->start = (*(u8 **)gPlayers)[0x4F4];
-        s->accumulated = 0;
+        s->participantStart = gPlayers[0]->facingChangeEffects;
+        s->participantProgress = 0;
     }
-    SceneActorAnimation_SelectProfileEntry(a, 14);
-    if (Mod(a->base.frameCounter, s->interval) == 0) {
+    SceneActorAnimation_SelectProfileEntry(&a->base, 14);
+    if (Mod(a->base.frameCounter, s->parameter3D8) == 0) {
         u16 *mode = &a->base.paletteOffset;
         u32 value = *mode;
         if (!value) {
@@ -215,28 +206,28 @@ void ActorBehavior_TickParticipantProgress(struct ChaseActor *a)
         } else {
             {
                 u32 increment = a->base.attacks.first[0];
-                u16 *counter = &s->accumulated;
+                u16 *counter = &s->participantProgress;
                 *counter = *counter + increment;
             }
-            if (s->accumulated > 100) {
+            if (s->participantProgress > 100) {
                 if (*mode == 1)
                     Player_QueueStatusEffect((*(u8 **)gPlayers), 1);
                 else
                     Player_QueueStatusEffect((*(u8 **)gPlayers), 2);
-                s->accumulated = 0;
+                s->participantProgress = 0;
             }
         }
     }
     {
-        s32 start = s->start;
-        s32 now = (*(u8 **)gPlayers)[0x4F4];
+        s32 start = s->participantStart;
+        s32 now = gPlayers[0]->facingChangeEffects;
         if (now < start) {
             s32 wrapped = WrapCounter(start);
             delta = now - wrapped;
         } else
             delta = now - start;
     }
-    elapsed = &s->elapsed;
+    elapsed = &s->participantElapsed;
     if (*elapsed != delta) {
         if (Mod(*elapsed, 4) == 0) {
             u32 mask = 0x20;
@@ -246,7 +237,7 @@ void ActorBehavior_TickParticipantProgress(struct ChaseActor *a)
         }
         *elapsed = delta;
     }
-    if (s->elapsed > s->limit)
+    if (s->participantElapsed > s->parameter3D9)
         a->base.stepDone = 1;
 }
 
@@ -735,11 +726,6 @@ static inline void Add(struct ContactPosition *out, const struct ContactPosition
     out->z = from->z + out->z;
 }
 
-struct SavedMotion {
-    u8 pad[12];
-    struct ContactPosition position;
-};
-
 void Centipede_ResetOscillation(void *);
 
 s32 Callback_InvokeActor(void *, void *);
@@ -756,17 +742,17 @@ void sub_080A9DB0(void *, s32, s32);
 
 void Centipede_UpdateOscillation(void *, s32, s32);
 
-static inline u8 Approach(struct ChaseActor *actor, struct SavedMotion *saved, s32 speed)
+static inline u8 Approach(struct ChaseActor *actor, const struct SceneActorMotionSubject *saved, s32 speed)
 {
-    u8 *motion = (u8 *)actor + 0x50;
-    s16 dx = saved->position.x - *(u16 *)(motion + 12);
-    s16 dz = saved->position.z - *(u16 *)(motion + 16);
+    struct SceneActorBody *body = &actor->base.body;
+    s16 dx = saved->position.x - body->position.x;
+    s16 dz = saved->position.z - body->position.z;
     if ((dx < 0 ? -dx : dx) <= 32 && (dz < 0 ? -dz : dz) <= 32)
         return 1;
     if (dx || dz) {
-        motion[9] = Math_Atan2(dx, dz);
-        *(u16 *)(motion + 20) += Math_ShiftTowardZero(gUnk_086149C4[(motion[9] + 64) & 255] * speed, 12);
-        *(u16 *)(motion + 24) += Math_ShiftTowardZero(gUnk_086149C4[motion[9]] * speed, 12);
+        body->direction = Math_Atan2(dx, dz);
+        body->motion.x += Math_ShiftTowardZero(gUnk_086149C4[(body->direction + 64) & 255] * speed, 12);
+        body->motion.z += Math_ShiftTowardZero(gUnk_086149C4[body->direction] * speed, 12);
     }
     return 0;
 }
@@ -818,7 +804,7 @@ void Lun_FollowRoute(struct ChaseActor *actor)
     speed = Callback_InvokeActor(actor, actor->base.animationQuery.opaque);
     Lun_UpdateRouteAnimationScale(actor);
     Lun_UpdateSway(actor);
-    if (Approach(actor, (void *)(&body->curveSubject), speed) && Lun_StepCurveMotion(actor)) {
+    if (Approach(actor, &body->curveSubject, speed) && Lun_StepCurveMotion(actor)) {
         struct SceneActorRouteCursor *route;
         struct ContactPosition *p;
         struct ContactPosition *saved;
@@ -1075,7 +1061,7 @@ void SceneActor_BeginLinkedIdleReaction_0809C834(struct ChaseActor *s)
 
 static inline void SetHeightFromGround(struct ChaseActor *actor)
 {
-    u32 ground = ((struct SceneActorControlGroundView *)actor)->ground;
+    u32 ground = actor->base.groundHeight;
     actor->base.body.position.y = actor->base.heightOffset + ground;
 }
 
@@ -1118,10 +1104,10 @@ void Lun_UpdateHoverHeight(struct ChaseActor *actor)
         if (state->phase <= 0x3f)
             state->phase++;
         actor->base.body.position.y =
-            ((struct SceneActorControlGroundView *)actor)->ground + actor->base.heightOffset;
+            actor->base.groundHeight + actor->base.heightOffset;
     }
     delta =
-        ((struct SceneActorControlGroundView *)actor)->ground + cap - actor->base.body.position.y;
+        actor->base.groundHeight + cap - actor->base.body.position.y;
     magnitude = delta >= 0 ? delta : -delta;
     if (magnitude > 0x10) {
         if (delta < 0)
@@ -1139,7 +1125,7 @@ void Lun_UpdateHoverHeight(struct ChaseActor *actor)
 
 void Lun_UpdateSway(struct ChaseActor *actor)
 {
-    struct SceneActorControlMotionState *state = SceneActorControl_GetMotionState(actor);
+    struct Lun *state = actor->base.context;
     if (state->sway > 320) {
         state->swayStep = -1;
         state->sway = 320;
@@ -1217,8 +1203,9 @@ extern const u32 gLunRouteProgressRates[8];
 
 u32 Lun_GetRouteProgressRate(void *actor)
 {
-    struct SceneActorControlMotionState *state = SceneActorControl_GetMotionState(actor);
-    s32 phase = state->field3E0 >> 7;
+    struct ChaseActor *chase = actor;
+    struct Lun *state = chase->base.context;
+    s32 phase = state->curveTime >> 7;
     s16 index = phase;
     if (phase > 7)
         index = 7;
@@ -1292,7 +1279,7 @@ void Lun_ResetMovementState(struct ChaseActor *actor)
 void SceneActorControl_ResetCollisionFlags(struct ChaseActor *input)
 {
     struct ChaseActor *actor = input;
-    struct SceneActorControlMotionState *state = SceneActorControl_GetMotionState(actor);
+    struct Lun *state = actor->base.context;
     u32 mask = 0x100000;
     u32 *flags = &actor->base.statusFlags;
     *flags |= mask;
@@ -1340,29 +1327,23 @@ void Lun_BeginMoveToPosition(struct ChaseActor *actor, struct ContactPosition *t
     ZeroFill8(&context->routeMotion);
 }
 
-struct SceneActorTargetLink {
-    u8 *target;
-    u8 unknownE0[0xB];
-    u8 flags;
-};
-
 void SceneActorControl_ResetTargetFlags(struct ChaseActor *input)
 {
     struct ChaseActor *s = input;
-    struct SceneActorPendingTargetState *q = s->base.context;
+    struct Lun *q = s->base.context;
     u16 *hp = &s->base.motionFlags;
     u32 hm = 0xFFFFFEFF;
-    struct SceneActorTargetLink *t;
+    struct SceneActorChaseTracking *t;
     u32 bm;
     u16 zero;
     u16 hv;
     hv = *hp & hm;
     zero = 0;
     *hp = hv;
-    t = (void *)((u8 *)s + 0xDC);
+    t = &s->base.tracking;
     bm = ~8;
     t->flags = t->flags & bm;
-    q->field444 = zero;
+    q->routeDelay = zero;
 }
 
 #define RouteCursor_SelectRandomPoint Lun_SelectRandomRouteEntry
@@ -1370,13 +1351,6 @@ void SceneActorControl_ResetTargetFlags(struct ChaseActor *input)
 #define RouteActor_SetDestination Lun_BeginMoveToPosition
 
 void SceneActorControl_ResetTargetFlags(struct ChaseActor *input);
-
-struct RouteActorDestinationState {
-    u8 unknown0[0x42C];
-    struct SceneActorRouteCursor route;
-    u8 unknown438[12];
-    u16 delay;
-};
 
 static inline u16 TestFlag(struct ChaseActor *p, u32 mask)
 {
@@ -1386,15 +1360,15 @@ static inline u16 TestFlag(struct ChaseActor *p, u32 mask)
 
 void RouteActor_UpdateRandomDestination(struct ChaseActor *actor)
 {
-    struct RouteActorDestinationState *state = actor->base.context;
+    struct Lun *state = actor->base.context;
     if (!TestFlag(actor, 0x100)) {
-        state->delay = 0;
-    } else if (state->delay) {
-        state->delay--;
+        state->routeDelay = 0;
+    } else if (state->routeDelay) {
+        state->routeDelay--;
     } else {
         struct ContactPosition target;
         struct ContactPosition *p;
-        struct SceneActorRouteCursor *route = &state->route;
+        struct SceneActorRouteCursor *route = (struct SceneActorRouteCursor *)&state->route;
         s32 cell;
         u16 attr;
         u32 kind;
@@ -1421,7 +1395,7 @@ void RouteActor_UpdateRandomDestination(struct ChaseActor *actor)
         }
         p->y = height;
         Lun_BeginMoveToPosition(actor, &target);
-        SceneActorControl_ResetTargetFlags((u8 *)actor);
+        SceneActorControl_ResetTargetFlags(actor);
     }
 }
 
@@ -1466,13 +1440,11 @@ void RouteActor_ReflectAtRaisedTerrain(struct ChaseActor *actor)
         height = Height(cell, &target);
         if (actor->base.groundHeight < height) {
             s32 zero;
-            s32 off = 0x2EC;
-            s16 *x = (s16 *)((u8 *)actor + off);
+            s16 *x = &actor->base.secondaryMotion.x;
             s32 value = -*x;
             zero = 0;
             *x = value;
-            off = 0x2F0;
-            x_2 = (s16 *)(((u8 *)actor) + off);
+            x_2 = &actor->base.secondaryMotion.z;
             value = -(*x_2);
             *x_2 = value;
             actor->base.body.motion.x = zero;
@@ -1625,7 +1597,7 @@ void Lun_RenewPlayerRoute(struct ChaseActor *actor)
     speed = Callback_InvokeActor(actor, actor->base.animationQuery.opaque);
     Lun_UpdateRouteAnimationScale(actor);
     Lun_UpdateSway(actor);
-    if (Approach(actor, (void *)(&body->curveSubject), speed) && Lun_StepCurveMotion(actor)) {
+    if (Approach(actor, &body->curveSubject, speed) && Lun_StepCurveMotion(actor)) {
         Lun_SetMovementEndpoints(actor, &gPlayers[0]->position);
         Lun_StepCurveMotion(actor);
         SceneActorTerrain_EnterState(actor, 0, 0, 1);
@@ -1677,11 +1649,6 @@ void Lun_InitSecondaryActionTable(u8 *p)
     *(u8 **)(p + 0x28c) = gUnk_08605E68;
 }
 
-struct RouteActorDestinationStateUpdatePlayerDestinationPhase {
-    u8 unknown0[0x442];
-    u16 delayDuration, delay;
-};
-
 static inline u16 SetFlag_UpdatePlayerDestinationPhase(struct ChaseActor *actor, u32 mask)
 {
     u16 *flags = &actor->base.motionFlags;
@@ -1691,10 +1658,10 @@ static inline u16 SetFlag_UpdatePlayerDestinationPhase(struct ChaseActor *actor,
 void RouteActor_UpdatePlayerDestinationPhase(struct ChaseActor *actor)
 {
     if (TakeFlag(&actor->base.field2B1)) {
-        struct RouteActorDestinationStateUpdatePlayerDestinationPhase *state = actor->base.context;
+        struct Lun *state = actor->base.context;
         SceneActorChase_SetControl(actor, Lun_UpdateWaitingAnimation, 10);
         SetFlag_UpdatePlayerDestinationPhase(actor, 0x100);
-        state->delay = state->delayDuration;
+        state->routeDelay = state->field442;
     }
     if (actor->base.stepDone)
         Lun_BeginMoveToPosition(actor, &gPlayers[0]->position);
@@ -2210,9 +2177,9 @@ s32 Lun_Init(void *);
 
 void Lun_Create(void)
 {
-    void *m = Heap_Alloc(0x44c);
+    void *m = Heap_Alloc(sizeof(struct Lun));
     if (m != 0) {
-        Memory_Clear(m, 0x44c);
+        Memory_Clear(m, sizeof(struct Lun));
         if (Lun_Init(m) < 0) {
             Lun_Destroy(m);
             Heap_Free(m);
