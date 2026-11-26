@@ -48,11 +48,11 @@ src/field/bouncing_object_pool,src/objects/bouncing_bombs,Nidhoggr’s grid atta
 src/field/breakable_props,src/objects/quest_barriers,0029→3931. 3DB0 E912 and sprite 474D shatter and unlock the Trinity scene when the recorded task is triggered. Other scenes supply different barrier sprites.
 src/field/cell_traversal_gates,src/objects/passage_barriers,0042→4755. GCL 71BA controls edge passage along the Wind Cannon row. Live approach clears the collision boundary and starts traversal.
 src/field/collision_controllers,src/objects/strike_traps.c,0866 slots respond to collision. Staged original hit in 3955 produces a visible marker and delayed particle blast.
-src/field/directional_interaction_controllers,src/objects/interaction_prompts.c,"883A positional prompt layer dispatches callbacks to show context-sensitive text, including White Forest fireball instruction #1690."
+src/field/directional_interaction_controllers,src/objects/interaction_prompts.c,0029→3955. Live A-button handler selects 883A slot E6CC and script 3954 opens the Fireball hint.
 src/field/group_objects,src/effects/scene/bat_flock.c,"The stock ROM draws a purple bat flock after a debugger call to the registered constructor and launch handler. Sprite package DA6D. The only constructor pointer is registry entry E534, absent from the GCX body. No shipped kind 10 cutscene packet sends any of its four commands."
 src/field/named_object,src/objects/moving_platforms,"0042→4808. A4FC ID 085F loads B019, updates its route and is released by a floor switch. Text #7181 calls it a moving platform."
 src/field/native_effect,src/effects/particles/projectile_motes.c,Staged 1C1A motion and real launch callback use the native trail particles.
-src/field/pooled_interactables,src/objects/light_puzzle_props.c,"0038→4479. B8CC is created by 2E1C from light-region wrapper 1174, with live Breakable_UpdateAll. The same GCL wrapper is used for candlestick and light spots."
+src/field/pooled_interactables,src/objects/light_fixtures.c,0038→4479. Script 2E1C ID B8CC draws the F099 candlestick. Its native hit response toggles a script flag and lights the room. Other kinds use the B991 and 999B fixtures.
 src/field/proximity_actor,src/objects/ice_boulders.c,0029→3955. Proc 1176 creates 377D. Native update draws the large blue 863A ice boulder.
 src/field/proximity_particle_emitter,src/effects/particles/tether_rings,"F156, 0BA8. Original ring and sparkles draw around the tether-proximity trigger."
 src/field/scene_debris/native_effect.c,src/effects/sprites/projectile_effects.c,"This file owns profile-driven rotating, accelerating and linear projectile effects. Keep it apart from Coffin Bike and cutscene scene debris."

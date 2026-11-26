@@ -936,3 +936,30 @@ of the trap room. This links the visible trap to the same slot
 whose press and contact handlers ran in the trace. The independent
 particle and collision draws in the other two renderer samples did
 not yield comparable slot-local addresses.
+
+### Candlestick and Fireball hint follow-up
+
+Tags: candlestick, light fixtures, Fireball, interaction prompts, 2E1C, 883A
+
+Load `review-prop-s0/arrived.ss` from the 0038 warp to 4479.
+The slot dump in `resume-light-inspect` locates B8CC at
+(1408, 512, 1408) and its F099 drawable at 02010C78. Reposition
+the Player and strike as in `resume-light-actions`. The sword
+reaches `Breakable_OnHit`. The `resume-candlestick` replay then
+supplies reaction bit 4 to that callback for the live slot.
+`Breakable_React` and `Breakable_RunScript` call proc 4478 at
+frame 1860. Compare `unlit.png` with `lit.png`. The flame appears
+on the candlestick and the lit portion of the floor expands.
+The renderer trace ties the candle and flame pieces to the slot's
+drawable. The pool's other sprite resources are B991 and 999B.
+
+Load `review-proximity/arrived.ss` from 0029 at 3955. In
+`resume-hint-actions`, stand near E6CC and align the Player before
+pressing A. At frame 1980 `DirectionalController_SelectTarget`
+selects 0200E174 from the normal input handler. The same update
+runs proc 3954, and `prompt-1-1.png` shows the Fireball heading.
+
+For both position preparations, read the current Player pointer from
+`gPlayers` at 02000580. Confirm it against the `Player_Update`
+probe and add the position field offset 0x30. The actor address
+varies by room and checkpoint.
