@@ -1,0 +1,40 @@
+08119B80 glove-command-dispatch-return
+
+The no-message path preserves p in r0 after the attachment position stores.
+Otherwise the final SceneMessages_SetPendingTrigger provides the result.
+
+The explicit form changed the ROM bytes. The guarded form passed the unit ROM check.
+
+--- a/src/fn/sub_08119B80.c
++++ b/src/fn/sub_08119B80.c
+@@ -18,5 +18,9 @@
+ void *ActorAttachment_ReleaseResource(void *, s32, u32);
+ void *ActorAttachment_ReleasePartsResource(void *, s32, u32);
++#ifdef UBFIX
++u32 SceneMessages_SetPendingTrigger(void *, void *);
++#else
+ void SceneMessages_SetPendingTrigger(void *, void *);
++#endif
+ static inline u8 IsActive(struct GloveDraw *motion)
+ {
+@@ -50,4 +54,7 @@
+     s32 i;
+     struct GloveCommand *cmd;
++#ifdef UBFIX
++    s32 result = (s32)p;
++#endif
+     if (!IsActive(motion))
+         return 0;
+@@ -135,5 +142,12 @@
+                     break;
+             }
++#ifdef UBFIX
++            result = SceneMessages_SetPendingTrigger(queue, cmd);
++#else
+             SceneMessages_SetPendingTrigger(queue, cmd);
++#endif
+         } while (++i < queue->count[gSceneEventDispatchState->bank]);
++#ifdef UBFIX
++    return result; // r0 retains the final message result or actor pointer
++#endif
+ }
