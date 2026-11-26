@@ -304,6 +304,12 @@ executes `ActorRecoil_ReceiveBodyContact` (081162D8) and
 neither, and the HP drop is visible in `bike-impact/obstacles.png`. Name the
 ride and recoil units `src/minigames/coffin_bike`.
 
+The same `Glove_UpdateTask` (0811A604) drives the riders in the two-player
+Back Street Bike Battle. The linked mGBA replay described below records
+948 calls per core over the sampled race window. Both players and their
+separate HUD values are visible in `build/identify/link-peer/play-3-0.png`
+and `play-3-1.png`.
+
 In a copy of stock 0072, set GameState+063C to 100000 and +0638 to 1 to select
 Sabata's ending branch. Continue from 6323, tap A and wait 28 frames repeatedly.
 Script 6316 invokes A8CB at frame 2534 while Django's own bike is still
@@ -393,8 +399,39 @@ sequence for the other modes.
 Five late files go in `player/link_actions`. `Player_AccumulateActionCharge`
 (0823C02C) gets its charge from the link-session update paths. The other
 four are indexed by 08E87A10 or 08E87A90 from `Player_UpdateLinkKind` and
-`Player_UpdateHalfChargeLinkKind`. These moves follow the Link dispatch.
-The capture set has no connected peer replay.
+`Player_UpdateHalfChargeLinkKind`. The `link_actions` path describes that
+dispatch family. Its shipped entry point is still unconfirmed. The latter
+dispatcher has no code or pointer cross-reference in the generated assembly
+or the ROM literal search. The constructor at 08243B0C, which installs
+`Player_UpdateLinkCore`, likewise has no direct caller or literal pointer.
+
+### Connected Bike Battle control
+
+The scratch host at `build/identify/link-peer/peer.c` connects two mGBA
+0.11 cores with the library's `GBASIOLockstepCoordinator`. It runs them
+one at a time at matched emulated timestamps and loads copies of stock
+batteries 0032 and 0070. Connect at title **Link → Bike Battle**. Wait for
+both players to show ENTRY, press START to open the primary player's
+course selection, and confirm Back Street. Press START on each core's
+customization screen. The start banner, independent movement and the
+two active HUDs show the match advancing beyond setup.
+
+```sh
+cp build/saves/0032.sav build/identify/link-peer/player0.sav
+cp build/saves/0070.sav build/identify/link-peer/player1.sav
+build/identify/link-peer/peer baserom.gba \
+  build/identify/link-peer/player0.sav build/identify/link-peer/player1.sav \
+  build/identify/link-peer/bike-play.txt
+```
+
+Build the scratch host against the same mGBA include paths, build defines
+and library as `tools/emu/Makefile`. `bike-start.log` records the serial
+menu's choice exchange on both cores. `bike-play.log` records zero calls
+to each of 0823C02C, 0823D080, 0823D3A0, 0823FE94 and 08240F9C during the
+race. It also records zero calls to their three observed dispatch parents.
+`Glove_UpdateTask` runs on both cores. The samples give a connected Bike
+Battle control for the late Player files, whose actual gameplay route
+remains open.
 
 The extra `src/player/sub_*.c` rows in `corrections.csv` override the
 corresponding `player_files_*.txt` membership. Apply them by removing each
