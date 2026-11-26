@@ -397,6 +397,20 @@ source evidence. The ordinary gun and sword actions both take motion 3,
 and none of the controlled motion captures establishes a regular input
 sequence for the other modes.
 
+### Spiral Burst startup
+
+Entering mode 17 first exercises its animation loop. To witness the
+initial cast, `build/identify/effect_harness.c` calls the original
+08144624 routine while Django is still idle in the 0016 outdoor snapshot.
+The harness clears the selected resource timer and seeds the sunlight
+level immediately before entering the routine. Use `stageplayer 08144624 0`
+and `stageplayer 08144624 8` from the same state. The first resource check
+returns 0. The second returns 1, calls `SpiralBurst_Create` (082347C8) and
+draws the green spiral around Django. Both weapon probes stay idle. See
+`build/identify/replays/spiral-start/comparison.png`, `commands.txt` and
+`probes.tsv`. The sunlight dependency and visual are verified in this
+controlled run. The normal input trigger remains open.
+
 ### Plasma Cannon contact and the timed reaction
 
 Load 0060 with `scene=5875 entrance=7 story=166`. The cannon's native update
@@ -561,6 +575,8 @@ Read the running actor's category byte at `RoomActor+0x98` in the dump
 made by `tentacle-dark-room/commands.txt`. It is 9. The defeat path passes
 this category to `Bestiary_GetEntryForActor`, which maps it to entry 13,
 text #9851, Centipede. Merge both units at `src/monsters/centipede`.
+The similarly named `Centipede_Create` registry entry 0AD8 queues a terrain
+overlay command. The visible combatant uses the 0AC7 constructor.
 
 The story order is Count → Hresvelgr → Sabata → Nidhoggr → Ratatosk →
 Vanargand after the opening dream. The table records each arena and the
