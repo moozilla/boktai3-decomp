@@ -8,9 +8,9 @@
 #include "engine/ram.h"
 #include "engine/runtime.h"
 #include "engine/engine_globals.h"
+#include "link/session/link_session_state.h"
 #include "scene/collision/scene_actor_contact_list.h"
 
-extern u32 gLinkSession;
 void SceneActorPalette_BeginTransition(u32, u32, u32, s32, u32);
 void ActorShadow_Enable(void *);
 void ActorShadow_Disable(void *);
@@ -313,7 +313,7 @@ static inline void ActorStatus_Palette(struct ChaseActor *actor)
     if (SceneEnvironment_LinkMode()) {
         if (gLinkSession == 0)
             return;
-        res = *(s16 *)(gLinkSession + 0x18);
+        res = gLinkSession->localPlayer;
         if ((s32)res >= 0)
             goto valid_player;
         return;
