@@ -36,8 +36,6 @@ static inline void Show(struct ChaseActor *a)
 
 void SceneActorReaction_SinkAndRemove(struct ChaseActor *actor, s32 frame)
 {
-    u32 state;
-
     if (SceneActorReaction_TakePrepared(actor)) {
         struct ContactCollider *collider = &actor->base.colliderA;
         u32 category = actor->base.category;
@@ -55,18 +53,7 @@ void SceneActorReaction_SinkAndRemove(struct ChaseActor *actor, s32 frame)
             *destination = mask;
         }
         Show(actor);
-        {
-            u32 zero;
-            u8 *first;
-            state = 3;
-            first = &actor->base.state2A8;
-            zero = 0;
-            *first = state;
-            actor->base.phase2A9 = zero;
-            actor->base.behavior2AA = zero;
-            actor->base.counter2AC = zero;
-            actor->base.field2B1 = 1;
-        }
+        SceneActorTerrain_EnterState(actor, 3, 0, 0);
         actor->base.attachmentTimer = 0;
         actor->base.restart = 0;
         collider->responseValue = 0;
@@ -87,7 +74,6 @@ void SceneActorReaction_SinkAndRemove(struct ChaseActor *actor, s32 frame)
                 actor->base.body.position;
         if (frame > 8) {
             u16 zeroWord = 0;
-            u32 zeroByte = 0;
             {
                 s16 health = zeroWord;
                 actor->base.health = health;
