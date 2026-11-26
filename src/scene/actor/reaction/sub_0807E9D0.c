@@ -28,7 +28,7 @@ static inline void AimAtContactTarget(struct ChaseActor *actor)
 {
     struct SceneActorChaseTarget *target;
     if (SceneActorChase_HasPlacementFlags(actor, 2))
-        actor->base.tracking.target = &((struct SceneActorChasePlayer *)gPlayers[0])->target;
+        SceneActorChase_TrackPlayer(actor);
     else if (actor->base.tracking.target == 0)
         return;
     target = actor->base.tracking.target;
@@ -45,7 +45,7 @@ static inline void SelectContactTarget(struct ContactCollider *source, void *obj
     s32 flagged = 0;
     u16 owners = source->contactFlags;
     if (owners & 1) {
-        actor->base.tracking.target = &((struct SceneActorChasePlayer *)gPlayers[0])->target;
+        SceneActorChase_TrackPlayer(actor);
         flagged = 1;
     } else if (owners & 2) {
         actor->base.tracking.target = &((struct SceneActorChasePlayer *)gPlayers[1])->target;
@@ -106,23 +106,23 @@ available:
 }
 static inline void SpawnContactParts(struct ChaseActor *actor)
 {
-    union SceneActorRegistryPackedPosition velocity, bounds, position;
+    struct ContactPosition velocity, bounds, position;
     s32 i;
     for (i = 0; i < 3; i++) {
         union RandomTableView table = {gRandomTable};
         const struct ContactPosition *origin;
-        velocity.packed.x = ((s8)SceneActorEffects_NextSample(table.samples) & 15) - 7;
-        velocity.packed.y = (SceneActorEffects_NextSample(table.samples) & 31) - 16;
-        velocity.packed.z = ((s8)SceneActorEffects_NextSample(table.samples) & 15) - 7;
-        bounds.packed.x = 5;
-        bounds.packed.y = 10;
-        bounds.packed.z = 5;
+        velocity.x = ((s8)SceneActorEffects_NextSample(table.samples) & 15) - 7;
+        velocity.y = (SceneActorEffects_NextSample(table.samples) & 31) - 16;
+        velocity.z = ((s8)SceneActorEffects_NextSample(table.samples) & 15) - 7;
+        bounds.x = 5;
+        bounds.y = 10;
+        bounds.z = 5;
         origin = actor->group.effectOrigin;
-        position.packed.x = origin->x;
-        position.packed.y = origin->y + 128;
-        position.packed.z = origin->z;
-        EffectGroup_SpawnPart((void *)actor->group.effectConfig, 3, &position.position,
-                              &velocity.position, &bounds.position, 40, 40);
+        position.x = origin->x;
+        position.y = origin->y + 128;
+        position.z = origin->z;
+        EffectGroup_SpawnPart((void *)actor->group.effectConfig, 3, &position,
+                              &velocity, &bounds, 40, 40);
     }
     actor->base.attachmentTimer = 0;
     actor->base.hitLockTimer = 0;
