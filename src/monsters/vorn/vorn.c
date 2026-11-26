@@ -1,3 +1,4 @@
+#include "scene/actor/scene_actor_drawable_flags.h"
 #include "global.h"
 #include "scene/motion/scene_actor_availability.h"
 #include "scene/actor/scene_actor_reset.h"
@@ -254,65 +255,20 @@ extern void ActorShadow_Disable(void *);
 
 void Vorn_RestoreSavedState(struct ChaseActor *s);
 
-static inline u8 take6030(u8 *s)
+
+void Vorn_UpdateHiddenRecovery(struct ChaseActor *actor, s32 frame)
 {
-    if (s[0x2B2]) {
-        s[0x2B2] = 0;
-        return 1;
-    }
-    return 0;
-}
-
-struct Obj6030 {
-    u32 flags;
-    u8 pad[0x1C];
-};
-
-struct Part6030 {
-    u8 pad[8];
-    u32 flags;
-};
-
-void Vorn_UpdateHiddenRecovery(u8 *s, s32 arg, u32 unused)
-{
-    u32 queued = take6030(s);
+    u32 queued = SceneActorReaction_TakePrepared(actor);
     if (queued) {
-        u32 mask = 1;
-        if (s[8] == 0) {
-            struct Obj6030 *obj = *(struct Obj6030 **)(s + 4);
-            u32 value = obj->flags;
-            obj->flags = value | mask;
-        } else {
-            struct Obj6030 *obj = *(struct Obj6030 **)(s + 4);
-            struct Part6030 *part = (struct Part6030 *)((u8 *)obj + 0x20);
-            u32 value = part->flags;
-            part->flags = value | mask;
-        }
-        ActorShadow_Disable(s + 0x320);
-    } else if (arg > 0x1A) {
-        void (*fn)(void);
-        u32 code;
-        u32 *flags;
-        u32 mask;
-        SceneActorAnimation_SelectDirectionalEntry(s, 9);
-        fn = Vorn_RestoreSavedState;
-        code = 0xD;
-        s[0x2B2] = 1;
-        s[0x2B0] = queued;
-        s[0x2B5] = code;
-        *(void (**)(void))(s + 0x21C) = fn;
-        *(u16 *)(s + 0x2C8) = queued;
-        flags = (u32 *)(s + 0x114);
-        mask = ~1;
-        *flags &= mask;
-        *(u32 *)(s + 0x104) = queued;
+        ActorStatus_SetDrawableFlags(actor, 1);
+        ActorShadow_Disable(actor->base.shadow);
+    } else if (frame > 0x1A) {
+        SceneActorAnimation_SelectDirectionalEntry(&actor->base, 9);
+        SceneActorChase_SetControl(actor, Vorn_RestoreSavedState, 13);
     } else {
-        s[0x2B3] = queued;
+        actor->base.restart = queued;
     }
 }
-
-/* Observed in this callback: owner flags at +0 and inner +0x20/+8.
- * The snapshot fields below are copied and reset at the listed offsets. */
 
 void ActorShadow_Enable(void *);
 
@@ -320,14 +276,6 @@ void SceneActor_ResetContextAnimation(struct Vorn *);
 
 void SceneActorPalette_ClearCompletedTransitions(void);
 
-static inline u8 take_flag(struct ChaseActor *s)
-{
-    if (s->base.field2B2) {
-        s->base.field2B2 = 0;
-        return 1;
-    }
-    return 0;
-}
 
 /* Keep this byte predicate local; its address is not retained by the body. */
 
@@ -339,23 +287,10 @@ static inline u8 peek_flag(struct ChaseActor *s)
 void Vorn_RestoreSavedState(struct ChaseActor *s)
 {
     s32 n;
-    if (take_flag(s)) {
+    if (SceneActorReaction_TakePrepared(s)) {
         ActorShadow_Enable(s->base.shadow);
-        if (!s->base.drawableKind) {
-            u32 *q = &((struct SceneActorRegistrySequenceDrawable *)s->base.drawable)->flags;
-            u32 mask = ~1;
-            *q = mask & *q;
-        } else {
-            struct SceneActorAnimationTileDrawable *drawable = s->base.drawable;
-            struct AnimSprite *q = &drawable->tile;
-            u32 mask = ~1;
-            q->flags = mask & q->flags;
-        }
-        {
-            u16 one = 1;
-            s->base.health = one;
-        }
-        s->base.colliderA.responseValue = 60;
+        ActorStatus_ClearDrawableFlags(s, 1);
+        SceneActorReaction_BeginRevival(&s->base, 1);
     }
     if (!peek_flag(s))
         return;
