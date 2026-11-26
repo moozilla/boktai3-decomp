@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 struct Nd;
 struct T;
 struct Nd *HashTable_FindNode(struct T *t, u32 key);

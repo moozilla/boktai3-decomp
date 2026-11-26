@@ -1,5 +1,5 @@
-#include "modifier_list.h"
-#include "ram.h"
+#include "scene/actor/modifier_list.h"
+#include "engine/ram.h"
 
 // MATCHING_CONCESSION: register-pinning
 void ModifierMenu_SelectPendingSource(struct ModifierMenu *menu)

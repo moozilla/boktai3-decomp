@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 extern const u32 gUnk_08612004[];
 s32 ScenePanel_RequestPairReaction(u8 *);
 void Callback_InvokeActor(u8 *, u32);

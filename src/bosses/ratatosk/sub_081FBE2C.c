@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 #include "bosses/ratatosk/ratatosk_particle.h"
 
 s32 Ratatosk_OnAnimatedParticleUpdate(struct RatatoskParticle *particle, s32 slot)

@@ -1,4 +1,4 @@
-#include "scene_actor_chase.h"
+#include "scene/actor/scene_actor_chase.h"
 
 // confidence=low: periodically probes a randomized heading and updates the Spider route endpoint and cooldown.
 

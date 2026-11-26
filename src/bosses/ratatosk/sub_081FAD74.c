@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 
 /* Observed component starts; component extents remain unknown. */
 struct Ratatosk {

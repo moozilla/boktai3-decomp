@@ -1,6 +1,6 @@
-#include "engine/shared/global.h"
+#include "global.h"
 #include "bosses/ratatosk/ratatosk.h"
-#include "menus/scene_indicators/scene_indicator.h"
+#include "ui/hud/scene_indicator.h"
 
 struct HitResponse {
     u8 pad0[0x3e];

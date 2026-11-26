@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 // confidence=low: selects a reaction animation from the boss reaction mode.
 struct Actor {
     u8 pad0[0x51];

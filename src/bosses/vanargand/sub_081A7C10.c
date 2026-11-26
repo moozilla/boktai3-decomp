@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 struct ScenePanelPairSequence {
     u8 unknown0[0x5C4];
     u8 state, cursor, transition;

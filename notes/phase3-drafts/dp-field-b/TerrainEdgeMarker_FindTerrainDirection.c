@@ -1,5 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
-#include "terrain_edge_marker.h"
+#include "scene/terrain/terrain_edge_marker.h"
 static inline u32 TerrainMarker_GetCellIndex(union TerrainMarkerPosition *position)
 {
     s32 x = position->world.x >> 8;

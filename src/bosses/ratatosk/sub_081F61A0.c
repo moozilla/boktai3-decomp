@@ -1,5 +1,5 @@
 #define gSceneAngleSineTable gUnk_086149C4
-#include "engine/shared/global.h"
+#include "global.h"
 typedef struct SceneParticleActor {
     u8 pad0[0x90];
     u32 tick;

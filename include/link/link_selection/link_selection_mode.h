@@ -1,7 +1,7 @@
 #ifndef GUARD_LINK_SELECTION_MODE_H
 #define GUARD_LINK_SELECTION_MODE_H
 
-#include "engine/shared/global.h"
+#include "global.h"
 
 /* A participant's selection word (struct AreaEffectLinkState selection[]) holds a mode in
  * bits 10-13 (mask 0x3C00) and a value in the low bits. Each test takes the mode mask from

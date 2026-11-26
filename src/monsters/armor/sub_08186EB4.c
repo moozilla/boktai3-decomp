@@ -1,5 +1,5 @@
-#include "engine/shared/global.h"
-#include "engine/shared/engine_globals.h"
+#include "global.h"
+#include "engine/engine_globals.h"
 struct ArmorDecisionActor {
     u8 pad0[0x18];
     u16 taskFlags;

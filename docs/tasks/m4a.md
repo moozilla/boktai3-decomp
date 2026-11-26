@@ -26,7 +26,7 @@ mapping in `symbols/proposed/m4a.csv`.
 
 * Headers: copy what's needed from pokeemerald `include/gba/` into
   `include/gba/` with a header comment crediting pret (see THIRD_PARTY.md).
-  Make `include/engine/shared/global.h` compatible (it already defines u8/u16/...; avoid
+  Make `include/global.h` compatible (it already defines u8/u16/...; avoid
   duplicate typedefs, e.g. include `gba/types.h` from global.h instead).
 * m4a.c references RAM globals (`gSoundInfo`, `gMPlayJumpTable`, `gCgbChans`,
   `gMPlayMemAccArea`, ...) and ROM tables (`gCgbScaleTable`, `gNoiseTable`,

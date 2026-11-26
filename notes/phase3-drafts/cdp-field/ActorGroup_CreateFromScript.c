@@ -1,7 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
-#include "display_sprite_playback.h"
-#include "ram.h"
+#include "engine/video/display_sprite_playback.h"
+#include "engine/ram.h"
 struct Frames {
     u16 *data;
     u8 flags;

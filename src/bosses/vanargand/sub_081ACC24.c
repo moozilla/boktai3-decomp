@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 #include "bosses/vanargand/vanargand_pair_attack.h"
 #include "bosses/vanargand/vanargand_stage_colors.h"
 void Sound_PlaySong(u32);

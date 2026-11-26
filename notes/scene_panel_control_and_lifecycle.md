@@ -5,14 +5,14 @@ Tags: #scene #panel #matching #types
 Range: `0805B28C–0805CB88` (end exclusive).
 
 Consolidated the 48 existing implementations in ROM order into
-`src/menus/scene_panel_control_and_lifecycle/scene_panel_control_and_lifecycle.c`. All 48 were already matched; this
+`src/objects/pile_driver/scene_panel_control_and_lifecycle.c`. All 48 were already matched; this
 is type recovery and consolidation, with no newly matched functions, drafts,
 or gap functions. The range remains 100% matching, a gain of 0 percentage
 points (6,396 retained exact bytes).
 
 ## Shared types
 
-Reused `include/menus/scene_panel_presentation/scene_panel.h`, because these are the same parent, rig and
+Reused `include/objects/pile_driver/scene_panel.h`, because these are the same parent, rig and
 subjects already described by that header. It now contains the combined
 `ScenePanel` layout, the existing complete subject layout as
 `ScenePanelSubject`, the embedded `ScenePanelRig` and its sprite type, palette

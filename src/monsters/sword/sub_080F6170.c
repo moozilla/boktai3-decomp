@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 void Sword_BeginTargetOrbit(u8 *);
 void Callback_InvokeActor(u8 *, void (*)(u8 *));
 static inline u8 Take(u8 *s)

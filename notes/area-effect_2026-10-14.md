@@ -14,7 +14,7 @@ resource accumulator. Exact gameplay identity is not yet established.
 
 ## Shared layout and contracts
 
-`include/field/rectangular_area_effects/area_effect.h` describes the manager behind **0200010C**. Its creator
+`include/scene/area_effect/area_effect.h` describes the manager behind **0200010C**. Its creator
 allocates 0xAB4 bytes, precisely the 0x2C-byte prefix, sixteen 0xA8-byte entries,
 and four trailing fractional counters. Prefix: player18, initial particle mode
 1C, resource fraction1E, idle frame20, action frame22, graphics ID24, count26,

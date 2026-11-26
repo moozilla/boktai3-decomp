@@ -1,5 +1,5 @@
-#include "scene_actor_registry.h"
-#include "player.h"
+#include "scene/actor/scene_actor_registry.h"
+#include "player/player.h"
 u8 *TerrainModifiers_FindCellOverride(s32, s32);
 s32 Nav_IsPositionInMesh(void *, const struct ContactPosition *, const struct ContactPosition *);
 s32 Terrain_ApplyBlocked(void *, const struct ContactPosition *, const struct ContactPosition *);

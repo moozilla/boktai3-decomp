@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 void *ScriptProc_Start(u32, u32);
 void ResourceHeader_Relocate(u8 *, void *);
 void Widget_InitLinked(u8 *, u8 *, u32, u32, u32, u32, u32, u8 *);

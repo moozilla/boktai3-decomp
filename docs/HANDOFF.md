@@ -34,8 +34,9 @@ not by fuzzy scores. Blind spelling sweeps don't count.
 
 ## Where things stand (2026-11-25)
 
-Source and headers are grouped by subsystem. [SOURCE_LAYOUT.md](SOURCE_LAYOUT.md)
-explains where new files belong and how to find a function by name or ROM address.
+Source and headers use the reviewed placement tables in `symbols/`.
+[SOURCE_LAYOUT.md](SOURCE_LAYOUT.md) maps the directories and explains where
+new files belong and how to find a function.
 
 Numbers live only in [PROGRESS.md](../PROGRESS.md) (regenerated at batch integration) and
 the README badges. Use `python3 tools/progress.py` for the current figures and
@@ -46,7 +47,11 @@ the README badges. Use `python3 tools/progress.py` for the current figures and
 | Build | `make` rebuilds the ROM byte-identical (`build/boktai3.gba: OK`, SHA-1 `2651c5e6…`) |
 | Phase 1 | complete: every function has C |
 | Phase 2 | complete: every function matches; no `#ifdef NONMATCHING` drafts are left |
-| Phase 4 | the object model: [OBJECT_MODEL.md](OBJECT_MODEL.md) describes tasks, the registry actor and pool slots. Monsters derive from `struct RoomActor` (`include/link/registry_1745/room_actor.h`) or `struct ChaseActor` (`include/engine/shared/chase_actor.h`), with named and typed method slots and `enum MonsterCategory`; the per-header views and the `SCENE_ACTOR_CHASE_*` selector macros are gone. The eleven registry classes (Spider, Octopus, Ivy, Lun, Bat, Axe, Dog, Mummy, Vorn, Golem, Skeleton) are class units in `src/`; the functions that match only alone are explained in [notes/unit-context-sensitivity_2026-11-16.md](../notes/unit-context-sensitivity_2026-11-16.md) |
+<<<<<<< HEAD
+| Phase 4 | the object model: [OBJECT_MODEL.md](OBJECT_MODEL.md) describes tasks, the registry actor and pool slots. Monsters derive from `struct RoomActor` (`include/link/session/room_actor.h`) or `struct ChaseActor` (`include/monsters/chase_actor.h`), with named and typed method slots and `enum MonsterCategory`; the per-header views and the `SCENE_ACTOR_CHASE_*` selector macros are gone. The eleven registry classes (Spider, Octopus, Ivy, Lun, Bat, Axe, Dog, Mummy, Vorn, Golem, Skeleton) are class units in `src/`; the functions that match only alone are explained in [notes/unit-context-sensitivity_2026-11-16.md](../notes/unit-context-sensitivity_2026-11-16.md) |
+=======
+| Phase 4 | the object model: [OBJECT_MODEL.md](OBJECT_MODEL.md) describes tasks, the registry actor and pool slots. Monsters derive from `struct RoomActor` (`include/link/session/room_actor.h`) or `struct ChaseActor` (`include/monsters/chase_actor.h`), with named and typed method slots and `enum MonsterCategory`; the per-header views and the `SCENE_ACTOR_CHASE_*` selector macros are gone. The eleven registry classes (Spider, Octopus, Ivy, Lun, Bat, Axe, Dog, Mummy, Vorn, Golem, Skeleton) are class units in `src/`; the functions that match only alone are explained in [notes/unit-context-sensitivity_2026-11-16.md](../notes/unit-context-sensitivity_2026-11-16.md) |
+>>>>>>> 38c9b5978
 | Phase 3 | 3b in progress: 3 linter errors (volatile: the two scene link-list insertions and the scene camera global) and a use-weighted steering-debt subtotal in the linter summary. The [flag-order survey](../notes/flag-accessors_2026-11-25.md) gives the evidence for accepting a shared flag operation. The 2026-11-22 run recovered boss, Player, monster and menu types by subsystem and cleared two hard sites; its [report](../notes/claude-warning-run_2026-11-22.md) says what worked (type recovery first, plain loops), what the count hides (constants moved into accessor arguments) and the leads not taken. Hard sites: [hard-sites_2026-11-23.md](../notes/hard-sites_2026-11-23.md). Earlier: the [round-15 report](../notes/round15-priority-recovery.md) and [union review](../notes/round15-union-review.md). A falling count is not evidence of plausible original source. |
 | Data | fully relocatable; `make shifttest` compares 35 emulator screenshots after moving data. decomp.dev's data measure is ROM data that round-trips through an editable form (`tools/data_roundtrip.py`), by kind ([DATA_TRACKING.md](DATA_TRACKING.md)); RAM is tracked in PROGRESS.md |
 | Report | every function in one of ~490 subsystem units under 11 categories plus Libraries ([REPORT_SUBSYSTEMS.md](REPORT_SUBSYSTEMS.md)); main-only CI publishes to decomp.dev |
@@ -98,7 +103,7 @@ Recent (details in [docs/history/](history/README.md) and the notes they link):
   them). `tools/unselect.py` replaces selector macros with a file's own copies of the
   inlines. `tools/fold_views.py`, `tools/struct_views.py`, `tools/merge_resolve.py` and
   `tools/header_dependents.py --since REV --check` support class folds and unit merges.
-* **ARM code**: `sub_08000430` (IWRAM, `src/engine/iwram_arm_code/iwram_code.c`) matched without pinning
+* **ARM code**: `sub_08000430` (IWRAM, `src/engine/iwram_code.c`) matched without pinning
   through an instrumented ARM compiler (`agbcc_arm`; [notes/arm-08000430.md](../notes/arm-08000430.md)).
   scope compiles Thumb only.
 

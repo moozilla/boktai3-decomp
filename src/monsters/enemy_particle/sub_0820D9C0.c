@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 
 void EnemyParticle_EnableShadow(u8 *p)
 {

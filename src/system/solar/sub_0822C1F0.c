@@ -1,6 +1,6 @@
-#include "engine/shared/global.h"
-#include "engine/shared/runtime.h"
-#include "engine/shared/ram.h"
+#include "global.h"
+#include "engine/runtime.h"
+#include "engine/ram.h"
 struct S {
     u8 p[0x19];
     u8 b;

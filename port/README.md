@@ -100,10 +100,9 @@ What's left:
   not been compared sample-for-sample with mGBA.
 * Wireless (RFU) link play is stubbed.
 * Soft-float and EEPROM SDK routines are port replacements, not the original C.
-* The older slice builds (`port/build.py --slice`, `run_boot.py`, `run_rtc.py`,
-  `run_returns_slice.py`, `run_display_bus.py`) name `src/fn/*.c` files that main
-  has since folded into units, so they fail on main too; the full-game build
-  replaces them.
+* The full-game build replaces the older slice builds (`port/build.py --slice`,
+  `run_boot.py`, `run_rtc.py`, `run_returns_slice.py`, `run_display_bus.py`).
+  Some of their individual source files now live inside larger units.
 
 ## Build the C
 ## Hardware slice
@@ -123,7 +122,7 @@ LLVM clang is selected from Homebrew when available; override with `--cc` or
 `PORT_CC`. Four compiler processes run by default (`-j`). Each source retains its
 own object under `build/port/TARGET/src/`, and `compile.json` records every unit,
 its result and diagnostic path. Unchanged inputs are cached by content, compiler
-identity and flags. `--source src/engine/game_entry_point/AgbMain.c` limits a diagnostic run.
+identity and flags. `--source src/engine/AgbMain.c` limits a diagnostic run.
 
 The wasm32 compile sweep currently passes all **10,169 translation units**,
 including `src/lib/`. This proves compilation, not a linked or playable game.

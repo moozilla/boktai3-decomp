@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 
 void Registry1745_SetState(u8 *, u32, void (*)(void));
 void LinkSelection_ExchangeParticipantInput(void);

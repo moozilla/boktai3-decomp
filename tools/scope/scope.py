@@ -5388,7 +5388,7 @@ def explain_regmove(wd, uid, gone, new, nm, at):
               " if, or give the result its own variable that is read before the operation. For a"
               " byte read and masked (`u8` flags), read it into a byte union and narrow the and:"
               " `control.raw = a->flags; first = (u8)(control.raw & bit);` (DisplaySequence_ApplyFrame,"
-              " include/engine/shared/display_sequence_inline.h; it matched AnimatedTile_TickAlternateAnimation where"
+              " include/engine/video/display_sequence_inline.h; it matched AnimatedTile_TickAlternateAnimation where"
               " `u8 left`/`u8 input` did not). For a u16/u8 field masked by a constant, write the and"
               " on the read itself, `(*field & K)`, not through u32 variables: the constant then sits in"
               " an HImode pseudo read through a subreg, which regmove does not tie, and cse does not move a"
@@ -7961,7 +7961,7 @@ def cmd_new(target):
             head, where_ = tree_prototype(name)
             if where_:
                 seed += f" with the signature {where_} declares"
-            out = (f'#include "engine/shared/global.h"\n\n// scope: write {name} here (`scope.py rom {name}`)\n'
+            out = (f'#include "global.h"\n\n// scope: write {name} here (`scope.py rom {name}`)\n'
                    f"{head or f'void {name}(void)'}\n{{\n}}\n")
     g = ghidra_c(addr)
     if g:  # a reading aid inside the stub: Ghidra's types and control flow, never matching C

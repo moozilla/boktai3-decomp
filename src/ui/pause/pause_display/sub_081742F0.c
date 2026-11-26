@@ -1,0 +1,52 @@
+#include "global.h"
+void PauseMenu_CloseTextWindows(u8 *);
+void Hud_SetupBackgroundLayer(u8 *, u32, u32, u32, u32);
+void PauseMenu_HideAllSprites(u8 *);
+void PauseMenu_LoadSpriteKeyframe(u8 *, u32, u32);
+void PauseMenu_ClearSpriteFlags(u8 *, u32, u32);
+void PauseMenu_ShowPromptSprite(u8 *, u32, u32);
+void Hud_DrawDefaultHealthMeter(u8 *, u32, u32, u32);
+void Hud_DrawDefaultEnergyMeter(u8 *, u32, u32, u32, u32, u32);
+void Hud_DrawHeaderCounter(void);
+void InventoryPanel_UpdateSelectedUnlock(u8 *, u32, u32, u32, u32);
+void InventoryPanel_UpdateSelectedEquipment(u8 *, u32, u32, u32, u32);
+void MenuDisplay_SnapshotValues(u8 *);
+void MenuDisplay_DrawStatComparison(u8 *, u32, u32);
+void PauseInventory_InitItemCursors(u8 *);
+void SceneHud_LayoutEquipmentGrid(u8 *);
+void InventoryPanel_ShowStatusIcons(u8 *);
+void SceneHud_RefreshEquipmentIcons(u8 *, u32);
+void Hud_SetInteractionCallback(u8 *, void (*)(void), u32);
+void Hud_UpdateInventoryMenuInput(void);
+void PauseMenu_SetPromptIconPositions(u8 *, u32, s32);
+void MenuDisplay_UpdateActionPrompt(u8 *, u32);
+void MenuDisplay_SetPaletteOverrides(u8 *, u32, u32, u32, u32);
+void ScrollingDialogue_HideImmediately(void);
+void Hud_InitInventoryMenu(u8 *s)
+{
+    u8 *p;
+    PauseMenu_CloseTextWindows(s);
+    Hud_SetupBackgroundLayer(s, *(u32 *)(s + 0x18), 0, 6, *(u32 *)(s + 0x2C));
+    PauseMenu_HideAllSprites(s);
+    PauseMenu_LoadSpriteKeyframe(s, 0, 0x55);
+    PauseMenu_ClearSpriteFlags(s, 0x4D, 1);
+    PauseMenu_LoadSpriteKeyframe(s, 8, 0x65);
+    PauseMenu_ShowPromptSprite(s, 8, 0x20);
+    Hud_DrawDefaultHealthMeter(s, 1, 2, 12);
+    p = *(u8 **)(s + 0xA40);
+    Hud_DrawDefaultEnergyMeter(s, 1, 2, 14, *(u16 *)(p + 0x428), *(u16 *)(p + 0x42A));
+    Hud_DrawHeaderCounter();
+    InventoryPanel_UpdateSelectedUnlock(s, 8, 3, 0, 0);
+    InventoryPanel_UpdateSelectedEquipment(s, 8, 4, 0, 0);
+    MenuDisplay_SnapshotValues(s);
+    MenuDisplay_DrawStatComparison(s, 10, 6);
+    PauseInventory_InitItemCursors(s);
+    SceneHud_LayoutEquipmentGrid(s);
+    InventoryPanel_ShowStatusIcons(s);
+    SceneHud_RefreshEquipmentIcons(s, 0);
+    Hud_SetInteractionCallback(s, Hud_UpdateInventoryMenuInput, 0);
+    PauseMenu_SetPromptIconPositions(s, 0, 0);
+    MenuDisplay_UpdateActionPrompt(s, 2);
+    MenuDisplay_SetPaletteOverrides(s, 0, 1, 0, 0);
+    ScrollingDialogue_HideImmediately();
+}

@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 extern const u16 gUnk_08E879EC[];
 u16 LinkPlayer_GetAbilityCostById(u32 i)
 {

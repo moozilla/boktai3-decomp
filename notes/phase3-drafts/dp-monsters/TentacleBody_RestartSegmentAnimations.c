@@ -1,7 +1,7 @@
 #include "global.h"
-#include "tentacle_segment_animation.h"
-#include "display_animation.h"
-#include "display_sequence_inline.h"
+#include "monsters/centipede/tentacle_segment_animation.h"
+#include "engine/video/display_animation.h"
+#include "engine/video/display_sequence_inline.h"
 // MATCHING_CONCESSION: register-pinning
 
 void *SceneActorProfiles_GetEntryAddress(u32, u32, s32);

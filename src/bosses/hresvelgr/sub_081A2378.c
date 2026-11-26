@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 
 #define gRadialSineTable gUnk_086149C4
 struct MotionPosition {

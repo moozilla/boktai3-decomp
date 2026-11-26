@@ -947,7 +947,7 @@ Each was read from the compiler source and confirmed on a live draft.
    spider recovery tick) needed its random table allocated before the 0x3FF mask (ip and
    sb): 3 refs each, the table's life longer, so the mask won (348 against 300). Reading the
    delay samples through `ParticleRandom_ReadSample`, whose `PARTICLE_RANDOM_READ_SAMPLE`
-   eight matched functions share (include/engine/shared/monster_particle_random.h), counts that read at
+   eight matched functions share (include/engine/math/monster_particle_random.h), counts that read at
    depth 2: 4 refs, 800, and an exact match with no concession. `why`'s macro lever now
    lists each line that flips the order alone and the shared statement macros in include/
    (two or more src files, directly or through an inline of the same header), preferring
@@ -1380,7 +1380,7 @@ Each was read from the compiler source and confirmed on a live draft.
    `one` (fact 41's backward pass) and the second or ties into it. With the callback stored through
    a local in between (`void (*fn)(void *, void *) = F; q->fn = fn;`, whose literal then loads
    first), Actor_TryInteraction matched as `u8 one = 1; p->flags |= one; ...; q->flags |= one;`,
-   and so did seven more 0xf5a state changes in src/actors/actor_animation_controller/actor_animation_controller.c whose
+   and so did seven more 0xf5a state changes in src/npc/cutscene_actor/actor_animation_controller.c whose
    `register s32 mask asm("r0") = 1` flag pins went. The original's inline had the same spelling.
    `why` on such a tie prints this lever when the op's other operand is a small constant that is read
    again later. A related form: `lsls #24; ands #0x07000000; lsrs #24` is a masked u8 local,
@@ -1549,7 +1549,7 @@ Each was read from the compiler source and confirmed on a live draft.
    (`control.raw = c->control; ... c->control = control.raw & ~mask;`) keeps the result in the
    constant's register, with no other change. Type and operand-order sweeps of the plain local
    don't. It matched child_take (four callers) and Actor_HideAndResetChildren's
-   `child->flags = reset | control.raw` (src/actors/actor_animation_controller/actor_animation_controller.c), both pins removed.
+   `child->flags = reset | control.raw` (src/npc/cutscene_actor/actor_animation_controller.c), both pins removed.
 
 67. **The reverse of fact 61: a `u16 x[] = {0}` set first keeps the SI zero for a later byte
    store.** With `s32 a = 0, b = 0;`, a halfword store of b and a byte store of a after a call,
@@ -2286,7 +2286,7 @@ which is exactly `10:1`. Not tested.
   stored constants into a register), so that would need the pseudo to miss a
   hard register. Open.
 
-* **Vanargand_UpdatePartGroundStrike** (src/fn/sub_081B28D8.c, 1 insn). ROM
+* **Vanargand_UpdatePartGroundStrike** (`081B28D8`, 1 insn). ROM
   copies `&p->flags` (gcse copy) before `&p->enter` into r8; the draft's
   explicit `enter` pointer comes first. Dropping the pointer loses r8 reuse
   entirely (fact 2). Open: what C makes `&p->enter` shared yet copied after
@@ -2775,7 +2775,7 @@ which is exactly `10:1`. Not tested.
    /* sub_080399F4 (Item_Place): an always-zero term; no stack slot */
    const u16 *table = (const u16 *)(RANDOM_TABLE_ADDR + (p->shakeTicks >> 8));
 
-   /* sub_0801404C: include/engine/shared/monster_particle_random.h; one 4-byte stack slot */
+   /* sub_0801404C: include/engine/math/monster_particle_random.h; one 4-byte stack slot */
    union ParticleRandomTableSource source;
    const u16 *table;
    source.halves[0] = (u16)RANDOM_TABLE_ADDR;

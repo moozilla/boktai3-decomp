@@ -2,7 +2,7 @@
 
 Tags: Crow, 0809ED00, 0809F510, 0809FC74, 080A0364, 080A0E00, 080A1440, phase4
 
-Consolidated 40 files from 0809ED00 through 080A2048 into `src/monsters/crow/crow.c`.
+Consolidated 40 files from 0809ED00 through 080A2048 into `src/monsters/crow.c`.
 The final formatted unit matches all 13128 bytes.
 
 The shared header describes the complete 0x43C allocation: animation phase,

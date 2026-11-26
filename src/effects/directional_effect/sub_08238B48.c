@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 void DirectionalEffect_DecodeAnimationMode(u32 mode, s32 *variant, s32 *group)
 {
     s32 v = mode & 3;

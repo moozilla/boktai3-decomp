@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 #include "bosses/ratatosk/ratatosk.h"
 // Tentative family name: actor animation/state handlers; specific actor identity unknown.
 struct AnimationPosition {

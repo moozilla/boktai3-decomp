@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 
 void PlayerStats_AddContactHundredths(u32, u32, s32);
 

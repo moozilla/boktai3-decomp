@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 #include "system/game_state/game_state.h"
 struct Obj {
     u8 pad0[0x1c];

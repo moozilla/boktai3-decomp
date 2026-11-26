@@ -1,6 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
-#include "display_animation.h"
-#include "background_controller.h"
+#include "engine/video/display_animation.h"
+#include "effects/screen/background_controller.h"
 // Collectible defeat: launches a bouncing death animation, then expires.
 struct Render {
     u32 flags;

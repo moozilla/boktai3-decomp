@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 
 void Serial_CheckMultiplayerReady(void);
 void Serial_EnableInterrupt(void);

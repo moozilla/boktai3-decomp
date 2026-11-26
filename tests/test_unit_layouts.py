@@ -13,7 +13,7 @@ class LocalLayoutProbes(unittest.TestCase):
     def test_measures_nested_layout_and_union_aliases_with_stock_compiler(self):
         with tempfile.TemporaryDirectory() as directory:
             source = Path(directory) / "unit.c"
-            source.write_text("""#include "engine/shared/global.h"
+            source.write_text("""#include "global.h"
 struct Inner { unsigned char tag; short value; };
 struct Outer { unsigned char prefix; struct Inner inner; unsigned flags : 3; };
 union Aliases { unsigned word; unsigned short halves[2]; };

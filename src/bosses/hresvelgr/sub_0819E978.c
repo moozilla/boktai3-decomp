@@ -1,5 +1,5 @@
-#include "engine/shared/global.h"
-#include "engine/shared/ram.h"
+#include "global.h"
+#include "engine/ram.h"
 #include "bosses/hresvelgr/hresvelgr_travel.h"
 
 /* tentative: travels to the nearest active growth hazard, lands on it and resets its cooldown */

@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 void *SceneActors_GetBySlot(u32);
 void *Task_Create(u32, u32);
 void SceneDistance_UpdateActor(void);

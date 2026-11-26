@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 extern u8 *gGameState;
 extern u8 gSunClock[];
 u32 SunClock_GetPackedDate(void);

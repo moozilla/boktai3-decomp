@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 #include "bosses/nidhoggr/scene_panel_effect_pool.h"
 void SceneEffect_ResetState(struct ScenePanelOwnedEffect *effect)
 {

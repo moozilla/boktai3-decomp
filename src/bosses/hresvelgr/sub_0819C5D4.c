@@ -1,7 +1,7 @@
-#include "engine/shared/global.h"
-#include "engine/shared/engine.h"
-#include "engine/shared/ram.h"
-#include "engine/shared/monster_particle_random.h"
+#include "global.h"
+#include "engine/engine.h"
+#include "engine/ram.h"
+#include "engine/math/monster_particle_random.h"
 
 struct BurstVector {
     s16 x, y, z, pad;

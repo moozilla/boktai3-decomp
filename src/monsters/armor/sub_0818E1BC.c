@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 void Armor_BeginPartSpinup(void);
 static inline u8 reset(u8 *p)
 {

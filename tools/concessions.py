@@ -122,7 +122,7 @@ _REGEX = {
     "pin": re.compile(r'\bregister\b[^;{}]*?' + REGISTER_BINDING + r'|\b(?:asm|__asm__)\s*\(\s*"%s"\s*\)' % _REG),
     "debug-nop": re.compile(r"\bDEBUG_NOP\s*\(\s*\)"),
     "empty-loop": re.compile(r"\bdo\s*\{\s*\}\s*while\s*\(\s*0\s*\)"),
-    # an if with nothing in its body; one whose body is DEBUG_PRINT() (include/engine/shared/debug.h) is ordinary C
+    # an if with nothing in its body; one whose body is DEBUG_PRINT() (include/debug.h) is ordinary C
     "empty-if": re.compile(r"\bif\s*\((?:[^()]|\((?:[^()]|\([^()]*\))*\))*\)\s*(?:\{\s*\}|;)"),
     "volatile": re.compile(
         r"(?<![*\w])volatile\s+(?:const\s+)?(?:unsigned\s+|signed\s+|struct\s+)?\w+"

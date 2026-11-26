@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 
 void Ratatosk_ConfigureParticle(u8 *p, u16 a, u32 b, u8 c, u32 d, u32 e)
 {

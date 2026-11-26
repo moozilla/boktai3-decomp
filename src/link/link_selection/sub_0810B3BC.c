@@ -1,5 +1,5 @@
-#include "engine/shared/global.h"
-#include "engine/shared/area_effect_link.h"
+#include "global.h"
+#include "scene/area_effect/area_effect_link.h"
 struct SceneMenuRecord {
     u8 data[0x3E];
     u16 checksum;

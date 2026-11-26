@@ -1,8 +1,8 @@
-#include "engine/shared/player_slot_status.h"
+#include "player/player_slot_status.h"
 #include "bosses/nidhoggr/scene_pause.h"
-#include "engine/shared/global.h"
-#include "engine/shared/ram.h"
-#include "engine/shared/engine_globals.h"
+#include "global.h"
+#include "engine/ram.h"
+#include "engine/engine_globals.h"
 struct NidhoggrEffectVector {
     u16 x, y, z, pad;
 };

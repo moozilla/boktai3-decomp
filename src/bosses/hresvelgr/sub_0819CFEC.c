@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 #include "bosses/hresvelgr/hresvelgr_travel.h"
 
 // confidence=low: prioritizes defeat, recovery, and interrupted charge reactions.

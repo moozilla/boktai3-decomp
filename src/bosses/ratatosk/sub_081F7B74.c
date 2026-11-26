@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 #include "bosses/ratatosk/ratatosk.h"
 static inline s32 ConsumeActivation(struct Ratatosk *p)
 {

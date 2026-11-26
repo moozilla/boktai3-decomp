@@ -1,5 +1,5 @@
-#include "engine/shared/global.h"
-#include "engine/shared/ram.h"
+#include "global.h"
+#include "engine/ram.h"
 #include "link/serial/serial.h"
 
 /* Serial interrupt handler for the multiplayer link: reads the peer words,

@@ -1,6 +1,6 @@
-#include "engine/shared/global.h"
+#include "global.h"
 #include "bosses/hresvelgr/hresvelgr_travel.h"
-#include "engine/shared/scene_facing.h"
+#include "scene/actor/scene_facing.h"
 
 /* tentative: rises, then dives until it lands and spawns a ground burst */
 

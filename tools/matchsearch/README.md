@@ -24,7 +24,7 @@ with Session.create(
     "build/matchsearch/player",
     repo=".",
     function="Player_GetSmoothedDirection",
-    source_path="src/player/sub_08141BAC.c",
+    source_path="src/player/movement/sub_08141BAC.c",
 ) as session:
     print(session.status())
 
@@ -73,7 +73,7 @@ needed. Nodes accept their hash prefix or a unique label.
 
 ```bash
 build/venv/bin/python -m tools.matchsearch init build/matchsearch/player \
-    src/player/sub_08141BAC.c Player_GetSmoothedDirection
+    src/player/movement/sub_08141BAC.c Player_GetSmoothedDirection
 build/venv/bin/python -m tools.matchsearch propose build/matchsearch/player \
     build/player-candidate.c --parent root --label field-view \
     --hypothesis "Test a typed history field instead of repeated byte-offset arithmetic"

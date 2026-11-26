@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 u32 LinkPlayer_GetAbilityCostById(s32);
 u32 LinkPlayer_GetSelectedAbilityCost(u8 *s)
 {

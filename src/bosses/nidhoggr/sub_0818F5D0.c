@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 
 void Collider_Remove(u8 *);
 u32 Sprite_Remove(u8 *);

@@ -1,13 +1,13 @@
-#include "engine/shared/global.h"
-#include "engine/shared/scene_actor_reset.h"
+#include "global.h"
+#include "scene/actor/scene_actor_reset.h"
 #include "monsters/mummy/mummy.h"
-#include "actors/scene_actor_animation_and_scripted_actions/scene_actor_animation.h"
-#include "engine/shared/scene_actor_chase_reaction.h"
-#include "actors/scene_actor_reaction/scene_actor_reaction.h"
-#include "engine/shared/scene_actor_turn.h"
-#include "engine/shared/display_sequence.h"
-#include "engine/shared/scene_actor_chase.h"
-#include "engine/shared/scene_actor_chase_shared.h"
+#include "npc/manager/scene_actor_animation.h"
+#include "scene/actor/scene_actor_chase_reaction.h"
+#include "scene/actor/scene_actor_reaction.h"
+#include "scene/actor/scene_actor_turn.h"
+#include "engine/video/display_sequence.h"
+#include "scene/actor/scene_actor_chase.h"
+#include "scene/actor/scene_actor_chase_shared.h"
 
 /* Records attack contacts and queues a timed reaction (tentative). */
 

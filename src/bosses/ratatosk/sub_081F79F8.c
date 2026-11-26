@@ -1,6 +1,6 @@
-#include "engine/shared/global.h"
+#include "global.h"
 #include "bosses/ratatosk/ratatosk.h"
-#include "menus/scene_indicators/scene_indicator.h"
+#include "ui/hud/scene_indicator.h"
 struct PackedVec {
     s32 x : 16, y : 16, z : 16, pad : 16;
 };

@@ -1,6 +1,6 @@
 #include "global.h"
 
-#include "engine.h"
+#include "engine/engine.h"
 struct Vec {
     s16 x, y, z, pad;
 } __attribute__((aligned(4)));

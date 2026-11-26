@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 struct TimedEffect {
     u8 unknown0[0x18];
     u32 flags;

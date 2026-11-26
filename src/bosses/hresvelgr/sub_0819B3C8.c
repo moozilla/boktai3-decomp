@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 /* Math_WrapAngleArrayNearTargets: Replaces each angle with its equivalent nearest the corresponding target without approaching it */
 #define Math_WrapAngleArrayNearTargets sub_0819B3C8
 

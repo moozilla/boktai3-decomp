@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 s32 SolarFruit_GetInventorySlot(u8 *);
 void sub_0822EB14(u8 *, u8 *);
 void SolarFruit_SortInventorySlots(u8 *p)

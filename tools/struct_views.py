@@ -39,7 +39,11 @@ def defining_header(spell):
 def probe(types, includes):
     """{spell: {'size', 'file', 'leaves': [...]}} for each type."""
     path = os.path.join(ROOT, "build", "struct_views_probe.c")
-    lines = ['#include "engine/shared/global.h"']
+<<<<<<< HEAD
+    lines = ['#include "global.h"']
+=======
+    lines = ['#include "global.h"']
+>>>>>>> 38c9b5978
     lines += [f'#include "{os.path.relpath(h, "include")}"' if h.startswith("include/") else f'#include "../{h}"' for h in includes]
     with open(path, "w") as f:
         f.write("\n".join(lines) + "\n")

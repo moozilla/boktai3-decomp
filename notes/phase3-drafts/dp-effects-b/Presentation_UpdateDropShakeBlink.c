@@ -1,7 +1,7 @@
-#include "presentation_sequence.h"
-#include "engine_globals.h"
-#include "ram.h"
-#include "monster_particle_random.h"
+#include "effects/screen/presentation_sequence.h"
+#include "engine/engine_globals.h"
+#include "engine/ram.h"
+#include "engine/math/monster_particle_random.h"
 // Provisional name: Presentation_UpdateDropShakeBlink
 void Anim_LoadKeyframe(void *, void *, s32, s32);
 void Anim_SetKeyframes(void *, void *, s32, s32, s32);

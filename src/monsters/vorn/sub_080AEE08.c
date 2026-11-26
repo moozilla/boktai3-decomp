@@ -1,11 +1,11 @@
-#include "engine/shared/scene_actor_turn.h"
-#include "engine/shared/scene_actor_chase_reaction.h"
-#include "actors/scene_actor_reaction/scene_actor_reaction.h"
-#include "actors/scene_actor_behavior/scene_actor_behavior.h"
-#include "engine/script_utility_references/script_utility.h"
-#include "engine/shared/spark_particle.h"
-#include "menus/bestiary/bestiary.h"
-#include "engine/shared/monster_particle_random.h"
+#include "scene/actor/scene_actor_turn.h"
+#include "scene/actor/scene_actor_chase_reaction.h"
+#include "scene/actor/scene_actor_reaction.h"
+#include "scene/actor/scene_actor_behavior.h"
+#include "script/script_utility.h"
+#include "effects/particles/spark_particle.h"
+#include "ui/books/bestiary.h"
+#include "engine/math/monster_particle_random.h"
 
 void SceneActorAttachment_ReplaceResponseSlot(void *, u32, u32, u32);
 void SceneActorEffects_AdvanceSteps(void *, u32);

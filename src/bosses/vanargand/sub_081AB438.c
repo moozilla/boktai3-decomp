@@ -1,5 +1,5 @@
-#include "engine/shared/global.h"
-#include "actors/orbit_motion/motion_track.h"
+#include "global.h"
+#include "scene/actor/motion_track.h"
 
 struct MotionTrack;
 struct Vanargand {

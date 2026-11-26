@@ -1,7 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
-#include "area_effect_link.h"
-#include "ram.h"
+#include "scene/area_effect/area_effect_link.h"
+#include "engine/ram.h"
 
 #define gLinkSelectionDisplaySlots gSceneSelectionDisplaySlots
 u8 Registry1745_ConsumeStateEntry(struct AreaEffectLinkState *);

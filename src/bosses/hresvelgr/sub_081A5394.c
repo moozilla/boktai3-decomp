@@ -1,5 +1,5 @@
-#include "engine/shared/global.h"
-#include "engine/shared/input.h"
+#include "global.h"
+#include "engine/input.h"
 static inline u32 tst(volatile u16 *a, u32 m)
 {
     return *a & m;

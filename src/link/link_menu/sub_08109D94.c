@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 
 #define ScriptPanel_SetSelection Registry1745_SetMenuRequest
 struct ScriptPanel {

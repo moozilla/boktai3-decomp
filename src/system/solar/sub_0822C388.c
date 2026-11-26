@@ -1,5 +1,5 @@
-#include "engine/shared/global.h"
-#include "engine/shared/runtime.h"
+#include "global.h"
+#include "engine/runtime.h"
 s32 Solar_GetMeasurement(void);
 /* Time left before the stored limit, clamped to 140; 0 if out of range. */
 s32 Solar_GetIntensity(void)

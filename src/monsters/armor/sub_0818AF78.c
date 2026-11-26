@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 struct S {
     u8 f0[0x48];
     s16 a48;

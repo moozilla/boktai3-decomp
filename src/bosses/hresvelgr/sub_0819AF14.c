@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 s32 Math_ApproachEighth(s32 a, s32 b)
 {
     s32 d = b - a;

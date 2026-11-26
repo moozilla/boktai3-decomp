@@ -1,16 +1,16 @@
 #ifndef GUARD_SKELETON_H
 #define GUARD_SKELETON_H
-#include "engine/shared/scene_actor_chase_reaction.h"
-#include "engine/shared/scene_actor_control_phase.h"
-#include "engine/shared/scene_actor_terrain.h"
-#include "actors/actor_animation_controller/actor_animation_controller.h"
-#include "engine/shared/scene_actor_init_primitives.h"
-#include "engine/shared/scene_actor_init_group.h"
-#include "engine/shared/scene_actor_init_dispatch.h"
-#include "engine/shared/scene_actor_init_graphics.h"
-#include "engine/shared/scene_actor_init_body.h"
-#include "engine/shared/display_sequence_inline.h"
-#include "engine/shared/chase_actor.h"
+#include "scene/actor/scene_actor_chase_reaction.h"
+#include "scene/actor/scene_actor_control_phase.h"
+#include "scene/actor/scene_actor_terrain.h"
+#include "npc/cutscene_actor/actor_animation_controller.h"
+#include "monsters/scene_actor_init_primitives.h"
+#include "monsters/scene_actor_init_group.h"
+#include "scene/actor/scene_actor_init_dispatch.h"
+#include "monsters/scene_actor_init_graphics.h"
+#include "monsters/scene_actor_init_body.h"
+#include "engine/video/display_sequence_inline.h"
+#include "monsters/chase_actor.h"
 
 /* Full 0x74C Skeleton allocation; unresolved script roles remain provisional. */
 struct Skeleton {

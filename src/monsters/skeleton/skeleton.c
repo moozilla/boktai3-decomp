@@ -1,8 +1,8 @@
 #include "monsters/skeleton/skeleton.h"
 #include "monsters/golem/golem.h"
-#include "engine/shared/scene_actor_contact_response.h"
-#include "engine/shared/scene_actor_chase_shared.h"
-#include "engine/shared/word_flags.h"
+#include "scene/actor/scene_actor_contact_response.h"
+#include "scene/actor/scene_actor_chase_shared.h"
+#include "engine/word_flags.h"
 
 /* Resolve contact flags, animation, and pursuit routing. The normal chase
  * continuation returns zero even after installing its control. */

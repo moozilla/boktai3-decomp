@@ -1,5 +1,5 @@
-#include "engine/shared/global.h"
-#include "monsters/armor/motion_0818.h"
+#include "global.h"
+#include "monsters/armor/spinning_approach_chain.h"
 
 void Armor_UpdatePartWaveXReturn(struct Motion0818Object *);
 void Armor_UpdatePartWaveZReturn(struct Motion0818Object *);

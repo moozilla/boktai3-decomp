@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 
 s32 Script_GetValue(void);
 s32 Script_SeekToKeyword(u32);

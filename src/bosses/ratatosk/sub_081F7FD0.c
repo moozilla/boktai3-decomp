@@ -1,8 +1,8 @@
-#include "engine/shared/global.h"
+#include "global.h"
 #include "bosses/ratatosk/ratatosk.h"
-#include "engine/shared/engine.h"
-#include "engine/shared/player.h"
-#include "engine/shared/ram.h"
+#include "engine/engine.h"
+#include "player/player.h"
+#include "engine/ram.h"
 
 struct RatatoskOrbitPoint {
     u32 xy, z;

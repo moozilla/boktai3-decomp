@@ -1,135 +1,161 @@
 #!/usr/bin/env python3
-"""Plan or apply the source tree migration. Run from the repository root."""
+"""Replay the reviewed source and header placement from either earlier layout."""
 import argparse
-from collections import Counter, defaultdict
+from collections import defaultdict
+import csv
 import os
 from pathlib import Path
 import re
 import subprocess
 
-from source_layout import directory_for, header_paths, is_upstream, new_filename, scan, source_paths, symbol_names
+from source_layout import (
+    HEADER_DIRS, SOURCE_DIRS, SOURCE_FILES, directory_for, header_paths, is_upstream,
+    layout_path, new_filename, scan, source_paths, source_placements, source_rules, symbol_names,
+)
 
 ROOT = Path(__file__).resolve().parents[1]
-INCLUDE = re.compile(r'^([ \t]*#[ \t]*include[ \t]+")([^"\n]+)(")', re.M)
+INCLUDE = re.compile(r'(?P<begin>#[ \t]*include[ \t]+\\?")(?P<name>[^"\\\n]+)(?P<end>\\?")')
+HEADER_LITERAL = re.compile(r'''(?P<quote>["'])(?P<name>[\w.-]+/[\w/.-]+\.h)(?P=quote)''')
 PATH = re.compile(r'(?<![\w/])((?:\.\./)*)(?P<path>(?:src|include)/[\w./-]+\.[ch])(?![\w.-])')
-UNIT_HEADER = {
-    "global.h": "engine/shared",
-    "debug.h": "engine/shared",
-    "rfu_compat.h": "lib/rfu",
-    "libm_compat.h": "lib/libm",
-    "m4a.h": "lib/m4a",
-}
+TEXT_SUFFIXES = {".c", ".h", ".csv", ".ld", ".md", ".py", ".js", ".mjs", ".html", ".sh", ".ts", ".yml"}
 
 
-def plan_sources(rename):
+def recorded_moves():
+    """Map prior paths to the recorded destinations."""
+    sources = {}
+    for record in source_placements(ROOT):
+        for previous in (record.original, record.current, record.pass2, record.target):
+            if previous is not None and sources.setdefault(previous, record.target) != record.target:
+                raise ValueError(f"{SOURCE_FILES}: conflicting destination for {previous}")
+    headers = {}
+    targets = set()
+    with (ROOT / HEADER_DIRS).open(newline="") as stream:
+        for row in csv.DictReader(stream):
+            current = layout_path(row["current_path"], "include")
+            target = layout_path(row["new_path"], "include")
+            if not 2 <= len(target.parts) <= 4 or target.suffix != ".h":
+                raise ValueError(f"{HEADER_DIRS}: invalid header destination {target}")
+            if target.as_posix().casefold() in targets:
+                raise ValueError(f"{HEADER_DIRS}: duplicate destination {target}")
+            targets.add(target.as_posix().casefold())
+            aliases = [Path("include", current.name), current, target]
+            if row.get("pass2_path"):
+                aliases.append(layout_path(row["pass2_path"], "include"))
+            for previous in aliases:
+                if headers.setdefault(previous, target) != target:
+                    raise ValueError(f"{HEADER_DIRS}: conflicting destination for {previous}")
+    return sources | headers
+
+
+def header_destination(old, recorded, folders, owners, rules):
+    if old in recorded or old.parts[1] == "gba":
+        return recorded.get(old, old)
+    # Replay a new header in a previously recorded unit by following its owner.
+    unit = Path("src", *old.parent.parts[1:]).as_posix()
+    if unit in rules:
+        folder = Path(rules[unit])
+        if folder.suffix == ".c":
+            folder = folder.parent
+        return Path("include", *folder.parts[1:3], old.name)
+    if old.parent in folders:
+        return old
+    candidates = owners.get(old.stem, set())
+    if len(candidates) == 1:
+        return next(iter(candidates)) / old.name
+    reason = "ambiguous owner" if candidates else "unknown owner"
+    raise ValueError(f"{old}: {reason}; add a placement in {HEADER_DIRS}")
+
+
+def plan_files(recorded, rename):
     manifest = scan(ROOT)
     names = symbol_names(ROOT)
-    files = source_paths(ROOT)
+    spellings = {}
+    for old, target in recorded.items():
+        casefolded = old.as_posix().casefold()
+        if spellings.setdefault(casefolded, target) != target:
+            raise ValueError(f"{old}: placement aliases have conflicting capitalization")
     moves = {}
-    for path in files:
+    owners = defaultdict(set)
+    for path in source_paths(ROOT):
         old = path.relative_to(ROOT)
-        addresses = manifest.by_file.get(old.as_posix(), [])
+        addresses = manifest.by_file.get(old.as_posix(), ())
         if not addresses:
             raise ValueError(f"{old}: no external function with a known ROM address")
-        directory = directory_for(min(addresses), ROOT)
-        filename = old.name
+        first = min(addresses)
+        directory = Path("src") / directory_for(first, ROOT, source=old)
+        new = spellings.get(old.as_posix().casefold(), directory / old.name)
+        if new.parent != directory:
+            raise ValueError(f"{old}: first function {first:08X} belongs under {directory}")
         if rename and len(addresses) == 1 and not is_upstream(old):
-            address = addresses[0]
-            filename = new_filename(names.get(address, f"sub_{address:08X}"), address)
-        moves[old] = Path("src") / directory / filename
-    return moves
+            new = new.with_name(new_filename(names.get(first, f"sub_{first:08X}"), first))
+        moves[old] = new
+        folder = Path("include", *new.parent.parts[1:3])
+        owners[old.stem].add(folder)
+        owners[new.stem].add(folder)
 
-
-def plan_headers(sources):
-    paths = header_paths(ROOT)
-    headers = {p.name: p.relative_to(ROOT) for p in paths}
-    if len(headers) != len(paths):
-        raise ValueError("header basenames must be unique for the flat-tree migration")
-
-    by_stem = defaultdict(set)
-    uses = defaultdict(Counter)
-    for old, new in sources.items():
-        directory = new.parent.relative_to("src")
-        by_stem[old.stem].add(directory)
-        for _, name, _ in INCLUDE.findall((ROOT / old).read_text()):
-            uses[Path(name).name][directory] += 1
-    for path in paths:
+    folders = {target.parent for target in recorded.values() if target.parts[0] == "include"}
+    folders.update(folder for candidates in owners.values() for folder in candidates)
+    # The include root is reserved for explicit project-wide headers.
+    folders.discard(Path("include"))
+    rules = source_rules(ROOT)
+    for path in header_paths(ROOT):
         old = path.relative_to(ROOT)
-        if len(old.parts) > 2:
-            directory = old.parent.relative_to("include")
-            for _, name, _ in INCLUDE.findall(path.read_text()):
-                uses[Path(name).name][directory] += 1
-
-    moves = {}
-    for name, old in headers.items():
-        if len(old.parts) > 2:  # Includes already organized, including SDK headers.
-            moves[old] = old
-            continue
-        same = by_stem[old.stem]
-        if name in UNIT_HEADER:
-            directory = UNIT_HEADER[name]
-        elif len(same) == 1:
-            directory = next(iter(same))
-        elif Path("engine", old.stem) in uses[name]:
-            directory = Path("engine", old.stem)
-        elif len(uses[name]) == 1:
-            directory = next(iter(uses[name]))
-        else:
-            # A narrow hero/actor header often has more than one consumer. Use
-            # a unit whose complete name prefixes the header when available.
-            candidates = {d for d in uses[name] if d.name != d.parts[0] and
-                          (old.stem == d.name or old.stem.startswith(d.name + "_"))}
-            directory = max(candidates, key=lambda d: (len(d.name), str(d))) if candidates else "engine/shared"
-        moves[old] = Path("include") / directory / name
+        moves[old] = header_destination(old, recorded, folders, owners, rules)
     return moves
 
 
 def transform(path, raw, moves, includes):
-    if path.parts[0] in ("src", "include", "port", "tools", "tests") and path.suffix in (".c", ".h"):
-        raw = INCLUDE.sub(lambda m: m[1] + includes.get(m[2], m[2]) + m[3], raw)
+    def include(match):
+        return match["begin"] + includes.get(match["name"], match["name"]) + match["end"]
+
+    def literal(match):
+        quote, name = match["quote"], match["name"]
+        return quote + includes.get(name, name) + quote
+
+    raw = INCLUDE.sub(include, raw)
+    raw = HEADER_LITERAL.sub(literal, raw)
 
     def reference(match):
         old = Path(match["path"])
         target = moves.get(old, old)
-        if match[1]:
-            old_relative = Path(os.path.normpath(path.parent / match[0]))
-            if old_relative == old:
-                return os.path.relpath(target, path.parent)
+        if match[1] and Path(os.path.normpath(path.parent / match[0])) == old:
+            return os.path.relpath(target, path.parent)
         return match[1] + target.as_posix()
 
     return PATH.sub(reference, raw)
 
 
 def migrate(rename=False, apply=False):
-    sources = plan_sources(rename)
-    headers = plan_headers(sources)
-    moves = sources | headers
+    recorded = recorded_moves()
+    moves = plan_files(recorded, rename)
     occupied = {}
     for old, new in moves.items():
-        previous = occupied.setdefault(new, old)
+        previous = occupied.setdefault(new.as_posix().casefold(), old)
         if previous != old:
             raise ValueError(f"{previous} and {old} both map to {new}")
-    includes = {old.relative_to("include").as_posix(): new.relative_to("include").as_posix()
-                for old, new in headers.items()}
+        if old != new and (ROOT / new).exists() and not (ROOT / old).samefile(ROOT / new):
+            raise ValueError(f"{old}: {new} already exists")
 
-    # Include migration also applies to files already in their final directories.
-    tracked = subprocess.check_output(["git", "ls-files", "-z"], cwd=ROOT).decode().split("\0")
+    references = {old: moves.get(new, new) for old, new in recorded.items()} | moves
+    includes = {old.relative_to("include").as_posix(): new.relative_to("include").as_posix()
+                for old, new in references.items() if old.parts[0] == "include"}
+    tracked = subprocess.check_output(["git", "ls-files", "--cached", "--others", "--exclude-standard", "-z"], cwd=ROOT).decode().split("\0")
     paths = set(moves)
     for value in filter(None, tracked):
         path = Path(value)
-        if (path.parts[0] not in ("src", "include") and
-                path.suffix in (".c", ".h", ".csv", ".ld", ".md", ".py", ".js", ".mjs", ".html", ".sh", ".ts", ".yml")):
-            # Progress snapshots are regenerated by the integration, and historic
-            # reports describe the source tree at their corresponding revisions.
-            if path.name != "PROGRESS.md" and path.parts[:2] != ("docs", "history"):
-                paths.add(path)
+        if (path.parts[0] not in ("src", "include", "tests") and path.suffix in TEXT_SUFFIXES
+                and path not in (SOURCE_DIRS, SOURCE_FILES, HEADER_DIRS)
+                and path not in (Path("PROGRESS.md"), Path("docs/SOURCE_LAYOUT_DECISIONS.md"))
+                and path.parts[:2] != ("docs", "history")):
+            paths.add(path)
+
     changed = []
     for old in sorted(paths):
         if not (ROOT / old).is_file():
             continue
         raw = (ROOT / old).read_bytes().decode("utf-8", errors="surrogateescape")
         new = moves.get(old, old)
-        updated = transform(old, raw, moves, includes)
+        updated = transform(old, raw, references, includes)
         if new != old:
             print(f"{old} -> {new}")
         elif updated != raw:
@@ -154,11 +180,18 @@ def migrate(rename=False, apply=False):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--apply", action="store_true", help="perform the printed plan")
+    action = parser.add_mutually_exclusive_group()
+    action.add_argument("--apply", action="store_true", help="perform the printed plan")
+    action.add_argument("--check", action="store_true", help="fail if the tree disagrees with the reviewed layout")
     parser.add_argument("--rename", action="store_true", help="also name one-function files from the symbol map")
     args = parser.parse_args()
-    print(f"{migrate(args.rename, args.apply)} paths {'updated' if args.apply else 'to update'}")
+    try:
+        changes = migrate(args.rename, args.apply)
+    except ValueError as error:
+        parser.error(str(error))
+    print(f"{changes} paths {'updated' if args.apply else 'to update'}")
+    return int(args.check and changes != 0)
 
 
 if __name__ == "__main__":
-    main()
+    raise SystemExit(main())

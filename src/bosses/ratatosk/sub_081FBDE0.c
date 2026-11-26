@@ -1,5 +1,5 @@
 #define SlotMotion_SetCallback Ratatosk_SetParticleUpdateCallback
-#include "engine/shared/global.h"
+#include "global.h"
 struct SlotMotion {
     u16 field0, duration;
     u16 field4;

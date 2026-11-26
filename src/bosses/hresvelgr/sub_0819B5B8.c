@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 /* Math_ApproachAngleArrayByEighth: Approaches each target angle by one eighth of the shortest difference with a minimum unit step */
 #define Math_ApproachAngleArrayByEighth sub_0819B5B8
 

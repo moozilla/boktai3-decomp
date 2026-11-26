@@ -1,0 +1,71 @@
+#include "global.h"
+#include "engine/ram.h"
+#include "engine/video/render.h"
+#include "player/player.h"
+#include "ui/hud/scene_indicator.h"
+struct Circle {
+    u8 pad[24];
+    s16 radius;
+    u16 direction, step;
+    u8 dispose, pad1f;
+    u16 time, bank;
+    u16 rows[2][160];
+    struct Vec center;
+};
+int Script_GetKeywordValue(int, int);
+void CircleWindow_GenerateScanlines(void *, int);
+static inline int project(int input)
+{
+    int v = input * 3;
+    if (v >= 0)
+        v = v >> 5;
+    else
+        v = -((-v) >> 5);
+    return v;
+}
+int CircleWindow_Initialize(struct Circle *p)
+{
+    int i;
+    gCircleWindow = p;
+    p->time = 0;
+    p->bank = 0;
+    p->direction = Script_GetKeywordValue('m', 0);
+    p->radius = Script_GetKeywordValue('r', 250) * 16;
+    if (p->radius >= 4000)
+        p->radius = 4000;
+    p->step = Script_GetKeywordValue('s', 8) * 16;
+    p->dispose = Script_GetKeywordValue('d', 0);
+    if (((u8 **)gPlayers)[0]) {
+        struct Vec *out = &p->center;
+        struct Vec *in = (void *)(((u8 **)gPlayers)[0] + 48);
+        int xy;
+        int height, x = in->x, z = in->z;
+        out->x = project(x - z);
+        xy = project(x + z);
+        height = project(in->y);
+        {
+            int y = xy - height, z = xy + height;
+            out->x = out->x - (*(struct Vec *)gCameraOrigin).x + 120;
+            out->y = y - (*(struct Vec *)gCameraOrigin).y + 80;
+            out->z = z - (*(struct Vec *)gCameraOrigin).z;
+        }
+        if (p->center.x < 0)
+            p->center.x = 0;
+        else if (p->center.x > 240)
+            p->center.x = 240;
+        if (p->center.y < 0)
+            p->center.y = 0;
+        else if (p->center.y > 160)
+            p->center.y = 160;
+    } else {
+        p->center.x = 120;
+        p->center.y = 80;
+    }
+    for (i = 0; i <= 1; i++)
+        CircleWindow_GenerateScanlines(p, i);
+#ifdef UBFIX
+    // falls off the end with r0 left over from its last statement; the creator only tests
+    // < 0, and this initializer has no failure path here
+    return 0;
+#endif
+}

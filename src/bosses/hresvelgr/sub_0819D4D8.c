@@ -1,6 +1,6 @@
 #include "bosses/hresvelgr/hresvelgr_travel.h"
 
-#include "engine/shared/ram.h"
+#include "engine/ram.h"
 
 // confidence=low: requests movement around adjacent terrain overrides.
 

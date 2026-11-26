@@ -1,0 +1,13 @@
+#include "global.h"
+void TaggedSceneNpc_PlayTaggedAnimation(void *, int, int, int, int);
+int DisplayAnimation_TestFinished(void *);
+void TaggedSceneNpc_UpdateState17Animation(void *unused, u8 *p)
+{
+    if (p[9]) {
+        p[9] = 0;
+        p[7] = 0;
+        TaggedSceneNpc_PlayTaggedAnimation(p, 6, 2, 0, 4);
+    }
+    if (DisplayAnimation_TestFinished(p + 0xd4))
+        p[7] = 1;
+}

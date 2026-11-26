@@ -1,5 +1,5 @@
-#include "render.h"
-#include "orbit_background.h"
+#include "engine/video/render.h"
+#include "effects/screen/orbit_background.h"
 // MATCHING_CONCESSION: register-pinning
 static inline s32 scale(s32 value)
 {

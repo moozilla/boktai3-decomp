@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 
 void Math_GetTargetAngleAndDistance(u8 *, u32, u8 *, u16 *);
 

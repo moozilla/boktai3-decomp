@@ -1,7 +1,7 @@
 #ifndef GUARD_MUMMY_H
 #define GUARD_MUMMY_H
 
-#include "engine/shared/chase_actor.h"
+#include "monsters/chase_actor.h"
 
 /* Mummy's class fields past the chase actor, as far as its code reads them (provisional). */
 struct Mummy {

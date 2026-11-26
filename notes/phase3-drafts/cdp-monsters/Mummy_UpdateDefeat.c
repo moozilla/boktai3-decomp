@@ -3,9 +3,9 @@
 
 // confidence=low: defeat control emits effects, runs scripts, and returns the actor to idle.
 
-#include "scene_actor_reaction.h"
-#include "script_utility.h"
-#include "engine.h"
+#include "scene/actor/scene_actor_reaction.h"
+#include "script/script_utility.h"
+#include "engine/engine.h"
 void SceneActorMovement_UpdateAirborne(void *);
 void SceneActorMovement_UpdateHeight(void *);
 void SceneEffect_EmitPositionPattern(void *);

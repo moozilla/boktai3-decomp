@@ -25,8 +25,8 @@ Explicit unsigned negation and right shift reproduce the desired operations;
 boolean comparisons instead produce a shorter shift-and-mask sequence.
 
 Shared layouts were extended only within padding: DisplaySequenceSprite in
-`include/effects/shared_display_animation_wrapper/display_animation.h` now exposes the resource pointer, playback bytes,
-and packed attributes. LevelAdvanceParticle in `include/menus/level_advance_display/level_advance_display.h`
+`include/engine/video/display_animation.h` now exposes the resource pointer, playback bytes,
+and packed attributes. LevelAdvanceParticle in `include/ui/hud/level_advance_display.h`
 now exposes queued state, scale, rotation, palette slot, mode, status, frame
 state and intrusive links. `foundry.py hdrcheck` passed all 16 and 14 matched
 consumers respectively. Names of currently unconsumed bytes are tentative.

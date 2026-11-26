@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 
 u32 Math_Atan2(s32, s32);
 

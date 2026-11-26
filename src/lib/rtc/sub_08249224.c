@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 /* Reconstructed from B3 instructions; SIIRTC correspondence: docs/RTC.md. */
 // concession-ok(cflags): SDK RTC driver (SIIRTC), built unoptimized as the SDK built siirtc.c
 // CFLAGS: -O0 -mthumb-interwork

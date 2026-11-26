@@ -1,7 +1,7 @@
 #ifndef GUARD_TARGET_REGISTRY_H
 #define GUARD_TARGET_REGISTRY_H
 
-#include "engine/shared/task.h"
+#include "engine/task.h"
 
 struct ContactCollider;
 struct SceneBody;

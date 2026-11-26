@@ -1,8 +1,8 @@
 #include "monsters/armor/armor_action.h"
-#include "engine/shared/global.h"
+#include "global.h"
 #include "system/game_state/game_state.h"
-#include "engine/shared/engine.h"
-#include "engine/shared/ram.h"
+#include "engine/engine.h"
+#include "engine/ram.h"
 
 s32 Armor_TryStartAction(void *, s32);
 s32 DirectionalActor_TryBeginState(void *, s32);

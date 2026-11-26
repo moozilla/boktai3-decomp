@@ -1,8 +1,8 @@
-#include "monster_particle_random.h"
-#include "spiral_burst.h"
+#include "engine/math/monster_particle_random.h"
+#include "effects/bursts/spiral_burst.h"
 
-#include "engine_globals.h"
-#include "ram.h"
+#include "engine/engine_globals.h"
+#include "engine/ram.h"
 
 static inline u32 SpiralBurst_Random(const u16 *table, u32 mask)
 {

@@ -1,6 +1,6 @@
 #include "global.h"
-#include "vanargand_pair_attack.h"
-#include "vanargand_stage_colors.h"
+#include "bosses/vanargand/vanargand_pair_attack.h"
+#include "bosses/vanargand/vanargand_stage_colors.h"
 void Sound_PlaySong(u32);
 void Vanargand_ResetPaletteTransition(struct VanargandPairAttack *);
 void CpuSet(const void *, void *, u32);

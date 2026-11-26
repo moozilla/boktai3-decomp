@@ -117,7 +117,7 @@ def pack_room(source, room, rooms, journal, map_coords):
 
 
 def ghoul_palette(source):
-    ghoul_code = (ROOT / "src/monsters/ghoul/ghoul.c").read_text()
+    ghoul_code = (ROOT / "src/monsters/ghoul.c").read_text()
     base = int(re.search(r"MonsterInit_ReadPalette\(actor, (0x[0-9A-Fa-f]+)", ghoul_code)[1], 16)
     spawn = next(t for _, t in source.walker.text(1496) if t.startswith("command 0x5a5 "))
     variant = int(re.search(r" C: (\d+)", spawn)[1])
@@ -172,8 +172,8 @@ def objects(source):
 def enemy_constants():
     # Lower values at their decision sites. A changed C expression must be
     # reviewed before the generated state machine silently acquires new timing.
-    states = (ROOT / "src/monsters/ghoul/ghoul_states.c").read_text()
-    chase = (ROOT / "src/monsters/ghoul/ghoul.c").read_text()
+    states = (ROOT / "src/monsters/ghoul_states.c").read_text()
+    chase = (ROOT / "src/monsters/ghoul.c").read_text()
     def literal(source, function, pattern):
         body = re.search(r"^void " + function + r"\([^;]*?\)\s*\{(.*?)^}", source, re.M | re.S)[1]
         return int(re.search(pattern, body)[1], 0)

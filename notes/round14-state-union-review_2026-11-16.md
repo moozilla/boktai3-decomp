@@ -9,7 +9,7 @@ Only the exact candidate is installed.
 
 ## Accepted control transition
 
-`SceneActor_BeginReactionAnimation` in `src/monsters/octopus/octopus.c` now calls the existing
+`SceneActor_BeginReactionAnimation` in `src/monsters/octopus.c` now calls the existing
 `SceneActorChase_SetControl(actor, Ivy_UpdateActiveState_080E98B4, 0x22)` when the
 actor restarts. The repeated stores already describe precisely this shared
 operation: prepare the step, reset completion, select the control kind and

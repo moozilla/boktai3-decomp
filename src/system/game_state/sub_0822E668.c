@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 
 extern u8 *gGameState;
 void GameState_SetUnlockSlot(s32 slot, s32 value); /* sets unlock slot */

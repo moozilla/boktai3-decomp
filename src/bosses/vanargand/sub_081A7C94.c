@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 
 struct ScenePanelPairState {
     u8 pad0[0xAE];

@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 
 void Vanargand_StartActionSequence(u8 *p)
 {

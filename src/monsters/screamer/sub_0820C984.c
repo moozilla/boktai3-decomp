@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 struct SceneDrawablePair {
     u8 unknown0[0x24];
     u32 flags;

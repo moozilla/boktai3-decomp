@@ -1,6 +1,6 @@
 // COMPILER: old_agbcc
-#include "engine/shared/global.h"
-#include "engine/shared/runtime.h"
+#include "global.h"
+#include "engine/runtime.h"
 extern u8 *gGameState;
 void Solar_UpdateMeasurement(void);
 void Solar_InitControllerState(u8 *p)

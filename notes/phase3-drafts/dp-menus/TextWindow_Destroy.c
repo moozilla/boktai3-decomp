@@ -1,5 +1,5 @@
 #include "global.h"
-#include "ram.h"
+#include "engine/ram.h"
 struct TextState {
     u8 x, y, left, top, width, height, palette, style;
     u8 entered, mode, skip, busy, padC, choiceCount, padE, fresh, pad10, voice, toggle, lastWidth,

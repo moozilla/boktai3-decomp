@@ -15,7 +15,7 @@ direction mode. CORE distance is one: agbcc derives the 0x45F offset from
 and integer-address spelling did not change the result; the retained source
 uses the shared Player fields.
 
-All six candidates use `SceneHudState` from `include/menus/scene_hud/scene_hud_display.h`.
+All six candidates use `SceneHudState` from `include/ui/pause/scene_hud_display.h`.
 Replaced only unknown bytes with page fade/callback/repeat fields, script
 pointer options, page visibility and timed-state parameters. Header checks
 preserve all seven matched consumers. The timed-state display meaning and

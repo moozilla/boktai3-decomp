@@ -1,6 +1,6 @@
-#include "engine/shared/global.h"
-#include "effects/shared_display_animation_wrapper/display_animation.h"
-#include "player/player_cue/player_cue_sequence.h"
+#include "global.h"
+#include "engine/video/display_animation.h"
+#include "player/cues/player_cue_sequence.h"
 
 struct DirectionalEffect {
     u32 flags;

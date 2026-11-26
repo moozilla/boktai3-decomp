@@ -1,8 +1,8 @@
-#include "engine/shared/global.h"
+#include "global.h"
 #include "monsters/screamer/screamer_state.h"
-#include "engine/shared/ram.h"
-#include "engine/shared/monster_particle_random.h"
-#include "engine/shared/engine_pause.h"
+#include "engine/ram.h"
+#include "engine/math/monster_particle_random.h"
+#include "engine/engine_pause.h"
 extern u32 gUnk_02000560;
 extern u8 gUnk_0203B000[];
 void SceneDrawablePair_SetFlags(void);

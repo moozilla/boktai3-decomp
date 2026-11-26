@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 
 s32 Sprite_Remove(u8 *);
 

@@ -1,8 +1,8 @@
-// Pin-free draft of AnimatedParticles_Create (src/effects/animated_particles/sub_080154EC.c): 6 ROM / 2 draft (scope's no_pins draft).
+// Pin-free draft of AnimatedParticles_Create (src/effects/particles/groups/sub_080154EC.c): 6 ROM / 2 draft (scope's no_pins draft).
 #include "global.h"
-#include "engine_globals.h"
-#include "ram.h"
-#include "display_sequence_inline.h"
+#include "engine/engine_globals.h"
+#include "engine/ram.h"
+#include "engine/video/display_sequence_inline.h"
 // MATCHING_CONCESSION: register-pinning
 struct Vec {
     s16 x, y, z, pad;

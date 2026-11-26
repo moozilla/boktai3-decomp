@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 void sub_08239D38(u8 *);
 void LinkPlayer_FlushPendingEffects(u8 *p)
 {

@@ -11,7 +11,7 @@
 /* m4a_1.s routines elsewhere in the ROM */
 #define ply_note m4a_Unk_0822FB18
 
-#include "engine/shared/global.h"
+#include "global.h"
 #include "gba/m4a_internal.h"
 #include "lib/m4a/sound.h"
 

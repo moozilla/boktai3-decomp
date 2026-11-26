@@ -1,7 +1,7 @@
-#include "engine/shared/global.h"
+#include "global.h"
 #include "system/game_state/game_state.h"
-#include "engine/shared/contact_position.h"
-#include "engine/shared/scene_actor_components.h"
+#include "scene/actor/contact_position.h"
+#include "scene/actor/scene_actor_components.h"
 #include "monsters/armor/armor_decision_ops.h"
 struct ArmorSelection {
     u8 pad0[0x3C];

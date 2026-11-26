@@ -1,7 +1,7 @@
-#include "engine/shared/global.h"
+#include "global.h"
 
-#include "effects/shared_display_animation_wrapper/display_animation.h"
-#include "player/player_cue/player_cue_sequence.h"
+#include "engine/video/display_animation.h"
+#include "player/cues/player_cue_sequence.h"
 
 struct Ooze {
     u8 pad0[0x20];

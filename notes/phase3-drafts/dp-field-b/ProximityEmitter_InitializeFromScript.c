@@ -1,4 +1,4 @@
-#include "proximity_emitter.h"
+#include "effects/particles/proximity_emitter.h"
 s32 ProximityEmitter_InitializeFromScript(struct ProximityEmitter *emitter, u32 unused1,
                                           u32 unused2)
 {

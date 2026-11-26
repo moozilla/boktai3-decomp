@@ -1,7 +1,7 @@
 #include "global.h"
-#include "engine_globals.h"
-#include "ram.h"
-#include "monster_particle_random.h"
+#include "engine/engine_globals.h"
+#include "engine/ram.h"
+#include "engine/math/monster_particle_random.h"
 // confidence=low: spawns six spark particles around the actor and plays a sound.
 void SparkParticle_Spawn(u8 *, u32, void *, u32, u32, u32, u32, u32);
 void Sound_PlaySong(u32);

@@ -1,0 +1,97 @@
+#include "scene/actor/scene_actor_reaction.h"
+#include "engine/engine.h"
+#include "scene/actor/scene_actor_chase_shared.h"
+static inline void Turn_ResetState(struct ChaseActor *actor, u32 state, u32 phase)
+{
+    actor->base.state2A8 = state;
+    actor->base.phase2A9 = phase;
+    actor->base.behavior2AA = 0;
+    actor->base.counter2AC = 0;
+    actor->base.field2B1 = 1;
+}
+static inline void Turn_SetControl(struct ChaseActor *actor, u32 kind, void *control)
+{
+    u32 *flags;
+    u32 mask;
+    actor->base.field2B2 = 1;
+    actor->base.stepDone = 0;
+    actor->base.controlKind = kind;
+    actor->base.target = control;
+    actor->base.field2C8 = 0;
+    flags = &actor->base.pendingControlFlags;
+    mask = ~1;
+    *flags &= mask;
+    actor->base.pendingControl = 0;
+}
+void SceneActorReaction_RestoreAfterTurns(struct ChaseActor *actor, s32 frame)
+{
+    struct SceneActorChaseGroup *group = &actor->group;
+    if (SceneActorReaction_TakePrepared(actor)) {
+        SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0);
+        SceneActorChase_SetMotionFlags(actor, 0x400);
+        actor->base.field2C2 = 32;
+    }
+    if (group->turn.turnsRemaining > 0) {
+        if (frame > 60) {
+            /* data holds the entry control, then the random table. */
+            const void *data;
+            u32 encoded;
+            Turn_ResetState(actor, 3, 1);
+            data = actor->base.onEntry;
+            Turn_SetControl(actor, 2, (void *)data);
+            if (group->turn.turnsRemaining == 1) {
+                encoded = ((group->turn.savedDirection >> 5) + 3) & 7;
+                actor->base.nextDirection = encoded;
+            } else {
+                s32 prior = actor->base.body.direction;
+                s32 tries = 0;
+                u32 *randomIndex;
+                u32 wrap, mask;
+                s32 choice;
+                data = gRandomTable;
+                randomIndex = &gRandomIndex;
+                wrap = 1023;
+                mask = 3;
+                for (;;) {
+                    u32 index = (*randomIndex + 1) & wrap;
+                    s32 next;
+                    *randomIndex = index;
+                    next = (((const u16 *)data)[index] & mask) << 6;
+                    if (next != prior) {
+                        choice = next;
+                        break;
+                    }
+                    if (++tries > 3) {
+                        choice = prior;
+                        break;
+                    }
+                }
+                encoded = ((choice >> 5) + 3) & 7;
+                actor->base.nextDirection = encoded;
+            }
+            group->turn.turnsRemaining--;
+        }
+    } else {
+        group->turn.turnsRemaining |= -1;
+        if (frame > 30) {
+            struct SceneActorChaseSavedControl *saved = &group->saved;
+            u32 kind = saved->kind;
+            void *control = saved->control;
+            u32 state, phase, behavior;
+            Turn_SetControl(actor, kind, control);
+            state = saved->state;
+            phase = saved->phase;
+            behavior = saved->behavior;
+            actor->base.state2A8 = state;
+            actor->base.phase2A9 = phase;
+            actor->base.behavior2AA = behavior;
+            actor->base.counter2AC = 0;
+            actor->base.field2B1 = 1;
+            {
+                u16 *flags = &actor->base.motionFlags;
+                u32 mask = ~0x400;
+                *flags = mask & *flags;
+            }
+        }
+    }
+}

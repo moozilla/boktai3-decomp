@@ -1,5 +1,5 @@
-#include "engine/shared/global.h"
-#include "engine/shared/runtime.h"
+#include "global.h"
+#include "engine/runtime.h"
 /* Solar_EnableControlFlag: Sets a nearby solar control flag whose precise purpose remains tentative */
 #define Solar_EnableControlFlag sub_0822C180
 void sub_0822C180(void)

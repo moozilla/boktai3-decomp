@@ -1,4 +1,4 @@
-#include "engine/shared/scalar_approach.h"
+#include "engine/math/scalar_approach.h"
 void sub_0819B734(s16 *values, const s16 *targets, s32 count, s32 step)
 {
     s16 *v = values;

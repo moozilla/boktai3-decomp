@@ -1,4 +1,4 @@
-// Plain rewrite of sub_08014634 (ParticleGroup_SpawnBouncing, src/effects/particle_groups/sub_08014634.c): 132 ROM / 116 draft,
+// Plain rewrite of sub_08014634 (ParticleGroup_SpawnBouncing, src/effects/particles/groups/sub_08014634.c): 132 ROM / 116 draft,
 // but structurally aligned (the pinned source's pins all removed is 92 / 86 from a much less natural base).
 static inline s32 Random(u16 *table, u32 mask, u32 *rng)
 {

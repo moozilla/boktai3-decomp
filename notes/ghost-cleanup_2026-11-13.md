@@ -3,9 +3,9 @@
 Tags: Ghost, 08095574, 08096D38, 08098064, 080982E4, 080989FC, 08099B44, phase4
 
 Consolidated 63 matching functions from 08095574 through 0809AE0C into
-`src/monsters/ghost/ghost.c`. The final formatted unit matches all 22680 bytes.
+`src/monsters/ghost.c`. The final formatted unit matches all 22680 bytes.
 
-`include/monsters/ghost/ghost.h` describes the complete 0x62C allocation: four 0x60-byte
+`include/monsters/ghost.h` describes the complete 0x62C allocation: four 0x60-byte
 afterimage records, visibility and drain counters, nine curve points, saved
 movement subject and positions, and the route cursor. Sprite and animation
 components reuse existing types. The actor prefix repeats the canonical reset

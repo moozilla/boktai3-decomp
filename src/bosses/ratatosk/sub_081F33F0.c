@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 struct SceneDistanceEntry {
     u32 value;
     u8 pad4[20];

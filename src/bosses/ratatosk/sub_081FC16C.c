@@ -1,6 +1,6 @@
-#include "engine/shared/global.h"
+#include "global.h"
 #include "bosses/ratatosk/ratatosk_particle.h"
-#include "engine/shared/ram.h"
+#include "engine/ram.h"
 
 u32 Ratatosk_OnAnimatedParticlePoolDestroy(struct RatatoskParticlePool *a)
 {

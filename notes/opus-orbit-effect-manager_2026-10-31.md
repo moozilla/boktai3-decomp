@@ -3,7 +3,7 @@
 Tags: #matching #orbit-effect #compiler #loop #giv #gcse #pre #reload
 
 **Exact match in ordinary C.** `OrbitEffect_UpdateManager`, 896 bytes,
-compiles byte-identically (`tools/check.py src/effects/orbit_effect/sub_081FE2C4.c`: MATCH, 0
+compiles byte-identically (`tools/check.py src/effects/orbits/orbit_effect/sub_081FE2C4.c`: MATCH, 0
 differing bytes). It has no register pins, barriers, inline assembly or compiler
 overrides. Commit `d0f08886f` on `codex/opus-ratatosk-defeat`. The unit's
 guarded draft was at 77.9% (80 ROM / 78 draft instructions differing in scope,

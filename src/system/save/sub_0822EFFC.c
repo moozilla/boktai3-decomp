@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 u16 Eeprom_ReadBlock(u16, void *);
 s32 Save_VerifyBlock(u16 start, s32 length)
 {

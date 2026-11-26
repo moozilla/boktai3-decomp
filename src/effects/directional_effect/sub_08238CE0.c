@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 /* Tentative role: place and launch a directional effect. */
 typedef struct Point {
     u16 x, z, y, pad6;

@@ -1,5 +1,5 @@
-#include "engine/shared/global.h"
-#include "engine/shared/ram.h"
+#include "global.h"
+#include "engine/ram.h"
 
 /* Up to 16 region ids (positive; the list ends at the first id <= 0). */
 struct RegionList {

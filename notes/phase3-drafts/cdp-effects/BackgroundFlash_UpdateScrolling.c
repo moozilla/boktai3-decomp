@@ -1,7 +1,7 @@
-#include "render.h"
+#include "engine/video/render.h"
 // MATCHING_CONCESSION: register-pinning
-#include "background_flash.h"
-#include "monster_particle_random.h"
+#include "effects/screen/background_flash.h"
+#include "engine/math/monster_particle_random.h"
 void BackgroundFlash_UpdateScrolling(struct BackgroundFlashController *controller)
 {
     s32 cameraX = ((s16 *)gCameraOrigin)[0] + gCamera.offsetX;

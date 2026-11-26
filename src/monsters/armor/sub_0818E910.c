@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 
 #define Callback_Invoke           Callback_InvokeActor
 #define gSceneEffectPoolCallbacks gUnk_08611D14

@@ -1,5 +1,5 @@
-#include "engine/shared/global.h"
-#include "engine/shared/area_effect_link.h"
+#include "global.h"
+#include "scene/area_effect/area_effect_link.h"
 
 #define LinkMenu_SetState       Registry1745_SetState
 #define LinkMenu_CheckSelection Registry1745_CheckSessionReady

@@ -1,9 +1,9 @@
-#include "engine/shared/global.h"
-#include "engine/shared/render.h"
-#include "engine/shared/player.h"
-#include "actors/orbit_motion/motion_track.h"
+#include "global.h"
+#include "engine/video/render.h"
+#include "player/player.h"
+#include "scene/actor/motion_track.h"
 #include "bosses/vanargand/positioned_effect_coordinates.h"
-#include "engine/shared/scene_input_widget.h"
+#include "ui/widgets/scene_input_widget.h"
 #include "bosses/vanargand/vanargand_stage_colors.h"
 
 typedef void (*VanargandStateCallback)(void *);

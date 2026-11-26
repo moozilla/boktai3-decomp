@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 u8 *SceneActors_GetBySlot(s32);
 struct S {
     u32 a;

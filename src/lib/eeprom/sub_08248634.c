@@ -1,7 +1,7 @@
 // concession-ok(cflags): SDK EEPROM driver, built at -O1 as the SDK built its save-memory objects
 // CFLAGS: -O1 -mthumb-interwork
-#include "engine/shared/global.h"
-#include "engine/shared/ram.h"
+#include "global.h"
+#include "engine/ram.h"
 /* Adapted from: laqieer/libgbabackup at 9597360b36d22df1ead5dd59566a3c8618cff6c0, src/eeprom.c (tmc lineage). */
 typedef struct EEPROMConfig {
     u32 unk_00;

@@ -1,8 +1,8 @@
-#include "engine/shared/monster_particle_random.h"
-#include "engine/shared/global.h"
+#include "engine/math/monster_particle_random.h"
+#include "global.h"
 
-#include "engine/shared/engine.h"
-#include "engine/shared/player.h"
+#include "engine/engine.h"
+#include "player/player.h"
 
 // confidence=low: moves a requested player position and eventually restores player control.
 struct Vec {

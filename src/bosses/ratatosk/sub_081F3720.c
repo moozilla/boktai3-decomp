@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 #include "bosses/ratatosk/ratatosk.h"
 void SceneActors_StartEightDirectionAnimation(void *, void *, void *, int, int, int, int);
 void SceneActors_StartDirectionalAnimation(void *, void *, void *, int, int, int, int);

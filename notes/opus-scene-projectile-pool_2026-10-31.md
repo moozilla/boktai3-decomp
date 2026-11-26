@@ -55,7 +55,7 @@ givs. terrainPosition is computed from sl at the top of every iteration
    `StepAnimation(p, animationSprite)` starts with
    `struct ProjectileSprite *sprite = obj;` and reads the flags through
    `state = &cursor->sequence`. That is how `DisplaySequence_Step`
-   (`include/engine/shared/display_sequence_inline.h`) is written. The shared helper can't
+   (`include/engine/video/display_sequence_inline.h`) is written. The shared helper can't
    be used here: it expects the sequence and the frame fields in one object,
    and here the sequence is in the slot and the frame in its sprite.
 3. **The first release is an if/else.**

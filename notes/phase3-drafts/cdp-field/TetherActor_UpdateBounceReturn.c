@@ -1,7 +1,7 @@
-#include "tether_actor.h"
-#include "engine.h"
-#include "ram.h"
-#include "monster_particle_random.h"
+#include "objects/coffin/tether_actor.h"
+#include "engine/engine.h"
+#include "engine/ram.h"
+#include "engine/math/monster_particle_random.h"
 
 #define TetherActor_GetStatusTag sub_08049F54
 

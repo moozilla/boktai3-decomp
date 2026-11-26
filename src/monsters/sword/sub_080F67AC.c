@@ -1,6 +1,6 @@
-#include "engine/shared/contact_swarm.h"
-#include "engine/shared/player.h"
-#include "engine/shared/display_sequence_inline.h"
+#include "scene/actor/contact_swarm.h"
+#include "player/player.h"
+#include "engine/video/display_sequence_inline.h"
 
 void ScaledShadow_Initialize(void *, void *, s32, s32, s32, s32, s32, s32, s32, s32, s32);
 s32 Terrain_GetHeightAt(void *);

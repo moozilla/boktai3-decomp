@@ -1,6 +1,6 @@
 #ifndef GUARD_IVY_PHASE_H
 #define GUARD_IVY_PHASE_H
-#include "engine/shared/scene_actor_control_phase.h"
+#include "scene/actor/scene_actor_control_phase.h"
 
 struct IvyCaptureState {
     u8 unknown0[0x62C];

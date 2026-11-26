@@ -1,5 +1,5 @@
-#include "engine/shared/global.h"
-#include "engine/shared/render.h"
+#include "global.h"
+#include "engine/video/render.h"
 #include "bosses/vanargand/vanargand_pair_attack.h"
 // confidence=low: palette transition accompanies the leap motion track.
 void SceneActors_StartUnmirroredAnimation(void *, void *, void *, int, int, int);

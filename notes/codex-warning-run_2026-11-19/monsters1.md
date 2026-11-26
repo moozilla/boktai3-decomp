@@ -3,7 +3,7 @@
 Stopped on `build/STOP` during Tentacle actor. The assigned queue went from 604 to 337 warnings, a reduction of 267 (44.2%), with stock byte matches preserved for every changed unit. The runner acknowledged all 63 commits.
 
 ## Bat
-- 14 → 1 warning, zero errors. `src/monsters/bat/bat.c` and `src/monsters/bat/bat_restore.c` match.
+- 14 → 1 warning, zero errors. `src/monsters/bat.c` and `src/monsters/bat_restore.c` match.
 - `Bat_Init` (08084F44) uses SDK `ZeroFill8` for both position clears. Replacing either alone changes the stack layout.
 - `Bat_RestoreSavedState` (08086C1C) uses the native actor and drawable types and the same revival setup as the matching ActorTrail candidate. All 79 header dependents match.
 - `Bat_ResumeSavedTarget` (08086E2C) uses the native route probe, animation sequence and chase controls.
@@ -40,7 +40,7 @@ Stopped on `build/STOP` during Tentacle actor. The assigned queue went from 604 
 - The single Slime header dependent matches after removing its duplicate drawable layout and renaming its callback declarations.
 
 ## Bee
-- 33 → 0 warnings, zero errors. `src/monsters/bee/bee.c` matches. Common chase controls, typed defeat and contact checks, native planar curves, SDK fills, and the native sequence drawable account for the reduction.
+- 33 → 0 warnings, zero errors. `src/monsters/bee.c` matches. Common chase controls, typed defeat and contact checks, native planar curves, SDK fills, and the native sequence drawable account for the reduction.
 - `Bee_Init` (08094764) matches both SDK position fills with stock PRE. The route and movement constructors also match the SDK clears, and both curve builders zero the actual height fields.
 - The remaining route reset matches with direct writes to its fields. The wander angle matches with the half-turn added to the heading before adding the random offset. The duplicate drawable header has one dependent and it matches.
 

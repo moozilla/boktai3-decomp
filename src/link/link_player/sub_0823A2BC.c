@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 
 void LinkPlayer_AdvanceActionTick(u8 *p)
 {

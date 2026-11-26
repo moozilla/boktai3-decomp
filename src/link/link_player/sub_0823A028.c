@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 
 struct FlashingActorEffect {
     u8 unknown0[0xad2];

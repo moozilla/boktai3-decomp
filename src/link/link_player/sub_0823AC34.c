@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 struct FlagAC {
     s8 a;
     u8 b, c, d;

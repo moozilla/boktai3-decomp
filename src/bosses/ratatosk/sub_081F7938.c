@@ -1,5 +1,5 @@
-#include "engine/shared/global.h"
-#include "engine/shared/state_actor_action_entry.h"
+#include "global.h"
+#include "bosses/state_actor_action_entry.h"
 
 void Ratatosk_UpdateTriggerState36(struct StateActor *p)
 {

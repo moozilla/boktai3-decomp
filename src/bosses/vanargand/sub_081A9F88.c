@@ -1,6 +1,6 @@
-#include "engine/shared/global.h"
-#include "engine/shared/engine_globals.h"
-#include "engine/shared/ram.h"
+#include "global.h"
+#include "engine/engine_globals.h"
+#include "engine/ram.h"
 // confidence=low: paired commands and positive-counter checks appear to gate a charged attack.
 #include "bosses/vanargand/vanargand_pair_attack.h"
 void Vanargand_SetPendingCue(void *, u16);

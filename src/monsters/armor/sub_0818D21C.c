@@ -1,8 +1,8 @@
 #include "monsters/sword/sword_orbit.h"
-#include "monsters/armor/motion_0818.h"
+#include "monsters/armor/spinning_approach_chain.h"
 #include "system/game_state/game_state.h"
-#include "engine/shared/engine_globals.h"
-#include "engine/shared/ram.h"
+#include "engine/engine_globals.h"
+#include "engine/ram.h"
 extern const s16 gUnk_086149C4[];
 u32 Math_Atan2(s32, s32);
 s32 Div(s32, s32);

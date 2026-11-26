@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 
 void Ratatosk_SetParticleUpdateCallback(u8 *p, u32 a)
 {

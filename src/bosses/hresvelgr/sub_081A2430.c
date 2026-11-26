@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 
 // confidence=low: dispatches pending scene messages into action and animation state.
 struct Vec {

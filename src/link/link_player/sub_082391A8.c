@@ -1,5 +1,5 @@
-#include "engine/shared/global.h"
-#include "monsters/ghoul/ghoul_disc.h"
+#include "global.h"
+#include "monsters/ghoul_disc.h"
 /* Tentative role: update four effects moving toward a common center. */
 typedef struct Effect {
     u32 flags;

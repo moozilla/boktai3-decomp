@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 s32 sub_081FB80C(u8 *p)
 {
     u32 bit;

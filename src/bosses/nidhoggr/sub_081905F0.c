@@ -1,5 +1,5 @@
-#include "engine/shared/global.h"
-#include "engine/shared/engine.h"
+#include "global.h"
+#include "engine/engine.h"
 struct BossAttack {
     u8 unknown0[0x4C];
     u32 colliderId;

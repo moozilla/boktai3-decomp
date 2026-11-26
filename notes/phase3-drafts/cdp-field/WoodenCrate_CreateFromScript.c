@@ -1,8 +1,8 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
-#include "display_animation.h"
-#include "contact_actor.h"
-#include "ram.h"
+#include "engine/video/display_animation.h"
+#include "scene/actor/contact_actor.h"
+#include "engine/ram.h"
 struct WoodenCrate {
     u32 flags;
     u8 pad4[3];

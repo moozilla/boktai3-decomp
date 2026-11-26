@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 void Script_WriteReferenceValue(u8 *, s32, u32);
 /* Write saved values back through the descriptors written by Registry3C8D_CaptureVariableValues. */
 s32 Registry3C8D_RestoreVariableValues(u32 *save)

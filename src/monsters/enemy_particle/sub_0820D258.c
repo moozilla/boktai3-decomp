@@ -1,5 +1,5 @@
-#include "engine/shared/global.h"
-#include "field/terrain_overlays/terrain_overlay.h"
+#include "global.h"
+#include "scene/terrain/terrain_overlay.h"
 #define SceneOverlayConfig_Init EnemyParticle_InitParameters
 struct SceneOverlayConfig {
     u8 unknown0[0x14];

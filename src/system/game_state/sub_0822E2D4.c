@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 #include "system/game_state/game_state.h"
 void GameState_UnequipConsumableSlot(s32 a)
 {

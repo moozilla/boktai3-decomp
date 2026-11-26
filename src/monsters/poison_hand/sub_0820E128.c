@@ -1,7 +1,7 @@
-#include "engine/shared/global.h"
-#include "engine/shared/scene_vec.h"
-#include "engine/shared/engine.h"
-#include "engine/shared/ram.h"
+#include "global.h"
+#include "engine/math/scene_vec.h"
+#include "engine/engine.h"
+#include "engine/ram.h"
 struct PoisonHandBurst {
     u8 pad0[0x18];
     s32 frame;

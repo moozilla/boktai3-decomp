@@ -1,8 +1,8 @@
-#include "scene_actor_behavior.h"
-#include "scene_actor_reaction.h"
-#include "script_utility.h"
-#include "engine.h"
-#include "monster_particle_random.h"
+#include "scene/actor/scene_actor_behavior.h"
+#include "scene/actor/scene_actor_reaction.h"
+#include "script/script_utility.h"
+#include "engine/engine.h"
+#include "engine/math/monster_particle_random.h"
 
 /* Bat defeat state (tentative; compare SceneActorReaction_BeginHiddenDefeat): on entry it
  * releases attachments, shows the drawable and clears the route; every 12 frames it emits

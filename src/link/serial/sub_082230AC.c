@@ -1,5 +1,5 @@
-#include "engine/shared/global.h"
-#include "engine/shared/ram.h"
+#include "global.h"
+#include "engine/ram.h"
 void InterruptsAndVideo_WaitForVBlank(void);
 void Serial_ResetMultiplayer_082230AC(void)
 {

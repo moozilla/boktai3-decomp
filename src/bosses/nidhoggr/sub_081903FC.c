@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 
 #define gNidhoggrEffectPhaseDurations gUnk_0824F292
 #define gNidhoggrEffectPhaseFrames    gUnk_0824F28C

@@ -1,6 +1,6 @@
 #define gPlayerActionCallbacks gUnk_08E879D8
-#include "engine/shared/global.h"
-#include "engine/shared/player.h"
+#include "global.h"
+#include "player/player.h"
 u32 LinkPlayer_GetInitialActionCount(struct Player *, const struct PlayerActionConfig *);
 void sub_0823A5EC(struct Player *, const struct PlayerActionConfig *);
 void sub_0823A830(struct Player *);

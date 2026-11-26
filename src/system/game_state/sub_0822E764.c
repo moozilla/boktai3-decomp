@@ -1,5 +1,5 @@
-#include "engine/shared/global.h"
-#include "engine/shared/engine.h"
+#include "global.h"
+#include "engine/engine.h"
 s32 GameState_GetUnlockEntry(s32 index);
 void GameState_SetUnlockSlot(s32 index, s32 value);
 s32 GameState_HasUnlockedInventoryEntry(s32 value);

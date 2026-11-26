@@ -24,7 +24,7 @@ handwritten instruction bodies were used.
 
 ## RFU wireless link-strength indicator
 
-`include/link/wireless_link_indicator/wireless_link_indicator.h` describes a **0xA4 task on list 11**, with
+`include/link/wireless/link_indicator.h` describes a **0xA4 task on list 11**, with
 singleton **gUnk_020000F4**, overall frame counter at 0x18, animation tick at
 0x1C, cached frame at 0x20, relocated resource at 0x24 and a **0x60 animation
 entry at 0x44**. Resource **CB05/7C8B** is loaded and relocated before animation
@@ -62,7 +62,7 @@ the generated disassembly lacks a function-start label there.
 Static constructors at **0804D5CC** allocate a **0x484 list-9 task** and retain
 it in **gUnk_02000488**. Registry entries include its constructor and an
 alternate constructor. The global identity is not established from the hash
-alone. `include/field/tether_actor/tether_actor.h` records only fields supported by this cohort:
+alone. `include/objects/coffin/tether_actor.h` records only fields supported by this cohort:
 world position at 0x50, heading at 0x260, **seven 0x28 effect segments at
 0x264**, palette index at 0x37C, opposing shake values at 0x37E/0x382,
 shake counter at 0x388, auxiliary ownership byte at 0x39B, auxiliary sprite

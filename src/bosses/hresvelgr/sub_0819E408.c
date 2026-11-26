@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 struct Hresvelgr {
     u8 pad0[0x94];
     s16 health, maxHealth;

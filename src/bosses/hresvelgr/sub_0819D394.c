@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 struct OffsetActorAction {
     u8 state, pad1[3];
     u32 frame, unk8, unkC;

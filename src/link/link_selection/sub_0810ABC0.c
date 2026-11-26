@@ -1,5 +1,5 @@
-#include "engine/shared/global.h"
-#include "engine/shared/ram.h"
+#include "global.h"
+#include "engine/ram.h"
 #define SessionMenu_ConsumeEntryFlag  Registry1745_ConsumeStateEntry
 #define SessionMenu_ResetWithCallback Registry1745_BeginShutdown
 u8 Registry1745_ConsumeStateEntry(void *);

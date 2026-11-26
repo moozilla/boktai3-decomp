@@ -1,5 +1,5 @@
-#include "engine/shared/global.h"
-#include "menus/scene_indicators/scene_indicator.h"
+#include "global.h"
+#include "ui/hud/scene_indicator.h"
 struct Actor {
     u8 pad[0x51];
     u8 heading;

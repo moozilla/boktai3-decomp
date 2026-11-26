@@ -1,8 +1,8 @@
-#include "engine/shared/global.h"
-#include "engine/shared/player.h"
-#include "engine/shared/contact_swarm.h"
-#include "engine/shared/ram.h"
-#include "player/player_cue/player_cue_sequence.h"
+#include "global.h"
+#include "player/player.h"
+#include "scene/actor/contact_swarm.h"
+#include "engine/ram.h"
+#include "player/cues/player_cue_sequence.h"
 void TimedEffect_GetOrCreateManager(s32);
 void *ActorDebris_Create(void *, void *, void *);
 void Sprite_Init(void *, void *, s32);

@@ -1,4 +1,4 @@
-#include "sprite_effect_controller.h"
+#include "effects/sprites/sprite_effect_controller.h"
 static inline u8 SpriteEffectController_IsUsed(struct SpriteEffectControllerPool *pool, s32 index)
 {
     if (pool->used & (1 << index))

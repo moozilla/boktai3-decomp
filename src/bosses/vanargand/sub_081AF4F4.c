@@ -1,5 +1,5 @@
-#include "engine/shared/global.h"
-#include "engine/shared/ram.h"
+#include "global.h"
+#include "engine/ram.h"
 #include "bosses/vanargand/vanargand_pair_attack.h"
 
 /* Registry routine 4D12: puts the Vanargand body back into action phase 14 and

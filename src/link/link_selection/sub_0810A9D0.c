@@ -1,7 +1,7 @@
-#include "engine/shared/global.h"
+#include "global.h"
 #include "link/link_selection/link_selection_mode.h"
-#include "engine/shared/area_effect_link.h"
-#include "engine/shared/ram.h"
+#include "scene/area_effect/area_effect_link.h"
+#include "engine/ram.h"
 
 #define gLinkSelectionDisplaySlots gSceneSelectionDisplaySlots
 u8 Registry1745_ConsumeStateEntry(struct AreaEffectLinkState *);

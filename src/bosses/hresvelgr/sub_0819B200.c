@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 /* Math_StepAngleTowardTarget: Steps along the shortest angular difference without overshooting the target */
 #define Math_StepAngleTowardTarget sub_0819B200
 

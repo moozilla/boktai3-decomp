@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 struct Ratatosk081F56F0 {
     u8 pad0[0xAF];
     u8 complete;

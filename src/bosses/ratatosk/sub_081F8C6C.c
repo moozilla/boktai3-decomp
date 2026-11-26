@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 struct SceneSongState {
     u8 pad0[0xAA];
     u8 state;

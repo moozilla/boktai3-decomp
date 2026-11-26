@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 
 void Sprite_Remove(void *);
 void ScaledShadow_Destroy(void *);

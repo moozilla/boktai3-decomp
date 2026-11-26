@@ -116,13 +116,13 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [docs/DEVLOG_2026-10-08.md](../docs/DEVLOG_2026-10-08.md) | Boktai 3 devlog for October 8 2026 | *#process* | 21 |
 | [docs/DRAFT_INVENTORY_2026-10-09.md](../docs/DRAFT_INVENTORY_2026-10-09.md) | Existing-draft inventory (October 9, 2026) | *#inventory #matching* | 12 |
 | [docs/EEPROM.md](../docs/EEPROM.md) | EEPROM SDK source matches | *#hardware #library* | 2 |
-| [docs/ENGINE.md](../docs/ENGINE.md) | How the Boktai 3 engine works |  | 48 |
+| [docs/ENGINE.md](../docs/ENGINE.md) | How the Boktai 3 engine works |  | 47 |
 | [docs/ENTRY_AND_MENUS.md](../docs/ENTRY_AND_MENUS.md) | Entry point and contiguous subsystem batch |  | 5 |
 | [docs/FINDINGS.md](../docs/FINDINGS.md) | Engine findings |  | 5 |
 | [docs/FOUNDRY.md](../docs/FOUNDRY.md) | The foundry: asm to a committed match, measured as a funnel | #matching #tooling | 12 |
-| [docs/GAME_LAYOUT.md](../docs/GAME_LAYOUT.md) | Boktai 3 game layout: from ROM to gameplay | *#assets* | 34 |
+| [docs/GAME_LAYOUT.md](../docs/GAME_LAYOUT.md) | Boktai 3 game layout: from ROM to gameplay | *#assets #text #tooling* | 40 |
 | [docs/GHOUL_CONTACT_RESPONSE.md](../docs/GHOUL_CONTACT_RESPONSE.md) | Ghoul contact response: 0808B3EC | #matching #ghoul #scene-actor #regalloc #0808B3EC | 3 |
-| [docs/HANDOFF.md](../docs/HANDOFF.md) | Handoff: current state and how to continue | #process | 14 |
+| [docs/HANDOFF.md](../docs/HANDOFF.md) | Handoff: current state and how to continue | #process | 15 |
 | [docs/HIT_SWITCH.md](../docs/HIT_SWITCH.md) | Hit-counted switch pool (tentative identity) |  | 5 |
 | [docs/KNIDL_PROCESS_REVIEW_2026-10-09.md](../docs/KNIDL_PROCESS_REVIEW_2026-10-09.md) | KNIDL workflow review and implications for Boktai 3 | *#process* | 13 |
 | [docs/LAYOUTS.md](../docs/LAYOUTS.md) | RAM object layouts merged across files | #tooling #matching | 12 |
@@ -142,7 +142,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [docs/PROGRESS_CI.md](../docs/PROGRESS_CI.md) | ROM-free progress reports | *#progress* | 13 |
 | [docs/PUSH20_2026-10-08.md](../docs/PUSH20_2026-10-08.md) | Matching push toward 20% code | *#matching* | 11 |
 | [docs/RAM.md](../docs/RAM.md) | RAM objects: the inventory and shared declarations | #tooling #matching #progress | 8 |
-| [docs/REGALLOC.md](../docs/REGALLOC.md) | Register allocation in agbcc, and how to steer it from C | *#matching #tooling* | 21 |
+| [docs/REGALLOC.md](../docs/REGALLOC.md) | Register allocation in agbcc, and how to steer it from C | *#matching #tooling* | 20 |
 | [docs/REPORT_SUBSYSTEMS.md](../docs/REPORT_SUBSYSTEMS.md) | Subsystem report organization | *#tooling #progress* | 10 |
 | [docs/RESEARCH_2026-10-12.md](../docs/RESEARCH_2026-10-12.md) | RESEARCH_2026-10-12.md |  | 28 |
 | [docs/RETROSPECTIVE_2026-10-08.md](../docs/RETROSPECTIVE_2026-10-08.md) | Boktai 3 matching run retrospective | *#matching #process* | 26 |
@@ -192,7 +192,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [docs/SCENE_INVENTORY_TAIL.md](../docs/SCENE_INVENTORY_TAIL.md) | Inventory controller tail, catalogs and completion | *#inventory #sound #tooling* | 8 |
 | [docs/SCENE_PANEL_COMMANDS.md](../docs/SCENE_PANEL_COMMANDS.md) | ScenePanel message and display helpers |  | 3 |
 | [docs/SCENE_PANEL_CONFIGURATION.md](../docs/SCENE_PANEL_CONFIGURATION.md) | Scene panel script configuration and subject creation | *#scripts #scene #panel* | 3 |
-| [docs/SCENE_PANEL_EFFECTS.md](../docs/SCENE_PANEL_EFFECTS.md) | Scene panel particles and time palettes | *#scene #panel #menu #particles #assets* | 10 |
+| [docs/SCENE_PANEL_EFFECTS.md](../docs/SCENE_PANEL_EFFECTS.md) | Scene panel particles and time palettes | *#scene #panel #particles #assets* | 10 |
 | [docs/SCENE_PANEL_INTERACTION.md](../docs/SCENE_PANEL_INTERACTION.md) | Scene panel interaction states | *#scene #panel #assets* | 7 |
 | [docs/SCENE_PANEL_LIFECYCLE.md](../docs/SCENE_PANEL_LIFECYCLE.md) | Scene panel lifecycle | *#scene #panel* | 2 |
 | [docs/SCENE_PANEL_ORCHESTRATION.md](../docs/SCENE_PANEL_ORCHESTRATION.md) | Scene panel initialization and script controls | *#scripts #scene #panel #assets* | 3 |
@@ -209,7 +209,8 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [docs/SHARED_MONSTER_REACTIONS.md](../docs/SHARED_MONSTER_REACTIONS.md) | Shared monster pursuit and contact operations | #matching #scene-actor #golem #skeleton #ghoul #mummy #regalloc #080C9C04 #080C12FC #0808B3EC #080DA97C #080D2584 #08078EE8 | 9 |
 | [docs/SHIFTABILITY.md](../docs/SHIFTABILITY.md) | Shiftable data: how it was proven | #tooling #assets | 1 |
 | [docs/SOLAR_SENSOR.md](../docs/SOLAR_SENSOR.md) | Cartridge solar sensor: code and runtime evidence | *#hardware* | 5 |
-| [docs/SOURCE_LAYOUT.md](../docs/SOURCE_LAYOUT.md) | Source layout | #tooling #process | 2 |
+| [docs/SOURCE_LAYOUT.md](../docs/SOURCE_LAYOUT.md) | Source layout | #tooling #process | 14 |
+| [docs/SOURCE_LAYOUT_DECISIONS.md](../docs/SOURCE_LAYOUT_DECISIONS.md) | Source layout: decisions | #tooling #process | 18 |
 | [docs/SPARK_PARTICLE.md](../docs/SPARK_PARTICLE.md) | Moving tile particles (tentative identity) | *#particles #assets* | 3 |
 | [docs/SPRITE_EFFECT_CONTROLLER.md](../docs/SPRITE_EFFECT_CONTROLLER.md) | Sprite effect controllers (tentative) | *#assets* | 2 |
 | [docs/SPRITE_EFFECT_STEERING_ACTORS.md](../docs/SPRITE_EFFECT_STEERING_ACTORS.md) | Sprite/effect controllers and steering actors (0806B2C4–0806CA3C) | *#actors #assets* | 13 |
@@ -240,7 +241,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [docs/history/2026-11-16.md](../docs/history/2026-11-16.md) | 2026-11-16 | #cleanup #compiler #concessions #depin #matching #object-model #round13 #round14 #tooling | 18 |
 | [docs/history/2026-11-17.md](../docs/history/2026-11-17.md) | 2026-11-17 | #compiler #depin #matching #phase3 #round13 #round15 #structs | 3 |
 | [docs/history/2026-11-20.md](../docs/history/2026-11-20.md) | 2026-11-20 | #actors #compiler #matching #monsters #phase3 #scene #scene-actors #tooling #wireless | 2 |
-| [docs/history/2026-11-25.md](../docs/history/2026-11-25.md) | Work log, 2026-11-25 | #compiler #matching #phase3 #process #tooling | 1 |
+| [docs/history/2026-11-25.md](../docs/history/2026-11-25.md) | Work log, 2026-11-25 | #compiler #matching #phase3 #process #tooling | 2 |
 | [docs/history/HANDOFF_2026-10-23.md](../docs/history/HANDOFF_2026-10-23.md) | Handoff: current state and how to continue | #process | 14 |
 | [docs/history/MANAGER_HANDOFF_2026-10-19.md](../docs/history/MANAGER_HANDOFF_2026-10-19.md) | Manager handoff (2026-10-19) | #process #tooling | 6 |
 | [docs/history/README.md](../docs/history/README.md) | Handoff history |  | 17 |
@@ -280,7 +281,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [notes/cloud-080D2194.md](../notes/cloud-080D2194.md) | Cloud task 080D2194 |  | 1 |
 | [notes/cloud-080D5778.md](../notes/cloud-080D5778.md) | Cloud task 080D5778 |  | 1 |
 | [notes/cloud-080E0750.md](../notes/cloud-080E0750.md) | Cloud task 080E0750 (Dog states, scene-actor defeat) | *#actors #scene* | 2 |
-| [notes/cloud-08122DF4.md](../notes/cloud-08122DF4.md) | Cloud task 08122DF4 | *#actors #particles #animation #assets* | 15 |
+| [notes/cloud-08122DF4.md](../notes/cloud-08122DF4.md) | Cloud task 08122DF4 | *#actors #scene #particles #animation #assets* | 15 |
 | [notes/cloud-08132904.md](../notes/cloud-08132904.md) | Cloud task 08132904 |  | 1 |
 | [notes/cloud-08132D2C.md](../notes/cloud-08132D2C.md) | Cloud task 08132D2C |  | 1 |
 | [notes/cloud-0819E7F0_2026-10-19.md](../notes/cloud-0819E7F0_2026-10-19.md) | Cloud task 0819E7F0: Hresvelgr burst phases (2026-10-19) | #matching #hresvelgr | 2 |
@@ -302,7 +303,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [notes/cx-astra1.md](../notes/cx-astra1.md) | Campaign worker astra1 | #matching #monsters #register-pinning | 7 |
 | [notes/cx-astra2.md](../notes/cx-astra2.md) | Campaign worker astra2 | #matching #monsters #actors | 4 |
 | [notes/cx-astra3.md](../notes/cx-astra3.md) | Campaign worker astra3 | #matching #nonmatching #golem #scene-actors | 3 |
-| [notes/cx-cl-bosses_cleanup_2026-11-13.md](../notes/cx-cl-bosses_cleanup_2026-11-13.md) | Bosses, Player and Engine core cleanup, 2026-11-13 | #matching #actors #tooling #process | 27 |
+| [notes/cx-cl-bosses_cleanup_2026-11-13.md](../notes/cx-cl-bosses_cleanup_2026-11-13.md) | Bosses, Player and Engine core cleanup, 2026-11-13 | #matching #actors #tooling #process | 26 |
 | [notes/cx-cl-field-effects_2026-11-13.md](../notes/cx-cl-field-effects_2026-11-13.md) | Field objects and presentation cleanup | #matching #animation #particles #scene #assets #tooling | 14 |
 | [notes/cx-dp-field_2026-11-13.md](../notes/cx-dp-field_2026-11-13.md) | Field concession removal, 2026-11-13 | #matching #phase3 #field | 2 |
 | [notes/cx-sol01.md](../notes/cx-sol01.md) | cx-sol01 campaign | #player #matching | 19 |
@@ -338,7 +339,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [notes/drawable-reset-playback.md](../notes/drawable-reset-playback.md) | Drawable playback in the monster reset callbacks | #monsters #matching | 1 |
 | [notes/effects-background-flash_2026-10-14.md](../notes/effects-background-flash_2026-10-14.md) | Transient sprite effects and BG1 flash controller, October 14 | *#assets* | 7 |
 | [notes/encoded-records_2026-10-14.md](../notes/encoded-records_2026-10-14.md) | Encoded records and password callers, 08044C80–080454C0 | *#menu #tooling* | 5 |
-| [notes/ewram-layout_2026-10-27.md](../notes/ewram-layout_2026-10-27.md) | EWRAM shared declarations and layouts (2026-10-27) | #matching #tooling | 12 |
+| [notes/ewram-layout_2026-10-27.md](../notes/ewram-layout_2026-10-27.md) | EWRAM shared declarations and layouts (2026-10-27) | #matching #tooling | 11 |
 | [notes/far-branch-tails.md](../notes/far-branch-tails.md) | Far-branch tails: big functions that were split in pieces | #matching #tooling | 3 |
 | [notes/field_effects_b_cleanup_2026-11-13.md](../notes/field_effects_b_cleanup_2026-11-13.md) | Field effects B cleanup, 2026-11-13 | #actors #particles #animation #matching | 3 |
 | [notes/finish-bosses_2026-10-30.md](../notes/finish-bosses_2026-10-30.md) | Boss matching worker: Ratatosk, Vanargand and Hresvelgr | #matching #bosses #ratatosk #vanargand #hresvelgr #compiler | 9 |
@@ -434,7 +435,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [notes/parameterized-motion-pool_2026-10-14.md](../notes/parameterized-motion-pool_2026-10-14.md) | Parameterized motion pool, 080454C0–08045A20 |  | 5 |
 | [notes/phase3-dp-bosses_2026-11-13.md](../notes/phase3-dp-bosses_2026-11-13.md) | Bosses, Player and Engine core phase 3 results | #matching #phase3 #bosses #player #tooling | 4 |
 | [notes/phase3-dp-field-b_2026-11-13.md](../notes/phase3-dp-field-b_2026-11-13.md) | Field objects and hazards: dp-field-b run | #phase3 #actors #particles #animation #tools | 4 |
-| [notes/phase3-holdouts.md](../notes/phase3-holdouts.md) | Phase 3 holdouts | #matching #phase3 #holdouts | 368 |
+| [notes/phase3-holdouts.md](../notes/phase3-holdouts.md) | Phase 3 holdouts | #matching #phase3 #holdouts | 367 |
 | [notes/pilot-haiku.md](../notes/pilot-haiku.md) | pilot-haiku notes |  | 1 |
 | [notes/pilot-sonnet.md](../notes/pilot-sonnet.md) | pilot-sonnet.md |  | 0 |
 | [notes/player-clone-fill_2026-11-13.md](../notes/player-clone-fill_2026-11-13.md) | Player clone fill-local cleanup | #matching #actors #animation | 2 |
@@ -453,7 +454,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [notes/registry-callback-updater_2026-11-01.md](../notes/registry-callback-updater_2026-11-01.md) | SceneActorRegistry_UpdateActors | *#particles* | 2 |
 | [notes/registry-particle-burst.md](../notes/registry-particle-burst.md) | Registry update and contact particles | #scene-actors #matching | 0 |
 | [notes/registry_terrain_reactions.md](../notes/registry_terrain_reactions.md) | Registered actor terrain reactions | #matching #scene-actors | 0 |
-| [notes/repeated-effect_2026-10-14.md](../notes/repeated-effect_2026-10-14.md) | Contiguous repeated effect cohort (Sol, 2026-10-14) |  | 6 |
+| [notes/repeated-effect_2026-10-14.md](../notes/repeated-effect_2026-10-14.md) | Contiguous repeated effect cohort (Sol, 2026-10-14) |  | 5 |
 | [notes/research-handoff-2026-10-23.md](../notes/research-handoff-2026-10-23.md) | Research handoff: making matching cheaper (2026-10-23) | *#matching #process* | 7 |
 | [notes/resource-station_2026-10-14.md](../notes/resource-station_2026-10-14.md) | Stored-resource station (Sol, 2026-10-14) | *#assets #tooling* | 3 |
 | [notes/room-actor-layout_2026-11-15.md](../notes/room-actor-layout_2026-11-15.md) | The registry actor base: merged layout (2026-11-15) | #object-model #structs #actors #registry #enemies | 10 |
@@ -641,7 +642,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [notes/solo-family_2026-10-09.md](../notes/solo-family_2026-10-09.md) | Solo family tranche, October 9 |  | 5 |
 | [notes/sonnet-081EEECC-task.md](../notes/sonnet-081EEECC-task.md) | Task 081EEECC worker notes |  | 1 |
 | [notes/sonnet-from-end-08241504.md](../notes/sonnet-from-end-08241504.md) | sub_0824261C (Player update by kind) — unfinished |  | 1 |
-| [notes/source-layout_2026-11-25.md](../notes/source-layout_2026-11-25.md) | Source directory migration | #tooling #process | 1 |
+| [notes/source-layout_2026-11-25.md](../notes/source-layout_2026-11-25.md) | Source directory migration | #tooling #process | 2 |
 | [notes/spread_shot_cleanup_draft.md](../notes/spread_shot_cleanup_draft.md) | Spread-shot cleanup and matching evidence | #matching #scene #particles #structs #compiler | 3 |
 | [notes/sprite-unit-revisit_2026-11-13.md](../notes/sprite-unit-revisit_2026-11-13.md) | Sprite unit cleanup | #assets #animation #matching #process | 4 |
 | [notes/stage-icon-display_2026-10-14.md](../notes/stage-icon-display_2026-10-14.md) | Staged keyframe icon display |  | 3 |

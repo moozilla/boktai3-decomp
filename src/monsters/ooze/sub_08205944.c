@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 void Ooze_OnCollision(void)
 {
 }

@@ -1,5 +1,5 @@
-#include "engine/shared/global.h"
-#include "engine/shared/display_sequence_sprite.h"
+#include "global.h"
+#include "engine/video/display_sequence_sprite.h"
 
 struct NidhoggrAnimatedSlot {
     void *update, *onComplete;

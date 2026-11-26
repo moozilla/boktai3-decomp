@@ -10,10 +10,10 @@ Combined ROM validation belongs to the batch integration.
 
 ## One sequence implementation
 
-`include/engine/shared/display_sequence.h` now owns the existing `DisplaySequenceState` and
+`include/engine/video/display_sequence.h` now owns the existing `DisplaySequenceState` and
 `SceneActorControlMotionDrawable` definitions. Their fields and layout are
 unchanged. The former headers include these definitions, preserving existing
-consumers. `include/engine/shared/display_sequence_inline.h` supplies one `DisplaySequence_Step`
+consumers. `include/engine/video/display_sequence_inline.h` supplies one `DisplaySequence_Step`
 implementation used by all four initializers. It replaces four private copies
 and removes their unused getters and temporary declarations.
 

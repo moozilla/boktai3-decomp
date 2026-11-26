@@ -1,8 +1,8 @@
 // MATCHING_CONCESSION: register-pinning
-#include "scene_steering_actor.h"
-#include "engine.h"
-#include "ram.h"
-#include "monster_particle_random.h"
+#include "scene/actor/scene_steering_actor.h"
+#include "engine/engine.h"
+#include "engine/ram.h"
+#include "engine/math/monster_particle_random.h"
 extern const s16 gUnk_086149C4[];
 void SceneMovingParticle_Create(struct ContactPosition *, struct ContactPosition *, s32, s32);
 static inline s32 Truncate(s32 v)

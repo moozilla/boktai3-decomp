@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 u8 *Save_GetContinuationData(void);
 u8 *Save_GetContinuationDataEnd(void);
 s32 Save_GetContinuationSize(void)

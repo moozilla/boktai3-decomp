@@ -2,23 +2,23 @@
 
 Tags: #assets #animation #matching #process
 
-Sprite, 082142DC–08215698, now lives in `src/engine/interrupts_and_video/sprite.c`: 37 former one-function
+Sprite, 082142DC–08215698, now lives in `src/engine/video/sprite.c`: 37 former one-function
 files, all 5052 bytes matching stock agbcc. This resolves the cleanup holdout
 recorded at the first weekly stop; work resumed on the subsequent continue
 instruction.
 
 ## Shared layouts and APIs
 
-`DisplaySequenceSprite` moved from `include/effects/shared_display_animation_wrapper/display_animation.h` into
-`include/engine/interrupts_and_video/sprite.h`, with the same layout and typed previous/next links at 24/28.
+`DisplaySequenceSprite` moved from `include/engine/video/display_animation.h` into
+`include/engine/video/sprite.h`, with the same layout and typed previous/next links at 24/28.
 Legacy public field spellings remain compatible with external users: `palette`
 and `paletteVariant` hold signed X/Y scales in the piece renderer, `attribute`
 holds rotation, `unknown4` stores linked/visible, and `unknownA[0]` selects the
 list. The renderer casts the scale bytes to their signed interpretation.
 
-The effect list helpers reuse `SpriteDrawable` from `include/engine/sprite_oam/sprite_oam.h`.
+The effect list helpers reuse `SpriteDrawable` from `include/engine/video/sprite_oam.h`.
 The animation list helpers reuse `SceneInputWidget` from
-`include/engine/shared/scene_input_widget.h`. Private padded list views were removed.
+`include/ui/widgets/scene_input_widget.h`. Private padded list views were removed.
 
 `SpriteRenderResource` unifies the resource views into a 28-byte record with
 palette key, bounds, palette/tile/frame pointers, and the trailing word copied

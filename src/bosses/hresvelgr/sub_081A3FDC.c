@@ -1,5 +1,5 @@
-#include "engine/shared/global.h"
-#include "engine/shared/ram.h"
+#include "global.h"
+#include "engine/ram.h"
 /* Effect pool family names and field interpretations are tentative. */
 void *EffectPool_Create(s32, s32, s32);
 void EffectPool_AllocateEntry(u32, u32, u32, s32);

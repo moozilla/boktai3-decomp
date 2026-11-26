@@ -1,8 +1,8 @@
-/* AreaEffect_AddSpriteFromScript (src/field/rectangular_area_effects/sub_0804E388.c): plain draft, no concessions.
+/* AreaEffect_AddSpriteFromScript (src/scene/area_effect/sub_0804E388.c): plain draft, no concessions.
  * 19 ROM / 19 draft insns differ, all register choice: global alloc runs manager (priority
  * 1604: 10 refs, live 187) before the 0xA8 stride constant (1600, REG_EQUIV doubled life), so
  * manager takes r5 instead of r6 (AGBCC_PRI=<stride>:+5 matches). Needs manager live 188+.
- * The groundHeight/cellIndex inlines (as in src/field/items_and_containers/item_container.c) give the ROM's point copy
+ * The groundHeight/cellIndex inlines (as in src/objects/items/item_container.c) give the ROM's point copy
  * without the barrier; gcse copies &manager->count into r8 without the pin.
  * Tried without effect on the live length: ternaries, getCell inline, prototype types,
  * early-return forms, count pointer forms, cellIndex forms. */

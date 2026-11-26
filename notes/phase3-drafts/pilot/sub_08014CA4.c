@@ -1,8 +1,8 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
-#include "monster_particle_random.h"
-#include "ram.h"
-#include "engine_globals.h"
+#include "engine/math/monster_particle_random.h"
+#include "engine/ram.h"
+#include "engine/engine_globals.h"
 // confidence=low: allocates a fragment group with randomized direction and lifetime.
 #define FragmentGroup_SpawnRadial sub_08014CA4
 struct Vec {

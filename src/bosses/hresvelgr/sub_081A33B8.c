@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 struct HresvelgrShot {
     u32 flags;
     u8 unknown04[0x18];

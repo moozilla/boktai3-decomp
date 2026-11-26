@@ -1,5 +1,5 @@
-#include "engine/shared/global.h"
-#include "engine/shared/render.h"
+#include "global.h"
+#include "engine/video/render.h"
 #include "link/link_player/link_player_palette.h"
 
 void LinkPlayer_LoadAnimationParameters(void *);

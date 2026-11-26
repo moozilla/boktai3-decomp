@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 
 #define gScenePanelEffectColliderShape gUnk_0824F184
 

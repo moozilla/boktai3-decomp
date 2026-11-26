@@ -1,5 +1,5 @@
-#include "engine/shared/global.h"
-#include "engine/shared/ram.h"
+#include "global.h"
+#include "engine/ram.h"
 void Solar_InitControllerState(void *);
 void sub_0822CB08(void *);
 u32 Solar_InitController(void *p)

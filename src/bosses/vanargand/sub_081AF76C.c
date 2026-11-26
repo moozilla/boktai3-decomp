@@ -1,4 +1,4 @@
-#include "actors/paired_scene_actor/paired_scene_actor.h"
+#include "bosses/vanargand/paired_scene_actor.h"
 
 void Vanargand_ResetState(struct PairedSceneHalf *actor, s32 state)
 {

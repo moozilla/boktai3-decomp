@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 void Collision_CalculateDamageResponse(void *, void *);
 void PlayerStats_AddContactHundredths(void *, void *, u32);
 struct Dest {

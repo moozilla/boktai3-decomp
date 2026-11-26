@@ -1,7 +1,7 @@
-#include "scene_actor_reset.h"
-#include "scene_actor_terrain.h"
-#include "engine.h"
-#include "ram.h"
+#include "scene/actor/scene_actor_reset.h"
+#include "scene/actor/scene_actor_terrain.h"
+#include "engine/engine.h"
+#include "engine/ram.h"
 struct TentacleWanderTarget {
     u8 unknown0[12];
     struct ContactPosition position;

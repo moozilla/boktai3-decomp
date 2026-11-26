@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 #include "monsters/armor/armor_action.h"
 
 s32 DirectionalActor_TryBeginState(void *, s32);

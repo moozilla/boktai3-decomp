@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 s32 Mod(s32, s32);
 void sub_0820B034(void *);
 void Anim_SetSequence(void *, void *, u32, u32, u32);

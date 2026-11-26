@@ -1,5 +1,5 @@
-#include "resource_station.h"
-#include "render.h"
+#include "objects/solar_stand/resource_station.h"
+#include "engine/video/render.h"
 s32 Div(s32, s32);
 void Anim_LoadKeyframe(void *, void *, u16, u32);
 static inline s32 truncateScale(s32 value)

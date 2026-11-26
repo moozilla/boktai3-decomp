@@ -1,5 +1,5 @@
-#include "spark_particle.h"
-#include "scene_particle_step.h"
+#include "effects/particles/spark_particle.h"
+#include "effects/scene_particle_step.h"
 s32 SparkParticle_UpdatePool(struct SparkParticlePool *pool)
 {
     if (pool->activeCount) {

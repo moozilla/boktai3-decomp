@@ -1,6 +1,6 @@
-#include "engine/shared/global.h"
-#include "engine/shared/engine_globals.h"
-#include "engine/shared/ram.h"
+#include "global.h"
+#include "engine/engine_globals.h"
+#include "engine/ram.h"
 s32 Mod(s32, s32);
 u8 *Ratatosk_GetRandomMovementPoint(u8 *p)
 {

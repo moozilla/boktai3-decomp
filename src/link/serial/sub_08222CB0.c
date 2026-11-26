@@ -1,5 +1,5 @@
-#include "engine/shared/global.h"
-#include "engine/shared/ram.h"
+#include "global.h"
+#include "engine/ram.h"
 extern void Serial_ServiceInterrupt(void);
 void Serial_EnableInterrupt(void)
 {

@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 struct SceneBackdrop {
     void *resource;
     u32 unknown4;

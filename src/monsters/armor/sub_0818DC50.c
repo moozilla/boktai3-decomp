@@ -1,4 +1,4 @@
-#include "monsters/armor/motion_0818.h"
+#include "monsters/armor/spinning_approach_chain.h"
 struct ReturnDampingCounter {
     u8 pad[0x126];
     u16 ticks;

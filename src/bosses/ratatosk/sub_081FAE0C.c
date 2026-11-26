@@ -1,9 +1,9 @@
-#include "engine/shared/global.h"
-#include "engine/shared/player.h"
-#include "engine/shared/scene_actor_init_actor.h"
-#include "engine/shared/engine.h"
-#include "engine/shared/scene_vec.h"
-#include "engine/shared/render.h"
+#include "global.h"
+#include "player/player.h"
+#include "scene/actor/scene_actor_init_actor.h"
+#include "engine/engine.h"
+#include "engine/math/scene_vec.h"
+#include "engine/video/render.h"
 
 void SceneActors_Register(void *, s32);
 void SceneActors_Initialize(void *, u32, s32, void *, s32);

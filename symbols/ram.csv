@@ -1,268 +1,268 @@
 addr,name,size,kind,decl,header,confidence,notes
-02000000,gBackgrounds,10,object,extern struct Background *gBackgrounds[];,include/effects/background_controllers/background_controller.h,low,
-02000010,gScrollingBackgrounds,10,object,extern struct ScrollingBackground *gScrollingBackgrounds[];,include/effects/background_controllers/background_controller.h,low,
-02000020,gColorFadeController,4,object,extern struct ColorFadeController *gColorFadeController;,include/engine/shared/ram.h,low,
-02000024,gSceneObjectManager,4,object,extern struct SceneObjectManager *gSceneObjectManager;,include/field/scene_objects/scene_object.h,low,
-02000028,gTerrainModifierManager,4,object,extern struct TerrainModifierManager *gTerrainModifierManager;,include/field/terrain_modifiers/terrain_modifier.h,low,
-0200002C,gChoiceMenu,4,object,extern struct ChoiceMenu *gChoiceMenu;,include/menus/choice_menu/choice_menu.h,low,
-02000030,gTriggerManager,4,object,extern struct TriggerManager *gTriggerManager;,include/field/items_and_containers/item_container.h,low,
-02000034,gPooledInteractableManager,4,object,extern struct PooledInteractableManager *gPooledInteractableManager;,include/field/pooled_interactables/pooled_interactable.h,low,
-02000038,gDirectionalManager,4,object,extern struct DirectionalManager *gDirectionalManager;,include/field/directional_interaction_controllers/directional_interaction.h,low,
-0200003C,gCollisionManager,4,object,extern struct CollisionManager *gCollisionManager;,include/field/collision_controllers/collision_controller.h,low,
-02000040,gEffectManager,4,object,extern struct EffectManager *gEffectManager;,include/effects/homing_and_orbiting_effects/homing_effect.h,low,
-02000044,gStatusScreen,4,object,extern struct StatusScreen *gStatusScreen;,include/menus/status_screen/status_screen.h,low,
-02000048,gNumericOverlay,4,object,extern struct NumericOverlay *gNumericOverlay;,include/menus/numeric_overlay/numeric_overlay.h,low,
-0200004C,gSceneIndicators,4,object,extern struct SceneIndicators *gSceneIndicators;,include/menus/scene_indicators/scene_indicator.h,low,
-02000050,gAnimatedHazardManager,4,object,extern struct AnimatedHazardManager *gAnimatedHazardManager;,include/field/animated_hazards/animated_hazard.h,low,
-02000054,gShadowManager,4,object,extern u32 gShadowManager;,include/engine/shared/ram.h,low,shadow task singleton (Shadow_*)
-02000058,gScaledShadowManager,4,object,extern u32 gScaledShadowManager;,include/engine/shared/ram.h,low,scaled shadow manager singleton (ScaledShadow_*)
-0200005C,gSceneActorEffectsManager,4,object,extern void *gSceneActorEffectsManager;,include/engine/shared/ram.h,low,scene actor effects manager (SceneActorEffects_*)
-02000060,gParticleGroupManager,4,object,extern void *gParticleGroupManager;,include/engine/shared/ram.h,low,provisional: six-group particle manager singleton (ParticleManager_Initialize)
-02000064,gFragmentManager,4,object,extern struct FragmentManager *gFragmentManager;,include/engine/shared/ram.h,low,fragment manager singleton (FragmentManager_*)
-02000068,gAnimatedParticleManager,4,object,extern void *gAnimatedParticleManager;,include/engine/shared/ram.h,low,animated particle manager (AnimatedParticleManager_*)
-0200006C,gFadingParticleManager,4,object,extern void *gFadingParticleManager;,include/engine/shared/ram.h,low,fading particle manager (FadingParticleManager_*)
-02000070,gPaletteLevels,4,object,extern struct PaletteLevels *gPaletteLevels;,include/effects/palette_level_transitions/palette_level_transitions.h,low,
-02000074,gDamageNumberDisplay,4,object,extern struct DamageNumberDisplay *gDamageNumberDisplay;,include/menus/floating_number_display/damage_number_display.h,low,
-02000078,gLinkedWidgetSet,4,object,extern struct LinkedWidgetSet *gLinkedWidgetSet;,include/engine/shared/ram.h,low,
-0200007C,gScanlineWave,4,object,extern u32 gScanlineWave;,include/engine/shared/ram.h,low,scanline wave effect task (ScanlineWave_*)
-02000080,gWeatherCooldownBase,4,object,extern s32 gWeatherCooldownBase;,include/engine/shared/ram.h,low,"weather cooldown base, configured by Weather_ConfigureCooldown"
-02000084,gWeatherCooldownRange,4,object,extern s32 gWeatherCooldownRange;,include/engine/shared/ram.h,low,random range added to the weather cooldown
-02000088,gStormActive,4,object,extern u32 gStormActive;,include/engine/shared/ram.h,low,set while Weather_Update is in storm phase 3
-0200008C,gStormTimer,4,object,extern s32 gStormTimer;,include/engine/shared/ram.h,low,provisional: storm duration/delay countdown shared by weather phases
-02000090,gWeatherState,4,object,extern struct WeatherState *gWeatherState;,include/engine/shared/ram.h,low,
-02000094,gPaletteCycle,4,object,extern u32 gPaletteCycle;,include/engine/shared/ram.h,low,palette cycle task (PaletteCycle_*)
-02000098,gEffectQuad,4,object,extern u32 gEffectQuad;,include/engine/shared/ram.h,low,
-0200009C,gCircleWindow,4,object,extern u32 gCircleWindow;,include/engine/shared/ram.h,low,circle window task (CircleWindow_*)
-020000A0,gTransientSpriteEffects,4,object,extern struct TransientSpriteEffects *gTransientSpriteEffects;,include/effects/transient_sprite_effects/transient_sprite_effects.h,low,
-020000A4,gTileAnimation,4,object,extern u32 gTileAnimation;,include/engine/shared/ram.h,low,tile animation task (TileAnimation_*)
-020000A8,gTemporaryAnimationPool,4,object,extern struct TemporaryAnimationPool *gTemporaryAnimationPool;,include/effects/temporary_animation_pool/temporary_animation_pool.h,low,
-020000AC,gTransientSpritePool,4,object,extern u8 *gTransientSpritePool;,include/engine/shared/ram.h,low,transient sprite pool (TransientSpritePool_*)
-020000B0,gSpritePoolManager,4,object,extern u32 gSpritePoolManager;,include/engine/shared/ram.h,low,sprite pool singleton (SpritePool_*)
-020000B8,gSceneActorRegistry,20,object,extern u8 *gSceneActorRegistry[8];,include/engine/shared/ram.h,low,eight scene actor registry slots (SceneActors_FindAvailable); eight-pointer loop ends before the independent 020000D8 slot
-020000D8,gActorPoolManager,4,object,extern void *gActorPoolManager;,include/engine/shared/ram.h,low,actor pool singleton; separate slot after the eight-entry registry
-020000DC,gMessageWindow,4,object,extern struct Actor *gMessageWindow;,include/engine/shared/ram.h,low,message window (MessageWindow_*)
-020000E0,gScrollingDialogue,4,object,extern struct Window *gScrollingDialogue;,include/engine/shared/ram.h,low,scrolling dialogue window (ScrollingDialogue_*)
-020000E4,gWindowManager,4,object,extern struct WindowManager *gWindowManager;,include/engine/shared/ram.h,low,
-020000E8,gTransition,4,object,extern struct Transition *gTransition;,include/engine/shared/ram.h,low,
-020000EC,gWirelessSessionState,1,object,extern u8 gWirelessSessionState;,include/engine/shared/ram.h,low,wireless session state byte (Wireless_*)
-020000F0,gWirelessLastStatus,4,object,extern u32 gWirelessLastStatus;,include/engine/shared/ram.h,low,cached wireless status used when its controller is absent
-020000F4,gWirelessLinkIndicator,4,object,extern struct WirelessLinkIndicator *gWirelessLinkIndicator;,include/link/wireless_link_indicator/wireless_link_indicator.h,low,
-020000F8,gLinkMenu,4,object,extern struct LinkMenu *gLinkMenu;,include/engine/shared/ram.h,low,
-020000FC,gWirelessTradeMenu,4,object,extern u32 gWirelessTradeMenu;,include/engine/shared/ram.h,low,wireless trade/exchange menu (WirelessTradeMenu_*)
-02000100,gWirelessGameItems,4,object,extern struct WirelessGameItems *gWirelessGameItems;,include/link/wireless_game_items_and_display/wireless_game_items_and_display.h,low,
-02000104,gResultMenu,4,object,extern struct ResultMenu *gResultMenu;,include/engine/shared/ram.h,low,
-02000108,gScenePool,4,object,extern u32 gScenePool;,include/engine/shared/ram.h,low,scene pool manager (ScenePool_*)
-0200010C,gAreaEffectManager,4,object,extern struct AreaEffectManager *gAreaEffectManager;,include/field/rectangular_area_effects/area_effect.h,low,
-02000110,gRepeatedEffectManager,4,object,extern struct RepeatedEffectManager *gRepeatedEffectManager;,include/effects/repeated_effects/repeated_effect.h,low,
-02000114,gDirectionalForce,4,object,extern struct DirectionalForce *gDirectionalForce;,include/engine/shared/directional_force.h,low,
-02000118,gStackedActor,4,object,extern struct StackedActor *gStackedActor;,include/field/stacked_actor/stacked_actor.h,low,
-0200011C,gStageIconDisplay,4,object,extern struct StageIconDisplay *gStageIconDisplay;,include/menus/stage_icon_display/stage_icon_display.h,low,
-02000120,gLevelAdvanceManager,4,object,extern struct LevelAdvanceManager *gLevelAdvanceManager;,include/menus/level_advance_display/level_advance_display.h,low,
-02000124,gActorAttachmentManager,4,object,extern struct ActorAttachmentManagerView *gActorAttachmentManager;,include/engine/shared/ram.h,low,actor attachment manager singleton
-02000128,gSceneActorControlManager,4,object,extern struct SceneActorControlManager *gSceneActorControlManager;,include/engine/shared/ram.h,low,
-0200012C,gColliderEffectPool,4,object,extern struct ColliderEffectPool *gColliderEffectPool;,include/engine/shared/ram.h,low,
-02000130,gSceneParticleBurstPool,4,object,extern struct SceneParticleBurstPool *gSceneParticleBurstPool;,include/engine/shared/ram.h,low,
-02000134,gSceneParticleEmitterPool,4,object,extern struct SceneParticlePool *gSceneParticleEmitterPool;,include/engine/shared/ram.h,low,provisional: scene particle emitter pool singleton
-02000138,gSpriteGroup,4,object,extern struct SpriteParticlePool *gSpriteGroup;,include/engine/shared/ram.h,low,
-0200013C,gSpriteEffectPool,4,object,extern struct SpriteEffectPool *gSpriteEffectPool;,include/engine/shared/ram.h,low,
-02000140,gAnimatedBodyPool,4,object,extern struct SceneScheduledEffectPool *gAnimatedBodyPool;,include/engine/shared/ram.h,low,
-02000144,gSpriteNoticeManager,4,object,extern struct SpriteNoticeManager *gSpriteNoticeManager;,include/engine/shared/ram.h,low,
-02000148,gPairSlotPool,4,object,extern struct PairSlotPool *gPairSlotPool;,include/engine/shared/ram.h,low,
-0200014C,gBouncingPool,4,object,extern struct BouncingPool *gBouncingPool;,include/field/bouncing_object_pool/bouncing_object.h,low,
-02000150,gSpriteBurstManager,4,object,extern u32 gSpriteBurstManager;,include/engine/shared/ram.h,low,
-02000154,gScriptedParticlePool,4,object,extern u8 *gScriptedParticlePool;,include/engine/shared/ram.h,low,scripted particle pool (ScriptedParticle_*)
-02000158,gSceneStatusIndicatorManager,4,object,extern u32 gSceneStatusIndicatorManager;,include/engine/shared/ram.h,low,
-0200015C,gBurstSparkPool,4,object,extern struct BurstSparkPool *gBurstSparkPool;,include/engine/shared/ram.h,low,
-02000160,gBurstEmitterPool,4,object,extern struct BurstEmitterPool *gBurstEmitterPool;,include/effects/five_slot_burst_emitter/burst_emitter.h,low,
-02000164,gPooledSpriteManager,4,object,extern struct ProjectilePool *gPooledSpriteManager;,include/engine/shared/ram.h,low,
-02000168,gSparkParticlePool,4,object,extern struct SparkParticlePool *gSparkParticlePool;,include/engine/shared/spark_particle.h,low,
-0200016C,gMovingSpritePool,4,object,extern u32 gMovingSpritePool;,include/engine/shared/ram.h,low,
-02000170,gSpriteGroupPool,4,object,extern struct FragmentBurstPool *gSpriteGroupPool;,include/engine/shared/ram.h,low,
-02000174,gFadingSpritePool,4,object,extern struct FeatherPool *gFadingSpritePool;,include/engine/shared/ram.h,low,
-02000178,gSpriteEffectControllerPool,4,object,extern struct SpriteEffectControllerPool *gSpriteEffectControllerPool;,include/engine/shared/sprite_effect_controller.h,low,
-0200017C,gSunDiscPool,4,object,extern u8 *gSunDiscPool;,include/engine/shared/ram.h,low,sun disc pool (SunDiscPool_*)
-02000180,gActorEffectManager,4,object,extern u8 *gActorEffectManager;,include/engine/shared/ram.h,low,
-02000184,gPursuingActorManager,4,object,extern struct Pool *gPursuingActorManager;,include/engine/shared/ram.h,low,
-02000188,gSceneSteeringActorPool,4,object,extern struct SceneSteeringActorPool *gSceneSteeringActorPool;,include/engine/shared/scene_steering_actor.h,low,
-0200018C,gFragmentEffectManager,4,object,extern u8 *gFragmentEffectManager;,include/engine/shared/ram.h,low,fragment effect manager (FragmentEffect_*)
-02000190,gScriptedColliderManager,4,object,extern u32 gScriptedColliderManager;,include/engine/shared/ram.h,low,
-02000194,gSceneParticlePool,4,object,extern struct SceneParticlePool *gSceneParticlePool;,include/engine/shared/ram.h,low,
-02000198,gRouteSpritePool,4,object,extern struct RouteSpritePool *gRouteSpritePool;,include/engine/shared/route_sprite_actor.h,low,
-0200019C,gSceneEffectSchedule,4,object,extern struct SceneEffectSchedule *gSceneEffectSchedule;,include/effects/scheduled_scene_effects/scene_effect_schedule.h,low,
-020001A0,gSceneActorContactManager,4,object,extern struct SceneActorContactManager *gSceneActorContactManager;,include/engine/shared/scene_actor_contacts.h,low,
-020001A4,gWoodenCrateManager,4,object,extern u8 *gWoodenCrateManager;,include/engine/shared/ram.h,low,
-020001A8,gFloorSwitchManager,4,object,extern u32 gFloorSwitchManager;,include/engine/shared/ram.h,low,floor switch manager (FloorSwitch_*)
-020001AC,gNamedActorManager,4,object,extern struct NamedObjectManager *gNamedActorManager;,include/engine/shared/ram.h,low,named actor object pool singleton; provisional common name
-020001B0,gActorGroupPool,4,object,extern void *gActorGroupPool;,include/engine/shared/ram.h,low,four-slot actor group and callback pool singleton
-020001B4,gRegionActorPool,4,object,extern struct RegionSpriteManager *gRegionActorPool;,include/engine/shared/ram.h,low,
-020001B8,gTileTriggerManager,4,object,extern struct TileTriggerManager *gTileTriggerManager;,include/engine/shared/ram.h,low,
-020001BC,gNamedEntryPool,4,object,extern u32 gNamedEntryPool;,include/engine/shared/ram.h,low,
-020001C0,gLinkSessionStep,4,object,extern u32 gLinkSessionStep;,include/engine/shared/ram.h,low,provisional: Registry1745_RunSession diagnostic step marker
-020001C4,gLinkPanel,4,object,extern u32 gLinkPanel;,include/engine/shared/ram.h,low,
-020001C8,gPanelSequence,4,object,extern u32 gPanelSequence;,include/engine/shared/ram.h,low,
-020001CC,gConfirmPanel,4,object,extern u8 *gConfirmPanel;,include/engine/shared/ram.h,low,provisional: Registry3C9F confirmation panel singleton
-020001D0,gActiveRecordMenu,4,object,extern u32 gActiveRecordMenu;,include/engine/shared/ram.h,low,
-020001D4,gSaveMenu,4,object,extern u32 gSaveMenu;,include/engine/shared/ram.h,low,save menu task (SaveMenu_*)
-020001D8,gPaletteFade,4,object,extern struct PaletteFade *gPaletteFade;,include/engine/shared/ram.h,low,
-020001DC,gParticleManager,4,object,extern struct ParticleManager *gParticleManager;,include/engine/shared/ram.h,low,
-020001E0,gScreenMoteManager,4,object,extern u32 gScreenMoteManager;,include/engine/shared/ram.h,low,
-020001E4,gActorParticlePool,4,object,extern u32 gActorParticlePool;,include/engine/shared/ram.h,low,
-020001E8,gCompactParticlePool,4,object,extern struct SmallCallbackPool *gCompactParticlePool;,include/engine/shared/ram.h,low,
-020001F0,gMessagePacket,8,object,extern struct Packet gMessagePacket;,include/engine/shared/ram.h,low,
-020001F8,gTerrainColumnIndices,4,object,extern u8 *gTerrainColumnIndices;,include/engine/shared/ram.h,low,
-020001FC,gTerrainColumns,4,object,extern struct TerrainColumn *gTerrainColumns;,include/engine/shared/ram.h,low,
-02000200,gSpatialIndex,4,object,extern struct SpatialIndex *gSpatialIndex;,include/engine/shared/ram.h,low,
-02000204,gRegistryE7BCManager,4,object,extern void *gRegistryE7BCManager;,include/engine/shared/ram.h,low,provisional: registry E7BC pooled-object manager
-02000208,gScriptRecordTable,4,object,extern u8 *gScriptRecordTable;,include/engine/shared/ram.h,low,
-0200020C,gActorManager,4,object,extern void *gActorManager;,include/engine/shared/ram.h,low,
-02000210,gGameOver,4,object,extern struct GameOver *gGameOver;,include/engine/shared/ram.h,low,
-02000214,gFieldHud,4,object,extern u8 *gFieldHud;,include/engine/shared/ram.h,low,
-02000218,gSceneEffectQueue,4,object,extern u8 *gSceneEffectQueue;,include/engine/shared/ram.h,low,scene effect queue (SceneEffectQueue_*)
-0200021C,gOffsetActorAnimationRepeats,4,object,extern s32 gOffsetActorAnimationRepeats;,include/engine/shared/ram.h,low,repeated offset-actor animation counter
-02000220,gHresvelgrAttackCount,4,object,extern s32 gHresvelgrAttackCount;,include/engine/shared/ram.h,low,provisional: Hresvelgr attack-cycle counter
-0200022C,gHresvelgrHazardIndex,4,object,extern s32 gHresvelgrHazardIndex;,include/engine/shared/ram.h,low,nearest active growth hazard selected by Hresvelgr_UpdateHazardVisit
-02000230,gHresvelgrVolleyState,4,object,extern u32 gHresvelgrVolleyState;,include/engine/shared/ram.h,low,provisional: Hresvelgr volley state word
-02000234,gHresvelgrVolleyCount,4,object,extern s32 gHresvelgrVolleyCount;,include/engine/shared/ram.h,low,alternating Hresvelgr volley pulse counter
-02000238,gDirectionBurstEmitter,4,object,extern void *gDirectionBurstEmitter;,include/engine/shared/ram.h,low,
-0200023C,gEffectPoolManager,4,object,extern void *gEffectPoolManager;,include/engine/shared/ram.h,low,effect pool (EffectPool_*)
-02000240,gMotionEntryManager,4,object,extern void *gMotionEntryManager;,include/engine/shared/ram.h,low,
-02000244,gHresvelgrProjectilePool,4,object,extern void *gHresvelgrProjectilePool;,include/engine/shared/ram.h,low,
-02000250,gSceneComposite,4,object,extern void *gSceneComposite;,include/engine/shared/ram.h,low,
-02000254,gVanargandPartController,4,object,extern void *gVanargandPartController;,include/engine/shared/ram.h,low,Vanargand part controller
-02000258,gGrowthHazardManager,4,object,extern u32 gGrowthHazardManager;,include/engine/shared/ram.h,low,
-0200025C,gSelectionPanel,4,object,extern u8 *gSelectionPanel;,include/engine/shared/ram.h,low,
-02000260,gSegmentDisplay,4,object,extern u32 gSegmentDisplay;,include/engine/shared/ram.h,low,
-02000264,gSparkleEmitter,4,object,extern void *gSparkleEmitter;,include/engine/shared/ram.h,low,sparkle emitter (SparkleEmitter_*)
-02000268,gRegistryF3E4Actor,4,object,extern struct F3E4Actor *gRegistryF3E4Actor;,include/engine/shared/ram.h,low,provisional: registry F3E4 singleton actor
-0200026C,gShipWheel,4,object,extern u32 gShipWheel;,include/engine/shared/ram.h,low,ship wheel task (ShipWheel_*)
-02000274,gSceneNpc,4,object,extern struct SceneNpc *gSceneNpc;,include/engine/shared/ram.h,low,
-02000278,gSceneNpcBlendPalette,20,object,extern u16 gSceneNpcBlendPalette[16];,include/engine/shared/ram.h,low,sixteen-color output palette blended by SceneNpc_BlendPalette
-02000298,gCloudTask,4,object,extern struct CloudTask *gCloudTask;,include/engine/shared/ram.h,low,
-020002A0,gOptionMenuParameters,20,object,extern struct OptionMenuParameters gOptionMenuParameters;,include/engine/shared/menu_parameters.h,low,option-menu callbacks; keyword names retained; indexed and named views share eight words
-020002C0,gChoiceMenuParameters,28,object,extern struct ChoiceMenuParameters gChoiceMenuParameters;,include/engine/shared/menu_parameters.h,low,provisional choice-menu parameters; script keyword fields retained; n2 is also called value
-020002E8,gMessageMenuParameters,10,object,extern struct MessageMenuParameters gMessageMenuParameters;,include/engine/shared/menu_parameters.h,low,provisional message-menu parameters; script keyword fields retained
-020002F8,gScreenParams,18,object,extern struct ScreenParams gScreenParams;,include/engine/shared/ram.h,low,
-02000310,gRegionMenuParameters,14,object,extern struct RegionMenuParameters gRegionMenuParameters;,include/engine/shared/menu_parameters.h,low,"region-menu script block, table and callbacks; merges keyword and consumer names"
-02000328,gNamePlaceholderScript,18,object,extern u32 gNamePlaceholderScript[];,include/engine/shared/ram.h,low,
-02000340,gDateMenuParameters,14,object,extern struct DateMenuParameters gDateMenuParameters;,include/engine/shared/menu_parameters.h,low,date-menu callbacks and flag; first eight bytes have no typed access in current evidence
-02000358,gSelectionMenuParameters,1C,object,extern struct SelectionMenuParameters gSelectionMenuParameters;,include/engine/shared/menu_parameters.h,low,provisional selection-menu parameters; script keyword fields retained
-02000378,gScriptMessageParameters,C,object,extern struct ScriptMessageParameters gScriptMessageParameters;,include/engine/shared/menu_parameters.h,low,"script-message text, script cursor and callback/value"
-02000388,gScriptPromptSettings,14,object,extern struct ScriptPromptSettings gScriptPromptSettings;,include/engine/shared/ram.h,low,
-020003A0,gListMenuParameters,1C,object,extern struct ListMenuParameters gListMenuParameters;,include/engine/shared/menu_parameters.h,low,provisional list-menu parameters; script keyword fields retained
-020003C0,gSoundTestParameters,8,object,extern struct SoundTestParameters gSoundTestParameters;,include/engine/shared/menu_parameters.h,low,sound-test text script and confirmation callback
-020003C8,gScriptedActorController,4,object,extern u8 *gScriptedActorController;,include/engine/shared/ram.h,low,provisional: singleton scripted actor animation controller
-020003D0,gTimeDisplayParameters,28,object,extern struct TimeDisplayParameters gTimeDisplayParameters;,include/engine/shared/menu_parameters.h,low,time display parameters; signed timeout and silent follow ROM ldrsh; fade names merged
-020003F8,gScreenTextParameters,28,object,extern struct ScreenTextParameters gScreenTextParameters;,include/engine/shared/ram.h,low,
-02000420,gScreenDelayParameters,8,object,extern struct ScreenDelayParameters gScreenDelayParameters;,include/engine/shared/ram.h,low,
-02000428,gScriptCommandTable,C,object,extern struct ScriptCommandTable gScriptCommandTable;,include/engine/shared/ram.h,low,
-02000438,gScriptProcedureTable,10,object,extern struct ScriptProcedureTable gScriptProcedureTable;,include/engine/script_virtual_machine/script_virtual_machine.h,low,
-02000448,gScriptSectionBases,10,object,extern u8 *gScriptSectionBases[4];,include/engine/shared/ram.h,low,four resolved section bases from the loaded script header
-02000458,gScriptCommandTables,4,object,extern struct ScriptCommandTable *gScriptCommandTables;,include/engine/shared/ram.h,low,registered native command-table list head; separate from section bases
-02000468,gPaletteController,4,object,extern struct PaletteController *gPaletteController;,include/effects/palette_controllers/palette_controller.h,low,
-0200046C,gFallingObjectManager,4,object,extern struct FallingObjectManager *gFallingObjectManager;,include/field/falling_objects/falling_objects.h,low,
-02000470,gShadowRegistry,4,object,extern u32 gShadowRegistry;,include/engine/shared/ram.h,low,shadow registry task (ShadowRegistry_*)
-02000474,gColliderSpritePool,4,object,extern u32 gColliderSpritePool;,include/engine/shared/ram.h,low,
-02000478,gWeatherCollisionTimer,4,object,extern s32 gWeatherCollisionTimer;,include/engine/shared/ram.h,low,provisional: shared weather and collision countdown
-0200047C,gSceneEventDispatchState,4,object,extern struct SceneEventDispatchState *gSceneEventDispatchState;,include/engine/shared/scene_event_dispatch.h,low,double-buffered scene event receiver state
-02000480,gSceneActorListManager,4,object,extern void *gSceneActorListManager;,include/engine/shared/ram.h,low,provisional: scene actor list and packet-queue manager
-02000484,gWirelessController,4,object,extern struct Engine *gWirelessController;,include/engine/shared/ram.h,low,wireless controller singleton; existing per-unit Engine views retained
-02000488,gTetherActor,4,object,extern struct TetherActor *gTetherActor;,include/field/tether_actor/tether_actor.h,low,tether actor singleton
-0200048C,gOrbitBackground,4,object,extern struct OrbitBackground *gOrbitBackground;,include/effects/orbit_background_controller/orbit_background.h,low,
-02000490,gHitSwitchManager,4,object,extern struct HitSwitchManager *gHitSwitchManager;,include/field/hit_switch/hit_switch.h,low,
-02000494,gDisplayTrackManager,4,object,extern struct DisplayTrackManager *gDisplayTrackManager;,include/engine/shared/display_track.h,low,
-02000498,gScriptKeyframeManager,4,object,extern struct ScriptKeyframeManager *gScriptKeyframeManager;,include/engine/script_keyframe_pool/script_keyframe_pool.h,low,
-0200049C,gCountdownTimer,4,object,extern struct CountdownTimer *gCountdownTimer;,include/menus/countdown_timer/countdown_timer.h,low,
-020004A0,gRisingSpritePool,4,object,extern u32 gRisingSpritePool;,include/engine/shared/ram.h,low,
-020004A4,gScenePanel,4,object,extern struct ScenePanel *gScenePanel;,include/menus/scene_panel_presentation/scene_panel.h,low,
-020004A8,gSceneActorRegistryManager,4,object,extern struct SceneActorRegistryManager *gSceneActorRegistryManager;,include/engine/shared/scene_actor_registry.h,low,
-020004AC,gSceneActorRegistryNode,4,object,extern struct SceneActorRegistryNode *gSceneActorRegistryNode;,include/engine/shared/scene_actor_registry.h,low,
-020004B0,gSlotMonitor,4,object,extern u32 gSlotMonitor;,include/engine/shared/ram.h,low,
-020004B4,gLinkSession,4,object,extern struct AreaEffectLinkState *gLinkSession;,include/engine/shared/area_effect_link.h,low,link session / menu peer object
-020004B8,gSceneCamera,4,object,extern struct Camera *gSceneCamera;,include/effects/background_controllers/background_controller.h,low,scene camera object
-020004BC,gPanelSpritePool,4,object,extern u8 *gPanelSpritePool;,include/engine/shared/ram.h,low,
-020004C0,gSpriteSlots,4,object,extern u32 gSpriteSlots;,include/engine/shared/ram.h,low,
-020004C4,gDebrisPool,4,object,extern struct DebrisPool *gDebrisPool;,include/engine/shared/ram.h,low,
-020004C8,gSceneCallbackPool,4,object,extern struct SceneCallbackPool *gSceneCallbackPool;,include/engine/shared/ram.h,low,
-020004CC,gSceneProcSprites,4,object,extern u8 *gSceneProcSprites;,include/engine/shared/ram.h,low,
-020004D0,gSceneProcParticles,4,object,extern u32 gSceneProcParticles;,include/engine/shared/ram.h,low,
-020004D4,gSpritePairPool,4,object,extern u32 gSpritePairPool;,include/engine/shared/ram.h,low,
-020004D8,gCompactSpritePool,4,object,extern u8 *gCompactSpritePool;,include/engine/shared/ram.h,low,
-020004F0,gParticipantActors,8,object,extern struct ScenePoolPlayer *gParticipantActors[2];,include/engine/shared/scene_pool.h,low,per-participant actors
-02000500,gPlayerInteractionMode,2,object,extern u16 gPlayerInteractionMode;,include/engine/shared/ram.h,low,provisional: player interaction and passage mode halfword
-02000504,gPlayerSavedMenuOption,2,object,extern u16 gPlayerSavedMenuOption;,include/engine/shared/ram.h,low,saved menu option restored when the second script-status slot is set
-02000508,gTrackedPlayerId,8,object,extern u16 gTrackedPlayerId[4];,include/engine/shared/ram.h,low,
-02000514,gPlayerLinkAttackBonus,2,object,extern u16 gPlayerLinkAttackBonus;,include/engine/shared/ram.h,low,provisional: link action-mode attack bonus override
-02000518,gPlayerCueTimer,2,object,extern u16 gPlayerCueTimer;,include/engine/shared/ram.h,low,
-02000520,gPlayerScriptState,2,object,extern u16 gPlayerScriptState;,include/engine/shared/ram.h,low,provisional: shared player script-state halfword
-02000528,gPlayerActionPending,2,object,extern u16 gPlayerActionPending;,include/engine/shared/ram.h,low,provisional: shared pending player-action counter
-0200052C,gPlayerDirectionLatch,2,object,extern u16 gPlayerDirectionLatch;,include/engine/shared/ram.h,low,provisional: direction and action latch halfword
-02000534,gPlayerPassageState,2,object,extern u16 gPlayerPassageState;,include/engine/shared/ram.h,low,provisional: shared player passage/interaction state
-0200053C,gPlayerBackgroundMode,2,object,extern u16 gPlayerBackgroundMode;,include/engine/shared/ram.h,low,provisional: background/player action mode halfword
-02000544,gPlayerCount,2,object,extern u16 gPlayerCount;,include/engine/shared/ram.h,low,
-02000548,gPlayerInitialSlotValues,4,object,extern u16 gPlayerInitialSlotValues[2];,include/engine/shared/ram.h,low,two script-status values saved before the local player exists
-0200054C,gPlayerPendingActor,4,object,extern void *gPlayerPendingActor;,include/engine/shared/ram.h,low,provisional: pending player interaction/notification actor; independent of slot values
-02000550,gPlayerBackgroundState,2,object,extern u16 gPlayerBackgroundState;,include/engine/shared/ram.h,low,provisional: shared background/player state halfword
-02000554,gPlayerAbilityLatched,2,object,extern u16 gPlayerAbilityLatched;,include/engine/shared/ram.h,low,provisional: ability request latch; ROM reader loads an unsigned halfword
-02000558,gForceDirectionMode,2,object,extern u16 gForceDirectionMode;,include/engine/shared/ram.h,low,
-02000560,gPlayerSlotStatus,10,object,extern u32 gPlayerSlotStatus[4];,include/engine/shared/player.h,high,Four words cleared at 08158C14. Player creation publishes status by slot and targeting tests bit 3.
-02000570,gPlayerSolarActionPending,2,object,extern u16 gPlayerSolarActionPending;,include/engine/shared/ram.h,low,provisional: solar action pending flag; separate from four slot words
-02000580,gPlayers,10,object,extern struct Player *gPlayers[4];,include/engine/shared/player.h,low,the four player actors (slot 0 is the local player)
-02000590,gPlayerEffectPendingCount,2,object,extern u16 gPlayerEffectPendingCount;,include/engine/shared/ram.h,low,provisional: pending player effect count; separate from actor pointers
-02000594,gPlayerNotificationPending,2,object,extern u16 gPlayerNotificationPending;,include/engine/shared/ram.h,low,
-02000598,gSceneLinkList,4,object,extern struct MotionTargets *gSceneLinkList;,include/engine/shared/ram.h,low,
-0200059C,gPlayerAttackEffect,4,object,extern u8 *gPlayerAttackEffect;,include/engine/shared/ram.h,low,player attack effect singleton
-020005A0,gInventoryUseFlags,2,object,extern u16 gInventoryUseFlags;,include/engine/shared/ram.h,low,inventory use-permission flags
-020005A4,gSceneHudMode,2,object,extern u16 gSceneHudMode;,include/engine/shared/ram.h,low,
-020005A8,gHudResetFlag,2,object,extern u16 gHudResetFlag;,include/engine/shared/ram.h,low,provisional: HUD flag initialized to one by Hud_ResetGlobals
-020005AC,gHresvelgr,4,object,extern void *gHresvelgr;,include/engine/shared/ram.h,low,Hresvelgr boss task (Hresvelgr_Create/Destroy)
-020005B4,gNameEntrySavedState,4,object,extern u8 gNameEntrySavedState[4];,include/engine/shared/ram.h,low,"cursor position, selection and per-slot name-entry state"
-020005C0,gAnimPanelSavedSelections,1A,object,extern u8 gAnimPanelSavedSelections[];,include/engine/shared/ram.h,low,
-020005DC,gScreenTextSavedValue,4,object,extern s32 gScreenTextSavedValue;,include/engine/shared/ram.h,low,provisional: value retained between screen-text menu instances
-020005E0,gParticlePool,4,object,extern struct ParticlePool *gParticlePool;,include/engine/shared/ram.h,low,
-020005E4,gRatatoskParticlePool,4,object,extern struct RatatoskParticlePool *gRatatoskParticlePool;,include/engine/shared/ram.h,low,Ratatosk animated particle pool
-020005E8,gSceneProjectilePool,4,object,extern u32 gSceneProjectilePool;,include/engine/shared/ram.h,low,scene projectile pool (SceneProjectile_*)
-020005EC,gSlotController,4,object,extern u8 *gSlotController;,include/engine/shared/ram.h,low,
-020005F0,gSpriteParticleManager,4,object,extern u32 gSpriteParticleManager;,include/engine/shared/ram.h,low,sprite particle manager (SpriteParticle_*)
-020005F4,gHomingManager,4,object,extern struct HomingManager *gHomingManager;,include/engine/shared/ram.h,low,
-020005F8,gDirectionalSpritePool,4,object,extern u8 *gDirectionalSpritePool;,include/engine/shared/ram.h,low,
-020005FC,gProjectilePool,4,object,extern u32 gProjectilePool;,include/engine/shared/ram.h,low,projectile pool (ProjectilePool_*)
-02000600,gFanCannonManager,4,object,extern struct Slot600Manager *gFanCannonManager;,include/engine/shared/ram.h,low,
-02000604,gEnemyParticlePool,4,object,extern u32 gEnemyParticlePool;,include/engine/shared/ram.h,low,enemy particle pool (EnemyParticle_*)
-02000608,gForgingBook,4,object,extern u32 gForgingBook;,include/engine/shared/ram.h,low,forging book task (ForgingBook_*)
-0200060C,gSaveStateSignature,4,object,extern u32 gSaveStateSignature;,include/engine/shared/ram.h,low,main-state save signature checked when reading and written before saving
-02000610,gScriptVm,70,object,extern struct ScriptVm gScriptVm;,include/engine/script_virtual_machine/script_virtual_machine.h,low,"script interpreter pc, result, keyword and argument stack pointers; shared 0x70-byte layout"
-02000700,gScriptLocalVariables,4,object,extern u8 *gScriptLocalVariables;,include/engine/shared/ram.h,low,0x400-byte local script-variable region at selected base plus 0x1E00
-02000704,gBackupGameVariables,4,object,extern u8 *gBackupGameVariables;,include/engine/shared/ram.h,low,backup game-variable region at selected base plus 0x1A00
-02000708,gGameVariables,4,object,extern u8 *gGameVariables;,include/engine/shared/ram.h,low,active 0x400-byte game-variable region
-0200070C,gBackupGameState,4,object,extern u8 *gBackupGameState;,include/engine/shared/ram.h,low,backup main-state region at selected base plus 0xB00
+02000000,gBackgrounds,10,object,extern struct Background *gBackgrounds[];,include/effects/screen/background_controller.h,low,
+02000010,gScrollingBackgrounds,10,object,extern struct ScrollingBackground *gScrollingBackgrounds[];,include/effects/screen/background_controller.h,low,
+02000020,gColorFadeController,4,object,extern struct ColorFadeController *gColorFadeController;,include/engine/ram.h,low,
+02000024,gSceneObjectManager,4,object,extern struct SceneObjectManager *gSceneObjectManager;,include/objects/scene_objects/scene_object.h,low,
+02000028,gTerrainModifierManager,4,object,extern struct TerrainModifierManager *gTerrainModifierManager;,include/scene/terrain/terrain_modifier.h,low,
+0200002C,gChoiceMenu,4,object,extern struct ChoiceMenu *gChoiceMenu;,include/ui/dialogue/choice_menu.h,low,
+02000030,gTriggerManager,4,object,extern struct TriggerManager *gTriggerManager;,include/objects/items/item_container.h,low,
+02000034,gPooledInteractableManager,4,object,extern struct PooledInteractableManager *gPooledInteractableManager;,include/objects/breakable.h,low,
+02000038,gDirectionalManager,4,object,extern struct DirectionalManager *gDirectionalManager;,include/objects/directional_controller.h,low,
+0200003C,gCollisionManager,4,object,extern struct CollisionManager *gCollisionManager;,include/objects/collision_controller.h,low,
+02000040,gEffectManager,4,object,extern struct EffectManager *gEffectManager;,include/effects/orbits/homing_effect.h,low,
+02000044,gStatusScreen,4,object,extern struct StatusScreen *gStatusScreen;,include/ui/status_screen/status_screen.h,low,
+02000048,gNumericOverlay,4,object,extern struct NumericOverlay *gNumericOverlay;,include/ui/status_screen/numeric_overlay.h,low,
+0200004C,gSceneIndicators,4,object,extern struct SceneIndicators *gSceneIndicators;,include/ui/hud/scene_indicator.h,low,
+02000050,gAnimatedHazardManager,4,object,extern struct AnimatedHazardManager *gAnimatedHazardManager;,include/objects/hazards/animated_hazard.h,low,
+02000054,gShadowManager,4,object,extern u32 gShadowManager;,include/engine/ram.h,low,shadow task singleton (Shadow_*)
+02000058,gScaledShadowManager,4,object,extern u32 gScaledShadowManager;,include/engine/ram.h,low,scaled shadow manager singleton (ScaledShadow_*)
+0200005C,gSceneActorEffectsManager,4,object,extern void *gSceneActorEffectsManager;,include/engine/ram.h,low,scene actor effects manager (SceneActorEffects_*)
+02000060,gParticleGroupManager,4,object,extern void *gParticleGroupManager;,include/engine/ram.h,low,provisional: six-group particle manager singleton (ParticleManager_Initialize)
+02000064,gFragmentManager,4,object,extern struct FragmentManager *gFragmentManager;,include/engine/ram.h,low,fragment manager singleton (FragmentManager_*)
+02000068,gAnimatedParticleManager,4,object,extern void *gAnimatedParticleManager;,include/engine/ram.h,low,animated particle manager (AnimatedParticleManager_*)
+0200006C,gFadingParticleManager,4,object,extern void *gFadingParticleManager;,include/engine/ram.h,low,fading particle manager (FadingParticleManager_*)
+02000070,gPaletteLevels,4,object,extern struct PaletteLevels *gPaletteLevels;,include/effects/palette/palette_level_transitions.h,low,
+02000074,gDamageNumberDisplay,4,object,extern struct DamageNumberDisplay *gDamageNumberDisplay;,include/ui/hud/damage_number_display.h,low,
+02000078,gLinkedWidgetSet,4,object,extern struct LinkedWidgetSet *gLinkedWidgetSet;,include/engine/ram.h,low,
+0200007C,gScanlineWave,4,object,extern u32 gScanlineWave;,include/engine/ram.h,low,scanline wave effect task (ScanlineWave_*)
+02000080,gWeatherCooldownBase,4,object,extern s32 gWeatherCooldownBase;,include/engine/ram.h,low,"weather cooldown base, configured by Weather_ConfigureCooldown"
+02000084,gWeatherCooldownRange,4,object,extern s32 gWeatherCooldownRange;,include/engine/ram.h,low,random range added to the weather cooldown
+02000088,gStormActive,4,object,extern u32 gStormActive;,include/engine/ram.h,low,set while Weather_Update is in storm phase 3
+0200008C,gStormTimer,4,object,extern s32 gStormTimer;,include/engine/ram.h,low,provisional: storm duration/delay countdown shared by weather phases
+02000090,gWeatherState,4,object,extern struct WeatherState *gWeatherState;,include/engine/ram.h,low,
+02000094,gPaletteCycle,4,object,extern u32 gPaletteCycle;,include/engine/ram.h,low,palette cycle task (PaletteCycle_*)
+02000098,gEffectQuad,4,object,extern u32 gEffectQuad;,include/engine/ram.h,low,
+0200009C,gCircleWindow,4,object,extern u32 gCircleWindow;,include/engine/ram.h,low,circle window task (CircleWindow_*)
+020000A0,gTransientSpriteEffects,4,object,extern struct TransientSpriteEffects *gTransientSpriteEffects;,include/effects/sprites/transient_sprite_effects.h,low,
+020000A4,gTileAnimation,4,object,extern u32 gTileAnimation;,include/engine/ram.h,low,tile animation task (TileAnimation_*)
+020000A8,gTemporaryAnimationPool,4,object,extern struct TemporaryAnimationPool *gTemporaryAnimationPool;,include/effects/sprites/temporary_animation_pool.h,low,
+020000AC,gTransientSpritePool,4,object,extern u8 *gTransientSpritePool;,include/engine/ram.h,low,transient sprite pool (TransientSpritePool_*)
+020000B0,gSpritePoolManager,4,object,extern u32 gSpritePoolManager;,include/engine/ram.h,low,sprite pool singleton (SpritePool_*)
+020000B8,gSceneActorRegistry,20,object,extern u8 *gSceneActorRegistry[8];,include/engine/ram.h,low,eight scene actor registry slots (SceneActors_FindAvailable); eight-pointer loop ends before the independent 020000D8 slot
+020000D8,gActorPoolManager,4,object,extern void *gActorPoolManager;,include/engine/ram.h,low,actor pool singleton; separate slot after the eight-entry registry
+020000DC,gMessageWindow,4,object,extern struct Actor *gMessageWindow;,include/engine/ram.h,low,message window (MessageWindow_*)
+020000E0,gScrollingDialogue,4,object,extern struct Window *gScrollingDialogue;,include/engine/ram.h,low,scrolling dialogue window (ScrollingDialogue_*)
+020000E4,gWindowManager,4,object,extern struct WindowManager *gWindowManager;,include/engine/ram.h,low,
+020000E8,gTransition,4,object,extern struct Transition *gTransition;,include/engine/ram.h,low,
+020000EC,gWirelessSessionState,1,object,extern u8 gWirelessSessionState;,include/engine/ram.h,low,wireless session state byte (Wireless_*)
+020000F0,gWirelessLastStatus,4,object,extern u32 gWirelessLastStatus;,include/engine/ram.h,low,cached wireless status used when its controller is absent
+020000F4,gWirelessLinkIndicator,4,object,extern struct WirelessLinkIndicator *gWirelessLinkIndicator;,include/link/wireless/link_indicator.h,low,
+020000F8,gLinkMenu,4,object,extern struct LinkMenu *gLinkMenu;,include/engine/ram.h,low,
+020000FC,gWirelessTradeMenu,4,object,extern u32 gWirelessTradeMenu;,include/engine/ram.h,low,wireless trade/exchange menu (WirelessTradeMenu_*)
+02000100,gWirelessGameItems,4,object,extern struct WirelessGameItems *gWirelessGameItems;,include/link/wireless/wireless_game_items_and_display.h,low,
+02000104,gResultMenu,4,object,extern struct ResultMenu *gResultMenu;,include/engine/ram.h,low,
+02000108,gScenePool,4,object,extern u32 gScenePool;,include/engine/ram.h,low,scene pool manager (ScenePool_*)
+0200010C,gAreaEffectManager,4,object,extern struct AreaEffectManager *gAreaEffectManager;,include/scene/area_effect/area_effect.h,low,
+02000110,gRepeatedEffectManager,4,object,extern struct RepeatedEffectManager *gRepeatedEffectManager;,include/effects/scene/repeated_effect.h,low,
+02000114,gDirectionalForce,4,object,extern struct DirectionalForce *gDirectionalForce;,include/objects/hazards/directional_force.h,low,
+02000118,gStackedActor,4,object,extern struct StackedActor *gStackedActor;,include/objects/warp_circle/stacked_actor.h,low,
+0200011C,gStageIconDisplay,4,object,extern struct StageIconDisplay *gStageIconDisplay;,include/ui/hud/stage_icon_display.h,low,
+02000120,gLevelAdvanceManager,4,object,extern struct LevelAdvanceManager *gLevelAdvanceManager;,include/ui/hud/level_advance_display.h,low,
+02000124,gActorAttachmentManager,4,object,extern struct ActorAttachmentManagerView *gActorAttachmentManager;,include/engine/ram.h,low,actor attachment manager singleton
+02000128,gSceneActorControlManager,4,object,extern struct SceneActorControlManager *gSceneActorControlManager;,include/engine/ram.h,low,
+0200012C,gColliderEffectPool,4,object,extern struct ColliderEffectPool *gColliderEffectPool;,include/engine/ram.h,low,
+02000130,gSceneParticleBurstPool,4,object,extern struct SceneParticleBurstPool *gSceneParticleBurstPool;,include/engine/ram.h,low,
+02000134,gSceneParticleEmitterPool,4,object,extern struct SceneParticlePool *gSceneParticleEmitterPool;,include/engine/ram.h,low,provisional: scene particle emitter pool singleton
+02000138,gSpriteGroup,4,object,extern struct SpriteParticlePool *gSpriteGroup;,include/engine/ram.h,low,
+0200013C,gSpriteEffectPool,4,object,extern struct SpriteEffectPool *gSpriteEffectPool;,include/engine/ram.h,low,
+02000140,gAnimatedBodyPool,4,object,extern struct SceneScheduledEffectPool *gAnimatedBodyPool;,include/engine/ram.h,low,
+02000144,gSpriteNoticeManager,4,object,extern struct SpriteNoticeManager *gSpriteNoticeManager;,include/engine/ram.h,low,
+02000148,gPairSlotPool,4,object,extern struct PairSlotPool *gPairSlotPool;,include/engine/ram.h,low,
+0200014C,gBouncingPool,4,object,extern struct BouncingPool *gBouncingPool;,include/objects/bouncing_object/bouncing_object.h,low,
+02000150,gSpriteBurstManager,4,object,extern u32 gSpriteBurstManager;,include/engine/ram.h,low,
+02000154,gScriptedParticlePool,4,object,extern u8 *gScriptedParticlePool;,include/engine/ram.h,low,scripted particle pool (ScriptedParticle_*)
+02000158,gSceneStatusIndicatorManager,4,object,extern u32 gSceneStatusIndicatorManager;,include/engine/ram.h,low,
+0200015C,gBurstSparkPool,4,object,extern struct BurstSparkPool *gBurstSparkPool;,include/engine/ram.h,low,
+02000160,gBurstEmitterPool,4,object,extern struct BurstEmitterPool *gBurstEmitterPool;,include/effects/particles/burst_emitter.h,low,
+02000164,gPooledSpriteManager,4,object,extern struct ProjectilePool *gPooledSpriteManager;,include/engine/ram.h,low,
+02000168,gSparkParticlePool,4,object,extern struct SparkParticlePool *gSparkParticlePool;,include/effects/particles/spark_particle.h,low,
+0200016C,gMovingSpritePool,4,object,extern u32 gMovingSpritePool;,include/engine/ram.h,low,
+02000170,gSpriteGroupPool,4,object,extern struct FragmentBurstPool *gSpriteGroupPool;,include/engine/ram.h,low,
+02000174,gFadingSpritePool,4,object,extern struct FeatherPool *gFadingSpritePool;,include/engine/ram.h,low,
+02000178,gSpriteEffectControllerPool,4,object,extern struct SpriteEffectControllerPool *gSpriteEffectControllerPool;,include/effects/sprites/sprite_effect_controller.h,low,
+0200017C,gSunDiscPool,4,object,extern u8 *gSunDiscPool;,include/engine/ram.h,low,sun disc pool (SunDiscPool_*)
+02000180,gActorEffectManager,4,object,extern u8 *gActorEffectManager;,include/engine/ram.h,low,
+02000184,gPursuingActorManager,4,object,extern struct Pool *gPursuingActorManager;,include/engine/ram.h,low,
+02000188,gSceneSteeringActorPool,4,object,extern struct SceneSteeringActorPool *gSceneSteeringActorPool;,include/scene/actor/scene_steering_actor.h,low,
+0200018C,gFragmentEffectManager,4,object,extern u8 *gFragmentEffectManager;,include/engine/ram.h,low,fragment effect manager (FragmentEffect_*)
+02000190,gScriptedColliderManager,4,object,extern u32 gScriptedColliderManager;,include/engine/ram.h,low,
+02000194,gSceneParticlePool,4,object,extern struct SceneParticlePool *gSceneParticlePool;,include/engine/ram.h,low,
+02000198,gRouteSpritePool,4,object,extern struct RouteSpritePool *gRouteSpritePool;,include/scene/actor/route_sprite_actor.h,low,
+0200019C,gSceneEffectSchedule,4,object,extern struct SceneEffectSchedule *gSceneEffectSchedule;,include/effects/scene/scene_effect_schedule.h,low,
+020001A0,gSceneActorContactManager,4,object,extern struct SceneActorContactManager *gSceneActorContactManager;,include/scene/actor/scene_actor_contacts.h,low,
+020001A4,gWoodenCrateManager,4,object,extern u8 *gWoodenCrateManager;,include/engine/ram.h,low,
+020001A8,gFloorSwitchManager,4,object,extern u32 gFloorSwitchManager;,include/engine/ram.h,low,floor switch manager (FloorSwitch_*)
+020001AC,gNamedActorManager,4,object,extern struct NamedObjectManager *gNamedActorManager;,include/engine/ram.h,low,named actor object pool singleton; provisional common name
+020001B0,gActorGroupPool,4,object,extern void *gActorGroupPool;,include/engine/ram.h,low,four-slot actor group and callback pool singleton
+020001B4,gRegionActorPool,4,object,extern struct RegionSpriteManager *gRegionActorPool;,include/engine/ram.h,low,
+020001B8,gTileTriggerManager,4,object,extern struct TileTriggerManager *gTileTriggerManager;,include/engine/ram.h,low,
+020001BC,gNamedEntryPool,4,object,extern u32 gNamedEntryPool;,include/engine/ram.h,low,
+020001C0,gLinkSessionStep,4,object,extern u32 gLinkSessionStep;,include/engine/ram.h,low,provisional: Registry1745_RunSession diagnostic step marker
+020001C4,gLinkPanel,4,object,extern u32 gLinkPanel;,include/engine/ram.h,low,
+020001C8,gPanelSequence,4,object,extern u32 gPanelSequence;,include/engine/ram.h,low,
+020001CC,gConfirmPanel,4,object,extern u8 *gConfirmPanel;,include/engine/ram.h,low,provisional: Registry3C9F confirmation panel singleton
+020001D0,gActiveRecordMenu,4,object,extern u32 gActiveRecordMenu;,include/engine/ram.h,low,
+020001D4,gSaveMenu,4,object,extern u32 gSaveMenu;,include/engine/ram.h,low,save menu task (SaveMenu_*)
+020001D8,gPaletteFade,4,object,extern struct PaletteFade *gPaletteFade;,include/engine/ram.h,low,
+020001DC,gParticleManager,4,object,extern struct ParticleManager *gParticleManager;,include/engine/ram.h,low,
+020001E0,gScreenMoteManager,4,object,extern u32 gScreenMoteManager;,include/engine/ram.h,low,
+020001E4,gActorParticlePool,4,object,extern u32 gActorParticlePool;,include/engine/ram.h,low,
+020001E8,gCompactParticlePool,4,object,extern struct SmallCallbackPool *gCompactParticlePool;,include/engine/ram.h,low,
+020001F0,gMessagePacket,8,object,extern struct Packet gMessagePacket;,include/engine/ram.h,low,
+020001F8,gTerrainColumnIndices,4,object,extern u8 *gTerrainColumnIndices;,include/engine/ram.h,low,
+020001FC,gTerrainColumns,4,object,extern struct TerrainColumn *gTerrainColumns;,include/engine/ram.h,low,
+02000200,gSpatialIndex,4,object,extern struct SpatialIndex *gSpatialIndex;,include/engine/ram.h,low,
+02000204,gRegistryE7BCManager,4,object,extern void *gRegistryE7BCManager;,include/engine/ram.h,low,provisional: registry E7BC pooled-object manager
+02000208,gScriptRecordTable,4,object,extern u8 *gScriptRecordTable;,include/engine/ram.h,low,
+0200020C,gActorManager,4,object,extern void *gActorManager;,include/engine/ram.h,low,
+02000210,gGameOver,4,object,extern struct GameOver *gGameOver;,include/engine/ram.h,low,
+02000214,gFieldHud,4,object,extern u8 *gFieldHud;,include/engine/ram.h,low,
+02000218,gSceneEffectQueue,4,object,extern u8 *gSceneEffectQueue;,include/engine/ram.h,low,scene effect queue (SceneEffectQueue_*)
+0200021C,gOffsetActorAnimationRepeats,4,object,extern s32 gOffsetActorAnimationRepeats;,include/engine/ram.h,low,repeated offset-actor animation counter
+02000220,gHresvelgrAttackCount,4,object,extern s32 gHresvelgrAttackCount;,include/engine/ram.h,low,provisional: Hresvelgr attack-cycle counter
+0200022C,gHresvelgrHazardIndex,4,object,extern s32 gHresvelgrHazardIndex;,include/engine/ram.h,low,nearest active growth hazard selected by Hresvelgr_UpdateHazardVisit
+02000230,gHresvelgrVolleyState,4,object,extern u32 gHresvelgrVolleyState;,include/engine/ram.h,low,provisional: Hresvelgr volley state word
+02000234,gHresvelgrVolleyCount,4,object,extern s32 gHresvelgrVolleyCount;,include/engine/ram.h,low,alternating Hresvelgr volley pulse counter
+02000238,gDirectionBurstEmitter,4,object,extern void *gDirectionBurstEmitter;,include/engine/ram.h,low,
+0200023C,gEffectPoolManager,4,object,extern void *gEffectPoolManager;,include/engine/ram.h,low,effect pool (EffectPool_*)
+02000240,gMotionEntryManager,4,object,extern void *gMotionEntryManager;,include/engine/ram.h,low,
+02000244,gHresvelgrProjectilePool,4,object,extern void *gHresvelgrProjectilePool;,include/engine/ram.h,low,
+02000250,gSceneComposite,4,object,extern void *gSceneComposite;,include/engine/ram.h,low,
+02000254,gVanargandPartController,4,object,extern void *gVanargandPartController;,include/engine/ram.h,low,Vanargand part controller
+02000258,gGrowthHazardManager,4,object,extern u32 gGrowthHazardManager;,include/engine/ram.h,low,
+0200025C,gSelectionPanel,4,object,extern u8 *gSelectionPanel;,include/engine/ram.h,low,
+02000260,gSegmentDisplay,4,object,extern u32 gSegmentDisplay;,include/engine/ram.h,low,
+02000264,gSparkleEmitter,4,object,extern void *gSparkleEmitter;,include/engine/ram.h,low,sparkle emitter (SparkleEmitter_*)
+02000268,gRegistryF3E4Actor,4,object,extern struct F3E4Actor *gRegistryF3E4Actor;,include/engine/ram.h,low,provisional: registry F3E4 singleton actor
+0200026C,gShipWheel,4,object,extern u32 gShipWheel;,include/engine/ram.h,low,ship wheel task (ShipWheel_*)
+02000274,gSceneNpc,4,object,extern struct SceneNpc *gSceneNpc;,include/engine/ram.h,low,
+02000278,gSceneNpcBlendPalette,20,object,extern u16 gSceneNpcBlendPalette[16];,include/engine/ram.h,low,sixteen-color output palette blended by SceneNpc_BlendPalette
+02000298,gCloudTask,4,object,extern struct CloudTask *gCloudTask;,include/engine/ram.h,low,
+020002A0,gOptionMenuParameters,20,object,extern struct OptionMenuParameters gOptionMenuParameters;,include/ui/menu_parameters.h,low,option-menu callbacks; keyword names retained; indexed and named views share eight words
+020002C0,gChoiceMenuParameters,28,object,extern struct ChoiceMenuParameters gChoiceMenuParameters;,include/ui/menu_parameters.h,low,provisional choice-menu parameters; script keyword fields retained; n2 is also called value
+020002E8,gMessageMenuParameters,10,object,extern struct MessageMenuParameters gMessageMenuParameters;,include/ui/menu_parameters.h,low,provisional message-menu parameters; script keyword fields retained
+020002F8,gScreenParams,18,object,extern struct ScreenParams gScreenParams;,include/engine/ram.h,low,
+02000310,gRegionMenuParameters,14,object,extern struct RegionMenuParameters gRegionMenuParameters;,include/ui/menu_parameters.h,low,"region-menu script block, table and callbacks; merges keyword and consumer names"
+02000328,gNamePlaceholderScript,18,object,extern u32 gNamePlaceholderScript[];,include/engine/ram.h,low,
+02000340,gDateMenuParameters,14,object,extern struct DateMenuParameters gDateMenuParameters;,include/ui/menu_parameters.h,low,date-menu callbacks and flag; first eight bytes have no typed access in current evidence
+02000358,gSelectionMenuParameters,1C,object,extern struct SelectionMenuParameters gSelectionMenuParameters;,include/ui/menu_parameters.h,low,provisional selection-menu parameters; script keyword fields retained
+02000378,gScriptMessageParameters,C,object,extern struct ScriptMessageParameters gScriptMessageParameters;,include/ui/menu_parameters.h,low,"script-message text, script cursor and callback/value"
+02000388,gScriptPromptSettings,14,object,extern struct ScriptPromptSettings gScriptPromptSettings;,include/engine/ram.h,low,
+020003A0,gListMenuParameters,1C,object,extern struct ListMenuParameters gListMenuParameters;,include/ui/menu_parameters.h,low,provisional list-menu parameters; script keyword fields retained
+020003C0,gSoundTestParameters,8,object,extern struct SoundTestParameters gSoundTestParameters;,include/ui/menu_parameters.h,low,sound-test text script and confirmation callback
+020003C8,gScriptedActorController,4,object,extern u8 *gScriptedActorController;,include/engine/ram.h,low,provisional: singleton scripted actor animation controller
+020003D0,gTimeDisplayParameters,28,object,extern struct TimeDisplayParameters gTimeDisplayParameters;,include/ui/menu_parameters.h,low,time display parameters; signed timeout and silent follow ROM ldrsh; fade names merged
+020003F8,gScreenTextParameters,28,object,extern struct ScreenTextParameters gScreenTextParameters;,include/engine/ram.h,low,
+02000420,gScreenDelayParameters,8,object,extern struct ScreenDelayParameters gScreenDelayParameters;,include/engine/ram.h,low,
+02000428,gScriptCommandTable,C,object,extern struct ScriptCommandTable gScriptCommandTable;,include/engine/ram.h,low,
+02000438,gScriptProcedureTable,10,object,extern struct ScriptProcedureTable gScriptProcedureTable;,include/script/script_virtual_machine.h,low,
+02000448,gScriptSectionBases,10,object,extern u8 *gScriptSectionBases[4];,include/engine/ram.h,low,four resolved section bases from the loaded script header
+02000458,gScriptCommandTables,4,object,extern struct ScriptCommandTable *gScriptCommandTables;,include/engine/ram.h,low,registered native command-table list head; separate from section bases
+02000468,gPaletteController,4,object,extern struct PaletteController *gPaletteController;,include/effects/palette/palette_controller.h,low,
+0200046C,gFallingObjectManager,4,object,extern struct FallingObjectManager *gFallingObjectManager;,include/objects/hazards/falling_objects.h,low,
+02000470,gShadowRegistry,4,object,extern u32 gShadowRegistry;,include/engine/ram.h,low,shadow registry task (ShadowRegistry_*)
+02000474,gColliderSpritePool,4,object,extern u32 gColliderSpritePool;,include/engine/ram.h,low,
+02000478,gWeatherCollisionTimer,4,object,extern s32 gWeatherCollisionTimer;,include/engine/ram.h,low,provisional: shared weather and collision countdown
+0200047C,gSceneEventDispatchState,4,object,extern struct SceneEventDispatchState *gSceneEventDispatchState;,include/scene/actor/scene_event_dispatch.h,low,double-buffered scene event receiver state
+02000480,gSceneActorListManager,4,object,extern void *gSceneActorListManager;,include/engine/ram.h,low,provisional: scene actor list and packet-queue manager
+02000484,gWirelessController,4,object,extern struct Engine *gWirelessController;,include/engine/ram.h,low,wireless controller singleton; existing per-unit Engine views retained
+02000488,gTetherActor,4,object,extern struct TetherActor *gTetherActor;,include/objects/coffin/tether_actor.h,low,tether actor singleton
+0200048C,gOrbitBackground,4,object,extern struct OrbitBackground *gOrbitBackground;,include/effects/screen/orbit_background.h,low,
+02000490,gHitSwitchManager,4,object,extern struct HitSwitchManager *gHitSwitchManager;,include/objects/hit_switch.h,low,
+02000494,gDisplayTrackManager,4,object,extern struct DisplayTrackManager *gDisplayTrackManager;,include/engine/video/display_track.h,low,
+02000498,gScriptKeyframeManager,4,object,extern struct ScriptKeyframeManager *gScriptKeyframeManager;,include/script/script_keyframe_pool.h,low,
+0200049C,gCountdownTimer,4,object,extern struct CountdownTimer *gCountdownTimer;,include/ui/hud/countdown_timer.h,low,
+020004A0,gRisingSpritePool,4,object,extern u32 gRisingSpritePool;,include/engine/ram.h,low,
+020004A4,gScenePanel,4,object,extern struct ScenePanel *gScenePanel;,include/objects/pile_driver/scene_panel.h,low,
+020004A8,gSceneActorRegistryManager,4,object,extern struct SceneActorRegistryManager *gSceneActorRegistryManager;,include/scene/actor/scene_actor_registry.h,low,
+020004AC,gSceneActorRegistryNode,4,object,extern struct SceneActorRegistryNode *gSceneActorRegistryNode;,include/scene/actor/scene_actor_registry.h,low,
+020004B0,gSlotMonitor,4,object,extern u32 gSlotMonitor;,include/engine/ram.h,low,
+020004B4,gLinkSession,4,object,extern struct AreaEffectLinkState *gLinkSession;,include/scene/area_effect/area_effect_link.h,low,link session / menu peer object
+020004B8,gSceneCamera,4,object,extern struct Camera *gSceneCamera;,include/effects/screen/background_controller.h,low,scene camera object
+020004BC,gPanelSpritePool,4,object,extern u8 *gPanelSpritePool;,include/engine/ram.h,low,
+020004C0,gSpriteSlots,4,object,extern u32 gSpriteSlots;,include/engine/ram.h,low,
+020004C4,gDebrisPool,4,object,extern struct DebrisPool *gDebrisPool;,include/engine/ram.h,low,
+020004C8,gSceneCallbackPool,4,object,extern struct SceneCallbackPool *gSceneCallbackPool;,include/engine/ram.h,low,
+020004CC,gSceneProcSprites,4,object,extern u8 *gSceneProcSprites;,include/engine/ram.h,low,
+020004D0,gSceneProcParticles,4,object,extern u32 gSceneProcParticles;,include/engine/ram.h,low,
+020004D4,gSpritePairPool,4,object,extern u32 gSpritePairPool;,include/engine/ram.h,low,
+020004D8,gCompactSpritePool,4,object,extern u8 *gCompactSpritePool;,include/engine/ram.h,low,
+020004F0,gParticipantActors,8,object,extern struct ScenePoolPlayer *gParticipantActors[2];,include/link/wireless/scene_pool.h,low,per-participant actors
+02000500,gPlayerInteractionMode,2,object,extern u16 gPlayerInteractionMode;,include/engine/ram.h,low,provisional: player interaction and passage mode halfword
+02000504,gPlayerSavedMenuOption,2,object,extern u16 gPlayerSavedMenuOption;,include/engine/ram.h,low,saved menu option restored when the second script-status slot is set
+02000508,gTrackedPlayerId,8,object,extern u16 gTrackedPlayerId[4];,include/engine/ram.h,low,
+02000514,gPlayerLinkAttackBonus,2,object,extern u16 gPlayerLinkAttackBonus;,include/engine/ram.h,low,provisional: link action-mode attack bonus override
+02000518,gPlayerCueTimer,2,object,extern u16 gPlayerCueTimer;,include/engine/ram.h,low,
+02000520,gPlayerScriptState,2,object,extern u16 gPlayerScriptState;,include/engine/ram.h,low,provisional: shared player script-state halfword
+02000528,gPlayerActionPending,2,object,extern u16 gPlayerActionPending;,include/engine/ram.h,low,provisional: shared pending player-action counter
+0200052C,gPlayerDirectionLatch,2,object,extern u16 gPlayerDirectionLatch;,include/engine/ram.h,low,provisional: direction and action latch halfword
+02000534,gPlayerPassageState,2,object,extern u16 gPlayerPassageState;,include/engine/ram.h,low,provisional: shared player passage/interaction state
+0200053C,gPlayerBackgroundMode,2,object,extern u16 gPlayerBackgroundMode;,include/engine/ram.h,low,provisional: background/player action mode halfword
+02000544,gPlayerCount,2,object,extern u16 gPlayerCount;,include/engine/ram.h,low,
+02000548,gPlayerInitialSlotValues,4,object,extern u16 gPlayerInitialSlotValues[2];,include/engine/ram.h,low,two script-status values saved before the local player exists
+0200054C,gPlayerPendingActor,4,object,extern void *gPlayerPendingActor;,include/engine/ram.h,low,provisional: pending player interaction/notification actor; independent of slot values
+02000550,gPlayerBackgroundState,2,object,extern u16 gPlayerBackgroundState;,include/engine/ram.h,low,provisional: shared background/player state halfword
+02000554,gPlayerAbilityLatched,2,object,extern u16 gPlayerAbilityLatched;,include/engine/ram.h,low,provisional: ability request latch; ROM reader loads an unsigned halfword
+02000558,gForceDirectionMode,2,object,extern u16 gForceDirectionMode;,include/engine/ram.h,low,
+02000560,gPlayerSlotStatus,10,object,extern u32 gPlayerSlotStatus[4];,include/player/player.h,high,Four words cleared at 08158C14. Player creation publishes status by slot and targeting tests bit 3.
+02000570,gPlayerSolarActionPending,2,object,extern u16 gPlayerSolarActionPending;,include/engine/ram.h,low,provisional: solar action pending flag; separate from four slot words
+02000580,gPlayers,10,object,extern struct Player *gPlayers[4];,include/player/player.h,low,the four player actors (slot 0 is the local player)
+02000590,gPlayerEffectPendingCount,2,object,extern u16 gPlayerEffectPendingCount;,include/engine/ram.h,low,provisional: pending player effect count; separate from actor pointers
+02000594,gPlayerNotificationPending,2,object,extern u16 gPlayerNotificationPending;,include/engine/ram.h,low,
+02000598,gSceneLinkList,4,object,extern struct MotionTargets *gSceneLinkList;,include/engine/ram.h,low,
+0200059C,gPlayerAttackEffect,4,object,extern u8 *gPlayerAttackEffect;,include/engine/ram.h,low,player attack effect singleton
+020005A0,gInventoryUseFlags,2,object,extern u16 gInventoryUseFlags;,include/engine/ram.h,low,inventory use-permission flags
+020005A4,gSceneHudMode,2,object,extern u16 gSceneHudMode;,include/engine/ram.h,low,
+020005A8,gHudResetFlag,2,object,extern u16 gHudResetFlag;,include/engine/ram.h,low,provisional: HUD flag initialized to one by Hud_ResetGlobals
+020005AC,gHresvelgr,4,object,extern void *gHresvelgr;,include/engine/ram.h,low,Hresvelgr boss task (Hresvelgr_Create/Destroy)
+020005B4,gNameEntrySavedState,4,object,extern u8 gNameEntrySavedState[4];,include/engine/ram.h,low,"cursor position, selection and per-slot name-entry state"
+020005C0,gAnimPanelSavedSelections,1A,object,extern u8 gAnimPanelSavedSelections[];,include/engine/ram.h,low,
+020005DC,gScreenTextSavedValue,4,object,extern s32 gScreenTextSavedValue;,include/engine/ram.h,low,provisional: value retained between screen-text menu instances
+020005E0,gParticlePool,4,object,extern struct ParticlePool *gParticlePool;,include/engine/ram.h,low,
+020005E4,gRatatoskParticlePool,4,object,extern struct RatatoskParticlePool *gRatatoskParticlePool;,include/engine/ram.h,low,Ratatosk animated particle pool
+020005E8,gSceneProjectilePool,4,object,extern u32 gSceneProjectilePool;,include/engine/ram.h,low,scene projectile pool (SceneProjectile_*)
+020005EC,gSlotController,4,object,extern u8 *gSlotController;,include/engine/ram.h,low,
+020005F0,gSpriteParticleManager,4,object,extern u32 gSpriteParticleManager;,include/engine/ram.h,low,sprite particle manager (SpriteParticle_*)
+020005F4,gHomingManager,4,object,extern struct HomingManager *gHomingManager;,include/engine/ram.h,low,
+020005F8,gDirectionalSpritePool,4,object,extern u8 *gDirectionalSpritePool;,include/engine/ram.h,low,
+020005FC,gProjectilePool,4,object,extern u32 gProjectilePool;,include/engine/ram.h,low,projectile pool (ProjectilePool_*)
+02000600,gFanCannonManager,4,object,extern struct Slot600Manager *gFanCannonManager;,include/engine/ram.h,low,
+02000604,gEnemyParticlePool,4,object,extern u32 gEnemyParticlePool;,include/engine/ram.h,low,enemy particle pool (EnemyParticle_*)
+02000608,gForgingBook,4,object,extern u32 gForgingBook;,include/engine/ram.h,low,forging book task (ForgingBook_*)
+0200060C,gSaveStateSignature,4,object,extern u32 gSaveStateSignature;,include/engine/ram.h,low,main-state save signature checked when reading and written before saving
+02000610,gScriptVm,70,object,extern struct ScriptVm gScriptVm;,include/script/script_virtual_machine.h,low,"script interpreter pc, result, keyword and argument stack pointers; shared 0x70-byte layout"
+02000700,gScriptLocalVariables,4,object,extern u8 *gScriptLocalVariables;,include/engine/ram.h,low,0x400-byte local script-variable region at selected base plus 0x1E00
+02000704,gBackupGameVariables,4,object,extern u8 *gBackupGameVariables;,include/engine/ram.h,low,backup game-variable region at selected base plus 0x1A00
+02000708,gGameVariables,4,object,extern u8 *gGameVariables;,include/engine/ram.h,low,active 0x400-byte game-variable region
+0200070C,gBackupGameState,4,object,extern u8 *gBackupGameState;,include/engine/ram.h,low,backup main-state region at selected base plus 0xB00
 02000710,gGameState,4,object,extern struct GameState *gGameState;,include/system/game_state/game_state.h,low,
-02000714,gHeapHead,10,object,extern struct HeapBlock gHeapHead;,include/engine/shared/heap.h,low,"general heap first block; prev/next, size/free flags and cleared trailing word"
-0201F400,gHeapEndGuard,4,object,extern u32 gHeapEndGuard;,include/engine/shared/ram.h,low,heap-end guard word expected to equal 0x516B92EE
-02037000,gBgMapWorkBuffer,2000,object,extern u8 gBgMapWorkBuffer[0x2000];,include/engine/shared/ram.h,low,"background map work buffer, cleared for 0x2000 bytes"
-02039000,gObjTileUploadRequests,8,object,extern struct ObjTileUploadRequest gObjTileUploadRequests[];,include/engine/interrupts_and_video/obj_tile_upload.h,low,eight-byte rectangular tile-upload records; descriptor aliases two halfwords; protected ARM producer retained
-0203B000,gResourceRegistryEntries,100,object,extern struct ResourceRegistryEntry gResourceRegistryEntries[32];,include/engine/resource_registry/resource_registry.h,low,"32-entry resource registry; id, flags and data pointer; protected draft views retained"
-0203B400,gRandomTable,800,object,extern u16 gRandomTable[1024];,include/engine/shared/ram.h,high,Random_InitValueTable fills 1024 halfwords from Random_Next15. Readers use the wrapping cursor at 03005308
-0203C400,gGameStateStorage,,object,extern u8 gGameStateStorage[];,include/engine/shared/ram.h,low,backing storage for timer-jittered game-state and variable regions
-03000000,gIwramCode,FC,object,extern u8 gIwramCode[];,include/engine/shared/runtime.h,low,IWRAM instruction buffer populated from Palette_CacheObjectBankArm through AgbMain__addr at startup; extent is not inferred from the partial RFU read
-03001110,gVideoIrqPhase,4,object,extern u32 gVideoIrqPhase;,include/engine/shared/runtime.h,low,Two-phase video/sound IRQ handler latch; toggled by sub_08214144 (tentative name)
-03001118,gVideoUploadTask,18,object,extern struct RuntimeTask gVideoUploadTask;,include/engine/shared/runtime.h,high callback identity; unresolved task bytes,Static task calling InterruptsAndVideo_OnVideoUploadTask at priority 0; +16 initialized to 1 with unresolved meaning
-03001130,gGraphicsUpdateTask,18,object,extern struct RuntimeTask gGraphicsUpdateTask;,include/engine/shared/runtime.h,high callback identity; unresolved task bytes,Static task calling InterruptsAndVideo_OnGraphicsUpdateTask at priority 13; +16 initialized to 1 with unresolved meaning
-03001148,gObjGfxSlots,400,object,extern struct ObjGfxSlot gObjGfxSlots[128];,include/engine/shared/render.h,high,"128 queued OBJ tile uploads, each 8 bytes; allocation rejects count above 127 and the next object starts at 03001548"
-03001548,gBgMapCacheKey,2,object,extern u16 gBgMapCacheKey;,include/engine/shared/render.h,low,"Last compressed BG map resource key, compared before LZ77 unpacking (tentative cache name)"
-0300154C,gSavedDispCnt,2,object,extern u16 gSavedDispCnt;,include/engine/shared/render.h,low,DISPCNT saved by Video_SaveDisplayControl
-0300154E,gSavedWindowShadow0,2,object,extern u16 gSavedWindowShadow0;,include/engine/shared/render.h,low,Saved window shadow slot 0
-03001550,gSavedWindowShadow3,2,object,extern u16 gSavedWindowShadow3;,include/engine/shared/render.h,low,Saved window shadow slot 3
-03001552,gSavedWindowShadow2,2,object,extern u16 gSavedWindowShadow2;,include/engine/shared/render.h,low,Saved window shadow slot 2
-03001554,gSavedWindowShadow1,2,object,extern u16 gSavedWindowShadow1;,include/engine/shared/render.h,low,Saved window shadow slot 1
-03001556,gSavedWinIn,2,object,extern u16 gSavedWinIn;,include/engine/shared/render.h,low,Saved WININ register
-03001558,gSavedWinOut,2,object,extern u16 gSavedWinOut;,include/engine/shared/render.h,low,Saved WINOUT register
-03001560,gTextTileUploadIndices,1,object,extern u8 gTextTileUploadIndices[];,include/engine/shared/render.h,low,"Queued text tile indices; bounded storage precedes its count, original guard permits index 256"
-03001660,gTextTileUploadCount,4,object,extern u32 gTextTileUploadCount;,include/engine/shared/render.h,low,Number of queued text tile DMA uploads
-03001664,gFontResource,4,object,extern struct FontResource *gFontResource;,include/engine/text/text.h,high physical shape; tentative narrow/wide interpretation,Heap copy of a 12-byte font header: two u16 glyph counts and two relocated u32 glyph-data addresses
-03001668,gRootTask,18,object,extern struct RuntimeTask gRootTask;,include/engine/shared/runtime.h,high callback identity,Static scheduler root task calling TaskSystem_UpdateRoot at priority 0
-03001680,gMessageQueueBufferIndex,4,object,extern u32 gMessageQueueBufferIndex;,include/engine/shared/runtime.h,low,"Active double-buffered message queue index, toggled by MessageQueue_SwapBuffers"
-03001684,gTrapDispatchStarted,4,object,extern u32 gTrapDispatchStarted;,include/engine/shared/runtime.h,low,Set by Trap_UpdateProbeContacts and reset when boxes are loaded
-03001688,gColliderManager,4,object,extern u8 *gColliderManager;,include/engine/shared/ram.h,low,
+02000714,gHeapHead,10,object,extern struct HeapBlock gHeapHead;,include/engine/heap.h,low,"general heap first block; prev/next, size/free flags and cleared trailing word"
+0201F400,gHeapEndGuard,4,object,extern u32 gHeapEndGuard;,include/engine/ram.h,low,heap-end guard word expected to equal 0x516B92EE
+02037000,gBgMapWorkBuffer,2000,object,extern u8 gBgMapWorkBuffer[0x2000];,include/engine/ram.h,low,"background map work buffer, cleared for 0x2000 bytes"
+02039000,gObjTileUploadRequests,8,object,extern struct ObjTileUploadRequest gObjTileUploadRequests[];,include/engine/video/obj_tile_upload.h,low,eight-byte rectangular tile-upload records; descriptor aliases two halfwords; protected ARM producer retained
+0203B000,gResourceRegistryEntries,100,object,extern struct ResourceRegistryEntry gResourceRegistryEntries[32];,include/engine/resource_registry.h,low,"32-entry resource registry; id, flags and data pointer; protected draft views retained"
+0203B400,gRandomTable,800,object,extern u16 gRandomTable[1024];,include/engine/ram.h,high,Random_InitValueTable fills 1024 halfwords from Random_Next15. Readers use the wrapping cursor at 03005308
+0203C400,gGameStateStorage,,object,extern u8 gGameStateStorage[];,include/engine/ram.h,low,backing storage for timer-jittered game-state and variable regions
+03000000,gIwramCode,FC,object,extern u8 gIwramCode[];,include/engine/runtime.h,low,IWRAM instruction buffer populated from Palette_CacheObjectBankArm through AgbMain__addr at startup; extent is not inferred from the partial RFU read
+03001110,gVideoIrqPhase,4,object,extern u32 gVideoIrqPhase;,include/engine/runtime.h,low,Two-phase video/sound IRQ handler latch; toggled by sub_08214144 (tentative name)
+03001118,gVideoUploadTask,18,object,extern struct RuntimeTask gVideoUploadTask;,include/engine/runtime.h,high callback identity; unresolved task bytes,Static task calling InterruptsAndVideo_OnVideoUploadTask at priority 0; +16 initialized to 1 with unresolved meaning
+03001130,gGraphicsUpdateTask,18,object,extern struct RuntimeTask gGraphicsUpdateTask;,include/engine/runtime.h,high callback identity; unresolved task bytes,Static task calling InterruptsAndVideo_OnGraphicsUpdateTask at priority 13; +16 initialized to 1 with unresolved meaning
+03001148,gObjGfxSlots,400,object,extern struct ObjGfxSlot gObjGfxSlots[128];,include/engine/video/render.h,high,"128 queued OBJ tile uploads, each 8 bytes; allocation rejects count above 127 and the next object starts at 03001548"
+03001548,gBgMapCacheKey,2,object,extern u16 gBgMapCacheKey;,include/engine/video/render.h,low,"Last compressed BG map resource key, compared before LZ77 unpacking (tentative cache name)"
+0300154C,gSavedDispCnt,2,object,extern u16 gSavedDispCnt;,include/engine/video/render.h,low,DISPCNT saved by Video_SaveDisplayControl
+0300154E,gSavedWindowShadow0,2,object,extern u16 gSavedWindowShadow0;,include/engine/video/render.h,low,Saved window shadow slot 0
+03001550,gSavedWindowShadow3,2,object,extern u16 gSavedWindowShadow3;,include/engine/video/render.h,low,Saved window shadow slot 3
+03001552,gSavedWindowShadow2,2,object,extern u16 gSavedWindowShadow2;,include/engine/video/render.h,low,Saved window shadow slot 2
+03001554,gSavedWindowShadow1,2,object,extern u16 gSavedWindowShadow1;,include/engine/video/render.h,low,Saved window shadow slot 1
+03001556,gSavedWinIn,2,object,extern u16 gSavedWinIn;,include/engine/video/render.h,low,Saved WININ register
+03001558,gSavedWinOut,2,object,extern u16 gSavedWinOut;,include/engine/video/render.h,low,Saved WINOUT register
+03001560,gTextTileUploadIndices,1,object,extern u8 gTextTileUploadIndices[];,include/engine/video/render.h,low,"Queued text tile indices; bounded storage precedes its count, original guard permits index 256"
+03001660,gTextTileUploadCount,4,object,extern u32 gTextTileUploadCount;,include/engine/video/render.h,low,Number of queued text tile DMA uploads
+03001664,gFontResource,4,object,extern struct FontResource *gFontResource;,include/engine/video/text.h,high physical shape; tentative narrow/wide interpretation,Heap copy of a 12-byte font header: two u16 glyph counts and two relocated u32 glyph-data addresses
+03001668,gRootTask,18,object,extern struct RuntimeTask gRootTask;,include/engine/runtime.h,high callback identity,Static scheduler root task calling TaskSystem_UpdateRoot at priority 0
+03001680,gMessageQueueBufferIndex,4,object,extern u32 gMessageQueueBufferIndex;,include/engine/runtime.h,low,"Active double-buffered message queue index, toggled by MessageQueue_SwapBuffers"
+03001684,gTrapDispatchStarted,4,object,extern u32 gTrapDispatchStarted;,include/engine/runtime.h,low,Set by Trap_UpdateProbeContacts and reset when boxes are loaded
+03001688,gColliderManager,4,object,extern u8 *gColliderManager;,include/engine/ram.h,low,
 03001690,gSerialByteReceiveWrite,4,object,extern s32 gSerialByteReceiveWrite;,include/link/serial/serial.h,low,Write cursor of the 64-byte serial receive ring
 03001694,gSerialByteReceiveRead,4,object,extern s32 gSerialByteReceiveRead;,include/link/serial/serial.h,low,Read cursor of the 64-byte serial receive ring
 03001698,gSerialByteReceiveCount,4,object,extern s32 gSerialByteReceiveCount;,include/link/serial/serial.h,low,Queued receive-byte count
@@ -273,210 +273,210 @@ addr,name,size,kind,decl,header,confidence,notes
 030016E8,gSerialByteSendBuffer,40,object,extern u8 gSerialByteSendBuffer[64];,include/link/serial/serial.h,low,"Separate 64-byte serial send ring; direct literal base, not part of receive ring"
 03001728,gSerialQueuedSendWord,2,object,extern u16 gSerialQueuedSendWord;,include/link/serial/serial.h,low,Separate queued multiplayer send word; not part of either byte ring
 0300172A,gSerialActiveSendWord,2,object,extern u16 gSerialActiveSendWord;,include/link/serial/serial.h,low,"Current multiplayer send word, with protocol status bits"
-0300172C,gSerialReceiveIndex,4,object,extern u32 gSerialReceiveIndex;,include/engine/shared/ram.h,low,
-03001730,gSerialReceivePending,4,object,extern u32 gSerialReceivePending;,include/engine/shared/ram.h,low,
-03001734,gSerialLatestPacketIndex,4,object,extern u32 gSerialLatestPacketIndex;,include/engine/shared/ram.h,low,
+0300172C,gSerialReceiveIndex,4,object,extern u32 gSerialReceiveIndex;,include/engine/ram.h,low,
+03001730,gSerialReceivePending,4,object,extern u32 gSerialReceivePending;,include/engine/ram.h,low,
+03001734,gSerialLatestPacketIndex,4,object,extern u32 gSerialLatestPacketIndex;,include/engine/ram.h,low,
 03001738,gRfuApiBuffer,E64,object,extern u8 gRfuApiBuffer[0xE64];,include/link/serial/serial.h,low,RFU API workspace passed to rfu_initializeAPI with size 0xE64
-030025A0,gSceneLifecycleTask,20,object,extern struct SceneRuntimeTask gSceneLifecycleTask;,include/engine/shared/runtime.h,high callback identity,Static scene lifecycle task; common scheduler header followed by state and counter words
-030025E8,gCommandSet,E,object,extern struct CommandSet gCommandSet;,include/engine/shared/ram.h,low,
-030025F8,gSceneBodyRegistry,4,object,extern struct SceneBodyRegistry *gSceneBodyRegistry;,include/engine/scene_body/scene_body_registry.h,high field offsets and subsystem,Scene body registry task pointer; linked-list first/last pointers at +18/+1C
-030025FC,gSceneStimulusState,4,object,extern struct SceneStimulusState *gSceneStimulusState;,include/engine/scene_stimulus/scene_stimulus.h,high physical layout; provisional field semantics,Scene stimulus task pointer: eight 16-byte stimuli at +18 and sixteen exclusion-region ids at +98
-03002600,gRegionList,4,object,extern struct RegionList *gRegionList;,include/engine/shared/ram.h,low,
-03002604,gSolarController,4,object,extern u8 *gSolarController;,include/engine/shared/ram.h,low,solar sensor controller (Solar_*)
-03002608,gTransferSavedRuntimeFlag,4,object,extern u32 gTransferSavedRuntimeFlag;,include/engine/shared/runtime.h,low,Saves 0300546C while save transfer suspends the runtime; semantic name tentative
-030035B0,gSolarMeasurementPhase,4,object,extern s32 gSolarMeasurementPhase;,include/engine/shared/runtime.h,low,Solar timer-interrupt measurement phase
-030035B4,gSolarInterruptCounter,4,object,extern s32 gSolarInterruptCounter;,include/engine/shared/runtime.h,low,Counter incremented during active sensor interrupts
-030035B8,gSolarLastInput,4,object,extern u32 gSolarLastInput;,include/engine/shared/runtime.h,low,Last GPIO light-input bit observed by the timer handler; tentative name
-030035BC,gSolarGpioShadow,4,object,extern u32 gSolarGpioShadow;,include/engine/shared/runtime.h,low,GPIO output/control shadow used by solar timer phases
-030035C0,gSolarEnabled,4,object,extern u32 gSolarEnabled;,include/engine/shared/runtime.h,low,"Software sensor-enable flag, set by Solar_Enable and cleared by Solar_Disable"
-030035C6,gRtcProtected,1,object,extern u8 gRtcProtected;,include/engine/shared/runtime.h,low,RTC GPIO protection flag set by Rtc_Protect and cleared by Rtc_Initialize
+030025A0,gSceneLifecycleTask,20,object,extern struct SceneRuntimeTask gSceneLifecycleTask;,include/engine/runtime.h,high callback identity,Static scene lifecycle task; common scheduler header followed by state and counter words
+030025E8,gCommandSet,E,object,extern struct CommandSet gCommandSet;,include/engine/ram.h,low,
+030025F8,gSceneBodyRegistry,4,object,extern struct SceneBodyRegistry *gSceneBodyRegistry;,include/scene/collision/scene_body_registry.h,high field offsets and subsystem,Scene body registry task pointer; linked-list first/last pointers at +18/+1C
+030025FC,gSceneStimulusState,4,object,extern struct SceneStimulusState *gSceneStimulusState;,include/scene/collision/scene_stimulus.h,high physical layout; provisional field semantics,Scene stimulus task pointer: eight 16-byte stimuli at +18 and sixteen exclusion-region ids at +98
+03002600,gRegionList,4,object,extern struct RegionList *gRegionList;,include/engine/ram.h,low,
+03002604,gSolarController,4,object,extern u8 *gSolarController;,include/engine/ram.h,low,solar sensor controller (Solar_*)
+03002608,gTransferSavedRuntimeFlag,4,object,extern u32 gTransferSavedRuntimeFlag;,include/engine/runtime.h,low,Saves 0300546C while save transfer suspends the runtime; semantic name tentative
+030035B0,gSolarMeasurementPhase,4,object,extern s32 gSolarMeasurementPhase;,include/engine/runtime.h,low,Solar timer-interrupt measurement phase
+030035B4,gSolarInterruptCounter,4,object,extern s32 gSolarInterruptCounter;,include/engine/runtime.h,low,Counter incremented during active sensor interrupts
+030035B8,gSolarLastInput,4,object,extern u32 gSolarLastInput;,include/engine/runtime.h,low,Last GPIO light-input bit observed by the timer handler; tentative name
+030035BC,gSolarGpioShadow,4,object,extern u32 gSolarGpioShadow;,include/engine/runtime.h,low,GPIO output/control shadow used by solar timer phases
+030035C0,gSolarEnabled,4,object,extern u32 gSolarEnabled;,include/engine/runtime.h,low,"Software sensor-enable flag, set by Solar_Enable and cleared by Solar_Disable"
+030035C6,gRtcProtected,1,object,extern u8 gRtcProtected;,include/engine/runtime.h,low,RTC GPIO protection flag set by Rtc_Protect and cleared by Rtc_Initialize
 030035C8,gSoftDoubleNaN,14,object,extern struct SoftDoubleNumber gSoftDoubleNaN;,include/lib/libgcc/libgcc_numbers.h,high library source correspondence,libgcc software double-precision NaN object; 20-byte fp-bit-base number layout
 030035E0,gSoftSingleNaN,10,object,extern struct SoftSingleNumber gSoftSingleNaN;,include/lib/libgcc/libgcc_numbers.h,high library source correspondence,libgcc software floating-point NaN number object; shared fp-bit-base layout
 030035F0,SoundMainRAM_Buffer,400,object,extern u8 SoundMainRAM_Buffer[0x400];,include/lib/m4a/sound.h,low,MP2K RAM instruction buffer copied with CpuCopy32 size 0x400; next script procedure word is a separate object
-030039F0,gScriptEntryProcedure,2,object,extern u16 gScriptEntryProcedure;,include/engine/shared/engine_globals.h,low,Script entry procedure selected by Script_SetEntryProcedure; separate from the preceding MP2K buffer
-03003A00,gScanlineDmaTarget,4,object,extern void *gScanlineDmaTarget;,include/engine/shared/render.h,low,"HBlank DMA0 destination: the I/O register the scanline effect writes (BGnHOFS, BGnVOFS, MOSAIC, BLDY)"
-03003A04,gVideoUploadFlags,4,object,extern u32 gVideoUploadFlags;,include/engine/shared/runtime.h,low,Video upload dirty flags; bit 0 requests OAM upload
-03003A08,gSceneEntryActive,4,object,extern u32 gSceneEntryActive;,include/engine/shared/runtime.h,low,Set while scene-entry script runs; suppresses part of video upload task
-03003A10,gSerialInterruptState,34,object,extern SerialIntrFunc gSerialInterruptState[];,include/engine/shared/ram.h,low,
+030039F0,gScriptEntryProcedure,2,object,extern u16 gScriptEntryProcedure;,include/engine/engine_globals.h,low,Script entry procedure selected by Script_SetEntryProcedure; separate from the preceding MP2K buffer
+03003A00,gScanlineDmaTarget,4,object,extern void *gScanlineDmaTarget;,include/engine/video/render.h,low,"HBlank DMA0 destination: the I/O register the scanline effect writes (BGnHOFS, BGnVOFS, MOSAIC, BLDY)"
+03003A04,gVideoUploadFlags,4,object,extern u32 gVideoUploadFlags;,include/engine/runtime.h,low,Video upload dirty flags; bit 0 requests OAM upload
+03003A08,gSceneEntryActive,4,object,extern u32 gSceneEntryActive;,include/engine/runtime.h,low,Set while scene-entry script runs; suppresses part of video upload task
+03003A10,gSerialInterruptState,34,object,extern SerialIntrFunc gSerialInterruptState[];,include/engine/ram.h,low,
 03003A14,gRfuIrqSlots,,interior,extern u8 gRfuIrqSlots[];,include/link/serial/serial.h,low,"Interior view of interrupt dispatch table entry 1, passed as RFU handler slots; not an independent allocation"
-03003A44,gVBlankOccurred,4,object,extern vu32 gVBlankOccurred;,include/engine/shared/runtime.h,low,"VBlank wait latch, volatile for interrupt polling"
-03003A48,gDialogueScrollOffset,4,object,extern u32 gDialogueScrollOffset;,include/engine/shared/runtime.h,low,Dialogue scroll/tick offset copied into the video IRQ shadow; tentative name
-03003A4C,gDialogueModeLatched,4,object,extern u32 gDialogueModeLatched;,include/engine/shared/runtime.h,low,VBlank-latched dialogue state controlling the two-phase video IRQ; tentative name
-03003A50,gSceneEffectPalettePhase,4,object,extern u32 gSceneEffectPalettePhase;,include/engine/shared/ram.h,low,
-03003A60,gInterruptCode,800,object,extern u8 gInterruptCode[0x800];,include/engine/shared/runtime.h,low,"IWRAM interrupt dispatcher copy, 512 words copied from IntrMain"
-03004260,gVBlankUploadPending,4,object,extern u32 gVBlankUploadPending;,include/engine/shared/runtime.h,low,Set by VBlank and cleared when the video upload task finishes; tentative name
-03004264,gVBlankFrameCounter,4,object,extern u32 gVBlankFrameCounter;,include/engine/shared/runtime.h,low,Counter incremented after VBlank clock/link updates
-03004268,gDialogueScrollLatched,4,object,extern u32 gDialogueScrollLatched;,include/engine/shared/runtime.h,low,Dialogue scroll offset latched in VBlank and read as a byte by the secondary video IRQ
-0300426C,gVideoInterruptsEnabled,4,object,extern u32 gVideoInterruptsEnabled;,include/engine/shared/runtime.h,low,Gates video register updates and link/clock work in VBlank
-03004270,gScanlineDmaCount,2,object,extern u16 gScanlineDmaCount;,include/engine/shared/render.h,low,"HBlank DMA0 transfer count, 1 for the single-halfword/word-per-line transfers"
-03004274,gScanlineDmaMode,2,object,extern s16 gScanlineDmaMode;,include/engine/shared/render.h,low,"HBlank DMA0 mode: 0 off, 1 halfword transfer, else word transfer (low confidence)"
-03004278,gScanlineDmaSource,4,object,extern void *gScanlineDmaSource;,include/engine/shared/render.h,low,HBlank DMA0 source: the staged 160-line effect buffer (VBlank handler programs DMA0 SAD)
-0300427C,gVideoTransferControl,2,object,extern u16 gVideoTransferControl;,include/engine/shared/runtime.h,low,Runtime transfer-control flag initialized to 1 and cleared around save/wireless transfer; tentative name
-03004280,gVBlankDialogueState,4,object,extern u32 gVBlankDialogueState;,include/engine/shared/render.h,high physical shape; provisional semantic name,scrolling-dialogue/video state copied during VBlank (guess)
-03004290,gRenderListIndex,4,object,extern u32 gRenderListIndex;,include/engine/shared/render.h,high physical shape; provisional semantic name,active list index into the three render list-head pairs
-03004294,gSpriteRenderCallback,4,object,extern u32 gSpriteRenderCallback;,include/engine/shared/render.h,high physical shape; provisional semantic name,"sprite render callback, called by the graphics task (function pointer)"
-030042A0,gCamera,14,object,extern struct CameraRenderState gCamera;,include/engine/shared/render.h,high physical shape; provisional semantic name,"Inline render camera; position, screen offsets and projection mode. +06 is copied, +0C/+10 initialized with unresolved meaning; distinct from active camera task."
-030042B4,gProjectedSpriteCallback,4,object,extern u32 gProjectedSpriteCallback;,include/engine/shared/render.h,high physical shape; provisional semantic name,projected-sprite queue callback (function pointer)
-030042B8,gExtraRenderCallback,4,object,extern u32 gExtraRenderCallback;,include/engine/shared/render.h,high physical shape; provisional semantic name,additional render callback (function pointer)
-030042C0,gSpriteListHeads,8,object,extern void *gSpriteListHeads[2];,include/engine/shared/render.h,high physical shape; provisional semantic name,"Two sprite render-list heads, selected by gRenderListIndex; pointees retain subsystem views"
-030042C8,gMainSpriteListHeads,8,object,extern void *gMainSpriteListHeads[2];,include/engine/shared/render.h,high physical shape; provisional semantic name,Two main/animation sprite-list heads; protected ARM source retains its address declaration
-030042D0,gDrawableListHeads,8,object,extern void *gDrawableListHeads[2];,include/engine/shared/render.h,high physical shape; provisional semantic name,"Two drawable/effect render-list heads, selected by gRenderListIndex"
-030042D8,gDynamicTileSum,2,object,extern u16 gDynamicTileSum;,include/engine/shared/render.h,high physical shape; provisional semantic name,"tile count of the dynamic OBJ slots, reset and accumulated each frame"
-030042DC,gMainSpriteTileSum,2,object,extern u16 gMainSpriteTileSum;,include/engine/shared/render.h,high physical shape; provisional semantic name,"tile count of the main sprites, reset and accumulated each frame"
-030042E0,gPaletteBankCount,2,object,extern u16 gPaletteBankCount;,include/engine/shared/render.h,high physical shape; provisional semantic name,palette resource bank count
-030042E4,gPaletteBankData,4,object,extern u8 *gPaletteBankData;,include/engine/shared/render.h,high physical shape; provisional semantic name,Palette-bank data pointer; pointee is a repeated bank array
-030042E8,gObjTileCursor,2,object,extern s16 gObjTileCursor;,include/engine/shared/render.h,high physical shape; provisional semantic name,OBJ tile allocation cursor (signed loads in the allocation tests)
-030042EC,gSpriteTileResource,4,object,extern struct SpriteTileResource *gSpriteTileResource;,include/engine/shared/render.h,high merged loader/lookup layout,"Static sprite tile resource header: tile count +4, entry count +6, relative data offset +8, eight-byte lookup entries from +C"
-030042F0,gQueuedObjSlotCount,2,object,extern u16 gQueuedObjSlotCount;,include/engine/shared/render.h,high physical shape; provisional semantic name,queued dynamic OBJ graphics slot count
-030042F4,gStaticTileCount,2,object,extern u16 gStaticTileCount;,include/engine/shared/render.h,high physical shape; provisional semantic name,reserved/static OBJ tile count (some files read it signed)
-030042F8,gAnimResourceSection0C,4,object,extern u8 *gAnimResourceSection0C;,include/engine/shared/render.h,high physical shape; provisional semantic name,resource-bank base plus header offset +0xC
-030042FC,gAnimResourceSection14,4,object,extern u8 *gAnimResourceSection14;,include/engine/shared/render.h,high physical shape; provisional semantic name,resource-bank base plus header offset +0x14
-03004300,gAnimationResource,4,object,extern struct AnimResourceHeader *gAnimationResource;,include/engine/shared/render.h,high merged loader/lookup layout,"Animation resource header: count +4, relative section offsets +C/+10/+14, 12-byte entries from +18"
-03004304,gArmTileUploadCount,4,object,extern u32 gArmTileUploadCount;,include/engine/shared/render.h,high physical shape; provisional semantic name,ARM tile-upload request count
-03004310,gSpriteAffineParams,80,object,extern struct SpriteAffineParam gSpriteAffineParams[32];,include/engine/shared/render.h,high physical layout,"32 four-byte sprite affine parameters: u8 angle, s8 scaleX/scaleY, unresolved tail byte; protected ARM source retains address declaration"
-03004390,gOamBuffer,400,object,extern struct OamEntry gOamBuffer[];,include/engine/shared/render.h,high physical shape; provisional semantic name,"final OAM entries, 8 bytes each (128)"
-03004790,gOamPriorityCounts,8,object,extern u16 gOamPriorityCounts[];,include/engine/shared/render.h,high physical shape; provisional semantic name,queued OAM entry count per priority (4)
-03004798,gOamCount,4,object,extern s32 gOamCount;,include/engine/shared/render.h,high physical shape; provisional semantic name,direct/final OAM entry count
-0300479C,gPendingOamCount,4,object,extern s32 gPendingOamCount;,include/engine/shared/render.h,high physical shape; provisional semantic name,depth-sorted pending OAM entry count
-030047A0,gPendingOamBuffer,400,object,extern struct OamEntry gPendingOamBuffer[];,include/engine/shared/render.h,high physical shape; provisional semantic name,pending depth-sorted OAM entries (128)
-03004BA0,gAffineRequestCount,4,object,extern s32 gAffineRequestCount;,include/engine/shared/render.h,high physical shape; provisional semantic name,"affine request count, capped at 32"
-03004BB0,gBgAffineAngle,2,object,extern u16 gBgAffineAngle;,include/engine/shared/render.h,high physical shape; provisional semantic name,BG affine angle
-03004BC0,gBgTileUploadSrc,10,object,extern void *gBgTileUploadSrc[];,include/engine/shared/render.h,high physical shape; provisional semantic name,per-layer pending tile-upload source (4)
-03004BD0,gBgAffineMatrix,8,object,extern s16 gBgAffineMatrix[4];,include/engine/shared/render.h,high physical shape; provisional semantic name,BG affine matrix coefficients
-03004BD8,gDispCntShadow,2,object,extern u16 gDispCntShadow;,include/engine/shared/render.h,high physical shape; provisional semantic name,display control / BG visibility shadow
-03004BE0,gBgTileUploadParamA,8,object,extern u16 gBgTileUploadParamA[];,include/engine/shared/render.h,high physical shape; provisional semantic name,per-layer tile-upload parameter (4)
-03004BEC,gBgAffineMode,2,object,extern u16 gBgAffineMode;,include/engine/shared/render.h,high physical shape; provisional semantic name,BG affine/non-affine shadow mode
-03004BF0,gBgAffineMatrixBuffer,8,object,extern u16 gBgAffineMatrixBuffer[];,include/engine/shared/render.h,high physical shape; provisional semantic name,"affine coefficients copied from gBgAffineMatrix, then uploaded (4)"
-03004BF8,gBgAffineRefX,4,object,extern u32 gBgAffineRefX;,include/engine/shared/render.h,high physical shape; provisional semantic name,BG affine reference X accumulator
-03004BFC,gBgAffineScaleY,2,object,extern u16 gBgAffineScaleY;,include/engine/shared/render.h,high physical shape; provisional semantic name,BG affine Y scale
-03004C00,gBgAffineRefY,4,object,extern u32 gBgAffineRefY;,include/engine/shared/render.h,high physical shape; provisional semantic name,BG affine reference Y accumulator
-03004C08,gBgTileUploadParamB,8,object,extern u16 gBgTileUploadParamB[];,include/engine/shared/render.h,high physical shape; provisional semantic name,per-layer tile-upload parameter (4)
-03004C14,gBgAffineScaleX,2,object,extern u16 gBgAffineScaleX;,include/engine/shared/render.h,high physical shape; provisional semantic name,BG affine X scale
-03004C18,gBgAffineRefBuffer,8,object,extern u32 gBgAffineRefBuffer[];,include/engine/shared/render.h,high physical shape; provisional semantic name,buffered affine X/Y reference (2)
-03004C20,gBgScrollShadow,10,object,extern u16 gBgScrollShadow[];,include/engine/shared/render.h,high physical shape; provisional semantic name,four BG horizontal/vertical scroll pairs (8)
-03004C30,gBgRecords,C0,object,extern struct BackgroundLayer gBgRecords[4];,include/engine/shared/render.h,high physical shape; provisional semantic name,Four 0x30-byte BG records; field names provisional where resource modes reuse storage. Protected drafts retain address declarations.
-03004CC0,gBgRecord3,,interior,extern struct BackgroundLayer gBgRecord3;,include/engine/shared/render.h,low,Interior view of gBgRecords[3] (no consumer declares it separately)
-03004CF0,gWindowShadow0,2,object,extern u16 gWindowShadow0;,include/engine/shared/render.h,high physical shape; provisional semantic name,window-control bound/shadow slot (which register: unknown)
-03004CF8,gWindowShadow1,2,object,extern u16 gWindowShadow1;,include/engine/shared/render.h,high physical shape; provisional semantic name,window-control bound/shadow slot
-03004CFC,gWindowShadow2,2,object,extern u16 gWindowShadow2;,include/engine/shared/render.h,high physical shape; provisional semantic name,window-control bound/shadow slot
-03004D08,gWindowShadow3,2,object,extern u16 gWindowShadow3;,include/engine/shared/render.h,high physical shape; provisional semantic name,window-control bound/shadow slot
-03004D10,gSpriteHeightTiles,10,object,extern u8 gSpriteHeightTiles[];,include/engine/shared/render.h,high physical shape; provisional semantic name,sprite height in tiles per shape/size index (16)
-03004D20,gSpriteHeightPixels,10,object,extern u8 gSpriteHeightPixels[];,include/engine/shared/render.h,high physical shape; provisional semantic name,sprite height in pixels per shape/size index (16)
-03004D30,gSpriteTileArea,10,object,extern u8 gSpriteTileArea[];,include/engine/shared/render.h,high physical shape; provisional semantic name,sprite tile count per shape/size index (16)
-03004D40,gSpriteWidthTiles,10,object,extern u8 gSpriteWidthTiles[];,include/engine/shared/render.h,high physical shape; provisional semantic name,sprite width in tiles per shape/size index (16)
-03004D50,gSpriteShapeAttr,40,object,extern u32 gSpriteShapeAttr[];,include/engine/shared/render.h,high physical shape; provisional semantic name,packed OAM shape/size attribute bits per index (16)
-03004D90,gSpriteWidthPixels,10,object,extern u8 gSpriteWidthPixels[];,include/engine/shared/render.h,high physical shape; provisional semantic name,sprite width in pixels per shape/size index (16)
-03004DA0,gBgFadeLevel,4,object,extern s32 gBgFadeLevel;,include/engine/shared/render.h,high physical shape; provisional semantic name,background fade level
-03004DA4,gObjPaletteBankCount,4,object,extern u32 gObjPaletteBankCount;,include/engine/shared/render.h,high physical shape; provisional semantic name,allocated object-palette bank count
-03004DA8,gBgFadeApplied,4,object,extern u32 gBgFadeApplied;,include/engine/shared/render.h,high physical shape; provisional semantic name,cached/applied background fade level
-03004DAC,gObjFadeApplied,4,object,extern u32 gObjFadeApplied;,include/engine/shared/render.h,high physical shape; provisional semantic name,cached/applied object fade level
-03004DB0,gBackdropOverride,2,object,extern s16 gBackdropOverride;,include/engine/shared/render.h,high physical shape; provisional semantic name,backdrop override enabled flag
-03004DC0,gObjPaletteBuffer,200,object,extern u16 gObjPaletteBuffer[][16];,include/engine/shared/render.h,high physical shape; provisional semantic name,sixteen object palette banks of 16 colors
-03004FC0,gBgPaletteBuffer,200,object,extern u16 gBgPaletteBuffer[];,include/engine/shared/render.h,high physical shape; provisional semantic name,sixteen background palette banks of 16 colors; labels inside it are interior rows
-03004FE0,gBgPaletteBank1,,interior,extern u16 gBgPaletteBank1[];,include/engine/shared/render.h,high containment; per-use extent varies,"Interior background palette bank 1, at gBgPaletteBuffer +0x20 bytes"
-03005000,gBgPaletteBank2,,interior,extern u16 gBgPaletteBank2[];,include/engine/shared/render.h,high containment; per-use extent varies,"Interior background palette bank 2, at gBgPaletteBuffer +0x40 bytes"
-03005020,gBgPaletteBank3,,interior,extern u16 gBgPaletteBank3[];,include/engine/shared/render.h,high containment; per-use extent varies,"Interior background palette bank 3, at gBgPaletteBuffer +0x60 bytes"
-030050E0,gBgPaletteBank9,,interior,extern u16 gBgPaletteBank9[];,include/engine/shared/render.h,high containment; per-use extent varies,"Interior background palette bank 9, at gBgPaletteBuffer +0x120 bytes"
-03005140,gBgPaletteBank12,,interior,extern u16 gBgPaletteBank12[];,include/engine/shared/render.h,high containment; per-use extent varies,"Interior background palette bank 12, at gBgPaletteBuffer +0x180 bytes"
-03005160,gBgPaletteBank13,,interior,extern u16 gBgPaletteBank13[];,include/engine/shared/render.h,low,"Interior background palette bank 13, at gBgPaletteBuffer + 0x1A0"
-03005164,gBgPaletteBank13Color2,,interior,extern u16 gBgPaletteBank13Color2[];,include/engine/shared/render.h,high containment; per-use extent varies,Interior view starting at background palette bank 13 color 2
-03005174,gBgPaletteBank13Color10,2,interior,extern u16 gBgPaletteBank13Color10;,include/engine/shared/render.h,high containment; per-use extent varies,Interior background palette bank 13 color 10
-03005176,gBgPaletteBank13Color11,2,interior,extern u16 gBgPaletteBank13Color11;,include/engine/shared/render.h,high containment; per-use extent varies,Interior background palette bank 13 color 11
-0300517C,gBgPaletteBank13Color14,2,interior,extern u16 gBgPaletteBank13Color14;,include/engine/shared/render.h,high containment; per-use extent varies,Interior background palette bank 13 color 14
-03005180,gBgPaletteBank14,,interior,extern u16 gBgPaletteBank14[];,include/engine/shared/render.h,high containment; per-use extent varies,"Interior background palette bank 14, at gBgPaletteBuffer +0x1C0 bytes"
-030051A0,gBgPaletteBank15,,interior,extern u16 gBgPaletteBank15[];,include/engine/shared/render.h,high containment; per-use extent varies,"Interior background palette bank 15, at gBgPaletteBuffer +0x1E0 bytes"
-030051C0,gObjPaletteReserved,4,object,extern u32 gObjPaletteReserved;,include/engine/shared/render.h,high physical shape; provisional semantic name,reserved object-palette allocation count
-030051C4,gBgFadeBankMask,2,object,extern u16 gBgFadeBankMask;,include/engine/shared/render.h,high physical shape; provisional semantic name,background-palette fade bank mask
-030051C8,gObjPaletteEffect,4,object,extern u32 gObjPaletteEffect;,include/engine/shared/render.h,high physical shape; provisional semantic name,object-palette refresh/effect control
-030051CC,gPaletteBanksInUse,4,object,extern u32 gPaletteBanksInUse;,include/engine/shared/render.h,high physical shape; provisional semantic name,active/reserved palette-bank count
-030051D0,gBackdropColor,2,object,extern u16 gBackdropColor;,include/engine/shared/render.h,high physical shape; provisional semantic name,backdrop RGB15 color
-030051D4,gObjFadeLevel,4,object,extern u32 gObjFadeLevel;,include/engine/shared/render.h,high physical shape; provisional semantic name,object fade/effect level
-030051D8,gFadeMultiplier,4,object,extern u32 gFadeMultiplier;,include/engine/shared/render.h,high physical shape; provisional semantic name,shared fade multiplier
-030051DC,gObjFadeColor,2,object,extern u16 gObjFadeColor;,include/engine/shared/render.h,high physical shape; provisional semantic name,object fade target color
-030051E0,gBgPaletteSource,4,object,extern u16 *gBgPaletteSource;,include/engine/shared/render.h,high physical shape; provisional semantic name,current background palette upload source
-030051E4,gGrayscaleControl,4,object,extern u32 gGrayscaleControl;,include/engine/shared/render.h,high physical shape; provisional semantic name,grayscale effect duration/control
-030051F0,gObjPaletteKeys,20,object,extern u16 gObjPaletteKeys[];,include/engine/shared/render.h,high physical shape; provisional semantic name,object palette key per bank (16)
-03005210,gObjFadeFlags,2,object,extern u16 gObjFadeFlags;,include/engine/shared/render.h,high physical shape; provisional semantic name,object palette fade exclusion/control flags
-03005214,gBgFadeColor,2,object,extern u16 gBgFadeColor;,include/engine/shared/render.h,high physical shape; provisional semantic name,background fade target color
-03005218,gMosaicByte,1,object,extern u8 gMosaicByte;,include/engine/shared/render.h,high physical shape; provisional semantic name,mosaic-related byte parameter (guess)
-0300521C,gMosaicHalfword,2,object,extern u16 gMosaicHalfword;,include/engine/shared/render.h,high physical shape; provisional semantic name,mosaic-related halfword parameter (guess)
-03005220,gScanlineEffectLayer,4,object,extern u32 gScanlineEffectLayer;,include/engine/shared/render.h,high physical shape; provisional semantic name,scanline effect layer selector
-03005224,gScanlineEffectSource,4,object,extern u16 *gScanlineEffectSource;,include/engine/shared/render.h,high physical shape; provisional semantic name,pending 160-line effect source; consumed then cleared
-03005228,gScanlineEffectMode,4,object,extern u32 gScanlineEffectMode;,include/engine/shared/render.h,high physical shape; provisional semantic name,scanline effect mode (scroll/mosaic/brightness)
-0300522C,gSpriteAttrFlags,4,object,extern u32 gSpriteAttrFlags;,include/engine/shared/render.h,high physical shape; provisional semantic name,sprite render/global attribute flags
-03005230,gSpriteMosaicAttr,1,object,extern u8 gSpriteMosaicAttr;,include/engine/shared/render.h,high physical shape; provisional semantic name,sprite mosaic/global attribute byte
-03005234,gMosaicParam,2,object,extern u16 gMosaicParam;,include/engine/shared/render.h,high physical shape; provisional semantic name,packed mosaic parameter (byte and halfword accesses)
-03005238,gDefaultAnimFlags,2,object,extern u16 gDefaultAnimFlags;,include/engine/shared/render.h,high physical shape; provisional semantic name,default animation/widget flags
-0300523C,gEnginePauseFlags,4,object,extern u32 gEnginePauseFlags;,include/engine/shared/render.h,high physical shape; provisional semantic name,engine pause/suspend flags (bits 1-2: sound off; task list masks)
-03005240,gNextTaskId,2,object,extern u16 gNextTaskId;,include/engine/shared/engine_globals.h,low,"next Task id (unique, never 0)"
-03005250,gLinkMenuActive,4,object,extern u32 gLinkMenuActive;,include/engine/shared/ram.h,low,
-03005260,gPadState,10,object,extern u16 gPadState[];,include/engine/shared/input.h,low,"input state: two slots of {held, pressed, released, pad}; updated by sub_08219B24"
-03005270,gHardwareKeys,2,object,extern u16 gHardwareKeys;,include/engine/shared/runtime.h,low,Raw active-low KEYINPUT sampled before per-player input records are updated
-03005274,gSceneSelectionDisplaySlots,A,object,extern u16 gSceneSelectionDisplaySlots[];,include/engine/shared/ram.h,high,Wireless input publisher writes five consecutive halfwords. Slots 2 and 3 overlap the word used by Random_Next15.
-03005278,gLcgState,4,interior,extern u32 gLcgState;,include/engine/shared/runtime.h,high,Random_Next15 updates this word. WirelessController writes input slots 2 and 3 at the same address.
-03005280,gTaskLists,70,object,extern struct TaskList gTaskLists[14];,include/engine/shared/engine_globals.h,low,task lists by priority
-030052F0,gResourceRegistryCount,4,object,extern s32 gResourceRegistryCount;,include/engine/shared/runtime.h,low,"High-water count of resource-registry entries, capped at 32"
-030052F4,gTerrainMap,4,object,extern struct EngineMap *gTerrainMap;,include/engine/shared/engine_globals.h,low,
-030052F8,gTerrainWidth,4,object,extern u32 gTerrainWidth;,include/engine/shared/engine_globals.h,low,
-030052FC,gTerrainHeight,4,object,extern u32 gTerrainHeight;,include/engine/shared/engine_globals.h,low,
-03005300,gTerrainTrapSerial,4,object,extern u32 gTerrainTrapSerial;,include/engine/shared/ram.h,low,
-03005304,gEffectRandomTableIndex,4,object,extern u32 gEffectRandomTableIndex;,include/engine/shared/ram.h,high,Ten-bit cursor into the fixed 1024-halfword ROM bank at 086141BC. Seeded by Random_InitValueTable
-03005308,gRandomIndex,4,object,extern u32 gRandomIndex;,include/engine/shared/engine_globals.h,high,Ten-bit cursor into the writable 1024-halfword bank at 0203B400. Seeded by Random_InitValueTable
+03003A44,gVBlankOccurred,4,object,extern vu32 gVBlankOccurred;,include/engine/runtime.h,low,"VBlank wait latch, volatile for interrupt polling"
+03003A48,gDialogueScrollOffset,4,object,extern u32 gDialogueScrollOffset;,include/engine/runtime.h,low,Dialogue scroll/tick offset copied into the video IRQ shadow; tentative name
+03003A4C,gDialogueModeLatched,4,object,extern u32 gDialogueModeLatched;,include/engine/runtime.h,low,VBlank-latched dialogue state controlling the two-phase video IRQ; tentative name
+03003A50,gSceneEffectPalettePhase,4,object,extern u32 gSceneEffectPalettePhase;,include/engine/ram.h,low,
+03003A60,gInterruptCode,800,object,extern u8 gInterruptCode[0x800];,include/engine/runtime.h,low,"IWRAM interrupt dispatcher copy, 512 words copied from IntrMain"
+03004260,gVBlankUploadPending,4,object,extern u32 gVBlankUploadPending;,include/engine/runtime.h,low,Set by VBlank and cleared when the video upload task finishes; tentative name
+03004264,gVBlankFrameCounter,4,object,extern u32 gVBlankFrameCounter;,include/engine/runtime.h,low,Counter incremented after VBlank clock/link updates
+03004268,gDialogueScrollLatched,4,object,extern u32 gDialogueScrollLatched;,include/engine/runtime.h,low,Dialogue scroll offset latched in VBlank and read as a byte by the secondary video IRQ
+0300426C,gVideoInterruptsEnabled,4,object,extern u32 gVideoInterruptsEnabled;,include/engine/runtime.h,low,Gates video register updates and link/clock work in VBlank
+03004270,gScanlineDmaCount,2,object,extern u16 gScanlineDmaCount;,include/engine/video/render.h,low,"HBlank DMA0 transfer count, 1 for the single-halfword/word-per-line transfers"
+03004274,gScanlineDmaMode,2,object,extern s16 gScanlineDmaMode;,include/engine/video/render.h,low,"HBlank DMA0 mode: 0 off, 1 halfword transfer, else word transfer (low confidence)"
+03004278,gScanlineDmaSource,4,object,extern void *gScanlineDmaSource;,include/engine/video/render.h,low,HBlank DMA0 source: the staged 160-line effect buffer (VBlank handler programs DMA0 SAD)
+0300427C,gVideoTransferControl,2,object,extern u16 gVideoTransferControl;,include/engine/runtime.h,low,Runtime transfer-control flag initialized to 1 and cleared around save/wireless transfer; tentative name
+03004280,gVBlankDialogueState,4,object,extern u32 gVBlankDialogueState;,include/engine/video/render.h,high physical shape; provisional semantic name,scrolling-dialogue/video state copied during VBlank (guess)
+03004290,gRenderListIndex,4,object,extern u32 gRenderListIndex;,include/engine/video/render.h,high physical shape; provisional semantic name,active list index into the three render list-head pairs
+03004294,gSpriteRenderCallback,4,object,extern u32 gSpriteRenderCallback;,include/engine/video/render.h,high physical shape; provisional semantic name,"sprite render callback, called by the graphics task (function pointer)"
+030042A0,gCamera,14,object,extern struct CameraRenderState gCamera;,include/engine/video/render.h,high physical shape; provisional semantic name,"Inline render camera; position, screen offsets and projection mode. +06 is copied, +0C/+10 initialized with unresolved meaning; distinct from active camera task."
+030042B4,gProjectedSpriteCallback,4,object,extern u32 gProjectedSpriteCallback;,include/engine/video/render.h,high physical shape; provisional semantic name,projected-sprite queue callback (function pointer)
+030042B8,gExtraRenderCallback,4,object,extern u32 gExtraRenderCallback;,include/engine/video/render.h,high physical shape; provisional semantic name,additional render callback (function pointer)
+030042C0,gSpriteListHeads,8,object,extern void *gSpriteListHeads[2];,include/engine/video/render.h,high physical shape; provisional semantic name,"Two sprite render-list heads, selected by gRenderListIndex; pointees retain subsystem views"
+030042C8,gMainSpriteListHeads,8,object,extern void *gMainSpriteListHeads[2];,include/engine/video/render.h,high physical shape; provisional semantic name,Two main/animation sprite-list heads; protected ARM source retains its address declaration
+030042D0,gDrawableListHeads,8,object,extern void *gDrawableListHeads[2];,include/engine/video/render.h,high physical shape; provisional semantic name,"Two drawable/effect render-list heads, selected by gRenderListIndex"
+030042D8,gDynamicTileSum,2,object,extern u16 gDynamicTileSum;,include/engine/video/render.h,high physical shape; provisional semantic name,"tile count of the dynamic OBJ slots, reset and accumulated each frame"
+030042DC,gMainSpriteTileSum,2,object,extern u16 gMainSpriteTileSum;,include/engine/video/render.h,high physical shape; provisional semantic name,"tile count of the main sprites, reset and accumulated each frame"
+030042E0,gPaletteBankCount,2,object,extern u16 gPaletteBankCount;,include/engine/video/render.h,high physical shape; provisional semantic name,palette resource bank count
+030042E4,gPaletteBankData,4,object,extern u8 *gPaletteBankData;,include/engine/video/render.h,high physical shape; provisional semantic name,Palette-bank data pointer; pointee is a repeated bank array
+030042E8,gObjTileCursor,2,object,extern s16 gObjTileCursor;,include/engine/video/render.h,high physical shape; provisional semantic name,OBJ tile allocation cursor (signed loads in the allocation tests)
+030042EC,gSpriteTileResource,4,object,extern struct SpriteTileResource *gSpriteTileResource;,include/engine/video/render.h,high merged loader/lookup layout,"Static sprite tile resource header: tile count +4, entry count +6, relative data offset +8, eight-byte lookup entries from +C"
+030042F0,gQueuedObjSlotCount,2,object,extern u16 gQueuedObjSlotCount;,include/engine/video/render.h,high physical shape; provisional semantic name,queued dynamic OBJ graphics slot count
+030042F4,gStaticTileCount,2,object,extern u16 gStaticTileCount;,include/engine/video/render.h,high physical shape; provisional semantic name,reserved/static OBJ tile count (some files read it signed)
+030042F8,gAnimResourceSection0C,4,object,extern u8 *gAnimResourceSection0C;,include/engine/video/render.h,high physical shape; provisional semantic name,resource-bank base plus header offset +0xC
+030042FC,gAnimResourceSection14,4,object,extern u8 *gAnimResourceSection14;,include/engine/video/render.h,high physical shape; provisional semantic name,resource-bank base plus header offset +0x14
+03004300,gAnimationResource,4,object,extern struct AnimResourceHeader *gAnimationResource;,include/engine/video/render.h,high merged loader/lookup layout,"Animation resource header: count +4, relative section offsets +C/+10/+14, 12-byte entries from +18"
+03004304,gArmTileUploadCount,4,object,extern u32 gArmTileUploadCount;,include/engine/video/render.h,high physical shape; provisional semantic name,ARM tile-upload request count
+03004310,gSpriteAffineParams,80,object,extern struct SpriteAffineParam gSpriteAffineParams[32];,include/engine/video/render.h,high physical layout,"32 four-byte sprite affine parameters: u8 angle, s8 scaleX/scaleY, unresolved tail byte; protected ARM source retains address declaration"
+03004390,gOamBuffer,400,object,extern struct OamEntry gOamBuffer[];,include/engine/video/render.h,high physical shape; provisional semantic name,"final OAM entries, 8 bytes each (128)"
+03004790,gOamPriorityCounts,8,object,extern u16 gOamPriorityCounts[];,include/engine/video/render.h,high physical shape; provisional semantic name,queued OAM entry count per priority (4)
+03004798,gOamCount,4,object,extern s32 gOamCount;,include/engine/video/render.h,high physical shape; provisional semantic name,direct/final OAM entry count
+0300479C,gPendingOamCount,4,object,extern s32 gPendingOamCount;,include/engine/video/render.h,high physical shape; provisional semantic name,depth-sorted pending OAM entry count
+030047A0,gPendingOamBuffer,400,object,extern struct OamEntry gPendingOamBuffer[];,include/engine/video/render.h,high physical shape; provisional semantic name,pending depth-sorted OAM entries (128)
+03004BA0,gAffineRequestCount,4,object,extern s32 gAffineRequestCount;,include/engine/video/render.h,high physical shape; provisional semantic name,"affine request count, capped at 32"
+03004BB0,gBgAffineAngle,2,object,extern u16 gBgAffineAngle;,include/engine/video/render.h,high physical shape; provisional semantic name,BG affine angle
+03004BC0,gBgTileUploadSrc,10,object,extern void *gBgTileUploadSrc[];,include/engine/video/render.h,high physical shape; provisional semantic name,per-layer pending tile-upload source (4)
+03004BD0,gBgAffineMatrix,8,object,extern s16 gBgAffineMatrix[4];,include/engine/video/render.h,high physical shape; provisional semantic name,BG affine matrix coefficients
+03004BD8,gDispCntShadow,2,object,extern u16 gDispCntShadow;,include/engine/video/render.h,high physical shape; provisional semantic name,display control / BG visibility shadow
+03004BE0,gBgTileUploadParamA,8,object,extern u16 gBgTileUploadParamA[];,include/engine/video/render.h,high physical shape; provisional semantic name,per-layer tile-upload parameter (4)
+03004BEC,gBgAffineMode,2,object,extern u16 gBgAffineMode;,include/engine/video/render.h,high physical shape; provisional semantic name,BG affine/non-affine shadow mode
+03004BF0,gBgAffineMatrixBuffer,8,object,extern u16 gBgAffineMatrixBuffer[];,include/engine/video/render.h,high physical shape; provisional semantic name,"affine coefficients copied from gBgAffineMatrix, then uploaded (4)"
+03004BF8,gBgAffineRefX,4,object,extern u32 gBgAffineRefX;,include/engine/video/render.h,high physical shape; provisional semantic name,BG affine reference X accumulator
+03004BFC,gBgAffineScaleY,2,object,extern u16 gBgAffineScaleY;,include/engine/video/render.h,high physical shape; provisional semantic name,BG affine Y scale
+03004C00,gBgAffineRefY,4,object,extern u32 gBgAffineRefY;,include/engine/video/render.h,high physical shape; provisional semantic name,BG affine reference Y accumulator
+03004C08,gBgTileUploadParamB,8,object,extern u16 gBgTileUploadParamB[];,include/engine/video/render.h,high physical shape; provisional semantic name,per-layer tile-upload parameter (4)
+03004C14,gBgAffineScaleX,2,object,extern u16 gBgAffineScaleX;,include/engine/video/render.h,high physical shape; provisional semantic name,BG affine X scale
+03004C18,gBgAffineRefBuffer,8,object,extern u32 gBgAffineRefBuffer[];,include/engine/video/render.h,high physical shape; provisional semantic name,buffered affine X/Y reference (2)
+03004C20,gBgScrollShadow,10,object,extern u16 gBgScrollShadow[];,include/engine/video/render.h,high physical shape; provisional semantic name,four BG horizontal/vertical scroll pairs (8)
+03004C30,gBgRecords,C0,object,extern struct BackgroundLayer gBgRecords[4];,include/engine/video/render.h,high physical shape; provisional semantic name,Four 0x30-byte BG records; field names provisional where resource modes reuse storage. Protected drafts retain address declarations.
+03004CC0,gBgRecord3,,interior,extern struct BackgroundLayer gBgRecord3;,include/engine/video/render.h,low,Interior view of gBgRecords[3] (no consumer declares it separately)
+03004CF0,gWindowShadow0,2,object,extern u16 gWindowShadow0;,include/engine/video/render.h,high physical shape; provisional semantic name,window-control bound/shadow slot (which register: unknown)
+03004CF8,gWindowShadow1,2,object,extern u16 gWindowShadow1;,include/engine/video/render.h,high physical shape; provisional semantic name,window-control bound/shadow slot
+03004CFC,gWindowShadow2,2,object,extern u16 gWindowShadow2;,include/engine/video/render.h,high physical shape; provisional semantic name,window-control bound/shadow slot
+03004D08,gWindowShadow3,2,object,extern u16 gWindowShadow3;,include/engine/video/render.h,high physical shape; provisional semantic name,window-control bound/shadow slot
+03004D10,gSpriteHeightTiles,10,object,extern u8 gSpriteHeightTiles[];,include/engine/video/render.h,high physical shape; provisional semantic name,sprite height in tiles per shape/size index (16)
+03004D20,gSpriteHeightPixels,10,object,extern u8 gSpriteHeightPixels[];,include/engine/video/render.h,high physical shape; provisional semantic name,sprite height in pixels per shape/size index (16)
+03004D30,gSpriteTileArea,10,object,extern u8 gSpriteTileArea[];,include/engine/video/render.h,high physical shape; provisional semantic name,sprite tile count per shape/size index (16)
+03004D40,gSpriteWidthTiles,10,object,extern u8 gSpriteWidthTiles[];,include/engine/video/render.h,high physical shape; provisional semantic name,sprite width in tiles per shape/size index (16)
+03004D50,gSpriteShapeAttr,40,object,extern u32 gSpriteShapeAttr[];,include/engine/video/render.h,high physical shape; provisional semantic name,packed OAM shape/size attribute bits per index (16)
+03004D90,gSpriteWidthPixels,10,object,extern u8 gSpriteWidthPixels[];,include/engine/video/render.h,high physical shape; provisional semantic name,sprite width in pixels per shape/size index (16)
+03004DA0,gBgFadeLevel,4,object,extern s32 gBgFadeLevel;,include/engine/video/render.h,high physical shape; provisional semantic name,background fade level
+03004DA4,gObjPaletteBankCount,4,object,extern u32 gObjPaletteBankCount;,include/engine/video/render.h,high physical shape; provisional semantic name,allocated object-palette bank count
+03004DA8,gBgFadeApplied,4,object,extern u32 gBgFadeApplied;,include/engine/video/render.h,high physical shape; provisional semantic name,cached/applied background fade level
+03004DAC,gObjFadeApplied,4,object,extern u32 gObjFadeApplied;,include/engine/video/render.h,high physical shape; provisional semantic name,cached/applied object fade level
+03004DB0,gBackdropOverride,2,object,extern s16 gBackdropOverride;,include/engine/video/render.h,high physical shape; provisional semantic name,backdrop override enabled flag
+03004DC0,gObjPaletteBuffer,200,object,extern u16 gObjPaletteBuffer[][16];,include/engine/video/render.h,high physical shape; provisional semantic name,sixteen object palette banks of 16 colors
+03004FC0,gBgPaletteBuffer,200,object,extern u16 gBgPaletteBuffer[];,include/engine/video/render.h,high physical shape; provisional semantic name,sixteen background palette banks of 16 colors; labels inside it are interior rows
+03004FE0,gBgPaletteBank1,,interior,extern u16 gBgPaletteBank1[];,include/engine/video/render.h,high containment; per-use extent varies,"Interior background palette bank 1, at gBgPaletteBuffer +0x20 bytes"
+03005000,gBgPaletteBank2,,interior,extern u16 gBgPaletteBank2[];,include/engine/video/render.h,high containment; per-use extent varies,"Interior background palette bank 2, at gBgPaletteBuffer +0x40 bytes"
+03005020,gBgPaletteBank3,,interior,extern u16 gBgPaletteBank3[];,include/engine/video/render.h,high containment; per-use extent varies,"Interior background palette bank 3, at gBgPaletteBuffer +0x60 bytes"
+030050E0,gBgPaletteBank9,,interior,extern u16 gBgPaletteBank9[];,include/engine/video/render.h,high containment; per-use extent varies,"Interior background palette bank 9, at gBgPaletteBuffer +0x120 bytes"
+03005140,gBgPaletteBank12,,interior,extern u16 gBgPaletteBank12[];,include/engine/video/render.h,high containment; per-use extent varies,"Interior background palette bank 12, at gBgPaletteBuffer +0x180 bytes"
+03005160,gBgPaletteBank13,,interior,extern u16 gBgPaletteBank13[];,include/engine/video/render.h,low,"Interior background palette bank 13, at gBgPaletteBuffer + 0x1A0"
+03005164,gBgPaletteBank13Color2,,interior,extern u16 gBgPaletteBank13Color2[];,include/engine/video/render.h,high containment; per-use extent varies,Interior view starting at background palette bank 13 color 2
+03005174,gBgPaletteBank13Color10,2,interior,extern u16 gBgPaletteBank13Color10;,include/engine/video/render.h,high containment; per-use extent varies,Interior background palette bank 13 color 10
+03005176,gBgPaletteBank13Color11,2,interior,extern u16 gBgPaletteBank13Color11;,include/engine/video/render.h,high containment; per-use extent varies,Interior background palette bank 13 color 11
+0300517C,gBgPaletteBank13Color14,2,interior,extern u16 gBgPaletteBank13Color14;,include/engine/video/render.h,high containment; per-use extent varies,Interior background palette bank 13 color 14
+03005180,gBgPaletteBank14,,interior,extern u16 gBgPaletteBank14[];,include/engine/video/render.h,high containment; per-use extent varies,"Interior background palette bank 14, at gBgPaletteBuffer +0x1C0 bytes"
+030051A0,gBgPaletteBank15,,interior,extern u16 gBgPaletteBank15[];,include/engine/video/render.h,high containment; per-use extent varies,"Interior background palette bank 15, at gBgPaletteBuffer +0x1E0 bytes"
+030051C0,gObjPaletteReserved,4,object,extern u32 gObjPaletteReserved;,include/engine/video/render.h,high physical shape; provisional semantic name,reserved object-palette allocation count
+030051C4,gBgFadeBankMask,2,object,extern u16 gBgFadeBankMask;,include/engine/video/render.h,high physical shape; provisional semantic name,background-palette fade bank mask
+030051C8,gObjPaletteEffect,4,object,extern u32 gObjPaletteEffect;,include/engine/video/render.h,high physical shape; provisional semantic name,object-palette refresh/effect control
+030051CC,gPaletteBanksInUse,4,object,extern u32 gPaletteBanksInUse;,include/engine/video/render.h,high physical shape; provisional semantic name,active/reserved palette-bank count
+030051D0,gBackdropColor,2,object,extern u16 gBackdropColor;,include/engine/video/render.h,high physical shape; provisional semantic name,backdrop RGB15 color
+030051D4,gObjFadeLevel,4,object,extern u32 gObjFadeLevel;,include/engine/video/render.h,high physical shape; provisional semantic name,object fade/effect level
+030051D8,gFadeMultiplier,4,object,extern u32 gFadeMultiplier;,include/engine/video/render.h,high physical shape; provisional semantic name,shared fade multiplier
+030051DC,gObjFadeColor,2,object,extern u16 gObjFadeColor;,include/engine/video/render.h,high physical shape; provisional semantic name,object fade target color
+030051E0,gBgPaletteSource,4,object,extern u16 *gBgPaletteSource;,include/engine/video/render.h,high physical shape; provisional semantic name,current background palette upload source
+030051E4,gGrayscaleControl,4,object,extern u32 gGrayscaleControl;,include/engine/video/render.h,high physical shape; provisional semantic name,grayscale effect duration/control
+030051F0,gObjPaletteKeys,20,object,extern u16 gObjPaletteKeys[];,include/engine/video/render.h,high physical shape; provisional semantic name,object palette key per bank (16)
+03005210,gObjFadeFlags,2,object,extern u16 gObjFadeFlags;,include/engine/video/render.h,high physical shape; provisional semantic name,object palette fade exclusion/control flags
+03005214,gBgFadeColor,2,object,extern u16 gBgFadeColor;,include/engine/video/render.h,high physical shape; provisional semantic name,background fade target color
+03005218,gMosaicByte,1,object,extern u8 gMosaicByte;,include/engine/video/render.h,high physical shape; provisional semantic name,mosaic-related byte parameter (guess)
+0300521C,gMosaicHalfword,2,object,extern u16 gMosaicHalfword;,include/engine/video/render.h,high physical shape; provisional semantic name,mosaic-related halfword parameter (guess)
+03005220,gScanlineEffectLayer,4,object,extern u32 gScanlineEffectLayer;,include/engine/video/render.h,high physical shape; provisional semantic name,scanline effect layer selector
+03005224,gScanlineEffectSource,4,object,extern u16 *gScanlineEffectSource;,include/engine/video/render.h,high physical shape; provisional semantic name,pending 160-line effect source; consumed then cleared
+03005228,gScanlineEffectMode,4,object,extern u32 gScanlineEffectMode;,include/engine/video/render.h,high physical shape; provisional semantic name,scanline effect mode (scroll/mosaic/brightness)
+0300522C,gSpriteAttrFlags,4,object,extern u32 gSpriteAttrFlags;,include/engine/video/render.h,high physical shape; provisional semantic name,sprite render/global attribute flags
+03005230,gSpriteMosaicAttr,1,object,extern u8 gSpriteMosaicAttr;,include/engine/video/render.h,high physical shape; provisional semantic name,sprite mosaic/global attribute byte
+03005234,gMosaicParam,2,object,extern u16 gMosaicParam;,include/engine/video/render.h,high physical shape; provisional semantic name,packed mosaic parameter (byte and halfword accesses)
+03005238,gDefaultAnimFlags,2,object,extern u16 gDefaultAnimFlags;,include/engine/video/render.h,high physical shape; provisional semantic name,default animation/widget flags
+0300523C,gEnginePauseFlags,4,object,extern u32 gEnginePauseFlags;,include/engine/video/render.h,high physical shape; provisional semantic name,engine pause/suspend flags (bits 1-2: sound off; task list masks)
+03005240,gNextTaskId,2,object,extern u16 gNextTaskId;,include/engine/engine_globals.h,low,"next Task id (unique, never 0)"
+03005250,gLinkMenuActive,4,object,extern u32 gLinkMenuActive;,include/engine/ram.h,low,
+03005260,gPadState,10,object,extern u16 gPadState[];,include/engine/input.h,low,"input state: two slots of {held, pressed, released, pad}; updated by sub_08219B24"
+03005270,gHardwareKeys,2,object,extern u16 gHardwareKeys;,include/engine/runtime.h,low,Raw active-low KEYINPUT sampled before per-player input records are updated
+03005274,gSceneSelectionDisplaySlots,A,object,extern u16 gSceneSelectionDisplaySlots[];,include/engine/ram.h,high,Wireless input publisher writes five consecutive halfwords. Slots 2 and 3 overlap the word used by Random_Next15.
+03005278,gLcgState,4,interior,extern u32 gLcgState;,include/engine/runtime.h,high,Random_Next15 updates this word. WirelessController writes input slots 2 and 3 at the same address.
+03005280,gTaskLists,70,object,extern struct TaskList gTaskLists[14];,include/engine/engine_globals.h,low,task lists by priority
+030052F0,gResourceRegistryCount,4,object,extern s32 gResourceRegistryCount;,include/engine/runtime.h,low,"High-water count of resource-registry entries, capped at 32"
+030052F4,gTerrainMap,4,object,extern struct EngineMap *gTerrainMap;,include/engine/engine_globals.h,low,
+030052F8,gTerrainWidth,4,object,extern u32 gTerrainWidth;,include/engine/engine_globals.h,low,
+030052FC,gTerrainHeight,4,object,extern u32 gTerrainHeight;,include/engine/engine_globals.h,low,
+03005300,gTerrainTrapSerial,4,object,extern u32 gTerrainTrapSerial;,include/engine/ram.h,low,
+03005304,gEffectRandomTableIndex,4,object,extern u32 gEffectRandomTableIndex;,include/engine/ram.h,high,Ten-bit cursor into the fixed 1024-halfword ROM bank at 086141BC. Seeded by Random_InitValueTable
+03005308,gRandomIndex,4,object,extern u32 gRandomIndex;,include/engine/engine_globals.h,high,Ten-bit cursor into the writable 1024-halfword bank at 0203B400. Seeded by Random_InitValueTable
 0300530C,gSerialMultiplayer1Word,2,object,extern u16 gSerialMultiplayer1Word;,include/link/serial/serial.h,low,Last word sampled from SIOMULTI1 by the byte-transfer interrupt
 03005310,gSerialPeer1Interrupts,4,object,extern s32 gSerialPeer1Interrupts;,include/link/serial/serial.h,low,Counter advanced by the SIOMULTI1 byte-transfer handler; tentative name
 03005314,gSerialInitialized,4,object,extern u32 gSerialInitialized;,include/link/serial/serial.h,low,Set to 1 by Serial_InitMultiplayer; no semantic reader observed here
 03005318,gSerialPeer0Interrupts,4,object,extern s32 gSerialPeer0Interrupts;,include/link/serial/serial.h,low,Counter advanced by the SIOMULTI0 byte-transfer handler; tentative name
-0300531C,gSerialConnectionRole,4,object,extern s32 gSerialConnectionRole;,include/engine/shared/ram.h,low,
+0300531C,gSerialConnectionRole,4,object,extern s32 gSerialConnectionRole;,include/engine/ram.h,low,
 03005320,gSerialMultiplayer0Word,2,object,extern u16 gSerialMultiplayer0Word;,include/link/serial/serial.h,low,Last word sampled from SIOMULTI0 by the byte-transfer interrupt
-03005324,gSerialTransferStatus,4,object,extern s32 gSerialTransferStatus;,include/engine/shared/ram.h,low,
+03005324,gSerialTransferStatus,4,object,extern s32 gSerialTransferStatus;,include/engine/ram.h,low,
 03005330,gSerialQueuedPacketCount,2,object,extern u16 gSerialQueuedPacketCount;,include/link/serial/serial.h,low,Number of queued four-halfword multiplayer packets
-03005340,gSerialLatestPackets,10,object,extern s16 gSerialLatestPackets[];,include/engine/shared/ram.h,low,
+03005340,gSerialLatestPackets,10,object,extern s16 gSerialLatestPackets[];,include/engine/ram.h,low,
 03005350,gSerialPacketQueue,2,object,extern u16 gSerialPacketQueue[4][4];,include/link/serial/serial.h,low,"Four queued packets of four halfwords, with ring indices masked by 3"
-03005370,gSerialReceivePackets,10,object,extern s16 gSerialReceivePackets[];,include/engine/shared/ram.h,low,
+03005370,gSerialReceivePackets,10,object,extern s16 gSerialReceivePackets[];,include/engine/ram.h,low,
 03005380,gSerialPacketReadIndex,2,object,extern u16 gSerialPacketReadIndex;,include/link/serial/serial.h,low,Current read index in the four-entry multiplayer packet ring
-03005390,gRfuLinkManager,48,object,extern struct RfuLinkManager gRfuLinkManager;,include/link/rfu_manager/rfu_manager.h,high merged layout and SDK correspondence,"RFU link manager: named SDK prefix, byte/halfword event parameter union at +14, two VBlank timers, configuration/callback tail through +44"
-030053D8,gPlayTimeCounterEnabled,4,object,extern u32 gPlayTimeCounterEnabled;,include/engine/shared/runtime.h,low,Enables the persistent play-time counter at game-state +0x614
-030053DC,gSceneControlWord0,4,object,extern u32 gSceneControlWord0;,include/engine/shared/runtime.h,low,Cleared by scene transitions and Engine_ClearControlFlags; finer meaning unresolved
-030053E0,gSceneInitWord0,4,object,extern u32 gSceneInitWord0;,include/engine/shared/runtime.h,low,Initialized to zero by the scene lifecycle manager; semantic name provisional
-030053E4,gRuntimeFrameCounter,4,object,extern u32 gRuntimeFrameCounter;,include/engine/shared/runtime.h,low,Incremented on every scene lifecycle task update
-030053E8,gSceneTransitionFlags,4,object,extern u32 gSceneTransitionFlags;,include/engine/shared/runtime.h,low,"Pending scene transition flags, including active-region backup/restore bits"
-030053EC,gSceneControlWord1,4,object,extern u32 gSceneControlWord1;,include/engine/shared/runtime.h,low,Cleared by Engine_ClearControlFlags; finer meaning unresolved
-030053F0,gScenePauseFlags,4,object,extern u32 gScenePauseFlags;,include/engine/shared/ram.h,low,scene pause/mute flags (bit tests across effects and actors)
-030053F4,gEngineFlags,4,object,extern u32 gEngineFlags;,include/engine/shared/engine_globals.h,low,
-030053F8,gSessionState,4,object,extern u8 *gSessionState;,include/engine/shared/runtime.h,low,Persistent/session state pointer; byte base preserves existing subsystem-specific pointee views
-030053FC,gSceneTransitionActive,4,object,extern u32 gSceneTransitionActive;,include/engine/shared/runtime.h,low,Set during transition cleanup and cleared when the scene starts
-03005400,gSceneInitWord1,4,object,extern u32 gSceneInitWord1;,include/engine/shared/runtime.h,low,Initialized to zero by the scene lifecycle manager; semantic name provisional
-03005404,gSleepResumePending,4,object,extern u32 gSleepResumePending;,include/engine/shared/runtime.h,low,Set after BIOS Stop and consumed by scene runtime refresh
-03005408,gSceneDialogActive,4,object,extern s32 gSceneDialogActive;,include/engine/shared/runtime.h,low,"Shared scene-dialog activity/control flag, retaining existing provisional aliases"
-0300540C,gSceneUnpausedFrames,4,object,extern u32 gSceneUnpausedFrames;,include/engine/shared/runtime.h,low,Counter incremented while the scene is not paused; provisional semantic name
-03005410,gSceneControlWord2,4,object,extern u32 gSceneControlWord2;,include/engine/shared/runtime.h,low,Cleared by Engine_ClearControlFlags; finer meaning unresolved
-03005414,gSceneControlWord3,4,object,extern u32 gSceneControlWord3;,include/engine/shared/runtime.h,low,Cleared during transitions and by Engine_ClearControlFlags; finer meaning unresolved
-03005418,gCameraOrigin,8,object,extern u16 gCameraOrigin[];,include/engine/shared/render.h,low,"camera origin in world coordinates (x, y, z halfwords then padding): sprites and actors subtract it, then add the 120x80 screen center"
-03005420,gActiveCamera,4,object,extern u8 *gActiveCamera;,include/engine/shared/ram.h,low,
-03005428,gSilentGlyph,2,object,extern u16 gSilentGlyph;,include/engine/shared/ram.h,low,"glyph code that plays no text sound; set by Text_SetSilentCharacterFromScript, compared in TextState_PlayGlyphSound"
-03005430,gSunClock,24,object,extern struct SunClock gSunClock;,include/system/clock_and_sun_schedule/sun_clock.h,low,"sun clock state (base time, times A and B, spans, light phase); the object is 0x24 bytes"
-03005460,gRtcDateTime,8,object,extern u8 gRtcDateTime[8];,include/system/clock_and_sun_schedule/sun_clock.h,low,"RTC date/time bytes (BCD year, month, day, weekday, hour, minute, second) read and written by the Clock functions"
-0300546C,gClockSynced,4,object,extern u32 gClockSynced;,include/engine/shared/ram.h,low,nonzero once the clock has been synced from the RTC; SunClock_Refresh syncs while it is zero
-03005470,gMusicSlotSongs,3E,object,extern u16 gMusicSlotSongs[];,include/engine/shared/ram.h,low,
-030054B0,gRegionOverride,4,object,extern u32 gRegionOverride;,include/engine/shared/ram.h,low,"region override flag: set by Region_SetCurrentFromScript, cleared when the region list is destroyed"
-030054B4,gSolarControlFlag,2,object,extern u16 gSolarControlFlag;,include/engine/shared/runtime.h,low,solar control flag set by sub_0822C180 and cleared by sub_0822C18C; purpose tentative
-030054B8,gSolarSimulatedIntensity,2,object,extern u16 gSolarSimulatedIntensity;,include/engine/shared/runtime.h,low,"simulated solar intensity ramping 0..140 (0x8C), returned by sub_0822C8D8"
-030054BC,gSolarPaused,2,object,extern u16 gSolarPaused;,include/engine/shared/runtime.h,low,"solar task paused flag: set by Solar_PauseMeasurement, cleared by Solar_ResumeMeasurement"
-030054C0,gSolarSavedLevel,2,object,extern u16 gSolarSavedLevel;,include/engine/shared/runtime.h,low,"copy of the current solar level (game state +0x874), restored by sub_0822CA5C"
-030054C4,gSolarSavedCachedLevel,2,object,extern u16 gSolarSavedCachedLevel;,include/engine/shared/runtime.h,low,"copy of the cached solar level (game state +0x876), restored by sub_0822CA5C"
-030054D0,gSnapshot,C,object,extern struct Snapshot gSnapshot;,include/engine/shared/ram.h,low,
+03005390,gRfuLinkManager,48,object,extern struct RfuLinkManager gRfuLinkManager;,include/link/wireless/rfu_manager.h,high merged layout and SDK correspondence,"RFU link manager: named SDK prefix, byte/halfword event parameter union at +14, two VBlank timers, configuration/callback tail through +44"
+030053D8,gPlayTimeCounterEnabled,4,object,extern u32 gPlayTimeCounterEnabled;,include/engine/runtime.h,low,Enables the persistent play-time counter at game-state +0x614
+030053DC,gSceneControlWord0,4,object,extern u32 gSceneControlWord0;,include/engine/runtime.h,low,Cleared by scene transitions and Engine_ClearControlFlags; finer meaning unresolved
+030053E0,gSceneInitWord0,4,object,extern u32 gSceneInitWord0;,include/engine/runtime.h,low,Initialized to zero by the scene lifecycle manager; semantic name provisional
+030053E4,gRuntimeFrameCounter,4,object,extern u32 gRuntimeFrameCounter;,include/engine/runtime.h,low,Incremented on every scene lifecycle task update
+030053E8,gSceneTransitionFlags,4,object,extern u32 gSceneTransitionFlags;,include/engine/runtime.h,low,"Pending scene transition flags, including active-region backup/restore bits"
+030053EC,gSceneControlWord1,4,object,extern u32 gSceneControlWord1;,include/engine/runtime.h,low,Cleared by Engine_ClearControlFlags; finer meaning unresolved
+030053F0,gScenePauseFlags,4,object,extern u32 gScenePauseFlags;,include/engine/ram.h,low,scene pause/mute flags (bit tests across effects and actors)
+030053F4,gEngineFlags,4,object,extern u32 gEngineFlags;,include/engine/engine_globals.h,low,
+030053F8,gSessionState,4,object,extern u8 *gSessionState;,include/engine/runtime.h,low,Persistent/session state pointer; byte base preserves existing subsystem-specific pointee views
+030053FC,gSceneTransitionActive,4,object,extern u32 gSceneTransitionActive;,include/engine/runtime.h,low,Set during transition cleanup and cleared when the scene starts
+03005400,gSceneInitWord1,4,object,extern u32 gSceneInitWord1;,include/engine/runtime.h,low,Initialized to zero by the scene lifecycle manager; semantic name provisional
+03005404,gSleepResumePending,4,object,extern u32 gSleepResumePending;,include/engine/runtime.h,low,Set after BIOS Stop and consumed by scene runtime refresh
+03005408,gSceneDialogActive,4,object,extern s32 gSceneDialogActive;,include/engine/runtime.h,low,"Shared scene-dialog activity/control flag, retaining existing provisional aliases"
+0300540C,gSceneUnpausedFrames,4,object,extern u32 gSceneUnpausedFrames;,include/engine/runtime.h,low,Counter incremented while the scene is not paused; provisional semantic name
+03005410,gSceneControlWord2,4,object,extern u32 gSceneControlWord2;,include/engine/runtime.h,low,Cleared by Engine_ClearControlFlags; finer meaning unresolved
+03005414,gSceneControlWord3,4,object,extern u32 gSceneControlWord3;,include/engine/runtime.h,low,Cleared during transitions and by Engine_ClearControlFlags; finer meaning unresolved
+03005418,gCameraOrigin,8,object,extern u16 gCameraOrigin[];,include/engine/video/render.h,low,"camera origin in world coordinates (x, y, z halfwords then padding): sprites and actors subtract it, then add the 120x80 screen center"
+03005420,gActiveCamera,4,object,extern u8 *gActiveCamera;,include/engine/ram.h,low,
+03005428,gSilentGlyph,2,object,extern u16 gSilentGlyph;,include/engine/ram.h,low,"glyph code that plays no text sound; set by Text_SetSilentCharacterFromScript, compared in TextState_PlayGlyphSound"
+03005430,gSunClock,24,object,extern struct SunClock gSunClock;,include/system/clock/sun_clock.h,low,"sun clock state (base time, times A and B, spans, light phase); the object is 0x24 bytes"
+03005460,gRtcDateTime,8,object,extern u8 gRtcDateTime[8];,include/system/clock/sun_clock.h,low,"RTC date/time bytes (BCD year, month, day, weekday, hour, minute, second) read and written by the Clock functions"
+0300546C,gClockSynced,4,object,extern u32 gClockSynced;,include/engine/ram.h,low,nonzero once the clock has been synced from the RTC; SunClock_Refresh syncs while it is zero
+03005470,gMusicSlotSongs,3E,object,extern u16 gMusicSlotSongs[];,include/engine/ram.h,low,
+030054B0,gRegionOverride,4,object,extern u32 gRegionOverride;,include/engine/ram.h,low,"region override flag: set by Region_SetCurrentFromScript, cleared when the region list is destroyed"
+030054B4,gSolarControlFlag,2,object,extern u16 gSolarControlFlag;,include/engine/runtime.h,low,solar control flag set by sub_0822C180 and cleared by sub_0822C18C; purpose tentative
+030054B8,gSolarSimulatedIntensity,2,object,extern u16 gSolarSimulatedIntensity;,include/engine/runtime.h,low,"simulated solar intensity ramping 0..140 (0x8C), returned by sub_0822C8D8"
+030054BC,gSolarPaused,2,object,extern u16 gSolarPaused;,include/engine/runtime.h,low,"solar task paused flag: set by Solar_PauseMeasurement, cleared by Solar_ResumeMeasurement"
+030054C0,gSolarSavedLevel,2,object,extern u16 gSolarSavedLevel;,include/engine/runtime.h,low,"copy of the current solar level (game state +0x874), restored by sub_0822CA5C"
+030054C4,gSolarSavedCachedLevel,2,object,extern u16 gSolarSavedCachedLevel;,include/engine/runtime.h,low,"copy of the cached solar level (game state +0x876), restored by sub_0822CA5C"
+030054D0,gSnapshot,C,object,extern struct Snapshot gSnapshot;,include/engine/ram.h,low,
 030054E0,gSoundInfo,FB0,object,extern struct SoundInfo gSoundInfo;,include/gba/m4a_internal.h,high,MP2K (m4a) global sound mixer state; pokeemerald SoundInfo
 03006490,gMPlayJumpTable,90,object,extern MPlayFunc gMPlayJumpTable[];,include/gba/m4a_internal.h,high,MP2K music player command jump table (36 entries)
 03006520,gCgbChans,100,object,extern struct CgbChannel gCgbChans[];,include/gba/m4a_internal.h,high,MP2K Game Boy PSG channel state (4 channels)
 030069E0,gMPlayMemAccArea,10,object,extern u8 gMPlayMemAccArea[];,include/gba/m4a_internal.h,high,MP2K memacc scratch area (0x10 bytes)
-03006A30,gSolarSensorParam0,4,object,extern u32 gSolarSensorParam0;,include/engine/shared/runtime.h,low,"solar sensor timer parameter, set to 255 by Solar_InitTimer (meaning tentative)"
-03006A34,gSolarGpioSaved,4,object,extern u32 gSolarGpioSaved;,include/engine/shared/runtime.h,low,cartridge GPIO data read by Solar_InitTimer; cleared by Solar_Enable
-03006A38,gSolarMeasuring,4,object,extern u32 gSolarMeasuring;,include/engine/shared/runtime.h,low,"solar measurement active flag (Solar_StartMeasurement sets, Solar_InitTimer clears)"
-03006A3C,gSolarLightBit,4,object,extern u32 gSolarLightBit;,include/engine/shared/runtime.h,low,light-detect bit (GPIO bit 3) sampled by Solar_OnTimerInterrupt
-03006A40,gSolarSensorParam1,4,object,extern u32 gSolarSensorParam1;,include/engine/shared/runtime.h,low,"solar sensor parameter, set to 1 by Solar_InitTimer (meaning tentative)"
-03006A44,gSolarSensorParam2,4,object,extern u32 gSolarSensorParam2;,include/engine/shared/runtime.h,low,"solar sensor parameter, set to 4 by Solar_InitTimer (meaning tentative)"
-03006A48,gSolarMeasurement,4,object,extern s32 gSolarMeasurement;,include/engine/shared/runtime.h,low,"measured solar value (counter >> 1), -1 while none"
-03006A4C,gSolarTimerPeriod,4,object,extern u32 gSolarTimerPeriod;,include/engine/shared/runtime.h,low,timer 3 period in cycles (0x3128); reload is its negation
+03006A30,gSolarSensorParam0,4,object,extern u32 gSolarSensorParam0;,include/engine/runtime.h,low,"solar sensor timer parameter, set to 255 by Solar_InitTimer (meaning tentative)"
+03006A34,gSolarGpioSaved,4,object,extern u32 gSolarGpioSaved;,include/engine/runtime.h,low,cartridge GPIO data read by Solar_InitTimer; cleared by Solar_Enable
+03006A38,gSolarMeasuring,4,object,extern u32 gSolarMeasuring;,include/engine/runtime.h,low,"solar measurement active flag (Solar_StartMeasurement sets, Solar_InitTimer clears)"
+03006A3C,gSolarLightBit,4,object,extern u32 gSolarLightBit;,include/engine/runtime.h,low,light-detect bit (GPIO bit 3) sampled by Solar_OnTimerInterrupt
+03006A40,gSolarSensorParam1,4,object,extern u32 gSolarSensorParam1;,include/engine/runtime.h,low,"solar sensor parameter, set to 1 by Solar_InitTimer (meaning tentative)"
+03006A44,gSolarSensorParam2,4,object,extern u32 gSolarSensorParam2;,include/engine/runtime.h,low,"solar sensor parameter, set to 4 by Solar_InitTimer (meaning tentative)"
+03006A48,gSolarMeasurement,4,object,extern s32 gSolarMeasurement;,include/engine/runtime.h,low,"measured solar value (counter >> 1), -1 while none"
+03006A4C,gSolarTimerPeriod,4,object,extern u32 gSolarTimerPeriod;,include/engine/runtime.h,low,timer 3 period in cycles (0x3128); reload is its negation
 03006A50,gSTWIStatus,4,object,extern struct STWIStatus *gSTWIStatus;,include/lib/rfu/rfu_compat.h,high,AgbRFU serial wireless adapter command interface (STWI) status (AgbRFU library name)
 03006A60,gRfuSlotStatusUNI,10,object,extern struct RfuSlotStatusUNI *gRfuSlotStatusUNI[RFU_CHILD_MAX];,include/lib/rfu/rfu_compat.h,high,"RFU unidirectional send/receive slot status, one per child slot (AgbRFU library name)"
 03006A70,gRfuSlotStatusNI,10,object,extern struct RfuSlotStatusNI *gRfuSlotStatusNI[RFU_CHILD_MAX];,include/lib/rfu/rfu_compat.h,high,"RFU network-interface slot status, one per child slot (AgbRFU library name)"
@@ -484,4 +484,4 @@ addr,name,size,kind,decl,header,confidence,notes
 03006A84,gRfuStatic,4,object,extern struct RfuStatic *gRfuStatic;,include/lib/rfu/rfu_compat.h,high,RFU static (per-session) state (AgbRFU library name)
 03006A88,gRfuFixed,4,object,extern struct RfuFixed *gRfuFixed;,include/lib/rfu/rfu_compat.h,high,RFU fixed (per-game) configuration (AgbRFU library name)
 03006A90,gRfuSIO32Id,C,object,extern struct RfuSIO32Id gRfuSIO32Id;,include/lib/rfu/rfu_compat.h,high,RFU SIO32 ID negotiation state (AgbRFU library name)
-03006A9C,gEEPROMConfig,4,object,extern const struct EEPROMConfig *gEEPROMConfig;,include/engine/shared/ram.h,low,
+03006A9C,gEEPROMConfig,4,object,extern const struct EEPROMConfig *gEEPROMConfig;,include/engine/ram.h,low,

@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 struct HitSource {
     u8 pad[0xc];
     struct {

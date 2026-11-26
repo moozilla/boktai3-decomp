@@ -1,7 +1,7 @@
 #ifndef GUARD_LINK_PLAYER_PALETTE_H
 #define GUARD_LINK_PLAYER_PALETTE_H
 
-#include "engine/shared/global.h"
+#include "global.h"
 
 struct LinkPalTarget {
     u8 pad0[0xc];

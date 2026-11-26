@@ -2,7 +2,7 @@
 
 Tags: TentacleBody, 080A5B8C, 080A60E0, 080A62DC, 080A6F50, phase4
 
-Consolidated 16 files from 080A5B8C through 080A7188 into `src/monsters/tentacle_body/tentacle_body.c`.
+Consolidated 16 files from 080A5B8C through 080A7188 into `src/monsters/centipede/tentacle_body.c`.
 The final formatted unit matches all 5628 bytes with the stock compiler.
 
 The header describes the complete 0x934 body allocation, verified against

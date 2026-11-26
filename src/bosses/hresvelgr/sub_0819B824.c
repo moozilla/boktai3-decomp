@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 /* Hresvelgr_ApproachArrayEighth: Approaches signed array targets by one eighth of the remaining difference and snaps near targets */
 #define Hresvelgr_ApproachArrayEighth sub_0819B824
 

@@ -1,6 +1,6 @@
-#include "engine/shared/global.h"
-#include "engine/shared/ram.h"
-#include "bosses/vanargand_projectile/vanargand_projectiles.h"
+#include "global.h"
+#include "engine/ram.h"
+#include "bosses/vanargand/vanargand_projectiles.h"
 extern const s16 gUnk_086149C4[];
 struct XZ {
     u32 x, z;

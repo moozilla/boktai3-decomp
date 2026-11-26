@@ -1,7 +1,7 @@
 #ifndef GUARD_ARMOR_PART_QUEUE_H
 #define GUARD_ARMOR_PART_QUEUE_H
 
-#include "engine/shared/global.h"
+#include "global.h"
 
 /* Partial views of the three embedded Armor parts. */
 struct ArmorLaunchPosition {

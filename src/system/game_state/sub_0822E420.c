@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 extern u8 gUnk_08E60944[];
 u8 *sub_0822E420(u32 index)
 {

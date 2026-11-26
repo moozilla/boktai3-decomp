@@ -1,6 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
-#include "ram.h"
+#include "engine/ram.h"
 struct PackedMotionPosition {
     u32 x : 16;
     s32 y : 16;

@@ -5,7 +5,7 @@ Tags: #matching #phase3 #field
 ## Scene_SpawnDirectionalDust (08004B64)
 
 Matched without concessions: function score 74.3% -> 100%, a 25.7 percentage-point gain
-(384 bytes). The complete `src/field/scene_objects/scene_object.c` unit passes `tools/check.py`.
+(384 bytes). The complete `src/objects/scene_objects/scene_object.c` unit passes `tools/check.py`.
 
 The old packed-word coordinate updates were retained: x and z are inserted into their
 32-bit position words while retaining the upper half. Ordinary halfword fields narrowed

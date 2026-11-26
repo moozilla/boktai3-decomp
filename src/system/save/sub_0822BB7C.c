@@ -1,5 +1,5 @@
-#include "engine/shared/global.h"
-#include "engine/shared/runtime.h"
+#include "global.h"
+#include "engine/runtime.h"
 u32 Save_AlignSizeToEightBytes(u32);
 u32 Save_WriteBlockWithRetries(u32, u32, u32);
 u32 Save_WriteHeader(void)

@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 void DirectionBurst_Emit(u8 *, s32, s32, s32);
 void sub_0819EB84(u8 *p, s32 angle, s32 count, s32 step)
 {

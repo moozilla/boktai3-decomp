@@ -1,5 +1,5 @@
-#include "engine/shared/global.h"
-#include "engine/shared/player_slot_status.h"
+#include "global.h"
+#include "player/player_slot_status.h"
 #include "bosses/ratatosk/ratatosk.h"
 
 extern void *const gUnk_08613F48[];

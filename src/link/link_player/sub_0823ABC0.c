@@ -1,5 +1,5 @@
-#include "engine/shared/global.h"
-#include "engine/shared/area_effect_link.h"
+#include "global.h"
+#include "scene/area_effect/area_effect_link.h"
 u32 LinkPlayer_HasSlotValueAtLeast(u8 *s, s32 m)
 {
     s32 i = *(s32 *)(s + 0x18);

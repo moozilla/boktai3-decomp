@@ -1,6 +1,6 @@
 #define LinkSelection_SwapPages Registry1745_ToggleConnectionRole
-#include "engine/shared/global.h"
-#include "engine/shared/area_effect_link.h"
+#include "global.h"
+#include "scene/area_effect/area_effect_link.h"
 #include "system/game_state/game_state.h"
 void Registry1745_ToggleConnectionRole(struct AreaEffectLinkState *);
 void LinkSession_UpdatePlayerValueAverage(struct AreaEffectLinkState *);

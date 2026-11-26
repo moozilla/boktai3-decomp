@@ -1,7 +1,7 @@
-#include "engine/shared/contact_swarm.h"
-#include "engine/shared/display_sequence_inline.h"
-#include "engine/shared/input.h"
-#include "actors/orbit_motion/motion_track.h"
+#include "scene/actor/contact_swarm.h"
+#include "engine/video/display_sequence_inline.h"
+#include "engine/input.h"
+#include "scene/actor/motion_track.h"
 
 s32 Vanargand_GetTargetLateralDistance(void *);
 

@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 /* Hresvelgr_ApproachArrayHalf: Approaches signed array targets by half the remaining difference and snaps near targets */
 #define Hresvelgr_ApproachArrayHalf sub_0819B794
 

@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 static inline u8 ge(s32 x)
 {
     if (x >= 0)

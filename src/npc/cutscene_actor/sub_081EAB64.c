@@ -1,0 +1,373 @@
+#include "npc/cutscene_actor/text_entry_widget.h"
+#include "engine/video/render.h"
+#include "ui/menu_parameters.h"
+#include "engine/input.h"
+// confidence=low: menu ownership follows Params3D0_CreateDisplay.
+
+// confidence=low: menu ownership follows Params3D0_CreateDisplay; option meanings remain tentative.
+struct Display {
+    u8 task[0x18];
+    struct TextEntryWidget widgets[9];
+    u8 keyframes[0x20]; /* 0x4E0: the widgets' keyframe resource (size a guess, confidence=low) */
+    u16 palettes[17][16]; /* 0x500: palette banks; 0 is widget 1's, 16 the blend output (confidence=low) */
+    u8 unknown720[4];
+    s32 selection, count;
+    u32 state;
+    s32 result, counter, fadeShift, idleTimer, unused740, unused744, stateTimer;
+    u32 lastState;
+    s32 velocity, timer, slide, paletteStep, unused760, skipped, musicTimer;
+};
+struct Message {
+    u32 count : 16;
+    u32 unused : 16;
+    void *values;
+};
+extern u8 *gGameState;
+extern const s32 gUnk_08613D80[];
+s32 TimeDisplay_GetCurrentMonth(void);
+s32 TimeDisplay_GetLightPhaseGroup(void);
+void Sound_PlaySong(s32);
+s32 Sound_IsSongPlaying(s32);
+void Sound_FadeOutChannel10(s32);
+void Menu_StartFadeOut(s32);
+void BgGfx_LoadTilemapAtPosition(s32, s32, s32);
+void ScreenTransition_SendCommand(s32, s32, s32, s32, s32, s32, s32);
+void Palette_InterpolateBanks(void *, void *, void *, s32, s32);
+s32 Mod(s32, s32);
+void TimeDisplay_SetSelectionKeyframe(void *);
+void Actor_HideAuxiliarySprites(void *);
+void Actor_UpdatePairedSpriteAnimation(void *);
+void Anim_LoadKeyframe(void *, void *, u16, s32);
+void TimeDisplay_HideAnimatedObjects(void *);
+void Script_Call(void *, void *);
+void Task_Kill(void *);
+void Params3D0_UpdateDisplay(struct Display *p)
+{
+    u8 *source_3;
+    u8 *source_2;
+    s32 value;
+    s16 position;
+    struct Message message;
+    message.count = 1;
+    message.values = &value;
+    if (p->timer == p->musicTimer + 170 && gTimeDisplayParameters.silent == 0) {
+        switch (TimeDisplay_GetCurrentMonth() - 1) {
+            case 2:
+            case 3:
+            case 4: {
+                const s32 *table = gUnk_08613D80;
+                s32 phase = TimeDisplay_GetLightPhaseGroup() * 4;
+                table += 2;
+                Sound_PlaySong(*(const s32 *)((const u8 *)table + phase));
+            } break;
+            case 5:
+            case 6:
+            case 7: {
+                const s32 *table = gUnk_08613D80;
+                s32 phase = TimeDisplay_GetLightPhaseGroup() * 4;
+                table += 4;
+                Sound_PlaySong(*(const s32 *)((const u8 *)table + phase));
+            } break;
+            case 8:
+            case 9:
+            case 10: {
+                const s32 *table = gUnk_08613D80;
+                s32 phase = TimeDisplay_GetLightPhaseGroup() * 4;
+                table += 6;
+                Sound_PlaySong(*(const s32 *)((const u8 *)table + phase));
+            } break;
+            case 0:
+            case 1:
+            case 11: {
+                const s32 *table = gUnk_08613D80;
+                s32 phase = TimeDisplay_GetLightPhaseGroup() * 4;
+                table += 8;
+                Sound_PlaySong(*(const s32 *)((const u8 *)table + phase));
+            } break;
+        }
+    }
+    if (p->idleTimer > gTimeDisplayParameters.timeout) {
+        p->state = 13;
+        p->result = 5;
+        p->fadeShift = gTimeDisplayParameters.fadeOut;
+        Menu_StartFadeOut(p->fadeShift);
+        if (Sound_IsSongPlaying(0xA4)) {
+            Sound_FadeOutChannel10(p->fadeShift);
+        }
+        p->idleTimer = 0;
+        return;
+    }
+    switch (p->state) {
+        case 0:
+            if (p->timer > (1 << p->fadeShift)) {
+                p->state = 1;
+            }
+            break;
+        case 1:
+            if ((gPadState[1] & 1) || (gPadState[1] & 10)) {
+                if (p->stateTimer > 10) {
+                    p->skipped = 1;
+                    p->unused760 = 1;
+                    BgGfx_LoadTilemapAtPosition(2, 0, 0);
+                    p->state = 3;
+                    break;
+                }
+            }
+            BgGfx_LoadTilemapAtPosition(2, p->slide, 0);
+            if (p->slide >= 0) {
+                p->state = 2;
+                p->slide = 0;
+            } else {
+                p->slide += 4;
+            }
+            break;
+        case 2:
+            if (p->stateTimer > 10) {
+                p->state = 3;
+            }
+            break;
+        case 3:
+            if (p->stateTimer == 0) {
+                ScreenTransition_SendCommand(1, 2, 31, 31, 31, 0xFFFF, 0);
+            } else if (p->stateTimer == 4) {
+                Sound_PlaySong(0x2BC);
+                p->musicTimer = p->timer;
+                ScreenTransition_SendCommand(0, 5, 31, 31, 31, 0xFFFF, 0);
+                p->widgets[0].flags &= ~1;
+                p->widgets[6].flags &= ~1;
+                p->widgets[7].flags &= ~1;
+                p->widgets[8].flags &= ~1;
+            } else if (p->stateTimer > 35) {
+                p->state = 4;
+            }
+            break;
+        case 4:
+            if (p->stateTimer > 10) {
+                p->state = 5;
+            }
+            break;
+        case 5:
+            if ((gPadState[1] & 1) || (gPadState[1] & 10)) {
+                if (!p->skipped) {
+                    p->skipped = 1;
+                    p->paletteStep = 1 << p->unused760;
+                }
+            }
+            {
+                u8 *source;
+                u8 *input;
+                u8 *output;
+                if (p->paletteStep <= (1 << p->unused760)) {
+                    p->widgets[1].flags &= ~1;
+                    source_2 = gPaletteBankData + 0x6240;
+                    input = (u8 *)p->palettes[1];
+                    output = (u8 *)p->palettes[16];
+                    Palette_InterpolateBanks(input, output, source_2, p->paletteStep, p->unused760);
+                    source = gPaletteBankData + 0x6260;
+                    Palette_InterpolateBanks(p->palettes[2], output, source, p->paletteStep,
+                                             p->unused760);
+                    p->widgets[1].palette = p->palettes[0];
+                    p->paletteStep++;
+                }
+            }
+            if ((p->paletteStep > ((1 << (p->unused760 - 1)) + 20)) || (p->skipped == 1)) {
+                p->state = 6;
+            }
+            break;
+        case 6:
+            if ((gPadState[1] & 1) || (gPadState[1] & 8)) {
+                if (p->timer > (1 << p->fadeShift)) {
+                    p->widgets[2].flags &= ~1;
+                    p->state = 7;
+                    Sound_PlaySong(0xE0);
+                    p->idleTimer = 0;
+                    p->paletteStep = 1 << p->unused760;
+                }
+            }
+            {
+                u8 *source;
+                u8 *input;
+                u8 *output;
+                if (p->paletteStep <= (1 << p->unused760)) {
+                    p->widgets[1].flags &= ~1;
+                    source_3 = gPaletteBankData + 0x6240;
+                    input = (u8 *)p->palettes[1];
+                    output = (u8 *)p->palettes[16];
+                    Palette_InterpolateBanks(input, output, source_3, p->paletteStep, p->unused760);
+                    source = gPaletteBankData + 0x6260;
+                    Palette_InterpolateBanks(p->palettes[2], output, source, p->paletteStep,
+                                             p->unused760);
+                    p->widgets[1].palette = p->palettes[0];
+                    p->paletteStep++;
+                }
+            }
+            if (Mod(p->stateTimer, 30) == 0) {
+                if (p->widgets[2].flags & 1)
+                    p->widgets[2].flags &= ~1;
+                else
+                    p->widgets[2].flags |= 1;
+            }
+            p->idleTimer++;
+            break;
+        case 7:
+            if (p->stateTimer > 124) {
+                p->state = 8;
+                p->widgets[2].flags &= ~1;
+                TimeDisplay_SetSelectionKeyframe(p);
+                Actor_HideAuxiliarySprites(p);
+            } else if (Mod(p->stateTimer, 4) == 0) {
+                if (p->widgets[2].flags & 1)
+                    p->widgets[2].flags &= ~1;
+                else
+                    p->widgets[2].flags |= 1;
+            }
+            break;
+        case 8:
+            if (p->timer < (1 << p->fadeShift)) {
+                break;
+            }
+            if ((gPadState[1] & 1) || (gPadState[1] & 0x38)) {
+                p->idleTimer = 0;
+                if ((gPadState[1] & 1) || (gPadState[1] & 8)) {
+                    *(u16 *)(gGameState + 0x870) = p->selection;
+                    if (p->selection == 0) {
+                        Sound_PlaySong(0xE0);
+                        p->fadeShift = gTimeDisplayParameters.confirmFade;
+                        if (p->fadeShift <= 5) {
+                            p->fadeShift = 6;
+                        }
+                    } else {
+                        Sound_PlaySong(0xDD);
+                        p->fadeShift = gTimeDisplayParameters.confirmFade;
+                    }
+                    p->state = 13;
+                    p->result = p->selection + 1;
+                    Menu_StartFadeOut(p->fadeShift);
+                    if (Sound_IsSongPlaying(0xA4)) {
+                        if (p->fadeShift <= 1) {
+                            Sound_FadeOutChannel10(p->fadeShift);
+                        } else {
+                            Sound_FadeOutChannel10(p->fadeShift - 1);
+                        }
+                    }
+                    break;
+                } else if (gPadState[1] & 0x20) {
+                    Sound_PlaySong(0x12B);
+                    if ((--p->selection) < 0) {
+                        p->selection = p->count - 1;
+                    }
+                    p->state = 11;
+                    break;
+                } else if (gPadState[1] & 0x10) {
+                    Sound_PlaySong(0x12B);
+                    if ((++p->selection) >= p->count) {
+                        p->selection = 0;
+                    }
+                    p->state = 9;
+                    break;
+                }
+            }
+            Actor_UpdatePairedSpriteAnimation(p);
+            p->idleTimer++;
+            break;
+        case 9:
+            Anim_LoadKeyframe(&p->widgets[3], p->keyframes, (u16)(p->selection + 12), 0);
+            p->widgets[3].flags &= ~1;
+            {
+                s16 *destination = &p->widgets[3].x;
+                s32 zero = 0;
+                *destination = 144;
+                p->velocity = zero;
+            }
+            p->state = 10;
+            break;
+        case 10:
+            Actor_UpdatePairedSpriteAnimation(p);
+            if (p->stateTimer <= 4) {
+                Anim_LoadKeyframe(&p->widgets[5], p->keyframes, 6, 0);
+            }
+            p->velocity -= 2;
+            position = p->widgets[3].x + p->velocity;
+            p->widgets[3].x = position;
+            {
+                s32 y = (s16)position - 144;
+                p->widgets[2].x = y;
+            }
+            if ((s16)position <= 0) {
+                Anim_LoadKeyframe(&p->widgets[2], p->keyframes, (u16)(p->selection + 12), 0);
+                p->widgets[2].x = 0;
+                p->widgets[3].flags |= 1;
+                p->state = 8;
+            }
+            break;
+        case 11:
+            Anim_LoadKeyframe(&p->widgets[3], p->keyframes, (u16)(p->selection + 12), 0);
+            p->widgets[3].flags &= ~1;
+            {
+                u16 *destination = (u16 *)&p->widgets[3].x;
+                s32 zero = 0;
+                {
+                    s32 initialY = 0xFF70;
+                    *destination = initialY;
+                }
+                p->velocity = zero;
+            }
+            p->state = 12;
+            break;
+        case 12:
+            Actor_UpdatePairedSpriteAnimation(p);
+            if (p->stateTimer <= 4) {
+                Anim_LoadKeyframe(&p->widgets[4], p->keyframes, 10, 0);
+            }
+            p->velocity += 2;
+            position = p->widgets[3].x + p->velocity;
+            p->widgets[3].x = position;
+            {
+                s32 y = (s16)position + 144;
+                p->widgets[2].x = y;
+            }
+            if ((s16)position >= 0) {
+                Anim_LoadKeyframe(&p->widgets[2], p->keyframes, (u16)(p->selection + 12), 0);
+                p->widgets[2].x = 0;
+                p->widgets[3].flags |= 1;
+                p->state = 8;
+            }
+            break;
+        case 14:
+            break;
+        case 13:
+            if ((u32)(p->result - 1) <= 3 && Mod(p->stateTimer, 4) == 0) {
+                if (p->widgets[2].flags & 1)
+                    p->widgets[2].flags &= ~1;
+                else
+                    p->widgets[2].flags |= 1;
+            }
+            if (p->counter > (1 << p->fadeShift) || p->fadeShift == 0) {
+                TimeDisplay_HideAnimatedObjects(p);
+                if (p->result == 0) {
+                    Script_Call(gTimeDisplayParameters.c, 0);
+                } else if (p->result == 1) {
+                    Script_Call(gTimeDisplayParameters.g, 0);
+                } else if (p->result == 2) {
+                    value = 0;
+                    Script_Call(gTimeDisplayParameters.o, &message);
+                } else if (p->result == 3) {
+                    Script_Call(gTimeDisplayParameters.l, 0);
+                } else if (p->result == 5) {
+                    Script_Call(gTimeDisplayParameters.d, 0);
+                } else if (p->result == 4) {
+                    Script_Call(gTimeDisplayParameters.s, 0);
+                }
+                Task_Kill(p);
+            }
+            p->counter++;
+            break;
+    }
+
+    if (p->state != p->lastState) {
+        p->stateTimer = 0;
+    }
+    p->lastState = p->state;
+    p->stateTimer++;
+    p->timer++;
+}

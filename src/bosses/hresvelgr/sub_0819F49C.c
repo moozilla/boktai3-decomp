@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 void DirectionBurst_Emit(const void *, u32, u32, u32);
 void sub_0819F49C(const void *origin, s32 angle, s32 spread, u32 kind, u32 parameter)
 {

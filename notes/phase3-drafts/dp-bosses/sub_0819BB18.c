@@ -1,8 +1,8 @@
 #include "global.h"
-#include "engine.h"
-#include "ram.h"
-#include "monster_particle_random.h"
-#include "resource_registry.h"
+#include "engine/engine.h"
+#include "engine/ram.h"
+#include "engine/math/monster_particle_random.h"
+#include "engine/resource_registry.h"
 
 // confidence=low: emits sixteen motion entries around the actor's facing direction.
 #define Hresvelgr_EmitFacingMotionBurst sub_0819BB18

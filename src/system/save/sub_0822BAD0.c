@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 u32 Save_GetPrimaryRegionBlock(u32 a, u32 b)
 {
     if (b != 0)

@@ -1,11 +1,11 @@
 #define gLinkMenuFlags gEnginePauseFlags
 #include "link/link_selection/link_selection_mode.h"
-#include "engine/shared/global.h"
-#include "engine/shared/area_effect_link.h"
+#include "global.h"
+#include "scene/area_effect/area_effect_link.h"
 #include "system/game_state/game_state.h"
-#include "engine/shared/render.h"
-#include "engine/shared/ram.h"
-#include "engine/shared/engine_pause_flags.h"
+#include "engine/video/render.h"
+#include "engine/ram.h"
+#include "engine/engine_pause_flags.h"
 u8 Registry1745_ConsumeStateEntry(struct AreaEffectLinkState *);
 s32 Registry1745_CheckSessionReady(struct AreaEffectLinkState *);
 void Registry1745_BeginShutdown(struct AreaEffectLinkState *, void (*)(void));

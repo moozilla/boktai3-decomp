@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 /* Effect pool family names and field interpretations are tentative. */
 struct EffectPool {
     u8 unknown0[0x18];

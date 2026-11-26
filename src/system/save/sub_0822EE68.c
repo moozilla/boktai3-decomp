@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 u16 Eeprom_WriteBlockWithFullDelay(u16, const u16 *), Eeprom_VerifyBlock(u16, const u16 *);
 
 s32 Save_WriteBlock(u16 start, const u16 *data, s32 length)

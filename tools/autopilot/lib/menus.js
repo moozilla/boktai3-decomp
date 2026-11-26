@@ -14,32 +14,32 @@ const KEY = { a: 1, b: 2, select: 4, start: 8, right: 16, left: 32, up: 64, down
 
 // update function -> { struct, ready(view): accepts input now, decide(view, policy): key name }
 const MENUS = {
-  // src/other/solar_calibration/solar_calibration_menu.c: state 0 confirms with A once timer > 30.
+  // src/system/solar/solar_calibration_menu.c: state 0 confirms with A once timer > 30.
   SolarCalibration_Update: {
     struct: 'struct SolarCalibrationMenu',
     ready: (v) => v.state === 0 && v.timer > 30,
     decide: () => 'a',
   },
-  // src/menus/date_menu/date_entry_menu.c: state 0; START sets the clock to the shown date.
+  // src/ui/title/date_menu.c: state 0; START sets the clock to the shown date.
   DateMenu_Update: {
     struct: 'struct DateMenu',
     ready: (v) => v.state === 0,
     decide: () => 'start',
   },
-  // src/system/time/region_menu.c: state 0; A picks the highlighted region (up/down move it).
+  // src/system/clock/region_menu.c: state 0; A picks the highlighted region (up/down move it).
   Time_HandleRegionKeypad: {
     struct: 'struct RegionMenu',
     ready: (v) => v.state === 0,
     decide: (v, p) => (p.region === undefined || p.region === v.selected ? 'a' : p.region < v.selected ? 'up' : 'down'),
   },
-  // src/effects/timed_presentation/timed_presentation.c (title logo, notices): state 0; A skips once
+  // src/effects/screen/presentation/timed_presentation.c (title logo, notices): state 0; A skips once
   // timer > 1 << minShift (and the heap guard holds); otherwise it times out.
   TimedPresentation_Update: {
     struct: 'struct TimedPresentation',
     ready: (v) => v.state === 0 && v.timer > (1 << v.minShift) + 1 && $.gHeapEndGuard === 0x516B92EE,
     decide: () => 'a',
   },
-  // src/actors/actor_animation_controller/sub_081EAB64.c, the title screen. Its struct Display is local to that
+  // src/npc/cutscene_actor/sub_081EAB64.c, the title screen. Its struct Display is local to that
   // file (not in types.json), so `view` is a raw-offset reader of the same layout.
   // States 1 and 5 skip the logo animation with A (after 10 frames / once), state 6
   // is PRESS START (A or START once timer > 1 << fadeShift), state 8 the menu
@@ -58,7 +58,7 @@ const MENUS = {
       return v.selection === want ? 'a' : 'right';
     },
   },
-  // src/menus/game_start/game_start.c: state 0; selection 0 = continue the save, 1 = start from the
+  // src/ui/title/game_start.c: state 0; selection 0 = continue the save, 1 = start from the
   // beginning; A runs it. Up/down only move when gGameState->flag86E (a save exists).
   GameStart_Update: {
     struct: 'struct GameStart',
@@ -69,7 +69,7 @@ const MENUS = {
       return v.selection === want || !canMove ? 'a' : 'down';
     },
   },
-  // src/menus/screen_message/screen_message.c: state 0; with choices, selection 0 = yes, 1 = no;
+  // src/ui/dialogue/screen_message.c: state 0; with choices, selection 0 = yes, 1 = no;
   // left/right toggle, A answers. The one before name entry asks for a Boktai 2 password.
   ScreenMessage_Update: {
     struct: 'struct ScreenMessage',
@@ -80,7 +80,7 @@ const MENUS = {
       return v.selection === want ? 'a' : want === 0 ? 'left' : 'right';
     },
   },
-  // src/menus/name_entry/name_entry.c: state 0; START jumps the cursor to the end key (0x56), A or
+  // src/ui/title/name_entry.c: state 0; START jumps the cursor to the end key (0x56), A or
   // START there confirms; a blank name becomes the default.
   NameEntry_Update: {
     struct: 'struct NameEntryTask',

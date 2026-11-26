@@ -1,6 +1,6 @@
-#include "engine/shared/global.h"
-#include "engine/shared/player.h"
-#include "engine/shared/scene_facing.h"
+#include "global.h"
+#include "player/player.h"
+#include "scene/actor/scene_facing.h"
 struct Vec {
     s16 x, y, z, pad;
 };

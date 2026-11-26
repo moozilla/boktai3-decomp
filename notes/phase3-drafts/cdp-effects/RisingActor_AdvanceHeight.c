@@ -1,7 +1,7 @@
 #include "global.h"
 
 // MATCHING_CONCESSION: register-pinning
-#include "sun_orb_effect.h"
+#include "objects/sun_orb/sun_orb_effect.h"
 
 s32 RisingActor_AdvanceHeight(struct OrbitEffect *actor, s32 slot)
 {

@@ -1,9 +1,9 @@
 // MATCHING_CONCESSION: register-pinning
-#include "scene_actor_behavior.h"
-#include "scene_actor_reaction.h"
-#include "script_utility.h"
-#include "engine.h"
-#include "runtime.h"
+#include "scene/actor/scene_actor_behavior.h"
+#include "scene/actor/scene_actor_reaction.h"
+#include "script/script_utility.h"
+#include "engine/engine.h"
+#include "engine/runtime.h"
 
 /* Skeleton defeat state (tentative). On entry: releases attachments, clears the route and,
  * for categories 6/7, emits a bone burst through sub_08127590. Then three outcomes:

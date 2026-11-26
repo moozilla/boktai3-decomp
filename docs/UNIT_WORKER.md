@@ -1,8 +1,8 @@
 # Subsystem unit worker
 
 Turn one subsystem (a contiguous ROM range from `symbols/progress_subsystems.csv`)
-into a single translation unit `src/<subsystem>.c` with shared types in
-`include/<subsystem>.h`. Matching must stay byte-identical. Read `CLAUDE.md` first.
+into a translation unit in its reviewed [source directory](SOURCE_LAYOUT.md),
+with shared types under the corresponding include category. Matching must stay byte-identical. Read `CLAUDE.md` first.
 
 ## Setup
 
@@ -18,12 +18,11 @@ have no C at all (gaps). Handwritten assembly already reviewed in
 `symbols/progress_asm.csv` appears separately as `protected assembly`; retain
 those fragments at their ROM positions.
 
-For a merge input list or commit manifest, use `--paths-only`. It prints one
-path per line and sends gap diagnostics to stderr, so function names and gap
-labels cannot accidentally become file paths:
+Use `--strict` to reject any unit extending beyond the range. Each output
+row starts with its source path followed by its functions.
 
 ```sh
-build/venv/bin/python tools/unit_files.py 080036F8 08003B44 --paths-only > build/unit-files.txt
+build/venv/bin/python tools/unit_files.py 080036F8 08003B44 --strict
 ```
 
 ## End state
@@ -33,7 +32,7 @@ build/venv/bin/python tools/unit_files.py 080036F8 08003B44 --paths-only > build
    existing headers in `include/` when the object is the same.
 2. Functions use the shared types: no per-function partial structs, no `u8 pad[]`
    views of a struct the header defines, no `(u8 *)p + 0x123` where a field fits.
-3. One file, made by `tools/merge_unit.py src/<subsystem>.c FILES... --write`. It
+3. One file, made by `tools/merge_unit.py UNIT.c FILES... --write`. It
    keeps identical repeated declarations once and reports same-named ones with
    different bodies: unify those first.
 4. Every function still matches.
@@ -52,15 +51,15 @@ Do not add register pins to force a match.
 
 ## Engine API
 
-`include/engine/shared/engine.h` declares the shared engine functions and globals (tasks, heap,
+`include/engine/engine.h` declares the shared engine functions and globals (tasks, heap,
 script reader, sound, sprites/animation, colliders, text windows). Include it via
 your header and don't redeclare those functions locally. If its prototype is wrong
 for your callers, say so in your report rather than working around it silently.
 
 ## Loop
 
-* `tools/check.py src/fn/sub_X.c` per function before merging, then
-  `tools/check.py src/<subsystem>.c` after.
+* `tools/check.py FUNCTION` per function before merging, then
+  `tools/check.py UNIT.c` after.
 * A field type change that breaks a match usually means the type is wrong (width,
   signedness). If a function truly needs its old shape, keep a minimal local
   adaptation with a comment.

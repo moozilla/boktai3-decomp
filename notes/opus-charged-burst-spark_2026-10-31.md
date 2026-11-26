@@ -107,7 +107,7 @@ outside the block that holds the copy. This function is one block from entry
 to the last table use, and cse1 and cse2 both follow it (entry, then the `if`
 body), so every copy of the table gets the note.
 
-The other one, SparkParticle_Spawn (`src/effects/moving_tile_particles/sub_0806A160.c`), keeps the table
+The other one, SparkParticle_Spawn (`src/effects/particles/spark_particles/sub_0806A160.c`), keeps the table
 in a union with the angle parameter. The union's first set copies the
 parameter, and the parameter is then reassigned, so cse can't substitute the
 later read of the angle. The union pseudo has two sets, and the first has no

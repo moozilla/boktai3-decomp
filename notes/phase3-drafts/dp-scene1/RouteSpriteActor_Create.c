@@ -1,5 +1,5 @@
-#include "route_sprite_actor.h"
-#include "display_animation.h"
+#include "scene/actor/route_sprite_actor.h"
+#include "engine/video/display_animation.h"
 u8 Route_Start(void *, s32, s32, s32);
 s32 ScaledShadow_Initialize(u8 *, void *, s32, s32, s32, s32, s32, s32, s32, s32, s32);
 void RouteSpriteActor_Create(struct ContactPosition *anchor, void *unused, s32 initialTimer,

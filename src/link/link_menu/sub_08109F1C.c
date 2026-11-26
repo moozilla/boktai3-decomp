@@ -1,7 +1,7 @@
-#include "engine/shared/global.h"
+#include "global.h"
 #include "link/link_selection/link_selection_mode.h"
-#include "engine/shared/input.h"
-#include "engine/shared/area_effect_link.h"
+#include "engine/input.h"
+#include "scene/area_effect/area_effect_link.h"
 
 struct LinkReadySessionFlags {
     u8 pad0[0x2c];

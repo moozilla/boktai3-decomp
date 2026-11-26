@@ -1,21 +1,21 @@
 addr,name,confidence,evidence
-0803CDF0,ScenePool_ParseEntryParameters,low,Tentative role from contiguous scene pool callbacks and include/engine/shared/scene_pool.h; notes/scene-pool_2026-10-13.md
-0803D1E8,ScenePool_ReadActorBounds,low,Tentative role from contiguous scene pool callbacks and include/engine/shared/scene_pool.h; notes/scene-pool_2026-10-13.md
-0803D61C,ScenePool_CreateEntryFromScript,low,Tentative role from contiguous scene pool callbacks and include/engine/shared/scene_pool.h; notes/scene-pool_2026-10-13.md
-0803D680,ScenePool_SelectInitialDirection,low,Tentative role from contiguous scene pool callbacks and include/engine/shared/scene_pool.h; notes/scene-pool_2026-10-13.md
-0803D700,ScenePool_SelectRepeatOrExit,low,Tentative role from contiguous scene pool callbacks and include/engine/shared/scene_pool.h; notes/scene-pool_2026-10-13.md
-0803D78C,ScenePool_SelectRepeatedDirection,low,Tentative role from contiguous scene pool callbacks and include/engine/shared/scene_pool.h; notes/scene-pool_2026-10-13.md
-0803D80C,ScenePool_SelectDirectionOrRepeat,low,Tentative role from contiguous scene pool callbacks and include/engine/shared/scene_pool.h; notes/scene-pool_2026-10-13.md
-0803D8A8,ScenePool_ResumeAfterIdle,low,Tentative role from contiguous scene pool callbacks and include/engine/shared/scene_pool.h; notes/scene-pool_2026-10-13.md
-0803D90C,ScenePool_ApplyMotionControls,low,Tentative role from contiguous scene pool callbacks and include/engine/shared/scene_pool.h; notes/scene-pool_2026-10-13.md
-0803DAC8,ScenePool_ScheduleSpeedControl,low,Tentative role from exact/retained contiguous scene state C; include/engine/shared/scene_pool.h; notes/scene-pool-states_2026-10-13.md
-0803DC60,ScenePool_UpdateSpeedPulse,low,Exact C writes forward-speed flags 0x10/0x20; include/engine/shared/scene_pool.h; notes/scene-pool-states_2026-10-13.md
-0803DDA8,ScenePool_StateCruise,low,Tentative role from contiguous scene pool callbacks and include/engine/shared/scene_pool.h; notes/scene-pool_2026-10-13.md
-0803DF90,ScenePool_StateTrackAdaptive,low,Tentative role from exact/retained contiguous scene state C; include/engine/shared/scene_pool.h; notes/scene-pool-states_2026-10-13.md
-0803E1AC,ScenePool_StateTrackFast,low,Tentative role from exact/retained contiguous scene state C; include/engine/shared/scene_pool.h; notes/scene-pool-states_2026-10-13.md
-0803E354,ScenePool_StateScheduleMotion,low,Tentative role from exact/retained contiguous scene state C; include/engine/shared/scene_pool.h; notes/scene-pool-states_2026-10-13.md
-0803E4D0,ScenePool_StateLateralWeave,low,Tentative role from exact/retained contiguous scene state C; include/engine/shared/scene_pool.h; notes/scene-pool-states_2026-10-13.md
-0803E5F4,ScenePool_StateLaunchArc,low,Tentative role from exact/retained contiguous scene state C; include/engine/shared/scene_pool.h; notes/scene-pool-states_2026-10-13.md
-0803E7B4,ScenePool_StateLaunchShortArc,low,Tentative role from exact/retained contiguous scene state C; include/engine/shared/scene_pool.h; notes/scene-pool-states_2026-10-13.md
-0803E998,ScenePool_StateEmitBursts,low,Tentative role from exact/retained contiguous scene state C; include/engine/shared/scene_pool.h; notes/scene-pool-states_2026-10-13.md
-0803ED84,ScenePool_StateDepartForward,low,Tentative role from exact/retained contiguous scene state C; include/engine/shared/scene_pool.h; notes/scene-pool-states_2026-10-13.md
+0803CDF0,ScenePool_ParseEntryParameters,low,Tentative role from contiguous scene pool callbacks and include/link/wireless/scene_pool.h; notes/scene-pool_2026-10-13.md
+0803D1E8,ScenePool_ReadActorBounds,low,Tentative role from contiguous scene pool callbacks and include/link/wireless/scene_pool.h; notes/scene-pool_2026-10-13.md
+0803D61C,ScenePool_CreateEntryFromScript,low,Tentative role from contiguous scene pool callbacks and include/link/wireless/scene_pool.h; notes/scene-pool_2026-10-13.md
+0803D680,ScenePool_SelectInitialDirection,low,Tentative role from contiguous scene pool callbacks and include/link/wireless/scene_pool.h; notes/scene-pool_2026-10-13.md
+0803D700,ScenePool_SelectRepeatOrExit,low,Tentative role from contiguous scene pool callbacks and include/link/wireless/scene_pool.h; notes/scene-pool_2026-10-13.md
+0803D78C,ScenePool_SelectRepeatedDirection,low,Tentative role from contiguous scene pool callbacks and include/link/wireless/scene_pool.h; notes/scene-pool_2026-10-13.md
+0803D80C,ScenePool_SelectDirectionOrRepeat,low,Tentative role from contiguous scene pool callbacks and include/link/wireless/scene_pool.h; notes/scene-pool_2026-10-13.md
+0803D8A8,ScenePool_ResumeAfterIdle,low,Tentative role from contiguous scene pool callbacks and include/link/wireless/scene_pool.h; notes/scene-pool_2026-10-13.md
+0803D90C,ScenePool_ApplyMotionControls,low,Tentative role from contiguous scene pool callbacks and include/link/wireless/scene_pool.h; notes/scene-pool_2026-10-13.md
+0803DAC8,ScenePool_ScheduleSpeedControl,low,Tentative role from exact/retained contiguous scene state C; include/link/wireless/scene_pool.h; notes/scene-pool-states_2026-10-13.md
+0803DC60,ScenePool_UpdateSpeedPulse,low,Exact C writes forward-speed flags 0x10/0x20; include/link/wireless/scene_pool.h; notes/scene-pool-states_2026-10-13.md
+0803DDA8,ScenePool_StateCruise,low,Tentative role from contiguous scene pool callbacks and include/link/wireless/scene_pool.h; notes/scene-pool_2026-10-13.md
+0803DF90,ScenePool_StateTrackAdaptive,low,Tentative role from exact/retained contiguous scene state C; include/link/wireless/scene_pool.h; notes/scene-pool-states_2026-10-13.md
+0803E1AC,ScenePool_StateTrackFast,low,Tentative role from exact/retained contiguous scene state C; include/link/wireless/scene_pool.h; notes/scene-pool-states_2026-10-13.md
+0803E354,ScenePool_StateScheduleMotion,low,Tentative role from exact/retained contiguous scene state C; include/link/wireless/scene_pool.h; notes/scene-pool-states_2026-10-13.md
+0803E4D0,ScenePool_StateLateralWeave,low,Tentative role from exact/retained contiguous scene state C; include/link/wireless/scene_pool.h; notes/scene-pool-states_2026-10-13.md
+0803E5F4,ScenePool_StateLaunchArc,low,Tentative role from exact/retained contiguous scene state C; include/link/wireless/scene_pool.h; notes/scene-pool-states_2026-10-13.md
+0803E7B4,ScenePool_StateLaunchShortArc,low,Tentative role from exact/retained contiguous scene state C; include/link/wireless/scene_pool.h; notes/scene-pool-states_2026-10-13.md
+0803E998,ScenePool_StateEmitBursts,low,Tentative role from exact/retained contiguous scene state C; include/link/wireless/scene_pool.h; notes/scene-pool-states_2026-10-13.md
+0803ED84,ScenePool_StateDepartForward,low,Tentative role from exact/retained contiguous scene state C; include/link/wireless/scene_pool.h; notes/scene-pool-states_2026-10-13.md

@@ -1,6 +1,6 @@
-#include "engine/shared/global.h"
+#include "global.h"
 #include "link/link_selection/link_selection_mode.h"
-#include "engine/shared/area_effect_link.h"
+#include "scene/area_effect/area_effect_link.h"
 u8 Registry1745_ConsumeStateEntry(void *);
 void Registry1745_ClearParticipantCounters(void *);
 s32 Registry1745_CheckSessionReady(void *);

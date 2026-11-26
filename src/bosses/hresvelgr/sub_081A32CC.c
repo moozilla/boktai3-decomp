@@ -1,5 +1,5 @@
-#include "engine/shared/global.h"
-#include "engine/shared/ram.h"
+#include "global.h"
+#include "engine/ram.h"
 
 u16 Hresvelgr_GetAnimationIdentifier(void)
 {

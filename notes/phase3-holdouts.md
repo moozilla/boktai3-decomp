@@ -8,7 +8,7 @@ what was tried, and the next idea.
 
 ## field-effects
 
-### Scene_SpawnDirectionalDust (src/field/scene_objects/scene_object.c, 08004B64): resolved
+### Scene_SpawnDirectionalDust (src/objects/scene_objects/scene_object.c, 08004B64): resolved
 
 Resolved without concessions by the dp-field Codex pass; see
 [cx-dp-field_2026-11-13.md](cx-dp-field_2026-11-13.md). The earlier investigation follows.
@@ -25,7 +25,7 @@ The pinned version gets z's RMW from a union of words plus FIRST/LAST macros. Ne
 the struct the particle really has at that offset (a packed `u32` position word written whole by
 its siblings) and recover it in `include/`.
 
-### Scene_TryStepDown (src/field/scene_objects/scene_object.c, 08004CE4): deferred
+### Scene_TryStepDown (src/objects/scene_objects/scene_object.c, 08004CE4): deferred
 
 Draft: `notes/phase3-drafts/field-effects/Scene_TryStepDown.c` (42 ROM / 40 draft insns differ,
 allocation only). Fixed so far: parameters used directly (no `actor = input` copy) and the
@@ -38,7 +38,7 @@ line 773 remain. The draft still has statement expressions and plain `register` 
 pinned form; strip them once the shape is right. The ROM's dead `subs r0, r7, #1` tail comes from
 `type == 1 || type == 2` with both arms returning 0 (fact 57-style cross-jump).
 
-### Trigger_RunScript (src/field/items_and_containers/item_container.c, 08006F00): deferred
+### Trigger_RunScript (src/objects/items/item_container.c, 08006F00): deferred
 
 Draft: `notes/phase3-drafts/field-effects/Trigger_RunScript.c` (11 ROM / 9 draft, two mechanisms).
 1. The ROM keeps two copies of the actor index: `ldrsb r1` (compared with -1), `adds r2, r1` (the
@@ -61,7 +61,7 @@ the copy): an early `savedActor = 0`/`-1` or `index = 0` at the top, `savedActor
 extended block starts at function entry, so no mention can come before it; the copy needs a last
 use past the block end (the loop label at `active`), and that use would merge the r5 copy instead.
 
-### DirectionalController_CheckRemaining (src/field/directional_interaction_controllers/directional_interaction.c, 080098CC): resolved
+### DirectionalController_CheckRemaining (src/objects/directional_controller.c, 080098CC): resolved
 
 Resolved by the dp-field Codex pass: the accepted branch returns without a value (fact 160), preserving the call result in hard r0. Both concessions are removed.
 
@@ -80,7 +80,7 @@ which the RTL keeps the call's hard r0 as the returned value (no pseudo between 
 return), for example the call's result returned through an inline whose result the caller
 returns, or a matched relative with the same "return the angle when facing" shape.
 
-### EffectManager_UpdateAll (src/effects/homing_and_orbiting_effects/homing_effect.c, 0800A8E4): deferred, one insn from a match
+### EffectManager_UpdateAll (src/effects/orbits/homing_effect.c, 0800A8E4): deferred, one insn from a match
 
 Draft: `notes/phase3-drafts/field-effects/EffectManager_UpdateAll.c` (1 ROM / 1 draft: one
 instruction in another place). Diagnosis: the 0x148 stride for `view` and `p` is not a register
@@ -98,7 +98,7 @@ giv of i (`view = &manager->effects[i]`) delays the reversal to pass 2 and fixes
 but then the giv's increment lands before i's increment, after `p++`. Next idea: a counter that
 check_dbra_loop can only reverse in pass 2 while view stays a giv of p.
 
-### ScanlinePresentation_UpdateNoise (src/effects/scanline_presentation/scanline_presentation.c, 0800D874): deferred
+### ScanlinePresentation_UpdateNoise (src/effects/screen/scanline_presentation.c, 0800D874): deferred
 
 Draft: `notes/phase3-drafts/field-effects/ScanlinePresentation_UpdateNoise.c`. It is the plain
 three-loop form, with `amplitude = &p->amplitude; delta = &p->delta;` after `i = p->start`, the
@@ -122,7 +122,7 @@ Next idea: C in which amplitude's address and the loop's `p->amplitude` don't sh
 equivalence at the preheader (a separate EBB, or a constant cse can't merge), so the hoisted
 add survives.
 
-### sub_08010C10 (src/field/group_objects/group_objects.c, 08010C10): deferred, reload rotation only
+### sub_08010C10 (src/effects/scene/bat_flock.c, 08010C10): deferred, reload rotation only
 
 Draft: `notes/phase3-drafts/field-effects/sub_08010C10.c` (2 ROM / 2 draft), the pinned
 source without the `d` pin and barrier. The only difference is the scratch for the first
@@ -140,7 +140,7 @@ Next idea: find C before line 679 whose RTL needs one reload choice and still em
 code (a copy that jump2 merges after reload, fact 59), or that keeps a value live in r1 across
 the first ldrsh.
 
-### sub_08012B34 (src/effects/debris_particles/debris_particles.c, 08012B34): deferred, the dead 0x0403B714 load
+### sub_08012B34 (src/effects/particles/debris_particles.c, 08012B34): deferred, the dead 0x0403B714 load
 
 Draft: `notes/phase3-drafts/field-effects/sub_08012B34.c` (20 ROM / 20 draft). The ROM loads
 0x0403B714 (PARTICLE_RANDOM_SAMPLE_ORIGIN) into r3 in both arms and never uses it. The same dead
@@ -162,7 +162,7 @@ Next idea: the original probably had the constant inside the "first sample" rand
 form where the constant isn't a REG_EQUIV (so the live length isn't multiplied), or where angle's
 priority drops below setup's.
 
-### sub_0801404C (ParticleGroup_UpdateBouncing, src/effects/particle_groups/sub_0801404C.c): deferred
+### sub_0801404C (ParticleGroup_UpdateBouncing, src/effects/particles/groups/sub_0801404C.c): deferred
 
 Draft: `notes/phase3-drafts/field-effects/sub_0801404C.c` (38 ROM / 40 draft; with the four
 barriers simply removed it is 45 / 51). `ParticleRandom_ReadSample(table)` in place of
@@ -175,7 +175,7 @@ REG_EQUIV table unallocated and rematerialized). Still open, in order:
   `sprite` (g + 20) is a stack slot in the draft and sb in the ROM; gRandomIndex's address is
   sb in the draft and r8 in the ROM (`AGBCC_PRI=144:+517` helps).
 
-### ParticleGroup_UpdateFrozen (src/effects/particle_groups/sub_08014330.c, 08014330): deferred, one zero-extend
+### ParticleGroup_UpdateFrozen (src/effects/particles/groups/sub_08014330.c, 08014330): deferred, one zero-extend
 
 Draft: `notes/phase3-drafts/field-effects/ParticleGroup_UpdateFrozen.c` (3 ROM / 1 draft). There
 is no `type` variable: plain `g->type` reads at the top and in the late test. gcse PRE then
@@ -188,7 +188,7 @@ lowpart subreg of an SImode value counts, since ARM has WORD_REGISTER_OPERATIONS
 local at the top is worse (it changes the expression, so PRE stops), and so are casts on either
 test.
 
-### sub_08014634 (ParticleGroup_SpawnBouncing, src/effects/particle_groups/sub_08014634.c): deferred, rewrite started
+### sub_08014634 (ParticleGroup_SpawnBouncing, src/effects/particles/groups/sub_08014634.c): deferred, rewrite started
 
 The pinned source imitates register pressure: a `struct SpawnArgs` copy of count, options and
 position with an `asm("" : "+m")`, plus 15 pins. In the ROM those three arguments are simply
@@ -201,7 +201,7 @@ mostly register shifts). The inner loop counts down in the ROM (loop.c reversed 
 pass); the ROM keeps both `pool` (spilled, sp+0x10) and `g` (r6) and holds velocity in r8;
 `rng` is caller-saved r3 around sub_08217E40.
 
-### AnimatedParticleManager_Update (src/effects/animated_particles/sub_08015160.c, 08015160): resolved by dp-effects
+### AnimatedParticleManager_Update (src/effects/particles/groups/sub_08015160.c, 08015160): resolved by dp-effects
 
 The shared DisplaySequence_StepSprite draft now matches without concessions.
 Writing p->timer++ in each playback-result branch gives p the extra references
@@ -210,7 +210,7 @@ the ROM's single tail; no user label is needed. Stock whole-unit check: MATCH,
 540 bytes. The former diagnosis p:+206 was correct; the ordinary branch-tail form
 supplies its effect. The earlier field-effects draft remains as historical evidence.
 
-### AnimatedParticle_PriorityFromFlags (src/effects/animated_particles/sub_080154D0.c, 080154D0): deferred, DEBUG_NOP
+### AnimatedParticle_PriorityFromFlags (src/effects/particles/groups/sub_080154D0.c, 080154D0): deferred, DEBUG_NOP
 
 Without the `DEBUG_NOP()` it is 7 ROM / 5 draft. regmove ties `flags & 0xf000` to the
 constant's register instead of to `flags` (`AGBCC_NOTIE=13` matches). The empty loop's notes
@@ -221,7 +221,7 @@ and `result = 2` before or after.
 The dp-effects follow-up below preserves a narrow-view draft and further source hypotheses.
 No evidence was found to excuse the DEBUG_NOP concession.
 
-### AnimatedParticles_Create (src/effects/animated_particles/sub_080154EC.c, 080154EC): partial, dp-effects follow-up below
+### AnimatedParticles_Create (src/effects/particles/groups/sub_080154EC.c, 080154EC): partial, dp-effects follow-up below
 
 Draft: `notes/phase3-drafts/field-effects/AnimatedParticles_Create.c` (6 ROM / 2 draft, all four
 concessions removed). Two separate problems:
@@ -237,7 +237,7 @@ concessions removed). Two separate problems:
   gives 7 / 3 but still no copy back. Without a separate `saved` it is 101 / 124 again, so
   the second pointer is real.
 
-### FadingParticleGroup_Spawn (src/effects/fading_particle_groups/sub_08015F60.c, 08015F60): deferred
+### FadingParticleGroup_Spawn (src/effects/particles/groups/sub_08015F60.c, 08015F60): deferred
 
 Draft: `notes/phase3-drafts/field-effects/FadingParticleGroup_Spawn.c` (57 ROM / 59 draft; with
 the two pins simply removed it is 64 / 66). The random read goes through
@@ -247,7 +247,7 @@ lengths; `AGBCC_PRI=table:+427` gives 43 / 45), and the sine table pointer wants
 (`AGBCC_FORCE=sine:2` gives 43 / 43). Moving the `rng` set, or dropping `rng` for the header's
 ReadSample/ReadDirectSample, is no better.
 
-### FadingParticleGroup_Update (src/effects/fading_particle_groups/sub_08016118.c, 08016118): deferred
+### FadingParticleGroup_Update (src/effects/particles/groups/sub_08016118.c, 08016118): deferred
 
 Draft: `notes/phase3-drafts/field-effects/FadingParticleGroup_Update.c` (the memory barrier
 removed: 43 ROM / 43 draft; the `raw` pin is still in it). Without the barrier, cse2 reuses the
@@ -259,7 +259,7 @@ The rest is allocation and one reload rotation (`AGBCC_SPILL=8:1` helps).
 
 ## menus-link (Menus, HUD and dialogue; Link and wireless)
 
-### StatusScreen_DrawClock (0800E5B8, src/menus/status_screen/status_screen.c)
+### StatusScreen_DrawClock (0800E5B8, src/ui/status_screen/status_screen.c)
 
 Draft: `notes/phase3-menus-link/StatusScreen_DrawClock.c` (4 ROM / 4 draft insns).
 * The pinned match keeps the digit-array address in a user variable `values` (pinned to ip).
@@ -279,7 +279,7 @@ Draft: `notes/phase3-menus-link/StatusScreen_DrawClock.c` (4 ROM / 4 draft insns
 * Next: a form where shift lives two insns less (or the pointer two more) without moving the
   `out = dst` copy; or what made the original's `values` denser.
 
-### StatusScreen_FadeAndExit (0800EC0C, src/menus/status_screen/status_screen_fade.c)
+### StatusScreen_FadeAndExit (0800EC0C, src/ui/status_screen/status_screen_fade.c)
 
 Draft: `notes/phase3-menus-link/StatusScreen_FadeAndExit.c` (3 ROM / 1 draft insns). The
 `int index = i; i = index;` block in main's version is not needed; only DEBUG_NOP is.
@@ -308,7 +308,7 @@ Draft: `notes/phase3-menus-link/StatusScreen_FadeAndExit.c` (3 ROM / 1 draft ins
   the new register the class head when it lives past cse_basic_block_end), or the construct
   the three siblings share.
 
-### sub_0800F4EC (0800F4EC, src/menus/numeric_overlay/numeric_overlay.c): StatusScreen_DrawClock's twin
+### sub_0800F4EC (0800F4EC, src/ui/status_screen/numeric_overlay.c): StatusScreen_DrawClock's twin
 
 Draft: `notes/phase3-menus-link/sub_0800F4EC.c` (4 ROM / 4 draft insns, only `mov ip, sp` /
 `mov rN, ip` as sb). Same blocker as DrawClock: the pinned `values` (ip) must be allocated before
@@ -325,7 +325,7 @@ the earlier blocks' sb pseudos, which takes priority of about 1250. Notes:
 * Next: a fourth ref, or about 6 fewer live insns, for the per-block `values`; or a set that
   doesn't get a REG_EQUIV note (3/23 = 1304 without the doubling).
 
-### Presentation_SetItemGraphic (08019ECC, src/menus/selection_menu/selection_menu.c)
+### Presentation_SetItemGraphic (08019ECC, src/ui/widgets/selection_menu.c)
 
 Draft: `notes/phase3-menus-link/Presentation_SetItemGraphic.c` (6 ROM / 6 draft insns).
 * The ROM keeps the 0x121 apart from the byte it is added to: `ldr r0, =0x121; adds r2, r0, #0;
@@ -341,7 +341,7 @@ Draft: `notes/phase3-menus-link/Presentation_SetItemGraphic.c` (6 ROM / 6 draft 
   copy. A `scope` knob that forbids one combine (like AGBCC_NOTIE) would show whether that alone
   is enough.
 
-### SelectionMenu_NavigateGrid (0801ACB8, src/menus/selection_menu/selection_menu.c)
+### SelectionMenu_NavigateGrid (0801ACB8, src/ui/widgets/selection_menu.c)
 
 Draft: `notes/phase3-menus-link/SelectionMenu_NavigateGrid.c`: main's C without the
 `asm("" ::: "memory")`, 2 ROM / 0 draft insns. The ROM reloads `*held` for the horizontal
@@ -359,7 +359,7 @@ matches, so this is the only decision left.
 * Also tried: 128 combinations of held vs gPadState for each of the nine pad reads, re-setting
   `held` between the tests, and inline vertical/horizontal helpers.
 
-### ResultGame_UpdatePlayerMarker (0801C6CC, src/minigames/transformation_and_result_game/sub_0801C6CC.c)
+### ResultGame_UpdatePlayerMarker (0801C6CC, src/minigames/result_game/sub_0801C6CC.c)
 
 Draft: `notes/phase3-menus-link/ResultGame_UpdatePlayerMarker.c` (11 ROM / 11 draft, only key
 and counter swapping r2/r3). The draft keeps velocity set in each arm, `u8 *counter` and
@@ -375,7 +375,7 @@ no asm.
 * Next: a spelling that keeps key from inheriting the constant's REG_EQUIV set, or that adds
   2 refs to key.
 
-### sub_0803198C (0803198C, src/menus/dialogue_task_setup/sub_0803198C.c): message window open
+### sub_0803198C (0803198C, src/ui/dialogue/message_window/sub_0803198C.c): message window open
 
 Draft: `notes/phase3-menus-link/sub_0803198C.c` (2 ROM / 2 draft: the callback constant in r0
 instead of r1). It has no pin; it keeps `(void)*(volatile u8 *)&p->mode;`.
@@ -393,7 +393,7 @@ instead of r1). It has no pin; it keeps `(void)*(volatile u8 *)&p->mode;`.
 * Next: find what makes r0 busy (or suggests r1) across the store in the original block, e.g. a
   value that lives from the `strh` past the store.
 
-### TextState_ProcessTag (0803232C, src/menus/dialogue_text_interpreter/sub_0803232C.c): one register copy left
+### TextState_ProcessTag (0803232C, src/ui/dialogue/text_interpreter/sub_0803232C.c): one register copy left
 
 Draft: `notes/phase3-menus-link/TextState_ProcessTag.c` (3 ROM / 3 draft, from 21 / 14 once
 main's 3 pins and 3 barriers came out). It has no pins and no barriers.
@@ -415,7 +415,7 @@ main's 3 pins and 3 barriers came out). It has no pins and no barriers.
   Reload's cse would copy r4 only within one block, so look for C that keeps 0x40C in name's
   block, or for a PRE copy placed after name's set (pre_optimal there).
 
-### TextWindow_Destroy (08033778, src/menus/text_window_manager/sub_08033778.c)
+### TextWindow_Destroy (08033778, src/ui/dialogue/text_window/sub_08033778.c)
 
 Draft: `notes/phase3-menus-link/TextWindow_Destroy.c` (3 ROM / 5 draft, no pins or barriers).
 It reads `next = w->next; nextSlot = &w->next;` (the ROM's `adds r3, r0, #0` copy), and both arms
@@ -429,7 +429,7 @@ into the join, which gives the ROM's `adds r2, r1, #0` there.
   (6, next in r1 vs r2; `AGBCC_FORCE=next:2` gives 4); `last` copies (cprop/cse fold them).
 * Next: C that makes the arm-1 temp global or keeps the constant alive past the add.
 
-### Wireless_ReceiveParentUniPackets (0803548C, src/link/wireless_connection_controller/sub_0803548C.c)
+### Wireless_ReceiveParentUniPackets (0803548C, src/link/wireless/connection/sub_0803548C.c)
 
 Draft: `notes/phase3-menus-link/Wireless_ReceiveParentUniPackets.c` (19 ROM / 19 draft, shape 6,
 no pins or barriers). Parked to revisit, not finished.
@@ -456,49 +456,49 @@ inline `do { ... } while (0)` with a body. Its loop notes still stop regmove's f
 The coordinator said to leave the scoring alone for now. These are the ones in src/ on
 2026-11-09, 161 blocks in 122 files (`function:line`):
 
-* `src/actors/actor_animation_controller/actor_animation_controller.c`: Actor_ConfigureInteractionChildFromScript:4331
-* `src/effects/background_controllers/background_controller.c`: Background_FindMapId:385
+* `src/npc/cutscene_actor/actor_animation_controller.c`: Actor_ConfigureInteractionChildFromScript:4331
+* `src/effects/screen/background_controller.c`: Background_FindMapId:385
 * `src/fn/sub_080192FC.c`: ClockEvents_Update:37
-* `src/actors/scene_object_controller/sub_0801F4C4.c`: SceneObject_UpdateLowering:51
-* `src/actors/scene_object_controller/sub_0801F5B8.c`: SceneObject_UpdateLowered:9, SceneObject_UpdateLowered:13
+* `src/objects/scene_objects/sub_0801F4C4.c`: SceneObject_UpdateLowering:51
+* `src/objects/scene_objects/sub_0801F5B8.c`: SceneObject_UpdateLowered:9, SceneObject_UpdateLowered:13
 * `src/fn/sub_08020A60.c`: SceneMessages_RunScript:24
 * `src/fn/sub_0802141C.c`: SceneActors_FindAvailable:21, SceneActors_FindAvailable:22
 * `src/fn/sub_0802FCA8.c`: Actor_SelectPathNodeAction:93
-* `src/link/wireless_connection_controller/sub_08035958.c`: Wireless_OnParentUniSendComplete:48
-* `src/link/wireless_connection_controller/sub_08035F5C.c`: Wireless_TryStartParentNiSend:56
-* `src/link/wireless_connection_controller/sub_080362E0.c`: Wireless_ExchangeChildNiPacket:90
-* `src/link/wireless_trade_and_selection_menu/sub_08038838.c`: WirelessGameMenu_UpdateSelectionExchange:42
-* `src/link/wireless_trade_and_selection_menu/sub_08038AD4.c`: WirelessGameMenu_UpdateActiveRound:103
-* `src/actors/scene_pooled_motion_and_actor_controls/sub_0803D8A8.c`: ScenePool_ResumeAfterIdle:9
+* `src/link/wireless/connection/sub_08035958.c`: Wireless_OnParentUniSendComplete:48
+* `src/link/wireless/connection/sub_08035F5C.c`: Wireless_TryStartParentNiSend:56
+* `src/link/wireless/connection/sub_080362E0.c`: Wireless_ExchangeChildNiPacket:90
+* `src/link/wireless/trade_menu/sub_08038838.c`: WirelessGameMenu_UpdateSelectionExchange:42
+* `src/link/wireless/trade_menu/sub_08038AD4.c`: WirelessGameMenu_UpdateActiveRound:103
+* `src/link/wireless/battle/sub_0803D8A8.c`: ScenePool_ResumeAfterIdle:9
 * `src/fn/sub_080427FC.c`: ContactActor_ApplyHealthContact:33
-* `src/effects/bg1_flash_and_scrolling_controller/sub_080478A4.c`: BackgroundFlash_UpdateAppearing:18
-* `src/effects/bg1_flash_and_scrolling_controller/sub_080479B0.c`: BackgroundFlash_UpdateDisappearing:10, BackgroundFlash_UpdateDisappearing:17
+* `src/effects/screen/background_flash/sub_080478A4.c`: BackgroundFlash_UpdateAppearing:18
+* `src/effects/screen/background_flash/sub_080479B0.c`: BackgroundFlash_UpdateDisappearing:10, BackgroundFlash_UpdateDisappearing:17
 * `src/fn/sub_08047F68.c`: ContactBurst_OnContact:16
 * `src/fn/sub_080480A4.c`: ContactBurst_Update:70
-* `src/field/interaction_marker/sub_0805386C.c`: InteractionMarker_TickIdle:27
-* `src/field/saved_position_marker/sub_08053DF8.c`: SavedPositionMarker_TickIdle:27
-* `src/effects/scripted_display_tracks/sub_08054DC4.c`: DisplayTrack_SetSequenceFromScript:16
-* `src/menus/stage_icon_display/sub_08055C04.c`: StageIconDisplay_TickReveal:4
-* `src/menus/stage_icon_display/sub_08055DD4.c`: StageIconDisplay_InitAnimations:26, StageIconDisplay_InitAnimations:31
+* `src/objects/markers/interaction_marker/sub_0805386C.c`: InteractionMarker_TickIdle:27
+* `src/objects/markers/saved_position_marker/sub_08053DF8.c`: SavedPositionMarker_TickIdle:27
+* `src/effects/sprites/display_track/sub_08054DC4.c`: DisplayTrack_SetSequenceFromScript:16
+* `src/ui/hud/stage_icon/sub_08055C04.c`: StageIconDisplay_TickReveal:4
+* `src/ui/hud/stage_icon/sub_08055DD4.c`: StageIconDisplay_InitAnimations:26, StageIconDisplay_InitAnimations:31
 * `src/fn/sub_08056D24.c`: ScriptUtility_SetFlag800:8, ScriptUtility_SetFlag800:9, ScriptUtility_SetFlag800:10
 * `src/fn/sub_0805DDE8.c`: SceneHud_DrawCenteredMeter:18
-* `src/menus/input_marker_widgets/sub_0805E270.c`: SceneInput_InitGlyphPair:26
-* `src/menus/input_marker_widgets/sub_0805E394.c`: SceneInput_GetGridPosition:17
-* `src/menus/input_grid_and_navigation/sub_0805E7D8.c`: SceneInput_GetNavigationKeys:14
-* `src/menus/inventory_action_transitions/sub_08060A70.c`: SceneInventory_BeginConsumableSwapPair:39
-* `src/effects/sprite_effect_controllers/sub_0806B8DC.c`: SpriteEffectController_UpdatePool:17, SpriteEffectController_UpdatePool:18
-* `src/actors/route_sprite_actor_pool/sub_0806E130.c`: RouteSpritePool_Tick:33
-* `src/actors/scene_actor_registry_manager/sub_08070FA8.c`: RegistryCurrentGame:25
-* `src/actors/scene_actor_contact_candidates/sub_08072E50.c`: SceneActorContacts_SetDistanceGate:27
-* `src/actors/scene_actor_animation_selection/sub_080764C8.c`: SceneActorAnimation_SelectDirectionFlagsVariant:29
-* `src/actors/scene_actor_control_phases/sub_080838AC.c`: SceneActorControl_TickGroundBob:82
+* `src/ui/widgets/input_grid/sub_0805E270.c`: SceneInput_InitGlyphPair:26
+* `src/ui/widgets/input_grid/sub_0805E394.c`: SceneInput_GetGridPosition:17
+* `src/ui/widgets/input_grid/sub_0805E7D8.c`: SceneInput_GetNavigationKeys:14
+* `src/ui/town/shop/sub_08060A70.c`: SceneInventory_BeginConsumableSwapPair:39
+* `src/effects/sprites/sprite_effect_controller/sub_0806B8DC.c`: SpriteEffectController_UpdatePool:17, SpriteEffectController_UpdatePool:18
+* `src/scene/actor/route_sprite_actor/sub_0806E130.c`: RouteSpritePool_Tick:33
+* `src/scene/actor/registry/sub_08070FA8.c`: RegistryCurrentGame:25
+* `src/scene/actor/reaction/sub_08072E50.c`: SceneActorContacts_SetDistanceGate:27
+* `src/scene/actor/animation/sub_080764C8.c`: SceneActorAnimation_SelectDirectionFlagsVariant:29
+* `src/scene/actor/control/sub_080838AC.c`: SceneActorControl_TickGroundBob:82
 * `src/fn/sub_08086A2C.c`: Ghoul_UpdateDyingState:57
 * `src/fn/sub_08089800.c`: Ghoul_UpdateScriptedAction:32, Ghoul_UpdateScriptedAction:34
 * `src/fn/sub_0808CE50.c`: Ghoul_UpdateSpecialActionControl:61, Ghoul_UpdateSpecialActionControl:63
 * `src/fn/sub_0808CF54.c`: Ghoul_UpdateAnimationElevenControl:61, Ghoul_UpdateAnimationElevenControl:63
 * `src/fn/sub_0808D058.c`: Ghoul_UpdateAttackControl:61, Ghoul_UpdateAttackControl:63
-* `src/monsters/tentacle_actor/sub_080A8144.c`: SceneActorPlacement_UpdateFlaggedResponse:27, SceneActorPlacement_UpdateFlaggedResponse:29
-* `src/monsters/tentacle_actor/sub_080AA8C4.c`: TentacleActor_AlignSegmentsToTerrain:81
+* `src/monsters/centipede/sub_080A8144.c`: SceneActorPlacement_UpdateFlaggedResponse:27, SceneActorPlacement_UpdateFlaggedResponse:29
+* `src/monsters/centipede/sub_080AA8C4.c`: TentacleActor_AlignSegmentsToTerrain:81
 * `src/fn/sub_080B713C.c`: SceneActorTerrain_FindOpenNeighborDirection:11
 * `src/fn/sub_080BB4DC.c`: Skeleton_UpdateDownedState:57
 * `src/fn/sub_080C61AC.c`: Golem_UpdateDying:57
@@ -513,13 +513,13 @@ The coordinator said to leave the scoring alone for now. These are the ones in s
 * `src/monsters/sword/sub_080F5B68.c`: TargetMotion_AdvanceFollowSegment:41
 * `src/monsters/sword/sub_080F645C.c`: Sword_UpdateDamage:56, Sword_UpdateDamage:74
 * `src/fn/sub_080FC894.c`: Axe_CopyAuxiliaryVector:15
-* `src/field/floor_switch/sub_081004F8.c`: FloorSwitch_Release:43
-* `src/field/named_object/sub_081029F8.c`: NamedObject_UpdatePlayerAttachment:73
-* `src/field/named_object/sub_08103110.c`: NamedObject_CreateFromScript:209
-* `src/link/link_session/sub_08109040.c`: SelectionSlots_ClearValue:23
+* `src/objects/floor_switch/sub_081004F8.c`: FloorSwitch_Release:43
+* `src/objects/named_object/sub_081029F8.c`: NamedObject_UpdatePlayerAttachment:73
+* `src/objects/named_object/sub_08103110.c`: NamedObject_CreateFromScript:209
+* `src/link/session/sub_08109040.c`: SelectionSlots_ClearValue:23
 * `src/link/link_selection/sub_0810B3BC.c`: SceneMenu_UpdateRecords:45
-* `src/menus/record_panel/sub_0810D60C.c`: PanelText_DrawDecimal:17
-* `src/monsters/glove/sub_0811A030.c`: MotionActor_DispatchRequestedState:72
+* `src/link/records/sub_0810D60C.c`: PanelText_DrawDecimal:17
+* `src/minigames/coffin_bike/sub_0811A030.c`: MotionActor_DispatchRequestedState:72
 * `src/fn/sub_0811B094.c`: Collider_ScheduleUpdates:49
 * `src/fn/sub_0811BD30.c`: Actor_UpdateShadowSpriteParts:84, Actor_UpdateShadowSpriteParts:88
 * `src/fn/sub_0811D270.c`: PanelText_DrawDigits:17
@@ -527,18 +527,18 @@ The coordinator said to leave the scoring alone for now. These are the ones in s
 * `src/fn/sub_0811E77C.c`: StatModifier_AddForGlobalMode:11, StatModifier_AddForGlobalMode:17
 * `src/fn/sub_0811E7C8.c`: StatModifier_AddForOwnerMode:11, StatModifier_AddForOwnerMode:17
 * `src/fn/sub_08121110.c`: ActorAction_RunActiveCallbacks:31
-* `src/effects/feather_effect_pool/sub_081296D0.c`: FeatherEffectPool_UpdateTask:36
-* `src/actors/scene_actor_behavior/sub_0812F3CC.c`: SceneActorReaction_BeginContactResponse:86
-* `src/link/registry_1745/sub_08136F58.c`: sub_08136F58:95
+* `src/effects/feathers/sub_081296D0.c`: FeatherEffectPool_UpdateTask:36
+* `src/scene/actor/behavior/sub_0812F3CC.c`: SceneActorReaction_BeginContactResponse:86
+* `src/link/session/sub_08136F58.c`: sub_08136F58:95
 * `src/fn/sub_0813BAD8.c`: sub_0813BAD8:132
 * `src/fn/sub_0813C5B4.c`: ConvergingEffects_EmitFarParticle:57
-* `src/player/sub_0813FE30.c`: sub_0813FE30:50
-* `src/player/sub_08140F40.c`: Player_GetForceDirection:93, Player_GetForceDirection:94
+* `src/player/core/sub_0813FE30.c`: sub_0813FE30:50
+* `src/player/movement/sub_08140F40.c`: Player_GetForceDirection:93, Player_GetForceDirection:94
 * `src/fn/sub_081559A4.c`: Player_UpdateTimedChargeAction:95
 * `src/fn/sub_08165488.c`: SceneHud_DrawDecimalDigits:16
-* `src/menus/scene_hud/sub_0816F6B4.c`: PauseMenu_BeginTypeThirteenItemUse:33
-* `src/menus/scene_hud/sub_0816F8AC.c`: PauseMenu_BeginTypeFourteenItemUse:33
-* `src/menus/scene_hud/sub_08173C0C.c`: SceneHud_TickEquipmentToggle:37
+* `src/ui/pause/pause_display/sub_0816F6B4.c`: PauseMenu_BeginTypeThirteenItemUse:33
+* `src/ui/pause/pause_display/sub_0816F8AC.c`: PauseMenu_BeginTypeFourteenItemUse:33
+* `src/ui/pause/pause_display/sub_08173C0C.c`: SceneHud_TickEquipmentToggle:37
 * `src/fn/sub_08175008.c`: Presentation_UpdateAllocationSelection:150
 * `src/fn/sub_0817A57C.c`: SceneActors_SpawnConvergingParticle:57
 * `src/fn/sub_0817B5E4.c`: update_facing:13
@@ -548,40 +548,40 @@ The coordinator said to leave the scoring alone for now. These are the ones in s
 * `src/fn/sub_081BD854.c`: DarkLoan_CreateHiddenDisplay:19
 * `src/fn/sub_081C0478.c`: ScenePaletteFade_BlendPaletteBanks:16
 * `src/fn/sub_081C6094.c`: sub_081C6094:24
-* `src/actors/scene_npc/sub_081D010C.c`: sub_081D010C:76
-* `src/actors/scene_npc/sub_081D07D8.c`: SceneNpc_EnterProjectedIdle:59
+* `src/npc/scripted_npc/sub_081D010C.c`: sub_081D010C:76
+* `src/npc/scripted_npc/sub_081D07D8.c`: SceneNpc_EnterProjectedIdle:59
 * `src/fn/sub_081D58B4.c`: MonsterBook_UpdateHighlightPulse:7
 * `src/fn/sub_081D71CC.c`: ScreenTransition_FadeBlendOut:26
 * `src/fn/sub_081EB8E0.c`: sub_081EB8E0:180
 * `src/fn/sub_08210C5C.c`: Collection_UpdateHighlightPulse:7
-* `src/menus/forging_book/sub_0821211C.c`: ForgingBook_UpdateHighlightPulse:7
-* `src/menus/forging_book/sub_08213294.c`: ForgingBook_UpdateCursorPulse:7
+* `src/ui/books/forging_book/sub_0821211C.c`: ForgingBook_UpdateHighlightPulse:7
+* `src/ui/books/forging_book/sub_08213294.c`: ForgingBook_UpdateCursorPulse:7
 * `src/fn/sub_08214B44.c`: Sprite_RenderScaledList:54
 * `src/fn/sub_08214D20.c`: sub_08214D20:43, sub_08214D20:44
-* `src/engine/palette/sub_08217430.c`: sub_08217430:86
+* `src/engine/video/palette/sub_08217430.c`: sub_08217430:86
 * `src/fn/sub_08219C40.c`: Heap_Alloc:16
 * `src/fn/sub_0821A184.c`: ResourceRegistry_AllocateEntry:8, ResourceRegistry_AllocateEntry:10
-* `src/engine/anim/sub_082210B8.c`: Random_InitValueTable:10
-* `src/engine/scalar_and_vector_interpolation/sub_08221D40.c`: ScalarApproach_ApplyProfileArray:13
-* `src/link/rfu_manager/sub_082237A0.c`: RfuManager_StartChildConnect:46
-* `src/system/clock_and_sun_schedule/sub_08228DB8.c`: SunClock_GetPhase:52, SunClock_GetPhase:62, SunClock_GetPhase:99, SunClock_GetPhase:109
+* `src/engine/video/anim/sub_082210B8.c`: Random_InitValueTable:10
+* `src/engine/math/sub_08221D40.c`: ScalarApproach_ApplyProfileArray:13
+* `src/link/wireless/rfu_manager/sub_082237A0.c`: RfuManager_StartChildConnect:46
+* `src/system/clock/sub_08228DB8.c`: SunClock_GetPhase:52, SunClock_GetPhase:62, SunClock_GetPhase:99, SunClock_GetPhase:109
 * `src/link/link_player/sub_082392E8.c`: sub_082392E8:70, sub_082392E8:73
 * `src/link/link_player/sub_08239480.c`: Player_EmitConvergingParticle:57
 * `src/link/link_player/sub_0823A028.c`: ActorEffect_SelectFlashingValue:15
 * `src/lib/libgcc/sub_0824AC74.c`: Libgcc_MultiplyInt64:61
 * `src/monsters/golem/golem_2.c`: Golem_UpdateScriptedAction:393, Golem_UpdateScriptedAction:395
-* `src/field/group_objects/group_objects.c`: BoardPiece_Wander:493, BoardPiece_Wander:494, BoardPiece_Wander:495, BoardPiece_Wander:496
-* `src/menus/modifier_selection_and_stat_previews/modifier_selection_and_stat_previews.c`: ModifierMenu_DrawSecondSourceStats:697, ModifierMenu_DrawSecondSourceStats:716, ModifierMenu_DrawBackground:863
-* `src/effects/palette_controllers/palette_controller.c`: Palette_BlendRange:69, Palette_InitializeFromScript:461, Palette_SetBrightnessFromScript:709
-* `src/menus/password_decoding/password.c`: Text_CopyWithoutTags:9, Password_DecodeEntry:174
-* `src/menus/status_screen/status_screen.c`: NumericDisplay_DrawPair:22, NumericDisplay_DrawStatusValues:68
-* `src/menus/status_screen/status_screen_fade.c`: StatusScreen_FadeInPalette:98
-* `src/field/tether_actor/tether_actor.c`: TetherActor_BeginAuxiliaryState:1122, slopePush_AdjustSlopeMovement:1183, TetherActor_UpdateWanderingState:3125
-* `src/link/wireless_game_items_and_display/wireless_game_items_and_display.c`: WirelessGameItems_UpdateTemporaryItem:887, WirelessGameItems_StartOutgoingItems:1292
+* `src/effects/scene/bat_flock.c`: BoardPiece_Wander:493, BoardPiece_Wander:494, BoardPiece_Wander:495, BoardPiece_Wander:496
+* `src/ui/modifier_menu/modifier_selection_and_stat_previews.c`: ModifierMenu_DrawSecondSourceStats:697, ModifierMenu_DrawSecondSourceStats:716, ModifierMenu_DrawBackground:863
+* `src/effects/palette/palette_controller.c`: Palette_BlendRange:69, Palette_InitializeFromScript:461, Palette_SetBrightnessFromScript:709
+* `src/ui/title/password.c`: Text_CopyWithoutTags:9, Password_DecodeEntry:174
+* `src/ui/status_screen/status_screen.c`: NumericDisplay_DrawPair:22, NumericDisplay_DrawStatusValues:68
+* `src/ui/status_screen/status_screen_fade.c`: StatusScreen_FadeInPalette:98
+* `src/objects/coffin/tether_actor.c`: TetherActor_BeginAuxiliaryState:1122, slopePush_AdjustSlopeMovement:1183, TetherActor_UpdateWanderingState:3125
+* `src/link/wireless/battle/wireless_game_items_and_display.c`: WirelessGameItems_UpdateTemporaryItem:887, WirelessGameItems_StartOutgoingItems:1292
 
 ## actors
 
-### SceneObjects_ScriptLower (src/actors/scene_object_controller/sub_0801E998.c, 0801E998): deferred
+### SceneObjects_ScriptLower (src/objects/scene_objects/sub_0801E998.c, 0801E998): deferred
 
 Draft: `notes/phase3-drafts/actors/SceneObjects_ScriptLower.c` (3 ROM / 3 draft insns differ,
 allocation only; a whole-file unit copy). Shape: a do-while inside `if (found < count)`, with
@@ -596,7 +596,7 @@ timer and lift, swapped stores, `lift = timer`, chained `timer = lift = zero`, a
 out of the loop preheader (a different spelling of the timer member, or the slot struct the
 siblings ScriptRaise/Append use, written as one HI store), or find the source of the tie.
 
-### ScenePool_StateLaunchArc (src/actors/scene_pooled_motion_and_actor_controls/sub_0803E5F4.c, 0803E5F4): deferred
+### ScenePool_StateLaunchArc (src/link/wireless/battle/sub_0803E5F4.c, 0803E5F4): deferred
 
 Drafts: `notes/phase3-drafts/actors/ScenePool_StateLaunchArc_owncalls.c` (5 ROM / 2 draft: every
 state block written in full with its own Memory_Clear, break, `return 0` after the switch) and
@@ -634,20 +634,20 @@ them. Next: find what else besides an asm makes case 1's tail end differently at
 CLOBBER insn stops the compare), or a helper that returns history (the pinned file's
 Prepare/PrepareFirst/PrepareZero inlines).
 
-### ScenePool_StateLaunchShortArc (src/actors/scene_pooled_motion_and_actor_controls/sub_0803E7B4.c, 0803E7B4): deferred
+### ScenePool_StateLaunchShortArc (src/link/wireless/battle/sub_0803E7B4.c, 0803E7B4): deferred
 
 Draft: `notes/phase3-drafts/actors/ScenePool_StateLaunchShortArc.c` (the LaunchArc own-calls
 form; kind in r8, the fire logic and the launch half match). Its switch tail is byte for byte
 the LaunchArc one and has the same residual (5 ROM / 2 draft). Solve LaunchArc first; then the
 return-split shape carries over.
 
-### ScenePool_StateEmitBursts (src/actors/scene_pooled_motion_and_actor_controls/sub_0803E998.c, 0803E998): deferred
+### ScenePool_StateEmitBursts (src/link/wireless/battle/sub_0803E998.c, 0803E998): deferred
 
 Not drafted separately: its kind switch ends in the same shared Memory_Clear tail as LaunchArc
 (cases 0, 1 and case 2's state 1 jump to case 3 state 2's `movs r1, #0x80`; case 3's state 1
 keeps `adds r1, #0xff`). The front half (the bursts) is ordinary. Do it after LaunchArc.
 
-### ContactActor_UpdateRetreat (src/actors/contact_actor_pool_states_and_lifecycle/sub_0804373C.c, 0804373C): deferred
+### ContactActor_UpdateRetreat (src/bosses/vampire/sub_0804373C.c, 0804373C): deferred
 
 Draft: `notes/phase3-drafts/actors/ContactActor_UpdateRetreat.c` (95 / 95, no pins). The ROM's
 dead `ldr r3, =0x0403B714; mov r8, r3` before the enter block's first random draw is the
@@ -660,7 +660,7 @@ with center (r8), and keeps a spill slot (sp #0xc against #8). `AGBCC_PRI=positi
 gets to 55 / 55. Next: find which draws use the relative read (it decides origin's live
 range), then the position/slot order.
 
-### ContactSwarm_UpdateTracking (src/actors/contact_swarm_states_and_spawning/sub_08044290.c, 08044290): deferred
+### ContactSwarm_UpdateTracking (src/bosses/vampire/sub_08044290.c, 08044290): deferred
 
 Draft: `notes/phase3-drafts/actors/ContactSwarm_UpdateTracking.c` (25 / 27, the pinned file
 with plain `jitter = *(const u16 *)(RANDOM_TABLE_ADDR + i * 2) & 15`). The pinned file's
@@ -675,7 +675,7 @@ keeps the shifts, 2 / 2), `% 16`, ParticleRandom_ReadSample (do/while), and swap
 frame test's arms (worse). Next: a mask whose bits combine narrows to 15 through nonzero_bits
 (the 15 would be a new const after cse).
 
-### ActorAttachment_CreateValueSpriteSlot (src/actors/actor_attachment_manager/sub_08065FD0.c, 08065FD0): PRE slot order only
+### ActorAttachment_CreateValueSpriteSlot (src/scene/actor/attachment/sub_08065FD0.c, 08065FD0): PRE slot order only
 
 Draft: `notes/phase3-drafts/actors/ActorAttachment_CreateValueSpriteSlot.c` (15 / 15, every
 difference a PRE stack slot; `AGBCC_GCSE_T=127` or `=133` gives MATCH). Three levers got it
@@ -696,7 +696,7 @@ inline moves N (e3: 263) but changes the code. Next: a structural difference tha
 remove (jump threading of a second null test, a return-label shape). Or a shared inline with
 CreateSpriteSlot / the other Create* slots once they are matched.
 
-### ActorAttachment_CreateSinglePartSlot (src/actors/actor_attachment_manager/sub_08066278.c, 08066278): PRE slot order only
+### ActorAttachment_CreateSinglePartSlot (src/scene/actor/attachment/sub_08066278.c, 08066278): PRE slot order only
 
 Draft: `notes/phase3-drafts/actors/ActorAttachment_CreateSinglePartSlot.c` (24 / 24, pin-free,
 every difference a PRE stack slot). It is the same family as CreateValueSpriteSlot: a tail inline
@@ -709,7 +709,7 @@ N = 182, and the loop forms and declaration orders tried all keep it.
 
 ## monsters-bosses (Monsters, Bosses, Player, Engine core)
 
-### SceneGrid_ScanColumns (src/engine/scene_grid_queries/sub_0806E7CC.c, 0806E7CC): deferred
+### SceneGrid_ScanColumns (src/scene/terrain/grid/sub_0806E7CC.c, 0806E7CC): deferred
 
 Draft: `notes/phase3-drafts/monsters-bosses/SceneGrid_ScanColumns.c`, the matched ScanRows form
 (`[row][column +/- count]`, `column <= 7`, returns `2 - cell` / `-(cell + 2)`). 14/14 insns differ,
@@ -721,7 +721,7 @@ Tried: `!steps`, a limit variable, gridRow per arm, 1D indexing, parameter types
 four or five more insns of life without changing the code (fact 17's `s16` conversion trick), or
 reorder the parameter's first use.
 
-### sub_0806F06C (src/engine/scene_state_and_spatial_queries/sub_0806F06C.c): deferred
+### sub_0806F06C (src/scene/state/sub_0806F06C.c): deferred
 
 Draft without the DEBUG_NOP: `notes/phase3-drafts/monsters-bosses/sub_0806F06C.c`, 23/23 differ.
 `AGBCC_PRI=i:+920` matches. cse puts REG_EQUAL (const 0) on i's first set, which doubles its life.
@@ -775,7 +775,7 @@ shape 16, and the rest is the order of input, transform, table and heading. The 
 help here either: the target packing reuses 0xFFFF0000. Next: a general way to set a constant pointer
 without a REG_EQUAL note at function entry; this is the same blocker as Bat.
 
-### TentacleActor_SelectWanderRoute (src/monsters/tentacle_actor/sub_080A8904.c, 080A8904): deferred
+### TentacleActor_SelectWanderRoute (src/monsters/centipede/sub_080A8904.c, 080A8904): deferred
 
 Draft: `TentacleActor_SelectWanderRoute.c`, every do/while(0) macro written out (46/48 differ, all
 allocation). The macros put their statements one loop level deeper, and flow weights REG_N_REFS by
@@ -785,7 +785,7 @@ The draft gives facing r6 and count r8. Next: C that really nests those statemen
 original had, for example the neighbor scan as an inner loop) or other refs that raise the mask
 and n by the same amount.
 
-### TentacleBody_RefreshDirectionalAnimations (src/monsters/tentacle_actor/sub_080A8F38.c, 080A8F38): deferred
+### TentacleBody_RefreshDirectionalAnimations (src/monsters/centipede/sub_080A8F38.c, 080A8F38): deferred
 
 Draft: `TentacleBody_RefreshDirectionalAnimations.c` (41/37 differ, against 83/79 for the plain
 no-pin draft). Step is written as the shared DisplaySequenceState playback, with the flip tests
@@ -802,9 +802,9 @@ Next: find what holds r7 in the ROM (another long-lived value the draft lacks, m
 Same family as TentacleBody_RefreshDirectionalAnimations: the same Step helper and the same
 `frame` stack struct and segment loop. With Refresh's draft Step and ordinary body C, Reset scores
 54/52 (`TentacleBody_ResetDirectionalAnimations.c`); Restart is not tried yet. Solve Refresh first,
-then move the shared Step into `include/monsters/tentacle_actor/tentacle_segment_animation.h` and port it to all three.
+then move the shared Step into `include/monsters/centipede/tentacle_segment_animation.h` and port it to all three.
 
-### TentacleActor_RemoveSegmentColliders (src/monsters/tentacle_actor/sub_080AA688.c, 080AA688): deferred
+### TentacleActor_RemoveSegmentColliders (src/monsters/centipede/sub_080AA688.c, 080AA688): deferred
 
 Draft: `sub_080AA688.c` (`--trail->activeCount;`, 25/24 differ). The ROM rebuilds `trail + 0x8EA` in
 the loop; the draft hoists it. `hoist`: in loop pass 2 the address (insn 148) moves at 13 x 1 x 3 >=
@@ -812,7 +812,7 @@ the loop; the draft hoists it. `hoist`: in loop pass 2 the address (insn 148) mo
 `activeCount--`, a pointer local and `= activeCount - 1`; all are hoisted. Next: a form whose pass-2
 threshold or lifetime fails, or a count address that is not invariant (derived from the segment).
 
-### TentacleActor_AlignSegmentsToTerrain (src/monsters/tentacle_actor/sub_080AA8C4.c, 080AA8C4): deferred
+### TentacleActor_AlignSegmentsToTerrain (src/monsters/centipede/sub_080AA8C4.c, 080AA8C4): deferred
 
 Draft: `TentacleActor_AlignSegmentsToTerrain.c`, 36/38 differ, all of it allocation. It passes
 `&segment->position` to Height (the landed code passes `&trail->segments[i].position`, which costs
@@ -834,7 +834,7 @@ records REG_EQUIV (const (plus sym k)) and the result is worse, and halves place
 writes. Next: a table source that cse does not see as constant and combine folds, with no mask
 constant in common with a bitfield write in the same block.
 
-### TentacleActor_UpdateRetraction (src/monsters/tentacle_actor/sub_080AB968.c, 080AB968): deferred
+### TentacleActor_UpdateRetraction (src/monsters/centipede/sub_080AB968.c, 080AB968): deferred
 
 The ROM computes |secondaryMotion.x| and |secondaryMotion.z| (`adds r3, r1, #0; ...; rsbs r3, r1, #0`)
 and never uses them. The landed C keeps them with a volatile asm. So in the original they fed
@@ -845,7 +845,7 @@ the abs, 20/2), branching inside Advance, and a `speed` variable set before the 
 arms that stay identical after reload (all arguments set before the branch), or a switch on the
 abs values.
 
-### TentacleActor_RecoverFromSegmentLoss (src/monsters/tentacle_actor/sub_080ABB18.c, 080ABB18): deferred
+### TentacleActor_RecoverFromSegmentLoss (src/monsters/centipede/sub_080ABB18.c, 080ABB18): deferred
 
 The ROM computes 15 field addresses of p before the segment-removal loop's first test and spills
 most of them to the stack. That looks like loop.c hoisting the invariants of a loop that contains
@@ -907,7 +907,7 @@ effect: local temps for angle/zero/speed/one, a shadow pointer, a struct copy th
 inline helpers for the ED6/ED4 stores (constant parameters are substituted), and simpler
 mask forms (those change the code).
 
-### Terrain_ResolveActorMotion (src/monsters/glove/sub_0811AE9C.c, 0811AE9C): 6 concessions, pin-free draft 10/10
+### Terrain_ResolveActorMotion (src/minigames/coffin_bike/sub_0811AE9C.c, 0811AE9C): 6 concessions, pin-free draft 10/10
 
 Resolved by dp-monsters: spell the offset as ~((difference << 12) - 1).
 CSE does not see the inner negation early enough to cancel Abs's negation;
@@ -931,7 +931,7 @@ negation (11/11, shape 0) but puts both in one register. The original's C must h
 result and shape sit one register higher (r3/r4, ROM r2/r3), because offset's pseudo takes r2.
 Fixing (1) probably fixes (2).
 
-### sub_0813D834 (src/player/player_3.c, 0813D834): 2 pins, one cse follow from a match
+### sub_0813D834 (src/player/appearance/player_visuals.c, 0813D834): 2 pins, one cse follow from a match
 
 Draft `sub_0813D834.c` (no pins) is 17/15. Every difference comes from cse following the
 switch's `beq` into case 1 (`probe`: `CSE_NOFOLLOW=2` matches). cse then knows kind == 1 and folds
@@ -941,7 +941,7 @@ preceded by a BARRIER, so the original's case 1 label must have had a second use
 before it. No effect: an if/else chain (worse), `u32 kind`, computing from `inputKind`, a
 `goto` to the timers block from the flags test.
 
-### PlayerAction_RefreshFlagState (src/player/player_3.c, 0813EDDC): 7 concessions, pin-free draft 8/8
+### PlayerAction_RefreshFlagState (src/player/appearance/player_visuals.c, 0813EDDC): 7 concessions, pin-free draft 8/8
 
 Draft `PlayerAction_RefreshFlagState.c` drops all seven (`if (alternate < 0) override = 0; else
 override = GameState_GetConsumableDescriptor(alternate);` and `override->slot` read directly).
@@ -1125,7 +1125,7 @@ The ROM has a block-local mask in r2 loaded before the address, with count in r3
 locals before the call, after it, before the accumulated block, and `return mask`. Next: break cse1's
 path between line 101 and the count block, or find a mask spelling that is not in const 1's class.
 
-### PlayerParticleCloud_ScatterAnchors (src/player/player_particle_cloud/sub_081D3620.c, 081D3620): deferred
+### PlayerParticleCloud_ScatterAnchors (src/player/effects/particle_cloud/sub_081D3620.c, 081D3620): deferred
 
 Pin: `register u32 random asm("r0")` in the loop.
 Draft: `notes/phase3-drafts/monsters-bosses/PlayerParticleCloud_ScatterAnchors.c` (12 ROM / 12 draft, swap only).
@@ -1171,7 +1171,7 @@ needed, and gcse puts &manager->count in r8 without the pin.
 19 -> 4 pins. Left: the incremented frame is zero-extended twice in the ROM (in plain C cse shares
 the two; switch and mixed cast/memory forms don't help), and r6 holds 0x380 in the falling arm.
 
-### VulcanCannon_UpdateFacingTurn (src/monsters/vulcan_cannon/sub_08207350.c, 08207350): deferred, one cse merge left
+### VulcanCannon_UpdateFacingTurn (src/monsters/cannons/vulcan/sub_08207350.c, 08207350): deferred, one cse merge left
 
 Landed: 12 concessions, a hand-unrolled step routine and VC_* selector macros for `vulcan_cannon_worker.h`.
 Draft: `notes/phase3-drafts/monsters-bosses/VulcanCannon_UpdateFacingTurn.c` (5 ROM / 3 draft).
@@ -1216,7 +1216,7 @@ A single `base` pointer, a per-iteration `cursor = base` copy, and `&pool->e[i]`
 Next: work out whether r8 is a cursor biv or loop's reduced giv (try `hoist`), then the C that puts sprite/state on the base side
 while the reads stay on r8.
 
-### OrangeSpine_ApplyHitReaction (src/monsters/orange_spine/sub_0820EE34.c, 0820EE34): deferred
+### OrangeSpine_ApplyHitReaction (src/monsters/cannons/plasma/sub_0820EE34.c, 0820EE34): deferred
 
 Landed: 2 pins and 4 barriers (r0 and r1 dummies around two statements).
 Draft: `notes/phase3-drafts/monsters-bosses/OrangeSpine_ApplyHitReaction.c` (36 ROM / 34 draft).
@@ -1232,7 +1232,7 @@ Tried:
 - `!= 0`
 Next: find what the original kept live in r0 and r1 across that store. The pinned dummies stand in for it.
 
-### sub_08217430 (src/engine/palette/sub_08217430.c, 08217430): deferred
+### sub_08217430 (src/engine/video/palette/sub_08217430.c, 08217430): deferred
 
 Landed: a `bank` pin in r3 and a barrier keeping `offset`/`base` live.
 Draft: `notes/phase3-drafts/monsters-bosses/sub_08217430.c`
@@ -1247,7 +1247,7 @@ Tried:
 - inline copy wrappers (worse: the base address is no longer hoisted)
 Next: C where bank does not die in the r0 copy (or is not a plain copy), so it gets no suggestion.
 
-### GameState_SelectRamBase (src/engine/script_virtual_machine/script_virtual_machine.c, 0821B084): deferred, one operand order
+### GameState_SelectRamBase (src/script/script_virtual_machine.c, 0821B084): deferred, one operand order
 
 Pin: `base` in r1.
 Draft: `notes/phase3-drafts/monsters-bosses/GameState_SelectRamBase.c` (1 ROM / 1 draft).
@@ -1509,7 +1509,7 @@ The single original base pin remains. Read fold_rtx in gcc/cse.c: after obtainin
 
 Tags: #matching #phase3 #effects
 
-### sub_08012B34 (08012B34, src/effects/debris_particles/debris_particles.c): partial, origin pin remains
+### sub_08012B34 (08012B34, src/effects/particles/debris_particles.c): partial, origin pin remains
 
 Removed the operand barrier using `ParticleRandom_ReadRelativeSample(setup, gRandomTable)`
 for subsequent draws. The complete unit still matches; only the existing r3 origin pin
@@ -1543,7 +1543,7 @@ and reload rotation. Next idea: recover a first-sample helper whose short-lived 
 use survives until combine, allowing local allocation to reserve r3 before the angle.
 No new concession or compiler override was landed.
 
-### sub_0801404C (0801404C, src/effects/particle_groups/sub_0801404C.c): partial, table barrier remains
+### sub_0801404C (0801404C, src/effects/particles/groups/sub_0801404C.c): partial, table barrier remains
 
 Removed three of four barriers. Reading coordinates through `CoordinateBits` keeps
 PRE from sharing the early signed x load with the later motion load. A local graphics
@@ -1577,7 +1577,7 @@ Persistent evidence: `build/matchsearch/sub_0801404C`; all source experiments in
 flow, or reduce table density slightly while keeping the -256 mask below it. A
 sampler or cursor helper with a useful late-eliminated copy may supply that effect.
 
-### ParticleGroup_UpdateFrozen (08014330, src/effects/particle_groups/sub_08014330.c): deferred, combine removes byte extension
+### ParticleGroup_UpdateFrozen (08014330, src/effects/particles/groups/sub_08014330.c): deferred, combine removes byte extension
 
 Best complete ordinary unit: `notes/phase3-drafts/dp-effects/ParticleGroup_UpdateFrozen.c`,
 3 ROM / 1 draft, shape 2. It preserves the earlier field-effects result: PRE creates
@@ -1605,7 +1605,7 @@ Scratch: `build/cx/work/ParticleGroup_UpdateFrozen`. Next: a genuine header/cach
 representation that makes an SI-to-QI copy with unknown upper bits before combine,
 but whose wide producer becomes the same byte load after combine. No source changed.
 
-### sub_08014634 (08014634, src/effects/particle_groups/sub_08014634.c): partial, 11 pins and one barrier removed
+### sub_08014634 (08014634, src/effects/particles/groups/sub_08014634.c): partial, 11 pins and one barrier removed
 
 The stock compiler matches the complete 664-byte unit after removing eleven of
 fifteen pins and the entry-offset barrier. Reusing an ordinary option scalar for
@@ -1651,7 +1651,7 @@ traces: `build/cx/work/sub_08014634`. Next: shorten the counter lifetime without
 extra early set, or recover the resource helper whose separate branch destinations
 survive CSE2. Then solve table equivalence and the options/count reload boundaries.
 
-### sub_08014CA4 (08014CA4, src/effects/particle_groups/sub_08014CA4.c): partial, output pin and initialization barrier removed
+### sub_08014CA4 (08014CA4, src/effects/particles/groups/sub_08014CA4.c): partial, output pin and initialization barrier removed
 
 The complete 704-byte unit matches after removing the lifetime-output pointer pin
 and the three-operand initialization barrier. A shared output pointer in the fixed
@@ -1708,7 +1708,7 @@ PRE. The fixed initialization and scope explanation are landed independently.
 
 Tags: #menus #hud #dialogue #matching #compiler
 
-### Presentation_SetItemGraphic (08019ECC, src/menus/selection_menu/selection_menu.c)
+### Presentation_SetItemGraphic (08019ECC, src/ui/widgets/selection_menu.c)
 
 Best ordinary-C draft: `notes/phase3-drafts/dp-menus/Presentation_SetItemGraphic.c`.
 It has the original 76-byte extent, 6 ROM / 6 draft differing instructions. The
@@ -2325,59 +2325,59 @@ a non-constant-equivalence initializer, potentially a union initializer whose cl
 canonicalization.
 ## cdp-effects (Codex)
 
-### BackgroundFlash_UpdateScrolling (src/effects/bg1_flash_and_scrolling_controller/sub_08047770.c, 08047770): deferred, 6/6
+### BackgroundFlash_UpdateScrolling (src/effects/screen/background_flash/sub_08047770.c, 08047770): deferred, 6/6
 
 Draft: `notes/phase3-drafts/cdp-effects/BackgroundFlash_UpdateScrolling.c`. Removing the frame r1 pin leaves only a register swap: `frame` has 3 references across 18 insns (priority 1666), while the short-lived target-speed pseudo has 3 references across 4 (priority 7500) and takes r1 first. `AGBCC_PRI=frame:+5835` matches. An inline mask helper raised frame to 5 references but changed the second AND's tie/canonicalization; nested wrappers folded away. Next: a natural frame-test helper that supplies two more pre-flow references while retaining the constant-first `odd &= frame` form.
 
-### RepeatedEffect_TickUpperTransition (src/effects/repeated_effects/sub_0804F9C4.c, 0804F9C4): deferred, 77/71
+### RepeatedEffect_TickUpperTransition (src/effects/scene/repeated_effect/sub_0804F9C4.c, 0804F9C4): deferred, 77/71
 
 Draft: `notes/phase3-drafts/cdp-effects/RepeatedEffect_TickUpperTransition.c`. The seven pins cover the repeated RNG-index, x/z sample, and result-value allocation in two symmetric transition arms. Removing them produces 77 ROM / 71 draft rows and one moved branch; the older recovery also found the first decisive mismatch at the halfword store after the upper-transition test. Next: factor the two arms through the table-first `ParticleRandom_ReadSample` form while preserving a separate post-join result value.
 
-### OrbitBackground_UpdateVisibility (src/effects/orbit_background_controller/sub_08050910.c, 08050910): deferred, 26/22
+### OrbitBackground_UpdateVisibility (src/effects/screen/orbit_background/sub_08050910.c, 08050910): deferred, 26/22
 
 Draft: `notes/phase3-drafts/cdp-effects/OrbitBackground_UpdateVisibility.c`. Removing the background/selected pins and status barrier changes the ordering of the final special-mode load/test relative to the enabled test (seven moved branches overall). Direct ordinary condition spellings retained the wrong scheduling. Next: repeat the post-join status statement in each arm so jump2 cross-jumps the tails while keeping the special-mode load on the ROM side of the join.
 
-### OrbitBackground_UpdatePosition (src/effects/orbit_background_controller/sub_080509E8.c, 080509E8): deferred, 53/53
+### OrbitBackground_UpdatePosition (src/effects/screen/orbit_background/sub_080509E8.c, 080509E8): deferred, 53/53
 
 Draft: `notes/phase3-drafts/cdp-effects/OrbitBackground_UpdatePosition.c`. Ten constraints steer the angle correction, game-state reload, two symmetric signed approach blocks, and loaded blend frame. The unsigned-halfword blend-frame form removes its binding, but signed correction allocation and reload ordering remain; removing all constraints yields 53/53 and twelve moved branches. Next: unify the two approach arms behind a signed step helper, then duplicate the post-join store in each arm.
 
-### DisplayTrack_Update (src/effects/scripted_display_tracks/sub_08054EC0.c, 08054EC0): deferred, 31/31
+### DisplayTrack_Update (src/effects/sprites/display_track/sub_08054EC0.c, 08054EC0): deferred, 31/31
 
 Draft: `notes/phase3-drafts/cdp-effects/DisplayTrack_Update.c`. The 27 constraints are concentrated in palette interpolation (period/divisor/frame pointers and color temporaries), the descending cleanup loop, and the sound-event tail. Despite their count, removing all leaves only 31/31 rows and one moved branch, indicating allocation rather than missing operations. Next: recover a typed palette-interpolation helper with the period pointer as its loop invariant and repeat the final packed-color store in the two interpolation arms.
 
-### DisplayTrack_AddFromScript (src/effects/scripted_display_tracks/sub_08055268.c, 08055268): deferred, 12/18
+### DisplayTrack_AddFromScript (src/effects/sprites/display_track/sub_08055268.c, 08055268): deferred, 12/18
 
 Draft: `notes/phase3-drafts/cdp-effects/DisplayTrack_AddFromScript.c`. Four constraints steer the initial script value, zero halfword, event, and has-sequence result. Removing all changes 12 ROM / 18 draft rows and one branch; the extra draft instructions point to value lifetime/CSE rather than pure allocation. Next: use a union-zero initializer for the halfword state and return directly from the sequence-present arms so the result is not live across the join.
 
-### Presentation_UpdateDropShakeBlink (src/effects/scripted_presentation/sub_081E2910.c, 081E2910): deferred, 46/34
+### Presentation_UpdateDropShakeBlink (src/effects/screen/presentation/sub_081E2910.c, 081E2910): deferred, 46/34
 
 Draft: `notes/phase3-drafts/cdp-effects/Presentation_UpdateDropShakeBlink.c`. The three destination pins as a group cost only 6/6, while removing the long-lived table r6 pin causes most of the 46/34 difference and three moved branches. The typed departure-layer layout is retained. Next: index the input table directly in each state arm (rather than advancing a shared table pointer), then address `layers[1].position.y` through a single typed destination local.
 
-### SpriteTrail_CreateFixedEffect (src/effects/sprite_trail/sub_081F28C4.c, 081F28C4): deferred, 4/4
+### SpriteTrail_CreateFixedEffect (src/bosses/vanargand/sub_081F28C4.c, 081F28C4): deferred, 4/4
 
 Draft: `notes/phase3-drafts/cdp-effects/SpriteTrail_CreateFixedEffect.c`. The pin-free code has identical instruction shape; reload keeps `pool` in sl and spills the render position, while the ROM spills `pool` at sp+4 and keeps the position in sl. Moving declarations and replacing the two position-x field expressions were tested; declaration order is neutral and the field rewrite worsens allocation. Next: find the original render-loop inline/helper boundary that raises the position pointer's density without changing the emitted body.
 
-### SpriteTrail_CreateMotionEffect (src/effects/sprite_trail/sub_081F2A08.c, 081F2A08): deferred, 4/4
+### SpriteTrail_CreateMotionEffect (src/bosses/vanargand/sub_081F2A08.c, 081F2A08): deferred, 4/4
 
 Draft: `notes/phase3-drafts/cdp-effects/SpriteTrail_CreateMotionEffect.c`. As in the fixed twin, only the equal-live pointer placement differs: pool is in sl in the draft, while the ROM spills it and keeps renderOrigin in sl. The already-separated motion setup eliminated the earlier second binding. Declaration reordering is neutral; direct origin-x spelling perturbs loop allocation. Next: solve the fixed twin's shared render-loop pointer-density form and apply it here.
 
-### RisingActor_AdvanceHeight (src/effects/orbit_effect/sub_081FDAF4.c, 081FDAF4): deferred, 5/3
+### RisingActor_AdvanceHeight (src/effects/orbits/orbit_effect/sub_081FDAF4.c, 081FDAF4): deferred, 5/3
 
 Draft: `notes/phase3-drafts/cdp-effects/RisingActor_AdvanceHeight.c`. Removing the zero r4 and state r2 pins together leaves five ROM / three draft rows in this 76-byte leaf. The verified Orbit Volley state/resource layout is retained. Next: express the height update as a returned value (including the missing-return lifetime lever) so zero remains live in r4 and the state destination naturally occupies r2.
 
-### sub_081FDCB0 (src/effects/orbit_effect/sub_081FDCB0.c, 081FDCB0): deferred, 38/30
+### sub_081FDCB0 (src/effects/orbits/orbit_effect/sub_081FDCB0.c, 081FDCB0): deferred, 38/30
 
 Draft: `notes/phase3-drafts/cdp-effects/sub_081FDCB0.c`. The source r1 pin costs only 4/4; the zero-use barrier and especially the memory barrier control the steering-stage schedule and account for four moved branches. The resource and 0x38 trail record types agree with their callers. Next: split steering calculation from trail emission into an inline returning the updated position, so the real call/data dependency replaces the memory fence.
 
-### HomingProjectile_UpdateDefaultState (src/effects/homing_projectile/sub_081FF454.c, 081FF454): deferred, 47/49
+### HomingProjectile_UpdateDefaultState (src/effects/projectiles/homing_projectile/sub_081FF454.c, 081FF454): deferred, 47/49
 
 Draft: `notes/phase3-drafts/cdp-effects/HomingProjectile_UpdateDefaultState.c`. Four constraints steer a saved r5 value, y destination r2, constant one, and delay. Removing them changes 47/49 with five moved branches; the typed projectile lifetime/state layout remains. Next: return the state-transition result directly from each arm and repeat the delay store before each return, shortening both constant lifetimes and eliminating the join allocation.
 
-### ProjectilePool_Update (src/effects/projectile_pool/sub_08202730.c, 08202730): deferred, 20/20
+### ProjectilePool_Update (src/effects/projectiles/projectile_pool/sub_08202730.c, 08202730): deferred, 20/20
 
 Draft: `notes/phase3-drafts/cdp-effects/ProjectilePool_Update.c`. Only two empty operand barriers remain, on the sprite object and velocity; removing both preserves length but rotates 20/20 allocation rows. The live slot (0x128), configuration (0x5c), shared command reader, signed motion, and collider layout are retained. Next: use the shared sprite-step helper with the object and velocity passed as distinct typed arguments, supplying genuine references across the command dispatch.
 
-### SpiralBurst_InitParticles (src/effects/spiral_burst/sub_08234540.c, 08234540): deferred, 49/47
+### SpiralBurst_InitParticles (src/effects/bursts/spiral_burst/sub_08234540.c, 08234540): deferred, 49/47
 
 Draft: `notes/phase3-drafts/cdp-effects/SpiralBurst_InitParticles.c`. The signed cosine-table/direct sine sampling already removed the old barrier. The remaining two pins keep separate effect-table and random-table aliases in r5/r6; removing the random-table pin dominates and introduces three moved branches. Next: convert all draws to the table-first `ParticleRandom_ReadSample`/`ReadDirectSample` helpers while keeping the effect table captured outside the loop.
 ## cdp-field (Codex)
@@ -2586,7 +2586,7 @@ Additional pass-2 allocation attempts:
 
 Queue audit on 2026-11-13 found that 21 of the 26 assigned functions no longer contain a
 concession on the current branch. Their queue scores predate the cleanup already present in
-`src/actors/actor_animation_controller/actor_animation_controller.c`. The five remaining functions are retained below as ordinary-C,
+`src/npc/cutscene_actor/actor_animation_controller.c`. The five remaining functions are retained below as ordinary-C,
 pin-free drafts; `scope.py ... pins FUNC` verified the checked-in forms match and measured each
 removal independently.
 
@@ -2646,7 +2646,7 @@ Tags: #phase3 #field #matching #compiler
 
 The matching partial moves the type calculation after the existing mask barrier.
 This removes the height-byte input barrier without changing any instruction.
-Stock `tools/check.py src/field/scene_objects/scene_object.c` matches all 37 functions (7,236 bytes).
+Stock `tools/check.py src/objects/scene_objects/scene_object.c` matches all 37 functions (7,236 bytes).
 
 Best pin-free draft: `notes/phase3-drafts/dp-field/Scene_TryStepDown.c`
 (18 ROM / 20 draft differing instructions, shape 6). It reads the cell byte into
@@ -2685,7 +2685,7 @@ The matching partial uses `argsPtr->values = values`, removes the redundant
 `argsPtr = &args` before Script_Call, and removes both the argsPtr input barrier
 and r2 pin. The single pointer definition survives GCC's PRE at the correct
 position, and its use for the values field gives the necessary allocation.
-Stock `tools/check.py src/field/items_and_containers/item_container.c`: all 30 functions MATCH (7,024 bytes).
+Stock `tools/check.py src/objects/items/item_container.c`: all 30 functions MATCH (7,024 bytes).
 One actor-output barrier and one actor-index pin remain.
 
 Best pin-free draft: `notes/phase3-drafts/dp-field/Trigger_RunScript.c` (11/9,
@@ -3683,7 +3683,7 @@ them in the plain draft. Next: find a genuine value/control-flow boundary for
 the constant copy without adding a barrier or unrelated arithmetic.
 ## dp-effects-b (Codex)
 
-### SparkParticle_UpdatePool (src/effects/moving_tile_particles/sub_08069FA4.c, 08069FA4): partial, remainder deferred
+### SparkParticle_UpdatePool (src/effects/particles/spark_particles/sub_08069FA4.c, 08069FA4): partial, remainder deferred
 
 Tags: #matching #phase3 #effects #08069FA4
 
@@ -3735,7 +3735,7 @@ as caller line numbers, crashing or editing unrelated caller statements. uid_loc
 now retains filenames, and hoist filters locations to the caller with bounds checks.
 Three regression tests cover this; both required test suites pass.
 
-### SpriteEffectController_QueueColliders (src/effects/sprite_effect_controllers/sub_0806A60C.c, 0806A60C): deferred
+### SpriteEffectController_QueueColliders (src/effects/sprites/sprite_effect_controller/sub_0806A60C.c, 0806A60C): deferred
 
 Tags: #matching #phase3 #effects #0806A60C
 
@@ -3780,7 +3780,7 @@ doing the mask through halves as well gives 7/25. A one-halfword array gives
 12/14 and hoists the mask, reproducing the earlier loop obstacle. No further
 partial matched. Best saved pin-free draft remains unchanged.
 
-### Presentation_UpdateDropShakeBlink (src/effects/scripted_presentation/sub_081E2910.c, 081E2910): resolved
+### Presentation_UpdateDropShakeBlink (src/effects/screen/presentation/sub_081E2910.c, 081E2910): resolved
 
 Tags: #matching #phase3 #presentation #081E2910
 
@@ -3833,7 +3833,7 @@ stores leaves 6/6. These do not change the saved best draft or the diagnosis:
 the late zero's r2 conflict gives the right earlier allocation but ties its own
 address to r3, preventing reuse of the x address in r0.
 
-### RisingActor_AdvanceHeight (src/effects/orbit_effect/sub_081FDAF4.c, 081FDAF4): resolved
+### RisingActor_AdvanceHeight (src/effects/orbits/orbit_effect/sub_081FDAF4.c, 081FDAF4): resolved
 
 Tags: #matching #phase3 #presentation #081FDAF4
 
@@ -4000,7 +4000,7 @@ lifetimes enough to give the table the required allocation order.
 
 Tags: #matching #phase3 #link #compiler
 
-### WirelessGameMenu_InitEquipmentChoices (08038448, src/link/wireless_trade_and_selection_menu/sub_08038448.c)
+### WirelessGameMenu_InitEquipmentChoices (08038448, src/link/wireless/trade_menu/sub_08038448.c)
 
 Best pin-free draft: `notes/phase3-drafts/dp-link/WirelessGameMenu_InitEquipmentChoices.c`.
 It uses the retained structured loops, typed save rows, and the numeric random-table address
@@ -4036,7 +4036,7 @@ the ROM's unused sl save/restore and resulting push grouping/alignment: 8 ROM / 
 Persistent evidence: `build/matchsearch/WirelessGameMenu_InitEquipmentChoices-v2`;
 working sources: `build/cx/work/WirelessGameMenu_InitEquipmentChoices/`.
 
-### sub_080399F4 (080399F4, src/link/wireless_game_items_and_display/wireless_game_items_and_display.c)
+### sub_080399F4 (080399F4, src/link/wireless/battle/wireless_game_items_and_display.c)
 
 Best draft: `notes/phase3-drafts/dp-link/sub_080399F4.c` (22 ROM / 22 draft,
 shape 0, 560 bytes). Only this target and its private sampler are pin-free in the
@@ -4069,7 +4069,7 @@ whole-unit draft; other functions retain their existing concessions. Production 
 
 Persistent evidence: `build/matchsearch/sub_080399F4`; scratch: `build/cx/work/sub_080399F4/`.
 
-### WirelessGameItems_UpdateItemMerge (08039CB0, src/link/wireless_game_items_and_display/wireless_game_items_and_display.c)
+### WirelessGameItems_UpdateItemMerge (08039CB0, src/link/wireless/battle/wireless_game_items_and_display.c)
 
 Best target-clean draft: `notes/phase3-drafts/dp-link/WirelessGameItems_UpdateItemMerge.c`
 (4 ROM / 4 draft, shape 2, 308 bytes). Other functions retain their existing concessions.
@@ -4098,7 +4098,7 @@ the two zero classes distinct, or add a precise CSE substitution diagnostic befo
 Persistent evidence: `build/matchsearch/WirelessGameItems_UpdateItemMerge`;
 scratch: `build/cx/work/WirelessGameItems_UpdateItemMerge/`.
 
-### WirelessGameItems_UpdateIncomingItem (08039EEC, src/link/wireless_game_items_and_display/wireless_game_items_and_display.c)
+### WirelessGameItems_UpdateIncomingItem (08039EEC, src/link/wireless/battle/wireless_game_items_and_display.c)
 
 Best target-clean draft: `notes/phase3-drafts/dp-link/WirelessGameItems_UpdateIncomingItem.c`
 (29 ROM / 29 draft, shape 8, 380 bytes). It uses direct array fields and separate first/second
@@ -4130,7 +4130,7 @@ is unchanged. The direct combined-count form is 27/27, shape 10; the inherited c
 Persistent evidence: `build/matchsearch/WirelessGameItems_UpdateIncomingItem`;
 scratch: `build/cx/work/WirelessGameItems_UpdateIncomingItem/`.
 
-### WirelessGameItems_QueueLocalItem (0803A514, src/link/wireless_game_items_and_display/wireless_game_items_and_display.c)
+### WirelessGameItems_QueueLocalItem (0803A514, src/link/wireless/battle/wireless_game_items_and_display.c)
 
 Target-clean draft: `notes/phase3-drafts/dp-link/WirelessGameItems_QueueLocalItem.c`
 (11 ROM / 9 draft, shape 2, 256 bytes). Production is unchanged. Removing only the
@@ -4156,7 +4156,7 @@ that preserves the separate byte zero. Do not repeat initializer spelling varian
 
 Scratch/evidence: `build/cx/work/WirelessGameItems_QueueLocalItem/`.
 
-### WirelessGameItems_QueueIncomingItem (0803A618, src/link/wireless_game_items_and_display/wireless_game_items_and_display.c)
+### WirelessGameItems_QueueIncomingItem (0803A618, src/link/wireless/battle/wireless_game_items_and_display.c)
 
 Target-clean draft: `notes/phase3-drafts/dp-link/WirelessGameItems_QueueIncomingItem.c`
 (30 ROM / 28 draft, shape 4, 220 bytes). Fresh direct counter fields recover owner,
@@ -4190,7 +4190,7 @@ reset-zero class. Do not repeat the subset or initializer searches.
 Persistent evidence: `build/matchsearch/WirelessGameItems_QueueIncomingItem`;
 scratch: `build/cx/work/WirelessGameItems_QueueIncomingItem/`.
 
-### WirelessGameDisplay_UpdateRoundAnnouncement (0803A844, src/link/wireless_game_items_and_display/wireless_game_items_and_display.c)
+### WirelessGameDisplay_UpdateRoundAnnouncement (0803A844, src/link/wireless/battle/wireless_game_items_and_display.c)
 
 Target-clean draft: `notes/phase3-drafts/dp-link/WirelessGameDisplay_UpdateRoundAnnouncement.c`
 (35 ROM / 33 draft, shape 10, 388 bytes). Shared ParticleRandom_ReadSample draws recover
@@ -4225,7 +4225,7 @@ NOEQUIV bug; a separate tool fix resolves C names before invoking the compiler.
 
 Scratch/evidence: `build/cx/work/WirelessGameDisplay_UpdateRoundAnnouncement/`.
 
-### WirelessResultPanel_UpdateOutcomeReveal (0803B01C, src/link/wireless_result_panel/sub_0803B01C.c)
+### WirelessResultPanel_UpdateOutcomeReveal (0803B01C, src/link/wireless/result_panel/sub_0803B01C.c)
 
 Landed partials remove all four pins and one call-setup barrier. Production matches
 all 264 bytes with three saved-counter barriers left. Sharing one function-scope
@@ -4413,7 +4413,7 @@ Final foreground follow-up: an initialized coordinate union leaves the retained 
 
 ### SingletonSlot7_UpdateEndingScene (081EF914): resolved without concessions
 
-Resolved in the resumed run: a local `u16 phaseReset[1] = {0}` at each transition keeps the separate halfword zero until its byte use. Both remaining pins are removed; stock scope and the complete unit check MATCH at 1392 bytes. The same byte array or byte struct initializer folds into the existing word zero and does not match; changing the phase field to a full-width byte bitfield or array also has no effect. This is the existing halfword-initializer lever (facts 61/67), applied at the two transition sites. The obsolete pin-free draft was removed; the checked implementation is `src/actors/singleton_slot_7/sub_081EF914.c`.
+Resolved in the resumed run: a local `u16 phaseReset[1] = {0}` at each transition keeps the separate halfword zero until its byte use. Both remaining pins are removed; stock scope and the complete unit check MATCH at 1392 bytes. The same byte array or byte struct initializer folds into the existing word zero and does not match; changing the phase field to a full-width byte bitfield or array also has no effect. This is the existing halfword-initializer lever (facts 61/67), applied at the two transition sites. The obsolete pin-free draft was removed; the checked implementation is `src/bosses/vanargand/sub_081EF914.c`.
 
 Previous draft: ROM 1392 bytes, draft 1388; 9 ROM / 7 draft instructions, shape 4. A local copy of the playback wrapper's state parameter restores both r4 state/r5 mask allocations. Both original r5 pins are removed in the checked source. `AGBCC_FORCE=one:5` confirmed one allocation region; the local-copy C fixes both regions, with the same result from the shared DisplaySequence_StepSprite helper.
 
@@ -4423,7 +4423,7 @@ Tried: byte masks, longer-lived mask uses, byte-union masks, wrapper-local state
 
 Next: derive the separate narrow zero from the transition's original representation, without extending its life out of the case. The first timer pointer's displacement is a consequence of the missing local byte-zero allocation, not an independent pin requirement.
 
-### AnimatedParticle_PriorityFromFlags (080154D0, src/effects/animated_particles/sub_080154D0.c): stopped at run end, DEBUG_NOP remains
+### AnimatedParticle_PriorityFromFlags (080154D0, src/effects/particles/groups/sub_080154D0.c): stopped at run end, DEBUG_NOP remains
 
 The production source is unchanged and still passes the stock 28-byte unit check.
 Removing DEBUG_NOP gives 7 ROM / 5 draft differences: regmove ties the AND result
@@ -4462,7 +4462,7 @@ flags-side AND destination. The owner's end-of-run instruction stopped this
 item; later queue entries were not started.
 
 
-### AnimatedParticles_Create (080154EC, src/effects/animated_particles/sub_080154EC.c): partial, saved-state pin and barrier removed
+### AnimatedParticles_Create (080154EC, src/effects/particles/groups/sub_080154EC.c): partial, saved-state pin and barrier removed
 
 The complete 1176-byte unit matches after removing the saved-state operand
 barrier and register pin. Type 5 saves a branch-local `first` pointer and jumps
@@ -4580,7 +4580,7 @@ Next: recover a natural short-lived sine operand or another table view whose
 allocation precedes heading; a one-use statement macro would only hide the
 priority knob and must not be used.
 
-### WirelessResultPanel_Init (0803B40C, src/link/wireless_result_panel/sub_0803B40C.c)
+### WirelessResultPanel_Init (0803B40C, src/link/wireless/result_panel/sub_0803B40C.c)
 
 Stopped at the explicit end-of-run request. Production is unchanged and independently
 checks MATCH (684 bytes). All eleven pins and three barriers remain there. The clean
@@ -4617,7 +4617,7 @@ Do not claim the spill override as a match or land the diagnostic partial.
 
 Scratch/evidence: `build/cx/work/WirelessResultPanel_Init/`.
 
-### EncodedRecord_XorRange (08044D6C, src/link/encoded_records_and_password_payloads/sub_08044D6C.c)
+### EncodedRecord_XorRange (08044D6C, src/link/encoded_records/sub_08044D6C.c)
 
 Landed removal of the volatile skip parameter: stock unit MATCH, 100 bytes. One
 current-pointer pin and two barriers remain. Fully clean draft is saved at
@@ -4647,7 +4647,7 @@ CSE diagnostics to isolate the copy substitution rather than the class-head prob
 Scratch: `build/cx/work/EncodedRecord_XorRange/`; persistent search:
 `build/matchsearch/EncodedRecord_XorRange/`.
 
-### sub_08108C94 (08108C94, src/link/link_handshake/sub_08108C94.c)
+### sub_08108C94 (08108C94, src/link/handshake/sub_08108C94.c)
 
 Both original pins remain; no production change. Best clean draft saved at
 `notes/phase3-drafts/dp-link/sub_08108C94.c`: 7 ROM / 7 draft differences, shape 2.

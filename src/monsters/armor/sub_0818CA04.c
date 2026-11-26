@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 struct Obj {
     u32 flags;
     u8 pad4[0x2];

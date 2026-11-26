@@ -1,6 +1,6 @@
-#include "actors/paired_scene_actor/paired_scene_actor.h"
-#include "engine/shared/engine_globals.h"
-#include "engine/shared/ram.h"
+#include "bosses/vanargand/paired_scene_actor.h"
+#include "engine/engine_globals.h"
+#include "engine/ram.h"
 // confidence=low: command 9 alternates the selected pair halves for six timed attacks.
 struct Vanargand {
     u8 pad0[0x9C];

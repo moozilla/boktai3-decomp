@@ -29,7 +29,7 @@ exports.grid = () => {
   return { w, h, cells, at: (x, z) => (x < 0 || z < 0 || x >= w || z >= h ? null : cells[z * w + x]) };
 };
 
-// Scene objects (src/field/scene_objects/scene_object.c, gSceneObjectManager->objects): blocks and
+// Scene objects (src/objects/scene_objects/scene_object.c, gSceneObjectManager->objects): blocks and
 // crates. An idle one (kind 0) can be pushed (SceneObjects_TryPushNeighbor) from a
 // cell one level below its top; type 1 movable block, 5 limited pushes.
 exports.blocks = () => {
@@ -438,7 +438,7 @@ exports.hitAt = function* (tx, tz, opts = {}) {
   return { done: done(), hits, lines };
 };
 
-// The weapon in hand (src/player/sub_081401A0.c Player_RefreshActionEquipment): GameState+0x50
+// The weapon in hand (src/player/stats/sub_081401A0.c Player_RefreshActionEquipment): GameState+0x50
 // is the selected slot of the equip list at +0x68 (0-7 swords, 8-15 the Gun Del Sol with a
 // frame); the gun's lens is lenses[slots88[4 + actionAuxiliarySlot]] (+0x828, +0x90, +0x54),
 // whose id is the element mode Player_GetAttackAttributeFlags maps to reaction flags.
@@ -465,7 +465,7 @@ exports.quickChange = function* (want) {
   return { done: false, ...exports.weapon() };
 };
 
-// Wait for energy in sunlight (src/field/rectangular_area_effects/sub_0804E618.c: the area effect adds gGameState->unk876,
+// Wait for energy in sunlight (src/scene/area_effect/sub_0804E618.c: the area effect adds gGameState->unk876,
 // the sun level, per frame; 120 make one energy). The light is the solar sensor (session
 // setSolar: 0 bright .. 255 dark), written into the ROM script as `lux` lines.
 exports.chargeEnergy = function* (need, opts = {}) {
@@ -479,7 +479,7 @@ exports.chargeEnergy = function* (need, opts = {}) {
 };
 
 // The pause menu (START) lives in the field HUD task (Hud_UpdateWithCallback,
-// src/menus/hud/sub_08178B98.c): its state is the callback at +0xA50 (SceneHud_UpdatePageInput,
+// src/ui/hud/display/sub_08178B98.c): its state is the callback at +0xA50 (SceneHud_UpdatePageInput,
 // PauseMenu_UpdateItemActions, ...), the page at +0x1414 (1 items, 2 valuables, ...), the
 // grid cursor at +0x4384 (Inventory_InitializeSelectionGrid; +0x4387 the cell id).
 exports.hudTask = () => { const t = exports.tasks().find((x) => !x.dead && x.update === 'Hud_UpdateWithCallback'); return t ? Number(t.task) : 0; };
@@ -537,7 +537,7 @@ exports.menuSearch = function* (goal, opts = {}) {
   return { done: !!found, keys: found ? found.join(' ') : null, states: seen.size, expanded, frames: g.frameNo - start, closed: !exports.menuState() || exports.menuState().callback === fieldCb };
 };
 
-// Live Breakables (src/field/pooled_interactables/pooled_interactable.c: gPooledInteractableManager slots): script id
+// Live Breakables (src/objects/breakable.c: gPooledInteractableManager slots): script id
 // and state (1 unlit / 2 lit for a candlestick; Breakable_OnHit moves them on).
 exports.breakables = () => {
   const m = $.gPooledInteractableManager;
@@ -557,19 +557,19 @@ exports.breakBlock = function* (block, opts = {}) {
   return { ...r, health: (exports.blocks().find((b) => b.slot === block.slot) || {}).health };
 };
 
-// A town map (src/menus/registry_3_f74/registry_choice_menu.c, registry key 3F74): a cursor (src/menus/menu_cursor/menu_cursor.c)
+// A town map (src/ui/town/town_map.c, registry key 3F74): a cursor (src/ui/widgets/menu_cursor.c)
 // moved freely with the D-pad over 11 entries; A on an entry runs its script (stages.json
 // doors with "hub": index). hub() is the live menu or null.
 exports.hub = () => {
   // a town map (Registry3F74, 11 entries) or San Miguel's gate (RegistrySelection,
-  // src/other/registry_selection/registry_selection_menu.c, 9 entries with enabled flags)
+  // src/ui/world_map.c, 9 entries with enabled flags)
   const t = exports.tasks().find((x) => !x.dead && (x.update === 'Registry3F74_OnUpdate' || x.update === 'RegistrySelection_OnUpdate'));
   if (!t) return null;
   const sel = t.update === 'RegistrySelection_OnUpdate';
   const menu = g.at(Number(t.task), sel ? 'struct RegistrySelectionMenu' : 'struct RegistryChoiceMenu');
   const ptr = sel ? menu.selectionCursor : menu.cursor;
   const cursor = ptr ? g.at(Number(ptr.$addr ?? ptr), 'struct MenuCursor') : null;
-  // ready: the cursor reads input (src/menus/menu_cursor/menu_cursor.c MenuCursor_UpdateInput)
+  // ready: the cursor reads input (src/ui/widgets/menu_cursor.c MenuCursor_UpdateInput)
   const ready = !!cursor && !!cursor.callback && g.name(cursor.callback) === 'MenuCursor_UpdateInput';
   return { menu, cursor, kind: sel ? '2388' : '3F74', ready, state: ready ? 'Registry3F74_UpdateSelection' : (menu.update ? g.name(menu.update) : '-') };
 };
@@ -597,13 +597,13 @@ exports.chooseHub = function* (index, opts = {}) {
   return { done: false, reason: 'out of frames' };
 };
 
-// The story counter: r708[0x3c], r708 = gGameVariables (src/engine/script_virtual_machine/script_virtual_machine.c
+// The story counter: r708[0x3c], r708 = gGameVariables (src/script/script_virtual_machine.c
 // Script_DecodeVariableValue).
 // San Miguel's facility flags r708[0x19a.0][i] (one bit each; proc 2566 needs ten of them).
 exports.facilities = () => { const b = g.u32(g.types.globals.gGameVariables.addr); if (!b) return []; const v = g.u16(b + 0x19a) | (g.u8(b + 0x19c) << 16); const out = []; for (let i = 0; i < 16; i++) if (v & (1 << i)) out.push(i); return out; };
 exports.story = () => { const b = g.u32(g.types.globals.gGameVariables.addr); return b ? g.u8(b + 0x3c) : null; };
 
-// People in a town (src/actors/scene_actor_resources_and_lifecycle/scene_actor_lifecycle.c SceneActorManager: head, then each
+// People in a town (src/npc/manager/scene_actor_lifecycle.c SceneActorManager: head, then each
 // actor's previous; body.id is the character's id as place_character gives it).
 exports.people = () => {
   const t = exports.tasks().find((x) => !x.dead && x.update === 'SceneActorManager_Update');
@@ -691,7 +691,7 @@ exports.push = function* (step, opts = {}) {
 
 // Enemies: the scene-actor registry list (gSceneActorRegistryNode: {next, actor},
 // ending at a node with a NULL actor). Living as SceneActorRegistry_CountLiving
-// counts them: health > 0 and status bit 0x20000 clear. src/fn/sub_080703A8.c.
+// counts them: health > 0 and status bit 0x20000 clear. src/scene/actor/registry/sub_080703A8.c.
 exports.enemies = () => {
   const out = [];
   let node = g.u32(g.types.globals.gSceneActorRegistryNode.addr);

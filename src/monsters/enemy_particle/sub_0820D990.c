@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 
 void EnemyParticle_SetMotionParameters(u8 *p, u16 a, u16 b, u8 c, u32 d)
 {

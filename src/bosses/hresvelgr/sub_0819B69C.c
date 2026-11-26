@@ -1,4 +1,4 @@
-#include "engine/shared/scalar_approach.h"
+#include "engine/math/scalar_approach.h"
 s32 Div(s32, s32);
 void sub_0819B69C(s16 *values, const s16 *targets, s32 count, s32 divisor)
 {

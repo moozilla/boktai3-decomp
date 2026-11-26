@@ -1,5 +1,5 @@
-#include "engine/shared/global.h"
-#include "engine/shared/engine.h"
+#include "global.h"
+#include "engine/engine.h"
 
 struct ArmorSpriteColliderPart {
     u8 sprite[0x9C];

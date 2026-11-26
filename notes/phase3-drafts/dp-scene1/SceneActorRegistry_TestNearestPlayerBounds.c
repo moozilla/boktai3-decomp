@@ -1,6 +1,6 @@
-#include "scene_actor_registry.h"
-#include "player.h"
-#include "ram.h"
+#include "scene/actor/scene_actor_registry.h"
+#include "player/player.h"
+#include "engine/ram.h"
 s32 Path_GetPointPositionById(u16 *, u32, u32);
 struct SceneActorBoundsRouteView {
     u8 unknown0[0x458];

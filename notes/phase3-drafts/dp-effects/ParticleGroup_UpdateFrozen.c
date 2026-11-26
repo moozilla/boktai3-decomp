@@ -1,5 +1,5 @@
 #include "global.h"
-#include "engine.h"
+#include "engine/engine.h"
 struct PGroup {
     u8 active, count, type, priority;
     u8 particles[448];

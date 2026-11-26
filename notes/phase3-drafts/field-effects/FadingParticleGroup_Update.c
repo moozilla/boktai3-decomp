@@ -1,7 +1,7 @@
-// FadingParticleGroup_Update (src/effects/fading_particle_groups/sub_08016118.c) without its memory barrier: 43 ROM / 43 draft.
+// FadingParticleGroup_Update (src/effects/particles/groups/sub_08016118.c) without its memory barrier: 43 ROM / 43 draft.
 #include "global.h"
-#include "ram.h"
-#include "display_sequence_inline.h"
+#include "engine/ram.h"
+#include "engine/video/display_sequence_inline.h"
 // MATCHING_CONCESSION: register-pinning
 struct Vec {
     s16 x, y, z, pad;

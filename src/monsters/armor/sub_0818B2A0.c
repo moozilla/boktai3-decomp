@@ -1,7 +1,7 @@
-#include "engine/shared/global.h"
-#include "engine/shared/contact_collider.h"
-#include "engine/shared/ram.h"
-#include "engine/shared/scene_combat_colliders.h"
+#include "global.h"
+#include "scene/actor/contact_collider.h"
+#include "engine/ram.h"
+#include "monsters/armor/scene_combat_colliders.h"
 
 struct Obj {
     u8 pad0[0x190];

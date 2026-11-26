@@ -1,5 +1,5 @@
-#include "script_virtual_machine.h"
-#include "ram.h"
+#include "script/script_virtual_machine.h"
+#include "engine/ram.h"
 
 void GameState_SelectRamBase(void)
 {

@@ -1,10 +1,10 @@
 #ifndef GUARD_AXE_H
 #define GUARD_AXE_H
 
-#include "engine/shared/chase_actor.h"
-#include "engine/interrupts_and_video/sprite.h"
-#include "engine/shared/display_sequence.h"
-#include "engine/shared/contact_swarm.h"
+#include "monsters/chase_actor.h"
+#include "engine/video/sprite.h"
+#include "engine/video/display_sequence.h"
+#include "scene/actor/contact_swarm.h"
 
 /* One of the four afterimage sprites the axe leaves along its path (struct Axe + 0x708). */
 struct AxeTrailSlot {

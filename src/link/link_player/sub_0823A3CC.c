@@ -1,7 +1,7 @@
-#include "engine/shared/global.h"
-#include "engine/shared/link_session_state.h"
-#include "engine/shared/ram.h"
-#include "engine/shared/player.h"
+#include "global.h"
+#include "link/session/link_session_state.h"
+#include "engine/ram.h"
+#include "player/player.h"
 void sub_08232264(void *, void *, s32, s32, s32);
 void Shadow_Initialize(void *, void *, s32);
 void *SceneParticlePool_EnsureSingleton(void);

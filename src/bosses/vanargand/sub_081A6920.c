@@ -1,8 +1,8 @@
-#include "engine/shared/global.h"
-#include "engine/shared/render.h"
-#include "engine/shared/engine.h"
-#include "engine/shared/ram.h"
-#include "field/group_objects/group_objects.h"
+#include "global.h"
+#include "engine/video/render.h"
+#include "engine/engine.h"
+#include "engine/ram.h"
+#include "effects/scene/bat_flock.h"
 #define gRandomTableIndex gRandomIndex
 
 struct ScreenPaletteTransition {

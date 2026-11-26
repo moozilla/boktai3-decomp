@@ -1,6 +1,6 @@
-#include "engine/shared/global.h"
-#include "engine/shared/engine_globals.h"
-#include "engine/shared/ram.h"
+#include "global.h"
+#include "engine/engine_globals.h"
+#include "engine/ram.h"
 struct A {
     u8 f0[6];
     u8 b6;

@@ -1,4 +1,4 @@
-#include "engine/shared/global.h"
+#include "global.h"
 struct ActorEffectStatus {
     u8 unknown0[0x38];
     u32 flags;

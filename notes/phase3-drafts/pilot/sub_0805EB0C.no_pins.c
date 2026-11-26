@@ -1,5 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
-#include "scene_input_panel.h"
+#include "ui/widgets/scene_input_panel.h"
 void SceneInputPanel_InitWidgets(struct SceneInputPanel *owner, s32 mode)
 {
     struct SceneInputPanel *incoming = owner;
