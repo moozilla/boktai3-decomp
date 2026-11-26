@@ -8,7 +8,7 @@ u8 *TerrainModifiers_FindCellOverride(s32, s32);
 void SceneActorAttachment_ReplaceResponseSlot(void *, u32, u32, u32);
 struct ReturnResponseGroup {
     u8 unknown0[0x7C];
-    s16 *coordinates;
+    struct SceneActorChaseRoutePoint *point;
     u8 unknown80[8];
     struct SceneActorPositionSource **source;
     struct SceneActorReactionCommand command;
@@ -19,7 +19,7 @@ struct ReturnResponseGroup {
 
 struct ReturnResponseCoordinates {
     u8 unknown0[8];
-    s16 *coordinates;
+    struct SceneActorChaseRoutePoint *point;
 };
 
 static inline void ClearMotionFlag(struct ChaseActor *actor, u32 flag)
@@ -83,7 +83,7 @@ static inline u8 MoveTo(struct ChaseActor *owner, struct ChaseActor *actor,
 
 static inline void SetCoordinates(struct ContactPosition *out, struct ReturnResponseGroup *group)
 {
-    struct SceneActorChaseRoutePoint *point = (void *)group->coordinates;
+    struct SceneActorChaseRoutePoint *point = group->point;
     out->x = point->x;
     out->z = point->z;
     out->y = HeightAt(out);
@@ -127,8 +127,8 @@ void SceneActorAttachment_BeginReturnResponse(struct ChaseActor *actor)
     SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0);
     destination = actor->group.destination;
     source = (void *)&actor->group.homeRoute;
-    destination->x = source->coordinates[0];
-    destination->z = source->coordinates[1];
+    destination->x = source->point->x;
+    destination->z = source->point->z;
     destination->y = HeightAt(destination);
     if (!MoveToSource(owner, actor, group, group->source)) {
         SetCoordinates(&position, group);
