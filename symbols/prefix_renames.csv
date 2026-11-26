@@ -27,8 +27,8 @@ SceneObjects_,PuzzleBlocks_,src/field/scene_objects,"0029→3955, E02A IDs 0EEC 
 SceneObject_,SlidingDoor_,src/actors/scene_object_controller,"0054→5297 D4E3 slot with opening/closing states, sprites 7ACD and 7AD3."
 SceneScriptObject_,DungeonScenery_,src/field/scene_script_object,0029→3905 with 3D91/B07C. Sword strike runs the flash and burst paths.
 SceneNpc_,Otenko_,src/actors/scene_npc,0000/2201 visible field companion. BB34 at 2544 loads Otenko sprite 97D3. Scope to this unit.
-Actor_BeginAnimationPhase,OtenkoTutorial_BeginAnimationPhase,src/actors/actor_animation_controller/actor_animation_controller.c,GCL tutorial procs 1474→1482 create 8AAB. 1484 uses animation phase commands in the tutorial.
-StateActor_,StoryCharacter_,src/actors/state_actor_kind_086121_c4,51 scoped functions. Kind 27 Trinity runs dash/animation after breaking the White Forest barrier at 3931. The 4915 kind 28 action uses the same family.
+Actor_BeginAnimationPhase,OtenkoTutorial_BeginAnimationPhase,src/actors/actor_animation_controller/actor_animation_controller.c,GCL 1481→1474→1482 uses 8AAB to create and 5B01 to configure the Otenko tutorial actor. The staged screen and trace reach 081EA1C0 and its phase routines.
+StateActor_,StoryCharacter_,src/actors/state_actor_kind_086121_c4,"The 51 scoped functions animate Trinity (kinds 27 and 28 at 3931 and 4915) and share the story dispatch family used for Sabata’s projection (kind 29, 6587)."
 SceneCatalog_,PauseStatus_,"src/menus/scene_catalog, addresses 08174F14–08175854","0032→4217, Status tab. Scope to SetDescription, GetLevelScaledValue, SetSelection, ResetTextWindow and SelectDescription. The three settings functions are outside this scope."
 BurstEmitter_,SparkExplosion_,src/effects/five_slot_burst_emitter,Staged GCL 1043→1488/8639 shows a spark blast and smoke tail.
 SparkleEmitter_,CutsceneSparkles_,src/effects/sparkle_emitter,"Trinity release proc 3845 uses 3D64, instance A3E7 and CC88 green sparkle."

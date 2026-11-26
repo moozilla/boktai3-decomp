@@ -1172,3 +1172,37 @@ by their pass-three order. All paths in the table are under
 | `objects/directional_controller.c` | 0029→3955, `resume-hint-actions/prompt-1-1.png`. A selects the 883A sign position and opens the Fireball hint. Use `objects/interaction_prompts.c`. |
 | `objects/tile_trigger.c` | 0013→3161, `resume-floor-walk/trap.png`. Original 2FA5 runs its press and contact from Django stepping into the slot after repositioning. The renderer binds A945 to the displacement. Use `objects/floor_traps.c`. |
 | `objects/breakable.c` | 0038→4479, `resume-candlestick/lit.png`. ID B8CC uses F099 and its hit callback invokes the lighting script and brightens the doorway. Use `objects/light_fixtures.c`. |
+
+## Pass 3 NPC paths, rows 12–15
+
+Tags: Otenko, Kuro, Trinity, Sabata projection, BB34, D774, 8EA3, 5B01
+
+1. `npc/scripted_npc` is Otenko's field actor. BB34 always loads 97D3 in
+   its constructor. It appears in stock 0000's 2201 garage and 0085's 6612
+   ending. The latter checkpoint runs `SceneNpc_OnModeUpdate` while Otenko
+   is the named speaker in `bank/0085/checkpoint.png`. Proc 6317 uses BB34
+   in a separate finale branch and reuses the same constructor.
+2. `npc/tagged_npc` is Kuro. D774 is the constructor in proc 1790. The
+   preceding 1789 resets related script variables. The 2537 speaker and
+   the in-room render replay tie E00E and ID 51E2 to Kuro, as above.
+3. `npc/story_character` is the shared cast dispatcher. Kind 27 is
+   Trinity in the 3931 White Forest shatter cutscene. For kind 28, stock
+   0046 invokes proc 4914 and 1677, allocates 59B0 at frame 1470, and
+   loads 35E3 one frame later. `StateActor_StartKind28Animation4` runs
+   on the same actor during the Nidhoggr room setup. At entrance 57 the
+   story sequence plays Trinity's dialogue #7360 and #7362. See
+   `grid-ident/message27.png`. For kind 29, warp 0001 to 6587 entrance
+   62, story 1. 8EA3 allocates 177C and loads DE23 at frame 1473.
+   `pass3-cast-kind29/line06.png` shows the purple Sabata projection.
+   Text #8232 and #8233 name Sabata and refer to the phantom disappearing.
+   These are witnessed kind assignments and the engine's other kind
+   numbers still need a cast inventory. Keep the shared StoryCharacter
+   destination and use the scoped prefix.
+4. `npc/cutscene_actor` includes the animated Otenko tutorial controller.
+   Original proc 1481 dispatches the boot tutorial through 1474. Proc
+   1482 spawns 8AAB and sends 5B01 (`Actor_ConfigureFromScript`, 081EA1C0).
+   The `review-native-tutorial` replay calls 1482 and draws Otenko in
+   `created.png`. Keep the separate Params3D0 title display in `ui/title`.
+
+Use `build/identify/pass3/npc_gcl.py` and `npc_calls.py` to list keyed
+placements and callers. `replay_cast.py` holds the kind 28 and 29 tapes.

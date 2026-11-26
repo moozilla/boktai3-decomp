@@ -1,13 +1,13 @@
 current_path,new_path,note
 src/actors/actor_animation_controller,src/ui/title,The four Params3D0 files build the live title emblem at boot. Keep the tutorial Otenko main file on its own per-file route.
-src/actors/actor_animation_controller/actor_animation_controller.c,src/ui/title/tutorial_otenko.c,Tutorial dispatcher uses 8AAB to create the visible Otenko actor for the title/Options tutorial.
+src/actors/actor_animation_controller/actor_animation_controller.c,src/ui/title/tutorial_otenko.c,Tutorial dispatcher uses 8AAB to create the visible Otenko actor for the title/Options tutorial. Proc 1482 configures the visible sunflower with key 5B01.
 src/actors/actor_display,src/bosses/vanargand,"GCL 6325 calls 6314, which creates registry 5856 with actor ID 7C56 (Vanargand). The head is on the left during Django’s bike chase."
 src/actors/actor_recoil,src/minigames/coffin_bike,A 6274 ride hits the crates and executes the named recoil functions. The same state at idle does not enter the recoil code. ActorParticles_SpawnImpactBurst runs at frame 2276.
 src/actors/contact_burst_effects,src/bosses/nidhoggr,GCL key 917F. Dialogue in scene 4915 identifies the visible opponent as Nidhoggr (#7368). His defeat unlocks Book index 80 (#9918). Scene 6425 replays the fight.
 src/actors/grid_attack_actor,src/bosses/nidhoggr,GCL key 917F. Dialogue in scene 4915 identifies the visible opponent as Nidhoggr (#7368). His defeat unlocks Book index 80 (#9918). Scene 6425 replays the fight.
 src/actors/orbit_contact_actor,src/bosses/nidhoggr,GCL key 917F. Dialogue in scene 4915 identifies the visible opponent as Nidhoggr (#7368). His defeat unlocks Book index 80 (#9918). Scene 6425 replays the fight.
 src/actors/registry_a8_cb,src/npc/sabata_rider,Proc 6316 creates A8CB in the Sabata ending branch. The purple bike is on screen alongside Django’s separate E881 bike. The dialogue lookup names Sabata (#5585).
-src/actors/scene_npc,src/npc/otenko,BB34 and resource 97D3 witness Otenko in the garage and home at 2201/2544. This unit owns the field companion and its transition effect.
+src/actors/scene_npc,src/npc/otenko,BB34 and resource 97D3 witness Otenko in the garage and home at 2201/2544. This unit owns the field companion and its transition effect. The named Otenko ending at 0085→6612 runs the same update.
 src/actors/scene_object_controller,src/objects/sliding_doors,0054→5297. 6D69 controller holds D4E3 door slots and loads the 7ACD/7AD3 sliding door graphics. The E02A puzzle block task has a separate lifetime.
 src/actors/script_combat_actor,src/monsters/muspell_head,GCL 3991 → 1604 → 1606 creates key 5153. Book index 31 (#9869). The head in package 7E7D is visible next to Django after moving the player onto the neighboring tile.
 src/actors/sequence_contact_actor_pool,src/bosses/nidhoggr,GCL key 917F. Dialogue in scene 4915 identifies the visible opponent as Nidhoggr (#7368). His defeat unlocks Book index 80 (#9918). Scene 6425 replays the fight.
