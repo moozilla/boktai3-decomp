@@ -1,27 +1,14 @@
-#include "global.h"
-#define B(o) (*(u8 *)((u8 *)p + (o)))
-#define W(o) (*(u32 *)((u8 *)p + (o)))
-struct S {
-    u8 f[1];
-    u8 b1;
-    u8 f2[5];
-    u8 b7;
-    u8 b8;
-    u8 b9;
-    u8 g[0xd4 - 0xa];
-    u8 d4[1];
-};
-void Actor_PlayAnimationEntry(void *, u32, u32, u32, u32);
-s32 DisplayAnimation_TestFinished(void *);
-void StoryCharacter_UpdateAnimation6State(u32 a, struct S *p)
+#include "npc/manager/scene_actor_lifecycle.h"
+s32 DisplayAnimation_TestFinished(struct DisplayAnimation *);
+void StoryCharacter_UpdateAnimation6State(u32 a, struct SceneActor *p)
 {
     u32 r;
     s32 state;
 
-    if (p->b9 != 0) {
-        p->b9 = 0;
-        p->b7 = 0;
-        switch (p->b1) {
+    if (p->animationEntered != 0) {
+        p->animationEntered = 0;
+        p->finished = 0;
+        switch (p->variant) {
             case 4:
             case 5:
             case 6:
@@ -57,17 +44,17 @@ void StoryCharacter_UpdateAnimation6State(u32 a, struct S *p)
                 break;
         }
         Actor_PlayAnimationEntry(p, r, 2, 1, 4);
-        B(0x18) = 0;
+        p->animationPhase = 0;
     }
 
-    state = B(0x18);
+    state = p->animationPhase;
     switch (state) {
         case 0:
-            if (DisplayAnimation_TestFinished(p->d4) == 0)
+            if (DisplayAnimation_TestFinished(&p->drawable.common) == 0)
                 break;
-            B(0x18)++;
-            W(0x10) = state;
-            switch (p->b1) {
+            p->animationPhase++;
+            p->stateFrame = state;
+            switch (p->variant) {
                 case 4:
                 case 5:
                 case 6:
@@ -106,10 +93,10 @@ void StoryCharacter_UpdateAnimation6State(u32 a, struct S *p)
             break;
         case 1:
         case 2:
-            if (DisplayAnimation_TestFinished(p->d4) == 0)
+            if (DisplayAnimation_TestFinished(&p->drawable.common) == 0)
                 break;
-            if (B(0x18) == 2) {
-                switch (p->b1) {
+            if (p->animationPhase == 2) {
+                switch (p->variant) {
                     case 4:
                     case 5:
                     case 6:
@@ -146,13 +133,13 @@ void StoryCharacter_UpdateAnimation6State(u32 a, struct S *p)
                 }
                 Actor_PlayAnimationEntry(p, r, 2, 1, 4);
             }
-            B(0x18)++;
+            p->animationPhase++;
             break;
         case 3:
-            if (DisplayAnimation_TestFinished(p->d4) == 0)
+            if (DisplayAnimation_TestFinished(&p->drawable.common) == 0)
                 break;
             Actor_PlayAnimationEntry(p, 0, 2, 1, 4);
-            p->b7 = 1;
+            p->finished = 1;
             break;
     }
 }
