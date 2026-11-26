@@ -8,7 +8,7 @@
 u32 SceneActorPalette_IsTransitionComplete(void)
 {
     u32 id;
-    struct SceneActorPaletteManagerView *manager = (void *)gSceneActorRegistryManager;
+    struct SceneActorRegistryManager *manager = gSceneActorRegistryManager;
     if (manager == NULL || !WordFlags_Has(0x2000, &manager->flags))
         return 1;
     if (SceneActorControl_TestFlags(gEngineFlags, 0x4800))

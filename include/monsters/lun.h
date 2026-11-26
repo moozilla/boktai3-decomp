@@ -4,6 +4,7 @@
 #include "link/session/room_actor.h"
 #include "scene/actor/scene_actor_group.h"
 #include "scene/motion/scene_actor_motion.h"
+#include "scene/motion/scene_actor_route.h"
 
 /* Lun's class fields past the room actor (Lun_Create allocates 0x44C bytes; provisional). */
 struct Lun {
@@ -22,7 +23,11 @@ struct Lun {
     struct SceneActorMotionSubject curveSubject;
     u8 unknown3FC[0x18];
     struct ContactPosition curveStart, curveEnd, routeMotion;
-    struct SceneActorRegistryRoute route;
+    /* Script placement and route playback share this cursor. */
+    union {
+        struct SceneActorRegistryRoute registry;
+        struct SceneActorRouteCursor cursor;
+    } route;
     u8 unknown440[2];
     u16 field442, routeDelay;
     u8 unknown446[6];

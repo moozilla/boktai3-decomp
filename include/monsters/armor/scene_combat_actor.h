@@ -2,6 +2,7 @@
 #define GUARD_SCENE_COMBAT_ACTOR_H
 #include "scene/collision/contact_collider.h"
 #include "monsters/armor/armor_palette_controller.h"
+#include "monsters/armor/armor_part_queue.h"
 
 struct ParticleVector {
     s32 x : 16, y : 16, z : 16;
@@ -101,9 +102,11 @@ struct SceneCombatActor {
     u8 behavior, behaviorPhase, behaviorCounter;
     u8 action, actionPhase, actionReady, actionCounter, animationComplete;
     u8 shakeStrength;
-    u8 unknownB45[0x5DB];
+    u8 unknownB45[0x13];
+    struct ArmorLaunchGroup parts;
     struct SceneCombatState state;
 };
+typedef char SceneCombatActorSize[(sizeof(struct SceneCombatActor) == 0x1134) ? 1 : -1];
 
 s32 Callback_InvokeActor(void *, void *);
 void Sprite_UnlinkFromList(void *, u32);

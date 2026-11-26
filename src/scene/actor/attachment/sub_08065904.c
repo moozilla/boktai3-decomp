@@ -9,12 +9,12 @@ void ActorAttachment_UpdateValueFrame(struct ActorAttachmentSlotView *input)
     if (!finished) {
         struct ActorAttachmentSlotView *view = slot;
         s16 *value;
-        s16 new_var;
+        s16 sampledValue;
         s32 current;
         s16 *sample;
         value = view->value;
-        new_var = *value;
-        current = new_var;
+        sampledValue = *value;
+        current = sampledValue;
         sample = value;
         if (current <= 0) {
             s16 *timer = &slot->timer;

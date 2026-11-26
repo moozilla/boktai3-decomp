@@ -4,11 +4,7 @@
 #include "engine/ram.h"
 #include "engine/engine_globals.h"
 #include "engine/input.h"
-struct Task {
-    u8 pad[24];
-    s32 state, counter;
-};
-extern u8 *gGameState;
+#include "system/game_state/game_state.h"
 void System_ShutdownAndSoftReset(void);
 void SceneLifecycle_InitSceneState(void);
 void Script_ResetLocalVariables(void);
@@ -22,14 +18,14 @@ void GameState_BackupActiveRegions(void);
 void GameState_RestoreActiveRegions(void);
 void Script_SetEntryProcedure(s32);
 void SunClock_Refresh(void);
-s32 SceneLifecycle_UpdateTask(struct Task *task)
+s32 SceneLifecycle_UpdateTask(struct SceneRuntimeTask *task)
 {
     if (!gSceneDialogActive) {
-        if (!((*(u16 *)gPadState) & 2))
+        if (!(gPadState[0] & 2))
             goto update;
-        if (!((*(u16 *)gPadState) & 1))
+        if (!(gPadState[0] & 1))
             goto update;
-        if ((12 & (*(u16 *)gPadState)) != 12)
+        if ((12 & gPadState[0]) != 12)
             goto update;
         System_ShutdownAndSoftReset();
         return 0;
@@ -106,7 +102,7 @@ update: {
                 GameState_BackupActiveRegions();
             else if (gSceneTransitionFlags & 0x100) {
                 GameState_RestoreActiveRegions();
-                Script_SetEntryProcedure(*(s16 *)(gGameState + 0x5A4));
+                Script_SetEntryProcedure(*(s16 *)&gGameState->unk5A4);
             }
             task->state = 0;
             break;
@@ -120,7 +116,7 @@ update: {
         (*((u32 *)gSessionState))++;
     gRuntimeFrameCounter++;
     if (gPlayTimeCounterEnabled) {
-        s32 *counter = (s32 *)(gGameState + 0x614);
+        s32 *counter = &gGameState->unk614;
         if (*counter <= 0x7FFFFFFE)
             (*counter)++;
     }

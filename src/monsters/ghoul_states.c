@@ -293,7 +293,7 @@ void Ghoul_UpdateHiddenRecovery(struct ChaseActor *actor, s32 frame, u32 unused)
 {
     u32 queued = SceneActorReaction_TakePrepared(actor);
     if (queued) {
-        ActorStatus_SetDrawableFlags(actor, 1);
+        ActorStatus_SetBodyBit(actor, 1);
         ActorShadow_Disable(actor->base.shadow);
     } else if (frame > 0x1A) {
         SceneActorAnimation_SelectDirectionalEntry((void *)actor, 9);

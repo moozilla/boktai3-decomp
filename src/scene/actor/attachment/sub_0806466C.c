@@ -19,11 +19,6 @@ u8 ActorAttachment_TickRemoval(void *owner, void *slotInput)
             s8 *slotId;
             u8 *active;
             u32 activeOffset;
-            u8 *status;
-            u32 zero;
-            u8 *secondary;
-            s16 *threshold;
-            s32 *counter;
             i = 0;
             /* offsetof-style constants retain the original separate address births. */
             flagsOffset = (u32) & ((struct ActorAttachmentSlot *)0)->flags31;
@@ -32,18 +27,12 @@ u8 ActorAttachment_TickRemoval(void *owner, void *slotInput)
             slotId = (s8 *)(idOffset + (u32)slot);
             activeOffset = (u32) & ((struct ActorAttachmentSlot *)0)->active;
             active = (u8 *)(activeOffset + (u32)slot);
-            status = slot->status;
-            zero = 0;
-            secondary = slot->secondaryStatus;
-            threshold = slot->thresholds;
-            counter = slot->counters;
-            do {
-                status[i] = zero;
-                secondary[i] = zero;
-                *counter++ = zero;
-                *threshold++ = zero;
-                i++;
-            } while (i <= 2);
+            for (i = 0; i < 3; i++) {
+                slot->status[i] = 0;
+                slot->secondaryStatus[i] = 0;
+                slot->counters[i] = 0;
+                slot->thresholds[i] = 0;
+            }
             {
                 u32 bit;
                 slot->unknown24 = 0;

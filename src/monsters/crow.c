@@ -1,3 +1,4 @@
+#include "scene/collision/contact_actor.h"
 #include "monsters/crow.h"
 #include "global.h"
 #include "scene/actor/scene_actor_control_phase.h"
@@ -274,7 +275,7 @@ void Crow_RecoverFromDisplacement(struct ChaseActor *actor, s32 elapsed)
         Crow_DisableAttackCollision(actor);
         actor->base.body.direction = actor->base.tracking.heading;
         SceneActorChase_SetControl(actor, SceneActorControl_OnIdle, 16);
-        SceneActorChase_SetState(actor, 0, 0, 1);
+        SceneActorTerrain_EnterState(actor, 0, 0, 1);
         actor->base.body.direction = actor->base.tracking.heading;
         actor->base.field2C2 = 64;
     }
@@ -587,10 +588,8 @@ void Crow_UpdateWanderTimer(struct ChaseActor *actor)
 {
     struct Crow *context = actor->base.context;
     if (SceneActorControl_TakeStateEntry(actor)) {
-        u32 value;
         SceneActorChase_SetControl(actor, actor->base.onStanding, 0);
-        value = Crow_NextWanderRandom();
-        context->wanderTicks = (0x7F & value) + 0x14;
+        context->wanderTicks = (Crow_NextWanderRandom() & 0x7F) + 0x14;
     }
     {
         if (!SceneActorPlacement_TestValue(4, context->flags)) {
@@ -606,15 +605,6 @@ void Crow_UpdateWanderTimer(struct ChaseActor *actor)
     }
 }
 
-static inline void Crow_SetReturnState(struct ChaseActor *actor, u32 phase, u32 behavior)
-{
-    actor->base.state2A8 = 0;
-    actor->base.phase2A9 = phase;
-    actor->base.behavior2AA = behavior;
-    actor->base.counter2AC = 0;
-    actor->base.field2B1 = 1;
-}
-
 void Crow_UpdateReturnAnimation(struct ChaseActor *actor)
 {
     if (Chase_TakeArrived(actor)) {
@@ -622,7 +612,7 @@ void Crow_UpdateReturnAnimation(struct ChaseActor *actor)
     }
     Callback_InvokeActor(actor, actor->base.contactQuery.opaque);
     if (actor->base.stepDone) {
-        Crow_SetReturnState(actor, 2, 1);
+        SceneActorTerrain_EnterState(actor, 0, 2, 1);
     } else {
         actor->base.counter2AC++;
     }
@@ -670,7 +660,7 @@ void Crow_BeginScriptedAction(struct ChaseActor *actor)
     if (!SceneActor_ActionsBlocked(actor) && gPlayers[0]) {
         struct Crow *p = actor->base.context;
         SceneActorChase_SetControl(actor, SceneActorControl_OnIdle, 0x10);
-        SceneActorChase_SetState(actor, 0, 0, 3);
+        SceneActorTerrain_EnterState(actor, 0, 0, 3);
         SceneActorChase_ClearWordFlags(&p->flags, 4);
         {
             struct SceneActorChaseTracking *extra = &actor->base.tracking;
@@ -790,26 +780,26 @@ adjust: {
     return;
 }
 
-void SceneActorCollision_InitBody(u8 *, struct CrowColliderVector *, struct CrowColliderVector *,
+void SceneActorCollision_InitBody(u8 *, struct ContactPackedVector *, struct ContactPackedVector *,
                                   void (*)(void), u8 *);
 
-void SceneActorCollision_InitAttack(u8 *, struct CrowColliderVector *, struct CrowColliderVector *,
+void SceneActorCollision_InitAttack(u8 *, struct ContactPackedVector *, struct ContactPackedVector *,
                                     void (*)(void), u32, u8 *);
 
 void Crow_InitColliders(u8 *p)
 {
-    struct CrowColliderVector s1, s2, s3, s4;
-    s1.a.lo = 0x2a;
-    s1.a.hi = 0x80;
-    s1.b.lo = 0x2a;
-    *(u32 *)&s2.a = 0;
-    *(u32 *)&s2.b &= 0xFFFF0000;
+    struct ContactPackedVector s1, s2, s3, s4;
+    s1.x = 0x2a;
+    s1.y = 0x80;
+    s1.z = 0x2a;
+    *(u32 *)&s2 = 0;
+    ((u32 *)&s2)[1] &= 0xFFFF0000;
     SceneActorCollision_InitBody(p, &s1, &s2, Crow_OnBodyContact, p);
-    s3.a.lo = 0x10;
-    s3.a.hi = 0x5c;
-    s3.b.lo = 0x10;
-    *(u32 *)&s4.a = 0;
-    *(u32 *)&s4.b &= 0xFFFF0000;
+    s3.x = 0x10;
+    s3.y = 0x5c;
+    s3.z = 0x10;
+    *(u32 *)&s4 = 0;
+    ((u32 *)&s4)[1] &= 0xFFFF0000;
     SceneActorCollision_InitAttack(p, &s3, &s4, Crow_OnAttackContact, 0, p);
 }
 
@@ -941,7 +931,7 @@ s32 Crow_TryActivatePlayerProximityResponse(struct ChaseActor *actor)
 {
     s32 d;
     struct SceneActorChaseTracking *p;
-    if (!MonsterInit_TestTargetingFlags(&actor->base.tracking, 2))
+    if (!SceneActorChase_TrackingFlags(&actor->base.tracking, 2))
         goto zero;
     d = actor->base.body.position.y - gPlayers[0]->position.y;
     if (d < 0)
@@ -986,7 +976,7 @@ void Crow_BeginReaction(struct ChaseActor *actor)
         return;
     if (!Crow_GetReactionTracking(actor, &extra)) {
         SceneActorChase_SetControl(actor, SceneActorControl_OnIdle, 0x10);
-        SceneActorChase_SetState(actor, 0, 0, 3);
+        SceneActorTerrain_EnterState(actor, 0, 0, 3);
         {
             u32 bit = 8;
             bit |= extra->flags;
@@ -1089,7 +1079,7 @@ void Crow_ReadSpawnScript(void *input)
     ((struct Crow *)actor)->base.body.direction = Script_GetKeywordValue(0x64, 0);
     if (Script_SeekToKeyword(0x70)) {
         u16 *height;
-        struct CrowPackedPosition *copy;
+        struct ContactPosition *copy;
         actor->position.x = Crow_ReadScriptValue();
         actor->position.y = Crow_ReadScriptValue();
         {
@@ -1103,7 +1093,7 @@ void Crow_ReadSpawnScript(void *input)
             actor->position.z = value;
         }
         copy = (void *)&s->storedPosition;
-        *copy = *((struct CrowPackedPosition *)(&actor->position));
+        *copy = actor->position;
         actor->cellIndex = Crow_GetPositionCell((struct ContactPosition *)&s->storedPosition);
         {
             u32 cell = actor->cellIndex;
@@ -1248,8 +1238,7 @@ void Crow_ApproachPlayerThenRecoil(struct ChaseActor *actor)
         struct ContactPosition *saved;
         SceneActorChase_SetControl(actor, Crow_UpdateDirectionalPose, 0x25);
         saved = (void *)(&body->curveSubject.position);
-        *((struct CrowPackedPosition *)saved) =
-            *(struct CrowPackedPosition *)&gPlayers[0]->position;
+        *saved = *(struct ContactPosition *)&gPlayers[0]->position;
         ZeroFill8(&body->vectors[2]);
         Chase_Delta(&delta, &actor->base.body.position, saved);
         actor->base.body.direction = Math_Atan2(delta.x, delta.z);
@@ -1280,7 +1269,7 @@ void Crow_ApproachPlayerThenRecoil(struct ChaseActor *actor)
             Crow_TestResponseFlags(body, 2)) {
             Crow_MakeRecoilVelocity(&actor->base.secondaryMotion, actor->base.body.direction,
                                     body->distance * 2);
-            MonsterInit_SetState(actor, 0, 2, 2);
+            SceneActorTerrain_EnterState(actor, 0, 2, 2);
         } else {
             actor->base.counter2AC++;
         }
@@ -1526,7 +1515,7 @@ s32 Crow_Init(void *object)
 {
     struct Crow *crow = object;
     struct ChaseActor *actor = object;
-    u32 zero;
+    u32 zero; // concession-ok(const-local): CpuSet reads this source word when filling the initial positions.
     struct ContactPosition tmp;
     u32 flag;
     crow->flags = 0;
@@ -1573,7 +1562,7 @@ s32 Crow_Init(void *object)
         flag = 1;
     }
     if (flag != 1) {
-        MonsterInit_SetState(actor, 0, 0, 0);
+        SceneActorTerrain_EnterState(actor, 0, 0, 0);
         MonsterInit_SetControl(actor, MonsterInit_GetStandingControl(actor), 0);
     }
     MonsterInit_InitializeRegion(actor);
@@ -1601,9 +1590,9 @@ s32 Crow_Init(void *object)
 
 void Crow_Create(void)
 {
-    void *m = Heap_Alloc(0x43c);
+    void *m = Heap_Alloc(sizeof(struct Crow));
     if (m != 0) {
-        Memory_Clear(m, 0x43c);
+        Memory_Clear(m, sizeof(struct Crow));
         if (Crow_Init(m) < 0) {
             Crow_Destroy(m);
             Heap_Free(m);

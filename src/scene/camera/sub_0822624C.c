@@ -1,12 +1,12 @@
-#include "global.h"
+#include "scene/camera/scene_camera_controller.h"
 #include "engine/ram.h"
 void Camera_Reset(void);
 
 void sub_0822624C(void)
 {
-    u8 *camera = gActiveCamera;
+    struct SceneCameraController *camera = (void *)gActiveCamera;
     if (camera != NULL) {
-        *(u16 *)(camera + 0x1e) = 0;
+        camera->completionMode = 0;
         Camera_Reset();
     }
 }

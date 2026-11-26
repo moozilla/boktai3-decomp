@@ -1,3 +1,5 @@
+#include "scene/motion/scene_actor_terrain_reaction.h"
+#include "scene/collision/scene_actor_delayed_response.h"
 #include "monsters/mimic.h"
 #include "engine/math/math_shift.h"
 #include "scene/actor/scene_actor_visibility.h"
@@ -5,7 +7,7 @@
 #include "scene/motion/scene_actor_terrain.h"
 #include "engine/math/movement_curve.h"
 
-static inline void SaveControl(struct MimicDeferredResponse *packet, void *control, u8 behavior)
+static inline void SaveControl(struct SceneActorDelayedResponse *packet, void *control, u8 behavior)
 {
     packet->delay = 30;
     packet->control = control;
@@ -48,10 +50,10 @@ static inline void Mimic_SaveRouteControl(struct ChaseActor *actor, struct Mimic
     u8 outside = SceneActorAttachment_TestPositionWindow((void *)actor, &context->origin, 32, 32);
     if (!outside) {
         SceneActorChase_AndWordFlags(flags, ~0xc0);
-        SaveControl((struct MimicDeferredResponse *)&group->saved, actor->base.onAlternateEntry, 2);
+        SaveControl((struct SceneActorDelayedResponse *)&group->saved, actor->base.onAlternateEntry, 2);
     } else {
         SceneActorChase_AndWordFlags(flags, ~0xC0);
-        SaveControl((struct MimicDeferredResponse *)&group->saved, actor->base.onStanding, 0);
+        SaveControl((struct SceneActorDelayedResponse *)&group->saved, actor->base.onStanding, 0);
         SceneActorChase_ClearBits(&context->reactionFlags, 1);
     }
     actor->base.field2C2 = 0x40;
@@ -62,7 +64,7 @@ static inline void Mimic_SaveRouteControl(struct ChaseActor *actor, struct Mimic
 void Mimic_UpdateHitRecovery(struct ChaseActor *actor)
 {
     struct Mimic *context = actor->base.context;
-    if (MimicChase_TakeArrived(actor)) {
+    if (SceneActorControl_TakeStateEntry(actor)) {
         struct SceneActorChaseTracking *motion;
         struct SceneActorRegistryControl *control;
         u16 *flags;
@@ -73,11 +75,7 @@ void Mimic_UpdateHitRecovery(struct ChaseActor *actor)
             h = &actor->base.field2C2;
             *h = 0x40;
         }
-        {
-            u16 *field;
-            field = (u16 *)&actor->group.common.gate.flags;
-            *field = 0;
-        }
+        actor->group.common.gate.flags = 0;
         {
             u16 *h;
             h = &actor->group.common.gate.counter;
@@ -120,11 +118,11 @@ void Mimic_UpdateHitRecovery(struct ChaseActor *actor)
         {
             struct Mimic *current = actor->base.context;
             u16 mask = 1;
-            struct MimicReactionFlags *mode = (void *)&current->reactionFlags;
+            struct SceneActorReactionMotionFlags *mode = (void *)&current->reactionFlags;
             mode->bits |= mask;
         }
         SceneActorAttachment_ReplaceResponseSlot(actor, 0, 2, actor->base.category);
-        SceneActorChase_SetState(actor, 3, 1, 0);
+        SceneActorTerrain_EnterState(actor, 3, 1, 0);
         SceneActorChase_SetControl(actor, SceneActorReaction_RestoreAfterDelay, 14);
         {
             void *route = actor->group.route;
@@ -311,11 +309,9 @@ void SceneActor_RestoreSavedTargetOnCompletion(struct ChaseActor *actor)
     {
         u32 mask = 0x10;
         if (actor->base.statusFlags & mask) {
-            void *saved;
             struct ContactCollider *collider = &actor->base.colliderA;
             collider->flags &= 0xFFFB;
-            saved = actor->base.onStanding;
-            SceneActorChase_SetControl(actor, saved, 0);
+            SceneActorChase_SetControl(actor, actor->base.onStanding, 0);
             SceneActorChase_SetBehavior(actor, 0);
         }
     }
@@ -615,7 +611,7 @@ u8 SceneActor_FindNearbyActivePlayer(struct ChaseActor *p)
             struct SceneVec *source = &player->position;
             s32 x, z;
             s16 deltaZ;
-            delta->x = (u16)player->position.x - (u16)position->x;
+            delta->x = (u16)source->x - (u16)position->x;
             delta->y = (u16)source->y - (u16)position->y;
             delta->z = (u16)source->z - (u16)position->z;
             x = Square(delta->x);
@@ -652,7 +648,7 @@ u8 Mimic_TryTargetRoute(struct ChaseActor *actor)
             goto fail;
         {
             u32 mask = 8;
-            if (!(gUnk_02000560[index] & mask))
+            if (!(gPlayerSlotStatus[index] & mask))
                 goto join;
             goto fail;
         }
@@ -695,10 +691,7 @@ void Mimic_BeginTargetResponse(struct ChaseActor *actor)
     s32 off;
     s32 mask;
     u16 *p;
-    {
-        u32 byte = actor->base.tracking.heading;
-        actor->base.body.direction = byte;
-    }
+    actor->base.body.direction = actor->base.tracking.heading;
     SceneActorAttachment_ReplaceResponseSlot((u8 *)actor, 0, 0, actor->base.category);
     SceneActorBehavior_CallActionScript((u8 *)actor);
     h = (u16 *)&actor->group.common.gate.flags;
@@ -880,24 +873,15 @@ s32 Mimic_OnBehaviorComplete(void)
     return 0;
 }
 
-static inline void resetState(struct ChaseActor *actor, u8 behavior)
-{
-    actor->base.state2A8 = 0;
-    actor->base.phase2A9 = 0;
-    actor->base.behavior2AA = behavior;
-    actor->base.counter2AC = 0;
-    actor->base.field2B1 = 1;
-}
-
 void SceneActor_ResetCollisionReaction(struct ChaseActor *actor)
 {
-    struct SceneActorReactionMotion *motion;
+    struct SceneActorChaseTracking *motion;
     struct SceneActorRegistryControl *control;
     u16 *flags;
-    resetState(actor, 0x11);
+    SceneActorTerrain_EnterState(actor, 0, 0, 0x11);
     SceneActorChase_SetControl(actor, SceneActorControl_OnIdle, 0x10);
-    motion = (void *)&actor->base.tracking.target;
-    motion->fieldDC = 0;
+    motion = &actor->base.tracking;
+    motion->target = NULL;
     actor->base.field2C2 = 0x40;
     actor->group.common.gate.flags = 0;
     actor->group.common.gate.counter = 0;
@@ -941,7 +925,7 @@ u8 Mimic_StartHitReaction(struct ChaseActor *actor)
         Sound_PlaySong(0x13E);
     if (actor->base.hitReactionFlags & 0xC0000) {
         SceneActorChase_SetControl(actor, actor->base.onReaction, 0x12);
-        SceneActorChase_SetState(actor, 3, 0, 0);
+        SceneActorTerrain_EnterState(actor, 3, 0, 0);
         return 1;
     }
     SceneActorChase_ClearBits(&actor->base.motionFlags, 0x20);
@@ -1179,7 +1163,7 @@ s32 Mimic_Init(void *object)
         flag = 1;
     }
     if (flag != 1) {
-        MonsterInit_SetState(actor, 0, 0, 0);
+        SceneActorTerrain_EnterState(actor, 0, 0, 0);
         MonsterInit_SetControl(actor, MonsterInit_GetStandingControl(actor), 0);
     }
     MonsterInit_InitializeRegion(actor);
@@ -1198,7 +1182,7 @@ s32 Mimic_Init(void *object)
     if (lift) {
         actor->base.heightOffset = lift;
         MonsterInit_SetControl(actor, SceneActor_RestoreSavedTargetOnCompletion, 0x26);
-        MonsterInit_SetState(actor, 3, 0, 0);
+        SceneActorTerrain_EnterState(actor, 3, 0, 0);
     }
     SceneActorBehavior_InstallCallbackTables(actor);
     Mimic_InitBehaviorTable(actor);
@@ -1213,9 +1197,9 @@ s32 Mimic_Init(void *object)
 
 void Mimic_Create(void)
 {
-    u8 *p = Heap_Alloc(0x664);
+    u8 *p = Heap_Alloc(sizeof(struct Mimic));
     if (p != 0) {
-        Memory_Clear(p, 0x664);
+        Memory_Clear(p, sizeof(struct Mimic));
         if (Mimic_Init(p) < 0) {
             Mimic_ReleaseResources(p);
             Heap_Free(p);

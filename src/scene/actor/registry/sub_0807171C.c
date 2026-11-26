@@ -1,3 +1,5 @@
+#include "npc/manager/scene_actor_animation.h"
+#include "scene/actor/scene_actor_status.h"
 #include "scene/motion/scene_actor_terrain.h"
 #include "scene/actor/scene_actor_reset.h"
 static inline void SceneActorRegistry_ResetRouteState(struct ChaseActor *actor)
@@ -40,22 +42,8 @@ static inline void SceneActorRegistry_ResetRouteState(struct ChaseActor *actor)
             selected = *address & mask;
             flags = address;
             renderFlags = &actor->base.statusFlags;
-            if (selected) {
-                u32 clearMask = ~0x1000000;
-                u32 value;
-                u16 *shortFlags;
-                u32 mask0;
-                value = *renderFlags;
-                value &= clearMask;
-                *renderFlags = value;
-                shortFlags = &actor->base.motionFlags;
-                mask0 = 0xFFFFFDFF;
-                mask0 &= *shortFlags;
-                *shortFlags = mask0;
-                control->mode = 0;
-                control->counter = zero;
-                control->timer = zero;
-            }
+            if (selected)
+                ActorStatus_ClearInteraction(actor, control);
         }
     }
     {
@@ -85,9 +73,9 @@ static inline void SceneActorRegistry_ResetRouteState(struct ChaseActor *actor)
     {
         u32 mode = 2;
         if (!actor->base.drawableKind)
-            ((u8 *)actor->base.drawable)[7] = mode;
+            ((struct SceneActorAnimationSequenceDrawable *)actor->base.drawable)->sprite.priority = mode;
         else
-            ((u8 *)actor->base.drawable)[0x3A] = mode;
+            ((struct SceneActorAnimationTileDrawable *)actor->base.drawable)->tile.attribute1A = mode;
     }
 }
 

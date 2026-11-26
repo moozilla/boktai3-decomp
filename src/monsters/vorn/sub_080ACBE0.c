@@ -1,4 +1,5 @@
 #include "global.h"
+#include "engine/math/scene_vec_polar.h"
 #include "scene/actor/scene_actor_reset.h"
 #include "player/player.h"
 extern const s16 gUnk_086149C4[];
@@ -23,8 +24,9 @@ void SceneActor_AimArcAtPlayer(struct ChaseActor *actor)
     out->y = player->y - own->y;
     out->z = player->z - own->z;
     angle = Math_Atan2(delta.x, out->z);
-    actor->base.secondaryMotion.x = TruncateShift(gUnk_086149C4[(angle + 64) & 255] * 32, 12);
-    actor->base.secondaryMotion.z = TruncateShift(gUnk_086149C4[angle & 255] * 32, 12);
+    actor->base.secondaryMotion.x =
+        SceneVec_TruncateComponent(gUnk_086149C4[(angle + 64) & 255] * 32);
+    actor->base.secondaryMotion.z = SceneVec_TruncateComponent(gUnk_086149C4[angle & 255] * 32);
     if (actor->base.secondaryMotion.x != 0)
         time = Div(delta.x, actor->base.secondaryMotion.x);
     else if (actor->base.secondaryMotion.z != 0)

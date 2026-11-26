@@ -1,20 +1,8 @@
-#include "global.h"
+#include "engine/math/math_shift.h"
+#include "monsters/poison_hand.h"
 #include "engine/math/scene_vec.h"
 #include "engine/engine.h"
 #include "engine/ram.h"
-struct PoisonHandBurst {
-    u8 pad0[0x18];
-    s32 frame;
-    u8 pad1C[0x24];
-    struct SceneVec position;
-    u8 pad48[0xd8];
-    s16 effectX, effectY, effectZ, unknown126;
-    s16 countdown;
-    u8 pad12A[2];
-    s16 spread;
-    u8 pad12E[0x16];
-    s16 timer;
-};
 void PoisonHand_RecordDefeat(void *);
 void *SpriteEffectController_Create(void *, void *, u32, u32, u32, u32, u32, u32, u32, u32, u32,
                                     u32, s32, s32, u32, s32, u32, u32);
@@ -45,33 +33,25 @@ void Anim_RestartSequence(void *, void *, u32, u32, u32);
 void Anim_SetDurationScale(void *, u16);
 void PoisonHand_WaitForPlayerApproach(void);
 struct SceneVec *Player_GetEffectivePosition(s32);
-static inline s32 Scale(s32 x)
-{
-    s32 r;
-    if (x >= 0)
-        r = x >> 12;
-    else
-        r = -((-x) >> 12);
-    return r;
-}
+
 // confidence=low: maintains the approach-triggered emergence animation and particle emission.
 struct Velocity {
     s16 x, y, z, pad;
 };
 static inline void Polar(struct Velocity *v, u8 angle, s32 magnitude)
 {
-    v->x = Scale(gUnk_086149C4[(angle + 64) & 255] * magnitude);
+    v->x = Math_ShiftTowardZero(gUnk_086149C4[(angle + 64) & 255] * magnitude, 12);
     v->y = 0;
-    v->z = Scale(gUnk_086149C4[angle] * magnitude);
+    v->z = Math_ShiftTowardZero(gUnk_086149C4[angle] * magnitude, 12);
 }
 static inline s32 Distance(struct SceneVec *a, struct SceneVec *b)
 {
     s32 x = b->x - a->x, z = b->z - a->z;
     return x * x + z * z;
 }
-s32 PoisonHand_UpdateEmergence(struct PoisonHandBurst *input)
+s32 PoisonHand_UpdateEmergence(struct PoisonHand *input)
 {
-    struct PoisonHandBurst *p = input;
+    struct PoisonHand *p = input;
     struct SceneVec position;
     struct Velocity velocity;
     s32 angle;
@@ -79,7 +59,7 @@ s32 PoisonHand_UpdateEmergence(struct PoisonHandBurst *input)
     s32 jitter;
     u32 attributes;
     u32 palette;
-    PoisonHand_CopyPosition(&position, &p->position);
+    PoisonHand_CopyPosition(&position, (struct SceneVec *)&p->sprite.position);
     PoisonHand_RaiseOrigin(&position);
     angle = PoisonHand_NextSpread(gRandomTable) & 255;
     jitter = PoisonHand_NextSpread(gRandomTable);
@@ -101,19 +81,19 @@ s32 PoisonHand_UpdateEmergence(struct PoisonHandBurst *input)
     if (p->countdown > 0) {
         p->countdown--;
         if (p->countdown == 30) {
-            s32 *range = (s32 *)((u8 *)p + 0x11c);
+            s32 *range = &p->attackDistanceSquared;
             struct SceneVec *player = Player_GetEffectivePosition(0);
-            if (*range < Distance(&p->position, player)) {
-                Anim_RestartSequence((u8 *)p + 0x10c, *(void **)((u8 *)p + 0x168), 0x18, 0, 12);
-                Anim_SetDurationScale((u8 *)p + 0x10c, 0x20);
+            if (*range < Distance((struct SceneVec *)&p->sprite.position, player)) {
+                Anim_RestartSequence(&p->sequence, p->animationResource, 0x18, 0, 12);
+                Anim_SetDurationScale(&p->sequence, 0x20);
             } else {
                 p->countdown = 180;
                 Sound_PlaySong(0x51c);
             }
         }
     } else {
-        Anim_RestartSequence((u8 *)p + 0x10c, *(void **)((u8 *)p + 0x168), 0x17, 0, 0);
-        *(void **)((u8 *)p + 0x108) = PoisonHand_WaitForPlayerApproach;
+        Anim_RestartSequence(&p->sequence, p->animationResource, 0x17, 0, 0);
+        p->update = PoisonHand_WaitForPlayerApproach;
     }
     return 0;
 }

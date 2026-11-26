@@ -1,52 +1,9 @@
-#include "global.h"
+#include "monsters/cannons/wind_cannon.h"
 #include "player/cutscene/player_cue_sequence.h"
 #include "engine/ram.h"
 #include "engine/engine_globals.h"
-struct FanVec {
-    s16 x, y, z, pad;
-};
-struct FanCannon {
-    s32 age;
-    s32 name;
-    struct FanVec initial;
-    u32 flags;
-    u8 p14[0xc];
-    u16 frame;
-    u8 p22[0xa];
-    struct FanVec position;
-    u8 p34[8];
-    u8 graphics[0x1c];
-    u8 collider[0x54];
-    u8 body[0x48];
-    void (*update)(void);
-    struct DisplaySequenceState sequence;
-    s32 range;
-    s16 maximumWind, health, damage, reaction;
-    s16 f114, dead, flash;
-    s8 direction;
-    u8 reverse;
-    s16 period, palette, wind, variant;
-    u8 activated, stopped;
-    s16 hasBody;
-    s16 maximumHealth, hudA, hudB, f12e, f130, f132, hudTime, initialDead;
-    void *schedule;
-    s32 f13c, terrain;
-    void *resource;
-    u8 terrainCell[8];
-    s32 f150, f154, f158, f15c, f160, f164, f168;
-    s16 scheduleCount, scheduleIndex;
-    s16 times[8];
-};
-struct FanManager {
-    u8 p0[0x18];
-    u32 used;
-};
-struct FanTerrain {
-    u8 pad[0x24];
-    u16 rows[1];
-};
 void *WindCannonManager_Create(void);
-struct FanCannon *WindCannonManager_FindFreeSlot(struct FanManager *, s32 *);
+struct FanCannon *WindCannonManager_FindFreeSlot(struct FanCannonManager *, s32 *);
 s32 Script_SeekToKeyword(s32);
 s32 Script_GetValue(void);
 void *Script_GetValueSafe(void);
@@ -60,17 +17,17 @@ void SceneBody_Init(void *, s32, void *, u32, s32, void *);
 void SceneBody_SetSprite(void *, void *);
 void TerrainOverlay_QueueAddActor(void *);
 void WindCannon_ReadToggleSchedule(struct FanCannon *);
-static inline s32 Fan_Cell(struct FanVec *v)
+static inline s32 Fan_Cell(struct ContactPosition *v)
 {
     s32 x = (s16)v->x >> 8, z = (s16)v->z >> 8;
     if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
         return 0;
-    return ((struct FanTerrain *)gTerrainMap)->rows[z] + x;
+    return gTerrainMap->rows[z] + x;
 }
 // confidence=low: script options initialize an eight-slot fan cannon and publish its occupied bit.
 s32 WindCannon_CreateFromScript(void)
 {
-    struct FanManager *manager = gFanCannonManager;
+    struct FanCannonManager *manager = gFanCannonManager;
     struct FanCannon *p;
     s32 slot;
     void *resource;
@@ -157,8 +114,8 @@ s32 WindCannon_CreateFromScript(void)
     } else
         p->hudTime = 1;
     AnimData_Load(p->graphics, 0x7e7d);
-    Sprite_Init(&p->flags, p->graphics, 1);
-    p->position = p->initial;
+    Sprite_Init(&p->sprite.flags, p->graphics, 1);
+    p->sprite.position = p->initial;
     if (!p->reverse) {
         p->palette = 0x1bf;
         p->variant = 0;
@@ -177,23 +134,23 @@ s32 WindCannon_CreateFromScript(void)
         p->dead = 1;
         Anim_SetSequence(&p->sequence, p->resource, 0x16, (u8)p->direction, (u8)p->variant);
     }
-    PlayerCue_StepSequence((struct ContactSwarmSprite *)&p->flags,
+    PlayerCue_StepSequence((struct ContactSwarmSprite *)&p->sprite.flags,
                            &p->sequence);
     if (!p->initialDead)
         sub_082093F8(p);
     if (p->terrain && !p->initialDead) {
-        s32 cell = Fan_Cell(&p->position);
-        TerrainModifiers_RegisterCell(p->terrainCell, cell, 0, p->position.y >> 8, 0, 0x803);
+        s32 cell = Fan_Cell(&p->sprite.position);
+        TerrainModifiers_RegisterCell(p->terrainCell, cell, 0, p->sprite.position.y >> 8, 0, 0x803);
     }
     if (p->hasBody) {
         u32 heading = (u8)((p->direction << 6) + 0xc0);
         void *body = p->body;
-        SceneBody_Init(body, p->name, &p->position, heading, 4, p);
-        SceneBody_SetSprite(body, &p->flags);
+        SceneBody_Init(body, p->name, &p->sprite.position, heading, 4, p);
+        SceneBody_SetSprite(body, &p->sprite.flags);
         TerrainOverlay_QueueAddActor(body);
     }
     if (p->schedule)
         WindCannon_ReadToggleSchedule(p);
-    manager->used |= 1 << slot;
+    manager->occupiedSlots |= 1 << slot;
     return slot;
 }

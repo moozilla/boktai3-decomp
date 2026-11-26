@@ -1,4 +1,4 @@
-#include "global.h"
+#include "monsters/muspell_head.h"
 #include "engine/engine_globals.h"
 #include "engine/ram.h"
 struct V {
@@ -6,25 +6,17 @@ struct V {
     u16 b;
     u32 c;
 };
-struct S {
-    u8 p0[0x18];
-    s32 w18;
-    u8 p1[0x40 - 0x1c];
-    struct V v;
-    u8 p2[0x1a8 - 0x48];
-    s16 h1a8;
-};
 void SpriteParticle_CreateDefaultVariant4384(void *, u32, u32, u32, u32, u32, u32, u32, u32, u32,
                                              u32, u32);
 void MuspellHead_RecordDefeat(void *);
-u32 MuspellHead_UpdateDefeatEffect(struct S *p)
+u32 MuspellHead_UpdateDefeatEffect(struct MuspellHead *p)
 {
-    if (p->h1a8 == 0) {
-        if (p->w18 <= 0x23) {
+    if (p->initialDead == 0) {
+        if (p->age <= 0x23) {
             struct V v;
             u16 *q = (u16 *)&v;
             u32 idx, t;
-            v = p->v;
+            v = *(struct V *)&p->sprite.position;
             q[1] += 0xc8;
             gRandomIndex = (gRandomIndex + 1) & 0x3ff;
             idx = gRandomIndex;
@@ -32,7 +24,7 @@ u32 MuspellHead_UpdateDefeatEffect(struct S *p)
             SpriteParticle_CreateDefaultVariant4384(&v, 0x80, 0x20, 0xc, 0xc, 0x18, t, 0x20, 0x20,
                                                     1, 2, 0x200);
         }
-        if (p->w18 == 1)
+        if (p->age == 1)
             MuspellHead_RecordDefeat(p);
     }
     return 0;

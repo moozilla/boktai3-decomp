@@ -4,20 +4,18 @@ void SceneActorControl_SetCollisionResponse(struct ChaseActor *input)
     s16 k2 = 0;
     u8 *field_2;
     struct ChaseActor *actor = input;
-    u8 *status = (u8 *)actor + 0xDC;
+    struct SceneActorChaseTracking *tracking = &actor->base.tracking;
     u32 statusMask = 8;
     u32 testMask;
     u16 *field;
-    statusMask |= status[0xF];
-    status[0xF] = statusMask;
+    statusMask |= tracking->flags;
+    tracking->flags = statusMask;
     testMask = 0x100;
     field = &actor->base.motionFlags;
     if (!(*field & testMask)) {
         struct SceneActorControlMotionState *state = SceneActorControl_GetMotionState(actor);
         u32 mask = 2;
-        u32 offset = 0x3D4;
-        u32 *flags;
-        flags = (void *)((u8 *)state + offset);
+        u32 *flags = &state->flags3D4;
         if (SceneActorControl_TestFlags(*flags, mask)) {
             u32 mask = 0x100;
             u16 *flags;
@@ -32,19 +30,14 @@ void SceneActorControl_SetCollisionResponse(struct ChaseActor *input)
             *flags = mask;
             {
                 u32 behavior = 3;
-                u32 offset = 0x2A8;
                 u8 *field;
-                field_2 = ((u8 *)actor) + offset;
+                field_2 = &actor->base.state2A8;
                 *field_2 = zeroByte;
-                offset = 0x2A9;
-                field = (u8 *)actor + offset;
+                field = &actor->base.phase2A9;
                 *field = zeroByte;
-                offset = 0x2AA;
-                field = (u8 *)actor + offset;
+                field = &actor->base.behavior2AA;
                 *field = behavior;
-                offset = 0x2AC;
-                field = (u8 *)actor + offset;
-                *(u32 *)field = zeroWord;
+                actor->base.counter2AC = zeroWord;
             }
             {
                 u8 *field = &actor->base.field2B1;

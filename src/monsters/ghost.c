@@ -137,13 +137,14 @@ void Ghost_BeginContactReaction(void *unused, struct ContactCollider *contact,
 
 void SceneActorBehavior_ApplyContactReaction(void *, void *, struct ChaseActor *);
 
-void SceneActorBehavior_OnContactForward(u16 *source, void *destination, struct ChaseActor *actor)
+void SceneActorBehavior_OnContactForward(struct ContactCollider *source, void *destination,
+                                        struct ChaseActor *actor)
 {
     if (SceneActor_ActionsBlocked(actor))
         return;
     if (SceneActorChase_QueryMotionFlagComponent(actor, 0x4000))
         return;
-    if (SceneActor_MaskedHalfword(0x800, &source[3]))
+    if (SceneActor_MaskedHalfword(0x800, &source->flags))
         return;
     SceneActorBehavior_ApplyContactReaction(source, destination, actor);
 }
@@ -683,7 +684,7 @@ void Ghost_FollowRoute(struct ChaseActor *actor)
         u32 kind;
         u16 attr;
         Ghost_MakeRouteMotion((void *)(&body->motion), actor->base.body.direction, speed);
-        route = (void *)&body->route;
+        route = &body->route.cursor;
         if (!Ghost_SelectRandomRouteEntry(route))
             goto done;
         p = &target;
@@ -714,16 +715,6 @@ done:
 
 // confidence=low: decays saved horizontal route motion before returning to pursuit or rest.
 
-static inline void Ghost_SetDecelerationState(struct ChaseActor *actor, u32 phase, u32 behavior,
-                                              u32 zero)
-{
-    actor->base.state2A8 = 0;
-    actor->base.phase2A9 = phase;
-    actor->base.behavior2AA = behavior;
-    actor->base.counter2AC = zero;
-    actor->base.field2B1 = 1;
-}
-
 void Ghost_DecelerateMovement(struct ChaseActor *actor)
 {
     struct Ghost *ctx = actor->base.context;
@@ -738,9 +729,9 @@ void Ghost_DecelerateMovement(struct ChaseActor *actor)
     if (actor->base.stepDone) {
         u16 flags = SceneActor_MaskedHalfword(0x100, &actor->base.motionFlags);
         if (flags)
-            Ghost_SetDecelerationState(actor, 2, 1, 0);
+            SceneActorChase_SetPhase(actor, 2, 1);
         else
-            Ghost_SetDecelerationState(actor, 0, 0, flags);
+            SceneActorChase_SetBehavior(actor, 0);
     } else
         actor->base.counter2AC++;
 }
@@ -758,7 +749,7 @@ void Ghost_ChooseRouteDestination(struct ChaseActor *actor)
     if ((s32)actor->base.counter2AC > 60) {
         struct SceneActorRouteCursor *route;
 
-        route = (void *)&state->route;
+        route = &state->route.cursor;
         Ghost_SelectRandomRouteEntry(route);
         target = &destination;
         target->x = route->point->x;
@@ -789,9 +780,9 @@ void Ghost_ChooseRouteDestination(struct ChaseActor *actor)
 static inline void Ghost_GetRouteEndpoint(struct GhostRouteCursor *path,
                                           struct ContactPosition *pos)
 {
-    struct SceneActorRoutePoint *point = path->point;
+    struct SceneActorRoutePoint *point = path->cursor.point;
     pos->x = point->x;
-    pos->z = path->point->z;
+    pos->z = path->cursor.point->z;
     pos->y = SceneActorTerrain_GetHeight(SceneActorTerrain_GetCellIndex(pos), pos);
 }
 
@@ -822,7 +813,7 @@ void Ghost_RecoilTowardEndpoint(struct ChaseActor *actor)
         SceneActorChase_SetControl(actor, SceneActorControl_OnIdle, 16);
         {
             struct GhostRouteCursor *path = &context->route;
-            Ghost_SelectRandomRouteEntry(path);
+            Ghost_SelectRandomRouteEntry(&path->cursor);
             Ghost_GetRouteEndpoint(path, &pos);
         }
         Ghost_StartMovementToPosition(actor, &pos);
@@ -907,7 +898,7 @@ static inline void Ghost_MakeRetreatOffset(struct ContactPosition *out, u32 angl
     s32 x, z;
     s32 speed = 728;
     u32 zero;
-    x = SceneRoute_ScaleComponent(gUnk_086149C4[(angle + 64) & 255] * speed);
+    x = SceneRoute_ScaleComponent(gUnk_086149C4[(angle + 64) & 255] * 728);
     zero = 0;
     GHOST_WRITE_COMPONENT(out, x, x);
     GHOST_SET_VERTICAL(out, zero);
@@ -1018,12 +1009,7 @@ void Ghost_RequestVisibility(struct ChaseActor *input, const u16 *inputRequest)
             if (!active) {
                 u32 hidden = SceneActorVisibility_IsHidden(actor);
                 if (hidden) {
-                    {
-
-                        u16 *timer;
-                        timer = &state->visibilityTimer;
-                        *timer = 0;
-                    }
+                    state->visibilityTimer = 0;
                     {
                         u32 mask = ~0x240;
                         {
@@ -1053,14 +1039,7 @@ void Ghost_RequestVisibility(struct ChaseActor *input, const u16 *inputRequest)
             if (!active) {
                 u32 hidden = SceneActorVisibility_IsHidden(actor);
                 if (!hidden) {
-                    u32 hiddenZero = hidden;
-                    {
-                        u32 zero = hiddenZero;
-
-                        u16 *timer;
-                        timer = &state->visibilityTimer;
-                        *timer = zero;
-                    }
+                    state->visibilityTimer = 0;
                     {
                         u32 mask = ~0x220;
                         {
@@ -1223,8 +1202,7 @@ void Ghost_ResetMovementState(struct ChaseActor *actor)
     context->drainElapsed = 0;
     context->drainStart = 0;
     context->flags = actor->base.saved.privateFlags;
-    *(struct GhostPackedPosition *)&context->previousPlayer =
-        *(struct GhostPackedPosition *)&gPlayers[0]->position;
+    context->previousPlayer = *(struct ContactPosition *)&gPlayers[0]->position;
     ZeroFill8(&context->start);
     ZeroFill8(&context->end);
     ZeroFill8(&context->motion);
@@ -1326,12 +1304,11 @@ void Ghost_UpdateRandomDestination(struct ChaseActor *actor)
         } else {
             struct ContactPosition target;
             struct ContactPosition *p;
-            struct SceneActorRouteCursor *route = &state->route;
+            struct SceneActorRouteCursor *route = &state->route.cursor;
             s32 cell;
             u16 attr;
             u32 kind;
             s32 height;
-            u32 zero, two;
             Ghost_SelectRandomRouteEntry(route);
             p = &target;
             p->x = route->point->x;
@@ -1353,16 +1330,10 @@ void Ghost_UpdateRandomDestination(struct ChaseActor *actor)
                     break;
             }
             p->y = height;
-            zero = 0;
             Ghost_StartMovementToPosition(actor, &target);
             Ghost_ClearActionFlags(actor);
             SceneActor_EndLinkedReaction(actor);
-            two = 2;
-            actor->base.state2A8 = zero;
-            actor->base.phase2A9 = zero;
-            actor->base.behavior2AA = two;
-            actor->base.counter2AC = zero;
-            actor->base.field2B1 = 1;
+            SceneActorChase_SetState(actor, 0, 0, 2);
         }
     }
 }
@@ -1732,12 +1703,7 @@ void Ghost_TickVisibilityTransition(struct ChaseActor *input)
         u8 ignored = SceneActorControl_TestFlags(gEngineFlags, 0x4800);
         u32 counter;
         u32 value;
-        {
-
-            u16 *field;
-            field = &state->visibilityTimer;
-            counter = (u32)*field << 16;
-        }
+        counter = (u32)state->visibilityTimer << 16;
         value = counter >> 16;
         if (value <= 19) {
             if ((u8)(counter >> 18) & 1)
@@ -1759,12 +1725,7 @@ void Ghost_TickVisibilityTransition(struct ChaseActor *input)
             flags = inputFlags;
             active = SceneActorControl_TestFlags(active, ~0);
             if (active) {
-                {
-                    u32 *field = actor->base.drawable;
-                    u32 value = *field;
-                    u32 mask = ~1;
-                    *field = value & mask;
-                }
+                ((struct ActorSprite *)actor->base.drawable)->flags &= ~1;
                 {
                     u32 mask = ~0x20;
                     *flags &= mask;
@@ -1950,7 +1911,7 @@ u32 ActorContact_UpdateColliderPositions(struct RoomActor *actor)
         if (*control & mask)
             goto done;
     }
-    if (SceneActorTurn_Flags(control, 0x110))
+    if (*control & 0x110)
         goto secondary;
     {
         u32 near = (u32)SceneActorBehavior_IsNearParticipant((void *)actor) << 24;
@@ -2219,7 +2180,7 @@ void Ghost_ChooseMovementDestination(struct ChaseActor *actor)
     if ((s32)actor->base.counter2AC > 60) {
         struct SceneActorRouteCursor *route;
 
-        route = (void *)&state->route;
+        route = &state->route.cursor;
         Ghost_SelectRandomRouteEntry(route);
         target = &destination;
         target->x = route->point->x;
@@ -2680,7 +2641,7 @@ s32 Ghost_Init(void *object)
     Ghost_InitActorProfile(a);
     Ghost_InitializeDrawable(a);
     Ghost_InitializeScriptFields(a);
-    route = &arg0->route;
+    route = (struct SceneActorRegistryRoute *)&arg0->route;
     if (Ghost_ReadRoute(a, route)) {
         {
             struct ContactPosition *dest = &a->base.body.position;
@@ -2773,9 +2734,9 @@ s32 Ghost_Init(void *object)
 
 void Ghost_Create(void)
 {
-    void *m = Heap_Alloc(0x62c);
+    void *m = Heap_Alloc(sizeof(struct Ghost));
     if (m != 0) {
-        Memory_Clear(m, 0x62c);
+        Memory_Clear(m, sizeof(struct Ghost));
         if (Ghost_Init(m) < 0) {
             Ghost_Destroy(m);
             Heap_Free(m);

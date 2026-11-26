@@ -1,6 +1,7 @@
 #include "scene/motion/scene_actor_turn.h"
 #include "scene/motion/scene_actor_chase_reaction.h"
 #include "scene/actor/scene_actor_reaction.h"
+#include "scene/actor/scene_actor_drawable_flags.h"
 #include "scene/actor/scene_actor_behavior.h"
 #include "script/script_utility.h"
 #include "effects/particles/spark_particle.h"
@@ -13,14 +14,6 @@ void SceneActor_CallContextScriptB(void *);
 void Vorn_SendMessage(void *);
 void SceneActorPlacement_PlayCategoryEventSound(void *);
 
-static inline u16 Vorn_GetDefeatScript(struct ChaseActor *actor)
-{
-    return actor->base.script1F8;
-}
-static inline s32 Vorn_GetScriptParameter(struct ChaseActor *actor, u32 index)
-{
-    return actor->base.parameters1FC[index];
-}
 static inline u8 Vorn_RandomSparkCount(const u16 *table, u32 *cursor)
 {
     u32 index = (*cursor + 1) & 1023;
@@ -40,11 +33,6 @@ static inline void Vorn_ClearRoute(struct ChaseActor *actor,
     control->timer = cleared;
 }
 
-static inline void Vorn_SetTileFlags(struct AnimSprite *tile, u32 bits)
-{
-    tile->flags |= bits;
-}
-
 static inline void Vorn_InstallIdleControl(struct ChaseActor *actor, void *callback, u32 kind,
                                            u32 prepared)
 {
@@ -61,6 +49,7 @@ static inline void Vorn_ResetStateEntry(struct ChaseActor *actor, u32 prepared)
 }
 union VornSpreadVector {
     struct ContactPackedVector bits;
+    struct ContactPosition position;
     u32 words[2];
 };
 /* Completes the defeat sequence, dispatches its script, and enters idle control. */
@@ -115,35 +104,35 @@ void Vorn_UpdateDefeat(struct ChaseActor *actor)
             SparkParticle_Spawn(
                 (origin = (const struct ContactPosition *)&actor->base.body.position),
                 Vorn_RandomSparkCount((const u16 *)workValue, cursor),
-                (const struct ContactPosition *)spread, 0x20, 4, 20, (sparkKind = 2), 1);
+                &spread->position, 0x20, 4, 20, (sparkKind = 2), 1);
             /* Keep the three shared spark values distinct through CSE. */
             sparkKind |= ((u32)actor & 255) >> 8;
             spread = (union VornSpreadVector *)((u32)spread + (((u32)actor & 31) >> 5));
             origin = (const struct ContactPosition *)((u32)origin + (((u32)actor & 127) >> 7));
             SparkParticle_Spawn(origin, Vorn_RandomSparkCount((const u16 *)workValue, cursor),
-                                (const struct ContactPosition *)spread, 0x40, 4, 20, sparkKind, 1);
+                                &spread->position, 0x40, 4, 20, sparkKind, 1);
             SparkParticle_Spawn(origin, Vorn_RandomSparkCount((const u16 *)workValue, cursor),
-                                (const struct ContactPosition *)spread, 0x5E, 4, 20, sparkKind, 1);
+                                &spread->position, 0x5E, 4, 20, sparkKind, 1);
             SparkParticle_Spawn(origin, Vorn_RandomSparkCount((const u16 *)workValue, cursor),
-                                (const struct ContactPosition *)spread, 0x80, 4, 20, sparkKind, 1);
+                                &spread->position, 0x80, 4, 20, sparkKind, 1);
             SparkParticle_Spawn(origin, Vorn_RandomSparkCount((const u16 *)workValue, cursor),
-                                (const struct ContactPosition *)spread, 0xC4, 4, 20, sparkKind, 1);
+                                &spread->position, 0xC4, 4, 20, sparkKind, 1);
             SparkParticle_Spawn(origin, Vorn_RandomSparkCount((const u16 *)workValue, cursor),
-                                (const struct ContactPosition *)spread, 0xF0, 4, 20, sparkKind, 1);
+                                &spread->position, 0xF0, 4, 20, sparkKind, 1);
         }
         category = actor->base.category;
         if (category == 4 || category == 1 || category == 5 || category == 7 || category == 6 ||
             category == 0x18 || category == 0x19)
             Sound_PlaySong(0xE5);
     }
-    script = Vorn_GetDefeatScript(actor);
+    script = actor->base.script1F8;
     if (script) {
         values[0] = actor->base.body.position.x;
         values[1] = actor->base.body.position.y;
         values[2] = actor->base.body.position.z;
-        values[3] = Vorn_GetScriptParameter(actor, 0);
-        values[4] = Vorn_GetScriptParameter(actor, 1);
-        values[5] = Vorn_GetScriptParameter(actor, 2);
+        values[3] = actor->base.parameters1FC[0];
+        values[4] = actor->base.parameters1FC[1];
+        values[5] = actor->base.parameters1FC[2];
         values[6] = actor->base.hitOwners;
         values[7] = actor->base.body.id;
         arguments.count = 8;
@@ -155,14 +144,7 @@ void Vorn_UpdateDefeat(struct ChaseActor *actor)
         Bestiary_UnlockEntry(
             Bestiary_GetEntryForActor(actor->base.category, actor->base.paletteOffset));
     actor->base.attachmentTimer = 0;
-    {
-        u32 mask = 1;
-        if (!actor->base.drawableKind)
-            *((u32 *)actor->base.drawable) |= mask;
-        else
-            Vorn_SetTileFlags(
-                &((struct SceneActorAnimationTileDrawable *)actor->base.drawable)->tile, mask);
-    }
+    ActorStatus_SetDrawableFlags(actor, 1);
     Vorn_InstallIdleControl(actor, SceneActorControl_OnIdle, 16, completedState);
     SceneActorChase_SelectState(actor, completedState, 0, 2);
     Vorn_ResetStateEntry(actor, completedState);

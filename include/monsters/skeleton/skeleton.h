@@ -31,15 +31,18 @@ struct Skeleton {
     u8 unknown700[2];
     u8 parameter702;
     u8 attempts; /* distance reactions tried since the last reset */
-    u8 unknown704[2];
+    u16 actionCooldown; /* Frames until the next timed turn or action. */
     u16 parameter706;
     u32 nearDistance, farDistance; /* target distance bands for the reaction choice */
-    u8 unknown710[8];
+    struct ContactPosition capturedTargetPosition;
     s32 healthThreshold;
     struct ChaseRouteProbe routeProbe;
     struct ContactPosition destination;
-    u8 unknown748[4];
+    u16 visibilityFrame; /* Frames elapsed in the visibility flicker transition. */
+    u8 unknown74A[2];
 };
+
+typedef char SkeletonSize[(sizeof(struct Skeleton) == 0x74C) ? 1 : -1];
 
 void SceneActorScript_TriggerCallOnCount(struct ChaseActor *actor);
 u8 SceneActorReaction_IsRangeReady(struct ChaseActor *actor);
@@ -54,8 +57,7 @@ void SceneActorApproach_UpdateRange(struct ChaseActor *actor);
 extern const u32 gUnk_086060B4[];
 s32 SceneActorReaction_TickHiddenResponse(struct ChaseActor *actor);
 void SceneActorControl_DispatchControl(void *);
-struct SkeletonActionFlagsActor;
-s32 Skeleton_UpdateActionFlags(struct SkeletonActionFlagsActor *p);
+s32 Skeleton_UpdateActionFlags(struct Skeleton *p);
 extern u32 gUnk_02000560;
 void SceneActorPlacement_ConsumeShakeFlags(struct ChaseActor *);
 void SceneActorTarget_OnBindingChanged(struct ChaseActor *);

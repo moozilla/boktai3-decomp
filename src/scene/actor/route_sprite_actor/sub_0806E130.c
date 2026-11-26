@@ -1,3 +1,4 @@
+#include "engine/engine_pause.h"
 #include "scene/motion/route_sprite_actor.h"
 #include "engine/ram.h"
 extern u32 gUnk_02000560;
@@ -6,11 +7,6 @@ static inline u8 Occupied(u32 *mask, s32 index)
     if (*mask & (1 << index))
         return TRUE;
     return FALSE;
-}
-static inline u32 Paused(void)
-{
-    u32 mask = 0x400;
-    return (gEngineFlags | gScenePauseFlags) & mask;
 }
 static inline u32 Locked(void)
 {
@@ -21,7 +17,7 @@ s32 RouteSpritePool_Tick(struct RouteSpritePool *pool)
 {
     struct RouteSpriteActor *start = pool->slots;
     if (pool->occupiedMask) {
-        if (!Paused()) {
+        if (!Engine_PauseBits(0x400)) {
             if (!Locked()) {
                 s32 i = 0;
                 RouteSpriteStateCallback *table = gUnk_08605BB0;

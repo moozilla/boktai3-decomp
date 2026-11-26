@@ -1,16 +1,7 @@
-#include "global.h"
-struct B {
-    u8 a[0x7c];
-    u32 w7c;
-};
-struct A {
-    u8 a[0x18];
-    u32 w18;
-};
-void Sprite_Remove(u32 *);
-void EnemyAttackParticle_ReleaseSlot(struct A *a, struct B *b, u32 n)
+#include "monsters/enemy_particle.h"
+void EnemyAttackParticle_ReleaseSlot(struct EnemyParticlePool *a, struct EnemyParticle *b, u32 n)
 {
-    b->w7c |= 1;
-    Sprite_Remove(&b->w7c);
-    a->w18 &= ~(1 << n);
+    b->sprite.flags |= 1;
+    Sprite_Remove(&b->sprite);
+    a->mask &= ~(1 << n);
 }

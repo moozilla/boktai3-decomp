@@ -1,10 +1,9 @@
-#include "global.h"
-void Sword_BeginTargetOrbit(u8 *);
-void Callback_InvokeActor(u8 *, void (*)(u8 *));
-static inline u8 Take(u8 *s)
+#include "monsters/sword/sword_task.h"
+void Sword_BeginTargetOrbit(struct SwordComponent *);
+static inline u8 Take(struct SwordComponent *s)
 {
     u32 test = 1;
-    u8 *p = s + 0x119;
+    u8 *p = &s->entryFlags;
     u8 value = *p;
     test &= value;
     if (test) {
@@ -13,20 +12,18 @@ static inline u8 Take(u8 *s)
         mask &= value;
         zero = 0;
         *p = mask;
-        s[0x12E] = zero;
+        s->entryReset = zero;
         return 1;
     }
     return 0;
 }
-void Sword_UpdateThrustAttack(u8 *s)
+void Sword_UpdateThrustAttack(struct SwordComponent *s)
 {
     if (Take(s)) {
-        void (**p)(u8 *) = (void (**)(u8 *))(s + 0x178);
-        void (*fn)(u8 *) = Sword_BeginTargetOrbit;
-        *p = fn;
+        s->thrustUpdate = Sword_BeginTargetOrbit;
     }
     {
-        void (*fn)(u8 *) = *(void (**)(u8 *))(s + 0x178);
+        void (*fn)(struct SwordComponent *) = s->thrustUpdate;
         if (fn)
             Callback_InvokeActor(s, fn);
     }

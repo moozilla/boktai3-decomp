@@ -1,7 +1,7 @@
-#include "global.h"
-void Centipede_ApplyPendingRadialVelocity(u8 *);
-u32 Centipede_UpdatePendingVelocity(u8 *actor)
+#include "monsters/centipede/centipede_body.h"
+void Centipede_ApplyPendingRadialVelocity(struct TentacleBody *);
+u32 Centipede_UpdatePendingVelocity(struct TentacleBody *body)
 {
-    Centipede_ApplyPendingRadialVelocity(actor);
+    Centipede_ApplyPendingRadialVelocity(body);
     return 1;
 }

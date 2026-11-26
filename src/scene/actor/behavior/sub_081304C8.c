@@ -1,3 +1,4 @@
+#include "scene/actor/scene_actor_drawable_flags.h"
 #include "scene/actor/scene_actor_control_phase.h"
 #include "scene/motion/scene_actor_terrain_reaction.h"
 #include "global.h"
@@ -36,7 +37,7 @@ void SceneActorControl_HideOffscreen(struct ChaseActor *actor)
     actor->base.body.position.x = 0;
     actor->base.body.position.y = 30000;
     actor->base.body.position.z = 0;
-    SceneActorControl_SetDrawableFlags(1, actor);
+    ActorStatus_SetDrawableFlags(actor, 1);
     SceneActorTerrain_EnterState(actor, 3, 0, 0);
     SceneActorTerrain_InstallControl(actor, SceneActorControl_OnIdle, 16);
     SceneActorTerrain_DisableCollision(actor);

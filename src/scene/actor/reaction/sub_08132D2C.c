@@ -1,10 +1,10 @@
+#include "scene/actor/scene_actor_record.h"
 #include "scene/motion/scene_actor_terrain_reaction.h"
 #include "global.h"
 #include "scene/actor/scene_actor_reaction.h"
 #include "engine/runtime.h"
 #include "scene/motion/scene_actor_chase_shared.h"
 /* At zero health: hand control to the defeat target (kind 17), then bump the saturating defeat counters in the game-state block by category and weapon kind. */
-void SceneActorRecord_RecordPair(u16, u16);
 void SceneActorContacts_ReleaseNode(void *);
 void Player_NotifyFirstSelectedSlot(u32, u32);
 void Player_RefreshLifeState(u32, u32);
@@ -62,11 +62,6 @@ static inline u8 Test2(u16 **out, struct ChaseActor *actor, u32 maskInput)
     if (value)
         return 1;
     return 0;
-}
-static inline u32 Flag2D0(struct ChaseActor *actor, u32 maskInput)
-{
-    u32 mask = maskInput;
-    return actor->base.statusFlags & mask;
 }
 u32 SceneActorReaction_DefeatRecordStats(struct ChaseActor *actor)
 {
@@ -203,9 +198,8 @@ u32 SceneActorReaction_DefeatRecordStats(struct ChaseActor *actor)
             Player_RefreshLifeState(actor->base.hitAttributes, actor->base.fieldA1);
         }
     record:
-        if (!SceneActorChase_Test(Mask(flags2C0, 0x80), ~0) &&
-            !SceneActorChase_Test(gEngineFlags, 0x4800) && !Flag2D0(actor, 0x800))
-            SceneActorRecord_RecordPair(gScriptEntryProcedure, actor->base.body.id);
+        if (!SceneActorChase_Test(Mask(flags2C0, 0x80), ~0))
+            SceneActorRecord_RecordDefeat(actor);
         ((struct ContactCollider *)collider)->flags |= 4;
     done:
         return 1;

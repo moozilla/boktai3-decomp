@@ -1,4 +1,6 @@
-#include "global.h"
+#include "monsters/enemy_particle.h"
+#include "player/cutscene/player_cue_sequence.h"
+#include "monsters/poison_hand.h"
 #include "engine/video/display_sequence_inline.h"
 #include "engine/math/scene_vec.h"
 #include "engine/engine.h"
@@ -7,58 +9,7 @@
 #include "engine/engine_pause.h"
 #include "engine/word_flags.h"
 
-struct PoisonHandSprite {
-    u32 flags;
-    u8 unk_04[0xc];
-    u16 frame;
-    u8 unk_12[0xa];
-};
-struct PoisonHandCollider {
-    u8 unk_00[6];
-    u16 flags;
-    u8 unk_08[4];
-    u8 damagePosition[8];
-    u8 damageOffset[8];
-    u8 unk_1C[0x27];
-    u8 direction;
-};
-/* This actor has private state at 0x108, inside the canonical actor prefix. */
-struct PoisonHand {
-    u8 unk_00[0x18];
-    u32 age;
-    u8 unk_1C[8];
-    struct PoisonHandSprite sprite;
-    struct SceneVec position;
-    u8 unk_48[8];
-    u8 graphics[0x1c];
-    struct PoisonHandCollider collider;
-    u16 blinkTimer;
-    u8 unk_B2[0x56];
-    void *update;
-    struct DisplaySequenceState sequence;
-    u8 unk_11C[0xe];
-    s16 flashTimer;
-    u8 unk_12C[4];
-    s16 hitReaction;
-    s16 defeated;
-    s16 damage;
-    s16 health;
-    s16 maxHealth;
-    u8 unk_13A[4];
-    s16 hudState;
-    u8 unk_140[2];
-    s16 hudTimer;
-    u8 unk_144[8];
-    void *hud;
-    u32 reaction;
-    u32 pendingReaction;
-    u8 unk_158[0x10];
-    void *animationResource;
-};
-struct ParticleParameters {
-    u32 words[14];
-};
-extern u32 gUnk_02000560;
+#include "player/player.h"
 extern u8 gUnk_0203B000[];
 void Sound_PlaySong(u32);
 s32 Callback_InvokeActor(void *, void *);
@@ -77,93 +28,22 @@ void EnemyAttackParticle_EnableShadow(void *);
 void EnemyAttackParticle_AddFlags(void *, u32);
 void EnemyAttackParticle_Emit(void *, void *);
 
-static inline u32 PoisonHand_StepSequence(struct PoisonHandSprite *owner,
-                                          struct DisplaySequenceState *state)
-{
-    const u16 *command;
-    u32 ended;
-    {
-        u32 offset = DisplaySequence_GetIndex(state) << 1;
-        const u16 *table;
-        table = state->commands;
-        command = (const u16 *)((u32)table + offset);
-    }
-    owner->frame = *command >> 6;
-    {
-        union DisplaySequenceControl control;
-        u32 bit, first;
-        control.raw = state->flags;
-        bit = 1;
-        first = (u8)(control.raw & bit);
-        if (first != (((*command & 0x30) >> 4) & bit))
-            owner->flags |= 4;
-        else
-            owner->flags &= ~4;
-    }
-    {
-        union DisplaySequenceControl control;
-        u32 bit, first;
-        control.raw = state->flags;
-        bit = 2;
-        first = (u8)(control.raw & bit);
-        if (first != (((*command & 0x30) >> 4) & bit))
-            owner->flags |= 8;
-        else
-            owner->flags &= ~8;
-    }
-    if (++state->elapsed >= state->duration) {
-        state->elapsed = 0;
-        if (state->flags & 4) {
-            if (state->index == 0) {
-                if (state->flags & 8)
-                    state->elapsed = state->duration;
-                else
-                    state->index = state->frameCount - 1;
-                ended = 1;
-            } else {
-                state->index--;
-                ended = 0;
-            }
-        } else {
-            if (++state->index >= state->frameCount) {
-                if (state->flags & 8) {
-                    state->elapsed = state->duration;
-                    state->index = state->frameCount - 1;
-                } else {
-                    state->index = 0;
-                }
-                ended = 1;
-            } else {
-                ended = 0;
-            }
-        }
-        command = state->commands + state->index;
-        state->frameWeight = DisplaySequence_MaskCommand(DisplaySequence_ReadCommand(command), 15);
-        state->duration = (state->frameWeight * (s32)state->speed) >> 6;
-        if (state->duration == 0)
-            state->duration = 1;
-    } else {
-        ended = 0;
-    }
-    return ended;
-}
-
 s32 PoisonHand_Update(struct PoisonHand *p)
 {
-    struct PoisonHandCollider *collider;
+    struct ContactCollider *collider;
     /* The loop bank and final age update share the current data owner. */
     void *dataOwner;
-    if (Engine_PauseBits(0x400) || Flags_MaskedWord(4, &gUnk_02000560))
+    if (Engine_PauseBits(0x400) || Flags_MaskedWord(4, &gPlayerSlotStatus[0]))
         return 0;
     Callback_InvokeActor(p, p->update);
     p->sprite.flags &= ~1;
     if (p->defeated == 0) {
-        struct PoisonHandCollider *c = &p->collider;
+        struct ContactCollider *c = &p->collider;
         c->flags &= ~4;
-        Collider_SetPosition(c, &p->position, 0);
+        Collider_SetPosition(c, &p->sprite.position, 0);
         collider = c;
     } else {
-        struct PoisonHandCollider *c = &p->collider;
+        struct ContactCollider *c = &p->collider;
         c->flags |= 4;
         collider = c;
     }
@@ -176,17 +56,17 @@ s32 PoisonHand_Update(struct PoisonHand *p)
             p->reaction = p->pendingReaction;
             Sound_PlaySong(0x13e);
             if (*damage > 0) {
-                DamageNumberDisplay_Show(collider, *damage, 0, p->collider.damagePosition,
-                                         p->collider.damageOffset, 1);
+                DamageNumberDisplay_Show(collider, *damage, 0, &p->collider.position,
+                                         &p->collider.offset, 1);
                 SceneHud_SetTimedState(p->hud, *health, p->maxHealth, p->hudState,
-                                       p->collider.direction == 4, p->hudTimer);
+                                       p->collider.costFlags == 4, p->hudTimer);
             }
             if (p->health <= 0) {
-                struct ParticleParameters parameters;
+                struct EnemyParticleParams parameters;
                 const u16 *randomTable;
                 s32 i;
                 p->defeated = 1;
-                p->blinkTimer = 0;
+                p->collider.responseValue = 0;
                 i = 0;
                 for (; i <= 7; i++) {
                     dataOwner = gUnk_0203B000;
@@ -213,7 +93,7 @@ s32 PoisonHand_Update(struct PoisonHand *p)
                             if (ParticleRandom_ReadBankSample(lateBank) & 1)
                                 EnemyAttackParticle_AddFlags(&parameters, 8);
                         }
-                        EnemyAttackParticle_Emit(&parameters, &p->position);
+                        EnemyAttackParticle_Emit(&parameters, &p->sprite.position);
                     }
                 }
                 Anim_RestartSequence(&p->sequence, p->animationResource, 0x19, 0, 0);
@@ -223,13 +103,9 @@ s32 PoisonHand_Update(struct PoisonHand *p)
                 p->age = 0;
                 Sound_PlaySong(0x52f);
             }
-            {
-                s16 *flash = &p->flashTimer;
-                s32 zero = 0;
-                *flash = 8;
-                p->hitReaction = 1;
-                p->damage = zero;
-            }
+            p->flashTimer = 8;
+            p->hitReaction = 1;
+            p->damage = 0;
         }
     }
     if (p->flashTimer > 0) {
@@ -237,14 +113,14 @@ s32 PoisonHand_Update(struct PoisonHand *p)
         p->flashTimer--;
     } else
         AnimData_SelectPaletteBank(p->graphics, 0x1c5);
-    if (p->blinkTimer) {
-        p->blinkTimer--;
-        if ((p->blinkTimer >> 2) & 1)
+    if (p->collider.responseValue) {
+        p->collider.responseValue--;
+        if ((p->collider.responseValue >> 2) & 1)
             p->sprite.flags |= 1;
         else
             p->sprite.flags &= ~1;
     }
-    PoisonHand_StepSequence(&p->sprite, &p->sequence);
+    PlayerCue_StepSequenceEnded((void *)&p->sprite, &p->sequence);
     dataOwner = p;
     ((struct PoisonHand *)dataOwner)->age++;
 }

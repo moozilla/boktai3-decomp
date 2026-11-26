@@ -12,8 +12,7 @@ void Armor_UpdatePartWaveZReturn(struct Motion0818Object *p)
     p->x = p->startX + Div(p->dx * p->timer, 128);
     p->y = p->startY + Div(p->dy * p->timer, 128);
     p->z = p->startZ + Div(p->dz * p->timer, 128) + wave;
-    p->timer--;
-    if (p->timer == 0) {
+    if (--p->timer == 0) {
         u8 one;
         p->rotation = 0x80;
         one = 1;

@@ -1,33 +1,14 @@
+#include "scene/collision/scene_actor_delayed_response.h"
 #include "scene/motion/scene_actor_terrain_reaction.h"
 #include "scene/actor/scene_actor_behavior.h"
 #include "global.h"
 #include "scene/motion/scene_actor_chase.h"
 #include "scene/motion/scene_actor_straight_route.h"
 #include "scene/actor/scene_actor_attachment.h"
-#include "scene/motion/scene_actor_terrain_reaction.h"
 
 // confidence=low: timed movement recovery restores a route and saves a delayed control.
 u8 sub_0812F3CC(struct ChaseActor *);
 void SceneActorAttachment_ReplaceResponseSlot(void *, u32, u32, u32);
-struct DelayedReactionControl {
-    u8 state, phase, behavior, unknown3;
-    u32 delay;
-    void *callback;
-};
-struct ReactionSavedControl {
-    struct SceneActorChaseSavedControl previous;
-    struct DelayedReactionControl next;
-};
-static inline void SaveControl(struct SceneActorChaseSavedControl *record, void *callback,
-                               u8 behavior)
-{
-    struct ReactionSavedControl *saved = (void *)record;
-    saved->next.delay = 30;
-    saved->next.callback = callback;
-    saved->next.state = 0;
-    saved->next.phase = 0;
-    saved->next.behavior = behavior;
-}
 void SceneActorReaction_UpdateRouteRecovery(struct ChaseActor *actor)
 {
     struct SceneActorChaseGroup *group = &actor->group;
@@ -73,14 +54,14 @@ void SceneActorReaction_UpdateRouteRecovery(struct ChaseActor *actor)
                 u32 mask = ~0xc0;
                 *flags &= mask;
             }
-            SaveControl(&group->saved, actor->base.onAlternateEntry, 7);
+            SceneActorDelay_Prepare((void *)&group->saved, actor->base.onAlternateEntry, 7, 30);
         } else {
             {
                 u32 *flags = savedFlags;
                 u32 mask = ~0xd0;
                 *flags &= mask;
             }
-            SaveControl(&group->saved, actor->base.onStanding, 0);
+            SceneActorDelay_Prepare((void *)&group->saved, actor->base.onStanding, 0, 30);
         }
         actor->base.field2C2 = 64;
     }

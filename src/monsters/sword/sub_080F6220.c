@@ -1,11 +1,5 @@
-#include "global.h"
+#include "scene/collision/contact_position.h"
 
-struct TargetMotionVector {
-    u32 x : 16;
-    s32 y : 16;
-    u32 z : 16;
-    u32 pad : 16;
-};
 struct TargetMotionOwner {
     u8 unknown0[0xD56];
     u16 palette;
@@ -16,7 +10,7 @@ struct TargetMotionExit {
     u8 unknown10[0x3E];
     u16 flags4E;
     u8 unknown50[0x1C];
-    struct TargetMotionVector position;
+    struct ContactPosition position;
     u8 unknown74[0x2E];
     u16 flagsA2;
     u8 unknownA4[0x75];
@@ -53,7 +47,7 @@ static inline u8 TargetMotion_TakeExitFlag(struct TargetMotionExit *p)
 void TargetMotion_UpdateFlashingExit(struct TargetMotionExit *p)
 {
     struct TargetMotionOwner *owner = p->owner;
-    struct TargetMotionVector position, size;
+    struct ContactPosition position, size;
     if (TargetMotion_TakeExitFlag(p)) {
         p->flags4E |= 4;
         p->flagsA2 |= 4;

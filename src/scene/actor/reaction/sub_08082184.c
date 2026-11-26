@@ -1,3 +1,4 @@
+#include "scene/motion/scene_actor_terrain_reaction.h"
 #include "global.h"
 #include "scene/actor/scene_actor_reaction.h"
 #include "scene/actor/scene_actor_init_actor.h"
@@ -83,20 +84,7 @@ static inline u8 TryRoute(struct ChaseActor *actor, void *context, struct Contac
     SceneActorChase_ClearBits(&actor->base.motionFlags, 0x200);
     return 0;
 }
-static inline void SetControl(struct ChaseActor *actor, void *callback, u32 kind)
-{
-    actor->base.field2B2 = 1;
-    actor->base.stepDone = 0;
-    actor->base.controlKind = kind;
-    actor->base.target = callback;
-    actor->base.field2C8 = 0;
-    {
-        u32 *flags = &actor->base.pendingControlFlags;
-        u32 mask = ~1;
-        *flags &= mask;
-    }
-    actor->base.pendingControl = 0;
-}
+
 static inline void SetResponse(struct RouteResponse *response, void *control, u32 state, u32 phase,
                                u32 behavior, s32 threshold)
 {
@@ -119,12 +107,12 @@ void SceneActorReaction_TryResumeRoute(struct ChaseActor *actor, s32 frame)
         SceneActorAttachment_ReplaceResponseSlot(actor, 0, 2, actor->base.category);
         SnapToRoute(group->destination, &group->route);
         if (!TryRoute(actor, group->context, &actor->base.body.position, group->destination)) {
-            SetControl(actor, SceneActorControl_OnIdle, 0);
+            SceneActorTerrain_InstallControl(actor, SceneActorControl_OnIdle, 0);
             MonsterInit_SetState(actor, 3, 0, 0);
         } else {
             group->destination->pad = 1;
             MonsterInit_SetState(actor, 3, 1, 0);
-            SetControl(actor, SceneActorReaction_RestoreAfterDelay, 14);
+            SceneActorTerrain_InstallControl(actor, SceneActorReaction_RestoreAfterDelay, 14);
             MonsterInit_SetBehaviorFlags(actor, 0x10);
             actor->base.field2C2 = 64;
             SetResponse(&group->response, actor->base.onAlternateEntry, 0, 0, 7, 60);

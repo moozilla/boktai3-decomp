@@ -1,4 +1,4 @@
-#include "global.h"
+#include "engine/video/render.h"
 
 void Sound_ResumePersistentSongs(void);
 
@@ -7,7 +7,7 @@ void SceneLifecycle_ResumeScene(void)
     u32 *p;
     u32 m;
     Sound_ResumePersistentSongs();
-    p = (u32 *)0x0300523C;
+    p = &gEnginePauseFlags;
     m = ~2;
     *p = *p & m;
 }

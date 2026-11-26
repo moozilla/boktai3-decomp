@@ -1,32 +1,23 @@
-#include "global.h"
+#include "monsters/axe_armor/axe_armor.h"
 #include "engine/engine_globals.h"
 #include "engine/ram.h"
-struct V {
-    u16 x;
-    u16 y;
-    u32 z;
-};
-struct R {
-    u8 a;
-    u8 b;
-} __attribute__((packed));
 void SpriteParticle_CreateDefaultVariant4384(void *, s32, s32, s32, s32, s32, s32, s32, s32, s32,
                                              s32, s32);
-void AxeArmor_RecordDefeat(void *);
-s32 AxeArmor_UpdateDeath(u8 *p)
+void AxeArmor_RecordDefeat(struct AxeArmor *);
+s32 AxeArmor_UpdateDeath(struct AxeArmor *p)
 {
-    if (!(*((s16 *)(p + 0x144)))) {
-        if ((*((s32 *)(p + 0x18))) <= 11) {
-            struct V v;
-            struct V *q = &v;
+    if (!p->initialDead) {
+        if (p->timer <= 11) {
+            struct ContactPosition v;
+            struct ContactPosition *q = &v;
             u32 r;
-            *q = *((struct V *)(p + 0x40));
+            *q = p->sprite.position;
             q->y += 200;
             gRandomIndex = (gRandomIndex + 1) & 0x3ff;
-            r = (*(&((struct R *)gRandomTable)[gRandomIndex])).a;
+            r = *(const u8 *)&gRandomTable[gRandomIndex];
             SpriteParticle_CreateDefaultVariant4384(&v, 128, 32, 12, 12, 24, r, 32, 32, 1, 1, 512);
         }
-        if ((*((s32 *)(p + 0x18))) == 12) {
+        if (p->timer == 12) {
             AxeArmor_RecordDefeat(p);
         }
     }

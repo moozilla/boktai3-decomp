@@ -1,13 +1,12 @@
-#include "global.h"
-void Anim_SetSequence(void *, u32, u32, u32, u32);
+#include "monsters/cannons/plasma_cannon.h"
 void PlasmaCannon_TryFireAtPlayer(void);
-u32 PlasmaCannon_UpdateRecoveryDelay(u8 *p)
+u32 PlasmaCannon_UpdateRecoveryDelay(struct OrangeSpineActor *p)
 {
-    u16 n = *(u16 *)(p + 0x12c);
-    if (*(s16 *)(p + 0x12c) > 0) {
-        *(u16 *)(p + 0x12c) = n - 1;
+    u16 n = p->recoveryTimer;
+    if ((s16)p->recoveryTimer > 0) {
+        p->recoveryTimer = n - 1;
     } else {
-        Anim_SetSequence(p + 0x10c, *(u32 *)(p + 0x170), 14, p[0x132], 0);
-        *(void (**)(void))(p + 0x108) = PlasmaCannon_TryFireAtPlayer;
+        Anim_SetSequence(&p->sequence, p->resource, 14, p->facing, 0);
+        p->update = PlasmaCannon_TryFireAtPlayer;
     }
 }

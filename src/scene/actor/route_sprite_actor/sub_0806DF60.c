@@ -13,7 +13,7 @@ struct RouteSpriteActor *RouteSpritePool_AllocateSlot(struct RouteSpritePool *po
         if (!Occupied(&pool->occupiedMask, i)) {
             slot = &pool->slots[i];
             pool->occupiedMask |= 1 << i;
-            Memory_Clear(slot, 0x178);
+            Memory_Clear(slot, sizeof(*slot));
             slot->index = i;
             return slot;
         }

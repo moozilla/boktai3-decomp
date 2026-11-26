@@ -1,9 +1,11 @@
+#include "scene/collision/contact_collider.h"
+#include "monsters/enemy_particle.h"
 #include "global.h"
 #include "monsters/screamer/screamer_state.h"
 #include "engine/ram.h"
 #include "engine/math/monster_particle_random.h"
 #include "engine/engine_pause.h"
-extern u32 gUnk_02000560;
+#include "player/player.h"
 extern u8 gUnk_0203B000[];
 void SceneDrawablePair_SetFlags(void);
 void Screamer_HandleDefeat(void *);
@@ -17,9 +19,6 @@ void EnemyAttackParticle_SetVerticalMotion(void *, s32, s32);
 void EnemyAttackParticle_EnableShadow(void *);
 void EnemyAttackParticle_AddFlags(void *, u32);
 void EnemyAttackParticle_Emit(void *, void *);
-struct ScreamerParticleParameters {
-    u32 data[14];
-};
 static inline u32 TestFlags(s16 mask, u32 *flags)
 {
     return *flags & mask;
@@ -30,12 +29,12 @@ static inline void Screamer_CopyPosition(struct ActorPosition *out, const struct
 }
 s32 Screamer_UpdateDamageParticles(struct ScreamerState *p)
 {
-    struct ScreamerParticleParameters parameters;
+    struct EnemyParticleParams parameters;
     struct ActorPosition position;
     s32 emitted;
     void *dataOwner;
     u16 *blink;
-    if (Engine_PauseBits(0x400) || TestFlags(4, &gUnk_02000560))
+    if (Engine_PauseBits(0x400) || TestFlags(4, &gPlayerSlotStatus[0]))
         return 0;
     Callback_InvokeActor(p, p->update);
     if ((p->f1DC > 0) && (!p->f1E0)) {
@@ -43,9 +42,9 @@ s32 Screamer_UpdateDamageParticles(struct ScreamerState *p)
         p->f200 = p->f204;
         Sound_PlaySong(0x13e);
         if (p->f1DC > 0) {
-            DamageNumberDisplay_Show(p->bodyCollider, p->f1DC, 0, ((u8 *)p) + 0xCC,
-                                     ((u8 *)p) + 0xD4, 1);
-            SceneHud_SetTimedState(p->f1F8, p->f1E4, p->f1E6, p->f1EC, (*(((u8 *)p) + 0x103)) == 4,
+            struct ContactCollider *body = (void *)p->bodyCollider;
+            DamageNumberDisplay_Show(body, p->f1DC, 0, &body->position, &body->offset, 1);
+            SceneHud_SetTimedState(p->f1F8, p->f1E4, p->f1E6, p->f1EC, body->costFlags == 4,
                                    p->f1F4);
         }
         if (p->f1E4 <= 0) {

@@ -1,4 +1,5 @@
 #include "monsters/centipede/centipede_body.h"
+#include "monsters/scene_route_sample.h"
 
 #include "scene/actor/scene_actor_init_actor.h"
 #include "engine/word_flags.h"
@@ -233,8 +234,8 @@ void CentipedeBody_UpdateSpreadWindup(struct ChaseActor *actor)
         }
         angle = (actor->base.body.direction + 128) & 255;
         actor->base.body.motion.x +=
-            CentipedeSpread_Shift(gUnk_086149C4[(angle + 64) & 255] * speed, 12);
-        actor->base.body.motion.z += CentipedeSpread_Shift(gUnk_086149C4[angle] * speed, 12);
+            SceneRoute_ScaleComponent(gUnk_086149C4[(angle + 64) & 255] * speed);
+        actor->base.body.motion.z += SceneRoute_ScaleComponent(gUnk_086149C4[angle] * speed);
         Centipede_UpdateSegmentPositions(actor, 14, 12000);
         activeSegment = 0;
         for (segmentIndex = 0; segmentIndex < body->segmentCount; segmentIndex++) {
@@ -244,22 +245,18 @@ void CentipedeBody_UpdateSpreadWindup(struct ChaseActor *actor)
                     case 0:
                         body->segments[segmentIndex].position.x =
                             (u16)actor->base.body.position.x -
-                            CentipedeSpread_Shift(
-                                gUnk_086149C4[(actor->base.body.direction + 64) & 255] * 54, 12);
+                            SceneRoute_ScaleComponent(gUnk_086149C4[(actor->base.body.direction + 64) & 255] * 54);
                         body->segments[segmentIndex].position.z =
                             (u16)actor->base.body.position.z -
-                            CentipedeSpread_Shift(gUnk_086149C4[actor->base.body.direction] * 54,
-                                                 12);
+                            SceneRoute_ScaleComponent(gUnk_086149C4[actor->base.body.direction] * 54);
                         break;
                     case 1:
                         body->segments[segmentIndex].position.x =
                             (u16)actor->base.body.position.x -
-                            CentipedeSpread_Shift(
-                                gUnk_086149C4[(actor->base.body.direction + 64) & 255] * 20, 12);
+                            SceneRoute_ScaleComponent(gUnk_086149C4[(actor->base.body.direction + 64) & 255] * 20);
                         body->segments[segmentIndex].position.z =
                             (u16)actor->base.body.position.z -
-                            CentipedeSpread_Shift(gUnk_086149C4[actor->base.body.direction] * 20,
-                                                 12);
+                            SceneRoute_ScaleComponent(gUnk_086149C4[actor->base.body.direction] * 20);
                         break;
                     default:
                         body->segments[segmentIndex].position.x = (u16)actor->base.body.position.x;
@@ -296,8 +293,8 @@ void CentipedeBody_UpdateSpreadRelease(struct ChaseActor *actor, s32 frame)
         direction = field;
     }
     actor->base.body.motion.x +=
-        CentipedeSpread_Shift(gUnk_086149C4[(angle + 64) & 255] * scale, 12);
-    actor->base.body.motion.z += CentipedeSpread_Shift(gUnk_086149C4[angle] * scale, 12);
+        SceneRoute_ScaleComponent(gUnk_086149C4[(angle + 64) & 255] * scale);
+    actor->base.body.motion.z += SceneRoute_ScaleComponent(gUnk_086149C4[angle] * scale);
     body->spin += 12;
     activeSegment = 0;
     for (segmentIndex = 0; segmentIndex < body->segmentCount; segmentIndex++) {
@@ -309,18 +306,18 @@ void CentipedeBody_UpdateSpreadRelease(struct ChaseActor *actor, s32 frame)
                 case 0:
                     body->segments[segmentIndex].position.x =
                         (u16)actor->base.body.position.x -
-                        CentipedeSpread_Shift(gUnk_086149C4[(*direction + 64) & 255] * 54, 12);
+                        SceneRoute_ScaleComponent(gUnk_086149C4[(*direction + 64) & 255] * 54);
                     body->segments[segmentIndex].position.z =
                         (u16)actor->base.body.position.z -
-                        CentipedeSpread_Shift(gUnk_086149C4[*direction] * 54, 12);
+                        SceneRoute_ScaleComponent(gUnk_086149C4[*direction] * 54);
                     break;
                 case 1:
                     body->segments[segmentIndex].position.x =
                         (u16)actor->base.body.position.x -
-                        CentipedeSpread_Shift(gUnk_086149C4[(*direction + 64) & 255] * 20, 12);
+                        SceneRoute_ScaleComponent(gUnk_086149C4[(*direction + 64) & 255] * 20);
                     body->segments[segmentIndex].position.z =
                         (u16)actor->base.body.position.z -
-                        CentipedeSpread_Shift(gUnk_086149C4[*direction] * 20, 12);
+                        SceneRoute_ScaleComponent(gUnk_086149C4[*direction] * 20);
                     break;
                 default:
                     body->segments[segmentIndex].position.x = (u16)actor->base.body.position.x;
@@ -364,8 +361,8 @@ void CentipedeBody_UpdateSpreadPreparation(struct ChaseActor *actor)
     }
     angle = (actor->base.body.direction + 128) & 255;
     actor->base.body.motion.x +=
-        CentipedeSpread_Shift(gUnk_086149C4[(angle + 64) & 255] * speed, 12);
-    actor->base.body.motion.z += CentipedeSpread_Shift(gUnk_086149C4[angle] * speed, 12);
+        SceneRoute_ScaleComponent(gUnk_086149C4[(angle + 64) & 255] * speed);
+    actor->base.body.motion.z += SceneRoute_ScaleComponent(gUnk_086149C4[angle] * speed);
     Centipede_UpdateSegmentPositions(actor, 10, 0x1000);
     ActorTrail_ApplyAngularOffsets(actor, 20, 24, 0);
 }
@@ -394,8 +391,8 @@ void CentipedeBody_UpdateChargeSpread(struct ChaseActor *actor, s32 frame)
         direction = field;
     }
     actor->base.body.motion.x +=
-        CentipedeSpread_Shift(gUnk_086149C4[(angle + 64) & 255] * scale, 12);
-    actor->base.body.motion.z += CentipedeSpread_Shift(gUnk_086149C4[angle] * scale, 12);
+        SceneRoute_ScaleComponent(gUnk_086149C4[(angle + 64) & 255] * scale);
+    actor->base.body.motion.z += SceneRoute_ScaleComponent(gUnk_086149C4[angle] * scale);
     body->spin += 12;
     activeSegment = 0;
     for (segmentIndex = 0; segmentIndex < body->segmentCount; segmentIndex++) {
@@ -407,18 +404,18 @@ void CentipedeBody_UpdateChargeSpread(struct ChaseActor *actor, s32 frame)
                 case 0:
                     body->segments[segmentIndex].position.x =
                         (u16)actor->base.body.position.x -
-                        CentipedeSpread_Shift(gUnk_086149C4[(*direction + 64) & 255] * 54, 12);
+                        SceneRoute_ScaleComponent(gUnk_086149C4[(*direction + 64) & 255] * 54);
                     body->segments[segmentIndex].position.z =
                         (u16)actor->base.body.position.z -
-                        CentipedeSpread_Shift(gUnk_086149C4[*direction] * 54, 12);
+                        SceneRoute_ScaleComponent(gUnk_086149C4[*direction] * 54);
                     break;
                 case 1:
                     body->segments[segmentIndex].position.x =
                         (u16)actor->base.body.position.x -
-                        CentipedeSpread_Shift(gUnk_086149C4[(*direction + 64) & 255] * 20, 12);
+                        SceneRoute_ScaleComponent(gUnk_086149C4[(*direction + 64) & 255] * 20);
                     body->segments[segmentIndex].position.z =
                         (u16)actor->base.body.position.z -
-                        CentipedeSpread_Shift(gUnk_086149C4[*direction] * 20, 12);
+                        SceneRoute_ScaleComponent(gUnk_086149C4[*direction] * 20);
                     break;
                 default:
                     body->segments[segmentIndex].position.x = (u16)actor->base.body.position.x;

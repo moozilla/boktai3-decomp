@@ -1,3 +1,5 @@
+#include "scene/collision/contact_actor.h"
+#include "engine/math/math_shift.h"
 #include "scene/motion/scene_actor_displacement.h"
 #include "scene/motion/scene_actor_chase.h"
 #include "monsters/centipede_spread.h"
@@ -27,6 +29,8 @@
 #include "monsters/scene_actor_init_graphics.h"
 #include "scene/motion/scene_actor_terrain_reaction.h"
 #include "monsters/ghoul_disc.h"
+
+typedef char SlimeSizeCheck[sizeof(struct Slime) == 0x40C ? 1 : -1];
 
 void Slime_ApplyBodyHit(struct ContactCollider *target, struct ContactCollider *info,
                         struct ChaseActor *actor)
@@ -151,7 +155,7 @@ void Slime_ResetAnimation(struct ChaseActor *actor)
 
 void Slime_StartWalkChoice(struct ChaseActor *actor)
 {
-    if (Slime_TakePrepared(actor)) {
+    if (SceneActorReaction_TakePrepared(actor)) {
         SceneActorAnimation_SelectProfileEntry((void *)actor, 1);
         actor->base.field2C2 = 0x40;
         Anim_SetDurationScale(
@@ -171,7 +175,7 @@ void Slime_StartWalkChoice(struct ChaseActor *actor)
 
 void Slime_RollMoveFlag(struct ChaseActor *actor)
 {
-    if (Slime_TakePrepared(actor)) {
+    if (SceneActorReaction_TakePrepared(actor)) {
         u16 *scale = &actor->base.field2C2;
         *scale = 0x40;
         Anim_SetDurationScale(
@@ -201,7 +205,7 @@ void Slime_RollMoveFlag(struct ChaseActor *actor)
 
 void Slime_StartRandomWait(struct ChaseActor *actor)
 {
-    if (Slime_TakePrepared(actor)) {
+    if (SceneActorReaction_TakePrepared(actor)) {
         SceneActorAnimation_SelectProfileEntry((void *)actor, 0x11);
         actor->base.field2C2 = 0x40;
         Anim_SetDurationScale(
@@ -213,21 +217,14 @@ void Slime_StartRandomWait(struct ChaseActor *actor)
 
 void Slime_UpdateReturnToIdle(struct ChaseActor *actor)
 {
-    if (Slime_TakePrepared(actor)) {
+    if (SceneActorReaction_TakePrepared(actor)) {
         SceneActorAnimation_SelectProfileEntry((void *)actor, 0x12);
         actor->base.field2C2 = 0x40;
         Anim_SetDurationScale(
             &((struct SceneActorAnimationSequenceDrawable *)actor->base.drawable)->sequence, 0x40);
     }
     if (actor->base.restart) {
-        u8 *q = &actor->base.state2A8;
-        u32 z;
-        z = 0;
-        *q = z;
-        actor->base.phase2A9 = z;
-        actor->base.behavior2AA = z;
-        actor->base.counter2AC = z;
-        actor->base.field2B1 = 1;
+        SceneActorTerrain_EnterState(actor, 0, 0, 0);
         SceneActorChase_SetControl(actor, SceneActorControl_OnIdle, 0x10);
     }
 }
@@ -267,8 +264,6 @@ static inline void Slime_SelectWaitAnimation(struct RoomActor *actor, s32 index,
         savedSelection = selectionAddress;
         restart = &actor->restart;
         if (!force && previous == selection && !*restart) {
-            if (flags == 1 && (tile->flags & 4))
-                return;
             if (flags == 0 && !(tile->flags & 4))
                 return;
         }
@@ -295,7 +290,7 @@ static inline void Slime_SelectWaitAnimation(struct RoomActor *actor, s32 index,
 
 void Slime_UpdateRandomWait(struct ChaseActor *actor)
 {
-    if (Slime_TakePrepared(actor)) {
+    if (SceneActorReaction_TakePrepared(actor)) {
         u32 index;
         Slime_SelectWaitAnimation((void *)actor, 15, 0, 0);
         index = (gRandomIndex + 1) & 1023;
@@ -316,7 +311,7 @@ void Slime_UpdateRandomWait(struct ChaseActor *actor)
 
 void Slime_PlayWaitAnimation(struct ChaseActor *actor)
 {
-    if (Slime_TakePrepared(actor))
+    if (SceneActorReaction_TakePrepared(actor))
         SceneActorTurn_SelectProfileAnimation((void *)actor, 15, 1, 0);
     if (actor->base.restart)
         SceneActorChase_SetControl(actor, Slime_TickWaitTimer, 0x24);
@@ -325,7 +320,7 @@ void Slime_PlayWaitAnimation(struct ChaseActor *actor)
 void Slime_TickWaitTimer(struct ChaseActor *actor)
 {
     struct Slime *q = actor->base.context;
-    if (Slime_TakePrepared(actor)) {
+    if (SceneActorReaction_TakePrepared(actor)) {
         u32 index = (gRandomIndex + 1) & 1023;
         u32 random;
         gRandomIndex = index;
@@ -343,7 +338,7 @@ void Anim_SetDurationScale(void *, u32);
 
 void Slime_UpdateWalkTransition(struct ChaseActor *p)
 {
-    if (Slime_TakePrepared(p)) {
+    if (SceneActorReaction_TakePrepared(p)) {
         SceneActorAnimation_SelectProfileEntry((void *)p, 0xe);
         Anim_SetDurationScale(
             &((struct SceneActorAnimationSequenceDrawable *)p->base.drawable)->sequence, 0x40);
@@ -415,7 +410,7 @@ void Slime_ConvergeReactionMotion(struct ChaseActor *actor)
     s16 *priorZ;
     u32 *actorFlags;
     u32 *t;
-    if (Slime_TakePrepared(actor)) {
+    if (SceneActorReaction_TakePrepared(actor)) {
         actor->base.secondaryMotion.x = SceneActorDisplacement_Quarter(actor->base.secondaryMotion.x);
         actor->base.secondaryMotion.z = SceneActorDisplacement_Quarter(actor->base.secondaryMotion.z);
         SceneActorAnimation_SelectProfileEntry((void *)actor, 3);
@@ -481,7 +476,7 @@ void Slime_UpdateShake(struct ChaseActor *actor, s32 elapsed)
     struct Slime *q = actor->base.context;
     struct DisplaySequenceState *st =
         &((struct SceneActorAnimationSequenceDrawable *)actor->base.drawable)->sequence;
-    if (Slime_TakePrepared(actor)) {
+    if (SceneActorReaction_TakePrepared(actor)) {
         q->enrageCount = 0;
         actor->base.field2C2 = 0x40;
         Anim_SetDurationScale(
@@ -515,7 +510,7 @@ void Slime_UpdateLaunch(struct ChaseActor *actor)
     struct SceneActorAnimationSequenceDrawable *d = actor->base.drawable;
     u32 mask;
     struct DisplaySequenceState *anim = &d->sequence;
-    if (Slime_TakePrepared(actor)) {
+    if (SceneActorReaction_TakePrepared(actor)) {
         struct ContactPosition *v;
         u32 heading;
         s32 speed;
@@ -561,7 +556,7 @@ void Slime_UpdateLaunch(struct ChaseActor *actor)
 void Slime_UpdateStill(struct ChaseActor *actor)
 {
     struct SceneActorAnimationSequenceDrawable *d = actor->base.drawable;
-    if (Slime_TakePrepared(actor)) {
+    if (SceneActorReaction_TakePrepared(actor)) {
         d->sprite.palette = 0x40;
         d->sprite.paletteVariant = 0x40;
         d->sprite.flags &= ~2;
@@ -627,22 +622,7 @@ void Slime_RunDefeatScript(struct ChaseActor *actor, s32 frame)
                 Bestiary_GetEntryForActor(actor->base.category, actor->base.paletteOffset));
         if (!(SceneActorChase_Bits32(stateFlags, 0x400)))
             SceneActorBehavior_CallTerrainScript((void *)actor);
-        {
-            void *callback = (void *)SceneActorControl_OnIdle;
-            u32 kind;
-            kind = 16;
-            actor->base.field2B2 = 1;
-            actor->base.stepDone = 0;
-            actor->base.controlKind = kind;
-            actor->base.target = callback;
-            actor->base.field2C8 = 0;
-            {
-                u32 *flags = &actor->base.pendingControlFlags;
-                u32 mask = ~1;
-                *flags &= mask;
-            }
-            actor->base.pendingControl = 0;
-        }
+        SceneActorChase_SetControl(actor, SceneActorControl_OnIdle, 16);
         SceneActorTerrain_EnterState(actor, 1, 0, 2);
     } else {
         if (SceneActorVisibility_IsHidden(actor))
@@ -688,21 +668,6 @@ void Anim_SetFrameDurationScale(void *, u32);
 
 
 
-static inline void Slime_SetApproachControl(struct ChaseActor *a, void *cb, u32 kind)
-{
-    a->base.field2B2 = 1;
-    a->base.stepDone = 0;
-    a->base.controlKind = kind;
-    a->base.target = cb;
-    a->base.field2C8 = 0;
-    {
-        u32 *flags = &a->base.pendingControlFlags;
-        u32 mask = ~1;
-        *flags &= mask;
-    }
-    a->base.pendingControl = 0;
-}
-
 static inline u8 Slime_ApproachWanderTarget(struct ChaseActor *actor,
                                             struct SceneActorMotionSubject *target, s32 speed)
 {
@@ -714,8 +679,8 @@ static inline u8 Slime_ApproachWanderTarget(struct ChaseActor *actor,
     if (dx || dz) {
         motion->direction = Math_Atan2(dx, dz);
         motion->motion.x +=
-            CentipedeSpread_Shift(gUnk_086149C4[(motion->direction + 64) & 255] * speed, 12);
-        motion->motion.z += CentipedeSpread_Shift(gUnk_086149C4[motion->direction] * speed, 12);
+            Math_ShiftTowardZero(gUnk_086149C4[(motion->direction + 64) & 255] * speed, 12);
+        motion->motion.z += Math_ShiftTowardZero(gUnk_086149C4[motion->direction] * speed, 12);
     }
     return 0;
 }
@@ -739,7 +704,7 @@ void Slime_ApproachSavedTarget(struct ChaseActor *actor)
     struct Slime *context = actor->base.context;
     s32 speed;
     if (SceneActorControl_TakeFlag(&actor->base.field2B1)) {
-        Slime_SetApproachControl(actor, actor->base.onAlternateEntry, 1);
+        SceneActorChase_SetControl(actor, actor->base.onAlternateEntry, 1);
         Slime_SelectWanderTarget(actor, actor->base.body.direction);
         actor->base.field2C2 = 0x40;
         return;
@@ -781,20 +746,20 @@ void Slime_SetPrimaryStateTable(struct ChaseActor *actor)
     actor->base.callbacks284 = gUnk_08605D18;
 }
 
-void SceneActorCollision_InitBody(u8 *, struct SlimeCollisionVector *,
-                                  struct SlimeCollisionVector *, void *, u8 *);
+void SceneActorCollision_InitBody(u8 *, struct ContactPackedVector *,
+                                  struct ContactPackedVector *, void *, u8 *);
 
-void SceneActorCollision_InitAttack(u8 *, struct SlimeCollisionVector *,
-                                    struct SlimeCollisionVector *, void *, u32, u8 *);
+void SceneActorCollision_InitAttack(u8 *, struct ContactPackedVector *,
+                                    struct ContactPackedVector *, void *, u32, u8 *);
 
 void Slime_InitColliders(struct ChaseActor *actor)
 {
-    struct SlimeCollisionVector s1, s2;
-    s1.xy.first = 0x40;
-    s1.xy.second = 0x80;
-    s1.zw.first = 0x40;
-    *(u32 *)&s2.xy = 0x800000;
-    *(u32 *)&s2.zw &= 0xFFFF0000;
+    struct ContactPackedVector s1, s2;
+    s1.x = 0x40;
+    s1.y = 0x80;
+    s1.z = 0x40;
+    *(u32 *)&s2 = 0x800000;
+    ((u32 *)&s2)[1] &= 0xFFFF0000;
     SceneActorCollision_InitBody(actor, &s1, &s2, Slime_ResolveBodyContact, actor);
     ((struct ContactPosition *)&s1)->x = 0x40;
     ((struct ContactPosition *)&s1)->y = 0x64;
@@ -963,7 +928,7 @@ u32 Slime_TryEnrage(struct ChaseActor *actor)
     struct Slime *q = actor->base.context;
     s32 dy;
     actor->base.field2C2 = 0x40;
-    if (!MonsterInit_TestTargetingFlags(&actor->base.tracking, 2))
+    if (!SceneActorChase_TrackingFlags(&actor->base.tracking, 2))
         return 0;
     dy = actor->base.body.position.y -
          ((struct SceneActorChasePlayer *)gPlayers[0])->target.position.y;
@@ -995,8 +960,7 @@ void Slime_FollowPlayer(struct ChaseActor *actor)
     struct SceneActorChasePlayer *p;
     u32 zero;
     struct ContactPosition *dst;
-    struct SceneActorReactionMotion *m =
-        (struct SceneActorReactionMotion *)&actor->base.tracking.target;
+    struct SceneActorChaseTracking *m = &actor->base.tracking;
     {
         u32 v = 8;
         u32 f = m->flags;
@@ -1530,7 +1494,7 @@ static inline void Slime_ClearMotionBits(u16 *p, u32 mask)
 
 static inline void Slime_ClearReactionBits(u16 *p, u32 mask)
 {
-    ((struct SlimeHalfFlags *)p)->bits &= mask;
+    ((struct SceneActorReactionMotionFlags *)p)->bits &= mask;
 }
 
 static inline u8 Slime_TestReactionFlag(struct Slime *s, u32 mask)
@@ -1550,11 +1514,6 @@ static inline u32 Slime_CollisionDamageFlags(struct ContactCollider *p)
 static inline u32 Slime_MaskedDamage(struct ChaseActor *actor, u32 flags, u32 mask)
 {
     return actor->base.hitReactionFlags & flags & mask;
-}
-
-static inline u32 Slime_DamageFlags(u32 *flags)
-{
-    return *flags;
 }
 
 // confidence=low: reaction callback chooses split/idle/recovery states after damage.
@@ -1587,7 +1546,7 @@ u32 Slime_ResolveDamageReaction(struct ChaseActor *actor)
             }
         }
     }
-    if ((Slime_DamageFlags(&actor->base.hitReactionFlags) & 0x40000)) {
+    if (actor->base.hitReactionFlags & 0x40000) {
         Slime_ClearReactionBits(&actor->base.reactionFlags, ~0x980);
         Chase_SetCtl(actor, actor->base.onReaction, 0x12);
         Chase_SetState(actor, 3, 0, 0);
@@ -1869,7 +1828,7 @@ s32 Slime_Init(void *object)
 {
     struct Slime *slime = object;
     struct ChaseActor *actor = object;
-    u32 zero;
+    u32 zero; // concession-ok(const-local): CpuSet reads this source word when filling the initial positions.
     struct ContactPosition tmp;
     u32 flag;
     s32 j;
@@ -1988,9 +1947,9 @@ s32 Slime_Init(void *object)
 
 void Slime_Create(void)
 {
-    void *m = Heap_Alloc(0x40c);
+    void *m = Heap_Alloc(sizeof(struct Slime));
     if (m != 0) {
-        Memory_Clear(m, 0x40c);
+        Memory_Clear(m, sizeof(struct Slime));
         if (Slime_Init(m) < 0) {
             Slime_Destroy(m);
             Heap_Free(m);

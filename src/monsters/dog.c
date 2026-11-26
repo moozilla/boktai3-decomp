@@ -304,11 +304,11 @@ void Dog_ResetActionState(struct ChaseActor *actor)
     struct Dog *context = actor->base.context;
     context->flags = 0;
     context->actionTimer = 0;
-    context->stolenSlot = 0xFFFF;
+    context->stolenSlot = -1;
     context->stolenParameter = 0;
     context->turnClockwise = 0;
     context->retreatCount = 0;
-    Memory_Clear(&context->leapTarget, 8);
+    Memory_Clear(&context->leapTarget, sizeof(context->leapTarget));
     SceneActorMovement_ResolveRoutePosition(actor);
     SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0);
     {
@@ -552,20 +552,17 @@ void Dog_UpdateCollisionBounds(struct ChaseActor *a)
 void Dog_UpdateActionTimers(struct ChaseActor *actor)
 {
     struct Dog *context = actor->base.context;
-    u16 *p = &context->nearTimer;
-    if (*p != 0)
-        *p = *p - 1;
-    p = &context->farTimer;
-    if (*p != 0)
-        *p = *p - 1;
+    if (context->nearTimer)
+        context->nearTimer--;
+    if (context->farTimer)
+        context->farTimer--;
 }
 
 void Dog_UpdateActionCooldown(struct ChaseActor *actor)
 {
     struct Dog *context = actor->base.context;
-    u16 *p = &context->actionCooldown;
-    if (*p != 0)
-        *p = *p - 1;
+    if (context->actionCooldown)
+        context->actionCooldown--;
 }
 
 static inline u8 HasPending(void **slot)
@@ -690,27 +687,6 @@ static inline u32 CellShape(struct EngineMap **terrain, u32 cell)
     return *data >> 4;
 }
 
-static inline u8 TryRoute(struct ChaseActor *actor, void *route, struct ContactPosition *position,
-                          struct ContactPosition *destination)
-{
-    s32 result;
-    if (Nav_IsPositionInMesh(route, position, destination)) {
-        result = Terrain_ApplyBlocked(route, position, destination);
-        if (result) {
-            if (result != 2)
-                Memory_Clear(&actor->base.body.motion, 8);
-            return 1;
-        }
-    }
-    {
-        u16 *flags = &actor->base.motionFlags;
-        u32 mask = ~0x200;
-        mask &= *flags;
-        *flags = mask;
-    }
-    return 0;
-}
-
 static inline void Dog_CaptureRoutePosition(struct ContactPosition **out, struct ChaseActor *actor)
 {
     *out = &actor->base.body.position;
@@ -820,7 +796,7 @@ selected: {
     actor->base.body.direction = priorDirection;
     SceneActorChase_CellCenter(chosen, &center);
     {
-        if (TryRoute(actor, GroupRoute(group), routePosition, &center)) {
+        if (Chase_TryRoute(actor, GroupRoute(group), routePosition, &center)) {
             context->retreatCount++;
             return 1;
         }
@@ -962,9 +938,8 @@ void Dog_SelectRetreatOrChase(struct ChaseActor *a)
 
 void Dog_TickCooldown(struct Dog *dog)
 {
-    u8 *p = &dog->turnDelay;
-    if (*p != 0)
-        *p = *p - 1;
+    if (dog->turnDelay)
+        dog->turnDelay--;
 }
 
 u8 InventorySlot_PickRandom(s16 *, s16 *, s16 *);
@@ -1359,15 +1334,12 @@ void Dog_UpdateArrivalAnimation(struct ChaseActor *a)
 {
     u16 saved;
     u16 *flags;
-    u16 *scale;
     u16 *originalScale;
-    unsigned long long originalOffset;
     if (SceneActorReaction_TakePrepared(a)) {
         SceneActorAnimation_SelectDirectionalEntry(a, 11);
         a->base.restart = 0;
     }
-    originalOffset = 0x2C2;
-    originalScale = (u16 *)((u8 *)a + originalOffset);
+    originalScale = &a->base.field2C2;
     saved = *originalScale;
     {
         u32 mask = 0x80;
@@ -1377,24 +1349,7 @@ void Dog_UpdateArrivalAnimation(struct ChaseActor *a)
         }
     }
 
-    if (SceneActorTurn_Flags(flags, 0xA02F)) {
-        u16 *p = &a->base.field2C2;
-        *p = 0x40;
-        scale = p;
-    } else {
-        u16 *p = &a->base.field2C2;
-        u16 value = *p;
-        scale = p;
-        if (!value) {
-            *scale = 0x40;
-        }
-    }
-    if (!a->base.drawableKind)
-        Anim_SetDurationScale(
-            &((struct SceneActorAnimationSequenceDrawable *)a->base.drawable)->sequence, *scale);
-    else
-        Anim_SetFrameDurationScale(
-            &((struct SceneActorAnimationTileDrawable *)a->base.drawable)->tile, *scale);
+    SceneActorTurn_ApplyDuration(a, flags);
     a->base.field2C2 = saved;
     if (a->base.restart) {
         a->base.stepDone = 1;
@@ -2101,18 +2056,11 @@ void SceneActorControl_CompleteBlinkOut(struct ChaseActor *actor, s32 frame)
 
 /* This class's own copies of the shared chase inlines it compiles differently. */
 
-/* The reaction fields overlap the canonical actor's species storage. */
-
-union DogReactionContext {
-    struct ChaseActor base;
-    struct Dog reaction;
-};
-
 /* React to contact, pursue the target, or select a delayed cardinal turn. */
 
 s32 Dog_ChooseReactionBehavior(struct ChaseActor *a)
 {
-    union DogReactionContext *context = a->base.context;
+    struct Dog *context = a->base.context;
     struct SceneActorChaseGroup *group = &a->group;
     if (a->base.reactionSoundVariant == 0)
         Sound_PlaySong(0x211);
@@ -2126,7 +2074,7 @@ s32 Dog_ChooseReactionBehavior(struct ChaseActor *a)
         SceneActorChase_SetControl(a, a->base.onReaction, 18);
         SceneActorChase_SetState(a, 3, 0, 0);
         SceneActorChase_ClearWordFlags(&a->base.statusFlags, 0x1000000);
-        SceneActorChase_ClearWordFlags(&context->reaction.flags, 8);
+        SceneActorChase_ClearWordFlags(&context->flags, 8);
         return 1;
     }
     SceneActorChase_ClearMotionFlags(a, 0x20);
@@ -2151,7 +2099,7 @@ s32 Dog_ChooseReactionBehavior(struct ChaseActor *a)
             SceneActorChase_SetBehavior(a, 12);
             return 1;
         }
-        if (context->reaction.turnDelay)
+        if (context->turnDelay)
             return 1;
         SceneActorChase_SetControl(a, SceneActorControl_OnIdle, 16);
         SceneActorChase_SetBehavior(a, 18);
@@ -2162,7 +2110,7 @@ s32 Dog_ChooseReactionBehavior(struct ChaseActor *a)
         {
             s32 direction = a->base.body.direction;
             a->base.body.direction = (((direction + 0xA0) & 255) >> 6) << 6;
-            context->reaction.turnDelay = 90;
+            context->turnDelay = 90;
             if ((u8)Dog_SelectRetreatDirection(a, direction))
                 return 1;
             return 0;
@@ -2752,7 +2700,7 @@ s32 Dog_OnAuxiliaryUpdate(void *actor)
 
 void SceneActorEffects_ReleaseResources(void *);
 
-s32 Dog_ReleaseResources(u8 *p)
+s32 Dog_ReleaseResources(void *p)
 {
     SceneActorEffects_ReleaseResources(p);
     return 0;
@@ -2836,7 +2784,7 @@ void Dog_SetSecondaryBehaviorPreset(struct ChaseActor *actor);
 
 s32 Dog_OnAuxiliaryUpdate(void *);
 
-s32 Dog_ReleaseResources(u8 *p);
+s32 Dog_ReleaseResources(void *p);
 
 static inline struct Dog *DogInit_Context(struct ChaseActor *actor)
 {
@@ -2861,7 +2809,7 @@ static inline void DogInit_InstallCompletionCallbacks(struct ChaseActor *actor)
 {
     actor->base.onMessage = SceneActorScript_OnCommand;
     actor->base.update = (SceneActorResultCallback)Dog_OnAuxiliaryUpdate;
-    actor->base.destroy = (SceneActorResultCallback)Dog_ReleaseResources;
+    actor->base.destroy = Dog_ReleaseResources;
 }
 
 s32 Dog_Init(void *object)
@@ -2880,8 +2828,8 @@ s32 Dog_Init(void *object)
     SceneActor_RefreshLivingCountAndProfile(actor);
     if (MonsterInit_GetDrawableKind(actor) == 0) {
         u8 *heap;
-        actor->base.drawable = Heap_Alloc(0x5C);
-        Memory_Clear(actor->base.drawable, 0x5C);
+        actor->base.drawable = Heap_Alloc(sizeof(struct SceneActorAnimationSequenceDrawable));
+        Memory_Clear(actor->base.drawable, sizeof(struct SceneActorAnimationSequenceDrawable));
         heap = MonsterInit_Drawable(actor);
         MonsterInit_InitializeSprite(heap, 0xD635, 0xF6E7);
         if (MonsterInit_GetCategory(actor) == 0x11 || MonsterInit_GetCategory(actor) == 0x17)
@@ -2889,8 +2837,8 @@ s32 Dog_Init(void *object)
         actor->base.body.direction = 0;
     } else {
         u8 *heap;
-        actor->base.drawable = Heap_Alloc(0x80);
-        Memory_Clear(actor->base.drawable, 0x80);
+        actor->base.drawable = Heap_Alloc(sizeof(struct SceneActorAnimationTileDrawable));
+        Memory_Clear(actor->base.drawable, sizeof(struct SceneActorAnimationTileDrawable));
         heap = MonsterInit_Drawable(actor);
         MonsterInit_ClearPosition(&zero, &tmp);
         MonsterInit_InitializeWidget(heap, 0xCB05, 0xD635, &tmp);
@@ -2911,7 +2859,7 @@ s32 Dog_Init(void *object)
     dog->itemDamagePercent = Script_GetKeywordValue('d', 50);
     if (!dog->itemDamagePercent)
         dog->itemDamagePercent = 50;
-    dog->stolenSlot = 0xFFFF;
+    dog->stolenSlot = -1;
     dog->stolenParameter = 0;
 
     MonsterInit_ReadPalette(actor, 0x273, 0x192);
@@ -2956,8 +2904,10 @@ s32 Dog_Init(void *object)
     SceneActorAnimation_SelectDirectionalEntry(actor, 0);
     if (MonsterInit_GetDrawableKind(actor) == 0)
         DisplaySequence_Step(actor->base.drawable);
-    else
-        Anim_Step(actor->base.drawable + 0x20, actor->base.drawable);
+    else {
+        struct SceneActorAnimationTileDrawable *drawable = actor->base.drawable;
+        Anim_Step(&drawable->tile, drawable);
+    }
     MonsterInit_ClearReceiver(actor);
 
     {
@@ -2994,12 +2944,12 @@ void Heap_Free(void *);
 
 void Dog_Create(void)
 {
-    u8 *p = Heap_Alloc(0x6e0);
-    if (p != 0) {
-        Memory_Clear(p, 0x6e0);
-        if (Dog_Init(p) < 0) {
-            Dog_ReleaseResources(p);
-            Heap_Free(p);
+    struct Dog *dog = Heap_Alloc(sizeof(*dog));
+    if (dog != NULL) {
+        Memory_Clear(dog, sizeof(*dog));
+        if (Dog_Init(dog) < 0) {
+            Dog_ReleaseResources(dog);
+            Heap_Free(dog);
         }
     }
 }
@@ -3013,7 +2963,7 @@ static inline void clearRouteFlag(u32 *flags)
 void Dog_ResetIdleControl(struct ChaseActor *actor)
 {
     if (Chase_TakeArrived(actor)) {
-        struct SceneActorReactionMotion *motion;
+        struct SceneActorChaseTracking *tracking;
         struct SceneActorRegistryControl *control;
         u16 *flags;
         actor->base.field2C2 = 0x40;
@@ -3025,11 +2975,11 @@ void Dog_ResetIdleControl(struct ChaseActor *actor)
             mask &= *flags;
             *flags = mask;
         }
-        motion = (void *)&actor->base.tracking.target;
+        tracking = &actor->base.tracking;
         {
             s32 mask = ~0x18;
-            mask &= motion->flags;
-            motion->flags = mask;
+            mask &= tracking->flags;
+            tracking->flags = mask;
         }
         control = &actor->group.common.control;
         if (SceneActorTurn_ActorFlags(actor, 0x200000)) {
@@ -3050,7 +3000,7 @@ void Dog_ResetIdleControl(struct ChaseActor *actor)
         }
         actor->group.turn.turnsRemaining = 0xFF;
 
-        motion->fieldDC = 0;
+        tracking->target = NULL;
         SceneActorChase_SetControl(actor, actor->base.onStanding, 0);
     }
     Callback_InvokeActor(actor, actor->base.contactQuery.opaque);

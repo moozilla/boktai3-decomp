@@ -1,19 +1,10 @@
-#include "global.h"
+#include "monsters/centipede/centipede_body.h"
 
-struct Entry080A9 {
-    u8 sprite[0x128];
-};
-struct Owner080A9 {
-    u8 pad0[0x3d4];
-    struct Entry080A9 entries[4];
-    u8 pad[0x8da - 0x3d4 - 4 * 0x128];
-    s16 count;
-};
 void Sprite_Remove(void *);
 
-void CentipedeBody_RemoveSegmentSprites(struct Owner080A9 *p)
+void CentipedeBody_RemoveSegmentSprites(struct TentacleBody *p)
 {
     s32 i;
-    for (i = 0; i < p->count; i++)
-        Sprite_Remove(&p->entries[i]);
+    for (i = 0; i < p->segmentCount; i++)
+        Sprite_Remove(&p->segments[i]);
 }

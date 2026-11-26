@@ -1,10 +1,10 @@
+#include "scene/actor/scene_actor_record.h"
 #include "scene/actor/scene_actor_registry.h"
 #include "engine/runtime.h"
 #include "npc/manager/scene_actor_animation.h"
 struct SceneActorRegistryManager *SceneActorRegistry_GetManager(void);
 void SceneActorControl_OnIdle(u8 *);
 void SceneActorTerrain_DisableCollision(struct ChaseActor *);
-void SceneActorRecord_RecordPair(u32, u32);
 static inline u8 IsUnavailable(struct ChaseActor *input)
 {
     struct ChaseActor *actor = input;
@@ -32,22 +32,6 @@ one:
     return 1;
 zero:
     return 0;
-}
-static inline u8 IsScenePaused(void)
-{
-    if (gEngineFlags & 0x4800)
-        return 1;
-    return 0;
-}
-static inline u32 ReadSuppressionFlag(struct ChaseActor *actor)
-{
-    u32 mask = 0x800;
-    u32 *field;
-    u32 value;
-    field = &actor->base.statusFlags;
-    value = *field;
-    value &= mask;
-    return value;
 }
 void SceneActorRegistry_DefeatActorsFromScript(void)
 {
@@ -133,8 +117,7 @@ void SceneActorRegistry_DefeatActorsFromScript(void)
                     actor->base.field2B1 = one;
                 }
                 SceneActorTerrain_DisableCollision(actor);
-                if (!IsScenePaused() && !ReadSuppressionFlag(actor))
-                    SceneActorRecord_RecordPair(gScriptEntryProcedure, (u16)actor->base.body.id);
+                SceneActorRecord_RecordDefeat(actor);
             }
             goto next;
         ordinary: {

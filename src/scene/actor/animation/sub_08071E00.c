@@ -8,7 +8,7 @@ static inline u8 Test(u32 value, u32 mask)
 void SceneActorPalette_BeginTransition(u32 destinationBank, u32 sourceBank, u32 unused,
                                        s32 category, u32 auxiliaryFlag)
 {
-    struct SceneActorPaletteManagerView *manager = (void *)gSceneActorRegistryManager;
+    struct SceneActorRegistryManager *manager = gSceneActorRegistryManager;
     struct SceneActorPaletteTransition *transition;
     const u16 *destination;
     const u16 *source;

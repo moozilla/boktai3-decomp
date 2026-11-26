@@ -10,18 +10,6 @@ static inline void SetFlags(struct ChaseActor *actor, u32 mask)
     value |= actor->base.reactionFlags;
     actor->base.reactionFlags = value;
 }
-static inline void SetState(struct ChaseActor *actor, u32 state, u32 zero)
-{
-    actor->base.state2A8 = state;
-    actor->base.phase2A9 = 0;
-    actor->base.behavior2AA = 0;
-    actor->base.counter2AC = zero;
-    {
-        typeof(actor->base.field2B1) *q1 = &actor->base.field2B1;
-        *q1 = 1;
-    }
-}
-
 void SceneActorControl_UpdateCallbackTrigger(struct ChaseActor *actor)
 {
     u32 taken = SceneActorControl_TakeFlag(&actor->base.field2B1);
@@ -30,7 +18,7 @@ void SceneActorControl_UpdateCallbackTrigger(struct ChaseActor *actor)
     } else if (actor->base.stepDone) {
         Trigger_ConsumePending(((u8 *)actor) + 0xC, 1);
         SceneActorControl_Begin(actor, SceneActorControl_OnIdle, 0x10, taken);
-        SetState(actor, 3, taken);
+        SceneActorTerrain_EnterState(actor, 3, 0, 0);
         SetFlags(actor, 0x1000);
     } else {
         actor->base.counter2AC++;

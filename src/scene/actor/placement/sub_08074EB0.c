@@ -25,11 +25,11 @@ static inline void SceneActorMotion_SetFlags(struct ChaseActor *actor, u32 bits)
     *field = value;
 }
 
-static inline u32 SceneActorMotion_StepSequence(struct SceneActorMotionSequence *drawable,
+static inline u32 SceneActorMotion_StepSequence(struct SceneActorAnimationSequenceDrawable *drawable,
                                                 struct DisplaySequenceState *input,
                                                 u32 firstFlipMask)
 {
-    struct SceneActorMotionSequence *sprite = drawable;
+    struct SceneActorAnimationSequenceDrawable *sprite = drawable;
     struct DisplaySequenceState *state = input;
     const u16 *command;
     {
@@ -66,8 +66,8 @@ static inline u16 SceneActorMotion_Elapsed(struct ChaseActor *actor)
 {
     if (!actor->base.drawableKind)
         return SceneActorMotion_SequenceElapsed(
-            &((struct SceneActorMotionSequence *)actor->base.drawable)->sequence);
-    return ((struct SceneActorMotionTile *)actor->base.drawable)->elapsed;
+            &((struct SceneActorAnimationSequenceDrawable *)actor->base.drawable)->sequence);
+    return ((struct SceneActorAnimationTileDrawable *)actor->base.drawable)->tile.elapsed;
 }
 s32 SceneActorMovement_UpdateAnimationAndTerrain(struct ChaseActor *object)
 {
@@ -87,7 +87,7 @@ s32 SceneActorMovement_UpdateAnimationAndTerrain(struct ChaseActor *object)
         SceneActorMotion_SetFlags(actor, 0x40);
     if (actor->base.restart != 1) {
         if (!actor->base.drawableKind) {
-            struct SceneActorMotionSequence *drawable = actor->base.drawable;
+            struct SceneActorAnimationSequenceDrawable *drawable = actor->base.drawable;
             actor->base.restart =
                 SceneActorMotion_StepSequence(drawable, &drawable->sequence, enabledBit);
         } else {

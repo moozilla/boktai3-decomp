@@ -1,14 +1,7 @@
-#include "global.h"
+#include "monsters/dragon_puppy.h"
 #include "player/cutscene/player_cue_sequence.h"
 #include "engine/math/scene_vec.h"
 #include "engine/engine_globals.h"
-struct PHVec {
-    s16 x, y, z, pad;
-};
-struct PHTerrain {
-    u8 pad[0x24];
-    u16 rows[1];
-};
 s32 Script_SeekToKeyword(s32);
 s32 Script_GetValue(void);
 s32 Script_GetValueSafe(void);
@@ -22,137 +15,121 @@ void TerrainModifiers_RegisterCell(void *, s32, s32, s32, s32, s32);
 void SceneBody_Init(void *, void *, void *, u32, u32, void *);
 void SceneBody_SetSprite(void *, void *);
 void TerrainOverlay_QueueAddActor(void *);
-#define H(o) (*(s16 *)(p + (o)))
-#define W(o) (*(u32 *)(p + (o)))
-#define B(o) (*(u8 *)(p + (o)))
-/* The state callback, defeat flag and resource slot the script setup writes. */
-// confidence=low: field names follow FanCannon, whose setup tail this mirrors.
-struct DragonPuppyTail {
-    u8 pad0[0x108];
-    void (*update)(void);
-    u8 pad10c[0x3e];
-    s16 dead;
-    u8 pad14c[0x24];
-    void *resource;
-};
-static inline s32 DragonPuppy_CellIndex(struct PHVec *v)
+static inline s32 DragonPuppy_CellIndex(struct ContactPosition *v)
 {
     s32 x = (s16)v->x >> 8, z = (s16)v->z >> 8;
     if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
         return 0;
-    return ((struct PHTerrain *)gTerrainMap)->rows[z] + x;
+    return gTerrainMap->rows[z] + x;
 }
-s32 DragonPuppy_InitializeFromScript(u8 *p, void *parent)
+s32 DragonPuppy_InitializeFromScript(struct DragonPuppy *p, void *parent)
 {
     void *resource;
     if (Script_SeekToKeyword('p')) {
-        H(0x1c) = Script_GetValue();
-        H(0x1e) = Script_GetValue();
-        H(0x20) = Script_GetValue();
+        p->initialPosition.x = Script_GetValue();
+        p->initialPosition.y = Script_GetValue();
+        p->initialPosition.z = Script_GetValue();
     }
     if (Script_SeekToKeyword('a')) {
-        H(0x120) = Script_GetValue();
-        H(0x122) = Script_GetValue();
-        H(0x124) = Script_GetValue();
-        H(0x136) = Script_GetValue();
+        p->attackX = Script_GetValue();
+        p->attackY = Script_GetValue();
+        p->attackZ = Script_GetValue();
+        p->unknown136 = Script_GetValue();
     } else {
-        H(0x120) = 30;
-        H(0x122) = 30;
-        H(0x124) = 30;
-        H(0x136) = 24;
+        p->attackX = 30;
+        p->attackY = 30;
+        p->attackZ = 30;
+        p->unknown136 = 24;
     }
     if (Script_SeekToKeyword('l')) {
         s32 health = Script_GetValue();
-        H(0x138) = health;
-        H(0x126) = health;
+        p->maxHealth = health;
+        p->health = health;
         if ((s16)health < 0)
-            H(0x14a) = 1;
+            p->initialDead = 1;
     } else {
-        H(0x138) = 120;
-        H(0x126) = 120;
+        p->maxHealth = 120;
+        p->health = 120;
     }
     if (Script_SeekToKeyword('d'))
-        W(0x16c) = Script_GetValue();
+        p->terrainEnabled = Script_GetValue();
     if (Script_SeekToKeyword('i'))
-        H(0x134) = Script_GetValue();
+        p->attackInterval = Script_GetValue();
     else
-        H(0x134) = 60;
+        p->attackInterval = 60;
     if (Script_SeekToKeyword('h')) {
         s32 v = Script_GetValue();
-        u8 *b = &B(0x132);
+        u8 *b = &p->deathVariant;
         *b = v;
         *b = ((s8)*b - 1) / 2;
         if (*b > 3)
             *b = 1;
     } else
-        B(0x132) = 1;
+        p->deathVariant = 1;
     if (Script_SeekToKeyword('r'))
-        W(0x164) = Script_GetValueSafe();
+        p->attackSchedule = Script_GetValueSafe();
     if (Script_SeekToKeyword('f'))
-        H(0x13a) = Script_GetValue();
-    else {
-        s16 *q = &H(0x13a);
-        u32 v = 600;
-        *q = v;
-    }
+        p->unknown13A = Script_GetValue();
+    else
+        p->unknown13A = 600;
     if (Script_SeekToKeyword('S'))
-        H(0x142) = Script_GetValue();
+        p->showTerrainBody = Script_GetValue();
     if (Script_SeekToKeyword('z')) {
-        H(0x13c) = Script_GetValue();
-        H(0x13e) = Script_GetValue();
+        p->bodyReactionFlags = Script_GetValue();
+        p->sparkMask = Script_GetValue();
     }
     if (Script_SeekToKeyword('g'))
-        H(0x140) = Script_GetValue();
+        p->hudValue140 = Script_GetValue();
     else
-        H(0x140) = 2;
+        p->hudValue140 = 2;
     if (Script_SeekToKeyword('D'))
-        W(0x168) = Script_GetValue();
+        p->unknown168 = Script_GetValue();
     if (Script_SeekToKeyword('G')) {
-        W(0x158) = Script_GetValue();
-        W(0x15c) = Script_GetValue();
-        W(0x160) = Script_GetValue();
+        p->unknown158 = Script_GetValue();
+        p->unknown15C = Script_GetValue();
+        p->unknown160 = Script_GetValue();
     }
     if (Script_SeekToKeyword('X')) {
-        H(0x144) = Script_GetValue();
-        H(0x146) = Script_GetValue();
+        p->unknown144 = Script_GetValue();
+        p->unknown146 = Script_GetValue();
     }
     if (Script_SeekToKeyword('V')) {
-        H(0x148) = Script_GetValue();
-        if (H(0x148) > 99)
-            H(0x148) = 99;
-        if (H(0x148) <= 0)
-            H(0x148) = 1;
+        p->hudValue148 = Script_GetValue();
+        if (p->hudValue148 > 99)
+            p->hudValue148 = 99;
+        if (p->hudValue148 <= 0)
+            p->hudValue148 = 1;
     } else
-        H(0x148) = 0;
-    *(void **)(p + 0x14c) = parent;
-    AnimData_Load(p + 0x50, 0x7e7d);
-    Sprite_Init(p + 0x24, p + 0x50, 1);
-    *(struct SceneVec *)(p + 0x40) = *(struct SceneVec *)(p + 0x1c);
-    AnimData_SelectPaletteBank(p + 0x50, 0x1b9);
+        p->hudValue148 = 0;
+    p->context = parent;
+    AnimData_Load(p->palette, 0x7e7d);
+    Sprite_Init(&p->sprite, p->palette, 1);
+    p->sprite.position = p->initialPosition;
+    AnimData_SelectPaletteBank(p->palette, 0x1b9);
     resource = ScriptProc_Start(0x922e, 0x5184);
-    ((struct DragonPuppyTail *)p)->resource = resource;
-    if (!((struct DragonPuppyTail *)p)->dead) {
-        ((struct DragonPuppyTail *)p)->update = DragonPuppy_UpdateAttackTiming;
-        Anim_SetSequence(p + 0x10c, resource, 3, B(0x132), 0);
+    p->deathAnimation = resource;
+    if (!p->initialDead) {
+        p->update = DragonPuppy_UpdateAttackTiming;
+        Anim_SetSequence(&p->animation, resource, 3, p->deathVariant, 0);
     } else {
-        ((struct DragonPuppyTail *)p)->update = DragonPuppy_UpdateAttackWindup;
-        Anim_SetSequence(p + 0x10c, resource, 5, B(0x132), 0);
+        p->update = DragonPuppy_UpdateAttackWindup;
+        Anim_SetSequence(&p->animation, resource, 5, p->deathVariant, 0);
     }
-    PlayerCue_StepSequence((struct ContactSwarmSprite *)(p + 0x24),
-                           (struct DisplaySequenceState *)(p + 0x10c));
-    if (!((struct DragonPuppyTail *)p)->dead)
+    PlayerCue_StepSequence((struct ContactSwarmSprite *)(&p->sprite),
+                           (struct DisplaySequenceState *)(&p->animation));
+    if (!p->initialDead)
         DragonPuppy_InitCollider(p);
-    if (W(0x16c) && !((struct DragonPuppyTail *)p)->dead) {
-        s32 cell = DragonPuppy_CellIndex((struct PHVec *)(p + 0x40));
-        TerrainModifiers_RegisterCell(p + 0x174, cell, 0, H(0x42) >> 8, 0, 1);
+    if (p->terrainEnabled && !p->initialDead) {
+        s32 cell = DragonPuppy_CellIndex(&p->sprite.position);
+        TerrainModifiers_RegisterCell(p->terrain, cell, 0, p->sprite.position.y >> 8, 0, 1);
     }
-    if (H(0x142)) {
-        u8 *body = p + 0xc0;
-        SceneBody_Init(body, *(void **)(p + 0x14c), p + 0x40, 0, 4, p);
-        SceneBody_SetSprite(body, p + 0x24);
+    if (p->showTerrainBody) {
+        u8 *body = p->terrainBody;
+        SceneBody_Init(body, p->context, &p->sprite.position, 0, 4, p);
+        SceneBody_SetSprite(body, &p->sprite);
         TerrainOverlay_QueueAddActor(body);
     }
-    if (W(0x164))
+    if (p->attackSchedule)
         DragonPuppy_ReadAttackSchedule(p);
 #ifdef UBFIX
     // falls off the end with r0 left over from its last statement; the creator only tests

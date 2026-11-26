@@ -1,27 +1,7 @@
-#include "global.h"
+#include "monsters/muspell_head.h"
 #include "engine/engine.h"
 #include "ui/hud/scene_indicator.h"
 
-struct ScriptCombatActor {
-    u8 unknown0[0x1c];
-    struct Vec origin;
-    u8 unknown24[0x1c];
-    struct Vec position;
-    u8 unknown48[0x114];
-    u32 (*update)(void *);
-    u8 animation[0x10];
-    s32 attackDistance;
-    s16 attackA, attackB, attackC;
-    u8 unknown17A[10];
-    u16 timer;
-    u8 unknown186[8];
-    u16 duration;
-    s16 enabled;
-    u8 unknown192[4];
-    u16 phase;
-    u8 unknown198[0x34];
-    void *sequence;
-};
 struct Vec *Player_GetEffectivePosition(u32);
 s32 Mod(s32, s32);
 s32 Math_Atan2(s32, s32);
@@ -52,7 +32,7 @@ static inline void raisePosition(struct Vec *p)
 {
     p->y += 128;
 }
-u32 MuspellHead_UpdateProjectileAttack(struct ScriptCombatActor *p)
+u32 MuspellHead_UpdateProjectileAttack(struct MuspellHead *p)
 {
     u8 config[0x5c];
     struct Vec position;
@@ -65,11 +45,11 @@ u32 MuspellHead_UpdateProjectileAttack(struct ScriptCombatActor *p)
     struct Vec *origin;
     if (Mod((s16)p->timer, 10) == 0 && (s16)p->timer > (s16)p->duration - 30) {
         velocity = 0x1400;
-        distance = distanceSquared(Player_GetEffectivePosition(0), &p->position);
-        origin = &p->position;
+        distance = distanceSquared(Player_GetEffectivePosition(0), (struct Vec *)&p->sprite.position);
+        origin = (struct Vec *)&p->sprite.position;
         ProjectileConfig_Init(config);
         pos = &position;
-        CopyPosition(pos, &p->position);
+        CopyPosition(pos, (struct Vec *)&p->sprite.position);
         raisePosition(pos);
         target = Player_GetEffectivePosition(0);
         aim = Math_Atan2(target->x - origin->x, target->z - origin->z);
@@ -104,9 +84,9 @@ u32 MuspellHead_UpdateProjectileAttack(struct ScriptCombatActor *p)
             x -= 8;
             range = 15;
             sample &= range;
-            p->position.x = x + sample;
+            p->sprite.position.x = x + sample;
         }
-        p->position.y = p->origin.y;
+        p->sprite.position.y = p->origin.y;
         index = (index + 1) & 1023;
         *cursor = index;
         {
@@ -114,14 +94,14 @@ u32 MuspellHead_UpdateProjectileAttack(struct ScriptCombatActor *p)
             s32 z = (u16)p->origin.z;
             z -= 8;
             sample &= range;
-            p->position.z = z + sample;
+            p->sprite.position.z = z + sample;
         }
     }
     if ((s16)p->timer > 0)
         p->timer--;
     else {
-        Anim_RestartSequence(p->animation, p->sequence, 0, 0, 0);
-        p->update = MuspellHead_TryProjectileAttack;
+        Anim_RestartSequence(&p->playback, p->sequence, 0, 0, 0);
+        p->action = (void (*)(void))MuspellHead_TryProjectileAttack;
     }
     return 0;
 }

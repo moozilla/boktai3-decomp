@@ -1,15 +1,13 @@
-#include "global.h"
-void *Task_Create(s32, s32);
-void Task_SetCallbacks(void *, void *, void *);
-void Task_Kill(void *);
-void SceneTask_DispatchUnlessPaused(void);
-void Ooze_Destroy(void);
+#include "monsters/ooze.h"
+s32 SceneTask_DispatchUnlessPaused(struct Ooze *);
+s32 Ooze_Destroy(u8 *);
 s32 Ooze_InitializeFromScript(void *, void *);
 void *Ooze_Create(void *p)
 {
-    void *r = Task_Create(8, 0x160);
+    void *r = Task_Create(8, sizeof(struct Ooze));
     if (r) {
-        Task_SetCallbacks(r, SceneTask_DispatchUnlessPaused, Ooze_Destroy);
+        Task_SetCallbacks(r, (void (*)(void *))SceneTask_DispatchUnlessPaused,
+                          (void (*)(void *))Ooze_Destroy);
         if (Ooze_InitializeFromScript(r, p) < 0) {
             Task_Kill(r);
             return 0;

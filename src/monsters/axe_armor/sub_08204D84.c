@@ -1,61 +1,33 @@
-#include "global.h"
+#include "monsters/axe_armor/axe_armor.h"
 
-struct EnemyD459Vector {
-    s16 x, y, z, pad;
-};
-struct EnemyD459 {
-    u8 pad0[0x18];
-    s32 timer;
-    u8 pad1c[0x40 - 0x1c];
-    struct EnemyD459Vector position;
-    u8 pad48[0x108 - 0x48];
-    u32 (*callback)(struct EnemyD459 *);
-    u8 animation[0x20];
-    u16 attackDuration;
-    u8 pad12e[4];
-    u8 facing;
-    u8 pad133;
-    s16 attackPeriod;
-    s16 movement;
-    u8 pad138[0x14c - 0x138];
-    u32 useAttackSchedule;
-    u8 pad150[8];
-    void *animationResource;
-    u8 pad15c[0x184 - 0x15c];
-    s16 attackCount;
-    s16 attackIndex;
-    s16 attackTimes[1];
-};
 void Anim_RestartSequence(void *, void *, u32, u32, u32);
 void Anim_SetDurationScale(void *, u32);
 s32 Mod(s32, s32);
-u32 AxeArmor_UpdateCountdown(struct EnemyD459 *);
+s32 AxeArmor_UpdateCountdown(struct AxeArmor *);
 
-u32 AxeArmor_UpdateAttackTiming(struct EnemyD459 *enemy)
+s32 AxeArmor_UpdateAttackTiming(struct AxeArmor *enemy)
 {
-    if (enemy->useAttackSchedule) {
+    if (enemy->attackSchedule) {
         s16 *index = &enemy->attackIndex;
-        s32 selected = *index * 2;
-        s16 *table = enemy->attackTimes;
-        if (enemy->timer > *(s16 *)((u8 *)table + selected)) {
-            void *anim = enemy->animation;
-            void *resource = enemy->animationResource;
-            u32 facing = enemy->facing;
+        if (enemy->timer > enemy->attackTimes[*index]) {
+            void *anim = &enemy->sequence;
+            void *resource = enemy->resource;
+            u32 facing = (u8)enemy->facing;
             Anim_RestartSequence(anim, resource, 3, facing, 0);
             Anim_SetDurationScale(anim, 64);
-            enemy->callback = AxeArmor_UpdateCountdown;
-            enemy->attackDuration = 80;
+            enemy->update = AxeArmor_UpdateCountdown;
+            enemy->countdown = 80;
             enemy->timer = 0;
             (*index)++;
             if (*index > enemy->attackCount - 1)
                 *index = 0;
         }
     } else {
-        s32 value = Mod(enemy->timer, enemy->attackPeriod);
+        s32 value = Mod(enemy->timer, enemy->interval);
         if (!value) {
-            Anim_RestartSequence(enemy->animation, enemy->animationResource, 3, enemy->facing,
+            Anim_RestartSequence(&enemy->sequence, enemy->resource, 3, (u8)enemy->facing,
                                  value);
-            enemy->callback = AxeArmor_UpdateCountdown;
+            enemy->update = AxeArmor_UpdateCountdown;
         }
     }
     return 0;

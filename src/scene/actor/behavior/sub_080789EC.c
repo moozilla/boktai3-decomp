@@ -1,9 +1,6 @@
+#include "scene/motion/scene_actor_chase_shared.h"
 #include "scene/actor/scene_actor_behavior.h"
 void SceneActorAttachment_ReplaceResponseSlot(struct RoomActor *, u32, u32, u32);
-struct SceneActorBehaviorPlayerSlot {
-    u8 unknown0[8];
-    u8 slot;
-};
 static inline u8 Test(u32 value, u32 mask)
 {
     if (value & mask)
@@ -32,8 +29,7 @@ void SceneActorBehavior_RecordDefeat(struct RoomActor *inputActor)
     u32 slot;
     {
         struct SceneActorChaseTracking *gate = &inputActor->tracking;
-        u32 mask = 8;
-        if (Test(gate->flags, mask))
+        if (SceneActorChase_TrackingFlags(gate, 8))
             return;
     }
     {
@@ -58,13 +54,13 @@ void SceneActorBehavior_RecordDefeat(struct RoomActor *inputActor)
         if (actor->statusFlags & mask)
             return;
     }
-    slot = ((struct SceneActorBehaviorPlayerSlot *)actor->tracking.target)->slot;
+    slot = actor->tracking.target->playerIndex;
     {
         u16 *counter;
         u32 value;
         u32 result;
         if (slot == 0) {
-            IncrementFirst(CounterAddress(0x884));
+            IncrementFirst(&gGameState->actorDefeatsByPlayer[0]);
             counter = CounterAddress(0x530);
             value = *counter;
             if (*(s16 *)counter > 9998)
@@ -73,7 +69,7 @@ void SceneActorBehavior_RecordDefeat(struct RoomActor *inputActor)
             *counter = result;
             return;
         } else if (slot == 1) {
-            counter = CounterAddress(0x886);
+            counter = &gGameState->actorDefeatsByPlayer[1];
             value = *counter;
             if (*(s16 *)counter > 9998)
                 goto capped;
@@ -81,7 +77,7 @@ void SceneActorBehavior_RecordDefeat(struct RoomActor *inputActor)
             *counter = result;
             return;
         } else if (slot == 2) {
-            counter = CounterAddress(0x888);
+            counter = &gGameState->actorDefeatsByPlayer[2];
             value = *counter;
             if (*(s16 *)counter > 9998)
                 goto capped;
@@ -89,7 +85,7 @@ void SceneActorBehavior_RecordDefeat(struct RoomActor *inputActor)
             *counter = result;
             return;
         } else if (slot == 3) {
-            counter = CounterAddress(0x88A);
+            counter = &gGameState->actorDefeatsByPlayer[3];
             value = *counter;
             if (*(s16 *)counter > 9998)
                 goto capped;

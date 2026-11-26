@@ -1,14 +1,6 @@
-#include "global.h"
+#include "monsters/cannons/wind_cannon.h"
 #include "engine/ram.h"
 #define WindCannonManager_RemoveCannon WindCannonManager_DestroySlot
-struct FanCannon {
-    u8 unknown0[0x180];
-};
-struct FanCannonManager {
-    u8 unknown0[0x18];
-    u32 active;
-    struct FanCannon cannons[8];
-};
 void Sound_StopSong(u32);
 void WindCannonManager_DestroySlot(struct FanCannonManager *, struct FanCannon *, u32);
 u32 WindCannonManager_Destroy(struct FanCannonManager *p)
@@ -16,10 +8,10 @@ u32 WindCannonManager_Destroy(struct FanCannonManager *p)
     struct FanCannon *cannon;
     s32 i;
     Sound_StopSong(0x519);
-    cannon = p->cannons;
+    cannon = p->slots;
     i = 0;
     do {
-        if (p->active & (1 << i))
+        if (p->occupiedSlots & (1 << i))
             WindCannonManager_DestroySlot(p, cannon, i);
         i++;
         cannon++;
