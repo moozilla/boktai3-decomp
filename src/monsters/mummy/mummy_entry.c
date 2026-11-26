@@ -344,7 +344,7 @@ static inline struct SceneActorChaseFlags16 *Mummy_BeginRecovery(struct ChaseAct
 void Mummy_ResumeRouteAfterRecovery(struct ChaseActor *actor, s32 frame)
 {
     struct DisplaySequenceState *sequence =
-        (void *)&((struct SceneActorAnimationSequenceDrawable *)actor->base.drawable)->sequence;
+        &((struct SceneActorAnimationSequenceDrawable *)actor->base.drawable)->sequence;
     struct SceneActorChaseFlags16 *reactionFlags;
     SceneActorReaction_TakePrepared(actor);
     reactionFlags = Mummy_BeginRecovery(actor, 0x10);
@@ -1224,13 +1224,9 @@ void Mummy_UpdateScriptedAction(struct ChaseActor *obj)
 {
     if (SceneActorControl_TakeStateEntry(obj)) {
         u16 *h;
-        u16 value;
         SceneActorChase_SetControl(obj, SceneActorAnimation_UpdateDirectionalEntry, 10);
-        {
-            u32 byte = obj->base.tracking.heading;
-            obj->base.body.direction = byte;
-        }
-        SceneActorAttachment_ReplaceResponseSlot((u8 *)obj, 0, 0, obj->base.category);
+        obj->base.body.direction = obj->base.tracking.heading;
+        SceneActorAttachment_ReplaceResponseSlot(obj, 0, 0, obj->base.category);
         SceneActorBehavior_CallActionScript((u8 *)obj);
         h = (u16 *)&obj->group.common.gate.flags;
         {
@@ -1244,10 +1240,9 @@ void Mummy_UpdateScriptedAction(struct ChaseActor *obj)
             flag |= *flags;
             *flags = flag;
         }
-        value = obj->group.common.gate.duration;
-        obj->group.common.gate.counter = value;
+        obj->group.common.gate.counter = obj->group.common.gate.duration;
     } else if (obj->base.stepDone) {
-        Mummy_EnterIdleControl((u8 *)obj);
+        Mummy_EnterIdleControl(obj);
     } else {
         ++obj->base.counter2AC;
     }
