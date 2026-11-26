@@ -1,14 +1,7 @@
-#include "global.h"
+#include "monsters/cannons/plasma_cannon.h"
 #include "player/cutscene/player_cue_sequence.h"
 #include "engine/math/scene_vec.h"
 #include "engine/engine_globals.h"
-struct PHVec {
-    s16 x, y, z, pad;
-};
-struct PHTerrain {
-    u8 pad[0x24];
-    u16 rows[1];
-};
 s32 Script_SeekToKeyword(s32);
 s32 Script_GetValue(void);
 void Sprite_Init(void *, void *, s32);
@@ -20,74 +13,54 @@ void TerrainModifiers_RegisterCell(void *, s32, s32, s32, s32, s32);
 void SceneBody_Init(void *, void *, void *, u32, u32, void *);
 void SceneBody_SetSprite(void *, void *);
 void TerrainOverlay_QueueAddActor(void *);
-#define H(o) (*(s16 *)(p + (o)))
-#define W(o) (*(u32 *)(p + (o)))
-/* The state callback, hit flag, facing, defeat flag and resource slot the script setup writes. */
-// confidence=low: field names follow FanCannon, whose setup tail this mirrors.
-struct OrangeSpineTail {
-    u8 pad0[0x108];
-    void (*update)(void);
-    u8 pad10c[0x22];
-    s16 hit;
-    u8 pad130[2];
-    u8 direction;
-    u8 pad133[0x17];
-    s16 dead;
-    u8 pad14c[0x24];
-    void *resource;
-};
-static inline s32 OrangeSpine_CellIndex(struct PHVec *v)
+static inline s32 OrangeSpine_CellIndex(struct SceneVec *v)
 {
     s32 x = (s16)v->x >> 8, z = (s16)v->z >> 8;
     if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
         return 0;
-    return ((struct PHTerrain *)gTerrainMap)->rows[z] + x;
+    return gTerrainMap->rows[z] + x;
 }
-s32 PlasmaCannon_InitializeFromScript(u8 *p, void *parent)
+s32 PlasmaCannon_InitializeFromScript(struct OrangeSpineActor *p, void *parent)
 {
     void *resource;
     if (Script_SeekToKeyword('p')) {
-        H(0x1c) = Script_GetValue();
-        H(0x1e) = Script_GetValue();
-        H(0x20) = Script_GetValue();
+        p->initialPosition.x = Script_GetValue();
+        p->initialPosition.y = Script_GetValue();
+        p->initialPosition.z = Script_GetValue();
     }
     if (Script_SeekToKeyword('a')) {
-        H(0x120) = Script_GetValue();
-        H(0x122) = Script_GetValue();
-        H(0x124) = Script_GetValue();
-        H(0x136) = Script_GetValue();
-        H(0x13a) = Script_GetValue();
+        p->projectileHitX = Script_GetValue();
+        p->projectileHitY = Script_GetValue();
+        p->projectileHitZ = Script_GetValue();
+        p->unknown136 = Script_GetValue();
+        p->projectileSpeed = Script_GetValue();
     } else {
-        H(0x120) = 30;
-        H(0x122) = 30;
-        H(0x124) = 30;
-        H(0x136) = 6;
-        {
-            s16 *q = &H(0x13a);
-            s32 v = 300;
-            *q = v;
-        }
+        p->projectileHitX = 30;
+        p->projectileHitY = 30;
+        p->projectileHitZ = 30;
+        p->unknown136 = 6;
+        p->projectileSpeed = 300;
     }
     if (Script_SeekToKeyword('l')) {
         s32 health = Script_GetValue();
-        H(0x138) = health;
-        H(0x126) = health;
+        p->maxHealth = health;
+        p->health = health;
         if ((s16)health < 0)
-            H(0x14a) = 1;
+            p->defeatDelay = 1;
     } else {
-        H(0x138) = 120;
-        H(0x126) = 120;
+        p->maxHealth = 120;
+        p->health = 120;
     }
     if (Script_SeekToKeyword('d'))
-        W(0x16c) = Script_GetValue();
+        p->registerTerrain = Script_GetValue();
     if (Script_SeekToKeyword('i'))
-        H(0x134) = Script_GetValue();
+        p->recoveryDelay = Script_GetValue();
     else
-        H(0x134) = 60;
+        p->recoveryDelay = 60;
     if (Script_SeekToKeyword('h')) {
         s8 *b;
         s32 v = Script_GetValue();
-        b = (s8 *)(p + 0x132);
+        b = (s8 *)&p->facing;
         *b = v;
         *b = (*b - 1) / 2;
         if ((u8)*b > 3)
@@ -97,64 +70,64 @@ s32 PlasmaCannon_InitializeFromScript(u8 *p, void *parent)
         else
             *b = 1;
     } else
-        *(u8 *)(p + 0x132) = 0;
+        p->facing = 0;
     if (Script_SeekToKeyword('S'))
-        H(0x142) = Script_GetValue();
+        p->showTerrainBody = Script_GetValue();
     if (Script_SeekToKeyword('z')) {
-        H(0x13c) = Script_GetValue();
-        H(0x13e) = Script_GetValue();
+        p->bodyReactionFlags = Script_GetValue();
+        p->sparkMask = Script_GetValue();
     }
     if (Script_SeekToKeyword('g'))
-        H(0x140) = Script_GetValue();
+        p->hudStyle = Script_GetValue();
     else
-        H(0x140) = 2;
+        p->hudStyle = 2;
     if (Script_SeekToKeyword('D'))
-        W(0x168) = Script_GetValue();
+        p->unknown168 = Script_GetValue();
     if (Script_SeekToKeyword('G')) {
-        W(0x158) = Script_GetValue();
-        W(0x15c) = Script_GetValue();
-        W(0x160) = Script_GetValue();
+        p->unknown158 = Script_GetValue();
+        p->unknown15C = Script_GetValue();
+        p->unknown160 = Script_GetValue();
     }
     if (Script_SeekToKeyword('X')) {
-        H(0x144) = Script_GetValue();
-        H(0x146) = Script_GetValue();
+        p->unknown144 = Script_GetValue();
+        p->unknown146 = Script_GetValue();
     }
     if (Script_SeekToKeyword('V')) {
-        H(0x148) = Script_GetValue();
-        if (H(0x148) > 99)
-            H(0x148) = 99;
-        if (H(0x148) <= 0)
-            H(0x148) = 1;
+        p->hudTime = Script_GetValue();
+        if (p->hudTime > 99)
+            p->hudTime = 99;
+        if (p->hudTime <= 0)
+            p->hudTime = 1;
     } else
-        H(0x148) = 0;
-    *(void **)(p + 0x14c) = parent;
-    AnimData_Load(p + 0x50, 0x7e7d);
-    Sprite_Init(p + 0x24, p + 0x50, 1);
-    *(struct SceneVec *)(p + 0x40) = *(struct SceneVec *)(p + 0x1c);
-    AnimData_SelectPaletteBank(p + 0x50, 0x1c1);
+        p->hudTime = 0;
+    p->hud = parent;
+    AnimData_Load(p->graphics, 0x7e7d);
+    Sprite_Init(&p->sprite.display, p->graphics, 1);
+    p->sprite.coordinates.position = p->initialPosition;
+    AnimData_SelectPaletteBank(p->graphics, 0x1c1);
     resource = ScriptProc_Start(0x922e, 0x5184);
-    ((struct OrangeSpineTail *)p)->resource = resource;
-    if (!((struct OrangeSpineTail *)p)->dead) {
-        ((struct OrangeSpineTail *)p)->update = PlasmaCannon_TryFireAtPlayer;
-        Anim_SetSequence(p + 0x10c, resource, 0xe, ((struct OrangeSpineTail *)p)->direction, 0);
+    p->resource = resource;
+    if (!p->defeatDelay) {
+        p->update = PlasmaCannon_TryFireAtPlayer;
+        Anim_SetSequence(&p->sequence, resource, 0xe, p->facing, 0);
     } else {
-        ((struct OrangeSpineTail *)p)->update = PlasmaCannon_UpdateDefeatEffect;
-        ((struct OrangeSpineTail *)p)->hit = 1;
-        Anim_SetSequence(p + 0x10c, ((struct OrangeSpineTail *)p)->resource, 0x10,
-                         ((struct OrangeSpineTail *)p)->direction, 0);
+        p->update = PlasmaCannon_UpdateDefeatEffect;
+        p->defeated = 1;
+        Anim_SetSequence(&p->sequence, p->resource, 0x10,
+                         p->facing, 0);
     }
-    PlayerCue_StepSequence((struct ContactSwarmSprite *)(p + 0x24),
-                           (struct DisplaySequenceState *)(p + 0x10c));
-    if (!((struct OrangeSpineTail *)p)->dead)
+    PlayerCue_StepSequence((struct ContactSwarmSprite *)(&p->sprite.display),
+                           (struct DisplaySequenceState *)(&p->sequence));
+    if (!p->defeatDelay)
         PlasmaCannon_InitCollider(p);
-    if (W(0x16c) && !((struct OrangeSpineTail *)p)->dead) {
-        s32 cell = OrangeSpine_CellIndex((struct PHVec *)(p + 0x40));
-        TerrainModifiers_RegisterCell(p + 0x174, cell, 0, H(0x42) >> 8, 0, 1);
+    if (p->registerTerrain && !p->defeatDelay) {
+        s32 cell = OrangeSpine_CellIndex(&p->sprite.coordinates.position);
+        TerrainModifiers_RegisterCell(p->terrainRegistration, cell, 0, p->sprite.display.position.y >> 8, 0, 1);
     }
-    if (H(0x142)) {
-        u8 *body = p + 0xc0;
-        SceneBody_Init(body, *(void **)(p + 0x14c), p + 0x40, 0, 4, p);
-        SceneBody_SetSprite(body, p + 0x24);
+    if (p->showTerrainBody) {
+        u8 *body = p->unknownC0;
+        SceneBody_Init(body, p->hud, &p->sprite.coordinates.position, 0, 4, p);
+        SceneBody_SetSprite(body, &p->sprite.display);
         TerrainOverlay_QueueAddActor(body);
     }
 #ifdef UBFIX
