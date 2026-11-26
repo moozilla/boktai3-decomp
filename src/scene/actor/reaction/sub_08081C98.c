@@ -21,9 +21,10 @@ static inline u8 Reaction_HasFlags(u32 bits)
 static inline void Reaction_Palette(struct ChaseActor *actor, u32 bank)
 {
     if (!actor->base.drawableKind)
-        AnimData_SelectPaletteBank((u8 *)actor->base.drawable + 0x2C, bank);
+        AnimData_SelectPaletteBank(&((struct SceneActorAnimationSequenceDrawable *)actor->base.drawable)->graphics, bank);
     else
-        *(u8 **)((u8 *)actor->base.drawable + 0x68) = gPaletteBankData + bank * 32;
+        ((struct SceneActorAnimationTileDrawable *)actor->base.drawable)->tile.palette =
+            (u16 *)(gPaletteBankData + bank * 32);
 }
 static inline void Reaction_SetWord(u32 *flags, u32 mask)
 {
