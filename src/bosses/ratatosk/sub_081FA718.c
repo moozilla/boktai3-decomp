@@ -257,16 +257,12 @@ void Ratatosk_UpdateCollidersAndPalette(struct Ratatosk *p)
             p->repeatHits = 0;
         p->damageWindow--;
     }
-    {
-        s16 *dest = &p->frameDamage;
-        u32 zero = 0;
-        *dest = zero;
-        actor->presentationFrames++;
-        actor->contactAttack = zero;
-        actor->contactFlags = zero;
-        p->unknownCBC = zero;
-        p->unknownCC0 = zero;
-    }
+    p->frameDamage = 0;
+    actor->presentationFrames++;
+    actor->contactAttack = 0;
+    actor->contactFlags = 0;
+    p->unknownCBC = 0;
+    p->unknownCC0 = 0;
     if (!actor->locked)
         CameraTracking_Update(&p->camera);
 }
