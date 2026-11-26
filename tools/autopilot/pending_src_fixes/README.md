@@ -20,5 +20,3 @@ build/venv/bin/python port/build_game.py --source-patches tools/autopilot/pendin
 | ProximityVolume_TranslateBounds | Both reported callers use the filled probe and discard the return in a comma expression. |
 | ResultTutorial_MovePlayer | r0 still holds the tutorial pointer. Both reported uses are calls after switch labels. |
 | WirelessPeerPanel_SetAvailable | r0 still holds the owner pointer. The reported caller discards it. |
-| SceneObjects_Append | The successful branch forwards r0 from the last placement helper. The out-of-range type retains the value left by Memory_Clear. The script wrapper consumes it. Placement-helper exits still need tracing. |
-| FeatherEffectPool_ClipScatterPath | On a same-cell call, r0 comes from the CpuSet BIOS call. An unobstructed traversal leaves r0 from the last TerrainModifiers_FindCellOverride. The caller tests the low byte. The same-cell path needs a ROM probe to recover its value. |
