@@ -7,18 +7,12 @@ s32 Callback_InvokeActor(void *, void *);
 void Hresvelgr_SetRandomTravelTarget(struct HresvelgrTravelActor *);
 void Hresvelgr_SteerTowardTarget(struct HresvelgrTravelActor *);
 s32 SceneMover_IsNearTarget(void *, s32);
-static inline void Clear(void *dest, u32 *zero)
-{
-    *zero = 0;
-    CpuSet(zero, dest, 0x5000002);
-}
 void Hresvelgr_UpdateTargetMotion(struct HresvelgrTravelActor *p)
 {
     Hresvelgr_SetFlags(p, 0x400040);
     if (p->changed) {
-        u32 zero;
         p->changed = 0;
-        Clear(&p->delta, &zero);
+        ZeroFill8(&p->delta);
         p->facing = p->targetHeading;
         p->facing4 = SceneFacing_FourWay(p->facing);
         p->facing8 = SceneFacing_EightWay(p->facing);
