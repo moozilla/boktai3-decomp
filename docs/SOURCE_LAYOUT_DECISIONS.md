@@ -84,10 +84,12 @@ no longer exists (corrections moved it to `ui/pause/menu_sequences`).
 
 ## 4. Overlaps
 
-* **`scene/state` + `scene/lifecycle` vs `system/game_state`**: `system/game_state`
-  is what is saved (story flags, records, Solar Fruit). `scene/state` holds
-  per-scene runtime counters and spatial filters that reset with the scene, so
-  it merges into `scene/lifecycle` (30 files, two ranges). Both stay out of `system`.
+* **Former `scene/state`** splits by role. The Pile Driver increments persistent
+  counters through `SceneState_IncrementCounters` (0806F218). The new-game script
+  calls 0806F2CC to reset persistent challenge flags and records. Both files
+  belong in `system/game_state`. The startup reset belongs in `scene/lifecycle`,
+  room actor-range queries in `scene/room_queries`, and wrapped background cell
+  addressing and fills in `engine/video`.
 * **`effects/scene` vs `scene/area_effect`**: `scene/area_effect` is rectangular
   gameplay areas that change terrain values and resource gain, not a visual,
   so it becomes `scene/areas` (function prefix `AreaEffect_` stays). `effects/scene`
@@ -131,9 +133,9 @@ The main decisions:
   already names the E043 アーマー family. Its defeat table 0824F004 unlocks Book
   entries 52–64: Bronze, Iron, Flame, Frost, Cloud, Earth and Dual Armor, and
   the Black Knight. D459 is Book #29 ARMOR (甲冑), a stationary sprite that
-  fires, beside STATUE #28. They are two objects, so D459 →
-  `monsters/suit_of_armor/` (its own range 08204748–08205944) with prefix
-  `SuitOfArmor_`. `EnemyF426_` → `Statue_`.
+  fires an axe shockwave described by game text #2538 and observed in replay.
+  D459 uses `monsters/axe_armor/` (08204748–08205944) and the prefix
+  `AxeArmor_`. STATUE #28 uses the prefix `Statue_`.
 * `StateActor_` → `StoryCharacter_` (51), after its directory. The kinds are
   needs-evidence.
 * Identified objects lose their mechanism prefixes:
@@ -196,12 +198,12 @@ procedures whose prints place chests and moving floors, which points to
 
 ## Least sure
 
-1. `link/player` for the 0823B264 block: the LinkPlayer names, the separate
-   0xCAC task and five traced dispatch entries agree, but nothing was seen
-   running it (`sub_08243B0C` has no ROM reference).
+1. `link/player` is a medium-confidence ownership name for 08238238–082389D8
+   and 08239130–08243B54. A staged call to 08243B0C created the alternate blue
+   Django and ran the separate 0xCAC task. The constructor has no observed
+   caller. Story-character calls identify the earlier timed sprites, and
+   `DarkLoan_DrawPreview` calls `StatGauge_Draw` at 08243B54.
 2. `player/motions` versus finer splits: one range, but it mixes damage
    reactions, form cues and special casts.
-3. `SuitOfArmor_` for D459 instead of the coordinator's "Armor".
-4. `StoryCharacter_`, `MoveSequence_`, `PopInSprite_`, `ScriptObjectPool_`,
+3. `StoryCharacter_`, `MoveSequence_`, `PopInSprite_`, `ScriptObjectPool_`,
    `SavedVariables_`: descriptive, pending identities.
-5. Folding `scene/state` into `scene/lifecycle`.

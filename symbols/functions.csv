@@ -9244,18 +9244,18 @@ addr,name,mode,confidence,source,notes
 08204224,Statue_Destroy,thumb,low,src-alias,Task destruction callback removes the enemy sprite
 08204230,Statue_InitializeFromScript,thumb,low,src-alias,
 08204704,Statue_Create,thumb,low,src-alias,Creates and initializes the enemy task registered under key F426
-08204748,SuitOfArmor_RecordDefeat,thumb,low,src-alias,Calls the death script and records event flag 29 and defeat statistics; enemy identity is tentative
-08204990,SuitOfArmor_ApplyHitReaction,thumb,low,src-alias,
-08204B3C,SuitOfArmor_InitCollider,thumb,low,src-alias,Initializes the enemy collider and installs its collision callback
-08204BD8,SuitOfArmor_ReadScriptValueList,thumb,low,src-alias,Reads a counted list of up to eight signed values from the stored script pointer
-08204C3C,SuitOfArmor_FireProjectile,thumb,low,src-alias,
-08204D84,SuitOfArmor_UpdateAttackTiming,thumb,low,src-alias,
-08204E5C,SuitOfArmor_UpdateCountdown,thumb,low,src-alias,
-08204EB8,SuitOfArmor_UpdateDeath,thumb,low,src-alias,Death state callback emits particles and records defeat on frame 12
-08204F40,SuitOfArmor_Update,thumb,low,src-alias,
-08205390,SuitOfArmor_Destroy,thumb,low,src-alias,Task destruction callback removes the enemy sprite
-0820539C,SuitOfArmor_InitializeFromScript,thumb,low,src-alias,
-08205900,SuitOfArmor_Create,thumb,low,src-alias,Creates and initializes the enemy task registered under key D459
+08204748,AxeArmor_RecordDefeat,thumb,low,src-alias,Calls the death script and records event flag 29 and defeat statistics; enemy identity is tentative
+08204990,AxeArmor_ApplyHitReaction,thumb,low,src-alias,
+08204B3C,AxeArmor_InitCollider,thumb,low,src-alias,Initializes the enemy collider and installs its collision callback
+08204BD8,AxeArmor_ReadScriptValueList,thumb,low,src-alias,Reads a counted list of up to eight signed values from the stored script pointer
+08204C3C,AxeArmor_FireProjectile,thumb,low,src-alias,
+08204D84,AxeArmor_UpdateAttackTiming,thumb,low,src-alias,
+08204E5C,AxeArmor_UpdateCountdown,thumb,low,src-alias,
+08204EB8,AxeArmor_UpdateDeath,thumb,low,src-alias,Death state callback emits particles and records defeat on frame 12
+08204F40,AxeArmor_Update,thumb,low,src-alias,
+08205390,AxeArmor_Destroy,thumb,low,src-alias,Task destruction callback removes the enemy sprite
+0820539C,AxeArmor_InitializeFromScript,thumb,low,src-alias,
+08205900,AxeArmor_Create,thumb,low,src-alias,Creates and initializes the enemy task registered under key D459
 08205944,Ooze_OnCollision,thumb,low,src-alias,Empty collision callback installed by the Ooze collider initializer
 08205948,Ooze_InitAttackCollider,thumb,low,src-alias,
 08205A6C,Ooze_ReadScriptValueList,thumb,low,src-alias,Reads a counted list of up to eight signed values from the stored script pointer

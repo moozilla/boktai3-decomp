@@ -210,7 +210,7 @@ src/engine/scene_grid_queries,src/scene/terrain/grid,eight-by-ten terrain-relati
 src/engine/scene_lifecycle,src/scene/lifecycle,"scene load, reset and teardown"
 src/engine/scene_message_controller,src/script/demo_manager.c,"the Demo Manager (デモマネージャ, key 4E69): runs cutscene message scripts"
 src/engine/scene_range_watcher,src/scene/range_watch.c,signed range transitions with script callbacks
-src/engine/scene_state_and_spatial_queries,src/scene/lifecycle,"per-scene runtime counters and spatial filters are scene lifecycle, not saved game state; merge:src/scene/lifecycle"
+src/engine/scene_state_and_spatial_queries,src/scene/room_queries,"Room actor-range queries run on 2FA5 floor-trap contact at 3161. Separate persistent counters, subsystem startup, and BG tilemap file roles below."
 src/engine/scene_stimulus,src/scene/collision/stimulus,stimulus regions and exclusions
 src/engine/script,src/script/runtime,"saved script variables, scheduling, session defaults"
 src/engine/script_entry_selector,src/script/script_selector.c,script-entry selector task
@@ -399,7 +399,7 @@ src/monsters/cannon_turret,src/monsters/garmr_statue,GCL 3884 → 1601 → 1603 
 src/monsters/crow,src/monsters/crow.c,Crow (クロウ)
 src/monsters/dog,src/monsters/dog.c,"Dog family: Hound, Hot Dog, Ice Dog"
 src/monsters/dragon_puppy,src/monsters/dragon_puppy,Dragon Puppy
-src/monsters/enemy_d459,src/monsters/suit_of_armor,"D459 is the Book's ARMOR (#29, 甲冑), a stationary Thing that fires; the existing Armor_ family (E043 アーマー) is the knight armors Bronze..Dual Armor and Black Knight (table 0824F004 → Book 52-64). Two objects, two directories"
+src/monsters/enemy_d459,src/monsters/axe_armor,"Axe-wielding Armor (Monster Book #29, 甲冑); text #2538 describes its observed axe shockwave. Distinct from Armor_ knights (Book #52–64)."
 src/monsters/enemy_f426,src/monsters/statue,"GCL 3184 → 1589 → 1590 spawns F426. Shared sprite package 7E82, palette 0225. Bestiary index 28 is string #9866, STATUE."
 src/monsters/enemy_particle,src/monsters/enemy_particle,particles shared by the late enemy block
 src/monsters/fan_cannon,src/monsters/cannons/wind,GCL 4751 → 1609 spawns the fan cannon manager 9CC2 and two color variants. The replay runs the actor update in view. Bestiary index 34 is text #9872.
@@ -500,5 +500,18 @@ src/player/sub_08240F9C.c,src/link/player,"08240F9C Player_UpdateChargeSpin: lin
 0815A400-0815E034,src/player/cutscene,script commands and cue command/dispatch files
 0815E034-0815F5B4,src/player/core,"contact responses, per-frame Player_Update, Create/Destroy/Init"
 0815F5B4-0815F7F4,src/player/target_registry,lock-on target registry
-08237EC8-082389D8,src/link/player,"link-play Django: sprite pulse and timed effects, tether mode, sounds, aura (first range)"
-08239130-08243C10,src/link/player,"link-play Django: LinkPlayer stats and abilities, keyframe actor, its own movement, attack and damage callbacks, created with Player_UpdateLinkCore (task 0xCAC)"
+08238238-082389D8,src/link/player,Alternate Link Player Django; medium-confidence ownership from the staged blue Django and Player_UpdateLinkCore. Constructor 08243B0C has no observed caller.
+08239130-08243B54,src/link/player,Alternate Link Player Django; medium-confidence ownership from the staged blue Django and Player_UpdateLinkCore. Constructor 08243B0C has no observed caller.
+src/engine/scene_state_and_spatial_queries/sub_0806EF04.c,src/scene/lifecycle/reset_subsystems.c,SceneLifecycle_InitManager calls this initialization helper as the runtime starts. The writes clear room subsystem instances.
+src/engine/scene_state_and_spatial_queries/sub_0806F1B0.c,src/engine/video/wrapped_tilemap_cells.c,"Wrapped BG cell addressing via gBgRecords, within the mixed former scene-state source group."
+src/engine/scene_state_and_spatial_queries/sub_0806F1D0.c,src/engine/video/fill_tilemap_rectangle.c,"Wrapped BG tilemap fill, using the same cell routine."
+src/engine/scene_state_and_spatial_queries/sub_0806F218.c,src/system/game_state/pile_driver_counters.c,"0016→6195. Pile Driver proc 6192 calls 8954 to increment persistent counters, independently of the room loader."
+src/engine/scene_state_and_spatial_queries/sub_0806F2CC.c,src/system/game_state/new_game_fields.c,New game GCL 541 calls 23F4. It resets persistent challenge flags and record fields.
+src/player/sub_08237EC8.c,src/effects/sprites/timed_character_effects,The 082381C8 standalone timed sprite is rendered in the 3955 controlled call. Original story-character updates 081CB3F4 and 081CBE30 call its constructor. Apply after the Pass 3 Player ROM range.
+src/player/sub_08237ED8.c,src/effects/sprites/timed_character_effects,The 082381C8 standalone timed sprite is rendered in the 3955 controlled call. Original story-character updates 081CB3F4 and 081CBE30 call its constructor. Apply after the Pass 3 Player ROM range.
+src/player/sub_08237FFC.c,src/effects/sprites/timed_character_effects,The 082381C8 standalone timed sprite is rendered in the 3955 controlled call. Original story-character updates 081CB3F4 and 081CBE30 call its constructor. Apply after the Pass 3 Player ROM range.
+src/player/sub_0823800C.c,src/effects/sprites/timed_character_effects,The 082381C8 standalone timed sprite is rendered in the 3955 controlled call. Original story-character updates 081CB3F4 and 081CBE30 call its constructor. Apply after the Pass 3 Player ROM range.
+src/player/sub_08238060.c,src/effects/sprites/timed_character_effects,The 082381C8 standalone timed sprite is rendered in the 3955 controlled call. Original story-character updates 081CB3F4 and 081CBE30 call its constructor. Apply after the Pass 3 Player ROM range.
+src/player/sub_08238110.c,src/effects/sprites/timed_character_effects,The 082381C8 standalone timed sprite is rendered in the 3955 controlled call. Original story-character updates 081CB3F4 and 081CBE30 call its constructor. Apply after the Pass 3 Player ROM range.
+src/player/sub_082381C8.c,src/effects/sprites/timed_character_effects,The 082381C8 standalone timed sprite is rendered in the 3955 controlled call. Original story-character updates 081CB3F4 and 081CBE30 call its constructor. Apply after the Pass 3 Player ROM range.
+src/player/sub_08243B54.c,src/ui/pause/menu_sequences,0032 Dark Card → Dark Loans. DarkLoan_DrawPreview calls StatGauge_Draw and the offer displays its gauge. Apply after the Pass 3 Player ROM range.

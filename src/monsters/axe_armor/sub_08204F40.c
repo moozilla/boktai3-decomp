@@ -17,7 +17,7 @@ void TerrainModifiers_UnregisterCell(void *);
 void sub_08014634(s32, s32, void *, void *, void *, s32, s32);
 void Anim_RestartSequence(void *, void *, u32, u32, u32);
 void AnimData_SelectPaletteBank(void *, s32);
-s32 SuitOfArmor_UpdateDeath(u8 *);
+s32 AxeArmor_UpdateDeath(u8 *);
 #define H(o) (*(s16 *)(p + (o)))
 #define U(o) (*(u16 *)(p + (o)))
 #define W(o) (*(u32 *)(p + (o)))
@@ -32,7 +32,7 @@ struct EffectPair {
 struct EffectVector {
     struct EffectPair a, b;
 };
-s32 SuitOfArmor_Update(u8 *p)
+s32 AxeArmor_Update(u8 *p)
 {
     struct ColliderView *collider;
     if (Engine_PauseBits(0x400) || Flags_MaskedWord(4, &gUnk_02000560))
@@ -92,7 +92,7 @@ s32 SuitOfArmor_Update(u8 *p)
             AnimData_SelectPaletteBank(p + 0x50, 0x1b7);
             *(u8 **)(p + 0x5c) = gPaletteBankData + 0x44a0;
             H(0x130) = 0;
-            *(void **)(p + 0x108) = SuitOfArmor_UpdateDeath;
+            *(void **)(p + 0x108) = AxeArmor_UpdateDeath;
             W(0x18) = 0;
             *position -= 0x60;
             *z -= 0x60;

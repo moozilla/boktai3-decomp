@@ -7,7 +7,7 @@
 Pinned matches often carry a private copy of a step the headers already share
 (PlayerCue_StepSequence and its Ended variants in include/player/cutscene/player_cue_sequence.h,
 VulcanCannon_StepAnimation): the copy holds the pins, and calling the shared
-helper instead drops them (SuitOfArmor_Update, Ooze_BeginAttack,
+helper instead drops them (AxeArmor_Update, Ooze_BeginAttack,
 VulcanCannon_InitializeFromScript matched that way, unchanged otherwise). The
 comparison is on the helper bodies' tokens with identifiers, register pins,
 asm barriers and casts' types folded away, so renamed fields and pointer

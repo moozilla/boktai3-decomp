@@ -11,19 +11,19 @@ struct SceneCountdownSequence {
     u8 unknown133[0x25];
     void *resource;
 };
-void SuitOfArmor_FireProjectile(struct SceneCountdownSequence *);
-s32 SuitOfArmor_UpdateAttackTiming(struct SceneCountdownSequence *);
+void AxeArmor_FireProjectile(struct SceneCountdownSequence *);
+s32 AxeArmor_UpdateAttackTiming(struct SceneCountdownSequence *);
 void Anim_RestartSequence(struct DisplaySequenceState *, void *, u32, u32, u32);
-s32 SuitOfArmor_UpdateCountdown(struct SceneCountdownSequence *p)
+s32 AxeArmor_UpdateCountdown(struct SceneCountdownSequence *p)
 {
     s16 *count = &p->countdown;
     if (*count > 0) {
         if (*count == 40)
-            SuitOfArmor_FireProjectile(p);
+            AxeArmor_FireProjectile(p);
         --*count;
     } else {
         Anim_RestartSequence(&p->sequence, p->resource, 2, p->variant, 0);
-        p->update = SuitOfArmor_UpdateAttackTiming;
+        p->update = AxeArmor_UpdateAttackTiming;
     }
     return 0;
 }

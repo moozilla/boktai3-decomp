@@ -20,9 +20,9 @@ list the evidence and the names still awaiting confirmation.
 | `src/minigames/` | The Coffin Bike, the Dark Generator, the result game |
 | `src/effects/` | Visual effects: palette, particles, screen effects, projectiles, bursts, orbits, sprite effects, shadows, weather |
 | `src/ui/` | HUD, dialogue, pause menu, town services and the town map, the world map, the books, title screens, results |
-| `src/link/` | Two-player play: cable (`serial`), wireless, the link menus, and the link-play Django (`link/player`) |
+| `src/link/` | Two-player play: cable (`serial`), wireless, the link menus, and the alternate Django (`link/player`, medium-confidence ownership) |
 | `src/system/` | The cartridge and what is saved: solar sensor, clock and sun schedule, saving, game state, inventory data |
-| `src/scene/` | The world simulation everything shares: the actor framework, collision, terrain and paths, gameplay areas, camera, scene lifecycle |
+| `src/scene/` | The world simulation everything shares: the actor framework, collision, terrain and paths, gameplay areas, room queries, camera, scene lifecycle |
 | `src/script/` | The GCL script interpreter (Metal Gear Solid's scripting language) and its runtime |
 | `src/engine/` | Boot, tasks, heap, interrupts, video (backgrounds, animated sprites, palettes, text tiles), math, game-side sound |
 | `src/lib/` | Third-party libraries in upstream form: m4a (sound driver), rfu (wireless), rtc, eeprom, libgcc, libc, libm |
@@ -82,7 +82,7 @@ list the evidence and the names still awaiting confirmation.
 | Bat, Bee, Slime, Ghost, Crow, Spider, Mimic, Octopus, Dog (Hound, Hot Dog, Ice Dog), Lun | `src/monsters/<name>.c` |
 | Skeleton, Golem, Mummy, Vorn, Ivy, Sword, Axe, Ooze, Screamer, Poison Hand, Dragon Puppy | `src/monsters/<name>/` |
 | Bronze, Iron, Flame, Frost, Cloud, Earth, Dual Armor, Black Knight | `src/monsters/armor/` |
-| ARMOR (the stationary suit, Book #29) and STATUE (#28) | `src/monsters/suit_of_armor/`, `src/monsters/statue/` |
+| Axe-wielding ARMOR (Book #29) and STATUE (#28) | `src/monsters/axe_armor/`, `src/monsters/statue/` |
 | Garmr Statue, Muspell Head, Popbud, Poisoner and Perplexer, Centipede | `src/monsters/garmr_statue/`, `muspell_head/`, `popbud/`, `pollen_flowers/`, `centipede/` |
 | Vulcan, Wind and Plasma Cannons | `src/monsters/cannons/{vulcan,wind,plasma}/` |
 | Hresvelgr (Ancient Tree) | `src/bosses/hresvelgr/` (its Solar Roots: `src/objects/solar_roots/`) |
@@ -98,23 +98,25 @@ list the evidence and the names still awaiting confirmation.
 | Warp Circle, Solar Stand, deck cannons, wooden crate, switches, Bat Curtain | `src/objects/<name>/` |
 | Treasure chests and dropped items | `src/objects/items/` |
 | Townspeople, story characters, cutscene actors | `src/npc/` |
+| Timed sprites created by story characters | `src/effects/sprites/timed_character_effects/` |
 | The solar sensor, solar level, calibration | `src/system/solar/` |
 | Clock, sunrise and sunset, region setting | `src/system/clock/` (RTC driver `src/lib/rtc/`) |
 | Saving | `src/system/save/` (EEPROM `src/lib/eeprom/`), save screen `src/ui/save/` |
-| Story flags, game state, Solar Fruit; item data | `src/system/game_state/`, `src/system/inventory/` |
+| Story flags, Pile Driver counters, new-game fields, Solar Fruit; item data | `src/system/game_state/`, `src/system/inventory/` |
 | Music and sound effects | `src/engine/sound/`, driver `src/lib/m4a/` |
 | The script interpreter (GCL), cutscene runner | `src/script/script_virtual_machine.c`, `src/script/demo_manager.c`; scripts in `gcl/` |
 | Dialogue boxes and text commands | `src/ui/dialogue/` |
 | HUD and damage numbers | `src/ui/hud/` |
 | Pause menu, inventory, map, Status page, Dark Card sequences | `src/ui/pause/{menu,inventory,map,status,menu_sequences}/` |
+| Gauge on the Dark Loans offer | `src/ui/pause/menu_sequences/sub_08243B54.c` (`StatGauge_Draw`) |
 | Shops, Solar Bank, Dark Loan, Storage, the San Miguel map | `src/ui/town/` (`shop/`, `solar_bank/`, `dark_loan.c`, `storage/`, `town_map.c`) |
 | The world map | `src/ui/world_map.c` |
 | Monster Book, Forging Book, collection | `src/ui/books/` |
 | Title, Game Start, Options, Name Entry, Password, sound test | `src/ui/title/` |
 | Stage results, time result, challenges | `src/ui/results/` |
-| Cable link, wireless adapter, link menus, link-play Django | `src/link/serial/`, `src/link/wireless/`, `src/link/{menu,panel,selection,lobby,records}/`, `src/link/player/` |
+| Cable link, wireless adapter, link menus, alternate Django | `src/link/serial/`, `src/link/wireless/`, `src/link/{menu,panel,selection,lobby,records}/`, `src/link/player/` |
 | Magic Cannon departure, bat flock, weather | `src/effects/screen/magic_cannon_departure.c`, `src/effects/bat_flock.c`, `src/effects/weather/` |
-| Actor framework, collision, terrain, gameplay areas, camera | `src/scene/{actor,collision,terrain,areas,camera}/` |
+| Actor framework, collision, terrain, gameplay areas, room queries, camera | `src/scene/{actor,collision,terrain,areas,room_queries,camera}/` |
 | Tasks, heap, interrupts, boot; sprites, OAM, backgrounds | `src/engine/`, `src/engine/video/` |
 
 ## Finding a function's file

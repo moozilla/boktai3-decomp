@@ -322,10 +322,10 @@ Actor position,0817A0FC,0817A900,,,auto: 4 of 15 functions named ActorPosition_*
 Scene volume,0817A900,0817B5C0,,,auto: 7 of 23 functions named SceneVolume_*; also SceneActors_*
 Actor state,0817B5C0,0817BB54,,,auto: 6 of 8 functions named ActorState_*
 Actor decision,0817BB54,0817C318,,,auto: 9 of 12 functions named ActorDecision_*
-Boss slot 2,0817C318,0817D67C,,,auto: 7 of 10 functions named BossSlot2_*
+Sabata,0817C318,0817D67C,,,auto: 7 of 10 functions named Sabata_*
 Scene volume,0817D67C,0817E378,,,auto: 4 of 6 functions named SceneVolume_*
 Scene event actor,0817E378,0817F330,,,auto: 7 of 10 functions named SceneEventActor_*
-Boss slot 2,0817F330,08180488,,,auto: 7 of 11 functions named BossSlot2_*
+Sabata,0817F330,08180488,,,auto: 7 of 11 functions named Sabata_*
 Sprite component,08180488,08180898,,,auto: 8 of 21 functions named SpriteComponent_*; also ProximityVolume_*
 Scene combat actor,08180898,08181134,,,auto: 5 of 11 functions named SceneCombatActor_*
 Actor marker,08181134,08181634,,,auto: 5 of 7 functions named ActorMarker_*
@@ -402,7 +402,7 @@ Scripted presentation,081E2898,081E34D0,,symbols/proposed/entry-animation.csv,do
 Actor animation controller (tentative),081E34D0,081EB81C,,symbols/proposed/entry-animation.csv,docs/ANIMATION_081E.md and docs/ENTRY_AND_MENUS.md shared actor layout and command/callback chain
 Mode menu,081EB81C,081EC380,,,auto: 7 of 12 functions named ModeMenu_*; also ResultScreen_*
 Actor display,081EC380,081EEE30,,,auto: 4 of 30 functions named ActorDisplay_*; also SceneActors_*
-Singleton slot 7,081EEE30,081F2190,,,auto: 33 of 55 functions named SingletonSlot7_*
+Vanargand head,081EEE30,081F2190,,,"Vanargand head runtime, animation states and transitions"
 Sprite trail,081F2190,081F2CD4,,,auto: 7 of 25 functions named SpriteTrail_*; also SingletonSlot7_*
 Ratatosk,081F2CD4,081FC66C,,,auto: 85 of 172 functions named Ratatosk_*
 Scene projectile,081FC66C,081FCFE8,,,auto: 12 of 13 functions named SceneProjectile_*
@@ -416,7 +416,7 @@ Script combat actor,08201388,0820264C,,,auto: 8 of 11 functions named ScriptComb
 Projectile pool,0820264C,08203200,,,auto: 6 of 25 functions named ProjectilePool_*; also ProjectileConfig_* ProximitySequence_*
 Cannon emitter,08203200,08203660,,,auto: 4 of 5 functions named CannonEmitter_*
 Enemy F426,08203660,08204748,,,auto: 10 of 12 functions named EnemyF426_*
-Enemy D459,08204748,08205944,,,auto: 11 of 12 functions named EnemyD459_*
+Axe Armor,08204748,08205944,,,auto: 12 of 12 functions named AxeArmor_*
 Ooze,08205944,082064B4,,,auto: 8 of 10 functions named Ooze_*
 Vulcan cannon,082064B4,08207FAC,,,auto: 14 of 14 functions named VulcanCannon_*
 Cannon turret,08207FAC,0820901C,,,auto: 8 of 10 functions named CannonTurret_*

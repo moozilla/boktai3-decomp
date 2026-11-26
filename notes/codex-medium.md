@@ -6789,7 +6789,7 @@ Stopped fresh work:
 
 - **0820E2A4 stopped below threshold — Poison hand damage/animation update**,
   1,140-byte target, 514 instructions. Read full assembly and BIG_FUNCTIONS;
-  SuitOfArmor_Update supplies the outer damage/collider/HUD/flash/blink pattern,
+  AxeArmor_Update supplies the outer damage/collider/HUD/flash/blink pattern,
   while Screamer_UpdateDamageParticles supplies the eight-particle defeat loop.
   Candidate handles health at 136, damage at 134, dead at 132, flash at 12A,
   resource 168, defeat callback E128 and palette 1C5. Initial 47.5%; removing

@@ -721,7 +721,7 @@ Tried: `!steps`, a limit variable, gridRow per arm, 1D indexing, parameter types
 four or five more insns of life without changing the code (fact 17's `s16` conversion trick), or
 reorder the parameter's first use.
 
-### sub_0806F06C (src/scene/lifecycle/sub_0806F06C.c): deferred
+### sub_0806F06C (src/scene/room_queries/sub_0806F06C.c): deferred
 
 Draft without the DEBUG_NOP: `notes/phase3-drafts/monsters-bosses/sub_0806F06C.c`, 23/23 differ.
 `AGBCC_PRI=i:+920` matches. cse puts REG_EQUAL (const 0) on i's first set, which doubles its life.

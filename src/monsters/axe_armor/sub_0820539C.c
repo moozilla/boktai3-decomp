@@ -68,10 +68,10 @@ s32 Script_GetValue(void);
 s32 Script_GetValueSafe(void);
 void Sprite_Init(void *, void *, s32);
 void AnimData_SelectPaletteBank(void *, s32);
-void SuitOfArmor_InitCollider(u8 *);
-void SuitOfArmor_ReadScriptValueList(u8 *);
-s32 SuitOfArmor_UpdateAttackTiming(void);
-s32 SuitOfArmor_UpdateDeath(u8 *);
+void AxeArmor_InitCollider(u8 *);
+void AxeArmor_ReadScriptValueList(u8 *);
+s32 AxeArmor_UpdateAttackTiming(void);
+s32 AxeArmor_UpdateDeath(u8 *);
 void TerrainModifiers_RegisterCell(void *, s32, s32, s32, s32, s32);
 void SceneBody_Init(void *, void *, void *, u32, u32, void *);
 void SceneBody_SetSprite(void *, void *);
@@ -164,7 +164,7 @@ inline static u32 Arg1(u32 k_, u8 *p)
     return p + k_;
 }
 
-s32 SuitOfArmor_InitializeFromScript(struct EnemyD459Actor *p, void *parent)
+s32 AxeArmor_InitializeFromScript(struct EnemyD459Actor *p, void *parent)
 {
     struct SpawnOffsets offsets = gUnk_0824FE5C;
     void *resource;
@@ -278,10 +278,10 @@ s32 SuitOfArmor_InitializeFromScript(struct EnemyD459Actor *p, void *parent)
     *slot = resource;
     dead = p->initialDead;
     if (dead == 0) {
-        *((void **)(&p->update)) = SuitOfArmor_UpdateAttackTiming;
+        *((void **)(&p->update)) = AxeArmor_UpdateAttackTiming;
         Anim_SetSequence(&p->sequence, resource, 2, (u8)(p->facing), dead);
     } else {
-        *((void **)(&p->update)) = SuitOfArmor_UpdateDeath;
+        *((void **)(&p->update)) = AxeArmor_UpdateDeath;
         {
             s16 *d = &(p->dead);
             s32 zero = 0;
@@ -299,7 +299,7 @@ s32 SuitOfArmor_InitializeFromScript(struct EnemyD459Actor *p, void *parent)
         EnemyD459_StepSequence(flipFlags, p, sprite, (struct DisplaySequenceState *)(&p->sequence));
     }
     if ((*((s16 *)&p->initialDead)) == 0)
-        SuitOfArmor_InitCollider(p);
+        AxeArmor_InitCollider(p);
     if (p->terrainEnabled && p->initialDead == 0) {
         s32 cell = EnemyD459_CellIndex((struct SceneVec *)position);
         TerrainModifiers_RegisterCell(&p->terrain, cell, 0, (p->sprite.coordinates.position.y) >> 8,
@@ -312,7 +312,7 @@ s32 SuitOfArmor_InitializeFromScript(struct EnemyD459Actor *p, void *parent)
         TerrainOverlay_QueueAddActor(body);
     }
     if (p->scriptList)
-        SuitOfArmor_ReadScriptValueList(p);
+        AxeArmor_ReadScriptValueList(p);
     /* The initializer has no explicit return assignment on this path. */
 #ifdef UBFIX
     // falls off the end with r0 left over from its last statement; the creator only tests
