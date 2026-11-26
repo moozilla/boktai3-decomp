@@ -1,3 +1,4 @@
+#include "scene/actor/scene_actor_record.h"
 #include "scene/actor/scene_actor_part_burst.h"
 #include "global.h"
 #include "scene/actor/scene_actor_reaction.h"
@@ -12,7 +13,6 @@
 #include "scene/motion/scene_actor_turn.h"
 #include "scene/motion/scene_actor_chase_shared.h"
 
-void SceneActorRecord_RecordPair(u32, u32);
 void SceneActorAttachment_ReplaceResponseSlot(struct ChaseActor *, u32, u32, u32);
 void SceneActorEffects_AdvanceSteps(u8 *, s32);
 
@@ -52,17 +52,6 @@ static inline void MarkHitFlag(s16 bit, struct HitMotionFlags *flags)
 static inline u32 *StatusFlags(struct ChaseActor *actor)
 {
     return &actor->base.statusFlags;
-}
-static inline void SelectAnimationState(struct ChaseActor *a, u8 state, u8 phase, u8 behavior)
-{
-    a->base.state2A8 = state;
-    a->base.phase2A9 = phase;
-    a->base.behavior2AA = behavior;
-}
-static inline void ResetEntry(struct ChaseActor *a, u32 ready)
-{
-    a->base.counter2AC = 0;
-    a->base.field2B1 = ready;
 }
 static inline void MaskContactFlags(u32 *dst, u32 mask)
 {
@@ -171,9 +160,11 @@ void SceneActorReaction_ApplyHitResponse(void *victim, u32 mode, struct ContactP
             a->base.body.position = *position;
             a->base.body.position.y += heightOffset;
             if (a->base.drawableKind == 0)
-                *(struct ContactPosition *)((u8 *)a->base.drawable + 0x1C) = a->base.body.position;
+                ((struct SceneActorRegistrySequenceDrawable *)a->base.drawable)->position =
+                    a->base.body.position;
             else
-                *(struct ContactPosition *)((u8 *)a->base.drawable + 0x40) = a->base.body.position;
+                ((struct SceneActorRegistryTileDrawable *)a->base.drawable)->position =
+                    a->base.body.position;
             {
                 u32 mask = 0x2000;
                 a->base.reactionFlags = mask | a->base.reactionFlags;
@@ -218,28 +209,25 @@ void SceneActorReaction_ApplyHitResponse(void *victim, u32 mode, struct ContactP
                 SceneActorAttachment_ReplaceResponseSlot(victim, 3, 0x7F, 0);
                 SceneActorEffects_AdvanceSteps((u8 *)victim, 4);
                 SceneActorTerrain_InstallControl(a, a->base.onDefeat, 0x11);
-                SelectAnimationState(a, 3, 0, 0);
-                ResetEntry(a, 1);
+                SceneActorTerrain_EnterState(a, 3, 0, 0);
                 if (SceneActorDamage_ShouldShow(a))
                     ShowDamage(a);
-                if (!SceneActorDamage_TestFlags(gEngineFlags, 0x4800) &&
-                    !SceneActorChase_StatusFlags(a, 0x800))
-                    SceneActorRecord_RecordPair(gScriptEntryProcedure, (u16)a->base.body.id);
+                SceneActorRecord_RecordDefeat(a);
                 if (category == 4 || category == 1) {
-                    union SceneActorRegistryPackedPosition range;
+                    struct ContactPosition range;
                     union HitSparkTable source = {0};
                     u32 first;
                     const u16 *samples;
-                    range.packed.x = 80;
-                    range.packed.y = 60;
-                    range.packed.z = 60;
+                    range.x = 80;
+                    range.y = 60;
+                    range.z = 60;
 
                     source.encoded.offset = (u16)RANDOM_TABLE_ADDR;
                     source.encoded.page = (u8)(RANDOM_TABLE_ADDR >> 16);
                     source.encoded.region = (u8)(RANDOM_TABLE_ADDR >> 24);
                     samples = ReadSparkTable(&source);
                     first = SceneActorEffects_NextSparkCount(samples);
-                    SceneActorEffects_SpawnDefeatSparks(a, &range.position, samples, first);
+                    SceneActorEffects_SpawnDefeatSparks(a, &range, samples, first);
                     if (a->base.category == 4 || a->base.category == 1 || a->base.category == 5 ||
                         a->base.category == 7 || a->base.category == 6 || a->base.category == 24 ||
                         a->base.category == 25)
