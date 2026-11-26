@@ -6,10 +6,6 @@
 #include "scene/collision/scene_actor_contact_response.h"
 #include "engine/word_flags.h"
 
-struct ReactionOwner {
-    u8 unknown0[0x3C];
-    struct ChaseActor *actor;
-};
 extern const s16 gUnk_086149C4[];
 static inline u8 Reaction_IsBlockedFlags(struct ChaseActor *actor, u32 flags)
 {
@@ -30,9 +26,9 @@ static inline s32 Reaction_ScaleMotion(s32 value)
     return -((-value) >> 12);
 }
 
-u32 SceneActorReaction_SetMotionMode(struct ReactionOwner *owner, s32 mode, s32 amplitude)
+u32 SceneActorReaction_SetMotionMode(struct SceneActorBody *body, s32 mode, s32 amplitude)
 {
-    struct ChaseActor *actor = owner->actor;
+    struct ChaseActor *actor = body->owner;
     struct SceneActorChaseGroup *group = &actor->group;
     struct ContactCollider *second = &actor->base.colliderB;
     struct ContactCollider *first = &actor->base.colliderA;
@@ -54,10 +50,7 @@ u32 SceneActorReaction_SetMotionMode(struct ReactionOwner *owner, s32 mode, s32 
                     *motion = updated;
                     if (updated) {
                         if (Reaction_IsBlockedFlags(actor, updated)) {
-                            u32 zero = 0;
-                            *motion = 0x40;
-                            actor->base.field2E6 = zero;
-                            HalfwordFlags_And(&actor->base.reactionFlags, ~0x980);
+                            SceneActorDamage_MarkDown(actor, motion);
                         } else {
                             u32 statusMask = 0x803E;
                             u32 flags = *motion;
