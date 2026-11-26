@@ -36,10 +36,12 @@ struct Vorn {
     u16 turnZ;
     u8 unknown6B6[3];
     u8 axis;
-    u8 unknown6BA[6];
+    u16 sideStepDuration;
+    u8 unknown6BC[4];
     u8 foreignPosition;
     u8 field6C1;
-    u8 unknown6C2[6];
+    u8 unknown6C2[2];
+    u32 retreatRequests;
     u32 minimumDistance;
     u32 maximumDistance;
     u16 field6D0;

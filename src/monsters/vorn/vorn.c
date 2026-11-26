@@ -4,6 +4,7 @@
 #include "scene/actor/scene_actor_reset.h"
 #include "npc/manager/scene_actor_animation.h"
 #include "scene/actor/scene_actor_reaction.h"
+#include "scene/collision/scene_actor_delayed_response.h"
 #include "player/player.h"
 #include "scene/motion/scene_actor_chase.h"
 #include "debug.h"
@@ -213,13 +214,6 @@ void Vorn_OnUnusedNoOp(void)
 
 #define SceneActorContext_RunPendingScript Vorn_RunPendingScript
 
-struct SceneActorFacingTarget {
-    u8 unknown0[0x30];
-    s16 x;
-    u8 unknown32[2];
-    s16 z;
-};
-
 s32 Math_Atan2(s32, s32);
 
 void Sound_PlaySong(u32);
@@ -231,10 +225,10 @@ void Vorn_RunPendingScript(void *);
 void SceneActorReaction_UpdateFacingAttack(struct ChaseActor *actor, s32 frame)
 {
     if (SceneActorReaction_TakePrepared(actor)) {
-        if ((*(struct SceneActorFacingTarget **)gPlayers))
+        if (gPlayers[0])
             actor->base.body.direction = Math_Atan2(
-                (*(struct SceneActorFacingTarget **)gPlayers)->x - actor->base.body.position.x,
-                (*(struct SceneActorFacingTarget **)gPlayers)->z - actor->base.body.position.z);
+                gPlayers[0]->position.x - actor->base.body.position.x,
+                gPlayers[0]->position.z - actor->base.body.position.z);
         SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0);
         actor->base.heightOffset = 80;
         Sound_PlaySong(0x1CF);
@@ -329,30 +323,18 @@ void Vorn_RestoreSavedState(struct ChaseActor *s)
     }
 }
 
-struct SceneActorReactionContext {
-    u8 unknown0[0x6D4];
-    u16 flags;
-};
-
-struct SceneActorReactionRoutePoint {
-    u8 unknown0[0x1C];
-    s16 x;
-    u8 unknown1E[2];
-    s16 z;
-};
-
 void SceneActor_SetPositionXZ(void *, s32, s32);
 
 
 void SceneActorReaction_ResumeSavedTarget(struct ChaseActor *actor, s32 frame)
 {
-    struct SceneActorReactionContext *context = actor->base.context;
-    struct SceneActorRegistryControlGroup *group = &actor->group.common;
+    struct Vorn *context = actor->base.context;
+    struct SceneActorChaseGroup *group = &actor->group;
     if (SceneActorReaction_TakePrepared(actor)) {
         actor->base.restart = 1;
         SceneActorAnimation_SelectDirectionalEntry((void *)actor, 12);
         {
-            u16 *flags = &context->flags;
+            u16 *flags = &context->flags6D4;
             s32 mask = ~12;
             *flags &= mask;
         }
@@ -365,8 +347,8 @@ void SceneActorReaction_ResumeSavedTarget(struct ChaseActor *actor, s32 frame)
             void *target;
             SceneActor_SetPositionXZ(
                 &actor->base.body.id,
-                (*(struct SceneActorReactionRoutePoint **)((u8 *)group + 0x1FC))->x,
-                (*(struct SceneActorReactionRoutePoint **)((u8 *)group + 0x1FC))->z);
+                ((struct ChaseRouteProbe *)group->route)->destination.x,
+                ((struct ChaseRouteProbe *)group->route)->destination.z);
             SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0);
             target = actor->base.onAlternateEntry;
             SceneActorChase_SetControl(actor, target, 1);
@@ -722,12 +704,6 @@ void Vorn_UpdatePursuitDistance(struct ChaseActor *actor)
     }
 }
 
-struct SceneActorSideStepContext {
-    u8 unknown0[0x6B9];
-    u8 side;
-    u16 duration;
-};
-
 static inline void SideStep_SetFlags(struct SceneActorReactionMotion *motion, u8 mask)
 {
     motion->flags |= mask;
@@ -735,10 +711,10 @@ static inline void SideStep_SetFlags(struct SceneActorReactionMotion *motion, u8
 
 void SceneActorReaction_BeginSideStep(struct ChaseActor *actor, s32 frame)
 {
-    struct SceneActorSideStepContext *context = actor->base.context;
+    struct Vorn *context = actor->base.context;
     if (SceneActorReaction_TakePrepared(actor)) {
         u32 flags;
-        if (!context->side) {
+        if (!context->axis) {
             flags = 1;
             actor->base.body.direction = 64;
             actor->base.tracking.destination = actor->base.body.position;
@@ -752,7 +728,7 @@ void SceneActorReaction_BeginSideStep(struct ChaseActor *actor, s32 frame)
         SceneActorAnimation_SelectEntryFlags((void *)actor, 16, flags);
     }
     SideStep_SetFlags((void *)&actor->base.tracking.target, 32);
-    if (frame > context->duration)
+    if (frame > context->sideStepDuration)
         actor->base.stepDone = 1;
 }
 
@@ -1095,11 +1071,6 @@ void SceneActorPhase_SelectLinkedAnimation(struct RoomActor *p)
 
 // confidence=low: tentative Vorn behavior role recovered from the surrounding callbacks.
 
-struct VornPatrolRoute {
-    u8 unknown0[8];
-    const u16 *points;
-};
-
 
 static inline u8 Vorn_GetRestorableMotion(struct SceneActorReactionMotion *m, u32 mask,
                                           struct SceneActorReactionMotion **saved)
@@ -1114,8 +1085,8 @@ static inline u8 Vorn_GetRestorableMotion(struct SceneActorReactionMotion *m, u3
 
 s32 Vorn_TryRestorePatrolRoute(struct ChaseActor *actor)
 {
-    u8 *group = (u8 *)(&actor->group.common);
-    u8 *context = actor->base.context;
+    struct SceneActorChaseGroup *group = &actor->group;
+    struct Vorn *context = actor->base.context;
     struct SceneActorReactionMotion *savedMotion;
     struct ContactPosition *destination;
     if (((!SceneActorTurn_ActorFlags(actor, 0x400000)) || (!SceneActorTurn_ActorFlags(actor, 0x200000))) ||
@@ -1127,24 +1098,15 @@ s32 Vorn_TryRestorePatrolRoute(struct ChaseActor *actor)
     Chase_SetState(actor, 3, 1, 0);
     Chase_SetCtl(actor, SceneActorReaction_RestoreAfterDelay, 14);
     MonsterInit_SetBehaviorFlags(actor, 16);
+    SceneActorDelay_Prepare((void *)&group->saved, actor->base.onStanding, 9, 30);
+    destination = group->destination;
     {
-        struct SceneActorReactionCommand *command = (void *)(group + 0x8C);
-        void *payload = actor->base.onStanding;
-        u32 kind = 9;
-        command->duration = 30;
-        command->payload = payload;
-        command->first = 0;
-        command->second = 0;
-        command->kind = kind;
-    }
-    destination = *((struct ContactPosition **)(group + 0x200));
-    {
-        struct VornPatrolRoute *route = (void *)(group + 0x74);
-        destination->x = ((u16 *)route->points)[0];
-        destination->z = ((u16 *)route->points)[1];
+        struct SceneActorRegistryRoute *route = &group->homeRoute;
+        destination->x = route->point->x;
+        destination->z = route->point->z;
     }
     destination->y = Chase_Height(destination);
-    (*((struct ContactPosition **)(group + 0x200)))->pad = 1;
+    (group->destination)->pad = 1;
     actor->base.field2C2 = 64;
     actor->group.common.gate.flags = 0;
     actor->group.common.gate.counter = 0;
@@ -1171,9 +1133,9 @@ s32 Vorn_TryRestorePatrolRoute(struct ChaseActor *actor)
         Chase_ClearBits(&actor->base.motionFlags, 0x400);
         actor->group.turn.turnsRemaining = 0xFF;
         Chase_ClearBits(&actor->base.motionFlags, 0x1000);
-        *((u16 *)(context + 0x6D4)) = 0;
-        *((u16 *)(context + 0x69E)) = 0;
-        *((u16 *)(context + 0x6AC)) = 0;
+        context->flags6D4 = 0;
+        context->field69E = 0;
+        context->pursuitCooldown = 0;
         {
             s32 mask = ~4;
             *flags &= mask;
