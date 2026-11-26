@@ -40,16 +40,7 @@ void MovingPlatform_UpdatePlayerAttachment(struct NamedObject *object)
         manager->followName = object->name;
         MovingPlatform_UpdatePlayerFollowFlags(object);
         MovingPlatform_EnableFlags(8, object);
-        {
-            u32 f;
-            u32 v;
-            u8 *p = (u8 *)gPlayers[0] + 0x701;
-            f = *p;
-            do {
-                v = 1 | f;
-            } while (0);
-            *p = v;
-        }
+        gPlayers[0]->shadow[1] |= 1;
     } else if (manager->followName == object->name) {
         if (object->kind == 1 && !(object->field_E0 & 8)) {
             if (IN_BOUNDS(gUnk_086064BC)) {
@@ -65,7 +56,7 @@ void MovingPlatform_UpdatePlayerAttachment(struct NamedObject *object)
             gPlayers[0]->followTarget = &gPlayers[0]->movementContactFlags;
             Player_ClearAttachmentFlags(gPlayers[0], 5);
             MovingPlatform_DisableFlags(8, object);
-            ((u8 *)gPlayers[0])[0x701] &= 0xFE;
+            gPlayers[0]->shadow[1] &= 0xFE;
         }
     }
 }
