@@ -1,29 +1,16 @@
-#include "global.h"
-struct S {
-    u8 f[4];
-    u8 b4;
-    u8 b5;
-    u8 f6;
-    u8 b7;
-    u8 b8;
-    u8 g[0x14 - 9];
-    u32 c14;
-    u8 g2[0x168 - 0x18];
-    u8 d[1];
-};
-void Trigger_ConsumePending(void *, s32);
-void Otenko_UpdateAnimation14(u32 a, struct S *p)
+#include "npc/story_character/state_actor.h"
+void Otenko_UpdateAnimation14(void *context, struct StateActor *p)
 {
-    if (p->b8 != 0) {
-        p->b8 = 0;
-        p->b7 = 0;
-        p->b5 = 0xe;
+    if (p->enterCommand != 0) {
+        p->enterCommand = 0;
+        p->done = 0;
+        p->nextState = 0xe;
     }
-    if (p->b7 != 0) {
+    if (p->done != 0) {
         u32 o = 1;
-        p->b4 = o;
-        p->c14 = 0;
-        p->b8 = o;
-        Trigger_ConsumePending(&p->d, 1);
+        p->state = o;
+        p->timer = 0;
+        p->enterCommand = o;
+        Trigger_ConsumePending(p->receiver, 1);
     }
 }
