@@ -1,7 +1,7 @@
 #include "global.h"
 #include "system/game_state/game_state.h"
 #include "scene/actor/scene_actor_components.h"
-#include "scene/actor/contact_collider.h"
+#include "scene/collision/contact_collider.h"
 
 struct ArmorDecisionActor {
     u8 pad0[0x18];

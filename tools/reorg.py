@@ -155,6 +155,7 @@ def recorded_moves():
             aliases = [Path("include", current.name), current, target]
             if row.get("pass2_path"):
                 aliases.append(layout_path(row["pass2_path"], "include"))
+            aliases.extend(layout_path(path, "include") for path in (row.get("prior_paths") or "").split("|") if path)
             for previous in aliases:
                 if headers.setdefault(previous, target) != target:
                     raise ValueError(f"{HEADER_DIRS}: conflicting destination for {previous}")

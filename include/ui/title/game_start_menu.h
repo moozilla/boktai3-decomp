@@ -1,7 +1,7 @@
 #ifndef GUARD_GAME_START_MENU_H
 #define GUARD_GAME_START_MENU_H
 
-#include "scene/actor/contact_swarm.h"
+#include "scene/collision/contact_swarm.h"
 #include "engine/video/display_sequence.h"
 #include "ui/widgets/scene_input.h"
 

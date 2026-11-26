@@ -1,4 +1,4 @@
-#include "scene/actor/contact_actor.h"
+#include "scene/collision/contact_actor.h"
 #include "objects/scene_objects/scene_object_controller.h"
 
 void SceneObject_UpdateLowered(struct SceneObjSlot *);

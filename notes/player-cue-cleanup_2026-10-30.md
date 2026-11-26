@@ -102,7 +102,7 @@ No duplicated player owner records, copied playback routines or numeric player
 address accesses remain in these units. The pending-notification and packet
 payloads stay distinct.
 
-`include/player/cues/player_cue_sequence.h` now also offers
+`include/player/cutscene/player_cue_sequence.h` now also offers
 `PlayerCue_StepSequenceEndedWithFirstFlipMask`; the existing completion-aware API
 wraps it with mask 1. Its prior alternate-form consumer remains stock exact.
 SideArrival passes its already-live phase, whose case value is 1. This removes

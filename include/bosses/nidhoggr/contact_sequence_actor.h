@@ -1,6 +1,6 @@
 #ifndef GUARD_CONTACT_SEQUENCE_ACTOR_H
 #define GUARD_CONTACT_SEQUENCE_ACTOR_H
-#include "scene/actor/contact_swarm.h"
+#include "scene/collision/contact_swarm.h"
 #include "engine/task.h"
 /* Tentative family name: eight sequence actors, each with health and resource colliders. */
 struct ContactSequenceActor {

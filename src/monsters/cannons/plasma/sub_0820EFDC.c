@@ -1,5 +1,5 @@
 #include "monsters/cannons/orange_spine.h"
-#include "scene/actor/collision_response.h"
+#include "scene/collision/collision_response.h"
 #include "engine/engine.h"
 struct H {
     u32 lo : 16;

@@ -3,7 +3,7 @@
 #include "engine/ram.h"
 #include "engine/engine.h"
 #include "player/player.h"
-#include "scene/actor/contact_actor.h"
+#include "scene/collision/contact_actor.h"
 #include "engine/engine_pause.h"
 
 u8 SceneActor14_UpdateAnimState(struct SceneScheduledEffect *);

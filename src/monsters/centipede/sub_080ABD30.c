@@ -1,6 +1,6 @@
 #include "scene/actor/scene_actor_state.h"
 #include "global.h"
-#include "scene/actor/scene_actor_chase_shared.h"
+#include "scene/motion/scene_actor_chase_shared.h"
 /* TentacleBody_Destroy: Ivy_Destroy shape; removes the tentacle segment sprites first (ported by relatives.py, fixed by hand; provisional name) */
 void Sprite_Remove(void *);
 void Anim_Remove(void *);

@@ -1,5 +1,5 @@
 #include "link/records/link_record_panel.h"
-#include "scene/area_effect/area_effect_link.h"
+#include "scene/areas/area_effect_link.h"
 #include "ui/dialogue/scrolling_dialogue.h"
 #include "engine/video/palette_resource.h"
 

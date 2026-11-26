@@ -3,8 +3,8 @@
 #include "engine/engine.h"
 #include "effects/projectiles/contact_swarm_sprite.h"
 #include "engine/video/display_sequence.h"
-#include "scene/actor/contact_collider.h"
-#include "player/cues/player_cue_sequence.h"
+#include "scene/collision/contact_collider.h"
+#include "player/cutscene/player_cue_sequence.h"
 
 struct ScenePanelEffect;
 struct ScenePanelOwnedEffect {

@@ -1,4 +1,4 @@
-#include "scene/actor/scene_actor_restoration.h"
+#include "scene/collision/scene_actor_restoration.h"
 /* SceneActorReaction_RestoreAndClearRestart: Clears the tentative restart flag and restores saved actor state and control once the delay threshold is reached */
 #define SceneActorReaction_RestoreAndClearRestart sub_0807FE80
 #define SceneActorReaction_RestoreAndClearRestart sub_0807FE80

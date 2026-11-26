@@ -1,4 +1,4 @@
-#include "scene/area_effect/area_effect_link.h"
+#include "scene/areas/area_effect_link.h"
 void Player_AddEnergy(struct AreaEffectPlayer *, s32);
 static inline u32 playerMode(struct AreaEffectPlayer *player)
 {

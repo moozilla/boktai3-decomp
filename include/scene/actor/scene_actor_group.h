@@ -1,7 +1,7 @@
 #ifndef GUARD_SCENE_ACTOR_GROUP_H
 #define GUARD_SCENE_ACTOR_GROUP_H
 
-#include "scene/actor/contact_position.h"
+#include "scene/collision/contact_position.h"
 
 struct SceneActorChaseRoutePoint {
     s16 x, z;

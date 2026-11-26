@@ -6,7 +6,7 @@
 #include "scene/actor/scene_actor_components.h"
 #include "scene/collision/scene_body_api.h"
 #include "engine/video/display_animation_api.h"
-#include "scene/actor/scene_actor_route.h"
+#include "scene/motion/scene_actor_route.h"
 
 struct SceneActorResourceEntry {
     u16 type;

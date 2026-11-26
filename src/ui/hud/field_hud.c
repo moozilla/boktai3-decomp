@@ -1,6 +1,6 @@
 #include "engine/engine_pause.h"
 #include "ui/hud/field_hud.h"
-#include "scene/actor/scene_actor_damage_visibility.h"
+#include "scene/collision/scene_actor_damage_visibility.h"
 
 s32 Div(s32, s32);
 void CpuSet(const void *, void *, u32);

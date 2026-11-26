@@ -1,7 +1,7 @@
 #ifndef GUARD_HOMING_PROJECTILE_H
 #define GUARD_HOMING_PROJECTILE_H
 
-#include "scene/actor/contact_position.h"
+#include "scene/collision/contact_position.h"
 #include "engine/video/display_sequence.h"
 
 struct HomingSlot;

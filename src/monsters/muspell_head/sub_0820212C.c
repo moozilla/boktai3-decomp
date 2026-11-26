@@ -1,7 +1,7 @@
 #include "global.h"
 #include "engine/math/scene_vec.h"
 #include "engine/engine_globals.h"
-#include "player/cues/player_cue_sequence.h"
+#include "player/cutscene/player_cue_sequence.h"
 #include "scene/terrain/terrain_cell_probe.h"
 struct ScriptActor {
     u8 unknown0[0x1c];

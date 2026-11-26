@@ -2,7 +2,7 @@
 #define GUARD_SCENE_INPUT_H
 #include "engine/engine.h"
 #include "engine/video/palette_pulse.h"
-#include "scene/actor/contact_actor.h"
+#include "scene/collision/contact_actor.h"
 #include "ui/widgets/scene_input_widget.h"
 #include "engine/input.h"
 

@@ -1,7 +1,7 @@
 #ifndef GUARD_SCENE_ACTOR_DRAWABLE_FLAGS_H
 #define GUARD_SCENE_ACTOR_DRAWABLE_FLAGS_H
 
-#include "scene/actor/scene_actor_chase_shared.h"
+#include "scene/motion/scene_actor_chase_shared.h"
 #include "scene/actor/scene_actor_registry.h"
 
 static inline void ActorStatus_SetDrawableFlags(struct ChaseActor *actor, u32 bits)

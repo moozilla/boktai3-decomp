@@ -1,6 +1,6 @@
 #include "global.h"
-#include "bosses/vampire/actor_graphics_and_basic_states.h"
-#include "scene/actor/contact_actor.h"
+#include "bosses/count/actor_graphics_and_basic_states.h"
+#include "scene/collision/contact_actor.h"
 #include "engine/engine.h"
 #include "engine/ram.h"
 #include "player/player.h"

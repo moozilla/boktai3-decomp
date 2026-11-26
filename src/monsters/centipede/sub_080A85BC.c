@@ -1,5 +1,5 @@
-#include "scene/actor/scene_actor_chase_reaction.h"
-#include "scene/actor/scene_actor_availability.h"
+#include "scene/motion/scene_actor_chase_reaction.h"
+#include "scene/motion/scene_actor_availability.h"
 #include "scene/actor/scene_actor_reset.h"
 #define FIELD(p, o, T) (*(T *)((u8 *)(p) + (o)))
 extern const s16 gUnk_086149C4[];

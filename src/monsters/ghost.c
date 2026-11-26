@@ -1,9 +1,9 @@
 #include "monsters/ghost.h"
 #include "engine/math/math_shift.h"
-#include "scene/actor/scene_actor_stimulus.h"
+#include "scene/collision/scene_actor_stimulus.h"
 #include "system/game_state/game_state_flags.h"
 #include "scene/actor/scene_actor_reaction.h"
-#include "scene/actor/scene_actor_turn.h"
+#include "scene/motion/scene_actor_turn.h"
 #include "engine/word_flags.h"
 
 #include "global.h"
@@ -14,9 +14,9 @@
 
 #include "scene/actor/scene_actor_state.h"
 
-#include "scene/actor/scene_actor_chase_reaction.h"
+#include "scene/motion/scene_actor_chase_reaction.h"
 
-#include "scene/actor/scene_actor_terrain.h"
+#include "scene/motion/scene_actor_terrain.h"
 
 #include "npc/manager/scene_actor_animation.h"
 
@@ -26,11 +26,11 @@
 
 #include "scene/actor/scene_actor_control_phase.h"
 
-#include "scene/actor/scene_actor_chase_shared.h"
+#include "scene/motion/scene_actor_chase_shared.h"
 
 #include "script/script_utility.h"
 
-#include "scene/actor/scene_actor_route.h"
+#include "scene/motion/scene_actor_route.h"
 
 #include "scene/actor/scene_actor_visibility.h"
 
@@ -38,7 +38,7 @@
 
 #include "engine/engine_globals.h"
 
-#include "scene/actor/contact_actor.h"
+#include "scene/collision/contact_actor.h"
 
 #include "engine/math/movement_curve.h"
 
@@ -69,11 +69,11 @@
 #include "monsters/scene_actor_init_group.h"
 
 #include "monsters/scene_actor_init_graphics.h"
-#include "scene/actor/scene_actor_contact_response.h"
+#include "scene/collision/scene_actor_contact_response.h"
 #include "bosses/vanargand/vanargand_projectiles.h"
-#include "scene/actor/scene_actor_displacement.h"
-#include "scene/actor/scene_actor_terrain_reaction.h"
-#include "scene/actor/scene_actor_chase.h"
+#include "scene/motion/scene_actor_displacement.h"
+#include "scene/motion/scene_actor_terrain_reaction.h"
+#include "scene/motion/scene_actor_chase.h"
 #include "objects/hazards/falling_objects.h"
 #include "bosses/vanargand/vanargand_parts.h"
 

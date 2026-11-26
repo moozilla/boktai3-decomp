@@ -1,7 +1,7 @@
 #include "effects/sprites/sprite_effect_controller.h"
 #include "engine/engine.h"
 #include "engine/ram.h"
-#include "player/cues/player_cue_sequence.h"
+#include "player/cutscene/player_cue_sequence.h"
 #include "player/player.h"
 #include "engine/engine_pause.h"
 struct SpriteEffectControllerPool *SpriteEffectController_EnsurePool(void);

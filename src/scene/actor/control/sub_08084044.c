@@ -1,7 +1,7 @@
 #include "scene/actor/scene_actor_control_helpers.h"
 #include "player/player.h"
 #include "scene/actor/scene_actor_reaction.h"
-#include "scene/actor/scene_actor_chase_shared.h"
+#include "scene/motion/scene_actor_chase_shared.h"
 #include "engine/word_flags.h"
 
 static inline void OrTrackingFlags(struct SceneActorChaseTracking *tracking, u32 bits)

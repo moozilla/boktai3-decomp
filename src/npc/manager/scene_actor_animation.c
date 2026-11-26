@@ -19,15 +19,15 @@ struct ContactPosition *TetherActor_GetPosition(void);
 
 #include "player/player.h"
 
-#include "scene/actor/scene_facing.h"
+#include "scene/motion/scene_facing.h"
 
 #include "engine/engine_globals.h"
 
-#include "scene/actor/scene_actor_route.h"
-#include "scene/actor/scene_actor_charge_offset.h"
+#include "scene/motion/scene_actor_route.h"
+#include "scene/motion/scene_actor_charge_offset.h"
 
 #include "engine/video/display_keyframe.h"
-#include "scene/actor/scene_actor_chase_shared.h"
+#include "scene/motion/scene_actor_chase_shared.h"
 
 u8 *TerrainModifiers_FindCellOverride(int, int);
 

@@ -3,7 +3,7 @@
 // confidence=low: part approaches the player and chooses contact or timeout animation
 #include "engine/video/display_animation.h"
 #include "engine/math/scene_vec.h"
-#include "player/cues/player_cue_sequence.h"
+#include "player/cutscene/player_cue_sequence.h"
 void MotionTrack_Update(void *);
 struct SceneVec *Player_GetEffectivePosition(u32);
 void Sound_PlaySong(u32);

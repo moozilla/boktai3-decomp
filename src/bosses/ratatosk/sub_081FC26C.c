@@ -1,7 +1,7 @@
 #include "global.h"
 #include "bosses/ratatosk/ratatosk_particle.h"
 #define Ratatosk_SpawnAnimatedParticle sub_081FC26C
-#include "scene/actor/contact_swarm.h"
+#include "scene/collision/contact_swarm.h"
 #include "engine/video/display_sequence_sprite.h"
 #include "engine/ram.h"
 

@@ -3,7 +3,7 @@
 #include "script/script_utility.h"
 #include "engine/runtime.h"
 #include "scene/actor/scene_actor_control_helpers.h"
-#include "scene/actor/scene_actor_terrain_reaction.h"
+#include "scene/motion/scene_actor_terrain_reaction.h"
 void SceneActorAttachment_ReplaceResponseSlot(void *, u32, u32, u32);
 void SceneActorEffects_AdvanceSteps(void *, u32);
 void *Bestiary_GetEntryForActor(u32, u32);

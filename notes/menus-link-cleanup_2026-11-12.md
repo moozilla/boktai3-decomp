@@ -70,7 +70,7 @@ which retain the original return-width check. Exact MATCH: 1,068 bytes.
 
 ## Wireless text: 08036CA4–08036E08
 
-Consolidated six functions into `src/link/wireless/wireless_text.c`. The API consistently uses
+Consolidated six functions into `src/link/wireless/character_table.c`. The API consistently uses
 u16 character codes and u8 encoded indices. GetCharacterCode replaces the misleading
 GetCharacterTableByte name. Named progress fields replace the initializer's two
 anonymous counters; its indexed table address keeps the original byte-address
@@ -109,7 +109,7 @@ row; continue in ROM order per the cleanup brief's resistant-type rule.
 
 ## Wireless exit task: 080394D4–080395D4
 
-Four functions now share `src/link/wireless/wireless_exit.c` and a WirelessExit task containing
+Four functions now share `src/link/wireless/exit.c` and a WirelessExit task containing
 a completion script key and shutdown state. The old generic Task and listener
 pointer views are gone. Creation uses the shared engine task API; all 256 bytes
 match. Existing function names retained.
@@ -261,7 +261,7 @@ Final menu-display validation: all 14 functions MATCH (2516 bytes); all 106 tran
 
 Link panel revisit after the run was reopened: 0810C238–0810C724 now matches as a five-function unit (1260 bytes). The earlier mismatch came from placing two whole 0x5FC slots at their status-byte offset 0x940. The tentative full slots begin at 0x348, with their last four-byte records at 0x940/F3C; the second slot ends at the callback at 0xF40, preserving allocation size 0xF78. Earlier slot contents remain unknown. Canonical task/widget/resource/palette types replace partial local views. Both renamed callers MATCH. Structured connection-status returns changed branch placement; retain the matched shared exits. The existing session-payload pointer guard still affects generated code and now refers to the canonical sessionData field.
 
-Link-panel controller revisit: 0810C724–0810CB7C now joins the preceding five helpers in src/link/link_panel/link_panel.c, giving thirteen contiguous functions and 2372 matching bytes. A four-byte LinkPanelStatus sits at the end of each tentative 0x5FC slot; advancing its cursor by sizeof(LinkPanelEntry) preserves the original register allocation. The message initializer retains its unused incoming panel parameter because its caller explicitly passes it. Direct state-callback dispatch matches. Scripts, text-window handles, selection bytes and task state use the complete layout; the session's exit-input-lock byte is named without changing any offsets. All 121 transitive header consumers MATCH; no scored concession sites. The following old_agbcc reset remains separate.
+Link-panel controller revisit: 0810C724–0810CB7C now joins the preceding five helpers in src/link/panel/link_panel.c, giving thirteen contiguous functions and 2372 matching bytes. A four-byte LinkPanelStatus sits at the end of each tentative 0x5FC slot; advancing its cursor by sizeof(LinkPanelEntry) preserves the original register allocation. The message initializer retains its unused incoming panel parameter because its caller explicitly passes it. Direct state-callback dispatch matches. Scripts, text-window handles, selection bytes and task state use the complete layout; the session's exit-input-lock byte is named without changing any offsets. All 121 transitive header consumers MATCH; no scored concession sites. The following old_agbcc reset remains separate.
 
 
 ## Reopened-run handoff

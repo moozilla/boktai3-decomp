@@ -3,11 +3,11 @@
 #define SceneActorControl_ApplyRecoveryContact sub_08082648
 #include "scene/actor/scene_actor_control_phase.h"
 #include "scene/actor/scene_actor_reaction.h"
-#include "scene/area_effect/area_effect_link.h"
+#include "scene/areas/area_effect_link.h"
 #include "engine/engine.h"
-#include "scene/actor/scene_actor_damage_visibility.h"
-#include "scene/actor/scene_actor_chase_shared.h"
-#include "scene/actor/scene_actor_contact_response.h"
+#include "scene/collision/scene_actor_damage_visibility.h"
+#include "scene/motion/scene_actor_chase_shared.h"
+#include "scene/collision/scene_actor_contact_response.h"
 static inline u8 Test(u32 value, u32 mask)
 {
     if (value & mask)

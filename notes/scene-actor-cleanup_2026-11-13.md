@@ -19,7 +19,7 @@ The coordinator still needs to validate the combined ROM build.
 | 0006 | `src/scene/actor/actor_pool/pooled_actor_controller.c` | 0802CD04–0802D5B4 | 28 | 2224 |
 | 0007 | `src/npc/manager/scene_actor_lifecycle.c` | 0802D5B4–0802D9F8 | 20 | 1092 |
 | 0014 | `src/npc/manager/scene_actor_animation.c` | 0802D9F8–08030710 | 52 | 11544 |
-| 0009 | `src/bosses/vampire/contact_actor_display.c` | 080427FC–08042E18 | 9 | 1564 |
+| 0009 | `src/bosses/count/contact_actor_display.c` | 080427FC–08042E18 | 9 | 1564 |
 | 0010 | `src/scene/actor/actor_pool/pooled_motion.c` | 080454C0–08045A20 | 19 | 1376 |
 | 0015 | `src/bosses/nidhoggr/contact_sequence_actor.c` | 08045D18–08046880 | 22 | 2920 |
 | 0011 | `src/bosses/nidhoggr/orbit_contact_actor.c` | 08046880–08046B28 | 8 | 680 |

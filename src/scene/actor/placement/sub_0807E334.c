@@ -1,4 +1,4 @@
-#include "scene/actor/scene_actor_straight_route.h"
+#include "scene/motion/scene_actor_straight_route.h"
 
 void SceneActorTerrain_RequestRetreatRoute(void *obj)
 {

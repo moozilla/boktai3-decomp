@@ -1,4 +1,4 @@
-#include "scene/actor/route_sprite_actor.h"
+#include "scene/motion/route_sprite_actor.h"
 #include "engine/ram.h"
 extern u32 gUnk_02000560;
 static inline u8 Occupied(u32 *mask, s32 index)

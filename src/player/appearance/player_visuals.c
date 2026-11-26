@@ -3,7 +3,7 @@
 #include "engine/ram.h"
 #include "ui/town/scene_consumable_definition.h"
 #include "player/player_slot_status.h"
-#include "effects/scene/bat_flock.h"
+#include "effects/bat_flock.h"
 
 /* Tentative role: select an effect flag from actor and global state. */
 

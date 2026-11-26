@@ -1,6 +1,6 @@
 #ifndef GUARD_PROXIMITY_EMITTER_H
 #define GUARD_PROXIMITY_EMITTER_H
-#include "scene/actor/contact_swarm.h"
+#include "scene/collision/contact_swarm.h"
 #include "engine/task.h"
 struct ProximityEmitterParticle {
     u32 flags;

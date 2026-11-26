@@ -2,7 +2,7 @@
 #include "global.h"
 #include "engine/engine.h"
 #include "engine/ram.h"
-#include "scene/actor/contact_actor.h"
+#include "scene/collision/contact_actor.h"
 
 struct ArmorActor {
     u8 pad0[0x94];

@@ -1,5 +1,5 @@
 #include "global.h"
-#include "scene/actor/scene_actor_terrain_reaction.h"
+#include "scene/motion/scene_actor_terrain_reaction.h"
 s32 Callback_InvokeActor(void *, void *);
 
 void SceneActorState_DispatchTable2A0State(struct ChaseActor *actor)

@@ -1,4 +1,4 @@
-#include "scene/actor/contact_swarm.h"
+#include "scene/collision/contact_swarm.h"
 #include "ui/widgets/scene_input_panel.h"
 #include "ui/widgets/scene_input_grid.h"
 /* The cleanup span contains 54 panel widgets and 15 comparison widgets. */

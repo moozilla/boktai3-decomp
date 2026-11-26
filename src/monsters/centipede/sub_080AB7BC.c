@@ -1,7 +1,7 @@
 #include "global.h"
 #include "player/player.h"
-#include "scene/actor/contact_position.h"
-#include "scene/actor/contact_collider.h"
+#include "scene/collision/contact_position.h"
+#include "scene/collision/contact_collider.h"
 
 // confidence=low: inferred from segment state and collider updates.
 

@@ -1,12 +1,12 @@
 #include "global.h"
 #include "scene/actor/scene_actor_drawable_flags.h"
-#include "scene/actor/scene_actor_delayed_response.h"
+#include "scene/collision/scene_actor_delayed_response.h"
 #include "scene/actor/scene_actor_reaction.h"
 #include "engine/engine.h"
 #include "engine/math/scene_vec.h"
 #include "engine/video/display_sequence_inline.h"
-#include "scene/actor/scene_actor_chase_reaction.h"
-#include "scene/actor/scene_actor_terrain.h"
+#include "scene/motion/scene_actor_chase_reaction.h"
+#include "scene/motion/scene_actor_terrain.h"
 #include "player/player.h"
 #include "monsters/octopus.h"
 #include "engine/word_flags.h"
@@ -32,7 +32,7 @@
 #include "scene/actor/scene_actor_init_actor.h"
 #include "scene/actor/scene_actor_placement.h"
 #include "engine/math/movement_curve.h"
-#include "scene/actor/scene_actor_terrain_reaction.h"
+#include "scene/motion/scene_actor_terrain_reaction.h"
 
 void SceneActorBehavior_ApplyContactReaction(void *, void *, void *);
 

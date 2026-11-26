@@ -1,10 +1,10 @@
-#include "scene/actor/scene_actor_terrain_reaction.h"
+#include "scene/motion/scene_actor_terrain_reaction.h"
 #include "scene/actor/scene_actor_behavior.h"
 #include "global.h"
-#include "scene/actor/scene_actor_chase.h"
-#include "scene/actor/scene_actor_straight_route.h"
+#include "scene/motion/scene_actor_chase.h"
+#include "scene/motion/scene_actor_straight_route.h"
 #include "scene/actor/scene_actor_attachment.h"
-#include "scene/actor/scene_actor_terrain_reaction.h"
+#include "scene/motion/scene_actor_terrain_reaction.h"
 
 // confidence=low: timed movement recovery restores a route and saves a delayed control.
 u8 sub_0812F3CC(struct ChaseActor *);

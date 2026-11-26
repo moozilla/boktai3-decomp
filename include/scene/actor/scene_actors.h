@@ -4,7 +4,7 @@
 #include "engine/engine.h"
 #include "npc/story_character/state_actor.h"
 #include "scene/collision/scene_body_api.h"
-#include "scene/actor/contact_collider.h"
+#include "scene/collision/contact_collider.h"
 #include "npc/manager/scene_actor_animation.h"
 #include "script/script_utility.h"
 

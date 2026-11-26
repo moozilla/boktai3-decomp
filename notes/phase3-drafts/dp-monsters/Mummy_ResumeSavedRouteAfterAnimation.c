@@ -1,4 +1,4 @@
-#include "scene/actor/scene_actor_chase.h"
+#include "scene/motion/scene_actor_chase.h"
 struct RecoverySequence {
     u8 pad[7];
     u8 mode;

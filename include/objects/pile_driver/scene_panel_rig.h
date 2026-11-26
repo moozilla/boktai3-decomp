@@ -1,7 +1,7 @@
 #ifndef GUARD_SCENE_PANEL_RIG_H
 #define GUARD_SCENE_PANEL_RIG_H
 #include "objects/pile_driver/scene_panel.h"
-#include "scene/actor/contact_actor.h"
+#include "scene/collision/contact_actor.h"
 #include "engine/video/display_sequence_inline.h"
 
 struct SceneRigParentView {

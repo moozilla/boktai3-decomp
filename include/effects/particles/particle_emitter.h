@@ -2,7 +2,7 @@
 #define GUARD_PARTICLE_EMITTER_H
 
 #include "engine/engine.h"
-#include "player/cues/player_cue_sequence.h"
+#include "player/cutscene/player_cue_sequence.h"
 #include "link/wireless/scene_pool.h"
 #include "effects/scene/scene_arc.h"
 

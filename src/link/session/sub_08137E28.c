@@ -1,5 +1,5 @@
 #include "global.h"
-#include "scene/actor/scene_actor_chase.h"
+#include "scene/motion/scene_actor_chase.h"
 
 u8 *Path_GetPointData(u8 *);
 s32 Math_Atan2(s32, s32);

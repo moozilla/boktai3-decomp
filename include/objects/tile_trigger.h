@@ -1,6 +1,6 @@
 #ifndef GUARD_TILE_TRIGGER_H
 #define GUARD_TILE_TRIGGER_H
-#include "player/cues/player_cue_sequence.h"
+#include "player/cutscene/player_cue_sequence.h"
 #include "engine/math/scene_vec.h"
 #include "scene/actor/scene_actor_components.h"
 #include "scene/scene_animation.h"

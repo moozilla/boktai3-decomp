@@ -1,7 +1,7 @@
 #ifndef GUARD_PAIRED_SCENE_ACTOR_H
 #define GUARD_PAIRED_SCENE_ACTOR_H
 
-#include "scene/actor/contact_collider.h"
+#include "scene/collision/contact_collider.h"
 #include "effects/projectiles/contact_swarm_sprite.h"
 #include "engine/video/display_sequence.h"
 #include "scene/actor/motion_track.h"

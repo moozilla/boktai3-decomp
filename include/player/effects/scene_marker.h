@@ -3,7 +3,7 @@
 
 #include "objects/scene_objects/scene_object.h"
 #include "scene/scene_animation.h"
-#include "scene/actor/contact_collider.h"
+#include "scene/collision/contact_collider.h"
 
 /* A placed scene marker: a body, an attack collider and two sprites (the player's barrier,
  * PlayerBarrier_*, is one; created by Task_Create(8, 0x150) and SceneMarker_InitSprites). */

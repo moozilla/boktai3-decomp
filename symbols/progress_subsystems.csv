@@ -108,7 +108,7 @@ Wireless link indicator,080483A0,080485FC,,,notes/wireless-tether_2026-10-14.md;
 Tether actor (tentative),080485FC,0804D620,,,notes/tether-initialization_2026-10-14.md; notes/tether-world-states_2026-10-14.md; notes/tether-roaming-states_2026-10-14.md; shared tether state and segment ownership
 Countdown controller,0804D620,0804D778,,,Countdown_Tick and adjacent script initialization in src/fn/sub_0804D620.c; shared timer task
 Staged sprite effect (tentative),0804D778,0804DF40,,,notes/staged-effect_2026-10-14.md; five-sprite scripted effect and palette states
-Rectangular area effects,0804DF40,0804EFB4,,,include/scene/area_effect/area_effect.h; singleton0200010C reset and bounds query precede notes/area-effect_2026-10-14.md and notes/area-effect-link_2026-10-14.md
+Rectangular area effects,0804DF40,0804EFB4,,,include/scene/areas/area_effect.h; singleton0200010C reset and bounds query precede notes/area-effect_2026-10-14.md and notes/area-effect-link_2026-10-14.md
 Stored-resource station (tentative),0804EFB4,0804F6C4,,,notes/resource-station_2026-10-14.md; resource transfer and digit display lifecycle
 Repeated effects (tentative),0804F6C4,08050128,,,notes/repeated-effect_2026-10-14.md; shared eight-entry manager; following script creator remains in same family
 Cell traversal gates,08050128,08050820,,,notes/cell-gates_2026-10-14.md; cell registration and player traversal constraints

@@ -1,7 +1,7 @@
 #include "global.h"
 #include "system/game_state/game_state.h"
 #include "engine/ram.h"
-#include "player/cues/player_cue_sequence.h"
+#include "player/cutscene/player_cue_sequence.h"
 
 struct NidhoggrEffectVector {
     u16 x, y, z, unk_6;

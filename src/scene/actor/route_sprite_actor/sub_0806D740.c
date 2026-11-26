@@ -1,7 +1,7 @@
-#include "scene/actor/route_sprite_actor.h"
+#include "scene/motion/route_sprite_actor.h"
 #include "engine/video/display_animation.h"
 #include "engine/engine.h"
-#include "player/cues/player_cue_sequence.h"
+#include "player/cutscene/player_cue_sequence.h"
 #include "engine/math/movement_curve.h"
 s32 Div(s32, s32);
 void RouteSpriteActor_PlanWanderPath(struct RouteSpriteActor *);

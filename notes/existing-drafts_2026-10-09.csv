@@ -14,10 +14,10 @@ sub_0803A4D4,64,0,exact; accepted in combined batch,src/fn/sub_0803A4D4.c,fffd14
 sub_0803D5A8,64,0,exact; accepted in combined batch,src/link/wireless/battle/sub_0803D5A8.c,5dc5e48a04392507f1eb645c5b2048900eca4154f8a4caa1f992f2a1aeb016d3,agbcc,default -O2 -mthumb-interwork,
 sub_0803F458,64,0,exact; accepted in combined batch,src/fn/sub_0803F458.c,502ca7d9a1f4a893ef008c7249ae33591cf0e02306c5d56efc6944fb51a601f7,agbcc,default -O2 -mthumb-interwork,
 sub_08042158,64,0,exact; accepted in combined batch,src/ui/modifier_menu/sub_08042158.c,823396c20b5d6d37b1d951b503eb689f4b936c4f860d395f90f069c2259d8b12,agbcc,default -O2 -mthumb-interwork,
-sub_08043C24,40,0,exact; accepted in combined batch,src/bosses/vampire/sub_08043C24.c,5495f4297a595321b4c37448b52407174553f4c32f79ca7fa463bca28d5f03e3,agbcc,default -O2 -mthumb-interwork,
-sub_08043CE0,76,0,exact; accepted in combined batch,src/bosses/vampire/sub_08043CE0.c,0d151cafd306fa5660fdff87e33cedd85e3127b272316f04b7919efcb087e66a,agbcc,default -O2 -mthumb-interwork,
-sub_080447AC,40,0,exact; accepted in combined batch,src/bosses/vampire/sub_080447AC.c,2a9d933f5f4d143c4da8ef73a575a624cbe3a2984e6ce8784174eb37fb2edd07,agbcc,default -O2 -mthumb-interwork,
-sub_08044814,64,0,exact; accepted in combined batch,src/bosses/vampire/sub_08044814.c,dfe6a5feaeb846ccae4aa3efa9ec4a7ffd993c98371bc8c33524c389be73a711,agbcc,default -O2 -mthumb-interwork,
+sub_08043C24,40,0,exact; accepted in combined batch,src/bosses/count/sub_08043C24.c,5495f4297a595321b4c37448b52407174553f4c32f79ca7fa463bca28d5f03e3,agbcc,default -O2 -mthumb-interwork,
+sub_08043CE0,76,0,exact; accepted in combined batch,src/bosses/count/sub_08043CE0.c,0d151cafd306fa5660fdff87e33cedd85e3127b272316f04b7919efcb087e66a,agbcc,default -O2 -mthumb-interwork,
+sub_080447AC,40,0,exact; accepted in combined batch,src/bosses/count/sub_080447AC.c,2a9d933f5f4d143c4da8ef73a575a624cbe3a2984e6ce8784174eb37fb2edd07,agbcc,default -O2 -mthumb-interwork,
+sub_08044814,64,0,exact; accepted in combined batch,src/bosses/count/sub_08044814.c,dfe6a5feaeb846ccae4aa3efa9ec4a7ffd993c98371bc8c33524c389be73a711,agbcc,default -O2 -mthumb-interwork,
 sub_08045704,64,0,exact; accepted in combined batch,src/fn/sub_08045704.c,c8a260206b0a7506906465101fbf15deffb136b72a67c0afd8cd9c22d6e3179d,agbcc,default -O2 -mthumb-interwork,
 sub_08045744,52,0,exact; accepted in combined batch,src/fn/sub_08045744.c,b56ec2d3c5be0c8a774ff6ca10523dc834fe90bf8795d92b3e58a5835d6048e3,agbcc,default -O2 -mthumb-interwork,
 sub_08045CB0,68,0,exact; accepted in combined batch,src/fn/sub_08045CB0.c,fa0c41bc4b67ab8d24b4e7464b4b1c901a2ba3b8b0a41a268e65953dc3ac9de9,agbcc,default -O2 -mthumb-interwork,
@@ -103,7 +103,7 @@ sub_08235B34,252,18,nonmatching; preserved on codex/wip-drafts-2026-10-09,../wt/
 sub_08235D68,72,0,exact; accepted in combined batch,src/effects/healing/sub_08235D68.c,4a5a05453209bc5a5abc5cb277c9f59ff215e1e0f9ac043633617f620431e7cb,agbcc,default -O2 -mthumb-interwork,
 sub_0823652C,112,14,nonmatching; preserved on codex/wip-drafts-2026-10-09,../wt/push20-high/wip/high/p1.c,8ce8de4e29281330b4efca19647d5728d962bbba1150a72369300ad4605d1fde,agbcc,default -O2 -mthumb-interwork,drafts/retained/wt/push20-high/wip/high/p1.c
 sub_08237E7C,76,0,exact; accepted in combined batch,src/fn/sub_08237E7C.c,aa89df56e1e87745e91238aff8616a9b86cdf347ba9bbaa8683a5953daf71d3f,agbcc,default -O2 -mthumb-interwork,
-sub_08239150,88,0,exact; accepted in combined batch,src/link/link_player/sub_08239150.c,d79606a895df0bd881d57e5df75e750943c8a764c98c137a4f870055b307c7c5,agbcc,default -O2 -mthumb-interwork,
+sub_08239150,88,0,exact; accepted in combined batch,src/link/player/sub_08239150.c,d79606a895df0bd881d57e5df75e750943c8a764c98c137a4f870055b307c7c5,agbcc,default -O2 -mthumb-interwork,
 sub_08239CDC,92,27,nonmatching; preserved on codex/wip-drafts-2026-10-09,../wt/push20-integrate/wip/last-pass/sub_08239CDC.c,b25633faeaca965dc881c36654b17c8c5bffe2ffc57d5e3b3c294d95c240036b,agbcc,default -O2 -mthumb-interwork,drafts/retained/wt/push20-integrate/wip/last-pass/sub_08239CDC.c
 sub_0823A2E4,164,34,nonmatching; preserved on codex/wip-drafts-2026-10-09,../wt/push20-integrate/wip/final-pass/sub_0823A2E4.c,017d2f46d25ce220f10063e9b70a4a7b21412730f857439bf48145525323f447,agbcc,default -O2 -mthumb-interwork,drafts/retained/wt/push20-integrate/wip/final-pass/sub_0823A2E4.c
 sub_0823ADB4,168,42,nonmatching; preserved on codex/wip-drafts-2026-10-09,../wt/push20-integrate/wip/final-pass/sub_0823ADB4.c,8fe428536a31b59473ce3e97fdd85f9123e62b980b9cbf2b00105066da4ca88c,agbcc,default -O2 -mthumb-interwork,drafts/retained/wt/push20-integrate/wip/final-pass/sub_0823ADB4.c

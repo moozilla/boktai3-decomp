@@ -1,6 +1,6 @@
 #include "global.h"
 #include "scene/actor/scene_actor_reset.h"
-#include "scene/actor/scene_actor_terrain.h"
+#include "scene/motion/scene_actor_terrain.h"
 struct TrailSegment {
     u8 unknown0[0x1c];
     struct ContactPosition position;

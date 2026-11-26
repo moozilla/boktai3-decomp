@@ -1,5 +1,5 @@
 #include "scene/actor/scene_actor_registry.h"
-#include "scene/actor/scene_actor_availability.h"
+#include "scene/motion/scene_actor_availability.h"
 struct ChaseActor *SceneActorRegistry_FindById(u32);
 void SceneActorRegistry_SetMovementMode(struct ChaseActor *, s32);
 static inline u8 HasMovementFlag(struct ChaseActor *actor)

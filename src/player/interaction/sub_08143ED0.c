@@ -3,7 +3,7 @@
 #include "system/game_state/game_state.h"
 #include "player/player_slot_status.h"
 #include "system/game_state/game_state_flags.h"
-#include "objects/orbit_motion.h"
+#include "objects/dungeon_prop/orbit_motion.h"
 
 // confidence=low: updates movement and step cues while constraining the tether target.
 struct PlayerMovementCueFields {

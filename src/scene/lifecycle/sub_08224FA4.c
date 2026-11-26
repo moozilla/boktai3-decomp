@@ -2,7 +2,7 @@
 #include "engine/ram.h"
 #include "engine/runtime.h"
 #include "engine/video/render.h"
-#include "scene/area_effect/area_effect_link.h"
+#include "scene/areas/area_effect_link.h"
 void m4aMPlayAllStop(void);
 void m4aSoundVSyncOff(void);
 void InterruptsAndVideo_WaitForVBlank(void);

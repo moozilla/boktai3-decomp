@@ -1,16 +1,16 @@
 #include "scene/actor/scene_actor_part_burst.h"
 #include "global.h"
 #include "scene/actor/scene_actor_reaction.h"
-#include "scene/actor/scene_actor_terrain_reaction.h"
+#include "scene/motion/scene_actor_terrain_reaction.h"
 
 #include "scene/actor/scene_actor_reset.h"
 #include "engine/engine.h"
 
-#include "scene/actor/scene_actor_damage_visibility.h"
+#include "scene/collision/scene_actor_damage_visibility.h"
 #include "engine/runtime.h"
 #include "engine/ram.h"
-#include "scene/actor/scene_actor_turn.h"
-#include "scene/actor/scene_actor_chase_shared.h"
+#include "scene/motion/scene_actor_turn.h"
+#include "scene/motion/scene_actor_chase_shared.h"
 
 void SceneActorRecord_RecordPair(u32, u32);
 void SceneActorAttachment_ReplaceResponseSlot(struct ChaseActor *, u32, u32, u32);

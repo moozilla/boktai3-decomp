@@ -1,4 +1,4 @@
-#include "scene/actor/scene_steering_actor.h"
+#include "scene/motion/scene_steering_actor.h"
 s32 SceneSteeringActor_InitializePool(struct SceneSteeringActorPool *);
 s32 SceneSteeringActor_UpdatePool(struct SceneSteeringActorPool *);
 s32 SceneSteeringActor_DestroyPool(struct SceneSteeringActorPool *);

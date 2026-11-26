@@ -1,7 +1,7 @@
 #include "monsters/centipede/tentacle_body.h"
 #include "global.h"
 #include "scene/actor/scene_actor_reset.h"
-#include "scene/actor/scene_actor_terrain.h"
+#include "scene/motion/scene_actor_terrain.h"
 #include "monsters/ghoul_disc.h"
 static inline u32 WordFlag(struct ChaseActor *p, u32 mask)
 {

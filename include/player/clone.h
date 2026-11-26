@@ -1,7 +1,7 @@
 #ifndef GUARD_PLAYER_CLONE_H
 #define GUARD_PLAYER_CLONE_H
 #include "ui/widgets/scene_input.h"
-#include "scene/actor/contact_collider.h"
+#include "scene/collision/contact_collider.h"
 #include "engine/task.h"
 
 struct PlayerCloneSlot;

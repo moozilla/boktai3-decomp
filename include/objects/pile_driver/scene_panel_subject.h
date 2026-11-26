@@ -1,7 +1,7 @@
 #ifndef GUARD_SCENE_PANEL_SUBJECT_H
 #define GUARD_SCENE_PANEL_SUBJECT_H
 #include "objects/pile_driver/scene_panel_commands.h"
-#include "scene/actor/contact_swarm.h"
+#include "scene/collision/contact_swarm.h"
 
 /* Tentative subject view; state-specific field meanings remain under review. */
 

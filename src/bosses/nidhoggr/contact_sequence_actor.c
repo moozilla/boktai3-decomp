@@ -1,7 +1,7 @@
 #include "bosses/nidhoggr/contact_sequence_pool.h"
 #include "bosses/nidhoggr/contact_sequence_actor.h"
 #include "engine/video/display_sprite_playback.h"
-#include "player/cues/player_cue_sequence.h"
+#include "player/cutscene/player_cue_sequence.h"
 #include "engine/video/render.h"
 #include "scene/actor/scene_actor_part_burst.h"
 

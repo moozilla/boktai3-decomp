@@ -1,7 +1,7 @@
 #ifndef GUARD_ACTOR_IMPACT_H
 #define GUARD_ACTOR_IMPACT_H
 
-#include "scene/actor/contact_actor.h"
+#include "scene/collision/contact_actor.h"
 #include "scene/actor/scene_actor_components.h"
 
 /* Shared contact/resource state used by the scene actor helpers. Names tentative. */

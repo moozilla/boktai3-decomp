@@ -2,7 +2,7 @@
 #include "engine/engine.h"
 #include "player/player.h"
 #include "effects/particles/proximity_emitter.h"
-#include "scene/actor/scene_actor_terrain.h"
+#include "scene/motion/scene_actor_terrain.h"
 
 // foundry draft (worker best 99.1%); what differs is mostly register allocation and instruction order
 #define GrowthHazard_EmitRevealEffects GrowthHazard_PlayImpactEffect

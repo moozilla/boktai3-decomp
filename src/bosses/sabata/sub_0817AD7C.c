@@ -1,7 +1,7 @@
 #include "global.h"
 #include "engine/engine_globals.h"
 #include "engine/ram.h"
-#include "scene/actor/contact_position.h"
+#include "scene/collision/contact_position.h"
 #include "bosses/vanargand/vanargand_projectiles.h"
 
 struct FormationActor {

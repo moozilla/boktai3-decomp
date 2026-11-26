@@ -1,7 +1,7 @@
 #ifndef GUARD_MOVEMENT_CURVE_H
 #define GUARD_MOVEMENT_CURVE_H
 
-#include "scene/actor/contact_position.h"
+#include "scene/collision/contact_position.h"
 #include "engine/engine_globals.h"
 
 static inline s32 MovementCurve_TruncateFixed10(s32 value)

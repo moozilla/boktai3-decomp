@@ -1,7 +1,7 @@
 #ifndef GUARD_SCENE_PANEL_SCHEDULE_H
 #define GUARD_SCENE_PANEL_SCHEDULE_H
 #include "objects/pile_driver/scene_panel.h"
-#include "scene/actor/contact_actor.h"
+#include "scene/collision/contact_actor.h"
 /* Observed scheduled action view of the same ScenePanel; identities tentative. */
 struct ScenePanelScheduleView {
     u8 unknown0[0x500];

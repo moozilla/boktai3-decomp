@@ -1,7 +1,7 @@
 #ifndef GUARD_TERRAIN_COLLISION_H
 #define GUARD_TERRAIN_COLLISION_H
 #include "engine/engine.h"
-#include "scene/actor/contact_position.h"
+#include "scene/collision/contact_position.h"
 #include "scene/terrain/terrain_probe.h"
 struct TerrainCell {
     u8 shapeAndHeight, attribute;

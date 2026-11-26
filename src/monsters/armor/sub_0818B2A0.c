@@ -1,5 +1,5 @@
 #include "global.h"
-#include "scene/actor/contact_collider.h"
+#include "scene/collision/contact_collider.h"
 #include "engine/ram.h"
 #include "monsters/armor/scene_combat_colliders.h"
 

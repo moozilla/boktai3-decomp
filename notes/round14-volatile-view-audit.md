@@ -92,7 +92,7 @@ their copied duration arithmetic. Their wider copied playback blocks remain;
 the full common-step candidates did not match.
 
 `FeatherEffectPool_CreateDirectional` (`081294B4`) matches with the complete
-`PlayerCue_StepSequence` helper from `include/player/cues/player_cue_sequence.h`, the
+`PlayerCue_StepSequence` helper from `include/player/cutscene/player_cue_sequence.h`, the
 shared `DisplaySequenceState`, and the existing graphics API declarations.
 Adjacent effect functions including `081299F8` and `08129B04` already use that
 helper. This removes the private sequence layout and the entire duplicated

@@ -1,7 +1,7 @@
 #ifndef GUARD_GOLEM_CHARGE_H
 #define GUARD_GOLEM_CHARGE_H
 
-#include "scene/actor/scene_actor_chase_reaction.h"
+#include "scene/motion/scene_actor_chase_reaction.h"
 
 extern const u16 gUnk_08606130[];
 void Anim_SetDurationScale(void *, u32);

@@ -1,6 +1,6 @@
-#include "scene/actor/scene_actor_chase_reaction.h"
+#include "scene/motion/scene_actor_chase_reaction.h"
 #include "scene/actor/scene_actor_init_actor.h"
-#include "scene/actor/scene_actor_chase_shared.h"
+#include "scene/motion/scene_actor_chase_shared.h"
 #include "scene/actor/scene_actor_reset.h"
 
 void TentacleBody_UpdateSpreadWindup(void);

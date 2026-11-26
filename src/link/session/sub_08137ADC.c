@@ -1,5 +1,5 @@
 #include "global.h"
-#include "scene/actor/scene_actor_terrain_reaction.h"
+#include "scene/motion/scene_actor_terrain_reaction.h"
 
 // confidence=low: counts down control.field14, then clears control.counter once it has expired.
 void sub_08137ADC(struct ChaseActor *actor)

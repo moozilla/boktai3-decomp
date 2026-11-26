@@ -1,8 +1,8 @@
 #ifndef GUARD_PINK_SPINE_PLAYBACK_H
 #define GUARD_PINK_SPINE_PLAYBACK_H
 #include "engine/video/display_animation.h"
-#include "scene/actor/contact_collider.h"
-#include "player/cues/player_cue_sequence.h"
+#include "scene/collision/contact_collider.h"
+#include "player/cutscene/player_cue_sequence.h"
 #include "engine/task.h"
 struct PinkSpineState {
     struct Task task;

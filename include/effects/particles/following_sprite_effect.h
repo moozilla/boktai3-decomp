@@ -1,7 +1,7 @@
 #ifndef GUARD_FOLLOWING_SPRITE_EFFECT_H
 #define GUARD_FOLLOWING_SPRITE_EFFECT_H
 #include "effects/particles/particle_effect_state.h"
-#include "player/cues/player_cue_sequence.h"
+#include "player/cutscene/player_cue_sequence.h"
 #include "effects/scene/scene_arc.h"
 #include "engine/task.h"
 

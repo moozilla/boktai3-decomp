@@ -1,11 +1,11 @@
 #include "monsters/ghoul_disc.h"
 #include "monsters/ghoul.h"
 
-#include "scene/actor/scene_actor_availability.h"
+#include "scene/motion/scene_actor_availability.h"
 
 #include "global.h"
 
-#include "scene/actor/scene_actor_chase_shared.h"
+#include "scene/motion/scene_actor_chase_shared.h"
 
 #include "monsters/scene_actor_chase_step.h"
 
@@ -15,9 +15,9 @@
 
 #include "engine/video/display_sequence.h"
 
-#include "scene/actor/scene_actor_chase_reaction.h"
+#include "scene/motion/scene_actor_chase_reaction.h"
 
-#include "scene/actor/scene_actor_turn.h"
+#include "scene/motion/scene_actor_turn.h"
 #include "scene/actor/scene_actor_status.h"
 
 void Ghoul_OnAttackCollision(struct ContactCollider *unused, struct ContactCollider *contact,

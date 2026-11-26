@@ -3,7 +3,7 @@
 #include "engine/engine.h"
 #include "scene/scene_animation.h"
 #include "effects/projectiles/contact_swarm_sprite.h"
-#include "scene/actor/contact_collider.h"
+#include "scene/collision/contact_collider.h"
 #include "engine/video/display_sequence.h"
 #include "effects/shadows/scaled_shadow_types.h"
 #include "player/player.h"

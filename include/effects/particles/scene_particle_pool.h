@@ -1,6 +1,6 @@
 #ifndef GUARD_SCENE_PARTICLE_POOL_H
 #define GUARD_SCENE_PARTICLE_POOL_H
-#include "scene/actor/contact_actor.h"
+#include "scene/collision/contact_actor.h"
 #include "engine/task.h"
 /* Provisional eight-slot anchored particle pool at 080682D0; its renderer uses
  * the common 0x28-byte effect record, distinct from the preceding 32-slot pool. */

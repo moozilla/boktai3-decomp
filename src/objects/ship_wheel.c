@@ -1,5 +1,5 @@
 #include "objects/ship_wheel.h"
-#include "player/cues/player_cue_sequence.h"
+#include "player/cutscene/player_cue_sequence.h"
 
 // Drawable layout shared with ActorDisplay_UpdateForegroundSprite.
 

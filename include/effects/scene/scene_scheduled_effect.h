@@ -4,7 +4,7 @@
 #include "engine/engine.h"
 #include "scene/actor/scene_actor_components.h"
 #include "effects/projectiles/contact_swarm_sprite.h"
-#include "scene/actor/contact_collider.h"
+#include "scene/collision/contact_collider.h"
 /* Four-slot animated-body effect used by the scheduling manager. */
 struct SceneScheduledEffect {
     struct SceneInputWidget animation;

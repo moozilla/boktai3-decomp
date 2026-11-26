@@ -1,7 +1,7 @@
 #ifndef GUARD_COLLECTION_H
 #define GUARD_COLLECTION_H
 #include "ui/widgets/scene_input.h"
-#include "scene/actor/contact_swarm.h"
+#include "scene/collision/contact_swarm.h"
 #include "engine/video/display_sequence.h"
 struct CollectionMenu {
     struct Task task;

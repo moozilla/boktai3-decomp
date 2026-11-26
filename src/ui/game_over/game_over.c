@@ -4,7 +4,7 @@
 #include "player/player.h"
 #include "ui/dialogue/message_window.h"
 #include "engine/runtime.h"
-#include "scene/actor/scene_actor_chase_shared.h"
+#include "scene/motion/scene_actor_chase_shared.h"
 
 void Sound_StopAllTrackedSongs(void);
 

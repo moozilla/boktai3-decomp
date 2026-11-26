@@ -3,7 +3,7 @@
 // graphics and the first animation frame, and installs the idle callback.
 #include "engine/math/scene_vec.h"
 #include "engine/engine_globals.h"
-#include "player/cues/player_cue_sequence.h"
+#include "player/cutscene/player_cue_sequence.h"
 struct PHVec {
     s16 x, y, z, pad;
 };

@@ -209,8 +209,8 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [docs/SHARED_MONSTER_REACTIONS.md](../docs/SHARED_MONSTER_REACTIONS.md) | Shared monster pursuit and contact operations | #matching #scene-actor #golem #skeleton #ghoul #mummy #regalloc #080C9C04 #080C12FC #0808B3EC #080DA97C #080D2584 #08078EE8 | 9 |
 | [docs/SHIFTABILITY.md](../docs/SHIFTABILITY.md) | Shiftable data: how it was proven | #tooling #assets | 1 |
 | [docs/SOLAR_SENSOR.md](../docs/SOLAR_SENSOR.md) | Cartridge solar sensor: code and runtime evidence | *#hardware* | 5 |
-| [docs/SOURCE_LAYOUT.md](../docs/SOURCE_LAYOUT.md) | Source layout | #tooling #process | 14 |
-| [docs/SOURCE_LAYOUT_DECISIONS.md](../docs/SOURCE_LAYOUT_DECISIONS.md) | Source layout: decisions | #tooling #process | 18 |
+| [docs/SOURCE_LAYOUT.md](../docs/SOURCE_LAYOUT.md) | Source layout | #tooling #process | 13 |
+| [docs/SOURCE_LAYOUT_DECISIONS.md](../docs/SOURCE_LAYOUT_DECISIONS.md) | Source layout pass 3: decisions | #tooling #process | 12 |
 | [docs/SPARK_PARTICLE.md](../docs/SPARK_PARTICLE.md) | Moving tile particles (tentative identity) | *#particles #assets* | 3 |
 | [docs/SPRITE_EFFECT_CONTROLLER.md](../docs/SPRITE_EFFECT_CONTROLLER.md) | Sprite effect controllers (tentative) | *#assets* | 2 |
 | [docs/SPRITE_EFFECT_STEERING_ACTORS.md](../docs/SPRITE_EFFECT_STEERING_ACTORS.md) | Sprite/effect controllers and steering actors (0806B2C4–0806CA3C) | *#actors #assets* | 13 |
@@ -281,7 +281,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [notes/cloud-080D2194.md](../notes/cloud-080D2194.md) | Cloud task 080D2194 |  | 1 |
 | [notes/cloud-080D5778.md](../notes/cloud-080D5778.md) | Cloud task 080D5778 |  | 1 |
 | [notes/cloud-080E0750.md](../notes/cloud-080E0750.md) | Cloud task 080E0750 (Dog states, scene-actor defeat) | *#actors #scene* | 2 |
-| [notes/cloud-08122DF4.md](../notes/cloud-08122DF4.md) | Cloud task 08122DF4 | *#actors #scene #particles #animation #assets* | 15 |
+| [notes/cloud-08122DF4.md](../notes/cloud-08122DF4.md) | Cloud task 08122DF4 | *#scene #particles #animation #assets* | 15 |
 | [notes/cloud-08132904.md](../notes/cloud-08132904.md) | Cloud task 08132904 |  | 1 |
 | [notes/cloud-08132D2C.md](../notes/cloud-08132D2C.md) | Cloud task 08132D2C |  | 1 |
 | [notes/cloud-0819E7F0_2026-10-19.md](../notes/cloud-0819E7F0_2026-10-19.md) | Cloud task 0819E7F0: Hresvelgr burst phases (2026-10-19) | #matching #hresvelgr | 2 |
@@ -494,7 +494,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [notes/round14-once-loop-review_2026-11-16.md](../notes/round14-once-loop-review_2026-11-16.md) | Round 14: once-loop inventory and checkpoint-three source recovery | #round14 #matching #once-loop #source-recovery #cleanup | 11 |
 | [notes/round14-palette-traversal_2026-11-16.md](../notes/round14-palette-traversal_2026-11-16.md) | Round 14: indexed palette-bank traversal | *#assets* | 4 |
 | [notes/round14-placeholder-audit.md](../notes/round14-placeholder-audit.md) | Round 14: placeholder-name audit | #matching #actors #animation #tooling | 12 |
-| [notes/round14-player-slots_2026-11-16.md](../notes/round14-player-slots_2026-11-16.md) | Round 14 checkpoint 4: player-slot ownership |  | 15 |
+| [notes/round14-player-slots_2026-11-16.md](../notes/round14-player-slots_2026-11-16.md) | Round 14 checkpoint 4: player-slot ownership |  | 14 |
 | [notes/round14-pool-cursor_2026-11-16.md](../notes/round14-pool-cursor_2026-11-16.md) | Round 14 checkpoint 4: indexed pool callbacks |  | 7 |
 | [notes/round14-proved-zero-expansion-audit.md](../notes/round14-proved-zero-expansion-audit.md) | Round 14: proved-zero reports from compiler expansion intermediates | #matching #tooling #compiler #concessions | 9 |
 | [notes/round14-random-draw-operation.md](../notes/round14-random-draw-operation.md) | Round 14: shared random-table draw operation | #round14 #matching #once-loop #random-table | 4 |

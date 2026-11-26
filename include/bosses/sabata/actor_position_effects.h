@@ -1,7 +1,7 @@
 #ifndef GUARD_ACTOR_POSITION_EFFECTS_H
 #define GUARD_ACTOR_POSITION_EFFECTS_H
 #include "bosses/sabata/actor_position.h"
-#include "scene/actor/contact_actor.h"
+#include "scene/collision/contact_actor.h"
 #include "engine/math/monster_particle_random.h"
 void ParticleSprite_Initialize(void *, void *, u32);
 void Effect_SetOrigin(void *, s32, s32);

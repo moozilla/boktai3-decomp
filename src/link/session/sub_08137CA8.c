@@ -1,7 +1,7 @@
 #define gPlayerSlotFlags gUnk_02000560
 #include "global.h"
-#include "scene/area_effect/area_effect_link.h"
-#include "scene/actor/scene_actor_terrain.h"
+#include "scene/areas/area_effect_link.h"
+#include "scene/motion/scene_actor_terrain.h"
 static inline u32 TestSlot(s32 i)
 {
     u32 mask = 8;

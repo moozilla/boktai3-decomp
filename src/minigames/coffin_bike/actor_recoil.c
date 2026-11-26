@@ -3,7 +3,7 @@
 #include "link/wireless/scene_pool.h"
 #include "scene/actor/actor_stats.h"
 #include "scene/collision/spatial_index.h"
-#include "scene/actor/contact_actor.h"
+#include "scene/collision/contact_actor.h"
 
 /* Clear the singleton sprite drop manager pointer. */
 

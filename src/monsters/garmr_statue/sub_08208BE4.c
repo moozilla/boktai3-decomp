@@ -1,5 +1,5 @@
 #include "global.h"
-#include "player/cues/player_cue_sequence.h"
+#include "player/cutscene/player_cue_sequence.h"
 #include "engine/video/display_animation.h"
 #include "engine/math/scene_vec.h"
 s32 Script_SeekToKeyword(s32);

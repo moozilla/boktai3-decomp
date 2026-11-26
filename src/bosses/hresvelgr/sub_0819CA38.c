@@ -1,5 +1,5 @@
 #include "bosses/hresvelgr/hresvelgr_travel.h"
-#include "scene/actor/scene_facing.h"
+#include "scene/motion/scene_facing.h"
 #include "bosses/vanargand/vanargand_projectiles.h"
 
 struct HresvelgrAngles {

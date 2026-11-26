@@ -1,7 +1,7 @@
-#include "scene/actor/scene_actor_chase_reaction.h"
-#include "scene/actor/scene_actor_contact_list.h"
-#include "scene/actor/scene_actor_position_search.h"
-#include "scene/actor/scene_actor_stimulus.h"
+#include "scene/motion/scene_actor_chase_reaction.h"
+#include "scene/collision/scene_actor_contact_list.h"
+#include "scene/motion/scene_actor_position_search.h"
+#include "scene/collision/scene_actor_stimulus.h"
 #include "engine/word_flags.h"
 
 s8 SceneStimulus_FindOverlap(u32, u32, u32, u8, u16);

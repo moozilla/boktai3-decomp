@@ -1,4 +1,4 @@
-#include "scene/actor/scene_actor_chase_shared.h"
+#include "scene/motion/scene_actor_chase_shared.h"
 #include "scene/actor/scene_actor_behavior.h"
 #include "monsters/skeleton/skeleton.h"
 #include "scene/actor/scene_actor_reaction.h"

@@ -1,12 +1,12 @@
-#include "scene/actor/scene_actor_availability.h"
-#include "scene/actor/scene_actor_chase_reaction.h"
+#include "scene/motion/scene_actor_availability.h"
+#include "scene/motion/scene_actor_chase_reaction.h"
 #include "scene/actor/scene_actor_behavior.h"
 #include "scene/actor/scene_actor_control_phase.h"
 #include "scene/actor/scene_actor_reaction.h"
 #include "script/script_utility.h"
 #include "engine/engine.h"
 #include "engine/ram.h"
-#include "scene/actor/scene_actor_terrain_reaction.h"
+#include "scene/motion/scene_actor_terrain_reaction.h"
 void *Bestiary_GetEntryForActor(u32, u32);
 void Bestiary_UnlockEntry(void *);
 void SceneActorBehavior_CallTerrainScript(struct RoomActor *);

@@ -1,4 +1,4 @@
-#include "scene/actor/scene_actor_contact_list.h"
+#include "scene/collision/scene_actor_contact_list.h"
 struct SceneActorContactNode *SceneActorContacts_FindNodeByKind(u32 kind)
 {
     struct SceneActorContactManager *manager = gSceneActorContactManager;

@@ -1,7 +1,7 @@
 #ifndef GUARD_BOUNCING_OBJECT_H
 #define GUARD_BOUNCING_OBJECT_H
 #include "engine/video/display_sequence_inline.h"
-#include "scene/actor/contact_swarm.h"
+#include "scene/collision/contact_swarm.h"
 #include "engine/ram.h"
 #include "engine/task.h"
 /* Separate twelve-slot family; not the preceding anchored-particle pool. */

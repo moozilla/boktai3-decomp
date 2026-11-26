@@ -3,7 +3,7 @@
 #include "scene/terrain/terrain_sampling.h"
 #include "global.h"
 #include "engine/video/display_sequence_inline.h"
-#include "scene/actor/contact_position.h"
+#include "scene/collision/contact_position.h"
 #include "engine/ram.h"
 #include "engine/engine_globals.h"
 s32 Math_Atan2(s32, s32);

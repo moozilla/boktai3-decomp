@@ -1,5 +1,5 @@
 #include "engine/engine.h"
-#include "scene/actor/scene_actor_route.h"
+#include "scene/motion/scene_actor_route.h"
 
 struct RouteBank {
     u16 count, reserved;

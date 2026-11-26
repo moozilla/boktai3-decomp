@@ -1,8 +1,8 @@
 #ifndef GUARD_SKELETON_H
 #define GUARD_SKELETON_H
-#include "scene/actor/scene_actor_chase_reaction.h"
+#include "scene/motion/scene_actor_chase_reaction.h"
 #include "scene/actor/scene_actor_control_phase.h"
-#include "scene/actor/scene_actor_terrain.h"
+#include "scene/motion/scene_actor_terrain.h"
 #include "npc/cutscene_actor/actor_animation_controller.h"
 #include "monsters/scene_actor_init_primitives.h"
 #include "monsters/scene_actor_init_group.h"

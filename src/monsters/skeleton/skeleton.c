@@ -1,7 +1,7 @@
 #include "monsters/skeleton/skeleton.h"
 #include "monsters/golem/golem.h"
-#include "scene/actor/scene_actor_contact_response.h"
-#include "scene/actor/scene_actor_chase_shared.h"
+#include "scene/collision/scene_actor_contact_response.h"
+#include "scene/motion/scene_actor_chase_shared.h"
 #include "engine/word_flags.h"
 
 /* Resolve contact flags, animation, and pursuit routing. The normal chase

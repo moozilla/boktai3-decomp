@@ -3,7 +3,7 @@
 #include "engine/engine.h"
 #include "objects/sun_orb/sun_orb_effect.h"
 #include "scene/actor/scene_event_dispatch.h"
-#include "objects/orbit_motion.h"
+#include "objects/dungeon_prop/orbit_motion.h"
 struct ContactImpactEffect {
     struct Task task;
     u8 animation[0x1C];

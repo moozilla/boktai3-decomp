@@ -1,7 +1,7 @@
 #include "engine/engine_pause.h"
 #include "ui/widgets/selection_panel.h"
 #include "engine/video/palette_pulse.h"
-#include "scene/area_effect/area_effect_link.h"
+#include "scene/areas/area_effect_link.h"
 #include "ui/dialogue/scrolling_dialogue.h"
 #include "engine/runtime.h"
 #include "script/script_utility.h"

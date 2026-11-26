@@ -1,6 +1,6 @@
 #ifndef GUARD_PATH_H
 #define GUARD_PATH_H
-#include "scene/actor/scene_actor_route.h"
+#include "scene/motion/scene_actor_route.h"
 #include "scene/terrain/terrain_cell_probe.h"
 #include "system/save/script_reference.h"
 struct PathResource {

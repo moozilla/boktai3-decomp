@@ -1,5 +1,5 @@
 #include "engine/video/sprite.h"
-#include "scene/actor/contact_collider.h"
+#include "scene/collision/contact_collider.h"
 #include "engine/video/display_sequence_inline.h"
 #include "effects/scene_effect_projection.h"
 #include "global.h"

@@ -1,4 +1,4 @@
-#include "scene/actor/scene_actor_terrain.h"
+#include "scene/motion/scene_actor_terrain.h"
 #include "scene/actor/scene_actor_reset.h"
 static inline void SceneActorRegistry_ResetRouteState(struct ChaseActor *actor)
 {

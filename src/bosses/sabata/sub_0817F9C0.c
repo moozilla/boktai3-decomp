@@ -1,6 +1,6 @@
 #include "global.h"
 #include "scene/camera/camera_tracking.h"
-#include "scene/actor/contact_collider.h"
+#include "scene/collision/contact_collider.h"
 #include "engine/word_flags.h"
 // confidence=low: BossSlot2 late per-frame update: collider/shadow/camera flags and shake counters.
 #define H(o) (*(s16 *)(q + (o)))

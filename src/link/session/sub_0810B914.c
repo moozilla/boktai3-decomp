@@ -1,7 +1,7 @@
 #include "global.h"
 #include "engine/engine.h"
 #include "engine/ram.h"
-#include "scene/area_effect/area_effect_link.h"
+#include "scene/areas/area_effect_link.h"
 struct Registry1745Settings {
     u8 pad0[0x15C];
     u32 field15C;

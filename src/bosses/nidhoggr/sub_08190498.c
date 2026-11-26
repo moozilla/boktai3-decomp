@@ -1,4 +1,4 @@
-#include "scene/actor/contact_collider.h"
+#include "scene/collision/contact_collider.h"
 #include "global.h"
 #include "engine/ram.h"
 struct NidhoggrEffectVector {

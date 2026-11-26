@@ -6,8 +6,8 @@
 
 #include "engine/math/scene_vec.h"
 #include "scene/camera/camera_tracking.h"
-#include "scene/actor/contact_swarm.h"
-#include "scene/actor/contact_actor.h"
+#include "scene/collision/contact_swarm.h"
+#include "scene/collision/contact_actor.h"
 #include "scene/actor/scene_event_dispatch.h"
 
 /* Grid attack actor (tentative), allocation size 0x924. Unknown spans are

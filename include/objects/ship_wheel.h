@@ -1,7 +1,7 @@
 #ifndef GUARD_SHIPWHEEL_PRESENTATION_H
 #define GUARD_SHIPWHEEL_PRESENTATION_H
 #include "engine/engine.h"
-#include "scene/actor/contact_swarm.h"
+#include "scene/collision/contact_swarm.h"
 #include "scene/actor/scene_event_dispatch.h"
 #include "effects/sprites/projected_display.h"
 #include "effects/contact_impact.h"

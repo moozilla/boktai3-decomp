@@ -1,7 +1,7 @@
 #include "global.h"
-#include "scene/actor/scene_actor_chase_direct_arrival.h"
-#include "scene/actor/scene_actor_straight_route.h"
-#include "scene/actor/scene_actor_cardinal_path.h"
+#include "scene/motion/scene_actor_chase_direct_arrival.h"
+#include "scene/motion/scene_actor_straight_route.h"
+#include "scene/motion/scene_actor_cardinal_path.h"
 
 static inline u8 RecoveryRoute_CanReach(s32 cell, s32 goal, s32 y)
 {

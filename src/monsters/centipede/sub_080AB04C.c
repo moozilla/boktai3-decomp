@@ -1,7 +1,7 @@
 #include "global.h"
 #include "scene/actor/scene_actor_reset.h"
-#include "scene/actor/scene_actor_terrain.h"
-#include "scene/actor/scene_actor_chase.h"
+#include "scene/motion/scene_actor_terrain.h"
+#include "scene/motion/scene_actor_chase.h"
 static inline u32 WordFlag(struct ChaseActor *p, u32 mask)
 {
     return mask & p->base.statusFlags;

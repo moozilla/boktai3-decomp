@@ -1,5 +1,5 @@
 #include "monsters/cannons/orange_spine.h"
-#include "scene/actor/collision_response.h"
+#include "scene/collision/collision_response.h"
 #include "ui/hud/damage_number_display.h"
 #include "engine/ram.h"
 #include "ui/pause/scene_hud_display.h"

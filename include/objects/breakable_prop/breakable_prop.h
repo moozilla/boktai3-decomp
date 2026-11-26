@@ -1,6 +1,6 @@
 #ifndef GUARD_BREAKABLE_PROP_H
 #define GUARD_BREAKABLE_PROP_H
-#include "scene/actor/contact_swarm.h"
+#include "scene/collision/contact_swarm.h"
 #include "system/game_state/game_state.h"
 #include "engine/engine_globals.h"
 #include "engine/task.h"

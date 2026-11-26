@@ -2,7 +2,7 @@
 #include "system/game_state/game_state.h"
 #include "engine/ram.h"
 #include "engine/engine_globals.h"
-#include "scene/area_effect/area_effect_link.h"
+#include "scene/areas/area_effect_link.h"
 #include "minigames/coffin_bike/glove.h"
 
 // confidence=low: recoil completion returns to the callback at 081198F8.

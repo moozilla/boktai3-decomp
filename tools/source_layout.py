@@ -220,7 +220,8 @@ def source_placements(root=ROOT):
 
 @lru_cache(maxsize=4)
 def groups(root=ROOT):
-    ranges = [(row.start, row.end, row.target.parent) for row in source_placements(root)]
+    recorded = [(row.start, row.end, row.target.parent) for row in source_placements(root)]
+    ranges = []
     if (Path(root) / SOURCE_DIRS).is_file():
         for key, destination in source_rules(root).items():
             if match := LAYOUT_RANGE.fullmatch(key):
@@ -232,14 +233,15 @@ def groups(root=ROOT):
     ranges.sort()
     if any(left[1] > right[0] for left, right in zip(ranges, ranges[1:])):
         raise ValueError(f"{SOURCE_DIRS}: overlapping ROM layout ranges")
-    return tuple(row[0] for row in ranges), ranges
+    return [(tuple(row[0] for row in entries), entries) for entries in (recorded, ranges)]
 
 
 def directory_for(address, root=ROOT, *, source=None):
-    starts, ranges = groups(root)
-    index = bisect_right(starts, address) - 1
-    if index >= 0 and address < ranges[index][1]:
-        return ranges[index][2].relative_to("src")
+    # A recorded translation unit stays intact even if it straddles a new range.
+    for starts, ranges in groups(root):
+        index = bisect_right(starts, address) - 1
+        if index >= 0 and address < ranges[index][1]:
+            return ranges[index][2].relative_to("src")
     location = f"{source} ({address:08X})" if source else f"sub_{address:08X}.c"
     raise ValueError(f"{location}: no ROM placement; add a rule in {SOURCE_DIRS} and {SOURCE_FILES}")
 

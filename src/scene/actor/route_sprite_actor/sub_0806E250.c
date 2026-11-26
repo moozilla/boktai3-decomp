@@ -1,4 +1,4 @@
-#include "scene/actor/route_sprite_actor.h"
+#include "scene/motion/route_sprite_actor.h"
 s32 RouteSpritePool_Tick(struct RouteSpritePool *);
 s32 RouteSpritePool_Destroy(struct RouteSpritePool *);
 s32 RouteSpritePool_Initialize(struct RouteSpritePool *);

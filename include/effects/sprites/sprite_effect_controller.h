@@ -1,6 +1,6 @@
 #ifndef GUARD_SPRITE_EFFECT_CONTROLLER_H
 #define GUARD_SPRITE_EFFECT_CONTROLLER_H
-#include "scene/actor/contact_swarm.h"
+#include "scene/collision/contact_swarm.h"
 #include "engine/task.h"
 /* Tentative independent sprite controller, global 02000178. Drawable layout
  * depends on flags bit 8: sequence sprite position1C, tile sprite position18. */

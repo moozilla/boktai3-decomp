@@ -2,8 +2,8 @@
 #include "global.h"
 #include "monsters/popbud/pink_spine_playback.h"
 #include "engine/ram.h"
-#include "scene/actor/contact_collider.h"
-#include "player/cues/player_cue_sequence.h"
+#include "scene/collision/contact_collider.h"
+#include "player/cutscene/player_cue_sequence.h"
 #include "engine/engine_pause.h"
 /* Species identity is tentative. The update callback increments age after animation. */
 extern u32 gUnk_02000560;

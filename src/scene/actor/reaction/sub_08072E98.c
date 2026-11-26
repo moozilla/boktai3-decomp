@@ -1,4 +1,4 @@
-#include "scene/actor/scene_actor_contact_list.h"
+#include "scene/collision/scene_actor_contact_list.h"
 #include "player/player.h"
 struct SceneActorContactObjectView {
     u8 unknown0[8];

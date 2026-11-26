@@ -1,5 +1,5 @@
 #include "global.h"
-#include "scene/actor/contact_position.h"
+#include "scene/collision/contact_position.h"
 #include "engine/engine.h"
 #include "engine/ram.h"
 extern const s16 gUnk_086149C4[];

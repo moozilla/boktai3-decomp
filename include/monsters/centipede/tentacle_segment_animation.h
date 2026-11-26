@@ -2,7 +2,7 @@
 #define GUARD_TENTACLE_SEGMENT_ANIMATION_H
 
 #include "engine/video/display_sequence.h"
-#include "scene/actor/contact_collider.h"
+#include "scene/collision/contact_collider.h"
 
 struct TentacleSegmentAnimation {
     struct DisplaySequenceState sequence;

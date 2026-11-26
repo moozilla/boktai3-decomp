@@ -52,7 +52,7 @@ addr,name,size,kind,decl,header,confidence,notes
 02000100,gWirelessGameItems,4,object,extern struct WirelessGameItems *gWirelessGameItems;,include/link/wireless/wireless_game_items_and_display.h,low,
 02000104,gResultMenu,4,object,extern struct ResultMenu *gResultMenu;,include/engine/ram.h,low,
 02000108,gScenePool,4,object,extern u32 gScenePool;,include/engine/ram.h,low,scene pool manager (ScenePool_*)
-0200010C,gAreaEffectManager,4,object,extern struct AreaEffectManager *gAreaEffectManager;,include/scene/area_effect/area_effect.h,low,
+0200010C,gAreaEffectManager,4,object,extern struct AreaEffectManager *gAreaEffectManager;,include/scene/areas/area_effect.h,low,
 02000110,gRepeatedEffectManager,4,object,extern struct RepeatedEffectManager *gRepeatedEffectManager;,include/effects/scene/repeated_effect.h,low,
 02000114,gDirectionalForce,4,object,extern struct DirectionalForce *gDirectionalForce;,include/objects/hazards/directional_force.h,low,
 02000118,gStackedActor,4,object,extern struct StackedActor *gStackedActor;,include/objects/warp_circle/stacked_actor.h,low,
@@ -83,13 +83,13 @@ addr,name,size,kind,decl,header,confidence,notes
 0200017C,gSunDiscPool,4,object,extern u8 *gSunDiscPool;,include/engine/ram.h,low,sun disc pool (SunDiscPool_*)
 02000180,gActorEffectManager,4,object,extern u8 *gActorEffectManager;,include/engine/ram.h,low,
 02000184,gPursuingActorManager,4,object,extern struct Pool *gPursuingActorManager;,include/engine/ram.h,low,
-02000188,gSceneSteeringActorPool,4,object,extern struct SceneSteeringActorPool *gSceneSteeringActorPool;,include/scene/actor/scene_steering_actor.h,low,
+02000188,gSceneSteeringActorPool,4,object,extern struct SceneSteeringActorPool *gSceneSteeringActorPool;,include/scene/motion/scene_steering_actor.h,low,
 0200018C,gFragmentEffectManager,4,object,extern u8 *gFragmentEffectManager;,include/engine/ram.h,low,fragment effect manager (FragmentEffect_*)
 02000190,gScriptedColliderManager,4,object,extern u32 gScriptedColliderManager;,include/engine/ram.h,low,
 02000194,gSceneParticlePool,4,object,extern struct SceneParticlePool *gSceneParticlePool;,include/engine/ram.h,low,
-02000198,gRouteSpritePool,4,object,extern struct RouteSpritePool *gRouteSpritePool;,include/scene/actor/route_sprite_actor.h,low,
+02000198,gRouteSpritePool,4,object,extern struct RouteSpritePool *gRouteSpritePool;,include/scene/motion/route_sprite_actor.h,low,
 0200019C,gSceneEffectSchedule,4,object,extern struct SceneEffectSchedule *gSceneEffectSchedule;,include/effects/scene/scene_effect_schedule.h,low,
-020001A0,gSceneActorContactManager,4,object,extern struct SceneActorContactManager *gSceneActorContactManager;,include/scene/actor/scene_actor_contacts.h,low,
+020001A0,gSceneActorContactManager,4,object,extern struct SceneActorContactManager *gSceneActorContactManager;,include/scene/collision/scene_actor_contacts.h,low,
 020001A4,gWoodenCrateManager,4,object,extern u8 *gWoodenCrateManager;,include/engine/ram.h,low,
 020001A8,gFloorSwitchManager,4,object,extern u32 gFloorSwitchManager;,include/engine/ram.h,low,floor switch manager (FloorSwitch_*)
 020001AC,gNamedActorManager,4,object,extern struct NamedObjectManager *gNamedActorManager;,include/engine/ram.h,low,named actor object pool singleton; provisional common name
@@ -177,7 +177,7 @@ addr,name,size,kind,decl,header,confidence,notes
 020004A8,gSceneActorRegistryManager,4,object,extern struct SceneActorRegistryManager *gSceneActorRegistryManager;,include/scene/actor/scene_actor_registry.h,low,
 020004AC,gSceneActorRegistryNode,4,object,extern struct SceneActorRegistryNode *gSceneActorRegistryNode;,include/scene/actor/scene_actor_registry.h,low,
 020004B0,gSlotMonitor,4,object,extern u32 gSlotMonitor;,include/engine/ram.h,low,
-020004B4,gLinkSession,4,object,extern struct AreaEffectLinkState *gLinkSession;,include/scene/area_effect/area_effect_link.h,low,link session / menu peer object
+020004B4,gLinkSession,4,object,extern struct AreaEffectLinkState *gLinkSession;,include/scene/areas/area_effect_link.h,low,link session / menu peer object
 020004B8,gSceneCamera,4,object,extern struct Camera *gSceneCamera;,include/effects/screen/background_controller.h,low,scene camera object
 020004BC,gPanelSpritePool,4,object,extern u8 *gPanelSpritePool;,include/engine/ram.h,low,
 020004C0,gSpriteSlots,4,object,extern u32 gSpriteSlots;,include/engine/ram.h,low,

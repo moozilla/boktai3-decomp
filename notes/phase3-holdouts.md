@@ -122,7 +122,7 @@ Next idea: C in which amplitude's address and the loop's `p->amplitude` don't sh
 equivalence at the preheader (a separate EBB, or a constant cse can't merge), so the hoisted
 add survives.
 
-### sub_08010C10 (src/effects/scene/bat_flock.c, 08010C10): deferred, reload rotation only
+### sub_08010C10 (src/effects/bat_flock.c, 08010C10): deferred, reload rotation only
 
 Draft: `notes/phase3-drafts/field-effects/sub_08010C10.c` (2 ROM / 2 draft), the pinned
 source without the `d` pin and barrier. The only difference is the scratch for the first
@@ -475,8 +475,8 @@ The coordinator said to leave the scoring alone for now. These are the ones in s
 * `src/effects/screen/background_flash/sub_080479B0.c`: BackgroundFlash_UpdateDisappearing:10, BackgroundFlash_UpdateDisappearing:17
 * `src/fn/sub_08047F68.c`: ContactBurst_OnContact:16
 * `src/fn/sub_080480A4.c`: ContactBurst_Update:70
-* `src/objects/markers/interaction_marker/sub_0805386C.c`: InteractionMarker_TickIdle:27
-* `src/objects/markers/saved_position_marker/sub_08053DF8.c`: SavedPositionMarker_TickIdle:27
+* `src/objects/markers/interaction/sub_0805386C.c`: InteractionMarker_TickIdle:27
+* `src/objects/markers/saved_position/sub_08053DF8.c`: SavedPositionMarker_TickIdle:27
 * `src/effects/sprites/display_track/sub_08054DC4.c`: DisplayTrack_SetSequenceFromScript:16
 * `src/ui/hud/stage_icon/sub_08055C04.c`: StageIconDisplay_TickReveal:4
 * `src/ui/hud/stage_icon/sub_08055DD4.c`: StageIconDisplay_InitAnimations:26, StageIconDisplay_InitAnimations:31
@@ -517,7 +517,7 @@ The coordinator said to leave the scoring alone for now. These are the ones in s
 * `src/objects/named_object/sub_081029F8.c`: NamedObject_UpdatePlayerAttachment:73
 * `src/objects/named_object/sub_08103110.c`: NamedObject_CreateFromScript:209
 * `src/link/session/sub_08109040.c`: SelectionSlots_ClearValue:23
-* `src/link/link_selection/sub_0810B3BC.c`: SceneMenu_UpdateRecords:45
+* `src/link/selection/sub_0810B3BC.c`: SceneMenu_UpdateRecords:45
 * `src/link/records/sub_0810D60C.c`: PanelText_DrawDecimal:17
 * `src/minigames/coffin_bike/sub_0811A030.c`: MotionActor_DispatchRequestedState:72
 * `src/fn/sub_0811B094.c`: Collider_ScheduleUpdates:49
@@ -536,9 +536,9 @@ The coordinator said to leave the scoring alone for now. These are the ones in s
 * `src/player/movement/sub_08140F40.c`: Player_GetForceDirection:93, Player_GetForceDirection:94
 * `src/fn/sub_081559A4.c`: Player_UpdateTimedChargeAction:95
 * `src/fn/sub_08165488.c`: SceneHud_DrawDecimalDigits:16
-* `src/ui/pause/pause_display/sub_0816F6B4.c`: PauseMenu_BeginTypeThirteenItemUse:33
-* `src/ui/pause/pause_display/sub_0816F8AC.c`: PauseMenu_BeginTypeFourteenItemUse:33
-* `src/ui/pause/pause_display/sub_08173C0C.c`: SceneHud_TickEquipmentToggle:37
+* `src/ui/pause/display/sub_0816F6B4.c`: PauseMenu_BeginTypeThirteenItemUse:33
+* `src/ui/pause/display/sub_0816F8AC.c`: PauseMenu_BeginTypeFourteenItemUse:33
+* `src/ui/pause/display/sub_08173C0C.c`: SceneHud_TickEquipmentToggle:37
 * `src/fn/sub_08175008.c`: Presentation_UpdateAllocationSelection:150
 * `src/fn/sub_0817A57C.c`: SceneActors_SpawnConvergingParticle:57
 * `src/fn/sub_0817B5E4.c`: update_facing:13
@@ -565,12 +565,12 @@ The coordinator said to leave the scoring alone for now. These are the ones in s
 * `src/engine/math/sub_08221D40.c`: ScalarApproach_ApplyProfileArray:13
 * `src/link/wireless/rfu_manager/sub_082237A0.c`: RfuManager_StartChildConnect:46
 * `src/system/clock/sub_08228DB8.c`: SunClock_GetPhase:52, SunClock_GetPhase:62, SunClock_GetPhase:99, SunClock_GetPhase:109
-* `src/link/link_player/sub_082392E8.c`: sub_082392E8:70, sub_082392E8:73
-* `src/link/link_player/sub_08239480.c`: Player_EmitConvergingParticle:57
-* `src/link/link_player/sub_0823A028.c`: ActorEffect_SelectFlashingValue:15
+* `src/link/player/sub_082392E8.c`: sub_082392E8:70, sub_082392E8:73
+* `src/link/player/sub_08239480.c`: Player_EmitConvergingParticle:57
+* `src/link/player/sub_0823A028.c`: ActorEffect_SelectFlashingValue:15
 * `src/lib/libgcc/sub_0824AC74.c`: Libgcc_MultiplyInt64:61
 * `src/monsters/golem/golem_2.c`: Golem_UpdateScriptedAction:393, Golem_UpdateScriptedAction:395
-* `src/effects/scene/bat_flock.c`: BoardPiece_Wander:493, BoardPiece_Wander:494, BoardPiece_Wander:495, BoardPiece_Wander:496
+* `src/effects/bat_flock.c`: BoardPiece_Wander:493, BoardPiece_Wander:494, BoardPiece_Wander:495, BoardPiece_Wander:496
 * `src/ui/modifier_menu/modifier_selection_and_stat_previews.c`: ModifierMenu_DrawSecondSourceStats:697, ModifierMenu_DrawSecondSourceStats:716, ModifierMenu_DrawBackground:863
 * `src/effects/palette/palette_controller.c`: Palette_BlendRange:69, Palette_InitializeFromScript:461, Palette_SetBrightnessFromScript:709
 * `src/ui/title/password.c`: Text_CopyWithoutTags:9, Password_DecodeEntry:174
@@ -647,7 +647,7 @@ Not drafted separately: its kind switch ends in the same shared Memory_Clear tai
 (cases 0, 1 and case 2's state 1 jump to case 3 state 2's `movs r1, #0x80`; case 3's state 1
 keeps `adds r1, #0xff`). The front half (the bursts) is ordinary. Do it after LaunchArc.
 
-### ContactActor_UpdateRetreat (src/bosses/vampire/sub_0804373C.c, 0804373C): deferred
+### ContactActor_UpdateRetreat (src/bosses/count/sub_0804373C.c, 0804373C): deferred
 
 Draft: `notes/phase3-drafts/actors/ContactActor_UpdateRetreat.c` (95 / 95, no pins). The ROM's
 dead `ldr r3, =0x0403B714; mov r8, r3` before the enter block's first random draw is the
@@ -660,7 +660,7 @@ with center (r8), and keeps a spill slot (sp #0xc against #8). `AGBCC_PRI=positi
 gets to 55 / 55. Next: find which draws use the relative read (it decides origin's live
 range), then the position/slot order.
 
-### ContactSwarm_UpdateTracking (src/bosses/vampire/sub_08044290.c, 08044290): deferred
+### ContactSwarm_UpdateTracking (src/bosses/count/sub_08044290.c, 08044290): deferred
 
 Draft: `notes/phase3-drafts/actors/ContactSwarm_UpdateTracking.c` (25 / 27, the pinned file
 with plain `jitter = *(const u16 *)(RANDOM_TABLE_ADDR + i * 2) & 15`). The pinned file's
@@ -721,7 +721,7 @@ Tried: `!steps`, a limit variable, gridRow per arm, 1D indexing, parameter types
 four or five more insns of life without changing the code (fact 17's `s16` conversion trick), or
 reorder the parameter's first use.
 
-### sub_0806F06C (src/scene/state/sub_0806F06C.c): deferred
+### sub_0806F06C (src/scene/lifecycle/sub_0806F06C.c): deferred
 
 Draft without the DEBUG_NOP: `notes/phase3-drafts/monsters-bosses/sub_0806F06C.c`, 23/23 differ.
 `AGBCC_PRI=i:+920` matches. cse puts REG_EQUAL (const 0) on i's first set, which doubles its life.

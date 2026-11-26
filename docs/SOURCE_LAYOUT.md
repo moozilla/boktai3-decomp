@@ -3,155 +3,119 @@
 Tags: #tooling #process
 
 The C source is arranged by what each piece of code *is in the game*, the way
-zeldaret's tmc and pret's pokeemerald arrange theirs. To find something, go to
-the category you would guess as a player, then to the object by its game name.
-Every `.c` file is matched C. Link order comes from function addresses
-(`tools/split.py`), not from directories, so a file's place in the tree is free
-to follow meaning.
+zeldaret's tmc and pret's pokeemerald arrange theirs. Go to the category you
+would guess as a player, then to the object by its game name. Identities were
+checked against the running game. The [layout decisions](SOURCE_LAYOUT_DECISIONS.md)
+list the evidence and the names still awaiting confirmation.
 
 ## The map
 
 | Directory | What is in it |
 |---|---|
-| `src/player/` | Django: core, movement, melee attacks, the gun, taking damage, stats, object interactions, animation cues, cutscene commands, appearance, special actions, and link actions |
-| `src/monsters/` | Every enemy family, one file or directory per monster (the game's own word: the Monster Book, 魔物図鑑) |
-| `src/bosses/` | The Immortals (Hresvelgr, Nidhoggr, Ratatosk, Vanargand, Sabata) and the Vampire |
-| `src/npc/` | Townspeople, story characters and cutscene actors, including Sabata's bike rider |
-| `src/objects/` | Coffin, crates, switches, Warp Circle, Solar Stand, Pile Driver, ship deck cannons, Solar Roots, sun orbs, items, hazards, and markers |
-| `src/effects/` | Palette, particles, screen effects, projectiles, bursts, orbits, sprites, bat flocks, shadows, and weather |
-| `src/ui/` | HUD, dialogue, pause menu, town and world maps, town services, books, title screens, and results |
-| `src/minigames/` | Django's Coffin Bike, the Dark Generator, and the result (transformation) minigame |
-| `src/link/` | Two-player play: cable link (`serial`), wireless (`wireless/`), the link menus and the other player's avatar |
-| `src/system/` | The cartridge and persistent state: solar sensor, clock and sun schedule, saving, game state, inventory data |
-| `src/scene/` | The world simulation shared by everything that moves: the actor framework, collision, terrain and paths, camera, scene lifecycle |
+| `src/player/` | Django, cut along his ROM ranges: core, movement, interaction (coffin chain, pushing), motions, melee attack, the Gun Del Sol, control, stats, state, cutscene, appearance, lock-on targets, effects, clone |
+| `src/monsters/` | Every Monster Book entry that is not a boss: one file or directory per monster |
+| `src/bosses/` | The Immortals and their forms: Hresvelgr, Nidhoggr (ship and duel), Ratatosk, Vanargand (arena, head in the bike chase), Sabata, and the Count |
+| `src/npc/` | Townspeople, story characters, cutscene actors, Sabata's rider in the ending |
+| `src/objects/` | Things placed in the world: coffin, Pile Driver, Warp Circle, Solar Stand, deck cannons, Solar Roots, crates, switches, items, hazards, markers |
+| `src/minigames/` | The Coffin Bike, the Dark Generator, the result game |
+| `src/effects/` | Visual effects: palette, particles, screen effects, projectiles, bursts, orbits, sprite effects, shadows, weather |
+| `src/ui/` | HUD, dialogue, pause menu, town services and the town map, the world map, the books, title screens, results |
+| `src/link/` | Two-player play: cable (`serial`), wireless, the link menus, and the link-play Django (`link/player`) |
+| `src/system/` | The cartridge and what is saved: solar sensor, clock and sun schedule, saving, game state, inventory data |
+| `src/scene/` | The world simulation everything shares: the actor framework, collision, terrain and paths, gameplay areas, camera, scene lifecycle |
 | `src/script/` | The GCL script interpreter (Metal Gear Solid's scripting language) and its runtime |
-| `src/engine/` | Boot, tasks, heap, interrupts, video (backgrounds, sprites, palettes, animation, text tiles), math, game-side sound |
-| `src/lib/` | Third-party libraries kept in their upstream form: m4a (sound driver), rfu (wireless), rtc, eeprom, libgcc, libc, libm |
+| `src/engine/` | Boot, tasks, heap, interrupts, video (backgrounds, sprites, the animated sprite, palettes, text tiles), math, game-side sound |
+| `src/lib/` | Third-party libraries in upstream form: m4a (sound driver), rfu (wireless), rtc, eeprom, libgcc, libc, libm |
 
 ## Conventions
 
 * `src/<category>/<object>/` for an object with three or more files;
   `src/<category>/<object>.c` for a one-file object; a two-file object's files
-  sit directly in the category (`monsters/ghoul.c`, `monsters/ghoul_states.c`).
-  Four two-file objects have a directory because their file names would not say
-  what they belong to: `objects/coffin/`, `objects/bat_curtain/`, `ui/save/`,
-  `ui/game_over/`.
-* A middle `<group>/` level only where a category has natural families:
-  `effects/{palette,particles,screen,projectiles,bursts,orbits,sprites,scene}/`,
-  `ui/{hud,dialogue,pause,town,books,title,results,widgets}/`, `link/wireless/`,
-  `monsters/cannons/`, `objects/{hazards,items,markers}/`,
-  `scene/{actor,collision,terrain}/`, `player/effects/`, `engine/{video,math,sound}/`.
-  Never more than three directory levels below `src/`.
-* Directory names are short lowercase snake_case nouns, the game's own name for
-  the thing where it has one (from `gcl/names/chara.csv`, the monster list in
-  the ROM text, and the function prefixes in `symbols/functions.csv`). No
-  numbers, no hex, no "tentative": an unidentified object gets the most honest
-  description of what it does, and [the layout decisions](SOURCE_LAYOUT_DECISIONS.md) says it is a guess.
-* Each object is one directory: code that belongs to one object (helpers,
-  projectiles, sub-parts) lives with it, even when the report split it.
-* Headers sit beside their object under the mirrored path in `include/`, at most
-  two directories deep: `#include "monsters/ghoul.h"`,
-  `#include "bosses/vanargand/vanargand_projectiles.h"`,
-  `#include "ui/pause/pause_menu.h"`. A three-level source directory such as
-  `src/ui/pause/map/` keeps its headers in `include/ui/pause/`. `global.h` and
-  `debug.h` are at the root of `include/`. Types genuinely shared across
-  categories live with the subsystem that defines them: `include/engine/`
-  (memory, tasks, input, RAM layout), `include/engine/video/` (display
-  sequences, palettes, render), `include/engine/math/` (vectors, interpolation,
-  random helpers), `include/scene/actor/` (the actor framework every monster
-  uses). `include/gba/` holds the SDK headers.
-* A one-function file uses the exact symbol spelling (`Hresvelgr_Create.c`).
-  An unnamed function keeps its address (`sub_08033568.c`). A multi-function
-  translation unit is named for what it contains. `lib/` keeps upstream file
-  names. The directory pass preserves existing basenames except where the
-  reviewed table explicitly gives a new one.
+  sit in the category. Five two-file objects keep a directory because their
+  file names do not say what they belong to: `objects/coffin/`,
+  `objects/bat_curtain/`, `objects/dungeon_prop/`, `ui/save/`, `ui/game_over/`.
+* A `<group>/` level only where a category has families
+  (`effects/particles/`, `ui/pause/`, `ui/town/`, `link/wireless/`,
+  `monsters/cannons/`, `objects/markers/`, `scene/actor/`, `player/effects/`,
+  `engine/video/`). Never more than three directory levels below `src/`.
+* A directory does not repeat its parent's word (`link/panel`, not
+  `link/link_panel`; `ui/pause/menu`, not `ui/pause/pause_menu`).
+* Lowercase snake_case nouns, the game's own name where it has one (Monster Book
+  names, `gcl/names/chara.csv`, text the screens show), no numbers, no hex.
+* Each object is one directory, and every directory is made of whole ROM
+  ranges: one contiguous range where possible, a few at most (Player's 18
+  directories hold 22 ranges. See the range rules in `symbols/source_dirs.csv`). That lets each range
+  become one unit file.
+* Function names are `Object_Action` with the object's game name
+  (`PileDriver_`, `VanargandHead_`, `Sabata_`, `Shop_`), never a registry key,
+  slot or address. One-function files are named after their function
+  (`Hresvelgr_Create.c`); an unnamed function keeps `sub_XXXXXXXX.c`.
+* Headers sit beside their object under the mirrored path in `include/`, at
+  most two directories deep (`#include "monsters/ghoul.h"`,
+  `#include "objects/pile_driver/scene_panel_rig.h"`); a three-level source
+  directory keeps its headers one level up (`src/ui/pause/map/` →
+  `include/ui/pause/`). `global.h` and `debug.h` are at the root. The
+  scene-actor framework's shared types are grouped by topic:
+  `include/scene/actor/` (registry, state, components, init, scripts),
+  `include/scene/collision/` (contacts and collision responses),
+  `include/scene/motion/` (routes, chase, turning, terrain movement). Engine-wide
+  headers: `include/engine/` (memory, tasks, input, RAM), `include/engine/video/`
+  (display sequences, palettes, render), `include/engine/math/`.
 
 ## Where is it?
 
 | You are looking for | Go to |
 |---|---|
-| Django (the player object: create, update, draw, modes) | `src/player/core/` |
-| Walking, turning, slopes, pushing forces, the camera following Django | `src/player/movement/` |
-| Melee weapons: slash, spin, sweep, throw, combos, attack power | `src/player/attack/` |
-| The solar gun: charged shots, projectiles, charge tiers | `src/player/gun/` (identification of gun vs. melee is partly by name) |
-| Getting hit, knockback, defeat and death | `src/player/damage/` |
+| Django: create, update, destroy, per-frame update | `src/player/core/` |
+| Walking, turning, slopes, forces, camera offsets | `src/player/movement/` |
+| Dragging the coffin, pushing blocks | `src/player/interaction/` |
+| Motions: paralysis, death, form changes, special casts (Spiral Burst) | `src/player/motions/` |
+| Swords: Gradius, Estoc, Kopis, Zweihander, Kagerou | `src/player/attack/` |
+| The Gun Del Sol: frames, shots, charge, Tempest, Rockbuster | `src/player/gun/` |
+| Input and action selection | `src/player/control/` |
 | Life, energy, resistance, equipment values | `src/player/stats/` |
-| Dragging the coffin, pushing blocks, using a Solar Stand | `src/player/interaction/` |
-| Django's animation cues and form changes | `src/player/cues/` |
-| Cutscene commands that move Django (kneel, aim, shoot) | `src/player/script/` |
-| Django's sprite model, palettes, visuals | `src/player/appearance/` |
-| Django's barrier, attack and burst effects | `src/player/effects/` |
-| Special motion effects, including Spiral Burst | `src/player/special_actions/` |
-| Link Player dispatchers | `src/player/link_actions/` |
-| Lock-on targets | `src/player/target_registry/` |
-| Ghoul (ボク family) | `src/monsters/ghoul.c`, `ghoul_states.c` |
+| Scripted position requests, stun, mode flags | `src/player/state/` |
+| Django in cutscenes (cues, script commands) | `src/player/cutscene/` |
+| Django's model, palettes, visuals | `src/player/appearance/` |
+| Lock-on targets; barrier, burst, attack effects; clones | `src/player/target_registry/`, `src/player/effects/`, `src/player/clone.c` |
+| Ghoul family (ボク) | `src/monsters/ghoul.c`, `ghoul_states.c` |
 | Bat, Bee, Slime, Ghost, Crow, Spider, Mimic, Octopus, Dog (Hound, Hot Dog, Ice Dog), Lun | `src/monsters/<name>.c` |
-| Skeleton, Golem, Mummy, Vorn | `src/monsters/<name>/` |
-| Armor and the elemental armors | `src/monsters/armor/` |
-| Statue | `src/monsters/statue/` |
-| Sword, Axe | `src/monsters/sword/`, `src/monsters/axe/` |
-| Ivy, Centipede, Popbud | `src/monsters/ivy/`, `centipede/`, `popbud/` |
-| Ooze, Screamer, Poison Hand, Dragon Puppy | `src/monsters/<name>/` |
-| Poisoner and Perplexer | `src/monsters/pollen_flowers/` |
-| Garmr Statue and Muspell Head | `src/monsters/garmr_statue/`, `muspell_head/` |
-| Vulcan, Wind, and Plasma Cannons | `src/monsters/cannons/{vulcan,wind,plasma}/` |
-| Hresvelgr (eagle) | `src/bosses/hresvelgr/` |
-| Nidhoggr (dragon), including its grid attacks | `src/bosses/nidhoggr/` |
-| Ratatosk | `src/bosses/ratatosk/` |
-| Vanargand (wolf), its projectiles, parts and bike-chase appearance | `src/bosses/vanargand/` |
-| Sabata | `src/bosses/sabata/` |
-| Sabata riding the purple bike | `src/npc/sabata_rider/` |
-| The Vampire and its bat swarm | `src/bosses/vampire/` |
-| Townspeople and NPCs | `src/npc/scripted_npc/`, `src/npc/tagged_npc/` |
-| Story characters in cutscenes | `src/npc/story_character/`, `src/npc/cutscene_actor/` |
+| Skeleton, Golem, Mummy, Vorn, Ivy, Sword, Axe, Ooze, Screamer, Poison Hand, Dragon Puppy | `src/monsters/<name>/` |
+| Bronze, Iron, Flame, Frost, Cloud, Earth, Dual Armor, Black Knight | `src/monsters/armor/` |
+| ARMOR (the stationary suit, Book #29) and STATUE (#28) | `src/monsters/suit_of_armor/`, `src/monsters/statue/` |
+| Garmr Statue, Muspell Head, Popbud, Poisoner and Perplexer, Centipede | `src/monsters/garmr_statue/`, `muspell_head/`, `popbud/`, `pollen_flowers/`, `centipede/` |
+| Vulcan, Wind and Plasma Cannons | `src/monsters/cannons/{vulcan,wind,plasma}/` |
+| Hresvelgr (Ancient Tree) | `src/bosses/hresvelgr/` (its Solar Roots: `src/objects/solar_roots/`) |
+| Nidhoggr: iron dragon and ship, and the duel inside | `src/bosses/nidhoggr/` |
+| Ratatosk (Dark Castle) | `src/bosses/ratatosk/` |
+| Vanargand, including his head in the bike chase | `src/bosses/vanargand/` |
+| Sabata (White Forest and rematch), his rider in the ending | `src/bosses/sabata/`, `src/npc/sabata_rider/` |
+| The Count and his bat swarm | `src/bosses/count/` |
+| The Pile Driver and purification | `src/objects/pile_driver/` |
 | The coffin | `src/objects/coffin/` |
-| Warp Circle | `src/objects/warp_circle/` |
-| Solar Stand | `src/objects/solar_stand/` |
-| Pile Driver (purification) | `src/objects/pile_driver/` |
-| Ship deck cannons and Solar Roots | `src/objects/deck_cannons/`, `solar_roots/` |
-| Wooden crate, floor switch, hit switch, Bat Curtain | `src/objects/wooden_crate/`, `floor_switch/`, `hit_switch.c`, `bat_curtain/` |
+| The Coffin Bike (Vector Coffin), the bike battle | `src/minigames/coffin_bike/` |
+| The Dark Generator (Dark Loan work) | `src/minigames/dark_generator.c` |
+| Warp Circle, Solar Stand, deck cannons, wooden crate, switches, Bat Curtain | `src/objects/<name>/` |
 | Treasure chests and dropped items | `src/objects/items/` |
-| Sun orbs, the solar bomb | `src/objects/sun_orb/`, `src/objects/solar_bomb/` |
-| Traps and hazards | `src/objects/hazards/` |
-| The solar sensor (GPIO), solar level, calibration screen | `src/system/solar/` |
-| The clock, sunrise and sunset, region setting | `src/system/clock/` (RTC chip driver: `src/lib/rtc/`) |
-| Saving and loading | `src/system/save/` (EEPROM driver: `src/lib/eeprom/`), save screen `src/ui/save/` |
-| Story flags, game state, challenge records, Solar Fruit | `src/system/game_state/` |
-| Items and equipment data | `src/system/inventory/` |
-| Music and sound effects | `src/engine/sound/` (game side), `src/lib/m4a/` (driver) |
-| The script interpreter (GCL) | `src/script/script_virtual_machine.c`; runtime `src/script/runtime/`; cutscene runner `src/script/demo_manager.c`; the scripts themselves: `gcl/` and the `gcx` resource |
-| Script commands of an object (`*_FromScript`) | in that object's own directory |
-| Dialogue boxes, text commands, text windows | `src/ui/dialogue/` |
-| HUD (life, energy, sun gauge), damage numbers | `src/ui/hud/display/`, `src/ui/hud/damage_numbers/` |
-| Pause menu, its inventory, map, status panel | `src/ui/pause/` |
-| Pause Status options and menu sequences | `src/ui/pause/status_options.c`, `menu_sequences/` |
-| Status screen | `src/ui/status_screen/` |
-| Weapon shop | `src/ui/town/shop/` |
-| San Miguel town map and world destination map | `src/ui/town/town_map.c`, `src/ui/world_map.c` |
-| Solar Bank, Dark Loan, Storage | `src/ui/town/solar_bank/`, `dark_loan.c`, `storage/` |
+| Townspeople, story characters, cutscene actors | `src/npc/` |
+| The solar sensor, solar level, calibration | `src/system/solar/` |
+| Clock, sunrise and sunset, region setting | `src/system/clock/` (RTC driver `src/lib/rtc/`) |
+| Saving | `src/system/save/` (EEPROM `src/lib/eeprom/`), save screen `src/ui/save/` |
+| Story flags, game state, Solar Fruit; item data | `src/system/game_state/`, `src/system/inventory/` |
+| Music and sound effects | `src/engine/sound/`, driver `src/lib/m4a/` |
+| The script interpreter (GCL), cutscene runner | `src/script/script_virtual_machine.c`, `src/script/demo_manager.c`; scripts in `gcl/` |
+| Dialogue boxes and text commands | `src/ui/dialogue/` |
+| HUD and damage numbers | `src/ui/hud/` |
+| Pause menu, inventory, map, Status page, Dark Card sequences | `src/ui/pause/{menu,inventory,map,status,menu_sequences}/` |
+| Shops, Solar Bank, Dark Loan, Storage, the San Miguel map | `src/ui/town/` (`shop/`, `solar_bank/`, `dark_loan.c`, `storage/`, `town_map.c`) |
+| The world map | `src/ui/world_map.c` |
 | Monster Book, Forging Book, collection | `src/ui/books/` |
-| Equipment modifier menu | `src/ui/modifier_menu/` |
 | Title, Game Start, Options, Name Entry, Password, sound test | `src/ui/title/` |
 | Stage results, time result, challenges | `src/ui/results/` |
-| Game over | `src/ui/game_over/` |
-| Django's Coffin Bike and the Dark Generator | `src/minigames/coffin_bike/`, `dark_generator.c` |
-| Cable link | `src/link/serial/`, `handshake/`, `session/` |
-| Wireless adapter and connection | `src/link/wireless/connection/`, `rfu_manager/`; SDK `src/lib/rfu/` |
-| Wireless battle, trading | `src/link/wireless/battle/`, `trade_menu/` |
-| Link lobby, records, scores | `src/link/lobby/`, `records/`, `score_panel/` |
-| Palette fades and cycling | `src/effects/palette/` |
-| Particles | `src/effects/particles/` |
-| Screen effects (scanline, flashes, blends, scrolling backdrops) | `src/effects/screen/` |
-| Magic Cannon departure and the cutscene bat flock | `src/effects/screen/magic_cannon_departure.c`, `src/effects/scene/bat_flock.c` |
-| Projectiles | `src/effects/projectiles/` |
-| Explosions and bursts, healing sparkles | `src/effects/bursts/`, `src/effects/healing/` |
-| Weather and storms, shadows | `src/effects/weather/`, `src/effects/shadows/` |
-| Actor framework shared by monsters (behavior, reactions, placement) | `src/scene/actor/` |
-| Collision | `src/scene/collision/` |
-| Terrain, paths, navigation mesh | `src/scene/terrain/` |
-| Camera | `src/scene/camera/` |
-| Tasks, heap, interrupts, boot (`AgbMain`) | `src/engine/` |
-| Sprites, OAM, backgrounds, palettes, text tiles | `src/engine/video/` |
+| Cable link, wireless adapter, link menus, link-play Django | `src/link/serial/`, `src/link/wireless/`, `src/link/{menu,panel,selection,lobby,records}/`, `src/link/player/` |
+| Magic Cannon departure, bat flock, weather | `src/effects/screen/magic_cannon_departure.c`, `src/effects/bat_flock.c`, `src/effects/weather/` |
+| Actor framework, collision, terrain, gameplay areas, camera | `src/scene/{actor,collision,terrain,areas,camera}/` |
+| Tasks, heap, interrupts, boot; sprites, OAM, backgrounds | `src/engine/`, `src/engine/video/` |
 
 ## Finding a function's file
 
@@ -160,11 +124,8 @@ build/venv/bin/python tools/source_layout.py 08033568 Ghoul_Create
 python3 tools/docindex.py 08033568
 ```
 
-The resolver reads definitions, placeholders, aliases and the symbol table, so
-it answers for any address or name. `symbols/functions.csv` gives the name; the
-file is the function's own `.c` or the unit that contains it. The address
-`08033568` resolves to `src/ui/dialogue/scrolling_dialogue.c`. `Ghoul_Create`
-is a separate lookup by symbol.
+The address `08033568` resolves to `src/ui/dialogue/scrolling_dialogue.c`.
+`Ghoul_Create` is a separate lookup by symbol.
 
 ## Where a new file goes
 
@@ -197,10 +158,11 @@ is a separate lookup by symbol.
 
 `symbols/source_dirs.csv` and `symbols/header_dirs.csv` hold the reviewed
 placement rules. `symbols/source_files.csv` records prior paths, ROM bounds,
-and per-file Player placement. `source_dirs.csv` also assigns the ROM ranges
-that contain intentional assembly. Progress report regrouping leaves these
-tables alone. An uncovered ROM address or a legacy header with no unique owner
-reports which table to update.
+and each source file's placement rule. `source_dirs.csv` assigns ROM ranges
+for Player, Link Player, and intentional assembly. A recorded translation
+unit stays intact at range boundaries. Progress report regrouping leaves
+these tables alone. An uncovered ROM address or a legacy header with no
+unique owner reports which table to update.
 
 ### Replay on a worker branch
 

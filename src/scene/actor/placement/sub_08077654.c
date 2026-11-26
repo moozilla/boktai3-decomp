@@ -1,4 +1,4 @@
-#include "scene/actor/scene_actor_availability.h"
+#include "scene/motion/scene_actor_availability.h"
 #include "scene/actor/scene_actor_placement.h"
 
 u32 SceneActorPlacement_ConsumeCallbackFlag(struct RoomActor *argument)

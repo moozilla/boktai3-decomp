@@ -24,9 +24,9 @@ those units passed independent stock checks with the original complete extents.
 | `src/objects/pile_driver/sub_0805AE58.c` | 2 | `b967776fb` |
 | `src/scene/actor/registry/sub_080714E4.c` | 1 | `c0e5a4f91` |
 | `src/scene/actor/reaction/sub_08080868.c` | 1 | `098c7c036` |
-| `src/player/damage/sub_08142CC0.c` | 1 | `e0f2d1b01` |
-| `src/player/damage/sub_08142FC4.c` | 1 | `e077ab8b9` |
-| `src/player/movement/sub_0814B1F8.c` | 1 | `e7fe304db` |
+| `src/player/interaction/sub_08142CC0.c` | 1 | `e0f2d1b01` |
+| `src/player/interaction/sub_08142FC4.c` | 1 | `e077ab8b9` |
+| `src/player/attack/sub_0814B1F8.c` | 1 | `e7fe304db` |
 | `src/bosses/hresvelgr/sub_0819C29C.c` | 2 | `638f4df4d` |
 | `src/bosses/vanargand/sub_081A96E0.c` | 3 | `82d1bb19b` |
 | `src/bosses/vanargand/sub_081A9910.c` | 4 | `b5059a10e` |

@@ -1,7 +1,7 @@
 #ifndef GUARD_SCENE_INDICATOR_H
 #define GUARD_SCENE_INDICATOR_H
 
-#include "scene/actor/contact_collider.h"
+#include "scene/collision/contact_collider.h"
 #include "engine/engine.h"
 #include "player/player.h"
 #include "engine/video/sprite.h"

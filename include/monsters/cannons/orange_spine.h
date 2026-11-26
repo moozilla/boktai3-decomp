@@ -2,7 +2,7 @@
 #define GUARD_ORANGE_SPINE_H
 
 #include "engine/video/display_animation.h"
-#include "scene/actor/contact_collider.h"
+#include "scene/collision/contact_collider.h"
 #include "engine/math/scene_vec.h"
 #include "engine/task.h"
 

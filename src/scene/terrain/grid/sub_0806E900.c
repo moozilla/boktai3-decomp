@@ -1,5 +1,5 @@
 #include "global.h"
-#include "scene/actor/scene_actor_terrain.h"
+#include "scene/motion/scene_actor_terrain.h"
 #include "objects/scene_objects/scene_object.h"
 
 static inline u32 SceneGrid_IsCellStop(u8 *cell)

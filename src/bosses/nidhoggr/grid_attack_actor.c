@@ -1,6 +1,6 @@
 #include "engine/math/hit_spark_random.h"
 #include "bosses/nidhoggr/grid_attack_actor.h"
-#include "player/cues/player_cue_sequence.h"
+#include "player/cutscene/player_cue_sequence.h"
 #include "player/player.h"
 #include "player/player_slot_status.h"
 #include "script/demo_manager.h"

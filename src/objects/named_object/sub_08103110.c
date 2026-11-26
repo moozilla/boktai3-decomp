@@ -2,8 +2,8 @@
 #include "engine/engine.h"
 
 #include "objects/named_object/named_object.h"
-#include "player/cues/player_cue_sequence.h"
-#include "scene/actor/scene_actor_terrain.h"
+#include "player/cutscene/player_cue_sequence.h"
+#include "scene/motion/scene_actor_terrain.h"
 #include "scene/collision/scene_body_api.h"
 #include "player/player.h"
 #include "engine/ram.h"

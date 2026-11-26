@@ -1,7 +1,7 @@
 #ifndef GUARD_TIMED_EFFECT_H
 #define GUARD_TIMED_EFFECT_H
 
-#include "scene/actor/contact_swarm.h"
+#include "scene/collision/contact_swarm.h"
 #include "engine/task.h"
 
 struct TimedEffectConfig {

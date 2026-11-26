@@ -1,5 +1,5 @@
 #include "scene/actor/scene_actor_state.h"
-#include "scene/actor/scene_actor_route.h"
+#include "scene/motion/scene_actor_route.h"
 #include "script/script_utility.h"
 void SceneActorMovement_ResolveRoutePosition(struct ChaseActor *);
 extern const u8 gUnk_08610814[];

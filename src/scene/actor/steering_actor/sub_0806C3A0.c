@@ -1,9 +1,9 @@
 #include "global.h"
 
-#include "scene/actor/scene_steering_actor.h"
-#include "scene/actor/scene_actor_terrain.h"
-#include "player/cues/player_cue_sequence.h"
-#include "scene/actor/scene_actor_chase.h"
+#include "scene/motion/scene_steering_actor.h"
+#include "scene/motion/scene_actor_terrain.h"
+#include "player/cutscene/player_cue_sequence.h"
+#include "scene/motion/scene_actor_chase.h"
 
 // confidence=low: steers an actor toward its target, advances its frame sequence, and checks the terrain cell it moves into.
 s32 Mod(s32, s32);

@@ -2,7 +2,7 @@
 #include "objects/items/item_container.h"
 #include "engine/ram.h"
 #include "engine/video/display_sequence_inline.h"
-#include "player/cues/player_cue_sequence.h"
+#include "player/cutscene/player_cue_sequence.h"
 #include "player/player_slot_status.h"
 
 void ScaledShadow_Destroy(void *);

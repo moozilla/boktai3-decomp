@@ -4,7 +4,7 @@
 #include "scene/scene_animation.h"
 #include "scene/actor/scene_actor_components.h"
 #include "effects/projectiles/contact_swarm_sprite.h"
-#include "scene/actor/contact_collider.h"
+#include "scene/collision/contact_collider.h"
 #include "engine/video/display_sequence.h"
 #include "scene/terrain/terrain_cell_override.h"
 struct RegionActor {

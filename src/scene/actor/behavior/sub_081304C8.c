@@ -1,8 +1,8 @@
 #include "scene/actor/scene_actor_control_phase.h"
-#include "scene/actor/scene_actor_terrain_reaction.h"
+#include "scene/motion/scene_actor_terrain_reaction.h"
 #include "global.h"
 #include "scene/actor/scene_actor_reaction.h"
-#include "scene/actor/scene_actor_terrain.h"
+#include "scene/motion/scene_actor_terrain.h"
 // confidence=low: hides the drawable and moves the actor above the active field.
 static inline void SetFlags(struct ChaseActor *actor, u32 mask)
 {

@@ -3,7 +3,7 @@
 #include "engine/engine.h"
 #include "scene/actor/scene_actor_components.h"
 #include "effects/projectiles/contact_swarm_sprite.h"
-#include "scene/actor/contact_collider.h"
+#include "scene/collision/contact_collider.h"
 struct SpreadShot {
     struct SceneActorBody body;
     struct ContactSwarmSprite sprite;

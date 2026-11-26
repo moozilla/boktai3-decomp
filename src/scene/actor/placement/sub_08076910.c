@@ -1,6 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 /* One minimized r1 hint is in the shared terrain-height helper. */
-#include "scene/actor/scene_actor_terrain.h"
+#include "scene/motion/scene_actor_terrain.h"
 s32 SceneActorTerrain_GetNeighborCell(struct SceneActorTerrainView *actor, s32 direction)
 {
     struct ContactPosition center;

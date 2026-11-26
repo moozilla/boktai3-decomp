@@ -1,6 +1,6 @@
 #include "scene/actor/scene_event_dispatch.h"
-#include "scene/actor/scene_actor_terrain_reaction.h"
-#include "scene/actor/scene_actor_chase_reaction.h"
+#include "scene/motion/scene_actor_terrain_reaction.h"
+#include "scene/motion/scene_actor_chase_reaction.h"
 #include "scene/actor/scene_actor_status.h"
 struct ActorCommand {
     u8 unknown0[6];

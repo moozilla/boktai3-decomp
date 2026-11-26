@@ -1,5 +1,5 @@
 #include "effects/sprites/glyph_trail.h"
-#include "scene/actor/scene_facing.h"
+#include "scene/motion/scene_facing.h"
 #include "engine/engine.h"
 
 void TimedSprite_UpdateMotion(struct ActorGlyphTrail *);

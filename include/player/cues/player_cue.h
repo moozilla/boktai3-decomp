@@ -2,7 +2,7 @@
 #define GUARD_PLAYER_CUE_H
 
 #include "player/player.h"
-#include "scene/actor/contact_swarm.h"
+#include "scene/collision/contact_swarm.h"
 #include "engine/video/display_sequence.h"
 #include "script/script_utility.h"
 #include "scene/actor/scene_event_dispatch.h"

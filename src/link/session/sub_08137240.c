@@ -1,5 +1,5 @@
 #include "global.h"
-#include "scene/actor/scene_actor_terrain_reaction.h"
+#include "scene/motion/scene_actor_terrain_reaction.h"
 s32 Callback_InvokeActor(void *, void *);
 
 // confidence=low: scene actor state tick: clears the entry flag, runs the update callback and counts frames while it reports idle.

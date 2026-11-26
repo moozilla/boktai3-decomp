@@ -1,6 +1,6 @@
 #include "objects/hazards/falling_objects.h"
 #include "scene/terrain/terrain_collision.h"
-#include "player/cues/player_cue_sequence.h"
+#include "player/cutscene/player_cue_sequence.h"
 
 
 void FallingObjectManager_ClearGlobal(void)

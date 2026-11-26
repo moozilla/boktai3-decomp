@@ -2,7 +2,7 @@
 #include "engine/engine.h"
 #include "scene/actor/scene_actor_components.h"
 #include "scene/actor/scene_actor_registry.h"
-#include "scene/actor/scene_actor_terrain.h"
+#include "scene/motion/scene_actor_terrain.h"
 #include "scene/collision/scene_body_api.h"
 #include "scene/actor/actor_attachment_manager.h"
 

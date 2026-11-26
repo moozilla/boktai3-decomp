@@ -1,6 +1,6 @@
 #include "global.h"
 #include "scene/actor/scene_actor_reset.h"
-#include "scene/actor/scene_actor_chase.h"
+#include "scene/motion/scene_actor_chase.h"
 struct Group {
     u8 pad0[0x8d0];
     u16 flags;

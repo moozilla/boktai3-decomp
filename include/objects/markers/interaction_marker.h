@@ -1,6 +1,6 @@
 #ifndef GUARD_INTERACTION_MARKER_H
 #define GUARD_INTERACTION_MARKER_H
-#include "scene/actor/contact_swarm.h"
+#include "scene/collision/contact_swarm.h"
 #include "engine/input.h"
 #include "engine/task.h"
 #include "player/player.h"

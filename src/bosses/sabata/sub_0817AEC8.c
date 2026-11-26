@@ -1,5 +1,5 @@
 #include "global.h"
-#include "scene/actor/contact_actor.h"
+#include "scene/collision/contact_actor.h"
 #include "engine/math/monster_particle_random.h"
 struct SpriteEffectController;
 struct SpriteEffectController *SpriteEffectController_Create(const struct ContactPosition *,

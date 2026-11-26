@@ -3,7 +3,7 @@
 #include "ui/hud/scene_hud_map.h"
 #include "engine/video/display_animation.h"
 #include "ui/widgets/scene_input.h"
-#include "scene/actor/contact_actor.h"
+#include "scene/collision/contact_actor.h"
 #include "engine/math/scene_vec.h"
 #include "scene/scene_value_equipment.h"
 #include "effects/projectiles/contact_swarm_sprite.h"

@@ -438,7 +438,7 @@ exports.hitAt = function* (tx, tz, opts = {}) {
   return { done: done(), hits, lines };
 };
 
-// The weapon in hand (src/player/stats/sub_081401A0.c Player_RefreshActionEquipment): GameState+0x50
+// The weapon in hand (src/player/core/sub_081401A0.c Player_RefreshActionEquipment): GameState+0x50
 // is the selected slot of the equip list at +0x68 (0-7 swords, 8-15 the Gun Del Sol with a
 // frame); the gun's lens is lenses[slots88[4 + actionAuxiliarySlot]] (+0x828, +0x90, +0x54),
 // whose id is the element mode Player_GetAttackAttributeFlags maps to reaction flags.
@@ -465,7 +465,7 @@ exports.quickChange = function* (want) {
   return { done: false, ...exports.weapon() };
 };
 
-// Wait for energy in sunlight (src/scene/area_effect/sub_0804E618.c: the area effect adds gGameState->unk876,
+// Wait for energy in sunlight (src/scene/areas/sub_0804E618.c: the area effect adds gGameState->unk876,
 // the sun level, per frame; 120 make one energy). The light is the solar sensor (session
 // setSolar: 0 bright .. 255 dark), written into the ROM script as `lux` lines.
 exports.chargeEnergy = function* (need, opts = {}) {

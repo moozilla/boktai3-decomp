@@ -1,7 +1,7 @@
 #ifndef GUARD_SCENE_PROJECTILE_POOL_H
 #define GUARD_SCENE_PROJECTILE_POOL_H
 #include "engine/engine.h"
-#include "scene/actor/contact_swarm.h"
+#include "scene/collision/contact_swarm.h"
 #include "objects/sun_orb/sun_orb_effect.h"
 #include "effects/projectiles/scene_projectile_params.h"
 struct SceneParticleLaunchParams {

@@ -10,7 +10,7 @@
 #include "player/converging_effect_state.h"
 #include "engine/task.h"
 #include "ui/widgets/scene_input_widget.h"
-#include "scene/actor/contact_collider.h"
+#include "scene/collision/contact_collider.h"
 
 /* Body colliders use a fixed defense in both setup and hit resolution. */
 #define PLAYER_BODY_DEFENSE 0

@@ -1,5 +1,5 @@
-#include "scene/actor/scene_actor_chase_reaction.h"
-#include "scene/actor/scene_actor_availability.h"
+#include "scene/motion/scene_actor_chase_reaction.h"
+#include "scene/motion/scene_actor_availability.h"
 #include "scene/actor/scene_actor_reset.h"
 extern const s16 gUnk_086149C4[];
 void sub_080A9DB0(void *, s32, s32);

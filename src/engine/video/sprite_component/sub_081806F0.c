@@ -1,5 +1,5 @@
 #include "global.h"
-#include "scene/actor/contact_actor.h"
+#include "scene/collision/contact_actor.h"
 #include "player/player.h"
 struct ProximityVolume {
     u8 unknown0[8];

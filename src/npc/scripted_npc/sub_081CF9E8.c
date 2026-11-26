@@ -1,5 +1,5 @@
 #include "scene/terrain/terrain_cell_probe.h"
-#include "scene/actor/contact_actor.h"
+#include "scene/collision/contact_actor.h"
 // confidence=low: animation 13 rising phase that settles onto terrain height plus 160.
 struct Npc {
     u8 pad0[7];

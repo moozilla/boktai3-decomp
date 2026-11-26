@@ -1,5 +1,5 @@
 #include "global.h"
-#include "scene/actor/contact_collider.h"
+#include "scene/collision/contact_collider.h"
 struct ArmorContactOwner {
     u8 pad0[0xB18];
     u32 actorId;

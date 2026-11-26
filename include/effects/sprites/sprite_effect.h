@@ -2,7 +2,7 @@
 #define GUARD_SPRITE_EFFECT_H
 #include "engine/engine.h"
 #include "engine/math/scene_vec.h"
-#include "scene/actor/contact_collider.h"
+#include "scene/collision/contact_collider.h"
 #include "engine/math/hit_spark_random.h"
 /* Word copies and signed halfword motion share the same eight-byte vector. */
 union SpriteEffectVector {

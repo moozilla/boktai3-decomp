@@ -1,5 +1,5 @@
 #include "effects/sprites/transient_sprite_effects.h"
-#include "objects/orbit_motion.h"
+#include "objects/dungeon_prop/orbit_motion.h"
 s32 TransientSpriteEffects_Update(struct TransientSpriteEffects *pool)
 {
     s32 index = 0;

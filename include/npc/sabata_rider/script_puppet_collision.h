@@ -1,7 +1,7 @@
 #ifndef GUARD_REGISTRY_ACTOR_COLLISION_H
 #define GUARD_REGISTRY_ACTOR_COLLISION_H
 #include "npc/sabata_rider/script_puppet.h"
-#include "scene/actor/contact_actor.h"
+#include "scene/collision/contact_actor.h"
 #include "engine/input.h"
 struct RegistryCollisionMessage {
     u32 unknown0;

@@ -1,6 +1,6 @@
 #ifndef GUARD_PROJECTED_DISPLAY_H
 #define GUARD_PROJECTED_DISPLAY_H
-#include "scene/actor/contact_actor.h"
+#include "scene/collision/contact_actor.h"
 #include "ui/widgets/scene_input_widget.h"
 struct ProjectedDisplayResource {
     u32 words[8];

@@ -1,6 +1,6 @@
 #include "global.h"
 #include "link/lobby/record_menu.h"
-#include "scene/area_effect/area_effect_link.h"
+#include "scene/areas/area_effect_link.h"
 #include "engine/ram.h"
 s32 Script_SeekToKeyword(u32);
 u32 Script_GetTextSourcePc(void);

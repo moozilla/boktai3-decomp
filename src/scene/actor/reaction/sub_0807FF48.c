@@ -1,4 +1,4 @@
-#include "scene/actor/scene_actor_restoration.h"
+#include "scene/collision/scene_actor_restoration.h"
 void SceneActorReaction_RestoreAlternateAfterDelay(struct ChaseActor *actor, s32 frame)
 {
     struct ChaseActor *owner = actor;

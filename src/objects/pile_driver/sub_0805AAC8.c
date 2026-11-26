@@ -1,5 +1,5 @@
 #include "objects/pile_driver/scene_panel_rig.h"
-#include "player/cues/player_cue_sequence.h"
+#include "player/cutscene/player_cue_sequence.h"
 void ScenePanelRig_TickPrimarySprites(struct ScenePanelRig *, u32);
 void ScenePanelRig_TickSecondarySprites(struct ScenePanelRig *, u32);
 void ScenePanelRig_TickSprites(struct ScenePanelRig *rig, u32 palette)

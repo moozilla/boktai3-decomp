@@ -1,4 +1,4 @@
-#include "scene/actor/route_sprite_actor.h"
+#include "scene/motion/route_sprite_actor.h"
 /* RouteSpritePool_IsFull: Ensures the pool exists and returns true if creation fails or all four slots are occupied */
 #define RouteSpritePool_IsFull sub_0806E308
 #define RouteSpritePool_IsFull sub_0806E308

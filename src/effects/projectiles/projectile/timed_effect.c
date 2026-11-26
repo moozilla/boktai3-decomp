@@ -1,7 +1,7 @@
 #include "effects/projectiles/timed_effect.h"
 #include "player/player.h"
 #include "engine/engine.h"
-#include "scene/actor/scene_actor_terrain.h"
+#include "scene/motion/scene_actor_terrain.h"
 
 /* TimedEffect_OnContact.c */
 struct TimedEffectCollision {

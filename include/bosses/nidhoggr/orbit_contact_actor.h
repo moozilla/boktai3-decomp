@@ -1,6 +1,6 @@
 #ifndef GUARD_ORBIT_CONTACT_ACTOR_H
 #define GUARD_ORBIT_CONTACT_ACTOR_H
-#include "scene/actor/contact_swarm.h"
+#include "scene/collision/contact_swarm.h"
 /* Tentative identity: rotating resource-contact sprite, list-8 task size 0xC8. */
 struct OrbitContactActor {
     struct Task task;

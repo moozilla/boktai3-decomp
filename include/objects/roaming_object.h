@@ -1,6 +1,6 @@
 #ifndef GUARD_ROAMING_OBJECT_H
 #define GUARD_ROAMING_OBJECT_H
-#include "scene/actor/contact_swarm.h"
+#include "scene/collision/contact_swarm.h"
 #include "scene/actor/scene_actor_components.h"
 #include "scene/scene_animation.h"
 #include "effects/shadows/terrain_shadow.h"

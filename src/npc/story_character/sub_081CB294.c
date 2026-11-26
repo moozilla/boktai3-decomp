@@ -1,5 +1,5 @@
 #include "scene/terrain/terrain_cell_probe.h"
-#include "scene/actor/contact_position.h"
+#include "scene/collision/contact_position.h"
 
 extern const s16 gUnk_086149C4[];
 

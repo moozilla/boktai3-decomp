@@ -1,4 +1,4 @@
-#include "scene/actor/contact_position.h"
+#include "scene/collision/contact_position.h"
 #include "player/player.h"
 
 /* tentative: probes tiles beside the facing and picks a diagonal direction */

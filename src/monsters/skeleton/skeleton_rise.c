@@ -1,12 +1,12 @@
 #include "global.h"
 #include "player/player.h"
-#include "scene/actor/scene_actor_chase_reaction.h"
+#include "scene/motion/scene_actor_chase_reaction.h"
 #include "scene/actor/scene_actor_reaction.h"
 #include "scene/actor/scene_actor_control_phase.h"
-#include "scene/actor/scene_actor_terrain.h"
-#include "scene/actor/scene_actor_turn.h"
+#include "scene/motion/scene_actor_terrain.h"
+#include "scene/motion/scene_actor_turn.h"
 #include "monsters/scene_actor_init_primitives.h"
-#include "scene/actor/scene_actor_delayed_response.h"
+#include "scene/collision/scene_actor_delayed_response.h"
 
 void SceneActorReaction_PlayAnimationBUntilComplete(void);
 

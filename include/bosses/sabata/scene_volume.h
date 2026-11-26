@@ -4,7 +4,7 @@
 #include "engine/engine.h"
 #include "effects/projectiles/projectile_task.h"
 #include "player/player.h"
-#include "scene/actor/contact_collider.h"
+#include "scene/collision/contact_collider.h"
 #include "objects/pile_driver/scene_panel.h"
 
 /* Shared attack, pursuit, impact, and landing state. Behavior names are tentative. */

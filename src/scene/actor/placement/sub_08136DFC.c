@@ -1,4 +1,4 @@
-#include "scene/actor/scene_actor_chase_shared.h"
+#include "scene/motion/scene_actor_chase_shared.h"
 #include "npc/manager/scene_actor_animation.h"
 #include "ui/widgets/scene_input_widget.h"
 #include "global.h"

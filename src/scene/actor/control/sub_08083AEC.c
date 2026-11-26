@@ -1,6 +1,6 @@
 #include "scene/actor/scene_actor_control_phase.h"
 #include "global.h"
-#include "scene/actor/scene_actor_collision.h"
+#include "scene/collision/scene_actor_collision.h"
 struct Z {
     struct ContactPackedVector bits;
 };

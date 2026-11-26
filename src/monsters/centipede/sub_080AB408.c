@@ -1,6 +1,6 @@
 #include "global.h"
 #include "scene/actor/scene_actor_reset.h"
-#include "scene/actor/scene_actor_chase_shared.h"
+#include "scene/motion/scene_actor_chase_shared.h"
 s32 Div(s32, s32);
 s32 Mod(s32, s32);
 struct ActorTrail {

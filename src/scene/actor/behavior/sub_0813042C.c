@@ -1,4 +1,4 @@
-#include "scene/actor/scene_actor_chase_reaction.h"
+#include "scene/motion/scene_actor_chase_reaction.h"
 #include "global.h"
 #include "scene/actor/scene_actor_reaction.h"
 #include "debug.h"

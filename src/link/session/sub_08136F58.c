@@ -1,9 +1,9 @@
-#include "scene/actor/scene_actor_contact_entry.h"
+#include "scene/collision/scene_actor_contact_entry.h"
 #include "scene/actor/scene_actor_control_begin.h"
 #include "scene/actor/scene_actor_control_phase.h"
-#include "scene/actor/scene_actor_terrain_reaction.h"
+#include "scene/motion/scene_actor_terrain_reaction.h"
 #include "scene/actor/scene_actor_placement.h"
-#include "scene/actor/scene_actor_chase_shared.h"
+#include "scene/motion/scene_actor_chase_shared.h"
 #include "scene/actor/scene_actor_reset.h"
 s32 Callback_InvokeActor(void *, void *);
 void SceneActorAttachment_ReplaceResponseSlot(void *, u32, u32, u32);

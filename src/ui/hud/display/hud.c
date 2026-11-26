@@ -3,7 +3,7 @@
 #include "link/session/link_session_state.h"
 #include "engine/engine_pause.h"
 #include "engine/word_flags.h"
-#include "scene/actor/scene_actor_damage_visibility.h"
+#include "scene/collision/scene_actor_damage_visibility.h"
 
 extern u16 gUnk_03005178;
 

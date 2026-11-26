@@ -1,6 +1,6 @@
 #include "global.h"
 #include "objects/hazards/falling_objects.h"
-#include "player/cues/player_cue_sequence.h"
+#include "player/cutscene/player_cue_sequence.h"
 struct ColliderSpriteObject {
     u8 unknown0[2];
     u8 type, unknown3;

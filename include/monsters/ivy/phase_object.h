@@ -1,8 +1,8 @@
 #ifndef GUARD_PHASE_OBJECT_H
 #define GUARD_PHASE_OBJECT_H
 
-#include "scene/actor/contact_collider.h"
-#include "scene/actor/contact_position.h"
+#include "scene/collision/contact_collider.h"
+#include "scene/collision/contact_position.h"
 #include "global.h"
 
 struct PhaseTarget {

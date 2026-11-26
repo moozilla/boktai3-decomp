@@ -1,5 +1,5 @@
 #define gSineTable gUnk_086149C4
-#include "objects/orbit_motion.h"
+#include "objects/dungeon_prop/orbit_motion.h"
 /* Orbit_OffsetFromAngle: Writes a point on the horizontal circle around base + 0x20 at the given angle and radius */
 
 void Orbit_OffsetFromAngle(u8 *owner, struct OrbitVector *out, u8 angle, u16 radius)

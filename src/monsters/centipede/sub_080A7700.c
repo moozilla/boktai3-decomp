@@ -1,8 +1,8 @@
-#include "scene/actor/scene_actor_chase_reaction.h"
+#include "scene/motion/scene_actor_chase_reaction.h"
 #include "global.h"
 #include "scene/actor/scene_actor_reaction.h"
-#include "scene/actor/scene_actor_terrain.h"
-#include "scene/actor/scene_actor_chase.h"
+#include "scene/motion/scene_actor_terrain.h"
+#include "scene/motion/scene_actor_chase.h"
 
 extern const s16 gUnk_086149C4[];
 

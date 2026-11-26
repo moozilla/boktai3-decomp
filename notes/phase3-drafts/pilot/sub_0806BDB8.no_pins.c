@@ -1,5 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
-#include "scene/actor/scene_steering_actor.h"
+#include "scene/motion/scene_steering_actor.h"
 #include "engine/engine.h"
 #include "engine/ram.h"
 #include "engine/math/monster_particle_random.h"

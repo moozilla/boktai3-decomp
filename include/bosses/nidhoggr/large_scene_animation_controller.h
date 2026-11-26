@@ -3,7 +3,7 @@
 #include "global.h"
 #include "engine/engine.h"
 #include "engine/math/scene_vec.h"
-#include "scene/actor/contact_collider.h"
+#include "scene/collision/contact_collider.h"
 #include "ui/widgets/scene_input_widget.h"
 #include "scene/actor/scene_event_dispatch.h"
 

@@ -1,7 +1,7 @@
 #include "engine/math/monster_particle_random.h"
 #include "link/wireless/wireless_game_items_and_display.h"
 #include "engine/video/render.h"
-#include "effects/scene/bat_flock.h"
+#include "effects/bat_flock.h"
 
 void WirelessGame_AddItem(void *p, int index)
 {

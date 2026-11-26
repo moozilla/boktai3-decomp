@@ -4,8 +4,8 @@ void SceneActorAttachment_ReplaceResponseSlot(struct RoomActor *, u32, u32, u32)
 extern const u8 gUnk_0824E114[];
 void SceneActorReaction_ResetResponseState(void *, const void *, u32);
 void SceneActorControl_OnIdle(u8 *);
-#include "scene/actor/scene_actor_contact_list.h"
-#include "scene/actor/scene_actor_chase_shared.h"
+#include "scene/collision/scene_actor_contact_list.h"
+#include "scene/motion/scene_actor_chase_shared.h"
 struct SceneActorBehaviorPlayerSlot {
     u8 unknown0[8];
     u8 slot;

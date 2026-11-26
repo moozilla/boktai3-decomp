@@ -12,7 +12,7 @@ before a header ends up after it.
 
 Thirteen of the functions set chase selector macros before their includes, for
 example `#define SCENE_ACTOR_CHASE_WIDE_MAP_WIDTH 1` and then
-`#include "scene/actor/scene_actor_chase_reaction.h"`. That header picks between two bodies of
+`#include "scene/motion/scene_actor_chase_reaction.h"`. That header picks between two bodies of
 several shared inlines by these macros, and it is include-guarded. Inside a unit the
 selector stops working in two ways:
 
@@ -51,20 +51,20 @@ reproduce. That run had the chase header included earlier.
 | Function | Its selectors | Smallest content that breaks it | Doesn't break it |
 |---|---|---|---|
 | 08087018 | TYPED_GROUP | the next file's `#define SCENE_ACTOR_CHASE_WIDE_MAP_WIDTH 1` placed before it | Bat_RestoreSavedState and the rest of bat_restore.c before it |
-| 08087A70 | WIDE_MAP_WIDTH, FRACTION_ACCESSOR, DIRECT_SAVED_CONTROL | an earlier `#include "scene/actor/scene_actor_chase_reaction.h"` | everything in test 2 |
+| 08087A70 | WIDE_MAP_WIDTH, FRACTION_ACCESSOR, DIRECT_SAVED_CONTROL | an earlier `#include "scene/motion/scene_actor_chase_reaction.h"` | everything in test 2 |
 | 080ACBE0 | (`#define gSineTable gUnk_086149C4`) | merged with the next file 080ACCD4: the hoist moves its alias define below the headers (31 bytes differ) | its own content in its own order |
-| 080B2580 | JOIN_ROUTE_FAILURES | an earlier `#include "scene/actor/scene_actor_chase_reaction.h"` (vorn_main.c) | vorn_main.c's 46 function bodies |
-| 080CF3E4 | SCALAR_CELLS | an earlier `#include "scene/actor/scene_actor_chase_reaction.h"` (golem_main_2.c) | golem_main_2.c's bodies |
+| 080B2580 | JOIN_ROUTE_FAILURES | an earlier `#include "scene/motion/scene_actor_chase_reaction.h"` (vorn_main.c) | vorn_main.c's 46 function bodies |
+| 080CF3E4 | SCALAR_CELLS | an earlier `#include "scene/motion/scene_actor_chase_reaction.h"` (golem_main_2.c) | golem_main_2.c's bodies |
 | 080D2194 | SCALAR_CELLS | the merge hoisting the chase header above its define | mummy_entry.c before it |
 | 080D2584 | six selectors | the preceding file's `#define SCENE_ACTOR_CHASE_SCALAR_CELLS 1` | |
-| 080D5778 | SCALAR_CELLS, ROUTE_COUNT_ACCESSOR, DIRECT_SAVED_CONTROL | an earlier `#include "scene/actor/scene_actor_chase_reaction.h"` (mummy_defeat.c) | mummy_defeat.c's bodies |
-| 080D6608 | DIRECT_SAVED_CONTROL | an earlier `#include "scene/actor/scene_actor_chase_reaction.h"` (mummy_path.c, hoisted) | mummy_pursuit.c before it |
-| 080DA97C | TYPED_GROUP, WIDE_MAP_WIDTH, DIRECT_ROUTE_FIELDS | an earlier `#include "scene/actor/scene_actor_chase_reaction.h"` (mummy_path.c) | mummy_path.c's bodies |
+| 080D5778 | SCALAR_CELLS, ROUTE_COUNT_ACCESSOR, DIRECT_SAVED_CONTROL | an earlier `#include "scene/motion/scene_actor_chase_reaction.h"` (mummy_defeat.c) | mummy_defeat.c's bodies |
+| 080D6608 | DIRECT_SAVED_CONTROL | an earlier `#include "scene/motion/scene_actor_chase_reaction.h"` (mummy_path.c, hoisted) | mummy_pursuit.c before it |
+| 080DA97C | TYPED_GROUP, WIDE_MAP_WIDTH, DIRECT_ROUTE_FIELDS | an earlier `#include "scene/motion/scene_actor_chase_reaction.h"` (mummy_path.c) | mummy_path.c's bodies |
 | 080DC228 | DIRECT_SAVED_CONTROL | the preceding file's `#define SCENE_ACTOR_CHASE_WIDE_MAP_WIDTH 1` | |
 | 080E059C | none | nothing: it matches in the merge; the 88 differing bytes were in 080E0750 | |
 | 080E0750 | WIDE_MAP_WIDTH | merged with the next file 080E17D8: the hoist puts its define after `scene_actor_chase_reaction.h` (88 bytes differ) | 080E17D8's whole content appended after it |
-| 080E25FC | WIDE_MAP_WIDTH | an earlier `#include "scene/actor/scene_actor_chase_reaction.h"` (dog_scripted.c) | |
-| 080E4B34 | DIRECT_SAVED_CONTROL, SCALAR_CELLS | an earlier `#include "scene/actor/scene_actor_chase_reaction.h"` (dog_scripted.c) | |
+| 080E25FC | WIDE_MAP_WIDTH | an earlier `#include "scene/motion/scene_actor_chase_reaction.h"` (dog_scripted.c) | |
+| 080E4B34 | DIRECT_SAVED_CONTROL, SCALAR_CELLS | an earlier `#include "scene/motion/scene_actor_chase_reaction.h"` (dog_scripted.c) | |
 
 No case needed a preceding function body. The cases where a body looked necessary all
 came from placing a later function's body ahead of the one under test, which ROM order

@@ -7,7 +7,7 @@
 
 #include "engine/video/display_animation.h"
 #include "engine/math/scene_vec.h"
-#include "player/cues/player_cue_sequence.h"
+#include "player/cutscene/player_cue_sequence.h"
 void MotionTrack_Update(void *);
 struct SceneVec *Player_GetEffectivePosition(u32);
 void OrbitMotion_BeginDistanceWave(void *, const void *, const void *, u32, u32);

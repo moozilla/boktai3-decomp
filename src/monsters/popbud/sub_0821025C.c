@@ -1,4 +1,4 @@
-#include "scene/actor/contact_actor.h"
+#include "scene/collision/contact_actor.h"
 #include "monsters/popbud/pink_spine_playback.h"
 #include "engine/engine.h"
 #include "engine/math/monster_particle_random.h"

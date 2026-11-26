@@ -1,4 +1,4 @@
-#include "player/cues/player_cue_sequence.h"
+#include "player/cutscene/player_cue_sequence.h"
 struct TaskSequenceConfig {
     u16 flags, duration;
 };

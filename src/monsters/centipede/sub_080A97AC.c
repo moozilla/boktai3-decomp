@@ -1,6 +1,6 @@
 #include "monsters/chase_actor.h"
 #include "global.h"
-#include "scene/actor/scene_actor_chase_shared.h"
+#include "scene/motion/scene_actor_chase_shared.h"
 struct Pos080A97AC {
     u32 v[2];
 };

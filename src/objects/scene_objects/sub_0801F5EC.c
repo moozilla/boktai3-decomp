@@ -1,5 +1,5 @@
 #include "objects/scene_objects/scene_object_controller.h"
-#include "scene/actor/scene_actor_terrain.h"
+#include "scene/motion/scene_actor_terrain.h"
 void TerrainModifiers_RegisterCell(void *, u32, u32, u32, u32, u32);
 void SceneObject_UpdateIdleA(void);
 void SceneObject_UpdateIdleB(void);

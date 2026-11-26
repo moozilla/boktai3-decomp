@@ -46,18 +46,18 @@ No declarations or direct references to separate `02000584`, `02000588`, or
 
 | Lifecycle operation | Existing source evidence |
 |---|---|
-| Reset all slots | `Player_ResetLinkState` (`src/player/interaction/sub_08158C14.c`) clears four `gPlayers`, tracked-ID, and slot-status entries, then clears the player count and related state. |
-| Publish regular player | `Player_InitializeFromScript` (`src/player/target_registry/sub_0815F2C8.c`) initializes components, publishes the actor by its body-mode slot byte, and increments `gPlayerCount`. |
-| Remove regular player | `Player_Destroy` (`src/player/target_registry/sub_0815F224.c`) removes the actor's components, clears that slot, and decrements the count. |
-| Publish link player | `Player_OnCreate` (`src/player/core/sub_08243A50.c`) initializes the link-player components, publishes the actor, and increments the count. |
-| Remove link player | `Player_OnDestroy` (`src/player/core/sub_082439EC.c`) unregisters its components, clears the slot indexed by the word at actor `+0x18`, and decrements the count. |
+| Reset all slots | `Player_ResetLinkState` (`src/player/control/sub_08158C14.c`) clears four `gPlayers`, tracked-ID, and slot-status entries, then clears the player count and related state. |
+| Publish regular player | `Player_InitializeFromScript` (`src/player/core/sub_0815F2C8.c`) initializes components, publishes the actor by its body-mode slot byte, and increments `gPlayerCount`. |
+| Remove regular player | `Player_Destroy` (`src/player/core/sub_0815F224.c`) removes the actor's components, clears that slot, and decrements the count. |
+| Publish link player | `Player_OnCreate` (`src/link/player/sub_08243A50.c`) initializes the link-player components, publishes the actor, and increments the count. |
+| Remove link player | `Player_OnDestroy` (`src/link/player/sub_082439EC.c`) unregisters its components, clears the slot indexed by the word at actor `+0x18`, and decrements the count. |
 
 The apparent slot-offset disagreement is explained by the body initializer.
 `Player_InitSlotFromScript` in `src/player/appearance/player_visuals.c` and
-`LinkPlayer_ReadSlotFromScript` in `src/link/link_player/sub_0823AC78.c` store script option
+`LinkPlayer_ReadSlotFromScript` in `src/link/player/sub_0823AC78.c` store script option
 `i`, defaulting to zero, at actor `+0x18`. Both
-`Player_InitBodyFromScript` (`src/player/script/sub_0813FFE4.c`) and
-`KeyframeActor_InitBodyFromScript` (`src/player/appearance/keyframe_actor.c`) pass its low byte to
+`Player_InitBodyFromScript` (`src/player/core/sub_0813FFE4.c`) and
+`KeyframeActor_InitBodyFromScript` (`src/link/player/keyframe_actor.c`) pass its low byte to
 `SceneBody_Init`. That function (`src/scene/collision/body/sub_08225AB4.c`) stores the value at
 body `+8`, hence player `+0x2C`. The normal four-slot domain makes these indices
 consistent. The provisional Player field name `movementRequestBlocked` at

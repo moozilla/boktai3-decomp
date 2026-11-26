@@ -1,8 +1,8 @@
-#include "scene/actor/contact_swarm.h"
+#include "scene/collision/contact_swarm.h"
 // confidence=low: moves two sprite sequences left before destruction.
 #include "engine/math/scene_vec.h"
 #include "engine/ram.h"
-#include "player/cues/player_cue_sequence.h"
+#include "player/cutscene/player_cue_sequence.h"
 s32 SceneMover_StepPastScreenX(void *, s32, s32);
 extern const u16 gUnk_086141BC[];
 struct Drawable {

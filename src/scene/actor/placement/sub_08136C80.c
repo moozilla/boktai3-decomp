@@ -2,7 +2,7 @@
 #include "ui/widgets/scene_input_widget.h"
 #include "global.h"
 #include "scene/actor/scene_actor_placement.h"
-#include "scene/actor/scene_actor_chase_shared.h"
+#include "scene/motion/scene_actor_chase_shared.h"
 void ActorShadow_Disable(void *);
 static inline void ClearTile(struct SceneInputWidget *p, u32 mask)
 {

@@ -3,7 +3,7 @@
 #include "engine/video/render.h"
 #include "engine/ram.h"
 #include "engine/runtime.h"
-#include "scene/area_effect/area_effect_link.h"
+#include "scene/areas/area_effect_link.h"
 #include "engine/engine_pause_flags.h"
 
 struct Reg1745Run {

@@ -1,7 +1,7 @@
 #ifndef GUARD_SUN_ORB_EFFECT_H
 #define GUARD_SUN_ORB_EFFECT_H
 
-#include "scene/actor/contact_collider.h"
+#include "scene/collision/contact_collider.h"
 #include "engine/task.h"
 
 struct OrbitEffect;

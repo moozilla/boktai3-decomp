@@ -2,7 +2,7 @@
 #include "global.h"
 #include "scene/actor/actor_attachment_state.h"
 #include "effects/screen/background_controller.h"
-#include "player/cues/player_cue_sequence.h"
+#include "player/cutscene/player_cue_sequence.h"
 #include "engine/ram.h"
 #include "effects/particles/scene_debris.h"
 #include "engine/video/render.h"

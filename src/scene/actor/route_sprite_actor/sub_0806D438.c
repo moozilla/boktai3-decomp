@@ -1,6 +1,6 @@
 #include "global.h"
 
-#include "scene/actor/route_sprite_actor.h"
+#include "scene/motion/route_sprite_actor.h"
 #include "engine/engine.h"
 #include "engine/ram.h"
 #include "engine/math/monster_particle_random.h"

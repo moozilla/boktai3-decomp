@@ -1,4 +1,4 @@
-#include "scene/actor/scene_actor_terrain.h"
+#include "scene/motion/scene_actor_terrain.h"
 
 u8 SceneActorTerrain_CheckNeighborHeight(s32 direction, s32 cell, struct ContactPosition *position);
 u8 SceneTerrain_IsPathBlocked(struct ContactPosition *a, struct ContactPosition *b, s32 direction,

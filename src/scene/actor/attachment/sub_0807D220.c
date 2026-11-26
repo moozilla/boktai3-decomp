@@ -1,6 +1,6 @@
-#include "scene/actor/contact_actor.h"
+#include "scene/collision/contact_actor.h"
 #include "player/player.h"
-#include "scene/actor/scene_actor_contact_list.h"
+#include "scene/collision/scene_actor_contact_list.h"
 #include "engine/ram.h"
 struct RetargetActorView {
     u8 unknown0[0xDC];

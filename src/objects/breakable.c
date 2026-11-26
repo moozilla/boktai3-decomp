@@ -1,5 +1,5 @@
 #include "objects/breakable.h"
-#include "scene/actor/scene_actor_terrain.h"
+#include "scene/motion/scene_actor_terrain.h"
 /* Breakable_NullCallback: Empty no-op function used as a placeholder/gap callback entry. */
 
 struct PooledInteractable *Breakable_FindFreeSlot(struct PooledInteractableManager *manager)

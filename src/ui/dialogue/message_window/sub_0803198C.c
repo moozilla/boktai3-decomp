@@ -1,5 +1,5 @@
 #include "ui/dialogue/message_window.h"
-#include "player/cues/player_cue_sequence.h"
+#include "player/cutscene/player_cue_sequence.h"
 #include "ui/widgets/scene_input.h"
 
 void TextWindow_InitializeGraphics(void);

@@ -1,8 +1,8 @@
 #ifndef GUARD_SCENE_TRANSITION_H
 #define GUARD_SCENE_TRANSITION_H
 #include "engine/engine.h"
-#include "objects/orbit_motion.h"
-#include "scene/actor/contact_swarm.h"
+#include "objects/dungeon_prop/orbit_motion.h"
+#include "scene/collision/contact_swarm.h"
 struct ContactImpactEffect;
 struct SceneTransition {
     struct Task task;

@@ -3,11 +3,11 @@
 
 #include "engine/engine.h"
 #include "scene/collision/scene_body_api.h"
-#include "scene/actor/scene_facing.h"
+#include "scene/motion/scene_facing.h"
 #include "engine/video/display_animation.h"
 #include "player/player.h"
 #include "scene/actor/scene_actor_components.h"
-#include "scene/actor/contact_collider.h"
+#include "scene/collision/contact_collider.h"
 
 /* Common pooled actor; behavior-specific storage follows this header. */
 struct PooledActor {

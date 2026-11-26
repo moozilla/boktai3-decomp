@@ -1,7 +1,7 @@
 #ifndef GUARD_NAV_MESH_H
 #define GUARD_NAV_MESH_H
 
-#include "scene/actor/contact_position.h"
+#include "scene/collision/contact_position.h"
 
 struct NavMeshResource {
     u16 count, unknown2;

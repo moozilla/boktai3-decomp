@@ -1,5 +1,5 @@
 #include "objects/tile_trigger.h"
-#include "scene/actor/scene_actor_chase.h"
+#include "scene/motion/scene_actor_chase.h"
 #include "engine/ram.h"
 #include "effects/particles/proximity_emitter.h"
 #include "engine/engine.h"

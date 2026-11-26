@@ -2,9 +2,9 @@
 #define GUARD_SCENE_PANEL_H
 #include "engine/engine.h"
 #include "effects/screen/background_controller.h"
-#include "scene/actor/contact_actor.h"
+#include "scene/collision/contact_actor.h"
 #include "objects/scene_objects/scene_object.h"
-#include "scene/actor/contact_swarm.h"
+#include "scene/collision/contact_swarm.h"
 #include "engine/video/render.h"
 struct ScenePanel;
 struct ScenePanelInteractionPlayer;

@@ -1,5 +1,5 @@
 #include "global.h"
-#include "scene/actor/scene_facing.h"
+#include "scene/motion/scene_facing.h"
 #include "engine/engine_globals.h"
 
 struct Vec {

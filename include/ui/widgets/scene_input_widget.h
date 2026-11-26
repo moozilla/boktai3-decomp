@@ -1,7 +1,7 @@
 #ifndef GUARD_SCENE_INPUT_WIDGET_H
 #define GUARD_SCENE_INPUT_WIDGET_H
 
-#include "scene/actor/contact_position.h"
+#include "scene/collision/contact_position.h"
 
 struct SceneWidgetPlayback {
     u8 priority, mode;

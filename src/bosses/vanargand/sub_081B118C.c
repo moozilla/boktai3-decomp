@@ -4,7 +4,7 @@
 #include "scene/actor/scene_actor_control_motion.h"
 #include "npc/manager/scene_actor_animation.h"
 #include "player/player.h"
-#include "player/cues/player_cue_sequence.h"
+#include "player/cutscene/player_cue_sequence.h"
 // confidence=low: positions player before setting release phase
 void Player_ApplyPositionRequest(void *, void *, u32, u32, u32, u32, u32, u32);
 void ActorStatus_BeginPlayerRelease(struct VanargandAttackPair *owner, struct PairedSceneHalf *s)

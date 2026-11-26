@@ -5,13 +5,13 @@
 #include "player/player.h"
 #include "engine/ram.h"
 #include "scene/actor/scene_actor_part_burst.h"
-#include "scene/actor/scene_actor_chase_reaction.h"
+#include "scene/motion/scene_actor_chase_reaction.h"
 #include "global.h"
 #include "scene/actor/scene_actor_control_phase.h"
 #include "scene/actor/scene_actor_reaction.h"
-#include "scene/actor/scene_actor_delayed_response.h"
-#include "scene/actor/scene_actor_contact_response.h"
-#include "scene/actor/scene_actor_turn.h"
+#include "scene/collision/scene_actor_delayed_response.h"
+#include "scene/collision/scene_actor_contact_response.h"
+#include "scene/motion/scene_actor_turn.h"
 
 void SceneActorReaction_PlayAnimationBUntilComplete(void);
 
