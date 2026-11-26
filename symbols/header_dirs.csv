@@ -62,6 +62,7 @@ include/actors/spinning_approach_motion/spinning_approach.h,include/monsters/arm
 include/actors/task_4_e01/contact_swarm_sprite.h,include/effects/projectiles/contact_swarm_sprite.h,beside its unit,,
 include/actors/task_4_e01/task4e01_projectile.h,include/effects/projectiles/projectile_task.h,beside its unit; renamed from task4e01_projectile.h,,
 include/bosses/hresvelgr/boss_action_state.h,include/bosses/hresvelgr/boss_action_state.h,beside its unit,,
+include/bosses/hresvelgr/hresvelgr_shot.h,include/bosses/hresvelgr/hresvelgr_shot.h,beside its unit,,
 include/bosses/hresvelgr/hresvelgr_travel.h,include/bosses/hresvelgr/hresvelgr_travel.h,beside its unit,,
 include/bosses/nidhoggr/scene_panel_effect_pool.h,include/bosses/nidhoggr/nidhoggr_effect_pool.h,renamed,,include/bosses/nidhoggr/scene_panel_effect_pool.h
 include/bosses/nidhoggr/scene_pause.h,include/bosses/nidhoggr/scene_pause.h,beside its unit,,
