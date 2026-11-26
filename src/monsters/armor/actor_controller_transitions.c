@@ -93,13 +93,7 @@ void ActorController_UpdateAttackCollider(struct SceneCombatActor *actor)
             if (actor->animationComplete != 0) {
                 *phase = 0xFF;
                 actor->actionReady = initialPhase;
-                {
-                    u16 *flags = &actor->colliderGroup.colliders[0].flags;
-                    u32 oldFlags = *flags;
-                    u32 activeFlag = 4;
-                    activeFlag |= oldFlags;
-                    *flags = activeFlag;
-                }
+                actor->colliderGroup.colliders[0].flags |= 4;
             }
             break;
     }
