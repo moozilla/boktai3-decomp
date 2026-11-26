@@ -1738,7 +1738,7 @@ void Skeleton_SelectRandomBehavior(u8 *owner)
 
 void SceneActorScript_ReadCallScriptConfig(struct ChaseActor *actor)
 {
-    struct SceneActorScriptPropertiesView *context = actor->base.context;
+    struct Skeleton *context = actor->base.context;
     s32 found = Script_SeekToKeyword('x');
     s32 a;
     s32 b;
@@ -1748,18 +1748,18 @@ void SceneActorScript_ReadCallScriptConfig(struct ChaseActor *actor)
             a = Script_GetValue();
         else
             a = 0;
-        context->scriptId6CC = a;
+        context->callScriptId = a;
 
         if (Script_GetPc())
             b = Script_GetValue();
         else
             b = 0;
-        context->callLimit6CE = b;
-        context->callCount6CF = 0;
+        context->callLimit = b;
+        context->callCount = 0;
     } else {
-        context->scriptId6CC = found;
-        context->callLimit6CE = found;
-        context->callCount6CF = 0;
+        context->callScriptId = 0;
+        context->callLimit = 0;
+        context->callCount = 0;
     }
 }
 
@@ -1876,27 +1876,20 @@ s32 SceneActorReaction_TickHiddenResponse(struct ChaseActor *actor)
     return 1;
 }
 
-struct SkeletonActionFlagsActor {
-    u8 f[0x2d4];
-    u16 fl;
-    u8 g[0x6dc - 0x2d6];
-    u32 v;
-};
-
 void Skeleton_UpdateFacingColliders(struct ChaseActor *p);
 
 void Skeleton_UpdateActionCooldown(struct ChaseActor *);
 
-s32 Skeleton_UpdateActionFlags(struct SkeletonActionFlagsActor *p)
+s32 Skeleton_UpdateActionFlags(struct Skeleton *p)
 {
     u32 m;
     u16 *q;
-    Skeleton_UpdateFacingColliders(p);
-    Skeleton_UpdateActionCooldown((struct ChaseActor *)p);
+    Skeleton_UpdateFacingColliders(&p->chase);
+    Skeleton_UpdateActionCooldown(&p->chase);
     m = 0x200;
-    q = &p->fl;
+    q = &p->chase.base.motionFlags;
     if ((*q & m) == 0) {
-        u32 *vp = &p->v;
+        u32 *vp = &p->actionFlags;
         u32 k = 0xFFFFDFFF;
         *vp = *vp & k;
     }
@@ -1926,12 +1919,12 @@ void Skeleton_OnAttackCollision(u8 *unused, u8 *obj, u8 *ctx)
     int mask;
     u32 *flags;
     u8 *base = ctx;
-    u32 *state = *(u32 **)(ctx + 0x3D0);
+    struct Skeleton *context = ((struct ChaseActor *)ctx)->base.context;
     if (Unavailable_OnAttackCollision(ctx))
         return;
     {
         u32 bit = 0x10;
-        u32 *sp = (u32 *)((u8 *)state + 0x6DC);
+        u32 *sp = &context->actionFlags;
         u32 *held;
         u32 v;
         v = *sp & bit;
@@ -3535,19 +3528,6 @@ static inline void ClearRoute(struct ChaseActor *a, struct SceneActorRegistryCon
     route->timer = 0;
 }
 
-static inline void Show_SinkThenDefeat(struct ChaseActor *a)
-{
-    if (!a->base.drawableKind) {
-        u32 *flags = a->base.drawable;
-        u32 mask = ~1;
-        *flags &= mask;
-    } else {
-        struct AnimSprite *tile = (void *)((u8 *)a->base.drawable + 0x20);
-        u32 mask = ~1;
-        tile->flags &= mask;
-    }
-}
-
 void SceneActorReaction_SinkThenDefeat(struct ChaseActor *actor, s32 frame)
 {
     u32 state;
@@ -3565,7 +3545,7 @@ void SceneActorReaction_SinkThenDefeat(struct ChaseActor *actor, s32 frame)
             mask |= flags;
             *destination = mask;
         }
-        Show_SinkThenDefeat(actor);
+        ActorStatus_ClearDrawableFlags(actor, 1);
         {
             u32 zero;
             u8 *first;
