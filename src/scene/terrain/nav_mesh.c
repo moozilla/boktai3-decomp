@@ -294,13 +294,13 @@ u32 NavMesh_FindRoute(void *route, void *origin, void *destination)
     return 0;
 }
 
-int Terrain_ApplyBlocked(u16 *out, void *arg, struct ContactPosition *pos)
+int Terrain_ApplyBlocked(struct NavMeshRoute *route, void *origin, struct ContactPosition *pos)
 {
     s32 x = (s16)pos->x >> 8;
     s32 z = (s16)pos->z >> 8;
     s32 cell;
     u8 *props;
-    u32 mask, flags;
+    u32 flags;
     if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
         cell = 0;
     else
@@ -314,13 +314,11 @@ int Terrain_ApplyBlocked(u16 *out, void *arg, struct ContactPosition *pos)
         props = map->cells + offset;
     }
     flags = *(u16 *)(props + 2);
-    mask = 2;
-    if (flags & mask) {
-        int z = 0;
-        *out = z;
-        return z;
+    if (flags & 2) {
+        route->status = 0;
+        return 0;
     }
-    return NavMesh_FindRoute(out, arg, pos);
+    return NavMesh_FindRoute(route, origin, pos);
 }
 
 /* NavMesh_ClearProbeFlags: Clears the navigation probe's flag word */
