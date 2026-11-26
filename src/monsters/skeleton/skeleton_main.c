@@ -527,38 +527,43 @@ void Skeleton_OnContactEvent(u8 *unused, u8 *obj, u8 *ctx);
 void SceneActorControl_InitBehaviorColliders(struct ChaseActor *actor)
 {
     struct Skeleton *context = actor->base.context;
-    union SceneActorRegistryPackedPosition bodySize, bodyOffset;
-    union SceneActorRegistryPackedPosition innerSize, innerOffset;
-    union SceneActorRegistryPackedPosition attackSize, attackOffset;
-    union SceneActorRegistryPackedPosition extraSize, extraOffset;
-    bodySize.packed.x = 0x80;
-    bodySize.packed.y = 0x80;
-    bodySize.packed.z = 0x80;
-    *(u32 *)&bodyOffset = 0x800000;
-    *(u32 *)((u8 *)&bodyOffset + 4) &= 0xFFFF0000;
+    struct ContactPosition bodySize, bodyOffset;
+    struct ContactPosition innerSize, innerOffset;
+    struct ContactPosition attackSize, attackOffset;
+    struct ContactPosition extraSize, extraOffset;
+    bodySize.x = 0x80;
+    bodySize.y = 0x80;
+    bodySize.z = 0x80;
+    bodyOffset.x = 0;
+    bodyOffset.y = 128;
+    bodyOffset.z = 0;
     {
         u32 flags = 0x410B;
         SceneActorCollision_InitExternalBody(actor, &context->bodyCollider, &bodySize,
                                              &bodyOffset, SceneActorReaction_TryStartContact, actor,
                                              flags);
     }
-    innerSize.packed.x = 0x80;
-    innerSize.packed.y = 0x80;
-    innerSize.packed.z = 0x80;
-    *(u32 *)&innerOffset = 0x800000;
-    *(u32 *)((u8 *)&innerOffset + 4) &= 0xFFFF0000;
+    innerSize.x = 0x80;
+    innerSize.y = 0x80;
+    innerSize.z = 0x80;
+    innerOffset.x = 0;
+    innerOffset.y = 128;
+    innerOffset.z = 0;
     SceneActorCollision_InitBody(actor, &innerSize, &innerOffset, SceneActor_TryForward, actor);
-    attackSize.packed.x = 0x40;
-    attackSize.packed.y = 0x64;
-    attackSize.packed.z = 0x40;
-    *(u32 *)&attackOffset = 0x800000;
-    *(u32 *)((u8 *)&attackOffset + 4) &= 0xFFFF0000;
+    attackSize.x = 0x40;
+    attackSize.y = 0x64;
+    attackSize.z = 0x40;
+    attackOffset.x = 0;
+    attackOffset.y = 128;
+    attackOffset.z = 0;
     SceneActorCollision_InitAttack(actor, &attackSize, &attackOffset, Skeleton_OnAttackCollision, 0,
                                    actor);
-    *(u32 *)&extraSize = 0x640000;
-    *(u32 *)((u8 *)&extraSize + 4) &= 0xFFFF0000;
-    *(u32 *)&extraOffset = 0x800000;
-    *(u32 *)((u8 *)&extraOffset + 4) &= 0xFFFF0000;
+    extraSize.x = 0;
+    extraSize.y = 100;
+    extraSize.z = 0;
+    extraOffset.x = 0;
+    extraOffset.y = 128;
+    extraOffset.z = 0;
     SceneActorCollision_InitExternalAttack(actor, &context->attackCollider, &extraSize,
                                            &extraOffset, Skeleton_OnContactEvent, 1, actor);
 }
