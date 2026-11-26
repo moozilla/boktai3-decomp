@@ -4,11 +4,16 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { parseArgs } from 'node:util';
+import { setFlagsFromString } from 'node:v8';
 import { openSession } from '../../port/agent/session.mjs';
 import { root, clock, lux, holdTicks, runRom } from './lib/rom.mjs';
 
+// A wasm fault must reach the catch below so we can replay its input prefix.
+// On this host Node's signal-based bounds checks can exit with SIGBUS instead.
+setFlagsFromString('--wasm-enforce-bounds-checks');
+
 const { values: opts } = parseArgs({ options: {
-  save: { type: 'string' }, out: { type: 'string' },
+  save: { type: 'string' }, out: { type: 'string' }, scene: { type: 'string' },
   frames: { type: 'string', default: '2800' }, seed: { type: 'string', default: '1' },
   mode: { type: 'string', default: 'fuzz' }, from: { type: 'string' }, wasm: { type: 'string' },
 }});
@@ -37,6 +42,7 @@ const auditNames = mode === 'fuzz' && fs.existsSync(auditPath)
   : [];
 let firstCheck = replay?.firstCheck ?? 0;
 let fault = null;
+let faultAt = null;
 let tick, regions;
 const s = await openSession({
   save, lib: ['port/agent/lib', 'tools/autopilot/lib'].map((p) => path.join(root, p)),
@@ -71,6 +77,8 @@ try {
     const start = yield* g.lib.continueSave();
     firstCheck = reads.length;
     console.log(JSON.stringify({ start, firstCheck }));
+    if (opts.scene !== undefined && start.scene !== Number(opts.scene))
+      throw new Error(`Checkpoint loaded scene ${start.scene}, expected ${opts.scene}`);
     if (mode === 'reset') {
       yield g.press('a+b+select+start', 2);
       const continued = yield* g.lib.continueSave();
@@ -92,6 +100,7 @@ try {
   });
 } catch (error) {
   fault = String(error?.stack || error);
+  faultAt = { tick: reads.length, frame: s.frame };
 }
 const movie = replay?.movie || s.movie;
 const run = { save: save ? path.relative(root, path.resolve(save)) : null, movie, readFrames, firstCheck, seed: Number(opts.seed),
@@ -116,8 +125,8 @@ try {
   const partial = fs.existsSync(romSamples) && compare(fs.readFileSync(romSamples), samples, regions, readFrames);
   difference = { ...partial, error: String(error) };
 }
-const result = { save: run.save, ticks: reads.length, frames: movie.length, firstCheck, boots,
-  equipmentDetails, missingReturns: [...missingReturns].sort(), difference, fault };
+const result = { save: run.save, seed: run.seed, ticks: reads.length, frames: movie.length, firstCheck, boots,
+  equipmentDetails, missingReturns: [...missingReturns].sort(), difference, fault, faultAt };
 fs.writeFileSync(path.join(out, 'result.json'), JSON.stringify(result, null, 2) + '\n');
 console.log(`${difference || fault ? 'DIFFER' : 'MATCH'} ${JSON.stringify(result)}`);
 process.exitCode = difference || fault ? 1 : 0;
