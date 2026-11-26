@@ -1,13 +1,6 @@
 #ifndef GUARD_SCENE_ACTOR_PALETTE_H
 #define GUARD_SCENE_ACTOR_PALETTE_H
 #include "scene/actor/scene_actor_registry.h"
-/* Registry categories 10 and 23 have independent 32-step RGB15 transitions. */
-struct SceneActorPaletteTransition {
-    u16 colors[16];
-    u16 remaining, destinationBank;
-    s16 red[16], green[16], blue[16];
-    s8 deltaRed[16], deltaGreen[16], deltaBlue[16];
-};
 struct SceneActorPaletteManagerView {
     u8 unknown0[0x2C];
     u32 flags;
