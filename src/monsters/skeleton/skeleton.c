@@ -4,6 +4,7 @@
 #include "scene/collision/scene_actor_contact_response.h"
 #include "scene/motion/scene_actor_chase_shared.h"
 #include "engine/word_flags.h"
+#include "engine/engine_pause.h"
 
 /* Resolve contact flags, animation, and pursuit routing. The normal chase
  * continuation returns zero even after installing its control. */
@@ -263,7 +264,7 @@ s32 Skeleton_UpdateBehaviorCallbacks(struct ChaseActor *actor)
 {
     struct Skeleton *state = (void *)actor;
     struct SceneActorRegistryControlGroup *block = &state->chase.group.common;
-    if (SceneActorBehavior_GlobalPauseBits(0x400))
+    if (Engine_PauseBits(0x400))
         return 0;
     if (test(4, gUnk_02000560))
         return 0;
