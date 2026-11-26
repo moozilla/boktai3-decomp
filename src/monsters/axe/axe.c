@@ -2146,7 +2146,7 @@ void Axe_EmitMotionTrail(struct ChaseActor *actor)
     u8 *slotBase;
     void *scaleDrawable;
     u8 *scaleSlotBase;
-    if ((*((u32 *)actor->base.drawable)) & 1)
+    if (((struct SceneActorControlMotionDrawable *)actor->base.drawable)->flags & 1)
         return;
     {
         s32 zero = Mod(actor->base.frameCounter, trail->trailSpacing);
@@ -2157,12 +2157,10 @@ void Axe_EmitMotionTrail(struct ChaseActor *actor)
             struct DisplaySequenceState *source = &drawable->sequence;
             u16 sequence = source->sequenceId;
             {
-                u32 offset = trail->nextTrail * sizeof(struct AxeTrailSlot);
-                u8 *destination = context + (offset + 0x708);
-                u8 *sequenceState = destination + 0x48;
+                struct DisplaySequenceState *state = &trail->trail[trail->nextTrail].sequence;
                 const void *commands = trail->trail[trail->nextTrail].resource;
                 u8 speed = trail->variant;
-                Anim_SetSequence((void *)sequenceState, (void *)commands, sequence, speed, zero);
+                Anim_SetSequence(state, (void *)commands, sequence, speed, zero);
             }
         }
     }
