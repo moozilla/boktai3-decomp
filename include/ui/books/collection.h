@@ -7,9 +7,9 @@ struct CollectionMenu {
     struct Task task;
     void *backgroundMap;
     u32 unknown1C, unknown20;
-    struct SceneInputResource resource;
-    struct SceneInputWidget background, cursor, completionBadge, pageIndicator;
-    struct SceneInputWidget countDigits[4];
+    struct AnimSpriteResource resource;
+    struct AnimSprite background, cursor, completionBadge, pageIndicator;
+    struct AnimSprite countDigits[4];
     u16 cursorColors[16];
     s16 pulseFrame;
     u16 unknown366;

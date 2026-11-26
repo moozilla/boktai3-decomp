@@ -12,7 +12,7 @@ int sub_0803198C(void *arg0, void *arg1)
     struct MessageWindow *p = arg0;
     struct MessagePlaybackState *st;
     u32 buf[2];
-    struct SceneInputResource *proc;
+    struct AnimSpriteResource *proc;
     s32 palette;
     u32 bufferMask;
     void **fnSlot;

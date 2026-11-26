@@ -17,7 +17,7 @@ s32 Player_BeginInterpolatedMovement(struct Player *p, struct SceneVec *destinat
     p->movementDestination = *destination;
     p->movementDuration = duration;
     p->movementStart = p->position;
-    SceneInputWidget_Show(&p->animation);
+    AnimSprite_Show(&p->animation);
     Player_SetAnimation(p, ActorVariant_GetTableValue(p->actionMode, 0x31), 0x40, 1);
     p->actionEighteenParameter = 500;
     p->movementRequestScale = 0x40;

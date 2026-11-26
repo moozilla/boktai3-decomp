@@ -170,7 +170,7 @@ mask copy/register lifetime. No private replacement volatile type was added.
 
 For actor animation, `Anim_Step` (`08220F70`) writes the status byte at
 animation offset `0x1D`, corresponding to controller offset `0xD1`. The
-existing `SceneInputWidget` view exposes this byte. Ordinary access folds the
+existing `AnimSprite` view exposes this byte. Ordinary access folds the
 mask test into the loaded register and drops the ROM's separate copy. The
 tested single regmove prohibition did not recover it; no new constant local
 or packed union was substituted.

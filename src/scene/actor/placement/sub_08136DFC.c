@@ -1,9 +1,9 @@
 #include "scene/motion/scene_actor_chase_shared.h"
 #include "npc/manager/scene_actor_animation.h"
-#include "ui/widgets/scene_input_widget.h"
+#include "engine/video/anim_sprite.h"
 #include "global.h"
 #include "scene/actor/scene_actor_placement.h"
-static inline void ClearTile(struct SceneInputWidget *p, u32 mask)
+static inline void ClearTile(struct AnimSprite *p, u32 mask)
 {
     p->flags &= mask;
 }
@@ -29,7 +29,7 @@ void SceneActorPlacement_ShowActor(struct RoomActor *s)
                 u32 *p = s->drawable;
                 SceneActorChase_AndWordFlags(p, ~1);
             } else {
-                struct SceneInputWidget *p =
+                struct AnimSprite *p =
                     &((struct SceneActorAnimationTileDrawable *)s->drawable)->tile;
                 ClearTile(p, ~1);
             }

@@ -16,17 +16,17 @@ s32 PauseMenu_GetSelectedListEntryType(void *);
 
 static inline void PauseMenu_ShowWidget(u8 *p)
 {
-    ((struct SceneInputWidget *)p)->flags &= ~1;
+    ((struct AnimSprite *)p)->flags &= ~1;
 }
 
 static inline void PauseMenu_HideWidgetWithMask(u8 *p, u32 bit)
 {
-    ((struct SceneInputWidget *)p)->flags |= bit;
+    ((struct AnimSprite *)p)->flags |= bit;
 }
 
 static inline void PauseMenu_HideWidget(u8 *p)
 {
-    ((struct SceneInputWidget *)p)->flags |= 1;
+    ((struct AnimSprite *)p)->flags |= 1;
 }
 
 void sub_08168214(struct SceneHudState *p)
@@ -37,7 +37,7 @@ void sub_08168214(struct SceneHudState *p)
     s32 n;
     u32 one;
     u8 *row;
-    struct SceneInputWidget *third;
+    struct AnimSprite *third;
     if ((((u8)(p->actionOwner->actionMode - 1)) > 1) || (gEngineFlags & 0x1000))
         wide = 1;
     for (i = 0, one = 1, row = (u8 *)p, third = p->tertiaryWidgets; i < 3; i++) {

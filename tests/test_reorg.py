@@ -121,6 +121,21 @@ class ReorgTests(unittest.TestCase):
             self.assertEqual(reorg.function_renames(table, prefixes=True, apply=True), 0)
             self.assertIn("void Npc_Two(void) { Player_One(); }", (root / "src/npc/two.c").read_text())
 
+    def test_type_renames_keep_related_identifiers_and_the_input_table_intact(self):
+        path = "include/engine/video/sprite.h"
+        table_path = "symbols/type_renames.csv"
+        files = {
+            path: "struct OldSprite;\nstruct OldSpriteState;\nvoid OldSprite_Draw(struct OldSprite *p);\n",
+            table_path: "old_name,new_name\nOldSprite,NewSprite\nOldSprite_Draw,NewSprite_Draw\n",
+        }
+        with fixture(files) as root:
+            table = root / table_path
+            self.assertEqual(reorg.type_renames(table, apply=True), 1)
+            self.assertEqual(reorg.type_renames(table), 0)
+            self.assertEqual((root / table_path).read_text(), files[table_path])
+            self.assertEqual((root / path).read_text(),
+                             "struct NewSprite;\nstruct OldSpriteState;\nvoid NewSprite_Draw(struct NewSprite *p);\n")
+
     def test_player_file_routes_update_placement_and_replay(self):
         old = "src/player/core/sub_08001000.c"
         new = "src/link/player/sub_08001000.c"

@@ -65,23 +65,23 @@ void WorldMap_SetUpdate(struct RegistrySelectionMenu *menu,
 void WorldMap_ShowIndicators(struct RegistrySelectionMenu *menu)
 {
     menu->animations[1].flags &= ~1;
-    SceneInputWidget_Show(&menu->animations[2]);
-    SceneInputWidget_Show(&menu->animations[3]);
-    SceneInputWidget_Show(&menu->animations[4]);
-    SceneInputWidget_Show(&menu->animations[5]);
-    SceneInputWidget_Show(&menu->animations[8]);
+    AnimSprite_Show(&menu->animations[2]);
+    AnimSprite_Show(&menu->animations[3]);
+    AnimSprite_Show(&menu->animations[4]);
+    AnimSprite_Show(&menu->animations[5]);
+    AnimSprite_Show(&menu->animations[8]);
     menu->animations[0].flags &= ~1;
-    SceneInputWidget_Show(&menu->animations[10]);
-    SceneInputWidget_Show(&menu->animations[9]);
-    SceneInputWidget_Show(&menu->animations[11]);
+    AnimSprite_Show(&menu->animations[10]);
+    AnimSprite_Show(&menu->animations[9]);
+    AnimSprite_Show(&menu->animations[11]);
 }
 
 void WorldMap_UpdateIndicators(struct RegistrySelectionMenu *menu)
 {
     u32 available = menu->availableEntries;
-    struct SceneInputResource *resource = &menu->resource;
-    struct SceneInputWidget *widgets = menu->animations;
-    struct SceneInputWidget *widget;
+    struct AnimSpriteResource *resource = &menu->resource;
+    struct AnimSprite *widgets = menu->animations;
+    struct AnimSprite *widget;
     struct MenuCursorEntry *entry;
     if (available & 2)
         Anim_LoadKeyframe(widgets + 1, resource, 14, 0);
@@ -274,9 +274,9 @@ void WorldMap_OnUnusedTransition(void)
 
 void WorldMap_InitializeAnimations(struct RegistrySelectionMenu *menu)
 {
-    struct SceneInputResource *resource = ScriptProc_Start(0xcb05, 0xa2db);
+    struct AnimSpriteResource *resource = ScriptProc_Start(0xcb05, 0xa2db);
     if (resource) {
-        struct SceneInputWidget *anim;
+        struct AnimSprite *anim;
         void *palette;
         s32 count;
         u32 zero;
@@ -364,8 +364,8 @@ void WorldMap_StartTimedEffect(struct RegistrySelectionMenu *menu, s32 shift, s3
     menu->mode = mode;
     menu->inputDisabled = one = 1;
     MenuCursor_Hide(menu->selectionCursor);
-    SceneInputWidget_Hide(&menu->animations[11]);
-    SceneInputWidget_Hide(&menu->animations[12]);
+    AnimSprite_Hide(&menu->animations[11]);
+    AnimSprite_Hide(&menu->animations[12]);
     WorldMap_SetUpdate(menu, WorldMap_UpdateTimedEffect);
 }
 
@@ -418,7 +418,7 @@ void WorldMap_OnUpdate(struct RegistrySelectionMenu *menu)
 
 void WorldMap_Destroy(struct RegistrySelectionMenu *menu)
 {
-    struct SceneInputWidget *animation = menu->animations;
+    struct AnimSprite *animation = menu->animations;
     s32 i = 12;
     do {
         if (animation->active)

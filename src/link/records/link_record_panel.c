@@ -313,7 +313,7 @@ void LinkRecordPanel_HideDisplay(struct LinkRecordPanel *owner)
 
 void LinkRecordPanel_RemoveWidgets(struct LinkRecordPanel *owner)
 {
-    struct SceneInputWidget *q = owner->widgets;
+    struct AnimSprite *q = owner->widgets;
     s32 i;
 
     for (i = 6; i >= 0; i--) {

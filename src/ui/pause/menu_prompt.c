@@ -273,7 +273,7 @@ void MenuPrompt_BeginAccountMenu(struct SceneHudState *p)
 {
     u32 zero;
     s16 *coord;
-    struct SceneInputWidget *anim;
+    struct AnimSprite *anim;
     MessageWindow_Clear();
     ScrollingDialogue_ClearScript();
     ScrollingDialogue_RequestHide();

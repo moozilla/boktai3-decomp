@@ -1,5 +1,5 @@
 #include "ui/town/shop_lifecycle.h"
-s32 SceneInputPanel_AdjustSlidingY(struct SceneInputWidget *, s32, u16);
+s32 SceneInputPanel_AdjustSlidingY(struct AnimSprite *, s32, u16);
 void Shop_BeginAlternateSelection(struct SceneInventoryTail *);
 s32 Shop_TickSaleFeedback(struct SceneInventoryTail *p)
 {

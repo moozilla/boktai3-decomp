@@ -29,9 +29,9 @@ u32 Anim_ResetDefaultFlags(void)
     return 0;
 }
 
-void Anim_UnlinkFromList(struct SceneInputWidget *, u32);
+void Anim_UnlinkFromList(struct AnimSprite *, u32);
 
-void Anim_Remove(struct SceneInputWidget *widget)
+void Anim_Remove(struct AnimSprite *widget)
 {
     if (widget->active != 0)
         Anim_UnlinkFromList(widget, widget->list);
@@ -41,9 +41,9 @@ void Anim_Remove(struct SceneInputWidget *widget)
 
 void Anim_RemoveAllInCurrentList(void)
 {
-    struct SceneInputWidget *widget = gMainSpriteListHeads[gRenderListIndex];
+    struct AnimSprite *widget = gMainSpriteListHeads[gRenderListIndex];
     while (widget) {
-        struct SceneInputWidget *next = widget->next;
+        struct AnimSprite *next = widget->next;
         Anim_Remove(widget);
         widget = next;
     }
@@ -77,7 +77,7 @@ s32 ResourceHeader_Relocate(void *destination, void *source)
     return 0;
 }
 
-struct WidgetGlyphEntry *Anim_FindGlyphEntryById(struct SceneInputResource *table, u16 id)
+struct WidgetGlyphEntry *Anim_FindGlyphEntryById(struct AnimSpriteResource *table, u16 id)
 {
     struct WidgetGlyphEntry *entry = table->glyphs;
     s32 i;
@@ -89,7 +89,7 @@ struct WidgetGlyphEntry *Anim_FindGlyphEntryById(struct SceneInputResource *tabl
     return NULL;
 }
 
-s32 Anim_SelectWidgetGlyph(struct SceneInputWidget *widget, struct SceneInputResource *resource,
+s32 Anim_SelectWidgetGlyph(struct AnimSprite *widget, struct AnimSpriteResource *resource,
                            u16 index)
 {
     struct WidgetGlyphEntry *entry = resource->glyphs + index;
@@ -115,7 +115,7 @@ s32 Anim_SelectWidgetGlyph(struct SceneInputWidget *widget, struct SceneInputRes
     return 0;
 }
 
-s32 Anim_InitPositionedWidget(struct SceneInputWidget *widget, void *resource, u16 glyph, u32 flags,
+s32 Anim_InitPositionedWidget(struct AnimSprite *widget, void *resource, u16 glyph, u32 flags,
                               u8 attributeA, u8 mode, u8 duration,
                               const struct ContactPosition *position)
 {
@@ -132,7 +132,7 @@ s32 Anim_InitPositionedWidget(struct SceneInputWidget *widget, void *resource, u
     return 0;
 }
 
-s32 Anim_LoadKeyframe(struct SceneInputWidget *widget, struct SceneInputResource *resource,
+s32 Anim_LoadKeyframe(struct AnimSprite *widget, struct AnimSpriteResource *resource,
                       u16 glyph, u8 mode)
 {
     if (Anim_SelectWidgetGlyph(widget, resource, glyph) < 0)
@@ -144,7 +144,7 @@ s32 Anim_LoadKeyframe(struct SceneInputWidget *widget, struct SceneInputResource
 
 void Anim_LinkToList(void *, u32);
 
-s32 Widget_InitLinked(struct SceneInputWidget *widget, void *resource, u16 glyph, u32 flags,
+s32 Widget_InitLinked(struct AnimSprite *widget, void *resource, u16 glyph, u32 flags,
                       u8 attributeA, u8 mode, u8 duration,
                       const struct ContactPosition *position)
 {
@@ -195,7 +195,7 @@ s32 Widget_InitLinked(struct SceneInputWidget *widget, void *resource, u16 glyph
     return -1;
 }
 
-s32 Widget_InitCleared(struct SceneInputWidget *widget, void *resource, u16 glyph, u32 flags,
+s32 Widget_InitCleared(struct AnimSprite *widget, void *resource, u16 glyph, u32 flags,
                        u8 attributeA, u8 mode, u8 duration, void *position)
 {
     u32 zero = widget->active;
@@ -240,7 +240,7 @@ void Sprite_OnRenderPhase(void)
 {
 }
 
-void Widget_CopyMasked(struct SceneInputWidget *dst, struct SceneInputWidget *src, u32 mask)
+void Widget_CopyMasked(struct AnimSprite *dst, struct AnimSprite *src, u32 mask)
 {
     dst->glyphKind = src->glyphKind;
     if (mask & 1)
@@ -274,7 +274,7 @@ void Widget_CopyMasked(struct SceneInputWidget *dst, struct SceneInputWidget *sr
     dst->frames = src->frames;
 }
 
-void Anim_SelectPaletteBank(struct SceneInputWidget *animation, u32 index)
+void Anim_SelectPaletteBank(struct AnimSprite *animation, u32 index)
 {
     s32 selected;
     animation->paletteBank = index;

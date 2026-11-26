@@ -349,7 +349,7 @@ static inline void Item_LoadFrame(struct WirelessGameItems *owner, struct Wirele
     p->sprite.flags &= ~1;
     {
         struct WirelessGameDrawing *d = drawing = &p->drawing;
-        struct SceneInputResource *res = &owner->resource;
+        struct AnimSpriteResource *res = &owner->resource;
         if (index > 7)
             choice = (index & 3) + 4;
         else
@@ -735,7 +735,7 @@ void WirelessGameItems_UpdateScatteredItem(struct WirelessGameItems *owner, stru
         p->sprite.flags &= ~1;
         {
             struct WirelessGameDrawing *d = drawing;
-            struct SceneInputResource *res = &owner->resource;
+            struct AnimSpriteResource *res = &owner->resource;
             if (index > 7)
                 choice = (index & 3) + 4;
             else
@@ -912,7 +912,7 @@ int WirelessGameItems_Destroy(struct WirelessGameItems *p)
 
 int WirelessGameItems_Init(struct WirelessGameItems *p)
 {
-    struct SceneInputResource *resource;
+    struct AnimSpriteResource *resource;
     struct WirelessGameItem *item;
     int i;
     gWirelessGameItems = p;
@@ -1355,7 +1355,7 @@ int WirelessGameDisplay_Destroy(struct WirelessGameDisplay *p)
 
 int WirelessGameDisplay_Init(struct WirelessGameDisplay *p)
 {
-    struct SceneInputResource *resource;
+    struct AnimSpriteResource *resource;
     struct WirelessGameDrawing *drawing;
     int i;
     struct ContactPosition position;

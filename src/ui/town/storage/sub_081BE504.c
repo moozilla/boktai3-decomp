@@ -4,12 +4,12 @@
 
 struct StorageCategoryWidgets {
     u8 unk_00[0x318];
-    struct SceneInputWidget carried[4][4];
-    struct SceneInputWidget stored[4][4];
+    struct AnimSprite carried[4][4];
+    struct AnimSprite stored[4][4];
     u8 unk_F18[0x1E0];
-    struct SceneInputWidget markers[8];
+    struct AnimSprite markers[8];
     u8 unk_13F8[0x140];
-    struct SceneInputResource resource;
+    struct AnimSpriteResource resource;
     u8 unk_1558[0x1FE];
     u8 emptyCarried;
     s8 emptyStored;
@@ -60,25 +60,25 @@ void Storage_RefreshEquipmentSlots(struct StorageCategoryWidgets *p)
             s32 index = rowSlot + col;
             id = Inventory_GetEquipmentId(p->slots[index]);
             if (id != 255) {
-                struct SceneInputWidget *widget;
-                SceneInputWidget_Show(&cellBase->carried[0][0]);
+                struct AnimSprite *widget;
+                AnimSprite_Show(&cellBase->carried[0][0]);
                 {
                     u32 offset = widgetOffset + STORAGE_MEMBER_OFFSET(carried);
                     widget = (void *)((u32)p + offset);
                 }
                 Anim_LoadKeyframe(widget, &p->resource, (u16)(id + 240), 0);
                 if (Storage_FindEquippedItemSlot(p, p->slots[index]) >= 0) {
-                    struct SceneInputWidget *mark;
+                    struct AnimSprite *mark;
                     SceneHud_SetKeyframePaletteBank(widget, 0x374);
-                    SceneInputWidget_Show(&markerBase->markers[0]);
+                    AnimSprite_Show(&markerBase->markers[0]);
                     {
                         u32 offset = STORAGE_MEMBER_OFFSET(markers) + markerOffset;
                         mark = (void *)((u32)p + offset);
                     }
                     Storage_GetSlotPosition(&mark->position, p->slots[index]);
-                    markerBase = (void *)((u8 *)markerBase + sizeof(struct SceneInputWidget));
-                    markerOffset += sizeof(struct SceneInputWidget);
-                    markerBytes += sizeof(struct SceneInputWidget);
+                    markerBase = (void *)((u8 *)markerBase + sizeof(struct AnimSprite));
+                    markerOffset += sizeof(struct AnimSprite);
+                    markerBytes += sizeof(struct AnimSprite);
                     marker++;
                 } else if (!Inventory_CanAssignEquipment(p->slots[index])) {
                     SceneHud_SetKeyframePaletteBank(widget, 0x374);
@@ -90,9 +90,9 @@ void Storage_RefreshEquipmentSlots(struct StorageCategoryWidgets *p)
                     p->emptyCarried = index;
                 *hideFlags |= 1;
             }
-            hideFlags += sizeof(struct SceneInputWidget) / sizeof(*hideFlags);
-            cellBase = (void *)((u8 *)cellBase + sizeof(struct SceneInputWidget));
-            widgetOffset += sizeof(struct SceneInputWidget);
+            hideFlags += sizeof(struct AnimSprite) / sizeof(*hideFlags);
+            cellBase = (void *)((u8 *)cellBase + sizeof(struct AnimSprite));
+            widgetOffset += sizeof(struct AnimSprite);
             col++;
             if (col > 3)
                 goto carriedRowDone;
@@ -106,12 +106,12 @@ void Storage_RefreshEquipmentSlots(struct StorageCategoryWidgets *p)
     } while (1);
 carriedDone:
     for (row = 0; row < 4;) {
-        struct SceneInputWidget *widget;
+        struct AnimSprite *widget;
         s32 slot;
         s32 index;
         s32 nextRow;
         u32 offset;
-        struct SceneInputWidget *base;
+        struct AnimSprite *base;
         col = 0;
         slot = row * 4;
         nextRow = row + 1;

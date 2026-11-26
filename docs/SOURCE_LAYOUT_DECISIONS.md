@@ -164,13 +164,12 @@ Headers follow (`headers_delta.csv`):
 * the Nidhoggr duel headers → `nidhoggr_duel*.h`
 * `scene_input_widget.h` → `include/engine/video/anim_sprite.h`
 
-**Type**: `struct SceneInputWidget` → `struct AnimSprite`. It is the engine's
-animated sprite: sequence and keyframe playback, position, scale, rotation,
+**Type**: `struct AnimSprite` is the engine's animated sprite. It holds
+sequence and keyframe playback, position, scale, rotation,
 palette bank and tiles, with an animation-list link. `Anim_*` and
 `AnimData_*` operate on it; it appears in 219 files and twice inside
-`struct Player`. Its resource header becomes `AnimSpriteResource`, its
-playback pair `AnimSpritePlayback`, its inline helpers `AnimSprite_Hide`/`Show`.
-None of these names exists yet.
+`struct Player`. `anim_sprite.h` also defines `AnimSpriteResource`,
+`AnimSpritePlayback`, and the `AnimSprite_Hide` and `AnimSprite_Show` helpers.
 
 ## needs-evidence (left alone this pass)
 

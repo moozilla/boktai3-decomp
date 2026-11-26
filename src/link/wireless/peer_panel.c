@@ -119,7 +119,7 @@ int WirelessPeerPanel_Init(struct WirelessPeerMenu *owner, struct WirelessPeerPa
 
 void WirelessPeerPanel_Destroy(void *owner, struct WirelessPeerPanel *panel)
 {
-    struct SceneInputWidget *drawing;
+    struct AnimSprite *drawing;
     int i;
     Sprite_Remove(&panel->sprite);
     drawing = &panel->digits[0];
@@ -290,7 +290,7 @@ void WirelessPeerMenu_UpdateDismissibleNotice(struct WirelessPeerMenu *menu)
     menu->timer++;
 }
 
-static inline struct SceneInputWidget *WirelessPeerPanel_GetDigit(struct WirelessPeerPanel *panel,
+static inline struct AnimSprite *WirelessPeerPanel_GetDigit(struct WirelessPeerPanel *panel,
                                                                   int index)
 {
     u8 *row = (u8 *)panel + index * sizeof(panel->digits[0]);

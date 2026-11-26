@@ -125,7 +125,7 @@ void Golem_UpdateDefeat(struct ChaseActor *actor)
         drawable->flags |= 1;
     } else {
         struct SceneActorAnimationTileDrawable *drawable = actor->base.drawable;
-        struct SceneInputWidget *tile = &drawable->tile;
+        struct AnimSprite *tile = &drawable->tile;
         tile->flags |= 1;
     }
     ActorParticles_SpawnWideBurst(actor);

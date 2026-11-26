@@ -99,8 +99,8 @@ s32 ScreenMessage_Initialize(struct ScreenMessage *s)
 {
     u32 value;
     void *a, *p, *resource;
-    struct SceneInputResource *obj;
-    struct SceneInputResource *obj2;
+    struct AnimSpriteResource *obj;
+    struct AnimSpriteResource *obj2;
     struct ScreenParams *global;
     u32 *save;
     u8 *dest;

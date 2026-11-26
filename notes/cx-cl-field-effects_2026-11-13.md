@@ -29,7 +29,7 @@ Range boundaries include a few singleton resets belonging to the following owner
 
 ## Shared header verification
 
-`SceneInputWidget` now names the affine scale bytes at 0x34/0x35. It remains 0x60 bytes with all existing offsets preserved. All 345 transitive source dependents passed `tools/check.py`. No unrelated source was changed.
+`AnimSprite` now names the affine scale bytes at 0x34/0x35. It remains 0x60 bytes with all existing offsets preserved. All 345 transitive source dependents passed `tools/check.py`. No unrelated source was changed.
 
 ## Tooling
 

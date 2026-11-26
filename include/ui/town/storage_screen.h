@@ -5,12 +5,12 @@
 
 struct StorageScreen {
     u8 task[0x18];
-    struct SceneInputWidget controls[8];
-    struct SceneInputWidget firstSlots[16], secondSlots[16];
-    struct SceneInputWidget indicators[5];
-    struct SceneInputWidget categorySlots[8];
-    struct SceneInputWidget labels[3];
-    struct SceneInputResource commonResource, storageResource;
+    struct AnimSprite controls[8];
+    struct AnimSprite firstSlots[16], secondSlots[16];
+    struct AnimSprite indicators[5];
+    struct AnimSprite categorySlots[8];
+    struct AnimSprite labels[3];
+    struct AnimSpriteResource commonResource, storageResource;
     struct SceneInputPair markers, glyphs;
     u8 unknown1740[0x14];
     u8 category, categoryCount, emptyCarried;

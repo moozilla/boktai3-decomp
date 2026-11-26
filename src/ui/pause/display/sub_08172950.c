@@ -3,7 +3,7 @@
 #include "ui/pause/scene_hud_display.h"
 s32 Div(s32, s32);
 s32 Mod(s32, s32);
-void PauseMenu_SetSpritePalette(struct SceneInputWidget *, u16);
+void PauseMenu_SetSpritePalette(struct AnimSprite *, u16);
 void PauseMenu_RefreshFruitAndUnlockIcons(void *);
 static inline void SetPosition(struct SceneVec *position, s16 x, s16 y, s16 z)
 {
@@ -16,7 +16,7 @@ void SceneHud_LayoutActionGrid_08172950(struct SceneHudState *p)
 {
     struct SceneVec position;
     s32 i;
-    struct SceneInputWidget *w;
+    struct AnimSprite *w;
     SetPosition(&position, 0x50, 0x20, 0);
     for (i = 0; i <= 7; i++) {
         p->categoryWidgets[i + 10].position = *(struct ContactPosition *)&position;
@@ -31,11 +31,11 @@ void SceneHud_LayoutActionGrid_08172950(struct SceneHudState *p)
     }
     PauseMenu_RefreshFruitAndUnlockIcons(p);
     {
-        struct SceneInputWidget *a = &p->actionPanelWidgets[0];
+        struct AnimSprite *a = &p->actionPanelWidgets[0];
         a->flags &= ~1;
     }
     {
-        struct SceneInputWidget *a = &p->actionPanelWidgets[1];
+        struct AnimSprite *a = &p->actionPanelWidgets[1];
         a->flags &= ~1;
     }
     w = &p->actionPanelWidgets[2];

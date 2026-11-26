@@ -15,10 +15,10 @@ struct SelectionMenu {
     struct ContactPosition choiceTarget;
     u16 cancelScript, confirmScript;
     u8 graphicData[8];
-    struct SceneInputResource panelResource, iconResource;
+    struct AnimSpriteResource panelResource, iconResource;
     struct SceneInputPanelDrawable panel;
-    struct SceneInputWidget panels[2], cursors[3], markers[8];
-    struct SceneInputWidget highlight, heading, icons[19];
+    struct AnimSprite panels[2], cursors[3], markers[8];
+    struct AnimSprite highlight, heading, icons[19];
     u8 result[16];
     void (*callback)(struct SelectionMenu *);
     u32 actorMessages, itemMessages, promptMessages;

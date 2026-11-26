@@ -169,7 +169,7 @@ void Player_UpdateGrabMotion(struct Player *p)
         p->actionEighteenParameter = 0x16F;
         p->actionEighteenDuration = 0x20;
         Sound_PlaySong(0x39E);
-        SceneInputWidget_Show(&p->secondaryAnimation);
+        AnimSprite_Show(&p->secondaryAnimation);
         p->secondaryAnimation.position = p->animation.position;
         {
             u16 resource = p->animation.paletteBank;

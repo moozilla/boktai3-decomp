@@ -42,7 +42,7 @@ s32 PanelKeyframeSprite_Create(struct SceneDebris *owner, u32 key, u32 index, u3
         s32 position[2];
     } local;
     void *position;
-    struct SceneInputWidget *widget;
+    struct AnimSprite *widget;
     u32 spriteFlags;
     u32 frame;
     owner->visual = Heap_Alloc(0x80);

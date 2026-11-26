@@ -14,7 +14,7 @@ void SceneHud_AnimateActionResult(struct SceneHudState *s)
     short index;
     s32 mode;
     u32 palette;
-    struct SceneInputWidget *widget;
+    struct AnimSprite *widget;
     if (!PauseMenu_UpdateSpriteMotion(s, 0))
         return;
     if (++s->actionTransferDelay <= 7)

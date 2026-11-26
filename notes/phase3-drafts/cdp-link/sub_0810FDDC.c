@@ -3,9 +3,9 @@
 
 struct ScoreDigits {
     u8 taskAndResources[0x24];
-    struct SceneInputWidget slots[18];
+    struct AnimSprite slots[18];
     u8 unknown6E4[0x20];
-    struct SceneInputResource glyphs;
+    struct AnimSpriteResource glyphs;
 };
 
 static inline void SetDigitVisible(struct ScoreDigits *p, s32 idx, s32 glyph)
@@ -32,7 +32,7 @@ void sub_0810FDDC(struct ScoreDigits *p, s32 row, s32 n)
     index = base;
     SetDigitVisible(p, index, glyph);
     Anim_SelectWidgetGlyph((u8 *)p->slots +
-                               ((index << 1) + base) * (sizeof(struct SceneInputWidget) / 3),
+                               ((index << 1) + base) * (sizeof(struct AnimSprite) / 3),
                            &p->glyphs, (u16)glyph);
     glyph = 0x3e;
     {
@@ -45,7 +45,7 @@ void sub_0810FDDC(struct ScoreDigits *p, s32 row, s32 n)
 
         SetDigitVisible(p, tens, glyph);
         Anim_SelectWidgetGlyph((u8 *)&p->slots[1] +
-                                   ((index << 1) + base) * (sizeof(struct SceneInputWidget) / 3),
+                                   ((index << 1) + base) * (sizeof(struct AnimSprite) / 3),
                                &p->glyphs, (u16)glyph);
         glyph = 0x3e;
         while (n > 0) {

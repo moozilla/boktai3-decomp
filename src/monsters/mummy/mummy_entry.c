@@ -154,7 +154,7 @@ static inline void Mummy_SelectAnimation(struct ChaseActor *actor, u32 selection
                          (u8)variant, (u8)flags);
         restart = &actor->base.restart;
     } else {
-        struct SceneInputWidget *tile =
+        struct AnimSprite *tile =
             &((struct SceneActorAnimationTileDrawable *)actor->base.drawable)->tile;
         u8 *savedSelection;
         selection += variant;
@@ -230,7 +230,7 @@ void Mummy_UpdateRevival(void *object)
             *flags = mask & *flags;
         } else {
             struct SceneActorAnimationTileDrawable *drawable = actor->base.drawable;
-            struct SceneInputWidget *tile = &drawable->tile;
+            struct AnimSprite *tile = &drawable->tile;
             u32 mask = ~1;
             tile->flags = mask & tile->flags;
         }
@@ -799,7 +799,7 @@ static inline u32 Mummy_DisplayFlags(struct ChaseActor *actor, u32 maskInput)
     return actor->base.statusFlags & mask;
 }
 
-static inline void HideTile(struct SceneInputWidget *tile)
+static inline void HideTile(struct AnimSprite *tile)
 {
     u32 mask = ~1;
     tile->flags = mask & tile->flags;

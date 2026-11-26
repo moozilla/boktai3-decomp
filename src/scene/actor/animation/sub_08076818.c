@@ -21,7 +21,7 @@ void SceneActorAnimation_SelectProfileEntry(struct RoomActor *actor, s32 index)
                          (u8)variant, (u8)flags);
         restart = &actor->restart;
     } else {
-        struct SceneInputWidget *tile =
+        struct AnimSprite *tile =
             &((struct SceneActorAnimationTileDrawable *)actor->drawable)->tile;
         u8 *savedSelection;
         selection += variant;

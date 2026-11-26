@@ -1701,22 +1701,22 @@ sub_081BDC34	28	matched	100.0	The matched SceneInputPanel_ShowDescription relati
 sub_081BDC78	123	draft	97.6	Retained the 252-byte candidate with matching register allocation; three FF constant loads occur before rather than after address setup (six halfwords differ).
 sub_081BDDCC	32	matched	100.0	An explicit found label before lower-half setup reproduced the original block order.
 sub_081BDE30	47	matched	100.0	Explicit indexed GameState views and loading the global before shifting preserved the original reload and loop structure.
-sub_081BE0AC	25	matched	100.0	The final initializer identified these offsets as SceneInputWidget palette fields rather than a separate transition object.
-sub_081BE0F0	22	matched	100.0	Reuses the source-palette temporary and established SceneInputWidget layout; retained trailing routines are outside the matched body.
+sub_081BE0AC	25	matched	100.0	The final initializer identified these offsets as AnimSprite palette fields rather than a separate transition object.
+sub_081BE0F0	22	matched	100.0	Reuses the source-palette temporary and established AnimSprite layout; retained trailing routines are outside the matched body.
 sub_081BE7FC	72	matched	100.0	Matched from the inventory sibling with a local storage layout and no register pins.
 sub_081BE8B0	72	matched	100.0	Widget address calculation needed to preserve the array element before adding the storage widget base.
 sub_081BE960	91	matched	100.0	Preserved both string-reference parser calls and the form-dependent text offset.
 sub_081BEA4C	71	matched	100.0	Keeping an explicit banner pointer reproduced the original shared address lifetime.
 sub_081BEB08	82	matched	100.0	Matched the signed consumable lookup through the stored slot map and retained both numeric arguments.
 sub_081BED9C	39	matched	100.0	The selected category is encoded in the high seven bits; the category sorter names remain provisional.
-sub_081BEE48	29	matched	100.0	An inline SceneInputWidget flag helper reproduced the original base addressing and register allocation.
+sub_081BEE48	29	matched	100.0	An inline AnimSprite flag helper reproduced the original base addressing and register allocation.
 sub_081BEEC0	40	matched	100.0	Separating the halfword increment from the comparison preserved the original truncation and reloads.
 sub_081BEF28	71	matched	100.0	Explicit indexed game-state and slot pointers reproduced the consumable removal store.
-sub_081BEFEC	32	matched	100.0	Existing SceneInputWidget and SceneInput_TickChoice types reproduced the four-argument input call immediately.
+sub_081BEFEC	32	matched	100.0	Existing AnimSprite and SceneInput_TickChoice types reproduced the four-argument input call immediately.
 sub_081BF04C	141	matched	100.0	An inline boolean and explicit source/destination pointers reproduced the validation and register allocation.
 sub_081BF3D0	38	matched	100.0	Reusing the preceding choice-input layout matched immediately and confirms the selected-category operation is a sort.
 sub_081BF440	78	draft	98.0	All calls and branches agree but the negative fourth description argument is materialized too early.
-sub_081BF51C	37	matched	100.0	Existing SceneInputWidget fields established the shared palette pointer and palette attribute offsets without header edits.
+sub_081BF51C	37	matched	100.0	Existing AnimSprite fields established the shared palette pointer and palette attribute offsets without header edits.
 sub_081BF57C	35	matched	100.0	The six-entry identity map and optional script value match exactly; Storage_Create establishes screen ownership.
 sub_081BF5DC	33	matched	100.0	Background resource setup matches exactly and its pointer is stored at offset 0x172C.
 sub_081BF9C4	48	matched	100.0	Script argument PCs and text-window setup match exactly; the four option meanings remain tentative.

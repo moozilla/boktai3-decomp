@@ -19,15 +19,15 @@ void SceneHud_RefreshWidgetVisibility(struct SceneHudState *p)
         u32 *af = &p->primaryWidgets[0].flags;
         for (; i <= 2; i++) {
             if (i == 0 && p->primaryVisible)
-                ((struct SceneInputWidget *)((u8 *)p + 0xC88))->flags &= mask;
+                ((struct AnimSprite *)((u8 *)p + 0xC88))->flags &= mask;
             else
                 *af |= one;
             if (i == 0 && p->secondaryCount && !blocked)
-                ((struct SceneInputWidget *)((u8 *)p + 0xE28))->flags &= mask;
+                ((struct AnimSprite *)((u8 *)p + 0xE28))->flags &= mask;
             else
                 *bf |= one;
             if (PauseMenu_GetSelectedListEntryType(p) && i == 0 && p->tertiaryVisible && !blocked)
-                ((struct SceneInputWidget *)((u8 *)p + 0xF70))->flags &= mask;
+                ((struct AnimSprite *)((u8 *)p + 0xF70))->flags &= mask;
             else
                 *cf |= one;
             cf += 24;
@@ -43,8 +43,8 @@ void SceneHud_RefreshWidgetVisibility(struct SceneHudState *p)
         u32 offsetC = 0x12D0;
         for (i = 2; i >= 0; i--) {
             *flags |= one;
-            ((struct SceneInputWidget *)(q + offsetB))->flags |= one;
-            ((struct SceneInputWidget *)(q + offsetC))->flags |= one;
+            ((struct AnimSprite *)(q + offsetB))->flags |= one;
+            ((struct AnimSprite *)(q + offsetC))->flags |= one;
             flags += 24;
             q += 0x60;
         }

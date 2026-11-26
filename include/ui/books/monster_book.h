@@ -13,12 +13,12 @@ struct MonsterBook {
     s32 windows[8];
     u8 selectedRow;
     u8 playerName[3];
-    struct SceneInputResource resource;
-    struct SceneInputWidget selectionCursor, tabCursor, detailMarker, categoryBadge, categoryNumber,
+    struct AnimSpriteResource resource;
+    struct AnimSprite selectionCursor, tabCursor, detailMarker, categoryBadge, categoryNumber,
         titleIcon;
-    struct SceneInputWidget rowMarkers[7], entryDigits[7][2];
-    struct SceneInputWidget unlockedDigits[2], countSeparator, totalDigits[2];
-    struct SceneInputWidget completionBadge, groupBadge;
+    struct AnimSprite rowMarkers[7], entryDigits[7][2];
+    struct AnimSprite unlockedDigits[2], countSeparator, totalDigits[2];
+    struct AnimSprite completionBadge, groupBadge;
     u16 palette[16];
     s16 highlightFrame;
     u16 transitionFlags;
@@ -59,7 +59,7 @@ u32 MonsterBook_SetupPageBackgrounds(struct MonsterBook *s, u32 value);
 void MonsterBook_RefreshPage(struct MonsterBook *p);
 void MonsterBook_SetPage(struct MonsterBook *p, u8 v);
 u32 MonsterBook_UpdateNavigation(struct MonsterBook *p);
-void MonsterBook_RemoveActiveAnimation(struct SceneInputWidget *p);
+void MonsterBook_RemoveActiveAnimation(struct AnimSprite *p);
 s32 MonsterBook_Destroy(struct MonsterBook *p);
 s32 MonsterBook_Init(struct MonsterBook *s, void *context);
 struct MonsterBook *MonsterBook_Create(void *a);

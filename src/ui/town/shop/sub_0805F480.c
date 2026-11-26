@@ -1,9 +1,9 @@
 #include "ui/widgets/scene_input_compare.h"
 #include "ui/hud/scene_hud_map.h"
 #include "ui/widgets/scene_input_grid.h"
-void SceneInputPanel_ShowItemComparison(struct SceneInputWidget *primary,
-                                        struct SceneInputWidget *secondary,
-                                        struct SceneInputResource *resource,
+void SceneInputPanel_ShowItemComparison(struct AnimSprite *primary,
+                                        struct AnimSprite *secondary,
+                                        struct AnimSpriteResource *resource,
                                         const struct SceneInputItemDescriptor *candidate,
                                         s32 referenceIndex)
 {

@@ -5,7 +5,7 @@
 #include "effects/projectiles/contact_swarm_sprite.h"
 #include "engine/video/display_sequence.h"
 #include "scene/actor/motion_track.h"
-#include "ui/widgets/scene_input_widget.h"
+#include "engine/video/anim_sprite.h"
 #include "engine/task.h"
 
 struct PairedHalfGraphics {
@@ -50,8 +50,8 @@ struct PairedSceneHalf {
 };
 struct VanargandAttackPair {
     struct Task task;
-    struct SceneInputWidget widget;
-    struct SceneInputResource resource;
+    struct AnimSprite widget;
+    struct AnimSpriteResource resource;
     struct PairedSceneHalf halves[2];
     const void *effectResource;
     u16 palettes[7][16];

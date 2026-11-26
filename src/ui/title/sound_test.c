@@ -30,12 +30,12 @@ void SoundTest_CountEntries(struct SoundTest *p)
 
 void SoundTest_ShowCategory(struct SoundTest *p)
 {
-    SceneInputWidget_Show(&p->cursor);
+    AnimSprite_Show(&p->cursor);
     Anim_LoadKeyframe(&p->categoryLabel, &p->digitsResource, (u16)(p->selection + 47), 0);
     p->categoryLabel.flags &= ~1;
 }
 
-static inline void MoveCategoryCursor(struct SceneInputWidget *s, s32 selection)
+static inline void MoveCategoryCursor(struct AnimSprite *s, s32 selection)
 {
     s->position.y = (selection + 1) * 32;
 }
@@ -201,7 +201,7 @@ void SoundTest_UpdatePlaybackIndicators(struct SoundTest *p)
     for (i = 0; i <= 2; i++) {
         const s16 *table;
         s32 index;
-        struct SceneInputWidget *s = &p->playbackIndicators[i];
+        struct AnimSprite *s = &p->playbackIndicators[i];
         switch (i) {
             case 0:
                 table = gUnk_086136F0;
@@ -300,7 +300,7 @@ void SoundTest_Update(struct SoundTest *p)
 void SoundTest_Destroy(struct SoundTest *p)
 {
     s32 i;
-    struct SceneInputWidget *a, *b, *c;
+    struct AnimSprite *a, *b, *c;
     {
         s32 mask = 3;
         gDispCntShadow = ~mask & gDispCntShadow;

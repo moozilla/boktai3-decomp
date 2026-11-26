@@ -1553,7 +1553,7 @@ void SceneActorReaction_SlideBack(struct ChaseActor *actor)
                              (u8)variant, (u8)flags);
             restart = &actor->base.restart;
         } else {
-            struct SceneInputWidget *tile =
+            struct AnimSprite *tile =
                 &((struct SceneActorAnimationTileDrawable *)actor->base.drawable)->tile;
             u8 *savedSelection;
 

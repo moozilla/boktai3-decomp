@@ -39,7 +39,7 @@ void Bat_RestoreSavedState(struct ChaseActor *actor)
             u32 mask = ~1;
             *q = mask & *q;
         } else {
-            struct SceneInputWidget *q =
+            struct AnimSprite *q =
                 &((struct SceneActorAnimationTileDrawable *)actor->base.drawable)->tile;
             u32 mask = ~1;
             q->flags = mask & q->flags;

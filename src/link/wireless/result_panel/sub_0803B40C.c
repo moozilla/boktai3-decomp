@@ -1,7 +1,7 @@
 #include "engine/video/display_sequence_sprite.h"
 #include "global.h"
 #include "engine/ram.h"
-#include "ui/widgets/scene_input_widget.h"
+#include "engine/video/anim_sprite.h"
 #include "engine/video/sprite.h"
 #include "engine/task.h"
 struct ResultMenu {
@@ -9,10 +9,10 @@ struct ResultMenu {
     u32 timer;
     u8 state, entered;
     u8 pad1e[0x12];
-    struct SceneInputResource primary, secondary;
+    struct AnimSpriteResource primary, secondary;
     struct DisplaySequenceSprite sprite;
     struct SpriteRenderResource glyph;
-    struct SceneInputWidget draws[22];
+    struct AnimSprite draws[22];
     void *onClose, *resource;
     int windows[4];
     u8 left[16], right[16];
@@ -25,11 +25,11 @@ void *WirelessExchange_GetPeerEntry(int);
 int WirelessResultPanel_Init(struct ResultMenu *arg)
 {
     struct ResultMenu *p = arg;
-    struct SceneInputResource *res;
-    struct SceneInputResource *first;
+    struct AnimSpriteResource *res;
+    struct AnimSpriteResource *first;
     int pack;
-    struct SceneInputResource *primary;
-    struct SceneInputResource *secondary;
+    struct AnimSpriteResource *primary;
+    struct AnimSpriteResource *secondary;
     void *resource;
     void *glyph;
     struct DisplaySequenceState animation;
@@ -72,7 +72,7 @@ initialize:
     secondary = &p->secondary;
     ResourceHeader_Relocate(secondary, res);
     {
-        struct SceneInputWidget *draw = p->draws;
+        struct AnimSprite *draw = p->draws;
         Widget_InitLinked(draw, secondary, 30, 0x2011, 0, 0, 60, 0);
         draw = p->draws + 1;
         Widget_InitLinked(draw, secondary, 2, 0x2011, 0, 0, 60, 0);

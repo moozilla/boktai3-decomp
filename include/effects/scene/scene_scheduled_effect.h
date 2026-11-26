@@ -1,13 +1,13 @@
 #ifndef GUARD_SCENE_SCHEDULED_EFFECT_H
 #define GUARD_SCENE_SCHEDULED_EFFECT_H
-#include "ui/widgets/scene_input_widget.h"
+#include "engine/video/anim_sprite.h"
 #include "engine/engine.h"
 #include "scene/actor/scene_actor_components.h"
 #include "effects/projectiles/contact_swarm_sprite.h"
 #include "scene/collision/contact_collider.h"
 /* Four-slot animated-body effect used by the scheduling manager. */
 struct SceneScheduledEffect {
-    struct SceneInputWidget animation;
+    struct AnimSprite animation;
     struct SceneActorBody body;
     struct ContactSwarmSprite sprite;
     struct ContactPosition position;
@@ -19,8 +19,8 @@ struct SceneScheduledEffect {
 };
 struct SceneScheduledEffectPool {
     struct Task task;
-    struct SceneInputResource resource;
-    struct SceneInputResource *source;
+    struct AnimSpriteResource resource;
+    struct AnimSpriteResource *source;
     struct SceneScheduledEffect slots[4];
     u32 occupied;
 };

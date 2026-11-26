@@ -9,12 +9,12 @@ static inline void ActorStatus_SetDrawableFlags(struct ChaseActor *actor, u32 bi
     if (actor->base.drawableKind == 0)
         ((struct SceneActorRegistrySequenceDrawable *)actor->base.drawable)->flags |= bits;
     else {
-        struct SceneInputWidget *tile = (void *)((u8 *)actor->base.drawable + 0x20);
+        struct AnimSprite *tile = (void *)((u8 *)actor->base.drawable + 0x20);
         tile->flags |= bits;
     }
 }
 
-static inline void ActorStatus_ClearTileFlags(struct SceneInputWidget *tile, u32 bits)
+static inline void ActorStatus_ClearTileFlags(struct AnimSprite *tile, u32 bits)
 {
     u32 keep = ~bits;
     tile->flags &= keep;
@@ -26,7 +26,7 @@ static inline void ActorStatus_ClearDrawableFlags(struct ChaseActor *actor, u32 
         SceneActorChase_ClearWordFlags(
             &((struct SceneActorRegistrySequenceDrawable *)actor->base.drawable)->flags, bits);
     else {
-        struct SceneInputWidget *tile = (void *)((u8 *)actor->base.drawable + 0x20);
+        struct AnimSprite *tile = (void *)((u8 *)actor->base.drawable + 0x20);
         ActorStatus_ClearTileFlags(tile, bits);
     }
 }

@@ -4,7 +4,7 @@
 #include "ui/town/shop_item_values.h"
 struct SceneInventoryPanel {
     struct SceneInputPanel display;
-    struct SceneInputWidget comparison[5][3];
+    struct AnimSprite comparison[5][3];
     u32 unknown1A88;
     const void *equipmentText;
     const void *unknown1A90;
@@ -27,10 +27,10 @@ s32 MessageWindow_SetDisplayMode(s32);
 s32 MessageWindow_ShowMessage(s32);
 s32 ScrollingDialogue_SetScript(const u8 *);
 s32 ScrollingDialogue_SetNumberArgument(s32, s32);
-void SceneInputPanel_ShowItemComparison(struct SceneInputWidget *, struct SceneInputWidget *,
-                                        struct SceneInputResource *, const void *, s32);
-void SceneInputPanel_ShowAttributeComparison(struct SceneInputWidget *, struct SceneInputWidget *,
-                                             struct SceneInputWidget *, struct SceneInputResource *,
+void SceneInputPanel_ShowItemComparison(struct AnimSprite *, struct AnimSprite *,
+                                        struct AnimSpriteResource *, const void *, s32);
+void SceneInputPanel_ShowAttributeComparison(struct AnimSprite *, struct AnimSprite *,
+                                             struct AnimSprite *, struct AnimSpriteResource *,
                                              s32);
 struct SceneInventoryWidgetFlags {
     u32 flags;
@@ -42,5 +42,5 @@ struct SceneInventoryFlagsView {
 };
 u32 Selection_GetDisplayFrame(s32);
 s32 GameState_IsConsumableSlotEquipped(u32);
-void SceneHud_SetKeyframePaletteBank(struct SceneInputWidget *, u32);
+void SceneHud_SetKeyframePaletteBank(struct AnimSprite *, u32);
 #endif

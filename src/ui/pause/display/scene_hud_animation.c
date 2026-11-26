@@ -127,7 +127,7 @@ void PauseMenu_SetSpritePalette(void *, u16);
 
 void SceneHud_LoadActionMotion(struct SceneHudState *p, u32 index, u32 source, u32 target, u32 kind)
 {
-    struct SceneInputWidget *w = &p->motionWidgets[index];
+    struct AnimSprite *w = &p->motionWidgets[index];
     w->flags &= ~1;
     if (kind == 0) {
         void *data = p->motionResource;

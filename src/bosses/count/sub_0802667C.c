@@ -29,7 +29,7 @@ void SceneActorAnimation_UpdateFlashPulse(struct StateActor *p, int tick)
     struct SceneGraphicsActor *actor = (struct SceneGraphicsActor *)p;
     if (p->actionChanged) {
         int sequence;
-        struct SceneInputWidget *draw;
+        struct AnimSprite *draw;
         int resource;
         p->actionChanged = 0;
         sequence = choose(actor->graphics.animationFlags, 66, 28);

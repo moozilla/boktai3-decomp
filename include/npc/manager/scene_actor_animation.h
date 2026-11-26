@@ -3,7 +3,7 @@
 #include "scene/actor/scene_actor_profile.h"
 #include "link/session/room_actor.h"
 #include "engine/video/display_sequence.h"
-#include "ui/widgets/scene_input_widget.h"
+#include "engine/video/anim_sprite.h"
 #include "engine/video/sprite.h"
 /* Animation-phase actor and drawable views; selection names are provisional. */
 struct SceneActorAnimationLink {
@@ -21,8 +21,8 @@ struct SceneActorAnimationSequenceDrawable {
     const u8 *resource;
 };
 struct SceneActorAnimationTileDrawable {
-    struct SceneInputResource resource;
-    struct SceneInputWidget tile;
+    struct AnimSpriteResource resource;
+    struct AnimSprite tile;
 };
 void SceneActorAnimation_SelectDirectionalEntry(struct RoomActor *, s32);
 void SceneActorAnimation_SelectDirectionalEntryFlags(struct RoomActor *, s32, u32);

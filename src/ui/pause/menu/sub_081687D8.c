@@ -4,7 +4,7 @@
 #include "global.h"
 #include "ui/pause/scene_hud_display.h"
 s32 PauseMenu_IsEquipmentSelectionEnabled(struct SceneHudState *);
-void PauseMenu_LoadStatusIconFrame(struct SceneHudState *, struct SceneInputWidget *, s32);
+void PauseMenu_LoadStatusIconFrame(struct SceneHudState *, struct AnimSprite *, s32);
 s32 PauseMenu_GetEquipmentRowY(struct SceneHudState *, s32, s32, s32, s32);
 void SceneHud_UpdateTertiaryWidgets(struct SceneHudState *p)
 {

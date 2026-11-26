@@ -9,7 +9,7 @@
 #include "monsters/axe/directional_sprite_state.h"
 #include "player/converging_effect_state.h"
 #include "engine/task.h"
-#include "ui/widgets/scene_input_widget.h"
+#include "engine/video/anim_sprite.h"
 #include "scene/collision/contact_collider.h"
 
 /* Body colliders use a fixed defense in both setup and hit resolution. */
@@ -174,11 +174,11 @@ struct Player {
         *followTarget; /* 0x40: active movement source, reset to the player's own contact object. */
     u8 unk44[0x50 - 0x44];
     u32 visualState;
-    struct SceneInputWidget *activeAnimation;
+    struct AnimSprite *activeAnimation;
     u8 unk58[0x6C - 0x58];
     u8 animationData[0x20];                     /* 0x6C: keyframe resource */
-    struct SceneInputWidget animation;          /* 0x8C: body sprite and its keyframe playback */
-    struct SceneInputWidget secondaryAnimation; /* 0xEC: alternate keyframe channel */
+    struct AnimSprite animation;          /* 0x8C: body sprite and its keyframe playback */
+    struct AnimSprite secondaryAnimation; /* 0xEC: alternate keyframe channel */
     u32 secondaryDrawFlags;                     /* 0x14C: bit zero follows reset flag one */
     u8 unk150[3];
     u8 secondaryPriority;

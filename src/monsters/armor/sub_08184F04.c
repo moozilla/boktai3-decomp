@@ -2,7 +2,7 @@
 #include "engine/engine.h"
 #include "engine/ram.h"
 #include "monsters/armor/scene_combat_actor.h"
-#include "ui/widgets/scene_input_widget.h"
+#include "engine/video/anim_sprite.h"
 
 #define gActorStateCallbacks gUnk_0824EF10
 
@@ -12,7 +12,7 @@ extern void *gUnk_0824EF10[];
 void ActorController_UpdateAnimation(struct SceneCombatActor *p)
 {
     u8 *finished;
-    struct SceneInputWidget *anim;
+    struct AnimSprite *anim;
     u32 mask = 0x400;
     if (!((gEngineFlags | gScenePauseFlags) & mask)) {
         u32 four = 4;

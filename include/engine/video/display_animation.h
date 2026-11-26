@@ -6,7 +6,7 @@
 #include "engine/video/display_keyframe.h"
 #include "scene/collision/contact_position.h"
 #include "scene/scene_animation.h"
-#include "ui/widgets/scene_input_widget.h"
+#include "engine/video/anim_sprite.h"
 #include "engine/video/sprite.h"
 /* Resource header read through a sequence sprite (palette index and data). */
 struct DisplayAnimationResource {
@@ -30,8 +30,8 @@ struct DisplayAnimationSequence {
     void *sequence;
 };
 struct DisplayAnimationKeyframes {
-    struct SceneInputResource resource;
-    struct SceneInputWidget widget;
+    struct AnimSpriteResource resource;
+    struct AnimSprite widget;
 };
 union DisplayAnimationBody {
     struct DisplayAnimationSequence sequence;

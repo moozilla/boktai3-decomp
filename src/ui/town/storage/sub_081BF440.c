@@ -4,7 +4,7 @@
 
 struct SceneInventoryCategoryMenu {
     u8 unknown0[0x258];
-    struct SceneInputWidget prompt;
+    struct AnimSprite prompt;
     u8 unknown2B8[0x1458 - 0x2B8];
     u8 cursor[0xC0];
     u8 choiceResource[0x1734 - 0x1518];

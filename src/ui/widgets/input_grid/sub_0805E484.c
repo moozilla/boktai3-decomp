@@ -7,7 +7,7 @@ void SceneInput_BeginPairTransition(struct SceneInputPair *pair, const u32 *enab
     s32 i = 0;
     const struct SceneInputPosition *targets = targetsInput;
     const struct SceneInputPosition *starts = startsInput;
-    struct SceneInputWidget *widget;
+    struct AnimSprite *widget;
     const u32 *enabled;
     u32 widgetOffset;
     const u32 *localFrames;

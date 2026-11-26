@@ -256,7 +256,7 @@ static inline void Slime_SelectWaitAnimation(struct RoomActor *actor, s32 index,
                          flags);
         restart = &actor->restart;
     } else {
-        struct SceneInputWidget *tile =
+        struct AnimSprite *tile =
             &((struct SceneActorAnimationTileDrawable *)actor->drawable)->tile;
         u8 *selectionAddress;
         u32 previous;

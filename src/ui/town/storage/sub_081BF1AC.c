@@ -2,9 +2,9 @@
 #include "ui/widgets/scene_input_navigation.h"
 struct StorageBrowse {
     u8 unknown0[0x258];
-    struct SceneInputWidget prompt;
+    struct AnimSprite prompt;
     u8 unknown2B8[0x11A0];
-    struct SceneInputWidget cursor, savedCursor;
+    struct AnimSprite cursor, savedCursor;
     u8 resource[0x21C];
     void *description;
     u8 unknown1738[0x15];
@@ -50,7 +50,7 @@ void Storage_UpdateCategoryBrowse(struct StorageBrowse *p)
     } else if (gPadState[1] & 1) {
         SceneInput_SaveSelection(&p->grid);
         if (p->mode == 1) {
-            struct SceneInputWidget *saved = &p->savedCursor;
+            struct AnimSprite *saved = &p->savedCursor;
             saved->flags &= ~1;
             p->savedCursor.position = p->cursor.position;
             Storage_SetGridFlags(&p->grid, 0x10);

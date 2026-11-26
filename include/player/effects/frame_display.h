@@ -3,7 +3,7 @@
 
 #include "engine/task.h"
 #include "effects/projectiles/contact_swarm_sprite.h"
-#include "ui/widgets/scene_input_widget.h"
+#include "engine/video/anim_sprite.h"
 
 struct FrameDisplay {
     struct Task task;
@@ -14,7 +14,7 @@ struct FrameDisplay {
     u32 frameCounter;
     u8 *heading;
     u8 *flip;
-    struct SceneInputWidget *animation; /* parent body animation the display follows */
+    struct AnimSprite *animation; /* parent body animation the display follows */
 };
 
 typedef char FrameDisplaySizeCheck[sizeof(struct FrameDisplay) == 0x78 ? 1 : -1];

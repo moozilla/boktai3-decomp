@@ -17,7 +17,7 @@ static inline void SceneActorControl_SetDrawableFlags(u32 bits, struct ChaseActo
         sprite->flags |= bits;
     } else {
         struct SceneActorAnimationTileDrawable *drawable = actor->base.drawable;
-        struct SceneInputWidget *tile = &drawable->tile;
+        struct AnimSprite *tile = &drawable->tile;
         tile->flags |= bits;
     }
 }

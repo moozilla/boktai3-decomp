@@ -23,7 +23,7 @@ void Player_UpdateFacingSide(struct Player *player)
 s32 Player_SetAnimation(void *player, u32 index, u32 rate, u32 mode)
 {
     struct Player *actor;
-    struct SceneInputWidget *anim;
+    struct AnimSprite *anim;
     void *data;
     u32 flags = 4;
     actor = player;
@@ -47,7 +47,7 @@ s32 Player_SetAnimation(void *player, u32 index, u32 rate, u32 mode)
 
 s32 PlayerAnimation_SelectSecondaryKeyframes(struct Player *player, s32 index, s32 rate)
 {
-    struct SceneInputWidget *anim;
+    struct AnimSprite *anim;
     void *data;
     u32 flags = 0;
     if (player->animationIndex == index) {

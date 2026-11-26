@@ -16,8 +16,8 @@ struct RegistrySelectionMenu {
     struct Task task;
     u32 unknown18;
     u8 *palettes;
-    struct SceneInputWidget animations[13];
-    struct SceneInputResource resource;
+    struct AnimSprite animations[13];
+    struct AnimSpriteResource resource;
     s16 elapsed;
     u8 shift, mode;
     u32 unknown524;

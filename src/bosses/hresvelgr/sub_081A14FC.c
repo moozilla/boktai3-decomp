@@ -1,6 +1,6 @@
 #include "global.h"
 #include "engine/engine.h"
-#include "ui/widgets/scene_input_widget.h"
+#include "engine/video/anim_sprite.h"
 #include "scene/terrain/terrain_sampling.h"
 struct Action {
     u8 state, substate, step, pad3;
@@ -20,8 +20,8 @@ struct Hresvelgr {
     u8 padB3[0x19];
     u8 targetHeading;
     u8 padCD[0xa7];
-    struct SceneInputResource animationData;
-    struct SceneInputWidget animation;
+    struct AnimSpriteResource animationData;
+    struct AnimSprite animation;
     u8 pad1F4[0xfc];
     struct Action action;
     u8 pad300[0x1c];

@@ -108,7 +108,7 @@ void DarkGenerator_ShowRewardBalanceDigits(struct ControlPanel *panel)
     s32 digits[4];
     s32 *digit;
     s32 remaining;
-    struct SceneInputWidget *widget;
+    struct AnimSprite *widget;
 
     digits[0] = Div(value, 1000);
     value -= digits[0] * 1000;
@@ -528,7 +528,7 @@ void DarkGenerator_InitializeValueWidgets(struct ControlPanel *panel)
     struct ContactPosition position;
     s32 i;
     s32 zero;
-    struct SceneInputResource *resource = ScriptProc_Start(0xCB05, 0x530D);
+    struct AnimSpriteResource *resource = ScriptProc_Start(0xCB05, 0x530D);
     panel->resource = *resource;
     ResourceHeader_Relocate(&panel->resource, resource);
     position.x = 144;

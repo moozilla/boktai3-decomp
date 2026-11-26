@@ -12,8 +12,8 @@ enum SelectionPanelState {
 struct SelectionPanel {
     struct Task task;
     void *backgroundResource, *paletteResource;
-    struct SceneInputWidget widgets[10];
-    struct SceneInputResource auxiliaryResource, widgetResource;
+    struct AnimSprite widgets[10];
+    struct AnimSpriteResource auxiliaryResource, widgetResource;
     u16 entryIds[10], cachedIds[10];
     void *widgetScript, *auxiliaryScript;
     u16 widgetPalette[16];

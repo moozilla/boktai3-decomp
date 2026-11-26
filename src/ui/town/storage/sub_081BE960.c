@@ -2,9 +2,9 @@
 #include "ui/town/shop_panel.h"
 struct StoragePanel {
     u8 unknown0[0x1098];
-    struct SceneInputWidget banner;
+    struct AnimSprite banner;
     u8 unknown10F8[0x1538 - 0x10F8];
-    struct SceneInputResource gridResource;
+    struct AnimSpriteResource gridResource;
     u8 unknown1558[0x1734 - 0x1558];
     const void *itemText;
     u8 unknown1738[0x29];

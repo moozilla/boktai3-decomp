@@ -3,7 +3,7 @@
 void SceneMenu_InitializeDisplay(struct LinkPanel *p)
 {
     s32 i;
-    struct SceneInputResource *resource;
+    struct AnimSpriteResource *resource;
     resource = ScriptProc_Start(0xCB05, 0x1289);
     p->entrySource = resource;
     ResourceHeader_Relocate(&p->entryResource, resource);

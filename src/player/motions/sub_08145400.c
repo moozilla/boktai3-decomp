@@ -13,7 +13,7 @@ void Player_SetActionPhase(struct Player *, u8);
 void ActorSequence_Begin(struct Player *, s32, s32);
 void Player_UpdateScaleTransition(struct Player *p)
 {
-    struct SceneInputWidget *animation;
+    struct AnimSprite *animation;
     if (Player_ConsumeStateEntry(p))
         Player_SetPendingCallback(p, Player_OnFadeMotionExit);
     animation = &p->animation;

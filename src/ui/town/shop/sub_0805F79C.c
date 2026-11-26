@@ -1,7 +1,7 @@
 #include "ui/widgets/scene_input_panel.h"
 struct SceneInputPanelMessageView {
     u8 unknown0[0xD08];
-    struct SceneInputWidget banner;
+    struct AnimSprite banner;
     u8 unknownD68[0x1A88 - 0xD68];
     void *text;
 };

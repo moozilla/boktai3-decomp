@@ -6,7 +6,7 @@ s32 Div(s32, s32);
 /* SceneHudState viewed as one widget array from 0x1420 (indices 75 and 76 are valueWidgets). */
 struct SceneHudWidgetTable {
     u8 unknown0[0x1420];
-    struct SceneInputWidget widgets[0x80];
+    struct AnimSprite widgets[0x80];
 };
 #define WIDGET(p, n) (((struct SceneHudWidgetTable *)(p))->widgets[n])
 

@@ -666,12 +666,12 @@ static inline void SetDigitVisibility(struct SceneHudState *hud, u32 mask, s32 h
     if (hide) {
         do {
             *flags |= mask;
-            flags += sizeof(struct SceneInputWidget) / sizeof(*flags);
+            flags += sizeof(struct AnimSprite) / sizeof(*flags);
         } while (--i >= 0);
     } else {
         do {
             *flags &= mask;
-            flags += sizeof(struct SceneInputWidget) / sizeof(*flags);
+            flags += sizeof(struct AnimSprite) / sizeof(*flags);
         } while (--i >= 0);
     }
 }
@@ -704,7 +704,7 @@ void Hud_UpdateCountdownDigits(struct SceneHudState *hud)
                     ones = 0;
                 }
                 if ((gEngineFlags & 0x1000) || (*&gGameState->flags868 & 0x400)) {
-                    SceneInputWidget_Hide(&hud->countdownDigits[2]);
+                    AnimSprite_Hide(&hud->countdownDigits[2]);
                     if (hundreds == 0 && tens == 0) {
                         Anim_LoadKeyframe(&hud->countdownDigits[0], resource, (u16)(0x33), 1);
                         Anim_LoadKeyframe(&hud->countdownDigits[1], resource, (u16)(ones + 0x33),

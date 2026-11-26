@@ -63,7 +63,7 @@ void Storage_BeginSwapTransition(u8 *p)
             case 1: {
                 s32 slot = Storage_FindEquippedItemSlot(p, slots[selected]);
                 if (slot >= 0)
-                    ((struct SceneInputWidget *)(p + slot * sizeof(struct SceneInputWidget) +
+                    ((struct AnimSprite *)(p + slot * sizeof(struct AnimSprite) +
                                                  SWAP_OFFSET(categorySlots)))
                         ->flags |= mode;
                 item = Inventory_GetEquipmentId(slots[selected]);

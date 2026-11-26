@@ -213,7 +213,7 @@ void GameOver_InitSprites(struct GameOver *panel)
 
 void GameOver_InitOverlay(struct GameOver *panel)
 {
-    struct SceneInputResource *resource = ScriptProc_Start(0xCB05, 0x530D);
+    struct AnimSpriteResource *resource = ScriptProc_Start(0xCB05, 0x530D);
     if (resource) {
         struct SceneInputPackedPosition position;
         panel->overlayResource = *resource;

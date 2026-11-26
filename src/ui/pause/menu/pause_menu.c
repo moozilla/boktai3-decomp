@@ -64,10 +64,10 @@ void PauseMenu_HideAllSprites(struct SceneHudState *hud)
     u32 hidden = 1;
     s32 i;
     u32 *flags = &hud->categoryWidgets[0].flags;
-    struct SceneInputWidget *widget;
+    struct AnimSprite *widget;
     for (i = 0x7b; i >= 0; i--) {
         *flags |= hidden;
-        flags += sizeof(struct SceneInputWidget) / sizeof(*flags);
+        flags += sizeof(struct AnimSprite) / sizeof(*flags);
     }
     hud->selectorFlags |= 1;
     widget = &hud->comparisonUnlockWidget;
@@ -79,8 +79,8 @@ void PauseMenu_HideAllSprites(struct SceneHudState *hud)
 
 void PauseMenu_LoadSpriteKeyframe(struct SceneHudState *hud, s32 index, u32 keyframe)
 {
-    struct SceneInputWidget *widget =
-        &((struct SceneHudState *)(index * sizeof(struct SceneInputWidget) + (u32)hud))
+    struct AnimSprite *widget =
+        &((struct SceneHudState *)(index * sizeof(struct AnimSprite) + (u32)hud))
              ->categoryWidgets[0];
     widget->flags &= ~1;
     Anim_LoadKeyframe(&hud->categoryWidgets[index], hud->widgetResource, (u16)keyframe, 0);
@@ -89,7 +89,7 @@ void PauseMenu_LoadSpriteKeyframe(struct SceneHudState *hud, s32 index, u32 keyf
 void PauseMenu_SetSpritePosition(struct SceneHudState *hud, s32 index, u16 x, u16 y)
 {
     struct ContactPosition *position =
-        &((struct SceneHudState *)(index * sizeof(struct SceneInputWidget) + (u32)hud))
+        &((struct SceneHudState *)(index * sizeof(struct AnimSprite) + (u32)hud))
              ->categoryWidgets[0]
              .position;
     position->x = x;
@@ -100,16 +100,16 @@ void PauseMenu_SetSpritePosition(struct SceneHudState *hud, s32 index, u16 x, u1
 
 void PauseMenu_AddSpriteFlags(struct SceneHudState *hud, s32 index, u32 mask)
 {
-    struct SceneInputWidget *widget =
-        &((struct SceneHudState *)(index * sizeof(struct SceneInputWidget) + (u32)hud))
+    struct AnimSprite *widget =
+        &((struct SceneHudState *)(index * sizeof(struct AnimSprite) + (u32)hud))
              ->categoryWidgets[0];
     widget->flags |= mask;
 }
 
 void PauseMenu_ClearSpriteFlags(struct SceneHudState *hud, s32 index, u32 mask)
 {
-    struct SceneInputWidget *widget =
-        &((struct SceneHudState *)(index * sizeof(struct SceneInputWidget) + (u32)hud))
+    struct AnimSprite *widget =
+        &((struct SceneHudState *)(index * sizeof(struct AnimSprite) + (u32)hud))
              ->categoryWidgets[0];
     widget->flags &= ~mask;
 }
@@ -126,7 +126,7 @@ void PauseMenu_ClearTileRect(s32 x, s32 y, s32 width, s32 height)
     }
 }
 
-void PauseMenu_SetSpritePalette(struct SceneInputWidget *widget, u32 bank)
+void PauseMenu_SetSpritePalette(struct AnimSprite *widget, u32 bank)
 {
     widget->paletteBank = bank;
     widget->palette = (u16 *)((u8 *)gPaletteBankData + (widget->paletteBank << 5));
@@ -271,7 +271,7 @@ void PauseMenu_BeginSpriteMotion(struct SceneHudState *hud, u32 index, u32 keyfr
                                  struct SceneVec *from, struct SceneVec *to, s32 bend, u32 duration)
 {
     struct SceneHudWidgetMotion *motion = &hud->widgetMotions[index];
-    struct SceneInputWidget *widget;
+    struct AnimSprite *widget;
     motion->from = *from;
     motion->to = *to;
     if (bend != 0) {
@@ -296,7 +296,7 @@ void PauseMenu_BeginSpriteMotion(struct SceneHudState *hud, u32 index, u32 keyfr
 
 u32 PauseMenu_UpdateSpriteMotion(struct SceneHudState *hud, u32 index)
 {
-    struct SceneInputWidget *widget = &hud->motionWidgets[index];
+    struct AnimSprite *widget = &hud->motionWidgets[index];
     struct SceneHudWidgetMotion *motion = &hud->widgetMotions[index];
     s32 remaining;
     if (motion->active == 0)
@@ -390,19 +390,19 @@ void PauseMenu_ShowPromptSprite(struct SceneHudState *hud, s16 x, s16 y)
     PlayerCue_StepSequence(&hud->promptSprite, &hud->promptSequence);
 }
 
-void PauseMenu_LoadCategoryIconFrame(struct SceneHudState *hud, struct SceneInputWidget *widget,
+void PauseMenu_LoadCategoryIconFrame(struct SceneHudState *hud, struct AnimSprite *widget,
                                      s32 icon)
 {
     Anim_LoadKeyframe(widget, hud->motionResource, (u16)(icon + 0xf0), 0);
 }
 
-void PauseMenu_LoadEquipmentIconFrame(struct SceneHudState *hud, struct SceneInputWidget *widget,
+void PauseMenu_LoadEquipmentIconFrame(struct SceneHudState *hud, struct AnimSprite *widget,
                                       s32 icon)
 {
     Anim_LoadKeyframe(widget, hud->motionResource, (u16)(icon + 0xd9), 0);
 }
 
-void PauseMenu_LoadAttributeIconFrame(struct SceneHudState *hud, struct SceneInputWidget *widget,
+void PauseMenu_LoadAttributeIconFrame(struct SceneHudState *hud, struct AnimSprite *widget,
                                       s32 icon)
 {
     if (icon <= 5)
@@ -411,23 +411,23 @@ void PauseMenu_LoadAttributeIconFrame(struct SceneHudState *hud, struct SceneInp
         Anim_LoadKeyframe(widget, hud->motionResource, (u16)(icon + 0x19c), 1);
 }
 
-void PauseMenu_LoadStatusIconFrame(struct SceneHudState *hud, struct SceneInputWidget *widget,
+void PauseMenu_LoadStatusIconFrame(struct SceneHudState *hud, struct AnimSprite *widget,
                                    s32 icon)
 {
     Anim_LoadKeyframe(widget, hud->motionResource, (u16)(icon + 0xe7), 0);
 }
 
-void PauseMenu_LoadEmptySlotFrame(struct SceneHudState *hud, struct SceneInputWidget *widget)
+void PauseMenu_LoadEmptySlotFrame(struct SceneHudState *hud, struct AnimSprite *widget)
 {
     Anim_LoadKeyframe(widget, hud->motionResource, 0xc9, 1);
 }
 
-void PauseMenu_LoadFixedIconKeyframe(struct SceneHudState *hud, struct SceneInputWidget *widget)
+void PauseMenu_LoadFixedIconKeyframe(struct SceneHudState *hud, struct AnimSprite *widget)
 {
     Anim_LoadKeyframe(widget, hud->motionResource, 0xc8, 1);
 }
 
-void PauseMenu_LoadIndexedIconKeyframe(struct SceneHudState *hud, struct SceneInputWidget *widget,
+void PauseMenu_LoadIndexedIconKeyframe(struct SceneHudState *hud, struct AnimSprite *widget,
                                        s32 icon)
 {
     Anim_LoadKeyframe(widget, hud->widgetResource, (u16)(icon + 0x90), 0);

@@ -4,7 +4,7 @@
 #include "engine/engine.h"
 #include "engine/math/scene_vec.h"
 #include "scene/collision/contact_collider.h"
-#include "ui/widgets/scene_input_widget.h"
+#include "engine/video/anim_sprite.h"
 #include "scene/actor/scene_event_dispatch.h"
 
 /* Tentative: Nidhoggr, a dragon boss task (allocated at 0x72FC bytes, Task_Create(8, ...)).
@@ -43,8 +43,8 @@ struct Nidhoggr {
     s16 bgScrollX;                /* 0x5416 */
     s16 bgScrollY;                /* 0x5418 */
     u8 unknown541A[0x541C - 0x541A];
-    struct SceneInputResource animHdr;                /* 0x541C: shared keyframe/resource header for all part rows */
-    struct SceneInputWidget rows[26]; /* 0x543C: one per body segment */
+    struct AnimSpriteResource animHdr;                /* 0x541C: shared keyframe/resource header for all part rows */
+    struct AnimSprite rows[26]; /* 0x543C: one per body segment */
     struct ContactCollider timedCollider;       /* 0x5DFC: refreshed each frame in Update while
                                                  * flags[0] counts down */
     struct ContactCollider attackColliders[26]; /* 0x5E50: one per part */

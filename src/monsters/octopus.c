@@ -171,7 +171,7 @@ void SceneActor_EndReactionAnimation(struct ChaseActor *actor)
         if (!actor->base.drawableKind)
             *(u32 *)actor->base.drawable |= 1;
         else {
-            struct SceneInputWidget *tile = (void *)((u8 *)actor->base.drawable + 0x20);
+            struct AnimSprite *tile = (void *)((u8 *)actor->base.drawable + 0x20);
             tile->flags |= 1;
         }
     }

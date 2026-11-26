@@ -1,6 +1,6 @@
 #include "global.h"
 #include "engine/video/render.h"
-#include "ui/widgets/scene_input_widget.h"
+#include "engine/video/anim_sprite.h"
 #include "engine/video/sprite_drawable_api.h"
 typedef struct {
     s32 a, b;
@@ -26,7 +26,7 @@ typedef struct {
     u8 padb8[0xe4 - 0xb8];
     u8 pal[0x104 - 0xe4];
     u8 anim[0x144 - 0x104];
-    struct SceneInputWidget g[15];
+    struct AnimSprite g[15];
     struct SpriteDrawable marker[4];
 } Ctx;
 static inline void Clamp(s16 *v, s32 lo, s32 hi)
@@ -43,7 +43,7 @@ s32 ResultGame_InitializeDisplay(Ctx *p)
     u8 *tbl;
     u32 layer1 = layer + 1;
     s32 w;
-    struct SceneInputWidget *g;
+    struct AnimSprite *g;
     const struct SpriteEffectTileResource *entry;
     s32 i;
     s32 y;

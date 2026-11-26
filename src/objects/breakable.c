@@ -263,7 +263,7 @@ s32 Breakable_InitManager(struct PooledInteractableManager *manager)
     struct PooledInteractable *slot;
     gPooledInteractableManager = manager;
     for (i = 0; i < 3; i++) {
-        struct SceneInputResource *resource = ScriptProc_Start(0xcb05, gUnk_086049C8[i]);
+        struct AnimSpriteResource *resource = ScriptProc_Start(0xcb05, gUnk_086049C8[i]);
         if (!resource)
             return -1;
         manager->resources[i] = *resource;

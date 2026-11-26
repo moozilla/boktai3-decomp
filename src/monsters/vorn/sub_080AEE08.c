@@ -40,7 +40,7 @@ static inline void Vorn_ClearRoute(struct ChaseActor *actor,
     control->timer = cleared;
 }
 
-static inline void Vorn_SetTileFlags(struct SceneInputWidget *tile, u32 bits)
+static inline void Vorn_SetTileFlags(struct AnimSprite *tile, u32 bits)
 {
     tile->flags |= bits;
 }

@@ -17,7 +17,7 @@ void SceneHud_UpdateActionSwap(struct SceneHudState *p)
 {
     u8 *input = p->actionInput;
     u8 *cursor, *selection, *category;
-    struct SceneInputWidget *widget;
+    struct AnimSprite *widget;
     if (SceneInput_NavigateGridKeys(input, 240)) {
         SceneHud_GetActionIconPosition(&p->categoryWidgets[5].position, p->actionCursor);
         SceneHud_ShowActionPreview(p);

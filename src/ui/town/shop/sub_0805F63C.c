@@ -1,8 +1,8 @@
 #include "ui/widgets/scene_input_compare.h"
-void SceneInputPanel_ShowAttributeComparison(struct SceneInputWidget *first,
-                                             struct SceneInputWidget *second,
-                                             struct SceneInputWidget *third,
-                                             struct SceneInputResource *resource, s32 candidate)
+void SceneInputPanel_ShowAttributeComparison(struct AnimSprite *first,
+                                             struct AnimSprite *second,
+                                             struct AnimSprite *third,
+                                             struct AnimSpriteResource *resource, s32 candidate)
 {
     s32 digits[3];
     s32 current0, current1, current2, target0, target1, target2;
@@ -24,7 +24,7 @@ void SceneInputPanel_ShowAttributeComparison(struct SceneInputWidget *first,
     {
         s32 offset;
         s32 *digit;
-        struct SceneInputWidget *widget;
+        struct AnimSprite *widget;
         offset = comparison * 10;
         digit = digits;
         widget = first;
@@ -43,7 +43,7 @@ void SceneInputPanel_ShowAttributeComparison(struct SceneInputWidget *first,
     {
         s32 offset;
         s32 *digit;
-        struct SceneInputWidget *widget;
+        struct AnimSprite *widget;
         offset = comparison * 10;
         digit = digits;
         widget = second;
@@ -62,7 +62,7 @@ void SceneInputPanel_ShowAttributeComparison(struct SceneInputWidget *first,
     {
         s32 offset;
         s32 *digit;
-        struct SceneInputWidget *widget;
+        struct AnimSprite *widget;
         offset = comparison * 10;
         digit = digits;
         widget = third;

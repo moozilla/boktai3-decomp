@@ -280,7 +280,7 @@ void MeterDisplay_InitializeWidgets(struct FieldHudWidgets *widgets)
     s32 i, result;
     u32 zero;
     u32 *flags;
-    struct SceneInputWidget *widget;
+    struct AnimSprite *widget;
     void *script;
     script = ScriptProc_Start(0xCB05, 0x1289);
     widgets->meterScript = script;

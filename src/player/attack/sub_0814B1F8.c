@@ -90,7 +90,7 @@ static inline void PlayerMotion_SetPolar(struct ContactPosition *out, u16 angle,
     out->z = PlayerMotion_Scale12(gUnk_086149C4[angle & 255] * magnitude);
 }
 
-static inline void PlayerMotion_ClearAnimationFlags(struct SceneInputWidget *animation, u32 flags)
+static inline void PlayerMotion_ClearAnimationFlags(struct AnimSprite *animation, u32 flags)
 {
     u32 value = animation->flags;
     value &= ~flags;
@@ -108,16 +108,16 @@ static inline void PlayerMotion_AddPosition(struct SceneVec *out, const struct S
 #define PLAYER_START_ANIM(A0, A1, N, F)                                                            \
     {                                                                                              \
         if (p->heading == 0) {                                                                     \
-            struct SceneInputWidget *channel = &p->secondaryAnimation;                             \
+            struct AnimSprite *channel = &p->secondaryAnimation;                             \
             void *data = p->animationData;                                                         \
             Anim_SetKeyframes(channel, data, A0, N, F);                                            \
         } else {                                                                                   \
-            struct SceneInputWidget *channel = &p->secondaryAnimation;                             \
+            struct AnimSprite *channel = &p->secondaryAnimation;                             \
             void *data = p->animationData;                                                         \
             Anim_SetKeyframes(channel, data, A1, N, F);                                            \
         }                                                                                          \
         {                                                                                          \
-            struct SceneInputWidget *flagChannel = &p->secondaryAnimation;                         \
+            struct AnimSprite *flagChannel = &p->secondaryAnimation;                         \
             if (p->side)                                                                           \
                 flagChannel->flags |= 4;                                                           \
             else                                                                                   \
@@ -225,14 +225,14 @@ void Player_UpdateTargetMotion(struct Player *p)
                 dy = tp[2] - p->secondaryAnimation.position.z;
                 Player_SetFacingFromAngle(p, Math_Atan2(dx, dy));
                 if (p->heading == 0) {
-                    struct SceneInputWidget *channel = &p->secondaryAnimation;
+                    struct AnimSprite *channel = &p->secondaryAnimation;
                     Anim_SetKeyframes(channel, p->animationData, 0x1A1, 1, 0);
                 } else {
-                    struct SceneInputWidget *channel = &p->secondaryAnimation;
+                    struct AnimSprite *channel = &p->secondaryAnimation;
                     Anim_SetKeyframes(channel, p->animationData, 0x1A6, 1, 0);
                 }
                 {
-                    struct SceneInputWidget *channel = &p->secondaryAnimation;
+                    struct AnimSprite *channel = &p->secondaryAnimation;
                     if (p->side)
                         channel->flags |= 4;
                     else
@@ -250,7 +250,7 @@ void Player_UpdateTargetMotion(struct Player *p)
             struct PlayerMotionCounter count;
             u16 frame;
             s16 *tp;
-            struct SceneInputWidget *animation;
+            struct AnimSprite *animation;
             tp = TGT_POS();
             dx = tp[0] - p->secondaryAnimation.position.x;
             tp = TGT_POS();
@@ -417,7 +417,7 @@ void Player_UpdateTargetMotion(struct Player *p)
         }
         case 3: {
             struct ContactPosition pos;
-            struct SceneInputWidget *animation;
+            struct AnimSprite *animation;
             void *data;
             s16 cnt;
             if (p->tetherFrame == 0) {
@@ -488,7 +488,7 @@ void Player_UpdateTargetMotion(struct Player *p)
             break;
         }
         case 5: {
-            struct SceneInputWidget *animation;
+            struct AnimSprite *animation;
             void *data;
             PLAYER_START_ANIM_SHARED(0x1A1, 0x1A6, 1, 0);
             Anim_Step(animation, data);
@@ -524,7 +524,7 @@ void Player_UpdateTargetMotion(struct Player *p)
             break;
         }
         case 7: {
-            struct SceneInputWidget *animation;
+            struct AnimSprite *animation;
             u16 frame;
             frame = p->tetherFrame;
             animation = &p->secondaryAnimation;

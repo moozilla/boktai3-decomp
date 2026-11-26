@@ -5,8 +5,8 @@
 #include "engine/video/render.h"
 struct ChallengeTimeResult {
     struct Task task;
-    struct SceneInputResource categoryGraphics, digitGraphics;
-    struct SceneInputWidget category, label, digits[6];
+    struct AnimSpriteResource categoryGraphics, digitGraphics;
+    struct AnimSprite category, label, digits[6];
     s32 rank;
     void *backgroundResource;
     u16 *paletteSource;
@@ -32,7 +32,7 @@ s32 Mod(s32, s32);
 s32 ChallengeMenu_GetRankKeyframe(u32);
 extern u32 gUnk_08612160[];
 void TimeResult_SetState(struct ChallengeTimeResult *p, void (*v)(struct ChallengeTimeResult *));
-void TimeResult_LoadDigit(struct SceneInputWidget *digit, struct SceneInputResource *graphics,
+void TimeResult_LoadDigit(struct AnimSprite *digit, struct AnimSpriteResource *graphics,
                           u32 value);
 void TimeResult_BeginFadeIn(struct ChallengeTimeResult *p);
 void TimeResult_BeginFadeOut(struct ChallengeTimeResult *p);

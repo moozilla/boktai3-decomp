@@ -110,7 +110,7 @@ u32 Selection_GetDisplayFrame(s32);
 
 s32 SceneHud_CanApplySelectedAction(s32);
 
-void PauseMenu_SetSpritePalette(struct SceneInputWidget *, u16);
+void PauseMenu_SetSpritePalette(struct AnimSprite *, u16);
 
 void SceneHud_RefreshActionIcons(struct SceneHudState *owner)
 {
@@ -118,7 +118,7 @@ void SceneHud_RefreshActionIcons(struct SceneHudState *owner)
     u8 *category;
     u8 *base;
     u32 *flags;
-    struct SceneInputWidget *w;
+    struct AnimSprite *w;
     i = 0;
     category = &owner->actionCategory;
     base = (u8 *)owner;
@@ -129,7 +129,7 @@ void SceneHud_RefreshActionIcons(struct SceneHudState *owner)
         if (action < 0) {
             *flags |= 1;
         } else {
-            struct SceneInputWidget *current = ((struct SceneHudState *)base)->categoryWidgets + 10;
+            struct AnimSprite *current = ((struct SceneHudState *)base)->categoryWidgets + 10;
             current->flags &= ~1;
             Anim_LoadKeyframe(w, owner->motionResource, (u16)Selection_GetDisplayFrame(action), 1);
             if (*category == 0) {
@@ -151,11 +151,11 @@ void SceneHud_RefreshActionIcons(struct SceneHudState *owner)
 
 s32 SceneHud_FindCategoryAction(u32, u32);
 
-void SceneHud_SetIconPalette(struct SceneInputWidget *, u16);
+void SceneHud_SetIconPalette(struct AnimSprite *, u16);
 
 void SceneHud_BeginActionIconMotion(struct SceneHudState *s, s32 index, s32 source, s32 target)
 {
-    struct SceneInputWidget *w = &s->motionWidgets[index];
+    struct AnimSprite *w = &s->motionWidgets[index];
     void *resource;
     w->flags &= ~1;
     resource = s->motionResource;

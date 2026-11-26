@@ -202,7 +202,7 @@ void Presentation_UpdateAllocationSelection(struct SceneHudState *menu)
     refreshDisplay:
         menu->comparisonIndicators[0].flags &= ~1;
         if (menu->comparisonModifier) {
-            SceneInputWidget_Show(&menu->comparisonIndicators[1]);
+            AnimSprite_Show(&menu->comparisonIndicators[1]);
             menu->comparisonIndicators[1].position.x = 0;
             menu->comparisonIndicators[1].position.y = 8;
             PauseMenu_HidePromptIcons(menu);
@@ -297,7 +297,7 @@ void MenuSelection_DrawNumericSummary(struct SceneHudState *s)
 
 void StatusOptions_SetSelection(struct SceneHudState *s, u32 selection)
 {
-    struct SceneInputWidget *animation = &s->categoryWidgets[5];
+    struct AnimSprite *animation = &s->categoryWidgets[5];
     animation->flags &= ~1;
     Anim_LoadKeyframe(animation, s->widgetResource, 0x7C, 0);
     s->rowIndex = selection;
@@ -373,7 +373,7 @@ void Hud_InitStatusMenu(struct SceneHudState *s)
         Hud_SetInteractionCallback(s, InventoryGrid_UpdateModifierPreview, 0);
         MenuDisplay_SetPaletteOverrides(s, 0, 0, 0, 0);
     } else {
-        struct SceneInputWidget *obj = &s->comparisonIndicators[0];
+        struct AnimSprite *obj = &s->comparisonIndicators[0];
         u32 n;
         obj->flags &= ~1;
         s->comparisonIndicators[0].position.x = 0;

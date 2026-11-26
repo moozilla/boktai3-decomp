@@ -70,7 +70,7 @@ void TownMap_ApplyPaletteStep(struct RegistryChoiceMenu *transition, u32 step)
 void TownMap_UpdateAnimations(struct RegistryChoiceMenu *menu)
 {
     void *data = &menu->resource;
-    struct SceneInputWidget *anim = &menu->animations[1];
+    struct AnimSprite *anim = &menu->animations[1];
     struct MenuCursorEntry *offset;
     if (menu->selection >= 0 && TestFlags(menu->cursor, 2)) {
         anim->flags &= ~1;
@@ -108,9 +108,9 @@ void TownMap_ConfirmSelection(struct RegistryChoiceMenu *menu)
 
 void TownMap_InitAnimations(struct RegistryChoiceMenu *menu)
 {
-    struct SceneInputResource *resource = ScriptProc_Start(0xcb05, 0xa2db);
+    struct AnimSpriteResource *resource = ScriptProc_Start(0xcb05, 0xa2db);
     if (resource) {
-        struct SceneInputWidget *anim;
+        struct AnimSprite *anim;
         s32 count;
         menu->resource = *resource;
         ResourceHeader_Relocate(&menu->resource, resource);
@@ -229,7 +229,7 @@ void TownMap_OnUpdate(struct RegistryChoiceMenu *menu)
 
 void TownMap_OnDestroy(struct RegistryChoiceMenu *menu)
 {
-    struct SceneInputWidget *animation = menu->animations;
+    struct AnimSprite *animation = menu->animations;
     s32 i = 4;
     do {
         if (animation->active)

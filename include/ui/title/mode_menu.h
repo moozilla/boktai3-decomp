@@ -12,8 +12,8 @@ struct ModeMenu {
     s32 selection;
     u32 unknown20;
     s32 choiceCount;
-    struct SceneInputResource resource;
-    struct SceneInputWidget background, cursor;
+    struct AnimSpriteResource resource;
+    struct AnimSprite background, cursor;
     s32 state, result, fadeTimer, fadeShift;
     u16 *savedPalette;
     u16 palette[16];
@@ -27,8 +27,8 @@ struct ScreenDelayParameters {
     u32 script;
 };
 struct ResultWidget {
-    struct SceneInputWidget sprite;
-    struct SceneInputResource resource;
+    struct AnimSprite sprite;
+    struct AnimSpriteResource resource;
     u32 unknown80[2];
 };
 struct ResultScreen {

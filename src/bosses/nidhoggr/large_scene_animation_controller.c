@@ -1548,9 +1548,9 @@ static inline void Nidhoggr_AddTargetFlags(u32 *p, u32 mask)
 void Nidhoggr_InitParts(void *arg0)
 {
     struct Nidhoggr *t = arg0;
-    struct SceneInputResource *src;
+    struct AnimSpriteResource *src;
     s32 i;
-    struct SceneInputWidget *row;
+    struct AnimSprite *row;
     struct NidhoggrPartExtra *target;
     struct ContactCollider *collider;
     u32 damage;

@@ -38,9 +38,9 @@ struct PlayerCloneSlot {
     struct ContactCollider contact, collider, area, playerAttack;
     u8 unknown17C[0x1C];
     struct PlayerCloneConfiguration configuration;
-    struct SceneInputWidget animation;
+    struct AnimSprite animation;
     u8 unknown218[0x60];
-    struct SceneInputResource resource;
+    struct AnimSpriteResource resource;
     u8 shadow[0x6C];
     u32 flags, behaviorPhase;
     u8 unknown30C[0x10];

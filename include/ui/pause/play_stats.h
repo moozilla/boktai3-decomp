@@ -4,14 +4,14 @@
 
 struct PlayStatsScreen {
     struct Task task;
-    struct SceneInputResource resources[2];
+    struct AnimSpriteResource resources[2];
     void *layerMap;
     u8 *palettes;
     u32 flags, script, screen, screenTimer;
     s32 state, timer;
     u32 mapId;
     u8 timeText[9], valueText[11];
-    struct SceneInputWidget entries[10];
+    struct AnimSprite entries[10];
     u32 soundCued;
     void (*callback)(struct PlayStatsScreen *);
     u8 *scriptPc[3];

@@ -81,7 +81,7 @@ struct SceneHudState {
     s32 optionEValue;               /* 0x60: -e */
     u8 widgetResource[0x40];        /* 0x64 */
     u8 motionResource[0x20];        /* 0xA4: keyframe resource */
-    struct SceneInputResource accountResource; /* 0xC4: account prompt glyphs and keyframes */
+    struct AnimSpriteResource accountResource; /* 0xC4: account prompt glyphs and keyframes */
     u8 unknownE4[0x20];
     u8 actionResultResources[2][0x20];      /* 0x104: normal and bonus keyframes */
     u8 controlAnimationResource[0x20];      /* 0x144 */
@@ -144,7 +144,7 @@ struct SceneHudState {
     u8 actionCueInitialized, actionCueSuppressed; /* 0xB00 */
     u8 previousCueGroup, previousCueSelection;    /* 0xB02 */
     const u16 *countdownValue;
-    struct SceneInputWidget countdownDigits[3]; /* 0xB08 */
+    struct AnimSprite countdownDigits[3]; /* 0xB08 */
     u32 selectorFlags;                          /* 0xC28 */
     u8 unknownC2C[0x44];
     u8 primaryVisible;           /* 0xC70 */
@@ -153,13 +153,13 @@ struct SceneHudState {
     u8 primaryBlinkTimer;        /* 0xC73: 60-frame icon blink */
     s16 *primarySelectionOutput; /* 0xC74 */
     struct SceneHudPrimaryOption primaryOptions[4];
-    struct SceneInputWidget primaryWidgets[3]; /* 0xC88 */
+    struct AnimSprite primaryWidgets[3]; /* 0xC88 */
     s8 secondaryFirstValue;  /* 0xDA8: first value of stride-eight option records */
     s8 secondaryUnlockIndex; /* 0xDA9: indexed with stride eight */
     u8 secondaryEntryEnabled, secondaryEntryIcon; /* 0xDAA: indexed with stride eight */
     s32 secondaryActionValue;                     /* 0xDAC: indexed with stride eight */
     u8 unknownDB0[0x78];
-    struct SceneInputWidget secondaryWidgets[3]; /* 0xE28 */
+    struct AnimSprite secondaryWidgets[3]; /* 0xE28 */
     s8 selection;                                /* 0xF48 */
     u8 unknownF49;
     s8 tertiarySelection;  /* 0xF4A */
@@ -167,10 +167,10 @@ struct SceneHudState {
     u8 tertiarySlideTimer; /* 0xF4C */
     u8 unknownF4D[3];
     struct SceneHudTertiaryOption tertiaryOptions[8]; /* 0xF50 */
-    struct SceneInputWidget tertiaryWidgets[3];       /* 0xF70 */
-    struct SceneInputWidget extraWidgetsA[3];         /* 0x1090 */
-    struct SceneInputWidget extraWidgetsB[3];         /* 0x11B0 */
-    struct SceneInputWidget extraWidgetsC[3];         /* 0x12D0 */
+    struct AnimSprite tertiaryWidgets[3];       /* 0xF70 */
+    struct AnimSprite extraWidgetsA[3];         /* 0x1090 */
+    struct AnimSprite extraWidgetsB[3];         /* 0x11B0 */
+    struct AnimSprite extraWidgetsC[3];         /* 0x12D0 */
     u8 unknown13F0;
     u8 secondaryInputEnabled; /* 0x13F1 */
     u8 secondaryCount;        /* 0x13F2 */
@@ -179,42 +179,42 @@ struct SceneHudState {
     u8 mode; /* 0x1414: snapshot of gSceneHudMode */
     u8 unknown1415;
     u8 pageEnabled[10]; /* 0x1416: script -o visibility list */
-    struct SceneInputWidget
+    struct AnimSprite
         categoryWidgets[30]; /* 0x1420: ten controls, eight action icons, twelve unlock icons */
     u8 unknown1F60[0xC0];
-    struct SceneInputWidget modeWidget; /* 0x2020 */
+    struct AnimSprite modeWidget; /* 0x2020 */
     u8 unknown2080[0x4E0];
-    struct SceneInputWidget actionPanelWidgets[3]; /* 0x2560 */
+    struct AnimSprite actionPanelWidgets[3]; /* 0x2560 */
     u8 unknown2680[0x22];
     u16 actionFeedbackY; /* 0x26A2: transient action feedback animation */
     u8 unknown26A4[0x3C];
-    struct SceneInputWidget settingsValues[3]; /* 0x26E0: glyphs for the three settings */
+    struct AnimSprite settingsValues[3]; /* 0x26E0: glyphs for the three settings */
     u8 unknown2800[0x240];
     struct SceneHudControlAnimation actionAnimation; /* 0x2A40 */
     u8 unknown2A60[0x40];
-    struct SceneInputWidget motionWidgets[15]; /* 0x2AA0: extent bounded by valueWidgets */
-    struct SceneInputWidget valueWidgets[2];   /* 0x3040, 0x30A0: widget indices 75 and 76 */
+    struct AnimSprite motionWidgets[15]; /* 0x2AA0: extent bounded by valueWidgets */
+    struct AnimSprite valueWidgets[2];   /* 0x3040, 0x30A0: widget indices 75 and 76 */
     u8 unknown3100[0xC0];
-    struct SceneInputWidget statusIcons[4];          /* 0x31C0 */
-    struct SceneInputWidget comparisonIndicators[2]; /* 0x3340 */
-    struct SceneInputWidget statMarkers[3][3];       /* 0x3400: base, bonus, delta */
-    struct SceneInputWidget settingsArrows[2];       /* 0x3760: left and right */
+    struct AnimSprite statusIcons[4];          /* 0x31C0 */
+    struct AnimSprite comparisonIndicators[2]; /* 0x3340 */
+    struct AnimSprite statMarkers[3][3];       /* 0x3400: base, bonus, delta */
+    struct AnimSprite settingsArrows[2];       /* 0x3760: left and right */
     u8 unknown3820[0x240];
-    struct SceneInputWidget navigationArrows[4]; /* 0x3A60: up, down, left, right. */
-    struct SceneInputWidget accountAnimation;    /* 0x3BE0 */
-    struct SceneInputWidget accountChoices[2];   /* 0x3C40 */
-    struct SceneInputWidget accountCursor;       /* 0x3D00 */
-    struct SceneInputWidget accountCountDigits[3]; /* 0x3D60 */
-    struct SceneInputWidget accountValueDigits[4]; /* 0x3E80 */
-    struct SceneInputWidget accountRateIcon;       /* 0x4000 */
-    struct SceneInputWidget accountTotalDigits[4]; /* 0x4060 */
-    struct SceneInputWidget transferWidgets[2]; /* 0x41E0: hidden after action transfer */
+    struct AnimSprite navigationArrows[4]; /* 0x3A60: up, down, left, right. */
+    struct AnimSprite accountAnimation;    /* 0x3BE0 */
+    struct AnimSprite accountChoices[2];   /* 0x3C40 */
+    struct AnimSprite accountCursor;       /* 0x3D00 */
+    struct AnimSprite accountCountDigits[3]; /* 0x3D60 */
+    struct AnimSprite accountValueDigits[4]; /* 0x3E80 */
+    struct AnimSprite accountRateIcon;       /* 0x4000 */
+    struct AnimSprite accountTotalDigits[4]; /* 0x4060 */
+    struct AnimSprite transferWidgets[2]; /* 0x41E0: hidden after action transfer */
     u8 statusRefreshRequested;                  /* 0x42A0 */
     u8 pageRepeatTimer;                         /* 0x42A1: held shoulder-button repeat */
     u8 clockSelection;                          /* 0x42A2: base time, time A or time B */
     u8 unknown42A3;
-    struct SceneInputWidget comparisonActionWidget; /* 0x42A4 */
-    struct SceneInputWidget comparisonUnlockWidget; /* 0x4304 */
+    struct AnimSprite comparisonActionWidget; /* 0x42A4 */
+    struct AnimSprite comparisonUnlockWidget; /* 0x4304 */
     u16 comparisonPalette[16];                      /* 0x4364 */
     u8 actionInput[3];  /* 0x4384: action-grid input state, extent tentative */
     u8 actionCursor;    /* 0x4387: position lookup index */
@@ -304,7 +304,7 @@ u32 SunClock_GetBaseHour(void);
 u32 SunClock_GetBaseMinute(void);
 struct SceneInputGrid;
 u32 SceneInput_TestGridFlags(struct SceneInputGrid *, u32);
-void SceneHud_SetKeyframePaletteBank(struct SceneInputWidget *, u32);
+void SceneHud_SetKeyframePaletteBank(struct AnimSprite *, u32);
 void SceneHud_SetTimedState(u32 unused, s32 start, u32 value, u32 kind, u32 phaseEnabled,
                             u32 parameter);
 #endif

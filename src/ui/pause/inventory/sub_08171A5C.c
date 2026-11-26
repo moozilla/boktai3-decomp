@@ -6,7 +6,7 @@ void PauseMenu_SetSpritePalette(void *, u16);
 void SceneHud_PrepareActionTransferToSlot(struct SceneHudState *p, s32 index, s32 action,
                                           s32 target)
 {
-    struct SceneInputWidget *widget = &p->motionWidgets[index];
+    struct AnimSprite *widget = &p->motionWidgets[index];
     void *resource;
     struct ContactPosition *position;
     widget->flags &= ~1;

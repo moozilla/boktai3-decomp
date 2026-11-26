@@ -226,7 +226,7 @@ void SelectionPanel_HideDisplayObjects(struct SelectionPanel *panel)
 
 void SelectionPanel_RemoveWidgets(struct SelectionPanel *panel)
 {
-    struct SceneInputWidget *q = panel->widgets;
+    struct AnimSprite *q = panel->widgets;
     s32 i;
 
     for (i = 9; i >= 0; i--) {

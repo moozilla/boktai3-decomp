@@ -30,7 +30,7 @@ struct DarkLoanMapHeader {
 struct DarkLoanScreen {
     struct Task task;
     struct DisplayResourceHeader resource, secondaryResource;
-    struct SceneInputWidget widgets[DARK_LOAN_WIDGET_COUNT];
+    struct AnimSprite widgets[DARK_LOAN_WIDGET_COUNT];
     struct ContactSwarmSprite sprite;
     u8 animation[0x1C];
     struct DarkLoanMapHeader *map;

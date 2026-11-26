@@ -2746,7 +2746,7 @@ void PlayerCue_UpdateStandDiagonalB(struct Player *player)
 
 extern u32 gUnk_0200051C, gUnk_02000524;
 
-static inline void ClearAnimationFlags(struct SceneInputWidget *animation, u32 mask)
+static inline void ClearAnimationFlags(struct AnimSprite *animation, u32 mask)
 {
     u32 flags = animation->flags;
     flags &= ~mask;
@@ -2765,7 +2765,7 @@ static inline void TargetDash_SetKeyframes(u32 index, void *anim, void *data, u3
     Anim_SetKeyframes(anim, data, selection.sequence, mode, flags);
 }
 
-static inline void TargetDash_StartAnimation(struct Player *player, struct SceneInputWidget *anim,
+static inline void TargetDash_StartAnimation(struct Player *player, struct AnimSprite *anim,
                                              void *data, u32 a, u32 b, u32 mode)
 {
     if (player->heading == 0)
@@ -2844,7 +2844,7 @@ static inline void TargetDash_EmitRelativeTargetSpark(struct Player *player)
 
 void PlayerCue_UpdateTargetDash(struct Player *player)
 {
-    struct SceneInputWidget *anim;
+    struct AnimSprite *anim;
     void *data;
     u32 animationFrame;
 
@@ -2962,7 +2962,7 @@ void PlayerCue_UpdateTargetDash(struct Player *player)
                 gUnk_0200051C = 0;
             }
             if (player->tetherFrame == 5) {
-                struct SceneInputWidget *animation;
+                struct AnimSprite *animation;
                 if (player->heading == 0) {
                     animation = &player->secondaryAnimation;
                     Anim_SetKeyframes(animation, player->animationData, 0x1A3, 2, 0);

@@ -2,7 +2,7 @@
 #include "ui/widgets/scene_input.h"
 struct SceneInventoryCategoryMenu {
     u8 unknown0[0x258];
-    struct SceneInputWidget prompt;
+    struct AnimSprite prompt;
     u8 unknown2B8[0x1260];
     u8 choiceResource[0x235];
     u8 choiceState;

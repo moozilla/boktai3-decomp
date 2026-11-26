@@ -211,7 +211,7 @@ void StateSprite_InitAnimation(struct SceneScheduledEffect *sprite, s32 type, s3
                                s32 variant)
 {
     struct SceneScheduledEffectPool *pool = gAnimatedBodyPool;
-    struct SceneInputResource *data;
+    struct AnimSpriteResource *data;
     s32 index = direction * 3 + type * 9;
     sprite->animationIndex = index;
     sprite->variant = variant;

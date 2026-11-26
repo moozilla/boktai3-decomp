@@ -3,10 +3,10 @@
 #include "ui/pause/scene_hud_display.h"
 s32 Inventory_GetEquipmentId(u32);
 void SceneHud_GetActionIconPosition(void *, int);
-void PauseMenu_SetSpritePalette(struct SceneInputWidget *, u16);
+void PauseMenu_SetSpritePalette(struct AnimSprite *, u16);
 void SceneHud_InitEquipmentTransfer(struct SceneHudState *p, s32 index, s32 from, s32 to)
 {
-    struct SceneInputWidget *w = &p->motionWidgets[index];
+    struct AnimSprite *w = &p->motionWidgets[index];
     void *data;
     struct ContactPosition *target;
     w->flags &= ~1;

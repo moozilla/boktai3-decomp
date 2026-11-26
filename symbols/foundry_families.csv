@@ -1290,7 +1290,7 @@ addr,function,name,family,note
 08217298,sub_08217298,ResourceSlots_Reset,"display resource slots","clears a two-slot resource cache and invalidates its IDs"
 08217EEC,sub_08217EEC,SpriteDrawable_SelectTileFrame,"sprite drawable","sets tile dimensions, OAM attributes and frame tile index"
 08218ED8,sub_08218ED8,BackgroundMap_ClearTextRect,"text background map","fills a rectangle on BG0 with tile 0xF001"
-082197A4,sub_082197A4,Anim_InitPositionedWidget,"animation widgets (shared SceneInputWidget)","selects a widget glyph and initializes flags, attributes and position"
+082197A4,sub_082197A4,Anim_InitPositionedWidget,"animation widgets (shared AnimSprite)","selects a widget glyph and initializes flags, attributes and position"
 0821BB34,sub_0821BB34,Terrain_ResetMap,"terrain map","clear map resources and reset trap storage"
 0821BBBC,sub_0821BBBC,Terrain_BuildRowOffsets,"terrain map","build cell-index offsets for each terrain row"
 0821FE04,sub_0821FE04,Collider_InsertPriorityList,"collider manager","insert a collider once into the bit-0x2000 list"

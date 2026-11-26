@@ -2,7 +2,7 @@
 void SceneInput_InitMarkerPair(struct SceneInputPair *pair)
 {
     struct ContactPosition position;
-    struct SceneInputResource *resource = ScriptProc_Start(0xCB05, 0x5D04);
+    struct AnimSpriteResource *resource = ScriptProc_Start(0xCB05, 0x5D04);
     s32 i;
     pair->resource = *resource;
     ResourceHeader_Relocate(pair, resource);

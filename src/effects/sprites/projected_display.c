@@ -18,7 +18,7 @@ static inline void ProjectedDisplay_Project(struct ContactPosition *out,
 
 struct ProjectedDisplay *ProjectedDisplay_PositionEntry(struct ProjectedDisplay *display, s32 index)
 {
-    struct SceneInputWidget *entry = &display->entries[index];
+    struct AnimSprite *entry = &display->entries[index];
     if (index == 1)
         ProjectedDisplay_Project(&entry->position, &display->world);
     else
@@ -30,7 +30,7 @@ struct ProjectedDisplay *ProjectedDisplay_PositionEntry(struct ProjectedDisplay 
 
 void ProjectedDisplay_UpdateEntries(struct ProjectedDisplay *display)
 {
-    struct SceneInputWidget *entry = display->entries;
+    struct AnimSprite *entry = display->entries;
     s32 index = 0;
     do {
         Anim_Step(entry, &display->resource);
@@ -50,9 +50,9 @@ s32 Widget_InitLinked(void *, void *, u32, u32, u32, u32, u32, void *);
 
 s32 ProjectedDisplay_InitializeEntries(struct ProjectedDisplay *display)
 {
-    struct SceneInputWidget *entry = display->entries;
+    struct AnimSprite *entry = display->entries;
     s32 index = 0;
-    struct SceneInputResource *resource = &display->resource;
+    struct AnimSpriteResource *resource = &display->resource;
     do {
         if (Widget_InitLinked(entry, resource, 0, 16, 2, 0, 60, &display->screen) >= 0) {
             Anim_SetKeyframes(entry, resource, gUnk_08605960[index].frame, 1, 4);
@@ -69,7 +69,7 @@ s32 ProjectedDisplay_InitializeEntries(struct ProjectedDisplay *display)
 void ProjectedDisplay_RemoveEntries(struct ProjectedDisplay *display)
 {
     s32 remaining;
-    struct SceneInputWidget *entry = display->entries;
+    struct AnimSprite *entry = display->entries;
     for (remaining = 4; remaining >= 0; remaining--, entry++)
         Anim_Remove(entry);
 }
@@ -101,7 +101,7 @@ s32 ProjectedDisplay_InitializeEntries(struct ProjectedDisplay *);
 s32 ProjectedDisplay_Initialize(struct ProjectedDisplay *display,
                                 const struct ContactPosition *position)
 {
-    struct SceneInputResource *resource;
+    struct AnimSpriteResource *resource;
     display->height = 0;
     display->world = *position;
     ProjectedDisplay_UpdateScreenPosition(display);

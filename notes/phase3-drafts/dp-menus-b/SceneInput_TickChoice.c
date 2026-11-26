@@ -1,5 +1,5 @@
 #include "ui/widgets/scene_input.h"
-s32 SceneInput_TickChoice(struct SceneInputWidget *widget, void *resource, u8 *selection, u8 *blink)
+s32 SceneInput_TickChoice(struct AnimSprite *widget, void *resource, u8 *selection, u8 *blink)
 {
     u32 keys = gPadState[1];
     u32 change;

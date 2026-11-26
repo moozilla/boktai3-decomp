@@ -6,7 +6,7 @@ struct SceneInventoryCleanupView {
     u8 task[0x60];
     struct ContactSwarmSprite sprite;
     u8 graphics[0x1C];
-    struct SceneInputWidget widgets[69];
+    struct AnimSprite widgets[69];
     u8 unknown1A88[0x1AF0 - 0x1A88];
     struct SceneInputPair transition;
     u8 unknown1BE4[0x30];
@@ -18,7 +18,7 @@ void MessageWindow_Clear(void);
 void ScrollingDialogue_ClearScript(void);
 s32 Shop_DestroyController(struct SceneInventoryCleanupView *owner)
 {
-    struct SceneInputWidget *widget;
+    struct AnimSprite *widget;
     s32 i;
     Sprite_Remove(&owner->sprite);
     widget = owner->widgets;

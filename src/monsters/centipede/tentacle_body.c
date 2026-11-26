@@ -95,7 +95,7 @@ void CentipedeBody_UpdateHiddenTransition(struct ChaseActor *actor, s32 frame, u
             drawable->flags = value | mask;
         } else {
             struct ActorSprite *drawable = actor->base.drawable;
-            struct SceneInputWidget *tile =
+            struct AnimSprite *tile =
                 &((struct SceneActorAnimationTileDrawable *)drawable)->tile;
             u32 value = tile->flags;
             tile->flags = value | mask;
@@ -128,7 +128,7 @@ void ActorTrail_RestoreSavedState(struct ChaseActor *actor)
             u32 mask = ~1;
             *q = mask & *q;
         } else {
-            struct SceneInputWidget *q =
+            struct AnimSprite *q =
                 &((struct SceneActorAnimationTileDrawable *)actor->base.drawable)->tile;
             u32 mask = ~1;
             q->flags = mask & q->flags;

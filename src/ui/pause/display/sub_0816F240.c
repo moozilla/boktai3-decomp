@@ -32,7 +32,7 @@ void PauseDisplay_BeginRandomTransition(u8 *s)
     kind = s + 0x438A;
     index = *kind + 10;
     {
-        u32 off = index * sizeof(struct SceneInputWidget);
+        u32 off = index * sizeof(struct AnimSprite);
         u8 *base = s + 0x1428;
         flags = (u32 *)(base + off);
     }

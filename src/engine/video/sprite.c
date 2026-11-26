@@ -8,7 +8,7 @@
 #define Sprite_SetCurrentListHead       sub_0821432C
 #include "engine/video/sprite.h"
 #include "engine/video/sprite_oam.h"
-#include "ui/widgets/scene_input_widget.h"
+#include "engine/video/anim_sprite.h"
 #include "engine/video/interrupts_video.h"
 #include "global.h"
 #include "engine/video/render.h"
@@ -119,9 +119,9 @@ void Effect_UnlinkFromList(struct SpriteDrawable *entry, u32 list)
         next->previous = previous;
 }
 
-s32 Anim_LinkToList(struct SceneInputWidget *entry, u32 list)
+s32 Anim_LinkToList(struct AnimSprite *entry, u32 list)
 {
-    struct SceneInputWidget *head;
+    struct AnimSprite *head;
     entry->list = list;
     entry->active = 1;
     entry->previous = 0;
@@ -133,10 +133,10 @@ s32 Anim_LinkToList(struct SceneInputWidget *entry, u32 list)
     return 0;
 }
 
-void Anim_UnlinkFromList(struct SceneInputWidget *entry, u32 list)
+void Anim_UnlinkFromList(struct AnimSprite *entry, u32 list)
 {
-    struct SceneInputWidget *previous = entry->previous;
-    struct SceneInputWidget *next = entry->next;
+    struct AnimSprite *previous = entry->previous;
+    struct AnimSprite *next = entry->next;
     entry->active = 0;
     if (previous)
         previous->next = next;

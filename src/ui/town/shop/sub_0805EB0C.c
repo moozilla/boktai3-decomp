@@ -43,11 +43,11 @@ void SceneInputPanel_InitWidgets(struct SceneInputPanel *owner, s32 mode)
     struct SceneInputPanel *panel = owner;
     struct SceneInputPackedPosition position;
     struct DisplaySequenceState sequence;
-    struct SceneInputResource *source;
+    struct AnimSpriteResource *source;
     void *sequenceResource;
     void *graphics;
     s32 i, k;
-    struct SceneWidgetPlayback playback;
+    struct AnimSpritePlayback playback;
     u8 priority;
 
     source = ScriptProc_Start(0xCB05, 0x5D04);

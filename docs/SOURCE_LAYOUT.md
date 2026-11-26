@@ -24,7 +24,7 @@ list the evidence and the names still awaiting confirmation.
 | `src/system/` | The cartridge and what is saved: solar sensor, clock and sun schedule, saving, game state, inventory data |
 | `src/scene/` | The world simulation everything shares: the actor framework, collision, terrain and paths, gameplay areas, camera, scene lifecycle |
 | `src/script/` | The GCL script interpreter (Metal Gear Solid's scripting language) and its runtime |
-| `src/engine/` | Boot, tasks, heap, interrupts, video (backgrounds, sprites, the animated sprite, palettes, text tiles), math, game-side sound |
+| `src/engine/` | Boot, tasks, heap, interrupts, video (backgrounds, animated sprites, palettes, text tiles), math, game-side sound |
 | `src/lib/` | Third-party libraries in upstream form: m4a (sound driver), rfu (wireless), rtc, eeprom, libgcc, libc, libm |
 
 ## Conventions
@@ -60,7 +60,7 @@ list the evidence and the names still awaiting confirmation.
   `include/scene/collision/` (contacts and collision responses),
   `include/scene/motion/` (routes, chase, turning, terrain movement). Engine-wide
   headers: `include/engine/` (memory, tasks, input, RAM), `include/engine/video/`
-  (display sequences, palettes, render), `include/engine/math/`.
+  (display sequences, palettes, render, `anim_sprite.h`), `include/engine/math/`.
 
 ## Where is it?
 
@@ -196,3 +196,7 @@ For worker replay, use `tools/reorg.py --function-renames
 symbols/function_renames.csv --apply` after replaying the placement tables.
 The symbol pass preserves source basenames, the reviewed input table, and
 history entries. `--check` with the same table verifies the rename replay.
+
+Replay the sprite types with `tools/reorg.py --type-renames
+symbols/type_renames.csv --apply`. The placement table routes the owning
+header to `include/engine/video/anim_sprite.h`.

@@ -2,7 +2,7 @@
 #include "ui/town/shop_panel.h"
 #include "ui/town/shop_catalog.h"
 #include "ui/pause/scene_hud_display.h"
-void SceneInput_PositionCursor(struct SceneInputGridView *, struct SceneInputWidget *);
+void SceneInput_PositionCursor(struct SceneInputGridView *, struct AnimSprite *);
 void SceneHud_HideFourDigits(struct SceneInputPanel *);
 void SceneInputPanel_TickHighlight(struct SceneInputHighlight *);
 void SceneInputPanel_SetMeterGlyph(struct SceneInputPanel *, u32, u32);

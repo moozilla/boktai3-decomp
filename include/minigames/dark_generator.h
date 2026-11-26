@@ -22,8 +22,8 @@ struct ControlPanel {
     struct ContactSwarmSprite markers[6];
     u8 markerGraphics[0x1C];
     u16 multiplierTimer, unknown376;
-    struct SceneInputResource resource;
-    struct SceneInputWidget widgets[5];
+    struct AnimSpriteResource resource;
+    struct AnimSprite widgets[5];
     u16 start, cooldown, soundTicks, selection;
     u8 unknown580[8];
     u16 sustainedInput, thresholds[3], multiplier, unknown592;

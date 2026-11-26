@@ -8,7 +8,7 @@ s32 SolarFruit_GetInventorySlot(s32);
 void SceneHud_RefreshEquippedActionIcons(struct SceneHudState *p)
 {
     s32 slot, unlock, action, entry, description;
-    struct SceneInputWidget *w;
+    struct AnimSprite *w;
     void *resource;
     if ((s16)gGameState->unk50 <= 7)
         slot = 0;
@@ -18,11 +18,11 @@ void SceneHud_RefreshEquippedActionIcons(struct SceneHudState *p)
     action = (&gGameState->slots88[4])[gGameState->actionAuxiliarySlot];
     if (unlock == -1 || action == -1) {
         {
-            struct SceneInputWidget *a = &p->comparisonUnlockWidget;
+            struct AnimSprite *a = &p->comparisonUnlockWidget;
             a->flags |= 1;
         }
         {
-            struct SceneInputWidget *a = &p->comparisonActionWidget;
+            struct AnimSprite *a = &p->comparisonActionWidget;
             a->flags |= 1;
         }
     } else {
@@ -37,7 +37,7 @@ void SceneHud_RefreshEquippedActionIcons(struct SceneHudState *p)
         else
             Anim_LoadKeyframe(&p->comparisonActionWidget, resource, 1, 0);
         {
-            struct SceneInputWidget *a = &p->comparisonActionWidget;
+            struct AnimSprite *a = &p->comparisonActionWidget;
             a->flags &= ~1;
         }
         if (description <= 5)

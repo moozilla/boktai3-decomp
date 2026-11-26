@@ -27,7 +27,7 @@ void SceneActorAnimation_UpdateFlashAlternatingRepeat(struct StateActor *p, int 
     struct SceneGraphicsActor *actor = (struct SceneGraphicsActor *)p;
     if (p->actionChanged) {
         int sequence;
-        struct SceneInputWidget *draw;
+        struct AnimSprite *draw;
         int resource;
         u8 cleared;
         p->actionChanged = 0;

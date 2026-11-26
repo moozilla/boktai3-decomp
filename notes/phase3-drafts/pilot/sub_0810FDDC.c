@@ -1,9 +1,9 @@
 
 struct ScoreDigits {
     u8 taskAndResources[0x24];
-    struct SceneInputWidget slots[18];
+    struct AnimSprite slots[18];
     u8 unknown6E4[0x20];
-    struct SceneInputResource glyphs;
+    struct AnimSpriteResource glyphs;
 };
 
 static inline void SetDigitVisible(struct ScoreDigits *p, s32 idx, s32 glyph)

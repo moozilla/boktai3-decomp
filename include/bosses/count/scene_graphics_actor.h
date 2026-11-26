@@ -2,7 +2,7 @@
 #define GUARD_SCENE_GRAPHICS_ACTOR_H
 
 #include "global.h"
-#include "ui/widgets/scene_input_widget.h"
+#include "engine/video/anim_sprite.h"
 
 struct ContactActorPool;
 struct BackgroundFlashController;
@@ -64,8 +64,8 @@ struct SceneActorGraphics {
 /* Actor-relative view used by contact, animation and palette handlers. */
 struct SceneGraphicsActor {
     u8 unk0[0x220];
-    struct SceneInputResource animationResource; /* 0x220: keyframe resource. */
-    struct SceneInputWidget animation; /* 0x240: body animation playback. */
+    struct AnimSpriteResource animationResource; /* 0x220: keyframe resource. */
+    struct AnimSprite animation; /* 0x240: body animation playback. */
     u8 unk2A0[0x33C - 0x2A0];
     s32 pendingDamage;
     u8 damagePending;

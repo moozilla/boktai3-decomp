@@ -35,9 +35,9 @@ void Player_ApplyControlPresentation(struct Player *p)
         Collider_SetPosition(&p->collider, &p->position, 0);
     }
     if (Player_GetControlFlags(p, 1))
-        SceneInputWidget_Hide(&p->animation);
+        AnimSprite_Hide(&p->animation);
     else
-        SceneInputWidget_Show(&p->animation);
+        AnimSprite_Show(&p->animation);
     if (Player_GetControlFlags(p, 2))
         p->animation.flags |= 0x200;
     else

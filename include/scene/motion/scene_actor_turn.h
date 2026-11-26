@@ -90,7 +90,7 @@ static inline void SceneActorTurn_SelectAnimation(struct ChaseActor *a, u32 sele
         Anim_SetSequence(&drawable->sequence, (void *)drawable->resource, (u16)selection,
                          (u8)variant, (u8)flags);
     } else {
-        struct SceneInputWidget *tile =
+        struct AnimSprite *tile =
             &((struct SceneActorAnimationTileDrawable *)a->base.drawable)->tile;
         selection += variant;
         {

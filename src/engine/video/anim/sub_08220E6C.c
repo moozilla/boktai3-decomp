@@ -1,4 +1,4 @@
-#include "ui/widgets/scene_input_widget.h"
+#include "engine/video/anim_sprite.h"
 s32 Anim_LoadKeyframe(void *, void *, u32, u32);
 static inline s32 Scale6(s32 v)
 {
@@ -6,7 +6,7 @@ static inline s32 Scale6(s32 v)
         return v >> 6;
     return -((-v) >> 6);
 }
-void sub_08220E6C(struct SceneInputWidget *anim, struct SceneInputResource *data, u16 sequence, u16 index)
+void sub_08220E6C(struct AnimSprite *anim, struct AnimSpriteResource *data, u16 sequence, u16 index)
 {
     struct AnimationKeyframeSequence *table = data->sequences;
     struct AnimationKeyframeSequence *entry = (struct AnimationKeyframeSequence *)((sequence * 8) + (u32)table);

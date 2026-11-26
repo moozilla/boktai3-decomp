@@ -3,7 +3,7 @@
 
 #include "scene/collision/contact_position.h"
 
-struct SceneWidgetPlayback {
+struct AnimSpritePlayback {
     u8 priority, mode;
 };
 
@@ -16,7 +16,7 @@ struct AnimationKeyframeSequence {
     u32 offset;
 };
 /* The relocatable 32-byte glyph/keyframe resource header. */
-struct SceneInputResource {
+struct AnimSpriteResource {
     u16 paletteIndex, glyphCount, sequenceCount, unknown6;
     u32 unknown8;
     struct WidgetGlyphEntry *glyphs;
@@ -26,7 +26,7 @@ struct SceneInputResource {
     u8 *extraData;
 };
 
-struct SceneInputWidget {
+struct AnimSprite {
     u16 glyphKind;
     u16 stamp; /* Copied from 03005238 on initialization; meaning tentative. */
     u8 active, unknown5; /* active: linked to an animation list */
@@ -48,16 +48,16 @@ struct SceneInputWidget {
     u16 *palette;
     u8 *tileData, *extraData;
     struct AnimationKeyframe *frames; /* sequence frame table at +0x54 */
-    struct SceneInputWidget *previous, *next;
+    struct AnimSprite *previous, *next;
 };
 
 /* flags bit 0 hides the widget's sprite. */
-static inline void SceneInputWidget_Hide(struct SceneInputWidget *widget)
+static inline void AnimSprite_Hide(struct AnimSprite *widget)
 {
     widget->flags |= 1;
 }
 
-static inline void SceneInputWidget_Show(struct SceneInputWidget *widget)
+static inline void AnimSprite_Show(struct AnimSprite *widget)
 {
     widget->flags &= ~1;
 }

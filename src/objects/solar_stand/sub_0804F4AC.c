@@ -3,11 +3,11 @@
 void ResourceStation_InitializeDigits(struct ResourceStation *station)
 {
     struct SceneInputPackedPosition position;
-    struct SceneInputResource *source = ScriptProc_Start(0xCB05, 0x530D);
+    struct AnimSpriteResource *source = ScriptProc_Start(0xCB05, 0x530D);
     if (source != 0) {
         u8 *cursor, *graphics;
         s32 remaining;
-        *(struct SceneInputResource *)station->digitGraphics = *source;
+        *(struct AnimSpriteResource *)station->digitGraphics = *source;
         cursor = station->digitGraphics;
         ResourceHeader_Relocate(cursor, source);
         {
@@ -16,11 +16,11 @@ void ResourceStation_InitializeDigits(struct ResourceStation *station)
             position.z = 0;
         }
         graphics = cursor;
-        cursor += sizeof(struct SceneInputResource);
+        cursor += sizeof(struct AnimSpriteResource);
         remaining = 3;
         do {
             Widget_InitLinked(cursor, graphics, 0x1e, 0x31, 1, 0, 0x3c, &position);
-            cursor += sizeof(struct SceneInputWidget);
+            cursor += sizeof(struct AnimSprite);
             remaining--;
         } while (remaining >= 0);
     }

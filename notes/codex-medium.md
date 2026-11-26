@@ -3753,7 +3753,7 @@ matched; no NONMATCHING drafts remain from this task.
   resources into +0x1538/+0x1518, initializes Storage's widgets (including the
   two sixteen-slot grids and eight equipped markers), then initializes the input
   marker/glyph pairs at +0x1558/+0x164C. Uses the shared `ContactPackedVector`
-  and `SceneInputResource` types. Taking the clear-fill value's address early
+  and `AnimSpriteResource` types. Taking the clear-fill value's address early
   (`zeroPtr`) gives the original stack layout; otherwise the position starts
   four bytes too early and creates extensive allocation differences. Initially
   committed as a recorded 95.9% draft, then superseded by an exact match.

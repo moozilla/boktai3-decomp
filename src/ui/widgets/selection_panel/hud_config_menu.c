@@ -25,17 +25,17 @@ void Power_EnterSleep(void);
 void SelectionPanel_UpdateCursor(struct SceneHudState *menu, s32 visible)
 {
     if (visible == 0) {
-        SceneInputWidget_Hide(&menu->categoryWidgets[5]);
-        SceneInputWidget_Hide(&menu->settingsArrows[0]);
-        SceneInputWidget_Hide(&menu->settingsArrows[1]);
+        AnimSprite_Hide(&menu->categoryWidgets[5]);
+        AnimSprite_Hide(&menu->settingsArrows[0]);
+        AnimSprite_Hide(&menu->settingsArrows[1]);
     } else {
         u8 *row;
         menu->categoryWidgets[5].flags &= ~1;
         menu->categoryWidgets[5].position.x = 0;
         row = &menu->settingsRow;
         menu->categoryWidgets[5].position.y = *row * 16 + 0x18;
-        SceneInputWidget_Show(&menu->settingsArrows[0]);
-        SceneInputWidget_Show(&menu->settingsArrows[1]);
+        AnimSprite_Show(&menu->settingsArrows[0]);
+        AnimSprite_Show(&menu->settingsArrows[1]);
         menu->settingsArrows[0].position.x = 0x80;
         menu->settingsArrows[1].position.x = 0xd8;
         {

@@ -15,7 +15,7 @@ static inline u8 OwnerWidgetsEnabled(u32 mask)
 }
 s32 SceneHud_DestroyOwner(struct SceneHudState *s)
 {
-    struct SceneInputWidget *widget;
+    struct AnimSprite *widget;
     s32 count;
     SceneHud_RemoveAnimations(s);
     PauseMenu_RemoveHeaderAnimation(s);

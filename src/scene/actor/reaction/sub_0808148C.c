@@ -41,7 +41,7 @@ void SceneActorReaction_PlayStaggerBurst(struct ChaseActor *actor, s32 frame)
             u32 mask = ~1;
             *flags &= mask;
         } else {
-            struct SceneInputWidget *tile = (void *)((u8 *)actor->base.drawable + 0x20);
+            struct AnimSprite *tile = (void *)((u8 *)actor->base.drawable + 0x20);
             u32 mask = ~1;
             tile->flags &= mask;
         }

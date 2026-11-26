@@ -79,7 +79,7 @@ void ModeMenu_Update(struct ModeMenu *p)
 {
     struct ContactPosition pos;
     s32 historyIndex, i;
-    struct SceneInputWidget *cursor;
+    struct AnimSprite *cursor;
     u32 *cursorFlags;
     s32 elapsed, firstFrame, timeout;
 
@@ -230,9 +230,9 @@ void ModeMenu_Destroy(struct ModeMenu *p)
 
 s32 ModeMenu_Initialize(struct ModeMenu *p)
 {
-    struct SceneInputResource *res;
-    struct SceneInputWidget *w1;
-    struct SceneInputWidget *w2;
+    struct AnimSpriteResource *res;
+    struct AnimSprite *w1;
+    struct AnimSprite *w2;
     u32 *flags;
     u16 **pal;
     u16 *x3A;

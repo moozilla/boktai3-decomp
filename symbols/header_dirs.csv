@@ -325,7 +325,7 @@ include/engine/shared/scene_input_compare.h,include/ui/widgets/scene_input_compa
 include/engine/shared/scene_input_grid.h,include/ui/widgets/scene_input_grid.h,"owned by src/ui/widgets/input_grid; included from system,ui",,
 include/engine/shared/scene_input_navigation.h,include/ui/widgets/scene_input_navigation.h,owned by src/ui/widgets/input_grid; included from ui,,
 include/engine/shared/scene_input_panel.h,include/ui/widgets/scene_input_panel.h,owned by src/ui/widgets/input_grid; included from ui,,
-include/engine/shared/scene_input_widget.h,include/ui/widgets/scene_input_widget.h,"owned by src/ui/widgets/input_grid; included from bosses,engine,link,minigames,monsters,scene,ui",,
+include/engine/shared/scene_input_widget.h,include/engine/video/anim_sprite.h,"struct SceneInputWidget becomes struct AnimSprite (type_renames.csv), owned by engine/video/anim",,include/ui/widgets/scene_input_widget.h
 include/engine/shared/scene_inventory_actions.h,include/ui/town/shop_actions.h,renamed,,include/ui/town/scene_inventory_actions.h
 include/engine/shared/scene_inventory_callback.h,include/ui/town/shop_callback.h,renamed,,include/ui/town/scene_inventory_callback.h
 include/engine/shared/scene_inventory_control.h,include/ui/town/shop_control.h,renamed,,include/ui/town/scene_inventory_control.h

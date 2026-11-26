@@ -3,7 +3,7 @@
 
 #include "engine/math/scene_vec.h"
 #include "bosses/hresvelgr/boss_action_state.h"
-#include "ui/widgets/scene_input_widget.h"
+#include "engine/video/anim_sprite.h"
 
 struct HresvelgrTravelActor {
     u8 pad0[0x51];
@@ -35,8 +35,8 @@ struct HresvelgrTravelActor {
     struct SceneVec *origin;
     s8 savedHeading;
     u8 pad115[0x5F];
-    struct SceneInputResource animationData;
-    struct SceneInputWidget animation;
+    struct AnimSpriteResource animationData;
+    struct AnimSprite animation;
     u8 pad1F4[0x248 - 0x1F4];
     u8 bodyCollider[0x2F0 - 0x248]; /* 0x248: set up by ColliderActor_InitBodyCollider. */
     struct BossActionState action, behavior; /* 0x2F0, 0x300 */

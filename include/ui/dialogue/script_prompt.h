@@ -3,8 +3,8 @@
 
 #include "ui/widgets/scene_input.h"
 struct ScriptPromptWidget {
-    struct SceneInputWidget sprite;
-    struct SceneInputResource resource;
+    struct AnimSprite sprite;
+    struct AnimSpriteResource resource;
     u32 unknown80[2];
 };
 struct ScriptPromptPalette {

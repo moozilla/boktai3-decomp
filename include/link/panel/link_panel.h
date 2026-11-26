@@ -19,11 +19,11 @@ struct LinkPanel {
     struct Task task;
     void *backgroundResource;
     void *paletteResource;
-    struct SceneInputWidget animations[7];
-    struct SceneInputResource lastEntryResource, entryResource;
+    struct AnimSprite animations[7];
+    struct AnimSpriteResource lastEntryResource, entryResource;
     u16 selected[7];
     s16 previous[7];
-    struct SceneInputResource *entrySource; /* 0x31C: the 0x1289 resource before relocation */
+    struct AnimSpriteResource *entrySource; /* 0x31C: the 0x1289 resource before relocation */
     u8 unknown320[4];
     struct LinkPanelPaletteCycle paletteCycle;
     struct LinkPanelEntry entries[2];

@@ -3,13 +3,13 @@
 #define SceneHud_GetCarouselY     PauseMenu_GetEquipmentRowY
 #include "global.h"
 #include "ui/pause/scene_hud_display.h"
-void PauseMenu_LoadCategoryIconFrame(struct SceneHudState *, struct SceneInputWidget *, s32);
-void PauseMenu_LoadEquipmentIconFrame(struct SceneHudState *, struct SceneInputWidget *, s32);
+void PauseMenu_LoadCategoryIconFrame(struct SceneHudState *, struct AnimSprite *, s32);
+void PauseMenu_LoadEquipmentIconFrame(struct SceneHudState *, struct AnimSprite *, s32);
 s32 PauseMenu_GetEquipmentRowY(struct SceneHudState *, s32, s32, s32, s32);
 void SceneHud_UpdateSecondaryWidgets(struct SceneHudState *p)
 {
     s32 i = 0;
-    struct SceneInputWidget *w = p->secondaryWidgets;
+    struct AnimSprite *w = p->secondaryWidgets;
     for (; i <= 2; w++, i++) {
         s32 index = i + p->selection;
         struct SceneHudState *entry;

@@ -43,9 +43,9 @@ int SelectionMenu_NavigateGrid(struct SelectionMenu *);
 u32 Script_GetTextSourcePc(void);
 
 u8 *SelectionMenu_GetIconPalette(s32 i);
-void Presentation_SetActorIconFrame(struct SelectionMenu *p, struct SceneInputWidget *q, u8 *r);
-void SelectionMenu_SetActorIcon(struct SelectionMenu *p, struct SceneInputWidget *q, u32 c);
-void Presentation_SetItemGraphic(struct SelectionMenu *p, struct SceneInputWidget *q, u32 item);
+void Presentation_SetActorIconFrame(struct SelectionMenu *p, struct AnimSprite *q, u8 *r);
+void SelectionMenu_SetActorIcon(struct SelectionMenu *p, struct AnimSprite *q, u32 c);
+void Presentation_SetItemGraphic(struct SelectionMenu *p, struct AnimSprite *q, u32 item);
 void SelectionMenu_SetCallback(struct SelectionMenu *p, void (*v)(struct SelectionMenu *));
 u32 SelectionMenu_ConsumeCallbackFlag(struct SelectionMenu *p);
 void Presentation_UpdateActorGraphic(struct SelectionMenu *p, u32 fallback);
@@ -93,13 +93,13 @@ u8 *SelectionMenu_GetIconPalette(s32 i)
     return gPaletteBankData + (i + 0x373) * 0x20;
 }
 
-void Presentation_SetActorIconFrame(struct SelectionMenu *p, struct SceneInputWidget *q, u8 *r)
+void Presentation_SetActorIconFrame(struct SelectionMenu *p, struct AnimSprite *q, u8 *r)
 {
     Anim_LoadKeyframe(q, &p->iconResource, *r + 0xf0, 0);
     q->flags &= ~1;
 }
 
-void SelectionMenu_SetActorIcon(struct SelectionMenu *p, struct SceneInputWidget *q, u32 c)
+void SelectionMenu_SetActorIcon(struct SelectionMenu *p, struct AnimSprite *q, u32 c)
 {
     u8 *r = Inventory_GetEquipmentEntry(c);
     if (*r != 0xff) {
@@ -110,7 +110,7 @@ void SelectionMenu_SetActorIcon(struct SelectionMenu *p, struct SceneInputWidget
     }
 }
 
-void Presentation_SetItemGraphic(struct SelectionMenu *p, struct SceneInputWidget *q, u32 item)
+void Presentation_SetItemGraphic(struct SelectionMenu *p, struct AnimSprite *q, u32 item)
 {
     int index = Inventory_GetConsumableId(item);
     if (index >= 0) {
@@ -340,7 +340,7 @@ void SelectionMenu_InitHighlight(struct SelectionMenu *p)
 
 void SelectionMenu_PositionCursors(struct SelectionMenu *p)
 {
-    struct SceneInputWidget *g = &p->cursors[0];
+    struct AnimSprite *g = &p->cursors[0];
     g->position.x = (p->selectedSlot & 3) * 24 + 144;
     g->position.y = (p->selectedSlot >> 2) * 24 + 32;
     g->flags &= ~1;
@@ -361,7 +361,7 @@ void SelectionMenu_PositionInventoryMarkers(struct SelectionMenu *p)
 {
     int i, index;
     for (i = 0; i < 8; i++) {
-        struct SceneInputWidget *g = &p->markers[i];
+        struct AnimSprite *g = &p->markers[i];
         /* Byte-index the owner first to preserve the original address-add order. */
         if (i <= 7)
             index = ((struct GameState *)((u8 *)gGameState + i * 2))->inventory[0];
@@ -380,7 +380,7 @@ void SelectionMenu_PositionEquipmentMarkers(struct SelectionMenu *p)
 {
     int i, index;
     for (i = 0; i < 8; i++) {
-        struct SceneInputWidget *g = &p->markers[i];
+        struct AnimSprite *g = &p->markers[i];
         /* Same address-order adaptation as the inventory marker loop. */
         if (i <= 3)
             index = ((struct GameState *)((u8 *)gGameState + i * 2))->party[0];
@@ -406,7 +406,7 @@ void SelectionMenu_HideMarkers(struct SelectionMenu *p)
 
 void SelectionMenu_StepCursors(struct SelectionMenu *p)
 {
-    struct SceneInputWidget *e = &p->cursors[0];
+    struct AnimSprite *e = &p->cursors[0];
     s32 i = 2;
     do {
         Anim_Step(e, &p->panelResource);
@@ -424,7 +424,7 @@ void SelectionMenu_RemovePanel(struct SelectionMenu *p)
 
 void SelectionMenu_RemoveCursors(struct SelectionMenu *p)
 {
-    struct SceneInputWidget *e = &p->cursors[0];
+    struct AnimSprite *e = &p->cursors[0];
     s32 i = 2;
     do {
         Anim_Remove(e);
@@ -435,7 +435,7 @@ void SelectionMenu_RemoveCursors(struct SelectionMenu *p)
 
 void SelectionMenu_RemoveMarkerAnim(struct SelectionMenu *p)
 {
-    struct SceneInputWidget *e = p->markers;
+    struct AnimSprite *e = p->markers;
     s32 i = 7;
     do {
         Anim_Remove(e);
@@ -453,7 +453,7 @@ void SelectionMenu_RemoveHighlight(struct SelectionMenu *p)
 void SelectionMenu_InitIconGrid(struct SelectionMenu *p)
 {
     struct ContactPosition position;
-    struct SceneInputWidget *heading;
+    struct AnimSprite *heading;
     int i;
 
     ZeroFill8(&position);
@@ -467,7 +467,7 @@ void SelectionMenu_InitIconGrid(struct SelectionMenu *p)
 
 void SelectionMenu_PopulateActors(struct SelectionMenu *p)
 {
-    struct SceneInputWidget *g = p->icons;
+    struct AnimSprite *g = p->icons;
     int i;
     struct ContactPosition position;
     for (i = 0; i < 16; i++, g++) {
@@ -490,7 +490,7 @@ void SelectionMenu_PopulateActors(struct SelectionMenu *p)
 
 void SelectionMenu_PopulateItems(struct SelectionMenu *p)
 {
-    struct SceneInputWidget *g = p->icons;
+    struct AnimSprite *g = p->icons;
     int i;
     struct ContactPosition position;
     for (i = 0; i < 16; i++, g++) {
@@ -513,7 +513,7 @@ void SelectionMenu_PopulateItems(struct SelectionMenu *p)
 
 void SelectionMenu_RemoveIconGrid(struct SelectionMenu *p)
 {
-    struct SceneInputWidget *e = p->icons;
+    struct AnimSprite *e = p->icons;
     s32 i = 0x12;
     do {
         Anim_Remove(e);
@@ -533,7 +533,7 @@ void SelectionMenu_StartAnimateChoice(struct SelectionMenu *p)
 
 void SelectionMenu_Back(struct SelectionMenu *p)
 {
-    struct SceneInputWidget *g = &p->cursors[1];
+    struct AnimSprite *g = &p->cursors[1];
     if (p->choiceCount) {
         Sound_PlaySong(0xde);
         Anim_LoadKeyframe(g, &p->panelResource, 0x4d, 0);
@@ -555,7 +555,7 @@ void SelectionMenu_Back(struct SelectionMenu *p)
 
 void SelectionMenu_AdvanceChoice(struct SelectionMenu *p)
 {
-    struct SceneInputWidget *g = &p->cursors[1];
+    struct AnimSprite *g = &p->cursors[1];
     if (!p->choiceCount)
         g->position.x = 64;
     else
@@ -818,8 +818,8 @@ void SelectionMenu_Choose(struct SelectionMenu *p)
 
 void SelectionMenu_AnimateChoice(struct SelectionMenu *p)
 {
-    struct SceneInputWidget *source = &p->icons[p->selectedSlot];
-    struct SceneInputWidget *dest = &p->icons[16 + p->choiceCount];
+    struct AnimSprite *source = &p->icons[p->selectedSlot];
+    struct AnimSprite *dest = &p->icons[16 + p->choiceCount];
     if (SelectionMenu_ConsumeCallbackFlag(p)) {
         Widget_CopyMasked(dest, source, 13);
         dest->flags &= ~1;
@@ -842,7 +842,7 @@ void SelectionMenu_AnimateChoice(struct SelectionMenu *p)
 
 void SelectionMenu_ReviewChoice(struct SelectionMenu *p)
 {
-    struct SceneInputWidget *g;
+    struct AnimSprite *g;
     if (SelectionMenu_ConsumeCallbackFlag(p)) {
         g = &p->icons[18];
         Anim_LoadKeyframe(&p->cursors[0], &p->panelResource, 0x4d, 0);
@@ -911,7 +911,7 @@ void SelectionMenu_Close(struct SelectionMenu *p)
 
 void SelectionMenu_Hide(struct SelectionMenu *p)
 {
-    struct SceneInputWidget *g;
+    struct AnimSprite *g;
     int i;
     g = &p->panels[0];
     g->flags |= 1;
@@ -962,7 +962,7 @@ u32 SelectionMenu_Destroy(struct SelectionMenu *p)
 
 int SelectionMenu_Initialize(struct SelectionMenu *p, void *a, void *b)
 {
-    struct SceneInputResource *resource = ScriptProc_Start(0xcb05, 0x530d);
+    struct AnimSpriteResource *resource = ScriptProc_Start(0xcb05, 0x530d);
     if (!resource)
         return -1;
     p->panelResource = *resource;

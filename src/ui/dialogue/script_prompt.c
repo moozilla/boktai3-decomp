@@ -132,9 +132,9 @@ s32 ScriptPrompt_Initialize(struct ScriptPromptScreen *s)
     void *palette;
     void *resource;
     u16 *sourcePalette;
-    struct SceneInputResource *frameResource;
-    struct SceneInputResource *acceptResource;
-    struct SceneInputResource *cancelResource;
+    struct AnimSpriteResource *frameResource;
+    struct AnimSpriteResource *acceptResource;
+    struct AnimSpriteResource *cancelResource;
     u16 **widgetPalette;
     u16 **savedPalette;
     u16 *colors;

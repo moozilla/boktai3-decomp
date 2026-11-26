@@ -11,7 +11,7 @@ void PauseMenu_SetSpritePosition(struct SceneHudState *hud, s32 index, u16 x, u1
 void PauseMenu_AddSpriteFlags(struct SceneHudState *hud, s32 index, u32 mask);
 void PauseMenu_ClearSpriteFlags(struct SceneHudState *hud, s32 index, u32 mask);
 void PauseMenu_ClearTileRect(s32 x, s32 y, s32 width, s32 height);
-void PauseMenu_SetSpritePalette(struct SceneInputWidget *widget, u32 bank);
+void PauseMenu_SetSpritePalette(struct AnimSprite *widget, u32 bank);
 void PauseMenu_SmoothPoint(s16 *position, s16 *target, s32 weight);
 u32 PauseMenu_GetPlayerStatusValue(struct SceneHudState *hud);
 void PauseMenu_StartPaletteTransition(struct SceneHudState *hud, u16 sourceBank, u16 targetBank,
@@ -28,16 +28,16 @@ void PauseMenu_SetPairedIcons(struct SceneHudState *hud, s32 left, s32 right);
 void PauseMenu_HidePromptIcons(struct SceneHudState *hud);
 void PauseMenu_CloseTextWindows(struct SceneHudState *hud);
 void PauseMenu_ShowPromptSprite(struct SceneHudState *hud, s16 x, s16 y);
-void PauseMenu_LoadCategoryIconFrame(struct SceneHudState *hud, struct SceneInputWidget *widget,
+void PauseMenu_LoadCategoryIconFrame(struct SceneHudState *hud, struct AnimSprite *widget,
                                      s32 icon);
-void PauseMenu_LoadEquipmentIconFrame(struct SceneHudState *hud, struct SceneInputWidget *widget,
+void PauseMenu_LoadEquipmentIconFrame(struct SceneHudState *hud, struct AnimSprite *widget,
                                       s32 icon);
-void PauseMenu_LoadAttributeIconFrame(struct SceneHudState *hud, struct SceneInputWidget *widget,
+void PauseMenu_LoadAttributeIconFrame(struct SceneHudState *hud, struct AnimSprite *widget,
                                       s32 icon);
-void PauseMenu_LoadStatusIconFrame(struct SceneHudState *hud, struct SceneInputWidget *widget,
+void PauseMenu_LoadStatusIconFrame(struct SceneHudState *hud, struct AnimSprite *widget,
                                    s32 icon);
-void PauseMenu_LoadEmptySlotFrame(struct SceneHudState *hud, struct SceneInputWidget *widget);
-void PauseMenu_LoadFixedIconKeyframe(struct SceneHudState *hud, struct SceneInputWidget *widget);
-void PauseMenu_LoadIndexedIconKeyframe(struct SceneHudState *hud, struct SceneInputWidget *widget,
+void PauseMenu_LoadEmptySlotFrame(struct SceneHudState *hud, struct AnimSprite *widget);
+void PauseMenu_LoadFixedIconKeyframe(struct SceneHudState *hud, struct AnimSprite *widget);
+void PauseMenu_LoadIndexedIconKeyframe(struct SceneHudState *hud, struct AnimSprite *widget,
                                        s32 icon);
 #endif

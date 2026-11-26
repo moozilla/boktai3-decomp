@@ -65,7 +65,7 @@ static inline void Golem_SelectAnimation(struct ChaseActor *actor, u32 selection
                          (u8)variant, (u8)flags);
         restart = &actor->base.restart;
     } else {
-        struct SceneInputWidget *tile =
+        struct AnimSprite *tile =
             &((struct SceneActorAnimationTileDrawable *)actor->base.drawable)->tile;
         u8 *savedSelection;
         selection += variant;

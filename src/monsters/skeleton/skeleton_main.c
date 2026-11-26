@@ -2208,7 +2208,7 @@ s32 SceneActorReaction_TickHiddenResponse(struct ChaseActor *actor)
                 u32 *field = saved->base.drawable;
                 *field |= one;
             } else {
-                struct SceneInputWidget *tile = (void *)((u8 *)saved->base.drawable + 0x20);
+                struct AnimSprite *tile = (void *)((u8 *)saved->base.drawable + 0x20);
                 tile->flags |= one;
             }
             {
@@ -3297,7 +3297,7 @@ void Skeleton_TurnTowardRouteFacing(struct ChaseActor *a)
     u8 prepared = SceneActorReaction_TakePrepared(a);
     s32 direction, target, delta;
     const u8 *entry;
-    struct SceneInputWidget *tile;
+    struct AnimSprite *tile;
 
     motionFlags = &a->base.motionFlags;
     if (prepared) {
@@ -4231,7 +4231,7 @@ static inline void Show_SinkThenDefeat(struct ChaseActor *a)
         u32 mask = ~1;
         *flags &= mask;
     } else {
-        struct SceneInputWidget *tile = (void *)((u8 *)a->base.drawable + 0x20);
+        struct AnimSprite *tile = (void *)((u8 *)a->base.drawable + 0x20);
         u32 mask = ~1;
         tile->flags &= mask;
     }

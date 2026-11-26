@@ -7,8 +7,8 @@ struct RegistryChoiceMenu {
     struct Task task;
     void *background;
     u16 *palettes;
-    struct SceneInputWidget animations[5];
-    struct SceneInputResource resource;
+    struct AnimSprite animations[5];
+    struct AnimSpriteResource resource;
     u32 unknown220;
     s32 initialSelection, selection;
     struct MenuCursor *cursor;

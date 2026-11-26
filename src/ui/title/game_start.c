@@ -67,7 +67,7 @@ void GameStart_DrawSaveInfo(struct GameStart *p)
     u8 titleTiles[6][16];
     s32 i;
     const u8 *s;
-    struct SceneInputResource *levelRes;
+    struct AnimSpriteResource *levelRes;
 
     seqs = gUnk_0824FD50;
     memcpy(titleTiles, gUnk_0824FD5C, sizeof(titleTiles));
@@ -80,9 +80,9 @@ void GameStart_DrawSaveInfo(struct GameStart *p)
         s32 portraitIndex;
         s32 hours, minutes, level;
         u8 *q;
-        struct SceneInputWidget *tens;
-        struct SceneInputResource *res;
-        struct SceneInputWidget *minuteOnes, *minuteTens, *colon, *levelOnes, *hourOnes;
+        struct AnimSprite *tens;
+        struct AnimSpriteResource *res;
+        struct AnimSprite *minuteOnes, *minuteTens, *colon, *levelOnes, *hourOnes;
 
         memcpy(misc, gUnk_0824FDBC, sizeof(misc));
         s = PlayerName_GetBuffer();
@@ -280,8 +280,8 @@ void GameStart_Update(struct GameStart *p)
 void GameStart_Destroy(struct GameStart *p)
 {
     s32 i;
-    struct SceneInputWidget *q;
-    struct SceneInputWidget *a, *b;
+    struct AnimSprite *q;
+    struct AnimSprite *a, *b;
     u16 *r = &gDispCntShadow;
     s32 m = 4;
     *r = *r & -m;
