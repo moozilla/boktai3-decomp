@@ -38,7 +38,6 @@ void MovingPlatform_RegisterFollowCells(struct NamedObject *objectArg)
     struct Pos16 where;
     struct Pos16 *w;
     u16 *flags;
-    u8 *registration;
     if (!manager) {
         MovingPlatform_ReleaseMember(object);
         return;
@@ -70,11 +69,10 @@ void MovingPlatform_RegisterFollowCells(struct NamedObject *objectArg)
     base = GetCell(&object->body.position);
     cell = base + 1;
     i = 0;
-    registration = object->cellRegistrations[0];
     for (; i < 4; i++) {
         if (HasBits((u16 *)(cellProps(cell) + 2))) {
-            TerrainModifiers_RegisterCell(registration, cell, 0, (s16)object->body.position.y >> 8,
-                                          0xFF, 5);
+            TerrainModifiers_RegisterCell(&object->cellRegistrations[i], cell, 0,
+                                          (s16)object->body.position.y >> 8, 0xFF, 5);
             object->cellRegistered[i] = 1;
             w = &where;
             col = Mod(cell, *(s16 *)(gTerrainMap->cells + 4));
@@ -98,6 +96,5 @@ void MovingPlatform_RegisterFollowCells(struct NamedObject *objectArg)
                 cell = base - *(s16 *)(gTerrainMap->cells + 4);
                 break;
         }
-        registration += 0x10;
     }
 }
