@@ -11,6 +11,7 @@ void SpriteTrail_UpdatePositions(struct SpriteTrail *p)
     struct DisplaySequenceSprite *tail = p->tail;
     struct DisplaySequenceSprite *next;
     struct TrailVector *position;
+    enum { LAST_HISTORY_INDEX = sizeof(p->history) / sizeof(p->history[0]) - 1 };
     s32 index, i;
     u32 *flags = &p->frame;
     u32 *savedFlags;
@@ -28,7 +29,7 @@ void SpriteTrail_UpdatePositions(struct SpriteTrail *p)
     }
     index = p->historyIndex - 1;
     if (index < 0)
-        index = 3;
+        index = LAST_HISTORY_INDEX;
     next = head;
     next++;
     savedFlags = flags;
@@ -50,8 +51,8 @@ void SpriteTrail_UpdatePositions(struct SpriteTrail *p)
         position--;
         index--;
         if (index < 0) {
-            position = &p->history[3];
-            index = 3;
+            position = &p->history[LAST_HISTORY_INDEX];
+            index = LAST_HISTORY_INDEX;
         }
         tail->position.x = (next->position.x + head->position.x) >> 1;
         tail->position.y = (next->position.y + head->position.y) >> 1;
@@ -62,7 +63,7 @@ void SpriteTrail_UpdatePositions(struct SpriteTrail *p)
     if (!(*savedFlags & 1)) {
         Vector3_CopyComponents(&p->history[p->historyIndex], &p->position);
         p->historyIndex++;
-        if (p->historyIndex > 3)
+        if (p->historyIndex > (s32)LAST_HISTORY_INDEX)
             p->historyIndex = 0;
     }
 }
