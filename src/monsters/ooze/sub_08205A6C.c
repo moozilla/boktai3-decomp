@@ -5,7 +5,6 @@ s32 Script_GetValue(void);
 void Ooze_ReadScriptValueList(struct Ooze *p)
 {
     s32 i;
-    s16 *d;
     s16 *np;
     Script_SetPc(p->delayScript);
     i = 0;
@@ -16,10 +15,8 @@ void Ooze_ReadScriptValueList(struct Ooze *p)
         if (*np > 8)
             *np = 8;
         if (*np != 0 && i < *np) {
-            d = p->delays;
             do {
-                *d = Script_GetValue();
-                d++;
+                p->delays[i] = Script_GetValue();
                 i++;
             } while (i < p->delayCount);
         }
