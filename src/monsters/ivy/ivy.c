@@ -99,15 +99,7 @@ void SceneActorReaction_PlayHiddenCue(struct ChaseActor *actor)
         u32 zero = 0;
         drawable[7] = 2;
         actor->base.colliderA.responseValue = zero;
-        if (!actor->base.drawableKind) {
-            u32 *flags = actor->base.drawable;
-            u32 clear = ~1;
-            *flags &= clear;
-        } else {
-            u8 *tile = (u8 *)actor->base.drawable + 0x20;
-            u32 clear = ~1;
-            *(u32 *)(tile + 8) &= clear;
-        }
+        ActorStatus_SetBodyBit(actor, 0);
         SceneActorAnimation_SelectDirectionalFlags(actor, 15);
         Sound_PlaySong(475);
     }
@@ -1134,14 +1126,6 @@ void SceneActorControl_WaitForTarget(struct ChaseActor *input)
     actor->base.counter2AC++;
 }
 
-/* The collider's flags as a 16-bit bitfield: the read-modify-write leaves the zeros that the
- * SetControl and ResetPhase stores reuse. */
-
-struct IvyColliderBits {
-    u8 unknown0[6];
-    u16 flags : 16;
-};
-
 #define SceneActorControl_UpdateDirectionalIdle Ivy_UpdateActiveState
 
 void SceneActorControl_UpdateTargetApproachPhase(struct ChaseActor *actor)
@@ -1153,7 +1137,7 @@ void SceneActorControl_UpdateTargetApproachPhase(struct ChaseActor *actor)
         state->targetMissFrames = 0;
     }
     if (actor->base.stepDone) {
-        struct IvyColliderBits *collider = (void *)&actor->base.colliderA;
+        struct ContactCollider *collider = &actor->base.colliderA;
         u32 mask = ~4;
         collider->flags &= mask;
         collider->flags |= 8;
