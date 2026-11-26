@@ -1,6 +1,6 @@
-#include "bosses/sabata/actor_position.h"
+#include "bosses/sabata/sabata_position.h"
 
-void ActorVariation_SelectRandomPair(struct ActorState *actor, u16 *out)
+void ActorVariation_SelectRandomPair(struct SabataActorState *actor, u16 *out)
 {
     u32 table = (u32)gRandomTable;
     u32 index = (gRandomIndex + 1) & 1023;
@@ -11,14 +11,14 @@ void ActorVariation_SelectRandomPair(struct ActorState *actor, u16 *out)
     Path_GetPointPositionById(out, actor->animationIndex, actor->animationDetail);
 }
 
-static inline s32 ActorPosition_ScaleOffset(s32 v)
+static inline s32 SabataPosition_ScaleOffset(s32 v)
 {
     if (v >= 0)
         return v >> 12;
     return -((-v) >> 12);
 }
 
-void ActorMovement_FindQuarterTurnPoint(struct ActorState *actor, struct ContactPosition *out)
+void ActorMovement_FindQuarterTurnPoint(struct SabataActorState *actor, struct ContactPosition *out)
 {
     struct ContactPosition point;
     struct ContactPosition *center = actor->selectedPoint;
@@ -31,13 +31,13 @@ void ActorMovement_FindQuarterTurnPoint(struct ActorState *actor, struct Contact
     do {
         u32 angle = (start + (quarterTurn << 6)) & mask;
         {
-            s32 x = ActorPosition_ScaleOffset(gUnk_086149C4[(angle + 64) & mask] * 128);
+            s32 x = SabataPosition_ScaleOffset(gUnk_086149C4[(angle + 64) & mask] * 128);
             coordinates->x = x;
             coordinates->y = 0;
         }
         {
             s32 sample = sine[angle & mask];
-            s32 z = ActorPosition_ScaleOffset((s32)(speed * sample));
+            s32 z = SabataPosition_ScaleOffset((s32)(speed * sample));
             coordinates->z = z;
             {
                 u32 x = (u16)center->x;

@@ -7,7 +7,7 @@ struct AnimSpritePlayback {
     u8 priority, mode;
 };
 
-struct WidgetGlyphEntry;
+struct AnimSpriteGlyph;
 struct AnimationKeyframe {
     u16 key, duration;
 };
@@ -19,7 +19,7 @@ struct AnimationKeyframeSequence {
 struct AnimSpriteResource {
     u16 paletteIndex, glyphCount, sequenceCount, unknown6;
     u32 unknown8;
-    struct WidgetGlyphEntry *glyphs;
+    struct AnimSpriteGlyph *glyphs;
     struct AnimationKeyframeSequence *sequences;
     u8 *tileBase;
     u8 *frameData;

@@ -1,4 +1,4 @@
-#include "objects/pile_driver/scene_panel.h"
+#include "objects/pile_driver/pile_driver.h"
 
 void PileDriver_UpdateBackgroundEffect(struct ScenePanel *panel, s32 tileX, s32 tileY, s32 screenX,
                                        s32 screenY)

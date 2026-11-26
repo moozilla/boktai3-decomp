@@ -21,18 +21,18 @@ struct BurstEmitterPool {
 /* 0x02000160 */
 extern struct BurstEmitterPool *gBurstEmitterPool;
 extern void *gUnk_08605B78[];
-void BurstEmitter_EmitFrame(struct BurstEmitter *);
-void BurstEmitter_PlayAmbientSound(struct BurstEmitter *);
-void BurstEmitter_InitCollider(struct BurstEmitter *, s32, s32, s32, s32);
-void BurstEmitter_TickActive(struct BurstEmitterPool *, struct BurstEmitter *);
-void BurstEmitter_ReleaseSlot(struct BurstEmitterPool *, struct BurstEmitter *);
-struct BurstEmitter *BurstEmitter_AllocateSlot(struct BurstEmitterPool *);
-s32 BurstEmitter_Create(const struct ContactPosition *, u32, u32, s32, s32, s32, s32);
-void BurstEmitter_CreateFromScript(void);
-s32 BurstEmitter_UpdatePool(struct BurstEmitterPool *);
-void BurstEmitter_DestroyPool(struct BurstEmitterPool *);
-void BurstEmitter_ResetPool(void);
-s32 BurstEmitter_InitPool(struct BurstEmitterPool *, u32);
-struct BurstEmitterPool *BurstEmitter_CreatePool(void);
-void BurstEmitter_ClearPool(void);
+void SparkExplosion_EmitFrame(struct BurstEmitter *);
+void SparkExplosion_PlayAmbientSound(struct BurstEmitter *);
+void SparkExplosion_InitCollider(struct BurstEmitter *, s32, s32, s32, s32);
+void SparkExplosion_TickActive(struct BurstEmitterPool *, struct BurstEmitter *);
+void SparkExplosion_ReleaseSlot(struct BurstEmitterPool *, struct BurstEmitter *);
+struct BurstEmitter *SparkExplosion_AllocateSlot(struct BurstEmitterPool *);
+s32 SparkExplosion_Create(const struct ContactPosition *, u32, u32, s32, s32, s32, s32);
+void SparkExplosion_CreateFromScript(void);
+s32 SparkExplosion_UpdatePool(struct BurstEmitterPool *);
+void SparkExplosion_DestroyPool(struct BurstEmitterPool *);
+void SparkExplosion_ResetPool(void);
+s32 SparkExplosion_InitPool(struct BurstEmitterPool *, u32);
+struct BurstEmitterPool *SparkExplosion_CreatePool(void);
+void SparkExplosion_ClearPool(void);
 #endif

@@ -482,7 +482,7 @@ void SceneActors_SpawnAmbientParticle(struct StateActor *actor)
         horizontalSample -= 0x7f;
         position.z = *z - horizontalSample;
     }
-    AnimatedParticles_EmitBurst(&position, 1, 0, 0x40, 12, 12, 4, 4);
+    ImpactBurst_EmitBurst(&position, 1, 0, 0x40, 12, 12, 4, 4);
 }
 
 void SceneActors_ScriptSetEffects(void)

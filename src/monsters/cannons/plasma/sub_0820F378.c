@@ -27,11 +27,11 @@ struct OrangeSpineEffectPair {
 struct OrangeSpineEffectVector {
     struct OrangeSpineEffectPair a, b;
 };
-static inline u16 OrangeSpine_RandomBurstCount(const u16 *table)
+static inline u16 PlasmaCannon_RandomBurstCount(const u16 *table)
 {
     return (ParticleRandom_ReadDirectSample(table) & 3) + 4;
 }
-static inline u32 OrangeSpine_StepSequence(struct DisplaySequenceSprite *owner,
+static inline u32 PlasmaCannon_StepSequence(struct DisplaySequenceSprite *owner,
                                            struct DisplaySequenceState *state)
 {
     const u16 *command;
@@ -102,7 +102,7 @@ static inline u32 OrangeSpine_StepSequence(struct DisplaySequenceSprite *owner,
     return ended;
 }
 
-static inline void OrangeSpine_BeginDefeat(s16 *state, u16 *blink)
+static inline void PlasmaCannon_BeginDefeat(s16 *state, u16 *blink)
 {
     u32 zero = 0;
     *state = 1;
@@ -139,7 +139,7 @@ s32 PlasmaCannon_UpdateDamageState(struct OrangeSpineActor *p)
             struct SceneVec center, smoke;
             struct OrangeSpineEffectVector velocity, spread;
             const u16 *table;
-            OrangeSpine_BeginDefeat(&p->defeated, &p->collider.responseValue);
+            PlasmaCannon_BeginDefeat(&p->defeated, &p->collider.responseValue);
             {
                 struct SceneVec *centerPosition = &center;
                 *centerPosition = p->sprite.coordinates.position;
@@ -152,7 +152,7 @@ s32 PlasmaCannon_UpdateDamageState(struct OrangeSpineActor *p)
             spread.a.lo = 24;
             spread.a.hi = (ParticleRandom_ReadDirectSample(table) & 7) + 3;
             spread.b.lo = 24;
-            sub_08014634(OrangeSpine_RandomBurstCount(table), 13, &center, &velocity, &spread, 15,
+            sub_08014634(PlasmaCannon_RandomBurstCount(table), 13, &center, &velocity, &spread, 15,
                          15);
             {
                 struct SceneVec *smokePosition = &smoke;
@@ -198,6 +198,6 @@ s32 PlasmaCannon_UpdateDamageState(struct OrangeSpineActor *p)
         else
             p->sprite.display.flags &= ~1;
     }
-    OrangeSpine_StepSequence(&p->sprite.display, &p->sequence);
+    PlasmaCannon_StepSequence(&p->sprite.display, &p->sequence);
     p->age++;
 }

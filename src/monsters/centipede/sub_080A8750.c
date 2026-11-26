@@ -2,7 +2,7 @@
 #include "scene/motion/scene_actor_availability.h"
 #include "scene/actor/scene_actor_reset.h"
 extern const s16 gUnk_086149C4[];
-void sub_080A9DB0(void *, s32, s32);
+void Centipede_UpdateSegmentPositions(void *, s32, s32);
 void Centipede_SelectWanderRoute(void *);
 static inline u8 TakeEntry(struct ChaseActor *p)
 {
@@ -35,7 +35,7 @@ void Centipede_UpdateKnockback(struct ChaseActor *p)
         p->base.secondaryMotion.y = 0;
         p->base.field2E8 = 2;
     }
-    sub_080A9DB0(p, 6, 0x1000);
+    Centipede_UpdateSegmentPositions(p, 6, 0x1000);
     {
         if (Flags_MaskedWord(16, &p->base.statusFlags)) {
             Centipede_SelectWanderRoute(p);

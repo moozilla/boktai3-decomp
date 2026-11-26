@@ -1,7 +1,7 @@
 #include "global.h"
 #include "ui/pause/scene_hud_display.h"
 
-#define SceneInventory_IsSlotEquipped Inventory_IsEquipmentAssigned
+#define PauseDisplay_IsSlotEquipped Inventory_IsEquipmentAssigned
 int SceneInput_NavigateGridKeys(void *, int);
 void SceneHud_GetActionIconPosition(void *, int);
 void SceneHud_ShowEquipmentDetails(void *);

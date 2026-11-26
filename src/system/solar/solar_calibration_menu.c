@@ -142,13 +142,13 @@ s32 SolarCalibration_Initialize(struct SolarCalibrationMenu *s)
     resource = ScriptProc_Start(0xCB05, 0xE2AB);
     obj = &s->widgets[0].graphics;
     ResourceHeader_Relocate(obj, resource);
-    Widget_InitLinked(&s->widgets[0].sprite, obj, 0x38, 0x10, zero, zero, zero, zero);
+    AnimSprite_InitLinked(&s->widgets[0].sprite, obj, 0x38, 0x10, zero, zero, zero, zero);
     obj2 = &s->widgets[1].graphics;
     ResourceHeader_Relocate(obj2, resource);
-    Widget_InitLinked(&s->widgets[1].sprite, obj2, 0x29, 0x10, zero, zero, zero, zero);
+    AnimSprite_InitLinked(&s->widgets[1].sprite, obj2, 0x29, 0x10, zero, zero, zero, zero);
     obj3 = &s->widgets[2].graphics;
     ResourceHeader_Relocate(obj3, resource);
-    Widget_InitLinked(&s->widgets[2].sprite, obj3, 0x2A, 0x10, zero, zero, zero, zero);
+    AnimSprite_InitLinked(&s->widgets[2].sprite, obj3, 0x2A, 0x10, zero, zero, zero, zero);
     s->widgets[1].sprite.flags &= ~1;
     s->widgets[2].sprite.flags |= one;
     MessageWindow_SetPalette(0xC486);

@@ -1,0 +1,123 @@
+#include "effects/particles/proximity_emitter.h"
+#include "scene/terrain/terrain_collision.h"
+s32 TetherRing_InitializeFromScript(struct ProximityEmitter *emitter, u32 unused1,
+                                          u32 unused2)
+{
+    struct ContactPosition *position;
+    u32 graphicsId;
+    u16 *nearby;
+    u32 script;
+    if (Script_SeekToKeyword('p')) {
+        u32 cell;
+        u32 height, surface;
+        struct TerrainCell *properties;
+        struct TerrainCellOverride *override;
+        struct ContactPosition *point;
+        s32 x, z;
+        emitter->position.x = Script_GetValue();
+        emitter->position.y = Script_GetValue();
+        emitter->position.z = Script_GetValue();
+        point = &emitter->position;
+        x = point->x >> 8;
+        z = point->z >> 8;
+        position = point;
+        if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
+            cell = 0;
+        else {
+            u32 row = gTerrainMap->rows[z];
+            cell = row + x;
+        }
+        override = (struct TerrainCellOverride *)TerrainModifiers_FindCellOverride(cell, 1);
+        if (override)
+            properties = &override->cell;
+        else
+            properties = &((struct TerrainGrid *)gTerrainMap->cells)->cells[cell];
+        surface = properties->shapeAndHeight >> 4;
+        height = (properties->shapeAndHeight & 15) << 8;
+        switch (surface) {
+            case 1:
+                height -= (u8)point->z;
+                break;
+            case 2:
+                height -= (u8)point->x;
+                break;
+        }
+        emitter->position.y = height;
+    } else {
+        emitter->position.x = 0;
+        emitter->position.y = 0;
+        emitter->position.z = 0;
+        position = &emitter->position;
+    }
+    {
+        struct ContactSwarmGraphics *graphics;
+        struct ContactSwarmSprite *sprite;
+        graphics = &emitter->primary.graphics;
+        graphicsId = 0xBA8;
+        AnimData_Load(graphics, graphicsId);
+        sprite = &emitter->primary.sprite;
+        Sprite_Init(sprite, graphics, 0);
+        sprite->frame = 0;
+        AnimData_SelectPaletteBank(graphics, 0xA2);
+        emitter->primary.sprite.flags |= 0x200;
+        emitter->primary.sprite.priority = 3;
+        {
+            struct ContactPosition *source = position;
+            emitter->primary.sprite.position = *source;
+        }
+        emitter->primary.sprite.position.y += 30;
+    }
+    {
+        struct ContactSwarmGraphics *graphics;
+        struct ContactSwarmSprite *sprite;
+        graphics = &emitter->secondary.graphics;
+        AnimData_Load(graphics, graphicsId);
+        sprite = &emitter->secondary.sprite;
+        Sprite_Init(sprite, graphics, 0);
+        sprite->frame = 0;
+        AnimData_SelectPaletteBank(graphics, 0xA0);
+        emitter->secondary.sprite.flags |= 0x400;
+        emitter->secondary.sprite.priority = 3;
+        {
+            struct ContactPosition *destination = &emitter->secondary.sprite.position;
+            struct ContactPosition *source;
+            source = position;
+            *destination = *source;
+        }
+    }
+    TetherRing_InitializeParticles(emitter);
+    if (Script_SeekToKeyword('m') && Script_GetValue()) {
+        emitter->primary.sprite.flags |= 1;
+        emitter->secondary.sprite.flags |= 1;
+        emitter->update = TetherRing_TickGrow;
+        Sound_PlaySong(0x15E);
+    } else
+        emitter->update = TetherRing_TickActive;
+    emitter->stateFrame = 0;
+    if (TetherRing_IsTetherNearby(emitter)) {
+        emitter->nearby = 1;
+        nearby = &emitter->nearby;
+    } else {
+        emitter->nearby = 0;
+        nearby = &emitter->nearby;
+    }
+    script = Script_SeekToKeyword('i');
+    if (script)
+        emitter->enterScriptId = Script_GetValue();
+    else
+        emitter->enterScriptId = script;
+    script = Script_SeekToKeyword('o');
+    if (script)
+        emitter->leaveScriptId = Script_GetValue();
+    else
+        emitter->leaveScriptId = script;
+    if (TetherRing_IsTetherNearby(emitter)) {
+        u32 value = 1;
+        *nearby = value;
+        TetherActor_RequestPaletteBlend(value);
+    } else {
+        *nearby = 0;
+        TetherActor_RequestPaletteBlend(0);
+    }
+    return 0;
+}

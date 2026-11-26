@@ -30,12 +30,12 @@ void PauseMenu_CreateSelectionWidgets(struct SceneHudState *p)
     tertiaryPos[2] = 0;
     tertiaryPos[3] = 0;
     for (i = 0; i <= 2; i++) {
-        Widget_InitLinked(&p->primaryWidgets[i], p->motionResource, 0x184, 0x10011, 0, 0, 60,
+        AnimSprite_InitLinked(&p->primaryWidgets[i], p->motionResource, 0x184, 0x10011, 0, 0, 60,
                           primaryPos);
-        Widget_InitLinked(&p->secondaryWidgets[i], p->motionResource, 0xF0, 0x10011, 0, 0, 60,
+        AnimSprite_InitLinked(&p->secondaryWidgets[i], p->motionResource, 0xF0, 0x10011, 0, 0, 60,
                           secondaryPos);
         tertiaryPos[1] = 0x88 - (i * 0x18);
-        Widget_InitLinked(&p->tertiaryWidgets[i], p->motionResource, 0xE7, 0x10011, 0, 0, 60,
+        AnimSprite_InitLinked(&p->tertiaryWidgets[i], p->motionResource, 0xE7, 0x10011, 0, 0, 60,
                           tertiaryPos);
     }
 
@@ -44,54 +44,54 @@ void PauseMenu_CreateSelectionWidgets(struct SceneHudState *p)
     position->y = 0;
     position->z = 0;
     position->pad = 0;
-    Widget_InitLinked(&p->extraWidgetsA[0], p->widgetResource, 0x90, 0x10011, 0, 0, 60,
+    AnimSprite_InitLinked(&p->extraWidgetsA[0], p->widgetResource, 0x90, 0x10011, 0, 0, 60,
                       (s16 *)position);
     pos.x = 0xB0;
     position->y = 0;
     position->z = 0;
     position->pad = 0;
-    Widget_InitLinked(&p->extraWidgetsA[1], p->widgetResource, 0x90, 0x10011, 0, 0, 60,
+    AnimSprite_InitLinked(&p->extraWidgetsA[1], p->widgetResource, 0x90, 0x10011, 0, 0, 60,
                       (s16 *)position);
     pos.x = 0xD0;
     position->y = 0;
     position->z = 0;
     position->pad = 0;
-    Widget_InitLinked(&p->extraWidgetsA[2], p->widgetResource, 0x90, 0x10011, 0, 0, 60,
+    AnimSprite_InitLinked(&p->extraWidgetsA[2], p->widgetResource, 0x90, 0x10011, 0, 0, 60,
                       (s16 *)position);
     pos.x = 0xC;
     position->y = 0;
     position->z = 0;
     position->pad = 0;
-    Widget_InitLinked(&p->extraWidgetsB[0], p->widgetResource, 0x90, 0x10011, 0, 0, 60,
+    AnimSprite_InitLinked(&p->extraWidgetsB[0], p->widgetResource, 0x90, 0x10011, 0, 0, 60,
                       (s16 *)position);
     pos.x = 0xBC;
     position->y = 0;
     position->z = 0;
     position->pad = 0;
-    Widget_InitLinked(&p->extraWidgetsB[1], p->widgetResource, 0x90, 0x10011, 0, 0, 60,
+    AnimSprite_InitLinked(&p->extraWidgetsB[1], p->widgetResource, 0x90, 0x10011, 0, 0, 60,
                       (s16 *)position);
     pos.x = 0xDC;
     position->y = 0;
     position->z = 0;
     position->pad = 0;
-    Widget_InitLinked(&p->extraWidgetsB[2], p->widgetResource, 0x90, 0x10011, 0, 0, 60,
+    AnimSprite_InitLinked(&p->extraWidgetsB[2], p->widgetResource, 0x90, 0x10011, 0, 0, 60,
                       (s16 *)position);
     pos.x = 0;
     position->y = 0;
     position->z = 0;
     position->pad = 0;
-    Widget_InitLinked(&p->extraWidgetsC[0], p->widgetResource, 0x8F, 0x10011, 0, 0, 60,
+    AnimSprite_InitLinked(&p->extraWidgetsC[0], p->widgetResource, 0x8F, 0x10011, 0, 0, 60,
                       (s16 *)position);
     pos.x = 0xB0;
     position->y = 0;
     position->z = 0;
     position->pad = 0;
-    Widget_InitLinked(&p->extraWidgetsC[1], p->widgetResource, 0x8F, 0x10011, 0, 0, 60,
+    AnimSprite_InitLinked(&p->extraWidgetsC[1], p->widgetResource, 0x8F, 0x10011, 0, 0, 60,
                       (s16 *)position);
     pos.x = 0xD0;
     position->y = 0;
     position->z = 0;
     position->pad = 0;
-    Widget_InitLinked(&p->extraWidgetsC[2], p->widgetResource, 0x8F, 0x10011, 0, 0, 60,
+    AnimSprite_InitLinked(&p->extraWidgetsC[2], p->widgetResource, 0x8F, 0x10011, 0, 0, 60,
                       (s16 *)position);
 }

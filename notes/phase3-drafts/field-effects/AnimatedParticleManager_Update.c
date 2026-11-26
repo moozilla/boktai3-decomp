@@ -1,4 +1,4 @@
-// Pin-free draft of AnimatedParticleManager_Update (src/effects/particles/groups/sub_08015160.c) on the shared
+// Pin-free draft of AnimatedParticleManager_Update (src/effects/particles/impact_bursts/sub_08015160.c) on the shared
 // DisplaySequence_StepSprite helper: 32 ROM / 32 draft; AGBCC_PRI=p:+245 matches.
 #include "global.h"
 #include "engine/video/display_sequence_sprite.h"

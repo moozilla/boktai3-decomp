@@ -15,7 +15,7 @@ static inline u32 readWord(const u16 *table, u32 index)
     do {                                                                                           \
         (out) = scale12(n);                                                                        \
     } while (0)
-void PileDriverRig_TickWandering(struct ScenePanelRig *rig)
+void PileDriverRig_TickWandering(struct PileDriverRig *rig)
 {
     u32 angle;
     union {

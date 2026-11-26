@@ -2,12 +2,12 @@
 #include "engine/engine.h"
 #include "link/wireless/scene_pool.h"
 #include "minigames/coffin_bike/coffin_bike.h"
-void CoffinBike_UpdateRecoil(struct Glove *);
-/* Registry routine E3EE (Glove): starts glove -i (default 0): active, update
+void CoffinBike_UpdateRecoil(struct CoffinBike *);
+/* Registry routine E3EE (CoffinBike): starts glove -i (default 0): active, update
    CoffinBike_UpdateRecoil, timer 0, draw flag 1. */
 void CoffinBike_StartFromScript(void)
 {
-    struct Glove *glove;
+    struct CoffinBike *glove;
     s32 i = Script_GetKeywordValue('i', 0);
     glove = gParticipantActors[i];
     if (glove) {
@@ -19,7 +19,7 @@ void CoffinBike_StartFromScript(void)
         glove->update = update;
         glove->timer = zero;
         {
-            struct GloveDraw *draw = &glove->draw;
+            struct CoffinBikeDraw *draw = &glove->draw;
             draw->flags = one | draw->flags;
         }
     }

@@ -200,7 +200,7 @@ spawn sub_082284B4(name=0x9f84, delay=1, a=[arg1, arg2]):
     e:
         match r700[0x2f7]:
             case 0:
-                SceneObjects_ScriptDeactivate(id=0xcb37)   # ← an object also set up by proc_1100 with door box CD23
+                SlidingDoors_ScriptDeactivate(id=0xcb37)   # ← an object also set up by proc_1100 with door box CD23
                 r700[0x2f7] = 1
                 return 120                                  # wait 120 frames
             case 1:

@@ -16,8 +16,8 @@ void sub_08249244(void *, s32, s32, void *);
 s32 Player_TestTetherActionInput(struct Player *);
 void Sound_PlaySong(u32);
 s32 Trigger_TryOpenNearby(void *);
-s32 PlayerBarrier_IsActive(void *);
-void PlayerBarrier_Hide(void *);
+s32 PileTrap_IsActive(void *);
+void PileTrap_Hide(void *);
 s32 Player_SelectRequestedActionMode(struct Player *);
 s32 Player_GetEventFlags(struct Player *, u32);
 void sub_0813B3CC(struct Player *);
@@ -174,8 +174,8 @@ s32 Player_SelectActionSequence(struct Player *p)
                     Sound_PlaySong(402);
                     goto end;
                 }
-                if (PlayerBarrier_IsActive(p->actionRequestEffect) && p->actionMode == 0) {
-                    PlayerBarrier_Hide(p->actionRequestEffect);
+                if (PileTrap_IsActive(p->actionRequestEffect) && p->actionMode == 0) {
+                    PileTrap_Hide(p->actionRequestEffect);
                     goto end;
                 }
                 mode = Player_SelectRequestedActionMode(p);
@@ -231,7 +231,7 @@ s32 Player_SelectActionSequence(struct Player *p)
                 }
                 if ((u8)Trigger_TryOpenNearby(&p->positionalEffectGroup))
                     goto idle;
-                if (!p->actionMode && PlayerBarrier_IsActive(p->actionRequestEffect)) {
+                if (!p->actionMode && PileTrap_IsActive(p->actionRequestEffect)) {
                     ActorSequence_Begin(p, 20, 0);
                     goto end;
                 }

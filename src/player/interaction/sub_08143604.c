@@ -10,7 +10,7 @@ s32 ActorVariant_GetTableValue(u32, u32);
 s32 Player_SetAnimation(void *, s32, s32, s32);
 void Player_UpdateFacingSide(void *);
 void Sound_PlaySong(u32);
-void ActorBurst_Create(void *, void *, void *, u32, u32);
+void ActionFlashBurst_Create(void *, void *, void *, u32, u32);
 static inline void ResetBurstSize(struct Player *p)
 {
     p->actionEighteenParameter = 0x16E;
@@ -59,7 +59,7 @@ void Player_UpdateHeldEnergyBurst(struct Player *p)
                 Sound_PlaySong(0x128);
                 ResetBurstSize(p);
                 p->actionEighteenDuration = 2;
-                ActorBurst_Create(p, &p->position, &p->actionOrigin, 0, p->burstParameter);
+                ActionFlashBurst_Create(p, &p->position, &p->actionOrigin, 0, p->burstParameter);
             }
             ActorSequence_Begin(p, 9, 1);
             break;

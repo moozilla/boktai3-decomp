@@ -527,7 +527,7 @@ s32 FallingSceneSprite_Initialize(struct FallingSceneSprite *actor, u32 id)
             pos = &position;
         }
     }
-    Widget_InitLinked(&actor->animation, savedHeader, 0, 0, 2, 0, 60, pos);
+    AnimSprite_InitLinked(&actor->animation, savedHeader, 0, 0, 2, 0, 60, pos);
     Anim_Step(&actor->animation, savedHeader);
     actor->id = id;
     SceneMessages_RegisterReceiver(&actor->receiver, id, 10);

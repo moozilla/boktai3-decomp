@@ -45,7 +45,7 @@ No opaque empty-asm output escapes into these returned C values.
 |---|---:|---|
 | `55EB8 StageIconDisplay_SelectUpdate` | 52 | The ROM pops its saved Thumb return address into R0. Its former void C definition could not supply that word to the two initializers. The guarded draft returns 0 explicitly. |
 | `54B64 HitSwitch_AddFromScript` | 28 | The wrapper forwards the incidental R0 of the void 668-byte initializer at `54834`. Retaining the small wrapper's ASM is the smaller correction. Its guarded draft returns 0 explicitly. |
-| `51B70 ProximityEmitter_IsTetherNearby` | 104 | In bounding-square corners outside the circle, the ROM returns the nonnull tether-position pointer. Four callers consume the result. The guarded draft returns that word explicitly, preserving the observed nonzero quirk. |
+| `51B70 TetherRing_IsTetherNearby` | 104 | In bounding-square corners outside the circle, the ROM returns the nonnull tether-position pointer. Four callers consume the result. The guarded draft returns that word explicitly, preserving the observed nonzero quirk. |
 | `0821FE40 Collider_Refresh` | 44 | The ROM pops its saved Thumb return address into R0. Shared and local declarations now expose the actual word ABI. Its guarded draft returns 0 explicitly. |
 | `66DB8 ActorAttachment_UpdateFromDescriptor` | 472 | Real callers `49258` and `4AB40` pass kind 127 and store the returned pointer. Unsupported kinds return the original slot with frame 127, or the final parts-release result otherwise. The complete defined draft differs in allocation and switch lowering. |
 

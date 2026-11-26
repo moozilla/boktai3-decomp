@@ -10,7 +10,7 @@ extern const s16 gUnk_086149C4[];
 s32 Callback_InvokeActor(void *, void *);
 void Anim_SetDurationScale(void *, u32);
 void Anim_SetFrameDurationScale(void *, u32);
-void sub_080A9DB0(void *, s32, s32);
+void Centipede_UpdateSegmentPositions(void *, s32, s32);
 
 static inline u8 Tentacle_TakeEntry(u8 *p)
 {
@@ -107,7 +107,7 @@ void CentipedeBody_ReturnToCellCenter(struct ChaseActor *actor)
         actor->base.body.motion.x += Div(target.x, 10);
         actor->base.body.motion.z += Div(target.z, 10);
     }
-    sub_080A9DB0(actor, 12, 0xA410);
+    Centipede_UpdateSegmentPositions(actor, 12, 0xA410);
     if (((difference < 0) ? (-difference) : (difference)) <= 7) {
         if ((body->returnCell) == index)
             Tentacle_BeginForwardState(actor);

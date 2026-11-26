@@ -296,8 +296,8 @@ void SelectionMenu_InitPanel(struct SelectionMenu *m)
     struct ContactPosition position;
     void *res;
     ZeroFill8(&position);
-    Widget_InitLinked(&m->panels[0], &m->panelResource, 0xB4, 0x10, 0, 0, 0x3C, &position);
-    Widget_InitLinked(&m->panels[1], &m->panelResource, 0xB5, 0x10, 0, 0, 0x3C, &position);
+    AnimSprite_InitLinked(&m->panels[0], &m->panelResource, 0xB4, 0x10, 0, 0, 0x3C, &position);
+    AnimSprite_InitLinked(&m->panels[1], &m->panelResource, 0xB5, 0x10, 0, 0, 0x3C, &position);
     res = ScriptProc_Start(0x922E, 0x4BBF);
     AnimData_Load(m->panel.graphics, 0x593A);
     AnimData_SelectPaletteBank(m->panel.graphics, 0x1F7);
@@ -316,7 +316,7 @@ void SelectionMenu_InitCursors(struct SelectionMenu *p)
 
     ZeroFill8(&position);
     for (i = 0; i < 3; i++)
-        Widget_InitLinked(&p->cursors[i], &p->panelResource, 0x4e, 0x10, 0, 0, 0x3c, &position);
+        AnimSprite_InitLinked(&p->cursors[i], &p->panelResource, 0x4e, 0x10, 0, 0, 0x3c, &position);
 }
 
 void SelectionMenu_InitMarkers(struct SelectionMenu *p)
@@ -326,7 +326,7 @@ void SelectionMenu_InitMarkers(struct SelectionMenu *p)
 
     ZeroFill8(&position);
     for (i = 0; i < 8; i++)
-        Widget_InitLinked(&p->markers[i], &p->panelResource, 0x50, 0x31, 0, 0, 0x3c, &position);
+        AnimSprite_InitLinked(&p->markers[i], &p->panelResource, 0x50, 0x31, 0, 0, 0x3c, &position);
 }
 
 void SelectionMenu_InitHighlight(struct SelectionMenu *p)
@@ -335,7 +335,7 @@ void SelectionMenu_InitHighlight(struct SelectionMenu *p)
     position.x = 0;
     position.y = 0x80;
     position.z = 0;
-    Widget_InitLinked(&p->highlight, &p->iconResource, 0x189, 0x11, 0, 0, 0x3c, &position);
+    AnimSprite_InitLinked(&p->highlight, &p->iconResource, 0x189, 0x11, 0, 0, 0x3c, &position);
 }
 
 void SelectionMenu_PositionCursors(struct SelectionMenu *p)
@@ -458,11 +458,11 @@ void SelectionMenu_InitIconGrid(struct SelectionMenu *p)
 
     ZeroFill8(&position);
     for (i = 18; i >= 0; i--)
-        Widget_InitLinked(&p->icons[i], &p->iconResource, 0, 0x11, 0, 0, 0x3c, &position);
+        AnimSprite_InitLinked(&p->icons[i], &p->iconResource, 0, 0x11, 0, 0, 0x3c, &position);
     heading = &p->heading;
     position.x = 0x20;
     position.y = 0;
-    Widget_InitLinked(heading, &p->panelResource, 0, 0x11, 0, 0, 0x3c, &position);
+    AnimSprite_InitLinked(heading, &p->panelResource, 0, 0x11, 0, 0, 0x3c, &position);
 }
 
 void SelectionMenu_PopulateActors(struct SelectionMenu *p)

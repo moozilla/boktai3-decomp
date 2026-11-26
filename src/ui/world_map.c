@@ -287,7 +287,7 @@ void WorldMap_InitializeAnimations(struct RegistrySelectionMenu *menu)
         zero = 0;
         count = 12;
         do {
-            Widget_InitLinked(anim, &menu->resource, 0, 0x10, 2, zero, 0x3c, (void *)zero);
+            AnimSprite_InitLinked(anim, &menu->resource, 0, 0x10, 2, zero, 0x3c, (void *)zero);
             anim->palette = palette;
             anim->attribute1A = 3;
             anim++;

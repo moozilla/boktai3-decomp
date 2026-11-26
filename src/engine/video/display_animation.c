@@ -128,7 +128,7 @@ setup:
     return 0;
 }
 
-s32 Widget_InitLinked(void *, void *, u32, s32, u32, u32, u32, const struct DisplayPosition *);
+s32 AnimSprite_InitLinked(void *, void *, u32, s32, u32, u32, u32, const struct DisplayPosition *);
 
 s32 DisplayAnimation_InitializeKeyframes(struct DisplayAnimation *display, u32 resourceId,
                                          s32 flags, const struct DisplayPosition *position)
@@ -150,7 +150,7 @@ setup:
     *resource = *source;
     ResourceHeader_Relocate(resource, (void *)source);
     {
-        s32 result = Widget_InitLinked(&display->resource.keyframes.widget, resource, 0, flags, 1,
+        s32 result = AnimSprite_InitLinked(&display->resource.keyframes.widget, resource, 0, flags, 1,
                                        inactive, 60, position);
         display->position = (struct DisplayPosition *)&display->resource.keyframes.widget.position;
         display->displayFlags = &display->resource.keyframes.widget.flags;

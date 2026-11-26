@@ -2,7 +2,7 @@
 #define GUARD_SCENE_ARC_H
 #include "link/wireless/scene_pool.h"
 #include "engine/math/scene_vec.h"
-#include "objects/scene_objects/scene_object.h"
+#include "objects/scene_object.h"
 #include "effects/projectiles/contact_swarm_sprite.h"
 #include "engine/video/display_sequence.h"
 #include "effects/sprites/sprite_effect_controller.h"

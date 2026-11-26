@@ -279,7 +279,7 @@ void ActorSprite_InitPartDrawings(struct ScenePoolActor *actor, struct Character
         part = &model->view.parts[partIndex];
         resource = &model->resource;
         animId = anim;
-        if (Widget_InitLinked(part, resource, animId, frames, 0, 1, 0, 0) != 0)
+        if (AnimSprite_InitLinked(part, resource, animId, frames, 0, 1, 0, 0) != 0)
             return;
         Anim_SetKeyframes(part, resource, animId, 1, 0);
         Anim_Step(part, resource);

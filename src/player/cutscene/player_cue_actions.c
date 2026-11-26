@@ -2801,7 +2801,7 @@ static inline void TargetDash_EmitTargetSpark(struct Player *player)
     q = &pos;
     *q = (*(struct ContactPosition *)&player->cueDestination);
     q->y += 0x1E;
-    SceneMovingParticle_Create(&pos, &vel, 60, 1);
+    DebrisMote_Create(&pos, &vel, 60, 1);
 }
 
 static inline void TargetDash_EmitRelativeTargetSpark(struct Player *player)
@@ -2837,7 +2837,7 @@ static inline void TargetDash_EmitRelativeTargetSpark(struct Player *player)
     q = &pos;
     *q = (*(struct ContactPosition *)&player->cueDestination);
     q->y += 0x1E;
-    SceneMovingParticle_Create(&pos, &vel, 60, 1);
+    DebrisMote_Create(&pos, &vel, 60, 1);
 }
 
 // confidence=low: Player action "dash to target": 5-phase state machine (approach, run, strike, return, stand)

@@ -93,7 +93,7 @@ The continuation completed the previously inspected spread-shot item as two cont
 
 Tags: #matching #particles #scene #structs #compiler
 
-At the next continuation request, completed 08125B64–08126140 as `src/effects/particles/scene_moving_particle.c` (13 former files, 1500 bytes). The shared MovingParticlePool now uses Task and the complete particle record, including the common sprite, velocity, animation counters and lifetime. All functions match, as does the other header consumer at 0812D8EC. The allocator originally used a volatile mask pointer even though this range was in the concession-free queue. A direct indexed loop using the shared occupancy helper matches and removes that access. Pointer-cursor variations had retained or reordered loads; no concession is needed. This completes the assigned forward queue before 08126650; four earlier typed-cleanup blockers remain for another pass.
+At the next continuation request, completed 08125B64–08126140 as `src/effects/particles/debris_motes.c` (13 former files, 1500 bytes). The shared MovingParticlePool now uses Task and the complete particle record, including the common sprite, velocity, animation counters and lifetime. All functions match, as does the other header consumer at 0812D8EC. The allocator originally used a volatile mask pointer even though this range was in the concession-free queue. A direct indexed loop using the shared occupancy helper matches and removes that access. Pointer-cursor variations had retained or reordered loads; no concession is needed. This completes the assigned forward queue before 08126650; four earlier typed-cleanup blockers remain for another pass.
 
 ## Scheduling-manager revisit
 

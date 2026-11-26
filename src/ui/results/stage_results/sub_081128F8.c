@@ -2,7 +2,7 @@
 #include "player/cutscene/player_cue_sequence.h"
 #include "scene/actor/actor_attachment_state.h"
 #include "effects/screen/background_controller.h"
-#include "effects/particles/native_effect.h"
+#include "effects/sprites/native_effect.h"
 struct FixedPosition {
     s32 x, y, z;
 };

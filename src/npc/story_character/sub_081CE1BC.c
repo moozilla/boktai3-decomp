@@ -95,7 +95,7 @@ void Actor_OnIdleUpdate(void);
 void Actor_OnHiddenIdleUpdate(void);
 void Actor_OnConfiguredAnimationUpdate(void);
 void StoryCharacter_SimpleStep(void);
-void sub_081CC1B4(void);
+void StoryCharacter_UpdateTargetTurn(void);
 void StoryCharacter_StartAnimStep(void);
 void StoryCharacter_StartKind5Animation9AndAttach(void);
 void StoryCharacter_StartAndMaybeFinishAnim(void);
@@ -324,7 +324,7 @@ void SceneCharacter_PlaceFromScript(void)
                 npc->mode = mode;
                 npc->field14 = 0;
                 npc->field8 = 1;
-                updates[1] = sub_081CC1B4;
+                updates[1] = StoryCharacter_UpdateTargetTurn;
                 npc->state = 0x5E;
                 npc->update = updates[1];
                 npc->field10 = 0;

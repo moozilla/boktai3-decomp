@@ -1,0 +1,13 @@
+#include "global.h"
+void Kuro_PlayTaggedAnimation(void *, int, int, int, int);
+int DisplayAnimation_TestFinished(void *);
+void Kuro_UpdateState16Animation(void *unused, u8 *p)
+{
+    if (p[9]) {
+        p[9] = 0;
+        p[7] = 0;
+        Kuro_PlayTaggedAnimation(p, 5, 2, 0, 4);
+    }
+    if (DisplayAnimation_TestFinished(p + 0xd4))
+        p[7] = 1;
+}

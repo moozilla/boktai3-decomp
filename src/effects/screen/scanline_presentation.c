@@ -155,7 +155,7 @@ int ScanlinePresentation_Destroy(struct ScanlinePresentation *p)
     return 0;
 }
 
-void Widget_InitLinked(void *, void *, u32, u32, u32, u32, u32, void *);
+void AnimSprite_InitLinked(void *, void *, u32, u32, u32, u32, u32, void *);
 s32 ResourceHeader_Relocate(void *, void *);
 u32 Script_GetTextSourcePc(void);
 s32 Mod(s32, s32);
@@ -227,14 +227,14 @@ s32 sub_0800DC90(struct ScanlinePresentation *p)
     p->header = *(struct ScanlineResourceHeader *)res;
     ResourceHeader_Relocate(&p->header, res);
     if (number >= 0)
-        Widget_InitLinked(&p->layers[0], &p->header, (u16)(number + 0x17), 0x870, 0, 0, 0x3C,
+        AnimSprite_InitLinked(&p->layers[0], &p->header, (u16)(number + 0x17), 0x870, 0, 0, 0x3C,
                           &attr);
     else
-        Widget_InitLinked(&p->layers[0], &p->header, 0x17, 0x871, 0, 0, 0x3C, &attr);
-    Widget_InitLinked(&p->layers[1], &p->header, 0x16, 0x871, 0, 0, 0x3C, &attr);
+        AnimSprite_InitLinked(&p->layers[0], &p->header, 0x17, 0x871, 0, 0, 0x3C, &attr);
+    AnimSprite_InitLinked(&p->layers[1], &p->header, 0x16, 0x871, 0, 0, 0x3C, &attr);
     if (shown)
         p->layers[1].flags &= ~1;
-    Widget_InitLinked(&p->layers[3], &p->header, p->banner ? 0x26 : 1, 0x871, 0, 0, 0x3C, &attr);
+    AnimSprite_InitLinked(&p->layers[3], &p->header, p->banner ? 0x26 : 1, 0x871, 0, 0, 0x3C, &attr);
     if (p->digitsA >= 0) {
         p->layers[3].flags &= ~1;
         digits[0] = Mod(p->digitsA, 10);
@@ -251,7 +251,7 @@ s32 sub_0800DC90(struct ScanlinePresentation *p)
     d = digits;
     layer = &p->layers[4];
     for (i = 0; i < 2; i++) {
-        Widget_InitLinked(layer, &p->header, (u16)*d, 0x871, 0, 0, 0x3C, &attr);
+        AnimSprite_InitLinked(layer, &p->header, (u16)*d, 0x871, 0, 0, 0x3C, &attr);
         if (p->digitsA >= 0) {
             s32 off = i * 0x60;
             u32 *f = &p->layers[4].flags;
@@ -262,7 +262,7 @@ s32 sub_0800DC90(struct ScanlinePresentation *p)
     }
     pb = &p->digitsB;
     v = *pb < 0 ? 0 : *pb;
-    Widget_InitLinked(&p->layers[2], &p->header, (u16)v, 0x871, 0, 0, 0x3C, &attr);
+    AnimSprite_InitLinked(&p->layers[2], &p->header, (u16)v, 0x871, 0, 0, 0x3C, &attr);
     if (*pb >= 0)
         p->layers[2].flags &= ~1;
     if (p->handle) {

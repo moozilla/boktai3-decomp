@@ -36,8 +36,8 @@ Two substantial movement controllers now have matching C: a curved move back to
 a resting point, and a curved move toward a scripted target. Both update facing,
 frame timing and position and notify a waiting caller on completion.
 
-The eight adjacent functions from `ActorPalette_BeginFade` through
-`Actor_SelectNearestInteraction` form a fully matching block. They cover:
+The eight adjacent functions from `TutorialOtenkoPalette_BeginFade` through
+`TutorialOtenko_SelectNearestInteraction` form a fully matching block. They cover:
 
 - Forward and reverse interpolation of the actor's 16-color palette, including
   restoring its resource palette and notifying completion.

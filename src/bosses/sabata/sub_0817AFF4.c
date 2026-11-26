@@ -1,6 +1,6 @@
-#include "bosses/sabata/scene_volume.h"
+#include "bosses/sabata/sabata_attack_state.h"
 
-s32 SabataVolume_CanActivate(struct SceneVolumeActor *volume)
+s32 Sabata_CanStartAttack(struct SabataAttackActor *volume)
 {
     if (!(volume->previousChoice == 2 || volume->previousChoice == 10))
         return 0;

@@ -234,7 +234,7 @@ void DarkGenerator_HideMultiplierSprites(struct ControlPanel *panel)
         panel->markers[i].flags |= 1;
 }
 
-static inline void ControlPanel_SetSegmentFrame(struct ContactSwarmSprite *sprite, u16 frame)
+static inline void DarkGenerator_SetSegmentFrame(struct ContactSwarmSprite *sprite, u16 frame)
 {
     sprite->frame = frame;
 }
@@ -247,12 +247,12 @@ void DarkGenerator_UpdatePlayerSegments(struct ControlPanel *panel)
         count = 7;
     for (i = 0; i < count; i++) {
         if (i <= 3)
-            ControlPanel_SetSegmentFrame(&panel->segments[i], 1);
+            DarkGenerator_SetSegmentFrame(&panel->segments[i], 1);
         else
-            ControlPanel_SetSegmentFrame(&panel->segments[i], 2);
+            DarkGenerator_SetSegmentFrame(&panel->segments[i], 2);
     }
     for (; i < 7; i++)
-        ControlPanel_SetSegmentFrame(&panel->segments[i], 0);
+        DarkGenerator_SetSegmentFrame(&panel->segments[i], 0);
 }
 
 void DarkGenerator_ShowInputGauge(struct ControlPanel *panel)
@@ -534,12 +534,12 @@ void DarkGenerator_InitializeValueWidgets(struct ControlPanel *panel)
     position.x = 144;
     position.y = 64;
     zero = position.z = 0;
-    Widget_InitLinked(&panel->widgets[0], &panel->resource, 0x28, 0x30, 1, zero, 0x3C, &position);
+    AnimSprite_InitLinked(&panel->widgets[0], &panel->resource, 0x28, 0x30, 1, zero, 0x3C, &position);
     panel->widgets[0].paletteBank = 0x3AC;
     panel->widgets[0].palette = (u16 *)(gPaletteBankData + panel->widgets[0].paletteBank * 32);
     position.x += 8;
     for (i = 0; i < 4; i++) {
-        Widget_InitLinked(&panel->widgets[i + 1], &panel->resource, 0x1E, 0x30, 1, 0, 0x3C,
+        AnimSprite_InitLinked(&panel->widgets[i + 1], &panel->resource, 0x1E, 0x30, 1, 0, 0x3C,
                           &position);
         panel->widgets[i + 1].paletteBank = 0x3AC;
         panel->widgets[i + 1].palette =

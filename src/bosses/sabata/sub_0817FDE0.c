@@ -20,7 +20,7 @@ void SceneActors_Initialize(u8 *, u32, s32, void *, u32);
 void CellObject_Init(void *, void *);
 void SceneBody_SetMovementProbe(void *, void *, u32, u32);
 void TerrainOverlay_QueueAddActor(void *);
-void Widget_InitLinked(void *, void *, s32, s32, s32, s32, s32, void *);
+void AnimSprite_InitLinked(void *, void *, s32, s32, s32, s32, s32, void *);
 void Anim_SelectPaletteBank(void *, s32);
 void SceneActors_StartUnmirroredAnimation(u8 *, void *, void *, s32, s32, s32);
 void SpriteComponent_Init(void *);
@@ -250,7 +250,7 @@ s32 sub_0817FDE0(struct BossInit *boss, u32 arg1)
     CellObject_Init(boss->cell, &pos);
     SceneBody_SetMovementProbe(&actor->body, boss->cell, 0x23, 0x23);
     TerrainOverlay_QueueAddActor(&actor->body);
-    Widget_InitLinked(&boss->widget, &boss->resource, 0, 0, 2, 0, 0x3C, &pos);
+    AnimSprite_InitLinked(&boss->widget, &boss->resource, 0, 0, 2, 0, 0x3C, &pos);
     Anim_SelectPaletteBank(&boss->widget, 0x34);
     SceneActors_StartUnmirroredAnimation((u8 *)actor, &boss->widget, &boss->resource, 0xF4, 1, 0);
     SpriteComponent_Init(boss->sprite);

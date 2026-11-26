@@ -7,7 +7,7 @@ An attack's collider carries reaction flags (ContactCollider.reactionFlags, +0x3
 target's hit callback tests them. This collects, from the decomp's own C and the ROM's
 weapon table, which flags each source of attack carries:
 
-* targets: Breakable_OnHit (src/objects/breakable.c): the flag each slot state needs
+* targets: LightFixture_OnHit (src/objects/light_fixtures.c): the flag each slot state needs
   (state 1 -> 4: a candlestick is lit; state 2 -> 8: put out) and the state it moves to.
 * lens: Player_GetAttackAttributeFlags (src/player/attack/sub_0814DD3C.c): the gun's flags per lens
   mode; the lens id in the bag (GameState+0x828) is the mode, its name is string 970 + id.
@@ -48,10 +48,10 @@ def body(text, name):
 
 
 def targets():
-    b = body(src("src/objects/breakable.c"), "Breakable_OnHit")
+    b = body(src("src/objects/light_fixtures.c"), "LightFixture_OnHit")
     out = {}
     for m in re.finditer(r"state == (\d+)\)\s*\{\s*if \(SceneCollider_ReadReactionFlags\(other, (\w+)\)\)\s*"
-                         r"Breakable_EnterState\(\w+, (\d+)\)", b):
+                         r"LightFixture_EnterState\(\w+, (\d+)\)", b):
         out[int(m.group(1))] = {"flag": int(m.group(2), 0), "next": int(m.group(3))}
     return out
 

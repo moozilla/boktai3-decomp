@@ -1,5 +1,5 @@
-#include "objects/pile_driver/scene_panel_subject_playback.h"
-void PileDriverSubject_TickAppearing(struct ScenePanelSubject *owner)
+#include "objects/pile_driver/pile_driver_subject_playback.h"
+void PileDriverSubject_TickAppearing(struct PileDriverSubject *owner)
 {
     if (owner->appearDelay)
         owner->appearDelay--;
@@ -9,7 +9,7 @@ void PileDriverSubject_TickAppearing(struct ScenePanelSubject *owner)
         owner->drawable.priority = 2;
         Anim_SetSequence(&owner->sequence, owner->sequenceResource, 0, owner->sequenceRow,
                          owner->sequenceVariant);
-        if (ScenePanelSubject_StepPlayback(owner)) {
+        if (PileDriverSubject_StepPlayback(owner)) {
             Collider_Refresh(&owner->collider);
             PileDriverSubject_SetState((void *)owner, 2);
         }

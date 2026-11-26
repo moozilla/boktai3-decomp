@@ -11,8 +11,7 @@ static inline s32 Scale(s32 value)
     return value >= 0 ? value >> 12 : -(-value >> 12);
 }
 // confidence=low: emits a radial effect around the actor tag's position.
-#define StateActor_SpawnRadialEffect sub_081C8EC0
-void StateActor_SpawnRadialEffect(struct StateActor *actor)
+void StoryCharacter_SpawnRadialEffect(struct StateActor *actor)
 {
     struct StateActorPos velocity;
     struct StateActorPos *v;

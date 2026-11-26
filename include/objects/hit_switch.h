@@ -1,6 +1,6 @@
 #ifndef GUARD_HIT_SWITCH_H
 #define GUARD_HIT_SWITCH_H
-#include "objects/scene_objects/scene_object.h"
+#include "objects/scene_object.h"
 #include "engine/video/display_animation.h"
 #include "scene/collision/contact_collider.h"
 #include "scene/actor/scene_actor_components.h"

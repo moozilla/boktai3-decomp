@@ -1,7 +1,7 @@
 #include "objects/pile_driver/pile_driver_rig.h"
-void PileDriverRig_TickRise(struct ScenePanelRig *rig)
+void PileDriverRig_TickRise(struct PileDriverRig *rig)
 {
-    struct ScenePanel *parent = rig->parent;
+    struct PileDriver *parent = rig->parent;
     u16 *counter;
     u32 frame;
     rig->colliderHold = 16;

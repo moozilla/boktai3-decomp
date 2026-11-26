@@ -8,7 +8,7 @@ void SoundDelay_Update(struct ParticleEmitter *p)
         p->entered = 0;
     }
     if (p->timer > 30) {
-        p->update = ParticleEmitter_UpdateFlight;
+        p->update = BallisticTrail_UpdateFlight;
         p->entered = 1;
     } else {
         p->timer++;
@@ -17,7 +17,7 @@ void SoundDelay_Update(struct ParticleEmitter *p)
 
 extern const u16 gUnk_086141BC[];
 
-void NativeParticle_CreateWithFlag(void *, s32, void *, s32, s32, s32, s32);
+void ProjectileMote_CreateWithFlag(void *, s32, void *, s32, s32, s32, s32);
 
 static inline s32 FrameDelay(s32 speed, s32 weight)
 {
@@ -67,7 +67,7 @@ void BallisticSpriteEffect_UpdateLaunch(struct ParticleEmitter *p)
         offset.x = (RandomValue() & 15) - 7;
         gEffectRandomTableIndex = (gEffectRandomTableIndex + 1) & 1023;
         offset.y = (RandomValue() & 15) - 7;
-        NativeParticle_CreateWithFlag(&p->sprite.position, 0, &offset, 1, 1, 0, 0);
+        ProjectileMote_CreateWithFlag(&p->sprite.position, 0, &offset, 1, 1, 0, 0);
     }
     BallisticSpriteEffect_StepAnimation(&p->sprite, &p->animation);
     {

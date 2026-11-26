@@ -366,37 +366,37 @@ u32 MonsterBook_InitWidgets(struct MonsterBook *book)
     WidgetPos_Clear(&position);
     for (i = 0; i < 7; i++) {
         for (j = 0; j < 2; j++)
-            Widget_InitLinked(&book->entryDigits[i][j], &book->resource, 0, 0x10, 0, 2, 0x3C,
+            AnimSprite_InitLinked(&book->entryDigits[i][j], &book->resource, 0, 0x10, 0, 2, 0x3C,
                               &position);
-        Widget_InitLinked(&book->rowMarkers[i], &book->resource, 0x14, 0x10, 0, 2, 0x3C, &position);
+        AnimSprite_InitLinked(&book->rowMarkers[i], &book->resource, 0x14, 0x10, 0, 2, 0x3C, &position);
     }
     WidgetPos_Clear(&position);
     for (i = 0; i < 2; i++) {
-        Widget_InitLinked(&book->unlockedDigits[i], &book->resource, 0, 0x10, 0, 2, 0x3C,
+        AnimSprite_InitLinked(&book->unlockedDigits[i], &book->resource, 0, 0x10, 0, 2, 0x3C,
                           &position);
-        Widget_InitLinked(&book->totalDigits[i], &book->resource, 0, 0x10, 0, 2, 0x3C, &position);
+        AnimSprite_InitLinked(&book->totalDigits[i], &book->resource, 0, 0x10, 0, 2, 0x3C, &position);
     }
-    Widget_InitLinked(&book->countSeparator, &book->resource, 0x15, 0x10, 0, 2, 0x3C, &position);
+    AnimSprite_InitLinked(&book->countSeparator, &book->resource, 0x15, 0x10, 0, 2, 0x3C, &position);
     WidgetPos_Clear(&position);
     badge = &book->completionBadge;
-    Widget_InitLinked(badge, &book->resource, 0x3E, 0x10, 0, 2, 0x3C, &position);
+    AnimSprite_InitLinked(badge, &book->resource, 0x3E, 0x10, 0, 2, 0x3C, &position);
     badge->flags |= 1;
     WidgetPos_Clear(&position);
-    Widget_InitLinked(&book->groupBadge, &book->resource, 0x40, 0x10, 0, 2, 0x3C, &position);
+    AnimSprite_InitLinked(&book->groupBadge, &book->resource, 0x40, 0x10, 0, 2, 0x3C, &position);
     book->groupBadge.flags |= 1;
     WidgetPos_Clear(&position);
-    Widget_InitLinked(&book->titleIcon, &book->resource, 0x3F, 0x10, 0, 2, 0x3C, &position);
+    AnimSprite_InitLinked(&book->titleIcon, &book->resource, 0x3F, 0x10, 0, 2, 0x3C, &position);
     WidgetPos_Clear(&position);
-    Widget_InitLinked(&book->detailMarker, &book->resource, 0x48, 0x10, 0, 2, 0x3C, &position);
+    AnimSprite_InitLinked(&book->detailMarker, &book->resource, 0x48, 0x10, 0, 2, 0x3C, &position);
     WidgetPos_Clear(&position);
-    Widget_InitLinked(&book->categoryNumber, &book->resource, 1, 0x10, 0, 2, 0x3C, &position);
+    AnimSprite_InitLinked(&book->categoryNumber, &book->resource, 1, 0x10, 0, 2, 0x3C, &position);
     WidgetPos_Clear(&position);
-    Widget_InitLinked(&book->categoryBadge, &book->resource, 0x41, 0x10, 0, 2, 0x3C, &position);
+    AnimSprite_InitLinked(&book->categoryBadge, &book->resource, 0x41, 0x10, 0, 2, 0x3C, &position);
     WidgetPos_Clear(&position);
-    Widget_InitLinked(&book->selectionCursor, &book->resource, 0x46, 0x10, 0, 2, 0x3C, &position);
+    AnimSprite_InitLinked(&book->selectionCursor, &book->resource, 0x46, 0x10, 0, 2, 0x3C, &position);
     book->selectionCursor.position.y = book->selectedRow << 4;
     WidgetPos_Clear(&position);
-    Widget_InitLinked(&book->tabCursor, &book->resource, 0x47, 0x10, 0, 2, 0x3C, &position);
+    AnimSprite_InitLinked(&book->tabCursor, &book->resource, 0x47, 0x10, 0, 2, 0x3C, &position);
     CpuSet(book->selectionCursor.palette, book->palette, 0x04000008);
     book->selectionCursor.palette = book->palette;
     book->tabCursor.palette = book->palette;
