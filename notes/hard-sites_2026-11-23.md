@@ -507,3 +507,40 @@ history address operand order. Moving the decrement into the
 non-wrap path adds instructions. Wireless's native flip bitfields
 also change the current match. Neither follow-up changes the
 verified SpriteTrail or Wireless fixes.
+
+## 2026-11-26: Action-icon launch random table
+
+In sub_0816E570, the direct symbolic table loads into sl and the
+376-byte draft loses eight bytes. Insn 107 defines table pseudo 28.
+Suppressing its equivalence matches all 384 bytes without other
+diagnostic changes. Using the existing ParticleRandom_ReadSample
+helper also gives 384 bytes with stock agbcc, leaving 22 differing
+instructions and a register-blind distance of two. Raising the
+table's priority on the shared-helper draft changes more operands.
+Passing the symbol directly, using the named owner type, and
+reading the selection member directly preserve the 376-byte miss.
+The original proved-zero expression remains. See
+`build/hard-sites/action-icon/` and `build/matchsearch/sub_0816E570`.
+
+## 2026-11-26: Spider wander allocation without equivalence control
+
+The ordinary symbolic Spider_UpdateWanderGoal draft emits 592 of
+584 bytes. The known combined diagnostic still matches. A new
+isolation check shows that suppressing equivalence is unnecessary
+in this checkout: `AGBCC_FORCE=29:5,31:6,32:10` is exact. Those
+pseudos are the body address, random table, and cursor address.
+Suppressing table and cursor equivalence alone emits 580 bytes
+and still differs. The body address and cursor eventually take
+the expected registers even in the stock draft, but reserving
+those homes during allocation changes which other pseudos get
+the remaining registers.
+
+Using the table size for the wrap mask and accessing the shared
+cursor directly preserve the stock miss. Removing only the timeout
+test's zero term, writing that timeout as a conditional expression,
+and delaying the distance calculation until projection also miss.
+Moving the body pointer closer to projection or using the member
+directly increases the miss. Removing the jump to the timer decrement
+preserves the stock mismatch.
+See `build/hard-sites/spider-wander/` and
+`build/matchsearch/Spider_UpdateWanderGoal`.
