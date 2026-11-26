@@ -96,16 +96,7 @@ void SceneActorReaction_BeginDefeatBurst(struct ChaseActor *actor)
     if (!SceneActorReaction_TakePrepared(actor))
         return;
     {
-        struct SceneActorRegistryControl *control = &group->control;
-
-        u32 *field;
-        u32 mask;
-        field = &actor->base.behaviorFlags;
-        mask = ~0x141C0;
-        *field &= mask;
-        control->counter = 0;
-        control->field14 = 0;
-        control->timer = 0;
+        SceneActorReaction_ResetRouteControl(actor, &group->control);
         {
             struct ContactCollider *collider;
 
