@@ -1,6 +1,7 @@
 #include "scene/motion/scene_actor_chase_reaction.h"
 #include "monsters/scene_route_sample.h"
 #include "global.h"
+#include "monsters/centipede/centipede_body.h"
 #include "scene/actor/scene_actor_reaction.h"
 #include "scene/motion/scene_actor_terrain.h"
 #include "engine/engine.h"
@@ -97,7 +98,7 @@ static inline void Scale(struct ChaseActor *actor)
 // confidence=low: moves toward a saved waypoint using the facing quadrant behind the actor.
 void CentipedeBody_UpdateRetreat(struct ChaseActor *actor)
 {
-    u8 *body = actor->base.context;
+    struct TentacleBody *body = actor->base.context;
     s32 speed;
     struct ContactPosition delta;
     if (Take(&actor->base.field2B1)) {
@@ -105,24 +106,24 @@ void CentipedeBody_UpdateRetreat(struct ChaseActor *actor)
         Centipede_ResetOscillation(actor);
         {
             u32 direction = (((actor->base.tracking.heading) + 128) & 255) >> 6;
-            body[0x8E9] = direction;
+            body->wanderDirection = direction;
         }
-        body[0x8E8] = 0;
+        body->wanderAttempts = 0;
         Centipede_SelectWanderRoute(actor);
     }
 
-    if (*(s16 *)(body + 0x8D6) <= 0)
-        *(s16 *)(body + 0x8D6) = 1;
+    if (body->hitReactionTimer <= 0)
+        body->hitReactionTimer = 1;
     speed = Callback_InvokeActor(actor, actor->base.animationQuery.opaque);
     Scale(actor);
-    if (Approach(actor, (void *)(body + 0x8F8), speed)) {
+    if (Approach(actor, (void *)((u8 *)body + 0x8F8), speed)) {
         Centipede_SelectWanderRoute(actor);
-        Chase_Delta(&delta, &actor->base.body.position, (void *)(body + 0x904));
+        Chase_Delta(&delta, &actor->base.body.position, &body->waypoint);
         actor->base.nextDirection = Math_Atan2(delta.x, delta.z);
     }
     Centipede_AdvanceMotionPhase(actor, speed);
     {
-        u16 *p = (void *)(body + 0x8E4);
+        u16 *p = &body->routeMotionTimer;
         if (*p) {
             sub_080A9DB0(actor, 18, 0x1000);
             --*p;
