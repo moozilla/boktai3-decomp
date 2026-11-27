@@ -1,14 +1,9 @@
 #include "global.h"
-struct S {
-    u8 f[0x1026];
-    u16 h;
-    u8 p[6];
-    u16 h2;
-};
+#include "link/link_score_panel.h"
 s32 Mod(s32, s32);
 void Sound_PlaySong(s32);
-void LinkMenu_DrawRandomizedFourDigitNumber(struct S *, s32);
-void LinkScorePanel_UpdateRollingNumber(struct S *s)
+void LinkMenu_DrawRandomizedFourDigitNumber(struct LinkScorePanel *, s32);
+void LinkScorePanel_UpdateRollingNumber(struct LinkScorePanel *s)
 {
     if (Mod(s->h, 2) == 0)
         Sound_PlaySong(0x2A5);
