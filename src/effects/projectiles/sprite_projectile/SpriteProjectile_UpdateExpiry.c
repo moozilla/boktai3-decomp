@@ -3,11 +3,7 @@
 #include "engine/engine_globals.h"
 #include "player/cutscene/player_cue_sequence.h"
 #include "recovered/particle_emission_vector_layout.h"
-struct ParticleSequence {
-    const u16 *commands;
-    u8 flags, frameCount, frameWeight, duration;
-    u16 index, unknownA, speed, elapsed;
-};
+#include "engine/video/display_sequence.h"
 struct Projectile {
     u32 flags;
     u8 unknown4[2], angle, unknown7[9];
@@ -15,7 +11,7 @@ struct Projectile {
     u8 unknown12[10];
     struct ParticleEmissionVector position;
     u8 unknown24[8];
-    struct ParticleSequence sequence;
+    struct DisplaySequenceState sequence;
     u8 unknown3C[0x1C];
     u8 collider[0x58];
     struct ParticleEmissionVector velocity;

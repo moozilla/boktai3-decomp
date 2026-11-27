@@ -10,6 +10,7 @@
 #include "player/cutscene/player_cue_sequence.h"
 #include "engine/math/scene_vec.h"
 #include "scene/collision/packed_contact_halfwords.h"
+#include "engine/video/display_sequence.h"
 
 u32 LargeFragmentEffect_IsActive(void)
 {
@@ -217,12 +218,6 @@ void SceneSlot_UpdateTimedPulse(void *unused, struct LargeFragmentSlot *slot)
         slot->timer++;
 }
 
-struct FeatherSequence {
-    const u16 *commands;
-    u8 flags, frameCount, frameWeight, duration;
-    u16 index, unknownA, speed, elapsed;
-};
-
 struct Feather {
     u32 flags;
     u8 unknown4[3], priority;
@@ -232,7 +227,7 @@ struct Feather {
     u8 unknown12[10];
     struct Vec position;
     u8 unknown24[8];
-    struct FeatherSequence sequence;
+    struct DisplaySequenceState sequence;
     u8 unknown3C[0x54];
     u16 age;
     u8 unknown92[4];
