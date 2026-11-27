@@ -17,9 +17,9 @@ s32 GameState_LoadSessionOrInitDefaults(void)
             u32 value = 230;
             ((struct SessionSave *)gSessionState)->solarBaseline = value;
         }
-        ((struct SessionSave *)gSessionState)->unknown8[0] = result;
-        ((struct SessionSave *)gSessionState)->unknown8[1] = result;
-        ((struct SessionSave *)gSessionState)->unknown8[2] = result;
+        ((struct SessionSave *)gSessionState)->selectedSlot = result;
+        ((struct SessionSave *)gSessionState)->saveRequested = result;
+        ((struct SessionSave *)gSessionState)->unknownA = result;
     }
     return result;
 }
