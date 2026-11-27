@@ -1,9 +1,7 @@
 #include "global.h"
 #include "engine/video/render.h"
+#include "effects/orbits/screen_orbit_effect/orbit_vec_layout.h"
 // confidence=low: projects the source and positions a timed icon around the screen center.
-struct OrbitVec {
-    s16 x, y, z, pad;
-};
 struct OrbitSlot {
     u8 state, angle, enter, unknown3;
     u32 age, flags;
