@@ -1,4 +1,4 @@
-#include "link/wireless/scene_pool.h"
+#include "link/wireless/scene_pool_collision.h"
 
 void ScenePool_SetLateralControlSchedule(struct ScenePoolEntry *, s32, s32, s32);
 s32 ScenePool_SelectStateAtPositionLimit(struct ScenePoolEntry *);
@@ -35,7 +35,7 @@ s32 ScenePool_StateCruise(void *manager, struct ScenePoolActor *actor, struct Sc
         history[1] = 0;
         entry->turnStep = 0x200;
         {
-            u32 *flags = &actor->motionFlags;
+            u32 *flags = &ScenePool_MotionCollider(actor)->flags;
             u32 mask;
             mask = ~1;
             *flags &= mask;
