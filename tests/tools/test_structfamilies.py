@@ -72,6 +72,23 @@ def measure(text, path):
 
 
 class SourceEvidenceTests(unittest.TestCase):
+    def test_prefix_view_requires_pointer_type_positions(self):
+        path = "src/a.c"
+        key = f"{path}:struct Prefix"
+        for source, expected in (
+            ("struct Prefix *items[8]; void Run(struct Prefix *p);", True),
+            ("void Run(void *p) { ((struct Prefix *)p)->mode = 1; }", True),
+            ("struct Prefix buffer[8];", False),
+            ("struct Owner { struct Prefix prefix; };", False),
+            ("struct Prefix (*items)[8];", False),
+            ("struct Prefix Run(void);", False),
+            ("void Run(struct Prefix value);", False),
+            ("int Size(void) { return sizeof(struct Prefix); }", False),
+        ):
+            with self.subTest(source=source):
+                _, _, ast, tu = parse("struct Prefix { int mode; };\n" + source, path)
+                self.assertEqual(merge.pointer_only(ast, tu, key, path), expected)
+
     def test_pointer_arithmetic_and_array_member(self):
         path = "src/moved/a.c"
         _, _, ast, tu = parse(A, path)

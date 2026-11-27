@@ -292,9 +292,11 @@ def member_edits(text, pre, refs, view, mapping, span):
     return edits
 
 
-def rewrite_unit(text, old, new, header, spell):
+def rewrite_unit(text, old, new, header, spell, *, allow_prefix=False):
     """Replace one file-scope declaration and the member uses bound to it."""
-    if (old["size"], old["align"]) != (new["size"], new["align"]):
+    grows = old["size"] < new["size"]
+    pointer_view = allow_prefix and grows and old["kind"] == new["kind"] == "struct"
+    if old["align"] != new["align"] or (old["size"] != new["size"] and not pointer_view):
         raise Holdout(f"private size/alignment {old['size']:#x}/{old['align']} differs from shared "
                       f"{new['size']:#x}/{new['align']}")
     spans = [r for r in inline_twins.records(text) if r.kind == old["kind"]
@@ -312,7 +314,7 @@ def rewrite_unit(text, old, new, header, spell):
     same_sequence = [(m["name"], type_key(m)) for m in old["members"]] == [
         (m["name"], type_key(m)) for m in new["members"]]
     edits = []
-    if not same_sequence or any(name != new_name for name, new_name in mapping.items()):
+    if pointer_view or not same_sequence or any(name != new_name for name, new_name in mapping.items()):
         pre = lm.preprocess(old["file"])
         if pre is None:
             raise Holdout("preprocessing failed")
@@ -322,6 +324,8 @@ def rewrite_unit(text, old, new, header, spell):
             raise Holdout(f"source parse failed: {exc}") from exc
         if error:
             raise Holdout(f"body parse failed: {error}")
+        if pointer_view and not pointer_only(ast, tu, old["id"], old["file"]):
+            raise Holdout("larger shared type requires a pointer-only private declaration")
         if not same_sequence and has_initializers(ast, tu, old["id"], old["file"]):
             raise Holdout("aggregate initializer needs a positional layout review")
         refs = evidence.References(ast, tu, old["file"])
@@ -334,6 +338,18 @@ def rewrite_unit(text, old, new, header, spell):
     for start, end, replacement in sorted(edits, reverse=True):
         text = text[:start] + replacement + text[end:]
     return inline_twins.add_include(text, ramlayout.inc_name(str(header)))
+
+
+def pointer_only(ast, tu, key, path):
+    """Reject by-value type positions before expanding a prefix view."""
+    from pycparser import c_ast
+
+    def visit(node, parent=None):
+        if isinstance(node, c_ast.TypeDecl) and evidence.record_of(tu, node) == key:
+            return isinstance(parent, c_ast.PtrDecl)
+        return all(visit(child, node) for _, child in node.children())
+
+    return all(visit(node) for node in ast.ext if node.coord and Path(node.coord.file).as_posix() == path)
 
 
 def has_initializers(ast, tu, key, path):
@@ -446,7 +462,7 @@ def convert(catalog, family, args):
                 raise Holdout("source changed since scan; rescan the tree")
             if len(items) != 1:
                 raise Holdout("multiple family declarations in one unit need joint scope review")
-            proposals[rel] = rewrite_unit(text, items[0], new, header, spell)
+            proposals[rel] = rewrite_unit(text, items[0], new, header, spell, allow_prefix=args.allow_prefix)
             if not args.apply:
                 print(f"PROPOSED {rel}")
         except (Holdout, OSError) as exc:
@@ -506,10 +522,14 @@ def main(argv=None):
     ap.add_argument("--name", help="new shared tag")
     ap.add_argument("--header", type=Path, help="new header path below include/")
     ap.add_argument("--use-shared", help="reuse a related existing type instead of generating a header")
+    ap.add_argument("--allow-prefix", action="store_true",
+                    help="allow pointer-only struct views to adopt a larger existing type with --use-shared")
     ap.add_argument("-j", type=int, default=2, help="parallel header-dependent checks")
     args = ap.parse_args(argv)
     if args.j < 1 or args.use_shared and (args.name or args.header):
         ap.error("select positive jobs and either a new header or --use-shared")
+    if args.allow_prefix and not args.use_shared:
+        ap.error("--allow-prefix requires --use-shared")
     os.chdir(families.ROOT)
     try:
         catalog = families.load_catalog(args.catalog)
