@@ -121,48 +121,47 @@ void SolarCalibration_Destroy(struct SolarCalibrationMenu *p)
 
 s32 SolarCalibration_Initialize(struct SolarCalibrationMenu *s)
 {
-    u32 zero, one, value;
+    s32 maps[1];
     void *a, *p, *resource;
     struct AnimSpriteResource *obj, *obj2, *obj3;
     struct MessageMenuParameters *global;
     Bg_ClearTilemap(0);
-    zero = 0;
-    BgGfx_LoadTilemapSimple(0, 0, 0, 0, zero);
+    BgGfx_LoadTilemapSimple(0, 0, 0, 0, 0);
     Bg_ClearTilemap(2);
-    BgGfx_LoadTilemapSimple(2, 0, 0, 0, zero);
+    BgGfx_LoadTilemapSimple(2, 0, 0, 0, 0);
     Bg_ClearTilemap(3);
-    BgGfx_LoadTilemapSimple(3, 0, 0, 0, zero);
+    BgGfx_LoadTilemapSimple(3, 0, 0, 0, 0);
     a = ScriptProc_Start(0xC091, 0x3536);
     s->backgroundMap = a;
-    value = 6;
-    Bg_SetupLayers(2, 0, a, 0, zero, one = 1, &value);
-    BgGfx_LoadTilemapSimple(3, 0, 0, 0, zero);
+    maps[0] = 6;
+    Bg_SetupLayers(2, 0, a, 0, 0, 1, maps);
+    BgGfx_LoadTilemapSimple(3, 0, 0, 0, 0);
     p = ((struct MenuDisplayPalette *)ScriptProc_Start(0x92B3, 0x204))->colors;
     CpuSet(p, gBgPaletteBuffer, 0x100);
     resource = ScriptProc_Start(0xCB05, 0xE2AB);
     obj = &s->widgets[0].graphics;
     ResourceHeader_Relocate(obj, resource);
-    AnimSprite_InitLinked(&s->widgets[0].sprite, obj, 0x38, 0x10, zero, zero, zero, zero);
+    AnimSprite_InitLinked(&s->widgets[0].sprite, obj, 0x38, 0x10, 0, 0, 0, 0);
     obj2 = &s->widgets[1].graphics;
     ResourceHeader_Relocate(obj2, resource);
-    AnimSprite_InitLinked(&s->widgets[1].sprite, obj2, 0x29, 0x10, zero, zero, zero, zero);
+    AnimSprite_InitLinked(&s->widgets[1].sprite, obj2, 0x29, 0x10, 0, 0, 0, 0);
     obj3 = &s->widgets[2].graphics;
     ResourceHeader_Relocate(obj3, resource);
-    AnimSprite_InitLinked(&s->widgets[2].sprite, obj3, 0x2A, 0x10, zero, zero, zero, zero);
+    AnimSprite_InitLinked(&s->widgets[2].sprite, obj3, 0x2A, 0x10, 0, 0, 0, 0);
     s->widgets[1].sprite.flags &= ~1;
-    s->widgets[2].sprite.flags |= one;
+    s->widgets[2].sprite.flags |= 1;
     MessageWindow_SetPalette(0xC486);
     global = &gMessageMenuParameters;
     MessageWindow_SetMessageTable(global->lBlock);
     MessageWindow_ShowMessage(0);
     MessageWindow_SetBounds(2, 3, 0x20, 6);
     MessageWindow_SetDisplayMode(1);
-    s->pageTimer = one;
-    s->blinkTimer = one;
+    s->pageTimer = 1;
+    s->blinkTimer = 1;
     if (global->f == 1)
         s->fadeSpeed = 3;
     else
-        s->fadeSpeed = zero;
+        s->fadeSpeed = 0;
     Menu_StartFadeIn(s->fadeSpeed);
     return s->fadeSpeed = 0;
 }
