@@ -1,9 +1,5 @@
 #include "global.h"
-struct SpriteComponent {
-    void (*update)(struct SpriteComponent *);
-    void (*destroy)(struct SpriteComponent *);
-    u32 flags;
-};
+#include "engine/video/sprite_component.h"
 void Sound_PlaySong(u32);
 u32 SpriteComponent_Resume(struct SpriteComponent *component)
 {

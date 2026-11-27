@@ -26,18 +26,10 @@ static inline u8 IsUnavailable(struct ChaseActor *actor)
     return 0;
 }
 
-static inline s32 PlayerSlot(u8 *target)
-{
-    if (target[8] <= 3)
-        return target[8];
-    return -1;
-}
-
 static inline u32 TestSlot(s32 i)
 {
     u32 mask = 8;
-    u32 *flags = &gPlayerSlotFlags;
-    return flags[i] & mask;
+    return gPlayerSlotStatus[i] & mask;
 }
 
 
@@ -51,44 +43,6 @@ static inline void ClearHalfFlags(u16 *flags, u32 mask)
     struct FlagHalfword *field = (void *)flags;
     field->bits = mask & field->bits;
 }
-
-struct RoutePoint {
-    s16 x, z;
-};
-struct RouteLink {
-    u8 unknown0[8];
-    struct RoutePoint *point;
-};
-
-struct ReactionControl {
-    u8 unknown0[8];
-    u16 timer;
-    u8 mode, unknownB[9];
-    u16 recoveryTimer, unknown16;
-    u32 counter;
-};
-struct ReactionSavedControl {
-    u8 unknown0[8];
-    u8 state, phase, behavior, unknownB;
-    u32 counter;
-    void *callback;
-};
-struct ReactionGroup {
-    u8 unknown0[0x40];
-    u16 flags414, unknown42, flags418;
-    u8 unknown46[2];
-    void *entryControl;
-    struct ReactionControl control;
-    u8 unknown68[0xC];
-    struct RouteLink route;
-    u8 unknown80[0xC];
-    struct ReactionSavedControl saved;
-    u8 unknownA0[0x15C];
-    void *shape;
-    struct ContactPosition *destination;
-    u8 unknown204[0x20];
-    void *failureCallback;
-};
 
 static inline u8 MoveTo(struct ChaseActor *actor, void *shape, struct ContactPosition *position,
                         void *destination, u16 *const *motionFlags, u32 blocked)
@@ -156,14 +110,18 @@ done:
     return height;
 }
 
-static inline void SaveControl(void *record, void *callback, u8 behavior)
+struct ReactionControlPair {
+    struct SceneActorChaseSavedControl saved;
+    struct SceneActorTimedRestoration timed;
+};
+
+static inline void SaveControl(struct ReactionControlPair *record, void *callback, u8 behavior)
 {
-    struct ReactionSavedControl *saved = record;
-    saved->counter = 30;
-    saved->callback = callback;
-    saved->state = 0;
-    saved->phase = 0;
-    saved->behavior = behavior;
+    record->timed.threshold = 30;
+    record->timed.control = callback;
+    record->timed.state = 0;
+    record->timed.phase = 0;
+    record->timed.behavior = behavior;
 }
 static inline void SetFlags(struct ChaseActor *actor, u32 mask)
 {
@@ -173,18 +131,18 @@ static inline void SetFlags(struct ChaseActor *actor, u32 mask)
 }
 u32 sub_0813727C(struct ChaseActor *actor)
 {
-    struct ReactionGroup *group;
-    u8 *target;
+    struct SceneActorChaseGroup *group;
+    struct SceneActorChaseTarget *target;
     s32 slot;
     u16 flags;
     u16 *flagsp;
     struct ContactPosition *dest;
     if (IsUnavailable(actor))
         return 0;
-    target = (void *)actor->base.tracking.target;
+    target = actor->base.tracking.target;
     if (!target)
         return 0;
-    slot = PlayerSlot(target);
+    slot = SceneActorChase_PlayerSlot(target);
     if (slot < 0)
         return 0;
     if (!TestSlot(slot))
@@ -203,7 +161,7 @@ u32 sub_0813727C(struct ChaseActor *actor)
         return 0;
     if (actor->base.secondaryMotion.z)
         return 0;
-    group = (void *)&actor->group.common;
+    group = &actor->group;
     {
         s32 bits = ~0x20;
         bits &= *flagsp;
@@ -215,24 +173,24 @@ u32 sub_0813727C(struct ChaseActor *actor)
     SceneActorTerrain_EnterState(actor, 3, 1, 0);
     SceneActorControl_Begin(actor, SceneActorReaction_RestoreAfterDelay, 14, 0);
     SetFlags(actor, 0x10);
-    SaveControl(&group->saved, actor->base.onAlternateEntry, 7);
+    SaveControl((void *)&group->saved, actor->base.onAlternateEntry, 7);
     ResetControl(actor, ActorFlags(actor, 0x200000), flagsp);
     ProximityVolume_TranslateBounds(actor->group.route, &actor->base.body.position);
     dest = actor->group.destination;
     {
-        struct RouteLink *link = &group->route;
+        struct SceneActorRegistryRoute *link = &group->homeRoute;
         dest->x = link->point->x;
         dest->z = link->point->z;
         dest->y = CellHeight(Terrain_GetCellIndex(dest), dest);
     }
     group->destination->pad = 1;
-    if (!MoveTo(actor, group->shape, &actor->base.body.position, group->destination, &flagsp,
+    if (!MoveTo(actor, group->route, &actor->base.body.position, group->destination, &flagsp,
                 0x200)) {
-        Callback_InvokeActor(actor, group->failureCallback);
+        Callback_InvokeActor(actor, group->fallback);
     } else {
         u16 *resetFlags;
-        group->control.counter = 0;
-        group->control.recoveryTimer = 0;
+        group->common.control.counter = 0;
+        group->common.control.field14 = 0;
         actor->base.field2C2 = 0x40;
         actor->group.common.gate.flags = 0;
         actor->group.common.gate.counter = 0;

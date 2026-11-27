@@ -1,20 +1,14 @@
 #include "global.h"
 #include "engine/runtime.h"
-struct Obj {
-    u8 pad[0x19];
-    u8 state;
-    u16 pad1a;
-    s16 a, b;
-    u16 count;
-};
+#include "system/solar/solar_measurement_task.h"
 struct Context {
     u8 pad[0x874];
     s16 a, b;
 };
 extern u8 *gGameState;
-void Solar_StartMeasurement(void), sub_0822C598(struct Obj *);
+void Solar_StartMeasurement(void), sub_0822C598(struct SolarMeasurementTask *);
 s32 Solar_GetIntensity(void), Solar_GetLevelForIntensity(s32), Solar_ApplyIntensityModifiers(s32);
-void Solar_UpdateMeasurement(struct Obj *obj)
+void Solar_UpdateMeasurement(struct SolarMeasurementTask *obj)
 {
     switch (obj->state) {
         case 0:
@@ -32,7 +26,7 @@ void Solar_UpdateMeasurement(struct Obj *obj)
             break;
         case 2:
             obj->a = Solar_GetIntensity();
-            obj->b = Solar_GetLevelForIntensity(obj->a);
+            obj->gain = Solar_GetLevelForIntensity(obj->a);
             (*(s16 *)(gGameState + 0x874)) = Solar_ApplyIntensityModifiers(obj->a);
             (*(s16 *)(gGameState + 0x876)) =
                 Solar_GetLevelForIntensity((*(s16 *)(gGameState + 0x874)));

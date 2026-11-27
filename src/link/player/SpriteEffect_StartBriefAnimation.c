@@ -1,12 +1,7 @@
 #include "global.h"
 #include "engine/video/sprite_drawable_api.h"
-struct BriefSpriteEffect {
-    u8 unknown0[0x744];
-    const struct SpriteEffectTileResource *resource;
-    struct SpriteDrawable sprite;
-    u8 active, tick, firstFrame;
-};
-void SpriteEffect_StartBriefAnimation(struct BriefSpriteEffect *p,
+#include "link/player/brief_sprite_effect.h"
+void SpriteEffect_StartBriefAnimation(struct PlayerBriefSpriteEffect *p,
                                       const struct ContactPosition *position, s32 alternate)
 {
     struct SpriteDrawable *sprite = &p->sprite;
@@ -14,7 +9,7 @@ void SpriteEffect_StartBriefAnimation(struct BriefSpriteEffect *p,
         p->firstFrame = 0x48;
     else
         p->firstFrame = 4;
-    SpriteDrawable_SelectTileFrame(sprite, p->resource, p->firstFrame);
+    SpriteDrawable_SelectTileFrame(sprite, p->graphics, p->firstFrame);
     sprite->position = *position;
     sprite->flags &= ~1;
     p->active = 1;

@@ -5,21 +5,8 @@
 #include "engine/ram.h"
 #include "engine/runtime.h"
 #include "engine/engine_pause_flags.h"
-struct ScriptPanel {
-    u8 unk0[0x30];
-    u32 counter;
-    u8 unk34[0xA];
-    u16 scale;
-    u8 unk40[0x11];
-    u8 windowReady;
-    u8 unk52[0x26];
-    u8 hudReady;
-    u8 unk79[0x3F];
-    s32 window;
-    u8 unkBC[0x1C];
-    const u8 *script;
-};
-u8 LinkSession_ConsumeStateEntry(struct ScriptPanel *);
+#include "link/link_script_panel.h"
+u8 LinkSession_ConsumeStateEntry(struct LinkScriptPanel *);
 u8 MessageWindow_IsCreated(void);
 void Sound_FadeOutChannel10(u32);
 void ScrollingDialogue_HideImmediately(void);
@@ -35,7 +22,7 @@ s32 TextWindow_Create(s32, s32, s32, s32);
 void Hud_SetMode(s32);
 void TextWindow_StartPlayback(s32);
 void SpriteOam_ResetQueue(s32);
-s32 ScriptPanel_OpenTextWindow(struct ScriptPanel *p)
+s32 ScriptPanel_OpenTextWindow(struct LinkScriptPanel *p)
 {
     if (LinkSession_ConsumeStateEntry(p)) {
         gLinkMenuActive = 0;
@@ -61,7 +48,7 @@ s32 ScriptPanel_OpenTextWindow(struct ScriptPanel *p)
         p->window = TextWindow_Create(1, 6, 28, 6);
         p->windowReady = 1;
         Hud_SetMode(5);
-        TextWindow_SetScript(p->window, p->script);
+        TextWindow_SetScript(p->window, p->scriptD8);
         TextWindow_Refresh(p->window, 1);
         TextWindow_StartPlayback(p->window);
         Bg_DisableDisplay(DISPCNT_BG1_ON | DISPCNT_BG2_ON | DISPCNT_BG3_ON);

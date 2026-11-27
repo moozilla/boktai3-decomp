@@ -1,19 +1,14 @@
 #include "global.h"
+#include "link/player/brief_sprite_effect.h"
 void SpriteDrawable_SelectTileFrame(void *, void *, u32);
-struct BriefAnimation {
-    u8 unknown0[0x744];
-    void *frames;
-    u32 flags;
-    u8 unknown74C[0x24];
-    u8 active, timer, firstFrame;
-};
-void SpriteEffect_UpdateBriefAnimation(struct BriefAnimation *p)
+void SpriteEffect_UpdateBriefAnimation(struct PlayerBriefSpriteEffect *p)
 {
     if (p->active) {
-        if (++p->timer > 5) {
-            p->flags |= 1;
+        if (++p->tick > 5) {
+            p->sprite.flags |= 1;
             p->active = 0;
         } else
-            SpriteDrawable_SelectTileFrame(&p->flags, p->frames, p->firstFrame + (p->timer >> 2));
+            SpriteDrawable_SelectTileFrame(&p->sprite.flags, p->graphics,
+                                           p->firstFrame + (p->tick >> 2));
     }
 }

@@ -19,6 +19,7 @@ import layoutmerge as lm
 import ramlayout
 import struct_evidence as evidence
 import structfamilies as families
+from pycparser import c_ast
 from pycparser.c_parser import ParseError
 
 
@@ -425,6 +426,78 @@ def member_edits(text, pre, refs, view, mapping, span):
     return edits
 
 
+class PrefixUses(evidence.References):
+    """Reject uses that depend on the private record's complete size."""
+
+    def __init__(self, ast, tu, view):
+        self.key = view["id"]
+        super().__init__(ast, tu, view["file"])
+
+    def reject(self, node, use):
+        raise Holdout(f"line {node.coord.line} uses the private extent ({use})")
+
+    def check_type(self, node, decl):
+        t = self.resolve(decl)
+        if evidence.record_of(self.tu, t) == self.key:
+            self.reject(node, "record by value")
+        if isinstance(t, (c_ast.ArrayDecl, c_ast.FuncDecl)):
+            self.check_type(node, t.type)
+        if isinstance(t, c_ast.PtrDecl) and isinstance(self.resolve(t.type), c_ast.ArrayDecl):
+            self.check_type(node, t.type)
+
+    def visit_FuncDef(self, node):
+        self.visit(node.decl)
+        super().visit_FuncDef(node)
+
+    def visit_Decl(self, node):
+        self.check_type(node, node.type)
+        super().visit_Decl(node)
+
+    def visit_Typename(self, node):
+        self.check_type(node, node.type)
+        self.generic_visit(node)
+
+    def visit_FuncDecl(self, node):
+        self.check_type(node, node.type)
+        self.generic_visit(node)
+
+    def pointer(self, expr):
+        t = self.resolve(self.expr_type(expr))
+        if t is not None:
+            return self.pointee(t) == self.key
+        if isinstance(expr, c_ast.StructRef):
+            # An unresolved member might itself hold a pointer to this record.
+            return self.pointer(expr.name)
+        if isinstance(expr, c_ast.FuncCall):
+            t = self.resolve(self.expr_type(expr.name))
+            if isinstance(t, c_ast.PtrDecl):
+                t = self.resolve(t.type)
+            return isinstance(t, c_ast.FuncDecl) and self.pointee(t.type) == self.key
+        if isinstance(expr, c_ast.UnaryOp):
+            return expr.op in {"++", "--", "p++", "p--"} and self.pointer(expr.expr)
+        return any(self.pointer(child) for _, child in expr.children())
+
+    def visit_ArrayRef(self, node):
+        if self.pointer(node.name) or self.pointer(node.subscript):
+            self.reject(node, "record subscript")
+        self.generic_visit(node)
+
+    def visit_BinaryOp(self, node):
+        if node.op in {"+", "-"} and (self.pointer(node.left) or self.pointer(node.right)):
+            self.reject(node, "scaled pointer arithmetic")
+        self.generic_visit(node)
+
+    def visit_Assignment(self, node):
+        if node.op in {"+=", "-="} and self.pointer(node.lvalue):
+            self.reject(node, "scaled pointer assignment")
+        self.generic_visit(node)
+
+    def visit_UnaryOp(self, node):
+        if node.op in {"++", "--", "p++", "p--", "*"} and self.pointer(node.expr):
+            self.reject(node, "pointer update or whole-record dereference")
+        self.generic_visit(node)
+
+
 def check_pointer_prefix(ast, view):
     """Restrict a reviewed short view to pointer parameters and their field uses."""
     from pycparser import c_ast
@@ -455,8 +528,8 @@ def check_pointer_prefix(ast, view):
             parent = parents[-1]
             if isinstance(parent, c_ast.StructRef) and (parent.field is node or parent.type == "->"):
                 continue
-            if isinstance(parent, c_ast.UnaryOp) and parent.op == "!":
-                continue
+            if isinstance(parent, c_ast.UnaryOp) and parent.op in {"!", "sizeof"}:
+                continue  # a null test, or the pointer's own size
             if (isinstance(parent, c_ast.ExprList) and len(parents) > 1
                     and isinstance(parents[-2], c_ast.FuncCall) and parents[-2].args is parent):
                 continue
@@ -516,6 +589,7 @@ def rewrite_records(text, targets, header, *, allow_prefix=False):
                     line, operation = refs.extent_uses[old["id"]]
                     raise Holdout(f"{old['spell']}: line {line} uses the private extent in {operation}")
                 check_pointer_prefix(ast, old)
+                PrefixUses(ast, tu, old)
                 if not pointer_only(ast, tu, old["id"], old["file"]):
                     raise Holdout(f"{old['spell']}: larger shared type requires a pointer-only private declaration")
             if not same_sequence:
@@ -523,7 +597,7 @@ def rewrite_records(text, targets, header, *, allow_prefix=False):
                 if initialized and (designated or positional_layout(old) != positional_layout(new)):
                     raise Holdout(f"{old['spell']}: aggregate initializer needs a layout or designator review")
             edits.extend(member_edits(text, pre, refs, old, mapping, span))
-        replacement = f"typedef {spell} {span.name};\n" if span.typedef else ""
+        replacement = f"typedef {spell} {span.name};\n" if span.typedef and span.name != spell else ""
         removed.append((span.start, span.end, replacement))
 
     for tag, spell in renames:

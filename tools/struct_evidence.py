@@ -58,6 +58,16 @@ def integer_token(value):
         return None
 
 
+def global_record_types(tu, decl):
+    """Types stored at a global and separately at a pointer's destination."""
+    t = tu.resolve(decl)
+    if isinstance(t, c_ast.PtrDecl):
+        return None, record_of(tu, t.type)
+    while isinstance(t, c_ast.ArrayDecl):
+        t = tu.resolve(t.type)
+    return record_of(tu, t), None
+
+
 def const_int(expr):
     if isinstance(expr, c_ast.Constant) and any(word in expr.type for word in ("int", "long")):
         return integer_token(expr.value)
@@ -104,7 +114,7 @@ class References(c_ast.NodeVisitor):
                 else:
                     self.env[0][d.name] = d.type
                     if Path(d.coord.file).as_posix() == path:
-                        self.globals.append((d.name, record_of(tu, d.type), self.pointee(d.type)))
+                        self.globals.append((d.name, *global_record_types(tu, d.type)))
         for ext in ast.ext:
             if ext.coord and Path(ext.coord.file).as_posix() == path:
                 self.visit(ext)

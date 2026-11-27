@@ -2,6 +2,7 @@
 #include "global.h"
 #include "engine/engine.h"
 #include "engine/ram.h"
+#include "link/records/record_name_panel.h"
 
 s32 TextWindow_Create(u32, u32, u32, u32);
 s32 TextWindow_SetScript(s32 id, const u8 *script);
@@ -9,19 +10,10 @@ s32 TextWindow_Refresh(s32 id, s32 index);
 void TextWindow_StartPlayback(s32);
 u8 StateFlags_TestIndexedFlag(s32);
 
-struct RecordPanel {
-    u8 pad0[0xcec];
-    const u8 *script;
-    u8 padCF0[0xd08 - 0xcf0];
-    s32 win[7];
-    u8 padD24[2];
-    s8 page;
-};
-
-void sub_0810D760(struct RecordPanel *p)
+void sub_0810D760(struct RecordNamePanel *p)
 {
     s32 i, n;
-    struct RecordPanel *q;
+    struct RecordNamePanel *q;
     p->win[0] = TextWindow_Create(1, 3, 10, 2);
     p->win[1] = TextWindow_Create(13, 5, 16, 2);
     p->win[2] = TextWindow_Create(13, 7, 16, 2);
@@ -32,7 +24,7 @@ void sub_0810D760(struct RecordPanel *p)
     q = p;
     if (Engine_PauseBits(0x800)) {
         for (i = 0; i <= 5; i++) {
-            TextWindow_SetScript(p->win[i + 1], p->script);
+            TextWindow_SetScript(p->win[i + 1], p->labelScript);
             n = p->page * 6 + i;
             if (StateFlags_TestIndexedFlag(n))
                 TextWindow_Refresh(q->win[i + 1], n);
@@ -42,7 +34,7 @@ void sub_0810D760(struct RecordPanel *p)
         }
     } else {
         for (i = 0; i <= 5; i++) {
-            TextWindow_SetScript(p->win[i + 1], p->script);
+            TextWindow_SetScript(p->win[i + 1], p->labelScript);
             if (StateFlags_TestIndexedFlag(i))
                 TextWindow_Refresh(q->win[i + 1], i);
             else

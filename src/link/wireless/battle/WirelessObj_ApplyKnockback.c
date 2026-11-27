@@ -1,4 +1,5 @@
 #include "global.h"
+#include "link/wireless/wireless_knockback_actor.h"
 
 /* tentative: applies knockback velocity away from attacker and stun timer */
 
@@ -22,32 +23,6 @@ struct Msg {
     u8 speed;
 };
 
-struct Obj {
-    u8 pad0[0x68];
-    s32 value;
-    s32 type;
-    u8 pad70[0xC0 - 0x70];
-    s32 unkC0;
-    u8 padC4[0x338 - 0xC4];
-    u16 unk338;
-    u8 pad33A[0x57A - 0x33A];
-    s8 unk57A;
-    u8 pad57B;
-    s16 posX, posY, posZ;
-    u8 pad582[0x58C - 0x582];
-    s16 offX, offY, offZ;
-    u8 pad592[0x5AC - 0x592];
-    s32 unk5AC;
-    u8 pad5B0[0x5CC - 0x5B0];
-    s32 velX;
-    u8 pad5D0[4];
-    s32 velZ;
-    u8 pad5D8[0x5EC - 0x5D8];
-    s8 unk5EC;
-    u8 pad5ED;
-    u8 flags;
-};
-
 extern const s16 gUnk_086149C4[];
 s32 Math_Atan2(s32, s32);
 
@@ -58,7 +33,7 @@ static inline s32 scaleMotion(s32 value)
     return -((-value) >> 12);
 }
 
-static inline u8 isBusy(struct Obj *obj)
+static inline u8 isBusy(struct WirelessKnockbackActor *obj)
 {
     u32 mask = 1;
     if (obj->flags & mask)
@@ -80,10 +55,10 @@ static inline void polar(struct Vec3s *v, s32 angle, s32 speed)
     v->z = scaleMotion(gUnk_086149C4[angle & 255] * speed);
 }
 void SceneMotion_PlayKindSound(struct Msg *);
-void WirelessObj_ApplyKnockback(struct Obj *objArg, struct Msg *msgArg)
+void WirelessObj_ApplyKnockback(struct WirelessKnockbackActor *objArg, struct Msg *msgArg)
 {
     struct Msg *msg = msgArg;
-    struct Obj *obj = objArg;
+    struct WirelessKnockbackActor *obj = objArg;
     struct {
         struct Vec3i target;
         struct Vec3i self;
@@ -128,9 +103,9 @@ void WirelessObj_ApplyKnockback(struct Obj *objArg, struct Msg *msgArg)
     if (obj->unk5EC < 10)
         obj->unk5EC = 10;
     if ((u32)(angle - 10) > 0xEC) {
-        obj->unk5AC += 0x3000;
+        obj->f5AC += 0x3000;
     } else {
-        obj->unk5AC -= 0x100;
+        obj->f5AC -= 0x100;
         obj->unkC0 = 0;
     }
 sound:

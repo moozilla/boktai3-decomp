@@ -2,13 +2,10 @@
 #include "engine/math/scene_vec.h"
 #include "engine/engine.h"
 #include "engine/ram.h"
+#include "link/player/directional_particle_vector.h"
 
 extern const s16 gUnk_086149C4[];
 void DirectionalEffect_AddParticle(void *, void *, void *, void *);
-
-struct Vec16 {
-    u32 x : 16, y : 16, z : 16;
-};
 
 static inline s32 scale(s32 product)
 {
@@ -25,7 +22,7 @@ static inline u32 randomValue(const u16 *table)
 
 void Player_EmitScatterEffect(void *task, struct SceneVec *center, u32 yaw, u32 pitch, void *arg)
 {
-    struct Vec16 pos, vel;
+    struct DirectionalParticleVector pos, vel;
     s32 r, v;
     pos.x = (randomValue(gRandomTable) & 0x1F) + center->x - 15;
     pos.y = (randomValue(gRandomTable) & 0x1F) + center->y - 15;

@@ -4,13 +4,8 @@
 #include "engine/engine.h"
 #include "engine/ram.h"
 #include "scene/areas/area_effect_link.h"
+#include "link/records/record_name_panel.h"
 #define TextWindow_Show TextWindow_StartPlayback
-struct RecordPanel {
-    u8 pad0[0xCF4];
-    const u8 *nameScript;
-    u8 padCF8[0x10];
-    s32 windows[7];
-};
 struct PanelNameRecord {
     u8 pad0[0x10];
     u8 name[16];
@@ -34,7 +29,7 @@ static inline struct PanelNameRecord *GetNameRecord(void)
         return 0;
     return &p->record;
 }
-void RecordPanel_ShowName(struct RecordPanel *p)
+void RecordPanel_ShowName(struct RecordNamePanel *p)
 {
     u8 *name;
     if (Engine_PauseBits(0x800)) {
@@ -45,8 +40,8 @@ void RecordPanel_ShowName(struct RecordPanel *p)
     } else {
         name = &gGameState->playerName[16];
     }
-    TextWindow_SetScript(p->windows[0], p->nameScript);
-    TextWindow_Refresh(p->windows[0], 0);
-    TextWindow_SetString(p->windows[0], 1, name);
-    TextWindow_StartPlayback(p->windows[0]);
+    TextWindow_SetScript(p->win[0], p->nameScript);
+    TextWindow_Refresh(p->win[0], 0);
+    TextWindow_SetString(p->win[0], 1, name);
+    TextWindow_StartPlayback(p->win[0]);
 }

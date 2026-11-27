@@ -1,5 +1,6 @@
 #include "global.h"
 #include "lib/libm/libm_compat.h"
+#include "system/clock/solar_time_context.h"
 double Time_CalculateSolarLongitude(double);
 double Time_CalculateSolarLatitude(double);
 double Time_CalculateEclipticObliquity(double);
@@ -8,11 +9,7 @@ double __muldf3(double, double);
 double __adddf3(double, double);
 double __subdf3(double, double);
 double __divdf3(double, double);
-struct SA230 {
-    double d[12];
-    s32 n[4];
-};
-void Time_CalculateSolarRiseTransitSet(struct SA230 *s, s32 mode, double arg, s32 day,
+void Time_CalculateSolarRiseTransitSet(struct SolarTimeContext *s, s32 mode, double arg, s32 day,
                                        double longitude, double latitude)
 {
     double l, b, e, decl, alpha, hour;

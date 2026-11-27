@@ -117,6 +117,19 @@ void Shadow(struct View *(*Allocate)(void)) { Allocate(); }
                 _, _, ast, tu = parse("struct Prefix { int mode; };\n" + source, path)
                 self.assertEqual(merge.pointer_only(ast, tu, key, path), expected)
 
+    def test_global_record_array_is_inline_storage(self):
+        path = "src/records.c"
+        text = """
+struct Entry { unsigned state; };
+extern struct Entry entries[2];
+extern struct Entry *selected;
+extern struct Entry *pointers[2];
+"""
+        _, _, ast, tu = parse(text, path)
+        key = f"{path}:struct Entry"
+        self.assertEqual(evidence.References(ast, tu, path).globals,
+                         [("entries", key, None), ("selected", None, key), ("pointers", None, None)])
+
     def test_pointer_arithmetic_and_array_member(self):
         path = "src/moved/a.c"
         _, _, ast, tu = parse(A, path)
@@ -336,7 +349,7 @@ struct Parent { unsigned state; struct Entry linked; };
 
     def test_probe_compatible_headers_once_and_reuse_the_results(self):
         one = "struct A { u16 flags; };\n"
-        two = "struct B { struct A a; u16 next; };\n"
+        two = "struct B { struct A a; u16 next; };\nextern struct B *gB;\n"
         pre = TYPES + '# 1 "include/a.h"\n' + one + '# 1 "include/b.h"\n' + two
         jobs = [("include/a.h", one, b"version"), ("include/b.h", two, b"version")]
         with tempfile.TemporaryDirectory() as tmp, patch.object(families, "OUT", Path(tmp)), \
@@ -347,6 +360,28 @@ struct Parent { unsigned state; struct Entry linked; };
         self.assertEqual(first, second)
         b = first[1]["records"]["include/b.h:struct B"]
         self.assertEqual((b["size"], b["members"][0]["record"]), (8, "include/a.h:struct A"))
+        self.assertEqual(first[1]["globals"], [["gB", None, "include/b.h:struct B"]])
+
+    def test_shared_ram_declaration_links_views_of_the_same_address_space(self):
+        header = "include/work.h"
+        text = "struct Owner { unsigned state, tail; }; extern struct Owner *gWork;"
+        _, _, ast, tu = parse(text, header)
+        shared = families.header_globals(ast, tu)[header]
+        a, b = "src/a.c", "src/b.c"
+        private = "struct Local { unsigned state; };"
+        records = measure(text, header) | measure(private, a) | measure(private, b)
+        a_key, b_key = f"{a}:struct Local", f"{b}:struct Local"
+        scans = [
+            {"file": header, "globals": shared},
+            {"file": a, "globals": [("gWork", None, a_key)]},
+            {"file": b, "globals": [("gWork", b_key, None)]},
+        ]
+        with patch.object(families.ramlayout, "load", return_value=[{"addr": "020004B4", "name": "gWork"}]):
+            _, buckets, _, _, _ = families.flow(scans, records, {})
+        layouts = families.SharedLayouts(records, buckets)
+        self.assertEqual(layouts.relations([records[a_key]]),
+                         [(f"{header}:struct Owner", "contained by", "typed RAM declaration", 1)])
+        self.assertEqual(layouts.relations([records[b_key]]), [])
 
     def test_real_offsets_nested_types_and_votes(self):
         path = "src/moved/a.c"
@@ -657,6 +692,17 @@ unsigned Read(struct Pool *pool) { return pool->slots[2].timer; }
                         rewrite = merge.rewrite_records(body, targets, Path("include/actor.h"), allow_prefix=True)
                         self.assertIn("void Step(struct Actor *p) { p->state = 1; }", rewrite)
 
+    def test_tagged_typedef_rewrite_preserves_alias_and_updates_tag_references(self):
+        path = "src/a.c"
+        text = "typedef struct R { unsigned old; } Local;\n"
+        text += "int F(Local *a, struct R *b) { return a->old + b->old; }\n"
+        old = measure(text, path)[f"{path}:struct R"]
+        new = measure("struct S { unsigned state; };", "include/s.h")["include/s.h:struct S"]
+        with patch.object(lm, "preprocess", return_value=parse(text, path)[0]):
+            result = merge.rewrite_unit(text, old, new, Path("include/s.h"), "struct S")
+        self.assertIn("typedef struct S Local;", result)
+        self.assertIn("int F(Local *a, struct S *b) { return a->state + b->state; }", result)
+
     def test_initializer_with_changed_shape_is_a_holdout(self):
         path = "src/moved/a.c"
         old_text = TYPES + "struct R { u16 old, other; };\nstruct R data = { 2, 3 };\n"
@@ -726,6 +772,40 @@ int Draw(struct View *p) { return p->cursor.x; }
                         result = merge.rewrite_unit(text, old, new, Path("include/state.h"), "struct State",
                                                     allow_prefix=True)
                         self.assertIn("int Read(struct State *p) { return p->mode; }", result)
+
+    def test_shorter_record_rewrite_requires_opt_in_and_uses_measured_fields(self):
+        path = "src/r.c"
+        old_text = "struct R { unsigned old; };\nint F(struct R *p) { return p->old + sizeof(p); }\n"
+        old = measure(old_text, path)[f"{path}:struct R"]
+        new = measure("struct S { unsigned state, tail; };", "include/s.h")["include/s.h:struct S"]
+        with patch.object(lm, "preprocess", return_value=parse(old_text, path)[0]):
+            with self.assertRaisesRegex(merge.Holdout, "size/alignment"):
+                merge.rewrite_unit(old_text, old, new, Path("include/s.h"), "struct S")
+            result = merge.rewrite_unit(old_text, old, new, Path("include/s.h"), "struct S", allow_prefix=True)
+        self.assertIn("int F(struct S *p) { return p->state + sizeof(p); }", result)
+
+    def test_shorter_record_rewrite_refuses_extent_dependent_uses(self):
+        path = "src/r.c"
+        record = "struct R { unsigned old; }; typedef struct R Alias;\n"
+        old = measure(record, path)[f"{path}:struct R"]
+        new = measure("struct S { unsigned state, tail; };", "include/s.h")["include/s.h:struct S"]
+        for use in (
+            "unsigned F(Alias *p) { return sizeof(Alias); }",
+            "unsigned F(Alias *p) { return sizeof(*p); }",
+            "unsigned F(void) { Alias item; return item.old; }",
+            "unsigned F(void) { Alias items[2]; return items[1].old; }",
+            "unsigned F(Alias *p) { return p[1].old; }",
+            "unsigned F(Alias *p) { return (p + 1)->old; }",
+            "unsigned F(Alias *p) { p += 1; return p->old; }",
+            "unsigned F(Alias *p) { return (++p)->old; }",
+            "unsigned F(Alias *p, Alias *q, int c) { return (c ? p : q)[1].old; }",
+            "unsigned F(Alias *p, Alias *q) { return p - q; }",
+        ):
+            with self.subTest(use=use):
+                text = record + use
+                with patch.object(lm, "preprocess", return_value=parse(text, path)[0]):
+                    with self.assertRaisesRegex(merge.Holdout, "uses the private extent"):
+                        merge.rewrite_unit(text, old, new, Path("include/s.h"), "struct S", allow_prefix=True)
 
     def test_union_preserves_deliberate_overlays(self):
         text = TYPES + "union W { unsigned word; u16 halves[2]; };\n"

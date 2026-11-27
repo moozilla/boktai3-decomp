@@ -51,6 +51,20 @@ def json_write(path, data):
     os.replace(file.name, path)
 
 
+def header_globals(ast, tu):
+    """Group typed global declarations by the header that declares them."""
+    by_file = defaultdict(list)
+    for decl in ast.ext:
+        if not isinstance(decl, c_ast.Decl) or not decl.name or not decl.coord:
+            continue
+        if isinstance(tu.resolve(decl.type), c_ast.FuncDecl):
+            continue
+        direct, pointee = evidence.global_record_types(tu, decl.type)
+        if direct or pointee:
+            by_file[Path(decl.coord.file).as_posix()].append([decl.name, direct, pointee])
+    return by_file
+
+
 def scan_file(rel, text, *, qualified=False):
     """One probe per file, with declarations-only fallback after a body parse error."""
     path = rel
@@ -88,6 +102,8 @@ def scan_file(rel, text, *, qualified=False):
         refs = evidence.References(ast, tu, path)
         result.update(calls=refs.calls, params=refs.params, globals=refs.globals,
                       return_definitions=refs.return_definitions, return_calls=refs.return_calls)
+    elif rel.startswith("include/"):
+        result["globals"] = header_globals(ast, tu).get(path, [])
     return result
 
 
@@ -124,7 +140,7 @@ def scan_header_batch(jobs):
         pre = lm.preprocess(file.name, nonmatching=False)
     if pre:
         try:
-            body, _, tu, _ = evidence.parse(pre, file.name, declarations_only=True)
+            body, ast, tu, _ = evidence.parse(pre, file.name, declarations_only=True)
         except lm.pycparser.c_parser.ParseError:
             pre = None
     if not pre:
@@ -141,6 +157,7 @@ def scan_header_batch(jobs):
         rows = scan_header_batch(missing[:mid]) + scan_header_batch(missing[mid:])
         cached.update((row["file"], row) for row in rows)
         return [cached[job[0]] for job in jobs]
+    globals_by_file = header_globals(ast, tu)
     for job in missing:
         rel, text, version = job
         selected = selections[rel]
@@ -154,7 +171,8 @@ def scan_header_batch(jobs):
                 t = tu.resolve(decl.type)
                 member["record"] = evidence.record_of(tu, t.type if isinstance(t, c_ast.ArrayDecl) else decl.type)
             view.update(file=rel, line=node.coord.line)
-        row = {"file": rel, "digest": digest(text.encode()), "records": {k: measured[k] for k in selected}}
+        row = {"file": rel, "digest": digest(text.encode()), "records": {k: measured[k] for k in selected},
+               "globals": globals_by_file.get(rel, [])}
         json_write(cache_path(rel, text, version), row)
         cached[rel] = row
     return [cached[job[0]] for job in jobs]
@@ -194,6 +212,7 @@ def scan_tree(paths, jobs, shared_headers=None):
     stat = Path(lm.AGBCC).stat()
     key = hashlib.sha256(f"{stat.st_mtime_ns}:{stat.st_size}".encode())
     key.update(inspect.getsource(scan_file).encode())
+    key.update(inspect.getsource(header_globals).encode())
     for path in ("struct_evidence.py", "layoutmerge.py"):
         key.update((root / "tools" / path).read_bytes())
     for rel, text in sorted(headers.items()):
@@ -352,6 +371,8 @@ def flow(scans, records, groups):
             for space, rec in (("object", direct), ("pointee", pointee)):
                 if rec in private and name in ram_names:
                     buckets[("RAM", ram_names[name], space)].add(rec)
+                elif rec in records and path.startswith("include/") and name in ram_names:
+                    buckets[("shared RAM", ram_names[name], space)].add(rec)
     for scan in scans:
         for caller, line, fn, i, static, origin, declared, cast in scan.get("calls", ()):
             key, steps, delta = origin
@@ -465,6 +486,8 @@ def family_components(private, records, buckets, edges):
     """Merge supported pairs, keeping every pair in a component layout-compatible."""
     for anchor, keys in buckets.items():
         kind, *context = anchor
+        if kind == "shared RAM":
+            continue  # shared types provide adoption evidence, not private-family edges
         if kind == "parameter" and len(keys) > 64:
             continue  # ubiquitous allocators, bulk copies, and byte/word helpers
         for a, b in combinations(sorted(keys), 2):
@@ -598,6 +621,7 @@ class SharedLayouts:
     def __init__(self, records, buckets, returns=()):
         self.by_name, self.by_size, self.by_field, self.by_formal, self.by_return = (
             defaultdict(set) for _ in range(5))
+        self.by_ram = defaultdict(set)
         self.records = records
         for key, view in records.items():
             if view["file"].startswith("include/"):
@@ -609,6 +633,10 @@ class SharedLayouts:
             if anchor[0] == "formal type" and anchor[1] in records and records[anchor[1]]["file"].startswith("include/"):
                 for member in members:
                     self.by_formal[member].add(anchor[1])
+            if anchor[0] == "RAM":
+                shared = buckets.get(("shared RAM", *anchor[1:]), ())
+                for member in members:
+                    self.by_ram[member].update(shared)
         for finding in returns:
             result = finding["result"]
             if records[result]["file"].startswith("include/"):
@@ -621,7 +649,7 @@ class SharedLayouts:
         field_hits = Counter()
         for view in views:
             candidates |= self.by_name[short(view)] | self.by_size[view["kind"], view["size"]]
-            candidates |= self.by_formal[view["id"]] | self.by_return[view["id"]]
+            candidates |= self.by_formal[view["id"]] | self.by_return[view["id"]] | self.by_ram[view["id"]]
             field_hits.update(k for lf in view["known"] for k in self.by_field[lf["off"], lf["name"]])
         candidates |= {k for k, hits in field_hits.items() if hits >= 2}
         matches = []
@@ -629,8 +657,9 @@ class SharedLayouts:
             shared = self.records[key]
             formal = any(key in self.by_formal[v["id"]] for v in views)
             returned = any(key in self.by_return[v["id"]] for v in views)
+            ram = any(key in self.by_ram[v["id"]] for v in views)
             same_tag = any(short(v) == short(shared) and meaningful(v) for v in views)
-            if not any(compatible(v, shared, strong=formal or returned or same_tag)
+            if not any(compatible(v, shared, strong=formal or returned or ram or same_tag)
                        or key in self.by_formal[v["id"]] and same_scalar_storage(v, shared)
                        for v in views):
                 continue
@@ -638,7 +667,7 @@ class SharedLayouts:
             common = len(observed & known)
             named = set((lf["off"], lf["name"]) for v in views for lf in v["known"])
             name_hits = len(named & {(lf["off"], lf["name"]) for lf in shared["known"]})
-            if not (formal or returned or same_tag or common >= 3 and (known == observed or name_hits >= 2)):
+            if not (formal or returned or ram or same_tag or common >= 3 and (known == observed or name_hits >= 2)):
                 continue
             if size == shared["size"] and observed == known:
                 relation = "equals"
@@ -648,7 +677,7 @@ class SharedLayouts:
                 relation = "contained by"
             else:
                 relation = "overlapping view"
-            proof = ("typed call" if formal else "typed return" if returned else
+            proof = ("typed RAM declaration" if ram else "typed call" if formal else "typed return" if returned else
                      "same tag" if same_tag else "layout only")
             matches.append((key, relation, proof, common))
         return sorted(matches, key=lambda row: (row[2] == "layout only", -row[3], row[0]))

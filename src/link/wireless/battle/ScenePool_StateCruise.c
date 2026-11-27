@@ -35,7 +35,7 @@ s32 ScenePool_StateCruise(void *manager, struct ScenePoolActor *actor, struct Sc
         history[1] = 0;
         entry->turnStep = 0x200;
         {
-            u32 *flags = &actor->motionFlags;
+            u32 *flags = &actor->motionCollider.flags;
             u32 mask;
             mask = ~1;
             *flags &= mask;

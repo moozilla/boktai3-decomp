@@ -119,7 +119,7 @@ def helpers(text, path=""):
     return out
 
 
-class Record(collections.namedtuple("Record", "kind name typedef body start end file tag")):
+class Record(collections.namedtuple("Record", "kind name typedef body start end file tag", defaults=[None])):
     """A file-scope struct/union definition with an optional typedef."""
 
     @property

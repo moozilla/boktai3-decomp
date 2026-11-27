@@ -84,13 +84,13 @@ u32 Player_ApplyContact(struct Player *p, struct ContactCollider *source,
                 p->contactActionTag = 0x191;
             Player_QueueStatusEffect(p, 1);
         }
-    } else if (Player_ReadStatusBits(&source->reactionFlags, 8)) {
+    } else if (source->reactionFlags & 8) {
         if (!(target->costFlags & 2)) {
             if (p->contactSpecial == 0)
                 p->contactActionTag = 0x133;
             Player_QueueStatusEffect(p, 2);
         }
-    } else if (Player_ReadStatusBits(&source->reactionFlags, 0x40000))
+    } else if (source->reactionFlags & 0x40000)
         LinkPlayer_FlushPendingEffects(p);
     if (Player_ReadStatusBits(&source->reactionFlags, 0x8000))
         sub_0813D834(p, 0, 0x708);

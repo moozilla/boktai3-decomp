@@ -5,11 +5,14 @@
 struct SessionSave {
     u32 unknown0;
     s32 solarBaseline;
-    u8 unknown8[3], daylightSaving;
+    u8 selectedSlot, saveRequested, unknownA, daylightSaving;
     s32 points;
     u32 magic;
     u16 counterA, counterB;
     u32 region;
     u8 unknown1C[0xC];
 };
+
+typedef char SessionSaveSizeCheck[sizeof(struct SessionSave) == 0x28 ? 1 : -1];
+
 #endif

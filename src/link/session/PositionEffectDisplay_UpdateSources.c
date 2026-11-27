@@ -2,13 +2,7 @@
 #include "engine/video/display_animation.h"
 #include "engine/video/display_sequence_sprite.h"
 #include "engine/video/display_sprite_playback.h"
-struct PlayerSlotDisplaySlot {
-    u8 resource[0x1C];
-    struct DisplaySequenceSprite sprite;
-    struct DisplaySequenceState sequence;
-    const struct ContactPosition *source;
-    u16 stopOnEnd, active;
-};
+#include "link/session/player_slot_display_entry.h"
 struct PlayerSlotDisplay {
     u8 task[0x18];
     struct PlayerSlotDisplaySlot slots[4];

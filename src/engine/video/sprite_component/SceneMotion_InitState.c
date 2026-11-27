@@ -1,26 +1,16 @@
-#define SceneMotion_CreateTask SabataFrost_Create
-#include "global.h"
-struct SceneMotion {
-    u8 unknown00[8];
-    u32 position[2];
-    void *task;
-    u8 unknown14[0x24];
-    s16 active;
-};
+#include "engine/video/proximity_volume.h"
+
 void *SabataFrost_Create(void);
-static inline void ClearPosition(void *destination, u32 *source)
+void *SceneMotion_InitState(struct ProximityVolume *motion)
 {
-    *source = 0;
-    CpuSet(source, destination, 0x05000002);
-}
-void *SceneMotion_InitState(struct SceneMotion *motion)
-{
-    u32 *position = motion->position;
-    u32 zero;
     void *task;
-    ClearPosition(position, &zero);
+    ZeroFill8(&motion->position);
     task = SabataFrost_Create();
-    motion->task = task;
+    motion->emitter = task;
     motion->active = 0;
-    /* Original ABI leaves the task result in r0; callers ignore it. */
+#ifdef UBFIX
+    return task;
+#else
+    /* The ROM retains the value from SabataFrost_Create in r0. */
+#endif
 }

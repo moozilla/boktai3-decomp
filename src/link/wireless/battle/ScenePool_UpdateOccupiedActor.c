@@ -1,53 +1,6 @@
 #include "global.h"
+#include "link/wireless/scene_pool.h"
 #include "engine/math/scene_vec_polar.h"
-// Open: motion-pointer lifetimes, initial control layout and register allocation differ.
-
-struct WirelessSceneActor {
-    u8 unknown0[4];
-    u32 terrainFlags, previousTerrainFlags;
-    u8 unknownC[4];
-    struct {
-        s32 x, y, z, w;
-    } position;
-    s32 motion[3];
-    u8 unknown2c[0xc];
-    s32 heightA, heightB;
-    u32 flags40;
-    u8 colorEffect[4];
-    u8 unknown48[3];
-    u8 paletteIndex;
-    u8 unknown4c[0xc];
-    u16 timerA, timerB;
-    s32 parameter;
-    u8 unknown60[8];
-    u8 preview[0x58];
-    s32 forwardBias;
-    u8 unknownc4[0x468];
-    u8 contactIndex[0x40];
-    u32 motionFlags;
-    u8 unknown570[0x3c];
-    s32 forwardSpeed, verticalSpeed, lateralSpeed;
-    u8 unknown5b8[4];
-    s32 previousX;
-    u8 unknown5c0[4];
-    s32 previousZ;
-    u8 unknown5c8[4];
-    s32 impulse[4];
-    s32 offsetX;
-    u8 unknown5e0[0xc];
-    s8 impulseFrames;
-    u8 unknown5ed;
-    u8 stateFlags, unknown5ef;
-    u16 heading;
-    u8 unknown5f2[0xa];
-    u32 actionFlags;
-    u8 model[0x250];
-    s8 marker;
-    u8 unknown851[3];
-    u32 index;
-    u32 timer858, timer85C;
-    u32 controlFlags;
-};
 
 typedef void (*ScenePoolStateFunc)(u8 *, u8 *, u8 *, u32);
 extern ScenePoolStateFunc gUnk_0860585C[];
@@ -60,7 +13,7 @@ s32 Div(s32, s32);
 void Actor_ClampMovementSpeed(u8 *);
 s32 Math_Atan2(s32, s32);
 void Terrain_ResolveActorMotion(u8 *);
-void Character_GetHeightAdjustedPosition(void *, s16 *);
+void Character_GetHeightAdjustedPosition(void *, struct ContactPosition *);
 void SpatialIndex_SetPosition(void *, int, int, int);
 void ScenePool_UpdateProximityCollider(u8 *);
 void ScenePool_UpdateActorDrawablePosition(u8 *);
@@ -84,14 +37,11 @@ void ScenePool_ResetProximityContact(u8 *);
 void Character_UpdateTimedEffect(void *);
 void ActorParticles_SpawnImpactBurst(u8 *);
 
-#define ACTOR_OFFSET(member) ((u32) & ((struct WirelessSceneActor *)0)->member)
+#define ACTOR_OFFSET(member) ((u32) & ((struct ScenePoolActor *)0)->member)
 #define FIELD(p, off, T)     (*(T *)((u8 *)(p) + (off)))
 
 struct Vec16 {
     s32 a, b, c, d;
-};
-struct ShortVector {
-    s16 x, y, z;
 };
 struct ByteValue {
     u8 value;
@@ -107,7 +57,7 @@ static inline u8 TestBit(u8 *value, u32 input)
 
 static inline void ClearBits(u8 *p, const s32 input)
 {
-    u8 *value = &((struct WirelessSceneActor *)p)->stateFlags;
+    u8 *value = &((struct ScenePoolActor *)p)->flags5ee;
     s32 mask = input;
     ((struct ByteValue *)value)->value &= mask;
 }
@@ -132,20 +82,12 @@ static inline s32 Scale(s32 n)
     return n >= 0 ? n >> 12 : -((-n) >> 12);
 }
 
-static inline void RestartState(u8 *item, u32 state, u32 zero)
-{
-    FIELD(item, 0x68, u32) = state;
-    FIELD(item, 0x44, u32) = zero;
-    item[0x64] = 1;
-    Memory_Clear(item + 0x6C, 0x100);
-}
-
 // confidence=low: per-frame update of one occupied scene-pool actor slot: state dispatch, motion integration,
 // spatial-index placement, proximity/damage effects and marker visibility.
 void ScenePool_UpdateOccupiedActor(u8 *pool, u8 *slot, u8 *item, u32 index)
 {
-    struct WirelessSceneActor *actor = (struct WirelessSceneActor *)slot;
-    struct WirelessSceneActor *view = (struct WirelessSceneActor *)actor;
+    struct ScenePoolActor *actor = (struct ScenePoolActor *)slot;
+    struct ScenePoolActor *view = actor;
     s32 speed;
     s32 *speedB, *speedA, *vert;
     s32 *pprevZ;
@@ -154,36 +96,36 @@ void ScenePool_UpdateOccupiedActor(u8 *pool, u8 *slot, u8 *item, u32 index)
     u32 above, below;
     s32 *pprevX, *ox, *i1, *i2;
     u16 *ph;
-    struct ShortVector pos;
+    struct ContactPosition pos;
     u32 fieldOffset;
     s8 *earlyFrames;
     s32 *earlyForward;
 
     {
-        u32 *p = &actor->actionFlags;
+        u32 *p = &actor->stateFlags;
         u32 mask;
         *p = 0;
-        actor->timer858 = 0;
+        actor->controlFlags = 0;
         mask = 0x20;
         if (!(*p & mask) && (FIELD(actor, 0xC, u32) & 0x800)) {
             u32 bit = 4;
-            bit |= actor->stateFlags;
-            actor->stateFlags = bit;
+            bit |= actor->flags5ee;
+            actor->flags5ee = bit;
         }
     }
     if (TestBit((u8 *)view, 4)) {
         ClearBits(slot, ~6);
-        RestartState(item, 11, 0);
+        ScenePool_EnterStateAndClearHistory((struct ScenePoolEntry *)item, 11);
     } else {
         if (TestBit(slot, 2)) {
             ClearBits(slot, ~2);
-            RestartState(item, 10, 0);
+            ScenePool_EnterStateAndClearHistory((struct ScenePoolEntry *)item, 10);
         }
     }
-    if (view->flags40 & 2)
+    if (view->movementFlags & 2)
         view->lateralSpeed = 0;
     {
-        u32 controls = view->flags40;
+        u32 controls = view->movementFlags;
         if (controls & 1)
             view->verticalSpeed = 0;
     }
@@ -197,7 +139,7 @@ void ScenePool_UpdateOccupiedActor(u8 *pool, u8 *slot, u8 *item, u32 index)
     }
     if (FIELD(item, 0x68, u32) <= 11)
         gUnk_0860585C[FIELD(item, 0x68, u32)](pool, slot, item, index);
-    fieldOffset = ACTOR_OFFSET(impulseFrames);
+    fieldOffset = ACTOR_OFFSET(motionLock);
     earlyFrames = (s8 *)((u8 *)actor + fieldOffset);
     if (*earlyFrames <= 0)
         ScenePool_ApplyMotionControls(slot, item);
@@ -207,7 +149,7 @@ void ScenePool_UpdateOccupiedActor(u8 *pool, u8 *slot, u8 *item, u32 index)
     *earlyForward -= 0x20;
     {
         u32 mask = 0x20;
-        u32 *p = &((struct WirelessSceneActor *)slot)->actionFlags;
+        u32 *p = &((struct ScenePoolActor *)slot)->stateFlags;
         u32 value = *p & mask;
         flags = p;
         if (!value)
@@ -215,9 +157,9 @@ void ScenePool_UpdateOccupiedActor(u8 *pool, u8 *slot, u8 *item, u32 index)
     }
     actor->lateralSpeed = Div(actor->lateralSpeed * 90, 100);
     if (TestFlags(flags, 1)) {
-        ((struct WirelessSceneActor *)slot)->forwardSpeed = 0;
-        ((struct WirelessSceneActor *)slot)->lateralSpeed = 0;
-        ((struct WirelessSceneActor *)slot)->forwardBias = 0;
+        ((struct ScenePoolActor *)slot)->forwardSpeed = 0;
+        ((struct ScenePoolActor *)slot)->lateralSpeed = 0;
+        ((struct ScenePoolActor *)slot)->forwardBias = 0;
         FIELD(slot, 0xC8, s32) = 0;
         *earlyFrames = 0;
     }
@@ -231,27 +173,27 @@ void ScenePool_UpdateOccupiedActor(u8 *pool, u8 *slot, u8 *item, u32 index)
             speed = 0xF000;
     }
     actor->verticalSpeed += 0x200;
-    frames = actor->impulseFrames;
+    frames = actor->motionLock;
     vert = &actor->verticalSpeed;
     if (frames > 0) {
-        actor->offsetX += actor->impulse[0];
-        actor->impulse[0] += Div(-actor->impulse[0], actor->impulseFrames);
-        actor->impulse[1] += Div(-actor->impulse[1], actor->impulseFrames);
-        actor->impulse[2] += Div(-actor->impulse[2], actor->impulseFrames);
-        actor->impulseFrames--;
-        ox = &actor->offsetX;
+        actor->steering += actor->impulse[0];
+        actor->impulse[0] += Div(-actor->impulse[0], actor->motionLock);
+        actor->impulse[1] += Div(-actor->impulse[1], actor->motionLock);
+        actor->impulse[2] += Div(-actor->impulse[2], actor->motionLock);
+        actor->motionLock--;
+        ox = &actor->steering;
         i1 = &actor->impulse[1];
         i2 = &actor->impulse[2];
     } else {
         Memory_Clear(actor->impulse, 0x10);
-        ox = &actor->offsetX;
+        ox = &actor->steering;
         i1 = &actor->impulse[1];
         i2 = &actor->impulse[2];
     }
     Actor_ClampMovementSpeed(actor);
-    actor->motion[0] = speed + *ox - actor->previousX;
-    actor->motion[1] = *vert + *i1;
-    actor->motion[2] = actor->lateralSpeed + *i2;
+    actor->motionX = speed + *ox - actor->previousX;
+    actor->motionY = *vert + *i1;
+    actor->motionDisplacement = actor->lateralSpeed + *i2;
     dx = (*ox - actor->previousX) >> 12;
     dz = (actor->position.z - actor->previousZ) >> 12;
     lim = 0x3000;
@@ -269,29 +211,29 @@ void ScenePool_UpdateOccupiedActor(u8 *pool, u8 *slot, u8 *item, u32 index)
     *pprevX = *ox;
     *pprevZ = actor->position.z;
     Terrain_ResolveActorMotion(actor);
-    above = (u32) ~(actor->heightB >> 12) >> 31;
-    below = (u32) ~(actor->heightA >> 12) >> 31;
-    if (actor->terrainFlags != actor->previousTerrainFlags && (actor->terrainFlags & 0x1000) &&
-        !(actor->previousTerrainFlags & 0xF000) && below <= 1 && above == 1) {
+    above = (u32) ~(actor->terrainHeightB >> 12) >> 31;
+    below = (u32) ~(actor->restrictionMetric >> 12) >> 31;
+    if (actor->unknown4 != actor->kind && (actor->unknown4 & 0x1000) && !(actor->kind & 0xF000) &&
+        below <= 1 && above == 1) {
         s32 v = ((*speedA >> 10) + (*speedB >> 8)) >> 1;
         if (v < 4)
             v = 4;
         if (v > 0x12)
             v = 0x12;
         *vert -= v << 9;
-        actor->flags40 &= ~1;
+        actor->movementFlags &= ~1;
     }
     {
-        Character_GetHeightAdjustedPosition(actor, (s16 *)&pos);
-        SpatialIndex_SetPosition(&actor->motionFlags, pos.x, pos.y, pos.z);
+        Character_GetHeightAdjustedPosition(actor, &pos);
+        SpatialIndex_SetPosition(&actor->motionCollider, pos.x, pos.y, pos.z);
         h = *ph;
         heading = (s16)h;
         if (heading < 0) {
-            SpatialIndex_SetPosition(actor->contactIndex, pos.x, pos.y, pos.z);
+            SpatialIndex_SetPosition(&actor->hitCollider, pos.x, pos.y, pos.z);
         } else {
             struct SceneVec off;
             SceneVec_SetPolarXZ(&off, (s16)*ph, 20);
-            SpatialIndex_SetPosition(actor->contactIndex, pos.x + off.x, pos.y, pos.z + off.z);
+            SpatialIndex_SetPosition(&actor->hitCollider, pos.x + off.x, pos.y, pos.z + off.z);
         }
     }
     ScenePool_UpdateProximityCollider(slot);
@@ -316,7 +258,7 @@ void ScenePool_UpdateOccupiedActor(u8 *pool, u8 *slot, u8 *item, u32 index)
             goto countdown;
         if (ScenePool_UpdateProximityCooldown(slot)) {
             ModifierAction_SpawnBurst(actor, CharacterModel_GetPrimaryPaletteIndex(slot + 0x600));
-            ((struct WirelessSceneActor *)slot)->timer85C = 480;
+            ((struct ScenePoolActor *)slot)->proximityCooldown = 480;
             item[0x3B] = 0xF0;
         }
     }
@@ -352,11 +294,11 @@ void ScenePool_UpdateOccupiedActor(u8 *pool, u8 *slot, u8 *item, u32 index)
     {
         u32 *visible;
         if (!(TestFlags(flags, 8))) {
-            ModifyFlags(&((struct WirelessSceneActor *)slot)->motionFlags, ~1, 0);
-            visible = &((struct WirelessSceneActor *)slot)->motionFlags;
+            ModifyFlags(&((struct ScenePoolActor *)slot)->motionCollider.flags, ~1, 0);
+            visible = &((struct ScenePoolActor *)slot)->motionCollider.flags;
         } else {
-            ModifyFlags(&((struct WirelessSceneActor *)slot)->motionFlags, 1, 1);
-            visible = &((struct WirelessSceneActor *)slot)->motionFlags;
+            ModifyFlags(&((struct ScenePoolActor *)slot)->motionCollider.flags, 1, 1);
+            visible = &((struct ScenePoolActor *)slot)->motionCollider.flags;
         }
         if (!(TestFlags(flags, 4))) {
             u16 *hold;
@@ -372,8 +314,8 @@ void ScenePool_UpdateOccupiedActor(u8 *pool, u8 *slot, u8 *item, u32 index)
         }
     }
     ScenePool_ResetProximityContact(slot);
-    Character_UpdateTimedEffect(actor->preview);
-    if (!(TestFlags(flags, 0x20)) && (actor->flags40 & 4))
+    Character_UpdateTimedEffect(&actor->unknown68);
+    if (!(TestFlags(flags, 0x20)) && (actor->movementFlags & 4))
         ActorParticles_SpawnImpactBurst(actor);
     FIELD(item, 0x14, struct Vec16) = FIELD(actor, 0x10, struct Vec16);
 }
