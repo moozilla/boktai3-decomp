@@ -1,46 +1,25 @@
-#include "global.h"
+#include "player/effects/spiral_trail.h"
 #include "engine/engine.h"
 #include "scene/collision/contact_position.h"
 
-struct Unk08236C04Particle {
-    u32 flags;
-    u8 unknown4[0x14];
-    s16 x, y, z;
-    u8 unknown1E[0xA];
-    u8 active;
-    u8 frame;
-    u8 timer;
-    u8 speed;
-    u8 radius;
-    u8 angle;
-    u8 life;
-    u8 unknown2F;
-    struct ContactPosition origin;
-    void *update;
-};
-struct Unk08236C04Emitter {
-    u8 next, delay, spawned, unknown3;
-    void *graphics;
-    struct Unk08236C04Particle particles[8];
-};
 void SpriteDrawable_SelectTileFrame(void *, void *, u32);
-void SpiralTrail_UpdateOrbitParticle(void);
 
 static inline s32 Scale12(s32 n)
 {
     return n >= 0 ? n >> 12 : -((-n) >> 12);
 }
 
-void SpiralTrail_EmitOrbitParticle(u8 *owner, struct ContactPosition *origin)
+void SpiralTrail_EmitOrbitParticle(struct SpiralTrailTask *owner,
+                                   const struct ContactPosition *origin)
 {
-    struct Unk08236C04Emitter *emitter = (struct Unk08236C04Emitter *)(owner + 0x9C);
+    struct SpiralTrailEmitter *emitter = &owner->emitter;
 
     if (++emitter->delay > 1) {
-        struct Unk08236C04Particle *p = &emitter->particles[emitter->next];
+        struct SpiralTrailParticle *p = &emitter->particles[emitter->next];
         const u16 *table;
         u32 *seed;
         unsigned short i;
-        struct Unk08236C04Particle *sprite;
+        struct SpiralTrailParticle *sprite;
 
         p->active = 1;
         table = gRandomTable;
@@ -65,14 +44,15 @@ void SpiralTrail_EmitOrbitParticle(u8 *owner, struct ContactPosition *origin)
         p->update = SpiralTrail_UpdateOrbitParticle;
         sprite = p;
         sprite->flags &= ~1;
-        SpriteDrawable_SelectTileFrame(sprite, *(void **)(owner + 0xA0), sprite->frame);
-        sprite->x = p->origin.x + Scale12(p->radius * gUnk_086149C4[(p->angle + 0x40) & 0xFF]);
-        sprite->y = p->origin.y;
-        sprite->z = p->origin.z + Scale12(p->radius * gUnk_086149C4[p->angle]);
+        SpriteDrawable_SelectTileFrame(sprite, owner->emitter.graphics, sprite->frame);
+        sprite->position.x =
+            p->origin.x + Scale12(p->radius * gUnk_086149C4[(p->angle + 0x40) & 0xFF]);
+        sprite->position.y = p->origin.y;
+        sprite->position.z = p->origin.z + Scale12(p->radius * gUnk_086149C4[p->angle]);
         if ((++emitter->next) > 7) {
             emitter->next = 0;
         }
         emitter->delay = 0;
-        owner[0x9E] = 1;
+        owner->emitter.active = 1;
     }
 }

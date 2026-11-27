@@ -1,19 +1,11 @@
-#include "player/effects/spiral_trail_sprite.h"
+#include "player/effects/spiral_trail.h"
 #include "engine/video/render.h"
 #include "scene/collision/contact_position.h"
 
-struct AtUnit {
-    u8 pad0[0x18];
-    u32 pad18;
-    struct ContactPosition offset;
-    u8 kind;
-    u8 pad25[7];
-    struct SpiralTrailSprite sprite;
-};
 void AnimData_Load(void *, u32);
 void Sprite_Init(void *, void *, u32);
 
-void AttachmentSprite_Setup(struct AtUnit *owner, const struct ContactPosition *position)
+void AttachmentSprite_Setup(struct SpiralTrailTask *owner, const struct ContactPosition *position)
 {
     struct SpiralTrailSprite *sprite;
     struct SceneAnimation *anim;

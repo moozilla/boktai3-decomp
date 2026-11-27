@@ -1,53 +1,30 @@
-#include "global.h"
-#include "player/effects/orbit_effect.h"
+#include "player/effects/spiral_trail.h"
 
-struct TrailParticles {
-    u8 state;
-    u8 state1;
-    u8 pad2[2];
-    void *resource;
-    struct PlayerOrbitParticle slots[8];
-};
-struct Trail {
-    u8 pad0[0x24];
-    u8 kind;
-    u8 pad25[0x9C - 0x25];
-    struct TrailParticles particles;
-};
 void *AnimData_FindEntry(s32);
 void ParticleSprite_Initialize(void *, void *, u32);
 void Effect_SetOrigin(void *, s32, s32);
 void Effect_SetPalette(void *, u32);
 
-void sub_08236DC4(struct Trail *p)
+void sub_08236DC4(struct SpiralTrailTask *p)
 {
-    struct TrailParticles *q = &p->particles;
-    struct PlayerOrbitParticle *slot;
-    u8 *f;
+    struct SpiralTrailEmitter *emitter = &p->emitter;
     s32 i;
     s32 frame;
-    s32 offset;
-    q->resource = AnimData_FindEntry(0x1C1E);
-    q->state = 0;
-    q->state1 = 0;
+    emitter->graphics = AnimData_FindEntry(0x1C1E);
+    emitter->next = 0;
+    emitter->delay = 0;
     if (p->kind == 7)
         frame = 14;
     else
         frame = (p->kind + 1) * 2;
-    offset = -4;
-    f = &q->slots[0].priority;
-    slot = q->slots;
-    i = 7;
-    do {
-        f[0x19] = 0;
-        f[0x1A] = frame;
-        ParticleSprite_Initialize(slot, q->resource, 1);
-        Effect_SetOrigin(slot, offset, offset);
+    for (i = 0; i < 8; i++) {
+        struct SpiralTrailParticle *slot = &emitter->particles[i];
+        slot->active = 0;
+        slot->frame = frame;
+        ParticleSprite_Initialize(slot, emitter->graphics, 1);
+        Effect_SetOrigin(slot, -4, -4);
         Effect_SetPalette(slot, 1);
-        f[1] = 0xF8;
-        f[0] = 2;
-        f += 0x3C;
-        slot++;
-        i--;
-    } while (i >= 0);
+        slot->attribute = 0xF8;
+        slot->priority = 2;
+    }
 }
