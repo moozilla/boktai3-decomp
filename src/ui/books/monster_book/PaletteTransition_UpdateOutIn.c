@@ -1,22 +1,13 @@
 #include "global.h"
-struct PaletteTransition {
-    u8 pad0[0x20];
-    u32 frame;
-    u8 state;
-    u8 pad25[3];
-    u8 anim[0x9d4];
-    u16 counter;
-    u8 pad9fe[4];
-    u8 flag;
-};
-void PaletteTransition_BlendBankColors(struct PaletteTransition *, int, int);
-void PaletteTransition_SetAlternateVariantParameters(struct PaletteTransition *);
-void PaletteTransition_SetVariantParameters(struct PaletteTransition *);
+#include "ui/books/bestiary_palette_variant.h"
+void PaletteTransition_BlendBankColors(struct BestiaryPaletteVariant *, int, int);
+void PaletteTransition_SetAlternateVariantParameters(struct BestiaryPaletteVariant *);
+void PaletteTransition_SetVariantParameters(struct BestiaryPaletteVariant *);
 s32 DisplayAnimation_TestFinished(void *);
-void SceneDisplay_SwitchToAlternateDescriptor(struct PaletteTransition *);
-void PaletteTransition_BlendSelectedBanks(struct PaletteTransition *, int, int);
+void SceneDisplay_SwitchToAlternateDescriptor(struct BestiaryPaletteVariant *);
+void PaletteTransition_BlendSelectedBanks(struct BestiaryPaletteVariant *, int, int);
 
-void PaletteTransition_UpdateOutIn(struct PaletteTransition *p)
+void PaletteTransition_UpdateOutIn(struct BestiaryPaletteVariant *p)
 {
     s32 phase = p->frame & 0x3f;
     if (phase > 0x1f)
