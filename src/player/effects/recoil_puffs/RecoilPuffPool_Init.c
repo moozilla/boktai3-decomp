@@ -1,10 +1,9 @@
-#include "global.h"
+#include "player/effects/recoil_puff_sprite.h"
 #include "engine/ram.h"
-void sub_08237280(void *);
-u32 RecoilPuffPool_Init(u8 *s)
+s32 RecoilPuffPool_Init(struct RecoilPuffPool *s)
 {
     sub_08237280(s);
-    *(u16 *)(s + 0x198) = 0;
-    gRisingSpritePool = s;
+    s->next = 0;
+    gRisingSpritePool = (u32)s;
     return 0;
 }

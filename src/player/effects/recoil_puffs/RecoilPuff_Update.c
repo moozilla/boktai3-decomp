@@ -4,10 +4,10 @@ void SpriteDrawable_SelectTileFrame(void *, void *, u32);
 void RecoilPuff_Update(struct RecoilPuffSprite *p)
 {
     SpriteDrawable_SelectTileFrame(p, p->resource, (p->timer >> 1) + 12);
-    p->height += 10;
+    p->position.y += 10;
     p->timer++;
     if (p->timer == 16) {
         p->flags |= 1;
-        p->state = 0;
+        p->active = 0;
     }
 }
