@@ -13,6 +13,7 @@ position. The run used the source port and the worktree-local mGBA harness.
 | Town and bike task views restored | 41 | 3028 | 200,772 | 3,604 |
 | Permanent skeleton defeats recognized | 42 | 3073 | 176,907 | 3,631 |
 | Default continuous route | 50 | 3154 | 214,322 | 3,913 |
+| Live floor-trap routing | 51 | 3154 | 212,902 | 3,893 |
 
 The Bronze Armor reward in scene 2803 reused storage after `Armor_Destroy`
 unregistered the body. `TerrainOverlay_Update` still had that body in its
@@ -59,6 +60,15 @@ led to scene 3161. Its CD23 approach crossed trap cell (4,3). GCL proc
 same route until the room budget ran out. The story-50 endpoint matched
 and all 133 checkpoint labels matched across 72 scenes.
 
+The floor-trap planner reads the active `TileTriggerManager` slots and
+excludes their horizontal contact squares. `FloorTrap_TickIdle` at 08107320
+and `FloorTrap_ApplyContactEffects` at 08106E98 query the player within 128
+units of the trap on each horizontal axis. The route around the four active
+traps reached scene 3168 and collected the Yellow Key. The story event
+returned the player to scene 3154 at story 51. All 120 saved entries match
+their scene labels, covering 73 scenes. The 20 functions unique to the
+story-50 run include the trap dispatcher, particles and cue animations.
+
 The movies, function coverage, mGBA checkpoints and demo live under
 `build/autopilot/` in the worker checkout. To reproduce the run before
 integration, build the port with a generated copy containing the pending
@@ -70,7 +80,7 @@ cp tools/autopilot/pending_src_fixes/08003C20-terrain-overlay-stale-body.patch b
 build/venv/bin/python port/build_game.py -j2 --source-patches build/autopilot/story-overlays
 build/venv/bin/python port/agent/gametypes.py --jobs 2
 make -f tools/emu/Makefile build/emu/harness
-node tools/autopilot/autopilot.mjs story --verify --coverage
+node tools/autopilot/autopilot.mjs story --until-story 51 --verify --coverage
 ```
 
 The default room budget is 96. `--scenes 8` reproduces the earlier smoke
