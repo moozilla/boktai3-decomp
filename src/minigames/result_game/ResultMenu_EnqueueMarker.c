@@ -1,8 +1,6 @@
 #include "global.h"
-typedef struct {
-    u32 pad[2], flags;
-    u8 tail[84];
-} Graphic;
+#include "minigames/result_game/result_menu_marker.h"
+typedef struct ResultMenuMarkerGraphic Graphic;
 typedef struct {
     u16 state, time;
 } State;

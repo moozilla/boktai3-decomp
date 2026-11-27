@@ -585,3 +585,4 @@ include/system/time_palette_transitions/time_palette.h,include/system/clock/time
 include/monsters/enemy_particle.h,include/effects/particles/enemy_particle.h,Shared enemy attack particle pool,,
 include/player/effects/spiral_trail_sprite.h,include/player/effects/spiral_trail_sprite.h,owned by src/player/effects/spiral_trail,,
 include/player/effects/recoil_puff_sprite.h,include/player/effects/recoil_puff_sprite.h,owned by src/player/effects/recoil_puffs,,
+include/minigames/result_game/result_menu_marker.h,include/minigames/result_game/result_menu_marker.h,owned by src/minigames/result_game,,
