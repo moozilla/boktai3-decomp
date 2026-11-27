@@ -1,19 +1,13 @@
 /* Provisional names and object interpretation; offsets follow static accesses. */
 #include "global.h"
-struct MapMenuMarker {
-    u8 pad0[8];
-    u32 flags;
-    u8 padC[0x14];
-    u16 x, y, z;
-    u8 pad26[0x3a];
-};
+#include "ui/pause/map_menu_marker.h"
 struct MapMenu {
     u8 pad0[0x64];
     u8 arrowData[0x20];
     u8 markerData[0x2b60 - 0x84];
-    struct MapMenuMarker arrow;
+    struct MapMenuMarkerSprite arrow;
     u8 pad2bc0[0x3820 - 0x2bc0];
-    struct MapMenuMarker current, other;
+    struct MapMenuMarkerSprite current, other;
     u8 pad38e0[0x4908 - 0x38e0];
     s32 adjacent;
     u16 scrollX, scrollY;
