@@ -1,6 +1,7 @@
 #include "global.h"
 #include "engine/video/render.h"
 #include "engine/video/display_sequence.h"
+#include "scene/collision/contact_position.h"
 
 void CpuSet(const void *src, void *dst, u32 control);
 s32 AnimSprite_InitLinked(void *, void *, u16, u32, u32, u32, u32, const void *);
@@ -112,9 +113,6 @@ static inline void StepHudAnimation(struct HudAnimation *state, struct HudSprite
         }
     }
 }
-struct HudPosition {
-    s16 x, y, z, pad;
-};
 struct HudWidget {
     u8 unknown0[8];
     u32 flags;
@@ -122,7 +120,7 @@ struct HudWidget {
     u8 attribute1A;
     u8 attribute1B;
     u8 unknown1C[4];
-    struct HudPosition position;
+    struct ContactPosition position;
     u8 unknown28[0x38];
 };
 struct HudLayout {
@@ -152,14 +150,14 @@ static inline s32 HudLayout_InitWidget(struct HudLayout *p, s32 index, void *par
     return AnimSprite_InitLinked(&p->widgets[index], par, id, type, a, b, 60, pos);
 }
 
-static inline void ClearPosition(u32 value, struct HudPosition *position)
+static inline void ClearPosition(u32 value, struct ContactPosition *position)
 {
     CpuFill32(value, position, sizeof(*position));
 }
 
 void sub_08176F70(struct HudLayout *p)
 {
-    struct HudPosition v;
+    struct ContactPosition v;
     u8 *w;
     s32 i;
     struct HudAnimation *anim;
@@ -167,7 +165,7 @@ void sub_08176F70(struct HudLayout *p)
     {
         u8 *w;
         u32 initial = 0;
-        struct HudPosition *position = &v;
+        struct ContactPosition *position = &v;
         u32 defaults = 0;
         ClearPosition(initial, position);
         WI(&p->widgets[0], (p->resources[0]), 0x51, 0xB0, initial, initial, position);
@@ -249,7 +247,7 @@ void sub_08176F70(struct HudLayout *p)
     v.x = 0;
     v.y = 0;
     for (i = 0; i <= 3; i++) {
-        struct HudPosition *position = &v;
+        struct ContactPosition *position = &v;
         w = (u8 *)&p->widgets[79 + i];
         WI(w, p->resources[0], 0x5B, 0x91, 0, 0, position);
         v.y += 0xD;
