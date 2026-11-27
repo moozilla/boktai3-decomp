@@ -1,16 +1,6 @@
 #include "global.h"
 #include "engine/ram.h"
-struct TextState {
-    u8 x, y, left, top, width, height, palette, style;
-    u8 entered, mode, skip, busy, padC, choiceCount, padE, fresh, pad10, voice, toggle, lastWidth,
-        pad14;
-    s8 current;
-    u8 instant, wrap;
-    u32 frame;
-    const u8 *pc, *streams[4];
-    u8 pad30[0xD8];
-    u8 depth, styles[7];
-};
+#include "ui/dialogue/text_state.h"
 struct TextWindow {
     s32 id;
     u8 x, y, width, height;
