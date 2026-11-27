@@ -330,6 +330,9 @@ remeasures that header and its included definitions with agbcc before planning a
 Rescan if it reports layout drift. For a reviewed pointer-only view of the same allocation,
 `--allow-prefix` permits a larger existing type with the same alignment. The rewrite checks
 for by-value uses, size queries, and pointer stride before compiling the candidate.
+Use `--size` and `--member-type` to select a measured layout when one family contains
+distinct representations. A selected view can retain an embedded word when callers take
+its address, while a flat bitfield view can serve the callers that only use coordinates.
 
 The generated header can retain byte-aligned bitfields that occupy whole bytes. The compiler
 probe checks each emitted bitfield's position and width. Sub-byte fields need an allocation-group

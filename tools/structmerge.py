@@ -803,6 +803,23 @@ def convert(catalog, family, args):
     return 0 if kept else 1
 
 
+def family_variant(catalog, family, size, member_types):
+    """Select a coherent layout of a reported family using measured declarations."""
+    if size is None and not member_types:
+        return family
+    records = catalog["records"]
+    selected = []
+    for key in family["records"]:
+        view = records[key]
+        if size is not None and view["size"] != size:
+            continue
+        if member_types <= {m.get("ctype") for m in view["members"]}:
+            selected.append(key)
+    if len(selected) < 2:
+        raise Holdout("the layout selector needs at least two measured family views")
+    return dict(family, records=selected, size=max(records[key]["size"] for key in selected), loads=[])
+
+
 def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("family", help="catalog ID or unique dominant tag")
@@ -813,6 +830,9 @@ def main(argv=None):
     ap.add_argument("--use-shared", help="reuse a related existing type instead of generating a header")
     ap.add_argument("--allow-prefix", action="store_true",
                     help="adopt a larger existing record for a pointer view with no size-dependent uses")
+    ap.add_argument("--size", type=lambda value: int(value, 0), help="select family views with this measured extent")
+    ap.add_argument("--member-type", action="append", default=[],
+                    help="require an exact direct member type in the selected views (repeatable)")
     ap.add_argument("-j", type=int, default=2, help="parallel header-dependent checks")
     args = ap.parse_args(argv)
     if args.j < 1 or args.use_shared and (args.name or args.header):
@@ -823,6 +843,7 @@ def main(argv=None):
     try:
         catalog = families.load_catalog(args.catalog)
         family = families.select_family(catalog, args.family)
+        family = family_variant(catalog, family, args.size, set(args.member_type))
         return convert(catalog, family, args)
     except (OSError, ValueError) as exc:
         ap.exit(1, f"structmerge: {exc}\n")

@@ -448,6 +448,22 @@ int Read(struct Packed *p, struct Other *q) { return p->xy.hi + q->xy.hi; }
         self.assertEqual(expected, {"lo": (0, 2, 0, 16), "hi": (2, 2, 16, 16)})
         merge.probe_header(generated, "struct Pair", expected, 4, 4)
 
+    def test_variant_selects_measured_native_storage(self):
+        pair = "struct Half { unsigned x; }; struct Vector { struct Half xy, z; };"
+        flat = "struct Vector { unsigned x, z; };"
+        larger = pair.replace("xy, z;", "xy, z, pad;")
+        paths = ["src/a.c", "src/b.c", "src/c.c", "src/d.c"]
+        records = {}
+        for path, text in zip(paths, (pair, pair, flat, larger)):
+            records.update(measure(text, path))
+        ids = [f"{p}:struct Vector" for p in paths]
+        original = {"records": ids, "size": 12, "loads": [(8, 4, None, "F", 0x8000010)]}
+        best = merge.family_variant({"records": records}, original, 8, {"struct Half"})
+        self.assertEqual((best["records"], best["size"], best["loads"]), (ids[:2], 8, []))
+        self.assertIs(merge.family_variant({"records": records}, original, None, set()), original)
+        with self.assertRaisesRegex(merge.Holdout, "at least two"):
+            merge.family_variant({"records": records}, original, 12, {"struct Half"})
+
     def test_joint_merge_retains_typedef_and_rewrites_references_between_definitions(self):
         path = "src/a.c"
         source = """
