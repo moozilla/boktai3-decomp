@@ -1115,7 +1115,7 @@ static inline u8 Route(struct ChaseActor *a, void *nav, void *pos, void *target)
 s32 SceneActorPlacement_TriggerTetherAction(struct ChaseActor *a)
 {
     struct Spider *c = a->base.context;
-    u8 *nav = (u8 *)a + 0x3d4;
+    u8 *nav = (u8 *)&a->group;
     struct ContactPosition *target;
     if (Disabled(a))
         return 0;
@@ -1503,7 +1503,7 @@ u8 SceneActorPlacement_BeginNearbyPlayerContact(struct ChaseActor *a)
 {
     u8 *c = (void *)SceneActorControl_GetState(a);
     struct SceneActorChaseGroup *group = &a->group;
-    u8 *transform = (u8 *)a + 0x50;
+    u8 *transform = (u8 *)&a->base.body;
     u8 *player;
     u16 *flags;
     struct ContactPosition delta;

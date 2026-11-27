@@ -1021,7 +1021,7 @@ void Skeleton_RestorePursuitRoute(struct ChaseActor *actor)
             actor->base.behaviorFlags |= mask;
         }
         actor->base.field2C2 = 0x20;
-        command = (void *)((u8 *)actor + 0x460);
+        command = (void *)&actor->group.saved;
         {
             void *payload = actor->base.onAlternateEntry;
             u32 kind = 7;

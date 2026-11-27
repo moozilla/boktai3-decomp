@@ -31,6 +31,7 @@
 #include "engine/video/render.h"
 #include "monsters/scene_actor_init_graphics.h"
 #include "monsters/scene_actor_init_body.h"
+#include "scene/motion/scene_actor_chase.h"
 
 // confidence=low: animation-three state eases stored displacement into motion until animation completion.
 
@@ -682,13 +683,6 @@ static inline s32 Ghoul_DotXZ(struct ContactPosition *a, struct ContactPosition 
     return a->x * b->x + a->z * b->z;
 }
 
-static inline s32 Ghoul_CellIndex(s32 x, s32 z)
-{
-    if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
-        return 0;
-    return gTerrainMap->rows[z] + x;
-}
-
 static inline u32 Ghoul_RouteHeightAt(s32 cell, struct ContactPosition *position)
 {
     struct SceneActorChaseTerrainCell *data = SceneActorChase_CellProperties(cell);
@@ -712,7 +706,7 @@ done:
 static inline s32 Ghoul_RouteCellAt(struct ContactPosition *position)
 {
     s32 x = position->x >> 8;
-    x = Ghoul_CellIndex(x, position->z >> 8);
+    x = Chase_CellIndex(x, position->z >> 8);
     return x;
 }
 

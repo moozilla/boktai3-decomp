@@ -427,7 +427,7 @@ charge: {
 static inline s32 CanCharge(void *ctx)
 {
     struct Golem *body = ctx;
-    u8 *pos = (u8 *)body + 0x50;
+    u8 *pos = (u8 *)&body->chase.base.body;
     u8 ready;
     if (!body->chase.base.tracking.target)
         return 0;
