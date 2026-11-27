@@ -1,14 +1,10 @@
 #include "global.h"
 #include "engine/engine_globals.h"
 #include "engine/ram.h"
+#include "scene/collision/packed_contact_vector.h"
 // confidence=low: spawns six spark particles around the actor and plays a sound.
 void SparkParticle_Spawn(u8 *, u32, void *, u32, u32, u32, u32, u32);
 void Sound_PlaySong(u32);
-struct VAB {
-    u32 x : 16;
-    u32 y : 16;
-    u32 z : 16;
-};
 static inline u32 rnd(u8 *tbl, s32 *idx)
 {
     return *(u16 *)(((*idx = (*idx + 1) & 0x3ff) << 1) + (u32)tbl);
@@ -28,7 +24,7 @@ static inline const u16 *ReadSparkTable(const union HitSparkTable *r)
 
 void Centipede_SpawnSparkBurst(u8 *p)
 {
-    struct VAB v;
+    struct PackedContactVector v;
     u8 *tbl;
     s32 *idx;
     union HitSparkTable source = {0};

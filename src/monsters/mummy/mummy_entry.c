@@ -2864,11 +2864,6 @@ static inline void ClearHalf(u16 *p, u32 mask)
     *p = *p & mask;
 }
 
-static inline u32 WordFlag(struct ChaseActor *actor, u32 mask)
-{
-    return actor->base.behaviorFlags & mask;
-}
-
 void Mummy_ResetResponseState(struct ChaseActor *actor)
 {
     struct SceneActorChaseTracking *body = &actor->base.tracking;
@@ -2886,7 +2881,7 @@ void Mummy_ResetResponseState(struct ChaseActor *actor)
     ClearHalf(motion, 0xFFFFFC7F);
     body->flags &= mask;
     response = &actor->group.common.control;
-    if (WordFlag(actor, 0x200000)) {
+    if (SceneActorTurn_ActorFlags(actor, 0x200000)) {
         SceneActorChase_ClearWordFlags(flags, ROOM_ACTOR_STATUS_INTERACTING);
         ClearHalf(motion, 0xFFFFFDFF);
         response->mode = 0;

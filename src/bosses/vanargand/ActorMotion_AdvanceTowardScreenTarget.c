@@ -1,16 +1,12 @@
 #include "global.h"
 #include "effects/screen/background_controller.h"
-struct WorldPosition {
-    s32 x, y, z;
-};
-struct ScreenPosition {
-    s16 x, y, z, unused;
-};
+#include "bosses/vanargand/mover_position_layout.h"
+#include "bosses/vanargand/mover_screen_layout.h"
 struct ScreenMovingActor {
     u8 pad0[0x268];
-    struct WorldPosition position;
+    struct MoverPosition position;
     u8 pad274[4];
-    struct ScreenPosition screen;
+    struct MoverScreen screen;
     s32 horizontalSpeed;
     s32 horizontalAcceleration;
     u8 pad288[0x2AC - 0x288];
@@ -26,8 +22,8 @@ s32 Player_GetHorizontalVelocity(s32);
 s32 ActorMotion_AdvanceTowardScreenTarget(struct ScreenMovingActor *actor, s32 target)
 {
     s32 *speed;
-    struct WorldPosition *position;
-    struct ScreenPosition *screen;
+    struct MoverPosition *position;
+    struct MoverScreen *screen;
     if (target - actor->screen.x < 0 || (actor->screen.x > 60 && target <= 60))
         actor->horizontalAcceleration = -128;
     else

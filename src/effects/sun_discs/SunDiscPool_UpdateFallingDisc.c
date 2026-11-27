@@ -2,6 +2,7 @@
 #include "engine/engine.h"
 #include "engine/video/display_sequence_inline.h"
 #include "engine/math/scene_vec.h"
+#include "effects/sun_discs/disc_pool_layout.h"
 struct Sprite {
     u32 flags;
     u8 visible, unknown5, palette, unknown7;
@@ -36,10 +37,6 @@ struct Disc {
     s8 slot;
     u16 unknownF4, age;
     u8 entered;
-};
-struct DiscPool {
-    u8 pad[0x38];
-    u32 allocated;
 };
 u8 *TerrainModifiers_FindCellOverride(s32, s32);
 void Sprite_Remove(void *);

@@ -110,7 +110,7 @@ void Armor_InitPartDescent(struct Obj *p)
         p->param52 = 16;
         p->vec64 = gUnk_0824F150;
         setVector(&p->geometry);
-        ScaledShadow_Initialize((u8 *)p + 0x160, (u8 *)p + 0x1c, 32, 32, 32, 32, 0, 0, 0, 0, 0);
+        ScaledShadow_Initialize((u8 *)p + 0x160, (u8 *)&p->x, 32, 32, 32, 32, 0, 0, 0, 0, 0);
         p->callback = Armor_UpdatePartDescent;
     }
 }

@@ -1,9 +1,6 @@
 #include "global.h"
 #include "engine/video/render.h"
-struct ScriptValueRotation {
-    u8 unknown0[0x78];
-    s8 startIndex;
-};
+#include "objects/deck_cannons/script_value_rotation_layout.h"
 struct ScriptValueSource {
     u8 unknown0[0x56];
     u16 values[7];

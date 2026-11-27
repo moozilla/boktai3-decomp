@@ -2107,7 +2107,7 @@ void SpriteGroup_InitAnimatedSprites(struct ChaseActor *owner)
         slot->sprite.flags = 0x201;
         animation->frame = zero;
         animation++;
-        animation = (void *)((u8 *)animation + 0x2c);
+        animation = (void *)&animation->resource;
         slot++;
         offset += sizeof(struct AxeTrailSlot);
     } while (--i >= 0);

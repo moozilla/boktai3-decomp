@@ -1,14 +1,6 @@
 #include "global.h"
+#include "bosses/hresvelgr/effect_sprite_entry_layout.h"
 /* Effect pool family names and field interpretations are tentative. */
-struct EffectSpriteEntry {
-    u32 flags;
-    u8 unknown4[0x48];
-    u32 owner;
-    u16 state;
-    u8 unknown52[6];
-    u8 frame, mode;
-    u8 unknown5a[2];
-};
 struct EffectSpritePool {
     u8 unknown0[0x18];
     u8 animation[0x44];

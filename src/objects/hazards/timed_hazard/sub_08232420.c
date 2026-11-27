@@ -1,11 +1,7 @@
 #include "engine/engine.h"
 #include "engine/ram.h"
-struct HazardVec {
-    s16 x, y, z, pad;
-};
-struct HazardPackedVec {
-    s32 x : 16, y : 16, z : 16, pad : 16;
-};
+#include "scene/collision/packed_contact_vector.h"
+#include "recovered/particle_emission_vector_layout.h"
 struct HazardSprite {
     u32 flags;
     u8 pad4[3], priority;
@@ -16,7 +12,7 @@ struct TimedHazard {
     u8 pad4, unknown5;
     u16 timer, delay;
     u8 padA[2];
-    struct HazardVec position;
+    struct ParticleEmissionVector position;
     u16 ground;
     u16 health;
     void *collider, *attack;
@@ -46,11 +42,11 @@ static inline struct Cell *getCell(s32 index)
         return (struct Cell *)(dynamic + 4);
     return (struct Cell *)(gTerrainMap->cells + 12 + index * 4);
 }
-s32 sub_08232420(s32 id, s32 flags, s32 delay, s32 health, struct HazardVec *position)
+s32 sub_08232420(s32 id, s32 flags, s32 delay, s32 health, struct ParticleEmissionVector *position)
 {
-    struct HazardPackedVec size, offset;
+    struct PackedContactVector size, offset;
     struct TimedHazard *p;
-    struct HazardVec *pos;
+    struct ParticleEmissionVector *pos;
     void *resource;
     if (!((struct TimedHazardPool *)gColliderSpritePool) && !ColliderSpritePool_Create(0xC0DB, 0))
         return -1;
@@ -63,7 +59,7 @@ s32 sub_08232420(s32 id, s32 flags, s32 delay, s32 health, struct HazardVec *pos
     p->delay = delay;
     p->position = *position;
     {
-        struct HazardVec *groundPos = &p->position;
+        struct ParticleEmissionVector *groundPos = &p->position;
         s32 x = p->position.x >> 8, z = groundPos->z >> 8, index;
         struct Cell *cell;
         u32 slope;
@@ -109,12 +105,12 @@ s32 sub_08232420(s32 id, s32 flags, s32 delay, s32 health, struct HazardVec *pos
         if (!p->attack)
             return -1;
         Memory_Clear(p->attack, 84);
-        ((struct HazardVec *)&size)->x = 100;
-        ((struct HazardVec *)&size)->y = 120;
-        ((struct HazardVec *)&size)->z = 100;
-        ((struct HazardVec *)&offset)->x = 0;
-        ((struct HazardVec *)&offset)->y = 0;
-        ((struct HazardVec *)&offset)->z = 0;
+        ((struct ParticleEmissionVector *)&size)->x = 100;
+        ((struct ParticleEmissionVector *)&size)->y = 120;
+        ((struct ParticleEmissionVector *)&size)->z = 100;
+        ((struct ParticleEmissionVector *)&offset)->x = 0;
+        ((struct ParticleEmissionVector *)&offset)->y = 0;
+        ((struct ParticleEmissionVector *)&offset)->z = 0;
         Collider_Init(p->attack, 0, 0x2001, 0, 16, &size, &offset);
         Collider_SetCallback(p->attack, TimedHazard_OnAttackContact, p);
         Collider_SetAttackPowerAndForce(p->attack, 50, 20);
@@ -150,7 +146,7 @@ int Script_GetValue(void);
 // Provisional name: TimedHazard_CreateFromScript (hidden function, confidence low)
 s32 sub_0823269C(void)
 {
-    struct HazardPackedVec position;
+    struct PackedContactVector position;
     s32 id, flags, delay, health;
     id = Script_GetKeywordValue('t', 0);
     flags = Script_GetKeywordValue('f', 0);
@@ -165,5 +161,5 @@ s32 sub_0823269C(void)
         position.y = 0;
         position.z = 0;
     }
-    return sub_08232420(id, flags, delay, health, (struct HazardVec *)&position);
+    return sub_08232420(id, flags, delay, health, (struct ParticleEmissionVector *)&position);
 }

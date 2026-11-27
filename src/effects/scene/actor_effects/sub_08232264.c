@@ -1,11 +1,6 @@
 #include "global.h"
 #include "engine/ram.h"
-struct EffectManager {
-    u8 task[0x18];
-    void *animData;
-    void *sequence;
-    void *head;
-};
+#include "effects/scene/actor_effects/active_list_layout.h"
 struct EffectGroupEntry {
     u8 state, fadeTimer;
     u16 frame;
@@ -23,17 +18,17 @@ struct EffectGroup {
     struct EffectGroupEntry entries[4];
     void (*update)(struct EffectGroup *);
 };
-struct EffectManager *SceneActorEffects_CreateManager(void *, void *);
+struct ActiveList *SceneActorEffects_CreateManager(void *, void *);
 void ParticleSprite_Initialize(void *, void *, u32);
 void Effect_SetOrigin(void *, s32, s32);
 void Anim_SetSequence(void *, void *, u32, u32, u32);
-s32 ActiveList_PrependNode(struct EffectManager *, struct EffectGroup *);
+s32 ActiveList_PrependNode(struct ActiveList *, struct EffectGroup *);
 void SceneActorEffects_OnInactiveSlot(struct EffectGroup *);
 // confidence=low: sets up an effect group of four particles for an owner and adds it to the
 // scene actor effect manager, creating the manager if needed.
 s32 sub_08232264(struct EffectGroup *group, void *owner, s32 mode, s32 kind, s32 variant)
 {
-    struct EffectManager *manager = ((struct EffectManager *)gSceneActorEffectsManager);
+    struct ActiveList *manager = ((struct ActiveList *)gSceneActorEffectsManager);
     struct EffectGroupEntry *entry;
     s32 i;
     if (manager == NULL) {
@@ -56,12 +51,12 @@ s32 sub_08232264(struct EffectGroup *group, void *owner, s32 mode, s32 kind, s32
         entry->x = 0;
         entry->y = 0;
         entry->z = 0;
-        ParticleSprite_Initialize(
-            entry->sprite, ((struct EffectManager *)gSceneActorEffectsManager)->animData, 0x11);
+        ParticleSprite_Initialize(entry->sprite,
+                                  ((struct ActiveList *)gSceneActorEffectsManager)->animData, 0x11);
         Effect_SetOrigin(entry->sprite, -8, -8);
         entry->sprite[0xF] = 2;
-        Anim_SetSequence(entry->anim, ((struct EffectManager *)gSceneActorEffectsManager)->sequence,
-                         0, 0, 0);
+        Anim_SetSequence(entry->anim, ((struct ActiveList *)gSceneActorEffectsManager)->sequence, 0,
+                         0, 0);
     }
     ActiveList_PrependNode(manager, group);
     return 0;

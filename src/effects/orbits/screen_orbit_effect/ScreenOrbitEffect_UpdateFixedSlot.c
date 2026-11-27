@@ -1,22 +1,10 @@
 #include "global.h"
 #include "engine/video/render.h"
+#include "effects/orbits/screen_orbit_effect/orbit_vec_layout.h"
+#include "scene/actor/scene_actor_control_phase.h"
+#include "effects/orbits/screen_orbit_effect/orbit_slot_layout.h"
+#include "effects/orbits/screen_orbit_effect/orbit_owner_layout.h"
 // confidence=low: projects the source and positions a timed icon around the screen center.
-struct OrbitVec {
-    s16 x, y, z, pad;
-};
-struct OrbitSlot {
-    u8 state, angle, enter, unknown3;
-    u32 age, flags;
-    u8 unknownC[3], priority;
-    u8 unknown10[0x10];
-    struct OrbitVec position;
-    u8 unknown28[8];
-    struct OrbitVec world;
-};
-struct OrbitOwner {
-    u8 unknown0[0x18];
-    struct OrbitVec center;
-};
 extern const s16 gUnk_086149C4[];
 s32 Math_Atan2(s32, s32);
 static inline s32 Scale32(s32 n)
@@ -41,14 +29,6 @@ static inline void Place(struct OrbitSlot *p)
     p->position.z = 0;
     p->priority = 160 - p->angle;
 }
-static inline u8 TakeFlag(u8 *flag)
-{
-    if (*flag) {
-        *flag = 0;
-        return 1;
-    }
-    return 0;
-}
 static inline void Project(struct OrbitVec *out, struct OrbitVec *world)
 {
     s32 sum;
@@ -71,7 +51,7 @@ void ScreenOrbitEffect_UpdateFixedSlot(struct OrbitOwner *context, struct OrbitS
 {
     struct OrbitOwner *owner = context;
     struct OrbitSlot *input = input0;
-    u32 entered = TakeFlag(&input->enter);
+    u32 entered = SceneActorControl_TakeFlag(&input->enter);
     if (entered) {
         struct OrbitVec projected;
         Project(&projected, &input->world);

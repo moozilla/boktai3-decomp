@@ -1,24 +1,10 @@
 #include "global.h"
-struct Hresvelgr {
-    u8 pad0[0x94];
-    s16 health, maxHealth;
-    u8 pad98[0x16];
-    u8 behavior, finished, pending;
-    u8 padB1[0x13];
-    u32 behaviorTick;
-    u8 padC8[0x250];
-    u16 contact, pad31A, pad31C, pad31E, pad320, pad322;
-    u16 response;
-    u8 pad326[6];
-    u16 phase, index;
-    u8 pad330[0x53];
-    u8 ready;
-};
+#include "bosses/hresvelgr/offset_actor_layout.h"
 extern const u32 gUnk_08611D44[], gUnk_08611D5C[], gUnk_08611D7C[], gUnk_08611D8C[];
 // confidence=low: advances behavior tables on completed actions, with health and contact transitions.
-void Hresvelgr_SelectNextBehavior(struct Hresvelgr *p)
+void Hresvelgr_SelectNextBehavior(struct OffsetActor *p)
 {
-    struct Hresvelgr *q = p;
+    struct OffsetActor *q = p;
     u32 next;
     if (!p->ready)
         return;

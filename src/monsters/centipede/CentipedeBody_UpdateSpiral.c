@@ -4,21 +4,13 @@
 #include "scene/actor/scene_actor_reaction.h"
 #include "scene/motion/scene_actor_terrain.h"
 #include "scene/motion/scene_actor_chase.h"
+#include "scene/actor/scene_actor_control_phase.h"
 
 extern const s16 gUnk_086149C4[];
 
 s32 Math_Atan2(s32, s32);
 s32 Div(s32, s32);
 void CpuSet(const void *, void *, u32);
-
-static inline u8 Take(u8 *p)
-{
-    if (*p) {
-        *p = 0;
-        return 1;
-    }
-    return 0;
-}
 
 static inline s32 Shift(s32 n, u32 bits)
 {
@@ -53,7 +45,7 @@ void CentipedeBody_UpdateSpiral(struct ChaseActor *actor)
     s32 speed;
     s32 amplitude, turn, rate;
     s32 dx, dz;
-    if (Take(&actor->base.field2B1)) {
+    if (SceneActorControl_TakeFlag(&actor->base.field2B1)) {
         SceneActorChase_SetControl(actor, actor->base.onAlternateEntry, 1);
         MonsterInit_SetStatusFlags(actor, 0x100000);
     }

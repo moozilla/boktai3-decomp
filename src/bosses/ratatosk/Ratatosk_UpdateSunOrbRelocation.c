@@ -1,67 +1,9 @@
 #include "global.h"
 #include "bosses/ratatosk/ratatosk.h"
 #include "objects/sun_orb/sun_orb_effect.h"
-struct RatatoskOrbTarget {
-    u32 active;
-    struct OrbitEffectPosition position;
-    u32 referenceDistance, playerDistance;
-    u32 reserved;
-};
-/* The two selection getters use the last word of the fourth 0x18-byte target. */
-union RatatoskLinkedOrbs {
-    struct RatatoskOrbTarget targets[4];
-    struct {
-        u8 unknown0[0x5C];
-        s16 selectedPoint, selectedTarget;
-    } selection;
-};
-struct RatatoskOrbRelocation {
-    u8 pad0[0x54];
-    struct OrbitEffectPosition position;
-    u8 pad5C[0x34];
-    u32 counter;
-    u8 pad94[0x16];
-    u8 animation;
-    u8 padAB[0x3];
-    u8 requested;
-    u8 input;
-    u8 active;
-    u8 padB1[0x13];
-    u32 timer;
-    u8 padC8[0x4];
-    u8 direction;
-    u8 padCD[0xb3];
-    s32 sequence;
-    u32 finished;
-    u8 pad188[0xdf0 - 0x188];
-    union RatatoskLinkedOrbs orbs;
-    u8 padE50[0xa];
-    s16 completion;
-    struct OrbitEffectPosition destination;
-    struct OrbitEffectPosition target;
-    s16 duration;
-    u8 padE6E[0x6];
-    s16 pending;
-    u8 padE76[0xe];
-    s16 elapsed;
-    s16 phaseTime;
-    s16 orbCreated;
-    s16 playerAngle;
-    s16 released;
-    u8 padE8E[0x4];
-    s16 oldSlot;
-    u8 padE94[0x4a];
-    s16 repeat;
-    s16 particles;
-    s16 reuse;
-    u8 padEE4[0x2];
-    s16 releaseAngle;
-    u8 padEE8[0x26];
-    u16 orbParam;
-    u8 padF10[0x1c];
-    struct OrbitEffectManager *manager;
-};
-static inline u8 ConsumeActivation(struct RatatoskOrbRelocation *p)
+#include "bosses/ratatosk/ratatosk_orb_targets.h"
+#include "bosses/ratatosk/ratatosk_orb_distance_view.h"
+static inline u8 ConsumeActivation(struct RatatoskOrbDistanceView *p)
 {
     if (p->active) {
         p->active = 0;
@@ -79,9 +21,9 @@ s32 SunOrb_GetSlotState(s32);
 s32 SlotController_IsSlotIdle(s32);
 s32 sub_081FEC38(struct OrbitEffectManager *, s32);
 void Ratatosk_GetPlayerOffsetNearestSelf(void *, void *);
-void Ratatosk_UpdateSunOrbRelocation(struct RatatoskOrbRelocation *p)
+void Ratatosk_UpdateSunOrbRelocation(struct RatatoskOrbDistanceView *p)
 {
-    struct RatatoskOrbRelocation *q = p;
+    struct RatatoskOrbDistanceView *q = p;
     struct OrbitEffectParams config;
     struct OrbitEffectPosition far, near;
     s32 activated = ConsumeActivation(p);
@@ -150,15 +92,15 @@ void Ratatosk_UpdateSunOrbRelocation(struct RatatoskOrbRelocation *p)
                 q->animation = animation;
                 p->sequence = 3;
                 p->oldSlot = slot;
-                p->orbs.selection.selectedPoint = -1;
+                p->orbsStorage.orbs.selection.selectedPoint = -1;
                 RisingActorConfig_Initialize(&config);
                 SunOrb_SetTargetSource(&config, 1);
                 Ratatosk_GetPlayerOffsetFarthestFromSelf(p, &far);
                 slot = SunOrb_CreateAtPosition(&config, &far);
                 if (slot >= 0) {
-                    p->orbs.targets[slot].active = 1;
+                    p->orbsStorage.orbs.targets[slot].active = 1;
                     RisingActorManager_BeginRaise(slot);
-                    p->orbs.selection.selectedPoint = slot;
+                    p->orbsStorage.orbs.selection.selectedPoint = slot;
                 }
             } else {
                 if (p->repeat > 60 || !SlotController_IsSlotIdle(slot)) {
@@ -174,8 +116,8 @@ void Ratatosk_UpdateSunOrbRelocation(struct RatatoskOrbRelocation *p)
             if (q->input) {
                 struct OrbitEffectManager **manager = &p->manager;
                 sub_081FEC38(*manager, p->oldSlot);
-                p->position =
-                    *SunOrb_GetPositionFromManager(*manager, p->orbs.selection.selectedPoint);
+                p->position = *SunOrb_GetPositionFromManager(
+                    *manager, p->orbsStorage.orbs.selection.selectedPoint);
                 {
                     u32 animation = 14;
                     q->animation = animation;

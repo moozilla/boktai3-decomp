@@ -1,13 +1,11 @@
 #include "effects/sprites/sprite_effect_controller.h"
-struct SpriteEffectColliderVector {
-    u32 x : 16, y : 16, z : 16;
-};
+#include "scene/collision/packed_contact_vector.h"
 void Collider_SetAttackProperties(void *, u32, u32, u32, u32, u32);
 void SpriteEffectController_IgnoreContact(void);
 void SpriteEffectController_InitCollider(struct SpriteEffectController *controller, s32 a, s32 b,
                                          s32 c, s32 d)
 {
-    struct SpriteEffectColliderVector size, offset;
+    struct PackedContactVector size, offset;
     struct ContactCollider *collider;
     size.x = 16;
     size.y = 32;

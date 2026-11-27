@@ -22,7 +22,7 @@ static inline void decay(s16 *p)
 void SceneActorAnimation_UpdateLungeAttack(struct StateActor *p, int tick)
 {
     struct SceneGraphicsActor *actor = (struct SceneGraphicsActor *)p;
-    u8 *position = (u8 *)p + 0x48;
+    u8 *position = (u8 *)&p->bodyId;
     if (!p->locked)
         SceneActors_SetFacing(p, p->requestedAngle);
     if (p->actionChanged) {

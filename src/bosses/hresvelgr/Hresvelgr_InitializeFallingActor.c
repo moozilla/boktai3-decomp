@@ -1,22 +1,11 @@
 #include "global.h"
-struct HresvelgrPosition {
-    s16 x, y, z, pad;
-};
-struct HresvelgrSprite {
-    u32 flags;
-    u8 unknown4[3];
-    u8 priority;
-    u8 unknown8[8];
-    u16 field10;
-    u8 unknown12[10];
-    struct HresvelgrPosition position;
-    u8 unknown24[8];
-};
+#include "scene/collision/contact_position.h"
+#include "recovered/fragment_effect_sprite_layout.h"
 struct HresvelgrMotion {
     u8 unknown0[0x18];
-    struct HresvelgrSprite sprite;
+    struct FragmentEffectSprite sprite;
     u8 graphics[0x70];
-    struct HresvelgrPosition origin, velocity, offset;
+    struct ContactPosition origin, velocity, offset;
     u8 shadow[0x6c];
     u16 state, stateFrame;
 };
@@ -26,11 +15,11 @@ void Sprite_Init(void *, void *, u32);
 void Hresvelgr_InitializeMotionCollider(struct HresvelgrMotion *);
 void ScaledShadow_Initialize(void *, void *, s32, s32, s32, s32, s32, s32, s32, s32, s32);
 void ScaledShadow_SetGraphic(void *, s32, s32);
-s32 Hresvelgr_InitializeFallingActor(struct HresvelgrMotion *p, struct HresvelgrPosition *position,
-                                     struct HresvelgrPosition *velocity, u32 flip)
+s32 Hresvelgr_InitializeFallingActor(struct HresvelgrMotion *p, struct ContactPosition *position,
+                                     struct ContactPosition *velocity, u32 flip)
 {
     void *graphics = p->graphics;
-    struct HresvelgrSprite *sprite;
+    struct FragmentEffectSprite *sprite;
     void *shadow;
     if (!AnimData_Load(graphics, 0x3070))
         return -1;
@@ -38,7 +27,7 @@ s32 Hresvelgr_InitializeFallingActor(struct HresvelgrMotion *p, struct Hresvelgr
     Sprite_Init(sprite, graphics, 0);
     {
         u32 value = 5;
-        sprite->field10 = value;
+        sprite->frame = value;
     }
     AnimData_SelectPaletteBank(graphics, 0x2f2);
     if (flip)

@@ -1,6 +1,7 @@
 #include "global.h"
 #include "engine/engine.h"
 #include "engine/resource_registry.h"
+#include "scene/collision/contact_position.h"
 
 // confidence=low: emits sixteen motion entries around the actor's facing direction.
 union BurstWord {
@@ -11,16 +12,13 @@ static inline u32 ReadBurstWord(const union BurstWord *word)
 {
     return word->value;
 }
-struct BurstVector {
-    s16 x, y, z, pad;
-};
 struct BurstActor {
     u8 unknown0[0x51];
     u8 direction;
     u8 unknown52[2];
-    struct BurstVector position;
+    struct ContactPosition position;
     u8 unknown5C[0x110 - 0x5C];
-    struct BurstVector *target;
+    struct ContactPosition *target;
 };
 extern const s16 gUnk_086149C4[];
 void HresvelgrMotion_CreateWithDelta(void *, void *, s32, s32);
@@ -28,13 +26,14 @@ static inline s32 scale(s32 n)
 {
     return n >= 0 ? n >> 12 : -((-n) >> 12);
 }
-static inline void polar(struct BurstVector *v, s32 angle, s32 radius)
+static inline void polar(struct ContactPosition *v, s32 angle, s32 radius)
 {
     v->x = scale(gUnk_086149C4[(angle + 64) & 255] * radius);
     v->y = 0;
     v->z = scale(gUnk_086149C4[angle & 255] * radius);
 }
-static inline void add(struct BurstVector *d, struct BurstVector *a, struct BurstVector *b)
+static inline void add(struct ContactPosition *d, struct ContactPosition *a,
+                       struct ContactPosition *b)
 {
     d->x = b->x + a->x;
     d->y = b->y + a->y;
@@ -63,16 +62,16 @@ static inline s32 firstRandomValue(const u16 *table, u32 skip)
 }
 void Hresvelgr_EmitFacingMotionBurst(struct BurstActor *actor)
 {
-    struct BurstVector offset;
-    struct BurstVector position;
-    struct BurstVector delta;
+    struct ContactPosition offset;
+    struct ContactPosition position;
+    struct ContactPosition delta;
     s32 i;
     union BurstWord skip;
     const u16 *table;
     union BurstWord source;
     polar(&offset, (actor->direction + 128) & 255, 768);
     {
-        struct BurstVector *target = actor->target;
+        struct ContactPosition *target = actor->target;
         add(&position, target, &offset);
     }
     skip.halves[0] = 512;

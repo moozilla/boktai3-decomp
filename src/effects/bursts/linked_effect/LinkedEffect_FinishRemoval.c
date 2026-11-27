@@ -3,6 +3,7 @@
 #include "engine/ram.h"
 #include "player/cutscene/player_cue_sequence.h"
 #include "ui/hud/scene_indicator.h"
+#include "effects/bursts/spiral_burst.h"
 struct Sprite {
     u32 flags;
     u8 visible, unknown5, palette, unknown7;
@@ -43,10 +44,6 @@ static inline u32 RandomValue(void)
     u32 index = (gRandomIndex + 1) & 1023;
     gRandomIndex = index;
     return gRandomTable[index];
-}
-static inline s32 Truncate(s32 v)
-{
-    return v >= 0 ? v >> 12 : -((-v) >> 12);
 }
 void Collider_Remove(void *);
 // confidence=low: terminal animation releases the linked effect slot and collider.

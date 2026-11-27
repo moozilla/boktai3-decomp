@@ -1,20 +1,18 @@
 #include "global.h"
-struct Vec {
-    s16 x, y, z, pad;
-};
+#include "scene/collision/contact_position.h"
 struct PackedVec {
     s32 x : 16, y : 16, z : 16, pad : 16;
 };
 struct Point {
     u32 active;
-    struct Vec position;
+    struct ContactPosition position;
     u8 pad[12];
 };
 struct Actor {
     u8 pad0[0x51];
     u8 angle;
     u8 pad52[2];
-    struct Vec position, velocity;
+    struct ContactPosition position, velocity;
     u8 pad64[0x2c];
     u32 timer;
     s16 health;
@@ -37,9 +35,9 @@ struct Actor {
     u8 pad180[0x1ac];
     u8 animation[0x20];
     u8 animationData[0x20];
-    struct Vec anchor;
+    struct ContactPosition anchor;
     u8 pad374[0x58];
-    struct Vec home;
+    struct ContactPosition home;
     u8 pad3D4[0x944];
     struct Point points[9], targets[3];
     u8 padE38[0x14];

@@ -2,17 +2,12 @@
 #include "engine/engine.h"
 #include "engine/ram.h"
 #include "engine/task_manager.h"
-struct PackedVec {
-    u32 x : 16;
-    u32 y : 16;
-    u32 z : 16;
-    u32 pad : 16;
-};
+#include "scene/collision/packed_contact_vector.h"
 s32 SceneCharacter_GetModelId(s32);
 s32 SceneCharacter_GetPaletteIndex(s32);
 s32 SceneCharacter_GetResourceVariant(s32);
 struct SceneNpc *Actor_Allocate(s32 name, s32 variant);
-s32 Actor_InitMotion(struct SceneNpc *, s32 name, struct PackedVec *, s32 angle);
+s32 Actor_InitMotion(struct SceneNpc *, s32 name, struct PackedContactVector *, s32 angle);
 s32 Actor_InitDrawable(struct SceneNpc *, s32 kind, s32 a, s32 b, s32 c);
 void Actor_SetDefaultPaletteBank(struct SceneNpc *, s32);
 void Actor_InitShadow(struct SceneNpc *, u32, s32, s32, s32);
@@ -59,7 +54,7 @@ void SceneCharacter_PlaceFromScript(void)
     u8 mode;
     void (*updates[2])(void); /* two update temporaries; an array keeps agbcc's allocation */
     struct SceneNpc *npc;
-    struct PackedVec position;
+    struct PackedContactVector position;
     colorA = 0;
     sound = 0x34;
     manager = gSceneActorListManager;

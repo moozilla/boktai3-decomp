@@ -1,13 +1,11 @@
 #include "global.h"
 #include "engine/engine_globals.h"
 #include "engine/ram.h"
-struct Packed {
-    s32 x : 16, y : 16, z : 16, pad : 16;
-};
+#include "scene/collision/packed_contact_vector.h"
 void SparkParticle_Spawn(void *, int, void *, int, int, int, int, int);
 void SceneActors_SpawnDestructionParticles(u8 *p)
 {
-    struct Packed size;
+    struct PackedContactVector size;
     int angle;
     int speed;
     int count;

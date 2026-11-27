@@ -1,4 +1,5 @@
 #include "global.h"
+#include "scene/collision/packed_contact_vector.h"
 struct OrbitEffectSlot {
     u32 state;
     u8 unknown04[8];
@@ -17,11 +18,6 @@ struct OrbitEffectSlot {
 struct OrbitEffectManager {
     u8 unknown00[0x1c];
     u8 animation[0x1c];
-};
-struct OrbitColliderVector {
-    s32 x : 16;
-    s32 y : 16;
-    s32 z : 16;
 };
 void RisingActorConfig_Initialize(void *);
 void Sprite_InitUnlinked(void *, void *, s32);
@@ -42,7 +38,7 @@ static inline void ClearOrbitPosition(void *destination)
 void OrbitEffect_InitSlot(struct OrbitEffectManager *manager, struct OrbitEffectSlot *slot,
                           s32 index)
 {
-    struct OrbitColliderVector size, offset;
+    struct PackedContactVector size, offset;
     void *collider;
     RisingActorConfig_Initialize(slot->motionParams);
     slot->state = 0;

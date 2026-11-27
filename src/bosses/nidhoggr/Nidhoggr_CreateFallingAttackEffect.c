@@ -4,9 +4,7 @@
 #include "engine/engine_globals.h"
 #include "player/player_slot_status.h"
 #include "engine/engine_pause.h"
-struct NidhoggrEffectVector {
-    u16 x, y, z, pad;
-};
+#include "scene/collision/contact_position.h"
 struct NidhoggrEffectPair {
     u32 a, b;
 };
@@ -14,10 +12,10 @@ struct NidhoggrFallingEffect {
     void (*update)(void *), (*destroy)(void *);
     u8 animation[0x1c];
     u8 sprite[0x1c];
-    struct NidhoggrEffectVector position;
+    struct ContactPosition position;
     u8 unknown48[0x174 - 0x48];
-    struct NidhoggrEffectVector *anchor;
-    struct NidhoggrEffectVector offset;
+    struct ContactPosition *anchor;
+    struct ContactPosition offset;
     u8 unknown180[4];
     u8 *boss;
 };
@@ -39,12 +37,12 @@ void Sound_PlaySongChecked(u32);
 void ScaledShadow_InitializeDefaultSmall(void *, void *);
 void ScaledShadow_Disable(void *);
 // confidence=low: allocates a falling effect with attack/body colliders and an initially disabled shadow.
-void Nidhoggr_CreateFallingAttackEffect(u8 *owner, struct NidhoggrEffectVector *anchor,
-                                        struct NidhoggrEffectVector *offset, u8 *boss)
+void Nidhoggr_CreateFallingAttackEffect(u8 *owner, struct ContactPosition *anchor,
+                                        struct ContactPosition *offset, u8 *boss)
 {
     struct NidhoggrFallingEffect *effect;
     u8 *animation, *collider, *shadow;
-    struct NidhoggrEffectVector *position;
+    struct ContactPosition *position;
     void (*callback)(void *);
     if (Engine_PauseBits(0x400))
         return;

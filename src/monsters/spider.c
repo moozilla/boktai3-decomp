@@ -32,6 +32,7 @@
 #include "monsters/scene_actor_init_graphics.h"
 #include "monsters/scene_actor_init_body.h"
 #include "bosses/vanargand/vanargand_projectiles.h"
+#include "recovered/packed_centipede_halfwords_layout.h"
 
 inline static u8 blocked2048(u8 *c)
 {
@@ -903,13 +904,9 @@ void Spider_SetBehaviorTables(u8 *p)
     *(const u32 **)(p + 0x294) = gUnk_08605F24;
 }
 
-struct H {
-    u32 lo : 16;
-    u32 hi : 16;
-};
 
 struct Z {
-    struct H a, b;
+    struct PackedCentipedeHalfwords a, b;
 };
 
 void SceneActorCollision_InitBodyWithFlags(u8 *, struct Z *, struct Z *, void (*)(void), u8 *, u32);
@@ -1118,7 +1115,7 @@ static inline u8 Route(struct ChaseActor *a, void *nav, void *pos, void *target)
 s32 SceneActorPlacement_TriggerTetherAction(struct ChaseActor *a)
 {
     struct Spider *c = a->base.context;
-    u8 *nav = (u8 *)a + 0x3d4;
+    u8 *nav = (u8 *)&a->group;
     struct ContactPosition *target;
     if (Disabled(a))
         return 0;
@@ -1506,7 +1503,7 @@ u8 SceneActorPlacement_BeginNearbyPlayerContact(struct ChaseActor *a)
 {
     u8 *c = (void *)SceneActorControl_GetState(a);
     struct SceneActorChaseGroup *group = &a->group;
-    u8 *transform = (u8 *)a + 0x50;
+    u8 *transform = (u8 *)&a->base.body;
     u8 *player;
     u16 *flags;
     struct ContactPosition delta;

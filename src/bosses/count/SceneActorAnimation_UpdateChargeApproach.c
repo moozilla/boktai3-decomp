@@ -10,7 +10,7 @@ void TemporaryAnimationPool_CreateEntry(void *, int, int, int, void *);
 void SceneActorAnimation_UpdateChargeApproach(struct StateActor *p, int tick)
 {
     struct SceneGraphicsActor *actor = (struct SceneGraphicsActor *)p;
-    u8 *position = (u8 *)p + 0x48;
+    u8 *position = (u8 *)&p->bodyId;
     SceneActors_SetFacing(p, p->requestedAngle);
     if (p->actionChanged) {
         int sequence;

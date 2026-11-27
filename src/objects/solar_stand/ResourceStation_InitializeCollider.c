@@ -1,25 +1,21 @@
 #include "global.h"
-struct H {
-    u32 lo : 16;
-    u32 hi : 16;
-};
-struct Z {
-    struct H a, b;
-};
-void Collider_Init(u8 *, u32, u32, u32, u32, struct Z *, struct Z *);
+#include "scene/collision/packed_contact_halfwords.h"
+#include "scene/collision/packed_collider_extents.h"
+void Collider_Init(u8 *, u32, u32, u32, u32, struct PackedColliderExtents *,
+                   struct PackedColliderExtents *);
 void Collider_SetBodyProperties(u8 *, u32, u32, u32);
 void Collider_SetCallback(u8 *, u32, u8 *);
 void Collider_SetPosition(u8 *, u8 *, u32);
 s32 Collider_Refresh(u8 *);
 s32 ResourceStation_InitializeCollider(u8 *p)
 {
-    struct Z s1, s2;
+    struct PackedColliderExtents s1, s2;
     u8 *q = p + 0x200;
-    s1.a.lo = 0x64;
-    s1.a.hi = 0x96;
-    s1.b.lo = 0x64;
-    *(u32 *)&s2.a = 0x960000;
-    *(u32 *)&s2.b &= 0xFFFF0000;
+    s1.xy.lo = 0x64;
+    s1.xy.hi = 0x96;
+    s1.zAndPad.lo = 0x64;
+    *(u32 *)&s2.xy = 0x960000;
+    *(u32 *)&s2.zAndPad &= 0xFFFF0000;
     Collider_Init(q, *(u16 *)(p + 0x260), 0x4001, 0, 0, &s1, &s2);
     Collider_SetBodyProperties(q, 0, 0, 0);
     Collider_SetCallback(q, 0, p);

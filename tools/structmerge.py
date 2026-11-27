@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import argparse
 from collections import Counter, defaultdict
+from dataclasses import dataclass
 import os
 from pathlib import Path
 import re
@@ -38,6 +39,10 @@ def specificity(view):
 
 def type_key(member):
     return tuple(member.get(k) for k in ("ctype", "size", "align", "array", "esize", "bits", "bitpos"))
+
+
+def positional_layout(view):
+    return [(m.get("off"), m.get("name") is None, type_key(m)) for m in view["members"]]
 
 
 def bit_spans(view):
@@ -79,7 +84,7 @@ def pick_candidates(views, loads):
         occurrences = Counter()
         spans = bit_spans(view)
         for m in view["members"]:
-            if families.opaque(m):
+            if families.opaque(m) or m.get("bits") and m["name"] is None:
                 continue
             if not m.get("name") or m.get("off") is None or m.get("size") is None:
                 raise Holdout(f"{view['id']} has an unmeasured member")
@@ -89,7 +94,9 @@ def pick_candidates(views, loads):
             if view["kind"] == "union":
                 # Deliberate union overlays are separate alternatives. Compare names
                 # across copies only within the same scalar/array/aggregate shape.
-                shape = (m["off"], m["size"], m["base"], m["array"], m.get("esize"), m.get("signed"), m["bits"])
+                aggregate = m["ctype"] if m["base"] == "aggregate" else None
+                shape = (m["off"], m["size"], m["base"], m["array"], m.get("esize"), m.get("signed"), m["bits"],
+                         aggregate)
                 occurrences[shape] += 1
                 slot = (*shape, occurrences[shape])
             choices[slot].append((view, m))
@@ -125,7 +132,21 @@ def pick_candidates(views, loads):
     return output
 
 
-def plan_header(family, views, name, header):
+@dataclass
+class RecordPlan:
+    spell: str
+    size: int
+    align: int
+    lines: list
+    expected: dict
+    decisions: list
+    skipped: list
+    headers: set
+    forwards: set
+    embedded: set
+
+
+def plan_record(family, views, name):
     selected, skipped = [], []
     candidates = pick_candidates(views, family["loads"])
     for score, view, member, guess in sorted(candidates, key=lambda p: (
@@ -138,11 +159,11 @@ def plan_header(family, views, name, header):
         selected.append((member, view, score, guess))
 
     kind = family["kind"]
-    guard = "GUARD_" + re.sub(r"[^A-Za-z0-9]", "_", str(header)).upper()
+    spell = f"{kind} {name}"
     headers = {h for m, _, _, _ in selected for h in m["headers"]}
-    buf = [f"#ifndef {guard}", f"#define {guard}", "", '#include "global.h"']
-    buf.extend(f'#include "{ramlayout.inc_name(h)}"' for h in sorted(headers - {"include/global.h", "include/gba/types.h"}))
-    buf.extend(("", f"{kind} {name} {{"))
+    forwards = {tag for m, _, _, _ in selected for tag in m.get("forwards", ())}
+    embedded = {m["embedded"] for m, _, _, _ in selected if "embedded" in m}
+    buf = [f"{spell} {{"]
     offset = 0
     names = {m["name"] for m, _, _, _ in selected}
     used = set()
@@ -171,10 +192,29 @@ def plan_header(family, views, name, header):
     if offset < family["size"]:
         base = offset if kind == "struct" else 0
         pad(buf, names | used, base, family["size"] - base)
-    spell = f"{kind} {name}"
-    buf.extend(("};", "", f"typedef char {name}SizeCheck[sizeof({spell}) == {family['size']:#x} ? 1 : -1];",
-                "", "#endif", ""))
-    return "\n".join(buf), expected, decisions, skipped
+    align = max(v["align"] for v in views)
+    member_align = max((m.get("align") or m.get("width") or 1 for m, _, _, _ in selected), default=1)
+    close = f"}} __attribute__((aligned({align})));" if align > member_align else "};"
+    buf.extend((close, "", f"typedef char {name}SizeCheck[sizeof({spell}) == {family['size']:#x} ? 1 : -1];"))
+    return RecordPlan(spell, family["size"], align, buf, expected, decisions, skipped, headers, forwards, embedded)
+
+
+def render_header(header, plans):
+    guard = "GUARD_" + re.sub(r"[^A-Za-z0-9]", "_", str(header)).upper()
+    headers = set().union(*(p.headers for p in plans)) - {"include/global.h", "include/gba/types.h"}
+    forwards = set().union(*(p.forwards for p in plans))
+    buf = [f"#ifndef {guard}", f"#define {guard}", "", '#include "global.h"']
+    buf.extend(f'#include "{ramlayout.inc_name(h)}"' for h in sorted(headers))
+    if forwards:
+        buf.extend(("", *(tag + ";" for tag in sorted(forwards))))
+    for plan in plans:
+        buf.extend(("", *plan.lines))
+    return "\n".join([*buf, "", "#endif", ""])
+
+
+def plan_header(family, views, name, header):
+    plan = plan_record(family, views, name)
+    return render_header(header, [plan]), plan.expected, plan.decisions, plan.skipped
 
 
 def available_name(name, used):
@@ -202,7 +242,7 @@ def probe_header(text, spell, expected, size, align):
             raise Holdout(f"generated header failed parsing: {exc}") from exc
         kind, tag = spell.split()
         node = tu.tags.get((kind, tag))
-        measured = lm.probe_records(body, tu, {spell: (spell, node)}) if node else {}
+        measured = lm.probe_records(body, tu, {spell: (spell, node)}, qualified=True) if node else {}
         view = measured.get(spell)
     if not view or view["size"] != size or view["align"] != align:
         actual = (view["size"], view["align"]) if view else None
@@ -219,35 +259,80 @@ def probe_header(text, spell, expected, size, align):
 
 
 def field_paths(old, new):
-    """Storage-preserving replacements for direct members, including a flattened leaf."""
+    """Find direct and qualified member paths at the same measured storage."""
     fields = {}
     old_bits, new_bits = bit_spans(old), bit_spans(new)
-    choices = new["members"] + [dict(lf, name=lf["name"], base=lf["base"])
-                               for lf in new["known"] if "." in lf["name"]]
+    choices = new["members"] + new.get("qualified", []) + [lf for lf in new["known"] if "." in lf["name"]]
+    nested = [lf for lf in old["known"] if "." in lf["name"] and "[" not in lf["name"]]
+    scalar_elements = []
+    offsets = {member.get("off") for member in choices if member.get("off") is not None}
     for m in old["members"]:
+        if not m.get("array") or m["base"] not in {"int", "enum", "ptr"} or m.get("esize") != m["width"]:
+            continue
+        size, start = m["esize"], m["off"]
+        if not size or start is None:
+            continue
+        for off in sorted(offsets):
+            delta = off - start
+            if 0 <= delta < m["size"] and delta % size == 0:
+                scalar_elements.append(dict(m, name=f"{m['name']}[{delta // size}]", off=off,
+                                            size=size, array=False, esize=None, bits=False))
+    for m in old["members"] + nested + scalar_elements:
         if m.get("off") is None or m.get("size") is None:
             continue
         whole_bytes = (m["off"] * 8, m["size"] * 8)
         occupied_bits = old_bits.get(m["name"], whole_bytes)
-        hits = {n["name"] for n in choices if n.get("off") == m["off"] and n.get("size") == m["size"]
-                and n.get("array") == m["array"] and n.get("esize") == m.get("esize")
-                and (n.get("base") == m["base"] or {m["base"], n.get("base")} <= {"int", "enum"})
-                and occupied_bits == new_bits.get(n["name"], whole_bytes)}
+        candidates = [n for n in choices if n.get("off") == m["off"] and n.get("size") == m["size"]
+                      and n.get("array") == m["array"] and n.get("esize") == m.get("esize")
+                      and (n.get("base") == m["base"] or {m["base"], n.get("base")} <= {"int", "enum"})
+                      and occupied_bits == new_bits.get(n["name"], whole_bytes)]
+        if m["base"] == "aggregate":
+            exact = [n for n in candidates if n["ctype"] == m["ctype"]]
+            candidates = exact or candidates
+        hits = {n["name"] for n in candidates}
         if m["name"] in hits:
             fields[m["name"]] = m["name"]
         elif len(hits) == 1:
             fields[m["name"]] = next(iter(hits))
-        else:
+        elif named := {name for name in hits if name.rsplit(".", 1)[-1] == m["name"]}:
+            fields[m["name"]] = next(iter(named)) if len(named) == 1 else None
+        elif not re.search(r"[.\[]", m["name"]):
             fields[m["name"]] = None
     return fields
 
 
 def member_edits(text, pre, refs, view, mapping, span):
     """Map typed member token ordinals back to raw text, skipping ambiguous macros."""
-    changes = {name for name, new in mapping.items() if name != new}
-    if not changes:
+    changes = {name for name, new in mapping.items() if not re.search(r"[.\[]", name) and name != new}
+    indices = {}
+    for key, name, line, col, index in refs.array_fields:
+        if key != view["id"]:
+            continue
+        target = mapping.get(f"{name}[{index}]")
+        root = mapping.get(name)
+        if target and root is None:
+            indices[name, line, col] = (index, target)
+    chains = {}
+    for key, chain in refs.field_chains:
+        if key != view["id"]:
+            continue
+        names = [name for name, _, _ in chain]
+        target = mapping.get(".".join(names))
+        if not target:
+            continue
+        root = mapping.get(names[0])
+        if root is not None and target == ".".join([root, *names[1:]]):
+            continue  # The ordinary direct-member edit is sufficient.
+        site = chain[0]
+        if site not in chains or len(chain) > len(chains[site][0]):
+            chains[site] = (chain, target)
+    if any(len({line for _, line, _ in chain}) != 1 for chain, _ in chains.values()):
+        raise Holdout("a changed nested field crosses source lines")
+    chain_names = {name for name, _, _ in chains.keys() | indices.keys()}
+    if not changes and not chain_names:
         return []
-    field_token = re.compile(r"(?:->|\.)\s*([A-Za-z_]\w*)")
+    field_token = re.compile(r"(->|\.)\s*([A-Za-z_]\w*)")
+    index_token = re.compile(r"\s*\[\s*(0[xX][\da-fA-F]+|\d+)[uUlL]*\s*\]")
     code = keepcheck.blank_comments(text)
     source = code.splitlines(keepends=True)
     offsets = [0]
@@ -259,84 +344,139 @@ def member_edits(text, pre, refs, view, mapping, span):
             pre_lines[line].append(contents)
     refs_at = {(line, col - 1, name): key for key, name, line, col in refs.fields}
     edits = []
+    consumed = set()
     for ln, line in enumerate(source, 1):
         raw = list(field_token.finditer(line))
-        if not any(m.group(1) in changes for m in raw):
+        if not any(m.group(2) in changes | chain_names for m in raw):
             continue
-        outside = [m for m in raw if not span.start <= offsets[ln - 1] + m.start(1) < span.end]
-        if not any(m.group(1) in changes for m in outside):
+        base = offsets[ln - 1]
+        outside = [m for m in raw if not span.start <= base + m.start(2) < span.end]
+        if not any(m.group(2) in changes | chain_names for m in outside):
             continue
         parsed = pre_lines.get(ln, [])
         if len(parsed) != 1:
             raise Holdout(f"line {ln} has a changed field in inactive C or an ambiguous macro")
         tokens = list(field_token.finditer(parsed[0]))
-        if [m.group(1) for m in raw] != [m.group(1) for m in tokens]:
+        if [m.groups() for m in raw] != [m.groups() for m in tokens]:
             raise Holdout(f"line {ln} has a changed field whose macro expansion changes the token sequence")
+        at = {(token.group(2), ln, token.start(2) + 1): m for m, token in zip(raw, tokens)}
         for m, token in zip(raw, tokens):
-            name = m.group(1)
+            name = m.group(2)
+            coord = name, ln, token.start(2) + 1
+            if coord in consumed:
+                continue
+            if coord in indices:
+                index, target = indices[coord]
+                subscript = index_token.match(text, base + m.end(2), offsets[ln])
+                if not subscript or evidence.integer_token(subscript[1]) != index:
+                    raise Holdout(f"line {ln} has an array field with a nonliteral source index")
+                edits.append((base + m.start(2), subscript.end(), target))
+                consumed.add(coord)
+                continue
+            if coord in chains:
+                chain, target = chains[coord]
+                last = at.get(chain[-1])
+                if not all(site in at for site in chain) or last is None:
+                    raise Holdout(f"line {ln} cannot locate a nested field in the unexpanded source")
+                start, end = base + m.start(2), base + last.end(2)
+                pattern = r"\s*\.\s*".join(re.escape(field) for field, _, _ in chain)
+                if not re.fullmatch(pattern, text[start:end]):
+                    raise Holdout(f"line {ln} has a nested field interrupted by other source tokens")
+                edits.append((start, end, target))
+                consumed.update(chain)
+                continue
             if name not in changes or m not in outside:
                 continue
-            site = ln, token.start(1), name
+            site = ln, token.start(2), name
             if site not in refs_at or refs_at[site] is None:
                 raise Holdout(f"line {ln} cannot bind field {name} to a record")
             if refs_at[site] != view["id"]:
                 continue
             if mapping[name] is None:
                 raise Holdout(f"line {ln} uses {name}, whose storage has no unambiguous shared member")
-            start, end = m.span(1)
-            edits.append((offsets[ln - 1] + start, offsets[ln - 1] + end, mapping[name]))
+            start, end = m.span(2)
+            edits.append((base + start, base + end, mapping[name]))
+            consumed.add(coord)
     # A changed use created by a macro, or a member split after '->', has no safe raw token.
-    count = sum(key == view["id"] and name in changes for key, name, _, _ in refs.fields)
-    if count != len(edits):
+    if not (chains.keys() | indices.keys()) <= consumed or any(
+            key == view["id"] and name in changes and (name, line, col) not in consumed
+            for key, name, line, col in refs.fields):
         raise Holdout("some changed member uses are only visible after preprocessing")
     return edits
 
 
 def rewrite_unit(text, old, new, header, spell):
-    """Replace one file-scope declaration and the member uses bound to it."""
-    if (old["size"], old["align"]) != (new["size"], new["align"]):
-        raise Holdout(f"private size/alignment {old['size']:#x}/{old['align']} differs from shared "
-                      f"{new['size']:#x}/{new['align']}")
-    spans = [r for r in inline_twins.records(text) if r.kind == old["kind"]
-             and (r.name if r.typedef else f"{r.kind} {r.name}") == old["spell"]]
-    if len(spans) != 1:
-        raise Holdout("declaration is not a unique editable file-scope record")
-    span = spans[0]
-    if keepcheck.in_ranges(span.start, keepcheck.draft_ranges(text)):
-        raise Holdout("declaration belongs to a NONMATCHING draft")
+    return rewrite_records(text, [(old, new, spell)], header)
+
+
+def rewrite_records(text, targets, header, *, allow_prefix=False):
+    """Plan each record's edits against the original translation unit."""
+    spans = inline_twins.records(text)
+    drafts = keepcheck.draft_ranges(text)
     mask = keepcheck.blank_comments(text)
-    tag = re.compile(rf"\b{span.kind}\s+{re.escape(span.name)}\b")
-    if not span.typedef and len(re.findall(tag.pattern + r"\s*\{", mask)) != 1:
-        raise Holdout("another declaration shadows the record tag")
-    mapping = field_paths(old, new)
-    same_sequence = [(m["name"], type_key(m)) for m in old["members"]] == [
-        (m["name"], type_key(m)) for m in new["members"]]
     edits = []
-    if not same_sequence or any(name != new_name for name, new_name in mapping.items()):
-        pre = lm.preprocess(old["file"])
-        if pre is None:
-            raise Holdout("preprocessing failed")
-        try:
-            _, ast, tu, error = evidence.parse(pre, old["file"])
-        except ParseError as exc:
-            raise Holdout(f"source parse failed: {exc}") from exc
-        if error:
-            raise Holdout(f"body parse failed: {error}")
-        if not same_sequence and has_initializers(ast, tu, old["id"], old["file"]):
-            raise Holdout("aggregate initializer needs a positional layout review")
-        refs = evidence.References(ast, tu, old["file"])
-        edits = member_edits(text, pre, refs, old, mapping, span)
-    replacement = f"typedef {spell} {span.name};\n" if span.typedef else ""
-    edits.append((span.start, span.end, replacement))
-    if not span.typedef and old["spell"] != spell:
-        edits.extend((m.start(), m.end(), spell) for m in tag.finditer(mask)
-                     if m.end() <= span.start or m.start() >= span.end)
-    for start, end, replacement in sorted(edits, reverse=True):
+    removed = []
+    renames = []
+    refs = None
+    for old, new, spell in targets:
+        prefix = old["size"] < new["size"] and old["kind"] == new["kind"] == "struct"
+        if old["align"] != new["align"] or (old["size"] != new["size"] and not (allow_prefix and prefix)):
+            raise Holdout(f"{old['spell']}: private size/alignment {old['size']:#x}/{old['align']} differs "
+                          f"from shared {new['size']:#x}/{new['align']}")
+        found = [r for r in spans if r.spell == old["spell"]]
+        if len(found) != 1:
+            raise Holdout(f"{old['spell']}: declaration is not a unique editable file-scope record")
+        span = found[0]
+        if keepcheck.in_ranges(span.start, drafts):
+            raise Holdout(f"{old['spell']}: declaration belongs to a NONMATCHING draft")
+        if span.tag:
+            tag = re.compile(rf"\b{span.kind}\s+{re.escape(span.tag)}\b")
+            if len(re.findall(tag.pattern + r"\s*\{", mask)) != 1:
+                raise Holdout(f"another declaration shadows {old['spell']}")
+            if old["spell"] != spell:
+                renames.append((tag, spell))
+        mapping = field_paths(old, new)
+        same_sequence = [(m["name"], type_key(m)) for m in old["members"]] == [
+            (m["name"], type_key(m)) for m in new["members"]]
+        if prefix or not same_sequence or any(name != new_name for name, new_name in mapping.items()):
+            if refs is None:
+                pre = lm.preprocess(old["file"])
+                if pre is None:
+                    raise Holdout("preprocessing failed")
+                try:
+                    _, ast, tu, error = evidence.parse(pre, old["file"])
+                except ParseError as exc:
+                    raise Holdout(f"source parse failed: {exc}") from exc
+                if error:
+                    raise Holdout(f"body parse failed: {error}")
+                refs = evidence.References(ast, tu, old["file"])
+            if prefix:
+                if re.search(r"^\s*#\s*(?:if|ifdef|ifndef)\b", mask, re.M):
+                    raise Holdout(f"{old['spell']}: source conditionals require a pointer-view review")
+                if old["id"] in refs.extent_uses:
+                    line, operation = refs.extent_uses[old["id"]]
+                    raise Holdout(f"{old['spell']}: line {line} uses the private extent in {operation}")
+            if not same_sequence:
+                initialized, designated = initializers(ast, tu, old["id"], old["file"])
+                if initialized and (designated or positional_layout(old) != positional_layout(new)):
+                    raise Holdout(f"{old['spell']}: aggregate initializer needs a layout or designator review")
+            edits.extend(member_edits(text, pre, refs, old, mapping, span))
+        replacement = f"typedef {spell} {span.name};\n" if span.typedef else ""
+        removed.append((span.start, span.end, replacement))
+
+    for tag, spell in renames:
+        edits.extend((m.start(), m.end(), spell) for m in tag.finditer(mask))
+    edits = removed + [e for e in edits if all(e[1] <= start or end <= e[0] for start, end, _ in removed)]
+    previous = len(text)
+    for start, end, replacement in sorted(set(edits), reverse=True):
+        if end > previous:
+            raise Holdout("joint record changes need overlapping source edits")
         text = text[:start] + replacement + text[end:]
+        previous = start
     return inline_twins.add_include(text, ramlayout.inc_name(str(header)))
 
 
-def has_initializers(ast, tu, key, path):
+def initializers(ast, tu, key, path):
     from pycparser import c_ast
 
     def contains(t, seen=frozenset()):
@@ -352,24 +492,37 @@ def has_initializers(ast, tu, key, path):
             return any(contains(d.type, seen | {id(agg[1])}) for d in agg[1].decls or ())
         return False
 
+    class Designators(c_ast.NodeVisitor):
+        found = False
+
+        def visit_NamedInitializer(self, node):
+            self.found = True
+
     class Initializers(c_ast.NodeVisitor):
         found = False
+        designated = False
+
+        def examine(self, expr):
+            self.found = True
+            designators = Designators()
+            designators.visit(expr)
+            self.designated |= designators.found
 
         def visit_Decl(self, node):
             if node.init is not None and contains(node.type):
-                self.found = True
+                self.examine(node.init)
             self.generic_visit(node)
 
         def visit_CompoundLiteral(self, node):
             if contains(node.type.type):
-                self.found = True
+                self.examine(node.init)
             self.generic_visit(node)
 
     visitor = Initializers()
     for node in ast.ext:
         if node.coord and Path(node.coord.file).as_posix() == path:
             visitor.visit(node)
-    return visitor.found
+    return visitor.found, visitor.designated
 
 
 def path_under(path, directory, suffix):
@@ -386,6 +539,139 @@ def shared_layout(view):
     return view["kind"], view["size"], view["align"], members, view["leaves"], view["containers"]
 
 
+def embedded_members(views, records, used_tags, owner):
+    """Lift measured, equivalent private children repeated at an embedded slot."""
+    groups = defaultdict(list)
+    for parent in views:
+        for member in parent["members"]:
+            child = records.get(member.get("record"))
+            if (member.get("base") != "aggregate" or member.get("off") is None or not child
+                    or child["file"] != parent["file"]):
+                continue
+            spell = child["spell"]
+            if not spell.startswith(("struct ", "union ")) or member.get("private") != [spell]:
+                continue
+            if any(m.get("private") or not m.get("name") or m.get("off") is None or VOLATILE_TYPE.search(m["decl"])
+                   for m in child["members"]):
+                continue
+            fields = tuple((m["name"], m["off"], type_key(m)) for m in child["members"])
+            signature = spell, child["size"], child["align"], fields
+            groups[signature].append((parent, member, child))
+
+    replacements = {}
+    plans = {}
+    for signature, uses in sorted(groups.items(), key=lambda row: repr(row[0])):
+        slots = defaultdict(set)
+        for parent, member, _ in uses:
+            slots[member["off"], member["name"], member["size"], member["array"]].add(parent["file"])
+        if max(map(len, slots.values())) < 2:
+            continue
+        children = {child["id"]: child for _, _, child in uses}
+        spell, size, _, _ = signature
+        kind, tag = spell.split()
+        name = available_name(tag if tag not in used_tags and len(tag) >= 4 else owner + tag, used_tags)
+        child_family = {"kind": kind, "size": size, "loads": []}
+        plan = plan_record(child_family, list(children.values()), name)
+        plans[plan.spell] = plan, children
+        used_tags.add(name)
+        for parent, member, _ in uses:
+            pattern = rf"\b{re.escape(kind)}\s+{re.escape(tag)}\b"
+            replacements[parent["id"], member["name"]] = dict(
+                member, decl=re.sub(pattern, plan.spell, member["decl"], count=1),
+                ctype=re.sub(pattern, plan.spell, member["ctype"], count=1),
+                private=[], embedded=plan.spell)
+    return [dict(view, members=[replacements.get((view["id"], m["name"]), m) for m in view["members"]])
+            for view in views], plans
+
+
+def observed_members(views, catalog):
+    """Fill opaque storage when independent typed calls identify one shared child."""
+    if any(view["kind"] != "struct" for view in views):
+        return views
+    records = catalog["records"]
+    parents = {view["id"] for view in views}
+    observations = defaultdict(set)
+    for row in catalog.get("embeds", ()):
+        child = records.get(row["child"])
+        if row["parent"] not in parents or row["declared"] or row["offset"] == 0:
+            continue
+        if not child or not child["file"].startswith("include/"):
+            continue
+        observations[row["offset"], row["child"]].update(
+            (location.rsplit(":", 1)[0], caller) for location, caller, _, _ in row["sites"])
+
+    slots = defaultdict(list)
+    for (off, key), sites in observations.items():
+        if len(sites) >= 2:
+            slots[off].append(records[key])
+
+    additions = []
+    for off, children in sorted(slots.items()):
+        if len(children) != 1:
+            continue
+        child = children[0]
+        size, align = child["size"], child["align"]
+        if off % align or off + size > max(v["size"] for v in views):
+            continue
+        occupied = [m for v in views for m in v["members"]
+                    if not families.opaque(m) and m.get("off") is not None
+                    and m["off"] < off + size and off < m["off"] + m["size"]]
+        if occupied:
+            continue
+        name = families.short(child)
+        name = name[:1].lower() + name[1:]
+        additions.append(dict(name=name, decl=f"{child['spell']} {name}", ctype=child["spell"],
+                              off=off, size=size, align=align, base="aggregate", array=False, bits=False,
+                              private=[], headers=[child["file"]], self_ref=False))
+
+    # Overlapping call interpretations require an explicit layout in a source view.
+    unique = [m for m in additions if sum(n["off"] < m["off"] + m["size"]
+                                         and m["off"] < n["off"] + n["size"] for n in additions) == 1]
+    return [dict(v, members=v["members"] + [m for m in unique if m["off"] + m["size"] <= v["size"]])
+            for v in views]
+
+
+def explicit_overlays(views, used_tags, owner):
+    """Keep equal-span alternatives when one private view already declares a union."""
+    slots = defaultdict(list)
+    for view in views:
+        if view["kind"] != "struct":
+            continue
+        for m in view["members"]:
+            if not families.opaque(m) and m.get("off") is not None:
+                slots[m["off"]].append((view, m))
+
+    replacements, plans = {}, {}
+    for off, entries in sorted(slots.items()):
+        if len(entries) < 2 or len({m["size"] for _, m in entries}) != 1:
+            continue
+        if not any(m["base"] == "aggregate" and not m["array"] and m["ctype"].startswith("union ")
+                   for _, m in entries):
+            continue
+        if not any(m["base"] == "aggregate" and not m["ctype"].startswith("union ") for _, m in entries):
+            continue
+        if any(m.get("private") or m["bits"] or not m.get("align") or VOLATILE_TYPE.search(m["decl"])
+               for _, m in entries):
+            continue
+
+        size = entries[0][1]["size"]
+        role = next(m["name"] for _, m in entries if m["ctype"].startswith("union "))
+        name = available_name(owner + role[:1].upper() + role[1:], used_tags)
+        used_tags.add(name)
+        storage = role + "Storage"
+        alternatives = [dict(v, kind="union", members=[dict(m, off=0)], size=size, align=m["align"])
+                        for v, m in entries]
+        plan = plan_record({"kind": "union", "size": size, "loads": []}, alternatives, name)
+        plans[plan.spell] = plan
+        for view, m in entries:
+            replacements[view["id"], m["name"]] = dict(
+                m, name=storage, ctype=plan.spell, decl=f"{plan.spell} {storage}", align=plan.align,
+                array=False, esize=None, private=[], forwards=[], headers=[], self_ref=False,
+                signed=None, width=None, embedded=plan.spell)
+    return [dict(view, members=[replacements.get((view["id"], m["name"]), m) for m in view["members"]])
+            for view in views], plans
+
+
 def header_choice(catalog, family, views, args):
     existing = catalog["records"]
     if args.use_shared:
@@ -399,7 +685,7 @@ def header_choice(catalog, family, views, args):
         content = (families.ROOT / header).read_bytes()
         if families.digest(content) != catalog["files"][str(header)]:
             raise Holdout(f"stale catalog for {header}; rescan the tree")
-        result = families.scan_file(str(header), content.decode(errors="replace"))
+        result = families.scan_file(str(header), content.decode(errors="replace"), qualified=True)
         fresh = result["records"].get(key)
         if not fresh:
             detail = result.get("error", f"no measured definition for {view['spell']}")
@@ -416,10 +702,27 @@ def header_choice(catalog, family, views, args):
         raise Holdout("choose a C tag that is unused in shared headers")
     snake = re.sub(r"(?<=[a-z0-9])(?=[A-Z])", "_", name).lower()
     header = path_under(args.header or Path(f"include/recovered/{snake}.h"), "include", ".h")
-    text, expected, decisions, skipped = plan_header(family, views, name, header)
-    spell = f"{family['kind']} {name}"
-    new = probe_header(text, spell, expected, family["size"], max(v["align"] for v in views))
-    return header, spell, text, new, decisions, skipped
+    taken = used_tags | {name}
+    parents, embedded = embedded_members(observed_members(views, catalog), existing, taken, name)
+    parents, overlays = explicit_overlays(parents, taken, name)
+    parent = plan_record(family, parents, name)
+    active_overlays = [overlays[key] for key in sorted(parent.embedded & overlays.keys())]
+    needed = parent.embedded | set().union(*(overlay.embedded for overlay in active_overlays))
+    children = [embedded[child] for child in sorted(needed & embedded.keys())]
+    text = render_header(header, [*(plan for plan, _ in children), *active_overlays, parent])
+    new = probe_header(text, parent.spell, parent.expected, parent.size, parent.align)
+    new["embedded"] = {}
+    decisions = []
+    for plan, originals in children:
+        measured = probe_header(text, plan.spell, plan.expected, plan.size, plan.align)
+        for key in originals:
+            new["embedded"][key] = measured
+        decisions.append(f"embedded {plan.spell}, size {plan.size:#x}, alignment {plan.align}")
+    for overlay in active_overlays:
+        probe_header(text, overlay.spell, overlay.expected, overlay.size, overlay.align)
+        outer = next(m for m in new["members"] if m.get("ctype") == overlay.spell)
+        decisions.append(f"overlay {overlay.spell} at {outer['off']:#x}")
+    return header, parent.spell, text, new, decisions + parent.decisions, parent.skipped
 
 
 def convert(catalog, family, args):
@@ -444,9 +747,11 @@ def convert(catalog, family, args):
             text = path.read_text()
             if families.digest(text.encode()) != catalog["files"][rel]:
                 raise Holdout("source changed since scan; rescan the tree")
-            if len(items) != 1:
-                raise Holdout("multiple family declarations in one unit need joint scope review")
-            proposals[rel] = rewrite_unit(text, items[0], new, header, spell)
+            targets = [(item, new, spell) for item in items]
+            targets.extend((catalog["records"][key], child, child["spell"])
+                           for key, child in new.get("embedded", {}).items()
+                           if catalog["records"][key]["file"] == rel)
+            proposals[rel] = rewrite_records(text, targets, header, allow_prefix=getattr(args, "allow_prefix", False))
             if not args.apply:
                 print(f"PROPOSED {rel}")
         except (Holdout, OSError) as exc:
@@ -498,6 +803,23 @@ def convert(catalog, family, args):
     return 0 if kept else 1
 
 
+def family_variant(catalog, family, size, member_types):
+    """Select a coherent layout of a reported family using measured declarations."""
+    if size is None and not member_types:
+        return family
+    records = catalog["records"]
+    selected = []
+    for key in family["records"]:
+        view = records[key]
+        if size is not None and view["size"] != size:
+            continue
+        if member_types <= {m.get("ctype") for m in view["members"]}:
+            selected.append(key)
+    if len(selected) < 2:
+        raise Holdout("the layout selector needs at least two measured family views")
+    return dict(family, records=selected, size=max(records[key]["size"] for key in selected), loads=[])
+
+
 def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("family", help="catalog ID or unique dominant tag")
@@ -506,14 +828,22 @@ def main(argv=None):
     ap.add_argument("--name", help="new shared tag")
     ap.add_argument("--header", type=Path, help="new header path below include/")
     ap.add_argument("--use-shared", help="reuse a related existing type instead of generating a header")
+    ap.add_argument("--allow-prefix", action="store_true",
+                    help="adopt a larger existing record for a pointer view with no size-dependent uses")
+    ap.add_argument("--size", type=lambda value: int(value, 0), help="select family views with this measured extent")
+    ap.add_argument("--member-type", action="append", default=[],
+                    help="require an exact direct member type in the selected views (repeatable)")
     ap.add_argument("-j", type=int, default=2, help="parallel header-dependent checks")
     args = ap.parse_args(argv)
     if args.j < 1 or args.use_shared and (args.name or args.header):
         ap.error("select positive jobs and either a new header or --use-shared")
+    if args.allow_prefix and not args.use_shared:
+        ap.error("--allow-prefix requires --use-shared")
     os.chdir(families.ROOT)
     try:
         catalog = families.load_catalog(args.catalog)
         family = families.select_family(catalog, args.family)
+        family = family_variant(catalog, family, args.size, set(args.member_type))
         return convert(catalog, family, args)
     except (OSError, ValueError) as exc:
         ap.exit(1, f"structmerge: {exc}\n")

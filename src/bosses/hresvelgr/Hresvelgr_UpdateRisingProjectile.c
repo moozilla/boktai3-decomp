@@ -1,8 +1,7 @@
 #include "global.h"
+#include "scene/collision/contact_position.h"
+#include "engine/math/math_shift.h"
 // confidence=low: launches a moving projectile and approaches the elevated rest position.
-struct Vec {
-    s16 x, y, z, pad;
-} __attribute__((aligned(4)));
 struct Action {
     u8 state, pad[3];
     u32 frame;
@@ -11,7 +10,7 @@ struct Hresvelgr {
     u8 pad0[0x51];
     u8 heading;
     u8 pad52[2];
-    struct Vec position;
+    struct ContactPosition position;
     u8 pad5C[0x40];
     u32 flags;
     u8 padA0[8];
@@ -22,7 +21,7 @@ struct Hresvelgr {
     u8 targetHeading;
     u8 padCD[0xa7];
     u8 animationData[0x20], animation[0x20];
-    struct Vec renderPosition;
+    struct ContactPosition renderPosition;
     u8 pad1BC[0x134];
     struct Action action;
     u8 pad2F8[0x24];
@@ -30,7 +29,7 @@ struct Hresvelgr {
     u8 pad324[7];
     u8 side;
     u8 pad32C[0x70];
-    struct Vec target;
+    struct ContactPosition target;
 };
 extern const s16 gUnk_086149C4[];
 void Hresvelgr_SetAnimation(void *, void *, void *, u32, u32, u32);
@@ -55,29 +54,23 @@ static inline void SetHeading(struct Hresvelgr *p, s32 heading)
     value &= shifted;
     p->direction8 = value;
 }
-static inline s32 SignedShift(s32 value, u32 shift)
-{
-    if (value >= 0)
-        return value >> shift;
-    return -((-value) >> shift);
-}
-static inline void PolarVector(struct Vec *out, u32 angle, s32 magnitude)
+static inline void PolarVector(struct ContactPosition *out, u32 angle, s32 magnitude)
 {
     s32 value;
     angle &= 255;
     value = gUnk_086149C4[(angle + 64) & 255] * magnitude;
-    out->x = SignedShift(value, 12);
+    out->x = Math_ShiftTowardZero(value, 12);
     out->y = 0;
     value = gUnk_086149C4[angle] * magnitude;
-    out->z = SignedShift(value, 12);
+    out->z = Math_ShiftTowardZero(value, 12);
 }
-static inline void SetVector(struct Vec *p, s32 x, s32 y, s32 z)
+static inline void SetVector(struct ContactPosition *p, s32 x, s32 y, s32 z)
 {
     p->x = x;
     p->y = y;
     p->z = z;
 }
-static inline void CopyVector(struct Vec *out, struct Vec *source)
+static inline void CopyVector(struct ContactPosition *out, struct ContactPosition *source)
 {
     *out = *source;
 }
@@ -86,7 +79,7 @@ void Hresvelgr_UpdateRisingProjectile(struct Hresvelgr *actor)
     struct Hresvelgr *saved = actor;
     struct Action *action = &actor->action;
     if (actor->pending) {
-        struct Vec position, delta;
+        struct ContactPosition position, delta;
         actor->pending = 0;
         SetHeading(actor, actor->targetHeading);
         Hresvelgr_SetAnimation(actor, actor->animation, actor->animationData, 25, 2, 4);

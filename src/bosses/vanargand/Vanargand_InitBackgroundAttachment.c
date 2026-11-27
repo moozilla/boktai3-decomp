@@ -1,18 +1,10 @@
 #include "global.h"
 #include "engine/video/render.h"
-struct VanargandBackgroundAttachment {
-    void *resource;
-    void *position;
-    void *coordinates;
-    u8 offset[8];
-    u8 state;
-    u8 enabled;
-    u16 timer;
-};
+#include "bosses/vanargand/screen_palette_transition_layout.h"
 void Bg_SetupLayers(int, int, void *, int, int, int, void *);
 u8 *sub_08216E54(u16);
 void ScreenPalette_ProjectPosition(s32, void *, s32, s32);
-void Vanargand_InitBackgroundAttachment(u8 *owner, struct VanargandBackgroundAttachment *part,
+void Vanargand_InitBackgroundAttachment(u8 *owner, struct ScreenPaletteTransition *part,
                                         void *coordinates)
 {
     s32 layer;
@@ -30,6 +22,6 @@ void Vanargand_InitBackgroundAttachment(u8 *owner, struct VanargandBackgroundAtt
         s32 mask = ~0x200;
         *control = mask & *control;
     }
-    part->position = owner + 0x918;
+    part->palettes = owner + 0x918;
     ScreenPalette_ProjectPosition(1, part->coordinates, 136, -70);
 }

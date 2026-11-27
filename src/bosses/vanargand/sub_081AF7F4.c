@@ -1,13 +1,10 @@
 #include "global.h"
-
-struct HalfVector {
-    s16 x, y, z, pad;
-};
+#include "recovered/contact_reaction_vector_layout.h"
 
 /* Tentative layout of a Vanargand half's damage and state fields. */
 struct PairedSceneHalf {
     u8 unk_00[0x1C];
-    struct HalfVector position;
+    struct ContactReactionVector position;
     u8 unk_24[0x38 - 0x24];
     void *palette;
     u8 unk_3C[0x108 - 0x3C];
@@ -69,7 +66,7 @@ void sub_081AF7F4(struct PairedSceneHalf *actor)
     u32 hit = (actor->hitFlags >> 6) & 1;
     void *collider = &actor->damageCollider;
     u32 special;
-    struct HalfVector size;
+    struct ContactReactionVector size;
     if (actor->specialDamage)
         special = 1;
     else
@@ -80,7 +77,7 @@ void sub_081AF7F4(struct PairedSceneHalf *actor)
     if (damage > 0 || hit) {
         actor->health -= damage;
         {
-            struct HalfVector *v = &size;
+            struct ContactReactionVector *v = &size;
             v->x = 16;
             v->y = 0;
             v->z = 16;

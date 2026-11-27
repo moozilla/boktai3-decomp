@@ -7,6 +7,7 @@
 #include "scene/motion/scene_actor_terrain.h"
 #include "scene/motion/scene_actor_turn.h"
 #include "scene/terrain/terrain_collision.h"
+#include "scene/motion/scene_actor_chase.h"
 
 void SceneActorReaction_TickQueuedContact(void);
 
@@ -102,11 +103,6 @@ void Anim_SetDurationScale(void *, u32);
 
 void Anim_SetFrameDurationScale(void *, u32);
 
-static inline s32 Skeleton_ScaleApproachMotion(s32 n)
-{
-    return n >= 0 ? n >> 16 : -((-n) >> 16);
-}
-
 static inline void Skeleton_SetApproachState(void *object, u8 state, u8 phase, u32 behavior)
 {
     struct ChaseActor *actor = object;
@@ -199,8 +195,8 @@ static inline void Skeleton_ApplyApproachMotion(struct ChaseActor *actor,
 {
     SceneActorTurn_ApplyActorDuration(actor);
     actor->base.body.motion.x +=
-        Skeleton_ScaleApproachMotion(gUnk_086149C4[(angle + 0x40) & 0xFF] * speed);
-    actor->base.body.motion.z += Skeleton_ScaleApproachMotion(gUnk_086149C4[angle & 0xFF] * speed);
+        Chase_Scale16(gUnk_086149C4[(angle + 0x40) & 0xFF] * speed);
+    actor->base.body.motion.z += Chase_Scale16(gUnk_086149C4[angle & 0xFF] * speed);
     {
         u32 mask = 0x2000;
         actor->base.behaviorFlags |= mask;

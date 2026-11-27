@@ -1,9 +1,7 @@
+#include "scene/collision/packed_contact_vector.h"
 #define ActorCollider_Initialize SpatialIndex_InitEntry
 #define ActorCollider_Activate   SpatialIndex_InsertEntry
 #include "global.h"
-struct VanargandHeadPackedVector {
-    u32 x : 16, y : 16, z : 16, pad : 16;
-};
 struct VanargandHeadActorView {
     u8 pad0[0x1bc];
     u32 colliderFlags;
@@ -13,15 +11,15 @@ struct VanargandHeadActorView {
     s16 parameter5c4, parameter5c6;
 };
 void ActorReaction_MarkSequenceHit(void);
-void SpatialIndex_InitEntry(void *, struct VanargandHeadPackedVector *, struct VanargandHeadPackedVector *,
-                            struct VanargandHeadPackedVector *, s32, s32, s32, s32, s32, void (*)(void),
+void SpatialIndex_InitEntry(void *, struct PackedContactVector *, struct PackedContactVector *,
+                            struct PackedContactVector *, s32, s32, s32, s32, s32, void (*)(void),
                             void *);
 void SpatialIndex_InsertEntry(void *);
 void VanargandHead_InitCollider(struct VanargandHeadActorView *actor)
 {
     void *collider = &actor->colliderFlags;
     s32 category = 5;
-    struct VanargandHeadPackedVector position, size, offset;
+    struct PackedContactVector position, size, offset;
     position.x = actor->x >> 12;
     position.y = actor->y >> 12;
     position.z = actor->z >> 12;

@@ -1,5 +1,6 @@
 #include "scene/actor/scene_actor_placement.h"
 #include "engine/math/monster_particle_random.h"
+#include "scene/collision/packed_contact_vector.h"
 struct SceneActorEmissionPhase {
     u8 unknown0[0x2B6];
     u8 direction, unknown2B7[3];
@@ -8,9 +9,6 @@ struct SceneActorEmissionPhase {
     u16 timer;
 };
 /* ContactPosition as packed 16-bit fields (read-modify-write of whole words). */
-struct EmitPosition {
-    s32 x : 16, y : 16, z : 16, pad : 16;
-};
 /* The random table's address assembled byte by byte (scope README fact 48). */
 union EmitTableSource {
     const u16 *table;
@@ -22,13 +20,13 @@ static inline const u16 *EmitReadTable(const union EmitTableSource *source)
     return source->table;
 }
 /* Three particle bursts around the actor, raised by offset->y. */
-static inline void EmitBurst(struct RoomActor *actor, const struct EmitPosition *offset, s32 kind,
-                             u32 angle)
+static inline void EmitBurst(struct RoomActor *actor, const struct PackedContactVector *offset,
+                             s32 kind, u32 angle)
 {
     union EmitTableSource source = {0};
     const u16 *table;
-    struct EmitPosition position;
-    struct EmitPosition jitter;
+    struct PackedContactVector position;
+    struct PackedContactVector jitter;
     source.bytes[0] = (u8)RANDOM_TABLE_ADDR;
     source.bytes[1] = (u8)(RANDOM_TABLE_ADDR >> 8);
     source.bytes[2] = (u8)(RANDOM_TABLE_ADDR >> 16);
@@ -37,7 +35,7 @@ static inline void EmitBurst(struct RoomActor *actor, const struct EmitPosition 
     /* confidence=low: a jitter that is drawn but never applied. */
     jitter.y = ParticleRandom_ReadDirectSample(table);
     jitter.z = ParticleRandom_ReadDirectSample(table);
-    position = *(struct EmitPosition *)&actor->body.position;
+    position = *(struct PackedContactVector *)&actor->body.position;
     position.y += offset->y;
     {
         s32 count = (ParticleRandom_ReadDirectSample(table) & 3) + 2;
@@ -63,7 +61,7 @@ void SceneActorPlacement_EmitTimedParticles(struct RoomActor *actor)
 {
     struct SceneActorEmissionPhase *phase = (void *)actor;
     u32 angle;
-    struct EmitPosition offset;
+    struct PackedContactVector offset;
     if (!phase->timer)
         return;
     --phase->timer;

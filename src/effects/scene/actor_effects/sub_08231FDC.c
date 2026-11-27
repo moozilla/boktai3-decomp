@@ -1,5 +1,6 @@
 #include "global.h"
 #include "engine/video/render.h"
+#include "effects/scene/actor_effects/effect_group_layout.h"
 
 // confidence=low: projects the owner's position to the screen, then runs each of four parts'
 // state handlers from a table and places the active parts relative to that screen point.
@@ -10,24 +11,9 @@ struct Vec50 {
 struct ScreenPoint {
     u16 x, y, z, pad;
 };
-struct EffectPart;
+struct EffectGroupEffectPart;
 struct EffectGroup;
-typedef void (*EffectPartHandler)(void *, struct EffectGroup *, struct EffectPart *);
-struct EffectPart {
-    u8 state;
-    u8 pad1;
-    u16 timer;
-    u8 pad4[4];
-    u16 x, y, z;
-    u8 padE[0x28 - 0xe];
-    u16 screenX, screenY, screenZ;
-    u8 pad2E[0x48 - 0x2e];
-};
-struct EffectGroup {
-    u8 pad0[8];
-    struct Vec50 *position;
-    struct EffectPart parts[4];
-};
+typedef void (*EffectPartHandler)(void *, struct EffectGroup *, struct EffectGroupEffectPart *);
 extern EffectPartHandler const gUnk_08E879B4[];
 static inline s32 scale50(s32 v)
 {
@@ -43,8 +29,8 @@ void sub_08231FDC(void *context, struct EffectGroup *group)
     u16 *dest;
     s16 *coords;
     s32 x, z, sum, vertical, y, depth;
-    struct EffectPart *part;
-    struct EffectPart *state;
+    struct EffectGroupEffectPart *part;
+    struct EffectGroupEffectPart *state;
     s32 i;
     EffectPartHandler const *table;
     struct ScreenPoint *point;

@@ -1,12 +1,8 @@
 #include "global.h"
-struct Q {
-    u8 f[0x10];
-    u16 v;
-    u8 g[0x1C - 0x12];
-};
+#include "effects/projectiles/projectile/projectile_event_query_layout.h"
 void Projectile_SetUpdateCallback(void *, void *);
 void TimedEffect_TestDuration(void);
-s32 Projectile_InitAlternatingExpiry(struct Q *p)
+s32 Projectile_InitAlternatingExpiry(struct ProjectileEventQuery *p)
 {
     Projectile_SetUpdateCallback((u8 *)p + 0x18, TimedEffect_TestDuration);
     (p + 5)->v = 0x19;

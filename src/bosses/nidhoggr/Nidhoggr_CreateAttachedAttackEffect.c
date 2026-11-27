@@ -3,9 +3,7 @@
 #include "global.h"
 #include "engine/ram.h"
 #include "engine/engine_globals.h"
-struct NidhoggrEffectVector {
-    u16 x, y, z, pad;
-};
+#include "scene/collision/contact_position.h"
 struct NidhoggrEffectPair {
     u32 a, b;
 };
@@ -18,7 +16,7 @@ struct NidhoggrAttachedEffect {
     void (*destroy)(void *);
     u8 animation[0x1c];
     u8 sprite[0x1c];
-    struct NidhoggrEffectVector position;
+    struct ContactPosition position;
     u8 pad48[0x8c];
     u16 flagsD4, colliderFlags;
     u8 padD8[8];
@@ -26,8 +24,8 @@ struct NidhoggrAttachedEffect {
     u8 padF0[0x36];
     u16 flags126;
     u8 pad128[0x4c];
-    struct NidhoggrEffectVector *anchor;
-    struct NidhoggrEffectVector offset;
+    struct ContactPosition *anchor;
+    struct ContactPosition offset;
 };
 extern const struct NidhoggrEffectPair gUnk_0824F264, gUnk_0824F26C;
 struct NidhoggrAttachedEffect *SceneEffectPool_AllocateSlot(void *);
@@ -42,10 +40,10 @@ void Collider_SetAttackProperties(void *, s32, s32, s32, s32, s32);
 void Collider_SetCallback(void *, void *, void *);
 s32 Collider_Refresh(void *);
 void Sound_PlaySongChecked(u32);
-void Nidhoggr_CreateAttachedAttackEffect(u8 *owner, struct NidhoggrEffectVector *anchor,
-                                         void *offsetArg, u8 *boss)
+void Nidhoggr_CreateAttachedAttackEffect(u8 *owner, struct ContactPosition *anchor, void *offsetArg,
+                                         u8 *boss)
 {
-    struct NidhoggrEffectVector *offset = offsetArg;
+    struct ContactPosition *offset = offsetArg;
     struct NidhoggrAttachedEffect *effect;
     u8 *animation;
     u8 *collider;
@@ -71,7 +69,7 @@ void Nidhoggr_CreateAttachedAttackEffect(u8 *owner, struct NidhoggrEffectVector 
     effect->anchor = anchor;
     effect->offset = *offset;
     {
-        struct NidhoggrEffectVector *position = &effect->position;
+        struct ContactPosition *position = &effect->position;
         position->x = anchor->x + offset->x;
         position->y = anchor->y + offset->y;
         position->z = anchor->z + offset->z;

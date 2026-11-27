@@ -10,7 +10,7 @@ void SceneActors_UpdateExpandingShake(struct StateActor *p, int time)
 {
     int tick = time;
     struct StateActor *p2 = p;
-    u8 *position = (u8 *)p + 0x48;
+    u8 *position = (u8 *)&p->bodyId;
     if (p->actionChanged) {
         int sequence;
         p->actionChanged = 0;

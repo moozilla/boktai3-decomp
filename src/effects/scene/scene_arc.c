@@ -1,5 +1,6 @@
 #include "effects/scene/scene_arc.h"
 #include "engine/video/display_sprite_playback.h"
+#include "engine/math/math_shift.h"
 
 void SceneArc_HandleCollision(void)
 {
@@ -72,13 +73,6 @@ void SceneArc_ReleaseSlot(struct SceneArcManager *, struct SceneArcSlot *, u32);
 void SpriteEffect_CreateAtPosition(struct ScenePoolVec32 *, void *, void *, u32, u32, u32, u32, u32,
                                    u32, u32, u32, u32, u32, u32, u32);
 
-static inline s32 SignedShift(s32 value, u32 shift)
-{
-    if (value >= 0)
-        return value >> shift;
-    return -((-value) >> shift);
-}
-
 static inline void ProjectArc(struct SceneArcSlot *slot, struct ContactSwarmSprite *sprite,
                               s32 lift)
 {
@@ -103,8 +97,8 @@ static inline u8 PlayerSuspendsArc(void)
 
 static inline void MakeVelocity(struct SceneVec *out, s32 angle, s32 speed)
 {
-    out->x = SignedShift(gUnk_086149C4[(angle + 64) & 255] << 13, 12);
-    out->y = SignedShift(gUnk_086149C4[angle & 255] * speed, 12);
+    out->x = Math_ShiftTowardZero(gUnk_086149C4[(angle + 64) & 255] << 13, 12);
+    out->y = Math_ShiftTowardZero(gUnk_086149C4[angle & 255] * speed, 12);
     out->z = 0;
 }
 
@@ -143,7 +137,7 @@ void SceneArc_UpdateSlot(struct SceneArcManager *manager, struct SceneArcSlot *s
             __divsi3(((slot->target.z >> 12) * frame) + ((slot->start.z >> 12) * remainder),
                      slot->flightDuration)
             << 12;
-        lift = SignedShift(
+        lift = Math_ShiftTowardZero(
             gUnk_086149C4[Div(slot->frame << 7, slot->flightDuration) & 255] * slot->height, 12);
         ProjectArc(slot, sprite, lift);
         terrain = Terrain_GetHeightAtFixedPosition(&slot->position);
@@ -187,7 +181,7 @@ void SceneArc_UpdateSlot(struct SceneArcManager *manager, struct SceneArcSlot *s
         if (interval != 0) {
             s32 phase = Div(remaining << 7, interval);
             const s16 *table = gUnk_086149C4;
-            lift = SignedShift(table[phase & 255], 10);
+            lift = Math_ShiftTowardZero(table[phase & 255], 10);
         }
         ProjectArc(slot, sprite, lift);
         terrain = Terrain_GetHeightAtFixedPosition(&slot->position);

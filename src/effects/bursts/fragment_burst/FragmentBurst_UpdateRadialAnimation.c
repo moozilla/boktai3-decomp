@@ -1,15 +1,8 @@
 #include "global.h"
 #include "engine/video/display_sequence.h"
 #include "scene/collision/contact_position.h"
+#include "effects/bursts/fragment_burst/fragment_sprite_layout.h"
 
-struct FragmentSprite {
-    u32 flags;
-    u8 unk_04[0xc];
-    u16 frame;
-    u8 unk_12[0xa];
-    struct ContactPosition position;
-    u8 unk_24[8];
-};
 struct FragmentBurst {
     struct FragmentSprite sprites[4];
     struct DisplaySequenceState sequences[4];

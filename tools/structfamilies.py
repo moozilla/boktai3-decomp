@@ -37,6 +37,7 @@ BYTE_CAST = r"\(\s*(?:const\s+)?(?:u8|s8|(?:unsigned\s+|signed\s+)?char)\s*\*\s*
 ADDRESS_CANDIDATE = re.compile(
     rf"[(,]\s*(?:{POINTER_CAST}\s*){{0,2}}(?:\(\s*)*"
     rf"(?:&[^;,{{}}]{{0,200}}->|{BYTE_CAST}[^;,{{}}]{{0,150}}[+-])")
+RECORD_RETURN = re.compile(r"\b(?:struct|union)\s+\w+\s*\*\s*(?:const\s+)?\w+\s*\(")
 
 
 def digest(data):
@@ -50,7 +51,7 @@ def json_write(path, data):
     os.replace(file.name, path)
 
 
-def scan_file(rel, text):
+def scan_file(rel, text, *, qualified=False):
     """One probe per file, with declarations-only fallback after a body parse error."""
     path = rel
     if rel.startswith("include/"):
@@ -69,15 +70,15 @@ def scan_file(rel, text):
         # pycparser can reject GNU syntax even after bodies are removed.
         return {**result, "error": str(exc)[:250]}
     selected = evidence.selected_records(tu, path)
-    measured = lm.probe_records(body, tu, selected)
+    measured = lm.probe_records(body, tu, selected, qualified=qualified)
     for key, view in measured.items():
         spell, node = selected[key]
         for member, decl in zip(view["members"], node.decls):
             t = tu.resolve(decl.type)
             elem = t.type if isinstance(t, c_ast.ArrayDecl) else decl.type
             member["record"] = evidence.record_of(tu, elem)
-            headers, private, self_ref = evidence.member_dependencies(tu, decl, spell)
-            member.update(headers=headers, private=private, self_ref=self_ref)
+            headers, private, forwards, self_ref = evidence.member_dependencies(tu, decl, spell)
+            member.update(headers=headers, private=private, forwards=forwards, self_ref=self_ref)
         view.update(file=rel, line=node.coord.line)
     result["records"] = measured
     result["unmeasured"] = sorted(set(selected) - set(measured))
@@ -85,7 +86,8 @@ def scan_file(rel, text):
         result["error"] = error[:250]
     if rel.startswith("src/") and not error:
         refs = evidence.References(ast, tu, path)
-        result.update(calls=refs.calls, params=refs.params, globals=refs.globals)
+        result.update(calls=refs.calls, params=refs.params, globals=refs.globals,
+                      return_definitions=refs.return_definitions, return_calls=refs.return_calls)
     return result
 
 
@@ -142,7 +144,7 @@ def scan_header_batch(jobs):
     for job in missing:
         rel, text, version = job
         selected = selections[rel]
-        expected = {f"{rel}:{r.name if r.typedef else f'{r.kind} {r.name}'}" for r in inline_twins.records(text)}
+        expected = {f"{rel}:{r.spell}" for r in inline_twins.records(text)}
         if not selected or not (selected.keys() | expected) <= measured.keys():
             cached[rel] = scan_cached(job)
             continue
@@ -183,7 +185,8 @@ def scan_tree(paths, jobs, shared_headers=None):
     candidates = []
     for rel in keepcheck.src_files(paths):
         src = (root / rel).read_text(errors="replace")
-        if inline_twins.RECORD.search(src) or ADDRESS_CANDIDATE.search(keepcheck.blank_comments(src)):
+        code = keepcheck.blank_comments(src)
+        if inline_twins.RECORD.search(code) or ADDRESS_CANDIDATE.search(code) or RECORD_RETURN.search(code):
             candidates.append((rel, src))
     units = "unit" if len(candidates) == 1 else "units"
     header = "header" if len(shared) == 1 else "headers"
@@ -374,6 +377,27 @@ def strong_pair(a, b, proof):
         short(a) == short(b) and meaningful(a))
 
 
+def returned_views(scans, records):
+    """Compare the declared view at a call with the callee's measured return type."""
+    definitions = defaultdict(set)
+    sites = defaultdict(set)
+    for scan in scans:
+        for fn, static, result in scan.get("return_definitions", ()):
+            definitions[scan["file"] if static else "", fn].add(result)
+    for scan in scans:
+        for caller, line, fn, static, view in scan.get("return_calls", ()):
+            if view not in records:
+                continue
+            targets = definitions[scan["file"] if static else "", fn]
+            if len(targets) != 1:
+                continue
+            result = next(iter(targets))
+            if result != view and result in records:
+                sites[view, result, fn].add((f"{scan['file']}:{line}", caller))
+    return [{"view": view, "result": result, "function": fn, "sites": sorted(calls)}
+            for (view, result, fn), calls in sorted(sites.items())]
+
+
 def add_member_edges(private, records, edges):
     """Use corresponding by-value members of a supported parent pair as evidence."""
     slots = {}
@@ -395,13 +419,27 @@ def add_member_edges(private, records, edges):
         if not left or not right or not compatible(records[a], records[b],
                                                    strong=strong_pair(records[a], records[b], edges[a, b])):
             continue
-        for slot in sorted(left.keys() & right.keys()):
-            x, y = sorted((left[slot], right[slot]))
+        pairs = [(slot, slot) for slot in sorted(left.keys() & right.keys())]
+        if any(kind in {"flow", "RAM"} for kind, _ in edges[a, b]):
+            by_span = defaultdict(list)
+            for right_slot in right:
+                by_span[right_slot[1:]].append(right_slot)
+            for left_slot in sorted(left.keys() - right.keys()):
+                alternatives = by_span[left_slot[1:]]
+                if len(alternatives) != 1 or alternatives[0] in left:
+                    continue
+                right_slot = alternatives[0]
+                exact, names, common, _, _ = layout_stats(records[left[left_slot]], records[right[right_slot]])
+                if len(names) >= 2 and len(common - exact) <= 1:
+                    pairs.append((left_slot, right_slot))
+        for slot, other in pairs:
+            x, y = sorted((left[slot], right[other]))
             if x == y or records[x]["file"] == records[y]["file"] or not compatible(records[x], records[y]):
                 continue
             name, off, *_ = slot
             pair = (x, y)
-            edges[pair].add(("member", f"{a} and {b} both embed {name} at {off:#x}"))
+            label = name if slot == other else f"{name} / {other[0]}"
+            edges[pair].add(("member", f"{a} and {b} both embed {label} at {off:#x}"))
             if pair not in seen:
                 seen.add(pair)
                 pending.append(pair)
@@ -541,8 +579,9 @@ def extension_of(extra, existing):
 
 
 class SharedLayouts:
-    def __init__(self, records, buckets):
-        self.by_name, self.by_size, self.by_field, self.by_formal = (defaultdict(set) for _ in range(4))
+    def __init__(self, records, buckets, returns=()):
+        self.by_name, self.by_size, self.by_field, self.by_formal, self.by_return = (
+            defaultdict(set) for _ in range(5))
         self.records = records
         for key, view in records.items():
             if view["file"].startswith("include/"):
@@ -554,6 +593,10 @@ class SharedLayouts:
             if anchor[0] == "formal type" and anchor[1] in records and records[anchor[1]]["file"].startswith("include/"):
                 for member in members:
                     self.by_formal[member].add(anchor[1])
+        for finding in returns:
+            result = finding["result"]
+            if records[result]["file"].startswith("include/"):
+                self.by_return[finding["view"]].add(result)
 
     def relations(self, views):
         size = max(v["size"] for v in views)
@@ -562,21 +605,22 @@ class SharedLayouts:
         field_hits = Counter()
         for view in views:
             candidates |= self.by_name[short(view)] | self.by_size[view["kind"], view["size"]]
-            candidates |= self.by_formal[view["id"]]
+            candidates |= self.by_formal[view["id"]] | self.by_return[view["id"]]
             field_hits.update(k for lf in view["known"] for k in self.by_field[lf["off"], lf["name"]])
         candidates |= {k for k, hits in field_hits.items() if hits >= 2}
         matches = []
         for key in sorted(candidates):
             shared = self.records[key]
             formal = any(key in self.by_formal[v["id"]] for v in views)
+            returned = any(key in self.by_return[v["id"]] for v in views)
             same_tag = any(short(v) == short(shared) and meaningful(v) for v in views)
-            if not any(compatible(v, shared, strong=formal or same_tag) for v in views):
+            if not any(compatible(v, shared, strong=formal or returned or same_tag) for v in views):
                 continue
             known = {(lf["off"], leaf_shape(lf), lf["signed"]) for lf in shared["known"]}
             common = len(observed & known)
             named = set((lf["off"], lf["name"]) for v in views for lf in v["known"])
             name_hits = len(named & {(lf["off"], lf["name"]) for lf in shared["known"]})
-            if not (formal or same_tag or common >= 3 and (known == observed or name_hits >= 2)):
+            if not (formal or returned or same_tag or common >= 3 and (known == observed or name_hits >= 2)):
                 continue
             if size == shared["size"] and observed == known:
                 relation = "equals"
@@ -586,7 +630,8 @@ class SharedLayouts:
                 relation = "contained by"
             else:
                 relation = "overlapping view"
-            proof = "typed call" if formal else "same tag" if same_tag else "layout only"
+            proof = ("typed call" if formal else "typed return" if returned else
+                     "same tag" if same_tag else "layout only")
             matches.append((key, relation, proof, common))
         return sorted(matches, key=lambda row: (row[2] == "layout only", -row[3], row[0]))
 
@@ -627,7 +672,8 @@ def make_catalog(scans, *, jobs=2, compiler=True, rom=True):
         for key, row in evidence.rom_loads(rom_params):
             if key in participants:
                 loads[key].append(row)
-    shared = SharedLayouts(records, buckets)
+    returns = returned_views(scans, records)
+    shared = SharedLayouts(records, buckets, returns)
     families = []
     for keys in groups:
         views = [records[key] for key in keys]
@@ -654,7 +700,7 @@ def make_catalog(scans, *, jobs=2, compiler=True, rom=True):
     findings.sort(key=lambda r: (r["declared"], -len(r["sites"]), r["parent"], r["offset"], r["child"]))
     for v in records.values():
         del v["_offsets"]
-    return {"version": SCHEMA, "families": families, "embeds": findings, "warnings": warnings,
+    return {"version": SCHEMA, "families": families, "embeds": findings, "returns": returns, "warnings": warnings,
             "records": records, "files": {s["file"]: s["digest"] for s in scans},
             "scan_errors": {s["file"]: s["error"] for s in scans if s.get("error")},
             "unmeasured": [key for s in scans for key in s.get("unmeasured", ())],
@@ -728,6 +774,16 @@ def report_lines(catalog, limit):
         status = "declared" if r["declared"] else "candidate"
         yield (f"| `{r['parent']}` | `{r['offset']:#x}` | `{r['child']}` | {status} | {len(r['sites'])} | "
                f"`{where}` {caller} → {callee} argument {arg + 1} |")
+    if catalog.get("returns"):
+        yield ""
+        yield "## Return types seen through alternate declarations"
+        yield ""
+        yield "| Caller view | Defined result | Callee | Call sites | First site |"
+        yield "|---|---|---|---:|---|"
+        for finding in catalog["returns"]:
+            where, caller = finding["sites"][0]
+            yield (f"| `{finding['view']}` | `{finding['result']}` | `{finding['function']}` | "
+                   f"{len(finding['sites'])} | `{where}` {caller} |")
 
 
 def load_catalog(path):

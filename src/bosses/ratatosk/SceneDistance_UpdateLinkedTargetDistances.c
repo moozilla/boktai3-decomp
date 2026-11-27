@@ -1,34 +1,21 @@
 #include "global.h"
 #include "engine/math/scene_vec.h"
-struct SceneDistanceEntry {
-    struct SceneVec position;
-    u8 pad8[4];
-    s32 distanceSquared;
-    s32 targetDistanceSquared;
-    u8 pad14[4];
-};
-struct SceneDistanceSet {
-    u8 pad0[0x36C];
-    struct SceneVec position;
-    u8 pad374[0xA7C];
-    struct SceneDistanceEntry linked[4];
-    u8 padE50[0xDC];
-    u8 *source;
-};
-u8 *SunOrb_GetPositionFromManager(u8 *, s32);
+#include "bosses/ratatosk/scene_distance_entry_layout.h"
+#include "objects/sun_orb/sun_orb_effect.h"
+#include "bosses/ratatosk/ratatosk_orb_distance_view.h"
 struct SceneVec *Player_GetEffectivePosition(s32);
-void SceneDistance_UpdateLinkedTargetDistances(struct SceneDistanceSet *set)
+void SceneDistance_UpdateLinkedTargetDistances(struct RatatoskOrbDistanceView *set)
 {
     s32 i = 0;
     s32 j = 0;
     do {
         struct SceneVec *position = Player_GetEffectivePosition(0);
-        struct SceneVec *target = (struct SceneVec *)SunOrb_GetPositionFromManager(set->source, i);
+        struct SceneVec *target = (struct SceneVec *)SunOrb_GetPositionFromManager(set->manager, i);
         s32 x = target->x - position->x;
         s32 z = target->z - position->z;
         x *= x;
         x += z * z;
-        set->linked[j].targetDistanceSquared = x;
+        set->orbsStorage.linked[j].targetDistanceSquared = x;
         j++;
         i++;
     } while (i <= 3);

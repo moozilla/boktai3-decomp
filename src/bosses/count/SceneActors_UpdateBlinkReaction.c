@@ -5,7 +5,7 @@ u8 Sprite_BlinkUntilExpired(int *, int, int, int);
 void SceneActors_UpdateBlinkReaction(struct StateActor *p, int tick)
 {
     struct StateActor *p2 = p;
-    u8 *position = (u8 *)p + 0x48;
+    u8 *position = (u8 *)&p->bodyId;
     int done;
     if (p->actionChanged) {
         int sequence;

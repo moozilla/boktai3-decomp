@@ -9,6 +9,9 @@
 #include "ui/hud/scene_indicator.h"
 #include "player/cutscene/player_cue_sequence.h"
 #include "engine/math/scene_vec.h"
+#include "scene/collision/packed_contact_halfwords.h"
+#include "engine/video/display_sequence.h"
+#include "scene/collision/packed_contact_vector.h"
 
 u32 LargeFragmentEffect_IsActive(void)
 {
@@ -44,33 +47,18 @@ void LargeFragmentEffect_OnCollision(void)
 {
 }
 
-struct H {
-    u32 lo : 16;
-    u32 hi : 16;
-};
-
-struct Tail {
-    u32 lo : 16;
-    u32 : 16;
-};
-
-struct Z {
-    struct H a;
-    struct Tail b;
-};
-
 void LargeFragmentEffect_OnCollision(void); // a `bx lr` stub
 
 void LargeFragmentEffect_InitCollider(u8 *p, u32 a, u32 b, u32 c, u32 d)
 {
-    struct Z s1, s2;
+    struct PackedContactVector s1, s2;
     u8 *q;
-    s1.a.lo = 0x40;
-    s1.a.hi = 0x80;
-    s1.b.lo = 0x40;
-    s2.a.lo = 0;
-    s2.a.hi = 0;
-    s2.b.lo = 0;
+    s1.x = 0x40;
+    s1.y = 0x80;
+    s1.z = 0x40;
+    s2.x = 0;
+    s2.y = 0;
+    s2.z = 0;
     q = p + 0x3C;
     Collider_Init(q, 0, 0x2401, 0, 0x10, &s1, &s2);
     Collider_SetAttackProperties(q, a, b, 0, c, d);
@@ -226,12 +214,6 @@ void SceneSlot_UpdateTimedPulse(void *unused, struct LargeFragmentSlot *slot)
         slot->timer++;
 }
 
-struct FeatherSequence {
-    const u16 *commands;
-    u8 flags, frameCount, frameWeight, duration;
-    u16 index, unknownA, speed, elapsed;
-};
-
 struct Feather {
     u32 flags;
     u8 unknown4[3], priority;
@@ -241,7 +223,7 @@ struct Feather {
     u8 unknown12[10];
     struct Vec position;
     u8 unknown24[8];
-    struct FeatherSequence sequence;
+    struct DisplaySequenceState sequence;
     u8 unknown3C[0x54];
     u16 age;
     u8 unknown92[4];

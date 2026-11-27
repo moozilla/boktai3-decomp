@@ -1,9 +1,7 @@
 #include "scene/collision/contact_collider.h"
 #include "global.h"
 #include "engine/ram.h"
-struct NidhoggrEffectVector {
-    u16 x, y, z, pad;
-};
+#include "scene/collision/contact_position.h"
 struct NidhoggrEffectPair {
     u32 a, b;
 };
@@ -20,7 +18,7 @@ struct NidhoggrDistanceEffect {
     u8 animation[0x1c];
     struct NidhoggrEffectSprite sprite;
     u8 pad38[8];
-    struct NidhoggrEffectVector position;
+    struct ContactPosition position;
     u8 pad48[0x12c];
     u32 field174;
     s16 speedX, speedY, speedZ;
@@ -40,13 +38,13 @@ void Sprite_Init(void *, void *, u32);
 void Collider_SetAttackProperties(void *, s32, s32, s32, s32, s32);
 void Collider_SetCallback(void *, void *, void *);
 s32 Collider_Refresh(void *);
-void Nidhoggr_CreateDistanceLimitedEffect(void *owner, struct NidhoggrEffectVector *anchor,
-                                          struct NidhoggrEffectVector *offset, u8 *boss)
+void Nidhoggr_CreateDistanceLimitedEffect(void *owner, struct ContactPosition *anchor,
+                                          struct ContactPosition *offset, u8 *boss)
 {
     struct NidhoggrDistanceEffect *effect = SceneEffectPool_AllocateSlot(owner);
     u8 *animation;
     struct NidhoggrEffectSprite *sprite;
-    struct NidhoggrEffectVector *position;
+    struct ContactPosition *position;
     u8 *collider;
     if (!effect)
         return;

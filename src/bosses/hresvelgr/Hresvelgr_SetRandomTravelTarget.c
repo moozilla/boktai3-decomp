@@ -1,22 +1,20 @@
 #include "global.h"
 #include "engine/engine.h"
 #include "engine/ram.h"
+#include "scene/collision/contact_position.h"
 
 // confidence=low: stores a randomized elevated travel point in the actor.
-struct BurstVector {
-    s16 x, y, z, pad;
-};
 struct BurstActor {
     u8 unknown0[0x51];
     u8 direction;
     u8 unknown52[2];
-    struct BurstVector position;
+    struct ContactPosition position;
     u8 unknown5C[0x110 - 0x5C];
-    struct BurstVector *target;
+    struct ContactPosition *target;
     u8 unknown114[0x32B - 0x114];
     u8 side;
     u8 unknown32C[0x39C - 0x32C];
-    struct BurstVector travelTarget;
+    struct ContactPosition travelTarget;
 };
 extern const s16 gUnk_086149C4[];
 void HresvelgrMotion_CreateWithDelta(void *, void *, s32, s32);
@@ -24,13 +22,14 @@ static inline s32 scale(s32 n)
 {
     return n >= 0 ? n >> 12 : -((-n) >> 12);
 }
-static inline void polar(struct BurstVector *v, s32 angle, s32 radius)
+static inline void polar(struct ContactPosition *v, s32 angle, s32 radius)
 {
     v->x = scale(gUnk_086149C4[(angle + 64) & 255] * radius);
     v->y = 0;
     v->z = scale(gUnk_086149C4[angle & 255] * radius);
 }
-static inline void add(struct BurstVector *d, struct BurstVector *a, struct BurstVector *b)
+static inline void add(struct ContactPosition *d, struct ContactPosition *a,
+                       struct ContactPosition *b)
 {
     d->x = b->x + a->x;
     d->y = b->y + a->y;
@@ -58,7 +57,7 @@ void Hresvelgr_SetRandomTravelTarget(struct BurstActor *actor)
     work &= 255;
     polar(&actor->travelTarget, work, radius);
     {
-        struct BurstVector *target = saved->target;
+        struct ContactPosition *target = saved->target;
         add(&actor->travelTarget, target, &actor->travelTarget);
     }
     actor->travelTarget.y = 832;

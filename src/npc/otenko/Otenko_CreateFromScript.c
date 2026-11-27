@@ -2,14 +2,9 @@
 #include "engine/engine.h"
 #include "engine/ram.h"
 #include "engine/task_manager.h"
-struct PackedVec {
-    u32 x : 16;
-    u32 y : 16;
-    u32 z : 16;
-    u32 pad : 16;
-};
+#include "scene/collision/packed_contact_vector.h"
 struct OtenkoActor *Actor_Allocate(s32 name, s32 variant);
-s32 Actor_InitMotion(struct OtenkoActor *, s32 name, struct PackedVec *, s32 angle);
+s32 Actor_InitMotion(struct OtenkoActor *, s32 name, struct PackedContactVector *, s32 angle);
 s32 Actor_InitDrawable(struct OtenkoActor *, s32 kind, s32 a, s32 b, s32 c);
 void Actor_InitShadow(struct OtenkoActor *, u32, s32, s32, s32);
 void SceneMessages_RegisterReceiver(void *, s32, s32);
@@ -58,7 +53,7 @@ void Otenko_CreateFromScript(void)
     s32 extra;
     struct OtenkoActor *npc;
     void (*updateC)(void);
-    struct PackedVec position;
+    struct PackedContactVector position;
     struct OtenkoEffectState *effect;
     struct SceneActorBody *body;
     if (!manager) {

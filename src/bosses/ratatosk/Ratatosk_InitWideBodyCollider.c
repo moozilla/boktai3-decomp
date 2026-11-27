@@ -1,7 +1,5 @@
 #include "global.h"
-struct ColliderVector {
-    s32 x : 16, y : 16, z : 16, pad : 16;
-};
+#include "scene/collision/packed_contact_vector.h"
 struct Ratatosk {
     u8 pad0[0x2d8];
     u8 wideBodyCollider[0x94];
@@ -15,7 +13,7 @@ s32 Collider_Refresh(void *);
 void PreviewActor_ReplaceProjectileTowardPlayer(void);
 void Ratatosk_InitWideBodyCollider(struct Ratatosk *p)
 {
-    struct ColliderVector size, offset;
+    struct PackedContactVector size, offset;
     void *collider = p->wideBodyCollider;
     size.x = 140;
     size.y = 180;

@@ -1,17 +1,5 @@
 #include "global.h"
-
-struct VanargandPairState {
-    u8 pad0[0xAE];
-    u8 mode;
-    u8 padAF[0xE1 - 0xAF];
-    u8 gauge;
-    u8 padE2[0x56C - 0xE2];
-    void *pair;
-    u8 pad570[0x5C0 - 0x570];
-    s16 counter;
-    s16 variant;
-    u8 state, cursor, transition, level;
-};
+#include "bosses/vanargand/vanargand_pair_state_layout.h"
 
 extern const u8 gUnk_08611F74[];
 s32 __divsi3(s32, s32);

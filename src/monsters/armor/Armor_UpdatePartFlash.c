@@ -1,15 +1,10 @@
 #include "global.h"
+#include "scene/collision/packed_contact_vector.h"
 struct FlashBody {
     u8 pad0[0x5BC];
     u16 palette;
     u8 pad5BE[6];
     u8 count;
-};
-struct FlashVec {
-    u32 x : 16;
-    s32 y : 16;
-    u32 z : 16;
-    u32 pad : 16;
 };
 struct FlashPart {
     u32 flags;
@@ -18,7 +13,7 @@ struct FlashPart {
     u8 pad10[0x3e];
     u16 flags4E;
     u8 pad50[0x1c];
-    struct FlashVec pos;
+    struct PackedContactVector pos;
     u8 pad74[0x2e];
     u16 flagsA2;
     u8 padA4[0x7a];
@@ -77,8 +72,8 @@ void Armor_UpdatePartFlash(struct FlashPart *p)
             parent->count--;
         }
         if ((*counter & 7) == 0) {
-            struct FlashVec a;
-            struct FlashVec b;
+            struct PackedContactVector a;
+            struct PackedContactVector b;
             a = p->pos;
             a.x += 100;
             a.y += 100;

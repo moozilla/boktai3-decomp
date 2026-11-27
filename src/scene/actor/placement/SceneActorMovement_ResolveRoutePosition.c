@@ -1,16 +1,10 @@
 #include "scene/actor/scene_actor_effects.h"
 #include "scene/motion/scene_actor_route.h"
+#include "scene/terrain/terrain_sampling.h"
 u32 Nav_IsPositionInMesh(void *, const struct ContactPosition *,
                          struct ContactPosition *);
 u32 Terrain_ApplyBlocked(void *, const struct ContactPosition *,
                          struct ContactPosition *);
-static inline s32 GetCell(struct ContactPosition *p)
-{
-    s32 x = p->x >> 8, z = p->z >> 8;
-    if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
-        return 0;
-    return gTerrainMap->rows[z] + x;
-}
 void SceneActorMovement_ResolveRoutePosition(struct ChaseActor *actor)
 {
     struct ContactPosition target;
@@ -27,7 +21,7 @@ void SceneActorMovement_ResolveRoutePosition(struct ChaseActor *actor)
             p->x = point->x;
             p->z = point->z;
         }
-        cell = GetCell(p);
+        cell = Terrain_GetCellIndex(p);
         p->y = SceneActorTerrain_GetHeight(cell, p);
     }
     target.y = base->base.body.position.y;

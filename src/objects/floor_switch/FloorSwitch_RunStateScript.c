@@ -1,31 +1,7 @@
 #include "global.h"
-struct FloorSwitch {
-    u32 flags;
-    u8 pad4[8];
-    void *anim;
-    u16 field10;
-    u8 pad12[0xA];
-    s16 x, y, z;
-    u8 pad22[0xA];
-    u8 animData[0x1C];
-    s32 name;
-    s32 r[2];
-    s32 region;
-    u16 sprite, field5A;
-    u8 pad5C[8];
-    s32 s[4];
-    s32 w[4];
-    u8 pad84[2];
-    u16 field86;
-    u16 flags88;
-    u8 field8A, field8B;
-    u16 field8C, field8E;
-};
-struct FloorSwitchScriptArgs {
-    u32 count : 16, unused : 16;
-    s32 *values;
-};
-void Script_Call(u32, struct FloorSwitchScriptArgs *);
+#include "recovered/script_call_arguments_layout.h"
+#include "objects/floor_switch/floor_switch_layout.h"
+void Script_Call(u32, struct ScriptCallArguments *);
 static inline void fill(struct FloorSwitch *p, s32 *values)
 {
     values[0] = p->name;
@@ -42,7 +18,7 @@ static inline void fill(struct FloorSwitch *p, s32 *values)
 void FloorSwitch_RunStateScript(struct FloorSwitch *p)
 {
     s32 values[10];
-    struct FloorSwitchScriptArgs args;
+    struct ScriptCallArguments args;
     if (p->flags88 & 2) {
         if (p->r[0]) {
             fill(p, values);

@@ -2,12 +2,7 @@
 #include "engine/engine.h"
 #include "engine/ram.h"
 #include "engine/task_manager.h"
-struct PackedVec {
-    u32 x : 16;
-    u32 y : 16;
-    u32 z : 16;
-    u32 pad : 16;
-};
+#include "scene/collision/packed_contact_vector.h"
 struct Rig {
     u8 pad0[4];
     u32 handle;
@@ -71,7 +66,7 @@ struct SceneNpc {
     void *callbacks[6];
 };
 struct SceneNpc *Actor_Allocate(s32 name, s32 variant);
-s32 Actor_InitMotion(struct SceneNpc *, s32 name, struct PackedVec *, s32 angle);
+s32 Actor_InitMotion(struct SceneNpc *, s32 name, struct PackedContactVector *, s32 angle);
 s32 Actor_InitDrawable(struct SceneNpc *, s32 kind, s32 a, s32 b, s32 c);
 void Actor_InitShadow(struct SceneNpc *, u32, s32, s32, s32);
 void SceneMessages_RegisterReceiver(void *, s32, s32);
@@ -127,7 +122,7 @@ void Kuro_Create(u32 tag)
     s32 variant;
     s32 angle;
     struct SceneNpc *npc;
-    struct PackedVec position;
+    struct PackedContactVector position;
     u32 zero;
     struct Motion *motion;
     if (!manager)

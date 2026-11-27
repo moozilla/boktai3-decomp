@@ -1,25 +1,10 @@
 #include "global.h"
+#include "bosses/ratatosk/scene_directional_actor_layout.h"
 /* Ratatosk_UpdateDirectionalTrigger: same as SceneActor_UpdateDirectionalTrigger but sets the owner's +0x184 flag instead of consuming a trigger (provisional name) */
 
 u32 Trigger_ConsumePending(void *latch, u32 expected);
 
 // Tentative scene-actor layout; state semantics remain provisional.
-struct SceneDirectionalActor {
-    u8 pad00[0x51];
-    u8 direction;
-    u8 pad52[0xA8 - 0x52];
-    u8 direction4;
-    u8 direction8;
-    u8 state;
-    u8 previousState;
-    u8 padAC[3];
-    u8 pending;
-    u8 entered;
-    u8 padB1[0xC4 - 0xB1];
-    u32 timer;
-    u8 padC8[4];
-    u8 requestedDirection;
-};
 
 static inline u8 TakeEntry(struct SceneDirectionalActor *p)
 {

@@ -1,11 +1,8 @@
+#include "objects/solar_roots/animated_marker_collider_layout.h"
 #define AnimatedMarker_RegisterEmptyCell SolarRoot_RegisterCellEffect
 #define AnimatedMarker_TickReveal        SolarRoot_UpdateIdle
 #include "global.h"
 /* Tentative proximity-marker family; collider extent interpretation is provisional. */
-struct AnimatedMarkerCollider {
-    u8 pad0[10];
-    u16 extent;
-};
 struct AnimatedMarker {
     u32 flags;
     u8 pad4[3];

@@ -1,14 +1,10 @@
 #include "global.h"
 #include "engine/engine_globals.h"
 #include "engine/ram.h"
-struct Config {
-    u16 v[20];
-};
-struct Vec {
-    s16 x, y, z, pad;
-};
+#include "scene/collision/contact_position.h"
+#include "effects/particles/impact_burst.h"
 extern s16 gUnk_086149C4[];
-void ImpactBurst_Create(int, void *, struct Config *);
+void ImpactBurst_Create(int, void *, struct AnimatedParticleConfig *);
 static inline int scale(int a, int b)
 {
     int v = a * 40;
@@ -17,37 +13,37 @@ static inline int scale(int a, int b)
         return v >> 12;
     return -((-v) >> 12);
 }
-void ImpactBurst_EmitOffset(struct Vec *pos, int unused, int type, int flags, int speed,
+void ImpactBurst_EmitOffset(struct ContactPosition *pos, int unused, int type, int flags, int speed,
                                   int horizontal, int start, int decay)
 {
-    struct Config s;
-    struct Vec out;
-    s.v[0] = type;
-    s.v[1] = flags;
-    s.v[3] = speed;
-    s.v[4] = 0;
-    s.v[5] = 0;
-    s.v[6] = horizontal;
-    s.v[7] = 0;
+    struct AnimatedParticleConfig s;
+    struct ContactPosition out;
+    s.type = type;
+    s.flags = flags;
+    s.speed = speed;
+    s.vertical = 0;
+    s.verticalRange = 0;
+    s.horizontal = horizontal;
+    s.horizontalRange = 0;
     gRandomIndex = (gRandomIndex + 1) & 1023;
     {
         u32 offset = gRandomIndex * 2;
         u8 *sample = (u8 *)(offset + RANDOM_TABLE_ADDR);
-        s.v[10] = *sample;
+        s.yaw = *sample;
     }
-    s.v[11] = 0;
-    s.v[9] = 0;
-    s.v[8] = 0;
-    s.v[12] = start;
-    s.v[13] = 0;
-    s.v[14] = decay;
-    s.v[15] = 0;
-    s.v[16] = start;
-    s.v[17] = 0;
-    s.v[18] = decay;
-    s.v[19] = 0;
-    out.x = pos->x + scale(gUnk_086149C4[(s.v[10] + 192) & 255], horizontal);
+    s.yawRange = 0;
+    s.pitchRange = 0;
+    s.pitch = 0;
+    s.verticalStart = start;
+    s.verticalStartRange = 0;
+    s.verticalDecay = decay;
+    s.verticalDecayRange = 0;
+    s.horizontalStart = start;
+    s.horizontalStartRange = 0;
+    s.horizontalDecay = decay;
+    s.horizontalDecayRange = 0;
+    out.x = pos->x + scale(gUnk_086149C4[(s.yaw + 192) & 255], horizontal);
     out.y = pos->y;
-    out.z = pos->z + scale(gUnk_086149C4[(s.v[10] + 128) & 255], horizontal);
+    out.z = pos->z + scale(gUnk_086149C4[(s.yaw + 128) & 255], horizontal);
     ImpactBurst_Create(1, &out, &s);
 }

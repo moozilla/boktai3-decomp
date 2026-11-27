@@ -1,12 +1,10 @@
 
 #include "global.h"
 #include "monsters/screamer/screamer_playback.h"
+#include "scene/collision/packed_contact_vector.h"
 struct ColliderFlags {
     u8 pad[6];
     u32 flags : 16;
-};
-struct ScreamerColliderVector {
-    s32 x : 16, y : 16, z : 16, pad : 16;
 };
 void Collider_Init(void *, u16, u32, u32, u32, void *, void *);
 void Collider_SetCallback(void *, void *, void *);
@@ -18,7 +16,7 @@ void Screamer_OnColliderContact(void);
 void Screamer_ApplyHitReaction(void);
 void Screamer_InitColliders(struct ScreamerState *p)
 {
-    struct ScreamerColliderVector size, offset;
+    struct PackedContactVector size, offset;
     void *collider = p->attackCollider;
     if (!p->f1D8) {
         size.x = 160;

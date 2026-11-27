@@ -9,6 +9,9 @@
 #include "debug.h"
 #include "engine/math/hit_spark_random.h"
 #include "bosses/state_actor_action_entry.h"
+#include "scene/collision/contact_position.h"
+#include "recovered/contact_reaction_vector_layout.h"
+#include "scene/collision/packed_contact_vector.h"
 
 int SceneActorGraphics_GetResourceId(struct StateActor *p)
 {
@@ -85,16 +88,13 @@ void DamageNumberDisplay_Show(void *, u32, u32, void *, void *, u32);
 s32 Math_Atan2(s32, s32);
 s32 WirelessGame_TryAddCyclingItem(void *);
 void WirelessGame_AddItem(void *, s32);
-struct ContactVector {
-    s16 x, y, z;
-};
 
 void SceneActorGraphics_OnDamageContact(u8 *source, u8 *contact, u8 *p)
 {
     u8 *actor = p;
     u8 *sprite = p + 0x48;
     u32 mode;
-    struct ContactVector size;
+    struct ContactReactionVector size;
     u8 *position;
     s32 item;
     u16 responseValue;
@@ -194,9 +194,7 @@ void SceneActorGraphics_InitBodyNoOp(void)
 {
 }
 
-typedef struct {
-    s16 x, y, z;
-} Vec;
+typedef struct ContactPosition Vec;
 
 void SceneActorGraphics_InitBodyNoOp(void);
 
@@ -472,16 +470,12 @@ void sub_08022694(u8 *p)
     }
 }
 
-struct Packed {
-    s32 x : 16, y : 16, z : 16, pad : 16;
-};
-
 // confidence=low: five sparks 300 units above the actor; the large burst for big, otherwise a
 // smaller one shifted by the facing kept at 0xA8.
 void sub_08022790(u8 *p, s32 big)
 {
     struct ContactPosition pos;
-    struct Packed size;
+    struct PackedContactVector size;
     struct ContactPosition *at = &pos;
     s32 angle, count, speed;
     u16 index;
@@ -522,9 +516,7 @@ void sub_08022790(u8 *p, s32 big)
     SparkParticle_Spawn(&pos, 5, &size, angle, count, speed, 0, 2);
 }
 
-typedef struct BurstVec {
-    s32 x : 16, y : 16, z : 16, pad : 16;
-} BurstVec;
+typedef struct PackedContactVector BurstVec;
 extern const BurstVec gUnk_08604D84[];
 u16 Sqrt(u32);
 s32 Div(s32, s32);
@@ -574,7 +566,7 @@ void sub_08022878(BurstVec *p)
 void SceneActors_SpawnAmbientParticlePair(struct StateActor *p)
 {
     u8 *graphics = (u8 *)p + 0x240;
-    struct Packed size;
+    struct PackedContactVector size;
     int i;
     for (i = 0; i < 2; i++) {
         u32 angle, count;
@@ -643,7 +635,7 @@ s32 sub_08022B18(struct ReactionActor *p, s32 kind, s32 damage)
                 result = 0;
             }
             if (damage > 0) {
-                struct ContactVector size;
+                struct ContactReactionVector size;
                 size.x = 0x20;
                 size.y = 0;
                 size.z = 0x20;
@@ -1614,7 +1606,7 @@ void SceneActorState_StartContactPool(struct SceneGraphicsActor *actor)
     struct StateActor *p = (struct StateActor *)actor;
     struct ContactPosition pos;
     struct ContactPosition pos2;
-    u8 *src = (u8 *)p + 0x48;
+    u8 *src = (u8 *)&p->bodyId;
 
     if (StateActor_ConsumeActionEntry(p))
         SceneActorState_SetAnimation(p, 14);

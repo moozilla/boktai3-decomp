@@ -17,7 +17,8 @@ their own definition of a struct a header already has. A *twin* is exact:
 A helper with several shared twins is applied only when one of them has the private copy's own
 name or is the only one the unit already sees through its includes; otherwise it is reported
 as ambiguous. A twin whose shared name has no Object_ prefix (`scale`, `add`) is reported, not
-applied, in place of a private name that has one. A private helper's definition goes with the
+applied, in place of a private name that has one. Identical bodies in different object
+subsystems do not establish that the object-specific API is shared. A private helper's definition goes with the
 comment lines directly above it (its description; a `confidence=` note stays); a struct's
 comments stay.
 
@@ -118,8 +119,18 @@ def helpers(text, path=""):
     return out
 
 
-class Record(collections.namedtuple("Record", "kind name typedef body start end file")):
-    """A file-scope struct/union definition: `struct T {...};` (name T) or `typedef struct {...} T;`."""
+class Record(collections.namedtuple("Record", "kind name typedef body start end file tag")):
+    """A file-scope struct/union definition with an optional typedef."""
+
+    @property
+    def spell(self):
+        return f"{self.kind} {self.tag}" if self.tag else self.name
+
+
+RECORD_TAIL = re.compile(
+    r"\s*(?P<alignment>__attribute__\s*\(\(\s*aligned\s*\(\s*(?:0[xX][\da-fA-F]+|\d+)\s*\)\s*\)\))?"
+    r"\s*(?P<alias>\w*)\s*;"
+)
 
 
 def records(text, path=""):
@@ -127,23 +138,23 @@ def records(text, path=""):
     out = []
     for m in RECORD.finditer(code):
         end = match_brace(code, m.end())
-        tail = re.match(r"\s*(\w*)\s*;", code[end:])
+        tail = RECORD_TAIL.match(code, end)
         if not tail:
             continue
         typedef, kind, tag = bool(m.group(1)), m.group(2), m.group(3)
         if typedef:
-            if not tail.group(1) or tag:
-                continue  # typedef struct T {...} U; spells two names: leave it
-            name = tail.group(1)
+            if not tail["alias"]:
+                continue
+            name = tail["alias"]
         else:
-            if not tag or tail.group(1):
+            if not tag or tail["alias"]:
                 continue  # an untagged struct or one that also declares an object
             name = tag
-        body = " ".join(tokens(code[m.end():end - 1]))
-        stop = end + tail.end()
+        body = " ".join(tokens(code[m.end():end - 1] + (tail["alignment"] or "")))
+        stop = tail.end()
         if stop < len(text) and text[stop] == "\n":
             stop += 1
-        out.append(Record(kind, name, typedef, body, m.start(), stop, path))
+        out.append(Record(kind, name, typedef, body, m.start(), stop, path, tag))
     return out
 
 
@@ -248,7 +259,8 @@ def plan(text, idx, drafts):
     for r in records(text):
         if keepcheck.in_ranges(r.start, drafts):
             continue
-        same = rk.get((r.kind, r.typedef, r.body), [])
+        same = [c for c in rk.get((r.kind, r.typedef, r.body), [])
+                if not r.typedef or c.tag == r.tag]
         if any(c.name == r.name for c in same):
             exact.append(("record", r, [c for c in same if c.name == r.name]))
         elif same:
@@ -264,6 +276,24 @@ def replace(text, kind, priv, shared):
         else:
             new = rename(new, priv.name, shared.name, prefix=priv.kind + " ")
     return new
+
+
+OBJECT_CATEGORIES = {"bosses", "monsters", "npc", "objects", "effects"}
+
+
+def helper_owner(path):
+    """The object subsystem for a concrete actor or effect header."""
+    parts = path.split("/")
+    if len(parts) < 2 or parts[0] not in OBJECT_CATEGORIES:
+        return None
+    return parts[0], os.path.splitext(parts[1])[0]
+
+
+def related_helpers(rel, private, candidates):
+    owner = helper_owner(rel.removeprefix("src/"))
+    return [shared for shared in candidates
+            if shared.name == private.name or helper_owner(shared.file) in {None, owner}
+            or visible(rel, shared.file)]
 
 
 def process(rel, idx, dry=False, log=print):
@@ -284,6 +314,14 @@ def process(rel, idx, dry=False, log=print):
         for kind, priv, cands in exact:
             if (kind, priv.name) in failed:
                 continue
+            if kind == "helper":
+                related = related_helpers(rel, priv, cands)
+                if not related:
+                    failed.add((kind, priv.name))
+                    report.append(f"{rel}: helper {priv.name} has twins owned by other subsystems: "
+                                  + ", ".join(f"{c.file}:{c.name}" for c in cands[:4]))
+                    continue
+                cands = related
             if len(cands) > 1 and not any(c.name == priv.name for c in cands):
                 seen = [c for c in cands if visible(rel, c.file)]
                 if len(seen) == 1:

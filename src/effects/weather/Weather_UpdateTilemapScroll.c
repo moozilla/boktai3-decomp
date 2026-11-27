@@ -2,17 +2,8 @@
 #include "engine/video/render.h"
 #include "engine/engine.h"
 #include "engine/math/monster_particle_random.h"
+#include "effects/weather/weather_layout.h"
 // confidence=low: scrolls weather tilemap layers and adjusts their randomized drift.
-struct Weather {
-    u8 pad0[0x24];
-    u16 scroll;
-    u8 alternate;
-    u8 pad27[13];
-    s32 x[2], y[2];
-    s32 drift, target, timer, layer;
-    u8 pad54[8];
-    u32 frame;
-};
 s32 SceneTilemap_GetScrollDelta(void);
 s32 Div(s32, s32);
 void BgGfx_LoadTilemapSimple(u32, u32, u32, u32, u32);

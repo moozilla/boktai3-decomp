@@ -50,13 +50,17 @@ def record_of(tu, t):
     return None
 
 
+def integer_token(value):
+    value = re.sub(r"[uUlL]+$", "", value)
+    try:
+        return int(value, 8 if re.fullmatch(r"0[0-7]+", value) else 0)
+    except ValueError:
+        return None
+
+
 def const_int(expr):
     if isinstance(expr, c_ast.Constant) and any(word in expr.type for word in ("int", "long")):
-        value = re.sub(r"[uUlL]+$", "", expr.value)
-        try:
-            return int(value, 8 if re.fullmatch(r"0[0-7]+", value) else 0)
-        except ValueError:
-            return None
+        return integer_token(expr.value)
     if isinstance(expr, c_ast.UnaryOp):
         n = const_int(expr.expr)
         if n is not None:
@@ -87,6 +91,9 @@ class References(c_ast.NodeVisitor):
         self.static = set()
         self.func = ""
         self.calls, self.fields, self.params, self.globals = [], [], [], []
+        self.field_chains, self.array_fields = [], []
+        self.return_definitions, self.return_calls = [], []
+        self.extent_uses = {}
         for ext in ast.ext:
             d = ext.decl if isinstance(ext, c_ast.FuncDef) else ext
             if isinstance(d, c_ast.Decl) and d.name:
@@ -108,6 +115,16 @@ class References(c_ast.NodeVisitor):
     def pointee(self, t):
         t = self.resolve(t)
         return record_of(self.tu, t.type) if isinstance(t, (c_ast.PtrDecl, c_ast.ArrayDecl)) else None
+
+    def object_record(self, t):
+        t = self.resolve(t)
+        while isinstance(t, c_ast.ArrayDecl):
+            t = self.resolve(t.type)
+        return record_of(self.tu, t)
+
+    def uses_extent(self, record, node, operation):
+        if record and node.coord and Path(node.coord.file).as_posix() == self.path:
+            self.extent_uses.setdefault(record, (node.coord.line, operation))
 
     def binding(self, name):
         return next((env[name] for env in reversed(self.env) if name in env), None)
@@ -142,6 +159,10 @@ class References(c_ast.NodeVisitor):
             f = self.declarations.get(expr.name.name)
             if f:
                 return f.type
+        if isinstance(expr, c_ast.TernaryOp):
+            return self.expr_type(expr.iftrue) or self.expr_type(expr.iffalse)
+        if isinstance(expr, c_ast.ExprList) and expr.exprs:
+            return self.expr_type(expr.exprs[-1])
         return None
 
     def address(self, expr):
@@ -195,12 +216,17 @@ class References(c_ast.NodeVisitor):
 
     def visit_FuncDef(self, node):
         self.func = node.decl.name
+        result = self.pointee(node.decl.type.type)
+        if result:
+            self.return_definitions.append((self.func, self.func in self.static, result))
+        self.uses_extent(self.object_record(node.decl.type.type), node.decl, "a by-value return")
         params = node.decl.type.args
         self.env.append({})
         abi = record_of(self.tu, node.decl.type.type) is None
         for i, p in enumerate(params.params if params else ()):
             if not isinstance(p, c_ast.Decl):
                 break
+            self.uses_extent(self.object_record(p.type), p, "a by-value parameter")
             self.env[-1][p.name] = p.type
             rec = self.pointee(p.type)
             if rec:
@@ -220,24 +246,71 @@ class References(c_ast.NodeVisitor):
     visit_For = visit_Compound
 
     def visit_Decl(self, node):
+        if node.name:
+            self.uses_extent(self.object_record(node.type), node, "a by-value object")
         if self.func and node.name:
             self.env[-1][node.name] = node.type
         self.generic_visit(node)
 
+    def visit_FuncDecl(self, node):
+        self.uses_extent(self.object_record(node.type), node, "a by-value return")
+        self.generic_visit(node)
+
+    def visit_CompoundLiteral(self, node):
+        self.uses_extent(self.object_record(node.type.type), node, "a compound literal")
+        self.generic_visit(node)
+
+    def visit_ArrayRef(self, node):
+        index = const_int(node.subscript)
+        if index != 0:
+            self.uses_extent(self.pointee(self.expr_type(node.name)), node, "an indexed pointer")
+        if index is not None and isinstance(node.name, c_ast.StructRef):
+            rec, decl = self.member(node.name)
+            field = node.name.field
+            if decl and isinstance(self.resolve(decl.type), c_ast.ArrayDecl) and field.coord:
+                self.array_fields.append((rec, field.name, field.coord.line, field.coord.column, index))
+        self.generic_visit(node)
+
+    def visit_UnaryOp(self, node):
+        if node.op in {"sizeof", "_Alignof"}:
+            t = node.expr.type if isinstance(node.expr, c_ast.Typename) else self.expr_type(node.expr)
+            self.uses_extent(self.object_record(t), node, node.op)
+        elif node.op in {"++", "--", "p++", "p--"}:
+            self.uses_extent(self.pointee(self.expr_type(node.expr)), node, "a pointer increment")
+        self.generic_visit(node)
+
+    def visit_Assignment(self, node):
+        t = self.expr_type(node.lvalue)
+        if node.op in {"+=", "-="}:
+            self.uses_extent(self.pointee(t), node, "pointer arithmetic")
+        elif node.op == "=":
+            self.uses_extent(self.object_record(t), node, "a by-value assignment")
+        self.generic_visit(node)
+
+    def visit_BinaryOp(self, node):
+        if node.op in {"+", "-"}:
+            for operand in (node.left, node.right):
+                self.uses_extent(self.pointee(self.expr_type(operand)), node, "pointer arithmetic")
+        self.generic_visit(node)
+
     def visit_FuncCall(self, node):
-        if isinstance(node.name, c_ast.ID) and isinstance(node.args, c_ast.ExprList):
+        if isinstance(node.name, c_ast.ID):
             name = node.name.name
             if self.binding(name) is None:
                 declared = self.declarations.get(name)
+                static = name in self.static
+                result = self.pointee(declared.type) if declared else None
+                if result:
+                    self.return_calls.append((self.func, node.coord.line, name, static, result))
                 formals = declared.args.params if declared and declared.args else ()
-                for i, arg in enumerate(node.args.exprs):
+                for i, arg in enumerate(node.args.exprs if isinstance(node.args, c_ast.ExprList) else ()):
+                    self.uses_extent(self.object_record(self.expr_type(arg)), arg, "a by-value argument")
                     origin = self.address(arg)
                     if origin:
                         dest = self.pointee(formals[i].type) if i < len(formals) and isinstance(
                             formals[i], (c_ast.Decl, c_ast.Typename)) else None
                         cast = self.pointee(arg.to_type.type) if isinstance(arg, c_ast.Cast) else None
-                        self.calls.append((self.func, node.coord.line, name, i, name in self.static,
-                                           origin, dest, cast))
+                        self.calls.append((self.func, node.coord.line, name, i, static, origin, dest, cast))
         self.generic_visit(node)
 
     def visit_StructRef(self, node):
@@ -245,6 +318,17 @@ class References(c_ast.NodeVisitor):
         coord = node.field.coord
         if coord and Path(coord.file).as_posix() == self.path:
             self.fields.append((rec, node.field.name, coord.line, coord.column))
+            chain = []
+            part = node
+            while isinstance(part, c_ast.StructRef):
+                field = part.field
+                chain.append((field.name, field.coord.line, field.coord.column))
+                if part.type != "." or not isinstance(part.name, c_ast.StructRef):
+                    break
+                part = part.name
+            if len(chain) > 1:
+                root, _ = self.member(part)
+                self.field_chains.append((root, tuple(reversed(chain))))
         self.generic_visit(node)
 
 
@@ -275,7 +359,7 @@ def selected_records(tu, path):
 
 
 def member_dependencies(tu, node, parent_spell):
-    headers, private = set(), set()
+    headers, private, forwards = set(), set(), set()
     self_ref = False
 
     class Deps(c_ast.NodeVisitor):
@@ -291,7 +375,14 @@ def member_dependencies(tu, node, parent_spell):
                 name = base.names[0]
                 self.add(name, tu.typedefs[name].coord)
 
-        def visit_Struct(self, base):
+        def visit_PtrDecl(self, pointer):
+            target = pointer.type
+            if isinstance(target, c_ast.TypeDecl) and isinstance(target.type, (c_ast.Struct, c_ast.Union)):
+                self.record(target.type, pointer=True)
+            else:
+                self.generic_visit(pointer)
+
+        def record(self, base, pointer=False):
             nonlocal self_ref
             kind = lm.kind_of(base)
             if base.decls is not None:
@@ -301,9 +392,13 @@ def member_dependencies(tu, node, parent_spell):
                 decl = tu.tags.get((kind, base.name))
                 if spell == parent_spell:
                     self_ref = True
+                elif pointer and (decl is None or not decl.coord
+                                  or not Path(decl.coord.file).as_posix().startswith("include/")):
+                    forwards.add(spell)
                 else:
                     self.add(spell, decl.coord if decl else None)
 
+        visit_Struct = record
         visit_Union = visit_Struct
 
         def visit_Enum(self, base):
@@ -312,7 +407,7 @@ def member_dependencies(tu, node, parent_spell):
                 private.add(f"enum {base.name}")
 
     Deps().visit(node.type)
-    return sorted(headers), sorted(private), self_ref
+    return sorted(headers), sorted(private), sorted(forwards), self_ref
 
 
 def rom_loads(params):

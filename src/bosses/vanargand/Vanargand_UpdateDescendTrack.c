@@ -1,9 +1,6 @@
 #include "global.h"
+#include "bosses/vanargand/vanargand_part_layout.h"
 /* Vanargand_UpdateDescendTrack: starts the unmirrored animation, then runs two motion-track legs (origin heights 0x300 then 0x100) and on completion resets the part animation and flags the state finished (provisional name) */
-struct VanargandPart {
-    u8 pad0[0x10];
-    u16 state;
-};
 struct Vanargand {
     u8 pad0[0x54];
     u8 motionData[0x9C - 0x54];

@@ -20,7 +20,7 @@ static inline int f08026FF0_choose(u32 mode, int normal, int alternate)
 void Count_UpdateSwayReaction(struct StateActor *base, int time)
 {
     struct StateActor *p = base;
-    u8 *position = (u8 *)p + 0x48;
+    u8 *position = (u8 *)&p->bodyId;
     struct ContactPosition *velocity;
     s16 *minimum;
     s16 *maximum;

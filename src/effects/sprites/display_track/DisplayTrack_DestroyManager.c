@@ -9,7 +9,7 @@ s32 DisplayTrack_DestroyManager(struct DisplayTrackManager *manager)
         u8 *base;
         /* Manager+44 is the first sprite; manager+D0 is its owned resource. */
         Sprite_Remove((void *)(offset + (u32)manager + 0x44));
-        base = (u8 *)manager + 0xD0;
+        base = (u8 *)&manager->entries[0].ownedResource;
         resource = (void **)(base + offset);
         if (*resource) {
             Shadow_Destroy(*resource);

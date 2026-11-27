@@ -1,11 +1,6 @@
 #include "global.h"
 #include "engine/ram.h"
-struct Weather {
-    u8 pad[29];
-    u8 state;
-    u8 pad1e[62];
-    u32 frame;
-};
+#include "effects/weather/weather_layout.h"
 extern int (*const gUnk_08604C80[])(struct Weather *);
 extern u8 *gGameState;
 void Weather_UpdateTilemapScroll(void *);

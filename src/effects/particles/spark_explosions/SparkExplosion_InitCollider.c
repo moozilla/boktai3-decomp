@@ -1,11 +1,9 @@
 #include "effects/particles/burst_emitter.h"
+#include "scene/collision/packed_contact_vector.h"
 void Collider_SetAttackProperties(void *, s32, s32, s32, s32, s32);
-struct BurstEmitterSize {
-    u32 x : 16, y : 16, z : 16;
-};
 void SparkExplosion_InitCollider(struct BurstEmitter *emitter, s32 a, s32 b, s32 c, s32 config)
 {
-    struct BurstEmitterSize size, offset;
+    struct PackedContactVector size, offset;
     struct ContactCollider *collider = &emitter->collider;
     size.x = 256;
     size.y = 256;

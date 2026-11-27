@@ -26,6 +26,7 @@
 #include "scene/collision/scene_actor_delayed_response.h"
 #include "scene/actor/scene_actor_init_actor.h"
 #include "scene/motion/scene_actor_chase_shared.h"
+#include "recovered/packed_centipede_halfwords_layout.h"
 
 void Golem_CenterPositionInCell(struct ContactPosition *position)
 {
@@ -414,19 +415,11 @@ void Skeleton_ClearPendingFlag(struct ChaseActor *actor)
     }
 }
 
-struct H {
-    u32 lo : 16;
-    u32 hi : 16;
-};
 
-struct Tail {
-    u32 lo : 16;
-    u32 : 16;
-};
 
 struct Z {
-    struct H a;
-    struct Tail b;
+    struct PackedCentipedeHalfwords a;
+    struct PackedCentipedeHalfwords b;
 };
 
 void SceneActorCollision_InitBody(u8 *, struct Z *, struct Z *, void (*)(void), u8 *);

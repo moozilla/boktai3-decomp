@@ -3,12 +3,10 @@
 #include "bosses/vanargand/vanargand_stage_colors.h"
 #include "engine/input.h"
 #include "engine/engine_globals.h"
+#include "scene/collision/contact_position.h"
 
 // confidence=low: applies camera, collision, palette and shake presentation effects.
 #define RANDOM_TABLE_ADDR            0x0203B400
-struct PresentationVec {
-    s16 x, y, z, pad;
-};
 struct PresentationCollider {
     u8 pad0[6];
     u16 flags;
@@ -18,27 +16,27 @@ struct PresentationAnimation {
     u32 header[2];
     u32 flags;
     u8 padC[0x20 - 0xC];
-    struct PresentationVec collisionPosition;
+    struct ContactPosition collisionPosition;
     u8 pad28[0x60 - 0x28];
 };
 struct VanargandPresentation {
     u8 pad0[0x54];
-    struct PresentationVec position;
+    struct ContactPosition position;
     u8 pad5C[0x9C - 0x5C];
     u32 flags;
     u8 padA0[0xCC - 0xA0];
     u8 heading;
     u8 padCD[0x110 - 0xCD];
-    struct PresentationVec *target;
+    struct ContactPosition *target;
     u8 pad114[0x18C - 0x114];
     struct PresentationAnimation animation;
     u8 drawable[0x20C - 0x1EC];
-    struct PresentationVec blendPosition;
+    struct ContactPosition blendPosition;
     u8 pad214[0x21C - 0x214];
     u8 paletteState[0x234 - 0x21C];
     u32 shadowFlags;
     u8 pad238[0x418 - 0x238];
-    struct PresentationVec cameraPosition;
+    struct ContactPosition cameraPosition;
     u8 pad420[0x4FC - 0x420];
     u32 partFlags;
     u8 pad500[0x56C - 0x500];
@@ -90,7 +88,7 @@ static inline s32 Scale(s32 value)
         return value >> 12;
     return -(-value >> 12);
 }
-static inline void Direction(struct PresentationVec *v, s32 angle, s32 length)
+static inline void Direction(struct ContactPosition *v, s32 angle, s32 length)
 {
     v->x = Scale(gUnk_086149C4[(angle + 64) & 255] * length);
     v->y = 0;
@@ -256,7 +254,7 @@ void Vanargand_UpdatePresentation(struct VanargandPresentation *p)
     if (p->mode == 1)
         p->partFlags |= 1;
     if (TestActorFlag(0x40000, self)) {
-        struct PresentationVec destination;
+        struct ContactPosition destination;
         Direction(&destination, self->heading, 128);
         destination.x += 1024;
         destination.y += 256;

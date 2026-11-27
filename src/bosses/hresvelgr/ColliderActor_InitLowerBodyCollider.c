@@ -1,8 +1,6 @@
 #include "global.h"
 #include "engine/engine.h"
-struct ColliderActorExtent {
-    s32 x : 16, y : 16, z : 16, pad : 16;
-};
+#include "scene/collision/packed_contact_vector.h"
 struct ColliderActorRotation {
     s16 x, y, z;
 };
@@ -12,7 +10,7 @@ struct ColliderActor {
     u8 pad5A[0x248 - 0x5a];
     u8 collider[0x29c - 0x248];
     u8 lowerCollider[0x38c - 0x29c];
-    struct ColliderActorExtent offset;
+    struct PackedContactVector offset;
     struct ColliderActorRotation rotation;
 };
 void Hresvelgr_OnSecondaryContact(void);
@@ -20,7 +18,7 @@ void Collider_SetBodyProperties(void *, s32, s32, s32);
 void ColliderActor_InitLowerBodyCollider(struct ColliderActor *actor, s32 mode)
 {
     void *collider = actor->lowerCollider;
-    struct ColliderActorExtent size, offset;
+    struct PackedContactVector size, offset;
     size.x = 256;
     size.y = 256;
     size.z = 256;

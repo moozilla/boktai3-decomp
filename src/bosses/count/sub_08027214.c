@@ -3,6 +3,7 @@
 #include "scene/terrain/terrain_cell_probe.h"
 #include "scene/motion/scene_actor_charge_offset.h"
 #include "npc/story_character/state_actor.h"
+#include "scene/collision/contact_position.h"
 
 void SceneActors_RunFirstEventScript(void *, void *);
 void SceneActors_RunSecondEventScript(void *, void *);
@@ -21,16 +22,12 @@ struct __attribute__((packed)) DeathState {
     u8 value;
 };
 
-struct DeathVector {
-    s16 x, y, z, pad;
-};
-
 struct DeathActor {
     u8 pad0[0x51];
     u8 angle;
     u8 pad52[0x2];
     struct Pos16 position;
-    struct DeathVector velocity;
+    struct ContactPosition velocity;
     u8 pad64[0x38];
     u32 flags;
     u8 padA0[0x2];
@@ -51,7 +48,7 @@ struct DeathActor {
     u8 animationFlags;
     u8 pad25E[0x2];
     u8 scriptContext[0xcc];
-    struct DeathVector origin;
+    struct ContactPosition origin;
     u8 pad334[0xe];
     u8 heading;
     u8 variant;

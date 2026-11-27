@@ -2,6 +2,7 @@
 #include "scene/motion/scene_facing.h"
 #include "engine/video/render.h"
 #include "player/player.h"
+#include "scene/collision/packed_contact_vector.h"
 
 extern u8 *gSceneEventDispatchState;
 
@@ -74,22 +75,16 @@ static inline void setSpeed(struct SceneNpc *npc, s32 speed)
     npc->speedSquared = speed * speed;
 }
 
-struct PackedVec {
-    s32 x : 16;
-    s32 y : 16;
-    s32 z : 16;
-    s32 pad : 16;
-};
 struct Camera {
     u8 pad[0x30];
-    struct PackedVec position;
+    struct PackedContactVector position;
 };
 void *memset(void *, s32, u32);
 void *SceneMessages_FindScript(s32);
 void Trigger_CreateDrop(void *, s32, s32, void *, void *, s32, s32, s32);
 void FloatingItemEffect_Spawn(s32, s32, s32, s32, void *, void *, s32, void *);
 void SunOrb_GetOrCreateManager(void);
-s32 SunOrb_CreateSceneTargeted(struct PackedVec *);
+s32 SunOrb_CreateSceneTargeted(struct PackedContactVector *);
 void Palette_InterpolateBanks(void *, void *, void *, s32, s32);
 void SceneNpc_DispatchCutsceneCommands(struct SceneNpc *npc)
 {
@@ -136,7 +131,7 @@ void SceneNpc_DispatchCutsceneCommands(struct SceneNpc *npc)
                     }
                 } break;
                 case 69: {
-                    struct PackedVec pos;
+                    struct PackedContactVector pos;
                     s32 a = m[4], b = m[5];
                     struct ContactPosition *p = &npc->body.position;
                     pos = (*(struct Camera **)gPlayers)->position;
@@ -404,7 +399,7 @@ void SceneNpc_DispatchCutsceneCommands(struct SceneNpc *npc)
                 } break;
                 case 100: {
                     struct SceneCharacterEffects *sub = &npc->effects;
-                    struct PackedVec pos;
+                    struct PackedContactVector pos;
                     pos.x = (u16)m[4];
                     pos.y = (u16)m[5];
                     pos.z = (u16)m[6];

@@ -1,5 +1,6 @@
 #include "global.h"
 #include "scene/collision/contact_collider.h"
+#include "recovered/script_call_arguments_layout.h"
 struct ArmorContactOwner {
     u8 pad0[0xB18];
     u32 actorId;
@@ -28,17 +29,12 @@ void Armor_UpdateBehaviorAfterContact(void *, s32, u32, s32);
 void SceneHud_SetTimedState(u32, s32, s32, s32, s32, s32);
 void DamageNumberDisplay_Show(void *, s32, s32, void *, void *, s32);
 void Sound_PlaySongChecked(u32);
-struct ContactScriptArgs {
-    u32 count : 16;
-    u32 pad : 16;
-    s32 *values;
-};
 void Script_Call(u32, void *);
 
 void Armor_ReceiveColliderContact(struct ContactCollider *attack, struct ContactCollider *contact,
                                   struct ArmorContactOwner *input)
 {
-    struct ContactScriptArgs args;
+    struct ScriptCallArguments args;
     struct ArmorContactOwner *p;
     s32 originalDamage;
     s32 damage;
