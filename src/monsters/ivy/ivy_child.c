@@ -6,12 +6,7 @@
 #include "scene/collision/contact_collider.h"
 #include "engine/ram.h"
 #include "engine/engine_globals.h"
-
-struct IvyBurstVector {
-    s32 x : 16;
-    s32 y : 16;
-    s32 z : 16;
-};
+#include "scene/collision/packed_contact_vector.h"
 
 struct IvyBurstScene {
     u8 unknown0[0x1C];
@@ -64,7 +59,7 @@ struct IvyBurstPrefix {
     u8 unknownB6C[2];
     u8 direction;
     u8 unknownB6F[0x15];
-    struct IvyBurstVector position;
+    struct PackedContactVector position;
     u8 unknownB8C[0x24];
     u8 shadow[0x6C];
     struct ContactCollider colliderA, colliderB;
@@ -187,8 +182,8 @@ void Ivy_UpdateDefeatBurst(struct IvyBurstPrefix *actor)
         Callback_InvokeActor(actor, actor->callback);
     remainder = Mod(actor->counter, 2);
     if (remainder == 0) {
-        struct IvyBurstVector range;
-        struct IvyBurstVector position;
+        struct PackedContactVector range;
+        struct PackedContactVector position;
         struct SceneVec offset;
         actor->effectFlags |= 1;
         actor->flash = 0;

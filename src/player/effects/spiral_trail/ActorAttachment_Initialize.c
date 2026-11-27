@@ -1,29 +1,9 @@
-#include "global.h"
+#include "player/effects/spiral_trail.h"
+#include "player/player.h"
 
-struct AttachmentVector {
-    s16 x, y, z, pad;
-};
-struct AttachmentParent {
-    u8 pad0[0x30];
-    struct AttachmentVector position;
-    u8 pad38[0x457 - 0x38];
-    u8 variant;
-};
-struct ActorAttachment {
-    u8 pad0[0x18];
-    struct AttachmentParent *parent;
-    struct AttachmentVector offset;
-    u8 kind, variant;
-    u8 pad26[2];
-    u16 value28, value2A;
-    u8 pad2C[0x284 - 0x2C];
-    u8 mode;
-};
-void AttachmentSprite_Setup(struct ActorAttachment *, struct AttachmentVector *);
-void sub_08236DC4(struct ActorAttachment *);
 
-s32 ActorAttachment_Initialize(struct ActorAttachment *p, struct AttachmentParent *parent, u32 kind,
-                               struct AttachmentVector *offset, u32 a, u32 b, u32 mode)
+s32 ActorAttachment_Initialize(struct SpiralTrailTask *p, struct Player *parent, u32 kind,
+                               struct ContactPosition *offset, u32 a, u32 b, u32 mode)
 {
     p->kind = kind;
     p->parent = parent;
@@ -34,11 +14,11 @@ s32 ActorAttachment_Initialize(struct ActorAttachment *p, struct AttachmentParen
     } else {
         p->offset = *offset;
     }
-    p->variant = p->parent->variant;
-    p->value28 = a;
-    p->value2A = b;
+    p->parentMode = p->parent->tetherMode;
+    p->emissionLimit = a;
+    p->fadeLimit = b;
     p->mode = mode;
-    AttachmentSprite_Setup(p, &p->parent->position);
+    AttachmentSprite_Setup(p, (const struct ContactPosition *)&p->parent->position);
     if (p->mode == 1)
         sub_08236DC4(p);
     return 0;

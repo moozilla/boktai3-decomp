@@ -1,7 +1,5 @@
 #include "global.h"
-struct Pair33A {
-    u32 a, b;
-};
+#include "effects/bursts/pair33_a_layout.h"
 void ChargedBurst_InitCoreEffect(u8 *);
 void ChargedBurst_InitParticles(u8 *);
 void ChargedBurst_InitCollider(u8 *, u32, u32, u32);

@@ -1,8 +1,8 @@
-#include "global.h"
+#include "player/effects/spiral_trail.h"
 
-u32 Sprite_Remove(u8 *);
+void Sprite_Remove(void *);
 
-void SpiralTrail_RemoveSprite(u8 *p)
+void SpiralTrail_RemoveSprite(struct SpiralTrailTask *p)
 {
-    Sprite_Remove(p + 0x2C);
+    Sprite_Remove(&p->sprite.drawable);
 }

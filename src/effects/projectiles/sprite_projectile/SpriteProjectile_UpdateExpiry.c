@@ -2,25 +2,19 @@
 #include "engine/ram.h"
 #include "engine/engine_globals.h"
 #include "player/cutscene/player_cue_sequence.h"
-struct ParticleVector {
-    u16 x, y, z, unused;
-};
-struct ParticleSequence {
-    const u16 *commands;
-    u8 flags, frameCount, frameWeight, duration;
-    u16 index, unknownA, speed, elapsed;
-};
+#include "effects/particles/particle_emission_vector_layout.h"
+#include "engine/video/display_sequence.h"
 struct Projectile {
     u32 flags;
     u8 unknown4[2], angle, unknown7[9];
     u16 frame;
     u8 unknown12[10];
-    struct ParticleVector position;
+    struct ParticleEmissionVector position;
     u8 unknown24[8];
-    struct ParticleSequence sequence;
+    struct DisplaySequenceState sequence;
     u8 unknown3C[0x1C];
     u8 collider[0x58];
-    struct ParticleVector velocity;
+    struct ParticleEmissionVector velocity;
     u8 unknownB8;
     s8 spin;
     u8 spinScale, colliderFlags;
@@ -45,7 +39,7 @@ struct TerrainMap {
 void *TerrainModifiers_FindCellOverride(u32, u32);
 s32 Math_Atan2(s32, s32);
 s32 Div(s32, s32);
-static inline s32 Cell(struct ParticleVector *p)
+static inline s32 Cell(struct ParticleEmissionVector *p)
 {
     s32 x = (s16)p->x >> 8, z = (s16)p->z >> 8;
     if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)

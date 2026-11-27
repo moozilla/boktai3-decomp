@@ -1,32 +1,30 @@
 #include "global.h"
+#include "effects/particles/impact_burst.h"
 /* ImpactBurst_EmitAngledBurst: Builds a particle Config and emits a single burst with vertical/horizontal/pitch angle ranges (matches existing src alias) */
-struct Config {
-    u16 v[20];
-};
-void ImpactBurst_Create(int, void *, struct Config *);
+void ImpactBurst_Create(int, void *, struct AnimatedParticleConfig *);
 void ImpactBurst_EmitAngledBurst(void *pos, int type, int flags, int speed, int vertical,
                                        int verticalRange, int horizontal, int horizontalRange,
                                        int pitch, int pitchRange)
 {
-    struct Config s;
-    s.v[0] = type;
-    s.v[1] = flags;
-    s.v[3] = speed;
-    s.v[4] = vertical;
-    s.v[5] = verticalRange;
-    s.v[6] = horizontal;
-    s.v[7] = horizontalRange;
-    s.v[8] = pitch;
-    s.v[9] = pitchRange;
-    s.v[10] = 0;
-    s.v[11] = 255;
-    s.v[12] = 255;
-    s.v[13] = 0;
-    s.v[14] = 255;
-    s.v[15] = 0;
-    s.v[16] = 255;
-    s.v[17] = 0;
-    s.v[18] = 255;
-    s.v[19] = 0;
+    struct AnimatedParticleConfig s;
+    s.type = type;
+    s.flags = flags;
+    s.speed = speed;
+    s.vertical = vertical;
+    s.verticalRange = verticalRange;
+    s.horizontal = horizontal;
+    s.horizontalRange = horizontalRange;
+    s.pitch = pitch;
+    s.pitchRange = pitchRange;
+    s.yaw = 0;
+    s.yawRange = 255;
+    s.verticalStart = 255;
+    s.verticalStartRange = 0;
+    s.verticalDecay = 255;
+    s.verticalDecayRange = 0;
+    s.horizontalStart = 255;
+    s.horizontalStartRange = 0;
+    s.horizontalDecay = 255;
+    s.horizontalDecayRange = 0;
     ImpactBurst_Create(1, pos, &s);
 }

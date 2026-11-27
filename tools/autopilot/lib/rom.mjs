@@ -23,6 +23,7 @@ export function holdTicks(reads) {
 
 // keyTickPc: the keypad load in the tick function's prologue (BOKTAI3_KEY_TICK_PC in
 // tools/emu/harness.c), so untraced `tick` replays keep mGBA's normal frame loop.
+// coverage: 'exec' keeps execution maps without recording ROM data reads.
 // Returns the harness warnings about ticks; a missed holdt throws.
 export function runRom(script, out, { save, coverage = false, render = true, timeout = 90_000, keyTickPc } = {}) {
   const local = path.join(root, 'build/emu/harness');
@@ -30,10 +31,12 @@ export function runRom(script, out, { save, coverage = false, render = true, tim
   const env = { ...process.env };
   delete env.BOKTAI3_SAV;
   delete env.BOKTAI3_NO_COVERAGE;
+  delete env.BOKTAI3_EXEC_ONLY;
   delete env.BOKTAI3_HEADLESS;
   delete env.BOKTAI3_KEY_TICK_PC;
   if (save) env.BOKTAI3_SAV = path.resolve(save);
   if (!coverage) env.BOKTAI3_NO_COVERAGE = '1';
+  if (coverage === 'exec') env.BOKTAI3_EXEC_ONLY = '1';
   if (!render) env.BOKTAI3_HEADLESS = '1';
   if (keyTickPc) env.BOKTAI3_KEY_TICK_PC = keyTickPc.toString(16);
   const run = spawnSync(harness, [rom, script, out], {

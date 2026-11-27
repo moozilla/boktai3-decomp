@@ -1,4 +1,5 @@
 #include "global.h"
+#include "engine/engine_pause.h"
 #include "engine/ram.h"
 #include "engine/engine_globals.h"
 #include "minigames/coffin_bike/coffin_bike.h"
@@ -54,13 +55,12 @@ void MotionActor_DispatchRequestedState(struct CoffinBike *actor)
         *flags = mask;
         SetCallback(actor, sub_08116E44, zero);
         {
-            u32 mask = 0x800;
-            if (!((gEngineFlags | gScenePauseFlags) & mask)) {
+            if (!Engine_PauseBits(0x800)) {
                 StageIconDisplay_Create(1, 0, 0, actor);
             }
         }
         state->damageTimer = zero;
-        state->pendingDamage = zero;
+        state->palette.pendingDamage = zero;
     } else {
         u8 *flags;
         if (TestStateFlags(state, 2, &flags)) {

@@ -100,10 +100,10 @@ void sub_0803BC88(struct ScenePoolActor *a, struct ScenePoolEntry *e, u32 index)
     }
     {
         Character_GetHeightAdjustedPosition(a, &pos);
-        SpatialIndex_SetPosition((struct SpatialEntry *)&a->motionFlags, pos.x, pos.y, pos.z);
+        SpatialIndex_SetPosition(&a->motionCollider, pos.x, pos.y, pos.z);
         h = *ph;
         heading = (s16)h;
-        motion = &a->motionFlags;
+        motion = &a->motionCollider.flags;
         if (heading < 0) {
             SpatialIndex_SetPosition(&a->hitCollider, pos.x, pos.y, pos.z);
             contact = &a->hitCollider;

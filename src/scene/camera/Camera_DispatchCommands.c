@@ -1,14 +1,11 @@
 #include "scene/camera/scene_camera_controller.h"
-
-struct Vec {
-    u16 x, y, z, w;
-};
+#include "scene/camera/scene_camera_vector_layout.h"
 
 void Camera_SetMessageCompletionMode(struct SceneCameraController *);
 void Camera_ConsumePendingMessage(struct SceneCameraController *);
 void Camera_Reset(void);
-void Camera_SnapTo(struct Vec *);
-void Camera_PanTo(s32, struct Vec *);
+void Camera_SnapTo(struct SceneCameraVector *);
+void Camera_PanTo(s32, struct SceneCameraVector *);
 void Camera_ReturnToDefault(s32);
 void Camera_SetSway(s32, s32, s32);
 void Camera_FollowPlayer(s32);
@@ -17,8 +14,8 @@ void Camera_DispatchCommands(struct SceneCameraController *camera)
 {
     struct SceneEventReceiver *entry = &camera->receiver.queue;
     s32 i;
-    struct Vec snap;
-    struct Vec pan;
+    struct SceneCameraVector snap;
+    struct SceneCameraVector pan;
 
     i = 0;
     if (i < entry->count[gSceneEventDispatchState->phase])

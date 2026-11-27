@@ -1,21 +1,19 @@
-#include "global.h"
+#include "player/effects/recoil_puff_sprite.h"
 #include "engine/ram.h"
 
-u8 *Task_Create(u32, u32);
-void Task_SetCallbacks(u8 *, void (*)(void), void (*)(void));
-s32 RecoilPuffPool_Init(u8 *);
-void Task_Kill(u8 *);
-void RecoilPuffPool_UpdateTask(void);
-void RecoilPuffPool_DestroyTask(void);
+void *Task_Create(u32, u32);
+void Task_SetCallbacks(void *, void (*)(void), void (*)(void));
+void Task_Kill(void *);
 
-u8 *RecoilPuffPool_GetOrCreate(void)
+struct RecoilPuffPool *RecoilPuffPool_GetOrCreate(void)
 {
-    u8 *p;
+    struct RecoilPuffPool *p;
     if (gRisingSpritePool != 0)
-        return gRisingSpritePool;
-    p = Task_Create(0xa, 0x19c);
+        return (struct RecoilPuffPool *)gRisingSpritePool;
+    p = Task_Create(0xa, sizeof(*p));
     if (p != 0) {
-        Task_SetCallbacks(p, RecoilPuffPool_UpdateTask, RecoilPuffPool_DestroyTask);
+        Task_SetCallbacks(p, (void (*)(void))RecoilPuffPool_UpdateTask,
+                          (void (*)(void))RecoilPuffPool_DestroyTask);
         if (RecoilPuffPool_Init(p) < 0) {
             Task_Kill(p);
             return 0;

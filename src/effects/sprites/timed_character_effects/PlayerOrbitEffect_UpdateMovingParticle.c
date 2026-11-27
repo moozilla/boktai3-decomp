@@ -34,7 +34,7 @@ s32 PlayerOrbitEffect_UpdateMovingParticle(struct OrbitParticle *p)
             p->frame = 4;
         else if (timer == 4) {
             u16 *source = &p->variant;
-            struct ImpactSprite *sprite = (void *)((u8 *)p + 0x18);
+            struct ImpactSprite *sprite = (void *)&p->spriteFlags;
             s32 variant = *source;
             if (variant & 1)
                 sprite->frame = 7;

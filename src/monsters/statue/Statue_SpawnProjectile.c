@@ -1,3 +1,4 @@
+#include "scene/collision/contact_position.h"
 #define gSineTable gUnk_086149C4
 #include "global.h"
 
@@ -6,13 +7,9 @@
 // Collision arguments at 0x120-0x124 and movement argument at 0x136
 // retain neutral names until their setter contracts are better understood.
 
-struct StatuePosition {
-    s16 x, y, z, unused;
-};
-
 struct Statue {
     u8 unk0[0x40];
-    struct StatuePosition position;
+    struct ContactPosition position;
     u8 unk48[0x120 - 0x48];
     s16 collisionArg0;
     s16 collisionArg1;
@@ -31,7 +28,7 @@ void ProjectileConfig_SetCollisionExtents(void *, u32, u32, u32);
 void ProjectileConfig_SetCollisionOffset(void *, s32, s32, s32);
 void ProjectileConfig_SetMovement(void *, u32, u32, u32, s32);
 void ProjectileConfig_SetAnimation(void *, u32, u32, u32);
-s32 Projectile_SpawnFromConfig(void *, struct StatuePosition *);
+s32 Projectile_SpawnFromConfig(void *, struct ContactPosition *);
 void Sound_PlaySong(u32);
 
 static inline s32 truncate12(s32 n)
@@ -39,7 +36,7 @@ static inline s32 truncate12(s32 n)
     return n >= 0 ? n >> 12 : -((-n) >> 12);
 }
 
-static inline void polar(struct StatuePosition *v, u8 angle, s32 radius)
+static inline void polar(struct ContactPosition *v, u8 angle, s32 radius)
 {
     v->x = truncate12(gSineTable[(angle + 64) & 255] * radius);
     v->y = 0;
@@ -49,18 +46,18 @@ static inline void polar(struct StatuePosition *v, u8 angle, s32 radius)
 void Statue_SpawnProjectile(struct Statue *actor)
 {
     u8 config[0x5c];
-    struct StatuePosition delta;
-    struct StatuePosition position;
+    struct ContactPosition delta;
+    struct ContactPosition position;
     {
-        struct StatuePosition *pos = &position;
+        struct ContactPosition *pos = &position;
         *pos = actor->position;
         pos->y += 300;
     }
     polar(&delta, (actor->direction << 6) + 192, 128);
     {
-        struct StatuePosition *p = &position;
-        struct StatuePosition *d = &delta;
-        const struct StatuePosition *first = &delta;
+        struct ContactPosition *p = &position;
+        struct ContactPosition *d = &delta;
+        const struct ContactPosition *first = &delta;
         position.x += first->x;
         p->y += d->y;
         p->z += d->z;

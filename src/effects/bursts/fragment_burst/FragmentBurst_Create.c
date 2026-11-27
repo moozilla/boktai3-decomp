@@ -3,23 +3,15 @@
 #include "engine/engine.h"
 #include "engine/ram.h"
 #include "engine/video/render.h"
+#include "effects/bursts/fragment_effect_sprite_layout.h"
 
 struct FragmentSequence {
     const u16 *commands;
     u8 flags, frameCount, frameWeight, duration;
     u16 index, unk_0A, speed, elapsed;
 };
-struct FragmentSprite {
-    u32 flags;
-    u8 active, unk_05[2], mode;
-    u8 unk_08[4];
-    void *graphics;
-    u8 unk_10[0xC];
-    struct ContactPosition position;
-    u8 unk_24[8];
-};
 struct FragmentBurst {
-    struct FragmentSprite sprites[4];
+    struct FragmentEffectSprite sprites[4];
     struct FragmentSequence sequences[4];
     struct ContactPosition origin, position;
     u8 collider[0x54];
@@ -123,13 +115,13 @@ void FragmentBurst_Create(struct ContactPosition *position, u32 amount, u32 kind
         out->z = depth - (*(struct ContactPosition *)gCameraOrigin).z;
     }
     for (i = 0; i < 4; i++) {
-        struct FragmentSprite *sprite = &group->sprites[i];
+        struct FragmentEffectSprite *sprite = &group->sprites[i];
         Sprite_Init(sprite, pool->graphics, 0);
         sprite->flags |= 0x11;
-        sprite->mode = 1;
+        sprite->priority = 1;
     }
     for (i = 0; i < 3; i++) {
-        struct FragmentSprite *sprite = &group->sprites[i];
+        struct FragmentEffectSprite *sprite = &group->sprites[i];
         struct FragmentSequence *sequence = &group->sequences[i];
         Anim_SetSequence(sequence, pool->sequenceResource, 15, 0, 0);
         gRandomIndex = (gRandomIndex + 1) & 1023;

@@ -1,8 +1,6 @@
 #include "global.h"
+#include "objects/solar_roots/growth_hazard_position_layout.h"
 
-struct GrowthHazardPosition {
-    s16 x, y, z, unk6;
-};
 struct GrowthHazardEntry {
     u8 unk0[0xE4];
     struct GrowthHazardPosition position;

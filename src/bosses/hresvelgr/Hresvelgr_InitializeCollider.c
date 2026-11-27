@@ -1,6 +1,7 @@
 #include "global.h"
 #include "engine/engine.h"
 #include "engine/math/scene_vec.h"
+#include "scene/collision/contact_position.h"
 struct Hresvelgr {
     u8 unknown0[0x1B4];
     struct SceneVec colliderPosition;
@@ -9,9 +10,7 @@ struct Hresvelgr {
     u8 unknown234[0x124];
     s16 attackPower, attackForce, attackParameter;
 };
-typedef struct {
-    s16 x, y, z;
-} HresvelgrColliderVector;
+typedef struct ContactPosition HresvelgrColliderVector;
 void Collider_IgnoreCallback(void);
 void Collider_SetAttackProperties(void *, s32, s32, s32, s32, s32);
 void Hresvelgr_InitializeCollider(struct Hresvelgr *actor, u16 id)

@@ -1,27 +1,18 @@
 #include "global.h"
 #include "scene/areas/area_effect_link.h"
+#include "link/selection/link_selection_prompt.h"
 #define SceneMenu_SetState LinkSession_SetState
-struct SceneMenu {
-    u8 pad0[0x30];
-    u32 timer;
-    u8 pad34[0x84];
-    s32 window;
-    u8 padBC[0x1A0];
-    const u8 *script;
-    u32 field260;
-    u32 field264;
-};
-u8 LinkSession_ConsumeStateEntry(struct SceneMenu *);
-s32 LinkSession_CheckSessionReady(struct SceneMenu *);
-void LinkSession_BeginShutdown(struct SceneMenu *, void (*)(void));
-void LinkSession_SetState(struct SceneMenu *, u32, void (*)(void));
+u8 LinkSession_ConsumeStateEntry(struct LinkSelectionPrompt *);
+s32 LinkSession_CheckSessionReady(struct LinkSelectionPrompt *);
+void LinkSession_BeginShutdown(struct LinkSelectionPrompt *, void (*)(void));
+void LinkSession_SetState(struct LinkSelectionPrompt *, u32, void (*)(void));
 void ScriptPanel_OpenTextWindow(void);
 void SceneMenu_UpdateRecords(void);
 s32 TextWindow_Create(s32, s32, s32, s32);
 s32 TextWindow_SetScript(s32, const u8 *);
 s32 TextWindow_Refresh(s32, s32);
 void TextWindow_StartPlayback(s32);
-s32 SceneMenu_BeginTimedMessage(struct SceneMenu *p)
+s32 SceneMenu_BeginTimedMessage(struct LinkSelectionPrompt *p)
 {
     if (LinkSession_ConsumeStateEntry(p)) {
         p->field260 = 0;

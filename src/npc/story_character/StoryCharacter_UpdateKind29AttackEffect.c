@@ -1,12 +1,9 @@
 #include "npc/story_character/scene_character.h"
+#include "npc/story_character/vec081_cbe30_layout.h"
 
 s32 DisplayAnimation_TestFinished(struct DisplayAnimation *);
 u8 *TimedSpriteEffect_Create(u8 *pos, u32 flag, s32 duration, s32 arg3, s32 arg4, s32 arg5,
                              s32 arg6, s32 arg7, u32 arg8);
-
-struct VecCB3F4 {
-    s16 x, y, z, pad;
-};
 
 void StoryCharacter_UpdateKind29AttackEffect(u32 a, struct SceneNpc *actor, u32 c)
 {
@@ -105,7 +102,7 @@ void StoryCharacter_UpdateKind29AttackEffect(u32 a, struct SceneNpc *actor, u32 
                 s32 x = *coords++;
                 s32 y = *coords++;
                 s32 z = *coords;
-                struct VecCB3F4 v;
+                struct Vec081CBE30 v;
                 s16 *q = (s16 *)&v;
                 s32 vx = x - 0x20;
                 s32 vy = y + 0x180;

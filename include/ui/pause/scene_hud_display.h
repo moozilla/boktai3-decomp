@@ -60,6 +60,10 @@ struct SceneHudNavigationPage {
     u8 message;
 };
 
+struct MapMenuMarker {
+    u8 type, page, x, y;
+};
+
 /* Scene HUD owner: offsets established by 081651B0, 081658C8 and its initializer 08178FC8. */
 struct SceneHudState {
     struct Task task;
@@ -199,7 +203,8 @@ struct SceneHudState {
     struct AnimSprite comparisonIndicators[2]; /* 0x3340 */
     struct AnimSprite statMarkers[3][3];       /* 0x3400: base, bonus, delta */
     struct AnimSprite settingsArrows[2];       /* 0x3760: left and right */
-    u8 unknown3820[0x240];
+    struct AnimSprite mapPositionMarkers[2]; /* 0x3820 */
+    u8 unknown38E0[0x180];
     struct AnimSprite navigationArrows[4]; /* 0x3A60: up, down, left, right. */
     struct AnimSprite accountAnimation;    /* 0x3BE0 */
     struct AnimSprite accountChoices[2];   /* 0x3C40 */
@@ -284,13 +289,18 @@ struct SceneHudState {
     u32 accountCompletionScript; /* 0x48F0: script -d, run after account confirmation */
     struct DarkLoanScreen *loanDisplay; /* 0x48F4: optional child account display */
     struct SceneHudNavigationPage *navigationPages; /* 0x48F8 */
-    u8 unknown48FC[8];
+    u8 unknown48FC[4];
+    struct MapMenuMarker *mapMarkers; /* 0x4900 */
     u8 navigationPage, showAllMapLinks;
     u8 unknown4906[2];
     s8 navigationDestinations[4]; /* -1 when there is no displayed link. */
-    u8 unknown490C[0x10];
+    u16 mapScrollX, mapScrollY; /* 0x490C */
+    s16 mapMinScrollX, mapMinScrollY, mapMaxScrollX, mapMaxScrollY;
+    s16 mapFocusX, mapFocusY;
     u16 currentMapPage; /* 0x491C */
-    u8 unknown491E[0xE];
+    u16 mapPositionX, mapPositionY;
+    u16 otherMapPage, otherMapX, otherMapY;
+    u32 hideSpecialMarkers; /* 0x4928 */
     struct FieldHudWidgets fieldWidgets; /* 0x492C */
     u8 initializationFlag; /* 0x4CD8: cleared by both initializers */
     u8 unknown4CD9[3];

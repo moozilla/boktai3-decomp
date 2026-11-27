@@ -14,7 +14,7 @@ void ScenePool_ReleaseActorSlot(struct ScenePoolManager *p, struct ScenePoolActo
     p->seenIds[id >> 5] &= ~(1 << shift);
     CharacterModel_SetAnimationFlags(slot->model, 1);
     ActorMarkerPool_HideMarker(slot->marker);
-    slot->motionFlags |= 1;
+    slot->motionCollider.flags |= 1;
     CallbackList_ResetDispatch(slot);
     slot->entryIndex = -1;
 }

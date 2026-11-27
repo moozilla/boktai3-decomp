@@ -1,10 +1,6 @@
 #include "objects/warp_circle/warp_circle.h"
-struct ScriptParticleArgs {
-    u32 count : 16;
-    u32 pad : 16;
-    u32 *values;
-};
-s32 Script_Call(u32, struct ScriptParticleArgs *);
+#include "script/script_call_arguments_layout.h"
+s32 Script_Call(u32, struct ScriptCallArguments *);
 void WarpCircle_EmitScriptParticles(struct WarpCircle *actor)
 {
     u32 next_2;
@@ -24,7 +20,7 @@ void WarpCircle_EmitScriptParticles(struct WarpCircle *actor)
         if (next_2 == 64) {
             if (actor->particleScriptId) {
                 u32 value;
-                struct ScriptParticleArgs args;
+                struct ScriptCallArguments args;
                 args.count = 1;
                 args.values = &value;
                 value = actor->particleScriptValue;

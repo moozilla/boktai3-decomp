@@ -1,27 +1,6 @@
-#include "global.h"
+#include "player/effects/player_attack_particles.h"
 #include "engine/video/display_sequence_sprite.h"
 
-// Allocate an attack particle and initialize its sequence when requested.
-struct AttackParticleSlot {
-    u32 life, sequence, mode;
-    s32 angle;
-};
-struct AttackParticleOwner {
-    u8 unknown0[0x20];
-    struct ContactPosition position;
-};
-/* PlayerAttackEffect_Create allocates 0x5A8 bytes. Its initializer sets up sixteen slots. */
-struct AttackParticleEffect {
-    u8 taskAndGraphics[0xC4];
-    struct DisplaySequenceSprite sprites[16];
-    struct DisplaySequenceState sequences[16];
-    struct AttackParticleSlot slots[16];
-    u32 frame, unknown588;
-    const u8 *facing, *side;
-    const struct AttackParticleOwner *owner;
-    u32 previous, current, element;
-    void *sequenceResource;
-};
 s32 Math_Atan2(s32, s32);
 void Sprite_ApplyAnimation(struct DisplaySequenceSprite *, const u8 *);
 u32 Anim_RestartSequence(u8 *, u32, u16, u8, u8);

@@ -1,16 +1,7 @@
 #include "global.h"
 #include "engine/engine_globals.h"
 #include "engine/ram.h"
-struct Elem {
-    u32 flags;
-    u8 pad4[0x14];
-    u16 x, y, z;
-    u8 pad1E[10];
-    u16 age, active, dx, dy, dz;
-    u16 pad32;
-    void *data;
-    void (*update)(struct Elem *);
-};
+#include "effects/healing/elem_layout.h"
 void SpriteDrawable_SelectTileFrame(struct Elem *, void *, u32);
 void FlickerParticle_UpdateVerticalMotion(struct Elem *);
 s32 Mod(s32, s32);

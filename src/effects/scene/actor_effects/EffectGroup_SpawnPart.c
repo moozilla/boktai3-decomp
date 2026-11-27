@@ -1,11 +1,5 @@
 #include "effects/effect_group.h"
-struct EffectGroupEntry {
-    u8 state, fadeTimer;
-    u16 frame;
-    u8 unknown4[0xc];
-    u32 flags;
-    u8 unknown14[0x34];
-};
+#include "effects/scene/effect_group_entry_layout.h"
 struct EffectGroup {
     u8 active, mode, cursor, count;
     u8 unknown4[8];

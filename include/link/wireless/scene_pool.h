@@ -105,10 +105,7 @@ struct ScenePoolActor {
     u16 requestedSound, playingSound;
     u8 unknown528[4];
     struct SpatialEntry hitCollider;
-    u32 motionFlags;
-    u8 unknown570[0xa];
-    u8 unknown57a;
-    u8 unknown57b[0x31];
+    struct SpatialEntry motionCollider;
     s32 forwardSpeed, verticalSpeed, lateralSpeed;
     u8 unknown5b8[4];
     s32 previousX;

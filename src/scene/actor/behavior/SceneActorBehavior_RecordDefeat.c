@@ -1,12 +1,6 @@
 #include "scene/motion/scene_actor_chase_shared.h"
 #include "scene/actor/scene_actor_behavior.h"
 void SceneActorAttachment_ReplaceResponseSlot(struct RoomActor *, u32, u32, u32);
-static inline u8 Test(u32 value, u32 mask)
-{
-    if (value & mask)
-        return 1;
-    return 0;
-}
 static inline u16 *CounterAddress(u32 inputOffset)
 {
     u8 *base = (void *)gGameState;
@@ -47,7 +41,7 @@ void SceneActorBehavior_RecordDefeat(struct RoomActor *inputActor)
     }
     actor = early;
     SceneActorAttachment_ReplaceResponseSlot(actor, 0, 0, actor->category);
-    if (Test(gEngineFlags, 0x4800))
+    if (SceneActorChase_Test(gEngineFlags, 0x4800))
         return;
     {
         u32 mask = 0x8000;

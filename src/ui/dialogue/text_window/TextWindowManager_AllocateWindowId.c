@@ -1,5 +1,6 @@
 #include "global.h"
 #include "engine/ram.h"
+#include "ui/dialogue/text_window_manager.h"
 struct TextState {
     u8 x, y, left, top, width, height, palette, style;
     u8 entered, mode, skip, busy, padC, choiceCount, padE, fresh, pad10, voice, toggle, lastWidth,
@@ -23,12 +24,6 @@ struct TextWindow {
     struct TextState text;
     u8 pad170[0x54];
     struct TextWindow *next, *previous;
-};
-struct WindowManager {
-    u8 pad0[0x14];
-    void *script;
-    s32 nextId;
-    struct TextWindow *head;
 };
 void *Heap_Alloc(int);
 void Memory_Clear(void *, int);

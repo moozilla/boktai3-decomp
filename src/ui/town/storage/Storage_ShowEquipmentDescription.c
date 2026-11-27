@@ -1,5 +1,6 @@
 #include "global.h"
 #include "ui/town/shop_panel.h"
+#include "ui/town/equipment_descriptor.h"
 void Inventory_GetEquipmentDescriptor(s32, void *);
 void Presentation_ApplyGraphicData(void *, void *);
 void Presentation_ApplyPackedGraphicData(const void *, u32);
@@ -16,9 +17,6 @@ struct StoragePanel {
     u8 savedSelection;
     u8 unknown1764[0x2c];
     u8 items[1];
-};
-struct EquipmentDescriptor {
-    u32 words[8];
 };
 void Storage_HideItemDetails(struct StoragePanel *);
 void Storage_ShowEquipmentDescription(struct StoragePanel *panel)

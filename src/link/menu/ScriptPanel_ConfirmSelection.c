@@ -1,22 +1,13 @@
 #include "global.h"
+#include "link/link_script_panel.h"
 
 #define ScriptPanel_SetSelection LinkSession_SetMenuRequest
-struct ScriptPanel {
-    u8 unk0[0x23];
-    u8 selection;
-    u8 unk24[0xC];
-    u32 counter;
-    u8 unk34[0x30];
-    u8 buttons[4];
-    u8 unk68[0x68];
-    u32 script;
-};
-u8 LinkSession_ConsumeStateEntry(struct ScriptPanel *);
-void LinkSession_SetState(struct ScriptPanel *, u32, void (*)(void));
+u8 LinkSession_ConsumeStateEntry(struct LinkScriptPanel *);
+void LinkSession_SetState(struct LinkScriptPanel *, u32, void (*)(void));
 void LinkSession_SetMenuRequest(u32);
 void Script_Call(u32, void *);
 void ScriptPanel_PollSelection(void);
-s32 ScriptPanel_ConfirmSelection(struct ScriptPanel *p)
+s32 ScriptPanel_ConfirmSelection(struct LinkScriptPanel *p)
 {
     if (LinkSession_ConsumeStateEntry(p)) {
         s32 i;

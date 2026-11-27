@@ -1,12 +1,8 @@
 #include "objects/pile_driver/pile_driver_rig_setup.h"
-struct SceneRigColliderVector {
-    u32 x : 16;
-    u32 y : 16;
-    u32 z : 16;
-};
+#include "scene/collision/packed_contact_vector.h"
 void PileDriverRig_InitCollider(struct PileDriverRig *rig, u32 power)
 {
-    struct SceneRigColliderVector size, offset;
+    struct PackedContactVector size, offset;
     void *collider = &rig->collider;
     size.x = 128;
     size.y = 128;

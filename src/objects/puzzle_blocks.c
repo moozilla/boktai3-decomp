@@ -3,6 +3,7 @@
 #include "objects/scene_object.h"
 #include "engine/ram.h"
 #include "engine/math/monster_particle_random.h"
+#include "script/script_call_arguments_layout.h"
 
 static inline void scatter(u16 *coordinate, const u16 *sample)
 {
@@ -1000,10 +1001,6 @@ void PuzzleBlock_UpdateFallingObject(struct SceneObject *p)
     }
 }
 
-struct Args {
-    u32 count : 16;
-    s32 *values;
-};
 
 s32 Mod(s32, s32);
 
@@ -1015,7 +1012,7 @@ static inline void setMode(struct SceneDraw *draw, s16 mode)
 void PuzzleBlock_UpdateObjectDisappearance(struct SceneObject *p)
 {
     s32 values[5];
-    struct Args args;
+    struct ScriptCallArguments args;
     if (p->entered) {
         p->entered = 0;
         p->phase = 0;
@@ -1107,7 +1104,7 @@ s32 PuzzleBlock_Update(struct SceneObjectManager *manager)
     struct SceneObject *p = manager->objects;
     s32 i;
     s32 values[5];
-    struct Args args;
+    struct ScriptCallArguments args;
     for (i = 0; i < manager->count; i++, p++) {
         if (!p->active)
             continue;

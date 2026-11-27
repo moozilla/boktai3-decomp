@@ -125,6 +125,15 @@ s32 TerrainOverlay_Update(struct TerrainOverlay *p)
         s32 quadrant, yFixed, y, x, z;
         if (!entry->used)
             continue;
+#ifdef UBFIX
+        /* SceneBody_Unregister can leave the overlay holding a recycled body. */
+        if (SceneBody_GetById(entry->id) != actor) {
+            entry->used = 0;
+            entry->id = 0;
+            entry->actor = 0;
+            continue;
+        }
+#endif
         if (actor->keyframeDisplay && (actor->keyframeDisplay->flags & 1))
             continue;
         {

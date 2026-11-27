@@ -1,15 +1,11 @@
 #include "engine/video/display_sequence_sprite.h"
 #include "effects/screen/background_controller.h"
+#include "objects/items/render_layout.h"
 struct Camera {
     u8 unknown0[0x44];
     s32 screenX, screenY;
 };
 // Collectible defeat: launches a bouncing death animation, then expires.
-struct Render {
-    u32 flags;
-    u8 pad4[12];
-    u16 frame;
-};
 struct Col {
     u8 pad0[0x1C];
     struct Render render;

@@ -125,17 +125,17 @@ s32 PlayerContact_ApplyResponse(struct Player *p, struct ContactCollider *source
                 p->contactActionTag = 0x191;
             Player_QueueStatusEffect(p, 1);
         }
-    } else if (ContactCollider_TestReactionFlags(source, 0x400000)) {
+    } else if ((source->reactionFlags & 0x400000)) {
         if (!(target->costFlags & 2)) {
             if (!p->contactSpecial)
                 p->contactActionTag = 0x133;
             Player_QueueStatusEffect(p, 2);
         }
-    } else if (ContactCollider_TestReactionFlags(source, 0x4000)) {
+    } else if ((source->reactionFlags & 0x4000)) {
         p->contactActionTag = 0x133;
         Player_QueueStatusEffect(p, 3);
         p->contactSpecial = 0;
-    } else if (ContactCollider_TestReactionFlags(source, 0x40000))
+    } else if ((source->reactionFlags & 0x40000))
         Player_EmitQueuedEffects(p);
     if ((ContactCollider_TestReactionFlags(source, 0x8000)) && !(playerFlag(p, 0x100)) &&
         !(playerFlag(p, 0x20000000)))

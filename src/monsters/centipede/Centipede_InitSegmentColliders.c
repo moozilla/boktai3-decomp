@@ -1,9 +1,6 @@
 #include "global.h"
+#include "scene/collision/packed_contact_vector.h"
 /* Centipede_InitSegmentColliders: Sets up body and attack colliders for every tentacle segment */
-
-struct TentaclePacked {
-    s32 x : 16, y : 16, z : 16, pad : 16;
-};
 
 void Collider_Init(void *, u16, u32, u32, u32, void *, void *);
 void Collider_SetBodyProperties(void *, u32, u32, u32);
@@ -39,7 +36,7 @@ static inline void SetAttack(void *collider, u8 *p, s32 variant)
 void Centipede_InitSegmentColliders(u8 *p)
 {
     struct Body080AAE64 *g = *(struct Body080AAE64 **)(p + 0x3d0);
-    struct TentaclePacked size, offset;
+    struct PackedContactVector size, offset;
     s32 i;
     size.x = 64;
     size.y = 128;

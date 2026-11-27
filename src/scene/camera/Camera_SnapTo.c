@@ -2,10 +2,7 @@
 #include "global.h"
 #include "engine/video/render.h"
 #include "engine/ram.h"
-
-struct Vec {
-    s16 x, y, z;
-};
+#include "scene/camera/scene_camera_vector_layout.h"
 
 static inline int project(int input)
 {
@@ -15,7 +12,7 @@ static inline int project(int input)
 
 /* Camera command 1 (snap_to): move the camera to pos at once and recompute
    the scroll origin (gCameraOrigin) from its isometric projection. */
-void Camera_SnapTo(struct Vec *pos)
+void Camera_SnapTo(struct SceneCameraVector *pos)
 {
     struct SceneCameraController *c = ((struct SceneCameraController *)gActiveCamera);
     if (c) {
@@ -26,7 +23,7 @@ void Camera_SnapTo(struct Vec *pos)
         gCamera.position.y = c->position.y;
         gCamera.position.z = c->position.z;
         {
-            struct Vec *out = &gCameraOrigin;
+            struct SceneCameraVector *out = &gCameraOrigin;
             struct CameraPosition *in = &gCamera.position;
             int xy, height, x = in->x, z = in->z;
             out->x = project(x - z);

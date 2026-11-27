@@ -1,4 +1,4 @@
-"""Compare keypad-load counting with instruction-entry counting on the ROM."""
+"""Check that harness tracing and keypad counting preserve the ROM replay."""
 
 import os
 from pathlib import Path
@@ -8,7 +8,9 @@ import time
 import unittest
 
 ROOT = Path(__file__).resolve().parents[2]
-HARNESS = ROOT / "tools/emu/harness"
+HARNESS = ROOT / "build/emu/harness"
+if not HARNESS.is_file():
+    HARNESS = ROOT / "tools/emu/harness"
 ROM = ROOT / "baserom.gba"
 SCRIPT = """trace off
 rtc 1763035200
@@ -57,6 +59,34 @@ class KeyTickTest(unittest.TestCase):
             self.assertEqual(len(results[0][0]), 7)
             self.assertEqual(results[0], results[1])
             print(f"entry {timings[0]:.3f}s; keypad {timings[1]:.3f}s")
+
+    def test_execution_only_preserves_coverage_and_state(self):
+        with tempfile.TemporaryDirectory(prefix="boktai-exec-only-") as tmp:
+            work = Path(tmp)
+            script = work / "replay.txt"
+            script.write_text(SCRIPT.replace("trace off", "trace on")
+                              .replace("holdt A 1", "mark intro\nholdt A 1", 1))
+            env = os.environ.copy()
+            for name in ("BOKTAI3_EXEC_ONLY", "BOKTAI3_NO_COVERAGE", "BOKTAI3_SAV"):
+                env.pop(name, None)
+            full, execution = work / "full", work / "execution"
+            timings = []
+            for out in (full, execution):
+                out.mkdir()
+                if out == execution:
+                    env["BOKTAI3_EXEC_ONLY"] = "1"
+                started = time.monotonic()
+                result = subprocess.run([HARNESS, ROM, script, out], cwd=ROOT, env=env,
+                                        capture_output=True, text=True, check=True, timeout=60)
+                timings.append(time.monotonic() - started)
+                self.assertNotIn("holdt:", result.stderr)
+            for name in ("total.exec", "total.iwram_exec", "total.ewram_exec", "cov-intro.exec",
+                         "ewram.bin", "iwram.bin", "end.ppm"):
+                self.assertEqual((full / name).read_bytes(), (execution / name).read_bytes(), name)
+            for name in ("total.read", "total.word32", "cov-intro.read"):
+                self.assertTrue((full / name).is_file(), name)
+                self.assertFalse((execution / name).exists(), name)
+            print(f"full coverage {timings[0]:.3f}s; execution only {timings[1]:.3f}s")
 
 
 if __name__ == "__main__":

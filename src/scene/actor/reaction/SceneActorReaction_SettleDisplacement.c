@@ -6,15 +6,9 @@
 #include "engine/video/display_sequence.h"
 #include "scene/motion/scene_actor_turn.h"
 #include "scene/motion/scene_actor_chase_shared.h"
+#include "ui/hud/damage_number_display.h"
 
 void SceneActorAttachment_ReplaceResponseSlot(void *, u8, u8, u8);
-
-static inline s32 Reaction_ThirtySecond(s32 value)
-{
-    if (value >= 0)
-        return value >> 5;
-    return -((-value) >> 5);
-}
 
 static inline u8 Reaction_MotionStopped(s32 x, s32 z)
 {
@@ -144,7 +138,7 @@ void SceneActorReaction_SettleDisplacement(struct ChaseActor *actor)
     if (Reaction_MotionStopped(x, z) && (counter <= 0)) {
         struct ContactCollider *collider;
         actor->base.attachmentTimer = 0;
-        actor->base.reactionDirection = (Reaction_ThirtySecond(actor->base.body.direction) + 7) & 7;
+        actor->base.reactionDirection = (DamageNumber_ProjectScale(actor->base.body.direction) + 7) & 7;
         SceneActorChase_SetState(actor, 3, 1, 0);
         SceneActorChase_SetControl(actor, group->animationEndControl, 8);
         SceneActorChase_ClearWordFlags(&actor->base.statusFlags, 2);

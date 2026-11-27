@@ -398,7 +398,7 @@ void Bg_FillTilemapRectangle(s32 layer, s32 x, s32 y, s32 w, s32 h, s32 tile, s3
 
 void Bg_CopyTilemapRectangle(s32, s32, s32, s32, s32, s32 *, s32, s32);
 
-#define DIGIT(i, t)                                                                                \
+#define DIGIT(t)                                                                                   \
     {                                                                                              \
         d = base;                                                                                  \
         while (value > (t) - 1) {                                                                  \
@@ -417,15 +417,15 @@ void Text_DrawNumber(s32 layer, s32 x, s32 y, u32 value, s32 base, s32 count, s3
     s32 rest;
     if (count > 8)
         count = 8;
-    n = 0;
-    DIGIT(0, 10000000)
-    DIGIT(1, 1000000)
-    DIGIT(2, 100000)
-    DIGIT(3, 10000)
-    DIGIT(4, 1000)
-    DIGIT(5, 100)
-    DIGIT(6, 10)
-    DIGIT(7, 1)
+    n = 0; // concession-ok(literal-local): DIGIT appends at n and advances it once per decimal place
+    DIGIT(10000000)
+    DIGIT(1000000)
+    DIGIT(100000)
+    DIGIT(10000)
+    DIGIT(1000)
+    DIGIT(100)
+    DIGIT(10)
+    DIGIT(1)
     rest = n - count;
     Bg_CopyTilemapRectangle(layer, x, y, count, 1, digits + rest, 0, arg7);
 }

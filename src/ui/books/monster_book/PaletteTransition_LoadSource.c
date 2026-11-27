@@ -1,14 +1,7 @@
 #include "global.h"
 #include "engine/engine.h"
+#include "ui/books/palette_transition_banks.h"
 
-struct PaletteTransitionBanks {
-    u16 source[16][16];
-    u16 destination[16][16];
-    u16 target[16][16];
-    u8 pad600[2];
-    u8 firstBank;
-    u8 extraBank;
-};
 struct PaletteTransitionObject {
     u8 unk0[0x3A];
     u16 color;

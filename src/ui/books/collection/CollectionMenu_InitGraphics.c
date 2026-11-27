@@ -1,9 +1,7 @@
 #include "global.h"
 #include "engine/video/display_sprite_playback.h"
+#include "ui/books/collection_display_resources.h"
 
-struct CollectionRes {
-    u32 w[8];
-};
 struct CollectionPos {
     u16 x, y, z, pad;
 };
@@ -31,7 +29,7 @@ extern const u32 gUnk_0824FEB4[30];
 extern const u32 gUnk_0824FF2C[27];
 
 void *memcpy(void *, const void *, u32);
-struct CollectionRes *ScriptProc_Start(u32, u32);
+struct CollectionDisplayResources *ScriptProc_Start(u32, u32);
 void ResourceHeader_Relocate(void *, void *);
 void AnimSprite_InitLinked(void *, void *, int, int, int, int, int, void *);
 s32 Collection_IsComplete(void);
@@ -46,14 +44,14 @@ void CollectionMenu_InitGraphics(u8 *m)
 {
     u32 sequences[30];
     u32 palettes[27];
-    struct CollectionRes *res;
+    struct CollectionDisplayResources *res;
     struct CollectionPos pos;
     s32 i;
 
     memcpy(sequences, gUnk_0824FEB4, sizeof(sequences));
     memcpy(palettes, gUnk_0824FF2C, sizeof(palettes));
     res = ScriptProc_Start(0xcb05, 0xe2ab);
-    *(struct CollectionRes *)(m + 0x24) = *res;
+    *(struct CollectionDisplayResources *)(m + 0x24) = *res;
     ResourceHeader_Relocate(m + 0x24, res);
     AnimSprite_InitLinked(m + 0x44, m + 0x24, 0x56, 0x10, 0, 0, 0, 0);
     AnimSprite_InitLinked(m + 0xa4, m + 0x24, 0x58, 0x10, 0, 0, 0, 0);

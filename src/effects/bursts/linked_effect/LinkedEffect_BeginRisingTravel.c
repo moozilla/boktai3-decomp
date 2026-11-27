@@ -3,6 +3,7 @@
 #include "engine/ram.h"
 #include "player/cutscene/player_cue_sequence.h"
 #include "ui/hud/scene_indicator.h"
+#include "effects/bursts/spiral_burst.h"
 struct Sprite {
     u32 flags;
     u8 visible, unknown5, palette, unknown7;
@@ -44,15 +45,11 @@ static inline const u16 *RandomEntry(void)
     gRandomIndex = index;
     return (const u16 *)((index << 1) + (u32)gRandomTable);
 }
-static inline s32 Truncate(s32 v)
-{
-    return v >= 0 ? v >> 12 : -((-v) >> 12);
-}
 static inline void LinkedEffect_SetTravelOffset(struct Vec *velocity, u8 heading, s32 radius)
 {
-    velocity->x = Truncate(radius * gUnk_086149C4[(heading + 64) & 255]);
+    velocity->x = SpiralBurst_ScaleOffset(radius * gUnk_086149C4[(heading + 64) & 255]);
     velocity->y = 0;
-    velocity->z = Truncate(radius * gUnk_086149C4[heading]);
+    velocity->z = SpiralBurst_ScaleOffset(radius * gUnk_086149C4[heading]);
 }
 void LinkedEffect_SetVariant(void *, u32);
 // confidence=low: expands the linked effect while preparing an elevated travel target.

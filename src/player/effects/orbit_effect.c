@@ -24,15 +24,15 @@ void PlayerOrbitEffect_UpdateParticle(struct PlayerOrbitEffect *effect,
     particle->motion.angle += particle->motion.angularSpeed;
     value = particle->motion.radius * gUnk_086149C4[(particle->motion.angle + 64) & 0xFF];
     delta = TruncateOrbitOffset(value);
-    particle->position.unsignedCoordinates.x = (u16)effect->owner->position.x + delta;
+    particle->position.x = (u16)effect->owner->position.x + delta;
     valueZ = particle->motion.radius * gUnk_086149C4[particle->motion.angle];
     deltaZ = TruncateOrbitOffset(valueZ);
-    particle->position.unsignedCoordinates.z = (u16)effect->owner->position.z + deltaZ;
+    particle->position.z = (u16)effect->owner->position.z + deltaZ;
     if (effect->particleFrame >= particle->motion.expandDelay) {
         if ((effect->particleFrame & 7) == 0 && particle->motion.angularSpeed > 2)
             particle->motion.angularSpeed--;
         particle->motion.radius += 6;
-        particle->position.unsignedCoordinates.y += particle->motion.riseSpeed;
+        particle->position.y += particle->motion.riseSpeed;
     } else
         particle->motion.radius++;
     if (particle->motion.animationPhase == 0)
@@ -49,20 +49,20 @@ void PlayerBurst_UpdateParticle(struct PlayerOrbitEffect *effect,
 {
     {
         u16 x = particle->motion.velocityX;
-        u16 y = particle->position.unsignedCoordinates.x;
-        particle->position.unsignedCoordinates.x = x + y;
+        u16 y = particle->position.x;
+        particle->position.x = x + y;
     }
     {
         u16 x = particle->motion.velocityZ;
-        u16 y = particle->position.unsignedCoordinates.z;
-        particle->position.unsignedCoordinates.z = x + y;
+        u16 y = particle->position.z;
+        particle->position.z = x + y;
     }
     particle->motion.animationPhase++;
     if (particle->motion.animationPhase == 5)
         SpriteDrawable_SelectTileFrame(particle, effect->resource, 5);
 }
 
-void PlayerOrbitEffect_SpawnParticle(struct PlayerOrbitEffect *effect, struct SceneVec *position,
+void PlayerOrbitEffect_SpawnParticle(struct PlayerOrbitEffect *effect, struct ContactPosition *position,
                                      s32 angle)
 {
     s32 slotIndex;
@@ -78,27 +78,27 @@ void PlayerOrbitEffect_SpawnParticle(struct PlayerOrbitEffect *effect, struct Sc
             u32 index;
             particle = &effect->particles[slotIndex];
             particle->flags &= ~1;
-            particle->position.coordinates = *position;
+            particle->position = *position;
             randomTable = gRandomTable;
             index = (gRandomIndex + 1) & 0x3FF;
             {
                 u32 random = ParticleRandom_ReadCursor(randomTable, &index);
-                s32 x = (u16)particle->position.coordinates.x;
+                s32 x = (u16)particle->position.x;
                 x -= 63;
                 random &= 0x7F;
-                particle->position.coordinates.x = x + random;
+                particle->position.x = x + random;
             }
             index = (index + 1) & 0x3FF;
             gRandomIndex = index;
             {
                 u32 random = ParticleRandom_ReadCursor(randomTable, &index);
-                s32 z = (u16)particle->position.coordinates.z;
+                s32 z = (u16)particle->position.z;
                 z -= 63;
                 random &= 0x7F;
-                particle->position.coordinates.z = z + random;
+                particle->position.z = z + random;
             }
         }
-        particle->position.coordinates.y += 128;
+        particle->position.y += 128;
         SpriteDrawable_SelectTileFrame(particle, effect->resource, 4);
         particle->motion.velocityX = TruncateOrbitOffset(6 * gUnk_086149C4[(angle + 64) & 255]);
         particle->motion.velocityZ = TruncateOrbitOffset(6 * gUnk_086149C4[angle & 255]);
@@ -154,7 +154,7 @@ void PlayerOrbitEffect_UpdateIntro(struct PlayerOrbitEffect *effect)
     Anim_Step(&effect->drawable, &effect->animationData);
     effect->phaseFrame++;
     if (effect->phaseFrame > 59) {
-        effect->drawable.state = 1;
+        effect->drawable.attribute1A = 1;
         PlayerBurst_SetStateCallback(effect, PlayerOrbitEffect_UpdateStatTransfer);
     }
 }
@@ -164,8 +164,8 @@ void PlayerOrbitEffect_UpdateIntro(struct PlayerOrbitEffect *effect)
 void PlayerOrbitEffect_UpdateStatTransfer(struct PlayerOrbitEffect *effect)
 {
     u16 *frame = &effect->phaseFrame;
-    struct PlayerOrbitDrawable *animation;
-    struct PlayerOrbitResource *data;
+    struct AnimSprite *animation;
+    struct AnimSpriteResource *data;
     if (!*frame) {
         Sound_PlaySong(0x303);
         Sound_PlaySong(0x1FB);
@@ -243,7 +243,7 @@ void PlayerOrbitEffect_UpdateStatTransfer(struct PlayerOrbitEffect *effect)
         }
         PlayerOrbitEffect_SpawnParticle(effect, &effect->drawable.position, 0x89);
     } else {
-        struct SceneVec *position;
+        struct ContactPosition *position;
         u32 bits = *frame & 3;
         position = &effect->drawable.position;
         if (!bits)
@@ -278,7 +278,7 @@ void PlayerOrbitEffect_UpdateStatTransfer(struct PlayerOrbitEffect *effect)
     }
     ++effect->phaseFrame;
     if (effect->phaseFrame > 104) {
-        effect->drawable.state = 2;
+        effect->drawable.attribute1A = 2;
         effect->owner->currentStatA = effect->targetStatA;
         PlayerBurst_SetStateCallback(effect, PlayerTransition_StepReveal);
     }

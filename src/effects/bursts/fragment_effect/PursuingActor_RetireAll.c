@@ -2,12 +2,10 @@
 #include "engine/engine.h"
 #include "effects/projectiles/pursuing_actor.h"
 #include "engine/ram.h"
+#include "scene/collision/contact_sample_vector_layout.h"
 
-struct PackedPosition {
-    u32 x : 16, y : 16, z : 16, pad : 16;
-};
-void PursuingActor_CreateHomingSlash(const struct PackedPosition *, s32, s32, s32, s32, s32, s32,
-                                     s32, s32, s32, s32);
+void PursuingActor_CreateHomingSlash(const struct ContactSampleVector *, s32, s32, s32, s32, s32,
+                                     s32, s32, s32, s32, s32);
 
 static inline s32 OptionalValue(void)
 {
@@ -67,7 +65,7 @@ void PursuingActor_RecoilAll(void)
 /* Script keywords: p position, d heading, s speed, a phase, h homing, P collider. */
 void PursuingActor_CreateHomingSlashFromScript(void)
 {
-    struct PackedPosition position;
+    struct ContactSampleVector position;
     s32 heading, speed, phase;
     s32 turnTimer, turnSpeed, turnDelay;
     s32 attackParam1, attackParam2, attackParam3, attackParam4;

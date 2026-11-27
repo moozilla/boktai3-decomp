@@ -1,12 +1,10 @@
 #include "global.h"
 #include "engine/engine.h"
-struct CannonBatteryPosition {
-    s16 x, y, z, unk6;
-};
+#include "scene/collision/contact_position.h"
 struct CannonBatteryMuzzleFlash {
     u32 update, destroy;
     u8 animation[0x1C], sprite[0x1C];
-    struct CannonBatteryPosition position;
+    struct ContactPosition position;
     u8 unk48[8], sequence[0x10];
     u8 unk60[0x57], unkB7;
 };
@@ -15,7 +13,7 @@ void Anim_RestartSequence(void *, void *, u32, u32, u32);
 void DeckCannon_UpdateMuzzleFlash(void);
 void DeckCannon_DestroyMuzzleFlash(void);
 void DeckCannon_InitMuzzleFlash(void *pool, struct CannonBatteryMuzzleFlash *p,
-                                   struct CannonBatteryPosition *origin, s32 horizontal)
+                                   struct ContactPosition *origin, s32 horizontal)
 {
     void *resource = (void *)DeckCannon_LoadAnimation();
     AnimData_Load(p->animation, 0x8D95);

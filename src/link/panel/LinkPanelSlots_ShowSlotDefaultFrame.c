@@ -1,12 +1,9 @@
 #include "global.h"
+#include "link/panel/link_slot_display_element.h"
 
-struct Unk0810C1E8_Elem {
-    u32 flags;
-    u8 filler4[0x5C];
-};
 struct Unk0810C1E8 {
     u8 filler0[0x28];
-    struct Unk0810C1E8_Elem elems[7];
+    struct LinkSlotDisplayElement elems[7];
     u8 filler2C8[0x38];
     u16 vals[8]; // 0x300
 };

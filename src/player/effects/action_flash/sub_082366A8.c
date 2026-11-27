@@ -1,9 +1,7 @@
 #include "global.h"
 #include "engine/video/render.h"
+#include "scene/collision/contact_position.h"
 
-struct GlowVector {
-    s16 x, y, z, pad;
-};
 struct GlowAnim {
     u8 pad0[6];
     u16 id;
@@ -17,7 +15,7 @@ struct GlowSprite {
     u8 pad08[8];
     u16 f10;
     u8 pad12[0xA];
-    struct GlowVector position;
+    struct ContactPosition position;
     u8 pad24[0x24];
     u8 *palette;
     u16 colors[16];
@@ -34,7 +32,7 @@ struct GlowUnit {
 void AnimData_Load(void *, u32);
 void Sprite_Init(void *, void *, u32);
 
-void sub_082366A8(struct GlowUnit *p, struct GlowVector *pos)
+void sub_082366A8(struct GlowUnit *p, struct ContactPosition *pos)
 {
     struct GlowSprite *sprite = &p->sprite;
     u32 variant;

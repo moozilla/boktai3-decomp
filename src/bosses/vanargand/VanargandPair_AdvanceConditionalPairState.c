@@ -1,13 +1,6 @@
 #include "global.h"
+#include "bosses/vanargand/vanargand_pair_state_layout.h"
 
-struct VanargandPairState {
-    u8 unknown0[0xE1];
-    u8 threshold : 8;
-    u8 unknownE2[0x56C - 0xE2];
-    void *pair;
-    u8 unknown570[0x5C4 - 0x570];
-    u8 state;
-};
 s32 ScenePair_CountPositiveCounters(void *);
 void VanargandPair_AdvanceConditionalPairState(struct VanargandPairState *panel)
 {
@@ -24,7 +17,7 @@ void VanargandPair_AdvanceConditionalPairState(struct VanargandPairState *panel)
             if (ScenePair_CountPositiveCounters(panel->pair) != 2)
                 goto reset;
             {
-                s32 t = panel->threshold;
+                s32 t = panel->gauge;
                 if (t <= 42)
                     panel->state = 8;
                 else

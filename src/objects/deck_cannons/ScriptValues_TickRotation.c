@@ -1,9 +1,5 @@
 #include "global.h"
-struct ScriptValueRotation {
-    u8 unknown0[0x78];
-    s8 startIndex;
-    u8 ticks;
-};
+#include "objects/deck_cannons/script_value_rotation_layout.h"
 void ScriptValues_LoadRotatedArray(struct ScriptValueRotation *);
 s32 ScriptValues_TickRotation(struct ScriptValueRotation *rotation)
 {

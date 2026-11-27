@@ -1,6 +1,7 @@
 #include "global.h"
 #include "player/player.h"
 #include "engine/video/render.h"
+#include "scene/collision/contact_sample_vector_layout.h"
 
 /* confidence=low: Initialize the Count actor from script options and create its visual and contact objects. */
 
@@ -37,9 +38,6 @@ void SceneActorAnimation_UpdateEightDirectionCallback(void);
 void SceneActors_UpdateStationaryReaction(void);
 void sub_08022B18(void);
 
-struct CountInitPosition {
-    s32 x : 16, y : 16, z : 16, pad : 16;
-};
 
 struct CountResourceHeader {
     u32 words[8];
@@ -84,7 +82,7 @@ struct CountInitBase {
     u8 overlay[0x54];
     struct CountResourceHeader resource;
     u8 animation[0x20];
-    struct CountInitPosition position;
+    struct ContactSampleVector position;
     u8 pad268[0x20];
     void *palette;
     u8 pad28C[0x14];
@@ -184,8 +182,8 @@ int sub_08028F78(struct CountInit *s, u32 id)
     struct CountResourceHeader *resource;
     u32 *dst;
     const u8 *palette;
-    struct CountInitPosition pos;
-    struct CountInitPosition pos2;
+    struct ContactSampleVector pos;
+    struct ContactSampleVector pos2;
     s32 mode;
     u32 health;
     u32 facing;

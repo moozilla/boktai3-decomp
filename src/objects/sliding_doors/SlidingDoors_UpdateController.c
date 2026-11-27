@@ -1,6 +1,7 @@
 #include "objects/sliding_doors/scene_object_controller.h"
 #include "engine/video/sprite.h"
 #include "engine/input.h"
+#include "scene/collision/contact_position.h"
 
 s32 MessageQueue_GetMessagesById(u16, void *);
 void SlidingDoors_BeginActivation(struct SceneObjPool *, u16);
@@ -18,14 +19,11 @@ void SlidingDoors_UpdatePoseC(u8 *);
 u32 TetherActor_CopyPosition(void *);
 int SlidingDoors_CheckActorCompatibility(u8 *, u8 *);
 
-struct Obj1FPos {
-    s16 x, y, z;
-};
 struct Obj1FScriptArgs {
     u16 kind, unknown2;
     u8 *data;
 };
-static inline s32 Obj1F_GetCellDistanceFromOrigin(struct Obj1FPos *p)
+static inline s32 Obj1F_GetCellDistanceFromOrigin(struct ContactPosition *p)
 {
     s32 x = p->x >> 8;
     s32 z = p->z >> 8;
@@ -51,7 +49,7 @@ s32 SlidingDoors_UpdateController(struct SceneObjPool *self)
     s32 n;
     s32 i;
     u8 *msg;
-    struct Obj1FPos camera;
+    struct ContactPosition camera;
     if (self->count == 0)
         return 0;
     for (i = 0; i < self->primaryCount; i++)
@@ -96,12 +94,12 @@ s32 SlidingDoors_UpdateController(struct SceneObjPool *self)
         }
         switch (o->type) {
             case 0: {
-                struct Obj1FPos delta;
-                struct Obj1FPos tether;
+                struct ContactPosition delta;
+                struct ContactPosition tether;
                 if (o->activationFlags & 1)
                     break;
                 SlidingDoors_UpdatePoseA((u8 *)o);
-                delta = *(struct Obj1FPos *)&o->pos;
+                delta = *(struct ContactPosition *)&o->pos;
                 delta.x -= gGameState->positionX;
                 delta.y -= gGameState->positionY;
                 delta.z -= gGameState->positionZ;
@@ -112,8 +110,8 @@ s32 SlidingDoors_UpdateController(struct SceneObjPool *self)
                 }
                 SlidingDoors_AddPrimaryId((u8 *)self, (u8 *)o);
                 if (TetherActor_CopyPosition(&tether)) {
-                    struct Obj1FPos delta;
-                    delta = *(struct Obj1FPos *)&o->pos;
+                    struct ContactPosition delta;
+                    delta = *(struct ContactPosition *)&o->pos;
                     delta.x -= (&tether)->x;
                     delta.y -= (&tether)->y;
                     delta.z -= (&tether)->z;
@@ -137,13 +135,13 @@ s32 SlidingDoors_UpdateController(struct SceneObjPool *self)
             case 12:
             case 13:
             case 14: {
-                struct Obj1FPos delta;
+                struct ContactPosition delta;
                 struct Obj1FScriptArgs args;
-                struct Obj1FPos tether;
+                struct ContactPosition tether;
                 if (o->activationFlags & 1)
                     break;
                 SlidingDoors_UpdatePoseC((u8 *)o);
-                delta = *(struct Obj1FPos *)&o->pos;
+                delta = *(struct ContactPosition *)&o->pos;
                 delta.x -= gGameState->positionX;
                 delta.y -= gGameState->positionY;
                 delta.z -= gGameState->positionZ;
@@ -163,8 +161,8 @@ s32 SlidingDoors_UpdateController(struct SceneObjPool *self)
                     }
                 }
                 if (TetherActor_CopyPosition(&tether)) {
-                    struct Obj1FPos delta;
-                    delta = *(struct Obj1FPos *)&o->pos;
+                    struct ContactPosition delta;
+                    delta = *(struct ContactPosition *)&o->pos;
                     delta.x -= (&tether)->x;
                     delta.y -= (&tether)->y;
                     delta.z -= (&tether)->z;
@@ -178,12 +176,12 @@ s32 SlidingDoors_UpdateController(struct SceneObjPool *self)
                 break;
             }
             case 4: {
-                struct Obj1FPos delta;
-                struct Obj1FPos tether;
+                struct ContactPosition delta;
+                struct ContactPosition tether;
                 if (o->activationFlags & 1)
                     break;
                 SlidingDoors_UpdatePoseA((u8 *)o);
-                delta = *(struct Obj1FPos *)&o->pos;
+                delta = *(struct ContactPosition *)&o->pos;
                 delta.x -= gGameState->positionX;
                 delta.y -= gGameState->positionY;
                 delta.z -= gGameState->positionZ;
@@ -194,8 +192,8 @@ s32 SlidingDoors_UpdateController(struct SceneObjPool *self)
                 }
                 SlidingDoors_AddPrimaryId((u8 *)self, (u8 *)o);
                 if (TetherActor_CopyPosition(&tether)) {
-                    struct Obj1FPos delta;
-                    delta = *(struct Obj1FPos *)&o->pos;
+                    struct ContactPosition delta;
+                    delta = *(struct ContactPosition *)&o->pos;
                     delta.x -= (&tether)->x;
                     delta.y -= (&tether)->y;
                     delta.z -= (&tether)->z;
@@ -209,12 +207,12 @@ s32 SlidingDoors_UpdateController(struct SceneObjPool *self)
                 break;
             }
             case 5: {
-                struct Obj1FPos delta;
-                struct Obj1FPos tether;
+                struct ContactPosition delta;
+                struct ContactPosition tether;
                 if (o->activationFlags & 1)
                     break;
                 SlidingDoors_UpdatePoseA((u8 *)o);
-                delta = *(struct Obj1FPos *)&o->pos;
+                delta = *(struct ContactPosition *)&o->pos;
                 delta.x -= gGameState->positionX;
                 delta.y -= gGameState->positionY;
                 delta.z -= gGameState->positionZ;
@@ -225,8 +223,8 @@ s32 SlidingDoors_UpdateController(struct SceneObjPool *self)
                 }
                 SlidingDoors_AddPrimaryId((u8 *)self, (u8 *)o);
                 if (TetherActor_CopyPosition(&tether)) {
-                    struct Obj1FPos delta;
-                    delta = *(struct Obj1FPos *)&o->pos;
+                    struct ContactPosition delta;
+                    delta = *(struct ContactPosition *)&o->pos;
                     delta.x -= (&tether)->x;
                     delta.y -= (&tether)->y;
                     delta.z -= (&tether)->z;
@@ -240,12 +238,12 @@ s32 SlidingDoors_UpdateController(struct SceneObjPool *self)
                 break;
             }
             case 6: {
-                struct Obj1FPos delta;
-                struct Obj1FPos tether;
+                struct ContactPosition delta;
+                struct ContactPosition tether;
                 if (o->activationFlags & 1)
                     break;
                 SlidingDoors_UpdatePoseA((u8 *)o);
-                delta = *(struct Obj1FPos *)&o->pos;
+                delta = *(struct ContactPosition *)&o->pos;
                 delta.x -= gGameState->positionX;
                 delta.y -= gGameState->positionY;
                 delta.z -= gGameState->positionZ;
@@ -256,8 +254,8 @@ s32 SlidingDoors_UpdateController(struct SceneObjPool *self)
                 }
                 SlidingDoors_AddPrimaryId((u8 *)self, (u8 *)o);
                 if (TetherActor_CopyPosition(&tether)) {
-                    struct Obj1FPos delta;
-                    delta = *(struct Obj1FPos *)&o->pos;
+                    struct ContactPosition delta;
+                    delta = *(struct ContactPosition *)&o->pos;
                     delta.x -= (&tether)->x;
                     delta.y -= (&tether)->y;
                     delta.z -= (&tether)->z;
@@ -275,11 +273,11 @@ s32 SlidingDoors_UpdateController(struct SceneObjPool *self)
                     SlidingDoors_UpdatePoseA((u8 *)o);
                 break;
             case 15: {
-                struct Obj1FPos delta;
+                struct ContactPosition delta;
                 SlidingDoors_UpdatePoseA((u8 *)o);
                 if (gGameState->unk876 <= 2)
                     break;
-                delta = *(struct Obj1FPos *)&o->pos;
+                delta = *(struct ContactPosition *)&o->pos;
                 delta.x -= gGameState->positionX;
                 delta.y -= gGameState->positionY;
                 delta.z -= gGameState->positionZ;
@@ -291,13 +289,13 @@ s32 SlidingDoors_UpdateController(struct SceneObjPool *self)
                 break;
             }
             case 16: {
-                struct Obj1FPos delta;
+                struct ContactPosition delta;
                 struct Obj1FScriptArgs args;
-                struct Obj1FPos tether;
+                struct ContactPosition tether;
                 if (o->activationFlags & 1)
                     break;
                 SlidingDoors_UpdatePoseC((u8 *)o);
-                delta = *(struct Obj1FPos *)&o->pos;
+                delta = *(struct ContactPosition *)&o->pos;
                 delta.x -= gGameState->positionX;
                 delta.y -= gGameState->positionY;
                 delta.z -= gGameState->positionZ;
@@ -317,8 +315,8 @@ s32 SlidingDoors_UpdateController(struct SceneObjPool *self)
                     }
                 }
                 if (TetherActor_CopyPosition(&tether)) {
-                    struct Obj1FPos delta;
-                    delta = *(struct Obj1FPos *)&o->pos;
+                    struct ContactPosition delta;
+                    delta = *(struct ContactPosition *)&o->pos;
                     delta.x -= (&tether)->x;
                     delta.y -= (&tether)->y;
                     delta.z -= (&tether)->z;

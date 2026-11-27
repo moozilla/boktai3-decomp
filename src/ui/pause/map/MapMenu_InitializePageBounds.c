@@ -1,24 +1,11 @@
 #include "global.h"
-struct MapMenuPage {
-    u8 unknown0[2];
-    u8 focusX, focusY, widthTiles, heightTiles;
-    u8 unknown6[10];
-};
-struct MapMenu {
-    u8 unknown0[0x48F8];
-    struct MapMenuPage *pages;
-    u8 unknown48FC[8];
-    u8 page;
-    u8 unknown4905[0xB];
-    s16 minScrollX, minScrollY;
-    s16 maxScrollX, maxScrollY, focusX, focusY;
-};
-void MapMenu_InitializePageBounds(struct MapMenu *menu)
+#include "ui/pause/scene_hud_display.h"
+void MapMenu_InitializePageBounds(struct SceneHudState *menu)
 {
-    menu->minScrollX = 0;
-    menu->minScrollY = 0;
-    menu->maxScrollX = (menu->pages[menu->page].widthTiles - 30) * 8;
-    menu->maxScrollY = (menu->pages[menu->page].heightTiles - 20) * 8;
-    menu->focusX = menu->pages[menu->page].focusX * 8;
-    menu->focusY = menu->pages[menu->page].focusY * 8;
+    menu->mapMinScrollX = 0;
+    menu->mapMinScrollY = 0;
+    menu->mapMaxScrollX = (menu->navigationPages[menu->navigationPage].widthTiles - 30) * 8;
+    menu->mapMaxScrollY = (menu->navigationPages[menu->navigationPage].heightTiles - 20) * 8;
+    menu->mapFocusX = menu->navigationPages[menu->navigationPage].focusX * 8;
+    menu->mapFocusY = menu->navigationPages[menu->navigationPage].focusY * 8;
 }

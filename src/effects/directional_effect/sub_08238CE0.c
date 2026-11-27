@@ -1,8 +1,7 @@
 #include "global.h"
+#include "effects/directional_effect/point_layout.h"
 /* Tentative role: place and launch a directional effect. */
-typedef struct Point {
-    u16 x, z, y, pad6;
-} Point;
+typedef struct Point Point;
 typedef struct Sprite {
     u8 pad0[0x1c];
     Point pos;

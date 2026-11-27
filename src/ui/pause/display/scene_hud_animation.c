@@ -262,18 +262,13 @@ void SceneHud_FinishActionTransfer(struct SceneHudState *p)
 
 /* Tentative semantic names; field offsets are established by static accesses. */
 
-struct MotionSequence {
-    u8 unknown0[0x4388];
-    u8 selectionA, selectionB, selection;
-};
-
 int PauseMenu_UpdateBinaryChoice(void *);
 
 void sub_0822E86C(u32);
 
 void SolarFruit_SortInventorySlots(void *);
 
-void MotionSequence_ConfirmReset(struct MotionSequence *p)
+void MotionSequence_ConfirmReset(struct SceneHudState *p)
 {
     s32 r = PauseMenu_UpdateBinaryChoice(p);
     if (r == 0) {
@@ -283,9 +278,9 @@ void MotionSequence_ConfirmReset(struct MotionSequence *p)
         Sound_PlaySong(0xDD);
         sub_0822E86C(0);
         SolarFruit_SortInventorySlots(0);
-        p->selectionA = 0;
-        p->selectionB = 0;
-        p->selection = 0;
+        p->actionGridGroup = 0;
+        p->unknown4389 = 0;
+        p->actionSelection = 0;
         PauseInventory_ReturnToEquipmentSelection(p);
     }
 }

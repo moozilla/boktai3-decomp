@@ -2,6 +2,9 @@
 #define GUARD_ACTOR_ANIMATION_CONTROLLER_H
 
 #include "engine/task.h"
+#include "engine/video/display_sequence.h"
+#include "engine/video/sprite.h"
+#include "scene/actor/scene_actor_components.h"
 
 /* Tentative shared layout for the actor animation controller (081E34D0-081EAB64).
  * Offsets are cross-checked across many matched functions in this unit; field
@@ -47,6 +50,7 @@ struct ActorSprite {
     s16 z;
 };
 
+/* Playback fields used by the Ghost afterimage. */
 struct ActorAnim {
     const u16 *data;
     u8 flags, count, factor, rate;
@@ -59,27 +63,24 @@ struct ActorAnimController {
     struct Task task;
     struct Player *owner; /* 0x18: player linked to this controller */
     struct ActorChildSlot children[16]; /* 0x1C, stride 0xDC */
-    struct ActorSprite obj;             /* 0xDDC; agbcc tail-pads this to 0x24 bytes */
-    u8 unkE00[8];
+    struct DisplaySequenceSprite obj; /* 0xDDC */
     u8 effect[12];      /* 0xE08: palette bank index buffer, see AnimData_SelectPaletteBank */
     const u16 *palette; /* 0xE14: active 16-color palette pointer */
     u8 unkE18[12];
-    struct ActorAnim anim; /* 0xE24 */
+    struct DisplaySequenceState anim; /* 0xE24 */
     u8 p2[0x40];           /* 0xE34: motion-related state, not yet identified */
     u32 arg;               /* 0xE74 */
     u16 count;             /* 0xE78 */
     s8 delta;              /* 0xE7A */
-    u8 unkE7B[17];
-    u16 dx, dy, dz; /* 0xE8C */
-    u8 unkE92[0x36];
+    u8 unkE7B[5];
+    struct SceneActorBody body; /* 0xE80 */
     s16 deltaX, deltaY, deltaZ; /* 0xEC8 */
     u8 unkECE[2];
     s16 targetX, targetY, targetZ; /* 0xED0 */
     u8 unkED6[2];
     s16 startX, startY, startZ; /* 0xED8 */
     u8 unkEDE[2];
-    s16 savedX, savedY, savedZ; /* 0xEE0 */
-    u8 unkEE6[2];
+    struct ContactPosition savedPosition; /* 0xEE0 */
     u16 alternate[16];       /* 0xEE8: palette fade source colors */
     u16 base[16];            /* 0xF08: palette fade target colors */
     u16 output[16];          /* 0xF28: palette fade blended colors */
@@ -127,6 +128,8 @@ struct ActorAnimController {
     s32 timer;                 /* 0xF9C */
     u32 variant;               /* 0xFA0 */
 };
+
+typedef char ActorAnimControllerSizeCheck[sizeof(struct ActorAnimController) == 0xFA4 ? 1 : -1];
 
 /* Tentative layout for the actor being interacted with (a smaller, partial
  * view of a different actor instance; not this controller's own fields). */

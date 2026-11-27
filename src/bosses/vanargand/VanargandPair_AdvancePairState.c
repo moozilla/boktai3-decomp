@@ -1,11 +1,6 @@
 #include "global.h"
+#include "bosses/vanargand/vanargand_pair_state_layout.h"
 /* Paired Vanargand actor. Field names follow observed state and sprite operations. */
-struct VanargandPairState {
-    u8 pad0[0x56C];
-    void *pair;
-    u8 pad570[0x5C4 - 0x570];
-    u8 state;
-};
 s32 ScenePair_CountPositiveCounters(void *);
 void VanargandPair_AdvancePairState(struct VanargandPairState *panel)
 {

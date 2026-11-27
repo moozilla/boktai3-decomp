@@ -379,21 +379,20 @@ static inline u32 Clone_DisableColliderFlags(u32 value)
 void PlayerClone_InitSlot(void *unused, struct PlayerCloneSlot *s, u32 arg)
 {
     struct PlayerCloneConfiguration *context = &s->configuration;
-    u32 zero, fill;
+    u32 fill;
     void *res;
     struct ContactCollider *p;
     u32 value;
-    struct PlayerCloneColliderVector v, w;
+    struct ContactPosition v, w;
 
     PlayerClone_InitConfig(context);
-    zero = 0;
-    s->timer = zero;
+    s->timer = 0;
     {
         u8 *dest = &s->velocity;
         u32 *source;
-        fill = zero;
+        fill = 0;
         source = &fill;
-        Clone_ClearVector(source, dest, 0x05000002);
+        Clone_ClearVector(source, dest, CPU_SET_SRC_FIXED | CPU_SET_32BIT | 2);
     }
     res = ScriptProc_Start(0xcb05, 0xde23);
     {
@@ -401,7 +400,7 @@ void PlayerClone_InitSlot(void *unused, struct PlayerCloneSlot *s, u32 arg)
         ResourceHeader_Relocate(obj, res);
         {
             struct AnimSprite *p = &s->animation;
-            AnimSprite_InitLinked(p, obj, 0, 0, 2, 1, zero, zero);
+            AnimSprite_InitLinked(p, obj, 0, 0, 2, 1, 0, 0);
             s->animation.flags |= 1;
             value = ActorDebris_Create(p, &s->foldedFacing, &s->mirrored);
             s->debris = value;
@@ -418,10 +417,10 @@ void PlayerClone_InitSlot(void *unused, struct PlayerCloneSlot *s, u32 arg)
     v.x = 40;
     v.y = 128;
     v.z = 40;
-    w.x = zero;
+    w.x = 0;
     w.y = 128;
-    w.z = zero;
-    Collider_Init(p, zero, 0x4001, zero, 16, &v, &w);
+    w.z = 0;
+    Collider_Init(p, 0, 0x4001, 0, 16, &v, &w);
     Collider_SetCallback(p, PlayerClone_OnBodyColliderContact, s);
     Collider_SetBodyProperties(p, (s16)context->unknown16, 0x402, 1);
     Collider_Refresh(p);
@@ -430,32 +429,32 @@ void PlayerClone_InitSlot(void *unused, struct PlayerCloneSlot *s, u32 arg)
     v.x = 64;
     v.y = 128;
     v.z = 64;
-    w.x = zero;
+    w.x = 0;
     w.y = 128;
-    w.z = zero;
-    Collider_Init(p, zero, 0x2001, zero, 16, &v, &w);
+    w.z = 0;
+    Collider_Init(p, 0, 0x2001, 0, 16, &v, &w);
     Collider_SetCallback(p, PlayerClone_OnPassiveColliderContact, s);
     Collider_SetAttackProperties(p, (s16)context->operation.attack, (s16)context->operation.element,
-                                 0, zero, context->primaryPower);
+                                 0, 0, context->primaryPower);
     p = &s->area;
     v.x = 200;
     v.y = 128;
     v.z = 200;
-    w.x = zero;
+    w.x = 0;
     w.y = 128;
-    w.z = zero;
-    Collider_Init(p, zero, 0x2001, zero, 16, &v, &w);
+    w.z = 0;
+    Collider_Init(p, 0, 0x2001, 0, 16, &v, &w);
     Collider_SetCallback(p, PlayerClone_OnPassiveColliderContact, s);
     Collider_SetAttackProperties(p, context->secondaryCollider[0], context->secondaryCollider[1], 0,
-                                 zero, context->secondaryCollider[2]);
+                                 0, context->secondaryCollider[2]);
     p = &s->playerAttack;
     v.x = 32;
     v.y = 32;
     v.z = 32;
-    w.x = zero;
+    w.x = 0;
     w.y = 128;
-    w.z = zero;
-    Collider_Init(p, zero, 0x2001, zero, 16, &v, &w);
+    w.z = 0;
+    Collider_Init(p, 0, 0x2001, 0, 16, &v, &w);
     Collider_SetCallback(p, PlayerClone_OnPassiveColliderContact, s);
 }
 

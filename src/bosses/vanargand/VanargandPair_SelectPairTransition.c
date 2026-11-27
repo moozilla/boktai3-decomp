@@ -1,10 +1,7 @@
 #include "global.h"
-struct VanargandPairSequence {
-    u8 unknown0[0x5C4];
-    u8 state, cursor, transition;
-};
-void Vanargand_UpdateModeEffect(struct VanargandPairSequence *);
-void VanargandPair_SelectPairTransition(struct VanargandPairSequence *panel, const u8 table[][3])
+#include "bosses/vanargand/vanargand_pair_state_layout.h"
+void Vanargand_UpdateModeEffect(struct VanargandPairState *);
+void VanargandPair_SelectPairTransition(struct VanargandPairState *panel, const u8 table[][3])
 {
     do {
         panel->transition = table[panel->state][panel->cursor];

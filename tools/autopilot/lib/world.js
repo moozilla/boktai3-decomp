@@ -283,12 +283,15 @@ exports.navigate = function* (target, opts = {}) {
     // the same lines again: a scripted gate turned the player back
     if (opts.seen && [...opts.seen.values()].some((n) => n >= 2)) return done(false, 'gated', { lines: [...opts.seen.keys()] });
     const here = exports.cellOf(p.position.x, p.position.z);
-    let path = goals.has(here.join(',')) ? [here] : exports.findPath(grid, here, goals, new Set([...blocked, ...avoid]));
-    if (!path && blocked.size) path = exports.findPath(grid, here, goals, new Set([...blocked, ...avoid]), true);
+    const traps = exports.floorTrapCells();
+    const obstacles = new Set([...blocked, ...avoid, ...traps]);
+    let path = goals.has(here.join(',')) ? [here] : exports.findPath(grid, here, goals, obstacles);
+    if (!path && blocked.size) path = exports.findPath(grid, here, goals, obstacles, true);
     plans++;
-    if (opts.trace) opts.trace({ plan: plans, here, path: path && simplify(path), blocked: [...blocked], x: p.position.x, z: p.position.z });
+    if (opts.trace) opts.trace({ plan: plans, here, path: path && simplify(path), blocked: [...blocked],
+      ...(traps.size ? { traps: [...traps] } : {}), x: p.position.x, z: p.position.z });
     if (!path && !opts.noPush) {
-      const plan = exports.planPushes(grid, here, goals, exports.blocks());
+      const plan = exports.planPushes(grid, here, goals, exports.blocks(), undefined, { avoidCells: traps });
       if (opts.trace) opts.trace({ pushPlan: plan && plan.map((p) => `${p.x},${p.z}>${p.dir}`) });
       if (plan && plan.length) {
         const r = yield* exports.push(plan[0], opts);
@@ -303,7 +306,7 @@ exports.navigate = function* (target, opts = {}) {
       const open = { ...grid, cells: grid.cells.slice(), at: null };
       for (const b of crates) { const c = grid.at(b.x, b.z); if (c) open.cells[c.index] = { ...c, level: b.top - 1, open: true }; }
       open.at = (x, z) => (x < 0 || z < 0 || x >= grid.w || z >= grid.h ? null : open.cells[z * grid.w + x]);
-      const route = exports.findPath(open, here, goals, new Set([...blocked, ...avoid]));
+      const route = exports.findPath(open, here, goals, obstacles);
       const first = route && route.map(([x, z]) => crates.find((b) => b.x === x && b.z === z)).find(Boolean);
       if (opts.trace) opts.trace({ breakPlan: first ? [first.x, first.z] : null });
       if (first) {
@@ -581,12 +584,12 @@ exports.breakBlock = function* (block, opts = {}) {
 // moved freely with the D-pad over 11 entries; A on an entry runs its script (stages.json
 // doors with "hub": index). hub() is the live menu or null.
 exports.hub = () => {
-  // a town map (Registry3F74, 11 entries) or San Miguel's gate (RegistrySelection,
+  // a town map (Registry3F74, 11 entries) or San Miguel's gate (WorldMapMenu,
   // src/ui/world_map.c, 9 entries with enabled flags)
   const t = exports.tasks().find((x) => !x.dead && (x.update === 'TownMap_OnUpdate' || x.update === 'WorldMap_OnUpdate'));
   if (!t) return null;
   const sel = t.update === 'WorldMap_OnUpdate';
-  const menu = g.at(Number(t.task), sel ? 'struct RegistrySelectionMenu' : 'struct RegistryChoiceMenu');
+  const menu = g.at(Number(t.task), sel ? 'struct WorldMapMenu' : 'struct RegistryChoiceMenu');
   const ptr = sel ? menu.selectionCursor : menu.cursor;
   const cursor = ptr ? g.at(Number(ptr.$addr ?? ptr), 'struct MenuCursor') : null;
   // ready: the cursor reads input (src/ui/widgets/menu_cursor.c MenuCursor_UpdateInput)
@@ -649,7 +652,8 @@ const DIRS = [[0, -1], [1, 0], [0, 1], [-1, 0]];  // the game's 0 north (-z), 1 
 exports.DIR_KEYS = ['up+right', 'down+right', 'down+left', 'up+left'];
 exports.planPushes = (grid, start, goals, blocks, maxStates = 20000, opts = {}) => {
   const W = grid.w, H = grid.h;
-  const lvl0 = grid.cells.map((c) => c.level), slope = grid.cells.map((c) => c.slope), open = grid.cells.map((c) => c.open);
+  const lvl0 = grid.cells.map((c) => c.level), slope = grid.cells.map((c) => c.slope);
+  const open = grid.cells.map((c, i) => c.open && !opts.avoidCells?.has(`${i % W},${Math.floor(i / W)}`));
   const flag8 = grid.cells.map((c) => !!(c.flags & 8));
   const ix = (x, z) => z * W + x;
   const reach = (lvl, bset, from) => {
@@ -767,10 +771,13 @@ exports.fightTargets = () => {
     ignored = new Set();
   }
   // The scene heap can give a later enemy the same address.
-  const scripted = exports.barrierTargets().concat(exports.vampireTargets(), exports.hresvelgrTargets());
-  const reg = scripted.concat(exports.enemies().filter((e) => e.alive && !ignored.has(e.addr) &&
-    !scripted.some((actor) => actor.addr === e.addr)));
+  const reg = exports.barrierTargets().concat(exports.vampireTargets(), exports.hresvelgrTargets());
   const owners = new Set(reg.map((e) => e.addr));
+  for (const enemy of exports.enemies()) {
+    if (!enemy.alive || ignored.has(enemy.addr) || owners.has(enemy.addr)) continue;
+    owners.add(enemy.addr);  // the lock-on registry can still list a defeated skeleton
+    if (!exports.skeletonDefeated(enemy.view)) reg.push(enemy);
+  }
   for (const t of exports.targets()) {
     if (t.alive && t.health !== null && !owners.has(t.addr) && !ignored.has(t.addr)) {
       reg.push(t);

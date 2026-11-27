@@ -1,17 +1,9 @@
 #include "global.h"
 #include "player/cutscene/player_cue_sequence.h"
+#include "bosses/nidhoggr/nidhoggr_effect_motion_layout.h"
+#include "bosses/nidhoggr/nidhoggr_pool_sprite_layout.h"
+#include "bosses/nidhoggr/effect_delta_layout.h"
 
-struct NidhoggrEffectMotion {
-    u16 x, y, z, unknown6;
-};
-struct NidhoggrPoolSprite {
-    u32 flags;
-    u8 unknown4[12];
-    u16 frame;
-    u8 unknown12[10];
-    struct NidhoggrEffectMotion position;
-    u8 unknown24[8];
-};
 struct NidhoggrAnimatedSlot {
     void (*update)(struct NidhoggrAnimatedSlot *);
     void (*onComplete)(struct NidhoggrAnimatedSlot *);
@@ -28,11 +20,6 @@ static inline void StepSequence(struct NidhoggrAnimatedSlot *owner)
     PlayerCue_StepSequence(&owner->sprite, &owner->sequence);
 }
 
-struct EffectDelta {
-    s32 x : 16;
-    s32 y : 16;
-    s32 z : 16;
-};
 static inline void AddMotion(struct NidhoggrEffectMotion *motion,
                              const struct NidhoggrEffectMotion *delta)
 {

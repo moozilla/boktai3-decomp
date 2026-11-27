@@ -346,7 +346,7 @@ def spell_type(t):
         return "?"
 
 
-def flatten(tu, root, s, path, probes, leaves, containers, encl, seen):
+def flatten(tu, root, s, path, probes, leaves, containers, encl, seen, embedded=None):
     """Leaves of aggregate s, which `root` + path spells. path: list of ('m', name) / ('i', idx)."""
     if s.decls is None or id(s) in seen or len(path) > 24:
         return
@@ -365,7 +365,9 @@ def flatten(tu, root, s, path, probes, leaves, containers, encl, seen):
         r = tu.resolve(t)
         agg = tu.aggregate(t)
         if agg and bits is None:
-            flatten(tu, root, agg[1], p, probes, leaves, containers, encl, seen)
+            if embedded is not None and path and not encl and agg[1].decls is not None:
+                embedded.append(leaf(root, p, t, "aggregate", None, None, probes, encl, False))
+            flatten(tu, root, agg[1], p, probes, leaves, containers, encl, seen, embedded)
             if agg[1].decls is None:
                 leaves.append(leaf(root, p, t, "incomplete", None, None, probes, encl, False))
             continue
@@ -381,7 +383,7 @@ def flatten(tu, root, s, path, probes, leaves, containers, encl, seen):
                 containers.append({"size": len(probes), "elem": len(probes) + 1})
                 probes.append(f"sizeof({root}{display(p)})")
                 probes.append(f"sizeof({root}{display(p)}[0])")
-                flatten(tu, root, eagg[1], p + [("i", 0)], probes, leaves, containers, encl + [cid], seen)
+                flatten(tu, root, eagg[1], p + [("i", 0)], probes, leaves, containers, encl + [cid], seen, embedded)
                 continue
             w, sg, base = tu.scalar(et) if not eagg else (None, None, "agg")
             leaves.append(leaf(root, p, t, base, w, sg, probes, encl, True))
@@ -602,7 +604,7 @@ def finish_layouts(structs, vals, bitfields, bfbytes):
         st["size"] = vals[st["size"]]
         for c in st["containers"]:
             c["size"], c["elem"] = vals[c["size"]], vals[c["elem"]]
-        for lf in st["leaves"]:
+        for lf in st["leaves"] + st.get("aggregates", []):
             for k in ("off", "size", "esize"):
                 if k in lf:
                     lf[k] = vals[lf[k]]
@@ -622,26 +624,55 @@ def finish_layouts(structs, vals, bitfields, bfbytes):
         lf["bitpos"], lf["bits"] = lo, hi - lo
 
 
-def probe_records(body, tu, records):
+def aggregate_member_probes(tu, root, definition, probes, prefix="", seen=frozenset()):
+    """Measure the named aggregates within embedded structs, unions and element zero."""
+    if id(definition) in seen:
+        return
+    seen = seen | {id(definition)}
+    for decl in definition.decls or ():
+        if not decl.name:
+            continue
+        resolved = tu.resolve(decl.type)
+        array = isinstance(resolved, c_ast.ArrayDecl)
+        child = tu.aggregate(resolved.type if array else decl.type)
+        if not child or child[1].decls is None:
+            continue
+        name = prefix + decl.name
+        expr = root + name
+        if prefix:
+            member = {"name": name, "ctype": spell_type(decl.type), "array": array, "base": "aggregate"}
+            for field, probe in (("off", f"(unsigned)&{expr}"), ("size", f"sizeof({expr})"),
+                                 ("align", f"__alignof__({expr})")):
+                member[field] = len(probes)
+                probes.append(probe)
+            if array:
+                member["esize"] = len(probes)
+                probes.append(f"sizeof({expr}[0])")
+            yield member
+        nested = name + ("[0]." if array else ".")
+        yield from aggregate_member_probes(tu, root, child[1], probes, nested, seen)
+
+
+def probe_records(body, tu, records, *, qualified=False):
     """Probe named aggregate definitions directly, without synthetic RAM globals.
 
     RECORDS maps an arbitrary key to (C spelling, definition). Keep direct
-    members as well as flattened leaves so a consumer can preserve or rebuild
-    enclosing arrays and structs. Neither list guesses offsets or alignment.
+    members, embedded records, and flattened leaves so a consumer can preserve
+    or rebuild enclosing arrays and structs. Offsets come from agbcc.
     """
     probes, structs, bitfields = [], {}, []
     for key, (spell, definition) in records.items():
         root = f"(({spell} *)0)->"
         st = {"spell": spell, "kind": kind_of(definition), "size": len(probes), "align": len(probes) + 1,
-              "leaves": [], "containers": [], "members": []}
+              "leaves": [], "containers": [], "members": [], "aggregates": []}
         probes.extend((f"sizeof({spell})", f"__alignof__({spell})"))
-        flatten(tu, root, definition, [], probes, st["leaves"], st["containers"], [], frozenset())
+        flatten(tu, root, definition, [], probes, st["leaves"], st["containers"], [], frozenset(), st["aggregates"])
         for i, lf in enumerate(st["leaves"]):
             if "bf" in lf:
                 bitfields.append((key, i, spell, lf["bf"]))
         for d in definition.decls:
             if d.name is None:
-                st["members"].append({"name": None})
+                st["members"].append({"name": None, "bits": d.bitsize is not None})
                 continue
             t = tu.resolve(d.type)
             array = isinstance(t, c_ast.ArrayDecl)
@@ -661,6 +692,8 @@ def probe_records(body, tu, records):
                     m["esize"] = len(probes)
                     probes.append(f"sizeof({expr}[0])")
             st["members"].append(m)
+        if qualified:
+            st["qualified"] = list(aggregate_member_probes(tu, root, definition, probes))
         structs[key] = st
     if not structs:
         return structs
@@ -668,7 +701,7 @@ def probe_records(body, tu, records):
     finish_layouts(structs, vals, bitfields, bfbytes)
     for st in structs.values():
         st["align"] = vals[st["align"]]
-        for m in st["members"]:
+        for m in st["members"] + st.get("qualified", []):
             for k in ("off", "size", "align", "esize"):
                 if k in m:
                     m[k] = vals[m[k]]

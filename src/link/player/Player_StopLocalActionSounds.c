@@ -1,20 +1,12 @@
 #include "global.h"
 #include "player/player.h"
-struct PlayerLinkSelection {
-    u8 unknown0[0x18];
-    s16 localPlayer;
-};
-extern struct PlayerLinkSelection *gLinkSession;
+#include "link/session/link_session_state.h"
+#include "scene/collision/scene_actor_damage_visibility.h"
+extern struct AreaEffectLinkState *gLinkSession;
 void Sound_StopSong(u32);
-static inline s32 LocalPlayerSlot(void)
-{
-    if (!gLinkSession)
-        return -1;
-    return gLinkSession->localPlayer;
-}
 void Player_StopLocalActionSounds(struct Player *p)
 {
-    if (p->slot == LocalPlayerSlot()) {
+    if (p->slot == SceneActorDamage_LocalPlayer()) {
         if (p->actionMode != 6) {
             Sound_StopSong(0xd8);
         } else {

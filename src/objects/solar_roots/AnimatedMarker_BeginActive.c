@@ -1,11 +1,6 @@
 #include "global.h"
+#include "objects/solar_roots/animated_marker_collider_layout.h"
 /* Tentative proximity-marker family; collider extent interpretation is provisional. */
-struct AnimatedMarkerCollider {
-    u8 pad0[6];
-    u16 flags;
-    u16 pad8;
-    u16 extent;
-};
 struct AnimatedMarker {
     u32 flags;
     u8 pad4[3];

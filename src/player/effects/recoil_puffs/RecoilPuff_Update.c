@@ -1,20 +1,12 @@
 #include "global.h"
-struct RisingSprite {
-    u32 flags;
-    u8 unknown4[0x16];
-    u16 height;
-    u8 unknown1C[0xC];
-    void *resource;
-    u8 active, unknown2D;
-    u16 frame;
-};
+#include "player/effects/recoil_puff_sprite.h"
 void SpriteDrawable_SelectTileFrame(void *, void *, u32);
-void RecoilPuff_Update(struct RisingSprite *p)
+void RecoilPuff_Update(struct RecoilPuffSprite *p)
 {
-    SpriteDrawable_SelectTileFrame(p, p->resource, (p->frame >> 1) + 12);
-    p->height += 10;
-    p->frame++;
-    if (p->frame == 16) {
+    SpriteDrawable_SelectTileFrame(p, p->resource, (p->timer >> 1) + 12);
+    p->position.y += 10;
+    p->timer++;
+    if (p->timer == 16) {
         p->flags |= 1;
         p->active = 0;
     }

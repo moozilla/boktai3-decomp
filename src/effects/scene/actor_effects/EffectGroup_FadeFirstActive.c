@@ -1,9 +1,5 @@
 #include "global.h"
-struct EffectGroupEntry {
-    u8 state, fadeTimer;
-    u16 frame;
-    u8 unknown4[0x44];
-};
+#include "effects/scene/effect_group_entry_layout.h"
 struct EffectGroup {
     u8 active, unknown1[2], count;
     u8 unknown4[8];

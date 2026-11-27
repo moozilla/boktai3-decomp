@@ -1,6 +1,7 @@
 #include "effects/screen/presentation_sequence.h"
 #include "engine/video/render.h"
 #include "engine/input.h"
+#include "script/script_call_arguments_layout.h"
 // Provisional name: Presentation_Update
 void Anim_LoadKeyframe(void *, void *, s32, s32);
 void Anim_SetKeyframes(void *, void *, s32, s32, s32);
@@ -11,16 +12,11 @@ void Script_Call(void *, void *);
 s32 ScreenTransition_SendCommand(s32, s32, s32, s32, s32, s32, s32);
 void MessageWindow_SetDisplayMode(s32);
 void MessageWindow_ShowMessage(s32);
-struct Message {
-    u32 count : 16;
-    u32 unused : 16;
-    void *values;
-};
 // Advance a scripted presentation, handle skipping, and notify its caller on exit.
 s32 Presentation_Update(struct PresentationSequence *p)
 {
     s32 value;
-    struct Message message;
+    struct ScriptCallArguments message;
     if (p->callback)
         p->callback(p);
     if (p->exitTimer) {

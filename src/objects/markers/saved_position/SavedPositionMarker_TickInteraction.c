@@ -1,9 +1,5 @@
 #include "objects/markers/saved_position_marker.h"
-struct MarkerScriptArgs {
-    u32 count : 16;
-    u32 pad : 16;
-    u32 *values;
-};
+#include "script/script_call_arguments_layout.h"
 void SavedPositionMarker_TickInteraction(struct SavedPositionMarker *marker)
 {
     if (marker->height > 1)
@@ -18,7 +14,7 @@ void SavedPositionMarker_TickInteraction(struct SavedPositionMarker *marker)
         SavedPositionMarker_SetState(marker, SavedPositionMarker_TickDormant);
         if (marker->scriptId) {
             u32 values[2];
-            struct MarkerScriptArgs args;
+            struct ScriptCallArguments args;
             args.count = 2;
             args.values = values;
             values[0] = marker->scriptArgs[0];

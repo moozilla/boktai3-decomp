@@ -62,16 +62,74 @@ def measure(text, path):
     selected = evidence.selected_records(tu, path)
     views = lm.probe_records(body, tu, selected)
     for key, v in views.items():
-        _, node = selected[key]
+        spell, node = selected[key]
         for d, m in zip(node.decls, v["members"]):
             t = tu.resolve(d.type)
-            m["record"] = evidence.record_of(tu, getattr(t, "type", None) if m["array"] else d.type)
-            m.update(headers=[], private=[], self_ref=False)
+            m["record"] = evidence.record_of(tu, getattr(t, "type", None) if m.get("array") else d.type)
+            headers, private, forwards, self_ref = evidence.member_dependencies(tu, d, spell)
+            private = [name for name in private if name not in {"u8", "u16", "s16", "u32"}]
+            m.update(headers=headers, private=private, forwards=forwards, self_ref=self_ref)
         v.update(file=path, id=key, known=families.inhabited(v))
     return views
 
 
 class SourceEvidenceTests(unittest.TestCase):
+    def test_return_evidence_uses_calls_and_resolves_static_names_locally(self):
+        definition = "src/allocator.c"
+        caller = "src/npc.c"
+        header = "include/shared.h"
+        base = f"{header}:struct Base"
+        view = f"{caller}:struct View"
+        decls = f'# 1 "{header}"\nstruct Base {{ unsigned flags; }};\n'
+        body = f'# 1 "{definition}"\nstruct Base *Allocate(void) {{ return 0; }}\n'
+        defs = evidence.References(*parse(decls + body, definition)[2:], definition)
+        script = """
+struct View { unsigned flags; };
+struct View *Allocate(void);
+static struct View *Other(void) { return 0; }
+struct View *NeverCalled(void);
+void Run(void) { Allocate(); Other(); }
+void Shadow(struct View *(*Allocate)(void)) { Allocate(); }
+"""
+        calls = evidence.References(*parse(script, caller)[2:], caller)
+        self.assertEqual(calls.return_calls, [("Run", 6, "Allocate", False, view),
+                                               ("Run", 6, "Other", True, view)])
+        scans = [{"file": definition, "return_definitions": defs.return_definitions + [("Other", True, base)]},
+                 {"file": caller, "return_calls": calls.return_calls, "return_definitions": calls.return_definitions}]
+        self.assertEqual(families.returned_views(scans, {base: {}, view: {}}),
+                         [{"view": view, "result": base, "function": "Allocate",
+                           "sites": [("src/npc.c:6", "Run")]}])
+
+    def test_prefix_view_requires_pointer_type_positions(self):
+        path = "src/a.c"
+        key = f"{path}:struct Prefix"
+        for source, expected in (
+            ("struct Prefix *items[8]; void Run(struct Prefix *p);", True),
+            ("void Run(void *p) { ((struct Prefix *)p)->mode = 1; }", True),
+            ("struct Prefix buffer[8];", False),
+            ("struct Owner { struct Prefix prefix; };", False),
+            ("struct Prefix (*items)[8];", False),
+            ("struct Prefix Run(void);", False),
+            ("void Run(struct Prefix value);", False),
+            ("int Size(void) { return sizeof(struct Prefix); }", False),
+        ):
+            with self.subTest(source=source):
+                _, _, ast, tu = parse("struct Prefix { int mode; };\n" + source, path)
+                self.assertEqual(merge.pointer_only(ast, tu, key, path), expected)
+
+    def test_global_record_array_is_inline_storage(self):
+        path = "src/records.c"
+        text = """
+struct Entry { unsigned state; };
+extern struct Entry entries[2];
+extern struct Entry *selected;
+extern struct Entry *pointers[2];
+"""
+        _, _, ast, tu = parse(text, path)
+        key = f"{path}:struct Entry"
+        self.assertEqual(evidence.References(ast, tu, path).globals,
+                         [("entries", key, None), ("selected", None, key), ("pointers", None, None)])
+
     def test_pointer_arithmetic_and_array_member(self):
         path = "src/moved/a.c"
         _, _, ast, tu = parse(A, path)
@@ -275,9 +333,23 @@ struct Host {{ unsigned state; struct Link {member}[2]; }};
         self.assertEqual(groups, [sorted(parents), children])
         self.assertEqual({kind for kind, _ in edges[tuple(children)]}, {"member"})
 
+    def test_typed_parent_flow_finds_an_embedded_view_with_one_different_field(self):
+        one = TYPES + """
+struct Entry { u16 phase, timer, flags; };
+struct Parent { unsigned state; struct Entry linked; };
+"""
+        two = one.replace("timer, flags", "timer; s16 direction").replace(" linked;", " entries;")
+        views = measure(one, "src/a.c") | measure(two, "src/b.c")
+        parents = ("src/a.c:struct Parent", "src/b.c:struct Parent")
+        children = ["src/a.c:struct Entry", "src/b.c:struct Entry"]
+        edges = defaultdict(set, {parents: {("flow", "a typed handoff")}})
+        groups = families.family_components(set(views), views, {}, edges)
+        self.assertIn(children, groups)
+        self.assertEqual({kind for kind, _ in edges[tuple(children)]}, {"member"})
+
     def test_probe_compatible_headers_once_and_reuse_the_results(self):
         one = "struct A { u16 flags; };\n"
-        two = "struct B { struct A a; u16 next; };\n"
+        two = "struct B { struct A a; u16 next; };\nextern struct B *gB;\n"
         pre = TYPES + '# 1 "include/a.h"\n' + one + '# 1 "include/b.h"\n' + two
         jobs = [("include/a.h", one, b"version"), ("include/b.h", two, b"version")]
         with tempfile.TemporaryDirectory() as tmp, patch.object(families, "OUT", Path(tmp)), \
@@ -288,6 +360,28 @@ struct Host {{ unsigned state; struct Link {member}[2]; }};
         self.assertEqual(first, second)
         b = first[1]["records"]["include/b.h:struct B"]
         self.assertEqual((b["size"], b["members"][0]["record"]), (8, "include/a.h:struct A"))
+        self.assertEqual(first[1]["globals"], [["gB", None, "include/b.h:struct B"]])
+
+    def test_shared_ram_declaration_links_views_of_the_same_address_space(self):
+        header = "include/work.h"
+        text = "struct Owner { unsigned state, tail; }; extern struct Owner *gWork;"
+        _, _, ast, tu = parse(text, header)
+        shared = families.header_globals(ast, tu)[header]
+        a, b = "src/a.c", "src/b.c"
+        private = "struct Local { unsigned state; };"
+        records = measure(text, header) | measure(private, a) | measure(private, b)
+        a_key, b_key = f"{a}:struct Local", f"{b}:struct Local"
+        scans = [
+            {"file": header, "globals": shared},
+            {"file": a, "globals": [("gWork", None, a_key)]},
+            {"file": b, "globals": [("gWork", b_key, None)]},
+        ]
+        with patch.object(families.ramlayout, "load", return_value=[{"addr": "020004B4", "name": "gWork"}]):
+            _, buckets, _, _, _ = families.flow(scans, records, {})
+        layouts = families.SharedLayouts(records, buckets)
+        self.assertEqual(layouts.relations([records[a_key]]),
+                         [(f"{header}:struct Owner", "contained by", "typed RAM declaration", 1)])
+        self.assertEqual(layouts.relations([records[b_key]]), [])
 
     def test_real_offsets_nested_types_and_votes(self):
         path = "src/moved/a.c"
@@ -322,6 +416,26 @@ struct Host {{ unsigned state; struct Link {member}[2]; }};
         self.assertEqual(merge.probe_header(generated, "struct R", expected, views[0]["size"], views[0]["align"])
                          ["size"], views[0]["size"])
 
+    def test_private_record_pointer_needs_only_a_forward_declaration(self):
+        path = "src/list.c"
+        text = "struct Item { int value; }; struct List { struct Item *head; };"
+        with patch.object(lm, "preprocess", return_value=parse(text, path)[0]):
+            view = families.scan_file(path, text)["records"][f"{path}:struct List"]
+        view.update(id=f"{path}:struct List", known=families.inhabited(view))
+        family = {"kind": "struct", "size": view["size"], "loads": []}
+        generated, expected, _, _ = merge.plan_header(family, [view], "List", Path("include/list.h"))
+        self.assertIn("struct Item;\n\nstruct List {", generated)
+        self.assertNotIn("struct Item {", generated)
+        measured = merge.probe_header(generated, "struct List", expected, view["size"], view["align"])
+        self.assertEqual(merge.field_paths(view, measured), {"head": "head"})
+
+        text = text.replace("*head", "head")
+        with patch.object(lm, "preprocess", return_value=parse(text, path)[0]):
+            embedded = families.scan_file(path, text)["records"][f"{path}:struct List"]
+        embedded["id"] = f"{path}:struct List"
+        with self.assertRaisesRegex(merge.Holdout, "depends on struct Item"):
+            merge.plan_header(family, [embedded], "List", Path("include/list.h"))
+
     def test_field_rename_leaves_unrelated_member_on_same_line(self):
         path = "src/moved/a.c"
         old_text = TYPES + """
@@ -338,14 +452,360 @@ int X(struct R *r, struct Q *q) { return r->old + q->old; }
         self.assertIn("return r->value + q->old;", result)
         self.assertIn('#include "s.h"', result)
 
+    def test_nested_bitfield_flattens_without_touching_another_record(self):
+        path = "src/a.c"
+        old_text = """
+struct Half { unsigned lo : 16; unsigned hi : 16; };
+struct Packed { struct Half xy; unsigned z : 16; };
+struct Other { struct Half xy; };
+int Read(struct Packed *p, struct Other *q) { return p->xy.hi + q->xy.hi; }
+"""
+        old = measure(old_text, path)[f"{path}:struct Packed"]
+        new = measure("struct Vector { unsigned x : 16; unsigned y : 16; unsigned z : 16; };",
+                      "include/vector.h")["include/vector.h:struct Vector"]
+        with patch.object(lm, "preprocess", return_value=parse(old_text, path)[0]):
+            result = merge.rewrite_unit(old_text, old, new, Path("include/vector.h"), "struct Vector")
+        self.assertIn("return p->y + q->xy.hi;", result)
+
+    def test_shared_layout_measures_nested_aggregate_addresses(self):
+        path = "src/a.c"
+        vector = "struct Vec { unsigned x, z; };\n"
+        source = vector + "struct R { unsigned pad[2]; struct Vec pos; };\n" \
+                          "void Read(struct R *p) { Use(&p->pos); }\n"
+        old = measure(source, path)[f"{path}:struct R"]
+        shared = vector + "struct Body { unsigned pad; struct Vec position; };\n" \
+                          "struct Actor { unsigned flags; struct Body body; };\n"
+        new = merge.probe_header(shared, "struct Actor", {"flags": (0, 4), "body": (4, 12)}, 16, 4)
+        self.assertEqual([(m["name"], m["off"], m["size"]) for m in new["qualified"]],
+                         [("body.position", 8, 8)])
+        with patch.object(lm, "preprocess", return_value=parse(source, path)[0]):
+            result = merge.rewrite_unit(source, old, new, Path("include/actor.h"), "struct Actor")
+        self.assertIn("Use(&p->body.position);", result)
+
+    def test_literal_array_subscript_resolves_to_the_measured_scalar(self):
+        path = "src/a.c"
+        declaration = TYPES + "struct Raw { u16 v[3]; };\n"
+        new = measure(TYPES + "struct Config { u16 kind, flags, speed; };",
+                      "include/config.h")["include/config.h:struct Config"]
+        for subscript, refusal in (("0x2U", None), ("i", "no unambiguous shared member"),
+                                   ("1 + 1", "nonliteral source index")):
+            source = declaration + f"void Set(struct Raw *r, int i) {{ r->v[{subscript}] = i; }}"
+            old = measure(source, path)[f"{path}:struct Raw"]
+            with self.subTest(subscript=subscript), patch.object(lm, "preprocess", return_value=parse(source, path)[0]):
+                if refusal:
+                    with self.assertRaisesRegex(merge.Holdout, refusal):
+                        merge.rewrite_unit(source, old, new, Path("include/config.h"), "struct Config")
+                else:
+                    revised = merge.rewrite_unit(source, old, new, Path("include/config.h"), "struct Config")
+                    self.assertIn("r->speed = i;", revised)
+
+    def test_aligned_record_is_editable_and_keeps_its_alignment(self):
+        path = "src/a.c"
+        text = TYPES + "struct Short { u16 value; } __attribute__((aligned(4)));\n"
+        old = measure(text, path)[f"{path}:struct Short"]
+        family = {"kind": "struct", "size": old["size"], "loads": []}
+        generated, expected, _, _ = merge.plan_header(family, [old], "Shared", Path("include/shared.h"))
+        self.assertIn("__attribute__((aligned(4)))", generated)
+        new = merge.probe_header(generated, "struct Shared", expected, 4, 4)
+        with patch.object(lm, "preprocess", return_value=parse(text, path)[0]):
+            result = merge.rewrite_unit(text, old, new, Path("include/shared.h"), "struct Shared")
+        self.assertNotIn("struct Short", result)
+
+    def test_unnamed_bitfield_does_not_block_a_measured_common_layout(self):
+        one = "struct Half { unsigned lo : 16; unsigned : 16; };"
+        two = "struct Half { unsigned lo : 16; unsigned hi : 16; };"
+        views = [next(iter(measure(src, f"src/{i}.c").values())) for i, src in enumerate((one, two))]
+        family = {"kind": "struct", "size": 4, "loads": []}
+        generated, expected, _, _ = merge.plan_header(family, views, "Pair", Path("include/pair.h"))
+        self.assertEqual(expected, {"lo": (0, 2, 0, 16), "hi": (2, 2, 16, 16)})
+        merge.probe_header(generated, "struct Pair", expected, 4, 4)
+
+    def test_variant_selects_measured_native_storage(self):
+        pair = "struct Half { unsigned x; }; struct Vector { struct Half xy, z; };"
+        flat = "struct Vector { unsigned x, z; };"
+        larger = pair.replace("xy, z;", "xy, z, pad;")
+        paths = ["src/a.c", "src/b.c", "src/c.c", "src/d.c"]
+        records = {}
+        for path, text in zip(paths, (pair, pair, flat, larger)):
+            records.update(measure(text, path))
+        ids = [f"{p}:struct Vector" for p in paths]
+        original = {"records": ids, "size": 12, "loads": [(8, 4, None, "F", 0x8000010)]}
+        best = merge.family_variant({"records": records}, original, 8, {"struct Half"})
+        self.assertEqual((best["records"], best["size"], best["loads"]), (ids[:2], 8, []))
+        self.assertIs(merge.family_variant({"records": records}, original, None, set()), original)
+        with self.assertRaisesRegex(merge.Holdout, "at least two"):
+            merge.family_variant({"records": records}, original, 12, {"struct Half"})
+
+    def test_joint_merge_retains_typedef_and_rewrites_references_between_definitions(self):
+        path = "src/a.c"
+        source = """
+typedef struct Pair { unsigned count; } PairAlias;
+struct Tail { unsigned index; };
+int Read(struct Pair *pair, PairAlias *alias, struct Tail *tail) {
+    return pair->count + alias->count + tail->index;
+}
+"""
+        olds = measure(source, path)
+        new = next(iter(measure("struct Slot { unsigned position; };", "include/slot.h").values()))
+        with patch.object(lm, "preprocess", return_value=parse(source, path)[0]):
+            text = merge.rewrite_records(source, [(old, new, "struct Slot") for old in olds.values()],
+                                         Path("include/slot.h"))
+        self.assertIn("typedef struct Slot PairAlias;", text)
+        self.assertIn("Read(struct Slot *pair, PairAlias *alias, struct Slot *tail)", text)
+        self.assertIn("return pair->position + alias->position + tail->position;", text)
+        self.assertNotIn("struct Pair", text)
+        self.assertNotIn("struct Tail", text)
+
+    def test_pointer_members_only_require_a_private_tag_declaration(self):
+        path = "src/a.c"
+        source = """
+struct Node { unsigned id; };
+struct Host {
+    struct Node *head;
+    void (*visit)(struct Node *node);
+    struct Host *next;
+    struct Node (*batch)[2];
+};
+"""
+        _, _, _, tu = parse(source, path)
+        host = tu.tags["struct", "Host"]
+        deps = [evidence.member_dependencies(tu, decl, "struct Host") for decl in host.decls]
+        self.assertEqual(deps, [([], [], ["struct Node"], False), ([], [], ["struct Node"], False),
+                                ([], [], [], True), ([], ["struct Node"], [], False)])
+        old = measure(source, path)[f"{path}:struct Host"]
+        old["members"] = old["members"][:3]
+        old["size"] = 12
+        for member, (headers, private, forwards, self_ref) in zip(old["members"], deps):
+            member.update(headers=headers, private=private, forwards=forwards, self_ref=self_ref)
+        family = {"kind": "struct", "size": 12, "loads": []}
+        generated, expected, _, _ = merge.plan_header(family, [old], "List", Path("include/list.h"))
+        self.assertIn("struct Node;", generated)
+        self.assertIn("struct List *next;", generated)
+        merge.probe_header(generated, "struct List", expected, 12, 4)
+
+    def test_merge_lifts_repeated_private_elements_into_the_same_header(self):
+        source = """
+struct Entry { unsigned timer, state; };
+struct Pool { unsigned count; struct Entry slots[4]; };
+unsigned Read(struct Pool *pool) { return pool->slots[2].timer; }
+"""
+        records = measure(source, "src/a.c") | measure(source, "src/b.c")
+        views = [v for v in records.values() if v["spell"] == "struct Pool"]
+        family = {"kind": "struct", "size": 36, "loads": [], "name": "Pool"}
+        args = SimpleNamespace(use_shared=None, name="ScenePool", header=Path("include/scene_pool.h"))
+        header, spell, text, measured, _, _ = merge.header_choice({"records": records}, family, views, args)
+        self.assertIn("struct Entry slots[4];", text)
+        self.assertLess(text.index("struct Entry {"), text.index("struct ScenePool {"))
+        self.assertEqual(set(measured["embedded"]), {"src/a.c:struct Entry", "src/b.c:struct Entry"})
+        child = records["src/a.c:struct Entry"]
+        targets = [(views[0], measured, spell), (child, measured["embedded"][child["id"]], child["spell"])]
+        with patch.object(lm, "preprocess", return_value=parse(source, "src/a.c")[0]):
+            rewritten = merge.rewrite_records(source, targets, header)
+        self.assertIn("struct ScenePool *pool", rewritten)
+        self.assertIn("pool->slots[2].timer", rewritten)
+        self.assertNotIn("struct Entry {", rewritten)
+        with self.assertRaisesRegex(merge.Holdout, "depends on struct Entry"):
+            merge.header_choice({"records": records}, family, views[:1], args)
+
+    def test_measured_union_and_array_get_qualified_storage_paths(self):
+        header = "include/types.h"
+        declarations = "struct Entry { unsigned state; }; union Region { unsigned words[4]; };\n"
+        left = "struct Host { unsigned status; struct Entry entries[4]; };\n" \
+               "unsigned Read(struct Host *p, int i) { return p->entries[i].state; }\n"
+        right = "struct Host { unsigned status; union Region parts; };\n" \
+                "unsigned Read(struct Host *p, int i) { return p->parts.words[i]; }\n"
+        sources, records = {}, {}
+        for i, source in enumerate((left, right)):
+            path = f"src/{i}.c"
+            marker = f'# 1 "{header}"\n{declarations}# 1 "{path}"\n'
+            sources[path] = (source, marker + source)
+            records.update(measure(marker + source, path))
+        family = {"kind": "struct", "size": 20, "loads": [], "name": "Host"}
+        args = SimpleNamespace(use_shared=None, name="SharedHost", header=Path("include/host.h"))
+        with tempfile.TemporaryDirectory(dir=ROOT / "build") as tmp:
+            root = Path(tmp)
+            (root / "include").mkdir()
+            (root / "build").mkdir()
+            (root / "include/global.h").write_text(TYPES)
+            (root / header).write_text(declarations)
+            with patch.object(families, "ROOT", root), patch.object(lm, "ROOT", root):
+                target, spell, text, new, _, _ = merge.header_choice(
+                    {"records": records}, family, list(records.values()), args)
+            self.assertIn("union SharedHostParts {", text)
+            self.assertIn("struct Entry entries[4];", text)
+            self.assertIn("union Region parts;", text)
+            for path, expression in (("src/0.c", "p->partsStorage.entries[i].state"),
+                                     ("src/1.c", "p->partsStorage.parts.words[i]")):
+                original, pre = sources[path]
+                with patch.object(lm, "preprocess", return_value=pre):
+                    rewritten = merge.rewrite_unit(original, records[f"{path}:struct Host"], new, target, spell)
+                self.assertIn(expression, rewritten)
+
+    def test_independent_typed_calls_recover_an_opaque_embedded_slot(self):
+        header = "include/sprite.h"
+        declaration = "struct Sprite { unsigned timer, flags; };\n"
+        child = f"{header}:struct Sprite"
+        source = TYPES + "struct Owner { unsigned kind; u8 pad4[12]; };"
+        raw_views = measure(source, "src/a.c") | measure(source, "src/b.c")
+        catalog = {"records": raw_views | measure(declaration, header), "embeds": [
+            {"parent": key, "child": child, "declared": False, "offset": 4,
+             "sites": [[f"{view['file']}:7", "Step", "Sprite_Update", 0]]}
+            for key, view in raw_views.items()
+        ]}
+        family = {"kind": "struct", "size": 16, "name": "Owner", "loads": []}
+        args = SimpleNamespace(use_shared=None, name="SpriteOwner", header=Path("include/owner.h"))
+        with tempfile.TemporaryDirectory(dir=ROOT / "build") as tmp:
+            root = Path(tmp)
+            (root / "include").mkdir()
+            (root / "build").mkdir()
+            (root / "include/global.h").write_text(TYPES)
+            (root / header).write_text(declaration)
+            with patch.object(families, "ROOT", root), patch.object(lm, "ROOT", root):
+                result = merge.header_choice(catalog, family, list(raw_views.values()), args)
+                self.assertIn("struct Sprite sprite;", result[2])
+                self.assertEqual([(m["name"], m["off"]) for m in result[3]["members"]],
+                                 [("kind", 0), ("sprite", 4), ("padC", 12)])
+                catalog["embeds"].pop()
+                result = merge.header_choice(catalog, family, list(raw_views.values()), args)
+                self.assertNotIn("struct Sprite sprite;", result[2])
+
+    def test_pointer_view_adopts_a_larger_type_only_without_extent_uses(self):
+        path = "src/a.c"
+        short = "struct Short { unsigned phase; };\n"
+        safe = short + "void Step(struct Short *p) { p->phase = 1; }\n"
+        new = next(iter(measure("struct Actor { unsigned state, timer; };", "include/actor.h").values()))
+        for body, reason in ((safe, None),
+                             (short + "unsigned Read(struct Short *p) { return sizeof(*p); }", "sizeof"),
+                             (short + "void Step(struct Short *p) { p[1].phase = 1; }", "indexed pointer"),
+                             (short + "void Copy(struct Short *p, struct Short *q) { *p = *q; }", "by-value assignment"),
+                             (short + "struct Short items[2];", "by-value object")):
+            with self.subTest(body=body):
+                old = next(iter(measure(body, path).values()))
+                targets = [(old, new, "struct Actor")]
+                with patch.object(lm, "preprocess", return_value=parse(body, path)[0]):
+                    if reason:
+                        with self.assertRaisesRegex(merge.Holdout, reason):
+                            merge.rewrite_records(body, targets, Path("include/actor.h"), allow_prefix=True)
+                    else:
+                        with self.assertRaisesRegex(merge.Holdout, "size/alignment"):
+                            merge.rewrite_records(body, targets, Path("include/actor.h"))
+                        rewrite = merge.rewrite_records(body, targets, Path("include/actor.h"), allow_prefix=True)
+                        self.assertIn("void Step(struct Actor *p) { p->state = 1; }", rewrite)
+
+    def test_tagged_typedef_rewrite_preserves_alias_and_updates_tag_references(self):
+        path = "src/a.c"
+        text = "typedef struct R { unsigned old; } Local;\n"
+        text += "int F(Local *a, struct R *b) { return a->old + b->old; }\n"
+        old = measure(text, path)[f"{path}:struct R"]
+        new = measure("struct S { unsigned state; };", "include/s.h")["include/s.h:struct S"]
+        with patch.object(lm, "preprocess", return_value=parse(text, path)[0]):
+            result = merge.rewrite_unit(text, old, new, Path("include/s.h"), "struct S")
+        self.assertIn("typedef struct S Local;", result)
+        self.assertIn("int F(Local *a, struct S *b) { return a->state + b->state; }", result)
+
     def test_initializer_with_changed_shape_is_a_holdout(self):
         path = "src/moved/a.c"
-        old_text = TYPES + "struct R { u16 old; };\nstruct R data = { 2 };\n"
+        old_text = TYPES + "struct R { u16 old, other; };\nstruct R data = { 2, 3 };\n"
         old = measure(old_text, path)[f"{path}:struct R"]
-        new = measure(TYPES + "struct S { u16 value; };", "include/s.h")["include/s.h:struct S"]
+        new = measure(TYPES + "struct S { u16 value; u8 lo, hi; };", "include/s.h")["include/s.h:struct S"]
         with patch.object(lm, "preprocess", return_value=parse(old_text, path)[0]):
             with self.assertRaisesRegex(merge.Holdout, "initializer"):
                 merge.rewrite_unit(old_text, old, new, Path("include/s.h"), "struct S")
+
+    def test_positional_initializer_survives_a_member_rename(self):
+        path = "src/a.c"
+        declaration = TYPES + "struct R { u16 old; };\n"
+        new = measure(TYPES + "struct S { u16 value; };", "include/s.h")["include/s.h:struct S"]
+        for initializer in ("{ 2 }", "{ .old = 2 }"):
+            source = declaration + f"struct R data = {initializer};\n"
+            old = measure(source, path)[f"{path}:struct R"]
+            with patch.object(lm, "preprocess", return_value=parse(source, path)[0]):
+                if initializer.startswith("{ ."):
+                    with self.assertRaisesRegex(merge.Holdout, "designator"):
+                        merge.rewrite_unit(source, old, new, Path("include/s.h"), "struct S")
+                else:
+                    result = merge.rewrite_unit(source, old, new, Path("include/s.h"), "struct S")
+                    self.assertIn("struct S data = { 2 };", result)
+
+    def test_private_member_maps_to_one_shared_array_element(self):
+        path = "src/moved/a.c"
+        common = TYPES + "struct Sprite { u16 x, y; };\n"
+        old_text = common + """
+struct View { u8 pad[4]; struct Sprite cursor; };
+int Draw(struct View *p) { return p->cursor.x; }
+"""
+        shared = common + "struct Screen { struct Sprite sprites[2]; };\n"
+        old = measure(old_text, path)[f"{path}:struct View"]
+        new = measure(shared, "include/screen.h")["include/screen.h:struct Screen"]
+        with patch.object(lm, "preprocess", return_value=parse(old_text, path)[0]):
+            result = merge.rewrite_unit(old_text, old, new, Path("include/screen.h"), "struct Screen")
+        self.assertIn("return p->sprites[1].x;", result)
+
+        other = measure(shared.replace("struct Sprite sprites[2]", "struct Other { u16 x, y; } sprites[2]"),
+                        "include/screen.h")["include/screen.h:struct Screen"]
+        self.assertIsNone(merge.field_paths(old, other)["cursor"])
+
+    def test_reviewed_short_view_requires_direct_pointer_uses(self):
+        path = "src/moved/a.c"
+        shared = TYPES + "struct State { u16 mode; u16 extra[3]; };\n"
+        new = measure(shared, "include/state.h")["include/state.h:struct State"]
+        declaration = TYPES + "struct View { u16 field; };\n"
+        for expression, problem in [
+            ("int Read(struct View *p) { return p->field; }\nint Other(u16 *p) { return p[1]; }", None),
+            ("int Read(struct View p) { return p.field; }", "by-value parameter"),
+            ("int Read(struct View *p) { return p[1].field; }", "indexed pointer"),
+            ("int Read(struct View *p) { return sizeof(*p); }", "sizeof"),
+            ("int Read(struct View *p) { struct View *q = p; return q->field; }",
+             "outside a direct pointer parameter"),
+            ("int Read(struct View *p) { return *(u16 *)p; }", "outside a member access"),
+        ]:
+            with self.subTest(expression=expression):
+                text = declaration + expression
+                old = measure(text, path)[f"{path}:struct View"]
+                with patch.object(lm, "preprocess", return_value=parse(text, path)[0]):
+                    with self.assertRaisesRegex(merge.Holdout, "size/alignment"):
+                        merge.rewrite_unit(text, old, new, Path("include/state.h"), "struct State")
+                    if problem:
+                        with self.assertRaisesRegex(merge.Holdout, problem):
+                            merge.rewrite_unit(text, old, new, Path("include/state.h"), "struct State", allow_prefix=True)
+                    else:
+                        result = merge.rewrite_unit(text, old, new, Path("include/state.h"), "struct State",
+                                                    allow_prefix=True)
+                        self.assertIn("int Read(struct State *p) { return p->mode; }", result)
+
+    def test_shorter_record_rewrite_requires_opt_in_and_uses_measured_fields(self):
+        path = "src/r.c"
+        old_text = "struct R { unsigned old; };\nint F(struct R *p) { return p->old + sizeof(p); }\n"
+        old = measure(old_text, path)[f"{path}:struct R"]
+        new = measure("struct S { unsigned state, tail; };", "include/s.h")["include/s.h:struct S"]
+        with patch.object(lm, "preprocess", return_value=parse(old_text, path)[0]):
+            with self.assertRaisesRegex(merge.Holdout, "size/alignment"):
+                merge.rewrite_unit(old_text, old, new, Path("include/s.h"), "struct S")
+            result = merge.rewrite_unit(old_text, old, new, Path("include/s.h"), "struct S", allow_prefix=True)
+        self.assertIn("int F(struct S *p) { return p->state + sizeof(p); }", result)
+
+    def test_shorter_record_rewrite_refuses_extent_dependent_uses(self):
+        path = "src/r.c"
+        record = "struct R { unsigned old; }; typedef struct R Alias;\n"
+        old = measure(record, path)[f"{path}:struct R"]
+        new = measure("struct S { unsigned state, tail; };", "include/s.h")["include/s.h:struct S"]
+        for use in (
+            "unsigned F(Alias *p) { return sizeof(Alias); }",
+            "unsigned F(Alias *p) { return sizeof(*p); }",
+            "unsigned F(void) { Alias item; return item.old; }",
+            "unsigned F(void) { Alias items[2]; return items[1].old; }",
+            "unsigned F(Alias *p) { return p[1].old; }",
+            "unsigned F(Alias *p) { return (p + 1)->old; }",
+            "unsigned F(Alias *p) { p += 1; return p->old; }",
+            "unsigned F(Alias *p) { return (++p)->old; }",
+            "unsigned F(Alias *p, Alias *q, int c) { return (c ? p : q)[1].old; }",
+            "unsigned F(Alias *p, Alias *q) { return p - q; }",
+        ):
+            with self.subTest(use=use):
+                text = record + use
+                with patch.object(lm, "preprocess", return_value=parse(text, path)[0]):
+                    with self.assertRaisesRegex(merge.Holdout, "uses the private extent"):
+                        merge.rewrite_unit(text, old, new, Path("include/s.h"), "struct S", allow_prefix=True)
 
     def test_union_preserves_deliberate_overlays(self):
         text = TYPES + "union W { unsigned word; u16 halves[2]; };\n"
@@ -377,6 +837,22 @@ int X(struct R *r, struct Q *q) { return r->old + q->old; }
             merge.probe_header(generated, "struct W", {**expected, "extra": (2, 2, 17, 15)},
                                views[0]["size"], views[0]["align"])
 
+    def test_typed_call_relates_full_width_bitfields_to_scalar_members(self):
+        path = "include/position.h"
+        shared = measure(TYPES + "struct Position { s16 x, y; } __attribute__((aligned(4)));", path)
+        key, target = next(iter(shared.items()))
+        old = next(iter(measure("struct Packed { unsigned x : 16; unsigned y : 16; };", "src/a.c").values()))
+        narrow = next(iter(measure("struct Packed { unsigned x : 15; unsigned extra : 1; unsigned y : 16; };",
+                                   "src/b.c").values()))
+        records = {**shared, old["id"]: old, narrow["id"]: narrow}
+
+        self.assertFalse(families.compatible(old, target, strong=True))
+        self.assertEqual(families.SharedLayouts(records, {}).relations([old]), [])
+        layouts = families.SharedLayouts(records, {("formal type", key): {old["id"], narrow["id"]}})
+        self.assertEqual(layouts.relations([old]), [(key, "overlapping view", "typed call", 0)])
+        self.assertEqual(layouts.relations([narrow]), [])
+        self.assertEqual(merge.field_paths(old, target), {"x": "x", "y": "y"})
+
     def test_sub_byte_bitfield_rewrite_requires_the_same_bits(self):
         old = next(iter(measure("struct W { unsigned low : 4; unsigned high : 4; };", "src/a.c").values()))
         new = next(iter(measure("struct W { unsigned whole : 8; };", "include/w.h").values()))
@@ -384,6 +860,17 @@ int X(struct R *r, struct Q *q) { return r->old + q->old; }
         with self.assertRaisesRegex(merge.Holdout, "allocation-group"):
             merge.plan_header(family, [old], "W", Path("include/w.h"))
         self.assertEqual(merge.field_paths(old, new), {"low": None, "high": None})
+
+    def test_shared_record_can_map_a_private_field_to_a_nested_member(self):
+        types = "struct Body { int mode; };\nstruct Other { int mode; };\n"
+        old = measure(types + "struct View { struct Body body; };", "src/a.c")["src/a.c:struct View"]
+        shared = types + "struct Shared { struct { struct Body motion; struct Other other; } actor; };"
+        new = measure(shared, "include/shared.h")["include/shared.h:struct Shared"]
+        self.assertEqual(merge.field_paths(old, new)["body"], "actor.motion")
+
+        wrong = measure(shared.replace("Body motion", "Other motion"),
+                        "include/shared.h")["include/shared.h:struct Shared"]
+        self.assertEqual(merge.field_paths(old, wrong)["body"], None)
 
 
 class GateTests(unittest.TestCase):

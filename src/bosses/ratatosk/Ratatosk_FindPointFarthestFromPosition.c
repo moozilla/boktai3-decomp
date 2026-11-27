@@ -1,20 +1,18 @@
 #include "global.h"
+#include "scene/collision/contact_position.h"
 
-struct RatatoskPoint {
-    s16 x, y, z, unk6;
-};
 struct Ratatosk {
     u8 unk0[0xCCC];
-    struct RatatoskPoint movementPoints[9];
+    struct ContactPosition movementPoints[9];
 };
 
-struct RatatoskPoint *Ratatosk_FindPointFarthestFromPosition(struct Ratatosk *self,
-                                                             struct RatatoskPoint *position)
+struct ContactPosition *Ratatosk_FindPointFarthestFromPosition(struct Ratatosk *self,
+                                                               struct ContactPosition *position)
 {
     u32 maximum = 0;
     s32 selected = -1;
     s32 i = 0;
-    struct RatatoskPoint *result;
+    struct ContactPosition *result;
     s32 x = position->x;
     s32 z = position->z;
     for (; i < 9; i++) {

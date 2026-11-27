@@ -1,8 +1,6 @@
 #include "global.h"
 #include "engine/engine.h"
-struct CratePackedVector {
-    s32 x : 16, y : 16, z : 16;
-};
+#include "scene/collision/packed_contact_vector.h"
 struct CrateCollider {
     u8 pad0[4];
     u16 id;
@@ -19,7 +17,7 @@ struct WoodenCrate {
 void WoodenCrate_ReactToHit(void *, void *, struct WoodenCrate *);
 void WoodenCrate_InitCollider(struct WoodenCrate *p)
 {
-    struct CratePackedVector bounds, offset;
+    struct PackedContactVector bounds, offset;
     struct CrateCollider *c = &p->collider;
     bounds.x = 0;
     bounds.y = 128;

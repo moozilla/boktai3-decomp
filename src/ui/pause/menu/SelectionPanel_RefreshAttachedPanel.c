@@ -1,23 +1,20 @@
+#include "ui/pause/scene_hud_display.h"
 #define SelectionPanel_RefreshPrimaryEntries PauseMenu_RefreshEquipmentSlotIcons
 #include "global.h"
 #include "engine/engine.h"
-struct SelectionPanel {
-    u8 pad[0xA40];
-    void *owner;
-};
-void PauseMenu_CreateSelectionWidgets(struct SelectionPanel *);
-void sub_08168850(struct SelectionPanel *);
-void SceneHud_RebuildPrimaryOptions(struct SelectionPanel *);
-void SceneHud_RebuildTertiaryOptions(struct SelectionPanel *);
-void SceneHud_UpdateSecondaryWidgets(struct SelectionPanel *);
-void PauseMenu_RefreshEquipmentSlotIcons(struct SelectionPanel *);
-void SceneHud_UpdateTertiaryWidgets(struct SelectionPanel *);
-void Hud_SetElementGroupFlags(struct SelectionPanel *);
-void SceneHud_RefreshWidgetVisibility(struct SelectionPanel *);
-void SelectionPanel_RefreshAttachedPanel(struct SelectionPanel *p)
+void PauseMenu_CreateSelectionWidgets(struct SceneHudState *);
+void sub_08168850(struct SceneHudState *);
+void SceneHud_RebuildPrimaryOptions(struct SceneHudState *);
+void SceneHud_RebuildTertiaryOptions(struct SceneHudState *);
+void SceneHud_UpdateSecondaryWidgets(struct SceneHudState *);
+void PauseMenu_RefreshEquipmentSlotIcons(struct SceneHudState *);
+void SceneHud_UpdateTertiaryWidgets(struct SceneHudState *);
+void Hud_SetElementGroupFlags(struct SceneHudState *);
+void SceneHud_RefreshWidgetVisibility(struct SceneHudState *);
+void SelectionPanel_RefreshAttachedPanel(struct SceneHudState *p)
 {
     PauseMenu_CreateSelectionWidgets(p);
-    if (p->owner) {
+    if (p->actionOwner) {
         sub_08168850(p);
         SceneHud_RebuildPrimaryOptions(p);
         SceneHud_RebuildTertiaryOptions(p);

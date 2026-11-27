@@ -1,4 +1,5 @@
 #include "global.h"
+#include "engine/engine_pause.h"
 #include "engine/engine.h"
 #include "engine/ram.h"
 #include "link/wireless/scene_pool.h"
@@ -35,8 +36,7 @@ s32 MotionActor_Destroy(struct MotionActor *actor)
     } while (i >= 0);
     SpatialIndex_RemoveEntry(&state->resource);
     {
-        u32 mask = 0x800;
-        if (!((gEngineFlags | gScenePauseFlags) & mask))
+        if (!Engine_PauseBits(0x800))
             SceneMessages_UnregisterReceiver(&actor->display);
     }
     Sound_StopSong(0x87);

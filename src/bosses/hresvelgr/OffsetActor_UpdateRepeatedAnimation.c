@@ -1,28 +1,13 @@
 #include "global.h"
 #include "engine/ram.h"
-struct OffsetActorAction {
-    u8 state, pad1[3];
-    u32 frame, unk8, unkC;
-};
-struct OffsetActor {
-    u8 pad0[0x9A];
-    u8 active;
-    u8 pad9B[0xAA - 0x9B];
-    u8 animation;
-    u8 padAB[4];
-    u8 finished, entered;
-    u8 padB1[0x300 - 0xB1];
-    struct OffsetActorAction action;
-    u8 pad310[0x383 - 0x310];
-    u8 sequenceDone;
-};
+#include "bosses/hresvelgr/offset_actor_layout.h"
 void ActionState_Reset(void *);
 void ActionState_SetState(void *, u32);
 s32 Hresvelgr_HasAdjacentOverride(struct OffsetActor *);
 static inline u8 Enter(struct OffsetActor *p)
 {
-    if (p->entered) {
-        p->entered = 0;
+    if (p->pending) {
+        p->pending = 0;
         p->finished = 0;
         return 1;
     }
@@ -72,7 +57,7 @@ void OffsetActor_UpdateRepeatedAnimation(struct OffsetActor *p)
                 ActionState_SetState(s, 1);
             break;
         case 3:
-            p->sequenceDone = 1;
+            p->ready = 1;
             break;
     }
 }

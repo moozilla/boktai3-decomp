@@ -1089,13 +1089,13 @@ s32 Player_GetScaledTargetFlagBonus(s32 unused0, s32 unused1, struct PlayerModif
 {
     if (PlayerModifier_TestTargetFlags(target, 0x80))
         return LimitTargetBonus(gGameState->targetFlagBonuses[0] >> 6);
-    else if (PlayerModifier_TestTargetFlags(target, 0x100))
+    else if ((target->flags & 0x100))
         return LimitTargetBonus(gGameState->targetFlagBonuses[1] >> 6);
-    else if (PlayerModifier_TestTargetFlags(target, 0x200))
+    else if ((target->flags & 0x200))
         return LimitTargetBonus(gGameState->targetFlagBonuses[2] >> 6);
-    else if (PlayerModifier_TestTargetFlags(target, 0x400))
+    else if ((target->flags & 0x400))
         return LimitTargetBonus(gGameState->targetFlagBonuses[3] >> 6);
-    else if (PlayerModifier_TestTargetFlags(target, 0x800))
+    else if ((target->flags & 0x800))
         return LimitTargetBonus(gGameState->targetFlagBonuses[4] >> 6);
     return 0;
 }

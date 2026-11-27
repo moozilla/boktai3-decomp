@@ -1,8 +1,6 @@
 #include "global.h"
+#include "scene/collision/contact_position.h"
 
-struct CameraOffsetVector {
-    s16 x, y, z;
-};
 struct CameraPackedOffset {
     s32 x : 16;
     s32 y : 16;
@@ -14,7 +12,7 @@ static inline int scaleOffset(int n)
     return n >= 0 ? n >> 8 : -((-n) >> 8);
 }
 
-void Camera_BlendOffset(struct CameraOffsetVector *a, struct CameraOffsetVector *b, s32 weight)
+void Camera_BlendOffset(struct ContactPosition *a, struct ContactPosition *b, s32 weight)
 {
     struct CameraPackedOffset result;
     if (a && b) {

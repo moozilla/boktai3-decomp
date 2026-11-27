@@ -1,29 +1,8 @@
+#include "objects/floor_switch/floor_switch_layout.h"
 #define gSceneContactFlags gEngineFlags
 #include "global.h"
 #include "engine/engine.h"
 #include "player/player.h"
-struct FloorSwitch {
-    u32 flags;
-    u8 pad4[8];
-    void *anim;
-    u16 field10;
-    u8 pad12[0xA];
-    s16 x, y, z;
-    u8 pad22[0xA];
-    u8 animData[0x1C];
-    s32 name;
-    s32 r[2];
-    s32 region;
-    u16 sprite, field5A;
-    u8 pad5C[8];
-    s32 s[4];
-    s32 w[4];
-    u8 pad84[2];
-    u16 field86;
-    u16 flags88;
-    u8 field8A, field8B;
-    u16 field8C, field8E;
-};
 struct FloorSwitchObject {
     u32 id, flags;
     u8 kind;

@@ -1,4 +1,4 @@
-#include "npc/manager/scene_actor_lifecycle.h"
+#include "npc/manager/scene_actor_allocation.h"
 
 void *Actor_FindResourceData(int type, int variant)
 {
@@ -65,12 +65,12 @@ struct SceneActor *Actor_FindById(struct SceneActorManager *manager, int id)
 struct SceneActor *Actor_Allocate(int unused, int variant)
 {
     if (gSceneActorListManager) {
-        int size = sizeof(struct SceneActor);
-        struct SceneActor *actor = Heap_Alloc(size);
+        int size = sizeof(union SceneActorAllocation);
+        union SceneActorAllocation *actor = Heap_Alloc(size);
         if (actor) {
             Memory_Clear(actor, size);
-            actor->variant = variant;
-            return actor;
+            actor->scene.variant = variant;
+            return &actor->scene;
         }
     }
     return 0;

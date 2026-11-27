@@ -1,19 +1,9 @@
-#include "global.h"
+#include "player/effects/player_attack_particles.h"
 #include "engine/engine.h"
-struct Vec {
-    u32 x : 16;
-    u32 y : 16;
-    u32 z : 16;
-    u32 pad : 16;
-};
+#include "scene/collision/contact_position.h"
 extern const s16 gUnk_086149C4[];
 s32 Mod(s32, s32);
 s32 Div(s32, s32);
-void PlayerAttackEffect_AllocateParticle(u8 *, struct Vec *, s32, void *, s32, s32);
-#define W(n) (*(u32 *)(p + (n)))
-#define I(n) (*(s32 *)(p + (n)))
-#define P(n) (*(u8 **)(p + (n)))
-#define D(n) (*(u16 *)(P(0x594) + (n)))
 static inline s32 shift12(s32 x)
 {
     if (x >= 0)
@@ -33,68 +23,68 @@ static inline u16 mask8(s32 x)
 {
     return x & 255;
 }
-s32 PlayerAttackEffect_EmitPaletteThreeTrail(u8 *p)
+s32 PlayerAttackEffect_EmitPaletteThreeTrail(struct AttackParticleEffect *p)
 {
-    struct Vec a, b, c;
-    u32 state = W(0x59C);
+    struct ContactPosition a, b, c;
+    u32 state = p->current;
     if (state == 1) {
         s32 angle, step;
-        if (W(0x584) == 0) {
+        if (p->frame == 0) {
             gRandomIndex = (gRandomIndex + 1) & 1023;
             // literal gRandomTable (checked macro): a constant address leaves the load to
             // reload, whose spill rotation gives the original r3/r4 choices
-            I(0xC0) = Mod(*(u16 *)((gRandomIndex << 1) + RANDOM_TABLE_ADDR), 10) + 230;
+            p->radius = Mod(*(u16 *)((gRandomIndex << 1) + RANDOM_TABLE_ADDR), 10) + 230;
         }
-        angle = ((*P(0x58C) + 5) & 7) * 32;
-        step = Div(768, D(0x10));
-        if (D(0x14) > 2)
+        angle = ((*p->facing + 5) & 7) * 32;
+        step = Div(768, p->owner->durationScale);
+        if (p->owner->frameIndex > 2)
             goto done;
-        if (*P(0x590))
-            angle = angle - W(0x584) * step + 288;
+        if (*p->side)
+            angle = angle - p->frame * step + 288;
         else
-            angle = W(0x584) * step + angle + 224;
+            angle = p->frame * step + angle + 224;
         angle = mask8(angle);
-        a.x = D(0x20) + shift12(I(0xC0) * SIN(angle + 64));
-        a.y = D(0x22) + 200;
-        a.z = D(0x24) + shift12(I(0xC0) * gUnk_086149C4[angle]);
-        PlayerAttackEffect_AllocateParticle(p, &a, 5, p + 0x88, 3, 1);
-        W(0x584)++;
+        a.x = p->owner->position.x + shift12(p->radius * SIN(angle + 64));
+        a.y = p->owner->position.y + 200;
+        a.z = p->owner->position.z + shift12(p->radius * gUnk_086149C4[angle]);
+        PlayerAttackEffect_AllocateParticle(p, &a, 5, &p->graphics[4], 3, 1);
+        p->frame++;
     } else if (state == 2) {
-        if (W(0x584) == 0)
-            I(0xC0) = 290;
-        if (D(0x14) <= 1)
+        if (p->frame == 0)
+            p->radius = 290;
+        if (p->owner->frameIndex <= 1)
             goto done;
-        if (W(0x584) > 9)
+        if (p->frame > 9)
             goto done;
-        if (!(W(0x584) & 1)) {
+        if (!(p->frame & 1)) {
             s32 angle, pitch, distance;
-            angle = ((*P(0x58C) + 5) & 7) * 32;
-            pitch = (306 - W(0x584) * 10) & 255;
-            b.y = D(0x22) + shift12(I(0xC0) * SIN(pitch)) + 190;
-            distance = shift_distance(I(0xC0) * SIN(pitch + 64));
-            b.x = D(0x20) + shift12(distance * SIN(angle + 64)) - 16;
-            b.z = D(0x24) + shift12(distance * gUnk_086149C4[angle]) + 16;
-            PlayerAttackEffect_AllocateParticle(p, &b, 5, p + 0x88, 3, 1);
+            angle = ((*p->facing + 5) & 7) * 32;
+            pitch = (306 - p->frame * 10) & 255;
+            b.y = p->owner->position.y + shift12(p->radius * SIN(pitch)) + 190;
+            distance = shift_distance(p->radius * SIN(pitch + 64));
+            b.x = p->owner->position.x + shift12(distance * SIN(angle + 64)) - 16;
+            b.z = p->owner->position.z + shift12(distance * gUnk_086149C4[angle]) + 16;
+            PlayerAttackEffect_AllocateParticle(p, &b, 5, &p->graphics[4], 3, 1);
         }
-        W(0x584)++;
+        p->frame++;
     } else if (state == 3) {
-        if (W(0x584) == 0)
-            I(0xC0) = 60;
-        if (!(W(0x584) & 1)) {
+        if (p->frame == 0)
+            p->radius = 60;
+        if (!(p->frame & 1)) {
             s32 angle;
-            if (D(0x14) > 2)
-                I(0xC0) -= 70;
+            if (p->owner->frameIndex > 2)
+                p->radius -= 70;
             else
-                I(0xC0) += 35;
-            angle = ((*P(0x58C) + 5) & 7) * 32;
-            c.x = D(0x20) + shift12(I(0xC0) * SIN(angle + 64)) - 16;
-            c.y = D(0x22) + 200;
-            c.z = D(0x24) + shift12(I(0xC0) * gUnk_086149C4[angle]) + 16;
-            PlayerAttackEffect_AllocateParticle(p, &c, 5, p + 0x88, 3, 1);
+                p->radius += 35;
+            angle = ((*p->facing + 5) & 7) * 32;
+            c.x = p->owner->position.x + shift12(p->radius * SIN(angle + 64)) - 16;
+            c.y = p->owner->position.y + 200;
+            c.z = p->owner->position.z + shift12(p->radius * gUnk_086149C4[angle]) + 16;
+            PlayerAttackEffect_AllocateParticle(p, &c, 5, &p->graphics[4], 3, 1);
         }
-        W(0x584)++;
+        p->frame++;
     } else
-        W(0x584) = 0;
+        p->frame = 0;
 done:
     return 0;
 }

@@ -1,17 +1,14 @@
 #include "global.h"
-struct Pair77 {
-    u32 a;
-    u32 b;
-};
+#include "effects/bursts/pair47_layout.h"
 void SpiralBurst_InitParticles(u8 *);
 void SpiralBurst_InitCollider(u8 *);
 s32 Div(s32, s32);
 void Sound_PlaySong(u32);
 void SpiralBurst_UpdateParticles(u8 *);
 void SpiralBurst_SetState(u8 *, void (*)(u8 *));
-s32 SpiralBurst_Init(u8 *p, u8 *owner, struct Pair77 *q)
+s32 SpiralBurst_Init(u8 *p, u8 *owner, struct Pair47 *q)
 {
-    *(struct Pair77 *)(p + 0x1c) = *q;
+    *(struct Pair47 *)(p + 0x1c) = *q;
     *(u8 **)(p + 0x18) = owner;
     SpiralBurst_InitParticles(p);
     SpiralBurst_InitCollider(p);

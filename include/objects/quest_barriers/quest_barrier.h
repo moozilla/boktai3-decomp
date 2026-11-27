@@ -1,5 +1,6 @@
 #ifndef GUARD_QUEST_BARRIER_H
 #define GUARD_QUEST_BARRIER_H
+#include "effects/particles/impact_burst.h"
 #include "scene/collision/contact_swarm.h"
 #include "system/game_state/game_state.h"
 #include "engine/engine_globals.h"
@@ -15,14 +16,6 @@ struct BreakableProp {
     u16 cell;
     u8 destroyRequested, unknownC9[3];
     u32 scriptId;
-};
-struct AnimatedParticleConfig {
-    /* The particle consumer does not read the unused halfword at offset 4. */
-    u16 type, flags, unused, speed;
-    s16 vertical, verticalRange, horizontal, horizontalRange;
-    u16 pitch, pitchRange, yaw, yawRange;
-    u16 verticalStart, verticalStartRange, verticalDecay, verticalDecayRange;
-    u16 horizontalStart, horizontalStartRange, horizontalDecay, horizontalDecayRange;
 };
 void QuestBarrier_RequestBreakOnContact(struct ContactCollider *, s32,
                                          struct BreakableProp *);

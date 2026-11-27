@@ -1,11 +1,6 @@
 #include "global.h"
 #include "engine/engine.h"
-struct PackedVec {
-    u32 x : 16;
-    u32 y : 16;
-    u32 z : 16;
-    u32 pad : 16;
-};
+#include "scene/collision/packed_contact_vector.h"
 struct SceneNpc {
     u8 unknown0[2];
     u8 field2, field3, state, nextState, prevState, done, enterCommand, enter;
@@ -34,7 +29,7 @@ static inline void setHandler(void (*fn)(void), void (**slot)(void))
 }
 
 struct SceneNpc *Actor_Allocate(void *, s32 variant);
-s32 Actor_InitMotion(struct SceneNpc *, void *, struct PackedVec *, s32 angle);
+s32 Actor_InitMotion(struct SceneNpc *, void *, struct PackedContactVector *, s32 angle);
 s32 Actor_InitDrawable(struct SceneNpc *, s32 kind, s32 a, s32 b, s32 c);
 void Actor_InitShadow(struct SceneNpc *, u32, s32, s32, s32);
 void SceneMessages_RegisterReceiver(void *, void *, s32);
@@ -57,7 +52,7 @@ s32 StoryCharacter_CreateFromScriptEntry(void *manager, void *name)
     s32 variant;
     s32 angle;
     struct SceneNpc *npc;
-    struct PackedVec position;
+    struct PackedContactVector position;
     variant = Script_GetKeywordValue('k', 0);
     if (Script_SeekToKeyword('p')) {
         position.x = Script_GetValue();

@@ -5,14 +5,11 @@
 #include "bosses/vanargand/positioned_effect_coordinates.h"
 #include "engine/video/anim_sprite.h"
 #include "bosses/vanargand/vanargand_stage_colors.h"
+#include "bosses/vanargand/vanargand_part_layout.h"
 
 typedef void (*VanargandStateCallback)(void *);
 typedef s32 (*VanargandUpdateCallback)(void *);
 
-struct VanargandPart {
-    u8 pad0[0x10];
-    u16 state;
-};
 struct Vanargand {
     u8 unknown0[0x54];
     struct SceneVec position; /* 0x54 */

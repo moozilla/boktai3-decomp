@@ -1,18 +1,11 @@
-#include "global.h"
+#include "player/player.h"
 
-struct P081594C8 {
-    u8 f0[0x1c];
-    s32 f1c;
-    u8 f20[0x424 - 0x20];
-    u16 f424;
-};
-
-void Player_SubtractLifeNonlethal(struct P081594C8 *p, s32 d)
+void Player_SubtractLifeNonlethal(struct Player *p, s32 d)
 {
-    if (p->f1c == 1) {
-        if (p->f424 < d + 1)
-            p->f424 = p->f1c;
+    if (p->kind == 1) {
+        if (p->currentStatA < d + 1)
+            p->currentStatA = p->kind;
         else
-            p->f424 -= d;
+            p->currentStatA -= d;
     }
 }

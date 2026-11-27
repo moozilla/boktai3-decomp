@@ -4,6 +4,7 @@
 #include "engine/video/display_sequence.h"
 #include "engine/video/display_sequence_inline.h"
 #include "engine/math/scene_vec.h"
+#include "effects/sun_discs/disc_pool_layout.h"
 
 struct Sprite {
     u32 flags;
@@ -37,10 +38,6 @@ struct Disc {
     s8 slot;
     u16 unknownF4, age;
     u8 entered;
-};
-struct DiscPool {
-    u8 pad[0x38];
-    u32 allocated;
 };
 struct Map {
     u32 unknown;

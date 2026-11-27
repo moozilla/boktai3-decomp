@@ -1,10 +1,7 @@
 #include "global.h"
-struct H {
-    u32 lo : 16;
-    u32 hi : 16;
-};
+#include "monsters/centipede/packed_centipede_halfwords_layout.h"
 struct Z {
-    struct H a, b;
+    struct PackedCentipedeHalfwords a, b;
 };
 void SceneActorCollision_InitBody(u8 *, struct Z *, struct Z *, void (*)(void), u8 *);
 void SceneActorCollision_InitAttack(u8 *, struct Z *, struct Z *, void (*)(void), u32, u8 *);

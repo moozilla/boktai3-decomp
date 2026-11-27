@@ -2,25 +2,17 @@
 #include "system/game_state/game_state.h"
 #include "engine/ram.h"
 #include "player/cutscene/player_cue_sequence.h"
+#include "bosses/nidhoggr/nidhoggr_effect_motion_layout.h"
+#include "bosses/nidhoggr/nidhoggr_pool_sprite_layout.h"
+#include "bosses/nidhoggr/effect_delta_layout.h"
 
-struct NidhoggrEffectVector {
-    u16 x, y, z, unk_6;
-};
-struct NidhoggrPoolSprite {
-    u32 flags;
-    u8 unk_4[12];
-    u16 frame;
-    u8 unk_12[10];
-    struct NidhoggrEffectVector position;
-    u8 unk_24[8];
-};
 struct NidhoggrAnimatedSlot {
     void *update, *onComplete;
     u8 animationData[0x1c];
     struct NidhoggrPoolSprite sprite;
     struct DisplaySequenceState sequence;
     u8 unk_60[0x178 - 0x60];
-    struct NidhoggrEffectVector motion;
+    struct NidhoggrEffectMotion motion;
     u8 state, age;
     s16 unk_182;
     void *boss;
@@ -30,16 +22,11 @@ struct NidhoggrTarget {
     s16 x, y, z;
 };
 // Packed coordinates preserve the unused upper halfword of the last word.
-struct EffectDelta {
-    s32 x : 16;
-    s32 y : 16;
-    s32 z : 16;
-};
 extern const u16 gUnk_086141BC[];
 extern const s16 gUnk_086149C4[];
 s32 Callback_InvokeActor(void *, void *);
 s32 Math_Atan2(s32, s32);
-void Nidhoggr_CreateTimedPositionEffect(struct NidhoggrEffectVector *, void *);
+void Nidhoggr_CreateTimedPositionEffect(struct NidhoggrEffectMotion *, void *);
 
 void Collider_Remove(void *);
 
@@ -53,8 +40,8 @@ static inline s32 RandomValue(void)
     gEffectRandomTableIndex = (gEffectRandomTableIndex + 1) & 1023;
     return gUnk_086141BC[gEffectRandomTableIndex];
 }
-static inline void AddPosition(struct NidhoggrEffectVector *out,
-                               struct NidhoggrEffectVector *position)
+static inline void AddPosition(struct NidhoggrEffectMotion *out,
+                               struct NidhoggrEffectMotion *position)
 {
     out->x += position->x;
     out->y += position->y;
@@ -106,8 +93,8 @@ void Nidhoggr_UpdateSeekingAttackEffect(struct NidhoggrAnimatedSlot *owner)
         impact.x = 0;
         impact.y = -96;
         impact.z = 0;
-        AddPosition((struct NidhoggrEffectVector *)&impact, &owner->sprite.position);
-        Nidhoggr_CreateTimedPositionEffect((struct NidhoggrEffectVector *)&impact, boss);
+        AddPosition((struct NidhoggrEffectMotion *)&impact, &owner->sprite.position);
+        Nidhoggr_CreateTimedPositionEffect((struct NidhoggrEffectMotion *)&impact, boss);
         owner->update = 0;
         if (owner->onComplete) {
             Callback_InvokeActor(owner, owner->onComplete);
@@ -124,7 +111,7 @@ void Nidhoggr_UpdateSeekingAttackEffect(struct NidhoggrAnimatedSlot *owner)
         delta.x += gUnk_086149C4[(angle + 64) & 255] >> 10;
         delta.z += gUnk_086149C4[angle & 255] >> 10;
     }
-        owner->motion = *(struct NidhoggrEffectVector *)&delta;
+        owner->motion = *(struct NidhoggrEffectMotion *)&delta;
         if (owner->age == 0)
             owner->state++;
         if (owner->state > 1 && owner->age > 88) {
@@ -133,8 +120,8 @@ void Nidhoggr_UpdateSeekingAttackEffect(struct NidhoggrAnimatedSlot *owner)
             impact.x = 0;
             impact.y = -128;
             impact.z = 0;
-            AddPosition((struct NidhoggrEffectVector *)&impact, &owner->sprite.position);
-            Nidhoggr_CreateTimedPositionEffect((struct NidhoggrEffectVector *)&impact, boss);
+            AddPosition((struct NidhoggrEffectMotion *)&impact, &owner->sprite.position);
+            Nidhoggr_CreateTimedPositionEffect((struct NidhoggrEffectMotion *)&impact, boss);
             Collider_Remove((u8 *)owner + 0x120);
             owner->update = 0;
             if (owner->onComplete) {

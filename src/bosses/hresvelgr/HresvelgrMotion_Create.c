@@ -1,24 +1,9 @@
 #include "global.h"
 #include "engine/ram.h"
 #include "engine/engine_globals.h"
+#include "scene/collision/contact_position.h"
+#include "bosses/hresvelgr/motion_entry_layout.h"
 
-struct MotionVector {
-    s16 x, y, z, pad;
-};
-struct MotionEntry {
-    u32 flags;
-    u8 unknown4[0xC];
-    u16 tile;
-    u8 unknown12[0xA];
-    struct MotionVector position;
-    u8 unknown24[8];
-    u8 animation[0x10];
-    struct MotionVector savedPosition, delta;
-    struct MotionVector *origin;
-    u16 lifetime, frame, radius, height;
-    u8 type, mode;
-    u16 angularStep;
-};
 struct MotionPool {
     u8 unknown0[0x18];
     u8 animationA[0x1C], animationB[0x1C];
@@ -44,7 +29,7 @@ static inline s32 randomValue(void)
     offset = gRandomIndex * 2;
     return *(const u16 *)(offset + RANDOM_TABLE_ADDR);
 }
-struct MotionEntry *HresvelgrMotion_Create(struct MotionVector *origin, u32 type, u32 mode,
+struct MotionEntry *HresvelgrMotion_Create(struct ContactPosition *origin, u32 type, u32 mode,
                                        u32 lifetime)
 {
     struct MotionCounts counts = gUnk_0824F770;

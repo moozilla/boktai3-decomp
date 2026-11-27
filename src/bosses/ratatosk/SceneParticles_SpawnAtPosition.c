@@ -2,14 +2,7 @@
 #include "scene/collision/contact_swarm.h"
 #include "engine/ram.h"
 #include "player/cutscene/player_cue_sequence.h"
-struct ParticleConfig {
-    u8 pad0[6];
-    s8 angle;
-    u8 pad7;
-    s32 speed;
-    u8 pad0C[8];
-    u32 kind;
-};
+#include "bosses/ratatosk/particle_config_layout.h"
 struct Particle {
     u32 age;
     u8 pad4[8];
@@ -61,7 +54,7 @@ s32 SceneParticles_SpawnAtPosition(struct ParticleConfig *config, struct Contact
     {
         s16 *vel = &e->vx;
         s32 angle = config->angle;
-        s32 speed = config->speed;
+        s32 speed = config->mode;
         s32 x = Scale(gUnk_086149C4[(angle + 64) & 255] * speed);
         s32 zero = 0;
         vel[0] = x;

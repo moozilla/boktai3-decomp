@@ -1,14 +1,5 @@
-#include "global.h"
-/* Tentative ParticleEffect/ParticleBurst family names (low confidence). */
-#define SpiralTrail_RemoveSprite SpiralTrail_RemoveSprite
-#define SpiralTrail_RemoveSlots  SpiralTrail_RemoveParticles
-struct ParticleBurst {
-    u8 pad[0x284];
-    u8 mode;
-};
-void SpiralTrail_RemoveSprite(struct ParticleBurst *);
-void SpiralTrail_RemoveParticles(struct ParticleBurst *);
-u32 SpiralTrail_Destroy(struct ParticleBurst *p)
+#include "player/effects/spiral_trail.h"
+u32 SpiralTrail_Destroy(struct SpiralTrailTask *p)
 {
     SpiralTrail_RemoveSprite(p);
     if (p->mode == 1)

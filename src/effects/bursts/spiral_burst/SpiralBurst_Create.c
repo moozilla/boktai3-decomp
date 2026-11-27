@@ -1,7 +1,5 @@
 #include "global.h"
-struct Pair47 {
-    u32 a, b;
-};
+#include "effects/bursts/pair47_layout.h"
 u8 *Task_Create(u32, u32);
 void Task_SetCallbacks(u8 *, void (*)(u8 *), void (*)(u8 *));
 void Task_Kill(u8 *);

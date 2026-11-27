@@ -19,6 +19,7 @@
 #include "scene/motion/scene_actor_chase_shared.h"
 #include "scene/motion/scene_actor_turn.h"
 #include "scene/actor/scene_actor_init_actor.h"
+#include "ui/hud/damage_number_display.h"
 
 void Vorn_OnContactEvent(u8 *unused, struct ContactCollider *collider, struct ChaseActor *ctx)
 {
@@ -144,7 +145,7 @@ void Anim_SetFrameDurationScale(void *, u32);
 
 void Vorn_UpdateIdleFacing(struct ChaseActor *actor)
 {
-    u8 *group = (u8 *)actor + 0x50;
+    u8 *group = (u8 *)&actor->base.body;
     void *route = &actor->group.homeRoute;
     if (SceneActorReaction_TakePrepared(actor)) {
         s32 direction;
@@ -566,7 +567,7 @@ static inline u8 Vorn_TestNear(struct Vorn *p, u32 mask, u16 **out)
 void Vorn_UpdatePursuitDistance(struct ChaseActor *actor)
 {
     struct Vorn *context = actor->base.context;
-    u8 *group = (u8 *)context + 0x3D4;
+    u8 *group = (u8 *)&context->chase.group;
     struct ContactPosition center;
     u16 *flags;
     u8 near;
@@ -997,13 +998,6 @@ static inline u8 LinkActive(struct SceneActorAnimationLink *p)
     return 0;
 }
 
-static inline s32 AngleIndex(s32 angle)
-{
-    if (angle >= 0)
-        return angle >> 5;
-    return -((-angle) >> 5);
-}
-
 static inline s32 RandomByte(void)
 {
     u32 offset;
@@ -1026,7 +1020,7 @@ void SceneActorPhase_SelectLinkedAnimation(struct RoomActor *p)
                 p->behavior2AA = state;
                 p->counter2AC = 0;
                 p->field2B1 = 1;
-                p->nextDirection = (AngleIndex(p->tracking.heading) + 3) & 7;
+                p->nextDirection = (DamageNumber_ProjectScale(p->tracking.heading) + 3) & 7;
             } else {
                 if (RandomByte() <= 0x1f)
                     Vorn_SelectRetreatRoute(p, 1);

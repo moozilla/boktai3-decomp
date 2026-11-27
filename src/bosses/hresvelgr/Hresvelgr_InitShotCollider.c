@@ -1,8 +1,6 @@
 #include "bosses/hresvelgr/hresvelgr_shot.h"
+#include "scene/collision/packed_contact_vector.h"
 
-struct HresvelgrColliderVector {
-    u32 x : 16, y : 16, z : 16;
-};
 void Collider_Init(void *, u16, u32, u32, u32, void *, void *);
 void Collider_SetPosition(void *, void *, u32);
 void Collider_SetCallback(void *, void *, void *);
@@ -10,8 +8,8 @@ s32 Collider_SetAttackProperties(void *, s32, s32, s32, s32, s32);
 void Hresvelgr_OnShotCollision(void);
 s32 Hresvelgr_InitShotCollider(struct HresvelgrShot *shot, s32 a, s32 b, s32 c)
 {
-    struct HresvelgrColliderVector size;
-    struct HresvelgrColliderVector offset;
+    struct PackedContactVector size;
+    struct PackedContactVector offset;
     struct ContactCollider *collider = &shot->collider;
     size.x = 8;
     size.y = 16;

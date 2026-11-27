@@ -9,6 +9,7 @@
 #include "scene/actor/scene_actor_state.h"
 #include "scene/actor/scene_actor_placement.h"
 #include "scene/actor/scene_actor_status.h"
+#include "engine/math/math_shift.h"
 
 /* SceneActorControl_ReturnSuccess: Returns constant 1; provisional success stub with no known callers */
 
@@ -22,14 +23,6 @@ extern const s16 gUnk_086149C4[];
 s32 Math_Atan2(s32, s32);
 
 s32 Callback_InvokeActor(void *, void *);
-
-// concession-ok(literal-param): one truncating shift used with widths 3, 4 and 12; the width written in place gives the same code
-static inline s32 Shift(s32 n, u32 bits)
-{
-    if (n >= 0)
-        return n >> bits;
-    return -((-n) >> bits);
-}
 
 static inline u32 WanderRand(void)
 {
@@ -55,8 +48,9 @@ static inline u8 ApproachStoredPoint(struct ChaseActor *actor, struct StoredCurv
         return 1;
     if (dx || dz) {
         motion->direction = Math_Atan2(dx, dz);
-        motion->motion.x += Shift(gUnk_086149C4[(motion->direction + 64) & 255] * speed, 12);
-        motion->motion.z += Shift(gUnk_086149C4[motion->direction] * speed, 12);
+        motion->motion.x +=
+            Math_ShiftTowardZero(gUnk_086149C4[(motion->direction + 64) & 255] * speed, 12);
+        motion->motion.z += Math_ShiftTowardZero(gUnk_086149C4[motion->direction] * speed, 12);
     }
     return 0;
 }
@@ -97,8 +91,8 @@ void SceneActorControl_WanderAroundPlayer(struct ChaseActor *actor)
             u32 angle;
             angle = (u8)WanderRand();
             target = *(struct ContactPosition *)&gPlayers[0]->position;
-            target.x += Shift(gUnk_086149C4[angle], 4);
-            target.z += Shift(gUnk_086149C4[(angle + 64) & 255], 4);
+            target.x += Math_ShiftTowardZero(gUnk_086149C4[angle], 4);
+            target.z += Math_ShiftTowardZero(gUnk_086149C4[(angle + 64) & 255], 4);
             SceneActorControl_StartPositionCurve(actor, &target);
             MotionState_ClearFlags(actor->base.context, 8);
         }
@@ -133,8 +127,8 @@ void SceneActorControl_UpdateStoredMotion(struct ChaseActor *actor)
             struct ContactPosition target;
             angle = (u8)MotionRand();
             target = *(struct ContactPosition *)&gPlayers[0]->position;
-            target.x += Shift(gUnk_086149C4[angle], 3);
-            target.z += Shift(gUnk_086149C4[(angle + 64) & 255], 3);
+            target.x += Math_ShiftTowardZero(gUnk_086149C4[angle], 3);
+            target.z += Math_ShiftTowardZero(gUnk_086149C4[(angle + 64) & 255], 3);
             SceneActorControl_InitPositionCurveEndpoints(actor, &target);
             SceneActorControl_AdvancePositionCurve(actor);
             MotionState_ClearFlags(body, 8);
@@ -158,8 +152,8 @@ void SceneActorControl_UpdateStoredMotion(struct ChaseActor *actor)
                 u32 angle;
                 angle = (u8)MotionRand();
                 target = *(struct ContactPosition *)&gPlayers[0]->position;
-                target.x += Shift(gUnk_086149C4[angle], 3);
-                target.z += Shift(gUnk_086149C4[(angle + 64) & 255], 3);
+                target.x += Math_ShiftTowardZero(gUnk_086149C4[angle], 3);
+                target.z += Math_ShiftTowardZero(gUnk_086149C4[(angle + 64) & 255], 3);
                 SceneActorControl_InitPositionCurveEndpoints(actor, &target);
                 SceneActorControl_AdvancePositionCurve(actor);
             }

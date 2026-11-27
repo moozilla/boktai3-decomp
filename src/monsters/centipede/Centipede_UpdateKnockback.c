@@ -1,17 +1,10 @@
 #include "scene/motion/scene_actor_chase_reaction.h"
 #include "scene/motion/scene_actor_availability.h"
 #include "scene/actor/scene_actor_reset.h"
+#include "scene/motion/scene_actor_chase.h"
 extern const s16 gUnk_086149C4[];
 void Centipede_UpdateSegmentPositions(void *, s32, s32);
 void Centipede_SelectWanderRoute(void *);
-static inline u8 TakeEntry(struct ChaseActor *p)
-{
-    if (p->base.field2B1) {
-        p->base.field2B1 = 0;
-        return 1;
-    }
-    return 0;
-}
 static inline s32 Scale(s32 x)
 {
     if (x >= 0)
@@ -20,7 +13,7 @@ static inline s32 Scale(s32 x)
 }
 void Centipede_UpdateKnockback(struct ChaseActor *p)
 {
-    if (TakeEntry(p)) {
+    if (Chase_TakeArrived(p)) {
         struct ContactPosition *velocity;
         u32 angle;
         u32 factor = 4;

@@ -1,3 +1,4 @@
+#include "scene/collision/contact_position.h"
 #define gSceneAngleSineTable gUnk_086149C4
 #include "global.h"
 typedef struct SceneParticleActor {
@@ -12,9 +13,7 @@ typedef struct SceneParticleActor {
         s16 x, y, z, pad;
     } position;
 } SceneParticleActor;
-typedef struct ParticlePosition {
-    s16 x, y, z, pad;
-} ParticlePosition;
+typedef struct ContactPosition ParticlePosition;
 extern s16 gUnk_086149C4[];
 s32 Mod(s32, s32);
 void SceneActors_StartUnmirroredAnimation(void *, void *, void *, int, int, int);

@@ -1,14 +1,9 @@
+#include "scene/collision/packed_contact_vector.h"
 #define gParticleRandomIndex  gEffectRandomTableIndex
 #define gParticleRandomValues gUnk_086141BC
 // Tentative family and semantic names; layouts follow observed field offsets.
 #include "global.h"
 #include "engine/ram.h"
-struct ParticleOffset {
-    s32 x : 16;
-    s32 y : 16;
-    s32 z : 16;
-    s32 unused : 16;
-};
 struct ParticleEmitter {
     u8 unknown[0xdc];
     s16 position[3];
@@ -16,8 +11,8 @@ struct ParticleEmitter {
     u8 variant;
 };
 extern const u16 gUnk_086141BC[];
-void SceneDebris_Create(s16 *, struct ParticleOffset *, u32, u32, u32, u32, u32, u32, u32, u32, u32,
-                        u32, u32, u32);
+void SceneDebris_Create(s16 *, struct PackedContactVector *, u32, u32, u32, u32, u32, u32, u32, u32,
+                        u32, u32, u32, u32);
 static inline u32 ParticleRandom(void)
 {
     gEffectRandomTableIndex = (gEffectRandomTableIndex + 1) & 1023;
@@ -26,7 +21,7 @@ static inline u32 ParticleRandom(void)
 void ActorParticles_SpawnAlternatingBurst(struct ParticleEmitter *p)
 {
     s32 count, mode, i;
-    struct ParticleOffset offset;
+    struct PackedContactVector offset;
     switch (p->variant) {
         case 0:
             count = 1;

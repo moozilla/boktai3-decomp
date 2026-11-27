@@ -2,20 +2,13 @@
 #include "scene/actor/scene_actor_init_actor.h"
 #include "scene/motion/scene_actor_chase_shared.h"
 #include "scene/actor/scene_actor_reset.h"
+#include "scene/actor/scene_actor_control_phase.h"
 
 void CentipedeBody_UpdateSpreadWindup(void);
 void Centipede_SelectWanderRoute(struct ChaseActor *);
-static inline u8 TakeQueuedFlag(u8 *flag)
-{
-    if (*flag) {
-        *flag = 0;
-        return 1;
-    }
-    return 0;
-}
 void SceneActorPlacement_UpdateFlaggedResponse(struct ChaseActor *p)
 {
-    if (TakeQueuedFlag(&p->base.field2B1)) {
+    if (SceneActorControl_TakeFlag(&p->base.field2B1)) {
         SceneActorChase_SetControl(p, CentipedeBody_UpdateSpreadWindup, 38);
         MonsterInit_SetStatusFlags(p, 0x100000);
         Sound_PlaySong(0x19B);

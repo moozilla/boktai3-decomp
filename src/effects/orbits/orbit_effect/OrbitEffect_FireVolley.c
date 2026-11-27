@@ -2,12 +2,10 @@
 #include "engine/engine.h"
 #include "engine/ram.h"
 #include "objects/sun_orb/sun_orb_effect.h"
+#include "scene/collision/packed_contact_vector.h"
 
 struct OrbitW4 {
     u32 w[4];
-};
-struct OrbitPacked {
-    s32 x : 16, y : 16, z : 16, pad : 16;
 };
 struct OrbitShort3 {
     s16 x, y, z;
@@ -81,7 +79,7 @@ s32 OrbitEffect_FireVolley(struct OrbitEffect *p, s32 slot)
                 struct OrbitEffectPosition *target;
                 s32 dir;
                 struct OrbitEffectPosition vel;
-                struct OrbitPacked pos;
+                struct PackedContactVector pos;
                 s32 k;
                 struct OrbitEffectPosition *vp;
                 struct OrbitEffectPosition *pp;
@@ -117,7 +115,7 @@ s32 OrbitEffect_FireVolley(struct OrbitEffect *p, s32 slot)
                     v = -(v >> 12);
                 }
                 vp->z = v;
-                pos = *(struct OrbitPacked *)&p->sprite.position;
+                pos = *(struct PackedContactVector *)&p->sprite.position;
                 pos.y += 0x40;
                 vel.y = 0x36;
                 SpriteProjectile_Create(&pos, &vel, 0xB07C, 0x99CB, gUnk_08613F88[r], 0x1e, 2, 0,

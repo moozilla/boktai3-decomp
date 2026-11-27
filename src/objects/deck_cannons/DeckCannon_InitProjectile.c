@@ -1,14 +1,12 @@
 #include "global.h"
 #include "engine/engine.h"
+#include "scene/collision/contact_position.h"
 
 #define gCannonBatteryProjectileSize   gUnk_0824F6E8
 #define gCannonBatteryProjectileOffset gUnk_0824F6F0
-struct CannonBatteryPosition {
-    s16 x, y, z, unk6;
-};
 struct CannonBatteryCollider {
     u8 unk0[0x14];
-    struct CannonBatteryPosition size, offset;
+    struct ContactPosition size, offset;
     u8 unk24[0x1E];
     u8 direction;
     u8 unk43[0x11];
@@ -16,7 +14,7 @@ struct CannonBatteryCollider {
 struct CannonBatteryProjectile {
     u32 update, destroy;
     u8 animation[0x1C], sprite[0x1C];
-    struct CannonBatteryPosition position;
+    struct ContactPosition position;
     u8 unk48[8], sequence[0x10];
     struct CannonBatteryCollider collider;
     u16 startCoordinate;
@@ -32,9 +30,9 @@ void Collider_SetAttackProperties(void *, s32, s32, s32, s32, s32);
 void DeckCannon_OnProjectileCollision(void);
 void DeckCannon_DestroyProjectile(void);
 void DeckCannon_UpdateProjectile(void);
-extern struct CannonBatteryPosition gUnk_0824F6E8, gUnk_0824F6F0;
+extern struct ContactPosition gUnk_0824F6E8, gUnk_0824F6F0;
 void DeckCannon_InitProjectile(struct CannonBatteryPool *pool, struct CannonBatteryProjectile *p,
-                                  struct CannonBatteryPosition *origin, s32 horizontal)
+                                  struct ContactPosition *origin, s32 horizontal)
 {
     void *resource = (void *)DeckCannon_LoadAnimation();
     struct CannonBatteryCollider *collider;

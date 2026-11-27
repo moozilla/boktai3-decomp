@@ -1,17 +1,9 @@
-#include "global.h"
+#include "player/player.h"
 #include "player/player_slot_status.h"
 
-struct P08142F94 {
-    u8 f0[0x20];
-    u32 f20;
-    u8 f24[0x428 - 0x24];
-    u16 f428;
-    u16 f42A;
-};
-
-s32 Player_CanRecoverResourceWhileUnflagged(struct P08142F94 *p)
+s32 Player_CanRecoverResourceWhileUnflagged(struct Player *p)
 {
-    if (Player_ReadStatusBits(&p->f20, 0x10) == 0 && p->f428 < p->f42A)
+    if (Player_ReadStatusBits(&p->statusFlags, 0x10) == 0 && p->currentStatB < p->maximumStatB)
         return 1;
     return 0;
 }

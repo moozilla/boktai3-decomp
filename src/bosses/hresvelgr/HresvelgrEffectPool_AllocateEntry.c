@@ -1,14 +1,12 @@
 #include "global.h"
 #include "engine/ram.h"
 #include "engine/engine_globals.h"
+#include "scene/collision/contact_position.h"
 
 // confidence=low: updates homing effect entries, animation, trails and lifetime.
 
 struct Types {
     u32 values[4];
-};
-struct Vec {
-    s16 x, y, z, pad;
 };
 struct Animation {
     const u16 *data;
@@ -20,11 +18,11 @@ struct Entry {
     u8 pad4[0xc];
     u16 tile;
     u8 pad12[0xa];
-    struct Vec position;
+    struct ContactPosition position;
     u8 pad24[8];
     struct Animation animation;
     u8 collider[0xa8];
-    struct Vec velocity;
+    struct ContactPosition velocity;
     u8 padEC[0x6c];
     u8 frame, speed, trailCount;
     u8 pad15B[3];
@@ -58,13 +56,14 @@ static inline s32 scale(s32 n)
 {
     return n >= 0 ? n >> 12 : -((-n) >> 12);
 }
-static inline void polar(struct Vec *v, s32 angle, s32 radius)
+static inline void polar(struct ContactPosition *v, s32 angle, s32 radius)
 {
     v->x = scale(gUnk_086149C4[(angle + 64) & 255] * radius);
     v->y = 0;
     v->z = scale(gUnk_086149C4[angle & 255] * radius);
 }
-void HresvelgrEffectPool_AllocateEntry(struct Vec *position, s32 angle, s32 speed, s32 interval)
+void HresvelgrEffectPool_AllocateEntry(struct ContactPosition *position, s32 angle, s32 speed,
+                                       s32 interval)
 {
     struct Pool *pool = gEffectPoolManager;
     struct Entry *entry = HresvelgrEffectPool_FindIdleActiveEntry();

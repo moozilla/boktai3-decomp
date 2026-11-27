@@ -1,10 +1,7 @@
+#include "engine/video/sprite_component.h"
 #define SpriteComponent_RemoveSprite ArmorIndicator_DestroySprite
 #include "global.h"
 
-struct SpriteComponent {
-    void (*update)(struct SpriteComponent *);
-    void (*destroy)(struct SpriteComponent *);
-};
 s32 SceneSpriteCollider_Init(struct SpriteComponent *);
 void SpriteComponent_Update(struct SpriteComponent *);
 void ArmorIndicator_DestroySprite(struct SpriteComponent *);

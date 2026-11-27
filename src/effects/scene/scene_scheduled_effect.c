@@ -5,6 +5,7 @@
 #include "player/player.h"
 #include "scene/collision/contact_actor.h"
 #include "engine/engine_pause.h"
+#include "scene/collision/contact_position.h"
 
 u8 SpriteEffectSet_UpdateAnimState(struct SceneScheduledEffect *);
 
@@ -139,11 +140,7 @@ void SceneScheduledEffect_OnColliderContact(void)
 {
 }
 
-struct ColliderVector {
-    s16 x, y, z;
-};
-
-extern const struct ColliderVector gUnk_08610710, gUnk_08610718, gUnk_08610720;
+extern const struct ContactPosition gUnk_08610710, gUnk_08610718, gUnk_08610720;
 
 void Collider_Init(void *, u16, u32, u32, u32, void *, void *);
 
@@ -156,7 +153,7 @@ void SceneScheduledEffect_OnColliderContact(void);
 void StateSprite_InitCollider(struct SceneScheduledEffect *sprite, s32 side, s32 type, s32 a, s32 b,
                               s32 c)
 {
-    struct ColliderVector size, offset;
+    struct ContactPosition size, offset;
     struct ContactCollider *collider;
     if (side == 0) {
         switch (type) {

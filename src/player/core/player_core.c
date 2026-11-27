@@ -325,7 +325,7 @@ static inline u32 ResponseActor_GetHalfFlag(struct Player *actor)
 s32 ActorResponse_Apply(struct Player *actor, s32 value)
 {
     if (actor && Player_ReadStatusBits(&actor->actionFlags, 0x1000)) {
-        if (Player_ReadStatusBits(&actor->actionFlags, 0x800))
+        if ((actor->actionFlags & 0x800))
             return value;
     }
     if (ResponseActor_GetHalfFlag(actor))

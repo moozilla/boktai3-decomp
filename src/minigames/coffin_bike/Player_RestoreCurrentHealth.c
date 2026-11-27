@@ -1,22 +1,13 @@
-#include "global.h"
-struct Q {
-    u8 f[0x5c];
-    u8 a[4];
-    u8 b[0x14];
-    s32 v;
-};
-struct G {
-    u8 f[0x758];
-    s16 h;
-};
-extern struct Q *gParticipantActors;
-extern struct G *gGameState;
+#include "minigames/coffin_bike/coffin_bike.h"
+#include "system/game_state/game_state.h"
+
 void Character_SetLowResourceColorEffect(void *, void *);
+
 void Player_RestoreCurrentHealth(void)
 {
-    struct Q *q = gParticipantActors;
-    if (q != 0) {
-        q->v = gGameState->h;
-        Character_SetLowResourceColorEffect(q->a, q->b);
+    struct CoffinBike *bike = (struct CoffinBike *)gParticipantActors[0];
+    if (bike) {
+        bike->motion.style.initialWord = gGameState->unk758;
+        Character_SetLowResourceColorEffect(&bike->motion.emitter, &bike->motion.style);
     }
 }

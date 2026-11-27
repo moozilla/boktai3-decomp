@@ -26,8 +26,8 @@ not; a scalar member named for its offset, `field2E6`, does) and its type agrees
 * any other cast (a pointer, a struct, a typedef) needs agbcc to accept `T *x = &member`
   without a warning, checked in one probe compile per unit;
 * `(void *)` and a bare `(u8 *)p + K` passed on try the outermost member there first; one
-  assigned to a variable (`u8 *x = (u8 *)p + K`) tries a byte member first. A destination of
-  another pointer type rejects the wrong one through the warning check.
+  assigned to a variable (`u8 *x = (u8 *)p + K`) tries a byte member first. The original
+  address cast remains an option when the receiving declaration requires it.
 
 Each rewrite stays only when tools/check.py still reports MATCH with no new compiler warning
 (tools/keepcheck.py). Code inside `#ifdef NONMATCHING` is never touched (check.py does not
@@ -280,6 +280,20 @@ def spelled(site, path):
     return "&" + base
 
 
+def replacements(site, paths, source):
+    choices = [spelled(site, path) for path in paths]
+    # A named address can still be a byte buffer or an intentionally untyped
+    # argument. Preserve its original cast if the direct spelling warns.
+    if site.form == "bare":
+        expected = "u8"
+    elif site.form == "addr" and site.ctype == "void":
+        expected = "void"
+    else:
+        return choices
+    cast = re.match(rf"\(\s*(?:const\s+)?{expected}\s*\*\s*(?:const\s*)?\)", source[site.start:site.end])
+    return choices + [cast[0] + choice for choice in choices] if cast else choices
+
+
 def plan(rel, text):
     """[(site, [replacement, ...]), ...] and report rows, for the text of unit REL."""
     import layoutmerge
@@ -331,7 +345,7 @@ def plan(rel, text):
             continue
         if s.form == "bare" and code[:s.start].rstrip().endswith("="):  # u8 *x = ...: a u8 member first
             good.sort(key=lambda c: not (c[1] and c[1]["base"] == "int" and c[1].get("esize", c[1].get("width")) == 1))
-        out.append((s, [spelled(s, p) for p, _ in good], f"{rel}:{line}: {raw}"))
+        out.append((s, replacements(s, [p for p, _ in good], text), f"{rel}:{line}: {raw}"))
     return out, rows
 
 

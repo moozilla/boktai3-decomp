@@ -1,4 +1,5 @@
 #include "global.h"
+#include "ui/hud/scene_indicator.h"
 typedef struct {
     u16 id;
     u8 unk_02[4];
@@ -7,10 +8,6 @@ typedef struct {
     u8 unk_28[8];
     void *next;
 } SceneMessageReceiver;
-
-struct NpcVec {
-    s16 x, y, z, w;
-};
 
 /* The variant and arc parameter names are provisional. */
 struct TaggedNpcState {
@@ -24,7 +21,7 @@ struct NpcMotion {
     u8 unk_00[9];
     u8 angle;
     u8 unk_0A[2];
-    struct NpcVec pos;
+    struct Vec pos;
     u8 unk_14[0x20];
     u16 x, y, z;
 };
@@ -43,7 +40,7 @@ struct TaggedSceneNpc {
     u8 unk_1C[0x20 - 0x1C];
     struct TaggedNpcState sub20;
     u8 unk_3C[0x54 - 0x3C];
-    struct NpcVec target;
+    struct Vec target;
     struct NpcMotion motion;
     u8 unk_96[0xEC - 0x98];
     u8 *palette;
@@ -89,7 +86,7 @@ static inline void setFacing(struct TaggedSceneNpc *npc, s16 a)
 
 static inline void aim(struct TaggedSceneNpc *npc, s16 *m)
 {
-    struct NpcVec *t, *p;
+    struct Vec *t, *p;
     npc->target.x = m[4];
     npc->target.y = m[5];
     npc->target.z = m[6];

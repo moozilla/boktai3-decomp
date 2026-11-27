@@ -27,7 +27,7 @@ class ToolAPITests(unittest.TestCase):
     def test_open_c_at_store_pc(self):
         result = tool_api.open_c("08159518")
         self.assertEqual(result["function"]["name"], "Player_AddEnergy")
-        self.assertIn("p->f428 += d", result["c"]["text"])
+        self.assertIn("p->currentStatB += d", result["c"]["text"])
         self.assertEqual(result["function"]["offset"], 36)
 
     @unittest.skipUnless(fields.AGBCC.is_file(), "Target compiler unavailable")

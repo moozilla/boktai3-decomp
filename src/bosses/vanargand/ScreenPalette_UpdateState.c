@@ -3,17 +3,9 @@
 #include "engine/engine.h"
 #include "engine/ram.h"
 #include "effects/bat_flock.h"
+#include "bosses/vanargand/screen_palette_transition_layout.h"
 #define gRandomTableIndex gRandomIndex
 
-struct ScreenPaletteTransition {
-    u8 unknown0[4];
-    u8 *palettes;
-    s16 *position;
-    u8 unknownC[8];
-    u8 variant;
-    u8 state;
-    u16 phase;
-};
 extern u32 gUnk_02000560;
 s32 ScalarApproach_StepSixteenth(s32, s32);
 s32 sub_08249350(s32, s32);
@@ -26,7 +18,7 @@ void ScreenPalette_UpdateState(struct ScreenPaletteTransition *s)
     u32 mask = 4;
     if (gUnk_02000560 & mask)
         goto hide;
-    switch (s->state) {
+    switch (s->enabled) {
         case 0:
         hide: {
             u16 *control = &gDispCntShadow;
@@ -35,17 +27,17 @@ void ScreenPalette_UpdateState(struct ScreenPaletteTransition *s)
         }
             return;
         case 1:
-            if (s->phase == 0)
-                s->phase++;
+            if (s->timer == 0)
+                s->timer++;
             break;
         case 2:
-            s->phase = ScalarApproach_StepSixteenth(s->phase, 96);
-            if (s->phase > 95)
-                s->state = 3;
+            s->timer = ScalarApproach_StepSixteenth(s->timer, 96);
+            if (s->timer > 95)
+                s->enabled = 3;
             break;
         case 4:
-            if (--s->phase == 0) {
-                s->state = 0;
+            if (--s->timer == 0) {
+                s->enabled = 0;
                 return;
             }
             break;
@@ -57,10 +49,10 @@ void ScreenPalette_UpdateState(struct ScreenPaletteTransition *s)
         gDispCntShadow = visible | gDispCntShadow;
     }
     ScreenPalette_UpdateTransition(s);
-    if (s->state > 1) {
+    if (s->enabled > 1) {
         jitter = sub_08249350(randomValue() >> 3, 3) - 1;
     } else {
         jitter = 0;
     }
-    ScreenPalette_ProjectPosition(1, s->position, jitter + 136, jitter - 70);
+    ScreenPalette_ProjectPosition(1, s->coordinates, jitter + 136, jitter - 70);
 }

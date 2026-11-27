@@ -1,14 +1,7 @@
-#include "global.h"
+#include "scene/actor/scene_event_types.h"
 #include "link/wireless/scene_pool.h"
 #include "engine/ram.h"
-#define Packet_Send SceneMessages_Send
-struct Packet {
-    u16 id;
-    u8 kind, zero;
-    u16 reserved;
-    u8 command, count;
-};
-void SceneMessages_Send(struct Packet *);
+s32 SceneMessages_Send(struct SceneEventCommand *);
 void Sound_PlayTrackedSong(int);
 void CoffinBike_UpdateStopping(void);
 static inline void clearDrawFlags(struct ScenePoolPlayerDraw *d, s16 mask)
@@ -17,15 +10,15 @@ static inline void clearDrawFlags(struct ScenePoolPlayerDraw *d, s16 mask)
 }
 void CoffinBike_StopWithMessage(struct ScenePoolPlayer *glove)
 {
-    struct Packet *packet = &gMessagePacket;
+    struct SceneEventCommand *packet = (struct SceneEventCommand *)&gMessagePacket;
     u32 one;
-    packet->zero = 0;
-    packet->reserved = 0;
-    packet->command = 0x41;
-    packet->count = 0;
-    packet->kind = 4;
+    packet->trigger = 0;
+    packet->unknown4 = 0;
+    packet->kind = 0x41;
+    packet->argumentCount = 0;
+    packet->receiverKind = 4;
     packet->id = 0x7c56;
-    SceneMessages_Send(&gMessagePacket);
+    SceneMessages_Send(packet);
     {
         struct ScenePoolPlayerDraw *draw = &glove->gloveDraw;
         one = 1;

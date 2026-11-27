@@ -2,16 +2,14 @@
 #include "system/game_state/game_state.h"
 #include "player/player.h"
 #include "effects/healing/health_burst.h"
-struct BurstVector {
-    s32 x : 16, y : 16, z : 16, pad : 16;
-};
+#include "scene/collision/packed_contact_vector.h"
 void Collider_Init(void *, u16, u32, u32, u32, void *, void *);
 void Collider_SetCallback(void *, void *, void *);
 void Collider_SetPosition(void *, void *, u32);
 void Collider_SetAttackProperties(void *, s32, s32, s32, s32, s32);
 void sub_08235B34(struct HealthBurstTask *p)
 {
-    struct BurstVector size, offset;
+    struct PackedContactVector size, offset;
     void *collider = p->collider;
     s32 amount;
     u32 flags, attackFlags;

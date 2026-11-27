@@ -1,16 +1,14 @@
 /* The current build ELF still exports these two original address names. */
 #include "global.h"
 #include "engine/video/display_sequence.h"
+#include "scene/collision/contact_position.h"
 
-struct NidhoggrEffectMotion {
-    u16 x, y, z, unknown6;
-};
 struct NidhoggrPoolSprite {
     u32 flags;
     u8 unknown4[12];
     u16 frame;
     u8 unknown12[10];
-    struct NidhoggrEffectMotion position;
+    struct ContactPosition position;
     u8 unknown24[8];
 };
 struct NidhoggrAnimatedSlot {
@@ -19,7 +17,7 @@ struct NidhoggrAnimatedSlot {
     u8 animationData[0x1c];
     struct NidhoggrPoolSprite sprite;
     struct DisplaySequenceState sequence;
-    struct NidhoggrEffectMotion motion;
+    struct ContactPosition motion;
     u8 lifetime;
     u8 unknown69[3];
 };
@@ -39,15 +37,15 @@ void Sprite_Init(void *, void *, u32);
 void Anim_RestartSequence(struct DisplaySequenceState *, void *, u32, u32, u32);
 void ExplosionEffect_Create(void *, u32, u32, u32, u32);
 extern const u8 gUnk_08611D1C[];
-extern const struct NidhoggrEffectMotion gUnk_0824F214[];
+extern const struct ContactPosition gUnk_0824F214[];
 
-void Nidhoggr_CreateBurstEffects(struct NidhoggrPool *pool, struct NidhoggrEffectMotion *position)
+void Nidhoggr_CreateBurstEffects(struct NidhoggrPool *pool, struct ContactPosition *position)
 {
     s32 i;
     for (i = 0; i <= 5; i++) {
         struct NidhoggrAnimatedSlot *slot = EffectPool_AllocateSlot(pool);
-        const struct NidhoggrEffectMotion *motion;
-        struct NidhoggrEffectMotion *output;
+        const struct ContactPosition *motion;
+        struct ContactPosition *output;
         if (!slot)
             return;
         AnimData_Load(slot->animationData, 0xc7ed);

@@ -1,7 +1,5 @@
 #include "global.h"
-struct ContactPosition {
-    s16 x, y, z, pad;
-};
+#include "scene/collision/contact_position.h"
 void DirectionBurst_Emit(const void *, u32, u32, u32);
 void sub_0819F4D8(const struct ContactPosition *origin, s32 direction, s32 spacing, u32 kind,
                   u32 parameter)

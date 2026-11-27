@@ -1,17 +1,6 @@
 #include "global.h"
 #include "scene/collision/contact_position.h"
-struct ProximityVolume {
-    u8 unknown0[8];
-    struct ContactPosition position;
-    void *emitter;
-    u8 probe[0x1c];
-    s16 targetX;
-    u8 unknown32[2];
-    s16 targetZ;
-    u8 unknown36[2];
-    s16 active;
-    s16 damage;
-};
+#include "engine/video/proximity_volume.h"
 extern s16 gUnk_086149C4[];
 void NavMesh_UpdateProbe(void *, void *);
 u32 ProximityVolume_ContainsPlayer(struct ProximityVolume *);

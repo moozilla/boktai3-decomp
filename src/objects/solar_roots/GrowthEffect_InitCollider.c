@@ -1,34 +1,30 @@
 #include "global.h"
+#include "scene/collision/packed_contact_halfwords.h"
+#include "scene/collision/packed_collider_extents.h"
 
 // confidence=low: RepeatedEffect_InitCollider for an effect with its collider at 0x48 and its
 // position at 0xE4: a 0x80 by 0x100 attack box calling SolarRoot_ApplyAnimationEvent.
-struct H {
-    u32 lo : 16;
-    u32 hi : 16;
-};
-struct Z {
-    struct H a, b;
-};
 struct GrowthEffect {
     u8 unknown0[0x48];
     u8 collider[0xe4 - 0x48];
     u8 position[0xee - 0xe4];
     u16 tag;
 };
-void Collider_Init(u8 *, u32, u32, u32, u32, struct Z *, struct Z *);
+void Collider_Init(u8 *, u32, u32, u32, u32, struct PackedColliderExtents *,
+                   struct PackedColliderExtents *);
 void Collider_SetCallback(u8 *, void *, void *);
 void Collider_SetPosition(u8 *, u8 *, u32);
 s32 Collider_Refresh(u8 *);
 void SolarRoot_ApplyAnimationEvent(void *, void *, void *);
 void GrowthEffect_InitCollider(struct GrowthEffect *p)
 {
-    struct Z s1, s2;
+    struct PackedColliderExtents s1, s2;
     u8 *q = p->collider;
-    s1.a.lo = 0x80;
-    s1.a.hi = 0x100;
-    s1.b.lo = 0x80;
-    *(u32 *)&s2.a = 0;
-    *(u32 *)&s2.b &= 0xFFFF0000;
+    s1.xy.lo = 0x80;
+    s1.xy.hi = 0x100;
+    s1.zAndPad.lo = 0x80;
+    *(u32 *)&s2.xy = 0;
+    *(u32 *)&s2.zAndPad &= 0xFFFF0000;
     Collider_Init(q, p->tag, 0x4001, 0, 0x20, &s1, &s2);
     Collider_SetCallback(q, SolarRoot_ApplyAnimationEvent, p);
     Collider_SetPosition(q, p->position, 0);

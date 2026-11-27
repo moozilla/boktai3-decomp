@@ -1,4 +1,5 @@
 #include "global.h"
+#include "script/script_utility.h"
 #include "engine/ram.h"
 #include "engine/engine_globals.h"
 #include "scene/areas/area_effect_link.h"
@@ -12,11 +13,6 @@ struct LinkMenu {
     u8 type;
     u8 unk_54[0x264 - 0x54];
     u32 result;
-};
-struct ScriptArgs {
-    u32 count : 16;
-    u32 : 16;
-    s32 *values;
 };
 void LinkSession_SetMenuRequest(u32);
 s32 GameState_GetResultIndex(void);
@@ -67,7 +63,7 @@ void sub_08116E44(struct CoffinBike *p)
 {
     struct CoffinBikeMotion *self = &p->motion;
     s32 values[2];
-    struct ScriptArgs args;
+    struct ScriptUtilityArguments args;
     s32 h, dx, dz;
     u32 a, b;
     s32 *bias, *forward, *vertical, *offset, *impulseY, *impulseZ;
@@ -118,7 +114,7 @@ void sub_08116E44(struct CoffinBike *p)
         zero = 0;
         *flags = mask;
         self->damageTimer = zero;
-        self->pendingDamage = zero;
+        self->palette.pendingDamage = zero;
     }
     {
         u32 mask = 4;

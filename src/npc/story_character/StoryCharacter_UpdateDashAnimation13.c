@@ -1,9 +1,6 @@
 #include "scene/motion/scene_actor_terrain.h"
+#include "npc/story_character/npc_tag_layout.h"
 // confidence=low: state actor kind 28 dash with decreasing speed and height above terrain.
-struct NpcTag {
-    u8 pad[2];
-    s16 height;
-};
 struct Npc {
     u8 pad0[1];
     u8 kind;

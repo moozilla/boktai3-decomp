@@ -25,7 +25,8 @@ void FieldHud_InitializeWidgets(void *, void *, void *, u32, void *);
 void CoffinBike_UpdateLaunchSlowdown(void *);
 void CoffinBike_UpdateRisingCue(void *);
 void CoffinBike_UpdateStopping(void *);
-void CharacterPreview_InitializePalette(void *, void *, u32);
+void CharacterPreview_InitializePalette(struct CharacterPreviewPalette *,
+                                        struct CharacterPreviewModel *, s32);
 void CoffinBike_InitCollisionVolumes(void *);
 void SceneTilemap_SetScrollSource(void *);
 void CoffinBike_RegisterMessageReceiver(void *);
@@ -154,7 +155,7 @@ s32 CoffinBike_InitFromScript(struct CoffinBike *p)
         else
             CoffinBike_SetCallback(p, CoffinBike_UpdateRisingCue, ready);
     }
-    CharacterPreview_InitializePalette(&self->pendingDamage, &p->model, self->style.parameterD);
+    CharacterPreview_InitializePalette(&self->palette, &p->model, self->style.parameterD);
     CoffinBike_InitCollisionVolumes(p);
     SceneTilemap_SetScrollSource(gUnk_020004E0);
     gParticipantActors[p->participant] = (struct ScenePoolPlayer *)p;

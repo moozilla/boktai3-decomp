@@ -1,6 +1,6 @@
 exports.bikeRider = () => {
   const task = exports.tasks().find((t) => !t.dead && t.update === 'CoffinBike_UpdateTask');
-  return task ? g.at(Number(task.task), 'struct Glove') : null;
+  return task ? g.at(Number(task.task), 'struct CoffinBike') : null;
 };
 
 // CoffinBike_UpdatePostState applies damage to style.initialWord. The course moves

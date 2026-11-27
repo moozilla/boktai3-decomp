@@ -1,10 +1,8 @@
 #include "global.h"
 #include "engine/engine.h"
+#include "scene/collision/packed_contact_vector.h"
 void Collider_SetBodyProperties(void *, s32, s32, s32);
 void VanargandCombat_InitializeContact(void);
-struct ActorStatusExtent {
-    s32 x : 16, y : 16, z : 16, pad : 16;
-};
 struct ActorStatus {
     u8 pad0[0x1C];
     u8 position[8];
@@ -15,7 +13,7 @@ struct ActorStatus {
 void VanargandCombat_InitializeBodyCollider(struct ActorStatus *status)
 {
     void *collider = status->bodyCollider;
-    struct ActorStatusExtent size, offset;
+    struct PackedContactVector size, offset;
     size.x = 0x100;
     size.y = 0x100;
     size.z = 0x100;

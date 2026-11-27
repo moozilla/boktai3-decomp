@@ -1,12 +1,8 @@
+#include "effects/bursts/fragment_sprite_layout.h"
 #define SpriteGroup_CallCompletion FragmentBurst_RunCompletionScript
 #include "global.h"
-struct GroupPartSprite {
-    u32 flags;
-    u8 active;
-    u8 unknown05[0x27];
-};
 struct SpriteGroup {
-    struct GroupPartSprite sprites[4];
+    struct FragmentSprite sprites[4];
     u8 unknownB0[0xa4];
     u16 age;
     u8 active;
@@ -29,7 +25,7 @@ void SpriteGroup_Release(struct SpriteGroupPool *pool, struct SpriteGroup *group
         group->active = 0;
         i = 0;
         do {
-            struct GroupPartSprite *sprite = &group->sprites[i];
+            struct FragmentSprite *sprite = &group->sprites[i];
             if (sprite->active)
                 Sprite_Remove(sprite);
             i++;
