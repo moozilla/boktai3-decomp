@@ -1,13 +1,10 @@
 #include "global.h"
 #include "scene/areas/area_effect_link.h"
+#include "link/panel/link_slot_display_element.h"
 
-struct LPElem {
-    u32 flags;
-    u8 filler4[0x5C];
-};
 struct LPanel {
     u8 filler0[0x28];
-    struct LPElem elems[7];
+    struct LinkSlotDisplayElement elems[7];
     u8 filler2C8[0x38];
     u16 vals[8];
 };
