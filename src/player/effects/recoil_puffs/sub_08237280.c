@@ -1,20 +1,11 @@
 #include "global.h"
+#include "player/effects/recoil_puff_sprite.h"
 
 // confidence=low: initializes eight 0x30-byte sprite entries at 0x18 with animation 0x1C1A, frame 12,
 // origin (-8, -8), shaped like SpriteGroup_InitFourSprites.
-struct PuffEntry {
-    u32 flags;
-    u8 pad4[0xb];
-    u8 f0F;
-    u8 pad10[0x18];
-    void *resource;
-    u8 state;
-    u8 phase;
-    u16 timer;
-};
 struct PuffPool {
     u8 unknown0[0x18];
-    struct PuffEntry entries[8];
+    struct RecoilPuffSprite entries[8];
 };
 void *AnimData_FindEntry(s32);
 void ParticleSprite_Initialize(void *, void *, u32);
@@ -24,9 +15,9 @@ void SpriteDrawable_SelectTileFrame(void *, void *, u32);
 void sub_08237280(struct PuffPool *p)
 {
     u32 zero = 0;
-    struct PuffEntry *entry = p->entries;
+    struct RecoilPuffSprite *entry = p->entries;
     u8 *state = &p->entries[0].state;
-    struct PuffEntry *sprite = entry;
+    struct RecoilPuffSprite *sprite = entry;
     s32 offset = -8;
     s32 i = 7;
     do {
