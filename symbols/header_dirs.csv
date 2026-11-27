@@ -597,3 +597,4 @@ include/link/link_score_panel.h,include/link/link_score_panel.h,shared layout re
 include/system/clock/solar_time_context.h,include/system/clock/solar_time_context.h,shared layout recovered with Time_CalculateSolarRiseTransitSet,,
 include/link/selection/link_selection_prompt.h,include/link/selection/link_selection_prompt.h,shared layout recovered with SceneMenu_BeginTimedMessage,,
 include/link/link_script_panel.h,include/link/link_script_panel.h,shared layout recovered with ScriptPanel_ConfirmSelection,,
+include/link/records/record_name_panel.h,include/link/records/record_name_panel.h,shared layout recovered with RecordPanel_RefreshEntryLabels,,
