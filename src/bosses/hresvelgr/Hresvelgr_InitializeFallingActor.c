@@ -1,18 +1,9 @@
 #include "global.h"
 #include "scene/collision/contact_position.h"
-struct HresvelgrSprite {
-    u32 flags;
-    u8 unknown4[3];
-    u8 priority;
-    u8 unknown8[8];
-    u16 field10;
-    u8 unknown12[10];
-    struct ContactPosition position;
-    u8 unknown24[8];
-};
+#include "recovered/fragment_effect_sprite_layout.h"
 struct HresvelgrMotion {
     u8 unknown0[0x18];
-    struct HresvelgrSprite sprite;
+    struct FragmentEffectSprite sprite;
     u8 graphics[0x70];
     struct ContactPosition origin, velocity, offset;
     u8 shadow[0x6c];
@@ -28,7 +19,7 @@ s32 Hresvelgr_InitializeFallingActor(struct HresvelgrMotion *p, struct ContactPo
                                      struct ContactPosition *velocity, u32 flip)
 {
     void *graphics = p->graphics;
-    struct HresvelgrSprite *sprite;
+    struct FragmentEffectSprite *sprite;
     void *shadow;
     if (!AnimData_Load(graphics, 0x3070))
         return -1;
@@ -36,7 +27,7 @@ s32 Hresvelgr_InitializeFallingActor(struct HresvelgrMotion *p, struct ContactPo
     Sprite_Init(sprite, graphics, 0);
     {
         u32 value = 5;
-        sprite->field10 = value;
+        sprite->frame = value;
     }
     AnimData_SelectPaletteBank(graphics, 0x2f2);
     if (flip)

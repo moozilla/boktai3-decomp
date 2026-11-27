@@ -1,3 +1,4 @@
+#include "recovered/fragment_effect_sprite_layout.h"
 #define SpriteParticle_GetOrCreatePool SceneSpriteBurst_EnsureSingleton
 #define gSpriteParticlePool            gSpriteGroup
 #include "global.h"
@@ -12,18 +13,10 @@ struct SpriteParticleSlot {
     u8 active;
     s8 index;
 };
-struct SpriteParticleDisplay {
-    u32 flags;
-    u8 unk04[3];
-    u8 layer;
-    u8 unk08[4];
-    void *animation;
-    u8 unk10[0x1c];
-};
 struct SpriteParticlePool {
     u8 unk00[0x18];
     void *data;
-    struct SpriteParticleDisplay sprites[8];
+    struct FragmentEffectSprite sprites[8];
     u8 spriteData[0x1c];
     u8 animations[8][0x10];
     u32 occupied;
@@ -40,7 +33,7 @@ s32 SpriteParticle_SpawnBatch(struct SpriteParticlePosition *position, s32 count
 {
     struct SpriteParticlePool *pool;
     struct SpriteParticleSlot *slot;
-    struct SpriteParticleDisplay *sprite;
+    struct FragmentEffectSprite *sprite;
     s32 i;
     if (!position)
         return -1;
@@ -59,9 +52,9 @@ s32 SpriteParticle_SpawnBatch(struct SpriteParticlePosition *position, s32 count
         slot->position = *position;
         Sprite_Init(sprite, pool->spriteData, 0);
         Anim_SetSequence(pool->animations[slot->index], pool->data, (u16)sequence, 0, 0);
-        AnimData_SelectPaletteBank(sprite->animation, palette);
+        AnimData_SelectPaletteBank(sprite->graphics, palette);
         sprite->flags |= 1;
-        sprite->layer = layer;
+        sprite->priority = layer;
         slot->active = 1;
     }
     return 0;

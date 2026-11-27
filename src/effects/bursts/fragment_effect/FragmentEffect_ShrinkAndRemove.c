@@ -1,17 +1,7 @@
 #include "scene/collision/contact_swarm.h"
 #include "engine/ram.h"
 #include "player/cutscene/player_cue_sequence.h"
-struct FragmentSprite {
-    u32 flags;
-    u8 active, unknown5[2], priority;
-    s8 scaleX, scaleY;
-    u8 unknownA[2];
-    void *graphics;
-    u16 frame;
-    u8 unknown12[10];
-    struct ContactPosition position;
-    u8 unknown24[8];
-};
+#include "recovered/fragment_effect_sprite_layout.h"
 struct Fragment {
     u32 flags;
     u8 active, unk_05[2], priority;
@@ -102,7 +92,7 @@ void FragmentEffect_Create(const struct ContactPosition *position, u32 angle, u3
 {
     struct Pool *pool = (struct Pool *)gFragmentEffectManager;
     struct Fragment *p;
-    struct FragmentSprite *sprite;
+    struct FragmentEffectSprite *sprite;
     struct ContactPosition offset;
     if (!pool) {
         pool = FragmentEffect_GetOrCreateManager();
@@ -121,7 +111,7 @@ void FragmentEffect_Create(const struct ContactPosition *position, u32 angle, u3
     p->direction = direction;
     p->entered = 1;
     p->center = *position;
-    sprite = (struct FragmentSprite *)p;
+    sprite = (struct FragmentEffectSprite *)p;
     sprite->position = p->center;
     {
         u32 heading = p->angle;

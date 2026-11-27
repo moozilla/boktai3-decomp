@@ -1,20 +1,10 @@
 #include "global.h"
 #include "scene/collision/contact_position.h"
-
-struct VanargandEffectSprite {
-    u32 flags;
-    u8 pad4[3];
-    u8 mode;
-    u8 pad8[8];
-    u16 scale;
-    u8 pad12[0x1c - 0x12];
-    struct ContactPosition position;
-    u8 pad24[0x2c - 0x24];
-};
+#include "recovered/fragment_effect_sprite_layout.h"
 
 struct VanargandTransientEffect {
     u8 task[0x18];
-    struct VanargandEffectSprite sprite;
+    struct FragmentEffectSprite sprite;
     u8 animation[0x1c];
     u16 variant;
     u16 timer;
@@ -29,12 +19,12 @@ s32 Vanargand_InitTransientEffect(struct VanargandTransientEffect *effect,
 {
     struct ContactPosition offset;
     struct ContactPosition *position;
-    struct VanargandEffectSprite *sprite;
+    struct FragmentEffectSprite *sprite;
     AnimData_Load(effect->animation, 0x89cc);
     sprite = &effect->sprite;
     Sprite_Init(sprite, effect->animation, 0);
-    sprite->scale = (effect->timer >> 4) + 6;
-    effect->sprite.mode = 1;
+    sprite->frame = (effect->timer >> 4) + 6;
+    effect->sprite.priority = 1;
     effect->sprite.flags |= 0x200;
     Vanargand_ProjectEffectOffset(&offset, 0, 8, 0x40);
     position = &effect->sprite.position;
