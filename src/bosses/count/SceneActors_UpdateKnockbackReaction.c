@@ -23,7 +23,7 @@ void SceneActors_UpdateKnockbackReaction(struct StateActor *base, int time)
 {
     int tick = time;
     struct StateActor *p = base;
-    u8 *position = (u8 *)p + 0x48;
+    u8 *position = (u8 *)&p->bodyId;
     if (p->actionChanged) {
         int sequence;
         p->actionChanged = 0;

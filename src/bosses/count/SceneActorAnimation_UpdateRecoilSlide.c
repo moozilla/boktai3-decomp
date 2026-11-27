@@ -3,7 +3,7 @@
 
 void SceneActorAnimation_UpdateRecoilSlide(struct StateActor *p, int tick)
 {
-    u8 *position = (u8 *)p + 0x48;
+    u8 *position = (u8 *)&p->bodyId;
     if (p->actionChanged)
         p->actionChanged = 0;
     SceneActorState_SetFlags(p, 0x40000);

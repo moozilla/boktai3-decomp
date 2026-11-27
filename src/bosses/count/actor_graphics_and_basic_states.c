@@ -1606,7 +1606,7 @@ void SceneActorState_StartContactPool(struct SceneGraphicsActor *actor)
     struct StateActor *p = (struct StateActor *)actor;
     struct ContactPosition pos;
     struct ContactPosition pos2;
-    u8 *src = (u8 *)p + 0x48;
+    u8 *src = (u8 *)&p->bodyId;
 
     if (StateActor_ConsumeActionEntry(p))
         SceneActorState_SetAnimation(p, 14);

@@ -1,6 +1,7 @@
 #include "bosses/vanargand/vanargand_effect.h"
 #include "engine/engine.h"
 #include "engine/math/monster_particle_random.h"
+#include "bosses/vanargand/vanargand_parts.h"
 
 struct VanargandPart {
     u8 unk_00[0x90];
@@ -10,15 +11,11 @@ struct VanargandPart {
 };
 extern const s16 gUnk_086149C4[];
 
-static inline s32 Scale(s32 value)
-{
-    return value >= 0 ? value >> 12 : -((-value) >> 12);
-}
 static inline void Vector(struct MotionTrackVector *out, s32 angle, s32 radius)
 {
-    out->x = Scale(gUnk_086149C4[(angle + 64) & 255] * radius);
+    out->x = Vanargand_TruncateScale(gUnk_086149C4[(angle + 64) & 255] * radius);
     out->y = 0;
-    out->z = Scale(gUnk_086149C4[angle & 255] * radius);
+    out->z = Vanargand_TruncateScale(gUnk_086149C4[angle & 255] * radius);
 }
 static inline void Add(struct MotionTrackVector *out, struct MotionTrackVector *base,
                        struct MotionTrackVector *offset)

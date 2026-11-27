@@ -29,7 +29,7 @@ static inline int choose(u32 mode, int normal, int alternate)
 void SceneActors_UpdateDirectionalTurn(struct StateActor *p)
 {
     struct StateActor *p2 = p;
-    u8 *position = (u8 *)p + 0x48;
+    u8 *position = (u8 *)&p->bodyId;
     if (p->actionChanged) {
         int sequence;
         p->actionChanged = 0;
