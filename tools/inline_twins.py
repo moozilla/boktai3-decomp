@@ -17,7 +17,8 @@ their own definition of a struct a header already has. A *twin* is exact:
 A helper with several shared twins is applied only when one of them has the private copy's own
 name or is the only one the unit already sees through its includes; otherwise it is reported
 as ambiguous. A twin whose shared name has no Object_ prefix (`scale`, `add`) is reported, not
-applied, in place of a private name that has one. A private helper's definition goes with the
+applied, in place of a private name that has one. Identical bodies in different object
+subsystems do not establish that the object-specific API is shared. A private helper's definition goes with the
 comment lines directly above it (its description; a `confidence=` note stays); a struct's
 comments stay.
 
@@ -277,6 +278,24 @@ def replace(text, kind, priv, shared):
     return new
 
 
+OBJECT_CATEGORIES = {"bosses", "monsters", "npc", "objects", "effects"}
+
+
+def helper_owner(path):
+    """The object subsystem for a concrete actor or effect header."""
+    parts = path.split("/")
+    if len(parts) < 2 or parts[0] not in OBJECT_CATEGORIES:
+        return None
+    return parts[0], os.path.splitext(parts[1])[0]
+
+
+def related_helpers(rel, private, candidates):
+    owner = helper_owner(rel.removeprefix("src/"))
+    return [shared for shared in candidates
+            if shared.name == private.name or helper_owner(shared.file) in {None, owner}
+            or visible(rel, shared.file)]
+
+
 def process(rel, idx, dry=False, log=print):
     """Apply every exact twin in REL that keeps the match. Returns (applied, tried, report rows)."""
     unit = keepcheck.Unit(rel)
@@ -295,6 +314,14 @@ def process(rel, idx, dry=False, log=print):
         for kind, priv, cands in exact:
             if (kind, priv.name) in failed:
                 continue
+            if kind == "helper":
+                related = related_helpers(rel, priv, cands)
+                if not related:
+                    failed.add((kind, priv.name))
+                    report.append(f"{rel}: helper {priv.name} has twins owned by other subsystems: "
+                                  + ", ".join(f"{c.file}:{c.name}" for c in cands[:4]))
+                    continue
+                cands = related
             if len(cands) > 1 and not any(c.name == priv.name for c in cands):
                 seen = [c for c in cands if visible(rel, c.file)]
                 if len(seen) == 1:
