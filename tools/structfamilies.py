@@ -77,8 +77,8 @@ def scan_file(rel, text):
             t = tu.resolve(decl.type)
             elem = t.type if isinstance(t, c_ast.ArrayDecl) else decl.type
             member["record"] = evidence.record_of(tu, elem)
-            headers, private, self_ref = evidence.member_dependencies(tu, decl, spell)
-            member.update(headers=headers, private=private, self_ref=self_ref)
+            headers, private, forwards, self_ref = evidence.member_dependencies(tu, decl, spell)
+            member.update(headers=headers, private=private, forwards=forwards, self_ref=self_ref)
         view.update(file=rel, line=node.coord.line)
     result["records"] = measured
     result["unmeasured"] = sorted(set(selected) - set(measured))

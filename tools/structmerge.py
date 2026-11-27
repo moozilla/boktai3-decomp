@@ -142,6 +142,9 @@ def plan_header(family, views, name, header):
     headers = {h for m, _, _, _ in selected for h in m["headers"]}
     buf = [f"#ifndef {guard}", f"#define {guard}", "", '#include "global.h"']
     buf.extend(f'#include "{ramlayout.inc_name(h)}"' for h in sorted(headers - {"include/global.h", "include/gba/types.h"}))
+    forwards = {tag for m, _, _, _ in selected for tag in m.get("forwards", ())} - {f"{kind} {name}"}
+    if forwards:
+        buf.extend(("", *(tag + ";" for tag in sorted(forwards))))
     buf.extend(("", f"{kind} {name} {{"))
     offset = 0
     names = {m["name"] for m, _, _, _ in selected}

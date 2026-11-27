@@ -420,6 +420,33 @@ int Read(struct Pair *pair, PairAlias *alias, struct Tail *tail) {
         self.assertNotIn("struct Pair", text)
         self.assertNotIn("struct Tail", text)
 
+    def test_pointer_members_only_require_a_private_tag_declaration(self):
+        path = "src/a.c"
+        source = """
+struct Node { unsigned id; };
+struct Host {
+    struct Node *head;
+    void (*visit)(struct Node *node);
+    struct Host *next;
+    struct Node (*batch)[2];
+};
+"""
+        _, _, _, tu = parse(source, path)
+        host = tu.tags["struct", "Host"]
+        deps = [evidence.member_dependencies(tu, decl, "struct Host") for decl in host.decls]
+        self.assertEqual(deps, [([], [], ["struct Node"], False), ([], [], ["struct Node"], False),
+                                ([], [], [], True), ([], ["struct Node"], [], False)])
+        old = measure(source, path)[f"{path}:struct Host"]
+        old["members"] = old["members"][:3]
+        old["size"] = 12
+        for member, (headers, private, forwards, self_ref) in zip(old["members"], deps):
+            member.update(headers=headers, private=private, forwards=forwards, self_ref=self_ref)
+        family = {"kind": "struct", "size": 12, "loads": []}
+        generated, expected, _, _ = merge.plan_header(family, [old], "List", Path("include/list.h"))
+        self.assertIn("struct Node;", generated)
+        self.assertIn("struct List *next;", generated)
+        merge.probe_header(generated, "struct List", expected, 12, 4)
+
     def test_initializer_with_changed_shape_is_a_holdout(self):
         path = "src/moved/a.c"
         old_text = TYPES + "struct R { u16 old; };\nstruct R data = { 2 };\n"

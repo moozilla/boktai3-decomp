@@ -294,7 +294,7 @@ def selected_records(tu, path):
 
 
 def member_dependencies(tu, node, parent_spell):
-    headers, private = set(), set()
+    headers, private, forwards = set(), set(), set()
     self_ref = False
 
     class Deps(c_ast.NodeVisitor):
@@ -310,7 +310,14 @@ def member_dependencies(tu, node, parent_spell):
                 name = base.names[0]
                 self.add(name, tu.typedefs[name].coord)
 
-        def visit_Struct(self, base):
+        def visit_PtrDecl(self, pointer):
+            target = pointer.type
+            if isinstance(target, c_ast.TypeDecl) and isinstance(target.type, (c_ast.Struct, c_ast.Union)):
+                self.record(target.type, pointer=True)
+            else:
+                self.generic_visit(pointer)
+
+        def record(self, base, pointer=False):
             nonlocal self_ref
             kind = lm.kind_of(base)
             if base.decls is not None:
@@ -320,9 +327,13 @@ def member_dependencies(tu, node, parent_spell):
                 decl = tu.tags.get((kind, base.name))
                 if spell == parent_spell:
                     self_ref = True
+                elif pointer and (decl is None or not decl.coord
+                                  or not Path(decl.coord.file).as_posix().startswith("include/")):
+                    forwards.add(spell)
                 else:
                     self.add(spell, decl.coord if decl else None)
 
+        visit_Struct = record
         visit_Union = visit_Struct
 
         def visit_Enum(self, base):
@@ -331,7 +342,7 @@ def member_dependencies(tu, node, parent_spell):
                 private.add(f"enum {base.name}")
 
     Deps().visit(node.type)
-    return sorted(headers), sorted(private), self_ref
+    return sorted(headers), sorted(private), sorted(forwards), self_ref
 
 
 def rom_loads(params):
