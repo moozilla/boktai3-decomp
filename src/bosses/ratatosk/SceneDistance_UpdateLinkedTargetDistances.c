@@ -1,12 +1,6 @@
 #include "global.h"
 #include "engine/math/scene_vec.h"
-struct SceneDistanceEntry {
-    struct SceneVec position;
-    u8 pad8[4];
-    s32 distanceSquared;
-    s32 targetDistanceSquared;
-    u8 pad14[4];
-};
+#include "bosses/ratatosk/scene_distance_entry_layout.h"
 struct SceneDistanceSet {
     u8 pad0[0x36C];
     struct SceneVec position;
