@@ -19,8 +19,8 @@ The Bronze Armor reward in scene 2803 reused storage after `Armor_Destroy`
 unregistered the body. `TerrainOverlay_Update` still had that body in its
 actor table. At 08003D00, the ROM kept the stale body in r4 and read
 800010E0 into r1 as its sprite pointer. On wasm the same access trapped
-at frame 69,282. The pending 08003C20 patch validates each overlay entry
-against the live body registry. The guarded copy passed the stock 1,660-byte
+at frame 69,282. The 08003C20 repair (now in `src/scene/terrain/terrain_overlay.c`
+under `UBFIX`) validates each overlay entry against the live body registry. The guarded copy passed the stock 1,660-byte
 unit check. A port rebuild with that overlay reached the seal chamber and
 matched the original ROM.
 
@@ -70,14 +70,11 @@ their scene labels, covering 73 scenes. The 20 functions unique to the
 story-50 run include the trap dispatcher, particles and cue animations.
 
 The movies, function coverage, mGBA checkpoints and demo live under
-`build/autopilot/` in the worker checkout. To reproduce the run before
-integration, build the port with a generated copy containing the pending
-terrain overlay patch, then run the planner from the root.
+`build/autopilot/` in the worker checkout. The terrain overlay repair is
+in the source under `UBFIX`, so the port build needs no extra patch.
 
 ```sh
-mkdir -p build/autopilot/story-overlays
-cp tools/autopilot/pending_src_fixes/08003C20-terrain-overlay-stale-body.patch build/autopilot/story-overlays/
-build/venv/bin/python port/build_game.py -j2 --source-patches build/autopilot/story-overlays
+build/venv/bin/python port/build_game.py -j2
 build/venv/bin/python port/agent/gametypes.py --jobs 2
 make -f tools/emu/Makefile build/emu/harness
 node tools/autopilot/autopilot.mjs story --until-story 51 --verify --coverage
