@@ -1,28 +1,17 @@
-#include "global.h"
-#include "player/player.h"
-#define PlayerTransition_SetPhase     PlayerBurst_SetStateCallback
-#define PlayerTransition_FinishReveal PlayerBurst_UpdateShutdown
-struct PlayerTransition {
-    u8 unknown0[0x1c];
-    u8 animationData[0x20];
-    u8 animation[0xb6];
-    u16 phaseTicks;
-};
-void Sound_PlaySong(u32);
-void ActorShadow_Enable(void *);
-s32 Anim_Step(void *, void *);
-void PlayerBurst_UpdateShutdown(void *);
-void PlayerBurst_SetStateCallback(void *, void (*)(void *));
-void PlayerTransition_StepReveal(struct PlayerTransition *p)
+#include "player/effects/orbit_effect.h"
+
+void PlayerBurst_UpdateShutdown(struct PlayerOrbitEffect *);
+
+void PlayerTransition_StepReveal(struct PlayerOrbitEffect *p)
 {
-    u16 *ticks = &p->phaseTicks;
+    u16 *ticks = &p->phaseFrame;
     if (*ticks == 0) {
         Sound_PlaySong(0x1b0);
         (*ticks)++;
     }
     gPlayers[0]->animation.flags |= 1;
     ActorShadow_Enable(gPlayers[0]->shadow);
-    if (Anim_Step(p->animation, p->animationData)) {
+    if (Anim_Step(&p->drawable, &p->animationData)) {
         gPlayers[0]->tetherMode = 0;
         gPlayers[0]->facing = 5;
         gPlayers[0]->heading = 3;
