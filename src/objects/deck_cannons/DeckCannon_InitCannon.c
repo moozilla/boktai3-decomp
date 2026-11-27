@@ -1,15 +1,8 @@
 #include "global.h"
 #include "engine/engine.h"
+#include "objects/deck_cannons/cannon_battery_sprite_layout.h"
 struct CannonBatteryPosition {
     s16 x, y, z, unk6;
-};
-struct CannonBatterySprite {
-    u32 flags;
-    u8 unk4[3];
-    u8 mode;
-    u8 unk8[8];
-    u16 frame;
-    u8 unk12[0xA];
 };
 struct CannonBatteryCannon {
     u32 update, destroy;
