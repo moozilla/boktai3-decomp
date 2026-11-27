@@ -2,11 +2,8 @@
 #include "engine/engine.h"
 #include "system/game_state/game_state.h"
 #include "player/movement/player_saved_position.h"
-struct LinkRef {
-    u8 unk0[0x18];
-    s16 bit;
-};
-extern struct LinkRef *gLinkSession;
+#include "link/session/link_session_state.h"
+extern struct AreaEffectLinkState *gLinkSession;
 void Player_ResetActionState(struct Player *);
 s32 Player_ApplyTerrainDamage(struct Player *);
 void LinkPlayer_ResetToIdleState(struct Player *);
@@ -20,7 +17,7 @@ static inline s32 LocalPlayer(void)
 {
     if (!gLinkSession)
         return -1;
-    return gLinkSession->bit;
+    return gLinkSession->localPlayer;
 }
 #define F(T, off) (*(T *)((u8 *)p + (off)))
 s32 Player_UpdateLinkCore(struct Player *p)
