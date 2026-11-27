@@ -9,6 +9,7 @@
 #include "engine/word_flags.h"
 #include "engine/math/monster_particle_random.h"
 #include "scene/collision/packed_contact_halfwords.h"
+#include "scene/collision/packed_contact_vector.h"
 extern u32 gUnk_02000560;
 s32 Callback_InvokeActor(void *, void *);
 void Collider_SetPosition(void *, void *, u32);
@@ -19,9 +20,6 @@ void ImpactParticleGroup_SpawnBouncing(s32, s32, void *, void *, void *, s32, s3
 void Anim_RestartSequence(void *, void *, u32, u32, u32);
 void AnimData_SelectPaletteBank(void *, s32);
 s32 AxeArmor_UpdateDeath(struct AxeArmor *);
-struct EffectVector {
-    struct PackedContactHalfwords a, b;
-};
 s32 AxeArmor_Update(struct AxeArmor *p)
 {
     struct ContactCollider *collider;
@@ -50,7 +48,7 @@ s32 AxeArmor_Update(struct AxeArmor *p)
                                    p->collider.costFlags == 4, p->hudTime);
         }
         if (p->health <= 0) {
-            struct EffectVector spread, velocity;
+            struct PackedContactVector spread, velocity;
             struct SceneVec center;
             const u16 *table;
             s16 *position;
@@ -64,13 +62,13 @@ s32 AxeArmor_Update(struct AxeArmor *p)
                 *v = *(struct SceneVec *)position;
                 v->y += 200;
             }
-            velocity.a.lo = -4;
+            velocity.x = -4;
             table = (const u16 *)RANDOM_TABLE_ADDR;
-            velocity.a.hi = ParticleRandom_ReadDirectSample(table) & 7;
-            velocity.b.lo = -4;
-            spread.a.lo = 24;
-            spread.a.hi = (ParticleRandom_ReadDirectSample(table) & 7) + 3;
-            spread.b.lo = 24;
+            velocity.y = ParticleRandom_ReadDirectSample(table) & 7;
+            velocity.z = -4;
+            spread.x = 24;
+            spread.y = (ParticleRandom_ReadDirectSample(table) & 7) + 3;
+            spread.z = 24;
             ImpactParticleGroup_SpawnBouncing((ParticleRandom_ReadDirectSample(table) & 3) + 4, 13, &center, &velocity,
                          &spread, 15, 15);
             Anim_RestartSequence(&p->sequence, p->resource, 4, 0, 0);

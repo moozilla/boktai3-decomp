@@ -11,6 +11,7 @@
 #include "bosses/state_actor_action_entry.h"
 #include "scene/collision/contact_position.h"
 #include "recovered/contact_reaction_vector_layout.h"
+#include "scene/collision/packed_contact_vector.h"
 
 int SceneActorGraphics_GetResourceId(struct StateActor *p)
 {
@@ -469,16 +470,12 @@ void sub_08022694(u8 *p)
     }
 }
 
-struct Packed {
-    s32 x : 16, y : 16, z : 16, pad : 16;
-};
-
 // confidence=low: five sparks 300 units above the actor; the large burst for big, otherwise a
 // smaller one shifted by the facing kept at 0xA8.
 void sub_08022790(u8 *p, s32 big)
 {
     struct ContactPosition pos;
-    struct Packed size;
+    struct PackedContactVector size;
     struct ContactPosition *at = &pos;
     s32 angle, count, speed;
     u16 index;
@@ -519,9 +516,7 @@ void sub_08022790(u8 *p, s32 big)
     SparkParticle_Spawn(&pos, 5, &size, angle, count, speed, 0, 2);
 }
 
-typedef struct BurstVec {
-    s32 x : 16, y : 16, z : 16, pad : 16;
-} BurstVec;
+typedef struct PackedContactVector BurstVec;
 extern const BurstVec gUnk_08604D84[];
 u16 Sqrt(u32);
 s32 Div(s32, s32);
@@ -571,7 +566,7 @@ void sub_08022878(BurstVec *p)
 void SceneActors_SpawnAmbientParticlePair(struct StateActor *p)
 {
     u8 *graphics = (u8 *)p + 0x240;
-    struct Packed size;
+    struct PackedContactVector size;
     int i;
     for (i = 0; i < 2; i++) {
         u32 angle, count;

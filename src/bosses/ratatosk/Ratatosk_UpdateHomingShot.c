@@ -2,9 +2,7 @@
 #include "player/player.h"
 #include "scene/motion/scene_facing.h"
 #include "scene/collision/contact_position.h"
-struct PackedVec {
-    s32 x : 16, y : 16, z : 16, pad : 16;
-};
+#include "scene/collision/packed_contact_vector.h"
 struct Actor {
     u8 pad0[0x51];
     u8 angle;
@@ -76,7 +74,7 @@ void Projectile_SpawnAtPosition(void *, struct ContactPosition *);
 void Ratatosk_UpdateHomingShot(struct Actor *p, s32 tick)
 {
     u8 params[0x58];
-    struct PackedVec offset;
+    struct PackedContactVector offset;
     struct ContactPosition spawn;
     struct Actor *p2 = p;
     if (p->changed) {

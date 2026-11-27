@@ -1,9 +1,7 @@
 #include "effects/projectiles/homing_projectile.h"
 #include "scene/collision/packed_contact_halfwords.h"
+#include "scene/collision/packed_contact_vector.h"
 
-struct ColliderVector {
-    struct PackedContactHalfwords a, b;
-};
 struct ProjectileCollider {
     u8 unknown[6];
     u16 flags;
@@ -25,7 +23,7 @@ void HomingProjectile_OnSecondaryCollision(void);
 void HomingProjectile_InitializeSlot(void *manager, struct HomingSlot *p, u32 slotIndex)
 {
     struct HomingParams *params = &p->params;
-    struct ColliderVector size, offset;
+    struct PackedContactVector size, offset;
     u8 *collider;
     u16 *sizeComponents, *offsetComponents;
     HomingProjectile_InitParams(params);
@@ -34,12 +32,12 @@ void HomingProjectile_InitializeSlot(void *manager, struct HomingSlot *p, u32 sl
     Sprite_InitUnlinked(&p->sprite, &p->graphics, 1);
     p->slotIndex = slotIndex;
     collider = (u8 *)&p->primaryCollider;
-    size.a.lo = 40;
-    size.a.hi = 128;
-    size.b.lo = 40;
-    offset.a.lo = 0;
-    offset.a.hi = 128;
-    offset.b.lo = 0;
+    size.x = 40;
+    size.y = 128;
+    size.z = 40;
+    offset.x = 0;
+    offset.y = 128;
+    offset.z = 0;
     Collider_Init(collider, 0, 0x4001, 0, 16, &size, &offset);
     Collider_SetCallback(collider, HomingProjectile_BeginImpact, p);
     Collider_SetBodyProperties(collider, params->body, 0x402, 1);
