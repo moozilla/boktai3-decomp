@@ -598,4 +598,3 @@ include/system/clock/solar_time_context.h,include/system/clock/solar_time_contex
 include/link/selection/link_selection_prompt.h,include/link/selection/link_selection_prompt.h,shared layout recovered with SceneMenu_BeginTimedMessage,,
 include/link/link_script_panel.h,include/link/link_script_panel.h,shared layout recovered with ScriptPanel_ConfirmSelection,,
 include/link/records/record_name_panel.h,include/link/records/record_name_panel.h,shared layout recovered with RecordPanel_RefreshEntryLabels,,
-include/link/wireless/scene_pool_collision.h,include/link/wireless/scene_pool_collision.h,typed scene pool collision access,,
