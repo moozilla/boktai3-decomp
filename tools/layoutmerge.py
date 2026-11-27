@@ -622,7 +622,36 @@ def finish_layouts(structs, vals, bitfields, bfbytes):
         lf["bitpos"], lf["bits"] = lo, hi - lo
 
 
-def probe_records(body, tu, records):
+def aggregate_member_probes(tu, root, definition, probes, prefix="", seen=frozenset()):
+    """Measure the named aggregates within embedded structs, unions and element zero."""
+    if id(definition) in seen:
+        return
+    seen = seen | {id(definition)}
+    for decl in definition.decls or ():
+        if not decl.name:
+            continue
+        resolved = tu.resolve(decl.type)
+        array = isinstance(resolved, c_ast.ArrayDecl)
+        child = tu.aggregate(resolved.type if array else decl.type)
+        if not child or child[1].decls is None:
+            continue
+        name = prefix + decl.name
+        expr = root + name
+        if prefix:
+            member = {"name": name, "ctype": spell_type(decl.type), "array": array, "base": "aggregate"}
+            for field, probe in (("off", f"(unsigned)&{expr}"), ("size", f"sizeof({expr})"),
+                                 ("align", f"__alignof__({expr})")):
+                member[field] = len(probes)
+                probes.append(probe)
+            if array:
+                member["esize"] = len(probes)
+                probes.append(f"sizeof({expr}[0])")
+            yield member
+        nested = name + ("[0]." if array else ".")
+        yield from aggregate_member_probes(tu, root, child[1], probes, nested, seen)
+
+
+def probe_records(body, tu, records, *, qualified=False):
     """Probe named aggregate definitions directly, without synthetic RAM globals.
 
     RECORDS maps an arbitrary key to (C spelling, definition). Keep direct
@@ -661,6 +690,8 @@ def probe_records(body, tu, records):
                     m["esize"] = len(probes)
                     probes.append(f"sizeof({expr}[0])")
             st["members"].append(m)
+        if qualified:
+            st["qualified"] = list(aggregate_member_probes(tu, root, definition, probes))
         structs[key] = st
     if not structs:
         return structs
@@ -668,7 +699,7 @@ def probe_records(body, tu, records):
     finish_layouts(structs, vals, bitfields, bfbytes)
     for st in structs.values():
         st["align"] = vals[st["align"]]
-        for m in st["members"]:
+        for m in st["members"] + st.get("qualified", []):
             for k in ("off", "size", "align", "esize"):
                 if k in m:
                     m[k] = vals[m[k]]

@@ -51,7 +51,7 @@ def json_write(path, data):
     os.replace(file.name, path)
 
 
-def scan_file(rel, text):
+def scan_file(rel, text, *, qualified=False):
     """One probe per file, with declarations-only fallback after a body parse error."""
     path = rel
     if rel.startswith("include/"):
@@ -70,7 +70,7 @@ def scan_file(rel, text):
         # pycparser can reject GNU syntax even after bodies are removed.
         return {**result, "error": str(exc)[:250]}
     selected = evidence.selected_records(tu, path)
-    measured = lm.probe_records(body, tu, selected)
+    measured = lm.probe_records(body, tu, selected, qualified=qualified)
     for key, view in measured.items():
         spell, node = selected[key]
         for member, decl in zip(view["members"], node.decls):

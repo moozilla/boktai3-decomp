@@ -395,6 +395,21 @@ int Read(struct Packed *p, struct Other *q) { return p->xy.hi + q->xy.hi; }
             result = merge.rewrite_unit(old_text, old, new, Path("include/vector.h"), "struct Vector")
         self.assertIn("return p->y + q->xy.hi;", result)
 
+    def test_shared_layout_measures_nested_aggregate_addresses(self):
+        path = "src/a.c"
+        vector = "struct Vec { unsigned x, z; };\n"
+        source = vector + "struct R { unsigned pad[2]; struct Vec pos; };\n" \
+                          "void Read(struct R *p) { Use(&p->pos); }\n"
+        old = measure(source, path)[f"{path}:struct R"]
+        shared = vector + "struct Body { unsigned pad; struct Vec position; };\n" \
+                          "struct Actor { unsigned flags; struct Body body; };\n"
+        new = merge.probe_header(shared, "struct Actor", {"flags": (0, 4), "body": (4, 12)}, 16, 4)
+        self.assertEqual([(m["name"], m["off"], m["size"]) for m in new["qualified"]],
+                         [("body.position", 8, 8)])
+        with patch.object(lm, "preprocess", return_value=parse(source, path)[0]):
+            result = merge.rewrite_unit(source, old, new, Path("include/actor.h"), "struct Actor")
+        self.assertIn("Use(&p->body.position);", result)
+
     def test_literal_array_subscript_resolves_to_the_measured_scalar(self):
         path = "src/a.c"
         declaration = TYPES + "struct Raw { u16 v[3]; };\n"
@@ -591,12 +606,27 @@ unsigned Read(struct Pool *pool) { return pool->slots[2].timer; }
 
     def test_initializer_with_changed_shape_is_a_holdout(self):
         path = "src/moved/a.c"
-        old_text = TYPES + "struct R { u16 old; };\nstruct R data = { 2 };\n"
+        old_text = TYPES + "struct R { u16 old, other; };\nstruct R data = { 2, 3 };\n"
         old = measure(old_text, path)[f"{path}:struct R"]
-        new = measure(TYPES + "struct S { u16 value; };", "include/s.h")["include/s.h:struct S"]
+        new = measure(TYPES + "struct S { u16 value; u8 lo, hi; };", "include/s.h")["include/s.h:struct S"]
         with patch.object(lm, "preprocess", return_value=parse(old_text, path)[0]):
             with self.assertRaisesRegex(merge.Holdout, "initializer"):
                 merge.rewrite_unit(old_text, old, new, Path("include/s.h"), "struct S")
+
+    def test_positional_initializer_survives_a_member_rename(self):
+        path = "src/a.c"
+        declaration = TYPES + "struct R { u16 old; };\n"
+        new = measure(TYPES + "struct S { u16 value; };", "include/s.h")["include/s.h:struct S"]
+        for initializer in ("{ 2 }", "{ .old = 2 }"):
+            source = declaration + f"struct R data = {initializer};\n"
+            old = measure(source, path)[f"{path}:struct R"]
+            with patch.object(lm, "preprocess", return_value=parse(source, path)[0]):
+                if initializer.startswith("{ ."):
+                    with self.assertRaisesRegex(merge.Holdout, "designator"):
+                        merge.rewrite_unit(source, old, new, Path("include/s.h"), "struct S")
+                else:
+                    result = merge.rewrite_unit(source, old, new, Path("include/s.h"), "struct S")
+                    self.assertIn("struct S data = { 2 };", result)
 
     def test_union_preserves_deliberate_overlays(self):
         text = TYPES + "union W { unsigned word; u16 halves[2]; };\n"

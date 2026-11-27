@@ -41,6 +41,10 @@ def type_key(member):
     return tuple(member.get(k) for k in ("ctype", "size", "align", "array", "esize", "bits", "bitpos"))
 
 
+def positional_layout(view):
+    return [(m.get("off"), m.get("name") is None, type_key(m)) for m in view["members"]]
+
+
 def bit_spans(view):
     return {lf["name"]: (lf["bitpos"], lf["bits"]) for lf in view["leaves"]
             if lf.get("bits") is not None and lf.get("bitpos") is not None}
@@ -238,7 +242,7 @@ def probe_header(text, spell, expected, size, align):
             raise Holdout(f"generated header failed parsing: {exc}") from exc
         kind, tag = spell.split()
         node = tu.tags.get((kind, tag))
-        measured = lm.probe_records(body, tu, {spell: (spell, node)}) if node else {}
+        measured = lm.probe_records(body, tu, {spell: (spell, node)}, qualified=True) if node else {}
         view = measured.get(spell)
     if not view or view["size"] != size or view["align"] != align:
         actual = (view["size"], view["align"]) if view else None
@@ -452,8 +456,10 @@ def rewrite_records(text, targets, header, *, allow_prefix=False):
                 if old["id"] in refs.extent_uses:
                     line, operation = refs.extent_uses[old["id"]]
                     raise Holdout(f"{old['spell']}: line {line} uses the private extent in {operation}")
-            if not same_sequence and has_initializers(ast, tu, old["id"], old["file"]):
-                raise Holdout(f"{old['spell']}: aggregate initializer needs a positional layout review")
+            if not same_sequence:
+                initialized, designated = initializers(ast, tu, old["id"], old["file"])
+                if initialized and (designated or positional_layout(old) != positional_layout(new)):
+                    raise Holdout(f"{old['spell']}: aggregate initializer needs a layout or designator review")
             edits.extend(member_edits(text, pre, refs, old, mapping, span))
         replacement = f"typedef {spell} {span.name};\n" if span.typedef else ""
         removed.append((span.start, span.end, replacement))
@@ -470,7 +476,7 @@ def rewrite_records(text, targets, header, *, allow_prefix=False):
     return inline_twins.add_include(text, ramlayout.inc_name(str(header)))
 
 
-def has_initializers(ast, tu, key, path):
+def initializers(ast, tu, key, path):
     from pycparser import c_ast
 
     def contains(t, seen=frozenset()):
@@ -486,24 +492,37 @@ def has_initializers(ast, tu, key, path):
             return any(contains(d.type, seen | {id(agg[1])}) for d in agg[1].decls or ())
         return False
 
+    class Designators(c_ast.NodeVisitor):
+        found = False
+
+        def visit_NamedInitializer(self, node):
+            self.found = True
+
     class Initializers(c_ast.NodeVisitor):
         found = False
+        designated = False
+
+        def examine(self, expr):
+            self.found = True
+            designators = Designators()
+            designators.visit(expr)
+            self.designated |= designators.found
 
         def visit_Decl(self, node):
             if node.init is not None and contains(node.type):
-                self.found = True
+                self.examine(node.init)
             self.generic_visit(node)
 
         def visit_CompoundLiteral(self, node):
             if contains(node.type.type):
-                self.found = True
+                self.examine(node.init)
             self.generic_visit(node)
 
     visitor = Initializers()
     for node in ast.ext:
         if node.coord and Path(node.coord.file).as_posix() == path:
             visitor.visit(node)
-    return visitor.found
+    return visitor.found, visitor.designated
 
 
 def path_under(path, directory, suffix):
@@ -665,7 +684,7 @@ def header_choice(catalog, family, views, args):
         content = (families.ROOT / header).read_bytes()
         if families.digest(content) != catalog["files"][str(header)]:
             raise Holdout(f"stale catalog for {header}; rescan the tree")
-        result = families.scan_file(str(header), content.decode(errors="replace"))
+        result = families.scan_file(str(header), content.decode(errors="replace"), qualified=True)
         fresh = result["records"].get(key)
         if not fresh:
             detail = result.get("error", f"no measured definition for {view['spell']}")
@@ -692,7 +711,6 @@ def header_choice(catalog, family, views, args):
     text = render_header(header, [*(plan for plan, _ in children), *active_overlays, parent])
     new = probe_header(text, parent.spell, parent.expected, parent.size, parent.align)
     new["embedded"] = {}
-    new["qualified"] = []
     decisions = []
     for plan, originals in children:
         measured = probe_header(text, plan.spell, plan.expected, plan.size, plan.align)
@@ -700,10 +718,8 @@ def header_choice(catalog, family, views, args):
             new["embedded"][key] = measured
         decisions.append(f"embedded {plan.spell}, size {plan.size:#x}, alignment {plan.align}")
     for overlay in active_overlays:
-        measured = probe_header(text, overlay.spell, overlay.expected, overlay.size, overlay.align)
+        probe_header(text, overlay.spell, overlay.expected, overlay.size, overlay.align)
         outer = next(m for m in new["members"] if m.get("ctype") == overlay.spell)
-        new["qualified"].extend(dict(m, name=f"{outer['name']}.{m['name']}", off=outer["off"] + m["off"])
-                                for m in measured["members"] if m.get("off") is not None)
         decisions.append(f"overlay {overlay.spell} at {outer['off']:#x}")
     return header, parent.spell, text, new, decisions + parent.decisions, parent.skipped
 
