@@ -82,7 +82,7 @@ int WirelessController_UpdateAdapterSetup(struct Engine *p)
             p->gameIdLow = p->gameId;
             p->gameIdHigh = p->gameId >> 8;
             {
-                void *config = (u8 *)p + 0x11C;
+                void *config = p->rfuConfig;
                 int mode = p->isParent;
                 int flags = 0;
                 if (mode)
