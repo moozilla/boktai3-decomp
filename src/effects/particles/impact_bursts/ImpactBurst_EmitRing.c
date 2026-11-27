@@ -1,36 +1,34 @@
 #include "global.h"
-struct Config {
-    u16 v[20];
-};
+#include "effects/particles/impact_burst.h"
 int Div(int, int);
-void ImpactBurst_Create(int, void *, struct Config *);
+void ImpactBurst_Create(int, void *, struct AnimatedParticleConfig *);
 void ImpactBurst_EmitRing(void *pos, int count, int type, int flags, int speed,
                                 int horizontal, int start, int decay)
 {
-    struct Config s;
+    struct AnimatedParticleConfig s;
     int step, i;
-    s.v[0] = type;
-    s.v[1] = flags;
-    s.v[3] = speed;
-    s.v[4] = 0;
-    s.v[5] = 0;
-    s.v[6] = horizontal;
-    s.v[7] = 0;
+    s.type = type;
+    s.flags = flags;
+    s.speed = speed;
+    s.vertical = 0;
+    s.verticalRange = 0;
+    s.horizontal = horizontal;
+    s.horizontalRange = 0;
     step = Div(256, count);
-    s.v[9] = 0;
-    s.v[8] = 0;
-    s.v[12] = start;
-    s.v[13] = 0;
-    s.v[14] = decay;
-    s.v[15] = 0;
-    s.v[16] = start;
-    s.v[17] = 0;
-    s.v[18] = decay;
-    s.v[19] = 0;
-    s.v[11] = 10;
-    s.v[10] = 0;
+    s.pitchRange = 0;
+    s.pitch = 0;
+    s.verticalStart = start;
+    s.verticalStartRange = 0;
+    s.verticalDecay = decay;
+    s.verticalDecayRange = 0;
+    s.horizontalStart = start;
+    s.horizontalStartRange = 0;
+    s.horizontalDecay = decay;
+    s.horizontalDecayRange = 0;
+    s.yawRange = 10;
+    s.yaw = 0;
     for (i = 0; i < count; i++) {
         ImpactBurst_Create(1, pos, &s);
-        s.v[10] += step;
+        s.yaw += step;
     }
 }

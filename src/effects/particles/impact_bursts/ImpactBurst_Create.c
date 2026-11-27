@@ -3,14 +3,8 @@
 #include "engine/math/monster_particle_random.h"
 #include "engine/video/display_sequence_sprite.h"
 #include "ui/hud/scene_indicator.h"
+#include "effects/particles/impact_burst.h"
 
-struct AnimatedParticleSpawnParams {
-    u16 type, flags, pad, speed;
-    s16 vertical, verticalRange, horizontal, horizontalRange;
-    u16 pitch, pitchRange, yaw, yawRange, verticalStart, verticalStartRange, verticalDecay,
-        verticalDecayRange, horizontalStart, horizontalStartRange, horizontalDecay,
-        horizontalDecayRange;
-};
 struct AnimatedParticleManager *ImpactBurstManager_Create(int, int);
 int Mod(int, int);
 
@@ -25,7 +19,7 @@ static inline int scale12(int a, int b)
     return -((-x) >> 12);
 }
 int ImpactBurst_Create(int count, struct ContactPosition *pos,
-                             struct AnimatedParticleSpawnParams *c)
+                             struct AnimatedParticleConfig *c)
 {
     int i, emitted;
     if (!gAnimatedParticleManager && !ImpactBurstManager_Create(0, 0))

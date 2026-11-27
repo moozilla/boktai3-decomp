@@ -1,15 +1,13 @@
 #include "global.h"
 #include "ui/hud/scene_indicator.h"
-struct Config {
-    u16 v[20];
-};
+#include "effects/particles/impact_burst.h"
 int Script_GetKeywordValue(int, int);
 int Script_SeekToKeyword(int);
 int Script_GetValue(void);
-void ImpactBurst_Create(int, void *, struct Config *);
+void ImpactBurst_Create(int, void *, struct AnimatedParticleConfig *);
 void ImpactBurst_CreateFromScript(void)
 {
-    struct Config s;
+    struct AnimatedParticleConfig s;
     struct Vec pos;
     int count = Script_GetKeywordValue('n', 1);
     if (Script_SeekToKeyword('p')) {
@@ -21,49 +19,49 @@ void ImpactBurst_CreateFromScript(void)
         pos.y = 0;
         pos.z = 0;
     }
-    s.v[0] = Script_GetKeywordValue('t', 0);
-    s.v[1] = Script_GetKeywordValue('f', 0);
-    s.v[3] = Script_GetKeywordValue('a', 64);
+    s.type = Script_GetKeywordValue('t', 0);
+    s.flags = Script_GetKeywordValue('f', 0);
+    s.speed = Script_GetKeywordValue('a', 64);
     if (Script_SeekToKeyword('s')) {
-        s.v[4] = Script_GetValue();
-        s.v[5] = Script_GetValue();
-        s.v[6] = Script_GetValue();
-        s.v[7] = Script_GetValue();
+        s.vertical = Script_GetValue();
+        s.verticalRange = Script_GetValue();
+        s.horizontal = Script_GetValue();
+        s.horizontalRange = Script_GetValue();
     } else {
-        s.v[4] = 0;
-        s.v[5] = 0;
-        s.v[6] = 0;
-        s.v[7] = 0;
+        s.vertical = 0;
+        s.verticalRange = 0;
+        s.horizontal = 0;
+        s.horizontalRange = 0;
     }
     if (Script_SeekToKeyword('d')) {
-        s.v[8] = Script_GetValue();
-        s.v[9] = Script_GetValue();
-        s.v[10] = Script_GetValue();
-        s.v[11] = Script_GetValue();
+        s.pitch = Script_GetValue();
+        s.pitchRange = Script_GetValue();
+        s.yaw = Script_GetValue();
+        s.yawRange = Script_GetValue();
     } else {
-        s.v[8] = 0;
-        s.v[9] = 0;
-        s.v[10] = 0;
-        s.v[11] = 0;
+        s.pitch = 0;
+        s.pitchRange = 0;
+        s.yaw = 0;
+        s.yawRange = 0;
     }
     if (Script_SeekToKeyword('c')) {
-        s.v[12] = Script_GetValue();
-        s.v[13] = Script_GetValue();
-        s.v[14] = Script_GetValue();
-        s.v[15] = Script_GetValue();
-        s.v[16] = Script_GetValue();
-        s.v[17] = Script_GetValue();
-        s.v[18] = Script_GetValue();
-        s.v[19] = Script_GetValue();
+        s.verticalStart = Script_GetValue();
+        s.verticalStartRange = Script_GetValue();
+        s.verticalDecay = Script_GetValue();
+        s.verticalDecayRange = Script_GetValue();
+        s.horizontalStart = Script_GetValue();
+        s.horizontalStartRange = Script_GetValue();
+        s.horizontalDecay = Script_GetValue();
+        s.horizontalDecayRange = Script_GetValue();
     } else {
-        s.v[12] = 255;
-        s.v[13] = 0;
-        s.v[14] = 255;
-        s.v[15] = 0;
-        s.v[16] = 255;
-        s.v[17] = 0;
-        s.v[18] = 255;
-        s.v[19] = 0;
+        s.verticalStart = 255;
+        s.verticalStartRange = 0;
+        s.verticalDecay = 255;
+        s.verticalDecayRange = 0;
+        s.horizontalStart = 255;
+        s.horizontalStartRange = 0;
+        s.horizontalDecay = 255;
+        s.horizontalDecayRange = 0;
     }
     ImpactBurst_Create(count, &pos, &s);
 }
