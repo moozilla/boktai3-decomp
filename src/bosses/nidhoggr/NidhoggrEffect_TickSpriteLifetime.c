@@ -1,9 +1,7 @@
 #include "global.h"
 #include "player/cutscene/player_cue_sequence.h"
+#include "bosses/nidhoggr/nidhoggr_effect_motion_layout.h"
 
-struct NidhoggrEffectMotion {
-    u16 x, y, z, unknown6;
-};
 struct NidhoggrPoolSprite {
     u32 flags;
     u8 unknown4[12];
