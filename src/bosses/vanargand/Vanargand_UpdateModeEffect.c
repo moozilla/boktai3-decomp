@@ -1,15 +1,12 @@
 #include "global.h"
+#include "bosses/vanargand/vanargand_pair_state_layout.h"
 
-struct A {
-    u8 f[0x5c7];
-    u8 m;
-};
 void VanargandPair_AdvancePairState(void *);
 void VanargandPair_AdvanceConditionalPairState(void *);
 
-void Vanargand_UpdateModeEffect(struct A *p)
+void Vanargand_UpdateModeEffect(struct VanargandPairState *p)
 {
-    switch (p->m) {
+    switch (p->level) {
         case 1:
             VanargandPair_AdvancePairState(p);
             break;
