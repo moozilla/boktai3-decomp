@@ -1,8 +1,5 @@
 #include "global.h"
-struct Pair {
-    u32 a;
-    u32 b;
-};
+#include "objects/scene_object_slot.h"
 #define POS(n) (pp[n])
 struct Inner {
     u8 pad0[0x14];

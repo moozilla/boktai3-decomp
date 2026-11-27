@@ -1,4 +1,5 @@
 #include "global.h"
+#include "objects/scene_object_slot.h"
 
 struct SceneAnimationSlotFlags {
     u8 pad[0x71dc];
@@ -14,10 +15,7 @@ struct SceneAnimationEntries {
     u8 pad[0x5444];
     struct SceneAnimationFlagEntry slots[26];
 };
-struct SceneAnimationEffectPair {
-    u32 a, b;
-};
-extern const struct SceneAnimationEffectPair gUnk_0824F354;
+extern const struct Pair gUnk_0824F354;
 void Anim_SetKeyframes(void *, void *, u32, u32, u32);
 s32 Anim_Step(void *, void *);
 void Nidhoggr_CreateSeekingAttackEffect(void *, void *, void *, void *);
@@ -41,7 +39,7 @@ void SceneAnimation_UpdateSlotSequenceSevenEffect(u8 *p, int i)
         }
         case 1:
             if (((struct SceneAnimationSlotFlags *)p)->counter[i] > 23) {
-                struct SceneAnimationEffectPair v;
+                struct Pair v;
                 *q = 2;
                 v = gUnk_0824F354;
                 Nidhoggr_CreateSeekingAttackEffect(p + 0x54, (void *)(i * 0x60 + (u32)p + 0x545c),
