@@ -1,11 +1,8 @@
 #include "effects/projectiles/homing_projectile.h"
+#include "scene/collision/packed_contact_halfwords.h"
 
-struct ColliderHalfwords {
-    s32 lo : 16;
-    s32 hi : 16;
-};
 struct ColliderVector {
-    struct ColliderHalfwords a, b;
+    struct PackedContactHalfwords a, b;
 };
 struct ProjectileCollider {
     u8 unknown[6];

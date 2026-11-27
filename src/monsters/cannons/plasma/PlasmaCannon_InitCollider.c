@@ -1,12 +1,9 @@
 #include "monsters/cannons/plasma_cannon.h"
 #include "scene/collision/collision_response.h"
 #include "engine/engine.h"
-struct H {
-    u32 lo : 16;
-    u32 hi : 16;
-};
+#include "scene/collision/packed_contact_halfwords.h"
 struct Z {
-    struct H a, b;
+    struct PackedContactHalfwords a, b;
 };
 void PlasmaCannon_InitCollider(struct OrangeSpineActor *p)
 {

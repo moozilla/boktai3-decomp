@@ -1,10 +1,7 @@
 #include "global.h"
-struct H {
-    u32 lo : 16;
-    u32 hi : 16;
-};
+#include "scene/collision/packed_contact_halfwords.h"
 struct Z {
-    struct H a, b;
+    struct PackedContactHalfwords a, b;
 };
 void Collider_Init(u8 *, u32, u32, u32, u32, struct Z *, struct Z *);
 void Collider_SetBodyProperties(u8 *, u32, u32, u32);

@@ -1,14 +1,11 @@
 #include "effects/scene/repeated_effect.h"
-struct H {
-    u32 lo : 16;
-    u32 hi : 16;
-};
+#include "scene/collision/packed_contact_halfwords.h"
 struct Q {
     u8 f[0x3e];
     u16 v;
 };
 struct Z {
-    struct H a, b;
+    struct PackedContactHalfwords a, b;
 };
 void Collider_Init(u8 *, u32, u32, u32, u32, struct Z *, struct Z *);
 void Collider_SetCallback(u8 *,

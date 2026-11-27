@@ -1,14 +1,8 @@
 #include "bosses/vanargand/vanargand_damage_part.h"
-struct ColliderExtentPair {
-    u32 lo : 16, hi : 16;
-};
-struct ColliderExtentTail {
-    u32 lo : 16;
-    u32 : 16;
-};
+#include "scene/collision/packed_contact_halfwords.h"
 struct ColliderExtents {
-    struct ColliderExtentPair a;
-    struct ColliderExtentTail b;
+    struct PackedContactHalfwords a;
+    struct PackedContactHalfwords b;
 };
 void Collider_Init(void *, u16, u32, u32, u32, void *, void *);
 s32 Collider_Refresh(void *);

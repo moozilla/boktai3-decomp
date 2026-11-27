@@ -1,13 +1,10 @@
 #include "global.h"
+#include "scene/collision/packed_contact_halfwords.h"
 
 // confidence=low: RepeatedEffect_InitCollider for an effect with its collider at 0x48 and its
 // position at 0xE4: a 0x80 by 0x100 attack box calling SolarRoot_ApplyAnimationEvent.
-struct H {
-    u32 lo : 16;
-    u32 hi : 16;
-};
 struct Z {
-    struct H a, b;
+    struct PackedContactHalfwords a, b;
 };
 struct GrowthEffect {
     u8 unknown0[0x48];

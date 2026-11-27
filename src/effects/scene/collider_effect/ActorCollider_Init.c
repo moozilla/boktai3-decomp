@@ -1,14 +1,8 @@
 #include "global.h"
-struct ColliderExtentPair {
-    u32 lo : 16, hi : 16;
-};
-struct ColliderExtentTail {
-    u32 lo : 16;
-    u32 : 16;
-};
+#include "scene/collision/packed_contact_halfwords.h"
 struct ColliderExtents {
-    struct ColliderExtentPair a;
-    struct ColliderExtentTail b;
+    struct PackedContactHalfwords a;
+    struct PackedContactHalfwords b;
 };
 struct ColliderObject {
     u8 unknown0[0x1C];

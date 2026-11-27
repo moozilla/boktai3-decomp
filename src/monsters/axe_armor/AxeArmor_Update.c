@@ -8,6 +8,7 @@
 #include "engine/engine_pause.h"
 #include "engine/word_flags.h"
 #include "engine/math/monster_particle_random.h"
+#include "scene/collision/packed_contact_halfwords.h"
 extern u32 gUnk_02000560;
 s32 Callback_InvokeActor(void *, void *);
 void Collider_SetPosition(void *, void *, u32);
@@ -18,12 +19,8 @@ void ImpactParticleGroup_SpawnBouncing(s32, s32, void *, void *, void *, s32, s3
 void Anim_RestartSequence(void *, void *, u32, u32, u32);
 void AnimData_SelectPaletteBank(void *, s32);
 s32 AxeArmor_UpdateDeath(struct AxeArmor *);
-struct EffectPair {
-    s32 lo : 16;
-    u32 hi : 16;
-};
 struct EffectVector {
-    struct EffectPair a, b;
+    struct PackedContactHalfwords a, b;
 };
 s32 AxeArmor_Update(struct AxeArmor *p)
 {

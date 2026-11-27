@@ -1,10 +1,7 @@
 #include "objects/quest_barriers/quest_barrier.h"
-struct PropHalfwords {
-    u32 lo : 16;
-    u32 hi : 16;
-};
+#include "scene/collision/packed_contact_halfwords.h"
 struct PropVector {
-    struct PropHalfwords a, b;
+    struct PackedContactHalfwords a, b;
 };
 void QuestBarrier_InitializeCollider(struct BreakableProp *prop, u32 x, void *y)
 {

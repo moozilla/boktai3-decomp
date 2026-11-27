@@ -9,6 +9,7 @@
 #include "ui/hud/scene_indicator.h"
 #include "player/cutscene/player_cue_sequence.h"
 #include "engine/math/scene_vec.h"
+#include "scene/collision/packed_contact_halfwords.h"
 
 u32 LargeFragmentEffect_IsActive(void)
 {
@@ -44,19 +45,9 @@ void LargeFragmentEffect_OnCollision(void)
 {
 }
 
-struct H {
-    u32 lo : 16;
-    u32 hi : 16;
-};
-
-struct Tail {
-    u32 lo : 16;
-    u32 : 16;
-};
-
 struct Z {
-    struct H a;
-    struct Tail b;
+    struct PackedContactHalfwords a;
+    struct PackedContactHalfwords b;
 };
 
 void LargeFragmentEffect_OnCollision(void); // a `bx lr` stub
