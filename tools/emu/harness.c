@@ -43,6 +43,7 @@
 //                       the rest of that frame runs too), then disarm it
 //   unprobe             remove all probes; probes also work with trace off
 //   (env BOKTAI3_SAV=file.sav loads a battery save first)
+//   (env BOKTAI3_EXEC_ONLY=1 records executed addresses without ROM data reads)
 //   mark NAME           start a new coverage segment: subsequent coverage is
 //                       written to OUTDIR/cov-NAME.* in addition to the totals
 
@@ -184,7 +185,7 @@ static int tick_hits;
 static long tick_total;
 
 static inline void note_read(uint32_t addr, int width) {
-	if (!tracing) return;
+	if (!tracing || !rom_reader) return;
 	if (addr < 0x08000000 || addr >= 0x0E000000) return;
 	uint32_t o = (addr - 0x08000000) & (ROM_SIZE - 1);
 	uint32_t pc = cur_pc() | (cpu->executionMode == MODE_THUMB);
@@ -209,7 +210,7 @@ static int cpu_is_word_load(void) {
 }
 
 static inline void note_word(uint32_t addr, int nwords) {
-	if (!tracing || addr < 0x08000000 || addr >= 0x0A000000) return;
+	if (!tracing || !rom_word32 || addr < 0x08000000 || addr >= 0x0A000000) return;
 	if (!cpu_is_word_load()) return;
 	uint32_t w = ((addr - 0x08000000) & (ROM_SIZE - 1)) >> 2;
 	uint32_t pc = cur_pc() | (cpu->executionMode == MODE_THUMB);
@@ -434,10 +435,12 @@ static void shot(const char* name) {
 
 static void write_cov(const char* tag, uint32_t* reader, uint8_t* exec) {
 	char path[1024];
-	snprintf(path, sizeof(path), "%s/%s.read", outdir, tag);
-	FILE* f = fopen(path, "wb"); fwrite(reader, 4, ROM_SIZE, f); fclose(f);
+	if (reader) {
+		snprintf(path, sizeof(path), "%s/%s.read", outdir, tag);
+		FILE* f = fopen(path, "wb"); fwrite(reader, 4, ROM_SIZE, f); fclose(f);
+	}
 	snprintf(path, sizeof(path), "%s/%s.exec", outdir, tag);
-	f = fopen(path, "wb"); fwrite(exec, 1, ROM_SIZE / 2, f); fclose(f);
+	FILE* f = fopen(path, "wb"); fwrite(exec, 1, ROM_SIZE / 2, f); fclose(f);
 }
 
 static void end_segment(void) {
@@ -538,9 +541,11 @@ int main(int argc, char** argv) {
 #endif
 
 
-	rom_reader = calloc(ROM_SIZE, 4);
+	if (!getenv("BOKTAI3_EXEC_ONLY")) {
+		rom_reader = calloc(ROM_SIZE, 4);
+		rom_word32 = calloc(ROM_SIZE / 4, 4);
+	}
 	rom_exec = calloc(ROM_SIZE / 2, 1);
-	rom_word32 = calloc(ROM_SIZE / 4, 4);
 	seg_reader = NULL;
 	seg_exec = NULL;
 
@@ -684,8 +689,11 @@ int main(int argc, char** argv) {
 		else if (!strcmp(cmd, "unprobe")) { nprobes = 0; probe_lo = UINT32_MAX; probe_hi = 0; }
 		else if (!strcmp(cmd, "mark")) {
 			end_segment();
-			if (!seg_reader) { seg_reader = calloc(ROM_SIZE, 4); seg_exec = calloc(ROM_SIZE / 2, 1); }
-			memset(seg_reader, 0, ROM_SIZE * 4);
+			if (!seg_exec) {
+				if (rom_reader) seg_reader = calloc(ROM_SIZE, 4);
+				seg_exec = calloc(ROM_SIZE / 2, 1);
+			}
+			if (seg_reader) memset(seg_reader, 0, ROM_SIZE * 4);
 			memset(seg_exec, 0, ROM_SIZE / 2);
 			strncpy(seg_name, a1, sizeof(seg_name) - 1);
 		}
@@ -712,8 +720,10 @@ int main(int argc, char** argv) {
 #endif
 	write_cov("total", rom_reader, rom_exec);
 	char path[1024];
-	snprintf(path, sizeof(path), "%s/total.word32", outdir);
-	FILE* fw = fopen(path, "wb"); fwrite(rom_word32, 4, ROM_SIZE / 4, fw); fclose(fw);
+	if (rom_word32) {
+		snprintf(path, sizeof(path), "%s/total.word32", outdir);
+		FILE* fw = fopen(path, "wb"); fwrite(rom_word32, 4, ROM_SIZE / 4, fw); fclose(fw);
+	}
 	snprintf(path, sizeof(path), "%s/total.iwram_exec", outdir);
 	FILE* f = fopen(path, "wb"); fwrite(iwram_exec, 1, sizeof(iwram_exec), f); fclose(f);
 	snprintf(path, sizeof(path), "%s/total.ewram_exec", outdir);

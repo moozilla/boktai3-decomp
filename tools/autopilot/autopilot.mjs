@@ -2,7 +2,7 @@
 // The Autopilot: plays Boktai 3 on the source port from typed game state.
 //
 //   node tools/autopilot/autopilot.mjs m1 [--save F] [--out DIR] [--shots]
-//   node tools/autopilot/autopilot.mjs story [--from MOVIE|--save SAV] [--until-scene SCENE|--until-story N] [--verify]
+//   node tools/autopilot/autopilot.mjs story [--from MOVIE|--save SAV] [--scenes N] [--until-scene SCENE|--until-story N] [--verify]
 //
 // Runs headless in-process (port/agent/session.mjs) with the agent library plus
 // tools/autopilot/lib/*.js. Each milestone is a goal; the run writes the input
@@ -17,11 +17,15 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
+import { setFlagsFromString } from 'node:v8';
 import { openSession, png } from '../../port/agent/session.mjs';
 import { runRom } from './lib/rom.mjs';
 import { tickAt } from './movie-index.mjs';
 import { distanceFromEntrance, routeDistances, storyEntrances } from './route-entrances.mjs';
 import { landingReturn } from './higher-landings.mjs';
+
+// Keep a wasm stack trace if the host's signal handler cannot catch a trap.
+setFlagsFromString('--wasm-enforce-bounds-checks');
 
 const ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname), '../..');
 const args = process.argv.slice(2);
@@ -142,13 +146,13 @@ const GOALS = {
 
   // Onward: M1, then repeatedly play to control and leave by a door, preferring
   // scenes not visited yet (stages.json doors, else any box the live map has that a
-  // door record names). Logs each stop; --scenes N stops after N rooms.
+  // door record names). Logs each stop; --scenes N sets the room budget.
   *story(g, L) {
     if (!from) {
       if (battery) yield* L.continueSave();
       else if (!(yield* GOALS.m1(g, L))) return false;
     }
-    const visited = VISITED, limit = +(opt('--scenes', 8));
+    const visited = VISITED, limit = +(opt('--scenes', 96));
     const destination = +opt('--until-scene', -1), routeGoal = +opt('--goal', destination);
     const storyGoal = +opt('--until-story', -1), endpoint = destination >= 0 || storyGoal >= 0;
     const reachedScene = () => destination >= 0 && L.where().scene === destination;
@@ -655,7 +659,9 @@ const movie = s.movie.map((k) => k | 0);
 readFrames = readFrames.filter((n) => n < movie.length);
 rooms = rooms.filter((entry) => entry.frame < movie.length);
 const reads = readFrames.map((n) => movie[n]);
-const saves = rooms.map(({ frame, scene }) => ({ at: tickAt(readFrames, frame), name: `scene_${scene}_f${frame}` }));
+// Capture after the first poll that saw the scene. Before that poll, the ROM
+// can still be finishing the previous scene on this video frame.
+const saves = rooms.map(({ frame, scene }) => ({ at: tickAt(readFrames, frame + 1), name: `scene_${scene}_f${frame}` }));
 writeMovie('movie.json', end);
 fs.writeFileSync(path.join(out, 'harness.txt'), harnessScript(reads, saves, `autopilot ${goal}: ${ok ? 'reached' : 'NOT reached'}; port end ${JSON.stringify(end)}`));
 fs.writeFileSync(path.join(out, 'log.json'), JSON.stringify(log, null, 1));
@@ -722,7 +728,7 @@ function verify(end) {
   let warn;
   try {
     warn = runRom(path.join(out, 'harness.txt'), dir, {
-      save: battery || undefined, coverage: args.includes('--coverage'), timeout: 900_000, keyTickPc,
+      save: battery || undefined, coverage: args.includes('--coverage') ? 'exec' : false, timeout: 900_000, keyTickPc,
     });
   } catch (error) {
     console.error(`verify on ROM: ${error.message} (${path.relative(ROOT, dir)}/harness.log)`);
