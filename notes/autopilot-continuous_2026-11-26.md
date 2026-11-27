@@ -12,6 +12,7 @@ position. The run used the source port and the worktree-local mGBA harness.
 | Terrain overlay repaired | 24 | 2814 | 69,581 | 2,653 |
 | Town and bike task views restored | 41 | 3028 | 200,772 | 3,604 |
 | Permanent skeleton defeats recognized | 42 | 3073 | 176,907 | 3,631 |
+| Default continuous route | 50 | 3154 | 214,322 | 3,913 |
 
 The Bronze Armor reward in scene 2803 reused storage after `Armor_Destroy`
 unregistered the body. `TerrainOverlay_Update` still had that body in its
@@ -50,6 +51,14 @@ The execution-only trace mode retains all execution bitmaps and skips
 execution maps, RAM dumps and screenshot. Full tracing took 1.086 seconds
 and execution-only took 1.019 seconds in that check.
 
+The default run proceeded through 3073, rode the return lift in 3078,
+and collected key 44 in 3087. It unlocked the forward door in 3035,
+defeated the armor in 3095, and reached story 50. The next key detour
+led to scene 3161. Its CD23 approach crossed trap cell (4,3). GCL proc
+3164 returned the player to scene 3154 at entrance 82, repeating the
+same route until the room budget ran out. The story-50 endpoint matched
+and all 133 checkpoint labels matched across 72 scenes.
+
 The movies, function coverage, mGBA checkpoints and demo live under
 `build/autopilot/` in the worker checkout. To reproduce the run before
 integration, build the port with a generated copy containing the pending
@@ -61,8 +70,8 @@ cp tools/autopilot/pending_src_fixes/08003C20-terrain-overlay-stale-body.patch b
 build/venv/bin/python port/build_game.py -j2 --source-patches build/autopilot/story-overlays
 build/venv/bin/python port/agent/gametypes.py --jobs 2
 make -f tools/emu/Makefile build/emu/harness
-node tools/autopilot/autopilot.mjs story --until-story 42 --verify --coverage
+node tools/autopilot/autopilot.mjs story --verify --coverage
 ```
 
 The default room budget is 96. `--scenes 8` reproduces the earlier smoke
-budget. A larger budget gives the explorer more room after story 42.
+budget.
