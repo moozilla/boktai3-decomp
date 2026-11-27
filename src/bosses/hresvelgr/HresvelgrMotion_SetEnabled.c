@@ -1,8 +1,14 @@
 #include "global.h"
 #include "scene/collision/contact_position.h"
 #include "bosses/hresvelgr/motion_entry_layout.h"
-#include "bosses/vanargand/vanargand_parts.h"
 void HresvelgrMotion_UpdatePosition(struct MotionEntry *);
+static inline void Difference(struct ContactPosition *out, struct ContactPosition *a,
+                              struct ContactPosition *b)
+{
+    out->x = a->x - b->x;
+    out->y = a->y - b->y;
+    out->z = a->z - b->z;
+}
 void HresvelgrMotion_SetEnabled(u8 *raw, u32 enabled)
 {
     struct ContactPosition previous;
@@ -13,7 +19,7 @@ void HresvelgrMotion_SetEnabled(u8 *raw, u32 enabled)
             struct ContactPosition *pos = &p->position;
             *old = *pos;
             HresvelgrMotion_UpdatePosition(p);
-            Vanargand_Difference(&p->delta, pos, old);
+            Difference(&p->delta, pos, old);
         }
         p->mode = enabled;
     }

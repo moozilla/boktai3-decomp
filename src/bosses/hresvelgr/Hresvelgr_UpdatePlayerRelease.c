@@ -4,8 +4,8 @@
 #include "engine/engine.h"
 #include "player/player.h"
 #include "scene/collision/contact_position.h"
-#include "bosses/vanargand/vanargand_parts.h"
 #include "scene/terrain/terrain_sampling.h"
+#include "engine/math/math_shift.h"
 
 // confidence=low: moves a requested player position and eventually restores player control.
 struct Action {
@@ -57,6 +57,12 @@ static inline u32 PlayerHasFlag(struct Player *p, u32 mask)
 {
     return p->statusFlags & mask;
 }
+static inline void SetVector(struct ContactPosition *p, s32 x, s32 y, s32 z)
+{
+    p->x = x;
+    p->y = y;
+    p->z = z;
+}
 static inline void AddVector(struct ContactPosition *out, struct ContactPosition *a, struct ContactPosition *b)
 {
     out->x = b->x + a->x;
@@ -85,12 +91,6 @@ static inline s32 Height(struct ContactPosition *p)
     }
     return height;
 }
-static inline s32 SignedShift(s32 value, u32 shift)
-{
-    if (value >= 0)
-        return value >> shift;
-    return -((-value) >> shift);
-}
 static inline void PolarUnitVector(struct ContactPosition *out, u32 angle)
 {
     s32 value;
@@ -98,10 +98,10 @@ static inline void PolarUnitVector(struct ContactPosition *out, u32 angle)
     angle &= 255;
     magnitude = 256;
     value = gUnk_086149C4[(angle + 64) & 255] * magnitude;
-    out->x = SignedShift(value, 12);
+    out->x = Math_ShiftTowardZero(value, 12);
     out->y = 0;
     value = gUnk_086149C4[angle & 255] * magnitude;
-    out->z = SignedShift(value, 12);
+    out->z = Math_ShiftTowardZero(value, 12);
 }
 static inline void FindReleaseTarget(void *object, struct ContactPosition *out)
 {
@@ -126,7 +126,7 @@ static inline void FindReleaseTarget(void *object, struct ContactPosition *out)
                 }
             }
 
-            Vanargand_SetVector(out, 0xb54, 0, 0xb54);
+            SetVector(out, 0xb54, 0, 0xb54);
         }
     }
 }
@@ -175,7 +175,7 @@ void Hresvelgr_UpdatePlayerRelease(struct Hresvelgr *actor, u32 tick)
         case 2:
             if (!action->frame) {
                 Hresvelgr_SelectPlayerAnimation(actor, 1);
-                Vanargand_SetVector(&saved->step, 0, 72, 0);
+                SetVector(&saved->step, 0, 72, 0);
                 FindReleaseTarget(saved, &saved->target);
                 action->frame = 1;
             }
@@ -188,7 +188,7 @@ void Hresvelgr_UpdatePlayerRelease(struct Hresvelgr *actor, u32 tick)
                 u32 smallMask = 31;
                 u8 x = rawX & smallMask;
                 s32 z = ((s32)ParticleRandom_ReadDirectSample(table) >> 3) & smallMask;
-                Vanargand_SetVector(&delta, x - 16, 0, z - 16);
+                SetVector(&delta, x - 16, 0, z - 16);
                 actor->velocity = saved->step;
                 saved->step.y--;
                 if (tick & 1)
@@ -218,7 +218,7 @@ void Hresvelgr_UpdatePlayerRelease(struct Hresvelgr *actor, u32 tick)
                 const u16 *table = gRandomTable;
                 s32 x = ((s32)ParticleRandom_ReadDirectSample(table) >> 3) & 31;
                 s32 z = ((s32)ParticleRandom_ReadDirectSample(table) >> 3) & 31;
-                Vanargand_SetVector(&delta, x - 16, 0, z - 16);
+                SetVector(&delta, x - 16, 0, z - 16);
                 if (tick & 1)
                     HresvelgrMotion_CreateWithDelta(&saved->renderPosition, &delta,
                                                 ((s32)ParticleRandom_ReadSample(table) >> 5) % 4,

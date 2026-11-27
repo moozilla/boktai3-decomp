@@ -1,6 +1,6 @@
 #include "global.h"
 #include "scene/collision/contact_position.h"
-#include "bosses/vanargand/vanargand_parts.h"
+#include "engine/math/math_shift.h"
 // confidence=low: launches a moving projectile and approaches the elevated rest position.
 struct Action {
     u8 state, pad[3];
@@ -54,21 +54,21 @@ static inline void SetHeading(struct Hresvelgr *p, s32 heading)
     value &= shifted;
     p->direction8 = value;
 }
-static inline s32 SignedShift(s32 value, u32 shift)
-{
-    if (value >= 0)
-        return value >> shift;
-    return -((-value) >> shift);
-}
 static inline void PolarVector(struct ContactPosition *out, u32 angle, s32 magnitude)
 {
     s32 value;
     angle &= 255;
     value = gUnk_086149C4[(angle + 64) & 255] * magnitude;
-    out->x = SignedShift(value, 12);
+    out->x = Math_ShiftTowardZero(value, 12);
     out->y = 0;
     value = gUnk_086149C4[angle] * magnitude;
-    out->z = SignedShift(value, 12);
+    out->z = Math_ShiftTowardZero(value, 12);
+}
+static inline void SetVector(struct ContactPosition *p, s32 x, s32 y, s32 z)
+{
+    p->x = x;
+    p->y = y;
+    p->z = z;
 }
 static inline void CopyVector(struct ContactPosition *out, struct ContactPosition *source)
 {
@@ -100,7 +100,7 @@ void Hresvelgr_UpdateRisingProjectile(struct Hresvelgr *actor)
             break;
         case 1:
             if (!action->frame) {
-                Vanargand_SetVector(&actor->target, saved->position.x, 832, saved->position.z);
+                SetVector(&actor->target, saved->position.x, 832, saved->position.z);
                 Hresvelgr_SetAnimation(actor, actor->animation, actor->animationData, 0, 1, 4);
                 action->frame++;
             }
