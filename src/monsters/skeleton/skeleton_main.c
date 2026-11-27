@@ -1744,13 +1744,12 @@ void SceneActorScript_ReadCallScriptConfig(struct ChaseActor *actor)
 
 void SceneActorScript_TriggerCallOnCount(struct ChaseActor *actor)
 {
-    s32 zero = 0;
     struct Skeleton *context = actor->base.context;
     u16 *script = &context->callScriptId;
 
     if (*script != 0) {
         if (++context->callCount >= context->callLimit) {
-            Script_Call(*script, zero);
+            Script_Call(*script, 0);
             *script = 0;
             context->callLimit = 0;
             context->callCount = 0;
@@ -2971,15 +2970,6 @@ void Skeleton_ResetRouteReaction(struct ChaseActor *actor);
 
 u32 Trigger_ConsumePending(void *receiver, u32 count);
 
-static inline u8 take_flag(struct ChaseActor *s)
-{
-    if (s->base.field2B2) {
-        s->base.field2B2 = 0;
-        return 1;
-    }
-    return 0;
-}
-
 static inline u8 peek_flag(struct ChaseActor *s)
 {
     return s->base.restart;
@@ -2992,7 +2982,7 @@ void Actor_RestoreSnapshot(struct ChaseActor *s)
     s32 n;
     u8 saved;
     u32 keep;
-    if (take_flag(s)) {
+    if (SceneActorReaction_TakePrepared(s)) {
         ActorShadow_Enable(s->base.shadow);
         SceneActorAnimation_SelectDirectionalEntry(&s->base, 13);
         Sound_PlaySong(0x3AE);

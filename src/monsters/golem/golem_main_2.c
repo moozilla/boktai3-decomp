@@ -15,6 +15,7 @@
 #include "monsters/scene_actor_init_group.h"
 #include "scene/actor/scene_actor_init_dispatch.h"
 #include "monsters/scene_actor_init_graphics.h"
+#include "scene/motion/scene_actor_chase.h"
 
 /* Golem: route back to its home cell; near it, settle (Golem_AlignChargeTarget), else face the cell centre; then go to state 2 (tentative) */
 
@@ -30,22 +31,13 @@ s32 Golem_AlignChargeTarget(void *);
 
 s32 Math_Atan2(s32, s32);
 
-static inline u8 TakeFlag2B1(struct ChaseActor *actor)
-{
-    if (actor->base.field2B1) {
-        actor->base.field2B1 = 0;
-        return 1;
-    }
-    return 0;
-}
-
 void Golem_ReturnHome(struct ChaseActor *actor)
 {
     struct SceneActorChaseGroup *group = &actor->group;
     struct Golem *body = actor->base.context;
     struct ContactPosition center;
     struct ContactPosition diff;
-    if (TakeFlag2B1(actor)) {
+    if (Chase_TakeArrived(actor)) {
         void *target = Golem_BeginChargeBuildup;
         SceneActorChase_SetControl(actor, target, 0x25);
         actor->base.body.direction = actor->base.tracking.heading;
@@ -92,7 +84,7 @@ void Golem_UpdateChargeBuildup(void);
 void Golem_UpdateChargeSettle(struct ChaseActor *actor)
 {
     u8 busy;
-    if (TakeFlag2B1(actor)) {
+    if (Chase_TakeArrived(actor)) {
         void *target = Golem_UpdateChargeBuildup;
         SceneActorChase_SetTypedControl(actor, target, 0x22);
         actor->base.stepDone = 0;
@@ -231,7 +223,7 @@ void Golem_UpdateChargePursuit(struct ChaseActor *actor)
     struct Golem *body = actor->base.context;
     struct ContactPosition diff;
     void *route;
-    if (TakeFlag2B1(actor))
+    if (Chase_TakeArrived(actor))
         body->flag625 = 1;
     if (Golem_InvokeEnabledBehavior(actor))
         return;
@@ -455,7 +447,7 @@ static inline s32 CanCharge(void *ctx)
 void Golem_ChargeOrApproach(struct ChaseActor *actor)
 {
     u8 *body = actor->base.context;
-    if (TakeFlag2B1(actor))
+    if (Chase_TakeArrived(actor))
         actor->base.stepDone = 0;
     if (Golem_InvokeEnabledBehavior(actor))
         return;
@@ -590,7 +582,7 @@ void Golem_UpdateSettle(struct ChaseActor *actor)
 {
     struct Golem *body = actor->base.context;
     u8 busy;
-    if (TakeFlag2B1(actor)) {
+    if (Chase_TakeArrived(actor)) {
         void *target = Golem_UpdateRecoil;
         SceneActorChase_SetTypedControl(actor, target, 0x2A);
         actor->base.stepDone = 0;
@@ -625,7 +617,7 @@ void Golem_ChargeOrReturnHome(struct ChaseActor *actor)
     struct SceneActorChaseGroup *group = &actor->group;
     struct Golem *body = actor->base.context;
     u8 coop;
-    if (TakeFlag2B1(actor))
+    if (Chase_TakeArrived(actor))
         actor->base.stepDone = 0;
     if (Golem_InvokeEnabledBehavior(actor))
         return;

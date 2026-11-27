@@ -46,6 +46,7 @@
 #include "engine/math/movement_curve.h"
 #include "scene/collision/scene_actor_damage_visibility.h"
 #include "bosses/vanargand/vanargand_parts.h"
+#include "monsters/golem/golem_charge.h"
 
 void SceneActorAnimation_SelectDirectionalEntry(struct RoomActor *, s32);
 
@@ -128,56 +129,6 @@ static inline void Mummy_GetDirectionVariant(struct ChaseActor *actor, u8 *varia
     }
 }
 
-static inline void Mummy_SelectAnimation(struct ChaseActor *actor, u32 selection, u32 variant,
-                                         u32 flags)
-{
-    u32 force;
-    u8 *restart;
-    if (flags & 0x10) {
-        force = 0x10;
-        flags &= ~0x10;
-    } else
-        force = 0;
-    if (!actor->base.drawableKind) {
-        struct SceneActorAnimationSequenceDrawable *drawable;
-        actor->base.animationIndex = selection;
-        drawable = actor->base.drawable;
-        Anim_SetSequence(&drawable->sequence, (void *)drawable->resource, (u16)selection,
-                         (u8)variant, (u8)flags);
-        restart = &actor->base.restart;
-    } else {
-        struct AnimSprite *tile =
-            &((struct SceneActorAnimationTileDrawable *)actor->base.drawable)->tile;
-        u8 *savedSelection;
-        selection += variant;
-        savedSelection = &actor->base.animationIndex;
-        restart = &actor->base.restart;
-        if (!force && *savedSelection == selection && !*restart) {
-            if (flags == 1 && (tile->flags & 4))
-                return;
-            if (flags == 0 && !(tile->flags & 4))
-                return;
-        }
-        *savedSelection = selection;
-        {
-            u32 mode;
-            if (flags & 4)
-                mode = 6;
-            else
-                mode = 4;
-            Anim_SetKeyframes(
-                &((struct SceneActorAnimationTileDrawable *)actor->base.drawable)->tile,
-                actor->base.drawable, (u16)selection, 2, (u16)mode);
-            flags &= 1;
-            if (flags)
-                tile->flags |= 4;
-            else
-                tile->flags &= ~4;
-        }
-    }
-    *restart = 0;
-}
-
 void Mummy_UpdateRevival(void *);
 
 void Mummy_UpdateHiddenRecovery(struct ChaseActor *actor, s32 frame)
@@ -191,7 +142,7 @@ void Mummy_UpdateHiddenRecovery(struct ChaseActor *actor, s32 frame)
         {
             u8 directionVariant, mirror;
             Mummy_GetDirectionVariant(actor, &directionVariant, &mirror);
-            Mummy_SelectAnimation(actor, 8, directionVariant, mirror | 4);
+            Golem_SelectAnimation(actor, 8, directionVariant, mirror | 4);
         }
         SceneActorChase_SetControl(actor, Mummy_UpdateRevival, 13);
     } else
@@ -2864,11 +2815,6 @@ static inline void ClearHalf(u16 *p, u32 mask)
     *p = *p & mask;
 }
 
-static inline u32 WordFlag(struct ChaseActor *actor, u32 mask)
-{
-    return actor->base.behaviorFlags & mask;
-}
-
 void Mummy_ResetResponseState(struct ChaseActor *actor)
 {
     struct SceneActorChaseTracking *body = &actor->base.tracking;
@@ -2886,7 +2832,7 @@ void Mummy_ResetResponseState(struct ChaseActor *actor)
     ClearHalf(motion, 0xFFFFFC7F);
     body->flags &= mask;
     response = &actor->group.common.control;
-    if (WordFlag(actor, 0x200000)) {
+    if (SceneActorTurn_ActorFlags(actor, 0x200000)) {
         SceneActorChase_ClearWordFlags(flags, ROOM_ACTOR_STATUS_INTERACTING);
         ClearHalf(motion, 0xFFFFFDFF);
         response->mode = 0;
