@@ -4,6 +4,7 @@ import sys
 import tempfile
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "tools"))
@@ -184,6 +185,30 @@ struct Wrapper { struct Child nested; };
                 rows = list(csv.DictReader(stream))
             self.assertEqual((rows[0]["id"], rows[0]["class"]), (p.id, "PLAIN"))
             self.assertEqual(rows[-1]["class"], "PENDING")
+
+    def test_resume_reuses_plan_and_rebuilds_after_input_change(self):
+        sources = {"src/player/fixture.c": """u32 f(struct Actor *p) {
+    u32 mask = 8;
+    return p->flags & mask;
+}
+"""}
+        with tempfile.TemporaryDirectory() as tmp:
+            cache = Path(tmp) / "plan.json"
+            original, = pp.cached_sites(cache, "snapshot-one", sources)
+            with patch.object(pp, "plan_sites", wraps=pp.plan_sites) as planner:
+                restored, = pp.cached_sites(cache, "snapshot-one", sources)
+                planner.assert_not_called()
+                self.assertEqual(restored, original)
+                self.assertEqual(pp.probe_version(restored), pp.probe_version(original))
+
+                updated = {name: text.replace("mask = 8", "mask = 16") for name, text in sources.items()}
+                changed, = pp.cached_sites(cache, "snapshot-two", updated)
+                planner.assert_called_once_with(updated)
+                self.assertEqual(changed.value, 16)
+
+                cache.write_text("{")
+                recovered, = pp.cached_sites(cache, "snapshot-two", updated)
+                self.assertEqual(recovered, changed)
 
 
 if __name__ == "__main__":

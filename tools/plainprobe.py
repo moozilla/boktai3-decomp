@@ -25,7 +25,7 @@ import sys
 import tempfile
 from collections import Counter, defaultdict
 from concurrent.futures import ThreadPoolExecutor
-from dataclasses import dataclass, field as dataclass_field
+from dataclasses import asdict, dataclass, field as dataclass_field
 from functools import lru_cache
 from pathlib import Path
 
@@ -911,6 +911,35 @@ def probe_version(p):
     return hashlib.sha256(repr(evidence).encode()).hexdigest()[:24]
 
 
+def plan_sites(sources):
+    headers = {}
+    return sample_order([site for name, text in sources.items() for site in plan(ROOT / name, text, headers)])
+
+
+def cached_sites(path, digest, sources):
+    """Reuse the full-tree plan while its source snapshot and planner match."""
+    version = hashlib.sha256(digest.encode())
+    for module in (__file__, concessions.__file__, folds.__file__, keepcheck.__file__, rawfield.__file__):
+        version.update(hashlib.sha256(Path(module).read_bytes()).digest())
+    key = version.hexdigest()
+    if path.is_file():
+        try:
+            saved = json.loads(path.read_text())
+            if saved["version"] == key:
+                sites = []
+                for row in saved["sites"]:
+                    row["edits"] = tuple(map(tuple, row["edits"]))
+                    row["field_keys"] = tuple(map(tuple, row["field_keys"]))
+                    row["rom_matches"] = ()
+                    sites.append(Probe(**row))
+                return sites
+        except (ValueError, KeyError, TypeError):
+            pass  # A damaged cache can be rebuilt from the source snapshot.
+    sites = plan_sites(sources)
+    atomic(path, lambda f: json.dump({"version": key, "sites": [asdict(p) for p in sites]}, f))
+    return sites
+
+
 def lint_counts(path, source):
     sites = concessions.sites(source, path) + concessions.literal_argument_sites(path, source, ROOT)
     counts = Counter()
@@ -1012,8 +1041,9 @@ def run_sweep(args, paths, parser):
                 previous = {r["id"]: r for r in csv.DictReader(stream) if r["class"] in CLASSES}
     elif csv_path.exists():
         parser.error("sites.csv has no snapshot; choose a new --out")
-    header_cache = {}
-    sites = sample_order([site for name, text in sources.items() for site in plan(ROOT / name, text, header_cache)])
+    # The full inventory covers private src headers too. Focused paths can
+    # include files outside the snapshot, so plan them from source each time.
+    sites = plan_sites(sources) if args.paths else cached_sites(args.out / "plan.json", digest, sources)
     rom_orders, aliases, matches = read_rom(args.rom_tsv)
     link_rom(sites, aliases, matches)
     if not set(previous) <= {p.id for p in sites}:
@@ -1026,8 +1056,10 @@ def run_sweep(args, paths, parser):
     print(f"Inventory: {len(sites):,} sites, {sum(p.weight for p in sites):,} linter uses, "
           f"{sum(p.sample for p in sites):,} sampled, {len(results):,} recorded", flush=True)
     write_csv(csv_path, sites, results)
-    if len(results) == len(sites):
+    if len(results) == len(sites) or STOP.exists():
         write_reports(sites, results, args, rom_orders, aliases)
+        if STOP.exists():
+            print("STOP detected; checkpoint written", flush=True)
         return 0
     checker = Checker(args.out)
     with ThreadPoolExecutor(max_workers=args.jobs) as pool:

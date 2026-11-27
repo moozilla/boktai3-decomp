@@ -969,3 +969,8 @@ already match as plain expressions. These counts support reviewing the
 player status family together and applying the independently verified
 plain collider sets before evaluating a common accessor for the other
 collider operations.
+
+On this worktree, caching the unchanged probe inventory reduced a complete
+resume from 26.19 seconds to 0.94 seconds. The unmodified source and planner
+allow reuse of the 2.8 MB plan. A warmed resume reproduced the site CSV byte
+for byte.
