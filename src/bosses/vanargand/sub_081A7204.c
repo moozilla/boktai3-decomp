@@ -33,6 +33,6 @@ void Vanargand_ApplyPartDamage(struct VanargandDamagePart *part)
             Sound_PlaySong(318);
         }
         part->flashTimer = 6;
-        AnimData_SelectPaletteBank((u8 *)part + 0x2C, 402);
+        AnimData_SelectPaletteBank(&part->graphics, 402);
     }
 }

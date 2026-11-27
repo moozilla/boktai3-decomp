@@ -1,35 +1,11 @@
-#include "global.h"
-#include "scene/camera/camera_tracking.h"
-#include "scene/collision/contact_collider.h"
+#include "bosses/sabata/sabata_actor_state.h"
 #include "engine/word_flags.h"
-// confidence=low: BossSlot2 late per-frame update: collider/shadow/camera flags and shake counters.
-#define H(o) (*(s16 *)(q + (o)))
-#define U(o) (*(u16 *)(q + (o)))
-#define B(o) (*(u8 *)(q + (o)))
-#define W(o) (*(u32 *)(q + (o)))
-struct A {
-    u8 pad0[0x3dc];
-    u8 shadow;
-    u8 pad3dd[0x4ee - 0x3dd];
-    u16 t4ee;
-};
-struct Sprite {
-    u8 pad[9];
-    u8 direction;
-};
-struct Anim {
-    u8 pad[8];
-    u32 flags;
-};
-static inline void hide(struct Anim *a)
-{
-    a->flags |= 1;
-}
-static inline void fade(struct Anim *a)
+
+static inline void fade(struct AnimSprite *a)
 {
     a->flags = (a->flags & ~1) | 0x200;
 }
-static inline void unfade(struct Anim *a)
+static inline void unfade(struct AnimSprite *a)
 {
     a->flags &= ~0x201;
 }
@@ -51,128 +27,129 @@ void Camera_SetOffset(s32, void *);
 void SceneActors_EmitRandomBursts(void *);
 void Sabata_UpdateSequencePalette(void *);
 
-void Sabata_UpdatePresentation(u8 *p)
+void Sabata_UpdatePresentation(struct SabataActorState *p)
 {
-    u8 *q = p;
-    struct Sprite *sprite = (struct Sprite *)(p + 0x48);
+    struct SabataActorState *q = p;
+    struct SceneActorBody *sprite = &p->body;
     u32 *flags;
     struct ContactCollider *collider;
     u8 *grounded;
     SceneActors_UpdateEffects(p);
     SceneActors_UpdateConvergingParticles(p);
-    if ((*(u8 *)(p + 0xab)) == 10) {
-        if (H(0x150) > 0)
-            H(0x150)--;
+    if (p->controlPhase == 10) {
+        if (q->effectDuration > 0)
+            q->effectDuration--;
     } else
-        H(0x150) = 0;
+        q->effectDuration = 0;
     {
-        struct A *a = (struct A *)q;
-        u32 v = a->t4ee;
-        flags = (u32 *)(p + 0x9c);
+        struct SabataActorState *a = q;
+        u32 v = a->contactHoldoff;
+        flags = &p->flags;
         if (v) {
             WordFlags_Set(4, flags);
-            a->t4ee--;
+            a->contactHoldoff--;
         }
     }
-    collider = (struct ContactCollider *)(q + 0x1cc);
+    collider = &q->bodyCollider;
     if (WordFlags_Test(flags, 4)) {
         collider->flags |= 4;
         ActorExtension_ResetState(q);
     } else {
         ContactCollider_ClearFlags(collider, 6);
-        Collider_SetPosition(collider, q + 0x2ec, 0);
+        Collider_SetPosition(collider, &q->graphics.position, 0);
         {
             u32 direction = sprite->direction;
-            B(0x20e) = direction;
+            q->bodyCollider.direction = direction;
         }
     }
-    collider = (struct ContactCollider *)(q + 0x220);
+    collider = &q->proximityCollider;
     if (WordFlags_Test(flags, 0x400000)) {
         collider->flags |= 4;
     } else {
         ContactCollider_ClearFlags(collider, 4);
-        Collider_SetPosition(collider, q + 0x2ec, 0);
+        Collider_SetPosition(collider, &q->graphics.position, 0);
         {
             u32 direction = sprite->direction;
-            B(0x262) = direction;
+            q->proximityCollider.direction = direction;
         }
     }
     if (WordFlags_Test(flags, 0x100000))
-        SpriteComponent_Resume(q + 0x32c);
+        SpriteComponent_Resume(q->effect);
     else
-        SpriteComponent_Suspend(q + 0x32c);
-    ProximityVolume_DispatchUpdate(q + 0x428);
-    B(0x477) = SabataPosition_SaveSelectedPoint(q);
+        SpriteComponent_Suspend(q->effect);
+    ProximityVolume_DispatchUpdate(q->proximityVolume);
+    q->transitionBlocked = SabataPosition_SaveSelectedPoint(q);
     if (WordFlags_Test(flags, 0x200000))
-        SabataFrost_StartEmission(*(void **)(q + 0x41c), p + 0x54);
+        SabataFrost_StartEmission(q->frostEmitter, &p->body.position);
     else
-        SabataFrost_StopEmission(*(void **)(q + 0x41c));
+        SabataFrost_StopEmission(q->frostEmitter);
     if (WordFlags_Test(flags, 0x10)) {
-        hide((struct Anim *)(q + 0x2cc));
-        ActorShadow_Disable(&((struct A *)q)->shadow);
-        CameraTracking_ClearRequests((struct CameraTracking *)(q + 0xc30), 1);
-        ContactCollider_ClearFlags((struct ContactCollider *)(q + 0x1cc), 8);
-        grounded = p + 0xb3;
-    } else if (WordFlags_Test(flags, 0x40000)) {
-        fade((struct Anim *)(q + 0x2cc));
-        ActorShadow_Disable(&((struct A *)q)->shadow);
-        CameraTracking_ClearRequests((struct CameraTracking *)(q + 0xc30), 1);
-        ContactCollider_ClearFlags((struct ContactCollider *)(q + 0x1cc), 8);
-        grounded = p + 0xb3;
+        AnimSprite_Hide(&q->graphics);
+        ActorShadow_Disable(q->shadow);
+        CameraTracking_ClearRequests(&q->camera, 1);
+        ContactCollider_ClearFlags(&q->bodyCollider, 8);
+        grounded = &p->special;
+    } else if (*flags & 0x40000) {
+        fade(&q->graphics);
+        ActorShadow_Disable(q->shadow);
+        CameraTracking_ClearRequests(&q->camera, 1);
+        ContactCollider_ClearFlags(&q->bodyCollider, 8);
+        grounded = &p->special;
     } else {
-        unfade((struct Anim *)(q + 0x2cc));
+        unfade(&q->graphics);
         {
-            struct A *shadowActor = (struct A *)q;
-            u32 val = *(u8 *)(p + 0xb3);
-            grounded = p + 0xb3;
+            struct SabataActorState *shadowActor = q;
+            u32 val = p->special;
+            grounded = &p->special;
             if (val) {
-                ActorShadow_Enable(&shadowActor->shadow);
-                CameraTracking_ClearRequests((struct CameraTracking *)(q + 0xc30), 1);
+                ActorShadow_Enable(shadowActor->shadow);
+                CameraTracking_ClearRequests(&q->camera, 1);
             } else {
-                ActorShadow_Enable(&shadowActor->shadow);
-                CameraTracking_ClearRequests((struct CameraTracking *)(q + 0xc30), 1);
+                ActorShadow_Enable(shadowActor->shadow);
+                CameraTracking_ClearRequests(&q->camera, 1);
             }
         }
-        if (WordFlags_Test(flags, 0x20))
-            ((struct ContactCollider *)(q + 0x1cc))->flags |= 8;
-        else
-            ContactCollider_ClearFlags((struct ContactCollider *)(q + 0x1cc), 8);
+        if (WordFlags_Test(flags, 0x20)) {
+            struct ContactCollider *body = &q->bodyCollider;
+            body->flags |= 8;
+        } else
+            ContactCollider_ClearFlags(&q->bodyCollider, 8);
     }
-    if (B(0x51f)) {
-        u32 n = B(0x51f);
+    if (q->shakeTimer) {
+        u32 n = q->shakeTimer;
         Camera_RequestShake((s32)(n * n) >> 2);
-        B(0x51f)--;
+        q->shakeTimer--;
     }
-    if (B(0x511)) {
-        B(0x511)--;
+    if (q->jitterTicks) {
+        q->jitterTicks--;
         WordFlags_Set(0x20000, flags);
     }
-    if (H(0x4ec) > 0) {
-        H(0x4ec)--;
-        if (H(0x4ec) <= 0) {
+    if (q->paletteRestoreTimer > 0) {
+        q->paletteRestoreTimer--;
+        if (q->paletteRestoreTimer <= 0) {
             s32 k = ActorProperty_GetConstant34(q);
             if (k == 0)
-                W(0x314) = (u32)(q + 0x800);
+                q->graphics.palette = q->effectPalettes[1];
             else if (k == 1)
-                W(0x314) = (u32)(q + 0xa00);
+                q->graphics.palette = q->effectPalettes[2];
             else if (k == 2)
-                W(0x314) = (u32)(q + 0xc00);
+                q->graphics.palette = q->paletteData;
             else
-                W(0x314) = (u32)(q + 0x600);
-            H(0x4ec) = 0;
+                q->graphics.palette = q->effectPalettes[0];
+            q->paletteRestoreTimer = 0;
         }
-    } else if (B(0x506))
+    } else if (q->paletteMode)
         Sabata_UpdateSequencePalette(q);
     if (!*grounded) {
-        if ((*(u8 *)(p + 0xab)) == 0xb)
-            Camera_SetOffset(0xf, q + 0x2ec);
+        if (p->controlPhase == 0xb)
+            Camera_SetOffset(0xf, &q->graphics.position);
         else
-            CameraTracking_Update(q + 0xc30);
+            CameraTracking_Update(&q->camera);
     } else
-        Camera_SetOffset(0x1e, q + 0x2ec);
-    if (*grounded && B(0x51e) && !((*(u32 *)(p + 0xe4)) & 0xf))
+        Camera_SetOffset(0x1e, &q->graphics.position);
+    if (*grounded && q->emitBursts && !(p->presentationFrames & 0xf))
         SceneActors_EmitRandomBursts(q);
-    (*(u32 *)(p + 0xbc)) = 0;
-    (*(u32 *)(p + 0xc0)) = 0;
-    (*(u32 *)(p + 0xe4))++;
+    p->rewardMask = 0;
+    p->contactAttributes = 0;
+    p->presentationFrames++;
 }

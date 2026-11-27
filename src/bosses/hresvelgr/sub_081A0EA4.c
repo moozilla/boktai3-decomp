@@ -1,30 +1,9 @@
-#include "global.h"
+#include "bosses/hresvelgr/hresvelgr_travel.h"
 #include "engine/engine_globals.h"
 #include "engine/ram.h"
 
-#define gMotionRandomIndex gRandomIndex
-typedef struct MotionDelta {
-    s32 x : 16, y : 16, z : 16, pad : 16;
-} MotionDelta;
-typedef struct HresvelgrActor {
-    u8 pad0[0x9c];
-    u32 flags;
-    u8 padA0[3];
-    u8 phase;
-    u8 padA4[11];
-    u8 finished;
-    u8 padB0;
-    u8 changed;
-    u8 padB2[0x52];
-    void *callback;
-    u8 pad108[0x6c];
-    u8 animationData[0x20];
-    u8 animation[0x20];
-    u8 emitter[0x15c];
-    u16 state;
-} HresvelgrActor;
-void Hresvelgr_SetAnimation(HresvelgrActor *, void *, void *, u32, u32, u32);
-void *HresvelgrMotion_CreateWithDelta(u32, MotionDelta *, u32, u32);
+void Hresvelgr_SetAnimation(struct HresvelgrTravelActor *, void *, void *, u32, u32, u32);
+void *HresvelgrMotion_CreateWithDelta(u32, struct ContactPosition *, u32, u32);
 void Sound_PlaySong(u32);
 s32 Callback_InvokeActor(void *, void *);
 static inline s32 nextRandom(const u16 *table)
@@ -39,7 +18,7 @@ static inline void emitBurst(u32 emitter)
     int i;
 
     for (i = 0; i < 4; ++i) {
-        MotionDelta delta = {0};
+        struct ContactPosition delta = {0};
         union RandomTableView table = {gRandomTable};
         delta.x = (nextRandom(table.samples) & 15) - 8;
         delta.y = nextRandom(table.samples) & 7;
@@ -47,16 +26,16 @@ static inline void emitBurst(u32 emitter)
         HresvelgrMotion_CreateWithDelta(emitter, &delta, nextRandom(table.samples) % 4, 60);
     }
 }
-void Hresvelgr_EmitRandomMotionBurst(HresvelgrActor *p)
+void Hresvelgr_EmitRandomMotionBurst(struct HresvelgrTravelActor *p)
 {
     if (p->changed) {
         p->changed = 0;
-        Hresvelgr_SetAnimation(p, p->animation, p->animationData, 15, 1, 4);
-        p->state = 8;
-        emitBurst((u32)p->emitter);
+        Hresvelgr_SetAnimation(p, &p->animation, &p->animationData, 15, 1, 4);
+        p->reactionStage = 8;
+        emitBurst((u32)&p->animation.position);
         Sound_PlaySong(0x4d1);
     }
-    if (!(u8)Callback_InvokeActor(p, p->callback) && p->phase > 9) {
+    if (!(u8)Callback_InvokeActor(p, p->callback) && p->animationCompletions > 9) {
         u32 mask = 0x10000000;
         p->flags |= mask;
         p->finished = 1;

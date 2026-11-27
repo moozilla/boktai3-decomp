@@ -115,7 +115,7 @@ void SabataPosition_SetOffsetPoint(struct SabataActorState *actor)
 
 void SceneActors_EmitRandomBursts(struct SabataActorState *actor)
 {
-    struct SabataActorAnimationResource *graphics = &actor->graphics;
+    struct AnimSprite *graphics = &actor->graphics;
     struct ContactPackedVector size;
     int index;
     for (index = 0; index < 2; index++) {
@@ -130,7 +130,7 @@ void SceneActors_EmitRandomBursts(struct SabataActorState *actor)
             count = (ParticleRandom_ReadDirectSample(table.samples) & 3) + 2;
             speed = (ParticleRandom_ReadDirectSample(table.samples) & 3) + 20;
         }
-        SparkParticle_Spawn(graphics->eventScripts, 3, &size, angle, count, speed, 2, 2);
+        SparkParticle_Spawn(&graphics->position, 3, &size, angle, count, speed, 2, 2);
     }
 }
 

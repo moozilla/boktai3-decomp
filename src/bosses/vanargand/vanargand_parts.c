@@ -18,9 +18,7 @@ void Vanargand_UpdatePartTracking(struct VanargandAttackPair *boss, struct Paire
     Vanargand_SetFlags(p, 8);
     if (p->entered) {
         p->entered = 0;
-        p->actionCounters[0] = 0;
-        p->actionCounters[1] = 0;
-        p->actionEntered = 1;
+        PairedSceneHalf_BeginActionPhase(p, 0);
         Anim_SetSequence(&p->graphics.sequence, boss->effectResource, 8, (u8)p->mode, 0);
     }
     switch (p->actionCounters[0]) {
@@ -40,8 +38,7 @@ void Vanargand_UpdatePartTracking(struct VanargandAttackPair *boss, struct Paire
             {
                 u32 v = ++p->actionCounters[1];
                 if (v & 64) {
-                    Vanargand_SetState(p, 1);
-                    p->actionEntered = 1;
+                    PairedSceneHalf_BeginActionPhase(p, 1);
                 }
             }
             break;
@@ -77,9 +74,7 @@ void Vanargand_UpdatePartPairedStrike(struct VanargandAttackPair *boss, struct P
             p->targetPosition.z -= 256;
         }
         p->targetPosition.y = p->offset.y;
-        p->actionCounters[0] = 0;
-        p->actionCounters[1] = 0;
-        p->actionEntered = 1;
+        PairedSceneHalf_BeginActionPhase(p, 0);
     }
     switch (p->actionCounters[0]) {
         case 0: {
@@ -132,8 +127,7 @@ void Vanargand_UpdatePartPairedStrike(struct VanargandAttackPair *boss, struct P
                     Sound_PlaySong(0x1ba);
                     Vanargand_AddVector(&position, &p->targetPosition, p->origin);
                     ImpactBurst_EmitBurst(&position, (s16)p->fieldB0, 0, 64, 4, 4, 4, 4);
-                    Vanargand_SetState(p, 6);
-                    p->actionEntered = 1;
+                    PairedSceneHalf_BeginActionPhase(p, 6);
                     p->finished = 1;
                 } else {
                     Sound_PlaySong(0x3d9);
@@ -142,8 +136,7 @@ void Vanargand_UpdatePartPairedStrike(struct VanargandAttackPair *boss, struct P
                         s16 heading = (s16)p->fieldB0;
                         ImpactBurst_EmitBurst(position, heading, 0, 64, 4, 4, 4, 4);
                     }
-                    Vanargand_SetState(p, 6);
-                    p->actionEntered = 1;
+                    PairedSceneHalf_BeginActionPhase(p, 6);
                     p->finished = 1;
                 }
 
@@ -176,16 +169,14 @@ void Vanargand_UpdatePartPairedStrike(struct VanargandAttackPair *boss, struct P
             Vanargand_SetFlags(p, 8);
             MotionTrack_Update(&p->motion);
             if (Vanargand_MotionEnded(p)) {
-                Vanargand_SetState(p, 5);
-                p->actionEntered = 1;
+                PairedSceneHalf_BeginActionPhase(p, 5);
             }
             break;
 
         case 5:
             Vanargand_SetFlags(p, 8);
             if ((++p->actionCounters[1]) > 30) {
-                Vanargand_SetState(p, 6);
-                p->actionEntered = 1;
+                PairedSceneHalf_BeginActionPhase(p, 6);
             }
             break;
 
@@ -253,8 +244,7 @@ void Vanargand_UpdatePartRetreat(struct VanargandAttackPair *boss, struct Paired
             {
                 u32 finished = p->motion.active == 2;
                 if (finished) {
-                    Vanargand_SetState(p, 1);
-                    p->actionEntered = 1;
+                    PairedSceneHalf_BeginActionPhase(p, 1);
                 }
             }
             break;
@@ -288,9 +278,7 @@ void Vanargand_UpdatePartGroundStrike(struct VanargandAttackPair *boss, struct P
     Vanargand_SetFlags(p, 0x20);
     if (p->entered) {
         p->entered = 0;
-        p->actionCounters[0] = 0;
-        p->actionCounters[1] = 0;
-        p->actionEntered = 1;
+        PairedSceneHalf_BeginActionPhase(p, 0);
     }
     switch (p->actionCounters[0]) {
         case 0: {
@@ -366,8 +354,7 @@ void Vanargand_UpdatePartGroundStrike(struct VanargandAttackPair *boss, struct P
                 Sound_PlaySong(0x1ba);
                 ImpactBurst_EmitBurst(&p->sprite.position, (s16)p->fieldB0, 0, 64, 4, 4, 4,
                                             4);
-                Vanargand_SetState(p, 4);
-                p->actionEntered = 1;
+                PairedSceneHalf_BeginActionPhase(p, 4);
             } else if (!(tick & 1))
                 Vanargand_EmitPartTrail(p);
             break;
@@ -440,9 +427,7 @@ void Vanargand_UpdatePartOffsetStrike(struct VanargandAttackPair *boss, struct P
     Vanargand_SetFlags(p, 0x20);
     if (p->entered) {
         p->entered = 0;
-        p->actionCounters[0] = 0;
-        p->actionCounters[1] = 0;
-        p->actionEntered = 1;
+        PairedSceneHalf_BeginActionPhase(p, 0);
     }
     switch (p->actionCounters[0]) {
         case 0: {
@@ -547,9 +532,7 @@ void Vanargand_UpdatePartSweepingStrike(struct VanargandAttackPair *boss, struct
     Vanargand_SetFlags(p, 0x20);
     if (p->entered) {
         p->entered = 0;
-        p->actionCounters[0] = 0;
-        p->actionCounters[1] = 0;
-        p->actionEntered = 1;
+        PairedSceneHalf_BeginActionPhase(p, 0);
     }
     switch (p->actionCounters[0]) {
         case 0: {
@@ -630,8 +613,7 @@ void Vanargand_UpdatePartSweepingStrike(struct VanargandAttackPair *boss, struct
                 Sound_PlaySong(0x3d9);
                 ImpactBurst_EmitBurst(&p->sprite.position, (s16)p->fieldB0, 0, 64, 4, 4, 4,
                                             4);
-                Vanargand_SetState(p, 4);
-                p->actionEntered = 1;
+                PairedSceneHalf_BeginActionPhase(p, 4);
             } else if (!(tick & 1))
                 Vanargand_EmitPartTrail(p);
             break;
@@ -694,9 +676,7 @@ void Vanargand_UpdatePartLunge(void *unused, struct PairedSceneHalf *p)
     Vanargand_SetFlags(p, 0x20);
     if (p->entered) {
         p->entered = 0;
-        p->actionCounters[0] = 0;
-        p->actionCounters[1] = 0;
-        p->actionEntered = 1;
+        PairedSceneHalf_BeginActionPhase(p, 0);
     }
     switch (p->actionCounters[0]) {
         case 0: {
@@ -739,14 +719,12 @@ void Vanargand_UpdatePartLunge(void *unused, struct PairedSceneHalf *p)
         case 2:
             MotionTrack_Update(&p->motion);
             if (Vanargand_MotionEnded(p)) {
-                Vanargand_SetState(p, 3);
-                p->actionEntered = 1;
+                PairedSceneHalf_BeginActionPhase(p, 3);
             }
             break;
         case 3:
             if (++p->actionCounters[1] > 30) {
-                Vanargand_SetState(p, 4);
-                p->actionEntered = 1;
+                PairedSceneHalf_BeginActionPhase(p, 4);
             }
             break;
         case 4: {
@@ -809,8 +787,7 @@ void Vanargand_ReleaseRadialEffects(struct VanargandAttackPair *boss, struct Pai
         case 0:
             if (PlayerCue_StepSequenceEnded((struct ContactSwarmSprite *)p,
                                             &p->graphics.sequence)) {
-                Vanargand_SetState(p, 1);
-                p->actionEntered = 1;
+                PairedSceneHalf_BeginActionPhase(p, 1);
             }
             break;
 
@@ -870,8 +847,7 @@ void Vanargand_EmitRadialPartEffects(struct VanargandAttackPair *boss, struct Pa
         case 1:
             if (Vanargand_StepSequenceEnded(p)) {
                 Sound_PlaySong(0x58c);
-                Vanargand_SetState(p, 2);
-                p->actionEntered = 1;
+                PairedSceneHalf_BeginActionPhase(p, 2);
             }
             break;
 
@@ -893,9 +869,7 @@ void Vanargand_UpdatePartImpact(struct VanargandAttackPair *boss, struct PairedS
     Vanargand_SetFlags(p, 0x20);
     if (p->entered) {
         p->entered = 0;
-        p->actionCounters[0] = 0;
-        p->actionCounters[1] = 0;
-        p->actionEntered = 1;
+        PairedSceneHalf_BeginActionPhase(p, 0);
     }
     switch (p->actionCounters[0]) {
         case 0:
@@ -1003,8 +977,7 @@ void Vanargand_UpdatePartFlashFade(struct VanargandAttackPair *boss, struct Pair
     if (p->entered) {
         p->entered = 0;
         CpuSet(p->palettes[0], p->graphics.palette, 0x04000008);
-        Vanargand_SetState(p, 0);
-        p->actionEntered = 1;
+        PairedSceneHalf_BeginActionPhase(p, 0);
     }
     {
         u32 *statePtr;
@@ -1016,8 +989,7 @@ void Vanargand_UpdatePartFlashFade(struct VanargandAttackPair *boss, struct Pair
                 Palette_InterpolateBanks(p->graphics.palette, p->palettes[0], p->palettes[2], frame,
                                          7);
                 if (frame & 0x80) {
-                    Vanargand_SetState(p, 1);
-                    p->actionEntered = 1;
+                    PairedSceneHalf_BeginActionPhase(p, 1);
                 }
                 break;
             case 1: {
@@ -1134,8 +1106,7 @@ void Vanargand_UpdatePartLeap(struct VanargandAttackPair *boss, struct PairedSce
             Anim_SetSequence(&p->graphics.sequence, resource, 9, (u8)p->mode, 0);
         }
         PlayerCue_StepSequence((struct ContactSwarmSprite *)p, &p->graphics.sequence);
-        Vanargand_SetState(p, 0);
-        p->actionEntered = 1;
+        PairedSceneHalf_BeginActionPhase(p, 0);
     }
     switch (p->actionCounters[0]) {
         case 0: {
@@ -1193,9 +1164,7 @@ void Vanargand_UpdatePartVerticalOscillation(u8 *unused, struct PairedSceneHalf 
     Vanargand_SetFlags(p, 0x20);
     if (p->entered) {
         p->entered = 0;
-        p->actionCounters[0] = 0;
-        p->actionCounters[1] = 0;
-        p->actionEntered = 1;
+        PairedSceneHalf_BeginActionPhase(p, 0);
     }
     switch (p->actionCounters[0]) {
         case 0: {
@@ -1223,8 +1192,7 @@ void Vanargand_UpdatePartVerticalOscillation(u8 *unused, struct PairedSceneHalf 
         }
         case 1:
             if (++p->actionCounters[1] > 30) {
-                Vanargand_SetState(p, 2);
-                p->actionEntered = 1;
+                PairedSceneHalf_BeginActionPhase(p, 2);
             }
             break;
         case 2: {
@@ -1250,8 +1218,7 @@ void Vanargand_UpdatePartVerticalOscillation(u8 *unused, struct PairedSceneHalf 
         }
         case 3:
             if (++p->actionCounters[1] > 30) {
-                Vanargand_SetState(p, 0);
-                p->actionEntered = 1;
+                PairedSceneHalf_BeginActionPhase(p, 0);
             }
             break;
     }
@@ -1318,8 +1285,7 @@ void Vanargand_UpdatePartEmergence(struct VanargandAttackPair *boss, struct Pair
         p->entered = 0;
         if (!(p->sprite.flags & 1)) {
             p->finished = 1;
-            Vanargand_SetState(p, 3);
-            p->actionEntered = 1;
+            PairedSceneHalf_BeginActionPhase(p, 3);
             return;
         }
         boss->animSprite.flags &= ~1;
@@ -1438,8 +1404,7 @@ void Vanargand_UpdatePartRevealFade(struct VanargandAttackPair *boss, struct Pai
         case 0:
             Palette_InterpolateBanks(p->graphics.palette, p->palettes[1], p->palettes[0], frame, 6);
             if (frame > 63) {
-                Vanargand_SetState(p, 1);
-                p->actionEntered = 1;
+                PairedSceneHalf_BeginActionPhase(p, 1);
             }
             break;
         case 1:
@@ -1457,8 +1422,7 @@ void Vanargand_UpdatePartFadeOut(struct VanargandAttackPair *boss, struct Paired
     if (p->entered) {
         p->entered = 0;
         CpuSet(p->palettes[0], p->graphics.palette, 0x04000008);
-        Vanargand_SetState(p, 0);
-        p->actionEntered = 1;
+        PairedSceneHalf_BeginActionPhase(p, 0);
     }
     {
         u32 *statePtr;
@@ -1470,8 +1434,7 @@ void Vanargand_UpdatePartFadeOut(struct VanargandAttackPair *boss, struct Paired
                 Palette_InterpolateBanks(p->graphics.palette, p->palettes[0], p->palettes[1], frame,
                                          6);
                 if (frame > 63) {
-                    Vanargand_SetState(p, 1);
-                    p->actionEntered = 1;
+                    PairedSceneHalf_BeginActionPhase(p, 1);
                 }
                 break;
             case 1: {
@@ -1541,37 +1504,17 @@ void PairedSceneActor_UpdateHalves(struct VanargandAttackPair *actor)
 
 void Vanargand_DestroyPartController(struct VanargandAttackPair *controller)
 {
-    struct PairedHalfTarget *node;
-    u8 *shadow;
-    struct ContactCollider *collider;
-    struct ContactSwarmSprite *sprite;
     s32 i;
     Anim_Remove(&controller->animSprite);
-    node = &controller->halves[0].target;
-    shadow = controller->halves[0].shadow;
-    collider = &controller->halves[0].damageCollider;
-    sprite = &controller->halves[0].sprite;
-    i = 1;
-    do {
-        Collider_Remove(collider);
-        if (sprite->unknown4[0])
-            Sprite_Remove(sprite);
-        ScaledShadow_Destroy(shadow);
-        SceneLink_RemoveNode(node);
-        {
-            union VanargandPartStride {
-                u32 bytes;
-            } stride = {sizeof(struct PairedSceneHalf)};
-            node = (struct PairedHalfTarget *)((u8 *)node + stride.bytes);
-            shadow += stride.bytes;
-            collider = (struct ContactCollider *)((u8 *)collider + stride.bytes);
-            sprite = (struct ContactSwarmSprite *)((u8 *)sprite + stride.bytes);
-        }
-    } while (--i >= 0);
-    {
-        u32 zero = 0;
-        gVanargandPartController = (void *)zero;
+    for (i = 0; i < 2; i++) {
+        struct PairedSceneHalf *half = &controller->halves[i];
+        Collider_Remove(&half->damageCollider);
+        if (half->sprite.unknown4[0])
+            Sprite_Remove(&half->sprite);
+        ScaledShadow_Destroy(half->shadow);
+        SceneLink_RemoveNode(&half->target);
     }
+    gVanargandPartController = NULL;
 }
 
 void *ScriptProc_Start(u16, u16);

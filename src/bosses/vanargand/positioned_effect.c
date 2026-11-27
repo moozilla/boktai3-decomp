@@ -68,18 +68,6 @@ void PositionedEffect_InitAttackCollider(struct VanargandPairAttack *actor)
 
 extern const s16 gUnk_086149C4[];
 
-static inline s32 Scale(s32 value)
-{
-    return value >= 0 ? value >> 12 : -((-value) >> 12);
-}
-
-static inline void SetPolar(struct ContactPosition *vector, s32 angle, s32 radius)
-{
-    vector->x = Scale(gUnk_086149C4[(angle + 64) & 255] * radius);
-    vector->y = 0;
-    vector->z = Scale(gUnk_086149C4[angle & 255] * radius);
-}
-
 void PositionedEffect_InitRadialAttackColliders(struct VanargandPairAttack *actor)
 {
     struct PositionedPackedVector size;
@@ -93,7 +81,7 @@ void PositionedEffect_InitRadialAttackColliders(struct VanargandPairAttack *acto
     collider = actor->radialColliders;
     for (i = 0; i < 2; i++) {
         angle = 240 + i * 96;
-        SetPolar(&offset.vector, angle & 255, 416);
+        Vanargand_MakeRadialVector(&offset.vector, angle & 255, 416);
         Collider_Init(collider, 0, 0x2001, 0, 16, &size, &offset);
         Collider_SetCallback(collider, PositionedEffect_OnAttackContact, actor);
         Collider_SetAttackProperties(collider, actor->parameter584, 80, 0, 0, 30);
@@ -284,9 +272,10 @@ void PositionedEffect_UpdateOscillatingCoordinates(struct VanargandPairAttack *e
 {
     struct PositionedEffectCoordinates *coordinates = &effect->coordinates;
     PositionedEffect_SetHalfScaleCoordinates(coordinates, &effect->effectOrigin);
-    coordinates->position.y = Scale(gUnk_086149C4[(effect->attackParameter5B8 * phase) & 255]
-                                    << effect->attackParameter5BA) +
-                              256;
+    coordinates->position.y =
+        Vanargand_TruncateScale(gUnk_086149C4[(effect->attackParameter5B8 * phase) & 255]
+                                << effect->attackParameter5BA) +
+        256;
     Vanargand_SetVector(&coordinates->shifted, coordinates->position.x - 256,
                         coordinates->position.y, coordinates->position.z - 256);
 }

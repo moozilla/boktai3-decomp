@@ -1,15 +1,11 @@
 #ifndef GUARD_BOSSES_SABATA_SABATA_ACTOR_STATE_H
 #define GUARD_BOSSES_SABATA_SABATA_ACTOR_STATE_H
+#include "engine/video/anim_sprite.h"
 #include "scene/actor/scene_actor_components.h"
+#include "scene/camera/camera_tracking.h"
+#include "scene/collision/contact_collider.h"
 #include "bosses/sabata/converging_particles.h"
-struct SabataActorAnimationResource {
-    u8 id;
-    u8 unknown1[0x1C];
-    u8 eventFlags;
-    u8 unknown1E[2];
-    u8 eventScripts[0x28];
-};
-/* Tentative actor state prefix shared by the adjacent state callbacks. */
+/* Actor state shared by Sabata’s combat and presentation callbacks. */
 struct SabataActorState {
     u8 unknown0[0x48];
     struct SceneActorBody body;
@@ -27,31 +23,38 @@ struct SabataActorState {
     u8 controlPhase;
     u8 active, phase, variant, pending, triggered;
     u8 changed, finished, special;
-    u8 unknownB4[0x10];
+    u8 unknownB4[8];
+    u32 rewardMask, contactAttributes;
     u32 timer;
     u32 threshold;
     u8 requestedDirection;
-    u8 unknownCD[0x33];
+    u8 unknownCD[0x17];
+    u32 presentationFrames;
+    u8 unknownE8[0x18];
     void *stateCallback;
     void *callback;
     u8 unknown108[4];
     void *damageTarget;
     struct ContactPosition *selectedPoint;
     s8 alternateDirection;
-    u8 unknown115[0x173];
+    u8 unknown115[0x150 - 0x115];
+    s16 effectDuration;
+    u8 unknown152[0x178 - 0x152];
+    struct ContactCollider attackCollider, bodyCollider, proximityCollider;
+    u8 unknown274[0x288 - 0x274];
     u8 bounds[0x1C];
     struct ContactPosition destination;
-    u8 animationData[0x20];
-    struct SabataActorAnimationResource graphics;
-    void *palette;
-    u8 unknown318[0x14];
-    u8 effect[0xFC];
+    struct AnimSpriteResource animationResource;
+    struct AnimSprite graphics;
+    u8 effect[0xB0], shadow[0x40];
+    void *frostEmitter;
+    u8 unknown420[8];
     u8 proximityVolume[0x40];
     s16 height;
     u16 lastDamage;
     u32 hitAttributes;
     u8 slowDown, direction, hitParameter, impactCount;
-    u8 unknown474[3];
+    u8 recentHitCount, hitSequence, unknown476;
     u8 transitionBlocked;
     struct ContactPosition savedPosition;
     struct ContactPosition nearbyPosition;
@@ -59,7 +62,9 @@ struct SabataActorState {
     u8 animationState, unknown4E1, animationPhase, animationIndex, animationDetail, mode;
     u16 decisionTimeout;
     u8 request, requestedVariant, requestMode, requestPhase;
-    u8 unknown4EC[6];
+    s16 paletteRestoreTimer;
+    u16 contactHoldoff;
+    u16 hitstun;
     s16 floorHeight;
     s16 attackFlags;
     u8 unknown4F6[6];
@@ -70,13 +75,20 @@ struct SabataActorState {
     u8 unknown508[8];
     s8 randomOffset;
     u8 jitterTicks;
-    u8 unknown512[0xE];
+    u8 unknown512[0xC];
+    u8 emitBursts, shakeTimer;
     struct ConvergingParticleGroup convergingParticles;
     struct ContactPosition offsetPoint;
-    u8 unknown600[0x600];
+    u16 effectPalettes[3][256];
     u16 paletteData[16];
     struct ContactPosition movementTarget;
+    u8 unknownC28[8];
+    struct CameraTracking camera;
+    u32 summons[2];
 };
+
+typedef char SabataActorStateSizeCheck[sizeof(struct SabataActorState) == 0xC68 ? 1 : -1];
+
 /* The owner retains this actor prefix at offset zero. */
 struct SabataActorStateOwner {
     struct SabataActorState actor;

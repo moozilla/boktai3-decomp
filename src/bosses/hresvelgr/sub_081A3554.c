@@ -1,18 +1,5 @@
-#include "global.h"
+#include "bosses/hresvelgr/hresvelgr_shot.h"
 
-struct HresvelgrShotSprite {
-    u32 flags;
-    u8 unknown04[0xC];
-    u16 animation;
-    u8 unknown12[0xA];
-    u16 x, y, z;
-};
-struct HresvelgrShot {
-    struct HresvelgrShotSprite sprite;
-    u8 unknown24[0x66];
-    u16 lifetime;
-    u8 unknown8C[4];
-};
 struct HresvelgrShotPool {
     u8 unknown00[0x18];
     u8 animationData[0x28];
@@ -23,12 +10,11 @@ struct HresvelgrShotPool {
 s32 AnimData_Load(void *, u32);
 void AnimData_SelectPaletteBank(void *, u32);
 void Sprite_Init(void *, void *, u32);
-s32 Hresvelgr_InitShotCollider(struct HresvelgrShot *, s32, s32, s32);
 s32 Hresvelgr_InitializeShots(struct HresvelgrShotPool *pool)
 {
     struct HresvelgrShot *shot;
     s32 i;
-    struct HresvelgrShotSprite *sprite;
+    struct DisplaySequenceSprite *sprite;
     u16 zero, x, y, z;
     AnimData_Load(pool->animationData, 0x3070);
     AnimData_SelectPaletteBank(pool->animationData, 0x2F4);
@@ -36,22 +22,19 @@ s32 Hresvelgr_InitializeShots(struct HresvelgrShotPool *pool)
     zero = 0;
     i = 31;
     sprite = &shot->sprite;
-    // The order matters: x lives longest, gets no register, and is
-    // rematerialized in the loop, which sets reload's register rotation.
-    // zero is a variable in the original too: the ROM keeps it in r8.
     x = 0x708;
     y = 0x100;
     z = 0x4B0;
     do {
         Sprite_Init(shot, pool->animationData, 0);
-        sprite->animation = zero;
-        sprite->x = x;
-        sprite->y = y;
-        sprite->z = z;
+        sprite->frame = zero;
+        sprite->position.x = x;
+        sprite->position.y = y;
+        sprite->position.z = z;
         sprite->flags |= 1;
         shot->lifetime = zero;
         Hresvelgr_InitShotCollider(shot, pool->attackA, pool->attackB, pool->attackC);
-        sprite = (struct HresvelgrShotSprite *)((u8 *)sprite + 0x90);
+        sprite = (struct DisplaySequenceSprite *)((u8 *)sprite + sizeof(*shot));
         shot++;
     } while (--i >= 0);
     return 0;

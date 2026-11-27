@@ -1,56 +1,7 @@
-#include "global.h"
+#include "bosses/count/count.h"
 #include "engine/engine.h"
 #include "npc/story_character/state_actor.h"
 // confidence=low: Count pending-damage handler: applies queued damage, flash/shake, death and stagger transitions.
-struct CountDamage {
-    u8 pad0[0x48];
-    u8 sprite[0x14];
-    u8 pad5C[0x34];
-    u32 timer;
-    s16 health, maxHealth;
-    u8 pad98[2];
-    u8 healthCheck, pad9b;
-    u32 flags;
-    u8 padA0[2];
-    u8 reset;
-    u8 padA3;
-    u32 pending;
-    u8 padA8[3];
-    u8 state;
-    u8 padAC[5];
-    u8 changed;
-    u8 padB2[0x4e];
-    void (*callback)(void *);
-    u8 pad104[0xc8];
-    u8 collider[0x43];
-    u8 contactFlags;
-    u8 pad210[0x78];
-    void *damageEffect;
-    u8 pad28c[0xb0];
-    s32 pendingDamage;
-    u8 pendingSpecial;
-    u8 forcedHit;
-    u8 pad342[0xa];
-    u16 flashTimer;
-    u16 effectState;
-    u16 effectCooldown;
-    u8 pad352[6];
-    s32 kind;
-    u8 pad35c[0x1a];
-    s16 hitThreshold;
-    u8 pad378[0xc];
-    u8 damageGuard;
-    u8 pad385[0x13];
-    u8 shakeAngle;
-    u8 shakeAmplitude;
-    u8 pad39a[0xe];
-    u32 hitCount;
-    u32 damageFlags;
-    u8 pad3b0[0x214];
-    u8 normalEffect[0x200];
-    u8 specialEffect[1];
-};
-
 struct CountDamageGameState {
     u8 pad0[0x876];
     s16 damageLevel;
@@ -70,12 +21,12 @@ static inline s16 Count_GetHealthFloor(void)
     return 0;
 }
 
-int Count_ApplyPendingDamage(struct CountDamage *p)
+int Count_ApplyPendingDamage(struct Count *p)
 {
     int special;
-    struct CountDamage *base = p;
-    u8 *sprite = p->sprite;
-    void *collider = p->collider;
+    struct Count *base = p;
+    struct SceneActorBody *sprite = &p->body;
+    struct ContactCollider *collider = &p->overlayCollider;
     int damage;
     int trigger;
     int flaggedBit;
@@ -96,7 +47,7 @@ int Count_ApplyPendingDamage(struct CountDamage *p)
             *specialPtr = 0;
         }
     }
-    flaggedBit = p->contactFlags >> 3;
+    flaggedBit = p->overlayCollider.costFlags >> 3;
     flaggedBit &= 1;
     if (((p->damageFlags & 1) && (p->damageGuard == 0)) &&
         (((struct CountDamageGameState *)gGameState)->damageLevel > 0)) {
@@ -109,7 +60,7 @@ int Count_ApplyPendingDamage(struct CountDamage *p)
         damage > 0)
         p->hitCount++;
     if (p->effectCooldown == 0) {
-        if ((p->effectState == 0) && SceneActorGraphics_GetEffectState(p)) {
+        if ((p->invulnerabilityTimer == 0) && SceneActorGraphics_GetEffectState(p)) {
             SceneActors_SpawnDestructionParticles(p);
             damage = ((struct CountDamageGameState *)gGameState)->damageLevel * 5;
             Sound_PlaySongChecked(0x12a);
@@ -134,17 +85,17 @@ int Count_ApplyPendingDamage(struct CountDamage *p)
                 trigger = 0;
             }
         }
-        p->flashTimer = 10;
+        p->paletteRestoreTimer = 10;
         if (special) {
-            p->damageEffect = p->specialEffect;
+            p->animation.palette = p->paletteSpecial;
             SceneActors_SpawnDestructionParticles(p);
         } else {
-            p->damageEffect = p->normalEffect;
+            p->animation.palette = p->paletteNormal;
         }
         size.x = 16;
         size.y = 0;
         size.z = 16;
-        DamageNumberDisplay_Show(collider, damage, 0, sprite + 0xc, &size, 1);
+        DamageNumberDisplay_Show(collider, damage, 0, &sprite->position, &size, 1);
         if ((*hp) <= 0) {
             s16 health = Count_GetHealthFloor();
             *hp = health;
@@ -158,7 +109,7 @@ int Count_ApplyPendingDamage(struct CountDamage *p)
             }
             Sound_PlaySongChecked(0x13e);
         }
-        if (p->kind == 3)
+        if (p->graphicsKind == 3)
             trigger = flaggedBit;
         if (trigger) {
             SceneActorState_SetFlags((struct StateActor *)base, 1);

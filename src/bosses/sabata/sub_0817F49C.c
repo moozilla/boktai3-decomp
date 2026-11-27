@@ -1,9 +1,7 @@
 #include "global.h"
 #include "bosses/state_actor_action_entry.h"
-// confidence=low: BossSlot2 pending-damage handler: applies damage, shows numbers, picks hurt/knockback/death state.
-#define H(o) (*(s16 *)(q + (o)))
-#define B(o) (*(u8 *)(q + (o)))
-#define W(o) (*(u32 *)(q + (o)))
+#include "bosses/sabata/sabata_actor_state.h"
+
 struct Packed {
     s32 x : 16, y : 16, z : 16, pad : 16;
 };
@@ -18,28 +16,27 @@ void DamageNumberDisplay_Show(void *, int, int, void *, void *, int);
 void Sabata_UpdateRemovalSequence(void *);
 void Sabata_UpdateKnockbackLanding(void *, int);
 
-int Sabata_ApplyPendingDamage(u8 *p)
+int Sabata_ApplyPendingDamage(struct SabataActorState *p)
 {
     struct StateActor *base = (struct StateActor *)p;
-    u8 *q = p;
+    struct SabataActorState *q = p;
     u32 special;
-    u8 *position = p + 0x48;
-    u8 *collider = p + 0x1cc;
-    u32 off = 0x46a;
+    struct SceneActorBody *body = &p->body;
+    struct ContactCollider *collider = &p->bodyCollider;
+    u32 flagsActive;
     s32 damage;
     u8 *specialPtr;
     u32 flags;
     s16 *health;
     u32 sound;
-    damage = *(s16 *)(q + off);
-    specialPtr = q + 0x470;
+    damage = (s16)q->lastDamage;
+    specialPtr = &q->slowDown;
     special = *specialPtr;
-    off += 2;
-    flags = *(u32 *)(q + off);
+    flags = q->hitAttributes;
     ActorExtension_ResetState(base);
     *specialPtr = 0;
-    off = SceneActorState_TestFlags(base, 0x100000);
-    if (off) {
+    flagsActive = SceneActorState_TestFlags(base, 0x100000);
+    if (flagsActive) {
         damage = damage >= 0 ? damage >> 1 : -(-damage >> 1);
     }
     if (flags & 0x40) {
@@ -48,11 +45,11 @@ int Sabata_ApplyPendingDamage(u8 *p)
     } else
         sound = 0x13e;
     {
-        u16 *hitstun = (u16 *)(q + 0x4f0);
+        u16 *hitstun = &q->hitstun;
         if (*hitstun == 0) {
-            if (*(u16 *)(q + 0x4ee) == 0 && !off && SceneActors_GetEffectiveTimeStep(q)) {
+            if (q->contactHoldoff == 0 && !flagsActive && SceneActors_GetEffectiveTimeStep(q)) {
                 damage = *(s16 *)(gGameState + 0x876) * 5;
-                Sabata_SpawnDestructionParticles(q + 0x2ec);
+                Sabata_SpawnDestructionParticles(&q->graphics.position);
                 sound = 0x12a;
                 Sound_PlaySong(0x57a);
                 *hitstun = 60;
@@ -69,25 +66,25 @@ int Sabata_ApplyPendingDamage(u8 *p)
         Sound_PlaySong(sound);
         health = &base->health;
         if (damage > 0 && base->actionState != 0xb) {
-            B(0x475) = 0;
-            B(0x474)++;
+            q->hitSequence = 0;
+            q->recentHitCount++;
         }
-        if (B(0x474) > 2) {
-            B(0x474) = 0;
+        if (q->recentHitCount > 2) {
+            q->recentHitCount = 0;
             knockback = 1;
         }
         if (ActorResource_IsBelowSelectedLimit(q, *health))
             knockback = 1;
-        H(0x4ec) = 10;
+        q->paletteRestoreTimer = 10;
         if (special) {
-            W(0x314) = (u32)(q + 0xa00);
-            Sabata_SpawnDestructionParticles(q + 0x2ec);
+            q->graphics.palette = q->effectPalettes[2];
+            Sabata_SpawnDestructionParticles(&q->graphics.position);
         } else
-            W(0x314) = (u32)(q + 0x800);
+            q->graphics.palette = q->effectPalettes[1];
         size.x = 16;
         size.y = 0;
         size.z = 16;
-        DamageNumberDisplay_Show(collider, damage, 0, position + 0xc, &size, 1);
+        DamageNumberDisplay_Show(collider, damage, 0, &body->position, &size, 1);
         if (*health <= 0) {
             s16 clearedHealth[1];
             int zero;

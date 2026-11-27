@@ -1,18 +1,11 @@
-#include "global.h"
+#include "bosses/sabata/sabata_actor_state.h"
 #include "bosses/state_actor_action_entry.h"
 
-struct BossTask {
-    struct StateActor base;
-    u8 unk348[0x4E8 - 0x348];
-    u8 field4E8;
-    u8 unk4E9;
-    u8 step, field4EB;
-};
 void *SceneActors_GetBySlot(u32 slot);
 
-static inline void BossTask_SetStep(struct BossTask *p, u32 step)
+static inline void BossTask_SetStep(struct SabataActorState *p, u32 step)
 {
-    p->step = step;
+    p->requestMode = step;
 }
 
 /* Registry routine 4EC9: cycles the singleton in slot 2 through steps 0-2
@@ -20,12 +13,12 @@ static inline void BossTask_SetStep(struct BossTask *p, u32 step)
 void Sabata_AdvanceStepFromScript(void)
 {
     struct StateActor *actor = SceneActors_GetBySlot(2);
-    struct BossTask *p = (struct BossTask *)actor;
+    struct SabataActorState *p = (struct SabataActorState *)actor;
     if (p) {
-        if (p->step == 0) {
+        if (p->requestMode == 0) {
             BossTask_SetStep(p, 1);
             SceneActorState_StartAction(actor, 0, 0, 8);
-        } else if (p->step == 1) {
+        } else if (p->requestMode == 1) {
             BossTask_SetStep(p, 2);
             SceneActorState_StartAction(actor, 0, 0, 10);
         } else {
@@ -36,7 +29,7 @@ void Sabata_AdvanceStepFromScript(void)
             u8 cleared = 0;
             actor->locked = cleared;
         }
-        p->field4EB = 0;
-        p->field4E8 = 0;
+        p->requestPhase = 0;
+        p->request = 0;
     }
 }
