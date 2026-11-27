@@ -1,18 +1,10 @@
-#include "global.h"
+#include "player/player.h"
 
-struct P08159494 {
-    u8 f0[0x1c];
-    s32 f1c;
-    u8 f20[0x424 - 0x20];
-    u16 f424;
-    u16 f426;
-};
-
-void Player_IncreaseLifeTowardLimit(struct P08159494 *p, u32 d)
+void Player_IncreaseLifeTowardLimit(struct Player *p, u32 d)
 {
-    if (p->f1c == 1) {
-        p->f424 += d;
-        if (p->f424 >= p->f426)
-            p->f424 = p->f426;
+    if (p->kind == 1) {
+        p->currentStatA += d;
+        if (p->currentStatA >= p->maximumStatA)
+            p->currentStatA = p->maximumStatA;
     }
 }
