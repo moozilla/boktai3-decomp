@@ -585,3 +585,4 @@ include/system/time_palette_transitions/time_palette.h,include/system/clock/time
 include/monsters/enemy_particle.h,include/effects/particles/enemy_particle.h,Shared enemy attack particle pool,,
 include/ui/dialogue/text_state.h,include/ui/dialogue/text_state.h,owned by the dialogue text interpreter,,
 include/ui/dialogue/text_window_manager.h,include/ui/dialogue/text_window_manager.h,owned by the text window manager,,
+include/ui/pause/map_menu.h,include/ui/pause/map_menu.h,owned by the pause map menu,,

@@ -1,22 +1,6 @@
 /* Provisional names and object interpretation; offsets follow static accesses. */
 #include "global.h"
-struct MapMenu {
-    u8 pad0[0x3828];
-    u32 flagsA;
-    u8 pad382c[0x3840 - 0x382c];
-    s16 posAX, posAY;
-    u8 pad3844[0x3888 - 0x3844];
-    u32 flagsB;
-    u8 pad388c[0x38a0 - 0x388c];
-    s16 posBX, posBY;
-    u8 pad38a4[0x4904 - 0x38a4];
-    u8 index, unlocked;
-    u8 pad4906[6];
-    u16 scrollX, scrollY;
-    u8 pad4910[8];
-    u16 originX, originY;
-    u16 map, x, y, otherMap, otherX, otherY;
-};
+#include "ui/pause/map_menu.h"
 extern struct {
     u16 held, pressed;
 } gPadState;
@@ -63,8 +47,8 @@ void MapMenu_UpdateInput(struct MapMenu *s)
     if (s->unlocked && changed) {
         s32 dx, dy, tx, ty;
         MapMenu_ClampScrollAndUpdateArrows(s);
-        dx = (s16)s->scrollX - (s16)s->originX;
-        dy = (s16)s->scrollY - (s16)s->originY;
+        dx = (s16)s->scrollX - (s16)s->focusX;
+        dy = (s16)s->scrollY - (s16)s->focusY;
         tx = dx >> 3;
         ty = (dy >> 3) & ~1;
         BgGfx_LoadTilemapSimple(1, tx, ty, dx, dy);

@@ -1,15 +1,9 @@
 #include "global.h"
 #include "system/game_state/game_state.h"
+#include "ui/pause/map_menu.h"
 
 struct MapMenuMarker {
     u8 type, page, x, y;
-};
-struct MapMenu {
-    u8 unknown0[0x4900];
-    struct MapMenuMarker *markers;
-    u8 page;
-    u8 unknown4905[0x23];
-    u32 hideSpecialMarkers;
 };
 u32 MapScreen_GetMarkerType(u32);
 s32 MapScreen_GetMarkerFlipFlags(s32);
@@ -37,7 +31,7 @@ void MapMenu_DrawActiveMarkers(struct MapMenu *menu, s32 left, s32 top)
         kind = MapScreen_GetMarkerType(marker->type);
         if (kind == 0)
             break;
-        if (marker->page != menu->page)
+        if (marker->page != menu->index)
             continue;
         if (!((((s32 *)gGameState->unk5C0)[(s16)gGameState->savedX] >> i) & 1))
             continue;
