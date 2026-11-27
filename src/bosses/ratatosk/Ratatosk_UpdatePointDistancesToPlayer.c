@@ -1,20 +1,15 @@
 #include "global.h"
 #include "engine/math/scene_vec.h"
+#include "bosses/ratatosk/proximity_entry_layout.h"
 
-struct SceneDistanceEntry {
-    struct SceneVec position;
-    u8 pad8[4];
-    s32 distanceSquared;
-    u8 pad10[8];
-};
 struct SceneDistanceSet {
     u8 pad0[0xD1C];
-    struct SceneDistanceEntry entries[9];
+    struct ProximityEntry entries[9];
 };
 struct SceneVec *Player_GetEffectivePosition(s32);
 void Ratatosk_UpdatePointDistancesToPlayer(struct SceneDistanceSet *set)
 {
-    struct SceneDistanceEntry *entry = set->entries;
+    struct ProximityEntry *entry = set->entries;
     u32 offset = 0;
     s32 count = 8;
     do {

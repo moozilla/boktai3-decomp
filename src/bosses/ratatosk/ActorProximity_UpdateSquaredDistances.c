@@ -1,12 +1,8 @@
 /* Tentative family and field names, based on static accesses. */
 #include "global.h"
+#include "bosses/ratatosk/proximity_entry_layout.h"
 struct ProximityPosition {
     s16 x, y, z, unknown6;
-};
-struct ProximityEntry {
-    struct ProximityPosition position;
-    s32 squaredDistance;
-    u8 unknownC[0xC];
 };
 struct ActorProximity {
     u8 unknown0[0x36C];
