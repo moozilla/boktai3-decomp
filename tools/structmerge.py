@@ -256,10 +256,22 @@ def field_paths(old, new):
     """Find direct and qualified member paths at the same measured storage."""
     fields = {}
     old_bits, new_bits = bit_spans(old), bit_spans(new)
-    choices = new["members"] + [dict(lf, name=lf["name"], base=lf["base"])
-                               for lf in new["known"] if "." in lf["name"]]
+    choices = new["members"] + new.get("qualified", []) + [lf for lf in new["known"] if "." in lf["name"]]
     nested = [lf for lf in old["known"] if "." in lf["name"] and "[" not in lf["name"]]
-    for m in old["members"] + nested:
+    scalar_elements = []
+    offsets = {member.get("off") for member in choices if member.get("off") is not None}
+    for m in old["members"]:
+        if not m.get("array") or m["base"] not in {"int", "enum", "ptr"} or m.get("esize") != m["width"]:
+            continue
+        size, start = m["esize"], m["off"]
+        if not size or start is None:
+            continue
+        for off in sorted(offsets):
+            delta = off - start
+            if 0 <= delta < m["size"] and delta % size == 0:
+                scalar_elements.append(dict(m, name=f"{m['name']}[{delta // size}]", off=off,
+                                            size=size, array=False, esize=None, bits=False))
+    for m in old["members"] + nested + scalar_elements:
         if m.get("off") is None or m.get("size") is None:
             continue
         whole_bytes = (m["off"] * 8, m["size"] * 8)
@@ -272,14 +284,22 @@ def field_paths(old, new):
             fields[m["name"]] = m["name"]
         elif len(hits) == 1:
             fields[m["name"]] = next(iter(hits))
-        elif "." not in m["name"]:
+        elif not re.search(r"[.\[]", m["name"]):
             fields[m["name"]] = None
     return fields
 
 
 def member_edits(text, pre, refs, view, mapping, span):
     """Map typed member token ordinals back to raw text, skipping ambiguous macros."""
-    changes = {name for name, new in mapping.items() if "." not in name and name != new}
+    changes = {name for name, new in mapping.items() if not re.search(r"[.\[]", name) and name != new}
+    indices = {}
+    for key, name, line, col, index in refs.array_fields:
+        if key != view["id"]:
+            continue
+        target = mapping.get(f"{name}[{index}]")
+        root = mapping.get(name)
+        if target and root is None:
+            indices[name, line, col] = (index, target)
     chains = {}
     for key, chain in refs.field_chains:
         if key != view["id"]:
@@ -296,10 +316,11 @@ def member_edits(text, pre, refs, view, mapping, span):
             chains[site] = (chain, target)
     if any(len({line for _, line, _ in chain}) != 1 for chain, _ in chains.values()):
         raise Holdout("a changed nested field crosses source lines")
-    chain_names = {name for name, _, _ in chains}
-    if not changes and not chains:
+    chain_names = {name for name, _, _ in chains.keys() | indices.keys()}
+    if not changes and not chain_names:
         return []
     field_token = re.compile(r"(->|\.)\s*([A-Za-z_]\w*)")
+    index_token = re.compile(r"\s*\[\s*(0[xX][\da-fA-F]+|\d+)[uUlL]*\s*\]")
     code = keepcheck.blank_comments(text)
     source = code.splitlines(keepends=True)
     offsets = [0]
@@ -332,6 +353,14 @@ def member_edits(text, pre, refs, view, mapping, span):
             coord = name, ln, token.start(2) + 1
             if coord in consumed:
                 continue
+            if coord in indices:
+                index, target = indices[coord]
+                subscript = index_token.match(text, base + m.end(2), offsets[ln])
+                if not subscript or evidence.integer_token(subscript[1]) != index:
+                    raise Holdout(f"line {ln} has an array field with a nonliteral source index")
+                edits.append((base + m.start(2), subscript.end(), target))
+                consumed.add(coord)
+                continue
             if coord in chains:
                 chain, target = chains[coord]
                 last = at.get(chain[-1])
@@ -357,8 +386,9 @@ def member_edits(text, pre, refs, view, mapping, span):
             edits.append((base + start, base + end, mapping[name]))
             consumed.add(coord)
     # A changed use created by a macro, or a member split after '->', has no safe raw token.
-    if not chains.keys() <= consumed or any(key == view["id"] and name in changes and (name, line, col) not in consumed
-                                          for key, name, line, col in refs.fields):
+    if not (chains.keys() | indices.keys()) <= consumed or any(
+            key == view["id"] and name in changes and (name, line, col) not in consumed
+            for key, name, line, col in refs.fields):
         raise Holdout("some changed member uses are only visible after preprocessing")
     return edits
 

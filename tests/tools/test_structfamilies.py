@@ -381,6 +381,23 @@ int Read(struct Packed *p, struct Other *q) { return p->xy.hi + q->xy.hi; }
             result = merge.rewrite_unit(old_text, old, new, Path("include/vector.h"), "struct Vector")
         self.assertIn("return p->y + q->xy.hi;", result)
 
+    def test_literal_array_subscript_resolves_to_the_measured_scalar(self):
+        path = "src/a.c"
+        declaration = TYPES + "struct Raw { u16 v[3]; };\n"
+        new = measure(TYPES + "struct Config { u16 kind, flags, speed; };",
+                      "include/config.h")["include/config.h:struct Config"]
+        for subscript, refusal in (("0x2U", None), ("i", "no unambiguous shared member"),
+                                   ("1 + 1", "nonliteral source index")):
+            source = declaration + f"void Set(struct Raw *r, int i) {{ r->v[{subscript}] = i; }}"
+            old = measure(source, path)[f"{path}:struct Raw"]
+            with self.subTest(subscript=subscript), patch.object(lm, "preprocess", return_value=parse(source, path)[0]):
+                if refusal:
+                    with self.assertRaisesRegex(merge.Holdout, refusal):
+                        merge.rewrite_unit(source, old, new, Path("include/config.h"), "struct Config")
+                else:
+                    revised = merge.rewrite_unit(source, old, new, Path("include/config.h"), "struct Config")
+                    self.assertIn("r->speed = i;", revised)
+
     def test_aligned_record_is_editable_and_keeps_its_alignment(self):
         path = "src/a.c"
         text = TYPES + "struct Short { u16 value; } __attribute__((aligned(4)));\n"

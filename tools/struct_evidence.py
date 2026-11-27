@@ -50,13 +50,17 @@ def record_of(tu, t):
     return None
 
 
+def integer_token(value):
+    value = re.sub(r"[uUlL]+$", "", value)
+    try:
+        return int(value, 8 if re.fullmatch(r"0[0-7]+", value) else 0)
+    except ValueError:
+        return None
+
+
 def const_int(expr):
     if isinstance(expr, c_ast.Constant) and any(word in expr.type for word in ("int", "long")):
-        value = re.sub(r"[uUlL]+$", "", expr.value)
-        try:
-            return int(value, 8 if re.fullmatch(r"0[0-7]+", value) else 0)
-        except ValueError:
-            return None
+        return integer_token(expr.value)
     if isinstance(expr, c_ast.UnaryOp):
         n = const_int(expr.expr)
         if n is not None:
@@ -87,7 +91,7 @@ class References(c_ast.NodeVisitor):
         self.static = set()
         self.func = ""
         self.calls, self.fields, self.params, self.globals = [], [], [], []
-        self.field_chains = []
+        self.field_chains, self.array_fields = [], []
         self.return_definitions, self.return_calls = [], []
         self.extent_uses = {}
         for ext in ast.ext:
@@ -257,8 +261,14 @@ class References(c_ast.NodeVisitor):
         self.generic_visit(node)
 
     def visit_ArrayRef(self, node):
-        if const_int(node.subscript) != 0:
+        index = const_int(node.subscript)
+        if index != 0:
             self.uses_extent(self.pointee(self.expr_type(node.name)), node, "an indexed pointer")
+        if index is not None and isinstance(node.name, c_ast.StructRef):
+            rec, decl = self.member(node.name)
+            field = node.name.field
+            if decl and isinstance(self.resolve(decl.type), c_ast.ArrayDecl) and field.coord:
+                self.array_fields.append((rec, field.name, field.coord.line, field.coord.column, index))
         self.generic_visit(node)
 
     def visit_UnaryOp(self, node):
