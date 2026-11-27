@@ -1,13 +1,12 @@
 #include "global.h"
 #include "scene/collision/packed_contact_halfwords.h"
-struct Z {
-    struct PackedContactHalfwords a, b;
-};
+#include "scene/collision/packed_collider_extents.h"
 struct Q {
     u8 pad[6];
     u16 flags;
 };
-void Collider_Init(u8 *, u16, u32, u32, u32, struct Z *, struct Z *);
+void Collider_Init(u8 *, u16, u32, u32, u32, struct PackedColliderExtents *,
+                   struct PackedColliderExtents *);
 void Collider_SetCallback(u8 *, void (*)(void), u8 *);
 void Collider_SetAttackProperties(u8 *, s32, s32, u32, u32, s32);
 void Collider_SetPosition(u8 *, u8 *, u32);
@@ -19,14 +18,14 @@ void MuspellHead_ApplyHitReaction(void);
 void MuspellHead_InitializeColliders(u8 *pArg)
 {
     u8 *p = pArg;
-    struct Z a, b;
+    struct PackedColliderExtents a, b;
     u8 *q = p + 0x6c;
     u16 *v, *r;
-    a.a.lo = 120;
-    a.a.hi = 120;
-    a.b.lo = 120;
-    *(u32 *)&b.a = 0x780000;
-    *(u32 *)&b.b &= 0xffff0000;
+    a.xy.lo = 120;
+    a.xy.hi = 120;
+    a.zAndPad.lo = 120;
+    *(u32 *)&b.xy = 0x780000;
+    *(u32 *)&b.zAndPad &= 0xffff0000;
     Collider_Init(q, 0, 0x2001, 0, 0x10, &a, &b);
     Collider_SetCallback(q, MuspellHead_OnPassiveColliderContact, p);
     Collider_SetAttackProperties(q, *(s16 *)(p + 0x174), *(s16 *)(p + 0x176), 0, 0,
