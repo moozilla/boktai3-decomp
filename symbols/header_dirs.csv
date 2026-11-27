@@ -588,6 +588,7 @@ include/ui/books/bestiary_palette_variant.h,include/ui/books/bestiary_palette_va
 include/ui/books/collection_display_resources.h,include/ui/books/collection_display_resources.h,owned by the collection and forging books,,
 include/ui/books/palette_transition_banks.h,include/ui/books/palette_transition_banks.h,owned by the bestiary palette display,,
 include/ui/dialogue/text_state.h,include/ui/dialogue/text_state.h,owned by the dialogue text interpreter,,
+include/ui/dialogue/text_window.h,include/ui/dialogue/text_window.h,owned by the text window manager,,
 include/ui/dialogue/text_window_manager.h,include/ui/dialogue/text_window_manager.h,owned by the text window manager,,
 include/ui/pause/map_menu.h,include/ui/pause/map_menu.h,owned by the pause map menu,,
 include/ui/pause/map_menu_marker.h,include/ui/pause/map_menu_marker.h,owned by the pause map menu,,
