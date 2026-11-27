@@ -87,6 +87,7 @@ class References(c_ast.NodeVisitor):
         self.static = set()
         self.func = ""
         self.calls, self.fields, self.params, self.globals = [], [], [], []
+        self.return_definitions, self.return_calls = [], []
         for ext in ast.ext:
             d = ext.decl if isinstance(ext, c_ast.FuncDef) else ext
             if isinstance(d, c_ast.Decl) and d.name:
@@ -195,6 +196,9 @@ class References(c_ast.NodeVisitor):
 
     def visit_FuncDef(self, node):
         self.func = node.decl.name
+        result = self.pointee(node.decl.type.type)
+        if result:
+            self.return_definitions.append((self.func, self.func in self.static, result))
         params = node.decl.type.args
         self.env.append({})
         abi = record_of(self.tu, node.decl.type.type) is None
@@ -225,19 +229,22 @@ class References(c_ast.NodeVisitor):
         self.generic_visit(node)
 
     def visit_FuncCall(self, node):
-        if isinstance(node.name, c_ast.ID) and isinstance(node.args, c_ast.ExprList):
+        if isinstance(node.name, c_ast.ID):
             name = node.name.name
             if self.binding(name) is None:
                 declared = self.declarations.get(name)
+                static = name in self.static
+                result = self.pointee(declared.type) if declared else None
+                if result:
+                    self.return_calls.append((self.func, node.coord.line, name, static, result))
                 formals = declared.args.params if declared and declared.args else ()
-                for i, arg in enumerate(node.args.exprs):
+                for i, arg in enumerate(node.args.exprs if isinstance(node.args, c_ast.ExprList) else ()):
                     origin = self.address(arg)
                     if origin:
                         dest = self.pointee(formals[i].type) if i < len(formals) and isinstance(
                             formals[i], (c_ast.Decl, c_ast.Typename)) else None
                         cast = self.pointee(arg.to_type.type) if isinstance(arg, c_ast.Cast) else None
-                        self.calls.append((self.func, node.coord.line, name, i, name in self.static,
-                                           origin, dest, cast))
+                        self.calls.append((self.func, node.coord.line, name, i, static, origin, dest, cast))
         self.generic_visit(node)
 
     def visit_StructRef(self, node):

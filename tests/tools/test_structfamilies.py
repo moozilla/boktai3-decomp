@@ -72,6 +72,32 @@ def measure(text, path):
 
 
 class SourceEvidenceTests(unittest.TestCase):
+    def test_return_evidence_uses_calls_and_resolves_static_names_locally(self):
+        definition = "src/allocator.c"
+        caller = "src/npc.c"
+        header = "include/shared.h"
+        base = f"{header}:struct Base"
+        view = f"{caller}:struct View"
+        decls = f'# 1 "{header}"\nstruct Base {{ unsigned flags; }};\n'
+        body = f'# 1 "{definition}"\nstruct Base *Allocate(void) {{ return 0; }}\n'
+        defs = evidence.References(*parse(decls + body, definition)[2:], definition)
+        script = """
+struct View { unsigned flags; };
+struct View *Allocate(void);
+static struct View *Other(void) { return 0; }
+struct View *NeverCalled(void);
+void Run(void) { Allocate(); Other(); }
+void Shadow(struct View *(*Allocate)(void)) { Allocate(); }
+"""
+        calls = evidence.References(*parse(script, caller)[2:], caller)
+        self.assertEqual(calls.return_calls, [("Run", 6, "Allocate", False, view),
+                                               ("Run", 6, "Other", True, view)])
+        scans = [{"file": definition, "return_definitions": defs.return_definitions + [("Other", True, base)]},
+                 {"file": caller, "return_calls": calls.return_calls, "return_definitions": calls.return_definitions}]
+        self.assertEqual(families.returned_views(scans, {base: {}, view: {}}),
+                         [{"view": view, "result": base, "function": "Allocate",
+                           "sites": [("src/npc.c:6", "Run")]}])
+
     def test_pointer_arithmetic_and_array_member(self):
         path = "src/moved/a.c"
         _, _, ast, tu = parse(A, path)
