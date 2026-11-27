@@ -1,9 +1,5 @@
 #include "objects/markers/interaction_marker.h"
-struct MarkerScriptArgs {
-    u32 count : 16;
-    u32 pad : 16;
-    u32 *values;
-};
+#include "recovered/script_call_arguments_layout.h"
 void InteractionMarker_TickInteraction(struct InteractionMarker *marker)
 {
     if (marker->height > 1)
@@ -18,7 +14,7 @@ void InteractionMarker_TickInteraction(struct InteractionMarker *marker)
         InteractionMarker_SetState(marker, InteractionMarker_TickDormant);
         if (marker->scriptId) {
             u32 values[2];
-            struct MarkerScriptArgs args;
+            struct ScriptCallArguments args;
             args.count = 2;
             args.values = values;
             values[0] = marker->scriptArgs[0];

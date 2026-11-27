@@ -4,6 +4,7 @@
 #include "engine/ram.h"
 #include "engine/engine_globals.h"
 #include "scene/collision/packed_contact_vector.h"
+#include "recovered/script_call_arguments_layout.h"
 
 extern u8 *gGameState;
 
@@ -260,10 +261,6 @@ struct ArmorScriptedActor {
     u32 attackScript;
 };
 
-struct ArmorScriptedActorScriptArgs {
-    u32 count : 16, unused : 16;
-    s32 *values;
-};
 
 
 
@@ -272,7 +269,7 @@ void Script_Call(u32, void *);
 void Armor_UpdateScriptedAttack(struct ArmorScriptedActor *p)
 {
     s32 values[3];
-    struct ArmorScriptedActorScriptArgs args;
+    struct ScriptCallArguments args;
     u8 state = p->state;
     switch (state) {
         case 0:
@@ -530,10 +527,6 @@ struct ArmorDefeatActor {
     u32 defeatScript;
 };
 
-struct ArmorDefeatActorScriptArgs {
-    u32 count : 16, unused : 16;
-    s32 *values;
-};
 
 extern u32 gUnk_02000560;
 
@@ -559,7 +552,7 @@ static inline u32 Armor_TestDefeatBlocked(void)
 void Armor_FinalizeDefeat(struct ArmorDefeatActor *p)
 {
     s32 values[8];
-    struct ArmorDefeatActorScriptArgs args;
+    struct ScriptCallArguments args;
     u32 mask = 0x400;
     if (!((gEngineFlags | gScenePauseFlags) & mask) && !Armor_TestDefeatBlocked()) {
         s32 v;

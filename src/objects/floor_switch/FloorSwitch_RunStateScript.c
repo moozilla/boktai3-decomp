@@ -1,4 +1,5 @@
 #include "global.h"
+#include "recovered/script_call_arguments_layout.h"
 struct FloorSwitch {
     u32 flags;
     u8 pad4[8];
@@ -21,11 +22,7 @@ struct FloorSwitch {
     u8 field8A, field8B;
     u16 field8C, field8E;
 };
-struct FloorSwitchScriptArgs {
-    u32 count : 16, unused : 16;
-    s32 *values;
-};
-void Script_Call(u32, struct FloorSwitchScriptArgs *);
+void Script_Call(u32, struct ScriptCallArguments *);
 static inline void fill(struct FloorSwitch *p, s32 *values)
 {
     values[0] = p->name;
@@ -42,7 +39,7 @@ static inline void fill(struct FloorSwitch *p, s32 *values)
 void FloorSwitch_RunStateScript(struct FloorSwitch *p)
 {
     s32 values[10];
-    struct FloorSwitchScriptArgs args;
+    struct ScriptCallArguments args;
     if (p->flags88 & 2) {
         if (p->r[0]) {
             fill(p, values);

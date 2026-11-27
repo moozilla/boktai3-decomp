@@ -3,6 +3,7 @@
 #include "engine/video/display_sprite_playback.h"
 #include "scene/collision/contact_actor.h"
 #include "engine/ram.h"
+#include "recovered/script_call_arguments_layout.h"
 struct WoodenCrate {
     struct ContactSwarmSprite sprite;
     struct DisplaySequenceState animation;
@@ -30,11 +31,6 @@ u8 WoodenCrate_HasFlags(struct WoodenCrate *, s32);
 s32 Script_SeekToKeyword(s32);
 s32 Script_GetValue(void);
 s32 Script_GetKeywordValue(s32, s32);
-struct CrateArguments {
-    u32 count : 16;
-    u32 pad : 16;
-    s32 *values;
-};
 // confidence=low: finishes the opening/closing animation and invokes its script with crate name and flags.
 void WoodenCrate_UpdateToggleAnimation(struct WoodenCrateManager *manager,
                                        struct WoodenCrate *crate)
@@ -42,7 +38,7 @@ void WoodenCrate_UpdateToggleAnimation(struct WoodenCrateManager *manager,
     WoodenCrate_UpdatePaletteTimers(crate);
     if (PlayerCue_StepSequenceEnded(&crate->sprite, &crate->animation)) {
         s32 values[2];
-        struct CrateArguments args;
+        struct ScriptCallArguments args;
         if (crate->animation.flags & 4) {
             Anim_SetSequence(&crate->animation, manager->animationData, 0, (u8)crate->palette,
                              crate->sequenceFlags);
