@@ -1,13 +1,9 @@
-#include "global.h"
+#include "player/player.h"
 #include "engine/engine.h"
 #include "scene/collision/contact_position.h"
 
 // confidence=low: validates terrain for a tether target and snaps to the tether actor on flagged cells.
 
-struct Actor {
-    u8 pad[0x30];
-    struct ContactPosition position;
-};
 struct Map {
     u32 pad;
     u8 *cells;
@@ -45,7 +41,7 @@ static inline s32 absolute(s32 v)
         v = -v;
     return v;
 }
-u32 Player_TestTetherTarget(struct Actor *actor, struct ContactPosition *candidate)
+u32 Player_TestTetherTarget(struct Player *actor, struct ContactPosition *candidate)
 {
     u8 *p = properties(candidate);
     u32 flags = *(u16 *)(p + 2);
