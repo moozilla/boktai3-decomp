@@ -5,18 +5,15 @@
 #include "objects/scene_object.h"
 #include "player/cues/player_cue.h"
 #include "player/player_slot_status.h"
+#include "link/session/link_session_state.h"
 
-struct LinkRef {
-    u8 unk0[0x18];
-    s16 bit;
-};
-extern struct LinkRef *gLinkSession;
+extern struct AreaEffectLinkState *gLinkSession;
 
 static inline s32 LocalPlayer(void)
 {
     if (!gLinkSession)
         return -1;
-    return gLinkSession->bit;
+    return gLinkSession->localPlayer;
 }
 
 static inline u32 Busy(struct Player *p)
