@@ -1,7 +1,7 @@
 #include "global.h"
 #include "engine/video/display_sequence.h"
 #include "ui/title/actor_animation_controller.h"
-#include "engine/video/display_sprite_playback.h"
+#include "engine/video/display_sequence_step.h"
 #include "engine/video/render.h"
 #include "engine/input.h"
 #include "engine/ram.h"
@@ -1218,71 +1218,12 @@ void TutorialOtenko_UpdateRotatingAnimation(struct ActorAnimController *p)
 {
     struct DisplaySequenceSprite *o;
     struct DisplaySequenceState *a;
-    const u16 *entry;
-    u32 flag;
     u8 done;
     take(p);
     rotate(p);
     o = &p->obj;
     a = &p->anim;
-    entry = a->commands + a->index;
-    o->frame = *entry >> 6;
-    {
-        union DisplaySequenceControl control;
-        u32 bit, first;
-        control.raw = a->flags;
-        bit = 1;
-        first = (u8)(control.raw & bit);
-        if (first != (((*entry & 0x30) >> 4) & bit))
-            o->flags |= 4;
-        else
-            o->flags &= ~4;
-    }
-    {
-        union DisplaySequenceControl control;
-        u32 bit, first;
-        control.raw = a->flags;
-        bit = 2;
-        first = (u8)(control.raw & bit);
-        if (first != (((*entry & 0x30) >> 4) & bit))
-            o->flags |= 8;
-        else
-            o->flags &= ~8;
-    }
-    if (++a->elapsed >= a->duration) {
-        a->elapsed = 0;
-        if (a->flags & 4) {
-            if (a->index == 0) {
-                if (a->flags & 8) {
-                    a->elapsed = a->duration;
-                } else {
-                    a->index = a->frameCount - 1;
-                }
-                done = 1;
-            } else {
-                a->index--;
-                done = 0;
-            }
-        } else {
-            if (++a->index >= a->frameCount) {
-                if ((u8)(a->flags & 8)) {
-                    a->elapsed = a->duration;
-                    a->index = a->frameCount - 1;
-                    done = 1;
-                } else {
-                    a->index = 0;
-                    done = 1;
-                }
-            } else
-                done = 0;
-        }
-        entry = a->commands + a->index;
-        a->frameWeight = frame_factor(*entry);
-        a->duration = (a->frameWeight * a->speed) >> 6;
-        if (!a->duration)
-            a->duration = 1;
-    } else
-        done = 0;
+    done = DisplaySequence_StepSprite(o, a);
     p->done = done;
 }
 
@@ -1708,8 +1649,6 @@ void TutorialOtenko_UpdateShadowedRestAnimation(struct ActorAnimController *p)
 {
     struct DisplaySequenceSprite *o;
     struct DisplaySequenceState *a;
-    const u16 *entry;
-    u32 flag;
     u8 done;
     if (take(p)) {
         p->obj.flags &= ~1;
@@ -1735,64 +1674,7 @@ void TutorialOtenko_UpdateShadowedRestAnimation(struct ActorAnimController *p)
     }
     o = &p->obj;
     a = &p->anim;
-    entry = a->commands + a->index;
-    o->frame = *entry >> 6;
-    {
-        union DisplaySequenceControl control;
-        u32 bit, first;
-        control.raw = a->flags;
-        bit = 1;
-        first = (u8)(control.raw & bit);
-        if (first != (((*entry & 0x30) >> 4) & bit))
-            o->flags |= 4;
-        else
-            o->flags &= ~4;
-    }
-    {
-        union DisplaySequenceControl control;
-        u32 bit, first;
-        control.raw = a->flags;
-        bit = 2;
-        first = (u8)(control.raw & bit);
-        if (first != (((*entry & 0x30) >> 4) & bit))
-            o->flags |= 8;
-        else
-            o->flags &= ~8;
-    }
-    if (++a->elapsed >= a->duration) {
-        a->elapsed = 0;
-        if (a->flags & 4) {
-            if (a->index == 0) {
-                if (a->flags & 8) {
-                    a->elapsed = a->duration;
-                } else {
-                    a->index = a->frameCount - 1;
-                }
-                done = 1;
-            } else {
-                a->index--;
-                done = 0;
-            }
-        } else {
-            if (++a->index >= a->frameCount) {
-                if ((u8)(a->flags & 8)) {
-                    a->elapsed = a->duration;
-                    a->index = a->frameCount - 1;
-                    done = 1;
-                } else {
-                    a->index = 0;
-                    done = 1;
-                }
-            } else
-                done = 0;
-        }
-        entry = a->commands + a->index;
-        a->frameWeight = frame_factor(*entry);
-        a->duration = (a->frameWeight * a->speed) >> 6;
-        if (!a->duration)
-            a->duration = 1;
-    } else
-        done = 0;
+    done = DisplaySequence_StepSprite(o, a);
     p->done = done;
     {
         if (p->handle) {
@@ -1810,8 +1692,6 @@ void TutorialOtenko_UpdateLargeRestAnimation(struct ActorAnimController *p)
 {
     struct DisplaySequenceSprite *o;
     struct DisplaySequenceState *a;
-    const u16 *entry;
-    u32 flag;
     u8 done;
     if (take(p)) {
         p->obj.flags &= ~1;
@@ -1834,64 +1714,7 @@ void TutorialOtenko_UpdateLargeRestAnimation(struct ActorAnimController *p)
     }
     o = &p->obj;
     a = &p->anim;
-    entry = a->commands + a->index;
-    o->frame = *entry >> 6;
-    {
-        union DisplaySequenceControl control;
-        u32 bit, first;
-        control.raw = a->flags;
-        bit = 1;
-        first = (u8)(control.raw & bit);
-        if (first != (((*entry & 0x30) >> 4) & bit))
-            o->flags |= 4;
-        else
-            o->flags &= ~4;
-    }
-    {
-        union DisplaySequenceControl control;
-        u32 bit, first;
-        control.raw = a->flags;
-        bit = 2;
-        first = (u8)(control.raw & bit);
-        if (first != (((*entry & 0x30) >> 4) & bit))
-            o->flags |= 8;
-        else
-            o->flags &= ~8;
-    }
-    if (++a->elapsed >= a->duration) {
-        a->elapsed = 0;
-        if (a->flags & 4) {
-            if (a->index == 0) {
-                if (a->flags & 8) {
-                    a->elapsed = a->duration;
-                } else {
-                    a->index = a->frameCount - 1;
-                }
-                done = 1;
-            } else {
-                a->index--;
-                done = 0;
-            }
-        } else {
-            if (++a->index >= a->frameCount) {
-                if ((u8)(a->flags & 8)) {
-                    a->elapsed = a->duration;
-                    a->index = a->frameCount - 1;
-                    done = 1;
-                } else {
-                    a->index = 0;
-                    done = 1;
-                }
-            } else
-                done = 0;
-        }
-        entry = a->commands + a->index;
-        a->frameWeight = frame_factor(*entry);
-        a->duration = (a->frameWeight * a->speed) >> 6;
-        if (!a->duration)
-            a->duration = 1;
-    } else
-        done = 0;
+    done = DisplaySequence_StepSprite(o, a);
     p->done = done;
     {
         if (p->handle) {
@@ -1972,7 +1795,6 @@ void TutorialOtenko_MoveAlongCurveToRest(struct ActorAnimController *p)
 {
     struct DisplaySequenceSprite *o;
     struct DisplaySequenceState *a;
-    const u16 *entry;
     u8 done;
     if (take(p)) {
         p->timer = 0;
@@ -2001,64 +1823,7 @@ void TutorialOtenko_MoveAlongCurveToRest(struct ActorAnimController *p)
     p->heading = Math_Atan2(p->targetX - p->obj.position.x, p->targetY - p->obj.position.y);
     o = &p->obj;
     a = &p->anim;
-    entry = a->commands + a->index;
-    o->frame = *entry >> 6;
-    {
-        union DisplaySequenceControl control;
-        u32 bit, first;
-        control.raw = a->flags;
-        bit = 1;
-        first = (u8)(control.raw & bit);
-        if (first != (((*entry & 0x30) >> 4) & bit))
-            o->flags |= 4;
-        else
-            o->flags &= ~4;
-    }
-    {
-        union DisplaySequenceControl control;
-        u32 bit, first;
-        control.raw = a->flags;
-        bit = 2;
-        first = (u8)(control.raw & bit);
-        if (first != (((*entry & 0x30) >> 4) & bit))
-            o->flags |= 8;
-        else
-            o->flags &= ~8;
-    }
-    if (++a->elapsed >= a->duration) {
-        a->elapsed = 0;
-        if (a->flags & 4) {
-            if (a->index == 0) {
-                if (a->flags & 8) {
-                    a->elapsed = a->duration;
-                } else {
-                    a->index = a->frameCount - 1;
-                }
-                done = 1;
-            } else {
-                a->index--;
-                done = 0;
-            }
-        } else {
-            if (++a->index >= a->frameCount) {
-                if ((u8)(a->flags & 8)) {
-                    a->elapsed = a->duration;
-                    a->index = a->frameCount - 1;
-                    done = 1;
-                } else {
-                    a->index = 0;
-                    done = 1;
-                }
-            } else
-                done = 0;
-        }
-        entry = a->commands + a->index;
-        a->frameWeight = frame_factor(*entry);
-        a->duration = (a->frameWeight * a->speed) >> 6;
-        if (!a->duration)
-            a->duration = 1;
-    } else
-        done = 0;
+    done = DisplaySequence_StepSprite(o, a);
     p->done = done;
     if (p->timer++ > 31) {
         p->obj.position.x = p->targetX;
@@ -2094,7 +1859,6 @@ void TutorialOtenko_MoveAlongScriptedCurve(struct ActorAnimController *p)
 {
     struct DisplaySequenceSprite *o;
     struct DisplaySequenceState *a;
-    const u16 *entry;
     u8 done;
     if (take(p)) {
         p->timer = 0;
@@ -2112,64 +1876,7 @@ void TutorialOtenko_MoveAlongScriptedCurve(struct ActorAnimController *p)
     p->heading = Math_Atan2(p->targetX - p->obj.position.x, p->targetY - p->obj.position.y);
     o = &p->obj;
     a = &p->anim;
-    entry = a->commands + a->index;
-    o->frame = *entry >> 6;
-    {
-        union DisplaySequenceControl control;
-        u32 bit, first;
-        control.raw = a->flags;
-        bit = 1;
-        first = (u8)(control.raw & bit);
-        if (first != (((*entry & 0x30) >> 4) & bit))
-            o->flags |= 4;
-        else
-            o->flags &= ~4;
-    }
-    {
-        union DisplaySequenceControl control;
-        u32 bit, first;
-        control.raw = a->flags;
-        bit = 2;
-        first = (u8)(control.raw & bit);
-        if (first != (((*entry & 0x30) >> 4) & bit))
-            o->flags |= 8;
-        else
-            o->flags &= ~8;
-    }
-    if (++a->elapsed >= a->duration) {
-        a->elapsed = 0;
-        if (a->flags & 4) {
-            if (a->index == 0) {
-                if (a->flags & 8) {
-                    a->elapsed = a->duration;
-                } else {
-                    a->index = a->frameCount - 1;
-                }
-                done = 1;
-            } else {
-                a->index--;
-                done = 0;
-            }
-        } else {
-            if (++a->index >= a->frameCount) {
-                if ((u8)(a->flags & 8)) {
-                    a->elapsed = a->duration;
-                    a->index = a->frameCount - 1;
-                    done = 1;
-                } else {
-                    a->index = 0;
-                    done = 1;
-                }
-            } else
-                done = 0;
-        }
-        entry = a->commands + a->index;
-        a->frameWeight = frame_factor(*entry);
-        a->duration = (a->frameWeight * a->speed) >> 6;
-        if (!a->duration)
-            a->duration = 1;
-    } else
-        done = 0;
+    done = DisplaySequence_StepSprite(o, a);
     p->done = done;
     if (p->timer++ > 31) {
         p->obj.position.x = p->targetX;
@@ -2263,7 +1970,7 @@ void TutorialOtenko_MoveTowardTarget(struct ActorAnimController *p)
 
     TutorialOtenko_ApplyBob(p, (void *)&p->obj);
     Anim_SetSequence(&p->anim, p->arg, p->state, p->direction, p->flip);
-    p->done = PlayerCue_StepSequenceEnded((void *)&p->obj, &p->anim);
+    p->done = DisplaySequence_StepSprite(&p->obj, &p->anim);
 
     adx = dx < 0 ? -dx : dx;
     adz = dz < 0 ? -dz : dz;
@@ -2281,7 +1988,7 @@ void TutorialOtenko_MoveTowardTarget(struct ActorAnimController *p)
                 flip = 1;
             }
             Anim_SetSequence(&p->anim, p->arg, p->state, (u8)row, flip);
-            p->done = PlayerCue_StepSequenceEnded((void *)&p->obj, &p->anim);
+            p->done = DisplaySequence_StepSprite(&p->obj, &p->anim);
         }
         FinishApproach(p);
         return;
@@ -2412,8 +2119,6 @@ void TutorialOtenko_UpdateReverseFadeAnimation(struct ActorAnimController *p)
 {
     struct DisplaySequenceSprite *o;
     struct DisplaySequenceState *a;
-    const u16 *entry;
-    u32 flag;
     u8 done;
     if (take(p)) {
         p->state = 19;
@@ -2425,64 +2130,7 @@ void TutorialOtenko_UpdateReverseFadeAnimation(struct ActorAnimController *p)
         p->previous(p);
     o = &p->obj;
     a = &p->anim;
-    entry = a->commands + a->index;
-    o->frame = *entry >> 6;
-    {
-        union DisplaySequenceControl control;
-        u32 bit, first;
-        control.raw = a->flags;
-        bit = 1;
-        first = (u8)(control.raw & bit);
-        if (first != (((*entry & 0x30) >> 4) & bit))
-            o->flags |= 4;
-        else
-            o->flags &= ~4;
-    }
-    {
-        union DisplaySequenceControl control;
-        u32 bit, first;
-        control.raw = a->flags;
-        bit = 2;
-        first = (u8)(control.raw & bit);
-        if (first != (((*entry & 0x30) >> 4) & bit))
-            o->flags |= 8;
-        else
-            o->flags &= ~8;
-    }
-    if (++a->elapsed >= a->duration) {
-        a->elapsed = 0;
-        if (a->flags & 4) {
-            if (a->index == 0) {
-                if (a->flags & 8) {
-                    a->elapsed = a->duration;
-                } else {
-                    a->index = a->frameCount - 1;
-                }
-                done = 1;
-            } else {
-                a->index--;
-                done = 0;
-            }
-        } else {
-            if (++a->index >= a->frameCount) {
-                if ((u8)(a->flags & 8)) {
-                    a->elapsed = a->duration;
-                    a->index = a->frameCount - 1;
-                    done = 1;
-                } else {
-                    a->index = 0;
-                    done = 1;
-                }
-            } else
-                done = 0;
-        }
-        entry = a->commands + a->index;
-        a->frameWeight = frame_factor(*entry);
-        a->duration = (a->frameWeight * a->speed) >> 6;
-        if (!a->duration)
-            a->duration = 1;
-    } else
-        done = 0;
+    done = DisplaySequence_StepSprite(o, a);
     p->done = done;
 }
 
@@ -2803,9 +2451,6 @@ void TutorialOtenko_UpdateRotatingAnimation2(struct ActorAnimController *p)
 {
     struct DisplaySequenceSprite *o;
     struct DisplaySequenceState *a;
-    const u16 *entry;
-    u32 flag;
-    u8 done;
     if (take(p)) {
         p->state = 2;
         Anim_SetSequence(&p->anim, p->arg, 2, 0, p->last);
@@ -2818,68 +2463,7 @@ void TutorialOtenko_UpdateRotatingAnimation2(struct ActorAnimController *p)
     rotate(p);
     o = &p->obj;
     a = &p->anim;
-    entry = a->commands + a->index;
-    {
-        u32 frame = *entry >> 6;
-        o->frame = frame;
-    }
-    {
-        union DisplaySequenceControl control;
-        u32 bit, first;
-        control.raw = a->flags;
-        bit = 1;
-        first = (u8)(control.raw & bit);
-        if (first != (((*entry & 0x30) >> 4) & bit))
-            o->flags |= 4;
-        else
-            o->flags &= ~4;
-    }
-    {
-        union DisplaySequenceControl control;
-        u32 bit, first;
-        control.raw = a->flags;
-        bit = 2;
-        first = (u8)(control.raw & bit);
-        if (first != (((*entry & 0x30) >> 4) & bit))
-            o->flags |= 8;
-        else
-            o->flags &= ~8;
-    }
-    if (++a->elapsed >= a->duration) {
-        a->elapsed = 0;
-        if (a->flags & 4) {
-            if (a->index == 0) {
-                if (a->flags & 8) {
-                    a->elapsed = a->duration;
-                } else {
-                    a->index = a->frameCount - 1;
-                }
-                done = 1;
-            } else {
-                a->index--;
-                done = 0;
-            }
-        } else {
-            if (++a->index >= a->frameCount) {
-                if ((u8)(a->flags & 8)) {
-                    a->elapsed = a->duration;
-                    a->index = a->frameCount - 1;
-                    done = 1;
-                } else {
-                    a->index = 0;
-                    done = 1;
-                }
-            } else
-                done = 0;
-        }
-        entry = a->commands + a->index;
-        a->frameWeight = frame_factor(*entry);
-        a->duration = (a->frameWeight * a->speed) >> 6;
-        if (!a->duration)
-            a->duration = 1;
-    } else
-        done = 0;
-    p->done = done;
+    p->done = DisplaySequence_StepSprite(o, a);
 }
 
 /* Tentative role: initialize and advance a rotating animated effect.
@@ -2889,9 +2473,6 @@ void TutorialOtenko_UpdateRotatingAnimation3(struct ActorAnimController *p)
 {
     struct DisplaySequenceSprite *o;
     struct DisplaySequenceState *a;
-    const u16 *entry;
-    u32 flag;
-    u8 done;
     if (take(p)) {
         p->state = 3;
         Anim_SetSequence(&p->anim, p->arg, 3, 0, p->last);
@@ -2904,68 +2485,7 @@ void TutorialOtenko_UpdateRotatingAnimation3(struct ActorAnimController *p)
     rotate(p);
     o = &p->obj;
     a = &p->anim;
-    entry = a->commands + a->index;
-    {
-        u32 frame = *entry >> 6;
-        o->frame = frame;
-    }
-    {
-        union DisplaySequenceControl control;
-        u32 bit, first;
-        control.raw = a->flags;
-        bit = 1;
-        first = (u8)(control.raw & bit);
-        if (first != (((*entry & 0x30) >> 4) & bit))
-            o->flags |= 4;
-        else
-            o->flags &= ~4;
-    }
-    {
-        union DisplaySequenceControl control;
-        u32 bit, first;
-        control.raw = a->flags;
-        bit = 2;
-        first = (u8)(control.raw & bit);
-        if (first != (((*entry & 0x30) >> 4) & bit))
-            o->flags |= 8;
-        else
-            o->flags &= ~8;
-    }
-    if (++a->elapsed >= a->duration) {
-        a->elapsed = 0;
-        if (a->flags & 4) {
-            if (a->index == 0) {
-                if (a->flags & 8) {
-                    a->elapsed = a->duration;
-                } else {
-                    a->index = a->frameCount - 1;
-                }
-                done = 1;
-            } else {
-                a->index--;
-                done = 0;
-            }
-        } else {
-            if (++a->index >= a->frameCount) {
-                if ((u8)(a->flags & 8)) {
-                    a->elapsed = a->duration;
-                    a->index = a->frameCount - 1;
-                    done = 1;
-                } else {
-                    a->index = 0;
-                    done = 1;
-                }
-            } else
-                done = 0;
-        }
-        entry = a->commands + a->index;
-        a->frameWeight = frame_factor(*entry);
-        a->duration = (a->frameWeight * a->speed) >> 6;
-        if (!a->duration)
-            a->duration = 1;
-    } else
-        done = 0;
-    p->done = done;
+    p->done = DisplaySequence_StepSprite(o, a);
 }
 
 /* Tentative role: initialize and advance a rotating animated effect.
@@ -2975,9 +2495,6 @@ void TutorialOtenko_UpdateRotatingAnimation4(struct ActorAnimController *p)
 {
     struct DisplaySequenceSprite *o;
     struct DisplaySequenceState *a;
-    const u16 *entry;
-    u32 flag;
-    u8 done;
     if (take(p)) {
         p->state = 4;
         Anim_SetSequence(&p->anim, p->arg, 4, 0, p->last);
@@ -2990,68 +2507,7 @@ void TutorialOtenko_UpdateRotatingAnimation4(struct ActorAnimController *p)
     rotate(p);
     o = &p->obj;
     a = &p->anim;
-    entry = a->commands + a->index;
-    {
-        u32 frame = *entry >> 6;
-        o->frame = frame;
-    }
-    {
-        union DisplaySequenceControl control;
-        u32 bit, first;
-        control.raw = a->flags;
-        bit = 1;
-        first = (u8)(control.raw & bit);
-        if (first != (((*entry & 0x30) >> 4) & bit))
-            o->flags |= 4;
-        else
-            o->flags &= ~4;
-    }
-    {
-        union DisplaySequenceControl control;
-        u32 bit, first;
-        control.raw = a->flags;
-        bit = 2;
-        first = (u8)(control.raw & bit);
-        if (first != (((*entry & 0x30) >> 4) & bit))
-            o->flags |= 8;
-        else
-            o->flags &= ~8;
-    }
-    if (++a->elapsed >= a->duration) {
-        a->elapsed = 0;
-        if (a->flags & 4) {
-            if (a->index == 0) {
-                if (a->flags & 8) {
-                    a->elapsed = a->duration;
-                } else {
-                    a->index = a->frameCount - 1;
-                }
-                done = 1;
-            } else {
-                a->index--;
-                done = 0;
-            }
-        } else {
-            if (++a->index >= a->frameCount) {
-                if ((u8)(a->flags & 8)) {
-                    a->elapsed = a->duration;
-                    a->index = a->frameCount - 1;
-                    done = 1;
-                } else {
-                    a->index = 0;
-                    done = 1;
-                }
-            } else
-                done = 0;
-        }
-        entry = a->commands + a->index;
-        a->frameWeight = frame_factor(*entry);
-        a->duration = (a->frameWeight * a->speed) >> 6;
-        if (!a->duration)
-            a->duration = 1;
-    } else
-        done = 0;
-    p->done = done;
+    p->done = DisplaySequence_StepSprite(o, a);
 }
 
 /* Tentative role: initialize and advance a rotating animated effect.
@@ -3061,9 +2517,6 @@ void TutorialOtenko_UpdateRotatingAnimation5(struct ActorAnimController *p)
 {
     struct DisplaySequenceSprite *o;
     struct DisplaySequenceState *a;
-    const u16 *entry;
-    u32 flag;
-    u8 done;
     if (take(p)) {
         p->state = 5;
         Anim_SetSequence(&p->anim, p->arg, 5, 0, p->last);
@@ -3076,68 +2529,7 @@ void TutorialOtenko_UpdateRotatingAnimation5(struct ActorAnimController *p)
     rotate(p);
     o = &p->obj;
     a = &p->anim;
-    entry = a->commands + a->index;
-    {
-        u32 frame = *entry >> 6;
-        o->frame = frame;
-    }
-    {
-        union DisplaySequenceControl control;
-        u32 bit, first;
-        control.raw = a->flags;
-        bit = 1;
-        first = (u8)(control.raw & bit);
-        if (first != (((*entry & 0x30) >> 4) & bit))
-            o->flags |= 4;
-        else
-            o->flags &= ~4;
-    }
-    {
-        union DisplaySequenceControl control;
-        u32 bit, first;
-        control.raw = a->flags;
-        bit = 2;
-        first = (u8)(control.raw & bit);
-        if (first != (((*entry & 0x30) >> 4) & bit))
-            o->flags |= 8;
-        else
-            o->flags &= ~8;
-    }
-    if (++a->elapsed >= a->duration) {
-        a->elapsed = 0;
-        if (a->flags & 4) {
-            if (a->index == 0) {
-                if (a->flags & 8) {
-                    a->elapsed = a->duration;
-                } else {
-                    a->index = a->frameCount - 1;
-                }
-                done = 1;
-            } else {
-                a->index--;
-                done = 0;
-            }
-        } else {
-            if (++a->index >= a->frameCount) {
-                if ((u8)(a->flags & 8)) {
-                    a->elapsed = a->duration;
-                    a->index = a->frameCount - 1;
-                    done = 1;
-                } else {
-                    a->index = 0;
-                    done = 1;
-                }
-            } else
-                done = 0;
-        }
-        entry = a->commands + a->index;
-        a->frameWeight = frame_factor(*entry);
-        a->duration = (a->frameWeight * a->speed) >> 6;
-        if (!a->duration)
-            a->duration = 1;
-    } else
-        done = 0;
-    p->done = done;
+    p->done = DisplaySequence_StepSprite(o, a);
 }
 
 /* Tentative role: initialize and advance a rotating animated effect.
@@ -3167,8 +2559,6 @@ void TutorialOtenko_UpdateRotatingAnimation6(struct ActorAnimController *p)
 {
     struct DisplaySequenceSprite *o;
     struct DisplaySequenceState *a;
-    const u16 *entry;
-    u32 flag;
     u8 done;
     if (take(p)) {
         p->state = 6;
@@ -3181,67 +2571,7 @@ void TutorialOtenko_UpdateRotatingAnimation6(struct ActorAnimController *p)
     rotate_v2(p);
     o = &p->obj;
     a = &p->anim;
-    entry = a->commands + a->index;
-    {
-        u32 frame = *entry >> 6;
-        o->frame = frame;
-    }
-    {
-        union DisplaySequenceControl control;
-        u32 bit, first;
-        control.raw = a->flags;
-        bit = 1;
-        first = (u8)(control.raw & bit);
-        if (first != (((*entry & 0x30) >> 4) & bit))
-            o->flags |= 4;
-        else
-            o->flags &= ~4;
-    }
-    {
-        union DisplaySequenceControl control;
-        u32 bit, first;
-        control.raw = a->flags;
-        bit = 2;
-        first = (u8)(control.raw & bit);
-        if (first != (((*entry & 0x30) >> 4) & bit))
-            o->flags |= 8;
-        else
-            o->flags &= ~8;
-    }
-    if (++a->elapsed >= a->duration) {
-        a->elapsed = 0;
-        if (a->flags & 4) {
-            if (a->index == 0) {
-                if (a->flags & 8) {
-                    a->elapsed = a->duration;
-                } else {
-                    a->index = a->frameCount - 1;
-                }
-                done = 1;
-            } else {
-                a->index--;
-                done = 0;
-            }
-        } else {
-            if (++a->index >= a->frameCount) {
-                if ((u8)(a->flags & 8)) {
-                    a->elapsed = a->duration;
-                    a->index = a->frameCount - 1;
-                    done = 1;
-                } else {
-                    a->index = 0;
-                    done = 1;
-                }
-            } else
-                done = 0;
-        }
-        entry = a->commands + a->index;
-        a->frameWeight = frame_factor(*entry);
-        a->duration = (a->frameWeight * a->speed) >> 6;
-        if (!a->duration)
-            a->duration = 1;
-    } else
-        done = 0;
+    done = DisplaySequence_StepSprite(o, a);
     p->done = done;
 }
 
@@ -3252,9 +2582,6 @@ void TutorialOtenko_UpdateRotatingAnimation7(struct ActorAnimController *p)
 {
     struct DisplaySequenceSprite *o;
     struct DisplaySequenceState *a;
-    const u16 *entry;
-    u32 flag;
-    u8 done;
     if (take(p)) {
         p->state = 7;
         Anim_SetSequence(&p->anim, p->arg, 7, 0, p->last);
@@ -3267,68 +2594,7 @@ void TutorialOtenko_UpdateRotatingAnimation7(struct ActorAnimController *p)
     rotate(p);
     o = &p->obj;
     a = &p->anim;
-    entry = a->commands + a->index;
-    {
-        u32 frame = *entry >> 6;
-        o->frame = frame;
-    }
-    {
-        union DisplaySequenceControl control;
-        u32 bit, first;
-        control.raw = a->flags;
-        bit = 1;
-        first = (u8)(control.raw & bit);
-        if (first != (((*entry & 0x30) >> 4) & bit))
-            o->flags |= 4;
-        else
-            o->flags &= ~4;
-    }
-    {
-        union DisplaySequenceControl control;
-        u32 bit, first;
-        control.raw = a->flags;
-        bit = 2;
-        first = (u8)(control.raw & bit);
-        if (first != (((*entry & 0x30) >> 4) & bit))
-            o->flags |= 8;
-        else
-            o->flags &= ~8;
-    }
-    if (++a->elapsed >= a->duration) {
-        a->elapsed = 0;
-        if (a->flags & 4) {
-            if (a->index == 0) {
-                if (a->flags & 8) {
-                    a->elapsed = a->duration;
-                } else {
-                    a->index = a->frameCount - 1;
-                }
-                done = 1;
-            } else {
-                a->index--;
-                done = 0;
-            }
-        } else {
-            if (++a->index >= a->frameCount) {
-                if ((u8)(a->flags & 8)) {
-                    a->elapsed = a->duration;
-                    a->index = a->frameCount - 1;
-                    done = 1;
-                } else {
-                    a->index = 0;
-                    done = 1;
-                }
-            } else
-                done = 0;
-        }
-        entry = a->commands + a->index;
-        a->frameWeight = frame_factor(*entry);
-        a->duration = (a->frameWeight * a->speed) >> 6;
-        if (!a->duration)
-            a->duration = 1;
-    } else
-        done = 0;
-    p->done = done;
+    p->done = DisplaySequence_StepSprite(o, a);
 }
 
 /* Tentative role: initialize and advance a rotating animated effect.
@@ -3338,9 +2604,6 @@ void TutorialOtenko_UpdateRotatingAnimation8(struct ActorAnimController *p)
 {
     struct DisplaySequenceSprite *o;
     struct DisplaySequenceState *a;
-    const u16 *entry;
-    u32 flag;
-    u8 done;
     if (take(p)) {
         p->state = 8;
         Anim_SetSequence(&p->anim, p->arg, 8, 0, p->last);
@@ -3353,68 +2616,7 @@ void TutorialOtenko_UpdateRotatingAnimation8(struct ActorAnimController *p)
     rotate(p);
     o = &p->obj;
     a = &p->anim;
-    entry = a->commands + a->index;
-    {
-        u32 frame = *entry >> 6;
-        o->frame = frame;
-    }
-    {
-        union DisplaySequenceControl control;
-        u32 bit, first;
-        control.raw = a->flags;
-        bit = 1;
-        first = (u8)(control.raw & bit);
-        if (first != (((*entry & 0x30) >> 4) & bit))
-            o->flags |= 4;
-        else
-            o->flags &= ~4;
-    }
-    {
-        union DisplaySequenceControl control;
-        u32 bit, first;
-        control.raw = a->flags;
-        bit = 2;
-        first = (u8)(control.raw & bit);
-        if (first != (((*entry & 0x30) >> 4) & bit))
-            o->flags |= 8;
-        else
-            o->flags &= ~8;
-    }
-    if (++a->elapsed >= a->duration) {
-        a->elapsed = 0;
-        if (a->flags & 4) {
-            if (a->index == 0) {
-                if (a->flags & 8) {
-                    a->elapsed = a->duration;
-                } else {
-                    a->index = a->frameCount - 1;
-                }
-                done = 1;
-            } else {
-                a->index--;
-                done = 0;
-            }
-        } else {
-            if (++a->index >= a->frameCount) {
-                if ((u8)(a->flags & 8)) {
-                    a->elapsed = a->duration;
-                    a->index = a->frameCount - 1;
-                    done = 1;
-                } else {
-                    a->index = 0;
-                    done = 1;
-                }
-            } else
-                done = 0;
-        }
-        entry = a->commands + a->index;
-        a->frameWeight = frame_factor(*entry);
-        a->duration = (a->frameWeight * a->speed) >> 6;
-        if (!a->duration)
-            a->duration = 1;
-    } else
-        done = 0;
-    p->done = done;
+    p->done = DisplaySequence_StepSprite(o, a);
 }
 
 /* Tentative role: initialize and advance a rotating animated effect.
@@ -3424,9 +2626,6 @@ void TutorialOtenko_UpdateRotatingAnimation9(struct ActorAnimController *p)
 {
     struct DisplaySequenceSprite *o;
     struct DisplaySequenceState *a;
-    const u16 *entry;
-    u32 flag;
-    u8 done;
     if (take(p)) {
         p->state = 9;
         Anim_SetSequence(&p->anim, p->arg, 9, 0, p->last);
@@ -3439,68 +2638,7 @@ void TutorialOtenko_UpdateRotatingAnimation9(struct ActorAnimController *p)
     rotate(p);
     o = &p->obj;
     a = &p->anim;
-    entry = a->commands + a->index;
-    {
-        u32 frame = *entry >> 6;
-        o->frame = frame;
-    }
-    {
-        union DisplaySequenceControl control;
-        u32 bit, first;
-        control.raw = a->flags;
-        bit = 1;
-        first = (u8)(control.raw & bit);
-        if (first != (((*entry & 0x30) >> 4) & bit))
-            o->flags |= 4;
-        else
-            o->flags &= ~4;
-    }
-    {
-        union DisplaySequenceControl control;
-        u32 bit, first;
-        control.raw = a->flags;
-        bit = 2;
-        first = (u8)(control.raw & bit);
-        if (first != (((*entry & 0x30) >> 4) & bit))
-            o->flags |= 8;
-        else
-            o->flags &= ~8;
-    }
-    if (++a->elapsed >= a->duration) {
-        a->elapsed = 0;
-        if (a->flags & 4) {
-            if (a->index == 0) {
-                if (a->flags & 8) {
-                    a->elapsed = a->duration;
-                } else {
-                    a->index = a->frameCount - 1;
-                }
-                done = 1;
-            } else {
-                a->index--;
-                done = 0;
-            }
-        } else {
-            if (++a->index >= a->frameCount) {
-                if ((u8)(a->flags & 8)) {
-                    a->elapsed = a->duration;
-                    a->index = a->frameCount - 1;
-                    done = 1;
-                } else {
-                    a->index = 0;
-                    done = 1;
-                }
-            } else
-                done = 0;
-        }
-        entry = a->commands + a->index;
-        a->frameWeight = frame_factor(*entry);
-        a->duration = (a->frameWeight * a->speed) >> 6;
-        if (!a->duration)
-            a->duration = 1;
-    } else
-        done = 0;
-    p->done = done;
+    p->done = DisplaySequence_StepSprite(o, a);
 }
 
 /* Tentative role: initialize and advance an animation with a previous-state callback.
