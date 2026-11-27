@@ -1,13 +1,6 @@
 #include "global.h"
+#include "engine/video/sprite_component.h"
 
-struct SpriteComponent {
-    void (*update)(struct SpriteComponent *);
-    void (*destroy)(struct SpriteComponent *);
-    u8 unknown08[0x48];
-    u32 position[2];
-    s16 frame;
-    s16 collisionStatus;
-};
 void Sound_PlaySong(u32);
 s32 Callback_InvokeActor(void *, void *);
 
