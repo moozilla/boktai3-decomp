@@ -4,6 +4,7 @@
 #include "player/cutscene/player_cue_sequence.h"
 #include "bosses/nidhoggr/nidhoggr_effect_motion_layout.h"
 #include "bosses/nidhoggr/nidhoggr_pool_sprite_layout.h"
+#include "bosses/nidhoggr/effect_delta_layout.h"
 
 struct NidhoggrAnimatedSlot {
     void *update, *onComplete;
@@ -21,11 +22,6 @@ struct NidhoggrTarget {
     s16 x, y, z;
 };
 // Packed coordinates preserve the unused upper halfword of the last word.
-struct EffectDelta {
-    s32 x : 16;
-    s32 y : 16;
-    s32 z : 16;
-};
 extern const u16 gUnk_086141BC[];
 extern const s16 gUnk_086149C4[];
 s32 Callback_InvokeActor(void *, void *);
