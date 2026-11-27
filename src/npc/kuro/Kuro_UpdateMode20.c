@@ -1,15 +1,7 @@
 #include "global.h"
-struct S {
-    u8 f[5];
-    u8 b5;
-    u8 f6;
-    u8 b7;
-    u8 b8;
-    u8 g[0x168 - 9];
-    u8 d[1];
-};
+#include "npc/kuro/kuro_command_actor_layout.h"
 void Trigger_ConsumePending(void *, s32);
-void Kuro_UpdateMode20(u32 a, struct S *p)
+void Kuro_UpdateMode20(u32 a, struct KuroCommandActor *p)
 {
     if (p->b8 != 0) {
         p->b8 = 0;
