@@ -56,11 +56,9 @@ def header_globals(ast, tu):
     for decl in ast.ext:
         if not isinstance(decl, c_ast.Decl) or not decl.name or not decl.coord:
             continue
-        t = tu.resolve(decl.type)
-        if isinstance(t, c_ast.FuncDecl):
+        if isinstance(tu.resolve(decl.type), c_ast.FuncDecl):
             continue
-        direct = evidence.record_of(tu, t)
-        pointee = evidence.record_of(tu, t.type) if isinstance(t, (c_ast.PtrDecl, c_ast.ArrayDecl)) else None
+        direct, pointee = evidence.global_record_types(tu, decl.type)
         if direct or pointee:
             by_file[Path(decl.coord.file).as_posix()].append([decl.name, direct, pointee])
     return by_file

@@ -72,6 +72,19 @@ def measure(text, path):
 
 
 class SourceEvidenceTests(unittest.TestCase):
+    def test_global_record_array_is_inline_storage(self):
+        path = "src/records.c"
+        text = """
+struct Entry { unsigned state; };
+extern struct Entry entries[2];
+extern struct Entry *selected;
+extern struct Entry *pointers[2];
+"""
+        _, _, ast, tu = parse(text, path)
+        key = f"{path}:struct Entry"
+        self.assertEqual(evidence.References(ast, tu, path).globals,
+                         [("entries", key, None), ("selected", None, key), ("pointers", None, None)])
+
     def test_pointer_arithmetic_and_array_member(self):
         path = "src/moved/a.c"
         _, _, ast, tu = parse(A, path)
