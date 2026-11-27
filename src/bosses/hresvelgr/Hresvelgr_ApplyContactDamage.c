@@ -2,13 +2,11 @@
 #include "engine/engine_globals.h"
 #include "engine/ram.h"
 #include "scene/collision/packed_contact_vector.h"
+#include "recovered/contact_reaction_vector_layout.h"
 
-struct ShortVector {
-    s16 x, y, z, pad;
-};
 struct DamageTransform {
     u8 unk_00[0xc];
-    struct ShortVector coordinates;
+    struct ContactReactionVector coordinates;
 };
 struct HresvelgrDamage {
     u8 unk_00[0x48];
@@ -32,7 +30,7 @@ struct HresvelgrDamage {
     u8 unk_C0[0x40];
     void (*callback)(void *);
     u8 unk_104[0xb0];
-    struct ShortVector renderPosition;
+    struct ContactReactionVector renderPosition;
     u8 unk_1BC[0x12];
     u16 paletteId;
     u8 unk_1D0[0xc];
@@ -101,7 +99,7 @@ static inline void setReaction(struct HresvelgrDamage *p, void (*callback)(void 
     p->stateReset = 0;
     p->pending = 0;
 }
-static inline void setScale(struct ShortVector *v, s16 x, s16 y, s16 z)
+static inline void setScale(struct ContactReactionVector *v, s16 x, s16 y, s16 z)
 {
     v->x = x;
     v->y = y;
@@ -192,7 +190,7 @@ s32 Hresvelgr_ApplyContactDamage(struct HresvelgrDamage *p)
     saved->flashTimer = 10;
     setHitPalette(saved, 0x2f7);
     {
-        struct ShortVector scale;
+        struct ContactReactionVector scale;
         setScale(&scale, 16, 0, 16);
         DamageNumberDisplay_Show(display, damage, 0, &transform->coordinates, &scale, 1);
     }

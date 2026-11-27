@@ -10,6 +10,7 @@
 #include "engine/math/hit_spark_random.h"
 #include "bosses/state_actor_action_entry.h"
 #include "scene/collision/contact_position.h"
+#include "recovered/contact_reaction_vector_layout.h"
 
 int SceneActorGraphics_GetResourceId(struct StateActor *p)
 {
@@ -86,16 +87,13 @@ void DamageNumberDisplay_Show(void *, u32, u32, void *, void *, u32);
 s32 Math_Atan2(s32, s32);
 s32 WirelessGame_TryAddCyclingItem(void *);
 void WirelessGame_AddItem(void *, s32);
-struct ContactVector {
-    s16 x, y, z;
-};
 
 void SceneActorGraphics_OnDamageContact(u8 *source, u8 *contact, u8 *p)
 {
     u8 *actor = p;
     u8 *sprite = p + 0x48;
     u32 mode;
-    struct ContactVector size;
+    struct ContactReactionVector size;
     u8 *position;
     s32 item;
     u16 responseValue;
@@ -642,7 +640,7 @@ s32 sub_08022B18(struct ReactionActor *p, s32 kind, s32 damage)
                 result = 0;
             }
             if (damage > 0) {
-                struct ContactVector size;
+                struct ContactReactionVector size;
                 size.x = 0x20;
                 size.y = 0;
                 size.z = 0x20;
