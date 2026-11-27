@@ -1,8 +1,6 @@
 #include "global.h"
 #include "effects/screen/background_controller.h"
-struct MoverPosition {
-    s32 x, y, z;
-};
+#include "bosses/vanargand/mover_position_layout.h"
 struct MoverScreen {
     s16 x, y, z;
 };
