@@ -211,7 +211,7 @@ void TutorialOtenko_ProjectAndClampToScreen(struct ActorAnimController *p)
 {
     struct Vec pos;
     p->obj.flags |= 0x30;
-    screen(&pos, (struct Vec *)&p->obj.x);
+    screen(&pos, (struct Vec *)&p->obj.position.x);
     if (pos.x > 240)
         pos.x = 240;
     else if (pos.x < 0)
@@ -220,9 +220,9 @@ void TutorialOtenko_ProjectAndClampToScreen(struct ActorAnimController *p)
         pos.y = 160;
     else if (pos.y < 0)
         pos.y = 0;
-    p->obj.x = pos.x;
-    p->obj.y = pos.y;
-    p->obj.z = 0;
+    p->obj.position.x = pos.x;
+    p->obj.position.y = pos.y;
+    p->obj.position.z = 0;
 }
 
 // Provisional name: TutorialOtenko_TryInteraction
@@ -303,9 +303,9 @@ void TutorialOtenko_TryInteraction(struct ActorAnimController *p, struct Interac
         return;
     if (q->request)
         Script_Call(q->request, 0);
-    p->obj.x = q->x;
-    p->obj.y = q->y;
-    p->obj.z = q->z;
+    p->obj.position.x = q->x;
+    p->obj.position.y = q->y;
+    p->obj.position.z = q->z;
     p->handle = q->handle;
     p->option = q->option;
     if (q->flags & 16) {
@@ -489,8 +489,8 @@ static inline s32 absolute(s32 x)
 
 void TutorialOtenko_UpdateScaleGrowth(struct ActorAnimController *p)
 {
-    s32 x = p->obj.scaleX;
-    s32 y = p->obj.scaleY;
+    s32 x = (s8)p->obj.palette;
+    s32 y = (s8)p->obj.paletteVariant;
     x += 2;
     y += 2;
     if (x > 127) {
@@ -498,22 +498,22 @@ void TutorialOtenko_UpdateScaleGrowth(struct ActorAnimController *p)
         x = 127;
         p->scaleFn = 0;
     }
-    p->obj.scaleX = x;
-    p->obj.scaleY = y;
+    p->obj.palette = x;
+    p->obj.paletteVariant = y;
 }
 
 /* Tentative role: arm the idle animation transition at its resting position. */
 
 void TutorialOtenko_ArmRestIdleTransition(struct ActorAnimController *p)
 {
-    if (p->obj.x == 25 && p->obj.z == 0 && absolute(p->obj.y - 102) <= 9) {
+    if (p->obj.position.x == 25 && p->obj.position.z == 0 && absolute(p->obj.position.y - 102) <= 9) {
         p->timer = 0;
         p->fn = TutorialOtenko_UpdateIdleWait;
         if (gSunClock[14] == 5 || gSunClock[14] == 0 || gSunClock[14] == 4)
             p->delay = 1800;
         else
             p->delay = 10800;
-        if (p->growFlag && p->obj.scaleX != 127 && (p->obj.flags & 16))
+        if (p->growFlag && (s8)p->obj.palette != 127 && (p->obj.flags & 16))
             p->scaleFn = TutorialOtenko_UpdateScaleGrowth;
     } else
         p->fn = 0;
@@ -552,7 +552,7 @@ void TutorialOtenko_UpdateIdleWait(struct ActorAnimController *p)
                 *field = one;
                 p->fn = TutorialOtenko_UpdateIdlePhaseRestoration;
                 p->count = zero;
-                p->savedY2 = p->obj.y;
+                p->savedY2 = p->obj.position.y;
             }
         }
     }
@@ -596,7 +596,7 @@ void TutorialOtenko_UpdateIdlePhaseRestoration(struct ActorAnimController *p)
         p->count = 0;
     }
     if (p->interrupted && p->done) {
-        p->obj.y = p->savedY2 - 1;
+        p->obj.position.y = p->savedY2 - 1;
         p->timer = 0;
         p->fn = TutorialOtenko_UpdateIdleWait;
         TutorialOtenko_SetState(p, 3, p->savedPhase);
@@ -989,21 +989,21 @@ void TutorialOtenko_BeginPositionedEffect(void)
             return;
     }
     if (Script_SeekToKeyword(0x70)) {
-        g->obj.x = Script_GetValue();
-        g->obj.y = Script_GetValue();
-        g->obj.z = Script_GetValue();
+        g->obj.position.x = Script_GetValue();
+        g->obj.position.y = Script_GetValue();
+        g->obj.position.z = Script_GetValue();
     } else {
         {
             u32 value = (u16)g->owner->position.x;
-            g->obj.x = value;
+            g->obj.position.x = value;
         }
         {
             u32 value = (u16)g->owner->position.y + 160;
-            g->obj.y = value;
+            g->obj.position.y = value;
         }
         {
             u32 value = (u16)g->owner->position.z;
-            g->obj.z = value;
+            g->obj.position.z = value;
         }
     }
     TutorialOtenko_SetState(g, 2, 14);
@@ -1216,7 +1216,7 @@ static inline u32 frame_factor(u16 v)
 
 void TutorialOtenko_UpdateRotatingAnimation(struct ActorAnimController *p)
 {
-    struct ActorSprite *o;
+    struct DisplaySequenceSprite *o;
     struct DisplaySequenceState *a;
     const u16 *entry;
     u32 flag;
@@ -1291,7 +1291,7 @@ void TutorialOtenko_UpdateRotatingAnimation(struct ActorAnimController *p)
 
 void TutorialOtenko_UpdateAppearanceAnimation(struct ActorAnimController *p)
 {
-    struct ActorSprite *o;
+    struct DisplaySequenceSprite *o;
     struct DisplaySequenceState *a;
     const u16 *entry;
     u32 flag;
@@ -1302,10 +1302,10 @@ void TutorialOtenko_UpdateAppearanceAnimation(struct ActorAnimController *p)
         p->obj.flags &= ~1;
         p->obj.flags &= ~16;
         p->obj.flags &= ~32;
-        p->obj.scaleY = 64;
-        p->obj.scaleX = 64;
-        (*(u16 *)&p->obj.y) += 160;
-        p->savedY = (*(u16 *)&p->obj.y);
+        p->obj.paletteVariant = 64;
+        p->obj.palette = 64;
+        (*(u16 *)&p->obj.position.y) += 160;
+        p->savedY = (*(u16 *)&p->obj.position.y);
         Sound_PlaySong(286);
         TutorialOtenko_SetInteractionControlFlag(p);
         AnimData_SelectPaletteBank(p->effect, 343);
@@ -1396,7 +1396,7 @@ void TutorialOtenko_UpdateAppearanceAnimation(struct ActorAnimController *p)
 
 void TutorialOtenko_UpdateCompactEntryAnimation(struct ActorAnimController *p)
 {
-    struct ActorSprite *o;
+    struct DisplaySequenceSprite *o;
     struct DisplaySequenceState *a;
     const u16 *entry;
     u32 flag;
@@ -1412,8 +1412,8 @@ void TutorialOtenko_UpdateCompactEntryAnimation(struct ActorAnimController *p)
         Anim_SetSequence(&p->anim, p->arg, 1, 0, p->next);
         p->obj.flags &= ~1;
         p->obj.flags |= 48;
-        p->obj.scaleY = 64;
-        p->obj.scaleX = 64;
+        p->obj.paletteVariant = 64;
+        p->obj.palette = 64;
         ActorShadow_Disable(p->p2);
         Sound_PlaySong(286);
         TutorialOtenko_SetInteractionControlFlag(p);
@@ -1497,7 +1497,7 @@ void TutorialOtenko_UpdateCompactEntryAnimation(struct ActorAnimController *p)
 
 void TutorialOtenko_UpdateProjectedEntryAnimation(struct ActorAnimController *p)
 {
-    struct ActorSprite *o;
+    struct DisplaySequenceSprite *o;
     struct DisplaySequenceState *a;
     const u16 *entry;
     u32 flag;
@@ -1513,11 +1513,11 @@ void TutorialOtenko_UpdateProjectedEntryAnimation(struct ActorAnimController *p)
         Anim_SetSequence(&p->anim, p->arg, 1, 0, p->next);
         p->variant8 = zero;
         p->obj.flags &= ~1;
-        p->obj.scaleY = 64;
-        p->obj.scaleX = 64;
+        p->obj.paletteVariant = 64;
+        p->obj.palette = 64;
         TutorialOtenko_ProjectAndClampToScreen(p);
-        (*(u16 *)&p->obj.y) += 8;
-        p->savedY = (*(u16 *)&p->obj.y);
+        (*(u16 *)&p->obj.position.y) += 8;
+        p->savedY = (*(u16 *)&p->obj.position.y);
         ActorShadow_Disable(p->p2);
         Sound_PlaySong(286);
         TutorialOtenko_SetInteractionControlFlag(p);
@@ -1602,7 +1602,7 @@ void TutorialOtenko_UpdateProjectedEntryAnimation(struct ActorAnimController *p)
 
 void TutorialOtenko_UpdateSilentProjectedEntryAnimation(struct ActorAnimController *p)
 {
-    struct ActorSprite *o;
+    struct DisplaySequenceSprite *o;
     struct DisplaySequenceState *a;
     const u16 *entry;
     u32 flag;
@@ -1618,11 +1618,11 @@ void TutorialOtenko_UpdateSilentProjectedEntryAnimation(struct ActorAnimControll
         Anim_SetSequence(&p->anim, p->arg, 1, 0, p->next);
         p->variant8 = zero;
         p->obj.flags &= ~1;
-        p->obj.scaleY = 64;
-        p->obj.scaleX = 64;
+        p->obj.paletteVariant = 64;
+        p->obj.palette = 64;
         TutorialOtenko_ProjectAndClampToScreen(p);
-        (*(u16 *)&p->obj.y) += 8;
-        p->savedY = (*(u16 *)&p->obj.y);
+        (*(u16 *)&p->obj.position.y) += 8;
+        p->savedY = (*(u16 *)&p->obj.position.y);
         ActorShadow_Disable(p->p2);
         TutorialOtenko_SetInteractionControlFlag(p);
         AnimData_SelectPaletteBank(p->effect, 343);
@@ -1706,7 +1706,7 @@ void TutorialOtenko_UpdateSilentProjectedEntryAnimation(struct ActorAnimControll
 
 void TutorialOtenko_UpdateShadowedRestAnimation(struct ActorAnimController *p)
 {
-    struct ActorSprite *o;
+    struct DisplaySequenceSprite *o;
     struct DisplaySequenceState *a;
     const u16 *entry;
     u32 flag;
@@ -1715,10 +1715,10 @@ void TutorialOtenko_UpdateShadowedRestAnimation(struct ActorAnimController *p)
         p->obj.flags &= ~1;
         p->obj.flags &= ~16;
         p->obj.flags &= ~32;
-        p->obj.scaleY = 64;
-        p->obj.scaleX = 64;
-        (*(u16 *)&p->obj.y) += 160;
-        p->savedY = (*(u16 *)&p->obj.y);
+        p->obj.paletteVariant = 64;
+        p->obj.palette = 64;
+        (*(u16 *)&p->obj.position.y) += 160;
+        p->savedY = (*(u16 *)&p->obj.position.y);
         ActorShadow_Enable(p->p2);
         TutorialOtenko_SetInteractionControlFlag(p);
         AnimData_SelectPaletteBank(p->effect, 343);
@@ -1808,7 +1808,7 @@ void TutorialOtenko_UpdateShadowedRestAnimation(struct ActorAnimController *p)
 
 void TutorialOtenko_UpdateLargeRestAnimation(struct ActorAnimController *p)
 {
-    struct ActorSprite *o;
+    struct DisplaySequenceSprite *o;
     struct DisplaySequenceState *a;
     const u16 *entry;
     u32 flag;
@@ -1816,8 +1816,8 @@ void TutorialOtenko_UpdateLargeRestAnimation(struct ActorAnimController *p)
     if (take(p)) {
         p->obj.flags &= ~1;
         p->obj.flags |= 48;
-        p->obj.scaleY = 127;
-        p->obj.scaleX = 127;
+        p->obj.paletteVariant = 127;
+        p->obj.palette = 127;
         ActorShadow_Disable(p->p2);
         TutorialOtenko_SetInteractionControlFlag(p);
         AnimData_SelectPaletteBank(p->effect, 343);
@@ -1907,7 +1907,7 @@ void TutorialOtenko_UpdateLargeRestAnimation(struct ActorAnimController *p)
 
 void TutorialOtenko_HideAndResetChildren(struct ActorAnimController *p)
 {
-    struct ActorSprite *o;
+    struct DisplaySequenceSprite *o;
     struct DisplaySequenceState *a;
     const u16 *entry;
     u32 flag;
@@ -1970,19 +1970,19 @@ static inline void set_direction(s16 angle, u8 *directionOut, u8 *flipOut)
 
 void TutorialOtenko_MoveAlongCurveToRest(struct ActorAnimController *p)
 {
-    struct ActorSprite *o;
+    struct DisplaySequenceSprite *o;
     struct DisplaySequenceState *a;
     const u16 *entry;
     u8 done;
     if (take(p)) {
         p->timer = 0;
-        p->startX = p->obj.x;
-        p->startY = p->obj.y;
-        p->startZ = p->obj.z;
+        p->startX = p->obj.position.x;
+        p->startY = p->obj.position.y;
+        p->startZ = p->obj.position.z;
         p->state = 0;
         p->bend = (p->variant & 1) ? 1 : -1;
         ActorShadow_Disable(p->p2);
-        if (p->growFlag && p->obj.scaleX != 127 && (p->obj.flags & 16))
+        if (p->growFlag && (s8)p->obj.palette != 127 && (p->obj.flags & 16))
             p->scaleFn = TutorialOtenko_UpdateScaleGrowth;
         if (!p->variant8) {
             p->targetX = 25;
@@ -1998,7 +1998,7 @@ void TutorialOtenko_MoveAlongCurveToRest(struct ActorAnimController *p)
             p->targetZ = 0;
         }
     }
-    p->heading = Math_Atan2(p->targetX - p->obj.x, p->targetY - p->obj.y);
+    p->heading = Math_Atan2(p->targetX - p->obj.position.x, p->targetY - p->obj.position.y);
     o = &p->obj;
     a = &p->anim;
     entry = a->commands + a->index;
@@ -2061,8 +2061,8 @@ void TutorialOtenko_MoveAlongCurveToRest(struct ActorAnimController *p)
         done = 0;
     p->done = done;
     if (p->timer++ > 31) {
-        p->obj.x = p->targetX;
-        p->obj.y = p->targetY;
+        p->obj.position.x = p->targetX;
+        p->obj.position.y = p->targetY;
         TutorialOtenko_SetState(p, 3, 1);
         if (p->handle) {
             void *handle = p->handle;
@@ -2074,13 +2074,13 @@ void TutorialOtenko_MoveAlongCurveToRest(struct ActorAnimController *p)
         Anim_SetSequence(&p->anim, p->arg, p->state, p->direction, p->flip);
         {
             s32 delta = p->targetX - p->startX;
-            p->obj.x = p->startX + Div(delta * p->timer, 32);
+            p->obj.position.x = p->startX + Div(delta * p->timer, 32);
         }
         {
             s32 delta = p->targetY - p->startY;
             s32 y = (u16)p->startY + Div(delta * p->timer, 32);
             s32 bend = p->bend;
-            p->obj.y = y + bend * (gUnk_086149C4[(p->timer * 4) & 255] >> 7);
+            p->obj.position.y = y + bend * (gUnk_086149C4[(p->timer * 4) & 255] >> 7);
         }
     }
 }
@@ -2092,24 +2092,24 @@ void TutorialOtenko_MoveAlongCurveToRest(struct ActorAnimController *p)
 
 void TutorialOtenko_MoveAlongScriptedCurve(struct ActorAnimController *p)
 {
-    struct ActorSprite *o;
+    struct DisplaySequenceSprite *o;
     struct DisplaySequenceState *a;
     const u16 *entry;
     u8 done;
     if (take(p)) {
         p->timer = 0;
-        p->startX = p->obj.x;
-        p->startY = p->obj.y;
-        p->startZ = p->obj.z;
-        p->deltaX = p->targetX - p->obj.x;
-        p->deltaY = p->targetY - p->obj.y;
+        p->startX = p->obj.position.x;
+        p->startY = p->obj.position.y;
+        p->startZ = p->obj.position.z;
+        p->deltaX = p->targetX - p->obj.position.x;
+        p->deltaY = p->targetY - p->obj.position.y;
         p->state = 0;
         p->bend = (p->variant & 1) ? 1 : -1;
         ActorShadow_Disable(p->p2);
-        if (p->obj.scaleX != 127 && (p->obj.flags & 16))
+        if ((s8)p->obj.palette != 127 && (p->obj.flags & 16))
             p->scaleFn = TutorialOtenko_UpdateScaleGrowth;
     }
-    p->heading = Math_Atan2(p->targetX - p->obj.x, p->targetY - p->obj.y);
+    p->heading = Math_Atan2(p->targetX - p->obj.position.x, p->targetY - p->obj.position.y);
     o = &p->obj;
     a = &p->anim;
     entry = a->commands + a->index;
@@ -2172,8 +2172,8 @@ void TutorialOtenko_MoveAlongScriptedCurve(struct ActorAnimController *p)
         done = 0;
     p->done = done;
     if (p->timer++ > 31) {
-        p->obj.x = p->targetX;
-        p->obj.y = p->targetY;
+        p->obj.position.x = p->targetX;
+        p->obj.position.y = p->targetY;
         TutorialOtenko_SetState(p, 3, 1);
         if (p->handle) {
             void *handle = p->handle;
@@ -2183,7 +2183,7 @@ void TutorialOtenko_MoveAlongScriptedCurve(struct ActorAnimController *p)
     } else {
         set_direction(p->heading - 16, &p->direction, &p->flip);
         Anim_SetSequence(&p->anim, p->arg, p->state, p->direction, p->flip);
-        p->obj.x = p->startX + Div(p->deltaX * p->timer, 32);
+        p->obj.position.x = p->startX + Div(p->deltaX * p->timer, 32);
         {
             s32 y = Div(p->deltaY * p->timer, 32);
             s32 sine = gUnk_086149C4[(p->timer * 4) & 255];
@@ -2191,7 +2191,7 @@ void TutorialOtenko_MoveAlongScriptedCurve(struct ActorAnimController *p)
             s32 product = bend * 30;
             product *= sine;
             sine = product >= 0 ? product >> 12 : -((-product) >> 12);
-            p->obj.y = (u16)p->startY + y + sine;
+            p->obj.position.y = (u16)p->startY + y + sine;
         }
     }
 }
@@ -2245,8 +2245,8 @@ void TutorialOtenko_MoveTowardTarget(struct ActorAnimController *p)
 {
     s32 dx, dz, adx, adz;
 
-    dx = p->targetX - p->obj.x;
-    dz = p->targetZ - p->obj.z;
+    dx = p->targetX - p->obj.position.x;
+    dz = p->targetZ - p->obj.position.z;
     p->heading = Math_Atan2(dx, dz);
 
     if (TakeApproachEntry(p)) {
@@ -2268,8 +2268,8 @@ void TutorialOtenko_MoveTowardTarget(struct ActorAnimController *p)
     adx = dx < 0 ? -dx : dx;
     adz = dz < 0 ? -dz : dz;
     if (adx + adz <= 9 && p->heightSettled != 0) {
-        p->obj.x = p->targetX;
-        p->obj.z = p->targetZ;
+        p->obj.position.x = p->targetX;
+        p->obj.position.z = p->targetZ;
         if (p->targetFacing >= 0) {
             s8 row;
             u32 flip = 0;
@@ -2288,19 +2288,19 @@ void TutorialOtenko_MoveTowardTarget(struct ActorAnimController *p)
     }
 
     if (p->heightSettled == 0) {
-        if (p->targetY > p->obj.y) {
-            p->obj.y += 7;
+        if (p->targetY > p->obj.position.y) {
+            p->obj.position.y += 7;
             p->savedY += 7;
-            if (p->targetY < p->obj.y) {
-                p->obj.y = p->targetY;
+            if (p->targetY < p->obj.position.y) {
+                p->obj.position.y = p->targetY;
                 p->savedY = p->targetY;
                 p->heightSettled = 1;
             }
-        } else if (p->targetY < p->obj.y) {
-            p->obj.y -= 7;
+        } else if (p->targetY < p->obj.position.y) {
+            p->obj.position.y -= 7;
             p->savedY -= 7;
-            if (p->targetY > p->obj.y) {
-                p->obj.y = p->targetY;
+            if (p->targetY > p->obj.position.y) {
+                p->obj.position.y = p->targetY;
                 p->savedY = p->targetY;
                 p->heightSettled = 1;
             }
@@ -2315,10 +2315,10 @@ void TutorialOtenko_MoveTowardTarget(struct ActorAnimController *p)
         p->deltaX = Div(sine[((s16)p->heading + 64) & 255], 500);
         sinv = sine[p->heading & 255];
         p->deltaZ = Div(sinv, 500);
-        p->obj.x += p->deltaX;
-        p->obj.z += p->deltaZ;
-        p->savedX = p->obj.x;
-        p->savedZ = p->obj.z;
+        p->obj.position.x += p->deltaX;
+        p->obj.position.z += p->deltaZ;
+        p->savedX = p->obj.position.x;
+        p->savedZ = p->obj.position.z;
     }
 }
 
@@ -2327,7 +2327,7 @@ void TutorialOtenko_MoveTowardTarget(struct ActorAnimController *p)
 
 void TutorialOtenko_UpdateFadeAnimation(struct ActorAnimController *p)
 {
-    struct ActorSprite *o;
+    struct DisplaySequenceSprite *o;
     struct DisplaySequenceState *a;
     const u16 *entry;
     u32 flag;
@@ -2410,7 +2410,7 @@ void TutorialOtenko_UpdateFadeAnimation(struct ActorAnimController *p)
 
 void TutorialOtenko_UpdateReverseFadeAnimation(struct ActorAnimController *p)
 {
-    struct ActorSprite *o;
+    struct DisplaySequenceSprite *o;
     struct DisplaySequenceState *a;
     const u16 *entry;
     u32 flag;
@@ -2491,7 +2491,7 @@ void TutorialOtenko_UpdateReverseFadeAnimation(struct ActorAnimController *p)
 
 void TutorialOtenko_UpdateNotifyingAnimation(struct ActorAnimController *p)
 {
-    struct ActorSprite *o;
+    struct DisplaySequenceSprite *o;
     struct DisplaySequenceState *a;
     const u16 *entry;
     u32 flag;
@@ -2580,7 +2580,7 @@ void TutorialOtenko_UpdateNotifyingAnimation(struct ActorAnimController *p)
 
 void TutorialOtenko_InitPaletteEffectPose(struct ActorAnimController *p)
 {
-    struct ActorSprite *o;
+    struct DisplaySequenceSprite *o;
     struct DisplaySequenceState *a;
     const u16 *entry;
     u32 flag;
@@ -2664,7 +2664,7 @@ void ImpactParticleGroup_SpawnRadial(s32, s32, void *, s32, s32, s32, s32, s32, 
 
 void TutorialOtenko_UpdateBlinkBurstDisappearance(struct ActorAnimController *p)
 {
-    struct ActorSprite *o;
+    struct DisplaySequenceSprite *o;
     struct DisplaySequenceState *a;
     const u16 *entry;
     u32 flag;
@@ -2744,25 +2744,25 @@ void TutorialOtenko_UpdateBlinkBurstDisappearance(struct ActorAnimController *p)
             p->obj.flags |= 1;
         if (--(*(u16 *)&p->blinkInterval) == 0) {
             s32 duration = 10;
-            ImpactBurst_EmitBurst(&p->obj.x, 1, 512, 48, 8, 8, 8, 4);
-            ImpactBurst_EmitBurst(&p->obj.x, 1, 512, 48, 8, 8, 8, 4);
-            ImpactBurst_EmitBurst(&p->obj.x, 1, 512, 48, 8, 8, 8, 4);
-            ImpactBurst_EmitBurst(&p->obj.x, 1, 512, 48, 8, 8, 8, 4);
-            ImpactParticleGroup_SpawnRadial(1, 3, &p->obj.x, 32, 60, duration, 3, duration, 5, 60,
+            ImpactBurst_EmitBurst(&p->obj.position.x, 1, 512, 48, 8, 8, 8, 4);
+            ImpactBurst_EmitBurst(&p->obj.position.x, 1, 512, 48, 8, 8, 8, 4);
+            ImpactBurst_EmitBurst(&p->obj.position.x, 1, 512, 48, 8, 8, 8, 4);
+            ImpactBurst_EmitBurst(&p->obj.position.x, 1, 512, 48, 8, 8, 8, 4);
+            ImpactParticleGroup_SpawnRadial(1, 3, &p->obj.position.x, 32, 60, duration, 3, duration, 5, 60,
                                             duration);
-            ImpactParticleGroup_SpawnRadial(1, 3, &p->obj.x, 64, 60, duration, 3, duration, 5, 60,
+            ImpactParticleGroup_SpawnRadial(1, 3, &p->obj.position.x, 64, 60, duration, 3, duration, 5, 60,
                                             duration);
-            ImpactParticleGroup_SpawnRadial(1, 3, &p->obj.x, 96, 60, duration, 3, duration, 5, 60,
+            ImpactParticleGroup_SpawnRadial(1, 3, &p->obj.position.x, 96, 60, duration, 3, duration, 5, 60,
                                             duration);
-            ImpactParticleGroup_SpawnRadial(1, 3, &p->obj.x, 128, 60, duration, 3, duration, 5, 60,
+            ImpactParticleGroup_SpawnRadial(1, 3, &p->obj.position.x, 128, 60, duration, 3, duration, 5, 60,
                                             duration);
-            ImpactParticleGroup_SpawnRadial(1, 3, &p->obj.x, 160, 60, duration, 3, duration, 5, 60,
+            ImpactParticleGroup_SpawnRadial(1, 3, &p->obj.position.x, 160, 60, duration, 3, duration, 5, 60,
                                             duration);
-            ImpactParticleGroup_SpawnRadial(1, 3, &p->obj.x, 192, 60, duration, 3, duration, 5, 60,
+            ImpactParticleGroup_SpawnRadial(1, 3, &p->obj.position.x, 192, 60, duration, 3, duration, 5, 60,
                                             duration);
-            ImpactParticleGroup_SpawnRadial(1, 3, &p->obj.x, 224, 60, duration, 3, duration, 5, 60,
+            ImpactParticleGroup_SpawnRadial(1, 3, &p->obj.position.x, 224, 60, duration, 3, duration, 5, 60,
                                             duration);
-            ImpactParticleGroup_SpawnRadial(1, 3, &p->obj.x, 256, 60, duration, 3, duration, 5, 60,
+            ImpactParticleGroup_SpawnRadial(1, 3, &p->obj.position.x, 256, 60, duration, 3, duration, 5, 60,
                                             duration);
             ActorShadow_Disable(p->p2);
             p->obj.flags |= 1;
@@ -2801,7 +2801,7 @@ void TutorialOtenko_OnAnimationNoOp(void)
 
 void TutorialOtenko_UpdateRotatingAnimation2(struct ActorAnimController *p)
 {
-    struct ActorSprite *o;
+    struct DisplaySequenceSprite *o;
     struct DisplaySequenceState *a;
     const u16 *entry;
     u32 flag;
@@ -2887,7 +2887,7 @@ void TutorialOtenko_UpdateRotatingAnimation2(struct ActorAnimController *p)
 
 void TutorialOtenko_UpdateRotatingAnimation3(struct ActorAnimController *p)
 {
-    struct ActorSprite *o;
+    struct DisplaySequenceSprite *o;
     struct DisplaySequenceState *a;
     const u16 *entry;
     u32 flag;
@@ -2973,7 +2973,7 @@ void TutorialOtenko_UpdateRotatingAnimation3(struct ActorAnimController *p)
 
 void TutorialOtenko_UpdateRotatingAnimation4(struct ActorAnimController *p)
 {
-    struct ActorSprite *o;
+    struct DisplaySequenceSprite *o;
     struct DisplaySequenceState *a;
     const u16 *entry;
     u32 flag;
@@ -3059,7 +3059,7 @@ void TutorialOtenko_UpdateRotatingAnimation4(struct ActorAnimController *p)
 
 void TutorialOtenko_UpdateRotatingAnimation5(struct ActorAnimController *p)
 {
-    struct ActorSprite *o;
+    struct DisplaySequenceSprite *o;
     struct DisplaySequenceState *a;
     const u16 *entry;
     u32 flag;
@@ -3160,12 +3160,12 @@ static inline void rotate_v2(struct ActorAnimController *p)
             break;
     }
     if (Mod(p->anim.elapsed, 5) == 0)
-        (*(u16 *)&p->obj.y) += p->delta;
+        (*(u16 *)&p->obj.position.y) += p->delta;
 }
 
 void TutorialOtenko_UpdateRotatingAnimation6(struct ActorAnimController *p)
 {
-    struct ActorSprite *o;
+    struct DisplaySequenceSprite *o;
     struct DisplaySequenceState *a;
     const u16 *entry;
     u32 flag;
@@ -3250,7 +3250,7 @@ void TutorialOtenko_UpdateRotatingAnimation6(struct ActorAnimController *p)
 
 void TutorialOtenko_UpdateRotatingAnimation7(struct ActorAnimController *p)
 {
-    struct ActorSprite *o;
+    struct DisplaySequenceSprite *o;
     struct DisplaySequenceState *a;
     const u16 *entry;
     u32 flag;
@@ -3336,7 +3336,7 @@ void TutorialOtenko_UpdateRotatingAnimation7(struct ActorAnimController *p)
 
 void TutorialOtenko_UpdateRotatingAnimation8(struct ActorAnimController *p)
 {
-    struct ActorSprite *o;
+    struct DisplaySequenceSprite *o;
     struct DisplaySequenceState *a;
     const u16 *entry;
     u32 flag;
@@ -3422,7 +3422,7 @@ void TutorialOtenko_UpdateRotatingAnimation8(struct ActorAnimController *p)
 
 void TutorialOtenko_UpdateRotatingAnimation9(struct ActorAnimController *p)
 {
-    struct ActorSprite *o;
+    struct DisplaySequenceSprite *o;
     struct DisplaySequenceState *a;
     const u16 *entry;
     u32 flag;
@@ -3508,7 +3508,7 @@ void TutorialOtenko_UpdateRotatingAnimation9(struct ActorAnimController *p)
 
 void TutorialOtenko_UpdateFinishingAnimation(struct ActorAnimController *p)
 {
-    struct ActorSprite *o;
+    struct DisplaySequenceSprite *o;
     struct DisplaySequenceState *a;
     const u16 *entry;
     u32 flag;
@@ -3653,7 +3653,7 @@ void TutorialOtenko_UpdateRotatingShrink(struct ActorAnimController *p)
 
 void sub_081E99EC(struct ActorAnimController *p)
 {
-    struct ActorSprite *o;
+    struct DisplaySequenceSprite *o;
     struct DisplaySequenceState *a;
     const u16 *entry;
     u32 flag;
@@ -3910,8 +3910,8 @@ struct InteractionChildHandler {
 };
 
 struct ScriptInteractionChild {
-    struct ActorSprite sprite;
-    u8 unknown24[0x48 - 0x24];
+    struct DisplaySequenceSprite sprite;
+    u8 unknown2C[0x48 - 0x2C];
     struct Vec world;
     u8 unknown50[0xA4 - 0x50];
     s32 completionScript, startScript;
@@ -3997,7 +3997,7 @@ void TutorialOtenko_ConfigureInteractionChildFromScript(void)
 
     for (; i < 16; i++) {
         if (handler->control & 2) {
-            struct ActorSprite *selectedSprite;
+            struct DisplaySequenceSprite *selectedSprite;
             u8 *completionBase;
             u8 direction;
             handler->control = 4;
@@ -4040,22 +4040,22 @@ void TutorialOtenko_ConfigureInteractionChildFromScript(void)
             direction = *orientation;
             if (direction) {
                 world->x = position.x;
-                selectedSprite->x = position.x;
+                selectedSprite->position.x = position.x;
                 world->y = position.y;
-                selectedSprite->y = position.y;
+                selectedSprite->position.y = position.y;
                 world->z = position.z;
-                selectedSprite->z = position.z - 128;
+                selectedSprite->position.z = position.z - 128;
             } else {
                 world->x = position.x;
-                selectedSprite->x = position.x - 128;
+                selectedSprite->position.x = position.x - 128;
                 world->y = position.y;
-                selectedSprite->y = position.y;
+                selectedSprite->position.y = position.y;
                 world->z = position.z;
-                selectedSprite->z = position.z;
+                selectedSprite->position.z = position.z;
             }
-            selectedSprite->x += 60;
-            selectedSprite->z += 60;
-            selectedSprite->y += 84;
+            selectedSprite->position.x += 60;
+            selectedSprite->position.z += 60;
+            selectedSprite->position.y += 84;
             selectedSprite->priority = 2;
 
             if (Script_SeekToKeyword('m')) {
@@ -4121,7 +4121,7 @@ void TutorialOtenko_ConfigureInteractionChildFromScript(void)
 void TutorialOtenko_ConfigureFromScript(void)
 {
     struct ActorAnimController *g = (struct ActorAnimController *)gScriptedActorController;
-    struct ActorSprite *obj;
+    struct DisplaySequenceSprite *obj;
     if (!g)
         g = (struct ActorAnimController *)TutorialOtenko_EnsureController(0xbb34, 0);
     obj = &g->obj;
@@ -4135,29 +4135,29 @@ void TutorialOtenko_ConfigureFromScript(void)
         {
             s32 v = Script_GetValue();
             g->savedX = v;
-            obj->x = v;
+            obj->position.x = v;
         }
         {
             s32 v = Script_GetValue();
             g->savedY = v;
-            obj->y = v;
+            obj->position.y = v;
         }
         {
             s32 v = Script_GetValue();
             g->savedZ = v;
-            obj->z = v;
+            obj->position.z = v;
         }
     } else {
         struct Player *owner;
         owner = g->owner;
         g->savedX = (u16)owner->position.x;
-        obj->x = (u16)owner->position.x;
+        obj->position.x = (u16)owner->position.x;
         owner = g->owner;
         g->savedY = (u16)owner->position.y;
-        obj->y = (u16)owner->position.y;
+        obj->position.y = (u16)owner->position.y;
         owner = g->owner;
         g->savedZ = (u16)owner->position.z;
-        obj->z = (u16)owner->position.z;
+        obj->position.z = (u16)owner->position.z;
     }
     if (Script_SeekToKeyword(0x63))
         g->handle = (void *)Script_GetValue();
@@ -4200,8 +4200,7 @@ struct ActorInitController {
     u8 unk_00[0x18];
     void *owner;
     struct ActorChildSlot children[16];
-    struct ActorSprite obj;
-    u8 unk_E00[8];
+    struct DisplaySequenceSprite obj;
     struct ActorInitData data[1];
     u8 shadow[0x40];
     void *animationResource;
@@ -4243,7 +4242,7 @@ void Sprite_SetOriginStub(void *, s32, s32);
 void Shadow_Initialize(void *, void *, s32);
 void SceneBody_Init(void *, s32, void *, s32, s32, void *);
 
-static inline void ActorInit_InitMainSprite(struct ActorInitController *p, struct ActorSprite *obj)
+static inline void ActorInit_InitMainSprite(struct ActorInitController *p, struct DisplaySequenceSprite *obj)
 {
     void *effect;
     p->animationResource = ScriptProc_Start(0x922e, 0xc6a0);
@@ -4267,7 +4266,7 @@ static inline void ActorInit_SetChildControl(void (*callback)(void *, void *),
 s32 TutorialOtenko_InitializeController(void *arg0)
 {
     struct ActorInitController *p = arg0;
-    struct ActorSprite *obj;
+    struct DisplaySequenceSprite *obj;
     void *shadow;
     const u16 *palette, *src;
     u16 *dst;
@@ -4278,7 +4277,7 @@ s32 TutorialOtenko_InitializeController(void *arg0)
     obj = &p->obj;
     ActorInit_InitMainSprite(p, obj);
     shadow = p->shadow;
-    Shadow_Initialize(shadow, &p->obj.x, 0);
+    Shadow_Initialize(shadow, &p->obj.position.x, 0);
     ActorShadow_Disable(shadow);
     p->delta = 1;
     p->count = 0;
@@ -4322,9 +4321,9 @@ s32 TutorialOtenko_InitializeController(void *arg0)
     }
     p->scaleFn = 0;
     p->otherFn = 0;
-    p->obj.x = 0;
-    p->obj.y = 0;
-    p->obj.z = 0;
+    p->obj.position.x = 0;
+    p->obj.position.y = 0;
+    p->obj.position.z = 0;
     p->deltaZ = 0;
     p->deltaY = 0;
     p->deltaX = 0;

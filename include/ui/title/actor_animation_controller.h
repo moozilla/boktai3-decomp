@@ -3,6 +3,7 @@
 
 #include "engine/task.h"
 #include "engine/video/display_sequence.h"
+#include "engine/video/sprite.h"
 
 /* Tentative shared layout for the actor animation controller (081E34D0-081EAB64).
  * Offsets are cross-checked across many matched functions in this unit; field
@@ -61,8 +62,7 @@ struct ActorAnimController {
     struct Task task;
     struct Player *owner; /* 0x18: player linked to this controller */
     struct ActorChildSlot children[16]; /* 0x1C, stride 0xDC */
-    struct ActorSprite obj;             /* 0xDDC; agbcc tail-pads this to 0x24 bytes */
-    u8 unkE00[8];
+    struct DisplaySequenceSprite obj; /* 0xDDC */
     u8 effect[12];      /* 0xE08: palette bank index buffer, see AnimData_SelectPaletteBank */
     const u16 *palette; /* 0xE14: active 16-color palette pointer */
     u8 unkE18[12];
