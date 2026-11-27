@@ -565,6 +565,53 @@ def embedded_members(views, records, used_tags, owner):
             for view in views], plans
 
 
+def observed_members(views, catalog):
+    """Fill opaque storage when independent typed calls identify one shared child."""
+    if any(view["kind"] != "struct" for view in views):
+        return views
+    records = catalog["records"]
+    parents = {view["id"] for view in views}
+    observations = defaultdict(set)
+    for row in catalog.get("embeds", ()):
+        child = records.get(row["child"])
+        if row["parent"] not in parents or row["declared"] or row["offset"] == 0:
+            continue
+        if not child or not child["file"].startswith("include/"):
+            continue
+        observations[row["offset"], row["child"]].update(
+            (location.rsplit(":", 1)[0], caller) for location, caller, _, _ in row["sites"])
+
+    slots = defaultdict(list)
+    for (off, key), sites in observations.items():
+        if len(sites) >= 2:
+            slots[off].append(records[key])
+
+    additions = []
+    for off, children in sorted(slots.items()):
+        if len(children) != 1:
+            continue
+        child = children[0]
+        size, align = child["size"], child["align"]
+        if off % align or off + size > max(v["size"] for v in views):
+            continue
+        occupied = [m for v in views for m in v["members"]
+                    if not families.opaque(m) and m.get("off") is not None
+                    and m["off"] < off + size and off < m["off"] + m["size"]]
+        if occupied:
+            continue
+        name = families.short(child)
+        name = name[:1].lower() + name[1:]
+        additions.append(dict(name=name, decl=f"{child['spell']} {name}", ctype=child["spell"],
+                              off=off, size=size, align=align, base="aggregate", array=False, bits=False,
+                              private=[], headers=[child["file"]], self_ref=False))
+
+    # Overlapping call interpretations require an explicit layout in a source view.
+    unique = [m for m in additions if sum(n["off"] < m["off"] + m["size"]
+                                         and m["off"] < n["off"] + n["size"] for n in additions) == 1]
+    return [dict(v, members=v["members"] + [m for m in unique if m["off"] + m["size"] <= v["size"]])
+            for v in views]
+
+
 def explicit_overlays(views, used_tags, owner):
     """Keep equal-span alternatives when one private view already declares a union."""
     slots = defaultdict(list)
@@ -636,7 +683,7 @@ def header_choice(catalog, family, views, args):
     snake = re.sub(r"(?<=[a-z0-9])(?=[A-Z])", "_", name).lower()
     header = path_under(args.header or Path(f"include/recovered/{snake}.h"), "include", ".h")
     taken = used_tags | {name}
-    parents, embedded = embedded_members(views, existing, taken, name)
+    parents, embedded = embedded_members(observed_members(views, catalog), existing, taken, name)
     parents, overlays = explicit_overlays(parents, taken, name)
     parent = plan_record(family, parents, name)
     active_overlays = [overlays[key] for key in sorted(parent.embedded & overlays.keys())]

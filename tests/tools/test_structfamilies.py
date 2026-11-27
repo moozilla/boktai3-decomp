@@ -538,6 +538,34 @@ unsigned Read(struct Pool *pool) { return pool->slots[2].timer; }
                     rewritten = merge.rewrite_unit(original, records[f"{path}:struct Host"], new, target, spell)
                 self.assertIn(expression, rewritten)
 
+    def test_independent_typed_calls_recover_an_opaque_embedded_slot(self):
+        header = "include/sprite.h"
+        declaration = "struct Sprite { unsigned timer, flags; };\n"
+        child = f"{header}:struct Sprite"
+        source = TYPES + "struct Owner { unsigned kind; u8 pad4[12]; };"
+        raw_views = measure(source, "src/a.c") | measure(source, "src/b.c")
+        catalog = {"records": raw_views | measure(declaration, header), "embeds": [
+            {"parent": key, "child": child, "declared": False, "offset": 4,
+             "sites": [[f"{view['file']}:7", "Step", "Sprite_Update", 0]]}
+            for key, view in raw_views.items()
+        ]}
+        family = {"kind": "struct", "size": 16, "name": "Owner", "loads": []}
+        args = SimpleNamespace(use_shared=None, name="SpriteOwner", header=Path("include/owner.h"))
+        with tempfile.TemporaryDirectory(dir=ROOT / "build") as tmp:
+            root = Path(tmp)
+            (root / "include").mkdir()
+            (root / "build").mkdir()
+            (root / "include/global.h").write_text(TYPES)
+            (root / header).write_text(declaration)
+            with patch.object(families, "ROOT", root), patch.object(lm, "ROOT", root):
+                result = merge.header_choice(catalog, family, list(raw_views.values()), args)
+                self.assertIn("struct Sprite sprite;", result[2])
+                self.assertEqual([(m["name"], m["off"]) for m in result[3]["members"]],
+                                 [("kind", 0), ("sprite", 4), ("padC", 12)])
+                catalog["embeds"].pop()
+                result = merge.header_choice(catalog, family, list(raw_views.values()), args)
+                self.assertNotIn("struct Sprite sprite;", result[2])
+
     def test_pointer_view_adopts_a_larger_type_only_without_extent_uses(self):
         path = "src/a.c"
         short = "struct Short { unsigned phase; };\n"
