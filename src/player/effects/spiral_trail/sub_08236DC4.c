@@ -1,20 +1,12 @@
 #include "global.h"
+#include "player/effects/orbit_effect.h"
 
-struct TrailSlot {
-    u8 pad0[0xF];
-    u8 f0F;
-    u8 f10;
-    u8 pad11[0x17];
-    u8 f28;
-    u8 f29;
-    u8 pad2A[0x12];
-};
 struct TrailParticles {
     u8 state;
     u8 state1;
     u8 pad2[2];
     void *resource;
-    struct TrailSlot slots[8];
+    struct PlayerOrbitParticle slots[8];
 };
 struct Trail {
     u8 pad0[0x24];
@@ -30,7 +22,7 @@ void Effect_SetPalette(void *, u32);
 void sub_08236DC4(struct Trail *p)
 {
     struct TrailParticles *q = &p->particles;
-    struct TrailSlot *slot;
+    struct PlayerOrbitParticle *slot;
     u8 *f;
     s32 i;
     s32 frame;
@@ -43,7 +35,7 @@ void sub_08236DC4(struct Trail *p)
     else
         frame = (p->kind + 1) * 2;
     offset = -4;
-    f = &q->slots[0].f0F;
+    f = &q->slots[0].priority;
     slot = q->slots;
     i = 7;
     do {
