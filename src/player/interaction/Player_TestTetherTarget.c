@@ -1,14 +1,12 @@
 #include "global.h"
 #include "engine/engine.h"
+#include "scene/collision/contact_position.h"
 
 // confidence=low: validates terrain for a tether target and snaps to the tether actor on flagged cells.
 
-struct Position {
-    s16 x, y, z, pad;
-};
 struct Actor {
     u8 pad[0x30];
-    struct Position position;
+    struct ContactPosition position;
 };
 struct Map {
     u32 pad;
@@ -19,10 +17,10 @@ struct Map {
 u8 *TerrainModifiers_FindCellOverride(s32, s32);
 u32 TetherActor_GetStatusFlags(void);
 u32 Player_IsStatusBit4ActionActive(u32);
-struct Position *TetherActor_GetPosition(void);
+struct ContactPosition *TetherActor_GetPosition(void);
 void Sound_PlaySong(u32);
 void ActorSequence_Begin(void *, s32, s32);
-static inline u8 *properties(struct Position *position)
+static inline u8 *properties(struct ContactPosition *position)
 {
     s32 x = position->x >> 8, z = position->z >> 8;
     s32 cell;
@@ -47,12 +45,12 @@ static inline s32 absolute(s32 v)
         v = -v;
     return v;
 }
-u32 Player_TestTetherTarget(struct Actor *actor, struct Position *candidate)
+u32 Player_TestTetherTarget(struct Actor *actor, struct ContactPosition *candidate)
 {
     u8 *p = properties(candidate);
     u32 flags = *(u16 *)(p + 2);
     s32 height, surface;
-    struct Position *target;
+    struct ContactPosition *target;
     if (flags & 1)
         return 0;
     if (!TetherActor_GetStatusFlags()) {

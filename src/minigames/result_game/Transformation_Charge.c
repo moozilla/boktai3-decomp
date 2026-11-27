@@ -1,8 +1,7 @@
 #include "global.h"
 #include "player/player.h"
-typedef struct {
-    s16 x, y, z, pad;
-} Vec;
+#include "scene/collision/contact_position.h"
+typedef struct ContactPosition Vec;
 typedef struct {
     u8 pad[48];
     Vec position;
