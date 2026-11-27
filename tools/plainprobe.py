@@ -6,7 +6,7 @@
 
 The default sweep visits each linter binding or argument once. A fixed random sample
 of up to 40 sites per src directory runs first. Weighted linter counts are retained
-in the CSV. Headers without a single owning unit receive explicit skips.
+in the CSV. Header probes compare scratch include copies through their dependents.
 """
 from __future__ import annotations
 
@@ -560,7 +560,7 @@ def plan(path, text, header_cache):
         r"(?ms)^\s*#\s*ifdef\s+UBFIX\b.*?(?=^\s*#\s*(?:else|endif)\b)", code)]
     local_folds = folds.folds(text, rel, every=True, sites=locals_) if locals_ else {}
     remaining = {s.offset for s in locals_ if not s.excused} - local_folds.keys()
-    if remaining and path.suffix == ".c":
+    if remaining:
         local_folds.update(folds.grouped_folds(text, rel, remaining))
     helpers, values, bodies = unit_facts(path, text)
     helper_args = dict(helper_reads(code, helpers)) if local_folds else {}
@@ -579,9 +579,6 @@ def plan(path, text, header_cache):
         span = spans[index] if index >= 0 and pos < spans[index][1] else None
         if span:
             p.function = span[2]
-        if path.suffix != ".c":
-            p.reason = "header site has no single owning translation unit"
-            continue
         if span is None or keepcheck.in_ranges(pos, macro_ranges):
             p.reason = "outside an ordinary C function body"
             continue
@@ -646,6 +643,54 @@ def relocate_includes(text, path):
     return concessions._INCLUDE.sub(replace, text)
 
 
+@lru_cache(maxsize=1)
+def header_graph():
+    import header_dependents
+
+    parents = defaultdict(set)
+    for parent, children in header_dependents.tree().items():
+        for child in children:
+            parents[ROOT / child].add(ROOT / parent)
+    return parents
+
+
+@lru_cache(maxsize=None)
+def header_ancestors(target):
+    parents = header_graph()
+    affected = {target}
+    pending = [target]
+    while pending:
+        for parent in parents.get(pending.pop(), set()) - affected:
+            affected.add(parent)
+            pending.append(parent)
+    return frozenset(affected)
+
+
+def override_header(text, path, scratch, target, replacement, affected):
+    """Copy the include paths from this unit to the edited header into scratch."""
+    copied = {}
+
+    def rewrite(source, origin):
+        def replace(m):
+            spelling = m[1]
+            candidates = (origin.parent / spelling, ROOT / spelling, ROOT / "include" / spelling)
+            child = next((p.resolve() for p in candidates if p.is_file()), None)
+            if child is None:
+                return m[0]
+            if child in affected:
+                if child not in copied:
+                    copy = scratch / f"header-{len(copied)}-{child.name}"
+                    copied[child] = copy
+                    content = replacement if child == target else child.read_text(errors="replace")
+                    copy.write_text(rewrite(content, child))
+                child = copied[child]
+            return m[0].replace(f'"{spelling}"', f'"{child}"')
+
+        return concessions._INCLUDE.sub(replace, source)
+
+    return rewrite(text, path)
+
+
 class Checker:
     def __init__(self, out):
         self.work = out / "work"
@@ -655,11 +700,13 @@ class Checker:
         self.ram = build.ram_symbols()
         build.headers_hash()
 
-    def compile(self, path, text):
+    def compile(self, path, text, header=None):
         with tempfile.TemporaryDirectory(prefix="unit-", dir=self.work) as scratch:
             work = os.path.relpath(scratch, ROOT)
             source = Path(scratch) / path.name
-            source.write_text(relocate_includes(text, path))
+            content = relocate_includes(text, path) if header is None else override_header(
+                text, path, Path(scratch), header[0], header[1], header_ancestors(header[0]))
+            source.write_text(content)
             try:
                 _, address, names, binary = check.linked_bytes(
                     os.path.relpath(source, ROOT), work, syms=self.syms, ram=self.ram)
@@ -678,11 +725,11 @@ class Checker:
             return "unchanged scratch unit differs from ROM"
         return address, names, binary
 
-    def compare(self, path, original, variant):
+    def compare(self, path, original, variant, header=None):
         expected = self.baseline(path, original)
         if isinstance(expected, str):
             return "SKIP", expected
-        result = self.compile(path, variant)
+        result = self.compile(path, variant, header) if header else self.compile(path, variant)
         if isinstance(result, str):
             return "SKIP", "variant compile/link failed: " + result
         address, names, binary = result
@@ -694,10 +741,43 @@ class Checker:
         return "DIFF", f"{count} byte positions differ ({len(expected[2])} → {len(binary)} bytes at 0x{address:08X})"
 
 
+def probe_header(p, text, checker):
+    path = ROOT / p.path
+    deps = sorted(unit for unit in header_ancestors(path) if unit.suffix == ".c")
+    if not deps:
+        return "SKIP", "header has no source dependents in the include graph"
+    call = re.compile(rf"\b{re.escape(p.function)}\s*\(")
+    originals = {unit: unit.read_text(errors="replace") for unit in deps}
+    deps.sort(key=lambda unit: (not call.search(originals[unit]), len(originals[unit]), unit))
+    variant = folds.edit_text(text, p.edits)
+    control = folds.edit_text(text, p.control_edits) if p.control_edits else None
+    failures = []
+    for unit in deps:
+        if STOP.exists():
+            return None
+        original = originals[unit]
+        if control is not None:
+            verdict, detail = checker.compare(unit, original, original, (path, control))
+            if verdict != "PLAIN":
+                failures.append(f"specialization control {verdict}: {detail}")
+                continue
+        verdict, detail = checker.compare(unit, original, original, (path, variant))
+        if verdict == "DIFF":
+            return ("BOUND-SHARED" if p.other_uses else "BOUND-SINGLE",
+                    f"{unit.relative_to(ROOT)}: {detail}")
+        if verdict == "SKIP":
+            failures.append(detail)
+    if failures:
+        return "SKIP", f"header dependent checks incomplete ({len(failures)}/{len(deps)}): {failures[0]}"
+    return "PLAIN", f"MATCH ({len(deps)} header dependent units)"
+
+
 def probe(p, sources, checker):
     if p.reason:
         return "SKIP", p.reason
     text = sources[p.path]
+    if Path(p.path).suffix == ".h":
+        return probe_header(p, text, checker)
     if p.control_edits:
         control, detail = checker.compare(ROOT / p.path, text, folds.edit_text(text, p.control_edits))
         if control != "PLAIN":
@@ -1141,12 +1221,13 @@ def run_sweep(args, paths, parser):
             if not phase and args.sample_only:
                 break
             pending = [p for p in sites if p.sample == phase and p.id not in results]
-            for start in range(0, len(pending), 32):
+            batch_size = 4 if any(p.path.endswith(".h") for p in pending) else 32
+            for start in range(0, len(pending), batch_size):
                 if STOP.exists():
                     break
-                batch = pending[start:start + 32]
+                batch = pending[start:start + batch_size]
                 verdicts = pool.map(lambda p: probe(p, sources, checker), batch)
-                results.update((p.id, verdict) for p, verdict in zip(batch, verdicts))
+                results.update((p.id, verdict) for p, verdict in zip(batch, verdicts) if verdict is not None)
                 write_csv(csv_path, sites, results)
                 if start % 256 == 224:
                     write_reports(sites, results, args, rom_orders, aliases)

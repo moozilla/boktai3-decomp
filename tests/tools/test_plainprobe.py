@@ -206,6 +206,25 @@ void f(struct Actor *p) {
         self.assertEqual(verdict, "DIFF")
         self.assertIn("2 byte positions", detail)
 
+    def test_header_overlay_keeps_transitive_neighbors_and_isolates_the_edit(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp).resolve()
+            scratch = root / "scratch"
+            scratch.mkdir()
+            unit = root / "unit.c"
+            middle = root / "middle.h"
+            target = root / "target.h"
+            neighbor = root / "neighbor.h"
+            middle.write_text('#include "target.h"\n#include "neighbor.h"\n')
+            target.write_text("int old;\n")
+            neighbor.write_text("int shared;\n")
+            content = pp.override_header('#include "middle.h"\n', unit, scratch,
+                                         target, "int changed;\n", {unit, middle, target})
+            self.assertIn(str(scratch / "header-0-middle.h"), content)
+            self.assertIn(str(neighbor.resolve()), (scratch / "header-0-middle.h").read_text())
+            self.assertEqual((scratch / "header-1-target.h").read_text(), "int changed;\n")
+            self.assertEqual(target.read_text(), "int old;\n")
+
     def test_embedded_type_aliases_are_only_from_by_value_members(self):
         with tempfile.TemporaryDirectory() as tmp:
             path = Path(tmp) / "record.h"

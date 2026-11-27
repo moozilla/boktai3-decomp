@@ -16,23 +16,23 @@ To reproduce the sweep, run `build/venv/bin/python tools/plainprobe.py`. Use `--
 
 | Scope | PLAIN | BOUND-SINGLE | BOUND-SHARED | SKIP | Pending |
 | --- | --- | --- | --- | --- | --- |
-| All sites | 26 | 203 | 193 | 86 | 0 |
+| All sites | 33 | 225 | 203 | 47 | 0 |
 
-26 of 422 compiler-tested sites matched (6.2%).
+33 of 461 compiler-tested sites matched (7.2%).
 
 ## Overall
 
 | Scope | PLAIN | BOUND-SINGLE | BOUND-SHARED | SKIP | Pending |
 | --- | --- | --- | --- | --- | --- |
-| All sites | 282 | 2566 | 2091 | 432 | 0 |
+| All sites | 310 | 2621 | 2145 | 295 | 0 |
 
-282 of 4,939 compiler-tested sites matched (5.7%).
+310 of 5,076 compiler-tested sites matched (6.1%).
 
 ## Directory sample
 
 | Directory | PLAIN | BOUND-SINGLE | BOUND-SHARED | SKIP | Pending |
 | --- | --- | --- | --- | --- | --- |
-| include | 0 | 0 | 0 | 40 | 0 |
+| include | 7 | 22 | 10 | 1 | 0 |
 | src/bosses | 4 | 15 | 20 | 1 | 0 |
 | src/effects | 2 | 12 | 21 | 5 | 0 |
 | src/engine | 0 | 11 | 16 | 7 | 0 |
@@ -52,15 +52,15 @@ To reproduce the sweep, run `build/venv/bin/python tools/plainprobe.py`. Use `--
 
 | Warning kind | PLAIN | BOUND-SINGLE | BOUND-SHARED | SKIP | Pending |
 | --- | --- | --- | --- | --- | --- |
-| const-local | 22 | 59 | 373 | 174 | 0 |
-| literal-local | 24 | 1059 | 769 | 169 | 0 |
-| literal-param | 236 | 1448 | 949 | 89 | 0 |
+| const-local | 24 | 60 | 375 | 169 | 0 |
+| literal-local | 28 | 1083 | 797 | 113 | 0 |
+| literal-param | 258 | 1478 | 973 | 13 | 0 |
 
 ## Directory
 
 | Directory | PLAIN | BOUND-SINGLE | BOUND-SHARED | SKIP | Pending |
 | --- | --- | --- | --- | --- | --- |
-| include | 0 | 0 | 0 | 143 | 0 |
+| include | 28 | 55 | 54 | 6 | 0 |
 | src/bosses | 62 | 406 | 410 | 31 | 0 |
 | src/effects | 46 | 101 | 163 | 28 | 0 |
 | src/engine | 0 | 11 | 16 | 7 | 0 |
@@ -82,24 +82,24 @@ To reproduce the sweep, run `build/venv/bin/python tools/plainprobe.py`. Use `--
 | --- | --- | --- | --- | --- | --- |
 | ARMOR_QUEUE_PART_ACTION | 0 | 0 | 0 | 2 | 0 |
 | Actor16_UpdateMovementSlowdown | 0 | 1 | 0 | 0 | 0 |
-| ActorControllerMotion_ClearFlags | 0 | 0 | 0 | 1 | 0 |
-| ActorController_ClearColliderFlags | 0 | 0 | 3 | 5 | 0 |
+| ActorControllerMotion_ClearFlags | 0 | 0 | 1 | 0 | 0 |
+| ActorController_ClearColliderFlags | 0 | 0 | 8 | 0 | 0 |
 | ActorController_ClearMotionFlags | 0 | 0 | 8 | 0 | 0 |
-| ActorController_SetColliderFlags | 1 | 0 | 0 | 3 | 0 |
+| ActorController_SetColliderFlags | 4 | 0 | 0 | 0 | 0 |
 | ActorFlag | 0 | 1 | 0 | 0 | 0 |
 | ActorHalfBits | 0 | 1 | 0 | 0 | 0 |
 | ActorStats_SetDamageFlags | 0 | 1 | 2 | 0 | 0 |
 | ActorStats_TestDamageFlags | 0 | 0 | 1 | 0 | 0 |
-| ActorStatus_BehaviorFlags | 0 | 7 | 4 | 6 | 0 |
-| ActorStatus_BodyFlags | 0 | 4 | 2 | 1 | 0 |
-| ActorStatus_ClearMotionFlags | 0 | 6 | 8 | 1 | 0 |
+| ActorStatus_BehaviorFlags | 2 | 7 | 8 | 0 | 0 |
+| ActorStatus_BodyFlags | 0 | 5 | 2 | 0 | 0 |
+| ActorStatus_ClearMotionFlags | 0 | 7 | 8 | 0 | 0 |
 | ActorStatus_ClearPlacementFlags | 0 | 0 | 1 | 0 | 0 |
-| ActorStatus_PalettePlayerFlags | 0 | 0 | 0 | 1 | 0 |
-| ActorStatus_SetDrawableFlags | 1 | 0 | 19 | 1 | 0 |
+| ActorStatus_PalettePlayerFlags | 0 | 1 | 0 | 0 | 0 |
+| ActorStatus_SetDrawableFlags | 1 | 0 | 20 | 0 | 0 |
 | ActorStatus_SetPendingBits | 4 | 2 | 0 | 0 | 0 |
 | ActorStatus_SetPlacementFlags | 0 | 0 | 1 | 0 | 0 |
-| ActorStatus_SetWord | 2 | 1 | 2 | 2 | 0 |
-| ActorStatus_StatusFlags | 0 | 3 | 0 | 1 | 0 |
+| ActorStatus_SetWord | 4 | 1 | 2 | 0 | 0 |
+| ActorStatus_StatusFlags | 0 | 4 | 0 | 0 | 0 |
 | AnyMotion | 0 | 0 | 1 | 0 | 0 |
 | Arg1 | 0 | 0 | 1 | 0 | 0 |
 | Armor_ContactFlags | 0 | 1 | 0 | 0 | 0 |
@@ -116,12 +116,12 @@ To reproduce the sweep, run `build/venv/bin/python tools/plainprobe.py`. Use `--
 | CameraTracking_ClearRequests | 4 | 0 | 8 | 0 | 0 |
 | CameraTracking_SetRequests | 0 | 0 | 3 | 0 | 0 |
 | CentipedeSpread_Test | 0 | 6 | 2 | 0 | 0 |
-| Chase_Bits32 | 0 | 2 | 0 | 1 | 0 |
+| Chase_Bits32 | 1 | 2 | 0 | 0 | 0 |
 | Chase_Bits32_1 | 0 | 1 | 0 | 0 | 0 |
-| Chase_ClearBits | 0 | 11 | 4 | 2 | 0 |
-| Chase_MotionFlags | 1 | 0 | 0 | 3 | 0 |
-| Chase_RandomBits | 0 | 0 | 0 | 1 | 0 |
-| Chase_Test | 0 | 3 | 0 | 2 | 0 |
+| Chase_ClearBits | 0 | 11 | 6 | 0 | 0 |
+| Chase_MotionFlags | 4 | 0 | 0 | 0 | 0 |
+| Chase_RandomBits | 1 | 0 | 0 | 0 | 0 |
+| Chase_Test | 2 | 3 | 0 | 0 | 0 |
 | ClearActivity | 0 | 1 | 0 | 0 | 0 |
 | ClearActorFlag | 0 | 0 | 1 | 0 | 0 |
 | ClearAnimationFlags | 1 | 0 | 0 | 0 | 0 |
@@ -151,9 +151,9 @@ To reproduce the sweep, run `build/venv/bin/python tools/plainprobe.py`. Use `--
 | CommandFlip | 1 | 0 | 0 | 0 | 0 |
 | Command_SetMotionFlag | 0 | 0 | 1 | 0 | 0 |
 | ContactActor_ReadMotionFlags | 0 | 1 | 0 | 0 | 0 |
-| ContactCollider_ClearFlags | 0 | 1 | 21 | 3 | 0 |
+| ContactCollider_ClearFlags | 0 | 1 | 24 | 0 | 0 |
 | ContactCollider_ClearReactionFlags | 5 | 0 | 5 | 0 | 0 |
-| ContactCollider_SetFlags | 11 | 1 | 3 | 1 | 0 |
+| ContactCollider_SetFlags | 12 | 1 | 3 | 0 | 0 |
 | ContactCollider_SetReactionFlags | 14 | 1 | 8 | 0 | 0 |
 | ContactCollider_TestContactFlags | 0 | 3 | 0 | 0 | 0 |
 | ContactCollider_TestFlags | 0 | 6 | 0 | 0 | 0 |
@@ -176,7 +176,7 @@ To reproduce the sweep, run `build/venv/bin/python tools/plainprobe.py`. Use `--
 | FeatherBlockedSlots | 0 | 1 | 0 | 0 | 0 |
 | Flag | 1 | 3 | 4 | 0 | 0 |
 | FlagsSave | 0 | 1 | 1 | 0 | 0 |
-| Flags_MaskedWord | 1 | 12 | 11 | 1 | 0 |
+| Flags_MaskedWord | 1 | 13 | 11 | 0 | 0 |
 | GameState_SetWorldFlags | 0 | 2 | 0 | 0 | 0 |
 | GameState_TestWorldFlags | 0 | 19 | 6 | 0 | 0 |
 | GetFlags | 0 | 0 | 1 | 0 | 0 |
@@ -238,12 +238,12 @@ To reproduce the sweep, run `build/venv/bin/python tools/plainprobe.py`. Use `--
 | MimicChase_ClearBits | 0 | 0 | 2 | 0 | 0 |
 | ModifierMenu_MarkDirty | 0 | 3 | 0 | 0 | 0 |
 | MonsterInit_MaskColliderFlags | 0 | 22 | 0 | 0 | 0 |
-| MonsterInit_MaskControlFlags | 0 | 0 | 0 | 1 | 0 |
-| MonsterInit_SetBehaviorFlags | 0 | 28 | 1 | 4 | 0 |
+| MonsterInit_MaskControlFlags | 0 | 1 | 0 | 0 | 0 |
+| MonsterInit_SetBehaviorFlags | 1 | 31 | 1 | 0 | 0 |
 | MonsterInit_SetMotionFlags | 0 | 11 | 10 | 0 | 0 |
-| MonsterInit_SetStatusFlags | 0 | 92 | 9 | 3 | 0 |
-| MonsterInit_TestMotionFlags | 0 | 28 | 14 | 2 | 0 |
-| MonsterInit_TestTargetingFlags | 0 | 0 | 0 | 1 | 0 |
+| MonsterInit_SetStatusFlags | 0 | 94 | 10 | 0 | 0 |
+| MonsterInit_TestMotionFlags | 0 | 29 | 15 | 0 | 0 |
+| MonsterInit_TestTargetingFlags | 0 | 1 | 0 | 0 | 0 |
 | MotionFlag | 0 | 0 | 1 | 0 | 0 |
 | MotionFlagSet | 0 | 0 | 2 | 0 | 0 |
 | MotionFlags | 4 | 2 | 2 | 0 | 0 |
@@ -306,11 +306,11 @@ To reproduce the sweep, run `build/venv/bin/python tools/plainprobe.py`. Use `--
 | RegistryActor_SetUpdateFlags | 0 | 0 | 4 | 0 | 0 |
 | RegistryActor_TestDamageFlags | 0 | 0 | 1 | 0 | 0 |
 | RegistryActor_TestMotionFlags | 0 | 0 | 1 | 0 | 0 |
-| RotationPhase_Mask | 0 | 1 | 0 | 1 | 0 |
+| RotationPhase_Mask | 0 | 2 | 0 | 0 | 0 |
 | Sabata_SetFlags | 0 | 10 | 6 | 0 | 0 |
 | SaveControlFlags | 0 | 1 | 0 | 0 | 0 |
 | SaveFlags | 0 | 0 | 1 | 0 | 0 |
-| ScalarApproach_ApplyDelta | 0 | 0 | 0 | 3 | 0 |
+| ScalarApproach_ApplyDelta | 3 | 0 | 0 | 0 | 0 |
 | Scale | 2 | 0 | 0 | 0 | 0 |
 | ScaleTowardZero | 1 | 0 | 0 | 0 | 0 |
 | ScaleTowardZeroResult | 1 | 0 | 0 | 0 | 0 |
@@ -321,17 +321,17 @@ To reproduce the sweep, run `build/venv/bin/python tools/plainprobe.py`. Use `--
 | SceneActorBehavior_SetWordFlags | 0 | 1 | 2 | 0 | 0 |
 | SceneActorBody_SetFlags | 0 | 1 | 0 | 0 | 0 |
 | SceneActorChase_AndMotionFlags | 0 | 1 | 0 | 0 | 0 |
-| SceneActorChase_AndWordFlags | 1 | 25 | 6 | 2 | 0 |
-| SceneActorChase_Bits32 | 0 | 35 | 3 | 1 | 0 |
+| SceneActorChase_AndWordFlags | 1 | 27 | 6 | 0 | 0 |
+| SceneActorChase_Bits32 | 0 | 36 | 3 | 0 | 0 |
 | SceneActorChase_ClearActorFlags | 0 | 4 | 7 | 0 | 0 |
 | SceneActorChase_ClearBehaviorFlags | 0 | 0 | 1 | 0 | 0 |
 | SceneActorChase_ClearBits | 0 | 17 | 22 | 0 | 0 |
 | SceneActorChase_ClearFlagComponent | 0 | 33 | 6 | 0 | 0 |
 | SceneActorChase_ClearMotionFlags | 0 | 4 | 12 | 0 | 0 |
 | SceneActorChase_ClearStatusFlags | 0 | 0 | 5 | 0 | 0 |
-| SceneActorChase_ClearWordFlags | 5 | 40 | 50 | 8 | 0 |
+| SceneActorChase_ClearWordFlags | 6 | 41 | 56 | 0 | 0 |
 | SceneActorChase_FlagComponentBits | 0 | 1 | 4 | 0 | 0 |
-| SceneActorChase_GroupClearFlags | 0 | 2 | 0 | 1 | 0 |
+| SceneActorChase_GroupClearFlags | 0 | 3 | 0 | 0 | 0 |
 | SceneActorChase_HasPlacementFlags | 0 | 2 | 0 | 0 | 0 |
 | SceneActorChase_NextSample | 0 | 0 | 0 | 2 | 0 |
 | SceneActorChase_OrReactionFlags | 0 | 1 | 3 | 0 | 0 |
@@ -342,7 +342,7 @@ To reproduce the sweep, run `build/venv/bin/python tools/plainprobe.py`. Use `--
 | SceneActorChase_SetMotionFlags | 0 | 5 | 2 | 0 | 0 |
 | SceneActorChase_SetStatusFlags | 0 | 2 | 2 | 0 | 0 |
 | SceneActorChase_StatusFlags | 0 | 10 | 5 | 0 | 0 |
-| SceneActorChase_Test | 0 | 37 | 6 | 3 | 0 |
+| SceneActorChase_Test | 0 | 40 | 6 | 0 | 0 |
 | SceneActorChase_TestField | 0 | 25 | 6 | 0 | 0 |
 | SceneActorContact_MotionFlags | 0 | 25 | 7 | 0 | 0 |
 | SceneActorContact_QueryMotionField | 0 | 2 | 2 | 0 | 0 |
@@ -351,13 +351,13 @@ To reproduce the sweep, run `build/venv/bin/python tools/plainprobe.py`. Use `--
 | SceneActorContact_TestTracking | 0 | 1 | 0 | 0 | 0 |
 | SceneActorContact_TestTrackingOwned | 0 | 0 | 2 | 0 | 0 |
 | SceneActorControl_TestFlags | 0 | 11 | 8 | 0 | 0 |
-| SceneActorDamage_OwnershipBits | 0 | 0 | 0 | 1 | 0 |
-| SceneActorDamage_TestFlags | 0 | 1 | 0 | 2 | 0 |
+| SceneActorDamage_OwnershipBits | 0 | 1 | 0 | 0 | 0 |
+| SceneActorDamage_TestFlags | 0 | 3 | 0 | 0 | 0 |
 | SceneActorMotion_TestStatus | 0 | 1 | 0 | 0 | 0 |
 | SceneActorPlacement_ClearColliderFlags | 1 | 0 | 0 | 0 | 0 |
-| SceneActorPlacement_ClearFlags | 0 | 11 | 2 | 2 | 0 |
-| SceneActorPlacement_ReadFlags16 | 0 | 4 | 0 | 1 | 0 |
-| SceneActorPlacement_ReadFlags32 | 0 | 5 | 0 | 1 | 0 |
+| SceneActorPlacement_ClearFlags | 0 | 12 | 2 | 1 | 0 |
+| SceneActorPlacement_ReadFlags16 | 0 | 5 | 0 | 0 | 0 |
+| SceneActorPlacement_ReadFlags32 | 0 | 6 | 0 | 0 | 0 |
 | SceneActorPlacement_SetFlags | 0 | 4 | 0 | 0 | 0 |
 | SceneActorPlacement_TestFlags | 0 | 5 | 5 | 0 | 0 |
 | SceneActorPlacement_TestMask | 0 | 0 | 2 | 0 | 0 |
@@ -373,7 +373,7 @@ To reproduce the sweep, run `build/venv/bin/python tools/plainprobe.py`. Use `--
 | SceneActorStimulus_CaptureMotionFlags | 0 | 1 | 0 | 0 | 0 |
 | SceneActorTurn_ActorFlags | 2 | 18 | 12 | 0 | 0 |
 | SceneActorTurn_Flags | 0 | 20 | 16 | 0 | 0 |
-| SceneActor_MaskedHalfword | 0 | 9 | 2 | 1 | 0 |
+| SceneActor_MaskedHalfword | 0 | 10 | 2 | 0 | 0 |
 | SceneActor_SetFlags | 0 | 11 | 1 | 0 | 0 |
 | SceneActor_TestFlags | 0 | 4 | 0 | 0 | 0 |
 | SceneActor_TestPendingFlag | 0 | 2 | 1 | 0 | 0 |
@@ -468,9 +468,9 @@ To reproduce the sweep, run `build/venv/bin/python tools/plainprobe.py`. Use `--
 | VanargandPairAttack_SetFlags | 0 | 8 | 4 | 0 | 0 |
 | VanargandPairAttack_TestFlags | 0 | 1 | 0 | 0 | 0 |
 | Vanargand_GetModeShifted | 1 | 0 | 0 | 0 | 0 |
-| Vanargand_MaskedFlags | 0 | 1 | 0 | 1 | 0 |
+| Vanargand_MaskedFlags | 0 | 2 | 0 | 0 | 0 |
 | Vanargand_SetFlags | 0 | 17 | 13 | 0 | 0 |
-| Vanargand_TruncateShift | 11 | 0 | 0 | 2 | 0 |
+| Vanargand_TruncateShift | 13 | 0 | 0 | 0 | 0 |
 | Vg_SetFlags | 0 | 0 | 9 | 0 | 0 |
 | Vg_ShiftTowardZero | 4 | 0 | 0 | 0 | 0 |
 | Vorn_ActorFlags | 0 | 1 | 0 | 0 | 0 |
@@ -539,7 +539,7 @@ The ROM share is mask-first among classified mask-first and load-first operation
 | (global) / gDispCntShadow / clear | 0 | 7 | 11 | 0 | 0 | `Bg_DisableDisplay`, `bits`, `mask`, `visible` | 39 / 0 / 0 (100.0%) |
 | (global) / gDispCntShadow / set | 1 | 13 | 20 | 0 | 0 | `Bg_EnableDisplay`, `Or16`, `bgEnable`, `bits` | 31 / 0 / 0 (100.0%) |
 | (global) / gEngineFlags / and-store | 0 | 2 | 0 | 0 | 0 | `SceneActorChase_AndWordFlags` | 2 / 5 / 1 (28.6%) |
-| (global) / gEngineFlags / nonzero | 0 | 49 | 6 | 0 | 0 | `Chase_Test`, `SceneActorChase_Test`, `SceneActorControl_TestFlags`, `SceneActorDamage_TestFlags`, `Test` | 1 / 269 / 1 (0.4%) |
+| (global) / gEngineFlags / nonzero | 1 | 54 | 6 | 0 | 0 | `Chase_Test`, `SceneActorChase_Test`, `SceneActorControl_TestFlags`, `SceneActorDamage_TestFlags`, `Test` | 1 / 269 / 1 (0.4%) |
 | (global) / gEnginePauseFlags / and | 0 | 1 | 0 | 0 | 0 | `Mask` | 0 / 32 / 0 (0.0%) |
 | (global) / gEnginePauseFlags / and-store | 0 | 7 | 0 | 0 | 0 | `SceneActorChase_AndWordFlags`, `andm`, `m`, `mask` | 10 / 1 / 0 (90.9%) |
 | (global) / gEnginePauseFlags / clear | 0 | 2 | 4 | 0 | 0 | `Engine_ClearPauseFlags` | 10 / 1 / 0 (90.9%) |
@@ -555,7 +555,7 @@ The ROM share is mask-first among classified mask-first and load-first operation
 | struct A / fl / set | 0 | 1 | 1 | 0 | 0 | `m` | 2 / 0 / 0 (100.0%) |
 | struct ActorAnimController / flags / set | 0 | 17 | 9 | 0 | 0 | `one` | — |
 | struct ActorAttachmentFollowView / flags / and | 0 | 0 | 1 | 0 | 0 | `mask` | — |
-| struct ActorControllerMotion / flags / clear | 0 | 0 | 10 | 0 | 0 | `ActorController_ClearMotionFlags`, `one` | 4 / 0 / 0 (100.0%) |
+| struct ActorControllerMotion / flags / clear | 0 | 0 | 11 | 0 | 0 | `ActorControllerMotion_ClearFlags`, `ActorController_ClearMotionFlags`, `one` | 4 / 0 / 0 (100.0%) |
 | struct ActorControllerMotion / flags / set | 0 | 0 | 7 | 0 | 0 | `one` | — |
 | struct ActorEffectStatus / flags / nonzero | 0 | 1 | 0 | 0 | 0 | `mask` | 1 / 4 / 0 (20.0%) |
 | struct ActorReaction / flags / set | 0 | 1 | 0 | 0 | 0 | `flags` | — |
@@ -564,7 +564,7 @@ The ROM share is mask-first among classified mask-first and load-first operation
 | struct ActorStats / damageFlags / nonzero | 0 | 0 | 2 | 0 | 0 | `ActorStats_TestDamageFlags`, `RegistryActor_TestDamageFlags` | 2 / 0 / 0 (100.0%) |
 | struct ActorStats / damageFlags / set | 0 | 1 | 1 | 0 | 0 | `ActorStats_SetDamageFlags` | — |
 | struct AnimSprite / flags / and-store | 0 | 1 | 6 | 0 | 0 | `clear`, `mask` | 4 / 19 / 0 (17.4%) |
-| struct AnimSprite / flags / set | 0 | 0 | 2 | 0 | 0 | `mask`, `one` | 3 / 6 / 0 (33.3%) |
+| struct AnimSprite / flags / set | 2 | 0 | 2 | 0 | 0 | `mask`, `one` | 3 / 6 / 0 (33.3%) |
 | struct AreaEffectManager / player.statusFlags / and | 0 | 1 | 0 | 0 | 0 | `tst` | — |
 | struct ArmorCollisionControl / flags / and-store | 0 | 1 | 0 | 0 | 0 | `mask` | — |
 | struct ArmorCollisionControl / flags / set | 0 | 1 | 0 | 0 | 0 | `mask` | — |
@@ -604,9 +604,9 @@ The ROM share is mask-first among classified mask-first and load-first operation
 | struct ContactCollider / contactFlags / and | 0 | 3 | 0 | 0 | 0 | `ContactCollider_TestContactFlags` | 2 / 1 / 0 (66.7%) |
 | struct ContactCollider / flags / and | 0 | 11 | 2 | 0 | 0 | `ContactCollider_TestFlags`, `SceneActorTurn_Flags`, `SceneActor_MaskedHalfword`, `Slime_ContactFlags`, `TestColliderFlags`, `mask` | 9 / 2 / 0 (81.8%) |
 | struct ContactCollider / flags / and-store | 0 | 34 | 10 | 0 | 0 | `ClearFlags`, `Clone_MaskColliderFlags`, `HalfwordFlags_And`, `MonsterInit_MaskColliderFlags`, `Nidhoggr_MaskPartFlags`, `clearMask`, `mask` | — |
-| struct ContactCollider / flags / clear | 0 | 1 | 29 | 0 | 0 | `ActorController_ClearColliderFlags`, `ContactCollider_ClearFlags`, `GolemSlide_ClearColliderFlags`, `attackFlag`, `mask` | — |
+| struct ContactCollider / flags / clear | 0 | 1 | 37 | 0 | 0 | `ActorController_ClearColliderFlags`, `ContactCollider_ClearFlags`, `GolemSlide_ClearColliderFlags`, `attackFlag`, `mask` | — |
 | struct ContactCollider / flags / nonzero | 0 | 8 | 1 | 0 | 0 | `angleFlag`, `directionMask`, `mask` | 9 / 2 / 0 (81.8%) |
-| struct ContactCollider / flags / set | 12 | 5 | 10 | 0 | 0 | `ActorController_SetColliderFlags`, `ContactCollider_SetFlags`, `attackFlag`, `bodyFlags`, `flags`, `mask` | 1 / 15 / 0 (6.2%) |
+| struct ContactCollider / flags / set | 16 | 5 | 10 | 0 | 0 | `ActorController_SetColliderFlags`, `ContactCollider_SetFlags`, `attackFlag`, `bodyFlags`, `flags`, `mask` | 1 / 15 / 0 (6.2%) |
 | struct ContactCollider / reactionFlags / and | 11 | 18 | 14 | 0 | 0 | `AttackFlags`, `ContactCollider_TestReactionFlags`, `Flags_MaskedWord`, `Mask`, `Player_ReadStatusBits`, `mask`, `testReaction` | 4 / 3 / 0 (57.1%) |
 | struct ContactCollider / reactionFlags / and-store | 0 | 1 | 2 | 0 | 0 | `mask` | — |
 | struct ContactCollider / reactionFlags / clear | 5 | 0 | 5 | 0 | 0 | `ContactCollider_ClearReactionFlags` | — |
@@ -725,7 +725,7 @@ The ROM share is mask-first among classified mask-first and load-first operation
 | struct P0823D370 / f20 / and | 0 | 1 | 0 | 0 | 0 | `Player_ReadStatusBits` | 1 / 0 / 0 (100.0%) |
 | struct PairedHalfTarget / flags / and-store | 0 | 0 | 1 | 0 | 0 | `mask` | — |
 | struct PairedHalfTarget / flags / set | 0 | 0 | 1 | 0 | 0 | `mask` | — |
-| struct PairedSceneHalf / actionFlags / and | 0 | 8 | 0 | 0 | 0 | `bit`, `fmask`, `mask`, `masked` | — |
+| struct PairedSceneHalf / actionFlags / and | 0 | 9 | 0 | 0 | 0 | `Vanargand_MaskedFlags`, `bit`, `fmask`, `mask`, `masked` | — |
 | struct PairedSceneHalf / actionFlags / and-store | 0 | 1 | 0 | 0 | 0 | `mask` | — |
 | struct PairedSceneHalf / actionFlags / set | 0 | 25 | 18 | 0 | 0 | `Vanargand_SetFlags`, `mask`, `setFlags`, `twelve` | — |
 | struct PairedSceneHalf / flags / and | 0 | 1 | 0 | 0 | 0 | `mask` | — |
@@ -735,7 +735,7 @@ The ROM share is mask-first among classified mask-first and load-first operation
 | struct PhaseObjectMode / flags / set | 0 | 1 | 0 | 0 | 0 | `PhaseObject_SetFlags` | 1 / 0 / 0 (100.0%) |
 | struct PlacementFlagHalfword / bits / set | 0 | 1 | 0 | 0 | 0 | `PlacementDamage_SetHitFlags` | — |
 | struct PlayStatsScreen / flags / set | 0 | 1 | 1 | 0 | 0 | `bit` | — |
-| struct Player / actionFlags / and | 1 | 16 | 3 | 0 | 0 | `Player_ReadStatusBits`, `WordFlags_Test` | 4 / 2 / 0 (66.7%) |
+| struct Player / actionFlags / and | 1 | 17 | 3 | 0 | 0 | `ActorStatus_PalettePlayerFlags`, `Player_ReadStatusBits`, `WordFlags_Test` | 4 / 2 / 0 (66.7%) |
 | struct Player / actionFlags / nonzero | 0 | 1 | 0 | 0 | 0 | `mask` | 4 / 2 / 0 (66.7%) |
 | struct Player / statBonusFlags / and | 0 | 7 | 2 | 0 | 0 | `Player_ReadStatusBits` | 3 / 0 / 0 (100.0%) |
 | struct Player / statusFlags / and | 0 | 25 | 9 | 0 | 0 | `Flag`, `PlayerScript_TestFlags`, `Player_ReadStatusBits`, `SceneActorChase_Bits32`, `SceneActorState_TestPlayerFlags`, `TestField`, `TestFlags`, `TestPlayerFlag`, `blocked`, `excluded`, `flag`, `mask`, `playerMask` | 3 / 0 / 0 (100.0%) |
@@ -769,38 +769,39 @@ The ROM share is mask-first among classified mask-first and load-first operation
 | struct RepeatedEffectCollider / contactFlags / and | 1 | 0 | 0 | 0 | 0 | `Flags_MaskedWord` | 1 / 0 / 0 (100.0%) |
 | struct RepeatedEffectCollider / responseFlags / and | 0 | 0 | 1 | 0 | 0 | `Flags_MaskedWord` | 1 / 0 / 0 (100.0%) |
 | struct RoamingObjectListener / flags / and-store | 0 | 2 | 0 | 0 | 0 | `mask` | — |
-| struct RoomActor / behaviorFlags / and | 2 | 41 | 22 | 0 | 0 | `ActorStatus_BehaviorFlags`, `Flags_MaskedWord`, `SceneActorBehavior_OverrideBits`, `SceneActorChase_Bits32`, `SceneActorTurn_ActorFlags`, `Vorn_ActorFlags`, `Vorn_MaskLow`, `WordFlag`, `actionMask`, `bit`, `invalidMask`, `mask`, `mask3`, `one`, `test` | 16 / 5 / 0 (76.2%) |
-| struct RoomActor / behaviorFlags / and-store | 0 | 19 | 3 | 0 | 0 | `MaskContactFlags`, `SceneActorChase_AndWordFlags`, `m`, `mask` | 1 / 0 / 0 (100.0%) |
-| struct RoomActor / behaviorFlags / clear | 4 | 19 | 43 | 0 | 0 | `SceneActorChase_ClearActorFlags`, `SceneActorChase_ClearBehaviorFlags`, `SceneActorChase_ClearWordFlags` | 1 / 0 / 0 (100.0%) |
+| struct RoomActor / behaviorFlags / and | 4 | 41 | 26 | 0 | 0 | `ActorStatus_BehaviorFlags`, `Flags_MaskedWord`, `SceneActorBehavior_OverrideBits`, `SceneActorChase_Bits32`, `SceneActorTurn_ActorFlags`, `Vorn_ActorFlags`, `Vorn_MaskLow`, `WordFlag`, `actionMask`, `bit`, `invalidMask`, `mask`, `mask3`, `one`, `test` | 16 / 5 / 0 (76.2%) |
+| struct RoomActor / behaviorFlags / and-store | 0 | 21 | 3 | 0 | 0 | `MaskContactFlags`, `SceneActorChase_AndWordFlags`, `m`, `mask` | 1 / 0 / 0 (100.0%) |
+| struct RoomActor / behaviorFlags / clear | 4 | 19 | 47 | 0 | 0 | `SceneActorChase_ClearActorFlags`, `SceneActorChase_ClearBehaviorFlags`, `SceneActorChase_ClearWordFlags` | 1 / 0 / 0 (100.0%) |
 | struct RoomActor / behaviorFlags / nonzero | 0 | 3 | 3 | 0 | 0 | `bit`, `enabled`, `mask` | 16 / 5 / 0 (76.2%) |
-| struct RoomActor / behaviorFlags / set | 1 | 96 | 57 | 0 | 0 | `ActorStatus_SetWord`, `Golem_SetRouteFlags`, `MonsterInit_SetBehaviorFlags`, `Reaction_SetWord`, `SceneActorBehavior_SetWordFlags`, `SceneActorChase_SetActorFlags`, `SceneActorChase_SetBehaviorFlags`, `bit`, `mask` | 1 / 0 / 0 (100.0%) |
+| struct RoomActor / behaviorFlags / set | 4 | 99 | 57 | 0 | 0 | `ActorStatus_SetWord`, `Golem_SetRouteFlags`, `MonsterInit_SetBehaviorFlags`, `Reaction_SetWord`, `SceneActorBehavior_SetWordFlags`, `SceneActorChase_SetActorFlags`, `SceneActorChase_SetBehaviorFlags`, `bit`, `mask` | 1 / 0 / 0 (100.0%) |
 | struct RoomActor / context.captureFlags / and | 0 | 0 | 0 | 1 | 0 | `ContextFlag` | — |
 | struct RoomActor / context.flags / nonzero | 0 | 0 | 0 | 1 | 0 | `Ghost_TestFlags` | — |
 | struct RoomActor / context.flags / set | 0 | 0 | 0 | 1 | 0 | `Dog_SetContextFlags` | — |
 | struct RoomActor / context.flags3D4 / clear | 0 | 0 | 0 | 1 | 0 | `MotionState_ClearFlags` | — |
 | struct RoomActor / context.flags62C / nonzero | 0 | 0 | 0 | 1 | 0 | `HasFlag` | — |
 | struct RoomActor / context.flags6D4 / nonzero | 0 | 0 | 0 | 2 | 0 | `TestContext_BeginTargetPursuit` | — |
-| struct RoomActor / motionFlags / and | 1 | 104 | 40 | 0 | 0 | `Chase_MotionFlags`, `ContactActor_ReadMotionFlags`, `Mask16`, `SceneActorBehavior_MotionBits`, `SceneActorChase_QueryMotionFlags`, `SceneActorContact_MotionFlags`, `SceneActorPlacement_ReadFlags16`, `SceneActorTurn_Flags`, `SceneActor_MaskedHalfword`, `TestMotionFlag`, `Vorn_Mask16`, `activeMask`, `hm`, `m`, `mask`, `motionMode`, `partFlag`, `testMask` | 108 / 2 / 0 (98.2%) |
-| struct RoomActor / motionFlags / and-store | 0 | 34 | 4 | 0 | 0 | `ClearHalf`, `ClearMotionFlags`, `HalfwordFlags_And`, `SceneActorChase_AndMotionFlags`, `SceneActorPlacement_ClearFlags`, `Slime_ClearMotionBits`, `m`, `mask`, `n` | 14 / 0 / 0 (100.0%) |
-| struct RoomActor / motionFlags / clear | 0 | 20 | 36 | 0 | 0 | `ActorStatus_ClearMotionFlags`, `Chase_ClearBits`, `MimicChase_ClearBits`, `SceneActorChase_ClearBits`, `SceneActorChase_ClearMotionFlags`, `k1`, `mask`, `motionMask` | 14 / 0 / 0 (100.0%) |
-| struct RoomActor / motionFlags / nonzero | 0 | 12 | 5 | 0 | 0 | `bit`, `chasing`, `liftFlag`, `m`, `mask` | 108 / 2 / 0 (98.2%) |
+| struct RoomActor / motionFlags / and | 5 | 106 | 40 | 0 | 0 | `Chase_MotionFlags`, `ContactActor_ReadMotionFlags`, `Mask16`, `SceneActorBehavior_MotionBits`, `SceneActorChase_QueryMotionFlags`, `SceneActorContact_MotionFlags`, `SceneActorPlacement_ReadFlags16`, `SceneActorTurn_Flags`, `SceneActor_MaskedHalfword`, `TestMotionFlag`, `Vorn_Mask16`, `activeMask`, `hm`, `m`, `mask`, `motionMode`, `partFlag`, `testMask` | 108 / 2 / 0 (98.2%) |
+| struct RoomActor / motionFlags / and-store | 0 | 35 | 5 | 0 | 0 | `ClearHalf`, `ClearMotionFlags`, `HalfwordFlags_And`, `SceneActorChase_AndMotionFlags`, `SceneActorPlacement_ClearFlags`, `Slime_ClearMotionBits`, `m`, `mask`, `n` | 14 / 0 / 0 (100.0%) |
+| struct RoomActor / motionFlags / clear | 0 | 21 | 38 | 0 | 0 | `ActorStatus_ClearMotionFlags`, `Chase_ClearBits`, `MimicChase_ClearBits`, `SceneActorChase_ClearBits`, `SceneActorChase_ClearMotionFlags`, `k1`, `mask`, `motionMask` | 14 / 0 / 0 (100.0%) |
+| struct RoomActor / motionFlags / nonzero | 0 | 14 | 5 | 0 | 0 | `bit`, `chasing`, `liftFlag`, `m`, `mask` | 108 / 2 / 0 (98.2%) |
 | struct RoomActor / motionFlags / set | 0 | 19 | 2 | 0 | 0 | `Golem_SetMotionFlags`, `Or16`, `SceneActorChase_SetMotionFlags`, `SetFlags`, `mask` | 6 / 0 / 0 (100.0%) |
-| struct RoomActor / pendingControlFlags / and-store | 1 | 9 | 1 | 0 | 0 | `SceneActorChase_AndWordFlags`, `mask` | 9 / 0 / 0 (100.0%) |
+| struct RoomActor / pendingControlFlags / and | 0 | 1 | 0 | 0 | 0 | `RotationPhase_Mask` | — |
+| struct RoomActor / pendingControlFlags / and-store | 1 | 14 | 1 | 0 | 0 | `MonsterInit_MaskControlFlags`, `SceneActorChase_AndWordFlags`, `mask` | 9 / 0 / 0 (100.0%) |
 | struct RoomActor / placementFlags / and | 0 | 3 | 0 | 0 | 0 | `ClearRotationFlag`, `SceneActor_MaskedHalfword`, `mask` | 2 / 0 / 0 (100.0%) |
 | struct RoomActor / placementFlags / and-store | 0 | 4 | 0 | 0 | 0 | `IvyInit_ClearMotionFlags`, `mask` | — |
 | struct RoomActor / placementFlags / clear | 0 | 4 | 0 | 0 | 0 | `HalfwordFlags_Clear`, `clearFlags16` | — |
-| struct RoomActor / placementFlags / nonzero | 0 | 40 | 17 | 0 | 0 | `ActorStatus_BodyFlags`, `MonsterInit_TestMotionFlags`, `PlacementDamage_TestField`, `SceneActorChase_HasPlacementFlags`, `SceneActorChase_TestField`, `mask`, `movementMask` | 2 / 0 / 0 (100.0%) |
+| struct RoomActor / placementFlags / nonzero | 0 | 42 | 18 | 0 | 0 | `ActorStatus_BodyFlags`, `MonsterInit_TestMotionFlags`, `PlacementDamage_TestField`, `SceneActorChase_HasPlacementFlags`, `SceneActorChase_TestField`, `mask`, `movementMask` | 2 / 0 / 0 (100.0%) |
 | struct RoomActor / placementFlags / set | 0 | 19 | 10 | 0 | 0 | `HalfwordFlags_Set`, `MonsterInit_SetMotionFlags`, `Or16`, `SceneActorPlacement_SetFlags` | — |
 | struct RoomActor / reactionFlags / and | 0 | 3 | 0 | 0 | 0 | `ClearReaction`, `clear`, `mask` | 1 / 0 / 0 (100.0%) |
-| struct RoomActor / reactionFlags / and-store | 0 | 8 | 0 | 0 | 0 | `SceneActorPlacement_ClearFlags`, `Slime_ClearPendingFlags`, `clear`, `mask` | 3 / 0 / 0 (100.0%) |
+| struct RoomActor / reactionFlags / and-store | 0 | 9 | 0 | 0 | 0 | `SceneActorPlacement_ClearFlags`, `Slime_ClearPendingFlags`, `clear`, `mask` | 3 / 0 / 0 (100.0%) |
 | struct RoomActor / reactionFlags / clear | 0 | 4 | 4 | 0 | 0 | `Chase_ClearBits`, `SceneActorChase_ClearBits` | 3 / 0 / 0 (100.0%) |
 | struct RoomActor / reactionFlags / nonzero | 0 | 1 | 0 | 0 | 0 | `Slime_TestPendingFlag` | 1 / 0 / 0 (100.0%) |
-| struct RoomActor / reactionFlags / set | 4 | 6 | 5 | 0 | 0 | `ActorStatus_SetPendingBits`, `HalfwordFlags_Set`, `SceneActorChase_OrReactionFlags` | 2 / 0 / 0 (100.0%) |
-| struct RoomActor / statusFlags / and | 1 | 28 | 8 | 0 | 0 | `ActorStatus_StatusFlags`, `Flags_MaskedWord`, `SceneActorChase_Bits32`, `SceneActorChase_StatusFlags`, `SceneActorPlacement_ReadFlags32`, `WordFlag`, `bit`, `mask`, `queryMask` | 32 / 0 / 0 (100.0%) |
-| struct RoomActor / statusFlags / and-store | 1 | 28 | 1 | 0 | 0 | `ClearWord`, `Reaction_ClearWord`, `SceneActorChase_AndWordFlags`, `WordFlags_And`, `clear`, `m`, `mask` | 13 / 3 / 0 (81.2%) |
-| struct RoomActor / statusFlags / clear | 1 | 17 | 14 | 0 | 0 | `SceneActorChase_ClearStatusFlags`, `SceneActorChase_ClearWordFlags`, `k2` | 13 / 3 / 0 (81.2%) |
-| struct RoomActor / statusFlags / nonzero | 0 | 13 | 3 | 0 | 0 | `k2`, `mask` | 32 / 0 / 0 (100.0%) |
-| struct RoomActor / statusFlags / set | 1 | 109 | 13 | 0 | 0 | `ActorStatus_SetWord`, `MonsterInit_SetStatusFlags`, `SceneActorBehavior_SetWordFlags`, `SceneActorChase_SetStatusFlags`, `SetFlags`, `WordFlags_Set`, `c`, `m`, `mask`, `status` | 5 / 0 / 0 (100.0%) |
+| struct RoomActor / reactionFlags / set | 4 | 7 | 5 | 0 | 0 | `ActorStatus_SetPendingBits`, `HalfwordFlags_Set`, `SceneActorChase_OrReactionFlags`, `bit` | 2 / 0 / 0 (100.0%) |
+| struct RoomActor / statusFlags / and | 1 | 33 | 8 | 0 | 0 | `ActorStatus_StatusFlags`, `Flags_MaskedWord`, `SceneActorChase_Bits32`, `SceneActorChase_StatusFlags`, `SceneActorPlacement_ReadFlags32`, `WordFlag`, `bit`, `mask`, `queryMask`, `suppressed` | 32 / 0 / 0 (100.0%) |
+| struct RoomActor / statusFlags / and-store | 1 | 30 | 1 | 0 | 0 | `ClearWord`, `Reaction_ClearWord`, `SceneActorChase_AndWordFlags`, `WordFlags_And`, `clear`, `m`, `mask` | 13 / 3 / 0 (81.2%) |
+| struct RoomActor / statusFlags / clear | 2 | 18 | 16 | 0 | 0 | `SceneActorChase_ClearStatusFlags`, `SceneActorChase_ClearWordFlags`, `k2` | 13 / 3 / 0 (81.2%) |
+| struct RoomActor / statusFlags / nonzero | 0 | 14 | 3 | 0 | 0 | `k2`, `mask` | 32 / 0 / 0 (100.0%) |
+| struct RoomActor / statusFlags / set | 1 | 111 | 14 | 0 | 0 | `ActorStatus_SetWord`, `MonsterInit_SetStatusFlags`, `SceneActorBehavior_SetWordFlags`, `SceneActorChase_SetStatusFlags`, `SetFlags`, `WordFlags_Set`, `c`, `m`, `mask`, `status` | 5 / 0 / 0 (100.0%) |
 | struct S / f9c / set | 0 | 1 | 0 | 0 | 0 | `setf` | — |
 | struct S / fl / and-store | 0 | 2 | 0 | 0 | 0 | `m` | — |
 | struct S / flags / and-store | 0 | 1 | 0 | 0 | 0 | `mask` | — |
@@ -824,11 +825,11 @@ The ROM share is mask-first among classified mask-first and load-first operation
 | struct SceneActorChasePlacement / flags / clear | 0 | 0 | 1 | 0 | 0 | `ActorStatus_ClearPlacementFlags` | — |
 | struct SceneActorChasePlacement / flags / set | 0 | 0 | 3 | 0 | 0 | `ActorStatus_SetPlacementFlags`, `Golem_MarkContactPlacement`, `one` | — |
 | struct SceneActorChaseTracking / flags / and | 0 | 2 | 1 | 0 | 0 | `clearMask`, `m2`, `mask` | 20 / 0 / 0 (100.0%) |
-| struct SceneActorChaseTracking / flags / and-store | 0 | 11 | 3 | 0 | 0 | `ClearTargetFlags`, `Reaction_ClearMotion`, `bm`, `m`, `mask`, `trackingMask` | 10 / 0 / 0 (100.0%) |
+| struct SceneActorChaseTracking / flags / and-store | 0 | 12 | 3 | 0 | 0 | `ClearTargetFlags`, `Reaction_ClearMotion`, `bm`, `m`, `mask`, `trackingMask` | 10 / 0 / 0 (100.0%) |
 | struct SceneActorChaseTracking / flags / clear | 0 | 1 | 4 | 0 | 0 | `Recovery_ClearTrackingFlags`, `Vorn_ClearTrackingFlags` | 10 / 0 / 0 (100.0%) |
-| struct SceneActorChaseTracking / flags / nonzero | 0 | 1 | 0 | 0 | 0 | `SceneActorContact_TestTracking` | 20 / 0 / 0 (100.0%) |
+| struct SceneActorChaseTracking / flags / nonzero | 0 | 2 | 0 | 0 | 0 | `MonsterInit_TestTargetingFlags`, `SceneActorContact_TestTracking` | 20 / 0 / 0 (100.0%) |
 | struct SceneActorChaseTracking / flags / set | 0 | 5 | 3 | 0 | 0 | `SceneActorContact_SetTrackingFlags`, `Vorn_SetTrackingFlags`, `m`, `mask` | 8 / 0 / 0 (100.0%) |
-| struct SceneActorControlGate / flags / clear | 0 | 12 | 0 | 0 | 0 | `SceneActorChase_GroupClearFlags`, `SceneActorRecovery_ClearGate`, `bits` | 3 / 0 / 0 (100.0%) |
+| struct SceneActorControlGate / flags / clear | 0 | 13 | 0 | 0 | 0 | `SceneActorChase_GroupClearFlags`, `SceneActorRecovery_ClearGate`, `bits` | 3 / 0 / 0 (100.0%) |
 | struct SceneActorControlGate / flags / set | 0 | 2 | 0 | 0 | 0 | `SetFlags`, `four` | 1 / 0 / 0 (100.0%) |
 | struct SceneActorControlMotionState / flags3D4 / and | 0 | 0 | 1 | 0 | 0 | `firstMask` | — |
 | struct SceneActorControlMotionState / flags3D4 / and-store | 0 | 3 | 0 | 0 | 0 | `SceneActorChase_AndWordFlags`, `clearMask`, `mask` | — |
@@ -936,7 +937,7 @@ The ROM share is mask-first among classified mask-first and load-first operation
 | struct WirelessGameExchange / exchangeFlags / and | 0 | 1 | 4 | 0 | 0 | `WordFlags_Test` | — |
 | struct WirelessGameExchange / exchangeFlags / and-store | 0 | 1 | 0 | 0 | 0 | `mask` | — |
 | struct WorldMapMenu / selectionCursor.stateFlags / and | 0 | 0 | 1 | 0 | 0 | `Test` | — |
-| union DisplaySequenceControl / raw / and | 5 | 1 | 129 | 0 | 0 | `active`, `bit` | — |
+| union DisplaySequenceControl / raw / and | 6 | 1 | 152 | 0 | 0 | `active`, `bit` | — |
 | union DisplaySequenceControl / raw / nonzero | 0 | 0 | 1 | 0 | 0 | `mask` | — |
 | union RegistryFlagField / word / clear | 0 | 0 | 2 | 0 | 0 | `SceneActorChase_ClearWordFlags` | — |
 | union RegistryFlagField / word / set | 1 | 0 | 0 | 0 | 0 | `bit` | — |
@@ -945,21 +946,20 @@ The ROM share is mask-first among classified mask-first and load-first operation
 
 | Verdict | Weighted uses |
 | --- | ---: |
-| PLAIN | 369 |
-| BOUND-SINGLE | 2,566 |
-| BOUND-SHARED | 2,948 |
-| SKIP | 533 |
+| PLAIN | 403 |
+| BOUND-SINGLE | 2,621 |
+| BOUND-SHARED | 3,031 |
+| SKIP | 361 |
 | PENDING | 0 |
 
 ## Skip reasons
 
 | Reason | Sites |
 | --- | ---: |
-| header site has no single owning translation unit | 143 |
-| helper has no safe inline specialization | 1 |
+| helper has no safe inline specialization | 4 |
 | helper has other arguments | 1 |
 | mask value could not be resolved | 1 |
-| no safe fold_literals --every-read proposal | 275 |
+| no safe fold_literals --every-read proposal | 278 |
 | variant compile/link failed | 11 |
 
 ## Scratch application control
@@ -1056,3 +1056,10 @@ the staging of the mask even when the helper includes other behavior.
 Of 342 previously skipped helper sites, 146 were PLAIN,
 68 BOUND-SINGLE, and 127 BOUND-SHARED.
 One specialization still skipped. Total SKIP fell from 773 to 432.
+
+The header pass tests a variant through scratch copies of the affected
+include paths. PLAIN requires each translation unit in the include graph
+to match. A mismatch in one matching dependent supplies the verdict and
+the CSV names that unit. Of the 143 header sites, 28 were PLAIN,
+55 BOUND-SINGLE, 54 BOUND-SHARED,
+and 6 still skipped. Total SKIP fell from 432 to 295.
