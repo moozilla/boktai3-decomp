@@ -229,7 +229,8 @@ def field_paths(old, new):
             continue
         whole_bytes = (m["off"] * 8, m["size"] * 8)
         occupied_bits = old_bits.get(m["name"], whole_bytes)
-        hits = {n["name"] for n in choices if n.get("off") == m["off"] and n.get("size") == m["size"]
+        embedded = [n for n in new.get("embedded", ()) if n["ctype"] == m["ctype"]]
+        hits = {n["name"] for n in choices + embedded if n.get("off") == m["off"] and n.get("size") == m["size"]
                 and n.get("array") == m["array"] and n.get("esize") == m.get("esize")
                 and (n.get("base") == m["base"] or {m["base"], n.get("base")} <= {"int", "enum"})
                 and occupied_bits == new_bits.get(n["name"], whole_bytes)}
@@ -399,7 +400,7 @@ def path_under(path, directory, suffix):
 def shared_layout(view):
     members = [(m.get("name"), m.get("off"), m.get("base"), m.get("width"), m.get("signed"), type_key(m))
                for m in view["members"]]
-    return view["kind"], view["size"], view["align"], members, view["leaves"], view["containers"]
+    return view["kind"], view["size"], view["align"], members, view["leaves"], view["containers"], view.get("embedded")
 
 
 def header_choice(catalog, family, views, args):

@@ -418,6 +418,17 @@ int X(struct R *r, struct Q *q) { return r->old + q->old; }
             merge.plan_header(family, [old], "W", Path("include/w.h"))
         self.assertEqual(merge.field_paths(old, new), {"low": None, "high": None})
 
+    def test_shared_record_can_map_a_private_field_to_a_nested_member(self):
+        types = "struct Body { int mode; };\nstruct Other { int mode; };\n"
+        old = measure(types + "struct View { struct Body body; };", "src/a.c")["src/a.c:struct View"]
+        shared = types + "struct Shared { struct { struct Body motion; struct Other other; } actor; };"
+        new = measure(shared, "include/shared.h")["include/shared.h:struct Shared"]
+        self.assertEqual(merge.field_paths(old, new), {"body": "actor.motion"})
+
+        wrong = measure(shared.replace("Body motion", "Other motion"),
+                        "include/shared.h")["include/shared.h:struct Shared"]
+        self.assertEqual(merge.field_paths(old, wrong), {"body": None})
+
 
 class GateTests(unittest.TestCase):
     @unittest.skipUnless(sys.platform == "darwin" and Path(deadcode.CLANG).is_file(), "macOS clang required")
