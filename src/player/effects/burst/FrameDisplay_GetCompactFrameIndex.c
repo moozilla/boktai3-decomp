@@ -1,20 +1,8 @@
-#include "global.h"
-struct FrameDisplayEntry {
-    u16 frame, unknown2;
-};
-struct FrameDisplayAnimation {
-    u8 unknown0[0x14];
-    u16 frameIndex;
-    u8 unknown16[0x3e];
-    struct FrameDisplayEntry *frames;
-};
-struct FrameDisplay {
-    u8 unknown0[0x74];
-    struct FrameDisplayAnimation *animation;
-};
+#include "player/effects/frame_display.h"
+
 s32 FrameDisplay_GetCompactFrameIndex(struct FrameDisplay *p)
 {
-    s32 frame = p->animation->frames[p->animation->frameIndex].frame;
+    s32 frame = p->animation->frames[p->animation->frameIndex].key;
     if ((u32)(frame - 0xeb) <= 0x3a) {
         if (frame == 0xff)
             frame = 0xfe;
