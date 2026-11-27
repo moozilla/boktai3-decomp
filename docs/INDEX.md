@@ -302,7 +302,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [notes/codex-projectile-task-recovery_2026-11-26.md](../notes/codex-projectile-task-recovery_2026-11-26.md) | Timed projectile and trail source recovery | #effects #types #matching #phase3 | 2 |
 | [notes/codex-remaining-monsters_2026-11-26.md](../notes/codex-remaining-monsters_2026-11-26.md) | Remaining monster state and type recovery | #monster #types #matching #phase3 | 13 |
 | [notes/codex-story-character-recovery_2026-11-26.md](../notes/codex-story-character-recovery_2026-11-26.md) | Story character layouts and state resets | #actors #types #matching #phase3 | 3 |
-| [notes/codex-ui-playback-and-layout_2026-11-26.md](../notes/codex-ui-playback-and-layout_2026-11-26.md) | UI layouts and playback recovery | #ui #types #matching #phase3 #tooling | 3 |
+| [notes/codex-ui-playback-and-layout_2026-11-26.md](../notes/codex-ui-playback-and-layout_2026-11-26.md) | UI layouts and playback recovery | #ui #types #matching #phase3 #tooling | 4 |
 | [notes/collision-process-pairs-round9.md](../notes/collision-process-pairs-round9.md) | Collision_ProcessPairs |  | 0 |
 | [notes/compiler-debugger-2026-10-23.md](../notes/compiler-debugger-2026-10-23.md) | Compiler debugger: first session (2026-10-23) | #matching #tooling #regalloc | 12 |
 | [notes/contact-actor-pool_2026-10-14.md](../notes/contact-actor-pool_2026-10-14.md) | Contact actor pool setup and display (tentative) | *#actors* | 7 |

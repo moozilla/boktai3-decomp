@@ -59,6 +59,21 @@ directly changes the two early zero assignments from r5 and r6 to r4 and
 r5, according to Scope's local allocation trace.
 
 UI steering debt fell from 550 to 436 constant uses and weighted warnings
-from 577 to 463, with zero errors. Stock checks match every changed unit.
-The final controller header passed all 41 dependent checks, and the
-playback header split passed all 28 checks before the UI adopted it.
+from 577 to 463 through the HUD pass.
+
+## Modifier previews, play statistics, and the map
+
+At 08040610 the eight comparison tile calls use direct corner and palette
+values. At 081C0CE4 the results page uses the complete phase-entry
+transition. PlayStats_SetState also sets its final pending flag directly.
+Direct event consumption in the results cases changes the test and clear
+sequence, so the explicit operation remains there.
+
+The map callbacks at 0816B958, 0816BA90, and 0816C2FC use SceneHudState
+for the navigation pages, viewport bounds, and position sprites. All
+115 dependent units match.
+
+The full worker batch leaves 418 constant uses and 445 weighted warnings,
+with zero errors. Stock checks match all 58 changed UI units. The final
+controller header passed all 41 dependent checks, and the playback
+header split passed all 28 checks before the UI adopted it.
