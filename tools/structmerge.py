@@ -319,7 +319,6 @@ def check_pointer_prefix(ast, view):
     from pycparser import c_ast
 
     tag = view["spell"].split()[1]
-    names = set()
 
     def nodes(node, parents=()):
         yield node, parents
@@ -328,6 +327,7 @@ def check_pointer_prefix(ast, view):
 
     roots = [node for node in ast.ext if node.coord and Path(node.coord.file).as_posix() == view["file"]]
     for root in roots:
+        names = set()
         for node, parents in nodes(root):
             if not isinstance(node, c_ast.Struct) or node.name != tag or node.decls is not None:
                 continue
@@ -338,7 +338,6 @@ def check_pointer_prefix(ast, view):
             if parameter.name:
                 names.add(parameter.name)
 
-    for root in roots:
         for node, parents in nodes(root):
             if not isinstance(node, c_ast.ID) or node.name not in names or not parents:
                 continue

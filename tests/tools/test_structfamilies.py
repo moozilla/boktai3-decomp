@@ -391,7 +391,7 @@ int Draw(struct View *p) { return p->cursor.x; }
         new = measure(shared, "include/state.h")["include/state.h:struct State"]
         declaration = TYPES + "struct View { u16 field; };\n"
         for expression, problem in [
-            ("int Read(struct View *p) { return p->field; }", None),
+            ("int Read(struct View *p) { return p->field; }\nint Other(u16 *p) { return p[1]; }", None),
             ("int Read(struct View p) { return p.field; }", "outside a direct pointer parameter"),
             ("int Read(struct View *p) { return p[1].field; }", "outside a member access"),
             ("int Read(struct View *p) { return sizeof(*p); }", "outside a member access"),
