@@ -1,15 +1,8 @@
 #include "global.h"
 #include "player/cutscene/player_cue_sequence.h"
 #include "bosses/nidhoggr/nidhoggr_effect_motion_layout.h"
+#include "bosses/nidhoggr/nidhoggr_pool_sprite_layout.h"
 
-struct NidhoggrPoolSprite {
-    u32 flags;
-    u8 unknown4[12];
-    u16 frame;
-    u8 unknown12[10];
-    struct NidhoggrEffectMotion position;
-    u8 unknown24[8];
-};
 struct NidhoggrAnimatedSlot {
     void (*update)(struct NidhoggrAnimatedSlot *);
     void (*onComplete)(struct NidhoggrAnimatedSlot *);
