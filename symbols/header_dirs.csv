@@ -584,3 +584,4 @@ include/system/time/region_menu.h,include/system/clock/region_menu.h,beside its 
 include/system/time_palette_transitions/time_palette.h,include/system/clock/time_palette.h,beside its unit,,
 include/monsters/enemy_particle.h,include/effects/particles/enemy_particle.h,Shared enemy attack particle pool,,
 include/ui/dialogue/text_state.h,include/ui/dialogue/text_state.h,owned by the dialogue text interpreter,,
+include/ui/dialogue/text_window_manager.h,include/ui/dialogue/text_window_manager.h,owned by the text window manager,,
