@@ -2,11 +2,11 @@
 
 Tags: #player #minigames #types #matching #phase3 #tooling
 
-The lane-wide linter started at 402 weighted warnings and 393 steering-debt
-uses. At the spiral trail checkpoint it reports 302 warnings and 293 uses, a
-25.4% debt reduction. All 68 changed source units passed the stock ROM check.
-The dependent checks covered every changed header. The two existing volatile
-declarations in the target registry still contribute the lane's two errors.
+The lane-wide linter fell from 402 to 296 weighted warnings and from 393 to 287
+steering-debt uses, a 27.0% debt reduction. All 83 changed source units and all
+190 transitive dependents of the nine changed headers passed stock ROM checks.
+The two existing volatile declarations in the target registry still contribute
+the lane's two errors.
 
 ## Typed objects and state updates
 
@@ -50,6 +50,13 @@ declarations in the target registry still contribute the lane's two errors.
   the field directly. The first generic helper at the remaining sites
   still shapes mask setup. The debris sprite hide bit can use the bit
   already set up by the display-state test or update.
+- The recoil puff pool is a 0x19C-byte task with eight typed slots. The
+  initializer (08237280) and update callback index those slots. Typed fields
+  and the loops clear five staged uses. CoffinBike_UpdateDefeatEffects
+  indexes the five model parts in its hide loop, clearing one further use.
+- Player motion recovery uses the shared cue sequence and pushing fields.
+  Frame displays read the native drawable and keyframe fields. Coffin Bike
+  and Result Menu send SceneEventCommand packets with counted arguments.
 
 ## Tool changes and repeatable checks
 
@@ -64,7 +71,7 @@ whole-byte bitfield view has identical named storage and alignment.
 Structmerge accepts an explicit larger shared prefix for pointer-only
 uses, with measured member mapping and the usual compiler gate. It also
 maps a private aggregate field to a matching measured nested field.
-All 28 tests in tests/tools/test_structfamilies.py passed.
+All 34 tests in the focused struct family, layout, and view suites passed.
 
 ## Open decisions
 
@@ -89,6 +96,13 @@ All 28 tests in tests/tools/test_structfamilies.py passed.
   view. Both indexed and typed pointer-walk conversions change the
   pointer allocation. The spiral trail slot dispatcher also keeps its
   existing pointer walk after direct callback accesses changed the loop.
+- In PanelText_DrawDigits, the direct assignment lets the cell pointer
+  take r5. Raising the value pseudo's allocation priority isolates a
+  matching diagnostic build. The source keeps its current assignment form.
+- Removing the indirect index read in PlayerClone_SetAnimation leaves a
+  commutative operand order difference. In PlayerCue_UpdateTurningPalette,
+  the direct RGB composition changes the destination of two ORR instructions
+  after regmove ties the red component to a different register.
 
 The worker report under build/REPORT.md has per-family refusals, checks,
 and resume locations. The integration run owns combined ROM verification.

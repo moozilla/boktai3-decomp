@@ -299,7 +299,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [notes/codex-monster-continuation_2026-11-26.md](../notes/codex-monster-continuation_2026-11-26.md) | Monster route, control, and sprite follow-up | #monsters #types #phase3 #matching | 7 |
 | [notes/codex-monster-layout-cleanup_2026-11-26.md](../notes/codex-monster-layout-cleanup_2026-11-26.md) | Golem, Dog, Axe and Axe Armor layouts | #monsters #types #phase3 #matching | 3 |
 | [notes/codex-platform-and-otenko-recovery_2026-11-26.md](../notes/codex-platform-and-otenko-recovery_2026-11-26.md) | Moving platform and Otenko source recovery | #actors #types #matching #phase3 | 3 |
-| [notes/codex-player-minigame-recovery_2026-11-26.md](../notes/codex-player-minigame-recovery_2026-11-26.md) | Player and minigame source recovery | #player #minigames #types #matching #phase3 #tooling | 6 |
+| [notes/codex-player-minigame-recovery_2026-11-26.md](../notes/codex-player-minigame-recovery_2026-11-26.md) | Player and minigame source recovery | #player #minigames #types #matching #phase3 #tooling | 7 |
 | [notes/codex-projectile-task-recovery_2026-11-26.md](../notes/codex-projectile-task-recovery_2026-11-26.md) | Timed projectile and trail source recovery | #effects #types #matching #phase3 | 2 |
 | [notes/codex-remaining-monsters_2026-11-26.md](../notes/codex-remaining-monsters_2026-11-26.md) | Remaining monster state and type recovery | #monster #types #matching #phase3 | 13 |
 | [notes/codex-story-character-recovery_2026-11-26.md](../notes/codex-story-character-recovery_2026-11-26.md) | Story character layouts and state resets | #actors #types #matching #phase3 | 3 |
