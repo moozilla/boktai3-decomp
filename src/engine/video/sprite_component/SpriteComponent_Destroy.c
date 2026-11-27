@@ -1,8 +1,5 @@
 #include "global.h"
-struct SpriteComponent {
-    void (*update)(struct SpriteComponent *);
-    void (*destroy)(struct SpriteComponent *);
-};
+#include "engine/video/sprite_component.h"
 s32 Callback_InvokeActor(void *, void *);
 u32 SpriteComponent_Destroy(struct SpriteComponent *component)
 {
