@@ -1,18 +1,16 @@
 #include "global.h"
 #include "engine/engine.h"
 #include "engine/ram.h"
+#include "scene/collision/contact_position.h"
 
 // confidence=low: advances falling projectiles and switches to impact on terrain contact.
-struct ProjectilePosition {
-    s16 x, y, z, pad;
-};
 struct FallingProjectile {
     u8 unknown0[8];
     u32 flags;
     u8 unknownC[0x14];
-    struct ProjectilePosition position;
+    struct ContactPosition position;
     u8 unknown28[0x38];
-    struct ProjectilePosition precisePosition, velocity;
+    struct ContactPosition precisePosition, velocity;
     u8 shadow[0x6C];
     void *callback;
     u16 timer, phase, unknownE4, delay;
@@ -24,13 +22,13 @@ void Hresvelgr_EmitImpactExplosions(void *);
 void Hresvelgr_RepelNearbyTetherActor(void *);
 void Hresvelgr_UpdateProjectileImpact(void *);
 void Hresvelgr_SetFallingAttackState(void *, void (*)(void *));
-static inline void AddPosition(struct ProjectilePosition *out, struct ProjectilePosition *v)
+static inline void AddPosition(struct ContactPosition *out, struct ContactPosition *v)
 {
     out->x = out->x + v->x;
     out->y = out->y + v->y;
     out->z = out->z + v->z;
 }
-static inline s32 CellIndex(struct ProjectilePosition *p)
+static inline s32 CellIndex(struct ContactPosition *p)
 {
     s32 x = p->x >> 8, z = p->z >> 8;
     if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
@@ -44,7 +42,7 @@ static inline u8 *CellProperties(s32 cell)
         return p + 4;
     return (cell * 4 + 12) + gTerrainMap->cells;
 }
-static inline u32 Height(struct ProjectilePosition *p)
+static inline u32 Height(struct ContactPosition *p)
 {
     u8 *cell = CellProperties(CellIndex(p));
     u32 shape = *cell >> 4;

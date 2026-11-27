@@ -1,15 +1,13 @@
 #include "global.h"
 #include "engine/ram.h"
-struct ProjectilePosition {
-    s16 x, y, z, pad;
-};
+#include "scene/collision/contact_position.h"
 struct HresvelgrProjectile {
     u8 unknown0[8];
     u32 flags;
     u8 unknownC[0x14];
-    struct ProjectilePosition position;
+    struct ContactPosition position;
     u8 unknown28[0x38];
-    struct ProjectilePosition origin, velocity;
+    struct ContactPosition origin, velocity;
     u8 shadow[0x6c];
     u32 state;
     u16 stateFrame, timer, parameter, noShadow;
@@ -30,11 +28,11 @@ static inline void clear(void *dest)
     u32 zero = 0;
     CpuSet(&zero, dest, 0x05000002);
 }
-u32 Hresvelgr_InitializeProjectile(struct ProjectilePosition *position, u32 noShadow, u32 parameter)
+u32 Hresvelgr_InitializeProjectile(struct ContactPosition *position, u32 noShadow, u32 parameter)
 {
     struct HresvelgrProjectilePool *pool = gHresvelgrProjectilePool;
     struct HresvelgrProjectile *p;
-    struct ProjectilePosition *current;
+    struct ContactPosition *current;
     if (!position)
         return 0;
     p = Hresvelgr_FindFreeProjectileSlot();

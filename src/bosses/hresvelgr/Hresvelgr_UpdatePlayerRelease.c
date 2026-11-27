@@ -3,11 +3,9 @@
 
 #include "engine/engine.h"
 #include "player/player.h"
+#include "scene/collision/contact_position.h"
 
 // confidence=low: moves a requested player position and eventually restores player control.
-struct Vec {
-    s16 x, y, z, pad;
-} __attribute__((aligned(4)));
 struct Action {
     u8 state, pad[3];
     u32 frame;
@@ -16,23 +14,23 @@ struct Hresvelgr {
     u8 pad0[0x51];
     u8 heading;
     u8 pad52[2];
-    struct Vec position, velocity;
+    struct ContactPosition position, velocity;
     u8 pad64[0x38];
     u32 flags;
     u8 padA0[15];
     u8 finished, padB0, pending, pulse;
     u8 padB3[0x59];
     struct Player *player;
-    struct Vec *requestedPosition;
+    struct ContactPosition *requestedPosition;
     u8 pad114[0x60];
     u8 animationData[0x20], animation[0x20];
-    struct Vec renderPosition;
+    struct ContactPosition renderPosition;
     u8 pad1BC[0x134];
     struct Action action;
     u8 pad2F8[0x78];
     s16 releaseHeight;
     u8 pad372[0x2a];
-    struct Vec target, step, savedPosition;
+    struct ContactPosition target, step, savedPosition;
 };
 void ActionState_Reset(void *);
 void ActionState_AdvanceState(void *);
@@ -57,19 +55,19 @@ static inline u32 PlayerHasFlag(struct Player *p, u32 mask)
 {
     return p->statusFlags & mask;
 }
-static inline void SetVector(struct Vec *p, s32 x, s32 y, s32 z)
+static inline void SetVector(struct ContactPosition *p, s32 x, s32 y, s32 z)
 {
     p->x = x;
     p->y = y;
     p->z = z;
 }
-static inline void AddVector(struct Vec *out, struct Vec *a, struct Vec *b)
+static inline void AddVector(struct ContactPosition *out, struct ContactPosition *a, struct ContactPosition *b)
 {
     out->x = b->x + a->x;
     out->y = b->y + a->y;
     out->z = b->z + a->z;
 }
-static inline s32 CellIndex(struct Vec *p)
+static inline s32 CellIndex(struct ContactPosition *p)
 {
     s32 x = p->x >> 8, z = p->z >> 8;
     if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
@@ -83,7 +81,7 @@ static inline u8 *CellProperties(s32 cell)
         return p + 4;
     return (cell * 4 + 12) + gTerrainMap->cells;
 }
-static inline s32 Height(struct Vec *p)
+static inline s32 Height(struct ContactPosition *p)
 {
     u8 *cell = CellProperties(CellIndex(p));
     u32 shape = *cell >> 4;
@@ -104,7 +102,7 @@ static inline s32 SignedShift(s32 value, u32 shift)
         return value >> shift;
     return -((-value) >> shift);
 }
-static inline void PolarUnitVector(struct Vec *out, u32 angle)
+static inline void PolarUnitVector(struct ContactPosition *out, u32 angle)
 {
     s32 value;
     s32 magnitude;
@@ -116,7 +114,7 @@ static inline void PolarUnitVector(struct Vec *out, u32 angle)
     value = gUnk_086149C4[angle & 255] * magnitude;
     out->z = SignedShift(value, 12);
 }
-static inline void FindReleaseTarget(void *object, struct Vec *out)
+static inline void FindReleaseTarget(void *object, struct ContactPosition *out)
 {
     struct Hresvelgr *actor = object;
     u32 blockedMask = 0x81;
@@ -176,7 +174,7 @@ void Hresvelgr_UpdatePlayerRelease(struct Hresvelgr *actor, u32 tick)
             if (!action->frame) {
                 Hresvelgr_SelectPlayerAnimation(actor, 0);
                 {
-                    struct Vec *requested = actor->requestedPosition;
+                    struct ContactPosition *requested = actor->requestedPosition;
                     saved->savedPosition = *requested;
                 }
                 action->frame = 1;
@@ -195,7 +193,7 @@ void Hresvelgr_UpdatePlayerRelease(struct Hresvelgr *actor, u32 tick)
             if (saved->step.y < 0)
                 ActionState_AdvanceState(action);
             else {
-                struct Vec delta;
+                struct ContactPosition delta;
                 const u16 *table = gRandomTable;
                 s32 rawX = (s32)ParticleRandom_ReadDirectSample(table) >> 3;
                 u32 smallMask = 31;
@@ -227,7 +225,7 @@ void Hresvelgr_UpdatePlayerRelease(struct Hresvelgr *actor, u32 tick)
                 actor->position.y = Height(&actor->position);
                 ActionState_AdvanceState(action);
             } else {
-                struct Vec delta;
+                struct ContactPosition delta;
                 const u16 *table = gRandomTable;
                 s32 x = ((s32)ParticleRandom_ReadDirectSample(table) >> 3) & 31;
                 s32 z = ((s32)ParticleRandom_ReadDirectSample(table) >> 3) & 31;

@@ -1,9 +1,7 @@
 #include "global.h"
+#include "scene/collision/contact_position.h"
 
 // confidence=low: dispatches pending scene messages into action and animation state.
-struct Vec {
-    s16 x, y, z, pad;
-};
 struct Message {
     u8 pad0[6];
     u8 command;
@@ -19,7 +17,7 @@ struct Hresvelgr {
     u8 pad0[0x51];
     u8 heading;
     u8 pad52[2];
-    struct Vec position;
+    struct ContactPosition position;
     u8 pad5C[0x34];
     u32 actionFrame;
     u8 pad94[0xe];
@@ -47,7 +45,7 @@ struct Hresvelgr {
     u8 pad1AE;
     u8 animationFlags;
     u8 pad1B0[4];
-    struct Vec renderPosition;
+    struct ContactPosition renderPosition;
     u8 pad1BC[0x16f];
     u8 colliderDirection;
 };

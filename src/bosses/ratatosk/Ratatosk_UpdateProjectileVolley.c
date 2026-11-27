@@ -1,13 +1,11 @@
 #include "global.h"
+#include "scene/collision/contact_position.h"
 
-struct Vec {
-    s16 x, y, z, pad;
-};
 struct Actor {
     u8 pad0[0x51];
     u8 angle;
     u8 pad52[2];
-    struct Vec position, velocity;
+    struct ContactPosition position, velocity;
     u8 pad64[0x2c];
     u32 timer;
     s16 health;
@@ -30,9 +28,9 @@ struct Actor {
     u8 pad180[0x1ac];
     u8 animation[0x20];
     u8 animationData[0x20];
-    struct Vec anchor;
+    struct ContactPosition anchor;
     u8 pad374[0x58];
-    struct Vec home;
+    struct ContactPosition home;
     u8 pad3D4[0xa78];
     s16 selectedPoint, selectedTarget;
     u16 padE50;
@@ -65,29 +63,30 @@ static inline s32 Fixed_Truncate12(s32 v)
 {
     return v >= 0 ? v >> 12 : -((-v) >> 12);
 }
-static inline void Vec_SetPolar(struct Vec *v, s32 angle, s32 radius)
+static inline void Vec_SetPolar(struct ContactPosition *v, s32 angle, s32 radius)
 {
     s32 x = Fixed_Truncate12(gUnk_086149C4[(angle + 64) & 255] * radius);
     v->x = x;
     v->y = 0;
     v->z = Fixed_Truncate12(gUnk_086149C4[angle & 255] * radius);
 }
-static inline void Vec_Add(struct Vec *d, struct Vec *a, struct Vec *b)
+static inline void Vec_Add(struct ContactPosition *d, struct ContactPosition *a,
+                           struct ContactPosition *b)
 {
     d->x = b->x + a->x;
     d->y = a->y + b->y;
     d->z = b->z + a->z;
 }
-struct Vec *Player_GetEffectivePosition(s32);
+struct ContactPosition *Player_GetEffectivePosition(s32);
 void Projectile_InitParameters(void *);
 void Projectile_SetLaunchParameters(void *, u16, u32, u8, u32);
 void Projectile_SetSpriteParameters(void *, u32, u32, u32);
 void Projectile_SetScriptProcedure(void *, u32, u16);
 void Projectile_SetCollisionParameters(void *, s32, u32, s32, s32, s32);
 void Projectile_SetBehaviorMode(void *, u16);
-void Projectile_SpawnAtPosition(void *, struct Vec *);
+void Projectile_SpawnAtPosition(void *, struct ContactPosition *);
 s32 SceneProjectile_ConsumeHitEvent(void);
-static inline void Vec_SetVolleyOffset(s16 angle, struct Vec *offset)
+static inline void Vec_SetVolleyOffset(s16 angle, struct ContactPosition *offset)
 {
     Vec_SetPolar(offset, angle, 180);
 }
@@ -97,8 +96,8 @@ void Ratatosk_UpdateProjectileVolley(struct Actor *p, s32 tick)
 {
     int angleStep;
     u8 params[0x58];
-    struct Vec delta;
-    struct Vec spawn;
+    struct ContactPosition delta;
+    struct ContactPosition spawn;
     struct Actor *p2 = p;
     if (p->changed) {
         p->changed = 0;
@@ -133,8 +132,8 @@ void Ratatosk_UpdateProjectileVolley(struct Actor *p, s32 tick)
 
         case 3:
             if (tick > 42) {
-                struct Vec *target = Player_GetEffectivePosition(0);
-                struct Vec *anchor = &p2->anchor;
+                struct ContactPosition *target = Player_GetEffectivePosition(0);
+                struct ContactPosition *anchor = &p2->anchor;
                 u8 angle = Math_Atan2(target->x - anchor->x, target->z - anchor->z);
                 u8 facingAngle = (p->facing << 6) - 64;
                 s32 difference = facingAngle - angle;
@@ -156,7 +155,7 @@ void Ratatosk_UpdateProjectileVolley(struct Actor *p, s32 tick)
                 angle -= angleStep;
                 Sound_PlaySong(0x568);
                 {
-                    struct Vec *spawnPtr = &spawn;
+                    struct ContactPosition *spawnPtr = &spawn;
                     i = 2;
                     do {
                         Projectile_InitParameters(params);

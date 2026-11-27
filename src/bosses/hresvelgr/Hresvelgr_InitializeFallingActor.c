@@ -1,7 +1,5 @@
 #include "global.h"
-struct HresvelgrPosition {
-    s16 x, y, z, pad;
-};
+#include "scene/collision/contact_position.h"
 struct HresvelgrSprite {
     u32 flags;
     u8 unknown4[3];
@@ -9,14 +7,14 @@ struct HresvelgrSprite {
     u8 unknown8[8];
     u16 field10;
     u8 unknown12[10];
-    struct HresvelgrPosition position;
+    struct ContactPosition position;
     u8 unknown24[8];
 };
 struct HresvelgrMotion {
     u8 unknown0[0x18];
     struct HresvelgrSprite sprite;
     u8 graphics[0x70];
-    struct HresvelgrPosition origin, velocity, offset;
+    struct ContactPosition origin, velocity, offset;
     u8 shadow[0x6c];
     u16 state, stateFrame;
 };
@@ -26,8 +24,8 @@ void Sprite_Init(void *, void *, u32);
 void Hresvelgr_InitializeMotionCollider(struct HresvelgrMotion *);
 void ScaledShadow_Initialize(void *, void *, s32, s32, s32, s32, s32, s32, s32, s32, s32);
 void ScaledShadow_SetGraphic(void *, s32, s32);
-s32 Hresvelgr_InitializeFallingActor(struct HresvelgrMotion *p, struct HresvelgrPosition *position,
-                                     struct HresvelgrPosition *velocity, u32 flip)
+s32 Hresvelgr_InitializeFallingActor(struct HresvelgrMotion *p, struct ContactPosition *position,
+                                     struct ContactPosition *velocity, u32 flip)
 {
     void *graphics = p->graphics;
     struct HresvelgrSprite *sprite;

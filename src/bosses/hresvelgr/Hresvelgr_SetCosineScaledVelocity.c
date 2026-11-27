@@ -1,23 +1,21 @@
 #include "global.h"
 #include "engine/engine.h"
 #include "engine/ram.h"
+#include "scene/collision/contact_position.h"
 
 // confidence=low: projects a cosine-scaled speed opposite the actor side.
-struct BurstVector {
-    s16 x, y, z, pad;
-};
 struct BurstActor {
     u8 unknown0[0x51];
     u8 direction;
     u8 unknown52[2];
-    struct BurstVector position;
-    struct BurstVector velocity;
+    struct ContactPosition position;
+    struct ContactPosition velocity;
     u8 unknown64[0x110 - 0x64];
-    struct BurstVector *target;
+    struct ContactPosition *target;
     u8 unknown114[0x32B - 0x114];
     u8 side;
     u8 unknown32C[0x39C - 0x32C];
-    struct BurstVector travelTarget;
+    struct ContactPosition travelTarget;
 };
 extern const s16 gUnk_086149C4[];
 void HresvelgrMotion_CreateWithDelta(void *, void *, s32, s32);
@@ -30,7 +28,7 @@ static inline s32 scale(s32 n)
 // flow counts it, so speed outlives actor and is allocated after it; the
 // operand order puts speed's REG_DEAD note first, so it does not inherit the
 // table's r3 preference (tools/scope/README.md, facts 11 and 16).
-static inline void polar(struct BurstVector *v, s16 angle, s32 radius)
+static inline void polar(struct ContactPosition *v, s16 angle, s32 radius)
 {
     v->x = scale(gUnk_086149C4[(angle + 64) & 255] * radius);
     v->y = 0;

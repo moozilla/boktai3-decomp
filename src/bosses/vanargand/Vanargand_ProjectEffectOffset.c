@@ -1,14 +1,12 @@
 #include "global.h"
 #include "scene/actor/scene_actor_init_actor.h"
+#include "scene/collision/contact_position.h"
 
-struct VanargandEffectVec {
-    s16 x, y, z;
-};
 union PackedXY {
     u32 packed;
     s16 xy[3];
 };
-void Vanargand_ProjectEffectOffset(struct VanargandEffectVec *out, s16 x, s16 y, s32 height)
+void Vanargand_ProjectEffectOffset(struct ContactPosition *out, s16 x, s16 y, s32 height)
 {
     union PackedXY in;
     s32 screenX, screenY, projected;

@@ -2,17 +2,15 @@
 #include "engine/engine.h"
 #include "engine/ram.h"
 #include "engine/math/monster_particle_random.h"
+#include "scene/collision/contact_position.h"
 
-struct BurstVector {
-    s16 x, y, z, pad;
-};
 struct BurstActor {
     u8 unknown0[0x51];
     u8 direction;
     u8 unknown52[2];
-    struct BurstVector position;
+    struct ContactPosition position;
     u8 unknown5C[0x110 - 0x5C];
-    struct BurstVector *target;
+    struct ContactPosition *target;
     u8 unknown114[0x32B - 0x114];
     u8 side;
 };
@@ -22,20 +20,21 @@ static inline s32 scale(s32 n)
 {
     return n >= 0 ? n >> 12 : -((-n) >> 12);
 }
-static inline void polar(struct BurstVector *v, s32 angle, s32 radius)
+static inline void polar(struct ContactPosition *v, s32 angle, s32 radius)
 {
     v->x = scale(gUnk_086149C4[(angle + 64) & 255] * radius);
     v->y = 0;
     v->z = scale(gUnk_086149C4[angle & 255] * radius);
 }
-static inline void add(struct BurstVector *d, struct BurstVector *a, struct BurstVector *b)
+static inline void add(struct ContactPosition *d, struct ContactPosition *a,
+                       struct ContactPosition *b)
 {
     d->x = b->x + a->x;
     d->y = b->y + a->y;
     d->z = b->z + a->z;
 }
 
-void Hresvelgr_GetTravelTarget(struct BurstActor *object, struct BurstVector *out)
+void Hresvelgr_GetTravelTarget(struct BurstActor *object, struct ContactPosition *out)
 {
     struct BurstActor *actor = object;
     if (out) {

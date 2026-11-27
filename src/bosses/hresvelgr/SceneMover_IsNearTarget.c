@@ -1,16 +1,14 @@
 #include "global.h"
-struct SceneMoverPosition {
-    s16 x, y, z;
-};
+#include "scene/collision/contact_position.h"
 struct SceneMover {
     u8 unknown0[0x54];
-    struct SceneMoverPosition position;
+    struct ContactPosition position;
     u8 unknown5C[0x340];
-    struct SceneMoverPosition target;
+    struct ContactPosition target;
 };
-static inline void SceneMover_SubtractVector(struct SceneMoverPosition *out,
-                                             const struct SceneMoverPosition *a,
-                                             const struct SceneMoverPosition *b)
+static inline void SceneMover_SubtractVector(struct ContactPosition *out,
+                                             const struct ContactPosition *a,
+                                             const struct ContactPosition *b)
 {
     out->x = (u16)a->x - (u16)b->x;
     out->y = (u16)a->y - (u16)b->y;
@@ -18,7 +16,7 @@ static inline void SceneMover_SubtractVector(struct SceneMoverPosition *out,
 }
 s32 SceneMover_IsNearTarget(struct SceneMover *p, s32 threshold)
 {
-    struct SceneMoverPosition difference;
+    struct ContactPosition difference;
     s32 x, z, xSquare, zSquare, distance;
     SceneMover_SubtractVector(&difference, &p->target, &p->position);
     x = difference.x;

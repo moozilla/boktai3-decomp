@@ -1,9 +1,7 @@
 #include "global.h"
 #include "player/player.h"
 #include "scene/motion/scene_facing.h"
-struct Vec {
-    s16 x, y, z, pad;
-};
+#include "scene/collision/contact_position.h"
 struct PackedVec {
     s32 x : 16, y : 16, z : 16, pad : 16;
 };
@@ -11,7 +9,7 @@ struct Actor {
     u8 pad0[0x51];
     u8 angle;
     u8 pad52[2];
-    struct Vec position, velocity;
+    struct ContactPosition position, velocity;
     u8 pad64[0x2c];
     u32 timer;
     s16 health;
@@ -34,9 +32,9 @@ struct Actor {
     u8 pad180[0x1ac];
     u8 animation[0x20];
     u8 animationData[0x20];
-    struct Vec anchor;
+    struct ContactPosition anchor;
     u8 pad374[0x58];
-    struct Vec home;
+    struct ContactPosition home;
     u8 pad3D4[0xa78];
     s16 selectedPoint, selectedTarget;
     u16 padE50;
@@ -59,7 +57,8 @@ static inline void facing(struct Actor *p, s32 angle)
     p->facing = SceneFacing_FourWay(p->angle);
     p->facing8 = SceneFacing_EightWay(p->angle);
 }
-static inline void sum(struct Vec *d, struct Vec *a, struct Vec *b)
+static inline void sum(struct ContactPosition *d, struct ContactPosition *a,
+                       struct ContactPosition *b)
 {
     d->x = b->x + a->x;
     d->y = b->y + a->y;
@@ -73,12 +72,12 @@ void Projectile_SetSpriteParameters(void *, u32, u32, u32);
 void Projectile_SetScriptProcedure(void *, u32, u16);
 void Projectile_SetCollisionParameters(void *, u32, u32, u32, u32, u32);
 void Projectile_SetBehaviorMode(void *, u16);
-void Projectile_SpawnAtPosition(void *, struct Vec *);
+void Projectile_SpawnAtPosition(void *, struct ContactPosition *);
 void Ratatosk_UpdateHomingShot(struct Actor *p, s32 tick)
 {
     u8 params[0x58];
     struct PackedVec offset;
-    struct Vec spawn;
+    struct ContactPosition spawn;
     struct Actor *p2 = p;
     if (p->changed) {
         p->changed = 0;
@@ -128,7 +127,7 @@ void Ratatosk_UpdateHomingShot(struct Actor *p, s32 tick)
                 offset.z = 96;
                 break;
         }
-        sum(&spawn, (struct Vec *)&offset, &p2->anchor);
+        sum(&spawn, (struct ContactPosition *)&offset, &p2->anchor);
         spawn.y += 150;
         Projectile_SpawnAtPosition(params, &spawn);
         Sound_PlaySong(0x56a);

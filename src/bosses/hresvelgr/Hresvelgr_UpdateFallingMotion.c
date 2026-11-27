@@ -1,8 +1,6 @@
 #include "global.h"
 #include "engine/engine.h"
-struct HresvelgrPosition {
-    s16 x, y, z, pad;
-};
+#include "scene/collision/contact_position.h"
 struct HresvelgrMotionFlags {
     u8 unknown0[6];
     u16 flags;
@@ -10,7 +8,7 @@ struct HresvelgrMotionFlags {
 struct HresvelgrSprite {
     u32 flags;
     u8 unknown4[0x18];
-    struct HresvelgrPosition position;
+    struct ContactPosition position;
     u8 unknown24[0x24];
 };
 struct HresvelgrMotion {
@@ -18,14 +16,14 @@ struct HresvelgrMotion {
     struct HresvelgrSprite sprite;
     struct HresvelgrMotionFlags motion;
     u8 unknown68[0x4c];
-    struct HresvelgrPosition origin;
-    struct HresvelgrPosition velocity;
-    struct HresvelgrPosition offset;
+    struct ContactPosition origin;
+    struct ContactPosition velocity;
+    struct ContactPosition offset;
     u8 unknownCC[0x6c];
     u16 state, stateFrame;
 };
-static inline void add(struct HresvelgrPosition *d, struct HresvelgrPosition *a,
-                       struct HresvelgrPosition *b)
+static inline void add(struct ContactPosition *d, struct ContactPosition *a,
+                       struct ContactPosition *b)
 {
     d->x = b->x + a->x;
     d->y = b->y + a->y;
@@ -47,14 +45,14 @@ struct HresvelgrTerrain {
     u16 rows[1];
 };
 u8 *TerrainModifiers_FindCellOverride(s32, s32);
-static inline s32 cellIndex(struct HresvelgrPosition *pos)
+static inline s32 cellIndex(struct ContactPosition *pos)
 {
     s32 x = pos->x >> 8, z = pos->z >> 8;
     if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
         return 0;
     return gTerrainMap->rows[z] + x;
 }
-static inline s32 groundHeight(struct HresvelgrPosition *position)
+static inline s32 groundHeight(struct ContactPosition *position)
 {
     s32 index = cellIndex(position), height;
     u8 *cell = TerrainModifiers_FindCellOverride(index, 1);
@@ -76,7 +74,7 @@ static inline s32 groundHeight(struct HresvelgrPosition *position)
     return height;
 }
 
-static inline void advance(struct HresvelgrPosition *d, struct HresvelgrPosition *v)
+static inline void advance(struct ContactPosition *d, struct ContactPosition *v)
 {
     d->x += v->x;
     d->y += v->y;

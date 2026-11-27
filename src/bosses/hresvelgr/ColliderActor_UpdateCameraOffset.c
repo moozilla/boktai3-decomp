@@ -1,7 +1,5 @@
 #include "global.h"
-struct ColliderActorVector {
-    s16 x, y, z, pad;
-};
+#include "scene/collision/contact_position.h"
 struct ColliderActorExtent {
     s32 x : 16, y : 16, z : 16, pad : 16;
 };
@@ -10,23 +8,23 @@ struct ColliderActorCamera {
 };
 struct ColliderActor {
     u8 pad0[0x54];
-    struct ColliderActorVector position;
+    struct ContactPosition position;
     u8 pad5A[0xc8 - 0x5c];
     struct ColliderActorCamera camera;
     u8 padCC[0x110 - 0xcc];
-    struct ColliderActorVector *cameraAnchor;
+    struct ContactPosition *cameraAnchor;
 };
 void Camera_SetOffset(s32, void *);
 void ColliderActor_UpdateCameraOffset(struct ColliderActor *actor)
 {
     struct ColliderActorCamera *camera = &actor->camera;
     s32 shift = camera->shift;
-    struct ColliderActorVector *anchor;
-    struct ColliderActorVector delta;
+    struct ContactPosition *anchor;
+    struct ContactPosition delta;
     struct ColliderActorExtent offset;
     s32 value;
-    struct ColliderActorVector *out;
-    struct ColliderActorVector *position;
+    struct ContactPosition *out;
+    struct ContactPosition *position;
     if (shift > 15)
         shift = 16;
     else if (shift == 0)

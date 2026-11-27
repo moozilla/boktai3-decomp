@@ -1,16 +1,14 @@
 #include "global.h"
-struct SceneMoverPosition {
-    s16 x, y, z;
-};
+#include "scene/collision/contact_position.h"
 struct SceneMover {
     u8 unknown0[0x110];
-    struct SceneMoverPosition *anchor;
+    struct ContactPosition *anchor;
     u8 unknown114[0x217];
     u8 side;
     u8 unknown32C[0x70];
-    struct SceneMoverPosition target;
+    struct ContactPosition target;
 };
-static inline void SceneMover_SetVector(struct SceneMoverPosition *v, s32 x, s32 y, s32 z)
+static inline void SceneMover_SetVector(struct ContactPosition *v, s32 x, s32 y, s32 z)
 {
     v->x = x;
     v->y = y;
@@ -18,8 +16,8 @@ static inline void SceneMover_SetVector(struct SceneMoverPosition *v, s32 x, s32
 }
 void SceneMover_SetSideTarget(struct SceneMover *p)
 {
-    struct SceneMoverPosition *anchor = p->anchor;
-    struct SceneMoverPosition *other = anchor;
+    struct ContactPosition *anchor = p->anchor;
+    struct ContactPosition *other = anchor;
     if (p->side == 0) {
         SceneMover_SetVector(&p->target, 1024, 832, anchor->z);
     } else {
