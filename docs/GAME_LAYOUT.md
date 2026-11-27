@@ -101,7 +101,7 @@ Reset, the ARM crt0, the IWRAM helpers, `AgbMain` and the first frame. The
 |---|---|---|---|
 | `08000000`–`08000350` | GBA header and crt0 | - | Cartridge header, SDK crt0 (stacks, IntrMain install). Handwritten assembly; reported as intentional assembly. |
 | `08000350`–`0800145C` | IWRAM ARM code | [`src/engine/iwram_code.c`](../src/engine/iwram_code.c) | Six ARM C functions copied to IWRAM 0x03000000 by AgbMain (palette bank cache, sprite/blit helpers). |
-| `0800145C`–`080015AC` | Game entry point | [`src/engine/AgbMain.c`](../src/engine/AgbMain.c), [`src/engine/sub_08001590.c`](../src/engine/sub_08001590.c) | `AgbMain`: hardware and subsystem startup, then the endless `TaskSystem_RunFrame` loop. See ENTRY_AND_MENUS.md. |
+| `0800145C`–`080015AC` | Game entry point | [`src/engine/AgbMain.c`](../src/engine/AgbMain.c), [`src/engine/Background_ClearSlots.c`](../src/engine/Background_ClearSlots.c) | `AgbMain`: hardware and subsystem startup, then the endless `TaskSystem_RunFrame` loop. See ENTRY_AND_MENUS.md. |
 
 [ENTRY_AND_MENUS.md](ENTRY_AND_MENUS.md) describes the entry point and the
 start of the menus. The solar and RTC initialization are in section 11.
@@ -155,9 +155,9 @@ first ([ENGINE.md](ENGINE.md), sections 4 and 9).
 
 | Range | Subsystem (from progress_subsystems.csv) | C location | What it does |
 |---|---|---|---|
-| `08003B44`–`080041CC` | Terrain overlays (tentative) | [`src/scene/terrain/terrain_overlay.c`](../src/scene/terrain/terrain_overlay.c), [`src/scene/terrain/sub_080041C0.c`](../src/scene/terrain/sub_080041C0.c) | Overlays that track actors and draw terrain edges, with queued commands. |
+| `08003B44`–`080041CC` | Terrain overlays (tentative) | [`src/scene/terrain/terrain_overlay.c`](../src/scene/terrain/terrain_overlay.c), [`src/scene/terrain/SceneObjects_ClearManager.c`](../src/scene/terrain/SceneObjects_ClearManager.c) | Overlays that track actors and draw terrain edges, with queued commands. |
 | `080041CC`–`08005E10` | Scene objects (tentative) | [`src/objects/puzzle_blocks.c`](../src/objects/puzzle_blocks.c) | Scene blocks: push, step, fall, flash, disappear. Created from script with keywords (`0x74` manager, `0x1A8` objects). |
-| `08005E10`–`08006374` | Terrain modifiers (tentative) | [`src/scene/terrain/terrain_modifier.c`](../src/scene/terrain/terrain_modifier.c), [`src/scene/terrain/sub_08006368.c`](../src/scene/terrain/sub_08006368.c) | Registers and changes terrain cells at runtime, including the script change commands. |
+| `08005E10`–`08006374` | Terrain modifiers (tentative) | [`src/scene/terrain/terrain_modifier.c`](../src/scene/terrain/terrain_modifier.c), [`src/scene/terrain/TerrainModifiers_ResetState.c`](../src/scene/terrain/TerrainModifiers_ResetState.c) | Registers and changes terrain cells at runtime, including the script change commands. |
 | `08006F00`–`08008A70` | Items and containers (tentative) | [`src/objects/items/item_container.c`](../src/objects/items/item_container.c) | Dropped items (fall, land, bob, pick up) and treasure containers (open, locked). Singleton `TriggerManager`. |
 | `08008A70`–`08009500` | Pooled interactables (tentative) | [`src/objects/light_fixtures.c`](../src/objects/light_fixtures.c) | Fixed-pool breakable props with a five-state machine, placed and activated from script (`0xEC`-byte slots). |
 | `08009500`–`08009E30` | Directional interaction controllers (tentative) | [`src/objects/interaction_prompts.c`](../src/objects/interaction_prompts.c) | Interaction prompts gated by actor distance, facing and input. |
@@ -165,7 +165,7 @@ first ([ENGINE.md](ENGINE.md), sections 4 and 9).
 | `0800CBA0`–`0800D874` | Falling objects (tentative) | [`src/objects/hazards/falling_objects.c`](../src/objects/hazards/falling_objects.c) | Objects that fall onto the terrain, with allocation, update and cleanup. |
 | `0800F9C4`–`080111EC` | Group objects (tentative) | [`src/effects/bat_flock.c`](../src/effects/bat_flock.c) | Manager for sixteen objects with animation and movement; several movement callbacks are unmatched. |
 | `08011884`–`08012040` | Scene indicators (tentative) | [`src/ui/hud/scene_indicator.c`](../src/ui/hud/scene_indicator.c) | Scene indicators: lifecycle, timing, visibility, terrain placement, script pause and resume. |
-| `08012D08`–`080133CC` | Breakable barriers | [`src/objects/bat_curtain/breakable_barrier.c`](../src/objects/bat_curtain/breakable_barrier.c), [`src/objects/bat_curtain/sub_080133C0.c`](../src/objects/bat_curtain/sub_080133C0.c) | Breakable barriers: manager and callbacks (tentative grouping). |
+| `08012D08`–`080133CC` | Breakable barriers | [`src/objects/bat_curtain/breakable_barrier.c`](../src/objects/bat_curtain/breakable_barrier.c), [`src/objects/bat_curtain/BreakableBarriers_Reset.c`](../src/objects/bat_curtain/BreakableBarriers_Reset.c) | Breakable barriers: manager and callbacks (tentative grouping). |
 | `0801E000`–`08020964` | Scene object controller (tentative) | [`src/objects/scene_objects/`](../src/objects/scene_objects/) (43 files) | Scene object controller: shared object slots (140 bytes), script handlers and callbacks. |
 | `08020964`–`08020F6C` | Scene message controller | [`src/script/demo_manager.c`](../src/script/demo_manager.c) | Scene message controller: receiver registration, double-buffered dispatch and the scene-script lifecycle. |
 | `08020F6C`–`080213EC` | Scene presentation commands | [`src/effects/screen/scene_presentation_commands.c`](../src/effects/screen/scene_presentation_commands.c) | Scene presentation commands: effect, palette-fade and blend script command handlers. |
@@ -186,7 +186,7 @@ descriptive, not confirmed roles.
 | `08024F2C`–`08026AA4` | Actor animation and action controllers (tentative) | [`src/bosses/count/`](../src/bosses/count/) (18 files) | Actor animation and action controllers: variant transitions, motion, recoil, frame holds and timed effects. |
 | `08026AA4`–`080284FC` | Actor projectile and reaction controllers (tentative) | [`src/bosses/count/`](../src/bosses/count/) (22 files) | Actor projectile and reaction controllers: projectiles, turning, anchored reactions, destruction effects. |
 | `080284FC`–`080297E8` | Actor damage and lifecycle (tentative) | [`src/bosses/count/`](../src/bosses/count/) (12 files) | Actor damage visuals and lifecycle callbacks. |
-| `080297E8`–`0802C678` | Grid attack actor (tentative) | [`src/bosses/nidhoggr/grid_attack_actor.c`](../src/bosses/nidhoggr/grid_attack_actor.c) | Grid attack actor: attack animation states, damage reactions and command dispatch. |
+| `080297E8`–`0802C678` | Grid attack actor (tentative) | [`src/bosses/nidhoggr/duel.c`](../src/bosses/nidhoggr/duel.c) | Grid attack actor: attack animation states, damage reactions and command dispatch. |
 | `0802C678`–`0802C8A0` | Pooled actor manager | [`src/scene/actor/actor_pool/actor_pool.c`](../src/scene/actor/actor_pool/actor_pool.c) | Pooled actor manager: intrusive actor list, update dispatch, party target cache and allocation. |
 | `0802C8A0`–`0802CD04` | Pooled actor shared helpers (tentative) | [`src/scene/actor/actor_pool/pooled_actor_helpers.c`](../src/scene/actor/actor_pool/pooled_actor_helpers.c) | Shared helpers for pooled actors: facing, health, hit capture, target selection and turning. |
 | `0802CD04`–`0802D5B4` | Pooled actor controllers (tentative) | [`src/scene/actor/actor_pool/pooled_actor_controller.c`](../src/scene/actor/actor_pool/pooled_actor_controller.c) | Pooled actor controllers: script initialization, drawable, collision, timers, state and action dispatch. |
@@ -213,7 +213,7 @@ selection grids, the password screen and the sound test.
 
 | Range | Subsystem (from progress_subsystems.csv) | C location | What it does |
 |---|---|---|---|
-| `08006374`–`08006F00` | Choice menu | [`src/ui/dialogue/choice_menu.c`](../src/ui/dialogue/choice_menu.c), [`src/ui/dialogue/sub_08006EF4.c`](../src/ui/dialogue/sub_08006EF4.c) | Script-driven choice list: input, text markup, layout and dispatch of the chosen callback. |
+| `08006374`–`08006F00` | Choice menu | [`src/ui/dialogue/choice_menu.c`](../src/ui/dialogue/choice_menu.c), [`src/ui/dialogue/TriggerManager_Reset.c`](../src/ui/dialogue/TriggerManager_Reset.c) | Script-driven choice list: input, text markup, layout and dispatch of the chosen callback. |
 | `0800E3E0`–`0800F4C4` | Status screen (tentative) | [`src/ui/status_screen/`](../src/ui/status_screen/) (3 files) | Status screen: numeric display, palette fades and the scanline transition chain. Split in three files for compiler flags. |
 | `0800F4C4`–`0800F850` | Numeric overlay (tentative) | [`src/ui/status_screen/numeric_overlay.c`](../src/ui/status_screen/numeric_overlay.c) | Counter display, a sibling of the status screen with the same background and palette load but no fades. |
 | `0800F850`–`0800F9C4` | Result prompt | [`src/ui/results/result_prompt.c`](../src/ui/results/result_prompt.c) | Input prompt with callbacks and lifecycle. |
@@ -255,7 +255,7 @@ sprite and tile animation, and the timed presentations that run them.
 | `0800C49C`–`0800C7F4` | Effect emitter (tentative) | [`src/objects/strike_crystal.c`](../src/objects/strike_crystal.c) | Emitter task that spawns effects; allocation, initialization, update and cleanup. |
 | `0800C7F4`–`0800CBA0` | Damage controller | [`src/objects/hazards/damage_controller.c`](../src/objects/hazards/damage_controller.c) | Hit and death handling for an actor; runs its hit and death scripts with `Script_Call`. |
 | `0800D874`–`0800E0CC` | Scanline presentation (tentative) | [`src/effects/screen/scanline_presentation.c`](../src/effects/screen/scanline_presentation.c) | Per-scanline animation layers (six display layers) and their lifecycle. |
-| `0800E0CC`–`0800E3E0` | Palette sets | [`src/effects/palette/palette_set.c`](../src/effects/palette/palette_set.c), [`src/effects/palette/sub_0800E3D4.c`](../src/effects/palette/sub_0800E3D4.c) | Palette sets: allocation, initialization, blending and upload. |
+| `0800E0CC`–`0800E3E0` | Palette sets | [`src/effects/palette/palette_set.c`](../src/effects/palette/palette_set.c), [`src/effects/palette/StatusScreen_ClearActive.c`](../src/effects/palette/StatusScreen_ClearActive.c) | Palette sets: allocation, initialization, blending and upload. |
 | `08012AD0`–`08012D08` | Debris particles | [`src/objects/bat_curtain/debris_particles.c`](../src/objects/bat_curtain/debris_particles.c) | Debris particles: manager callbacks (tentative grouping). |
 | `080133CC`–`080136B4` | Terrain shadows | [`src/effects/shadows/terrain_shadow.c`](../src/effects/shadows/terrain_shadow.c) | Terrain shadows: shadows that follow the terrain height. |
 | `080136B4`–`08013C14` | Scaled shadows | [`src/effects/shadows/scaled_shadow.c`](../src/effects/shadows/scaled_shadow.c) | Scaled shadows: shadows scaled to the object's height. |
@@ -337,7 +337,7 @@ files. The EEPROM save is in section 12.
 | Range | Subsystem | C location | What it does |
 |---|---|---|---|
 | `08248970`–`08249238` | SIIRTC (RTC) | [`src/lib/rtc/`](../src/lib/rtc/) (16 files) | cartridge clock: unprotect and protect, status, time read and write. The alias `Rtc_Initialize` in `symbols/functions.csv` names the same address as `SiiRtcUnprotect` (see ENGINE.md, section 17) |
-| `082284F4`, `082290F4` | `Clock_ClearState`, `Clock_CheckRtcDate` | [`src/system/clock/sub_082284F4.c`](../src/system/clock/sub_082284F4.c), [`src/system/clock/sub_082290F4.c`](../src/system/clock/sub_082290F4.c) | game clock state and the date check at boot |
+| `082284F4`, `082290F4` | `Clock_ClearState`, `Clock_CheckRtcDate` | [`src/system/clock/Clock_ClearState.c`](../src/system/clock/Clock_ClearState.c), [`src/system/clock/Clock_CheckRtcDate.c`](../src/system/clock/Clock_CheckRtcDate.c) | game clock state and the date check at boot |
 | `0822AE00`, `0822A7A8` | `Time_CalculateSunriseSunset`, `Time_CalculateSunriseSunsetCore` | [`src/system/clock/Time_CalculateSunriseSunset.c`](../src/system/clock/Time_CalculateSunriseSunset.c), [`src/system/clock/Time_CalculateSunriseSunsetCore.c`](../src/system/clock/Time_CalculateSunriseSunsetCore.c) | sunrise and sunset from the boot-time arguments |
 | `080192D0`–`08019518` | Clock events (section 8) | [`src/system/clock/clock_events.c`](../src/system/clock/clock_events.c) | script events on clock edges |
 

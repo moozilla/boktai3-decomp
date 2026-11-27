@@ -5,8 +5,8 @@ The callback clears its global through r1 and r2, preserving r0.
 
 The explicit form passed the unit ROM check.
 
---- a/src/scene/collision/stimulus/sub_0822B8E0.c
-+++ b/src/scene/collision/stimulus/sub_0822B8E0.c
+--- a/src/scene/collision/stimulus/SceneStimulus_DestroyTask.c
++++ b/src/scene/collision/stimulus/SceneStimulus_DestroyTask.c
 @@ -1,6 +1,7 @@
  #include "global.h"
  #include "scene/collision/scene_stimulus.h"

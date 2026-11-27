@@ -13,7 +13,7 @@ writer/sibling review, with no new source experiment.
 **One source fix landed; `Anim_SetSequence` remains open.** Commit
 `c940902f6` uses the existing shared actor layout and removes the unjustified
 status-byte volatility from `08184F04`. An independent stock
-`tools/check.py src/monsters/armor/sub_08184F04.c --target-size 228` check reports zero
+`tools/check.py src/monsters/armor/ActorController_UpdateAnimation.c --target-size 228` check reports zero
 differing bytes across the entire unit. The compiler-aware concession scan
 changes from one `volatile-view` warning to zero warnings and zero errors.
 

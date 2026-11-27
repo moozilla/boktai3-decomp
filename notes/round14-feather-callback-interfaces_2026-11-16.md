@@ -91,14 +91,14 @@ is preserved as a complete replayable source patch.
 
 ## Creator and scheduler boundary
 
-`src/effects/feathers/sub_081297DC.c` now includes the Feather owner and removes its false
+`src/effects/feathers/FeatherEffectPool_GetOrCreate.c` now includes the Feather owner and removes its false
 `void FeatherEffectPool_UpdateTask(void)` declaration. The creator returns
 `struct FeatherPool *`, using its existing allocation local as an opaque
 object pointer through the pre-existing task APIs. This removes the old
 incompatible return warning without a cast or a new helper.
 
 The sole existing caller, `FeatherEffectPool_CreateDirectional` in
-`src/effects/feathers/sub_081294B4.c`, already declares a `FeatherPool *` return. Its complete
+`src/effects/feathers/FeatherEffectPool_CreateDirectional.c`, already declares a `FeatherPool *` return. Its complete
 540-byte unit was checked. **Only the return tag/address meaning is aligned:**
 that caller still defines private Feather and truncated FeatherPool records.
 This is not a claim that the creator/caller family has fully canonical types.
@@ -145,12 +145,12 @@ Remaining private family records are deliberately outside this bounded fix:
 
 | Existing source | Remaining private view |
 |---|---|
-| `src/effects/feathers/sub_08128B4C.c` | Allocator's private `S`/`E` pool and slot records |
-| `src/effects/feathers/sub_08128D24.c` | Clip-path Feather view |
-| `src/effects/feathers/sub_08128F98.c` | Ground-scatter Feather view |
-| `src/effects/feathers/sub_081294B4.c` | Directional creator's Feather, pool, and vector views |
-| `src/effects/feathers/sub_0812975C.c` | Destructor's private pool/entry records |
-| `src/effects/feathers/sub_081297A4.c` | Initializer's private pool prefix |
+| `src/effects/feathers/FeatherEffectPool_AllocEntry.c` | Allocator's private `S`/`E` pool and slot records |
+| `src/effects/feathers/FeatherEffectPool_ClipScatterPath.c` | Clip-path Feather view |
+| `src/effects/feathers/FeatherEffectPool_SpawnGroundScatter.c` | Ground-scatter Feather view |
+| `src/effects/feathers/FeatherEffectPool_CreateDirectional.c` | Directional creator's Feather, pool, and vector views |
+| `src/effects/feathers/FeatherEffectPool_DestroyTask.c` | Destructor's private pool/entry records |
+| `src/effects/feathers/FeatherEffectPool_Init.c` | Initializer's private pool prefix |
 
 The local types named Feather in `src/effects/bursts/large_fragment_effect.c` are a different
 record: their state/slot/enter offsets differ. Name similarity alone is not

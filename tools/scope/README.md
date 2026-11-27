@@ -2291,7 +2291,7 @@ which is exactly `10:1`. Not tested.
   explicit `enter` pointer comes first. Dropping the pointer loses r8 reuse
   entirely (fact 2). Open: what C makes `&p->enter` shared yet copied after
   the gcse insertion.
-* **Vanargand_UpdateRepeatedPairAttack** (src/bosses/vanargand/sub_081AA178.c, 1 insn). ROM
+* **Vanargand_UpdateRepeatedPairAttack** (src/bosses/vanargand/Vanargand_UpdateRepeatedPairAttack.c, 1 insn). ROM
   stores `phase` (r5) to `p->timer` in case 0 (line 76); the draft stores the
   call result (r7). `CSE_KEEP=24` (keep `phase` canonical) matches exactly, so
   this is cse canonicity (facts 4, 6, 7). Chain in the draft: at the switch

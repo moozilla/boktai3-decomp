@@ -218,22 +218,22 @@ addr,name,confidence,evidence
 08013D3C,ShadowRegistry_Create,medium,Tentative descriptive name from exact C in src/fn/sub_08013D3C.c
 08013DC0,ShadowRegistry_CreateFromScript,medium,Tentative descriptive name from exact C in src/fn/sub_08013DC0.c
 08013E34,ShadowRegistry_Remove,medium,Tentative descriptive name from exact C in src/fn/sub_08013E34.c
-08013F98,ImpactParticleGroup_Update,medium,Tentative descriptive name from exact C in src/effects/particles/impact_fragments/sub_08013F98.c
-08014498,ImpactParticleManager_Update,medium,Tentative descriptive name from exact C in src/effects/particles/impact_fragments/sub_08014498.c
-08014568,ImpactParticleManager_Initialize,medium,Tentative descriptive name from exact C in src/effects/particles/impact_fragments/sub_08014568.c
+08013F98,ImpactParticleGroup_Update,medium,Tentative descriptive name from exact C in src/effects/particles/impact_fragments/ImpactParticleGroup_Update.c
+08014498,ImpactParticleManager_Update,medium,Tentative descriptive name from exact C in src/effects/particles/impact_fragments/ImpactParticleManager_Update.c
+08014568,ImpactParticleManager_Initialize,medium,Tentative descriptive name from exact C in src/effects/particles/impact_fragments/ImpactParticleManager_Initialize.c
 08014F64,ImpactFragmentGroup_Update,medium,Tentative descriptive name from exact C in src/fn/sub_08014F64.c
 080150D0,ImpactFragmentManager_Initialize,medium,Tentative descriptive name from exact C in src/fn/sub_080150D0.c
-08015160,ImpactBurstManager_Update,medium,Tentative descriptive name from exact C in src/effects/particles/impact_bursts/sub_08015160.c
-080153B0,ImpactBurstManager_Initialize,medium,Tentative descriptive name from exact C in src/effects/particles/impact_bursts/sub_080153B0.c
-080154D0,AnimatedParticle_PriorityFromFlags,medium,Tentative descriptive name from exact C in src/effects/particles/impact_bursts/sub_080154D0.c
-080154EC,ImpactBurst_Create,medium,Tentative descriptive name from exact C in src/effects/particles/impact_bursts/sub_080154EC.c
-08015984,ImpactBurst_EmitRing,medium,Tentative descriptive name from exact C in src/effects/particles/impact_bursts/sub_08015984.c
-08015B1C,AnimatedParticles_EmitFan,medium,Tentative descriptive name from exact C in src/effects/particles/impact_bursts/sub_08015B1C.c
-08015BD4,ImpactBurst_EmitDirectional,medium,Tentative descriptive name from exact C in src/effects/particles/impact_bursts/sub_08015BD4.c
-08015C30,ImpactBurst_EmitBurst,medium,Tentative descriptive name from exact C in src/effects/particles/impact_bursts/sub_08015C30.c
-08015C90,AnimatedParticles_EmitAngledBurst,medium,Tentative descriptive name from exact C in src/effects/particles/impact_bursts/sub_08015C90.c
-08015CF0,ImpactBurst_EmitOffset,medium,Tentative descriptive name from exact C in src/effects/particles/impact_bursts/sub_08015CF0.c
-08015DE0,ImpactBurst_CreateFromScript,medium,Tentative descriptive name from exact C in src/effects/particles/impact_bursts/sub_08015DE0.c
+08015160,ImpactBurstManager_Update,medium,Tentative descriptive name from exact C in src/effects/particles/impact_bursts/ImpactBurstManager_Update.c
+080153B0,ImpactBurstManager_Initialize,medium,Tentative descriptive name from exact C in src/effects/particles/impact_bursts/ImpactBurstManager_Initialize.c
+080154D0,AnimatedParticle_PriorityFromFlags,medium,Tentative descriptive name from exact C in src/effects/particles/impact_bursts/AnimatedParticle_PriorityFromFlags.c
+080154EC,ImpactBurst_Create,medium,Tentative descriptive name from exact C in src/effects/particles/impact_bursts/ImpactBurst_Create.c
+08015984,ImpactBurst_EmitRing,medium,Tentative descriptive name from exact C in src/effects/particles/impact_bursts/ImpactBurst_EmitRing.c
+08015B1C,AnimatedParticles_EmitFan,medium,Tentative descriptive name from exact C in src/effects/particles/impact_bursts/ImpactBurst_EmitFan.c
+08015BD4,ImpactBurst_EmitDirectional,medium,Tentative descriptive name from exact C in src/effects/particles/impact_bursts/ImpactBurst_EmitDirectional.c
+08015C30,ImpactBurst_EmitBurst,medium,Tentative descriptive name from exact C in src/effects/particles/impact_bursts/ImpactBurst_EmitBurst.c
+08015C90,AnimatedParticles_EmitAngledBurst,medium,Tentative descriptive name from exact C in src/effects/particles/impact_bursts/ImpactBurst_EmitAngledBurst.c
+08015CF0,ImpactBurst_EmitOffset,medium,Tentative descriptive name from exact C in src/effects/particles/impact_bursts/ImpactBurst_EmitOffset.c
+08015DE0,ImpactBurst_CreateFromScript,medium,Tentative descriptive name from exact C in src/effects/particles/impact_bursts/ImpactBurst_CreateFromScript.c
 08016118,FadingParticleGroup_Update,low,Tentative effect/palette interpretation from matched state updates and manager layout
 080163C8,FadingParticleManager_Initialize,low,Tentative effect/palette interpretation from matched state updates and manager layout
 080164B8,PaletteLevels_Increase,low,Tentative effect/palette interpretation from matched state updates and manager layout
@@ -362,38 +362,38 @@ addr,name,confidence,evidence
 0801DD40,ResultTutorial_UpdateSequence,tentative,Exact C; result-game and tutorial state transitions and demonstration sequence
 0801DEBC,ResultTutorial_ReadScript,tentative,Exact C; result-game and tutorial state transitions and demonstration sequence
 0801DEF4,ResultTutorial_Initialize,tentative,Exact C; result-game and tutorial state transitions and demonstration sequence
-0801E000,SlidingDoors_UpdatePoseA,low,Tentative scene-object controller role; exact C in src/objects/sliding_doors/sub_0801E000.c
-0801E090,SlidingDoors_UpdatePoseB,low,Tentative scene-object controller role; exact C in src/objects/sliding_doors/sub_0801E090.c
-0801E0F4,SlidingDoors_UpdatePoseC,low,Tentative scene-object controller role; exact C in src/objects/sliding_doors/sub_0801E0F4.c
-0801E184,SlidingDoors_Append,low,Tentative scene-object controller role; exact C in src/objects/sliding_doors/sub_0801E184.c
-0801E344,SlidingDoors_HasPrimaryId,low,Tentative scene-object controller role; exact C in src/objects/sliding_doors/sub_0801E344.c
-0801E374,SlidingDoors_HasSecondaryId,low,Tentative scene-object controller role; exact C in src/objects/sliding_doors/sub_0801E374.c
-0801E3A4,SlidingDoors_CheckActorCompatibility,low,Tentative scene-object controller role; exact C in src/objects/sliding_doors/sub_0801E3A4.c
-0801E3E4,SlidingDoors_ScriptAppend,low,Tentative scene-object controller role; exact C in src/objects/sliding_doors/sub_0801E3E4.c
-0801E530,SlidingDoors_BeginActivation,low,Tentative scene-object controller role; exact C in src/objects/sliding_doors/sub_0801E530.c
-0801E5B8,SlidingDoors_BeginDeactivation,low,Tentative scene-object controller role; exact C in src/objects/sliding_doors/sub_0801E5B8.c
-0801E630,SlidingDoors_SetActive,low,Tentative scene-object controller role; exact C in src/objects/sliding_doors/sub_0801E630.c
-0801E698,SlidingDoors_SetInactive,low,Tentative scene-object controller role; exact C in src/objects/sliding_doors/sub_0801E698.c
-0801E700,SlidingDoors_Lock,low,Tentative scene-object controller role; exact C in src/objects/sliding_doors/sub_0801E700.c
-0801E740,SlidingDoors_Unlock,low,Tentative scene-object controller role; exact C in src/objects/sliding_doors/sub_0801E740.c
-0801E784,SlidingDoors_ScriptActivate,low,Tentative scene-object controller role; exact C in src/objects/sliding_doors/sub_0801E784.c
-0801E820,SlidingDoors_ScriptDeactivate,low,Tentative scene-object controller role; exact C in src/objects/sliding_doors/sub_0801E820.c
-0801E8B8,SlidingDoors_ScriptRaise,low,Tentative scene-object controller role; exact C in src/objects/sliding_doors/sub_0801E8B8.c
-0801E998,SlidingDoors_ScriptLower,low,Tentative scene-object controller role; exact C in src/objects/sliding_doors/sub_0801E998.c
-0801EA70,SlidingDoors_ScriptPromote,low,Tentative scene-object controller role; exact C in src/objects/sliding_doors/sub_0801EA70.c
-0801EB08,SlidingDoors_ScriptReadPosition,low,Tentative scene-object controller role; exact C in src/objects/sliding_doors/sub_0801EB08.c
-0801EBBC,SlidingDoors_ScriptSetSelection,low,Tentative scene-object controller role; exact C in src/objects/sliding_doors/sub_0801EBBC.c
-0801EBE4,SlidingDoors_ClearSelection,low,Tentative scene-object controller role; exact C in src/objects/sliding_doors/sub_0801EBE4.c
-0801EC00,SlidingDoors_HasTypeTwoResource,low,Tentative scene-object controller role; exact C in src/objects/sliding_doors/sub_0801EC00.c
-0801EF60,SlidingDoors_AnimateInactive,low,Tentative scene-object controller role; exact C in src/objects/sliding_doors/sub_0801EF60.c
-0801EFDC,SlidingDoors_AnimateActive,low,Tentative scene-object controller role; exact C in src/objects/sliding_doors/sub_0801EFDC.c
-0801F3A0,SlidingDoors_BeginRaising,low,Tentative scene-object controller role; exact C in src/objects/sliding_doors/sub_0801F3A0.c
-0801F3CC,SlidingDoors_BeginLowering,low,Tentative scene-object controller role; exact C in src/objects/sliding_doors/sub_0801F3CC.c
-0801F430,SlidingDoors_UpdateRaising,low,Tentative scene-object controller role; exact C in src/objects/sliding_doors/sub_0801F430.c
-0801F4C4,SlidingDoors_UpdateLowering,low,Tentative scene-object controller role; exact C in src/objects/sliding_doors/sub_0801F4C4.c
-0801F580,SlidingDoors_UpdateRaised,low,Tentative scene-object controller role; exact C in src/objects/sliding_doors/sub_0801F580.c
-0801F5B8,SlidingDoors_UpdateLowered,low,Tentative scene-object controller role; exact C in src/objects/sliding_doors/sub_0801F5B8.c
-080203D4,SlidingDoors_Destroy,low,Tentative lifecycle or scene-message role; exact C in src/objects/sliding_doors/sub_080203D4.c
+0801E000,SlidingDoors_UpdatePoseA,low,Tentative scene-object controller role; exact C in src/objects/sliding_doors/SlidingDoors_UpdatePoseA.c
+0801E090,SlidingDoors_UpdatePoseB,low,Tentative scene-object controller role; exact C in src/objects/sliding_doors/SlidingDoors_UpdatePoseB.c
+0801E0F4,SlidingDoors_UpdatePoseC,low,Tentative scene-object controller role; exact C in src/objects/sliding_doors/SlidingDoors_UpdatePoseC.c
+0801E184,SlidingDoors_Append,low,Tentative scene-object controller role; exact C in src/objects/sliding_doors/SlidingDoors_Append.c
+0801E344,SlidingDoors_HasPrimaryId,low,Tentative scene-object controller role; exact C in src/objects/sliding_doors/SlidingDoors_HasPrimaryId.c
+0801E374,SlidingDoors_HasSecondaryId,low,Tentative scene-object controller role; exact C in src/objects/sliding_doors/SlidingDoors_HasSecondaryId.c
+0801E3A4,SlidingDoors_CheckActorCompatibility,low,Tentative scene-object controller role; exact C in src/objects/sliding_doors/SlidingDoors_CheckActorCompatibility.c
+0801E3E4,SlidingDoors_ScriptAppend,low,Tentative scene-object controller role; exact C in src/objects/sliding_doors/SlidingDoors_ScriptAppend.c
+0801E530,SlidingDoors_BeginActivation,low,Tentative scene-object controller role; exact C in src/objects/sliding_doors/SlidingDoors_BeginActivation.c
+0801E5B8,SlidingDoors_BeginDeactivation,low,Tentative scene-object controller role; exact C in src/objects/sliding_doors/SlidingDoors_BeginDeactivation.c
+0801E630,SlidingDoors_SetActive,low,Tentative scene-object controller role; exact C in src/objects/sliding_doors/SlidingDoors_SetActive.c
+0801E698,SlidingDoors_SetInactive,low,Tentative scene-object controller role; exact C in src/objects/sliding_doors/SlidingDoors_SetInactive.c
+0801E700,SlidingDoors_Lock,low,Tentative scene-object controller role; exact C in src/objects/sliding_doors/SlidingDoors_Lock.c
+0801E740,SlidingDoors_Unlock,low,Tentative scene-object controller role; exact C in src/objects/sliding_doors/SlidingDoors_Unlock.c
+0801E784,SlidingDoors_ScriptActivate,low,Tentative scene-object controller role; exact C in src/objects/sliding_doors/SlidingDoors_ScriptActivate.c
+0801E820,SlidingDoors_ScriptDeactivate,low,Tentative scene-object controller role; exact C in src/objects/sliding_doors/SlidingDoors_ScriptDeactivate.c
+0801E8B8,SlidingDoors_ScriptRaise,low,Tentative scene-object controller role; exact C in src/objects/sliding_doors/SlidingDoors_ScriptRaise.c
+0801E998,SlidingDoors_ScriptLower,low,Tentative scene-object controller role; exact C in src/objects/sliding_doors/SlidingDoors_ScriptLower.c
+0801EA70,SlidingDoors_ScriptPromote,low,Tentative scene-object controller role; exact C in src/objects/sliding_doors/SlidingDoors_ScriptPromote.c
+0801EB08,SlidingDoors_ScriptReadPosition,low,Tentative scene-object controller role; exact C in src/objects/sliding_doors/SlidingDoors_ScriptReadPosition.c
+0801EBBC,SlidingDoors_ScriptSetSelection,low,Tentative scene-object controller role; exact C in src/objects/sliding_doors/SlidingDoors_ScriptSetSelection.c
+0801EBE4,SlidingDoors_ClearSelection,low,Tentative scene-object controller role; exact C in src/objects/sliding_doors/SlidingDoors_ClearSelection.c
+0801EC00,SlidingDoors_HasTypeTwoResource,low,Tentative scene-object controller role; exact C in src/objects/sliding_doors/SlidingDoors_HasTypeTwoResource.c
+0801EF60,SlidingDoors_AnimateInactive,low,Tentative scene-object controller role; exact C in src/objects/sliding_doors/SlidingDoors_AnimateInactive.c
+0801EFDC,SlidingDoors_AnimateActive,low,Tentative scene-object controller role; exact C in src/objects/sliding_doors/SlidingDoors_AnimateActive.c
+0801F3A0,SlidingDoors_BeginRaising,low,Tentative scene-object controller role; exact C in src/objects/sliding_doors/SlidingDoors_BeginRaising.c
+0801F3CC,SlidingDoors_BeginLowering,low,Tentative scene-object controller role; exact C in src/objects/sliding_doors/SlidingDoors_BeginLowering.c
+0801F430,SlidingDoors_UpdateRaising,low,Tentative scene-object controller role; exact C in src/objects/sliding_doors/SlidingDoors_UpdateRaising.c
+0801F4C4,SlidingDoors_UpdateLowering,low,Tentative scene-object controller role; exact C in src/objects/sliding_doors/SlidingDoors_UpdateLowering.c
+0801F580,SlidingDoors_UpdateRaised,low,Tentative scene-object controller role; exact C in src/objects/sliding_doors/SlidingDoors_UpdateRaised.c
+0801F5B8,SlidingDoors_UpdateLowered,low,Tentative scene-object controller role; exact C in src/objects/sliding_doors/SlidingDoors_UpdateLowered.c
+080203D4,SlidingDoors_Destroy,low,Tentative lifecycle or scene-message role; exact C in src/objects/sliding_doors/SlidingDoors_Destroy.c
 080209D0,SceneMessages_Enqueue,low,Tentative lifecycle or scene-message role; exact C in src/fn/sub_080209D0.c
 08020A14,SceneMessages_SwapBuffers,low,Tentative lifecycle or scene-message role; exact C in src/fn/sub_08020A14.c
 08020A60,SceneMessages_RunScript,low,Tentative descriptive role from exact C in src/fn/sub_08020A60.c
@@ -457,45 +457,45 @@ addr,name,confidence,evidence
 08024B60,SceneActorState_WaitForFlagClear,low,Tentative role from matched actor layout and control flow in src/fn/sub_08024B60.c
 08024CE0,SceneActorAnimation_StartDirectional,low,Tentative role from matched actor layout and control flow in src/fn/sub_08024CE0.c
 08024E18,SceneActorAnimation_StartEightDirection,low,Tentative role from matched actor layout and control flow in src/fn/sub_08024E18.c
-08024F2C,SceneActorAnimation_TransitionVariant,medium,Tentative descriptive role from exact C control flow; src/bosses/count/sub_08024F2C.c
-080251C4,SceneActorAnimation_FollowMotionPath,medium,Tentative descriptive role from exact C control flow; src/bosses/count/sub_080251C4.c
-0802533C,SceneActorAnimation_Recoil,medium,Tentative descriptive role from exact C control flow; src/bosses/count/sub_0802533C.c
-08025550,SceneActorAnimation_ApproachTarget,medium,Tentative descriptive role from exact C control flow; src/bosses/count/sub_08025550.c
-08025714,SceneActorAnimation_Decelerate,medium,Tentative descriptive role from exact C control flow; src/bosses/count/sub_08025714.c
-080257D0,SceneActorAnimation_RecoverMovement,medium,Tentative descriptive role from exact C control flow; src/bosses/count/sub_080257D0.c
-08025CD4,SceneActorAnimation_WaitForCompletion,medium,Tentative descriptive role from exact C control flow; src/bosses/count/sub_08025CD4.c
-08025D60,SceneActorAnimation_WaitForAlternateCompletion,medium,Tentative descriptive role from exact C control flow; src/bosses/count/sub_08025D60.c
-08025DEC,SceneActor_FireRandomizedProjectile,low,Tentative descriptive role from exact C control flow; src/bosses/count/sub_08025DEC.c
-08026248,SceneActorAnimation_TimedEffectReset,medium,Tentative descriptive role from exact C control flow; src/bosses/count/sub_08026248.c
-0802634C,SceneActorAnimation_LockedReset,medium,Tentative descriptive role from exact C control flow; src/bosses/count/sub_0802634C.c
-08026398,SceneActorAnimation_AlternateEffectReset,medium,Tentative descriptive role from exact C control flow; src/bosses/count/sub_08026398.c
-08026488,SceneActorAnimation_TimedAction,medium,Tentative descriptive role from exact C control flow; src/bosses/count/sub_08026488.c
-0802667C,SceneActorAnimation_HoldFrame,medium,Tentative descriptive role from exact C control flow; src/bosses/count/sub_0802667C.c
-08026780,SceneActorAnimation_ReleaseHeldFrame,medium,Tentative descriptive role from exact C control flow; src/bosses/count/sub_08026780.c
-08026908,SceneActorAnimation_ReleaseSavedAction,medium,Tentative descriptive role from exact C control flow; src/bosses/count/sub_08026908.c
-08026AA4,SceneActor_PeriodicProjectileBurst,low,Tentative descriptive role from exact C control flow; src/bosses/count/sub_08026AA4.c
-08026C38,SceneActor_FireDirectedProjectile,low,Tentative descriptive role from exact C control flow; src/bosses/count/sub_08026C38.c
-08026DE0,SceneActor_DecayScale,low,Tentative descriptive role from exact C control flow; src/bosses/count/sub_08026DE0.c
-08026EB4,SceneActor_DecayScaleAndMove,low,Tentative descriptive role from exact C control flow; src/bosses/count/sub_08026EB4.c
-080277B8,SceneActor_ResetWhenBlocked,low,Tentative descriptive role from exact C control flow; src/bosses/count/sub_080277B8.c
-08027824,SceneActor_TurnFourDirections,low,Tentative descriptive role from exact C control flow; src/bosses/count/sub_08027824.c
-0802797C,SceneActor_TurnEightDirections,low,Tentative descriptive role from exact C control flow; src/bosses/count/sub_0802797C.c
-08027AD4,SceneActor_ContractAnchoredShake,low,Tentative descriptive role from exact C control flow; src/bosses/count/sub_08027AD4.c
-08027BF0,SceneActor_ExpandAnchoredShake,low,Tentative descriptive role from exact C control flow; src/bosses/count/sub_08027BF0.c
-08027CF8,SceneActor_TimedCommandAnimation,low,Tentative descriptive role from exact C control flow; src/bosses/count/sub_08027CF8.c
-08027DAC,SceneActor_HoldSavedFacing,low,Tentative descriptive role from exact C control flow; src/bosses/count/sub_08027DAC.c
-08027E44,SceneActor_CompleteTriggeredAnimation,low,Tentative descriptive role from exact C control flow; src/bosses/count/sub_08027E44.c
-08027F08,SceneActor_HoldAlternateSavedFacing,low,Tentative descriptive role from exact C control flow; src/bosses/count/sub_08027F08.c
-08027FA0,SceneActor_AnchorAnimation,low,Tentative descriptive role from exact C control flow; src/bosses/count/sub_08027FA0.c
-08028040,SceneActor_HoldUnmirroredAnimation,low,Tentative descriptive role from exact C control flow; src/bosses/count/sub_08028040.c
-080280CC,SceneActor_RepeatDirectedProjectiles,low,Tentative descriptive role from exact C control flow; src/bosses/count/sub_080280CC.c
-080282BC,SceneActor_TimedAnchoredReaction,low,Tentative descriptive role from exact C control flow; src/bosses/count/sub_080282BC.c
-08028414,SceneActor_EmitDestructionParticles,low,Tentative descriptive role from exact C control flow; src/bosses/count/sub_08028414.c
-08028E18,SceneActor_DispatchCompanionCommand,low,Tentative actor/grid-effect role from exact C control flow; src/bosses/count/sub_08028E18.c
-08028E6C,SceneActor_QueueCompanionCommand,low,Tentative actor/grid-effect role from exact C control flow; src/bosses/count/sub_08028E6C.c
-08028EC0,SceneActor_QueueDefaultCompanionCommand,low,Tentative actor/grid-effect role from exact C control flow; src/bosses/count/sub_08028EC0.c
-08028F48,SceneActor_DestroyController,low,Tentative actor/grid-effect role from exact C control flow; src/bosses/count/sub_08028F48.c
-08029798,SceneActor_CreateController,low,Tentative actor/grid-effect role from exact C control flow; src/bosses/count/sub_08029798.c
+08024F2C,SceneActorAnimation_TransitionVariant,medium,Tentative descriptive role from exact C control flow; src/bosses/count/SceneActorAnimation_TransitionVariant.c
+080251C4,SceneActorAnimation_FollowMotionPath,medium,Tentative descriptive role from exact C control flow; src/bosses/count/SceneActorAnimation_UpdateChargeApproach.c
+0802533C,SceneActorAnimation_Recoil,medium,Tentative descriptive role from exact C control flow; src/bosses/count/SceneActorAnimation_UpdateLungeAttack.c
+08025550,SceneActorAnimation_ApproachTarget,medium,Tentative descriptive role from exact C control flow; src/bosses/count/SceneActorAnimation_UpdateHomingLunge.c
+08025714,SceneActorAnimation_Decelerate,medium,Tentative descriptive role from exact C control flow; src/bosses/count/SceneActorAnimation_UpdateRecoilSlide.c
+080257D0,SceneActorAnimation_RecoverMovement,medium,Tentative descriptive role from exact C control flow; src/bosses/count/SceneActorAnimation_UpdateChargeSlide.c
+08025CD4,SceneActorAnimation_WaitForCompletion,medium,Tentative descriptive role from exact C control flow; src/bosses/count/SceneActorAnimation_UpdateSwingLight.c
+08025D60,SceneActorAnimation_WaitForAlternateCompletion,medium,Tentative descriptive role from exact C control flow; src/bosses/count/SceneActorAnimation_UpdateSwingHeavy.c
+08025DEC,SceneActor_FireRandomizedProjectile,low,Tentative descriptive role from exact C control flow; src/bosses/count/SceneActorAnimation_UpdateChargeShotRelease.c
+08026248,SceneActorAnimation_TimedEffectReset,medium,Tentative descriptive role from exact C control flow; src/bosses/count/SceneActorAnimation_UpdateImpactFinish.c
+0802634C,SceneActorAnimation_LockedReset,medium,Tentative descriptive role from exact C control flow; src/bosses/count/SceneActorAnimation_ResetActionState.c
+08026398,SceneActorAnimation_AlternateEffectReset,medium,Tentative descriptive role from exact C control flow; src/bosses/count/SceneActorAnimation_UpdateImpactRelease.c
+08026488,SceneActorAnimation_TimedAction,medium,Tentative descriptive role from exact C control flow; src/bosses/count/SceneActorAnimation_UpdateFlashWindup.c
+0802667C,SceneActorAnimation_HoldFrame,medium,Tentative descriptive role from exact C control flow; src/bosses/count/SceneActorAnimation_UpdateFlashPulse.c
+08026780,SceneActorAnimation_ReleaseHeldFrame,medium,Tentative descriptive role from exact C control flow; src/bosses/count/SceneActorAnimation_UpdateFlashAlternating.c
+08026908,SceneActorAnimation_ReleaseSavedAction,medium,Tentative descriptive role from exact C control flow; src/bosses/count/SceneActorAnimation_UpdateFlashAlternatingRepeat.c
+08026AA4,SceneActor_PeriodicProjectileBurst,low,Tentative descriptive role from exact C control flow; src/bosses/count/SceneActors_UpdateRouteProjectileAttack.c
+08026C38,SceneActor_FireDirectedProjectile,low,Tentative descriptive role from exact C control flow; src/bosses/count/SceneActors_UpdateTravelProjectileAttack.c
+08026DE0,SceneActor_DecayScale,low,Tentative descriptive role from exact C control flow; src/bosses/count/SceneActors_UpdateShrinkingReaction.c
+08026EB4,SceneActor_DecayScaleAndMove,low,Tentative descriptive role from exact C control flow; src/bosses/count/SceneActors_UpdateKnockbackReaction.c
+080277B8,SceneActor_ResetWhenBlocked,low,Tentative descriptive role from exact C control flow; src/bosses/count/SceneActors_UpdateStationaryReaction.c
+08027824,SceneActor_TurnFourDirections,low,Tentative descriptive role from exact C control flow; src/bosses/count/SceneActors_UpdateDirectionalTurn.c
+0802797C,SceneActor_TurnEightDirections,low,Tentative descriptive role from exact C control flow; src/bosses/count/SceneActors_UpdateEightDirectionTurn.c
+08027AD4,SceneActor_ContractAnchoredShake,low,Tentative descriptive role from exact C control flow; src/bosses/count/SceneActors_UpdateContractingShake.c
+08027BF0,SceneActor_ExpandAnchoredShake,low,Tentative descriptive role from exact C control flow; src/bosses/count/SceneActors_UpdateExpandingShake.c
+08027CF8,SceneActor_TimedCommandAnimation,low,Tentative descriptive role from exact C control flow; src/bosses/count/SceneActors_UpdateHazardAttack.c
+08027DAC,SceneActor_HoldSavedFacing,low,Tentative descriptive role from exact C control flow; src/bosses/count/SceneActors_UpdateRestPose.c
+08027E44,SceneActor_CompleteTriggeredAnimation,low,Tentative descriptive role from exact C control flow; src/bosses/count/SceneActors_UpdateReleasePose.c
+08027F08,SceneActor_HoldAlternateSavedFacing,low,Tentative descriptive role from exact C control flow; src/bosses/count/SceneActors_UpdateSpecialPose.c
+08027FA0,SceneActor_AnchorAnimation,low,Tentative descriptive role from exact C control flow; src/bosses/count/SceneActors_UpdateAnchoredReaction.c
+08028040,SceneActor_HoldUnmirroredAnimation,low,Tentative descriptive role from exact C control flow; src/bosses/count/SceneActors_UpdateUnmirroredReaction.c
+080280CC,SceneActor_RepeatDirectedProjectiles,low,Tentative descriptive role from exact C control flow; src/bosses/count/SceneActors_UpdateSwarmAttack.c
+080282BC,SceneActor_TimedAnchoredReaction,low,Tentative descriptive role from exact C control flow; src/bosses/count/SceneActors_UpdateBlinkReaction.c
+08028414,SceneActor_EmitDestructionParticles,low,Tentative descriptive role from exact C control flow; src/bosses/count/SceneActors_SpawnDestructionParticles.c
+08028E18,SceneActor_DispatchCompanionCommand,low,Tentative actor/grid-effect role from exact C control flow; src/bosses/count/Count_TriggerBackgroundFlash.c
+08028E6C,SceneActor_QueueCompanionCommand,low,Tentative actor/grid-effect role from exact C control flow; src/bosses/count/Count_TryQueueCommand.c
+08028EC0,SceneActor_QueueDefaultCompanionCommand,low,Tentative actor/grid-effect role from exact C control flow; src/bosses/count/Count_QueueDefaultCommand.c
+08028F48,SceneActor_DestroyController,low,Tentative actor/grid-effect role from exact C control flow; src/bosses/count/Count_Destroy.c
+08029798,SceneActor_CreateController,low,Tentative actor/grid-effect role from exact C control flow; src/bosses/count/Count_Create.c
 080297FC,GridActor_SetAnimation,low,Tentative actor/grid-effect role from exact C control flow; src/fn/sub_080297FC.c
 08029908,GridActor_InitializeBodyCollider,low,Tentative actor/grid-effect role from exact C control flow; src/fn/sub_08029908.c
 080299B4,GridActor_InitializeAttackCollider,low,Tentative actor/grid-effect role from exact C control flow; src/fn/sub_080299B4.c
@@ -596,10 +596,10 @@ addr,name,confidence,evidence
 080304F8,SceneActor_StateTargetWaitA,medium,Tentative descriptive role from exact C and contiguous callers; src/fn/sub_080304F8.c
 080305AC,SceneActor_StatePhaseWindowWait,medium,Tentative descriptive role from exact C and contiguous callers; src/fn/sub_080305AC.c
 08030658,SceneActor_StateTargetWaitB,medium,Tentative descriptive role from exact C and contiguous callers; src/fn/sub_08030658.c
-08030710,SceneActorManager_Update,medium,Tentative descriptive role from exact C and contiguous callers; src/npc/manager/sub_08030710.c
-080307D8,SceneActorManager_Destroy,medium,Tentative descriptive role from exact C and contiguous callers; src/npc/manager/sub_080307D8.c
-08030818,SceneActorManager_Initialize,medium,Tentative descriptive role from exact C and contiguous callers; src/npc/manager/sub_08030818.c
-08030864,SceneActorManager_Create,medium,Tentative descriptive role from exact C and contiguous callers; src/npc/manager/sub_08030864.c
+08030710,SceneActorManager_Update,medium,Tentative descriptive role from exact C and contiguous callers; src/npc/manager/SceneActorManager_Update.c
+080307D8,SceneActorManager_Destroy,medium,Tentative descriptive role from exact C and contiguous callers; src/npc/manager/SceneActorManager_Destroy.c
+08030818,SceneActorManager_Initialize,medium,Tentative descriptive role from exact C and contiguous callers; src/npc/manager/SceneActorManager_Init.c
+08030864,SceneActorManager_Create,medium,Tentative descriptive role from exact C and contiguous callers; src/npc/manager/SceneActorManager_Create.c
 080308D0,Dialogue_LoadPaletteResource,medium,Tentative descriptive role from exact C and contiguous callers; src/fn/sub_080308D0.c
 0803092C,Dialogue_AdvanceAnimation,medium,Tentative descriptive role from exact C and contiguous callers; src/fn/sub_0803092C.c
 08030B78,Dialogue_SetDisplayMode,medium,Tentative descriptive role from exact C and contiguous callers; src/fn/sub_08030B78.c

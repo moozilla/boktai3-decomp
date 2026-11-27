@@ -1,4 +1,4 @@
-// Pin-free draft of FadingParticleGroup_Spawn (src/objects/hazards/falling_object_effects/sub_08015F60.c): 57 ROM / 59 draft.
+// Pin-free draft of FadingParticleGroup_Spawn (src/objects/hazards/falling_object_effects/FadingParticleGroup_Spawn.c): 57 ROM / 59 draft.
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "engine/engine_globals.h"

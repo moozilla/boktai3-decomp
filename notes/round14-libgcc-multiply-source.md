@@ -2,7 +2,7 @@
 
 Tags: #matching #cleanup #round14 #libraries
 
-`Libgcc_MultiplyInt64` (`0824AC74`, `src/lib/libgcc/sub_0824AC74.c`) comes directly
+`Libgcc_MultiplyInt64` (`0824AC74`, `src/lib/libgcc/Libgcc_MultiplyInt64.c`) comes directly
 from `pret/agbcc` commit `da598c1d918402c42c0c0d7128ba14567f3175e9`:
 
 * `libgcc/libgcc2.c`, `__muldi3`, assigns the product of its two low words

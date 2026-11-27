@@ -1,4 +1,4 @@
-// Pin-free draft of ImpactParticleGroup_UpdateFrozen (src/effects/particles/impact_fragments/sub_08014330.c): 3 ROM / 1 draft.
+// Pin-free draft of ImpactParticleGroup_UpdateFrozen (src/effects/particles/impact_fragments/ImpactParticleGroup_UpdateFrozen.c): 3 ROM / 1 draft.
 void ImpactParticleGroup_UpdateFrozen(struct PManager *m, struct PGroup *g)
 {
     u8 *p;

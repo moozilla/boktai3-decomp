@@ -21,9 +21,9 @@ The coordinator still needs to validate the combined ROM build.
 | 0014 | `src/npc/manager/scene_actor_animation.c` | 0802D9F8–08030710 | 52 | 11544 |
 | 0009 | `src/bosses/count/contact_actor_display.c` | 080427FC–08042E18 | 9 | 1564 |
 | 0010 | `src/scene/actor/actor_pool/pooled_motion.c` | 080454C0–08045A20 | 19 | 1376 |
-| 0015 | `src/bosses/nidhoggr/contact_sequence_actor.c` | 08045D18–08046880 | 22 | 2920 |
-| 0011 | `src/bosses/nidhoggr/orbit_contact_actor.c` | 08046880–08046B28 | 8 | 680 |
-| 0012 | `src/bosses/nidhoggr/contact_burst.c` | 08047F68–080483A0 | 9 | 1080 |
+| 0015 | `src/bosses/nidhoggr/duel_minions.c` | 08045D18–08046880 | 22 | 2920 |
+| 0011 | `src/bosses/nidhoggr/duel_orbs.c` | 08046880–08046B28 | 8 | 680 |
+| 0012 | `src/bosses/nidhoggr/duel_bursts.c` | 08047F68–080483A0 | 9 | 1080 |
 | 0013 | `src/scene/actor/registry/scene_actor_terrain_reactions.c` | 08072854–08072BA8 | 3 | 852 |
 | 0016 | `src/scene/actor/registry/scene_actor_profiles.c` | 08073C04–0807462C | 6 | 2600 |
 | 0017 | `src/monsters/axe/actor_phase.c` | 080F8010–080F85B0 | 6 | 1440 |

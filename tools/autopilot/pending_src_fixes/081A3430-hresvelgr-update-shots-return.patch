@@ -5,8 +5,8 @@ Otherwise the last Hresvelgr_TickShot exits through r0, leaving 081A3455.
 
 The explicit form changed the ROM bytes. The guarded form passed the unit ROM check.
 
---- a/src/bosses/hresvelgr/sub_081A3430.c
-+++ b/src/bosses/hresvelgr/sub_081A3430.c
+--- a/src/bosses/hresvelgr/Hresvelgr_UpdateShots.c
++++ b/src/bosses/hresvelgr/Hresvelgr_UpdateShots.c
 @@ -16,10 +16,23 @@
      struct E *e = p->e;
      s32 i = 0;

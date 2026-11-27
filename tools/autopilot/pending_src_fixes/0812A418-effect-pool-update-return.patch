@@ -4,8 +4,8 @@ The suspended path branches directly to the epilogue while r0 still holds pool.
 
 The explicit form changed the ROM bytes. The guarded form passed the unit ROM check.
 
---- a/src/effects/sun_discs/sub_0812A418.c
-+++ b/src/effects/sun_discs/sub_0812A418.c
+--- a/src/effects/sun_discs/EffectPool_UpdateSlots.c
++++ b/src/effects/sun_discs/EffectPool_UpdateSlots.c
 @@ -40,4 +40,6 @@
          return 0;
      }

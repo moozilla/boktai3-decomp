@@ -4,8 +4,8 @@ Memory_Clear pops its return address into r0. The parser returns through r1.
 
 The explicit form changed the ROM bytes. The guarded form passed the unit ROM check.
 
---- a/src/link/wireless/battle/sub_0803CDF0.c
-+++ b/src/link/wireless/battle/sub_0803CDF0.c
+--- a/src/link/wireless/battle/ScenePool_ParseEntryParameters.c
++++ b/src/link/wireless/battle/ScenePool_ParseEntryParameters.c
 @@ -50,3 +50,6 @@
      entry->stateEntered = 1;
      Memory_Clear(entry->history, 0x100);

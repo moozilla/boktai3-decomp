@@ -53,11 +53,11 @@ existing source, independently of the allocation experiment:
 
 | Existing source | Layout evidence |
 |---|---|
-| `src/effects/feathers/sub_08128B4C.c` — allocator | Twenty slots, `0xA0` bytes per slot, pool array at `+0x3C`, slot index at `+0x93` |
-| `src/effects/feathers/sub_0812975C.c` — destructor | Same twenty-slot array and stride, occupancy word at `+0x38` |
-| `src/effects/feathers/sub_081297A4.c` — initializer | Task prefix, graphics storage at `+0x18`, sequence resource at `+0x34`, occupancy at `+0x38` |
-| `src/effects/feathers/sub_081297DC.c` — creator | Complete task allocation of `0xCBC` bytes |
-| `src/effects/feathers/sub_08128B9C.c`, `sub_081292D4.c`, `sub_081294B4.c` — animation states | Full feather field layout, including sequence storage, state, slot index, age, angle, and effect fields |
+| `src/effects/feathers/FeatherEffectPool_AllocEntry.c` — allocator | Twenty slots, `0xA0` bytes per slot, pool array at `+0x3C`, slot index at `+0x93` |
+| `src/effects/feathers/FeatherEffectPool_DestroyTask.c` — destructor | Same twenty-slot array and stride, occupancy word at `+0x38` |
+| `src/effects/feathers/FeatherEffectPool_Init.c` — initializer | Task prefix, graphics storage at `+0x18`, sequence resource at `+0x34`, occupancy at `+0x38` |
+| `src/effects/feathers/FeatherEffectPool_GetOrCreate.c` — creator | Complete task allocation of `0xCBC` bytes |
+| `src/effects/feathers/FeatherEffectPool_UpdateOpeningAnimation.c`, `sub_081292D4.c`, `sub_081294B4.c` — animation states | Full feather field layout, including sequence storage, state, slot index, age, angle, and effect fields |
 | `include/engine/video/display_sequence.h` | Existing canonical sixteen-byte `DisplaySequenceState` matching the animation-state layout |
 
 An ignored layout probe compiled with stock ARM agbcc measured:
@@ -73,7 +73,7 @@ An ignored layout probe compiled with stock ARM agbcc measured:
 | `sizeof(struct FeatherPool)` | `0xCBC` |
 
 At the original indexed-loop commit, the header had one dependent source unit,
-`src/effects/feathers/sub_081296D0.c`; that complete 140-byte unit was independently checked.
+`src/effects/feathers/FeatherEffectPool_UpdateTask.c`; that complete 140-byte unit was independently checked.
 Review then found incompatible private definitions at the four state callback
 targets. The [interface follow-up](round14-feather-callback-interfaces_2026-11-16.md)
 migrates all four to the owner and embeds the actual ContactSwarmSprite prefix.

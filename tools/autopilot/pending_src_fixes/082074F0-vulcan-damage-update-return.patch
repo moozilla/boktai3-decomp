@@ -5,8 +5,8 @@ stores use other registers and preserve that Thumb return address.
 
 The explicit form changed the ROM bytes. The guarded form passed the unit ROM check.
 
---- a/src/monsters/cannons/vulcan/sub_082074F0.c
-+++ b/src/monsters/cannons/vulcan/sub_082074F0.c
+--- a/src/monsters/cannons/vulcan/VulcanCannon_UpdateDamageState.c
++++ b/src/monsters/cannons/vulcan/VulcanCannon_UpdateDamageState.c
 @@ -34,4 +34,7 @@
  {
      struct CannonCollider *collider;

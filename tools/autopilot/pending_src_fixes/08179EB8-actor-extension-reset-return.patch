@@ -4,8 +4,8 @@ The stores use r1, r2, r3 and r4. The incoming actor pointer remains in r0.
 
 The explicit form changed the ROM bytes. The guarded form passed the unit ROM check.
 
---- a/src/bosses/sabata/actor_impact.c
-+++ b/src/bosses/sabata/actor_impact.c
+--- a/src/bosses/sabata/impact.c
++++ b/src/bosses/sabata/impact.c
 @@ -148,4 +148,7 @@
      actor->hitByLight = 0;
      actor->hitAttributes = 0;

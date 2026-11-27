@@ -5,8 +5,8 @@ MessageWindow_SetStringArgument and ScrollingDialogue_SetStringArgument forward 
 
 The explicit form changed the ROM bytes. The guarded form passed the unit ROM check.
 
---- a/src/ui/dialogue/text_interpreter/sub_08032CD4.c
-+++ b/src/ui/dialogue/text_interpreter/sub_08032CD4.c
+--- a/src/ui/dialogue/text_interpreter/TextState_SetString.c
++++ b/src/ui/dialogue/text_interpreter/TextState_SetString.c
 @@ -8,3 +8,6 @@
  {
      p->a[i] = v;

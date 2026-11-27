@@ -18,7 +18,7 @@ settings changed. The parent integration task owns the full-ROM build gate.
 | `src/ui/title/tutorial_otenko.c` | 36 → 31 | 30,356 | `7474978c5` |
 | `src/bosses/count/actor_graphics_and_basic_states.c` | 16 → 10 | 12,420 | `0f429931e` |
 | `src/monsters/armor/actor_controller_transitions.c` | 13 → 6 | 3,404 | `88e29c2bf` |
-| `src/bosses/sabata/scene_event_actor.c` | 14 → 2 | 4,024 | `0bb3db59d` |
+| `src/bosses/sabata/reactions.c` | 14 → 2 | 4,024 | `0bb3db59d` |
 | `src/scene/actor/control/scene_actor_stored_motion.c` | 6 → 5 | 3,268 | `9e798c993` |
 
 All six combined units total **65,016 exact bytes**. Their final concession scan

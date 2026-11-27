@@ -128,9 +128,9 @@ validation logs are retained under `build/`.
 | 02000480 | `gSceneActorListManager` | unified | `include/engine/ram.h` |
 | 02000484 | `gWirelessController` | unified | `include/engine/ram.h` |
 | 02000488 | `gUnk_02000488` | skipped | restored protected src/objects/coffin/tether_actor.c needs the old header declaration; renamed header leaves old gUnk references undeclared; full batch restored |
-| 020004B4 | `gUnk_020004B4` | skipped | protected src/scene/actor/reaction/sub_08135F70.c uses the old declaration from include/scene/areas/area_effect_link.h; header rename gives compile error after restoring consumer |
+| 020004B4 | `gUnk_020004B4` | skipped | protected src/scene/actor/reaction/SceneActorReaction_ResolveDamage.c uses the old declaration from include/scene/areas/area_effect_link.h; header rename gives compile error after restoring consumer |
 | 020004B8 | `gUnk_020004B8` | skipped | protected src/fn/sub_0803EF4C.c uses the old declaration from include/effects/scene/scene_arc.h; header rename gives compile error after restoring consumer |
-| 020004F0 | `gUnk_020004F0` | skipped | protected src/link/wireless/battle/sub_0803DF90.c uses the old declaration from include/link/wireless/scene_pool.h; header rename gives compile error after restoring consumer |
+| 020004F0 | `gUnk_020004F0` | skipped | protected src/link/wireless/battle/ScenePool_StateTrackAdaptive.c uses the old declaration from include/link/wireless/scene_pool.h; header rename gives compile error after restoring consumer |
 | 02000500 | `gPlayerInteractionMode` | unified | `include/engine/ram.h` |
 | 02000504 | `gPlayerSavedMenuOption` | unified | `include/engine/ram.h` |
 | 02000514 | `gPlayerLinkAttackBonus` | unified | `include/engine/ram.h` |
@@ -162,5 +162,5 @@ validation logs are retained under `build/`.
 | 02037000 | `gBgMapWorkBuffer` | unified | `include/engine/ram.h` |
 | 02039000 | `gObjTileUploadRequests` | struct | `include/engine/video/obj_tile_upload.h` |
 | 0203B000 | `gResourceRegistryEntries` | struct | `include/engine/resource_registry.h` |
-| 0203B400 | `gUnk_0203B400` | skipped | protected src/bosses/count/sub_08025FFC.c relies on old random-table declaration in engine.h; header rename leaves old uses undeclared |
+| 0203B400 | `gUnk_0203B400` | skipped | protected src/bosses/count/SceneActorAnimation_UpdateImpactHazard.c relies on old random-table declaration in engine.h; header rename leaves old uses undeclared |
 | 0203C400 | `gGameStateStorage` | unified | `include/engine/ram.h` |

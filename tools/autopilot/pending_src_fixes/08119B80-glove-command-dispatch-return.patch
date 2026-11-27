@@ -5,8 +5,8 @@ Otherwise the final SceneMessages_SetPendingTrigger provides the result.
 
 The explicit form changed the ROM bytes. The guarded form passed the unit ROM check.
 
---- a/src/minigames/coffin_bike/sub_08119B80.c
-+++ b/src/minigames/coffin_bike/sub_08119B80.c
+--- a/src/minigames/coffin_bike/CoffinBike_DispatchCommands.c
++++ b/src/minigames/coffin_bike/CoffinBike_DispatchCommands.c
 @@ -18,5 +18,9 @@
  void *ActorAttachment_ReleaseResource(void *, s32, u32);
  void *ActorAttachment_ReleasePartsResource(void *, s32, u32);

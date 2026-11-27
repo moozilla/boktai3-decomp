@@ -5,8 +5,8 @@ r5 and r7 for the bit loop. r0 retains the command.
 
 The explicit form changed the ROM bytes. The guarded form passed the unit ROM check.
 
---- a/src/lib/rtc/sub_08249040.c
-+++ b/src/lib/rtc/sub_08249040.c
+--- a/src/lib/rtc/Rtc_WriteCommandByte.c
++++ b/src/lib/rtc/Rtc_WriteCommandByte.c
 @@ -14,3 +14,6 @@
          *(vu16 *)0x080000C4 = (bit << 1) | 5;
      }

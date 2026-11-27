@@ -5,8 +5,8 @@ step triggers an animation reset, Anim_SetSequence supplies the result.
 
 The explicit form changed the ROM bytes. The guarded form passed the unit ROM check.
 
---- a/src/monsters/garmr_statue/sub_08208740.c
-+++ b/src/monsters/garmr_statue/sub_08208740.c
+--- a/src/monsters/garmr_statue/GarmrStatue_UpdateCombat.c
++++ b/src/monsters/garmr_statue/GarmrStatue_UpdateCombat.c
 @@ -160,4 +160,7 @@
      struct ColliderView *collider;
      u32 ended;

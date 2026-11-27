@@ -8,8 +8,8 @@ call preserves the incoming entry pointer.
 
 The explicit form changed the ROM bytes. The guarded form passed the unit ROM check.
 
---- a/src/ui/books/monster_book/sub_081D4AC0.c
-+++ b/src/ui/books/monster_book/sub_081D4AC0.c
+--- a/src/ui/books/monster_book/BestiaryDisplay_UpdateEntry.c
++++ b/src/ui/books/monster_book/BestiaryDisplay_UpdateEntry.c
 @@ -15,10 +15,18 @@
  extern const s16 gUnk_086149C4[];
  void DisplayAnimation_SetFlags(void *, u32);

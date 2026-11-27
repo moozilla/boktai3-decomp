@@ -39,7 +39,7 @@ six expansions and direct table, with the full 1,256-byte function exact.
 
 - `src/monsters/mummy/mummy.c` 4 → 0. Uses the shared display sequence and typed player
   and Mummy contact fields.
-- `src/monsters/mummy/sub_080D1784.c` 2 → 0 under the improved linter. At 080D1784 the
+- `src/monsters/mummy/Mummy_ResumeSavedRouteAfterAnimation.c` 2 → 0 under the improved linter. At 080D1784 the
   shared route check and terrain snap restore PRE stack ordering after the
   discarded arithmetic and signed offset mask are removed.
 - `src/monsters/mummy/mummy_entry.c` 83 → 26 under the improved linter. Named range,

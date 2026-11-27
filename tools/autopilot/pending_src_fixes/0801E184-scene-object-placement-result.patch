@@ -8,8 +8,8 @@ return -1 explicitly.
 
 The explicit form changed the ROM bytes. The guarded form passed the unit ROM check.
 
---- a/src/objects/sliding_doors/sub_0801E184.c
-+++ b/src/objects/sliding_doors/sub_0801E184.c
+--- a/src/objects/sliding_doors/SlidingDoors_Append.c
++++ b/src/objects/sliding_doors/SlidingDoors_Append.c
 @@ -88,3 +88,31 @@
          slot->args.words[0] = 0;
      ++p->count;

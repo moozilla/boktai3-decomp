@@ -17,7 +17,7 @@ SingletonSlot7_,VanargandHead_,40,identity worker: Vanargand's layered head in t
 Slot7_,VanargandHead_,1,same object,src/bosses/vanargand/
 BossSlot2_,Sabata_,19,"identity worker: Sabata, White Forest 4233 and rematch 6415 (GCL EC71)",src/bosses/sabata/
 SceneEventActor_,Sabata_,7,Sabata block,src/bosses/sabata/
-SceneEventActor_SetDirection,Sabata_SetReactionDirection,,Separate reaction direction helper from the boss heading helper,src/bosses/sabata/scene_event_actor.c
+SceneEventActor_SetDirection,Sabata_SetReactionDirection,,Separate reaction direction helper from the boss heading helper,src/bosses/sabata/reactions.c
 ActorImpact_,SabataImpact_,7,Sabata block,src/bosses/sabata/
 ActorPosition_,SabataPosition_,5,Sabata block,src/bosses/sabata/
 ActorState_,SabataState_,8,Sabata block,src/bosses/sabata/
@@ -144,7 +144,7 @@ RisingSprite_,RecoilPuff_,,Observed identity of the defining unit (Pass 4),src/p
 ParticleEffect_,ActionFlash_,,Observed identity of the defining unit (Pass 4),src/player/effects/action_flash/
 ActorBurst_,ActionFlashBurst_,,Observed identity of the defining unit (Pass 4),src/player/effects/action_flash/
 PlayerBarrier_,PileTrap_,,Observed identity of the defining unit (Pass 4),src/player/pile_trap/
-Player_UpdateBarrierRecovery,PileTrap_UpdateSolarPileRecovery,,Promote the recovery alias after exact replay,src/player/motions/sub_08144AAC.c
+Player_UpdateBarrierRecovery,PileTrap_UpdateSolarPileRecovery,,Promote the recovery alias after exact replay,src/player/motions/PileTrap_UpdateSolarPileRecovery.c
 TentacleSpread_,CentipedeSpread_,,Observed identity of the defining unit (Pass 4),src/monsters/centipede/
 TentacleSpread_,CentipedeSpread_,,Observed identity of the defining unit (Pass 4),src/monsters/slime.c
 TentacleSpread_,CentipedeSpread_,,Observed identity of the defining unit (Pass 4),include/monsters/centipede_spread.h
