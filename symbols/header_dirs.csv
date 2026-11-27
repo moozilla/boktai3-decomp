@@ -589,3 +589,6 @@ include/link/player/directional_particle_vector.h,include/link/player/directiona
 include/system/solar/solar_measurement_task.h,include/system/solar/solar_measurement_task.h,shared layout recovered with Solar_UpdateMeasurement,,
 include/engine/video/proximity_volume.h,include/engine/video/proximity_volume.h,shared layout recovered with ProximityVolume_Update,,
 include/link/player/brief_sprite_effect.h,include/link/player/brief_sprite_effect.h,shared layout recovered with SpriteEffect_StartBriefAnimation,,
+include/link/panel/link_slot_display_element.h,include/link/panel/link_slot_display_element.h,shared layout recovered with LinkPanelSlots_ShowSlotDefaultFrame,,
+include/link/wireless/wireless_knockback_actor.h,include/link/wireless/wireless_knockback_actor.h,shared layout recovered with WirelessObj_ApplyKnockback,,
+include/link/session/player_slot_display_entry.h,include/link/session/player_slot_display_entry.h,shared layout recovered with PositionEffectDisplay_UpdateSources,,
