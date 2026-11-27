@@ -35,7 +35,7 @@ source or verification.
 
 ## Verification
 
-- `tools/check.py src/monsters/vorn/sub_080AEE08.c --target-size 984 --json`: zero differing
+- `tools/check.py src/monsters/vorn/Vorn_UpdateDefeat.c --target-size 984 --json`: zero differing
   bytes, reviewed complete extent, stock compiler.
 - Scope independently reports `MATCH`, 984 bytes.
 - Target and candidate SHA-256:

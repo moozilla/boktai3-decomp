@@ -4,7 +4,7 @@ Tags: #grid-attack-actor #unit #matching #080297E8 #0802C678
 
 Range: `080297E8–0802C678` (end exclusive). Subsystem interpretation is tentative.
 
-Consolidated all 63 existing matching files into `src/bosses/nidhoggr/grid_attack_actor.c`, in
+Consolidated all 63 existing matching files into `src/bosses/nidhoggr/duel.c`, in
 ROM order, with the six existing unmatched functions in their original positions.
 No new function gaps or inventory entries. No commits or shared-doc edits.
 `merge_unit.py --write` performed the merge; its `git rm` removal step was replaced

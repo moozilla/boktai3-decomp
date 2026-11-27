@@ -208,7 +208,7 @@ workers are idle, because it touches most gameplay files.
    through a cast (`(*(u8 **)gPlayers)[0x418]`, `(struct SceneActorChasePlayer *)gPlayers[0]`
    and 21 other view types).
 4. *(done 2026-11-15)* **Duplicate boss structs.** `struct Nidhoggr` was defined in its
-   header and again in `src/bosses/nidhoggr/sub_08191508.c`, and `src/bosses/nidhoggr/sub_08190C98.c` had a third
+   header and again in `src/bosses/nidhoggr/Nidhoggr_HidePartWithExplosion.c`, and `src/bosses/nidhoggr/Nidhoggr_ChangeCompletedPartState.c` had a third
    view (`struct BossParts`). One definition, in the header.
 5. *(done 2026-11-16)* **The registry-actor base.** It was eleven overlapping views
    (`SceneActorRegistryResetView`, about 2,700 uses; `SceneActorRegistryActor`, about 320;

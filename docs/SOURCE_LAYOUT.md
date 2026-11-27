@@ -137,7 +137,7 @@ source-file paths.
 | Dialogue boxes and text commands | `src/ui/dialogue/` |
 | HUD and damage numbers | `src/ui/hud/` |
 | Pause menu, inventory, map, Status page, Dark Card sequences | `src/ui/pause/{menu,inventory,map,status,menu_sequences}/` |
-| Gauge on the Dark Loans offer | `src/ui/pause/menu_sequences/sub_08243B54.c` (`StatGauge_Draw`) |
+| Gauge on the Dark Loans offer | `src/ui/pause/menu_sequences/StatGauge_Draw.c` (`StatGauge_Draw`) |
 | Shops, Solar Bank, Dark Loan, Storage, the San Miguel map | `src/ui/town/` (`shop/`, `solar_bank/`, `dark_loan.c`, `storage/`, `town_map.c`) |
 | The world map | `src/ui/world_map.c` |
 | Monster Book, Forging Book, collection | `src/ui/books/` |

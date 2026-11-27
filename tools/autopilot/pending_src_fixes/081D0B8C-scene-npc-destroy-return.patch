@@ -5,8 +5,8 @@ path ParticlePool_Destroy returned via r0 and left 081D0BA5.
 
 The explicit form changed the ROM bytes. The guarded form passed the unit ROM check.
 
---- a/src/npc/otenko/sub_081D0B8C.c
-+++ b/src/npc/otenko/sub_081D0B8C.c
+--- a/src/npc/otenko/Otenko_OnDestroy.c
++++ b/src/npc/otenko/Otenko_OnDestroy.c
 @@ -9,6 +9,16 @@
      SceneMessages_UnregisterReceiver(b + 0x168);
      ParticlePool_Destroy(*(u32 *)(q + 4));

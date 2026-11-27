@@ -1,4 +1,4 @@
-/* AreaEffect_AddSpriteFromScript (src/scene/areas/sub_0804E388.c): plain draft, no concessions.
+/* AreaEffect_AddSpriteFromScript (src/scene/areas/AreaEffect_AddSpriteFromScript.c): plain draft, no concessions.
  * 19 ROM / 19 draft insns differ, all register choice: global alloc runs manager (priority
  * 1604: 10 refs, live 187) before the 0xA8 stride constant (1600, REG_EQUIV doubled life), so
  * manager takes r5 instead of r6 (AGBCC_PRI=<stride>:+5 matches). Needs manager live 188+.

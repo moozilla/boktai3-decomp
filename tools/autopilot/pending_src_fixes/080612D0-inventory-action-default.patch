@@ -4,8 +4,8 @@ The out-of-range category branch returns with panel in r0
 
 The explicit form changed the ROM bytes. The guarded form passed the unit ROM check.
 
---- a/src/ui/town/shop/sub_080612D0.c
-+++ b/src/ui/town/shop/sub_080612D0.c
+--- a/src/ui/town/shop/Shop_ClassifySelectedAction.c
++++ b/src/ui/town/shop/Shop_ClassifySelectedAction.c
 @@ -10,3 +10,6 @@
              return Shop_ClassifyConsumableAction(panel);
      }

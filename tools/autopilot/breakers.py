@@ -9,7 +9,7 @@ weapon table, which flags each source of attack carries:
 
 * targets: LightFixture_OnHit (src/objects/light_fixtures.c): the flag each slot state needs
   (state 1 -> 4: a candlestick is lit; state 2 -> 8: put out) and the state it moves to.
-* lens: Player_GetAttackAttributeFlags (src/player/attack/sub_0814DD3C.c): the gun's flags per lens
+* lens: Player_GetAttackAttributeFlags (src/player/attack/Player_GetAttackAttributeFlags.c): the gun's flags per lens
   mode; the lens id in the bag (GameState+0x828) is the mode, its name is string 970 + id.
 * weapon modifiers: Player_BuildActionModifiers (src/player/appearance/player_visuals.c): modifier kind -> the
   Player_OnWeaponHitApply* callback -> the flags it returns.

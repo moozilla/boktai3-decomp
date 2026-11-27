@@ -10,7 +10,7 @@ The checkpoint before this bundle is `4d63ef54a`.
 ## Current source
 
 Nine of eleven assigned functions are exact. The remaining guarded source is
-`src/player/attack/sub_0814B1F8.c` (99.6% fuzzy) and `src/fn/sub_08200C94.c` (96.1%).
+`src/player/attack/Player_UpdateTargetMotion.c` (99.6% fuzzy) and `src/fn/sub_08200C94.c` (96.1%).
 Normal builds retain their exact assembly fallbacks. The matching reports here
 archive the closest candidates, compiler decisions and next source questions.
 Their original scratch-relative references are provenance, not required inputs;

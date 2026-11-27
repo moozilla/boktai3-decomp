@@ -3,7 +3,7 @@
 Tags: #matching #ratatosk #compiler #cse #combine #basic-blocks
 
 **Exact match in ordinary C.** `Ratatosk_UpdateKnockbackRecovery`, 800 bytes,
-now compiles byte-identically (`tools/check.py src/bosses/ratatosk/sub_081F5290.c`: MATCH, 0
+now compiles byte-identically (`tools/check.py src/bosses/ratatosk/Ratatosk_UpdateKnockbackRecovery.c`: MATCH, 0
 differing bytes). It has no register pins, barriers, inline assembly or
 compiler overrides. Commit `4fd4db14b` on `codex/opus-ratatosk-defeat`. The
 starting point was GPT-6 Pro's round 8 candidate (83.5%) in

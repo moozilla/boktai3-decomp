@@ -4,8 +4,8 @@ FrameDisplay_UpdateSprite returns through r0. The frame counter update uses r1.
 
 The explicit form changed the ROM bytes. The guarded form passed the unit ROM check.
 
---- a/src/player/effects/burst/sub_081604C0.c
-+++ b/src/player/effects/burst/sub_081604C0.c
+--- a/src/player/effects/burst/ActorDebris_Update.c
++++ b/src/player/effects/burst/ActorDebris_Update.c
 @@ -10,3 +10,6 @@
      FrameDisplay_UpdateSprite(display);
      display->frameCounter++;

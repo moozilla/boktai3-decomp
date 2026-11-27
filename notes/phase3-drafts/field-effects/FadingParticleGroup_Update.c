@@ -1,4 +1,4 @@
-// FadingParticleGroup_Update (src/objects/hazards/falling_object_effects/sub_08016118.c) without its memory barrier: 43 ROM / 43 draft.
+// FadingParticleGroup_Update (src/objects/hazards/falling_object_effects/FadingParticleGroup_Update.c) without its memory barrier: 43 ROM / 43 draft.
 #include "global.h"
 #include "engine/ram.h"
 #include "engine/video/display_sequence_inline.h"

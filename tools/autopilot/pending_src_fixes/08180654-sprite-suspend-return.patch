@@ -5,8 +5,8 @@ On the other path Sound_StopSong returns through r0, leaving 08180669.
 
 The explicit form changed the ROM bytes. The guarded form passed the unit ROM check.
 
---- a/src/engine/video/sprite_component/sub_08180654.c
-+++ b/src/engine/video/sprite_component/sub_08180654.c
+--- a/src/engine/video/sprite_component/SpriteComponent_Suspend.c
++++ b/src/engine/video/sprite_component/SpriteComponent_Suspend.c
 @@ -14,3 +14,6 @@
      component->flags |= 1;
      /* Callers ignore the unspecified ABI result. */

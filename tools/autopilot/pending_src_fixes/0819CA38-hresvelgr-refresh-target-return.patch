@@ -5,8 +5,8 @@ halfword to travel via r2.
 
 The explicit form changed the ROM bytes. The guarded form passed the unit ROM check.
 
---- a/src/bosses/hresvelgr/sub_0819CA38.c
-+++ b/src/bosses/hresvelgr/sub_0819CA38.c
+--- a/src/bosses/hresvelgr/Hresvelgr_RefreshTarget.c
++++ b/src/bosses/hresvelgr/Hresvelgr_RefreshTarget.c
 @@ -44,5 +44,13 @@
      obj->facing8 = SceneFacing_EightWay(obj->facing);
      Subtract(&v, &obj->position);

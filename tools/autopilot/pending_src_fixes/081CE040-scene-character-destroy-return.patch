@@ -4,8 +4,8 @@ The ROM leaves the result of its last call, SceneMessages_UnregisterReceiver, in
 
 The explicit form passed the unit ROM check.
 
---- a/src/npc/story_character/sub_081CE040.c
-+++ b/src/npc/story_character/sub_081CE040.c
+--- a/src/npc/story_character/SceneCharacter_OnDestroy.c
++++ b/src/npc/story_character/SceneCharacter_OnDestroy.c
 @@ -1,9 +1,9 @@
  #include "global.h"
  void ParticlePool_Destroy(u32);

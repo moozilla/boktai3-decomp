@@ -3,7 +3,7 @@
 Tags: #matching #ratatosk #compiler #reload #addressing
 
 **Exact match in ordinary C.** `Ratatosk_UpdateDefeatSequence`, 1,064 bytes, now
-compiles byte-identically (`tools/check.py src/bosses/ratatosk/sub_081F4CF8.c`: MATCH, 0
+compiles byte-identically (`tools/check.py src/bosses/ratatosk/Ratatosk_UpdateDefeatSequence.c`: MATCH, 0
 differing bytes). It has no register pins, barriers, inline assembly or
 compiler overrides. Commit `3c752a8b9` on `codex/opus-ratatosk-defeat`. The
 change to the earlier draft is three lines. About 21 source variants were

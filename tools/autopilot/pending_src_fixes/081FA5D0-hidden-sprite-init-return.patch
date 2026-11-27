@@ -4,8 +4,8 @@ The flags update uses r1 through r3. r0 remains the result of AnimSprite_InitLin
 
 The explicit form passed the unit ROM check.
 
---- a/src/bosses/ratatosk/sub_081FA5D0.c
-+++ b/src/bosses/ratatosk/sub_081FA5D0.c
+--- a/src/bosses/ratatosk/SceneResource_InitializeHiddenSprite.c
++++ b/src/bosses/ratatosk/SceneResource_InitializeHiddenSprite.c
 @@ -11,5 +11,5 @@
  void *ScriptProc_Start(u16, u16);
  s32 ResourceHeader_Relocate(void *, void *);

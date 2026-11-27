@@ -88,7 +88,7 @@ and zero errors before and after.
 The argument prefilter reduced scan inputs from 4,554 to 3,584. A two-header test uses one
 compiler probe on the first pass and zero new probes on the cached pass. Compatible headers can
 share a probe and incompatible groups fall back to smaller groups or individual headers.
-On `src/bosses/nidhoggr/grid_attack_actor.c`, three direct Clang preprocessing invocations took 5.304 seconds
+On `src/bosses/nidhoggr/duel.c`, three direct Clang preprocessing invocations took 5.304 seconds
 versus 10.161 through `cc`, with identical output. The final whole-tree refresh with cached
 probes took 1 minute 42 seconds at two jobs. The nested-evidence refresh took 3 minutes
 1 second and ranked the newly discovered families as well.

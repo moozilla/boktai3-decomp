@@ -740,7 +740,7 @@ The SDK routines `EEPROMRead` (`082486B4`), `EEPROMWrite` (`08248778`),
 (`08248634`) are matched EEPROM_V124 code.
 
 The game's save writer is `sub_0822EE68` (a non-matching draft, in
-`src/system/save/sub_0822EE68.c` under `#ifdef NONMATCHING`). Its layout, from the code:
+`src/system/save/Save_WriteBlock.c` under `#ifdef NONMATCHING`). Its layout, from the code:
 
 * The data is split into **8-byte blocks**, starting at a block index. All blocks are
   written with `sub_08248764`, then all are compared with `sub_082488D8`. A

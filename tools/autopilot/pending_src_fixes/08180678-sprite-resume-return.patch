@@ -5,8 +5,8 @@ Sound_PlaySong returns through r0, leaving 0818068D.
 
 The explicit form changed the ROM bytes. The guarded form passed the unit ROM check.
 
---- a/src/engine/video/sprite_component/sub_08180678.c
-+++ b/src/engine/video/sprite_component/sub_08180678.c
+--- a/src/engine/video/sprite_component/SpriteComponent_Resume.c
++++ b/src/engine/video/sprite_component/SpriteComponent_Resume.c
 @@ -8,7 +8,17 @@
  u32 SpriteComponent_Resume(struct SpriteComponent *component)
  {

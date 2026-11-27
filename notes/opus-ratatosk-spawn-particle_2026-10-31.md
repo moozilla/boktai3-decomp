@@ -3,7 +3,7 @@
 Tags: #matching #ratatosk #compiler #combine #jump2 #flow #dead-code
 
 **Exact match in ordinary C.** `Ratatosk_SpawnAnimatedParticle`, 940 bytes, now
-compiles byte-identically (`tools/check.py src/bosses/ratatosk/sub_081FC26C.c`: MATCH, 0
+compiles byte-identically (`tools/check.py src/bosses/ratatosk/Ratatosk_SpawnAnimatedParticle.c`: MATCH, 0
 differing bytes). It has no register pins, barriers, inline assembly or compiler
 overrides. Commit `fc3350f85` on `codex/opus-ratatosk-defeat` (merged to main
 as PR 907); matchsearch node
