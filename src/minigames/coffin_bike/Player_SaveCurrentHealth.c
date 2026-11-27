@@ -1,12 +1,11 @@
-#include "global.h"
-extern u8 *gGameState;
-struct S {
-    u8 f[0x74];
-    u32 a;
-};
-extern struct S *gParticipantActors;
+#include "minigames/coffin_bike/coffin_bike.h"
+#include "system/game_state/game_state.h"
+
 void Player_SaveCurrentHealth(void)
 {
-    if (gParticipantActors)
-        *(u16 *)(gGameState + 0x758) = gParticipantActors->a;
+    if (gParticipantActors[0]) {
+        struct CoffinBike *bike = (struct CoffinBike *)gParticipantActors[0];
+        s16 *savedLife = &gGameState->unk758;
+        *savedLife = bike->motion.style.initialWord;
+    }
 }

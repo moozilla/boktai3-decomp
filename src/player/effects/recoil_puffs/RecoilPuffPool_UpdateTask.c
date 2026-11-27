@@ -1,16 +1,10 @@
-#include "global.h"
-void RecoilPuff_Update(void *);
-u32 RecoilPuffPool_UpdateTask(u8 *s)
+#include "player/effects/recoil_puff_sprite.h"
+u32 RecoilPuffPool_UpdateTask(struct RecoilPuffPool *s)
 {
-    u8 *p = s + 0x18;
-    u8 *q = s + 0x44;
-    s32 i = 7;
-    do {
-        if (*q != 0)
-            RecoilPuff_Update(p);
-        p += 0x30;
-        q += 0x30;
-        i--;
-    } while (i >= 0);
+    s32 i;
+    for (i = 0; i < 8; i++) {
+        if (s->entries[i].active)
+            RecoilPuff_Update(&s->entries[i]);
+    }
     return 0;
 }

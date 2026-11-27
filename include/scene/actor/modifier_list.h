@@ -81,7 +81,8 @@ struct CharacterPreviewModel {
     s8 playerIndex;
 };
 struct CharacterPreviewPalette {
-    u8 unknown0[0xC];
+    s32 pendingDamage, damageType;
+    u8 unknown8[4];
     const u8 *flashPalette, *normalPalette;
     u8 framesRemaining, unknown15;
     u16 paletteId;

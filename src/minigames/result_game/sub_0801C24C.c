@@ -1,13 +1,7 @@
 #include "global.h"
 #include "engine/video/render.h"
-typedef struct {
-    u32 pad[2], flags;
-    u8 unkC[0xe];
-    u8 layer;
-    u8 unk1B[5];
-    s16 x, y, z;
-    u8 tail[0x3a];
-} Graphic;
+#include "minigames/result_game/result_menu_marker.h"
+typedef struct ResultMenuMarkerGraphic Graphic;
 s32 Anim_LoadKeyframe(void *anim, void *data, u32 index, u32 mode);
 void Anim_SetKeyframes(void *anim, void *data, u32 index, u32 mode, u32 flags);
 s32 Anim_Step(void *anim, void *data);

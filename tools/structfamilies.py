@@ -261,6 +261,22 @@ def compatible(a, b, *, strong=False):
     return False
 
 
+def same_scalar_storage(a, b):
+    """A typed call can identify a scalar record written with whole-byte bitfields."""
+    if a["kind"] != "struct" or b["kind"] != "struct" or (a["size"], a["align"]) != (b["size"], b["align"]):
+        return False
+    fields = []
+    for view in (a, b):
+        scalars = set()
+        for leaf in view["known"]:
+            if (leaf["base"] != "int" or leaf["array"] or "." in leaf["name"] or "[" in leaf["name"]
+                    or leaf["bits"] and (leaf["bitpos"], leaf["bits"]) != (leaf["off"] * 8, leaf["size"] * 8)):
+                return False
+            scalars.add((leaf["name"], leaf["off"], leaf["size"]))
+        fields.append(scalars)
+    return bool(fields[0]) and fields[0] == fields[1]
+
+
 def short(view):
     return view["spell"].split()[-1]
 
@@ -614,7 +630,9 @@ class SharedLayouts:
             formal = any(key in self.by_formal[v["id"]] for v in views)
             returned = any(key in self.by_return[v["id"]] for v in views)
             same_tag = any(short(v) == short(shared) and meaningful(v) for v in views)
-            if not any(compatible(v, shared, strong=formal or returned or same_tag) for v in views):
+            if not any(compatible(v, shared, strong=formal or returned or same_tag)
+                       or key in self.by_formal[v["id"]] and same_scalar_storage(v, shared)
+                       for v in views):
                 continue
             known = {(lf["off"], leaf_shape(lf), lf["signed"]) for lf in shared["known"]}
             common = len(observed & known)

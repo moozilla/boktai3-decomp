@@ -1,3 +1,4 @@
+#include "scene/collision/contact_position.h"
 #include "global.h"
 #define B(o)       (*(u8 *)(p + (o)))
 #define H(o)       (*(u16 *)(p + (o)))
@@ -23,9 +24,6 @@ void Player_UpdateFacingSide(void *);
 void ActorSequence_Begin(void *, u32, u32);
 u32 Player_GetAttackEffectType(u32);
 void AnimData_SelectPaletteBank(void *, u32);
-struct AttackVec {
-    s32 x : 16, y : 16, z : 16, pad : 16;
-};
 static inline s32 scale(s32 v)
 {
     return v >= 0 ? v >> 12 : -((-v) >> 12);
@@ -33,7 +31,7 @@ static inline s32 scale(s32 v)
 // confidence=low: held input sustains the rotating attack collider while consuming energy.
 void Player_UpdateSustainedSpinAttack(u8 *p)
 {
-    struct AttackVec pos;
+    struct ContactPosition pos;
     if (Player_ConsumeStateEntry(p)) {
         Player_SetActionPhase(p, 0);
         Player_SetPendingCallback(p, Player_StopActionSongOnExit);
@@ -100,7 +98,7 @@ void Player_UpdateSustainedSpinAttack(u8 *p)
                         Sound_PlaySong(0xCC);
                     H(0xC0A) = (H(0xC0A) + 16) & 255;
                     DirectionalSpriteEffect_PlaceOppositeAngle(p, H(0xC0A), p + 0x30);
-                    pos = *(struct AttackVec *)(p + 0x30);
+                    pos = *(struct ContactPosition *)(p + 0x30);
                     angle = (416 - H(0xC0A)) & 255;
                     pos.x += scale(170 * gUnk_086149C4[(angle + 64) & 255]);
                     pos.y += 230;

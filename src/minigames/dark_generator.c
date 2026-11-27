@@ -460,23 +460,20 @@ void DarkGenerator_UpdateInteraction(struct ControlPanel *panel)
         ScreenTransition_SendCommand(1, 5, 4, 4, 4, 0x1FFF, 0);
     } else if (phaseValue == 3) {
         if (player->tetherFrame > 0x1F) {
-            s32 zero = 0;
-            s32 four = 4;
-            *phase = four;
-            gPlayers[0]->tetherFrame = zero;
+            player->tetherPhase = 4;
+            gPlayers[0]->tetherFrame = 0;
             gPlayers[0]->position.x = 0x380;
             gPlayers[0]->position.y = 0x100;
             gPlayers[0]->position.z = 0x580;
             gPlayers[0]->heading = 1;
             gPlayers[0]->side = 1;
-            ScreenTransition_SendCommand(0, 5, four, 4, four, 0x1FFF, zero);
+            ScreenTransition_SendCommand(0, 5, 4, 4, 4, 0x1FFF, 0);
         }
     } else if (phaseValue == 4) {
         if (player->tetherFrame > 0x1F) {
-            s32 zero = 0;
-            *phase = zero;
-            gPlayers[0]->tetherFrame = zero;
-            panel->sustainedInput = zero;
+            player->tetherPhase = 0;
+            gPlayers[0]->tetherFrame = 0;
+            panel->sustainedInput = 0;
         }
     }
     DarkGenerator_UpdatePlayerSegments(panel);

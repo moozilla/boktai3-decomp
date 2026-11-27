@@ -1,3 +1,4 @@
+#include "scene/collision/contact_position.h"
 #include "player/player.h"
 #include "effects/particles/scene_particle_burst_api.h"
 #include "global.h"
@@ -6,9 +7,6 @@
 #define B(o) (*(u8 *)(p + (o)))
 #define H(o) (*(u16 *)(p + (o)))
 #define W(o) (*(u32 *)(p + (o)))
-struct AttackVec {
-    s32 x : 16, y : 16, z : 16, pad : 16;
-};
 extern const s16 gUnk_086149C4[];
 void Player_SetTetherMode(void *, u32, u32);
 u32 ActorVariant_GetTableValue(u32, u32);
@@ -149,7 +147,7 @@ void Player_UpdateSelectedSpinAttack(u8 *p)
             break;
         case 8: {
             struct ContactPosition offset, size;
-            struct AttackVec pos;
+            struct ContactPosition pos;
             s32 angle;
             B(0x4B9) = 0;
             if (Player_UpdateAttackFacing(p))
@@ -169,7 +167,7 @@ void Player_UpdateSelectedSpinAttack(u8 *p)
                 (((struct Player *)p)->statModifierContext.contactTimer + 16) & 255;
             DirectionalSpriteEffect_PlaceOppositeAngle(
                 p, ((struct Player *)p)->statModifierContext.contactTimer, p + 0x30);
-            pos = *(struct AttackVec *)(p + 0x30);
+            pos = *(struct ContactPosition *)(p + 0x30);
             angle = (0x1A0 - ((struct Player *)p)->statModifierContext.contactTimer) & 255;
             pos.x += scale(170 * gUnk_086149C4[(angle + 64) & 255]);
             pos.y += 230;

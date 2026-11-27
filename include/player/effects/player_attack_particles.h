@@ -2,6 +2,7 @@
 #define GUARD_PLAYER_ATTACK_PARTICLES_H
 
 #include "engine/task.h"
+#include "engine/video/anim_sprite.h"
 #include "scene/scene_animation.h"
 #include "engine/video/sprite.h"
 #include "engine/video/display_sequence.h"
@@ -9,10 +10,6 @@
 struct AttackParticleSlot {
     u32 life, sequence, mode;
     s32 angle;
-};
-struct AttackParticleOwner {
-    u8 unknown0[0x20];
-    struct ContactPosition position;
 };
 /* PlayerAttackEffect_Create allocates 0x5A8 bytes. Its initializer sets up sixteen slots. */
 struct AttackParticleEffect {
@@ -24,11 +21,15 @@ struct AttackParticleEffect {
     struct AttackParticleSlot slots[16];
     u32 frame, unknown588;
     const u8 *facing, *side;
-    const struct AttackParticleOwner *owner;
+    const struct AnimSprite *owner;
     u32 previous, current, element;
     void *sequenceResource;
 };
 
 typedef char AttackParticleEffectSizeCheck[sizeof(struct AttackParticleEffect) == 0x5A8 ? 1 : -1];
+
+s32 PlayerAttackEffect_AllocateParticle(struct AttackParticleEffect *effect,
+                                        struct ContactPosition *position, s32 lifetime,
+                                        void *animation, s32 sequence, s32 mode);
 
 #endif

@@ -1,8 +1,6 @@
 #include "global.h"
+#include "scene/collision/contact_position.h"
 
-struct OrbitPosition {
-    s16 x, y, z, pad;
-};
 struct OrbitSprite {
     u32 flags;
     u8 pad4[3];
@@ -10,7 +8,7 @@ struct OrbitSprite {
     u8 pad08[8];
     u16 f10;
     u8 pad12[0xA];
-    struct OrbitPosition position;
+    struct ContactPosition position;
     u8 pad24[8];
 };
 struct OrbitSpriteGroup {
@@ -37,7 +35,7 @@ void Sprite_Init(void *, void *, u32);
 void AnimData_SelectPaletteBank(void *, u32);
 void sub_08236790(void);
 
-void OrbitEffect_Initialize(struct OrbitEffect *p, struct OrbitPosition *position)
+void OrbitEffect_Initialize(struct OrbitEffect *p, struct ContactPosition *position)
 {
     struct OrbitSpriteGroup *g = &p->group;
     u32 firstPalette;

@@ -292,7 +292,8 @@ def field_paths(old, new):
             continue
         whole_bytes = (m["off"] * 8, m["size"] * 8)
         occupied_bits = old_bits.get(m["name"], whole_bytes)
-        candidates = [n for n in choices if n.get("off") == m["off"] and n.get("size") == m["size"]
+        aggregates = [n for n in new.get("aggregates", ()) if n["ctype"] == m["ctype"]]
+        candidates = [n for n in choices + aggregates if n.get("off") == m["off"] and n.get("size") == m["size"]
                       and n.get("array") == m["array"] and n.get("esize") == m.get("esize")
                       and (n.get("base") == m["base"] or {m["base"], n.get("base")} <= {"int", "enum"})
                       and occupied_bits == new_bits.get(n["name"], whole_bytes)]
@@ -515,6 +516,8 @@ def rewrite_records(text, targets, header, *, allow_prefix=False):
                     line, operation = refs.extent_uses[old["id"]]
                     raise Holdout(f"{old['spell']}: line {line} uses the private extent in {operation}")
                 check_pointer_prefix(ast, old)
+                if not pointer_only(ast, tu, old["id"], old["file"]):
+                    raise Holdout(f"{old['spell']}: larger shared type requires a pointer-only private declaration")
             if not same_sequence:
                 initialized, designated = initializers(ast, tu, old["id"], old["file"])
                 if initialized and (designated or positional_layout(old) != positional_layout(new)):
@@ -533,6 +536,18 @@ def rewrite_records(text, targets, header, *, allow_prefix=False):
         text = text[:start] + replacement + text[end:]
         previous = start
     return inline_twins.add_include(text, ramlayout.inc_name(str(header)))
+
+
+def pointer_only(ast, tu, key, path):
+    """Reject by-value type positions before expanding a prefix view."""
+    from pycparser import c_ast
+
+    def visit(node, parent=None):
+        if isinstance(node, c_ast.TypeDecl) and evidence.record_of(tu, node) == key:
+            return isinstance(parent, c_ast.PtrDecl)
+        return all(visit(child, node) for _, child in node.children())
+
+    return all(visit(node) for node in ast.ext if node.coord and Path(node.coord.file).as_posix() == path)
 
 
 def initializers(ast, tu, key, path):
@@ -595,7 +610,7 @@ def path_under(path, directory, suffix):
 def shared_layout(view):
     members = [(m.get("name"), m.get("off"), m.get("base"), m.get("width"), m.get("signed"), type_key(m))
                for m in view["members"]]
-    return view["kind"], view["size"], view["align"], members, view["leaves"], view["containers"]
+    return view["kind"], view["size"], view["align"], members, view["leaves"], view["containers"], view.get("aggregates")
 
 
 def embedded_members(views, records, used_tags, owner):

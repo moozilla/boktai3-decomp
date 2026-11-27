@@ -1,29 +1,15 @@
-#include "global.h"
-/* Tentative ParticleEffect/ParticleBurst family names (low confidence). */
-struct ParticleBurstSlot {
-    u8 pad[0x28];
-    u8 active;
-    u8 pad29[0xF];
-    void *callback;
-};
-struct ParticleBurst {
-    u8 pad[0x9E];
-    u8 active;
-    u8 pad9F;
-    void *context;
-    struct ParticleBurstSlot slots[8];
-};
+#include "player/effects/spiral_trail.h"
 s32 sub_08249240(void *, void *, void *);
-void SpiralTrail_UpdateSlots(struct ParticleBurst *p)
+void SpiralTrail_UpdateSlots(struct SpiralTrailTask *p)
 {
-    if (p->active) {
+    if (p->emitter.active) {
         s32 count = 0;
-        u8 *slot = (u8 *)&p->slots[0].active;
-        struct ParticleBurstSlot *effect = p->slots;
+        u8 *slot = (u8 *)&p->emitter.particles[0].active;
+        struct SpiralTrailParticle *effect = p->emitter.particles;
         s32 i = 7;
         do {
             if (*slot) {
-                sub_08249240(effect, p->context, *(void **)(slot + 0x10));
+                sub_08249240(effect, p->emitter.graphics, *(void **)(slot + 0x10));
                 count++;
             }
             slot += 0x3C;
@@ -31,6 +17,6 @@ void SpiralTrail_UpdateSlots(struct ParticleBurst *p)
             i--;
         } while (i >= 0);
         if (!count)
-            p->active = count;
+            p->emitter.active = count;
     }
 }

@@ -593,3 +593,7 @@ include/ui/dialogue/text_window.h,include/ui/dialogue/text_window.h,owned by the
 include/ui/dialogue/text_window_manager.h,include/ui/dialogue/text_window_manager.h,owned by the text window manager,,
 include/ui/pause/map_menu_marker.h,include/ui/pause/map_menu_marker.h,owned by the pause map menu,,
 include/ui/town/equipment_descriptor.h,include/ui/town/equipment_descriptor.h,owned by the shop and storage equipment panels,,
+include/player/effects/spiral_trail_sprite.h,include/player/effects/spiral_trail_sprite.h,owned by src/player/effects/spiral_trail,,
+include/player/effects/recoil_puff_sprite.h,include/player/effects/recoil_puff_sprite.h,owned by src/player/effects/recoil_puffs,,
+include/minigames/result_game/result_menu_marker.h,include/minigames/result_game/result_menu_marker.h,owned by src/minigames/result_game,,
+include/player/effects/spiral_trail.h,include/player/effects/spiral_trail.h,owned by src/player/effects/spiral_trail,,

@@ -98,12 +98,6 @@ u32 ActorDebris_Create(void *, void *, void *);
 void Collider_SetAttackProperties(void *, s32, s32, u32, u32, s32);
 void Collider_SetBodyProperties(void *, s32, u32, u32);
 
-struct PlayerCloneColliderVector {
-    u32 x : 16;
-    u32 y : 16;
-    u32 z : 16;
-};
-
 struct CloneAreaWork {
     struct ContactCollider *collider;
     u8 *facing;

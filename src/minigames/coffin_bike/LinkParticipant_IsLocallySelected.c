@@ -1,4 +1,5 @@
 #include "global.h"
+#include "engine/engine_pause.h"
 #include "scene/areas/area_effect_link.h"
 #include "engine/engine.h"
 #include "engine/ram.h"
@@ -15,8 +16,7 @@ static inline s32 LinkSelection_GetLocalPlayer(void)
 }
 u8 LinkParticipant_IsLocallySelected(struct LinkParticipant *participant)
 {
-    u32 mask = 0x800;
-    if ((gEngineFlags | gScenePauseFlags) & mask) {
+    if (Engine_PauseBits(0x800)) {
         s32 index = participant->playerIndex;
         s32 selected = LinkSelection_GetLocalPlayer();
         if (index != selected)

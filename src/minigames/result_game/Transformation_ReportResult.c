@@ -1,15 +1,11 @@
 #include "global.h"
+#include "script/script_utility.h"
 typedef struct {
     u8 id, pad;
     u16 level;
     u8 data[12];
 } Entry;
-typedef struct {
-    unsigned count : 16;
-    int *values;
-} Args;
 Entry *Inventory_GetEquipmentEntry(int);
-void Script_Call(int, Args *);
 static inline int clamp(int x)
 {
     if (x > 999)
@@ -21,7 +17,7 @@ static inline int clamp(int x)
 void Transformation_ReportResult(u8 *p)
 {
     int values[7];
-    Args args;
+    struct ScriptUtilityArguments args;
     Entry *entry = Inventory_GetEquipmentEntry(p[0xba]);
     values[0] = clamp(*(int *)(p + 0xd8));
     values[1] = clamp(*(int *)(p + 0xdc));

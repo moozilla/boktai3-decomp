@@ -346,7 +346,7 @@ def spell_type(t):
         return "?"
 
 
-def flatten(tu, root, s, path, probes, leaves, containers, encl, seen):
+def flatten(tu, root, s, path, probes, leaves, containers, encl, seen, embedded=None):
     """Leaves of aggregate s, which `root` + path spells. path: list of ('m', name) / ('i', idx)."""
     if s.decls is None or id(s) in seen or len(path) > 24:
         return
@@ -365,7 +365,9 @@ def flatten(tu, root, s, path, probes, leaves, containers, encl, seen):
         r = tu.resolve(t)
         agg = tu.aggregate(t)
         if agg and bits is None:
-            flatten(tu, root, agg[1], p, probes, leaves, containers, encl, seen)
+            if embedded is not None and path and not encl and agg[1].decls is not None:
+                embedded.append(leaf(root, p, t, "aggregate", None, None, probes, encl, False))
+            flatten(tu, root, agg[1], p, probes, leaves, containers, encl, seen, embedded)
             if agg[1].decls is None:
                 leaves.append(leaf(root, p, t, "incomplete", None, None, probes, encl, False))
             continue
@@ -381,7 +383,7 @@ def flatten(tu, root, s, path, probes, leaves, containers, encl, seen):
                 containers.append({"size": len(probes), "elem": len(probes) + 1})
                 probes.append(f"sizeof({root}{display(p)})")
                 probes.append(f"sizeof({root}{display(p)}[0])")
-                flatten(tu, root, eagg[1], p + [("i", 0)], probes, leaves, containers, encl + [cid], seen)
+                flatten(tu, root, eagg[1], p + [("i", 0)], probes, leaves, containers, encl + [cid], seen, embedded)
                 continue
             w, sg, base = tu.scalar(et) if not eagg else (None, None, "agg")
             leaves.append(leaf(root, p, t, base, w, sg, probes, encl, True))
@@ -602,7 +604,7 @@ def finish_layouts(structs, vals, bitfields, bfbytes):
         st["size"] = vals[st["size"]]
         for c in st["containers"]:
             c["size"], c["elem"] = vals[c["size"]], vals[c["elem"]]
-        for lf in st["leaves"]:
+        for lf in st["leaves"] + st.get("aggregates", []):
             for k in ("off", "size", "esize"):
                 if k in lf:
                     lf[k] = vals[lf[k]]
@@ -655,16 +657,16 @@ def probe_records(body, tu, records, *, qualified=False):
     """Probe named aggregate definitions directly, without synthetic RAM globals.
 
     RECORDS maps an arbitrary key to (C spelling, definition). Keep direct
-    members as well as flattened leaves so a consumer can preserve or rebuild
-    enclosing arrays and structs. Neither list guesses offsets or alignment.
+    members, embedded records, and flattened leaves so a consumer can preserve
+    or rebuild enclosing arrays and structs. Offsets come from agbcc.
     """
     probes, structs, bitfields = [], {}, []
     for key, (spell, definition) in records.items():
         root = f"(({spell} *)0)->"
         st = {"spell": spell, "kind": kind_of(definition), "size": len(probes), "align": len(probes) + 1,
-              "leaves": [], "containers": [], "members": []}
+              "leaves": [], "containers": [], "members": [], "aggregates": []}
         probes.extend((f"sizeof({spell})", f"__alignof__({spell})"))
-        flatten(tu, root, definition, [], probes, st["leaves"], st["containers"], [], frozenset())
+        flatten(tu, root, definition, [], probes, st["leaves"], st["containers"], [], frozenset(), st["aggregates"])
         for i, lf in enumerate(st["leaves"]):
             if "bf" in lf:
                 bitfields.append((key, i, spell, lf["bf"]))

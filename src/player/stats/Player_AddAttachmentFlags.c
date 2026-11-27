@@ -1,13 +1,7 @@
-#include "global.h"
+#include "player/player.h"
 
-struct P08159404 {
-    u8 f0[0x474];
-    u16 f474;
-    u16 f476;
-};
-
-void Player_AddAttachmentFlags(struct P08159404 *p, u32 a, u16 b)
+void Player_AddAttachmentFlags(struct Player *p, u32 a, u16 b)
 {
-    p->f474 |= a;
-    p->f476 = b;
+    p->tetherStatusFlags |= a;
+    p->tetherStatusTag = b;
 }

@@ -60,13 +60,13 @@ static inline void CoffinBike_UpdateSecondaryAction(struct CoffinBike *p, struct
             if (p->input[0] & 1) {
                 if (!sub_08249240(&p->motion.secondaryCallback, 0, p->motion.secondaryCallback)) {
                     if ((p->motion.secondaryLatched) == 1) {
-                        PalFade_Start(self, palette, p->motion.recoveryValue, 0, 0, 16, 1, 1);
+                        PalFade_Start(self, palette, p->motion.palette.paletteId, 0, 0, 16, 1, 1);
                         p->motion.secondaryLatched = 0;
                     }
                     p->motion.secondaryRelease = 0;
                 }
             } else if ((p->motion.secondaryLatched) && (p->previousInput & 1)) {
-                PalFade_Start(self, palette, p->motion.recoveryValue, 0, 0, 16, 1, 1);
+                PalFade_Start(self, palette, p->motion.palette.paletteId, 0, 0, 16, 1, 1);
                 p->motion.secondaryRelease = 0;
             }
         } else if (p->input[1] & 1)
@@ -81,10 +81,10 @@ static inline void CoffinBike_UpdateSecondaryAction(struct CoffinBike *p, struct
             self->recoveryTimer--;
             CoffinBike_ClearDamageFlag(&self->damageFlags, ~1);
             self->damageTimer = 0;
-            self->pendingDamage = 0;
+            self->palette.pendingDamage = 0;
             if (!self->recoveryTimer) {
                 palette = CharacterModel_GetPrimaryPaletteIndex(&p->model);
-                PalFade_Start(self, palette, self->recoveryValue, 0, 0, 16, 1, 1);
+                PalFade_Start(self, palette, self->palette.paletteId, 0, 0, 16, 1, 1);
             }
         }
         if (self->cooldown)
@@ -100,9 +100,9 @@ static inline void CoffinBike_UpdatePrimaryAction(struct CoffinBike *p, struct C
         if (p->input[0] & 2) {
             if (!sub_08249240(&p->motion.primaryCallback, 0, p->motion.primaryCallback)) {
                 if (p->motion.primaryLatched) {
-                    Anim_SetKeyframes(&p->model.parts[1], p->model.primaryAnimation,
+                    Anim_SetKeyframes(&p->model.view.parts[1], &p->model.resource,
                                       p->motion.primaryKeyframes, 2, 0);
-                    Anim_Step(&p->model.parts[1], p->model.primaryAnimation);
+                    Anim_Step(&p->model.view.parts[1], &p->model.resource);
                     p->motion.primarySpriteRefresh = 1;
                     p->motion.primaryLatched = 0;
                     if (LinkParticipant_IsLocallySelected(p))
@@ -114,9 +114,9 @@ static inline void CoffinBike_UpdatePrimaryAction(struct CoffinBike *p, struct C
             }
         } else {
             if (p->motion.primaryLatched) {
-                Anim_SetKeyframes(&p->model.parts[1], p->model.primaryAnimation,
+                Anim_SetKeyframes(&p->model.view.parts[1], &p->model.resource,
                                   p->motion.primaryKeyframes, 2, 0);
-                Anim_Step(&p->model.parts[1], p->model.primaryAnimation);
+                Anim_Step(&p->model.view.parts[1], &p->model.resource);
                 p->motion.primarySpriteRefresh = 1;
                 p->motion.primaryLatched = 0;
                 if (LinkParticipant_IsLocallySelected(p))
@@ -128,9 +128,9 @@ static inline void CoffinBike_UpdatePrimaryAction(struct CoffinBike *p, struct C
         if (p->input[1] & 2)
             sub_08249240(&p->motion.primaryCallback, 0, p->motion.primaryCallback);
         if (p->motion.actionCooldown == 1)
-            Anim_SetKeyframes(&p->model.parts[1], p->model.primaryAnimation,
+            Anim_SetKeyframes(&p->model.view.parts[1], &p->model.resource,
                               p->motion.primaryKeyframes, 2, 0);
-        Anim_Step(&p->model.parts[1], p->model.primaryAnimation);
+        Anim_Step(&p->model.view.parts[1], &p->model.resource);
     } else {
         if (p->input[1] & 2)
             sub_08249240(&p->motion.primaryCallback, 0, p->motion.primaryCallback);
@@ -146,7 +146,7 @@ static inline u16 CoffinBike_DamageFlagWord(const u16 *field)
 {
     return *field;
 }
-static inline struct CoffinBikeModel *CoffinBike_ModelFromWorkOwner(void *const *object)
+static inline struct CharacterPreviewModel *CoffinBike_ModelFromWorkOwner(void *const *object)
 {
     return &((struct CoffinBike *)*object)->model;
 }

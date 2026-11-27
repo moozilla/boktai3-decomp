@@ -100,6 +100,23 @@ void Shadow(struct View *(*Allocate)(void)) { Allocate(); }
                          [{"view": view, "result": base, "function": "Allocate",
                            "sites": [("src/npc.c:6", "Run")]}])
 
+    def test_prefix_view_requires_pointer_type_positions(self):
+        path = "src/a.c"
+        key = f"{path}:struct Prefix"
+        for source, expected in (
+            ("struct Prefix *items[8]; void Run(struct Prefix *p);", True),
+            ("void Run(void *p) { ((struct Prefix *)p)->mode = 1; }", True),
+            ("struct Prefix buffer[8];", False),
+            ("struct Owner { struct Prefix prefix; };", False),
+            ("struct Prefix (*items)[8];", False),
+            ("struct Prefix Run(void);", False),
+            ("void Run(struct Prefix value);", False),
+            ("int Size(void) { return sizeof(struct Prefix); }", False),
+        ):
+            with self.subTest(source=source):
+                _, _, ast, tu = parse("struct Prefix { int mode; };\n" + source, path)
+                self.assertEqual(merge.pointer_only(ast, tu, key, path), expected)
+
     def test_pointer_arithmetic_and_array_member(self):
         path = "src/moved/a.c"
         _, _, ast, tu = parse(A, path)
@@ -740,6 +757,22 @@ int Draw(struct View *p) { return p->cursor.x; }
             merge.probe_header(generated, "struct W", {**expected, "extra": (2, 2, 17, 15)},
                                views[0]["size"], views[0]["align"])
 
+    def test_typed_call_relates_full_width_bitfields_to_scalar_members(self):
+        path = "include/position.h"
+        shared = measure(TYPES + "struct Position { s16 x, y; } __attribute__((aligned(4)));", path)
+        key, target = next(iter(shared.items()))
+        old = next(iter(measure("struct Packed { unsigned x : 16; unsigned y : 16; };", "src/a.c").values()))
+        narrow = next(iter(measure("struct Packed { unsigned x : 15; unsigned extra : 1; unsigned y : 16; };",
+                                   "src/b.c").values()))
+        records = {**shared, old["id"]: old, narrow["id"]: narrow}
+
+        self.assertFalse(families.compatible(old, target, strong=True))
+        self.assertEqual(families.SharedLayouts(records, {}).relations([old]), [])
+        layouts = families.SharedLayouts(records, {("formal type", key): {old["id"], narrow["id"]}})
+        self.assertEqual(layouts.relations([old]), [(key, "overlapping view", "typed call", 0)])
+        self.assertEqual(layouts.relations([narrow]), [])
+        self.assertEqual(merge.field_paths(old, target), {"x": "x", "y": "y"})
+
     def test_sub_byte_bitfield_rewrite_requires_the_same_bits(self):
         old = next(iter(measure("struct W { unsigned low : 4; unsigned high : 4; };", "src/a.c").values()))
         new = next(iter(measure("struct W { unsigned whole : 8; };", "include/w.h").values()))
@@ -747,6 +780,17 @@ int Draw(struct View *p) { return p->cursor.x; }
         with self.assertRaisesRegex(merge.Holdout, "allocation-group"):
             merge.plan_header(family, [old], "W", Path("include/w.h"))
         self.assertEqual(merge.field_paths(old, new), {"low": None, "high": None})
+
+    def test_shared_record_can_map_a_private_field_to_a_nested_member(self):
+        types = "struct Body { int mode; };\nstruct Other { int mode; };\n"
+        old = measure(types + "struct View { struct Body body; };", "src/a.c")["src/a.c:struct View"]
+        shared = types + "struct Shared { struct { struct Body motion; struct Other other; } actor; };"
+        new = measure(shared, "include/shared.h")["include/shared.h:struct Shared"]
+        self.assertEqual(merge.field_paths(old, new)["body"], "actor.motion")
+
+        wrong = measure(shared.replace("Body motion", "Other motion"),
+                        "include/shared.h")["include/shared.h:struct Shared"]
+        self.assertEqual(merge.field_paths(old, wrong)["body"], None)
 
 
 class GateTests(unittest.TestCase):
