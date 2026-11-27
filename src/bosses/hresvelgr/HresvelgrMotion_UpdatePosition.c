@@ -1,15 +1,7 @@
 #include "global.h"
 #include "scene/collision/contact_position.h"
+#include "bosses/hresvelgr/motion_entry_layout.h"
 
-struct MotionEntry {
-    u8 unknown0[0x1C];
-    struct ContactPosition position;
-    u8 unknown24[0x28];
-    struct ContactPosition *origin;
-    u16 lifetime, frame, radius, height;
-    u8 unknown58[2];
-    u16 angularStep;
-};
 extern const s16 gUnk_086149C4[];
 static inline s32 scale(s32 n)
 {

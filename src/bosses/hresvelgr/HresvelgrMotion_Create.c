@@ -2,21 +2,8 @@
 #include "engine/ram.h"
 #include "engine/engine_globals.h"
 #include "scene/collision/contact_position.h"
+#include "bosses/hresvelgr/motion_entry_layout.h"
 
-struct MotionEntry {
-    u32 flags;
-    u8 unknown4[0xC];
-    u16 tile;
-    u8 unknown12[0xA];
-    struct ContactPosition position;
-    u8 unknown24[8];
-    u8 animation[0x10];
-    struct ContactPosition savedPosition, delta;
-    struct ContactPosition *origin;
-    u16 lifetime, frame, radius, height;
-    u8 type, mode;
-    u16 angularStep;
-};
 struct MotionPool {
     u8 unknown0[0x18];
     u8 animationA[0x1C], animationB[0x1C];

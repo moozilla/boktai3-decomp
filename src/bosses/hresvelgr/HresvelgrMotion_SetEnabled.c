@@ -1,13 +1,6 @@
 #include "global.h"
 #include "scene/collision/contact_position.h"
-struct MotionEntry {
-    u8 unknown0[0x1c];
-    struct ContactPosition position;
-    u8 unknown24[0x20];
-    struct ContactPosition delta;
-    u8 unknown4C[0xD];
-    u8 enabled;
-};
+#include "bosses/hresvelgr/motion_entry_layout.h"
 void HresvelgrMotion_UpdatePosition(struct MotionEntry *);
 static inline void Difference(struct ContactPosition *out, struct ContactPosition *a,
                               struct ContactPosition *b)
@@ -28,6 +21,6 @@ void HresvelgrMotion_SetEnabled(u8 *raw, u32 enabled)
             HresvelgrMotion_UpdatePosition(p);
             Difference(&p->delta, pos, old);
         }
-        p->enabled = enabled;
+        p->mode = enabled;
     }
 }
