@@ -1,23 +1,17 @@
 #include "global.h"
+#include "player/player.h"
 
 // confidence=low: alternate action handlers use this copy of the facing-fold helper.
 
-struct FacingState {
-    u8 pad[0x3A2];
-    u8 side;
-    u8 flipped;
-    u8 direction;
-};
-
-void Player_UpdateActionFacingSide(struct FacingState *player)
+void Player_UpdateActionFacingSide(struct Player *player)
 {
-    u32 direction = player->direction;
+    u32 direction = player->facing;
     if (direction > 4) {
         u32 side = 8 - direction;
-        player->side = side;
-        player->flipped = 1;
+        player->heading = side;
+        player->side = 1;
     } else {
-        player->side = direction;
-        player->flipped = 0;
+        player->heading = direction;
+        player->side = 0;
     }
 }
