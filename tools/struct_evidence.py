@@ -89,6 +89,7 @@ class References(c_ast.NodeVisitor):
         self.calls, self.fields, self.params, self.globals = [], [], [], []
         self.field_chains = []
         self.return_definitions, self.return_calls = [], []
+        self.extent_uses = {}
         for ext in ast.ext:
             d = ext.decl if isinstance(ext, c_ast.FuncDef) else ext
             if isinstance(d, c_ast.Decl) and d.name:
@@ -110,6 +111,16 @@ class References(c_ast.NodeVisitor):
     def pointee(self, t):
         t = self.resolve(t)
         return record_of(self.tu, t.type) if isinstance(t, (c_ast.PtrDecl, c_ast.ArrayDecl)) else None
+
+    def object_record(self, t):
+        t = self.resolve(t)
+        while isinstance(t, c_ast.ArrayDecl):
+            t = self.resolve(t.type)
+        return record_of(self.tu, t)
+
+    def uses_extent(self, record, node, operation):
+        if record and node.coord and Path(node.coord.file).as_posix() == self.path:
+            self.extent_uses.setdefault(record, (node.coord.line, operation))
 
     def binding(self, name):
         return next((env[name] for env in reversed(self.env) if name in env), None)
@@ -144,6 +155,10 @@ class References(c_ast.NodeVisitor):
             f = self.declarations.get(expr.name.name)
             if f:
                 return f.type
+        if isinstance(expr, c_ast.TernaryOp):
+            return self.expr_type(expr.iftrue) or self.expr_type(expr.iffalse)
+        if isinstance(expr, c_ast.ExprList) and expr.exprs:
+            return self.expr_type(expr.exprs[-1])
         return None
 
     def address(self, expr):
@@ -200,12 +215,14 @@ class References(c_ast.NodeVisitor):
         result = self.pointee(node.decl.type.type)
         if result:
             self.return_definitions.append((self.func, self.func in self.static, result))
+        self.uses_extent(self.object_record(node.decl.type.type), node.decl, "a by-value return")
         params = node.decl.type.args
         self.env.append({})
         abi = record_of(self.tu, node.decl.type.type) is None
         for i, p in enumerate(params.params if params else ()):
             if not isinstance(p, c_ast.Decl):
                 break
+            self.uses_extent(self.object_record(p.type), p, "a by-value parameter")
             self.env[-1][p.name] = p.type
             rec = self.pointee(p.type)
             if rec:
@@ -225,8 +242,45 @@ class References(c_ast.NodeVisitor):
     visit_For = visit_Compound
 
     def visit_Decl(self, node):
+        if node.name:
+            self.uses_extent(self.object_record(node.type), node, "a by-value object")
         if self.func and node.name:
             self.env[-1][node.name] = node.type
+        self.generic_visit(node)
+
+    def visit_FuncDecl(self, node):
+        self.uses_extent(self.object_record(node.type), node, "a by-value return")
+        self.generic_visit(node)
+
+    def visit_CompoundLiteral(self, node):
+        self.uses_extent(self.object_record(node.type.type), node, "a compound literal")
+        self.generic_visit(node)
+
+    def visit_ArrayRef(self, node):
+        if const_int(node.subscript) != 0:
+            self.uses_extent(self.pointee(self.expr_type(node.name)), node, "an indexed pointer")
+        self.generic_visit(node)
+
+    def visit_UnaryOp(self, node):
+        if node.op in {"sizeof", "_Alignof"}:
+            t = node.expr.type if isinstance(node.expr, c_ast.Typename) else self.expr_type(node.expr)
+            self.uses_extent(self.object_record(t), node, node.op)
+        elif node.op in {"++", "--", "p++", "p--"}:
+            self.uses_extent(self.pointee(self.expr_type(node.expr)), node, "a pointer increment")
+        self.generic_visit(node)
+
+    def visit_Assignment(self, node):
+        t = self.expr_type(node.lvalue)
+        if node.op in {"+=", "-="}:
+            self.uses_extent(self.pointee(t), node, "pointer arithmetic")
+        elif node.op == "=":
+            self.uses_extent(self.object_record(t), node, "a by-value assignment")
+        self.generic_visit(node)
+
+    def visit_BinaryOp(self, node):
+        if node.op in {"+", "-"}:
+            for operand in (node.left, node.right):
+                self.uses_extent(self.pointee(self.expr_type(operand)), node, "pointer arithmetic")
         self.generic_visit(node)
 
     def visit_FuncCall(self, node):
@@ -240,6 +294,7 @@ class References(c_ast.NodeVisitor):
                     self.return_calls.append((self.func, node.coord.line, name, static, result))
                 formals = declared.args.params if declared and declared.args else ()
                 for i, arg in enumerate(node.args.exprs if isinstance(node.args, c_ast.ExprList) else ()):
+                    self.uses_extent(self.object_record(self.expr_type(arg)), arg, "a by-value argument")
                     origin = self.address(arg)
                     if origin:
                         dest = self.pointee(formals[i].type) if i < len(formals) and isinstance(

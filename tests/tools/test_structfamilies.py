@@ -473,6 +473,29 @@ unsigned Read(struct Pool *pool) { return pool->slots[2].timer; }
         with self.assertRaisesRegex(merge.Holdout, "depends on struct Entry"):
             merge.header_choice({"records": records}, family, views[:1], args)
 
+    def test_pointer_view_adopts_a_larger_type_only_without_extent_uses(self):
+        path = "src/a.c"
+        short = "struct Short { unsigned phase; };\n"
+        safe = short + "void Step(struct Short *p) { p->phase = 1; }\n"
+        new = next(iter(measure("struct Actor { unsigned state, timer; };", "include/actor.h").values()))
+        for body, reason in ((safe, None),
+                             (short + "unsigned Read(struct Short *p) { return sizeof(*p); }", "sizeof"),
+                             (short + "void Step(struct Short *p) { p[1].phase = 1; }", "indexed pointer"),
+                             (short + "void Copy(struct Short *p, struct Short *q) { *p = *q; }", "by-value assignment"),
+                             (short + "struct Short items[2];", "by-value object")):
+            with self.subTest(body=body):
+                old = next(iter(measure(body, path).values()))
+                targets = [(old, new, "struct Actor")]
+                with patch.object(lm, "preprocess", return_value=parse(body, path)[0]):
+                    if reason:
+                        with self.assertRaisesRegex(merge.Holdout, reason):
+                            merge.rewrite_records(body, targets, Path("include/actor.h"), allow_prefix=True)
+                    else:
+                        with self.assertRaisesRegex(merge.Holdout, "size/alignment"):
+                            merge.rewrite_records(body, targets, Path("include/actor.h"))
+                        rewrite = merge.rewrite_records(body, targets, Path("include/actor.h"), allow_prefix=True)
+                        self.assertIn("void Step(struct Actor *p) { p->state = 1; }", rewrite)
+
     def test_initializer_with_changed_shape_is_a_holdout(self):
         path = "src/moved/a.c"
         old_text = TYPES + "struct R { u16 old; };\nstruct R data = { 2 };\n"

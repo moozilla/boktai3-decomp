@@ -367,7 +367,7 @@ def rewrite_unit(text, old, new, header, spell):
     return rewrite_records(text, [(old, new, spell)], header)
 
 
-def rewrite_records(text, targets, header):
+def rewrite_records(text, targets, header, *, allow_prefix=False):
     """Plan each record's edits against the original translation unit."""
     spans = inline_twins.records(text)
     drafts = keepcheck.draft_ranges(text)
@@ -377,7 +377,8 @@ def rewrite_records(text, targets, header):
     renames = []
     refs = None
     for old, new, spell in targets:
-        if (old["size"], old["align"]) != (new["size"], new["align"]):
+        prefix = old["size"] < new["size"] and old["kind"] == new["kind"] == "struct"
+        if old["align"] != new["align"] or (old["size"] != new["size"] and not (allow_prefix and prefix)):
             raise Holdout(f"{old['spell']}: private size/alignment {old['size']:#x}/{old['align']} differs "
                           f"from shared {new['size']:#x}/{new['align']}")
         found = [r for r in spans if r.spell == old["spell"]]
@@ -395,7 +396,7 @@ def rewrite_records(text, targets, header):
         mapping = field_paths(old, new)
         same_sequence = [(m["name"], type_key(m)) for m in old["members"]] == [
             (m["name"], type_key(m)) for m in new["members"]]
-        if not same_sequence or any(name != new_name for name, new_name in mapping.items()):
+        if prefix or not same_sequence or any(name != new_name for name, new_name in mapping.items()):
             if refs is None:
                 pre = lm.preprocess(old["file"])
                 if pre is None:
@@ -407,6 +408,12 @@ def rewrite_records(text, targets, header):
                 if error:
                     raise Holdout(f"body parse failed: {error}")
                 refs = evidence.References(ast, tu, old["file"])
+            if prefix:
+                if re.search(r"^\s*#\s*(?:if|ifdef|ifndef)\b", mask, re.M):
+                    raise Holdout(f"{old['spell']}: source conditionals require a pointer-view review")
+                if old["id"] in refs.extent_uses:
+                    line, operation = refs.extent_uses[old["id"]]
+                    raise Holdout(f"{old['spell']}: line {line} uses the private extent in {operation}")
             if not same_sequence and has_initializers(ast, tu, old["id"], old["file"]):
                 raise Holdout(f"{old['spell']}: aggregate initializer needs a positional layout review")
             edits.extend(member_edits(text, pre, refs, old, mapping, span))
@@ -591,7 +598,7 @@ def convert(catalog, family, args):
             targets.extend((catalog["records"][key], child, child["spell"])
                            for key, child in new.get("embedded", {}).items()
                            if catalog["records"][key]["file"] == rel)
-            proposals[rel] = rewrite_records(text, targets, header)
+            proposals[rel] = rewrite_records(text, targets, header, allow_prefix=getattr(args, "allow_prefix", False))
             if not args.apply:
                 print(f"PROPOSED {rel}")
         except (Holdout, OSError) as exc:
@@ -651,10 +658,14 @@ def main(argv=None):
     ap.add_argument("--name", help="new shared tag")
     ap.add_argument("--header", type=Path, help="new header path below include/")
     ap.add_argument("--use-shared", help="reuse a related existing type instead of generating a header")
+    ap.add_argument("--allow-prefix", action="store_true",
+                    help="adopt a larger existing record for a pointer view with no size-dependent uses")
     ap.add_argument("-j", type=int, default=2, help="parallel header-dependent checks")
     args = ap.parse_args(argv)
     if args.j < 1 or args.use_shared and (args.name or args.header):
         ap.error("select positive jobs and either a new header or --use-shared")
+    if args.allow_prefix and not args.use_shared:
+        ap.error("--allow-prefix requires --use-shared")
     os.chdir(families.ROOT)
     try:
         catalog = families.load_catalog(args.catalog)
