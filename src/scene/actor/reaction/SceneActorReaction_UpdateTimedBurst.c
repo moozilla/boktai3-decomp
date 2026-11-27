@@ -8,6 +8,7 @@
 #include "engine/word_flags.h"
 #include "scene/motion/scene_actor_chase_shared.h"
 #include "scene/actor/scene_actor_init_actor.h"
+#include "ui/hud/damage_number_display.h"
 void EffectGroup_Reset(void *);
 void SceneActorEffects_EmitRandomOffsets(void *, s32, u32, s32, s32, u32);
 static inline u8 Reaction_HasFlags(u32 bits)
@@ -61,12 +62,6 @@ static inline void Reaction_SpawnPart(struct SceneActorChaseGroup *group)
     position.y = source->y + 128;
     position.z = source->z;
     EffectGroup_SpawnPart(group->effectConfig, 3, &position, &velocity, &scale, 40, 40);
-}
-static inline s32 Reaction_ThirtySecond(s32 value)
-{
-    if (value >= 0)
-        return value >> 5;
-    return -((-value) >> 5);
 }
 void SceneActorReaction_UpdateTimedBurst(struct ChaseActor *actor)
 {
@@ -138,7 +133,7 @@ void SceneActorReaction_UpdateTimedBurst(struct ChaseActor *actor)
         Chase_SetState(actor, 3, 1, 0);
         Chase_SetCtl(actor, group->routeResumeControl, 15);
         actor->base.reactionDirection =
-            (Reaction_ThirtySecond((MonsterInit_GetDirection(actor) + 128) & 255) + 7) & 7;
+            (DamageNumber_ProjectScale((MonsterInit_GetDirection(actor) + 128) & 255) + 7) & 7;
     } else {
         actor->base.hitLockTimer--;
     }

@@ -7,7 +7,7 @@ extern const u8 gUnk_08610814[];
 void SceneActorRoute_AdvanceActorPoint(struct ChaseActor *actor,
                                        struct SceneActorRouteCursor *cursor)
 {
-    struct SceneActorRouteCursor *embedded = (void *)((u8 *)actor + 0x448);
+    struct SceneActorRouteCursor *embedded = (void *)&actor->group.homeRoute;
     u16 script = (u16)actor->base.scriptId;
     u32 mode, near;
     if (script) {

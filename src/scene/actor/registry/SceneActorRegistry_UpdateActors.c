@@ -7,6 +7,7 @@
 #include "scene/motion/scene_actor_turn.h"
 #include "scene/actor/scene_actor_init_actor.h"
 #include "scene/motion/scene_actor_chase_shared.h"
+#include "scene/actor/scene_actor_drawable_flags.h"
 void Heap_Free(void *);
 
 static inline u8 RemovalRequested(struct ChaseActor *p)
@@ -87,21 +88,6 @@ static inline void UpdateActors_SpawnContactParts(struct ChaseActor *actor)
     actor->base.hitLockTimer = 0;
 }
 
-static inline void ClearTileFlags(struct AnimSprite *tile, u32 bits)
-{
-    u32 keep = ~bits;
-    tile->flags &= keep;
-}
-static inline void ClearDrawableFlags(struct ChaseActor *actor, u32 bits)
-{
-    if (actor->base.drawableKind == 0)
-        SceneActorChase_ClearWordFlags(
-            &((struct SceneActorRegistrySequenceDrawable *)actor->base.drawable)->flags, bits);
-    else {
-        struct AnimSprite *tile = (void *)((u8 *)actor->base.drawable + 0x20);
-        ClearTileFlags(tile, bits);
-    }
-}
 static inline void ClearField2B8(struct ChaseActor *p)
 {
     p->base.hitLockTimer = 0;
@@ -214,7 +200,7 @@ next:
             RegistryCurrentGame()->unk876 > 0 && !PlayerActionPending()) {
             actor->base.colliderA.responseValue = 0;
             ClearField2B8(actor);
-            ClearDrawableFlags(actor, 1);
+            ActorStatus_ClearDrawableFlags(actor, 1);
             {
                 s16 zero = 0;
                 actor->base.health = zero;
