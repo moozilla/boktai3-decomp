@@ -23,7 +23,7 @@ void MotionActor_RunPendingScript(struct CoffinBike *actor)
         zero = 0;
         *flags = mask;
         state->damageTimer = zero;
-        state->pendingDamage = zero;
+        state->palette.pendingDamage = zero;
     }
     {
         u32 mask = 4;

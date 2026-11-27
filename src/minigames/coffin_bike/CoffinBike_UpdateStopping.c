@@ -60,13 +60,13 @@ static inline void CoffinBike_UpdateSecondaryAction(struct CoffinBike *p, struct
             if (p->input[0] & 1) {
                 if (!sub_08249240(&p->motion.secondaryCallback, 0, p->motion.secondaryCallback)) {
                     if ((p->motion.secondaryLatched) == 1) {
-                        PalFade_Start(self, palette, p->motion.recoveryValue, 0, 0, 16, 1, 1);
+                        PalFade_Start(self, palette, p->motion.palette.paletteId, 0, 0, 16, 1, 1);
                         p->motion.secondaryLatched = 0;
                     }
                     p->motion.secondaryRelease = 0;
                 }
             } else if ((p->motion.secondaryLatched) && (p->previousInput & 1)) {
-                PalFade_Start(self, palette, p->motion.recoveryValue, 0, 0, 16, 1, 1);
+                PalFade_Start(self, palette, p->motion.palette.paletteId, 0, 0, 16, 1, 1);
                 p->motion.secondaryRelease = 0;
             }
         } else if (p->input[1] & 1)
@@ -81,10 +81,10 @@ static inline void CoffinBike_UpdateSecondaryAction(struct CoffinBike *p, struct
             self->recoveryTimer--;
             CoffinBike_ClearDamageFlag(&self->damageFlags, ~1);
             self->damageTimer = 0;
-            self->pendingDamage = 0;
+            self->palette.pendingDamage = 0;
             if (!self->recoveryTimer) {
                 palette = CharacterModel_GetPrimaryPaletteIndex(&p->model);
-                PalFade_Start(self, palette, self->recoveryValue, 0, 0, 16, 1, 1);
+                PalFade_Start(self, palette, self->palette.paletteId, 0, 0, 16, 1, 1);
             }
         }
         if (self->cooldown)

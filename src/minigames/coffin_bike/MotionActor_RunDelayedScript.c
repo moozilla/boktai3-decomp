@@ -28,7 +28,7 @@ void MotionActor_RunDelayedScript(struct CoffinBike *actor)
         zero = 0;
         *flags = mask;
         state->damageTimer = zero;
-        state->pendingDamage = zero;
+        state->palette.pendingDamage = zero;
     }
     actor->timer++;
 }

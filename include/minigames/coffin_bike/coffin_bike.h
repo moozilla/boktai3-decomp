@@ -40,10 +40,7 @@ struct CoffinBikeMotion {
     struct CoffinBikeEmitter emitter; /* 0x44 */
     struct SceneActorStyle style; /* 0x48 */
     u8 pad64[4];
-    u32 pendingDamage; /* 0x68 */
-    u8 pad6C[0x7E - 0x6C];
-    u16 recoveryValue;
-    void *parts; /* 0x80: the glove's model, read through a slot view */
+    struct CharacterPreviewPalette palette; /* 0x68 */
     u8 pad84[0xB0 - 0x84];
     u8 drain[0x10]; /* 0xB0: drain modifier state */
     s32 unkC0;

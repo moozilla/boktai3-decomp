@@ -60,7 +60,7 @@ void MotionActor_DispatchRequestedState(struct CoffinBike *actor)
             }
         }
         state->damageTimer = zero;
-        state->pendingDamage = zero;
+        state->palette.pendingDamage = zero;
     } else {
         u8 *flags;
         if (TestStateFlags(state, 2, &flags)) {

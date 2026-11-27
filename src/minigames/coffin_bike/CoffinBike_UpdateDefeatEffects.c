@@ -101,7 +101,7 @@ void CoffinBike_UpdateDefeatEffects(struct CoffinBike *p)
         actionTimer = &p->motion.recoveryTimer;
         cooldown = &p->motion.cooldown;
         flags = &p->flags;
-        sprites = &p->motion.parts;
+        sprites = (void **)&p->motion.palette.target;
         style = &p->motion.style.parameterD;
         motionBias = &p->motion.secondaryBias;
         hidden = 1;

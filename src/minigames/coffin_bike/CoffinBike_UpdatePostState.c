@@ -18,7 +18,7 @@ void SpatialIndex_SetPosition(void *, s32, s32, s32);
 void SpatialIndex_InsertEntry(void *);
 void PaletteFade_SetScrollPosition(s32, s32);
 void ActorStats_ApplyPendingDamage(void *);
-void Character_UpdateTimedEffect(void *);
+void Character_UpdateTimedEffect(struct CharacterPreviewPalette *);
 void ActorParticles_UpdateEmitter(void *, void *, u32);
 void CharacterModel_SetAnimationFlags(void *, u32);
 void CharacterModel_ClearAnimationFlags(void *, u32);
@@ -134,7 +134,7 @@ void CoffinBike_UpdatePostState(struct CoffinBike *p)
         CoffinBike_UpdateLocalPresentation(p);
         if (!(p && ((CoffinBike_ReadFlags(p)) & 0x14)))
             ActorStats_ApplyPendingDamage(self);
-        Character_UpdateTimedEffect(&self->pendingDamage);
+        Character_UpdateTimedEffect(&self->palette);
         if ((!Inactive(p)) && (!(p && ((CoffinBike_ReadFlags(p)) & 0x10))))
             ActorParticles_UpdateEmitter(self, &self->emitter, self->style.initialWord);
         if (CoffinBike_ActorFlags(p, 1)) {

@@ -118,7 +118,7 @@ void sub_08116E44(struct CoffinBike *p)
         zero = 0;
         *flags = mask;
         self->damageTimer = zero;
-        self->pendingDamage = zero;
+        self->palette.pendingDamage = zero;
     }
     {
         u32 mask = 4;
