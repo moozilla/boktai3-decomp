@@ -122,7 +122,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [docs/FOUNDRY.md](../docs/FOUNDRY.md) | The foundry: asm to a committed match, measured as a funnel | #matching #tooling | 12 |
 | [docs/GAME_LAYOUT.md](../docs/GAME_LAYOUT.md) | Boktai 3 game layout: from ROM to gameplay | *#assets #text #tooling* | 40 |
 | [docs/GHOUL_CONTACT_RESPONSE.md](../docs/GHOUL_CONTACT_RESPONSE.md) | Ghoul contact response: 0808B3EC | #matching #ghoul #scene-actor #regalloc #0808B3EC | 3 |
-| [docs/HANDOFF.md](../docs/HANDOFF.md) | Handoff: current state and how to continue | #process | 15 |
+| [docs/HANDOFF.md](../docs/HANDOFF.md) | Handoff: current state and how to continue | #process | 16 |
 | [docs/HIT_SWITCH.md](../docs/HIT_SWITCH.md) | Hit-counted switch pool (tentative identity) |  | 5 |
 | [docs/KNIDL_PROCESS_REVIEW_2026-10-09.md](../docs/KNIDL_PROCESS_REVIEW_2026-10-09.md) | KNIDL workflow review and implications for Boktai 3 | *#process* | 13 |
 | [docs/LAYOUTS.md](../docs/LAYOUTS.md) | RAM object layouts merged across files | #tooling #matching | 12 |
@@ -217,7 +217,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [docs/STACKED_ACTOR.md](../docs/STACKED_ACTOR.md) | Stacked display actor (tentative identity) | *#actors #particles #assets* | 5 |
 | [docs/TERRAIN_EDGE_MARKER.md](../docs/TERRAIN_EDGE_MARKER.md) | Terrain edge marker manager (tentative identity) | *#scripts* | 4 |
 | [docs/UNIT_WORKER.md](../docs/UNIT_WORKER.md) | Subsystem unit worker | *#text* | 5 |
-| [docs/WORKER.md](../docs/WORKER.md) | Worker playbook: matching with scope | #matching #process | 22 |
+| [docs/WORKER.md](../docs/WORKER.md) | Worker playbook: matching with scope | #matching #process | 23 |
 | [docs/tasks/m4a.md](../docs/tasks/m4a.md) | Task: lift the MP2K (m4a) sound library from pokeemerald | *#sound #library* | 3 |
 | [docs/tasks/relatives.md](../docs/tasks/relatives.md) | Unmatched functions with matched relatives | *#tooling* | 35 |
 | [docs/tasks/script_targets.md](../docs/tasks/script_targets.md) | Decomp targets: the code the scripts call | *#scripts #assets #tooling* | 2 |
@@ -298,6 +298,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [notes/codex-medium.md](../notes/codex-medium.md) | Codex medium worker: task 080D6FDC | #matching #scene-actor #terrain #mummy #dog | 476 |
 | [notes/codex-monster-continuation_2026-11-26.md](../notes/codex-monster-continuation_2026-11-26.md) | Monster route, control, and sprite follow-up | #monsters #types #phase3 #matching | 7 |
 | [notes/codex-monster-layout-cleanup_2026-11-26.md](../notes/codex-monster-layout-cleanup_2026-11-26.md) | Golem, Dog, Axe and Axe Armor layouts | #monsters #types #phase3 #matching | 3 |
+| [notes/codex-object-type-sweep_2026-11-26.md](../notes/codex-object-type-sweep_2026-11-26.md) | Object type recovery across the six object directories | #matching #types #tooling #phase3 | 4 |
 | [notes/codex-platform-and-otenko-recovery_2026-11-26.md](../notes/codex-platform-and-otenko-recovery_2026-11-26.md) | Moving platform and Otenko source recovery | #actors #types #matching #phase3 | 3 |
 | [notes/codex-projectile-task-recovery_2026-11-26.md](../notes/codex-projectile-task-recovery_2026-11-26.md) | Timed projectile and trail source recovery | #effects #types #matching #phase3 | 2 |
 | [notes/codex-remaining-monsters_2026-11-26.md](../notes/codex-remaining-monsters_2026-11-26.md) | Remaining monster state and type recovery | #monster #types #matching #phase3 | 13 |
@@ -447,7 +448,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [notes/parameterized-motion-pool_2026-10-14.md](../notes/parameterized-motion-pool_2026-10-14.md) | Parameterized motion pool, 080454C0–08045A20 |  | 5 |
 | [notes/phase3-dp-bosses_2026-11-13.md](../notes/phase3-dp-bosses_2026-11-13.md) | Bosses, Player and Engine core phase 3 results | #matching #phase3 #bosses #player #tooling | 4 |
 | [notes/phase3-dp-field-b_2026-11-13.md](../notes/phase3-dp-field-b_2026-11-13.md) | Field objects and hazards: dp-field-b run | #phase3 #actors #particles #animation #tools | 4 |
-| [notes/phase3-holdouts.md](../notes/phase3-holdouts.md) | Phase 3 holdouts | #matching #phase3 #holdouts | 367 |
+| [notes/phase3-holdouts.md](../notes/phase3-holdouts.md) | Phase 3 holdouts | #matching #phase3 #holdouts | 369 |
 | [notes/pilot-haiku.md](../notes/pilot-haiku.md) | pilot-haiku notes |  | 1 |
 | [notes/pilot-sonnet.md](../notes/pilot-sonnet.md) | pilot-sonnet.md |  | 0 |
 | [notes/player-clone-fill_2026-11-13.md](../notes/player-clone-fill_2026-11-13.md) | Player clone fill-local cleanup | #matching #actors #animation | 2 |
@@ -506,11 +507,11 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [notes/round14-once-loop-review_2026-11-16.md](../notes/round14-once-loop-review_2026-11-16.md) | Round 14: once-loop inventory and checkpoint-three source recovery | #round14 #matching #once-loop #source-recovery #cleanup | 11 |
 | [notes/round14-palette-traversal_2026-11-16.md](../notes/round14-palette-traversal_2026-11-16.md) | Round 14: indexed palette-bank traversal | *#assets* | 4 |
 | [notes/round14-placeholder-audit.md](../notes/round14-placeholder-audit.md) | Round 14: placeholder-name audit | #matching #actors #animation #tooling | 12 |
-| [notes/round14-player-slots_2026-11-16.md](../notes/round14-player-slots_2026-11-16.md) | Round 14 checkpoint 4: player-slot ownership |  | 14 |
+| [notes/round14-player-slots_2026-11-16.md](../notes/round14-player-slots_2026-11-16.md) | Round 14 checkpoint 4: player-slot ownership |  | 15 |
 | [notes/round14-pool-cursor_2026-11-16.md](../notes/round14-pool-cursor_2026-11-16.md) | Round 14 checkpoint 4: indexed pool callbacks |  | 7 |
 | [notes/round14-proved-zero-expansion-audit.md](../notes/round14-proved-zero-expansion-audit.md) | Round 14: proved-zero reports from compiler expansion intermediates | #matching #tooling #compiler #concessions | 9 |
 | [notes/round14-random-draw-operation.md](../notes/round14-random-draw-operation.md) | Round 14: shared random-table draw operation | #round14 #matching #once-loop #random-table | 4 |
-| [notes/round14-scoped-constant-review.md](../notes/round14-scoped-constant-review.md) | Round 14: independent block-local constants | #round14 #concessions #matching #cleanup | 3 |
+| [notes/round14-scoped-constant-review.md](../notes/round14-scoped-constant-review.md) | Round 14: independent block-local constants | #round14 #concessions #matching #cleanup | 4 |
 | [notes/round14-state-union-review_2026-11-16.md](../notes/round14-state-union-review_2026-11-16.md) | Round 14: shared state operations and ordinary union alternatives | #round14 #matching #concessions #object-model #cleanup | 4 |
 | [notes/round14-statement-expression-review.md](../notes/round14-statement-expression-review.md) | Round 14: remaining statement expressions | #matching #cleanup #round14 #compiler | 8 |
 | [notes/round14-structural-followup_2026-11-16.md](../notes/round14-structural-followup_2026-11-16.md) | Round 14: structural follow-up | #round14 #matching #shared-operation #source-evidence #checkpoint4 | 4 |
@@ -671,7 +672,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [notes/stage-icon-display_2026-10-14.md](../notes/stage-icon-display_2026-10-14.md) | Staged keyframe icon display |  | 3 |
 | [notes/staged-effect_2026-10-14.md](../notes/staged-effect_2026-10-14.md) | Contiguous staged effect subsection (Sol, 2026-10-14) | *#tooling* | 4 |
 | [notes/storage-equipment-slots-round9.md](../notes/storage-equipment-slots-round9.md) | Storage_RefreshEquipmentSlots |  | 1 |
-| [notes/structfamilies_2026-11-25.md](../notes/structfamilies_2026-11-25.md) | Private record recovery, 2026-11-25 | #tooling #matching #process | 7 |
+| [notes/structfamilies_2026-11-25.md](../notes/structfamilies_2026-11-25.md) | Private record recovery, 2026-11-25 | #tooling #matching #process | 6 |
 | [notes/sub_082392E8.md](../notes/sub_082392E8.md) | sub_082392E8.md | *#particles* | 1 |
 | [notes/subsystem-run_2026-10-25.md](../notes/subsystem-run_2026-10-25.md) | Subsystem scope run, 2026-10-25/26 | #process #tooling #matching | 4 |
 | [notes/subsystem-run_2026-10-27.md](../notes/subsystem-run_2026-10-27.md) | Subsystem scope run, 2026-10-27 | #process #tooling #matching #ram | 1 |
