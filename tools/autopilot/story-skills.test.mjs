@@ -319,6 +319,21 @@ test('a pressure-plate preview rolls back a falling attack', () => {
   assert.equal(state.restores, 2);
 });
 
+test('navigation can route around a live floor trap', () => {
+  const tiles = [
+    { state: 1, triggerFlags: 0, position: { x: 384, y: 256, z: 128 } },
+    { state: 1, triggerFlags: 0x200, position: { x: 384, y: 256, z: 384 } },
+    { state: 3, triggerFlags: 0, position: { x: 640, y: 256, z: 384 } },
+  ];
+  const game = { gTileTriggerManager: { tiles, used: 7 } };
+  const { floorTrapCells } = skill('floor-traps', {}, game);
+  const { findPath } = skill('world', {});
+  const grid = { at: (x, z) => x >= 0 && x < 3 && z >= 0 && z < 2 ? { open: true, level: 1 } : null };
+  const traps = floorTrapCells();
+  assert.deepEqual([...traps], ['1,0']);
+  assert.deepEqual(findPath(grid, [0, 0], new Set(['2,0']), traps), [[0, 0], [0, 1], [1, 1], [2, 1], [2, 0]]);
+});
+
 test('the vampire model uses signed health and the source sunlight flag', () => {
   const addr = 0x02010000;
   const values = { [addr + 0x94]: 310, [addr + 0x9c]: 0x10, [addr + 0x3ac]: 1, [addr + 0x54]: 400 };
