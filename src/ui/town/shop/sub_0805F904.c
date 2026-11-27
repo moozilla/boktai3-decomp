@@ -1,9 +1,6 @@
 #include "global.h"
 #include "ui/town/shop_panel.h"
-struct EquipmentDescriptor {
-    u32 prefix[3];
-    u8 modifierA, unknownD[3], modifierB, unknown11[3], modifierC, unknown15[11];
-};
+#include "ui/town/equipment_descriptor.h"
 void Inventory_GetEquipmentDescriptor(s32, void *);
 void Shop_PrepareEquipmentDescriptor(struct ShopPanel *,
                                                struct EquipmentDescriptor *);

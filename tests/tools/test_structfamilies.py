@@ -364,6 +364,26 @@ struct Parent { unsigned state; struct Entry linked; };
         self.assertEqual(merge.probe_header(generated, "struct R", expected, views[0]["size"], views[0]["align"])
                          ["size"], views[0]["size"])
 
+    def test_private_record_pointer_needs_only_a_forward_declaration(self):
+        path = "src/list.c"
+        text = "struct Item { int value; }; struct List { struct Item *head; };"
+        with patch.object(lm, "preprocess", return_value=parse(text, path)[0]):
+            view = families.scan_file(path, text)["records"][f"{path}:struct List"]
+        view.update(id=f"{path}:struct List", known=families.inhabited(view))
+        family = {"kind": "struct", "size": view["size"], "loads": []}
+        generated, expected, _, _ = merge.plan_header(family, [view], "List", Path("include/list.h"))
+        self.assertIn("struct Item;\n\nstruct List {", generated)
+        self.assertNotIn("struct Item {", generated)
+        measured = merge.probe_header(generated, "struct List", expected, view["size"], view["align"])
+        self.assertEqual(merge.field_paths(view, measured), {"head": "head"})
+
+        text = text.replace("*head", "head")
+        with patch.object(lm, "preprocess", return_value=parse(text, path)[0]):
+            embedded = families.scan_file(path, text)["records"][f"{path}:struct List"]
+        embedded["id"] = f"{path}:struct List"
+        with self.assertRaisesRegex(merge.Holdout, "depends on struct Item"):
+            merge.plan_header(family, [embedded], "List", Path("include/list.h"))
+
     def test_field_rename_leaves_unrelated_member_on_same_line(self):
         path = "src/moved/a.c"
         old_text = TYPES + """
@@ -643,6 +663,52 @@ unsigned Read(struct Pool *pool) { return pool->slots[2].timer; }
                 else:
                     result = merge.rewrite_unit(source, old, new, Path("include/s.h"), "struct S")
                     self.assertIn("struct S data = { 2 };", result)
+
+    def test_private_member_maps_to_one_shared_array_element(self):
+        path = "src/moved/a.c"
+        common = TYPES + "struct Sprite { u16 x, y; };\n"
+        old_text = common + """
+struct View { u8 pad[4]; struct Sprite cursor; };
+int Draw(struct View *p) { return p->cursor.x; }
+"""
+        shared = common + "struct Screen { struct Sprite sprites[2]; };\n"
+        old = measure(old_text, path)[f"{path}:struct View"]
+        new = measure(shared, "include/screen.h")["include/screen.h:struct Screen"]
+        with patch.object(lm, "preprocess", return_value=parse(old_text, path)[0]):
+            result = merge.rewrite_unit(old_text, old, new, Path("include/screen.h"), "struct Screen")
+        self.assertIn("return p->sprites[1].x;", result)
+
+        other = measure(shared.replace("struct Sprite sprites[2]", "struct Other { u16 x, y; } sprites[2]"),
+                        "include/screen.h")["include/screen.h:struct Screen"]
+        self.assertIsNone(merge.field_paths(old, other)["cursor"])
+
+    def test_reviewed_short_view_requires_direct_pointer_uses(self):
+        path = "src/moved/a.c"
+        shared = TYPES + "struct State { u16 mode; u16 extra[3]; };\n"
+        new = measure(shared, "include/state.h")["include/state.h:struct State"]
+        declaration = TYPES + "struct View { u16 field; };\n"
+        for expression, problem in [
+            ("int Read(struct View *p) { return p->field; }\nint Other(u16 *p) { return p[1]; }", None),
+            ("int Read(struct View p) { return p.field; }", "by-value parameter"),
+            ("int Read(struct View *p) { return p[1].field; }", "indexed pointer"),
+            ("int Read(struct View *p) { return sizeof(*p); }", "sizeof"),
+            ("int Read(struct View *p) { struct View *q = p; return q->field; }",
+             "outside a direct pointer parameter"),
+            ("int Read(struct View *p) { return *(u16 *)p; }", "outside a member access"),
+        ]:
+            with self.subTest(expression=expression):
+                text = declaration + expression
+                old = measure(text, path)[f"{path}:struct View"]
+                with patch.object(lm, "preprocess", return_value=parse(text, path)[0]):
+                    with self.assertRaisesRegex(merge.Holdout, "size/alignment"):
+                        merge.rewrite_unit(text, old, new, Path("include/state.h"), "struct State")
+                    if problem:
+                        with self.assertRaisesRegex(merge.Holdout, problem):
+                            merge.rewrite_unit(text, old, new, Path("include/state.h"), "struct State", allow_prefix=True)
+                    else:
+                        result = merge.rewrite_unit(text, old, new, Path("include/state.h"), "struct State",
+                                                    allow_prefix=True)
+                        self.assertIn("int Read(struct State *p) { return p->mode; }", result)
 
     def test_union_preserves_deliberate_overlays(self):
         text = TYPES + "union W { unsigned word; u16 halves[2]; };\n"

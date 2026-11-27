@@ -42,11 +42,7 @@ void PlayStats_SetState(struct PlayStatsScreen *screen, u32 screenId)
     }
     screen->state = 0;
     screen->timer = 0;
-    {
-        u32 mask = 2;
-        flags |= mask;
-    }
-    screen->flags = flags;
+    screen->flags = flags | 2;
 }
 
 void PlayStats_RemoveAnimations(struct PlayStatsScreen *screen)
@@ -137,12 +133,7 @@ void PlayStats_UpdateResults(struct PlayStatsScreen *task)
         GameState_UpdateCounterBalanceRank();
         GameStats_SelectLeadingCounter();
         PlayStats_DrawLabels(task);
-        task->state = 0;
-        task->timer = 0;
-        {
-            u32 bit = 2;
-            task->flags |= bit;
-        }
+        PlayStats_Enter(task, 0);
     }
 
     state = task->state;

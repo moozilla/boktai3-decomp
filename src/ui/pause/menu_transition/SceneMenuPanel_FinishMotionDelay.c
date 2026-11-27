@@ -1,28 +1,21 @@
+#include "ui/pause/scene_hud_display.h"
 #define SceneMenuPanel_UpdateMotion           PauseMenu_UpdateSpriteMotion
 #define SceneMenuPanel_StartPaletteTransition PauseMenu_StartPaletteTransition
 #define SceneMenuPanel_SetCallback            Hud_SetInteractionCallback
 #include "global.h"
-struct SceneMenuPanel {
-    u8 unknown0[0xA4E];
-    u16 delay;
-    u8 unknownA50[0x2058];
-    u32 widgetFlags;
-    u8 unknown2AAC[0x18DE];
-    u8 selection;
-};
-u32 SceneMenuPanel_UpdateMotion(struct SceneMenuPanel *, u32);
-u32 PauseMenu_GetPlayerStatusValue(struct SceneMenuPanel *);
-void SceneMenuPanel_StartPaletteTransition(struct SceneMenuPanel *, u16, u32, s32);
-void PauseMenu_ApplyItemSlot(struct SceneMenuPanel *, u32);
+u32 SceneMenuPanel_UpdateMotion(struct SceneHudState *, u32);
+u32 PauseMenu_GetPlayerStatusValue(struct SceneHudState *);
+void SceneMenuPanel_StartPaletteTransition(struct SceneHudState *, u16, u32, s32);
+void PauseMenu_ApplyItemSlot(struct SceneHudState *, u32);
 void Sound_PlaySong(u32);
-void SceneMenuPanel_SetCallback(struct SceneMenuPanel *, void (*)(void), s32);
+void SceneMenuPanel_SetCallback(struct SceneHudState *, void (*)(void), s32);
 void PauseMenu_OnItemUseDelayUpdate(void);
-void SceneMenuPanel_FinishMotionDelay(struct SceneMenuPanel *panel)
+void SceneMenuPanel_FinishMotionDelay(struct SceneHudState *panel)
 {
     if (SceneMenuPanel_UpdateMotion(panel, 0)) {
-        if (++panel->delay > 7) {
-            panel->widgetFlags |= 1;
-            PauseMenu_ApplyItemSlot(panel, panel->selection);
+        if (++panel->actionTransferDelay > 7) {
+            panel->motionWidgets[0].flags |= 1;
+            PauseMenu_ApplyItemSlot(panel, panel->actionSelection);
             SceneMenuPanel_StartPaletteTransition(panel, 366, PauseMenu_GetPlayerStatusValue(panel),
                                                   16);
             Sound_PlaySong(269);

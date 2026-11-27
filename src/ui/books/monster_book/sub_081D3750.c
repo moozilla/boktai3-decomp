@@ -1,11 +1,8 @@
 #include "global.h"
 #include "engine/engine.h"
 #include "engine/ram.h"
+#include "ui/books/bestiary_homing_sprite.h"
 
-struct TurnSprite {
-    u8 pad0[0x18];
-    s16 x, y, z;
-};
 struct TurnTarget {
     s16 x, y, z;
 };
@@ -21,7 +18,7 @@ struct TurnParticle {
     s16 vz;
     u8 pad12[0xA];
     struct TurnTarget *target;
-    struct TurnSprite sprite_at20;
+    struct BestiaryHomingSprite sprite_at20;
 };
 extern const s16 gUnk_086149C4[];
 s32 Math_Atan2(s32, s32);
@@ -44,7 +41,7 @@ static inline s32 randomNeg(void)
 void sub_081D3750(u8 *actor, struct TurnParticle *p)
 {
     struct TurnTarget *target = p->target;
-    struct TurnSprite *sprite = &p->sprite_at20;
+    struct BestiaryHomingSprite *sprite = &p->sprite_at20;
     u8 *angle = &p->angle;
     s32 diff;
     s32 abs;

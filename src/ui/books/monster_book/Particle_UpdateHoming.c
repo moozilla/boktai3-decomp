@@ -1,10 +1,7 @@
 #include "global.h"
 #include "engine/engine.h"
+#include "ui/books/bestiary_homing_sprite.h"
 
-struct HomingSprite {
-    u8 pad0[0x18];
-    s16 x, y, z;
-};
 struct HomingTarget {
     u8 pad0[2];
     s16 y;
@@ -20,7 +17,7 @@ struct HomingParticle {
     s16 vz;
     u8 pad12[0xA];
     struct HomingTarget *target;
-    struct HomingSprite sprite_at20;
+    struct BestiaryHomingSprite sprite_at20;
 };
 
 extern const s16 gUnk_086149C4[];
@@ -29,7 +26,7 @@ s32 Math_Atan2(s32, s32);
 void Particle_UpdateHoming(u8 *actor, struct HomingParticle *p)
 {
     struct HomingTarget *target = p->target;
-    struct HomingSprite *sprite = &p->sprite_at20;
+    struct BestiaryHomingSprite *sprite = &p->sprite_at20;
     s32 dx = *(s16 *)(actor + 0x24) - sprite->x;
     s32 dz = *(s16 *)(actor + 0x28) - sprite->z;
     s32 vx;

@@ -60,6 +60,14 @@ def related_width(member):
     return member.get("width")
 
 
+def forward_tag(member):
+    """A direct pointer to a named record needs only its tag declaration."""
+    match = re.fullmatch(r"(?:const )?((?:struct|union) [A-Za-z_]\w*) \*", member["ctype"])
+    if match and member["private"] == [match[1]]:
+        return match[1]
+    return None
+
+
 def load_vote(view, member, loads):
     """Count voters at measured leaf offsets, including leaves within aggregates."""
     if member["bits"]:
@@ -108,7 +116,8 @@ def pick_candidates(views, loads):
             grouped[key].append((view, m))
         proposals = []
         for supporters in grouped.values():
-            eligible = [(v, m) for v, m in supporters if not m["private"] and not VOLATILE_TYPE.search(m["decl"])]
+            eligible = [(v, m) for v, m in supporters
+                        if (not m["private"] or forward_tag(m)) and not VOLATILE_TYPE.search(m["decl"])]
             if not eligible:
                 continue
             qualified = sorted(eligible, key=lambda vm: (
@@ -162,6 +171,7 @@ def plan_record(family, views, name):
     spell = f"{kind} {name}"
     headers = {h for m, _, _, _ in selected for h in m["headers"]}
     forwards = {tag for m, _, _, _ in selected for tag in m.get("forwards", ())}
+    forwards |= {tag for m, _, _, _ in selected if (tag := forward_tag(m)) and tag != spell}
     embedded = {m["embedded"] for m, _, _, _ in selected if "embedded" in m}
     buf = [f"{spell} {{"]
     offset = 0
@@ -290,6 +300,15 @@ def field_paths(old, new):
             exact = [n for n in candidates if n["ctype"] == m["ctype"]]
             candidates = exact or candidates
         hits = {n["name"] for n in candidates}
+        if m["base"] == "aggregate" and not m["array"] and m["size"]:
+            for n in new["members"]:
+                # A complete embedded sprite in a private view can be one
+                # element of the owning object's sprite array.
+                if (n["array"] and n.get("off") is not None and n.get("esize") == m["size"]
+                        and re.fullmatch(re.escape(m["ctype"]) + r" \[[^\[\]]+\]", n["ctype"])):
+                    offset = m["off"] - n["off"]
+                    if 0 <= offset <= n["size"] - m["size"] and offset % m["size"] == 0:
+                        hits.add(f"{n['name']}[{offset // m['size']}]")
         if m["name"] in hits:
             fields[m["name"]] = m["name"]
         elif len(hits) == 1:
@@ -405,8 +424,47 @@ def member_edits(text, pre, refs, view, mapping, span):
     return edits
 
 
-def rewrite_unit(text, old, new, header, spell):
-    return rewrite_records(text, [(old, new, spell)], header)
+def check_pointer_prefix(ast, view):
+    """Restrict a reviewed short view to pointer parameters and their field uses."""
+    from pycparser import c_ast
+
+    tag = view["spell"].split()[1]
+
+    def nodes(node, parents=()):
+        yield node, parents
+        for _, child in node.children():
+            yield from nodes(child, (*parents[-3:], node))
+
+    roots = [node for node in ast.ext if node.coord and Path(node.coord.file).as_posix() == view["file"]]
+    for root in roots:
+        names = set()
+        for node, parents in nodes(root):
+            if not isinstance(node, c_ast.Struct) or node.name != tag or node.decls is not None:
+                continue
+            if len(parents) < 4 or not all(isinstance(parent, cls) for parent, cls in zip(
+                    parents[-4:], (c_ast.ParamList, (c_ast.Decl, c_ast.Typename), c_ast.PtrDecl, c_ast.TypeDecl))):
+                raise Holdout("short view is used outside a direct pointer parameter")
+            parameter = parents[-3]
+            if parameter.name:
+                names.add(parameter.name)
+
+        for node, parents in nodes(root):
+            if not isinstance(node, c_ast.ID) or node.name not in names or not parents:
+                continue
+            parent = parents[-1]
+            if isinstance(parent, c_ast.StructRef) and (parent.field is node or parent.type == "->"):
+                continue
+            if isinstance(parent, c_ast.UnaryOp) and parent.op == "!":
+                continue
+            if (isinstance(parent, c_ast.ExprList) and len(parents) > 1
+                    and isinstance(parents[-2], c_ast.FuncCall) and parents[-2].args is parent):
+                continue
+            raise Holdout(f"line {node.coord.line} uses a short-view pointer outside a member access, "
+                          "null test, or call argument")
+
+
+def rewrite_unit(text, old, new, header, spell, *, allow_prefix=False):
+    return rewrite_records(text, [(old, new, spell)], header, allow_prefix=allow_prefix)
 
 
 def rewrite_records(text, targets, header, *, allow_prefix=False):
@@ -456,6 +514,7 @@ def rewrite_records(text, targets, header, *, allow_prefix=False):
                 if old["id"] in refs.extent_uses:
                     line, operation = refs.extent_uses[old["id"]]
                     raise Holdout(f"{old['spell']}: line {line} uses the private extent in {operation}")
+                check_pointer_prefix(ast, old)
             if not same_sequence:
                 initialized, designated = initializers(ast, tu, old["id"], old["file"])
                 if initialized and (designated or positional_layout(old) != positional_layout(new)):
@@ -725,6 +784,12 @@ def header_choice(catalog, family, views, args):
     return header, parent.spell, text, new, decisions + parent.decisions, parent.skipped
 
 
+def allow_prefix(args, rel):
+    """Whether --allow-prefix names this unit (or was given without a unit)."""
+    chosen = getattr(args, "allow_prefix", None) or []
+    return "*" in chosen or rel in chosen
+
+
 def convert(catalog, family, args):
     views = [catalog["records"][key] for key in family["records"]]
     header, spell, header_text, new, decisions, skipped = header_choice(catalog, family, views, args)
@@ -751,7 +816,7 @@ def convert(catalog, family, args):
             targets.extend((catalog["records"][key], child, child["spell"])
                            for key, child in new.get("embedded", {}).items()
                            if catalog["records"][key]["file"] == rel)
-            proposals[rel] = rewrite_records(text, targets, header, allow_prefix=getattr(args, "allow_prefix", False))
+            proposals[rel] = rewrite_records(text, targets, header, allow_prefix=allow_prefix(args, rel))
             if not args.apply:
                 print(f"PROPOSED {rel}")
         except (Holdout, OSError) as exc:
@@ -828,8 +893,9 @@ def main(argv=None):
     ap.add_argument("--name", help="new shared tag")
     ap.add_argument("--header", type=Path, help="new header path below include/")
     ap.add_argument("--use-shared", help="reuse a related existing type instead of generating a header")
-    ap.add_argument("--allow-prefix", action="store_true",
-                    help="adopt a larger existing record for a pointer view with no size-dependent uses")
+    ap.add_argument("--allow-prefix", action="append", nargs="?", const="*", default=[], metavar="SRC",
+                    help="adopt a larger existing record for this reviewed unit's pointer view with no "
+                         "size-dependent uses (repeatable; with no SRC, every unit)")
     ap.add_argument("--size", type=lambda value: int(value, 0), help="select family views with this measured extent")
     ap.add_argument("--member-type", action="append", default=[],
                     help="require an exact direct member type in the selected views (repeatable)")

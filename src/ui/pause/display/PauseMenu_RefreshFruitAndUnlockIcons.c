@@ -1,22 +1,15 @@
 #include "global.h"
+#include "engine/video/anim_sprite.h"
 
 /* tentative: redraws the solar-fruit and unlock icons, showing equipped entries */
 
 struct Slot {
     u8 v : 8;
 } __attribute__((packed));
-struct Widget {
-    u8 pad0[8];
-    u32 flags;
-    u8 pad1[0x14];
-    s16 x;
-    s16 y;
-    u8 pad2[0x3C];
-};
 struct Menu {
     u8 pad0[0xA4];
     u8 resource[0x17E0 - 0xA4];
-    struct Widget widgets[20];
+    struct AnimSprite widgets[20];
     u8 pad1[0x4D80 - 0x17E0 - 20 * 0x60];
     struct Slot fruitSlots[8];
     struct Slot unlockSlots[8];
@@ -35,7 +28,7 @@ void PauseMenu_RefreshFruitAndUnlockIcons(struct Menu *p)
 {
     s32 n;
     s32 i;
-    struct Widget *w;
+    struct AnimSprite *w;
     s32 slot;
 
     {
@@ -58,7 +51,7 @@ void PauseMenu_RefreshFruitAndUnlockIcons(struct Menu *p)
         PauseMenu_SetSpritePalette(w, 0x373);
         if (SolarFruit_IsInventorySlotEquipped(i)) {
             PauseMenu_ClearSpriteFlags(p, n + 0x1e, 1);
-            PauseMenu_SetSpritePosition(p, n + 0x1e, w->x, w->y);
+            PauseMenu_SetSpritePosition(p, n + 0x1e, w->position.x, w->position.y);
             p->fruitSlots[n].v = i;
             n++;
         }
@@ -78,7 +71,7 @@ void PauseMenu_RefreshFruitAndUnlockIcons(struct Menu *p)
         PauseMenu_SetSpritePalette(w, 0x373);
         if (GameState_HasUnlockedInventoryEntry(i)) {
             PauseMenu_ClearSpriteFlags(p, n + 0x26, 1);
-            PauseMenu_SetSpritePosition(p, n + 0x26, w->x, w->y);
+            PauseMenu_SetSpritePosition(p, n + 0x26, w->position.x, w->position.y);
             p->unlockSlots[n].v = i;
             n++;
         }
