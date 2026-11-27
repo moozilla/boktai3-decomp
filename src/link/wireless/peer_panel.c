@@ -1,48 +1,7 @@
 #include "link/wireless/wireless_controller.h"
 #include "link/wireless/peer_panel.h"
 #include "engine/input.h"
-#include "engine/video/display_sequence_inline.h"
-
-static inline void WirelessPeerPanel_StepSprite(struct ContactSwarmSprite *sprite,
-                                                struct DisplaySequenceState *a)
-{
-    const u16 *frame;
-    frame = a->commands + a->index;
-    sprite->frame = *frame >> 6;
-
-    // Combine the animation and frame orientation flags for the sprite.
-    {
-        union DisplaySequenceControl control;
-        u32 bit, first;
-        control.raw = a->flags;
-        bit = 1;
-        first = (u8)(control.raw & bit);
-        if (first != (((*frame & 0x30) >> 4) & bit))
-            sprite->flags |= 4;
-        else
-            sprite->flags &= ~4;
-    }
-
-    {
-        union DisplaySequenceControl control;
-        u32 bit, first;
-        control.raw = a->flags;
-        bit = 2;
-        first = (u8)(control.raw & bit);
-        if (first != (((*frame & 0x30) >> 4) & bit))
-            sprite->flags |= 8;
-        else
-            sprite->flags &= ~8;
-    }
-
-    if (++a->elapsed >= a->duration) {
-        DisplaySequence_SelectNext(a);
-        frame = a->commands + a->index;
-        DisplaySequence_UpdateWeight(a, frame);
-        if (!a->duration)
-            a->duration = 1;
-    }
-}
+#include "engine/video/display_sprite_playback.h"
 
 void WirelessPeerMenu_InitBackground(struct WirelessPeerMenu *menu, int layer)
 {
@@ -88,7 +47,7 @@ int WirelessPeerPanel_Init(struct WirelessPeerMenu *owner, struct WirelessPeerPa
     Sprite_Init(initialSprite, glyph, style->priority | 48);
     Anim_RestartSequence(&animation, resource, style->animation, 0, 0);
     sprite = initialSprite;
-    WirelessPeerPanel_StepSprite(sprite, &animation);
+    PlayerCue_StepSequenceEnded(sprite, &animation);
     {
         struct WirelessPeerPanel *write;
         const struct WirelessPeerStyle *table;
