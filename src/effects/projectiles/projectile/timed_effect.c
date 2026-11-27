@@ -45,26 +45,16 @@ void Sprite_InitUnlinked(void *, void *, u32);
 void Collider_SetCallback(void *, void *, void *);
 void Collider_SetAttackProperties(void *, u32, u32, u32, u32, u32);
 
-static inline void FillWords(u32 *dst, int ctl, u32 *src)
-{
-    CpuSet(src, dst, ctl);
-}
-
 void TimedEffect_InitEntry(void *manager, struct Task4E01Projectile *entry, s32 index)
 {
     struct Task4E01Params *config = &entry->params;
     void *collider;
-    // concession-ok(const-local): CpuSet reads this fixed-source word by address.
-    u32 zero;
-    u32 *vel;
 
     Projectile_InitializeParams(config);
     entry->frame = 0;
     entry->runtime.restarted = 0;
     entry->runtime.index = index;
-    vel = (u32 *)&entry->velocity;
-    zero = 0;
-    FillWords(vel, 0x05000002, &zero);
+    ZeroFill8(&entry->velocity);
     AnimData_Load(&entry->graphics, config->sprite[0]);
     Sprite_InitUnlinked(&entry->sprite, &entry->graphics, 1);
     collider = entry->colliders;
