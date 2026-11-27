@@ -322,6 +322,26 @@ struct Host {{ unsigned state; struct Link {member}[2]; }};
         self.assertEqual(merge.probe_header(generated, "struct R", expected, views[0]["size"], views[0]["align"])
                          ["size"], views[0]["size"])
 
+    def test_private_record_pointer_needs_only_a_forward_declaration(self):
+        path = "src/list.c"
+        text = "struct Item { int value; }; struct List { struct Item *head; };"
+        with patch.object(lm, "preprocess", return_value=parse(text, path)[0]):
+            view = families.scan_file(path, text)["records"][f"{path}:struct List"]
+        view.update(id=f"{path}:struct List", known=families.inhabited(view))
+        family = {"kind": "struct", "size": view["size"], "loads": []}
+        generated, expected, _, _ = merge.plan_header(family, [view], "List", Path("include/list.h"))
+        self.assertIn("struct Item;\n\nstruct List {", generated)
+        self.assertNotIn("struct Item {", generated)
+        measured = merge.probe_header(generated, "struct List", expected, view["size"], view["align"])
+        self.assertEqual(merge.field_paths(view, measured), {"head": "head"})
+
+        text = text.replace("*head", "head")
+        with patch.object(lm, "preprocess", return_value=parse(text, path)[0]):
+            embedded = families.scan_file(path, text)["records"][f"{path}:struct List"]
+        embedded["id"] = f"{path}:struct List"
+        with self.assertRaisesRegex(merge.Holdout, "depends on struct Item"):
+            merge.plan_header(family, [embedded], "List", Path("include/list.h"))
+
     def test_field_rename_leaves_unrelated_member_on_same_line(self):
         path = "src/moved/a.c"
         old_text = TYPES + """

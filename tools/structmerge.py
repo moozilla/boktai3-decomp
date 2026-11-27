@@ -55,6 +55,14 @@ def related_width(member):
     return member.get("width")
 
 
+def forward_tag(member):
+    """A direct pointer to a named record needs only its tag declaration."""
+    match = re.fullmatch(r"(?:const )?((?:struct|union) [A-Za-z_]\w*) \*", member["ctype"])
+    if match and member["private"] == [match[1]]:
+        return match[1]
+    return None
+
+
 def load_vote(view, member, loads):
     """Count voters at measured leaf offsets, including leaves within aggregates."""
     if member["bits"]:
@@ -101,7 +109,8 @@ def pick_candidates(views, loads):
             grouped[key].append((view, m))
         proposals = []
         for supporters in grouped.values():
-            eligible = [(v, m) for v, m in supporters if not m["private"] and not VOLATILE_TYPE.search(m["decl"])]
+            eligible = [(v, m) for v, m in supporters
+                        if (not m["private"] or forward_tag(m)) and not VOLATILE_TYPE.search(m["decl"])]
             if not eligible:
                 continue
             qualified = sorted(eligible, key=lambda vm: (
@@ -140,8 +149,12 @@ def plan_header(family, views, name, header):
     kind = family["kind"]
     guard = "GUARD_" + re.sub(r"[^A-Za-z0-9]", "_", str(header)).upper()
     headers = {h for m, _, _, _ in selected for h in m["headers"]}
+    forwards = {tag for m, _, _, _ in selected if (tag := forward_tag(m)) and tag != f"{kind} {name}"}
     buf = [f"#ifndef {guard}", f"#define {guard}", "", '#include "global.h"']
     buf.extend(f'#include "{ramlayout.inc_name(h)}"' for h in sorted(headers - {"include/global.h", "include/gba/types.h"}))
+    if forwards:
+        buf.append("")
+        buf.extend(f"{tag};" for tag in sorted(forwards))
     buf.extend(("", f"{kind} {name} {{"))
     offset = 0
     names = {m["name"] for m, _, _, _ in selected}
