@@ -2,6 +2,7 @@
 #define GUARD_ACTOR_ANIMATION_CONTROLLER_H
 
 #include "engine/task.h"
+#include "engine/video/display_sequence.h"
 
 /* Tentative shared layout for the actor animation controller (081E34D0-081EAB64).
  * Offsets are cross-checked across many matched functions in this unit; field
@@ -47,6 +48,7 @@ struct ActorSprite {
     s16 z;
 };
 
+/* Playback fields used by the Ghost afterimage. */
 struct ActorAnim {
     const u16 *data;
     u8 flags, count, factor, rate;
@@ -64,7 +66,7 @@ struct ActorAnimController {
     u8 effect[12];      /* 0xE08: palette bank index buffer, see AnimData_SelectPaletteBank */
     const u16 *palette; /* 0xE14: active 16-color palette pointer */
     u8 unkE18[12];
-    struct ActorAnim anim; /* 0xE24 */
+    struct DisplaySequenceState anim; /* 0xE24 */
     u8 p2[0x40];           /* 0xE34: motion-related state, not yet identified */
     u32 arg;               /* 0xE74 */
     u16 count;             /* 0xE78 */
