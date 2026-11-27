@@ -591,6 +591,5 @@ include/ui/books/palette_transition_banks.h,include/ui/books/palette_transition_
 include/ui/dialogue/text_state.h,include/ui/dialogue/text_state.h,owned by the dialogue text interpreter,,
 include/ui/dialogue/text_window.h,include/ui/dialogue/text_window.h,owned by the text window manager,,
 include/ui/dialogue/text_window_manager.h,include/ui/dialogue/text_window_manager.h,owned by the text window manager,,
-include/ui/pause/map_menu.h,include/ui/pause/map_menu.h,owned by the pause map menu,,
 include/ui/pause/map_menu_marker.h,include/ui/pause/map_menu_marker.h,owned by the pause map menu,,
 include/ui/town/equipment_descriptor.h,include/ui/town/equipment_descriptor.h,owned by the shop and storage equipment panels,,
