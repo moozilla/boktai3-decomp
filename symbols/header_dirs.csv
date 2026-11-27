@@ -376,6 +376,7 @@ include/engine/text/scanline_effect.h,include/engine/video/scanline_effect.h,bes
 include/engine/text/text.h,include/engine/video/text.h,beside its unit,,
 include/engine/text/text_graphics.h,include/engine/video/text_graphics.h,beside its unit,,
 include/engine/tile_animation/tile_animation.h,include/engine/video/tile_animation.h,beside its unit,,
+include/engine/video/display_sequence_step.h,include/engine/video/display_sequence_step.h,owned by engine sprite playback,,
 include/field/animated_hazards/animated_hazard.h,include/objects/hazards/animated_hazard.h,beside its unit,,
 include/field/animated_tile/animated_tile.h,include/objects/animated_tile.h,beside its unit,,
 include/field/bouncing_object_pool/bouncing_object.h,include/objects/bouncing_bombs/bouncing_object.h,Pass 4: beside its documented owner,,include/objects/bouncing_object/bouncing_object.h
