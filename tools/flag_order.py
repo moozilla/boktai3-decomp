@@ -3,6 +3,9 @@
 
 Run struct_views.py first (see notes/flag-accessors_2026-11-25.md). Print one TSV row
 per proven test or same-field update. Stop tracking values at incoming branch labels.
+The uses column counts classified flag operations that share the mask definition
+and register. For example, an earlier byte store that also uses the same constant
+does not contribute to this count.
 """
 import argparse
 import csv

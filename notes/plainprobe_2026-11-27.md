@@ -974,3 +974,31 @@ On this worktree, caching the unchanged probe inventory reduced a complete
 resume from 26.19 seconds to 0.94 seconds. The unmodified source and planner
 allow reuse of the 2.8 MB plan. A warmed resume reproduced the site CSV byte
 for byte.
+
+## ROM mask reuse controls
+
+The `uses` column in `flag_sites.tsv` counts classified flag operations
+sharing a mask definition and register. Joining it to uniquely linked
+`rom_matches` in `sites.csv` gives the following counts.
+
+| Verdict | Mask-first, one classified flag use | Mask-first, shared | Load-first, one classified flag use |
+| --- | ---: | ---: | ---: |
+| PLAIN | 3 | 3 | 1 |
+| BOUND-SINGLE | 195 | 0 | 16 |
+| BOUND-SHARED | 70 | 4 | 5 |
+
+All six mask-first PLAIN sites have other occurrences of the value in the
+source function. In the PLAIN control `SceneActorMotion_Update`, the ROM
+loads 1 into r3 at 0807A8E8, uses it in the preceding `enabled` byte store
+at 0807A8EA, then uses the same r3 in the behavior flag test at 0807A8F4.
+Replacing the test helper with a direct expression matches all 1,736 bytes.
+This case still has `uses = 1` because the first consumer is a byte store.
+A count of one rules out reuse among identified flag operations. Other
+instructions can still share the definition.
+
+The Otenko control at 081D088C reuses the halfword loaded at 081D0876 for
+the earlier test. In the plain scratch rewrite, both the load-first order
+and the 196-byte unit extent survive. agbcc puts the mask in r3 and copies
+it to r0 before the OR, where the ROM builds the mask directly in r0.
+That control and the boolean test at 08078A42 are two distinct ways for
+a BOUND-SINGLE verdict to arise while the ROM remains load-first.
