@@ -3,11 +3,8 @@
 #include "system/game_state/game_state.h"
 #include "player/movement/player_saved_position.h"
 #include "engine/ram.h"
-struct LinkRef {
-    u8 unk0[0x18];
-    s16 bit;
-};
-extern struct LinkRef *gLinkSession;
+#include "link/session/link_session_state.h"
+extern struct AreaEffectLinkState *gLinkSession;
 void LinkPlayer_ReadSlotFromScript(void *);
 void sub_0823ADB4(struct Player *);
 void KeyframeActor_InitBodyFromScript(struct Player *, void *);
@@ -20,7 +17,7 @@ static inline s32 LocalPlayer(void)
 {
     if (!gLinkSession)
         return -1;
-    return gLinkSession->bit;
+    return gLinkSession->localPlayer;
 }
 s32 Player_OnCreate(struct Player *p, void *script)
 {
