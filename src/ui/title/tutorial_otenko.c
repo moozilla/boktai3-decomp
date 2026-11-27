@@ -5,6 +5,7 @@
 #include "engine/video/render.h"
 #include "engine/input.h"
 #include "engine/ram.h"
+#include "scene/collision/scene_body_api.h"
 
 // Provisional name: TutorialOtenkoPalette_BeginFade
 
@@ -1246,7 +1247,7 @@ void TutorialOtenko_UpdateAppearanceAnimation(struct ActorAnimController *p)
         p->obj.paletteVariant = 64;
         p->obj.palette = 64;
         (*(u16 *)&p->obj.position.y) += 160;
-        p->savedY = (*(u16 *)&p->obj.position.y);
+        p->savedPosition.y = (*(u16 *)&p->obj.position.y);
         Sound_PlaySong(286);
         TutorialOtenko_SetInteractionControlFlag(p);
         AnimData_SelectPaletteBank(p->effect, 343);
@@ -1458,7 +1459,7 @@ void TutorialOtenko_UpdateProjectedEntryAnimation(struct ActorAnimController *p)
         p->obj.palette = 64;
         TutorialOtenko_ProjectAndClampToScreen(p);
         (*(u16 *)&p->obj.position.y) += 8;
-        p->savedY = (*(u16 *)&p->obj.position.y);
+        p->savedPosition.y = (*(u16 *)&p->obj.position.y);
         ActorShadow_Disable(p->p2);
         Sound_PlaySong(286);
         TutorialOtenko_SetInteractionControlFlag(p);
@@ -1563,7 +1564,7 @@ void TutorialOtenko_UpdateSilentProjectedEntryAnimation(struct ActorAnimControll
         p->obj.palette = 64;
         TutorialOtenko_ProjectAndClampToScreen(p);
         (*(u16 *)&p->obj.position.y) += 8;
-        p->savedY = (*(u16 *)&p->obj.position.y);
+        p->savedPosition.y = (*(u16 *)&p->obj.position.y);
         ActorShadow_Disable(p->p2);
         TutorialOtenko_SetInteractionControlFlag(p);
         AnimData_SelectPaletteBank(p->effect, 343);
@@ -1657,7 +1658,7 @@ void TutorialOtenko_UpdateShadowedRestAnimation(struct ActorAnimController *p)
         p->obj.paletteVariant = 64;
         p->obj.palette = 64;
         (*(u16 *)&p->obj.position.y) += 160;
-        p->savedY = (*(u16 *)&p->obj.position.y);
+        p->savedPosition.y = (*(u16 *)&p->obj.position.y);
         ActorShadow_Enable(p->p2);
         TutorialOtenko_SetInteractionControlFlag(p);
         AnimData_SelectPaletteBank(p->effect, 343);
@@ -1997,18 +1998,18 @@ void TutorialOtenko_MoveTowardTarget(struct ActorAnimController *p)
     if (p->heightSettled == 0) {
         if (p->targetY > p->obj.position.y) {
             p->obj.position.y += 7;
-            p->savedY += 7;
+            p->savedPosition.y += 7;
             if (p->targetY < p->obj.position.y) {
                 p->obj.position.y = p->targetY;
-                p->savedY = p->targetY;
+                p->savedPosition.y = p->targetY;
                 p->heightSettled = 1;
             }
         } else if (p->targetY < p->obj.position.y) {
             p->obj.position.y -= 7;
-            p->savedY -= 7;
+            p->savedPosition.y -= 7;
             if (p->targetY > p->obj.position.y) {
                 p->obj.position.y = p->targetY;
-                p->savedY = p->targetY;
+                p->savedPosition.y = p->targetY;
                 p->heightSettled = 1;
             }
         }
@@ -2024,8 +2025,8 @@ void TutorialOtenko_MoveTowardTarget(struct ActorAnimController *p)
         p->deltaZ = Div(sinv, 500);
         p->obj.position.x += p->deltaX;
         p->obj.position.z += p->deltaZ;
-        p->savedX = p->obj.position.x;
-        p->savedZ = p->obj.position.z;
+        p->savedPosition.x = p->obj.position.x;
+        p->savedPosition.z = p->obj.position.z;
     }
 }
 
@@ -2944,9 +2945,9 @@ extern void (*const gUnk_08613CF4[])(void *);
 
 void TutorialOtenko_UpdateMotionPhase(struct ActorAnimController *p)
 {
-    p->dx = p->savedX;
-    p->dy = p->savedY;
-    p->dz = p->savedZ;
+    p->body.position.x = p->savedPosition.x;
+    p->body.position.y = p->savedPosition.y;
+    p->body.position.z = p->savedPosition.z;
     gUnk_08613CF4[p->phase](p);
 }
 
@@ -3029,7 +3030,7 @@ s32 TutorialOtenko_DestroyController(struct ActorAnimController *p)
         c += 0xdc;
     }
     if (SceneBody_GetById(p->resource))
-        SceneBody_Unregister((u8 *)p + 0xe80);
+        SceneBody_Unregister(&p->body);
     gScriptedActorController = 0;
 }
 
@@ -3272,29 +3273,29 @@ void TutorialOtenko_ConfigureFromScript(void)
     if (Script_SeekToKeyword(0x70)) {
         {
             s32 v = Script_GetValue();
-            g->savedX = v;
+            g->savedPosition.x = v;
             obj->position.x = v;
         }
         {
             s32 v = Script_GetValue();
-            g->savedY = v;
+            g->savedPosition.y = v;
             obj->position.y = v;
         }
         {
             s32 v = Script_GetValue();
-            g->savedZ = v;
+            g->savedPosition.z = v;
             obj->position.z = v;
         }
     } else {
         struct Player *owner;
         owner = g->owner;
-        g->savedX = (u16)owner->position.x;
+        g->savedPosition.x = (u16)owner->position.x;
         obj->position.x = (u16)owner->position.x;
         owner = g->owner;
-        g->savedY = (u16)owner->position.y;
+        g->savedPosition.y = (u16)owner->position.y;
         obj->position.y = (u16)owner->position.y;
         owner = g->owner;
-        g->savedZ = (u16)owner->position.z;
+        g->savedPosition.z = (u16)owner->position.z;
         obj->position.z = (u16)owner->position.z;
     }
     if (Script_SeekToKeyword(0x63))
@@ -3346,16 +3347,14 @@ struct ActorInitController {
     u8 delta, unk_E7B;
     u16 counter;
     u8 unk_E7E[2];
-    u8 body[0xc];
-    u8 unk_E8C[0x3c];
+    struct SceneActorBody body;
     s16 deltaX, deltaY, deltaZ;
     u8 unk_ECE[2];
     s16 targetX, targetY, targetZ;
     u8 unk_ED6[2];
     s16 startX, startY, startZ;
     u8 unk_EDE[2];
-    s16 savedX, savedY, savedZ;
-    u8 unk_EE6[2];
+    struct ContactPosition savedPosition;
     u16 alternate[16], fadeColors[32];
     const u16 *savedPalette;
     u8 unk_F4C[0x12];
@@ -3378,7 +3377,6 @@ s32 AnimData_Load(void *, u32);
 void Sprite_Init(void *, void *, u32);
 void Sprite_SetOriginStub(void *, s32, s32);
 void Shadow_Initialize(void *, void *, s32);
-void SceneBody_Init(void *, s32, void *, s32, s32, void *);
 
 static inline void ActorInit_InitMainSprite(struct ActorInitController *p, struct DisplaySequenceSprite *obj)
 {
@@ -3471,7 +3469,7 @@ s32 TutorialOtenko_InitializeController(void *arg0)
     p->targetZ = 0;
     p->speed = 200;
     if (!SceneBody_GetById(p->resource))
-        SceneBody_Init(p->body, p->resource, &p->savedX, 0, 7, p);
+        SceneBody_Init(&p->body, p->resource, &p->savedPosition, 0, 7, p);
     p->variant = 0;
     return 0;
 }
