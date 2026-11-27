@@ -65,7 +65,7 @@ def measure(text, path):
         _, node = selected[key]
         for d, m in zip(node.decls, v["members"]):
             t = tu.resolve(d.type)
-            m["record"] = evidence.record_of(tu, getattr(t, "type", None) if m["array"] else d.type)
+            m["record"] = evidence.record_of(tu, getattr(t, "type", None) if m.get("array") else d.type)
             m.update(headers=[], private=[], self_ref=False)
         v.update(file=path, id=key, known=families.inhabited(v))
     return views
@@ -363,6 +363,42 @@ int X(struct R *r, struct Q *q) { return r->old + q->old; }
         self.assertIn("struct S *r", result)
         self.assertIn("return r->value + q->old;", result)
         self.assertIn('#include "s.h"', result)
+
+    def test_nested_bitfield_flattens_without_touching_another_record(self):
+        path = "src/a.c"
+        old_text = """
+struct Half { unsigned lo : 16; unsigned hi : 16; };
+struct Packed { struct Half xy; unsigned z : 16; };
+struct Other { struct Half xy; };
+int Read(struct Packed *p, struct Other *q) { return p->xy.hi + q->xy.hi; }
+"""
+        old = measure(old_text, path)[f"{path}:struct Packed"]
+        new = measure("struct Vector { unsigned x : 16; unsigned y : 16; unsigned z : 16; };",
+                      "include/vector.h")["include/vector.h:struct Vector"]
+        with patch.object(lm, "preprocess", return_value=parse(old_text, path)[0]):
+            result = merge.rewrite_unit(old_text, old, new, Path("include/vector.h"), "struct Vector")
+        self.assertIn("return p->y + q->xy.hi;", result)
+
+    def test_aligned_record_is_editable_and_keeps_its_alignment(self):
+        path = "src/a.c"
+        text = TYPES + "struct Short { u16 value; } __attribute__((aligned(4)));\n"
+        old = measure(text, path)[f"{path}:struct Short"]
+        family = {"kind": "struct", "size": old["size"], "loads": []}
+        generated, expected, _, _ = merge.plan_header(family, [old], "Shared", Path("include/shared.h"))
+        self.assertIn("__attribute__((aligned(4)))", generated)
+        new = merge.probe_header(generated, "struct Shared", expected, 4, 4)
+        with patch.object(lm, "preprocess", return_value=parse(text, path)[0]):
+            result = merge.rewrite_unit(text, old, new, Path("include/shared.h"), "struct Shared")
+        self.assertNotIn("struct Short", result)
+
+    def test_unnamed_bitfield_does_not_block_a_measured_common_layout(self):
+        one = "struct Half { unsigned lo : 16; unsigned : 16; };"
+        two = "struct Half { unsigned lo : 16; unsigned hi : 16; };"
+        views = [next(iter(measure(src, f"src/{i}.c").values())) for i, src in enumerate((one, two))]
+        family = {"kind": "struct", "size": 4, "loads": []}
+        generated, expected, _, _ = merge.plan_header(family, views, "Pair", Path("include/pair.h"))
+        self.assertEqual(expected, {"lo": (0, 2, 0, 16), "hi": (2, 2, 16, 16)})
+        merge.probe_header(generated, "struct Pair", expected, 4, 4)
 
     def test_initializer_with_changed_shape_is_a_holdout(self):
         path = "src/moved/a.c"

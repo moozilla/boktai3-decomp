@@ -79,7 +79,7 @@ def pick_candidates(views, loads):
         occurrences = Counter()
         spans = bit_spans(view)
         for m in view["members"]:
-            if families.opaque(m):
+            if families.opaque(m) or m.get("bits") and m["name"] is None:
                 continue
             if not m.get("name") or m.get("off") is None or m.get("size") is None:
                 raise Holdout(f"{view['id']} has an unmeasured member")
@@ -172,7 +172,10 @@ def plan_header(family, views, name, header):
         base = offset if kind == "struct" else 0
         pad(buf, names | used, base, family["size"] - base)
     spell = f"{kind} {name}"
-    buf.extend(("};", "", f"typedef char {name}SizeCheck[sizeof({spell}) == {family['size']:#x} ? 1 : -1];",
+    align = max(v["align"] for v in views)
+    member_align = max((m.get("align") or m.get("width") or 1 for m, _, _, _ in selected), default=1)
+    close = f"}} __attribute__((aligned({align})));" if align > member_align else "};"
+    buf.extend((close, "", f"typedef char {name}SizeCheck[sizeof({spell}) == {family['size']:#x} ? 1 : -1];",
                 "", "#endif", ""))
     return "\n".join(buf), expected, decisions, skipped
 
@@ -219,12 +222,13 @@ def probe_header(text, spell, expected, size, align):
 
 
 def field_paths(old, new):
-    """Storage-preserving replacements for direct members, including a flattened leaf."""
+    """Find direct and qualified member paths at the same measured storage."""
     fields = {}
     old_bits, new_bits = bit_spans(old), bit_spans(new)
     choices = new["members"] + [dict(lf, name=lf["name"], base=lf["base"])
                                for lf in new["known"] if "." in lf["name"]]
-    for m in old["members"]:
+    nested = [lf for lf in old["known"] if "." in lf["name"] and "[" not in lf["name"]]
+    for m in old["members"] + nested:
         if m.get("off") is None or m.get("size") is None:
             continue
         whole_bytes = (m["off"] * 8, m["size"] * 8)
@@ -237,17 +241,34 @@ def field_paths(old, new):
             fields[m["name"]] = m["name"]
         elif len(hits) == 1:
             fields[m["name"]] = next(iter(hits))
-        else:
+        elif "." not in m["name"]:
             fields[m["name"]] = None
     return fields
 
 
 def member_edits(text, pre, refs, view, mapping, span):
     """Map typed member token ordinals back to raw text, skipping ambiguous macros."""
-    changes = {name for name, new in mapping.items() if name != new}
-    if not changes:
+    changes = {name for name, new in mapping.items() if "." not in name and name != new}
+    chains = {}
+    for key, chain in refs.field_chains:
+        if key != view["id"]:
+            continue
+        names = [name for name, _, _ in chain]
+        target = mapping.get(".".join(names))
+        if not target:
+            continue
+        root = mapping.get(names[0])
+        if root is not None and target == ".".join([root, *names[1:]]):
+            continue  # The ordinary direct-member edit is sufficient.
+        site = chain[0]
+        if site not in chains or len(chain) > len(chains[site][0]):
+            chains[site] = (chain, target)
+    if any(len({line for _, line, _ in chain}) != 1 for chain, _ in chains.values()):
+        raise Holdout("a changed nested field crosses source lines")
+    chain_names = {name for name, _, _ in chains}
+    if not changes and not chains:
         return []
-    field_token = re.compile(r"(?:->|\.)\s*([A-Za-z_]\w*)")
+    field_token = re.compile(r"(->|\.)\s*([A-Za-z_]\w*)")
     code = keepcheck.blank_comments(text)
     source = code.splitlines(keepends=True)
     offsets = [0]
@@ -259,35 +280,54 @@ def member_edits(text, pre, refs, view, mapping, span):
             pre_lines[line].append(contents)
     refs_at = {(line, col - 1, name): key for key, name, line, col in refs.fields}
     edits = []
+    consumed = set()
     for ln, line in enumerate(source, 1):
         raw = list(field_token.finditer(line))
-        if not any(m.group(1) in changes for m in raw):
+        if not any(m.group(2) in changes | chain_names for m in raw):
             continue
-        outside = [m for m in raw if not span.start <= offsets[ln - 1] + m.start(1) < span.end]
-        if not any(m.group(1) in changes for m in outside):
+        base = offsets[ln - 1]
+        outside = [m for m in raw if not span.start <= base + m.start(2) < span.end]
+        if not any(m.group(2) in changes | chain_names for m in outside):
             continue
         parsed = pre_lines.get(ln, [])
         if len(parsed) != 1:
             raise Holdout(f"line {ln} has a changed field in inactive C or an ambiguous macro")
         tokens = list(field_token.finditer(parsed[0]))
-        if [m.group(1) for m in raw] != [m.group(1) for m in tokens]:
+        if [m.groups() for m in raw] != [m.groups() for m in tokens]:
             raise Holdout(f"line {ln} has a changed field whose macro expansion changes the token sequence")
+        at = {(token.group(2), ln, token.start(2) + 1): m for m, token in zip(raw, tokens)}
         for m, token in zip(raw, tokens):
-            name = m.group(1)
+            name = m.group(2)
+            coord = name, ln, token.start(2) + 1
+            if coord in consumed:
+                continue
+            if coord in chains:
+                chain, target = chains[coord]
+                last = at.get(chain[-1])
+                if not all(site in at for site in chain) or last is None:
+                    raise Holdout(f"line {ln} cannot locate a nested field in the unexpanded source")
+                start, end = base + m.start(2), base + last.end(2)
+                pattern = r"\s*\.\s*".join(re.escape(field) for field, _, _ in chain)
+                if not re.fullmatch(pattern, text[start:end]):
+                    raise Holdout(f"line {ln} has a nested field interrupted by other source tokens")
+                edits.append((start, end, target))
+                consumed.update(chain)
+                continue
             if name not in changes or m not in outside:
                 continue
-            site = ln, token.start(1), name
+            site = ln, token.start(2), name
             if site not in refs_at or refs_at[site] is None:
                 raise Holdout(f"line {ln} cannot bind field {name} to a record")
             if refs_at[site] != view["id"]:
                 continue
             if mapping[name] is None:
                 raise Holdout(f"line {ln} uses {name}, whose storage has no unambiguous shared member")
-            start, end = m.span(1)
-            edits.append((offsets[ln - 1] + start, offsets[ln - 1] + end, mapping[name]))
+            start, end = m.span(2)
+            edits.append((base + start, base + end, mapping[name]))
+            consumed.add(coord)
     # A changed use created by a macro, or a member split after '->', has no safe raw token.
-    count = sum(key == view["id"] and name in changes for key, name, _, _ in refs.fields)
-    if count != len(edits):
+    if not chains.keys() <= consumed or any(key == view["id"] and name in changes and (name, line, col) not in consumed
+                                          for key, name, line, col in refs.fields):
         raise Holdout("some changed member uses are only visible after preprocessing")
     return edits
 

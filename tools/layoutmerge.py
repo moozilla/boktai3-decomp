@@ -641,7 +641,7 @@ def probe_records(body, tu, records):
                 bitfields.append((key, i, spell, lf["bf"]))
         for d in definition.decls:
             if d.name is None:
-                st["members"].append({"name": None})
+                st["members"].append({"name": None, "bits": d.bitsize is not None})
                 continue
             t = tu.resolve(d.type)
             array = isinstance(t, c_ast.ArrayDecl)

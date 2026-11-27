@@ -122,25 +122,31 @@ class Record(collections.namedtuple("Record", "kind name typedef body start end 
     """A file-scope struct/union definition: `struct T {...};` (name T) or `typedef struct {...} T;`."""
 
 
+RECORD_TAIL = re.compile(
+    r"\s*(?P<alignment>__attribute__\s*\(\(\s*aligned\s*\(\s*(?:0[xX][\da-fA-F]+|\d+)\s*\)\s*\)\))?"
+    r"\s*(?P<alias>\w*)\s*;"
+)
+
+
 def records(text, path=""):
     code = blank_comments(text)
     out = []
     for m in RECORD.finditer(code):
         end = match_brace(code, m.end())
-        tail = re.match(r"\s*(\w*)\s*;", code[end:])
+        tail = RECORD_TAIL.match(code, end)
         if not tail:
             continue
         typedef, kind, tag = bool(m.group(1)), m.group(2), m.group(3)
         if typedef:
-            if not tail.group(1) or tag:
+            if not tail["alias"] or tag:
                 continue  # typedef struct T {...} U; spells two names: leave it
-            name = tail.group(1)
+            name = tail["alias"]
         else:
-            if not tag or tail.group(1):
+            if not tag or tail["alias"]:
                 continue  # an untagged struct or one that also declares an object
             name = tag
-        body = " ".join(tokens(code[m.end():end - 1]))
-        stop = end + tail.end()
+        body = " ".join(tokens(code[m.end():end - 1] + (tail["alignment"] or "")))
+        stop = tail.end()
         if stop < len(text) and text[stop] == "\n":
             stop += 1
         out.append(Record(kind, name, typedef, body, m.start(), stop, path))

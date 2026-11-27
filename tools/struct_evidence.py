@@ -87,6 +87,7 @@ class References(c_ast.NodeVisitor):
         self.static = set()
         self.func = ""
         self.calls, self.fields, self.params, self.globals = [], [], [], []
+        self.field_chains = []
         self.return_definitions, self.return_calls = [], []
         for ext in ast.ext:
             d = ext.decl if isinstance(ext, c_ast.FuncDef) else ext
@@ -252,6 +253,17 @@ class References(c_ast.NodeVisitor):
         coord = node.field.coord
         if coord and Path(coord.file).as_posix() == self.path:
             self.fields.append((rec, node.field.name, coord.line, coord.column))
+            chain = []
+            part = node
+            while isinstance(part, c_ast.StructRef):
+                field = part.field
+                chain.append((field.name, field.coord.line, field.coord.column))
+                if part.type != "." or not isinstance(part.name, c_ast.StructRef):
+                    break
+                part = part.name
+            if len(chain) > 1:
+                root, _ = self.member(part)
+                self.field_chains.append((root, tuple(reversed(chain))))
         self.generic_visit(node)
 
 
