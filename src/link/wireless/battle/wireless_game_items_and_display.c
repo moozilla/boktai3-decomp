@@ -821,7 +821,7 @@ void WirelessGameItems_InitItem(struct WirelessGameItems *owner, struct Wireless
     p->count = 0;
     p->pendingFlag = 0;
     sprite = &p->sprite;
-    Sprite_Init(sprite, owner->sprite, 0x10011);
+    Sprite_Init(sprite, &owner->spriteResource, 0x10011);
     {
         u8 *visible;
         sprite->value = 0;
@@ -921,7 +921,7 @@ int WirelessGameItems_Init(struct WirelessGameItems *p)
         return -1;
     p->resource = *resource;
     ResourceHeader_Relocate(&p->resource, resource);
-    if (!AnimData_Load(p->sprite, 0x18a9))
+    if (!AnimData_Load(&p->spriteResource, 0x18a9))
         return -1;
     item = p->items;
     i = 0;

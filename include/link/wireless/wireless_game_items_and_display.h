@@ -2,6 +2,7 @@
 #define GUARD_WIRELESS_GAME_ITEMS_AND_DISPLAY_H
 #include "engine/engine.h"
 #include "engine/video/anim_sprite.h"
+#include "engine/video/sprite.h"
 #include "link/wireless/wireless_trade_menu.h"
 
 /* Layouts recovered from the item state handlers and display lifecycle.
@@ -65,7 +66,7 @@ static inline void WirelessGameItem_EnterState(struct WirelessGameItem *item, u8
 struct WirelessGameItems {
     struct Task task;
     u8 current[4], pending[4];
-    u8 sprite[0x1c]; /* animation-data descriptor, not a sprite instance */
+    struct SpriteRenderResource spriteResource;
     struct AnimSpriteResource resource;
     struct WirelessGameItem items[16];
 };
