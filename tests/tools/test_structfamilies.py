@@ -377,6 +377,22 @@ int X(struct R *r, struct Q *q) { return r->old + q->old; }
             merge.probe_header(generated, "struct W", {**expected, "extra": (2, 2, 17, 15)},
                                views[0]["size"], views[0]["align"])
 
+    def test_typed_call_relates_full_width_bitfields_to_scalar_members(self):
+        path = "include/position.h"
+        shared = measure(TYPES + "struct Position { s16 x, y; } __attribute__((aligned(4)));", path)
+        key, target = next(iter(shared.items()))
+        old = next(iter(measure("struct Packed { unsigned x : 16; unsigned y : 16; };", "src/a.c").values()))
+        narrow = next(iter(measure("struct Packed { unsigned x : 15; unsigned extra : 1; unsigned y : 16; };",
+                                   "src/b.c").values()))
+        records = {**shared, old["id"]: old, narrow["id"]: narrow}
+
+        self.assertFalse(families.compatible(old, target, strong=True))
+        self.assertEqual(families.SharedLayouts(records, {}).relations([old]), [])
+        layouts = families.SharedLayouts(records, {("formal type", key): {old["id"], narrow["id"]}})
+        self.assertEqual(layouts.relations([old]), [(key, "overlapping view", "typed call", 0)])
+        self.assertEqual(layouts.relations([narrow]), [])
+        self.assertEqual(merge.field_paths(old, target), {"x": "x", "y": "y"})
+
     def test_sub_byte_bitfield_rewrite_requires_the_same_bits(self):
         old = next(iter(measure("struct W { unsigned low : 4; unsigned high : 4; };", "src/a.c").values()))
         new = next(iter(measure("struct W { unsigned whole : 8; };", "include/w.h").values()))
