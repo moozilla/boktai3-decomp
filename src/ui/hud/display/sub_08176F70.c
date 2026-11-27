@@ -68,18 +68,18 @@ void sub_08176F70(struct HudLayout *p)
         // write ends the value's use, so the later zeros come from `defaults`.
         initial = 1;
         WI(&p->widgets[1], &p->resources[0], 0x43, 0xB1, defaults, defaults, position);
-        WI(&p->widgets[2], &p->resources[0], 0x44, 0xB1, defaults, defaults, position);
-        WI(&p->widgets[8], &p->resources[0], 0x63, 0xB1, defaults, defaults, position);
-        WI(&p->widgets[9], &p->resources[0], 0x70, 0xB1, defaults, defaults, position);
-        WI(&p->widgets[3], &p->resources[0], 0x40, 0xB1, defaults, defaults, position);
-        WI(&p->widgets[4], &p->resources[0], 0x4D, 0xB1, defaults, defaults, position);
-        WI(&p->widgets[6], &p->resources[0], 0x4E, 0xB1, defaults, defaults, position);
+        WI(&p->widgets[2], &p->resources[0], 0x44, 0xB1, 0, 0, position);
+        WI(&p->widgets[8], &p->resources[0], 0x63, 0xB1, 0, 0, position);
+        WI(&p->widgets[9], &p->resources[0], 0x70, 0xB1, 0, 0, position);
+        WI(&p->widgets[3], &p->resources[0], 0x40, 0xB1, 0, 0, position);
+        WI(&p->widgets[4], &p->resources[0], 0x4D, 0xB1, 0, 0, position);
+        WI(&p->widgets[6], &p->resources[0], 0x4E, 0xB1, 0, 0, position);
         w = (u8 *)&p->widgets[54];
-        WI(w, &p->resources[0], 0x4D, 0xB1, defaults, defaults, position);
+        WI(w, &p->resources[0], 0x4D, 0xB1, 0, 0, position);
         Anim_LoadKeyframe(w, &p->resources[0], 0x4D, 1);
-        WI(&p->widgets[5], &p->resources[0], 0x4D, 0xB1, defaults, defaults, position);
-        WI(&p->widgets[75], &p->resources[0], 0x7F, 0xB1, defaults, defaults, position);
-        WI(&p->widgets[76], &p->resources[0], 0x7F, 0xB1, defaults, defaults, position);
+        WI(&p->widgets[5], &p->resources[0], 0x4D, 0xB1, 0, 0, position);
+        WI(&p->widgets[75], &p->resources[0], 0x7F, 0xB1, 0, 0, position);
+        WI(&p->widgets[76], &p->resources[0], 0x7F, 0xB1, 0, 0, position);
     }
     for (i = 0; i <= 0x13; i++) {
         WI((&p->widgets[10 + i]), &p->resources[2], 0x68, 0xB1, 0, 0, &v);
