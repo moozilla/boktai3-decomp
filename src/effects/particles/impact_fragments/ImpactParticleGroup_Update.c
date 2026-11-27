@@ -29,7 +29,7 @@ void ImpactParticleGroup_Update(struct Manager *m, struct Group *g)
     u8 *sprite;
     if (i < g->count) {
         p = g->particles;
-        sprite = (u8 *)g + 20;
+        sprite = (u8 *)&g->particles[0].flags;
         do {
             if (p->active) {
                 u8 *resource;

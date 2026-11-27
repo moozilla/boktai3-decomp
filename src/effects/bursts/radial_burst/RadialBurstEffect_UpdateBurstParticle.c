@@ -1,4 +1,5 @@
 #include "global.h"
+#include "effects/bursts/spiral_burst.h"
 
 extern const s16 gUnk_086149C4[];
 
@@ -22,11 +23,6 @@ struct RbParticle {
 s32 Div(s32, s32);
 void SparkParticle_Spawn(void *, u32, const void *, u32, u32, u32, u32, u32);
 
-static inline s32 Scale12(s32 n)
-{
-    return n >= 0 ? n >> 12 : -((-n) >> 12);
-}
-
 void RadialBurstEffect_UpdateBurstParticle(struct RbParticle *p)
 {
     if (++p->timer > 15) {
@@ -34,16 +30,17 @@ void RadialBurstEffect_UpdateBurstParticle(struct RbParticle *p)
         p->active = 0;
         SparkParticle_Spawn(&p->x, 1, 0, 0, 0, 0, 2, 1);
     } else if (p->timer > 11) {
-        p->x = p->origin->x + Scale12(gUnk_086149C4[(p->angle + 0x40) & 0xFF] * 10);
+        p->x = p->origin->x + SpiralBurst_ScaleOffset(gUnk_086149C4[(p->angle + 0x40) & 0xFF] * 10);
         p->y = p->origin->y;
-        p->z = p->origin->z + Scale12(gUnk_086149C4[p->angle] * 10);
+        p->z = p->origin->z + SpiralBurst_ScaleOffset(gUnk_086149C4[p->angle] * 10);
     } else {
         s32 n = 12 - p->timer;
         s32 d = n + 1;
         p->angle += p->speed;
         p->radius = Div(p->radius * n, d);
-        p->x = p->origin->x + Scale12(p->radius * gUnk_086149C4[(p->angle + 0x40) & 0xFF]);
+        p->x = p->origin->x +
+               SpiralBurst_ScaleOffset(p->radius * gUnk_086149C4[(p->angle + 0x40) & 0xFF]);
         p->y = p->origin->y;
-        p->z = p->origin->z + Scale12(p->radius * gUnk_086149C4[p->angle]);
+        p->z = p->origin->z + SpiralBurst_ScaleOffset(p->radius * gUnk_086149C4[p->angle]);
     }
 }

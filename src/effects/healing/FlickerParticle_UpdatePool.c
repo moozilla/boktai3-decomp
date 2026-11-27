@@ -12,7 +12,7 @@ void FlickerParticle_UpdatePool(struct FlickerParticlePool *s)
     s32 i = 7;
     do {
         if (p->active != 0) {
-            u8 *q = (u8 *)s + 0x1a0;
+            u8 *q = (u8 *)&s->particles[0].callback;
             Callback_InvokeActor(p, *(void **)(q + o));
         }
         p++;

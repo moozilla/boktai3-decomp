@@ -4,6 +4,7 @@
 #include "engine/ram.h"
 #include "player/cutscene/player_cue_sequence.h"
 #include "ui/hud/scene_indicator.h"
+#include "effects/bursts/spiral_burst.h"
 // confidence=low: steers and accelerates a linked effect toward a target until expiry.
 struct Sprite {
     u32 flags;
@@ -46,10 +47,6 @@ static inline s32 RandomValue(void)
     gRandomIndex = index;
     return *(const u16 *)((index << 1) + RANDOM_TABLE_ADDR);
 }
-static inline s32 Truncate(s32 v)
-{
-    return v >= 0 ? v >> 12 : -((-v) >> 12);
-}
 
 static inline void Vec_Subtract(struct Vec *out, const struct Vec *a, const struct Vec *b)
 {
@@ -60,9 +57,9 @@ static inline void Vec_Subtract(struct Vec *out, const struct Vec *a, const stru
 
 static inline void Polar(struct Vec *out, u32 heading, u32 speed)
 {
-    out->x = Truncate(speed * gUnk_086149C4[(heading + 64) & 255]);
+    out->x = SpiralBurst_ScaleOffset(speed * gUnk_086149C4[(heading + 64) & 255]);
     out->y = 0;
-    out->z = Truncate(speed * gUnk_086149C4[heading]);
+    out->z = SpiralBurst_ScaleOffset(speed * gUnk_086149C4[heading]);
 }
 
 static inline u16 RandomByte(void)

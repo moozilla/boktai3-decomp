@@ -1,6 +1,7 @@
 #include "global.h"
 #include "engine/video/render.h"
 #include "effects/orbits/screen_orbit_effect/orbit_vec_layout.h"
+#include "scene/actor/scene_actor_control_phase.h"
 // confidence=low: projects the source and positions a timed icon around the screen center.
 struct OrbitSlot {
     u8 state, angle, enter, unknown3;
@@ -39,14 +40,6 @@ static inline void Place(struct OrbitSlot *p)
     p->position.z = 0;
     p->priority = 160 - p->angle;
 }
-static inline u8 TakeFlag(u8 *flag)
-{
-    if (*flag) {
-        *flag = 0;
-        return 1;
-    }
-    return 0;
-}
 static inline void Project(struct OrbitVec *out, struct OrbitVec *world)
 {
     s32 sum;
@@ -69,7 +62,7 @@ void ScreenOrbitEffect_UpdateFixedSlot(struct OrbitOwner *context, struct OrbitS
 {
     struct OrbitOwner *owner = context;
     struct OrbitSlot *input = input0;
-    u32 entered = TakeFlag(&input->enter);
+    u32 entered = SceneActorControl_TakeFlag(&input->enter);
     if (entered) {
         struct OrbitVec projected;
         Project(&projected, &input->world);

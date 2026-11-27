@@ -2,6 +2,7 @@
 #include "engine/ram.h"
 #include "player/cutscene/player_cue_sequence.h"
 #include "recovered/fragment_effect_sprite_layout.h"
+#include "effects/bursts/spiral_burst.h"
 struct Fragment {
     u32 flags;
     u8 active, unk_05[2], priority;
@@ -74,18 +75,14 @@ struct Pool *FragmentEffect_GetOrCreateManager(void);
 struct Fragment *sub_0812C3D0(struct Pool *);
 void FragmentEffect_InitCollider(struct Fragment *, u32, u32, u32, u32, u32, u32, u32);
 extern const s16 gUnk_086149C4[];
-static inline s32 FragmentEffect_Truncate(s32 value)
-{
-    return value >= 0 ? value >> 12 : -((-value) >> 12);
-}
 static inline void FragmentEffect_ComputeOffset(struct ContactPosition *out, u32 heading,
                                                 s32 radius)
 {
     u32 angle = heading >> 12;
     s32 scale = radius * 128;
-    out->x = FragmentEffect_Truncate(scale * gUnk_086149C4[(angle + 64) & 255]);
+    out->x = SpiralBurst_ScaleOffset(scale * gUnk_086149C4[(angle + 64) & 255]);
     out->y = 0;
-    out->z = FragmentEffect_Truncate(scale * gUnk_086149C4[angle & 255]);
+    out->z = SpiralBurst_ScaleOffset(scale * gUnk_086149C4[angle & 255]);
 }
 void FragmentEffect_Create(const struct ContactPosition *position, u32 angle, u32 angularSpeed,
                            s32 radius, s32 direction, s32 lifetime, u32 a, u32 b, u32 c, u32 d)

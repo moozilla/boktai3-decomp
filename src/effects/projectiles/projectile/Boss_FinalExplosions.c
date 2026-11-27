@@ -37,7 +37,7 @@ s32 Boss_FinalExplosions(struct Boss *self)
     u32 zero;
     s32 h;
     s16 *pp = (s16 *)&pos;
-    u8 *src = (u8 *)self + 0xa8;
+    u8 *src = (u8 *)&self->cx;
     pos = *(struct Pair *)src;
     h = self->height - 0x6c;
     zero = 0;
