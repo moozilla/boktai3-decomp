@@ -16,7 +16,7 @@ int WirelessController_StartConfiguredLink(struct Engine *p)
     if (p->operationEntered)
         p->operationEntered = 0;
     if (p->operationFrame > 59) {
-        RfuManager_StartConfiguration((u8 *)p + 0x11C);
+        RfuManager_StartConfiguration(p->rfuConfig);
         gWirelessSessionState = 0;
         setOperation(p, 4, 0);
     }
