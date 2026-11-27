@@ -246,6 +246,15 @@ def field_paths(old, new):
                 and n.get("array") == m["array"] and n.get("esize") == m.get("esize")
                 and (n.get("base") == m["base"] or {m["base"], n.get("base")} <= {"int", "enum"})
                 and occupied_bits == new_bits.get(n["name"], whole_bytes)}
+        if m["base"] == "aggregate" and not m["array"] and m["size"]:
+            for n in new["members"]:
+                # A complete embedded sprite in a private view can be one
+                # element of the owning object's sprite array.
+                if (n["array"] and n.get("off") is not None and n.get("esize") == m["size"]
+                        and re.fullmatch(re.escape(m["ctype"]) + r" \[[^\[\]]+\]", n["ctype"])):
+                    offset = m["off"] - n["off"]
+                    if 0 <= offset <= n["size"] - m["size"] and offset % m["size"] == 0:
+                        hits.add(f"{n['name']}[{offset // m['size']}]")
         if m["name"] in hits:
             fields[m["name"]] = m["name"]
         elif len(hits) == 1:
@@ -305,9 +314,52 @@ def member_edits(text, pre, refs, view, mapping, span):
     return edits
 
 
-def rewrite_unit(text, old, new, header, spell):
+def check_pointer_prefix(ast, view):
+    """Restrict a reviewed short view to pointer parameters and their field uses."""
+    from pycparser import c_ast
+
+    tag = view["spell"].split()[1]
+    names = set()
+
+    def nodes(node, parents=()):
+        yield node, parents
+        for _, child in node.children():
+            yield from nodes(child, (*parents[-3:], node))
+
+    roots = [node for node in ast.ext if node.coord and Path(node.coord.file).as_posix() == view["file"]]
+    for root in roots:
+        for node, parents in nodes(root):
+            if not isinstance(node, c_ast.Struct) or node.name != tag or node.decls is not None:
+                continue
+            if len(parents) < 4 or not all(isinstance(parent, cls) for parent, cls in zip(
+                    parents[-4:], (c_ast.ParamList, (c_ast.Decl, c_ast.Typename), c_ast.PtrDecl, c_ast.TypeDecl))):
+                raise Holdout("short view is used outside a direct pointer parameter")
+            parameter = parents[-3]
+            if parameter.name:
+                names.add(parameter.name)
+
+    for root in roots:
+        for node, parents in nodes(root):
+            if not isinstance(node, c_ast.ID) or node.name not in names or not parents:
+                continue
+            parent = parents[-1]
+            if isinstance(parent, c_ast.StructRef) and (parent.field is node or parent.type == "->"):
+                continue
+            if isinstance(parent, c_ast.UnaryOp) and parent.op == "!":
+                continue
+            if (isinstance(parent, c_ast.ExprList) and len(parents) > 1
+                    and isinstance(parents[-2], c_ast.FuncCall) and parents[-2].args is parent):
+                continue
+            raise Holdout(f"line {node.coord.line} uses a short-view pointer outside a member access, "
+                          "null test, or call argument")
+
+
+def rewrite_unit(text, old, new, header, spell, *, allow_prefix=False):
     """Replace one file-scope declaration and the member uses bound to it."""
-    if (old["size"], old["align"]) != (new["size"], new["align"]):
+    short_view = (allow_prefix and old["kind"] == new["kind"] == "struct"
+                  and old["spell"].startswith("struct ")
+                  and old["size"] < new["size"] and old["align"] <= new["align"])
+    if not short_view and (old["size"], old["align"]) != (new["size"], new["align"]):
         raise Holdout(f"private size/alignment {old['size']:#x}/{old['align']} differs from shared "
                       f"{new['size']:#x}/{new['align']}")
     spans = [r for r in inline_twins.records(text) if r.kind == old["kind"]
@@ -325,7 +377,7 @@ def rewrite_unit(text, old, new, header, spell):
     same_sequence = [(m["name"], type_key(m)) for m in old["members"]] == [
         (m["name"], type_key(m)) for m in new["members"]]
     edits = []
-    if not same_sequence or any(name != new_name for name, new_name in mapping.items()):
+    if short_view or not same_sequence or any(name != new_name for name, new_name in mapping.items()):
         pre = lm.preprocess(old["file"])
         if pre is None:
             raise Holdout("preprocessing failed")
@@ -335,6 +387,8 @@ def rewrite_unit(text, old, new, header, spell):
             raise Holdout(f"source parse failed: {exc}") from exc
         if error:
             raise Holdout(f"body parse failed: {error}")
+        if short_view:
+            check_pointer_prefix(ast, old)
         if not same_sequence and has_initializers(ast, tu, old["id"], old["file"]):
             raise Holdout("aggregate initializer needs a positional layout review")
         refs = evidence.References(ast, tu, old["file"])
@@ -459,7 +513,8 @@ def convert(catalog, family, args):
                 raise Holdout("source changed since scan; rescan the tree")
             if len(items) != 1:
                 raise Holdout("multiple family declarations in one unit need joint scope review")
-            proposals[rel] = rewrite_unit(text, items[0], new, header, spell)
+            proposals[rel] = rewrite_unit(text, items[0], new, header, spell,
+                                          allow_prefix=rel in args.allow_prefix)
             if not args.apply:
                 print(f"PROPOSED {rel}")
         except (Holdout, OSError) as exc:
@@ -519,6 +574,8 @@ def main(argv=None):
     ap.add_argument("--name", help="new shared tag")
     ap.add_argument("--header", type=Path, help="new header path below include/")
     ap.add_argument("--use-shared", help="reuse a related existing type instead of generating a header")
+    ap.add_argument("--allow-prefix", action="append", default=[], metavar="SRC",
+                    help="allow this reviewed unit's short pointer view of the same allocation")
     ap.add_argument("-j", type=int, default=2, help="parallel header-dependent checks")
     args = ap.parse_args(argv)
     if args.j < 1 or args.use_shared and (args.name or args.header):
