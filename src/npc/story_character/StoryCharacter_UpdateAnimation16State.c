@@ -1,9 +1,6 @@
 #include "scene/motion/scene_actor_terrain.h"
 #include "scene/motion/scene_actor_chase_types.h"
-struct NpcTag {
-    u8 pad[2];
-    s16 height;
-};
+#include "npc/story_character/npc_tag_layout.h"
 struct Npc {
     u8 pad0[1];
     u8 kind;
