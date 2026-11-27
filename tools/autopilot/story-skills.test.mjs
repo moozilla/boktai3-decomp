@@ -56,6 +56,22 @@ test('the best assigned gun frame uses Quick Change', () => {
     value: { kind: 'frame', id: 0, power: 10, cost: 3, done: true, method: 'quick change' } });
 });
 
+test('the free gun equips Luna before ranking the frame', () => {
+  const selection = { id: 9, power: 50, cost: 0 };
+  const lib = skill('gun', {}, {}, {
+    bags: () => ({ lenses: [1, 2] }), session: { snapshot: () => ({}) },
+    quickChange: function* (want) {
+      assert.deepEqual(want, { gun: true, lens: 1 });
+      return { done: true, frame: 1, lens: 1 };
+    },
+    weapon: () => ({ gun: true, lens: 1, frame: 9, energy: 2 }),
+  });
+  lib.equipBestFrame = function* () { return selection; };
+  assert.deepEqual(lib.equipEnergyFreeGun().next(), { done: true, value: {
+    done: true, gun: true, lens: 1, frame: 9, energy: 2, rankedFrame: selection,
+  } });
+});
+
 test('gun inventory navigation wraps past empty cells and honors the vertical option menu', () => {
   const { gunGridRoute } = skill('gun', {});
   const cells = Array(36).fill(0xff);
@@ -330,18 +346,79 @@ test('Hresvelgr is tracked by the live boss pointer and its own contact state', 
     at: () => actor, fn: { AreaEffect_IsPositionCovered: (position) => Number(position === addr + 0x54) } };
   const { hresvelgrTargets } = skill('hresvelgr', g);
   assert.deepEqual(hresvelgrTargets(), [{ addr, boss: 'Hresvelgr', health: 730, alive: true,
-    x: 640, y: 512, z: 1920, hitLock: 17, solarReactive: true }]);
+    x: 640, y: 512, z: 1920, hitLock: 17, solarReactive: true, collisionDisabled: false }]);
+  actor.flags = 0xc;
+  assert.equal(hresvelgrTargets()[0].collisionDisabled, true);
   actor.flags = 2;
   assert.deepEqual(hresvelgrTargets(), []);
 });
 
-test('combat waits while a story script controls the player', () => {
+test('Hresvelgr tactics account for the script limit on hits to Trinity', () => {
+  const base = 0x02002000;
+  const g = { types: { globals: { gScriptLocalVariables: { addr: 0x02000700 } } },
+    u32: (address) => address === 0x02000700 ? base : 0,
+    u8: (address) => address === base + 0x89 ? 2 : 0 };
+  const { hresvelgrTrinityHits, hresvelgrTrinityCost } = skill('hresvelgr', g);
+  const hits = hresvelgrTrinityHits();
+  assert.equal(hits, 2);
+  assert.equal(hresvelgrTrinityCost(hits, 2, 1200), 0);
+  assert.equal(hresvelgrTrinityCost(hits, 3, 1200), 400);
+  assert.equal(hresvelgrTrinityCost(4, 5, 1200), 10000);
+});
+
+test('Hresvelgr flight waits rewind when a captive takes a hit', () => {
+  const boss = { position: { y: 4000 } };
+  const g = { at: () => boss, until: (stop, frames) => ({ stop, frames }) };
+  const session = { frame: 100, snapshot: () => session.frame, restore: (frame) => { session.frame = frame; } };
+  let hits = 1;
+  const lib = skill('hresvelgr', g, {}, { session, where: () => ({ scene: 1, life: 487, y: 512 }), message: () => ({}) });
+  lib.hresvelgrTrinityHits = () => hits;
+  const wait = lib.waitForHresvelgr({ addr: 8, y: boss.position.y });
+  const { stop, frames } = wait.next().value;
+  assert.equal(stop(), false);
+  assert.equal(frames, 120);
+  hits++;
+  session.frame += 54;
+  assert.equal(stop(), true);
+  assert.deepEqual(wait.next(), { value: null, done: true });
+  assert.equal(session.frame, 100);
+});
+
+test('Solar Trance activates ability one and waits for form two', () => {
+  const player = { $addr: 8, statHundredths: 1000, actionMode: 0, tetherMode: 0 };
+  const g = { fn: { Player_GetSelectedAbility: () => 1 }, press: (key) => key,
+    until: (ready) => ready };
+  const lib = skill('trance', g, { gPlayers: [player] }, { session: { snapshot: () => ({}) } });
+  assert.equal(lib.solarTranceReady(), true);
+  const entry = lib.enterSolarTrance();
+  assert.equal(entry.next().value, 'l');
+  const ready = entry.next().value;
+  assert.equal(ready(), false);
+  player.actionMode = 2;
+  assert.equal(ready(), true);
+  assert.deepEqual(entry.next(), { done: true, value: true });
+});
+
+test('Solar Trance trials include both attack modes and compare at the same frame', () => {
+  const { solarTranceLook, solarTranceTactics } = skill('trance', {});
+  const tactics = [[['up', 12]], ...solarTranceTactics('up')];
+  const endpoints = tactics.map((tactic) => {
+    const elapsed = tactic.reduce((frames, [, hold]) => frames + hold, 0);
+    return elapsed + solarTranceLook(elapsed);
+  });
+  assert.deepEqual(endpoints, [105, 105, 105]);
+  assert.deepEqual(tactics[1], [['b', 2], [0, 22], ['b', 2], [0, 12]]);
+  assert.deepEqual(tactics[2], [['up', 4], ['a', 2], [0, 24]]);
+});
+
+test('resumed combat uses the session clock while waiting for a story script', () => {
   let scripted = true, scene = 1;
-  const g = { frameNo: 1, fn: { ScriptUtility_IsControlFlagSet: () => scripted },
+  const g = { frameNo: 0, fn: { ScriptUtility_IsControlFlagSet: () => scripted },
     until: (ready, timeout) => ({ ready, timeout }) };
+  const session = { frame: 38000, solar: 232, setSolar: () => {} };
   const lib = skill('world', g, { gPlayers: [{ currentStatA: 70 }] });
   Object.assign(lib, {
-    session: { solar: 232, setSolar: () => {} },
+    session,
     where: () => ({ scene }), message: () => ({ open: false }),
     weapon: () => ({ gun: false }), fightTargets: () => [{ life: 10 }],
     clearInterruptions: function* () { return false; },
@@ -352,10 +429,12 @@ test('combat waits while a story script controls the player', () => {
   assert.equal(wait.timeout, 120);
   scripted = false;
   assert.equal(wait.ready(), true);
+  session.frame += 120;
   scene = 2;
   const result = fight.next();
   assert.equal(result.done, true);
   assert.equal(result.value.steps, 0);
+  assert.equal(result.value.frames, 120);
 });
 
 test('coffin navigation holds A until the exit text opens', () => {

@@ -74,7 +74,7 @@ exports.gunGridRoute = (cells, x, y, target, verticalOnly = false) => {
   return null;
 };
 
-function* setGunLoadout(best, worst) {
+function* changeGunGrid(changes) {
   const field = exports.menuState()?.callback;
   if (!field) return false;
   const secondary = 'SceneHud_UpdateSecondaryActionSelection';
@@ -90,22 +90,45 @@ function* setGunLoadout(best, worst) {
     yield* pulse('a');
     return true;
   };
-  const slotOf = (id) => {
-    const state = g.u32(g.types.globals.gGameState.addr);
-    for (let i = 0; i < 12; i++) if (g.u16(state + 0x4c0 + i * 2) === id + 1) return i;
-    return -1;
-  };
-  const bestSlot = slotOf(best), worstSlot = worst === undefined ? null : slotOf(worst);
-  if (bestSlot < 0 || worstSlot === -1) return false;
   yield* pulse('start', 60);
   for (let i = 0; i < 8 && exports.menuState()?.sub !== secondary; i++) yield* pulse('r', 40);
   if (exports.menuState()?.sub !== secondary || !(yield* select(32, true))) return false;
   if (exports.menuState()?.sub !== action) return false;
-  // The frame grid's cells 8–19 map to the twelve unlock inventory slots.
-  if (worstSlot !== null && (!(yield* select(8 + worstSlot, false)) || exports.gunLoadout().includes(worst))) return false;
-  if (!(yield* select(8 + bestSlot, false)) || exports.weapon().frame !== best) return false;
+  for (const { cell, changed } of changes) {
+    if (!(yield* select(cell, false)) || !changed()) return false;
+  }
   for (let i = 0; i < 3 && exports.menuState()?.callback !== field; i++) yield* pulse('b', 35);
   return exports.menuState()?.callback === field;
+}
+
+function inventorySlot(state, offset, length, value) {
+  for (let i = 0; i < length; i++) if (g.u16(state + offset + i * 2) === value) return i;
+  return -1;
+}
+
+function* setGunLoadout(best, worst) {
+  const state = g.u32(g.types.globals.gGameState.addr);
+  const slotOf = (id) => inventorySlot(state, 0x4c0, 12, id + 1);
+  const bestSlot = slotOf(best), worstSlot = worst === undefined ? null : slotOf(worst);
+  if (bestSlot < 0 || worstSlot === -1) return false;
+  // The frame grid's cells 8–19 map to the twelve unlock inventory slots.
+  const changes = [];
+  if (worstSlot !== null) changes.push({ cell: 8 + worstSlot, changed: () => !exports.gunLoadout().includes(worst) });
+  changes.push({ cell: 8 + bestSlot, changed: () => exports.weapon().frame === best });
+  return yield* changeGunGrid(changes);
+}
+
+function* setGunLens(id) {
+  const state = g.u32(g.types.globals.gGameState.addr);
+  const cell = inventorySlot(state, 0x828, 8, id);
+  if (cell < 0) return false;
+  // SolarFruit_ToggleEquipSlot selects a lens when it inserts it. An
+  // assigned lens needs to be removed and inserted again to select it.
+  const assigned = () => inventorySlot(state, 0x90, 8, cell) >= 0;
+  const changes = [];
+  if (assigned()) changes.push({ cell, changed: () => !assigned() });
+  changes.push({ cell, changed: () => exports.weapon().lens === id });
+  return yield* changeGunGrid(changes);
 }
 
 exports.equipBestFrame = function* () {
@@ -127,4 +150,24 @@ exports.equipBestFrame = function* () {
     yield g.press(0, 1);
   }
   return { ...details, done, frames: g.frameNo - start, method: 'pause menu' };
+};
+
+exports.equipEnergyFreeGun = function* () {
+  // Player_SpawnSelectedAttackProjectile waives the frame cost for Luna.
+  if (!exports.bags().lenses.includes(1)) return null;
+  const session = exports.session, root = session.snapshot();
+  const lens = yield* exports.quickChange({ gun: true, lens: 1 });
+  let done = lens.done;
+  if (!done) {
+    session.restore(root);
+    const gun = yield* exports.quickChange({ gun: true });
+    done = gun.done && (yield* setGunLens(1));
+  }
+  if (done) {
+    const rankedFrame = yield* exports.equipBestFrame();
+    return { done: true, ...exports.weapon(), rankedFrame };
+  }
+  session.restore(root);
+  yield g.press(0, 1);
+  return { done: false, ...exports.weapon() };
 };

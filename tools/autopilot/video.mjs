@@ -90,10 +90,12 @@ const describe = (e) => {
     case 'lift': return e.reached ? `reached lift landing at height ${e.height}` : `approach lift at height ${e.height}`;
     case 'landing': return `return via scene ${e.via} at height ${e.height}`;
     case 'fight':
-      if (e.threshold !== undefined) return `sunlight: threshold ${e.threshold}, guard ${e.guard}`;
+      if (e.threshold !== undefined) return `sunlight threshold ${e.threshold}${e.guard === undefined ? '' : `, guard ${e.guard}`}`;
       if (e.equip) return e.equip.gun ? 'equip the solar gun' : 'equip a sword';
-      if (e.trance) return 'enter Dark Trance';
+      if (e.trance) return e.tranceForm === 'solar' ? 'enter Solar Trance' : 'enter Dark Trance';
+      if (e.flight) return 'wait for Hresvelgr to descend';
       if (e.dialogue !== undefined) return `battle dialogue ${e.dialogue}`;
+      if (e.trinityHits !== undefined) return `Hresvelgr ${e.hp} life, Trinity ${e.trinityHits}/5 hits`;
       if (e.hp !== undefined) return `fight: targets ${e.enemies}, health ${e.hp}`;
       return null;
     case 'fought': return `fight ${e.won ? 'won' : 'left'} life ${e.life}`;

@@ -781,7 +781,7 @@ exports.fightTargets = () => {
 };
 
 exports.fight = function* (opts = {}) {
-  const S = exports.session, p = $.gPlayers[0], start = g.frameNo, scene = exports.where().scene;
+  const S = exports.session, p = $.gPlayers[0], start = S.frame, scene = exports.where().scene;
   const DIRS8 = ['up', 'down', 'left', 'right', 'up+left', 'up+right', 'down+left', 'down+right'];
   const progress = new Map(), living = exports.fightTargets, triedOtherWeapon = new Set();
   const initialGun = exports.weapon().gun;
@@ -795,7 +795,7 @@ exports.fight = function* (opts = {}) {
   };
   const life = () => $.gPlayers[0]?.currentStatA ?? 0;
   let steps = 0, interruptions = 0;
-  while (exports.where().scene === scene && p && life() > 0 && living().length && g.frameNo - start < (opts.frames ?? 6000)) {
+  while (exports.where().scene === scene && p && life() > 0 && living().length && S.frame - start < (opts.frames ?? 6000)) {
     if (yield* exports.clearInterruptions(opts)) {
       interruptions++;
       continue;
@@ -810,8 +810,9 @@ exports.fight = function* (opts = {}) {
     const target = living().sort((a, b) => Number(Boolean(b.barrier)) - Number(Boolean(a.barrier)) || distance(a) - distance(b))[0];
     const tk = toward(target);
     const weapon = exports.weapon();
-    const darkTrance = p.actionMode === 1;
-    const frame = darkTrance ? null : exports.gunFrame();
+    const darkTrance = p.actionMode === 1, solarTrance = p.actionMode === 2;
+    const transformed = darkTrance || solarTrance;
+    const frame = transformed ? null : exports.gunFrame();
     // Once the last curtain starts breaking, the sensor can settle while
     // the sprite's destruction timer still holds the Count's damage guard.
     if (target.solarReactive && S.solar > 64) {
@@ -827,18 +828,37 @@ exports.fight = function* (opts = {}) {
       if (opts.trace) opts.trace({ trance: changed, target: target.addr });
       if (changed) continue;
     }
+    if (target.boss === 'Hresvelgr') {
+      const flight = yield* exports.waitForHresvelgr(target);
+      if (flight) {
+        if (opts.trace) opts.trace({ flight, boss: target.boss, ...exports.where() });
+        continue;
+      }
+      if (!pr.solarAttempt && exports.solarTranceReady()) {
+        pr.solarAttempt = true;
+        const changed = yield* exports.enterSolarTrance();
+        if (opts.trace) opts.trace({ trance: changed, tranceForm: 'solar', target: target.addr });
+        if (changed) continue;
+      }
+    }
+    if (target.boss === 'Hresvelgr' && !pr.triedFreeGun && !transformed && weapon.energy < (frame?.cost ?? 3)) {
+      pr.triedFreeGun = true;
+      const equip = yield* exports.equipEnergyFreeGun();
+      if (equip && opts.trace) opts.trace({ equip, target: target.addr });
+      if (equip?.done) { pr.since = steps; continue; }
+    }
     if (frame && weapon.energy < frame.cost && distance(target) > 512 && !pr.triedCharge) {
       pr.triedCharge = true;
       const charge = yield* exports.chargeEnergy(frame.cost, { stopIf: () => living().some((e) => distance(e) < 512) });
       if (charge.done) continue;
     }
-    if (!darkTrance && target.barrier && weapon.gun && !pr.triedSword) {
+    if (!transformed && target.barrier && weapon.gun && !pr.triedSword) {
       pr.triedSword = true;
       const equip = yield* exports.quickChange({ gun: false });
       if (opts.trace) opts.trace({ equip, target: target.addr });
       if (equip.done) continue;
     }
-    if (!darkTrance && !target.barrier && !triedOtherWeapon.has(target.addr) && exports.bags().frames.length &&
+    if (!transformed && !target.barrier && !triedOtherWeapon.has(target.addr) && exports.bags().frames.length &&
         ((frame && weapon.energy < frame.cost) || steps - pr.since >= 8)) {
       triedOtherWeapon.add(target.addr);
       const equip = yield* exports.quickChange({ gun: !weapon.gun });
@@ -846,43 +866,62 @@ exports.fight = function* (opts = {}) {
       if (equip.done) continue;
     }
     const tactics = DIRS8.map((k) => [[k, 12]]);
+    const tranceTactics = solarTrance ? exports.solarTranceTactics(tk) : [];
     if (darkTrance) tactics.push(...exports.darkTranceTactics(tk));
-    else if (weapon.gun) tactics.push(...exports.gunTactics(tk));
-    else tactics.push([['b', 2], [0, 10]], ...(tk ? [[[tk, 6], ['b', 2], [0, 4]]] : []));
-    if (!darkTrance && (target.barrier || target.boss) && tk && !weapon.gun) tactics.push([[tk, 4], [tk + '+b', 4], [0, 16]]);
-    const wait = exports.combatWait(target);
-    if (target.boss || wait) tactics.push([[0, wait || 18]]);
-    const root = S.snapshot(), hp0 = hpSum(), life0 = life();
-    let best = null;
-    for (const t of tactics) {
-      S.restore(root);
-      for (const [k, n] of t) yield g.press(k, n);
-      if (exports.where().scene !== scene) continue;  // walked out through a door
-      const mid = S.snapshot();
-      yield g.press(0, opts.look ?? (target.boss ? 60 : weapon.gun ? 40 : 20));
-      if (exports.where().scene !== scene) continue;
-      const e = living().find((actor) => actor.addr === target.addr), dist = e ? distance(e) : 0;
-      const dealt = target.barrier ? 20 * (target.health - (e?.health ?? 0)) : hp0 - hpSum();
-      const lost = life0 - life();
-      const spent = Math.max(0, weapon.energy - exports.weapon().energy);
-      const score = dealt - (opts.lifeCost ?? 3) * lost - spent / 8 - dist / 400 - (life() > 0 ? 0 : 10000);
-      if (!best || score > best.score) best = { score, t, mid };
+    else if (!solarTrance) {
+      if (weapon.gun) tactics.push(...exports.gunTactics(tk));
+      else tactics.push([['b', 2], [0, 10]], ...(tk ? [[[tk, 6], ['b', 2], [0, 4]]] : []));
     }
+    if (!transformed && (target.barrier || target.boss) && tk && !weapon.gun) tactics.push([[tk, 4], [tk + '+b', 4], [0, 16]]);
+    const wait = exports.combatWait(target);
+    if (solarTrance || target.boss || wait) tactics.push([[0, wait || 18]]);
+    const root = S.snapshot(), hp0 = hpSum(), life0 = life();
+    const trinityHits = target.boss === 'Hresvelgr' ? exports.hresvelgrTrinityHits : null;
+    const hits0 = trinityHits?.();
+    // The session clock rewinds immediately when a speculative branch is restored.
+    const decisionFrame = S.frame;
+    const searchTactics = function* (choices, longPreview = false) {
+      let best = null;
+      for (const t of choices) {
+        S.restore(root);
+        for (const [k, n] of t) yield g.press(k, n);
+        if (exports.where().scene !== scene) continue;  // walked out through a door
+        const mid = S.snapshot();
+        const look = opts.look ?? (longPreview ? exports.solarTranceLook(S.frame - decisionFrame) :
+          target.boss ? 60 : weapon.gun ? 40 : 20);
+        if (look > 0) yield g.press(0, look);
+        if (exports.where().scene !== scene) continue;
+        const e = living().find((actor) => actor.addr === target.addr), dist = e ? distance(e) : 0;
+        const dealt = target.barrier ? 20 * (target.health - (e?.health ?? 0)) : hp0 - hpSum();
+        const lost = life0 - life();
+        const spent = Math.max(0, weapon.energy - exports.weapon().energy);
+        const trinityCost = trinityHits ? exports.hresvelgrTrinityCost(hits0, trinityHits(), target.health) : 0;
+        const score = dealt - (opts.lifeCost ?? 3) * lost - trinityCost - spent / 8 - dist / 400 - (life() > 0 ? 0 : 10000);
+        if (!best || score > best.score) best = { score, t, mid };
+      }
+      return best;
+    };
+    let best = yield* searchTactics(tactics);
+    // Compare the best short move and both trance attacks at the same frame.
+    // Keep only the initial action so the player can still react afterward.
+    if (best && tranceTactics.length) best = (yield* searchTactics([best.t, ...tranceTactics], true)) ?? best;
     if (!best) { S.restore(root); break; }
     S.restore(best.mid);
     steps++;
     // Some targets are scripted actors or invulnerable during this encounter.
     if (!target.boss && !target.barrier && steps - pr.since > 40) { ignored.add(target.addr); if (opts.trace) opts.trace({ ignore: target.addr, category: target.category }); }
-    if (opts.trace && steps % 10 === 0) {
+    if (opts.trace && (steps % 10 === 0 || (solarTrance && steps === 1))) {
       const enemies = living();
       const hp = enemies.reduce((sum, enemy) => sum + enemy.health, 0);
       const guard = enemies.reduce((sum, enemy) => sum + (enemy.guard ?? 0), 0);
       const { scene, life, x, y, z } = exports.where();
-      opts.trace({ fight: steps, hp, guard, scene, life, x, y, z, form: p.actionMode, enemies: enemies.length });
+      opts.trace({ fight: steps, hp, guard, scene, life, x, y, z, form: p.actionMode, enemies: enemies.length,
+        ...(trinityHits ? { trinityHits: trinityHits() } : {}),
+        ...(solarTrance ? { energy: p.currentStatB, motion: p.tetherMode, solar: exports.solarStatus() } : {}) });
     }
   }
   S.setSolar(initialLight);
   if (exports.where().scene === scene && life() > 0 && exports.weapon().gun !== initialGun)
     yield* exports.quickChange({ gun: initialGun });
-  return { won: exports.where().scene === scene && life() > 0 && !living().length, life: life(), frames: g.frameNo - start, steps };
+  return { won: exports.where().scene === scene && life() > 0 && !living().length, life: life(), frames: S.frame - start, steps };
 };
