@@ -437,6 +437,23 @@ test('resumed combat uses the session clock while waiting for a story script', (
   assert.equal(result.value.frames, 120);
 });
 
+test('a permanently downed skeleton cannot return as a lock-on target', () => {
+  const view = { $addr: 8, state2A8: 3, controlKind: 0x39, update: 4 };
+  const skeleton = { revivalDelay: 20000, actionFlags: 0x10 };
+  const g = { name: () => 'Skeleton_UpdateBehaviorCallbacks', at: () => skeleton };
+  const lib = skill('world', g);
+  skill('skeletons', g, {}, lib);
+  const target = { addr: 8, health: 1, alive: true };
+  Object.assign(lib, {
+    where: () => ({ scene: 1 }),
+    barrierTargets: () => [], vampireTargets: () => [], hresvelgrTargets: () => [],
+    enemies: () => [{ ...target, view }], targets: () => [target],
+  });
+  assert.deepEqual(lib.fightTargets(), []);
+  skeleton.revivalDelay = 300;
+  assert.equal(lib.fightTargets()[0].addr, target.addr);
+});
+
 test('coffin navigation holds A until the exit text opens', () => {
   const player = { $addr: 0x02010000, tetherMode: 0 };
   const g = { keys: 0, keyMask: () => 1, fn: {

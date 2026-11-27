@@ -767,10 +767,13 @@ exports.fightTargets = () => {
     ignored = new Set();
   }
   // The scene heap can give a later enemy the same address.
-  const scripted = exports.barrierTargets().concat(exports.vampireTargets(), exports.hresvelgrTargets());
-  const reg = scripted.concat(exports.enemies().filter((e) => e.alive && !ignored.has(e.addr) &&
-    !scripted.some((actor) => actor.addr === e.addr)));
+  const reg = exports.barrierTargets().concat(exports.vampireTargets(), exports.hresvelgrTargets());
   const owners = new Set(reg.map((e) => e.addr));
+  for (const enemy of exports.enemies()) {
+    if (!enemy.alive || ignored.has(enemy.addr) || owners.has(enemy.addr)) continue;
+    owners.add(enemy.addr);  // the lock-on registry can still list a defeated skeleton
+    if (!exports.skeletonDefeated(enemy.view)) reg.push(enemy);
+  }
   for (const t of exports.targets()) {
     if (t.alive && t.health !== null && !owners.has(t.addr) && !ignored.has(t.addr)) {
       reg.push(t);
