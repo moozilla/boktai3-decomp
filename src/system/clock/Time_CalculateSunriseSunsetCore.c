@@ -1,12 +1,9 @@
 #include "global.h"
 #include "lib/libm/libm_compat.h"
-struct SunContext {
-    double d[12];
-    s32 n[4];
-};
+#include "system/clock/solar_time_context.h"
 double Time_CalculateModifiedJulianDate(s32, u32, s32, s32);
 double Time_CalculateMoonAge(s32, u32, s32, s32);
-void Time_CalculateSolarRiseTransitSet(struct SunContext *, s32, double, s32, double, double);
+void Time_CalculateSolarRiseTransitSet(struct SolarTimeContext *, s32, double, s32, double, double);
 void SunClock_SetSunrise(s32, s32);
 void SunClock_SetSunset(s32, s32);
 void SunClock_SetMoonAge(s32, s32);
@@ -20,7 +17,7 @@ static inline double transform(double date, double offset)
 u32 Time_CalculateSunriseSunsetCore(u32 year, s32 month, s32 day, double latitude, double longitude,
                                     s32 zone)
 {
-    struct SunContext c;
+    struct SolarTimeContext c;
     double middle, rise, set, offset;
     offset = longitude / 360.0;
     c.d[6] = Time_CalculateModifiedJulianDate((s32)&c, year, month, day) - 0.375;
