@@ -80,8 +80,6 @@ void CoffinBike_UpdateDefeatEffects(struct CoffinBike *p)
     if (p->active) {
         struct CoffinBikeMotion *entrySelf;
         s32 count;
-        u32 *animation;
-        u32 hidden;
         u32 offset;
         u8 *actionKind;
         ActorParticles_SpawnSideBurst(self);
@@ -104,14 +102,8 @@ void CoffinBike_UpdateDefeatEffects(struct CoffinBike *p)
         sprites = (void **)&p->motion.palette.target;
         style = &p->motion.style.parameterD;
         motionBias = &p->motion.secondaryBias;
-        hidden = 1;
-        animation = &p->model.view.parts[0].flags;
-        count = 4;
-        do {
-            *animation |= hidden;
-            animation += sizeof(struct ModifierDisplayObject) / sizeof(*animation);
-            count--;
-        } while (count >= 0);
+        for (count = 0; count < 5; count++)
+            p->model.view.parts[count].flags |= 1;
         ActorMarkerPool_HideMarker((s8)p->model.primaryAppearance);
         p->active = 0;
         self->dx = 0;
