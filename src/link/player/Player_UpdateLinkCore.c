@@ -3,6 +3,7 @@
 #include "system/game_state/game_state.h"
 #include "player/movement/player_saved_position.h"
 #include "link/session/link_session_state.h"
+#include "scene/collision/scene_actor_damage_visibility.h"
 extern struct AreaEffectLinkState *gLinkSession;
 void Player_ResetActionState(struct Player *);
 s32 Player_ApplyTerrainDamage(struct Player *);
@@ -13,12 +14,6 @@ void Player_PlayLocalSong(s32, u32);
 s32 Callback_InvokeActor(void *, void *);
 void sub_0823A2E4(struct Player *);
 void Trap_UpdateProbeContacts(void *);
-static inline s32 LocalPlayer(void)
-{
-    if (!gLinkSession)
-        return -1;
-    return gLinkSession->localPlayer;
-}
 #define F(T, off) (*(T *)((u8 *)p + (off)))
 s32 Player_UpdateLinkCore(struct Player *p)
 {
@@ -37,7 +32,7 @@ s32 Player_UpdateLinkCore(struct Player *p)
     Callback_InvokeActor(p, p->updateCallback);
     sub_0823A2E4(p);
     gPlayerSlotStatus[p->slot] = p->kind;
-    if (p->slot == LocalPlayer()) {
+    if (p->slot == SceneActorDamage_LocalPlayer()) {
         Player_SavePositionAndFacing(p);
     }
     p->lastContactFlags = 0;
