@@ -1,13 +1,7 @@
-#include "global.h"
+#include "player/player.h"
 
-struct P08159424 {
-    u8 f0[0x474];
-    u16 f474;
-    u16 f476;
-};
-
-void Player_ClearAttachmentFlags(struct P08159424 *p, u32 a)
+void Player_ClearAttachmentFlags(struct Player *p, u32 a)
 {
-    p->f474 &= ~a;
-    p->f476 = 0;
+    p->tetherStatusFlags &= ~a;
+    p->tetherStatusTag = 0;
 }
