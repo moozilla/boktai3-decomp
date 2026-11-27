@@ -62,11 +62,13 @@ def measure(text, path):
     selected = evidence.selected_records(tu, path)
     views = lm.probe_records(body, tu, selected)
     for key, v in views.items():
-        _, node = selected[key]
+        spell, node = selected[key]
         for d, m in zip(node.decls, v["members"]):
             t = tu.resolve(d.type)
             m["record"] = evidence.record_of(tu, getattr(t, "type", None) if m.get("array") else d.type)
-            m.update(headers=[], private=[], self_ref=False)
+            headers, private, forwards, self_ref = evidence.member_dependencies(tu, d, spell)
+            private = [name for name in private if name not in {"u8", "u16", "s16", "u32"}]
+            m.update(headers=headers, private=private, forwards=forwards, self_ref=self_ref)
         v.update(file=path, id=key, known=families.inhabited(v))
     return views
 
@@ -446,6 +448,30 @@ struct Host {
         self.assertIn("struct Node;", generated)
         self.assertIn("struct List *next;", generated)
         merge.probe_header(generated, "struct List", expected, 12, 4)
+
+    def test_merge_lifts_repeated_private_elements_into_the_same_header(self):
+        source = """
+struct Entry { unsigned timer, state; };
+struct Pool { unsigned count; struct Entry slots[4]; };
+unsigned Read(struct Pool *pool) { return pool->slots[2].timer; }
+"""
+        records = measure(source, "src/a.c") | measure(source, "src/b.c")
+        views = [v for v in records.values() if v["spell"] == "struct Pool"]
+        family = {"kind": "struct", "size": 36, "loads": [], "name": "Pool"}
+        args = SimpleNamespace(use_shared=None, name="ScenePool", header=Path("include/scene_pool.h"))
+        header, spell, text, measured, _, _ = merge.header_choice({"records": records}, family, views, args)
+        self.assertIn("struct Entry slots[4];", text)
+        self.assertLess(text.index("struct Entry {"), text.index("struct ScenePool {"))
+        self.assertEqual(set(measured["embedded"]), {"src/a.c:struct Entry", "src/b.c:struct Entry"})
+        child = records["src/a.c:struct Entry"]
+        targets = [(views[0], measured, spell), (child, measured["embedded"][child["id"]], child["spell"])]
+        with patch.object(lm, "preprocess", return_value=parse(source, "src/a.c")[0]):
+            rewritten = merge.rewrite_records(source, targets, header)
+        self.assertIn("struct ScenePool *pool", rewritten)
+        self.assertIn("pool->slots[2].timer", rewritten)
+        self.assertNotIn("struct Entry {", rewritten)
+        with self.assertRaisesRegex(merge.Holdout, "depends on struct Entry"):
+            merge.header_choice({"records": records}, family, views[:1], args)
 
     def test_initializer_with_changed_shape_is_a_holdout(self):
         path = "src/moved/a.c"

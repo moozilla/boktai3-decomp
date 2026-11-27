@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import argparse
 from collections import Counter, defaultdict
+from dataclasses import dataclass
 import os
 from pathlib import Path
 import re
@@ -125,7 +126,21 @@ def pick_candidates(views, loads):
     return output
 
 
-def plan_header(family, views, name, header):
+@dataclass
+class RecordPlan:
+    spell: str
+    size: int
+    align: int
+    lines: list
+    expected: dict
+    decisions: list
+    skipped: list
+    headers: set
+    forwards: set
+    embedded: set
+
+
+def plan_record(family, views, name):
     selected, skipped = [], []
     candidates = pick_candidates(views, family["loads"])
     for score, view, member, guess in sorted(candidates, key=lambda p: (
@@ -138,14 +153,11 @@ def plan_header(family, views, name, header):
         selected.append((member, view, score, guess))
 
     kind = family["kind"]
-    guard = "GUARD_" + re.sub(r"[^A-Za-z0-9]", "_", str(header)).upper()
+    spell = f"{kind} {name}"
     headers = {h for m, _, _, _ in selected for h in m["headers"]}
-    buf = [f"#ifndef {guard}", f"#define {guard}", "", '#include "global.h"']
-    buf.extend(f'#include "{ramlayout.inc_name(h)}"' for h in sorted(headers - {"include/global.h", "include/gba/types.h"}))
-    forwards = {tag for m, _, _, _ in selected for tag in m.get("forwards", ())} - {f"{kind} {name}"}
-    if forwards:
-        buf.extend(("", *(tag + ";" for tag in sorted(forwards))))
-    buf.extend(("", f"{kind} {name} {{"))
+    forwards = {tag for m, _, _, _ in selected for tag in m.get("forwards", ())}
+    embedded = {m["embedded"] for m, _, _, _ in selected if "embedded" in m}
+    buf = [f"{spell} {{"]
     offset = 0
     names = {m["name"] for m, _, _, _ in selected}
     used = set()
@@ -174,13 +186,29 @@ def plan_header(family, views, name, header):
     if offset < family["size"]:
         base = offset if kind == "struct" else 0
         pad(buf, names | used, base, family["size"] - base)
-    spell = f"{kind} {name}"
     align = max(v["align"] for v in views)
     member_align = max((m.get("align") or m.get("width") or 1 for m, _, _, _ in selected), default=1)
     close = f"}} __attribute__((aligned({align})));" if align > member_align else "};"
-    buf.extend((close, "", f"typedef char {name}SizeCheck[sizeof({spell}) == {family['size']:#x} ? 1 : -1];",
-                "", "#endif", ""))
-    return "\n".join(buf), expected, decisions, skipped
+    buf.extend((close, "", f"typedef char {name}SizeCheck[sizeof({spell}) == {family['size']:#x} ? 1 : -1];"))
+    return RecordPlan(spell, family["size"], align, buf, expected, decisions, skipped, headers, forwards, embedded)
+
+
+def render_header(header, plans):
+    guard = "GUARD_" + re.sub(r"[^A-Za-z0-9]", "_", str(header)).upper()
+    headers = set().union(*(p.headers for p in plans)) - {"include/global.h", "include/gba/types.h"}
+    forwards = set().union(*(p.forwards for p in plans))
+    buf = [f"#ifndef {guard}", f"#define {guard}", "", '#include "global.h"']
+    buf.extend(f'#include "{ramlayout.inc_name(h)}"' for h in sorted(headers))
+    if forwards:
+        buf.extend(("", *(tag + ";" for tag in sorted(forwards))))
+    for plan in plans:
+        buf.extend(("", *plan.lines))
+    return "\n".join([*buf, "", "#endif", ""])
+
+
+def plan_header(family, views, name, header):
+    plan = plan_record(family, views, name)
+    return render_header(header, [plan]), plan.expected, plan.decisions, plan.skipped
 
 
 def available_name(name, used):
@@ -447,6 +475,51 @@ def shared_layout(view):
     return view["kind"], view["size"], view["align"], members, view["leaves"], view["containers"]
 
 
+def embedded_members(views, records, used_tags, owner):
+    """Lift measured, equivalent private children repeated at an embedded slot."""
+    groups = defaultdict(list)
+    for parent in views:
+        for member in parent["members"]:
+            child = records.get(member.get("record"))
+            if (member.get("base") != "aggregate" or member.get("off") is None or not child
+                    or child["file"] != parent["file"]):
+                continue
+            spell = child["spell"]
+            if not spell.startswith(("struct ", "union ")) or member.get("private") != [spell]:
+                continue
+            if any(m.get("private") or not m.get("name") or m.get("off") is None or VOLATILE_TYPE.search(m["decl"])
+                   for m in child["members"]):
+                continue
+            fields = tuple((m["name"], m["off"], type_key(m)) for m in child["members"])
+            signature = spell, child["size"], child["align"], fields
+            groups[signature].append((parent, member, child))
+
+    replacements = {}
+    plans = {}
+    for signature, uses in sorted(groups.items(), key=lambda row: repr(row[0])):
+        slots = defaultdict(set)
+        for parent, member, _ in uses:
+            slots[member["off"], member["name"], member["size"], member["array"]].add(parent["file"])
+        if max(map(len, slots.values())) < 2:
+            continue
+        children = {child["id"]: child for _, _, child in uses}
+        spell, size, _, _ = signature
+        kind, tag = spell.split()
+        name = available_name(tag if tag not in used_tags and len(tag) >= 4 else owner + tag, used_tags)
+        child_family = {"kind": kind, "size": size, "loads": []}
+        plan = plan_record(child_family, list(children.values()), name)
+        plans[plan.spell] = plan, children
+        used_tags.add(name)
+        for parent, member, _ in uses:
+            pattern = rf"\b{re.escape(kind)}\s+{re.escape(tag)}\b"
+            replacements[parent["id"], member["name"]] = dict(
+                member, decl=re.sub(pattern, plan.spell, member["decl"], count=1),
+                ctype=re.sub(pattern, plan.spell, member["ctype"], count=1),
+                private=[], embedded=plan.spell)
+    return [dict(view, members=[replacements.get((view["id"], m["name"]), m) for m in view["members"]])
+            for view in views], plans
+
+
 def header_choice(catalog, family, views, args):
     existing = catalog["records"]
     if args.use_shared:
@@ -477,10 +550,19 @@ def header_choice(catalog, family, views, args):
         raise Holdout("choose a C tag that is unused in shared headers")
     snake = re.sub(r"(?<=[a-z0-9])(?=[A-Z])", "_", name).lower()
     header = path_under(args.header or Path(f"include/recovered/{snake}.h"), "include", ".h")
-    text, expected, decisions, skipped = plan_header(family, views, name, header)
-    spell = f"{family['kind']} {name}"
-    new = probe_header(text, spell, expected, family["size"], max(v["align"] for v in views))
-    return header, spell, text, new, decisions, skipped
+    parents, embedded = embedded_members(views, existing, used_tags | {name}, name)
+    parent = plan_record(family, parents, name)
+    children = [embedded[child] for child in sorted(parent.embedded)]
+    text = render_header(header, [*(plan for plan, _ in children), parent])
+    new = probe_header(text, parent.spell, parent.expected, parent.size, parent.align)
+    new["embedded"] = {}
+    decisions = []
+    for plan, originals in children:
+        measured = probe_header(text, plan.spell, plan.expected, plan.size, plan.align)
+        for key in originals:
+            new["embedded"][key] = measured
+        decisions.append(f"embedded {plan.spell}, size {plan.size:#x}, alignment {plan.align}")
+    return header, parent.spell, text, new, decisions + parent.decisions, parent.skipped
 
 
 def convert(catalog, family, args):
@@ -505,7 +587,11 @@ def convert(catalog, family, args):
             text = path.read_text()
             if families.digest(text.encode()) != catalog["files"][rel]:
                 raise Holdout("source changed since scan; rescan the tree")
-            proposals[rel] = rewrite_records(text, [(item, new, spell) for item in items], header)
+            targets = [(item, new, spell) for item in items]
+            targets.extend((catalog["records"][key], child, child["spell"])
+                           for key, child in new.get("embedded", {}).items()
+                           if catalog["records"][key]["file"] == rel)
+            proposals[rel] = rewrite_records(text, targets, header)
             if not args.apply:
                 print(f"PROPOSED {rel}")
         except (Holdout, OSError) as exc:
