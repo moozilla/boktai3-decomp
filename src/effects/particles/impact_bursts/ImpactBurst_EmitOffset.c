@@ -1,11 +1,9 @@
 #include "global.h"
 #include "engine/engine_globals.h"
 #include "engine/ram.h"
+#include "scene/collision/contact_position.h"
 struct Config {
     u16 v[20];
-};
-struct Vec {
-    s16 x, y, z, pad;
 };
 extern s16 gUnk_086149C4[];
 void ImpactBurst_Create(int, void *, struct Config *);
@@ -17,11 +15,11 @@ static inline int scale(int a, int b)
         return v >> 12;
     return -((-v) >> 12);
 }
-void ImpactBurst_EmitOffset(struct Vec *pos, int unused, int type, int flags, int speed,
+void ImpactBurst_EmitOffset(struct ContactPosition *pos, int unused, int type, int flags, int speed,
                                   int horizontal, int start, int decay)
 {
     struct Config s;
-    struct Vec out;
+    struct ContactPosition out;
     s.v[0] = type;
     s.v[1] = flags;
     s.v[3] = speed;

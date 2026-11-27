@@ -9,6 +9,7 @@
 #include "debug.h"
 #include "engine/math/hit_spark_random.h"
 #include "bosses/state_actor_action_entry.h"
+#include "scene/collision/contact_position.h"
 
 int SceneActorGraphics_GetResourceId(struct StateActor *p)
 {
@@ -194,9 +195,7 @@ void SceneActorGraphics_InitBodyNoOp(void)
 {
 }
 
-typedef struct {
-    s16 x, y, z;
-} Vec;
+typedef struct ContactPosition Vec;
 
 void SceneActorGraphics_InitBodyNoOp(void);
 
