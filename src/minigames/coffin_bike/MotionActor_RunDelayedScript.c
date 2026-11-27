@@ -2,52 +2,33 @@
 #include "engine/engine_pause.h"
 #include "engine/ram.h"
 #include "engine/engine_globals.h"
-struct MotionActorState {
-    u8 unknown0[0x68];
-    u32 pending;
-    u8 unknown6C[0x50E];
-    u8 mode;
-    u8 unknown57B[0x73];
-    u8 flags;
-};
-struct MotionActor {
-    u8 unknown0[0x18];
-    struct MotionActorState state;
-    u8 unknown608[0x25C];
-    u32 scriptTimer;
-    u8 scriptRequested;
-    u8 unknown869[0x8B];
-    u16 flags;
-    u8 unknown8F6[0x16];
-    u32 script;
-};
+#include "minigames/coffin_bike/coffin_bike.h"
 void Hud_SetMode(s32);
-void Script_Call(u32, void *);
-void MotionActor_RunDelayedScript(struct MotionActor *actor)
+void MotionActor_RunDelayedScript(struct CoffinBike *actor)
 {
-    struct MotionActorState *state = &actor->state;
-    if (actor->scriptRequested)
-        actor->scriptRequested = 0;
+    struct CoffinBikeMotion *state = &actor->motion;
+    if (actor->active)
+        actor->active = 0;
     {
         u32 mask = 4;
         mask |= actor->flags;
         actor->flags = mask;
     }
-    if (actor->scriptTimer > 60 && actor->script) {
+    if (actor->timer > 60 && actor->eventScript) {
         if (!Engine_PauseBits(0x800))
             Hud_SetMode(7);
-        Script_Call(actor->script, 0);
-        actor->script = 0;
+        Script_Call(actor->eventScript, 0);
+        actor->eventScript = 0;
     }
     {
-        u8 *flags = &state->flags;
+        u8 *flags = &state->damageFlags;
         s32 mask = ~1;
         u32 zero;
         mask &= *flags;
         zero = 0;
         *flags = mask;
-        state->mode = zero;
-        state->pending = zero;
+        state->damageTimer = zero;
+        state->pendingDamage = zero;
     }
-    actor->scriptTimer++;
+    actor->timer++;
 }
