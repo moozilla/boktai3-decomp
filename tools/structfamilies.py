@@ -419,13 +419,27 @@ def add_member_edges(private, records, edges):
         if not left or not right or not compatible(records[a], records[b],
                                                    strong=strong_pair(records[a], records[b], edges[a, b])):
             continue
-        for slot in sorted(left.keys() & right.keys()):
-            x, y = sorted((left[slot], right[slot]))
+        pairs = [(slot, slot) for slot in sorted(left.keys() & right.keys())]
+        if any(kind in {"flow", "RAM"} for kind, _ in edges[a, b]):
+            by_span = defaultdict(list)
+            for right_slot in right:
+                by_span[right_slot[1:]].append(right_slot)
+            for left_slot in sorted(left.keys() - right.keys()):
+                alternatives = by_span[left_slot[1:]]
+                if len(alternatives) != 1 or alternatives[0] in left:
+                    continue
+                right_slot = alternatives[0]
+                exact, names, common, _, _ = layout_stats(records[left[left_slot]], records[right[right_slot]])
+                if len(names) >= 2 and len(common - exact) <= 1:
+                    pairs.append((left_slot, right_slot))
+        for slot, other in pairs:
+            x, y = sorted((left[slot], right[other]))
             if x == y or records[x]["file"] == records[y]["file"] or not compatible(records[x], records[y]):
                 continue
             name, off, *_ = slot
             pair = (x, y)
-            edges[pair].add(("member", f"{a} and {b} both embed {name} at {off:#x}"))
+            label = name if slot == other else f"{name} / {other[0]}"
+            edges[pair].add(("member", f"{a} and {b} both embed {label} at {off:#x}"))
             if pair not in seen:
                 seen.add(pair)
                 pending.append(pair)

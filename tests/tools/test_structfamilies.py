@@ -303,6 +303,20 @@ struct Host {{ unsigned state; struct Link {member}[2]; }};
         self.assertEqual(groups, [sorted(parents), children])
         self.assertEqual({kind for kind, _ in edges[tuple(children)]}, {"member"})
 
+    def test_typed_parent_flow_finds_an_embedded_view_with_one_different_field(self):
+        one = TYPES + """
+struct Entry { u16 phase, timer, flags; };
+struct Parent { unsigned state; struct Entry linked; };
+"""
+        two = one.replace("timer, flags", "timer; s16 direction").replace(" linked;", " entries;")
+        views = measure(one, "src/a.c") | measure(two, "src/b.c")
+        parents = ("src/a.c:struct Parent", "src/b.c:struct Parent")
+        children = ["src/a.c:struct Entry", "src/b.c:struct Entry"]
+        edges = defaultdict(set, {parents: {("flow", "a typed handoff")}})
+        groups = families.family_components(set(views), views, {}, edges)
+        self.assertIn(children, groups)
+        self.assertEqual({kind for kind, _ in edges[tuple(children)]}, {"member"})
+
     def test_probe_compatible_headers_once_and_reuse_the_results(self):
         one = "struct A { u16 flags; };\n"
         two = "struct B { struct A a; u16 next; };\n"
@@ -489,6 +503,40 @@ unsigned Read(struct Pool *pool) { return pool->slots[2].timer; }
         self.assertNotIn("struct Entry {", rewritten)
         with self.assertRaisesRegex(merge.Holdout, "depends on struct Entry"):
             merge.header_choice({"records": records}, family, views[:1], args)
+
+    def test_measured_union_and_array_get_qualified_storage_paths(self):
+        header = "include/types.h"
+        declarations = "struct Entry { unsigned state; }; union Region { unsigned words[4]; };\n"
+        left = "struct Host { unsigned status; struct Entry entries[4]; };\n" \
+               "unsigned Read(struct Host *p, int i) { return p->entries[i].state; }\n"
+        right = "struct Host { unsigned status; union Region parts; };\n" \
+                "unsigned Read(struct Host *p, int i) { return p->parts.words[i]; }\n"
+        sources, records = {}, {}
+        for i, source in enumerate((left, right)):
+            path = f"src/{i}.c"
+            marker = f'# 1 "{header}"\n{declarations}# 1 "{path}"\n'
+            sources[path] = (source, marker + source)
+            records.update(measure(marker + source, path))
+        family = {"kind": "struct", "size": 20, "loads": [], "name": "Host"}
+        args = SimpleNamespace(use_shared=None, name="SharedHost", header=Path("include/host.h"))
+        with tempfile.TemporaryDirectory(dir=ROOT / "build") as tmp:
+            root = Path(tmp)
+            (root / "include").mkdir()
+            (root / "build").mkdir()
+            (root / "include/global.h").write_text(TYPES)
+            (root / header).write_text(declarations)
+            with patch.object(families, "ROOT", root), patch.object(lm, "ROOT", root):
+                target, spell, text, new, _, _ = merge.header_choice(
+                    {"records": records}, family, list(records.values()), args)
+            self.assertIn("union SharedHostParts {", text)
+            self.assertIn("struct Entry entries[4];", text)
+            self.assertIn("union Region parts;", text)
+            for path, expression in (("src/0.c", "p->parts.entries[i].state"),
+                                     ("src/1.c", "p->parts.parts.words[i]")):
+                original, pre = sources[path]
+                with patch.object(lm, "preprocess", return_value=pre):
+                    rewritten = merge.rewrite_unit(original, records[f"{path}:struct Host"], new, target, spell)
+                self.assertIn(expression, rewritten)
 
     def test_pointer_view_adopts_a_larger_type_only_without_extent_uses(self):
         path = "src/a.c"

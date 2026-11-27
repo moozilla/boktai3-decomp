@@ -90,7 +90,9 @@ def pick_candidates(views, loads):
             if view["kind"] == "union":
                 # Deliberate union overlays are separate alternatives. Compare names
                 # across copies only within the same scalar/array/aggregate shape.
-                shape = (m["off"], m["size"], m["base"], m["array"], m.get("esize"), m.get("signed"), m["bits"])
+                aggregate = m["ctype"] if m["base"] == "aggregate" else None
+                shape = (m["off"], m["size"], m["base"], m["array"], m.get("esize"), m.get("signed"), m["bits"],
+                         aggregate)
                 occurrences[shape] += 1
                 slot = (*shape, occurrences[shape])
             choices[slot].append((view, m))
@@ -276,14 +278,20 @@ def field_paths(old, new):
             continue
         whole_bytes = (m["off"] * 8, m["size"] * 8)
         occupied_bits = old_bits.get(m["name"], whole_bytes)
-        hits = {n["name"] for n in choices if n.get("off") == m["off"] and n.get("size") == m["size"]
-                and n.get("array") == m["array"] and n.get("esize") == m.get("esize")
-                and (n.get("base") == m["base"] or {m["base"], n.get("base")} <= {"int", "enum"})
-                and occupied_bits == new_bits.get(n["name"], whole_bytes)}
+        candidates = [n for n in choices if n.get("off") == m["off"] and n.get("size") == m["size"]
+                      and n.get("array") == m["array"] and n.get("esize") == m.get("esize")
+                      and (n.get("base") == m["base"] or {m["base"], n.get("base")} <= {"int", "enum"})
+                      and occupied_bits == new_bits.get(n["name"], whole_bytes)]
+        if m["base"] == "aggregate":
+            exact = [n for n in candidates if n["ctype"] == m["ctype"]]
+            candidates = exact or candidates
+        hits = {n["name"] for n in candidates}
         if m["name"] in hits:
             fields[m["name"]] = m["name"]
         elif len(hits) == 1:
             fields[m["name"]] = next(iter(hits))
+        elif named := {name for name in hits if name.rsplit(".", 1)[-1] == m["name"]}:
+            fields[m["name"]] = next(iter(named)) if len(named) == 1 else None
         elif not re.search(r"[.\[]", m["name"]):
             fields[m["name"]] = None
     return fields
@@ -557,6 +565,46 @@ def embedded_members(views, records, used_tags, owner):
             for view in views], plans
 
 
+def explicit_overlays(views, used_tags, owner):
+    """Keep equal-span alternatives when one private view already declares a union."""
+    slots = defaultdict(list)
+    for view in views:
+        if view["kind"] != "struct":
+            continue
+        for m in view["members"]:
+            if not families.opaque(m) and m.get("off") is not None:
+                slots[m["off"]].append((view, m))
+
+    replacements, plans = {}, {}
+    for off, entries in sorted(slots.items()):
+        if len(entries) < 2 or len({m["size"] for _, m in entries}) != 1:
+            continue
+        if not any(m["base"] == "aggregate" and not m["array"] and m["ctype"].startswith("union ")
+                   for _, m in entries):
+            continue
+        if not any(m["base"] == "aggregate" and not m["ctype"].startswith("union ") for _, m in entries):
+            continue
+        if any(m.get("private") or m["bits"] or not m.get("align") or VOLATILE_TYPE.search(m["decl"])
+               for _, m in entries):
+            continue
+
+        size = entries[0][1]["size"]
+        role = next(m["name"] for _, m in entries if m["ctype"].startswith("union "))
+        name = available_name(owner + role[:1].upper() + role[1:], used_tags)
+        used_tags.add(name)
+        alternatives = [dict(v, kind="union", members=[dict(m, off=0)], size=size, align=m["align"])
+                        for v, m in entries]
+        plan = plan_record({"kind": "union", "size": size, "loads": []}, alternatives, name)
+        plans[plan.spell] = plan
+        for view, m in entries:
+            replacements[view["id"], m["name"]] = dict(
+                m, name=role, ctype=plan.spell, decl=f"{plan.spell} {role}", align=plan.align,
+                array=False, esize=None, private=[], forwards=[], headers=[], self_ref=False,
+                signed=None, width=None, embedded=plan.spell)
+    return [dict(view, members=[replacements.get((view["id"], m["name"]), m) for m in view["members"]])
+            for view in views], plans
+
+
 def header_choice(catalog, family, views, args):
     existing = catalog["records"]
     if args.use_shared:
@@ -587,18 +635,29 @@ def header_choice(catalog, family, views, args):
         raise Holdout("choose a C tag that is unused in shared headers")
     snake = re.sub(r"(?<=[a-z0-9])(?=[A-Z])", "_", name).lower()
     header = path_under(args.header or Path(f"include/recovered/{snake}.h"), "include", ".h")
-    parents, embedded = embedded_members(views, existing, used_tags | {name}, name)
+    taken = used_tags | {name}
+    parents, embedded = embedded_members(views, existing, taken, name)
+    parents, overlays = explicit_overlays(parents, taken, name)
     parent = plan_record(family, parents, name)
-    children = [embedded[child] for child in sorted(parent.embedded)]
-    text = render_header(header, [*(plan for plan, _ in children), parent])
+    active_overlays = [overlays[key] for key in sorted(parent.embedded & overlays.keys())]
+    needed = parent.embedded | set().union(*(overlay.embedded for overlay in active_overlays))
+    children = [embedded[child] for child in sorted(needed & embedded.keys())]
+    text = render_header(header, [*(plan for plan, _ in children), *active_overlays, parent])
     new = probe_header(text, parent.spell, parent.expected, parent.size, parent.align)
     new["embedded"] = {}
+    new["qualified"] = []
     decisions = []
     for plan, originals in children:
         measured = probe_header(text, plan.spell, plan.expected, plan.size, plan.align)
         for key in originals:
             new["embedded"][key] = measured
         decisions.append(f"embedded {plan.spell}, size {plan.size:#x}, alignment {plan.align}")
+    for overlay in active_overlays:
+        measured = probe_header(text, overlay.spell, overlay.expected, overlay.size, overlay.align)
+        outer = next(m for m in new["members"] if m.get("ctype") == overlay.spell)
+        new["qualified"].extend(dict(m, name=f"{outer['name']}.{m['name']}", off=outer["off"] + m["off"])
+                                for m in measured["members"] if m.get("off") is not None)
+        decisions.append(f"overlay {overlay.spell} at {outer['off']:#x}")
     return header, parent.spell, text, new, decisions + parent.decisions, parent.skipped
 
 
