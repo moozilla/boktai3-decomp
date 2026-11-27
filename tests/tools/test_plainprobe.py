@@ -144,6 +144,26 @@ void f(struct Actor *p) {
 """)
         self.assertEqual(p.field_keys, (("struct Actor", "flags", "set"),))
 
+    def test_pointer_retry_uses_formal_type_and_preserves_other_verdicts(self):
+        p, = self.plan("""static inline void Mark(struct Context *ctx, u32 mask) {
+    ctx->flags |= mask;
+}
+void f(struct Actor *p) {
+    Mark(p->context, 4);
+}
+""")
+        original = p.edits
+        row = {"probe_version": pp.probe_version(p), "class": "BOUND-SINGLE", "detail": "diff"}
+        pp.choose_pointer_retry(p, row)
+        self.assertEqual(p.edits, original)
+        row.update({"class": "SKIP", "detail": "variant compile/link failed: fixture"})
+        pp.choose_pointer_retry(p, row)
+        self.assertIn("((struct Context *)(p->context))->flags", str(p.edits))
+        row.update({"probe_version": pp.probe_version(p), "class": "PENDING"})
+        p.edits = original
+        pp.choose_pointer_retry(p, row)
+        self.assertEqual(p.edits, p.pointer_edits)
+
     def test_narrow_unsigned_local_does_not_lose_its_conversion(self):
         p, = self.plan("""u32 f(u32 word) {
     u8 keep = ~3;

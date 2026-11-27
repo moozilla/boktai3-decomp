@@ -16,17 +16,17 @@ To reproduce the sweep, run `build/venv/bin/python tools/plainprobe.py`. Use `--
 
 | Scope | PLAIN | BOUND-SINGLE | BOUND-SHARED | SKIP | Pending |
 | --- | --- | --- | --- | --- | --- |
-| All sites | 33 | 225 | 203 | 47 | 0 |
+| All sites | 33 | 226 | 203 | 46 | 0 |
 
-33 of 461 compiler-tested sites matched (7.2%).
+33 of 462 compiler-tested sites matched (7.1%).
 
 ## Overall
 
 | Scope | PLAIN | BOUND-SINGLE | BOUND-SHARED | SKIP | Pending |
 | --- | --- | --- | --- | --- | --- |
-| All sites | 310 | 2621 | 2145 | 295 | 0 |
+| All sites | 310 | 2627 | 2146 | 288 | 0 |
 
-310 of 5,076 compiler-tested sites matched (6.1%).
+310 of 5,083 compiler-tested sites matched (6.1%).
 
 ## Directory sample
 
@@ -39,7 +39,7 @@ To reproduce the sweep, run `build/venv/bin/python tools/plainprobe.py`. Use `--
 | src/lib | 0 | 0 | 0 | 1 | 0 |
 | src/link | 4 | 16 | 13 | 7 | 0 |
 | src/minigames | 1 | 15 | 23 | 1 | 0 |
-| src/monsters | 1 | 22 | 13 | 4 | 0 |
+| src/monsters | 1 | 23 | 13 | 3 | 0 |
 | src/npc | 0 | 25 | 14 | 1 | 0 |
 | src/objects | 3 | 15 | 20 | 2 | 0 |
 | src/player | 4 | 20 | 9 | 7 | 0 |
@@ -54,7 +54,7 @@ To reproduce the sweep, run `build/venv/bin/python tools/plainprobe.py`. Use `--
 | --- | --- | --- | --- | --- | --- |
 | const-local | 24 | 60 | 375 | 169 | 0 |
 | literal-local | 28 | 1083 | 797 | 113 | 0 |
-| literal-param | 258 | 1478 | 973 | 13 | 0 |
+| literal-param | 258 | 1484 | 974 | 6 | 0 |
 
 ## Directory
 
@@ -67,11 +67,11 @@ To reproduce the sweep, run `build/venv/bin/python tools/plainprobe.py`. Use `--
 | src/lib | 0 | 0 | 0 | 1 | 0 |
 | src/link | 12 | 88 | 72 | 49 | 0 |
 | src/minigames | 2 | 31 | 41 | 2 | 0 |
-| src/monsters | 77 | 1050 | 637 | 45 | 0 |
+| src/monsters | 77 | 1055 | 638 | 39 | 0 |
 | src/npc | 8 | 98 | 77 | 10 | 0 |
 | src/objects | 13 | 114 | 127 | 12 | 0 |
 | src/player | 16 | 108 | 59 | 35 | 0 |
-| src/scene | 27 | 437 | 283 | 35 | 0 |
+| src/scene | 27 | 438 | 283 | 34 | 0 |
 | src/script | 0 | 3 | 2 | 0 | 0 |
 | src/system | 4 | 12 | 7 | 5 | 0 |
 | src/ui | 15 | 107 | 197 | 29 | 0 |
@@ -158,7 +158,7 @@ To reproduce the sweep, run `build/venv/bin/python tools/plainprobe.py`. Use `--
 | ContactCollider_TestContactFlags | 0 | 3 | 0 | 0 | 0 |
 | ContactCollider_TestFlags | 0 | 6 | 0 | 0 | 0 |
 | ContactCollider_TestReactionFlags | 9 | 9 | 9 | 0 | 0 |
-| ContextFlag | 0 | 0 | 0 | 1 | 0 |
+| ContextFlag | 0 | 1 | 0 | 0 | 0 |
 | ContextFlags | 0 | 2 | 1 | 0 | 0 |
 | ContextHasFlag | 0 | 1 | 0 | 0 | 0 |
 | Crow_ClearFlags | 0 | 0 | 1 | 0 | 0 |
@@ -167,7 +167,7 @@ To reproduce the sweep, run `build/venv/bin/python tools/plainprobe.py`. Use `--
 | Dog_ClearAttackFlags | 1 | 0 | 0 | 0 | 0 |
 | Dog_HasAwarenessFlag | 0 | 0 | 4 | 0 | 0 |
 | Dog_ScaleMagnitude | 0 | 0 | 2 | 0 | 0 |
-| Dog_SetContextFlags | 0 | 0 | 0 | 1 | 0 |
+| Dog_SetContextFlags | 0 | 0 | 1 | 0 | 0 |
 | Dog_TestApproachFlag | 0 | 0 | 1 | 0 | 0 |
 | EnableFlags | 0 | 3 | 0 | 0 | 0 |
 | Engine_ClearPauseFlags | 0 | 2 | 4 | 0 | 0 |
@@ -185,7 +185,7 @@ To reproduce the sweep, run `build/venv/bin/python tools/plainprobe.py`. Use `--
 | Ghost_ClearMotionFlags | 1 | 0 | 0 | 0 | 0 |
 | Ghost_FirstLoopRandom | 2 | 0 | 0 | 0 | 0 |
 | Ghost_SetFlags | 0 | 3 | 5 | 0 | 0 |
-| Ghost_TestFlags | 0 | 4 | 4 | 1 | 0 |
+| Ghost_TestFlags | 0 | 5 | 4 | 0 | 0 |
 | Ghost_TestRouteFlags | 1 | 0 | 2 | 0 | 0 |
 | Ghoul_ClearDiscFlags | 0 | 0 | 3 | 0 | 0 |
 | Ghoul_SetDiscFlags | 0 | 2 | 0 | 0 | 0 |
@@ -203,7 +203,7 @@ To reproduce the sweep, run `build/venv/bin/python tools/plainprobe.py`. Use `--
 | HalfwordFlags_Set | 0 | 7 | 2 | 0 | 0 |
 | HalfwordFlags_Test | 0 | 2 | 0 | 0 | 0 |
 | HasBit | 0 | 1 | 1 | 0 | 0 |
-| HasFlag | 0 | 0 | 4 | 1 | 0 |
+| HasFlag | 0 | 1 | 4 | 0 | 0 |
 | HasFlag_BeginNearbyPlayerContact | 0 | 0 | 1 | 0 | 0 |
 | HasFlag_BeginPlayerPursuit | 0 | 0 | 1 | 0 | 0 |
 | HasFlag_SelectPlayerApproach | 0 | 0 | 1 | 0 | 0 |
@@ -247,7 +247,7 @@ To reproduce the sweep, run `build/venv/bin/python tools/plainprobe.py`. Use `--
 | MotionFlag | 0 | 0 | 1 | 0 | 0 |
 | MotionFlagSet | 0 | 0 | 2 | 0 | 0 |
 | MotionFlags | 4 | 2 | 2 | 0 | 0 |
-| MotionState_ClearFlags | 0 | 2 | 2 | 1 | 0 |
+| MotionState_ClearFlags | 0 | 3 | 2 | 0 | 0 |
 | MotionState_SetFlags | 0 | 0 | 1 | 0 | 0 |
 | MotionState_TestFlags | 0 | 1 | 1 | 0 | 0 |
 | MovingPlatform_DisableFlags | 0 | 1 | 10 | 0 | 0 |
@@ -446,7 +446,7 @@ To reproduce the sweep, run `build/venv/bin/python tools/plainprobe.py`. Use `--
 | TestBits | 0 | 2 | 0 | 0 | 0 |
 | TestColliderFlags | 0 | 0 | 1 | 0 | 0 |
 | TestContext | 0 | 2 | 1 | 0 | 0 |
-| TestContext_BeginTargetPursuit | 0 | 0 | 1 | 2 | 0 |
+| TestContext_BeginTargetPursuit | 0 | 2 | 1 | 0 | 0 |
 | TestFalling | 0 | 0 | 1 | 0 | 0 |
 | TestField | 0 | 2 | 0 | 0 | 0 |
 | TestFlag | 0 | 1 | 2 | 0 | 0 |
@@ -774,12 +774,12 @@ The ROM share is mask-first among classified mask-first and load-first operation
 | struct RoomActor / behaviorFlags / clear | 4 | 19 | 47 | 0 | 0 | `SceneActorChase_ClearActorFlags`, `SceneActorChase_ClearBehaviorFlags`, `SceneActorChase_ClearWordFlags` | 1 / 0 / 0 (100.0%) |
 | struct RoomActor / behaviorFlags / nonzero | 0 | 3 | 3 | 0 | 0 | `bit`, `enabled`, `mask` | 16 / 5 / 0 (76.2%) |
 | struct RoomActor / behaviorFlags / set | 4 | 99 | 57 | 0 | 0 | `ActorStatus_SetWord`, `Golem_SetRouteFlags`, `MonsterInit_SetBehaviorFlags`, `Reaction_SetWord`, `SceneActorBehavior_SetWordFlags`, `SceneActorChase_SetActorFlags`, `SceneActorChase_SetBehaviorFlags`, `bit`, `mask` | 1 / 0 / 0 (100.0%) |
-| struct RoomActor / context.captureFlags / and | 0 | 0 | 0 | 1 | 0 | `ContextFlag` | — |
-| struct RoomActor / context.flags / nonzero | 0 | 0 | 0 | 1 | 0 | `Ghost_TestFlags` | — |
-| struct RoomActor / context.flags / set | 0 | 0 | 0 | 1 | 0 | `Dog_SetContextFlags` | — |
-| struct RoomActor / context.flags3D4 / clear | 0 | 0 | 0 | 1 | 0 | `MotionState_ClearFlags` | — |
-| struct RoomActor / context.flags62C / nonzero | 0 | 0 | 0 | 1 | 0 | `HasFlag` | — |
-| struct RoomActor / context.flags6D4 / nonzero | 0 | 0 | 0 | 2 | 0 | `TestContext_BeginTargetPursuit` | — |
+| struct RoomActor / context.captureFlags / and | 0 | 1 | 0 | 0 | 0 | `ContextFlag` | — |
+| struct RoomActor / context.flags / nonzero | 0 | 1 | 0 | 0 | 0 | `Ghost_TestFlags` | — |
+| struct RoomActor / context.flags / set | 0 | 0 | 1 | 0 | 0 | `Dog_SetContextFlags` | — |
+| struct RoomActor / context.flags3D4 / clear | 0 | 1 | 0 | 0 | 0 | `MotionState_ClearFlags` | — |
+| struct RoomActor / context.flags62C / nonzero | 0 | 1 | 0 | 0 | 0 | `HasFlag` | — |
+| struct RoomActor / context.flags6D4 / nonzero | 0 | 2 | 0 | 0 | 0 | `TestContext_BeginTargetPursuit` | — |
 | struct RoomActor / motionFlags / and | 5 | 106 | 40 | 0 | 0 | `Chase_MotionFlags`, `ContactActor_ReadMotionFlags`, `Mask16`, `SceneActorBehavior_MotionBits`, `SceneActorChase_QueryMotionFlags`, `SceneActorContact_MotionFlags`, `SceneActorPlacement_ReadFlags16`, `SceneActorTurn_Flags`, `SceneActor_MaskedHalfword`, `TestMotionFlag`, `Vorn_Mask16`, `activeMask`, `hm`, `m`, `mask`, `motionMode`, `partFlag`, `testMask` | 108 / 2 / 0 (98.2%) |
 | struct RoomActor / motionFlags / and-store | 0 | 35 | 5 | 0 | 0 | `ClearHalf`, `ClearMotionFlags`, `HalfwordFlags_And`, `SceneActorChase_AndMotionFlags`, `SceneActorPlacement_ClearFlags`, `Slime_ClearMotionBits`, `m`, `mask`, `n` | 14 / 0 / 0 (100.0%) |
 | struct RoomActor / motionFlags / clear | 0 | 21 | 38 | 0 | 0 | `ActorStatus_ClearMotionFlags`, `Chase_ClearBits`, `MimicChase_ClearBits`, `SceneActorChase_ClearBits`, `SceneActorChase_ClearMotionFlags`, `k1`, `mask`, `motionMask` | 14 / 0 / 0 (100.0%) |
@@ -947,9 +947,9 @@ The ROM share is mask-first among classified mask-first and load-first operation
 | Verdict | Weighted uses |
 | --- | ---: |
 | PLAIN | 403 |
-| BOUND-SINGLE | 2,621 |
-| BOUND-SHARED | 3,031 |
-| SKIP | 361 |
+| BOUND-SINGLE | 2,627 |
+| BOUND-SHARED | 3,032 |
+| SKIP | 354 |
 | PENDING | 0 |
 
 ## Skip reasons
@@ -960,7 +960,7 @@ The ROM share is mask-first among classified mask-first and load-first operation
 | helper has other arguments | 1 |
 | mask value could not be resolved | 1 |
 | no safe fold_literals --every-read proposal | 278 |
-| variant compile/link failed | 11 |
+| variant compile/link failed | 4 |
 
 ## Scratch application control
 
@@ -1063,3 +1063,8 @@ to match. A mismatch in one matching dependent supplies the verdict and
 the CSV names that unit. Of the 143 header sites, 28 were PLAIN,
 55 BOUND-SINGLE, 54 BOUND-SHARED,
 and 6 still skipped. Total SKIP fell from 432 to 295.
+
+The pointer retry preserves the helper's formal pointer type when the
+initial direct expression fails to compile. Seven source call sites
+through opaque pointers gained verdicts, six BOUND-SINGLE and one
+BOUND-SHARED. Total SKIP fell from 295 to 288.

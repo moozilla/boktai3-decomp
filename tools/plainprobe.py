@@ -269,7 +269,7 @@ def unit_facts(path, text):
     return helpers, constants, bodies
 
 
-def substitute_target(helper, args, code, function, offset):
+def substitute_target(helper, args, code, function, offset, *, typed_pointer=False):
     target = helper.target
     root = re.search(ID, target)[0]
     rest = target[target.index(root) + len(root):]
@@ -284,6 +284,12 @@ def substitute_target(helper, args, code, function, offset):
         return target
     index = helper.params.index(root)
     arg = unparen(args[index].strip())
+    if typed_pointer and "*" in helper.types[index]:
+        pointer = f"(({helper.types[index]})({arg}))"
+        if target.startswith("*"):
+            return f"*{pointer}"
+        if rest.startswith("->"):
+            return pointer + rest
     owner = re.fullmatch(r"(?:const\s+)?((?:struct|union)\s+\w+)\s*\*\s*(?:const)?", helper.types[index])
     arg_name = re.match(ID, arg)
     actual = rawfield.declared_type(code, function, offset, arg_name[0]) if arg_name else None
@@ -312,7 +318,7 @@ def substitute_target(helper, args, code, function, offset):
     return f"({arg}){rest}" if rest or not re.fullmatch(MEMBER, compact(arg)) else arg
 
 
-def plain_call(helper, args, argument, values, code, function, offset):
+def plain_call(helper, args, argument, values, code, function, offset, *, typed_pointer=False):
     """Return the replacement, field expression and the mask spelling, or a skip reason."""
     if len(args) != len(helper.params) or helper.params[argument] != helper.mask:
         return "helper has another mask or uses additional arguments"
@@ -336,7 +342,7 @@ def plain_call(helper, args, argument, values, code, function, offset):
             return "plain mask would change parameter conversion"
     if not re.fullmatch(folds.LIT, literal):
         literal = f"({literal})"
-    target = substitute_target(helper, args, code, function, offset)
+    target = substitute_target(helper, args, code, function, offset, typed_pointer=typed_pointer)
     op = helper.operation
     if op in ("and", "nonzero"):
         expr = f"({target} & {literal})"
@@ -454,6 +460,7 @@ class Probe:
     rom_matches: tuple = ()
     edits: tuple = dataclass_field(default=(), repr=False)
     control_edits: tuple = dataclass_field(default=(), repr=False)
+    pointer_edits: tuple = dataclass_field(default=(), repr=False)
     reason: str = ""
     sample: bool = False
 
@@ -628,6 +635,10 @@ def plan(path, text, header_cache):
             if p.owner:
                 p.field_keys = ((p.owner, p.field, p.operation),)
             p.edits = ((pos, end, expr),)
+            if any("*" in dtype for dtype in helper.types):
+                typed = plain_call(helper, args, site.argument, values, code, span[0], pos, typed_pointer=True)
+                if not isinstance(typed, str) and typed[0] != expr:
+                    p.pointer_edits = ((pos, end, typed[0]),)
             # Exclude only the mask argument, not identical values in the field address.
             arg_start = call.end() + sum(len(a) + 1 for a in args[:site.argument])
             p.other_uses = other_uses(code, span, p, [(arg_start, arg_start + len(args[site.argument]))], (), values)
@@ -783,6 +794,10 @@ def probe(p, sources, checker):
         if control != "PLAIN":
             return "SKIP", f"helper specialization control {control}: {detail}"
     verdict, detail = checker.compare(ROOT / p.path, text, folds.edit_text(text, p.edits))
+    if (verdict == "SKIP" and detail.startswith("variant compile/link failed")
+            and p.pointer_edits and p.edits != p.pointer_edits):
+        p.edits = p.pointer_edits
+        verdict, detail = checker.compare(ROOT / p.path, text, folds.edit_text(text, p.edits))
     if verdict == "DIFF":
         verdict = "BOUND-SHARED" if p.other_uses else "BOUND-SINGLE"
     return verdict, detail
@@ -1062,6 +1077,20 @@ def probe_version(p):
     return hashlib.sha256(repr(evidence).encode()).hexdigest()[:24]
 
 
+def choose_pointer_retry(p, row):
+    if not row or not p.pointer_edits:
+        return
+    # Keep the alternate selected across checkpoint writes, including PENDING.
+    direct = probe_version(p)
+    edit = p.edits
+    p.edits = p.pointer_edits
+    if row["probe_version"] == probe_version(p):
+        return
+    if (row["probe_version"] != direct or row["class"] != "SKIP"
+            or not row["detail"].startswith("variant compile/link failed")):
+        p.edits = edit
+
+
 def plan_sites(sources):
     headers = {}
     return sample_order([site for name, text in sources.items() for site in plan(ROOT / name, text, headers)])
@@ -1081,6 +1110,7 @@ def cached_sites(path, digest, sources):
                 for row in saved["sites"]:
                     row["edits"] = tuple(map(tuple, row["edits"]))
                     row["control_edits"] = tuple(map(tuple, row.get("control_edits", ())))
+                    row["pointer_edits"] = tuple(map(tuple, row.get("pointer_edits", ())))
                     row["field_keys"] = tuple(map(tuple, row["field_keys"]))
                     row["rom_matches"] = ()
                     sites.append(Probe(**row))
@@ -1192,7 +1222,7 @@ def run_sweep(args, paths, parser):
             parser.error("source, tool or ROM inputs changed; choose a new --out")
         if csv_path.exists():
             with csv_path.open() as stream:
-                previous = {r["id"]: r for r in csv.DictReader(stream) if r["class"] in CLASSES}
+                previous = {r["id"]: r for r in csv.DictReader(stream)}
     elif csv_path.exists():
         parser.error("sites.csv has no snapshot; choose a new --out")
     # The full inventory covers private src headers too. Focused paths can
@@ -1204,7 +1234,8 @@ def run_sweep(args, paths, parser):
         parser.error("checkpoint contains unknown sites")
     for p in sites:
         row = previous.get(p.id)
-        if row and row.get("probe_version") == probe_version(p):
+        choose_pointer_retry(p, row)
+        if row and row["class"] in CLASSES and row.get("probe_version") == probe_version(p):
             results[p.id] = row["class"], row["detail"]
     atomic(state, lambda f: json.dump({"digest": digest}, f))
     print(f"Inventory: {len(sites):,} sites, {sum(p.weight for p in sites):,} linter uses, "
