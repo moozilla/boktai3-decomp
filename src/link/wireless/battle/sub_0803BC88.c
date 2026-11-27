@@ -1,4 +1,4 @@
-#include "link/wireless/scene_pool_collision.h"
+#include "link/wireless/scene_pool.h"
 #include "scene/collision/spatial_index.h"
 #include "engine/math/scene_vec_polar.h"
 void ScenePool_InitActorAppearance(void *, struct ScenePoolEntry *, u32, u32);
@@ -100,10 +100,10 @@ void sub_0803BC88(struct ScenePoolActor *a, struct ScenePoolEntry *e, u32 index)
     }
     {
         Character_GetHeightAdjustedPosition(a, &pos);
-        SpatialIndex_SetPosition(ScenePool_MotionCollider(a), pos.x, pos.y, pos.z);
+        SpatialIndex_SetPosition(&a->motionCollider, pos.x, pos.y, pos.z);
         h = *ph;
         heading = (s16)h;
-        motion = &ScenePool_MotionCollider(a)->flags;
+        motion = &a->motionCollider.flags;
         if (heading < 0) {
             SpatialIndex_SetPosition(&a->hitCollider, pos.x, pos.y, pos.z);
             contact = &a->hitCollider;
