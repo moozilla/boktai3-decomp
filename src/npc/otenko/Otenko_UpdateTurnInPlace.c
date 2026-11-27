@@ -1,20 +1,8 @@
 #include "global.h"
-struct SceneNpc {
-    u8 pad0[7];
-    u8 done, changed, entered;
-    u8 padA[6];
-    u32 frame;
-    u8 pad14[4];
-    u8 phase, facing4, facing8, angle;
-    u8 pad1C[0x65 - 0x1C];
-    u8 motionAngle;
-    u8 pad66[0x2e4 - 0x66];
-    u8 (*callback)(struct SceneNpc *);
-};
-void Actor_PlayAnimationEntry(void *, s32, s32, s32, s32);
-static inline void facing(struct SceneNpc *npc, u32 angle)
+#include "npc/otenko/otenko_actor.h"
+static inline void facing(struct OtenkoActor *npc, u32 angle)
 {
-    npc->motionAngle = angle;
+    npc->body.direction = angle;
     {
         s32 t = (s32)(angle + 0x70) >> 5;
         u32 m = 7;
@@ -28,34 +16,34 @@ static inline void facing(struct SceneNpc *npc, u32 angle)
         npc->facing4 = m;
     }
 }
-void Otenko_UpdateTurnInPlace(void *ctx, struct SceneNpc *npc)
+void Otenko_UpdateTurnInPlace(void *ctx, struct OtenkoActor *npc)
 {
     u8 facing8;
-    if (npc->entered) {
-        npc->entered = 0;
+    if (npc->animationEntered) {
+        npc->animationEntered = 0;
         npc->done = 0;
         Actor_PlayAnimationEntry(npc, 0, 0, 0, 4);
-        npc->phase = 0;
+        npc->animationPhase = 0;
     }
-    if (npc->callback(npc) == 1)
+    if ((u8)npc->animationCallback(npc) == 1)
         return;
     facing8 = npc->facing8;
-    switch (npc->phase) {
+    switch (npc->animationPhase) {
         case 2:
-            facing(npc, (npc->motionAngle + 4) & 0xff);
-            if (npc->frame & 0x20) {
-                npc->frame = 0;
-                npc->phase++;
+            facing(npc, (npc->body.direction + 4) & 0xff);
+            if (npc->stateFrame & 0x20) {
+                npc->stateFrame = 0;
+                npc->animationPhase++;
             }
             break;
         case 0:
         case 4:
-            facing(npc, (npc->motionAngle - 4) & 0xff);
+            facing(npc, (npc->body.direction - 4) & 0xff);
         case 1:
         case 3:
-            if (npc->frame & 0x10) {
-                npc->frame = 0;
-                npc->phase++;
+            if (npc->stateFrame & 0x10) {
+                npc->stateFrame = 0;
+                npc->animationPhase++;
             }
             break;
         case 5:
