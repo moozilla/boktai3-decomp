@@ -3,17 +3,8 @@
 #include "engine/ram.h"
 #include "engine/math/monster_particle_random.h"
 #include "bosses/vanargand/vanargand_projectiles.h"
+#include "effects/healing/flicker_particle_layout.h"
 
-struct FlickerParticle {
-    u32 flags;
-    u8 unk_04[0x18 - 4];
-    u16 x, y;
-    u8 unk_1C[0x28 - 0x1C];
-    u16 age, active, velocityX, velocityY;
-    u8 unk_30[4];
-    void *resource;
-    void (*callback)(struct FlickerParticle *);
-};
 struct FlickerParticlePool {
     u8 unk_00[0x7C];
     u16 x, y;
