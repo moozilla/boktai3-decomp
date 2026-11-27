@@ -1,7 +1,5 @@
 #include "npc/story_character/scene_character.h"
-struct Vec081CBE30 {
-    s16 x, y, z, pad;
-};
+#include "npc/story_character/vec081_cbe30_layout.h"
 s32 DisplayAnimation_TestFinished(struct DisplayAnimation *);
 void TimedSpriteEffect_Create(struct Vec081CBE30 *, s32, s32, s32, s32, s32, s32, s32, s32);
 /* Three-phase attack: play the wind-up, spawn an effect above the actor on
