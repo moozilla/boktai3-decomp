@@ -227,8 +227,7 @@ void Menu_DrawText(s32 left, s32 row, const u8 *s)
                     TextWindow_DrawNarrowGlyph(glyph, x, y, highlight);
                     x++;
                 } else if (code & 0xFF00) {
-                    u32 mask = 0x7FFF;
-                    code &= mask;
+                    code &= 0x7FFF;
                     TextWindow_DrawWideGlyph(code, x, y, highlight);
                     x += 2;
                 } else {
@@ -242,12 +241,9 @@ void Menu_DrawText(s32 left, s32 row, const u8 *s)
                 x++;
             }
         } else {
+            u32 high = *s++ & 0x7f;
             u32 low = *s;
-            u32 mask = 0x7f;
-            c = mask & low;
-            s++;
-            low = *s;
-            glyph = (c << 8) | low;
+            glyph = (high << 8) | low;
             if (glyph >= Text_GetWideGlyphCount())
                 x += 2;
             else {
