@@ -109,25 +109,21 @@ static inline void Vg_ResetSprite(struct VanargandSprite *sprite)
     Sprite_ApplyAnimation(sprite, sprite->graphics);
     sprite->sprite.frame = frame;
 }
-static inline s32 Vg_HalfOffset(s32 value)
+static inline s32 Vg_ShiftTowardZero(s32 n, u32 shift)
 {
-    return value >= 0 ? value >> 1 : -((-value) >> 1);
-}
-static inline s32 Vg_ScaleTrigProduct(s32 value)
-{
-    return value >= 0 ? value >> 12 : -((-value) >> 12);
+    return n >= 0 ? n >> shift : -((-n) >> shift);
 }
 static inline void Vg_ProjectChargeOffset(struct ContactPosition *dst, s32 x, s32 y)
 {
-    dst->x = Vg_HalfOffset(((x + y) * 32) / 3 + 0x40);
+    dst->x = Vg_ShiftTowardZero(((x + y) * 32) / 3 + 0x40, 1);
     dst->y = 0x40;
-    dst->z = Vg_HalfOffset(((-x + y) * 32) / 3 + 0x40);
+    dst->z = Vg_ShiftTowardZero(((-x + y) * 32) / 3 + 0x40, 1);
 }
 static inline void Vg_Polar(struct ContactPosition *out, s32 angle, s32 radius)
 {
-    out->x = Vg_ScaleTrigProduct(gUnk_086149C4[(angle + 0x40) & 0xFF] * radius);
+    out->x = Vg_ShiftTowardZero(gUnk_086149C4[(angle + 0x40) & 0xFF] * radius, 12);
     out->y = 0;
-    out->z = Vg_ScaleTrigProduct(gUnk_086149C4[angle] * radius);
+    out->z = Vg_ShiftTowardZero(gUnk_086149C4[angle] * radius, 12);
 }
 static inline u8 Vg_TrackEnded(struct VanargandBoss *actor)
 {
