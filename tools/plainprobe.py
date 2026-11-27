@@ -499,6 +499,9 @@ def plan(path, text, header_cache):
     disabled = [(m.start(), m.end()) for m in re.finditer(
         r"(?ms)^\s*#\s*ifdef\s+UBFIX\b.*?(?=^\s*#\s*(?:else|endif)\b)", code)]
     local_folds = folds.folds(text, rel, every=True, sites=locals_) if locals_ else {}
+    remaining = {s.offset for s in locals_ if not s.excused} - local_folds.keys()
+    if remaining and path.suffix == ".c":
+        local_folds.update(folds.grouped_folds(text, rel, remaining))
     helpers, values = unit_facts(path, text)
     helper_args = dict(helper_reads(code, helpers)) if local_folds else {}
     out = []

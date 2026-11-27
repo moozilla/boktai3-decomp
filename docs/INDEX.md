@@ -451,7 +451,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [notes/phase3-holdouts.md](../notes/phase3-holdouts.md) | Phase 3 holdouts | #matching #phase3 #holdouts | 369 |
 | [notes/pilot-haiku.md](../notes/pilot-haiku.md) | pilot-haiku notes |  | 1 |
 | [notes/pilot-sonnet.md](../notes/pilot-sonnet.md) | pilot-sonnet.md |  | 0 |
-| [notes/plainprobe_2026-11-27.md](../notes/plainprobe_2026-11-27.md) | Plain flag and local-constant probes | #compiler #phase3 #tooling | 67 |
+| [notes/plainprobe_2026-11-27.md](../notes/plainprobe_2026-11-27.md) | Plain flag and local-constant probes | #compiler #phase3 #tooling | 70 |
 | [notes/player-clone-fill_2026-11-13.md](../notes/player-clone-fill_2026-11-13.md) | Player clone fill-local cleanup | #matching #actors #animation | 2 |
 | [notes/player-cue-cleanup_2026-10-30.md](../notes/player-cue-cleanup_2026-10-30.md) | Player cue cleanup — 2026-10-30 | #matching #player #cue #structs #compiler #data #studio | 12 |
 | [notes/player_3.md](../notes/player_3.md) | Player 3 unit consolidation | #player #matching #types | 7 |

@@ -31,6 +31,7 @@ import argparse
 import os
 import re
 import sys
+from collections import defaultdict
 from dataclasses import dataclass
 
 TOOLS = os.path.dirname(os.path.abspath(__file__))
@@ -172,6 +173,90 @@ def folds(text, rel=None, every=False, *, sites=None):
                         f"{rel}:{line}: {name} = {lit} folded into {where} in {fname}")
             for offset in sorted(offsets & warned):
                 out[offset] = fold
+    return out
+
+
+def grouped_folds(text, rel, offsets):
+    """Plan remaining literal bindings in grouped declarations or sibling scopes."""
+    code = keepcheck.blank_comments(text)
+    declarations = list(concessions._local_declarations(code))
+    bindings = defaultdict(list)
+    for group in declarations:
+        for name, pos, _, _ in group:
+            bindings[name].append(pos)
+    out = {}
+    for group in declarations:
+        first = group[0][1]
+        start = max(code.rfind(c, 0, first) for c in "\n;{}") + 1
+        dtype = code[start:first].strip()
+        if not re.fullmatch(r"(?:(?:register|const)\s+)*(?:(?:signed|unsigned)\s+)?\w+", dtype):
+            continue
+        bounds = type_range(dtype)
+        if bounds is None:
+            continue
+        end = group[-1][2]
+        limit = concessions._scope_end(code, end)
+        for index, (name, pos, stop, initialized) in enumerate(group):
+            previous = group[index - 1][2] if index else first
+            if initialized is False or (previous != pos and not code[previous:pos].isspace()):
+                continue
+            if initialized and pos not in offsets:
+                continue
+            uses = reads(code, name, stop, limit)
+            if not uses or any(stop <= offset < limit for offset in bindings[name]):
+                continue
+            if len(group) == 1:
+                cuts = [(start, stop, "")]
+            elif index == len(group) - 1:
+                cuts = [(previous - 1, stop - 1, "")]
+            else:
+                cuts = [(pos, stop, "")]
+            key = pos
+            if initialized:
+                lit = re.fullmatch(r"\s*=\s*(" + LIT + r")\s*", code[pos + len(name):stop - 1])
+                # The declarator itself and any following declarator's read
+                # stay in the same scope. Replacing the latter is safe.
+            else:
+                at = uses[0]
+                if at not in offsets and pos not in offsets:
+                    continue
+                if (code[end:at].rstrip()[-1:] not in ("", ";", "}") or
+                        concessions._scope_end(code, at) != limit or
+                        re.search(r"\bgoto\b", code[end:at])):
+                    continue
+                lit = re.match(r"\s*=\s*(" + LIT + r")\s*;", code[at + len(name):limit])
+                if not lit:
+                    continue
+                cuts.append((at, at + len(name) + lit.end(), ""))
+                uses = uses[1:]
+                key = pos if pos in offsets else at
+            if not lit or not uses or key not in offsets:
+                continue
+            literal = lit[1]
+            try:
+                number = value(literal)
+            except ValueError:
+                continue
+            if not bounds[0] <= number <= bounds[1]:
+                # Write the same converted value even when the literal has
+                # a different width or signedness from the local.
+                ctype = re.sub(r"\b(?:const|register)\s+", "", dtype)
+                replacement = f"(({ctype})({literal}))"
+            else:
+                replacement = re.sub(r"\s+", "", literal)
+            for use in uses:
+                before = code[:use].rstrip()
+                after = code[use + len(name):].lstrip()
+                if (address_or_size(before) or re.search(r"(?:\+\+|--)$", before)
+                        or re.match(r"(?:[-+*/%&|^]|<<|>>)?=(?!=)|\+\+|--", after)
+                        or re.match(r"\s*#", code[code.rfind("\n", 0, use) + 1:use])
+                        or (replacement.startswith("-") and before.endswith(("+", "-")))):
+                    break
+            else:
+                edits = cuts + [(use, use + len(name), replacement) for use in uses]
+                line = code.count("\n", 0, key) + 1
+                out[key] = Fold(name, literal, tuple(uses), tuple(sorted(edits)),
+                                f"{rel}:{line}: fold {name} at its {len(uses)} reads")
     return out
 
 

@@ -54,7 +54,28 @@ u32 f(struct Actor *p) {
 }
 """)
         self.assertEqual([r.spelling for r in rows], ["mask", "keep"])
-        self.assertTrue(all(r.reason for r in rows))
+        self.assertTrue(all(r.edits for r in rows))
+
+    def test_delayed_grouped_binding_keeps_later_sibling_scope(self):
+        text = """u32 f(u32 x) {
+    {
+        u32 a = 0, mask;
+        mask = 16;
+        x = (x & mask) | (a & mask);
+    }
+    {
+        u32 mask = 3;
+        x &= mask;
+    }
+    return x;
+}
+"""
+        p = next(p for p in self.plan(text) if p.spelling == "mask")
+        variant = pp.folds.edit_text(text, p.edits)
+        self.assertIn("u32 a = 0;", variant)
+        self.assertIn("(x & 16) | (a & 16)", variant)
+        self.assertIn("u32 mask = 3;", variant)
+        self.assertIn("same binding", p.other_uses)
 
     def test_boolean_and_compound_operations(self):
         for body, expected in (
@@ -129,7 +150,7 @@ void f(struct Actor *p) {
     return word & keep;
 }
 """)
-        self.assertFalse(p.edits)
+        self.assertIn("((u8)(~3))", str(p.edits))
 
     def test_equal_constant_expression_is_another_use(self):
         p, = self.plan("""u32 f(u32 flags) {
