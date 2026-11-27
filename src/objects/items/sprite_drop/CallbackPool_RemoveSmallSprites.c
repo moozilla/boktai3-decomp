@@ -1,15 +1,7 @@
 #include "global.h"
 #include "engine/ram.h"
+#include "objects/items/sprite_drop/small_callback_entry_layout.h"
 #define gSmallCallbackPool gCompactParticlePool
-struct SmallCallbackEntry {
-    u8 pad0[0x1C];
-    u8 sprite[4];
-    u8 spriteActive;
-    u8 pad21[0x8F];
-    u8 active;
-    u8 padB1[3];
-    void *callback;
-};
 struct SmallCallbackPool {
     u8 pad0[0x18];
     struct SmallCallbackEntry entries[16];

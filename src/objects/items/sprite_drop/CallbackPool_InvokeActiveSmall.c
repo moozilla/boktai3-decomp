@@ -1,10 +1,5 @@
 #include "global.h"
-struct SmallCallbackEntry {
-    u8 payload[0xB0];
-    u8 active;
-    u8 padB1[3];
-    void *callback;
-};
+#include "objects/items/sprite_drop/small_callback_entry_layout.h"
 struct SmallCallbackPool {
     u8 pad0[0x18];
     struct SmallCallbackEntry entries[16];
