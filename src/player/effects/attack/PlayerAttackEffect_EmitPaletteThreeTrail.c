@@ -1,15 +1,10 @@
 #include "global.h"
 #include "engine/engine.h"
-struct Vec {
-    u32 x : 16;
-    u32 y : 16;
-    u32 z : 16;
-    u32 pad : 16;
-};
+#include "scene/collision/contact_position.h"
 extern const s16 gUnk_086149C4[];
 s32 Mod(s32, s32);
 s32 Div(s32, s32);
-void PlayerAttackEffect_AllocateParticle(u8 *, struct Vec *, s32, void *, s32, s32);
+void PlayerAttackEffect_AllocateParticle(u8 *, struct ContactPosition *, s32, void *, s32, s32);
 #define W(n) (*(u32 *)(p + (n)))
 #define I(n) (*(s32 *)(p + (n)))
 #define P(n) (*(u8 **)(p + (n)))
@@ -35,7 +30,7 @@ static inline u16 mask8(s32 x)
 }
 s32 PlayerAttackEffect_EmitPaletteThreeTrail(u8 *p)
 {
-    struct Vec a, b, c;
+    struct ContactPosition a, b, c;
     u32 state = W(0x59C);
     if (state == 1) {
         s32 angle, step;
