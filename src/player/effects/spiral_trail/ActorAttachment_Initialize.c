@@ -1,29 +1,27 @@
 #include "global.h"
+#include "scene/collision/contact_position.h"
 
-struct AttachmentVector {
-    s16 x, y, z, pad;
-};
 struct AttachmentParent {
     u8 pad0[0x30];
-    struct AttachmentVector position;
+    struct ContactPosition position;
     u8 pad38[0x457 - 0x38];
     u8 variant;
 };
 struct ActorAttachment {
     u8 pad0[0x18];
     struct AttachmentParent *parent;
-    struct AttachmentVector offset;
+    struct ContactPosition offset;
     u8 kind, variant;
     u8 pad26[2];
     u16 value28, value2A;
     u8 pad2C[0x284 - 0x2C];
     u8 mode;
 };
-void AttachmentSprite_Setup(struct ActorAttachment *, struct AttachmentVector *);
+void AttachmentSprite_Setup(struct ActorAttachment *, struct ContactPosition *);
 void sub_08236DC4(struct ActorAttachment *);
 
 s32 ActorAttachment_Initialize(struct ActorAttachment *p, struct AttachmentParent *parent, u32 kind,
-                               struct AttachmentVector *offset, u32 a, u32 b, u32 mode)
+                               struct ContactPosition *offset, u32 a, u32 b, u32 mode)
 {
     p->kind = kind;
     p->parent = parent;

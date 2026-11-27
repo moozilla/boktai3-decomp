@@ -1,9 +1,7 @@
 #include "global.h"
 #include "engine/engine.h"
+#include "scene/collision/contact_position.h"
 
-struct Unk08236C04Position {
-    s16 x, y, z, pad;
-};
 struct Unk08236C04Particle {
     u32 flags;
     u8 unknown4[0x14];
@@ -17,7 +15,7 @@ struct Unk08236C04Particle {
     u8 angle;
     u8 life;
     u8 unknown2F;
-    struct Unk08236C04Position origin;
+    struct ContactPosition origin;
     void *update;
 };
 struct Unk08236C04Emitter {
@@ -33,7 +31,7 @@ static inline s32 Scale12(s32 n)
     return n >= 0 ? n >> 12 : -((-n) >> 12);
 }
 
-void SpiralTrail_EmitOrbitParticle(u8 *owner, struct Unk08236C04Position *origin)
+void SpiralTrail_EmitOrbitParticle(u8 *owner, struct ContactPosition *origin)
 {
     struct Unk08236C04Emitter *emitter = (struct Unk08236C04Emitter *)(owner + 0x9C);
 

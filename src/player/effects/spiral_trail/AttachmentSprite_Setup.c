@@ -1,9 +1,7 @@
 #include "global.h"
 #include "engine/video/render.h"
+#include "scene/collision/contact_position.h"
 
-struct AtVector {
-    s16 x, y, z, pad;
-};
 struct AtAnim {
     u8 pad0[6];
     u16 id;
@@ -17,7 +15,7 @@ struct AtSprite {
     u8 pad08[8];
     u16 f10;
     u8 pad12[0xA];
-    struct AtVector position;
+    struct ContactPosition position;
     u8 pad24[0x24];
     u8 *palette;
     u16 colors[16];
@@ -26,7 +24,7 @@ struct AtSprite {
 struct AtUnit {
     u8 pad0[0x18];
     u32 pad18;
-    struct AtVector offset;
+    struct ContactPosition offset;
     u8 kind;
     u8 pad25[7];
     struct AtSprite sprite;
@@ -34,7 +32,7 @@ struct AtUnit {
 void AnimData_Load(void *, u32);
 void Sprite_Init(void *, void *, u32);
 
-void AttachmentSprite_Setup(struct AtUnit *owner, const struct AtVector *position)
+void AttachmentSprite_Setup(struct AtUnit *owner, const struct ContactPosition *position)
 {
     struct AtSprite *sprite;
     struct AtAnim *anim;

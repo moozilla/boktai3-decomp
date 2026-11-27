@@ -1,12 +1,10 @@
 #include "global.h"
+#include "scene/collision/contact_position.h"
 #define RecoilPuff_CreatePool RecoilPuffPool_GetOrCreate
-struct RisingSpritePosition {
-    s16 x, y, z, pad;
-};
 struct RisingSprite {
     u32 flags;
     u8 unknown4[0x14];
-    struct RisingSpritePosition position;
+    struct ContactPosition position;
     u8 unknown20[8];
     void *resource;
     u8 active, unknown2D;
@@ -19,7 +17,7 @@ struct RisingSpritePool {
 };
 extern struct RisingSpritePool *gRisingSpritePool;
 void *RecoilPuffPool_GetOrCreate(void);
-void RecoilPuff_Spawn(struct RisingSpritePosition *position)
+void RecoilPuff_Spawn(struct ContactPosition *position)
 {
     struct RisingSprite *p;
     if (!gRisingSpritePool)

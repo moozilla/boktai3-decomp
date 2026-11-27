@@ -1,23 +1,21 @@
 #include "global.h"
+#include "scene/collision/contact_position.h"
 
-struct BurstVector {
-    s16 x, y, z, pad;
-};
 struct BurstParent {
     u8 pad0[0x30];
-    struct BurstVector position;
+    struct ContactPosition position;
     u8 pad38[0x457 - 0x38];
     u8 variant;
 };
 struct Burst {
     u8 pad0[0x18];
     struct BurstParent *parent;
-    struct BurstVector offset;
+    struct ContactPosition offset;
     u8 kind, variant;
     u16 timer;
     u16 limit28, limit2A;
     u8 sprite[0x1C];
-    struct BurstVector position;
+    struct ContactPosition position;
     u8 pad50[0x98 - 0x50];
     u8 active;
     u8 pad99[0x284 - 0x99];
@@ -25,7 +23,7 @@ struct Burst {
 };
 void SpiralTrail_AdvanceFrame(void *);
 void SpiralTrail_RewindFrame(void *);
-void SpiralTrail_EmitOrbitParticle(struct Burst *, struct BurstVector *);
+void SpiralTrail_EmitOrbitParticle(struct Burst *, struct ContactPosition *);
 
 void sub_08236F48(struct Burst *p)
 {
