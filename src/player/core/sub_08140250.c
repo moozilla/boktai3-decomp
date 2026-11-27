@@ -1,9 +1,7 @@
+#include "scene/collision/contact_position.h"
 #include "global.h"
 // confidence=low: sets up the player body collider that grants stat rewards on contact.
-struct Vec40250 {
-    u32 x : 16, y : 16, z : 16;
-};
-void Collider_Init(u8 *, s32, s32, s32, s32, struct Vec40250 *, struct Vec40250 *);
+void Collider_Init(u8 *, s32, s32, s32, s32, struct ContactPosition *, struct ContactPosition *);
 void Collider_SetBodyProperties(u8 *, s32, s32, s32);
 void Collider_SetCallback(u8 *, void *, u8 *);
 void Collider_SetPosition(u8 *, u8 *, s32);
@@ -12,8 +10,8 @@ void PlayerAction_RefreshModifiers(u8 *);
 s32 Collider_Refresh(u8 *);
 void sub_08140250(u8 *p)
 {
-    struct Vec40250 scale;
-    struct Vec40250 position;
+    struct ContactPosition scale;
+    struct ContactPosition position;
     u8 *q = p + 0x230;
     scale.x = 50;
     scale.y = 127;

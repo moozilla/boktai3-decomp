@@ -1,9 +1,7 @@
+#include "scene/collision/contact_position.h"
 #include "global.h"
 #include "player/pile_trap/scene_marker.h"
 #define TerrainOverlay_RegisterBody TerrainOverlay_QueueAddActor
-struct SceneMarkerVector {
-    u32 x : 16, y : 16, z : 16;
-};
 void PileTrap_OnCollision(void);
 void Collider_Init(void *, u16, u32, u32, u32, void *, void *);
 void Collider_SetCallback(void *, void *, void *);
@@ -14,7 +12,7 @@ u32 TerrainOverlay_QueueAddActor(void *);
 s32 SceneMarker_InitSprites(struct SceneMarker *p, u32 source)
 {
     struct SceneVec position;
-    struct SceneMarkerVector size, offset;
+    struct ContactPosition size, offset;
     void *collider;
     ZeroFill8(&position);
     collider = &p->collider;
