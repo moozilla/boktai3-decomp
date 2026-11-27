@@ -777,19 +777,15 @@ void ModifierMenu_DrawFourthSourceStats(struct ModifierMenu *menu)
     switch (menu->state) {
         case 0:
         case 2: {
-            u32 zero, one;
             ModifierMenu_DrawStatComparison(first, first, 25, 4, 9);
             ModifierMenu_DrawStatComparison(second, second, 25, 5, 10);
-            zero = 0;
-            Bg_SetTilemapEntry(2, 24, 4, 0x1d, zero, zero);
-            one = 1;
-            Bg_SetTilemapEntry(2, 28, 4, 0x1d, one, zero);
-            Bg_SetTilemapEntry(2, 24, 5, 0x1d, zero, zero);
-            Bg_SetTilemapEntry(2, 28, 5, 0x1d, one, zero);
+            Bg_SetTilemapEntry(2, 24, 4, 0x1d, 0, 0);
+            Bg_SetTilemapEntry(2, 28, 4, 0x1d, 1, 0);
+            Bg_SetTilemapEntry(2, 24, 5, 0x1d, 0, 0);
+            Bg_SetTilemapEntry(2, 28, 5, 0x1d, 1, 0);
             break;
         }
         case 1: {
-            u32 zero, one;
             if (StateFlags_GetCategoryBit(menu->choice.cursor.category,
                                           menu->choice.cursor.index)) {
                 ModifierMenu_DrawStatComparison(first, nextFirst, 8, 13, 9);
@@ -798,12 +794,10 @@ void ModifierMenu_DrawFourthSourceStats(struct ModifierMenu *menu)
                 ModifierMenu_DrawUnavailableStat(8, 13, 3);
                 ModifierMenu_DrawUnavailableStat(8, 14, 3);
             }
-            zero = 0;
-            Bg_SetTilemapEntry(2, 7, 13, 0x1d, zero, zero);
-            one = 1;
-            Bg_SetTilemapEntry(2, 11, 13, 0x1d, one, zero);
-            Bg_SetTilemapEntry(2, 7, 14, 0x1d, zero, zero);
-            Bg_SetTilemapEntry(2, 11, 14, 0x1d, one, zero);
+            Bg_SetTilemapEntry(2, 7, 13, 0x1d, 0, 0);
+            Bg_SetTilemapEntry(2, 11, 13, 0x1d, 1, 0);
+            Bg_SetTilemapEntry(2, 7, 14, 0x1d, 0, 0);
+            Bg_SetTilemapEntry(2, 11, 14, 0x1d, 1, 0);
             break;
         }
     }
