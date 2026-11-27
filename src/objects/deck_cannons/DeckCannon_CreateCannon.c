@@ -1,4 +1,5 @@
 #include "global.h"
+#include "objects/deck_cannons/callback_slot_layout.h"
 struct CannonBatteryPosition {
     s16 x, y, z, unk6;
 };
@@ -10,33 +11,19 @@ struct CannonBatterySprite {
     u16 frame;
     u8 unk12[0xA];
 };
-struct CannonBatteryCannon {
-    u32 update, destroy;
-    u8 animation[0x1C];
-    struct CannonBatterySprite sprite;
-    struct CannonBatteryPosition position;
-    u8 unk48[8];
-    u8 collider[0x54];
-    struct CannonBatteryPosition initialPosition;
-    struct CannonBatteryPool *owner;
-    u8 unkB0[0x20];
-    u16 unkD0;
-    u8 unkD2;
-    u8 state;
-};
 struct CannonBatteryPool {
     u8 unk0[0x1C];
     u16 used;
     u8 unk1E[0xA];
-    struct CannonBatteryCannon cannons[16];
+    struct CallbackSlot cannons[16];
 };
-void DeckCannon_InitCannon(struct CannonBatteryCannon *, s32, s32, s32, s32);
-struct CannonBatteryCannon *DeckCannon_CreateCannon(struct CannonBatteryPool *pool, s32 x, s32 y,
+void DeckCannon_InitCannon(struct CallbackSlot *, s32, s32, s32, s32);
+struct CallbackSlot *DeckCannon_CreateCannon(struct CannonBatteryPool *pool, s32 x, s32 y,
                                                        s32 z, s32 flip)
 {
-    struct CannonBatteryCannon *cannon = NULL;
+    struct CallbackSlot *cannon = NULL;
     s32 i;
-    struct CannonBatteryCannon *result;
+    struct CallbackSlot *result;
     for (i = 0; i < 16; i++) {
         if (!((pool->used >> i) & 1)) {
             cannon = &pool->cannons[i];
