@@ -277,7 +277,7 @@ struct Host {{ unsigned state; struct Link {member}[2]; }};
 
     def test_probe_compatible_headers_once_and_reuse_the_results(self):
         one = "struct A { u16 flags; };\n"
-        two = "struct B { struct A a; u16 next; };\n"
+        two = "struct B { struct A a; u16 next; };\nextern struct B *gB;\n"
         pre = TYPES + '# 1 "include/a.h"\n' + one + '# 1 "include/b.h"\n' + two
         jobs = [("include/a.h", one, b"version"), ("include/b.h", two, b"version")]
         with tempfile.TemporaryDirectory() as tmp, patch.object(families, "OUT", Path(tmp)), \
@@ -288,6 +288,28 @@ struct Host {{ unsigned state; struct Link {member}[2]; }};
         self.assertEqual(first, second)
         b = first[1]["records"]["include/b.h:struct B"]
         self.assertEqual((b["size"], b["members"][0]["record"]), (8, "include/a.h:struct A"))
+        self.assertEqual(first[1]["globals"], [["gB", None, "include/b.h:struct B"]])
+
+    def test_shared_ram_declaration_links_views_of_the_same_address_space(self):
+        header = "include/work.h"
+        text = "struct Owner { unsigned state, tail; }; extern struct Owner *gWork;"
+        _, _, ast, tu = parse(text, header)
+        shared = families.header_globals(ast, tu)[header]
+        a, b = "src/a.c", "src/b.c"
+        private = "struct Local { unsigned state; };"
+        records = measure(text, header) | measure(private, a) | measure(private, b)
+        a_key, b_key = f"{a}:struct Local", f"{b}:struct Local"
+        scans = [
+            {"file": header, "globals": shared},
+            {"file": a, "globals": [("gWork", None, a_key)]},
+            {"file": b, "globals": [("gWork", b_key, None)]},
+        ]
+        with patch.object(families.ramlayout, "load", return_value=[{"addr": "020004B4", "name": "gWork"}]):
+            _, buckets, _, _, _ = families.flow(scans, records, {})
+        layouts = families.SharedLayouts(records, buckets)
+        self.assertEqual(layouts.relations([records[a_key]]),
+                         [(f"{header}:struct Owner", "contained by", "typed RAM declaration", 1)])
+        self.assertEqual(layouts.relations([records[b_key]]), [])
 
     def test_real_offsets_nested_types_and_votes(self):
         path = "src/moved/a.c"
