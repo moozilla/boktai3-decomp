@@ -1,13 +1,7 @@
 #include "global.h"
+#include "player/effects/spiral_trail_sprite.h"
 /* RadialBurstEffect_BlendPaletteTowardWhite: same code as RadialBurstEffect_BlendSpritePalette at another address (ported by relatives.py; provisional name) */
-struct S {
-    u8 p0[0x48];
-    u16 *src;
-    u16 dest[16];
-    u8 b6c;
-    u8 alpha;
-};
-void RadialBurstEffect_BlendPaletteTowardWhite(struct S *s)
+void RadialBurstEffect_BlendPaletteTowardWhite(struct SpiralTrailSprite *s)
 {
     u16 *p = s->src;
     int bias = (16 - s->alpha) * 15;

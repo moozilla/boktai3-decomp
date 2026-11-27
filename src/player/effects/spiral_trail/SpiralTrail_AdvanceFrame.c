@@ -1,19 +1,15 @@
 #include "global.h"
+#include "player/effects/spiral_trail_sprite.h"
 /* Tentative ParticleEffect/ParticleBurst family names (low confidence). */
-struct ParticleBurstSprite {
-    u32 flags;
-    u8 pad4[0x69];
-    u8 frame;
-};
-void RadialBurstEffect_BlendPaletteTowardWhite(struct ParticleBurstSprite *);
-void SpiralTrail_AdvanceFrame(struct ParticleBurstSprite *p)
+void RadialBurstEffect_BlendPaletteTowardWhite(struct SpiralTrailSprite *);
+void SpiralTrail_AdvanceFrame(struct SpiralTrailSprite *p)
 {
-    if (p->frame <= 5)
+    if (p->alpha <= 5)
         p->flags |= 0x400;
     else
         p->flags &= ~0x400;
-    if (p->frame <= 15) {
-        p->frame++;
+    if (p->alpha <= 15) {
+        p->alpha++;
         RadialBurstEffect_BlendPaletteTowardWhite(p);
     }
 }
