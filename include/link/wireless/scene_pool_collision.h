@@ -5,7 +5,7 @@
 
 static inline struct SpatialEntry *ScenePool_MotionCollider(struct ScenePoolActor *actor)
 {
-    return (struct SpatialEntry *)&actor->motionFlags;
+    return &actor->motionCollider;
 }
 
 #endif

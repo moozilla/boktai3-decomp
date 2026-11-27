@@ -17,7 +17,7 @@ s32 ScenePool_StateDepartForward(void *manager, struct ScenePoolActor *actor,
         mask &= *flags;
         zero = 0;
         *flags = mask;
-        actor->unknown57a = zero;
+        actor->motionCollider.hit = zero;
         actor->unknown68 = 0;
         ScenePoolActor_SetStateFlags(actor, 0x2c);
         if ((actor->position.x - actor->savedPosition.x) >> 12 > 127) {
