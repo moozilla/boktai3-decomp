@@ -144,7 +144,7 @@ def scan_header_batch(jobs):
     for job in missing:
         rel, text, version = job
         selected = selections[rel]
-        expected = {f"{rel}:{r.name if r.typedef else f'{r.kind} {r.name}'}" for r in inline_twins.records(text)}
+        expected = {f"{rel}:{r.spell}" for r in inline_twins.records(text)}
         if not selected or not (selected.keys() | expected) <= measured.keys():
             cached[rel] = scan_cached(job)
             continue

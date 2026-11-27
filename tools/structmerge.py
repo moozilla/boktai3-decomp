@@ -333,46 +333,64 @@ def member_edits(text, pre, refs, view, mapping, span):
 
 
 def rewrite_unit(text, old, new, header, spell):
-    """Replace one file-scope declaration and the member uses bound to it."""
-    if (old["size"], old["align"]) != (new["size"], new["align"]):
-        raise Holdout(f"private size/alignment {old['size']:#x}/{old['align']} differs from shared "
-                      f"{new['size']:#x}/{new['align']}")
-    spans = [r for r in inline_twins.records(text) if r.kind == old["kind"]
-             and (r.name if r.typedef else f"{r.kind} {r.name}") == old["spell"]]
-    if len(spans) != 1:
-        raise Holdout("declaration is not a unique editable file-scope record")
-    span = spans[0]
-    if keepcheck.in_ranges(span.start, keepcheck.draft_ranges(text)):
-        raise Holdout("declaration belongs to a NONMATCHING draft")
+    return rewrite_records(text, [(old, new, spell)], header)
+
+
+def rewrite_records(text, targets, header):
+    """Plan each record's edits against the original translation unit."""
+    spans = inline_twins.records(text)
+    drafts = keepcheck.draft_ranges(text)
     mask = keepcheck.blank_comments(text)
-    tag = re.compile(rf"\b{span.kind}\s+{re.escape(span.name)}\b")
-    if not span.typedef and len(re.findall(tag.pattern + r"\s*\{", mask)) != 1:
-        raise Holdout("another declaration shadows the record tag")
-    mapping = field_paths(old, new)
-    same_sequence = [(m["name"], type_key(m)) for m in old["members"]] == [
-        (m["name"], type_key(m)) for m in new["members"]]
     edits = []
-    if not same_sequence or any(name != new_name for name, new_name in mapping.items()):
-        pre = lm.preprocess(old["file"])
-        if pre is None:
-            raise Holdout("preprocessing failed")
-        try:
-            _, ast, tu, error = evidence.parse(pre, old["file"])
-        except ParseError as exc:
-            raise Holdout(f"source parse failed: {exc}") from exc
-        if error:
-            raise Holdout(f"body parse failed: {error}")
-        if not same_sequence and has_initializers(ast, tu, old["id"], old["file"]):
-            raise Holdout("aggregate initializer needs a positional layout review")
-        refs = evidence.References(ast, tu, old["file"])
-        edits = member_edits(text, pre, refs, old, mapping, span)
-    replacement = f"typedef {spell} {span.name};\n" if span.typedef else ""
-    edits.append((span.start, span.end, replacement))
-    if not span.typedef and old["spell"] != spell:
-        edits.extend((m.start(), m.end(), spell) for m in tag.finditer(mask)
-                     if m.end() <= span.start or m.start() >= span.end)
-    for start, end, replacement in sorted(edits, reverse=True):
+    removed = []
+    renames = []
+    refs = None
+    for old, new, spell in targets:
+        if (old["size"], old["align"]) != (new["size"], new["align"]):
+            raise Holdout(f"{old['spell']}: private size/alignment {old['size']:#x}/{old['align']} differs "
+                          f"from shared {new['size']:#x}/{new['align']}")
+        found = [r for r in spans if r.spell == old["spell"]]
+        if len(found) != 1:
+            raise Holdout(f"{old['spell']}: declaration is not a unique editable file-scope record")
+        span = found[0]
+        if keepcheck.in_ranges(span.start, drafts):
+            raise Holdout(f"{old['spell']}: declaration belongs to a NONMATCHING draft")
+        if span.tag:
+            tag = re.compile(rf"\b{span.kind}\s+{re.escape(span.tag)}\b")
+            if len(re.findall(tag.pattern + r"\s*\{", mask)) != 1:
+                raise Holdout(f"another declaration shadows {old['spell']}")
+            if old["spell"] != spell:
+                renames.append((tag, spell))
+        mapping = field_paths(old, new)
+        same_sequence = [(m["name"], type_key(m)) for m in old["members"]] == [
+            (m["name"], type_key(m)) for m in new["members"]]
+        if not same_sequence or any(name != new_name for name, new_name in mapping.items()):
+            if refs is None:
+                pre = lm.preprocess(old["file"])
+                if pre is None:
+                    raise Holdout("preprocessing failed")
+                try:
+                    _, ast, tu, error = evidence.parse(pre, old["file"])
+                except ParseError as exc:
+                    raise Holdout(f"source parse failed: {exc}") from exc
+                if error:
+                    raise Holdout(f"body parse failed: {error}")
+                refs = evidence.References(ast, tu, old["file"])
+            if not same_sequence and has_initializers(ast, tu, old["id"], old["file"]):
+                raise Holdout(f"{old['spell']}: aggregate initializer needs a positional layout review")
+            edits.extend(member_edits(text, pre, refs, old, mapping, span))
+        replacement = f"typedef {spell} {span.name};\n" if span.typedef else ""
+        removed.append((span.start, span.end, replacement))
+
+    for tag, spell in renames:
+        edits.extend((m.start(), m.end(), spell) for m in tag.finditer(mask))
+    edits = removed + [e for e in edits if all(e[1] <= start or end <= e[0] for start, end, _ in removed)]
+    previous = len(text)
+    for start, end, replacement in sorted(set(edits), reverse=True):
+        if end > previous:
+            raise Holdout("joint record changes need overlapping source edits")
         text = text[:start] + replacement + text[end:]
+        previous = start
     return inline_twins.add_include(text, ramlayout.inc_name(str(header)))
 
 
@@ -484,9 +502,7 @@ def convert(catalog, family, args):
             text = path.read_text()
             if families.digest(text.encode()) != catalog["files"][rel]:
                 raise Holdout("source changed since scan; rescan the tree")
-            if len(items) != 1:
-                raise Holdout("multiple family declarations in one unit need joint scope review")
-            proposals[rel] = rewrite_unit(text, items[0], new, header, spell)
+            proposals[rel] = rewrite_records(text, [(item, new, spell) for item in items], header)
             if not args.apply:
                 print(f"PROPOSED {rel}")
         except (Holdout, OSError) as exc:

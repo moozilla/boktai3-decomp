@@ -400,6 +400,26 @@ int Read(struct Packed *p, struct Other *q) { return p->xy.hi + q->xy.hi; }
         self.assertEqual(expected, {"lo": (0, 2, 0, 16), "hi": (2, 2, 16, 16)})
         merge.probe_header(generated, "struct Pair", expected, 4, 4)
 
+    def test_joint_merge_retains_typedef_and_rewrites_references_between_definitions(self):
+        path = "src/a.c"
+        source = """
+typedef struct Pair { unsigned count; } PairAlias;
+struct Tail { unsigned index; };
+int Read(struct Pair *pair, PairAlias *alias, struct Tail *tail) {
+    return pair->count + alias->count + tail->index;
+}
+"""
+        olds = measure(source, path)
+        new = next(iter(measure("struct Slot { unsigned position; };", "include/slot.h").values()))
+        with patch.object(lm, "preprocess", return_value=parse(source, path)[0]):
+            text = merge.rewrite_records(source, [(old, new, "struct Slot") for old in olds.values()],
+                                         Path("include/slot.h"))
+        self.assertIn("typedef struct Slot PairAlias;", text)
+        self.assertIn("Read(struct Slot *pair, PairAlias *alias, struct Slot *tail)", text)
+        self.assertIn("return pair->position + alias->position + tail->position;", text)
+        self.assertNotIn("struct Pair", text)
+        self.assertNotIn("struct Tail", text)
+
     def test_initializer_with_changed_shape_is_a_holdout(self):
         path = "src/moved/a.c"
         old_text = TYPES + "struct R { u16 old; };\nstruct R data = { 2 };\n"

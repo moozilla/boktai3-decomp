@@ -118,8 +118,12 @@ def helpers(text, path=""):
     return out
 
 
-class Record(collections.namedtuple("Record", "kind name typedef body start end file")):
-    """A file-scope struct/union definition: `struct T {...};` (name T) or `typedef struct {...} T;`."""
+class Record(collections.namedtuple("Record", "kind name typedef body start end file tag")):
+    """A file-scope struct/union definition with an optional typedef."""
+
+    @property
+    def spell(self):
+        return f"{self.kind} {self.tag}" if self.tag else self.name
 
 
 RECORD_TAIL = re.compile(
@@ -138,8 +142,8 @@ def records(text, path=""):
             continue
         typedef, kind, tag = bool(m.group(1)), m.group(2), m.group(3)
         if typedef:
-            if not tail["alias"] or tag:
-                continue  # typedef struct T {...} U; spells two names: leave it
+            if not tail["alias"]:
+                continue
             name = tail["alias"]
         else:
             if not tag or tail["alias"]:
@@ -149,7 +153,7 @@ def records(text, path=""):
         stop = tail.end()
         if stop < len(text) and text[stop] == "\n":
             stop += 1
-        out.append(Record(kind, name, typedef, body, m.start(), stop, path))
+        out.append(Record(kind, name, typedef, body, m.start(), stop, path, tag))
     return out
 
 
@@ -254,7 +258,8 @@ def plan(text, idx, drafts):
     for r in records(text):
         if keepcheck.in_ranges(r.start, drafts):
             continue
-        same = rk.get((r.kind, r.typedef, r.body), [])
+        same = [c for c in rk.get((r.kind, r.typedef, r.body), [])
+                if not r.typedef or c.tag == r.tag]
         if any(c.name == r.name for c in same):
             exact.append(("record", r, [c for c in same if c.name == r.name]))
         elif same:
