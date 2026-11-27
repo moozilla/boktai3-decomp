@@ -1,9 +1,7 @@
 #include "global.h"
 #include "effects/screen/background_controller.h"
 #include "bosses/vanargand/mover_position_layout.h"
-struct MoverScreen {
-    s16 x, y, z;
-};
+#include "bosses/vanargand/mover_screen_layout.h"
 struct SceneMover {
     u8 pad0[0x268];
     struct MoverPosition position;
