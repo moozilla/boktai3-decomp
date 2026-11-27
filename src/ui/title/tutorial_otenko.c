@@ -175,22 +175,7 @@ void TutorialOtenkoPalette_UpdateReverseFade(struct ActorAnimController *p)
         p->previous = 0;
         AnimData_SelectPaletteBank(p->effect, 343);
         p->palette = p->savedPalette;
-        p->oldMode = p->mode;
-        {
-            u32 mode = 2;
-            p->mode = mode;
-        }
-        p->phase = 13;
-        if (p->oldMode == 3) {
-            if (p->mode == 3) {
-                p->savedFrame = p->anim.index;
-                p->savedTimer = p->anim.elapsed;
-            }
-        }
-        {
-            u8 one = 1;
-            p->flags |= one;
-        }
+        TutorialOtenko_SetState(p, 2, 13);
     }
 }
 
@@ -611,25 +596,10 @@ void TutorialOtenko_UpdateIdlePhaseRestoration(struct ActorAnimController *p)
         p->count = 0;
     }
     if (p->interrupted && p->done) {
-        u16 phase;
         p->obj.y = p->savedY2 - 1;
         p->timer = 0;
         p->fn = TutorialOtenko_UpdateIdleWait;
-        phase = p->savedPhase;
-        p->oldMode = p->mode;
-        {
-            u32 mode = 3;
-            p->mode = mode;
-        }
-        p->phase = phase;
-        if (p->oldMode == 3 && p->mode == 3) {
-            p->savedFrame = p->anim.index;
-            p->savedTimer = p->anim.elapsed;
-        }
-        {
-            u8 one = 1;
-            p->flags |= one;
-        }
+        TutorialOtenko_SetState(p, 3, p->savedPhase);
     }
 }
 
@@ -669,177 +639,89 @@ u8 *TutorialOtenko_EnsureController(u32, u32);
 void TutorialOtenko_BeginAnimationPhaseOne(void)
 {
     struct ActorAnimController *g = (struct ActorAnimController *)gScriptedActorController;
-    u32 three = 3;
     if (g == 0) {
         g = (struct ActorAnimController *)TutorialOtenko_EnsureController(0xBB34, 0);
         if (g == 0)
             return;
     }
-    g->oldMode = g->mode;
-    g->mode = three;
-    g->phase = 1;
-    if (g->oldMode == 3 && g->mode == 3) {
-        g->savedFrame = g->anim.index;
-        g->savedTimer = g->anim.elapsed;
-    }
-    {
-        u8 one = 1;
-        g->flags |= one;
-    }
+    TutorialOtenko_SetState(g, 3, 1);
 }
 
 void TutorialOtenko_BeginAnimationPhaseTwo(void)
 {
     struct ActorAnimController *g = (struct ActorAnimController *)gScriptedActorController;
-    u32 three = 3;
     if (g == 0) {
         g = (struct ActorAnimController *)TutorialOtenko_EnsureController(0xBB34, 0);
         if (g == 0)
             return;
     }
-    g->oldMode = g->mode;
-    g->mode = three;
-    g->phase = 2;
-    if (g->oldMode == 3 && g->mode == 3) {
-        g->savedFrame = g->anim.index;
-        g->savedTimer = g->anim.elapsed;
-    }
-    {
-        u8 one = 1;
-        g->flags |= one;
-    }
+    TutorialOtenko_SetState(g, 3, 2);
 }
 
 void TutorialOtenko_BeginAnimationPhaseThree(void)
 {
     struct ActorAnimController *g = (struct ActorAnimController *)gScriptedActorController;
-    u32 three = 3;
     if (g == 0) {
         g = (struct ActorAnimController *)TutorialOtenko_EnsureController(0xBB34, 0);
         if (g == 0)
             return;
     }
-    g->oldMode = g->mode;
-    g->mode = three;
-    g->phase = 3;
-    if (g->oldMode == 3 && g->mode == 3) {
-        g->savedFrame = g->anim.index;
-        g->savedTimer = g->anim.elapsed;
-    }
-    {
-        u8 one = 1;
-        g->flags |= one;
-    }
+    TutorialOtenko_SetState(g, 3, 3);
 }
 
 void TutorialOtenko_BeginAnimationPhaseFour(void)
 {
     struct ActorAnimController *g = (struct ActorAnimController *)gScriptedActorController;
-    u32 three = 3;
     if (g == 0) {
         g = (struct ActorAnimController *)TutorialOtenko_EnsureController(0xBB34, 0);
         if (g == 0)
             return;
     }
-    g->oldMode = g->mode;
-    g->mode = three;
-    g->phase = 4;
-    if (g->oldMode == 3 && g->mode == 3) {
-        g->savedFrame = g->anim.index;
-        g->savedTimer = g->anim.elapsed;
-    }
-    {
-        u8 one = 1;
-        g->flags |= one;
-    }
+    TutorialOtenko_SetState(g, 3, 4);
 }
 
 void TutorialOtenko_BeginAnimationPhaseFive(void)
 {
     struct ActorAnimController *g = (struct ActorAnimController *)gScriptedActorController;
-    u32 three = 3;
     if (g == 0) {
         g = (struct ActorAnimController *)TutorialOtenko_EnsureController(0xBB34, 0);
         if (g == 0)
             return;
     }
-    g->oldMode = g->mode;
-    g->mode = three;
-    g->phase = 5;
-    if (g->oldMode == 3 && g->mode == 3) {
-        g->savedFrame = g->anim.index;
-        g->savedTimer = g->anim.elapsed;
-    }
-    {
-        u8 one = 1;
-        g->flags |= one;
-    }
+    TutorialOtenko_SetState(g, 3, 5);
 }
 
 void TutorialOtenko_BeginAnimationPhaseSix(void)
 {
     struct ActorAnimController *g = (struct ActorAnimController *)gScriptedActorController;
-    u32 three = 3;
     if (g == 0) {
         g = (struct ActorAnimController *)TutorialOtenko_EnsureController(0xBB34, 0);
         if (g == 0)
             return;
     }
-    g->oldMode = g->mode;
-    g->mode = three;
-    g->phase = 6;
-    if (g->oldMode == 3 && g->mode == 3) {
-        g->savedFrame = g->anim.index;
-        g->savedTimer = g->anim.elapsed;
-    }
-    {
-        u8 one = 1;
-        g->flags |= one;
-    }
+    TutorialOtenko_SetState(g, 3, 6);
 }
 
 void TutorialOtenko_BeginAnimationPhaseSeven(void)
 {
     struct ActorAnimController *g = (struct ActorAnimController *)gScriptedActorController;
-    u32 three = 3;
     if (g == 0) {
         g = (struct ActorAnimController *)TutorialOtenko_EnsureController(0xBB34, 0);
         if (g == 0)
             return;
     }
-    g->oldMode = g->mode;
-    g->mode = three;
-    g->phase = 7;
-    if (g->oldMode == 3 && g->mode == 3) {
-        g->savedFrame = g->anim.index;
-        g->savedTimer = g->anim.elapsed;
-    }
-    {
-        u8 one = 1;
-        g->flags |= one;
-    }
+    TutorialOtenko_SetState(g, 3, 7);
 }
 
 void TutorialOtenko_BeginAnimationPhaseEight(void)
 {
     struct ActorAnimController *g = (struct ActorAnimController *)gScriptedActorController;
-    u32 three = 3;
     if (g == 0) {
         g = (struct ActorAnimController *)TutorialOtenko_EnsureController(0xBB34, 0);
         if (g == 0)
             return;
     }
-    g->oldMode = g->mode;
-    g->mode = three;
-    g->phase = 8;
-    if (g->oldMode == 3 && g->mode == 3) {
-        g->savedFrame = g->anim.index;
-        g->savedTimer = g->anim.elapsed;
-    }
-    {
-        u8 one = 1;
-        g->flags |= one;
-    }
+    TutorialOtenko_SetState(g, 3, 8);
 }
 
 /* Script command: configure the singleton animation controller. */
@@ -921,23 +803,12 @@ void TutorialOtenko_SetAnimationPhase(u32 phase)
 void TutorialOtenko_BeginAnimationPhaseTen(void)
 {
     struct ActorAnimController *g = (struct ActorAnimController *)gScriptedActorController;
-    u32 three = 3;
     if (g == 0) {
         g = (struct ActorAnimController *)TutorialOtenko_EnsureController(0xBB34, 0);
         if (g == 0)
             return;
     }
-    g->oldMode = g->mode;
-    g->mode = three;
-    g->phase = 10;
-    if (g->oldMode == 3 && g->mode == 3) {
-        g->savedFrame = g->anim.index;
-        g->savedTimer = g->anim.elapsed;
-    }
-    {
-        u8 one = 1;
-        g->flags |= one;
-    }
+    TutorialOtenko_SetState(g, 3, 10);
 }
 
 /* TutorialOtenko_BeginAnimationPhaseEleven: Ensures the controller exists and requests mode three phase eleven with playback preservation */
@@ -946,23 +817,12 @@ void TutorialOtenko_BeginAnimationPhaseTen(void)
 void TutorialOtenko_BeginAnimationPhaseEleven(void)
 {
     struct ActorAnimController *g = (struct ActorAnimController *)gScriptedActorController;
-    u32 three = 3;
     if (g == 0) {
         g = (struct ActorAnimController *)TutorialOtenko_EnsureController(0xBB34, 0);
         if (g == 0)
             return;
     }
-    g->oldMode = g->mode;
-    g->mode = three;
-    g->phase = 11;
-    if (g->oldMode == 3 && g->mode == 3) {
-        g->savedFrame = g->anim.index;
-        g->savedTimer = g->anim.elapsed;
-    }
-    {
-        u8 one = 1;
-        g->flags |= one;
-    }
+    TutorialOtenko_SetState(g, 3, 11);
 }
 
 /* TutorialOtenko_BeginCompletionAnimation: Selects mode 3 phase 13 whose handler plays sequence 18 and invokes the completion script */
@@ -971,23 +831,12 @@ void TutorialOtenko_BeginAnimationPhaseEleven(void)
 void TutorialOtenko_BeginCompletionAnimation(void)
 {
     struct ActorAnimController *g = (struct ActorAnimController *)gScriptedActorController;
-    u32 three = 3;
     if (g == 0) {
         g = (struct ActorAnimController *)TutorialOtenko_EnsureController(0xBB34, 0);
         if (g == 0)
             return;
     }
-    g->oldMode = g->mode;
-    g->mode = three;
-    g->phase = 13;
-    if (g->oldMode == 3 && g->mode == 3) {
-        g->savedFrame = g->anim.index;
-        g->savedTimer = g->anim.elapsed;
-    }
-    {
-        u8 one = 1;
-        g->flags |= one;
-    }
+    TutorialOtenko_SetState(g, 3, 13);
 }
 
 /* Script command: configure the singleton animation controller. */
@@ -1032,7 +881,6 @@ void TutorialOtenko_BeginCurveToPosition(void)
 void TutorialOtenko_BeginCurveToRest(void)
 {
     struct ActorAnimController *g = (struct ActorAnimController *)gScriptedActorController;
-    u32 three = 2;
     if (g == 0) {
         g = (struct ActorAnimController *)TutorialOtenko_EnsureController(0xBB34, 0);
         if (g == 0)
@@ -1042,17 +890,7 @@ void TutorialOtenko_BeginCurveToRest(void)
     g->variant8 = Script_GetKeywordValue(0x75, 0);
     g->handle = (void *)Script_GetKeywordValue(0x70, 0);
     TutorialOtenko_ProjectAndClampToScreen(g);
-    g->oldMode = g->mode;
-    g->mode = three;
-    g->phase = 8;
-    if (g->oldMode == 3 && g->mode == 3) {
-        g->savedFrame = g->anim.index;
-        g->savedTimer = g->anim.elapsed;
-    }
-    {
-        u8 one = 1;
-        g->flags |= one;
-    }
+    TutorialOtenko_SetState(g, 2, 8);
 }
 
 /* Script command: configure the singleton animation controller. */
@@ -1106,71 +944,38 @@ void TutorialOtenko_SetFacingAndIdle(void)
 void TutorialOtenko_BeginFadeAnimation(void)
 {
     struct ActorAnimController *g = (struct ActorAnimController *)gScriptedActorController;
-    u32 three = 2;
     if (g == 0) {
         g = (struct ActorAnimController *)TutorialOtenko_EnsureController(0xBB34, 0);
         if (g == 0)
             return;
     }
     g->resource = Script_GetValue();
-    g->oldMode = g->mode;
-    g->mode = three;
-    g->phase = 11;
-    if (g->oldMode == 3 && g->mode == 3) {
-        g->savedFrame = g->anim.index;
-        g->savedTimer = g->anim.elapsed;
-    }
-    {
-        u8 one = 1;
-        g->flags |= one;
-    }
+    TutorialOtenko_SetState(g, 2, 11);
     g->completionHandle = (void *)Script_GetKeywordValue(0x70, 0);
 }
 
 void TutorialOtenko_BeginReverseFadeAnimation(void)
 {
     struct ActorAnimController *g = (struct ActorAnimController *)gScriptedActorController;
-    u32 three = 2;
     if (g == 0) {
         g = (struct ActorAnimController *)TutorialOtenko_EnsureController(0xBB34, 0);
         if (g == 0)
             return;
     }
     g->resource = Script_GetValue();
-    g->oldMode = g->mode;
-    g->mode = three;
-    g->phase = 12;
-    if (g->oldMode == 3 && g->mode == 3) {
-        g->savedFrame = g->anim.index;
-        g->savedTimer = g->anim.elapsed;
-    }
-    {
-        u8 one = 1;
-        g->flags |= one;
-    }
+    TutorialOtenko_SetState(g, 2, 12);
     g->completionHandle = (void *)Script_GetKeywordValue(0x70, 0);
 }
 
 void TutorialOtenko_BeginHide(void)
 {
     struct ActorAnimController *g = (struct ActorAnimController *)gScriptedActorController;
-    u32 three = 2;
     if (g == 0) {
         g = (struct ActorAnimController *)TutorialOtenko_EnsureController(0xBB34, 0);
         if (g == 0)
             return;
     }
-    g->oldMode = g->mode;
-    g->mode = three;
-    g->phase = 7;
-    if (g->oldMode == 3 && g->mode == 3) {
-        g->savedFrame = g->anim.index;
-        g->savedTimer = g->anim.elapsed;
-    }
-    {
-        u8 one = 1;
-        g->flags |= one;
-    }
+    TutorialOtenko_SetState(g, 2, 7);
 }
 
 /* Script command: configure the singleton animation controller. */
