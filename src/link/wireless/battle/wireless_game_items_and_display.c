@@ -958,17 +958,10 @@ int WirelessGameItems_QueueLocalItem(struct ContactPosition *position, int index
     if (!owner)
         return -1;
     if (amount > 0) {
-        /* Field-derived byte offsets preserve the matched address lifetimes. */
-        int size = sizeof(struct WirelessGameItem);
-        int scaled = index * size;
-        int extra = (u32) & ((struct WirelessGameItems *)0)->items[4];
-        int offset = scaled + extra;
-        target = (struct WirelessGameItem *)((u8 *)owner + offset);
+        target = &owner->items[index + 4];
         if (target->count) {
-            struct WirelessGameItem *current;
-            int offset = scaled + (u32) & ((struct WirelessGameItems *)0)->items;
+            struct WirelessGameItem *current = &owner->items[index];
             int count;
-            current = (struct WirelessGameItem *)((u8 *)owner + offset);
             if (current->state == 4)
                 count = target->count;
             else
@@ -1055,20 +1048,9 @@ int WirelessGameItems_QueueIncomingItem(int indexArg, int amountArg, int pending
     if (amount <= 0)
         return 0;
     {
-        /* Field-derived byte offsets preserve the matched address lifetimes. */
-        int size = sizeof(struct WirelessGameItem);
-        int scaled;
-        int extra;
-        int offset;
-        scaled = index * size;
-        extra = (u32) & ((struct WirelessGameItems *)0)->items[12];
-        offset = scaled + extra;
-        target = (struct WirelessGameItem *)((u8 *)owner + offset);
+        target = &owner->items[index + 12];
         if (target->count) {
-            struct WirelessGameItem *current;
-            extra = (u32) & ((struct WirelessGameItems *)0)->items[8];
-            offset = scaled + extra;
-            current = (struct WirelessGameItem *)((u8 *)owner + offset);
+            struct WirelessGameItem *current = &owner->items[index + 8];
             if (target->pendingFlag) {
                 int total = owner->pending[index];
                 total += target->count;
