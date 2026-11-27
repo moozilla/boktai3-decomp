@@ -2,12 +2,7 @@
 #include "engine/ram.h"
 #include "ui/dialogue/text_state.h"
 #include "ui/dialogue/text_window.h"
-struct WindowManager {
-    u8 pad0[0x14];
-    void *script;
-    s32 nextId;
-    struct TextWindow *head;
-};
+#include "ui/dialogue/text_window_manager.h"
 void *Heap_Alloc(int);
 void Memory_Clear(void *, int);
 void Heap_Free(void *);
