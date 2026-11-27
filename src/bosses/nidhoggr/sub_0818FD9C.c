@@ -1,5 +1,5 @@
 #include "player/player_slot_status.h"
-#include "bosses/nidhoggr/scene_pause.h"
+#include "engine/engine_pause.h"
 #include "global.h"
 #include "engine/ram.h"
 #include "engine/engine_globals.h"
@@ -49,7 +49,7 @@ void Nidhoggr_CreateAttachedAttackEffect(u8 *owner, struct NidhoggrEffectVector 
     struct NidhoggrAttachedEffect *effect;
     u8 *animation;
     u8 *collider;
-    if (Scene_TestPauseFlags(0x400))
+    if (Engine_PauseBits(0x400))
         return;
     if (PlayerSlot_ReadStatus(0, 4))
         return;

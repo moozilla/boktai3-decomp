@@ -1,4 +1,4 @@
-#include "global.h"
+#include "bosses/sabata/sabata_actor_state.h"
 u8 *Task_Create(u32, u32);
 s32 Script_GetKeywordValue(u32, u32);
 u8 *SceneActors_GetBySlot(u32);
@@ -13,7 +13,7 @@ u8 *Sabata_CreateFromScript(u32 a)
     p = SceneActors_GetBySlot(Script_GetKeywordValue(0x74, 2));
     if (p != 0)
         return p;
-    p = Task_Create(9, 0xC68);
+    p = Task_Create(9, sizeof(struct SabataActorState));
     if (p != 0) {
         Task_SetCallbacks(p, SceneActor_UpdateUnlessPaused, SceneActor_DestroyComponents);
         if (sub_0817FDE0(p, a) < 0) {

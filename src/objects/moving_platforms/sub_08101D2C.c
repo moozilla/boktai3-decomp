@@ -28,7 +28,7 @@ void MovingPlatform_UpdateTerrainRegistration(struct NamedObject *object)
     s32 cell;
     if ((u16)(object->state - 3) > 1) {
         if (NamedObjectFlags_Has(1, &object->flags)) {
-            TerrainModifiers_UnregisterCell(object->registration);
+            TerrainModifiers_UnregisterCell(&object->registration);
             MovingPlatform_DisableFlags(1, object);
         }
     } else {
@@ -40,7 +40,7 @@ void MovingPlatform_UpdateTerrainRegistration(struct NamedObject *object)
         if (object->body.position.y != gPlayers[0]->position.y)
             return;
         cell = GetCell(&object->body.position, map);
-        TerrainModifiers_RegisterCell(object->registration, cell, 0, object->body.position.y >> 8,
+        TerrainModifiers_RegisterCell(&object->registration, cell, 0, object->body.position.y >> 8,
                                       0xFF, 4);
         SetFlag((u16 *)&object->flags, 1);
     }

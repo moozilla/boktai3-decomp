@@ -1,23 +1,11 @@
-#include "player/cutscene/player_cue_sequence.h"
-struct TaskSequenceConfig {
-    u16 flags, duration;
-};
-struct Actor {
-    u32 tick, flags;
-    u8 pad8[0x10];
-    struct TaskSequenceConfig config;
-    u8 pad1c[0x8c - 0x1c];
-    struct ContactSwarmSprite render;
-    u8 unknownB8[0x180 - 0xB8];
-    struct DisplaySequenceState frames;
-};
-s32 ProjectileTask_StepTimedSequence(struct Actor *p)
+#include "effects/projectiles/projectile_task.h"
+s32 ProjectileTask_StepTimedSequence(struct Task4E01Projectile *p)
 {
-    struct TaskSequenceConfig *config = &p->config;
+    struct Task4E01Params *config = &p->params;
     u32 bit = 2;
     p->flags |= bit;
-    PlayerCue_StepSequence(&p->render, &p->frames);
-    if (p->tick >= config->duration)
+    PlayerCue_StepSequence(&p->sprite, &p->runtime.sequence);
+    if (p->frame >= config->lifetime)
         return 2;
     return 0;
 }

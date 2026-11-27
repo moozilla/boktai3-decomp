@@ -1,43 +1,24 @@
-#include "global.h"
-struct TimedSpriteConfig {
-    u16 flags;
-    u16 duration;
-};
-struct TimedSpriteSprite {
-    u32 flags;
-    u8 unknown4[0xC];
-    u16 frame;
-};
-struct TimedSprite {
-    u32 tick;
-    u32 flags;
-    u8 unknown8[0x10];
-    struct TimedSpriteConfig config;
-    u8 unknown1C[0x8C - 0x1C];
-    struct TimedSpriteSprite sprite;
-    u8 unknownA0[0x1A4 - 0xA0];
-    s16 timer;
-};
-s32 ProjectileTask_UpdateTimedSprite(struct TimedSprite *p)
+#include "effects/projectiles/projectile_task.h"
+s32 ProjectileTask_UpdateTimedSprite(struct Task4E01Projectile *p)
 {
-    struct TimedSpriteConfig *config = &p->config;
-    struct TimedSpriteSprite *sprite = &p->sprite;
+    struct Task4E01Params *config = &p->params;
+    struct ContactSwarmSprite *sprite = &p->sprite;
     s32 t;
     sprite->flags &= ~1;
-    if (p->tick & 1) {
-        t = p->timer;
+    if (p->frame & 1) {
+        t = p->runtime.trailFrame;
         sprite->frame = t + 0x19;
-    } else if (p->timer == 0) {
+    } else if (p->runtime.trailFrame == 0) {
         sprite->flags |= 1;
     } else {
-        t = p->timer;
+        t = p->runtime.trailFrame;
         sprite->frame = t + 0x18;
     }
     {
         u32 two = 2;
         p->flags |= two;
     }
-    if (p->tick >= config->duration)
+    if (p->frame >= config->lifetime)
         return 2;
     return 0;
 }

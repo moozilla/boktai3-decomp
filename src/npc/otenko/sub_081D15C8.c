@@ -1,21 +1,14 @@
-#include "global.h"
+#include "npc/otenko/scene_npc_transition.h"
 
-struct E {
-    u8 pad[0x30];
-};
-struct S {
-    u8 pad[0x7c];
-    struct E e[8];
-};
 void Sprite_Remove(u8 *);
-void Effect_Remove(struct E *);
+void Effect_Remove(struct TransitionParticle *);
 
-s32 Otenko_OnTransitionEffectDestroy(struct S *p)
+s32 Otenko_OnTransitionEffectDestroy(struct TransitionEffect *effect)
 {
-    struct E *e;
+    struct TransitionParticle *e;
     s32 i;
-    Sprite_Remove((u8 *)p + 0x18);
-    e = p->e;
+    Sprite_Remove((u8 *)&effect->sprite);
+    e = effect->particles;
     for (i = 7; i >= 0; i--) {
         Effect_Remove(e);
         e++;

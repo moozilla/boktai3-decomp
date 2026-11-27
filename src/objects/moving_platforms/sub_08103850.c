@@ -5,7 +5,7 @@
 #include "engine/ram.h"
 #include "engine/engine_pause.h"
 #include "objects/moving_platforms/named_object.h"
-extern s32 gUnk_02000560;
+#include "player/player.h"
 extern void *gUnk_086064CC[];
 void MovingPlatform_RegisterFollowCells(struct NamedObject *);
 void MovingPlatform_UpdateFollowers(struct NamedObject *);
@@ -21,7 +21,7 @@ static inline u8 isActive(u32 mask, u32 bit)
 static inline u32 testMask(void)
 {
     s16 mask = 4;
-    return gUnk_02000560 & mask;
+    return gPlayerSlotStatus[0] & mask;
 }
 u32 MovingPlatform_UpdatePool(struct NamedObjectManager *manager)
 {

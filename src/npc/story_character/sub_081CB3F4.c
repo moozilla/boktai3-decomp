@@ -1,7 +1,6 @@
-#include "global.h"
+#include "npc/story_character/scene_character.h"
 
-void Actor_PlayAnimationEntry(void *, u32, u32, u32, u32);
-s32 DisplayAnimation_TestFinished(void *);
+s32 DisplayAnimation_TestFinished(struct DisplayAnimation *);
 u8 *TimedSpriteEffect_Create(u8 *pos, u32 flag, s32 duration, s32 arg3, s32 arg4, s32 arg5,
                              s32 arg6, s32 arg7, u32 arg8);
 
@@ -9,13 +8,13 @@ struct VecCB3F4 {
     s16 x, y, z, pad;
 };
 
-void StoryCharacter_UpdateKind29AttackEffect(u32 a, u8 *b, u32 c)
+void StoryCharacter_UpdateKind29AttackEffect(u32 a, struct SceneNpc *actor, u32 c)
 {
     u32 anim;
-    if (b[9]) {
-        b[9] = 0;
-        b[7] = 0;
-        switch (b[1]) {
+    if (actor->animationEntered) {
+        actor->animationEntered = 0;
+        actor->done = 0;
+        switch (actor->kind) {
             case 4:
             case 5:
             case 6:
@@ -52,17 +51,14 @@ void StoryCharacter_UpdateKind29AttackEffect(u32 a, u8 *b, u32 c)
                 anim = 0;
                 break;
         }
-        Actor_PlayAnimationEntry(b, anim, 2, 1, 4);
-        {
-            u32 zero = 0;
-            b[0x18] = zero;
-            *(u32 *)(b + 0x10) = zero;
-        }
+        Actor_PlayAnimationEntry(actor, anim, 2, 1, 4);
+        actor->animationPhase = 0;
+        actor->stateFrame = 0;
     }
-    switch (b[0x18]) {
+    switch (actor->animationPhase) {
         case 0:
-            if (*(u32 *)(b + 0x10) > 0x3c) {
-                switch (b[1]) {
+            if (actor->stateFrame > 0x3c) {
+                switch (actor->kind) {
                     case 4:
                     case 5:
                     case 6:
@@ -99,16 +95,16 @@ void StoryCharacter_UpdateKind29AttackEffect(u32 a, u8 *b, u32 c)
                         anim = 0;
                         break;
                 }
-                Actor_PlayAnimationEntry(b, anim, 2, 1, 4);
-                b[0x18]++;
+                Actor_PlayAnimationEntry(actor, anim, 2, 1, 4);
+                actor->animationPhase++;
             }
             break;
         case 1:
-            if (DisplayAnimation_TestFinished(b + 0xd4)) {
-                s16 *p = (s16 *)(b + 0x68);
-                s32 x = *p++;
-                s32 y = *p++;
-                s32 z = *p;
+            if (DisplayAnimation_TestFinished(&actor->display)) {
+                const s16 *coords = (const s16 *)&actor->body.position;
+                s32 x = *coords++;
+                s32 y = *coords++;
+                s32 z = *coords;
                 struct VecCB3F4 v;
                 s16 *q = (s16 *)&v;
                 s32 vx = x - 0x20;
@@ -118,11 +114,11 @@ void StoryCharacter_UpdateKind29AttackEffect(u32 a, u8 *b, u32 c)
                 q[1] = vy;
                 q[2] = vz;
                 TimedSpriteEffect_Create((u8 *)&v, 0xa0, 0x20, 1, 6, 0, 0, 0, 0);
-                b[0x18]++;
+                actor->animationPhase++;
             }
             break;
         case 2:
-            b[7] = 1;
+            actor->done = 1;
             break;
     }
 }

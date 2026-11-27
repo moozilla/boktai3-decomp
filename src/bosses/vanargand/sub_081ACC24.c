@@ -89,9 +89,10 @@ s32 Vanargand_ApplyPendingDamage(struct VanargandPairAttack *p)
     if (partDamage > 0 || partSpecial) {
         s16 pos[4];
         p->health -= partDamage;
-        setPosition(pos, self->part.position.x + 64, self->part.position.y,
-                    self->part.position.z + 64);
-        DamageNumberDisplay_ShowWithDefaultScale(&self->part.damageSource, partDamage, 0, pos, 1);
+        setPosition(pos, self->part.sprite.position.x + 64, self->part.sprite.position.y,
+                    self->part.sprite.position.z + 64);
+        DamageNumberDisplay_ShowWithDefaultScale((struct DamageNumberSource *)&self->part.collider,
+                                                partDamage, 0, pos, 1);
         if (p->health <= 0) {
             VanargandPairAttack_SetFlags(p, 2);
         } else if (self->part.flags & 4) {

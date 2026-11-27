@@ -1,30 +1,16 @@
-#include "global.h"
+#include "npc/otenko/otenko_actor.h"
 #include "engine/engine.h"
 #include "engine/ram.h"
-struct SceneNpc {
-    u8 pad0[2];
-    u8 field2, field3, mode;
-    u8 pad5;
-    u8 state;
-    u8 pad7;
-    u8 field8, field9;
-    u8 padA[6];
-    u32 field10, field14;
-    u8 field18;
-    u8 pad19[0xBB];
-    u8 blockD4[0x1F8];
-    void *update;
-};
-struct SceneNpc *Actor_FindById(void *manager, s32 name);
+struct OtenkoActor *Actor_FindById(void *manager, s32 name);
 void DisplayAnimation_SetFlags(void *, s32);
-void Actor_DisableShadow(struct SceneNpc *);
+void Actor_DisableShadow(struct OtenkoActor *);
 void Otenko_UpdateStopped(void);
 /* Registry routine 6CBE: puts scene NPC -n (default: the last created) into
    mode 0x11, state 15 (update Otenko_UpdateStopped) and resets its animation
    (tentative: stop and stand). */
 void Otenko_StopFromScript(void)
 {
-    struct SceneNpc *npc;
+    struct OtenkoActor *npc;
     u8 mode;
     void (*update)(void);
     if (!gSceneNpc)
@@ -37,19 +23,19 @@ void Otenko_StopFromScript(void)
         if (!npc)
             return;
     } else
-        npc = gSceneNpc;
+        npc = (struct OtenkoActor *)gSceneNpc;
     mode = 0x11;
-    npc->field2 = 0;
-    npc->field3 = 0;
-    npc->mode = mode;
-    npc->field14 = 0;
-    npc->field8 = 1;
+    npc->stage = 0;
+    npc->stageEntered = 0;
+    npc->state = mode;
+    npc->timer = 0;
+    npc->commandEntered = 1;
     update = Otenko_UpdateStopped;
-    npc->state = 15;
-    npc->update = update;
-    npc->field10 = 0;
-    npc->field9 = 1;
-    npc->field18 = 0;
-    DisplayAnimation_SetFlags(npc->blockD4, 1);
+    npc->prevState = 15;
+    npc->stateCallback = update;
+    npc->stateFrame = 0;
+    npc->animationEntered = 1;
+    npc->animationPhase = 0;
+    DisplayAnimation_SetFlags(&npc->display, 1);
     Actor_DisableShadow(npc);
 }

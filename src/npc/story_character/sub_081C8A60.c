@@ -1,27 +1,12 @@
-#include "global.h"
-struct S {
-    u8 f0[1];
-    u8 b1;
-    u8 f2[5];
-    u8 b7;
-    u8 b8;
-    u8 b9;
-    u8 f3[4];
-    u32 w10;
-    u8 f5[4];
-    u8 b18;
-    u8 f6[0xd4 - 0x19];
-    u8 d4[1];
-};
-void Actor_PlayAnimationEntry(void *, u32, u32, u32, u32);
-s32 DisplayAnimation_TestFinished(void *);
-void StoryCharacter_RunApproachAndFinishSequence(u32 a, struct S *p, s32 a2)
+#include "npc/manager/scene_actor_lifecycle.h"
+s32 DisplayAnimation_TestFinished(struct DisplayAnimation *);
+void StoryCharacter_RunApproachAndFinishSequence(u32 a, struct SceneActor *p, s32 a2)
 {
-    if (p->b9 != 0) {
+    if (p->animationEntered != 0) {
         s32 animId;
-        p->b9 = 0;
-        p->b7 = 0;
-        switch (p->b1) {
+        p->animationEntered = 0;
+        p->finished = 0;
+        switch (p->variant) {
             case 4:
                 animId = 0;
                 break;
@@ -105,14 +90,14 @@ void StoryCharacter_RunApproachAndFinishSequence(u32 a, struct S *p, s32 a2)
                 break;
         }
         Actor_PlayAnimationEntry(p, animId, 2, 0, 4);
-        p->b18 = 0;
-        p->w10 = 0;
+        p->animationPhase = 0;
+        p->stateFrame = 0;
     }
-    switch (p->b18) {
+    switch (p->animationPhase) {
         case 0:
-            if (DisplayAnimation_TestFinished(p->d4) != 0) {
+            if (DisplayAnimation_TestFinished(&p->drawable.common) != 0) {
                 s32 animId;
-                switch (p->b1) {
+                switch (p->variant) {
                     case 4:
                         animId = 0;
                         break;
@@ -196,14 +181,14 @@ void StoryCharacter_RunApproachAndFinishSequence(u32 a, struct S *p, s32 a2)
                         break;
                 }
                 Actor_PlayAnimationEntry(p, animId, 2, 0, 4);
-                p->b18++;
-                p->w10 = 0;
+                p->animationPhase++;
+                p->stateFrame = 0;
             }
             break;
         case 1:
             if (a2 > 0xa) {
                 s32 animId;
-                switch (p->b1) {
+                switch (p->variant) {
                     case 4:
                         animId = 0;
                         break;
@@ -287,12 +272,12 @@ void StoryCharacter_RunApproachAndFinishSequence(u32 a, struct S *p, s32 a2)
                         break;
                 }
                 Actor_PlayAnimationEntry(p, animId, 2, 0, 4);
-                p->b18++;
+                p->animationPhase++;
             }
             break;
         case 2:
-            if (DisplayAnimation_TestFinished(p->d4) != 0) {
-                p->b7 = 1;
+            if (DisplayAnimation_TestFinished(&p->drawable.common) != 0) {
+                p->finished = 1;
             }
             break;
     }

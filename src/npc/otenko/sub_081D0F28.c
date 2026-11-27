@@ -1,41 +1,15 @@
-#include "global.h"
+#include "npc/otenko/otenko_actor.h"
 #include "engine/engine.h"
 #include "player/player.h"
 #include "engine/ram.h"
-struct Motion {
-    u8 pad0[9];
-    u8 angle;
-    u8 padA[2];
-    s16 x, y, z;
-    u8 pad12[0x66];
-};
-struct SceneNpc {
-    u8 pad0[2];
-    u8 field2, field3, mode;
-    u8 pad5;
-    u8 state;
-    u8 pad7;
-    u8 field8, field9;
-    u8 padA[2];
-    u16 flagsC;
-    u8 padE[2];
-    u32 field10, field14;
-    u8 field18, facing4, facing8, angle;
-    u8 pad1C[0x40];
-    struct Motion motion;
-    u8 padD4[0x1F8];
-    void *update;
-};
-struct SceneNpc *Actor_FindById(void *manager, s32 name);
+struct OtenkoActor *Actor_FindById(void *manager, s32 name);
 s32 Math_Atan2(s32 dx, s32 dz);
 void sub_081CEE50(void);
-/* Sets the motion angle and the derived 8- and 4-way facings. The facing math
-   needs register pins and an empty asm barrier (register-pinning concession):
-   agbcc otherwise ties the AND result to the shift instead of the constant. */
-static inline void setAngle(struct SceneNpc *npc, s32 angle)
+/* Set the motion angle and its directional animation rows. */
+static inline void setAngle(struct OtenkoActor *npc, s32 angle)
 {
     u16 a;
-    npc->motion.angle = angle;
+    npc->body.direction = angle;
     a = angle;
     {
         s32 t;
@@ -54,14 +28,14 @@ static inline void setAngle(struct SceneNpc *npc, s32 angle)
         m &= t;
         npc->facing4 = m;
     }
-    npc->angle = npc->motion.angle;
+    npc->targetAngle = npc->body.direction;
 }
 /* Registry routine 8918: puts scene NPC -n (default: the last one created,
    gSceneNpc) into the scripted state (mode 0x10, state 14, update
    sub_081CEE50), then -p x y z, -d angle, -w face the player, -s sets flag 1. */
 void Otenko_CommandFromScript(void)
 {
-    struct SceneNpc *npc;
+    struct OtenkoActor *npc;
     u8 mode;
     void (*update)(void);
     if (!gSceneNpc)
@@ -74,31 +48,31 @@ void Otenko_CommandFromScript(void)
         if (!npc)
             return;
     } else
-        npc = gSceneNpc;
+        npc = (struct OtenkoActor *)gSceneNpc;
     mode = 0x10;
-    npc->field2 = 0;
-    npc->field3 = 0;
-    npc->mode = mode;
-    npc->field14 = 0;
-    npc->field8 = 1;
+    npc->stage = 0;
+    npc->stageEntered = 0;
+    npc->state = mode;
+    npc->timer = 0;
+    npc->commandEntered = 1;
     update = sub_081CEE50;
-    npc->state = 14;
-    npc->update = update;
-    npc->field10 = 0;
-    npc->field9 = 1;
-    npc->field18 = 0;
+    npc->prevState = 14;
+    npc->stateCallback = update;
+    npc->stateFrame = 0;
+    npc->animationEntered = 1;
+    npc->animationPhase = 0;
     if (Script_SeekToKeyword('p')) {
-        npc->motion.x = Script_GetValue();
-        npc->motion.y = Script_GetValue();
-        npc->motion.z = Script_GetValue();
+        npc->body.position.x = Script_GetValue();
+        npc->body.position.y = Script_GetValue();
+        npc->body.position.z = Script_GetValue();
     }
     if (Script_SeekToKeyword('d'))
         setAngle(npc, Script_GetValue());
     if (Script_GetKeywordValue('w', 0) > 0) {
         struct Player *player = gPlayers[0];
-        s16 *pos = &npc->motion.x;
+        s16 *pos = &npc->body.position.x;
         setAngle(npc, Math_Atan2(player->position.x - pos[0], player->position.z - pos[2]));
     }
     if (Script_GetKeywordValue('s', 0) > 0)
-        npc->flagsC |= 1;
+        npc->commandFlags |= 1;
 }

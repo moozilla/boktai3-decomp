@@ -1,4 +1,4 @@
-#include "global.h"
+#include "npc/story_character/scene_character.h"
 #include "engine/engine.h"
 #include "engine/ram.h"
 #include "engine/task_manager.h"
@@ -7,66 +7,6 @@ struct PackedVec {
     u32 y : 16;
     u32 z : 16;
     u32 pad : 16;
-};
-struct CharacterExtra {
-    u32 handle;
-    u8 pad4[2];
-    u16 field6;
-    u8 pad8[8];
-    u16 field10, field12;
-    u32 field14, field18;
-};
-struct Motion {
-    u8 pad0[9];
-    u8 angle;
-    u8 padA[0x2A];
-    u16 field34;
-    u16 field36;
-    u16 field38;
-    u8 pad3A[0x3E];
-};
-struct Display {
-    u8 pad0[0x5A];
-    u16 paletteBank;
-    u8 pad5C[0xC];
-    u16 *palette;
-};
-struct SceneNpc {
-    u8 pad0;
-    u8 type;
-    u8 field2;
-    u8 field3;
-    u8 mode;
-    u8 pad5;
-    u8 state;
-    u8 pad7;
-    u8 field8;
-    u8 field9;
-    u8 padA[6];
-    u32 field10;
-    u32 field14;
-    u8 field18;
-    u8 facing4;
-    u8 facing8;
-    u8 pad1B;
-    u16 palette1C, palette1E;
-    struct CharacterExtra extra;
-    u8 pad3C[0x20];
-    struct Motion motion;
-    u32 animMode;
-    u8 padD8[8];
-    struct Display display;
-    u8 pad14C[0x14];
-    u32 field160;
-    u8 pad164[0x68];
-    u8 colors[0x20];
-    u8 pad1EC[7];
-    s8 field1F3;
-    u8 pad1F4[0x27];
-    u8 field21B;
-    u8 pad21C[0xB0];
-    void *update;
-    void *callbacks[6];
 };
 s32 SceneCharacter_GetModelId(s32);
 s32 SceneCharacter_GetPaletteIndex(s32);
@@ -165,24 +105,24 @@ void SceneCharacter_PlaceFromScript(void)
     }
     if (palette >= 0) {
         if (k == 0x19) {
-            CpuSet(gPaletteBankData + palette * 32, npc->colors, 0x04000008);
-            npc->palette1C = palette;
-            npc->palette1E = palette;
+            CpuSet(gPaletteBankData + palette * 32, npc->workPalette, 0x04000008);
+            npc->defaultPaletteBank = palette;
+            npc->paletteBank = palette;
             {
-                struct Display *d = &npc->display;
-                d->palette = (u16 *)npc->colors;
+                struct DisplayAnimationKeyframes *keyframes = &npc->display.resource.keyframes;
+                keyframes->sprite.palette = npc->workPalette;
             }
-            npc->display.paletteBank = palette;
+            npc->display.resource.keyframes.sprite.paletteBank = palette;
         } else {
             Actor_SetDefaultPaletteBank(npc, palette);
         }
     }
     if (k == 0x19) {
-        struct CharacterExtra *x = &npc->extra;
-        x->handle = ParticlePool_Create();
-        x->field12 = 0;
-        x->field10 = colorA;
-        x->field14 = 0x34;
+        struct SceneCharacterEffects *x = &npc->effects;
+        x->particleHandle = ParticlePool_Create();
+        x->fadeCounter = 0;
+        x->fadeMode = colorA;
+        x->bankB = 0x34;
         if (sound == 1) {
             sound = 0x174;
         } else if (sound == 9) {
@@ -190,16 +130,16 @@ void SceneCharacter_PlaceFromScript(void)
         } else {
             sound = 0x34;
         }
-        x->field18 = sound;
+        x->bankA = sound;
     } else if (k == 5) {
-        struct CharacterExtra *x = &npc->extra;
-        x->field6 = 1;
-        x->field12 = 0;
-        x->field10 = 0;
+        struct SceneCharacterEffects *x = &npc->effects;
+        x->tag = 1;
+        x->fadeCounter = 0;
+        x->fadeMode = 0;
     }
-    Actor_InitShadow(npc, npc->field160, 1, 0, 0x40);
+    Actor_InitShadow(npc, (u32)npc->display.position, 1, 0, 0x40);
     SceneCharacter_RegisterMessageReceiver(npc, name);
-    npc->motion.angle = angle;
+    npc->body.direction = angle;
     {
         u16 a = angle;
         {
@@ -233,202 +173,202 @@ void SceneCharacter_PlaceFromScript(void)
     switch (behavior) {
         case 0: {
             u8 one = 1;
-            npc->field2 = 0;
-            npc->field3 = 0;
-            npc->mode = one;
-            npc->field14 = 0;
-            npc->field8 = 1;
+            npc->stage = 0;
+            npc->stageEntered = 0;
+            npc->state = one;
+            npc->timer = 0;
+            npc->commandEntered = 1;
             updates[1] = Actor_OnIdleUpdate;
-            npc->state = 2;
-            npc->update = updates[1];
-            npc->field10 = 0;
-            npc->field9 = 1;
+            npc->prevState = 2;
+            npc->stateCallback = updates[1];
+            npc->stateFrame = 0;
+            npc->animationEntered = 1;
         }
-            npc->field18 = 0;
+            npc->animationPhase = 0;
             break;
         case 1:
-            npc->field2 = 0;
-            npc->field3 = 0;
-            npc->mode = 0;
-            npc->field14 = 0;
-            npc->field8 = 1;
+            npc->stage = 0;
+            npc->stageEntered = 0;
+            npc->state = 0;
+            npc->timer = 0;
+            npc->commandEntered = 1;
             updates[1] = Actor_OnHiddenIdleUpdate;
-            npc->state = 1;
-            npc->update = updates[1];
-            npc->field10 = 0;
-            npc->field9 = 1;
-            npc->field18 = 0;
-            DisplayAnimation_SetFlags(&npc->animMode, 1);
+            npc->prevState = 1;
+            npc->stateCallback = updates[1];
+            npc->stateFrame = 0;
+            npc->animationEntered = 1;
+            npc->animationPhase = 0;
+            DisplayAnimation_SetFlags(&npc->display.kind, 1);
             Actor_DisableShadow(npc);
             break;
         case 2: {
             void (*fn)(void);
-            npc->field21B = 1;
-            if (npc->field1F3 >= 0) {
+            npc->controlled = 1;
+            if (npc->routeId >= 0) {
                 mode = SceneCharacter_GetPathNodeState(npc);
-                npc->field2 = 0;
-                npc->field3 = 0;
-                npc->mode = mode;
-                npc->field14 = 0;
-                npc->field8 = 1;
+                npc->stage = 0;
+                npc->stageEntered = 0;
+                npc->state = mode;
+                npc->timer = 0;
+                npc->commandEntered = 1;
                 fn = Actor_OnIdleUpdate;
-                npc->state = 2;
-                npc->update = fn;
-                npc->field10 = 0;
-                npc->field9 = 1;
-                npc->field18 = 0;
+                npc->prevState = 2;
+                npc->stateCallback = fn;
+                npc->stateFrame = 0;
+                npc->animationEntered = 1;
+                npc->animationPhase = 0;
             } else {
                 mode = 6;
-                npc->field2 = 0;
-                npc->field3 = 0;
-                npc->mode = mode;
-                npc->field14 = 0;
-                npc->field8 = 1;
+                npc->stage = 0;
+                npc->stageEntered = 0;
+                npc->state = mode;
+                npc->timer = 0;
+                npc->commandEntered = 1;
                 fn = Actor_OnConfiguredAnimationUpdate;
-                npc->state = 7;
-                npc->update = fn;
-                npc->field10 = 0;
-                npc->field9 = 1;
-                npc->field18 = 0;
+                npc->prevState = 7;
+                npc->stateCallback = fn;
+                npc->stateFrame = 0;
+                npc->animationEntered = 1;
+                npc->animationPhase = 0;
             }
             break;
         }
         case 4:
             mode = 6;
-            npc->field2 = 0;
-            npc->field3 = 0;
-            npc->mode = mode;
-            npc->field14 = 0;
-            npc->field8 = 1;
+            npc->stage = 0;
+            npc->stageEntered = 0;
+            npc->state = mode;
+            npc->timer = 0;
+            npc->commandEntered = 1;
             updates[0] = Actor_OnConfiguredAnimationUpdate;
-            npc->state = 7;
-            npc->update = updates[0];
-            npc->field10 = 0;
-            npc->field9 = 1;
-            npc->field18 = 0;
+            npc->prevState = 7;
+            npc->stateCallback = updates[0];
+            npc->stateFrame = 0;
+            npc->animationEntered = 1;
+            npc->animationPhase = 0;
             break;
         case 6:
-            if (npc->type == 0x1D) {
-                struct Motion *motion;
-                npc->extra.field6 = 1;
-                motion = &npc->motion;
+            if (npc->kind == 0x1D) {
+                struct SceneActorBody *body;
+                npc->effects.tag = 1;
+                body = &npc->body;
                 {
                     s32 speed = 0x210;
-                    motion->field34 = 0;
-                    motion->field36 = speed;
-                    motion->field38 = 0;
+                    body->positionOffset.x = 0;
+                    body->positionOffset.y = speed;
+                    body->positionOffset.z = 0;
                 }
                 mode = 0x62;
-                npc->field2 = 0;
-                npc->field3 = 0;
-                npc->mode = mode;
-                npc->field14 = 0;
-                npc->field8 = 1;
+                npc->stage = 0;
+                npc->stageEntered = 0;
+                npc->state = mode;
+                npc->timer = 0;
+                npc->commandEntered = 1;
                 updates[1] = StoryCharacter_UpdateTargetTurn;
-                npc->state = 0x5E;
-                npc->update = updates[1];
-                npc->field10 = 0;
-                npc->field9 = 1;
-                npc->field18 = 0;
+                npc->prevState = 0x5E;
+                npc->stateCallback = updates[1];
+                npc->stateFrame = 0;
+                npc->animationEntered = 1;
+                npc->animationPhase = 0;
             } else {
                 mode = 6;
-                npc->field2 = 0;
-                npc->field3 = 0;
-                npc->mode = mode;
-                npc->field14 = 0;
-                npc->field8 = 1;
+                npc->stage = 0;
+                npc->stageEntered = 0;
+                npc->state = mode;
+                npc->timer = 0;
+                npc->commandEntered = 1;
                 updates[0] = Actor_OnConfiguredAnimationUpdate;
-                npc->state = 7;
-                npc->update = updates[0];
-                npc->field10 = 0;
-                npc->field9 = 1;
-                npc->field18 = 0;
+                npc->prevState = 7;
+                npc->stateCallback = updates[0];
+                npc->stateFrame = 0;
+                npc->animationEntered = 1;
+                npc->animationPhase = 0;
             }
             break;
         case 5:
             mode = 0x12;
-            npc->field2 = 0;
-            npc->field3 = 0;
-            npc->mode = mode;
-            npc->field14 = 0;
-            npc->field8 = 1;
+            npc->stage = 0;
+            npc->stageEntered = 0;
+            npc->state = mode;
+            npc->timer = 0;
+            npc->commandEntered = 1;
             updates[0] = StoryCharacter_SimpleStep;
-            npc->state = 0xF;
-            npc->update = updates[0];
-            npc->field10 = 0;
-            npc->field9 = 1;
-            npc->field18 = 0;
+            npc->prevState = 0xF;
+            npc->stateCallback = updates[0];
+            npc->stateFrame = 0;
+            npc->animationEntered = 1;
+            npc->animationPhase = 0;
             break;
         case 7:
-            if (npc->type == 0x1D) {
-                struct Motion *motion;
-                npc->extra.field6 = 1;
-                motion = &npc->motion;
+            if (npc->kind == 0x1D) {
+                struct SceneActorBody *body;
+                npc->effects.tag = 1;
+                body = &npc->body;
                 {
                     s32 speed = 0x210;
-                    motion->field34 = 0;
-                    motion->field36 = speed;
-                    motion->field38 = 0;
+                    body->positionOffset.x = 0;
+                    body->positionOffset.y = speed;
+                    body->positionOffset.z = 0;
                 }
                 mode = 0x61;
-                npc->field2 = 0;
-                npc->field3 = 0;
-                npc->mode = mode;
-                npc->field14 = 0;
-                npc->field8 = 1;
+                npc->stage = 0;
+                npc->stageEntered = 0;
+                npc->state = mode;
+                npc->timer = 0;
+                npc->commandEntered = 1;
                 updates[1] = StoryCharacter_StartAnimStep;
-                npc->state = 0x5D;
-                npc->update = updates[1];
-                npc->field10 = 0;
-                npc->field9 = 1;
-                npc->field18 = 0;
+                npc->prevState = 0x5D;
+                npc->stateCallback = updates[1];
+                npc->stateFrame = 0;
+                npc->animationEntered = 1;
+                npc->animationPhase = 0;
             } else {
                 mode = 0x12;
-                npc->field2 = 0;
-                npc->field3 = 0;
-                npc->mode = mode;
-                npc->field14 = 0;
-                npc->field8 = 1;
+                npc->stage = 0;
+                npc->stageEntered = 0;
+                npc->state = mode;
+                npc->timer = 0;
+                npc->commandEntered = 1;
                 updates[0] = StoryCharacter_SimpleStep;
-                npc->state = 0xF;
-                npc->update = updates[0];
-                npc->field10 = 0;
-                npc->field9 = 1;
-                npc->field18 = 0;
+                npc->prevState = 0xF;
+                npc->stateCallback = updates[0];
+                npc->stateFrame = 0;
+                npc->animationEntered = 1;
+                npc->animationPhase = 0;
             }
             break;
         case 8:
-            if (npc->type == 5) {
+            if (npc->kind == 5) {
                 mode = 0x2A;
-                npc->field2 = 0;
-                npc->field3 = 0;
-                npc->mode = mode;
-                npc->field14 = 0;
-                npc->field8 = 1;
+                npc->stage = 0;
+                npc->stageEntered = 0;
+                npc->state = mode;
+                npc->timer = 0;
+                npc->commandEntered = 1;
                 updates[0] = StoryCharacter_StartKind5Animation9AndAttach;
-                npc->state = 0x28;
-                npc->update = updates[0];
-                npc->field10 = 0;
-                npc->field9 = 1;
-                npc->field18 = 0;
-            } else if (npc->type == 0x1B) {
+                npc->prevState = 0x28;
+                npc->stateCallback = updates[0];
+                npc->stateFrame = 0;
+                npc->animationEntered = 1;
+                npc->animationPhase = 0;
+            } else if (npc->kind == 0x1B) {
                 mode = 0x4E;
-                npc->field2 = 0;
-                npc->field3 = 0;
-                npc->mode = mode;
-                npc->field14 = 0;
-                npc->field8 = 1;
+                npc->stage = 0;
+                npc->stageEntered = 0;
+                npc->state = mode;
+                npc->timer = 0;
+                npc->commandEntered = 1;
                 updates[0] = StoryCharacter_StartAndMaybeFinishAnim;
-                npc->state = 0x4A;
-                npc->update = updates[0];
-                npc->field10 = 0;
-                npc->field9 = 1;
-                npc->field18 = 0;
+                npc->prevState = 0x4A;
+                npc->stateCallback = updates[0];
+                npc->stateFrame = 0;
+                npc->animationEntered = 1;
+                npc->animationPhase = 0;
             }
             break;
     }
 
-    if (npc->animMode == 1) {
+    if (npc->display.kind == 1) {
         Actor_PlayAnimationEntry(npc, 0, 0, 0, 0);
     }
     SceneNpc_SetKindMotionVector(npc, kind);

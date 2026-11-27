@@ -1,6 +1,6 @@
 #include "bosses/nidhoggr/nidhoggr_effect_pool.h"
 #include "player/player_slot_status.h"
-#include "bosses/nidhoggr/scene_pause.h"
+#include "engine/engine_pause.h"
 
 void NidhoggrEffect_UpdatePool(struct NidhoggrEffectPool *);
 
@@ -188,7 +188,7 @@ void Nidhoggr_CreateOwnedSeekingEffect(struct NidhoggrEffect *owner,
     u8 *animation, *collider, *shadow;
     struct ContactPosition *position;
     void (*callback)(void *);
-    if (Scene_TestPauseFlags(0x400))
+    if (Engine_PauseBits(0x400))
         return;
     if (PlayerSlot_ReadStatus(0, 4))
         return;

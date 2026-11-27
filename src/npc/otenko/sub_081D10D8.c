@@ -1,41 +1,41 @@
-#include "global.h"
+#include "npc/otenko/otenko_actor.h"
 #include "engine/ram.h"
 s32 Script_SeekToKeyword(s32);
 s32 Script_GetKeywordValue(s32, s32);
-u8 *Actor_FindById(void *, s32);
+struct OtenkoActor *Actor_FindById(void *, s32);
 void Otenko_FollowSceneTarget(void);
 void Otenko_SetBehaviorTwoFromScript(void)
 {
-    u8 *p;
+    struct OtenkoActor *p;
     if (!gSceneNpc)
         return;
     if (Script_SeekToKeyword(0x6e)) {
-        p = gSceneActorListManager;
-        if (!p)
+        void *manager = gSceneActorListManager;
+        if (!manager)
             return;
-        p = Actor_FindById(p, Script_GetKeywordValue(0x6e, 0));
+        p = Actor_FindById(manager, Script_GetKeywordValue(0x6e, 0));
         if (!p)
             return;
     } else
         p = gSceneNpc;
     {
-        u8 *q = p + 0x21b;
+        u8 *q = &p->controlled;
         s32 zero = 0, one = 1;
         void (*f)(void);
-        *q = one;
+        *q = 1;
         {
             s32 kind = 0x12;
-            p[2] = zero;
-            p[3] = zero;
-            p[4] = kind;
+            p->stage = 0;
+            p->stageEntered = 0;
+            p->state = kind;
         }
-        *(u32 *)(p + 0x14) = zero;
-        p[8] = one;
+        p->timer = 0;
+        p->commandEntered = 1;
         f = Otenko_FollowSceneTarget;
-        p[6] = 0x10;
-        *(void (**)(void))(p + 0x2cc) = f;
-        *(u32 *)(p + 0x10) = zero;
-        p[9] = one;
-        p[0x18] = zero;
+        p->prevState = 0x10;
+        p->stateCallback = f;
+        p->stateFrame = 0;
+        p->animationEntered = one;
+        p->animationPhase = zero;
     }
 }

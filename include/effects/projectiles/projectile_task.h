@@ -21,7 +21,7 @@ struct Task4E01Runtime {
     s32 elapsed, unknown16C, height;
     struct ContactPosition previousPosition;
     s16 turn;
-    u16 unknown17E;
+    s16 arcStartHeight;
     struct DisplaySequenceState sequence;
     u32 restarted, animation;
     u8 unknown198[4];

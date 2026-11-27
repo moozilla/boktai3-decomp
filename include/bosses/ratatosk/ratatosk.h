@@ -62,7 +62,8 @@ struct Ratatosk {
     struct ContactPosition targetPosition; /* 0xD0 */
     u8 unknownD8[0xE2 - 0xD8];
     u8 healthRatio;
-    u8 unknownE3[5];
+    u8 unknownE3;
+    u32 presentationFrames;
     u32 firstEventScript, secondEventScript; /* 0xE8 */
     u8 unknownF0[0x100 - 0xF0];
     void (*actionCallback)(void);

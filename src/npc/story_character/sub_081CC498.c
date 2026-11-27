@@ -1,14 +1,12 @@
-#include "global.h"
-void Actor_PlayAnimationEntry(u8 *, u32, u32, u32, u32);
-void SceneCharacter_StartAnimationThree(u8 *a, u8 *b)
+#include "npc/story_character/state_actor.h"
+void SceneCharacter_StartAnimationThree(void *context, struct StateActor *actor)
 {
-    if (b[9]) {
-        u32 z = 0;
-        b[9] = z;
-        b[7] = z;
-        Actor_PlayAnimationEntry(b, 3, 1, 0, 4);
-        b[0x18] = z;
-        *(u32 *)(b + 0x10) = z;
-        b[7] = 1;
+    if (actor->enter) {
+        actor->enter = 0;
+        actor->done = 0;
+        Actor_PlayAnimationEntry(actor, 3, 1, 0, 4);
+        actor->phase = 0;
+        actor->stateFrame = 0;
+        actor->done = 1;
     }
 }

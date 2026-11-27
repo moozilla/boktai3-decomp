@@ -1,33 +1,21 @@
-#include "global.h"
+#include "npc/otenko/otenko_actor.h"
 
-struct Npc081CF518 {
-    u8 pad0[7];
-    u8 done, changed, entered;
-    u8 padA[4];
-    u16 flags;
-    u8 pad10[4];
-    s32 timer;
-    u8 phase;
-    u8 pad19[0x2E4 - 0x19];
-    u8 (*callback)(struct Npc081CF518 *);
-};
-
-void Otenko_UpdateBlinkWithCallback(void *ctx, struct Npc081CF518 *npc)
+void Otenko_UpdateBlinkWithCallback(void *ctx, struct OtenkoActor *npc)
 {
-    if (npc->entered) {
-        npc->entered = 0;
+    if (npc->animationEntered) {
+        npc->animationEntered = 0;
         npc->done = 0;
         npc->timer = 16;
     }
-    if (npc->callback(npc) != 1) {
-        u8 phase = npc->phase;
+    if ((u8)npc->animationCallback(npc) != 1) {
+        u8 phase = npc->animationPhase;
         if (phase & 1) {
             u32 mask = 0x100;
-            npc->flags = mask | npc->flags;
+            npc->displayFlags = mask | npc->displayFlags;
         }
         if (npc->timer) {
             if (--npc->timer == 0) {
-                npc->phase = (phase + 1) & 1;
+                npc->animationPhase = (phase + 1) & 1;
                 npc->timer = 16;
             }
         }

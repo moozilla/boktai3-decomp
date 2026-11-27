@@ -4,6 +4,7 @@
 #include "engine/math/scene_vec.h"
 #include "bosses/hresvelgr/boss_action_state.h"
 #include "engine/video/anim_sprite.h"
+#include "scene/collision/contact_collider.h"
 
 struct HresvelgrTravelActor {
     u8 pad0[0x51];
@@ -23,11 +24,14 @@ struct HresvelgrTravelActor {
     u8 facing4, facing8, requestedAnimation, currentAnimation;
     u8 actionMode, actionIndex, actionPhase, finished;
     u8 actionEnter, changed, pulse;
-    u8 padB3[0xC4 - 0xB3];
+    u8 padB3[0xBC - 0xB3];
+    u32 contactFlags, contactAttributes;
     u32 actionTimer; /* 0xC4: StateActor actionTimer. */
     u8 padC8[0xCC - 0xC8];
     u8 targetHeading;
-    u8 padCD[0x100 - 0xCD];
+    u8 padCD[0xE4 - 0xCD];
+    u8 swayAngle;
+    u8 padE5[0x100 - 0xE5];
     void *actionCallback; /* 0x100: StateActor actionCallback. */
     void *callback;
     u8 pad108[4];
@@ -37,11 +41,11 @@ struct HresvelgrTravelActor {
     u8 pad115[0x5F];
     struct AnimSpriteResource animationData;
     struct AnimSprite animation;
-    u8 pad1F4[0x248 - 0x1F4];
-    u8 bodyCollider[0x2F0 - 0x248]; /* 0x248: set up by ColliderActor_InitBodyCollider. */
+    struct ContactCollider attackCollider, bodyColliders[2];
     struct BossActionState action, behavior; /* 0x2F0, 0x300 */
     u16 reactionStage; /* 0x310: set 6 by ActorReaction_BeginCollisionPhase (tentative). */
-    u8 pad312[6];
+    s16 paletteRestoreTimer;
+    u16 invulnerabilityTimer, verticalSway;
     u16 recoveryFrames;
     u8 pad31A[2];
     s16 motionX, motionY, motionZ, motionW;
@@ -52,21 +56,27 @@ struct HresvelgrTravelActor {
     u8 pad332[4];
     u16 burstCount;
     struct SceneVec shotOffsets[4];
-    u8 pad358[0x383 - 0x358];
+    u8 pad358[0x372 - 0x358];
+    u16 backgroundState;
+    u8 pad374[0x382 - 0x374];
+    u8 cameraState;
     u8 behaviorFinished;
     void *savedCallback;
     u8 savedPhase, savedAnimation;
     s16 travel;
-    struct SceneVec bodyOffset; /* 0x38C */
+    struct ContactPosition bodyOffset; /* 0x38C */
     struct SceneVec bodyRotation; /* 0x394 */
     struct SceneVec target, delta;
-    u8 pad3AC[0x420 - 0x3AC];
+    u8 pad3AC[8];
+    u8 scaledShadow[0x6C];
     void *hazards; /* 0x420: growth hazard list visited by Hresvelgr_UpdateHazardVisit. */
     u16 normalPalette[16][16]; /* 0x424: copied from bank 0x2F0 at initialization. */
     u8 pad624[0x704 - 0x624];
     u16 flashPalette[7][16]; /* 0x704: initialized to RGB555 gray. */
     void *linked; /* 0x7E4: actor notified by Hresvelgr_BeginLinkedAnimation. */
 };
+
+typedef char HresvelgrTravelActorSizeCheck[sizeof(struct HresvelgrTravelActor) == 0x7E8 ? 1 : -1];
 
 /* StateActor_ConsumeActionEntry on this type. */
 static inline u8 Hresvelgr_ConsumeActionEntry(struct HresvelgrTravelActor *actor)

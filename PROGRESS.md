@@ -16,22 +16,22 @@ Without concessions: **100.000%**. With concessions (register pins, asm barriers
 |---|---:|
 | `dead-code` | 11 (+1 excused) |
 | `proved-zero` | 17 |
-| `once-loop` | 77 (+1 excused) |
+| `once-loop` | 75 (+1 excused) |
 | `stmt-expr` | 1 |
-| `const-local` | 1,057 (+12 excused) |
-| `literal-local` | 2,727 |
-| `addr-deref` | 18 |
+| `const-local` | 1,002 (+12 excused) |
+| `literal-local` | 2,692 |
+| `addr-deref` | 16 |
 | `subtract-negative` | 8 |
 | `duplicate-branches` | 18 (+6 excused) |
-| `placeholder-name` | 4 |
+| `placeholder-name` | 2 |
 | `volatile-view` | 2 |
-| `local-union` | 67 (+2 excused) |
-| `literal-param` | 2,732 (+91 excused) |
-| total | 6,739 |
+| `local-union` | 64 (+2 excused) |
+| `literal-param` | 2,722 (+91 excused) |
+| total | 6,630 |
 
-Steering debt (parked constant uses and unresolved inline constant arguments): **6,516**.
+Steering debt (parked constant uses and unresolved inline constant arguments): **6,416**.
 
-Source files with no warning: **4,524** of 6,041.
+Source files with no warning: **4,544** of 6,041.
 
 Nonmatching drafts (`#ifdef NONMATCHING`, not counted above): **0 functions**, 0.000% of code, mean fuzzy match 0.0%.
 

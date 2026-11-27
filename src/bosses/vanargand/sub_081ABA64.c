@@ -113,6 +113,12 @@ static inline s32 Vg_ShiftTowardZero(s32 n, u32 shift)
 {
     return n >= 0 ? n >> shift : -((-n) >> shift);
 }
+static inline void Vg_ProjectChargeOffset(struct ContactPosition *dst, s32 x, s32 y)
+{
+    dst->x = Vg_ShiftTowardZero(((x + y) * 32) / 3 + 0x40, 1);
+    dst->y = 0x40;
+    dst->z = Vg_ShiftTowardZero(((-x + y) * 32) / 3 + 0x40, 1);
+}
 static inline void Vg_Polar(struct ContactPosition *out, s32 angle, s32 radius)
 {
     out->x = Vg_ShiftTowardZero(gUnk_086149C4[(angle + 0x40) & 0xFF] * radius, 12);
@@ -294,9 +300,7 @@ void Vanargand_UpdateChargeSequence(struct VanargandBoss *arg0)
                     point = &projected1;
                     a = point->x;
                     b = point->y;
-                    dst->x = Vg_ShiftTowardZero(((a + b) << 5) / 3 + 0x40, 1);
-                    dst->y = 0x40;
-                    dst->z = Vg_ShiftTowardZero(((-a + b) << 5) / 3 + 0x40, 1);
+                    Vg_ProjectChargeOffset(dst, a, b);
                 }
             } else if (arg0->timer == 0xA) {
                 {
@@ -308,9 +312,7 @@ void Vanargand_UpdateChargeSequence(struct VanargandBoss *arg0)
                     point = &projected2;
                     a = point->x;
                     b = point->y;
-                    dst->x = Vg_ShiftTowardZero(((a + b) << 5) / 3 + 0x40, 1);
-                    dst->y = 0x40;
-                    dst->z = Vg_ShiftTowardZero(((-a + b) << 5) / 3 + 0x40, 1);
+                    Vg_ProjectChargeOffset(dst, a, b);
                 }
             }
             if (arg0->timer > 6)
@@ -375,9 +377,7 @@ void Vanargand_UpdateChargeSequence(struct VanargandBoss *arg0)
                     point = &projected3;
                     a = point->x;
                     b = point->y;
-                    dst->x = Vg_ShiftTowardZero(((a + b) << 5) / 3 + 0x40, 1);
-                    dst->y = 0x40;
-                    dst->z = Vg_ShiftTowardZero(((-a + b) << 5) / 3 + 0x40, 1);
+                    Vg_ProjectChargeOffset(dst, a, b);
                 }
                 sequenceEnded = Vg_081ABA64_StepFrame(&sub->sprite);
                 Vanargand_StartActionSequence((u8 *)self + 0x21C);
@@ -488,9 +488,7 @@ void Vanargand_UpdateChargeSequence(struct VanargandBoss *arg0)
                     point = &projected4;
                     a = point->x;
                     b = point->y;
-                    dst->x = Vg_ShiftTowardZero(((a + b) << 5) / 3 + 0x40, 1);
-                    dst->y = 0x40;
-                    dst->z = Vg_ShiftTowardZero(((-a + b) << 5) / 3 + 0x40, 1);
+                    Vg_ProjectChargeOffset(dst, a, b);
                 }
                 if (sub->side == 0) {
                     Vg_SetPalette(self, 4, 5, 0);
@@ -516,9 +514,7 @@ void Vanargand_UpdateChargeSequence(struct VanargandBoss *arg0)
                 point = &projected5;
                 a = point->x;
                 b = point->y;
-                dst->x = Vg_ShiftTowardZero(((a + b) << 5) / 3 + 0x40, 1);
-                dst->y = 0x40;
-                dst->z = Vg_ShiftTowardZero(((-a + b) << 5) / 3 + 0x40, 1);
+                Vg_ProjectChargeOffset(dst, a, b);
             }
             if (arg0->timer <= 6)
                 Vg_SetFlags(arg0, 0x80000);

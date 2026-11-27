@@ -1,4 +1,5 @@
 #include "bosses/sabata/sabata_state_commands.h"
+#include "scene/motion/scene_facing.h"
 
 void Sabata_BeginCombatPhase(struct SabataActorState *volume, s32 phase)
 {
@@ -8,16 +9,8 @@ void Sabata_BeginCombatPhase(struct SabataActorState *volume, s32 phase)
 
 static inline void update_facing(struct SabataActorState *actor, u8 *facingDirection)
 {
-    s32 direction = (*facingDirection + 96) >> 6;
-    u8 mask = 3;
-    do {
-        mask &= direction;
-    } while (0);
-    actor->facing4 = mask;
-    direction = (*facingDirection + 112) >> 5;
-    mask = 7;
-    mask &= direction;
-    actor->facing8 = mask;
+    actor->facing4 = SceneFacing_FourWay(*facingDirection);
+    actor->facing8 = SceneFacing_EightWay(*facingDirection);
 }
 
 s32 ActorEffect_StepTurn(struct SabataActorState *actor, s32 frame, s32 start, s32 period, s32 mode)

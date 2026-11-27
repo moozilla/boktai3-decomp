@@ -61,10 +61,11 @@ include/actors/singleton_slot_7/slot7_transition.h,include/bosses/vanargand/vana
 include/actors/spinning_approach_motion/spinning_approach.h,include/monsters/armor/spinning_approach.h,beside its unit,,
 include/actors/task_4_e01/contact_swarm_sprite.h,include/effects/projectiles/contact_swarm_sprite.h,beside its unit,,
 include/actors/task_4_e01/task4e01_projectile.h,include/effects/projectiles/projectile_task.h,beside its unit; renamed from task4e01_projectile.h,,
+include/bosses/count/count.h,include/bosses/count/count.h,beside its unit,,
 include/bosses/hresvelgr/boss_action_state.h,include/bosses/hresvelgr/boss_action_state.h,beside its unit,,
+include/bosses/hresvelgr/hresvelgr_shot.h,include/bosses/hresvelgr/hresvelgr_shot.h,beside its unit,,
 include/bosses/hresvelgr/hresvelgr_travel.h,include/bosses/hresvelgr/hresvelgr_travel.h,beside its unit,,
 include/bosses/nidhoggr/scene_panel_effect_pool.h,include/bosses/nidhoggr/nidhoggr_effect_pool.h,renamed,,include/bosses/nidhoggr/scene_panel_effect_pool.h
-include/bosses/nidhoggr/scene_pause.h,include/bosses/nidhoggr/scene_pause.h,beside its unit,,
 include/bosses/ratatosk/ratatosk.h,include/bosses/ratatosk/ratatosk.h,beside its unit,,
 include/bosses/ratatosk/ratatosk_facing.h,include/bosses/ratatosk/ratatosk_facing.h,beside its unit,,
 include/bosses/ratatosk/ratatosk_particle.h,include/bosses/ratatosk/ratatosk_particle.h,beside its unit,,
@@ -553,6 +554,8 @@ include/monsters/tentacle_actor/tentacle_segment_animation.h,include/monsters/ce
 include/monsters/tentacle_body/tentacle_body.h,include/monsters/centipede/centipede_body.h,renamed moved with its unit,include/monsters/tentacle/tentacle_body.h,include/monsters/centipede/tentacle_body.h
 include/monsters/vorn/vorn.h,include/monsters/vorn/vorn.h,beside its unit,,
 include/monsters/vulcan_cannon/vulcan_cannon_worker.h,include/monsters/cannons/vulcan_cannon_worker.h,beside its unit,,
+include/npc/otenko/otenko_actor.h,include/npc/otenko/otenko_actor.h,beside its Otenko script and projection users,,
+include/npc/story_character/scene_character.h,include/npc/story_character/scene_character.h,beside its story character script users,,
 include/other/callback_pool/callback_pool.h,include/objects/loot_deposits/callback_pool.h,Pass 4: beside its documented owner,,include/objects/actor_group/callback_pool.h
 include/other/registry_selection/registry_selection_menu.h,include/ui/world_map.h,with its reviewed owner; original basename registry_selection_menu.h,include/ui/widgets/indicator_selection.h,
 include/other/scene_terrain_probe/scene_moving_particle.h,include/effects/particles/scene_moving_particle.h,beside its unit,,

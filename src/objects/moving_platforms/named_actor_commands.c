@@ -107,7 +107,7 @@ void MovingPlatform_RemoveFromScript(void)
         member = MovingPlatform_FindByName(name);
         group = gNamedActorManager;
         if (MemberHasBit(member, 1)) {
-            TerrainModifiers_UnregisterCell(member->registration);
+            TerrainModifiers_UnregisterCell(&member->registration);
             MovingPlatform_DisableFlags(1, member);
         }
         MovingPlatform_ReleaseMember(member);

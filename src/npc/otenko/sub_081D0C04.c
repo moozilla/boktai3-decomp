@@ -1,4 +1,4 @@
-#include "global.h"
+#include "npc/otenko/otenko_actor.h"
 #include "engine/engine.h"
 #include "engine/ram.h"
 #include "engine/task_manager.h"
@@ -8,74 +8,19 @@ struct PackedVec {
     u32 z : 16;
     u32 pad : 16;
 };
-struct Rig {
-    u8 pad0[4];
-    u32 handle;
-    u8 pad8[4];
-    u8 fieldC;
-    u8 attached;
-    u8 padE[2];
-};
-struct Motion {
-    u8 pad0[9];
-    u8 angle;
-    u8 padA[0x2A];
-    u16 field34;
-    u16 field36;
-    u16 field38;
-    u8 pad3A[0x3E];
-};
-struct SceneNpc {
-    u8 pad0[2];
-    u8 field2;
-    u8 field3;
-    u8 mode;
-    u8 pad5;
-    u8 state;
-    u8 pad7;
-    u8 field8;
-    u8 field9;
-    u8 padA[2];
-    u16 fieldC;
-    u8 padE[2];
-    u32 field10;
-    u32 field14;
-    u8 field18;
-    u8 facing4;
-    u8 facing8;
-    u8 pad1B[5];
-    struct Rig rig;
-    u8 pad30[0x2C];
-    struct Motion motion;
-    u8 blockD4[0x8C];
-    u32 field160;
-    u8 pad164[4];
-    u8 block168[0x8C];
-    u16 field1F4;
-    u16 field1F6;
-    u32 field1F8;
-    u32 field1FC;
-    u32 field200;
-    u32 field204;
-    u8 pad208[0x13];
-    u8 field21B;
-    u8 pad21C[0xB0];
-    void *update;
-    void *callbacks[6];
-};
-struct SceneNpc *Actor_Allocate(s32 name, s32 variant);
-s32 Actor_InitMotion(struct SceneNpc *, s32 name, struct PackedVec *, s32 angle);
-s32 Actor_InitDrawable(struct SceneNpc *, s32 kind, s32 a, s32 b, s32 c);
-void Actor_InitShadow(struct SceneNpc *, u32, s32, s32, s32);
+struct OtenkoActor *Actor_Allocate(s32 name, s32 variant);
+s32 Actor_InitMotion(struct OtenkoActor *, s32 name, struct PackedVec *, s32 angle);
+s32 Actor_InitDrawable(struct OtenkoActor *, s32 kind, s32 a, s32 b, s32 c);
+void Actor_InitShadow(struct OtenkoActor *, u32, s32, s32, s32);
 void SceneMessages_RegisterReceiver(void *, s32, s32);
-void Actor_InitResources(void *, struct SceneNpc *, s32, s32);
-void Actor_LinkToManager(void *, struct SceneNpc *);
-void Actor_InitBehaviorFromScript(void *, struct SceneNpc *);
+void Actor_InitResources(void *, struct OtenkoActor *, s32, s32);
+void Actor_LinkToManager(void *, struct OtenkoActor *);
+void Actor_InitBehaviorFromScript(void *, struct OtenkoActor *);
 void DisplayAnimation_SetFlags(void *, u32);
-void Actor_DisableShadow(struct SceneNpc *);
-s32 Actor_SetMirroredFourWayAnimation(struct SceneNpc *, s32, s32, s32, s32, s32);
+void Actor_DisableShadow(struct OtenkoActor *);
+s32 Actor_SetMirroredFourWayAnimation(struct OtenkoActor *, s32, s32, s32, s32, s32);
 u32 ParticlePool_Create(void);
-void Otenko_EnterProjectedIdle(void *, struct SceneNpc *);
+void Otenko_EnterProjectedIdle(void *, struct OtenkoActor *);
 void Otenko_OnStateChange(void);
 void sub_081D0864(void);
 void Otenko_OnModeUpdate(void);
@@ -88,20 +33,19 @@ void Otenko_FollowSceneTarget(void);
 void Otenko_PlayAnimation12(void);
 void Actor_OnConfiguredAnimationUpdate(void);
 
-static inline void setBox(struct SceneNpc *npc, s32 width, s32 height)
+static inline void setBox(struct OtenkoActor *npc, s32 width, s32 height)
 {
-    npc->field1F4 = width;
-    npc->field1F6 = height;
-    npc->field1F8 = width;
-    npc->field1FC = height;
+    npc->extentX = width;
+    npc->extentZ = height;
+    npc->rangeX = width;
+    npc->rangeZ = height;
 }
 
 /* Registry routine BB34: creates a scene NPC (0x384-byte object from
    Actor_Allocate) named -n, variant -k (default 1), at -p x y z facing -d, with
    behavior -i (0-4: update callback, mode and state), records it in
    gSceneNpc and registers it with the scene actor manager; -K also runs
-   Otenko_EnterProjectedIdle on it. The facing computation needs register pins and an empty
-   asm barrier (agbcc otherwise turns the arithmetic shift into a logical one). */
+   Otenko_EnterProjectedIdle on it. */
 void Otenko_CreateFromScript(void)
 {
     void (*update)(void);
@@ -112,12 +56,11 @@ void Otenko_CreateFromScript(void)
     s32 variant;
     s32 angle;
     s32 extra;
-    struct SceneNpc *npc;
+    struct OtenkoActor *npc;
     void (*updateC)(void);
     struct PackedVec position;
-    u32 zero;
-    struct Rig *rig;
-    struct Motion *motion;
+    struct OtenkoEffectState *effect;
+    struct SceneActorBody *body;
     if (!manager) {
         return;
     }
@@ -138,23 +81,23 @@ void Otenko_CreateFromScript(void)
     if (!npc) {
         return;
     }
-    gSceneNpc = npc;
+    gSceneNpc = (void *)npc;
     if (Actor_InitMotion(npc, name, &position, angle) < 0) {
         return;
     }
-    if (Actor_InitDrawable(npc, 1, 0x97D3, 0xC6A0, zero = 0) < 0) {
+    if (Actor_InitDrawable(npc, 1, 0x97D3, 0xC6A0, 0) < 0) {
         return;
     }
-    motion = &npc->motion;
+    body = &npc->body;
     {
         s32 speed = 400;
-        motion->field34 = zero;
-        motion->field36 = speed;
-        motion->field38 = zero;
+        body->positionOffset.x = 0;
+        body->positionOffset.y = speed;
+        body->positionOffset.z = 0;
     }
-    Actor_InitShadow(npc, npc->field160, 1, 0, 0x40);
-    SceneMessages_RegisterReceiver(npc->block168, name, 5);
-    npc->motion.angle = angle;
+    Actor_InitShadow(npc, (u32)npc->display.position, 1, 0, 0x40);
+    SceneMessages_RegisterReceiver(&npc->receiver, name, 5);
+    npc->body.direction = angle;
     {
         u16 a = angle;
         {
@@ -174,7 +117,7 @@ void Otenko_CreateFromScript(void)
             npc->facing4 = m;
         }
     }
-    Task_SetManager(Otenko_OnStateChange, &npc->callbacks[5]);
+    Task_SetManager(Otenko_OnStateChange, (void **)&npc->animationCallback);
     Task_SetManager(sub_081D0864, &npc->callbacks[0]);
     Task_SetManager(Otenko_OnModeUpdate, &npc->callbacks[1]);
     Task_SetManager(Otenko_OnStateUpdate, &npc->callbacks[2]);
@@ -183,96 +126,96 @@ void Otenko_CreateFromScript(void)
     Actor_InitResources(manager, npc, 0x97D3, 0);
     Actor_LinkToManager(manager, npc);
     Actor_InitBehaviorFromScript(manager, npc);
-    rig = &npc->rig;
-    npc->fieldC = zero;
-    rig->fieldC = 0;
+    effect = &npc->effect;
+    npc->commandFlags = 0;
+    effect->projected = 0;
     switch (Script_GetKeywordValue('i', 0)) {
         case 0: {
             u8 one = 1;
-            npc->field2 = 0;
-            npc->field3 = 0;
-            npc->mode = one;
-            npc->field14 = 0;
-            npc->field8 = 1;
+            npc->stage = 0;
+            npc->stageEntered = 0;
+            npc->state = one;
+            npc->timer = 0;
+            npc->commandEntered = 1;
             update = Actor_OnIdleUpdate;
-            npc->state = 2;
-            npc->update = update;
-            npc->field10 = 0;
-            npc->field9 = 1;
-            npc->field18 = 0;
+            npc->prevState = 2;
+            npc->stateCallback = update;
+            npc->stateFrame = 0;
+            npc->animationEntered = 1;
+            npc->animationPhase = 0;
             break;
         }
 
         case 1:
-            npc->field2 = 0;
-            npc->field3 = 0;
-            npc->mode = 0;
-            npc->field14 = 0;
-            npc->field8 = 1;
+            npc->stage = 0;
+            npc->stageEntered = 0;
+            npc->state = 0;
+            npc->timer = 0;
+            npc->commandEntered = 1;
             update = Actor_OnHiddenIdleUpdate;
-            npc->state = 1;
-            npc->update = update;
-            npc->field10 = 0;
-            npc->field9 = 1;
-            npc->field18 = 0;
-            DisplayAnimation_SetFlags(npc->blockD4, 1);
+            npc->prevState = 1;
+            npc->stateCallback = update;
+            npc->stateFrame = 0;
+            npc->animationEntered = 1;
+            npc->animationPhase = 0;
+            DisplayAnimation_SetFlags(&npc->display, 1);
             Actor_DisableShadow(npc);
             break;
 
         case 2:
-            npc->field21B = 1;
+            npc->controlled = 1;
             mode = 0x12;
-            npc->field2 = 0;
-            npc->field3 = 0;
-            npc->mode = mode;
-            npc->field14 = 0;
-            npc->field8 = 1;
+            npc->stage = 0;
+            npc->stageEntered = 0;
+            npc->state = mode;
+            npc->timer = 0;
+            npc->commandEntered = 1;
             update = Otenko_FollowSceneTarget;
-            npc->state = 0x10;
-            npc->update = update;
-            npc->field10 = 0;
-            npc->field9 = 1;
-            npc->field18 = 0;
+            npc->prevState = 0x10;
+            npc->stateCallback = update;
+            npc->stateFrame = 0;
+            npc->animationEntered = 1;
+            npc->animationPhase = 0;
             break;
 
         case 3:
             mode = 0x19;
-            npc->field2 = 0;
-            npc->field3 = 0;
-            npc->mode = mode;
-            npc->field14 = 0;
-            npc->field8 = 1;
+            npc->stage = 0;
+            npc->stageEntered = 0;
+            npc->state = mode;
+            npc->timer = 0;
+            npc->commandEntered = 1;
             updateC = Otenko_PlayAnimation12;
-            npc->state = 0x16;
-            npc->update = updateC;
-            npc->field10 = 0;
-            npc->field9 = 1;
-            npc->field18 = 0;
+            npc->prevState = 0x16;
+            npc->stateCallback = updateC;
+            npc->stateFrame = 0;
+            npc->animationEntered = 1;
+            npc->animationPhase = 0;
             break;
 
         case 4:
             mode = 6;
-            npc->field2 = 0;
-            npc->field3 = 0;
-            npc->mode = mode;
-            npc->field14 = 0;
-            npc->field8 = 1;
+            npc->stage = 0;
+            npc->stageEntered = 0;
+            npc->state = mode;
+            npc->timer = 0;
+            npc->commandEntered = 1;
             updateB = Actor_OnConfiguredAnimationUpdate;
-            npc->state = 7;
-            npc->update = updateB;
-            npc->field10 = 0;
-            npc->field9 = 1;
-            npc->field18 = 0;
+            npc->prevState = 7;
+            npc->stateCallback = updateB;
+            npc->stateFrame = 0;
+            npc->animationEntered = 1;
+            npc->animationPhase = 0;
             break;
     }
 
     Actor_SetMirroredFourWayAnimation(npc, 0, 0, 0, 0, 0);
     setBox(npc, 16, 20);
-    npc->field200 = 0x100;
-    npc->field204 = 0x190;
-    rig->handle = ParticlePool_Create();
+    npc->rangeXSquared = 0x100;
+    npc->rangeZSquared = 0x190;
+    effect->particleHandle = ParticlePool_Create();
     if (extra) {
-        rig->attached = 1;
+        effect->attached = 1;
         Otenko_EnterProjectedIdle(manager, npc);
     }
 }

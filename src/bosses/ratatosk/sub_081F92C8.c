@@ -48,16 +48,10 @@ static inline void snapshotWithState(struct Ratatosk *p, struct Ratatosk *q, u32
     *savedState = q->actionPhase;
     p->savedSequence = p->sequence;
 }
-static inline void setState(struct Ratatosk *q, u32 state, u32 zero, u32 one)
-{
-    q->actionPhase = state;
-    q->actionTimer = zero;
-    q->actionEnter = 1;
-}
 static inline void choose(struct Ratatosk *p, struct Ratatosk *q, struct ChoiceTable *choices)
 {
     snapshot(p, q);
-    setState(q, choices->entries[p->pattern][p->choice], 0, 1);
+    Ratatosk_EnterPhase(q, choices->entries[p->pattern][p->choice]);
     ++p->choice;
     if (choices->entries[p->pattern][p->choice] == -1) {
         p->pattern = 0;
@@ -84,7 +78,7 @@ void Ratatosk_UpdateAttackSelection(struct Ratatosk *p)
             q->actionPhase != 5) {
             if (q->actionPhase != 6 || p->hasOrb == 1) {
                 snapshot(p, q);
-                setState(q, 10, 0, 1);
+                Ratatosk_EnterPhase(q, 10);
                 Sound_StopSong(0x570);
             } else
                 Ratatosk_BeginInterruptState(p);
@@ -93,7 +87,7 @@ void Ratatosk_UpdateAttackSelection(struct Ratatosk *p)
             q->actionPhase != 5) {
             if (q->actionPhase != 6 || p->hasOrb == 1) {
                 snapshot(p, q);
-                setState(q, 9, 0, 1);
+                Ratatosk_EnterPhase(q, 9);
                 Sound_StopSong(0x570);
             } else
                 Ratatosk_BeginInterruptState(p);
@@ -110,17 +104,17 @@ void Ratatosk_UpdateAttackSelection(struct Ratatosk *p)
                 if (p->interval != 60)
                     p->duration = 32;
                 if ((s32)randomByte() > 128 && p->savedState != 3)
-                    setState(q, p->savedState, 0, 1);
+                    Ratatosk_EnterPhase(q, p->savedState);
                 else {
                     p->destination = *Ratatosk_GetRandomMovementPoint(p);
-                    setState(q, 2, 0, 1);
+                    Ratatosk_EnterPhase(q, 2);
                 }
                 snapshot(p, q);
             } else {
                 p->duration = 128;
                 snapshot(p, q);
                 p->destination = *Ratatosk_GetRandomMovementPoint(p);
-                setState(q, 2, 0, 1);
+                Ratatosk_EnterPhase(q, 2);
             }
         } else if (p->healthPhase == 1) {
             if (q->actionPhase == 2) {
@@ -129,22 +123,22 @@ void Ratatosk_UpdateAttackSelection(struct Ratatosk *p)
             } else if ((u8)(q->actionPhase - 8) <= 2 && *(savedState = &p->savedState) == 6 &&
                        p->hasOrb == 0) {
                 snapshotWithState(p, q, savedState);
-                setState(q, 6, 0, 1);
+                Ratatosk_EnterPhase(q, 6);
             } else {
                 SunOrb_FadeOutAll(p->sunOrbs);
                 if (q->actionPhase == 1) {
                     if (p->pendingAttack) {
                         p->duration = 32;
                         snapshot(p, q);
-                        setState(q, 6, 0, 1);
+                        Ratatosk_EnterPhase(q, 6);
                         p->pendingAttack = 0;
                     } else {
                         p->duration = 32;
                         if ((s32)randomByte() > 128)
-                            setState(q, p->savedState, 0, 1);
+                            Ratatosk_EnterPhase(q, p->savedState);
                         else {
                             p->destination = *Ratatosk_GetRandomMovementPoint(p);
-                            setState(q, 2, 0, 1);
+                            Ratatosk_EnterPhase(q, 2);
                         }
                         snapshot(p, q);
                     }
@@ -152,7 +146,7 @@ void Ratatosk_UpdateAttackSelection(struct Ratatosk *p)
                     p->duration = 64;
                     snapshot(p, q);
                     Ratatosk_GetPlayerOffsetFarthestFromSelf(p, &p->destination);
-                    setState(q, 2, 0, 1);
+                    Ratatosk_EnterPhase(q, 2);
                 }
             }
         } else {
@@ -162,17 +156,17 @@ void Ratatosk_UpdateAttackSelection(struct Ratatosk *p)
             } else if ((u8)(q->actionPhase - 8) <= 2 && *(savedState = &p->savedState) == 6 &&
                        p->hasOrb == 0) {
                 snapshotWithState(p, q, savedState);
-                setState(q, 6, 0, 1);
+                Ratatosk_EnterPhase(q, 6);
             } else if (q->actionPhase == 1) {
                 if (p->pendingAttack) {
                     p->duration = 32;
                     snapshot(p, q);
-                    setState(q, 6, 0, 1);
+                    Ratatosk_EnterPhase(q, 6);
                     p->pendingAttack = 0;
                 } else {
                     p->duration = 32;
                     savedState = &p->savedState;
-                    setState(q, *savedState, 0, 1);
+                    Ratatosk_EnterPhase(q, *savedState);
                     snapshotWithState(p, q, savedState);
                 }
             } else {
@@ -180,7 +174,7 @@ void Ratatosk_UpdateAttackSelection(struct Ratatosk *p)
                 p->duration = 64;
                 snapshot(p, q);
                 Ratatosk_GetPlayerOffsetFarthestFromSelf(p, &p->destination);
-                setState(q, 2, 0, 1);
+                Ratatosk_EnterPhase(q, 2);
             }
         }
         p->sequenceDone = 0;

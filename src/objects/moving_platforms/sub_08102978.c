@@ -1,21 +1,15 @@
-#include "global.h"
+#include "objects/moving_platforms/named_object.h"
 #include "player/player.h"
 
-struct S {
-    u8 filler[0xb6];
-    u16 h;
-    u8 filler2[0xdc - 0xb8];
-    u32 k;
-};
 void Player_AddAttachmentFlags(u8 *, u32, u32);
 void Player_ClearAttachmentFlags(u8 *, u32);
 
-void MovingPlatform_UpdatePlayerFollowFlags(struct S *s)
+void MovingPlatform_UpdatePlayerFollowFlags(struct NamedObject *object)
 {
-    if ((u16)(s->h - 3) > 1) {
-        Player_AddAttachmentFlags((*(u8 **)gPlayers), 5, s->k);
+    if ((u16)(object->state - 3) > 1) {
+        Player_AddAttachmentFlags((*(u8 **)gPlayers), 5, object->name);
     } else {
-        Player_AddAttachmentFlags((*(u8 **)gPlayers), 1, s->k);
+        Player_AddAttachmentFlags((*(u8 **)gPlayers), 1, object->name);
         Player_ClearAttachmentFlags((*(u8 **)gPlayers), 4);
     }
 }

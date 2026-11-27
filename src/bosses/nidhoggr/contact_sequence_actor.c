@@ -176,10 +176,7 @@ static inline u32 RandomBits(const u16 *table, u16 mask)
 void NidhoggrDuelMinion_UpdateDying(struct ContactSequenceOwner *parent,
                                       struct ContactSequenceActor *actor)
 {
-    union {
-        struct ContactPackedVector bits;
-        struct ContactPosition position;
-    } scatter;
+    struct ContactPosition scatter;
     struct ContactPosition *position;
     struct ContactPosition *scatterPosition;
     s32 coordinates[3];
@@ -188,10 +185,10 @@ void NidhoggrDuelMinion_UpdateDying(struct ContactSequenceOwner *parent,
 
     if (NidhoggrDuelMinion_TakeEntryFlag(actor)) {
         table = (const u16 *)RANDOM_TABLE_ADDR;
-        scatter.bits.x = SceneActorEffects_NextSample(table) & 63;
-        scatter.bits.y = RandomBits(table, 127);
-        scatter.bits.z = SceneActorEffects_NextSample(table) & 63;
-        scatterPosition = &scatter.position;
+        scatter.x = SceneActorEffects_NextSample(table) & 63;
+        scatter.y = RandomBits(table, 127);
+        scatter.z = SceneActorEffects_NextSample(table) & 63;
+        scatterPosition = &scatter;
         scatterPosition->x += actor->position.x;
         scatterPosition->y += (position = &actor->position)->y;
         scatterPosition->z += position->z;
