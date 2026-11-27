@@ -2,7 +2,7 @@
 #include "engine/engine.h"
 
 s32 PlayerAttackEffect_Initialize(struct AttackParticleEffect *effect,
-                                  struct AttackParticleOwner *source, u8 *facing, u8 *side)
+                                  const struct AnimSprite *source, u8 *facing, u8 *side)
 {
     struct SceneAnimation *graphics = effect->graphics;
     struct DisplaySequenceSprite *entry;
