@@ -372,16 +372,16 @@ def rewrite_unit(text, old, new, header, spell, *, allow_prefix=False):
     if not prefix and (old["size"], old["align"]) != (new["size"], new["align"]):
         raise Holdout(f"private size/alignment {old['size']:#x}/{old['align']} differs from shared "
                       f"{new['size']:#x}/{new['align']}")
-    spans = [r for r in inline_twins.records(text) if r.kind == old["kind"]
-             and (r.name if r.typedef else f"{r.kind} {r.name}") == old["spell"]]
+    spans = [r for r in inline_twins.records(text, tagged_typedefs=True) if r.kind == old["kind"]
+             and (r.typedef and r.name == old["spell"] or f"{r.kind} {r.tag}" == old["spell"])]
     if len(spans) != 1:
         raise Holdout("declaration is not a unique editable file-scope record")
     span = spans[0]
     if keepcheck.in_ranges(span.start, keepcheck.draft_ranges(text)):
         raise Holdout("declaration belongs to a NONMATCHING draft")
     mask = keepcheck.blank_comments(text)
-    tag = re.compile(rf"\b{span.kind}\s+{re.escape(span.name)}\b")
-    if not span.typedef and len(re.findall(tag.pattern + r"\s*\{", mask)) != 1:
+    tag = re.compile(rf"\b{span.kind}\s+{re.escape(span.tag)}\b") if span.tag else None
+    if tag and len(re.findall(tag.pattern + r"\s*\{", mask)) != 1:
         raise Holdout("another declaration shadows the record tag")
     mapping = field_paths(old, new)
     same_sequence = [(m["name"], type_key(m)) for m in old["members"]] == [
@@ -401,9 +401,9 @@ def rewrite_unit(text, old, new, header, spell, *, allow_prefix=False):
             raise Holdout("aggregate initializer needs a positional layout review")
         refs = PrefixUses(ast, tu, old) if prefix else evidence.References(ast, tu, old["file"])
         edits = member_edits(text, pre, refs, old, mapping, span)
-    replacement = f"typedef {spell} {span.name};\n" if span.typedef else ""
+    replacement = f"typedef {spell} {span.name};\n" if span.typedef and span.name != spell else ""
     edits.append((span.start, span.end, replacement))
-    if not span.typedef and old["spell"] != spell:
+    if tag and f"{span.kind} {span.tag}" != spell:
         edits.extend((m.start(), m.end(), spell) for m in tag.finditer(mask)
                      if m.end() <= span.start or m.start() >= span.end)
     for start, end, replacement in sorted(edits, reverse=True):

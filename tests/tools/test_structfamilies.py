@@ -360,6 +360,17 @@ int X(struct R *r, struct Q *q) { return r->old + q->old; }
         self.assertIn("return r->value + q->old;", result)
         self.assertIn('#include "s.h"', result)
 
+    def test_tagged_typedef_rewrite_preserves_alias_and_updates_tag_references(self):
+        path = "src/a.c"
+        text = "typedef struct R { unsigned old; } Local;\n"
+        text += "int F(Local *a, struct R *b) { return a->old + b->old; }\n"
+        old = measure(text, path)[f"{path}:struct R"]
+        new = measure("struct S { unsigned state; };", "include/s.h")["include/s.h:struct S"]
+        with patch.object(lm, "preprocess", return_value=parse(text, path)[0]):
+            result = merge.rewrite_unit(text, old, new, Path("include/s.h"), "struct S")
+        self.assertIn("typedef struct S Local;", result)
+        self.assertIn("int F(Local *a, struct S *b) { return a->state + b->state; }", result)
+
     def test_initializer_with_changed_shape_is_a_holdout(self):
         path = "src/moved/a.c"
         old_text = TYPES + "struct R { u16 old; };\nstruct R data = { 2 };\n"

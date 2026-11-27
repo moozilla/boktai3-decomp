@@ -118,11 +118,11 @@ def helpers(text, path=""):
     return out
 
 
-class Record(collections.namedtuple("Record", "kind name typedef body start end file")):
+class Record(collections.namedtuple("Record", "kind name typedef body start end file tag", defaults=[None])):
     """A file-scope struct/union definition: `struct T {...};` (name T) or `typedef struct {...} T;`."""
 
 
-def records(text, path=""):
+def records(text, path="", *, tagged_typedefs=False):
     code = blank_comments(text)
     out = []
     for m in RECORD.finditer(code):
@@ -132,8 +132,8 @@ def records(text, path=""):
             continue
         typedef, kind, tag = bool(m.group(1)), m.group(2), m.group(3)
         if typedef:
-            if not tail.group(1) or tag:
-                continue  # typedef struct T {...} U; spells two names: leave it
+            if not tail.group(1) or (tag and not tagged_typedefs):
+                continue
             name = tail.group(1)
         else:
             if not tag or tail.group(1):
@@ -143,7 +143,7 @@ def records(text, path=""):
         stop = end + tail.end()
         if stop < len(text) and text[stop] == "\n":
             stop += 1
-        out.append(Record(kind, name, typedef, body, m.start(), stop, path))
+        out.append(Record(kind, name, typedef, body, m.start(), stop, path, tag))
     return out
 
 
