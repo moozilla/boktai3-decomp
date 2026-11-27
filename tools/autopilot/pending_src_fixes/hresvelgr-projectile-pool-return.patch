@@ -13,8 +13,8 @@ The generated port with this guard reproduced all 12 original-ROM RAM
 checkpoints between controller frames 36257 and 37047, including the
 projectile count, first hit, position, boss reaction and sampled RNG.
 
---- a/src/fn/sub_081A4DF0.c
-+++ b/src/fn/sub_081A4DF0.c
+--- a/src/bosses/hresvelgr/sub_081A4DF0.c
++++ b/src/bosses/hresvelgr/sub_081A4DF0.c
 @@ -57,4 +57,7 @@
      /* Success falls through without a defined C value. The stock Anim_SetKeyframes
       * returns through r0, leaving its positive Thumb return address for the caller
