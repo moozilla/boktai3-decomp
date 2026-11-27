@@ -241,6 +241,13 @@ void WirelessPeerPanel_Update(struct WirelessPeerMenu *menu, struct WirelessPeer
     }
 }
 
+static inline void WirelessPeerMenu_SetState(struct WirelessPeerMenu *menu, u8 state)
+{
+    menu->state = state;
+    menu->entered = 1;
+    menu->timer = 0;
+}
+
 void WirelessPeerMenu_UpdateCancelInput(struct WirelessPeerMenu *menu)
 {
     if (menu->entered)
@@ -250,12 +257,7 @@ void WirelessPeerMenu_UpdateCancelInput(struct WirelessPeerMenu *menu)
         if (busy) {
             if (gPadState[1] & 2) {
                 Wireless_RequestAdvanceConnection();
-                {
-                    u32 state = 7;
-                    menu->state = state;
-                    menu->entered = 1;
-                    menu->timer = 0;
-                }
+                WirelessPeerMenu_SetState(menu, 7);
             }
         } else {
             if (gPadState[1] & 0x200) {
@@ -279,12 +281,7 @@ void WirelessPeerMenu_UpdateDismissibleNotice(struct WirelessPeerMenu *menu)
     if (menu->timer > 35) {
         if (gPadState[1] & 3) {
             Wireless_RequestAdvanceConnection();
-            {
-                u32 state = 7;
-                menu->state = state;
-                menu->entered = 1;
-                menu->timer = 0;
-            }
+            WirelessPeerMenu_SetState(menu, 7);
         }
     }
     menu->timer++;
@@ -430,13 +427,6 @@ void WirelessPeerMenu_UpdateExit(struct WirelessPeerMenu *menu)
             Script_Call(menu->completionProcedure, 0);
     }
     menu->timer++;
-}
-
-static inline void WirelessPeerMenu_SetState(struct WirelessPeerMenu *menu, u8 state)
-{
-    menu->state = state;
-    menu->entered = 1;
-    menu->timer = 0;
 }
 
 void WirelessPeerMenu_UpdateConnectionState(struct WirelessPeerMenu *menu)
