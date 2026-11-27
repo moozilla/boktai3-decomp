@@ -1,10 +1,7 @@
 #include "global.h"
 #include "player/player.h"
-struct PlayerLinkSelection {
-    u8 unknown0[0x18];
-    s16 localPlayer;
-};
-extern struct PlayerLinkSelection *gLinkSession;
+#include "link/session/link_session_state.h"
+extern struct AreaEffectLinkState *gLinkSession;
 void Sound_StopSong(u32);
 static inline s32 LocalPlayerSlot(void)
 {
