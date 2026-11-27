@@ -546,8 +546,8 @@ unsigned Read(struct Pool *pool) { return pool->slots[2].timer; }
             self.assertIn("union SharedHostParts {", text)
             self.assertIn("struct Entry entries[4];", text)
             self.assertIn("union Region parts;", text)
-            for path, expression in (("src/0.c", "p->parts.entries[i].state"),
-                                     ("src/1.c", "p->parts.parts.words[i]")):
+            for path, expression in (("src/0.c", "p->partsStorage.entries[i].state"),
+                                     ("src/1.c", "p->partsStorage.parts.words[i]")):
                 original, pre = sources[path]
                 with patch.object(lm, "preprocess", return_value=pre):
                     rewritten = merge.rewrite_unit(original, records[f"{path}:struct Host"], new, target, spell)

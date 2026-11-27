@@ -284,13 +284,15 @@ to clean, before reading warnings by hand, in this order:
 
 * `tools/inline_twins.py`: a private `static inline` helper, or a struct, that is an exact copy
   of one in `include/` gives way to the shared one (calls renamed, header included). Run it
-  first, and again after you add a helper to a header. Near twins (same body, another parameter
+  first, and again after you add a helper to a header. Object-specific twins need a shared name,
+  an owning subsystem, or a header the unit already sees. Near twins (same body, another parameter
   order or type) and structs with the same members under another name are listed, not changed:
   decide those by reading them.
 * `tools/rawfield.py`: `*(u16 *)((u8 *)actor + 0x2D0)`, `(u8 *)p + 0x120` passed to a call and
   the like become member accesses when the base's declared type has a member of that type at
-  that offset (layouts from the compiler, as `tools/struct_views.py` reads them). Run it after
-  a header gains members. The "no member at" rows say where a struct is still missing one.
+  that offset (layouts from the compiler, as `tools/struct_views.py` reads them). A named address
+  can retain its original cast when the receiving declaration needs it. Run it after a header
+  gains members. The "no member at" rows say where a struct is still missing one.
 * `tools/fold_literals.py`: a `literal-local` or `const-local` read exactly once is written in
   place (`u32 mask = 0x40; f & mask` becomes `f & 0x40`). A local read more than once is left
   for you.
@@ -303,11 +305,16 @@ leaves the source tree alone and writes the top 50 families and embedded-object 
 directory. Pass source paths or directories for a smaller scan. Inspect any family with
 `tools/structfamilies.py --family FAMILY`, using the ID in the report. A family needs compatible
 compiler-measured storage plus evidence from calls, a RAM object, or a report unit. Check the
-evidence before applying a family with only report-unit or shared-parameter support.
+evidence before applying a family with only report-unit or shared-parameter support. Return
+observations compare direct calls with the callee's measured result type, which can expose
+different declarations of the same allocator.
 
 Two supported parent declarations can provide evidence for a child family when both embed
-compatible private types in the same named member slot. Merge the child first if the parent
-preview reports a private type dependency, then rescan the parent units for their new layouts.
+compatible private types. A typed handoff can support a renamed slot with the same span and
+agreeing child fields. The merger can declare equivalent private children from the same slot
+alongside their parent. It can also place a shared child in opaque storage when independent
+typed calls identify one size-checked candidate. Where the preview still reports a private
+type dependency, merge the child first and rescan its users.
 For a focused rescan, pass the parent source paths and repeat `--shared-header include/PATH.h`
 for the known shared types. Write the focused catalog with `--out build/structfamilies/focus`
 and give its `families.json` to `structmerge.py --catalog`. The report identifies the restricted
@@ -320,14 +327,18 @@ marks uncertain choices, checks the total size, and leaves unnamed bytes as padd
 `--name TAG` or `--header include/PATH.h` to choose another destination, or
 `--use-shared 'struct TAG'` to adopt a related type listed in the report. The merger
 remeasures that header and its included definitions with agbcc before planning a rewrite.
-Rescan if it reports layout drift.
+Rescan if it reports layout drift. For a reviewed pointer-only view of the same allocation,
+`--allow-prefix` permits a larger existing type with the same alignment. The rewrite checks
+for by-value uses, size queries, and pointer stride before compiling the candidate.
 
 The generated header can retain byte-aligned bitfields that occupy whole bytes. The compiler
 probe checks each emitted bitfield's position and width. Sub-byte fields need an allocation-group
 review before the tool can generate a header for them.
 
 An aggregate layout conflict lists the direct declarations alongside the flattened field votes.
-Use this evidence to review overlays, such as an array and a union that cover the same bytes.
+When an explicit union and a different aggregate cover the same measured span, the merger can
+preserve both in a named union and rewrite uses through their respective members. It can also
+map literal array indexes to named scalar fields at the same offsets.
 
 Add `--apply` in a writable worker checkout to try the proposals. Each unit goes through
 `keepcheck.py`, and the tool checks every dependent of a newly written header. The output

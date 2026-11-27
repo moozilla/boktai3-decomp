@@ -658,13 +658,14 @@ def explicit_overlays(views, used_tags, owner):
         role = next(m["name"] for _, m in entries if m["ctype"].startswith("union "))
         name = available_name(owner + role[:1].upper() + role[1:], used_tags)
         used_tags.add(name)
+        storage = role + "Storage"
         alternatives = [dict(v, kind="union", members=[dict(m, off=0)], size=size, align=m["align"])
                         for v, m in entries]
         plan = plan_record({"kind": "union", "size": size, "loads": []}, alternatives, name)
         plans[plan.spell] = plan
         for view, m in entries:
             replacements[view["id"], m["name"]] = dict(
-                m, name=role, ctype=plan.spell, decl=f"{plan.spell} {role}", align=plan.align,
+                m, name=storage, ctype=plan.spell, decl=f"{plan.spell} {storage}", align=plan.align,
                 array=False, esize=None, private=[], forwards=[], headers=[], self_ref=False,
                 signed=None, width=None, embedded=plan.spell)
     return [dict(view, members=[replacements.get((view["id"], m["name"]), m) for m in view["members"]])
