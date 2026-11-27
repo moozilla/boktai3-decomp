@@ -1,8 +1,6 @@
 #include "monsters/cannons/vulcan_cannon_worker.h"
 #include "objects/hazards/animated_hazard.h"
-struct CannonSample {
-    s32 x : 16, y : 16, z : 16, pad : 16;
-};
+#include "recovered/contact_sample_vector_layout.h"
 s32 Div(s32, s32);
 static inline void subtract(struct SceneVec *v, struct SceneVec *a, struct SceneVec *b)
 {
@@ -27,7 +25,7 @@ static inline u8 *cellData(s32 index)
 s32 VulcanCannon_HasClearShot(struct VulcanCannon *p)
 {
     struct SceneVec delta;
-    struct CannonSample sample;
+    struct ContactSampleVector sample;
     s32 count = Div(p->range, 256);
     s32 i;
     subtract(&delta, Player_GetEffectivePosition(0), (struct SceneVec *)&p->display.position);

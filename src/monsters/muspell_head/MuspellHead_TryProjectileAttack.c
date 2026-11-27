@@ -1,11 +1,9 @@
 #include "monsters/muspell_head.h"
 #include "objects/hazards/animated_hazard.h"
+#include "recovered/contact_sample_vector_layout.h"
 u32 MuspellHead_UpdateProjectileAttack(void *);
 void Anim_RestartSequence(void *, void *, u32, u32, u32);
 void Sound_PlaySong(u32);
-struct CannonSample {
-    s32 x : 16, y : 16, z : 16, pad : 16;
-};
 s32 Div(s32, s32);
 static inline void subtract(struct SceneVec *v, struct SceneVec *a, struct SceneVec *b)
 {
@@ -36,7 +34,7 @@ static inline s32 distanceSquared(struct SceneVec *a, struct SceneVec *b)
 u32 MuspellHead_TryProjectileAttack(struct MuspellHead *p)
 {
     struct SceneVec delta;
-    struct CannonSample sample;
+    struct ContactSampleVector sample;
     s32 i;
     if (p->enabled) {
         if (distanceSquared(Player_GetEffectivePosition(0), (struct SceneVec *)&p->sprite.position) < p->attackDistance) {

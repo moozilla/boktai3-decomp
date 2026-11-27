@@ -1,4 +1,5 @@
 #include "monsters/armor/scene_combat_actor.h"
+#include "recovered/contact_sample_vector_layout.h"
 
 s32 Script_GetValue(void);
 s32 Script_SeekToKeyword(u32);
@@ -18,13 +19,6 @@ u32 Script_GetKeywordValue(u32, u32);
 void Anim_SetKeyframes(void *, void *, int, int, int);
 void Armor_InitParts(void *, u32, u32);
 void Armor_ReceiveTargetEvent(void);
-
-struct T {
-    u32 a : 16;
-    u32 b : 16;
-    u32 c : 16;
-    u32 d : 16;
-};
 
 struct W {
     u32 w[8];
@@ -47,7 +41,7 @@ struct S {
     u8 f3c[0x58];
     struct W f94;
     u8 fb4[0x20];
-    struct T fd4;
+    struct ContactSampleVector fd4;
     u8 pad1[0x114 - 0xdc];
     u8 f114[0x6c];
     u32 f180[2];
@@ -107,7 +101,7 @@ struct S {
 s32 Armor_InitFromScript(struct S *p, u32 arg)
 {
     struct SceneCombatActor *actor = (void *)p;
-    struct T t;
+    struct ContactSampleVector t;
     void *q;
     u32 r;
     s32 i;
@@ -115,12 +109,12 @@ s32 Armor_InitFromScript(struct S *p, u32 arg)
     u8 *a;
     u8 *w;
     u8 *x;
-    struct T *y;
+    struct ContactSampleVector *y;
     u32 one;
 
-    t.a = 0x480;
-    t.b = 0x100;
-    t.c = 0x480;
+    t.x = 0x480;
+    t.y = 0x100;
+    t.z = 0x480;
     p->wB34 = 0;
     p->bB38 = 0;
     p->hB32 = 0x8001;
@@ -137,9 +131,9 @@ s32 Armor_InitFromScript(struct S *p, u32 arg)
     p->hB46 = 0;
     p->wB48 = 0;
     if (Script_SeekToKeyword(0x70)) {
-        t.a = Script_GetValue();
-        t.b = Script_GetValue();
-        t.c = Script_GetValue();
+        t.x = Script_GetValue();
+        t.y = Script_GetValue();
+        t.z = Script_GetValue();
     }
     p->bB39 = Script_GetKeywordValue(0x64, 0);
     p->hB1E = Script_GetKeywordValue(0x6c, 5000);
