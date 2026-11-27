@@ -1,9 +1,6 @@
 #include "global.h"
 #include "player/player.h"
-struct LinkSide {
-    u8 pad0[0x18];
-    s16 side;
-};
+#include "link/session/link_session_state.h"
 struct LinkAura {
     u8 pad0[0x18];
     s32 owner;
@@ -24,14 +21,14 @@ struct LinkAura {
     u8 pad53A[0xaf2 - 0x53a];
     u16 fade;
 };
-extern struct LinkSide *gLinkSession;
+extern struct AreaEffectLinkState *gLinkSession;
 void Player_PlayLocalSong(s32, s32);
 static inline s32 LinkAura_LocalSide(void)
 {
-    struct LinkSide *a = gLinkSession;
+    struct AreaEffectLinkState *a = gLinkSession;
     if (a == 0)
         return -1;
-    return a->side;
+    return a->localPlayer;
 }
 static inline s32 LinkAura_IsInStateFour(struct LinkAura *other)
 {
