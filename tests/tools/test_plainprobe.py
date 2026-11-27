@@ -77,6 +77,25 @@ u32 f(struct Actor *p) {
         self.assertIn("u32 mask = 3;", variant)
         self.assertIn("same binding", p.other_uses)
 
+    def test_named_constant_fold_excludes_inner_shadow(self):
+        text = """#define FIRST_MASK (1 << 5)
+u32 f(u32 x) {
+    u32 mask = FIRST_MASK;
+    if (x & mask) {
+        u32 mask = 8;
+        x |= mask;
+    }
+    return x & mask;
+}
+"""
+        p = next(item for item in self.plan(text) if item.literal == "FIRST_MASK")
+        self.assertEqual(p.value, 32)
+        self.assertIn("same binding", p.other_uses)
+        variant = pp.folds.edit_text(text, p.edits)
+        self.assertIn("if (x & ((u32)(FIRST_MASK)))", variant)
+        self.assertIn("return x & ((u32)(FIRST_MASK));", variant)
+        self.assertIn("u32 mask = 8;\n        x |= mask;", variant)
+
     def test_boolean_and_compound_operations(self):
         for body, expected in (
             ("if (*p & m) return 1; return 0;", ("*p", "nonzero")),

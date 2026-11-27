@@ -87,6 +87,7 @@ class Fold:
     uses: tuple
     edits: tuple
     description: str
+    number: int | None = None
 
 
 def edit_text(text, edits):
@@ -176,7 +177,7 @@ def folds(text, rel=None, every=False, *, sites=None):
     return out
 
 
-def grouped_folds(text, rel, offsets):
+def grouped_folds(text, rel, offsets, *, resolve_constant=None):
     """Plan remaining literal bindings in grouped declarations or sibling scopes."""
     code = keepcheck.blank_comments(text)
     declarations = list(concessions._local_declarations(code))
@@ -202,8 +203,11 @@ def grouped_folds(text, rel, offsets):
                 continue
             if initialized and pos not in offsets:
                 continue
-            uses = reads(code, name, stop, limit)
-            if not uses or any(stop <= offset < limit for offset in bindings[name]):
+            shadows = [(offset, concessions._scope_end(code, offset))
+                       for offset in bindings[name] if stop <= offset < limit]
+            uses = [use for use in reads(code, name, stop, limit)
+                    if not any(begin <= use < finish for begin, finish in shadows)]
+            if not uses:
                 continue
             if len(group) == 1:
                 cuts = [(start, stop, "")]
@@ -213,7 +217,7 @@ def grouped_folds(text, rel, offsets):
                 cuts = [(pos, stop, "")]
             key = pos
             if initialized:
-                lit = re.fullmatch(r"\s*=\s*(" + LIT + r")\s*", code[pos + len(name):stop - 1])
+                lit = re.fullmatch(r"\s*=\s*(.+?)\s*", code[pos + len(name):stop - 1], re.S)
                 # The declarator itself and any following declarator's read
                 # stay in the same scope. Replacing the latter is safe.
             else:
@@ -224,7 +228,7 @@ def grouped_folds(text, rel, offsets):
                         concessions._scope_end(code, at) != limit or
                         re.search(r"\bgoto\b", code[end:at])):
                     continue
-                lit = re.match(r"\s*=\s*(" + LIT + r")\s*;", code[at + len(name):limit])
+                lit = re.match(r"\s*=(?!=)\s*([^;{}]+?)\s*;", code[at + len(name):limit])
                 if not lit:
                     continue
                 cuts.append((at, at + len(name) + lit.end(), ""))
@@ -232,12 +236,24 @@ def grouped_folds(text, rel, offsets):
                 key = pos if pos in offsets else at
             if not lit or not uses or key not in offsets:
                 continue
-            literal = lit[1]
-            try:
-                number = value(literal)
-            except ValueError:
+            literal = lit[1].strip()
+            numeric = re.fullmatch(LIT, literal)
+            if numeric:
+                try:
+                    number = value(literal)
+                except ValueError:
+                    continue
+            elif (resolve_constant and concessions._is_constant_arg(literal)
+                  and not re.search(r"(?m)^[ \t]*#", code[pos:limit])
+                  and not any(pos <= declaration < limit
+                              for token in re.findall(r"\b[A-Za-z_]\w*\b", literal)
+                              for declaration in bindings[token])):
+                number = resolve_constant(literal)
+            else:
+                number = None
+            if number is None:
                 continue
-            if not bounds[0] <= number <= bounds[1]:
+            if not numeric or not bounds[0] <= number <= bounds[1]:
                 # Write the same converted value even when the literal has
                 # a different width or signedness from the local.
                 ctype = re.sub(r"\b(?:const|register)\s+", "", dtype)
@@ -256,7 +272,7 @@ def grouped_folds(text, rel, offsets):
                 edits = cuts + [(use, use + len(name), replacement) for use in uses]
                 line = code.count("\n", 0, key) + 1
                 out[key] = Fold(name, literal, tuple(uses), tuple(sorted(edits)),
-                                f"{rel}:{line}: fold {name} at its {len(uses)} reads")
+                                f"{rel}:{line}: fold {name} at its {len(uses)} reads", number)
     return out
 
 

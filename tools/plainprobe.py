@@ -566,10 +566,11 @@ def plan(path, text, header_cache):
     disabled = [(m.start(), m.end()) for m in re.finditer(
         r"(?ms)^\s*#\s*ifdef\s+UBFIX\b.*?(?=^\s*#\s*(?:else|endif)\b)", code)]
     local_folds = folds.folds(text, rel, every=True, sites=locals_) if locals_ else {}
+    helpers, values, bodies = unit_facts(path, text)
     remaining = {s.offset for s in locals_ if not s.excused} - local_folds.keys()
     if remaining:
-        local_folds.update(folds.grouped_folds(text, rel, remaining))
-    helpers, values, bodies = unit_facts(path, text)
+        local_folds.update(folds.grouped_folds(text, rel, remaining,
+                                              resolve_constant=lambda literal: constant(literal, values)))
     helper_args = dict(helper_reads(code, helpers)) if local_folds else {}
     out = []
     for site in sites:
@@ -598,7 +599,7 @@ def plan(path, text, header_cache):
                 p.reason = "no safe fold_literals --every-read proposal"
                 continue
             p.spelling, p.literal, p.edits = fold.name, fold.literal, fold.edits
-            p.value = folds.value(fold.literal)
+            p.value = folds.value(fold.literal) if fold.number is None else fold.number
             keys = set()
             for use in fold.uses:
                 helper = None
