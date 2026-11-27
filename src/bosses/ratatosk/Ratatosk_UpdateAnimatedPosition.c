@@ -1,10 +1,8 @@
 #include "global.h"
-struct RatatoskPosition {
-    s16 x, y, z, pad;
-};
+#include "bosses/ratatosk/proximity_position_layout.h"
 struct RatatoskSprite {
     u8 pad0[12];
-    struct RatatoskPosition position;
+    struct ProximityPosition position;
     u8 pad14[0x34];
 };
 struct Ratatosk {
@@ -17,12 +15,12 @@ struct Ratatosk {
     s32 targetDistanceSquared;
     u8 targetAngle;
     u8 padCD[0x43];
-    struct RatatoskPosition *target;
+    struct ProximityPosition *target;
     u8 pad114[0x218];
     s32 animationDelta;
     u8 pad330[0x1c];
     u8 animation[0x20];
-    struct RatatoskPosition colliderPosition;
+    struct ProximityPosition colliderPosition;
     u8 pad374[0xadc];
     s16 scale;
 };
