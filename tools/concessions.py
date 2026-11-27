@@ -207,6 +207,8 @@ class Site:
     excused: bool = False
     weight: int = field(default=1, compare=False, kw_only=True)
     note: str = field(default="", compare=False)  # detail for the report ("12 call sites, ...")
+    offset: int = field(default=-1, compare=False, kw_only=True)
+    argument: int = field(default=-1, compare=False, kw_only=True)
 
 
 def strip(text: str) -> str:
@@ -479,9 +481,11 @@ def _warn_sites(code: str, weights):
             yield m.start(), "once-loop"
 
 
-def sites(text: str, path=None, *, single_use=frozenset(), kinds=SCORED + WARN + TRACKED) -> list[Site]:
+def sites(text: str, path=None, *, single_use=frozenset(), kinds=SCORED + WARN + TRACKED,
+          split_locals=False) -> list[Site]:
     """Every concession in TEXT (a function body, a unit or a header), excused or not.
-    SINGLE_USE names the statement macros used at only one site in the tree."""
+    SINGLE_USE names the statement macros used at only one site in the tree.
+    SPLIT_LOCALS exposes each binding even if several share a diagnostic line."""
     code = strip(text)
     ok = allows(text)
     library = is_library(path)
@@ -493,7 +497,7 @@ def sites(text: str, path=None, *, single_use=frozenset(), kinds=SCORED + WARN +
     def add(pos, kind):
         line = _line(code, pos)
         excused = kind in EXCUSABLE + WARN and (library or kind in ok.get(line, {}))
-        found.append(Site(line, kind, excused, weight=weights.get(pos, 1)))
+        found.append(Site(line, kind, excused, weight=weights.get(pos, 1), offset=pos))
 
     for m in _ASM_EMPTY.finditer(code):
         kind = asm_kind(m.group("rest"))
@@ -512,7 +516,8 @@ def sites(text: str, path=None, *, single_use=frozenset(), kinds=SCORED + WARN +
     if any(k in kinds for k in WARN) and not library:
         seen = set()
         for pos, kind in _warn_sites(code, weights):
-            if kind in kinds and (_line(code, pos), kind) not in seen:
+            if kind in kinds and ((_line(code, pos), kind) not in seen or
+                                  split_locals and kind in ("const-local", "literal-local")):
                 seen.add((_line(code, pos), kind))
                 add(pos, kind)
             elif kind in kinds and kind in ("const-local", "literal-local"):
@@ -968,7 +973,7 @@ def literal_argument_sites(path, text, root=None, *, headers=None):
         for index, param in params.items():
             if index < len(args) and _is_constant_arg(args[index]):
                 out.append(Site(line, "literal-param", excused or "literal-param" in ok.get(line, {}),
-                                f"{name} argument {param}"))
+                                f"{name} argument {param}", offset=call.start(), argument=index))
     return out
 
 

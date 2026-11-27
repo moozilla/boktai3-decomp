@@ -31,6 +31,7 @@ import argparse
 import os
 import re
 import sys
+from dataclasses import dataclass
 
 TOOLS = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, TOOLS)
@@ -50,11 +51,10 @@ ASSIGN = r"^[ \t]*{0}\s*=\s*(" + LIT + r")\s*;[ \t]*\n"
 
 def value(lit):
     s = re.sub(r"\s+", "", lit).rstrip("uUlL")
-    if s.startswith("~"):
-        return ~int(s[1:], 0)
-    if s.startswith("-"):
-        return -int(s[1:], 0)
-    return int(s, 0)
+    op = s[0] if s.startswith(("~", "-")) else ""
+    digits = s[len(op):]
+    v = int(digits, 16 if digits.lower().startswith("0x") else 8 if digits.startswith("0") else 10)
+    return ~v if op == "~" else -v if op == "-" else v
 
 
 def type_range(decl_type):
@@ -79,13 +79,29 @@ def address_or_size(before):
     return re.search(r"(?:^|[(,=?:;{}]|\breturn)\s*&$", before) is not None
 
 
-def candidates(text, rel=None, every=False):
-    """[(new text, description)] for each single-use literal local the linter warns about (EVERY:
-    also a local read more than once, the literal written at every read)."""
+@dataclass(frozen=True)
+class Fold:
+    name: str
+    literal: str
+    uses: tuple
+    edits: tuple
+    description: str
+
+
+def edit_text(text, edits):
+    for start, end, replacement in sorted(edits, reverse=True):
+        text = text[:start] + replacement + text[end:]
+    return text
+
+
+def folds(text, rel=None, every=False, *, sites=None):
+    """Map linter offsets to individual folds, or all reads of a binding with EVERY."""
     code = keepcheck.blank_comments(text)
     drafts = keepcheck.draft_ranges(text)
-    warned = {s.line for s in concessions.sites(text, rel, kinds=("literal-local", "const-local")) if not s.excused}
-    out = []
+    if sites is None:
+        sites = concessions.sites(text, rel, kinds=("literal-local", "const-local"), split_locals=True)
+    warned = {s.offset for s in sites if not s.excused}
+    out = {}
     for fstart, fend, fname in keepcheck.function_spans(text):
         if keepcheck.in_ranges(fstart, drafts):
             continue
@@ -93,7 +109,8 @@ def candidates(text, rel=None, every=False):
             indent, dtype, base, name, lit = d.groups()
             if base in ("return", "goto", "case", "else") or dtype.split()[-1] == name:
                 continue
-            line = decl_line = text.count("\n", 0, d.start()) + 1
+            line = text.count("\n", 0, d.start()) + 1
+            offsets = {d.start(4)}
             body_end = concessions._scope_end(code, d.end())
             cut = [(d.start(), d.end())]
             if lit is None:  # u32 mask; ... mask = 0x40;
@@ -104,12 +121,13 @@ def candidates(text, rel=None, every=False):
                 if not a or a.start(1) < first[0]:
                     continue
                 line = text.count("\n", 0, a.start()) + 1
+                offsets.add(first[0])
                 lit = a.group(1)
                 cut.append((a.start(), a.end()))
                 lo = a.end()
             else:
                 lo = d.end()
-            if line not in warned and decl_line not in warned:  # const-local warns at the declaration
+            if not offsets & warned:  # const-local warns at the declaration
                 continue
             uses = reads(code, name, lo, body_end)
             if not uses or (len(uses) != 1 and not every) \
@@ -118,7 +136,10 @@ def candidates(text, rel=None, every=False):
             if re.search(r"\b(?:\w+\s+)+\**\s*%s\s*[=;,\[)]" % re.escape(name), code[fstart:fend].replace(
                     code[d.start():d.end()], "", 1)):
                 continue  # declared again (shadowed) or a parameter of the same name
-            v = value(lit)
+            try:
+                v = value(lit)
+            except ValueError:
+                continue
             rng = type_range(dtype)
             if rng is None:
                 continue
@@ -144,14 +165,19 @@ def candidates(text, rel=None, every=False):
                     break
             if not ok:
                 continue
-            new = text
-            for use in sorted(uses, reverse=True):
-                new = new[:use] + re.sub(r"\s+", "", lit) + new[use + len(name):]
-            for a, b in sorted(cut, reverse=True):
-                new = new[:a] + new[b:]
+            edits = [(a, b, "") for a, b in cut]
+            edits.extend((use, use + len(name), re.sub(r"\s+", "", lit)) for use in uses)
             where = "its one use" if len(uses) == 1 else f"its {len(uses)} uses"
-            out.append((new, f"{rel}:{line}: {name} = {lit} folded into {where} in {fname}"))
+            fold = Fold(name, lit, tuple(uses), tuple(sorted(edits)),
+                        f"{rel}:{line}: {name} = {lit} folded into {where} in {fname}")
+            for offset in sorted(offsets & warned):
+                out[offset] = fold
     return out
+
+
+def candidates(text, rel=None, every=False):
+    """[(new text, description)] for the folds selected by this tool."""
+    return [(edit_text(text, fold.edits), fold.description) for fold in folds(text, rel, every).values()]
 
 
 def adds_concession(old, new, rel):
