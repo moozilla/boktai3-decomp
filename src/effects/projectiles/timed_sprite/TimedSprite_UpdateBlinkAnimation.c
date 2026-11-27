@@ -1,9 +1,7 @@
 #include "global.h"
 #include "engine/engine_globals.h"
 #include "player/cutscene/player_cue_sequence.h"
-struct ParticleVector {
-    u16 x, y, z, unused;
-};
+#include "recovered/particle_emission_vector_layout.h"
 struct ParticleSequence {
     const u16 *commands;
     u8 flags, frameCount, frameWeight, duration;
@@ -14,10 +12,10 @@ struct Projectile {
     u8 unknown4[0xC];
     u16 frame;
     u8 unknown12[10];
-    struct ParticleVector position;
+    struct ParticleEmissionVector position;
     u8 unknown24[8];
     struct ParticleSequence sequence;
-    struct ParticleVector velocity;
+    struct ParticleEmissionVector velocity;
     u8 collider[0x56];
     u8 active;
     s8 slot;

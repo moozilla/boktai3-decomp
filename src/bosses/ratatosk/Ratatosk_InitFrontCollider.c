@@ -1,9 +1,7 @@
 #include "scene/collision/packed_contact_vector.h"
+#include "recovered/particle_emission_vector_layout.h"
 #define gSineTable gUnk_086149C4
 #include "global.h"
-struct RatatoskPosition {
-    s16 x, y, z, pad;
-};
 struct RatatoskFacing {
     u8 pad[9];
     u8 direction;
@@ -13,7 +11,7 @@ struct Ratatosk {
     struct RatatoskFacing facing;
     u8 pad54[0x1dc];
     u8 frontCollider[0x13c];
-    struct RatatoskPosition position;
+    struct ParticleEmissionVector position;
     u8 pad374[0xb2e];
     s16 attack, damage, attackKind;
 };
@@ -27,7 +25,7 @@ static inline s32 scale(s32 v)
 {
     return v >= 0 ? v >> 12 : -((-v) >> 12);
 }
-static inline void polar(struct RatatoskPosition *v, s32 angle, s32 radius)
+static inline void polar(struct ParticleEmissionVector *v, s32 angle, s32 radius)
 {
     v->x = scale(gSineTable[(angle + 64) & 255] * radius);
     v->y = 0;
@@ -38,7 +36,7 @@ void Ratatosk_InitFrontCollider(struct Ratatosk *p)
     struct RatatoskFacing *facing = &p->facing;
     void *collider = p->frontCollider;
     struct PackedContactVector size, offset;
-    struct RatatoskPosition pos;
+    struct ParticleEmissionVector pos;
     size.x = 96;
     size.y = 128;
     size.z = 96;
@@ -48,8 +46,8 @@ void Ratatosk_InitFrontCollider(struct Ratatosk *p)
     Collider_Init(collider, 0, 0x2001, 0, 16, &size, &offset);
     polar(&pos, (u8)((facing->direction << 6) - 64), 512);
     {
-        struct RatatoskPosition *v = &pos;
-        struct RatatoskPosition *base = &p->position;
+        struct ParticleEmissionVector *v = &pos;
+        struct ParticleEmissionVector *base = &p->position;
         v->x = v->x + base->x;
         v->y = v->y + base->y;
         v->z = v->z + base->z;

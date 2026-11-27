@@ -3,20 +3,18 @@
 #include "engine/video/display_animation.h"
 #include "engine/video/display_sprite_playback.h"
 #include "scene/terrain/terrain_cell_probe.h"
+#include "recovered/particle_emission_vector_layout.h"
 
 /* Tentative: animate a pooled effect, integrate its velocity and stop it at terrain. */
-struct EffectPosition {
-    s16 x, y, z, pad;
-};
 struct SceneColliderEffect {
     u32 flags;
     u8 unk_04[0xc];
     u16 frame;
     u8 unk_12[0xa];
-    struct EffectPosition position;
+    struct ParticleEmissionVector position;
     u8 unk_24[8];
     struct DisplaySequenceState sequence;
-    struct EffectPosition velocity;
+    struct ParticleEmissionVector velocity;
     u8 collider[0x54];
     s16 motionFlags;
     u8 active;
@@ -34,7 +32,7 @@ static inline u8 TestFlag(struct SceneColliderEffect *effect, s32 mask)
         return 1;
     return 0;
 }
-static inline u32 GroundHeight(struct EffectPosition *position)
+static inline u32 GroundHeight(struct ParticleEmissionVector *position)
 {
     s32 x = position->x >> 8, z = position->z >> 8, index;
     u8 *cell;
@@ -57,8 +55,8 @@ static inline u32 GroundHeight(struct EffectPosition *position)
     }
     return height;
 }
-static inline void AddPosition(struct EffectPosition *out, struct EffectPosition *a,
-                               struct EffectPosition *b)
+static inline void AddPosition(struct ParticleEmissionVector *out, struct ParticleEmissionVector *a,
+                               struct ParticleEmissionVector *b)
 {
     out->x = b->x + a->x;
     out->y = b->y + a->y;
@@ -71,7 +69,7 @@ void sub_08121504(struct SceneColliderEffectPool *pool, struct SceneColliderEffe
     struct SceneColliderEffect *sprite = effect;
     struct DisplaySequenceState *state;
     u32 ended;
-    struct EffectPosition *position;
+    struct ParticleEmissionVector *position;
     void *collider;
     sprite->flags &= ~1;
     state = &effect->sequence;
@@ -91,7 +89,7 @@ void sub_08121504(struct SceneColliderEffectPool *pool, struct SceneColliderEffe
         u8 stopped = TestFlag(effect, 0x20);
         position = &sprite->position;
         if (!stopped) {
-            struct EffectPosition next = sprite->position;
+            struct ParticleEmissionVector next = sprite->position;
             u16 oldHeight, newHeight;
             AddPosition(&next, &next, &effect->velocity);
             effect->velocity.y--;

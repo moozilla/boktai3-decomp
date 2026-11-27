@@ -1,9 +1,7 @@
 #include "global.h"
 #include "engine/engine_globals.h"
 #include "player/cutscene/player_cue_sequence.h"
-struct ParticleVector {
-    u16 x, y, z, unused;
-};
+#include "recovered/particle_emission_vector_layout.h"
 struct ParticleSequence {
     const u16 *commands;
     u8 flags, frameCount, frameWeight, duration;
@@ -14,10 +12,10 @@ struct Projectile {
     u8 unknown4[0xC];
     u16 frame;
     u8 unknown12[10];
-    struct ParticleVector position;
+    struct ParticleEmissionVector position;
     u8 unknown24[8];
     struct ParticleSequence sequence;
-    struct ParticleVector velocity;
+    struct ParticleEmissionVector velocity;
     u8 collider[0x56];
     u8 active;
     s8 slot;
@@ -31,7 +29,7 @@ struct TerrainMap {
     u16 rows[1];
 };
 void *TerrainModifiers_FindCellOverride(u32, u32);
-static inline s32 Cell(struct ParticleVector *p)
+static inline s32 Cell(struct ParticleEmissionVector *p)
 {
     s32 x = (s16)p->x >> 8, z = (s16)p->z >> 8;
     if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
@@ -45,7 +43,7 @@ static inline u8 *Properties(u32 cell)
         return p + 4;
     return ((struct TerrainMap *)gTerrainMap)->cells + (cell * 4 + 12);
 }
-static inline s32 Height(u32 cell, struct ParticleVector *p)
+static inline s32 Height(u32 cell, struct ParticleEmissionVector *p)
 {
     u8 *data = Properties(cell);
     u32 shape = *data >> 4;
@@ -60,14 +58,15 @@ static inline s32 Height(u32 cell, struct ParticleVector *p)
     }
     return height;
 }
-static inline void Sum(struct ParticleVector *out, struct ParticleVector *a,
-                       struct ParticleVector *b)
+static inline void Sum(struct ParticleEmissionVector *out, struct ParticleEmissionVector *a,
+                       struct ParticleEmissionVector *b)
 {
     out->x = a->x + b->x;
     out->y = a->y + b->y;
     out->z = a->z + b->z;
 }
-inline static s32 Cell_X(u16 inputX, struct ParticleVector *p, struct ParticleVector **saved)
+inline static s32 Cell_X(u16 inputX, struct ParticleEmissionVector *p,
+                         struct ParticleEmissionVector **saved)
 {
     s32 x = (s16)inputX >> 8;
     s32 z = (s16)p->z >> 8;
@@ -82,8 +81,8 @@ void TimedSprite_UpdateBallisticFlight(void *unused, struct Projectile *input)
     struct Projectile *p = input;
     struct Projectile *sprite = input;
     struct ParticleSequence *sequence;
-    struct ParticleVector next;
-    struct ParticleVector *position;
+    struct ParticleEmissionVector next;
+    struct ParticleEmissionVector *position;
     s32 floor;
     s32 nextFloor;
     p->flags &= ~1;
@@ -101,7 +100,7 @@ void TimedSprite_UpdateBallisticFlight(void *unused, struct Projectile *input)
     Sum(&next, &p->velocity, &next);
     p->velocity.y--;
     {
-        struct ParticleVector *current = &sprite->position;
+        struct ParticleEmissionVector *current = &sprite->position;
         {
             u32 cell = Cell_X(sprite->position.x, current, &position);
             floor = Height(cell, position);
