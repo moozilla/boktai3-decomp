@@ -76,6 +76,8 @@ def signatures():
 
 
 def layout_fields(layout):
+    if "targets" in layout:
+        return {(row["owner"], row["offset"], row["width"]): row["field"] for row in layout["targets"]}
     fields = {}
     for row in layout["rows"]:
         for owner, member in row["members"].items():
@@ -84,7 +86,7 @@ def layout_fields(layout):
                 fields[owner, row["off"], width] = f"{owner}.{member['name']}"
     # Only classes with a proven first-member base qualify (no offset-only guesses).
     parents = {}
-    for path in Path("include").glob("*.h"):
+    for path in Path("include").rglob("*.h"):
         parents.update(re.findall(r"struct (\w+)\s*\{\s*struct (RoomActor|ChaseActor)\s+\w+;",
                                   strip(path.read_text())))
     for child in parents:
@@ -215,12 +217,14 @@ def main():
     asm = Path("gen/code.s").read_text()
     funcs = {int(addr, 16): name for name, addr in re.findall(LABEL.pattern, asm, re.M)}
     joins = {int(addr, 16) for addr in re.findall(r"^_([0-9A-Fa-f]{8}):", asm, re.M)}
+    layout = json.loads(args.layouts.read_text())
+    globals_ = {(int(r["addr"], 16), r["width"]): r["field"] for r in layout.get("globals", [])}
     with open("symbols/ram.csv") as f:
-        globals_ = {(int(r["addr"], 16), 4): r["name"] for r in csv.DictReader(f)
-                    if r["name"] in PAUSE | {"gEnginePauseFlags"}}
+        globals_.update({(int(r["addr"], 16), 4): r["name"] for r in csv.DictReader(f)
+                         if r["name"] in PAUSE | {"gEnginePauseFlags"}})
     with subprocess.Popen(["arm-none-eabi-objdump", "-d", "--no-show-raw-insn", "--stop-address=0x0824dafc",
                            "build/boktai3.elf"], stdout=subprocess.PIPE, text=True) as process:
-        rows = sample(process.stdout, rom, funcs, joins, signatures(), layout_fields(json.loads(args.layouts.read_text())), globals_)
+        rows = sample(process.stdout, rom, funcs, joins, signatures(), layout_fields(layout), globals_)
         if process.wait():
             sys.exit("objdump failed")
     shared = Counter((r.mask.ready, r.reg) for _, _, _, r in rows.values())

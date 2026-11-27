@@ -18,8 +18,8 @@ Two shapes are folded, each with its declaration alone on its line:
     u32 mask;  ...  mask = 0x40;     (a bare declaration, then one literal assignment)
 
 The value must fit the local's type (`u8 x = 0x1FF` would change the value), except a negative
-or `~` literal of an unsigned local whose read is an operand of `&`, `|` or `^`, where the
-conversion is the same. Not folded: a read under `sizeof`, a negative literal after `+` or `-`
+or `~` literal of an unsigned word whose read is an operand of `&`, `|` or `^`, where the
+word's bits are the same. Not folded: a read under `sizeof`, a negative literal after `+` or `-`
 (that is `subtract-negative`'s form), a local declared twice in the function, anything inside
 `#ifdef NONMATCHING` or a macro, and a fold that gives the linter a new finding (`off = 0x8D0`
 read as `(u8 *)p + off` would become a raw-offset error). Locals the linter excuses with
@@ -154,7 +154,7 @@ def folds(text, rel=None, every=False, *, sites=None):
                 if not rng[0] <= v <= rng[1]:
                     bitwise = re.search(r"(?:[&|^]=?)$", before) and not before.endswith(("&&", "||")) \
                         or re.match(r"[&|^](?![&|])", after)
-                    if not (negative and rng[0] == 0 and bitwise):
+                    if not (negative and rng == (0, 0xFFFFFFFF) and bitwise):
                         ok = False
                         break
                 if address_or_size(before):

@@ -122,7 +122,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [docs/FOUNDRY.md](../docs/FOUNDRY.md) | The foundry: asm to a committed match, measured as a funnel | #matching #tooling | 12 |
 | [docs/GAME_LAYOUT.md](../docs/GAME_LAYOUT.md) | Boktai 3 game layout: from ROM to gameplay | *#assets #text #tooling* | 40 |
 | [docs/GHOUL_CONTACT_RESPONSE.md](../docs/GHOUL_CONTACT_RESPONSE.md) | Ghoul contact response: 0808B3EC | #matching #ghoul #scene-actor #regalloc #0808B3EC | 3 |
-| [docs/HANDOFF.md](../docs/HANDOFF.md) | Handoff: current state and how to continue | #process | 15 |
+| [docs/HANDOFF.md](../docs/HANDOFF.md) | Handoff: current state and how to continue | #process | 16 |
 | [docs/HIT_SWITCH.md](../docs/HIT_SWITCH.md) | Hit-counted switch pool (tentative identity) |  | 5 |
 | [docs/KNIDL_PROCESS_REVIEW_2026-10-09.md](../docs/KNIDL_PROCESS_REVIEW_2026-10-09.md) | KNIDL workflow review and implications for Boktai 3 | *#process* | 13 |
 | [docs/LAYOUTS.md](../docs/LAYOUTS.md) | RAM object layouts merged across files | #tooling #matching | 12 |
@@ -243,6 +243,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [docs/history/2026-11-20.md](../docs/history/2026-11-20.md) | 2026-11-20 | #actors #compiler #matching #monsters #phase3 #scene #scene-actors #tooling #wireless | 2 |
 | [docs/history/2026-11-25.md](../docs/history/2026-11-25.md) | Work log, 2026-11-25 | #actors #assets #compiler #hardware #matching #menu #phase3 #process #scene #tooling | 5 |
 | [docs/history/2026-11-26.md](../docs/history/2026-11-26.md) | Work log, 2026-11-26 | #actors #autopilot #bosses #camera #compiler #effects #matching #menu #monster #monsters #phase3 #port #scene #scripts #terrain #tooling #tools #types #verification | 23 |
+| [docs/history/2026-11-27.md](../docs/history/2026-11-27.md) | Work log, 2026-11-27 | #compiler #phase3 #tooling | 1 |
 | [docs/history/HANDOFF_2026-10-23.md](../docs/history/HANDOFF_2026-10-23.md) | Handoff: current state and how to continue | #process | 14 |
 | [docs/history/MANAGER_HANDOFF_2026-10-19.md](../docs/history/MANAGER_HANDOFF_2026-10-19.md) | Manager handoff (2026-10-19) | #process #tooling | 6 |
 | [docs/history/README.md](../docs/history/README.md) | Handoff history |  | 17 |
@@ -450,7 +451,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [notes/phase3-holdouts.md](../notes/phase3-holdouts.md) | Phase 3 holdouts | #matching #phase3 #holdouts | 369 |
 | [notes/pilot-haiku.md](../notes/pilot-haiku.md) | pilot-haiku notes |  | 1 |
 | [notes/pilot-sonnet.md](../notes/pilot-sonnet.md) | pilot-sonnet.md |  | 0 |
-| [notes/plainprobe_2026-11-27.md](../notes/plainprobe_2026-11-27.md) | Plain flag and local-constant probes | #compiler #phase3 #tooling | 58 |
+| [notes/plainprobe_2026-11-27.md](../notes/plainprobe_2026-11-27.md) | Plain flag and local-constant probes | #compiler #phase3 #tooling | 65 |
 | [notes/player-clone-fill_2026-11-13.md](../notes/player-clone-fill_2026-11-13.md) | Player clone fill-local cleanup | #matching #actors #animation | 2 |
 | [notes/player-cue-cleanup_2026-10-30.md](../notes/player-cue-cleanup_2026-10-30.md) | Player cue cleanup — 2026-10-30 | #matching #player #cue #structs #compiler #data #studio | 12 |
 | [notes/player_3.md](../notes/player_3.md) | Player 3 unit consolidation | #player #matching #types | 7 |

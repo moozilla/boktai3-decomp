@@ -9,6 +9,7 @@ ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "tools"))
 
 import plainprobe as pp
+import plainprobe_rom as rom
 
 
 class PlainProbeTests(unittest.TestCase):
@@ -90,6 +91,84 @@ u32 f(struct Actor *p) {
         self.assertEqual(pp.probe(p, sources, checker), ("BOUND-SHARED", "fixture"))
         checker.verdict = "SKIP"
         self.assertEqual(pp.probe(p, sources, checker), ("SKIP", "fixture"))
+
+    def test_mask_operand_orientation_and_temporary_clear(self):
+        rows = self.plan("""static inline u32 Test(u32 v, u32 m) {
+    return v & m;
+}
+static inline void Clear(u32 *p, u32 m) {
+    u32 keep = ~m;
+    *p &= keep;
+}
+u32 f(struct Actor *p) {
+    Clear(&p->flags, 8);
+    return Test(p->flags, 16) | Test(32, p->flags);
+}
+""")
+        clear, right, left = rows
+        self.assertEqual([(p.operation, p.field) for p in rows],
+                         [("clear", "flags"), ("and", "flags"), ("and", "flags")])
+        self.assertEqual([p.value for p in rows], [8, 16, 32])
+        self.assertIn("(p->flags &= ~8)", clear.edits[0][2])
+        self.assertTrue(right.edits and left.edits)
+
+    def test_local_helper_argument_and_typed_pointer_alias(self):
+        p, = self.plan("""#include "engine/word_flags.h"
+void f(struct Actor *p) {
+    u32 mask = 8;
+    u32 *ptr = &p->flags;
+    WordFlags_Set(mask, ptr);
+}
+""")
+        self.assertEqual(p.field_keys, (("struct Actor", "flags", "set"),))
+
+    def test_narrow_unsigned_local_does_not_lose_its_conversion(self):
+        p, = self.plan("""u32 f(u32 word) {
+    u8 keep = ~3;
+    return word & keep;
+}
+""")
+        self.assertFalse(p.edits)
+
+    def test_equal_constant_expression_is_another_use(self):
+        p, = self.plan("""u32 f(u32 flags) {
+    u32 mask = 16;
+    g(1 << 4);
+    return flags & mask;
+}
+""")
+        self.assertIn("1 << 4", p.other_uses)
+
+    def test_clear_links_to_inverted_and_store(self):
+        p, = self.plan("""static inline void Clear(u32 *p, u32 m) {
+    *p &= ~m;
+}
+void f(struct Actor *p) {
+    Clear(&p->flags, 8);
+}
+""")
+        pp.link_rom([p], {}, {("f", "Actor.flags", "and-store", 0xFFFFFFF7): {("08000000", "mask")}})
+        self.assertEqual(p.rom_matches, (("08000000", "mask"),))
+
+    def test_baseline_extent_counts_deleted_trailing_bytes(self):
+        checker = pp.Checker.__new__(pp.Checker)
+        checker.baseline = lambda path, text: (0x08000000, ["f"], b"abcd")
+        checker.compile = lambda path, text: (0x08000000, ["f"], b"ab")
+        verdict, detail = checker.compare(Path("fixture.c"), "base", "edit")
+        self.assertEqual(verdict, "DIFF")
+        self.assertIn("2 byte positions", detail)
+
+    def test_embedded_type_aliases_are_only_from_by_value_members(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "record.h"
+            path.write_text("""struct Actor { u32 flags; };
+struct Child { struct Actor base; struct Actor *ref; };
+struct Wrapper { struct Child nested; };
+""")
+            _, members, ambiguous = rom.records([path])
+        self.assertFalse(ambiguous)
+        self.assertEqual(rom.canonical("struct Wrapper", "nested.base.flags", members), ("struct Actor", "flags"))
+        self.assertEqual(rom.canonical("struct Child", "ref.flags", members), ("struct Child", "ref.flags"))
 
     def test_sample_and_checkpoint(self):
         sites = [pp.Probe("src/scene/here.c", i, 1, i + 1, "literal-param", 1, 0, "src/scene")

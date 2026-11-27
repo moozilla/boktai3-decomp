@@ -14,6 +14,7 @@ import argparse
 import ast
 import bisect
 import csv
+import fcntl
 import hashlib
 import json
 import operator
@@ -42,11 +43,14 @@ REPORT = ROOT / "build/REPORT.md"
 STOP = ROOT / "build/STOP"
 LOCAL_KINDS = ("literal-local", "const-local")
 CLASSES = ("PLAIN", "BOUND-SINGLE", "BOUND-SHARED", "SKIP")
+REVIEW_MARK = "<!-- Worker interpretation below. Preserved on resume. -->"
 ID = r"[A-Za-z_]\w*"
-MEMBER = rf"{ID}(?:(?:->|\.){ID})*"
-FIELD_EXPR = rf"(?:\*{ID}|{MEMBER})"
+MEMBER = rf"{ID}(?:(?:->|\.){ID}|\[(?:{ID}|\d+)\])*"
+FIELD_EXPR = rf"(?:\*\(?{ID}\)?|{MEMBER})"
 NUM = r"(?:0[xX][0-9a-fA-F]+|[0-9]+)[uUlL]*"
 TOKEN = re.compile(rf"{ID}|{NUM}")
+CONST_ATOM = rf"(?:{NUM}|[A-Z][A-Z0-9_]*)"
+CONST_EXPR = re.compile(rf"(?<!\w){CONST_ATOM}(?:\s*(?:<<|>>|[+*|^&-])\s*{CONST_ATOM})+(?!\w)")
 DEFINE = re.compile(rf"(?m)^[ \t]*#[ \t]*define[ \t]+({ID})[ \t]+([^\n]+)")
 PARAM = re.compile(rf"(?P<type>.*?)\s*(?P<name>{ID})\s*$")
 BINOPS = {ast.Add: operator.add, ast.Sub: operator.sub, ast.Mult: operator.mul,
@@ -105,10 +109,13 @@ class Helper:
     mask: str
     operation: str
     result: str
+    alias: tuple = ()
+    complement_type: str = ""
 
 
 def operation(body, mask):
     """Recognize one mask expression, including its simple assignment/boolean spellings."""
+    body = re.sub(rf"\(({FIELD_EXPR})\)", r"\1", body) if "if(" not in body else body
     expr = rf"(?P<target>{FIELD_EXPR})"
     mask = re.escape(mask)
     if m := re.fullmatch(rf"{expr}(?P<op>\|=|&=)(?P<neg>~?){mask};", body):
@@ -116,13 +123,12 @@ def operation(body, mask):
         return (m["target"], op) if op else None
     if m := re.fullmatch(rf"{expr}=(?P<rhs>[^;]+);", body):
         target, rhs = m["target"], unparen(m["rhs"])
-        for join, op in (("|", "set"), ("&", "and-store"), ("&~", "clear")):
+        for bitop, op in (("|", "set"), ("&", "and-store"), ("&", "clear")):
             operand = "~" + mask if op == "clear" else mask
-            bitop = "&" if op == "clear" else join
             if rhs in (target + bitop + operand, operand + bitop + target):
                 return target, op
         return None
-    if m := re.fullmatch(r"if\((.+)\)(?:\{return1;\}|return1;)return0;", body):
+    if m := re.fullmatch(r"if\((.+)\)(?:\{return(?:1|TRUE);\}|return(?:1|TRUE);)return(?:0|FALSE);", body):
         test, op = unparen(m[1]), "nonzero"
     elif m := re.fullmatch(r"return(.+);", body):
         test, op = unparen(m[1]), "and"
@@ -134,32 +140,58 @@ def operation(body, mask):
     return (m["target"] or m["reverse"], op) if m else None
 
 
-def parse_helper(code, match):
+def parse_helper(code, match, getters):
     params = [PARAM.fullmatch(p.strip()) for p in match["params"].split(",")]
     if not all(p and p["type"] for p in params):
-        return None
+        return {}
     names = tuple(p["name"] for p in params)
     types = tuple(p["type"].strip() for p in params)
-    body = compact(code[match.end():concessions._scope_end(code, match.end())])
+    raw = code[match.end():concessions._scope_end(code, match.end())].strip()
+    alias = ()
+    # Some helpers name a typed view of an opaque argument before the operation.
+    if view := re.match(rf"((?:struct|union)\s+{ID})\s*\*\s*({ID})\s*=\s*"
+                        rf"(?:\(\s*(?:void|(?:struct|union)\s+{ID})\s*\*\s*\)\s*)?({ID})\s*;", raw):
+        if view[3] in names:
+            alias = (view[2], view[3], view[1])
+            raw = raw[view.end():]
+    body = compact(raw)
+    # Replace a same-file, one-return field getter. Narrowing getters stay
+    # out of this grammar, since their conversions can change the flag test.
+    for getter, member in getters.items():
+        body = re.sub(rf"\b{re.escape(getter)}\(({ID})\)", lambda m: m[1] + member, body)
     result = re.sub(r"\b(?:static|inline|__inline__)\b", "", code[match.start():match.start("name")]).strip()
-    for mask in names:
+    supported = {}
+    for index, mask in enumerate(names):
         found = operation(body, mask)
         if found:
             target, op = found
-            return Helper(names, types, target, mask, op, result)
-    return None
+            supported[index] = Helper(names, types, target, mask, op, result, alias)
+        # A complemented keep mask is the same one clear operation.
+        keep = re.match(rf"\s*((?:{concessions._SCALAR_TYPE}))\s+({ID})\s*=\s*~\s*{mask}\s*;", raw)
+        if keep and (found := operation(compact(raw[keep.end():]), keep[2])) and found[1] == "and-store":
+            supported[index] = Helper(names, types, found[0], mask, "clear", result, alias, keep[1])
+    return supported
 
 
 def file_facts(text):
     code = keepcheck.blank_comments(text)
-    helpers = {m["name"]: parse_helper(code, m) for m in concessions._INLINE_DEF.finditer(code)}
+    definitions = list(concessions._INLINE_DEF.finditer(code))
+    getters = {}
+    for m in definitions:
+        param = PARAM.fullmatch(m["params"].strip())
+        result = code[m.start():m.start("name")]
+        if param and "," not in param["type"] and "*" in param["type"] and re.search(r"\bu32\s*$", result):
+            body = compact(code[m.end():concessions._scope_end(code, m.end())])
+            getter = re.fullmatch(rf"return{param['name']}((?:->|\.){MEMBER});", body)
+            if getter:
+                getters[m["name"]] = getter[1]
+    helpers = {m["name"]: parse_helper(code, m, getters) for m in definitions}
     for m in concessions._MACRO_DEF.finditer(code):
         macro = concessions._FUNCTION_DEFINE.fullmatch(m[0].replace("\\\n", " "))
         if not macro:
             continue
-        helpers[macro[1]] = None
+        helpers[macro[1]] = {}
         args = tuple(arg.strip() for arg in macro[2].split(","))
-        body = compact(macro[3])
         # Only a statement-expression with a single scalar binding and a single operation.
         if (tmp := concessions._MASK_TEMP.search(macro[3])) and tmp[2] in args:
             prefix, tail = compact(macro[3][:tmp.start()]), compact(macro[3][tmp.end():])
@@ -168,7 +200,10 @@ def file_facts(text):
                 found = operation(body, tmp[1]) or operation("return" + body, tmp[1])
                 if found:
                     target, op = found
-                    helpers[macro[1]] = Helper(args, ("",) * len(args), target, tmp[2], op, "")
+                    index = args.index(tmp[2])
+                    dtype = tmp[0][:tmp.start(1) - tmp.start()].strip()
+                    types = tuple(dtype if i == index else "" for i in range(len(args)))
+                    helpers[macro[1]][index] = Helper(args, types, target, tmp[2], op, "")
     constants = dict(DEFINE.findall(code))
     for enum in re.finditer(r"\benum(?:\s+\w+)?\s*\{([^{}]*)\}", code):
         previous = "-1"
@@ -215,32 +250,58 @@ def unit_facts(path, text):
     return helpers, constants
 
 
-def substitute_target(helper, args):
+def substitute_target(helper, args, code, function, offset):
     target = helper.target
     root = re.search(ID, target)[0]
     rest = target[target.index(root) + len(root):]
+    if helper.alias and root == helper.alias[0]:
+        _, source, dtype = helper.alias
+        arg = args[helper.params.index(source)].strip()
+        return f"(({dtype} *)({arg})){rest}"
     if root not in helper.params:
+        for index in re.findall(rf"\[({ID})\]", rest):
+            if index in helper.params:
+                target = target.replace(f"[{index}]", f"[{args[helper.params.index(index)].strip()}]")
         return target
     index = helper.params.index(root)
     arg = unparen(args[index].strip())
     owner = re.fullmatch(r"(?:const\s+)?((?:struct|union)\s+\w+)\s*\*\s*(?:const)?", helper.types[index])
+    arg_name = re.match(ID, arg)
+    actual = rawfield.declared_type(code, function, offset, arg_name[0]) if arg_name else None
+    opaque = re.match(r"\(\s*void\s*\*\s*\)", arg) or (
+        arg_name and actual is None and re.search(
+            rf"\bvoid\s*\*\s*(?:const\s+)?{arg_name[0]}\b", code[function:offset]))
     if target.startswith("*"):
-        return unparen(arg[1:].strip()) if arg.startswith("&") else f"*({arg})"
+        if arg.startswith("&"):
+            return unparen(arg[1:].strip())
+        if opaque and helper.types[index]:
+            arg = f"({helper.types[index]})({arg})"
+        return f"*({arg})"
     if rest.startswith("->"):
         if arg.startswith("&"):
-            return f"({unparen(arg[1:].strip())}).{rest[2:]}"
-        if owner and concessions._SCALAR_CAST.match(arg):
-            return f"({arg}){rest}"
+            item = unparen(arg[1:].strip())
+            address_type = rawfield.declared_type(code, function, offset, item) if re.fullmatch(ID, item) else None
+            if owner and (not address_type or address_type != (owner[1], False)):
+                return f"(({helper.types[index]})({arg})){rest}"
+            return f"({item}).{rest[2:]}"
+        if owner and opaque:
+            return f"(({helper.types[index]})({arg})){rest}"
         return arg + rest if re.fullmatch(MEMBER, compact(arg)) else f"({arg}){rest}"
+    for subscript in re.findall(rf"\[({ID})\]", rest):
+        if subscript in helper.params:
+            rest = rest.replace(f"[{subscript}]", f"[{args[helper.params.index(subscript)].strip()}]")
     return f"({arg}){rest}" if rest or not re.fullmatch(MEMBER, compact(arg)) else arg
 
 
-def plain_call(helper, args, argument, values):
+def plain_call(helper, args, argument, values, code, function, offset):
     """Return the replacement, field expression and the mask spelling, or a skip reason."""
     if len(args) != len(helper.params) or helper.params[argument] != helper.mask:
         return "helper has another mask or uses additional arguments"
     root = re.search(ID, helper.target)[0]
     needed = {helper.mask} | ({root} if root in helper.params else set())
+    if helper.alias and root == helper.alias[0]:
+        needed.add(helper.alias[1])
+    needed.update(re.findall(rf"\[({ID})\]", helper.target))
     if set(helper.params) != needed:
         return "helper has other arguments"
     literal = args[argument].strip()
@@ -256,7 +317,7 @@ def plain_call(helper, args, argument, values):
             return "plain mask would change parameter conversion"
     if not re.fullmatch(folds.LIT, literal):
         literal = f"({literal})"
-    target = substitute_target(helper, args)
+    target = substitute_target(helper, args, code, function, offset)
     op = helper.operation
     if op in ("and", "nonzero"):
         expr = f"({target} & {literal})"
@@ -267,7 +328,10 @@ def plain_call(helper, args, argument, values):
             expr = f"(({helper.result}){expr})"
     else:
         sign = "~" if op == "clear" else ""
-        expr = f"({target} {'|=' if op == 'set' else '&='} {sign}{literal})"
+        operand = sign + literal
+        if helper.complement_type and folds.type_range(helper.complement_type) != (0, 0xFFFFFFFF):
+            operand = f"({helper.complement_type})({operand})"
+        expr = f"({target} {'|=' if op == 'set' else '&='} {operand})"
     return expr, target, args[argument].strip(), value
 
 
@@ -280,6 +344,16 @@ def normalize_field(expr):
 
 def field_key(expr, code, function, offset, helper=None):
     expr = normalize_field(expr)
+    if pointer := re.fullmatch(rf"\*\(?({ID})\)?", expr):
+        name = pointer[1]
+        writes = list(re.finditer(rf"(?<![\w.>]){name}\s*=(?!=)\s*([^;]+);", code[function:offset]))
+        if len(writes) == 1:
+            assigned = writes[0]
+            target = re.fullmatch(rf"&\s*({MEMBER})", compact(assigned[1]))
+            if target and offset < concessions._scope_end(code, function + assigned.end()):
+                expr = target[1]
+    if cast := re.fullmatch(rf"\(\((?:const)?(struct|union)({ID})\*\)\(.+\)\)->({MEMBER})", expr):
+        return f"{cast[1]} {cast[2]}", cast[3].replace("->", ".")
     m = re.fullmatch(rf"({ID})((?:(?:->|\.){ID})+)", expr)
     if m:
         root, chain = m.groups()
@@ -306,11 +380,36 @@ def local_operation(code, use, name):
               ("&", ""): "and"}.get((lhs["op"], lhs["neg"]))
         if op and op == "and" and re.match(r"\s*\)*\s*!=\s*0\b", after):
             op = "nonzero"
+        if op == "and":
+            stem = before[:lhs.start()]
+            if re.search(rf"(?<!\w){re.escape(lhs['field'])}\s*=\s*$", stem):
+                op = "and-store"
+            elif re.search(r"\b(?:if|while)\s*\(+\s*$", stem) and re.match(r"\s*\)", after):
+                op = "nonzero"
         return (lhs["field"], op) if op else ("", "")
-    rhs = re.match(rf"\s*&(?![&=])\s*(?P<field>{FIELD_EXPR})", after)
+    rhs = re.match(rf"\s*&\s*(?P<field>{FIELD_EXPR})(?![\w.>])", after)
     if rhs:
-        return rhs["field"], "and"
+        op = "and-store" if re.search(rf"(?<!\w){re.escape(rhs['field'])}\s*=\s*~?\s*$", before) else "and"
+        return rhs["field"], "clear" if op == "and-store" and before.rstrip().endswith("~") else op
     return "", ""
+
+
+def helper_reads(code, helpers):
+    """Map exact local argument offsets to the operation performed by a flag helper."""
+    for call in concessions._CALLED.finditer(code):
+        forms = helpers.get(call[1])
+        if not forms:
+            continue
+        args, end = concessions._arguments(code, call.end())
+        if args is None or concessions._BODY_START.match(code, end):
+            continue
+        for index, helper in forms.items():
+            if len(args) != len(helper.params):
+                continue
+            actual = args[index]
+            if re.fullmatch(rf"\s*{ID}\s*", actual):
+                offset = call.end() + sum(len(a) + 1 for a in args[:index]) + len(actual) - len(actual.lstrip())
+                yield offset, (helper, args)
 
 
 @dataclass
@@ -331,7 +430,9 @@ class Probe:
     owner: str = ""
     field: str = ""
     operation: str = ""
+    field_keys: tuple = ()
     other_uses: str = ""
+    rom_matches: tuple = ()
     edits: tuple = dataclass_field(default=(), repr=False)
     reason: str = ""
     sample: bool = False
@@ -370,6 +471,13 @@ def other_uses(code, span, candidate, excluded, local_reads, constants):
         if value is not None and value & 0xFFFFFFFF == wanted:
             line = concessions._line(code, token.start())
             found.append(f"{line}:{token.start() - code.rfind(chr(10), 0, token.start())} {word}")
+    for match in CONST_EXPR.finditer(code, start, end):
+        if any(a < match.end() and match.start() < b for a, b in excluded):
+            continue
+        value = constant(match[0], constants)
+        if value is not None and value & 0xFFFFFFFF == wanted:
+            pos = match.start()
+            found.append(f"{concessions._line(code, pos)}:{pos - code.rfind(chr(10), 0, pos)} {match[0].strip()}")
     return "; ".join(found)
 
 
@@ -392,6 +500,7 @@ def plan(path, text, header_cache):
         r"(?ms)^\s*#\s*ifdef\s+UBFIX\b.*?(?=^\s*#\s*(?:else|endif)\b)", code)]
     local_folds = folds.folds(text, rel, every=True, sites=locals_) if locals_ else {}
     helpers, values = unit_facts(path, text)
+    helper_args = dict(helper_reads(code, helpers)) if local_folds else {}
     out = []
     for site in sites:
         pos = site.offset
@@ -425,28 +534,37 @@ def plan(path, text, header_cache):
             p.value = folds.value(fold.literal)
             keys = set()
             for use in fold.uses:
-                expr, op = local_operation(code, use, fold.name)
-                owner, member = field_key(expr, code, span[0], use)
+                helper = None
+                if use in helper_args:
+                    helper, args = helper_args[use]
+                    expr = substitute_target(helper, args, code, span[0], use)
+                    op = helper.operation
+                else:
+                    expr, op = local_operation(code, use, fold.name)
+                owner, member = field_key(expr, code, span[0], use, helper)
                 if owner:
                     keys.add((owner, member, op))
+            p.field_keys = tuple(sorted(keys))
             if len(keys) == 1:
                 p.owner, p.field, p.operation = keys.pop()
             p.other_uses = other_uses(code, span, p, [(a, b) for a, b, _ in p.edits], fold.uses, values)
         else:
-            helper = helpers.get(p.helper)
+            helper = helpers.get(p.helper, {}).get(site.argument)
             call = concessions._CALLED.match(code, pos)
             args, end = concessions._arguments(code, call.end())
             p.literal = args[site.argument].strip()
             if helper is None:
                 p.reason = "helper is outside the single flag expression grammar"
                 continue
-            form = plain_call(helper, args, site.argument, values)
+            form = plain_call(helper, args, site.argument, values, code, span[0], pos)
             if isinstance(form, str):
                 p.reason = form
                 continue
             expr, target, p.literal, p.value = form
             p.owner, p.field = field_key(target, code, span[0], pos, helper)
             p.operation = helper.operation
+            if p.owner:
+                p.field_keys = ((p.owner, p.field, p.operation),)
             p.edits = ((pos, end, expr),)
             # Exclude only the mask argument, not identical values in the field address.
             arg_start = call.end() + sum(len(a) + 1 for a in args[:site.argument])
@@ -534,7 +652,7 @@ def sample_order(sites):
 
 COLUMNS = ("id", "path", "directory", "line", "column", "offset", "kind", "argument", "weight",
            "sample", "function", "helper", "spelling", "literal", "value", "owner", "field", "operation",
-           "other_uses", "class", "detail")
+           "other_uses", "field_keys", "rom_matches", "probe_version", "class", "detail")
 
 
 def atomic(path, write):
@@ -550,7 +668,8 @@ def write_csv(path, sites, results):
         writer.writerow(COLUMNS)
         for p in sites:
             verdict, detail = results.get(p.id, ("PENDING", ""))
-            writer.writerow([getattr(p, key) for key in COLUMNS[:-2]] + [verdict, detail])
+            writer.writerow([getattr(p, key) for key in COLUMNS[:-5]] +
+                            [json.dumps(p.field_keys), json.dumps(p.rom_matches), probe_version(p), verdict, detail])
     atomic(path, write)
 
 
@@ -558,12 +677,13 @@ def counts(sites, results):
     return Counter(results.get(p.id, ("PENDING", ""))[0] for p in sites)
 
 
-def table(sites, results, group, label, additional=None):
+def table(sites, results, group, label, additional=None, *, multiple=False):
     groups = defaultdict(list)
     for p in sites:
-        key = group(p)
-        if key:
-            groups[key].append(p)
+        keys = group(p) if multiple else [group(p)]
+        for key in keys:
+            if key:
+                groups[key].append(p)
     columns = [label, *CLASSES, "Pending"]
     if additional:
         columns.extend(("Helper and local spellings", "ROM mask / load / interleaved"))
@@ -578,7 +698,7 @@ def table(sites, results, group, label, additional=None):
         yield "| " + " | ".join(cell.replace("|", "\\|") for cell in cells) + " |"
 
 
-def summary(sites, results, rom_orders):
+def summary(sites, results, rom_orders, aliases):
     sample = [p for p in sites if p.sample]
     for name, members in (("Sample", sample), ("Overall", sites)):
         yield f"## {name}"
@@ -590,7 +710,12 @@ def summary(sites, results, rom_orders):
         if tested:
             yield f"{c['PLAIN']:,} of {tested:,} compiler-tested sites matched ({c['PLAIN'] / tested:.1%})."
             yield ""
-    for title, key in (("Directory", lambda p: p.directory), ("Helper", lambda p: p.helper)):
+    yield "## Directory sample"
+    yield ""
+    yield from table(sample, results, lambda p: p.directory, "Directory")
+    yield ""
+    for title, key in (("Warning kind", lambda p: p.kind), ("Directory", lambda p: p.directory),
+                       ("Helper", lambda p: p.helper)):
         yield f"## {title}"
         yield ""
         yield from table(sites, results, key, title)
@@ -604,7 +729,8 @@ def summary(sites, results, rom_orders):
         names = sorted({p.helper or p.spelling for p in members})
         owner, member, op = key
         rom_field = member if owner == "(global)" else f"{owner.removeprefix('struct ')}.{member}"
-        order = rom_orders.get((rom_field, {"and": "test", "nonzero": "test"}.get(op, op)))
+        rom_op = {"and": "test", "nonzero": "test", "clear": "and-update", "and-store": "and-update"}.get(op, op)
+        order = rom_orders.get((rom_field, rom_op))
         evidence = "—"
         if order:
             mask, load, interleaved = (order[k] for k in ("mask", "word", "interleaved"))
@@ -612,16 +738,61 @@ def summary(sites, results, rom_orders):
             evidence = f"{mask} / {load} / {interleaved}{share}"
         return ", ".join(f"`{name}`" for name in names), evidence
 
-    yield from table(sites, results, lambda p: (p.owner, p.field, p.operation)
-                     if p.owner and p.operation else None, "Type / field / operation", extra)
+    def groups(p):
+        return {(*aliases.get((owner, member), (owner, member)), op) for owner, member, op in p.field_keys}
+
+    yield from table(sites, results, groups, "Type / field / operation", extra, multiple=True)
 
 
-def write_reports(sites, results, args):
+def read_rom(path):
     rom_orders = defaultdict(Counter)
-    if args.rom_tsv and args.rom_tsv.is_file():
-        with args.rom_tsv.open() as stream:
+    matches = defaultdict(set)
+    aliases = {}
+    alias_path = path.with_suffix(".aliases.json")
+    if alias_path.is_file():
+        aliases = {(owner, member): (canonical, field)
+                   for owner, member, canonical, field in json.loads(alias_path.read_text())}
+    if path.is_file():
+        with path.open() as stream:
             for row in csv.DictReader(stream, delimiter="\t"):
-                rom_orders[row["field"], row["op"]][row["order"]] += 1
+                op = "and-update" if row["op"] in ("clear", "and-store") else row["op"]
+                rom_orders[row["field"], op][row["order"]] += 1
+                key = (row["function"], row["field"], row["op"], int(row["mask"], 16))
+                matches[key].add((row["site"], row["order"]))
+    return rom_orders, aliases, matches
+
+
+def link_rom(sites, aliases, matches):
+    for p in sites:
+        if p.value is None:
+            continue
+        found = set()
+        mask = p.value & 0xFFFFFFFF
+        inverted = mask ^ 0xFFFFFFFF
+        for owner, member, op in p.field_keys:
+            owner, member = aliases.get((owner, member), (owner, member))
+            field = member if owner == "(global)" else f"{owner.removeprefix('struct ')}.{member}"
+            keys = {
+                "set": (("set", mask),),
+                "clear": (("clear", mask), ("and-store", inverted)),
+                "and-store": (("and-store", mask), ("clear", inverted)),
+                "and": (("test", mask),), "nonzero": (("test", mask),),
+            }
+            for key, value in keys.get(op, ()):
+                found.update(matches.get((p.function, field, key, value), ()))
+        p.rom_matches = tuple(sorted(found))
+
+
+def write_reports(sites, results, args, rom_orders, aliases):
+    corroborated = Counter(p.rom_matches[0][1] for p in sites if len(p.rom_matches) == 1
+                           and results.get(p.id, ("", ""))[0] == "BOUND-SINGLE")
+    rom_summary = (
+        f"The ROM census found {sum(sum(order.values()) for order in rom_orders.values()):,} classifiable operations. "
+        f"Among BOUND-SINGLE sites with one ROM observation on the same function, field, operation and value, "
+        f"{corroborated['mask']:,} are mask-first, {corroborated['word']:,} load-first, "
+        f"and {corroborated['interleaved']:,} interleaved. The CSV includes their ROM addresses "
+        "and retains multiple observations when the correspondence is ambiguous."
+    )
     note = [
         "# Plain flag and local-constant probes", "", "Tags: #compiler #phase3 #tooling", "",
         "Each row represents one linter binding or constant argument. A local probe uses the "
@@ -631,13 +802,51 @@ def write_reports(sites, results, args):
         "PLAIN is a byte-identical scratch rewrite. BOUND-SINGLE is a mismatch with one use "
         "found in the containing source function. BOUND-SHARED is a mismatch with other uses "
         "listed in the CSV. SKIP records an unsupported form, inactive code or check failure. "
-        "A mismatch identifies a dependency in the current reconstruction. Confirm mask order "
-        "and alternative matching C before inferring an original accessor or macro.", "",
+        "A mismatch identifies a dependency in the current reconstruction. The other-use scan "
+        "looks for reads of the same binding and equal literals or named constants in the "
+        "containing function. It cannot see every value produced by inlining or optimization. "
+        "Confirm mask order and alternative matching C before inferring an original accessor or macro.", "",
         "The ROM-side scan follows recognized register provenance and omits cases it cannot "
         "attribute. Its branch-consumed tests are reported alongside both raw AND and boolean "
-        "source forms. The compiler probes also cover non-flag locals.", "",
-        *summary(sites, results, rom_orders), "",
+        "source forms. AND and BIC stores share a ROM denominator for clear and keep-mask forms. "
+        "The compiler probes also cover non-flag locals. A local used on several fields appears "
+        "once in each applicable field row.", "",
+        rom_summary, "",
+        "To reproduce the sweep, run `build/venv/bin/python tools/plainprobe.py`. Use "
+        "`--resume` to continue from the CSV. Run "
+        "`build/venv/bin/python tools/plainprobe_rom.py` to refresh the typed ROM census, "
+        "then run plainprobe with `--resume` to import it.", "",
+        *summary(sites, results, rom_orders, aliases), "",
     ]
+    weights = Counter()
+    skips = Counter()
+    for p in sites:
+        verdict, detail = results.get(p.id, ("PENDING", ""))
+        weights[verdict] += p.weight
+        if verdict == "SKIP":
+            skips[detail.split(":", 1)[0]] += 1
+    note += ["## Linter-use weights", "", "| Verdict | Weighted uses |", "| --- | ---: |"]
+    note += [f"| {key} | {weights[key]:,} |" for key in (*CLASSES, "PENDING")]
+    note += ["", "## Skip reasons", "", "| Reason | Sites |", "| --- | ---: |"]
+    note += [f"| {reason} | {count:,} |" for reason, count in sorted(skips.items())]
+    if args.out == OUT:
+        note += [
+            "", "## Scratch application control", "",
+            "The control rewrites one argument at 08081C98 and leaves the full 1,260-byte "
+            "unit on MATCH. The command checks the independent form, then keeps each "
+            "cumulative edit only if it matches and adds no linter or compiler warning.", "",
+            "```sh",
+            "mkdir -p build/plainprobe/apply-control",
+            "cp src/scene/actor/reaction/SceneActorReaction_UpdateTimedBurst.c build/plainprobe/apply-control/",
+            "build/venv/bin/python tools/plainprobe.py --apply-plain \\",
+            "  build/plainprobe/apply-control/SceneActorReaction_UpdateTimedBurst.c --out build/plainprobe/apply-control",
+            "build/venv/bin/python tools/check.py build/plainprobe/apply-control/SceneActorReaction_UpdateTimedBurst.c --match-only",
+            "```", "",
+        ]
+    if args.note.is_file():
+        _, marker, review = args.note.read_text().partition(REVIEW_MARK)
+        if marker:
+            note += ["", marker + review.rstrip(), ""]
     atomic(args.note, lambda f: f.write("\n".join(note)))
     sc = counts([p for p in sites if p.sample], results)
     total = counts(sites, results)
@@ -646,14 +855,17 @@ def write_reports(sites, results, args):
     report = [
         "# Plain constant probe", "",
         f"Recorded {done:,} of {len(sites):,} bindings or arguments ({weighted:,} linter uses). "
-        "The sweep edits scratch copies only. Game source, headers and progress files are untouched.", "",
+        "The game source retains the baseline steering-debt count. This measurement makes "
+        "zero percentage-point change to exact code progress.", "",
     ]
     for name, c in (("Directory sample", sc), ("Full inventory", total)):
         report += [f"## {name}", "", ", ".join(f"{c[key]:,} {key}" for key in (*CLASSES, "PENDING")) + ".", ""]
+    report += [rom_summary, ""]
     report += [
         "## Resume here", "",
         "From the worktree root run `build/venv/bin/python tools/plainprobe.py --resume`. "
-        "The CSV is the checkpoint. The note contains the directory, helper and field breakdowns.", "",
+        "The CSV is the checkpoint. The note contains the directory, helper and field breakdowns. "
+        "Use `build/venv/bin/python tools/plainprobe_rom.py` to rebuild the ROM census.", "",
         "Open question for each mismatching flag form is whether the ROM's field and mask loads "
         "show the order expected from source binding. A byte difference alone can also reflect "
         "allocation, conversions or other code structure.", "",
@@ -681,8 +893,8 @@ def inventory(paths):
 
 def snapshot(sources):
     digest = hashlib.sha256()
-    inputs = [Path(__file__), ROOT / "tools/concessions.py", ROOT / "tools/fold_literals.py",
-              ROOT / "tools/check.py", ROOT / "symbols/functions.csv", ROOT / "symbols/ram.csv",
+    inputs = [ROOT / "tools/check.py", ROOT / "tools/build.py",
+              ROOT / "symbols/functions.csv", ROOT / "symbols/ram.csv",
               ROOT / "build/boktai3.elf", ROOT / "baserom.gba"]
     for path in inputs:
         with path.open("rb") as stream:
@@ -693,13 +905,67 @@ def snapshot(sources):
     return digest.hexdigest()
 
 
+def probe_version(p):
+    """Invalidate just the rows whose rewrite or classification inputs have changed."""
+    evidence = (p.edits, p.other_uses, p.reason)
+    return hashlib.sha256(repr(evidence).encode()).hexdigest()[:24]
+
+
+def lint_counts(path, source):
+    sites = concessions.sites(source, path) + concessions.literal_argument_sites(path, source, ROOT)
+    counts = Counter()
+    for site in sites:
+        if not site.excused:
+            counts[site.kind] += site.weight
+    return counts
+
+
+def apply_plain(paths, out):
+    """Retest sites independently, then gate each cumulative edit before keeping it."""
+    checker = Checker(out)
+    applied = 0
+    for path in paths:
+        if STOP.exists():
+            break
+        rel = os.path.relpath(path, ROOT)
+        unit = keepcheck.Unit(rel)
+        before = unit.text
+        accepted = []
+        for p in plan(path, before, {}):
+            if STOP.exists():
+                break
+            verdict, _ = probe(p, {rel: before}, checker)
+            if verdict != "PLAIN":
+                continue
+            if any(a < end and start < b for start, end, _ in p.edits for a, b, _ in accepted):
+                print(f"{rel}:{p.line}:{p.column}: overlapping accepted edit")
+                continue
+            translated = []
+            for start, end, replacement in p.edits:
+                delta = sum(len(new) - (b - a) for a, b, new in accepted if b <= start)
+                translated.append((start + delta, end + delta, replacement))
+            variant = folds.edit_text(unit.text, translated)
+            if lint_counts(rel, variant) - lint_counts(rel, unit.text):
+                print(f"{rel}:{p.line}:{p.column}: would add a linter finding")
+                continue
+            verdict, detail = checker.compare(path, unit.text, variant)
+            if verdict == "PLAIN" and unit.attempt(variant):
+                accepted.extend(p.edits)
+                applied += 1
+                print(f"{rel}:{p.line}:{p.column}: {detail}")
+            else:
+                print(f"{rel}:{p.line}:{p.column}: cumulative edit held ({unit.last or detail})")
+    print(f"Applied {applied:,} PLAIN sites")
+    return 0
+
+
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("paths", nargs="*")
-    parser.add_argument("--out", type=Path, default=OUT)
-    parser.add_argument("--note", type=Path, default=NOTE)
+    parser.add_argument("--out", type=Path)
+    parser.add_argument("--note", type=Path)
     parser.add_argument("--report", type=Path)
-    parser.add_argument("--rom-tsv", type=Path, default=OUT / "flag_sites.tsv")
+    parser.add_argument("--rom-tsv", type=Path)
     parser.add_argument("--resume", action="store_true")
     parser.add_argument("--sample-only", action="store_true")
     parser.add_argument("--apply-plain", action="store_true")
@@ -707,14 +973,27 @@ def main(argv=None):
     args = parser.parse_args(argv)
     if args.jobs < 1:
         parser.error("jobs must be positive")
-    if args.apply_plain:
-        parser.error("--apply-plain is not implemented yet")
+    if args.apply_plain and (not args.paths or args.resume or args.sample_only):
+        parser.error("--apply-plain requires explicit paths and cannot resume a sweep")
     try:
         paths = inventory(args.paths)
     except ValueError as error:
         parser.error(str(error))
-    args.out = args.out.resolve()
+    args.out = (args.out or (OUT / "focus" if args.paths else OUT)).resolve()
     args.out.mkdir(parents=True, exist_ok=True)
+    args.note = args.note or (NOTE if args.out == OUT else args.out / "SUMMARY.md")
+    args.rom_tsv = args.rom_tsv or args.out / "flag_sites.tsv"
+    if args.apply_plain:
+        return apply_plain([p for p in paths if p.suffix == ".c"], args.out)
+    with (args.out / "sweep.lock").open("a") as lock:
+        try:
+            fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
+        except BlockingIOError:
+            parser.error("another sweep is using this --out")
+        return run_sweep(args, paths, parser)
+
+
+def run_sweep(args, paths, parser):
     if args.report is None and args.out == OUT:
         args.report = REPORT
     csv_path = args.out / "sites.csv"
@@ -723,24 +1002,33 @@ def main(argv=None):
         parser.error("sites.csv exists; use --resume or choose a new --out")
     sources = {os.path.relpath(path, ROOT): path.read_text(errors="replace") for path in paths}
     digest = snapshot(sources)
+    previous = {}
     results = {}
     if args.resume and state.exists():
         if json.loads(state.read_text())["digest"] != digest:
             parser.error("source, tool or ROM inputs changed; choose a new --out")
         if csv_path.exists():
             with csv_path.open() as stream:
-                results = {r["id"]: (r["class"], r["detail"]) for r in csv.DictReader(stream)
-                           if r["class"] in CLASSES}
+                previous = {r["id"]: r for r in csv.DictReader(stream) if r["class"] in CLASSES}
     elif csv_path.exists():
         parser.error("sites.csv has no snapshot; choose a new --out")
     header_cache = {}
     sites = sample_order([site for name, text in sources.items() for site in plan(ROOT / name, text, header_cache)])
-    if not set(results) <= {p.id for p in sites}:
+    rom_orders, aliases, matches = read_rom(args.rom_tsv)
+    link_rom(sites, aliases, matches)
+    if not set(previous) <= {p.id for p in sites}:
         parser.error("checkpoint contains unknown sites")
+    for p in sites:
+        row = previous.get(p.id)
+        if row and row.get("probe_version") == probe_version(p):
+            results[p.id] = row["class"], row["detail"]
     atomic(state, lambda f: json.dump({"digest": digest}, f))
     print(f"Inventory: {len(sites):,} sites, {sum(p.weight for p in sites):,} linter uses, "
           f"{sum(p.sample for p in sites):,} sampled, {len(results):,} recorded", flush=True)
     write_csv(csv_path, sites, results)
+    if len(results) == len(sites):
+        write_reports(sites, results, args, rom_orders, aliases)
+        return 0
     checker = Checker(args.out)
     with ThreadPoolExecutor(max_workers=args.jobs) as pool:
         for phase in (True, False):
@@ -754,8 +1042,10 @@ def main(argv=None):
                 verdicts = pool.map(lambda p: probe(p, sources, checker), batch)
                 results.update((p.id, verdict) for p, verdict in zip(batch, verdicts))
                 write_csv(csv_path, sites, results)
+                if start % 256 == 224:
+                    write_reports(sites, results, args, rom_orders, aliases)
                 print(f"{len(results):,}/{len(sites):,}: {dict(counts(sites, results))}", flush=True)
-            write_reports(sites, results, args)
+            write_reports(sites, results, args, rom_orders, aliases)
             if STOP.exists():
                 print("STOP detected; checkpoint written", flush=True)
                 break
