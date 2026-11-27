@@ -1,9 +1,7 @@
 #include "global.h"
 #include "objects/deck_cannons/callback_slot_layout.h"
 #include "objects/deck_cannons/cannon_battery_sprite_layout.h"
-struct CannonBatteryPosition {
-    s16 x, y, z, unk6;
-};
+#include "objects/deck_cannons/cannon_battery_position_layout.h"
 struct CannonBatteryPool {
     u8 unk0[0x1C];
     u16 used;

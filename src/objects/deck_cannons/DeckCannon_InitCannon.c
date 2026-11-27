@@ -1,9 +1,7 @@
 #include "global.h"
 #include "engine/engine.h"
 #include "objects/deck_cannons/cannon_battery_sprite_layout.h"
-struct CannonBatteryPosition {
-    s16 x, y, z, unk6;
-};
+#include "objects/deck_cannons/cannon_battery_position_layout.h"
 struct CannonBatteryCannon {
     u32 update, destroy;
     u8 animation[0x1C];
