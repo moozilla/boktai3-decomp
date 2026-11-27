@@ -172,6 +172,32 @@ void f(struct Actor *p) {
         pp.link_rom([p], {}, {("f", "Actor.flags", "and-store", 0xFFFFFFF7): {("08000000", "mask")}})
         self.assertEqual(p.rom_matches, (("08000000", "mask"),))
 
+    def test_multi_statement_helper_has_matching_control_and_literal_body(self):
+        source = """static inline void Update(struct Actor *p, u32 mask) {
+    p->flags |= mask;
+    p->more &= ~mask;
+}
+void f(struct Actor *p) {
+    Update(p, 8);
+}
+"""
+        p, = self.plan(source)
+        staged = pp.folds.edit_text(source, p.control_edits)
+        literal = pp.folds.edit_text(source, p.edits)
+        self.assertIn("p, u32 mask)", staged[staged.index("PlainProbe_"):])
+        clone = literal[literal.index("PlainProbe_"):]
+        self.assertIn("p->flags |= ((u32)(8));", clone)
+        self.assertIn("p->more &= ~((u32)(8));", clone)
+        self.assertIn("mask read 2", p.other_uses)
+
+        class Check:
+            def compare(self, path, original, variant):
+                return "DIFF", "fixture"
+
+        verdict, detail = pp.probe(p, {p.path: source}, Check())
+        self.assertEqual(verdict, "SKIP")
+        self.assertIn("specialization control", detail)
+
     def test_baseline_extent_counts_deleted_trailing_bytes(self):
         checker = pp.Checker.__new__(pp.Checker)
         checker.baseline = lambda path, text: (0x08000000, ["f"], b"abcd")

@@ -113,6 +113,13 @@ class Helper:
     complement_type: str = ""
 
 
+@dataclass(frozen=True)
+class InlineBody:
+    prefix: str
+    params: tuple
+    body: str
+
+
 def operation(body, mask):
     """Recognize one mask expression, including its simple assignment/boolean spellings."""
     body = re.sub(rf"\(({FIELD_EXPR})\)", r"\1", body) if "if(" not in body else body
@@ -186,11 +193,17 @@ def file_facts(text):
             if getter:
                 getters[m["name"]] = getter[1]
     helpers = {m["name"]: parse_helper(code, m, getters) for m in definitions}
+    bodies = {
+        m["name"]: InlineBody(code[m.start():m.start("name")], tuple(m["params"].split(",")),
+                              text[m.end() - 1:concessions._scope_end(code, m.end()) + 1])
+        for m in definitions
+    }
     for m in concessions._MACRO_DEF.finditer(code):
         macro = concessions._FUNCTION_DEFINE.fullmatch(m[0].replace("\\\n", " "))
         if not macro:
             continue
         helpers[macro[1]] = {}
+        bodies.pop(macro[1], None)
         args = tuple(arg.strip() for arg in macro[2].split(","))
         # Only a statement-expression with a single scalar binding and a single operation.
         if (tmp := concessions._MASK_TEMP.search(macro[3])) and tmp[2] in args:
@@ -212,7 +225,7 @@ def file_facts(text):
             if m:
                 constants[m[1]] = m[2] or f"({previous}) + 1"
                 previous = m[1]
-    return helpers, constants, concessions._INCLUDE.findall(text)
+    return helpers, constants, concessions._INCLUDE.findall(text), bodies
 
 
 @lru_cache(maxsize=None)
@@ -229,9 +242,9 @@ def header_path(parent, name):
 
 
 def unit_facts(path, text):
-    helpers, constants = {}, {}
+    helpers, constants, bodies = {}, {}, {}
     seen = {path.resolve()}
-    local, values, names = file_facts(text)
+    local, values, names, local_bodies = file_facts(text)
 
     def visit(parent, includes):
         for name in includes:
@@ -239,15 +252,21 @@ def unit_facts(path, text):
             if target is None or target in seen:
                 continue
             seen.add(target)
-            defs, values, nested = header_facts(target)
+            defs, values, nested, definitions = header_facts(target)
             visit(target.parent, nested)
             helpers.update(defs)
             constants.update(values)
+            for name in defs.keys() - definitions.keys():
+                bodies.pop(name, None)
+            bodies.update(definitions)
 
     visit(path.parent, names)
     helpers.update(local)
     constants.update(values)
-    return helpers, constants
+    for name in local.keys() - local_bodies.keys():
+        bodies.pop(name, None)
+    bodies.update(local_bodies)
+    return helpers, constants, bodies
 
 
 def substitute_target(helper, args, code, function, offset):
@@ -434,6 +453,7 @@ class Probe:
     other_uses: str = ""
     rom_matches: tuple = ()
     edits: tuple = dataclass_field(default=(), repr=False)
+    control_edits: tuple = dataclass_field(default=(), repr=False)
     reason: str = ""
     sample: bool = False
 
@@ -481,6 +501,46 @@ def other_uses(code, span, candidate, excluded, local_reads, constants):
     return "; ".join(found)
 
 
+def specialize_helper(p, definition, args, end, call, code, span, values):
+    """Make one copy of the helper and compare its staged and literal forms."""
+    if definition is None or len(args) != len(definition.params) or p.helper == span[2]:
+        return
+    declaration = PARAM.fullmatch(definition.params[p.argument].strip())
+    if declaration is None or not concessions._SCALAR_PARAM.fullmatch(definition.params[p.argument]):
+        return
+    mask = declaration["name"]
+    body = definition.body
+    clean = keepcheck.blank_comments(body)
+    uses = folds.reads(clean, mask, 0, len(clean))
+    if not uses or re.search(r"(?m)^\s*#|\b" + re.escape(p.helper) + r"\s*\(", clean):
+        return
+    if any(name == mask for group in concessions._local_declarations(clean) for name, *_ in group):
+        return
+    value = constant(p.literal, values)
+    if value is None:
+        return
+    name = f"PlainProbe_{p.helper}_{p.offset}"
+    if re.search(rf"\b{name}\b", code):
+        return
+
+    def edits(params, body_text, arguments):
+        signature = ", ".join(item.strip() for item in params) or "void"
+        clone = f"{definition.prefix}{name}({signature})\n{body_text}\n"
+        return ((span[0], span[0], clone), (p.offset, end, f"{name}({', '.join(arguments)})"))
+
+    dtype = declaration["type"].strip().removeprefix("const ").removesuffix(" const")
+    literal = f"(({dtype})({p.literal}))"
+    rewritten = folds.edit_text(body, [(use, use + len(mask), literal) for use in uses])
+    i = p.argument
+    p.control_edits = edits(definition.params, body, args)
+    p.edits = edits(definition.params[:i] + definition.params[i + 1:], rewritten, args[:i] + args[i + 1:])
+    p.value = value
+    start = call.end() + sum(len(a) + 1 for a in args[:i])
+    shared = other_uses(code, span, p, [(start, start + len(args[i]))], (), values)
+    p.other_uses = "; ".join(filter(None, [shared, *(f"{p.helper}: mask read {j}"
+                                                    for j in range(2, len(uses) + 1))]))
+
+
 def plan(path, text, header_cache):
     rel = os.path.relpath(path, ROOT)
     parts = Path(rel).parts
@@ -502,7 +562,7 @@ def plan(path, text, header_cache):
     remaining = {s.offset for s in locals_ if not s.excused} - local_folds.keys()
     if remaining and path.suffix == ".c":
         local_folds.update(folds.grouped_folds(text, rel, remaining))
-    helpers, values = unit_facts(path, text)
+    helpers, values, bodies = unit_facts(path, text)
     helper_args = dict(helper_reads(code, helpers)) if local_folds else {}
     out = []
     for site in sites:
@@ -557,7 +617,9 @@ def plan(path, text, header_cache):
             args, end = concessions._arguments(code, call.end())
             p.literal = args[site.argument].strip()
             if helper is None:
-                p.reason = "helper is outside the single flag expression grammar"
+                specialize_helper(p, bodies.get(p.helper), args, end, call, code, span, values)
+                if not p.edits:
+                    p.reason = "helper has no safe inline specialization"
                 continue
             form = plain_call(helper, args, site.argument, values, code, span[0], pos)
             if isinstance(form, str):
@@ -636,6 +698,10 @@ def probe(p, sources, checker):
     if p.reason:
         return "SKIP", p.reason
     text = sources[p.path]
+    if p.control_edits:
+        control, detail = checker.compare(ROOT / p.path, text, folds.edit_text(text, p.control_edits))
+        if control != "PLAIN":
+            return "SKIP", f"helper specialization control {control}: {detail}"
     verdict, detail = checker.compare(ROOT / p.path, text, folds.edit_text(text, p.edits))
     if verdict == "DIFF":
         verdict = "BOUND-SHARED" if p.other_uses else "BOUND-SINGLE"
@@ -911,6 +977,8 @@ def snapshot(sources):
 def probe_version(p):
     """Invalidate just the rows whose rewrite or classification inputs have changed."""
     evidence = (p.edits, p.other_uses, p.reason)
+    if p.control_edits:
+        evidence += (p.control_edits,)
     return hashlib.sha256(repr(evidence).encode()).hexdigest()[:24]
 
 
@@ -932,6 +1000,7 @@ def cached_sites(path, digest, sources):
                 sites = []
                 for row in saved["sites"]:
                     row["edits"] = tuple(map(tuple, row["edits"]))
+                    row["control_edits"] = tuple(map(tuple, row.get("control_edits", ())))
                     row["field_keys"] = tuple(map(tuple, row["field_keys"]))
                     row["rom_matches"] = ()
                     sites.append(Probe(**row))
@@ -966,6 +1035,8 @@ def apply_plain(paths, out):
         for p in plan(path, before, {}):
             if STOP.exists():
                 break
+            if p.control_edits:
+                continue  # This is an evidence-only comparison of helper bodies.
             verdict, _ = probe(p, {rel: before}, checker)
             if verdict != "PLAIN":
                 continue
