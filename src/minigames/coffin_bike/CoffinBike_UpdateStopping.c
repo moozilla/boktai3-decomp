@@ -100,9 +100,9 @@ static inline void CoffinBike_UpdatePrimaryAction(struct CoffinBike *p, struct C
         if (p->input[0] & 2) {
             if (!sub_08249240(&p->motion.primaryCallback, 0, p->motion.primaryCallback)) {
                 if (p->motion.primaryLatched) {
-                    Anim_SetKeyframes(&p->model.parts[1], p->model.primaryAnimation,
+                    Anim_SetKeyframes(&p->model.view.parts[1], &p->model.resource,
                                       p->motion.primaryKeyframes, 2, 0);
-                    Anim_Step(&p->model.parts[1], p->model.primaryAnimation);
+                    Anim_Step(&p->model.view.parts[1], &p->model.resource);
                     p->motion.primarySpriteRefresh = 1;
                     p->motion.primaryLatched = 0;
                     if (LinkParticipant_IsLocallySelected(p))
@@ -114,9 +114,9 @@ static inline void CoffinBike_UpdatePrimaryAction(struct CoffinBike *p, struct C
             }
         } else {
             if (p->motion.primaryLatched) {
-                Anim_SetKeyframes(&p->model.parts[1], p->model.primaryAnimation,
+                Anim_SetKeyframes(&p->model.view.parts[1], &p->model.resource,
                                   p->motion.primaryKeyframes, 2, 0);
-                Anim_Step(&p->model.parts[1], p->model.primaryAnimation);
+                Anim_Step(&p->model.view.parts[1], &p->model.resource);
                 p->motion.primarySpriteRefresh = 1;
                 p->motion.primaryLatched = 0;
                 if (LinkParticipant_IsLocallySelected(p))
@@ -128,9 +128,9 @@ static inline void CoffinBike_UpdatePrimaryAction(struct CoffinBike *p, struct C
         if (p->input[1] & 2)
             sub_08249240(&p->motion.primaryCallback, 0, p->motion.primaryCallback);
         if (p->motion.actionCooldown == 1)
-            Anim_SetKeyframes(&p->model.parts[1], p->model.primaryAnimation,
+            Anim_SetKeyframes(&p->model.view.parts[1], &p->model.resource,
                               p->motion.primaryKeyframes, 2, 0);
-        Anim_Step(&p->model.parts[1], p->model.primaryAnimation);
+        Anim_Step(&p->model.view.parts[1], &p->model.resource);
     } else {
         if (p->input[1] & 2)
             sub_08249240(&p->motion.primaryCallback, 0, p->motion.primaryCallback);
@@ -146,7 +146,7 @@ static inline u16 CoffinBike_DamageFlagWord(const u16 *field)
 {
     return *field;
 }
-static inline struct CoffinBikeModel *CoffinBike_ModelFromWorkOwner(void *const *object)
+static inline struct CharacterPreviewModel *CoffinBike_ModelFromWorkOwner(void *const *object)
 {
     return &((struct CoffinBike *)*object)->model;
 }

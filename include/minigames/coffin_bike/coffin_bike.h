@@ -1,5 +1,6 @@
 #ifndef GUARD_COFFIN_BIKE_H
 #define GUARD_COFFIN_BIKE_H
+#include "scene/actor/modifier_list.h"
 #include "global.h"
 #include "link/wireless/scene_pool.h"
 #include "scene/actor/scene_actor_style.h"
@@ -10,7 +11,6 @@
  * Merged from the per-unit declarations of the units that drive it. Names are
  * tentative (confidence=low) unless a sibling confirms them. */
 
-struct CoffinBikeModel;
 struct CoffinBike;
 
 /* The animation key at +0x524, read as a word and as its two halves. */
@@ -103,23 +103,6 @@ struct CoffinBikeMotion {
     struct CoffinBike *owner; /* 0x5F4 */
 };
 
-struct CoffinBikeModelPart {
-    u8 pad0[8];
-    u32 flags;
-    u8 padC[0x20 - 0xC];
-    u8 drainSource[0x48 - 0x20]; /* 0x20 (guess, confidence=low) */
-    void *palette;
-    u8 pad4C[0x60 - 0x4C];
-};
-
-/* The sprite model, 0x250 bytes at CoffinBike+0x610: five parts, then the primary
- * animation and the palette. */
-struct CoffinBikeModel {
-    struct CoffinBikeModelPart parts[5];
-    u8 primaryAnimation[0x30];
-    u8 palette[0x40];
-};
-
 /* A queued scene command for the glove (kind in `type`). */
 struct CoffinBikeCommand {
     u8 unknown0[6], type, unknown7;
@@ -155,10 +138,7 @@ struct CoffinBikePosition {
 struct CoffinBike {
     u8 pad0[0x18];
     struct CoffinBikeMotion motion; /* 0x18 */
-    struct CoffinBikeModel model;   /* 0x610 */
-    s8 marker, markerSlot;     /* 0x860 */
-    u8 stylePlayer;            /* 0x862 */
-    u8 pad863;
+    struct CharacterPreviewModel model; /* 0x610 */
     u32 timer;  /* 0x864 */
     u8 active;  /* 0x868 */
     u8 pad869[3];
@@ -190,7 +170,7 @@ struct CoffinBike {
 };
 
 typedef char CoffinBikeMotionSizeCheck[sizeof(struct CoffinBikeMotion) == 0x5F8 ? 1 : -1];
-typedef char CoffinBikeModelSizeCheck[sizeof(struct CoffinBikeModel) == 0x250 ? 1 : -1];
+typedef char CoffinBikeModelSizeCheck[sizeof(struct CharacterPreviewModel) == 0x254 ? 1 : -1];
 typedef char CoffinBikeSizeCheck[sizeof(struct CoffinBike) == 0x968 ? 1 : -1];
 
 #endif

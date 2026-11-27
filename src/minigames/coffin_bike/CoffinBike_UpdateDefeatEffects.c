@@ -50,15 +50,15 @@ struct CoffinBikeModelSlotView {
 static inline void CoffinBike_RestorePartPalettes(const struct CoffinBikeModelSlotView *view)
 {
     void **sprites = view->slot;
-    u32 paletteOffset = (u32)((struct CoffinBikeModel *)0)->palette;
+    u32 paletteOffset = (u32)((struct CharacterPreviewModel *)0)->activePalette;
     u32 offset = 0;
     s32 count = 4;
     do {
-        struct CoffinBikeModel *base = *sprites;
-        u8 *destination = (u8 *)&base->parts[0].palette;
+        struct CharacterPreviewModel *base = *sprites;
+        u8 *destination = (u8 *)&base->view.parts[0].palette;
         destination += offset;
         *(void **)destination = (u8 *)base + paletteOffset;
-        offset += sizeof(struct CoffinBikeModelPart);
+        offset += sizeof(struct ModifierDisplayObject);
         count--;
     } while (count >= 0);
 }
@@ -105,14 +105,14 @@ void CoffinBike_UpdateDefeatEffects(struct CoffinBike *p)
         style = &p->motion.style.parameterD;
         motionBias = &p->motion.secondaryBias;
         hidden = 1;
-        animation = &p->model.parts[0].flags;
+        animation = &p->model.view.parts[0].flags;
         count = 4;
         do {
             *animation |= hidden;
-            animation += sizeof(struct CoffinBikeModelPart) / sizeof(*animation);
+            animation += sizeof(struct ModifierDisplayObject) / sizeof(*animation);
             count--;
         } while (count >= 0);
-        ActorMarkerPool_HideMarker(p->marker);
+        ActorMarkerPool_HideMarker((s8)p->model.primaryAppearance);
         p->active = 0;
         self->dx = 0;
         self->dz = 0;
@@ -121,21 +121,21 @@ void CoffinBike_UpdateDefeatEffects(struct CoffinBike *p)
         actionSelf = entrySelf;
         if (*actionKind == 2) {
             p->motion.primaryCharge = 0;
-            ActorMarker_HideSlot(p->markerSlot);
+            ActorMarker_HideSlot((s8)p->model.secondaryAppearance);
         } else if (*actionKind == 5) {
             p->motion.primaryLatched = 1;
-            Anim_SetKeyframes(&p->model.parts[1], p->model.primaryAnimation,
+            Anim_SetKeyframes(&p->model.view.parts[1], &p->model.resource,
                               p->motion.primaryKeyframes, 2, 0);
-            Anim_Step(&p->model.parts[1], p->model.primaryAnimation);
+            Anim_Step(&p->model.view.parts[1], &p->model.resource);
             p->motion.primarySpriteRefresh = 1;
             p->motion.primaryLatched = 0;
             if (LinkParticipant_IsLocallySelected(p))
                 Sound_StopSong(0x93);
             actionSelf->actionActive = 0;
         } else if (*actionKind == 3) {
-            Anim_SetKeyframes(&p->model.parts[1], p->model.primaryAnimation,
+            Anim_SetKeyframes(&p->model.view.parts[1], &p->model.resource,
                               p->motion.primaryKeyframes, 2, 0);
-            Anim_Step(&p->model.parts[1], p->model.primaryAnimation);
+            Anim_Step(&p->model.view.parts[1], &p->model.resource);
         }
         actionSelf->actionCooldown = 0;
         SpritePair_ReleaseSlot(*(s8 *)spriteSlot, 0);

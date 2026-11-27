@@ -75,10 +75,10 @@ void CoffinBike_InitializeStyleModifiers(struct CoffinBike *p)
             self->style.entries[i] = payload->style.entries[i];
         self->style.parameterB = payload->style.parameterB;
         self->style.parameterD = payload->style.parameterD;
-        p->stylePlayer = p->participant;
+        p->model.playerIndex = p->participant;
     } else {
         SceneActorStyle_InitializeFromGameState(&self->style);
-        p->stylePlayer = p->participant;
+        p->model.playerIndex = p->participant;
     }
     Modifier_InitSourceInfo(self, p);
     ModifierAction_InitializeSecondary(self, p);
@@ -90,7 +90,7 @@ void CoffinBike_InitializeStyleModifiers(struct CoffinBike *p)
     if (self->primaryKind == 5)
         ActorEffect_EmitOffsetPair(self, &p->model, &self->primaryCallback,
                                    Character_OnActionSoundCue, p->participant + 1);
-    Modifier_InitDrainState(self->drain, p->model.parts[0].drainSource, 120, 1);
+    Modifier_InitDrainState(self->drain, &p->model.view.parts[0].x, 120, 1);
     Modifier_InitFourthSourceEffect(self, p);
     self->fourthValue = ModifierStats_ApplyKind3(self, self->fourthValue);
     Character_SetLowResourceColorEffect(&self->emitter, &self->style);

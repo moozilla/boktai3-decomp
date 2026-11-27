@@ -3,5 +3,5 @@
 void Anim_SetKeyframes(void *, void *, u32, u32, u32);
 void CoffinBike_SetAnimationKeyframes(struct CoffinBike *s, u32 x)
 {
-    Anim_SetKeyframes(&s->model.parts[2], s->model.primaryAnimation, (u16)x, 1, 0);
+    Anim_SetKeyframes(&s->model.view.parts[2], &s->model.resource, (u16)x, 1, 0);
 }

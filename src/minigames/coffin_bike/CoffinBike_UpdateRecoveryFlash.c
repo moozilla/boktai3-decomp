@@ -142,7 +142,7 @@ void CoffinBike_UpdateRecoveryFlash(struct CoffinBike *p)
     if (p->blinkTimer) {
         p->blinkTimer--;
     } else {
-        if ((p->model.parts[0].flags) & 1)
+        if ((p->model.view.parts[0].flags) & 1)
             CharacterModel_ClearAnimationFlags(&p->model, 1);
         else
             CharacterModel_SetAnimationFlags(&p->model, 1);
@@ -171,7 +171,7 @@ void CoffinBike_UpdateRecoveryFlash(struct CoffinBike *p)
             current->bits = target->bits;
             CharacterModel_ClearAnimationFlags(&p->model, 1);
             CoffinBike_ChangeUpdate(p, (void (*)(void *))CoffinBike_UpdateStopping);
-            ActorMarkerPool_ShowMarker(p->marker);
+            ActorMarkerPool_ShowMarker((s8)p->model.primaryAppearance);
             {
                 s32 mask = ~1;
                 *flags &= mask;

@@ -91,7 +91,7 @@ static inline s32 *CoffinBike_AccumulateResource(struct CoffinBike *p, s32 amoun
     *balance += amount;
     return balance;
 }
-static inline void CoffinBike_ClearAnimationFlags(struct CoffinBikeModel *model, u32 flags)
+static inline void CoffinBike_ClearAnimationFlags(struct CharacterPreviewModel *model, u32 flags)
 {
     CharacterModel_ClearAnimationFlags(model, flags);
 }
@@ -146,14 +146,14 @@ void CoffinBike_UpdatePostState(struct CoffinBike *p)
                     CharacterModel_SetAnimationFlags(&p->model, 0x200);
                 } else {
                     CharacterModel_SetAnimationFlags(&p->model, 1);
-                    ActorMarkerPool_HideMarker(p->marker);
+                    ActorMarkerPool_HideMarker((s8)p->model.primaryAppearance);
                 }
             } else
                 CharacterModel_SetAnimationFlags(&p->model, 0x200);
         } else {
             CoffinBike_ClearAnimationFlags(&p->model, 0x200);
             CharacterModel_ClearAnimationFlags(&p->model, 1);
-            ActorMarkerPool_ShowMarker(p->marker);
+            ActorMarkerPool_ShowMarker((s8)p->model.primaryAppearance);
         }
         {
             struct CoffinBikeMotion *view = &p->motion;
