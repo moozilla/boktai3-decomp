@@ -585,3 +585,5 @@ include/system/time_palette_transitions/time_palette.h,include/system/clock/time
 include/monsters/enemy_particle.h,include/effects/particles/enemy_particle.h,Shared enemy attack particle pool,,
 include/engine/video/sprite_component.h,include/engine/video/sprite_component.h,shared scene sprite component layout,,
 include/link/handshake/slot_monitor.h,include/link/handshake/slot_monitor.h,owned by src/link/handshake,,
+include/link/player/directional_particle_vector.h,include/link/player/directional_particle_vector.h,shared layout recovered with Player_EmitRandomSpark,,
+include/system/solar/solar_measurement_task.h,include/system/solar/solar_measurement_task.h,shared layout recovered with Solar_UpdateMeasurement,,

@@ -2,14 +2,12 @@
 #include "engine/math/scene_vec.h"
 #include "engine/engine_globals.h"
 #include "engine/ram.h"
+#include "link/player/directional_particle_vector.h"
 
 extern const s16 gUnk_086149C4[];
 
-struct BitVec {
-    u32 x : 16, y : 16, z : 16, pad : 16;
-};
-
-void DirectionalEffect_AddParticle(void *, struct BitVec *, struct BitVec *, u32);
+void DirectionalEffect_AddParticle(void *, struct DirectionalParticleVector *,
+                                   struct DirectionalParticleVector *, u32);
 
 static inline s32 scale(s32 product)
 {
@@ -20,7 +18,7 @@ static inline s32 scale(s32 product)
 
 void Player_EmitRandomSpark(void *p, struct SceneVec *in, u32 angle, u32 extra)
 {
-    struct BitVec a, b;
+    struct DirectionalParticleVector a, b;
     s32 k;
     u16 *tbl = gRandomTable;
     a.x = (RAND() % 32) + in->x - 15;
