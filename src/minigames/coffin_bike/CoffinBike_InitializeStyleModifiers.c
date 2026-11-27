@@ -1,4 +1,5 @@
 #include "global.h"
+#include "engine/engine_pause.h"
 #include "scene/areas/area_effect_link.h"
 #include "scene/actor/scene_actor_style.h"
 #include "engine/engine.h"
@@ -48,8 +49,7 @@ static inline struct AreaEffectLinkState *CoffinBike_ReadStyleSession(struct Cof
 void CoffinBike_InitializeStyleModifiers(struct CoffinBike *p)
 {
     struct CoffinBikeMotion *self = &p->motion;
-    u32 mask = 0x800;
-    if ((gEngineFlags | gScenePauseFlags) & mask) {
+    if (Engine_PauseBits(0x800)) {
         s32 player;
         struct AreaEffectLinkState *link;
         struct LinkStylePayload *payload;

@@ -1,4 +1,5 @@
 #include "global.h"
+#include "engine/engine_pause.h"
 #include "engine/ram.h"
 #include "engine/engine_globals.h"
 struct MotionActorState {
@@ -34,8 +35,7 @@ void MotionActor_RunPendingScript(struct MotionActor *actor)
     struct MotionActorState *state = &actor->state;
     if (actor->scriptRequested) {
         if (actor->script) {
-            u32 mask = 0x800;
-            if (!((gEngineFlags | gScenePauseFlags) & mask))
+            if (!Engine_PauseBits(0x800))
                 Hud_SetMode(7);
             Script_Call(actor->script, 0);
         }

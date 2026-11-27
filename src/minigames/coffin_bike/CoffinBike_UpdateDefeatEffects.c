@@ -1,4 +1,5 @@
 #include "global.h"
+#include "engine/engine_pause.h"
 #include "scene/actor/scene_actor_style.h"
 #include "system/game_state/game_state.h"
 #include "engine/ram.h"
@@ -150,8 +151,7 @@ void CoffinBike_UpdateDefeatEffects(struct CoffinBike *p)
         CharacterModel_LoadPrimaryPalette(&p->model);
         CharacterModel_LoadSecondaryPalette(&p->model, *style);
         {
-            u32 mask = 0x800;
-            if ((gEngineFlags | gScenePauseFlags) & mask) {
+            if (Engine_PauseBits(0x800)) {
                 struct AreaEffectLinkState *peer = gLinkSession;
                 if (peer) {
                     if (peer->unavailable != 1)
@@ -261,8 +261,7 @@ void CoffinBike_UpdateDefeatEffects(struct CoffinBike *p)
     if (p->timer > 120) {
         void (*callback)(void *);
         u8 *active;
-        u32 mask = 0x800;
-        if (((gEngineFlags | gScenePauseFlags) & mask) ||
+        if ((Engine_PauseBits(0x800)) ||
             (status = GameState_TestWorldFlags(0x100))) {
             callback = (void (*)(void *))CoffinBike_UpdateRecoveryFlash;
             active = &p->active;
