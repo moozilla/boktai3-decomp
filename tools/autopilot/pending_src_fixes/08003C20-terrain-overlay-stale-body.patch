@@ -1,0 +1,31 @@
+08003C20 TerrainOverlay_Update stale body (sprite read at 08003D00)
+
+Armor_InitFromScript queues its body with the overlay. Armor_Destroy
+unregisters that body with SceneBody_Unregister, leaving the overlay entry
+live when the reward reuses the actor storage. In the power-on movie in
+scene 2803, r4 at the original sprite read still names 0200E3E0 and r1
+becomes 800010E0 at mGBA frame 70513. The ROM continues through the read.
+The corresponding wasm access traps outside linear memory at port frame
+69282. Validate the body against the live registry before dereferencing it.
+
+The explicit form differed. The guarded copy matched the full 1660-byte
+translation unit at 08003B44 with the stock compiler.
+
+--- a/src/scene/terrain/terrain_overlay.c
++++ b/src/scene/terrain/terrain_overlay.c
+@@ -125,6 +125,15 @@
+         s32 quadrant, yFixed, y, x, z;
+         if (!entry->used)
+             continue;
++#ifdef UBFIX
++        /* SceneBody_Unregister can leave the overlay holding a recycled body. */
++        if (SceneBody_GetById(entry->id) != actor) {
++            entry->used = 0;
++            entry->id = 0;
++            entry->actor = 0;
++            continue;
++        }
++#endif
+         if (actor->keyframeDisplay && (actor->keyframeDisplay->flags & 1))
+             continue;
+         {

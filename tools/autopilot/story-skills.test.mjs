@@ -319,6 +319,21 @@ test('a pressure-plate preview rolls back a falling attack', () => {
   assert.equal(state.restores, 2);
 });
 
+test('navigation can route around a live floor trap', () => {
+  const tiles = [
+    { state: 1, triggerFlags: 0, position: { x: 384, y: 256, z: 128 } },
+    { state: 1, triggerFlags: 0x200, position: { x: 384, y: 256, z: 384 } },
+    { state: 3, triggerFlags: 0, position: { x: 640, y: 256, z: 384 } },
+  ];
+  const game = { gTileTriggerManager: { tiles, used: 7 } };
+  const { floorTrapCells } = skill('floor-traps', {}, game);
+  const { findPath } = skill('world', {});
+  const grid = { at: (x, z) => x >= 0 && x < 3 && z >= 0 && z < 2 ? { open: true, level: 1 } : null };
+  const traps = floorTrapCells();
+  assert.deepEqual([...traps], ['1,0']);
+  assert.deepEqual(findPath(grid, [0, 0], new Set(['2,0']), traps), [[0, 0], [0, 1], [1, 1], [2, 1], [2, 0]]);
+});
+
 test('the vampire model uses signed health and the source sunlight flag', () => {
   const addr = 0x02010000;
   const values = { [addr + 0x94]: 310, [addr + 0x9c]: 0x10, [addr + 0x3ac]: 1, [addr + 0x54]: 400 };
@@ -435,6 +450,23 @@ test('resumed combat uses the session clock while waiting for a story script', (
   assert.equal(result.done, true);
   assert.equal(result.value.steps, 0);
   assert.equal(result.value.frames, 120);
+});
+
+test('a permanently downed skeleton cannot return as a lock-on target', () => {
+  const view = { $addr: 8, state2A8: 3, controlKind: 0x39, update: 4 };
+  const skeleton = { revivalDelay: 20000, actionFlags: 0x10 };
+  const g = { name: () => 'Skeleton_UpdateBehaviorCallbacks', at: () => skeleton };
+  const lib = skill('world', g);
+  skill('skeletons', g, {}, lib);
+  const target = { addr: 8, health: 1, alive: true };
+  Object.assign(lib, {
+    where: () => ({ scene: 1 }),
+    barrierTargets: () => [], vampireTargets: () => [], hresvelgrTargets: () => [],
+    enemies: () => [{ ...target, view }], targets: () => [target],
+  });
+  assert.deepEqual(lib.fightTargets(), []);
+  skeleton.revivalDelay = 300;
+  assert.equal(lib.fightTargets()[0].addr, target.addr);
 });
 
 test('coffin navigation holds A until the exit text opens', () => {
