@@ -1,12 +1,5 @@
 #include "global.h"
-struct PaletteTransitionBanks {
-    u16 source[16][16];
-    u16 destination[16][16];
-    u16 target[16][16];
-    u8 pad600[2];
-    u8 firstBank;
-    u8 extraBank;
-};
+#include "ui/books/palette_transition_banks.h"
 void Palette_CopyBank(u16 *, u16 *);
 void PaletteTransition_CopyBanks(struct PaletteTransitionBanks *p, u8 *data, u32 first, u32 extra)
 {
